@@ -23,10 +23,10 @@ events:
     text: "อายุ {อายุ} ปี ถึงเวลาหางานทำ เงินติดตัว {เงิน} บาท"
     choices:
       - text: "รับงานมั่นคงเงินเดือนน้อย"
-        effects: { money: { unit: fixed_baht, amount: 30000 }, happiness: -1 }
+        effects: { money: { unit: income_x, amount: 1 }, happiness: -1 }
         merit: [{ cat: neutral }]
       - text: "ลองงานเสี่ยงที่ผลตอบแทนสูง"
-        effects: { money: { unit: fixed_baht, amount: 80000 }, health: -1, relations: -1 }
+        effects: { money: { unit: income_x, amount: 2.5 }, health: -1, relations: -1 }
         merit: [{ cat: neutral }]
   - id: retirement
     type: A
@@ -40,5 +40,5 @@ events:
         effects: { relations: 2, happiness: 2, health: 1 }
         merit: [{ cat: neutral }]
       - text: "ทำงานต่ออีกหน่อย"
-        effects: { money: { unit: fixed_baht, amount: 100000 }, health: -1, happiness: -1 }
+        effects: { money: { unit: income_x, amount: 3 }, health: -1, happiness: -1 }
         merit: [{ cat: neutral }]
