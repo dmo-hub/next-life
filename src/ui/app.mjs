@@ -62,6 +62,7 @@ function render(card) {
     const chart = sparkline(card.moneySeries);
     if (chart) box.append(chart);
     box.append(el('p', 'sub', `เงิน ${baht(card.money)} ≈ ${baht(card.moneyAtBirth)} ค่าเงินปีเกิด`));
+    if (card.disclaimer) box.append(el('p', 'note', card.disclaimer));
     const b = el('button', 'choice', 'ต่อไป');
     b.onclick = () => render(nextCard(st));
     box.append(b);
@@ -69,7 +70,14 @@ function render(card) {
     const b = el('button', 'choice', 'ต่อไป');
     b.onclick = () => render(nextCard(st));
     box.append(b);
-  } else if (card.kind === 'event') {
+  } else if (card.kind === 'event' || card.kind === 'alloc') {
+    if (card.items?.length) {
+      const ul = el('ul', 'items');
+      for (const it of card.items) ul.append(el('li', null, it));
+      box.append(ul);
+    }
+    if (card.simulatedFrom) box.append(el('p', 'note', `ผลตั้งแต่ปี ${card.simulatedFrom} เป็นอนาคตจำลอง`));
+    if (card.disclaimer) box.append(el('p', 'note', card.disclaimer));
     card.choices.forEach((c, i) => {
       const b = el('button', 'choice', c);
       b.onclick = () => {

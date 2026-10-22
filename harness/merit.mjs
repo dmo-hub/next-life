@@ -25,6 +25,8 @@ const score = (c) =>
     return s + (SIN_CATS.includes(id) ? -v : v);
   }, 0);
 const extreme = (sign) => (card, rng, st) => {
+  // การ์ดจัดสรรเงินไม่มีป้ายบุญบาป — เลือกตัวแรกโดยไม่ดึงเลขสุ่ม ลำดับการเลือกของบอทจึงเหมือนก่อนมีการ์ดนี้
+  if (st.pending.alloc) return 0;
   const s = st.pending.choices.map((c) => sign * score(c));
   const best = Math.max(...s);
   const ties = s.flatMap((v, i) => (v === best ? [i] : []));

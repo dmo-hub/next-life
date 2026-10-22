@@ -68,14 +68,21 @@ export function expectedDeathAge(era, sex, birthYear) {
 export const periodE0 = (era, sex, year) => at(era.mort.e0[sex], year);
 export const infantMortality = (era, sex, year) => at(era.mort.imr[sex], year);
 
-// ปีหลังข้อมูลล่าสุด: เลือกค่าจริงจากอดีตด้วย hash ของ seed กับปี — ชีวิตเดิมได้อนาคตเดิม และไม่กินลำดับสุ่มของโลก
-export function inflationRate(era, seed, year) {
-  const c = era.cpi;
-  if (year < c.from + c.v.length) return at(c, year);
-  const pool = c.v.slice(c.sampleFrom - c.from);
+// ปีอนาคตยืมทั้งปีจากอดีตปีเดียว (ปีต้นแบบ) แล้วทุกชุด (เงินเฟ้อ หุ้น ทอง ดอกเบี้ย) อ่านค่าของปีนั้นพร้อมกัน
+// — คงความสัมพันธ์ข้ามสินทรัพย์ของปีจริงไว้ · hash ของ seed กับปี ชีวิตเดิมได้อนาคตเดิม และไม่กินลำดับสุ่มของโลก
+export function protoYear(era, seed, year) {
+  const { from, to } = era.future;
   let h = Math.imul((seed ^ Math.imul(year, 0x9e3779b1)) >>> 0, 0x85ebca6b) >>> 0;
   h ^= h >>> 13;
-  return pool[(h >>> 0) % pool.length];
+  return from + ((h >>> 0) % (to - from + 1));
+}
+
+// ชุดรายปีที่จบก่อนปีนี้ใช้ปีต้นแบบ — ทุกชุดจึงข้ามไปอนาคตด้วยปีต้นแบบเดียวกัน
+export const seriesYear = (era, seed, series, year) => (year < series.from + series.v.length ? year : protoYear(era, seed, year));
+export const seriesAt = (era, seed, series, year) => at(series, seriesYear(era, seed, series, year));
+
+export function inflationRate(era, seed, year) {
+  return seriesAt(era, seed, era.cpi, year);
 }
 
 export const lastCpiYear = (era) => era.cpi.from + era.cpi.v.length - 1;

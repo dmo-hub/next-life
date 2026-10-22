@@ -1,17 +1,27 @@
 import { makeRng } from './rng.mjs';
 import { pickBirthYear, qx, priceRatio, inflationRate, infantMortality, lastCpiYear, eraEventsAt } from './era.mjs';
-import { pickRegion, regionRatio, nationalIncome, classOdds } from './birth.mjs';
+import { pickRegion, regionRatio, classOdds } from './birth.mjs';
+import { monthlyWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER } from './finance.mjs';
 import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN } from './merit.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
-// เรียงตามเส้นแบ่งฐานะใน data/birthplace.json (rules.classes) — ต่ำไปสูง
-export const CLASSES = ['ยากจน', 'ชนชั้นกลาง', 'ร่ำรวย'];
-// ค่าแถบเริ่มตามฐานะยังเป็นค่าตั้งของเกม ไม่มีสถิติให้แปลงตรง ๆ
-const START = {
-  ยากจน: { health: 55, happiness: 50, knowledge: 30, relations: 60 },
-  ชนชั้นกลาง: { health: 65, happiness: 55, knowledge: 45, relations: 60 },
-  ร่ำรวย: { health: 75, happiness: 60, knowledge: 60, relations: 55 },
-};
+// 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
+// ชื่อเดิม 3 ระดับ (ยากจน · ชนชั้นกลาง · ร่ำรวย) คงไว้ที่ระดับ 3 · 6 · 9 เนื้อหาที่อ้างชื่อเดิมจึงยังใช้ได้
+export const CLASSES = ['ยากไร้', 'ยากจนมาก', 'ยากจน', 'ค่อนข้างจน', 'ชนชั้นกลางล่าง', 'ชนชั้นกลาง', 'ชนชั้นกลางบน', 'มีอันจะกิน', 'ร่ำรวย', 'มั่งคั่ง'];
+// ค่าแถบเริ่มเป็นค่าตั้งของเกม ไม่มีสถิติให้แปลงตรง ๆ — ตั้งไว้ 3 จุด ระดับอื่นลากเส้นตรงผ่าน (ปลายสองข้างต่อเส้นออกไป)
+const START_ANCHORS = [
+  [2, { health: 55, happiness: 50, knowledge: 30, relations: 60 }],
+  [5, { health: 65, happiness: 55, knowledge: 45, relations: 60 }],
+  [8, { health: 75, happiness: 60, knowledge: 60, relations: 55 }],
+];
+// ค่าเริ่มของแต่ละคนสุ่ม ±START_JITTER รอบค่าของฐานะ — คนฐานะเดียวกันไม่เกิดมาเหมือนกันทุกคน
+export const START_JITTER = 8;
+export function startStats(cls) {
+  const d = CLASSES.indexOf(cls);
+  const [a, b] = d <= START_ANCHORS[1][0] ? [START_ANCHORS[0], START_ANCHORS[1]] : [START_ANCHORS[1], START_ANCHORS[2]];
+  const t = (d - a[0]) / (b[0] - a[0]);
+  return Object.fromEntries(Object.keys(a[1]).map((k) => [k, a[1][k] + (b[1][k] - a[1][k]) * t]));
+}
 // ตารางกลางแปลงระดับ ±1/±2/±3 เป็นตัวเลข (ใบ 07) ปรับสมดุลที่จุดเดียว · ไม่เป็นเส้นตรงเพื่อให้ ±3 เป็นเหตุใหญ่จริง
 export const LEVELS = { 1: 5, 2: 12, 3: 20 };
 const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations'];
@@ -53,12 +63,10 @@ function weighted(rng, items, weights) {
   return items[items.length - 1];
 }
 
-// เงินเก็บต่อปี เป็นบาทของปีนั้น: รายได้ครัวเรือนทั่วประเทศปีนั้น × สัดส่วนภาค × รายได้เฉลี่ยของฐานะในภาคนั้น × อัตราออม
+// เงินเก็บต่อปี เป็นบาทของปีนั้น: ค่าจ้างตามอาชีพ × ภาค ทั้งปี × อัตราออม (ใบ 14)
 export function yearlySaving(st, year = st.birthYear + st.age) {
   const era = st.content.era;
-  const ratio = regionRatio(era.birth, st.ses, year);
-  const factor = classOdds(era.birth, ratio)[CLASSES.indexOf(st.cls)].factor;
-  return nationalIncome(era, st.seed, year) * 12 * ratio * factor * era.birth.saveRate;
+  return monthlyWage(era, st.seed, st.occupation, st.ses, year) * 12 * era.birth.saveRate;
 }
 
 export function newLife(seed, content) {
@@ -69,7 +77,10 @@ export function newLife(seed, content) {
   const region = pickRegion(rng, era.birth);
   const odds = classOdds(era.birth, regionRatio(era.birth, region.ses, birthYear));
   const cls = weighted(rng, CLASSES, odds.map((o) => o.p));
-  const s = START[cls];
+  // ค่าเริ่มสุ่มจาก stream แยก — ไม่กินเลขสุ่มของโลก ลำดับสุ่มการตายจึงเหมือนก่อนมีการสุ่มนี้
+  const jit = makeRng(seed ^ 0x6a09e667);
+  const s = Object.fromEntries(Object.entries(startStats(cls)).map(([k, v]) => [k, clamp(v + (jit.next() * 2 - 1) * START_JITTER)]));
+  const occupation = pickOccupation(era, seed, cls);
   const st = {
     rng,
     seed,
@@ -79,6 +90,14 @@ export function newLife(seed, content) {
     region: region.name,
     ses: region.ses,
     cls,
+    occupation: occupation.id,
+    occupationName: occupation.name,
+    edu: occupation.edu,
+    // สัดส่วนเงินต่อสินทรัพย์ ปรับคืนทุกต้นปี · ก่อนการ์ดจัดสรรใบแรกเงินอยู่ในเงินฝาก
+    alloc: { deposit: 1 },
+    lastAllocYear: null,
+    // ยอดสุทธิตอนตาย ให้ระหว่างชาติ/รุ่นถัดไป (B06) อ่าน — มีค่าเมื่อตายแล้วเท่านั้น
+    estate: null,
     age: 0,
     health: s.health,
     happiness: s.happiness,
@@ -96,6 +115,8 @@ export function newLife(seed, content) {
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
     price: 1,
+    // ผลตอบแทนจริงรายปีของสินทรัพย์เสี่ยงที่ถือ ตั้งแต่การ์ดใบก่อน — การ์ดสรุปเล่าย้อนหลังแล้วล้าง
+    returns: [],
     trail: [],
     lastCardAge: 0,
     lastCardMoney: 0,
@@ -108,7 +129,7 @@ export function newLife(seed, content) {
     cards: 0,
     log: [],
   };
-  st.money = era.birth.startMoney[cls] * yearlySaving(st);
+  st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
   st.lastCardMoney = st.money;
   st.trail.push({ year: birthYear, money: Math.round(st.money) });
   return st;
@@ -159,6 +180,16 @@ export function moneyValue(st, m) {
 function applyEffects(st, fx = {}) {
   for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + levelValue(fx[k]));
   if (fx.money) st.money += moneyValue(st, fx.money);
+  if (fx.invest) invest(st, fx.invest);
+}
+
+// ย้ายสัดส่วน share ของเงินทั้งหมดเข้าสินทรัพย์เดียว · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
+function invest(st, { asset, share }) {
+  if (!assetOpen(st.content.era, asset, st.birthYear + st.age)) throw new Error(`${assetName(asset)} ยังไม่มีในปี ${st.birthYear + st.age}`);
+  const next = {};
+  for (const [id, w] of Object.entries(st.alloc)) next[id] = w * (1 - share);
+  next[asset] = (next[asset] ?? 0) + share;
+  st.alloc = next;
 }
 
 // เดินหนึ่งปี: ทุกอย่างไหลเป็นรายปีในลูปนี้ที่เดียว การกระโดดหลายปีจึงได้ผลเท่ากับเดินทีละปีเสมอ
@@ -174,6 +205,15 @@ function stepYear(st) {
   st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
   st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * (100 - st.knowledge)) / 100);
   st.relations = clamp(st.relations * (1 - RELATION_FADE));
+  // ผลตอบแทนคิดกับเงินต้นปีก่อนเงินเก็บของปีนี้เข้า · ติดลบ = หนี้ ทบดอกเบี้ยเงินกู้ของปีนั้น
+  const era = st.content.era;
+  if (st.money > 0) {
+    st.money *= 1 + portfolioReturn(era, st.seed, st.alloc, year);
+    for (const id of Object.keys(st.alloc)) {
+      if (id === 'cash' || id === 'deposit' || !assetOpen(era, id, year)) continue;
+      st.returns.push({ year, id, r: assetReturn(era, st.seed, id, year) });
+    }
+  } else if (st.money < 0) st.money *= 1 + lendingRate(era, st.seed, year);
   if (st.age >= 22 && st.age < 60) st.money += yearlySaving(st, year);
   st.trail.push({ year, money: Math.round(st.money) });
 
@@ -186,6 +226,7 @@ function stepYear(st) {
     st.due.push({ kind: 'omen', tone, age: st.age, stage, text: omenText(tone, st.seed, st.age) });
   }
   if (stage !== prevStage) st.due.push({ kind: 'stage', age: st.age, stage, text: `เข้าสู่ช่วง${stage}` });
+  if (isAllocAge(st.age)) st.due.push(allocCard(st, year, stage));
   for (const e of eraEventsAt(st.content.era, year)) {
     if (e.from === year && (!e.regions || e.regions.includes(st.region))) {
       st.due.push({ kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: `ปี ${year} ${e.name}` });
@@ -202,8 +243,13 @@ function summaryCard(st) {
     items.push(`เงิน ${Math.round(st.lastCardMoney).toLocaleString('en-US')} → ${money.toLocaleString('en-US')} บาท`);
   }
   const year = st.birthYear + st.age;
+  const lastReal = st.content.era.future.to;
+  for (const x of st.returns) items.push(`ปี ${x.year} ${assetName(x.id)} ${formatReturn(x.r)}${x.year > lastReal ? ' (อนาคตจำลอง)' : ''}`);
+  const disclaimer = st.returns.length ? DISCLAIMER : null;
+  st.returns = [];
   return {
     kind: 'summary',
+    disclaimer,
     fromAge: from,
     age: st.age,
     stage: stageOf(st.age),
@@ -212,6 +258,24 @@ function summaryCard(st) {
     money,
     moneyAtBirth: Math.round(st.money / st.price),
     moneySeries: st.trail.filter((p) => p.year >= st.birthYear + from && p.year <= year),
+  };
+}
+
+// การ์ดจัดสรรเงิน (ใบ 11) เล่าผลจริงของช่วงที่ผ่านมาก่อนให้เลือก — ไม่บอกปีถัดไป · ตัวเลือกสร้างตอนออกการ์ด
+function allocCard(st, year, stage) {
+  const era = st.content.era;
+  const from = st.lastAllocYear === null ? year - ALLOC.every + 1 : st.lastAllocYear + 1;
+  const items = periodReturns(era, st.seed, from, year).map((x) => `${x.name} ${formatReturn(x.r)}`);
+  items.push(`ของแพงขึ้น ${formatReturn(priceRatio(era, st.seed, from - 1, year) - 1)}`);
+  return {
+    kind: 'alloc',
+    age: st.age,
+    stage,
+    text: `อายุ ${st.age} ปี ทบทวนเงินเก็บ ${Math.round(st.money).toLocaleString('en-US')} บาท · ผลจริงช่วงปี ${from}–${year}`,
+    items,
+    disclaimer: DISCLAIMER,
+    simulatedFrom: year > era.future.to ? Math.max(from, era.future.to + 1) : null,
+    choices: [],
   };
 }
 
@@ -227,7 +291,15 @@ export function nextCard(st) {
   if (st.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
   if (st.dead) return deathCard(st);
   // การ์ดเปลี่ยนช่วง/เหตุการณ์ยุคเป็นใบของตัวเอง ตามหลังการ์ดสรุปของปีเดียวกัน
-  if (st.queue.length) return emit(st, st.queue.shift());
+  if (st.queue.length) {
+    const card = st.queue.shift();
+    if (card.kind === 'alloc') {
+      const options = allocOptions(st.content.era, st.birthYear + st.age);
+      card.choices = options.map((o) => o.label);
+      st.pending = { alloc: options };
+    }
+    return emit(st, card);
+  }
   for (;;) {
     if (st.advance) {
       // สุ่มตายของปีที่อายุ st.age ก่อนขึ้นปีใหม่ — ทารกจึงตายได้ตั้งแต่ขวบปีแรกตามอัตราตายทารกจริง และอายุบนการ์ดตายเป็นปีเต็ม
@@ -246,7 +318,9 @@ export function nextCard(st) {
       st.due = [];
       return emit(st, card);
     }
-    const ev = st.content.events.find((e) => !st.done[e.id] && (e.age === st.age || isScheduled(st, e.id)) && flagsOk(st, e.when));
+    // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
+    const year = st.birthYear + st.age;
+    const ev = st.content.events.find((e) => !st.done[e.id] && (e.age === st.age || isScheduled(st, e.id)) && inYears(e, year) && flagsOk(st, e.when));
     if (ev) st.done[ev.id] = true;
     st.scheduled = st.scheduled.filter((x) => x.age >= st.age && !st.done[x.event]);
     if (ev) {
@@ -266,6 +340,7 @@ export function nextCard(st) {
 }
 
 const isScheduled = (st, id) => st.scheduled.some((x) => x.event === id && x.age === st.age);
+const inYears = (e, year) => !e.years || (year >= e.years[0] && year <= e.years[1]);
 function flagsOk(st, when) {
   const f = when?.flags;
   if (!f) return true;
@@ -284,6 +359,15 @@ function applyChoice(st, ev, c) {
 
 export function choose(st, idx) {
   const ev = st.pending;
+  if (ev?.alloc) {
+    const opt = ev.alloc[idx];
+    if (!opt) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    st.pending = null;
+    if (opt.alloc) st.alloc = opt.alloc;
+    st.lastAllocYear = st.birthYear + st.age;
+    st.log.push({ id: 'alloc', age: st.age, choice: idx });
+    return;
+  }
   if (!ev || !ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
   st.pending = null;
   applyEffects(st, ev.choices[idx].effects);
@@ -306,6 +390,7 @@ function deathCard(st) {
       simulatedFrom: year > lastCpiYear(era) ? lastCpiYear(era) + 1 : null,
     },
   };
+  st.estate = { year, money: card.summary.money, moneyAtBirth: card.summary.moneyAtBirth };
   // ใบ 07: ตายตอนเด็กได้บันทึกสั้นบอกสถิติยุคนั้น
   if (st.age < 5) {
     const imr = infantMortality(era, st.sex, st.birthYear);
@@ -318,7 +403,7 @@ function deathCard(st) {
 export const regionLabel = (st) => (st.ses === 'bkk' ? st.region : `ภาค${st.region}`);
 
 export function profileText(st) {
-  return `เกิดปี ${st.birthYear} · ${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls}`;
+  return `เกิดปี ${st.birthYear} · ${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls} · ${st.occupationName}`;
 }
 
 export function statsOf(st) {
@@ -335,6 +420,6 @@ export function playLife(seed, content, pickChoice, onCard) {
     const card = nextCard(st);
     onCard?.(card, st);
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
-    if (card.kind === 'event') choose(st, pickChoice(card, bot, st));
+    if (card.choices?.length) choose(st, pickChoice(card, bot, st));
   }
 }

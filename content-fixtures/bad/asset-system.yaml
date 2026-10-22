@@ -1,0 +1,13 @@
+# ย้ายเงินเข้าตลาดหุ้นแต่ไม่ประกาศ systems: [stock] — ด่านปีเลยกั้นปีก่อนตลาดเปิดไม่ได้ (ข้อความไม่มีคำของระบบ)
+events:
+  - id: invest_no_system
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "เพื่อนชวนเอาเงินไปลงตลาด"
+    choices:
+      - {text: "ลองลงตามเพื่อนครึ่งหนึ่ง", effects: {invest: {asset: stock, share: 0.5}}, merit: [{cat: neutral}]}
+      - {text: "ฝากธนาคารต่อ", merit: [{cat: neutral}]}
+      - {text: "ซื้อทองแทน", effects: {invest: {asset: gold, share: 0.3}}, merit: [{cat: neutral}]}
+      - {text: "ไม่ทำอะไร", merit: [{cat: neutral}]}

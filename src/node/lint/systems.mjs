@@ -1,5 +1,6 @@
 // กติกาปีสินทรัพย์/ระบบ: เหตุการณ์ที่อ้างระบบต้องประกาศใน systems และช่วงปีต้องไม่ก่อนระบบมีจริง (data/system-starts.json)
-import { isRange, list, textsOf } from './util.mjs';
+import { isObj, isRange, list, textsOf, effectSites } from './util.mjs';
+import { ASSETS } from '../../engine/finance.mjs';
 import { YEAR_MIN, YEAR_MAX } from './vocab.mjs';
 
 const declared = (e, ctx) => list(e.systems).map((id) => ({ id, sys: ctx.systems.get(id) }));
@@ -35,6 +36,17 @@ export const rules = [
     event(e, ctx, r) {
       const y = years(e);
       for (const { id, sys } of declared(e, ctx)) if (y && sys?.to !== undefined && y[1] > sys.to) r('.years', `${sys.name} (${id}) สิ้นสุดปี ${sys.to} แต่ years ถึง ${y[1]}`);
+    },
+  },
+  {
+    id: 'asset-system',
+    desc: 'ผลที่ย้ายเงินเข้าสินทรัพย์ที่มีปีเริ่ม (เช่น หุ้น) ต้องประกาศระบบนั้นใน systems — ด่านปีจึงกั้นการเสนอสินทรัพย์ก่อนปีที่มีจริงได้',
+    event(e, ctx, r) {
+      const have = new Set(list(e.systems));
+      for (const { node, path } of effectSites(e)) {
+        const asset = ASSETS.find((a) => isObj(node.effects) && a.id === node.effects.invest?.asset);
+        if (asset?.system && !have.has(asset.system)) r(`${path}.effects.invest`, `ลงเงินใน${asset.name} ต้องประกาศ systems: [${asset.system}]`);
+      }
     },
   },
   {

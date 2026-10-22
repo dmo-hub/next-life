@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { brassLx, e0FromLx, stdFor, MAX_AGE } from '../engine/era.mjs';
 import { normCdf } from '../engine/birth.mjs';
+import { CLASSES } from '../engine/life.mjs';
 import { lintDocs, formatProblem } from './lint/index.mjs';
 import { MERIT_CATS } from './lint/vocab.mjs';
 import { checkMeritTable } from '../engine/merit.mjs';
@@ -11,6 +12,13 @@ const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
 const json = (p) => JSON.parse(read(p));
 const SEXES = ['ชาย', 'หญิง'];
+
+// ค่ารายฐานะเรียงตาม CLASSES ของแกน — จำนวนต้องตรงกับจำนวนฐานะ ไม่งั้นฐานะท้าย ๆ ได้ undefined เงียบ
+function classList(xs, what, n) {
+  if (n !== CLASSES.length) throw new Error(`เส้นแบ่งฐานะให้ ${n} ระดับ แต่แกนมี ${CLASSES.length} ชื่อ`);
+  if (!Array.isArray(xs) || xs.length !== n || !xs.every((x) => x > 0)) throw new Error(`${what} ต้องเป็นเลขบวก ${n} ค่า`);
+  return xs;
+}
 const r = (v, d) => Number(v.toFixed(d));
 
 // แปลงเป็นรูปที่แกนเกมอ่าน: at_age → age (เหตุการณ์หลักไมล์) · label → text · cost → เงินจ่ายออก
@@ -130,8 +138,47 @@ export function loadBirth() {
     cutZ: rules.classes.cuts.map((c) => r(normInv(c), 6)),
     backcastGrowth: rules.before_2524.growth,
     saveRate: rules.save_rate.v,
-    startMoney: { ยากจน: rules.start_money.ยากจน, ชนชั้นกลาง: rules.start_money.ชนชั้นกลาง, ร่ำรวย: rules.start_money.ร่ำรวย },
+    startMoney: classList(rules.start_money.by_class, 'เงินติดตัว', rules.classes.cuts.length + 1),
   };
+}
+
+// ชุดการเงินในรูปที่แกนเกมอ่าน (B08) · real = ชุดที่ปีสุดท้ายเป็นข้อมูลจริง ใช้กำหนดช่วงปีต้นแบบอนาคต
+export function loadFinance() {
+  const f = json('data/finance.json');
+  const rules = f.rules;
+  const set = series([f.set_close.base, ...f.set_close.rows]);
+  const div = series(f.set_dividend.rows);
+  if (div.from !== set.from + 1 || div.v.length !== set.v.length - 1) throw new Error('ปีปันผลไม่ตรงกับปีดัชนีหุ้น');
+  const occupations = f.occupations.list.map(({ id, name, edu, wage }) => ({ id, name, edu, wage: wage.v }));
+  // อาชีพเรียงตามค่าจ้าง ฐานะสูงเล็งอาชีพค่าจ้างสูง · พื้น floor ให้ทุกอาชีพเกิดได้ทุกฐานะ
+  const { spread, floor } = rules.occupation_by_class;
+  const byWage = occupations.map((o, i) => i).sort((a, b) => occupations[a].wage - occupations[b].wage);
+  const rank = byWage.reduce((m, oi, r) => ((m[oi] = r), m), []);
+  const top = occupations.length - 1;
+  const occByClass = {};
+  CLASSES.forEach((cls, d) => {
+    const aim = (d * top) / (CLASSES.length - 1);
+    const w = occupations.map((o, i) => Math.exp(-((rank[i] - aim) ** 2) / (2 * spread ** 2)) + floor);
+    const sum = w.reduce((s, x) => s + x, 0);
+    occByClass[cls] = w.map((x) => x / sum);
+  });
+  const era = {
+    deposit: series(f.deposit.rows),
+    lending: series(f.lending.rows),
+    fx: series(f.fx.rows),
+    gold: series(f.gold_usd.rows),
+    setClose: set,
+    setDiv: div,
+    house: series(f.house_bkk.rows),
+    housePremium: rules.house_before_bis.premium,
+    minWage: series(f.min_wage_bkk.rows),
+    refYear: f.occupations.ref_year.y,
+    daysPerMonth: rules.days_per_month.v,
+    occupations,
+    occByClass,
+  };
+  const real = [era.deposit, era.lending, era.fx, era.gold, era.setClose, era.house];
+  return { era, real, sampleFrom: rules.future.sampleFrom };
 }
 
 export function loadEra() {
@@ -143,7 +190,12 @@ export function loadEra() {
   });
 
   const infl = json('data/inflation.json');
-  const firstReal = infl.rows.find((x) => !x.assumption).y;
+  const cpi = series(infl.rows);
+  const finance = loadFinance();
+  // ปีต้นแบบของอนาคตต้องมีค่าจริงครบทุกชุด จึงจบที่ชุดที่จบเร็วสุด
+  const lastOf = (s) => s.from + s.v.length - 1;
+  const future = { from: finance.sampleFrom, to: Math.min(lastOf(cpi), ...finance.real.map(lastOf)) };
+  if (future.from < cpi.from + 1 || future.from >= future.to) throw new Error(`ช่วงปีต้นแบบอนาคตใช้ไม่ได้ ${future.from}–${future.to}`);
 
   const m = json('data/mortality.json');
   const std = {};
@@ -177,7 +229,10 @@ export function loadEra() {
 
   return {
     births: { from: births.cbr.rows[0].y, w },
-    cpi: { ...series(infl.rows), sampleFrom: firstReal },
+    cpi,
+    future,
+    finance: finance.era,
+    systems: json('data/system-starts.json').systems.map(({ id, status, from, to }) => ({ id, status, from, to })),
     mort: {
       from: m.e0.ชาย[0].y,
       std,

@@ -12,3 +12,16 @@ events:
       - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  # B08: เสนอซื้อหุ้น (ประกาศระบบครบ) แต่ปีเริ่มก่อนตลาดหุ้นเปิด 2518
+  - id: bad_case_stock_early
+    type: A
+    stage: ทำงาน
+    years: [2510, 2650]
+    text: "เพื่อนชวนเอาเงินไปลงตลาด"
+    systems: [stock]
+    lore_ref: lore-finance-series.html#1
+    choices:
+      - {text: "ลองลงตามเพื่อนครึ่งหนึ่ง", effects: {invest: {asset: stock, share: 0.5}}, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

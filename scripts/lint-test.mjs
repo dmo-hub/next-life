@@ -3,8 +3,9 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { RULES, DOC_SHAPE, lintContext, lintDocs, formatProblem } from '../src/node/lint/index.mjs';
-import { loadEvents } from '../src/node/load.mjs';
-import { MERIT_CATS, MAX_LEN } from '../src/node/lint/vocab.mjs';
+import { loadEvents, loadEra } from '../src/node/load.mjs';
+import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
+import { MERIT_CATS, MAX_LEN, MIN_CHOICES } from '../src/node/lint/vocab.mjs';
 import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA } from '../src/engine/merit.mjs';
 
 const root = new URL('../', import.meta.url);
@@ -58,6 +59,21 @@ for (const [tone, xs] of Object.entries(OMEN_TEXT)) for (const s of xs) {
   if (s.length > MAX_LEN.text) fails.push(`ลาง ${tone}: ยาวเกิน ${MAX_LEN.text} "${s}"`);
   if (/[0-9๐-๙]/.test(s)) fails.push(`ลาง ${tone}: มีตัวเลข "${s}"`);
 }
+
+// การ์ดจัดสรรเงินสร้างในแกน ไม่ผ่านด่านเนื้อหา — ตรวจทุกปีของเกม: ≥4 ตัวเลือก · ยาว · คำต้องห้าม · หุ้นไม่โผล่ก่อน 2518
+const era = loadEra();
+const seenLabels = new Set();
+for (let y = 2500; y <= 2700; y++) {
+  const opts = allocOptions(era, y);
+  if (opts.length < MIN_CHOICES) fails.push(`การ์ดจัดสรรปี ${y}: ${opts.length} ตัวเลือก`);
+  if (y < 2518 && opts.some((o) => o.alloc?.stock)) fails.push(`การ์ดจัดสรรปี ${y}: เสนอหุ้นก่อนตลาดเปิด`);
+  for (const o of opts) seenLabels.add(o.label);
+}
+for (const s of [...seenLabels, DISCLAIMER]) {
+  for (const b of ctx.banned) if (b.re.test(s)) fails.push(`การ์ดจัดสรร: โดนคำต้องห้าม ${b.id} "${s}"`);
+  if (s.length > MAX_LEN.choice) fails.push(`การ์ดจัดสรร: ยาวเกิน ${MAX_LEN.choice} "${s}"`);
+}
+rows.push(['การ์ดจัดสรร 2500–2700', `${seenLabels.size} ข้อความ`]);
 
 try {
   rows.push(['content/', `ผ่าน ${loadEvents().length} เหตุการณ์`]);

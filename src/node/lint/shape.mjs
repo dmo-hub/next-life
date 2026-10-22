@@ -3,13 +3,15 @@ import {
   STAT_KEYS, EFFECT_KEYS, CLASSES, SEXES, STAGE_AGES, STAGE_NAMES, CATEGORIES, PLACEHOLDERS,
   ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES,
 } from './vocab.mjs';
+import { ASSETS } from '../../engine/finance.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem'],
   outcome: ['weight', 'text', 'effects', 'merit', 'sets_flags', 'schedules'],
-  effects: EFFECT_KEYS,
+  effects: [...EFFECT_KEYS, 'invest'],
+  invest: ['asset', 'share'],
   money: ['unit', 'amount', 'ref_year'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
@@ -59,6 +61,7 @@ function* shaped(e) {
     if (isObj(node.effects)) {
       yield ['effects', node.effects, `${path}.effects`];
       if (isObj(node.effects.money)) yield ['money', node.effects.money, `${path}.effects.money`];
+      if (isObj(node.effects.invest)) yield ['invest', node.effects.invest, `${path}.effects.invest`];
     }
     if (isObj(node.cost)) yield ['money', node.cost, `${path}.cost`];
     for (const [i, m] of list(node.merit).entries()) if (isObj(m)) yield ['merit', m, `${path}.merit[${i}]`];
@@ -251,6 +254,19 @@ export const rules = [
       const v = isObj(b.vow) ? b.vow : {};
       for (const [p, m] of [['.belief.stake', b.stake], ['.belief.vow.redeem_full_cost', v.redeem_full_cost], ['.belief.vow.redeem_light_cost', v.redeem_light_cost]]) {
         if (m !== undefined && !(isMoney(m) && m.amount > 0)) r(p, 'ต้องเป็นเงินมีหน่วย amount > 0');
+      }
+    },
+  },
+  {
+    id: 'invest-shape',
+    desc: `ย้ายเงินเข้าสินทรัพย์ effects.invest = {asset: ${ASSETS.map((a) => a.id).join('|')}, share: 0 < สัดส่วน ≤ 1}`,
+    event(e, ctx, r) {
+      for (const { node, path } of effectSites(e)) {
+        const v = isObj(node.effects) ? node.effects.invest : undefined;
+        if (v === undefined) continue;
+        if (!isObj(v) || !ASSETS.some((a) => a.id === v.asset) || !(typeof v.share === 'number' && v.share > 0 && v.share <= 1)) {
+          r(`${path}.effects.invest`, `ต้องเป็น {asset: id สินทรัพย์, share: 0–1} ได้ ${JSON.stringify(v)}`);
+        }
       }
     },
   },

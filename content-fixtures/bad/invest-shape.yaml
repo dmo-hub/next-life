@@ -1,0 +1,13 @@
+# invest อ้างสินทรัพย์ที่ไม่มี และสัดส่วนเกิน 1
+events:
+  - id: invest_bad_shape
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2530, 2650]
+    text: "มีเงินเหลือจากโบนัส"
+    choices:
+      - {text: "เอาไปซื้อพระเครื่อง", effects: {invest: {asset: amulet, share: 0.5}}, merit: [{cat: neutral}]}
+      - {text: "ฝากธนาคารเกินตัว", effects: {invest: {asset: deposit, share: 1.5}}, merit: [{cat: neutral}]}
+      - {text: "เก็บไว้ก่อน", merit: [{cat: neutral}]}
+      - {text: "เลี้ยงข้าวเพื่อน", effects: {relations: 1}, merit: [{cat: neutral}]}
