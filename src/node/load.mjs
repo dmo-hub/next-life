@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { brassLx, e0FromLx, stdFor, MAX_AGE } from '../engine/era.mjs';
 import { normCdf } from '../engine/birth.mjs';
+import { lintDocs, formatProblem } from './lint/index.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -10,23 +11,24 @@ const json = (p) => JSON.parse(read(p));
 const SEXES = ['ชาย', 'หญิง'];
 const r = (v, d) => Number(v.toFixed(d));
 
-export function loadEvents() {
-  const events = [];
-  for (const f of readdirSync(new URL('content/', root)).filter((n) => n.endsWith('.yaml')).sort()) {
-    const doc = parse(read(`content/${f}`));
-    for (const e of doc.events ?? []) {
-      if (!e.id || typeof e.age !== 'number' || !Array.isArray(e.choices) || !e.choices.length) {
-        throw new Error(`${f}: เหตุการณ์ ${e.id ?? '?'} ขาดฟิลด์บังคับ (id/age/choices)`);
-      }
-      events.push(e);
-    }
-  }
-  const ids = new Set();
-  for (const e of events) {
-    if (ids.has(e.id)) throw new Error(`id ซ้ำ: ${e.id}`);
-    ids.add(e.id);
-  }
-  return events;
+// แปลงเป็นรูปที่แกนเกมอ่าน: at_age → age (เหตุการณ์หลักไมล์) · label → text · cost → เงินจ่ายออก
+// ฟิลด์ที่แกนยังไม่อ่านคงไว้ครบ ใบถัดไปใช้ต่อได้โดยไม่ต้องแก้ loader
+function normalize(e) {
+  const choices = e.choices.map(({ label, cost, ...c }) => {
+    const effects = cost ? { ...c.effects, money: { ...cost, amount: -cost.amount } } : c.effects;
+    return { ...c, text: c.text ?? label, ...(effects && { effects }) };
+  });
+  return { ...e, ...(e.at_age !== undefined && { age: e.at_age }), choices };
+}
+
+export function loadEvents(dir = 'content/') {
+  const docs = readdirSync(new URL(dir, root))
+    .filter((n) => n.endsWith('.yaml'))
+    .sort()
+    .map((f) => ({ file: `${dir}${f}`, doc: parse(read(`${dir}${f}`)) }));
+  const problems = lintDocs(docs);
+  if (problems.length) throw new Error(`เนื้อหาไม่ผ่านด่าน ${problems.length} ข้อ\n${problems.map(formatProblem).join('\n')}`);
+  return docs.flatMap(({ doc }) => doc.events.map(normalize));
 }
 
 // แถวต้องเรียงปีติดกันไม่มีรู ไม่งั้นการเปิดดูด้วย index ปีผิดเงียบ

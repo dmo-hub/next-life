@@ -1,0 +1,9 @@
+# ผิดกติกาเดียว: ช่วงวัยที่ไม่มี
+events:
+  - id: bad_case_01
+    type: A
+    stage: วัยเกษียณ
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}

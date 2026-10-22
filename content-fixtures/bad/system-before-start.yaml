@@ -1,0 +1,11 @@
+# ผิดกติกาเดียว: พร้อมเพย์ก่อน 2560
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2550, 2650]
+    text: "ข้อความการ์ด"
+    systems: [promptpay]
+    lore_ref: lore-finance-series.html#6
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}

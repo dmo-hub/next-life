@@ -1,0 +1,12 @@
+# ผิดกติกาเดียว: เครื่องรางอ่านบัญชีบุญบาป
+events:
+  - id: bad_case_01
+    type: B
+    stage: ทำงาน
+    years: [2560, 2650]
+    text: "ข้อความการ์ด"
+    category: belief
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: amulet, tradition: พุทธ, odds_modifier: {source: merit_ledger.net}}
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}

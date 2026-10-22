@@ -1,0 +1,54 @@
+# ใช้ทุกฟิลด์ของใบ 07 แบบถูกต้อง — กันกติกาจับผิดของที่ควรผ่าน
+events:
+  - id: work_stock_first_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2518, 2650]
+    title: "บัญชีหุ้นบัญชีแรก"
+    text: "{ชื่อ} อายุ {อายุ} เงินเก็บ {เงิน} บาท เพื่อนที่{จังหวัด}ชวนเปิดบัญชีหุ้นปี {ปี}"
+    lore_ref: lore-finance-series.html#1
+    systems: [stock]
+    when:
+      age: [31, 45]
+      year: [2518, 2650]
+      class: [ชนชั้นกลาง, ร่ำรวย]
+      region: [กรุงเทพฯ และปริมณฑล, ตะวันออก]
+      sex: [ชาย, หญิง]
+      stats: {knowledge: {min: 40}, happiness: {min: 10, max: 90}}
+      flags: {has: [has_job], not: [in_debt]}
+      family: [{role: child, age: [17, 19], alive: true, relations: {min: 30}}]
+    weight: 2
+    multipliers: {class: {ร่ำรวย: 1.5}, stats: {knowledge: 1.2}, karma: 1.1, family_fame: 1.05}
+    hidden: [money]
+    choices:
+      - id: open_account
+        text: "ลองเปิดบัญชี{ครับ}"
+        outcomes:
+          - {weight: 3, text: "ราคาขึ้นช่วงแรก", effects: {happiness: 1, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ราคาตกหนักในปีนั้น", effects: {happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: help_parents
+        text: "เอาเงินไปช่วยพ่อแม่ก่อน"
+        effects: {relations: 2, money: {unit: fixed_baht, amount: -20000, ref_year: 2560}}
+        merit: [{cat: care_parents, level: 2}, {cat: dana, level: 1}]
+        sets_flags: [helped_parents]
+        schedules: [{event: work_parents_thanks_01, after_years: [1, 3]}]
+  - id: work_parents_thanks_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2518, 2650]
+    text: "พ่อแม่เล่าให้ญาติฟังว่าลูกคนนี้ช่วยบ้านมาตลอด"
+    when: {flags: {has: [helped_parents]}}
+    choices: []
+  - id: work_job_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    at_age: 23
+    years: [2500, 2650]
+    text: "ได้งานประจำแห่งแรก"
+    choices:
+      - {text: "รับงาน", sets_flags: [has_job], effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+      - {text: "กู้นอกระบบมาเปิดร้าน", sets_flags: [has_job, in_debt], merit: [{cat: neutral}]}

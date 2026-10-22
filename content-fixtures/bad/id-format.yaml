@@ -1,0 +1,9 @@
+# ผิดกติกาเดียว: id มีตัวใหญ่และขีด
+events:
+  - id: Bad-Case
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}

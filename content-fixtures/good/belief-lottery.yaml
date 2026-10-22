@@ -1,0 +1,27 @@
+# ตัวอย่าง YAML ตัวที่ 2 ของใบ 12 (หวยสายมู) — ส่วน belief ตามใบ · บรรทัด "# เติม" = ฟิลด์บังคับของใบ 07 ที่ตัวอย่างละไว้
+events:
+  - id: bel_lottery_dream_01                        # เติม
+    type: B                                         # เติม
+    category: belief                                # เติม
+    stage: ทำงาน                                    # เติม
+    years: [2560, 2650]                             # เติม
+    text: "เงินเดือนชนสิ้นเดือน คืนนั้นฝันเห็นเลขสามตัวชัดเจน"   # เติม
+    lore_ref: [lore-finance-belief.md#A, lore-finance-belief.md#B]   # เติม
+    belief:
+      kind: lottery_numen
+      tradition: ผสม
+      outside_canon: [odds_by_merit]
+      trigger: {money_state: tight}
+      cap_per_life: 5
+      prize_table: finance.lottery
+      stake: {unit: fixed_baht, amount: 80}
+      odds_modifier:
+        source: merit_ledger.net
+        formula: mult_up_only
+        max_mult: 4.0
+        prize_scope: small
+        direction: up_only
+        ref_scale: table.merit_ref
+    choices:                                        # เติม
+      - {id: buy, label: ซื้อสลากหนึ่งใบตามความฝัน, merit: [{cat: neutral}]}
+      - {id: skip, label: จดเลขไว้เฉย ๆ, merit: [{cat: neutral}]}

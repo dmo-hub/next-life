@@ -1,0 +1,56 @@
+# ตัวอย่าง YAML ตัวที่ 1 ของใบ 12 (บนบาน) — ส่วน belief และ choices[0] ตามใบ · บรรทัด "# เติม" = ฟิลด์บังคับของใบ 07 ที่ตัวอย่างละไว้
+# เหตุการณ์แก้บน 2 ใบ (ครั้งที่ 1 เลื่อนได้ · ครั้งที่ 2 ไม่แก้ได้) เติมเพราะ due_event/schedules ต้องชี้เหตุการณ์ที่มีจริง
+events:
+  - id: bel_vow_exam_01
+    type: B
+    category: belief
+    stage: วัยรุ่น                                  # เติม
+    years: [2500, 2650]                             # เติม
+    text: "พรุ่งนี้สอบเข้ามหาวิทยาลัย แม่พาไปไหว้ศาลเจ้าพ่อประจำเมือง"   # เติม
+    lore_ref: lore-finance-belief.md#B              # เติม
+    belief:
+      kind: vow
+      tradition: ผสม
+      outside_canon: [vow_broken]
+      vow:
+        deadline_years: [2, 5]
+        due_event: bel_vow_due_01
+        redeem_full_cost: {unit: fixed_baht, amount: 1500}
+        redeem_light_cost: {unit: income_x, amount: 0.05}
+        defer_once: true
+    choices:
+      - id: make_vow
+        label: บนบานไว้
+        sets_flags: [vow_open:exam_01]
+        schedules: [{event: bel_vow_due_01, after_years: [2, 5]}]
+        effects: {happiness: +1}
+        merit: [{cat: neutral}]
+      - id: just_pray                               # เติม
+        label: ไหว้ขอพรเฉย ๆ
+        merit: [{cat: neutral}]
+  - id: bel_vow_due_01
+    type: B
+    category: belief
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    text: "ถึงเวลาแก้บนที่เคยบนไว้ตอนสอบเข้า"
+    lore_ref: lore-finance-belief.md#B
+    when: {flags: {has: [vow_open:exam_01]}}
+    belief: {kind: vow, tradition: ผสม, outside_canon: [vow_broken]}
+    choices:
+      - {id: redeem_full, label: แก้บนเต็มตามที่บนไว้, redeem: full, cost: {unit: fixed_baht, amount: 1500}, clears_flags: [vow_open:exam_01], effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: redeem_light, label: แก้ตามกำลังที่มี, redeem: light, cost: {unit: income_x, amount: 0.05}, clears_flags: [vow_open:exam_01], effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: defer, label: ขอเลื่อนไปก่อน, redeem: defer, schedules: [{event: bel_vow_due_02, after_years: [1, 2]}], merit: [{cat: neutral}]}
+  - id: bel_vow_due_02
+    type: B
+    category: belief
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    text: "คำบนที่เลื่อนไว้ยังค้างอยู่"
+    lore_ref: lore-finance-belief.md#B
+    when: {flags: {has: [vow_open:exam_01]}}
+    belief: {kind: vow, tradition: ผสม, outside_canon: [vow_broken]}
+    choices:
+      - {id: redeem_full, label: แก้บนเต็มตามที่บนไว้, redeem: full, cost: {unit: fixed_baht, amount: 1500}, clears_flags: [vow_open:exam_01], effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: redeem_light, label: แก้ตามกำลังที่มี, redeem: light, cost: {unit: income_x, amount: 0.05}, clears_flags: [vow_open:exam_01], effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: skip, label: ไม่แก้แล้ว, redeem: none, clears_flags: [vow_open:exam_01], effects: {happiness: -1}, merit: [{cat: vow_broken, level: flag}]}

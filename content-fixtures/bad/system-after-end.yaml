@@ -1,0 +1,11 @@
+# ผิดกติกาเดียว: SSF หลัง 2567
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2563, 2600]
+    text: "ข้อความการ์ด"
+    systems: [ssf]
+    lore_ref: lore-finance-series.html#6
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}

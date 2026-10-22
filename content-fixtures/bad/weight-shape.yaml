@@ -1,0 +1,10 @@
+# ผิดกติกาเดียว: weight 0
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    weight: 0
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}

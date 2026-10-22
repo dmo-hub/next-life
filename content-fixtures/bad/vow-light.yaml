@@ -1,0 +1,27 @@
+# ผิดกติกาเดียว: แก้ตามกำลังแพงเกิน 0.05 เท่ารายได้
+events:
+  - id: bad_case_01
+    type: B
+    stage: ทำงาน
+    years: [2560, 2650]
+    text: "ข้อความการ์ด"
+    category: belief
+    lore_ref: lore-finance-belief.md#B
+    belief:
+      kind: vow
+      tradition: ผสม
+      outside_canon: [vow_broken]
+      vow: {deadline_years: [2, 5], due_event: bad_vow_due_01, redeem_full_cost: {unit: fixed_baht, amount: 1500}, redeem_light_cost: {unit: income_x, amount: 0.1}, defer_once: true}
+    choices:
+      - {label: บนไว้, sets_flags: [vow_open:x], schedules: [{event: bad_vow_due_01, after_years: [2, 5]}], merit: [{cat: neutral}]}
+  - id: bad_vow_due_01
+    type: B
+    stage: ทำงาน
+    years: [2560, 2650]
+    text: "ข้อความการ์ด"
+    category: belief
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: vow, tradition: ผสม, outside_canon: [vow_broken]}
+    choices:
+      - {label: แก้เต็ม, redeem: full, cost: {unit: fixed_baht, amount: 1500}, merit: [{cat: neutral}]}
+      - {label: แก้ตามกำลัง, redeem: light, cost: {unit: income_x, amount: 0.05}, merit: [{cat: neutral}]}

@@ -1,26 +1,44 @@
-# เหตุการณ์หลักไมล์ของ tracer (B01) ผลเป็นระดับ ±1..±3 ตามตารางกลางในแกนเกม
+# เหตุการณ์หลักไมล์ของ tracer (B01) ผลเป็นระดับ ±1..±3 ตามตารางกลางในแกนเกม · at_age = เกิดที่อายุนี้ทุกชีวิต
 events:
   - id: school_start
-    age: 6
+    type: A
+    category: study
+    stage: เด็ก
+    at_age: 6
+    years: [2500, 2650]
     text: "อายุ {อายุ} ปี ถึงเวลาเข้าโรงเรียนแล้ว ปี {ปี} ที่บ้านใน{ภาค}"
     choices:
       - text: "ตั้งใจเรียนเต็มที่"
         effects: { knowledge: 2, happiness: -1 }
+        merit: [{ cat: neutral }]
       - text: "เรียนไปเล่นไป"
         effects: { knowledge: 1, happiness: 1 }
+        merit: [{ cat: neutral }]
   - id: first_job
-    age: 22
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    at_age: 22
+    years: [2500, 2650]
     text: "อายุ {อายุ} ปี ถึงเวลาหางานทำ เงินติดตัว {เงิน} บาท"
     choices:
       - text: "รับงานมั่นคงเงินเดือนน้อย"
-        effects: { money: 30000, happiness: -1 }
+        effects: { money: { unit: fixed_baht, amount: 30000 }, happiness: -1 }
+        merit: [{ cat: neutral }]
       - text: "ลองงานเสี่ยงที่ผลตอบแทนสูง"
-        effects: { money: 80000, health: -1, relations: -1 }
+        effects: { money: { unit: fixed_baht, amount: 80000 }, health: -1, relations: -1 }
+        merit: [{ cat: neutral }]
   - id: retirement
-    age: 60
+    type: A
+    category: work_money
+    stage: ชรา
+    at_age: 60
+    years: [2500, 2650]
     text: "อายุ {อายุ} ปี ถึงวัยเกษียณ เงินเก็บ {เงิน} บาท"
     choices:
       - text: "พักผ่อนอยู่กับครอบครัว"
         effects: { relations: 2, happiness: 2, health: 1 }
+        merit: [{ cat: neutral }]
       - text: "ทำงานต่ออีกหน่อย"
-        effects: { money: 100000, health: -1, happiness: -1 }
+        effects: { money: { unit: fixed_baht, amount: 100000 }, health: -1, happiness: -1 }
+        merit: [{ cat: neutral }]

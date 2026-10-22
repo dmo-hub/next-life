@@ -1,0 +1,9 @@
+# ผิดกติกาเดียว: พูดถึงหุ้นแต่ไม่ประกาศ systems
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "เพื่อนชวนเปิดบัญชีหุ้นครั้งแรก"
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}

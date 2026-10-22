@@ -1,0 +1,29 @@
+# ตัวอย่าง YAML ตัวที่ 3 ของใบ 12 (ทำบุญเสริมดวง คู่เจตนา) — choices ตามใบ (หมวด "ทาน" เป็นชื่อไทยของ dana)
+# บรรทัด "# เติม" = ฟิลด์บังคับของใบ 07 ที่ตัวอย่างละไว้ (รวม label ของตัวเลือก) · เหตุการณ์นัด bel_hope_unmet_01 เติมเพราะ schedules ต้องชี้ของจริง
+events:
+  - id: bel_merit_wish_01                           # เติม
+    type: B                                         # เติม
+    category: belief                                # เติม
+    stage: ทำงาน                                    # เติม
+    years: [2500, 2650]                             # เติม
+    text: "วัดใกล้บ้านจัดงานทอดผ้าป่า เพื่อนชวนไปร่วมทำบุญ"   # เติม
+    lore_ref: lore-finance-belief.md#B              # เติม
+    belief: {kind: merit_wish, tradition: พุทธ, outside_canon: [intent_merit]}   # เติม
+    choices:
+      - {id: give_sincere, pair_id: mw_01, intent: sincere,
+         label: ทำบุญด้วยใจ,                         # เติม
+         cost: {unit: income_x, amount: 0.02},
+         merit: [{cat: ทาน, level: 2}], effects: {happiness: +1}}
+      - {id: give_wish, pair_id: mw_01, intent: wish_for_gain,
+         label: ทำบุญขอให้รวย,                       # เติม
+         cost: {unit: income_x, amount: 0.02},
+         merit: [{cat: ทาน, level: 1}], effects: {happiness: +1},
+         sets_flags: [hope_set:mw_01],
+         schedules: [{event: bel_hope_unmet_01, after_years: [3, 5]}]}
+  - id: bel_hope_unmet_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "หลายปีผ่านไป ชีวิตยังเหมือนเดิม"
+    when: {flags: {has: [hope_set:mw_01]}}
+    choices: []

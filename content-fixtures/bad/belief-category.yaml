@@ -1,0 +1,12 @@
+# ผิดกติกาเดียว: มี belief แต่ category ไม่ใช่ belief
+events:
+  - id: bad_case_01
+    type: B
+    stage: ทำงาน
+    years: [2560, 2650]
+    text: "ข้อความการ์ด"
+    category: work_money
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: amulet, tradition: พุทธ}
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}

@@ -1,0 +1,9 @@
+# ผิดกติกาเดียว: นัดเหตุการณ์ที่ไม่มี
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ตกลง", schedules: [{event: nope_01, after_years: [1, 2]}], merit: [{cat: neutral}]}

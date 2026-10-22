@@ -1,0 +1,12 @@
+# ผิดกติกาเดียว: เครื่องรางเพิ่มสุขภาพ
+events:
+  - id: bad_case_01
+    type: B
+    stage: ทำงาน
+    years: [2560, 2650]
+    text: "ข้อความการ์ด"
+    category: belief
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: amulet, tradition: พุทธ}
+    choices:
+      - {label: ซื้อเครื่องราง, cost: {unit: fixed_baht, amount: 500}, effects: {health: 1}, merit: [{cat: neutral}]}

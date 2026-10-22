@@ -7,6 +7,7 @@
     "sim": "node harness/run.mjs --n 1000 --seed 1",
     "gate": "node harness/run.mjs --n 20000 --seed 1",
     "check:data": "node scripts/check-data.mjs",
+    "lint:test": "node scripts/lint-test.mjs",
     "fetch:data": "node scripts/fetch-data.mjs"
   },
   "dependencies": {

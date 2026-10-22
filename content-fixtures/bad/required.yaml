@@ -1,0 +1,8 @@
+# ผิดกติกาเดียว: ไม่มี years
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}

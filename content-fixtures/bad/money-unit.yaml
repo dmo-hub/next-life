@@ -1,0 +1,9 @@
+# ผิดกติกาเดียว: เงินเป็นตัวเลขเปล่า
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ตกลง", effects: {money: 30000}, merit: [{cat: neutral}]}

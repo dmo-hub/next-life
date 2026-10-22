@@ -1,0 +1,10 @@
+# ผิดกติกาเดียว: หัวข้อ lore ที่ไม่มี
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    lore_ref: lore-era-data.md#99
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}

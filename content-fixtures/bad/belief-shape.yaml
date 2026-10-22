@@ -1,0 +1,12 @@
+# ผิดกติกาเดียว: kind ที่ไม่มี
+events:
+  - id: bad_case_01
+    type: B
+    stage: ทำงาน
+    years: [2560, 2650]
+    text: "ข้อความการ์ด"
+    category: belief
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: horoscope, tradition: พุทธ}
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}

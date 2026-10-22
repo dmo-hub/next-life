@@ -1,0 +1,21 @@
+{
+ "title": "ปีที่ระบบ/สินทรัพย์เริ่มมีจริงในไทย — ตัวกั้นไม่ให้เหตุการณ์อ้างระบบก่อนปีที่มี (ใบ 07) · ที่มาจาก lore-finance-series.html หัวข้อ (6)",
+ "note": "open = ใช้ได้ตั้งแต่ from (ถึง to ถ้ามี) · closed = ปีเริ่มยังไม่ยืนยัน เจ้าของเคาะให้ปิดตัวเลือกไว้จนได้แหล่ง · keywords = คำในข้อความที่ถือว่าอ้างระบบนี้ (เหตุการณ์ต้องประกาศใน systems)",
+ "systems": [
+  { "id": "min_wage", "name": "ค่าแรงขั้นต่ำ", "status": "open", "from": 2516, "keywords": ["ค่าแรงขั้นต่ำ"], "source": "https://today.line.me/th/v3/article/yz3rGpz" },
+  { "id": "stock", "name": "หุ้นไทย (SET)", "status": "open", "from": 2518, "keywords": ["หุ้น", "ตลาดหลักทรัพย์"], "source": "https://en.wikipedia.org/wiki/Stock_Exchange_of_Thailand" },
+  { "id": "fraud_loan_act", "name": "พ.ร.ก.กู้ยืมเงินที่เป็นการฉ้อโกงประชาชน", "status": "open", "from": 2527, "keywords": ["ฉ้อโกงประชาชน"], "source": "https://www.thaipbs.or.th/news/content/318855" },
+  { "id": "social_security", "name": "ประกันสังคม", "status": "open", "from": 2533, "keywords": ["ประกันสังคม"], "source": "https://www.ilaw.or.th/articles/31628" },
+  { "id": "student_loan", "name": "กยศ.", "status": "open", "from": 2539, "keywords": ["กยศ"], "source": "https://www.thaipbs.or.th/news/content/36274" },
+  { "id": "universal_health", "name": "บัตรทอง 30 บาท", "status": "open", "from": 2545, "keywords": ["บัตรทอง", "30 บาทรักษาทุกโรค"], "source": "https://policywatch.thaipbs.or.th/article/life-389" },
+  { "id": "promptpay", "name": "พร้อมเพย์", "status": "open", "from": 2560, "keywords": ["พร้อมเพย์"], "source": "https://thaipublica.org/?p=114729" },
+  { "id": "ssf", "name": "กองทุน SSF (สิทธิลดหย่อน)", "status": "open", "from": 2563, "to": 2567, "keywords": ["SSF"], "source": "https://www.scbam.com/th/announce/announce-13122024-1" },
+  { "id": "credit_card", "name": "บัตรเครดิต", "status": "closed", "keywords": ["บัตรเครดิต"], "note": "ปีใบแรกของไทยยังไม่ยืนยัน" },
+  { "id": "provident_fund", "name": "กองทุนสำรองเลี้ยงชีพ", "status": "closed", "keywords": ["กองทุนสำรองเลี้ยงชีพ"], "note": "ปี พ.ร.บ. ยังไม่แน่น" },
+  { "id": "elderly_allowance", "name": "เบี้ยยังชีพผู้สูงอายุ", "status": "closed", "keywords": ["เบี้ยยังชีพ"], "note": "ปีเริ่มระบบยังไม่ยืนยัน (ขั้นบันไดเริ่ม 1 ต.ค. 2554)" },
+  { "id": "savings_lottery", "name": "สลากออมสิน", "status": "closed", "keywords": ["สลากออมสิน"], "note": "ปีเริ่มยังไม่ยืนยัน" },
+  { "id": "ltf_rmf", "name": "LTF / RMF", "status": "closed", "keywords": ["LTF", "RMF"], "note": "ปีเริ่มไม่พบ" },
+  { "id": "online_stock", "name": "ซื้อขายหุ้นออนไลน์", "status": "closed", "keywords": ["หุ้นออนไลน์"], "note": "ปีเริ่มยังไม่ยืนยัน" },
+  { "id": "mobile_banking", "name": "โมบายแบงกิ้ง", "status": "closed", "keywords": ["โมบายแบงกิ้ง", "แอปธนาคาร"], "note": "ปีเริ่มยังไม่ยืนยัน" }
+ ]
+}
