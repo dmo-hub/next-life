@@ -1,0 +1,12 @@
+{
+  "name": "next-life",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "sim": "node harness/run.mjs --n 1000 --seed 1"
+  },
+  "dependencies": {
+    "yaml": "2.8.1"
+  }
+}

@@ -1,0 +1,26 @@
+# เหตุการณ์หลักไมล์ของ tracer (B01) ผลเป็นระดับ ±1..±3 ตามตารางกลางในแกนเกม
+events:
+  - id: school_start
+    age: 6
+    text: "อายุ {อายุ} ปี ถึงเวลาเข้าโรงเรียนแล้ว ปี {ปี} ที่บ้านในภาค{ภาค}"
+    choices:
+      - text: "ตั้งใจเรียนเต็มที่"
+        effects: { knowledge: 2, happiness: -1 }
+      - text: "เรียนไปเล่นไป"
+        effects: { knowledge: 1, happiness: 1 }
+  - id: first_job
+    age: 22
+    text: "อายุ {อายุ} ปี ถึงเวลาหางานทำ เงินติดตัว {เงิน} บาท"
+    choices:
+      - text: "รับงานมั่นคงเงินเดือนน้อย"
+        effects: { money: 30000, happiness: -1 }
+      - text: "ลองงานเสี่ยงที่ผลตอบแทนสูง"
+        effects: { money: 80000, health: -1, relations: -1 }
+  - id: retirement
+    age: 60
+    text: "อายุ {อายุ} ปี ถึงวัยเกษียณ เงินเก็บ {เงิน} บาท"
+    choices:
+      - text: "พักผ่อนอยู่กับครอบครัว"
+        effects: { relations: 2, happiness: 2, health: 1 }
+      - text: "ทำงานต่ออีกหน่อย"
+        effects: { money: 100000, health: -1, happiness: -1 }
