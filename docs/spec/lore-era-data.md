@@ -35,7 +35,7 @@
 - ความเสี่ยงตายช่วงอายุ 1–4 ปี = 1-(1-U5MR)/(1-IMR) เช่นปี 1960 ≈ 38.57 ต่อ 1,000
 - UN Data Portal มีตัวชี้วัด qx abridged (id 81) · qx complete (id 82) · Ex (id 75) · lx (id 77) · mx (id 79) ครอบคลุมปี 1950–2100 ตาม WPP 2024 ต้องใช้ Bearer token (ไม่มี token ได้ HTTP 401) — https://population.un.org/dataportalapi/api/v1/indicators/?format=json
 - WHO GHO: LIFE_0000000030 = nqx และ LIFE_0000000029 = nMx แยกเพศ 19 กลุ่มอายุ (0–1 ถึง 85+) มีเฉพาะปี 2000–2023 เช่น nMx ชายอายุ 85+ ปี 2023 = 0.10 — https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim eq 'THA'
-- HLD มีตารางชีพไทย 2 ชุดคือ 1960 (Keyfitz & Flieger) และ 2005–2006 (สำนักงานสถิติแห่งชาติ) หน้าเว็บไม่ระบุว่าแยกเพศ — https://www.lifetable.de/Country/Country?cntr=THA
+- HLD มีตารางชีพไทย 2 ชุดคือ 1960 (Keyfitz & Flieger) และ 2005–2006 (สำนักงานสถิติแห่งชาติ) — https://www.lifetable.de/Country/Country?cntr=THA · (แก้ 2026-10-22 ตอนทำ B02) ไฟล์ข้อมูลปี 1960 **แยกเพศ** (คอลัมน์ Sex 1/2 · กลุ่มอายุ 0, 1–4, 5–9 … 80–84, 85+ พร้อม m(x) q(x)) ดาวน์โหลดตรงได้ที่ https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt · e0 ในตารางนี้ ชาย 57.87 หญิง 62.62 ต่างจาก World Bank ปี 1960 (48.99 / 52.34) มาก เกมจึงใช้เป็นรูปเส้นเท่านั้น แล้วปรับให้ e0 ตรง World Bank
 - มีตารางชีพประวัติศาสตร์ปี 1937/1947/1960/1970 (Rungpitarangsi 1974) และจากการสำรวจการเปลี่ยนแปลงประชากร (SPC) ปี 1964–67 ถึง 2005–06 ผู้เขียนปรับค่าปี 1937/1947 ใหม่ จึงไม่ควรใช้ตารางต้นฉบับตรง ๆ — https://pmc.ncbi.nlm.nih.gov/articles/PMC3175806
 
 ## 4. สาเหตุการตายและพฤติกรรมเสี่ยงตามยุค
