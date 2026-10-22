@@ -1389,6 +1389,105 @@
  "standard": {
   "ชาย": [
    {
+    "y": 2503,
+    "nqx": [
+     {
+      "age": 0,
+      "v": 0.08339,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 1,
+      "v": 0.04422,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 5,
+      "v": 0.01695,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 10,
+      "v": 0.01079,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 15,
+      "v": 0.01108,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 20,
+      "v": 0.01449,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 25,
+      "v": 0.01591,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 30,
+      "v": 0.02014,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 35,
+      "v": 0.02822,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 40,
+      "v": 0.03726,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 45,
+      "v": 0.05056,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 50,
+      "v": 0.06612,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 55,
+      "v": 0.08528,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 60,
+      "v": 0.1242,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 65,
+      "v": 0.16088,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 70,
+      "v": 0.23438,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 75,
+      "v": 0.3061,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 80,
+      "v": 0.4305,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     }
+    ],
+    "m85": {
+     "v": 0.27653,
+     "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+    }
+   },
+   {
     "y": 2543,
     "nqx": [
      {
@@ -3766,6 +3865,105 @@
    }
   ],
   "หญิง": [
+   {
+    "y": 2503,
+    "nqx": [
+     {
+      "age": 0,
+      "v": 0.06298,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 1,
+      "v": 0.04054,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 5,
+      "v": 0.01548,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 10,
+      "v": 0.00874,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 15,
+      "v": 0.00994,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 20,
+      "v": 0.01491,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 25,
+      "v": 0.01755,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 30,
+      "v": 0.02103,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 35,
+      "v": 0.02744,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 40,
+      "v": 0.03226,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 45,
+      "v": 0.0347,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 50,
+      "v": 0.04364,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 55,
+      "v": 0.0545,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 60,
+      "v": 0.08095,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 65,
+      "v": 0.11003,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 70,
+      "v": 0.17041,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 75,
+      "v": 0.22854,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     },
+     {
+      "age": 80,
+      "v": 0.3406,
+      "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+     }
+    ],
+    "m85": {
+     "v": 0.25129,
+     "source": "https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt"
+    }
+   },
    {
     "y": 2543,
     "nqx": [
@@ -6148,7 +6346,7 @@
   "shape": {
    "method": "brass_logit",
    "assumption": true,
-   "note": "รูปเส้นตามอายุ: ปี 2543–2566 ใช้ตาราง WHO ของปีนั้น (ตาม lore-era-data หัวข้อ 6) · ก่อน 2543 ใช้ตาราง WHO ปี 2543 แทนตาราง HLD 1960 ที่ lore เสนอ (ยังไม่ได้ดึง และ lore บอกว่าหน้าเว็บไม่ระบุแยกเพศ) · หลัง 2566 ใช้ปี 2566 · แล้วปรับ 2 ค่า (alpha beta) ให้อัตราตายทารกและ e0 ตรงกับ World Bank รายปี"
+   "note": "รูปเส้นตามอายุ (lore-era-data หัวข้อ 6): ก่อน 2543 ใช้ตาราง HLD ปี 2503 (Keyfitz & Flieger แยกเพศ) · ปี 2543–2566 ใช้ตาราง WHO ของปีนั้น · หลัง 2566 ใช้ปี 2566 · แล้วปรับ 2 ค่า (alpha beta) ให้อัตราตายทารกและ e0 ตรงกับ World Bank รายปี"
   },
   "tail": {
    "method": "gompertz_from_85",

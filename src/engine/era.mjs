@@ -28,9 +28,11 @@ export function e0FromLx(lx) {
   return e;
 }
 
-// ตารางมาตรฐานของปีนั้น ปีนอกช่วงที่มีตารางใช้ปีที่ใกล้สุด
+// ตารางมาตรฐานล่าสุดที่ปีไม่เกิน year (ตารางไม่ได้มีทุกปี เช่น HLD 2503 แล้วข้ามไป WHO 2543) · ก่อนตารางแรกใช้ตารางแรก
 export function stdFor(std, year) {
-  return std.lx[Math.max(0, Math.min(std.lx.length - 1, year - std.from))];
+  let i = 0;
+  while (i + 1 < std.ys.length && std.ys[i + 1] <= year) i++;
+  return std.lx[i];
 }
 
 const qCache = new WeakMap();

@@ -104,6 +104,27 @@ for (let i = 1; i < stdYears.length; i++) if (stdYears[i] !== stdYears[i - 1] + 
 const stdFirst = stdYears[0] + BE;
 const stdLast = stdYears.at(-1) + BE;
 
+// ตาราง HLD ปี 1960 (Keyfitz & Flieger) แยกเพศ — มาตรฐานของปีก่อนตาราง WHO ตาม lore-era-data หัวข้อ 6
+const HLD_URL = 'https://www.lifetable.de/File/GetDocument/data%5CTHA%5CTHA000019601960KFb.txt';
+const hldRes = await fetch(HLD_URL);
+if (!hldRes.ok) throw new Error(`HLD: HTTP ${hldRes.status}`);
+const hldRows = (await hldRes.text())
+  .trim()
+  .split(/\r?\n/)
+  .slice(1)
+  .map((l) => l.split(',').map((c) => c.trim()));
+function hldStandard(sexCode) {
+  // คอลัมน์: ... Sex(10) Age(11) AgeInt(12) m(x)(13) q(x)(14)
+  const rows = hldRows.filter((c) => c[10] === sexCode && c[7] === '1960');
+  const nqx = rows.filter((c) => Number(c[11]) < 85).map((c) => ({ age: Number(c[11]), v: round(Number(c[14]), 6), source: HLD_URL }));
+  const open = rows.find((c) => Number(c[11]) === 85);
+  if (nqx.length !== GROUPS.length || !open) throw new Error(`HLD 1960 เพศ ${sexCode} กลุ่มอายุไม่ครบ`);
+  nqx.forEach((r, i) => {
+    if (r.age !== startOf(GROUPS[i])) throw new Error(`HLD 1960 กลุ่มอายุไม่ตรง WHO ที่ ${r.age}`);
+  });
+  return { y: 1960 + BE, nqx, m85: { v: round(Number(open[13]), 6), source: HLD_URL } };
+}
+
 write('mortality.json', {
   title: 'อายุคาดเฉลี่ยและอัตราตายทารก แยกเพศ + ตารางมาตรฐานรูปเส้นการตาย',
   retrieved: today,
@@ -117,14 +138,14 @@ write('mortality.json', {
     หญิง: yearly(imrf, 'SP.DYN.IMRT.FE.IN', FIRST, lastMort, mortNote),
   },
   standard: {
-    ชาย: stdYears.map((ce) => standard('SEX_MLE', ce)),
-    หญิง: stdYears.map((ce) => standard('SEX_FMLE', ce)),
+    ชาย: [hldStandard('1'), ...stdYears.map((ce) => standard('SEX_MLE', ce))],
+    หญิง: [hldStandard('2'), ...stdYears.map((ce) => standard('SEX_FMLE', ce))],
   },
   rules: {
     shape: {
       method: 'brass_logit',
       assumption: true,
-      note: `รูปเส้นตามอายุ: ปี ${stdFirst}–${stdLast} ใช้ตาราง WHO ของปีนั้น (ตาม lore-era-data หัวข้อ 6) · ก่อน ${stdFirst} ใช้ตาราง WHO ปี ${stdFirst} แทนตาราง HLD 1960 ที่ lore เสนอ (ยังไม่ได้ดึง และ lore บอกว่าหน้าเว็บไม่ระบุแยกเพศ) · หลัง ${stdLast} ใช้ปี ${stdLast} · แล้วปรับ 2 ค่า (alpha beta) ให้อัตราตายทารกและ e0 ตรงกับ World Bank รายปี`,
+      note: `รูปเส้นตามอายุ (lore-era-data หัวข้อ 6): ก่อน ${stdFirst} ใช้ตาราง HLD ปี 2503 (Keyfitz & Flieger แยกเพศ) · ปี ${stdFirst}–${stdLast} ใช้ตาราง WHO ของปีนั้น · หลัง ${stdLast} ใช้ปี ${stdLast} · แล้วปรับ 2 ค่า (alpha beta) ให้อัตราตายทารกและ e0 ตรงกับ World Bank รายปี`,
     },
     tail: {
       method: 'gompertz_from_85',

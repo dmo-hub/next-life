@@ -101,11 +101,11 @@ export function loadEra() {
   for (const s of SEXES) {
     const tables = m.standard[s];
     tables.forEach((t, i) => {
-      if (t.y !== tables[0].y + i) throw new Error(`ตารางมาตรฐานปีไม่ต่อเนื่องที่ ${t.y}`);
+      if (i && t.y <= tables[i - 1].y) throw new Error(`ตารางมาตรฐานต้องเรียงปีไม่ซ้ำ (${t.y})`);
     });
     // ปัดก่อน fit เพื่อให้ค่าที่ฝังในเกมคือค่าที่ใช้ fit จริง · ปัดตามเลขนัยสำคัญ ไม่ใช่ทศนิยม ไม่งั้นหางอายุ 110+ กลายเป็น 0 (ตายแน่นอนก่อน 120)
     const lxs = tables.map((t) => standardLx(t, m.rules.tail.slope).map((l, x) => (x === MAX_AGE ? 0 : Number(l.toPrecision(6)))));
-    std[s] = { from: tables[0].y, lx: lxs };
+    std[s] = { ys: tables.map((t) => t.y), lx: lxs };
     const e0 = series(m.e0[s]);
     const imr = series(m.imr[s]);
     if (e0.from !== imr.from || e0.v.length !== imr.v.length) throw new Error('ช่วงปี e0 กับ IMR ไม่ตรงกัน');
