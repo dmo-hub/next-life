@@ -1,0 +1,323 @@
+# โรคภัยวัยชรา (กองสุ่ม stage ชรา) — ใช้ธง smoker · heavy_drinker · sporty · has_insurance จากช่วงวัยก่อน
+events:
+  - id: oldh_stroke_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {flags: {smoker: 2, heavy_drinker: 1.5, sporty: 0.5}}
+    title: "เช้าที่แขนขวาไม่ฟัง"
+    text: "อายุ {อายุ} ตื่นมาแปรงฟันแล้วแปรงหลุดมือ ปากเบี้ยว พูดไม่ชัด หลานตะโกนว่า \"หน้าเบี้ยวแล้ว!\" นาฬิกาเดินไปทีละนาที"
+    choices:
+      - id: call_ambulance
+        text: "เรียกรถพยาบาลเดี๋ยวนี้"
+        outcomes:
+          - {weight: 3, text: "ถึงทันชั่วโมงทอง หมอฉีดยาสลายลิ่มเลือด เดินออกจากโรงพยาบาลเองได้", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถติดหนัก ไปถึงช้า ขาขวาลากไปอีกนาน", effects: {health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sleep_it_off
+        text: "นอนพักก่อน เดี๋ยวก็หาย"
+        outcomes:
+          - {weight: 1, text: "ตื่นมาหายเป็นปลิดทิ้ง หมอบอกว่าเป็นแค่เส้นเลือดตีบชั่วคราว รอบหน้าไม่รอดแน่", effects: {health: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตื่นมาอีกทีพูดไม่ได้ทั้งประโยค ต้องมีคนป้อนข้าว", effects: {health: -2, happiness: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: aspirin_wait
+        text: "กินแอสไพรินแล้วนั่งรอลูกกลับ"
+        outcomes:
+          - {weight: 2, text: "อาการทุเลาลงก่อนลูกถึงบ้าน หมอบอกว่าโชคช่วยล้วน ๆ แต่ต้องกินยาไปตลอด", effects: {health: 1, knowledge: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกติดประชุมกลับช้า กว่าจะถึงหมอแขนขวาก็ยกไม่ขึ้นแล้ว", effects: {health: -2, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: grandkid_drive
+        text: "ให้หลานขับมอเตอร์ไซค์พาไป"
+        outcomes:
+          - {weight: 2, text: "หลานซิ่งทะลุไฟแดงสามแยก ถึงก่อนรถพยาบาลเสียอีก", effects: {health: 1, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ล้มกลางทาง เจ็บซ้ำสองต่อ", effects: {health: -2, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: oldh_dementia_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [65, 110]}
+    multipliers: {stats: {knowledge: 0.8}}
+    title: "กาต้มน้ำไหม้ครั้งที่สาม"
+    text: "เดือนนี้ลืมปิดเตาแก๊สสามครั้ง เรียกหลานด้วยชื่อแมวที่ตายไปนานแล้ว ลูกเริ่มกระซิบกันหลังบ้าน"
+    choices:
+      - id: get_checked
+        text: "ยอมไปตรวจสมองให้รู้เรื่อง"
+        outcomes:
+          - {weight: 1, text: "หักมุม! แค่ขาดวิตามินบีสิบสอง กินยาเดือนเดียวความจำกลับมาแจ๋ว", effects: {health: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "อัลไซเมอร์ระยะแรก หมอให้ยาชะลอ ได้เวลาเตรียมใจกันทั้งบ้าน", effects: {health: -1, relations: 1, chronic: {knowledge: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: deny_it
+        text: "โวยว่าทุกคนใส่ร้าย ไม่ได้ลืม"
+        effects: {relations: -2, health: -1, chronic: {knowledge: -1}}
+        merit: [{cat: neutral}]
+      - id: brain_games
+        text: "เล่นหมากรุกกับป้าข้างบ้านทุกเย็น"
+        outcomes:
+          - {weight: 2, text: "เดินหมากทุกเย็นจนความจำกลับมาคมขึ้น ชนะป้าติดกันสิบตา", effects: {knowledge: 1, relations: 1, health: 1, chronic: {knowledge: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลืมกติกากลางกระดาน เถียงกับป้าจนคว่ำกระดาน ไม่มองหน้ากันเป็นเดือน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: memory_book
+        text: "เขียนบันทึกชีวิตไว้ให้หลาน"
+        outcomes:
+          - {weight: 2, text: "สมุดเล่มนั้นกลายเป็นของรักที่สุดในบ้าน หลานอ่านซ้ำจนปกขาด", effects: {relations: 3, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขียนเรื่องเดิมซ้ำสิบหน้า แต่ทุกคนก็อ่านจนจบ", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: oldh_hipfall_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 3
+    multipliers: {flags: {sporty: 0.5}}
+    title: "พื้นห้องน้ำลื่นกว่าที่คิด"
+    text: "ก้าวออกจากห้องน้ำแล้วล้มก้นกระแทก ได้ยินเสียงกร๊อบดังในสะโพก หมอบอกว่าวัย {อายุ} ล้มครั้งนี้อาจเปลี่ยนชีวิตทั้งชีวิต"
+    choices:
+      - id: hip_replace
+        text: "ผ่าตัดเปลี่ยนข้อสะโพกเทียม"
+        outcomes:
+          - {weight: 3, text: "ข้อใหม่ดีกว่าข้อเก่า สามเดือนต่อมาเดินตลาดได้เอง", effects: {health: 1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แผลติดเชื้อ ต้องนอนโรงพยาบาลอีกเป็นเดือน", effects: {health: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bed_rest
+        text: "ไม่ผ่า นอนพักบนเตียงเอา"
+        effects: {health: -2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: folk_healer
+        text: "ไปหมอกระดูกพื้นบ้านต่างจังหวัด"
+        outcomes:
+          - {weight: 1, text: "เข้าเฝือกไม้ไผ่กับยาพอกสมุนไพร กระดูกติดเองแบบหมอยังงง", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กระดูกติดเบี้ยว เดินกะเผลกไปตลอด", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: rebuild_home
+        text: "ผ่าตัดแล้วรื้อบ้านติดราวจับ"
+        outcomes:
+          - {weight: 3, text: "ข้อใหม่บวกราวจับทั้งบ้าน ไม่ล้มอีกเลย ลูกหลานแวะมาช่วยต่อเติมทุกเสาร์", effects: {health: 2, relations: 1, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แผลติดเชื้อ ราวจับติดเสร็จแต่ยังลุกไม่ไหว เงินหมดไปสองก้อน", effects: {health: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: oldh_cancer_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {flags: {smoker: 3, heavy_drinker: 1.5}}
+    title: "ก้อนในฟิล์มเอกซเรย์"
+    text: "ไปตรวจสุขภาพประจำปีแค่ไปเอาใบรับรอง หมอกลับเรียกเข้าห้องปิดประตู ชี้เงาก้อนหนึ่งในฟิล์ม แล้วถามว่า \"มากับใครครับ\""
+    choices:
+      - id: full_chemo
+        text: "สู้เต็มคอร์ส เคมีบำบัดทุกเข็ม"
+        outcomes:
+          - {weight: 2, text: "ผมร่วงหมดหัว แต่ผลสแกนรอบสุดท้ายไม่เจอก้อนแล้ว", effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร่างกายรับยาไม่ไหว ก้อนหดแต่คนก็หดตาม", effects: {health: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: trial_drug
+        text: "สมัครเป็นอาสาทดลองยาใหม่"
+        outcomes:
+          - {weight: 1, text: "ยาใหม่ได้ผลเกินคาด ชื่ออยู่ในงานวิจัยที่คนทั่วโลกอ้างถึง", effects: {health: 3, knowledge: 1}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 2, text: "ยาไม่ได้ผลกับตัวเอง แต่ข้อมูลช่วยคนไข้รุ่นหลัง", effects: {health: -2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: herbal_only
+        text: "กินยาต้มสมุนไพรที่เพื่อนส่งมา"
+        outcomes:
+          - {weight: 2, text: "ก้อนไม่โตขึ้นเลย จะเพราะยาหรือดวงก็ไม่มีใครรู้", effects: {health: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เสียเวลาไปครึ่งปี ก้อนลามไปที่อื่นแล้ว", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: last_trip
+        text: "ไม่รักษา เอาเงินไปเที่ยวทั่วไทย"
+        effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+
+  - id: oldh_kidney_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {flags: {heavy_drinker: 1.5, sporty: 0.7}}
+    title: "ขาบวมจนใส่รองเท้าไม่ได้"
+    text: "ขาบวมเป่ง ปัสสาวะเป็นฟอง หมอบอกไตเหลือทำงานไม่ถึงหนึ่งในห้า ต้องเลือกวันนี้ว่าจะใช้ชีวิตที่เหลือแบบไหน"
+    choices:
+      - id: hemo
+        text: "ฟอกเลือดที่ รพ. สัปดาห์ละสามวัน"
+        effects: {health: 1, happiness: -2, money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+      - id: home_pd
+        text: "ล้างไตทางหน้าท้องเองที่บ้าน"
+        outcomes:
+          - {weight: 3, text: "คล่องมือในเดือนเดียว ยังได้นั่งขายของหน้าบ้านเหมือนเดิม", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ติดเชื้อในช่องท้อง นอนไอซียูหลายคืน", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: child_kidney
+        text: "ลูกคนเล็กขอบริจาคไตให้"
+        outcomes:
+          - {weight: 2, text: "ไตลูกเข้ากันได้ ผ่าตัดเสร็จ สองคนนอนเตียงติดกันหัวเราะทั้งคืน", effects: {health: 3, relations: 3, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผลเลือดไม่เข้ากัน แต่น้ำตาวันนั้นทำให้บ้านคืนดีกันหมด", effects: {health: -1, relations: 2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: refuse
+        text: "ไม่ฟอก ไม่ผ่า ขอกินของอร่อย"
+        effects: {happiness: 2, health: -3, chronic: {health: -1}}
+        merit: [{cat: neutral}]
+
+  - id: oldh_cataract_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 3
+    title: "โลกที่ขุ่นเหมือนกระจกฝ้า"
+    text: "ทักคนผิดในงานบวชสามคน เผลอหยอดน้ำปลาลงในกาแฟ หมอตาบอกว่าต้อกระจกสุกเต็มที่แล้วทั้งสองข้าง"
+    choices:
+      - id: surgery
+        text: "ผ่าตัดเปลี่ยนเลนส์แก้วตา"
+        outcomes:
+          - {weight: 4, text: "เปิดผ้าปิดตาแล้วร้องไห้ โลกมีสีสดขนาดนี้มาตลอดเลยเหรอ", effects: {health: 1, happiness: 3}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตาอักเสบหลังผ่า ต้องหยอดยาเป็นเดือน แต่สุดท้ายก็เห็นชัด", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait
+        text: "รอคิวสิทธิ์รักษาฟรีอีกปี"
+        effects: {health: -1, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - id: thick_glasses
+        text: "ใส่แว่นหนาเตอะไปก่อน"
+        outcomes:
+          - {weight: 2, text: "พอถูไถได้ หลานตั้งฉายาว่าแว่นก้นขวด", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มองบันไดพลาด ตกลงมาสามขั้น", effects: {health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep_driving
+        text: "ช่างมัน ยังขับรถไปตลาดเองได้"
+        outcomes:
+          - {weight: 1, text: "รอดทุกเที่ยวแบบไม่มีใครเข้าใจ", effects: {happiness: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ถอยชนเสาไฟหน้าบ้าน ลูกยึดกุญแจรถทันที", effects: {health: -1, relations: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: oldh_copd_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 3
+    when: {flags: {has: [smoker]}}
+    title: "ขึ้นบันไดห้าขั้นก็หอบ"
+    text: "บุหรี่ที่สูบมาครึ่งชีวิตทวงหนี้ หมอบอกว่าถุงลมโป่งพอง ปอดเสียไปแล้วครึ่งหนึ่ง ซองบุหรี่ยังวางอยู่ในกระเป๋าเสื้อ"
+    choices:
+      - id: quit_now
+        text: "ขยำซองทิ้งต่อหน้าหมอ เลิกวันนี้"
+        effects: {health: 1, happiness: -1, chronic: {health: 1}}
+        merit: [{cat: sila, level: 1}]
+      - id: keep_smoking
+        text: "สูบต่อ แก่ขนาดนี้แล้ว"
+        effects: {happiness: 1, health: -2, chronic: {health: -1}}
+        merit: [{cat: neutral}]
+      - id: oxygen_tank
+        text: "ซื้อถังออกซิเจนไว้ข้างเตียง"
+        effects: {health: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: lung_rehab
+        text: "เข้าคอร์สฝึกหายใจกับเป่าขลุ่ย"
+        outcomes:
+          - {weight: 2, text: "ปอดดีขึ้นจนหมองง ได้เป่าขลุ่ยในงานวัดด้วย", effects: {health: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เป่าได้สามเพลงก็หอบ แต่ได้เพื่อนใหม่ทั้งกลุ่ม", effects: {health: -1, relations: 2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: oldh_liver_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 3
+    when: {flags: {has: [heavy_drinker]}}
+    title: "ตาเหลืองเหมือนขมิ้น"
+    text: "ท้องบวมเหมือนกลองยาว ตาเหลือง หมอบอกตับแข็งจากเหล้าที่ดื่มมาหลายสิบปี เพื่อนวงเหล้าเก่าโทรมาชวนไปงานเลี้ยงรุ่น"
+    choices:
+      - id: quit_temple
+        text: "เลิกเหล้า ไปถือศีลที่วัด"
+        effects: {health: 1, happiness: -1, chronic: {health: 1}}
+        merit: [{cat: sila, level: 2}]
+      - id: one_last_party
+        text: "ไปงานเลี้ยงรุ่น ขอแก้วสุดท้าย"
+        outcomes:
+          - {weight: 1, text: "แก้วสุดท้ายจริง ๆ จบงานแล้วไม่แตะอีกเลย", effects: {happiness: 2, relations: 2}, merit: [{cat: intoxicants, level: 1}]}
+          - {weight: 2, text: "แก้วสุดท้ายกลายเป็นขวดที่สาม อาเจียนเป็นเลือดคืนนั้น", effects: {health: -3, happiness: 1, chronic: {health: -1}}, merit: [{cat: intoxicants, level: 1}]}
+        merit: [{cat: intoxicants, level: 1}]
+      - id: transplant_list
+        text: "ลงชื่อรอเปลี่ยนตับ"
+        outcomes:
+          - {weight: 1, text: "ได้ตับจากผู้บริจาคที่ไม่รู้จักชื่อ ชีวิตเริ่มใหม่ตอนแก่", effects: {health: 3, happiness: 2, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "คิวยาวเกินอายุที่เหลือ ได้แต่รอ", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tell_youngsters
+        text: "ไปเล่าให้เด็กในหมู่บ้านฟัง"
+        outcomes:
+          - {weight: 1, text: "หนุ่มขี้เมาคนหนึ่งฟังจบแล้วเทเหล้าทิ้งต่อหน้าทุกคน แม่เขามากราบขอบคุณถึงบ้าน", effects: {relations: 3, happiness: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 2, text: "เด็ก ๆ ฟังกันตาโต แต่หัวเราะท้องบวมมากกว่าเรื่องที่เล่า", effects: {relations: 1, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: oldh_insured_ward_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 3
+    when: {flags: {has: [has_insurance]}}
+    title: "กรมธรรม์ที่ลืมไปแล้ว"
+    text: "นอนโรงพยาบาลด้วยปอดอักเสบ ลูกค้นลิ้นชักเจอกรมธรรม์ที่จ่ายเบี้ยมาหลายสิบปี เจ้าหน้าที่ยิ้มกว้างแล้วถามว่าจะใช้วงเงินแบบไหน"
+    choices:
+      - id: private_room
+        text: "ย้ายไปห้องเดี่ยวหมอเฉพาะทาง"
+        effects: {health: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: cash_out
+        text: "นอนห้องรวม เก็บค่าชดเชยไว้"
+        outcomes:
+          - {weight: 2, text: "ได้เงินชดเชยรายวันก้อนโต พอซื้อทองให้หลานคนละเส้น", effects: {relations: 1, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ติดหวัดจากเตียงข้าง ๆ ต้องนอนต่ออีกสัปดาห์", effects: {health: -2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: full_checkup
+        text: "ขอตรวจทั้งตัวให้คุ้มวงเงิน"
+        outcomes:
+          - {weight: 1, text: "เจอเนื้องอกเล็ก ๆ ที่ลำไส้เข้าพอดี ตัดออกก่อนจะลาม", effects: {health: 2, knowledge: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตรวจจนเหนื่อย ไม่เจออะไรเพิ่ม ประกันปฏิเสธบางรายการด้วย", effects: {health: -1, happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: donate_payout
+        text: "ยกเงินชดเชยให้ญาติเตียงข้าง"
+        effects: {relations: 2, happiness: 2, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: dana, level: 2}]
+
+  - id: oldh_sporty_heart_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 2
+    when: {flags: {has: [sporty]}}
+    title: "หัวใจอายุสี่สิบ"
+    text: "หมอดูผลตรวจแล้วเลิกคิ้ว วัย {อายุ} แต่หัวใจแข็งแรงเหมือนคนวัยทำงาน ชมรมวิ่งผู้สูงวัยมาชวนลงมินิมาราธอนรุ่นอาวุโส"
+    choices:
+      - id: run_race
+        text: "ลงแข่ง ไล่ล่าเหรียญทอง"
+        outcomes:
+          - {weight: 2, text: "เข้าเส้นชัยที่หนึ่งของรุ่น รูปขึ้นหน้าเพจจังหวัด", effects: {happiness: 3, health: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวใจเต้นผิดจังหวะกิโลที่ห้า หน่วยแพทย์ช่วยไว้ทัน", effects: {health: -3, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: coach_kids
+        text: "เป็นโค้ชวิ่งให้เด็กในหมู่บ้าน"
+        effects: {relations: 2, happiness: 1, health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: slow_down
+        text: "พอแล้ว หันมารำไทเก๊กสวนสาธารณะ"
+        effects: {health: 1, happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: push_limit
+        text: "ปั่นจักรยานขึ้นดอยให้สุด"
+        outcomes:
+          - {weight: 1, text: "พิชิตยอดดอยในวัยที่คนอื่นนั่งรถเข็น", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เข่าพังลงดอยไม่ไหว เข่าเสื่อมติดตัวไปตลอด", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

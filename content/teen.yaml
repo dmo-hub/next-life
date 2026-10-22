@@ -1,0 +1,256 @@
+# กองสุ่มวัยรุ่น (13–18) — ตัวละครเลือกเอง · ตั้งธง smoker likes_clips good_student sporty bullied
+events:
+  - id: teen_entrance_exam_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [15, 18]}
+    weight: 3
+    multipliers: {flags: {good_student: 2}}
+    title: "สนามสอบเข้า"
+    text: "อายุ {อายุ} สนามสอบเข้ามาถึงแล้ว เพื่อนทั้งห้องลงคอร์สติวกันหมด ที่บ้านใน{ภาค}มีเงินเก็บ {เงิน} บาท"
+    choices:
+      - id: cram_hard
+        text: "ลงคอร์สติวหนักจนตาลาย"
+        effects: {knowledge: 3, health: -1, happiness: -1, money: {unit: income_x, amount: -0.3}}
+        sets_flags: [good_student]
+        merit: [{cat: neutral}]
+      - id: guess_luck
+        text: "ไม่อ่าน ฝนตามดวงเอา"
+        outcomes:
+          - {weight: 1, text: "ติดคณะดังแบบงง ๆ ทั้งโรงเรียนแตกตื่น", effects: {knowledge: 1, happiness: 3}, sets_flags: [good_student], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ฝนผิดแถวตั้งแต่ข้อแรก รู้ตัวตอนหมดเวลา", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: vocational
+        text: "ไม่สอบ ไปเรียนสายอาชีพ"
+        effects: {knowledge: 1, happiness: 1, income_mult: 1.1}
+        merit: [{cat: neutral}]
+      - id: study_buddy
+        text: "ติวเองกับเพื่อนสนิท"
+        effects: {knowledge: 2, relations: 2, health: 1}
+        merit: [{cat: neutral}]
+
+  - id: teen_gaming_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 2
+    title: "ศึกร้านเกม"
+    text: "ร้านเกมหน้าโรงเรียนเปิดศึกแข่งทีม เงินรางวัลเท่าค่าเทอมทั้งปี ทีมเพื่อนขาดอีกคนเดียว และทุกคนหันมามองคุณ"
+    choices:
+      - id: skip_to_train
+        text: "โดดเรียนไปซ้อมทั้งเดือน"
+        outcomes:
+          - {weight: 1, text: "ทีมคว้าแชมป์ แมวมองทีมอีสปอร์ตมาขอเบอร์ถึงที่", effects: {happiness: 3, money: {unit: income_x, amount: 1}, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ตกรอบแรก แถมครูโทรหาที่บ้านเรื่องขาดเรียน", effects: {knowledge: -2, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: weekend_only
+        text: "เล่นแค่เสาร์อาทิตย์"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: join_basketball
+        text: "เลิกเกม ไปเข้าชมรมบาส"
+        effects: {health: 2, happiness: -1}
+        sets_flags: [sporty]
+        merit: [{cat: neutral}]
+      - id: play_till_3am
+        text: "เล่นยันตีสามทุกคืน"
+        effects: {health: -2, knowledge: -1, happiness: 2}
+        merit: [{cat: neutral}]
+
+  - id: teen_first_smoke_01
+    type: A
+    category: health
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 2
+    title: "บุหรี่มวนแรก"
+    text: "หลังเลิกเรียน รุ่นพี่ยื่นบุหรี่มวนหนึ่งมาให้ ทั้งวงเงียบกริบ จ้องรอดูว่าจะกล้าสูบไหม"
+    choices:
+      - id: smoke_cool
+        text: "สูบโชว์ให้ดูเท่"
+        effects: {health: -1, happiness: 1, relations: 1}
+        sets_flags: [smoker]
+        merit: [{cat: neutral}]
+      - id: smoke_choke
+        text: "ลองสูบ แล้วสำลักหนัก"
+        outcomes:
+          - {weight: 2, text: "ไอจนน้ำตาไหล ทั้งวงหัวเราะ แต่ไม่มีใครชวนอีกเลย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สำลักแต่ฝืนสูบต่อทุกวันจนติดงอมแงม", effects: {health: -1}, sets_flags: [smoker], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: refuse_walk
+        text: "ปฏิเสธแล้วเดินหนี"
+        outcomes:
+          - {weight: 2, text: "รุ่นพี่ยักไหล่ ไม่ว่าอะไร", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รุ่นพี่ล้อว่าลูกแหง่ไปทั้งเทอม", effects: {health: 1, happiness: -2}, sets_flags: [bullied], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tell_teacher
+        text: "แอบบอกครูฝ่ายปกครอง"
+        outcomes:
+          - {weight: 1, text: "ครูจับได้คาหนังคาเขา ไม่มีใครรู้ว่าใครบอก", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ความแตกว่าใครฟ้อง ทั้งสายชั้นเลิกคุยด้วย", effects: {relations: -2, happiness: -1}, sets_flags: [bullied], merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: teen_first_love_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [14, 18]}
+    weight: 2
+    title: "จดหมายใต้โต๊ะ"
+    text: "มีจดหมายสอดไว้ใต้โต๊ะ ลงท้ายว่า 'ชอบมานานแล้ว' ลายมือคุ้นตาเหมือนของเพื่อนสนิทที่สุดของคุณ"
+    choices:
+      - id: say_yes
+        text: "ตอบตกลงทันที"
+        outcomes:
+          - {weight: 2, text: "รักแรกหวานฉ่ำ เกรดร่วงพร้อมกันทั้งคู่", effects: {happiness: 3, knowledge: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ที่แท้เพื่อนในห้องแกล้งเขียน ทั้งห้องหัวเราะลั่น", effects: {happiness: -2, relations: -1}, sets_flags: [bullied], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep_friend
+        text: "ปฏิเสธเพื่อรักษาเพื่อน"
+        outcomes:
+          - {weight: 1, text: "เพื่อนเงียบหายไปทั้งเทอม", effects: {relations: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนขอบคุณที่จริงใจ กลายเป็นเพื่อนกันตลอดชีวิต", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: secret_date
+        text: "แอบคบ ไม่ให้ที่บ้านรู้"
+        effects: {happiness: 2, relations: -1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: study_first
+        text: "ขอเรียนให้จบก่อนนะ"
+        effects: {knowledge: 2, happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+
+  - id: teen_gang_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {flags: {bullied: 2}}
+    title: "แก๊งซิ่งประจำซอย"
+    text: "แก๊งซิ่งประจำซอยชวนเข้ากลุ่ม หัวโจกตบไหล่บอกว่า อยู่กับพวกนี้แล้วทั้งซอยจะเกรงใจ"
+    choices:
+      - id: join_gang
+        text: "เข้าแก๊ง ซิ่งทุกคืน"
+        outcomes:
+          - {weight: 2, text: "มีพวกพ้องเต็มซอย ไม่มีใครกล้าแตะ", effects: {happiness: 2, relations: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ด่านตำรวจรวบทั้งแก๊ง พ่อแม่ต้องมาประกันตัว", effects: {relations: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: extort_juniors
+        text: "ร่วมไถเงินรุ่นน้อง"
+        effects: {money: {unit: income_x, amount: 0.3}, relations: -2, happiness: 1}
+        merit: [{cat: greed_harm, level: 1}]
+      - id: boxing_camp
+        text: "หนีไปเข้าค่ายมวยแทน"
+        effects: {health: 2, happiness: -1}
+        sets_flags: [sporty]
+        merit: [{cat: neutral}]
+      - id: rescue_junior
+        text: "พารุ่นน้องหนีแก๊ง"
+        outcomes:
+          - {weight: 1, text: "โดนรุมกระทืบหน้าปากซอย แต่รุ่นน้องรอด", effects: {health: -2, relations: 1}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 2, text: "รุ่นน้องคนนั้นกลายเป็นเพื่อนตายไปตลอดชีวิต", effects: {relations: 3}, merit: [{cat: help_others, level: 2}]}
+        merit: [{cat: help_others, level: 2}]
+
+  - id: teen_viral_clip_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {flags: {likes_clips: 3}}
+    title: "คลิปเต้นดังข้ามคืน"
+    text: "คลิปเต้นที่ถ่ายเล่นในห้องเรียนยอดวิวทะลุแสน แบรนด์ทักมาขอจ้างรีวิว ส่วนครูประจำชั้นก็เพิ่งเห็นคลิปเหมือนกัน"
+    choices:
+      - id: take_brand_deal
+        text: "รับงานรีวิวเต็มตัว"
+        outcomes:
+          - {weight: 2, text: "ค่ารีวิวเดือนเดียวเท่าค่าขนมทั้งปี", effects: {money: {unit: income_x, amount: 1}, happiness: 1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ของที่รีวิวเป็นของปลอม คนแห่ด่าทั้งเน็ต", effects: {happiness: -2, relations: -1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: clip_every_night
+        text: "ถ่ายคลิปทุกวันจนดึก"
+        effects: {health: -1, knowledge: 1, happiness: 1}
+        sets_flags: [likes_clips]
+        merit: [{cat: neutral}]
+      - id: delete_and_study
+        text: "ลบคลิป กลับไปอ่านหนังสือ"
+        effects: {knowledge: 2, happiness: -1, health: 1}
+        sets_flags: [good_student]
+        merit: [{cat: neutral}]
+      - id: dance_with_teacher
+        text: "ชวนครูมาเต้นคลิปต่อ"
+        outcomes:
+          - {weight: 1, text: "คลิปครูเต้นดังกว่าเดิมสิบเท่า ทั้งโรงเรียนรักครูขึ้น", effects: {relations: 2, happiness: 2}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูโดนผู้บริหารเรียกพบ ไม่มองหน้ากันอีกเลย", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: teen_part_time_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [15, 18]}
+    weight: 2
+    title: "หาเงินเองครั้งแรก"
+    text: "ที่บ้านเงินเริ่มตึง ร้านหมูกระทะข้างตลาดรับเด็กล้างจาน ส่วนเพื่อนชวนไปแบกของที่ท่าเรือ ได้เงินมากกว่าเท่าตัว"
+    choices:
+      - id: wash_dishes
+        text: "ล้างจาน เอาเงินช่วยบ้าน"
+        effects: {money: {unit: income_x, amount: 0.5}, knowledge: -1, relations: 1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: dock_work
+        text: "ไปแบกของที่ท่าเรือ"
+        outcomes:
+          - {weight: 3, text: "ได้เงินดี กล้ามขึ้นเป็นมัด", effects: {money: {unit: income_x, amount: 1}, health: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลังหล่นทับหลัง นอนซมไปหลายเดือน", effects: {money: {unit: income_x, amount: 0.3}, health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sell_online
+        text: "ขายเคสมือถือออนไลน์"
+        outcomes:
+          - {weight: 1, text: "ขายดีจนต้องจ้างเพื่อนช่วยแพ็กของ", effects: {money: {unit: income_x, amount: 2}, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ของค้างสต็อกเต็มห้องนอน", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: chase_scholarship
+        text: "ไม่ทำ ตั้งใจเรียนชิงทุน"
+        outcomes:
+          - {weight: 1, text: "ได้ทุนเรียนฟรีถึงปริญญาตรี", effects: {knowledge: 2, money: {unit: income_x, amount: 1}}, sets_flags: [good_student], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทุนตกไปที่คนอื่นแค่คะแนนเดียว", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: teen_moto_crash_01
+    type: A
+    category: health
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [15, 18]}
+    weight: 2
+    title: "ไถลกลางทางกลับจากงานวัด"
+    text: "ซ้อนมอเตอร์ไซค์เพื่อนกลับจากงานวัด ไม่มีใครใส่หมวก รถเสียหลักไถลข้างทาง ขาบวมเป่ง ส่วนเพื่อนที่ขับหายไปไหนไม่รู้"
+    choices:
+      - id: go_hospital
+        text: "โบกรถไปโรงพยาบาลทันที"
+        effects: {health: 1, happiness: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: folk_massage
+        text: "ไปหาหมอนวดพื้นบ้าน"
+        outcomes:
+          - {weight: 1, text: "นวดไม่กี่ครั้งก็เดินฉิว ประหยัดไปเยอะ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กระดูกติดผิดรูป เดินกะเผลกไปอีกนาน", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: find_friend
+        text: "ลากขาไปตามหาเพื่อนก่อน"
+        outcomes:
+          - {weight: 1, text: "เจอเพื่อนสลบในคูน้ำ คุณช่วยชีวิตเขาไว้ได้ทัน", effects: {relations: 3, health: -1}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 1, text: "เพื่อนหนีกลับบ้านไปแล้ว ทิ้งให้นอนเจ็บคนเดียว", effects: {relations: -2, health: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: call_parents
+        text: "โทรให้พ่อแม่มารับ"
+        outcomes:
+          - {weight: 2, text: "โดนด่ายับ แต่พ่อแม่พาไปรักษาจนหายดี", effects: {health: 1, relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พ่อแม่ยึดทั้งรถทั้งมือถือไปทั้งปี", effects: {health: 1, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

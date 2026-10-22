@@ -131,7 +131,7 @@ function render(card) {
       ? `รายได้ ${baht(monthlyIncome(st, year))}/เดือน`
       : `เงินติดตัว ${baht(s.money)}`;
     box.append(el('div', 'meta', `ฐานะ${st.cls} · ${st.occupationName} · ${purse}`));
-    body.append(el('span', 'kicker', card.kind === 'event' ? `ช่วง${card.stage}` : KICKER[card.kind]));
+    body.append(el('span', 'kicker', card.kind === 'event' ? (card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind]));
 
     if (card.kind === 'stage') {
       body.append(el('span', 'stamp', card.text));

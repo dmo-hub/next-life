@@ -1,0 +1,336 @@
+# การ์ดบ้านเมือง · ภัยพิบัติ/โรคระบาด — 5 เหตุการณ์ × (เด็ก ครอบครัวเลือก + ผู้ใหญ่)
+events:
+  # ---------- พายุไต้ฝุ่นเกย์ ----------
+  - id: era_dis_typhoon_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: typhoon_gay
+    when: {age: [0, 12]}
+    title: "ไต้ฝุ่นกลางดึก"
+    text: "พายุเข้าฝั่งตอนตีสอง ลมหอบหลังคาสังกะสีปลิวไปทั้งแผ่น เช้ามาเรือของพ่อที่จอดหน้าบ้านหายไปกับคลื่น พ่อแม่นั่งเงียบอยู่นานว่าจะเอายังไงต่อ"
+    choices:
+      - id: move_to_town
+        text: "ย้ายไปอาศัยญาติในเมือง"
+        effects: {health: 1, happiness: -1, relations: -1, income_mult: 1.2}
+        merit: [{cat: neutral}]
+      - id: rebuild_boat
+        text: "กู้เงินต่อเรือใหม่ ออกทะเลต่อ"
+        outcomes:
+          - {weight: 3, text: "หลังพายุปลาชุกผิดปกติ เรือลำใหม่ใช้หนี้หมดในปีเดียว", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรือรั่วกลางทะเล พ่อกลับมาได้แต่เจ็บหนัก ลูกต้องหยุดเรียนมาช่วยแม่หาเงินใช้หนี้", effects: {happiness: -2, knowledge: -1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: shelter_neighbors
+        text: "เปิดบ้านให้เพื่อนบ้านมานอน"
+        effects: {health: -1, relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 2}]
+      - id: boarding_school
+        text: "ส่งลูกไปเรียนประจำในเมือง"
+        effects: {knowledge: 2, relations: -2}
+        merit: [{cat: neutral}]
+
+  - id: era_dis_typhoon_adult_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: typhoon_gay
+    when: {age: [13, 110]}
+    title: "ไต้ฝุ่นถล่มชายฝั่ง"
+    text: "ไต้ฝุ่นลูกใหญ่ซัดชายฝั่ง ข่าวบอกว่าบางหมู่บ้านหายไปทั้งแถบ ทีวีเปิดรับบริจาคทั้งคืน ส่วนคนในพื้นที่ขาดทั้งช่างทั้งแรงงานรื้อซาก"
+    choices:
+      - id: go_help
+        text: "ลงพื้นที่ไปช่วยรื้อซาก"
+        effects: {health: -1, relations: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 2}]
+      - id: donate_tv
+        text: "โอนเงินช่วยผ่านทีวี"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: dana, level: 1}]
+      - id: contractor
+        text: "รับจ้างซ่อมบ้านหลังพายุ"
+        outcomes:
+          - {weight: 2, text: "งานล้นมือจนต้องจ้างลูกน้อง กลายเป็นผู้รับเหมาเจ้าประจำของทั้งอำเภอ", effects: {money: {unit: income_x, amount: 1}, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รับงานเกินตัว ตกนั่งร้านขาเดาะ ลูกค้าทวงมัดจำคืน", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: price_gouge
+        text: "กักน้ำดื่มไว้ขายราคาสามเท่า"
+        effects: {happiness: 1, relations: -2, money: {unit: income_x, amount: 1.5}}
+        merit: [{cat: greed_harm, level: 1}]
+      - id: stay_home
+        text: "ปิดทีวี ไปวิ่งให้หายเครียด"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  # ---------- SARS ----------
+  - id: era_dis_sars_kid_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    era: sars
+    when: {age: [0, 12]}
+    title: "ไอสามวันช่วงโรคระบาด"
+    text: "ข่าวโรคปอดอักเสบปริศนาจากต่างประเทศเต็มจอ ทั้งห้องเรียนใส่หน้ากาก ลูกไอติดกันสามวัน ตัวรุม ๆ พ่อแม่ใจคอไม่ดี"
+    choices:
+      - id: private_hospital
+        text: "พาไปโรงพยาบาลเอกชนทันที"
+        effects: {money: {unit: income_x, amount: -0.5}}
+        outcomes:
+          - {weight: 3, text: "หมอบอกแค่หวัดธรรมดา ได้ไอติมปลอบใจขากลับ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตรวจเจอปอดบวมตั้งแต่เนิ่น ๆ หมอว่าถ้ามาช้ากว่านี้อาจแย่ พ่อแม่กอดลูกแน่นทั้งคืน", effects: {relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: home_quarantine
+        text: "ให้หยุดเรียนอยู่บ้านสองอาทิตย์"
+        effects: {health: 1, knowledge: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: herbal_boil
+        text: "ต้มยาสมุนไพรสูตรยายให้กิน"
+        outcomes:
+          - {weight: 2, text: "หายเองในสองวัน ยายคุยเรื่องนี้ไปอีกสิบปี", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไอยืดเป็นเดือน ไปหาหมอช้าจนปอดอักเสบ", effects: {health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: school_as_usual
+        text: "ส่งไปโรงเรียนตามปกติ"
+        outcomes:
+          - {weight: 3, text: "เรียนทันเพื่อน ไม่มีอะไรเกิดขึ้น", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไข้ขึ้นกลางห้อง ถูกจับแยก เพื่อนตั้งฉายาไปทั้งปี", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: era_dis_sars_adult_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    era: sars
+    when: {age: [13, 110]}
+    title: "เที่ยวบินว่างเปล่า"
+    text: "ทั่วโลกผวาโรคทางเดินหายใจตัวใหม่ นักท่องเที่ยวหายวับ สนามบินเงียบเหมือนวันหยุด ตั๋วเครื่องบินกับโรงแรมลดราคากระหน่ำ"
+    choices:
+      - id: cheap_trip
+        text: "คว้าตั๋วถูกไปเที่ยวนอก"
+        outcomes:
+          - {weight: 3, text: "ทริปคุ้มที่สุดในชีวิต ถ่ายรูปสถานที่ดังได้โดยไม่มีคนติดเฟรม", effects: {happiness: 3, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไข้ขึ้นที่สนามบินขากลับ ถูกกักตัวสิบสี่วัน ทั้งที่สุดท้ายเป็นแค่หวัด", effects: {health: -1, happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hoard_masks
+        text: "ตุนหน้ากากไว้ขาย"
+        outcomes:
+          - {weight: 1, text: "ขายหมดเกลี้ยงในสามวัน กำไรเท่าเงินเดือนครึ่งปี", effects: {happiness: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 2, text: "ข่าวซาเร็วกว่าคิด หน้ากากค้างเต็มห้องไปอีกหลายปี", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: greed_harm, level: 1}]}
+        merit: [{cat: greed_harm, level: 1}]
+      - id: study_in_slump
+        text: "ใช้ช่วงซบเซาไปเรียนเพิ่ม"
+        effects: {knowledge: 2, money: {unit: income_x, amount: -1}, income_mult: 1.15}
+        merit: [{cat: neutral}]
+      - id: careful_routine
+        text: "ล้างมือ ใส่หน้ากาก ใช้ชีวิตปกติ"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: airport_screening
+        text: "อาสาช่วยคัดกรองที่สนามบิน"
+        effects: {health: -1, relations: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 2}]
+
+  # ---------- สึนามิ ----------
+  - id: era_dis_tsunami_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: tsunami
+    when: {age: [0, 12]}
+    title: "ทะเลถอยหนี"
+    text: "เช้าวันหยุดที่ชายหาด น้ำทะเลลดลงไปไกลผิดปกติ ปลาดิ้นอยู่บนทรายเต็มไปหมด เด็ก ๆ ทั้งหาดวิ่งกรูลงไปเก็บ ลูกกำลังจะวิ่งตามเพื่อน"
+    choices:
+      - id: run_uphill
+        text: "พ่อแม่หิ้วลูกวิ่งขึ้นเนินทันที"
+        outcomes:
+          - {weight: 2, text: "หนีทันทั้งบ้าน แต่รถกับข้าวของบนหาดถูกคลื่นกวาดไปหมด", effects: {health: 1, happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขึ้นเนินทันเส้นยาแดง ลูกเห็นคลื่นกวาดหาดกับตา ฝันร้ายไปหลายปี", effects: {happiness: -2, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: let_kid_play
+        text: "ปล่อยลูกเก็บปลาอีกแป๊บ"
+        outcomes:
+          - {weight: 2, text: "คลื่นก้อนแรกมาถึง พ่อคว้าตัวขึ้นหลังคารถได้ทันเส้นยาแดง", effects: {health: -1, happiness: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คลื่นซัดไปไกลเกือบกิโล รอดเพราะเกาะต้นมะพร้าวไว้ทั้งคืน กลายเป็นข่าวไปทั้งประเทศ", effects: {health: -3, relations: 2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: shout_warning
+        text: "ตะโกนเตือนคนทั้งหาดก่อนหนี"
+        outcomes:
+          - {weight: 2, text: "มีคนเชื่อ หนีขึ้นเนินทันกันหลายสิบคน ทุกปีมีคนมากราบขอบคุณ", effects: {relations: 3}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 1, text: "ไม่มีใครฟัง ต้องวิ่งเอาตัวรอดจนหอบ", effects: {health: -1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: move_inland
+        text: "ย้ายบ้านไปอยู่ไกลทะเลถาวร"
+        effects: {health: 1, happiness: -1, income_mult: 0.8}
+        merit: [{cat: neutral}]
+
+  - id: era_dis_tsunami_adult_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: tsunami
+    when: {age: [13, 110]}
+    title: "คลื่นยักษ์อันดามัน"
+    text: "ข่าวด่วน คลื่นยักษ์ถล่มฝั่งอันดามัน ยอดผู้เสียชีวิตขึ้นทุกชั่วโมง ญาติที่ทำงานรีสอร์ตริมหาดยังติดต่อไม่ได้ตั้งแต่เมื่อวาน"
+    choices:
+      - id: search_relative
+        text: "ดั้นด้นไปตามหาเอง"
+        outcomes:
+          - {weight: 2, text: "เจอเขาในศูนย์พักพิง กอดกันร้องไห้กลางเต็นท์", effects: {health: -1, relations: 3}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ตามหาสามวัน แล้วเขาโทรมาเอง ปลอดภัยดี ติดอยู่อีกเกาะ มือถือแบตหมด", effects: {health: -1, happiness: 1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: volunteer_id
+        text: "อาสาช่วยพิสูจน์เอกลักษณ์ศพ"
+        effects: {health: -1, happiness: -2, relations: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 3}]
+      - id: donate_wait
+        text: "โอนเงินช่วยแล้วรอข่าว"
+        effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: dana, level: 1}]
+      - id: buy_beach_land
+        text: "ชวนที่บ้านซื้อที่ริมหาดราคาตก"
+        outcomes:
+          - {weight: 2, text: "หลายปีต่อมานักท่องเที่ยวกลับมาล้นหาด ราคาที่ดินพุ่งหลายเท่า", effects: {money: {unit: income_x, amount: 3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ที่ดินแปลงนั้นถูกประกาศเป็นเขตเสี่ยงภัย สร้างอะไรไม่ได้ ทิ้งร้างจนวันตาย", effects: {happiness: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: turn_off_news
+        text: "ปิดข่าว ไม่อยากรับรู้อีก"
+        effects: {health: 1, happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  # ---------- น้ำท่วมใหญ่ ----------
+  - id: era_dis_flood_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: great_flood
+    when: {age: [0, 12]}
+    title: "น้ำขึ้นวันละคืบ"
+    text: "น้ำเหนือไหลเข้าเมือง ระดับน้ำขึ้นวันละคืบ ชั้นล่างของบ้านจมไปแล้ว โรงเรียนประกาศปิดไม่มีกำหนด ลูกตื่นเต้นมากกว่ากลัว"
+    choices:
+      - id: stay_upstairs
+        text: "ขนของขึ้นชั้นสอง อยู่สู้"
+        outcomes:
+          - {weight: 2, text: "ลูกพายกะละมังไปบ้านเพื่อนทุกวัน เป็นปิดเทอมที่สนุกที่สุดในชีวิต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เหยียบเศษแก้วใต้น้ำ แผลติดเชื้อต้องนอนโรงพยาบาล", effects: {health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: evacuate_shelter
+        text: "อพยพไปศูนย์พักพิง"
+        effects: {happiness: -1, relations: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: relatives_upcountry
+        text: "หนีไปอยู่บ้านญาติต่างจังหวัด"
+        effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: build_boats
+        text: "พ่อแม่ต่อเรือขายริมถนน"
+        outcomes:
+          - {weight: 2, text: "เรือขายดีเป็นเทน้ำเทท่า ลูกได้ช่วยทาสีจนมือเลอะทั้งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้ำลดเร็วกว่าที่คิด เรือค้างเต็มหน้าบ้าน กลายเป็นกระถางต้นไม้", effects: {money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: era_dis_flood_adult_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: great_flood
+    when: {age: [13, 110]}
+    title: "ถุงทรายหน้าบ้าน"
+    text: "น้ำท่วมนิคมอุตสาหกรรมทั้งแถบ โรงงานหยุดเป็นเดือน น้ำจ่ออยู่ปากซอย แนวถุงทรายหน้าซอยกลายเป็นเรื่องให้เพื่อนบ้านสองฝั่งทะเลาะกันทุกคืน"
+    choices:
+      - id: open_sandbags
+        text: "ยอมเปิดแนวทรายให้น้ำระบาย"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: help_others, level: 1}]
+      - id: wall_own_house
+        text: "กั้นทรายบ้านตัวเองสูงท่วมหัว"
+        effects: {happiness: 1, relations: -3, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: greed_harm, level: 1}]
+      - id: wade_to_work
+        text: "ลุยน้ำไปทำงานไปเรียนทุกวัน"
+        outcomes:
+          - {weight: 2, text: "ความอึดเป็นที่เลื่องลือ ใครมีงานดี ๆ ก็นึกถึงเป็นคนแรก", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ติดเชื้อจากน้ำขัง ตับไตไม่เหมือนเดิม", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: back_to_farm
+        text: "ย้ายกลับไปอยู่บ้านเกิดทำสวน"
+        effects: {health: 1, happiness: 1, chronic: {health: 1}, income_mult: 0.8}
+        merit: [{cat: neutral}]
+
+  # ---------- โควิด-19 ----------
+  - id: era_dis_covid_kid_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    era: covid19
+    when: {age: [0, 12]}
+    title: "เรียนผ่านจอ"
+    text: "โรคระบาดทั่วโลก โรงเรียนปิด ครูสอนผ่านจอ แต่บ้านมีมือถือเครื่องเดียว แม่ต้องใช้ขายของ พ่อต้องใช้รับงาน ลูกต้องใช้เรียน"
+    choices:
+      - id: buy_tablet
+        text: "ควักเงินซื้อแท็บเล็ตให้ลูก"
+        effects: {knowledge: 2, health: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: help_live_sell
+        text: "ให้ลูกช่วยแม่ไลฟ์ขายของ"
+        effects: {knowledge: -1}
+        outcomes:
+          - {weight: 2, text: "ลูกพูดเก่งจนคนดูติดงอมแงม ยอดขายพุ่ง ทั้งบ้านเรียกว่าแม่ค้าตัวน้อย", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนดูสามคน เป็นยายสองคน แต่ลูกกล้าพูดต่อหน้ากล้องขึ้นเยอะ", effects: {relations: 1}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: send_to_grandma
+        text: "ส่งไปอยู่กับยายต่างจังหวัด"
+        effects: {health: 1, knowledge: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: share_phone
+        text: "ผลัดกันใช้มือถือเครื่องเดียว"
+        outcomes:
+          - {weight: 2, text: "หลุดเรียนบ่อยจนเกรดร่วง ตามเพื่อนไม่ทันไปอีกหลายปี", effects: {knowledge: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูเห็นความพยายาม ขี่มอเตอร์ไซค์เอาชีทมาส่งถึงบ้านทุกอาทิตย์", effects: {knowledge: 1, relations: 2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: era_dis_covid_adult_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: covid19
+    when: {age: [13, 110]}
+    title: "เมืองเงียบ"
+    text: "โรคระบาดทำเมืองเงียบสนิท ห้างปิด งานหาย คนไม่ออกจากบ้าน แต่ยอดสั่งของออนไลน์ทะลุเพดาน ไรเดอร์วิ่งกันทั้งคืน"
+    choices:
+      - id: live_selling
+        text: "เปิดไลฟ์ขายของออนไลน์"
+        outcomes:
+          - {weight: 2, text: "ไลฟ์ตีสองยอดพุ่ง กลายเป็นแม่ค้าออนไลน์ที่มีแฟนคลับเหนียวแน่น", effects: {happiness: 2, money: {unit: income_x, amount: 1}, income_mult: 1.4}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ขายได้แต่ญาติ แต่ได้วิชาถ่ายรูป ตอบแชต ส่งของติดตัวมา", effects: {knowledge: 1}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกค้าตีของคืนทั้งล็อต ทุนจมหายในเดือนเดียว", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: become_rider
+        text: "สมัครเป็นไรเดอร์ส่งอาหาร"
+        effects: {health: -1, money: {unit: income_x, amount: 0.5}, income_mult: 1.1}
+        merit: [{cat: neutral}]
+      - id: secret_party
+        text: "แอบไปงานวันเกิดเพื่อน"
+        outcomes:
+          - {weight: 2, text: "รอดมาได้ เป็นคืนที่สนุกที่สุดของปี", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ติดเชื้อกันทั้งวง หายแล้วแต่เหนื่อยง่าย หายใจไม่เต็มปอดไปอีกนาน", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: home_workout
+        text: "กักตัว หัดทำกับข้าว ออกกำลัง"
+        effects: {money: {unit: income_x, amount: -0.3}}
+        outcomes:
+          - {weight: 1, text: "ติดเป็นนิสัย ออกกำลังทุกเช้าจนทุกวันนี้", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทำได้สองอาทิตย์ก็เลิก เหลือแต่ฝีมือทอดไข่เจียว", effects: {happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: vaccine_volunteer
+        text: "อาสาไปช่วยศูนย์ฉีดวัคซีน"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 2}]

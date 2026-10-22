@@ -1,0 +1,290 @@
+# กลุ่ม work_money · ช่วงวัยทำงาน (31–45) · การ์ดกองสุ่มเรื่องงาน/เงิน ใช้ income_mult เป็นผลไกล
+events:
+  - id: work_layoff_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {flags: {in_debt: 1.5}}
+    title: "กล่องกระดาษใบนั้น"
+    text: "เช้าวันจันทร์ HR เรียกเข้าห้องประชุม บนโต๊ะมีซองเงินชดเชยกับกล่องกระดาษเปล่าวางรออยู่ อายุ {อายุ} ปี เพิ่งถูกเลย์ออฟ"
+    choices:
+      - id: open_shop
+        text: "เอาเงินชดเชยเปิดร้านเอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ร้านติดตลาด ลูกค้าแน่นทุกเย็น ได้เป็นนายตัวเองสักที", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ร้านเงียบเหงา เงินชดเชยหมดภายในปีเดียว ต้องกู้มาจ่ายค่าเช่า", effects: {happiness: -2, money: {unit: income_x, amount: -1.5}}, sets_flags: [own_business, in_debt], merit: [{cat: neutral}]}
+      - id: beg_to_stay
+        text: "ขอทำต่อ ยอมลดเงินเดือน"
+        effects: {income_mult: 0.8, happiness: -1, health: -1}
+        merit: [{cat: neutral}]
+      - id: go_home_farm
+        text: "กลับบ้านเกิดไปทำสวน"
+        effects: {income_mult: 0.7, health: 2, relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: rant_live
+        text: "ไลฟ์ระบายความในใจลงเน็ต"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "คลิปไวรัล บริษัทคู่แข่งทักมาเสนองานที่เงินดีกว่าเดิม", effects: {happiness: 2, income_mult: 1.4}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "บริษัทเก่าส่งทนายมาฟ้องหมิ่นประมาท ต้องจ่ายค่าไกล่เกลี่ย", effects: {relations: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+
+  - id: work_promotion_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {stats: {knowledge: 1.3}, flags: {good_student: 1.5}}
+    title: "เก้าอี้ผู้จัดการ"
+    text: "หัวหน้าเกษียณ ผู้บริหารยื่นข้อเสนอให้ขึ้นเป็นผู้จัดการ เงินเดือนเกือบสองเท่า แต่มีเงื่อนไขเดียว ต้องย้ายไปประจำสาขาต่างจังหวัด"
+    choices:
+      - id: take_move
+        text: "รับเลย ย้ายไปคนเดียว"
+        effects: {income_mult: 1.4, relations: -2, health: -1}
+        merit: [{cat: neutral}]
+      - id: decline_family
+        text: "ปฏิเสธ ขออยู่ใกล้ครอบครัว"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: negotiate_remote
+        text: "ต่อรองขอทำงานทางไกล"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ผู้บริหารยอม ได้ทั้งตำแหน่งและอยู่บ้านเดิม", effects: {happiness: 2, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตำแหน่งตกเป็นของรุ่นน้องที่ไม่ต่อรองสักคำ", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: recommend_junior
+        text: "เสนอชื่อลูกน้องที่เก่งกว่า"
+        effects: {relations: 2, health: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: work_callcenter_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2540, 2650]
+    weight: 2
+    multipliers: {flags: {online_seller: 1.5}}
+    title: "สายจากเจ้าหน้าที่"
+    text: "ปลายสายอ้างเป็นตำรวจ บอกว่าชื่อของคุณพัวพันคดีฟอกเงิน ต้องโอนเงินเก็บก้อนใหญ่มาให้ตรวจสอบภายในหนึ่งชั่วโมง ไม่งั้นออกหมายจับ"
+    choices:
+      - id: panic_transfer
+        text: "ตกใจ รีบโอนตามที่บอก"
+        effects: {money: {unit: income_x, amount: -2}, happiness: -2, health: -1}
+        merit: [{cat: neutral}]
+      - id: hang_up_check
+        text: "วางสาย โทรเช็กโรงพักเอง"
+        effects: {knowledge: 1, happiness: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: troll_scammer
+        text: "แกล้งคุยยื้อ อัดเสียงไว้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "คลิปแกล้งแก๊งคอลเซ็นเตอร์ดังทั้งประเทศ คนทักมาขอบคุณไม่หยุด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มันเอาเบอร์ไปขาย โดนโทรก่อกวนทั้งเดือน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+      - id: warn_neighbors
+        text: "เตือนพ่อแม่กับคนทั้งซอย"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: work_guarantor_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {flags: {not: [guarantor]}}
+    title: "แค่ลายเซ็นเดียว"
+    text: "เพื่อนสนิทสมัยเรียนถือเอกสารกู้มาที่บ้าน ขอแค่ลายเซ็นค้ำประกัน \"ไม่มีอะไรหรอก เราผ่อนเองทุกงวด สาบานเลย\""
+    choices:
+      - id: sign_it
+        text: "เซ็นให้ เพื่อนกันทั้งที"
+        sets_flags: [guarantor]
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 2, text: "เพื่อนผ่อนครบจริง ซึ้งใจจนขอให้เป็นพ่อแม่ทูนหัวของลูก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "สามเดือนต่อมาเพื่อนหายเงียบ จดหมายทวงหนี้ส่งมาที่บ้านคุณแทน", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+      - id: refuse_flat
+        text: "ปฏิเสธตรง ๆ ไม่ค้ำใคร"
+        effects: {relations: -2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: lend_small
+        text: "ไม่เซ็น แต่ให้ยืมเงินก้อนเล็ก"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: dana, level: 1}]
+      - id: check_first
+        text: "ขอดูภาระหนี้เพื่อนก่อน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "เจอว่าเพื่อนติดหนี้อีกห้าเจ้า รอดตัวไปหวุดหวิด", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนน้อยใจว่าไม่ไว้ใจกัน เลิกคบไปเลย", effects: {relations: -2}, merit: [{cat: neutral}]}
+
+  - id: work_house_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {flags: {has: [married], not: [has_kids, home_owner]}}
+    multipliers: {flags: {guarantor: 0.5}}
+    title: "บ้านหลังแรก"
+    text: "คู่ชีวิตกระซิบข่าวดี กำลังจะมีเจ้าตัวเล็ก ห้องเช่าที่อยู่กันสองคนเริ่มแคบลงทุกวัน ถึงเวลาตัดสินใจเรื่องบ้าน"
+    choices:
+      - id: house_loan_insured
+        text: "กู้ซื้อบ้านเดี่ยว พ่วงประกัน"
+        effects: {happiness: 2, health: -1, money: {unit: income_x, amount: -1.5}}
+        sets_flags: [has_kids, in_debt, has_insurance, home_owner]
+        merit: [{cat: neutral}]
+      - id: condo_near_work
+        text: "ซื้อคอนโดใกล้ที่ทำงาน"
+        effects: {happiness: 1, money: {unit: income_x, amount: -1}}
+        sets_flags: [has_kids, home_owner]
+        merit: [{cat: neutral}]
+      - id: move_to_parents
+        text: "ย้ายไปอยู่บ้านพ่อแม่"
+        effects: {health: 1}
+        sets_flags: [has_kids]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ปู่ย่าตายายช่วยเลี้ยงหลาน เงินเหลือเก็บทุกเดือน", effects: {relations: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แม่กับคู่ชีวิตเปิดศึกกันทุกมื้อ บ้านไม่เคยสงบ", effects: {relations: -2, happiness: -2}, merit: [{cat: neutral}]}
+      - id: auction_house
+        text: "ประมูลบ้านมือสองครึ่งราคา"
+        sets_flags: [has_kids, home_owner]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ได้บ้านสภาพดีในราคาครึ่งเดียว เพื่อนบ้านยังอิจฉา", effects: {happiness: 2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของเดิมไม่ยอมย้ายออก ฟ้องร้องกันยืดเยื้อหลายปี", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+
+  - id: work_biz_boom_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {flags: {has: [own_business]}}
+    multipliers: {flags: {street_vendor: 2}}
+    title: "คิวยาวถึงปากซอย"
+    text: "นักรีวิวชื่อดังแวะใช้บริการร้านคุณแบบไม่บอกใคร แล้วโพสต์ชมว่าดีที่สุดในชีวิต เช้าวันรุ่งขึ้นคิวยาวถึงปากซอย รับลูกค้าไม่ทันตั้งแต่ก่อนเที่ยง"
+    choices:
+      - id: expand_fast
+        text: "กู้มาเปิดเพิ่มอีกสามสาขา"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "สาขาใหม่ขายดีทุกแห่ง มีคนมาขอซื้อแฟรนไชส์", effects: {happiness: 2, health: -1, income_mult: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ขยายเร็วจนคุมคุณภาพไม่อยู่ ลูกค้าหาย หนี้ยังอยู่ครบ", effects: {happiness: -2, income_mult: 0.7, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+      - id: sell_recipe
+        text: "ขายกิจการให้นายทุน แล้วพักยาว"
+        effects: {happiness: 1, health: 1, money: {unit: income_x, amount: 3}}
+        clears_flags: [own_business]
+        merit: [{cat: neutral}]
+      - id: stay_small_share
+        text: "ไม่ขยาย แบ่งรายได้ช่วยคนยากไร้"
+        effects: {relations: 1, happiness: 1, income_mult: 1.2}
+        merit: [{cat: dana, level: 1}]
+      - id: cut_corners
+        text: "ขึ้นราคา แอบลดคุณภาพของ"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 1, text: "กำไรพุ่ง ไม่มีใครสังเกต อย่างน้อยก็ตอนนี้", effects: {money: {unit: income_x, amount: 2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "นักรีวิวคนเดิมกลับมาแฉ ร้านร้างภายในเดือนเดียว", effects: {happiness: -2, relations: -1, income_mult: 0.7}, merit: [{cat: neutral}]}
+
+  - id: work_biz_bust_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {flags: {has: [own_business]}}
+    multipliers: {flags: {in_debt: 2, guarantor: 1.5}}
+    title: "ห้างมาเปิดตรงข้าม"
+    text: "ห้างใหญ่มาเปิดตรงข้ามร้าน ลูกค้าหายไปครึ่งหนึ่งในชั่วข้ามคืน แต่ค่าเช่ากับค่าแรงลูกน้องยังรออยู่ทุกต้นเดือน"
+    choices:
+      - id: loan_shark
+        text: "กู้นอกระบบมาประคองร้าน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ฝ่าช่วงวิกฤตไปได้ ร้านรอดและแข็งแรงกว่าเดิม", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ดอกทบดอก คนทวงหนี้มายืนหน้าบ้านทุกเย็น", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+      - id: close_be_employee
+        text: "ปิดร้าน กลับไปเป็นลูกจ้าง"
+        effects: {happiness: -1, health: 1, income_mult: 0.8}
+        clears_flags: [own_business]
+        merit: [{cat: neutral}]
+      - id: pivot_delivery
+        text: "ย้ายไปขายออนไลน์อย่างเดียว"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ปิดหน้าร้าน รับงานผ่านแอปแทน ออเดอร์เด้งไม่หยุด", effects: {happiness: 1, income_mult: 1.3}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ค่าคอมแอปกินกำไรหมด ขายมากยิ่งเหนื่อยฟรี", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: sell_lease
+        text: "เซ้งกิจการให้คนอื่น"
+        effects: {happiness: -1, relations: 1, money: {unit: income_x, amount: 1}}
+        clears_flags: [own_business]
+        merit: [{cat: neutral}]
+
+  - id: work_influencer_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2550, 2650]
+    weight: 1
+    multipliers: {flags: {likes_clips: 3}}
+    title: "ยอดวิวทะลุล้าน"
+    text: "คลิปที่โพสต์เล่น ๆ ตอนพักเที่ยงมีคนดูทะลุล้าน เอเจนซีทักมาชวนเป็นอินฟลูฯ เต็มตัว พร้อมสัญญาที่ตัวเลขทำให้ตาลาย"
+    choices:
+      - id: quit_go_full
+        text: "ลาออก ทำคอนเทนต์เต็มเวลา"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ผู้ติดตามพุ่ง แบรนด์ต่อคิวจ้างจนต้องปฏิเสธ", effects: {happiness: 2, health: -1, income_mult: 2}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "กระแสหมดในสามเดือน จะกลับไปงานเดิมก็ไม่มีที่ว่างแล้ว", effects: {happiness: -2, income_mult: 0.7}, merit: [{cat: neutral}]}
+      - id: side_hustle
+        text: "ทำคู่กับงานประจำ นอนน้อยหน่อย"
+        effects: {happiness: 1, health: -1, income_mult: 1.2}
+        merit: [{cat: neutral}]
+      - id: fake_review
+        text: "รับรีวิวของที่ไม่เคยลองใช้"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 2, text: "เงินเข้าง่ายจนแทบไม่เชื่อ", effects: {money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ติดตามใช้แล้วแพ้หนัก แฉกันทั้งเน็ต ชื่อเสียงพังในคืนเดียว", effects: {relations: -2, happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: fundraise_hospital
+        text: "ใช้ยอดวิวระดมทุนให้ รพ.บ้านเกิด"
+        effects: {relations: 2, happiness: 1, health: 1}
+        merit: [{cat: help_others, level: 2}]
+
+  - id: work_online_shop_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2550, 2650]
+    weight: 2
+    when: {flags: {not: [online_seller]}}
+    multipliers: {flags: {street_vendor: 2, likes_clips: 1.5}}
+    title: "ลงทุนแค่สต็อกแรก"
+    text: "เพื่อนร่วมงานขายครีมออนไลน์จนลาออกไปถอยรถใหม่ เธอชวนคุณมาเป็นตัวแทน \"ลงทุนแค่สต็อกแรก ที่เหลือไลฟ์อย่างเดียว\""
+    choices:
+      - id: big_stock
+        text: "ทุ่มเงินเก็บซื้อสต็อกล็อตใหญ่"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ไลฟ์คืนแรกขายหมดเกลี้ยง กลายเป็นแม่ทีมในปีเดียว", effects: {happiness: 2, income_mult: 1.6}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ครีมไม่ผ่านมาตรฐาน ลองทาเองหน้าพัง ของค้างเต็มห้อง", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
+      - id: own_shop_online
+        text: "เปิดร้านออนไลน์ของที่ถนัดเอง"
+        effects: {happiness: 1, health: -1, income_mult: 1.2}
+        sets_flags: [online_seller]
+        merit: [{cat: neutral}]
+      - id: warn_pyramid
+        text: "ปฏิเสธ เตือนเพื่อนเรื่องลูกโซ่"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: sell_secondhand
+        text: "ไลฟ์ขายของมือสองในบ้านแทน"
+        effects: {happiness: 1, health: 1, money: {unit: income_x, amount: 0.5}}
+        sets_flags: [online_seller]
+        merit: [{cat: neutral}]

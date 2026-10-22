@@ -1,0 +1,220 @@
+events:
+  - id: workh_office_syndrome_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    multipliers: {flags: {sporty: 0.5}}
+    title: "คอแข็งเป็นหิน"
+    text: "อายุ {อายุ} นั่งหน้าจอวันละสิบสองชั่วโมง เช้านี้หันคอไปทางซ้ายไม่ได้ นิ้วชาไปถึงข้อศอก เพื่อนโต๊ะข้าง ๆ บอกว่าเป็นกันทั้งออฟฟิศ"
+    choices:
+      - id: push_on
+        text: "แปะพลาสเตอร์ แล้วทำงานต่อ"
+        effects: {health: -1, chronic: {health: -1}, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - id: stretch_hourly
+        text: "ตั้งนาฬิกาลุกยืดทุกชั่วโมง"
+        effects: {health: 1, chronic: {health: 1}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: roadside_massage
+        text: "ลองหมอนวดจับเส้นข้างตลาด"
+        outcomes:
+          - {weight: 2, text: "กดจุดเดียวคอกลับมาหมุนได้ เหมือนปาฏิหาริย์", effects: {health: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เส้นพลิก ต้องใส่เฝือกคอเดินไปทำงานสองเดือน", effects: {health: -2, chronic: {health: -1}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ergonomic_chair
+        text: "ซื้อเก้าอี้เพื่อสุขภาพราคาแพง"
+        effects: {money: {unit: income_x, amount: -0.5}}
+        outcomes:
+          - {weight: 1, text: "นั่งแล้วหลังตรงเอง ปวดคอหายไปภายในเดือนเดียว", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สุดท้ายเก้าอี้กลายเป็นที่แขวนเสื้อ คอยังแข็งเหมือนเดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit_desk
+        text: "ลาออกไปเป็นไกด์เดินป่า"
+        effects: {health: 2, chronic: {health: 1}, happiness: 2, income_mult: 0.8}
+        merit: [{cat: neutral}]
+
+  - id: workh_road_accident_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    title: "สี่แยกตอนฝนตก"
+    text: "รถกระบะเบรกไม่อยู่ ชนท้ายมอเตอร์ไซค์ของคุณกลางสี่แยก ตื่นมาในห้องฉุกเฉิน ขาซ้ายหักสองท่อน คู่กรณียืนขอโทษอยู่ข้างเตียง"
+    choices:
+      - id: private_surgery
+        text: "ผ่าตัดใส่เหล็กที่ รพ.เอกชน"
+        effects: {health: 1, money: {unit: income_x, amount: -1.5}}
+        merit: [{cat: neutral}]
+      - id: public_queue
+        text: "รอคิวผ่าตัดที่ รพ.รัฐ"
+        effects: {health: -1, happiness: -1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: bone_healer
+        text: "ไปหมอต่อกระดูกพื้นบ้าน"
+        outcomes:
+          - {weight: 1, text: "กระดูกติดสนิท หมอชาวบ้านไม่คิดเงินสักบาท", effects: {health: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กระดูกติดเบี้ยว เดินกะเผลกไปอีกนาน", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sue_driver
+        text: "ฟ้องเรียกค่าเสียหายเต็มที่"
+        outcomes:
+          - {weight: 2, text: "ศาลสั่งจ่ายค่ารักษาและค่าขาดรายได้ครบทุกบาท", effects: {money: {unit: income_x, amount: 0.8}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คู่กรณีไม่มีอะไรให้ยึด เสียค่าทนายฟรี ๆ", effects: {money: {unit: income_x, amount: -0.5}, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: forgive_driver
+        text: "ยกโทษให้ เขามีลูกเล็กสามคน"
+        effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: help_others, level: 2}]
+
+  - id: workh_burnout_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    title: "ไฟมอดกลางประชุม"
+    text: "กลางประชุมเช้าวันจันทร์ น้ำตาคุณไหลออกมาเองโดยไม่รู้ตัว นอนไม่หลับมาสามเดือน เห็นชื่อหัวหน้าเด้งในแชตแล้วใจสั่น"
+    choices:
+      - id: vent_online
+        text: "ระบายลงโซเชียลแบบไม่เซ็นเซอร์"
+        outcomes:
+          - {weight: 1, text: "โพสต์ไวรัล บริษัทคู่แข่งทักมาชวนไปทำงาน เงินเดือนดีกว่าเดิม", effects: {happiness: 2, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าเห็นโพสต์ โดนกดดันจนต้องเขียนใบลาออก", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: grind_bonus
+        text: "ฝืนอีกนิด โบนัสใกล้ออกแล้ว"
+        effects: {health: -1, chronic: {happiness: -1}, money: {unit: income_x, amount: 1}}
+        merit: [{cat: neutral}]
+      - id: see_psychiatrist
+        text: "ไปพบจิตแพทย์"
+        effects: {happiness: 1, health: 1, chronic: {happiness: 1}, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: meditation_retreat
+        text: "ลาพักร้อนไปปฏิบัติธรรม"
+        effects: {happiness: 2, relations: -1}
+        merit: [{cat: bhavana, level: 2}]
+      - id: transfer_team
+        text: "ขอย้ายไปแผนกอื่น"
+        outcomes:
+          - {weight: 1, text: "หัวหน้าใหม่ใจดี ทีมน่ารัก ได้ขึ้นเงินเดือนด้วย", effects: {happiness: 2, income_mult: 1.15}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หนีเสือปะจระเข้ หัวหน้าใหม่โหดกว่าเดิมสองเท่า", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workh_drunk_drive_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {flags: {has: [heavy_drinker]}}
+    title: "กุญแจในมือตอนตีสอง"
+    text: "งานเลี้ยงเลิกตีสอง โลกหมุนเป็นวงกลม กุญแจรถอยู่ในมือ บ้านอยู่ห่างไปแค่สิบนาที เพื่อนตะโกนว่า ไหวน่า ขับช้า ๆ ก็ถึง"
+    choices:
+      - id: drive_home
+        text: "ขับกลับเอง แค่สิบนาที"
+        outcomes:
+          - {weight: 2, text: "ถึงบ้านปลอดภัย แต่กล้องหน้าร้านจับภาพไว้ เพื่อนเอาคลิปไปโพสต์", effects: {relations: -1}, merit: [{cat: intoxicants, level: 2}]}
+          - {weight: 2, text: "เจอด่านตรวจแอลกอฮอล์ โดนยึดใบขับขี่ ค่าปรับอ่วม", effects: {money: {unit: income_x, amount: -0.8}, relations: -1}, merit: [{cat: intoxicants, level: 2}]}
+          - {weight: 1, text: "รถพุ่งชนเสาไฟ ตื่นมาในไอซียู", effects: {health: -3, chronic: {health: -1}, money: {unit: income_x, amount: -1}}, merit: [{cat: intoxicants, level: 2}]}
+        merit: [{cat: intoxicants, level: 2}]
+      - id: call_taxi
+        text: "เรียกแท็กซี่ ทิ้งรถไว้ที่ร้าน"
+        effects: {money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: sleep_in_car
+        text: "นอนในรถรอให้สร่าง"
+        outcomes:
+          - {weight: 2, text: "ตื่นมาคอเคล็ด แต่ทุกอย่างปลอดภัย", effects: {health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตื่นมากระจกแตก กระเป๋าสตางค์หายเกลี้ยง", effects: {money: {unit: income_x, amount: -0.4}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: drive_friends
+        text: "ยึดกุญแจทุกคน เรียกรถส่งทีละคน"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: help_others, level: 1}]
+      - id: quit_tonight
+        text: "สาบานว่าเลิกเหล้าตั้งแต่คืนนี้"
+        effects: {health: 2, chronic: {health: 1}, happiness: -1, relations: -1}
+        clears_flags: [heavy_drinker]
+        merit: [{cat: sila, level: 2}]
+
+  - id: workh_fatty_liver_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {flags: {heavy_drinker: 3, sporty: 0.5}}
+    title: "ตับมีไขมันเกาะ"
+    text: "ผลตรวจสุขภาพประจำปีออกมา หมอชี้จอแล้วถามว่า ดื่มหนักหรือกินหวานจัดหรือเปล่า ภาพอัลตราซาวด์ตับคุณขาวโพลนไปด้วยไขมัน อายุแค่ {อายุ} เอง"
+    choices:
+      - id: ignore_it
+        text: "ช่างมัน คืนนี้ชาบูเหมือนเดิม"
+        effects: {happiness: 1, chronic: {health: -1}}
+        merit: [{cat: neutral}]
+      - id: run_every_morning
+        text: "คุมอาหาร วิ่งทุกเช้า"
+        effects: {health: 2, chronic: {health: 1}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: herbal_detox
+        text: "ซื้อสมุนไพรล้างตับจากเน็ต"
+        effects: {money: {unit: income_x, amount: -0.3}}
+        outcomes:
+          - {weight: 1, text: "รู้สึกตัวเบาขึ้น ทั้งที่ผลตรวจไม่ขยับเลย", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "สมุนไพรปลอม ตับอักเสบหนักกว่าเดิม", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: apply_insurance
+        text: "รีบยื่นทำประกันสุขภาพ"
+        effects: {money: {unit: income_x, amount: -0.4}}
+        outcomes:
+          - {weight: 1, text: "บริษัทรับทำประกัน แต่ไม่คุ้มครองโรคตับ", effects: {happiness: 1}, sets_flags: [has_insurance], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถูกปฏิเสธ เพราะเป็นโรคมาก่อนยื่น", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: weightloss_shot
+        text: "จ่ายแพงฉีดยาลดน้ำหนัก"
+        effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -1.2}}
+        merit: [{cat: neutral}]
+
+  - id: workh_smoker_cough_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {flags: {smoker: 3, sporty: 0.7}}
+    title: "ไอไม่หยุดสามเดือน"
+    text: "ไอทุกเช้าจนตาแดง ขึ้นบันไดสองชั้นก็หอบ เพื่อนร่วมงานเริ่มขยับโต๊ะหนี ลูกพี่ลูกน้องเพิ่งตรวจเจอจุดที่ปอดเมื่อเดือนก่อน"
+    choices:
+      - id: xray_lungs
+        text: "ไปเอกซเรย์ปอดให้รู้ไปเลย"
+        effects: {money: {unit: income_x, amount: -0.2}}
+        outcomes:
+          - {weight: 3, text: "แค่หลอดลมอักเสบ หมอให้ยาไปกินสองอาทิตย์ก็หาย", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจอเงาเล็ก ๆ ที่ปอด ต้องตามตรวจทุกครึ่งปี", effects: {health: -1, happiness: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit_cold
+        text: "เลิกบุหรี่แบบหักดิบ"
+        effects: {health: 1, chronic: {health: 1}, happiness: -2}
+        clears_flags: [smoker]
+        merit: [{cat: sila, level: 1}]
+      - id: cough_syrup
+        text: "ซื้อยาแก้ไอกินเอง สูบต่อ"
+        effects: {health: -1, chronic: {health: -1}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: quit_clinic
+        text: "ไปคลินิกเลิกบุหรี่ของ รพ."
+        clears_flags: [smoker]
+        outcomes:
+          - {weight: 1, text: "หมอให้ยาช่วยเลิก ครบหกเดือนไม่แตะบุหรี่อีกเลย", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: sila, level: 1}]}
+          - {weight: 1, text: "เลิกได้สามเดือน งานเข้าหนักคืนเดียวก็กลับไปสูบซองละวัน", effects: {happiness: -1}, sets_flags: [smoker], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: switch_vape
+        text: "เปลี่ยนไปสูบไฟฟ้ากลิ่นผลไม้"
+        sets_flags: [smoker]
+        outcomes:
+          - {weight: 1, text: "ไอหายไปสองเดือน แล้วกลับมาไอหนักกว่าเดิม", effects: {health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โดนตำรวจเรียกตรวจ ยึดของแถมเสียค่าปรับ", effects: {money: {unit: income_x, amount: -0.3}, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สูบถี่กว่าเดิมสามเท่า ปอดแย่ลงกว่าเก่า", effects: {health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

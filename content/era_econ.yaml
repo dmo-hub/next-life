@@ -1,0 +1,221 @@
+# กลุ่ม era_econ_ · การ์ดบ้านเมืองเศรษฐกิจ 4 เหตุการณ์ × (เด็ก ครอบครัวเลือก + ผู้ใหญ่)
+# การ์ดเด็กตั้งได้แค่ธง "โตมากับร้านของพ่อแม่" (street_vendor · online_seller) · own_business/in_debt ตั้งเฉพาะการ์ดผู้ใหญ่
+events:
+  # ── วิกฤตน้ำมันครั้งแรก ──
+  - id: era_econ_oil1_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: oil_crisis_1
+    when: {age: [0, 12]}
+    title: "น้ำมันแพงข้ามคืน"
+    text: "ปั๊มหน้าบ้านติดป้ายราคาใหม่ทุกเช้า รถเมล์ขึ้นค่าโดยสาร พ่อนั่งคิดเลขบนกระดาษจนดึก ข้าวสารในบ้านเหลือครึ่งถัง"
+    choices:
+      - text: "พ่อขายรถ หันมาปั่นจักรยาน"
+        effects: {health: 1, happiness: -1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+      - text: "แม่ตั้งแผงขายกับข้าวหน้าบ้าน"
+        outcomes:
+          - {weight: 2, text: "แกงหม้อแรกหมดก่อนเที่ยง คนงานในซอยมาต่อคิวทุกวัน", effects: {relations: 1, money: {unit: income_x, amount: 0.4}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขายไม่ออก ต้องกินแกงเหลือกันสามวัน ลูกเบื่อแกงไปทั้งชีวิต", effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "ยืมเงินญาติมาประคองไปก่อน"
+        effects: {relations: -1, happiness: -1, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - text: "ส่งลูกไปอยู่กับยายต่างจังหวัด"
+        effects: {relations: 2, knowledge: -1, health: 1}
+        merit: [{cat: neutral}]
+
+  - id: era_econ_oil1_adult_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    era: oil_crisis_1
+    when: {age: [13, 110]}
+    title: "คิวยาวที่ปั๊มน้ำมัน"
+    text: "อายุ {อายุ} ต้องตื่นตีห้าไปต่อคิวเติมน้ำมัน ค่าข้าวแกงขึ้นทุกสัปดาห์ ข่าววิทยุบอกว่าโลกขาดน้ำมัน ไม่มีใครรู้ว่าจะจบเมื่อไร"
+    choices:
+      - text: "รับจ้างขี่สามล้อถีบส่งของ"
+        effects: {health: 1, happiness: -1, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - text: "เปิดร้านซ่อมรถเก่าให้วิ่งได้"
+        outcomes:
+          - {weight: 2, text: "ไม่มีใครซื้อรถใหม่ไหว ร้านซ่อมคิวเต็มยาวสองเดือน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, text: "อะไหล่ขาดตลาด ร้านต้องปิด เหลือแต่เครื่องมือกับหนี้", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "กักตุนน้ำมันไว้ขายต่อแพง ๆ"
+        outcomes:
+          - {weight: 1, text: "ขายได้กำไรสามเท่า แต่เพื่อนบ้านจำหน้าไว้ทุกคน", effects: {relations: -2, money: {unit: income_x, amount: 1.5}}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 1, text: "ถังรั่วกลางดึก ไฟเกือบไหม้ทั้งห้องแถว", effects: {health: -2, relations: -1}, merit: [{cat: greed_harm, level: 1}]}
+        merit: [{cat: greed_harm, level: 1}]
+      - text: "แบ่งน้ำมันให้รถพยาบาลชุมชน"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: help_others, level: 2}]
+
+  # ── วิกฤตน้ำมันครั้งที่สอง ──
+  - id: era_econ_oil2_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: oil_crisis_2
+    when: {age: [0, 12]}
+    title: "บ้านต้องรัดเข็มขัด"
+    text: "น้ำมันขึ้นอีกรอบ ไฟฟ้าดับบ่อย โรงงานที่พ่อทำงานลดกะเหลือวันเว้นวัน ค่าเทอมงวดหน้ายังไม่รู้จะเอามาจากไหน"
+    choices:
+      - text: "ย้ายลูกไปโรงเรียนวัดใกล้บ้าน"
+        effects: {knowledge: -1, relations: 1, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - text: "พ่อลาออกไปเข็นรถขายผลไม้"
+        outcomes:
+          - {weight: 2, text: "มะม่วงน้ำปลาหวานขายดีเกินคาด พ่อกลับบ้านพร้อมรอยยิ้มทุกเย็น", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 1, text: "โดนเทศกิจไล่ที่สามรอบ รถเข็นพังหนึ่งคัน", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "กู้นอกระบบมาจ่ายค่าเทอม"
+        effects: {knowledge: 1, happiness: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - text: "ให้ลูกช่วยปลูกผักไว้กินเอง"
+        effects: {health: 1, knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: era_econ_oil2_adult_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: oil_crisis_2
+    when: {age: [13, 110]}
+    title: "โรงงานลดกะ"
+    text: "น้ำมันแพงซ้ำสอง โรงงานแถวบ้านประกาศลดกะ คนในบ้านกับเพื่อนบ้านครึ่งซอยตกงาน ทุกคนนั่งคิดว่าเดือนหน้าจะเอาอะไรกิน"
+    choices:
+      - text: "ยอมรับค่าแรงต่ำลงขอทำต่อ"
+        effects: {happiness: -1, income_mult: 0.85}
+        merit: [{cat: neutral}]
+      - text: "ไปเสี่ยงโชคทำงานต่างประเทศ"
+        outcomes:
+          - {weight: 2, text: "ได้งานก่อสร้างในทะเลทราย ส่งเงินกลับบ้านทุกเดือน แต่หลังพังตั้งแต่ปีแรก", effects: {health: -2, income_mult: 1.5}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นายหน้าหอบเงินค่าหัวหายไป ต้องกู้มาจ่ายคืนญาติ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "รวมกลุ่มเพื่อนเปิดอู่ทอผ้า"
+        outcomes:
+          - {weight: 1, text: "ผ้าทอมือได้ออเดอร์จากร้านในเมือง กลายเป็นเถ้าแก่ตัวเล็ก", effects: {relations: 1, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทอเสร็จแต่ไม่มีคนซื้อ ผ้ากองเต็มบ้านจนใช้เป็นผ้าห่ม", effects: {happiness: -1, health: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "กลับบ้านไปทำนากับพ่อแม่"
+        effects: {health: 1, relations: 1, income_mult: 0.8}
+        merit: [{cat: care_parents, level: 1}]
+
+  # ── ต้มยำกุ้ง ──
+  - id: era_econ_tyk_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: tom_yum_kung
+    when: {age: [0, 12]}
+    title: "ต้มยำกุ้งเดือดทั้งบ้าน"
+    text: "ข่าวค่าเงินบาทลอยตัว พ่อเงียบไปทั้งคืน บริษัทพ่อปิดกะทันหัน หนี้บ้านเพิ่มเท่าตัวในพริบตา แม่ถามลูกว่าอยากย้ายบ้านไหม"
+    choices:
+      - text: "ขายบ้าน ย้ายไปเช่าห้องแถว"
+        effects: {happiness: -2, relations: 1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+      - text: "พ่อเอาเงินเก็บไปขายแซนด์วิช"
+        outcomes:
+          - {weight: 2, text: "แซนด์วิชของพ่อขายหมดทุกเช้า คนในตึกเรียกพ่อว่าเสี่ยแซนด์วิช", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: 0.5}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขนมปังเหลือทุกวัน ลูกกินแซนด์วิชเป็นข้าวสามมื้อจนโต", effects: {health: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "สู้ผ่อนต่อ กู้ใหม่โปะเก่า"
+        effects: {happiness: 1, health: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - text: "ทั้งบ้านกลับไปอยู่กับย่า"
+        effects: {health: 1, relations: 2, knowledge: -1}
+        merit: [{cat: care_parents, level: 1}]
+
+  - id: era_econ_tyk_adult_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: tom_yum_kung
+    when: {age: [13, 110]}
+    title: "เช้าวันที่บาทลอยตัว"
+    text: "อายุ {อายุ} ตื่นมาค่าเงินบาทร่วงเกือบครึ่ง ร้านกับบริษัทแถวบ้านเอาโซ่คล้องประตู คนในบ้านตกงานกันระนาว เงินเก็บที่เหลือ {เงิน} บาทดูเล็กลงทันตา"
+    choices:
+      - text: "เปิดท้ายขายของมือสองทั้งบ้าน"
+        outcomes:
+          - {weight: 2, text: "ขายเกลี้ยงในสองวัน ได้ทุนตั้งแผงขายของต่อ", effects: {happiness: 1, money: {unit: income_x, amount: 0.5}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งตลาดก็ขายของมือสองเหมือนกัน กลับบ้านพร้อมของเต็มรถ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "ช้อนซื้อกิจการเจ๊งราคาถูก"
+        outcomes:
+          - {weight: 1, text: "ฟื้นร้านที่เจ้าของทิ้งได้สำเร็จ สิบปีต่อมาคุณมีร้านสามสาขา", effects: {happiness: 2, income_mult: 1.6, money: {unit: income_x, amount: -1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ราคายังดิ่งไม่หยุด กิจการที่ซื้อมาลากคุณจมไปด้วย", effects: {health: -1, happiness: -2, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "ไปเป็นลูกจ้างรายวันก่อสร้าง"
+        effects: {health: 1, happiness: -1, income_mult: 0.75}
+        merit: [{cat: neutral}]
+      - text: "เปิดครัวแจกข้าวคนตกงานในซอย"
+        effects: {relations: 3, health: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: dana, level: 2}]
+
+  # ── วิกฤตการเงินโลก ──
+  - id: era_econ_gfc_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: global_financial_crisis
+    when: {age: [0, 12]}
+    title: "ข่าวร้ายจากอีกซีกโลก"
+    text: "ธนาคารใหญ่ฝั่งอเมริกาล้ม ออเดอร์โรงงานแถวบ้านหายไปครึ่ง แม่โดนพักงานไม่มีกำหนด ลูกเห็นแม่นั่งดูประกาศรับสมัครงานทุกคืน"
+    choices:
+      - text: "แม่โพสต์ขายขนมทางเน็ต"
+        outcomes:
+          - {weight: 2, text: "บราวนี่ถาดแรกถูกจองหมดจากกลุ่มแม่บ้าน ครัวกลายเป็นร้านเล็ก ๆ", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 1, text: "เตาอบระเบิด ขนมไหม้ แต่ลูกได้กินขนมไหม้ฟรีเป็นเดือน", effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "งดเรียนพิเศษ ให้ลูกอ่านเอง"
+        effects: {knowledge: -1, happiness: 1, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
+      - text: "รูดผ่อนของใช้ไปพลาง ๆ"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - text: "พาลูกไปช่วยงานวัดทุกเสาร์"
+        effects: {relations: 1, happiness: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: era_econ_gfc_adult_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: global_financial_crisis
+    when: {age: [13, 110]}
+    title: "คลื่นจากอีกซีกโลก"
+    text: "ข่าวต่างประเทศเต็มไปด้วยคำว่าล้มละลาย บริษัทส่งออกแถวบ้านยกเลิกโบนัส ประกาศรับคนสมัครใจลาออกพร้อมเงินชดเชยก้อนโต คนในบ้านต้องคิดหนัก"
+    choices:
+      - text: "รับเงินชดเชย เปิดร้านกาแฟ"
+        outcomes:
+          - {weight: 1, text: "ร้านเล็กหน้าออฟฟิศเก่ากลายเป็นที่นั่งประจำของอดีตเพื่อนร่วมงาน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านกาแฟเปิดใหม่อีกสามร้านในซอยเดียวกัน คุณเจ๊งเป็นร้านแรก", effects: {happiness: -2, money: {unit: income_x, amount: -1.5}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "กัดฟันอยู่ต่อ ทำงานแทนสามคน"
+        effects: {health: -1, knowledge: 1, income_mult: 1.1}
+        merit: [{cat: neutral}]
+      - text: "เอาเงินชดเชยตั้งรถเข็นขายหมูปิ้ง"
+        effects: {health: 1, happiness: 1, income_mult: 0.9}
+        sets_flags: [street_vendor]
+        merit: [{cat: neutral}]
+      - text: "ลาออก ไปเรียนต่อเปลี่ยนสาย"
+        effects: {knowledge: 2, money: {unit: income_x, amount: -1}}
+        outcomes:
+          - {weight: 1, text: "เรียนจบพอดีตลาดฟื้น ได้งานสายใหม่เงินดีกว่าเดิม", effects: {happiness: 1, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรียนจบแต่ตลาดงานยังซบ ต้องรับงานเงินน้อยกว่าเดิม", effects: {happiness: -1, income_mult: 0.9}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "ขายของมือสองทางเน็ต"
+        outcomes:
+          - {weight: 2, text: "ของเก่าในบ้านขายหมดเกลี้ยง เลยรับของคนอื่นมาขายต่อจนเป็นร้านออนไลน์", effects: {happiness: 1, money: {unit: income_x, amount: 0.4}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 1, text: "โดนลูกค้าโกงโอนเงินปลอม ของหายไปสามกล่อง", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

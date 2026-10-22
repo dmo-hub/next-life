@@ -1,0 +1,302 @@
+# กองสุ่มช่วงหนุ่มสาว (19–30) · ตั้งธง married has_kids in_debt own_business heavy_drinker smoker
+# ใช้ธงวัยต้น: good_student (ทุน/ไปนอก) · likes_clips (อินฟลูฯ) · bullied (หัวหน้าเอาเปรียบ/ปาร์ตี้) · sporty (ไปนอก)
+events:
+  - id: young_scholarship_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {good_student: 4}}
+    when: {age: [19, 24]}
+    title: "จดหมายทุนเรียนต่อ"
+    text: "อายุ {อายุ} จดหมายแจ้งว่าได้ทุนเรียนต่อ แต่ต้องกลับมาใช้ทุนอีกหลายปี วันเดียวกันรุ่นพี่ก็ชวนไปทำงานบริษัทที่เงินเดือนสูงกว่าเกือบเท่าตัว"
+    choices:
+      - id: take_scholarship
+        text: "รับทุน ไปเรียนต่อ"
+        outcomes:
+          - {weight: 3, text: "เรียนจบกลับมา ได้ตำแหน่งที่คนอื่นต้องรอสิบปี", effects: {knowledge: 3, income_mult: 1.4}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรียนหนักจนร่างพัง จบช้ากว่าเพื่อนหนึ่งปี", effects: {knowledge: 2, health: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: take_job
+        text: "ไม่รับทุน ไปเอางานเงินดี"
+        effects: {money: {unit: income_x, amount: 1.5}, happiness: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: give_away
+        text: "สละทุนให้เพื่อนที่ยากจนกว่า"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 2}]
+      - id: study_and_work
+        text: "เรียนภาคค่ำ กลางวันทำงาน"
+        effects: {knowledge: 2, money: {unit: income_x, amount: 0.5}, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: young_first_boss_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {flags: {bullied: 2}}
+    when: {age: [21, 28]}
+    title: "หัวหน้าขโมยผลงาน"
+    text: "งานแรกปีแรก หัวหน้าโยนงานให้จนดึกทุกคืน แล้วเช้าวันประชุมก็เอาผลงานของ{ผม}ขึ้นพรีเซนต์ต่อหน้าผู้บริหารเป็นของตัวเองหน้าตาเฉย"
+    choices:
+      - id: endure
+        text: "ทนเงียบ เก็บแต้มไปก่อน"
+        outcomes:
+          - {weight: 2, text: "ผู้บริหารรู้เองว่าใครทำ เรียกไปคุยตัวต่อตัว", effects: {money: {unit: income_x, amount: 1}, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทนจนหมดไฟ ตื่นเช้ามาไม่อยากลุกจากเตียง", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: speak_up
+        text: "ยกมือแย้งกลางห้องประชุม"
+        outcomes:
+          - {weight: 1, text: "ผู้บริหารชอบความกล้า ข้ามหัวหน้าขึ้นไปเลย", effects: {happiness: 2, income_mult: 1.4}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "โดนเขม่นทั้งแผนก สุดท้ายต้องเขียนใบลาออก", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit
+        text: "ลาออกไปหางานใหม่"
+        effects: {happiness: 1, health: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: football
+        text: "ไปเตะบอลกับทีมบริษัทระบายแค้น"
+        effects: {health: 1, relations: 2}
+        merit: [{cat: neutral}]
+
+  - id: young_wedding_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [22, 30], flags: {not: [married]}}
+    title: "ขอแต่งงานกลางร้านหมูกระทะ"
+    text: "คนรักคุกเข่ายื่นแหวนกลางร้านหมูกระทะ ทั้งร้านวางตะเกียบปรบมือรอคำตอบ ส่วนญาติฝั่งโน้นกระซิบเรื่องสินสอดก้อนโตไว้ตั้งแต่เมื่อวาน"
+    choices:
+      - id: big_wedding
+        text: "ตกลง จัดงานใหญ่ให้สมหน้า"
+        effects: {relations: 2, happiness: 2, money: {unit: income_x, amount: -2}}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: quiet_wedding
+        text: "ตกลง จดทะเบียนเงียบ ๆ"
+        effects: {happiness: 1, relations: 1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: borrow_dowry
+        text: "ตกลง แล้วกู้มาจ่ายสินสอด"
+        sets_flags: [married]
+        outcomes:
+          - {weight: 1, text: "ช่วยกันผ่อนจนปิดหนี้ได้ งานใหญ่สมหน้าทั้งสองบ้าน", effects: {happiness: 2, relations: 2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ดอกบานทุกเดือน ทะเลาะกันเรื่องเงินตั้งแต่ยังไม่ครบปี", effects: {happiness: 1, relations: -1}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait
+        text: "ขอเวลาคิดก่อนนะ"
+        outcomes:
+          - {weight: 1, text: "เขายิ้มแล้วบอกว่ารอได้ ความรักแน่นกว่าเดิม", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เขาเก็บแหวนแล้วเดินออกจากร้านไปเลย", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: refuse
+        text: "ปฏิเสธ ขอไปตามฝันก่อน"
+        effects: {happiness: -1, knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: young_baby_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [22, 30], flags: {has: [married], not: [has_kids]}}
+    title: "สองขีด"
+    text: "ที่ตรวจครรภ์ขึ้นสองขีด ทั้งบ้านตื่นเต้นจนนอนไม่หลับ หมอนัดฟังผลอัลตราซาวด์สัปดาห์หน้า เงินเก็บตอนนี้มีอยู่ {เงิน} บาท"
+    choices:
+      - id: stay_home
+        text: "ลาออกมาเลี้ยงลูกเอง"
+        effects: {relations: 2, happiness: 1, health: 1, income_mult: 0.8}
+        sets_flags: [has_kids]
+        merit: [{cat: neutral}]
+      - id: grandparents
+        text: "ฝากปู่ย่าตายายเลี้ยง"
+        effects: {money: {unit: income_x, amount: 1}, relations: -1}
+        sets_flags: [has_kids]
+        merit: [{cat: neutral}]
+      - id: ultrasound
+        text: "ลุ้นผลอัลตราซาวด์"
+        outcomes:
+          - {weight: 1, text: "หมอยิ้มแปลก ๆ แล้วชี้จอ มีสองคน! แฝดมาแล้ว", effects: {happiness: 2, health: -1, money: {unit: income_x, amount: -2}}, sets_flags: [has_kids], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ลูกคนเดียว แข็งแรงดีทุกอย่าง", effects: {happiness: 2}, sets_flags: [has_kids], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: two_shifts
+        text: "ทำงานสองกะเก็บค่านม"
+        effects: {money: {unit: income_x, amount: 1.5}, health: -1, relations: -1}
+        sets_flags: [has_kids]
+        merit: [{cat: neutral}]
+
+  - id: young_loan_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [20, 30], flags: {not: [in_debt]}}
+    title: "ไม่ต้องดาวน์สักบาท"
+    text: "เซลส์บอกออกรถคันแรกได้ไม่ต้องดาวน์ ยังไม่ทันเซ็น เพื่อนสนิทก็ทักมาขอยืมเงินก้อนใหญ่ สาบานว่าเดือนหน้าคืนแน่นอน"
+    choices:
+      - id: new_car
+        text: "ออกรถป้ายแดง ผ่อนยาว"
+        effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -1}}
+        sets_flags: [in_debt]
+        merit: [{cat: neutral}]
+      - id: lend_friend
+        text: "ให้เพื่อนยืม"
+        outcomes:
+          - {weight: 1, text: "เพื่อนคืนครบพร้อมกระเช้าผลไม้ ซึ้งจนพูดไม่ออก", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 2, text: "เพื่อนบล็อกไลน์ ย้ายบ้านหายเงียบ", effects: {money: {unit: income_x, amount: -1}, happiness: -2, relations: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: loan_shark
+        text: "กู้นอกระบบมาเปิดท้ายขายของ"
+        outcomes:
+          - {weight: 1, text: "ขายดีจนปิดหนี้ได้ในครึ่งปี", effects: {money: {unit: income_x, amount: 2}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ดอกทบดอก คนทวงหนี้มายืนหน้าห้องทุกเช้า", effects: {money: {unit: income_x, amount: -2}, health: -1, happiness: -2}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bike
+        text: "ไม่ซื้อ ไม่ให้ยืม ปั่นจักรยานไป"
+        effects: {health: 1, money: {unit: income_x, amount: 1}, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: young_shop_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [22, 30], flags: {not: [own_business]}}
+    title: "ห้องแถวหัวมุมตลาด"
+    text: "ห้องแถวหัวมุมตลาดใกล้บ้านติดป้ายให้เช่า ทำเลดีจนคนมายืนดูทั้งวัน เจ้าของบอกใครวางมัดจำก่อนได้ไป"
+    choices:
+      - id: cafe
+        text: "กู้มาเปิดร้านกาแฟตามฝัน"
+        sets_flags: [own_business, in_debt]
+        outcomes:
+          - {weight: 2, text: "คนต่อคิวยาวถึงหน้าร้าน กลายเป็นร้านดังของย่าน", effects: {happiness: 2, income_mult: 1.5}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ขายได้วันละสิบแก้ว ค่าเช่ากินเงินเก็บหมด", effects: {happiness: -2, money: {unit: income_x, amount: -2}, income_mult: 0.8}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: chicken_rice
+        text: "เปิดร้านข้าวมันไก่สูตรแม่"
+        sets_flags: [own_business]
+        outcomes:
+          - {weight: 3, text: "อร่อยจนคนบอกกันปากต่อปาก", effects: {relations: 1, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขายดีแต่ยืนหน้าเตาจนหลังพัง", effects: {health: -2, income_mult: 1.2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: partner
+        text: "ชวนเพื่อนลงขันกันคนละครึ่ง"
+        sets_flags: [own_business]
+        outcomes:
+          - {weight: 1, text: "ช่วยกันจนรุ่ง เปิดสาขาสองในปีเดียว", effects: {relations: 1, income_mult: 1.4}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เช้าวันหนึ่งเพื่อนหอบเงินในลิ้นชักหายไปทั้งหมด", effects: {relations: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pass
+        text: "ปล่อยไป ทำงานประจำต่อ"
+        effects: {happiness: -1, health: 1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+
+  - id: young_party_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 3
+    multipliers: {flags: {bullied: 0.5, heavy_drinker: 2}}
+    when: {age: [19, 26]}
+    title: "ปาร์ตี้คืนวันศุกร์"
+    text: "เพื่อนร่วมรุ่นนัดปาร์ตี้ทุกคืนวันศุกร์ เหล้าไม่อั้น บุหรี่ส่งต่อกันทั้งวง ใครขอกลับก่อนโดนแซวว่าไม่เป็นเพื่อน"
+    choices:
+      - id: drink
+        text: "ดื่มไม่ยั้งทุกสุดสัปดาห์"
+        effects: {happiness: 2, relations: 1, health: -2, money: {unit: income_x, amount: -0.5}}
+        sets_flags: [heavy_drinker]
+        merit: [{cat: intoxicants, level: 2}]
+      - id: smoke
+        text: "สูบตามวงให้เข้ากับเพื่อน"
+        effects: {relations: 1, health: -1}
+        sets_flags: [smoker]
+        merit: [{cat: neutral}]
+      - id: designated_driver
+        text: "จิบน้ำเปล่า ขับไปส่งเพื่อนที่เมา"
+        outcomes:
+          - {weight: 2, text: "เพื่อนทั้งวงยกให้เป็นที่พึ่งยามดึก", effects: {relations: 2, health: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "คืนหนึ่งดึงกุญแจจากมือเพื่อนที่เมา ตั้งแต่นั้นเขานับเป็นเพื่อนตาย", effects: {relations: 3, happiness: 1}, merit: [{cat: help_others, level: 2}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: run
+        text: "ไม่ไป ตื่นเช้าไปวิ่งสวนแทน"
+        effects: {health: 2, relations: -1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: young_influencer_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {likes_clips: 4}}
+    when: {age: [19, 30]}
+    title: "คลิปทะลุล้านวิว"
+    text: "คลิปที่ลงเล่น ๆ เมื่อคืนยอดวิวทะลุล้าน เช้านี้มีแบรนด์ทักมาจ้างรีวิวสามเจ้า ส่วนในคอมเมนต์ก็เริ่มมีคนขุดเรื่องเก่ามาแซะ"
+    choices:
+      - id: full_time
+        text: "ลาออก ทำคอนเทนต์เต็มตัว"
+        outcomes:
+          - {weight: 2, text: "ยอดฟอลพุ่งไม่หยุด กลายเป็นอินฟลูฯ ตัวจริง", effects: {happiness: 2, income_mult: 1.8}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กระแสหมดในสามเดือน กลับไปสมัครงานก็ไม่มีใครเรียก", effects: {happiness: -2, income_mult: 0.7}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: side_job
+        text: "รับรีวิวเป็นงานเสริม"
+        effects: {money: {unit: income_x, amount: 1.5}, health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: fake_review
+        text: "รับรีวิวของที่ไม่เคยใช้จริง"
+        outcomes:
+          - {weight: 2, text: "เงินเข้าง่ายกว่าที่คิด ไม่มีใครจับได้", effects: {money: {unit: income_x, amount: 2}}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 1, text: "โดนแฉว่ารีวิวปลอม ทัวร์ลงทั้งเพจ", effects: {relations: -2, happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: greed_harm, level: 1}]}
+        merit: [{cat: greed_harm, level: 1}]
+      - id: fundraise
+        text: "ใช้ยอดวิวระดมทุนช่วยโรงเรียน"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 2}]
+      - id: delete
+        text: "ลบคลิป ปิดบัญชีหนีดราม่า"
+        effects: {happiness: 1, health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: young_abroad_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {flags: {sporty: 1.5, good_student: 1.5}}
+    when: {age: [20, 30]}
+    title: "ตั๋วไปทำงานเมืองนอก"
+    text: "นายหน้ามาชวนไปทำงานต่างประเทศ เงินเดือนสูงกว่าที่นี่หลายเท่า แต่ต้องจ่ายค่าดำเนินการก้อนใหญ่ก่อน บางคนกลับมาสร้างบ้าน บางคนไม่ได้กลับมาเลย"
+    choices:
+      - id: agent
+        text: "จ่ายนายหน้า ไปทำงานโรงงาน"
+        outcomes:
+          - {weight: 3, text: "ทำงานหนักสามปี ส่งเงินกลับมาสร้างบ้านให้พ่อแม่", effects: {money: {unit: income_x, amount: 3}, health: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปถึงแล้วไม่มีงานจริง นายหน้าปิดเบอร์หนี", effects: {money: {unit: income_x, amount: -2}, happiness: -3}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: legal_route
+        text: "เรียนภาษา สอบไปแบบถูกกฎหมาย"
+        effects: {knowledge: 2, happiness: -1, income_mult: 1.3}
+        merit: [{cat: neutral}]
+      - id: overstay
+        text: "กู้ค่าหัวไปเป็นแรงงานผิดกฎหมาย"
+        outcomes:
+          - {weight: 1, text: "รอดการตรวจมาได้ เก็บเงินก้อนโตกลับบ้าน", effects: {money: {unit: income_x, amount: 3}, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถูกจับส่งกลับกลางดึก หนี้ค่าหัวค้างเต็มบ่า", effects: {money: {unit: income_x, amount: -2}, happiness: -2}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: stay
+        text: "ไม่ไป อยู่ดูแลพ่อแม่ที่บ้าน"
+        effects: {relations: 2, happiness: 1, health: 1}
+        merit: [{cat: care_parents, level: 1}]

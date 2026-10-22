@@ -57,7 +57,7 @@ export const POOL_CHANCE = 0.35;
 export const INCOME_MULT = [0.25, 3];
 // ผลเรื้อรังสะสมต่อค่าได้ไม่เกิน ±CHRONIC_MAX ระดับ · ไหลระดับละ CHRONIC_STEP หน่วยต่อปี
 const CHRONIC_MAX = 3;
-const CHRONIC_STEP = 1;
+const CHRONIC_STEP = 0.35;
 // ออกการ์ดสรุปอย่างน้อยทุก K ปี ถึงไม่มีอะไรเกิด · ปีที่มีเรื่อง (เปลี่ยนช่วง · ยุค · ลาง · จัดสรรเงิน) สรุปทันที
 // ปีเงียบรวบเป็นใบเดียว — การ์ดสรุปทุกปีที่มีแค่เงินขยับอ่านแล้วเปล่า
 export const SUMMARY_EVERY = 5;
@@ -373,6 +373,8 @@ function eventCard(st, ev) {
     id: ev.id,
     // แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): A ชีวิตจริง · B ความเชื่อ/แฟนตาซี
     type: ev.type ?? 'A',
+    // การ์ดเนื้อหาที่ผูกเหตุการณ์บ้านเมือง — หน้าจอติดป้ายบ้านเมืองแทนช่วงวัย
+    national: !!ev.era,
     age: st.age,
     stage: stageOf(st.age),
     title: ev.title ? fill(ev.title, st) : null,
