@@ -1,6 +1,7 @@
 import { makeRng } from './rng.mjs';
 import { pickBirthYear, qx, priceRatio, inflationRate, infantMortality, lastCpiYear, eraEventsAt } from './era.mjs';
 import { pickRegion, regionRatio, nationalIncome, classOdds } from './birth.mjs';
+import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN } from './merit.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // เรียงตามเส้นแบ่งฐานะใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -86,6 +87,12 @@ export function newLife(seed, content) {
     money: 0,
     // เส้นสุขภาพของชีวิตนี้ถ้าไม่มีเหตุการณ์ใดเลย — ตัวคูณการตายวัดจากส่วนต่างกับเส้นนี้
     healthNatural: s.health,
+    // บัญชีบุญบาปซ่อน — ห้ามส่งออกไปกับการ์ดหรือ statsOf
+    ledger: newLedger(),
+    omenTone: null,
+    omenAge: null,
+    flags: {},
+    scheduled: [],
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
     price: 1,
@@ -107,7 +114,7 @@ export function newLife(seed, content) {
   return st;
 }
 
-// โอกาสตายภายในปีนี้ = ตารางชีพจริงของปีปฏิทินนั้นตามอายุ/เพศ × ตัวคูณจากสุขภาพ (ใบ 03)
+// โอกาสตายภายในปีนี้ = ตารางชีพจริงของปีปฏิทินนั้นตามอายุ/เพศ × ตัวคูณจากสุขภาพ (ใบ 03) × ตัวคูณกรรม (ใบ 09)
 // ตัวคูณอิงส่วนต่างจากเส้นสุขภาพตามธรรมชาติของชีวิตนั้น ไม่ใช่ค่าคงที่ — ชีวิตที่ไม่มีเหตุการณ์จึงได้ qx จริงพอดี
 // และสุขภาพที่ไหลลงตามวัยไม่ถูกนับซ้ำกับ qx ที่สูงขึ้นตามวัยอยู่แล้ว · สุขภาพแย่เพิ่มความเสี่ยงแรงกว่าสุขภาพดีลด
 export function healthMultiplier(st) {
@@ -118,7 +125,7 @@ export function healthMultiplier(st) {
 export function deathChance(st) {
   const base = qx(st.content.era, st.sex, st.birthYear + st.age, st.age);
   if (base >= 1) return 1;
-  return Math.min(1, base * healthMultiplier(st));
+  return Math.min(1, base * healthMultiplier(st) * karmaMultiplier(st.ledger));
 }
 
 function fill(text, st) {
@@ -171,6 +178,13 @@ function stepYear(st) {
   st.trail.push({ year, money: Math.round(st.money) });
 
   const stage = stageOf(st.age);
+  const tone = omenTone(st.ledger);
+  if (!tone) st.omenTone = null;
+  else if (tone !== st.omenTone && (st.omenAge === null || st.age - st.omenAge >= OMEN.gap)) {
+    st.omenTone = tone;
+    st.omenAge = st.age;
+    st.due.push({ kind: 'omen', tone, age: st.age, stage, text: omenText(tone, st.seed, st.age) });
+  }
   if (stage !== prevStage) st.due.push({ kind: 'stage', age: st.age, stage, text: `เข้าสู่ช่วง${stage}` });
   for (const e of eraEventsAt(st.content.era, year)) {
     if (e.from === year && (!e.regions || e.regions.includes(st.region))) {
@@ -232,9 +246,12 @@ export function nextCard(st) {
       st.due = [];
       return emit(st, card);
     }
-    const ev = st.content.events.find((e) => e.age === st.age && !st.done[e.id]);
+    const ev = st.content.events.find((e) => !st.done[e.id] && (e.age === st.age || isScheduled(st, e.id)) && flagsOk(st, e.when));
+    if (ev) st.done[ev.id] = true;
+    st.scheduled = st.scheduled.filter((x) => x.age >= st.age && !st.done[x.event]);
     if (ev) {
-      st.done[ev.id] = true;
+      // อายุนี้อาจมีเหตุการณ์อื่นรออยู่ (หลักไมล์ชนกับนัด) — ค้นอายุเดิมอีกรอบก่อนเดินปี
+      st.advance = false;
       st.pending = ev;
       return emit(st, {
         kind: 'event',
@@ -248,11 +265,29 @@ export function nextCard(st) {
   }
 }
 
+const isScheduled = (st, id) => st.scheduled.some((x) => x.event === id && x.age === st.age);
+function flagsOk(st, when) {
+  const f = when?.flags;
+  if (!f) return true;
+  return (f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]);
+}
+
+// ป้ายบุญบาปเข้าบัญชีซ่อน · ธง · นัดเหตุการณ์ต่อเนื่อง (ใบ 07) — นัดสุ่มปีจาก rng ของโลก เพราะเป็นผลของการเลือก
+function applyChoice(st, ev, c) {
+  // คำบนเดียวกันมีหลายการ์ดนัด (ครั้งที่ 1 · ครั้งที่ 2) — ใช้ธงคำบนที่การ์ดปิดเป็นตัวระบุ ไม่ใช่ id การ์ด
+  const vow = (c.clears_flags ?? []).find((f) => f.startsWith('vow_open:')) ?? ev.id;
+  for (const f of recordMerit(st.ledger, c.merit, vow)) st.flags[f] = true;
+  for (const f of c.sets_flags ?? []) st.flags[f] = true;
+  for (const f of c.clears_flags ?? []) delete st.flags[f];
+  for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]) });
+}
+
 export function choose(st, idx) {
   const ev = st.pending;
   if (!ev || !ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
   st.pending = null;
   applyEffects(st, ev.choices[idx].effects);
+  applyChoice(st, ev, ev.choices[idx]);
   st.log.push({ id: ev.id, age: st.age, choice: idx });
 }
 
@@ -291,6 +326,7 @@ export function statsOf(st) {
 }
 
 // harness วิ่งชีวิตผ่านฟังก์ชันชุดเดียวกับหน้าเว็บ ผู้เรียกส่งแค่ตัวเลือกเลือกตัวเลือก · onCard เห็นสถานะทุกการ์ด
+// บอทได้ st เพื่ออ่านป้ายบุญบาปของตัวเลือกแทนการอ่านความหมายของข้อความแบบที่ผู้เล่นทำ — ห้ามอ่านบัญชีเอง
 // stream ของบอทแยกจาก rng ของแกนเกม เพื่อไม่ให้การเลือกไปเปลี่ยนลำดับสุ่มของโลก
 export function playLife(seed, content, pickChoice, onCard) {
   const st = newLife(seed, content);
@@ -299,6 +335,6 @@ export function playLife(seed, content, pickChoice, onCard) {
     const card = nextCard(st);
     onCard?.(card, st);
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
-    if (card.kind === 'event') choose(st, pickChoice(card, bot));
+    if (card.kind === 'event') choose(st, pickChoice(card, bot, st));
   }
 }

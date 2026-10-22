@@ -4,6 +4,8 @@ import { parse } from 'yaml';
 import { brassLx, e0FromLx, stdFor, MAX_AGE } from '../engine/era.mjs';
 import { normCdf } from '../engine/birth.mjs';
 import { lintDocs, formatProblem } from './lint/index.mjs';
+import { MERIT_CATS } from './lint/vocab.mjs';
+import { checkMeritTable } from '../engine/merit.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -26,6 +28,8 @@ export function loadEvents(dir = 'content/') {
     .filter((n) => n.endsWith('.yaml'))
     .sort()
     .map((f) => ({ file: `${dir}${f}`, doc: parse(read(`${dir}${f}`)) }));
+  const table = checkMeritTable(MERIT_CATS);
+  if (table.length) throw new Error(`ตารางบุญบาปไม่ผ่านด่าน ${table.length} ข้อ\n${table.join('\n')}`);
   const problems = lintDocs(docs);
   if (problems.length) throw new Error(`เนื้อหาไม่ผ่านด่าน ${problems.length} ข้อ\n${problems.map(formatProblem).join('\n')}`);
   return docs.flatMap(({ doc }) => doc.events.map(normalize));

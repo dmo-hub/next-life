@@ -4,6 +4,8 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { RULES, DOC_SHAPE, lintContext, lintDocs, formatProblem } from '../src/node/lint/index.mjs';
 import { loadEvents } from '../src/node/load.mjs';
+import { MERIT_CATS, MAX_LEN } from '../src/node/lint/vocab.mjs';
+import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA } from '../src/engine/merit.mjs';
 
 const root = new URL('../', import.meta.url);
 const dir = (d) => readdirSync(new URL(d, root)).filter((n) => n.endsWith('.yaml')).sort();
@@ -34,6 +36,27 @@ for (const b of ctx.banned) {
   for (const s of b.bad ?? []) if (!b.re.test(s)) fails.push(`banned ${b.id}: ไม่จับ "${s}"`);
   for (const s of b.ok ?? []) if (b.re.test(s)) fails.push(`banned ${b.id}: จับผิด "${s}"`);
   if (!b.bad?.length || !b.ok?.length) fails.push(`banned ${b.id}: ต้องมีตัวอย่าง bad และ ok`);
+}
+
+// ตารางบุญบาป: ของจริงผ่าน · ตัวควบคุมที่ผิดทีละอย่างต้องตก (กันด่านที่ไม่เคยตก)
+const table = checkMeritTable(MERIT_CATS);
+rows.push(['merit-table', table.length ? `ตก ${table.length} ข้อ` : 'ผ่าน']);
+for (const t of table) fails.push(`merit-table: ${t}`);
+const controls = {
+  'vow_broken หนักเท่าระดับ 1': [MERIT_CATS, { ...MERIT_WEIGHTS, vow_broken: 1 }],
+  'ขาดหมวด dana': [MERIT_CATS, Object.fromEntries(Object.entries(MERIT_WEIGHTS).filter(([k]) => k !== 'dana'))],
+  'หมวดเกินจากด่าน': [MERIT_CATS.filter((c) => c.id !== 'sila'), MERIT_WEIGHTS],
+  'ด่านว่าเป็นธงแต่แกนไม่รู้': [MERIT_CATS.map((c) => (c.id === 'adultery' ? { ...c, flag: true } : c)), MERIT_WEIGHTS],
+  'ระดับไม่เรียง': [MERIT_CATS, MERIT_WEIGHTS, { ...MERIT_LEVELS, 2: 5 }],
+  'บุญเพิ่มความเสี่ยง': [MERIT_CATS, MERIT_WEIGHTS, MERIT_LEVELS, { ...KARMA, meritMin: 1.2 }],
+};
+for (const [name, args] of Object.entries(controls)) if (!checkMeritTable(...args).length) fails.push(`merit-table ตัวควบคุม "${name}" ไม่ตก`);
+rows.push(['merit-table ตัวควบคุม', `${Object.keys(controls).length} แบบ`]);
+// ข้อความลางอยู่ในแกน ไม่ผ่านด่านเนื้อหา — ตรวจคำต้องห้าม · ความยาว · ไม่มีตัวเลข ที่นี่แทน
+for (const [tone, xs] of Object.entries(OMEN_TEXT)) for (const s of xs) {
+  for (const b of ctx.banned) if (b.re.test(s)) fails.push(`ลาง ${tone}: โดนคำต้องห้าม ${b.id} "${s}"`);
+  if (s.length > MAX_LEN.text) fails.push(`ลาง ${tone}: ยาวเกิน ${MAX_LEN.text} "${s}"`);
+  if (/[0-9๐-๙]/.test(s)) fails.push(`ลาง ${tone}: มีตัวเลข "${s}"`);
 }
 
 try {

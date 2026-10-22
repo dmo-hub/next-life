@@ -1,0 +1,118 @@
+# เนื้อหาทดสอบของ B05 — ให้ harness พิสูจน์บัญชีบุญบาป (บอทสายบุญ/บาปแยกกัน · ธง vow_broken ตั้งได้) · อยู่นอก content/ จึงไม่เข้าเกม
+# อายุไม่ชนหลักไมล์จริง (6 · 22 · 60) · ผลค่าสถานะเบาเท่าที่จำเป็น ให้ส่วนต่างอายุมาจากตัวคูณกรรมเป็นหลัก
+events:
+  - id: tm_alms
+    type: A
+    category: belief
+    stage: เด็ก
+    at_age: 10
+    years: [2500, 2650]
+    text: "เช้าวันพระ ยายปลุกให้ไปตักบาตรด้วยกันหน้าบ้าน"
+    lore_ref: lore-afterlife.md#1
+    belief: {kind: merit_wish, tradition: พุทธ}
+    choices:
+      - {label: ลุกไปตักบาตรกับยาย, merit: [{cat: dana, level: 1}], effects: {happiness: 1}}
+      - {label: ขอนอนต่ออีกหน่อย, merit: [{cat: neutral}]}
+      - {label: ช่วยยายถือขันข้าว, merit: [{cat: care_parents, level: 1}]}
+      - {label: แอบหยิบขนมจากถาดไปกินก่อน, merit: [{cat: greed_harm, level: 1}]}
+  - id: tm_drink
+    type: A
+    category: society
+    stage: วัยรุ่น
+    at_age: 17
+    years: [2500, 2650]
+    text: "เพื่อนกลุ่มใหม่ชวนไปนั่งดื่มเหล้าหลังเลิกเรียน"
+    choices:
+      - {label: ดื่มกับเพื่อนจนดึก, merit: [{cat: intoxicants, level: 2}], effects: {relations: 1}}
+      - {label: ขอตัวกลับบ้าน, merit: [{cat: sila, level: 1}]}
+      - {label: ไปด้วยแต่ไม่ดื่ม, merit: [{cat: neutral}], effects: {relations: 1}}
+      - {label: ไปส่งเพื่อนที่เมากลับบ้าน, merit: [{cat: help_others, level: 1}]}
+  - id: tm_vow
+    type: B
+    category: belief
+    stage: วัยรุ่น
+    at_age: 18
+    years: [2500, 2650]
+    text: "พรุ่งนี้สอบเข้ามหาวิทยาลัย แม่พาไปไหว้ศาลประจำเมือง"
+    lore_ref: lore-finance-belief.md#B
+    belief:
+      kind: vow
+      tradition: ผสม
+      outside_canon: [vow_broken]
+      vow:
+        deadline_years: [2, 4]
+        due_event: tm_vow_due_1
+        redeem_full_cost: {unit: fixed_baht, amount: 1500}
+        redeem_light_cost: {unit: income_x, amount: 0.05}
+        defer_once: true
+    choices:
+      - {label: บนบานไว้, sets_flags: [vow_open:tm_exam], schedules: [{event: tm_vow_due_1, after_years: [2, 4]}], effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {label: ไหว้ขอพรเฉย ๆ, merit: [{cat: neutral}]}
+      - {label: ไหว้แล้วหยอดตู้บริจาค, cost: {unit: fixed_baht, amount: 20}, merit: [{cat: dana, level: 1}]}
+      - {label: รออยู่ข้างนอก ไม่เข้าไปไหว้, merit: [{cat: neutral}]}
+  - id: tm_vow_due_1
+    type: B
+    category: belief
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    text: "ถึงเวลาแก้บนที่เคยบนไว้ตอนสอบเข้า"
+    lore_ref: lore-finance-belief.md#B
+    when: {flags: {has: [vow_open:tm_exam]}}
+    belief: {kind: vow, tradition: ผสม, outside_canon: [vow_broken]}
+    choices:
+      - {label: แก้บนเต็มตามที่บนไว้, redeem: full, cost: {unit: fixed_baht, amount: 1500}, clears_flags: [vow_open:tm_exam], effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {label: แก้ตามกำลังที่มี, redeem: light, cost: {unit: income_x, amount: 0.05}, clears_flags: [vow_open:tm_exam], effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {label: ขอเลื่อนไปก่อน, redeem: defer, schedules: [{event: tm_vow_due_2, after_years: [1, 2]}], merit: [{cat: neutral}]}
+      - {label: แก้บนเต็มพร้อมถวายสังฆทาน, redeem: full, cost: {unit: fixed_baht, amount: 2000}, clears_flags: [vow_open:tm_exam], effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
+  - id: tm_vow_due_2
+    type: B
+    category: belief
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    text: "คำบนที่เลื่อนไว้ยังค้างอยู่"
+    lore_ref: lore-finance-belief.md#B
+    when: {flags: {has: [vow_open:tm_exam]}}
+    belief: {kind: vow, tradition: ผสม, outside_canon: [vow_broken]}
+    choices:
+      - {label: แก้บนเต็มตามที่บนไว้, redeem: full, cost: {unit: fixed_baht, amount: 1500}, clears_flags: [vow_open:tm_exam], effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {label: แก้ตามกำลังที่มี, redeem: light, cost: {unit: income_x, amount: 0.05}, clears_flags: [vow_open:tm_exam], effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {label: ไม่แก้แล้ว, redeem: none, clears_flags: [vow_open:tm_exam], effects: {happiness: -1}, merit: [{cat: vow_broken, level: flag}]}
+      - {label: แก้บนเต็มพร้อมถวายสังฆทาน, redeem: full, cost: {unit: fixed_baht, amount: 2000}, clears_flags: [vow_open:tm_exam], effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
+  - id: tm_parent
+    type: A
+    category: family
+    stage: ทำงาน
+    at_age: 35
+    years: [2500, 2650]
+    text: "พ่อป่วยหนัก ต้องมีคนเฝ้าที่โรงพยาบาลหลายสัปดาห์"
+    choices:
+      - {label: ลางานไปเฝ้าพ่อเอง, cost: {unit: income_x, amount: 0.1}, merit: [{cat: care_parents, level: 2}]}
+      - {label: ส่งเงินไปช่วยค่ารักษา, cost: {unit: income_x, amount: 0.05}, merit: [{cat: care_parents, level: 1}]}
+      - {label: ตะคอกใส่ว่าไม่มีเวลา, merit: [{cat: abuse_elders, level: 2}], effects: {relations: -1}}
+      - {label: ผลัดกันเฝ้ากับพี่น้อง, merit: [{cat: care_parents, level: 1}], effects: {relations: 1}}
+  - id: tm_bribe
+    type: A
+    category: work_money
+    stage: ทำงาน
+    at_age: 40
+    years: [2500, 2650]
+    text: "คนที่มาติดต่องานยื่นซองหนาให้ ขอให้ช่วยเซ็นผ่านเรื่องที่ยังไม่ครบ"
+    choices:
+      - {label: รับซองแล้วเซ็นให้, merit: [{cat: greed_harm, level: 2}, {cat: unjust_judgment, level: 1}], effects: {money: {unit: income_x, amount: 0.5}}}
+      - {label: ปฏิเสธแล้วให้ไปเติมเอกสาร, merit: [{cat: sila, level: 2}]}
+      - {label: ส่งเรื่องให้หัวหน้าตัดสินแทน, merit: [{cat: neutral}]}
+      - {label: รับซองไว้แต่ไม่เซ็นให้, merit: [{cat: greed_harm, level: 1}], effects: {money: {unit: income_x, amount: 0.5}}}
+  - id: tm_ordain
+    type: A
+    category: belief
+    stage: กลางคน
+    at_age: 50
+    years: [2500, 2650]
+    text: "หลานชายบวชที่วัดใกล้บ้าน ญาติมารวมกันเต็มศาลา"
+    lore_ref: lore-afterlife.md#1
+    belief: {kind: merit_wish, tradition: พุทธ}
+    choices:
+      - {label: ช่วยงานครัวทั้งวัน, merit: [{cat: help_others, level: 1}, {cat: dana, level: 1}], effects: {relations: 1}}
+      - {label: ดื่มกับญาติเสียงดังรบกวนพระ, merit: [{cat: intoxicants, level: 2}, {cat: disturb_monk, level: 1}], effects: {relations: -1}}
+      - {label: ร่วมงานพิธีแล้วกลับ, merit: [{cat: neutral}]}
+      - {label: ฟังพระเทศน์จนจบงาน, merit: [{cat: bhavana, level: 1}]}

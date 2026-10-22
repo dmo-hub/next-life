@@ -65,7 +65,7 @@ function render(card) {
     const b = el('button', 'choice', 'ต่อไป');
     b.onclick = () => render(nextCard(st));
     box.append(b);
-  } else if (card.kind === 'stage' || card.kind === 'era') {
+  } else if (card.kind === 'stage' || card.kind === 'era' || card.kind === 'omen') {
     const b = el('button', 'choice', 'ต่อไป');
     b.onclick = () => render(nextCard(st));
     box.append(b);
