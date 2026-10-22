@@ -78,9 +78,8 @@ const [e0m, e0f, imrm, imrf] = await Promise.all(
 const lastMort = Math.max(...e0m.keys());
 const mortNote = (y, near) => `ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี ${near} (lore-era-data หัวข้อ 6)`;
 
-// ตารางมาตรฐาน: WHO nqx รายกลุ่มอายุ ปี 2010 + nMx กลุ่ม 85+ ไว้ต่อหางเส้น
-const STD_YEAR = 2010;
-const ghoUrl = (ind) => `https://ghoapi.azureedge.net/api/${ind}?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%20${STD_YEAR}`;
+// ตารางมาตรฐานรายปี: WHO nqx รายกลุ่มอายุ ทุกปีที่มี + nMx กลุ่ม 85+ ไว้ต่อหางเส้น
+const ghoUrl = (ind) => `https://ghoapi.azureedge.net/api/${ind}?$filter=SpatialDim%20eq%20'THA'`;
 async function gho(ind) {
   const res = await fetch(ghoUrl(ind));
   if (!res.ok) throw new Error(`${ind}: HTTP ${res.status}`);
@@ -90,16 +89,20 @@ const GROUPS = ['AGEGROUP_YEARS00-01', 'AGEGROUP_YEARS01-04'];
 for (let a = 5; a < 85; a += 5) GROUPS.push(`AGEGROUP_YEARS${String(a).padStart(2, '0')}-${String(a + 4).padStart(2, '0')}`);
 const startOf = (g) => Number(g.slice(14, 16));
 const [nqx, nmx] = await Promise.all([gho('LIFE_0000000030'), gho('LIFE_0000000029')]);
-function standard(sexCode) {
+const stdYears = [...new Set(nqx.map((x) => x.TimeDim))].sort((a, b) => a - b);
+function standard(sexCode, ce) {
   const rows = GROUPS.map((g) => {
-    const r = nqx.find((x) => x.Dim1 === sexCode && x.Dim2 === g);
-    if (!r) throw new Error(`WHO nqx ขาด ${sexCode} ${g}`);
+    const r = nqx.find((x) => x.TimeDim === ce && x.Dim1 === sexCode && x.Dim2 === g);
+    if (!r) throw new Error(`WHO nqx ขาด ${ce} ${sexCode} ${g}`);
     return { age: startOf(g), v: round(r.NumericValue, 6), source: ghoUrl('LIFE_0000000030') };
   });
-  const m85 = nmx.find((x) => x.Dim1 === sexCode && x.Dim2 === 'AGEGROUP_YEARS85PLUS');
-  if (!m85) throw new Error(`WHO nMx ขาด ${sexCode} 85+`);
-  return { nqx: rows, m85: { v: round(m85.NumericValue, 6), source: ghoUrl('LIFE_0000000029') } };
+  const m85 = nmx.find((x) => x.TimeDim === ce && x.Dim1 === sexCode && x.Dim2 === 'AGEGROUP_YEARS85PLUS');
+  if (!m85) throw new Error(`WHO nMx ขาด ${ce} ${sexCode} 85+`);
+  return { y: ce + BE, nqx: rows, m85: { v: round(m85.NumericValue, 6), source: ghoUrl('LIFE_0000000029') } };
 }
+for (let i = 1; i < stdYears.length; i++) if (stdYears[i] !== stdYears[i - 1] + 1) throw new Error(`WHO ปีขาดช่วงที่ ${stdYears[i]}`);
+const stdFirst = stdYears[0] + BE;
+const stdLast = stdYears.at(-1) + BE;
 
 write('mortality.json', {
   title: 'อายุคาดเฉลี่ยและอัตราตายทารก แยกเพศ + ตารางมาตรฐานรูปเส้นการตาย',
@@ -113,18 +116,21 @@ write('mortality.json', {
     ชาย: yearly(imrm, 'SP.DYN.IMRT.MA.IN', FIRST, lastMort, mortNote),
     หญิง: yearly(imrf, 'SP.DYN.IMRT.FE.IN', FIRST, lastMort, mortNote),
   },
-  standard: { year: STD_YEAR + BE, ชาย: standard('SEX_MLE'), หญิง: standard('SEX_FMLE') },
+  standard: {
+    ชาย: stdYears.map((ce) => standard('SEX_MLE', ce)),
+    หญิง: stdYears.map((ce) => standard('SEX_FMLE', ce)),
+  },
   rules: {
     shape: {
       method: 'brass_logit',
       assumption: true,
-      note: 'รูปเส้นตามอายุใช้ตารางมาตรฐาน WHO ปี 2553 แล้วปรับ 2 ค่า (alpha beta) ให้อัตราตายทารกและ e0 ตรงกับ World Bank รายปี (lore-era-data หัวข้อ 6 เสนอปรับ scale)',
+      note: `รูปเส้นตามอายุ: ปี ${stdFirst}–${stdLast} ใช้ตาราง WHO ของปีนั้น (ตาม lore-era-data หัวข้อ 6) · ก่อน ${stdFirst} ใช้ตาราง WHO ปี ${stdFirst} แทนตาราง HLD 1960 ที่ lore เสนอ (ยังไม่ได้ดึง และ lore บอกว่าหน้าเว็บไม่ระบุแยกเพศ) · หลัง ${stdLast} ใช้ปี ${stdLast} · แล้วปรับ 2 ค่า (alpha beta) ให้อัตราตายทารกและ e0 ตรงกับ World Bank รายปี`,
     },
     tail: {
       method: 'gompertz_from_85',
       slope: 0.1,
       assumption: true,
-      note: 'อายุ 85 ขึ้นไป อัตราตายโตแบบ Gompertz 10%/ปี เริ่มจาก nMx 85+ ของ WHO ตัดที่อายุ 120',
+      note: 'อายุ 85 ขึ้นไป อัตราตายโตแบบ Gompertz 10%/ปี เริ่มจาก nMx 85+ ของ WHO · อายุ 120 ตายแน่นอน (เพดานคำนวณ อายุก่อนหน้านั้นยังมีโอกาสรอด)',
     },
     future: {
       method: 'hold_last',

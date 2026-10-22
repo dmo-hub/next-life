@@ -1,30 +1,38 @@
 {
- "title": "ไทม์ไลน์เศรษฐกิจและภัยพิบัติ (ไม่แตะการเมือง)",
+ "title": "ไทม์ไลน์เศรษฐกิจและภัยพิบัติ (ไม่แตะการเมือง) · ช่วงปี from/to มีที่มาระดับเหตุการณ์ ตัวเลขผลกระทบมีที่มาใน facts",
  "events": [
   { "id": "oil_crisis_1", "from": 2516, "to": 2517, "name": "วิกฤตน้ำมันครั้งที่ 1", "kind": "economy",
+    "assumption": true, "note": "ช่วงปีตามตาราง lore-era-data หัวข้อ 5 (1973–74) ซึ่งอิงปีเงินเฟ้อพุ่ง ไม่มีแหล่งกำหนดปีเริ่ม/จบ",
     "facts": [{ "label": "เงินเฟ้อ 2517", "v": 24.31, "unit": "%", "source": "https://api.worldbank.org/v2/country/THA/indicator/FP.CPI.TOTL.ZG?format=json&date=1960:2025&per_page=100" }] },
   { "id": "oil_crisis_2", "from": 2522, "to": 2524, "name": "วิกฤตน้ำมันครั้งที่ 2", "kind": "economy",
+    "assumption": true, "note": "ช่วงปีตามตาราง lore-era-data หัวข้อ 5 (1979–81) ซึ่งอิงปีเงินเฟ้อพุ่ง ไม่มีแหล่งกำหนดปีเริ่ม/จบ",
     "facts": [{ "label": "เงินเฟ้อ 2523", "v": 19.7, "unit": "%", "source": "https://api.worldbank.org/v2/country/THA/indicator/FP.CPI.TOTL.ZG?format=json&date=1960:2025&per_page=100" }] },
   { "id": "typhoon_gay", "from": 2532, "to": 2532, "name": "พายุไต้ฝุ่นเกย์", "kind": "disaster", "regions": ["ใต้"],
+    "source": "https://en.wikipedia.org/wiki/Typhoon_Gay_(1989)",
     "facts": [{ "label": "ตายบนบก", "v": 558, "unit": "ราย", "weak": true, "source": "https://en.wikipedia.org/wiki/Typhoon_Gay_(1989)" }] },
   { "id": "tom_yum_kung", "from": 2540, "to": 2541, "name": "วิกฤตต้มยำกุ้ง", "kind": "economy",
+    "source": "https://en.wikipedia.org/wiki/1997_Asian_financial_crisis",
     "facts": [
      { "label": "ค่าเงินบาทต่ำสุด ม.ค. 2541", "v": 56, "unit": "บาท/USD", "source": "https://en.wikipedia.org/wiki/1997_Asian_financial_crisis" },
      { "label": "GDP 2541", "v": -7.63, "unit": "%", "source": "https://api.worldbank.org/v2/country/THA/indicator/NY.GDP.MKTP.KD.ZG?format=json" }
     ] },
   { "id": "sars", "from": 2546, "to": 2546, "name": "SARS", "kind": "disaster",
+    "source": "https://en.wikipedia.org/wiki/2003_SARS_outbreak",
     "facts": [{ "label": "ผู้ป่วยในไทย", "v": 9, "unit": "ราย", "source": "https://en.wikipedia.org/wiki/2003_SARS_outbreak" }] },
   { "id": "tsunami", "from": 2547, "to": 2547, "name": "สึนามิอันดามัน", "kind": "disaster", "regions": ["ใต้"],
+    "source": "https://en.wikipedia.org/wiki/2004_Indian_Ocean_earthquake_and_tsunami",
     "facts": [{ "label": "เสียชีวิต รวมชาวต่างชาติ", "v": 8000, "unit": "ราย (ราว)", "source": "https://en.wikipedia.org/wiki/2004_Indian_Ocean_earthquake_and_tsunami" }] },
   { "id": "global_financial_crisis", "from": 2551, "to": 2552, "name": "วิกฤตการเงินโลก", "kind": "economy",
+    "assumption": true, "note": "ช่วงปีตามคำตัดสินใบ 03 (หุ้นตก 2551 · GDP หด 2552)",
     "facts": [{ "label": "GDP 2552", "v": -0.69, "unit": "%", "source": "https://api.worldbank.org/v2/country/THA/indicator/NY.GDP.MKTP.KD.ZG?format=json" }] },
   { "id": "great_flood", "from": 2554, "to": 2554, "name": "น้ำท่วมใหญ่", "kind": "disaster",
+    "source": "https://en.wikipedia.org/wiki/2011_Thailand_floods",
     "facts": [
      { "label": "เสียชีวิต", "v": 815, "unit": "ราย", "source": "https://en.wikipedia.org/wiki/2011_Thailand_floods" },
      { "label": "ผู้ได้รับผลกระทบ", "v": 13600000, "unit": "คน", "source": "https://en.wikipedia.org/wiki/2011_Thailand_floods" }
     ] },
   { "id": "covid19", "from": 2563, "to": 2564, "name": "โควิด-19", "kind": "disaster",
-    "facts": [{ "label": "GDP 2563", "v": -6.09, "unit": "%", "source": "https://api.worldbank.org/v2/country/THA/indicator/NY.GDP.MKTP.KD.ZG?format=json" }],
-    "assumption": true, "note": "ปีสิ้นสุด 2564 เกมตั้งเอง ข้อมูลมีแค่ GDP ปี 2563" }
+    "assumption": true, "note": "ปีสิ้นสุด 2564 เกมตั้งเอง ข้อมูลมีแค่ GDP ปี 2563",
+    "facts": [{ "label": "GDP 2563", "v": -6.09, "unit": "%", "source": "https://api.worldbank.org/v2/country/THA/indicator/NY.GDP.MKTP.KD.ZG?format=json" }] }
  ]
 }

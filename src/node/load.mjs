@@ -1,7 +1,7 @@
 // โหลด content/*.yaml + data/*.json เป็นก้อนเดียวที่แกนเกมใช้ — build กับ harness เรียกตัวเดียวกัน ข้อมูลจึงไม่แตกเป็นสองชุด
 import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
-import { brassLx, e0FromLx, MAX_AGE } from '../engine/era.mjs';
+import { brassLx, e0FromLx, stdFor, MAX_AGE } from '../engine/era.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -32,6 +32,8 @@ export function loadEvents() {
 function series(rows) {
   rows.forEach((row, i) => {
     if (row.y !== rows[0].y + i) throw new Error(`ปีไม่ต่อเนื่องที่ ${row.y}`);
+    // ค่าหายแล้วปล่อยผ่าน = bisection เทียบกับ undefined แล้วได้ fit มั่วเงียบ ๆ
+    if (typeof row.v !== 'number' || !Number.isFinite(row.v)) throw new Error(`ค่า v ไม่ใช่ตัวเลขที่ปี ${row.y}`);
   });
   return { from: rows[0].y, v: rows.map((x) => x.v) };
 }
@@ -97,12 +99,17 @@ export function loadEra() {
   const std = {};
   const fitBy = {};
   for (const s of SEXES) {
-    // ปัดก่อน fit เพื่อให้ค่าที่ฝังในเกมคือค่าที่ใช้ fit จริง
-    std[s] = standardLx(m.standard[s], m.rules.tail.slope).map((l) => r(l, 7));
+    const tables = m.standard[s];
+    tables.forEach((t, i) => {
+      if (t.y !== tables[0].y + i) throw new Error(`ตารางมาตรฐานปีไม่ต่อเนื่องที่ ${t.y}`);
+    });
+    // ปัดก่อน fit เพื่อให้ค่าที่ฝังในเกมคือค่าที่ใช้ fit จริง · ปัดตามเลขนัยสำคัญ ไม่ใช่ทศนิยม ไม่งั้นหางอายุ 110+ กลายเป็น 0 (ตายแน่นอนก่อน 120)
+    const lxs = tables.map((t) => standardLx(t, m.rules.tail.slope).map((l, x) => (x === MAX_AGE ? 0 : Number(l.toPrecision(6)))));
+    std[s] = { from: tables[0].y, lx: lxs };
     const e0 = series(m.e0[s]);
     const imr = series(m.imr[s]);
     if (e0.from !== imr.from || e0.v.length !== imr.v.length) throw new Error('ช่วงปี e0 กับ IMR ไม่ตรงกัน');
-    const fits = e0.v.map((v, i) => fit(std[s], v, imr.v[i]));
+    const fits = e0.v.map((v, i) => fit(stdFor(std[s], e0.from + i), v, imr.v[i]));
     fitBy[s] = { a: fits.map((f) => r(f.a, 6)), b: fits.map((f) => r(f.b, 6)) };
   }
 
@@ -112,6 +119,7 @@ export function loadEra() {
     smoking: { ชาย: points(h.smoking.ชาย), หญิง: points(h.smoking.หญิง) },
     alcohol_litres: { all: points(h.alcohol_litres.all) },
     drinkers: { ชาย: points(hs.drinkers.ชาย), หญิง: points(hs.drinkers.หญิง) },
+    drinkers_11plus: { ชาย: points(hs.drinkers_11plus.ชาย), หญิง: points(hs.drinkers_11plus.หญิง) },
     exercise: { ชาย: points(hs.exercise.ชาย), หญิง: points(hs.exercise.หญิง) },
   };
 

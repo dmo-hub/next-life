@@ -1,14 +1,21 @@
 {
  "title": "พฤติกรรมเสี่ยงจากรายงานสำรวจ (อ่านค่าเอง ไม่มี API)",
  "drinkers": {
-  "unit": "% ผู้ดื่มในรอบ 12 เดือน",
+  "unit": "% ผู้ดื่ม (lore ไม่ระบุช่วงเวลาที่ถาม/ฐานอายุของจุดนี้)",
   "ชาย": [
-   { "y": 2550, "v": 48, "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4690366/" },
-   { "y": 2554, "v": 49.71, "source": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8575245/", "note": "ฐานอายุ 11+ ต่างจากปีอื่น" }
+   { "y": 2550, "v": 48, "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4690366/" }
   ],
   "หญิง": [
-   { "y": 2550, "v": 13, "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4690366/" },
-   { "y": 2554, "v": 10.19, "source": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8575245/", "note": "ฐานอายุ 11+ ต่างจากปีอื่น" }
+   { "y": 2550, "v": 13, "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4690366/" }
+  ]
+ },
+ "drinkers_11plus": {
+  "unit": "% ดื่มในรอบ 12 เดือน ฐานอายุ 11+ (แยกจาก drinkers เพราะ lore ห้ามเทียบตรงกับฐาน 15+)",
+  "ชาย": [
+   { "y": 2554, "v": 49.71, "source": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8575245/", "note": "lore อ้าง สสช. Table 1 ไม่มี URL · URL นี้คือแหล่งที่ lore ใช้กับช่วง 2550–2560 ยังไม่ได้ยืนยันว่ามีค่านี้" }
+  ],
+  "หญิง": [
+   { "y": 2554, "v": 10.19, "source": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8575245/", "note": "lore อ้าง สสช. Table 1 ไม่มี URL · URL นี้คือแหล่งที่ lore ใช้กับช่วง 2550–2560 ยังไม่ได้ยืนยันว่ามีค่านี้" }
   ]
  },
  "heavy_drinking_2559": {

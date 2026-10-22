@@ -1,5 +1,5 @@
 import { makeRng } from './rng.mjs';
-import { pickBirthYear, qx, priceRatio, infantMortality } from './era.mjs';
+import { pickBirthYear, qx, priceRatio, infantMortality, lastCpiYear } from './era.mjs';
 
 // ภาค/ฐานะ/ค่าเริ่มยังเป็นค่าคงที่ชั่วคราวของ tracer — ปีเกิดและการตายใช้ข้อมูลยุคจริงแล้ว (era.mjs)
 export const SEXES = ['ชาย', 'หญิง'];
@@ -56,6 +56,7 @@ export function newLife(seed, content) {
 // โอกาสตายภายในปีนี้ = ตารางชีพจริงของปีปฏิทินนั้นตามอายุ/เพศ × ตัวคูณจากสุขภาพ (ใบ 03)
 export function deathChance(st) {
   const base = qx(st.content.era, st.sex, st.birthYear + st.age, st.age);
+  if (base >= 1) return 1;
   const mult = 1 + Math.max(0, 50 - st.health) / 40 - Math.max(0, st.health - 50) / 200;
   return Math.min(1, base * mult);
 }
@@ -125,6 +126,8 @@ function deathCard(st) {
       year,
       money: Math.round(st.money),
       moneyAtBirth: Math.round(st.money / priceRatio(era, st.seed, st.birthYear, year)),
+      // lore หัวข้อ 6: เงินเฟ้อปีหลังข้อมูลเป็นอนาคตจำลอง ต้องบอกผู้เล่น
+      simulatedFrom: year > lastCpiYear(era) ? lastCpiYear(era) + 1 : null,
     },
   };
   // ใบ 07: ตายตอนเด็กได้บันทึกสั้นบอกสถิติยุคนั้น

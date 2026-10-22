@@ -28,6 +28,11 @@ export function e0FromLx(lx) {
   return e;
 }
 
+// ตารางมาตรฐานของปีนั้น ปีนอกช่วงที่มีตารางใช้ปีที่ใกล้สุด
+export function stdFor(std, year) {
+  return std.lx[Math.max(0, Math.min(std.lx.length - 1, year - std.from))];
+}
+
 const qCache = new WeakMap();
 // โอกาสตายภายในปีที่อายุ age ตามตารางชีพของปีปฏิทิน year (ชีวิตหนึ่งเดินผ่านตารางของแต่ละปีไปตามแนวทแยง)
 export function qx(era, sex, year, age) {
@@ -40,7 +45,7 @@ export function qx(era, sex, year, age) {
   let q = bySex[key];
   if (!q) {
     const i = y - m.from;
-    const lx = brassLx(m.std[sex], m.fit[sex].a[i], m.fit[sex].b[i]);
+    const lx = brassLx(stdFor(m.std[sex], y), m.fit[sex].a[i], m.fit[sex].b[i]);
     q = lx.slice(0, -1).map((l, x) => (l > 0 ? 1 - lx[x + 1] / l : 1));
     bySex[key] = q;
   }
@@ -70,6 +75,8 @@ export function inflationRate(era, seed, year) {
   h ^= h >>> 13;
   return pool[(h >>> 0) % pool.length];
 }
+
+export const lastCpiYear = (era) => era.cpi.from + era.cpi.v.length - 1;
 
 // ราคาของปี toYear เป็นกี่เท่าของปี fromYear
 export function priceRatio(era, seed, fromYear, toYear) {

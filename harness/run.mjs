@@ -1,4 +1,4 @@
-import { playLife, mixSeed, expectedDeathAge, periodE0 } from '../src/engine/index.mjs';
+import { playLife, mixSeed, expectedDeathAge, periodE0, qx, e0FromLx, infantMortality, MAX_AGE } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 
 const args = process.argv.slice(2);
@@ -41,12 +41,34 @@ console.log(`อายุเฉลี่ย ${f(sum / n)} ปี · ต่ำส
 console.log(`ตายหลังอายุ 60: ${f((over60 / n) * 100)}% · ตายก่อน 5 ขวบ: ${f((under5 / n) * 100)}%`);
 for (const [s, [t, c]] of Object.entries(bySex)) console.log(`${s}: อายุเฉลี่ย ${f(t / c)} ปี (${c} ชีวิต)`);
 
-// ด่าน 3 (ใบ 07): เป้า = อายุตายที่ข้อมูลจริงคาดไว้ตามแนวชีวิต (ตารางชีพของแต่ละปีที่ผ่าน) ไม่ใช่ e0 ของปีเกิดปีเดียว
+// ด่าน 3 มีสองชั้น เพราะเป้าของ 3b คำนวณจาก qx ตัวเดียวกับที่เกมใช้ ถ้าตารางชีพผิด 3b ก็ยังผ่าน
+// 3a: ตารางชีพรายปีที่เกมใช้ต้องให้ e0 และอัตราตายทารกตรงข้อมูลจริงของปีนั้น (ไม่ผ่านแกนเกม ไม่ผ่านการสุ่ม)
+const E0_TOL = 0.05, IMR_TOL = 0.5;
+let bad3a = 0, worstE0 = 0, worstImr = 0;
+const lastMort = era.mort.from + era.mort.e0.ชาย.v.length - 1;
+for (const sex of ['ชาย', 'หญิง']) {
+  for (let y = era.mort.from; y <= lastMort; y++) {
+    const lx = [1];
+    for (let a = 0; a < MAX_AGE; a++) lx.push(lx[a] * (1 - qx(era, sex, y, a)));
+    const dE0 = Math.abs(e0FromLx(lx) - periodE0(era, sex, y));
+    const dImr = Math.abs((1 - lx[1]) * 1000 - infantMortality(era, sex, y));
+    worstE0 = Math.max(worstE0, dE0);
+    worstImr = Math.max(worstImr, dImr);
+    if (dE0 > E0_TOL || dImr > IMR_TOL) {
+      bad3a++;
+      console.log(`  ✗ ${sex} ${y}: e0 ห่าง ${f(dE0)} · IMR ห่าง ${f(dImr)}`);
+    }
+  }
+}
+console.log(`\nด่าน 3a: ตารางชีพที่เกมใช้ vs ข้อมูลจริงรายปี (e0 ±${E0_TOL} · IMR ±${IMR_TOL}/1,000) ห่างสุด e0 ${worstE0.toFixed(4)} · IMR ${worstImr.toFixed(4)} → ${bad3a ? `ตก ${bad3a} ปี-เพศ` : 'ผ่าน'}`);
+if (bad3a) process.exitCode = 1;
+
+// 3b (ใบ 07 + MAP: ตายตามแนวชีวิต): อายุเฉลี่ยของบอทสุ่ม vs อายุตายที่ข้อมูลคาดตามแนวชีวิต (ตารางชีพของแต่ละปีที่ผ่าน) ไม่ใช่ e0 ปีเกิด
 const TOL = 3;
 // กลุ่มเล็กกว่านี้ค่าเฉลี่ยแกว่งเกิน ±1 ปีจากสุ่มล้วน (อายุตาย SD ราว 22 ปี) ตัดสินไม่ได้
 const MIN_LIVES = 500;
 let fail = 0, small = 0;
-console.log(`\nด่าน 3: อายุเฉลี่ยห่างค่าที่ข้อมูลคาด ไม่เกิน ±${TOL} ปี`);
+console.log(`\nด่าน 3b: อายุเฉลี่ยห่างค่าที่ข้อมูลคาดตามแนวชีวิต ไม่เกิน ±${TOL} ปี`);
 console.log('ทศวรรษเกิด เพศ   ชีวิต  อายุเฉลี่ย  ข้อมูลคาด  ต่าง   (e0 ปีเกิด)');
 for (const key of [...groups.keys()].sort()) {
   const [dec, sex] = key.split('|');
@@ -59,7 +81,7 @@ for (const key of [...groups.keys()].sort()) {
   const verdict = !judged ? 'ไม่ตัดสิน (ชีวิตน้อย)' : ok ? 'ผ่าน' : 'ตก';
   console.log(`${dec}s ${sex.padEnd(4)} ${String(c).padStart(6)} ${f(real / c).padStart(10)} ${f(exp / c).padStart(10)} ${(diff >= 0 ? '+' : '') + f(diff)} (${f(e0 / c)}) ${verdict}`);
 }
-if (fail) console.log(`ด่าน 3 ตก ${fail} กลุ่ม`);
-else if (small) console.log(`ด่าน 3 ยังไม่ตัดสิน: ${small} กลุ่มมีไม่ถึง ${MIN_LIVES} ชีวิต — รัน npm run gate (20,000 ชีวิต)`);
-else console.log('ด่าน 3 ผ่านทุกกลุ่ม');
+if (fail) console.log(`ด่าน 3b ตก ${fail} กลุ่ม`);
+else if (small) console.log(`ด่าน 3b ยังไม่ตัดสิน: ${small} กลุ่มมีไม่ถึง ${MIN_LIVES} ชีวิต — รัน npm run gate (20,000 ชีวิต)`);
+else console.log('ด่าน 3b ผ่านทุกกลุ่ม');
 if (fail) process.exitCode = 1;
