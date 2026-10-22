@@ -1,16 +1,18 @@
 // กติกาโครงข้อมูล: ฟิลด์บังคับ · ชนิด · key นอกรายการ · ระดับผล · หน่วยเงิน · ช่องแทนค่า
 import {
   STAT_KEYS, EFFECT_KEYS, CLASSES, SEXES, STAGE_AGES, STAGE_NAMES, CATEGORIES, PLACEHOLDERS,
-  ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES,
+  ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE,
 } from './vocab.mjs';
+import { INCOME_MULT } from '../../engine/life.mjs';
 import { ASSETS } from '../../engine/finance.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief'],
+  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem'],
   outcome: ['weight', 'text', 'effects', 'merit', 'sets_flags', 'schedules'],
-  effects: [...EFFECT_KEYS, 'invest'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic'],
+  chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   money: ['unit', 'amount', 'ref_year'],
   merit: ['cat', 'level'],
@@ -19,7 +21,7 @@ const KEYS = {
   bound: ['min', 'max'],
   whenFlags: ['has', 'not'],
   family: ['role', 'age', 'alive', 'health', 'relations'],
-  multipliers: ['class', 'stats', 'karma', 'family_fame'],
+  multipliers: ['class', 'stats', 'karma', 'family_fame', 'flags'],
   belief: ['kind', 'tradition', 'outside_canon', 'vow', 'trigger', 'cap_per_life', 'prize_table', 'stake', 'odds_modifier'],
   vow: ['deadline_years', 'due_event', 'redeem_full_cost', 'redeem_light_cost', 'defer_once'],
   trigger: ['money_state'],
@@ -62,6 +64,7 @@ function* shaped(e) {
       yield ['effects', node.effects, `${path}.effects`];
       if (isObj(node.effects.money)) yield ['money', node.effects.money, `${path}.effects.money`];
       if (isObj(node.effects.invest)) yield ['invest', node.effects.invest, `${path}.effects.invest`];
+      if (isObj(node.effects.chronic)) yield ['chronic', node.effects.chronic, `${path}.effects.chronic`];
     }
     if (isObj(node.cost)) yield ['money', node.cost, `${path}.cost`];
     for (const [i, m] of list(node.merit).entries()) if (isObj(m)) yield ['merit', m, `${path}.merit[${i}]`];
@@ -213,7 +216,7 @@ export const rules = [
   },
   {
     id: 'weight-shape',
-    desc: 'weight เป็นเลขบวก · multipliers (ฐานะ · ค่าสถานะ · กรรม · ชื่อเสียงตระกูล) เป็นเลขบวก',
+    desc: 'weight เป็นเลขบวก · multipliers (ฐานะ · ค่าสถานะ · กรรม · ชื่อเสียงตระกูล · ธง) เป็นเลขบวก',
     event(e, ctx, r) {
       if (e.weight !== undefined && !positive(e.weight)) r('.weight', 'weight ต้องเป็นเลขบวก');
       const m = e.multipliers;
@@ -224,11 +227,12 @@ export const rules = [
         if (!isObj(m[k]) || Object.entries(m[k]).some(([kk, v]) => !of.includes(kk) || !positive(v))) r(`.multipliers.${k}`, `ต้องเป็น {${of.join('|')}: เลขบวก}`);
       }
       for (const k of ['karma', 'family_fame']) if (m[k] !== undefined && !positive(m[k])) r(`.multipliers.${k}`, 'ต้องเป็นเลขบวก');
+      if (m.flags !== undefined && (!isObj(m.flags) || Object.entries(m.flags).some(([f, v]) => !FLAG_RE.test(f) || !positive(v)))) r('.multipliers.flags', 'ต้องเป็น {ชื่อธง: เลขบวก}');
     },
   },
   {
     id: 'effect-level',
-    desc: 'ผลต่อค่าสถานะเป็นระดับจำนวนเต็ม ±1..±3 (ตารางกลางแปลงเป็นตัวเลข) ไม่ใช่ตัวเลขดิบ',
+    desc: 'ผลต่อค่าสถานะ (รวม chronic ที่ไหลทุกปี) เป็นระดับจำนวนเต็ม ±1..±3 ไม่ใช่ตัวเลขดิบ · income_mult อยู่ในเพดาน',
     event(e, ctx, r) {
       for (const { node, path } of effectSites(e)) {
         if (node.effects === undefined) continue;
@@ -237,6 +241,13 @@ export const rules = [
           const v = node.effects[k];
           if (v !== undefined && !(isInt(v) && v !== 0 && Math.abs(v) <= 3)) r(`${path}.effects.${k}`, `ระดับต้องเป็น ±1..±3 ได้ ${v}`);
         }
+        const ch = node.effects.chronic;
+        if (ch !== undefined) {
+          if (!isObj(ch)) r(`${path}.effects.chronic`, 'chronic ต้องเป็น {ค่าสถานะ: ระดับ}');
+          else for (const [k, v] of Object.entries(ch)) if (!(isInt(v) && v !== 0 && Math.abs(v) <= 3)) r(`${path}.effects.chronic.${k}`, `ระดับต้องเป็น ±1..±3 ได้ ${v}`);
+        }
+        const im = node.effects.income_mult;
+        if (im !== undefined && !(typeof im === 'number' && im >= INCOME_MULT[0] && im <= INCOME_MULT[1] && im !== 1)) r(`${path}.effects.income_mult`, `ตัวคูณรายได้ต้องอยู่ ${INCOME_MULT[0]}–${INCOME_MULT[1]} และไม่ใช่ 1 ได้ ${im}`);
       }
     },
   },
@@ -288,6 +299,14 @@ export const rules = [
       for (const { path, s } of textsOf(e)) {
         for (const k of placeholdersIn(s)) if (!(k in PLACEHOLDERS) && !isLedgerPlaceholder(k)) r(path, `ช่องแทนค่า {${k}} ไม่อยู่ในรายการ`);
       }
+    },
+  },  {
+    id: 'era-ref',
+    desc: 'era ชี้ id เหตุการณ์บ้านเมืองใน data/era-events.json · การ์ดบ้านเมืองไม่มีอายุตายตัว (ห้ามมี at_age/weight — เกิดเมื่อเหตุการณ์บ้านเมืองมาเท่านั้น)',
+    event(e, ctx, r) {
+      if (e.era === undefined) return;
+      if (typeof e.era !== 'string' || !ctx.eras.has(e.era)) r('.era', `ไม่มีเหตุการณ์บ้านเมือง "${e.era}" (${[...ctx.eras].join(' ')})`);
+      if (e.at_age !== undefined || e.weight !== undefined) r('.era', 'การ์ดบ้านเมืองห้ามมี at_age หรือ weight');
     },
   },
 ];

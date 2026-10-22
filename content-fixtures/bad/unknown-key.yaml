@@ -11,3 +11,13 @@ events:
       - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: bad_case_chronic_key
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ป่วยเรื้อรัง"
+    choices:
+      - {text: "รักษา", effects: {chronic: {luck: -1}}, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

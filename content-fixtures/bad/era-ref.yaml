@@ -1,0 +1,25 @@
+# ผิดกติกาเดียว: era ชี้เหตุการณ์บ้านเมืองที่ไม่มีอยู่
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: moon_landing
+    text: "ข่าวใหญ่ทั้งประเทศ"
+    choices:
+      - {text: "ตามข่าว", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: tom_yum_kung
+    weight: 2
+    text: "ค่าเงินบาทลอยตัว"
+    choices:
+      - {text: "ตามข่าว", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

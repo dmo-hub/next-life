@@ -9,6 +9,8 @@ function flagRefs(e) {
   }
   const w = isObj(e.when) && isObj(e.when.flags) ? e.when.flags : {};
   for (const k of ['has', 'not']) list(w[k]).forEach((f, i) => out.push({ f, path: `.when.flags.${k}[${i}]`, need: true }));
+  // ธงที่คูณโอกาสเกิดแต่ไม่มีใครตั้ง = ตัวคูณที่ไม่เคยทำงาน
+  if (isObj(e.multipliers) && isObj(e.multipliers.flags)) for (const f of Object.keys(e.multipliers.flags)) out.push({ f, path: `.multipliers.flags.${f}`, need: true });
   return out;
 }
 

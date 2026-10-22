@@ -23,7 +23,8 @@ export function lintContext() {
   for (const f of readdirSync(new URL('docs/spec/', root)).filter((n) => /^lore-.*\.(md|html)$/.test(n))) {
     lore.set(f, loreHeadings(f, read(`docs/spec/${f}`)));
   }
-  return { regions, systems, lore, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
+  const eras = new Set(JSON.parse(read('data/era-events.json')).events.map((x) => x.id));
+  return { regions, systems, eras, lore, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]

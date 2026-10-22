@@ -61,3 +61,28 @@ events:
       - {text: "กู้นอกระบบมาเปิดร้าน", sets_flags: [has_job, in_debt], merit: [{cat: neutral}]}
       - {text: "ช่วยกิจการที่บ้านไปก่อน", merit: [{cat: neutral}]}
       - {text: "ขอพักสักปีแล้วค่อยหางาน", effects: {happiness: 1}, merit: [{cat: neutral}]}
+  - id: teen_clips_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 2
+    multipliers: {flags: {likes_clips: 3}}
+    text: "เพื่อนชวนตัดคลิปลงเน็ต"
+    choices:
+      - {text: "ตัดคลิปจนดึก", sets_flags: [likes_clips], effects: {knowledge: 1, health: -1}, merit: [{cat: neutral}]}
+      - {text: "ลองทำคลิปตลก", outcomes: [{weight: 1, text: "คลิปดังชั่วข้ามคืน", effects: {happiness: 2}, sets_flags: [likes_clips], merit: [{cat: neutral}]}, {weight: 3, text: "ไม่มีใครดู", effects: {happiness: -1}, merit: [{cat: neutral}]}], merit: [{cat: neutral}]}
+      - {text: "ไม่สนใจ", merit: [{cat: neutral}]}
+      - {text: "ไปเตะบอลแทน", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
+  - id: work_flood_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: great_flood
+    text: "น้ำท่วมถึงหลังคาบ้าน"
+    choices:
+      - {text: "ย้ายไปทำงานในเมือง", effects: {income_mult: 1.2, relations: -1}, merit: [{cat: neutral}]}
+      - {text: "ปลูกใหม่ทั้งที่ขาดทุน", effects: {income_mult: 0.7}, merit: [{cat: neutral}]}
+      - {text: "ช่วยเพื่อนบ้านก่อน", effects: {relations: 2}, merit: [{cat: dana, level: 1}]}
+      - {text: "ป่วยเพราะน้ำขัง", effects: {chronic: {health: -1}}, merit: [{cat: neutral}]}

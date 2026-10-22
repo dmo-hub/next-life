@@ -601,6 +601,13 @@ const HAPPY_PULL = 1 - 0.5 ** (1 / 3);
 const knowledgeGain = (age) => (age <= 12 ? 3 : age <= 18 ? 2.5 : age <= 30 ? 1 : age < 60 ? 0.4 : 0);
 const RELATION_FADE = 0.007;
 const ERA_GAP = 3;
+// ปีหนึ่งจับเหตุการณ์จากกองสุ่มได้ด้วยโอกาสนี้ (เมื่อกองมีใบที่เกิดได้) — ปรับให้ด่าน 4 (80–150 การ์ด) ผ่าน
+const POOL_CHANCE = 0.35;
+// ตัวคูณรายได้ถาวรสะสมทั้งชีวิตอยู่ในเพดานนี้ — ผลซ้อนหลายครั้งไม่ทำให้รายได้หายหมดหรือพุ่งไร้ขอบ
+const INCOME_MULT = [0.25, 3];
+// ผลเรื้อรังสะสมต่อค่าได้ไม่เกิน ±CHRONIC_MAX ระดับ · ไหลระดับละ CHRONIC_STEP หน่วยต่อปี
+const CHRONIC_MAX = 3;
+const CHRONIC_STEP = 1;
 // ออกการ์ดสรุปอย่างน้อยทุก K ปี ถึงไม่มีอะไรเกิด · ปีที่มีเรื่อง (เปลี่ยนช่วง · ยุค · ลาง · จัดสรรเงิน) สรุปทันที
 // ปีเงียบรวบเป็นใบเดียว — การ์ดสรุปทุกปีที่มีแค่เงินขยับอ่านแล้วเปล่า
 const SUMMARY_EVERY = 5;
@@ -623,7 +630,12 @@ const isWorking = (age) => age >= WORK_AGES[0] && age < WORK_AGES[1];
 // เงินเก็บต่อปี เป็นบาทของปีนั้น: ค่าจ้างตามอาชีพ × ภาค ทั้งปี × อัตราออม (ใบ 14)
 function yearlySaving(st, year = st.birthYear + st.age) {
   const era = st.content.era;
-  return monthlyWage(era, st.seed, st.occupation, st.ses, year) * 12 * era.birth.saveRate;
+  return monthlyIncome(st, year) * 12 * era.birth.saveRate;
+}
+
+// รายได้/เดือนของชีวิตนี้: ค่าจ้างอาชีพ × ตัวคูณรายได้ถาวรจากเหตุการณ์
+function monthlyIncome(st, year = st.birthYear + st.age) {
+  return monthlyWage(st.content.era, st.seed, st.occupation, st.ses, year) * st.incomeMult;
 }
 
 function newLife(seed, content) {
@@ -688,6 +700,10 @@ function newLife(seed, content) {
     // ค่าตอนเริ่มช่วงวัยปัจจุบัน — การ์ดเปลี่ยนช่วงเล่าว่าช่วงที่ผ่านมาเปลี่ยนไปเท่าไร
     stageMark: null,
     lastEraAge: null,
+    // อายุล่าสุดที่จับกองสุ่มแล้ว — กันจับซ้ำเมื่อการ์ดอายุเดียวกันทำให้ลูปค้นซ้ำ
+    poolAge: null,
+    incomeMult: 1,
+    chronic: {},
   };
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
   st.lastCardMoney = st.money;
@@ -727,9 +743,11 @@ function choiceFx(ev, c) {
     if (hidden.includes(k)) { out.push('?'); break; }
     const sign = k === 'money' && typeof fx[k] === 'object' ? Math.sign(fx[k].amount) : Math.sign(fx[k]);
     // ช่องว่างไม่ตัดบรรทัด: ลูกศรต้องติดชื่อค่า ไม่หล่นไปบรรทัดใหม่
-    out.push(`${STAT_LABELS[k]} ${sign > 0 ? '↑' : '↓'}`);
+    out.push(`${STAT_LABELS[k]}\u00a0${sign > 0 ? '↑' : '↓'}`);
   }
   if (fx.invest) out.push('ลงทุน');
+  if (fx.income_mult) out.push(`รายได้\u00a0${fx.income_mult > 1 ? '↑' : '↓'}`);
+  for (const [k, v] of Object.entries(fx.chronic ?? {})) out.push(`${STAT_LABELS[k]}\u00a0${v > 0 ? '↑' : '↓'}\u00a0ระยะยาว`);
   return out.join(' · ');
 }
 
@@ -778,6 +796,12 @@ function applyEffects(st, fx = {}) {
   for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + levelValue(fx[k]));
   if (fx.money) st.money += moneyValue(st, fx.money);
   if (fx.invest) invest(st, fx.invest);
+  if (fx.income_mult) st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * fx.income_mult));
+  for (const [k, v] of Object.entries(fx.chronic ?? {})) {
+    const lv = Math.max(-CHRONIC_MAX, Math.min(CHRONIC_MAX, (st.chronic[k] ?? 0) + v));
+    if (lv) st.chronic[k] = lv;
+    else delete st.chronic[k];
+  }
 }
 
 // ย้ายสัดส่วน share ของเงินทั้งหมดเข้าสินทรัพย์เดียว · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
@@ -802,6 +826,8 @@ function stepYear(st) {
   st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
   st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * (100 - st.knowledge)) / 100);
   st.relations = clamp(st.relations * (1 - RELATION_FADE));
+  // ผลเรื้อรังไหลทุกปีจนกว่าจะมีผลกลับทาง · ไม่แตะเส้นสุขภาพธรรมชาติ — ป่วยเรื้อรังจึงเพิ่มโอกาสตายจริง
+  for (const [k, lv] of Object.entries(st.chronic)) st[k] = clamp(st[k] + lv * CHRONIC_STEP);
   // ผลตอบแทนคิดกับเงินต้นปีก่อนเงินเก็บของปีนี้เข้า · ติดลบ = หนี้ ทบดอกเบี้ยเงินกู้ของปีนั้น
   const era = st.content.era;
   if (st.money > 0) {
@@ -831,7 +857,11 @@ function stepYear(st) {
   const eras = eraEventsAt(st.content.era, st.seed, year);
   if (eras.length && (st.lastEraAge === null || st.age - st.lastEraAge >= ERA_GAP)) {
     st.lastEraAge = st.age;
-    for (const e of eras) st.due.push({ kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: e.name });
+    for (const e of eras) {
+      // มีการ์ดเนื้อหาผูกเหตุการณ์นี้ = ให้เลือกรับมือ · ไม่มี = การ์ดเล่าเรื่องเดิม
+      const ev = st.content.events.find((c) => c.era === e.id && whenOk(st, c.when) && (c.when?.age || c.stage === stage));
+      st.due.push(ev ? { kind: 'eraEvent', ev, age: st.age } : { kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: e.name });
+    }
   }
 }
 
@@ -885,13 +915,31 @@ function emit(st, card) {
   return card;
 }
 
+// การ์ดเลือกของเหตุการณ์ — ตั้ง pending ไว้ให้ choose อ่าน
+function eventCard(st, ev) {
+  st.pending = ev;
+  return emit(st, {
+    kind: 'event',
+    id: ev.id,
+    // แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): A ชีวิตจริง · B ความเชื่อ/แฟนตาซี
+    type: ev.type ?? 'A',
+    age: st.age,
+    stage: stageOf(st.age),
+    title: ev.title ? fill(ev.title, st) : null,
+    text: fill(ev.text, st),
+    choices: ev.choices.map((c) => fill(c.text, st)),
+    fx: ev.choices.map((c) => choiceFx(ev, c)),
+  });
+}
+
 // เดินปีละครั้งจนมีการ์ดถึงกำหนดหรือตาย คืนการ์ดใบถัดไป
 function nextCard(st) {
   if (st.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
   if (st.dead) return deathCard(st);
-  // การ์ดเปลี่ยนช่วง/เหตุการณ์ยุคเป็นใบของตัวเอง ตามหลังการ์ดสรุปของปีเดียวกัน
+  // การ์ดเปลี่ยนช่วง/เหตุการณ์ยุค/ผลสุ่มเป็นใบของตัวเอง ตามหลังการ์ดสรุปของปีเดียวกัน
   if (st.queue.length) {
     const card = st.queue.shift();
+    if (card.kind === 'eraEvent') return eventCard(st, card.ev);
     if (card.kind === 'alloc') {
       const options = allocOptions(st.content.era, st.birthYear + st.age);
       card.choices = options.map((o) => o.label);
@@ -919,35 +967,57 @@ function nextCard(st) {
     }
     // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
     const year = st.birthYear + st.age;
-    const ev = st.content.events.find((e) => !st.done[e.id] && (e.age === st.age || isScheduled(st, e.id)) && inYears(e, year) && flagsOk(st, e.when));
+    let ev = st.content.events.find((e) => !st.done[e.id] && (e.age === st.age || isScheduled(st, e.id)) && inYears(e, year) && whenOk(st, e.when));
+    // กองสุ่มจับได้ปีละครั้ง หลังหลักไมล์/นัดของปีนั้นหมดแล้ว
+    if (!ev && st.poolAge !== st.age) {
+      st.poolAge = st.age;
+      ev = drawPool(st, year);
+    }
     if (ev) st.done[ev.id] = true;
     st.scheduled = st.scheduled.filter((x) => x.age >= st.age && !st.done[x.event]);
     if (ev) {
       // อายุนี้อาจมีเหตุการณ์อื่นรออยู่ (หลักไมล์ชนกับนัด) — ค้นอายุเดิมอีกรอบก่อนเดินปี
       st.advance = false;
-      st.pending = ev;
-      return emit(st, {
-        kind: 'event',
-        id: ev.id,
-        // แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): A ชีวิตจริง · B ความเชื่อ/แฟนตาซี
-        type: ev.type ?? 'A',
-        age: st.age,
-        stage: stageOf(st.age),
-        title: ev.title ? fill(ev.title, st) : null,
-        text: fill(ev.text, st),
-        choices: ev.choices.map((c) => fill(c.text, st)),
-        fx: ev.choices.map((c) => choiceFx(ev, c)),
-      });
+      return eventCard(st, ev);
     }
   }
 }
 
+// กองสุ่ม (B14): เหตุการณ์ไม่มี at_age แต่มี weight · ใบเดิมไม่ซ้ำในชีวิต · ไม่มีใบที่เกิดได้ = ไม่ดึงเลขสุ่ม
+// ชีวิตที่เนื้อหาไม่มีกองจึงได้ชะตาเดิมทุกหลัก
+function drawPool(st, year) {
+  const stage = stageOf(st.age);
+  const pool = st.content.events.filter((e) => e.weight && e.age === undefined && !e.era && !st.done[e.id] && e.stage === stage && inYears(e, year) && whenOk(st, e.when));
+  if (!pool.length || st.rng.next() >= POOL_CHANCE) return null;
+  return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers)));
+}
+
+// ตัวคูณโอกาสเกิด (ใบ 07): ค่าสถานะคูณแบบต่อเนื่อง m^((ค่า−50)/50) · กรรมตามทิศบัญชีสุทธิ · ธงที่ถืออยู่
+// ชื่อเสียงตระกูลยังไม่มีระบบ คูณ 1
+function poolMultiplier(st, m) {
+  if (!m) return 1;
+  let x = m.class?.[st.cls] ?? 1;
+  for (const [k, v] of Object.entries(m.stats ?? {})) x *= v ** ((st[k] - 50) / 50);
+  if (m.karma) x *= m.karma ** Math.sign(netLedger(st.ledger));
+  for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
+  return x;
+}
+
 const isScheduled = (st, id) => st.scheduled.some((x) => x.event === id && x.age === st.age);
 const inYears = (e, year) => !e.years || (year >= e.years[0] && year <= e.years[1]);
-function flagsOk(st, when) {
-  const f = when?.flags;
-  if (!f) return true;
-  return (f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]);
+const inRange = (v, r) => !r || (v >= r[0] && v <= r[1]);
+const inBound = (v, b) => !b || ((b.min === undefined || v >= b.min) && (b.max === undefined || v <= b.max));
+// เงื่อนไขเกิดแบบประกาศทุกฟิลด์ (ใบ 07) · family ยังไม่มีระบบครอบครัว จึงไม่ผ่านเสมอ
+function whenOk(st, when) {
+  if (!when) return true;
+  if (when.family) return false;
+  if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
+  if (when.class && !when.class.includes(st.cls)) return false;
+  if (when.region && !when.region.includes(st.region)) return false;
+  if (when.sex && !when.sex.includes(st.sex)) return false;
+  for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;
+  const f = when.flags;
+  return !f || ((f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]));
 }
 
 // ป้ายบุญบาปเข้าบัญชีซ่อน · ธง · นัดเหตุการณ์ต่อเนื่อง (ใบ 07) — นัดสุ่มปีจาก rng ของโลก เพราะเป็นผลของการเลือก
@@ -975,9 +1045,17 @@ function choose(st, idx) {
   st.pending = null;
   // เติมข้อความก่อนผลลง — {เงิน} ต้องเป็นยอดตอนที่ผู้เล่นเห็นตัวเลือก
   const text = fill(ev.choices[idx].text, st);
-  applyEffects(st, ev.choices[idx].effects);
-  applyChoice(st, ev, ev.choices[idx]);
+  const c = ev.choices[idx];
+  applyEffects(st, c.effects);
+  applyChoice(st, ev, c);
   st.log.push({ id: ev.id, age: st.age, choice: idx, text });
+  // ผลสุ่ม: จับทางด้วย rng ของโลก (เป็นผลของการเลือก) แล้วเล่าเป็นการ์ดผลลัพธ์ใบถัดไป
+  if (c.outcomes?.length) {
+    const o = weighted(st.rng, c.outcomes, c.outcomes.map((x) => x.weight));
+    applyEffects(st, o.effects);
+    applyChoice(st, ev, o);
+    if (o.text) st.queue.unshift({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) });
+  }
 }
 
 function deathCard(st) {
@@ -1127,9 +1205,9 @@ function button(label, fx, onclick) {
 }
 
 // แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): ลางกับเหตุการณ์ความเชื่อเป็นทาง B ที่เหลือเป็นทาง A
-const styleOf = (card) => (card.kind === 'omen' || (card.kind === 'event' && card.type === 'B') ? 'b' : 'a');
+const styleOf = (card) => (card.kind === 'omen' || ((card.kind === 'event' || card.kind === 'result') && card.type === 'B') ? 'b' : 'a');
 
-const KICKER = { summary: 'สรุปปี', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ' };
+const KICKER = { summary: 'สรุปปี', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
 
 function render(card) {
   root.replaceChildren();
@@ -1157,7 +1235,7 @@ function render(card) {
     box.append(top, stats(s));
     // มีงานทำแล้วบอกรายได้ต่อเดือน ก่อนทำงาน/หลังเกษียณไม่มีรายได้ จึงบอกเงินติดตัวแทน
     const purse = isWorking(card.age)
-      ? `รายได้ ${baht(monthlyWage(st.content.era, st.seed, st.occupation, st.ses, year))}/เดือน`
+      ? `รายได้ ${baht(monthlyIncome(st, year))}/เดือน`
       : `เงินติดตัว ${baht(s.money)}`;
     box.append(el('div', 'meta', `ฐานะ${st.cls} · ${st.occupationName} · ${purse}`));
     body.append(el('span', 'kicker', card.kind === 'event' ? `ช่วง${card.stage}` : KICKER[card.kind]));
@@ -1174,7 +1252,7 @@ function render(card) {
       body.append(el('p', 'sub', `เงิน ${baht(card.money)} ≈ ${baht(card.moneyAtBirth)} ค่าเงินปีเกิด`));
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
       choices.append(button('ต่อไป', null, next));
-    } else if (card.kind === 'era' || card.kind === 'omen') {
+    } else if (card.kind === 'era' || card.kind === 'omen' || card.kind === 'result') {
       body.append(el('h3', null, card.text));
       choices.append(button('ต่อไป', null, next));
     } else {

@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, isWorking, monthlyWage } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, isWorking, monthlyIncome } from '../engine/index.mjs';
 
 const root = document.getElementById('app');
 let st;
@@ -98,9 +98,9 @@ function button(label, fx, onclick) {
 }
 
 // แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): ลางกับเหตุการณ์ความเชื่อเป็นทาง B ที่เหลือเป็นทาง A
-const styleOf = (card) => (card.kind === 'omen' || (card.kind === 'event' && card.type === 'B') ? 'b' : 'a');
+const styleOf = (card) => (card.kind === 'omen' || ((card.kind === 'event' || card.kind === 'result') && card.type === 'B') ? 'b' : 'a');
 
-const KICKER = { summary: 'สรุปปี', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ' };
+const KICKER = { summary: 'สรุปปี', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
 
 function render(card) {
   root.replaceChildren();
@@ -128,7 +128,7 @@ function render(card) {
     box.append(top, stats(s));
     // มีงานทำแล้วบอกรายได้ต่อเดือน ก่อนทำงาน/หลังเกษียณไม่มีรายได้ จึงบอกเงินติดตัวแทน
     const purse = isWorking(card.age)
-      ? `รายได้ ${baht(monthlyWage(st.content.era, st.seed, st.occupation, st.ses, year))}/เดือน`
+      ? `รายได้ ${baht(monthlyIncome(st, year))}/เดือน`
       : `เงินติดตัว ${baht(s.money)}`;
     box.append(el('div', 'meta', `ฐานะ${st.cls} · ${st.occupationName} · ${purse}`));
     body.append(el('span', 'kicker', card.kind === 'event' ? `ช่วง${card.stage}` : KICKER[card.kind]));
@@ -145,7 +145,7 @@ function render(card) {
       body.append(el('p', 'sub', `เงิน ${baht(card.money)} ≈ ${baht(card.moneyAtBirth)} ค่าเงินปีเกิด`));
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
       choices.append(button('ต่อไป', null, next));
-    } else if (card.kind === 'era' || card.kind === 'omen') {
+    } else if (card.kind === 'era' || card.kind === 'omen' || card.kind === 'result') {
       body.append(el('h3', null, card.text));
       choices.append(button('ต่อไป', null, next));
     } else {

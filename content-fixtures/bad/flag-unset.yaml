@@ -11,3 +11,15 @@ events:
       - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: bad_case_flagmult
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {never_set_flag: 2}}
+    text: "มีคนชวนทำคลิป"
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
