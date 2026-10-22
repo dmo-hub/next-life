@@ -18,3 +18,6 @@ events:
       odds_modifier: {source: player_luck, formula: mult_up_only, max_mult: 4.0, prize_scope: small, direction: up_only, ref_scale: table.merit_ref}
     choices:
       - {text: "ตกลง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

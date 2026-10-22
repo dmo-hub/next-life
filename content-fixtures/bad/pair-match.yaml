@@ -11,3 +11,5 @@ events:
     choices:
       - {pair_id: mw, intent: sincere, label: ทำด้วยใจ, cost: {unit: income_x, amount: 0.02}, merit: [{cat: dana, level: 2}], effects: {happiness: 1}}
       - {pair_id: mw, intent: wish_for_gain, label: ทำหวังผล, cost: {unit: income_x, amount: 0.05}, merit: [{cat: dana, level: 1}], effects: {happiness: 1}}
+      - {label: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {label: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

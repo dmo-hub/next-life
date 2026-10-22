@@ -7,3 +7,6 @@ events:
     text: "ข้อความการ์ด"
     choices:
       - {text: "ตกลง", merit: [{cat: lust, level: 1}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

@@ -10,3 +10,6 @@ events:
     belief: {kind: amulet, tradition: พุทธ, odds_modifier: {source: merit_ledger.net}}
     choices:
       - {text: "ตกลง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

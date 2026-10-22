@@ -10,3 +10,6 @@ events:
     belief: {kind: amulet, tradition: พุทธ}
     choices:
       - {label: ซื้อเครื่องราง, cost: {unit: fixed_baht, amount: 500}, effects: {health: 1}, merit: [{cat: neutral}]}
+      - {label: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {label: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {label: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

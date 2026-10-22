@@ -7,3 +7,6 @@ events:
     text: "เพื่อนชวนเปิดบัญชีหุ้นครั้งแรก"
     choices:
       - {text: "ตกลง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

@@ -34,6 +34,13 @@ events:
         merit: [{cat: care_parents, level: 2}, {cat: dana, level: 1}]
         sets_flags: [helped_parents]
         schedules: [{event: work_parents_thanks_01, after_years: [1, 3]}]
+      - id: save_first
+        text: "เก็บเงินไว้ก่อน"
+        merit: [{cat: neutral}]
+      - id: read_more
+        text: "อ่านหาข้อมูลอีกสักปี"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
   - id: work_parents_thanks_01
     type: A
     category: family
@@ -52,3 +59,5 @@ events:
     choices:
       - {text: "รับงาน", sets_flags: [has_job], effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
       - {text: "กู้นอกระบบมาเปิดร้าน", sets_flags: [has_job, in_debt], merit: [{cat: neutral}]}
+      - {text: "ช่วยกิจการที่บ้านไปก่อน", merit: [{cat: neutral}]}
+      - {text: "ขอพักสักปีแล้วค่อยหางาน", effects: {happiness: 1}, merit: [{cat: neutral}]}

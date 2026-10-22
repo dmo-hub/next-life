@@ -1,7 +1,7 @@
 // กติกาโครงข้อมูล: ฟิลด์บังคับ · ชนิด · key นอกรายการ · ระดับผล · หน่วยเงิน · ช่องแทนค่า
 import {
   STAT_KEYS, EFFECT_KEYS, CLASSES, SEXES, STAGE_AGES, STAGE_NAMES, CATEGORIES, PLACEHOLDERS,
-  ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES,
+  ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES,
 } from './vocab.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 
@@ -99,6 +99,13 @@ export const rules = [
         list(node.merit).forEach((m, i) => isObj(m) && m.cat === undefined && r(`${path}.merit[${i}]`, 'ขาด cat'));
         list(node.schedules).forEach((s, i) => isObj(s) && (s.event === undefined || s.after_years === undefined) && r(`${path}.schedules[${i}]`, 'ต้องมี event และ after_years'));
       }
+    },
+  },
+  {
+    id: 'choice-count',
+    desc: `การ์ดที่มีตัวเลือกต้องมีอย่างน้อย ${MIN_CHOICES} ตัวเลือก · การ์ดเล่าเรื่องใช้ choices: [] ได้`,
+    event(e, ctx, r) {
+      if (Array.isArray(e.choices) && e.choices.length && e.choices.length < MIN_CHOICES) r('.choices', `มี ${e.choices.length} ตัวเลือก ต้องมีอย่างน้อย ${MIN_CHOICES}`);
     },
   },
   {

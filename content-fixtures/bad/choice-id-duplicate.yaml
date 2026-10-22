@@ -8,3 +8,5 @@ events:
     choices:
       - {id: a, text: "หนึ่ง", merit: [{cat: neutral}]}
       - {id: a, text: "สอง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

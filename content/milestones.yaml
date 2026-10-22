@@ -14,6 +14,12 @@ events:
       - text: "เรียนไปเล่นไป"
         effects: { knowledge: 1, happiness: 1 }
         merit: [{ cat: neutral }]
+      - text: "เลิกเรียนแล้วช่วยงานที่บ้าน"
+        effects: { knowledge: 1, relations: 1 }
+        merit: [{ cat: neutral }]
+      - text: "ร้องไห้ไม่อยากไปโรงเรียน"
+        effects: { happiness: -1, relations: 1 }
+        merit: [{ cat: neutral }]
   - id: first_job
     type: A
     category: work_money
@@ -28,6 +34,12 @@ events:
       - text: "ลองงานเสี่ยงที่ผลตอบแทนสูง"
         effects: { money: { unit: income_x, amount: 2.5 }, health: -1, relations: -1 }
         merit: [{ cat: neutral }]
+      - text: "กลับไปช่วยกิจการที่บ้าน"
+        effects: { money: { unit: income_x, amount: 0.5 }, relations: 1 }
+        merit: [{ cat: neutral }]
+      - text: "เรียนต่ออีกสองปี"
+        effects: { knowledge: 2, happiness: -1 }
+        merit: [{ cat: neutral }]
   - id: retirement
     type: A
     category: work_money
@@ -41,4 +53,10 @@ events:
         merit: [{ cat: neutral }]
       - text: "ทำงานต่ออีกหน่อย"
         effects: { money: { unit: income_x, amount: 3 }, health: -1, happiness: -1 }
+        merit: [{ cat: neutral }]
+      - text: "ปลูกผักเลี้ยงหลานอยู่บ้าน"
+        effects: { relations: 1, health: 1 }
+        merit: [{ cat: neutral }]
+      - text: "รับจ้างงานเบา ๆ เป็นรายวัน"
+        effects: { money: { unit: income_x, amount: 1 }, happiness: 1 }
         merit: [{ cat: neutral }]

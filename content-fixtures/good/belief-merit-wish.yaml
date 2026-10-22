@@ -20,6 +20,8 @@ events:
          merit: [{cat: ทาน, level: 1}], effects: {happiness: +1},
          sets_flags: [hope_set:mw_01],
          schedules: [{event: bel_hope_unmet_01, after_years: [3, 5]}]}
+      - {id: help_hands, label: ไปช่วยยกของในงานแทน, merit: [{cat: ช่วยคน, level: 1}], effects: {relations: +1}}   # เติม (ด่านขั้นต่ำ 4 ตัวเลือก)
+      - {id: stay_home, label: ไม่ไปงานนี้, merit: [{cat: neutral}]}                                                 # เติม
   - id: bel_hope_unmet_01
     type: A
     stage: ทำงาน

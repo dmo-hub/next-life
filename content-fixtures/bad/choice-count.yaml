@@ -1,0 +1,17 @@
+# การ์ดที่ให้เลือกมี 3 ตัวเลือก (ต้องอย่างน้อย 4) — การ์ดเล่าเรื่อง choices: [] ยังผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+  - id: ok_story_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "การ์ดเล่าเรื่อง ไม่มีตัวเลือก"
+    choices: []

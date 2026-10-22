@@ -7,3 +7,6 @@ events:
     text: "ข้อความการ์ด"
     choices:
       - {text: "ลอง", outcomes: [{weight: 1, effects: {happiness: 1}}], merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

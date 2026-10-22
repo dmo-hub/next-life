@@ -28,6 +28,13 @@ events:
       - id: just_pray                               # เติม
         label: ไหว้ขอพรเฉย ๆ
         merit: [{cat: neutral}]
+      - id: give_box                                # เติม (ด่านขั้นต่ำ 4 ตัวเลือก)
+        label: ไหว้แล้วหยอดตู้บริจาค
+        cost: {unit: fixed_baht, amount: 20}
+        merit: [{cat: dana, level: 1}]
+      - id: wait_outside                            # เติม
+        label: รออยู่ข้างนอก ไม่เข้าไปไหว้
+        merit: [{cat: neutral}]
   - id: bel_vow_due_01
     type: B
     category: belief
@@ -41,6 +48,7 @@ events:
       - {id: redeem_full, label: แก้บนเต็มตามที่บนไว้, redeem: full, cost: {unit: fixed_baht, amount: 1500}, clears_flags: [vow_open:exam_01], effects: {happiness: 1}, merit: [{cat: neutral}]}
       - {id: redeem_light, label: แก้ตามกำลังที่มี, redeem: light, cost: {unit: income_x, amount: 0.05}, clears_flags: [vow_open:exam_01], effects: {happiness: 1}, merit: [{cat: neutral}]}
       - {id: defer, label: ขอเลื่อนไปก่อน, redeem: defer, schedules: [{event: bel_vow_due_02, after_years: [1, 2]}], merit: [{cat: neutral}]}
+      - {id: redeem_plus, label: แก้บนเต็มพร้อมถวายสังฆทาน, redeem: full, cost: {unit: fixed_baht, amount: 2000}, clears_flags: [vow_open:exam_01], effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
   - id: bel_vow_due_02
     type: B
     category: belief
@@ -54,3 +62,4 @@ events:
       - {id: redeem_full, label: แก้บนเต็มตามที่บนไว้, redeem: full, cost: {unit: fixed_baht, amount: 1500}, clears_flags: [vow_open:exam_01], effects: {happiness: 1}, merit: [{cat: neutral}]}
       - {id: redeem_light, label: แก้ตามกำลังที่มี, redeem: light, cost: {unit: income_x, amount: 0.05}, clears_flags: [vow_open:exam_01], effects: {happiness: 1}, merit: [{cat: neutral}]}
       - {id: skip, label: ไม่แก้แล้ว, redeem: none, clears_flags: [vow_open:exam_01], effects: {happiness: -1}, merit: [{cat: vow_broken, level: flag}]}
+      - {id: redeem_plus, label: แก้บนเต็มพร้อมถวายสังฆทาน, redeem: full, cost: {unit: fixed_baht, amount: 2000}, clears_flags: [vow_open:exam_01], effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
