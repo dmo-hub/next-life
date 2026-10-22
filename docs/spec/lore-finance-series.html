@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ข้อมูลเกมจำลองชีวิต</title>
+<style>
+:root{--bg:#fbfaf7;--fg:#1d1f23;--mut:#5d636e;--line:#e3e0d8;--card:#fff;--acc:#1f5f8b;--warn:#9a5b00;--warnbg:#fff4e0;--bad:#a1281e;--badbg:#fde9e7;--ok:#1d6b3a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--fg:#e7e5df;--mut:#a3a7ad;--line:#2c3036;--card:#1c1f23;--acc:#7fb6dd;--warn:#f0b357;--warnbg:#3a2c12;--bad:#f08a80;--badbg:#3b1d1a;--ok:#7fd29a}}
+:root[data-theme="dark"]{--bg:#15171a;--fg:#e7e5df;--mut:#a3a7ad;--line:#2c3036;--card:#1c1f23;--acc:#7fb6dd;--warn:#f0b357;--warnbg:#3a2c12;--bad:#f08a80;--badbg:#3b1d1a;--ok:#7fd29a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 "Sarabun","Noto Sans Thai",system-ui,sans-serif}
+main{max-width:960px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.5rem;margin:0 0 4px}
+h2{font-size:1.1rem;margin:28px 0 8px;padding-bottom:4px;border-bottom:2px solid var(--line)}
+p.sub{color:var(--mut);margin:0 0 12px}
+table{width:100%;border-collapse:collapse;background:var(--card);font-size:.92rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:color-mix(in srgb,var(--line) 45%,var(--card))}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wrap{overflow-x:auto}
+ul{margin:6px 0;padding-left:20px}
+a{color:var(--acc);word-break:break-all}
+.tag{display:inline-block;font-size:.75rem;padding:0 6px;border-radius:4px;margin-left:4px;white-space:nowrap}
+.weak{background:var(--warnbg);color:var(--warn)}
+.ref{background:var(--badbg);color:var(--bad)}
+.asm{background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc)}
+.note{margin-top:28px;padding:12px;border:1px solid var(--line);background:var(--card);color:var(--mut);font-size:.88rem}
+</style>
+</head>
+<body>
+<main>
+<h1>แผ่นข้อมูลเกมจำลองชีวิตคนไทย (เกิด พ.ศ. 2500–2569)</h1>
+<p class="sub">รวมผลรีเสิร์ช + ผลตรวจหักล้าง · ปีที่สินทรัพย์/ระบบเริ่มมี ใช้กั้นตัวเลือกของผู้เล่น · <span class="tag weak">ยังไม่แน่น</span> = weakened · <span class="tag asm">สมมติฐานเกม</span> = ค่าที่ทีมตั้งเอง ไม่ใช่ข้อเท็จจริง</p>
+
+<h2>(1) ตลาดหุ้น</h2>
+<ul>
+<li>SET เริ่มซื้อขาย 30 เม.ย. 2518 (1975) ⇒ เปิดหุ้นไทยได้ตั้งแต่ปี 2518 · ดัชนีฐาน 100 จุด ณ วันเดียวกัน — <a href="https://en.wikipedia.org/wiki/Stock_Exchange_of_Thailand">Wikipedia SET</a> · <a href="https://en.wikipedia.org/wiki/SET_Index">Wikipedia SET Index</a></li>
+<li>SET TRI (รวมปันผล) เริ่มเผยแพร่ 2 พ.ค. 2549 ฐาน 1,000 จุด · วันฐาน/ปีย้อนหลังยังไม่ยืนยัน (Ground Rules PDF อ่านไม่ได้) — <a href="https://mondovisione.com/media-and-resources/news/thai-bourse-launches-total-return-index-2011124/">Mondo Visione</a> · <a href="https://www.set.or.th/en/market/index/tri/profile">SET TRI profile</a></li>
+</ul>
+<div class="wrap"><table>
+<tr><th>ปี ค.ศ. (พ.ศ.)</th><th>ปิดปี (จุด)</th><th>เปลี่ยนแปลง (price return)</th><th>ปี ค.ศ. (พ.ศ.)</th><th>ปิดปี (จุด)</th><th>เปลี่ยนแปลง</th></tr>
+<tr><td>1975 (2518)</td><td class="n">84.08</td><td class="n">ปีบางส่วน</td><td>2003 (2546)</td><td class="n">772.15</td><td class="n">+116.60%</td></tr>
+<tr><td>1977 (2520)</td><td class="n">181.59</td><td class="n">+119.58%</td><td>2008 (2551)</td><td class="n">449.96</td><td class="n">-47.56%</td></tr>
+<tr><td>1989 (2532)</td><td class="n">879.19</td><td class="n">+127.34%</td><td>2009 (2552)</td><td class="n">734.54</td><td class="n">+63.25%</td></tr>
+<tr><td>1993 (2536)</td><td class="n">1,682.85</td><td class="n">+88.36%</td><td>2017 (2560)</td><td class="n">1,753.71</td><td class="n">+13.66%</td></tr>
+<tr><td>1997 (2540)</td><td class="n">372.69</td><td class="n">-55.18%</td><td>2024 (2567)</td><td class="n">1,400.21</td><td class="n">-1.10%</td></tr>
+<tr><td>2000 (2543)</td><td class="n">269.19</td><td class="n">-44.14%</td><td>2025 (2568)</td><td class="n">1,259.67</td><td class="n">-10.04%</td></tr>
+</table></div>
+<p>ชุดเต็ม 1975–2025 รายปี: ตารางใน <a href="https://en.wikipedia.org/wiki/SET_Index">Wikipedia SET Index</a> (อ้าง SET Market Statistics ดึง 2020-01-21 · แถวหลังปี 2019 มีคนเติมทีหลัง ควรเทียบ <a href="https://www.set.or.th">set.or.th</a>) · ไม่รวมปันผล · ปี 2569 ยังไม่จบปี ห้ามใช้</p>
+
+<h2>(2) ทองคำ</h2>
+<ul>
+<li>ราคาทองไทย บาท/บาททอง <span class="tag weak">ยังไม่แน่น</span>: 2519 1,379 · 2523 5,660 · 2540 4,869 · 2549 12,900 · 2554 27,100 · 2563 30,400 · 2567 44,550 · 2568 45,500 — ตาราง "(โดยประมาณ)" ไม่ระบุที่มา/ชนิดทอง/ต้น-ปลายปี — <a href="https://www.sanook.com/news/9871214/">Sanook</a> · ควรเทียบ <a href="https://www.goldtraders.or.th">สมาคมค้าทองคำ</a></li>
+<li>ทองโลก LBMA ปิดปี USD/ออนซ์ (ทุก 5 ปี): 1970 37 · 1975 140 · 1980 590 · 1990 391 · 2000 273 · 2005 513 · 2010 1,410 — <a href="https://en.wikipedia.org/wiki/Gold_as_an_investment">Wikipedia Gold</a> · รายปีเต็ม: <a href="https://www.lbma.org.uk/prices-and-data/precious-metal-prices">LBMA</a></li>
+<li>Bretton Woods ตรึง 35 USD/ออนซ์ ถึงปี 1971 ⇒ ผลตอบแทนทองโลกก่อน 2514 "ใกล้ 0%" ไม่ใช่ 0% ตรงตัว (ปี 1970 ตลาดอยู่ที่ 37) <span class="tag weak">ยังไม่แน่น</span> — URL เดียวกัน</li>
+</ul>
+
+<h2>(3) ดอกเบี้ยเงินฝาก</h2>
+<p>World Bank FR.INR.DPST (ที่มา IMF IFS, CC BY-4.0) มีข้อมูล 1977–2025 · ปี 1960–1976 และ 2002–2003 เป็น null · นิยามเป็นดอกเบี้ยเงินฝากโดยรวม ไม่ใช่ฝากประจำ 1 ปี — <a href="https://data.worldbank.org/indicator/FR.INR.DPST?locations=TH">หน้า WB</a> · ดาวน์โหลดเต็ม (JSON): <a href="https://api.worldbank.org/v2/country/THA/indicator/FR.INR.DPST?format=json&amp;per_page=100">API</a></p>
+<div class="wrap"><table>
+<tr><th>ปี ค.ศ.</th><td>1977</td><td>1980</td><td>1985</td><td>1989</td><td>1991</td><td>1995</td><td>1998</td><td>1999</td></tr>
+<tr><th>%/ปี</th><td class="n">8.00%</td><td class="n">12.00%</td><td class="n">13.00%</td><td class="n">9.50%</td><td class="n">13.67%</td><td class="n">11.58%</td><td class="n">10.65%</td><td class="n">4.77%</td></tr>
+<tr><th>ปี ค.ศ.</th><td>2000</td><td>2006</td><td>2012</td><td>2015</td><td>2020</td><td>2021</td><td>2023</td><td>2025</td></tr>
+<tr><th>%/ปี</th><td class="n">3.29%</td><td class="n">4.34%</td><td class="n">2.60%</td><td class="n">1.43%</td><td class="n">0.62%</td><td class="n">0.41%</td><td class="n">1.37%</td><td class="n">1.15%</td></tr>
+</table></div>
+
+<h2>(4) ที่อยู่อาศัย / ที่ดิน</h2>
+<ul>
+<li>BIS Residential Property Prices for Bangkok (2010=100): จุดแรก 1991Q1 = 51.8031 · ล่าสุด 2026Q1 = 183.8196 ⇒ ราคาบ้าน กทม. มีย้อนถึง พ.ศ. 2534 — <a href="https://fred.stlouisfed.org/data/QTHN628BIS">FRED QTHN628BIS</a></li>
+<li>ธปท. House Price Index (Commercial Bank Mortgage Loan) ฐาน ม.ค. 2009=100 ช่วง 2008Q1–2021Q3 (ผ่านตัวกลาง Moody's) — <a href="https://www.economy.com/thailand/house-price-index-for-existing-homes">economy.com</a></li>
+<li>REIC มีดัชนีบ้านจัดสรรใหม่ ห้องชุดใหม่ ที่ดินเปล่าก่อนพัฒนา กทม.-ปริมณฑล + ที่อยู่อาศัยระหว่างขาย 3 จังหวัด EEC · ไม่ระบุปีเริ่ม — <a href="https://www.reic.or.th/">reic.or.th</a></li>
+</ul>
+
+<h2>(5) ค่าแรงขั้นต่ำ + ค่าจ้างตามวุฒิ/อาชีพ</h2>
+<div class="wrap"><table>
+<tr><th>มีผล</th><th>กรุงเทพฯ (บาท/วัน)</th><th>ทั่วประเทศ</th><th>แหล่ง</th></tr>
+<tr><td>14 ก.พ. 2516 (ฉบับแรก)</td><td class="n">12</td><td>4 จังหวัด เฉพาะไร้ฝีมือ ไม่รวมเกษตร</td><td><a href="https://today.line.me/th/v3/article/yz3rGpz">LINE TODAY (ซ้ำศิลปวัฒนธรรม)</a></td></tr>
+<tr><td>2517 <span class="tag weak">ยังไม่แน่น</span></td><td class="n">20</td><td>+สมุทรสาคร นครปฐม · ไม่มีวันมีผล</td><td>URL เดียวกัน</td></tr>
+<tr><td>2560 · 2561 · 2563</td><td class="n">310 · 325 · 331</td><td>ช่วง 305–336 <span class="tag weak">ยังไม่แน่น</span></td><td><a href="https://www.bangkokbiznews.com/social/935583">กรุงเทพธุรกิจ</a></td></tr>
+<tr><td>1 ต.ค. 2565 (ฉบับ 11)</td><td class="n">353</td><td>328–354 เฉลี่ย 337 (+5.02%)</td><td><a href="https://www.finnomena.com/?p=221675">Finnomena</a></td></tr>
+<tr><td>1 ม.ค. 2567 (ฉบับ 12)</td><td class="n">363</td><td>—</td><td><a href="https://www.thansettakij.com/business/economy/583033">ฐานเศรษฐกิจ</a></td></tr>
+<tr><td>1 ม.ค. 2568 (ฉบับ 13)</td><td class="n">372</td><td>337–400</td><td><a href="https://thestandard.co/new-minimum-wage-announced-68/">THE STANDARD</a></td></tr>
+<tr><td>1 ก.ค. 2568 (ฉบับ 14)</td><td class="n">400</td><td>—</td><td><a href="https://www.thansettakij.com/economy/631531">ฐานเศรษฐกิจ</a></td></tr>
+</table></div>
+<ul>
+<li>ข้าราชการแรกบรรจุ ป.ตรี (บาท/เดือน): ก่อน 2555 9,140 · 2555 11,680–12,390 · 2556 15,000–16,500 — <a href="https://th.jobsdb.com/th/career-advice/article/%E0%B9%80%E0%B8%87%E0%B8%B4%E0%B8%99%E0%B9%80%E0%B8%94%E0%B8%B7%E0%B8%AD%E0%B8%99%E0%B8%82%E0%B9%89%E0%B8%B2%E0%B8%A3%E0%B8%B2%E0%B8%8A%E0%B8%81%E0%B8%B2%E0%B8%A3-%E0%B8%9B-%E0%B8%95%E0%B8%A3%E0%B8%B5">JobsDB</a> · 1 พ.ค. 2567 16,500–18,150 · 1 พ.ค. 2568 18,150–19,970 — <a href="https://www.thairath.co.th/news/society/2779241">ไทยรัฐ</a> (มติ ครม. 28 พ.ย. 2566 <a href="https://thaipublica.org/2023/11/increase-civil-servant-salaries-2566/">ไทยพับลิก้า</a>)</li>
+<li>เงินเดือนต่ำสุดของบัญชีข้าราชการรวม (ไม่ใช่ ป.ตรี): 2547 4,230 · 2548 4,450 · 2550 4,630 · 2551–2554 4,870 · ปรับ 3.00%/5.00%/4.00%/5.00% — <a href="https://thaipublica.org/2014/10/personal-income-in-thailand-2/">ไทยพับลิก้า</a></li>
+<li>LFS ค่าจ้างเฉลี่ยลูกจ้างทั่วประเทศ Q1 2561 (บาท/เดือน): รวม 14,357 · ไม่มีการศึกษา 7,846 · ประถม 8,730 · ม.ปลายอาชีวะ 13,602 · อุดมศึกษาสายวิชาการ 25,568 (≈2.93 เท่าของประถม) · ชุดนี้มีแค่ปี 2561–2562 · <b>ห้ามใช้แถว กทม.</b> (ซ้ำกับนอกเขตเทศบาล) — <a href="https://catalogapi.nso.go.th/api/index?table=OS_02_0024_02&amp;format=json">NSO API (เต็ม)</a> · <a href="https://catalog.nso.go.th/en/dataset/0706_02_0019">catalog</a></li>
+<li>เกษตรกร: รายได้เงินสดสุทธิครัวเรือนเกษตร 2562 = 269,449 บาท/ครัวเรือน/ปี (+9.02% จาก 247,150) · ในภาคเกษตร 78,604 (29.17%) นอกภาคเกษตร 190,845 (70.83%) — <a href="https://www.thairath.co.th/news/business/1763401">ไทยรัฐ อ้าง สศก.</a></li>
+</ul>
+
+<h2>(6) ปีที่ระบบเริ่ม (ตัวกั้นตัวเลือก)</h2>
+<div class="wrap"><table>
+<tr><th>ระบบ</th><th>เปิดในเกมตั้งแต่</th><th>หลักฐาน</th></tr>
+<tr><td>บัตรเครดิต (ไดเนอร์สคลับเข้าไทย)</td><td>2512 <span class="tag weak">"ใบแรกของไทย" ยังไม่ยืนยัน</span></td><td><a href="https://mgronline.com/live/detail/9530000019448">MGR Online</a></td></tr>
+<tr><td>ค่าแรงขั้นต่ำ</td><td>14 ก.พ. 2516</td><td>ดูหัวข้อ 5</td></tr>
+<tr><td>หุ้นไทย (SET)</td><td>30 เม.ย. 2518</td><td>ดูหัวข้อ 1</td></tr>
+<tr><td>เหตุการณ์แชร์แม่ชม้อย</td><td>2520–2528 · เสียหาย 4,043,997,795 บาท ผู้เสียหาย &gt;16,000 คน</td><td rowspan="3"><a href="https://www.thaipbs.or.th/news/content/318855">Thai PBS</a></td></tr>
+<tr><td>พ.ร.ก.กู้ยืมเงินที่เป็นการฉ้อโกงประชาชน</td><td>13 พ.ย. 2527</td></tr>
+<tr><td>เหตุการณ์ Forex 3D</td><td>ปลาย 2558 · 9,824 คน ≈2,489,820,322 บาท</td></tr>
+<tr><td>กองทุนสำรองเลี้ยงชีพ (พ.ร.บ.)</td><td>2530 <span class="tag weak">ยังไม่แน่น</span></td><td><a href="https://benoit-partners.com/provident-fund-act-thailand/">Benoit Partners</a></td></tr>
+<tr><td>ประกันสังคม</td><td>2533 · บำนาญอายุ 55 ปี 20.00% ของค่าจ้างเฉลี่ย 60 เดือนสุดท้าย (กฎปี 2552) · &lt;180 เดือน = บำเหน็จ</td><td><a href="https://www.ilaw.or.th/articles/31628">iLaw</a> · <a href="https://so04.tci-thaijo.org/index.php/lawnujournal/article/view/98724">วารสารนิติ มน.</a></td></tr>
+<tr><td>กยศ.</td><td>2539 (พ.ร.บ. 15 มี.ค. 2541)</td><td><a href="https://www.thaipbs.or.th/news/content/36274">Thai PBS</a></td></tr>
+<tr><td>บัตรทอง 30 บาท</td><td>กองทุนเริ่ม 2545 · 1,202 บาท/คน/ปี</td><td><a href="https://policywatch.thaipbs.or.th/article/life-389">Policy Watch</a></td></tr>
+<tr><td>เบี้ยยังชีพผู้สูงอายุ ขั้นบันได 600/700/800/1,000</td><td>1 ต.ค. 2554 (ก่อนนั้น 500 บาท/เดือนอัตราเดียว) · ปีเริ่มระบบยังไม่ยืนยัน</td><td><a href="https://thaipublica.org/2012/02/elderly-people-budget/">ไทยพับลิก้า</a> · <a href="https://www.pptvhd36.com/news/สังคม/198561">PPTV</a></td></tr>
+<tr><td>พร้อมเพย์</td><td>27 ม.ค. 2560 (บุคคล) · นิติบุคคล มี.ค. 2560</td><td><a href="https://thaipublica.org/?p=114729">ไทยพับลิก้า</a></td></tr>
+<tr><td>LTF / RMF / SSF</td><td>LTF สิทธิหมดปี 2562 · SSF ลดหย่อน 2563–2568 (30.00% ≤200,000 บาท ถือ 10 ปี รวมกองเกษียณ ≤500,000) · RMF ลดหย่อน 15.00%→30.00% · ปีเริ่ม LTF/RMF ไม่พบ</td><td><a href="https://www.thestandard.co/?p=309561">THE STANDARD</a></td></tr>
+</table></div>
+
+<h2>ที่หักล้างแล้ว</h2>
+<ul>
+<li><span class="tag ref">ตัด</span> "ดัชนีบ้านทางการเริ่มราว 2551 เท่านั้น" — ชุด BIS กทม. เริ่ม 2534</li>
+<li><span class="tag ref">ตัด</span> วางกรุงเทพฯ 363 บาทที่ปี 2566 — ปี 2566 ยังเป็น 353 · 363 มีผล 1 ม.ค. 2567 (+10 บาท ไม่ใช่ +8)</li>
+<li><span class="tag ref">ตัด</span> เบี้ยยังชีพขั้นบันไดเริ่มปี 2566 — เริ่ม 1 ต.ค. 2554</li>
+<li><span class="tag ref">ตัด</span> ทองโลกก่อน 1971 ผลตอบแทน 0% ตรงตัว · พร้อมเพย์เปิดกับ "21 ธนาคาร" (ไม่มีแหล่งยืนยัน)</li>
+</ul>
+
+<h2>(7) ช่องว่าง + ค่าตั้งต้นที่เสนอ</h2>
+<div class="wrap"><table>
+<tr><th>ช่องว่าง</th><th>ค่าตั้งต้น <span class="tag asm">สมมติฐานเกม</span></th></tr>
+<tr><td>หุ้นไม่รวมปันผล · TRI ไม่มีย้อนก่อน 2549</td><td>ใช้ price return + อัตราปันผลคงที่ที่ทีมกำหนดเอง ระบุในเกมว่าเป็นค่าสมมติ</td></tr>
+<tr><td>ทองไทยก่อน 2519 · ตารางไม่มีที่มา</td><td>ล็อกทองก่อน 2519 จนได้ตารางสมาคมค้าทองคำ หรือใช้ทองโลก×ค่าเงินบาท ธปท. (ยังไม่ได้เปิด)</td></tr>
+<tr><td>ดอกเบี้ยก่อน 2520 และ 2545–2546</td><td>ก่อน 2520 ใช้ 8.00% ของปี 1977 คงที่ · 2545–2546 เฉลี่ยเส้นตรงจากปีข้าง ๆ ใน API</td></tr>
+<tr><td>บ้านก่อน 2534 · ต่างจังหวัด · ที่ดิน</td><td>ล็อกการซื้อบ้านเพื่อลงทุนก่อน 2534 หรือผูกกับเงินเฟ้อ · ใช้ดัชนี กทม. แทนทั้งประเทศ</td></tr>
+<tr><td>ค่าแรงขั้นต่ำ 2518–2554 · ก่อน 2516</td><td>เติมเส้นตรงระหว่างจุดที่ยืนยัน · ก่อน 2516 ใช้ค่าจ้างตามอาชีพแทน · ชุดเต็มรอราชกิจจานุเบกษา/กองค่าจ้าง</td></tr>
+<tr><td>ค่าจ้างตามวุฒิรายยุค (2528–2558)</td><td>ใช้ตัวคูณวุฒิของปี 2561 (อุดม ≈2.93 เท่าประถม) กับทุกยุค</td></tr>
+<tr><td>ปีเริ่มเบี้ยยังชีพ · บำนาญประกันสังคม (2541/2557) · LTF/RMF · หุ้นออนไลน์ · โมบายแบงกิ้ง · สลากออมสิน</td><td>ยังไม่ยืนยัน (verified=false) · ปิดตัวเลือกไว้จนได้แหล่งทางการ</td></tr>
+</table></div>
+
+<div class="note">ข้อมูลชุดนี้รวบรวมเพื่อออกแบบเกมและการศึกษาเท่านั้น ไม่ใช่คำแนะนำหรือคำชี้ชวนในการลงทุน ตัวเลขบางชุดมาจากสื่อรองและยังต้องตรวจกับแหล่งทางการก่อนใช้จริง ผู้ลงทุนควรศึกษาข้อมูลเพิ่มเติมก่อนตัดสินใจ</div>
+</main>
+</body>
+</html>
