@@ -196,6 +196,10 @@ export function loadEra() {
   const lastOf = (s) => s.from + s.v.length - 1;
   const future = { from: finance.sampleFrom, to: Math.min(lastOf(cpi), ...finance.real.map(lastOf)) };
   if (future.from < cpi.from + 1 || future.from >= future.to) throw new Error(`ช่วงปีต้นแบบอนาคตใช้ไม่ได้ ${future.from}–${future.to}`);
+  // ทุกปีเกมอ่านปีต้นแบบ (B14) — ค่าแรงต้องมีปีก่อนหน้าเพื่อคิดอัตราโต · ปีอ้างอิงต้องอยู่ในข้อมูล
+  const mw = finance.era.minWage;
+  if (mw.from > future.from - 1 || lastOf(mw) < future.to) throw new Error(`ค่าแรงขั้นต่ำ ${mw.from}–${lastOf(mw)} ไม่ครอบปีต้นแบบ ${future.from - 1}–${future.to}`);
+  if (finance.era.refYear < mw.from || finance.era.refYear > lastOf(mw)) throw new Error(`ปีอ้างอิงค่าจ้าง ${finance.era.refYear} อยู่นอกข้อมูลค่าแรง`);
 
   const m = json('data/mortality.json');
   const std = {};

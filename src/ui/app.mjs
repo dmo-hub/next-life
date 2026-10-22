@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, profileText, statsOf } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, isWorking, monthlyWage } from '../engine/index.mjs';
 
 const root = document.getElementById('app');
 let st;
@@ -10,19 +10,24 @@ function el(tag, cls, text) {
   return e;
 }
 
-function bar(label, v) {
-  const row = el('div', 'bar');
-  row.append(el('span', 'lbl', label));
-  const track = el('div', 'track');
-  const fill = el('div', 'fill');
-  fill.style.width = `${Math.round(v)}%`;
-  track.append(fill);
-  row.append(track);
-  return row;
-}
-
 const SVG = 'http://www.w3.org/2000/svg';
 const baht = (v) => `${Math.round(v).toLocaleString('en-US')} บาท`;
+
+// แถบค่าสถานะไม่มีตัวเลข (ใบ 06) — ผู้เล่นอ่านจากความยาวแถบเท่านั้น
+function stats(s) {
+  const box = el('div', 'stats');
+  for (const k of ['health', 'happiness', 'knowledge', 'relations']) {
+    const col = el('div');
+    col.append(el('span', null, STAT_LABELS[k]));
+    const track = el('div', 'bar');
+    const fill = el('i');
+    fill.style.width = `${Math.round(s[k])}%`;
+    track.append(fill);
+    col.append(track);
+    box.append(col);
+  }
+  return box;
+}
 
 // กราฟเงินของช่วงที่ผ่านไป — จุดเดียวไม่มีเส้นให้วาด
 function sparkline(series) {
@@ -41,60 +46,124 @@ function sparkline(series) {
   return svg;
 }
 
+function list(items, cls = 'items') {
+  const ul = el('ul', cls);
+  for (const it of items) ul.append(el('li', null, it));
+  return ul;
+}
+
+// สรุปช่วงวัยที่ผ่านมา: แถบตอนนี้ + ขีดตำแหน่งต้นช่วง — บอกว่าเปลี่ยนไปมากน้อยโดยไม่มีตัวเลข
+const RECAP_PICKS = 8;
+function recap(r) {
+  const box = el('div', 'recap');
+  box.append(el('div', 'h', `ช่วง${r.stage} · อายุ ${r.fromAge}–${r.toAge}`));
+  const grid = el('div', 'delta');
+  for (const s of r.stats) {
+    const row = el('div');
+    const dir = s.to - s.from;
+    row.append(el('span', null, `${s.label} ${Math.abs(dir) < 1 ? '·' : dir > 0 ? '↑' : '↓'}`));
+    const track = el('div', 'bar');
+    const now = el('i');
+    now.style.width = `${Math.round(s.to)}%`;
+    const was = el('b');
+    was.style.left = `${Math.round(s.from)}%`;
+    track.append(now, was);
+    row.append(track);
+    grid.append(row);
+  }
+  box.append(grid);
+  const m = r.money;
+  box.append(el('p', 'sub', `เงิน ${baht(m.from)} → ${baht(m.to)}`));
+  box.append(el('p', 'note', `เทียบค่าเงินปีเกิด ${baht(m.fromAtBirth)} → ${baht(m.toAtBirth)}`));
+  if (r.picks.length) {
+    box.append(el('div', 'h', 'สิ่งที่เลือก'));
+    const shown = r.picks.slice(-RECAP_PICKS).map((p) => `อายุ ${p.age} · ${p.text}`);
+    if (r.picks.length > RECAP_PICKS) shown.unshift(`… ก่อนหน้านี้อีก ${r.picks.length - RECAP_PICKS} ข้อ`);
+    box.append(list(shown, 'picks'));
+  } else box.append(el('p', 'sub', 'ช่วงนี้ไม่มีเรื่องให้ตัดสินใจ'));
+  return box;
+}
+
+function button(label, fx, onclick) {
+  const b = el('button', 'choice');
+  b.append(el('span', null, label));
+  if (fx) {
+    // ป้ายแต่ละค่าเป็นก้อนเดียว ตัดบรรทัดได้แค่ระหว่างก้อน — ไม่งั้นคำไทยหักกลางคำ
+    const tag = el('span', 'fx');
+    fx.split(' · ').forEach((part, i) => tag.append(...(i ? [' · '] : []), el('span', null, part)));
+    b.append(tag);
+  }
+  b.onclick = onclick;
+  return b;
+}
+
+// แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): ลางกับเหตุการณ์ความเชื่อเป็นทาง B ที่เหลือเป็นทาง A
+const styleOf = (card) => (card.kind === 'omen' || (card.kind === 'event' && card.type === 'B') ? 'b' : 'a');
+
+const KICKER = { summary: 'สรุปปี', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ' };
+
 function render(card) {
   root.replaceChildren();
   const s = statsOf(st);
-  const head = el('div', 'head');
-  head.append(el('div', 'profile', profileText(st)));
-  head.append(bar('สุขภาพ', s.health), bar('ความสุข', s.happiness), bar('ความรู้', s.knowledge), bar('ความสัมพันธ์', s.relations));
-  head.append(el('div', 'money', `เงิน ${baht(s.money)}`));
-  root.append(head);
+  // ปีเกมใช้ภายในเท่านั้น หน้าจอบอกแค่อายุ (B14 ข้อ 12)
+  const year = st.birthYear + card.age;
+  const box = el('article', `card ${styleOf(card)}`);
+  const top = el('div', 'top');
+  const body = el('div', 'body');
+  const choices = el('div', 'choices');
+  const next = () => render(nextCard(st));
 
-  const box = el('div', 'card');
-  box.append(el('p', card.kind === 'death' ? 'text death' : 'text', card.text));
-  if (card.stage) box.prepend(el('div', 'stage', `ช่วง${card.stage}`));
-  if (card.kind === 'summary') {
-    if (card.items.length) {
-      const ul = el('ul', 'items');
-      for (const it of card.items) ul.append(el('li', null, it));
-      box.append(ul);
-    }
-    const chart = sparkline(card.moneySeries);
-    if (chart) box.append(chart);
-    box.append(el('p', 'sub', `เงิน ${baht(card.money)} ≈ ${baht(card.moneyAtBirth)} ค่าเงินปีเกิด`));
-    if (card.disclaimer) box.append(el('p', 'note', card.disclaimer));
-    const b = el('button', 'choice', 'ต่อไป');
-    b.onclick = () => render(nextCard(st));
-    box.append(b);
-  } else if (card.kind === 'stage' || card.kind === 'era' || card.kind === 'omen') {
-    const b = el('button', 'choice', 'ต่อไป');
-    b.onclick = () => render(nextCard(st));
-    box.append(b);
-  } else if (card.kind === 'event' || card.kind === 'alloc') {
-    if (card.items?.length) {
-      const ul = el('ul', 'items');
-      for (const it of card.items) ul.append(el('li', null, it));
-      box.append(ul);
-    }
-    if (card.simulatedFrom) box.append(el('p', 'note', `ผลตั้งแต่ปี ${card.simulatedFrom} เป็นอนาคตจำลอง`));
-    if (card.disclaimer) box.append(el('p', 'note', card.disclaimer));
-    card.choices.forEach((c, i) => {
-      const b = el('button', 'choice', c);
-      b.onclick = () => {
-        choose(st, i);
-        render(nextCard(st));
-      };
-      box.append(b);
-    });
+  if (card.kind === 'death') {
+    top.append(el('b', null, 'มรณบัตร'), el('small', null, `สิริอายุ ${card.age} ปี`));
+    box.append(top);
+    body.append(el('span', 'stamp', 'ถึงแก่กรรม'));
+    body.append(el('h3', null, `ตายอายุ ${card.age}`));
+    body.append(el('p', null, `${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls} · ${st.occupationName}`));
+    body.append(el('p', 'sub', `เงินคงเหลือ ${baht(card.summary.money)} ≈ ${baht(card.summary.moneyAtBirth)} ค่าเงินปีเกิด`));
+    if (card.note) body.append(el('p', 'sub', card.note));
+    if (card.recap) body.append(recap(card.recap));
+    choices.append(button('เกิดใหม่', null, start));
   } else {
-    box.append(el('p', 'sub', `ปี ${card.summary.year} · เงินคงเหลือ ${card.summary.money.toLocaleString('en-US')} บาท`));
-    const sim = card.summary.simulatedFrom ? ` (เงินเฟ้อตั้งแต่ปี ${card.summary.simulatedFrom} เป็นอนาคตจำลอง)` : '';
-    box.append(el('p', 'sub', `≈ ${card.summary.moneyAtBirth.toLocaleString('en-US')} บาท ค่าเงินปีเกิด${sim}`));
-    if (card.note) box.append(el('p', 'sub', card.note));
-    const b = el('button', 'choice', 'เกิดใหม่');
-    b.onclick = start;
-    box.append(b);
+    top.append(el('b', null, `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, regionLabel(st)));
+    box.append(top, stats(s));
+    // มีงานทำแล้วบอกรายได้ต่อเดือน ก่อนทำงาน/หลังเกษียณไม่มีรายได้ จึงบอกเงินติดตัวแทน
+    const purse = isWorking(card.age)
+      ? `รายได้ ${baht(monthlyWage(st.content.era, st.seed, st.occupation, st.ses, year))}/เดือน`
+      : `เงินติดตัว ${baht(s.money)}`;
+    box.append(el('div', 'meta', `ฐานะ${st.cls} · ${st.occupationName} · ${purse}`));
+    body.append(el('span', 'kicker', card.kind === 'event' ? `ช่วง${card.stage}` : KICKER[card.kind]));
+
+    if (card.kind === 'stage') {
+      body.append(el('span', 'stamp', card.text));
+      body.append(recap(card.recap));
+      choices.append(button('ต่อไป', null, next));
+    } else if (card.kind === 'summary') {
+      body.append(el('h3', null, card.text));
+      if (card.items.length) body.append(list(card.items));
+      const chart = sparkline(card.moneySeries);
+      if (chart) body.append(chart);
+      body.append(el('p', 'sub', `เงิน ${baht(card.money)} ≈ ${baht(card.moneyAtBirth)} ค่าเงินปีเกิด`));
+      if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
+      choices.append(button('ต่อไป', null, next));
+    } else if (card.kind === 'era' || card.kind === 'omen') {
+      body.append(el('h3', null, card.text));
+      choices.append(button('ต่อไป', null, next));
+    } else {
+      if (card.title) body.append(el('h3', null, card.title));
+      body.append(el(card.title ? 'p' : 'h3', card.title ? null : 'lead', card.text));
+      if (card.items?.length) body.append(list(card.items));
+      if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
+      card.choices.forEach((c, i) => {
+        choices.append(
+          button(c, card.fx?.[i], () => {
+            choose(st, i);
+            next();
+          }),
+        );
+      });
+    }
   }
+  box.append(body, choices);
   root.append(box);
 }
 

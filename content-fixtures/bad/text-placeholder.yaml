@@ -10,3 +10,13 @@ events:
       - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ปี {ปี} เศรษฐกิจดี"
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

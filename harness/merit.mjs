@@ -68,7 +68,7 @@ for (const [name, pick] of Object.entries(BOTS)) {
     r.nets.push(netLedger(state.ledger));
     r.mult += karmaMultiplier(state.ledger);
     r.age += age;
-    r.ageDiff += age - expectedDeathAge(content.era, state.sex, state.birthYear);
+    r.ageDiff += age - expectedDeathAge(content.era, state.sex, state.birthYear, state.seed);
     if (state.flags.vow_broken) r.vow++;
     if (omens) r.omenLives++;
   }

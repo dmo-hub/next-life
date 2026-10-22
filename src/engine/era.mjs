@@ -54,12 +54,16 @@ export function qx(era, sex, year, age) {
   return q[age];
 }
 
+// โอกาสตายของชีวิตหนึ่งในปีเกม year — อ่านตารางชีพของปีต้นแบบ ปีเดียวกับที่การเงินอ่าน
+export const lifeQx = (era, seed, sex, year, age) => qx(era, sex, protoYear(era, seed, year), age);
+
 // อายุตอนตายที่คาดได้จากข้อมูลล้วน (นับปีเต็มแบบเดียวกับการ์ด "ตายอายุ X") ใช้เป็นเป้าของ harness
-export function expectedDeathAge(era, sex, birthYear) {
+// เดินตามปีต้นแบบของชีวิตนั้นเอง — ปีสลับคนละชุดต่อ seed เป้าจึงต้องคิดรายชีวิต
+export function expectedDeathAge(era, sex, birthYear, seed) {
   let alive = 1;
   let sum = 0;
   for (let a = 0; a < MAX_AGE; a++) {
-    alive *= 1 - qx(era, sex, birthYear + a, a);
+    alive *= 1 - lifeQx(era, seed, sex, birthYear + a, a);
     sum += alive;
   }
   return sum;
@@ -68,8 +72,9 @@ export function expectedDeathAge(era, sex, birthYear) {
 export const periodE0 = (era, sex, year) => at(era.mort.e0[sex], year);
 export const infantMortality = (era, sex, year) => at(era.mort.imr[sex], year);
 
-// ปีอนาคตยืมทั้งปีจากอดีตปีเดียว (ปีต้นแบบ) แล้วทุกชุด (เงินเฟ้อ หุ้น ทอง ดอกเบี้ย) อ่านค่าของปีนั้นพร้อมกัน
-// — คงความสัมพันธ์ข้ามสินทรัพย์ของปีจริงไว้ · hash ของ seed กับปี ชีวิตเดิมได้อนาคตเดิม และไม่กินลำดับสุ่มของโลก
+// ทุกปีในเกมยืมทั้งปีจากปีจริงปีเดียว (ปีต้นแบบ) สุ่มรายปีอิสระ แล้วทุกชุด (เงินเฟ้อ หุ้น ทอง ดอกเบี้ย ค่าแรง การตาย)
+// อ่านค่าของปีนั้นพร้อมกัน — ผู้เล่นเดาไม่ได้ว่าวิกฤตมาเมื่อไร แต่ความสัมพันธ์ข้ามชุดของปีจริงยังอยู่
+// hash ของ seed กับปี ชีวิตเดิมได้ชุดปีเดิม และไม่กินลำดับสุ่มของโลก
 export function protoYear(era, seed, year) {
   const { from, to } = era.future;
   let h = Math.imul((seed ^ Math.imul(year, 0x9e3779b1)) >>> 0, 0x85ebca6b) >>> 0;
@@ -77,8 +82,8 @@ export function protoYear(era, seed, year) {
   return from + ((h >>> 0) % (to - from + 1));
 }
 
-// ชุดรายปีที่จบก่อนปีนี้ใช้ปีต้นแบบ — ทุกชุดจึงข้ามไปอนาคตด้วยปีต้นแบบเดียวกัน
-export const seriesYear = (era, seed, series, year) => (year < series.from + series.v.length ? year : protoYear(era, seed, year));
+// ช่วงปีต้นแบบ (era.future) อยู่ในข้อมูลจริงของทุกชุด — load.mjs ตรวจไว้
+export const seriesYear = (era, seed, series, year) => protoYear(era, seed, year);
 export const seriesAt = (era, seed, series, year) => at(series, seriesYear(era, seed, series, year));
 
 export function inflationRate(era, seed, year) {
@@ -109,4 +114,8 @@ export function habitRate(era, kind, sex, year) {
   return pts[pts.length - 1][1];
 }
 
-export const eraEventsAt = (era, year) => era.events.filter((e) => year >= e.from && year <= e.to);
+// เหตุการณ์บ้านเมืองเกิดในปีเกมที่ยืมปีเริ่มของเหตุการณ์มา — วิกฤตที่เห็นจึงตรงกับเงินที่เสียปีนั้น
+export const eraEventsAt = (era, seed, year) => {
+  const p = protoYear(era, seed, year);
+  return era.events.filter((e) => e.from === p);
+};

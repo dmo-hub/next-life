@@ -1,6 +1,6 @@
 // การเงิน (ใบ 10 · 11 · 14): ผลตอบแทนสินทรัพย์รายปี · ค่าจ้างตามอาชีพ · การ์ดจัดสรรเงิน — ฟังก์ชันล้วน ไม่แตะ DOM/ไฟล์
 import { makeRng } from './rng.mjs';
-import { seriesAt, seriesYear, inflationRate, priceRatio } from './era.mjs';
+import { seriesAt, seriesYear, inflationRate, priceRatio, protoYear } from './era.mjs';
 import { regionRatio } from './birth.mjs';
 
 // system = id ใน data/system-starts.json ที่กั้นปีที่ซื้อได้ · ไม่มี system = มีตลอดช่วงเกม
@@ -45,7 +45,8 @@ export function assetReturn(era, seed, id, year) {
     case 'land': {
       const y = seriesYear(era, seed, f.house, year);
       if (y - 1 >= f.house.from) return at(f.house, y) / at(f.house, y - 1) - 1;
-      return (inflationRate(era, seed, y) + f.housePremium) / 100;
+      // y เป็นปีต้นแบบแล้ว อ่านชุดตรง — ผ่าน inflationRate จะสุ่มปีต้นแบบซ้ำอีกชั้น
+      return (at(era.cpi, y) + f.housePremium) / 100;
     }
     default:
       throw new Error(`ไม่มีผลตอบแทนของ ${id}`);
@@ -54,13 +55,19 @@ export function assetReturn(era, seed, id, year) {
 
 export const lendingRate = (era, seed, year) => seriesAt(era, seed, era.finance.lending, year) / 100;
 
-// ค่าแรงขั้นต่ำกรุงเทพฯ บาท/วัน · ก่อนปีแรกย้อนด้วยเงินเฟ้อ · หลังปีสุดท้ายโตตามเงินเฟ้อ (ปีต้นแบบ)
+// ค่าแรงขั้นต่ำกรุงเทพฯ บาท/วัน = ค่าจริงปีอ้างอิง × อัตราโตของปีต้นแบบสะสมทีละปี
+// อ่านระดับค่าแรงของปีต้นแบบตรง ๆ ไม่ได้ — ปีติดกันยืมคนละยุค ค่าแรงจะกระโดดขึ้นลงหลายเท่า
 export function minWage(era, seed, year) {
   const s = era.finance.minWage;
-  const last = s.from + s.v.length - 1;
-  if (year < s.from) return s.v[0] / priceRatio(era, seed, year, s.from);
-  if (year > last) return s.v.at(-1) * priceRatio(era, seed, last, year);
-  return s.v[year - s.from];
+  const ref = era.finance.refYear;
+  const growth = (y) => {
+    const p = protoYear(era, seed, y) - s.from;
+    return s.v[p] / s.v[p - 1];
+  };
+  let w = s.v[ref - s.from];
+  for (let y = ref + 1; y <= year; y++) w *= growth(y);
+  for (let y = ref; y > year; y--) w /= growth(y);
+  return w;
 }
 
 // ค่าจ้าง/เดือนของอาชีพ = ค่าจ้างปีอ้างอิง × ดัชนีค่าแรงขั้นต่ำ × สัดส่วนรายได้ภาค — วุฒิผูกกับอาชีพแล้ว ไม่คูณซ้ำ
@@ -110,7 +117,7 @@ export function allocOptions(era, year) {
 
 export const formatReturn = (r) => `${r >= 0 ? '+' : '−'}${Math.abs(r * 100).toFixed(2)}%`;
 
-// ผลจริงหลังเกิดแล้วของช่วงปี from..to ต่อสินทรัพย์ที่ซื้อได้ (ใบ 11: บอกย้อนหลัง ไม่บอกล่วงหน้า)
+// ผลหลังเกิดแล้วของช่วงปีเกม from..to ต่อสินทรัพย์ที่ซื้อได้ (ใบ 11: บอกย้อนหลัง ไม่บอกล่วงหน้า)
 export function periodReturns(era, seed, from, to) {
   const out = [];
   for (const a of ASSETS) {

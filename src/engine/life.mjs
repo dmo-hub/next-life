@@ -1,5 +1,5 @@
 import { makeRng } from './rng.mjs';
-import { pickBirthYear, qx, priceRatio, inflationRate, infantMortality, lastCpiYear, eraEventsAt } from './era.mjs';
+import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
 import { pickRegion, regionRatio, classOdds } from './birth.mjs';
 import { monthlyWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER } from './finance.mjs';
 import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN } from './merit.mjs';
@@ -25,6 +25,7 @@ export function startStats(cls) {
 // ตารางกลางแปลงระดับ ±1/±2/±3 เป็นตัวเลข (ใบ 07) ปรับสมดุลที่จุดเดียว · ไม่เป็นเส้นตรงเพื่อให้ ±3 เป็นเหตุใหญ่จริง
 export const LEVELS = { 1: 5, 2: 12, 3: 20 };
 const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations'];
+export const STAT_LABELS = { health: 'สุขภาพ', happiness: 'ความสุข', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', money: 'เงิน' };
 
 // ช่วงชีวิต (ใบ 03) · ระหว่างชาติไม่ใช่ช่วงอายุ แต่จองชื่อไว้ให้ใบที่ทำหลังตาย
 export const STAGES = [
@@ -49,8 +50,10 @@ const healthDecay = (age) => (age <= 30 ? 0 : age <= 60 ? 0.005 : 0.005 + 0.0007
 const HAPPY_PULL = 1 - 0.5 ** (1 / 3);
 const knowledgeGain = (age) => (age <= 12 ? 3 : age <= 18 ? 2.5 : age <= 30 ? 1 : age < 60 ? 0.4 : 0);
 const RELATION_FADE = 0.007;
-// ออกการ์ดสรุปอย่างน้อยทุก K ปี ถึงไม่มีอะไรเกิด
-export const SUMMARY_EVERY = 1;
+export const ERA_GAP = 3;
+// ออกการ์ดสรุปอย่างน้อยทุก K ปี ถึงไม่มีอะไรเกิด · ปีที่มีเรื่อง (เปลี่ยนช่วง · ยุค · ลาง · จัดสรรเงิน) สรุปทันที
+// ปีเงียบรวบเป็นใบเดียว — การ์ดสรุปทุกปีที่มีแค่เงินขยับอ่านแล้วเปล่า
+export const SUMMARY_EVERY = 5;
 
 const clamp = (v) => Math.max(0, Math.min(100, v));
 
@@ -62,6 +65,10 @@ function weighted(rng, items, weights) {
   }
   return items[items.length - 1];
 }
+
+// ช่วงอายุที่มีงานทำ [เริ่ม, เกษียณ) — แกนเติมเงินเก็บและหน้าจอแสดงรายได้จากเกณฑ์เดียวกัน
+export const WORK_AGES = [22, 60];
+export const isWorking = (age) => age >= WORK_AGES[0] && age < WORK_AGES[1];
 
 // เงินเก็บต่อปี เป็นบาทของปีนั้น: ค่าจ้างตามอาชีพ × ภาค ทั้งปี × อัตราออม (ใบ 14)
 export function yearlySaving(st, year = st.birthYear + st.age) {
@@ -128,11 +135,52 @@ export function newLife(seed, content) {
     advance: false,
     cards: 0,
     log: [],
+    // ค่าตอนเริ่มช่วงวัยปัจจุบัน — การ์ดเปลี่ยนช่วงเล่าว่าช่วงที่ผ่านมาเปลี่ยนไปเท่าไร
+    stageMark: null,
+    lastEraAge: null,
   };
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
   st.lastCardMoney = st.money;
   st.trail.push({ year: birthYear, money: Math.round(st.money) });
+  st.stageMark = markStage(st);
   return st;
+}
+
+function markStage(st) {
+  return { age: st.age, stage: stageOf(st.age), price: st.price, money: st.money, ...Object.fromEntries(STAT_KEYS.map((k) => [k, st[k]])) };
+}
+
+// สรุปช่วงวัยที่เพิ่งจบ: ตัวเลือกที่เลือก + ค่าสถานะ/เงินต้นช่วง → ตอนนี้ · อ่าน state ล้วน ไม่ดึงเลขสุ่มของโลก
+// ไม่มีค่าบัญชีบุญบาป — การ์ดทุกใบถูก harness ตรวจรั่ว
+// lastAge = อายุสุดท้ายของช่วง: การ์ดเปลี่ยนช่วงออกตอนขึ้นอายุแรกของช่วงใหม่แล้ว
+function stageRecap(st, lastAge) {
+  const m = st.stageMark;
+  return {
+    stage: m.stage,
+    fromAge: m.age,
+    toAge: lastAge,
+    picks: st.log.filter((x) => x.age >= m.age).map(({ age, text }) => ({ age, text })),
+    stats: STAT_KEYS.map((k) => ({ key: k, label: STAT_LABELS[k], from: m[k], to: st[k] })),
+    // ค่าเงินปีเกิดคู่กัน — เงินต้น/ท้ายช่วงเป็นบาทคนละปี เทียบตรง ๆ ไม่ได้
+    money: { from: Math.round(m.money), to: Math.round(st.money), fromAtBirth: Math.round(m.money / m.price), toAtBirth: Math.round(st.money / st.price) },
+  };
+}
+
+// ป้ายผลบนตัวเลือก (ใบ 07): ผลคงที่ = ↑/↓ · ผลสุ่มหรือค่าที่เหตุการณ์ซ่อน = ? · หวยสายมู = ? เสมอ (ใบ 12)
+function choiceFx(ev, c) {
+  if (c.outcomes || ev.belief?.kind === 'lottery_numen') return '?';
+  const hidden = [...(ev.hidden ?? []), ...(c.hidden ?? [])];
+  const fx = c.effects ?? {};
+  const out = [];
+  for (const k of [...STAT_KEYS, 'money']) {
+    if (!fx[k]) continue;
+    if (hidden.includes(k)) { out.push('?'); break; }
+    const sign = k === 'money' && typeof fx[k] === 'object' ? Math.sign(fx[k].amount) : Math.sign(fx[k]);
+    // ช่องว่างไม่ตัดบรรทัด: ลูกศรต้องติดชื่อค่า ไม่หล่นไปบรรทัดใหม่
+    out.push(`${STAT_LABELS[k]} ${sign > 0 ? '↑' : '↓'}`);
+  }
+  if (fx.invest) out.push('ลงทุน');
+  return out.join(' · ');
 }
 
 // โอกาสตายภายในปีนี้ = ตารางชีพจริงของปีปฏิทินนั้นตามอายุ/เพศ × ตัวคูณจากสุขภาพ (ใบ 03) × ตัวคูณกรรม (ใบ 09)
@@ -144,7 +192,7 @@ export function healthMultiplier(st) {
 }
 
 export function deathChance(st) {
-  const base = qx(st.content.era, st.sex, st.birthYear + st.age, st.age);
+  const base = lifeQx(st.content.era, st.seed, st.sex, st.birthYear + st.age, st.age);
   if (base >= 1) return 1;
   return Math.min(1, base * healthMultiplier(st) * karmaMultiplier(st.ledger));
 }
@@ -152,7 +200,6 @@ export function deathChance(st) {
 function fill(text, st) {
   return text
     .replaceAll('{อายุ}', st.age)
-    .replaceAll('{ปี}', st.birthYear + st.age)
     .replaceAll('{ภาค}', regionLabel(st))
     .replaceAll('{เงิน}', Math.round(st.money).toLocaleString('en-US'));
 }
@@ -211,10 +258,10 @@ function stepYear(st) {
     st.money *= 1 + portfolioReturn(era, st.seed, st.alloc, year);
     for (const id of Object.keys(st.alloc)) {
       if (id === 'cash' || id === 'deposit' || !assetOpen(era, id, year)) continue;
-      st.returns.push({ year, id, r: assetReturn(era, st.seed, id, year) });
+      st.returns.push({ age: st.age, id, r: assetReturn(era, st.seed, id, year) });
     }
   } else if (st.money < 0) st.money *= 1 + lendingRate(era, st.seed, year);
-  if (st.age >= 22 && st.age < 60) st.money += yearlySaving(st, year);
+  if (isWorking(st.age)) st.money += yearlySaving(st, year);
   st.trail.push({ year, money: Math.round(st.money) });
 
   const stage = stageOf(st.age);
@@ -225,12 +272,16 @@ function stepYear(st) {
     st.omenAge = st.age;
     st.due.push({ kind: 'omen', tone, age: st.age, stage, text: omenText(tone, st.seed, st.age) });
   }
-  if (stage !== prevStage) st.due.push({ kind: 'stage', age: st.age, stage, text: `เข้าสู่ช่วง${stage}` });
+  if (stage !== prevStage) {
+    st.due.push({ kind: 'stage', age: st.age, stage, text: `เข้าสู่ช่วง${stage}`, recap: stageRecap(st, st.age - 1) });
+    st.stageMark = markStage(st);
+  }
   if (isAllocAge(st.age)) st.due.push(allocCard(st, year, stage));
-  for (const e of eraEventsAt(st.content.era, year)) {
-    if (e.from === year && (!e.regions || e.regions.includes(st.region))) {
-      st.due.push({ kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: `ปี ${year} ${e.name}` });
-    }
+  // ทุกภาคเจอได้ เกิดซ้ำได้ (B14 ข้อ 13) · เว้นอย่างน้อย ERA_GAP ปีไม่ให้ถี่จนกลบเรื่องชีวิต — ปีที่เว้น เงินยังเสียตามปีต้นแบบ
+  const eras = eraEventsAt(st.content.era, st.seed, year);
+  if (eras.length && (st.lastEraAge === null || st.age - st.lastEraAge >= ERA_GAP)) {
+    st.lastEraAge = st.age;
+    for (const e of eras) st.due.push({ kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: e.name });
   }
 }
 
@@ -243,8 +294,7 @@ function summaryCard(st) {
     items.push(`เงิน ${Math.round(st.lastCardMoney).toLocaleString('en-US')} → ${money.toLocaleString('en-US')} บาท`);
   }
   const year = st.birthYear + st.age;
-  const lastReal = st.content.era.future.to;
-  for (const x of st.returns) items.push(`ปี ${x.year} ${assetName(x.id)} ${formatReturn(x.r)}${x.year > lastReal ? ' (อนาคตจำลอง)' : ''}`);
+  for (const x of st.returns) items.push(`อายุ ${x.age} ${assetName(x.id)} ${formatReturn(x.r)}`);
   const disclaimer = st.returns.length ? DISCLAIMER : null;
   st.returns = [];
   return {
@@ -271,10 +321,9 @@ function allocCard(st, year, stage) {
     kind: 'alloc',
     age: st.age,
     stage,
-    text: `อายุ ${st.age} ปี ทบทวนเงินเก็บ ${Math.round(st.money).toLocaleString('en-US')} บาท · ผลจริงช่วงปี ${from}–${year}`,
+    text: `อายุ ${st.age} ปี ทบทวนเงินเก็บ ${Math.round(st.money).toLocaleString('en-US')} บาท · ผลช่วงอายุ ${st.age - (year - from)}–${st.age}`,
     items,
     disclaimer: DISCLAIMER,
-    simulatedFrom: year > era.future.to ? Math.max(from, era.future.to + 1) : null,
     choices: [],
   };
 }
@@ -330,10 +379,14 @@ export function nextCard(st) {
       return emit(st, {
         kind: 'event',
         id: ev.id,
+        // แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): A ชีวิตจริง · B ความเชื่อ/แฟนตาซี
+        type: ev.type ?? 'A',
         age: st.age,
         stage: stageOf(st.age),
+        title: ev.title ? fill(ev.title, st) : null,
         text: fill(ev.text, st),
         choices: ev.choices.map((c) => fill(c.text, st)),
+        fx: ev.choices.map((c) => choiceFx(ev, c)),
       });
     }
   }
@@ -365,14 +418,16 @@ export function choose(st, idx) {
     st.pending = null;
     if (opt.alloc) st.alloc = opt.alloc;
     st.lastAllocYear = st.birthYear + st.age;
-    st.log.push({ id: 'alloc', age: st.age, choice: idx });
+    st.log.push({ id: 'alloc', age: st.age, choice: idx, text: opt.label });
     return;
   }
   if (!ev || !ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
   st.pending = null;
+  // เติมข้อความก่อนผลลง — {เงิน} ต้องเป็นยอดตอนที่ผู้เล่นเห็นตัวเลือก
+  const text = fill(ev.choices[idx].text, st);
   applyEffects(st, ev.choices[idx].effects);
   applyChoice(st, ev, ev.choices[idx]);
-  st.log.push({ id: ev.id, age: st.age, choice: idx });
+  st.log.push({ id: ev.id, age: st.age, choice: idx, text });
 }
 
 function deathCard(st) {
@@ -386,15 +441,15 @@ function deathCard(st) {
       year,
       money: Math.round(st.money),
       moneyAtBirth: Math.round(st.money / priceRatio(era, st.seed, st.birthYear, year)),
-      // lore หัวข้อ 6: เงินเฟ้อปีหลังข้อมูลเป็นอนาคตจำลอง ต้องบอกผู้เล่น
-      simulatedFrom: year > lastCpiYear(era) ? lastCpiYear(era) + 1 : null,
     },
   };
   st.estate = { year, money: card.summary.money, moneyAtBirth: card.summary.moneyAtBirth };
+  // ช่วงวัยสุดท้ายไม่มีการ์ดเปลี่ยนช่วงมาปิด — เล่าบนบันทึกการตายแทน
+  card.recap = stageRecap(st, st.age);
   // ใบ 07: ตายตอนเด็กได้บันทึกสั้นบอกสถิติยุคนั้น
   if (st.age < 5) {
-    const imr = infantMortality(era, st.sex, st.birthYear);
-    card.note = `ปี ${st.birthYear} ทารก${st.sex}ไทยตายก่อนอายุ 1 ขวบ ราว ${Math.round(imr)} คนในทุก 1,000 คน`;
+    const imr = infantMortality(era, st.sex, protoYear(era, st.seed, st.birthYear));
+    card.note = `ยุคนั้นทารก${st.sex}ไทยตายก่อนอายุ 1 ขวบ ราว ${Math.round(imr)} คนในทุก 1,000 คน`;
   }
   return card;
 }
