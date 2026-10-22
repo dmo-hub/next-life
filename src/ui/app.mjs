@@ -43,6 +43,8 @@ function render(card) {
     });
   } else {
     box.append(el('p', 'sub', `ปี ${card.summary.year} · เงินคงเหลือ ${card.summary.money.toLocaleString('en-US')} บาท`));
+    box.append(el('p', 'sub', `≈ ${card.summary.moneyAtBirth.toLocaleString('en-US')} บาท ค่าเงินปีเกิด`));
+    if (card.note) box.append(el('p', 'sub', card.note));
     const b = el('button', 'choice', 'เกิดใหม่');
     b.onclick = start;
     box.append(b);

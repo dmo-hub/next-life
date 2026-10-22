@@ -1,0 +1,1606 @@
+{
+ "title": "อายุคาดเฉลี่ยและอัตราตายทารก แยกเพศ + ตารางมาตรฐานรูปเส้นการตาย",
+ "retrieved": "2026-10-22",
+ "e0": {
+  "ชาย": [
+   {
+    "y": 2500,
+    "v": 48.987,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2501,
+    "v": 48.987,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2502,
+    "v": 48.987,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2503,
+    "v": 48.987,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2504,
+    "v": 49.288,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2505,
+    "v": 49.586,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2506,
+    "v": 50.083,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2507,
+    "v": 50.553,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2508,
+    "v": 51.063,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2509,
+    "v": 51.559,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2510,
+    "v": 52.065,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2511,
+    "v": 52.634,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2512,
+    "v": 53.292,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2513,
+    "v": 53.997,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2514,
+    "v": 54.59,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2515,
+    "v": 55.199,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2516,
+    "v": 55.702,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2517,
+    "v": 56.316,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2518,
+    "v": 56.904,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2519,
+    "v": 57.447,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2520,
+    "v": 57.875,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2521,
+    "v": 58.096,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2522,
+    "v": 58.383,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2523,
+    "v": 58.756,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2524,
+    "v": 59.425,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2525,
+    "v": 60.244,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2526,
+    "v": 61.25,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2527,
+    "v": 62.402,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2528,
+    "v": 63.477,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2529,
+    "v": 64.263,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2530,
+    "v": 64.762,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2531,
+    "v": 65.051,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2532,
+    "v": 65.349,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2533,
+    "v": 65.629,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2534,
+    "v": 65.74,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2535,
+    "v": 65.885,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2536,
+    "v": 66.069,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2537,
+    "v": 65.96,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2538,
+    "v": 65.876,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2539,
+    "v": 65.918,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2540,
+    "v": 66.473,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2541,
+    "v": 66.94,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2542,
+    "v": 67.187,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2543,
+    "v": 67.368,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2544,
+    "v": 67.652,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2545,
+    "v": 68.02,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2546,
+    "v": 68.412,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2547,
+    "v": 68.524,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2548,
+    "v": 69.343,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2549,
+    "v": 69.87,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2550,
+    "v": 70.387,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2551,
+    "v": 70.859,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2552,
+    "v": 71.273,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2553,
+    "v": 71.434,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2554,
+    "v": 71.534,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2555,
+    "v": 71.698,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2556,
+    "v": 72.003,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2557,
+    "v": 72.254,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2558,
+    "v": 72.464,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2559,
+    "v": 72.628,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2560,
+    "v": 72.792,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2561,
+    "v": 72.95,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2562,
+    "v": 72.849,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2563,
+    "v": 72.971,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2564,
+    "v": 73.303,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2565,
+    "v": 71.025,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2566,
+    "v": 72.161,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2567,
+    "v": 72.342,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.MA.IN?format=json&date=1960:2025&per_page=100"
+   }
+  ],
+  "หญิง": [
+   {
+    "y": 2500,
+    "v": 52.339,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2501,
+    "v": 52.339,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2502,
+    "v": 52.339,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2503,
+    "v": 52.339,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2504,
+    "v": 52.983,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2505,
+    "v": 53.458,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2506,
+    "v": 54.047,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2507,
+    "v": 54.682,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2508,
+    "v": 55.361,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2509,
+    "v": 56.071,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2510,
+    "v": 56.74,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2511,
+    "v": 57.495,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2512,
+    "v": 58.29,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2513,
+    "v": 59.114,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2514,
+    "v": 59.781,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2515,
+    "v": 60.463,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2516,
+    "v": 61.124,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2517,
+    "v": 61.935,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2518,
+    "v": 62.722,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2519,
+    "v": 63.51,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2520,
+    "v": 64.165,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2521,
+    "v": 64.689,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2522,
+    "v": 65.291,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2523,
+    "v": 65.917,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2524,
+    "v": 66.575,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2525,
+    "v": 67.218,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2526,
+    "v": 67.967,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2527,
+    "v": 68.878,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2528,
+    "v": 69.761,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2529,
+    "v": 70.492,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2530,
+    "v": 71.04,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2531,
+    "v": 71.481,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2532,
+    "v": 71.919,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2533,
+    "v": 72.384,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2534,
+    "v": 72.706,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2535,
+    "v": 73.016,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2536,
+    "v": 73.267,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2537,
+    "v": 73.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2538,
+    "v": 73.909,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2539,
+    "v": 74.255,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2540,
+    "v": 74.506,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2541,
+    "v": 74.685,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2542,
+    "v": 74.975,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2543,
+    "v": 75.244,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2544,
+    "v": 75.591,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2545,
+    "v": 75.717,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2546,
+    "v": 75.97,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2547,
+    "v": 75.845,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2548,
+    "v": 76.61,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2549,
+    "v": 76.967,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2550,
+    "v": 77.313,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2551,
+    "v": 77.716,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2552,
+    "v": 78.19,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2553,
+    "v": 78.738,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2554,
+    "v": 79.247,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2555,
+    "v": 79.672,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2556,
+    "v": 80.109,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2557,
+    "v": 80.497,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2558,
+    "v": 80.858,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2559,
+    "v": 81.105,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2560,
+    "v": 81.383,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2561,
+    "v": 81.629,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2562,
+    "v": 81.763,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2563,
+    "v": 81.904,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2564,
+    "v": 82.098,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2565,
+    "v": 79.79,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2566,
+    "v": 80.861,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2567,
+    "v": 80.978,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.LE00.FE.IN?format=json&date=1960:2025&per_page=100"
+   }
+  ]
+ },
+ "imr": {
+  "unit": "ต่อ 1,000 เกิดมีชีพ",
+  "ชาย": [
+   {
+    "y": 2500,
+    "v": 120.7,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2501,
+    "v": 120.7,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2502,
+    "v": 120.7,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2503,
+    "v": 120.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2504,
+    "v": 116.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2505,
+    "v": 113.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2506,
+    "v": 109.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2507,
+    "v": 106.3,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2508,
+    "v": 102.8,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2509,
+    "v": 99.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2510,
+    "v": 95.8,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2511,
+    "v": 92.3,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2512,
+    "v": 88.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2513,
+    "v": 85.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2514,
+    "v": 81.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2515,
+    "v": 78.1,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2516,
+    "v": 74.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2517,
+    "v": 71.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2518,
+    "v": 68.3,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2519,
+    "v": 65.3,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2520,
+    "v": 62.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2521,
+    "v": 59.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2522,
+    "v": 57.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2523,
+    "v": 55,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2524,
+    "v": 52.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2525,
+    "v": 50.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2526,
+    "v": 48.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2527,
+    "v": 46.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2528,
+    "v": 44.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2529,
+    "v": 42.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2530,
+    "v": 40.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2531,
+    "v": 38.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2532,
+    "v": 36.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2533,
+    "v": 34.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2534,
+    "v": 32.8,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2535,
+    "v": 31,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2536,
+    "v": 29.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2537,
+    "v": 27.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2538,
+    "v": 26.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2539,
+    "v": 25.1,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2540,
+    "v": 23.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2541,
+    "v": 22.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2542,
+    "v": 21.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2543,
+    "v": 20.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2544,
+    "v": 19.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2545,
+    "v": 18.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2546,
+    "v": 17.8,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2547,
+    "v": 17,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2548,
+    "v": 16.3,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2549,
+    "v": 15.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2550,
+    "v": 14.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2551,
+    "v": 14.3,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2552,
+    "v": 13.8,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2553,
+    "v": 13.3,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2554,
+    "v": 12.8,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2555,
+    "v": 12.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2556,
+    "v": 12,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2557,
+    "v": 11.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2558,
+    "v": 11.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2559,
+    "v": 10.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2560,
+    "v": 10.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2561,
+    "v": 10.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2562,
+    "v": 9.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2563,
+    "v": 9.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2564,
+    "v": 9.3,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2565,
+    "v": 9.1,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2566,
+    "v": 8.8,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2567,
+    "v": 8.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.MA.IN?format=json&date=1960:2025&per_page=100"
+   }
+  ],
+  "หญิง": [
+   {
+    "y": 2500,
+    "v": 105.4,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2501,
+    "v": 105.4,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2502,
+    "v": 105.4,
+    "assumption": true,
+    "note": "ไม่มีข้อมูลก่อน 2503 ใช้ค่าปี 2503 (lore-era-data หัวข้อ 6)"
+   },
+   {
+    "y": 2503,
+    "v": 105.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2504,
+    "v": 102,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2505,
+    "v": 98.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2506,
+    "v": 95.3,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2507,
+    "v": 91.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2508,
+    "v": 88.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2509,
+    "v": 85.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2510,
+    "v": 82.1,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2511,
+    "v": 78.8,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2512,
+    "v": 75.3,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2513,
+    "v": 71.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2514,
+    "v": 68.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2515,
+    "v": 65,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2516,
+    "v": 61.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2517,
+    "v": 58.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2518,
+    "v": 55.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2519,
+    "v": 53,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2520,
+    "v": 50.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2521,
+    "v": 48.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2522,
+    "v": 46,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2523,
+    "v": 44,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2524,
+    "v": 42.1,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2525,
+    "v": 40.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2526,
+    "v": 38.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2527,
+    "v": 36.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2528,
+    "v": 35,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2529,
+    "v": 33.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2530,
+    "v": 31.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2531,
+    "v": 30.1,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2532,
+    "v": 28.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2533,
+    "v": 27,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2534,
+    "v": 25.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2535,
+    "v": 24.1,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2536,
+    "v": 22.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2537,
+    "v": 21.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2538,
+    "v": 20.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2539,
+    "v": 19.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2540,
+    "v": 18.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2541,
+    "v": 17.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2542,
+    "v": 16.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2543,
+    "v": 15.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2544,
+    "v": 15.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2545,
+    "v": 14.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2546,
+    "v": 13.8,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2547,
+    "v": 13.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2548,
+    "v": 12.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2549,
+    "v": 12.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2550,
+    "v": 11.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2551,
+    "v": 11.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2552,
+    "v": 10.8,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2553,
+    "v": 10.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2554,
+    "v": 10.1,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2555,
+    "v": 9.8,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2556,
+    "v": 9.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2557,
+    "v": 9.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2558,
+    "v": 8.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2559,
+    "v": 8.6,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2560,
+    "v": 8.4,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2561,
+    "v": 8.2,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2562,
+    "v": 7.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2563,
+    "v": 7.7,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2564,
+    "v": 7.5,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2565,
+    "v": 7.3,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2566,
+    "v": 7.1,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   },
+   {
+    "y": 2567,
+    "v": 6.9,
+    "source": "https://api.worldbank.org/v2/country/THA/indicator/SP.DYN.IMRT.FE.IN?format=json&date=1960:2025&per_page=100"
+   }
+  ]
+ },
+ "standard": {
+  "year": 2553,
+  "ชาย": {
+   "nqx": [
+    {
+     "age": 0,
+     "v": 0.013246,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 1,
+     "v": 0.002394,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 5,
+     "v": 0.002876,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 10,
+     "v": 0.003345,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 15,
+     "v": 0.007328,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 20,
+     "v": 0.008634,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 25,
+     "v": 0.012052,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 30,
+     "v": 0.017985,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 35,
+     "v": 0.026608,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 40,
+     "v": 0.029142,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 45,
+     "v": 0.032667,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 50,
+     "v": 0.037168,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 55,
+     "v": 0.04661,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 60,
+     "v": 0.063909,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 65,
+     "v": 0.090743,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 70,
+     "v": 0.134062,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 75,
+     "v": 0.199979,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 80,
+     "v": 0.289172,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    }
+   ],
+   "m85": {
+    "v": 0.129791,
+    "source": "https://ghoapi.azureedge.net/api/LIFE_0000000029?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+   }
+  },
+  "หญิง": {
+   "nqx": [
+    {
+     "age": 0,
+     "v": 0.010365,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 1,
+     "v": 0.002025,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 5,
+     "v": 0.001962,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 10,
+     "v": 0.002088,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 15,
+     "v": 0.002488,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 20,
+     "v": 0.002565,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 25,
+     "v": 0.003901,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 30,
+     "v": 0.006153,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 35,
+     "v": 0.008589,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 40,
+     "v": 0.010528,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 45,
+     "v": 0.014137,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 50,
+     "v": 0.01798,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 55,
+     "v": 0.024938,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 60,
+     "v": 0.0387,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 65,
+     "v": 0.058832,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 70,
+     "v": 0.094627,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 75,
+     "v": 0.155667,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    },
+    {
+     "age": 80,
+     "v": 0.243908,
+     "source": "https://ghoapi.azureedge.net/api/LIFE_0000000030?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+    }
+   ],
+   "m85": {
+    "v": 0.126855,
+    "source": "https://ghoapi.azureedge.net/api/LIFE_0000000029?$filter=SpatialDim%20eq%20'THA'%20and%20TimeDim%20eq%202010"
+   }
+  }
+ },
+ "rules": {
+  "shape": {
+   "method": "brass_logit",
+   "assumption": true,
+   "note": "รูปเส้นตามอายุใช้ตารางมาตรฐาน WHO ปี 2553 แล้วปรับ 2 ค่า (alpha beta) ให้อัตราตายทารกและ e0 ตรงกับ World Bank รายปี (lore-era-data หัวข้อ 6 เสนอปรับ scale)"
+  },
+  "tail": {
+   "method": "gompertz_from_85",
+   "slope": 0.1,
+   "assumption": true,
+   "note": "อายุ 85 ขึ้นไป อัตราตายโตแบบ Gompertz 10%/ปี เริ่มจาก nMx 85+ ของ WHO ตัดที่อายุ 120"
+  },
+  "future": {
+   "method": "hold_last",
+   "assumption": true,
+   "note": "ปีหลัง 2567 ยังไม่มีข้อมูล (UN WPP ต้องมี token) ใช้ค่าปี 2567"
+  }
+ }
+}

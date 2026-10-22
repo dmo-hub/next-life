@@ -4,7 +4,10 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "sim": "node harness/run.mjs --n 1000 --seed 1"
+    "sim": "node harness/run.mjs --n 1000 --seed 1",
+    "gate": "node harness/run.mjs --n 20000 --seed 1",
+    "check:data": "node scripts/check-data.mjs",
+    "fetch:data": "node scripts/fetch-data.mjs"
   },
   "dependencies": {
     "yaml": "2.8.1"
