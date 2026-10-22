@@ -2,6 +2,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { brassLx, e0FromLx, stdFor, MAX_AGE } from '../engine/era.mjs';
+import { normCdf } from '../engine/birth.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -84,6 +85,49 @@ function fit(stdLx, e0, imr) {
 
 const points = (rows) => rows.map((x) => [x.y, x.v]);
 
+function normInv(p) {
+  let lo = -10, hi = 10;
+  for (let i = 0; i < 80; i++) {
+    const mid = (lo + hi) / 2;
+    if (normCdf(mid) < p) lo = mid;
+    else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+const SES_KEYS = ['all', 'bkk', 'central', 'north', 'northeast', 'south'];
+export function loadBirth() {
+  const b = json('data/birthplace.json');
+  const rows = b.household_income.rows;
+  rows.forEach((row, i) => {
+    if (i && row.y <= rows[i - 1].y) throw new Error(`รายได้รายภาคต้องเรียงปีไม่ซ้ำ (${row.y})`);
+    for (const k of SES_KEYS) if (!(row[k] > 0)) throw new Error(`รายได้ ${k} ปี ${row.y} ไม่ใช่ตัวเลขบวก`);
+  });
+  for (const r of b.population.regions) if (!SES_KEYS.includes(r.ses) || r.ses === 'all') throw new Error(`ภาค ${r.name} อ้าง ses ไม่รู้จัก: ${r.ses}`);
+  // ความกว้างของ lognormal ที่ทำให้ส่วนแบ่ง 5 กลุ่มใกล้ข้อมูลที่สุด
+  const shares = b.income_share.q.map((x) => x.v / 100);
+  if (Math.abs(shares.reduce((s, x) => s + x, 0) - 1) > 0.01) throw new Error('ส่วนแบ่ง 5 กลุ่มรวมไม่ใกล้ 100%');
+  const qz = [-Infinity, ...[0.2, 0.4, 0.6, 0.8].map(normInv), Infinity];
+  const sse = (sg) => shares.reduce((s, v, k) => s + (normCdf(qz[k + 1] - sg) - normCdf(qz[k] - sg) - v) ** 2, 0);
+  let lo = 0.05, hi = 3;
+  for (let i = 0; i < 100; i++) {
+    const m1 = lo + (hi - lo) / 3, m2 = hi - (hi - lo) / 3;
+    if (sse(m1) < sse(m2)) hi = m2;
+    else lo = m1;
+  }
+  const sigma = r((lo + hi) / 2, 6);
+  const rules = b.rules;
+  return {
+    regions: b.population.regions.map(({ name, ses, v }) => ({ name, ses, w: v })),
+    income: rows.map((row) => Object.fromEntries([['y', row.y], ...SES_KEYS.map((k) => [k, row[k]])])),
+    sigma,
+    cutZ: rules.classes.cuts.map((c) => r(normInv(c), 6)),
+    backcastGrowth: rules.before_2524.growth,
+    saveRate: rules.save_rate.v,
+    startMoney: { ยากจน: rules.start_money.ยากจน, ชนชั้นกลาง: rules.start_money.ชนชั้นกลาง, ร่ำรวย: rules.start_money.ร่ำรวย },
+  };
+}
+
 export function loadEra() {
   const births = json('data/births.json');
   const pop = new Map(births.population.rows.map((x) => [x.y, x.v]));
@@ -137,6 +181,7 @@ export function loadEra() {
     },
     habits,
     events,
+    birth: loadBirth(),
   };
 }
 

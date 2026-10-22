@@ -1,0 +1,66 @@
+{
+ "title": "จุดเกิด: ภาค (ประชากรทะเบียน) · ฐานะ (ส่วนแบ่งรายได้ 5 กลุ่ม) · รายได้ครัวเรือนรายภาคตามปี",
+ "retrieved": "2026-10-22",
+ "population": {
+  "title": "ประชากรจากทะเบียนราษฎร์รายภาค 31 ธ.ค. 2566 (สสช. Statistical Yearbook 2024 ตาราง 1.5) · ses = ภาคในตารางรายได้ที่ภาคนี้ใช้",
+  "y": 2566,
+  "source": "https://www.nso.go.th/public/e-book/Statistical-Yearbook/SYB-2024_webPage/File%20SYB/2024/1/T%201.5%202024.pdf",
+  "regions": [
+   { "name": "กรุงเทพฯ และปริมณฑล", "ses": "bkk", "v": 10888403 },
+   { "name": "กลาง", "ses": "central", "v": 2979014 },
+   { "name": "ตะวันออก", "ses": "central", "v": 5205868 },
+   { "name": "ตะวันตก", "ses": "central", "v": 3809056 },
+   { "name": "เหนือ", "ses": "north", "v": 11940324 },
+   { "name": "ตะวันออกเฉียงเหนือ", "ses": "northeast", "v": 21716975 },
+   { "name": "ใต้", "ses": "south", "v": 9512975 }
+  ]
+ },
+ "income_share": {
+  "title": "ส่วนแบ่งรายได้ (%) ของประชากร 5 กลุ่มเท่ากัน ต่ำ→สูง + 10% บนสุด · ปี 2023 (2566) · World Bank PIP (ไทยวัดจากรายจ่ายต่อหัว)",
+  "y": 2566,
+  "q": [
+   { "v": 7.9, "source": "https://api.worldbank.org/v2/country/THA/indicator/SI.DST.FRST.20?format=json&date=2015:2024&per_page=20" },
+   { "v": 11.9, "source": "https://api.worldbank.org/v2/country/THA/indicator/SI.DST.02ND.20?format=json&date=2015:2024&per_page=20" },
+   { "v": 16.1, "source": "https://api.worldbank.org/v2/country/THA/indicator/SI.DST.03RD.20?format=json&date=2015:2024&per_page=20" },
+   { "v": 22.6, "source": "https://api.worldbank.org/v2/country/THA/indicator/SI.DST.04TH.20?format=json&date=2015:2024&per_page=20" },
+   { "v": 41.5, "source": "https://api.worldbank.org/v2/country/THA/indicator/SI.DST.05TH.20?format=json&date=2015:2024&per_page=20" }
+  ],
+  "top10": { "v": 26.1, "source": "https://api.worldbank.org/v2/country/THA/indicator/SI.DST.10TH.10?format=json&date=2015:2024&per_page=20" }
+ },
+ "household_income": {
+  "title": "รายได้เฉลี่ยครัวเรือน (SES สสช.) บาท/ครัวเรือน/เดือน · all = ทั่วประเทศ · bkk = กทม.+ปริมณฑล · central = กลาง (รวมตะวันออก/ตะวันตก)",
+  "unit": "บาท/ครัวเรือน/เดือน",
+  "rows": [
+   { "y": 2524, "all": 3378, "bkk": 5972, "central": 3665, "north": 2886, "northeast": 2512, "south": 3256, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2529, "all": 3631, "bkk": 6949, "central": 4006, "north": 3106, "northeast": 2555, "south": 3657, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2531, "all": 4106, "bkk": 7877, "central": 4220, "north": 3400, "northeast": 3067, "south": 3959, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2533, "all": 5625, "bkk": 11724, "central": 5827, "north": 4719, "northeast": 3529, "south": 5153, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2535, "all": 7062, "bkk": 15951, "central": 6906, "north": 5255, "northeast": 4525, "south": 6383, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2537, "all": 8262, "bkk": 16418, "central": 8724, "north": 6260, "northeast": 5599, "south": 8014, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2539, "all": 10799, "bkk": 21947, "central": 10907, "north": 8331, "northeast": 7388, "south": 9846, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf", "note": "JICA Housing Sector ให้ทั่วประเทศ 10,779 ใช้ค่าจาก Poverty Profile" },
+   { "y": 2541, "all": 12492, "bkk": 24929, "central": 12643, "north": 9779, "northeast": 8546, "south": 11461, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2543, "all": 12150, "bkk": 25242, "central": 13012, "north": 8652, "northeast": 7765, "south": 11186, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2544, "all": 12185, "bkk": 24365, "central": 12807, "north": 8930, "northeast": 8281, "south": 10914, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2545, "all": 13736, "bkk": 28239, "central": 14128, "north": 9530, "northeast": 9279, "south": 12487, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2547, "all": 14963, "bkk": 28135, "central": 16355, "north": 10885, "northeast": 10139, "south": 14469, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2549, "all": 17787, "bkk": 33088, "central": 19279, "north": 13146, "northeast": 11815, "south": 18668, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2550, "all": 18660, "bkk": 35007, "central": 18932, "north": 13568, "northeast": 12995, "south": 19716, "source": "https://openjicareport.jica.go.jp/pdf/12015236_01.pdf" },
+   { "y": 2552, "all": 20903, "bkk": 37732, "central": 20952, "north": 15727, "northeast": 15358, "south": 22926, "source": "https://www.nso.go.th/public/e-book/Statistical-Yearbook/SYB-2013/360-361/" },
+   { "y": 2556, "all": 25194, "bkk": 43058, "central": 26114, "north": 19267, "northeast": 19181, "south": 27504, "source": "https://www.nso.go.th/public/e-book/Statistical-Yearbook/SYB-2014/352-353/" },
+   { "y": 2560, "all": 26946, "bkk": 41897, "central": 27042, "north": 19046, "northeast": 20271, "south": 26913, "source": "https://www.nso.go.th/public/e-book/Statistical-Yearbook/SYB-2018/290-291/" },
+   { "y": 2566, "all": 29030, "bkk": 39087, "central": 30200, "north": 24040, "northeast": 22524, "south": 28532, "source": "https://www.nso.go.th/public/e-book/Statistical-Yearbook/SYB-2025/295/" }
+  ]
+ },
+ "rules": {
+  "population_all_years": { "assumption": true, "note": "ใช้สัดส่วนประชากรรายภาคปี 2566 กับทุกปีเกิด — ยังไม่มีชุดรายภาคย้อนหลัง (กทม. โตเร็วกว่าภาคอื่น ⇒ ยุคแรกได้คนกรุงเทพฯ มากเกินจริง)" },
+  "vicinity_mismatch": { "assumption": true, "note": "ปริมณฑลในตารางประชากรมี 5 จังหวัด (รวมนครปฐม สมุทรสาคร) ส่วน SES กทม.+ปริมณฑลมี 3 จังหวัด ใช้รายได้ SES กับทั้งกลุ่ม" },
+  "share_all_years": { "assumption": true, "note": "รูปการกระจายรายได้ (ส่วนแบ่ง 5 กลุ่ม) ของปี 2566 ใช้กับทุกปี · เป็นส่วนแบ่งรายจ่ายต่อหัว ใช้แทนรายได้ครัวเรือน" },
+  "lognormal": { "assumption": true, "note": "รายได้ในภาคหนึ่งเป็น lognormal ที่ความกว้างเท่าทั้งประเทศ (fit จากส่วนแบ่ง 5 กลุ่ม) ค่าเฉลี่ยเลื่อนตามสัดส่วนรายได้ภาค/ทั่วประเทศของปีนั้น · ฐานะวัดจากเส้นแบ่งระดับประเทศ" },
+  "classes": { "assumption": true, "note": "ยากจน = ต่ำกว่า 40% ล่างของประเทศ · ร่ำรวย = 10% บนสุด · ที่เหลือชนชั้นกลาง", "cuts": [0.4, 0.9] },
+  "between_rounds": { "assumption": true, "note": "ปีระหว่างรอบสำรวจ: รายได้ทั่วประเทศโตคงที่ (log-linear) · สัดส่วนภาค/ทั่วประเทศเป็นเส้นตรง (lore-finance-series 5c)" },
+  "before_2524": { "growth": 10.2, "source": "https://www.fao.org/4/y2876e/y2876e1m.htm", "assumption": true, "note": "ก่อนรอบ 2524 ย้อนรายได้ทั่วประเทศด้วยอัตราโตเฉลี่ย 10.20%/ปี ของช่วง 2519–2541 (FAO) แม้ปีก่อน 2519 · คงสัดส่วนภาคของปี 2524" },
+  "after_2566": { "assumption": true, "note": "หลังรอบล่าสุด รายได้ทั่วประเทศโตเท่าเงินเฟ้อของเกม (รายได้จริงคงที่) · คงสัดส่วนภาคของรอบล่าสุด" },
+  "save_rate": { "v": 0.1, "assumption": true, "note": "เงินเก็บต่อปี = 10% ของรายได้ครัวเรือนทั้งปี จนกว่า B08 จะมีรายจ่าย/ค่าจ้างตามอาชีพ" },
+  "start_money": { "assumption": true, "note": "เงินติดตัวตอนเกิด = จำนวนปีของเงินเก็บต่อปีตอนเกิด ตามฐานะ", "ยากจน": 0.2, "ชนชั้นกลาง": 1, "ร่ำรวย": 8 }
+ }
+}

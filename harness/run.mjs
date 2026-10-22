@@ -15,11 +15,27 @@ const era = content.era;
 const randomBot = (card, rng) => rng.int(0, card.choices.length - 1);
 
 let sum = 0, min = Infinity, max = -Infinity, over60 = 0, under5 = 0;
+// ค่าแถบต้องอยู่ใน 0–100 ทุกการ์ด (การ์ดสรุปออกทุกปี จึงเท่ากับตรวจทุกปี) · เงินต้องเป็นตัวเลขจำกัด
+const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations'];
+let statChecks = 0, statBad = 0, yearsCovered = 0, yearsLived = 0;
+const checkStats = (card, st) => {
+  if (card.kind === 'summary') yearsCovered += card.age - card.fromAge;
+  for (const k of STAT_KEYS) {
+    statChecks++;
+    if (!(st[k] >= 0 && st[k] <= 100)) statBad++;
+  }
+  if (!Number.isFinite(st.money)) statBad++;
+};
+// ด่าน 4: จำนวนการ์ดของชีวิตที่ตายหลังอายุ 60 (นับการ์ดสรุปและการ์ดตายด้วย)
+const CARD_MIN = 80, CARD_MAX = 150;
+const cardsOver60 = [];
 const bySex = { ชาย: [0, 0], หญิง: [0, 0] };
 // ด่าน 3 จัดกลุ่มตามทศวรรษเกิด × เพศ: [ผลรวมอายุจริง, ผลรวมอายุที่ข้อมูลคาด, ผลรวม e0 ปีเกิด, จำนวน]
 const groups = new Map();
 for (let i = 0; i < n; i++) {
-  const { age, state } = playLife(mixSeed(seed, i), content, randomBot);
+  const { age, cards, state } = playLife(mixSeed(seed, i), content, randomBot, checkStats);
+  yearsLived += age;
+  if (age > 60) cardsOver60.push(cards);
   sum += age;
   min = Math.min(min, age);
   max = Math.max(max, age);
@@ -40,6 +56,17 @@ console.log(`ชีวิต ${n} · seed ${seed}`);
 console.log(`อายุเฉลี่ย ${f(sum / n)} ปี · ต่ำสุด ${min} · สูงสุด ${max}`);
 console.log(`ตายหลังอายุ 60: ${f((over60 / n) * 100)}% · ตายก่อน 5 ขวบ: ${f((under5 / n) * 100)}%`);
 for (const [s, [t, c]] of Object.entries(bySex)) console.log(`${s}: อายุเฉลี่ย ${f(t / c)} ปี (${c} ชีวิต)`);
+
+console.log(`
+ค่าสถานะ: ตรวจ ${statChecks.toLocaleString('en-US')} ค่า · การ์ดสรุปครอบ ${yearsCovered.toLocaleString('en-US')} จาก ${yearsLived.toLocaleString('en-US')} ปีที่มีชีวิต · หลุด 0–100/ไม่ใช่ตัวเลข ${statBad} → ${statBad ? 'ตก' : 'ผ่าน'}`);
+if (statBad) process.exitCode = 1;
+
+cardsOver60.sort((a, b) => a - b);
+const inRange = cardsOver60.filter((c) => c >= CARD_MIN && c <= CARD_MAX).length;
+const share = cardsOver60.length ? inRange / cardsOver60.length : 0;
+const pct = (p) => cardsOver60[Math.min(cardsOver60.length - 1, Math.floor(p * cardsOver60.length))];
+console.log(`ด่าน 4: ชีวิตที่ตายหลัง 60 ยาว ${CARD_MIN}–${CARD_MAX} การ์ด ${f(share * 100)}% (ต้อง ≥90%) · ${cardsOver60.length} ชีวิต · การ์ด p5 ${pct(0.05)} · p25 ${pct(0.25)} · p50 ${pct(0.5)} · p75 ${pct(0.75)} · p95 ${pct(0.95)} · ต่ำกว่า ${CARD_MIN} ${cardsOver60.filter((c) => c < CARD_MIN).length} · เกิน ${CARD_MAX} ${cardsOver60.filter((c) => c > CARD_MAX).length} → ${share >= 0.9 ? 'ผ่าน' : 'ตก'}`);
+if (share < 0.9) process.exitCode = 1;
 
 // ด่าน 3 มีสองชั้น เพราะเป้าของ 3b คำนวณจาก qx ตัวเดียวกับที่เกมใช้ ถ้าตารางชีพผิด 3b ก็ยังผ่าน
 // 3a: ตารางชีพรายปีที่เกมใช้ต้องให้ e0 และอัตราตายทารกตรงข้อมูลจริงของปีนั้น (ไม่ผ่านแกนเกม ไม่ผ่านการสุ่ม)
