@@ -55,6 +55,21 @@ function walk(node, path, covered, key) {
 const files = readdirSync(dir).filter((f) => f.endsWith('.json')).sort();
 for (const f of files) walk(JSON.parse(readFileSync(new URL(f, dir), 'utf8')), f, false, '');
 
+// จังหวัดซ้อนใต้ภาค (B34): เกมสุ่มภาคก่อนแล้วสุ่มจังหวัดในภาค — ยอดสองชั้นมาจากตารางเดียวกัน ผลรวมจึงต้องเท่ากันพอดี
+const pop = JSON.parse(readFileSync(new URL('birthplace.json', dir), 'utf8')).population;
+const provNames = new Set();
+for (const r of pop.regions) {
+  const sum = (r.provinces ?? []).reduce((s, p) => s + p.v, 0);
+  checked++;
+  if (!r.provinces?.length) problems.push(`birthplace.json ภาค${r.name}: ไม่มีรายจังหวัด`);
+  else if (sum !== r.v) problems.push(`birthplace.json ภาค${r.name}: ผลรวมจังหวัด ${sum} ≠ ยอดภาค ${r.v}`);
+  for (const p of r.provinces ?? []) {
+    if (provNames.has(p.name)) problems.push(`birthplace.json: จังหวัด${p.name} ซ้ำ`);
+    provNames.add(p.name);
+  }
+}
+if (provNames.size !== 77) problems.push(`birthplace.json: จังหวัด ${provNames.size} ≠ 77`);
+
 console.log(`ตรวจ ${checked.toLocaleString('en-US')} ตัวเลขใน ${files.length} ไฟล์`);
 if (problems.length) {
   for (const p of problems.slice(0, 50)) console.log(`  ✗ ${p}`);

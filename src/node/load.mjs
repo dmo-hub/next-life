@@ -134,7 +134,7 @@ export function loadBirth() {
   const sigma = r((lo + hi) / 2, 6);
   const rules = b.rules;
   return {
-    regions: b.population.regions.map(({ name, ses, v }) => ({ name, ses, w: v })),
+    regions: b.population.regions.map(({ name, ses, v, provinces }) => ({ name, ses, w: v, provinces: provinces.map((p) => ({ name: p.name, w: p.v })) })),
     income: rows.map((row) => Object.fromEntries([['y', row.y], ...SES_KEYS.map((k) => [k, row[k]])])),
     sigma,
     cutZ: rules.classes.cuts.map((c) => r(normInv(c), 6)),

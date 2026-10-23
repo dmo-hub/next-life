@@ -1,6 +1,6 @@
 import { makeRng } from './rng.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
-import { pickRegion, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
+import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
 import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard } from './career.mjs';
@@ -115,6 +115,8 @@ export function newLife(seed, content, heir = null) {
   const odds = classOdds(era.birth, regionRatio(era.birth, region.ses, birthYear));
   let cls = weighted(rng, CLASSES, odds.map((o) => o.p));
   if (heir) ({ birthYear, sex, region, cls } = heir);
+  // จังหวัดสุ่มจาก stream แยกในภาคที่ได้ (B34) — ไม่กินเลขสุ่มของโลก · ทางเป็นลูกเกิดบ้านเดิม · เซฟเก่าไม่มีจังหวัด สุ่มซ้ำจาก seed ได้ค่าเดิม
+  const province = heir?.province ?? pickProvince(makeRng(seed ^ 0xa54ff53a), era.birth, region.name);
   // ค่าเริ่มสุ่มจาก stream แยก — ไม่กินเลขสุ่มของโลก ลำดับสุ่มการตายจึงเหมือนก่อนมีการสุ่มนี้
   const jit = makeRng(seed ^ 0x6a09e667);
   const s = Object.fromEntries(Object.entries(startStats(cls)).map(([k, v]) => [k, clamp(v + (jit.next() * 2 - 1) * START_JITTER + (heir?.bonus[k] ?? 0))]));
@@ -136,6 +138,7 @@ export function newLife(seed, content, heir = null) {
     // heir ของ harness ไม่มี lineage — ไม่มีรุ่นก่อนให้เลี่ยงชื่อ
     name: pickName(seed, sex, birthYear, era.names, (heir?.lineage ?? []).map((l) => l.name)),
     region: region.name,
+    province,
     ses: region.ses,
     cls,
     // ก่อนได้งาน occupation = อาชีพของครอบครัว เป็นฐานของเงินในผลการ์ด (income_x) · ได้งานแล้วเปลี่ยนเป็นงานของตัวเอง
@@ -329,11 +332,11 @@ export function deathChance(st) {
 
 // ช่องแทนค่าครบทุกตัวในรายการปิดของด่าน build (PLACEHOLDERS) — ตัวที่ไม่เติมจะโผล่เป็น {ชื่อ} ดิบบนการ์ด
 // ชื่อ = ชื่อเล่นที่สุ่มตอนเกิด (คำบรรยายยังเรียกผู้เล่นว่า "คุณ") · ลูกยังไม่มีชื่อ: เพศลูกรู้ตอนส่งไปเกิด ชื่อจึงตั้งที่รุ่นถัดไป
-// จังหวัด = ภาคที่เกิด · คำพูดตามเพศ
+// จังหวัด = จังหวัดที่เกิด · ภาค = ภาคที่เกิด · คำพูดตามเพศ
 export const FILL = {
   อายุ: (st) => st.age,
   ภาค: (st) => regionLabel(st),
-  จังหวัด: (st) => regionLabel(st),
+  จังหวัด: (st) => provinceLabel(st),
   เงิน: (st) => Math.round(st.money).toLocaleString('en-US'),
   ชื่อ: (st) => st.name,
   ชื่อลูก: () => 'ลูก',
@@ -871,9 +874,13 @@ export function reckoning(ledger) {
 
 // "ภาค" นำหน้าไม่เข้ากับกรุงเทพฯ และปริมณฑล
 export const regionLabel = (st) => (st.ses === 'bkk' ? st.region : `ภาค${st.region}`);
+// ที่เกิดบนจอ (B34) — ภาคยังใช้คิดฐานะ/รายได้/ภัยพิบัติ จังหวัดเป็นแค่ที่อยู่ที่เล่า
+export const provinceLabel = (st) => placeName(st.province);
+// จังหวัดพร้อมภาค ให้ประโยคที่ผลขึ้นกับภาค (ภัยรายภาค) บอกได้ว่าทำไมโดน · กรุงเทพฯ ไม่ต้องต่อ · ปริมณฑลต่อชื่อกลุ่ม
+export const areaLabel = (st) => (st.ses !== 'bkk' ? `${provinceLabel(st)} ${regionLabel(st)}` : st.province === 'กรุงเทพมหานคร' ? st.province : `${provinceLabel(st)} ปริมณฑลของกรุงเทพฯ`);
 
 export function profileText(st) {
-  return `เกิดปี ${st.birthYear} · ${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls} · ${jobText(st)}`;
+  return `เกิดปี ${st.birthYear} · ${st.sex} · ${provinceLabel(st)} · ฐานะ${st.cls} · ${jobText(st)}`;
 }
 
 export function statsOf(st) {

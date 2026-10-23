@@ -18,6 +18,20 @@ export function pickRegion(rng, birth) {
   return birth.regions[birth.regions.length - 1];
 }
 
+// จังหวัดในภาคที่ได้ ตามประชากร (B34) — ผู้เรียกส่ง rng แยกเสมอ ภาคและทุกผลที่คิดจากภาคจึงไม่ขยับ
+export function pickProvince(rng, birth, regionName) {
+  const list = birth.regions.find((x) => x.name === regionName).provinces;
+  let r = rng.next() * list.reduce((s, x) => s + x.w, 0);
+  for (const x of list) {
+    r -= x.w;
+    if (r < 0) return x.name;
+  }
+  return list[list.length - 1].name;
+}
+
+// ชื่อจังหวัดบนจอ: กรุงเทพฯ ไม่ใช่ "จังหวัด" จึงไม่นำหน้า จ.
+export const placeName = (province) => (province === 'กรุงเทพมหานคร' ? province : `จ.${province}`);
+
 // ค่าในแถวสำรวจ ณ ปีใดก็ได้: ก่อนรอบแรก/หลังรอบสุดท้ายใช้รอบที่ใกล้สุด ระหว่างรอบเป็นเส้นตรง
 function between(rows, year, f) {
   if (year <= rows[0].y) return f(rows[0]);

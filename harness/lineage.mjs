@@ -53,7 +53,7 @@ const f = (v, d = 2) => v.toFixed(d);
 const near = (a, b) => Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.abs(b));
 
 const out = {};
-let streamBad = 0, streamChecks = 0, childDeaths = 0, childBad = 0, occBad = 0;
+let streamBad = 0, streamChecks = 0, childDeaths = 0, childBad = 0, occBad = 0, provBad = 0, provSame = 0, rebirths = 0;
 let leaks = 0, reveals = 0, afterlives = 0, statBad = 0, carryBad = 0, debtLeak = 0, lenBad = 0;
 const lens = [];
 // ทางในตระกูลแยกชั้น (B18): จำนวน · ผลรวมสัดส่วนส่งต่อ · มรดก (เท่ารายได้ปี) · |ส่วนต่างความสัมพันธ์+คอนเน็คชั่นจากบ้าน|
@@ -137,9 +137,12 @@ for (const [name, pick] of Object.entries(BOTS)) {
         if (a.age !== b.age || a.cards !== b.cards || Math.round(a.state.money) !== Math.round(b.state.money)) streamBad++;
         streamChecks++;
       }
-      const lastJob = st.occupation;
+      const lastJob = st.occupation, lastProv = st.province;
       st = nextLife(af);
       if (af.path === 'child' && st.familyOcc !== lastJob) occBad++;
+      if (af.path === 'child' && st.province !== lastProv) provBad++;
+      // เกิดใหม่ต้องสุ่มจังหวัดใหม่จริง — ถ้าทางเกิดใหม่ติดจังหวัดเดิมเกือบทุกครั้ง แปลว่าค่าบ้านรั่วมาทางที่ไม่ใช่ลูก
+      if (af.path !== 'child') { rebirths++; if (st.province === lastProv) provSame++; }
       for (const k of STAT_KEYS) if (!(st[k] >= 0 && st[k] <= 100)) statBad++;
     }
   }
@@ -185,6 +188,8 @@ check(`รุ่นถัดไปดึงเลขสุ่มของโล�
 const childPaths = Object.values(out).reduce((s, r) => s + r.paths.child, 0);
 check('ทางเป็นลูกเกิดได้จริง', childPaths ? 0 : 1, ` ${childPaths} ครั้ง`);
 check('ทางเป็นลูก อาชีพที่บ้าน = งานสุดท้ายของรุ่นก่อน', occBad);
+check('ทางเป็นลูก เกิดจังหวัดเดียวกับรุ่นก่อน', provBad);
+check('ทางเกิดใหม่ สุ่มจังหวัดใหม่ (ติดจังหวัดเดิมไม่เกิน 20%)', provSame > rebirths * 0.2 ? 1 : 0, ` ${provSame}/${rebirths}`);
 // ทุกชั้นออกได้จริง แล้วค่าเฉลี่ยที่ส่งต่อต้องไม่เพิ่มเมื่อห่างสายเลือดขึ้น (ลูก ≥ หลาน ≥ เหลน)
 const tm = tiers.map((t) => ({ n: t.n, carry: t.carry / t.n, legacy: t.legacy / t.n, kin: t.kin / t.n }));
 console.log(`\nชั้นในตระกูล          ${KIN_TIERS.map((t) => t.name.padEnd(8)).join(' ')}`);

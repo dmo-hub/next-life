@@ -1,7 +1,7 @@
 // การ์ดเปิดชีวิต (B16) + บรรทัดเล่าของการ์ดบ้านเมือง — อ่าน state ล้วน ไม่ดึงเลขสุ่มของโลก ลำดับสุ่มของชีวิตจึงเหมือนก่อนมีการ์ดนี้
 // ไม่มีค่าบัญชีบุญบาป: กรรมที่ติดมาเล่าเป็นปริมาณคำเดียวกับการ์ดส่งต่อ ฐานะ/ญาติบอกแค่ทิศ ↑/↓
 import { infantMortality, protoYear } from './era.mjs';
-import { CLASSES, STAT_LABELS, regionLabel, stageOf } from './life.mjs';
+import { CLASSES, STAT_LABELS, provinceLabel, areaLabel, stageOf } from './life.mjs';
 import { LEGACY, lineageText, carryAmount, kinTier } from './afterlife.mjs';
 
 // สัดส่วนจำนวนเกิดปีนั้นเทียบปีที่เกิดมากที่สุดในข้อมูล — แบ่งบรรยากาศรุ่นเป็น 3 ขั้น (ค่าตั้งของเกม)
@@ -90,7 +90,7 @@ export function introCard(st, heir) {
     age: 0,
     stage: stageOf(0),
     gen: st.gen,
-    text: `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${regionLabel(st)} ได้ชื่อเล่นว่า “${st.name}”`,
+    text: `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${provinceLabel(st)} ได้ชื่อเล่นว่า “${st.name}”`,
     story: [familyText(st), eraText(st)],
     // heir ที่ไม่มีรุ่นก่อน (harness สร้างทับค่าเกิดเฉย ๆ) ไม่มีอะไรให้สืบทอด
     inherit: heir && st.lineage.length ? inheritText(st, heir) : [],
@@ -105,6 +105,6 @@ const placeLabel = (name) => (name.startsWith('กรุงเทพ') ? name : 
 export function eraStory(st, e) {
   if (e.kind === 'economy') return 'เศรษฐกิจทั้งประเทศสะดุด ข้าวของแพง งานหายาก หลายบ้านต้องรัดเข็มขัด เงินเก็บและการลงทุนปีนี้ได้รับผลไปด้วย';
   if (!e.regions?.length) return 'ข่าวนี้อยู่ในความสนใจของคนทั้งประเทศ หลายบ้านต้องระวังตัวและปรับชีวิตตาม';
-  if (e.regions.includes(st.region)) return `${regionLabel(st)}ที่คุณอยู่เป็นพื้นที่ที่โดนหนัก บ้านเรือนและการทำมาหากินของคนแถวนี้เสียหาย`;
+  if (e.regions.includes(st.region)) return `${areaLabel(st)}ที่คุณอยู่เป็นพื้นที่ที่โดนหนัก บ้านเรือนและการทำมาหากินของคนแถวนี้เสียหาย`;
   return `เหตุหนักอยู่ที่${e.regions.map(placeLabel).join(' ')} ข่าวความเสียหายไปถึงทั่วประเทศ`;
 }
