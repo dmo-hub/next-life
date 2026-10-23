@@ -23,10 +23,13 @@ const table = LOTTERY_PRIZES;
 const rate = (small) => table.prizes.filter((p) => p.small === small).reduce((s, p) => s + p.n, 0) / table.per;
 const P_SMALL = rate(true), P_BIG = rate(false);
 const Z = 1.96;
+// ด่านในเกม (6ข) ใช้ 3 SE: seed ตายตัวแต่เนื้อหาเปลี่ยนทุกรอบ ลำดับสุ่มจึงเลื่อน — แถบ 95% ตกเองราว 1 ใน 20 รอบทั้งที่สูตรถูก
+// สูตรตรวจละเอียดที่ 6ก (4 ล้านใบต่อค่า m) อยู่แล้ว
+const Z_GAME = 3;
 const f = (v, d = 2) => v.toFixed(d);
 const pct = (v, d = 3) => `${(v * 100).toFixed(d)}%`;
-// ช่วงเชื่อมั่น 95% ของสัดส่วน (Wilson) — อัตราเล็กมากใช้ช่วงปกติแล้วติดลบ
-function wilson(k, N) {
+// ช่วงเชื่อมั่นของสัดส่วน (Wilson) — อัตราเล็กมากใช้ช่วงปกติแล้วติดลบ
+function wilson(k, N, Z = 1.96) {
   const p = k / N, d = 1 + (Z * Z) / N;
   const mid = (p + (Z * Z) / (2 * N)) / d, half = (Z * Math.sqrt((p * (1 - p)) / N + (Z * Z) / (4 * N * N))) / d;
   return [mid - half, mid + half];
@@ -115,9 +118,9 @@ for (const [name, r] of Object.entries(res)) {
 const MIN_TICKETS = 200;
 const ratioCheck = (label, ts, want) => {
   const N = ts.length, k = ts.filter(isSmall).length;
-  const [lo, hi] = wilson(k, N);
+  const [lo, hi] = wilson(k, N, Z_GAME);
   const ok = N >= MIN_TICKETS && lo / P_SMALL <= want && want <= hi / P_SMALL;
-  console.log(`${label}: ${N} ใบ (ต้อง ≥${MIN_TICKETS}) · เล็ก ${pct(k / N)} ÷ ${pct(P_SMALL, 1)} = ${f(k / N / P_SMALL, 3)} (CI 95% ${f(lo / P_SMALL, 3)}–${f(hi / P_SMALL, 3)} ต้องครอบ ${want}) → ${verdict(ok)}`);
+  console.log(`${label}: ${N} ใบ (ต้อง ≥${MIN_TICKETS}) · เล็ก ${pct(k / N)} ÷ ${pct(P_SMALL, 1)} = ${f(k / N / P_SMALL, 3)} (±${Z_GAME} SE ${f(lo / P_SMALL, 3)}–${f(hi / P_SMALL, 3)} ต้องครอบ ${want}) → ${verdict(ok)}`);
 };
 console.log('');
 ratioCheck('บุญเต็ม (สายบุญ m = max_mult)', res['สายบุญ'].tickets.filter((t) => t.m === MAX_MULT), MAX_MULT);
@@ -129,8 +132,8 @@ console.log(`สายบาปได้ m ≠ 1: ${sinAbove} ใบ (ใบท�
 // รางวัลใหญ่ทุกบอทต้องเท่าฐานจริง — นับรวมทุกใบของบอทนั้น ช่วงเชื่อมั่นครอบ 0.0168%
 for (const [name, r] of Object.entries(res)) {
   const N = r.tickets.length, big = r.tickets.filter(isBig).length;
-  const [lo, hi] = wilson(big, N);
-  console.log(`รางวัลใหญ่ ${name}: ${big} ครั้ง/${N} ใบ = ${pct(big / N, 4)} (CI ${pct(lo, 4)}–${pct(hi, 4)} ต้องครอบ ${pct(P_BIG, 4)}) → ${verdict(lo <= P_BIG && P_BIG <= hi)}`);
+  const [lo, hi] = wilson(big, N, Z_GAME);
+  console.log(`รางวัลใหญ่ ${name}: ${big} ครั้ง/${N} ใบ = ${pct(big / N, 4)} (±${Z_GAME} SE ${pct(lo, 4)}–${pct(hi, 4)} ต้องครอบ ${pct(P_BIG, 4)}) → ${verdict(lo <= P_BIG && P_BIG <= hi)}`);
 }
 const over = Object.values(res).reduce((s, r) => s + r.over, 0);
 console.log(`เพดาน ${cap} ครั้ง/ชีวิต (lint ≤${LOTTERY.cap}): ชีวิตที่ทะลุหรือนับใบไม่ตรง ${over} → ${verdict(over === 0)}`);
