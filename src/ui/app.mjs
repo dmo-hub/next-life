@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, startAfterlife, nextAfterCard, chooseAfter, nextLife } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.1.04';
@@ -357,6 +357,8 @@ function render(card) {
     if (card.summary.bankruptcies) body.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
     if (card.note) body.append(el('p', 'sub', card.note));
     body.append(titlesBox(card));
+    const tree = familyTree();
+    if (tree) body.append(tree);
     // บัญชีบุญบาปเฉลยที่การ์ดศาลในระหว่างชาติ ไม่ใช่การ์ดตาย · ตายตอนเด็กได้บันทึกสั้น (ใบ 07) — ไม่มีสรุปช่วงวัย
     if (card.recap && !card.short) body.append(recap(card.recap));
     choices.append(button('ไปช่วงระหว่างชาติ', null, () => {
@@ -371,6 +373,8 @@ function render(card) {
       ? `รายได้ ${baht(monthlyIncome(st, year))}/เดือน`
       : `เงินติดตัว ${baht(s.money)}`;
     box.append(el('div', 'meta', `ฐานะ${st.cls} · ${jobText(st, card.age)} · ${purse}`));
+    const tree = familyTree();
+    if (tree) box.append(tree);
     body.append(el('span', 'kicker', card.kind === 'event' ? (card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind]));
 
     if (card.kind === 'stage') {
@@ -402,6 +406,14 @@ function render(card) {
 }
 
 const genLabel = () => (st.gen > 1 ? `รุ่นที่ ${st.gen} · ` : '');
+
+// ผังตระกูลพับได้ (ใบ 05 เลิกเมื่อไรก็ดูได้) — มีเมื่อเป็นรุ่นที่ 2 ขึ้นไป
+function familyTree() {
+  if (!st.lineage.length) return null;
+  const d = el('details', 'tree');
+  d.append(el('summary', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), list(lineageText(st.lineage), 'picks'));
+  return d;
+}
 
 // ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะ — ชีวิตจบแล้ว
 const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ศาลพญายม', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ' };
