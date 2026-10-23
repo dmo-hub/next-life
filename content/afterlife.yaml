@@ -394,7 +394,7 @@ events:
     type: B
     stage: ระหว่างชาติ
     scene: realm
-    realm: [hell]
+    realm: [hell, peta]
     years: [2400, 2700]
     lore_ref: lore-afterlife.md#2
     when: {flags: {has: [heavy_drinker]}}
