@@ -6,5 +6,6 @@ export * from './merit.mjs';
 export * from './career.mjs';
 export * from './life.mjs';
 export * from './afterlife.mjs';
+export * from './intro.mjs';
 export * from './titles.mjs';
 export * from './belief.mjs';

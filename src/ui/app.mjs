@@ -411,7 +411,7 @@ function button(label, fx, onclick) {
 // แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): ลางกับเหตุการณ์ความเชื่อเป็นทาง B ที่เหลือเป็นทาง A
 const styleOf = (card) => (card.kind === 'omen' || ((card.kind === 'event' || card.kind === 'result') && card.type === 'B') ? 'b' : 'a');
 
-const KICKER = { stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
+const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
 
 function render(card) {
   root.replaceChildren();
@@ -464,12 +464,25 @@ function render(card) {
     if (tree) box.append(tree);
     body.append(el('span', 'kicker', card.kind === 'event' ? (card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind]));
 
-    if (card.kind === 'stage') {
+    if (card.kind === 'intro') {
+      body.append(el('span', 'stamp', 'แรกเกิด'));
+      body.append(el('h3', 'lead', card.text));
+      // บรรทัดแรกเป็นเรื่องของบ้าน · ที่เหลือเป็นบรรยากาศยุค ตัวรอง
+      card.story.forEach((p, i) => body.append(el('p', i ? 'sub' : null, p)));
+      if (card.inherit.length) {
+        const box = el('div', 'recap');
+        box.append(el('div', 'h', 'สิ่งที่สืบทอดจากชาติก่อน'), list(card.inherit, 'picks'));
+        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), list(card.lineage, 'picks'));
+        body.append(box);
+      }
+      choices.append(button('ต่อไป', null, next));
+    } else if (card.kind === 'stage') {
       body.append(el('span', 'stamp', card.text));
       body.append(recap(card.recap));
       choices.append(button('ต่อไป', null, next));
     } else if (card.kind === 'era' || card.kind === 'omen' || card.kind === 'result') {
       body.append(el('h3', null, card.text));
+      if (card.story) body.append(el('p', null, card.story));
       choices.append(button('ต่อไป', null, next));
     } else {
       if (card.title) body.append(el('h3', null, card.title));

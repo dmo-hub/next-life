@@ -132,10 +132,13 @@ function pathCard(af) {
   });
 }
 
+// การ์ดเปิดชีวิตของรุ่นถัดไปเล่าคำเดียวกัน — ผู้เล่นเห็นสองใบตรงกัน
+export const carryAmount = (r) => (r >= 0.55 ? 'มาก' : r >= 0.45 ? 'พอประมาณ' : 'น้อย');
+
 function carryCard(af) {
   const r = CARRY.min + af.rng.next() * (CARRY.max - CARRY.min);
   af.heir = makeHeir(af, r);
-  const amount = r >= 0.55 ? 'มาก' : r >= 0.45 ? 'พอประมาณ' : 'น้อย';
+  const amount = carryAmount(r);
   const h = af.heir;
   const who = af.path === 'child' ? 'กลับมาเกิดเป็นลูกของตัวเอง' : 'ไปเกิดใหม่';
   return emitAfter(af, {
@@ -267,6 +270,8 @@ function makeHeir(af, r) {
     bonus,
     ledger: carryLedger(st.ledger, net, r),
     carried: r,
+    // ส่วนที่บ้านส่งต่อ แยกจาก bonus (ซึ่งรวมผลกรรม) ให้การ์ดเปิดชีวิตเล่าทิศได้โดยไม่เผยบัญชี
+    kin: { relations: kin('relations'), network: kin('network') },
     lineage,
   };
 }

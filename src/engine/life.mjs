@@ -5,6 +5,7 @@ import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, ass
 import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard } from './career.mjs';
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
+import { introCard, eraStory } from './intro.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -206,6 +207,8 @@ export function newLife(seed, content, heir = null) {
     famRng,
   };
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
+  // การ์ดเปิดชีวิตมาก่อนการ์ดมรดกตอนแรกเกิด — ต้องเล่ามรดกก่อน receiveLegacy ล้าง st.legacy
+  st.due.push(introCard(st, heir));
   if (st.legacy?.age === 0) receiveLegacy(st, birthYear, stageOf(0));
   st.trail.push({ year: birthYear, money: Math.round(st.money) });
   st.stageMark = markStage(st);
@@ -501,7 +504,7 @@ function stepYear(st) {
     st.lastEraAge = st.age;
     for (const e of eras) {
       // เล่าเหตุการณ์บ้านเมืองก่อนเสมอ · มีการ์ดเนื้อหาผูกไว้ = ตามด้วยการ์ดให้เลือกรับมือ
-      st.due.push({ kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: e.name });
+      st.due.push({ kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: e.name, story: eraStory(st, e) });
       // ใบรับมือเดิมไม่ออกซ้ำในชีวิตเดียว — เหตุการณ์เกิดซ้ำได้ แต่ข้อความ/ผลเดิมทุกตัวอักษรอ่านเหมือนบั๊ก · ครั้งหลังเล่าแค่การ์ดบ้านเมือง
       const ev = st.content.events.find((c) => c.era === e.id && !st.done[c.id] && whenOk(st, c.when) && (c.when?.age || c.stage === stage));
       if (ev) {
