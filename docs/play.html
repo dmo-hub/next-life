@@ -1798,9 +1798,10 @@ function wrapThai(ctx, text, maxW) {
 
 async function shareBlob(facts) {
   // ฟอนต์เว็บต้องโหลดก่อนวาด ไม่งั้น canvas ใช้ฟอนต์สำรอง · เน็ตช้าเกินรอวาดด้วยฟอนต์สำรองไปเลย
+  // ข้อความตัวอย่างต้องครอบทั้ง subset ไทยและละติน — load() โหลดเฉพาะ subset ที่ตัวอย่างใช้ ตัวเลข/อังกฤษจะตกฟอนต์สำรอง
   if (document.fonts) {
     await Promise.race([
-      Promise.all(SHARE_FONTS.map((f) => document.fonts.load(f, 'ชาติหน้า'))),
+      Promise.all(SHARE_FONTS.map((f) => document.fonts.load(f, 'ชาติหน้า NEXT LIFE 0123456789?'))),
       new Promise((r) => setTimeout(r, FONT_WAIT_MS)),
     ]).catch(() => {});
   }
@@ -1898,14 +1899,17 @@ const canShareFiles = () => {
 // วาดภาพไว้ก่อนตั้งแต่เปิดการ์ดตาย — Safari ให้เรียก share ได้เฉพาะช่วงสั้น ๆ หลังกด รอวาดตอนกดอาจหลุดสิทธิ์
 // ปุ่มบันทึกมีเสมอ: Chrome บนคอมก็แชร์ไฟล์ได้ แต่หน้าแชร์ของระบบไม่ได้ให้ไฟล์เก็บไว้
 function shareButtons(card) {
-  const ready = shareBlob(shareFacts(card));
-  ready.catch(() => {});
+  // วาดล้มแล้วล้าง promise ทิ้ง ไม่งั้นกดซ้ำจะได้ promise ที่ reject ค้างไว้ทุกครั้ง
+  let ready = null;
+  const blob = () => (ready ??= shareBlob(shareFacts(card)).catch((e) => { ready = null; throw e; }));
+  blob().catch(() => {});
   const name = `next-life-age-${card.age}.png`;
   const act = (label, fn) => {
     const b = button(label, null, async () => {
       b.disabled = true;
+      b.firstChild.textContent = label;
       try {
-        await fn(await ready);
+        await fn(await blob());
       } catch {
         b.firstChild.textContent = 'สร้างภาพไม่สำเร็จ';
       } finally {
