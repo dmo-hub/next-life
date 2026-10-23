@@ -370,13 +370,13 @@ events:
         clears_flags: [loan_shark]
         merit: [{cat: neutral}]
       - id: kids_help
-        text: "สารภาพกับลูก ขอให้ช่วย"
+        text: "สารภาพกับญาติ ขอให้ช่วย"
         requires: {flags: {has: [has_kids]}, reason: "ไม่มีลูกให้พึ่ง"}
         clears_flags: [loan_shark]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ลูกเงียบไปนาน แล้วโอนเงินปิดหนี้ให้ทั้งก้อน ขอแค่อย่าปิดบังกันอีก", effects: {settle: informal, relations: 1, happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ลูกโกรธจนไม่รับสายไปครึ่งปี หนี้ก็ยังอยู่ที่เดิม", effects: {relations: -2, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ญาติเงียบไปนาน แล้วโอนเงินปิดหนี้ให้ทั้งก้อน ขอแค่อย่าปิดบังกันอีก", effects: {settle: informal, relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ญาติโกรธจนไม่รับสายไปครึ่งปี หนี้ก็ยังอยู่ที่เดิม", effects: {relations: -2, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
       - id: pay_interest
         text: "จ่ายดอกไปก่อน"
         effects: {happiness: -1}
@@ -483,13 +483,13 @@ events:
           - {weight: 2, ok: true, text: "ตำรวจสั่งลดดอกตามกฎหมาย คนทวงเสียงอ่อนลงทันที เหลือแต่เงินต้นที่ค่อย ๆ คืน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ดอกลดจริง แต่กระถางต้นไม้หน้าบ้านถูกเตะแตกทั้งแถวในคืนเดียว", effects: {happiness: -2}, merit: [{cat: neutral}]}
       - id: kids_help
-        text: "สารภาพกับลูก ขอให้ช่วย"
+        text: "สารภาพกับญาติ ขอให้ช่วย"
         requires: {flags: {has: [has_kids]}, reason: "ไม่มีลูกให้พึ่ง"}
         clears_flags: [loan_shark]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ลูกรวมเงินกันปิดหนี้ให้ทั้งก้อน แล้วพาไปอยู่ด้วยกันที่บ้านลูก", effects: {settle: informal, relations: 2, happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ลูกเองก็ผ่อนบ้านอยู่ ช่วยได้แค่ค่ากับข้าว หนี้ก้อนเดิมยังอยู่ที่เดิม", effects: {relations: 1, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ญาติรวมเงินกันปิดหนี้ให้ทั้งก้อน แล้วพาไปอยู่ด้วยกันที่บ้านหลาน", effects: {settle: informal, relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ญาติเองก็ผ่อนบ้านอยู่ ช่วยได้แค่ค่ากับข้าว หนี้ก้อนเดิมยังอยู่ที่เดิม", effects: {relations: 1, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
       - id: sell_gold
         text: "ขายทองที่เก็บมาทั้งชีวิตใช้หนี้"
         effects: {settle: informal, happiness: -1}

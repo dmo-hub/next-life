@@ -36,7 +36,7 @@ events:
         merit: [{cat: help_others, level: 1}, {cat: sila, level: 1}]
         outcomes:
           - {weight: 1, ok: true, text: "ผู้ตรวจจับผู้รับเหมาได้คาหนังคาเขา ได้เลื่อนขั้นเป็นคนคุมงานตรวจรับทั้งหมด", effects: {income_mult: 1.2, network: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "เรื่องเงียบหาย ไม่กี่วันต่อมามีจดหมายไม่ลงชื่อมาถึงบ้าน เขียนว่ารู้นะว่าลูกเรียนที่ไหน", effects: {happiness: -1}, next: fraud_whistle_01, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เรื่องเงียบหาย ไม่กี่วันต่อมามีจดหมายไม่ลงชื่อมาถึงบ้าน เขียนว่ารู้นะว่าหลานเรียนที่ไหน", effects: {happiness: -1}, next: fraud_whistle_01, merit: [{cat: neutral}]}
 
   - id: fraud_whistle_01
     type: A
@@ -327,7 +327,7 @@ events:
         text: "ซัดทอดว่าคนอื่นสั่งให้ทำ"
         merit: [{cat: unjust_judgment, level: 2}]
         outcomes:
-          - {weight: 2, text: "รอดตัว คนที่ถูกซัดทอดติดคุกแทน ลูกเขาเรียนห้องเดียวกับลูกเรา", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "รอดตัว คนที่ถูกซัดทอดติดคุกแทน ลูกเขาเรียนห้องเดียวกับหลานเรา", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "หักมุม เขาอัดเสียงทุกครั้งที่คุยกันไว้ เปิดในศาลทีละไฟล์", effects: {job: labor, money: {unit: income_x, amount: -2}, relations: -3, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: state_witness
         text: "ขอเป็นพยาน ชี้ตัวการใหญ่"

@@ -158,7 +158,7 @@ events:
         sets_flags: [has_kids]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ปู่ย่าตายายช่วยเลี้ยงหลาน เงินเหลือเก็บทุกเดือน", effects: {relations: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
+          - {weight: 2, ok: true, text: "พ่อแม่ช่วยทำกับข้าวช่วยดูบ้าน เงินเหลือเก็บทุกเดือน", effects: {relations: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "แม่กับคู่ชีวิตเปิดศึกกันทุกมื้อ บ้านไม่เคยสงบ", effects: {relations: -2, happiness: -2}, merit: [{cat: neutral}]}
       - id: auction_house
         text: "ประมูลบ้านมือสองครึ่งราคา"

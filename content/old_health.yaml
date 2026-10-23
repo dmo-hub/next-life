@@ -24,10 +24,10 @@ events:
           - {weight: 2, text: "ตื่นมาอีกทีพูดไม่ได้ทั้งประโยค ต้องมีคนป้อนข้าว", effects: {health: -2, happiness: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: aspirin_wait
-        text: "กินแอสไพรินแล้วนั่งรอลูกกลับ"
+        text: "กินแอสไพรินแล้วนั่งรอหลานกลับ"
         outcomes:
-          - {weight: 2, ok: true, text: "อาการทุเลาลงก่อนลูกถึงบ้าน หมอบอกว่าโชคช่วยล้วน ๆ แต่ต้องกินยาไปตลอด", effects: {health: 1, knowledge: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ลูกติดประชุมกลับช้า กว่าจะถึงหมอแขนขวาก็ยกไม่ขึ้นแล้ว", effects: {health: -2, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "อาการทุเลาลงก่อนหลานถึงบ้าน หมอบอกว่าโชคช่วยล้วน ๆ แต่ต้องกินยาไปตลอด", effects: {health: 1, knowledge: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลานติดประชุมกลับช้า กว่าจะถึงหมอแขนขวาก็ยกไม่ขึ้นแล้ว", effects: {health: -2, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: grandkid_drive
         text: "ให้หลานขับมอเตอร์ไซค์พาไป"
@@ -45,7 +45,7 @@ events:
     when: {age: [65, 110]}
     multipliers: {stats: {knowledge: 0.8}}
     title: "กาต้มน้ำไหม้ครั้งที่สาม"
-    text: "เดือนนี้ลืมปิดเตาแก๊สสามครั้ง เรียกหลานด้วยชื่อแมวที่ตายไปนานแล้ว ลูกเริ่มกระซิบกันหลังบ้าน"
+    text: "เดือนนี้ลืมปิดเตาแก๊สสามครั้ง เรียกหลานด้วยชื่อแมวที่ตายไปนานแล้ว ญาติ ๆ เริ่มกระซิบกันหลังบ้าน"
     choices:
       - id: get_checked
         text: "ยอมไปตรวจสมองให้รู้เรื่อง"
@@ -159,9 +159,9 @@ events:
           - {weight: 1, text: "ติดเชื้อในช่องท้อง นอนไอซียูหลายคืน", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: child_kidney
-        text: "ลูกคนเล็กขอบริจาคไตให้"
+        text: "หลานคนเล็กขอบริจาคไตให้"
         outcomes:
-          - {weight: 2, ok: true, text: "ไตลูกเข้ากันได้ ผ่าตัดเสร็จ สองคนนอนเตียงติดกันหัวเราะทั้งคืน", multipliers: {karma: 1.4}, effects: {health: 3, relations: 3, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ไตหลานเข้ากันได้ ผ่าตัดเสร็จ สองคนนอนเตียงติดกันหัวเราะทั้งคืน", multipliers: {karma: 1.4}, effects: {health: 3, relations: 3, chronic: {health: 1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ผลเลือดไม่เข้ากัน แต่น้ำตาวันนั้นทำให้บ้านคืนดีกันหมด", effects: {health: -1, relations: 2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse
@@ -199,7 +199,7 @@ events:
         text: "ช่างมัน ยังขับรถไปตลาดเองได้"
         outcomes:
           - {weight: 1, ok: true, text: "รอดทุกเที่ยวแบบไม่มีใครเข้าใจ", effects: {happiness: 1, health: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ถอยชนเสาไฟหน้าบ้าน ลูกยึดกุญแจรถทันที", effects: {health: -1, relations: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ถอยชนเสาไฟหน้าบ้าน หลานยึดกุญแจรถทันที", effects: {health: -1, relations: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   - id: oldh_copd_01
@@ -273,7 +273,7 @@ events:
     weight: 3
     when: {flags: {has: [has_insurance]}}
     title: "กรมธรรม์ที่ลืมไปแล้ว"
-    text: "นอนโรงพยาบาลด้วยปอดอักเสบ ลูกค้นลิ้นชักเจอกรมธรรม์ที่จ่ายเบี้ยมาหลายสิบปี เจ้าหน้าที่ยิ้มกว้างแล้วถามว่าจะใช้วงเงินแบบไหน"
+    text: "นอนโรงพยาบาลด้วยปอดอักเสบ หลานค้นลิ้นชักเจอกรมธรรม์ที่จ่ายเบี้ยมาหลายสิบปี เจ้าหน้าที่ยิ้มกว้างแล้วถามว่าจะใช้วงเงินแบบไหน"
     choices:
       - id: private_room
         text: "ย้ายไปห้องเดี่ยวหมอเฉพาะทาง"
