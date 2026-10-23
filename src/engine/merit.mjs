@@ -30,6 +30,8 @@ const TH = {
   ทาน: 'dana', ศีล: 'sila', ภาวนา: 'bhavana', ดูแลพ่อแม่: 'care_parents', ช่วยคน: 'help_others', กลาง: 'neutral',
 };
 export const meritId = (cat) => TH[cat] ?? cat;
+const TH_BY_ID = Object.fromEntries(Object.entries(TH).map(([th, id]) => [id, th]));
+export const meritName = (id) => TH_BY_ID[id] ?? id;
 
 // กรรมตามทัน (ใบ 09): ตัวคูณโอกาสตายจากบัญชีสุทธิ อิ่มตัวที่ ±ref · บาปเพิ่มเสี่ยงแรงกว่าบุญลด (ทรงเดียวกับตัวคูณสุขภาพ)
 // เจ้าของเคาะค่าเริ่ม บาปสุด ×2.0 · บุญสุด ×0.75
@@ -84,7 +86,7 @@ export function recordMerit(ledger, tags = [], key = '') {
 }
 
 export const netLedger = (ledger) => ledger.merit - ledger.sin;
-const ledgerLevel = (ledger) => Math.max(-1, Math.min(1, netLedger(ledger) / KARMA.ref));
+export const ledgerLevel = (ledger) => Math.max(-1, Math.min(1, netLedger(ledger) / KARMA.ref));
 
 export function karmaMultiplier(ledger) {
   const x = ledgerLevel(ledger);

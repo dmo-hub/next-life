@@ -2,17 +2,19 @@ import { makeRng } from './rng.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
 import { pickRegion, regionRatio, classOdds } from './birth.mjs';
 import { monthlyWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER } from './finance.mjs';
-import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger } from './merit.mjs';
+import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
+import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard } from './career.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
 // ชื่อเดิม 3 ระดับ (ยากจน · ชนชั้นกลาง · ร่ำรวย) คงไว้ที่ระดับ 3 · 6 · 9 เนื้อหาที่อ้างชื่อเดิมจึงยังใช้ได้
 export const CLASSES = ['ยากไร้', 'ยากจนมาก', 'ยากจน', 'ค่อนข้างจน', 'ชนชั้นกลางล่าง', 'ชนชั้นกลาง', 'ชนชั้นกลางบน', 'มีอันจะกิน', 'ร่ำรวย', 'มั่งคั่ง'];
 // ค่าแถบเริ่มเป็นค่าตั้งของเกม ไม่มีสถิติให้แปลงตรง ๆ — ตั้งไว้ 3 จุด ระดับอื่นลากเส้นตรงผ่าน (ปลายสองข้างต่อเส้นออกไป)
+// คอนเน็คชั่นต่อท้ายเสมอ — ค่าเริ่มสุ่มทีละ key ตามลำดับ ค่าเดิม 4 ตัวจึงได้เลขสุ่มชุดเดิม
 const START_ANCHORS = [
-  [2, { health: 55, happiness: 50, knowledge: 30, relations: 60 }],
-  [5, { health: 65, happiness: 55, knowledge: 45, relations: 60 }],
-  [8, { health: 75, happiness: 60, knowledge: 60, relations: 55 }],
+  [2, { health: 55, happiness: 50, knowledge: 30, relations: 60, network: 20 }],
+  [5, { health: 65, happiness: 55, knowledge: 45, relations: 60, network: 40 }],
+  [8, { health: 75, happiness: 60, knowledge: 60, relations: 55, network: 65 }],
 ];
 // ค่าเริ่มของแต่ละคนสุ่ม ±START_JITTER รอบค่าของฐานะ — คนฐานะเดียวกันไม่เกิดมาเหมือนกันทุกคน
 export const START_JITTER = 8;
@@ -24,8 +26,9 @@ export function startStats(cls) {
 }
 // ตารางกลางแปลงระดับ ±1/±2/±3 เป็นตัวเลข (ใบ 07) ปรับสมดุลที่จุดเดียว · ไม่เป็นเส้นตรงเพื่อให้ ±3 เป็นเหตุใหญ่จริง
 export const LEVELS = { 1: 5, 2: 12, 3: 20 };
-const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations'];
-export const STAT_LABELS = { health: 'สุขภาพ', happiness: 'ความสุข', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', money: 'เงิน' };
+// network ไม่แตะการตาย (อ่านแค่ health) — เปิดทางงาน/ผลสมัครงานเท่านั้น
+export const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations', 'network'];
+export const STAT_LABELS = { health: 'สุขภาพ', happiness: 'ความสุข', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'คอนเน็คชั่น', money: 'เงิน' };
 
 // ช่วงชีวิต (ใบ 03) · ระหว่างชาติไม่ใช่ช่วงอายุ แต่จองชื่อไว้ให้ใบที่ทำหลังตาย
 export const STAGES = [
@@ -59,7 +62,7 @@ export const INCOME_MULT = [0.1, 5];
 // ผลเรื้อรังสะสมต่อค่าได้ไม่เกิน ±CHRONIC_MAX ระดับ · ไหลระดับละ CHRONIC_STEP หน่วยต่อปี · จางลงระดับละ 1 ทุก CHRONIC_FADE ปี
 // สุขภาพไหลเบากว่าค่าอื่น: การตายอ่านสุขภาพตัวเดียว ค่าแรงกว่านี้ดึงอายุตายของบอทหลุดด่าน 3b · ค่าอื่นไม่แตะการตาย
 const CHRONIC_MAX = 3;
-const CHRONIC_STEP = { health: 0.35, happiness: 1, knowledge: 1, relations: 1 };
+const CHRONIC_STEP = { health: 0.35, happiness: 1, knowledge: 1, relations: 1, network: 1 };
 const CHRONIC_FADE = 5;
 // ตัวคูณตามค่าสถานะเป็นขั้นบันได: คนเขียนเนื้อหารู้ว่าค่าเท่าไรถึงนับว่า "สูง/ต่ำ" ไม่ต้องคิดเลขยกกำลัง
 const STAT_HIGH = 70;
@@ -79,9 +82,18 @@ function weighted(rng, items, weights) {
   return items[items.length - 1];
 }
 
-// ช่วงอายุที่มีงานทำ [เริ่ม, เกษียณ) — แกนเติมเงินเก็บและหน้าจอแสดงรายได้จากเกณฑ์เดียวกัน
-export const WORK_AGES = [22, 60];
-export const isWorking = (age) => age >= WORK_AGES[0] && age < WORK_AGES[1];
+// เริ่มทำงานเมื่อได้งานแรก (เลิกเรียนอายุไหนก็เริ่มอายุนั้น) จนเกษียณ — แกนเติมเงินเก็บและหน้าจอแสดงรายได้จากเกณฑ์เดียวกัน
+export const RETIRE_AGE = 60;
+export const isWorking = (st, age = st.age) => st.workFrom !== null && age >= st.workFrom && age < RETIRE_AGE;
+
+// ป้ายสถานะงานบนจอ: ก่อนมีงานไม่โชว์อาชีพ (อาชีพตอนเกิดเป็นของครอบครัว ใช้คิดเงินติดตัวเท่านั้น)
+export function jobText(st, age = st.age) {
+  if (st.workFrom === null) {
+    if (st.school && age >= SCHOOL_FROM) return `กำลังเรียน${TRACKS[st.school].name}`;
+    return age < SCHOOL_FROM ? 'ยังไม่เข้าเรียน' : 'ยังไม่ทำงาน';
+  }
+  return age >= RETIRE_AGE ? `เกษียณ (เคยเป็น${st.occupationName})` : st.occupationName;
+}
 
 // เงินเก็บต่อปี เป็นบาทของปีนั้น: ค่าจ้างตามอาชีพ × ภาค ทั้งปี × อัตราออม (ใบ 14)
 export function yearlySaving(st, year = st.birthYear + st.age) {
@@ -123,9 +135,15 @@ export function newLife(seed, content) {
     region: region.name,
     ses: region.ses,
     cls,
+    // ก่อนได้งาน occupation = อาชีพของครอบครัว เป็นฐานของเงินในผลการ์ด (income_x) · ได้งานแล้วเปลี่ยนเป็นงานของตัวเอง
     occupation: occupation.id,
     occupationName: occupation.name,
-    edu: occupation.edu,
+    familyOcc: occupation.id,
+    workFrom: null,
+    // ช่วงเรียนปัจจุบัน (null = เลิกเรียนแล้ว) · วุฒิที่จบจริง (null = ยังไม่จบอะไร)
+    school: 'primary',
+    edu: null,
+    needJob: false,
     // สัดส่วนเงินต่อสินทรัพย์ ปรับคืนทุกต้นปี · ก่อนการ์ดจัดสรรใบแรกเงินอยู่ในเงินฝาก
     alloc: { deposit: 1 },
     lastAllocYear: null,
@@ -136,6 +154,7 @@ export function newLife(seed, content) {
     happiness: s.happiness,
     knowledge: s.knowledge,
     relations: s.relations,
+    network: s.network,
     money: 0,
     // เส้นสุขภาพของชีวิตนี้ถ้าไม่มีเหตุการณ์ใดเลย — ตัวคูณการตายวัดจากส่วนต่างกับเส้นนี้
     healthNatural: s.health,
@@ -222,12 +241,34 @@ export function riskLabel(outcomes) {
   return RISK.find(([max]) => spread <= max)[1];
 }
 
-// ป้ายผลบนตัวเลือก (ใบ 07): ผลคงที่ = ↑/↓ · ผลสุ่ม = ระดับเสี่ยงจากความกว้างของผล · ค่าที่เหตุการณ์ซ่อน = ? · หวยสายมู = ? เสมอ (ใบ 12)
-function choiceFx(ev, c) {
+// ป้ายผลบนตัวเลือก (ใบ 07): ผลคงที่ = ↑/↓ · ค่าที่เหตุการณ์ซ่อน = ? · หวยสายมู = ? เสมอ (ใบ 12)
+// ผลสุ่มที่มีทางสำเร็จ (ok) = % สำเร็จ · ผลสุ่มที่ไม่มีทางสำเร็จ = ระดับเสี่ยงจากความกว้างของผล
+function choiceFx(st, ev, c) {
   if (ev.belief?.kind === 'lottery_numen') return '?';
   const fixed = fixedFx(ev, c);
   if (!c.outcomes?.length) return fixed;
-  return [fixed, riskLabel(c.outcomes)].filter(Boolean).join(' · ');
+  return [fixed, outcomeFx(st, c)].filter(Boolean).join(' · ');
+}
+
+// ทางที่เอียงด้วยบัญชีบุญบาปโชว์ ? — % จะบอกยอดบัญชีที่ต้องซ่อนจนตาย
+function outcomeFx(st, c) {
+  if (!c.outcomes.some((o) => o.ok)) return riskLabel(c.outcomes);
+  if (c.outcomes.some((o) => o.multipliers?.karma || o.multipliers?.wish)) return 'สำเร็จ ?';
+  return `สำเร็จ ~${successPct(st, c)}%`;
+}
+
+// โอกาสได้ทางสำเร็จ ปัดเป็นขั้น PCT_STEP ไม่โชว์ 0/100 · ผลของตัวเลือกลงก่อนสุ่มทาง (choose)
+// จึงคิดบนค่าหลังผลตัวเลือกในสำเนา ไม่แตะ state จริง
+export const PCT_STEP = 5;
+export function successPct(st, c) {
+  const fx = c.effects ?? {};
+  const p = { ...st, flags: { ...st.flags } };
+  for (const k of STAT_KEYS) if (fx[k]) p[k] = clamp(p[k] + levelValue(fx[k]));
+  for (const f of c.sets_flags ?? []) p.flags[f] = true;
+  for (const f of c.clears_flags ?? []) delete p.flags[f];
+  const w = c.outcomes.map((o) => o.weight * poolMultiplier(p, o.multipliers));
+  const r = w.reduce((s, x, i) => s + (c.outcomes[i].ok ? x : 0), 0) / w.reduce((s, x) => s + x, 0);
+  return Math.max(PCT_STEP, Math.min(100 - PCT_STEP, Math.round((r * 100) / PCT_STEP) * PCT_STEP));
 }
 
 function fixedFx(ev, c) {
@@ -293,6 +334,19 @@ function applyEffects(st, fx = {}) {
   if (fx.money) st.money += moneyValue(st, fx.money);
   if (fx.invest) invest(st, fx.invest);
   if (fx.income_mult) st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * fx.income_mult));
+  if (fx.school) {
+    st.school = fx.school === 'none' ? null : fx.school;
+    if (!st.school && st.workFrom === null) st.needJob = true;
+  }
+  if (fx.job) {
+    const o = st.content.era.finance.occupations.find((x) => x.id === fx.job);
+    if (!o) throw new Error(`อาชีพไม่รู้จัก: ${fx.job}`);
+    st.occupation = o.id;
+    st.occupationName = o.name;
+    if (st.workFrom === null) st.workFrom = st.age;
+    // ตัวคูณรายได้ผูกกับงานเดิม เปลี่ยนงานแล้วเริ่มนับใหม่
+    st.incomeMult = 1;
+  }
   for (const [k, v] of Object.entries(fx.chronic ?? {})) {
     const lv = Math.max(-CHRONIC_MAX, Math.min(CHRONIC_MAX, (st.chronic[k] ?? 0) + v));
     if (lv) st.chronic[k] = lv;
@@ -356,7 +410,7 @@ function stepYear(st) {
       st.returns.push({ age: st.age, id, r: assetReturn(era, st.seed, id, year) });
     }
   } else if (st.money < 0) st.money *= 1 + lendingRate(era, st.seed, year);
-  if (isWorking(st.age)) st.money += yearlySaving(st, year);
+  if (isWorking(st)) st.money += yearlySaving(st, year);
   st.trail.push({ year, money: Math.round(st.money) });
 
   const stage = stageOf(st.age);
@@ -370,6 +424,16 @@ function stepYear(st) {
   if (stage !== prevStage) {
     st.due.push({ kind: 'stage', age: st.age, stage, text: `เข้าสู่ช่วง${stage}`, recap: stageRecap(st, st.age - 1) });
     st.stageMark = markStage(st);
+  }
+  // จบช่วงเรียน: ได้วุฒิ แล้วออกด่านเรียนต่อ หรือการ์ดหางานถ้าเป็นช่วงสุดท้าย
+  const track = st.school && TRACKS[st.school];
+  if (track && st.age === track.until) {
+    if (eduRank(track.edu) > eduRank(st.edu)) st.edu = track.edu;
+    if (track.gate) st.due.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
+    else {
+      st.school = null;
+      st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
+    }
   }
   if (isAllocAge(st.age)) st.due.push(allocCard(st, year, stage));
   // ทุกภาคเจอได้ เกิดซ้ำได้ (B14 ข้อ 13) · เว้นอย่างน้อย ERA_GAP ปีไม่ให้ถี่จนกลบเรื่องชีวิต — ปีที่เว้น เงินยังเสียตามปีต้นแบบ
@@ -450,7 +514,7 @@ function eventCard(st, ev) {
     title: ev.title ? fill(ev.title, st) : null,
     text: fill(ev.text, st),
     choices: ev.choices.map((c) => fill(c.text, st)),
-    fx: ev.choices.map((c) => choiceFx(ev, c)),
+    fx: ev.choices.map((c) => choiceFx(st, ev, c)),
     // เหตุผลที่ตัวเลือกกดไม่ได้ (null = กดได้) — หน้าจอแสดงเทาพร้อมเหตุผล
     locked: ev.choices.map((c) => lockReason(st, c)),
   });
@@ -467,6 +531,7 @@ function lockReason(st, c) {
     if (b.max !== undefined && st[k] > b.max) why.push(`${STAT_LABELS[k]}มากเกินไป`);
   }
   if (q.flags && !flagsOk(st, q.flags)) why.push('ยังไม่เข้าเงื่อนไข');
+  if (q.edu && eduRank(st.edu) < eduRank(q.edu)) why.push('วุฒิไม่ถึง');
   if (!why.length) return null;
   return q.reason ?? why.join(' · ');
 }
@@ -546,7 +611,10 @@ function poolMultiplier(st, m) {
   let x = m.class?.[st.cls] ?? 1;
   for (const [k, v] of Object.entries(m.stats ?? {})) x *= st[k] >= STAT_HIGH ? v : st[k] <= STAT_LOW ? 1 / v : 1;
   if (m.karma) x *= m.karma ** Math.sign(netLedger(st.ledger));
+  // ขอพร: เอียงตามบัญชีแบบต่อเนื่อง บุญน้อยเอียงน้อย บาปหนักกลับทิศ
+  if (m.wish) x *= m.wish ** ledgerLevel(st.ledger);
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
+  if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
   return x;
 }
 
@@ -566,6 +634,8 @@ function whenOk(st, when) {
   if (when.region && !when.region.includes(st.region)) return false;
   if (when.sex && !when.sex.includes(st.sex)) return false;
   for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;
+  // อาชีพนับเมื่อมีงานของตัวเองแล้ว — อาชีพครอบครัวก่อนทำงานไม่ทำให้การ์ดที่ทำงานออก
+  if (when.occupation && !(st.workFrom !== null && when.occupation.includes(st.occupation))) return false;
   return !when.flags || flagsOk(st, when.flags);
 }
 
@@ -607,6 +677,11 @@ export function choose(st, idx) {
     applyChoice(st, ev, o);
     if (o.text) st.queue.unshift({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) });
   }
+  // เลิกเรียนแล้วหางานทันที — การ์ดหางานต่อจากการ์ดผลของตัวเลือกนี้
+  if (st.needJob) {
+    st.needJob = false;
+    st.queue.splice(st.queue[0]?.kind === 'result' ? 1 : 0, 0, { kind: 'eraEvent', ev: jobCard(st), age: st.age });
+  }
 }
 
 function deathCard(st) {
@@ -625,6 +700,8 @@ function deathCard(st) {
   st.estate = { year, money: card.summary.money, moneyAtBirth: card.summary.moneyAtBirth };
   // ช่วงวัยสุดท้ายไม่มีการ์ดเปลี่ยนช่วงมาปิด — เล่าบนบันทึกการตายแทน
   card.recap = stageRecap(st, st.age);
+  card.job = jobText(st);
+  card.reckoning = reckoning(st.ledger);
   // ใบ 07: ตายตอนเด็กได้บันทึกสั้นบอกสถิติยุคนั้น
   if (st.age < 5) {
     const imr = infantMortality(era, st.sex, protoYear(era, st.seed, st.birthYear));
@@ -633,15 +710,28 @@ function deathCard(st) {
   return card;
 }
 
+// เฉลยบัญชีบุญบาป (ใบ 09 "เฉลยที่ศาลพญายม") — ออกบนการ์ดตายใบเดียว จนกว่าระหว่างชาติ (B06) จะรับไปเล่า
+// ชื่อ key เลี่ยงคำที่ด่านรั่วของ harness จับ · harness ยกเว้นช่องนี้บนการ์ดตายช่องเดียว
+export const RECKON_TOP = 3;
+function reckoning(ledger) {
+  const r1 = (v) => Math.round(v * 10) / 10;
+  const good = r1(ledger.merit), bad = r1(ledger.sin);
+  const top = Object.entries(ledger.byCat)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, RECKON_TOP)
+    .map(([id, v]) => ({ name: meritName(id), bad: SIN_CATS.includes(id), weight: r1(v) }));
+  return { good, bad, lean: good > bad ? 'บุญ' : bad > good ? 'บาป' : 'เสมอ', top };
+}
+
 // "ภาค" นำหน้าไม่เข้ากับกรุงเทพฯ และปริมณฑล
 export const regionLabel = (st) => (st.ses === 'bkk' ? st.region : `ภาค${st.region}`);
 
 export function profileText(st) {
-  return `เกิดปี ${st.birthYear} · ${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls} · ${st.occupationName}`;
+  return `เกิดปี ${st.birthYear} · ${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls} · ${jobText(st)}`;
 }
 
 export function statsOf(st) {
-  return { health: st.health, happiness: st.happiness, knowledge: st.knowledge, relations: st.relations, money: st.money };
+  return { health: st.health, happiness: st.happiness, knowledge: st.knowledge, relations: st.relations, network: st.network, money: st.money };
 }
 
 // harness วิ่งชีวิตผ่านฟังก์ชันชุดเดียวกับหน้าเว็บ ผู้เรียกส่งแค่ตัวเลือกเลือกตัวเลือก · onCard เห็นสถานะทุกการ์ด

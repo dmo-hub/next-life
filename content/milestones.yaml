@@ -20,26 +20,6 @@ events:
       - text: "ร้องไห้ไม่อยากไปโรงเรียน"
         effects: { happiness: -1, relations: 1 }
         merit: [{ cat: neutral }]
-  - id: first_job
-    type: A
-    category: work_money
-    stage: หนุ่มสาว
-    at_age: 22
-    years: [2500, 2650]
-    text: "อายุ {อายุ} ปี ถึงเวลาหางานทำ เงินติดตัว {เงิน} บาท"
-    choices:
-      - text: "รับงานมั่นคงเงินเดือนน้อย"
-        effects: { money: { unit: income_x, amount: 1 }, happiness: -1 }
-        merit: [{ cat: neutral }]
-      - text: "ลองงานเสี่ยงที่ผลตอบแทนสูง"
-        effects: { money: { unit: income_x, amount: 2.5 }, health: -1, relations: -1 }
-        merit: [{ cat: neutral }]
-      - text: "กลับไปช่วยกิจการที่บ้าน"
-        effects: { money: { unit: income_x, amount: 0.5 }, relations: 1 }
-        merit: [{ cat: neutral }]
-      - text: "เรียนต่ออีกสองปี"
-        effects: { knowledge: 2, happiness: -1 }
-        merit: [{ cat: neutral }]
   - id: retirement
     type: A
     category: work_money

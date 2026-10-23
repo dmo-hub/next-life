@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, isWorking, monthlyIncome } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText } from '../engine/index.mjs';
 
 const root = document.getElementById('app');
 let st;
@@ -16,7 +16,7 @@ const baht = (v) => `${Math.round(v).toLocaleString('en-US')} บาท`;
 // แถบค่าสถานะไม่มีตัวเลข (ใบ 06) — ผู้เล่นอ่านจากความยาวแถบเท่านั้น
 function stats(s) {
   const box = el('div', 'stats');
-  for (const k of ['health', 'happiness', 'knowledge', 'relations']) {
+  for (const k of STAT_KEYS) {
     const col = el('div');
     col.append(el('span', null, STAT_LABELS[k]));
     const track = el('div', 'bar');
@@ -84,6 +84,16 @@ function recap(r) {
   return box;
 }
 
+// เฉลยบัญชีบุญบาปตอนสิ้นชีวิต (ใบ 09) — ระหว่างชีวิตผู้เล่นไม่เคยเห็นตัวเลขนี้
+function reckoningBox(r) {
+  const box = el('div', 'recap');
+  box.append(el('div', 'h', 'บัญชีบุญบาป เฉลยตอนสิ้นชีวิต'));
+  box.append(el('p', null, `บุญ ${r.good} · บาป ${r.bad} · ${r.lean === 'เสมอ' ? 'บุญบาปพอ ๆ กัน' : `หนักไปทาง${r.lean}`}`));
+  if (r.top.length) box.append(list(r.top.map((t) => `${t.bad ? 'บาป' : 'บุญ'} · ${t.name} ${t.weight}`), 'picks'));
+  else box.append(el('p', 'sub', 'ชีวิตนี้ไม่ได้ทำบุญหรือบาปที่นับได้'));
+  return box;
+}
+
 function button(label, fx, onclick) {
   const b = el('button', 'choice');
   b.append(el('span', null, label));
@@ -118,19 +128,20 @@ function render(card) {
     box.append(top);
     body.append(el('span', 'stamp', 'ถึงแก่กรรม'));
     body.append(el('h3', null, `ตายอายุ ${card.age}`));
-    body.append(el('p', null, `${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls} · ${st.occupationName}`));
+    body.append(el('p', null, `${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
     body.append(el('p', 'sub', `เงินคงเหลือ ${baht(card.summary.money)} ≈ ${baht(card.summary.moneyAtBirth)} ค่าเงินปีเกิด`));
     if (card.note) body.append(el('p', 'sub', card.note));
+    body.append(reckoningBox(card.reckoning));
     if (card.recap) body.append(recap(card.recap));
     choices.append(button('เกิดใหม่', null, start));
   } else {
     top.append(el('b', null, `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, regionLabel(st)));
     box.append(top, stats(s));
     // มีงานทำแล้วบอกรายได้ต่อเดือน ก่อนทำงาน/หลังเกษียณไม่มีรายได้ จึงบอกเงินติดตัวแทน
-    const purse = isWorking(card.age)
+    const purse = isWorking(st, card.age)
       ? `รายได้ ${baht(monthlyIncome(st, year))}/เดือน`
       : `เงินติดตัว ${baht(s.money)}`;
-    box.append(el('div', 'meta', `ฐานะ${st.cls} · ${st.occupationName} · ${purse}`));
+    box.append(el('div', 'meta', `ฐานะ${st.cls} · ${jobText(st, card.age)} · ${purse}`));
     body.append(el('span', 'kicker', card.kind === 'event' ? (card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind]));
 
     if (card.kind === 'stage') {
