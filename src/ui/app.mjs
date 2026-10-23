@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, startAfterlife, nextAfterCard, chooseAfter, nextLife } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.1.04';
@@ -7,6 +7,8 @@ const APP_BUILD = '2026-10-23';
 const root = document.getElementById('app');
 document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`;
 let st;
+// ระหว่างชาติของชีวิตที่เพิ่งจบ (null = ยังมีชีวิต)
+let af = null;
 
 function el(tag, cls, text) {
   const e = document.createElement(tag);
@@ -93,10 +95,10 @@ function recap(r) {
   return box;
 }
 
-// เฉลยบัญชีบุญบาปตอนสิ้นชีวิต (ใบ 09) — ระหว่างชีวิตผู้เล่นไม่เคยเห็นตัวเลขนี้
+// เฉลยบัญชีบุญบาปที่ศาลพญายม (ใบ 09) — ระหว่างชีวิตผู้เล่นไม่เคยเห็นตัวเลขนี้
 function reckoningBox(r) {
   const box = el('div', 'recap');
-  box.append(el('div', 'h', 'บัญชีบุญบาป เฉลยตอนสิ้นชีวิต'));
+  box.append(el('div', 'h', 'บัญชีบุญบาป เฉลยที่ศาลพญายม'));
   box.append(el('p', null, `บุญ ${r.good} · บาป ${r.bad} · ${r.lean === 'เสมอ' ? 'บุญบาปพอ ๆ กัน' : `หนักไปทาง${r.lean}`}`));
   if (r.top.length) box.append(list(r.top.map((t) => `${t.bad ? 'บาป' : 'บุญ'} · ${t.name} ${t.weight}`), 'picks'));
   else box.append(el('p', 'sub', 'ชีวิตนี้ไม่ได้ทำบุญหรือบาปที่นับได้'));
@@ -344,7 +346,7 @@ function render(card) {
   const next = () => render(nextCard(st));
 
   if (card.kind === 'death') {
-    top.append(el('b', null, 'มรณบัตร'), el('small', null, `สิริอายุ ${card.age} ปี`));
+    top.append(el('b', null, 'มรณบัตร'), el('small', null, `${genLabel()}สิริอายุ ${card.age} ปี`));
     box.append(top);
     body.append(el('span', 'stamp', 'ถึงแก่กรรม'));
     body.append(el('h3', null, `ตายอายุ ${card.age}`));
@@ -355,11 +357,14 @@ function render(card) {
     if (card.summary.bankruptcies) body.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
     if (card.note) body.append(el('p', 'sub', card.note));
     body.append(titlesBox(card));
-    body.append(reckoningBox(card.reckoning));
-    if (card.recap) body.append(recap(card.recap));
-    choices.append(...shareButtons(card), button('เกิดใหม่', null, start));
+    // บัญชีบุญบาปเฉลยที่การ์ดศาลในระหว่างชาติ ไม่ใช่การ์ดตาย · ตายตอนเด็กได้บันทึกสั้น (ใบ 07) — ไม่มีสรุปช่วงวัย
+    if (card.recap && !card.short) body.append(recap(card.recap));
+    choices.append(button('ไปช่วงระหว่างชาติ', null, () => {
+      af = startAfterlife(st);
+      renderAfter(nextAfterCard(af));
+    }), ...shareButtons(card));
   } else {
-    top.append(el('b', null, `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, regionLabel(st)));
+    top.append(el('b', null, `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, `${genLabel()}${regionLabel(st)}`));
     box.append(top, stats(s));
     // มีงานทำแล้วบอกรายได้ต่อเดือน ก่อนทำงาน/หลังเกษียณไม่มีรายได้ จึงบอกเงินติดตัวแทน
     const purse = isWorking(st, card.age)
@@ -396,9 +401,55 @@ function render(card) {
   root.append(box);
 }
 
+const genLabel = () => (st.gen > 1 ? `รุ่นที่ ${st.gen} · ` : '');
+
+// ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะ — ชีวิตจบแล้ว
+const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ศาลพญายม', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ' };
+const AFTER_TOP = { verdict: 'ศาลพญายม', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา' };
+function renderAfter(card) {
+  root.replaceChildren();
+  const box = el('article', 'card b');
+  const top = el('div', 'top');
+  top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, `${genLabel()}ตายอายุ ${st.age}`));
+  const body = el('div', 'body');
+  const choices = el('div', 'choices');
+  const next = () => renderAfter(nextAfterCard(af));
+  body.append(el('span', 'kicker', card.kind === 'scene' ? AFTER_KICKER[card.scene] : AFTER_TOP[card.kind]));
+  if (card.title) body.append(el('h3', null, card.title));
+  if (card.kind === 'verdict') body.append(el('h3', null, `ภูมิ${card.realm}`));
+  body.append(el(card.title || card.kind === 'verdict' ? 'p' : 'h3', card.title || card.kind === 'verdict' ? null : 'lead', card.text));
+  if (card.reckoning) body.append(reckoningBox(card.reckoning));
+  if (card.lineage) {
+    body.append(el('div', 'kicker', 'ผังตระกูล'));
+    body.append(list(card.lineage, 'picks'));
+  }
+  if (card.note) body.append(el('p', 'note', card.note));
+  if (card.done) {
+    choices.append(button('ไปเกิด', null, () => {
+      st = nextLife(af);
+      af = null;
+      render(nextCard(st));
+    }));
+    choices.append(button('เริ่มตระกูลใหม่', null, start));
+  } else if (card.choices.length) {
+    card.choices.forEach((c, i) => {
+      const why = card.locked?.[i];
+      const b = button(c, why ?? card.fx?.[i], () => {
+        chooseAfter(af, i);
+        next();
+      });
+      if (why) b.disabled = true;
+      choices.append(b);
+    });
+  } else choices.append(button('ต่อไป', null, next));
+  box.append(top, body, choices);
+  root.append(box);
+}
+
 function start() {
   // seed จากเวลาเฉพาะฝั่งหน้าเว็บ แกนเกมเองไม่แตะนาฬิกา
   st = newLife((Date.now() ^ (performance.now() * 1000)) >>> 0, CONTENT);
+  af = null;
   render(nextCard(st));
 }
 
