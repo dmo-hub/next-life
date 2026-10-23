@@ -993,7 +993,7 @@ function newLife(seed, content, heir = null) {
   // ค่าเริ่มสุ่มจาก stream แยก — ไม่กินเลขสุ่มของโลก ลำดับสุ่มการตายจึงเหมือนก่อนมีการสุ่มนี้
   const jit = makeRng(seed ^ 0x6a09e667);
   const s = Object.fromEntries(Object.entries(startStats(cls)).map(([k, v]) => [k, clamp(v + (jit.next() * 2 - 1) * START_JITTER + (heir?.bonus[k] ?? 0))]));
-  const occupation = pickOccupation(era, seed, cls);
+  const occupation = (heir?.occupation && era.finance.occupations.find((o) => o.id === heir.occupation)) ?? pickOccupation(era, seed, cls);
   // พ่อแม่ใช้ stream แยก — การมีพ่อแม่ไม่กินเลขสุ่มของโลก ลำดับสุ่มการตายของตัวเองจึงไม่ขยับ
   // อายุพ่อแม่ตอนเกิดเป็นค่าตั้งของเกม (ยังไม่มีข้อมูลอายุแม่ตอนคลอดรายยุคในชุดข้อมูล)
   const famRng = makeRng(seed ^ 0x3c6ef372);
@@ -2118,8 +2118,10 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   const sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง';
-  let cls, region, birthYear, parents = null, legacy = null;
+  let cls, region, birthYear, parents = null, legacy = null, occupation = null;
   if (af.path === 'child') {
+    // บ้านของรุ่นถัดไปคือบ้านของคนในชาติก่อน — อาชีพของครอบครัวจึงเป็นงานสุดท้ายของเขา ไม่สุ่มใหม่
+    occupation = st.occupation;
     const kidAge = Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     // ปีเกมไม่เกินปีเกิดสุดท้ายในข้อมูล — เนื้อหา/ข้อมูลยุคครอบถึงช่วงนั้น · หน้าจอไม่แสดงปีอยู่แล้ว
     birthYear = Math.min(lastBirth, st.birthYear + kidAge);
@@ -2154,6 +2156,7 @@ function makeHeir(af, r) {
     birthYear,
     parents,
     legacy,
+    occupation,
     bonus,
     ledger: carryLedger(st.ledger, net, r),
     carried: r,
@@ -2630,7 +2633,7 @@ function titlesOf(st) {
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.17';
+const APP_VERSION = 'v0.2.18';
 const APP_BUILD = '2026-10-24';
 
 const root = document.getElementById('app');
