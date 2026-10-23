@@ -36,21 +36,66 @@ function stats(s) {
   return box;
 }
 
-// กราฟเงินของช่วงที่ผ่านไป — จุดเดียวไม่มีเส้นให้วาด
-function sparkline(series) {
+// ป้ายแกนเงินสั้นพอวางข้างกราฟ: 15k · 1.2 ล้าน
+function shortBaht(v) {
+  const a = Math.abs(v), sign = v < 0 ? '−' : '';
+  const num = (x) => String(Number(x.toFixed(x < 10 ? 1 : 0)));
+  if (a >= 1e6) return `${sign}${num(a / 1e6)} ล้าน`;
+  if (a >= 1e3) return `${sign}${num(a / 1e3)}k`;
+  return `${sign}${Math.round(a)}`;
+}
+
+// ขั้นแกนตั้งเลขกลม (1 · 2 · 2.5 · 5 × 10^n) ให้ได้ราว 2 ช่อง
+function niceStep(span) {
+  const raw = span / 2, p = 10 ** Math.floor(Math.log10(raw));
+  return [1, 2, 2.5, 5, 10].map((m) => m * p).find((s) => s >= raw);
+}
+
+const svgEl = (tag, attrs, text) => {
+  const n = document.createElementNS(SVG, tag);
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+  if (text != null) n.textContent = text;
+  return n;
+};
+
+// กราฟเงินของช่วงที่ผ่านไป — แกนตั้งรวมศูนย์เสมอ ส่วนต่างเล็กจึงดูเล็ก · viewBox คงสัดส่วนให้ตัวหนังสือไม่บิด
+// จุดเดียวไม่มีเส้นให้วาด
+function sparkline(series, fromAge, toAge) {
   if (series.length < 2) return null;
-  const vals = series.map((p) => p.money);
-  const lo = Math.min(...vals), hi = Math.max(...vals);
-  const svg = document.createElementNS(SVG, 'svg');
-  svg.setAttribute('class', 'spark');
-  svg.setAttribute('viewBox', '0 0 100 40');
-  svg.setAttribute('preserveAspectRatio', 'none');
-  svg.setAttribute('role', 'img');
-  svg.setAttribute('aria-label', `เงิน ${baht(vals[0])} → ${baht(vals.at(-1))}`);
-  const line = document.createElementNS(SVG, 'polyline');
-  line.setAttribute('points', vals.map((v, i) => `${(i / (vals.length - 1)) * 100},${hi === lo ? 20 : 38 - ((v - lo) / (hi - lo)) * 36}`).join(' '));
-  svg.append(line);
+  const nom = series.map((p) => p.money);
+  const real = series.every((p) => p.real != null) ? series.map((p) => p.real) : null;
+  const all = real ? nom.concat(real) : nom;
+  let lo = Math.min(0, ...all), hi = Math.max(0, ...all);
+  if (hi === lo) hi = 1;
+  const step = niceStep(hi - lo);
+  lo = Math.floor(lo / step) * step;
+  hi = Math.ceil(hi / step) * step;
+  const W = 320, H = 118, L = 46, R = 8, T = 6, B = 20;
+  const x = (i) => L + (i / (series.length - 1)) * (W - L - R);
+  const y = (v) => T + ((hi - v) / (hi - lo)) * (H - T - B);
+  const svg = svgEl('svg', { class: 'spark', viewBox: `0 0 ${W} ${H}`, role: 'img',
+    'aria-label': `เงินติดตัว ${baht(nom[0])} → ${baht(nom.at(-1))}` });
+  if (lo < 0) svg.append(svgEl('rect', { class: 'neg', x: L, y: y(0), width: W - L - R, height: y(lo) - y(0) }));
+  for (let v = lo; v <= hi + step / 2; v += step) {
+    svg.append(svgEl('line', { class: v === 0 ? 'zero' : 'grid', x1: L, x2: W - R, y1: y(v), y2: y(v) }));
+    svg.append(svgEl('text', { class: 'ty', x: L - 4, y: y(v) + 3.5 }, v === 0 ? '0' : shortBaht(v)));
+  }
+  // จุดสุดท้ายคือเงินตอนสิ้นอายุ toAge — ป้ายจึงยึดช่วงอายุเดียวกับหัวกล่อง ไม่นับจากจำนวนจุด
+  const ageX = (a) => L + ((a - fromAge) / Math.max(toAge - fromAge, 1)) * (W - L - R);
+  const ages = toAge - fromAge >= 10 ? [fromAge, Math.round((fromAge + toAge) / 2), toAge] : [fromAge, toAge];
+  const anchor = (a) => (a === fromAge ? 'start' : a === toAge ? 'end' : 'middle');
+  for (const a of ages) svg.append(svgEl('text', { class: 'tx', x: ageX(a), y: H - 6, 'text-anchor': anchor(a) }, `อายุ ${a}`));
+  const path = (vals, cls) => svgEl('polyline', { class: cls, points: vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ') });
+  if (real) svg.append(path(real, 'real'));
+  svg.append(path(nom, 'nom'));
+  for (const i of [0, series.length - 1]) svg.append(svgEl('circle', { class: 'dot', cx: x(i), cy: y(nom[i]), r: 3 }));
   return svg;
+}
+
+function sparkLegend() {
+  const p = el('p', 'note spark-key');
+  p.append(el('span', 'k-nom', 'เงินติดตัว'), ' · ', el('span', 'k-real', 'เทียบค่าเงินปีเกิด'));
+  return p;
 }
 
 function list(items, cls = 'items') {
@@ -82,8 +127,8 @@ function recap(r) {
   const m = r.money;
   box.append(el('p', 'sub', `เงิน ${baht(m.from)} → ${baht(m.to)}`));
   box.append(el('p', 'note', `เทียบค่าเงินปีเกิด ${baht(m.fromAtBirth)} → ${baht(m.toAtBirth)}`));
-  const chart = sparkline(r.moneySeries);
-  if (chart) box.append(chart);
+  const chart = sparkline(r.moneySeries, r.fromAge, r.toAge);
+  if (chart) box.append(chart, sparkLegend());
   if (r.items.length) box.append(list(r.items));
   if (r.disclaimer) box.append(el('p', 'note', r.disclaimer));
   if (r.picks.length) {

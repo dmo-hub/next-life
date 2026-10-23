@@ -210,7 +210,7 @@ export function newLife(seed, content, heir = null) {
   // การ์ดเปิดชีวิตมาก่อนการ์ดมรดกตอนแรกเกิด — ต้องเล่ามรดกก่อน receiveLegacy ล้าง st.legacy
   st.due.push(introCard(st, heir));
   if (st.legacy?.age === 0) receiveLegacy(st, birthYear, stageOf(0));
-  st.trail.push({ year: birthYear, money: Math.round(st.money) });
+  st.trail.push({ year: birthYear, money: Math.round(st.money), real: Math.round(st.money / st.price) });
   st.stageMark = markStage(st);
   return st;
 }
@@ -473,7 +473,8 @@ function stepYear(st) {
   st.debts = st.debts.filter((d) => !debtDone(d));
   const stage = stageOf(st.age);
   if (st.legacy && st.age >= st.legacy.age) receiveLegacy(st, year, stage);
-  st.trail.push({ year, money: Math.round(st.money) });
+  // real = ค่าเงินปีเกิดจาก st.price ที่มีอยู่แล้ว (ไม่ดึงเลขสุ่ม) ให้กราฟวาดเส้นที่สอง
+  st.trail.push({ year, money: Math.round(st.money), real: Math.round(st.money / st.price) });
 
   checkBankrupt(st, year, stage);
   const tone = omenTone(st.ledger);
