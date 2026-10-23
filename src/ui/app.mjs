@@ -478,6 +478,8 @@ function render(card) {
         if (why) b.disabled = true;
         choices.append(b);
       });
+      // การ์ดเล่าเรื่อง (choices: []) ไม่มีปุ่มให้เลือก — ต้องมีทางไปใบถัดไป
+      if (!card.choices.length) choices.append(button('ต่อไป', null, next));
     }
   }
   box.append(body, choices);

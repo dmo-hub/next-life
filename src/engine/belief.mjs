@@ -79,10 +79,10 @@ const LOSE_TEXT = [
 // มูลค่ารางวัลเป็นตัวเลขเฉพาะปีที่ใช้ตารางรางวัลชุดปัจจุบันแล้ว — ตรงกับด่าน build ข้อ (ค) ของเนื้อหา
 const PRIZE_TEXT_FROM = 2560;
 function prizeText(st, p, baht) {
-  const amount = st.birthYear + st.age >= PRIZE_TEXT_FROM ? `${Math.round(baht).toLocaleString('en-US')} บาท` : null;
+  const amount = st.birthYear + st.age >= PRIZE_TEXT_FROM ? ` ${Math.round(baht).toLocaleString('en-US')} บาท` : null;
   if (p.id === 'first') return `ตรวจผลซ้ำหลายรอบ ใบที่ซื้อถูก${p.name}จริง ๆ ได้เงิน${amount ?? 'ก้อนใหญ่จนตั้งตัวไม่ถูก'} โชคมาหาแบบไม่ทันตั้งตัว`;
   if (!p.small) return `ใบที่ซื้อถูก${p.name} ได้เงิน${amount ?? 'ก้อนโต'} ดวงงวดนี้เข้าข้างจนตกใจ`;
-  return `ใบที่ซื้อถูก${p.name} ได้เงิน${amount ? ` ${amount}` : 'มาก้อนเล็ก ๆ'} พอให้หายใจคล่องขึ้นอีกนิด`;
+  return `ใบที่ซื้อถูก${p.name} ได้เงิน${amount ?? 'มาก้อนเล็ก ๆ'} พอให้หายใจคล่องขึ้นอีกนิด`;
 }
 
 // ซื้อหวยสายมูหนึ่งใบ: จ่ายราคาใบ แล้วจับรางวัลด้วย rng ของโลก (เป็นผลของการเลือก) · คืนการ์ดผล
