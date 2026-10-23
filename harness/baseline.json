@@ -1,0 +1,35 @@
+{
+  "n": 20000,
+  "seed": 1,
+  "deadEvents": [
+    "era_econ_oil1_kid_01",
+    "era_econ_oil1_adult_01"
+  ],
+  "deadChoices": [
+    "after_realm_hell_02#0",
+    "after_realm_hell_02#1",
+    "lot_pool_split_01#split_by_stake",
+    "lot_jackpot_kin_01#give_everyone",
+    "lot_jackpot_kin_01#quit_open_shop",
+    "lot_jackpot_kin_01#hide_money",
+    "lot_jackpot_kin_01#friend_invest"
+  ],
+  "deadFlags": [
+    "vow_broken",
+    "vow_open",
+    "hope_set",
+    "has_amulet"
+  ],
+  "statBad": 0,
+  "gate4Share": 0.9924,
+  "gate3bWorst": 1.064,
+  "ageMean": {
+    "สุ่ม": 69.963,
+    "สายบุญ": 73.375,
+    "สายบาป": 58.29,
+    "สายเงิน": 60.337,
+    "สายครอบครัว": 70.957,
+    "สายสุขภาพ": 77.183
+  },
+  "at": "2026-10-23"
+}
