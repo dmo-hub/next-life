@@ -9,7 +9,7 @@ const opt = (name, def) => {
   const i = args.indexOf(`--${name}`);
   return i >= 0 ? Number(args[i + 1]) : def;
 };
-const n = opt('n', 20000);
+const n = opt('n', 50000);
 const seed = opt('seed', 1);
 const randomBot = (card, rng) => rng.int(0, card.choices.length - 1);
 const median = (xs) => {
