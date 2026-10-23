@@ -4,9 +4,11 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { RULES, DOC_SHAPE, lintContext, lintDocs, formatProblem } from '../src/node/lint/index.mjs';
 import { strings } from '../src/node/lint/util.mjs';
-import { loadEvents, loadEra } from '../src/node/load.mjs';
+import { loadEvents, loadEra, loadContent } from '../src/node/load.mjs';
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
-import { MERIT_CATS, MAX_LEN, MIN_CHOICES } from '../src/node/lint/vocab.mjs';
+import { schoolGate, jobCard, TRACKS, EDU } from '../src/engine/career.mjs';
+import { newLife, CLASSES } from '../src/engine/life.mjs';
+import { MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES } from '../src/node/lint/vocab.mjs';
 import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA } from '../src/engine/merit.mjs';
 
 const root = new URL('../', import.meta.url);
@@ -81,6 +83,36 @@ for (const s of [...seenLabels, DISCLAIMER]) {
   if (s.length > MAX_LEN.choice) fails.push(`การ์ดจัดสรร: ยาวเกิน ${MAX_LEN.choice} "${s}"`);
 }
 rows.push(['การ์ดจัดสรร 2500–2700', `${seenLabels.size} ข้อความ`]);
+
+// ด่านเรียนต่อ + การ์ดหางานสร้างในแกน ไม่ผ่านด่านเนื้อหา — ตรวจทุกช่วงเรียน × ทุกฐานะ × คอนเน็คชั่น/วุฒิหลายระดับ:
+// ≥4 ตัวเลือก · มีทางไม่ล็อก · ยาว · คำต้องห้าม · ผล job/school ชี้ของที่มีจริง
+const career = { ...loadContent(), events: [] };
+const occIds = career.era.finance.occupations.map((o) => o.id);
+const careerTexts = new Set();
+let careerCards = 0;
+function checkCareer(ev, where) {
+  careerCards++;
+  if (ev.choices.length < MIN_CHOICES) fails.push(`${where}: ${ev.choices.length} ตัวเลือก`);
+  if (ev.choices.every((c) => c.requires)) fails.push(`${where}: ล็อกได้ทุกตัวเลือก`);
+  if (ev.text.length > MAX_LEN.text) fails.push(`${where}: ข้อความยาวเกิน ${MAX_LEN.text}`);
+  for (const c of ev.choices) {
+    if (c.text.length > MAX_LEN.choice) fails.push(`${where}: ตัวเลือกยาวเกิน ${MAX_LEN.choice} "${c.text}"`);
+    for (const node of [c, ...(c.outcomes ?? [])]) {
+      if (node.text) careerTexts.add(node.text);
+      const fx = node.effects ?? {};
+      if (fx.job !== undefined && !occIds.includes(fx.job)) fails.push(`${where}: อาชีพ ${fx.job} ไม่มีจริง`);
+      if (fx.school !== undefined && !SCHOOL_VALUES.includes(fx.school)) fails.push(`${where}: ช่วงเรียน ${fx.school} ไม่มีจริง`);
+    }
+  }
+}
+for (const cls of CLASSES) for (const network of [0, 50, 100]) for (const [i, edu] of [null, ...EDU].entries()) {
+  checkCareer(jobCard(Object.assign(newLife(i + 1, career), { cls, network, edu, age: 22 })), `การ์ดหางาน ${cls} คอนเน็คชั่น ${network} วุฒิ ${edu}`);
+}
+for (const [t, track] of Object.entries(TRACKS)) {
+  if (track.gate) checkCareer(schoolGate(Object.assign(newLife(1, career), { school: t, age: track.until })), `ด่านเรียนต่อ ${t}`);
+}
+for (const s of careerTexts) for (const b of ctx.banned) if (b.re.test(s)) fails.push(`การ์ดเรียน/งาน: โดนคำต้องห้าม ${b.id} "${s}"`);
+rows.push(['การ์ดเรียน/งานจากแกน', `${careerCards} ใบ · ${careerTexts.size} ข้อความ`]);
 
 // ทะเบียนธงต้องไม่มีชื่อค้างที่ไม่มีเนื้อหาไหนใช้ — ตรวจกับ content/ จริง (ด่านรายไฟล์มองไม่เห็นทั้งชุด)
 const realDocs = dir('content/').map((f) => load('content/', f));

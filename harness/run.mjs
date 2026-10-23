@@ -19,7 +19,7 @@ const randomBot = (card, rng) => {
 
 let sum = 0, min = Infinity, max = -Infinity, over60 = 0, under5 = 0;
 // ค่าแถบต้องอยู่ใน 0–100 ทุกการ์ด (การ์ดสรุปออกทุกปี จึงเท่ากับตรวจทุกปี) · เงินต้องเป็นตัวเลขจำกัด
-const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations'];
+const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations', 'network'];
 let statChecks = 0, statBad = 0, yearsCovered = 0, yearsLived = 0;
 const checkStats = (card, st) => {
   if (card.kind === 'summary') yearsCovered += card.age - card.fromAge;

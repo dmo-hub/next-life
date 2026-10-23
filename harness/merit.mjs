@@ -45,7 +45,9 @@ const BOTS = {
 
 // ค่าบัญชีห้ามออกไปกับการ์ดหรือค่าที่หน้าจอวาด — ตรวจทุก key ทุกชั้น
 const LEAK = /ledger|merit|sin|karma|byCat|broken|omenTone|omenAge/i;
-const STAT_SHOWN = ['health', 'happiness', 'knowledge', 'relations', 'money'];
+const STAT_SHOWN = ['health', 'happiness', 'knowledge', 'relations', 'network', 'money'];
+// ข้อยกเว้นช่องเดียว: เฉลยบัญชีบนการ์ดตาย (ใบ 09 เฉลยตอนสิ้นชีวิต) · โผล่บนการ์ดอื่น = รั่ว
+const REVEAL = 'reckoning';
 function* keys(v) {
   if (Array.isArray(v)) for (const x of v) yield* keys(x);
   else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) { yield k; yield* keys(x); }
@@ -54,14 +56,17 @@ function* keys(v) {
 const f = (v, d = 2) => v.toFixed(d);
 const q = (xs, p) => xs[Math.min(xs.length - 1, Math.floor(p * xs.length))];
 const out = {};
-let leaks = 0, cardsSeen = 0;
+let leaks = 0, cardsSeen = 0, reveals = 0;
 for (const [name, pick] of Object.entries(BOTS)) {
   const r = { nets: [], ageDiff: 0, age: 0, vow: 0, omen: { good: 0, bad: 0 }, omenLives: 0, mult: 0 };
   for (let i = 0; i < n; i++) {
     let omens = 0;
     const onCard = (card, st) => {
       cardsSeen++;
-      for (const k of keys(card)) if (LEAK.test(k)) leaks++;
+      const { [REVEAL]: reveal, ...rest } = card;
+      for (const k of keys(rest)) if (LEAK.test(k)) leaks++;
+      if (card.kind === 'death') reveals += reveal ? 1 : 0;
+      else if (reveal !== undefined) leaks++;
       const shown = Object.keys(statsOf(st));
       if (shown.length !== STAT_SHOWN.length || shown.some((k) => !STAT_SHOWN.includes(k))) leaks++;
       if (card.kind === 'omen') {
@@ -99,4 +104,7 @@ console.log(`ด่าน 5: vow_broken ตั้งได้จริง ${vowS
 if (!(out['สุ่ม'].vow > 0)) fail++;
 console.log(`ค่าบัญชีไม่ออกไปกับการ์ด/ค่าที่หน้าจอวาด: ตรวจ ${cardsSeen.toLocaleString('en-US')} การ์ด รั่ว ${leaks} → ${leaks ? 'ตก' : 'ผ่าน'}`);
 if (leaks) fail++;
+// ข้อยกเว้นต้องไม่ว่าง — การ์ดตายทุกใบต้องมีเฉลย ไม่งั้นด่านรั่วผ่านเพราะไม่มีอะไรให้ยกเว้น
+console.log(`เฉลยบัญชีบนการ์ดตาย: ${reveals.toLocaleString('en-US')} จาก ${(n * Object.keys(BOTS).length).toLocaleString('en-US')} ชีวิต → ${reveals === n * Object.keys(BOTS).length ? 'ผ่าน' : 'ตก'}`);
+if (reveals !== n * Object.keys(BOTS).length) fail++;
 if (fail) process.exitCode = 1;

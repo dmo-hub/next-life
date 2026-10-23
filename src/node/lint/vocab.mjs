@@ -1,10 +1,13 @@
 // คำศัพท์ปิดของ schema เหตุการณ์ (ใบ 07 + ส่วนต่อ belief ใบ 12) — ทุกกติกาอ่านจากที่นี่ที่เดียว
 import { STAGES, AFTERLIFE_STAGE, CLASSES, SEXES } from '../../engine/life.mjs';
 import { MAX_AGE } from '../../engine/era.mjs';
+import { EDU, TRACKS } from '../../engine/career.mjs';
 
-export const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations'];
+export const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations', 'network'];
 export const EFFECT_KEYS = [...STAT_KEYS, 'money'];
-export { CLASSES, SEXES };
+export { CLASSES, SEXES, EDU };
+// ผล school: ช่วงเรียนที่ย้ายไป · none = เลิกเรียน (แกนต่อการ์ดหางานให้)
+export const SCHOOL_VALUES = [...Object.keys(TRACKS), 'none'];
 
 // ช่วงอายุของแต่ละช่วงวัย ใช้ตรวจว่า at_age อยู่ในช่วงที่ประกาศ
 export const STAGE_AGES = Object.fromEntries(

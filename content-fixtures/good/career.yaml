@@ -1,0 +1,25 @@
+# ช่องอาชีพ/การเรียน/คอนเน็คชั่น (B15) แบบถูกต้อง — การ์ดเปลี่ยนงานที่ workflow เนื้อหาจะเขียน
+events:
+  - id: work_job_switch_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "บริษัทคู่แข่งโทรมาชวนไปทำงาน เงินเดือนสูงกว่าเดิม แต่ต้องย้ายไปอยู่ต่างจังหวัด"
+    when: {occupation: [clerk, technician], stats: {network: {min: 40}}}
+    weight: 1
+    multipliers: {occupation: {technician: 1.5}, stats: {network: 1.5}}
+    choices:
+      - text: "ย้ายไปเป็นผู้จัดการสาขา"
+        requires: {edu: อุดมศึกษา, reason: "ต้องจบปริญญาตรี"}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.6}}, text: "ได้ตำแหน่ง ลูกน้องสิบคน", effects: {job: manager, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปถึงแล้วตำแหน่งถูกยุบ ต้องกลับที่เดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - {text: "อยู่ที่เดิมต่อ", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - {text: "ลาออกไปเรียนต่อภาคค่ำ", effects: {school: uni, knowledge: 1}, merit: [{cat: neutral}]}
+      - text: "ขอพรก่อนตัดสินใจ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {wish: 2}, text: "ได้ตำแหน่งใหม่ที่ดีกว่าที่คิด", effects: {job: manager}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีอะไรเปลี่ยน", effects: {happiness: -1}, merit: [{cat: neutral}]}

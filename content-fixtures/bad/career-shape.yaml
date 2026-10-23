@@ -1,0 +1,39 @@
+# อาชีพไม่รู้จัก · ช่วงเรียนผิด · ok ไม่ใช่ true · วุฒิผิด · ตัวคูณอาชีพไม่รู้จัก — ใบ ok ใช้ทุกช่องถูกต้อง
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    when: {occupation: [astronaut]}
+    multipliers: {occupation: {astronaut: 2}}
+    choices:
+      - {text: "ทางที่หนึ่ง", effects: {job: astronaut}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", effects: {school: phd}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", requires: {edu: ปริญญาเอก}, merit: [{cat: neutral}]}
+      - text: "ทางที่สี่"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: false, text: "ผลหนึ่ง", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผลสอง", merit: [{cat: neutral}]}
+      - text: "ทางที่ห้า"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ผลหนึ่ง", merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ผลสอง", merit: [{cat: neutral}]}
+  - id: ok_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    when: {occupation: [clerk, manager]}
+    multipliers: {occupation: {manager: 1.5}}
+    choices:
+      - {text: "ทางที่หนึ่ง", effects: {job: technician}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", effects: {school: none}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", requires: {edu: อุดมศึกษา}, merit: [{cat: neutral}]}
+      - text: "ทางที่สี่"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {occupation: {clerk: 2}, wish: 2, stats: {network: 1.5}}, text: "ผลหนึ่ง", effects: {job: manager, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผลสอง", merit: [{cat: neutral}]}

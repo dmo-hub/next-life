@@ -1,7 +1,7 @@
 // กติกาโครงข้อมูล: ฟิลด์บังคับ · ชนิด · key นอกรายการ · ระดับผล · หน่วยเงิน · ช่องแทนค่า
 import {
   STAT_KEYS, EFFECT_KEYS, CLASSES, SEXES, STAGE_AGES, STAGE_NAMES, CATEGORIES, PLACEHOLDERS,
-  ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE,
+  ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE, EDU, SCHOOL_VALUES,
 } from './vocab.mjs';
 import { INCOME_MULT } from '../../engine/life.mjs';
 import { ASSETS } from '../../engine/finance.mjs';
@@ -10,20 +10,20 @@ import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placehold
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires'],
-  outcome: ['weight', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic'],
+  outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   money: ['unit', 'amount', 'ref_year'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family'],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation'],
   bound: ['min', 'max'],
   whenFlags: ['has', 'not'],
   family: ['role', 'age', 'alive', 'health', 'relations'],
-  multipliers: ['class', 'stats', 'karma', 'family_fame', 'flags'],
+  multipliers: ['class', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish'],
   repeat: ['gap', 'max'],
-  requires: ['money', 'stats', 'flags', 'reason'],
+  requires: ['money', 'stats', 'flags', 'edu', 'reason'],
   belief: ['kind', 'tradition', 'outside_canon', 'vow', 'trigger', 'cap_per_life', 'prize_table', 'stake', 'odds_modifier'],
   vow: ['deadline_years', 'due_event', 'redeem_full_cost', 'redeem_light_cost', 'defer_once'],
   trigger: ['money_state'],
@@ -100,7 +100,7 @@ function checkMultipliers(m, at, r) {
     if (m[k] === undefined) continue;
     if (!isObj(m[k]) || Object.entries(m[k]).some(([kk, v]) => !of.includes(kk) || !positive(v))) r(`${at}.${k}`, `ต้องเป็น {${of.join('|')}: เลขบวก}`);
   }
-  for (const k of ['karma', 'family_fame']) if (m[k] !== undefined && !positive(m[k])) r(`${at}.${k}`, 'ต้องเป็นเลขบวก');
+  for (const k of ['karma', 'family_fame', 'wish']) if (m[k] !== undefined && !positive(m[k])) r(`${at}.${k}`, 'ต้องเป็นเลขบวก');
   if (m.flags !== undefined && (!isObj(m.flags) || Object.entries(m.flags).some(([f, v]) => !FLAG_RE.test(f) || !positive(v)))) r(`${at}.flags`, 'ต้องเป็น {ชื่อธง: เลขบวก}');
 }
 
@@ -342,14 +342,14 @@ export const rules = [
   },
   {
     id: 'choice-lock',
-    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
+    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
     event(e, ctx, r) {
       const cs = choicesOf(e);
       for (const { c, path } of cs) {
         const q = c.requires;
         if (q === undefined) continue;
         const at = `${path}.requires`;
-        if (!isObj(q) || !['money', 'stats', 'flags'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats หรือ flags อย่างน้อยหนึ่งอย่าง'); continue; }
+        if (!isObj(q) || !['money', 'stats', 'flags', 'edu'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags หรือ edu อย่างน้อยหนึ่งอย่าง'); continue; }
         if (q.money !== undefined && !(isMoney(q.money) && q.money.amount > 0)) r(`${at}.money`, 'ต้องเป็นเงินมีหน่วย amount > 0');
         if (q.stats !== undefined && (!isObj(q.stats) || Object.entries(q.stats).some(([k, b]) => !STAT_KEYS.includes(k) || !bound(b) || (b.min === undefined && b.max === undefined)))) r(`${at}.stats`, 'ต้องเป็น {ค่าสถานะ: {min, max}} 0–100');
         if (q.flags !== undefined && (!isObj(q.flags) || ['has', 'not'].some((k) => q.flags[k] !== undefined && !Array.isArray(q.flags[k])))) r(`${at}.flags`, 'flags ต้องเป็น {has: [...], not: [...]}');
@@ -358,6 +358,36 @@ export const rules = [
         if (q.reason !== undefined && !(typeof q.reason === 'string' && q.reason.trim())) r(`${at}.reason`, 'reason ต้องเป็นข้อความ');
       }
       if (cs.length && cs.every(({ c }) => c.requires !== undefined)) r('.choices', 'ทุกตัวเลือกล็อกได้ — ต้องมีตัวเลือกที่ไม่มี requires อย่างน้อย 1 ตัว ไม่งั้นการ์ดค้าง');
+    },
+  },
+  {
+    id: 'career-shape',
+    desc: `อาชีพ/การเรียน (B15): effects.job = id อาชีพใน data/finance.json · effects.school = ${SCHOOL_VALUES.join('|')} · when.occupation = รายการ id อาชีพ · multipliers.occupation = {id อาชีพ: เลขบวก} · requires.edu = ${EDU.join('|')} · outcome ok = true เท่านั้น (ทางสำเร็จที่ใช้คิด %)`,
+    event(e, ctx, r) {
+      const occ = ctx.occupations;
+      const w = isObj(e.when) ? e.when.occupation : undefined;
+      if (w !== undefined && !nonEmptySubset(w, occ)) r('.when.occupation', `ต้องเป็นรายการจาก ${occ.join(' ')}`);
+      const mults = [[e.multipliers, '.multipliers']];
+      for (const { node, path } of effectSites(e)) {
+        if (path.includes('outcomes')) {
+          mults.push([node.multipliers, `${path}.multipliers`]);
+          if (node.ok !== undefined && node.ok !== true) r(`${path}.ok`, 'ok ใช้ได้แค่ true (ทางที่ไม่สำเร็จไม่ต้องใส่)');
+        }
+        const fx = isObj(node.effects) ? node.effects : {};
+        if (fx.job !== undefined && !occ.includes(fx.job)) r(`${path}.effects.job`, `อาชีพ "${fx.job}" ไม่รู้จัก (${occ.join(' ')})`);
+        if (fx.school !== undefined && !SCHOOL_VALUES.includes(fx.school)) r(`${path}.effects.school`, `ต้องเป็น ${SCHOOL_VALUES.join(' ')}`);
+      }
+      for (const [m, at] of mults) {
+        const o = isObj(m) ? m.occupation : undefined;
+        if (o !== undefined && (!isObj(o) || Object.entries(o).some(([k, v]) => !occ.includes(k) || !positive(v)))) r(`${at}.occupation`, 'ต้องเป็น {id อาชีพ: เลขบวก}');
+      }
+      for (const { c, path } of choicesOf(e)) {
+        const q = isObj(c.requires) ? c.requires : {};
+        if (q.edu !== undefined && !EDU.includes(q.edu)) r(`${path}.requires.edu`, `ต้องเป็น ${EDU.join(' ')}`);
+      }
+      for (const { c, path } of choicesOf(e)) {
+        if (Array.isArray(c.outcomes) && c.outcomes.length && c.outcomes.every((o) => isObj(o) && o.ok === true)) r(`${path}.outcomes`, 'ทุกทางเป็น ok — % สำเร็จจะเป็น 100 เสมอ ไม่ต้องเป็นผลสุ่ม');
+      }
     },
   },
   {
