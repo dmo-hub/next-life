@@ -88,6 +88,16 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .b .choice { border:1px solid var(--bronze2); background:var(--lacquer2); color:var(--cream); }
 .b .choice:hover, .b .choice:focus-visible { border-color:var(--gold); background:#2E2218; outline:none; }
 .b .choice .fx { color:var(--gold); }
+.b .picks, .b .tree summary { color:#E3D6B3; }
+.b .recap { border:1px solid var(--bronze); background:var(--lacquer2); }
+.b .recap .h { color:var(--gold); }
+.scene { height:96px; background:var(--lacquer2); border-bottom:1px solid var(--bronze); }
+.scene svg { display:block; width:100%; height:100%; }
+.scale { display:flex; gap:12px; }
+.scale > div { flex:1; min-width:0; border:1px solid var(--bronze); padding:10px; display:flex; flex-direction:column; gap:4px; font-size:13px; overflow-wrap:anywhere; }
+.scale > div.heavy { border-color:var(--gold); }
+.scale b { color:var(--gold2); font-family:Srisakdi,serif; font-size:18px; }
+.scale .sum { font-size:15px; font-weight:600; color:var(--cream); }
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
 .a .choice:disabled, .b .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
 </style>

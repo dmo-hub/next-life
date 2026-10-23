@@ -88,6 +88,16 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .b .choice { border:1px solid var(--bronze2); background:var(--lacquer2); color:var(--cream); }
 .b .choice:hover, .b .choice:focus-visible { border-color:var(--gold); background:#2E2218; outline:none; }
 .b .choice .fx { color:var(--gold); }
+.b .picks, .b .tree summary { color:#E3D6B3; }
+.b .recap { border:1px solid var(--bronze); background:var(--lacquer2); }
+.b .recap .h { color:var(--gold); }
+.scene { height:96px; background:var(--lacquer2); border-bottom:1px solid var(--bronze); }
+.scene svg { display:block; width:100%; height:100%; }
+.scale { display:flex; gap:12px; }
+.scale > div { flex:1; min-width:0; border:1px solid var(--bronze); padding:10px; display:flex; flex-direction:column; gap:4px; font-size:13px; overflow-wrap:anywhere; }
+.scale > div.heavy { border-color:var(--gold); }
+.scale b { color:var(--gold2); font-family:Srisakdi,serif; font-size:18px; }
+.scale .sum { font-size:15px; font-weight:600; color:var(--cream); }
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
 .a .choice:disabled, .b .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
 </style>
@@ -1947,7 +1957,7 @@ function playAfterlife(st, pickChoice, onCard) {
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.00';
+const APP_VERSION = 'v0.2.01';
 const APP_BUILD = '2026-10-23';
 
 const root = document.getElementById('app');
@@ -2042,13 +2052,46 @@ function recap(r) {
 }
 
 // เฉลยบัญชีบุญบาปที่ศาลพญายม (ใบ 09) — ระหว่างชีวิตผู้เล่นไม่เคยเห็นตัวเลขนี้
+// วางเป็นตาชั่งสองฝั่ง (ต้นแบบการ์ดศาล) — ฝั่งที่หนักกว่าได้ขอบทอง ผู้เล่นเห็นทิศก่อนอ่านตัวเลข
 function reckoningBox(r) {
   const box = el('div', 'recap');
   box.append(el('div', 'h', 'บัญชีบุญบาป เฉลยที่ศาลพญายม'));
-  box.append(el('p', null, `บุญ ${r.good} · บาป ${r.bad} · ${r.lean === 'เสมอ' ? 'บุญบาปพอ ๆ กัน' : `หนักไปทาง${r.lean}`}`));
-  if (r.top.length) box.append(list(r.top.map((t) => `${t.bad ? 'บาป' : 'บุญ'} · ${t.name} ${t.weight}`), 'picks'));
-  else box.append(el('p', 'sub', 'ชีวิตนี้ไม่ได้ทำบุญหรือบาปที่นับได้'));
+  const scale = el('div', 'scale');
+  for (const [side, total, bad] of [['บุญ', r.good, false], ['บาป', r.bad, true]]) {
+    const pan = el('div', r.lean === side ? 'heavy' : null);
+    pan.append(el('b', null, side), el('span', 'sum', String(total)));
+    const cats = r.top.filter((t) => t.bad === bad);
+    for (const t of cats) pan.append(el('span', null, `${t.name} ${t.weight}`));
+    if (!cats.length) pan.append(el('span', 'sub', '—'));
+    scale.append(pan);
+  }
+  box.append(scale);
+  box.append(el('p', 'sub', r.lean === 'เสมอ' ? 'บุญบาปพอ ๆ กัน' : `หนักไปทาง${r.lean}`));
+  if (!r.top.length) box.append(el('p', 'sub', 'ชีวิตนี้ไม่ได้ทำบุญหรือบาปที่นับได้'));
   return box;
+}
+
+// แถบภาพพิกเซลศาลพญายม (ต้นแบบการ์ด B2) — ทำเครื่องหมายฉากศาลให้ต่างจากการ์ดระหว่างชาติใบอื่น
+const COURT_PX = [
+  [0, 25, 76, 5, '#3A2C1F'], [30, 6, 16, 19, '#5A1A14'], [28, 4, 20, 3, '#D9B45A'], [34, 1, 8, 3, '#F0D78C'],
+  [36, 10, 4, 4, '#C98A5A'], [35, 14, 6, 7, '#2F2A6B'], [36, 9, 4, 1, '#F0D78C'],
+  [12, 17, 3, 3, '#C98A5A'], [11, 20, 5, 5, '#EFE3C2'],
+  [4, 3, 1, 1, '#F0D78C'], [68, 5, 1, 1, '#F0D78C'], [60, 2, 1, 1, '#F0D78C'], [18, 6, 1, 1, '#F0D78C'],
+];
+function courtScene() {
+  const wrap = el('div', 'scene');
+  const svg = document.createElementNS(SVG, 'svg');
+  svg.setAttribute('viewBox', '0 0 76 30');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMax meet');
+  svg.setAttribute('shape-rendering', 'crispEdges');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const [x, y, w, h, fill] of COURT_PX) {
+    const r = document.createElementNS(SVG, 'rect');
+    for (const [k, v] of Object.entries({ x, y, width: w, height: h, fill })) r.setAttribute(k, v);
+    svg.append(r);
+  }
+  wrap.append(svg);
+  return wrap;
 }
 
 // ลวดลาย/ฉายามาจาก B10 (card.pattern · card.titles เรียงหายากก่อน) — ก่อนนั้นใช้ค่าวาง ??? แบบช่องที่ยังไม่เปิดในสมุดฉายา
@@ -2372,6 +2415,7 @@ function renderAfter(card) {
   const body = el('div', 'body');
   const choices = el('div', 'choices');
   const next = () => renderAfter(nextAfterCard(af));
+  const court = card.kind === 'verdict' || card.scene === 'devaduta';
   body.append(el('span', 'kicker', card.kind === 'scene' ? AFTER_KICKER[card.scene] : AFTER_TOP[card.kind]));
   if (card.title) body.append(el('h3', null, card.title));
   if (card.kind === 'verdict') body.append(el('h3', null, `ภูมิ${card.realm}`));
@@ -2400,7 +2444,9 @@ function renderAfter(card) {
       choices.append(b);
     });
   } else choices.append(button('ต่อไป', null, next));
-  box.append(top, body, choices);
+  box.append(top);
+  if (court) box.append(courtScene());
+  box.append(body, choices);
   root.append(box);
 }
 
