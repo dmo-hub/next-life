@@ -207,7 +207,9 @@ export const TITLES = [
   { id: 'first_grad', tier: 'หายาก', name: 'บัณฑิตคนแรกของบ้าน', hint: 'เรียนจบสูงกว่าที่บ้านเคยมีใครได้', test: (f) => f.st.edu === 'อุดมศึกษา' && LOW_FAMILY_OCC.includes(f.st.familyOcc) },
   { id: 'debt_bearer', tier: 'ทั่วไป', name: 'ผู้แบกหนี้จนวันสุดท้าย', hint: 'ยังผ่อนไม่หมดจนวันที่จากไป', test: (f) => f.debt > 0 || f.worth < 0 },
   { id: 'scarred', tier: 'หายาก', name: 'แผลในใจที่ผ่านมาได้', hint: 'เคยถูกรังแก แต่จากไปอย่างมีความสุข', test: (f) => has(f, 'bullied') && f.st.happiness >= 75 },
-  { id: 'kind_fooled', tier: 'ทั่วไป', name: 'ใจดีจนโดนหลอก', hint: 'ไว้ใจคนผิดเรื่องเงิน', test: (f) => has(f, 'ponzi_victim', 'caught_fraud') },
+  { id: 'kind_fooled', tier: 'ทั่วไป', name: 'ใจดีจนโดนหลอก', hint: 'ไว้ใจคนผิดเรื่องเงิน', test: (f) => has(f, 'ponzi_victim') },
+  // caught_fraud = ทุจริตเองแล้วถูกจับ/ไล่ออก — แยกจากฉายาเหยื่อ ใช้คำเห็นใจแบบเดียวกับด้านลบตัวอื่น
+  { id: 'stumbled', tier: 'หายาก', name: 'ผู้เคยก้าวพลาด', hint: 'เคยถูกจับได้เพราะเลือกทางลัด', test: (f) => has(f, 'caught_fraud') },
   { id: 'guarantor', tier: 'หายาก', name: 'ผู้แบกหนี้แทนคนอื่น', hint: 'เซ็นค้ำให้คนที่ไว้ใจ', test: (f) => has(f, 'guarantor') },
   { id: 'lone_walker', tier: 'หายาก', name: 'ผู้เดินทางคนเดียว', hint: 'อยู่จนแก่โดยไม่มีครอบครัวของตัวเอง', test: (f) => f.age >= 70 && !has(f, 'has_kids', 'married') && f.st.relations < 20 },
   { id: 'comeback', tier: 'ตำนาน', name: 'ล้มแล้วลุก', hint: 'ล้มละลายแล้วกลับมามีเงินเหลือ', test: (f) => f.st.bankruptcies >= 1 && f.debt <= 0 && f.worth >= 0 },
