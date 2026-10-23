@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.2.16';
@@ -105,7 +105,6 @@ function list(items, cls = 'items') {
 }
 
 // สรุปช่วงวัยที่ผ่านมา: แถบตอนนี้ + ขีดตำแหน่งต้นช่วง — บอกว่าเปลี่ยนไปมากน้อยโดยไม่มีตัวเลข
-const RECAP_PICKS = 8;
 function recap(r) {
   const box = el('div', 'recap');
   box.append(el('div', 'h', `ช่วง${r.stage} · อายุ ${r.fromAge}–${r.toAge}`));
@@ -132,10 +131,18 @@ function recap(r) {
   if (r.items.length) box.append(list(r.items));
   if (r.disclaimer) box.append(el('p', 'note', r.disclaimer));
   if (r.picks.length) {
-    box.append(el('div', 'h', 'สิ่งที่เลือก'));
-    const shown = r.picks.slice(-RECAP_PICKS).map((p) => `อายุ ${p.age} · ${p.text}`);
-    if (r.picks.length > RECAP_PICKS) shown.unshift(`… ก่อนหน้านี้อีก ${r.picks.length - RECAP_PICKS} ข้อ`);
-    box.append(list(shown, 'picks'));
+    // ภาพรวมเล่าเป็นทิศ ไม่มีตัวเลข · รายการเต็มยังเปิดดูได้ — คนที่อยากไล่ย้อนทีละข้อไม่เสียข้อมูล
+    const sum = stageSummary(st, r.stage, r.fromAge, r.toAge);
+    box.append(el('div', 'h', 'ภาพรวมสิ่งที่เลือก'));
+    box.append(list(sum.lines, 'items lean'));
+    if (sum.highlights.length) {
+      box.append(el('div', 'h', 'เรื่องที่โดดเด่น'));
+      box.append(list(sum.highlights.map((p) => `อายุ ${p.age} · ${p.text}`), 'picks'));
+    }
+    const all = el('details', 'all-picks');
+    all.append(el('summary', null, `ดูทุกสิ่งที่เลือก (${r.picks.length} เรื่อง)`));
+    all.append(list(r.picks.map((p) => `อายุ ${p.age} · ${p.text}`), 'picks'));
+    box.append(all);
   } else box.append(el('p', 'sub', 'ช่วงนี้ไม่มีเรื่องให้ตัดสินใจ'));
   return box;
 }
