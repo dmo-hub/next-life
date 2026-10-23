@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.2.02';
@@ -138,28 +138,28 @@ function courtScene() {
   return wrap;
 }
 
-// ลวดลาย/ฉายามาจาก B10 (card.pattern · card.titles เรียงหายากก่อน) — ก่อนนั้นใช้ค่าวาง ??? แบบช่องที่ยังไม่เปิดในสมุดฉายา
-const TITLE_STUB = {
-  pattern: { name: '???', hint: 'ลวดลายชีวิตยังไม่เปิด' },
-  titles: [
-    { name: '???', tier: 'ตำนาน' },
-    { name: '???', tier: 'หายาก' },
-    { name: '???', tier: 'หายาก' },
-    { name: '???', tier: 'ทั่วไป' },
-    { name: '???', tier: 'ทั่วไป' },
-  ],
-};
-const lifeTitles = (card) => ({ pattern: card.pattern ?? TITLE_STUB.pattern, titles: card.titles ?? TITLE_STUB.titles });
+// ตายก่อนมีตัวเลือกหลังอายุ 18 พอ = ไม่มีลวดลาย (titles.mjs) — บอกเหตุแทนช่องว่าง
+const NO_PATTERN = { name: 'ยังไม่ทันเห็นลวดลาย', hint: 'ชีวิตนี้สั้นเกินกว่าจะเห็นว่าเดินทางไหน' };
+// ลวดลาย/ฉายาคิดครั้งเดียวต่อการ์ดตาย แล้วลงสมุดฉายา — กดย้อน/วาดซ้ำไม่นับซ้ำ
+function lifeTitles(card) {
+  if (!card.lifeTitles) {
+    const t = titlesOf(st);
+    card.lifeTitles = { ...t, pattern: t.pattern ?? NO_PATTERN };
+    bookAdd(t);
+  }
+  return card.lifeTitles;
+}
 const TITLES_SHOWN = 3;
 
-// บันทึกการตาย (ใบ 04): ลวดลาย 1 + ฉายาเด่น 3 + ปุ่มดูทั้งหมด
+// บันทึกการตาย (ใบ 04): ลวดลาย 1 + ฉายาเด่น 3 + ปุ่มดูทั้งหมด · ฉายาตระกูลแยกหัวข้อ
 function titlesBox(card) {
-  const { pattern, titles } = lifeTitles(card);
+  const { pattern, titles, family } = lifeTitles(card);
   const box = el('div', 'recap titles');
   box.append(el('div', 'h', 'ลวดลายชีวิต'));
   box.append(el('p', 'pattern', pattern.name));
   if (pattern.hint) box.append(el('p', 'note', pattern.hint));
   box.append(el('div', 'h', 'ฉายาเด่น'));
+  if (!titles.length) box.append(el('p', 'sub', 'ชีวิตนี้ยังไม่ได้ฉายา'));
   const ul = el('ul', 'picks');
   const rows = titles.map((t) => el('li', null, `${t.name} · ${t.tier}`));
   rows.forEach((li, i) => {
@@ -175,7 +175,53 @@ function titlesBox(card) {
     };
     box.append(more);
   }
+  if (family.length) {
+    box.append(el('div', 'h', 'ฉายาตระกูล'));
+    box.append(list(family.map((t) => t.name), 'picks'));
+  }
+  box.append(bookBox());
   return box;
+}
+
+// สมุดฉายา (ใบ 04): เก็บในเครื่องผู้เล่น · ตัวที่ยังไม่เคยได้เป็น ??? พร้อมคำใบ้
+// อ่าน/เขียนพังได้ (โหมดส่วนตัว · ปิด storage) — หน้ายังเล่นได้ สมุดแค่ไม่จำ
+const BOOK_KEY = 'next-life-book-v1';
+function bookRead() {
+  try {
+    const b = JSON.parse(localStorage.getItem(BOOK_KEY) ?? '{}');
+    return { p: b.p ?? [], t: b.t ?? [], f: b.f ?? [] };
+  } catch {
+    return { p: [], t: [], f: [] };
+  }
+}
+function bookAdd(t) {
+  const b = bookRead();
+  const add = (xs, id) => (xs.includes(id) ? xs : [...xs, id]);
+  if (t.pattern) b.p = add(b.p, t.pattern.id);
+  for (const x of t.titles) b.t = add(b.t, x.id);
+  for (const x of t.family) b.f = add(b.f, x.id);
+  try {
+    localStorage.setItem(BOOK_KEY, JSON.stringify(b));
+  } catch {
+    // ไม่มีที่เก็บ — สมุดเห็นแค่ชีวิตนี้
+  }
+}
+function bookBox() {
+  const b = bookRead();
+  const d = el('details', 'book');
+  const all = ALL_PATTERNS.length + TITLES.length + FAMILY_TITLES.length;
+  d.append(el('summary', null, `สมุดฉายา · เปิดแล้ว ${b.p.length + b.t.length + b.f.length}/${all}`));
+  const section = (head, items, got, tierOf) => {
+    d.append(el('div', 'h', head));
+    d.append(list(items.map((x) => {
+      const tier = tierOf ? ` · ${tierOf(x)}` : '';
+      return got.includes(x.id) ? `${x.name}${tier}` : `???${tier} — ${x.hint}`;
+    }), 'picks'));
+  };
+  section('ลวดลายชีวิต', ALL_PATTERNS, b.p);
+  section('ฉายา', [...TITLES].sort((x, y) => TIERS.indexOf(x.tier) - TIERS.indexOf(y.tier)), b.t, (x) => x.tier);
+  section('ฉายาตระกูล', FAMILY_TITLES, b.f);
+  return d;
 }
 
 // ภาพแชร์รับเฉพาะช่องที่ไล่ชื่อไว้ตรงนี้ — บัญชีบุญบาปบนการ์ดตายหลุดลงภาพไม่ได้ แม้แกนเกมจะเติมช่องใหม่ให้การ์ด

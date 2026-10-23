@@ -253,7 +253,8 @@ function makeHeir(af, r) {
   const kin = (k) => (af.path === 'child' && (k === 'relations' || k === 'network') ? Math.max(-FATE.bonusCap, Math.min(FATE.bonusCap, (st[k] - 50) * FATE.kin)) : 0);
   const bonus = Object.fromEntries(STAT_KEYS.map((k) => [k, x * FATE.stat + (af.bonus[k] ?? 0) + kin(k)]));
   const gen = st.gen ?? 1;
-  const lineage = [...(st.lineage ?? []), { gen, sex: st.sex, cls: st.cls, age: st.age, realm: realm.name, path: af.path }];
+  // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน
+  const lineage = [...(st.lineage ?? []), { gen, sex: st.sex, cls: st.cls, age: st.age, realm: realm.name, path: af.path, broke: (st.estate?.money ?? 0) < 0 }];
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1,
