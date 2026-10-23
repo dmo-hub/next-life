@@ -1,4 +1,5 @@
-# กลุ่ม era_econ_ · การ์ดบ้านเมืองเศรษฐกิจ 3 เหตุการณ์ × (เด็ก ครอบครัวเลือก + ผู้ใหญ่)
+# กลุ่ม era_econ_ · การ์ดบ้านเมืองเศรษฐกิจ 3 เหตุการณ์ × (เด็ก ครอบครัวเลือก + ผู้ใหญ่ + ชรา)
+# การ์ดชราไม่มี income_mult (เกษียณแล้วไม่มีค่าจ้างให้ขึ้นลง) · ไม่ตั้งธงธุรกิจ/หนี้ · พูดถึงหลาน/ญาติ ไม่ใช่ลูก (ไม่ใช่ทุกคนมีลูก)
 # วิกฤตน้ำมันครั้งแรก (2516) ไม่มีการ์ด: ปีเกมทุกปีแม็ปเข้าช่วงปีต้นแบบ era.future (เริ่ม 2520) เหตุการณ์ปีก่อนนั้นจึงไม่เคยเกิด
 # การ์ดเด็กตั้งได้แค่ธง "โตมากับร้านของพ่อแม่" (street_vendor · online_seller) · own_business/in_debt ตั้งเฉพาะการ์ดผู้ใหญ่
 events:
@@ -105,7 +106,8 @@ events:
         requires: {money: {unit: income_x, amount: 1}, reason: "ไม่มีเงินก้อนพอช้อนซื้อ"}
         outcomes:
           - {weight: 1, ok: true, multipliers: {occupation: {service: 1.5, manager: 1.5}}, text: "ฟื้นร้านที่เจ้าของทิ้งได้สำเร็จ สิบปีต่อมาคุณมีร้านสามสาขา", effects: {happiness: 2, income_mult: 1.6, money: {unit: income_x, amount: -1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
-          - {weight: 2, text: "ราคายังดิ่งไม่หยุด กิจการที่ซื้อมาลากคุณจมไปด้วย", effects: {health: -1, happiness: -2, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          # ไม่ตั้ง in_debt: ทางนี้บังคับมีเงินก้อนก่อนเข้า คนมีเงินมากเสียแค่บางส่วน — ติดลบจริงยอดเงินบอกเอง
+          - {weight: 2, text: "ราคายังดิ่งไม่หยุด กิจการที่ซื้อมาลากเงินเก็บของคุณจมไปด้วย", effects: {health: -1, happiness: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ไปเป็นลูกจ้างรายวันก่อสร้าง"
         effects: {health: 1, happiness: -1, income_mult: 0.75}
@@ -173,6 +175,86 @@ events:
         outcomes:
           - {weight: 2, ok: true, text: "ของเก่าในบ้านขายหมดเกลี้ยง เลยรับของคนอื่นมาขายต่อจนเป็นร้านออนไลน์", effects: {happiness: 1, money: {unit: income_x, amount: 0.4}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
           - {weight: 1, text: "โดนลูกค้าโกงโอนเงินปลอม ของหายไปสามกล่อง", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ── ชรา 60+ (ทั้งสามเหตุการณ์) ──
+  - id: era_econ_oil2_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    era: oil_crisis_2
+    when: {age: [60, 120]}
+    title: "ค่าไฟกินเงินเก็บ"
+    text: "อายุ {อายุ} น้ำมันแพงซ้ำสอง ค่าไฟค่ารถขึ้นทุกเดือน หลานกับญาติที่โรงงานลดกะทยอยกลับมาอาศัยบ้านหลังเดิม เงินเก็บหลังเกษียณที่คิดว่าพอใช้เริ่มบางลง"
+    choices:
+      - text: "เอาเงินเก็บช่วยหลานที่ตกงาน"
+        effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: help_others, level: 1}]
+      - text: "ปิดไฟเร็ว ลดกับข้าวเหลือสองอย่าง"
+        effects: {health: -1, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
+      - text: "ปลูกผักเลี้ยงไก่หลังบ้าน"
+        outcomes:
+          - {weight: 2, ok: true, text: "ไข่กับผักพอกินทั้งบ้าน เหลือแบ่งเพื่อนบ้านทุกเช้า", effects: {health: 1, relations: 1, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หมาข้างบ้านลอดรั้วมาเอาไก่ไปหมดเล้า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "ลงวงแชร์ดอกสูงในซอย"
+        outcomes:
+          - {weight: 1, ok: true, text: "วงแชร์เปียได้ตามนัด ได้ดอกมาจ่ายค่าไฟไปทั้งปี", effects: {happiness: 1, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ท้าวแชร์หอบเงินหนีกลางดึก เงินเก็บหายไปก้อนใหญ่", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: era_econ_tyk_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    era: tom_yum_kung
+    when: {age: [60, 120]}
+    title: "บาทลอยตัวตอนแก่"
+    text: "อายุ {อายุ} ข่าวไฟแนนซ์ถูกสั่งปิดทีละแห่ง คนแก่ในซอยไปยืนต่อแถวหน้าธนาคารตั้งแต่ตีห้า หลานโทรมาบอกว่าบริษัทเลิกจ้างทั้งแผนก เงินเก็บที่เหลือ {เงิน} บาทคือทั้งหมดที่มี"
+    choices:
+      - text: "ถอนเงินฝากมาเก็บไว้ที่บ้าน"
+        outcomes:
+          - {weight: 2, ok: true, text: "นอนกอดกล่องเงินอยู่หลายเดือน แต่ใจสงบกว่าดูข่าวทุกคืน", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขโมยงัดบ้านตอนไปงานศพเพื่อนบ้าน กล่องเงินหายไปทั้งกล่อง", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "เอาทองที่เก็บไว้ออกมาขาย"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+      - text: "รับหลานที่ตกงานมาอยู่ด้วย"
+        effects: {relations: 2, health: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: help_others, level: 1}]
+      - text: "ใส่บาตรเท่าเดิมทุกเช้า ไม่ลด"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: dana, level: 1}]
+
+  - id: era_econ_gfc_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    era: global_financial_crisis
+    when: {age: [60, 120]}
+    title: "ข่าวร้ายในวัยเกษียณ"
+    text: "อายุ {อายุ} ข่าวทีวีพูดแต่คำว่าล้มละลาย ดอกเบี้ยเงินฝากที่เคยพอจ่ายค่ายาลดลงทุกเดือน ญาติที่ทำงานส่งออกโดนพักงาน เพื่อนวัยเดียวกันนั่งคุยกันแต่เรื่องเงินพอใช้ไหม"
+    choices:
+      - text: "ไม่ดูข่าว ไปช่วยงานวัดทุกวันพระ"
+        effects: {happiness: 1, relations: 1, health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - text: "รับเลี้ยงหลานให้ญาติไปหางาน"
+        effects: {relations: 2, health: -1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: help_others, level: 1}]
+      - text: "รับจ้างพับถุงกระดาษหารายได้เสริม"
+        outcomes:
+          - {weight: 2, ok: true, text: "พับวันละร้อยใบ ได้ค่าขนมพอซื้อยาเองทุกเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตาไม่ดีแล้ว พับเบี้ยวจนโดนคืนทั้งมัด", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "ย้ายเงินไปฝากที่ให้ดอกสูงกว่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ดอกได้ตามสัญญา ค่ายาไม่ต้องควักเงินต้น", effects: {happiness: 1, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ที่ให้ดอกสูงกลายเป็นแชร์ลูกโซ่ ปิดตัวเงียบไปพร้อมเงินต้น", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   # ── เรื่องต่อ (ออกทาง next เท่านั้น · ไม่มี era/weight) ──

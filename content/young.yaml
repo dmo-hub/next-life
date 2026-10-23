@@ -40,7 +40,7 @@ events:
     multipliers: {flags: {bullied: 2}, occupation: {clerk: 1.5}}
     when: {age: [21, 28], occupation: [clerk, technician, professional, manager]}
     title: "หัวหน้าขโมยผลงาน"
-    text: "งานแรกปีแรก หัวหน้าโยนงานให้จนดึกทุกคืน แล้วเช้าวันประชุมก็เอาผลงานของ{ผม}ขึ้นพรีเซนต์ต่อหน้าผู้บริหารเป็นของตัวเองหน้าตาเฉย"
+    text: "งานแรกปีแรก หัวหน้าโยนงานให้จนดึกทุกคืน แล้วเช้าวันประชุมก็เอาผลงานของคุณขึ้นพรีเซนต์ต่อหน้าผู้บริหารเป็นของตัวเองหน้าตาเฉย"
     choices:
       - id: endure
         text: "ทนเงียบ เก็บแต้มไปก่อน"
@@ -315,7 +315,7 @@ events:
     years: [2500, 2650]
     when: {occupation: [clerk, technician, professional, manager]}
     title: "แฟ้มลับในห้องผู้บริหาร"
-    text: "ผู้บริหารปิดประตูแล้ววางแฟ้มลงตรงหน้า ข้างในคือใบเบิกปลอมที่หัวหน้าเซ็นมาสองปีเต็ม เขาถามเรียบ ๆ ว่าเรื่องนี้{ผม}อยากให้จบแบบไหน"
+    text: "ผู้บริหารปิดประตูแล้ววางแฟ้มลงตรงหน้า ข้างในคือใบเบิกปลอมที่หัวหน้าเซ็นมาสองปีเต็ม เขาถามเรียบ ๆ ว่าเรื่องนี้คุณอยากให้จบแบบไหน"
     choices:
       - id: take_seat
         text: "ขอขึ้นเป็นหัวหน้าแทน"
@@ -331,7 +331,7 @@ events:
       - id: second_chance
         text: "ขอให้หัวหน้าได้แก้ตัวสักครั้ง"
         outcomes:
-          - {weight: 2, ok: true, text: "หัวหน้าคืนเงินครบ แล้วกลายเป็นคนที่ดันหลัง{ผม}มาตลอด", effects: {relations: 2, network: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 2, ok: true, text: "หัวหน้าคืนเงินครบ แล้วกลายเป็นคนที่ดันหลังคุณมาตลอด", effects: {relations: 2, network: 2}, merit: [{cat: help_others, level: 1}]}
           - {weight: 1, text: "หัวหน้ารอดตัวแล้วหันมาเล่นงานคนที่ช่วยไว้", effects: {happiness: -2, relations: -1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
       - id: blackmail
