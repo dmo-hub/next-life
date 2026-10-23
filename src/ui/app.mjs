@@ -75,6 +75,10 @@ function recap(r) {
   const m = r.money;
   box.append(el('p', 'sub', `เงิน ${baht(m.from)} → ${baht(m.to)}`));
   box.append(el('p', 'note', `เทียบค่าเงินปีเกิด ${baht(m.fromAtBirth)} → ${baht(m.toAtBirth)}`));
+  const chart = sparkline(r.moneySeries);
+  if (chart) box.append(chart);
+  if (r.items.length) box.append(list(r.items));
+  if (r.disclaimer) box.append(el('p', 'note', r.disclaimer));
   if (r.picks.length) {
     box.append(el('div', 'h', 'สิ่งที่เลือก'));
     const shown = r.picks.slice(-RECAP_PICKS).map((p) => `อายุ ${p.age} · ${p.text}`);
@@ -110,7 +114,7 @@ function button(label, fx, onclick) {
 // แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): ลางกับเหตุการณ์ความเชื่อเป็นทาง B ที่เหลือเป็นทาง A
 const styleOf = (card) => (card.kind === 'omen' || ((card.kind === 'event' || card.kind === 'result') && card.type === 'B') ? 'b' : 'a');
 
-const KICKER = { summary: 'สรุปปี', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
+const KICKER = { stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
 
 function render(card) {
   root.replaceChildren();
@@ -150,14 +154,6 @@ function render(card) {
     if (card.kind === 'stage') {
       body.append(el('span', 'stamp', card.text));
       body.append(recap(card.recap));
-      choices.append(button('ต่อไป', null, next));
-    } else if (card.kind === 'summary') {
-      body.append(el('h3', null, card.text));
-      if (card.items.length) body.append(list(card.items));
-      const chart = sparkline(card.moneySeries);
-      if (chart) body.append(chart);
-      body.append(el('p', 'sub', `เงิน ${baht(card.money)} ≈ ${baht(card.moneyAtBirth)} ค่าเงินปีเกิด`));
-      if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
       choices.append(button('ต่อไป', null, next));
     } else if (card.kind === 'era' || card.kind === 'omen' || card.kind === 'result') {
       body.append(el('h3', null, card.text));

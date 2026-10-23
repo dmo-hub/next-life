@@ -67,10 +67,6 @@ const CHRONIC_FADE = 5;
 // ตัวคูณตามค่าสถานะเป็นขั้นบันได: คนเขียนเนื้อหารู้ว่าค่าเท่าไรถึงนับว่า "สูง/ต่ำ" ไม่ต้องคิดเลขยกกำลัง
 const STAT_HIGH = 70;
 const STAT_LOW = 30;
-// ออกการ์ดสรุปอย่างน้อยทุก K ปี ถึงไม่มีอะไรเกิด · ปีที่มีเรื่อง (เปลี่ยนช่วง · ยุค · ลาง · จัดสรรเงิน) สรุปทันที
-// ปีเงียบรวบเป็นใบเดียว — การ์ดสรุปทุกปีที่มีแค่เงินขยับอ่านแล้วเปล่า
-export const SUMMARY_EVERY = 5;
-
 const clamp = (v) => Math.max(0, Math.min(100, v));
 
 function weighted(rng, items, weights) {
@@ -174,11 +170,9 @@ export function newLife(seed, content) {
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
     price: 1,
-    // ผลตอบแทนจริงรายปีของสินทรัพย์เสี่ยงที่ถือ ตั้งแต่การ์ดใบก่อน — การ์ดสรุปเล่าย้อนหลังแล้วล้าง
+    // ผลตอบแทนจริงรายปีของสินทรัพย์เสี่ยงที่ถือ ตั้งแต่ต้นช่วงวัย — การ์ดเปลี่ยนช่วงเล่าย้อนหลังแล้วล้าง
     returns: [],
     trail: [],
-    lastCardAge: 0,
-    lastCardMoney: 0,
     due: [],
     queue: [],
     done: {},
@@ -202,7 +196,6 @@ export function newLife(seed, content) {
     famRng,
   };
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
-  st.lastCardMoney = st.money;
   st.trail.push({ year: birthYear, money: Math.round(st.money) });
   st.stageMark = markStage(st);
   return st;
@@ -217,7 +210,14 @@ function markStage(st) {
 // lastAge = อายุสุดท้ายของช่วง: การ์ดเปลี่ยนช่วงออกตอนขึ้นอายุแรกของช่วงใหม่แล้ว
 function stageRecap(st, lastAge) {
   const m = st.stageMark;
+  const items = st.returns.map((x) => `อายุ ${x.age} ${assetName(x.id)} ${formatReturn(x.r)}`);
+  for (const d of st.debts) items.push(`${debtName(d.kind)} ค้าง ${Math.round(d.balance).toLocaleString('en-US')} บาท`);
+  const disclaimer = st.returns.length ? DISCLAIMER : null;
+  st.returns = [];
   return {
+    items,
+    disclaimer,
+    moneySeries: st.trail.filter((p) => p.year >= st.birthYear + m.age),
     stage: m.stage,
     fromAge: m.age,
     toAge: lastAge,
@@ -510,33 +510,6 @@ function borrow(st, { kind, amount }) {
   st.debts.push(newDebt(era, st.seed, kind, baht, year));
 }
 
-// การ์ดสรุปเป็นของคำนวณล้วน ไม่ดึงเลขสุ่มของโลก — เพิ่ม/ลดการ์ดสรุปแล้วชะตาชีวิตต้องเหมือนเดิม
-function summaryCard(st) {
-  const from = st.lastCardAge;
-  const items = [];
-  const money = Math.round(st.money);
-  if (money !== Math.round(st.lastCardMoney)) {
-    items.push(`เงิน ${Math.round(st.lastCardMoney).toLocaleString('en-US')} → ${money.toLocaleString('en-US')} บาท`);
-  }
-  const year = st.birthYear + st.age;
-  for (const x of st.returns) items.push(`อายุ ${x.age} ${assetName(x.id)} ${formatReturn(x.r)}`);
-  for (const d of st.debts) items.push(`${debtName(d.kind)} ค้าง ${Math.round(d.balance).toLocaleString('en-US')} บาท`);
-  const disclaimer = st.returns.length ? DISCLAIMER : null;
-  st.returns = [];
-  return {
-    kind: 'summary',
-    disclaimer,
-    fromAge: from,
-    age: st.age,
-    stage: stageOf(st.age),
-    text: `ผ่านไป ${st.age - from} ปี · อายุ ${from} → ${st.age}`,
-    items,
-    money,
-    moneyAtBirth: Math.round(st.money / st.price),
-    moneySeries: st.trail.filter((p) => p.year >= st.birthYear + from && p.year <= year),
-  };
-}
-
 // การ์ดจัดสรรเงิน (ใบ 11) เล่าผลจริงของช่วงที่ผ่านมาก่อนให้เลือก — ไม่บอกปีถัดไป · ตัวเลือกสร้างตอนออกการ์ด
 function allocCard(st, year, stage) {
   const era = st.content.era;
@@ -556,8 +529,6 @@ function allocCard(st, year, stage) {
 
 function emit(st, card) {
   st.cards++;
-  st.lastCardAge = st.age;
-  st.lastCardMoney = st.money;
   return card;
 }
 
@@ -605,7 +576,7 @@ export const openChoices = (card) => card.choices.map((_, i) => i).filter((i) =>
 export function nextCard(st) {
   if (st.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
   if (st.dead) return deathCard(st);
-  // การ์ดเปลี่ยนช่วง/เหตุการณ์ยุค/ผลสุ่มเป็นใบของตัวเอง ตามหลังการ์ดสรุปของปีเดียวกัน
+  // การ์ดเปลี่ยนช่วง/เหตุการณ์ยุค/ผลสุ่มเป็นใบของตัวเอง เรียงตามที่ถึงกำหนดในปีนั้น
   if (st.queue.length) {
     const card = st.queue.shift();
     if (card.kind === 'eraEvent') return eventCard(st, card.ev);
@@ -626,13 +597,12 @@ export function nextCard(st) {
       stepYear(st);
     }
     st.advance = true;
-    if (st.age > st.lastCardAge && (st.due.length || st.age - st.lastCardAge >= SUMMARY_EVERY)) {
-      // เหตุการณ์ของอายุนี้ยังรอ: การ์ดใบถัดไปต้องไม่เดินเวลา
+    if (st.due.length) {
+      // เหตุการณ์ของอายุนี้ยังรอ: การ์ดใบถัดไปต้องไม่เดินเวลา · เงิน/ผลตอบแทน/หนี้ไปสรุปรวมที่การ์ดเปลี่ยนช่วงวัย
       st.advance = false;
-      const card = summaryCard(st);
       st.queue = st.due;
       st.due = [];
-      return emit(st, card);
+      return nextCard(st);
     }
     // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
     const year = st.birthYear + st.age;

@@ -18,21 +18,22 @@ const randomBot = (card, rng) => {
 };
 
 let sum = 0, min = Infinity, max = -Infinity, over60 = 0, under5 = 0;
-// ค่าแถบต้องอยู่ใน 0–100 ทุกการ์ด (การ์ดสรุปออกทุกปี จึงเท่ากับตรวจทุกปี) · เงินต้องเป็นตัวเลขจำกัด
+// ค่าแถบต้องอยู่ใน 0–100 ทุกการ์ด · เงินต้องเป็นตัวเลขจำกัด
+// การ์ดสรุปช่วงวัย (เปลี่ยนช่วง + การ์ดตาย) ต้องครอบทุกปีที่มีชีวิต — ไม่มีการ์ดสรุปรายปีแล้ว ปีที่ไม่มีเรื่องเล่าผ่านใบนี้ใบเดียว
 const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations', 'network'];
 let statChecks = 0, statBad = 0, yearsCovered = 0, yearsLived = 0;
 const checkStats = (card, st) => {
-  if (card.kind === 'summary') yearsCovered += card.age - card.fromAge;
+  if (card.recap) yearsCovered += card.recap.toAge - card.recap.fromAge + 1;
   for (const k of STAT_KEYS) {
     statChecks++;
     if (!(st[k] >= 0 && st[k] <= 100)) statBad++;
   }
   if (!Number.isFinite(st.money)) statBad++;
 };
-// ด่าน 4: จำนวนการ์ดของชีวิตที่ตายหลังอายุ 60 (นับการ์ดสรุปและการ์ดตายด้วย)
-const CARD_MIN = 80, CARD_MAX = 150;
-// พักการตัดสิน: เจ้าของเลือกรวบปีเงียบ (สรุปทุก SUMMARY_EVERY ปี) ซึ่งทำให้การ์ดไม่ถึงเกณฑ์จนกว่ากองสุ่มเหตุการณ์จะมีเนื้อหา
-// ยังพิมพ์ตัวเลขทุกรอบเพื่อดูว่าเนื้อหาที่เติมเข้าไปดันขึ้นมาใกล้เกณฑ์แค่ไหน · มีกองสุ่มแล้วต้องเปิดกลับ
+// ด่าน 4: จำนวนการ์ดของชีวิตที่ตายหลังอายุ 60 (นับการ์ดเปลี่ยนช่วงและการ์ดตายด้วย)
+// ขอบล่างลดจาก 80 เมื่อเลิกการ์ดสรุปรายปี (สรุปเฉพาะตอนเปลี่ยนช่วงวัย) — ขอบบนคงไว้ให้เนื้อหาเรื่องต่อเติมได้
+const CARD_MIN = 70, CARD_MAX = 150;
+// พักการตัดสินได้ระหว่างรอเนื้อหา · ยังพิมพ์ตัวเลขทุกรอบเพื่อดูว่าเนื้อหาที่เติมดันขึ้นมาใกล้เกณฑ์แค่ไหน
 const GATE4_PAUSED = false;
 const cardsOver60 = [];
 const bySex = { ชาย: [0, 0], หญิง: [0, 0] };
@@ -40,7 +41,8 @@ const bySex = { ชาย: [0, 0], หญิง: [0, 0] };
 const groups = new Map();
 for (let i = 0; i < n; i++) {
   const { age, cards, state } = playLife(mixSeed(seed, i), content, randomBot, checkStats);
-  yearsLived += age;
+  // นับอายุ 0 ถึงอายุตาย รวมปีที่ตาย — ตรงกับช่วงที่การ์ดสรุปช่วงวัยครอบ
+  yearsLived += age + 1;
   if (age > 60) cardsOver60.push(cards);
   sum += age;
   min = Math.min(min, age);
