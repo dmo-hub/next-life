@@ -1,9 +1,10 @@
 // harness ของลวดลาย + ฉายา (B10 · ใบ 04): บอทหลายบุคลิกเล่นต่อกันหลายรุ่น แล้วนับว่าแต่ละตัวออกกี่ %
 // ด่าน (1) ใบ 07: ลวดลาย 17 แบบ + ฉายาทุกตัว (รวมฉายาตระกูล) ≥ MIN_RATE ของชีวิตทั้งหมดรวมทุกบุคลิก
 // · ผลของ titlesOf ไม่มีค่าบัญชีบุญบาป (ขึ้นบนการ์ดตายก่อนศาลเฉลย) · พิมพ์ค่ากลาง/ช่วงแกนของบอทสุ่มให้ตั้ง AXES
-import { playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS } from '../src/engine/index.mjs';
+import { playLife, playAfterlife, nextLife, mixSeed } from '../src/engine/index.mjs';
 import { titlesOf, axisRaw, ALL_PATTERNS, TITLES, FAMILY_TITLES, AXES, PATTERN_MIN_PICKS } from '../src/engine/titles.mjs';
 import { loadContent } from '../src/node/load.mjs';
+import { BOTS } from './bots.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
@@ -15,28 +16,6 @@ const gens = opt('gens', 3);
 const seed = opt('seed', 1);
 const MIN_RATE = 0.001;
 const content = loadContent();
-
-// บุคลิกเท่าที่มีก่อน B07: สุ่ม · สายบุญ · สายบาป (อ่านป้ายของตัวเลือกแบบเดียวกับ harness/merit) — B07 เพิ่มบุคลิกแล้วเติมที่นี่
-const score = (c) =>
-  (c.merit ?? []).reduce((s, t) => {
-    const id = meritId(t.cat);
-    if (id === 'neutral') return s;
-    const v = MERIT_WEIGHTS[id] * (FLAG_CATS.includes(id) ? 1 : MERIT_LEVELS[t.level]);
-    return s + (SIN_CATS.includes(id) ? -v : v);
-  }, 0);
-const random = (card, rng) => {
-  const open = openChoices(card);
-  return open[rng.int(0, open.length - 1)];
-};
-const extreme = (sign) => (card, rng, st) => {
-  if (st.pending?.alloc || st.pending?.path) return random(card, rng);
-  const open = openChoices(card);
-  const s = open.map((i) => sign * score(st.pending.choices[i]));
-  const best = Math.max(...s);
-  const ties = open.filter((_, j) => s[j] === best);
-  return ties[rng.int(0, ties.length - 1)];
-};
-const BOTS = { สุ่ม: random, สายบุญ: extreme(1), สายบาป: extreme(-1) };
 
 const count = new Map();
 const hit = (id) => count.set(id, (count.get(id) ?? 0) + 1);

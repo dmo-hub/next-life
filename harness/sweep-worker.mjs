@@ -11,16 +11,10 @@ const content = loadContent();
 // ตัวควบคุมด่าน (7): ถอดเหตุการณ์ belief ออกทั้งหมด แล้วเทียบอายุเฉลี่ยกับรอบที่มี
 if (dropBelief) content.events = content.events.filter((e) => e.category !== 'belief');
 const era = content.era;
+const INDEX = new Map(content.events.map((e, i) => [e.id, i]));
 const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations', 'network'];
 
 const inc = (m, k, v = 1) => m.set(k, (m.get(k) ?? 0) + v);
-const add3 = (m, k, a, b, c) => {
-  const x = m.get(k) ?? [0, 0, 0];
-  x[0] += a;
-  x[1] += b;
-  x[2] += c;
-  m.set(k, x);
-};
 const r = {
   bot, seed, n, dropBelief: !!dropBelief,
   ageSum: 0, statBad: 0,
@@ -28,9 +22,9 @@ const r = {
   cardsOver60: [],
   // ชีวิตที่เจอเหตุการณ์นั้น (นับครั้งเดียวต่อชีวิต) · ครั้งที่กดตัวเลือก id#ลำดับ · ธงที่เคยติด
   fired: new Map(), picks: new Map(), flags: new Set(),
-  // ชี้ต้นเหตุ (blame ใน gates.mjs): ต่อกลุ่ม 3b → id → [ชีวิต, ผลรวมส่วนต่างอายุ, ผลรวมอายุที่เจอ] + [[อายุตาย, ส่วนต่างอายุ]] ทุกชีวิต
-  // · ด่าน 4 → id → [ชีวิตหลัง 60, ชีวิตที่จำนวนการ์ดหลุดช่วง, ผลรวมอายุที่เจอ] + [[อายุตาย, หลุดช่วง 0/1]]
-  ageBlame: new Map(), groupLives: new Map(), cardBlame: new Map(), cardLives: [],
+  // ชี้ต้นเหตุ (blame ใน gates.mjs) ต้องรู้ว่าแต่ละชีวิตเจออะไรตอนอายุเท่าไร — รายชีวิตของบอทสุ่ม (ด่าน 3b/4 ตัดสินบอทนี้ตัวเดียว):
+  // [กลุ่ม 3b, อายุตาย, ส่วนต่างอายุ, หลุดช่วงด่าน 4 (null = ไม่ถึง 60), ลำดับเหตุการณ์ในเนื้อหา, อายุที่เจอ]
+  lives: [],
   // การ์ดเหตุการณ์ในชีวิต (ไม่นับระหว่างชาติ) ต่อ ช่วงวัย|หมวด · แฟนตาซี (แนว B) และหวยสายมูต่อชีวิต
   cells: new Map(), fantasy: new Map(), numen: 0,
 };
@@ -62,18 +56,11 @@ for (let i = 0; i < n; i++) {
   r.ageSum += age;
   inc(r.fantasy, fantasy);
   const diff = addGroup(r.groups, era, state, age);
-  const gk = groupKey(state);
-  const gb = r.ageBlame.get(gk) ?? new Map();
-  for (const [id, at] of seenAt) add3(gb, id, 1, diff, at);
-  r.ageBlame.set(gk, gb);
-  const gl = r.groupLives.get(gk) ?? [];
-  gl.push([age, diff]);
-  r.groupLives.set(gk, gl);
-  if (age > 60) {
-    r.cardsOver60.push(cards);
-    const out = cardsInRange(cards) ? 0 : 1;
-    r.cardLives.push([age, out]);
-    for (const [id, at] of seenAt) add3(r.cardBlame, id, 1, out, at);
+  if (age > 60) r.cardsOver60.push(cards);
+  if (bot === 'สุ่ม') {
+    // การ์ดที่แกนสร้างเอง (หางาน · ด่านเรียนต่อ) ไม่อยู่ในเนื้อหา ตัดทิ้ง
+    const ids = [...seenAt.keys()].filter((id) => INDEX.has(id));
+    r.lives.push([groupKey(state), age, diff, age > 60 ? (cardsInRange(cards) ? 0 : 1) : null, Int16Array.from(ids, (id) => INDEX.get(id)), Uint8Array.from(ids, (id) => seenAt.get(id))]);
   }
   playAfterlife(state, choose, (card) => {
     if (card.kind === 'scene') seen.add(card.id);

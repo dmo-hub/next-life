@@ -64,15 +64,6 @@ export function addGroup(groups, era, st, age) {
   groups.set(key, g);
   return age - exp;
 }
-export function mergeGroups(into, from) {
-  for (const [k, v] of from) {
-    const g = into.get(k) ?? [0, 0, 0, 0];
-    for (let i = 0; i < 4; i++) g[i] += v[i];
-    into.set(k, g);
-  }
-  return into;
-}
-
 export function gate3b(groups) {
   const lines = [`\nด่าน 3b: อายุเฉลี่ยห่างค่าที่ข้อมูลคาดตามแนวชีวิต ไม่เกิน ±${AGE_TOL} ปี`, 'ทศวรรษเกิด เพศ   ชีวิต  อายุเฉลี่ย  ข้อมูลคาด  ต่าง   (e0 ปีเกิด)'];
   const failed = [];
@@ -97,23 +88,48 @@ export function gate3b(groups) {
   return { lines, fail: failed.length > 0, failed, worst };
 }
 
-// ชี้ id ต้นเหตุเมื่อด่านตก: ค่าเฉลี่ยของชีวิตที่เจอเหตุการณ์ ลบชีวิตที่อยู่ถึงอายุเฉลี่ยที่เหตุการณ์ออกแต่ไม่เจอ
-// × สัดส่วนที่เจอในกลุ่ม = เหตุการณ์นี้ดันค่าเฉลี่ยของทั้งกลุ่มไปเท่าไร
-// เทียบกับชีวิตที่รอดถึงอายุนั้นเท่านั้น — เทียบกับทุกชีวิตแล้วการ์ดที่ต้องโตก่อนถึงเจอ (เข้าเรียน · งานแรก) ขึ้นอันดับหนึ่งเสมอ
-// เป็นความสัมพันธ์ ไม่ใช่เหตุผล · lives = [[อายุตาย, ค่า]] ทุกชีวิตในกลุ่ม · byId = Map(id → [ชีวิตที่เจอ, ผลรวมค่า, ผลรวมอายุที่เจอ])
-export function blame(lives, byId, sign, top = 5) {
-  const rows = [];
-  for (const [id, [ne, se, sa]] of byId) {
-    if (ne < 30) continue;
-    const at = Math.floor(sa / ne);
-    let n = 0, sum = 0;
-    for (const [age, v] of lives) if (age >= at) {
-      n++;
-      sum += v;
+// ชี้ id ต้นเหตุเมื่อด่านตก: คนที่เจอเหตุการณ์ตอนอายุ a เทียบกับค่าเฉลี่ยของคนไม่เจอที่ยังมีชีวิตที่อายุ a
+// เฉลี่ยส่วนต่างของคนเจอ × สัดส่วนที่เจอในกลุ่ม = เหตุการณ์นี้ดันค่าเฉลี่ยของทั้งกลุ่มไปเท่าไร
+// เทียบที่อายุของแต่ละคน: เทียบกับทุกชีวิตแล้วการ์ดที่ต้องโตก่อนถึงเจอ (เข้าเรียน · งานแรก) ขึ้นอันดับหนึ่งเสมอ
+// ส่วนตัดที่อายุเดียวทั้งก้อนทิ้งคนที่เจอแล้วตายเร็ว ซึ่งคือตัวที่ด่าน 3b ต้องหา · เป็นความสัมพันธ์ ไม่ใช่เหตุผล
+// lives = [[อายุตาย, ค่า, ลำดับเหตุการณ์ที่เจอ, อายุที่เจอ]] · ids = ลำดับ → id
+export const MIN_SIDE = 30;
+export function blame(lives, ids, sign, top = 5) {
+  // ผลรวมจากท้าย: คน/ค่าของทุกชีวิตที่ยังอยู่ที่อายุ a (ตายอายุ ≥ a)
+  const MAX = Math.max(...lives.map((l) => l[0])) + 2;
+  const tail = (rows) => {
+    const n = new Float64Array(MAX), s = new Float64Array(MAX);
+    for (const [age, v] of rows) {
+      n[age]++;
+      s[age] += v;
     }
-    if (n - ne < 30) continue;
-    const push = (se / ne - (sum - se) / (n - ne)) * (ne / lives.length);
-    if (Math.sign(push) === sign) rows.push({ id, n: ne, at, push });
+    for (let a = MAX - 2; a >= 0; a--) {
+      n[a] += n[a + 1];
+      s[a] += s[a + 1];
+    }
+    return { n, s };
+  };
+  const all = tail(lives);
+  const byEvent = new Map();
+  for (const [age, v, idx, ats] of lives) idx.forEach((e, k) => {
+    const x = byEvent.get(e) ?? [];
+    x.push([age, v, ats[k]]);
+    byEvent.set(e, x);
+  });
+  const rows = [];
+  for (const [e, seers] of byEvent) {
+    if (seers.length < MIN_SIDE || lives.length - seers.length < MIN_SIDE) continue;
+    const mine = tail(seers);
+    let d = 0, used = 0;
+    for (const [, v, a] of seers) {
+      const n = all.n[a] - mine.n[a];
+      if (n < MIN_SIDE) continue;
+      d += v - (all.s[a] - mine.s[a]) / n;
+      used++;
+    }
+    if (used < MIN_SIDE) continue;
+    const push = (d / used) * (seers.length / lives.length);
+    if (Math.sign(push) === sign) rows.push({ id: ids[e], n: seers.length, push });
   }
   return rows.sort((a, b) => Math.abs(b.push) - Math.abs(a.push)).slice(0, top);
 }

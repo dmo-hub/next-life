@@ -1,6 +1,7 @@
-import { playLife, openChoices, mixSeed } from '../src/engine/index.mjs';
+import { playLife, mixSeed } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { gate3a, gate3b, gate4, addGroup } from './gates.mjs';
+import { random as randomBot } from './bots.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
@@ -11,12 +12,6 @@ const n = opt('n', 1000);
 const seed = opt('seed', 1);
 const content = loadContent();
 const era = content.era;
-
-// บอทสุ่มล้วน เลือกจากตัวเลือกที่ผู้เล่นกดได้เท่านั้น
-const randomBot = (card, rng) => {
-  const open = openChoices(card);
-  return open[rng.int(0, open.length - 1)];
-};
 
 let sum = 0, min = Infinity, max = -Infinity, over60 = 0, under5 = 0;
 // ค่าแถบต้องอยู่ใน 0–100 ทุกการ์ด · เงินต้องเป็นตัวเลขจำกัด

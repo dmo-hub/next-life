@@ -10,7 +10,7 @@ import { availableParallelism } from 'node:os';
 import { parse } from 'yaml';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
-import { gate3a, gate3b, gate4, blame, cardsInRange } from './gates.mjs';
+import { gate3a, gate3b, gate4, blame } from './gates.mjs';
 
 const args = process.argv.slice(2);
 const has = (name) => args.includes(`--${name}`);
@@ -73,6 +73,7 @@ await Promise.all(Array.from({ length: Math.min(slots, jobs.length) }, runOne));
 const sideOut = await Promise.all(side);
 const wall = Date.now() - started;
 
+const IDS = content.events.map((e) => e.id);
 const main = results.filter((r) => !r.dropBelief);
 const of = (bot, s) => main.find((r) => r.bot === bot && r.seed === s);
 
@@ -124,7 +125,8 @@ if (rare.length) console.log(`  ⚠ เหตุการณ์ที่เจ�
 
 // ---- ด่าน 3a (ไม่ผ่านการสุ่ม) · 3b + 4 บอทสุ่ม ทั้งสอง seed ----
 const g3a = gate3a(content.era);
-console.log(g3a.lines.at(-1));
+// ผ่านพิมพ์บรรทัดสรุปบรรทัดเดียว · ตกพิมพ์ปี-เพศที่ห่างทุกบรรทัด
+console.log((g3a.fail ? g3a.lines : g3a.lines.slice(-1)).join('\n'));
 if (g3a.fail) fails.push('ด่าน 3a');
 const judged = {};
 for (const s of [seed, seed2]) {
@@ -134,15 +136,15 @@ for (const s of [seed, seed2]) {
   judged[s] = { g3b, g4 };
   console.log(`\n[บอทสุ่ม · seed ${s}]${g3b.lines.join('\n')}`);
   for (const { key, diff } of g3b.failed) {
-    const top = blame(r.groupLives.get(key), r.ageBlame.get(key), Math.sign(diff));
-    console.log(`  ต้นเหตุที่น่าสงสัยของ ${key.replace('|', 's ')} (${diff > 0 ? 'อายุเกิน' : 'อายุขาด'}): ${top.map((x) => `${x.id} ${x.push >= 0 ? '+' : ''}${f(x.push)} ปี (${x.n} ชีวิต · เจออายุ ~${x.at})`).join(' · ') || 'ไม่มีเหตุการณ์ใดเอียงชัด'}`);
+    const top = blame(r.lives.filter((l) => l[0] === key).map(([, age, d, , idx, ats]) => [age, d, idx, ats]), IDS, Math.sign(diff));
+    console.log(`  ต้นเหตุที่น่าสงสัยของ ${key.replace('|', 's ')} (${diff > 0 ? 'อายุเกิน' : 'อายุขาด'}): ${top.map((x) => `${x.id} ${x.push >= 0 ? '+' : ''}${f(x.push)} ปี (${x.n} ชีวิต)`).join(' · ') || 'ไม่มีเหตุการณ์ใดเอียงชัด'}`);
   }
   if (g3b.fail) fails.push(`ด่าน 3b seed ${s}`);
   console.log(g4.line);
   if (g4.fail) {
     fails.push(`ด่าน 4 seed ${s}`);
-    const top = blame(r.cardLives, r.cardBlame, 1);
-    console.log(`  ต้นเหตุที่น่าสงสัย (เจอแล้วการ์ดหลุดช่วงบ่อยขึ้น): ${top.map((x) => `${x.id} +${f(x.push * 100)}% (${x.n} ชีวิต · เจออายุ ~${x.at})`).join(' · ') || 'ไม่มีเหตุการณ์ใดเอียงชัด'}`);
+    const top = blame(r.lives.filter((l) => l[3] !== null).map(([, age, , out, idx, ats]) => [age, out, idx, ats]), IDS, 1);
+    console.log(`  ต้นเหตุที่น่าสงสัย (เจอแล้วการ์ดหลุดช่วงบ่อยขึ้น): ${top.map((x) => `${x.id} +${f(x.push * 100)}% (${x.n} ชีวิต)`).join(' · ') || 'ไม่มีเหตุการณ์ใดเอียงชัด'}`);
   }
 }
 // บอทอื่นพิมพ์ไว้ดู ไม่ตัดสิน — ด่าน 3b/4 นิยามกับบอทสุ่ม (ใบ 07) บุคลิกที่เลือกสุดทางตั้งใจให้อายุ/ความยาวต่างจากค่ากลาง
