@@ -1516,7 +1516,7 @@ function nextCard(st) {
     }
     // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
     const year = st.birthYear + st.age;
-    let ev = st.content.events.find((e) => !st.done[e.id] && (e.age === st.age || isScheduled(st, e.id)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
+    let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
     // กองสุ่มจับได้ปีละครั้ง หลังหลักไมล์/นัดของปีนั้นหมดแล้ว
     if (!ev && st.poolAge !== st.age) {
       st.poolAge = st.age;
@@ -1527,7 +1527,7 @@ function nextCard(st) {
       st.fired[ev.id] = { n: (st.fired[ev.id]?.n ?? 0) + 1, age: st.age };
       beliefFired(st, ev);
     }
-    st.scheduled = st.scheduled.filter((x) => x.age >= st.age && !st.done[x.event]);
+    if (st.scheduled.length) st.scheduled = st.scheduled.filter((x) => x.age >= st.age && !st.done[x.event]);
     if (ev) {
       // อายุนี้อาจมีเหตุการณ์อื่นรออยู่ (หลักไมล์ชนกับนัด) — ค้นอายุเดิมอีกรอบก่อนเดินปี
       st.advance = false;
@@ -1540,9 +1540,35 @@ function nextCard(st) {
 // ชีวิตที่เนื้อหาไม่มีกองจึงได้ชะตาเดิมทุกหลัก
 function drawPool(st, year) {
   const stage = stageOf(st.age);
-  const pool = st.content.events.filter((e) => e.weight && e.age === undefined && !e.era && (!st.done[e.id] || canRepeat(st, e)) && e.stage === stage && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
+  const pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
   if (!pool.length || st.rng.next() >= POOL_CHANCE[stage]) return null;
   return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers)));
+}
+
+// ไล่ทั้งกองเหตุการณ์ทุกปีกินเวลา harness ราวหนึ่งในห้า — จัดกลุ่มครั้งเดียวต่อชุดเนื้อหา (ผูกกับตัวอาเรย์ แทนทั้งอาเรย์ = กลุ่มใหม่)
+// ในกลุ่มเรียงตามลำดับในเนื้อหา ใบที่ค้นเจอและลำดับสุ่มจึงเหมือนไล่ทั้งกองทุกหลัก
+const lifeEventCache = new WeakMap();
+function lifeEventIndex(events) {
+  let ix = lifeEventCache.get(events);
+  if (ix) return ix;
+  ix = { byAge: new Map(), pos: new Map(), pool: new Map() };
+  const add = (m, k, v) => (m.get(k) ?? m.set(k, []).get(k)).push(v);
+  events.forEach((e, i) => {
+    if (!ix.pos.has(e.id)) ix.pos.set(e.id, i);
+    if (e.age !== undefined) add(ix.byAge, e.age, i);
+    if (e.weight && e.age === undefined && !e.era) add(ix.pool, e.stage, e);
+  });
+  lifeEventCache.set(events, ix);
+  return ix;
+}
+
+// เหตุการณ์ที่ถึงกำหนดอายุนี้: หลักไมล์ของอายุนี้ + ใบที่นัดไว้ปีนี้ เรียงตามลำดับในเนื้อหา
+function dueAt(st) {
+  const events = st.content.events;
+  const ix = lifeEventIndex(events);
+  const at = [...(ix.byAge.get(st.age) ?? [])];
+  for (const x of st.scheduled) if (x.age === st.age && ix.pos.has(x.event)) at.push(ix.pos.get(x.event));
+  return [...new Set(at)].sort((a, b) => a - b).map((i) => events[i]);
 }
 
 const canRepeat = (st, e) => e.repeat && st.fired[e.id].n < e.repeat.max && st.age - st.fired[e.id].age >= e.repeat.gap;
@@ -1561,7 +1587,6 @@ function poolMultiplier(st, m) {
   return x;
 }
 
-const isScheduled = (st, id) => st.scheduled.some((x) => x.event === id && x.age === st.age);
 const inYears = (e, year) => !e.years || (year >= e.years[0] && year <= e.years[1]);
 const inRange = (v, r) => !r || (v >= r[0] && v <= r[1]);
 const inBound = (v, b) => !b || ((b.min === undefined || v >= b.min) && (b.max === undefined || v <= b.max));
@@ -2384,7 +2409,7 @@ function titlesOf(st) {
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.08';
+const APP_VERSION = 'v0.2.09';
 const APP_BUILD = '2026-10-24';
 
 const root = document.getElementById('app');
