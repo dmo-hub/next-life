@@ -48,6 +48,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .recap .h { font-size:13px; font-weight:600; }
 .delta { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px 14px; font-size:12px; }
 .delta > div { display:flex; flex-direction:column; gap:4px; }
+.titles .pattern { font-family:Pridi,serif; font-weight:600; font-size:20px; }
+.titles .more { all:unset; align-self:flex-start; min-height:44px; cursor:pointer; font-size:14px; font-weight:600; text-decoration:underline; }
+.titles .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
 .stamp { align-self:flex-start; font-family:Pridi,serif; font-weight:600; padding:4px 10px; transform:rotate(-3deg); font-size:16px; }
 
 /* ทาง A — ทะเบียนราษฎร์: กระดาษ หมึก ตราประทับแดง */
@@ -1718,6 +1721,213 @@ function reckoningBox(r) {
   return box;
 }
 
+// ลวดลาย/ฉายามาจาก B10 (card.pattern · card.titles เรียงหายากก่อน) — ก่อนนั้นใช้ค่าวาง ??? แบบช่องที่ยังไม่เปิดในสมุดฉายา
+const TITLE_STUB = {
+  pattern: { name: '???', hint: 'ลวดลายชีวิตยังไม่เปิด' },
+  titles: [
+    { name: '???', tier: 'ตำนาน' },
+    { name: '???', tier: 'หายาก' },
+    { name: '???', tier: 'หายาก' },
+    { name: '???', tier: 'ทั่วไป' },
+    { name: '???', tier: 'ทั่วไป' },
+  ],
+};
+const lifeTitles = (card) => ({ pattern: card.pattern ?? TITLE_STUB.pattern, titles: card.titles ?? TITLE_STUB.titles });
+const TITLES_SHOWN = 3;
+
+// บันทึกการตาย (ใบ 04): ลวดลาย 1 + ฉายาเด่น 3 + ปุ่มดูทั้งหมด
+function titlesBox(card) {
+  const { pattern, titles } = lifeTitles(card);
+  const box = el('div', 'recap titles');
+  box.append(el('div', 'h', 'ลวดลายชีวิต'));
+  box.append(el('p', 'pattern', pattern.name));
+  if (pattern.hint) box.append(el('p', 'note', pattern.hint));
+  box.append(el('div', 'h', 'ฉายาเด่น'));
+  const ul = el('ul', 'picks');
+  const rows = titles.map((t) => el('li', null, `${t.name} · ${t.tier}`));
+  rows.forEach((li, i) => {
+    li.hidden = i >= TITLES_SHOWN;
+    ul.append(li);
+  });
+  box.append(ul);
+  if (titles.length > TITLES_SHOWN) {
+    const more = el('button', 'more', `ดูฉายาทั้งหมด (${titles.length})`);
+    more.onclick = () => {
+      rows.forEach((li) => (li.hidden = false));
+      more.remove();
+    };
+    box.append(more);
+  }
+  return box;
+}
+
+// ภาพแชร์รับเฉพาะช่องที่ไล่ชื่อไว้ตรงนี้ — บัญชีบุญบาปบนการ์ดตายหลุดลงภาพไม่ได้ แม้แกนเกมจะเติมช่องใหม่ให้การ์ด
+function shareFacts(card) {
+  const { pattern, titles } = lifeTitles(card);
+  return {
+    age: card.age,
+    who: `${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls}`,
+    job: `${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`,
+    pattern: { name: pattern.name, hint: pattern.hint ?? '' },
+    title: titles[0] ? { name: titles[0].name, tier: titles[0].tier } : null,
+  };
+}
+
+// URL คงที่ ไม่ใช้ location.href — เปิดจากไฟล์ในเครื่องแล้ว path ในเครื่องจะติดไปกับภาพ
+const SHARE_URL = 'dmo-hub.github.io/next-life';
+const SHARE_W = 1080, SHARE_H = 1350;
+const SHARE_FONTS = ['700 110px Srisakdi', '400 40px Sarabun', '600 30px Sarabun'];
+const FONT_WAIT_MS = 3000;
+
+// ไทยไม่เว้นวรรคระหว่างคำ ตัดบรรทัดตามขอบเขตคำจาก Intl.Segmenter · เบราว์เซอร์ที่ไม่มีตัดรายตัวอักษร
+function wrapThai(ctx, text, maxW) {
+  const parts = typeof Intl.Segmenter === 'function'
+    ? [...new Intl.Segmenter('th', { granularity: 'word' }).segment(text)].map((s) => s.segment)
+    : [...text];
+  const lines = [];
+  let line = '';
+  for (const p of parts) {
+    if (line && ctx.measureText(line + p).width > maxW) {
+      lines.push(line.trimEnd());
+      line = p.trimStart();
+    } else line += p;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+async function shareBlob(facts) {
+  // ฟอนต์เว็บต้องโหลดก่อนวาด ไม่งั้น canvas ใช้ฟอนต์สำรอง · เน็ตช้าเกินรอวาดด้วยฟอนต์สำรองไปเลย
+  if (document.fonts) {
+    await Promise.race([
+      Promise.all(SHARE_FONTS.map((f) => document.fonts.load(f, 'ชาติหน้า'))),
+      new Promise((r) => setTimeout(r, FONT_WAIT_MS)),
+    ]).catch(() => {});
+  }
+  const cv = document.createElement('canvas');
+  cv.width = SHARE_W;
+  cv.height = SHARE_H;
+  const ctx = cv.getContext('2d');
+  const css = getComputedStyle(document.documentElement);
+  const c = (k) => css.getPropertyValue(`--${k}`).trim();
+  const cx = SHARE_W / 2, maxW = SHARE_W - 200;
+
+  ctx.fillStyle = c('lacquer');
+  ctx.fillRect(0, 0, SHARE_W, SHARE_H);
+  ctx.strokeStyle = c('gold');
+  ctx.lineWidth = 4;
+  ctx.strokeRect(40, 40, SHARE_W - 80, SHARE_H - 80);
+  ctx.strokeStyle = c('bronze2');
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(56, 56, SHARE_W - 112, SHARE_H - 112);
+  ctx.fillStyle = c('gold');
+  for (const [x, y] of [[40, 40], [SHARE_W - 40, 40], [40, SHARE_H - 40], [SHARE_W - 40, SHARE_H - 40]]) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.PI / 4);
+    ctx.fillRect(-11, -11, 22, 22);
+    ctx.restore();
+  }
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  let y = 0;
+  const text = (s, font, color, lineH, gap = 0) => {
+    ctx.font = font;
+    ctx.fillStyle = color;
+    for (const line of wrapThai(ctx, s, maxW)) {
+      y += lineH;
+      ctx.fillText(line, cx, y);
+    }
+    y += gap;
+  };
+  const rule = (gap) => {
+    y += gap;
+    ctx.strokeStyle = c('bronze');
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx - 180, y);
+    ctx.lineTo(cx + 180, y);
+    ctx.stroke();
+    y += gap;
+  };
+
+  y = 110;
+  text('ชาติหน้า', '700 110px Srisakdi, serif', c('gold'), 120);
+  text('NEXT LIFE', '600 28px Sarabun, sans-serif', c('sand'), 44);
+  rule(44);
+  text(`ตายอายุ ${facts.age}`, '700 96px Srisakdi, serif', c('gold2'), 110, 16);
+  text(facts.who, '400 40px Sarabun, sans-serif', c('cream'), 58);
+  text(facts.job, '400 36px Sarabun, sans-serif', c('sand'), 52);
+  rule(44);
+  text('ลวดลายชีวิต', '600 30px Sarabun, sans-serif', c('gold'), 44);
+  text(facts.pattern.name, '700 76px Srisakdi, serif', c('gold2'), 92);
+  if (facts.pattern.hint) text(facts.pattern.hint, '400 32px Sarabun, sans-serif', c('sand'), 48);
+  if (facts.title) {
+    y += 36;
+    text('ฉายาหายากที่สุด', '600 30px Sarabun, sans-serif', c('gold'), 44);
+    text(facts.title.name, '700 68px Srisakdi, serif', c('gold2'), 84);
+    text(facts.title.tier, '400 32px Sarabun, sans-serif', c('sand'), 48);
+  }
+  ctx.font = '400 30px Sarabun, sans-serif';
+  ctx.fillStyle = c('sand');
+  ctx.fillText(SHARE_URL, cx, SHARE_H - 96);
+
+  return new Promise((ok, fail) => cv.toBlob((b) => (b ? ok(b) : fail(new Error('canvas toBlob ว่าง'))), 'image/png'));
+}
+
+function downloadBlob(blob, name) {
+  const a = el('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+}
+
+// ตรวจด้วยไฟล์เปล่า: เดสก์ท็อปหลายตัวมี navigator.share แต่ส่งไฟล์ไม่ได้
+const canShareFiles = () => {
+  try {
+    return !!navigator.canShare?.({ files: [new File([''], 'x.png', { type: 'image/png' })] });
+  } catch {
+    return false;
+  }
+};
+
+// วาดภาพไว้ก่อนตั้งแต่เปิดการ์ดตาย — Safari ให้เรียก share ได้เฉพาะช่วงสั้น ๆ หลังกด รอวาดตอนกดอาจหลุดสิทธิ์
+// ปุ่มบันทึกมีเสมอ: Chrome บนคอมก็แชร์ไฟล์ได้ แต่หน้าแชร์ของระบบไม่ได้ให้ไฟล์เก็บไว้
+function shareButtons(card) {
+  const ready = shareBlob(shareFacts(card));
+  ready.catch(() => {});
+  const name = `next-life-age-${card.age}.png`;
+  const act = (label, fn) => {
+    const b = button(label, null, async () => {
+      b.disabled = true;
+      try {
+        await fn(await ready);
+      } catch {
+        b.firstChild.textContent = 'สร้างภาพไม่สำเร็จ';
+      } finally {
+        b.disabled = false;
+      }
+    });
+    return b;
+  };
+  const save = act('บันทึกภาพการ์ด', (blob) => downloadBlob(blob, name));
+  if (!canShareFiles()) return [save];
+  const share = act('แชร์ภาพการ์ด', async (blob) => {
+    const file = new File([blob], name, { type: 'image/png' });
+    try {
+      await navigator.share({ files: [file], title: 'ชาติหน้า · Next Life', text: `ชาติหน้า · ตายอายุ ${card.age} — ${SHARE_URL}` });
+    } catch (e) {
+      // ผู้เล่นปิดหน้าแชร์เอง = จบ · แชร์พังด้วยเหตุอื่นให้ได้ไฟล์แทน
+      if (e?.name !== 'AbortError') downloadBlob(blob, name);
+    }
+  });
+  return [share, save];
+}
+
 function button(label, fx, onclick) {
   const b = el('button', 'choice');
   b.append(el('span', null, label));
@@ -1758,9 +1968,10 @@ function render(card) {
     if (card.summary.debt) body.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
     if (card.summary.bankruptcies) body.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
     if (card.note) body.append(el('p', 'sub', card.note));
+    body.append(titlesBox(card));
     body.append(reckoningBox(card.reckoning));
     if (card.recap) body.append(recap(card.recap));
-    choices.append(button('เกิดใหม่', null, start));
+    choices.append(...shareButtons(card), button('เกิดใหม่', null, start));
   } else {
     top.append(el('b', null, `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, regionLabel(st)));
     box.append(top, stats(s));
