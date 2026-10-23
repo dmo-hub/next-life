@@ -90,12 +90,16 @@ export const rules = [
   }),
   {
     id: 'ledger-read',
-    desc: '(ค) เฉพาะ lottery_numen อ่านบัญชีบุญบาป (merit_ledger / odds_modifier / prize_table) ได้',
+    desc: '(ค) เฉพาะ lottery_numen อ่านบัญชีบุญบาป (merit_ledger / odds_modifier / prize_table) ได้ · กิจกรรมสายมูอื่นห้ามมีตัวคูณกรรม',
     event(e, ctx, r) {
       if (lottery(e)) return;
       const b = beliefOf(e) ?? {};
       for (const k of ['odds_modifier', 'prize_table', 'cap_per_life', 'stake', 'trigger']) if (b[k] !== undefined) r(`.belief.${k}`, `${k} ใช้ได้เฉพาะ lottery_numen`);
       for (const { path, s } of strings(e)) if (/merit_ledger/.test(s)) r(path, 'อ่าน merit_ledger ได้เฉพาะ lottery_numen');
+      // ตัวคูณกรรมก็อ่านบัญชี — กิจกรรมสายมูห้ามให้บุญบาปเอียงโอกาสเกิดหรือผลสุ่ม
+      if (!beliefOf(e)) return;
+      if (isObj(e.multipliers) && e.multipliers.karma !== undefined) r('.multipliers.karma', 'กิจกรรมสายมูห้ามใช้ตัวคูณกรรม');
+      for (const { node, path } of effectSites(e)) if (isObj(node.multipliers) && node.multipliers.karma !== undefined) r(`${path}.multipliers.karma`, 'กิจกรรมสายมูห้ามใช้ตัวคูณกรรม');
     },
   },
   {

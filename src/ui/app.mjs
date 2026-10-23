@@ -154,12 +154,14 @@ function render(card) {
       if (card.items?.length) body.append(list(card.items));
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
       card.choices.forEach((c, i) => {
-        choices.append(
-          button(c, card.fx?.[i], () => {
-            choose(st, i);
-            next();
-          }),
-        );
+        const why = card.locked?.[i];
+        // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
+        const b = button(c, why ?? card.fx?.[i], () => {
+          choose(st, i);
+          next();
+        });
+        if (why) b.disabled = true;
+        choices.append(b);
       });
     }
   }

@@ -3,6 +3,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { RULES, DOC_SHAPE, lintContext, lintDocs, formatProblem } from '../src/node/lint/index.mjs';
+import { strings } from '../src/node/lint/util.mjs';
 import { loadEvents, loadEra } from '../src/node/load.mjs';
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
 import { MERIT_CATS, MAX_LEN, MIN_CHOICES } from '../src/node/lint/vocab.mjs';
@@ -12,6 +13,12 @@ const root = new URL('../', import.meta.url);
 const dir = (d) => readdirSync(new URL(d, root)).filter((n) => n.endsWith('.yaml')).sort();
 const load = (d, f) => ({ file: `${d}${f}`, doc: parse(readFileSync(new URL(`${d}${f}`, root), 'utf8')) });
 const ctx = lintContext();
+// ชื่อธงทุกตัวที่โผล่ในตำแหน่งธง (ตั้ง ล้าง เงื่อนไข ตัวคูณ ล็อก)
+const FLAG_PATH = /(sets_flags|clears_flags|\.flags\.(has|not))\[\d+\]$/;
+function* flagNames(doc) {
+  for (const x of strings(doc)) if (FLAG_PATH.test(x.path)) yield x;
+  for (const e of doc.events ?? []) for (const node of [e, ...(e.choices ?? []).flatMap((c) => c.outcomes ?? [])]) for (const f of Object.keys(node.multipliers?.flags ?? {})) yield { s: f };
+}
 const fails = [];
 const rows = [];
 
@@ -74,6 +81,15 @@ for (const s of [...seenLabels, DISCLAIMER]) {
   if (s.length > MAX_LEN.choice) fails.push(`การ์ดจัดสรร: ยาวเกิน ${MAX_LEN.choice} "${s}"`);
 }
 rows.push(['การ์ดจัดสรร 2500–2700', `${seenLabels.size} ข้อความ`]);
+
+// ทะเบียนธงต้องไม่มีชื่อค้างที่ไม่มีเนื้อหาไหนใช้ — ตรวจกับ content/ จริง (ด่านรายไฟล์มองไม่เห็นทั้งชุด)
+const realDocs = dir('content/').map((f) => load('content/', f));
+const used = new Set();
+for (const { doc } of realDocs) for (const { s: f } of flagNames(doc)) used.add(f.split(':')[0]);
+const stale = [...ctx.flags.flags, ...ctx.flags.prefixes].filter((f) => !used.has(f) && f !== 'vow_broken');
+rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${ctx.flags.prefixes.size} ชื่อหน้า · ค้าง ${stale.length}`]);
+// ธงมีพารามิเตอร์ยังไม่มีเนื้อหาจริงใช้ (มีแค่ใน fixture สายมู) จึงไม่นับว่าค้าง
+for (const f of stale) if (!ctx.flags.prefixes.has(f)) fails.push(`ทะเบียนธง: "${f}" ไม่มีเนื้อหาใน content/ ใช้`);
 
 try {
   rows.push(['content/', `ผ่าน ${loadEvents().length} เหตุการณ์`]);

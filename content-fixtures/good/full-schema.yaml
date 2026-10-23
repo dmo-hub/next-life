@@ -16,8 +16,8 @@ events:
       region: [กรุงเทพฯ และปริมณฑล, ตะวันออก]
       sex: [ชาย, หญิง]
       stats: {knowledge: {min: 40}, happiness: {min: 10, max: 90}}
-      flags: {has: [has_job], not: [in_debt]}
-      family: [{role: child, age: [17, 19], alive: true, relations: {min: 30}}]
+      flags: {has: [own_business], not: [in_debt]}
+      family: [{role: parent, age: [50, 90], alive: true}]
     weight: 2
     multipliers: {class: {ร่ำรวย: 1.5}, stats: {knowledge: 1.2}, karma: 1.1, family_fame: 1.05}
     hidden: [money]
@@ -25,20 +25,21 @@ events:
       - id: open_account
         text: "ลองเปิดบัญชี{ครับ}"
         outcomes:
-          - {weight: 3, text: "ราคาขึ้นช่วงแรก", effects: {happiness: 1, money: {unit: income_x, amount: 0.3}, invest: {asset: stock, share: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ราคาขึ้นช่วงแรก", multipliers: {stats: {knowledge: 1.5}, karma: 1.2}, effects: {happiness: 1, money: {unit: income_x, amount: 0.3}, invest: {asset: stock, share: 0.2}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ราคาตกหนักในปีนั้น", effects: {happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: help_parents
         text: "เอาเงินไปช่วยพ่อแม่ก่อน"
         effects: {relations: 2, money: {unit: fixed_baht, amount: -20000, ref_year: 2560}}
         merit: [{cat: care_parents, level: 2}, {cat: dana, level: 1}]
-        sets_flags: [helped_parents]
+        sets_flags: [married]
         schedules: [{event: work_parents_thanks_01, after_years: [1, 3]}]
       - id: save_first
         text: "เก็บเงินไว้ก่อน"
         merit: [{cat: neutral}]
       - id: read_more
         text: "อ่านหาข้อมูลอีกสักปี"
+        requires: {money: {unit: income_x, amount: 0.5}, stats: {knowledge: {min: 50}}}
         effects: {knowledge: 1}
         merit: [{cat: neutral}]
   - id: work_parents_thanks_01
@@ -47,7 +48,7 @@ events:
     stage: ทำงาน
     years: [2518, 2650]
     text: "พ่อแม่เล่าให้ญาติฟังว่าลูกคนนี้ช่วยบ้านมาตลอด"
-    when: {flags: {has: [helped_parents]}}
+    when: {flags: {has: [married]}}
     choices: []
   - id: work_job_01
     type: A
@@ -57,8 +58,8 @@ events:
     years: [2500, 2650]
     text: "ได้งานประจำแห่งแรก"
     choices:
-      - {text: "รับงาน", sets_flags: [has_job], effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
-      - {text: "กู้นอกระบบมาเปิดร้าน", sets_flags: [has_job, in_debt], merit: [{cat: neutral}]}
+      - {text: "รับงาน", sets_flags: [own_business], effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+      - {text: "กู้นอกระบบมาเปิดร้าน", sets_flags: [own_business, in_debt], merit: [{cat: neutral}]}
       - {text: "ช่วยกิจการที่บ้านไปก่อน", merit: [{cat: neutral}]}
       - {text: "ขอพักสักปีแล้วค่อยหางาน", effects: {happiness: 1}, merit: [{cat: neutral}]}
   - id: teen_clips_01
@@ -67,12 +68,14 @@ events:
     stage: วัยรุ่น
     years: [2500, 2650]
     weight: 2
+    repeat: {gap: 2, max: 3}
     multipliers: {flags: {likes_clips: 3}}
     text: "เพื่อนชวนตัดคลิปลงเน็ต"
     choices:
       - {text: "ตัดคลิปจนดึก", sets_flags: [likes_clips], effects: {knowledge: 1, health: -1}, merit: [{cat: neutral}]}
       - {text: "ลองทำคลิปตลก", outcomes: [{weight: 1, text: "คลิปดังชั่วข้ามคืน", effects: {happiness: 2}, sets_flags: [likes_clips], merit: [{cat: neutral}]}, {weight: 3, text: "ไม่มีใครดู", effects: {happiness: -1}, merit: [{cat: neutral}]}], merit: [{cat: neutral}]}
       - {text: "ไม่สนใจ", merit: [{cat: neutral}]}
+      - {text: "ชวนเพื่อนทำช่องคลิปด้วยกัน", requires: {flags: {has: [likes_clips]}, reason: "ยังไม่เคยทำคลิป"}, merit: [{cat: neutral}]}
       - {text: "ไปเตะบอลแทน", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
   - id: work_flood_01
     type: A

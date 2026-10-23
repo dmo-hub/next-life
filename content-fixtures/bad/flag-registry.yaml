@@ -1,0 +1,12 @@
+# ตั้งธงที่ไม่อยู่ในทะเบียน (สะกดผิด) + ธงมีพารามิเตอร์ที่ชื่อหน้าไม่อยู่ในทะเบียน — ธงในทะเบียนยังผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", sets_flags: [maried], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", sets_flags: ["wish_open:x"], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", sets_flags: [married, "vow_open:x"], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", clears_flags: [in_debt], merit: [{cat: neutral}]}

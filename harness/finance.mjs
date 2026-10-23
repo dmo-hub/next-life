@@ -1,7 +1,7 @@
 // harness การเงิน (B08): ทรัพย์สุทธิตอนตาย (บาทค่าเงินปีเกิด) ตามฐานะเกิด/ภาค ต้องไม่ผิดทิศกับความเหลื่อมล้ำจริง
 // ตัวควบคุม: ปิดผลจุดเกิด (อาชีพเท่ากันทุกฐานะ · รายได้ทุกภาค = ทั่วประเทศ · เงินติดตัวเท่ากัน) แล้วช่องว่างต้องหดลงชัด
 // — พิสูจน์ว่าตัววัดจับผลจุดเกิดได้จริง ไม่ใช่เรียงถูกเพราะบังเอิญ · รันซ้ำ seed เดิมต้องได้ผลเดิมทุกหลัก
-import { playLife, mixSeed, CLASSES } from '../src/engine/index.mjs';
+import { playLife, openChoices, mixSeed, CLASSES } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 
 const args = process.argv.slice(2);
@@ -11,7 +11,10 @@ const opt = (name, def) => {
 };
 const n = opt('n', 50000);
 const seed = opt('seed', 1);
-const randomBot = (card, rng) => rng.int(0, card.choices.length - 1);
+const randomBot = (card, rng) => {
+  const open = openChoices(card);
+  return open[rng.int(0, open.length - 1)];
+};
 const median = (xs) => {
   const s = [...xs].sort((a, b) => a - b);
   return s.length ? s[Math.floor(s.length / 2)] : NaN;

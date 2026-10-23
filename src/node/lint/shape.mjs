@@ -8,9 +8,9 @@ import { ASSETS } from '../../engine/finance.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem'],
-  outcome: ['weight', 'text', 'effects', 'merit', 'sets_flags', 'schedules'],
+  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires'],
+  outcome: ['weight', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
@@ -22,6 +22,8 @@ const KEYS = {
   whenFlags: ['has', 'not'],
   family: ['role', 'age', 'alive', 'health', 'relations'],
   multipliers: ['class', 'stats', 'karma', 'family_fame', 'flags'],
+  repeat: ['gap', 'max'],
+  requires: ['money', 'stats', 'flags', 'reason'],
   belief: ['kind', 'tradition', 'outside_canon', 'vow', 'trigger', 'cap_per_life', 'prize_table', 'stake', 'odds_modifier'],
   vow: ['deadline_years', 'due_event', 'redeem_full_cost', 'redeem_light_cost', 'defer_once'],
   trigger: ['money_state'],
@@ -57,9 +59,24 @@ function* shaped(e) {
     if (isObj(b.odds_modifier)) yield ['odds', b.odds_modifier, '.belief.odds_modifier'];
     if (isObj(b.stake)) yield ['money', b.stake, '.belief.stake'];
   }
-  for (const { c, path } of choicesOf(e)) yield ['choice', c, path];
+  if (isObj(e.repeat)) yield ['repeat', e.repeat, '.repeat'];
+  for (const { c, path } of choicesOf(e)) {
+    yield ['choice', c, path];
+    const q = c.requires;
+    if (!isObj(q)) continue;
+    yield ['requires', q, `${path}.requires`];
+    if (isObj(q.money)) yield ['money', q.money, `${path}.requires.money`];
+    if (isObj(q.flags)) yield ['whenFlags', q.flags, `${path}.requires.flags`];
+    if (isObj(q.stats)) {
+      yield ['stats', q.stats, `${path}.requires.stats`];
+      for (const [k, b] of Object.entries(q.stats)) if (isObj(b)) yield ['bound', b, `${path}.requires.stats.${k}`];
+    }
+  }
   for (const { node, path } of effectSites(e)) {
-    if (path.includes('outcomes')) yield ['outcome', node, path];
+    if (path.includes('outcomes')) {
+      yield ['outcome', node, path];
+      if (isObj(node.multipliers)) yield ['multipliers', node.multipliers, `${path}.multipliers`];
+    }
     if (isObj(node.effects)) {
       yield ['effects', node.effects, `${path}.effects`];
       if (isObj(node.effects.money)) yield ['money', node.effects.money, `${path}.effects.money`];
@@ -75,6 +92,17 @@ function* shaped(e) {
 const bound = (b) => isObj(b) && ['min', 'max'].every((k) => b[k] === undefined || (typeof b[k] === 'number' && b[k] >= 0 && b[k] <= 100)) && !(b.min > b.max);
 const nonEmptySubset = (v, of) => Array.isArray(v) && v.length > 0 && v.every((x) => of.includes(x));
 const positive = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
+
+function checkMultipliers(m, at, r) {
+  if (m === undefined) return;
+  if (!isObj(m)) return r(at, 'multipliers ต้องเป็น object');
+  for (const [k, of] of [['class', CLASSES], ['stats', STAT_KEYS]]) {
+    if (m[k] === undefined) continue;
+    if (!isObj(m[k]) || Object.entries(m[k]).some(([kk, v]) => !of.includes(kk) || !positive(v))) r(`${at}.${k}`, `ต้องเป็น {${of.join('|')}: เลขบวก}`);
+  }
+  for (const k of ['karma', 'family_fame']) if (m[k] !== undefined && !positive(m[k])) r(`${at}.${k}`, 'ต้องเป็นเลขบวก');
+  if (m.flags !== undefined && (!isObj(m.flags) || Object.entries(m.flags).some(([f, v]) => !FLAG_RE.test(f) || !positive(v)))) r(`${at}.flags`, 'ต้องเป็น {ชื่อธง: เลขบวก}');
+}
 
 export const rules = [
   {
@@ -216,18 +244,11 @@ export const rules = [
   },
   {
     id: 'weight-shape',
-    desc: 'weight เป็นเลขบวก · multipliers (ฐานะ · ค่าสถานะ · กรรม · ชื่อเสียงตระกูล · ธง) เป็นเลขบวก',
+    desc: 'weight เป็นเลขบวก · multipliers ของเหตุการณ์และของผลสุ่มแต่ละทาง (ฐานะ · ค่าสถานะ · กรรม · ชื่อเสียงตระกูล · ธง) เป็นเลขบวก',
     event(e, ctx, r) {
       if (e.weight !== undefined && !positive(e.weight)) r('.weight', 'weight ต้องเป็นเลขบวก');
-      const m = e.multipliers;
-      if (m === undefined) return;
-      if (!isObj(m)) return r('.multipliers', 'multipliers ต้องเป็น object');
-      for (const [k, of] of [['class', CLASSES], ['stats', STAT_KEYS]]) {
-        if (m[k] === undefined) continue;
-        if (!isObj(m[k]) || Object.entries(m[k]).some(([kk, v]) => !of.includes(kk) || !positive(v))) r(`.multipliers.${k}`, `ต้องเป็น {${of.join('|')}: เลขบวก}`);
-      }
-      for (const k of ['karma', 'family_fame']) if (m[k] !== undefined && !positive(m[k])) r(`.multipliers.${k}`, 'ต้องเป็นเลขบวก');
-      if (m.flags !== undefined && (!isObj(m.flags) || Object.entries(m.flags).some(([f, v]) => !FLAG_RE.test(f) || !positive(v)))) r('.multipliers.flags', 'ต้องเป็น {ชื่อธง: เลขบวก}');
+      checkMultipliers(e.multipliers, '.multipliers', r);
+      for (const { node, path } of effectSites(e)) if (path.includes('outcomes')) checkMultipliers(node.multipliers, `${path}.multipliers`, r);
     },
   },
   {
@@ -307,6 +328,48 @@ export const rules = [
       if (e.era === undefined) return;
       if (typeof e.era !== 'string' || !ctx.eras.has(e.era)) r('.era', `ไม่มีเหตุการณ์บ้านเมือง "${e.era}" (${[...ctx.eras].join(' ')})`);
       if (e.at_age !== undefined || e.weight !== undefined) r('.era', 'การ์ดบ้านเมืองห้ามมี at_age หรือ weight');
+    },
+  },
+  {
+    id: 'repeat-shape',
+    desc: 'repeat = {gap: เว้นกี่ปี 1–100, max: ออกได้กี่ครั้ง 2–20} · ใช้ได้เฉพาะใบในกองสุ่ม (มี weight ไม่มี at_age ไม่ผูก era)',
+    event(e, ctx, r) {
+      const p = e.repeat;
+      if (p === undefined) return;
+      if (!isObj(p) || !(isInt(p.gap) && p.gap >= 1 && p.gap <= 100) || !(isInt(p.max) && p.max >= 2 && p.max <= 20)) r('.repeat', `ต้องเป็น {gap: 1–100, max: 2–20} ได้ ${JSON.stringify(p)}`);
+      if (e.weight === undefined || e.at_age !== undefined || e.era !== undefined) r('.repeat', 'repeat ใช้ได้กับใบในกองสุ่มเท่านั้น (มี weight · ไม่มี at_age · ไม่มี era)');
+    },
+  },
+  {
+    id: 'choice-lock',
+    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
+    event(e, ctx, r) {
+      const cs = choicesOf(e);
+      for (const { c, path } of cs) {
+        const q = c.requires;
+        if (q === undefined) continue;
+        const at = `${path}.requires`;
+        if (!isObj(q) || !['money', 'stats', 'flags'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats หรือ flags อย่างน้อยหนึ่งอย่าง'); continue; }
+        if (q.money !== undefined && !(isMoney(q.money) && q.money.amount > 0)) r(`${at}.money`, 'ต้องเป็นเงินมีหน่วย amount > 0');
+        if (q.stats !== undefined && (!isObj(q.stats) || Object.entries(q.stats).some(([k, b]) => !STAT_KEYS.includes(k) || !bound(b) || (b.min === undefined && b.max === undefined)))) r(`${at}.stats`, 'ต้องเป็น {ค่าสถานะ: {min, max}} 0–100');
+        if (q.flags !== undefined && (!isObj(q.flags) || ['has', 'not'].some((k) => q.flags[k] !== undefined && !Array.isArray(q.flags[k])))) r(`${at}.flags`, 'flags ต้องเป็น {has: [...], not: [...]}');
+        // ชื่อธงเป็นภาษาโค้ด ผู้เล่นอ่านไม่ออก — ต้องบอกเหตุผลเป็นคำ
+        if (q.flags !== undefined && !(typeof q.reason === 'string' && q.reason.trim())) r(`${at}.reason`, 'ล็อกด้วยธงต้องมี reason ที่ผู้เล่นอ่านเข้าใจ');
+        if (q.reason !== undefined && !(typeof q.reason === 'string' && q.reason.trim())) r(`${at}.reason`, 'reason ต้องเป็นข้อความ');
+      }
+      if (cs.length && cs.every(({ c }) => c.requires !== undefined)) r('.choices', 'ทุกตัวเลือกล็อกได้ — ต้องมีตัวเลือกที่ไม่มี requires อย่างน้อย 1 ตัว ไม่งั้นการ์ดค้าง');
+    },
+  },
+  {
+    id: 'family-system',
+    desc: 'when.family ใช้ได้แค่ role parent กับ age/alive — คู่ครอง ลูก สุขภาพ/ความสัมพันธ์ของสมาชิกยังไม่มีระบบ ใส่ไปแล้วการ์ดไม่เคยออก',
+    event(e, ctx, r) {
+      const fam = isObj(e.when) ? e.when.family : undefined;
+      list(fam).forEach((f, i) => {
+        if (!isObj(f)) return;
+        if (f.role !== undefined && f.role !== 'parent') r(`.when.family[${i}].role`, `role ${f.role} ยังไม่มีระบบ (ใช้ได้แค่ parent)`);
+        for (const k of ['health', 'relations']) if (f[k] !== undefined) r(`.when.family[${i}].${k}`, `${k} ของสมาชิกครอบครัวยังไม่มีระบบ`);
+      });
     },
   },
 ];

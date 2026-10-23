@@ -1,7 +1,7 @@
 // harness ของบัญชีบุญบาป (B05): เนื้อหาจริง + เนื้อหาทดสอบใน content-fixtures/harness/ · บอท 3 บุคลิกเล่นชีวิตชุดเดียวกัน
 // ด่าน: บอทสายบุญกับสายบาปได้บัญชีแยกกันชัด · ธง vow_broken ตั้งได้จริง (ด่าน 5 ใบ 12) · การ์ด/ค่าที่หน้าจอใช้ไม่มีค่าบัญชี
 // --no-karma = ตัวควบคุม: ปิดตัวคูณกรรม ส่วนต่างอายุระหว่างบอทต้องหดเหลือแค่ผลจากค่าสถานะ
-import { playLife, mixSeed, expectedDeathAge, statsOf, netLedger, karmaMultiplier, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, KARMA } from '../src/engine/index.mjs';
+import { playLife, openChoices, mixSeed, expectedDeathAge, statsOf, netLedger, karmaMultiplier, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, KARMA } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 
 const args = process.argv.slice(2);
@@ -27,13 +27,18 @@ const score = (c) =>
 const extreme = (sign) => (card, rng, st) => {
   // การ์ดจัดสรรเงินไม่มีป้ายบุญบาป — เลือกตัวแรกโดยไม่ดึงเลขสุ่ม ลำดับการเลือกของบอทจึงเหมือนก่อนมีการ์ดนี้
   if (st.pending.alloc) return 0;
-  const s = st.pending.choices.map((c) => sign * score(c));
+  // ตัวเลือกที่ล็อกอยู่ผู้เล่นกดไม่ได้ บอทก็ห้ามเลือก
+  const open = openChoices(card);
+  const s = open.map((i) => sign * score(st.pending.choices[i]));
   const best = Math.max(...s);
-  const ties = s.flatMap((v, i) => (v === best ? [i] : []));
+  const ties = open.filter((_, j) => s[j] === best);
   return ties[rng.int(0, ties.length - 1)];
 };
 const BOTS = {
-  สุ่ม: (card, rng) => rng.int(0, card.choices.length - 1),
+  สุ่ม: (card, rng) => {
+    const open = openChoices(card);
+    return open[rng.int(0, open.length - 1)];
+  },
   สายบุญ: extreme(1),
   สายบาป: extreme(-1),
 };

@@ -1,0 +1,26 @@
+# repeat ผิดรูป (max 1 ไม่นับเป็นซ้ำ) + หลักไมล์ตั้ง repeat — ใบในกองสุ่มที่ตั้งถูกยังผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    repeat: {gap: 3, max: 1}
+    text: "ข้อความการ์ด"
+    choices: []
+  - id: bad_case_02
+    type: A
+    stage: ทำงาน
+    at_age: 35
+    years: [2500, 2650]
+    repeat: {gap: 3, max: 2}
+    text: "ข้อความการ์ด"
+    choices: []
+  - id: ok_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    repeat: {gap: 3, max: 2}
+    text: "ข้อความการ์ด"
+    choices: []

@@ -81,6 +81,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .b .choice { border:1px solid var(--bronze2); background:var(--lacquer2); color:var(--cream); }
 .b .choice:hover, .b .choice:focus-visible { border-color:var(--gold); background:#2E2218; outline:none; }
 .b .choice .fx { color:var(--gold); }
+/* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
+.a .choice:disabled, .b .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
 </style>
 </head>
 <body>
@@ -601,13 +603,19 @@ const HAPPY_PULL = 1 - 0.5 ** (1 / 3);
 const knowledgeGain = (age) => (age <= 12 ? 3 : age <= 18 ? 2.5 : age <= 30 ? 1 : age < 60 ? 0.4 : 0);
 const RELATION_FADE = 0.007;
 const ERA_GAP = 3;
-// ปีหนึ่งจับเหตุการณ์จากกองสุ่มได้ด้วยโอกาสนี้ (เมื่อกองมีใบที่เกิดได้) — ปรับให้ด่าน 4 (80–150 การ์ด) ผ่าน
-const POOL_CHANCE = 0.35;
+// ปีหนึ่งจับเหตุการณ์จากกองสุ่มได้ด้วยโอกาสนี้ (เมื่อกองมีใบที่เกิดได้) แยกตามช่วงวัย — วัยรุ่น/หนุ่มสาวสั้นแต่เรื่องเยอะ
+// ชราเป็นช่วงยาวสุด ถ้าถี่เท่ากันการ์ดจะล้นเพดานด่าน 4 (80–150 การ์ด)
+const POOL_CHANCE = { เด็ก: 0.3, วัยรุ่น: 0.5, หนุ่มสาว: 0.45, ทำงาน: 0.35, กลางคน: 0.35, ชรา: 0.3 };
 // ตัวคูณรายได้ถาวรสะสมทั้งชีวิตอยู่ในเพดานนี้ — ผลซ้อนหลายครั้งไม่ทำให้รายได้หายหมดหรือพุ่งไร้ขอบ
-const INCOME_MULT = [0.25, 3];
-// ผลเรื้อรังสะสมต่อค่าได้ไม่เกิน ±CHRONIC_MAX ระดับ · ไหลระดับละ CHRONIC_STEP หน่วยต่อปี
+const INCOME_MULT = [0.1, 5];
+// ผลเรื้อรังสะสมต่อค่าได้ไม่เกิน ±CHRONIC_MAX ระดับ · ไหลระดับละ CHRONIC_STEP หน่วยต่อปี · จางลงระดับละ 1 ทุก CHRONIC_FADE ปี
+// สุขภาพไหลเบากว่าค่าอื่น: การตายอ่านสุขภาพตัวเดียว ค่าแรงกว่านี้ดึงอายุตายของบอทหลุดด่าน 3b · ค่าอื่นไม่แตะการตาย
 const CHRONIC_MAX = 3;
-const CHRONIC_STEP = 0.35;
+const CHRONIC_STEP = { health: 0.35, happiness: 1, knowledge: 1, relations: 1 };
+const CHRONIC_FADE = 5;
+// ตัวคูณตามค่าสถานะเป็นขั้นบันได: คนเขียนเนื้อหารู้ว่าค่าเท่าไรถึงนับว่า "สูง/ต่ำ" ไม่ต้องคิดเลขยกกำลัง
+const STAT_HIGH = 70;
+const STAT_LOW = 30;
 // ออกการ์ดสรุปอย่างน้อยทุก K ปี ถึงไม่มีอะไรเกิด · ปีที่มีเรื่อง (เปลี่ยนช่วง · ยุค · ลาง · จัดสรรเงิน) สรุปทันที
 // ปีเงียบรวบเป็นใบเดียว — การ์ดสรุปทุกปีที่มีแค่เงินขยับอ่านแล้วเปล่า
 const SUMMARY_EVERY = 5;
@@ -650,6 +658,14 @@ function newLife(seed, content) {
   const jit = makeRng(seed ^ 0x6a09e667);
   const s = Object.fromEntries(Object.entries(startStats(cls)).map(([k, v]) => [k, clamp(v + (jit.next() * 2 - 1) * START_JITTER)]));
   const occupation = pickOccupation(era, seed, cls);
+  // พ่อแม่ใช้ stream แยก — การมีพ่อแม่ไม่กินเลขสุ่มของโลก ลำดับสุ่มการตายของตัวเองจึงไม่ขยับ
+  // อายุพ่อแม่ตอนเกิดเป็นค่าตั้งของเกม (ยังไม่มีข้อมูลอายุแม่ตอนคลอดรายยุคในชุดข้อมูล)
+  const famRng = makeRng(seed ^ 0x3c6ef372);
+  const motherAge = famRng.int(18, 40);
+  const parents = [
+    { sex: 'หญิง', age: motherAge, alive: true },
+    { sex: 'ชาย', age: motherAge + famRng.int(0, 8), alive: true },
+  ];
   const st = {
     rng,
     seed,
@@ -704,6 +720,12 @@ function newLife(seed, content) {
     poolAge: null,
     incomeMult: 1,
     chronic: {},
+    // อายุที่ระดับเรื้อรังของค่านั้นเปลี่ยนล่าสุด — นับรอบจางจากจุดนี้
+    chronicAge: {},
+    // เหตุการณ์ที่ออกแล้ว: จำนวนครั้ง + อายุครั้งล่าสุด ให้ใบที่ตั้ง repeat ออกซ้ำตามช่วงเว้น
+    fired: {},
+    parents,
+    famRng,
   };
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
   st.lastCardMoney = st.money;
@@ -732,9 +754,35 @@ function stageRecap(st, lastAge) {
   };
 }
 
-// ป้ายผลบนตัวเลือก (ใบ 07): ผลคงที่ = ↑/↓ · ผลสุ่มหรือค่าที่เหตุการณ์ซ่อน = ? · หวยสายมู = ? เสมอ (ใบ 12)
+// ความแรงของผลทางหนึ่งเป็นแต้มเดียว (ระดับค่าสถานะ + เรื้อรัง + เงิน + รายได้) ใช้วัดความกว้างของผลสุ่ม
+// อ่านเนื้อหาล้วน ไม่อ่าน state — ป้ายเสี่ยงจึงไม่บอกค่าที่ซ่อนอยู่ เช่นบัญชีบุญบาปที่เอียงผล
+function outcomeScore(o) {
+  const fx = o.effects ?? {};
+  let s = 0;
+  for (const k of STAT_KEYS) s += fx[k] ?? 0;
+  for (const v of Object.values(fx.chronic ?? {})) s += v;
+  const m = fx.money;
+  if (m) s += m.unit === 'income_x' ? Math.sign(m.amount) * Math.min(3, Math.max(1, Math.round(Math.abs(m.amount)))) : Math.sign(m.amount ?? m) * 2;
+  if (fx.income_mult) s += fx.income_mult > 1 ? 2 : -2;
+  return s;
+}
+// เกณฑ์แบ่งความกว้างของผล (แต้มสูงสุด − ต่ำสุด) เป็น 3 ระดับที่ผู้เล่นเห็น
+const RISK = [[2, 'เสี่ยงต่ำ'], [5, 'เสี่ยงกลาง'], [Infinity, 'เสี่ยงสูง']];
+function riskLabel(outcomes) {
+  const s = outcomes.map(outcomeScore);
+  const spread = Math.max(...s) - Math.min(...s);
+  return RISK.find(([max]) => spread <= max)[1];
+}
+
+// ป้ายผลบนตัวเลือก (ใบ 07): ผลคงที่ = ↑/↓ · ผลสุ่ม = ระดับเสี่ยงจากความกว้างของผล · ค่าที่เหตุการณ์ซ่อน = ? · หวยสายมู = ? เสมอ (ใบ 12)
 function choiceFx(ev, c) {
-  if (c.outcomes || ev.belief?.kind === 'lottery_numen') return '?';
+  if (ev.belief?.kind === 'lottery_numen') return '?';
+  const fixed = fixedFx(ev, c);
+  if (!c.outcomes?.length) return fixed;
+  return [fixed, riskLabel(c.outcomes)].filter(Boolean).join(' · ');
+}
+
+function fixedFx(ev, c) {
   const hidden = [...(ev.hidden ?? []), ...(c.hidden ?? [])];
   const fx = c.effects ?? {};
   const out = [];
@@ -801,6 +849,29 @@ function applyEffects(st, fx = {}) {
     const lv = Math.max(-CHRONIC_MAX, Math.min(CHRONIC_MAX, (st.chronic[k] ?? 0) + v));
     if (lv) st.chronic[k] = lv;
     else delete st.chronic[k];
+    st.chronicAge[k] = st.age;
+  }
+}
+
+// เรื้อรังไหลทุกปี แล้วจางลงระดับละ 1 ทุก CHRONIC_FADE ปีนับจากครั้งล่าสุดที่ระดับเปลี่ยน
+// ไม่แตะเส้นสุขภาพธรรมชาติ — ป่วยเรื้อรังจึงเพิ่มโอกาสตายจริง
+function flowChronic(st) {
+  for (const [k, lv] of Object.entries(st.chronic)) {
+    st[k] = clamp(st[k] + lv * CHRONIC_STEP[k]);
+    if (st.age - st.chronicAge[k] < CHRONIC_FADE) continue;
+    const next = lv - Math.sign(lv);
+    if (next) st.chronic[k] = next;
+    else delete st.chronic[k];
+    st.chronicAge[k] = st.age;
+  }
+}
+
+// พ่อแม่แก่และตายตามตารางชีพเดียวกับตัวเอง (แนวชีวิตของปีปฏิทินนั้น) ด้วย stream ของครอบครัว
+function ageParents(st, year) {
+  for (const p of st.parents) {
+    if (!p.alive) continue;
+    p.age += 1;
+    if (st.famRng.next() < lifeQx(st.content.era, st.seed, p.sex, year, p.age)) p.alive = false;
   }
 }
 
@@ -826,8 +897,8 @@ function stepYear(st) {
   st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
   st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * (100 - st.knowledge)) / 100);
   st.relations = clamp(st.relations * (1 - RELATION_FADE));
-  // ผลเรื้อรังไหลทุกปีจนกว่าจะมีผลกลับทาง · ไม่แตะเส้นสุขภาพธรรมชาติ — ป่วยเรื้อรังจึงเพิ่มโอกาสตายจริง
-  for (const [k, lv] of Object.entries(st.chronic)) st[k] = clamp(st[k] + lv * CHRONIC_STEP);
+  flowChronic(st);
+  ageParents(st, year);
   // ผลตอบแทนคิดกับเงินต้นปีก่อนเงินเก็บของปีนี้เข้า · ติดลบ = หนี้ ทบดอกเบี้ยเงินกู้ของปีนั้น
   const era = st.content.era;
   if (st.money > 0) {
@@ -858,9 +929,10 @@ function stepYear(st) {
   if (eras.length && (st.lastEraAge === null || st.age - st.lastEraAge >= ERA_GAP)) {
     st.lastEraAge = st.age;
     for (const e of eras) {
-      // มีการ์ดเนื้อหาผูกเหตุการณ์นี้ = ให้เลือกรับมือ · ไม่มี = การ์ดเล่าเรื่องเดิม
+      // เล่าเหตุการณ์บ้านเมืองก่อนเสมอ · มีการ์ดเนื้อหาผูกไว้ = ตามด้วยการ์ดให้เลือกรับมือ
+      st.due.push({ kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: e.name });
       const ev = st.content.events.find((c) => c.era === e.id && whenOk(st, c.when) && (c.when?.age || c.stage === stage));
-      st.due.push(ev ? { kind: 'eraEvent', ev, age: st.age } : { kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: e.name });
+      if (ev) st.due.push({ kind: 'eraEvent', ev, age: st.age });
     }
   }
 }
@@ -931,8 +1003,28 @@ function eventCard(st, ev) {
     text: fill(ev.text, st),
     choices: ev.choices.map((c) => fill(c.text, st)),
     fx: ev.choices.map((c) => choiceFx(ev, c)),
+    // เหตุผลที่ตัวเลือกกดไม่ได้ (null = กดได้) — หน้าจอแสดงเทาพร้อมเหตุผล
+    locked: ev.choices.map((c) => lockReason(st, c)),
   });
 }
+
+// ตัวเลือกที่ต้องมีเงิน/ค่าสถานะ/ธงถึงจะเลือกได้ (B14 A6) · ข้อความเหตุผลจากเนื้อหาทับข้อความตั้งต้น
+function lockReason(st, c) {
+  const q = c.requires;
+  if (!q) return null;
+  const why = [];
+  if (q.money && st.money < moneyValue(st, q.money)) why.push('เงินไม่พอ');
+  for (const [k, b] of Object.entries(q.stats ?? {})) {
+    if (b.min !== undefined && st[k] < b.min) why.push(`${STAT_LABELS[k]}ไม่ถึง`);
+    if (b.max !== undefined && st[k] > b.max) why.push(`${STAT_LABELS[k]}มากเกินไป`);
+  }
+  if (q.flags && !flagsOk(st, q.flags)) why.push('ยังไม่เข้าเงื่อนไข');
+  if (!why.length) return null;
+  return q.reason ?? why.join(' · ');
+}
+
+// ดัชนีตัวเลือกที่กดได้ — บอทเลือกจากชุดนี้เท่านั้น · ไม่มีตัวล็อก = ทุกตัว (ลำดับสุ่มของบอทจึงเหมือนก่อนมีการล็อก)
+const openChoices = (card) => card.choices.map((_, i) => i).filter((i) => !card.locked?.[i]);
 
 // เดินปีละครั้งจนมีการ์ดถึงกำหนดหรือตาย คืนการ์ดใบถัดไป
 function nextCard(st) {
@@ -975,7 +1067,10 @@ function nextCard(st) {
       st.poolAge = st.age;
       ev = drawPool(st, year);
     }
-    if (ev) st.done[ev.id] = true;
+    if (ev) {
+      st.done[ev.id] = true;
+      st.fired[ev.id] = { n: (st.fired[ev.id]?.n ?? 0) + 1, age: st.age };
+    }
     st.scheduled = st.scheduled.filter((x) => x.age >= st.age && !st.done[x.event]);
     if (ev) {
       // อายุนี้อาจมีเหตุการณ์อื่นรออยู่ (หลักไมล์ชนกับนัด) — ค้นอายุเดิมอีกรอบก่อนเดินปี
@@ -985,21 +1080,23 @@ function nextCard(st) {
   }
 }
 
-// กองสุ่ม (B14): เหตุการณ์ไม่มี at_age แต่มี weight · ใบเดิมไม่ซ้ำในชีวิต · ไม่มีใบที่เกิดได้ = ไม่ดึงเลขสุ่ม
+// กองสุ่ม (B14): เหตุการณ์ไม่มี at_age แต่มี weight · ใบเดิมไม่ซ้ำในชีวิต เว้นแต่ตั้ง repeat · ไม่มีใบที่เกิดได้ = ไม่ดึงเลขสุ่ม
 // ชีวิตที่เนื้อหาไม่มีกองจึงได้ชะตาเดิมทุกหลัก
 function drawPool(st, year) {
   const stage = stageOf(st.age);
-  const pool = st.content.events.filter((e) => e.weight && e.age === undefined && !e.era && !st.done[e.id] && e.stage === stage && inYears(e, year) && whenOk(st, e.when));
-  if (!pool.length || st.rng.next() >= POOL_CHANCE) return null;
+  const pool = st.content.events.filter((e) => e.weight && e.age === undefined && !e.era && (!st.done[e.id] || canRepeat(st, e)) && e.stage === stage && inYears(e, year) && whenOk(st, e.when));
+  if (!pool.length || st.rng.next() >= POOL_CHANCE[stage]) return null;
   return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers)));
 }
 
-// ตัวคูณโอกาสเกิด (ใบ 07): ค่าสถานะคูณแบบต่อเนื่อง m^((ค่า−50)/50) · กรรมตามทิศบัญชีสุทธิ · ธงที่ถืออยู่
+const canRepeat = (st, e) => e.repeat && st.fired[e.id].n < e.repeat.max && st.age - st.fired[e.id].age >= e.repeat.gap;
+
+// ตัวคูณโอกาส (ใบ 07) ใช้ทั้งโอกาสเกิดของเหตุการณ์และน้ำหนักผลสุ่มแต่ละทาง: ค่าสถานะขั้นบันได · กรรมตามทิศบัญชีสุทธิ · ธงที่ถืออยู่
 // ชื่อเสียงตระกูลยังไม่มีระบบ คูณ 1
 function poolMultiplier(st, m) {
   if (!m) return 1;
   let x = m.class?.[st.cls] ?? 1;
-  for (const [k, v] of Object.entries(m.stats ?? {})) x *= v ** ((st[k] - 50) / 50);
+  for (const [k, v] of Object.entries(m.stats ?? {})) x *= st[k] >= STAT_HIGH ? v : st[k] <= STAT_LOW ? 1 / v : 1;
   if (m.karma) x *= m.karma ** Math.sign(netLedger(st.ledger));
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
   return x;
@@ -1009,17 +1106,19 @@ const isScheduled = (st, id) => st.scheduled.some((x) => x.event === id && x.age
 const inYears = (e, year) => !e.years || (year >= e.years[0] && year <= e.years[1]);
 const inRange = (v, r) => !r || (v >= r[0] && v <= r[1]);
 const inBound = (v, b) => !b || ((b.min === undefined || v >= b.min) && (b.max === undefined || v <= b.max));
-// เงื่อนไขเกิดแบบประกาศทุกฟิลด์ (ใบ 07) · family ยังไม่มีระบบครอบครัว จึงไม่ผ่านเสมอ
+const flagsOk = (st, f) => (f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]);
+// ครอบครัวมีแค่พ่อแม่ (ด่าน family-system กั้นบทบาทอื่นไว้) · เงื่อนไขผ่านเมื่อพ่อหรือแม่คนใดคนหนึ่งตรง
+const familyOk = (st, f) => f.role === 'parent' && st.parents.some((p) => (f.alive === undefined || p.alive === f.alive) && inRange(p.age, f.age));
+// เงื่อนไขเกิดแบบประกาศทุกฟิลด์ (ใบ 07)
 function whenOk(st, when) {
   if (!when) return true;
-  if (when.family) return false;
+  if (when.family && !when.family.every((f) => familyOk(st, f))) return false;
   if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
   if (when.class && !when.class.includes(st.cls)) return false;
   if (when.region && !when.region.includes(st.region)) return false;
   if (when.sex && !when.sex.includes(st.sex)) return false;
   for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;
-  const f = when.flags;
-  return !f || ((f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]));
+  return !when.flags || flagsOk(st, when.flags);
 }
 
 // ป้ายบุญบาปเข้าบัญชีซ่อน · ธง · นัดเหตุการณ์ต่อเนื่อง (ใบ 07) — นัดสุ่มปีจาก rng ของโลก เพราะเป็นผลของการเลือก
@@ -1044,6 +1143,7 @@ function choose(st, idx) {
     return;
   }
   if (!ev || !ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
+  if (lockReason(st, ev.choices[idx])) throw new Error('ตัวเลือกนี้ล็อกอยู่');
   st.pending = null;
   // เติมข้อความก่อนผลลง — {เงิน} ต้องเป็นยอดตอนที่ผู้เล่นเห็นตัวเลือก
   const text = fill(ev.choices[idx].text, st);
@@ -1052,8 +1152,9 @@ function choose(st, idx) {
   applyChoice(st, ev, c);
   st.log.push({ id: ev.id, age: st.age, choice: idx, text });
   // ผลสุ่ม: จับทางด้วย rng ของโลก (เป็นผลของการเลือก) แล้วเล่าเป็นการ์ดผลลัพธ์ใบถัดไป
+  // น้ำหนักแต่ละทางเอียงตาม multipliers ของทางนั้น — บัญชีอ่านหลังป้ายบุญบาปของตัวเลือกนี้ลงแล้ว (กรรมตามทันทันที)
   if (c.outcomes?.length) {
-    const o = weighted(st.rng, c.outcomes, c.outcomes.map((x) => x.weight));
+    const o = weighted(st.rng, c.outcomes, c.outcomes.map((x) => x.weight * poolMultiplier(st, x.multipliers)));
     applyEffects(st, o.effects);
     applyChoice(st, ev, o);
     if (o.text) st.queue.unshift({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) });
@@ -1263,12 +1364,14 @@ function render(card) {
       if (card.items?.length) body.append(list(card.items));
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
       card.choices.forEach((c, i) => {
-        choices.append(
-          button(c, card.fx?.[i], () => {
-            choose(st, i);
-            next();
-          }),
-        );
+        const why = card.locked?.[i];
+        // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
+        const b = button(c, why ?? card.fx?.[i], () => {
+          choose(st, i);
+          next();
+        });
+        if (why) b.disabled = true;
+        choices.append(b);
       });
     }
   }

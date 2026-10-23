@@ -1,0 +1,22 @@
+# ล็อกทุกตัวเลือก · ล็อกด้วยธงไม่มี reason · requires ว่าง — การ์ดที่ล็อกบางตัวด้วยเงิน/ค่าสถานะยังผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", requires: {stats: {knowledge: {min: 60}}}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", requires: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", requires: {flags: {has: [married]}}, sets_flags: [married], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", requires: {reason: "ไม่มีเงื่อนไข"}, merit: [{cat: neutral}]}
+  - id: ok_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", requires: {stats: {health: {min: 40}}}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", requires: {money: {unit: income_x, amount: 2}, reason: "เงินเก็บไม่ถึงสองปี"}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}

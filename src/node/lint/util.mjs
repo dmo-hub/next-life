@@ -24,6 +24,8 @@ export function textsOf(e) {
   if (typeof e.text === 'string') out.push({ kind: 'text', path: '.text', s: e.text });
   for (const { c, path } of choicesOf(e)) {
     for (const k of ['text', 'label']) if (typeof c[k] === 'string') out.push({ kind: 'choice', path: `${path}.${k}`, s: c[k] });
+    // เหตุผลที่ล็อกขึ้นบนปุ่มแทนป้ายผล — ผ่านด่านความยาว/คำต้องห้ามเหมือนข้อความตัวเลือก
+    if (typeof c.requires?.reason === 'string') out.push({ kind: 'choice', path: `${path}.requires.reason`, s: c.requires.reason });
     list(c.outcomes).forEach((o, j) => typeof o?.text === 'string' && out.push({ kind: 'text', path: `${path}.outcomes[${j}].text`, s: o.text }));
   }
   return out;

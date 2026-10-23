@@ -1,4 +1,4 @@
-import { playLife, mixSeed, expectedDeathAge, periodE0, qx, e0FromLx, infantMortality, MAX_AGE } from '../src/engine/index.mjs';
+import { playLife, openChoices, mixSeed, expectedDeathAge, periodE0, qx, e0FromLx, infantMortality, MAX_AGE } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 
 const args = process.argv.slice(2);
@@ -11,8 +11,11 @@ const seed = opt('seed', 1);
 const content = loadContent();
 const era = content.era;
 
-// บอทสุ่มล้วน เลือกจากตัวเลือกที่ผู้เล่นเห็นเท่านั้น
-const randomBot = (card, rng) => rng.int(0, card.choices.length - 1);
+// บอทสุ่มล้วน เลือกจากตัวเลือกที่ผู้เล่นกดได้เท่านั้น
+const randomBot = (card, rng) => {
+  const open = openChoices(card);
+  return open[rng.int(0, open.length - 1)];
+};
 
 let sum = 0, min = Infinity, max = -Infinity, over60 = 0, under5 = 0;
 // ค่าแถบต้องอยู่ใน 0–100 ทุกการ์ด (การ์ดสรุปออกทุกปี จึงเท่ากับตรวจทุกปี) · เงินต้องเป็นตัวเลขจำกัด

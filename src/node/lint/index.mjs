@@ -24,7 +24,9 @@ export function lintContext() {
     lore.set(f, loreHeadings(f, read(`docs/spec/${f}`)));
   }
   const eras = new Set(JSON.parse(read('data/era-events.json')).events.map((x) => x.id));
-  return { regions, systems, eras, lore, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
+  const reg = parse(read('content/rules/flags.yaml'));
+  const flags = { flags: new Set(Object.keys(reg.flags)), prefixes: new Set(Object.keys(reg.prefixes)) };
+  return { regions, systems, eras, lore, flags, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]

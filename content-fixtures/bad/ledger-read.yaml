@@ -1,4 +1,4 @@
-# ผิดกติกาเดียว: เครื่องรางอ่านบัญชีบุญบาป
+# ผิดกติกาเดียว: เครื่องรางอ่านบัญชีบุญบาป — ทั้งทาง odds_modifier และทางตัวคูณกรรม (โอกาสเกิด + ผลสุ่ม)
 events:
   - id: bad_case_01
     type: B
@@ -10,6 +10,21 @@ events:
     belief: {kind: amulet, tradition: พุทธ, odds_modifier: {source: merit_ledger.net}}
     choices:
       - {text: "ตกลง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: B
+    stage: ทำงาน
+    years: [2560, 2650]
+    text: "ข้อความการ์ด"
+    category: belief
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: amulet, tradition: พุทธ}
+    weight: 1
+    multipliers: {karma: 1.5}
+    choices:
+      - {text: "ตกลง", outcomes: [{weight: 1, multipliers: {karma: 2}, text: "ผลหนึ่ง", effects: {happiness: 1}, merit: [{cat: neutral}]}, {weight: 1, text: "ผลสอง", merit: [{cat: neutral}]}], merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
