@@ -1,6 +1,6 @@
 import { makeRng } from './rng.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
-import { pickRegion, regionRatio, classOdds, nationalIncome } from './birth.mjs';
+import { pickRegion, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
 import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard } from './career.mjs';
@@ -133,6 +133,8 @@ export function newLife(seed, content, heir = null) {
     content,
     birthYear,
     sex,
+    // heir ของ harness ไม่มี lineage — ไม่มีรุ่นก่อนให้เลี่ยงชื่อ
+    name: pickName(seed, sex, birthYear, era.names, (heir?.lineage ?? []).map((l) => l.name)),
     region: region.name,
     ses: region.ses,
     cls,
@@ -327,19 +329,20 @@ export function deathChance(st) {
 }
 
 // ช่องแทนค่าครบทุกตัวในรายการปิดของด่าน build (PLACEHOLDERS) — ตัวที่ไม่เติมจะโผล่เป็น {ชื่อ} ดิบบนการ์ด
-// เกมยังไม่มีชื่อผู้เล่น/ลูก/จังหวัด: ชื่อ = "คุณ" แบบที่การ์ดอื่นเรียกผู้เล่น · จังหวัด = ภาคที่เกิด · คำพูดตามเพศ
+// ชื่อ = ชื่อเล่นที่สุ่มตอนเกิด (คำบรรยายยังเรียกผู้เล่นว่า "คุณ") · ลูกยังไม่มีชื่อ: เพศลูกรู้ตอนส่งไปเกิด ชื่อจึงตั้งที่รุ่นถัดไป
+// จังหวัด = ภาคที่เกิด · คำพูดตามเพศ
 export const FILL = {
   อายุ: (st) => st.age,
   ภาค: (st) => regionLabel(st),
   จังหวัด: (st) => regionLabel(st),
   เงิน: (st) => Math.round(st.money).toLocaleString('en-US'),
-  ชื่อ: () => 'คุณ',
+  ชื่อ: (st) => st.name,
   ชื่อลูก: () => 'ลูก',
   ครับ: (st) => (st.sex === 'หญิง' ? 'ค่ะ' : 'ครับ'),
   ผม: (st) => (st.sex === 'หญิง' ? 'ฉัน' : 'ผม'),
 };
 export function fill(text, st) {
-  return text.replace(/ชื่อ\s*\{ชื่อ\}/g, 'ชื่อของคุณ').replace(/\{([^{}]*)\}/g, (m, k) => (FILL[k] ? String(FILL[k](st)) : m));
+  return text.replace(/\{([^{}]*)\}/g, (m, k) => (FILL[k] ? String(FILL[k](st)) : m));
 }
 
 export function levelValue(level) {

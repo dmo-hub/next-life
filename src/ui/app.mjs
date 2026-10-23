@@ -281,6 +281,7 @@ function shareFacts(card) {
   const { pattern, titles } = lifeTitles(card);
   return {
     age: card.age,
+    name: st.name,
     who: `${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls}`,
     job: `${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`,
     pattern: { name: pattern.name, hint: pattern.hint ?? '' },
@@ -372,6 +373,7 @@ async function shareBlob(facts) {
   text('ชาติหน้า', '700 110px Srisakdi, serif', c('gold'), 120);
   text('NEXT LIFE', '600 28px Sarabun, sans-serif', c('sand'), 44);
   rule(44);
+  text(facts.name, '700 72px Srisakdi, serif', c('cream'), 84, 4);
   text(`ตายอายุ ${facts.age}`, '700 96px Srisakdi, serif', c('gold2'), 110, 16);
   text(facts.who, '400 40px Sarabun, sans-serif', c('cream'), 58);
   text(facts.job, '400 36px Sarabun, sans-serif', c('sand'), 52);
@@ -438,7 +440,7 @@ function shareButtons(card) {
   const share = act('แชร์ภาพการ์ด', async (blob) => {
     const file = new File([blob], name, { type: 'image/png' });
     try {
-      await navigator.share({ files: [file], title: 'ชาติหน้า · Next Life', text: `ชาติหน้า · ตายอายุ ${card.age} — ${SHARE_URL}` });
+      await navigator.share({ files: [file], title: 'ชาติหน้า · Next Life', text: `ชาติหน้า · ${st.name} ตายอายุ ${card.age} — ${SHARE_URL}` });
     } catch (e) {
       // ผู้เล่นปิดหน้าแชร์เอง = จบ · แชร์พังด้วยเหตุอื่นให้ได้ไฟล์แทน
       if (e?.name !== 'AbortError') downloadBlob(blob, name);
@@ -477,10 +479,10 @@ function render(card) {
   const next = () => render(nextCard(st));
 
   if (card.kind === 'death') {
-    top.append(el('b', null, 'มรณบัตร'), el('small', null, `${genLabel()}สิริอายุ ${card.age} ปี`));
+    top.append(el('b', null, 'มรณบัตร'), el('small', null, `${genLabel()}${st.name} · สิริอายุ ${card.age} ปี`));
     box.append(top);
     body.append(el('span', 'stamp', 'ถึงแก่กรรม'));
-    body.append(el('h3', null, `ตายอายุ ${card.age}`));
+    body.append(el('h3', null, `${st.name} ตายอายุ ${card.age}`));
     body.append(el('p', null, `${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
     const net = card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
     body.append(el('p', 'sub', `${net} ${baht(card.summary.money)} ≈ ${baht(card.summary.moneyAtBirth)} ค่าเงินปีเกิด`));
@@ -497,7 +499,7 @@ function render(card) {
       renderAfter(nextAfterCard(af));
     }), ...shareButtons(card));
   } else {
-    top.append(el('b', null, `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, `${genLabel()}${regionLabel(st)}`));
+    top.append(el('b', null, `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, `${genLabel()}${st.name} · ${regionLabel(st)}`));
     box.append(top, stats(s));
     // ไม่มีรายได้ก็ต้องเห็นเงินติดตัวเสมอแม้ 0 · มีงานทำแล้วซ่อนเงินติดตัวเฉพาะตอนเป็น 0 พอดี ติดลบ (หนี้) ยังต้องเห็น
     // เงินกู้เป็นยอดค้างของสัญญา ไม่ใช่เงินติดตัวติดลบ จึงแยกช่อง ไม่หักรวมกัน
@@ -576,7 +578,7 @@ function renderAfter(card) {
   root.replaceChildren();
   const box = el('article', 'card b');
   const top = el('div', 'top');
-  top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, `${genLabel()}ตายอายุ ${st.age}`));
+  top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, `${genLabel()}${st.name} · ตายอายุ ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
   const next = () => renderAfter(nextAfterCard(af));

@@ -4,7 +4,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { RULES, DOC_SHAPE, lintContext, lintDocs, formatProblem } from '../src/node/lint/index.mjs';
 import { strings } from '../src/node/lint/util.mjs';
-import { loadEvents, loadEra, loadContent } from '../src/node/load.mjs';
+import { loadEvents, loadEra, loadContent, checkNames } from '../src/node/load.mjs';
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
 import { schoolGate, jobCard, TRACKS, EDU } from '../src/engine/career.mjs';
 import { newLife, CLASSES, SEXES, fill } from '../src/engine/life.mjs';
@@ -84,6 +84,36 @@ for (const sex of SEXES) {
   }
 }
 rows.push(['ช่องแทนค่าแกนเติมครบ', `${Object.keys(PLACEHOLDERS).length} ช่อง × ${SEXES.length} เพศ`]);
+
+// ชื่อเล่น (B27): ผ่านด่านของ loader แล้ว ยังต้องไม่โดนคำต้องห้ามของเนื้อหา · ด่านต้องจับชื่อที่หลุดรายการ avoid/ยุคมีรู
+const namesRaw = JSON.parse(readFileSync(new URL('data/names.json', root), 'utf8'));
+const nameFrom = namesRaw.eras[0].from, nameTo = namesRaw.eras.at(-1).to;
+let nameCount = 0;
+for (const e of namesRaw.eras) for (const sex of SEXES) for (const n of e[sex]) {
+  nameCount++;
+  for (const b of ctx.banned) if (b.re.test(n)) fails.push(`ชื่อ ${e.from} ${sex}: โดนคำต้องห้าม ${b.id} "${n}"`);
+}
+for (const p of checkNames(namesRaw, nameFrom, nameTo)) fails.push(`names: ${p}`);
+const withFirst = (k, xs) => ({ ...namesRaw, eras: [{ ...namesRaw.eras[0], [k]: xs }, ...namesRaw.eras.slice(1)] });
+const nameControls = {
+  'ชื่อในรายการ avoid': withFirst('ชาย', [...namesRaw.eras[0].ชาย, namesRaw.avoid[0].name]),
+  'ยุคมีรู': { ...namesRaw, eras: namesRaw.eras.slice(1) },
+  'ชื่อซ้ำในยุค': withFirst('หญิง', [...namesRaw.eras[0].หญิง, namesRaw.eras[0].หญิง[0]]),
+  'ชื่อยาวเกินช่อง': withFirst('ชาย', ['ก'.repeat(PLACEHOLDERS.ชื่อ.length + 1)]),
+};
+for (const [name, n] of Object.entries(nameControls)) if (!checkNames(n, nameFrom, nameTo).length) fails.push(`names ตัวควบคุม "${name}" ไม่ตก`);
+// {ชื่อ} บนการ์ดต้องเป็นชื่อของชีวิตนั้น · รุ่นถัดไปไม่ได้ชื่อซ้ำรุ่นก่อน (ไล่หลาย seed ให้เจอรอบที่สุ่มได้ชื่อชนกันจริง)
+const nameContent = loadContent();
+const nameLife = newLife(7, nameContent);
+if (!nameLife.name || fill('{ชื่อ}', nameLife) !== nameLife.name) fails.push(`{ชื่อ} เติม "${fill('{ชื่อ}', nameLife)}" ไม่ใช่ชื่อของชีวิต "${nameLife.name}"`);
+const nameHeir = { birthYear: nameLife.birthYear, sex: nameLife.sex, region: { name: nameLife.region, ses: nameLife.ses }, cls: nameLife.cls, bonus: {} };
+let nameClash = 0;
+for (let s = 1; s <= 200; s++) {
+  const free = newLife(s, nameContent, nameHeir).name;
+  if (newLife(s, nameContent, { ...nameHeir, lineage: [{ gen: 1, name: free }] }).name === free) nameClash++;
+}
+if (nameClash) fails.push(`รุ่นถัดไปได้ชื่อซ้ำรุ่นก่อน ${nameClash} ครั้งใน 200 seed`);
+rows.push(['ชื่อเล่น', `${nameCount} ชื่อ · ${namesRaw.eras.length} ยุค ${nameFrom}–${nameTo} · ตัวควบคุม ${Object.keys(nameControls).length} แบบ`]);
 
 // การ์ดจัดสรรเงินสร้างในแกน ไม่ผ่านด่านเนื้อหา — ตรวจทุกปีของเกม: ≥4 ตัวเลือก · ยาว · คำต้องห้าม · หุ้นไม่โผล่ก่อน 2518
 const era = loadEra();

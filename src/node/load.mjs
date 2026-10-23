@@ -8,6 +8,7 @@ import { lintDocs, formatProblem } from './lint/index.mjs';
 import { MERIT_CATS } from './lint/vocab.mjs';
 import { checkMeritTable } from '../engine/merit.mjs';
 import { DEBTS } from '../engine/finance.mjs';
+import { PLACEHOLDERS } from './lint/vocab.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -214,6 +215,34 @@ export function loadDebt() {
   };
 }
 
+// รายชื่อเล่น (B27): ทุกปีเกิดของเกมต้องมียุค ทุกยุคมีชื่อทั้งสองเพศ · ชื่อในรายการ avoid (คนดัง/ความหมายลบ) ห้ามหลุดเข้ารายการ
+// ยาวเกินค่าของช่อง {ชื่อ} ไม่ได้ — ด่านความยาวของการ์ดวัดด้วยค่านั้น ชื่อที่ยาวกว่าจะดันการ์ดล้นโดยด่านไม่เห็น
+export function checkNames(names, from, to) {
+  const out = [];
+  const avoid = new Set((names.avoid ?? []).map((a) => a.name));
+  let next = from;
+  for (const e of names.eras ?? []) {
+    if (e.from !== next) out.push(`ยุค ${e.from}–${e.to} ต้องเริ่มปี ${next} (ห้ามมีรู/ซ้อน)`);
+    next = e.to + 1;
+    for (const sex of SEXES) {
+      const xs = e[sex];
+      if (!Array.isArray(xs) || !xs.length) {
+        out.push(`ยุค ${e.from} ไม่มีชื่อ${sex}`);
+        continue;
+      }
+      if (new Set(xs).size !== xs.length) out.push(`ยุค ${e.from} ชื่อ${sex}ซ้ำในรายการ`);
+      for (const n of xs) {
+        if (typeof n !== 'string' || !n.trim() || /[{}\s]/.test(n)) out.push(`ยุค ${e.from} ชื่อ${sex} "${n}" ต้องเป็นคำเดียว`);
+        else if (n.length > PLACEHOLDERS.ชื่อ.length) out.push(`ยุค ${e.from} ชื่อ "${n}" ยาวเกิน ${PLACEHOLDERS.ชื่อ.length}`);
+        if (avoid.has(n)) out.push(`ยุค ${e.from} ชื่อ "${n}" อยู่ในรายการ avoid`);
+      }
+    }
+  }
+  if (next !== to + 1) out.push(`ยุคชื่อจบปี ${next - 1} แต่ปีเกิดของเกมถึง ${to}`);
+  for (const a of names.avoid ?? []) if (!a.name || !a.why) out.push('avoid ทุกแถวต้องมี name + why');
+  return out;
+}
+
 export function loadEra() {
   const births = json('data/births.json');
   const pop = new Map(births.population.rows.map((x) => [x.y, x.v]));
@@ -264,8 +293,13 @@ export function loadEra() {
 
   const events = json('data/era-events.json').events.map(({ id, from, to, name, kind, regions }) => ({ id, from, to, name, kind, regions }));
 
+  const names = json('data/names.json');
+  const nameProblems = checkNames(names, births.cbr.rows[0].y, births.cbr.rows[0].y + w.length - 1);
+  if (nameProblems.length) throw new Error(`data/names.json ไม่ผ่าน ${nameProblems.length} ข้อ\n${nameProblems.join('\n')}`);
+
   return {
     births: { from: births.cbr.rows[0].y, w },
+    names: { eras: names.eras.map(({ from, to, ชาย, หญิง }) => ({ from, to, ชาย, หญิง })) },
     cpi,
     future,
     finance: { ...finance.era, debt: loadDebt() },

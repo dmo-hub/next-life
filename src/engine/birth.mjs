@@ -1,5 +1,6 @@
 // จุดเกิด (ใบ 01 · ใบ 03): ภาคตามประชากรจริง → ฐานะตามการกระจายรายได้ของภาคนั้นในปีเกิด → รายได้ตามปีที่ใช้ชีวิต
 import { priceRatio } from './era.mjs';
+import { makeRng } from './rng.mjs';
 
 // CDF ปกติมาตรฐาน (Abramowitz–Stegun 7.1.26 · คลาดไม่เกิน 1.5e-7)
 export function normCdf(z) {
@@ -54,4 +55,14 @@ export function classOdds(birth, ratio) {
     out.push({ p, factor: (ratio * m) / p });
   }
   return out;
+}
+
+// ชื่อเล่นตอนเกิด (B27) ตามเพศ × ยุคปีเกิด · stream แยก ไม่ดึงเลขสุ่มของโลก ผลเกมจึงเหมือนก่อนมีชื่อ
+export const nameEra = (names, birthYear) => names.eras.find((e) => birthYear >= e.from && birthYear <= e.to) ?? names.eras.at(-1);
+
+// taken = ชื่อรุ่นก่อนในตระกูล ให้ผังตระกูลแยกคนได้ · ยุคนั้นใช้ครบทุกชื่อแล้วค่อยยอมซ้ำ
+export function pickName(seed, sex, birthYear, names, taken = []) {
+  const pool = nameEra(names, birthYear)[sex];
+  const free = pool.filter((n) => !taken.includes(n));
+  return makeRng(seed ^ 0x510e527f).pick(free.length ? free : pool);
 }

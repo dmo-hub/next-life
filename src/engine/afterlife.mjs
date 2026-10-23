@@ -153,7 +153,7 @@ function carryCard(af) {
 }
 
 // ผังตระกูล (ใบ 05: เลิกเมื่อไรก็ดูได้) — หน้าจอวาดระหว่างชีวิตจาก st.lineage และบนการ์ดส่งต่อ
-export const lineageText = (lineage) => lineage.map((l) => `รุ่นที่ ${l.gen} · ${l.sex} · ฐานะ${l.cls} · ตายอายุ ${l.age} · ไปภูมิ${l.realm}`);
+export const lineageText = (lineage) => lineage.map((l) => `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ฐานะ${l.cls} · ตายอายุ ${l.age} · ไปภูมิ${l.realm}`);
 
 // การ์ดถัดไปของช่วงที่ 7 · การ์ด carry (done) เป็นใบสุดท้าย แล้วผู้เรียกต่อ nextLife
 export function nextAfterCard(af) {
@@ -259,7 +259,7 @@ function makeHeir(af, r) {
   const bonus = Object.fromEntries(STAT_KEYS.map((k) => [k, x * FATE.stat + (af.bonus[k] ?? 0) + kin(k)]));
   const gen = st.gen ?? 1;
   // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน
-  const lineage = [...(st.lineage ?? []), { gen, sex: st.sex, cls: st.cls, age: st.age, realm: realm.name, path: af.path, broke: (st.estate?.money ?? 0) < 0 }];
+  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, cls: st.cls, age: st.age, realm: realm.name, path: af.path, broke: (st.estate?.money ?? 0) < 0 }];
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1,
