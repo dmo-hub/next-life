@@ -60,6 +60,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .choice .fx span { white-space:nowrap; }
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
+.recap .picks { overflow-wrap:anywhere; }
+.all-picks summary { cursor:pointer; min-height:44px; display:flex; align-items:center; font-size:13px; font-weight:600; }
 .delta { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px 14px; font-size:12px; }
 .delta > div { display:flex; flex-direction:column; gap:4px; }
 .titles .pattern { font-family:Pridi,serif; font-weight:600; font-size:20px; }
@@ -2337,31 +2339,50 @@ function picksAfter(st, from = PATTERN_FROM) {
 
 // คะแนนดิบ 4 แกน (ใบ 04) บวก = ขั้วหลัง · แต่ละแกนคิดจากสิ่งที่ต่างกัน ไม่ใช้ตัวเดียวกันซ้ำสองแกนเท่าที่ทำได้
 // ① ครอบครัว(−) ↔ งาน(+) · ② บ้านเกิด(−) ↔ ไปไกล(+) · ③ มั่นคง(−) ↔ เสี่ยง(+) · ④ ทางโลก(−) ↔ ทางธรรม(+)
+// แยกส่วนที่ไม่อ่านป้ายบุญบาปออกมา ให้สรุปช่วงวัย (stageSummary) ใช้ได้โดยไม่เผยบัญชี · คืน false = การ์ดจัดสรรเงิน (ไม่มีตัวเลือกเนื้อหา)
+// ลำดับการบวกต้องเหมือนเดิม — axisRaw ผลต่างแม้ทศนิยมท้าย ๆ ทำให้ชีวิตที่อยู่ขอบแกนเปลี่ยนลวดลาย
+function pickBase(a, p) {
+  if (p.alloc !== undefined) {
+    // คงแบบเดิม (null) ไม่นับ · ส่วนที่ไม่อยู่ในเงินฝาก/เงินสด = ส่วนที่เสี่ยง
+    if (!p.alloc) return false;
+    const safe = (p.alloc.deposit ?? 0) + (p.alloc.cash ?? 0);
+    a.risk += safe >= 1 ? -1 : 2 * (1 - safe);
+    return false;
+  }
+  const c = p.c;
+  const fx = c.effects ?? {};
+  a.work += lv(fx.network) + 0.5 * lv(fx.knowledge) - lv(fx.relations);
+  if (fx.income_mult) a.work += fx.income_mult > 1 ? 1.5 : -0.5;
+  if (fx.job) a.work += 1;
+  if (AWAY.test(p.text)) a.away += 1.5;
+  if (HOME.test(p.text)) a.away -= 1.5;
+  if (c.outcomes?.length) a.risk += { เสี่ยงต่ำ: 0.5, เสี่ยงกลาง: 1, เสี่ยงสูง: 2 }[riskLabel(c.outcomes)] * (c.outcomes.some((o) => o.ok) ? 0.5 : 1);
+  else a.risk -= 0.4;
+  if (fx.invest) a.risk += 2 * fx.invest.share;
+  if (fx.debt) a.risk += 1;
+  if (fx.settle) a.risk -= 1;
+  const m = fx.money;
+  if (m && (typeof m === 'number' ? m : m.amount) > 0) a.dhamma -= 0.5;
+  return true;
+}
+function pickFlags(a, c) {
+  for (const f of flagsOf(c)) {
+    if (f === 'has_kids' || f === 'married' || f === 'raised_grandkids') a.work -= 2;
+    if (f === 'own_business' || f === 'online_seller') a.work += 1;
+    if (f === 'own_business' || f === 'guarantor' || f === 'loan_shark') a.risk += 1;
+    if (f === 'lottery_habit') { a.risk += 2; a.dhamma -= 1; }
+    if (f === 'has_insurance') a.risk -= 2;
+    if (f === 'home_owner') { a.risk -= 1; a.away -= 1; }
+    if (f === 'took_bribe' || f === 'embezzler') a.dhamma -= 2;
+  }
+}
+
 function axisRaw(st) {
   const picks = picksAfter(st);
   const a = { work: 0, away: 0, risk: 0, dhamma: 0 };
   for (const p of picks) {
-    if (p.alloc !== undefined) {
-      // คงแบบเดิม (null) ไม่นับ · ส่วนที่ไม่อยู่ในเงินฝาก/เงินสด = ส่วนที่เสี่ยง
-      if (!p.alloc) continue;
-      const safe = (p.alloc.deposit ?? 0) + (p.alloc.cash ?? 0);
-      a.risk += safe >= 1 ? -1 : 2 * (1 - safe);
-      continue;
-    }
+    if (!pickBase(a, p)) continue;
     const c = p.c;
-    const fx = c.effects ?? {};
-    a.work += lv(fx.network) + 0.5 * lv(fx.knowledge) - lv(fx.relations);
-    if (fx.income_mult) a.work += fx.income_mult > 1 ? 1.5 : -0.5;
-    if (fx.job) a.work += 1;
-    if (AWAY.test(p.text)) a.away += 1.5;
-    if (HOME.test(p.text)) a.away -= 1.5;
-    if (c.outcomes?.length) a.risk += { เสี่ยงต่ำ: 0.5, เสี่ยงกลาง: 1, เสี่ยงสูง: 2 }[riskLabel(c.outcomes)] * (c.outcomes.some((o) => o.ok) ? 0.5 : 1);
-    else a.risk -= 0.4;
-    if (fx.invest) a.risk += 2 * fx.invest.share;
-    if (fx.debt) a.risk += 1;
-    if (fx.settle) a.risk -= 1;
-    const m = fx.money;
-    if (m && (typeof m === 'number' ? m : m.amount) > 0) a.dhamma -= 0.5;
     for (const t of tags(c)) {
       if (t.id === 'dana' || t.id === 'sila' || t.id === 'bhavana') a.dhamma += t.level;
       else if (t.id === 'care_parents') {
@@ -2371,15 +2392,7 @@ function axisRaw(st) {
       } else if (t.id === 'help_others') a.dhamma += 0.5 * t.level;
       else if (SIN_CATS.includes(t.id) && t.id !== 'vow_broken') a.dhamma -= t.level;
     }
-    for (const f of flagsOf(c)) {
-      if (f === 'has_kids' || f === 'married' || f === 'raised_grandkids') a.work -= 2;
-      if (f === 'own_business' || f === 'online_seller') a.work += 1;
-      if (f === 'own_business' || f === 'guarantor' || f === 'loan_shark') a.risk += 1;
-      if (f === 'lottery_habit') { a.risk += 2; a.dhamma -= 1; }
-      if (f === 'has_insurance') a.risk -= 2;
-      if (f === 'home_owner') { a.risk -= 1; a.away -= 1; }
-      if (f === 'took_bribe' || f === 'embezzler') a.dhamma -= 2;
-    }
+    pickFlags(a, c);
   }
   // งานที่ทำ: ทิ้งอาชีพของครอบครัว = ไปไกล · สืบอาชีพครอบครัว = อยู่บ้านเกิด · เรียนจบสูง = ออกจากบ้านไปเรียน
   if (st.workFrom !== null) a.away += st.occupation === st.familyOcc ? -2 : 2;
@@ -2400,6 +2413,77 @@ const NEAR = 0.3;
 const HALF_AXES = 3;
 
 const axisZ = (raw) => AXES.map((a) => (raw[a.id] / Math.sqrt(raw.picks) - a.cut) / a.scale);
+
+// สรุปภาพรวมสิ่งที่เลือกในช่วงวัย (B21) บนการ์ดเปลี่ยนช่วง — ใช้แค่ 3 แกนที่ไม่แตะป้ายบุญบาป
+// แกนทางโลก/ทางธรรมคิดจากป้ายบุญบาป ใช้ไม่ได้ (เผยบัญชีก่อนศาล) · care_parents ก็เป็นป้ายบุญ จึงไม่นับในแกนครอบครัว
+// เด็กยังไม่ทำงาน ขั้วงานของแกนแรกจึงเล่าเป็นเรื่องเรียน/เพื่อนแทน
+const KID_STAGES = ['เด็ก', 'วัยรุ่น'];
+// [มัธยฐาน, ครึ่ง IQR] ของคะแนน ÷ √จำนวนตัวเลือก ต่อช่วงวัย จากบอทสุ่ม — AXES ตั้งจากทั้งชีวิต (รวมงาน/วุฒิท้ายชีวิต)
+// ใช้กับช่วงเดียวแล้วเอียงทั้งก้อน · LEAN 1 = นอกครึ่งกลางของบอทสุ่ม จึงขึ้นราวครึ่งหนึ่งของการ์ดต่อแกน
+// แกนบ้านเกิด/ไปไกลอ่านจากคำในข้อความ หลายช่วงไม่มีเลยจน IQR = 0 — พื้น SCALE_MIN กันหารศูนย์ และให้เอ่ยเมื่อเลือกเรื่องนั้นชัด ๆ
+const STAGE_AXES = {
+  เด็ก: { work: [-0.177, 0.677], away: [0, 0.556], risk: [-0.133, 0.321] },
+  วัยรุ่น: { work: [0.612, 0.486], away: [0, 0], risk: [-0.189, 0.313] },
+  หนุ่มสาว: { work: [-0.433, 0.69], away: [0, 0.226], risk: [0.633, 0.486] },
+  ทำงาน: { work: [0.151, 0.472], away: [0, 0.217], risk: [0.529, 0.55] },
+  กลางคน: { work: [0, 0.634], away: [0, 0], risk: [0.35, 0.5] },
+  ชรา: { work: [-0.874, 0.613], away: [0, 0.194], risk: [0.635, 0.495] },
+};
+const SCALE_MIN = 0.3;
+const LEAN = 1;
+const SUMMARY_AXES = [
+  { id: 'work', pos: 'ทุ่มให้งานมากกว่าครอบครัว', neg: 'ให้เวลาครอบครัวมากกว่างาน', kidPos: 'ใส่ใจเรื่องเรียนและเพื่อนมากกว่าเรื่องในบ้าน', kidNeg: 'อยู่ใกล้คนในบ้านมากกว่าออกไปหาเพื่อน' },
+  { id: 'away', pos: 'ออกไปไกลจากบ้านเกิด', neg: 'อยู่ใกล้บ้านเกิด' },
+  { id: 'risk', pos: 'เลือกทางเสี่ยงมากกว่ามั่นคง', neg: 'เลือกทางมั่นคงมากกว่าเสี่ยง' },
+];
+// เรื่องเด่น = ตัวเลือกที่ผลบนการ์ดแรงที่สุด (ป้ายที่ผู้เล่นเห็น) · ต่ำกว่า HIGHLIGHT_MIN ไม่นับว่าเด่น
+const HIGHLIGHT_MIN = 3;
+const HIGHLIGHTS = 3;
+function pickWeight(c) {
+  const fx = c.effects ?? {};
+  let s = 0;
+  for (const k of ['health', 'happiness', 'knowledge', 'relations', 'network']) s += Math.abs(fx[k] ?? 0);
+  for (const v of Object.values(fx.chronic ?? {})) s += Math.abs(v);
+  if (fx.money) s += 2;
+  if (fx.income_mult) s += 2;
+  if (fx.invest || fx.debt || fx.settle) s += 2;
+  if (fx.job) s += 1;
+  s += 1.5 * flagsOf(c).length;
+  if (c.outcomes?.length && riskLabel(c.outcomes) === 'เสี่ยงสูง') s += 2;
+  return s;
+}
+
+function stageSummary(st, stage, fromAge, toAge) {
+  const picks = picksAfter(st, fromAge).filter((p) => p.age <= toAge);
+  const a = { work: 0, away: 0, risk: 0, dhamma: 0 };
+  const scored = [];
+  for (const p of picks) {
+    if (!pickBase(a, p)) continue;
+    pickFlags(a, p.c);
+    scored.push({ age: p.age, text: p.text, w: pickWeight(p.c) });
+  }
+  const kid = KID_STAGES.includes(stage);
+  const lines = [];
+  const norm = {};
+  for (const ax of SUMMARY_AXES) norm[ax.id] = picks.length ? a[ax.id] / Math.sqrt(picks.length) : 0;
+  const ref = STAGE_AXES[stage];
+  if (picks.length && ref) {
+    for (const ax of SUMMARY_AXES) {
+      const z = (norm[ax.id] - ref[ax.id][0]) / Math.max(SCALE_MIN, ref[ax.id][1]);
+      if (Math.abs(z) < LEAN) continue;
+      lines.push(z > 0 ? (kid && ax.kidPos) || ax.pos : (kid && ax.kidNeg) || ax.neg);
+    }
+    if (!lines.length) lines.push('เลือกแบบพอดี ๆ ไม่เอียงไปทางไหนชัด');
+  }
+  // เสมอกันเอาเรื่องหลัง — ใกล้ตอนเปลี่ยนช่วงกว่า ผู้เล่นจำได้
+  const highlights = scored
+    .filter((x) => x.w >= HIGHLIGHT_MIN)
+    .sort((x, y) => y.w - x.w || y.age - x.age)
+    .slice(0, HIGHLIGHTS)
+    .sort((x, y) => x.age - y.age)
+    .map(({ age, text }) => ({ age, text }));
+  return { lines, highlights, norm };
+}
 
 // 16 แบบ: id = ขั้วของแกน ①②③④ ตามลำดับ (F ครอบครัว/W งาน · H บ้านเกิด/A ไปไกล · S มั่นคง/R เสี่ยง · L ทางโลก/D ทางธรรม)
 // ชื่อเป็นภาพไทย (ใบ 04: ต้นไม้ · แม่น้ำ · วัด · ตลาด) · ไม่มีแบบไหนดีกว่าแบบอื่น — คำใบ้เล่าทาง ไม่ตัดสิน
@@ -2546,7 +2630,7 @@ function titlesOf(st) {
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.16';
+const APP_VERSION = 'v0.2.17';
 const APP_BUILD = '2026-10-24';
 
 const root = document.getElementById('app');
@@ -2650,7 +2734,6 @@ function list(items, cls = 'items') {
 }
 
 // สรุปช่วงวัยที่ผ่านมา: แถบตอนนี้ + ขีดตำแหน่งต้นช่วง — บอกว่าเปลี่ยนไปมากน้อยโดยไม่มีตัวเลข
-const RECAP_PICKS = 8;
 function recap(r) {
   const box = el('div', 'recap');
   box.append(el('div', 'h', `ช่วง${r.stage} · อายุ ${r.fromAge}–${r.toAge}`));
@@ -2677,10 +2760,18 @@ function recap(r) {
   if (r.items.length) box.append(list(r.items));
   if (r.disclaimer) box.append(el('p', 'note', r.disclaimer));
   if (r.picks.length) {
-    box.append(el('div', 'h', 'สิ่งที่เลือก'));
-    const shown = r.picks.slice(-RECAP_PICKS).map((p) => `อายุ ${p.age} · ${p.text}`);
-    if (r.picks.length > RECAP_PICKS) shown.unshift(`… ก่อนหน้านี้อีก ${r.picks.length - RECAP_PICKS} ข้อ`);
-    box.append(list(shown, 'picks'));
+    // ภาพรวมเล่าเป็นทิศ ไม่มีตัวเลข · รายการเต็มยังเปิดดูได้ — คนที่อยากไล่ย้อนทีละข้อไม่เสียข้อมูล
+    const sum = stageSummary(st, r.stage, r.fromAge, r.toAge);
+    box.append(el('div', 'h', 'ภาพรวมสิ่งที่เลือก'));
+    box.append(list(sum.lines, 'items lean'));
+    if (sum.highlights.length) {
+      box.append(el('div', 'h', 'เรื่องที่โดดเด่น'));
+      box.append(list(sum.highlights.map((p) => `อายุ ${p.age} · ${p.text}`), 'picks'));
+    }
+    const all = el('details', 'all-picks');
+    all.append(el('summary', null, `ดูทุกสิ่งที่เลือก (${r.picks.length} เรื่อง)`));
+    all.append(list(r.picks.map((p) => `อายุ ${p.age} · ${p.text}`), 'picks'));
+    box.append(all);
   } else box.append(el('p', 'sub', 'ช่วงนี้ไม่มีเรื่องให้ตัดสินใจ'));
   return box;
 }
