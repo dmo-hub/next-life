@@ -502,8 +502,12 @@ function stepYear(st) {
     for (const e of eras) {
       // เล่าเหตุการณ์บ้านเมืองก่อนเสมอ · มีการ์ดเนื้อหาผูกไว้ = ตามด้วยการ์ดให้เลือกรับมือ
       st.due.push({ kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: e.name });
-      const ev = st.content.events.find((c) => c.era === e.id && whenOk(st, c.when) && (c.when?.age || c.stage === stage));
-      if (ev) st.due.push({ kind: 'eraEvent', ev, age: st.age });
+      // ใบรับมือเดิมไม่ออกซ้ำในชีวิตเดียว — เหตุการณ์เกิดซ้ำได้ แต่ข้อความ/ผลเดิมทุกตัวอักษรอ่านเหมือนบั๊ก · ครั้งหลังเล่าแค่การ์ดบ้านเมือง
+      const ev = st.content.events.find((c) => c.era === e.id && !st.done[c.id] && whenOk(st, c.when) && (c.when?.age || c.stage === stage));
+      if (ev) {
+        st.done[ev.id] = true;
+        st.due.push({ kind: 'eraEvent', ev, age: st.age });
+      }
     }
   }
 }
