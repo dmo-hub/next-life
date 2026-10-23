@@ -1306,18 +1306,23 @@ function ageParents(st, year) {
 
 // มรดกจากรุ่นก่อน (ทางเป็นลูก) ถึงมือปีที่พ่อ/แม่ผู้เล่นรุ่นก่อนตาย · เก็บเป็นเท่าของรายได้ครัวเรือนทั้งปีของประเทศ แปลงเป็นบาทของปีนี้
 function receiveLegacy(st, year, stage) {
-  const { units, debt } = st.legacy;
+  const { units, debt, from } = st.legacy;
   st.legacy = null;
   // มรดกมาพร้อมการจากไป — มรดกตอนแรกเกิด (ตายปีที่ลูกเกิด) ต้องปิดชีวิตพ่อ/แม่ตรงนี้ ageParents ยังไม่เคยเดิน
   for (const p of st.parents) if (p.ancestor) p.alive = false;
   const baht = units * nationalIncome(st.content.era, st.seed, year) * 12;
   st.money += baht;
-  const who = st.parents.find((p) => p.ancestor)?.sex === 'หญิง' ? 'แม่' : 'พ่อ';
-  const text = baht > 0
-    ? `${who}จากไป ทิ้งมรดกส่วนของเราไว้ ${Math.round(baht).toLocaleString('en-US')} บาท`
-    : debt
-      ? `${who}จากไปพร้อมหนี้ ทายาทรับผิดไม่เกินมรดกที่ได้ หนี้ที่เหลือจึงไม่ตกถึงเรา`
-      : `${who}จากไป ไม่มีทรัพย์เหลือเป็นมรดก`;
+  const ancestor = st.parents.find((p) => p.ancestor);
+  const who = from ?? (ancestor?.sex === 'หญิง' ? 'แม่' : 'พ่อ');
+  const sum = Math.round(baht).toLocaleString('en-US');
+  // หลาน/เหลน (B18): รุ่นก่อนไม่ใช่พ่อแม่ มรดกตกทอดผ่านพ่อแม่ — พ่อแม่ไม่ได้จากไปด้วย
+  const text = !ancestor && from
+    ? (baht > 0 ? `มรดกจาก${who}ตกทอดผ่านพ่อแม่มาถึงเรา ${sum} บาท` : debt ? `${who}จากไปพร้อมหนี้ ทายาทรับผิดไม่เกินมรดก หนี้จึงไม่ตกถึงเรา` : `${who}จากไป ไม่มีทรัพย์เหลือตกทอดมาถึงเรา`)
+    : baht > 0
+      ? `${who}จากไป ทิ้งมรดกส่วนของเราไว้ ${sum} บาท`
+      : debt
+        ? `${who}จากไปพร้อมหนี้ ทายาทรับผิดไม่เกินมรดกที่ได้ หนี้ที่เหลือจึงไม่ตกถึงเรา`
+        : `${who}จากไป ไม่มีทรัพย์เหลือเป็นมรดก`;
   st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text });
 }
 
@@ -1933,11 +1938,22 @@ const CARRY = { spend: 0.5, min: 0.3, max: 0.7 };
 // ผลกรรมต่อชาติหน้า "แรงทุกทาง" (ใบ 05 — ห้ามแก้คืน): ฐานะกับค่าเริ่มคิดจากระดับบัญชีที่ศาล
 // sd = ความกว้างของฐานะเกิดใหม่รอบจุดกลางตามกรรม · childStep = ฐานะลูกเลื่อนได้สูงสุดกี่ระดับจากกรรม
 // stat = ค่าเริ่มเลื่อนสูงสุดเมื่อบัญชีสุดขั้ว · bonusCap = เพดานผลรวมจากฉากระหว่างชาติต่อค่า
-// kin = ทางเป็นลูกรับความสัมพันธ์/คอนเน็คชั่นของบ้านต่อ (ใบ 05) เป็นสัดส่วนของส่วนต่างจากค่ากลาง 50 ตอนพ่อแม่ตาย เพดาน bonusCap
+// kin = ทางเป็นลูกรับความสัมพันธ์/คอนเน็คชั่นของบ้านต่อ (ใบ 05) เป็นสัดส่วนของส่วนต่างจากค่ากลาง 50 ตอนพ่อแม่ตาย เพดาน bonusCap · หลาน/เหลนคูณ KIN_TIERS.kin
 const FATE = { sd: 1.2, childStep: 3, stat: 10, bonusCap: 12, kin: 0.3 };
 // มรดก (ใบ 05 · lore-finance-belief): แบ่งตามจำนวนลูก · ภาษีการรับมรดก 5% ส่วนที่เกิน 100 ล้าน ตั้งแต่ปีที่กฎหมายมีผล
 // จำนวนลูกเป็นค่าตั้งของเกม — ธง has_kids ไม่ได้บอกว่ากี่คน
 const LEGACY = { kids: 2, taxFrom: 100e6, tax: 0.05, taxYear: 2559, richUnits: [10, 40] };
+// ทางในตระกูล (B18): เกิดเป็นลูก/หลาน/เหลน ยิ่งห่างสายเลือดยิ่งได้ต่อน้อย — ค่าตั้งของเกม
+// w = น้ำหนักสุ่มชั้น · carry คูณสัดส่วนส่งต่อบุญบาป (ลูก 1 = กรอบ CARRY เดิม) · kin คูณความสัมพันธ์/คอนเน็คชั่นของบ้าน
+// legacy คูณมรดกต่อหัว: หลานได้ส่วนของพ่อแม่ที่แบ่งต่อให้ลูก LEGACY.kids คนอีกทอด เหลนอีกทอด
+const KIN_TIERS = [
+  { tier: 1, name: 'ลูก', w: 6, carry: 1, kin: 1, legacy: 1 },
+  { tier: 2, name: 'หลาน', w: 3, carry: 0.75, kin: 0.6, legacy: 1 / LEGACY.kids },
+  { tier: 3, name: 'เหลน', w: 1, carry: 0.5, kin: 0.3, legacy: 1 / LEGACY.kids ** 2 },
+];
+const kinTier = (n) => KIN_TIERS[(n ?? 1) - 1];
+// ช่วงห่างรุ่น = อายุแม่ตอนคลอดช่วงเดียวกับ newLife
+const GEN_GAP = [18, 40];
 
 const clampIdx = (i) => Math.max(0, Math.min(CLASSES.length - 1, i));
 const gauss = (rng) => Math.sqrt(-2 * Math.log(1 - rng.next())) * Math.cos(2 * Math.PI * rng.next());
@@ -2019,7 +2035,7 @@ function verdictCard(af) {
 // ทางเกิด (ใบ 05): เป็นลูก (รับมรดกต่อ · ผีบรรพบุรุษเฝ้า) หรือเกิดใหม่ตามกรรม · ไม่มีลูกยังเล่นต่อได้ทางเกิดใหม่
 // การ์ดนี้เป็นทางแยกของเกม ไม่ใช่เหตุการณ์ จึงมีแค่สองทาง (ยกเว้นกติกา ≥4 ตัวเลือกของเนื้อหา)
 const PATHS = [
-  { id: 'child', text: 'เฝ้าลูกหลาน แล้วเกิดเป็นลูกของตัวเอง' },
+  { id: 'child', text: 'เฝ้าลูกหลาน แล้วกลับมาเกิดในตระกูลเดิม เป็นลูก หลาน หรือเหลน' },
   { id: 'reborn', text: 'ไปตามกรรม แล้วเกิดใหม่ที่ไหนก็ได้' },
 ];
 function pathCard(af) {
@@ -2039,9 +2055,9 @@ const carryAmount = (r) => (r >= 0.55 ? 'มาก' : r >= 0.45 ? 'พอปร�
 function carryCard(af) {
   const r = CARRY.min + af.rng.next() * (CARRY.max - CARRY.min);
   af.heir = makeHeir(af, r);
-  const amount = carryAmount(r);
   const h = af.heir;
-  const who = af.path === 'child' ? 'กลับมาเกิดเป็นลูกของตัวเอง' : 'ไปเกิดใหม่';
+  const amount = carryAmount(h.carried);
+  const who = af.path === 'child' ? `กลับมาเกิดเป็น${kinTier(h.tier).name}ของตัวเอง` : 'ไปเกิดใหม่';
   return emitAfter(af, {
     kind: 'carry',
     type: 'B',
@@ -2054,7 +2070,7 @@ function carryCard(af) {
 }
 
 // ผังตระกูล (ใบ 05: เลิกเมื่อไรก็ดูได้) — หน้าจอวาดระหว่างชีวิตจาก st.lineage และบนการ์ดส่งต่อ
-const lineageText = (lineage) => lineage.map((l) => `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ฐานะ${l.cls} · ตายอายุ ${l.age} · ไปภูมิ${l.realm}`);
+const lineageText = (lineage) => lineage.map((l) => `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ฐานะ${l.cls} · ตายอายุ ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${kinTier(l.tier).name}` : ''}`);
 
 // การ์ดถัดไปของช่วงที่ 7 · การ์ด carry (done) เป็นใบสุดท้าย แล้วผู้เรียกต่อ nextLife
 function nextAfterCard(af) {
@@ -2125,6 +2141,12 @@ function legacyUnits(st) {
 // อายุตอนมีลูกคนแรก: อายุที่ธง has_kids ติด · ไม่มีบันทึก (เนื้อหาเก่า) ใช้ 28 ตามค่ากลางที่เกมตั้ง
 const KID_AGE_DEFAULT = 28;
 
+const otherSex = (sex) => (sex === 'ชาย' ? 'หญิง' : 'ชาย');
+// คู่ของพ่อ/แม่สายเลือด: ฝ่ายชายแก่กว่าได้ถึง 8 ปี (แบบพ่อแม่ใน newLife)
+const spouseAge = (rng, sex, age) => (sex === 'หญิง' ? age + rng.int(0, 8) : Math.max(18, age - rng.int(0, 8)));
+// รุ่นก่อนในฐานะญาติของผู้เล่นใหม่ — หลานเรียกตามฝั่งของพ่อแม่ที่เป็นสายเลือด
+const elderWord = (tier, linkSex, sex) => (tier === 3 ? 'ทวด' : tier === 1 ? (sex === 'หญิง' ? 'แม่' : 'พ่อ') : linkSex === 'หญิง' ? (sex === 'หญิง' ? 'ยาย' : 'ตา') : sex === 'หญิง' ? 'ย่า' : 'ปู่');
+
 function makeHeir(af, r) {
   const st = af.st;
   const era = st.content.era;
@@ -2132,35 +2154,54 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   const sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง';
-  let cls, region, birthYear, parents = null, legacy = null, occupation = null;
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null;
   if (af.path === 'child') {
     // บ้านของรุ่นถัดไปคือบ้านของคนในชาติก่อน — อาชีพของครอบครัวจึงเป็นงานสุดท้ายของเขา ไม่สุ่มใหม่
     occupation = st.occupation;
+    tier = weighted(rng, KIN_TIERS, KIN_TIERS.map((t) => t.w));
     const kidAge = Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
-    // ปีเกมไม่เกินปีเกิดสุดท้ายในข้อมูล — เนื้อหา/ข้อมูลยุคครอบถึงช่วงนั้น · หน้าจอไม่แสดงปีอยู่แล้ว
-    birthYear = Math.min(lastBirth, st.birthYear + kidAge);
     region = { name: st.region, ses: st.ses };
-    const units = legacyUnits(st);
+    const units = legacyUnits(st) * tier.legacy;
     const rich = LEGACY.richUnits.filter((u) => units >= u).length;
     const wealth = st.estate?.money < 0 ? -1 : rich;
     cls = CLASSES[clampIdx(CLASSES.indexOf(st.cls) + wealth + Math.round(x * FATE.childStep))];
-    const otherAge = st.sex === 'หญิง' ? kidAge + rng.int(0, 8) : Math.max(18, kidAge - rng.int(0, 8));
-    // ผู้เล่นรุ่นก่อนตายตามชะตาเดิมของตัวเอง (diesAt) · อีกคนแก่และตายตามตารางชีพแบบพ่อแม่ทั่วไป
-    parents = [
-      { sex: st.sex, age: kidAge, alive: true, diesAt: st.age, ancestor: true },
-      { sex: st.sex === 'ชาย' ? 'หญิง' : 'ชาย', age: otherAge, alive: true },
-    ];
-    legacy = { age: st.age - kidAge, units, debt: st.estate?.money < 0 };
+    const debt = st.estate?.money < 0;
+    let year = st.birthYear + kidAge;
+    if (tier.tier === 1) {
+      // ผู้เล่นรุ่นก่อนตายตามชะตาเดิมของตัวเอง (diesAt) · อีกคนแก่และตายตามตารางชีพแบบพ่อแม่ทั่วไป
+      parents = [
+        { sex: st.sex, age: kidAge, alive: true, diesAt: st.age, ancestor: true },
+        { sex: otherSex(st.sex), age: spouseAge(rng, st.sex, kidAge), alive: true },
+      ];
+      legacy = { age: st.age - kidAge, units, debt, from: elderWord(1, null, st.sex) };
+    } else {
+      // รุ่นคั่นกลางเกิดห่างกันตามช่วงอายุแม่ตอนคลอด · พ่อ/แม่ของผู้เล่นใหม่เป็นลูก (หรือหลาน) ของรุ่นก่อน แก่และตายตามตารางชีพ
+      let gap = 0;
+      for (let i = 1; i < tier.tier; i++) {
+        gap = rng.int(...GEN_GAP);
+        year += gap;
+      }
+      const linkSex = rng.next() < 0.5 ? 'หญิง' : 'ชาย';
+      parents = [
+        { sex: linkSex, age: gap, alive: true },
+        { sex: otherSex(linkSex), age: spouseAge(rng, linkSex, gap), alive: true },
+      ];
+      // รุ่นก่อนไม่อยู่ในพ่อแม่ — มรดกตกทอดปีที่รุ่นก่อนตาย ตายก่อนเกิดก็ได้รับตอนแรกเกิด
+      legacy = { age: Math.max(0, st.birthYear + st.age - year), units, debt, from: elderWord(tier.tier, linkSex, st.sex) };
+    }
+    // ปีเกมไม่เกินปีเกิดสุดท้ายในข้อมูล — เนื้อหา/ข้อมูลยุคครอบถึงช่วงนั้น · หน้าจอไม่แสดงปีอยู่แล้ว
+    birthYear = Math.min(lastBirth, year);
   } else {
     birthYear = pickBirthYear(rng, era);
     region = pickRegion(rng, era.birth);
     cls = CLASSES[clampIdx(Math.round(4.5 + 4.5 * x + gauss(rng) * FATE.sd))];
   }
-  const kin = (k) => (af.path === 'child' && (k === 'relations' || k === 'network') ? Math.max(-FATE.bonusCap, Math.min(FATE.bonusCap, (st[k] - 50) * FATE.kin)) : 0);
+  const kin = (k) => (tier && (k === 'relations' || k === 'network') ? Math.max(-FATE.bonusCap, Math.min(FATE.bonusCap, (st[k] - 50) * FATE.kin * tier.kin)) : 0);
   const bonus = Object.fromEntries(STAT_KEYS.map((k) => [k, x * FATE.stat + (af.bonus[k] ?? 0) + kin(k)]));
   const gen = st.gen ?? 1;
-  // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน
-  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, cls: st.cls, age: st.age, realm: realm.name, path: af.path, broke: (st.estate?.money ?? 0) < 0 }];
+  // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน · tier = กลับมาเกิดเป็นชั้นไหนของตัวเอง (ทางเป็นลูก)
+  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, cls: st.cls, age: st.age, realm: realm.name, path: af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0 }];
+  const carried = r * (tier?.carry ?? 1);
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1,
@@ -2172,8 +2213,9 @@ function makeHeir(af, r) {
     legacy,
     occupation,
     bonus,
-    ledger: carryLedger(st.ledger, net, r),
-    carried: r,
+    ledger: carryLedger(st.ledger, net, carried),
+    carried,
+    tier: tier?.tier ?? null,
     // ส่วนที่บ้านส่งต่อ แยกจาก bonus (ซึ่งรวมผลกรรม) ให้การ์ดเปิดชีวิตเล่าทิศได้โดยไม่เผยบัญชี
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,
@@ -2256,13 +2298,14 @@ function inheritText(st, heir) {
   const prev = st.lineage.at(-1);
   const out = [];
   const ancestor = st.parents.find((p) => p.ancestor);
-  if (prev.path === 'child' && ancestor) out.push(`ชาติก่อนเฝ้าลูกหลานไว้ แล้วกลับมาเกิดเป็นลูกของตัวเอง — ${parentWord(ancestor)}ของคุณคือคุณในชาติก่อน`);
+  // เซฟก่อน B18 ไม่มี legacy.from — ทางเป็นลูกชั้นเดียวยังมีพ่อ/แม่ที่เป็นชาติก่อนให้เรียก
+  const who = heir.legacy?.from ?? (ancestor ? parentWord(ancestor) : null);
+  if (prev.path === 'child' && who) out.push(`ชาติก่อนเฝ้าลูกหลานไว้ แล้วกลับมาเกิดเป็น${kinTier(prev.tier).name}ของตัวเอง — ${who}ของคุณคือคุณในชาติก่อน`);
   else out.push('ชาติก่อนไปตามกรรม แล้วมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม');
   out.push(`กรรมที่ติดตัวมาจากชาติก่อน${carryAmount(heir.carried)}`);
   const d = CLASSES.indexOf(st.cls) - CLASSES.indexOf(prev.cls);
   out.push(d ? `ฐานะ ${d > 0 ? '↑' : '↓'} — เกิดในบ้านที่ฐานะ${d > 0 ? 'ดีกว่า' : 'ด้อยกว่า'}ชาติก่อน (ชาติก่อนฐานะ${prev.cls})` : `ฐานะ — ใกล้เคียงชาติก่อน (ฐานะ${prev.cls})`);
-  if (ancestor && heir.legacy) {
-    const who = parentWord(ancestor);
+  if (who && heir.legacy) {
     out.push(legacyText(heir.legacy, who));
     for (const k of ['relations', 'network']) {
       const line = kinText(k, heir.kin?.[k] ?? 0, who);
@@ -2628,7 +2671,7 @@ const FAMILY_TITLES = [
   { id: 'fam_no_hell', name: 'บรรพบุรุษไม่เคยตกนรก', hint: 'สองรุ่นก่อนหน้าไม่มีใครไปภูมินรก', test: (ch, lin) => lastN(lin, 2, (l) => l.realm !== 'นรก') },
   { id: 'fam_debt', name: 'หนี้ที่ส่งต่อกันมาสามรุ่น', hint: 'สามรุ่นติดกันจากไปพร้อมหนี้', test: (ch) => lastN(ch, 3, (l) => l.broke) },
   { id: 'fam_long', name: 'ตระกูลอายุยืน', hint: 'สามรุ่นติดกันอยู่ถึงแปดสิบ', test: (ch) => lastN(ch, 3, (l) => l.age >= 80) },
-  { id: 'fam_guardian', name: 'ผีบรรพบุรุษเฝ้าบ้าน', hint: 'รุ่นก่อนกลับมาเกิดเป็นลูกของตัวเอง', test: (ch, lin) => lastN(lin, 1, (l) => l.path === 'child') },
+  { id: 'fam_guardian', name: 'ผีบรรพบุรุษเฝ้าบ้าน', hint: 'รุ่นก่อนกลับมาเกิดเป็นลูกหลานของตัวเอง', test: (ch, lin) => lastN(lin, 1, (l) => l.path === 'child') },
   { id: 'fam_wander', name: 'ดวงวิญญาณพเนจร', hint: 'สองรุ่นติดกันไปเกิดใหม่ที่อื่น', test: (ch, lin) => lastN(lin, 2, (l) => l.path === 'reborn') },
   { id: 'fam_deva', name: 'ตระกูลมีเทวดา', hint: 'มีบรรพบุรุษไปเกิดเป็นเทวดาอย่างน้อยสองรุ่น', test: (ch, lin) => lin.filter((l) => l.realm === 'เทวดา').length >= 2 },
 ];
@@ -2647,7 +2690,7 @@ function titlesOf(st) {
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.19';
+const APP_VERSION = 'v0.2.20';
 const APP_BUILD = '2026-10-24';
 
 const root = document.getElementById('app');
