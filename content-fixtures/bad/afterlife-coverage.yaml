@@ -1,0 +1,14 @@
+# ผิดกติกาเดียว: ฉาก transfer มีแต่ใบที่มีเงื่อนไข คนที่ไม่เข้าเงื่อนไขตายแล้วไม่มีการ์ด
+events:
+  - id: bad_case_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    when: {age: [0, 12]}
+    text: "พ่อแม่ทำบุญไปให้"
+    choices:
+      - {text: อนุโมทนา, merit: [{cat: dana, level: 1}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

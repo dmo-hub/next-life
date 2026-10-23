@@ -1,0 +1,13 @@
+# ผิดกติกาเดียว: ฉากระหว่างชาติให้เงิน (คนตายไม่มีเงินให้เปลี่ยน)
+events:
+  - id: bad_case_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    text: "ลูกหลานทำบุญไปให้"
+    choices:
+      - {text: อนุโมทนา, effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: dana, level: 1}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

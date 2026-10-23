@@ -1,0 +1,748 @@
+# ฉากช่วงที่ 7 ระหว่างชาติ (B06 ชุด 0) — แกนอ่านใน afterlife.mjs ตามลำดับใบ 09: transfer → devaduta → ศาล → ทางเกิด → realm หรือ ancestor
+# ผล effects = ค่าเริ่มชาติหน้า · ป้ายบุญบาปเข้าบัญชีเดิม (ก่อนศาลเปลี่ยนคำตัดสิน · หลังศาลเปลี่ยนส่วนที่ส่งต่อ)
+events:
+  # ---- scene transfer ----
+  - id: after_transfer_any_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    title: "เสียงกรวดน้ำแว่วมา"
+    text: "ตัวเบาหวิว ได้ยินเสียงพระสวดมาแต่ไกล แล้วมีคนกรวดน้ำเอ่ยชื่อคุณ จะเป็นลูกหลาน ญาติห่าง ๆ หรือป้าข้างบ้านที่ยืมจานไปไม่เคยคืน ก็ไม่แน่ใจนัก"
+    choices:
+      - text: "สาธุ รับไว้ด้วยใจยินดี"
+        merit: [{cat: dana, level: 1}]
+        effects: {happiness: 1}
+        outcomes:
+          - {weight: 2, multipliers: {flags: {has_kids: 2}, stats: {relations: 1.5}}, text: "ส่วนบุญหลั่งมาหลายสาย มีคนเอ่ยชื่อคุณจากหลายวัด อุ่นไปทั้งตัว", merit: [{cat: dana, level: 2}]}
+          - {weight: 2, text: "ส่วนบุญมาสายเดียวบาง ๆ แต่ก็อุ่นพอให้ยิ้มได้", merit: [{cat: dana, level: 1}]}
+      - text: "ตามไปดูให้รู้ว่าใครทำให้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "เป็นป้าข้างบ้านจริง ๆ ถือจานของคุณมาใส่ขนมถวายพระด้วย", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตามไปถึงวัด พิธีเลิกพอดี เหลือแต่เสื่อกับแก้วน้ำเปล่า", merit: [{cat: neutral}]}
+      - text: "นึกถึงของที่ยังไม่ได้เก็บ"
+        merit: [{cat: neutral}]
+        effects: {happiness: -1}
+      - text: "เถียงในใจว่าทำบุญแค่นี้เองหรือ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "เถียงยังไม่ทันจบ เสียงกรวดน้ำก็เงียบไปแล้ว", merit: [{cat: neutral}], effects: {relations: -1}}
+          - {weight: 1, text: "เถียงไปเถียงมา ก็ยอมรับว่ามีคนนึกถึงก็ดีแล้ว", merit: [{cat: neutral}]}
+      - text: "นิ่งไว้ ตั้งใจแผ่ต่อให้คนอื่น"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {knowledge: 1}
+
+  - id: after_transfer_south_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    weight: 2
+    when: {region: [ใต้], flags: {has: [has_kids]}}
+    title: "สารทเดือนสิบ"
+    text: "แรมหนึ่งค่ำเดือนสิบ ได้กลับมาบ้าน ลูกหลานจัดหฺมฺรับขึ้นวัด ขนมลาฟูเต็มสำรับ ตั้งเปรตรอบลานวัดมีคนยืนรอชิงกันตาเป็นมัน อีกครึ่งเดือนก็ถึงวันส่งตายาย"
+    choices:
+      - text: "ยืนอนุโมทนาอยู่นอกกำแพงวัด"
+        merit: [{cat: dana, level: 1}]
+        outcomes:
+          - {weight: 2, multipliers: {stats: {relations: 1.5}}, text: "หฺมฺรับหลายบ้านขึ้นวัดพร้อมกัน ส่วนบุญหลั่งมาไม่ขาดสาย", merit: [{cat: dana, level: 2}]}
+          - {weight: 1, text: "มีแค่ลูกคนโตที่ตั้งใจเอ่ยชื่อ คนอื่นมัวแต่ถ่ายรูปหฺมฺรับ", merit: [{cat: dana, level: 1}]}
+      - text: "ไปดูเขาชิงเปรตให้หายเหงา"
+        merit: [{cat: neutral}]
+        effects: {happiness: 1}
+      - text: "แวะดูว่าลูกแบ่งสวนยางกันยังไง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ลูกตกลงกันได้ คุณโล่งใจจนลืมกลับไปฟังพระสวด", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกเถียงกันไม่จบ คุณยืนห่วงจนพิธีที่วัดเลิกไปแล้ว", merit: [{cat: neutral}], effects: {happiness: -1}}
+      - text: "น้อยใจที่ไม่มีของโปรดในหฺมฺรับ"
+        merit: [{cat: neutral}]
+        effects: {relations: -1}
+      - text: "อธิษฐานให้ลูกหลานอยู่เย็น"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {relations: 1}
+
+  - id: after_transfer_northeast_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    weight: 2
+    when: {region: [ตะวันออกเฉียงเหนือ], flags: {has: [has_kids]}}
+    title: "บุญข้าวประดับดิน"
+    text: "แรมสิบสี่ค่ำเดือนเก้า ก่อนไก่ขัน ลูกถือห่อข้าวใบตองไปวางโคนต้นมะขาม มีข้าวเหนียว ปลาแห้ง หมากพลู บุหรี่มวนหนึ่ง แล้วเรียกชื่อคุณเบา ๆ เหมือนกลัวคนข้างบ้านได้ยิน"
+    choices:
+      - text: "รับห่อข้าวด้วยใจอิ่ม"
+        merit: [{cat: dana, level: 1}]
+        outcomes:
+          - {weight: 2, multipliers: {stats: {relations: 1.5}}, text: "ห่อข้าววางเรียงหลายโคนต้น ลูกหลานทุกบ้านมาครบ ไม่มีใครลืมชื่อคุณ", merit: [{cat: dana, level: 2}]}
+          - {weight: 1, text: "มีห่อเดียว แต่ห่อแน่นจนรู้ว่าตั้งใจห่อ", merit: [{cat: dana, level: 1}]}
+      - text: "แบ่งข้าวให้ผีไร้ญาติข้าง ๆ"
+        merit: [{cat: help_others, level: 1}]
+        effects: {relations: 1}
+      - text: "นับว่าห่อบ้านอื่นใหญ่กว่า"
+        merit: [{cat: neutral}]
+        effects: {happiness: -1}
+      - text: "ตามลูกไปดูนาว่าน้ำพอไหม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "น้ำเต็มคันนา คุณยืนดูต้นกล้าจนลืมห่อข้าวไปเลย", merit: [{cat: neutral}]}
+          - {weight: 1, text: "นาแห้งแตกระแหง คุณห่วงจนกินอะไรไม่ลง", merit: [{cat: neutral}], effects: {happiness: -1}}
+
+  - id: after_transfer_north_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    weight: 2
+    when: {region: [เหนือ], flags: {has: [has_kids]}}
+    title: "เลี้ยงผีปู่ย่า"
+    text: "ถึงวันเลี้ยงผีปู่ย่าตามคติผีทางเหนือ ลูกหลานมากันเกือบพร้อมหน้า เช้าขึ้นวัดถวายสังฆทานอุทิศให้คุณ บ่ายตั้งเครื่องเซ่น ชื่อคุณถูกอ่านต่อท้ายรายชื่อบรรพบุรุษยาวเหยียด"
+    choices:
+      - text: "พนมมือรับส่วนบุญจากวัด"
+        merit: [{cat: dana, level: 1}]
+        outcomes:
+          - {weight: 2, multipliers: {stats: {relations: 1.5}}, text: "หลานตัวเล็กยังเอ่ยชื่อคุณได้ถูก ส่วนบุญมาเต็มมือ", merit: [{cat: dana, level: 2}]}
+          - {weight: 1, text: "ส่วนบุญมาถึงพอให้ใจสงบ แม้ลูกบางคนติดงานไม่ได้มา", merit: [{cat: dana, level: 1}]}
+      - text: "ขอไปนั่งกับปู่ย่ารุ่นก่อน"
+        merit: [{cat: neutral}]
+        effects: {relations: 1}
+      - text: "ห่วงว่าใครจะสืบพิธีต่อ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "หลานสาวคนรองจดขั้นตอนลงสมุดไว้ละเอียด คุณค่อยวางใจ", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีใครรับปาก คุณวนเวียนอยู่หัวเสาเรือนทั้งคืน", merit: [{cat: neutral}], effects: {happiness: -1}}
+      - text: "งอนที่ชื่อตัวเองอยู่ท้ายสุด"
+        merit: [{cat: neutral}]
+        effects: {relations: -1}
+      - text: "นั่งเงียบ ๆ ปล่อยวางเรื่องในบ้าน"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {happiness: 1}
+
+  - id: after_transfer_central_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    weight: 2
+    when: {region: [กลาง, กรุงเทพฯ และปริมณฑล, ตะวันออก, ตะวันตก], flags: {has: [has_kids]}}
+    title: "วันสารทไทย"
+    text: "วันสารทไทย ลูกกวนกระยาสารทไหม้ทั้งกระทะ เลยซื้อแบบห่อจากตลาดไปถวายวัดแทน กรวดน้ำเสร็จก็รีบกลับไปทำงาน น้ำในแก้วยังรินไม่ทันหมด"
+    choices:
+      - text: "อนุโมทนา ของซื้อก็ตั้งใจ"
+        merit: [{cat: dana, level: 1}]
+        outcomes:
+          - {weight: 2, multipliers: {stats: {relations: 1.5}}, text: "ลูกทุกคนแยกกันไปคนละวัด ชื่อคุณถูกเอ่ยหลายรอบในวันเดียว", merit: [{cat: dana, level: 2}]}
+          - {weight: 1, text: "กรวดน้ำรีบไปหน่อย แต่ส่วนบุญก็มาถึงครบ", merit: [{cat: dana, level: 1}]}
+      - text: "แอบตามไปดูที่ทำงานลูก"
+        merit: [{cat: neutral}]
+        effects: {relations: 1}
+      - text: "นึกเสียดายสูตรกวนของตัวเอง"
+        merit: [{cat: neutral}]
+        effects: {happiness: -1}
+      - text: "อยู่ฟังพระเทศน์ต่อจนจบ"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {knowledge: 1, happiness: -1}
+
+  - id: after_transfer_child_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    weight: 3
+    when: {age: [0, 12]}
+    title: "ขนมกับตุ๊กตา"
+    text: "พ่อแม่ถือขนมที่คุณชอบกับตุ๊กตาตัวโปรดไปวางหน้าศาลา แม่กรวดน้ำมือสั่นจนน้ำหกเลอะกระโปรง พ่อเอ่ยชื่อเล่นของคุณซ้ำ ๆ เหมือนกลัวส่วนบุญจะหลงทาง"
+    choices:
+      - text: "กางแขนเล็ก ๆ รับไว้ทั้งหมด"
+        merit: [{cat: dana, level: 1}]
+        outcomes:
+          - {weight: 2, multipliers: {stats: {relations: 1.5}}, text: "ปู่ย่าตายายกับน้าอาทุกคนมาด้วย ส่วนบุญอุ่นเหมือนผ้าห่มผืนโต", merit: [{cat: dana, level: 2}]}
+          - {weight: 1, text: "มีแค่พ่อกับแม่ แต่ก็อุ่นพอให้หลับสบาย", merit: [{cat: dana, level: 1}]}
+      - text: "ขอซบตักแม่อีกสักครั้ง"
+        merit: [{cat: neutral}]
+        effects: {relations: 1, happiness: -1}
+      - text: "ร้องอยากได้ตุ๊กตาคืน"
+        merit: [{cat: neutral}]
+        effects: {happiness: -1}
+      - text: "ฟังเสียงสวดจนใจนิ่ง"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {health: 1}
+
+  - id: after_transfer_lonely_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    weight: 2
+    when: {stats: {relations: {max: 30}}}
+    title: "ไม่มีใครเอ่ยชื่อ"
+    text: "รอเสียงกรวดน้ำอยู่นาน ไม่มีใครเอ่ยชื่อคุณ จนวันหนึ่งพระสวดอุทิศให้ญาติทั้งหลายแบบรวม ๆ ที่ศาลาวัดใกล้บ้าน ส่วนบุญเหลือมาถึงแค่ปลายนิ้ว"
+    choices:
+      - text: "รับไว้ ขอบใจใครก็ตามที่สวดให้"
+        merit: [{cat: dana, level: 1}]
+        outcomes:
+          - {weight: 1, multipliers: {flags: {has_kids: 2}}, text: "มีคนหนึ่งนึกถึงคุณขึ้นมากลางดึก วันรุ่งขึ้นไปทำบุญเอ่ยชื่อคุณเต็มเสียง", merit: [{cat: dana, level: 2}]}
+          - {weight: 2, text: "ส่วนบุญเล็กนิดเดียว แต่อุ่นกว่าที่คิด", merit: [{cat: dana, level: 1}]}
+      - text: "โกรธ เลี้ยงมาแทบตาย ไม่มีใครจำ"
+        merit: [{cat: neutral}]
+        effects: {relations: -1}
+      - text: "ไปเฝ้าบ้านเก่ารอคนมาจำได้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "คนเช่าบ้านใหม่จุดธูปให้ 'เจ้าของเก่า' ทั้งที่ไม่รู้จักชื่อ", merit: [{cat: neutral}], effects: {happiness: 1}}
+          - {weight: 2, text: "รอจนฝุ่นจับ ไม่มีใครมา", merit: [{cat: neutral}], effects: {happiness: -1}}
+      - text: "นั่งทบทวนว่าห่างใครไปตอนไหน"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {relations: 1}
+
+  # ---- scene devaduta ----
+  - id: after_devaduta_infant_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: devaduta
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#1
+    title: "เทวทูต: ทารก"
+    text: "พญายมเท้าคางมองลงมา 'ตอนอยู่โลกมนุษย์ เคยเห็นทารกนอนจมฉี่ตัวเอง จะลุกก็ลุกไม่ได้ จะพูดก็พูดไม่ได้ไหม' เสียงไม่ดุ แต่ทั้งห้องเงียบรอคำตอบ"
+    choices:
+      - text: "ตอนนั้นยุ่งงาน ไม่มีเวลาคิด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "พญายมเลิกคิ้ว 'แล้วตอนนี้ว่างหรือยัง' คำถามนั้นค้างอยู่ในห้องนานกว่าที่คิด", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยมทูตข้าง ๆ แอบกลั้นหัวเราะ พญายมกระแอมทีเดียวทั้งห้องก็เงียบ", merit: [{cat: neutral}]}
+      - text: "นิ่งไป นึกถึงตอนตัวเองเป็นเด็ก"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {happiness: 1}
+      - text: "ก็เด็กทุกคนเป็นแบบนั้นนี่"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "พญายมว่า 'ใช่ ทุกคน รวมทั้งเจ้าด้วย' แล้วปล่อยให้ประโยคนั้นค้างอยู่กลางห้อง", merit: [{cat: neutral}]}
+          - {weight: 1, text: "พญายมหัวเราะเบา ๆ เป็นครั้งแรกของวัน ยมทูตหันมามองกันเลิ่กลั่ก", merit: [{cat: neutral}]}
+      - text: "เห็น รู้ว่าเกิดมาต้องแก่ แต่ลืม"
+        merit: [{cat: sila, level: 1}]
+
+  - id: after_devaduta_elder_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: devaduta
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#1
+    title: "เทวทูต: คนชรา"
+    text: "'เคยเห็นคนแก่หลังงอ ฟันหลุด ถือไม้เท้าเดินตัวสั่นไหม' พญายมถาม 'แล้วเคยคิดไหมว่าวันหนึ่งจะเป็นอย่างนั้นเอง' ข้างหลังยังมีคนต่อแถวรอยาวเหยียด"
+    choices:
+      - text: "ถามกลับว่าท่านเคยแก่ไหม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "พญายมยิ้มมุมปาก 'ไม่ใช่ทุกคนจะอยู่ทันได้แก่หรอกนะ' แล้วหันไปเรียกคนต่อไป", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยมทูตที่ยืนเฝ้าประตูหันมามองกันเลิ่กลั่ก ไม่มีใครกล้าถามแบบนี้มานานแล้ว", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - text: "เห็น และรู้ตัวว่าผัดไว้ทุกที"
+        merit: [{cat: sila, level: 1}]
+      - text: "ขอจำหน้าคนแก่คนนั้นไว้"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {relations: 1}
+      - text: "ที่บ้านไม่เคยมีใครพูดเรื่องแก่"
+        merit: [{cat: neutral}]
+        effects: {relations: -1}
+
+  - id: after_devaduta_sick_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: devaduta
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#1
+    title: "เทวทูต: คนป่วย"
+    text: "พญายมเคาะนิ้วบนโต๊ะช้า ๆ 'เคยเห็นคนป่วยนอนจมไข้ ลุกเองไม่ไหว ต้องมีคนพยุง ป้อนข้าวให้ไหม ตอนเห็นแล้วคิดอะไรอยู่'"
+    choices:
+      - text: "เคยไปเยี่ยม ครั้งเดียวแหละ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "พญายมถามต่อว่าเยี่ยมแล้วกลับบ้านไปทำอะไร คำตอบติดอยู่ที่คอ", merit: [{cat: neutral}]}
+          - {weight: 1, text: "'ครั้งเดียวก็นับ' พญายมขีดอะไรบางอย่างลงสมุด แล้วพลิกหน้าใหม่", merit: [{cat: neutral}]}
+      - text: "หมอกับพยาบาลดูแลอยู่แล้ว"
+        merit: [{cat: neutral}]
+        effects: {relations: -1}
+      - text: "คิดว่าโชคดีที่ไม่ใช่เรา"
+        merit: [{cat: sila, level: 1}]
+      - text: "นึกถึงตอนตัวเองนอนป่วยครั้งก่อน"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {knowledge: 1}
+      - text: "ถ้าได้กลับไปจะสร้างโรงพยาบาลให้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "พญายมถามว่าตอนมีเงินทำไมไม่สร้าง ห้องเงียบไปพักหนึ่ง", merit: [{cat: neutral}]}
+          - {weight: 1, text: "'คำสัญญาที่นี่ราคาถูกมาก' พญายมว่า 'ใคร ๆ ก็ให้กันทั้งนั้น'", merit: [{cat: neutral}]}
+
+  - id: after_devaduta_punished_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: devaduta
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#1
+    title: "เทวทูต: คนรับโทษ"
+    text: "'เคยเห็นคนทำผิดถูกจับตัวไปรับโทษ นั่งเสียใจทีหลังไหม' พญายมถาม 'แล้วเคยคิดไหมว่าเรื่องที่ทำไว้ลับ ๆ ก็มีวันมาถึงเหมือนกัน แม้ไม่มีใครเห็น'"
+    choices:
+      - text: "สาบานว่าจะไม่ทำอีกแล้ว"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "พญายมว่า 'วันนี้ได้ยินประโยคนี้เป็นคนที่สามร้อยแล้ว' น้ำเสียงไม่ได้ประชด", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยมทูตที่ยืนเฝ้าประตูถอนหายใจพร้อมกันทั้งแถว", merit: [{cat: neutral}]}
+      - text: "ยอมรับว่ากลัว มาจนถึงตอนนี้"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {happiness: -1}
+      - text: "เรื่องของเราเล็กกว่าเขาเยอะ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "พญายมไม่เถียง แค่ถามว่า 'เล็กสำหรับใคร' แล้วรอ", merit: [{cat: neutral}]}
+          - {weight: 1, text: "พญายมเอนหลังพิงบัลลังก์ 'บางเรื่องก็เล็กจริง' แต่ไม่บอกว่าเรื่องไหน", merit: [{cat: neutral}]}
+      - text: "เห็นในข่าวทุกเย็น ดูเพลิน ๆ"
+        merit: [{cat: sila, level: 1}]
+      - text: "คนรอบตัวทำหนักกว่านี้อีก"
+        merit: [{cat: neutral}]
+        effects: {relations: -1}
+
+  - id: after_devaduta_corpse_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: devaduta
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#1
+    title: "เทวทูต: ศพ"
+    text: "'เคยเห็นศพไหม ศพที่บวม เขียว ไม่มีใครอยากเข้าใกล้' พญายมถาม 'ไปงานศพมากี่งาน กินข้าวต้มไปกี่ถ้วย แล้วระหว่างนั้นเคยคิดถึงตัวเองบ้างไหม'"
+    choices:
+      - text: "ตอนนี้คิดอยู่ ยังทันไหม"
+        merit: [{cat: bhavana, level: 1}]
+        outcomes:
+          - {weight: 1, text: "พญายมไม่ตอบ แต่ไม่ได้ส่ายหน้า", merit: [{cat: neutral}]}
+          - {weight: 1, text: "'ถามช้าไปหน่อย' พญายมว่า 'แต่ถามก็ยังดีกว่าไม่ถาม'", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+      - text: "ญาติชวนนั่งเล่นไพ่ทั้งคืนเลย"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "พญายมถอนหายใจยาว 'ทั้งคืนเลยหรือ' ยมทูตคนหนึ่งแอบเก็บสำรับไพ่เข้าแขนเสื้อ", merit: [{cat: neutral}]}
+          - {weight: 1, text: "พญายมถามว่าได้หรือเสีย ตอบไม่ได้ เพราะจำไม่ได้จริง ๆ", merit: [{cat: neutral}]}
+      - text: "ไปทุกงาน แต่ไปเพราะมารยาท"
+        merit: [{cat: sila, level: 1}]
+        effects: {relations: 1}
+      - text: "งานศพมีไว้ให้คนเป็นสบายใจ"
+        merit: [{cat: neutral}]
+        effects: {knowledge: 1}
+
+  - id: after_devaduta_child_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: devaduta
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#1
+    weight: 20
+    when: {age: [0, 12]}
+    title: "พญายมคุกเข่าลงคุย"
+    text: "พญายมลุกจากบัลลังก์ คุกเข่าลงให้ตาอยู่ระดับเดียวกัน เสียงเบาลงมาก 'ตอนอยู่บ้าน หนูเคยเห็นคุณยายเดินช้า ๆ หรือน้องเล็ก ๆ ร้องไห้ไหม' ไม่มีใครในห้องดุ ไม่มีใครเร่ง"
+    choices:
+      - text: "ไม่รู้ หนูจำไม่ได้แล้ว"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "'ไม่เป็นไรเลย' พญายมว่า 'เด็กไม่ต้องจำได้ทุกอย่างหรอก'", merit: [{cat: neutral}]}
+          - {weight: 1, text: "พญายมเล่านิทานสั้น ๆ ให้ฟัง จนหนูยิ้มออก", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - text: "หนูจะจำไว้ เกิดใหม่จะจำ"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {knowledge: 1}
+      - text: "หนูอยากกลับไปหาแม่"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "พญายมลูบหัวเบา ๆ 'คนที่บ้านยังคิดถึงหนูอยู่นะ'", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยมทูตตัวโตเงียบไปนาน แล้วยื่นผ้าเช็ดหน้ามาให้ ทั้งที่ตัวเองตาแดงกว่า", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - text: "เห็น คุณยายเดินช้ามาก"
+        merit: [{cat: sila, level: 1}]
+        effects: {relations: 1}
+
+  # ---- scene realm ----
+  - id: after_realm_hell_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    realm: [hell]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#2
+    weight: 2
+    title: "หน้าประตูขุมที่ไม่มีนาฬิกา"
+    text: "ยมบาลพาเดินมาถึงประตูเหล็กบานใหญ่ ข้างในมืดและร้อนจนไม่อยากมอง เขาบอกสั้น ๆ ว่าอยู่ไม่ตลอดไป พอกรรมหมดก็ได้ไปต่อ แต่จะนานแค่ไหนไม่มีใครบอกได้ ก่อนก้าวเข้าไป เหลือเวลาคิดอีกนิดเดียว"
+    choices:
+      - text: "ขอโทษคนที่เคยทำร้ายในใจ"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {relations: 1}
+      - text: "ถามยมบาลว่าเมื่อไหร่จะออก"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ยมบาลยิ้มนิดเดียว ตอบว่าให้ถามใจตัวเองดีกว่า", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยมบาลชี้ไปที่เงาตัวเอง แล้วไม่พูดอะไรอีก", merit: [{cat: neutral}]}
+      - text: "จำบทเรียนนี้ไว้ให้ถึงชาติหน้า"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {knowledge: 1, happiness: -1}
+      - text: "โทษคนอื่นที่ทำให้มาอยู่ที่นี่"
+        merit: [{cat: neutral}]
+        effects: {happiness: -1}
+
+  - id: after_realm_hell_02
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    realm: [hell]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#2
+    when: {flags: {has: [heavy_drinker]}}
+    title: "คนข้างประตูที่จำได้"
+    text: "ระหว่างรอ มีวิญญาณอีกดวงนั่งข้าง ๆ หน้าตาคุ้นเหมือนเพื่อนก๊งเหล้าหน้าปากซอย เขาบ่นว่าคิดถึงขวดสุดท้ายที่ยังไม่ได้เปิด ไกลออกไปมีเสียงระฆังจากโลกมนุษย์ลอยมาจาง ๆ ยมบาลบอกว่าพ้นกำหนดแล้วทุกคนได้ไปต่อ"
+    choices:
+      - text: "ชวนเพื่อนตั้งใจเลิกด้วยกัน"
+        merit: [{cat: help_others, level: 1}]
+        effects: {relations: 1}
+      - text: "ฟังเสียงระฆังจนใจสงบ"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {health: 1}
+      - text: "นั่งคุยเรื่องวงเหล้าเก่า ๆ"
+        merit: [{cat: neutral}]
+        effects: {happiness: 1, health: -1}
+      - text: "นั่งเงียบ ไม่อยากคุยกับใคร"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ความเงียบทำให้ได้ยินเสียงใจตัวเองชัดขึ้น", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ความเงียบยิ่งทำให้เวลาตรงนี้ยาวกว่าเดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+
+  - id: after_realm_peta_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    realm: [peta]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    weight: 2
+    title: "ยืนนอกฝาเรือน"
+    text: "ร่างผอมบางยืนอยู่นอกฝาบ้านเก่า มองเห็นลูกหลานจัดสำรับไปวัด ได้ยินเสียงกรวดน้ำแว่ว ๆ เหมือนมีใครเรียกชื่อ ท้องก็หิว ใจก็ร้อนรน"
+    choices:
+      - text: "พนมมืออนุโมทนา สาธุ"
+        merit: [{cat: bhavana, level: 1}]
+        outcomes:
+          - {weight: 2, multipliers: {flags: {has_kids: 2}}, text: "ความอิ่มค่อย ๆ ซึมเข้ามา ร่างเบาขึ้นเหมือนได้กินข้าวฝีมือแม่", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้มาแค่นิดเดียว แต่ก็พอให้ยิ้มออกครั้งแรก", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - text: "ไปเข้าฝันขอให้ทำบุญไปให้"
+        merit: [{cat: neutral}]
+        effects: {relations: 1}
+      - text: "แบ่งส่วนที่ได้ให้เปรตข้าง ๆ"
+        merit: [{cat: help_others, level: 1}]
+        effects: {happiness: 1}
+      - text: "น้อยใจ หันหลังไม่รับอะไร"
+        merit: [{cat: neutral}]
+        effects: {happiness: -1}
+
+  - id: after_realm_peta_02
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    realm: [peta]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    when: {region: [ใต้]}
+    title: "วันส่งตายาย เดือนสิบ"
+    text: "แรมสิบห้าค่ำ เดือนสิบ วันส่งตายาย วันสุดท้ายที่ได้ขึ้นมาเยี่ยมบ้านทาง{ภาค} ที่วัดเต็มไปด้วยหฺมฺรับและเสียงหัวเราะจากลานชิงเปรต เด็ก ๆ แย่งขนมกันวุ่น ตกเย็นต้องกลับลงไปแล้ว"
+    choices:
+      - text: "อนุโมทนาบุญจากหฺมฺรับลูกหลาน"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {relations: 1}
+      - text: "ไปยืนดูเด็ก ๆ ชิงเปรตจนอิ่มใจ"
+        merit: [{cat: neutral}]
+        effects: {happiness: 1}
+      - text: "ตามหาญาติที่ยังผิดใจกันอยู่"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 2, multipliers: {stats: {relations: 1.5}}, text: "ญาติคนนั้นจุดธูปเอ่ยชื่อพอดี ใจที่ค้างอยู่คลายลง", merit: [{cat: neutral}]}
+          - {weight: 1, text: "หาไม่เจอ เขาย้ายไปไกลแล้ว ได้แต่ฝากใจไว้ที่ลานวัด", merit: [{cat: neutral}]}
+      - text: "รีบแย่งของจากเปรตตัวอื่น"
+        merit: [{cat: greed_harm, level: 1}]
+        effects: {health: 1, relations: -1}
+
+  - id: after_realm_beast_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    realm: [beast]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#2
+    weight: 2
+    title: "ลืมตาเป็นสุนัขวัด"
+    text: "ตื่นมาอีกที ตัวมีขน หางกระดิกเองได้ นอนอยู่ใต้ศาลาวัดแถวบ้านเก่า จำคำพูดคนไม่ได้แล้ว แต่ยังจำกลิ่นบางคนได้"
+    choices:
+      - text: "เฝ้าศาลาให้ทุกคืน"
+        merit: [{cat: help_others, level: 1}]
+        effects: {health: 1}
+      - text: "นอนฟังเสียงสวดตอนเย็น"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {knowledge: 1}
+      - text: "เดินตามกลิ่นคนในครอบครัว"
+        merit: [{cat: neutral}]
+        effects: {relations: 1}
+      - text: "ขู่หมาตัวอื่นแย่งข้าวก้นบาตร"
+        merit: [{cat: greed_harm, level: 1}]
+        effects: {health: 1, relations: -1}
+
+  - id: after_realm_beast_02
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    realm: [beast]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#2
+    when: {age: [15, 45]}
+    title: "อสุรกายใต้เงาไม้"
+    text: "ร่างใหญ่โตแต่ไร้ที่อยู่ ไปทางไหนก็ไม่มีใครเห็น ความโกรธที่ค้างจากตอนตายอายุ {อายุ} ยังคุกรุ่นเหมือนถ่านใต้ขี้เถ้า"
+    choices:
+      - text: "ค่อย ๆ วางความโกรธลง"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {happiness: 1}
+      - text: "คุ้มกันคนเดินทางยามค่ำ"
+        merit: [{cat: help_others, level: 1}]
+        effects: {network: 1}
+      - text: "ไปหลอกคนที่เคยแกล้ง"
+        merit: [{cat: greed_harm, level: 1}]
+        effects: {happiness: 1, relations: -1}
+      - text: "นั่งนิ่ง รอให้เวลาผ่านไป"
+        merit: [{cat: neutral}]
+        effects: {health: 1}
+
+  - id: after_realm_human_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    realm: [human]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#2
+    weight: 2
+    title: "ก่อนลืมตาครั้งใหม่"
+    text: "แสงอุ่น ๆ ล้อมรอบ ได้ยินเสียงหัวใจแม่คนใหม่เต้นตุบ ๆ อีกอึดใจเดียวจะได้เกิด ความทรงจำชาตินี้กำลังจางเหมือนหมึกโดนน้ำ เลือกได้ว่าจะปล่อยอะไรไปก่อน"
+    choices:
+      - text: "ลืมความแค้น เก็บความอ่อนโยนไว้"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {happiness: 1}
+      - text: "ตั้งจิตขอปัญญาติดตัวไป"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {knowledge: 1}
+      - text: "ขอร่างกายแข็งแรงกว่าเดิม"
+        merit: [{cat: neutral}]
+        effects: {health: 1}
+      - text: "ขอเกิดมาเจอคนที่รักอีก"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ชื่อใครบางคนยังวนในใจ แม้หน้าจะเลือนไปแล้ว", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ความผูกพันแน่นจนลืมขอเรื่องอื่น", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+
+  - id: after_realm_human_02
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    realm: [human]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#2
+    when: {flags: {has: [has_kids]}}
+    title: "ภาพลูกที่กำลังจางไป"
+    text: "ภาพสุดท้ายที่ยังติดตาคือหน้าลูกตอนเด็ก ความจำกำลังจะหมดไปพร้อมลมหายใจแรกของชีวิตใหม่ ถ้ากำได้แค่อย่างเดียว จะกำอะไรไว้"
+    choices:
+      - text: "กำคำสอนที่เคยสอนลูกไว้"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {knowledge: 1}
+      - text: "ปล่อยวาง อวยพรลูกครั้งสุดท้าย"
+        merit: [{cat: help_others, level: 1}]
+        effects: {happiness: 1}
+      - text: "กำความห่วงลูกไว้แน่น"
+        merit: [{cat: neutral}]
+        effects: {relations: 1, happiness: -1}
+      - text: "กำความขยันทำมาหากินไว้"
+        merit: [{cat: neutral}]
+        effects: {network: 1}
+
+  - id: after_realm_deva_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    realm: [deva]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#6
+    weight: 2
+    title: "วิมานที่มีวันหมดอายุ"
+    text: "ตื่นมาในวิมานหอมกรุ่น ดนตรีเล่นเองไม่ต้องจ้าง เทวดารุ่นพี่กระซิบว่าที่นี่สุขก็จริง แต่บุญที่พามาย่อมหมดได้ วันหนึ่งดอกไม้บนตัวจะเริ่มเหี่ยว ระหว่างนี้จะใช้เวลาอย่างไรดี"
+    choices:
+      - text: "ไปฟังธรรมที่ศาลากลางสวรรค์"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {knowledge: 1}
+      - text: "เที่ยวสวนทิพย์ให้คุ้ม"
+        merit: [{cat: neutral}]
+        effects: {happiness: 1}
+      - text: "ไปงานเลี้ยงทำความรู้จักเทวดาอื่น"
+        merit: [{cat: neutral}]
+        effects: {network: 1}
+      - text: "ไม่แตะน้ำทิพย์ที่ทำให้เมา"
+        merit: [{cat: sila, level: 1}]
+        effects: {health: 1}
+
+  - id: after_realm_deva_02
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    realm: [deva]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#6
+    when: {stats: {relations: {min: 60}}}
+    title: "เพื่อนเก่ามาเยี่ยมวิมาน"
+    text: "เทวดาอีกองค์แวะมา ปรากฏว่าเป็นคนรู้จักจากโลกมนุษย์ ต่างคนต่างหัวเราะว่าไม่คิดว่าจะได้เจอกันที่นี่ เขาบอกว่าผ้าทิพย์ของเขาเริ่มหมองแล้ว อีกไม่นานต้องจากไปเกิดใหม่"
+    choices:
+      - text: "แบ่งผ้าทิพย์ของตัวเองให้เพื่อน"
+        merit: [{cat: dana, level: 1}]
+        effects: {relations: 1}
+      - text: "ชวนนั่งสมาธิด้วยกันจนวันสุดท้าย"
+        merit: [{cat: bhavana, level: 1}]
+        effects: {happiness: 1}
+      - text: "ถามเพื่อนว่าจะไปเกิดที่ไหน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "เขาไม่รู้ แต่สัญญาว่าถ้าเจอกันอีกจะทักก่อน", effects: {network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาตอบว่าตามบุญที่เหลือ แล้วยิ้มเหมือนไม่กลัว", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+      - text: "รีบปาร์ตี้ก่อนตัวเองจะเหี่ยว"
+        merit: [{cat: neutral}]
+        effects: {happiness: 1, knowledge: -1}
+
+  # ---- scene ancestor ----
+  - id: after_ancestor_watch_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: ancestor
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    weight: 2
+    title: "ผีเรือนเฝ้าเปล"
+    text: "คนเฒ่าคนแก่ว่าผีบ้านผีเรือนอยู่ที่หัวเสาเรือน คอยดูแลเฉพาะคนในบ้าน คืนนี้คุณนั่งอยู่บนขื่อ มองเด็กน้อยคนหนึ่งนอนดิ้นในเปล เด็กคนนี้แหละที่คุณกำลังจะไปเป็น"
+    choices:
+      - text: "เฝ้าทั้งคืนตอนเด็กตัวร้อน"
+        effects: {health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - text: "ฮัมเพลงที่คนในบ้านร้องกันมา"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - text: "เคาะเสาเบา ๆ ให้คนในบ้านตื่น"
+        outcomes:
+          - {weight: 2, text: "คนในบ้านตื่นมาห่มผ้าให้พอดี แล้วบ่นว่าบ้านเก่าเสียงดังจริง", effects: {health: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ยายตื่นแทน งัวเงียแต่ก็ห่มผ้าให้ แล้วนั่งไกวเปลจนเด็กหลับ", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: neutral}]
+      - text: "นั่งฟังเสียงหายใจเด็กจนเช้า"
+        effects: {happiness: 1}
+        merit: [{cat: bhavana, level: 1}]
+
+  - id: after_ancestor_school_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: ancestor
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    title: "ที่นั่งบนหิ้ง"
+    text: "ตามคติผีบ้านผีเรือน วิญญาณบรรพบุรุษสถิตบนหิ้งคอยคุ้มครองคนในบ้าน คุณได้ที่นั่งบนหิ้งเล็ก ๆ ข้างหน้าต่าง เห็นเด็กในบ้านทำการบ้านไปเล่นไป ดินสอหายวันละแท่ง"
+    choices:
+      - text: "กระซิบให้ตั้งใจเรียน"
+        effects: {knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - text: "ให้ฝันเห็นตัวเองทำงานดี ๆ"
+        outcomes:
+          - {weight: 2, text: "เด็กตื่นมาเล่าฝันไม่หยุด แล้วหยิบหนังสือขึ้นมาเอง", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เด็กจำฝันไม่ได้เลย จำได้แค่ว่ามีคนแก่ยิ้มให้", effects: {happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "เฝ้าไม่ให้วิ่งข้ามถนนคนเดียว"
+        effects: {health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - text: "พาเพื่อนบ้านมาชวนเด็กเล่นด้วย"
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - text: "ไม่ชี้ทาง ให้เขาเลือกเอง"
+        effects: {happiness: 1}
+        merit: [{cat: bhavana, level: 1}]
+
+  - id: after_ancestor_far_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: ancestor
+    realm: [hell, peta]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    title: "เฝ้าได้แค่นอกรั้ว"
+    text: "ตามคติผีเรือน บรรพบุรุษเฝ้าลูกหลานในบ้าน แต่ในพระสูตรเล่าว่าผู้ที่กรรมยังค้างได้แค่ยืนนอกฝาเรือน วันที่ประตูเปิดให้กลับมา คุณยืนอยู่ปลายรั้ว เห็นลูกวิ่งเล่นอยู่ไกล ๆ เรียกเท่าไรก็ไม่ได้ยิน"
+    choices:
+      - text: "ยืนเฝ้าเงียบ ๆ ไม่ไปไหน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - text: "ยกมือรับข้าวที่บ้านกรวดน้ำมา"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - text: "ฝากลมพัดกลิ่นดอกไม้เข้าไป"
+        outcomes:
+          - {weight: 1, text: "เด็กหยุดวิ่ง หันมามองทางรั้วนานผิดปกติ แล้วโบกมือ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ลมพัดไปไม่ถึง กลิ่นดอกไม้ไปตกที่บ้านข้าง ๆ แทน", effects: {network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "หันหลังกลับ ไม่อยากให้ใครห่วง"
+        effects: {health: 1}
+        merit: [{cat: bhavana, level: 1}]
+
+  - id: after_ancestor_debt_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: ancestor
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    when: {flags: {has: [in_debt]}}
+    title: "ห่วงหนี้ที่ทิ้งไว้"
+    text: "ผีบ้านผีเรือนว่ากันว่าห่วงคนในบ้านที่สุด แต่สิ่งที่คุณห่วงกว่าคือหนี้ก้อนที่ยังไม่ได้ปิด จดหมายทวงหนี้ยังมาส่งที่บ้านทุกเดือน ส่วนลูกน้อยของคุณเริ่มนับเหรียญเป็นแล้ว"
+    choices:
+      - text: "สอนเด็กให้กลัวการกู้"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - text: "เฝ้าให้ลูกหลานไม่โดนคนทวงข่ม"
+        outcomes:
+          - {weight: 2, text: "คนทวงมาถึงหน้าบ้านแล้วใจอ่อนเอง ยอมคุยผ่อนกันดี ๆ", effects: {happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "คนทวงไม่รู้สึกอะไรเลย แต่ญาติหันมาช่วยกันผ่อนจนจบ", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: neutral}]
+      - text: "ให้เด็กโตมามีเพื่อนดีคอยช่วย"
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - text: "ยอมรับว่าหนี้นั้นเป็นของตัวเอง"
+        effects: {relations: 1}
+        merit: [{cat: bhavana, level: 1}]
+
+  - id: after_ancestor_quiet_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: ancestor
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    when: {stats: {relations: {max: 30}}}
+    title: "บ้านที่ไม่ค่อยคุยกัน"
+    text: "ผีเรือนอย่างคุณได้กลับมาเฝ้าบ้านหลังเดิม ผู้ใหญ่ในบ้านยังไม่ค่อยคุยกันเหมือนตอนคุณอยู่ กินข้าวคนละเวลา ทักกันแค่ในกลุ่มแชต มีลูกคนเล็กของคุณนั่งมองทุกคนเงียบ ๆ"
+    choices:
+      - text: "ให้ฝนตกจนทุกคนติดอยู่บ้าน"
+        outcomes:
+          - {weight: 2, text: "ออกไปไหนไม่ได้ ทุกคนต้องนั่งกินข้าวพร้อมกัน หัวเราะกันครั้งแรกในรอบปี", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ต่างคนต่างนั่งเล่นมือถือ แต่เด็กได้นั่งตักยายทั้งบ่าย", effects: {happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "เข้าฝันญาติผู้ใหญ่ให้โทรหากัน"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - text: "เฝ้าลูกคนเล็กคนเดียวพอ"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - text: "สอนเด็กให้ช่างสังเกต"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - text: "ปล่อยวาง ให้คนเป็นว่ากันเอง"
+        effects: {happiness: 1}
+        merit: [{cat: bhavana, level: 1}]

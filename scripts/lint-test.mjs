@@ -9,6 +9,7 @@ import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
 import { schoolGate, jobCard, TRACKS, EDU } from '../src/engine/career.mjs';
 import { newLife, CLASSES } from '../src/engine/life.mjs';
 import { MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES } from '../src/node/lint/vocab.mjs';
+import { SCENES } from '../src/engine/afterlife.mjs';
 import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA } from '../src/engine/merit.mjs';
 
 const root = new URL('../', import.meta.url);
@@ -126,7 +127,12 @@ rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${c
 for (const f of stale) if (!ctx.flags.prefixes.has(f)) fails.push(`ทะเบียนธง: "${f}" ไม่มีเนื้อหาใน content/ ใช้`);
 
 try {
-  rows.push(['content/', `ผ่าน ${loadEvents().length} เหตุการณ์`]);
+  const real = loadEvents();
+  rows.push(['content/', `ผ่าน ${real.length} เหตุการณ์`]);
+  // ด่าน afterlife-coverage ตรวจได้แค่ scene ที่มีเนื้อหา — ชุดจริงต้องมีครบทุก scene ไม่งั้นแกนเดินช่วงที่ 7 แล้วหาการ์ดไม่เจอ
+  const open = SCENES.map((sc) => real.filter((e) => e.scene === sc && !e.when).length);
+  rows.push(['ฉากระหว่างชาติ (ใบไม่มี when)', SCENES.map((sc, i) => `${sc} ${open[i]}`).join(' · ')]);
+  SCENES.forEach((sc, i) => !open[i] && fails.push(`content/: ไม่มีฉาก ${sc} ที่ออกได้ทุกคน`));
 } catch (err) {
   fails.push(err.message);
 }

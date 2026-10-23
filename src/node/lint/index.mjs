@@ -9,9 +9,10 @@ import { rules as systems } from './systems.mjs';
 import { rules as banned, compileBanned } from './banned.mjs';
 import { rules as lore, loreHeadings } from './lore.mjs';
 import { rules as belief } from './belief.mjs';
+import { rules as afterlife } from './afterlife.mjs';
 import { isObj } from './util.mjs';
 
-export const RULES = [...shape, ...merit, ...flags, ...systems, ...banned, ...lore, ...belief];
+export const RULES = [...shape, ...merit, ...flags, ...systems, ...banned, ...lore, ...belief, ...afterlife];
 const root = new URL('../../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
 

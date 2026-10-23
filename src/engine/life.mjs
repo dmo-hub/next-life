@@ -1,6 +1,6 @@
 import { makeRng } from './rng.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
-import { pickRegion, regionRatio, classOdds } from './birth.mjs';
+import { pickRegion, regionRatio, classOdds, nationalIncome } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
 import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard } from './career.mjs';
@@ -69,7 +69,7 @@ const STAT_HIGH = 70;
 const STAT_LOW = 30;
 const clamp = (v) => Math.max(0, Math.min(100, v));
 
-function weighted(rng, items, weights) {
+export function weighted(rng, items, weights) {
   let r = rng.next() * weights.reduce((s, w) => s + w, 0);
   for (let i = 0; i < items.length; i++) {
     r -= weights[i];
@@ -102,23 +102,26 @@ export function monthlyIncome(st, year = st.birthYear + st.age) {
   return monthlyWage(st.content.era, st.seed, st.occupation, st.ses, year) * st.incomeMult;
 }
 
-export function newLife(seed, content) {
+// heir = รุ่นถัดไปจากระหว่างชาติ (afterlife.mjs): จุดเกิด/ฐานะ/ค่าเริ่ม/บัญชีที่ส่งต่อ ทับค่าที่สุ่ม
+// ยังดึงเลขสุ่มของโลกครบชุดเดิมก่อนทับ — ตำแหน่ง stream ของรุ่นถัดไปเหมือนชีวิตแรกทุกประการ
+export function newLife(seed, content, heir = null) {
   const era = content.era;
   const rng = makeRng(seed);
-  const birthYear = pickBirthYear(rng, era);
-  const sex = rng.pick(SEXES);
-  const region = pickRegion(rng, era.birth);
+  let birthYear = pickBirthYear(rng, era);
+  let sex = rng.pick(SEXES);
+  let region = pickRegion(rng, era.birth);
   const odds = classOdds(era.birth, regionRatio(era.birth, region.ses, birthYear));
-  const cls = weighted(rng, CLASSES, odds.map((o) => o.p));
+  let cls = weighted(rng, CLASSES, odds.map((o) => o.p));
+  if (heir) ({ birthYear, sex, region, cls } = heir);
   // ค่าเริ่มสุ่มจาก stream แยก — ไม่กินเลขสุ่มของโลก ลำดับสุ่มการตายจึงเหมือนก่อนมีการสุ่มนี้
   const jit = makeRng(seed ^ 0x6a09e667);
-  const s = Object.fromEntries(Object.entries(startStats(cls)).map(([k, v]) => [k, clamp(v + (jit.next() * 2 - 1) * START_JITTER)]));
+  const s = Object.fromEntries(Object.entries(startStats(cls)).map(([k, v]) => [k, clamp(v + (jit.next() * 2 - 1) * START_JITTER + (heir?.bonus[k] ?? 0))]));
   const occupation = pickOccupation(era, seed, cls);
   // พ่อแม่ใช้ stream แยก — การมีพ่อแม่ไม่กินเลขสุ่มของโลก ลำดับสุ่มการตายของตัวเองจึงไม่ขยับ
   // อายุพ่อแม่ตอนเกิดเป็นค่าตั้งของเกม (ยังไม่มีข้อมูลอายุแม่ตอนคลอดรายยุคในชุดข้อมูล)
   const famRng = makeRng(seed ^ 0x3c6ef372);
   const motherAge = famRng.int(18, 40);
-  const parents = [
+  const parents = heir?.parents ?? [
     { sex: 'หญิง', age: motherAge, alive: true },
     { sex: 'ชาย', age: motherAge + famRng.int(0, 8), alive: true },
   ];
@@ -162,7 +165,13 @@ export function newLife(seed, content) {
     // เส้นสุขภาพของชีวิตนี้ถ้าไม่มีเหตุการณ์ใดเลย — ตัวคูณการตายวัดจากส่วนต่างกับเส้นนี้
     healthNatural: s.health,
     // บัญชีบุญบาปซ่อน — ห้ามส่งออกไปกับการ์ดหรือ statsOf
-    ledger: newLedger(),
+    ledger: heir?.ledger ?? newLedger(),
+    // รุ่นที่เท่าไรของตระกูล + บันทึกรุ่นก่อน · มรดกจากรุ่นก่อนที่ยังไม่ถึงอายุรับ (ทางเป็นลูก)
+    gen: heir?.gen ?? 1,
+    lineage: heir?.lineage ?? [],
+    legacy: heir?.legacy ?? null,
+    // อายุที่ธงแต่ละตัวติดครั้งแรก — ระหว่างชาติอ่านอายุตอนมีลูก
+    flagAge: {},
     omenTone: null,
     omenAge: null,
     flags: {},
@@ -196,6 +205,7 @@ export function newLife(seed, content) {
     famRng,
   };
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
+  if (st.legacy?.age === 0) receiveLegacy(st, birthYear, stageOf(0));
   st.trail.push({ year: birthYear, money: Math.round(st.money) });
   st.stageMark = markStage(st);
   return st;
@@ -312,7 +322,7 @@ export function deathChance(st) {
   return Math.min(1, base * healthMultiplier(st) * karmaMultiplier(st.ledger));
 }
 
-function fill(text, st) {
+export function fill(text, st) {
   return text
     .replaceAll('{อายุ}', st.age)
     .replaceAll('{ภาค}', regionLabel(st))
@@ -382,12 +392,31 @@ function flowChronic(st) {
 }
 
 // พ่อแม่แก่และตายตามตารางชีพเดียวกับตัวเอง (แนวชีวิตของปีปฏิทินนั้น) ด้วย stream ของครอบครัว
+// พ่อ/แม่ที่เป็นผู้เล่นรุ่นก่อน (diesAt) ตายตามชะตาที่เล่นไปแล้ว ไม่สุ่มซ้ำ
 function ageParents(st, year) {
   for (const p of st.parents) {
     if (!p.alive) continue;
     p.age += 1;
-    if (st.famRng.next() < lifeQx(st.content.era, st.seed, p.sex, year, p.age)) p.alive = false;
+    const roll = st.famRng.next();
+    if (p.diesAt !== undefined ? p.age >= p.diesAt : roll < lifeQx(st.content.era, st.seed, p.sex, year, p.age)) p.alive = false;
   }
+}
+
+// มรดกจากรุ่นก่อน (ทางเป็นลูก) ถึงมือปีที่พ่อ/แม่ผู้เล่นรุ่นก่อนตาย · เก็บเป็นเท่าของรายได้ครัวเรือนทั้งปีของประเทศ แปลงเป็นบาทของปีนี้
+function receiveLegacy(st, year, stage) {
+  const { units, debt } = st.legacy;
+  st.legacy = null;
+  // มรดกมาพร้อมการจากไป — มรดกตอนแรกเกิด (ตายปีที่ลูกเกิด) ต้องปิดชีวิตพ่อ/แม่ตรงนี้ ageParents ยังไม่เคยเดิน
+  for (const p of st.parents) if (p.ancestor) p.alive = false;
+  const baht = units * nationalIncome(st.content.era, st.seed, year) * 12;
+  st.money += baht;
+  const who = st.parents.find((p) => p.ancestor)?.sex === 'หญิง' ? 'แม่' : 'พ่อ';
+  const text = baht > 0
+    ? `${who}จากไป ทิ้งมรดกส่วนของเราไว้ ${Math.round(baht).toLocaleString('en-US')} บาท`
+    : debt
+      ? `${who}จากไปพร้อมหนี้ ทายาทรับผิดไม่เกินมรดกที่ได้ หนี้ที่เหลือจึงไม่ตกถึงเรา`
+      : `${who}จากไป ไม่มีทรัพย์เหลือเป็นมรดก`;
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text });
 }
 
 // ย้ายสัดส่วน share ของเงินทั้งหมดเข้าสินทรัพย์เดียว · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
@@ -429,9 +458,10 @@ function stepYear(st) {
   else if (st.retireBase !== null) st.money -= retireSpend(st, year);
   for (const d of st.debts) st.money -= payDebt(era, st.seed, d, year);
   st.debts = st.debts.filter((d) => !debtDone(d));
+  const stage = stageOf(st.age);
+  if (st.legacy && st.age >= st.legacy.age) receiveLegacy(st, year, stage);
   st.trail.push({ year, money: Math.round(st.money) });
 
-  const stage = stageOf(st.age);
   checkBankrupt(st, year, stage);
   const tone = omenTone(st.ledger);
   if (!tone) st.omenTone = null;
@@ -648,7 +678,7 @@ const canRepeat = (st, e) => e.repeat && st.fired[e.id].n < e.repeat.max && st.a
 
 // ตัวคูณโอกาส (ใบ 07) ใช้ทั้งโอกาสเกิดของเหตุการณ์และน้ำหนักผลสุ่มแต่ละทาง: ค่าสถานะขั้นบันได · กรรมตามทิศบัญชีสุทธิ · ธงที่ถืออยู่
 // ชื่อเสียงตระกูลยังไม่มีระบบ คูณ 1
-function poolMultiplier(st, m) {
+export function poolMultiplier(st, m) {
   if (!m) return 1;
   let x = m.class?.[st.cls] ?? 1;
   for (const [k, v] of Object.entries(m.stats ?? {})) x *= st[k] >= STAT_HIGH ? v : st[k] <= STAT_LOW ? 1 / v : 1;
@@ -668,7 +698,7 @@ const flagsOk = (st, f) => (f.has ?? []).every((k) => st.flags[k]) && !(f.not ??
 // ครอบครัวมีแค่พ่อแม่ (ด่าน family-system กั้นบทบาทอื่นไว้) · เงื่อนไขผ่านเมื่อพ่อหรือแม่คนใดคนหนึ่งตรง
 const familyOk = (st, f) => f.role === 'parent' && st.parents.some((p) => (f.alive === undefined || p.alive === f.alive) && inRange(p.age, f.age));
 // เงื่อนไขเกิดแบบประกาศทุกฟิลด์ (ใบ 07)
-function whenOk(st, when) {
+export function whenOk(st, when) {
   if (!when) return true;
   if (when.family && !when.family.every((f) => familyOk(st, f))) return false;
   if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
@@ -686,7 +716,10 @@ function applyChoice(st, ev, c) {
   // คำบนเดียวกันมีหลายการ์ดนัด (ครั้งที่ 1 · ครั้งที่ 2) — ใช้ธงคำบนที่การ์ดปิดเป็นตัวระบุ ไม่ใช่ id การ์ด
   const vow = (c.clears_flags ?? []).find((f) => f.startsWith('vow_open:')) ?? ev.id;
   for (const f of recordMerit(st.ledger, c.merit, vow)) st.flags[f] = true;
-  for (const f of c.sets_flags ?? []) st.flags[f] = true;
+  for (const f of c.sets_flags ?? []) {
+    st.flags[f] = true;
+    st.flagAge[f] ??= st.age;
+  }
   for (const f of c.clears_flags ?? []) delete st.flags[f];
   for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]) });
 }
@@ -756,19 +789,23 @@ function deathCard(st) {
   // ช่วงวัยสุดท้ายไม่มีการ์ดเปลี่ยนช่วงมาปิด — เล่าบนบันทึกการตายแทน
   card.recap = stageRecap(st, st.age);
   card.job = jobText(st);
-  card.reckoning = reckoning(st.ledger);
-  // ใบ 07: ตายตอนเด็กได้บันทึกสั้นบอกสถิติยุคนั้น
+  card.gen = st.gen;
+  // ใบ 07: ตายตอนเด็กได้บันทึกสั้นบอกสถิติยุคนั้น (ทารกใช้อัตราตายทารก · เด็กโตใช้โอกาสตายรายปีของอายุนั้น) แล้วเข้าช่วงที่ 7 ตามปกติ
   if (st.age < 5) {
     const imr = infantMortality(era, st.sex, protoYear(era, st.seed, st.birthYear));
     card.note = `ยุคนั้นทารก${st.sex}ไทยตายก่อนอายุ 1 ขวบ ราว ${Math.round(imr)} คนในทุก 1,000 คน`;
+  } else if (st.age < STAGES[1].from) {
+    const q = lifeQx(era, st.seed, st.sex, year, st.age);
+    card.note = `ยุคนั้นเด็ก${st.sex}อายุ ${st.age} ปีจากไปราว ${Math.max(1, Math.round(q * 10000))} คนในทุก 10,000 คนต่อปี`;
   }
+  if (st.age < STAGES[1].from) card.short = true;
   return card;
 }
 
-// เฉลยบัญชีบุญบาป (ใบ 09 "เฉลยที่ศาลพญายม") — ออกบนการ์ดตายใบเดียว จนกว่าระหว่างชาติ (B06) จะรับไปเล่า
-// ชื่อ key เลี่ยงคำที่ด่านรั่วของ harness จับ · harness ยกเว้นช่องนี้บนการ์ดตายช่องเดียว
+// เฉลยบัญชีบุญบาป (ใบ 09 "เฉลยที่ศาลพญายม") — ออกบนการ์ดศาลในระหว่างชาติใบเดียว (afterlife.mjs)
+// ชื่อ key เลี่ยงคำที่ด่านรั่วของ harness จับ · harness ยกเว้นช่องนี้บนการ์ดศาลช่องเดียว
 export const RECKON_TOP = 3;
-function reckoning(ledger) {
+export function reckoning(ledger) {
   const r1 = (v) => Math.round(v * 10) / 10;
   const good = r1(ledger.merit), bad = r1(ledger.sin);
   const top = Object.entries(ledger.byCat)
@@ -792,8 +829,8 @@ export function statsOf(st) {
 // harness วิ่งชีวิตผ่านฟังก์ชันชุดเดียวกับหน้าเว็บ ผู้เรียกส่งแค่ตัวเลือกเลือกตัวเลือก · onCard เห็นสถานะทุกการ์ด
 // บอทได้ st เพื่ออ่านป้ายบุญบาปของตัวเลือกแทนการอ่านความหมายของข้อความแบบที่ผู้เล่นทำ — ห้ามอ่านบัญชีเอง
 // stream ของบอทแยกจาก rng ของแกนเกม เพื่อไม่ให้การเลือกไปเปลี่ยนลำดับสุ่มของโลก
-export function playLife(seed, content, pickChoice, onCard) {
-  const st = newLife(seed, content);
+// st ส่งเข้ามาได้ = เล่นชีวิตรุ่นถัดไปที่ระหว่างชาติสร้างไว้
+export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, content)) {
   const bot = makeRng(seed ^ 0x5bd1e995);
   for (;;) {
     const card = nextCard(st);

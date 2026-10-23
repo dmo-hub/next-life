@@ -9,6 +9,7 @@
     "gate": "node harness/run.mjs --n 20000 --seed 1",
     "merit": "node harness/merit.mjs --n 20000 --seed 1",
     "finance": "node harness/finance.mjs --n 50000 --seed 1",
+    "lineage": "node harness/lineage.mjs --n 2000 --gens 3 --seed 1",
     "fetch:finance": "node scripts/fetch-finance.mjs",
     "check:data": "node scripts/check-data.mjs",
     "lint:test": "node scripts/lint-test.mjs",

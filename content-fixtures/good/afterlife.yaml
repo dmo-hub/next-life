@@ -1,0 +1,53 @@
+# ฉากระหว่างชาติครบรูป: ใบไม่มีเงื่อนไขทุก scene · realm แยกภูมิได้ · ผลเป็นค่าเริ่มชาติหน้า · ผลสุ่มคูณความสัมพันธ์
+events:
+  - id: good_after_transfer_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    text: "ญาติทำบุญไปให้"
+    choices:
+      - text: อนุโมทนา
+        merit: [{cat: dana, level: 1}]
+        outcomes:
+          - {weight: 2, multipliers: {stats: {relations: 1.5}}, text: "ส่วนบุญมาถึงเต็มมือ", merit: [{cat: dana, level: 1}]}
+          - {weight: 1, text: "ส่วนบุญมาถึงนิดเดียว", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: good_after_transfer_02
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    when: {age: [0, 12]}
+    text: "พ่อแม่ทำบุญไปให้"
+    choices:
+      - {text: อนุโมทนา, merit: [{cat: dana, level: 1}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: good_after_realm_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    years: [2400, 2700]
+    text: "ระหว่างรอไปเกิด"
+    choices:
+      - {text: ขอปัญญา, effects: {knowledge: 1}, merit: [{cat: bhavana, level: 1}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: good_after_realm_02
+    type: B
+    stage: ระหว่างชาติ
+    scene: realm
+    realm: [hell]
+    years: [2400, 2700]
+    text: "ในภูมิที่มีกำหนดเวลา"
+    choices:
+      - {text: สำนึกผิด, merit: [{cat: bhavana, level: 1}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

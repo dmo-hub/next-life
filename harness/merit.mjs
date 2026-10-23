@@ -1,7 +1,7 @@
 // harness ของบัญชีบุญบาป (B05): เนื้อหาจริง + เนื้อหาทดสอบใน content-fixtures/harness/ · บอท 3 บุคลิกเล่นชีวิตชุดเดียวกัน
 // ด่าน: บอทสายบุญกับสายบาปได้บัญชีแยกกันชัด · ธง vow_broken ตั้งได้จริง (ด่าน 5 ใบ 12) · การ์ด/ค่าที่หน้าจอใช้ไม่มีค่าบัญชี
 // --no-karma = ตัวควบคุม: ปิดตัวคูณกรรม ส่วนต่างอายุระหว่างบอทต้องหดเหลือแค่ผลจากค่าสถานะ
-import { playLife, openChoices, mixSeed, expectedDeathAge, statsOf, netLedger, karmaMultiplier, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, KARMA } from '../src/engine/index.mjs';
+import { playLife, playAfterlife, openChoices, mixSeed, expectedDeathAge, statsOf, netLedger, karmaMultiplier, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, KARMA } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 
 const args = process.argv.slice(2);
@@ -46,7 +46,7 @@ const BOTS = {
 // ค่าบัญชีห้ามออกไปกับการ์ดหรือค่าที่หน้าจอวาด — ตรวจทุก key ทุกชั้น
 const LEAK = /ledger|merit|sin|karma|byCat|broken|omenTone|omenAge/i;
 const STAT_SHOWN = ['health', 'happiness', 'knowledge', 'relations', 'network', 'money'];
-// ข้อยกเว้นช่องเดียว: เฉลยบัญชีบนการ์ดตาย (ใบ 09 เฉลยตอนสิ้นชีวิต) · โผล่บนการ์ดอื่น = รั่ว
+// ข้อยกเว้นช่องเดียว: เฉลยบัญชีบนการ์ดศาลพญายมในระหว่างชาติ (ใบ 09) · โผล่บนการ์ดอื่นรวมการ์ดตาย = รั่ว
 const REVEAL = 'reckoning';
 function* keys(v) {
   if (Array.isArray(v)) for (const x of v) yield* keys(x);
@@ -65,7 +65,7 @@ for (const [name, pick] of Object.entries(BOTS)) {
       cardsSeen++;
       const { [REVEAL]: reveal, ...rest } = card;
       for (const k of keys(rest)) if (LEAK.test(k)) leaks++;
-      if (card.kind === 'death') reveals += reveal ? 1 : 0;
+      if (card.kind === 'verdict') reveals += reveal ? 1 : 0;
       else if (reveal !== undefined) leaks++;
       const shown = Object.keys(statsOf(st));
       if (shown.length !== STAT_SHOWN.length || shown.some((k) => !STAT_SHOWN.includes(k))) leaks++;
@@ -75,8 +75,11 @@ for (const [name, pick] of Object.entries(BOTS)) {
       }
     };
     const { age, state } = playLife(mixSeed(seed, i), content, pick, onCard);
-    r.nets.push(netLedger(state.ledger));
-    r.mult += karmaMultiplier(state.ledger);
+    // อายุ/บัญชีวัดตอนตาย (ก่อนฉากระหว่างชาติปรับบัญชี) · ระหว่างชาติเล่นต่อเพื่อตรวจรั่ว/เฉลย
+    const nets = netLedger(state.ledger), mult = karmaMultiplier(state.ledger);
+    playAfterlife(state, pick, onCard);
+    r.nets.push(nets);
+    r.mult += mult;
     r.age += age;
     r.ageDiff += age - expectedDeathAge(content.era, state.sex, state.birthYear, state.seed);
     if (state.flags.vow_broken) r.vow++;
@@ -104,7 +107,7 @@ console.log(`ด่าน 5: vow_broken ตั้งได้จริง ${vowS
 if (!(out['สุ่ม'].vow > 0)) fail++;
 console.log(`ค่าบัญชีไม่ออกไปกับการ์ด/ค่าที่หน้าจอวาด: ตรวจ ${cardsSeen.toLocaleString('en-US')} การ์ด รั่ว ${leaks} → ${leaks ? 'ตก' : 'ผ่าน'}`);
 if (leaks) fail++;
-// ข้อยกเว้นต้องไม่ว่าง — การ์ดตายทุกใบต้องมีเฉลย ไม่งั้นด่านรั่วผ่านเพราะไม่มีอะไรให้ยกเว้น
-console.log(`เฉลยบัญชีบนการ์ดตาย: ${reveals.toLocaleString('en-US')} จาก ${(n * Object.keys(BOTS).length).toLocaleString('en-US')} ชีวิต → ${reveals === n * Object.keys(BOTS).length ? 'ผ่าน' : 'ตก'}`);
+// ข้อยกเว้นต้องไม่ว่าง — ทุกชีวิตต้องมีเฉลยที่ศาล ไม่งั้นด่านรั่วผ่านเพราะไม่มีอะไรให้ยกเว้น
+console.log(`เฉลยบัญชีบนการ์ดศาล: ${reveals.toLocaleString('en-US')} จาก ${(n * Object.keys(BOTS).length).toLocaleString('en-US')} ชีวิต → ${reveals === n * Object.keys(BOTS).length ? 'ผ่าน' : 'ตก'}`);
 if (reveals !== n * Object.keys(BOTS).length) fail++;
 if (fail) process.exitCode = 1;
