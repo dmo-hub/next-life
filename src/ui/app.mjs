@@ -1,6 +1,11 @@
 import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText } from '../engine/index.mjs';
 
+// เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
+const APP_VERSION = 'v0.1.00';
+const APP_BUILD = '2026-10-23';
+
 const root = document.getElementById('app');
+document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`;
 let st;
 
 function el(tag, cls, text) {

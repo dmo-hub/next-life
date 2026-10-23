@@ -19,6 +19,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .logo { background:var(--lacquer); text-align:center; padding:10px 16px 6px; border-bottom:1px solid var(--bronze); }
 .logo b { font-family:Srisakdi,serif; font-weight:700; font-size:34px; line-height:1.2; color:var(--gold); }
 .logo small { display:block; font-size:12px; letter-spacing:0.12em; color:var(--sand); }
+.logo .ver { display:inline-block; margin-top:4px; padding:1px 9px; border:1px solid var(--bronze); border-radius:999px; font-size:11px; font-weight:600; color:var(--sand); white-space:nowrap; }
 #app { max-width:460px; margin:0 auto; padding:20px 16px 48px; }
 .card { display:flex; flex-direction:column; min-height:560px; }
 .top { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 20px; }
@@ -86,7 +87,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 </style>
 </head>
 <body>
-<header class="logo"><b>ชาติหน้า</b><small>NEXT LIFE</small></header>
+<header class="logo"><b>ชาติหน้า</b><small>NEXT LIFE</small><span id="appVer" class="ver" title="เวอร์ชันเดโม"></span></header>
 <main id="app"></main>
 <script>
 (() => {
@@ -872,10 +873,6 @@ const CHRONIC_FADE = 5;
 // ตัวคูณตามค่าสถานะเป็นขั้นบันได: คนเขียนเนื้อหารู้ว่าค่าเท่าไรถึงนับว่า "สูง/ต่ำ" ไม่ต้องคิดเลขยกกำลัง
 const STAT_HIGH = 70;
 const STAT_LOW = 30;
-// ออกการ์ดสรุปอย่างน้อยทุก K ปี ถึงไม่มีอะไรเกิด · ปีที่มีเรื่อง (เปลี่ยนช่วง · ยุค · ลาง · จัดสรรเงิน) สรุปทันที
-// ปีเงียบรวบเป็นใบเดียว — การ์ดสรุปทุกปีที่มีแค่เงินขยับอ่านแล้วเปล่า
-const SUMMARY_EVERY = 5;
-
 const clamp = (v) => Math.max(0, Math.min(100, v));
 
 function weighted(rng, items, weights) {
@@ -979,11 +976,9 @@ function newLife(seed, content) {
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
     price: 1,
-    // ผลตอบแทนจริงรายปีของสินทรัพย์เสี่ยงที่ถือ ตั้งแต่การ์ดใบก่อน — การ์ดสรุปเล่าย้อนหลังแล้วล้าง
+    // ผลตอบแทนจริงรายปีของสินทรัพย์เสี่ยงที่ถือ ตั้งแต่ต้นช่วงวัย — การ์ดเปลี่ยนช่วงเล่าย้อนหลังแล้วล้าง
     returns: [],
     trail: [],
-    lastCardAge: 0,
-    lastCardMoney: 0,
     due: [],
     queue: [],
     done: {},
@@ -1007,7 +1002,6 @@ function newLife(seed, content) {
     famRng,
   };
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
-  st.lastCardMoney = st.money;
   st.trail.push({ year: birthYear, money: Math.round(st.money) });
   st.stageMark = markStage(st);
   return st;
@@ -1022,7 +1016,14 @@ function markStage(st) {
 // lastAge = อายุสุดท้ายของช่วง: การ์ดเปลี่ยนช่วงออกตอนขึ้นอายุแรกของช่วงใหม่แล้ว
 function stageRecap(st, lastAge) {
   const m = st.stageMark;
+  const items = st.returns.map((x) => `อายุ ${x.age} ${assetName(x.id)} ${formatReturn(x.r)}`);
+  for (const d of st.debts) items.push(`${debtName(d.kind)} ค้าง ${Math.round(d.balance).toLocaleString('en-US')} บาท`);
+  const disclaimer = st.returns.length ? DISCLAIMER : null;
+  st.returns = [];
   return {
+    items,
+    disclaimer,
+    moneySeries: st.trail.filter((p) => p.year >= st.birthYear + m.age),
     stage: m.stage,
     fromAge: m.age,
     toAge: lastAge,
@@ -1315,33 +1316,6 @@ function borrow(st, { kind, amount }) {
   st.debts.push(newDebt(era, st.seed, kind, baht, year));
 }
 
-// การ์ดสรุปเป็นของคำนวณล้วน ไม่ดึงเลขสุ่มของโลก — เพิ่ม/ลดการ์ดสรุปแล้วชะตาชีวิตต้องเหมือนเดิม
-function summaryCard(st) {
-  const from = st.lastCardAge;
-  const items = [];
-  const money = Math.round(st.money);
-  if (money !== Math.round(st.lastCardMoney)) {
-    items.push(`เงิน ${Math.round(st.lastCardMoney).toLocaleString('en-US')} → ${money.toLocaleString('en-US')} บาท`);
-  }
-  const year = st.birthYear + st.age;
-  for (const x of st.returns) items.push(`อายุ ${x.age} ${assetName(x.id)} ${formatReturn(x.r)}`);
-  for (const d of st.debts) items.push(`${debtName(d.kind)} ค้าง ${Math.round(d.balance).toLocaleString('en-US')} บาท`);
-  const disclaimer = st.returns.length ? DISCLAIMER : null;
-  st.returns = [];
-  return {
-    kind: 'summary',
-    disclaimer,
-    fromAge: from,
-    age: st.age,
-    stage: stageOf(st.age),
-    text: `ผ่านไป ${st.age - from} ปี · อายุ ${from} → ${st.age}`,
-    items,
-    money,
-    moneyAtBirth: Math.round(st.money / st.price),
-    moneySeries: st.trail.filter((p) => p.year >= st.birthYear + from && p.year <= year),
-  };
-}
-
 // การ์ดจัดสรรเงิน (ใบ 11) เล่าผลจริงของช่วงที่ผ่านมาก่อนให้เลือก — ไม่บอกปีถัดไป · ตัวเลือกสร้างตอนออกการ์ด
 function allocCard(st, year, stage) {
   const era = st.content.era;
@@ -1361,8 +1335,6 @@ function allocCard(st, year, stage) {
 
 function emit(st, card) {
   st.cards++;
-  st.lastCardAge = st.age;
-  st.lastCardMoney = st.money;
   return card;
 }
 
@@ -1410,7 +1382,7 @@ const openChoices = (card) => card.choices.map((_, i) => i).filter((i) => !card.
 function nextCard(st) {
   if (st.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
   if (st.dead) return deathCard(st);
-  // การ์ดเปลี่ยนช่วง/เหตุการณ์ยุค/ผลสุ่มเป็นใบของตัวเอง ตามหลังการ์ดสรุปของปีเดียวกัน
+  // การ์ดเปลี่ยนช่วง/เหตุการณ์ยุค/ผลสุ่มเป็นใบของตัวเอง เรียงตามที่ถึงกำหนดในปีนั้น
   if (st.queue.length) {
     const card = st.queue.shift();
     if (card.kind === 'eraEvent') return eventCard(st, card.ev);
@@ -1431,13 +1403,12 @@ function nextCard(st) {
       stepYear(st);
     }
     st.advance = true;
-    if (st.age > st.lastCardAge && (st.due.length || st.age - st.lastCardAge >= SUMMARY_EVERY)) {
-      // เหตุการณ์ของอายุนี้ยังรอ: การ์ดใบถัดไปต้องไม่เดินเวลา
+    if (st.due.length) {
+      // เหตุการณ์ของอายุนี้ยังรอ: การ์ดใบถัดไปต้องไม่เดินเวลา · เงิน/ผลตอบแทน/หนี้ไปสรุปรวมที่การ์ดเปลี่ยนช่วงวัย
       st.advance = false;
-      const card = summaryCard(st);
       st.queue = st.due;
       st.due = [];
-      return emit(st, card);
+      return nextCard(st);
     }
     // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
     const year = st.birthYear + st.age;
@@ -1619,7 +1590,12 @@ function playLife(seed, content, pickChoice, onCard) {
 }
 
 
+// เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
+const APP_VERSION = 'v0.1.00';
+const APP_BUILD = '2026-10-23';
+
 const root = document.getElementById('app');
+document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`;
 let st;
 
 function el(tag, cls, text) {
@@ -1694,6 +1670,10 @@ function recap(r) {
   const m = r.money;
   box.append(el('p', 'sub', `เงิน ${baht(m.from)} → ${baht(m.to)}`));
   box.append(el('p', 'note', `เทียบค่าเงินปีเกิด ${baht(m.fromAtBirth)} → ${baht(m.toAtBirth)}`));
+  const chart = sparkline(r.moneySeries);
+  if (chart) box.append(chart);
+  if (r.items.length) box.append(list(r.items));
+  if (r.disclaimer) box.append(el('p', 'note', r.disclaimer));
   if (r.picks.length) {
     box.append(el('div', 'h', 'สิ่งที่เลือก'));
     const shown = r.picks.slice(-RECAP_PICKS).map((p) => `อายุ ${p.age} · ${p.text}`);
@@ -1729,7 +1709,7 @@ function button(label, fx, onclick) {
 // แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): ลางกับเหตุการณ์ความเชื่อเป็นทาง B ที่เหลือเป็นทาง A
 const styleOf = (card) => (card.kind === 'omen' || ((card.kind === 'event' || card.kind === 'result') && card.type === 'B') ? 'b' : 'a');
 
-const KICKER = { summary: 'สรุปปี', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
+const KICKER = { stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
 
 function render(card) {
   root.replaceChildren();
@@ -1769,14 +1749,6 @@ function render(card) {
     if (card.kind === 'stage') {
       body.append(el('span', 'stamp', card.text));
       body.append(recap(card.recap));
-      choices.append(button('ต่อไป', null, next));
-    } else if (card.kind === 'summary') {
-      body.append(el('h3', null, card.text));
-      if (card.items.length) body.append(list(card.items));
-      const chart = sparkline(card.moneySeries);
-      if (chart) body.append(chart);
-      body.append(el('p', 'sub', `เงิน ${baht(card.money)} ≈ ${baht(card.moneyAtBirth)} ค่าเงินปีเกิด`));
-      if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
       choices.append(button('ต่อไป', null, next));
     } else if (card.kind === 'era' || card.kind === 'omen' || card.kind === 'result') {
       body.append(el('h3', null, card.text));

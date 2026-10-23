@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
+    "bump": "node scripts/bump-version.mjs",
     "sim": "node harness/run.mjs --n 1000 --seed 1",
     "gate": "node harness/run.mjs --n 20000 --seed 1",
     "merit": "node harness/merit.mjs --n 20000 --seed 1",
