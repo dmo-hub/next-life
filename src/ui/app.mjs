@@ -1,8 +1,8 @@
 import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.07';
-const APP_BUILD = '2026-10-23';
+const APP_VERSION = 'v0.2.08';
+const APP_BUILD = '2026-10-24';
 
 const root = document.getElementById('app');
 document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`;
