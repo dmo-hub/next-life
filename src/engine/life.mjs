@@ -420,18 +420,23 @@ function ageParents(st, year) {
 
 // มรดกจากรุ่นก่อน (ทางเป็นลูก) ถึงมือปีที่พ่อ/แม่ผู้เล่นรุ่นก่อนตาย · เก็บเป็นเท่าของรายได้ครัวเรือนทั้งปีของประเทศ แปลงเป็นบาทของปีนี้
 function receiveLegacy(st, year, stage) {
-  const { units, debt } = st.legacy;
+  const { units, debt, from } = st.legacy;
   st.legacy = null;
   // มรดกมาพร้อมการจากไป — มรดกตอนแรกเกิด (ตายปีที่ลูกเกิด) ต้องปิดชีวิตพ่อ/แม่ตรงนี้ ageParents ยังไม่เคยเดิน
   for (const p of st.parents) if (p.ancestor) p.alive = false;
   const baht = units * nationalIncome(st.content.era, st.seed, year) * 12;
   st.money += baht;
-  const who = st.parents.find((p) => p.ancestor)?.sex === 'หญิง' ? 'แม่' : 'พ่อ';
-  const text = baht > 0
-    ? `${who}จากไป ทิ้งมรดกส่วนของเราไว้ ${Math.round(baht).toLocaleString('en-US')} บาท`
-    : debt
-      ? `${who}จากไปพร้อมหนี้ ทายาทรับผิดไม่เกินมรดกที่ได้ หนี้ที่เหลือจึงไม่ตกถึงเรา`
-      : `${who}จากไป ไม่มีทรัพย์เหลือเป็นมรดก`;
+  const ancestor = st.parents.find((p) => p.ancestor);
+  const who = from ?? (ancestor?.sex === 'หญิง' ? 'แม่' : 'พ่อ');
+  const sum = Math.round(baht).toLocaleString('en-US');
+  // หลาน/เหลน (B18): รุ่นก่อนไม่ใช่พ่อแม่ มรดกตกทอดผ่านพ่อแม่ — พ่อแม่ไม่ได้จากไปด้วย
+  const text = !ancestor && from
+    ? (baht > 0 ? `มรดกจาก${who}ตกทอดผ่านพ่อแม่มาถึงเรา ${sum} บาท` : debt ? `${who}จากไปพร้อมหนี้ ทายาทรับผิดไม่เกินมรดก หนี้จึงไม่ตกถึงเรา` : `${who}จากไป ไม่มีทรัพย์เหลือตกทอดมาถึงเรา`)
+    : baht > 0
+      ? `${who}จากไป ทิ้งมรดกส่วนของเราไว้ ${sum} บาท`
+      : debt
+        ? `${who}จากไปพร้อมหนี้ ทายาทรับผิดไม่เกินมรดกที่ได้ หนี้ที่เหลือจึงไม่ตกถึงเรา`
+        : `${who}จากไป ไม่มีทรัพย์เหลือเป็นมรดก`;
   st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text });
 }
 

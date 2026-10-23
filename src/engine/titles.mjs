@@ -321,7 +321,7 @@ export const FAMILY_TITLES = [
   { id: 'fam_no_hell', name: 'บรรพบุรุษไม่เคยตกนรก', hint: 'สองรุ่นก่อนหน้าไม่มีใครไปภูมินรก', test: (ch, lin) => lastN(lin, 2, (l) => l.realm !== 'นรก') },
   { id: 'fam_debt', name: 'หนี้ที่ส่งต่อกันมาสามรุ่น', hint: 'สามรุ่นติดกันจากไปพร้อมหนี้', test: (ch) => lastN(ch, 3, (l) => l.broke) },
   { id: 'fam_long', name: 'ตระกูลอายุยืน', hint: 'สามรุ่นติดกันอยู่ถึงแปดสิบ', test: (ch) => lastN(ch, 3, (l) => l.age >= 80) },
-  { id: 'fam_guardian', name: 'ผีบรรพบุรุษเฝ้าบ้าน', hint: 'รุ่นก่อนกลับมาเกิดเป็นลูกของตัวเอง', test: (ch, lin) => lastN(lin, 1, (l) => l.path === 'child') },
+  { id: 'fam_guardian', name: 'ผีบรรพบุรุษเฝ้าบ้าน', hint: 'รุ่นก่อนกลับมาเกิดเป็นลูกหลานของตัวเอง', test: (ch, lin) => lastN(lin, 1, (l) => l.path === 'child') },
   { id: 'fam_wander', name: 'ดวงวิญญาณพเนจร', hint: 'สองรุ่นติดกันไปเกิดใหม่ที่อื่น', test: (ch, lin) => lastN(lin, 2, (l) => l.path === 'reborn') },
   { id: 'fam_deva', name: 'ตระกูลมีเทวดา', hint: 'มีบรรพบุรุษไปเกิดเป็นเทวดาอย่างน้อยสองรุ่น', test: (ch, lin) => lin.filter((l) => l.realm === 'เทวดา').length >= 2 },
 ];

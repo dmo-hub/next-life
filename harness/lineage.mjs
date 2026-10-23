@@ -1,7 +1,7 @@
 // harness ระหว่างชาติ + หลายรุ่น (B06): บอท 3 บุคลิกเล่นตระกูลละหลายรุ่นผ่านฟังก์ชันชุดเดียวกับหน้าเว็บ
 // ด่าน: เล่นครบทุกรุ่น · ช่วงที่ 7 ยาว 6–10 การ์ด · ศาลเฉลยบัญชีทุกครั้งและที่เดียว · ส่งต่อ 30–70% ตรงสูตร
 // · ฐานะชาติหน้าขยับตามกรรมทั้งสองทาง (ใบ 05 แรงทุกทาง) · หนี้ไม่ตกถึงลูก · ทุกฉากในเนื้อหาออกได้จริง · ค่าแถบไม่หลุด
-import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS } from '../src/engine/index.mjs';
+import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 
 const args = process.argv.slice(2);
@@ -56,6 +56,8 @@ const out = {};
 let streamBad = 0, streamChecks = 0, childDeaths = 0, childBad = 0, occBad = 0;
 let leaks = 0, reveals = 0, afterlives = 0, statBad = 0, carryBad = 0, debtLeak = 0, lenBad = 0;
 const lens = [];
+// ทางในตระกูลแยกชั้น (B18): จำนวน · ผลรวมสัดส่วนส่งต่อ · มรดก (เท่ารายได้ปี) · |ส่วนต่างความสัมพันธ์+คอนเน็คชั่นจากบ้าน|
+const tiers = KIN_TIERS.map(() => ({ n: 0, carry: 0, legacy: 0, kin: 0 }));
 for (const [name, pick] of Object.entries(BOTS)) {
   const r = { realms: {}, paths: { child: 0, reborn: 0 }, byX: { child: [[0, 0], [0, 0], [0, 0]], reborn: [[0, 0], [0, 0], [0, 0]] }, ages: Array.from({ length: gens }, () => [0, 0]), legacy: [0, 0] };
   for (let i = 0; i < n; i++) {
@@ -100,7 +102,17 @@ for (const [name, pick] of Object.entries(BOTS)) {
       r.realms[verdict.realm.name] = (r.realms[verdict.realm.name] ?? 0) + 1;
       r.paths[af.path]++;
       const h = af.heir;
-      if (!(h.carried >= CARRY.min && h.carried <= CARRY.max)) carryBad++;
+      // กรอบ CARRY คุมสัดส่วนก่อนคูณชั้น — ชั้นลูก (และทางเกิดใหม่) ตัวคูณ 1 จึงยังอยู่ใน 30–70% ตรง ๆ
+      const base = h.carried / kinTier(h.tier).carry;
+      if (!(base >= CARRY.min - 1e-12 && base <= CARRY.max + 1e-12)) carryBad++;
+      if ((af.path === 'child') !== (h.tier !== null)) carryBad++;
+      if (h.tier) {
+        const t = tiers[h.tier - 1];
+        t.n++;
+        t.carry += h.carried;
+        t.legacy += h.legacy.units;
+        t.kin += Math.abs(h.kin.relations) + Math.abs(h.kin.network);
+      }
       const want = carryLedger(snap, verdict.net, h.carried);
       if (!near(want.merit, h.ledger.merit) || !near(want.sin, h.ledger.sin)) carryBad++;
       // สูตรเขียนซ้ำอิสระจากแกน: ฝั่งที่ชนะที่ศาลถูกหัก spend × |สุทธิ| (ไม่ติดลบ) ฝั่งแพ้ไม่ถูกหัก แล้วคูณ r
@@ -173,6 +185,17 @@ check(`รุ่นถัดไปดึงเลขสุ่มของโล�
 const childPaths = Object.values(out).reduce((s, r) => s + r.paths.child, 0);
 check('ทางเป็นลูกเกิดได้จริง', childPaths ? 0 : 1, ` ${childPaths} ครั้ง`);
 check('ทางเป็นลูก อาชีพที่บ้าน = งานสุดท้ายของรุ่นก่อน', occBad);
+// ทุกชั้นออกได้จริง แล้วค่าเฉลี่ยที่ส่งต่อต้องไม่เพิ่มเมื่อห่างสายเลือดขึ้น (ลูก ≥ หลาน ≥ เหลน)
+const tm = tiers.map((t) => ({ n: t.n, carry: t.carry / t.n, legacy: t.legacy / t.n, kin: t.kin / t.n }));
+console.log(`\nชั้นในตระกูล          ${KIN_TIERS.map((t) => t.name.padEnd(8)).join(' ')}`);
+for (const [k, label] of [['n', 'จำนวน'], ['carry', 'ส่งต่อบุญบาปเฉลี่ย'], ['legacy', 'มรดกเฉลี่ย (เท่ารายได้ปี)'], ['kin', 'ส่วนต่างจากบ้านเฉลี่ย']]) {
+  console.log(`  ${label.padEnd(20)} ${tm.map((t) => (k === 'n' ? String(t.n) : f(t[k])).padEnd(8)).join(' ')}`);
+}
+check('เกิดเป็นลูก/หลาน/เหลนได้จริงทุกชั้น', tm.filter((t) => !t.n).length, ` ${tm.map((t) => t.n).join(' / ')}`);
+const desc = (k) => tm.every((t, i) => !i || !(t[k] > tm[i - 1][k]));
+check('ส่งต่อบุญบาป ลูก ≥ หลาน ≥ เหลน', desc('carry') ? 0 : 1);
+check('มรดก ลูก ≥ หลาน ≥ เหลน', desc('legacy') ? 0 : 1);
+check('ความสัมพันธ์/คอนเน็คชั่นจากบ้าน ลูก ≥ หลาน ≥ เหลน', desc('kin') ? 0 : 1);
 if (!sceneIds.length) fails.push('ไม่มีฉากระหว่างชาติในเนื้อหา');
 if (fails.length) {
   for (const x of fails) console.log(`  ✗ ${x}`);

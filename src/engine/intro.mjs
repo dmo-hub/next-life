@@ -2,7 +2,7 @@
 // ไม่มีค่าบัญชีบุญบาป: กรรมที่ติดมาเล่าเป็นปริมาณคำเดียวกับการ์ดส่งต่อ ฐานะ/ญาติบอกแค่ทิศ ↑/↓
 import { infantMortality, protoYear } from './era.mjs';
 import { CLASSES, STAT_LABELS, regionLabel, stageOf } from './life.mjs';
-import { LEGACY, lineageText, carryAmount } from './afterlife.mjs';
+import { LEGACY, lineageText, carryAmount, kinTier } from './afterlife.mjs';
 
 // สัดส่วนจำนวนเกิดปีนั้นเทียบปีที่เกิดมากที่สุดในข้อมูล — แบ่งบรรยากาศรุ่นเป็น 3 ขั้น (ค่าตั้งของเกม)
 const COHORT = [
@@ -58,13 +58,14 @@ function inheritText(st, heir) {
   const prev = st.lineage.at(-1);
   const out = [];
   const ancestor = st.parents.find((p) => p.ancestor);
-  if (prev.path === 'child' && ancestor) out.push(`ชาติก่อนเฝ้าลูกหลานไว้ แล้วกลับมาเกิดเป็นลูกของตัวเอง — ${parentWord(ancestor)}ของคุณคือคุณในชาติก่อน`);
+  // เซฟก่อน B18 ไม่มี legacy.from — ทางเป็นลูกชั้นเดียวยังมีพ่อ/แม่ที่เป็นชาติก่อนให้เรียก
+  const who = heir.legacy?.from ?? (ancestor ? parentWord(ancestor) : null);
+  if (prev.path === 'child' && who) out.push(`ชาติก่อนเฝ้าลูกหลานไว้ แล้วกลับมาเกิดเป็น${kinTier(prev.tier).name}ของตัวเอง — ${who}ของคุณคือคุณในชาติก่อน`);
   else out.push('ชาติก่อนไปตามกรรม แล้วมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม');
   out.push(`กรรมที่ติดตัวมาจากชาติก่อน${carryAmount(heir.carried)}`);
   const d = CLASSES.indexOf(st.cls) - CLASSES.indexOf(prev.cls);
   out.push(d ? `ฐานะ ${d > 0 ? '↑' : '↓'} — เกิดในบ้านที่ฐานะ${d > 0 ? 'ดีกว่า' : 'ด้อยกว่า'}ชาติก่อน (ชาติก่อนฐานะ${prev.cls})` : `ฐานะ — ใกล้เคียงชาติก่อน (ฐานะ${prev.cls})`);
-  if (ancestor && heir.legacy) {
-    const who = parentWord(ancestor);
+  if (who && heir.legacy) {
     out.push(legacyText(heir.legacy, who));
     for (const k of ['relations', 'network']) {
       const line = kinText(k, heir.kin?.[k] ?? 0, who);
