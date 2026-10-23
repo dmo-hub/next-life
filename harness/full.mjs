@@ -1,7 +1,7 @@
 // harness เต็ม (B07 · ใบ 07 + ใบ 12): บอท 6 บุคลิก × (seed ตายตัว + seed สุ่ม) × n ชีวิต รันขนานใน worker
 // + harness เดิมที่มีด่านของตัวเอง (merit · lineage · finance · titles · belief) เป็น process ข้าง ๆ — คำสั่งเดียวได้ทุกด่าน
 // ด่าน (1) titles · (2) ไม่มีเหตุการณ์/ตัวเลือก/ธงตาย · (3a)(3b) อายุ · (4) จำนวนการ์ด · (5) merit · (6)(7) belief (หวยสายมู · สายมูไม่แตะอายุ)
-// จังหวะบังคับ: เทียบกับ harness/baseline.json (seed ตายตัวชุดเดียวกัน) ชุดใหม่ต้องไม่แย่กว่า · --save เขียนผลรอบนี้เป็นฐานใหม่
+// จังหวะบังคับ: เทียบกับ harness/baseline.json (seed ตายตัวชุดเดียวกัน) ชุดใหม่ต้องไม่แย่กว่า · --save เขียนผลรอบนี้เป็นฐานใหม่เมื่อไม่มีด่านตก (ตกแล้วยังจะเขียน = --force)
 // --release = 100,000 ชีวิตต่อบอท (ก่อนปล่อย) · --seed2 N ระบุ seed สุ่มซ้ำได้ · --solo ไม่รัน harness ข้าง ๆ
 import { Worker } from 'node:worker_threads';
 import { spawn } from 'node:child_process';
@@ -10,7 +10,7 @@ import { availableParallelism } from 'node:os';
 import { parse } from 'yaml';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
-import { gate3a, gate3b, gate4, blame } from './gates.mjs';
+import { gate3a, gate3b, gate4, blame, compareBaseline } from './gates.mjs';
 
 const args = process.argv.slice(2);
 const has = (name) => args.includes(`--${name}`);
@@ -183,8 +183,10 @@ for (const s of STAGES) {
 }
 console.log(`ช่องบาง ${thin.length} ช่อง — ชุดเนื้อหาถัดไปเริ่มจากช่องเหล่านี้`);
 
-// เป้า 5–8 ใบต่อชีวิต (MAP) นับการ์ดแนว B ในช่วงมีชีวิต ไม่นับระหว่างชาติ · หวยสายมูนับรวม เกินครึ่งของที่ออก = ยกให้เจ้าของเคาะ
+// เป้า 5–8 ใบต่อชีวิต (MAP) นับการ์ดแนว B ในช่วงมีชีวิต ไม่นับระหว่างชาติ · หวยสายมูนับรวม
+// เกินครึ่งของเป้าขั้นต่ำ = ยกให้เจ้าของเคาะ — เกณฑ์คงที่ ไม่ลอยตามจำนวนแฟนตาซีที่เนื้อหามีตอนนั้น
 const FANTASY = [5, 8];
+const NUMEN_WARN = FANTASY[0] / 2;
 console.log(`\nแฟนตาซี/สายมูต่อชีวิต (เป้า ${FANTASY[0]}–${FANTASY[1]}):`);
 for (const b of Object.keys(BOTS)) {
   const r = of(b, seed);
@@ -196,7 +198,7 @@ for (const b of Object.keys(BOTS)) {
   const mean = sum / n;
   const warn = mean < FANTASY[0] || mean > FANTASY[1] ? ' ⚠ นอกเป้า' : '';
   const numen = r.numen / n;
-  const half = numen > mean / 2 && numen > 0 ? ' ⚠ หวยสายมูกินเกินครึ่ง ยกให้เจ้าของเคาะ' : '';
+  const half = numen > NUMEN_WARN ? ` ⚠ หวยสายมูเกิน ${NUMEN_WARN} ใบ ยกให้เจ้าของเคาะ` : '';
   console.log(`  ${b.padEnd(10)} เฉลี่ย ${f(mean)} ใบ · ในเป้า ${f((inBand / n) * 100, 1)}% ของชีวิต · หวยสายมู ${f(numen)} ใบ${warn}${half}`);
 }
 
@@ -209,27 +211,22 @@ const now = {
   gate3bWorst: Number(f(judged[seed].g3b.worst, 3)),
   ageMean: Object.fromEntries(Object.keys(BOTS).map((b) => [b, Number(f(of(b, seed).ageSum / n, 3))])),
 };
-// ส่วนต่างเล็กกว่านี้เป็นแค่เลขสุ่มที่ขยับตามเนื้อหาที่เพิ่ม ไม่นับว่าแย่ลง
-const SLACK = { gate4Share: 0.005, gate3bWorst: 0.25 };
 if (prev) {
-  const worse = [];
-  for (const k of ['deadEvents', 'deadChoices', 'deadFlags']) {
-    const add = now[k].filter((x) => !prev[k].includes(x));
-    if (add.length) worse.push(`${k} ใหม่ ${add.join(' · ')}`);
-  }
-  if (now.statBad > prev.statBad) worse.push(`statBad ${prev.statBad} → ${now.statBad}`);
-  if (now.gate4Share < prev.gate4Share - SLACK.gate4Share) worse.push(`ด่าน 4 ${f(prev.gate4Share * 100)}% → ${f(now.gate4Share * 100)}%`);
-  if (now.gate3bWorst > prev.gate3bWorst + SLACK.gate3bWorst) worse.push(`ด่าน 3b ห่างสุด ${prev.gate3bWorst} → ${now.gate3bWorst} ปี`);
+  const worse = compareBaseline(prev, now);
   console.log(`\nเทียบรอบก่อน (${prev.at ?? '?'}): ${worse.length ? `แย่ลง ${worse.length} ข้อ → ตก` : 'ไม่แย่กว่า → ผ่าน'}`);
   for (const w of worse) console.log(`  ✗ ${w}`);
   const ages = Object.keys(now.ageMean).map((b) => `${b} ${prev.ageMean[b] ?? '?'}→${now.ageMean[b]}`).join(' · ');
   console.log(`  อายุเฉลี่ย: ${ages}`);
-  if (worse.length && !has('save')) fails.push('เทียบรอบก่อน');
+  if (worse.length) fails.push('เทียบรอบก่อน');
 } else if (stored) console.log(`\nเทียบรอบก่อน → ข้าม: ฐานเก็บไว้ที่ n ${stored.n} seed ${stored.seed}`);
-else console.log('\nเทียบรอบก่อน → ยังไม่มี harness/baseline.json · รันด้วย --save เพื่อเก็บรอบนี้เป็นฐาน');
+else console.log('\nเทียบรอบก่อน → ยังไม่มี harness/baseline.json · รันด้วย --save --force เพื่อเก็บรอบนี้เป็นฐาน');
+// ด่านตก (รวมแย่กว่าฐาน) แล้วยังเขียนฐาน = ยอมรับผลที่แย่ลงเงียบ ๆ — ต้องใส่ --force ให้เห็นว่าตั้งใจ
 if (has('save')) {
-  writeFileSync(BASELINE, `${JSON.stringify({ ...now, at: new Date().toISOString().slice(0, 10) }, null, 2)}\n`);
-  console.log('  เขียน harness/baseline.json แล้ว');
+  if (fails.length && !has('force')) console.log(`  ไม่เขียน harness/baseline.json: ตก ${fails.length} ข้อ · ยอมรับผลรอบนี้เป็นฐานจริง = ใส่ --force เพิ่ม`);
+  else {
+    writeFileSync(BASELINE, `${JSON.stringify({ ...now, at: new Date().toISOString().slice(0, 10) }, null, 2)}\n`);
+    console.log(`  เขียน harness/baseline.json แล้ว${fails.length ? ` (--force ทับทั้งที่ตก ${fails.length} ข้อ)` : ''}`);
+  }
 }
 
 console.log(`\n${fails.length ? `ตก ${fails.length}: ${fails.join(' · ')}` : 'ผ่านทุกด่านที่ตัดสินได้'} · seed สุ่มรอบนี้ ${seed2} (รันซ้ำ: npm run full -- --seed2 ${seed2})`);

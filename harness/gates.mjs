@@ -133,3 +133,18 @@ export function blame(lives, ids, sign, top = 5) {
   }
   return rows.sort((a, b) => Math.abs(b.push) - Math.abs(a.push)).slice(0, top);
 }
+
+// จังหวะบังคับ (ใบ 07): ผลรอบนี้ต้องไม่แย่กว่าฐาน (seed ตายตัวชุดเดียวกัน) · คืนรายการที่แย่ลง ว่าง = ผ่าน
+// ส่วนต่างเล็กกว่า SLACK เป็นแค่เลขสุ่มที่ขยับตามเนื้อหาที่เพิ่ม ไม่นับว่าแย่ลง
+export const SLACK = { gate4Share: 0.005, gate3bWorst: 0.25 };
+export function compareBaseline(prev, now) {
+  const worse = [];
+  for (const k of ['deadEvents', 'deadChoices', 'deadFlags']) {
+    const add = now[k].filter((x) => !prev[k].includes(x));
+    if (add.length) worse.push(`${k} ใหม่ ${add.join(' · ')}`);
+  }
+  if (now.statBad > prev.statBad) worse.push(`statBad ${prev.statBad} → ${now.statBad}`);
+  if (now.gate4Share < prev.gate4Share - SLACK.gate4Share) worse.push(`ด่าน 4 ${f(prev.gate4Share * 100)}% → ${f(now.gate4Share * 100)}%`);
+  if (now.gate3bWorst > prev.gate3bWorst + SLACK.gate3bWorst) worse.push(`ด่าน 3b ห่างสุด ${prev.gate3bWorst} → ${now.gate3bWorst} ปี`);
+  return worse;
+}

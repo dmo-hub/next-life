@@ -17,6 +17,7 @@
     "fetch:finance": "node scripts/fetch-finance.mjs",
     "check:data": "node scripts/check-data.mjs",
     "lint:test": "node scripts/lint-test.mjs",
+    "harness:test": "node scripts/harness-test.mjs",
     "fetch:data": "node scripts/fetch-data.mjs"
   },
   "dependencies": {
