@@ -4,16 +4,17 @@ import {
   ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE, EDU, SCHOOL_VALUES,
 } from './vocab.mjs';
 import { INCOME_MULT } from '../../engine/life.mjs';
-import { ASSETS } from '../../engine/finance.mjs';
+import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
+  debt: ['kind', 'amount'],
   money: ['unit', 'amount', 'ref_year'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
@@ -82,6 +83,10 @@ function* shaped(e) {
       if (isObj(node.effects.money)) yield ['money', node.effects.money, `${path}.effects.money`];
       if (isObj(node.effects.invest)) yield ['invest', node.effects.invest, `${path}.effects.invest`];
       if (isObj(node.effects.chronic)) yield ['chronic', node.effects.chronic, `${path}.effects.chronic`];
+      if (isObj(node.effects.debt)) {
+        yield ['debt', node.effects.debt, `${path}.effects.debt`];
+        if (isObj(node.effects.debt.amount)) yield ['money', node.effects.debt.amount, `${path}.effects.debt.amount`];
+      }
     }
     if (isObj(node.cost)) yield ['money', node.cost, `${path}.cost`];
     for (const [i, m] of list(node.merit).entries()) if (isObj(m)) yield ['merit', m, `${path}.merit[${i}]`];
@@ -286,6 +291,19 @@ export const rules = [
       const v = isObj(b.vow) ? b.vow : {};
       for (const [p, m] of [['.belief.stake', b.stake], ['.belief.vow.redeem_full_cost', v.redeem_full_cost], ['.belief.vow.redeem_light_cost', v.redeem_light_cost]]) {
         if (m !== undefined && !(isMoney(m) && m.amount > 0)) r(p, 'ต้องเป็นเงินมีหน่วย amount > 0');
+      }
+    },
+  },
+  {
+    id: 'debt-shape',
+    desc: `กู้เงิน effects.debt = {kind: ${DEBTS.map((d) => d.id).join('|')}, amount: เงินมีหน่วย amount > 0}`,
+    event(e, ctx, r) {
+      for (const { node, path } of effectSites(e)) {
+        const v = isObj(node.effects) ? node.effects.debt : undefined;
+        if (v === undefined) continue;
+        if (!isObj(v) || !DEBTS.some((d) => d.id === v.kind) || !(isMoney(v.amount) && v.amount.amount > 0)) {
+          r(`${path}.effects.debt`, `ต้องเป็น {kind: ชนิดหนี้, amount: {unit, amount > 0}} ได้ ${JSON.stringify(v)}`);
+        }
       }
     },
   },

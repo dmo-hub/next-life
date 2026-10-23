@@ -1,0 +1,13 @@
+# กู้เงินเรียนแต่ไม่ประกาศ systems: [student_loan] — ด่านปีเลยกั้นปีก่อนกองทุนเปิดไม่ได้ (ข้อความไม่มีคำของระบบ)
+events:
+  - id: debt_no_system
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2540, 2650]
+    text: "ค่าเทอมปีนี้สูงกว่าที่บ้านส่งไหว"
+    choices:
+      - {text: "ยื่นกู้เงินเรียนของรัฐ", effects: {debt: {kind: student_loan, amount: {unit: income_x, amount: 2}}}, merit: [{cat: neutral}]}
+      - {text: "ทำงานพิเศษส่งตัวเอง", merit: [{cat: neutral}]}
+      - {text: "ขอยืมญาติ", merit: [{cat: neutral}]}
+      - {text: "พักการเรียนไว้ก่อน", merit: [{cat: neutral}]}

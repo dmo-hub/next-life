@@ -118,7 +118,9 @@ rows.push(['การ์ดเรียน/งานจากแกน', `${care
 const realDocs = dir('content/').map((f) => load('content/', f));
 const used = new Set();
 for (const { doc } of realDocs) for (const { s: f } of flagNames(doc)) used.add(f.split(':')[0]);
-const stale = [...ctx.flags.flags, ...ctx.flags.prefixes].filter((f) => !used.has(f) && f !== 'vow_broken');
+// ธงที่แกนตั้งเอง (ป้ายหมวด 9 · ศาลสั่งล้มละลาย) มีในทะเบียนเพื่อให้เนื้อหาอ่านได้ ไม่ต้องรอเนื้อหาใช้
+const ENGINE_FLAGS = ['vow_broken', 'bankrupt'];
+const stale = [...ctx.flags.flags, ...ctx.flags.prefixes].filter((f) => !used.has(f) && !ENGINE_FLAGS.includes(f));
 rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${ctx.flags.prefixes.size} ชื่อหน้า · ค้าง ${stale.length}`]);
 // ธงมีพารามิเตอร์ยังไม่มีเนื้อหาจริงใช้ (มีแค่ใน fixture สายมู) จึงไม่นับว่าค้าง
 for (const f of stale) if (!ctx.flags.prefixes.has(f)) fails.push(`ทะเบียนธง: "${f}" ไม่มีเนื้อหาใน content/ ใช้`);

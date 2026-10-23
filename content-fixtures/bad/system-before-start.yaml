@@ -25,3 +25,16 @@ events:
       - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  # B08b: กู้เงินเรียน (ประกาศระบบครบ) แต่ปีเริ่มก่อนกองทุนเปิด 2539
+  - id: bad_case_loan_early
+    type: A
+    stage: หนุ่มสาว
+    years: [2530, 2650]
+    text: "ค่าเทอมปีนี้สูงกว่าที่บ้านส่งไหว"
+    systems: [student_loan]
+    lore_ref: lore-finance-series.html#6
+    choices:
+      - {text: "ยื่นกู้เงินเรียนของรัฐ", effects: {debt: {kind: student_loan, amount: {unit: income_x, amount: 2}}}, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

@@ -1,0 +1,13 @@
+# debt อ้างชนิดหนี้ที่ไม่มี และยอดกู้ไม่เป็นบวก
+events:
+  - id: debt_bad_shape
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2530, 2650]
+    text: "เงินขาดมือก่อนสิ้นเดือน"
+    choices:
+      - {text: "กู้เพื่อนร่วมงาน", effects: {debt: {kind: friend, amount: {unit: income_x, amount: 1}}}, merit: [{cat: neutral}]}
+      - {text: "กู้นอกระบบ", effects: {debt: {kind: informal, amount: {unit: income_x, amount: -1}}}, merit: [{cat: neutral}]}
+      - {text: "ประหยัดเอา", merit: [{cat: neutral}]}
+      - {text: "ขอเบิกเงินเดือนล่วงหน้า", merit: [{cat: neutral}]}

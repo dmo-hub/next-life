@@ -1,0 +1,15 @@
+# กู้ได้ทุกชนิดที่เปิด · ชนิดที่มีปีเริ่มประกาศ systems + ปีไม่ก่อนระบบ
+events:
+  - id: good_debt_home
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2540, 2650]
+    text: "ธนาคารเสนอสินเชื่อบ้าน"
+    choices:
+      - {text: "กู้ซื้อบ้าน", effects: {debt: {kind: mortgage, amount: {unit: income_x, amount: 30}}, invest: {asset: land, share: 0.5}}, merit: [{cat: neutral}]}
+      - {text: "ผ่อนรถแทน", effects: {debt: {kind: car, amount: {unit: fixed_baht, amount: 400000, ref_year: 2560}}}, merit: [{cat: neutral}]}
+      - {text: "กู้เงินเรียนต่อ", effects: {debt: {kind: student_loan, amount: {unit: income_x, amount: 2}}}, merit: [{cat: neutral}]}
+      - {text: "เช่าต่อไป", merit: [{cat: neutral}]}
+    systems: [student_loan]
+    lore_ref: lore-finance-series.html#6

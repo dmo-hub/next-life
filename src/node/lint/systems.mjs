@@ -1,6 +1,6 @@
 // กติกาปีสินทรัพย์/ระบบ: เหตุการณ์ที่อ้างระบบต้องประกาศใน systems และช่วงปีต้องไม่ก่อนระบบมีจริง (data/system-starts.json)
 import { isObj, isRange, list, textsOf, effectSites } from './util.mjs';
-import { ASSETS } from '../../engine/finance.mjs';
+import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { YEAR_MIN, YEAR_MAX } from './vocab.mjs';
 
 const declared = (e, ctx) => list(e.systems).map((id) => ({ id, sys: ctx.systems.get(id) }));
@@ -46,6 +46,17 @@ export const rules = [
       for (const { node, path } of effectSites(e)) {
         const asset = ASSETS.find((a) => isObj(node.effects) && a.id === node.effects.invest?.asset);
         if (asset?.system && !have.has(asset.system)) r(`${path}.effects.invest`, `ลงเงินใน${asset.name} ต้องประกาศ systems: [${asset.system}]`);
+      }
+    },
+  },
+  {
+    id: 'debt-system',
+    desc: 'ผลที่กู้หนี้ชนิดที่มีปีเริ่ม (เช่น กยศ. · บัตรเครดิต) ต้องประกาศระบบนั้นใน systems — ด่านปี/ระบบปิดจึงกั้นการกู้ก่อนมีจริงได้',
+    event(e, ctx, r) {
+      const have = new Set(list(e.systems));
+      for (const { node, path } of effectSites(e)) {
+        const debt = DEBTS.find((d) => isObj(node.effects) && d.id === node.effects.debt?.kind);
+        if (debt?.system && !have.has(debt.system)) r(`${path}.effects.debt`, `กู้${debt.name} ต้องประกาศ systems: [${debt.system}]`);
       }
     },
   },

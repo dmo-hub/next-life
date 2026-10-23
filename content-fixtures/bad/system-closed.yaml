@@ -12,3 +12,16 @@ events:
       - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  # B08b: กู้ชนิดที่ระบบปิด (ประกาศระบบครบ)
+  - id: bad_case_card_debt
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ธนาคารเสนอวงเงินใช้จ่าย"
+    systems: [credit_card]
+    lore_ref: lore-finance-series.html#6
+    choices:
+      - {text: "รับวงเงิน", effects: {debt: {kind: credit_card, amount: {unit: income_x, amount: 1}}}, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
