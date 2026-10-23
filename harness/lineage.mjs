@@ -80,11 +80,9 @@ for (const [name, pick] of Object.entries(BOTS)) {
       r.ages[g][0] += life.age;
       r.ages[g][1]++;
       // สำเนาบัญชีตอนการ์ดส่งต่อ (หลังฉากระหว่างชาติปรับบัญชีครบแล้ว) = บัญชีที่ makeHeir ใช้
-      let len = 1;
       let verdict = null;
       let snap = null;
       const af = playAfterlife(st, pick, (card, a) => {
-        len++;
         const { [REVEAL]: reveal, ...rest } = card;
         for (const k of keys(rest)) if (LEAK.test(k)) leaks++;
         if (card.kind === 'verdict') {
@@ -95,6 +93,8 @@ for (const [name, pick] of Object.entries(BOTS)) {
         if (card.kind === 'carry') snap = { merit: a.st.ledger.merit, sin: a.st.ledger.sin, byCat: { ...a.st.ledger.byCat }, broken: {} };
       });
       afterlives++;
+      // การ์ดตาย 1 ใบ + การ์ดที่ระหว่างชาติออก (แกนนับ รวมการ์ดผล)
+      const len = 1 + af.cards;
       lens.push(len);
       if (len < 6 || len > 10) lenBad++;
       r.realms[verdict.realm.name] = (r.realms[verdict.realm.name] ?? 0) + 1;

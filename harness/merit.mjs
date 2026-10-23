@@ -77,7 +77,8 @@ for (const [name, pick] of Object.entries(BOTS)) {
     const { age, state } = playLife(mixSeed(seed, i), content, pick, onCard);
     // อายุ/บัญชีวัดตอนตาย (ก่อนฉากระหว่างชาติปรับบัญชี) · ระหว่างชาติเล่นต่อเพื่อตรวจรั่ว/เฉลย
     const nets = netLedger(state.ledger), mult = karmaMultiplier(state.ledger);
-    playAfterlife(state, pick, onCard);
+    // การ์ดระหว่างชาติวาดบนชีวิตที่เพิ่งจบ — ตรวจค่าที่หน้าจอใช้กับ state ของชีวิตนั้น ไม่ใช่ af
+    playAfterlife(state, pick, (card) => onCard(card, state));
     r.nets.push(nets);
     r.mult += mult;
     r.age += age;

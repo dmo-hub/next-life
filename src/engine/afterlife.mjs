@@ -32,7 +32,8 @@ export const CARRY = { spend: 0.5, min: 0.3, max: 0.7 };
 // ผลกรรมต่อชาติหน้า "แรงทุกทาง" (ใบ 05 — ห้ามแก้คืน): ฐานะกับค่าเริ่มคิดจากระดับบัญชีที่ศาล
 // sd = ความกว้างของฐานะเกิดใหม่รอบจุดกลางตามกรรม · childStep = ฐานะลูกเลื่อนได้สูงสุดกี่ระดับจากกรรม
 // stat = ค่าเริ่มเลื่อนสูงสุดเมื่อบัญชีสุดขั้ว · bonusCap = เพดานผลรวมจากฉากระหว่างชาติต่อค่า
-export const FATE = { sd: 1.2, childStep: 3, stat: 10, bonusCap: 12 };
+// kin = ทางเป็นลูกรับความสัมพันธ์/คอนเน็คชั่นของบ้านต่อ (ใบ 05) เป็นสัดส่วนของส่วนต่างจากค่ากลาง 50 ตอนพ่อแม่ตาย เพดาน bonusCap
+export const FATE = { sd: 1.2, childStep: 3, stat: 10, bonusCap: 12, kin: 0.3 };
 // มรดก (ใบ 05 · lore-finance-belief): แบ่งตามจำนวนลูก · ภาษีการรับมรดก 5% ส่วนที่เกิน 100 ล้าน ตั้งแต่ปีที่กฎหมายมีผล
 // จำนวนลูกเป็นค่าตั้งของเกม — ธง has_kids ไม่ได้บอกว่ากี่คน
 export const LEGACY = { kids: 2, taxFrom: 100e6, tax: 0.05, taxYear: 2559, richUnits: [10, 40] };
@@ -141,12 +142,15 @@ function carryCard(af) {
     kind: 'carry',
     type: 'B',
     text: `ก่อนดื่มน้ำลืมชาติ พญายมแจ้งว่ากรรมที่ติดตัวไปครั้งนี้${amount} · ${who} เป็น${h.sex} ฐานะ${h.cls}`,
-    lineage: h.lineage.map((l) => `รุ่นที่ ${l.gen} · ${l.sex} · ฐานะ${l.cls} · ตายอายุ ${l.age} · ไปภูมิ${l.realm}`),
+    lineage: lineageText(h.lineage),
     note: 'กติกาแฟนตาซีของเกม ได้แรงบันดาลใจจากไตรภูมิพระร่วงและคติไทย',
     choices: [],
     done: true,
   });
 }
+
+// ผังตระกูล (ใบ 05: เลิกเมื่อไรก็ดูได้) — หน้าจอวาดระหว่างชีวิตจาก st.lineage และบนการ์ดส่งต่อ
+export const lineageText = (lineage) => lineage.map((l) => `รุ่นที่ ${l.gen} · ${l.sex} · ฐานะ${l.cls} · ตายอายุ ${l.age} · ไปภูมิ${l.realm}`);
 
 // การ์ดถัดไปของช่วงที่ 7 · การ์ด carry (done) เป็นใบสุดท้าย แล้วผู้เรียกต่อ nextLife
 export function nextAfterCard(af) {
@@ -246,7 +250,8 @@ function makeHeir(af, r) {
     region = pickRegion(rng, era.birth);
     cls = CLASSES[clampIdx(Math.round(4.5 + 4.5 * x + gauss(rng) * FATE.sd))];
   }
-  const bonus = Object.fromEntries(STAT_KEYS.map((k) => [k, x * FATE.stat + (af.bonus[k] ?? 0)]));
+  const kin = (k) => (af.path === 'child' && (k === 'relations' || k === 'network') ? Math.max(-FATE.bonusCap, Math.min(FATE.bonusCap, (st[k] - 50) * FATE.kin)) : 0);
+  const bonus = Object.fromEntries(STAT_KEYS.map((k) => [k, x * FATE.stat + (af.bonus[k] ?? 0) + kin(k)]));
   const gen = st.gen ?? 1;
   const lineage = [...(st.lineage ?? []), { gen, sex: st.sex, cls: st.cls, age: st.age, realm: realm.name, path: af.path }];
   return {
