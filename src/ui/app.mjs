@@ -447,11 +447,16 @@ function render(card) {
   } else {
     top.append(el('b', null, `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, `${genLabel()}${regionLabel(st)}`));
     box.append(top, stats(s));
-    // มีงานทำแล้วบอกรายได้ต่อเดือน ก่อนทำงาน/หลังเกษียณไม่มีรายได้ จึงบอกเงินติดตัวแทน
-    const purse = isWorking(st, card.age)
-      ? `รายได้ ${baht(monthlyIncome(st, year))}/เดือน`
-      : `เงินติดตัว ${baht(s.money)}`;
-    box.append(el('div', 'meta', `ฐานะ${st.cls} · ${jobText(st, card.age)} · ${purse}`));
+    // ไม่มีรายได้ก็ต้องเห็นเงินติดตัวเสมอแม้ 0 · มีงานทำแล้วซ่อนเงินติดตัวเฉพาะตอนเป็น 0 พอดี ติดลบ (หนี้) ยังต้องเห็น
+    const working = isWorking(st, card.age);
+    const purse = [
+      (!working || s.money !== 0) && `เงินติดตัว ${baht(s.money)}`,
+      working && `รายได้ ${baht(monthlyIncome(st, year))}/เดือน`,
+    ].filter(Boolean);
+    const meta = el('div', 'meta', `ฐานะ${st.cls} · ${jobText(st, card.age)}`);
+    // จอแคบให้ตัดบรรทัดได้แค่ที่ตัวคั่น — เบราว์เซอร์ตัดคำไทยกลาง "ราย|ได้" ได้แม้เว้นวรรคแบบไม่ตัด จึงต้องห่อ span
+    for (const t of purse) meta.append(' · ', el('span', null, t));
+    box.append(meta);
     const tree = familyTree();
     if (tree) box.append(tree);
     body.append(el('span', 'kicker', card.kind === 'event' ? (card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind]));
