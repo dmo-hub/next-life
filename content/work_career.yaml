@@ -1,0 +1,328 @@
+# กลุ่มเปลี่ยนงาน/สายอาชีพ · ช่วงหนุ่มสาว (19–30) · ทำงาน (31–45) · กลางคน (46–59) · ใช้ job/requires.edu ย้ายสายงาน และ network เป็นตัวคูณโอกาส
+events:
+  - id: career_poach_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 6, max: 2}
+    when: {occupation: [clerk, technician, professional, manager]}
+    multipliers: {stats: {network: 1.5}, occupation: {technician: 1.3, professional: 1.3}}
+    title: "สายลับจากบริษัทคู่แข่ง"
+    text: "เบอร์แปลกโทรมาตอนพักเที่ยง เป็นบริษัทคู่แข่งที่แย่งลูกค้ากันมาตลอด เสนอเงินเดือนเพิ่มเกือบครึ่ง ขอคำตอบภายในสัปดาห์นี้"
+    choices:
+      - id: jump_ship
+        text: "ย้ายไปเลย ไม่ลังเล"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, multipliers: {stats: {network: 1.4}}, text: "ที่ใหม่ให้อิสระเต็มที่ ผลงานพุ่ง เงินเดือนขึ้นตามที่สัญญา", effects: {income_mult: 1.3, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทำได้สามเดือน บริษัทใหม่ถูกขายกิจการ ผู้บริหารชุดใหม่ตัดเงินเดือนคนที่เพิ่งเข้ามา", effects: {income_mult: 0.85, happiness: -2}, merit: [{cat: neutral}]}
+      - id: counter_offer
+        text: "เอาข้อเสนอไปต่อรองเจ้านาย"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "เจ้านายยอมขึ้นเงินเดือนให้ทันที ไม่อยากเสียคนเก่ง", effects: {income_mult: 1.2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เจ้านายยิ้มรับ แต่เช้าวันรุ่งขึ้นโต๊ะของคุณถูกย้ายไปริมห้องเก็บของ", effects: {happiness: -2}, next: career_poach_cornered_01, merit: [{cat: neutral}]}
+      - id: steal_clients
+        text: "ย้ายไปพร้อมขนรายชื่อลูกค้า"
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ลูกค้าตามมาครึ่งพอร์ต ที่ใหม่ยกให้เป็นดาวเด่นของทีม", effects: {income_mult: 1.5, relations: -1}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 2, text: "บริษัทเดิมฟ้องละเมิดสัญญา ต้องจ่ายค่าเสียหายก้อนโต ที่ใหม่ก็ไม่กล้าจ้างต่อ", effects: {money: {unit: income_x, amount: -3}, income_mult: 0.8, happiness: -2}, merit: [{cat: neutral}]}
+      - id: stay_loyal
+        text: "ปฏิเสธ อยู่กับทีมเดิม"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: career_poach_cornered_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "โต๊ะริมห้องเก็บของ"
+    text: "งานสำคัญถูกโยกไปให้รุ่นน้อง ประชุมไม่มีชื่อคุณอีก ทุกคนในออฟฟิศรู้ว่าคุณกำลังถูกบีบให้ออก"
+    choices:
+      - text: "โทรกลับไปรับข้อเสนอเดิม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.5}}, text: "คู่แข่งยังรออยู่ แถมเพิ่มตำแหน่งให้อีกขั้นเพราะรู้ว่าคุณถูกเล่นงาน", effects: {income_mult: 1.35, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตำแหน่งนั้นมีคนได้ไปแล้ว ต้องอยู่ที่เดิมแบบหมดไฟ", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+      - {text: "ก้มหน้าทำงานต่อเงียบ ๆ", effects: {happiness: -1, income_mult: 0.9}, merit: [{cat: neutral}]}
+      - {text: "ขอโทษเจ้านายตรง ๆ", effects: {relations: 2, happiness: -1}, merit: [{cat: sila, level: 1}]}
+      - text: "ลาออกมาเปิดกิจการเอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ลูกค้าเก่าที่ชอบงานคุณตามมาจ้างเอง กิจการเล็กแต่ไปได้", effects: {income_mult: 1.25, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ไม่มีใครตามมาเลย เงินเก็บหมดไปกับค่าเช่าออฟฟิศ", effects: {money: {unit: income_x, amount: -2}, income_mult: 0.8}, sets_flags: [own_business], merit: [{cat: neutral}]}
+
+  - id: career_dream_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {occupation: [factory, clerk, service]}
+    multipliers: {stats: {happiness: 0.8}}
+    title: "ฝันที่เก็บไว้ในลิ้นชัก"
+    text: "อายุ {อายุ} นั่งทำงานเดิมมาหลายปี คืนหนึ่ง{ชื่อ}เปิดสมุดเก่าเจอแผนร้านขนมที่วาดไว้สมัยเรียน ใจเต้นแรงจนนอนไม่หลับ"
+    choices:
+      - id: quit_for_dream
+        text: "ลาออกเปิดร้านขนมพรุ่งนี้เลย"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.4}}, text: "เพื่อนช่วยกันแชร์ ขนมสูตรตัวเองขายหมดทุกวัน ได้เป็นเจ้าของร้านสมใจ", effects: {job: service, happiness: 3}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ครึ่งปีแรกขายไม่ออก เงินเก็บใกล้หมด ขนมเหลือทิ้งทุกเย็น", effects: {job: service, money: {unit: income_x, amount: -1.5}, happiness: -2}, next: career_dream_crossroad_01, merit: [{cat: neutral}]}
+      - id: side_hustle
+        text: "ทำงานเดิมควบทำขนมขายตอนเย็น"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "รายได้เสริมงอกเงย ลูกค้าประจำเริ่มสั่งล่วงหน้า", effects: {income_mult: 1.15, health: -1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อดนอนจนหลับในที่ทำงาน หัวหน้าเรียกตักเตือน", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+      - {id: save_five_years, text: "เก็บเงินอีกห้าปีค่อยว่ากัน", effects: {happiness: -1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+      - {id: give_recipe, text: "ยกสูตรให้น้องที่บ้านไปทำแทน", effects: {relations: 2, happiness: 1}, merit: [{cat: dana, level: 1}]}
+
+  - id: career_dream_crossroad_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "ทางแยกหน้าร้าน"
+    text: "เหลือเงินพอจ่ายค่าเช่าอีกเดือนเดียว เจ้าของตึกเริ่มถาม คนปล่อยกู้ปากซอยแวะมายื่นนามบัตรพร้อมรอยยิ้ม"
+    choices:
+      - text: "กู้นอกระบบมาสู้ต่อ"
+        effects: {debt: {kind: informal, amount: {unit: income_x, amount: 1}}}
+        sets_flags: [loan_shark]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ลูกค้าบอกกันปากต่อปาก คิวยาวถึงปากซอย ร้านรอดแบบเฉียดฉิว", effects: {income_mult: 1.3, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ร้านปิดอยู่ดี เหลือแต่หนี้ดอกรายวันกับเตาอบมือสอง", effects: {happiness: -3, income_mult: 0.8}, merit: [{cat: neutral}]}
+      - {text: "ปิดร้าน กลับไปสมัครงานประจำ", effects: {income_mult: 0.9, happiness: -1}, merit: [{cat: neutral}]}
+      - {text: "ย้ายไปขายตามตลาดนัดแทน", effects: {happiness: 1, income_mult: 0.95}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+      - {text: "กลับบ้านขอพ่อแม่ช่วยทุน", effects: {relations: -1, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+
+  - id: career_transfer_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 7, max: 2}
+    when: {occupation: [clerk, technician, professional, manager]}
+    multipliers: {flags: {married: 1.2}}
+    title: "คำสั่งย้ายด่วน"
+    text: "ประกาศติดบอร์ดเช้าวันจันทร์ ชื่อ{ชื่อ}อยู่บรรทัดแรก ย้ายไปประจำสาขา{จังหวัด} มีผลต้นเดือนหน้า"
+    choices:
+      - id: go_alone
+        text: "ไปตามคำสั่ง ลองดูสักตั้ง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "สาขาเล็กแต่งานเห็นผลไว ผู้บริหารจับตา ได้ขึ้นเงินเดือนก่อนเพื่อนรุ่นเดียวกัน", effects: {income_mult: 1.2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เหงาจนต้องกินเหล้าทุกคืน คนที่บ้านเริ่มห่างเหิน", effects: {happiness: -2, relations: -2, health: -1}, merit: [{cat: intoxicants, level: 1}]}
+          - {weight: 1, ok: true, text: "เจ้าของกิจการท้องถิ่นชอบฝีมือ ชวนออกมาร่วมกิจการด้วยกัน", effects: {income_mult: 1.4, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
+      - id: move_family
+        text: "ขนครอบครัวไปด้วยกันทั้งบ้าน"
+        effects: {relations: 2, money: {unit: income_x, amount: -1}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: pull_strings
+        text: "ใช้เส้นสายขอยกเลิกคำสั่ง"
+        requires: {stats: {network: {min: 50}}, reason: "ยังไม่มีคนรู้จักพอจะช่วยได้"}
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.5}}, text: "ผู้ใหญ่โทรศัพท์สายเดียว คำสั่งถูกเปลี่ยนเป็นชื่อคนอื่น", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เรื่องรั่วถึงหูผู้บริหาร โดนย้ายไกลกว่าเดิมแถมถูกลดขั้น", effects: {income_mult: 0.85, happiness: -2}, merit: [{cat: neutral}]}
+      - id: resign_transfer
+        text: "ลาออก หางานใหม่ใกล้บ้าน"
+        effects: {job: service, relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: career_lead_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {occupation: [clerk, technician, professional]}
+    multipliers: {stats: {network: 1.4}, flags: {good_student: 1.3}}
+    title: "เก้าอี้ที่ว่างลง"
+    text: "หัวหน้าแผนกลาออกกะทันหัน ผู้บริหารเรียก{ชื่อ}เข้าห้อง ถามสั้น ๆ ว่าพร้อมคุมคนยี่สิบคนหรือยัง"
+    choices:
+      - id: take_manager
+        text: "รับตำแหน่งผู้จัดการ"
+        requires: {edu: อุดมศึกษา, reason: "ตำแหน่งนี้ต้องจบปริญญาตรี"}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, multipliers: {stats: {network: 1.4, relations: 1.2}}, text: "ลูกน้องยอมรับ ทีมทำยอดทะลุเป้าตั้งแต่ไตรมาสแรก", effects: {job: manager, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้ตำแหน่งแต่ลูกน้องรุ่นพี่ไม่ยอมรับ เริ่มรวมหัวกันต่อต้าน", effects: {job: manager, happiness: -2, health: -1}, next: career_lead_mutiny_01, merit: [{cat: neutral}]}
+      - id: team_lead_only
+        text: "ขอคุมทีมเล็กไปก่อน"
+        effects: {income_mult: 1.15, network: 1}
+        merit: [{cat: neutral}]
+      - id: give_seat
+        text: "เสนอชื่อเพื่อนที่เหมาะกว่า"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: push_hard
+        text: "รับเลย แล้วบีบลูกน้องทำยอด"
+        requires: {edu: อุดมศึกษา, reason: "ตำแหน่งนี้ต้องจบปริญญาตรี"}
+        merit: [{cat: oppress_subjects, level: 2}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ยอดพุ่ง ผู้บริหารปลื้ม แต่ในทีมไม่มีใครยิ้มให้อีก", effects: {job: manager, relations: -2}, merit: [{cat: oppress_subjects, level: 1}]}
+          - {weight: 2, text: "ลูกน้องลาออกยกทีมในเดือนเดียว ถูกถอดจากตำแหน่งกลางที่ประชุม", effects: {happiness: -3, income_mult: 0.85, relations: -1}, merit: [{cat: neutral}]}
+
+  - id: career_lead_mutiny_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "จดหมายร้องเรียนบนโต๊ะ"
+    text: "เช้าวันศุกร์ HR ยื่นซองให้ ข้างในเป็นหนังสือร้องเรียนที่ลูกน้องเซ็นชื่อกันเต็มหน้า ผู้บริหารให้เวลาแก้ปัญหาหนึ่งเดือน"
+    choices:
+      - text: "เลี้ยงข้าวทีม เปิดใจคุยทีละคน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, multipliers: {stats: {relations: 1.4}}, text: "รุ่นพี่หัวโจกยอมเล่าเรื่องที่อัดอั้น ทีมกลับมาเหนียวแน่นกว่าเดิม", effects: {relations: 2, happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุยไม่รู้เรื่อง ลูกน้องเอาไปเล่าลือจนทั้งบริษัทรู้", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+      - {text: "ไล่หัวโจกออกให้เข็ด", effects: {relations: -2, happiness: 1}, merit: [{cat: unjust_judgment, level: 2}]}
+      - {text: "ขอลงจากตำแหน่งเอง", effects: {income_mult: 0.85, health: 1, happiness: 1}, merit: [{cat: neutral}]}
+      - {text: "ทำงานหนักให้ดูเป็นตัวอย่าง", effects: {health: -2, relations: 1}, merit: [{cat: neutral}]}
+
+  - id: career_midlife_restart_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {occupation: [factory, clerk, technician, manager, professional]}
+    multipliers: {flags: {took_bribe: 1.5, caught_fraud: 2}}
+    title: "เริ่มนับหนึ่งตอนห้าสิบ"
+    text: "บริษัทปรับโครงสร้าง ชื่อ{ชื่อ}วัย {อายุ} อยู่ในรายชื่อชุดแรก ใบสมัครงานที่ยื่นไปสิบกว่าแห่งเงียบกริบ เพราะทุกที่อยากได้คนอายุน้อยกว่า"
+    choices:
+      - id: drive_hire
+        text: "ขับรถรับจ้างไปก่อน"
+        effects: {job: labor, happiness: -1, health: -1}
+        merit: [{cat: neutral}]
+      - id: learn_craft
+        text: "ไปเรียนช่างใหม่ตั้งแต่ศูนย์"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "มือยังไวกว่าที่คิด รับงานซ่อมจนคิวเต็มทุกสุดสัปดาห์", effects: {job: craft, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เรียนจบแต่ไม่มีใครกล้าจ้างช่างมือใหม่วัยนี้", effects: {job: labor, money: {unit: income_x, amount: -1}, happiness: -2}, merit: [{cat: neutral}]}
+      - id: severance_shop
+        text: "เอาเงินชดเชยเปิดร้านอาหาร"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "สูตรแกงของแม่ขายดีเกินคาด ลูกค้าต่อคิวตั้งแต่สิบโมง", effects: {job: service, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ร้านเปิดผิดทำเล ขาดทุนจนเงินชดเชยหมดในปีเดียว", effects: {job: labor, money: {unit: income_x, amount: -2.5}, happiness: -2}, sets_flags: [own_business], merit: [{cat: neutral}]}
+      - id: call_old_friend
+        text: "โทรหาคนรู้จักเก่าทุกคน"
+        requires: {stats: {network: {min: 50}}, reason: "คนรู้จักยังน้อยเกินไป"}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.6}}, text: "ลูกน้องที่เคยช่วยไว้เมื่อสิบปีก่อน ตอนนี้เป็นเจ้าของบริษัท รับเข้าทำงานทันที", effects: {job: clerk, happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทุกคนบอกว่าจะช่วยดู แล้วก็หายเงียบ สุดท้ายต้องรับจ้างรายวัน", effects: {job: labor, happiness: -1}, merit: [{cat: neutral}]}
+
+  - id: career_factory_tech_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {occupation: [factory]}
+    title: "เครื่องจักรตัวที่สาม"
+    text: "เครื่องจักรในไลน์ผลิตดับกลางกะดึก ช่างประจำลาป่วย หัวหน้ากะหันมามอง{ชื่อ}ซึ่งแอบดูช่างซ่อมมาหลายปี"
+    choices:
+      - id: fix_it
+        text: "ลงมือซ่อมเองเลย"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.2}}, text: "เครื่องติดภายในสิบนาที หัวหน้าตั้งให้เป็นช่างซ่อมประจำโรงงาน ได้ขึ้นเงินเดือน", effects: {income_mult: 1.2, happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "สายไฟช็อตจนเครื่องพังหนัก ถูกหักเงินเดือนชดใช้", effects: {money: {unit: income_x, amount: -1}, health: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: night_vocational
+        text: "ลงเรียนช่างภาคค่ำ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "เรียนหลังเลิกงานสองปี ได้เพื่อนช่างเต็มรุ่น ขึ้นเงินเดือนตามฝีมือ", effects: {knowledge: 2, network: 2, income_mult: 1.15}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เหนื่อยสะสมจนเป็นโรคกระเพาะ ต้องพักเรียนกลางคัน", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+      - id: apply_technician
+        text: "สอบเลื่อนเป็นช่างเทคนิค"
+        requires: {edu: อาชีวะ, reason: "ต้องมีวุฒิอาชีวะ"}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "สอบผ่านอันดับหนึ่ง ได้ย้ายจากไลน์ผลิตไปห้องซ่อมบำรุง", effects: {job: technician, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตำแหน่งตกเป็นของหลานผู้จัดการ ทั้งที่คะแนนแพ้", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - {id: stay_ot, text: "ไม่เสี่ยง ทำโอทีต่อไป", effects: {money: {unit: income_x, amount: 0.5}, health: -1}, merit: [{cat: neutral}]}
+
+  - id: career_farm_city_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {occupation: [farmer, labor]}
+    multipliers: {occupation: {farmer: 1.5}}
+    title: "รถทัวร์เที่ยวสุดท้าย"
+    text: "ฝนแล้งปีที่สาม นาที่{จังหวัด}แตกระแหง เพื่อนที่เข้าเมืองไปก่อนโทรมาบอกว่ามีงานรอ ถ้ามาทันรถทัวร์คืนนี้"
+    choices:
+      - id: factory_job
+        text: "เข้าโรงงานนิคมกับเพื่อน"
+        requires: {edu: มัธยม, reason: "โรงงานรับวุฒิ ม.3 ขึ้นไป"}
+        effects: {job: factory, relations: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: construction
+        text: "รับจ้างไซต์ก่อสร้าง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "งานหนักแต่ได้เงินสด ส่งกลับบ้านได้ทุกเดือน", effects: {job: labor, money: {unit: income_x, amount: 0.5}, health: -1}, merit: [{cat: care_parents, level: 1}]}
+          - {weight: 1, text: "นั่งร้านพังใส่ ขาหักต้องกลับบ้านมือเปล่า", effects: {health: -3, chronic: {health: -1}}, merit: [{cat: neutral}]}
+      - id: street_stall
+        text: "ตั้งแผงส้มตำหน้าตลาด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "รสมือบ้านนาถูกปากคนเมือง แผงเล็กกลายเป็นร้านประจำซอย", effects: {job: service, happiness: 2}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 2, text: "โดนไล่ที่สามรอบในเดือนเดียว ทุนที่ติดตัวมาหมดเกลี้ยง", effects: {money: {unit: income_x, amount: -0.5}, happiness: -2}, merit: [{cat: neutral}]}
+      - id: stay_farm
+        text: "อยู่บ้าน เปลี่ยนมาปลูกผักขาย"
+        merit: [{cat: care_parents, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ผักปลอดสารขายดีจนแม่ค้าในเมืองมารับถึงสวน", effects: {income_mult: 1.3, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ฝนไม่มาอีกปี ผักตายทั้งแปลง", effects: {income_mult: 0.8, happiness: -1}, merit: [{cat: neutral}]}
+
+  - id: career_nepotism_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {occupation: [farmer, labor, factory, craft, service]}
+    multipliers: {stats: {network: 1.5}, class: {ร่ำรวย: 1.3}}
+    title: "ตั๋วช้าง"
+    text: "ญาติผู้ใหญ่ที่นั่งตำแหน่งสูงกระซิบว่า มีเก้าอี้ว่างหนึ่งที่ ถ้าอยากได้ ชื่อคนที่สอบได้ที่หนึ่งจะหายไปจากประกาศเอง"
+    choices:
+      - id: take_seat
+        text: "รับตำแหน่งที่ญาติฝาก"
+        requires: {edu: อาชีวะ, reason: "ตำแหน่งนี้ต้องมีวุฒิอาชีวะขึ้นไป"}
+        sets_flags: [took_bribe]
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ได้นั่งโต๊ะทำงานสบาย เงินเดือนดี ไม่มีใครกล้าถามที่มา", effects: {job: clerk, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนที่ถูกเบียดร้องเรียนจนมีการสอบสวน ถูกไล่ออกพร้อมข่าวฉาว", effects: {job: labor, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: pay_bribe
+        text: "จ่ายใต้โต๊ะซื้อเก้าอี้ผู้จัดการ"
+        requires: {edu: อุดมศึกษา, reason: "เก้าอี้นี้ต้องจบปริญญาตรี"}
+        effects: {money: {unit: income_x, amount: -2}}
+        sets_flags: [took_bribe]
+        merit: [{cat: greed_harm, level: 3}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เงินก้อนนั้นซื้อเก้าอี้ได้จริง ได้เป็นผู้จัดการทั้งที่ไม่เคยคุมใคร", effects: {job: manager}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "คนกลางหอบเงินหนีหายไปทั้งก้อน แจ้งความก็ไม่ได้เพราะตัวเองผิดด้วย", effects: {happiness: -3}, merit: [{cat: neutral}]}
+      - id: sit_exam
+        text: "สอบเองตามระบบ"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.2}}, text: "สอบติดด้วยตัวเอง เดินเข้าที่ทำงานใหม่แบบหลังตรง", effects: {income_mult: 1.15, happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "สอบตกห่างไปคะแนนเดียว ญาติส่ายหัวว่าไม่รู้จักใช้โอกาส", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+      - id: refuse_report
+        text: "ปฏิเสธ แล้วเตือนคนที่สอบได้"
+        effects: {relations: -2, network: -1, happiness: 1}
+        merit: [{cat: help_others, level: 2}]

@@ -23,19 +23,19 @@ events:
       - id: herbal_home
         text: "ต้มบอระเพ็ดให้กิน นอนพักที่บ้าน"
         outcomes:
-          - {weight: 2, text: "ไข้ลดเอง ยายภูมิใจในสูตรยาหม้อไปอีกสิบปี", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ไข้ลดเอง ยายภูมิใจในสูตรยาหม้อไปอีกสิบปี", effects: {happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "วันที่สี่ไข้ลดแต่ช็อก หามส่งห้องฉุกเฉินกลางดึก รอดหวุดหวิด", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: shop_pill
         text: "ซื้อยาแก้ปวดร้านชำให้กิน"
         outcomes:
-          - {weight: 1, text: "คนขายยาถามอาการแล้วเปลี่ยนยาให้ทันก่อนเลือดออก", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "คนขายยาถามอาการแล้วเปลี่ยนยาให้ทันก่อนเลือดออก", effects: {health: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ยาผิดตัว เลือดกำเดาไหลไม่หยุด ต้องนอนโรงพยาบาลเป็นอาทิตย์", effects: {health: -2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: kill_larvae
         text: "ไป รพ. แล้วชวนทั้งซอยคว่ำโอ่ง"
         outcomes:
-          - {weight: 2, text: "เดินเคาะประตูทั้งซอยจนขาลาก แต่ปีนั้นไม่มีใครในซอยป่วยอีกเลย", effects: {health: 1, relations: 2, happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: help_others, level: 1}], multipliers: {stats: {relations: 2}}}
+          - {weight: 2, ok: true, text: "เดินเคาะประตูทั้งซอยจนขาลาก แต่ปีนั้นไม่มีใครในซอยป่วยอีกเลย", effects: {health: 1, relations: 2, happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: help_others, level: 1}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "เพื่อนบ้านหาว่ายุ่งไม่เข้าเรื่อง โอ่งไม่มีใครคว่ำ แถมโดนนินทาไปทั้งซอย", effects: {health: 1, relations: -1, happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
 
@@ -62,7 +62,7 @@ events:
       - id: lung_check
         text: "พาไปเอกซเรย์ปอดให้ชัวร์"
         outcomes:
-          - {weight: 2, text: "ปอดสะอาด หมอชมว่าลุงช่วยได้ไวมาก", effects: {money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ปอดสะอาด หมอชมว่าลุงช่วยได้ไวมาก", effects: {money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เจอปอดอักเสบจากน้ำคลองแต่เนิ่น ๆ ฉีดยาไม่กี่วันก็หาย", effects: {health: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: thank_uncle
@@ -72,7 +72,7 @@ events:
       - id: let_play
         text: "เด็กก็งี้ ปล่อยเล่นน้ำต่อ"
         outcomes:
-          - {weight: 1, text: "ตกบ่อยจนว่ายเป็นเอง กลายเป็นเจ้าแห่งคลองประจำซอย", effects: {health: 1, happiness: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ตกบ่อยจนว่ายเป็นเอง กลายเป็นเจ้าแห่งคลองประจำซอย", effects: {health: 1, happiness: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
           - {weight: 2, text: "อาทิตย์ต่อมาจมซ้ำที่เดิม รอบนี้ไม่มีใครอยู่ใกล้ ลอยไปติดตอม่อถึงรอด", effects: {health: -3, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -89,7 +89,7 @@ events:
       - id: folk_bonesetter
         text: "พาไปหมอต่อกระดูกพื้นบ้าน"
         outcomes:
-          - {weight: 2, text: "น้ำมันสมุนไพรกับเฝือกไม้ไผ่ หายดีในเดือนเดียว", effects: {health: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "น้ำมันสมุนไพรกับเฝือกไม้ไผ่ หายดีในเดือนเดียว", effects: {health: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "กระดูกติดเบี้ยวนิด ๆ ยกแขนสุดไม่ได้ แต่ดันโยนลูกเปตองแม่นผิดคน", effects: {health: -2, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: hospital_cast
@@ -108,7 +108,7 @@ events:
         text: "ปีนเก่งขนาดนี้ ส่งไปยิมนาสติก"
         requires: {stats: {health: {min: 60}}, reason: "ร่างกายยังไม่แข็งแรงพอ"}
         outcomes:
-          - {weight: 1, text: "ครูพละตาลุก ได้ติดทีมโรงเรียน ถ้วยรางวัลเต็มตู้", effects: {health: 1, happiness: 2}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
+          - {weight: 1, ok: true, text: "ครูพละตาลุก ได้ติดทีมโรงเรียน ถ้วยรางวัลเต็มตู้", next: child_gym_team_01, effects: {health: 1, happiness: 2}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "ซ้อมวันแรกล้มทับแขนข้างเดิม หักซ้ำจุดเดิม", effects: {health: -2, happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -133,13 +133,13 @@ events:
       - id: measles_party
         text: "ให้ติดจากเพื่อนซะ จะได้จบ ๆ"
         outcomes:
-          - {weight: 1, text: "ผื่นขึ้นสามวันแล้วหาย ข้างบ้านยกให้เป็นเด็กดวงแข็ง", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ผื่นขึ้นสามวันแล้วหาย ข้างบ้านยกให้เป็นเด็กดวงแข็ง", effects: {health: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "หัดลงปอด นอนโรงพยาบาลจนเกือบไม่รอด ปอดไม่เหมือนเดิมอีกเลย", effects: {health: -3, chronic: {health: -1}, money: {unit: income_x, amount: -0.5}}, sets_flags: [weak_lungs], schedules: [{event: child_lungs_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: rally_parents
         text: "ชวนผู้ปกครองทั้งห้องไปฉีดด้วยกัน"
         outcomes:
-          - {weight: 2, text: "โทรตามทีละบ้านจนเหนื่อย แต่ห้องนี้ไม่มีใครติดหัดอีกเลย", effects: {health: 1, relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}], multipliers: {stats: {relations: 2}}}
+          - {weight: 2, ok: true, text: "โทรตามทีละบ้านจนเหนื่อย แต่ห้องนี้ไม่มีใครติดหัดอีกเลย", effects: {health: 1, relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "โดนผู้ปกครองสายต้านวัคซีนด่ากลางกลุ่มแชต ลูกโดนเพื่อนเมินไปพักใหญ่", effects: {health: 1, relations: -2, happiness: -1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
 
@@ -165,13 +165,13 @@ events:
       - id: wait_adult_teeth
         text: "ช่างมัน เดี๋ยวฟันแท้ก็ขึ้น"
         outcomes:
-          - {weight: 1, text: "ฟันน้ำนมหลุดเอง ฟันแท้ขึ้นมาขาวสวยราวปาฏิหาริย์", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ฟันน้ำนมหลุดเอง ฟันแท้ขึ้นมาขาวสวยราวปาฏิหาริย์", effects: {happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ฟันแท้ผุตามติด ๆ ปวดจนเรียนไม่รู้เรื่องไปทั้งเทอม", effects: {health: -2, knowledge: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: sell_candy
         text: "ให้เอาลูกอมไปขายที่โรงเรียน"
         outcomes:
-          - {weight: 2, text: "ขายดีจนเสียดายกำไร ไม่กล้ากินเองอีกเลย", effects: {knowledge: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}], multipliers: {stats: {knowledge: 2}}}
+          - {weight: 2, ok: true, text: "ขายดีจนเสียดายกำไร ไม่กล้ากินเองอีกเลย แต่ข่าวลือเริ่มไปถึงหูครู", next: child_candy_shop_01, effects: {knowledge: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}], multipliers: {stats: {knowledge: 2}}}
           - {weight: 1, text: "ขายไม่ออก เลยกินเองหมดถุง ฟันผุเพิ่มอีกสองซี่", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: brush_nightly
@@ -201,19 +201,19 @@ events:
       - id: swim_lungs
         text: "ให้ว่ายน้ำฝึกปอด"
         outcomes:
-          - {weight: 2, text: "ปอดแข็งแรงขึ้นจนลืมไปเลยว่าเคยหอบ ได้เหรียญว่ายน้ำมาด้วย", effects: {health: 2}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ปอดแข็งแรงขึ้นจนลืมไปเลยว่าเคยหอบ ได้เหรียญว่ายน้ำมาด้วย", effects: {health: 2}, sets_flags: [sporty], merit: [{cat: neutral}]}
           - {weight: 1, text: "กลิ่นคลอรีนในสระกระตุ้นหอบหนักกว่าเดิม ต้องเลิกกลางคัน", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: grandma_remedy
         text: "ต้มยาหม้อตามสูตรยาย"
         outcomes:
-          - {weight: 1, text: "อาการเบาลงจริง ไม่มีใครรู้ว่าเพราะยาหรือเพราะหน้าหนาวหมด", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "อาการเบาลงจริง ไม่มีใครรู้ว่าเพราะยาหรือเพราะหน้าหนาวหมด", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ไม่ดีขึ้นเลย หอบติดตัวเป็นโรคประจำตัวไปอีกนาน", effects: {health: -1, chronic: {health: -1}}, sets_flags: [weak_lungs], schedules: [{event: child_lungs_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: wait_outgrow
         text: "รอโตก่อน เดี๋ยวก็หายเอง"
         outcomes:
-          - {weight: 1, text: "พอโตขึ้นอีกหน่อยก็หายเกลี้ยง เหมือนหมอพูดเกินจริง", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "พอโตขึ้นอีกหน่อยก็หายเกลี้ยง เหมือนหมอพูดเกินจริง", effects: {health: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "หอบหนักกลางดึก ต้องพ่นยาในห้องฉุกเฉิน", effects: {health: -2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -240,16 +240,75 @@ events:
       - id: swim_team
         text: "ส่งเข้าชมรมว่ายน้ำฝึกปอด"
         outcomes:
-          - {weight: 1, text: "ปีเดียวปอดแข็งแรงกว่าเด็กทั้งห้อง ครูดึงเข้าทีมโรงเรียน", effects: {health: 1, chronic: {health: 1}}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {flags: {sporty: 2}}}
+          - {weight: 1, ok: true, text: "ปีเดียวปอดแข็งแรงกว่าเด็กทั้งห้อง ครูดึงเข้าทีมโรงเรียน", effects: {health: 1, chronic: {health: 1}}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {flags: {sporty: 2}}}
           - {weight: 1, text: "หอบกลางสระจนครูต้องกระโดดลงไปช่วย ต้องเลิกว่ายไปเลย", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: herbal_again
         text: "กลับไปพึ่งยาหม้อสูตรเดิม"
         outcomes:
-          - {weight: 1, text: "หน้าหนาวปีนี้ฝุ่นน้อย อาการเลยซาไปเองแบบไม่มีใครอธิบายได้", effects: {happiness: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "หน้าหนาวปีนี้ฝุ่นน้อย อาการเลยซาไปเองแบบไม่มีใครอธิบายได้", effects: {happiness: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "หอบหนักจนต้องเข้าห้องฉุกเฉินสองรอบในเดือนเดียว", effects: {health: -2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: live_with_it
         text: "ปล่อยให้ใช้ชีวิตปกติ ไม่ห้ามอะไร"
         effects: {health: -1, happiness: 2}
         merit: [{cat: neutral}]
+
+  # ตอนต่อของสาย next (ยิมนาสติกรุ่ง / ขายลูกอมรุ่ง) — ไม่อยู่ในกองสุ่ม เข้าผ่าน next เท่านั้น
+  - id: child_gym_team_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    title: "โค้ชจังหวัดมาจับตัว"
+    text: "แข่งจบไม่ทันข้ามวัน โค้ชทีมจังหวัดมาเคาะประตูบ้าน ขอตัวไปเข้าค่ายเก็บตัว ซ้อมทุกเย็นจนค่ำ เสาร์อาทิตย์ไม่ได้กลับบ้าน"
+    choices:
+      - id: join_camp
+        text: "ไปค่ายเลย ล่าเหรียญให้ได้"
+        outcomes:
+          - {weight: 1, ok: true, text: "คว้าเหรียญทองกีฬานักเรียน รูปขึ้นบอร์ดหน้าโรงเรียน ทั้งตำบลรู้จักชื่อ", effects: {health: 1, happiness: 2, network: 2, money: {unit: income_x, amount: -0.2}}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
+          - {weight: 1, text: "ซ้อมหนักจนข้อเท้าพลิกก่อนแข่งสามวัน นั่งดูเพื่อนรับเหรียญจากข้างสนาม", effects: {health: -2, happiness: -2, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: school_only
+        text: "ซ้อมแค่ในโรงเรียนก็พอ"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: quit_for_books
+        text: "เลิกกีฬา กลับมาตั้งใจเรียน"
+        effects: {knowledge: 1, happiness: -2}
+        merit: [{cat: neutral}]
+      - id: give_spot
+        text: "ยกที่ให้เพื่อนที่บ้านจนกว่า"
+        outcomes:
+          - {weight: 2, ok: true, text: "เพื่อนไปคว้าเหรียญกลับมา แม่เพื่อนเอาข้าวต้มมัดมาให้ทุกวันพระไปอีกหลายปี", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 1, text: "เพื่อนทนซ้อมไม่ไหว หนีกลับบ้านกลางค่าย โค้ชเลยไม่กลับมาหาใครอีก", effects: {relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: child_candy_shop_01
+    type: A
+    category: work_money
+    stage: เด็ก
+    years: [2500, 2650]
+    title: "ครูเรียกพบเรื่องลูกอม"
+    text: "แผงลูกอมใต้โต๊ะขายดีจนเพื่อนต่อคิวถึงหน้าห้อง ครูฝ่ายปกครองยืนกอดอกรออยู่ที่ประตู ถามคำเดียวว่าจะเลิกหรือจะดื้อต่อ"
+    choices:
+      - id: ask_fair_booth
+        text: "ขอครูเปิดบูธในงานโรงเรียน"
+        outcomes:
+          - {weight: 2, ok: true, text: "ครูหัวเราะแล้วให้ตั้งโต๊ะงานวันเด็ก ขายหมดเกลี้ยงก่อนเที่ยง ได้ฉายาเถ้าแก่น้อย", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
+          - {weight: 1, text: "ครูไม่ขำด้วย ยึดลูกอมทั้งกล่อง เรียกพ่อแม่มาเซ็นรับทราบ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sell_secretly
+        text: "แอบขายต่อหลังห้องน้ำ"
+        outcomes:
+          - {weight: 1, text: "ตลาดมืดหลังห้องน้ำรุ่งเรือง กระปุกออมสินหนักจนยกไม่ขึ้น", effects: {happiness: 1, money: {unit: income_x, amount: 0.15}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "โดนรุ่นพี่ดักรีดค่าคุ้มครอง แล้วยังโดนครูจับได้ซ้ำ ทัณฑ์บนติดแฟ้มยันจบ", effects: {happiness: -2, relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit_save
+        text: "เลิกขาย หยอดกำไรใส่กระปุก"
+        effects: {relations: 1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: give_kindergarten
+        text: "แจกที่เหลือให้น้องอนุบาล"
+        effects: {happiness: 1, relations: 2}
+        merit: [{cat: dana, level: 1}]

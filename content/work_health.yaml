@@ -5,7 +5,8 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 3
-    multipliers: {flags: {sporty: 0.5}}
+    when: {occupation: [clerk, professional, manager, technician]}
+    multipliers: {flags: {sporty: 0.5}, occupation: {clerk: 1.5, professional: 1.2}}
     title: "คอแข็งเป็นหิน"
     text: "อายุ {อายุ} นั่งหน้าจอวันละสิบสองชั่วโมง เช้านี้หันคอไปทางซ้ายไม่ได้ นิ้วชาไปถึงข้อศอก เพื่อนโต๊ะข้าง ๆ บอกว่าเป็นกันทั้งออฟฟิศ"
     choices:
@@ -20,14 +21,14 @@ events:
       - id: roadside_massage
         text: "ลองหมอนวดจับเส้นข้างตลาด"
         outcomes:
-          - {weight: 2, text: "กดจุดเดียวคอกลับมาหมุนได้ เหมือนปาฏิหาริย์", effects: {health: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
+          - {weight: 2, ok: true, text: "กดจุดเดียวคอกลับมาหมุนได้ เหมือนปาฏิหาริย์", effects: {health: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "เส้นพลิก ต้องใส่เฝือกคอเดินไปทำงานสองเดือน", effects: {health: -2, chronic: {health: -1}, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: ergonomic_chair
         text: "ซื้อเก้าอี้เพื่อสุขภาพราคาแพง"
         effects: {money: {unit: income_x, amount: -0.5}}
         outcomes:
-          - {weight: 1, text: "นั่งแล้วหลังตรงเอง ปวดคอหายไปภายในเดือนเดียว", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "นั่งแล้วหลังตรงเอง ปวดคอหายไปภายในเดือนเดียว", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "สุดท้ายเก้าอี้กลายเป็นที่แขวนเสื้อ คอยังแข็งเหมือนเดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: quit_desk
@@ -56,13 +57,13 @@ events:
       - id: bone_healer
         text: "ไปหมอต่อกระดูกพื้นบ้าน"
         outcomes:
-          - {weight: 1, text: "กระดูกติดสนิท หมอชาวบ้านไม่คิดเงินสักบาท", effects: {health: 2, relations: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.5}}
+          - {weight: 1, ok: true, text: "กระดูกติดสนิท หมอชาวบ้านไม่คิดเงินสักบาท แถมกวักมือเรียกคุณเข้าไปคุยหลังบ้าน", effects: {health: 2, relations: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.5}, next: workh_bone_healer_call_01}
           - {weight: 2, text: "กระดูกติดเบี้ยว เดินกะเผลกไปอีกนาน", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: sue_driver
         text: "ฟ้องเรียกค่าเสียหายเต็มที่"
         outcomes:
-          - {weight: 2, text: "ศาลสั่งจ่ายค่ารักษาและค่าขาดรายได้ครบทุกบาท", effects: {money: {unit: income_x, amount: 0.8}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ศาลสั่งจ่ายค่ารักษาและค่าขาดรายได้ครบทุกบาท", effects: {money: {unit: income_x, amount: 0.8}, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "คู่กรณีไม่มีอะไรให้ยึด เสียค่าทนายฟรี ๆ", effects: {money: {unit: income_x, amount: -0.5}, happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: forgive_driver
@@ -77,13 +78,15 @@ events:
     years: [2500, 2650]
     weight: 2
     repeat: {gap: 6, max: 3}
+    when: {occupation: [clerk, professional, manager, technician, service]}
+    multipliers: {occupation: {manager: 1.5, professional: 1.3}}
     title: "ไฟมอดกลางประชุม"
     text: "กลางประชุมเช้าวันจันทร์ น้ำตาคุณไหลออกมาเองโดยไม่รู้ตัว นอนไม่หลับมาสามเดือน เห็นชื่อหัวหน้าเด้งในแชตแล้วใจสั่น"
     choices:
       - id: vent_online
         text: "ระบายลงโซเชียลแบบไม่เซ็นเซอร์"
         outcomes:
-          - {weight: 1, text: "โพสต์ไวรัล บริษัทคู่แข่งทักมาชวนไปทำงาน เงินเดือนดีกว่าเดิม", effects: {happiness: 2, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "โพสต์ไวรัลข้ามคืน ยอดแชร์ทะลุแสน กล่องข้อความเด้งไม่หยุด มีทั้งคนให้กำลังใจและบริษัทคู่แข่งทักมาชวนไปทำงาน", effects: {happiness: 2}, merit: [{cat: neutral}], next: workh_viral_offer_01}
           - {weight: 1, text: "หัวหน้าเห็นโพสต์ โดนกดดันจนต้องเขียนใบลาออก", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: grind_bonus
@@ -101,7 +104,7 @@ events:
       - id: transfer_team
         text: "ขอย้ายไปแผนกอื่น"
         outcomes:
-          - {weight: 1, text: "หัวหน้าใหม่ใจดี ทีมน่ารัก ได้ขึ้นเงินเดือนด้วย", effects: {happiness: 2, income_mult: 1.15}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
+          - {weight: 1, ok: true, text: "หัวหน้าใหม่ใจดี ทีมน่ารัก ได้ขึ้นเงินเดือนด้วย", effects: {happiness: 2, income_mult: 1.15}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "หนีเสือปะจระเข้ หัวหน้าใหม่โหดกว่าเดิมสองเท่า", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -129,7 +132,7 @@ events:
       - id: sleep_in_car
         text: "นอนในรถรอให้สร่าง"
         outcomes:
-          - {weight: 2, text: "ตื่นมาคอเคล็ด แต่ทุกอย่างปลอดภัย", effects: {health: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ตื่นมาตอนเช้า รถอยู่ครบ ตัวก็อยู่ครบ รอดมาได้แบบไม่เสียอะไรเลย", effects: {happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ตื่นมากระจกแตก กระเป๋าสตางค์หายเกลี้ยง", effects: {money: {unit: income_x, amount: -0.4}, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: drive_friends
@@ -172,7 +175,7 @@ events:
         text: "รีบยื่นทำประกันสุขภาพ"
         effects: {money: {unit: income_x, amount: -0.4}}
         outcomes:
-          - {weight: 1, text: "บริษัทรับทำประกัน แต่ไม่คุ้มครองโรคตับ", effects: {happiness: 1}, sets_flags: [has_insurance], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "บริษัทรับทำประกัน แต่ไม่คุ้มครองโรคตับ", effects: {happiness: 1}, sets_flags: [has_insurance], merit: [{cat: neutral}]}
           - {weight: 1, text: "ถูกปฏิเสธ เพราะเป็นโรคมาก่อนยื่น", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: weightloss_shot
@@ -187,7 +190,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    multipliers: {flags: {smoker: 3, sporty: 0.7}}
+    multipliers: {flags: {smoker: 3, sporty: 0.7}, occupation: {factory: 1.5, craft: 1.5, farmer: 1.3}}
     title: "ไอไม่หยุดสามเดือน"
     text: "ไอทุกเช้าจนตาแดง ขึ้นบันไดสองชั้นก็หอบ เพื่อนร่วมงานเริ่มขยับโต๊ะหนี ลูกพี่ลูกน้องเพิ่งตรวจเจอจุดที่ปอดเมื่อเดือนก่อน"
     choices:
@@ -195,7 +198,7 @@ events:
         text: "ไปเอกซเรย์ปอดให้รู้ไปเลย"
         effects: {money: {unit: income_x, amount: -0.2}}
         outcomes:
-          - {weight: 3, text: "แค่หลอดลมอักเสบ หมอให้ยาไปกินสองอาทิตย์ก็หาย", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
+          - {weight: 3, ok: true, text: "แค่หลอดลมอักเสบ หมอให้ยาไปกินสองอาทิตย์ก็หาย", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "เจอเงาเล็ก ๆ ที่ปอด ต้องตามตรวจทุกครึ่งปี", effects: {health: -1, happiness: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: quit_cold
@@ -211,7 +214,7 @@ events:
         text: "ไปคลินิกเลิกบุหรี่ของ รพ."
         clears_flags: [smoker]
         outcomes:
-          - {weight: 1, text: "หมอให้ยาช่วยเลิก ครบหกเดือนไม่แตะบุหรี่อีกเลย", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: sila, level: 1}], multipliers: {stats: {happiness: 1.5}}}
+          - {weight: 1, ok: true, text: "หมอให้ยาช่วยเลิก ครบหกเดือนไม่แตะบุหรี่อีกเลย", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: sila, level: 1}], multipliers: {stats: {happiness: 1.5}}}
           - {weight: 1, text: "เลิกได้สามเดือน งานเข้าหนักคืนเดียวก็กลับไปสูบซองละวัน", effects: {happiness: -1}, sets_flags: [smoker], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: switch_vape
@@ -221,4 +224,68 @@ events:
           - {weight: 1, text: "ไอหายไปสองเดือน แล้วกลับมาไอหนักกว่าเดิม", effects: {health: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "โดนตำรวจเรียกตรวจ ยึดของแถมเสียค่าปรับ", effects: {money: {unit: income_x, amount: -0.3}, happiness: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "สูบถี่กว่าเดิมสามเท่า ปอดแย่ลงกว่าเก่า", effects: {health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workh_viral_offer_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ข้อเสนอจากโพสต์ไวรัล"
+    text: "ฝ่ายบุคคลบริษัทคู่แข่งนัดกินกาแฟ ยื่นเงินเดือนมากกว่าเดิมสามสิบเปอร์เซ็นต์ ขณะเดียวกันหัวหน้าก็ทักมาว่า คุยกันหน่อยได้ไหม"
+    choices:
+      - id: jump_ship
+        text: "ย้ายไปบริษัทคู่แข่งทันที"
+        outcomes:
+          - {weight: 2, ok: true, text: "ที่ใหม่ให้ทำงานแค่แปดโมงถึงห้าโมงจริง ๆ นอนหลับยาวครั้งแรกในรอบปี", effects: {happiness: 2, health: 1, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาแค่อยากได้ข่าว ผ่านไปสามเดือนก็ไม่ผ่านทดลองงาน", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: counter_offer
+        text: "เอาข้อเสนอไปต่อรองหัวหน้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวหน้ายอมขึ้นเงินเดือน แถมตัดงานด่วนออกให้ครึ่งหนึ่ง", effects: {happiness: 1, income_mult: 1.15}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้ายิ้มเย็น ๆ แล้วบอกว่า งั้นก็ไปเลย ที่ใหม่ก็เงียบหายไปพอดี", effects: {happiness: -2, money: {unit: income_x, amount: -0.8}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: start_page
+        text: "เปิดเพจเล่าชีวิตมนุษย์เงินเดือน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนตามหลักแสน สปอนเซอร์จ้างรีวิวทุกเดือน กลายเป็นรายได้เสริมงอกเงย", effects: {happiness: 2, network: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กระแสหายในสองอาทิตย์ เหลือคนกดไลก์แค่แม่กับป้า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: delete_post
+        text: "ลบโพสต์ แล้วกลับไปทำงานเงียบ ๆ"
+        effects: {happiness: -1, chronic: {happiness: -1}}
+        merit: [{cat: neutral}]
+
+  - id: workh_bone_healer_call_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ตำราใบลานหลังบ้าน"
+    text: "หมอกระดูกวัยเจ็ดสิบเปิดตำราใบลานให้ดู บอกว่ามือคุณนิ่ง เหมาะจะรับวิชาต่อ ลูกหลานแกไม่มีใครอยากเรียนสักคน"
+    choices:
+      - id: weekend_apprentice
+        text: "ฝากตัวเป็นศิษย์ เรียนวันหยุด"
+        effects: {relations: 1, network: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: full_time_healer
+        text: "ลาออกมาเป็นหมอพื้นบ้าน"
+        effects: {job: service}
+        outcomes:
+          - {weight: 1, ok: true, text: "คนไข้ต่อคิวยาวถึงปากซอย ใครหายแล้วก็หิ้วผลไม้มาฝาก", effects: {relations: 2, happiness: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ต่อกระดูกคนไข้รายแรกเบี้ยว ญาติเขาขู่ฟ้องจนต้องจ่ายค่าทำขวัญ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: offer_teacher_fee
+        text: "ถวายเงินค่าครูแล้วกราบลา"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: dana, level: 1}]
+      - id: film_healer
+        text: "ถ่ายคลิปหมอลงโซเชียล"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนแห่มารักษา หมอยิ้มไม่หุบ ส่งยาหม่องสูตรลับมาให้ทุกปีใหม่", effects: {relations: 1, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เจ้าหน้าที่มาตรวจว่าไม่มีใบอนุญาต หมอโดนสั่งหยุดรักษา มองหน้าคุณไม่ติด", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: just_thanks
+        text: "ขอบคุณ แล้วกลับไปทำงานเดิม"
         merit: [{cat: neutral}]

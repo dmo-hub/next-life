@@ -19,13 +19,13 @@ events:
       - id: spoil
         text: "ตามใจหลานทุกอย่าง"
         outcomes:
-          - {weight: 2, text: "หลานรักคุณสุดหัวใจ ใครแตะไม่ได้", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "หลานรักคุณสุดหัวใจ ใครแตะไม่ได้", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "หลานติดจอ ติดขนม ลูกกลับมาเห็นแล้วทะเลาะกันใหญ่", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: teach_old_way
         text: "สอนหลานแบบคนรุ่นเก่า"
         outcomes:
-          - {weight: 1, text: "หลานโตมาเป็นคนเดียวในรุ่นที่ทำกับข้าวเป็น ไปไหนใครก็รัก", effects: {relations: 2, knowledge: 1, health: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
+          - {weight: 1, ok: true, text: "หลานโตมาเป็นคนเดียวในรุ่นที่ทำกับข้าวเป็น ไปไหนใครก็รัก", effects: {relations: 2, knowledge: 1, health: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 2, text: "หลานเรียกว่า 'คุณครูโหด' แต่ก็ยอมฟัง", effects: {happiness: 1, health: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse_babysit
@@ -51,12 +51,12 @@ events:
         text: "ยกให้คนที่ดูแลมากกว่า"
         outcomes:
           - {weight: 2, text: "คนที่ดูแลซึ้งจนร้องไห้ อีกคนเลิกคุยไปเลย", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ทุกคนยอมรับ เพราะรู้อยู่แล้วว่าใครเหนื่อยที่สุด", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ทุกคนยอมรับ เพราะรู้อยู่แล้วว่าใครเหนื่อยที่สุด", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: give_temple
         text: "ยกให้มูลนิธิทั้งหมด"
         outcomes:
-          - {weight: 2, text: "ลูกช็อกแต่ต้องหันมาดูแลกันเองจริงจัง สุดท้ายสนิทกันขึ้น", effects: {relations: 1, happiness: 2}, merit: [{cat: dana, level: 3}]}
+          - {weight: 2, ok: true, text: "ลูกช็อกแต่ต้องหันมาดูแลกันเองจริงจัง สุดท้ายสนิทกันขึ้น", effects: {relations: 1, happiness: 2}, merit: [{cat: dana, level: 3}]}
           - {weight: 1, text: "ลูกโกรธจนไม่มาเยี่ยมทั้งปี บ้านเงียบจนได้ยินเสียงนาฬิกา", effects: {relations: -3, happiness: -1, health: -1}, merit: [{cat: dana, level: 3}]}
         merit: [{cat: dana, level: 2}]
       - id: spend_it_all
@@ -82,7 +82,7 @@ events:
       - id: give_all
         text: "ให้ไปทั้งก้อน"
         outcomes:
-          - {weight: 1, text: "ลูกตั้งตัวได้ ปีถัดมาส่งเงินกลับมาเลี้ยงทุกเดือน", effects: {relations: 3, happiness: 2, income_mult: 1.3, money: {unit: income_x, amount: -2}}, merit: [{cat: help_others, level: 2}], multipliers: {karma: 1.3}}
+          - {weight: 1, ok: true, text: "ลูกตั้งตัวได้ ปีถัดมาส่งเงินกลับมาเลี้ยงทุกเดือน", effects: {relations: 3, happiness: 2, income_mult: 1.3, money: {unit: income_x, amount: -2}}, merit: [{cat: help_others, level: 2}], multipliers: {karma: 1.3}}
           - {weight: 2, text: "เงินหายไปกับหนี้ก้อนเก่า ลูกยังโทรมาอีก", effects: {happiness: -2, health: -1, income_mult: 0.8, money: {unit: income_x, amount: -2}}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 2}]
       - id: give_half
@@ -92,7 +92,7 @@ events:
       - id: ask_why
         text: "นั่งคุยให้รู้เรื่องก่อน"
         outcomes:
-          - {weight: 2, text: "ลูกยอมเล่าตามจริง สองคนช่วยกันวางแผนใช้หนี้ทีละก้อน", effects: {relations: 2, knowledge: 1, health: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
+          - {weight: 2, ok: true, text: "ลูกยอมเล่าตามจริง สองคนช่วยกันวางแผนใช้หนี้ทีละก้อน", effects: {relations: 2, knowledge: 1, health: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "ลูกงอน วางสายแล้วหายเงียบ", effects: {relations: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse
@@ -125,13 +125,13 @@ events:
       - id: call_grandkid
         text: "โทรถามหลานก่อน"
         outcomes:
-          - {weight: 2, text: "หลานบอกทันทีว่ามิจฉาชีพ แล้วสอนวิธีสังเกตให้อีกชุด", effects: {relations: 1, knowledge: 1}, merit: [{cat: neutral}], sets_flags: [scam_aware], multipliers: {stats: {relations: 2}}}
+          - {weight: 2, ok: true, text: "หลานบอกทันทีว่ามิจฉาชีพ แล้วสอนวิธีสังเกตให้อีกชุด", effects: {relations: 1, knowledge: 1}, merit: [{cat: neutral}], sets_flags: [scam_aware], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "หลานไม่รับสาย ระหว่างรอเกือบกดโอนไปแล้ว มือสั่นทั้งวัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: troll_back
         text: "แกล้งคุยยื้อจนมิจท้อ"
         outcomes:
-          - {weight: 2, text: "คุยยาวชั่วโมงครึ่ง มิจฉาชีพบ่นเหนื่อยแล้ววางเอง คลิปที่หลานอัดไว้ดังทั้งเน็ต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "คุยยาวชั่วโมงครึ่ง มิจฉาชีพบ่นเหนื่อยแล้ววางเอง คลิปที่หลานอัดไว้ดังทั้งเน็ต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "หลงเผลอบอกเลขบัตรไปครึ่งหนึ่ง ต้องวิ่งเปลี่ยนเอกสารทั้งสัปดาห์", effects: {happiness: -1, health: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: warn_village
@@ -145,7 +145,7 @@ events:
     stage: ชรา
     years: [2500, 2650]
     weight: 2
-    multipliers: {flags: {married: 0.8}}
+    multipliers: {flags: {married: 0.8}, occupation: {professional: 1.3, manager: 1.3}}
     title: "เพื่อนเก่าชวนเที่ยว"
     text: "เพื่อนสมัยเรียนที่ไม่เจอกันสามสิบปีทักมา 'แก่แล้วไปเที่ยวกันสักทริปมั้ย ก่อนเดินไม่ไหว'"
     choices:
@@ -153,7 +153,7 @@ events:
         text: "ไปต่างประเทศกันเลย"
         requires: {money: {unit: income_x, amount: 1.5}, reason: "เงินเก็บไม่พอค่าตั๋วต่างประเทศ"}
         outcomes:
-          - {weight: 2, text: "ทริปในฝัน ถ่ายรูปกลับมาอวดได้ทั้งปี", effects: {happiness: 3, relations: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
+          - {weight: 2, ok: true, text: "ทริปในฝัน ถ่ายรูปกลับมาอวดได้ทั้งปี", effects: {happiness: 3, relations: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "ล้มที่สนามบินขาแพลง เที่ยวบนรถเข็นทั้งทริป", effects: {health: -2, happiness: 1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: go_temple_trip
@@ -163,7 +163,7 @@ events:
       - id: reunion_gang
         text: "ไปเพราะอยากเจอแก๊งเก่าครบทีม"
         outcomes:
-          - {weight: 1, text: "มากันครบทุกคน นั่งเล่าเรื่องสมัยเรียนจนเช้า หัวเราะเหมือนวัยรุ่นอีกรอบ", effects: {happiness: 3, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "มากันครบทุกคน นั่งเล่าเรื่องสมัยเรียนจนเช้า หัวเราะเหมือนวัยรุ่นอีกรอบ", effects: {happiness: 3, health: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "แต่ละคนพาหลานมาด้วยห้าคน ทั้งทริปได้คุยกันแค่สิบนาที", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: decline
@@ -179,13 +179,14 @@ events:
     stage: ชรา
     years: [2540, 2650]
     weight: 2
+    multipliers: {occupation: {service: 1.4, craft: 1.2}}
     title: "เรียนสิ่งใหม่ตอนแก่"
     text: "อายุ {อายุ} แล้ว ศูนย์ผู้สูงอายุเปิดคอร์สฟรีหลายอย่าง หลานบอกว่า 'แก่แล้วจะเรียนไปทำไม' ยิ่งพูดยิ่งอยากเรียน"
     choices:
       - id: learn_online_sell
         text: "เรียนขายของออนไลน์"
         outcomes:
-          - {weight: 1, text: "ไลฟ์ขายพริกแกงฝีมือตัวเอง คนดูแน่นทุกคืน กลายเป็นคนดังของตำบล", effects: {happiness: 2, knowledge: 1, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ไลฟ์ขายพริกแกงฝีมือตัวเอง คนดูแน่นทุกคืน กลายเป็นคนดังของตำบล", effects: {happiness: 2, knowledge: 1, income_mult: 1.3}, merit: [{cat: neutral}], next: old_learn_live_shop_01}
           - {weight: 2, text: "ลืมปิดไลฟ์ทั้งคืน คนแห่มาฟังเสียงกรนตัวเองจนยอดวิวพุ่ง", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: learn_dance
@@ -225,13 +226,13 @@ events:
       - id: go_public
         text: "เข้าสถานสงเคราะห์ของรัฐ"
         outcomes:
-          - {weight: 2, text: "เจอเพื่อนรุ่นเดียวกันเพียบ ตั้งวงหมากรุกทุกบ่าย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "เจอเพื่อนรุ่นเดียวกันเพียบ ตั้งวงหมากรุกทุกบ่าย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ห้องรวมเสียงดังทั้งคืน นอนไม่หลับจนทรุด", effects: {health: -2, happiness: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: stay_home
         text: "ยืนกรานอยู่บ้านตัวเอง"
         outcomes:
-          - {weight: 2, text: "ญาติกับเพื่อนบ้านผลัดกันแวะมาดู บ้านกลับมาคึกคัก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
+          - {weight: 2, ok: true, text: "ญาติกับเพื่อนบ้านผลัดกันแวะมาดู บ้านกลับมาคึกคัก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "ลื่นล้มในห้องน้ำตอนอยู่คนเดียว นอนรอจนเช้ากว่าจะมีคนเห็น", effects: {health: -3, happiness: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: share_house
@@ -256,7 +257,7 @@ events:
       - id: reveal_secret
         text: "เล่าความลับตระกูลกลางวง"
         outcomes:
-          - {weight: 1, text: "ญาติสองบ้านที่ไม่คุยกันมาสิบปีกอดกันร้องไห้", effects: {relations: 3, happiness: 2, chronic: {happiness: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ญาติสองบ้านที่ไม่คุยกันมาสิบปีกอดกันร้องไห้", effects: {relations: 3, happiness: 2, chronic: {happiness: 1}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "งานแตก ญาติแยกวงกินข้าวกันคนละมุม", effects: {relations: -2, happiness: -1, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: drink_with_nephews
@@ -293,10 +294,74 @@ events:
       - id: ask_name
         text: "ถามว่าชื่อนั้นคือใคร"
         outcomes:
-          - {weight: 1, text: "เป็นชื่อเพื่อนสมัยเด็กที่ตายไปนาน เรื่องเล่าคืนนั้นทำให้รักกันมากขึ้น", effects: {relations: 2, happiness: 1, health: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "เป็นชื่อแฟนเก่าที่ไม่เคยเล่าให้ฟัง นอนไม่หลับไปทั้งเดือน", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "เป็นชื่อเพื่อนสมัยเด็กที่ตายไปนาน เรื่องเล่าคืนนั้นทำให้รักกันมากขึ้น", effects: {relations: 2, happiness: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อีกฝ่ายอึกอักไม่ยอมตอบ ท่าทางแบบนี้น่าจะเป็นแฟนเก่า นอนไม่หลับไปทั้งเดือน", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}], next: old_spouse_flame_01}
         merit: [{cat: neutral}]
       - id: brain_games
         text: "ชวนเล่นเกมฝึกสมองทุกวัน"
         effects: {knowledge: 1, happiness: 1, health: 1, chronic: {health: 1}}
         merit: [{cat: neutral}]
+
+  - id: old_learn_live_shop_01
+    type: A
+    category: work_money
+    stage: ชรา
+    years: [2540, 2650]
+    title: "ไลฟ์ดังเกินตัว"
+    text: "ออเดอร์พริกแกงล้นจนตำไม่ทัน มีคนทักมาขอซื้อสูตรลับ อีกเจ้าชวนไปออกรายการ ส่วนลูกหลานเริ่มมาป้วนเปี้ยนแถวครกบ่อยผิดปกติ"
+    choices:
+      - id: hire_neighbors
+        text: "จ้างป้าข้างบ้านมาช่วยตำ"
+        outcomes:
+          - {weight: 2, ok: true, text: "ทั้งซอยมีงานทำ เสียงครกดังทั้งวัน กลายเป็นวิสาหกิจเล็ก ๆ ของหมู่บ้าน", effects: {relations: 2, happiness: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 1, text: "ป้าข้างบ้านแอบจดสูตรไปเปิดไลฟ์แข่ง ราคาถูกกว่าครึ่ง", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: sell_recipe
+        text: "ขายสูตรลับก้อนเดียวจบ"
+        effects: {money: {unit: income_x, amount: 2}, happiness: 1, income_mult: 0.8}
+        merit: [{cat: neutral}]
+      - id: give_to_grandkid
+        text: "ยกร้านให้หลานไลฟ์ต่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "หลานทำแพ็กเกจใหม่ ยอดขายพุ่งจนส่งเงินมาให้ทุกเดือน", effects: {relations: 3, happiness: 2, income_mult: 1.2}, merit: [{cat: dana, level: 1}]}
+          - {weight: 1, text: "หลานไลฟ์ได้สามวันแล้วเลิก ลูกค้าบ่นว่ารสไม่เหมือนเดิม", effects: {relations: -1, happiness: -1, income_mult: 0.8}, merit: [{cat: dana, level: 1}]}
+        merit: [{cat: dana, level: 1}]
+      - id: go_on_show
+        text: "ไปออกรายการให้ดังทั้งประเทศ"
+        outcomes:
+          - {weight: 1, ok: true, text: "พูดตรงจนคนดูขำทั้งประเทศ ออเดอร์เข้าวันเดียวเท่าทั้งปี", effects: {happiness: 3, network: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตื่นกล้องพูดผิดพูดถูก คลิปโดนตัดไปล้อทั้งเน็ต อายจนไม่กล้าออกจากบ้าน", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit_live
+        text: "พอแล้ว ขอกลับไปนอนกลางวัน"
+        effects: {health: 2, happiness: 1, income_mult: 0.8}
+        merit: [{cat: neutral}]
+
+  - id: old_spouse_flame_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    title: "ชื่อที่ไม่เคยได้ยิน"
+    text: "ชื่อนั้นยังวนอยู่ในหัว เจอรูปเก่าซ่อนในหีบเสื้อผ้า หลังรูปเขียนชื่อเดียวกัน กับเบอร์บ้านที่ยังโทรติด"
+    choices:
+      - id: call_number
+        text: "แอบโทรไปเบอร์หลังรูป"
+        outcomes:
+          - {weight: 1, ok: true, text: "ปลายสายคือน้องสาวของคนในรูป เล่าว่าคู่เราเคยช่วยชีวิตพี่เขาไว้ ไม่ใช่แฟนเก่าอย่างที่คิด", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปลายสายเป็นคนในรูปเอง ยังจำคู่เราได้ทุกอย่าง เสียงสั่นจนต้องวางสาย", effects: {happiness: -2, health: -1, chronic: {happiness: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_spouse_gently
+        text: "ถามคู่ชีวิตตอนเขาจำได้"
+        outcomes:
+          - {weight: 1, ok: true, text: "คู่หัวเราะ บอกว่าเป็นรักแรกตอนแปดขวบ แล้วจับมือเราแน่น 'แต่คนที่อยู่ด้วยจนแก่คือเธอ'", effects: {relations: 2, happiness: 2, chronic: {happiness: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คู่มองหน้างง ๆ แล้วถามว่า 'เธอเป็นใคร' ใจหายวาบ", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: burn_photo
+        text: "เผารูปทิ้ง ทำเป็นไม่เคยเห็น"
+        effects: {happiness: -1, health: -1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: let_it_go
+        text: "ปล่อยวาง อดีตก็คืออดีต"
+        effects: {happiness: 1, health: 1}
+        merit: [{cat: bhavana, level: 1}]

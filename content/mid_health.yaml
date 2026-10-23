@@ -6,7 +6,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 2
-    multipliers: {flags: {sporty: 0.5, heavy_drinker: 1.5}}
+    multipliers: {flags: {sporty: 0.5, heavy_drinker: 1.5}, occupation: {clerk: 1.3, manager: 1.3, professional: 1.2}}
     title: "น้ำตาลเกินร้อย"
     text: "ตรวจสุขภาพประจำปีตอนอายุ {อายุ} พยาบาลเจาะเลือดซ้ำสองรอบเพราะไม่เชื่อตัวเลข หมอยื่นผลให้แล้วถามว่า ชานมวันละกี่แก้ว"
     choices:
@@ -17,13 +17,13 @@ events:
       - id: pills_and_tea
         text: "กินยาตามหมอ แต่ชานมยังอยู่"
         outcomes:
-          - {weight: 2, text: "ยาเอาอยู่ ค่าน้ำตาลนิ่งแบบงง ๆ", effects: {happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {knowledge: 1.5}}}
+          - {weight: 2, ok: true, text: "ยาเอาอยู่ ค่าน้ำตาลนิ่งแบบงง ๆ", effects: {happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {health: 1.5}}}
           - {weight: 1, text: "ลืมกินยาบ่อย ปลายเท้าเริ่มชาจนเดินเหยียบหนามไม่รู้ตัว", effects: {health: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: line_herb
         text: "ลองสมุนไพรที่ญาติส่งในไลน์"
         outcomes:
-          - {weight: 1, text: "ค่าน้ำตาลลดจริง หมอยังงงจนขอชื่อสมุนไพร", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.4}}
+          - {weight: 1, ok: true, text: "ค่าน้ำตาลลดจริง หมอยังงงจนขอชื่อสมุนไพร", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.4}, next: midh_herb_fame_01}
           - {weight: 3, text: "ไตเริ่มรวน สุดท้ายต้องกลับไปหาหมอพร้อมค่ารักษาก้อนโต", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: weight_camp
@@ -38,7 +38,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 2
-    multipliers: {flags: {smoker: 1.5, heavy_drinker: 1.5, sporty: 0.6}}
+    multipliers: {flags: {smoker: 1.5, heavy_drinker: 1.5, sporty: 0.6}, occupation: {manager: 1.5, clerk: 1.2, professional: 1.2, farmer: 0.5}}
     title: "ตัวเลขที่ร้านขายยา"
     text: "ปวดท้ายทอยมาสามวัน แวะวัดความดันที่ร้านขายยา เภสัชกรมองจอแล้วขอวัดใหม่ทันที รอบสองตัวเลขยิ่งสูงกว่าเดิม"
     choices:
@@ -49,7 +49,7 @@ events:
       - id: cut_salt
         text: "ลดเค็ม เลิกน้ำปลาพริกทุกมื้อ"
         outcomes:
-          - {weight: 2, text: "ลิ้นชินรสจืดภายในเดือนเดียว ความดันลงจริง", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ลิ้นชินรสจืดภายในเดือนเดียว ความดันลงจริง", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ทนได้สามวัน แอบกินส้มตำปลาร้าตอนเที่ยงคืน", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: ignore_it
@@ -59,8 +59,8 @@ events:
           - {weight: 1, text: "ล้มหน้าห้องน้ำตอนตีห้า ตื่นมาอีกทีอยู่ห้องฉุกเฉิน", effects: {health: -3, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: quit_stress_job
-        text: "ลาออกจากงานเครียด ไปปลูกผัก"
-        effects: {health: 1, happiness: 2, income_mult: 0.7, chronic: {health: 1}}
+        text: "ทิ้งงานเครียด หันไปปลูกผักขาย"
+        effects: {health: 1, happiness: 2, job: farmer, chronic: {health: 1}}
         merit: [{cat: neutral}]
 
   - id: midh_cancer_early_01
@@ -69,20 +69,20 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 1
-    multipliers: {flags: {smoker: 2, heavy_drinker: 1.5, sporty: 0.8}}
+    multipliers: {flags: {smoker: 2, heavy_drinker: 1.5, sporty: 0.8}, occupation: {farmer: 1.3, factory: 1.2}}
     title: "ก้อนเล็กที่คลำเจอ"
     text: "หมอเรียกเข้าห้องพร้อมญาติ ก้อนเล็กที่คลำเจอตอนอาบน้ำเป็นเนื้อร้าย ข่าวดีเดียวคือยังระยะแรก เงินเก็บตอนนี้ {เงิน} บาท"
     choices:
       - id: surgery_now
         text: "ผ่าตัดทันที ทุ่มเงินเก็บ"
         outcomes:
-          - {weight: 4, text: "ตัดออกหมด หมอยิ้มกว้างที่สุดในชีวิตที่เคยเห็น", effects: {health: 2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
+          - {weight: 4, ok: true, text: "ตัดออกหมด หมอยิ้มกว้างที่สุดในชีวิตที่เคยเห็น", effects: {health: 2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "เจอเพิ่มอีกจุด ต้องให้คีโมต่ออีกหกรอบ", effects: {health: -1, money: {unit: income_x, amount: -2}, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: public_queue
         text: "ใช้สิทธิ์ รพ.รัฐ รอคิวผ่าตัด"
         outcomes:
-          - {weight: 2, text: "คิวทันพอดี หมอรัฐฝีมือไม่แพ้ใคร", effects: {health: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.5}}
+          - {weight: 2, ok: true, text: "คิวทันพอดี หมอรัฐฝีมือไม่แพ้ใคร", effects: {health: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.5}}
           - {weight: 1, text: "รอสี่เดือน ก้อนโตจนต้องผ่าใหญ่กว่าเดิม", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: miracle_cure
@@ -94,13 +94,13 @@ events:
       - id: secret_trip
         text: "ไม่บอกใคร แล้วออกเที่ยวรอบโลก"
         outcomes:
-          - {weight: 1, text: "กลับมาตรวจซ้ำ ผลแรกสลับชื่อกับคนไข้อีกคน เที่ยวฟรีเลยรอบนี้", effects: {health: 1, happiness: 3, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "กลับมาตรวจซ้ำ ผลแรกสลับชื่อกับคนไข้อีกคน เที่ยวฟรีเลยรอบนี้", effects: {health: 1, happiness: 3, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ทริปนี้ดีที่สุดในชีวิต แต่ก้อนก็โตไปพร้อมกัน", effects: {health: -2, happiness: 2, relations: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: surgery_reset
         text: "ผ่าตัด แล้วเลิกทุกนิสัยเสีย"
         outcomes:
-          - {weight: 4, text: "ตัดออกหมด ออกจาก รพ. แล้วทิ้งบุหรี่กับขวดเหล้าลงถังหน้าบ้าน", effects: {health: 2, happiness: -1, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: sila, level: 1}]}
+          - {weight: 4, ok: true, text: "ตัดออกหมด ออกจาก รพ. แล้วทิ้งบุหรี่กับขวดเหล้าลงถังหน้าบ้าน", effects: {health: 2, happiness: -1, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: sila, level: 1}]}
           - {weight: 1, text: "เจอเพิ่มอีกจุด ต้องคีโมหกรอบ แต่ร่างกายที่เลิกทุกอย่างแล้วฟื้นเร็วกว่าที่หมอคิด", effects: {health: -1, happiness: -1, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: sila, level: 1}]}
         clears_flags: [smoker, heavy_drinker]
         merit: [{cat: sila, level: 1}]
@@ -111,14 +111,14 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 2
-    multipliers: {flags: {smoker: 3, heavy_drinker: 1.5, sporty: 0.5}}
+    multipliers: {flags: {smoker: 3, heavy_drinker: 1.5, sporty: 0.5}, occupation: {manager: 1.4, labor: 1.2}}
     title: "ช้างนั่งบนหน้าอก"
     text: "เดินขึ้นสะพานลอยได้ครึ่งทาง หน้าอกแน่นเหมือนมีช้างนั่งทับ เหงื่อแตกทั้งที่ลมเย็น แม่ค้าข้างทางรีบเลื่อนเก้าอี้มาให้นั่ง"
     choices:
       - id: call_ambulance
         text: "เรียกรถพยาบาลทันที"
         outcomes:
-          - {weight: 3, text: "ทำบอลลูนทันเวลา หมอบอกช้าอีกครึ่งชั่วโมงก็จบ", effects: {health: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "ทำบอลลูนทันเวลา หมอบอกช้าอีกครึ่งชั่วโมงก็จบ", effects: {health: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], next: midh_heart_after_01}
           - {weight: 1, text: "แค่กรดไหลย้อน แต่ค่ารถพยาบาลกับความอายอยู่ไปอีกนาน", effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: bus_home
@@ -130,7 +130,7 @@ events:
       - id: massage_shop
         text: "แวะร้านนวดกดจุดปากซอย"
         outcomes:
-          - {weight: 1, text: "หมอนวดเคยเป็นพยาบาล ดูอาการแล้วโบกแท็กซี่ส่ง รพ. ให้เอง", effects: {health: 1, relations: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.5}}
+          - {weight: 1, ok: true, text: "หมอนวดเคยเป็นพยาบาล ดูอาการแล้วโบกแท็กซี่ส่ง รพ. ให้เอง", effects: {health: 1, relations: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.5}}
           - {weight: 2, text: "นวดได้ห้านาที หน้ามืดล้มลงบนเตียงนวด", effects: {health: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: bike_life
@@ -147,7 +147,7 @@ events:
     years: [2500, 2650]
     weight: 2
     repeat: {gap: 5, max: 2}
-    multipliers: {flags: {sporty: 0.7, heavy_drinker: 1.3}}
+    multipliers: {flags: {sporty: 0.7, heavy_drinker: 1.3}, occupation: {labor: 1.4, farmer: 1.3, factory: 1.3}}
     title: "นิ่วเม็ดเท่าเมล็ดถั่ว"
     text: "ปวดเอวร้าวลงขาหนีบจนต้องนอนบิดตัวบนพื้นห้องน้ำ ฉี่ออกมาเป็นสีชมพู ฟิล์มเอกซเรย์เห็นเม็ดขาว ๆ ขนาดเมล็ดถั่วนอนอยู่ในท่อไต"
     choices:
@@ -159,7 +159,7 @@ events:
       - id: drink_water
         text: "ดื่มน้ำวันละสี่ลิตร รอให้หลุด"
         outcomes:
-          - {weight: 2, text: "เม็ดหลุดออกมาดังกริ๊ง เก็บใส่ขวดโชว์แขกทุกคนที่มาบ้าน", effects: {health: 1, happiness: 2}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
+          - {weight: 2, ok: true, text: "เม็ดหลุดออกมาดังกริ๊ง เก็บใส่ขวดโชว์แขกทุกคนที่มาบ้าน", effects: {health: 1, happiness: 2}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 2, text: "ไม่ยอมหลุด ไตบวมจนต้องใส่สายระบาย", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: neighbor_brew
@@ -171,13 +171,13 @@ events:
       - id: work_through
         text: "ทนปวด ไปปิดงานใหญ่ให้จบ"
         outcomes:
-          - {weight: 1, text: "ปิดงานได้กลางห้องประชุม เจ้านายเห็นแล้วขึ้นเงินเดือนให้", effects: {health: -1, income_mult: 1.2}, merit: [{cat: neutral}], multipliers: {stats: {knowledge: 2}}}
-          - {weight: 2, text: "เป็นลมกลางห้องประชุม งานไม่จบ นิ่วก็ยังอยู่", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ปิดงานได้ทันกำหนด คนจ้างเห็นความอึดเลยขึ้นค่าตัวให้", effects: {health: -1, income_mult: 1.2}, merit: [{cat: neutral}], multipliers: {stats: {health: 1.5}}}
+          - {weight: 2, text: "เป็นลมกลางที่ทำงาน งานไม่จบ นิ่วก็ยังอยู่", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: share_room
         text: "รอคิวส่องกล้องฟรีที่ รพ.รัฐ"
         outcomes:
-          - {weight: 2, text: "นอนห้องรวมรอคิวสองอาทิตย์ ส่องกล้องเอานิ่วออกฟรี ได้เพื่อนร่วมห้องสามคน", effects: {health: 1, relations: 2}, merit: [{cat: neutral}], multipliers: {karma: 1.5}}
+          - {weight: 2, ok: true, text: "นอนห้องรวมรอคิวสองอาทิตย์ ส่องกล้องเอานิ่วออกฟรี ได้เพื่อนร่วมห้องสามคน", effects: {health: 1, relations: 2}, merit: [{cat: neutral}], multipliers: {karma: 1.5}}
           - {weight: 1, text: "ห้องรวมแออัด ติดหวัดคนเตียงข้าง ๆ คิวส่องกล้องเลื่อนอีกเดือน", effects: {health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -188,7 +188,7 @@ events:
     years: [2500, 2650]
     weight: 2
     when: {flags: {has: [heavy_drinker]}}
-    multipliers: {flags: {sporty: 0.8}}
+    multipliers: {flags: {sporty: 0.8}, occupation: {labor: 1.2, craft: 1.2}}
     title: "ค่าตับพุ่งสามเท่า"
     text: "ผลเลือดค่าตับพุ่งสามเท่า หมออัลตราซาวนด์ท้องเสร็จแล้วถามคำเดียว ดื่มวันละกี่ขวด คนทั้งวงเหล้าก็โทรมาชวนคืนนี้พอดี"
     choices:
@@ -200,7 +200,7 @@ events:
       - id: weekends_only
         text: "ลดเหลือแค่วันหยุด"
         outcomes:
-          - {weight: 1, text: "ทำได้จริง ค่าตับลดลงครึ่งหนึ่งในสามเดือน", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ทำได้จริง ค่าตับลดลงครึ่งหนึ่งในสามเดือน", effects: {health: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "วันหยุดของวงเหล้ามีทุกวัน", effects: {health: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: drink_on
@@ -227,25 +227,25 @@ events:
       - id: full_claim
         text: "เคลมเต็มสิทธิ์ ห้องเดี่ยววิวสวน"
         outcomes:
-          - {weight: 3, text: "ประกันจ่ายครบทุกบาท ตัดติ่งเนื้อออก ผลเป็นแค่เนื้อดี", effects: {health: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {knowledge: 1.5}}}
+          - {weight: 3, ok: true, text: "ประกันจ่ายครบทุกบาท ตัดติ่งเนื้อออก ผลเป็นแค่เนื้อดี", effects: {health: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 1.3}}}
           - {weight: 1, text: "บริษัทอ้างว่าเป็นมาก่อนทำสัญญา ต้องสำรองจ่ายเองแล้วสู้เรื่องอีกปี", effects: {health: 1, happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: gold_card_save
         text: "ใช้สิทธิ์ รพ.รัฐ เก็บวงเงินไว้"
         outcomes:
-          - {weight: 2, text: "รักษาครบไม่เสียสักบาท วงเงินประกันยังเหลือเต็ม", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "รักษาครบไม่เสียสักบาท วงเงินประกันยังเหลือเต็ม", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "คิวยาวสี่เดือน ติ่งเนื้อไม่รอใคร", effects: {health: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: daily_payout
         text: "นอนยาว รับเงินชดเชยรายวัน"
         outcomes:
-          - {weight: 2, text: "นอนดูซีรีส์จบสามเรื่อง ได้เงินชดเชยมากกว่าเงินเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "นอนดูซีรีส์จบสามเรื่อง ได้เงินชดเชยมากกว่าเงินเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "นอนนานจนขาลีบ ต้องทำกายภาพอีกสองเดือน", effects: {health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: skip_scope
         text: "ไม่ตัด กลัวเจ็บ ขอดูอาการ"
         outcomes:
-          - {weight: 2, text: "ติ่งเนื้อไม่โตเลยตลอดห้าปี ดวงดีเกินคาด", effects: {happiness: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.5}}
+          - {weight: 2, ok: true, text: "ติ่งเนื้อไม่โตเลยตลอดห้าปี ดวงดีเกินคาด", effects: {happiness: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.5}}
           - {weight: 1, text: "ปีถัดมากลายเป็นมะเร็งระยะสอง", effects: {health: -3, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: help_relative
@@ -253,3 +253,62 @@ events:
         requires: {money: {unit: income_x, amount: 1}, reason: "เงินเก็บไม่พอช่วยญาติ"}
         effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -1}}
         merit: [{cat: dana, level: 1}]
+
+  # เรื่องต่อ (ออกผ่าน next เท่านั้น)
+  - id: midh_heart_after_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "หมอสั่งชีวิตใหม่"
+    text: "ฟื้นในห้องไอซียู หมอชี้ฟิล์มเส้นเลือดที่เพิ่งถ่างแล้วพูดช้า ๆ ว่า ถ้ายังใช้ชีวิตแบบเดิม รอบหน้าบอลลูนก็ช่วยไม่ทัน"
+    choices:
+      - id: back_full
+        text: "กลับไปลุยงานเดิมเต็มสูบ"
+        outcomes:
+          - {weight: 2, ok: true, text: "ลุยงานเดิมได้เหมือนไม่เคยป่วย ปีนั้นงานปังกว่าทุกปี คนรอบตัวยกให้เป็นตัวอย่างคนไม่ยอมแพ้", effects: {happiness: 1, network: 1, income_mult: 1.1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เครียดจนเจ็บหน้าอกซ้ำกลางที่ทำงาน คราวนี้นอน รพ. สองอาทิตย์", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: open_shop
+        text: "ลาออก เปิดร้านข้าวต้มหน้าบ้าน"
+        outcomes:
+          - {weight: 2, ok: true, text: "ข้าวต้มติดตลาด คนในซอยมาต่อคิวตั้งแต่ตีห้า หัวใจเต้นสบายกว่างานเก่า", effects: {happiness: 2, job: service}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านเงียบเหงา เงินเก็บหายไปก้อนหนึ่ง แต่อย่างน้อยไม่ต้องแบกความเครียดแบบเดิม", effects: {happiness: 1, money: {unit: income_x, amount: -1}, job: service}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: go_farm
+        text: "ปลูกผักเงียบ ๆ อยู่กับบ้าน"
+        effects: {health: 1, happiness: 1, relations: 1, job: farmer, chronic: {health: 1}}
+        merit: [{cat: neutral}]
+      - id: heart_volunteer
+        text: "เป็นอาสาพาคนไข้หัวใจไปหาหมอ"
+        effects: {happiness: 1, relations: 2, network: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: midh_herb_fame_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "สมุนไพรดังทั้งตำบล"
+    text: "ข่าวน้ำตาลลดพิสดารลือไปทั้งตำบล เพื่อนบ้านมาต่อแถวขอสูตรถึงหน้าบ้าน มีคนเสนอจะบรรจุขวดขายส่ง ส่วนหมอขอใบไม้ไปส่งแล็บตรวจ"
+    choices:
+      - id: sell_cure
+        text: "บรรจุขวดขาย โฆษณาว่าหายขาด"
+        outcomes:
+          - {weight: 1, text: "ขายดีจนรวยไปพักใหญ่ จนลูกค้าคนหนึ่งเลิกกินยาหมอแล้วหามเข้า รพ.", effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: 2}}, merit: [{cat: greed_harm, level: 2}]}
+          - {weight: 2, text: "โดนร้องเรียนโฆษณาเกินจริง ของถูกยึดทั้งโกดัง ต้องคืนเงินลูกค้าทุกขวด", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: greed_harm, level: 1}]}
+        merit: [{cat: greed_harm, level: 1}]
+      - id: give_recipe
+        text: "แจกสูตรฟรี ย้ำให้กินยาหมอด้วย"
+        effects: {happiness: 1, relations: 2}
+        merit: [{cat: dana, level: 1}]
+      - id: send_lab
+        text: "ยกใบไม้ให้หมอส่งแล็บตรวจ"
+        outcomes:
+          - {weight: 1, ok: true, text: "แล็บเจอสารตัวจริงในใบไม้ หมอใส่ชื่อผู้ค้นพบในงานวิจัยให้ด้วย", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "แล็บสรุปว่าน้ำตาลลดเพราะเดินเข้าป่าหาใบไม้วันละสิบกิโล", effects: {health: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep_secret
+        text: "เก็บสูตรไว้กินคนเดียว"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]

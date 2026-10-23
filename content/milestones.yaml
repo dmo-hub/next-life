@@ -14,7 +14,7 @@ events:
       - text: "เรียนไปเล่นไป"
         effects: { knowledge: 1, happiness: 1 }
         merit: [{ cat: neutral }]
-      - text: "เลิกเรียนแล้วช่วยงานที่บ้าน"
+      - text: "เรียนไปด้วย ช่วยงานที่บ้านไปด้วย"
         effects: { knowledge: 1, relations: 1 }
         merit: [{ cat: neutral }]
       - text: "ร้องไห้ไม่อยากไปโรงเรียน"

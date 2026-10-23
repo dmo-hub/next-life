@@ -1,0 +1,410 @@
+# กลุ่ม business · ช่วงวัยทำงาน/กลางคน (บางใบหนุ่มสาว) · ธุรกิจตามยุค (ร้านชำ · รถเข็น · ร้านอาหาร · สวน · แฟรนไชส์) + แชร์ลูกโซ่
+events:
+  - id: biz_grocery_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {occupation: [farmer, labor, factory, craft, service], flags: {not: [own_business]}}
+    multipliers: {stats: {network: 1.3}, flags: {street_vendor: 1.5}}
+    title: "ห้องแถวหัวมุม"
+    text: "ห้องแถวหัวมุมปากซอยประกาศให้เช่า ป้าเจ้าของบอกว่าคนเดินผ่านวันละเป็นร้อย เปิดร้านชำตรงนี้ไม่มีทางเจ๊ง {ชื่อ} มีเงินเก็บ {เงิน} บาท"
+    choices:
+      - id: open_grocery
+        text: "เซ้งเลย เปิดร้านชำ"
+        effects: {money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คนทั้งซอยแวะซื้อของทุกเช้า ร้านติดตลาดเร็วกว่าที่คิด", effects: {happiness: 1, job: service}, sets_flags: [own_business], next: biz_grocery_rival_01, merit: [{cat: neutral}], multipliers: {stats: {relations: 1.4, network: 1.3}}}
+          - {weight: 2, text: "ของหมดอายุค้างชั้นเป็นแถบ ทุนจมไปกับขนมที่ไม่มีใครซื้อ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: credit_book
+        text: "เปิดร้าน ให้คนในซอยเชื่อได้"
+        effects: {money: {unit: income_x, amount: -1}, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกค้าเชื่อแล้วจ่ายตรง ทั้งซอยรักร้านนี้ ยอดขายโตทุกเดือน", effects: {job: service, relations: 1}, sets_flags: [own_business], merit: [{cat: neutral}], multipliers: {stats: {relations: 1.5}}}
+          - {weight: 2, text: "สมุดเชื่อหนาขึ้นทุกวัน แต่เงินสดหายไปหมด สุดท้ายต้องปิดร้าน", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: rent_to_friend
+        text: "บอกเพื่อนมาเช่าแทน"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: pass_grocery
+        text: "ทำงานประจำต่อดีกว่า"
+        merit: [{cat: neutral}]
+
+  - id: biz_grocery_rival_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ร้านสว่างตรงข้าม"
+    text: "ยังไม่ทันครบปี ร้านใหญ่ทุนหนามาเปิดตรงข้ามพอดี ของครบทุกอย่าง ไฟสว่างจ้า ลูกค้าประจำเริ่มเดินข้ามถนน"
+    choices:
+      - id: fight_price
+        text: "ตัดราคาสู้ ยอมกำไรบาง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้า ๆ ในซอยเลือกร้านที่คุยด้วยได้ ยอดกลับมาเท่าเดิม", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}], multipliers: {stats: {relations: 1.5}}}
+          - {weight: 2, text: "สู้ราคาได้สามเดือน ทุนก็หมด เหลือแต่ชั้นวางเปล่า", effects: {happiness: -2, income_mult: 0.8}, merit: [{cat: neutral}]}
+      - id: niche_shop
+        text: "หันขายของที่เขาไม่มี"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ถ่านหุงข้าว น้ำแข็งก้อน ของไหว้ครบชุด ร้านกลายเป็นร้านเดียวที่หาของพวกนี้ได้", effects: {happiness: 2, income_mult: 1.3}, merit: [{cat: neutral}], multipliers: {stats: {network: 1.4}}}
+          - {weight: 1, text: "ของที่หามาขายช้ากว่าที่คิด ร้านอยู่ได้แบบเหนื่อย ๆ", effects: {health: -1, income_mult: 0.9}, merit: [{cat: neutral}]}
+      - id: sell_to_chain
+        text: "ขายสิทธิ์เซ้งให้ร้านใหญ่"
+        effects: {money: {unit: income_x, amount: 1.5}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: spread_rumor
+        text: "ปล่อยข่าวว่าร้านเขาขายของเน่า"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 1, text: "ข่าวลือได้ผลอยู่เดือนเดียว ลูกค้ากลับมาบ้าง", effects: {income_mult: 1.1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "มีคนเห็นตอนพูดแล้วเอาไปบอกต่อ ทั้งซอยเลิกคุยด้วย", effects: {relations: -3, happiness: -1}, merit: [{cat: neutral}]}
+
+  - id: biz_food_cart_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {street_vendor: 2}}
+    title: "รถเข็นคันแรก"
+    text: "{ชื่อ} อายุ {อายุ} ได้สูตรน้ำจิ้มลับจากยายมาครบทั้งสมุด เพื่อนบอกว่าถ้าเข็นรถขายหน้าโรงงานตอนเลิกกะ ขายหมดแน่ ๆ"
+    choices:
+      - id: push_cart
+        text: "ซื้อรถเข็น ลุยเลย"
+        effects: {money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คนงานต่อคิวยาวถึงรั้ว น้ำจิ้มของยายกลายเป็นตำนานหน้าโรงงาน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [street_vendor], merit: [{cat: neutral}], multipliers: {stats: {network: 1.3, relations: 1.3}}}
+          - {weight: 1, text: "โดนเทศกิจยึดรถตั้งแต่วันที่สาม น้ำจิ้มเต็มถังยังไม่ได้เปิดฝา", effects: {happiness: -2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+      - id: night_market
+        text: "ไปเช่าล็อกตลาดนัดกลางคืน"
+        effects: {money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ขายดีจนเจ้าของตลาดให้ล็อกหัวมุม รายได้เสริมงอกทุกคืน", effects: {happiness: 1, health: -1, income_mult: 1.2}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ล็อกอยู่ท้ายตลาด ลมพัดกลิ่นห้องน้ำมาทั้งคืน ขายได้ไม่คุ้มค่าเช่า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: sell_recipe
+        text: "ขายสูตรให้ร้านดังในเมือง"
+        effects: {money: {unit: income_x, amount: 0.8}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: keep_recipe
+        text: "เก็บสูตรไว้ทำกินที่บ้าน"
+        effects: {relations: 1}
+        merit: [{cat: care_parents, level: 1}]
+
+  - id: biz_restaurant_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {occupation: [farmer, labor, factory, craft, service], flags: {not: [own_business]}}
+    multipliers: {flags: {street_vendor: 2}, stats: {network: 1.2}}
+    title: "ร้านในฝัน"
+    text: "อายุ {อายุ} แล้ว ฝันเรื่องร้านอาหารของตัวเองยังไม่เคยหาย ตึกแถวริมถนนใหญ่ว่างพอดี ค่ามัดจำเท่ากับเงินเก็บเกือบทั้งหมด"
+    choices:
+      - id: open_restaurant
+        text: "ทุ่มหมดตัว เปิดร้าน"
+        effects: {money: {unit: income_x, amount: -2}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คนขับรถทัวร์จอดกินแล้วบอกต่อ วันหยุดคิวยาวถึงปั๊มน้ำมัน", effects: {happiness: 2, job: service}, sets_flags: [own_business], merit: [{cat: neutral}], multipliers: {stats: {network: 1.4}, flags: {street_vendor: 1.5}}}
+          - {weight: 1, text: "หกเดือนแรกขายได้ดี แล้วมีโครงการขยายถนน ปิดหน้าร้านยาวสองปี", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: hire_chef
+        text: "จ้างพ่อครัวฝีมือดีมาคุม"
+        effects: {money: {unit: income_x, amount: -2}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "พ่อครัวทำร้านดังทั้งจังหวัด {ชื่อ} ได้นั่งนับเงินอย่างเดียว", effects: {happiness: 1, job: service, money: {unit: income_x, amount: 1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, text: "พ่อครัวดังได้สามเดือนก็พาสูตรกับลูกน้องไปเปิดร้านตรงข้าม", effects: {happiness: -2, relations: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: cook_for_temple
+        text: "ทำกับข้าวเลี้ยงงานวัดแทน"
+        effects: {happiness: 1, relations: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: dana, level: 1}]
+      - id: let_dream_go
+        text: "เก็บความฝันไว้ในลิ้นชัก"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: biz_farm_expand_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {occupation: [farmer]}
+    multipliers: {occupation: {farmer: 1.5}, stats: {network: 1.2}}
+    title: "ที่ดินแปลงข้างบ้าน"
+    text: "ลุงข้างบ้านจะย้ายไปอยู่กับลูกในเมือง เลยเสนอขายที่นาแปลงติดกันให้ก่อนใคร ถ้าได้มารวมกัน สวนของ{ชื่อ}จะใหญ่เป็นสองเท่า"
+    choices:
+      - id: buy_land_durian
+        text: "ซื้อ แล้วลงทุเรียนทั้งแปลง"
+        effects: {money: {unit: income_x, amount: -2}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ข่าวว่าลงทุเรียนทั้งแปลงไปถึงหูพ่อค้า เขามาจองล่วงหน้าตั้งแต่ต้นยังเล็ก", effects: {happiness: 2}, next: biz_farm_buyer_01, merit: [{cat: neutral}], multipliers: {stats: {health: 1.3}}}
+          - {weight: 1, text: "หน้าแล้งยาวผิดปกติ ต้นอ่อนยืนตายทั้งแถว เหลือรอดไม่ถึงครึ่ง", effects: {happiness: -2, health: -1, income_mult: 0.8}, merit: [{cat: neutral}]}
+      - id: buy_land_rice
+        text: "ซื้อ ทำนาเพิ่มแบบเดิม"
+        effects: {money: {unit: income_x, amount: -1.5}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ข้าวปีนั้นราคาดี นาสองแปลงเลี้ยงทั้งบ้านได้สบาย", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ราคาข้าวดิ่งตั้งแต่ปีแรก ได้ที่เพิ่มแต่งานหนักเป็นสองเท่า", effects: {health: -1, income_mult: 0.9}, merit: [{cat: neutral}]}
+      - id: rent_land
+        text: "ขอเช่าก่อน ไม่ซื้อขาด"
+        effects: {income_mult: 1.1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: help_uncle_sell
+        text: "ช่วยลุงหาคนซื้อราคาดี"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: biz_farm_buyer_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "พ่อค้าคนกลาง"
+    text: "พ่อค้าคนกลางขับกระบะมาจอดหน้าสวน ยื่นเงินมัดจำก้อนโตให้ดู ขอเหมาทั้งสวนทุกปีในราคาตายตัว เซ็นวันนี้ได้เงินสดทันที"
+    choices:
+      - id: sign_contract
+        text: "เซ็นเหมาทั้งสวน รับเงินก่อน"
+        effects: {money: {unit: income_x, amount: 1}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "พ่อค้าจ่ายตรงทุกงวด ไม่ต้องลุ้นราคา นอนหลับสบายทุกคืน", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปีต่อมาราคาพุ่งเท่าตัว แต่สัญญาล็อกไว้ ต้องขายถูกให้เขาอีกสามปี", effects: {happiness: -2, income_mult: 1.05}, merit: [{cat: neutral}]}
+      - id: sell_self
+        text: "ไม่เซ็น ขนไปขายตลาดเอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ตั้งแผงริมถนนเอง ได้ราคาเต็ม ลูกค้าประจำโทรสั่งทุกปี", effects: {happiness: 2, health: -1, income_mult: 1.4}, merit: [{cat: neutral}], multipliers: {stats: {network: 1.5}}}
+          - {weight: 1, text: "ขนไปถึงตลาดพร้อมกับสวนอื่นอีกสิบคัน ราคาร่วงจนต้องเทขาย", effects: {happiness: -1, income_mult: 1.05}, merit: [{cat: neutral}]}
+      - id: group_coop
+        text: "รวมสวนเพื่อนบ้านต่อรองราคา"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "สวนทั้งตำบลรวมกันได้ราคาดีขึ้นทุกบ้าน {ชื่อ} ถูกยกเป็นหัวหน้ากลุ่ม", effects: {relations: 2, network: 2, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประชุมกันสามรอบก็ยังตกลงกันไม่ได้ ผลไม้สุกคาต้นไปครึ่งหนึ่ง", effects: {relations: -1, income_mult: 1.05}, merit: [{cat: neutral}]}
+      - id: sell_whole_orchard
+        text: "ขายสวนทั้งแปลงให้เขาไปเลย"
+        effects: {money: {unit: income_x, amount: 3}, happiness: -1, income_mult: 0.8}
+        merit: [{cat: neutral}]
+
+  - id: biz_franchise_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {occupation: [farmer, labor, factory, craft, service], flags: {not: [own_business]}}
+    multipliers: {stats: {network: 1.3}}
+    title: "ซุ้มแฟรนไชส์"
+    text: "งานแสดงสินค้าในเมือง เซลส์ยิ้มกว้างชี้ซุ้มน้ำหวานสีชมพู ลงทุนครั้งเดียว ได้ทั้งสูตร ทั้งป้าย ทั้งอุปกรณ์ คืนทุนในหกเดือน"
+    choices:
+      - id: buy_franchise
+        text: "จ่ายค่าแฟรนไชส์เลย"
+        requires: {money: {unit: income_x, amount: 1.5}, reason: "เงินเก็บไม่พอค่าแฟรนไชส์"}
+        effects: {money: {unit: income_x, amount: -1.5}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ตั้งซุ้มหน้าโรงเรียน เด็กต่อแถวทุกเย็น คืนทุนเร็วกว่าที่เซลส์คุยไว้", effects: {happiness: 2, job: service}, sets_flags: [own_business], merit: [{cat: neutral}], multipliers: {stats: {network: 1.3}}}
+          - {weight: 2, text: "สามเดือนต่อมาเบอร์บริษัทแม่ติดต่อไม่ได้ ป้ายสีชมพูกลายเป็นของที่ระลึก", effects: {happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+      - id: copy_own_brand
+        text: "ทำยี่ห้อเองให้ถูกกว่า"
+        effects: {money: {unit: income_x, amount: -0.7}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "สูตรของตัวเองอร่อยกว่าเจ้าดัง ลูกค้าบอกต่อจนเปิดสาขาสอง", effects: {happiness: 2, job: service}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทำไปทำมาหน้าตาเหมือนยี่ห้อดังเกินไป โดนหนังสือเตือนให้ปลดป้าย", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+      - id: ask_owners
+        text: "ไปถามคนที่ซื้อไปก่อน"
+        effects: {network: 1}
+        sets_flags: [scam_aware]
+        merit: [{cat: neutral}]
+      - id: walk_away
+        text: "เดินผ่านไป ซื้อน้ำหวานแก้วเดียว"
+        effects: {happiness: 1, money: {unit: fixed_baht, amount: -40, ref_year: 2560}}
+        merit: [{cat: neutral}]
+
+  - id: biz_partner_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {flags: {has: [own_business]}}
+    multipliers: {stats: {network: 1.3}}
+    title: "ผู้ร่วมทุนคนสนิท"
+    text: "เพื่อนสมัยเรียนขอมาลงทุนในกิจการด้วย บอกว่ามีลูกค้ารายใหญ่รออยู่สิบเจ้า ขอแค่ให้เซ็นชื่อร่วมเป็นเจ้าของ และฝากสมุดบัญชีร้านไว้ให้ดูแล"
+    choices:
+      - id: trust_partner
+        text: "ไว้ใจ ยกบัญชีให้ดูแล"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกค้ารายใหญ่มาจริงตามคำ กิจการโตเท่าตัวในปีเดียว", effects: {happiness: 2, network: 2, income_mult: 1.4}, merit: [{cat: neutral}], multipliers: {stats: {relations: 1.5}}}
+          - {weight: 2, text: "เช้าวันหนึ่งบัญชีว่างเปล่า เพื่อนหายไปพร้อมเงินหมุนทั้งหมด เหลือแต่ใบแจ้งหนี้ค่าของ", effects: {happiness: -3, relations: -1, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
+      - id: partner_contract
+        text: "รับ แต่ทำสัญญาให้ชัด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เพื่อนอ่านสัญญาแล้วยิ้ม ทำงานหนักจนกิจการโตขึ้นจริง", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนงอนว่าไม่ไว้ใจกัน เลิกคบไปทั้งที่ยังไม่ได้เริ่ม", effects: {relations: -2}, merit: [{cat: neutral}]}
+      - id: refuse_partner
+        text: "ขอทำคนเดียวเหมือนเดิม"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+      - id: sell_whole_biz
+        text: "ขายกิจการให้เพื่อนไปเลย"
+        effects: {money: {unit: income_x, amount: 2}, happiness: -1, income_mult: 0.9}
+        clears_flags: [own_business]
+        merit: [{cat: neutral}]
+
+  - id: biz_ponzi_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2527, 2650]
+    weight: 1
+    multipliers: {stats: {network: 1.3}, flags: {scam_aware: 0.4, ponzi_victim: 0.5}}
+    title: "สัมมนาทรัพย์ทวี"
+    text: "เพื่อนบ้านชวนไปฟังสัมมนาของวงทรัพย์ทวี บนเวทีมีคนใส่สูทโชว์รถใหม่ ฝากเงินกับวงเดือนละครั้ง ได้ปันผลเดือนละห้าเปอร์เซ็นต์ ไม่ต้องทำอะไรเลย"
+    choices:
+      - id: join_small
+        text: "ลองลงเงินก้อนเล็กดูก่อน"
+        effects: {money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, text: "สิ้นเดือนเงินปันผลเข้าตรงวัน ไม่ขาดสักบาท {ชื่อ} เริ่มใจเต้น", effects: {happiness: 1, money: {unit: income_x, amount: 0.2}}, next: biz_ponzi_pay_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยังไม่ทันได้ปันผลรอบแรก สำนักงานวงก็ปิดประตูเงียบ เงินที่ลงไปหายเกลี้ยง", effects: {happiness: -2}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
+      - id: join_big
+        text: "เทเงินเก็บทั้งหมด"
+        effects: {money: {unit: income_x, amount: -2.5}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, text: "ปันผลก้อนแรกโตกว่าเงินเดือนเสียอีก คนในวงปรบมือให้บนเวที", effects: {happiness: 2, money: {unit: income_x, amount: 0.5}}, next: biz_ponzi_pay_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สัปดาห์ต่อมาหัววงหนีไปต่างประเทศ เงินเก็บทั้งชีวิตไปกับเขาด้วย", effects: {happiness: -3, health: -1}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
+      - id: refuse_ponzi
+        text: "ไม่เอา ไม่มีใครให้ฟรีหรอก"
+        sets_flags: [scam_aware]
+        merit: [{cat: neutral}]
+      - id: warn_neighbor
+        text: "เตือนเพื่อนบ้านให้ถอนตัว"
+        effects: {relations: -1}
+        sets_flags: [scam_aware]
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนบ้านถอนตัวทัน อีกปีวงล่ม เขามากราบขอบคุณถึงหน้าบ้าน", effects: {relations: 3, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนบ้านหาว่าอิจฉา เลิกพูดด้วยไปเป็นปี", effects: {happiness: -1}, merit: [{cat: neutral}]}
+
+  - id: biz_ponzi_pay_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2527, 2650]
+    title: "ปันผลรอบสอง"
+    text: "ปันผลเข้าตรงอีกรอบ หัววงประกาศโปรใหม่ ใครพาเพื่อนเข้าได้ค่าแนะนำสิบเปอร์เซ็นต์ ลงเพิ่มเดือนนี้ปันผลขึ้นเป็นเจ็ด คนในวงเริ่มซื้อทองใส่เต็มคอ"
+    choices:
+      - id: add_more
+        text: "ลงเพิ่มอีกก้อน"
+        effects: {money: {unit: income_x, amount: -1.5}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ยอดในสมุดวงพุ่งเป็นเท่าตัว แต่ยังไม่ถึงวันจ่าย {ชื่อ} เริ่มคิดจะลาออกจากงานประจำ", effects: {happiness: 2}, next: biz_ponzi_crash_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เงินก้อนใหม่เพิ่งโอนไปเช้าวันจันทร์ บ่ายวันนั้นตำรวจบุกสำนักงานวง ข้อหาฉ้อโกงประชาชน เงินทั้งหมดถูกอายัด", effects: {happiness: -3, health: -1}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
+      - id: recruit_friends
+        text: "ชวนญาติพี่น้องเข้าวง"
+        effects: {money: {unit: income_x, amount: 0.5}, network: 1}
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 2, text: "ญาติเข้ามาเจ็ดคน ค่าแนะนำไหลเข้าทุกสัปดาห์ ทุกคนเรียก{ชื่อ}ว่าเสี่ย", effects: {happiness: 1}, next: biz_ponzi_crash_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วงล่มเดือนถัดมา ญาติทั้งเจ็ดมายืนหน้าบ้านพร้อมกัน ทวงเงินที่ชวนเขามาเสีย", effects: {happiness: -3, relations: -3, money: {unit: income_x, amount: -1}}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
+      - id: try_withdraw
+        text: "ขอถอนเงินต้นคืน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "เจ้าหน้าที่วงบอกว่าบัญชีปิดตรวจสามวัน สามวันผ่านไป วงปิดประตูถาวร", effects: {happiness: -2}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้คืนมาแค่ส่วนน้อย ที่เหลือหัววงอ้างว่าติดค่าธรรมเนียม ไม่กี่วันวงก็ล่ม", effects: {happiness: -1, money: {unit: income_x, amount: 0.3}}, sets_flags: [ponzi_victim, scam_aware], merit: [{cat: neutral}]}
+      - id: report_police
+        text: "แจ้งความว่าวงนี้หลอก"
+        merit: [{cat: help_others, level: 2}]
+        outcomes:
+          - {weight: 1, text: "ตำรวจตั้งข้อหาฉ้อโกงประชาชนกับหัววง ศาลสั่งคืนเงินบางส่วน คนทั้งซอยยกให้เป็นคนกล้า", effects: {relations: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [ponzi_victim, scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "คดีเงียบหาย เงินไม่ได้คืน คนในวงหาว่าทำให้วงล่ม", effects: {relations: -2, happiness: -1}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
+    systems: [fraud_loan_act]
+    lore_ref: lore-finance-series.html#6
+
+  - id: biz_ponzi_crash_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2527, 2650]
+    title: "ประตูเหล็กปิดเงียบ"
+    text: "เช้าวันโอนปันผล เงินไม่เข้า ไปถึงสำนักงานวงเจอประตูเหล็กล็อกกุญแจ หน้าตึกมีคนยืนออกันเป็นร้อย ข่าวเย็นบอกว่าหัววงโดนข้อหาฉ้อโกงประชาชน"
+    choices:
+      - id: join_victims
+        text: "รวมกลุ่มผู้เสียหายฟ้อง"
+        sets_flags: [ponzi_victim]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "สู้คดีห้าปี ได้เงินคืนมาไม่ถึงหนึ่งในสิบของที่เสียไป", effects: {happiness: -1, network: 1, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "คดียืดยาวจนกลุ่มแตก เงินต้นไม่ได้คืนสักบาท", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: hide_shame
+        text: "เก็บเงียบ ไม่บอกใคร"
+        effects: {happiness: -2, health: -1}
+        sets_flags: [ponzi_victim]
+        merit: [{cat: neutral}]
+      - id: pay_back_relatives
+        text: "ช่วยเพื่อนบ้านที่เสียหายด้วยกัน"
+        effects: {money: {unit: income_x, amount: -1}, relations: 2}
+        sets_flags: [ponzi_victim]
+        merit: [{cat: help_others, level: 2}]
+      - id: chase_leader
+        text: "ตามหาหัววงด้วยตัวเอง"
+        sets_flags: [ponzi_victim]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "เจอหัววงที่ชายแดน แต่เขามีคนคุ้มกันครบ กลับมามือเปล่าพร้อมรอยช้ำ", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เสียค่ารถค่าที่พักไปอีกก้อน สุดท้ายรู้ว่าหัววงบินออกนอกประเทศไปนานแล้ว", effects: {happiness: -2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+    systems: [fraud_loan_act]
+    lore_ref: lore-finance-series.html#6
+
+  - id: biz_ponzi_again_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2527, 2650]
+    weight: 1
+    when: {flags: {has: [ponzi_victim]}}
+    title: "วงใหม่ชื่อใหม่"
+    text: "คนคุ้นหน้าจากวงเก่าโทรมาเสียงหวาน บอกว่าตั้งวงใหม่ชื่อทองทวี ผลตอบแทนดีกว่าเดิม คราวนี้มีทองคำค้ำประกัน แถมจะคืนเงินที่เสียไปจากวงเก่าให้ก่อนครึ่งหนึ่ง"
+    choices:
+      - id: rejoin_hope
+        text: "เข้าวง หวังได้เงินเก่าคืน"
+        effects: {money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ได้ปันผลรอบเดียว แล้ววงใหม่ก็หายไปเหมือนวงเก่าทุกอย่าง", effects: {happiness: -2, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เงินที่จะคืนไม่เคยมา มีแต่ค่าสมัครที่ต้องโอนเพิ่มเรื่อย ๆ จนหมดกระเป๋า", effects: {happiness: -3, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+      - id: play_along
+        text: "แกล้งตกลง แล้วแจ้งตำรวจ"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ตำรวจล่อซื้อจับคาที่นัด ข่าวลงหน้าหนึ่ง {ชื่อ} ได้คำชมไปทั้งอำเภอ", effects: {happiness: 2, relations: 2, network: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "อีกฝ่ายไหวตัวทัน ไม่มาตามนัด เปลี่ยนเบอร์หนีไปเงียบ ๆ", effects: {happiness: -1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+      - id: hang_up
+        text: "วางสายทันที"
+        effects: {happiness: 1}
+        sets_flags: [scam_aware]
+        merit: [{cat: neutral}]
+      - id: warn_old_group
+        text: "เตือนคนจากวงเก่าทุกคน"
+        effects: {relations: 2, network: 1}
+        sets_flags: [scam_aware]
+        merit: [{cat: help_others, level: 2}]

@@ -6,10 +6,10 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     title: "หนี้ล้นตัว"
-    text: "อายุ {อายุ} ดอกเบี้ยเดินเร็วกว่าเงินเดือน บัตรห้าใบรูดเต็มทุกใบ เสียงโทรศัพท์ทวงหนี้ดังตั้งแต่เจ็ดโมงเช้า"
+    text: "อายุ {อายุ} ดอกเบี้ยเดินเร็วกว่าเงินเดือน เงินกู้สามเจ้าหมุนไม่ทัน เสียงโทรศัพท์ทวงหนี้ดังตั้งแต่เจ็ดโมงเช้า"
     when: {flags: {has: [in_debt]}}
     weight: 3
-    multipliers: {flags: {guarantor: 1.5, own_business: 1.3}}
+    multipliers: {flags: {guarantor: 1.5, own_business: 1.3}, occupation: {labor: 1.3, service: 1.2}}
     choices:
       - id: sell_house
         text: "ขายบ้านโปะหนี้ทั้งก้อน"
@@ -21,7 +21,7 @@ events:
         # outcome ใส่ clears_flags ไม่ได้ (shape.mjs) — ล้างที่ตัวเลือกก่อน แล้วผลร้ายตั้งกลับ (applyChoice ของ outcome รันทีหลัง)
         clears_flags: [in_debt]
         outcomes:
-          - {weight: 1, text: "หมุนทันจริง ๆ งานใหญ่เข้าพอดี ปิดหนี้ได้หมดแบบไม่มีใครเชื่อ", effects: {happiness: 3, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}], multipliers: {karma: 1.4}}
+          - {weight: 1, ok: true, text: "หมุนทันจริง ๆ งานใหญ่เข้าพอดี ปิดหนี้ได้หมดแบบไม่มีใครเชื่อ", effects: {happiness: 3, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}], multipliers: {karma: 1.4}}
           - {weight: 3, text: "ดอกร้อยละยี่สิบต่อเดือน คนแปลกหน้ามายืนหน้าบ้านทุกเย็น", effects: {health: -2, happiness: -2, chronic: {happiness: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: debt_clinic
@@ -37,7 +37,7 @@ events:
       - id: kids_help
         text: "ยอมเล่าให้คนในบ้านฟังทั้งหมด"
         outcomes:
-          - {weight: 2, text: "ทั้งบ้านช่วยกันลงขันคนละนิด คืนนั้นนอนหลับได้เป็นครั้งแรกในรอบหลายเดือน", effects: {relations: 2, happiness: 1, health: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
+          - {weight: 2, ok: true, text: "ทั้งบ้านช่วยกันลงขันคนละนิด คืนนั้นนอนหลับได้เป็นครั้งแรกในรอบหลายเดือน", effects: {relations: 2, happiness: 1, health: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "เล่าจบบ้านแตก ทะเลาะกันหนักว่าปิดบังมาได้ยังไงตั้งนาน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: sila, level: 1}]
 
@@ -60,7 +60,7 @@ events:
         text: "ตามล่าตัวเพื่อนให้เจอ"
         clears_flags: [guarantor]
         outcomes:
-          - {weight: 2, text: "เจอเพื่อนขายก๋วยเตี๋ยวอยู่อีกจังหวัด ร้องไห้กอดกันแล้วผ่อนคืนทีละน้อย", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "เจอเพื่อนขายก๋วยเตี๋ยวอยู่อีกจังหวัด ร้องไห้กอดกันแล้วผ่อนคืนทีละน้อย", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "เจอแล้ว แต่เขามีหนี้มากกว่าเราอีก กลับบ้านมือเปล่าพร้อมค่าน้ำมัน", effects: {happiness: -2, health: -1}, sets_flags: [guarantor], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: fight_court
@@ -111,7 +111,7 @@ events:
       - id: kid_choose
         text: "ให้ลูกเลือกเองว่าจะไปทางไหน"
         outcomes:
-          - {weight: 2, text: "ลูกขอไปทำงานก่อนแล้วค่อยเรียนภาคค่ำ สามปีต่อมาลูกส่งเงินกลับบ้าน", effects: {relations: 2, happiness: 1, health: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ลูกขอไปทำงานก่อนแล้วค่อยเรียนภาคค่ำ สามปีต่อมาลูกส่งเงินกลับบ้าน", effects: {relations: 2, happiness: 1, health: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ลูกเลือกเรียนต่อ แต่ค่าเทอมทั้งหมดก็ยังตกมาที่เราอยู่ดี", effects: {relations: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -137,7 +137,7 @@ events:
       - id: share_siblings
         text: "เรียกญาติประชุมแบ่งเวร"
         outcomes:
-          - {weight: 2, text: "แบ่งเวรได้ลงตัว ญาติที่ไม่คุยกันสิบปีกลับมานั่งกินข้าวด้วยกัน", effects: {relations: 3, happiness: 1}, merit: [{cat: care_parents, level: 2}], multipliers: {stats: {relations: 2}}}
+          - {weight: 2, ok: true, text: "แบ่งเวรได้ลงตัว ญาติที่ไม่คุยกันสิบปีกลับมานั่งกินข้าวด้วยกัน", effects: {relations: 3, happiness: 1}, merit: [{cat: care_parents, level: 2}], multipliers: {stats: {relations: 2}}}
           - {weight: 2, text: "ประชุมจบที่ทะเลาะเรื่องมรดก สุดท้ายงานทั้งหมดตกที่เราคนเดียว", effects: {relations: -2, health: -1}, merit: [{cat: care_parents, level: 1}]}
         merit: [{cat: care_parents, level: 1}]
       - id: move_in
@@ -164,7 +164,7 @@ events:
         text: "ถอยบิ๊กไบค์ออกทริปทั่วไทย"
         requires: {money: {unit: income_x, amount: 1}, reason: "เงินไม่พอถอยบิ๊กไบค์"}
         outcomes:
-          - {weight: 3, text: "ได้เพื่อนแก๊งใหม่ ขี่ไปถึงปลายด้ามขวาน หัวใจกลับมาเต้นแรงอีกครั้ง", effects: {happiness: 3, health: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
+          - {weight: 3, ok: true, text: "ได้เพื่อนแก๊งใหม่ ขี่ไปถึงปลายด้ามขวาน หัวใจกลับมาเต้นแรงอีกครั้ง", effects: {happiness: 3, health: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "ล้มในโค้งแรกของทริปแรก ขาเข้าเฝือกสามเดือน รถยังผ่อนไม่หมด", effects: {health: -3, happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: quit_dream
@@ -194,18 +194,18 @@ events:
     title: "โอกาสครั้งสุดท้าย"
     text: "รุ่นน้องชวนลงขันเปิดกิจการใหม่ บอกว่าถ้าไม่ลองตอนนี้ แก่ไปก็ไม่มีแรงลองแล้ว เงินเก็บ {เงิน} บาทนอนรออยู่ในบัญชี"
     weight: 2
-    multipliers: {flags: {own_business: 1.5}, stats: {knowledge: 1.2}}
+    multipliers: {flags: {own_business: 1.5}, stats: {network: 1.2}, occupation: {service: 1.4, manager: 1.3}}
     choices:
       - id: all_in
         text: "ทุ่มหมดหน้าตัก"
         outcomes:
-          - {weight: 1, text: "กิจการติดตลาดภายในปีเดียว ยอดสั่งเข้าจนผลิตไม่ทัน ชีวิตเปลี่ยนทั้งบ้าน", effects: {happiness: 3, income_mult: 1.6}, sets_flags: [own_business], merit: [{cat: neutral}]}
-          - {weight: 2, text: "รุ่นน้องหายไปพร้อมบัญชีบริษัท เหลือแต่ป้ายร้านกับหนี้ร่วม", effects: {happiness: -3, health: -1, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "กิจการติดตลาดภายในปีเดียว ยอดสั่งเข้าจนผลิตไม่ทัน ชีวิตเปลี่ยนทั้งบ้าน", effects: {happiness: 3, income_mult: 1.6}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 2, text: "รุ่นน้องหายไปพร้อมบัญชีบริษัท เหลือแต่ป้ายร้านกับหนี้ร่วม", effects: {happiness: -3, health: -1, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], next: mid_risky_chase_01, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: half_in
         text: "ลงแค่ครึ่ง เก็บอีกครึ่ง"
         outcomes:
-          - {weight: 2, text: "ได้ปันผลพอซื้อของขวัญให้ตัวเองทุกปี", effects: {happiness: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ได้ปันผลพอซื้อของขวัญให้ตัวเองทุกปี", effects: {happiness: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ขาดทุนครึ่งที่ลง แต่อีกครึ่งยังอยู่ นอนหลับได้", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: be_partner
@@ -236,7 +236,7 @@ events:
       - id: scale_up
         text: "เช่าโกดัง จ้างคนแพ็กเพิ่ม"
         outcomes:
-          - {weight: 2, text: "ยอดขายโตต่อเนื่อง กลายเป็นเถ้าแก่ที่มีลูกน้องสิบคน", effects: {income_mult: 1.5, happiness: 2, health: -1}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ยอดขายโตต่อเนื่อง กลายเป็นเถ้าแก่ที่มีลูกน้องสิบคน", effects: {income_mult: 1.5, happiness: 2, health: -1}, sets_flags: [own_business], next: mid_online_empire_01, merit: [{cat: neutral}]}
           - {weight: 1, text: "กระแสหมดในสามเดือน โกดังว่างแต่สัญญาเช่ายังเหลือสองปี", effects: {happiness: -2, money: {unit: income_x, amount: -1.5}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: stay_small
@@ -265,24 +265,24 @@ events:
     title: "ปันผลเดือนละสิบเปอร์เซ็นต์"
     text: "เพื่อนสมัยเรียนทักมาหลังหายไปยี่สิบปี โชว์สลิปปันผลรายเดือน บอกว่ามีโควตาเหลือที่เดียว ปิดรับคืนนี้"
     weight: 2
-    multipliers: {flags: {in_debt: 1.5, own_business: 1.2}, stats: {knowledge: 0.7}}
+    multipliers: {flags: {in_debt: 1.5, own_business: 1.2, scam_aware: 0.5, ponzi_victim: 0.6}}
     choices:
       - id: put_in
         text: "ลงเงินเก็บเกือบทั้งหมด"
         outcomes:
-          - {weight: 3, text: "เดือนแรกได้ปันผลจริง เดือนที่สองแอปหายจากโทรศัพท์ทุกเครื่อง", effects: {happiness: -3, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "เดือนแรกได้ปันผลจริง เดือนที่สองแอปหายจากโทรศัพท์ทุกเครื่อง", effects: {happiness: -3, money: {unit: income_x, amount: -2}}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
           - {weight: 1, text: "ถอนทันก่อนวงแตกสองวัน ได้กำไรมาแบบงง ๆ แต่เพื่อนอีกหลายคนไม่ทัน", effects: {happiness: 1, money: {unit: income_x, amount: 1}, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: test_small
         text: "ลองก้อนเล็ก ๆ ดูก่อน"
         outcomes:
-          - {weight: 3, text: "ได้ปันผลสามเดือนติด เลยเติมก้อนใหญ่ แล้วทุกอย่างก็หายไปพร้อมกัน", effects: {happiness: -2, money: {unit: income_x, amount: -1}, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ได้ปันผลสามเดือนติด เลยเติมก้อนใหญ่ แล้วทุกอย่างก็หายไปพร้อมกัน", effects: {happiness: -2, money: {unit: income_x, amount: -1}, health: -1}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
           - {weight: 1, text: "ก้อนเล็กหายตั้งแต่เดือนแรก เจ็บแต่จำ ไม่เติมอีกเลย", effects: {knowledge: 2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: check_first
         text: "ค้นข้อมูลก่อนตัดสินใจ"
         outcomes:
-          - {weight: 2, text: "เจอข่าวว่าเป็นแชร์ลูกโซ่ที่มีคนเสียหายเป็นร้อย เลยรวบหลักฐานไปแจ้งความ", effects: {knowledge: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "เจอข่าวว่าเป็นแชร์ลูกโซ่ที่มีคนเสียหายเป็นร้อย เลยรวบหลักฐานไปแจ้งความ", effects: {knowledge: 2, health: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ข้อมูลดูน่าเชื่อจนเกือบโอนไปแล้ว มือสั่นนอนไม่หลับทั้งคืน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: warn_others
@@ -302,20 +302,20 @@ events:
     title: "ตัวแทนประกันที่หน้าบ้าน"
     text: "ตรวจสุขภาพประจำปีเจอค่าน้ำตาลเริ่มแดง วันรุ่งขึ้นหลานของเพื่อนบ้านถือแฟ้มประกันมานั่งรอที่หน้าประตู"
     weight: 2
-    multipliers: {flags: {married: 1.3, has_kids: 1.3}}
+    multipliers: {flags: {married: 1.3, has_kids: 1.3}, occupation: {clerk: 1.3, professional: 1.2}}
     choices:
       - id: buy_health
         text: "ทำประกันสุขภาพเต็มวงเงิน"
         effects: {money: {unit: income_x, amount: -0.5}}
         sets_flags: [has_insurance]
         outcomes:
-          - {weight: 1, text: "ปีต่อมาล้มป่วยต้องนอนโรงพยาบาล เคลมค่ารักษาได้เต็มไม่เสียสักบาท", effects: {happiness: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ปีต่อมาล้มป่วยต้องนอนโรงพยาบาล เคลมค่ารักษาได้เต็มไม่เสียสักบาท", effects: {happiness: 2, health: -1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "จ่ายเบี้ยไปทุกปีโดยไม่เคยได้ใช้สักครั้ง", effects: {money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: buy_cheap
         text: "เอาแผนถูกสุดพอมีติดตัว"
         outcomes:
-          - {weight: 3, text: "เบี้ยถูก ใจสบาย มีชื่ออยู่ในระบบแล้ว", effects: {happiness: 1}, sets_flags: [has_insurance], merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "เบี้ยถูก ใจสบาย มีชื่ออยู่ในระบบแล้ว", effects: {happiness: 1}, sets_flags: [has_insurance], merit: [{cat: neutral}]}
           - {weight: 1, text: "อ่านเงื่อนไขทีหลังถึงรู้ว่าโรคที่เป็นอยู่ไม่คุ้มครองเลย", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: self_insure
@@ -328,6 +328,78 @@ events:
         merit: [{cat: care_parents, level: 2}]
       - id: become_agent
         text: "ขอสมัครเป็นตัวแทนเสียเอง"
-        effects: {income_mult: 1.15, relations: -1, knowledge: 1, health: -1}
+        requires: {edu: มัธยม, reason: "ต้องจบมัธยมถึงจะสอบใบอนุญาตได้"}
+        effects: {income_mult: 1.15, relations: -1, network: 1, health: -1}
         sets_flags: [has_insurance]
+        merit: [{cat: neutral}]
+
+  # เรื่องต่อ (next) — ไม่มี weight · อายุเดียวกับการ์ดต้นทาง
+  - id: mid_online_empire_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "นายทุนมาเคาะประตู"
+    text: "ข่าวเถ้าแก่วัย {อายุ} ไปไกลถึงเมืองหลวง ธุรกิจโตจนต้องเลือกทางเดินต่อ แถมนายทุนใส่สูทนั่งรถตู้มายื่นซองถึงหน้าโกดัง"
+    choices:
+      - id: go_corp
+        text: "จดบริษัท นั่งเก้าอี้ผู้บริหาร"
+        requires: {edu: อุดมศึกษา, reason: "ต้องจบปริญญาตรีถึงจะคุมบริษัทได้"}
+        outcomes:
+          - {weight: 2, ok: true, text: "บริษัทโตจนมีสาขาทั่วภาค ชื่อ {ชื่อ} ขึ้นป้ายหน้าตึก", effects: {job: manager, network: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {network: 1.5}}}
+          - {weight: 1, text: "เอกสารบัญชีเยอะจนปวดหัว นอนไม่หลับสามเดือน แต่กิจการยังเดินได้", effects: {job: manager, health: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sell_out
+        text: "รับซองนายทุน ขายแล้วพักยาว"
+        effects: {money: {unit: income_x, amount: 2.5}, happiness: 1, health: 1}
+        clears_flags: [online_seller]
+        merit: [{cat: neutral}]
+      - id: big_ads
+        text: "ทุ่มโฆษณาเจาะทั้งประเทศ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คลิปโฆษณาดังข้ามคืน ยอดขายพุ่งจนต้องเปิดโกดังที่สอง", effects: {income_mult: 1.3, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เงินโฆษณาหายไปกับลม ยอดขายแทบไม่ขยับ", effects: {money: {unit: income_x, amount: -1.5}, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: share_staff
+        text: "แบ่งกำไรให้ลูกน้องทุกคน"
+        effects: {relations: 2, network: 2, income_mult: 0.9, happiness: 1}
+        merit: [{cat: dana, level: 2}]
+      - id: cheap_labor
+        text: "กดค่าแรงลูกน้อง เก็บกำไรเพิ่ม"
+        effects: {income_mult: 1.2, relations: -2, network: -1}
+        merit: [{cat: oppress_subjects, level: 2}]
+
+  - id: mid_risky_chase_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ตามล่ารุ่นน้อง"
+    text: "สามวันหลังร้านเจ๊ง เพื่อนเก่าส่งรูปมาให้ รุ่นน้องคนนั้นนั่งจิบกาแฟอยู่ริมทะเลที่ {จังหวัด} ใส่นาฬิกาเรือนใหม่"
+    choices:
+      - id: police
+        text: "รวบหลักฐานไปแจ้งความ"
+        outcomes:
+          - {weight: 2, ok: true, text: "ตำรวจตามเจอ ศาลสั่งคืนเงินบางส่วน ได้กลับมาพอหายใจคล่อง", effects: {money: {unit: income_x, amount: 1}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "คดีเดินช้าเป็นปี ค่าเดินทางขึ้นศาลกินเงินที่เหลือไปอีก", effects: {money: {unit: income_x, amount: -0.5}, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: confront
+        text: "ขับรถไปเผชิญหน้าเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "รุ่นน้องเห็นหน้าแล้วร้องไห้ ยอมเซ็นรับสภาพหนี้ต่อหน้าพยาน", effects: {money: {unit: income_x, amount: 0.5}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไปถึงเขาย้ายที่พักไปแล้ว เหลือแต่ใบเสร็จค่าน้ำมันกับความโกรธ", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: let_go
+        text: "ปล่อยวาง ถือว่าใช้เวรใช้กรรม"
+        effects: {happiness: 1, health: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: go_farm
+        text: "กลับไปทำสวน ยอมรายได้หดฮวบ"
+        effects: {job: farmer, happiness: 1, health: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: expose_post
+        text: "แฉลงโซเชียลให้ทั้งประเทศรู้"
+        outcomes:
+          - {weight: 1, ok: true, text: "โพสต์ไวรัล คนเสียหายอีกเป็นสิบโผล่มารวมตัว ฟ้องร่วมกันได้", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โดนฟ้องหมิ่นประมาทกลับ ต้องจ้างทนายเพิ่มอีกก้อน", effects: {money: {unit: income_x, amount: -1}, happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]

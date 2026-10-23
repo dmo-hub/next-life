@@ -1,0 +1,502 @@
+# กลุ่มหนี้ · ช่วงหนุ่มสาว/ทำงาน/กลางคน (19–59) + การ์ดทวงหนี้นอกระบบช่วงชรา · กยศ. บ้าน รถ ค้ำประกัน หนี้นอกระบบ — ใช้ธง loan_shark · guarantor · home_owner · has_car
+events:
+  - id: debt_student_loan_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2539, 2650]
+    systems: [student_loan]
+    lore_ref: lore-finance-series.html#6
+    when: {age: [19, 22]}
+    weight: 2
+    multipliers: {flags: {good_student: 1.3}}
+    title: "ใบสมัคร กยศ."
+    text: "ค่าเทอมงวดหน้ามาพร้อมค่าหอ เงินที่บ้านส่งมาไม่พอ รุ่นพี่ยื่นใบสมัครกยศ.ให้ บอกว่ากู้ได้ทั้งค่าเทอมและค่ากิน ดอกถูกกว่าที่ไหน ๆ"
+    choices:
+      - id: borrow_full
+        text: "กู้เต็มจำนวน ตั้งใจเรียน"
+        effects: {debt: {kind: student_loan, amount: {unit: income_x, amount: 3}}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ไม่ต้องห่วงเรื่องเงิน เกรดขึ้นทุกเทอม อาจารย์เริ่มชวนไปช่วยงานวิจัย", effects: {knowledge: 2, network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรียนจบแล้วหางานไม่ได้ จดหมายเตือนงวดแรกมาถึงก่อนสลิปเงินเดือน", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: borrow_spend
+        text: "กู้มา แบ่งไปซื้อมือถือใหม่"
+        effects: {debt: {kind: student_loan, amount: {unit: income_x, amount: 3}}, happiness: 1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "มือถือใหม่กลายเป็นร้านขายของออนไลน์ กำไรพอจ่ายค่ากินทั้งเทอม", effects: {money: {unit: income_x, amount: 1}, happiness: 1}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 2, text: "เงินหมดก่อนสอบกลางภาค ต้องยืมเพื่อนกินข้าวจนจบเทอม", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+      - id: work_parttime
+        text: "ทำงานพิเศษส่งตัวเอง"
+        effects: {health: -1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เจ้าของร้านที่ทำพาร์ตไทม์ถูกใจ ยื่นข้อเสนองานประจำรอไว้ตั้งแต่ยังไม่จบ", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทำงานดึกจนหลับในห้องสอบ ติด F วิชาหลักต้องลงซ้ำ", effects: {knowledge: -1, happiness: -2}, merit: [{cat: neutral}]}
+      - id: ask_parents
+        text: "โทรขอเงินที่บ้านเพิ่ม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "แม่บอกปีนี้ขายของได้ราคา โอนมาเกินที่ขอแถมกำชับให้กินดี ๆ", effects: {happiness: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้เงินครบ มารู้ทีหลังว่าพ่อเอาโฉนดที่นาไปจำนำมาให้", effects: {relations: 2, happiness: -2}, merit: [{cat: neutral}]}
+
+  - id: debt_car_buy_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [23, 30], flags: {not: [has_car]}}
+    weight: 1
+    multipliers: {class: {ร่ำรวย: 1.5}}
+    title: "ป้ายแดงทั้งกลุ่ม"
+    text: "เพื่อนรุ่นเดียวกันออกรถใหม่กันทั้งกลุ่ม เซลส์โทรมาทุกวัน บอกว่าดาวน์ต่ำ ผ่อนเดือนละนิดเดียว ของแถมเต็มคัน ขับไปงานเลี้ยงรุ่นทันแน่นอน"
+    choices:
+      - id: new_car
+        text: "ออกป้ายแดง ผ่อนเต็มที่"
+        effects: {debt: {kind: car, amount: {unit: income_x, amount: 6}}, money: {unit: income_x, amount: -6}, happiness: 2}
+        sets_flags: [has_car]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "รถพาไปรับงานไกลได้ทุกเสาร์อาทิตย์ รายได้เสริมเข้ามาพอจ่ายค่างวด", effects: {network: 1, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขับได้สามเดือนโดนชนท้าย อีกฝ่ายหนีไป ซ่อมเองหมดเงินเก็บ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: used_car
+        text: "ซื้อมือสองด้วยเงินสด"
+        requires: {money: {unit: income_x, amount: 2}}
+        effects: {money: {unit: income_x, amount: -2}}
+        sets_flags: [has_car]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เครื่องฟิตเกินราคา ขับมาหลายปีไม่เคยเข้าอู่ เพื่อนขอยืมไปเที่ยวจนชิน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไมล์ถูกกรอ เครื่องดับกลางทางด่วน ค่าซ่อมเกือบเท่าราคารถ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: keep_bike
+        text: "ขี่มอเตอร์ไซค์คันเดิมต่อ"
+        effects: {money: {unit: income_x, amount: 1}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: car_for_parents
+        text: "ออกรถให้พ่อแม่ใช้ที่บ้าน"
+        effects: {debt: {kind: car, amount: {unit: income_x, amount: 4}}, money: {unit: income_x, amount: -4}, relations: 2}
+        sets_flags: [has_car]
+        merit: [{cat: care_parents, level: 1}]
+
+  - id: debt_guarantor_ask_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {flags: {not: [guarantor]}}
+    weight: 1
+    multipliers: {stats: {relations: 1.3}}
+    title: "ขาดแค่ลายเซ็นเดียว"
+    text: "เพื่อนสนิทสมัยเรียนนัดกินข้าว เล่าเรื่องเก่าจนน้ำตาซึม ก่อนจะยื่นสัญญากู้ซื้อรถมาตรงหน้า บอกว่าทุกอย่างพร้อมแล้ว ขาดแค่ลายเซ็นคนค้ำ"
+    choices:
+      - id: sign
+        text: "เซ็นค้ำให้ เพื่อนกันนี่"
+        sets_flags: [guarantor]
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เพื่อนผ่อนตรงทุกงวด ปีใหม่ขับรถคันนั้นมาส่งกระเช้าถึงบ้าน", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หกเดือนต่อมา เบอร์แปลกโทรเข้ามา ไม่ใช่เพื่อน แต่เป็นไฟแนนซ์", effects: {happiness: -1}, next: debt_guarantor_default_01, merit: [{cat: neutral}]}
+      - id: refuse_soft
+        text: "ปฏิเสธแบบนุ่ม ๆ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "เพื่อนยิ้มแห้ง จ่ายค่าข้าวเองแล้วเลิกทักมาไปพักใหญ่", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปีต่อมาคนที่ไปค้ำแทนโดนตามหนี้ทั้งก้อน เพื่อนมาขอโทษที่เคยงอน", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+      - id: lend_cash
+        text: "ให้ยืมเงินสดแทนการค้ำ"
+        effects: {money: {unit: income_x, amount: -1}}
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนคืนครบในปีเดียว แถมพาไปรู้จักลูกค้ารายใหญ่", effects: {money: {unit: income_x, amount: 1}, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เงินก้อนนั้นหายไปพร้อมเพื่อน โซเชียลของเขาปิดเงียบทุกช่องทาง", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+      - id: joint_shop
+        text: "ชวนเพื่อนเปิดร้านด้วยกันแทน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้านเล็กของสองคนขายดีจนต้องจ้างคนเพิ่ม เพื่อนซื้อรถได้เองโดยไม่ต้องมีใครค้ำ", effects: {happiness: 2, money: {unit: income_x, amount: 1.5}}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทะเลาะเรื่องเงินทอนทุกคืน ร้านปิดในปีเดียว เพื่อนก็หายไปด้วย", effects: {relations: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+
+  - id: debt_guarantor_default_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "ลายเซ็นของคุณ"
+    text: "ไฟแนนซ์บอกว่าเพื่อนค้างค่างวดมาห้าเดือน โทรเบอร์เดิมไม่มีคนรับ บ้านเช่าก็ย้ายออกไปแล้ว ยอดค้างทั้งหมดตอนนี้ชี้มาที่ลายเซ็นของคุณคนเดียว"
+    choices:
+      - id: pay_off
+        text: "จ่ายปิดแทนให้จบ"
+        effects: {money: {unit: income_x, amount: -2}, happiness: -1}
+        clears_flags: [guarantor]
+        merit: [{cat: sila, level: 1}]
+      - id: track_down
+        text: "ตามหาเพื่อนให้เจอ"
+        clears_flags: [guarantor]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอเพื่อนเปิดแผงอยู่ต่างจังหวัด เขาก้มกราบขอโทษแล้วรับผ่อนต่อเอง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไปถึงบ้านเพื่อน เจอแต่แม่เขานอนป่วยติดเตียง กลับมามือเปล่าพร้อมค่าน้ำมัน", effects: {happiness: -2}, sets_flags: [guarantor], merit: [{cat: neutral}]}
+      - id: let_seize
+        text: "ให้ไฟแนนซ์ยึดรถไปขาย"
+        clears_flags: [guarantor]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "รถยังใหม่ ขายทอดตลาดได้ราคาดี จ่ายส่วนต่างนิดเดียวก็จบ", effects: {money: {unit: income_x, amount: -0.3}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ขายได้แค่ครึ่งเดียว ส่วนต่างพร้อมดอกตามมาเก็บที่คุณ", effects: {money: {unit: income_x, amount: -1.5}, happiness: -1}, merit: [{cat: neutral}]}
+      - id: ignore_calls
+        text: "เงียบ ไม่รับสายไฟแนนซ์"
+        effects: {happiness: -1, relations: -1}
+        sets_flags: [in_debt]
+        merit: [{cat: neutral}]
+
+  - id: debt_house_buy_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {flags: {not: [home_owner]}}
+    weight: 2
+    multipliers: {flags: {married: 1.5, has_kids: 1.3}}
+    title: "หลังมุมหลังสุดท้าย"
+    text: "เดินผ่านโครงการบ้านใหม่ทุกเช้า วันนี้เซลส์วิ่งมายื่นโบรชัวร์ บอกว่าเหลือหลังมุมหลังสุดท้าย จองวันนี้ฟรีค่าโอน ธนาคารอนุมัติง่ายกว่าที่คิด"
+    choices:
+      - id: new_house
+        text: "กู้ซื้อบ้านหลังมุม"
+        effects: {debt: {kind: mortgage, amount: {unit: income_x, amount: 25}}, invest: {asset: land, share: 0.6}}
+        sets_flags: [home_owner]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ย้ายเข้าทันปีใหม่ ทุกคนในบ้านมีห้องของตัวเองสักที", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อยู่ได้ปีเดียว น้ำท่วมทั้งหมู่บ้านถึงเอว เฟอร์นิเจอร์ใหม่ลอยออกหน้าต่าง", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: used_house
+        text: "ซื้อบ้านมือสองขายด่วน"
+        effects: {debt: {kind: mortgage, amount: {unit: income_x, amount: 15}}, invest: {asset: land, share: 0.5}}
+        sets_flags: [home_owner]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ราคาถูกกว่าตลาดเกือบครึ่ง ปีต่อมามีข่าวรถไฟฟ้าจะมาลงหน้าซอย", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วันรับกุญแจ ไขประตูเข้าไปเจอครอบครัวแปลกหน้ากำลังนั่งกินข้าวอยู่ในบ้าน", next: debt_house_squatter_01, merit: [{cat: neutral}]}
+      - id: keep_renting
+        text: "เช่าต่อ เก็บเงินไว้ก่อน"
+        effects: {money: {unit: income_x, amount: 1}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: rural_land
+        text: "ซื้อที่ดินเปล่าต่างจังหวัด"
+        requires: {money: {unit: income_x, amount: 3}}
+        effects: {invest: {asset: land, share: 0.4}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "สามปีต่อมาถนนสี่เลนตัดผ่านหน้าที่ดิน นายหน้าโทรมาขอซื้อทุกอาทิตย์", effects: {happiness: 2, money: {unit: income_x, amount: 2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไปดูของจริงถึงรู้ว่าเป็นที่ดินตาบอด ไม่มีทางเข้า ขายต่อใครก็ไม่เอา", effects: {happiness: -2}, merit: [{cat: neutral}]}
+
+  - id: debt_house_squatter_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ผู้เช่าที่ไม่ยอมไป"
+    text: "ผู้เช่าเก่าโชว์สัญญาว่าเจ้าของเดิมรับค่าเช่าล่วงหน้าไปสามปี แล้วหายตัว เขาไม่ยอมย้ายออก ส่วนคุณต้องเริ่มผ่อนบ้านที่ยังเข้าไปนอนไม่ได้"
+    choices:
+      - id: sue
+        text: "จ้างทนายฟ้องขับไล่"
+        effects: {money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ศาลสั่งให้ออกภายในเดือน ได้ย้ายเข้าบ้านพร้อมสัญญาฉบับปลอมเป็นที่ระลึก", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คดียืดไปสองปี ค่าทนายบานจนแทบเท่าเงินดาวน์", effects: {money: {unit: income_x, amount: -1}, health: -1, happiness: -2}, merit: [{cat: neutral}]}
+      - id: pay_moving
+        text: "ออกค่าย้ายให้เขาไปเอง"
+        effects: {money: {unit: income_x, amount: -0.5}, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: let_stay
+        text: "ให้อยู่ต่อ เก็บค่าเช่าแทน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ค่าเช่าพอผ่อนบ้านได้ทั้งงวด เหมือนมีคนผ่อนบ้านให้ฟรี ๆ", effects: {money: {unit: income_x, amount: 1}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาหนีไปกลางดึก ทิ้งไว้แต่ผนังพังกับค่าไฟค้างสามเดือน", effects: {money: {unit: income_x, amount: -1}, happiness: -1}, merit: [{cat: neutral}]}
+      - id: cut_utilities
+        text: "ตัดน้ำตัดไฟ บีบให้ออก"
+        effects: {happiness: 1, relations: -2}
+        merit: [{cat: greed_harm, level: 1}]
+
+  - id: debt_cash_short_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {flags: {not: [loan_shark]}}
+    weight: 1
+    repeat: {gap: 4, max: 3}
+    multipliers: {flags: {in_debt: 2, has_kids: 1.3}, occupation: {labor: 1.5, farmer: 1.3, service: 1.2}}
+    title: "เงินด่วนบนเสาไฟ"
+    text: "เงินงวดนี้ยังไม่เข้า แต่ค่ารักษาของคนในบ้าน ค่าเช่า กับค่างวดมาพร้อมกันในอาทิตย์เดียว ใบปลิวเงินด่วนไม่ต้องค้ำติดอยู่บนเสาไฟหน้าบ้านพอดี"
+    choices:
+      - id: call_shark
+        text: "โทรเบอร์เงินด่วนบนเสาไฟ"
+        effects: {debt: {kind: informal, amount: {unit: income_x, amount: 1}}, money: {unit: income_x, amount: -1}, happiness: 1}
+        sets_flags: [loan_shark]
+        merit: [{cat: neutral}]
+      - id: pawn_gold
+        text: "เอาทองไปจำนำ"
+        effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: ask_relative
+        text: "ขอยืมญาติ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ญาติให้ยืมแบบไม่คิดดอก แถมห่อกับข้าวใส่ถุงให้กลับบ้าน", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยืมได้ แต่เรื่องไปถึงหูทั้งตระกูลภายในวันเดียว", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+      - id: overtime
+        text: "รับงานเสริมทุกคืนจนครบ"
+        effects: {health: -2}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ลูกค้าประจำติดใจ จ้างต่อเป็นงานประจำ", effects: {income_mult: 1.1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ล้มฟุบกลางงาน ค่าหมอรอบนี้แพงกว่าเงินที่หามาได้", effects: {health: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+      - id: gamble_night
+        text: "ลงวงไพ่ หวังพลิกคืนเดียว"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ไพ่ขึ้นทุกตา ได้ครบทุกก้อนแถมเหลือกลับบ้าน", effects: {money: {unit: income_x, amount: 1}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "หมดตัวก่อนเที่ยงคืน สุดท้ายต้องโทรหาเบอร์บนเสาไฟอยู่ดี แถมยอดมากกว่าเดิม", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 1.5}}, money: {unit: income_x, amount: -1.5}, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+
+  - id: debt_shark_collect_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {flags: {has: [loan_shark]}}
+    weight: 6
+    repeat: {gap: 1, max: 6}
+    title: "ดอกรายวัน"
+    text: "เสียงมอเตอร์ไซค์ดับหน้าบ้านตอนหกโมงเย็นเหมือนทุกวัน ชายสองคนเคาะประตู ถามหายอดงวดนี้ แล้วยืนมองเข้ามาในบ้านนานผิดปกติ"
+    choices:
+      - id: settle_all
+        text: "กัดฟันปิดหนี้ทั้งก้อน"
+        effects: {settle: informal, happiness: 2, health: 1}
+        clears_flags: [loan_shark]
+        merit: [{cat: neutral}]
+      - id: report_police
+        text: "แจ้งตำรวจเรื่องดอกโหด"
+        effects: {complain: true}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ตำรวจเรียกไกล่เกลี่ย ดอกลดเหลือตามกฎหมาย คนทวงพูดจาสุภาพขึ้นทันตา เหลือแต่เงินต้นที่ต้องหามาคืน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "คืนต่อมามีขวดลอยมากระแทกหลังคาบ้าน เสียงหัวเราะดังลั่นปากซอย", effects: {happiness: -2, relations: -1}, next: debt_shark_threat_01, merit: [{cat: neutral}]}
+      - id: pay_interest
+        text: "จ่ายดอกไปก่อน ต้นค่อยว่ากัน"
+        effects: {happiness: -1, health: -1}
+        merit: [{cat: neutral}]
+      - id: bank_loan
+        text: "ยื่นกู้ธนาคารมาโปะ"
+        clears_flags: [loan_shark]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ธนาคารอนุมัติ ปิดหนี้นอกระบบได้ เหลือแต่งวดผ่อนดอกปกติ นอนหลับเป็นครั้งแรก", effects: {settle: informal, debt: {kind: car, amount: {unit: income_x, amount: 1}}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ธนาคารปฏิเสธ เพราะประวัติค้างชำระ คนทวงรู้ข่าวก่อนคุณกลับถึงบ้าน", effects: {happiness: -1}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+      - id: give_car
+        text: "ยกรถให้เจ้าหนี้แทนหนี้"
+        requires: {flags: {has: [has_car]}, reason: "ไม่มีรถให้ยก"}
+        effects: {money: {unit: income_x, amount: 2}, settle: informal, happiness: -1}
+        clears_flags: [loan_shark, has_car]
+        merit: [{cat: neutral}]
+      - id: flee
+        text: "หนีไปตั้งตัวต่างจังหวัด"
+        effects: {relations: -2}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ได้งานใหม่ในเมืองที่ไม่มีใครรู้จัก ปีนี้ยังไม่มีใครตามมาเจอ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "สองเดือนต่อมา มอเตอร์ไซค์คันเดิมมาจอดหน้าห้องเช่าใหม่", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+
+  - id: debt_shark_threat_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "สีแดงบนประตู"
+    text: "สามวันหลังแจ้งความ ประตูบ้านถูกพ่นสีแดงเต็มบาน ชื่อคุณตัวโตพร้อมคำว่าคนโกง เพื่อนบ้านเริ่มเดินอ้อม แม่ค้าปากซอยไม่กล้าขายของให้"
+    choices:
+      - id: press_case
+        text: "เดินหน้าคดีต่อ ไม่ยอม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "กล้องหน้าบ้านข้าง ๆ จับหน้าคนพ่นสีได้ชัด คนพ่นโดนจับ เพื่อนบ้านกลับมาทัก เหลือแต่เงินต้นที่ยังต้องคืน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คดีเงียบหาย คนทวงกลับมายืนหน้าบ้านทุกเย็นเหมือนไม่มีอะไรเกิดขึ้น", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+      - id: pay_principal
+        text: "ยอมจ่ายต้นคืนให้จบ"
+        effects: {settle: informal, happiness: -1, health: 1}
+        clears_flags: [loan_shark]
+        merit: [{cat: neutral}]
+      - id: move_out
+        text: "ย้ายไปเช่าที่อื่นเงียบ ๆ"
+        effects: {money: {unit: income_x, amount: -0.5}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: ask_elder
+        text: "ขอผู้ใหญ่ในชุมชนไกล่เกลี่ย"
+        clears_flags: [loan_shark]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.5}}, text: "ผู้ใหญ่ที่เจ้าหนี้เกรงใจออกหน้า ตกลงให้ผ่อนต้นคืนแบบไม่มีดอก", effects: {settle: informal, network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ใหญ่รับปากอย่างดี แล้วขอค่าเหนื่อยไปอีกก้อน", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+
+  - id: debt_shark_collect_mid_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    when: {flags: {has: [loan_shark]}}
+    weight: 6
+    repeat: {gap: 1, max: 6}
+    title: "ทวงกลางตลาด"
+    text: "คนทวงหนี้ไม่มาที่บ้านแล้ว คราวนี้มายืนรอถึงที่ทำมาหากิน ตะโกนชื่อคุณต่อหน้าคนทั้งตลาด แล้วยื่นกระดาษยอดดอกที่ทบมาหลายปี"
+    choices:
+      - id: settle_all
+        text: "ปิดหนี้ทั้งก้อนวันนี้เลย"
+        effects: {settle: informal, happiness: 2}
+        clears_flags: [loan_shark]
+        merit: [{cat: neutral}]
+      - id: report_police
+        text: "แจ้งตำรวจเรื่องดอกโหด"
+        effects: {complain: true}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ตำรวจสั่งลดดอกตามกฎหมาย คนทวงเสียงเบาลง เหลือแต่เงินต้นที่ต้องหามาคืน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ดอกลดจริง แต่กระจกหน้าบ้านแตกกลางดึกคืนนั้น", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+      - id: remortgage
+        text: "เอาบ้านเข้าธนาคารมาโปะ"
+        requires: {flags: {has: [home_owner]}, reason: "ไม่มีบ้านไปค้ำ"}
+        effects: {settle: informal, debt: {kind: mortgage, amount: {unit: income_x, amount: 2}}, happiness: 1}
+        clears_flags: [loan_shark]
+        merit: [{cat: neutral}]
+      - id: kids_help
+        text: "สารภาพกับลูก ขอให้ช่วย"
+        requires: {flags: {has: [has_kids]}, reason: "ไม่มีลูกให้พึ่ง"}
+        clears_flags: [loan_shark]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ลูกเงียบไปนาน แล้วโอนเงินปิดหนี้ให้ทั้งก้อน ขอแค่อย่าปิดบังกันอีก", effects: {settle: informal, relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกโกรธจนไม่รับสายไปครึ่งปี หนี้ก็ยังอยู่ที่เดิม", effects: {relations: -2, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+      - id: pay_interest
+        text: "จ่ายดอกไปก่อน"
+        effects: {happiness: -1, health: -1}
+        merit: [{cat: neutral}]
+
+  - id: debt_refinance_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {flags: {has: [home_owner]}}
+    weight: 1
+    title: "จดหมายรีไฟแนนซ์"
+    text: "ผ่อนบ้านมาหลายปี ดอกลอยขึ้นทุกปีจนงวดหนักกว่าวันแรก ธนาคารอีกแห่งส่งจดหมายมาเสนอดอกต่ำกว่า แถมให้กู้เพิ่มได้อีกก้อนถ้าย้ายมาตอนนี้"
+    choices:
+      - id: refinance
+        text: "ย้ายไปธนาคารใหม่ ดอกต่ำกว่า"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "งวดลดลงทุกเดือน เงินที่เหลือพอพาคนในบ้านไปเที่ยวทะเลปีละครั้ง", effects: {money: {unit: income_x, amount: 1}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ดอกต่ำแค่สามปีแรก ปีที่สี่พุ่งแรงกว่าธนาคารเดิม ค่าปรับย้ายก็เสียไปแล้ว", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
+      - id: cash_out
+        text: "รีไฟแนนซ์แล้วกู้เพิ่มอีกก้อน"
+        effects: {debt: {kind: mortgage, amount: {unit: income_x, amount: 3}}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เอาเงินก้อนไปต่อเติมชั้นล่างเป็นห้องเช่า ค่าเช่าจ่ายงวดบ้านแทนได้เกือบหมด", effects: {money: {unit: income_x, amount: 1}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เงินก้อนหมดไปกับรถคันใหม่ในเดือนเดียว เหลือแต่งวดบ้านที่ยาวกว่าเดิม", effects: {money: {unit: income_x, amount: -3}, happiness: 1}, sets_flags: [has_car], merit: [{cat: neutral}]}
+      - id: fake_slip
+        text: "แต่งสลิปเงินเดือนกู้เพิ่ม"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 2, text: "ผ่านฉลุย ได้เงินก้อนโตกว่าที่ควรได้ แต่งวดใหม่ก็โตตาม", effects: {debt: {kind: mortgage, amount: {unit: income_x, amount: 5}}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ธนาคารโทรเช็กกับที่ทำงาน เรื่องแดงไปทั้งแผนก ชื่อติดบัญชีดำ", effects: {happiness: -2, network: -2}, merit: [{cat: neutral}]}
+      - id: pay_off_house
+        text: "ปิดหนี้บ้านทีเดียว"
+        requires: {money: {unit: income_x, amount: 20}}
+        effects: {settle: mortgage, happiness: 2}
+        merit: [{cat: neutral}]
+      - id: stay_put
+        text: "ผ่อนแบบเดิมต่อไป"
+        merit: [{cat: neutral}]
+
+  - id: debt_house_sell_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    when: {flags: {has: [home_owner]}}
+    weight: 1
+    multipliers: {flags: {in_debt: 3, loan_shark: 3}}
+    title: "ราคาที่ใจสั่น"
+    text: "นายหน้าโทรมาบอกว่ามีคนเสนอซื้อบ้านหลังนี้ ราคาดีกว่าตอนซื้อมาเกือบเท่าตัว ยิ่งนึกถึงงวดผ่อนที่เหลืออีกสิบกว่าปี ยิ่งใจสั่น"
+    choices:
+      - id: sell_clear
+        text: "ขายบ้าน ปิดหนี้ให้หมด"
+        effects: {invest: {asset: deposit, share: 0.9}, settle: mortgage}
+        clears_flags: [home_owner, in_debt, loan_shark]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ปิดหนี้ได้หมด เหลือเงินก้อนไปเช่าห้องใกล้ที่ทำงาน ไม่ต้องตื่นตีห้าอีกต่อไป", effects: {settle: informal, happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สามเดือนหลังขาย ห้างใหญ่มาเปิดหน้าหมู่บ้าน ราคาบ้านแถวนั้นพุ่งอีกเท่าตัว", effects: {settle: informal, happiness: -2}, merit: [{cat: neutral}]}
+      - id: sell_open_shop
+        text: "ขายแล้วเอาเงินไปเปิดร้าน"
+        effects: {invest: {asset: deposit, share: 0.9}, settle: mortgage}
+        clears_flags: [home_owner]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้านติดตลาดตั้งแต่เดือนแรก ลูกค้าประจำเรียกชื่อคุณได้ทั้งซอย", effects: {money: {unit: income_x, amount: 2}, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ร้านเจ๊งในปีเดียว ไม่มีทั้งบ้านทั้งร้าน เหลือแต่หนี้ค่าเช่าที่", effects: {money: {unit: income_x, amount: -2}, happiness: -2}, sets_flags: [own_business, in_debt], merit: [{cat: neutral}]}
+      - id: rent_out
+        text: "ปล่อยเช่า แล้วไปอยู่ห้องเล็ก"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ค่าเช่าครอบคลุมงวดผ่อนทั้งหมด บ้านผ่อนตัวเองจนเกือบหมด", effects: {money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้เช่าเลี้ยงหมาสิบตัวในบ้าน คืนบ้านมาพร้อมพื้นพังทั้งหลัง", effects: {money: {unit: income_x, amount: -1}, happiness: -2}, merit: [{cat: neutral}]}
+      - id: keep_house
+        text: "ไม่ขาย บ้านนี้คือชีวิต"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: debt_shark_collect_old_01
+    type: A
+    category: work_money
+    stage: ชรา
+    years: [2500, 2650]
+    when: {flags: {has: [loan_shark]}}
+    weight: 4
+    repeat: {gap: 2, max: 4}
+    title: "หนี้ตามถึงวัยเกษียณ"
+    text: "ผมหงอกเต็มหัวแล้ว แต่มอเตอร์ไซค์คันเดิมยังมาจอดหน้าบ้าน คนทวงรุ่นลูกยื่นสมุดยอดดอกที่ทบมาตั้งแต่สมัยยังทำงาน หลานยืนมองอยู่ข้างหลัง"
+    choices:
+      - id: settle_all
+        text: "เอาเงินเก็บก้อนสุดท้ายปิดหนี้"
+        effects: {settle: informal, happiness: 2, health: 1}
+        clears_flags: [loan_shark]
+        merit: [{cat: neutral}]
+      - id: report_police
+        text: "ให้หลานพาไปแจ้งความ"
+        effects: {complain: true}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ตำรวจสั่งลดดอกตามกฎหมาย คนทวงเสียงอ่อนลงทันที เหลือแต่เงินต้นที่ค่อย ๆ คืน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ดอกลดจริง แต่กระถางต้นไม้หน้าบ้านถูกเตะแตกทั้งแถวในคืนเดียว", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: kids_help
+        text: "สารภาพกับลูก ขอให้ช่วย"
+        requires: {flags: {has: [has_kids]}, reason: "ไม่มีลูกให้พึ่ง"}
+        clears_flags: [loan_shark]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ลูกรวมเงินกันปิดหนี้ให้ทั้งก้อน แล้วพาไปอยู่ด้วยกันที่บ้านลูก", effects: {settle: informal, relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกเองก็ผ่อนบ้านอยู่ ช่วยได้แค่ค่ากับข้าว หนี้ก้อนเดิมยังอยู่ที่เดิม", effects: {relations: 1, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+      - id: sell_gold
+        text: "ขายทองที่เก็บมาทั้งชีวิตใช้หนี้"
+        effects: {settle: informal, happiness: -1}
+        clears_flags: [loan_shark]
+        merit: [{cat: neutral}]
+      - id: pay_interest
+        text: "จ่ายดอกไปทีละงวด"
+        effects: {happiness: -1, health: -1}
+        merit: [{cat: neutral}]

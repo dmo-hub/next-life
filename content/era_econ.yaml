@@ -17,7 +17,7 @@ events:
         merit: [{cat: neutral}]
       - text: "แม่ตั้งแผงขายกับข้าวหน้าบ้าน"
         outcomes:
-          - {weight: 2, text: "แกงหม้อแรกหมดก่อนเที่ยง คนงานในซอยมาต่อคิวทุกวัน", effects: {relations: 1, money: {unit: income_x, amount: 0.4}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "แกงหม้อแรกหมดก่อนเที่ยง คนงานในซอยมาต่อคิวทุกวัน", effects: {relations: 1, money: {unit: income_x, amount: 0.4}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
           - {weight: 1, text: "ขายไม่ออก ต้องกินแกงเหลือกันสามวัน ลูกเบื่อแกงไปทั้งชีวิต", effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ยืมเงินญาติมาประคองไปก่อน"
@@ -42,7 +42,7 @@ events:
         merit: [{cat: neutral}]
       - text: "เปิดร้านซ่อมรถเก่าให้วิ่งได้"
         outcomes:
-          - {weight: 2, text: "ไม่มีใครซื้อรถใหม่ไหว ร้านซ่อมคิวเต็มยาวสองเดือน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {occupation: {technician: 2, craft: 1.5}}, text: "ไม่มีใครซื้อรถใหม่ไหว ร้านซ่อมคิวเต็มยาวสองเดือน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 1, text: "อะไหล่ขาดตลาด ร้านต้องปิด เหลือแต่เครื่องมือกับหนี้", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "กักตุนน้ำมันไว้ขายต่อแพง ๆ"
@@ -70,7 +70,7 @@ events:
         merit: [{cat: neutral}]
       - text: "พ่อลาออกไปเข็นรถขายผลไม้"
         outcomes:
-          - {weight: 2, text: "มะม่วงน้ำปลาหวานขายดีเกินคาด พ่อกลับบ้านพร้อมรอยยิ้มทุกเย็น", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "มะม่วงน้ำปลาหวานขายดีเกินคาด พ่อกลับบ้านพร้อมรอยยิ้มทุกเย็น", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
           - {weight: 1, text: "โดนเทศกิจไล่ที่สามรอบ รถเข็นพังหนึ่งคัน", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "กู้นอกระบบมาจ่ายค่าเทอม"
@@ -96,16 +96,19 @@ events:
       - text: "ไปเสี่ยงโชคทำงานต่างประเทศ"
         requires: {money: {unit: income_x, amount: 0.5}, reason: "ไม่มีเงินสำรองพอไปตั้งตัวต่างแดน"}
         outcomes:
-          - {weight: 2, text: "ได้งานก่อสร้างในทะเลทราย ส่งเงินกลับบ้านทุกเดือน แต่หลังพังตั้งแต่ปีแรก", effects: {health: -2, income_mult: 1.5}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {occupation: {labor: 1.5, craft: 1.5}}, text: "ได้งานก่อสร้างในทะเลทราย ส่งเงินกลับบ้านทุกเดือน แต่หลังพังตั้งแต่ปีแรก", effects: {health: -2, income_mult: 1.5}, merit: [{cat: neutral}]}
           - {weight: 1, text: "นายหน้าหอบเงินค่าหัวหายไป ต้องกู้มาจ่ายคืนญาติ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "รวมกลุ่มเพื่อนเปิดอู่ทอผ้า"
         outcomes:
-          - {weight: 1, multipliers: {stats: {relations: 2}}, text: "ผ้าทอมือได้ออเดอร์จากร้านในเมือง กลายเป็นเถ้าแก่ตัวเล็ก", effects: {relations: 1, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 2}, occupation: {craft: 1.5}}, text: "ผ้าทอมือได้ออเดอร์จากร้านในเมือง กลายเป็นเถ้าแก่ตัวเล็ก", effects: {relations: 1, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 1, text: "ทอเสร็จแต่ไม่มีคนซื้อ ผ้ากองเต็มบ้านจนใช้เป็นผ้าห่ม", effects: {happiness: -1, health: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "กลับบ้านไปทำนากับพ่อแม่"
         effects: {health: 1, relations: 1, income_mult: 0.8}
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {occupation: {farmer: 2, labor: 1.5}}, text: "ข้าวปีนั้นราคาดีเกินคาด พ่อตบบ่าบอกว่านาผืนนี้รอคุณมานานแล้ว", effects: {happiness: 1, money: {unit: income_x, amount: 0.4}}, next: era_econ_oil2_farm_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝนทิ้งช่วงทั้งปี ต้นข้าวเหลืองตายคานา ต้องกลับเข้าเมืองไปหางานใหม่", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: care_parents, level: 1}]
 
   # ── ต้มยำกุ้ง ──
@@ -124,7 +127,7 @@ events:
         merit: [{cat: neutral}]
       - text: "พ่อเอาเงินเก็บไปขายแซนด์วิช"
         outcomes:
-          - {weight: 2, text: "แซนด์วิชของพ่อขายหมดทุกเช้า คนในตึกเรียกพ่อว่าเสี่ยแซนด์วิช", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: 0.5}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "แซนด์วิชของพ่อขายหมดทุกเช้า คนในตึกเรียกพ่อว่าเสี่ยแซนด์วิช", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: 0.5}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
           - {weight: 1, text: "ขนมปังเหลือทุกวัน ลูกกินแซนด์วิชเป็นข้าวสามมื้อจนโต", effects: {health: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "สู้ผ่อนต่อ กู้ใหม่โปะเก่า"
@@ -146,13 +149,13 @@ events:
     choices:
       - text: "เปิดท้ายขายของมือสองทั้งบ้าน"
         outcomes:
-          - {weight: 2, text: "ขายเกลี้ยงในสองวัน ได้ทุนตั้งแผงขายของต่อ", effects: {happiness: 1, money: {unit: income_x, amount: 0.5}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ขายเกลี้ยงในสองวัน ได้ทุนตั้งแผงขายของต่อ", effects: {happiness: 1, money: {unit: income_x, amount: 0.5}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
           - {weight: 1, text: "ทั้งตลาดก็ขายของมือสองเหมือนกัน กลับบ้านพร้อมของเต็มรถ", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ช้อนซื้อกิจการเจ๊งราคาถูก"
         requires: {money: {unit: income_x, amount: 1}, reason: "ไม่มีเงินก้อนพอช้อนซื้อ"}
         outcomes:
-          - {weight: 1, text: "ฟื้นร้านที่เจ้าของทิ้งได้สำเร็จ สิบปีต่อมาคุณมีร้านสามสาขา", effects: {happiness: 2, income_mult: 1.6, money: {unit: income_x, amount: -1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {occupation: {service: 1.5, manager: 1.5}}, text: "ฟื้นร้านที่เจ้าของทิ้งได้สำเร็จ สิบปีต่อมาคุณมีร้านสามสาขา", effects: {happiness: 2, income_mult: 1.6, money: {unit: income_x, amount: -1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 2, text: "ราคายังดิ่งไม่หยุด กิจการที่ซื้อมาลากคุณจมไปด้วย", effects: {health: -1, happiness: -2, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ไปเป็นลูกจ้างรายวันก่อสร้าง"
@@ -175,7 +178,7 @@ events:
     choices:
       - text: "แม่โพสต์ขายขนมทางเน็ต"
         outcomes:
-          - {weight: 2, text: "บราวนี่ถาดแรกถูกจองหมดจากกลุ่มแม่บ้าน ครัวกลายเป็นร้านเล็ก ๆ", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "บราวนี่ถาดแรกถูกจองหมดจากกลุ่มแม่บ้าน ครัวกลายเป็นร้านเล็ก ๆ", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
           - {weight: 1, text: "เตาอบระเบิด ขนมไหม้ แต่ลูกได้กินขนมไหม้ฟรีเป็นเดือน", effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "งดเรียนพิเศษ ให้ลูกอ่านเอง"
@@ -200,7 +203,7 @@ events:
     choices:
       - text: "รับเงินชดเชย เปิดร้านกาแฟ"
         outcomes:
-          - {weight: 1, multipliers: {stats: {relations: 2}}, text: "ร้านเล็กหน้าออฟฟิศเก่ากลายเป็นที่นั่งประจำของอดีตเพื่อนร่วมงาน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 2}, occupation: {service: 1.5}}, text: "ร้านเล็กหน้าออฟฟิศเก่ากลายเป็นที่นั่งประจำของอดีตเพื่อนร่วมงาน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], next: era_econ_gfc_cafe_01, merit: [{cat: neutral}]}
           - {weight: 1, text: "ร้านกาแฟเปิดใหม่อีกสามร้านในซอยเดียวกัน คุณเจ๊งเป็นร้านแรก", effects: {happiness: -2, money: {unit: income_x, amount: -1.5}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "กัดฟันอยู่ต่อ ทำงานแทนสามคน"
@@ -214,11 +217,65 @@ events:
         requires: {stats: {knowledge: {min: 60}}, reason: "พื้นความรู้ยังไม่พอสอบเข้า"}
         effects: {knowledge: 2, money: {unit: income_x, amount: -1}}
         outcomes:
-          - {weight: 1, text: "เรียนจบพอดีตลาดฟื้น ได้งานสายใหม่เงินดีกว่าเดิม", effects: {happiness: 1, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {occupation: {professional: 1.5, manager: 1.5}}, text: "เรียนจบพอดีตลาดฟื้น ได้งานสายใหม่เงินดีกว่าเดิม", effects: {happiness: 1, income_mult: 1.3}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เรียนจบแต่ตลาดงานยังซบ ต้องรับงานเงินน้อยกว่าเดิม", effects: {happiness: -1, income_mult: 0.9}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ขายของมือสองทางเน็ต"
         outcomes:
-          - {weight: 2, text: "ของเก่าในบ้านขายหมดเกลี้ยง เลยรับของคนอื่นมาขายต่อจนเป็นร้านออนไลน์", effects: {happiness: 1, money: {unit: income_x, amount: 0.4}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ของเก่าในบ้านขายหมดเกลี้ยง เลยรับของคนอื่นมาขายต่อจนเป็นร้านออนไลน์", effects: {happiness: 1, money: {unit: income_x, amount: 0.4}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
           - {weight: 1, text: "โดนลูกค้าโกงโอนเงินปลอม ของหายไปสามกล่อง", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
+
+  # ── เรื่องต่อ (ออกทาง next เท่านั้น · ไม่มี era/weight) ──
+  - id: era_econ_oil2_farm_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {occupation: [labor, factory, craft, service]}
+    title: "นาผืนเก่าเรียกกลับ"
+    text: "ข้าวขายได้ราคา พ่อเริ่มเหนื่อยง่าย เพื่อนในเมืองส่งจดหมายมาว่าโรงงานกลับมาเปิดกะแล้ว คนทั้งหมู่บ้านรอดูว่าคุณจะอยู่หรือไป"
+    choices:
+      - text: "ทิ้งงานเมือง ทำนาเต็มตัว"
+        effects: {job: farmer, health: 1, happiness: 1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: care_parents, level: 1}]
+      - text: "ปลูกผักขายตลาดนัดเสริม"
+        outcomes:
+          - {weight: 2, ok: true, text: "ผักปลอดสารของคุณหมดแผงก่อนสาย แม่ค้าในเมืองมาสั่งส่งประจำ", effects: {relations: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หนอนลงแปลงชั่วข้ามคืน ผักทั้งแปลงเหลือแต่ก้าน", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "กลับเมืองไปทำงานเดิม"
+        effects: {relations: -1, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - text: "ชวนเพื่อนบ้านตั้งโรงสีชุมชน"
+        requires: {money: {unit: income_x, amount: 1}, reason: "ไม่มีเงินก้อนพอซื้อเครื่องสี"}
+        effects: {money: {unit: income_x, amount: -1}}
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "โรงสีเล็กสีข้าวให้ทั้งตำบล คุณกลายเป็นเถ้าแก่โรงสีที่ใครก็เรียกหา", effects: {happiness: 2, relations: 1, income_mult: 1.25}, sets_flags: [own_business], merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เครื่องสีมือสองพังเดือนแรก เพื่อนบ้านถอนตัวหมด เหลือหนี้ค่าเครื่องคนเดียว", effects: {happiness: -2, relations: -1, money: {unit: income_x, amount: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: era_econ_gfc_cafe_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {occupation: [factory, craft, service, clerk, technician, professional, manager]}
+    title: "กาแฟแก้วนี้ขายได้"
+    text: "ร้านกาแฟเล็กของคุณติดปากคนทั้งย่าน มีคนตกงานมาขอซื้อสูตรไปเปิดเอง ส่วนบริษัทเก่าโทรมาชวนกลับไปทำตำแหน่งเดิม"
+    choices:
+      - text: "ขายสูตรเปิดสาขาให้คนอื่น"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "ร้านสาขาผุดขึ้นห้าจุดในปีเดียว ทุกร้านส่งค่าสูตรให้คุณทุกเดือน", effects: {network: 2, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สาขาชงกาแฟจืดเหมือนน้ำล้างแก้ว ลูกค้าเหมาว่าร้านคุณก็จืดด้วย", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "ปฏิเสธบริษัท ทุ่มให้ร้านเต็มตัว"
+        effects: {happiness: 2, health: 1, income_mult: 1.2}
+        sets_flags: [own_business]
+        merit: [{cat: neutral}]
+      - text: "กลับบริษัท ให้แม่ดูร้านแทน"
+        effects: {relations: 1, happiness: -1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+      - text: "จ้างคนตกงานในซอยมาช่วยชง"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: help_others, level: 1}]

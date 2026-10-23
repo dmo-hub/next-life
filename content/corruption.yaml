@@ -1,0 +1,373 @@
+# กลุ่มทางทุจริต · ช่วงวัยทำงาน (31–45) + กลางคน (46–59) · ทางโกงให้เงินเร็วแลกบาป/โดนจับ คู่ทางสุจริตเสมอ + การ์ดสอบสวนย้อนหลัง
+events:
+  - id: fraud_sign_bribe_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {occupation: [clerk, manager, professional]}
+    multipliers: {occupation: {manager: 1.5}, flags: {in_debt: 1.5}}
+    title: "ซองสีน้ำตาลบนโต๊ะ"
+    text: "ผู้รับเหมาวางซองหนาเตอะไว้ข้างแฟ้ม ยิ้มบอกว่าแค่เซ็นผ่านงานที่วัสดุไม่ตรงสเปก ใครเขาก็ทำกัน ในซองเท่าเงินเดือนหลายเดือน"
+    choices:
+      - id: take_and_sign
+        text: "รับซอง เซ็นให้เงียบ ๆ"
+        sets_flags: [took_bribe]
+        merit: [{cat: greed_harm, level: 2}, {cat: unjust_judgment, level: 1}]
+        outcomes:
+          - {weight: 3, ok: true, text: "เงินก้อนเข้ากระเป๋า งานผ่านไปไม่มีใครถาม ตอนกลางคืนนอนไม่ค่อยหลับ", effects: {money: {unit: income_x, amount: 2}, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สามเดือนต่อมาอาคารร้าวทั้งแถบ ชื่อคนเซ็นอยู่บนเอกสารชัดเจน ถูกไล่ออกพร้อมคดีติดตัว", effects: {job: labor, money: {unit: income_x, amount: -1.5}, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: ask_double
+        text: "ขอเพิ่มเป็นสองเท่า"
+        sets_flags: [took_bribe]
+        merit: [{cat: greed_harm, level: 3}, {cat: unjust_judgment, level: 2}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้รับเหมาจ่ายไม่อั้น ได้เงินก้อนโตกว่าที่คิด แต่ต่อจากนี้เขามีหลักฐานกุมไว้ในมือ", effects: {money: {unit: income_x, amount: 3}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หักมุม เขาคือเจ้าหน้าที่ล่อซื้อ กุญแจมือคล้องข้อมือกลางออฟฟิศ ข่าวลงทั้งจังหวัด", effects: {job: labor, money: {unit: income_x, amount: -2}, happiness: -3, relations: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: refuse
+        text: "ดันซองคืน ไม่เซ็น"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ผู้บริหารรู้เรื่องทีหลัง เรียกไปชมต่อหน้าที่ประชุม ชื่อเสียงเรื่องมือสะอาดเริ่มเป็นที่รู้กัน", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้รับเหมาไปหาคนอื่นเซ็นแทน แล้วเส้นสายเขาก็ทำให้ถูกย้ายไปสาขาที่ห่างไกล", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+      - id: report
+        text: "เก็บซองเป็นหลักฐาน แจ้งผู้ตรวจ"
+        merit: [{cat: help_others, level: 1}, {cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ตรวจจับผู้รับเหมาได้คาหนังคาเขา ได้เลื่อนขั้นเป็นคนคุมงานตรวจรับทั้งหมด", effects: {income_mult: 1.2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เรื่องเงียบหาย ไม่กี่วันต่อมามีจดหมายไม่ลงชื่อมาถึงบ้าน เขียนว่ารู้นะว่าลูกเรียนที่ไหน", effects: {happiness: -1}, next: fraud_whistle_01, merit: [{cat: neutral}]}
+
+  - id: fraud_whistle_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "จดหมายไม่ลงชื่อ"
+    text: "หลังแจ้งเรื่องซองไป ที่ทำงานเริ่มเย็นชา หัวหน้าเรียกไปคุยว่าถอนเรื่องเถอะ จะได้อยู่กันยาว ๆ ส่วนจดหมายขู่ยังวางอยู่บนโต๊ะกินข้าว"
+    choices:
+      - id: testify
+        text: "ยืนยันให้การจนสุดทาง"
+        merit: [{cat: sila, level: 1}, {cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คดีขยายไปถึงคนใหญ่กว่าที่คิด ได้เงินรางวัลนำจับ เพื่อนร่วมงานที่เคยเงียบแอบมาขอบคุณ", effects: {money: {unit: income_x, amount: 1}, relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คดีชนะ แต่ถูกย้ายไปนั่งห้องเก็บเอกสารชั้นใต้ดิน ไม่มีใครกล้าคุยด้วย", effects: {happiness: -2, network: -1}, merit: [{cat: neutral}]}
+      - id: withdraw
+        text: "ถอนเรื่อง ขอให้จบ ๆ"
+        effects: {happiness: -2}
+        merit: [{cat: neutral}]
+      - id: quit_sell
+        text: "ลาออก ไปเปิดร้านขายของ"
+        effects: {job: service, happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: go_press
+        text: "เอาหลักฐานไปให้นักข่าว"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ข่าวดังทั้งประเทศ กลายเป็นคนกล้าที่คนพูดถึง มีที่ทำงานใหม่ทักมาเสนองาน", effects: {network: 3, happiness: 2, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ข่าวออกแค่วันเดียวแล้วเงียบ แต่ถูกฟ้องหมิ่นประมาทตามมาเป็นปี", effects: {money: {unit: income_x, amount: -1}, happiness: -2}, merit: [{cat: neutral}]}
+
+  - id: fraud_contract_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {occupation: [service, craft, technician, manager]}
+    multipliers: {flags: {own_business: 1.5, took_bribe: 1.3}, stats: {network: 1.2}}
+    title: "ค่าน้ำร้อนน้ำชา"
+    text: "งานประมูลก้อนใหญ่ที่รอมาทั้งปีเปิดแล้ว คนในกระซิบว่าราคาไม่สำคัญเท่าไหร่ ใครจ่ายสิบเปอร์เซ็นต์ใต้โต๊ะก่อนคนนั้นได้"
+    choices:
+      - id: pay_under
+        text: "จ่ายใต้โต๊ะ เอางานให้ได้"
+        sets_flags: [took_bribe]
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ได้สัญญามาครอง งานไหลเข้าต่อเนื่อง แต่ทุกงานต่อจากนี้ก็ต้องจ่ายแบบเดิม", effects: {income_mult: 1.3, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนรับซองโดนจับก่อน แล้วซัดทอดรายชื่อคนจ่ายทั้งหมด ชื่อเราอยู่บรรทัดแรก", effects: {money: {unit: income_x, amount: -2}, happiness: -2, relations: -1}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: honest_bid
+        text: "ยื่นราคาจริง ไม่จ่ายสักบาท"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "หักมุม เจ้าที่จ่ายใต้โต๊ะถูกตัดสิทธิ์ทั้งหมด งานตกมาเป็นของเราคนเดียว", effects: {money: {unit: income_x, amount: 1.5}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "แพ้ประมูลตามคาด ทีมงานถามว่าปีหน้าจะยังเล่นแบบนี้อีกไหม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: record_report
+        text: "แอบอัดเสียงไว้ แล้วแจ้งความ"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เสียงที่อัดไว้ล้มทั้งขบวนการ ผู้ประกอบการรายเล็กรวมตัวมาขอบคุณ ได้ลูกค้าใหม่เพียบ", effects: {network: 2, relations: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ถูกขึ้นบัญชีดำเงียบ ๆ ไม่มีงานรัฐมาถึงมืออีกหลายปี", effects: {income_mult: 0.8, happiness: -1}, merit: [{cat: neutral}]}
+      - id: walk_away
+        text: "ถอยไปหางานเอกชนแทน"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+
+  - id: fraud_scale_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {occupation: [service, farmer]}
+    multipliers: {occupation: {service: 1.5, farmer: 1.3}, flags: {street_vendor: 1.5, in_debt: 1.3}}
+    title: "ตาชั่งของเพื่อนบ้าน"
+    text: "เพื่อนแผงข้าง ๆ กระซิบสอนวิธีถ่วงตาชั่งกับผสมของเกรดต่ำลงไปให้ดูเต็ม บอกว่าทำมาสิบปีไม่เคยมีใครรู้ เดือนนี้เขาเพิ่งออกรถใหม่"
+    choices:
+      - id: rig_scale
+        text: "ลองถ่วงตาชั่งดูบ้าง"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 3, ok: true, text: "กำไรงอกขึ้นทุกวันโดยไม่มีใครทัก เงินเก็บเริ่มเป็นก้อน", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกค้าหิ้วตาชั่งมาเทียบกลางตลาด ต่อหน้าคนทั้งซอย ของขาดไปเกือบขีด", effects: {happiness: -2, relations: -2}, sets_flags: [caught_fraud], next: fraud_scale_rumor_01, merit: [{cat: neutral}]}
+      - id: mix_cheap
+        text: "ผสมของเกรดต่ำลงไปด้วย"
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ต้นทุนลดฮวบ กำไรเกือบเท่าตัว ลูกค้ายังไม่รู้ตัว", effects: {money: {unit: income_x, amount: 2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกค้ากินแล้วป่วยกันทั้งบ้าน ถูกฟ้องจนหมดตัว ต้องเลิกกิจการไปรับจ้างรายวัน", effects: {job: labor, money: {unit: income_x, amount: -3}, happiness: -2, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: honest_extra
+        text: "ชั่งตรง แถมให้อีกนิด"
+        merit: [{cat: sila, level: 1}, {cat: dana, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ลูกค้าบอกปากต่อปากว่าร้านนี้ไม่โกง คิวยาวขึ้นทุกเช้า", effects: {income_mult: 1.2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กำไรบางเฉียบ แต่หลับสบาย", effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+      - id: warn_customers
+        text: "เตือนลูกค้าเรื่องตาชั่งแผงข้าง"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกค้าแห่ย้ายมาซื้อแผงเรา ยอดขายพุ่งทั้งเดือน", effects: {network: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เพื่อนบ้านโกรธจัด ปล่อยข่าวว่าเราขายของเน่า ทั้งตลาดมองค้อน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+
+  - id: fraud_materials_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {occupation: [factory, craft]}
+    multipliers: {occupation: {factory: 1.3}, flags: {in_debt: 1.3}}
+    title: "ใบเบิกวัสดุเกินจริง"
+    text: "หัวหน้างานกระซิบว่าเบิกวัสดุเกินใบสั่งไว้ทุกงาน ส่วนที่เหลือมีร้านรับซื้อของเก่าปากซอยจ่ายเงินสด ขอแค่เราเซ็นรับของให้ ทำกันมาหลายปีไม่มีใครเช็ก"
+    choices:
+      - id: sign_overdraw
+        text: "เซ็นให้ รับส่วนแบ่ง"
+        sets_flags: [embezzler]
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ส่วนแบ่งเข้ามือทุกสิ้นเดือน เงินเก็บโตเร็วกว่าเงินเดือนเสียอีก", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝ่ายตรวจนับสต็อกกะทันหัน ของขาดเป็นคันรถ ชื่อเราอยู่ทุกใบเบิก ถูกไล่ออกวันนั้นเลย", effects: {job: labor, money: {unit: income_x, amount: -1.5}, happiness: -2, relations: -1}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: swap_grade
+        text: "แอบใช้ของเกรดต่ำแทนสเปก"
+        sets_flags: [embezzler]
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ส่วนต่างราคาเข้ากระเป๋าเต็ม ๆ ของที่ส่งออกไปหน้าตาเหมือนเดิมทุกชิ้น", effects: {money: {unit: income_x, amount: 2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ของล็อตนั้นพังคามือลูกค้า ถูกเรียกคืนทั้งล็อต สืบมาถึงเรา ไล่ออกพร้อมโดนเรียกค่าเสียหาย", effects: {job: labor, money: {unit: income_x, amount: -2.5}, happiness: -2, relations: -1}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: refuse_sign
+        text: "ไม่เซ็น เบิกตามจริง"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ปีต่อมาเจ้าของจับขบวนการได้ เราเป็นคนเดียวที่ใบเบิกสะอาด ได้ขึ้นมาคุมคลังวัสดุ", effects: {income_mult: 1.2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าย้ายเราไปกะดึกถาวร งานหนักที่สุดตกมาที่เราทุกวัน", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+      - id: report_owner
+        text: "เอาใบเบิกไปให้เจ้าของดู"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของตรวจย้อนหลังเจอเงินรั่วมาเป็นปี ให้รางวัลก้อนหนึ่งแล้วไว้ใจให้คุมงานแทนหัวหน้าเก่า", effects: {money: {unit: income_x, amount: 1}, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หักมุม เจ้าของเป็นญาติหัวหน้า เรื่องเงียบหาย แล้วเราโดนจับผิดทุกวันจนต้องทนกัดฟัน", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+
+  - id: fraud_scale_rumor_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ข่าวลือทั้งตลาด"
+    text: "เรื่องตาชั่งลือไปทั่วภายในวันเดียว ลูกค้าประจำเดินผ่านหน้าร้านไม่หยุด แม่ค้าแผงอื่นซุบซิบกันเสียงดังพอให้ได้ยิน"
+    choices:
+      - id: refund_apologize
+        text: "คืนเงินลูกค้า ขอโทษทุกคน"
+        effects: {money: {unit: income_x, amount: -1}, relations: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: blame_scale
+        text: "อ้างว่าตาชั่งเสียเอง"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "คนส่วนใหญ่ยอมเชื่อ เรื่องค่อย ๆ เงียบไป", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ช่างประจำตลาดออกมาบอกว่าเพิ่งซ่อมตาชั่งให้เมื่อวาน คนหัวเราะกันทั้งซอย", effects: {relations: -2, happiness: -2}, merit: [{cat: neutral}]}
+      - id: quit_trade
+        text: "เลิกค้า ไปรับจ้างที่อื่น"
+        effects: {job: labor, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: weigh_show
+        text: "ตั้งตาชั่งโชว์ ให้ลูกค้าชั่งเอง"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "หักมุม ร้านกลายเป็นร้านดังเรื่องชั่งตรงที่สุดในตลาด คนแห่มาดู", effects: {income_mult: 1.3, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไม่มีใครกลับมาอยู่ดี ยอดขายหายไปเกือบครึ่ง", effects: {income_mult: 0.8, happiness: -1}, merit: [{cat: neutral}]}
+
+  - id: fraud_village_fund_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2545, 2650]
+    weight: 1
+    multipliers: {occupation: {farmer: 1.5, labor: 1.3}, stats: {relations: 1.2}, flags: {in_debt: 1.5, loan_shark: 1.5}}
+    title: "เหรัญญิกกองทุนหมู่บ้าน"
+    text: "ชาวบ้านเลือกให้เป็นเหรัญญิกกองทุนหมู่บ้าน สมุดบัญชีอยู่ในลิ้นชักบ้านเรา ไม่มีใครเปิดดูมาสามปีแล้ว ยอดในสมุดมากกว่าเงินเก็บทั้งชีวิตของเราหลายเท่า"
+    choices:
+      - id: borrow_quiet
+        text: "ยืมไปหมุนก่อน เดี๋ยวคืน"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "หมุนทันพอดี คืนครบก่อนวันประชุม ยังมีกำไรติดมือ ไม่มีใครรู้", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หมุนไม่ทัน วันประชุมใหญ่มีคนขอดูสมุดบัญชี ตัวเลขห่างกันเป็นแสน", effects: {relations: -2, happiness: -2}, sets_flags: [embezzler, caught_fraud], next: fraud_village_meeting_01, merit: [{cat: neutral}]}
+      - id: take_and_run
+        text: "เอาเงินก้อนหนีเข้าเมือง"
+        sets_flags: [embezzler]
+        merit: [{cat: greed_harm, level: 3}]
+        outcomes:
+          - {weight: 2, text: "ได้เงินก้อนตั้งตัวใหม่ แต่กลับบ้านเกิดไม่ได้อีกแล้ว แม่โทรมาร้องไห้ทุกเดือน", effects: {money: {unit: income_x, amount: 3}, relations: -3, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตำรวจตามเจอที่ห้องเช่าในอาทิตย์เดียว ต้องขายทุกอย่างใช้คืนพร้อมค่าทนาย", effects: {money: {unit: income_x, amount: -2}, relations: -3, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: open_books
+        text: "ปิดประกาศบัญชีให้ทุกคนดู"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: help_others, level: 1}, {cat: sila, level: 1}]
+      - id: call_audit
+        text: "ขอให้ชาวบ้านเลือกคนตรวจบัญชี"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "หักมุม คนตรวจเจอว่าเหรัญญิกคนก่อนยักยอกไว้ก้อนใหญ่ ได้เงินคืนกองทุน ชาวบ้านยกย่องเราทั้งหมู่บ้าน", effects: {relations: 3, network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนตรวจเป็นญาติผู้ใหญ่บ้าน หาว่าเราไม่ไว้ใจเพื่อนบ้าน งานบุญปีนี้ไม่มีใครชวน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+
+  - id: fraud_village_meeting_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2545, 2650]
+    title: "ประชุมใหญ่ศาลาหมู่บ้าน"
+    text: "ศาลาแน่นทั้งหมู่บ้าน ทุกสายตาจ้องมาที่เรา ผู้ใหญ่บ้านถามเสียงเรียบว่าเงินที่หายไปอยู่ไหน ข้างหลังมีคนพูดถึงการแจ้งความ"
+    choices:
+      - id: bow_repay
+        text: "ก้มกราบขอโทษ ขอผ่อนคืน"
+        effects: {money: {unit: income_x, amount: -1}, relations: 1, happiness: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: blame_other
+        text: "ชี้ว่ากรรมการอีกคนเอาไป"
+        merit: [{cat: unjust_judgment, level: 2}]
+        outcomes:
+          - {weight: 1, text: "ชาวบ้านหันไปเล่นงานคนนั้นแทน เขาถูกไล่ออกจากกรรมการทั้งที่ไม่ได้ทำ", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เขาเปิดสมุดบันทึกส่วนตัวที่จดทุกครั้งที่เราเบิก ทั้งศาลาเงียบกริบ", effects: {relations: -3, happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: sell_land
+        text: "ขายของมีค่าทุกอย่างใช้คืน"
+        effects: {money: {unit: income_x, amount: -2}, relations: 2, happiness: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: flee
+        text: "เก็บของหนีออกจากหมู่บ้าน"
+        effects: {relations: -3, happiness: -2, network: -1}
+        merit: [{cat: greed_harm, level: 2}]
+
+  - id: fraud_wage_squeeze_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 2
+    when: {occupation: [manager]}
+    multipliers: {flags: {in_debt: 1.3}}
+    title: "โบนัสแลกโอที"
+    text: "เจ้าของบริษัทยื่นข้อเสนอ ถ้าตัดโอทีลูกน้องทั้งแผนกได้ครบปีนี้ โบนัสก้อนใหญ่เป็นของคุณ ลูกน้องหลายคนผ่อนบ้านผ่อนรถอยู่"
+    choices:
+      - id: squeeze
+        text: "ตัดโอที เก็บโบนัสไว้"
+        merit: [{cat: oppress_subjects, level: 2}]
+        outcomes:
+          - {weight: 2, ok: true, text: "โบนัสเข้าบัญชีตามสัญญา ลูกน้องเดินผ่านไม่ทักสักคำ", effects: {money: {unit: income_x, amount: 2}, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกน้องรวมตัวร้องเรียน เจ้าของโยนความผิดมาให้คนเดียว ถูกไล่ออกไม่มีเงินชดเชย", effects: {job: labor, relations: -2, happiness: -2}, merit: [{cat: neutral}]}
+      - id: ghost_staff
+        text: "ใส่ชื่อลูกน้องผีเบิกเงินเดือน"
+        sets_flags: [embezzler]
+        merit: [{cat: greed_harm, level: 3}, {cat: oppress_subjects, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เงินเดือนของคนที่ไม่มีตัวตนเข้ากระเป๋าทุกเดือน ไม่มีใครเช็กรายชื่อ", effects: {money: {unit: income_x, amount: 2.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝ่ายบัญชีคนใหม่โทรหาพนักงานทุกคนเพื่อยืนยันตัว ชื่อผีโผล่ครบ ถูกไล่ออกและแจ้งความ", effects: {job: labor, money: {unit: income_x, amount: -2}, relations: -2, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: share_cut
+        text: "ลดเงินเดือนตัวเองแทนโอที"
+        effects: {income_mult: 0.8, relations: 2}
+        merit: [{cat: help_others, level: 2}]
+      - id: stand_up
+        text: "ค้านเจ้าของ ปกป้องลูกน้อง"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของยอมถอย ลูกน้องรักจนยอมทำงานเกินเวลาให้ฟรีตอนบริษัทลำบาก ยอดแผนกพุ่งเกินเป้า", effects: {relations: 2, network: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ถูกลดตำแหน่งไปคุมโกดัง แต่ลูกน้องเก่ายังแวะมาเลี้ยงข้าวทุกเดือน", effects: {income_mult: 0.7, relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+
+  - id: fraud_audit_back_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 2
+    when: {flags: {has: [took_bribe], not: [caught_fraud]}}
+    title: "แฟ้มคดีเก่า"
+    text: "เจ้าหน้าที่สอบสวนสองคนมาเคาะประตูตอนเช้า ในมือมีแฟ้มเรื่องเงินใต้โต๊ะเมื่อหลายปีก่อน ลายเซ็นของเราอยู่หน้าแรก"
+    choices:
+      - id: confess_return
+        text: "สารภาพ คืนเงินทั้งหมด"
+        effects: {money: {unit: income_x, amount: -2}, happiness: -1, relations: 1}
+        clears_flags: [took_bribe]
+        merit: [{cat: sila, level: 1}]
+      - id: hire_lawyer
+        text: "จ้างทนายสู้คดีเต็มที่"
+        effects: {money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "หลักฐานเก่าเกินไป ศาลยกฟ้อง ออกจากศาลมาพร้อมเงินที่หายไปกับค่าทนาย", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "แพ้คดี ถูกไล่ออกจากงาน ข่าวลงชื่อเต็มให้ญาติทั้งตระกูลอ่าน", effects: {job: labor, money: {unit: income_x, amount: -1.5}, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: frame_other
+        text: "ซัดทอดว่าคนอื่นสั่งให้ทำ"
+        merit: [{cat: unjust_judgment, level: 2}]
+        outcomes:
+          - {weight: 2, text: "รอดตัว คนที่ถูกซัดทอดติดคุกแทน ลูกเขาเรียนห้องเดียวกับลูกเรา", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หักมุม เขาอัดเสียงทุกครั้งที่คุยกันไว้ เปิดในศาลทีละไฟล์", effects: {job: labor, money: {unit: income_x, amount: -2}, relations: -3, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: state_witness
+        text: "ขอเป็นพยาน ชี้ตัวการใหญ่"
+        clears_flags: [took_bribe]
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ได้กันไว้เป็นพยาน ตัวการใหญ่ถูกจับทั้งขบวน ได้หลับเต็มตาครั้งแรกในรอบหลายปี", effects: {happiness: 2, network: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รอดคดีแต่มีรถมาจอดหน้าบ้านทุกคืน ต้องย้ายบ้านหนีไปต่างจังหวัด", effects: {happiness: -2, relations: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+
+  - id: fraud_ledger_ghost_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 2
+    when: {flags: {has: [embezzler], not: [caught_fraud]}}
+    title: "สมุดบัญชีในลิ้นชัก"
+    text: "หลานที่เพิ่งเรียนบัญชีมาช่วยไล่เอกสารเก่าในบ้าน แล้วถือสมุดเล่มหนึ่งเดินมาหา ถามเสียงเบาว่าตัวเลขพวกนี้ทำไมไม่ตรงกับใบเสร็จเลย"
+    choices:
+      - id: tell_truth
+        text: "เล่าความจริงทั้งหมด"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "หลานนิ่งไปนาน แล้วช่วยวางแผนผ่อนคืนเจ้าของเงินทีละน้อย ความลับที่แบกมาเบาลงทั้งบ้าน", effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลานรับไม่ได้ เล่าให้ทั้งตระกูลฟัง วันรวมญาติปีนี้ไม่มีใครนั่งข้างเรา", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+      - id: return_anon
+        text: "ใส่ซองคืนเงินแบบไม่ลงชื่อ"
+        effects: {money: {unit: income_x, amount: -2}, happiness: 2}
+        clears_flags: [embezzler]
+        merit: [{cat: dana, level: 1}, {cat: sila, level: 1}]
+      - id: lie_grandkid
+        text: "โกหกว่าเป็นสมุดของคนอื่น"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 2, text: "หลานพยักหน้ารับ แต่สายตาไม่เหมือนเดิมอีกแล้ว", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลานเอาสมุดไปเทียบกับเอกสารของทางการ แล้วพาเจ้าหน้าที่กลับมาด้วยตัวเอง", effects: {relations: -3, happiness: -3, money: {unit: income_x, amount: -2}}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: big_merit
+        text: "เอาเงินไปทำบุญก้อนใหญ่แทน"
+        effects: {money: {unit: income_x, amount: -1}}
+        merit: [{cat: dana, level: 1}]
+        outcomes:
+          - {weight: 1, text: "สบายใจขึ้นนิดหนึ่ง แต่เงินที่ขาดจากบัญชีของคนอื่นก็ยังขาดอยู่เท่าเดิม", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลานเห็นใบอนุโมทนาแล้วถามต่อว่า เจ้าของเงินจริงได้อะไรบ้าง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}

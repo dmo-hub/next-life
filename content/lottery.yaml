@@ -1,0 +1,205 @@
+# กลุ่ม work_money · หวยปกติ (ไม่ใช่สายมู) ช่วงหนุ่มสาว–ชรา · ลุ้นทีละใบ ติดเป็นนิสัย หวยใต้ดิน ลงขัน และญาติที่โผล่มาตอนถูกใหญ่
+events:
+  - id: lot_vendor_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    title: "แผงล็อตเตอรี่หน้าโต๊ะ"
+    text: "แม่ค้าล็อตเตอรี่เดินถือแผงมาหยุดที่โต๊ะข้าวเที่ยง เพื่อนสี่คนกำลังหารกันซื้อเลขชุด ส่วน{ชื่อ}เพิ่งได้เงินเดือนมาหมาด ๆ ในกระเป๋ายังหนาอยู่"
+    choices:
+      - id: buy_one
+        text: "ซื้อใบเดียว ลุ้นเล่น ๆ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 985, text: "ประกาศผลวันที่สิบหก ไม่ใกล้เลยสักตัว ฉีกทิ้งลงถังขยะหน้าออฟฟิศ", effects: {money: {unit: fixed_baht, amount: -80, ref_year: 2560}}, merit: [{cat: neutral}]}
+          - {weight: 13, ok: true, text: "ถูกเลขท้ายสองตัว! ได้คืนหลายสิบเท่าของค่าใบ เลี้ยงหมูกระทะเพื่อนทั้งโต๊ะจนหมดเกลี้ยง", effects: {happiness: 2, relations: 1, money: {unit: fixed_baht, amount: 2000, ref_year: 2560}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ตรวจซ้ำสามรอบ ทุกตัวตรงเป๊ะ ถูกรางวัลที่หนึ่ง มือสั่นจนต้องนั่งลงกับพื้น ชีวิตเปลี่ยนในบ่ายวันเดียว", effects: {happiness: 3, money: {unit: fixed_baht, amount: 6000000, ref_year: 2560}}, merit: [{cat: neutral}]}
+      - id: buy_every_draw
+        text: "จองเลขประจำ ซื้อทุกงวด"
+        effects: {happiness: 1, money: {unit: fixed_baht, amount: -160, ref_year: 2560}}
+        sets_flags: [lottery_habit]
+        merit: [{cat: neutral}]
+      - id: pool_friends
+        text: "ลงขันซื้อเลขชุดกับเพื่อน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 960, text: "ห้าคนนั่งลุ้นหน้าทีวี ไม่ถูกสักใบ หัวเราะกันแล้วสัญญาว่างวดหน้าเอาใหม่", effects: {relations: 1, money: {unit: fixed_baht, amount: -400, ref_year: 2560}}, merit: [{cat: neutral}]}
+          - {weight: 36, ok: true, text: "ถูกเลขท้ายสามตัวหนึ่งใบ หารห้าแล้วได้คนละนิดแต่ดีใจทั้งแผนก", effects: {happiness: 1, relations: 1, money: {unit: fixed_baht, amount: 400, ref_year: 2560}}, merit: [{cat: neutral}]}
+          - {weight: 4, text: "ใบหนึ่งในเลขชุดที่ลงขันกันถูกรางวัลที่หนึ่ง! สลากทั้งชุดอยู่ในกระเป๋า{ชื่อ}คนเดียว แล้วโทรศัพท์ก็เริ่มดังไม่หยุด", next: lot_pool_split_01, merit: [{cat: neutral}]}
+      - id: save_instead
+        text: "ไม่ซื้อ เอาเงินไปฝากดีกว่า"
+        effects: {money: {unit: fixed_baht, amount: 500, ref_year: 2560}}
+        merit: [{cat: neutral}]
+      - id: sell_tickets
+        text: "ขอแผงมาช่วยขายเอาค่าคอม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ปากหวานขายหมดแผงในบ่ายเดียว แม่ค้าชวนมาเป็นลูกมือทุกต้นเดือน", effects: {network: 1, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ขายไม่ออกสักใบ ต้องเหมาที่เหลือเองตามที่ตกลง แล้วก็ไม่ถูกสักใบ", effects: {happiness: -1, money: {unit: fixed_baht, amount: -1600, ref_year: 2560}}, merit: [{cat: neutral}]}
+
+  - id: lot_pool_split_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "สลากทั้งชุดในมือเรา"
+    text: "ตอนลงขัน ทุกคนแค่โอนเงินมา ไม่มีใครถ่ายรูปสลากไว้ เพื่อนคนหนึ่งบอกว่าตัวเองลงเงินมากกว่า อีกคนบอกว่าเลขนี้เขาเป็นคนเลือก ทุกสายตาจ้องมาที่{ชื่อ}"
+    choices:
+      - id: split_equal
+        text: "หารห้าเท่ากันตามที่ตกลง"
+        effects: {relations: 3, network: 2, happiness: 2, money: {unit: fixed_baht, amount: 1200000, ref_year: 2560}}
+        merit: [{cat: sila, level: 2}]
+      - id: claim_lost
+        text: "บอกว่าสลากหายไปแล้ว"
+        merit: [{cat: greed_harm, level: 3}]
+        outcomes:
+          - {weight: 1, text: "ไม่มีใครพิสูจน์ได้ เงินทั้งก้อนเป็นของคนเดียว แต่ตั้งแต่วันนั้นไม่มีเพื่อนเก่าคนไหนรับสายอีก", effects: {relations: -3, network: -2, happiness: -1, money: {unit: fixed_baht, amount: 6000000, ref_year: 2560}}, merit: [{cat: greed_harm, level: 3}]}
+          - {weight: 2, text: "เพื่อนเอาสลิปโอนเงินไปแจ้งความ ศาลสั่งคืนส่วนของทุกคนพร้อมค่าทนาย ชื่อเสียงพังทั้งแผนก", effects: {relations: -3, network: -3, happiness: -2, money: {unit: fixed_baht, amount: 600000, ref_year: 2560}}, merit: [{cat: greed_harm, level: 3}]}
+      - id: split_by_stake
+        text: "แบ่งตามเงินที่แต่ละคนลง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ทุกคนยอมรับ แม้คนที่ลงน้อยจะบ่นนิดหน่อย แต่ก็ยังนั่งกินข้าวโต๊ะเดียวกัน", effects: {relations: 1, happiness: 2, money: {unit: fixed_baht, amount: 1200000, ref_year: 2560}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เถียงกันว่าใครลงเท่าไรจนลงไม้ลงมือ แบ่งเงินได้แต่แผนกแตกเป็นสองก๊ก", effects: {relations: -2, happiness: -1, money: {unit: fixed_baht, amount: 1200000, ref_year: 2560}}, merit: [{cat: neutral}]}
+      - id: give_neediest
+        text: "เพิ่มส่วนให้เพื่อนที่แม่ป่วย"
+        effects: {relations: 3, happiness: 1, money: {unit: fixed_baht, amount: 900000, ref_year: 2560}}
+        merit: [{cat: dana, level: 2}, {cat: help_others, level: 1}]
+
+  - id: lot_habit_drain_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 4, max: 3}
+    when: {flags: {has: [lottery_habit]}}
+    title: "ต้นขั้วเต็มลิ้นชัก"
+    text: "ตอนรื้อลิ้นชักหาเอกสาร เจอต้นขั้วสลากเก่าเป็นปึกหนาเท่าสมุดโทรศัพท์ ลองคิดเลขดูคร่าว ๆ เงินที่หายไปกับมันมากพอจะดาวน์รถได้หนึ่งคัน"
+    choices:
+      - id: quit
+        text: "เลิกเด็ดขาด ตั้งแต่งวดนี้"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.3}}
+        clears_flags: [lottery_habit]
+        merit: [{cat: neutral}]
+      - id: keep_one
+        text: "ลดเหลืองวดละใบพอ"
+        effects: {money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: buy_set
+        text: "ทุ่มยกชุดทุกงวดทั้งปี เอาคืน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 950, text: "ทั้งปียกชุดมายี่สิบกว่างวด ผิดหมดทุกงวด เงินที่ตั้งใจจะเอาคืนกลับหายเพิ่มอีกก้อน", effects: {happiness: -1, money: {unit: income_x, amount: -0.6}}, merit: [{cat: neutral}]}
+          - {weight: 45, ok: true, text: "ปลายปีถูกเลขท้ายสามตัวยกชุด ได้คืนเกือบเท่าที่เสียไปทั้งปี ยิ้มได้ทั้งสัปดาห์", effects: {happiness: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 4, ok: true, text: "งวดหนึ่งในปีนั้น ใบที่ห้าในชุดถูกรางวัลที่หนึ่ง ข่าวไปเร็วกว่าที่คิด เย็นนั้นมีรถจากต่างจังหวัดมาจอดหน้าบ้านสามคัน", effects: {happiness: 2, money: {unit: fixed_baht, amount: 6000000, ref_year: 2560}}, next: lot_jackpot_kin_01, merit: [{cat: neutral}]}
+      - id: go_underground
+        text: "หันไปแทงหวยใต้ดิน จ่ายเยอะกว่า"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 6, text: "แทงสองตัวไม่เข้า งวดแล้วงวดเล่า เจ้ามือยิ้มรับโพยทุกครั้งที่เจอหน้า", effects: {money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "เลขเข้า! เจ้ามือจ่ายสดเป็นปึก ได้เงินคืนมากกว่าทั้งปีที่เสียไป", effects: {happiness: 2, money: {unit: income_x, amount: 0.8}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "งวดที่ถูก เจ้ามือปิดบ้านหนีไปพร้อมโพยทั้งซอย คนทั้งหมู่บ้านยืนด่าหน้าประตูเหล็ก", effects: {happiness: -2, relations: 1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตำรวจบุกจับวงโพยวันหวยออก ต้องเสียค่าปรับ ข่าวไปถึงที่ทำงานก่อนตัวจะกลับถึงบ้าน", effects: {happiness: -2, network: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+
+  - id: lot_jackpot_kin_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ญาติที่ไม่เคยเจอ"
+    text: "ลุงที่ไม่เคยเห็นหน้ามาพร้อมโฉนดที่ดินจะขาย ป้าอีกคนมีลูกจะบวช เพื่อนสมัยประถมโทรมาชวนลงทุน ทุกคนบอกตรงกันว่า 'เป็นญาติกันแท้ ๆ'"
+    choices:
+      - id: give_everyone
+        text: "แจกทุกคนที่มาขอ"
+        effects: {relations: 2, happiness: -1, money: {unit: fixed_baht, amount: -2400000, ref_year: 2560}}
+        merit: [{cat: dana, level: 2}]
+      - id: quit_open_shop
+        text: "เอาเงินรางวัลเปิดกิจการตัวเอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ร้านติดลมบน มีเงินทุนหนาไม่ต้องกู้ใคร ได้เป็นเถ้าแก่เต็มตัว", effects: {income_mult: 1.3, happiness: 2, network: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ญาติแห่มาสมัครเป็นลูกจ้างจนร้านขาดทุน ไล่ใครออกก็ไม่ได้ เงินรางวัลค่อย ๆ ละลาย", effects: {relations: -1, happiness: -2, money: {unit: fixed_baht, amount: -3000000, ref_year: 2560}}, sets_flags: [own_business], merit: [{cat: neutral}]}
+      - id: hide_money
+        text: "เก็บเงียบ บอกว่าโดนหลอกหมดแล้ว"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ข่าวลือว่าถังแตกได้ผล ญาติหายไปทีละคน เงินก้อนยังอยู่ครบ", effects: {relations: -2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกพี่ลูกน้องเห็นรถคันใหม่ในโรงจอด เรื่องโกหกแตก ทั้งตระกูลเลิกคบ", effects: {relations: -3, happiness: -2}, merit: [{cat: neutral}]}
+      - id: parents_house
+        text: "สร้างบ้านให้พ่อแม่ก่อนอย่างอื่น"
+        effects: {relations: 2, happiness: 2, money: {unit: fixed_baht, amount: -1000000, ref_year: 2560}}
+        merit: [{cat: care_parents, level: 3}]
+      - id: friend_invest
+        text: "ลงทุนกับเพื่อนสมัยประถม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนเอาไปทำโรงสีจริง ปันผลกลับมาทุกปีจนแปลกใจ", effects: {network: 2, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "เพื่อนหายเงียบพร้อมเงินครึ่งหนึ่งของรางวัล เบอร์โทรใช้ไม่ได้ตั้งแต่สัปดาห์แรก", effects: {happiness: -3, network: -1, money: {unit: fixed_baht, amount: -3000000, ref_year: 2560}}, merit: [{cat: neutral}]}
+
+  - id: lot_underground_mid_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {lottery_habit: 2}, occupation: {factory: 1.5, labor: 1.5, service: 1.3}}
+    title: "โพยเล่มเล็กของเจ๊"
+    text: "เจ๊ร้านขายของชำรับแทงหวยใต้ดินมาสิบปี วันนี้เข่าไม่ดีเดินไม่ไหว เลยยื่นสมุดโพยเล่มเล็กมาให้ 'ช่วยเดินเก็บโพยแทนหน่อย ให้ค่าเหนื่อยงาม'"
+    choices:
+      - id: run_slips
+        text: "รับเดินโพยแทนเจ๊"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 3, ok: true, text: "เดินเก็บโพยทั้งซอยได้ค่าคอมทุกงวด รู้จักคนทั้งตำบล", effects: {network: 2, money: {unit: income_x, amount: 0.6}}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 1, text: "ตำรวจตั้งด่านกลางซอย สมุดโพยอยู่ในกระเป๋าเรา โดนคุมตัวทั้งที่เจ๊นั่งดูทีวีอยู่บ้าน", effects: {happiness: -3, network: -2, money: {unit: income_x, amount: -1.5}}, merit: [{cat: greed_harm, level: 1}]}
+      - id: bet_big
+        text: "ขอแทงเลขเด็ดเองก้อนใหญ่"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 8, text: "หวยออกตัวท้ายสลับกัน พลาดไปนิดเดียว เงินก้อนที่เก็บไว้ซ่อมหลังคาหายวับ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "เลขเข้าเต็ม ๆ เจ๊ต้องขายทองมาจ่าย ทั้งซอยรู้ข่าวภายในชั่วโมง", effects: {happiness: 2, money: {unit: income_x, amount: 2.5}}, merit: [{cat: neutral}]}
+      - id: report_police
+        text: "แอบโทรแจ้งตำรวจ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "วงแตก ซอยเงียบลง เพื่อนบ้านหลายคนเลิกเสียเงินกับโพยไปเอง", effects: {happiness: 1, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 2, text: "ตำรวจมาตามนัด แต่เจ๊รู้ก่อนเก็บของหมด แล้วทั้งซอยก็รู้ว่าใครเป็นคนโทร", effects: {relations: -3, happiness: -1}, merit: [{cat: neutral}]}
+      - id: refuse
+        text: "ปฏิเสธ ช่วยยกของให้แทน"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: lot_old_drawer_01
+    type: A
+    category: work_money
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {lottery_habit: 2}}
+    title: "สลากใบในเสื้อตัวเก่า"
+    text: "หลานรื้อตู้เสื้อผ้าเตรียมบริจาค เจอสลากพับเป็นสี่เหลี่ยมในกระเป๋าเสื้อตัวเก่า ยังไม่มีใครตรวจเลย หลานตาลุกวาว บอกจะไปหาใบตรวจผลย้อนหลังมาเทียบ"
+    choices:
+      - id: check_it
+        text: "รีบเอามาดู ถูกหรือไม่ถูก"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 5, text: "ไม่ถูกสักตัว หลานแค่แกล้งทำหน้าเครียดให้ตกใจเล่น หัวเราะกันทั้งบ้าน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ถูกเลขท้ายสามตัว แต่เลยกำหนดขึ้นเงินไปแล้วหลายเดือน นั่งถอนหายใจทั้งบ่าย", effects: {happiness: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ถูกเลขท้ายสองตัว ยังทันกำหนดขึ้นเงินอีกสามวัน หลานขี่รถพาไปขึ้นเงินทันที", effects: {happiness: 2, relations: 1, money: {unit: fixed_baht, amount: 2000, ref_year: 2560}}, merit: [{cat: neutral}]}
+      - id: give_grandkid
+        text: "ยกให้หลานไปลุ้นเอง"
+        effects: {relations: 2}
+        merit: [{cat: dana, level: 1}]
+      - id: buy_grandkid_bday
+        text: "ซื้อใหม่ตามวันเกิดหลานทุกงวด"
+        effects: {relations: 1, happiness: 1, money: {unit: fixed_baht, amount: -2000, ref_year: 2560}}
+        sets_flags: [lottery_habit]
+        merit: [{cat: neutral}]
+      - id: frame_it
+        text: "ใส่กรอบไว้เตือนใจ ไม่ซื้ออีก"
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.2}}
+        clears_flags: [lottery_habit]
+        merit: [{cat: neutral}]

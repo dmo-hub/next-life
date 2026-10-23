@@ -20,7 +20,7 @@ events:
       - id: guess_luck
         text: "ไม่อ่าน ฝนตามดวงเอา"
         outcomes:
-          - {weight: 1, text: "ติดคณะดังแบบงง ๆ ทั้งโรงเรียนแตกตื่น", multipliers: {karma: 1.5}, effects: {knowledge: 1, happiness: 3}, sets_flags: [good_student], merit: [{cat: neutral}]}
+          - {ok: true, weight: 1, text: "ติดคณะดังแบบงง ๆ ทั้งโรงเรียนแตกตื่น", multipliers: {karma: 1.5}, effects: {knowledge: 1, happiness: 3}, sets_flags: [good_student], merit: [{cat: neutral}]}
           - {weight: 3, text: "ฝนผิดแถวตั้งแต่ข้อแรก รู้ตัวตอนหมดเวลา", effects: {happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: vocational
@@ -44,7 +44,7 @@ events:
       - id: skip_to_train
         text: "โดดเรียนไปซ้อมทั้งเดือน"
         outcomes:
-          - {weight: 1, text: "ทีมคว้าแชมป์ แมวมองทีมอีสปอร์ตมาขอเบอร์ถึงที่", effects: {happiness: 3, money: {unit: income_x, amount: 1}, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 1, text: "ทีมคว้าแชมป์ แมวมองทีมอีสปอร์ตมาขอเบอร์ถึงที่", next: teen_esports_scout_01, effects: {happiness: 3, money: {unit: income_x, amount: 1}, income_mult: 1.2}, merit: [{cat: neutral}]}
           - {weight: 3, text: "ตกรอบแรก แถมครูโทรหาที่บ้านเรื่องขาดเรียน", effects: {knowledge: -2, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: weekend_only
@@ -78,19 +78,19 @@ events:
       - id: smoke_choke
         text: "ลองสูบ แล้วสำลักหนัก"
         outcomes:
-          - {weight: 2, text: "ไอจนน้ำตาไหล ทั้งวงหัวเราะ แต่ไม่มีใครชวนอีกเลย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 2, text: "ไอจนน้ำตาไหล ทั้งวงหัวเราะ แต่ไม่มีใครชวนอีกเลย", effects: {happiness: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "สำลักแต่ฝืนสูบต่อทุกวันจนติดงอมแงม", effects: {health: -1}, sets_flags: [smoker], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse_walk
         text: "ปฏิเสธแล้วเดินหนี"
         outcomes:
-          - {weight: 2, text: "รุ่นพี่ยักไหล่ ไม่ว่าอะไร", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 2, text: "รุ่นพี่ยักไหล่ ไม่ว่าอะไร", effects: {health: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "รุ่นพี่ล้อว่าลูกแหง่ไปทั้งเทอม", effects: {health: 1, happiness: -2}, sets_flags: [bullied], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: tell_teacher
         text: "แอบบอกครูฝ่ายปกครอง"
         outcomes:
-          - {weight: 1, text: "ครูจับได้คาหนังคาเขา ไม่มีใครรู้ว่าใครบอก", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {ok: true, weight: 1, text: "ครูจับได้คาหนังคาเขา ไม่มีใครรู้ว่าใครบอก", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
           - {weight: 1, text: "ความแตกว่าใครฟ้อง ทั้งสายชั้นเลิกคุยด้วย", effects: {relations: -2, happiness: -1}, sets_flags: [bullied], merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
 
@@ -107,14 +107,14 @@ events:
       - id: say_yes
         text: "ตอบตกลงทันที"
         outcomes:
-          - {weight: 2, text: "รักแรกหวานฉ่ำ เกรดร่วงพร้อมกันทั้งคู่", effects: {happiness: 3, knowledge: -1}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 2, text: "รักแรกหวานฉ่ำ เกรดร่วงพร้อมกันทั้งคู่", effects: {happiness: 3, knowledge: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ที่แท้เพื่อนในห้องแกล้งเขียน ทั้งห้องหัวเราะลั่น", effects: {happiness: -2, relations: -1}, sets_flags: [bullied], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: keep_friend
         text: "ปฏิเสธเพื่อรักษาเพื่อน"
         outcomes:
           - {weight: 1, text: "เพื่อนเงียบหายไปทั้งเทอม", effects: {relations: -2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "เพื่อนขอบคุณที่จริงใจ กลายเป็นเพื่อนกันตลอดชีวิต", multipliers: {stats: {relations: 2}}, effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 1, text: "เพื่อนขอบคุณที่จริงใจ กลายเป็นเพื่อนกันตลอดชีวิต", multipliers: {stats: {relations: 2}}, effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: secret_date
         text: "แอบคบ ไม่ให้ที่บ้านรู้"
@@ -138,7 +138,7 @@ events:
       - id: join_gang
         text: "เข้าแก๊ง ซิ่งทุกคืน"
         outcomes:
-          - {weight: 2, text: "มีพวกพ้องเต็มซอย ไม่มีใครกล้าแตะ", effects: {happiness: 2, relations: 1, health: -1}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 2, text: "มีพวกพ้องเต็มซอย ไม่มีใครกล้าแตะ", effects: {happiness: 2, relations: 1, health: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ด่านตำรวจรวบทั้งแก๊ง พ่อแม่ต้องมาประกันตัว", effects: {relations: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: extort_juniors
@@ -154,7 +154,7 @@ events:
         text: "พารุ่นน้องหนีแก๊ง"
         outcomes:
           - {weight: 1, text: "โดนรุมกระทืบหน้าปากซอย แต่รุ่นน้องรอด", effects: {health: -2, relations: 1}, merit: [{cat: help_others, level: 2}]}
-          - {weight: 2, text: "รุ่นน้องคนนั้นกลายเป็นเพื่อนตายไปตลอดชีวิต", effects: {relations: 3}, merit: [{cat: help_others, level: 2}]}
+          - {ok: true, weight: 2, text: "รุ่นน้องคนนั้นกลายเป็นเพื่อนตายไปตลอดชีวิต", effects: {relations: 3}, merit: [{cat: help_others, level: 2}]}
         merit: [{cat: help_others, level: 2}]
 
   - id: teen_viral_clip_01
@@ -170,8 +170,8 @@ events:
       - id: take_brand_deal
         text: "รับงานรีวิวเต็มตัว"
         outcomes:
-          - {weight: 2, text: "ค่ารีวิวเดือนเดียวเท่าค่าขนมทั้งปี", multipliers: {flags: {scam_aware: 2}}, effects: {money: {unit: income_x, amount: 1}, happiness: 1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
-          - {weight: 1, text: "ของที่รีวิวเป็นของปลอม คนแห่ด่าทั้งเน็ต", effects: {happiness: -2, relations: -1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+          - {ok: true, weight: 2, text: "ค่ารีวิวเดือนเดียวเท่าค่าขนมทั้งปี", multipliers: {flags: {scam_aware: 2}}, effects: {money: {unit: income_x, amount: 1}, happiness: 1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ของที่รีวิวเป็นของปลอม คนแห่ด่าทั้งเน็ต", next: teen_clip_backlash_01, effects: {money: {unit: income_x, amount: 1}, happiness: -2, relations: -1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: clip_every_night
         text: "ถ่ายคลิปทุกวันจนดึก"
@@ -187,7 +187,7 @@ events:
         text: "ชวนครูมาเต้นคลิปต่อ"
         requires: {stats: {relations: {min: 60}}, reason: "ยังไม่กล้าพอจะชวนครู"}
         outcomes:
-          - {weight: 1, text: "คลิปครูเต้นดังกว่าเดิมสิบเท่า ทั้งโรงเรียนรักครูขึ้น", effects: {relations: 2, happiness: 2}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+          - {ok: true, weight: 1, text: "คลิปครูเต้นดังกว่าเดิมสิบเท่า ทั้งโรงเรียนรักครูขึ้น", effects: {relations: 2, happiness: 2}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
           - {weight: 1, text: "ครูโดนผู้บริหารเรียกพบ ไม่มองหน้ากันอีกเลย", effects: {relations: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -208,21 +208,21 @@ events:
       - id: dock_work
         text: "ไปแบกของที่ท่าเรือ"
         outcomes:
-          - {weight: 3, text: "ได้เงินดี กล้ามขึ้นเป็นมัด", multipliers: {stats: {health: 2}}, effects: {money: {unit: income_x, amount: 1}, health: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {ok: true, weight: 3, text: "ได้เงินดี กล้ามขึ้นเป็นมัด", multipliers: {stats: {health: 2}}, effects: {money: {unit: income_x, amount: 1}, health: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
           - {weight: 1, text: "ลังหล่นทับหลัง นอนซมไปหลายเดือน", effects: {money: {unit: income_x, amount: 0.3}, health: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: sell_online
         text: "ขายเคสมือถือออนไลน์"
         requires: {money: {unit: income_x, amount: 0.5}, reason: "ไม่มีทุนซื้อของมาขาย"}
         outcomes:
-          - {weight: 1, text: "ขายดีจนต้องจ้างเพื่อนช่วยแพ็กของ", multipliers: {stats: {knowledge: 2}}, effects: {money: {unit: income_x, amount: 2}, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 1, text: "ขายดีจนต้องจ้างเพื่อนช่วยแพ็กของ", multipliers: {stats: {knowledge: 2}}, effects: {money: {unit: income_x, amount: 2}, income_mult: 1.2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ของค้างสต็อกเต็มห้องนอน", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: chase_scholarship
         text: "ไม่ทำ ตั้งใจเรียนชิงทุน"
         requires: {stats: {knowledge: {min: 60}}, reason: "เกรดยังไม่ถึงเกณฑ์ชิงทุน"}
         outcomes:
-          - {weight: 1, text: "ได้ทุนเรียนฟรีถึงปริญญาตรี", multipliers: {stats: {knowledge: 2}}, effects: {knowledge: 2, money: {unit: income_x, amount: 1}}, sets_flags: [good_student], merit: [{cat: neutral}]}
+          - {ok: true, weight: 1, text: "ได้ทุนเรียนฟรีถึงปริญญาตรี", multipliers: {stats: {knowledge: 2}}, effects: {knowledge: 2, money: {unit: income_x, amount: 1}}, sets_flags: [good_student, scholarship], merit: [{cat: neutral}]}
           - {weight: 2, text: "ทุนตกไปที่คนอื่นแค่คะแนนเดียว", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -243,18 +243,79 @@ events:
       - id: folk_massage
         text: "ไปหาหมอนวดพื้นบ้าน"
         outcomes:
-          - {weight: 1, text: "นวดไม่กี่ครั้งก็เดินฉิว ประหยัดไปเยอะ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 1, text: "นวดไม่กี่ครั้งก็เดินฉิว ประหยัดไปเยอะ", effects: {happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "กระดูกติดผิดรูป เดินกะเผลกไปอีกนาน", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: find_friend
         text: "ลากขาไปตามหาเพื่อนก่อน"
         outcomes:
-          - {weight: 1, text: "เจอเพื่อนสลบในคูน้ำ คุณช่วยชีวิตเขาไว้ได้ทัน", multipliers: {karma: 1.4}, effects: {relations: 3, health: -1}, merit: [{cat: help_others, level: 2}]}
+          - {ok: true, weight: 1, text: "เจอเพื่อนสลบในคูน้ำ คุณช่วยชีวิตเขาไว้ได้ทัน", multipliers: {karma: 1.4}, effects: {relations: 3, health: -1}, merit: [{cat: help_others, level: 2}]}
           - {weight: 1, text: "เพื่อนหนีกลับบ้านไปแล้ว ทิ้งให้นอนเจ็บคนเดียว", effects: {relations: -2, health: -1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
       - id: call_parents
         text: "โทรให้พ่อแม่มารับ"
         outcomes:
-          - {weight: 2, text: "โดนด่ายับ แต่พ่อแม่พาไปรักษาจนหายดี", multipliers: {stats: {relations: 2}}, effects: {health: 1, relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 2, text: "โดนด่ายับ แต่พ่อแม่พาไปรักษาจนหายดี", multipliers: {stats: {relations: 2}}, effects: {health: 1, relations: 1, happiness: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "พ่อแม่ยึดทั้งรถทั้งมือถือไปทั้งปี", effects: {health: 1, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: teen_esports_scout_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "สัญญาจากแมวมอง"
+    text: "แมวมองยื่นสัญญาเข้าบ้านทีม กินนอนซ้อมวันละสิบสองชั่วโมง มีเงินเดือนให้ แต่ต้องพักการเรียนทันที ที่บ้านยังไม่รู้เรื่องนี้เลย"
+    choices:
+      - id: sign_pro
+        text: "เซ็นเลย ทิ้งห้องเรียน"
+        outcomes:
+          - {ok: true, weight: 1, text: "ทีมติดลีกใหญ่ ชื่อคุณขึ้นจอยักษ์กลางห้าง", effects: {happiness: 3, knowledge: -2, money: {unit: income_x, amount: 1.5}, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทีมยุบหลังสามเดือน กลับบ้านมือเปล่าแถมซ้ำชั้น", effects: {knowledge: -2, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: esports_scholarship
+        text: "ขอทุนนักกีฬาอีสปอร์ตแทน"
+        requires: {stats: {knowledge: {min: 50}}, reason: "เกรดไม่ถึงเกณฑ์ทุนนักกีฬา"}
+        outcomes:
+          - {ok: true, weight: 1, text: "ได้โควตาทุนนักกีฬาเต็มจำนวนไว้ใช้ตอนเข้ามหาวิทยาลัย เรียนไปแข่งไป ไม่ต้องจ่ายค่าเทอมสักบาท", effects: {happiness: 2, knowledge: 1}, sets_flags: [scholarship], merit: [{cat: neutral}]}
+          - {weight: 1, text: "โควตาทุนเต็มแล้ว ได้เสื้อทีมกลับบ้านมาตัวเดียว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_parents_scout
+        text: "พาแมวมองไปคุยกับพ่อแม่"
+        outcomes:
+          - {ok: true, weight: 1, text: "พ่อแม่ยอมให้ลองหนึ่งปี ขอแค่เกรดห้ามตก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พ่อไล่แมวมองออกจากบ้าน แล้วยกคอมไปขายทิ้งต่อหน้า", effects: {relations: -1, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: refuse_scout
+        text: "ปฏิเสธ กลับไปตั้งใจเรียน"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: teen_clip_backlash_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "ทัวร์ลงหน้าเพจ"
+    text: "คนที่ซื้อตามรีวิวแห่มาด่าเต็มเพจ บางคนขู่จะแจ้งความ ส่วนแบรนด์ปิดเพจหนีไปแล้ว เหลือคุณยืนรับหน้าอยู่คนเดียว"
+    choices:
+      - id: refund_apologize
+        text: "ไลฟ์ขอโทษ คืนค่ารีวิวทุกบาท"
+        effects: {money: {unit: income_x, amount: -1}, relations: 2, happiness: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: expose_brand
+        text: "ทำคลิปแฉแบรนด์ปลอม"
+        outcomes:
+          - {ok: true, weight: 1, text: "คลิปแฉดังกว่าคลิปเต้น ตำรวจตามรวบแบรนด์ได้ คุณกลายเป็นฮีโร่ของคนโดนหลอก", effects: {relations: 2, happiness: 3}, sets_flags: [likes_clips], merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "แบรนด์ส่งคนมาขู่ถึงหน้าบ้าน ต้องปิดเพจหนีไปทั้งเทอม", effects: {happiness: -2, health: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: delete_hide
+        text: "ลบเพจ ทำตัวเงียบ ๆ"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: blame_buyers
+        text: "ด่ากลับว่าคนซื้อไม่ดูเอง"
+        outcomes:
+          - {weight: 1, text: "ดราม่าทำยอดฟอลพุ่ง แบรนด์ใหม่ทักมาจ้างต่อทันที", effects: {money: {unit: income_x, amount: 0.5}, happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทัวร์ลงหนักกว่าเดิม คนแคปไปประจานถึงหน้าโรงเรียน", effects: {relations: -2, happiness: -2}, sets_flags: [bullied], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]

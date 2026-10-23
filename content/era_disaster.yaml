@@ -18,7 +18,7 @@ events:
       - id: rebuild_boat
         text: "กู้เงินต่อเรือใหม่ ออกทะเลต่อ"
         outcomes:
-          - {weight: 3, text: "หลังพายุปลาชุกผิดปกติ เรือลำใหม่ใช้หนี้หมดในปีเดียว", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "หลังพายุปลาชุกผิดปกติ เรือลำใหม่ใช้หนี้หมดในปีเดียว", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เรือรั่วกลางทะเล พ่อกลับมาได้แต่เจ็บหนัก ลูกต้องหยุดเรียนมาช่วยแม่หาเงินใช้หนี้", effects: {happiness: -2, knowledge: -1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: shelter_neighbors
@@ -51,7 +51,7 @@ events:
       - id: contractor
         text: "รับจ้างซ่อมบ้านหลังพายุ"
         outcomes:
-          - {weight: 2, multipliers: {stats: {health: 1.5}}, text: "งานล้นมือจนต้องจ้างลูกน้อง กลายเป็นผู้รับเหมาเจ้าประจำของทั้งอำเภอ", effects: {money: {unit: income_x, amount: 1}, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.5}, occupation: {craft: 2, technician: 1.5, labor: 1.3}}, text: "งานล้นมือจนต้องจ้างลูกน้อง กลายเป็นผู้รับเหมาเจ้าประจำของทั้งอำเภอ", effects: {money: {unit: income_x, amount: 1}, income_mult: 1.3}, merit: [{cat: neutral}]}
           - {weight: 1, text: "รับงานเกินตัว ตกนั่งร้านขาเดาะ ลูกค้าทวงมัดจำคืน", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: price_gouge
@@ -88,13 +88,13 @@ events:
       - id: herbal_boil
         text: "ต้มยาสมุนไพรสูตรยายให้กิน"
         outcomes:
-          - {weight: 2, multipliers: {stats: {health: 2}}, text: "หายเองในสองวัน ยายคุยเรื่องนี้ไปอีกสิบปี", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 2}}, text: "หายเองในสองวัน ยายคุยเรื่องนี้ไปอีกสิบปี", effects: {relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ไอยืดเป็นเดือน ไปหาหมอช้าจนปอดอักเสบ", effects: {health: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: school_as_usual
         text: "ส่งไปโรงเรียนตามปกติ"
         outcomes:
-          - {weight: 3, multipliers: {stats: {health: 1.5}}, text: "เรียนทันเพื่อน ไม่มีอะไรเกิดขึ้น", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, multipliers: {stats: {health: 1.5}}, text: "เรียนทันเพื่อน ไม่มีอะไรเกิดขึ้น", effects: {knowledge: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ไข้ขึ้นกลางห้อง ถูกจับแยก เพื่อนตั้งฉายาไปทั้งปี", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -111,7 +111,7 @@ events:
       - id: cheap_trip
         text: "คว้าตั๋วถูกไปเที่ยวนอก"
         outcomes:
-          - {weight: 3, text: "ทริปคุ้มที่สุดในชีวิต ถ่ายรูปสถานที่ดังได้โดยไม่มีคนติดเฟรม", effects: {happiness: 3, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "ทริปคุ้มที่สุดในชีวิต ถ่ายรูปสถานที่ดังได้โดยไม่มีคนติดเฟรม", effects: {happiness: 3, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ไข้ขึ้นที่สนามบินขากลับ ถูกกักตัวสิบสี่วัน ทั้งที่สุดท้ายเป็นแค่หวัด", effects: {health: -1, happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: hoard_masks
@@ -160,7 +160,7 @@ events:
       - id: shout_warning
         text: "ตะโกนเตือนคนทั้งหาดก่อนหนี"
         outcomes:
-          - {weight: 2, multipliers: {stats: {relations: 2}}, text: "มีคนเชื่อ หนีขึ้นเนินทันกันหลายสิบคน ทุกปีมีคนมากราบขอบคุณ", effects: {relations: 3}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 2}}, text: "มีคนเชื่อ หนีขึ้นเนินทันกันหลายสิบคน ทุกปีมีคนมากราบขอบคุณ", effects: {relations: 3}, merit: [{cat: help_others, level: 2}]}
           - {weight: 1, text: "ไม่มีใครฟัง ต้องวิ่งเอาตัวรอดจนหอบ", effects: {health: -1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
       - id: move_inland
@@ -181,7 +181,7 @@ events:
       - id: search_relative
         text: "ดั้นด้นไปตามหาเอง"
         outcomes:
-          - {weight: 2, multipliers: {karma: 1.4}, text: "เจอเขาในศูนย์พักพิง กอดกันร้องไห้กลางเต็นท์", effects: {health: -1, relations: 3}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 2, ok: true, multipliers: {karma: 1.4}, text: "เจอเขาในศูนย์พักพิง กอดกันร้องไห้กลางเต็นท์", effects: {health: -1, relations: 3}, merit: [{cat: help_others, level: 1}]}
           - {weight: 1, text: "ตามหาสามวัน แล้วเขาโทรมาเอง ปลอดภัยดี ติดอยู่อีกเกาะ มือถือแบตหมด", effects: {health: -1, happiness: 1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: help_others, level: 1}]
       - id: volunteer_id
@@ -196,7 +196,7 @@ events:
         text: "ชวนที่บ้านซื้อที่ริมหาดราคาตก"
         requires: {money: {unit: income_x, amount: 2}, reason: "เงินเก็บไม่พอซื้อที่ดิน"}
         outcomes:
-          - {weight: 2, text: "หลายปีต่อมานักท่องเที่ยวกลับมาล้นหาด ราคาที่ดินพุ่งหลายเท่า", effects: {money: {unit: income_x, amount: 3}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ยังไม่ทันข้ามปี นายหน้าแปลกหน้าเริ่มมาเดินวนดูที่ ข่าวลือว่ามีโครงการรีสอร์ตใหญ่จะมาลงหาดนี้", effects: {happiness: 1, money: {unit: income_x, amount: 1}}, next: era_dis_tsunami_land_offer_01, merit: [{cat: neutral}]}
           - {weight: 1, text: "ที่ดินแปลงนั้นถูกประกาศเป็นเขตเสี่ยงภัย สร้างอะไรไม่ได้ ทิ้งร้างจนวันตาย", effects: {happiness: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: turn_off_news
@@ -218,7 +218,7 @@ events:
       - id: stay_upstairs
         text: "ขนของขึ้นชั้นสอง อยู่สู้"
         outcomes:
-          - {weight: 2, text: "ลูกพายกะละมังไปบ้านเพื่อนทุกวัน เป็นปิดเทอมที่สนุกที่สุดในชีวิต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ลูกพายกะละมังไปบ้านเพื่อนทุกวัน เป็นปิดเทอมที่สนุกที่สุดในชีวิต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เหยียบเศษแก้วใต้น้ำ แผลติดเชื้อต้องนอนโรงพยาบาล", effects: {health: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: evacuate_shelter
@@ -232,7 +232,7 @@ events:
       - id: build_boats
         text: "พ่อแม่ต่อเรือขายริมถนน"
         outcomes:
-          - {weight: 2, text: "เรือขายดีเป็นเทน้ำเทท่า ลูกได้ช่วยทาสีจนมือเลอะทั้งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "เรือขายดีเป็นเทน้ำเทท่า ลูกได้ช่วยทาสีจนมือเลอะทั้งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "น้ำลดเร็วกว่าที่คิด เรือค้างเต็มหน้าบ้าน กลายเป็นกระถางต้นไม้", effects: {money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -257,8 +257,8 @@ events:
       - id: wade_to_work
         text: "ลุยน้ำไปทำงานไปเรียนทุกวัน"
         outcomes:
-          - {weight: 2, multipliers: {stats: {health: 2}}, text: "ความอึดเป็นที่เลื่องลือ ใครมีงานดี ๆ ก็นึกถึงเป็นคนแรก", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ติดเชื้อจากน้ำขัง ตับไตไม่เหมือนเดิม", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 2}}, text: "ความอึดเป็นที่เลื่องลือ ใครมีงานดี ๆ ก็นึกถึงเป็นคนแรก", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {occupation: {factory: 1.5, labor: 1.5}}, text: "ติดเชื้อจากน้ำขัง ตับไตไม่เหมือนเดิม", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: back_to_farm
         text: "ย้ายกลับไปอยู่บ้านเกิดทำสวน"
@@ -285,7 +285,7 @@ events:
         text: "ให้ลูกช่วยแม่ไลฟ์ขายของ"
         effects: {knowledge: -1}
         outcomes:
-          - {weight: 2, multipliers: {stats: {relations: 1.5}}, text: "ลูกพูดเก่งจนคนดูติดงอมแงม ยอดขายพุ่ง ทั้งบ้านเรียกว่าแม่ค้าตัวน้อย", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ลูกพูดเก่งจนคนดูติดงอมแงม ยอดขายพุ่ง ทั้งบ้านเรียกว่าแม่ค้าตัวน้อย", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
           - {weight: 1, text: "คนดูสามคน เป็นยายสองคน แต่ลูกกล้าพูดต่อหน้ากล้องขึ้นเยอะ", effects: {relations: 1}, sets_flags: [online_seller], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: send_to_grandma
@@ -296,7 +296,7 @@ events:
         text: "ผลัดกันใช้มือถือเครื่องเดียว"
         outcomes:
           - {weight: 2, text: "หลุดเรียนบ่อยจนเกรดร่วง ตามเพื่อนไม่ทันไปอีกหลายปี", effects: {knowledge: -2}, merit: [{cat: neutral}]}
-          - {weight: 1, multipliers: {stats: {relations: 2}}, text: "ครูเห็นความพยายาม ขี่มอเตอร์ไซค์เอาชีทมาส่งถึงบ้านทุกอาทิตย์", effects: {knowledge: 1, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 2}}, text: "ครูเห็นความพยายาม ขี่มอเตอร์ไซค์เอาชีทมาส่งถึงบ้านทุกอาทิตย์", effects: {knowledge: 1, relations: 2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   - id: era_dis_covid_adult_01
@@ -312,7 +312,7 @@ events:
       - id: live_selling
         text: "เปิดไลฟ์ขายของออนไลน์"
         outcomes:
-          - {weight: 2, multipliers: {flags: {online_seller: 2}}, text: "ไลฟ์ตีสองยอดพุ่ง กลายเป็นแม่ค้าออนไลน์ที่มีแฟนคลับเหนียวแน่น", effects: {happiness: 2, money: {unit: income_x, amount: 1}, income_mult: 1.4}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {flags: {online_seller: 2}, occupation: {service: 1.5}}, text: "ไลฟ์ตีสองยอดพุ่ง ออเดอร์เด้งไม่หยุดจนแพ็กของไม่ทัน แฟนคลับเริ่มถามหาของล็อตใหม่", effects: {happiness: 2, money: {unit: income_x, amount: 1}, income_mult: 1.2}, next: era_dis_covid_shop_boom_01, sets_flags: [online_seller], merit: [{cat: neutral}]}
           - {weight: 2, text: "ขายได้แต่ญาติ แต่ได้วิชาถ่ายรูป ตอบแชต ส่งของติดตัวมา", effects: {knowledge: 1}, sets_flags: [online_seller], merit: [{cat: neutral}]}
           - {weight: 1, text: "ลูกค้าตีของคืนทั้งล็อต ทุนจมหายในเดือนเดียว", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
@@ -330,10 +330,69 @@ events:
         text: "กักตัว หัดทำกับข้าว ออกกำลัง"
         effects: {money: {unit: income_x, amount: -0.3}}
         outcomes:
-          - {weight: 1, multipliers: {stats: {health: 2}}, text: "ติดเป็นนิสัย ออกกำลังทุกเช้าจนทุกวันนี้", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {health: 2}}, text: "ติดเป็นนิสัย ออกกำลังทุกเช้าจนทุกวันนี้", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ทำได้สองอาทิตย์ก็เลิก เหลือแต่ฝีมือทอดไข่เจียว", effects: {happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: vaccine_volunteer
         text: "อาสาไปช่วยศูนย์ฉีดวัคซีน"
         effects: {relations: 2, knowledge: 1}
         merit: [{cat: help_others, level: 2}]
+
+  # ---------- เรื่องต่อ (ออกทาง next เท่านั้น) ----------
+  - id: era_dis_tsunami_land_offer_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "นายหน้าเคาะประตู"
+    text: "นายหน้าใส่สูทยื่นซองหนาเตอะ ขอซื้อที่ริมหาดต่อในราคาสองเท่า ให้ตอบภายในคืนนี้ ชาวบ้านแถวนั้นกระซิบว่าถ้ารอ ราคาอาจขึ้นอีกเท่าตัว"
+    choices:
+      - id: sell_now
+        text: "ขายเลย กำไรเห็น ๆ"
+        effects: {happiness: 1, money: {unit: income_x, amount: 2}}
+        merit: [{cat: neutral}]
+      - id: build_bungalow
+        text: "ไม่ขาย สร้างบังกะโลเอง"
+        effects: {money: {unit: income_x, amount: -1}}
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.5}}, text: "บังกะโลริมหาดเต็มทุกหน้าเทศกาล ฝรั่งกลับมาพักซ้ำทุกปีจนกลายเป็นเพื่อนกัน", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: 3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สร้างเสร็จพอดีหน้ามรสุม ไม่มีแขกสักห้อง หนี้ค่าก่อสร้างพอกทุกเดือน", effects: {happiness: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hold_out
+        text: "โก่งราคา รอให้ขึ้นอีกเท่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "นายหน้ากลับมาอีกสามรอบ สุดท้ายยอมจ่ายเกือบสามเท่า", effects: {happiness: 2, money: {unit: income_x, amount: 3}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "โครงการย้ายไปลงอีกหาด นายหน้าหายเงียบ ที่ดินกลับไปราคาเดิม", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: donate_warning_tower
+        text: "แบ่งที่สร้างหอเตือนภัยสึนามิ"
+        effects: {happiness: 1, relations: 2, network: 1}
+        merit: [{cat: dana, level: 2}]
+
+  - id: era_dis_covid_shop_boom_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ออเดอร์ล้นห้อง"
+    text: "กล่องพัสดุกองถึงเพดาน ไลฟ์ทุกคืนคนดูเป็นพัน มีโรงงานทักมาเสนอทำแบรนด์ของตัวเอง แต่ต้องวางมัดจำก้อนใหญ่ และงานประจำก็เริ่มทนไม่ไหว"
+    choices:
+      - id: quit_go_full
+        text: "ลาออก ขายออนไลน์เต็มตัว"
+        effects: {happiness: 2, health: -1, income_mult: 1.3}
+        merit: [{cat: neutral}]
+      - id: own_brand
+        text: "วางมัดจำ ทำแบรนด์ของตัวเอง"
+        effects: {money: {unit: income_x, amount: -1}}
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.6}}, text: "แบรนด์ติดตลาด ของขาดสต็อกทุกล็อต รายได้เสริมแซงเงินเดือนไปไกล", effects: {happiness: 2, network: 1, income_mult: 1.4}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "โรงงานส่งของผิดสเปกทั้งล็อต ลูกค้าด่ายับในไลฟ์ มัดจำสูญเกลี้ยง", effects: {happiness: -2, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hire_relatives
+        text: "จ้างญาติที่ตกงานมาช่วยแพ็ก"
+        effects: {relations: 2, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: help_others, level: 1}]
+      - id: stop_live
+        text: "พอแค่นี้ กลับไปนอนให้เต็มอิ่ม"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
