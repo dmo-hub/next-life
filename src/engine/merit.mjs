@@ -105,7 +105,8 @@ export function omenTone(ledger) {
 export function omenText(tone, seed, age) {
   const pool = OMEN_TEXT[tone];
   let h = Math.imul((seed ^ Math.imul(age + 1, 0x27d4eb2f)) >>> 0, 0x165667b1) >>> 0;
-  h ^= h >>> 15;
+  // ^ คืนค่า int32 มีเครื่องหมาย — ไม่ดันกลับเป็น unsigned แล้ว index ติดลบ ได้ undefined ขึ้นการ์ด
+  h = (h ^ (h >>> 15)) >>> 0;
   return pool[h % pool.length];
 }
 

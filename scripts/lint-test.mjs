@@ -7,10 +7,10 @@ import { strings } from '../src/node/lint/util.mjs';
 import { loadEvents, loadEra, loadContent } from '../src/node/load.mjs';
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
 import { schoolGate, jobCard, TRACKS, EDU } from '../src/engine/career.mjs';
-import { newLife, CLASSES } from '../src/engine/life.mjs';
-import { MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES } from '../src/node/lint/vocab.mjs';
+import { newLife, CLASSES, SEXES, fill } from '../src/engine/life.mjs';
+import { MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
 import { SCENES } from '../src/engine/afterlife.mjs';
-import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA } from '../src/engine/merit.mjs';
+import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenText } from '../src/engine/merit.mjs';
 
 const root = new URL('../', import.meta.url);
 const dir = (d) => readdirSync(new URL(d, root)).filter((n) => n.endsWith('.yaml')).sort();
@@ -69,6 +69,21 @@ for (const [tone, xs] of Object.entries(OMEN_TEXT)) for (const s of xs) {
   if (s.length > MAX_LEN.text) fails.push(`ลาง ${tone}: ยาวเกิน ${MAX_LEN.text} "${s}"`);
   if (/[0-9๐-๙]/.test(s)) fails.push(`ลาง ${tone}: มีตัวเลข "${s}"`);
 }
+// ตัวเลือกข้อความลางมาจาก hash ของ seed+อายุ — ไล่ช่วงกว้างให้เจอ index ติดลบ (ข้อความ undefined บนการ์ด)
+let omenMiss = 0;
+for (const tone of Object.keys(OMEN_TEXT)) for (let s = 0; s < 500; s++) for (let a = 0; a < 120; a++) if (typeof omenText(tone, Math.imul(s, 2654435761) >>> 0, a) !== 'string') omenMiss++;
+rows.push(['ข้อความลางเลือกได้ทุก seed', omenMiss ? `ไม่ได้ข้อความ ${omenMiss} ครั้ง` : 'ผ่าน']);
+if (omenMiss) fails.push(`omenText คืนค่าที่ไม่ใช่ข้อความ ${omenMiss} ครั้ง`);
+// ทุกช่องในรายการปิดของด่าน build ต้องมีตัวเติมในแกน ไม่งั้นผ่านด่านแต่โผล่ดิบบนการ์ด · ทั้งสองเพศ
+for (const sex of SEXES) {
+  const st = { ...newLife(1, loadContent()), sex };
+  for (const k of Object.keys(PLACEHOLDERS)) {
+    const out = fill(`{${k}}`, st);
+    if (/[{}]/.test(out) || !out.trim()) fails.push(`ช่อง {${k}} แกนไม่เติม (${sex}): "${out}"`);
+    else if (out.length > PLACEHOLDERS[k].length) fails.push(`ช่อง {${k}} เติมแล้วยาว ${out.length} เกินค่ายาวสุดที่ด่านความยาวใช้ (${PLACEHOLDERS[k].length}) — แก้ PLACEHOLDERS`);
+  }
+}
+rows.push(['ช่องแทนค่าแกนเติมครบ', `${Object.keys(PLACEHOLDERS).length} ช่อง × ${SEXES.length} เพศ`]);
 
 // การ์ดจัดสรรเงินสร้างในแกน ไม่ผ่านด่านเนื้อหา — ตรวจทุกปีของเกม: ≥4 ตัวเลือก · ยาว · คำต้องห้าม · หุ้นไม่โผล่ก่อน 2518
 const era = loadEra();

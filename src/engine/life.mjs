@@ -323,11 +323,20 @@ export function deathChance(st) {
   return Math.min(1, base * healthMultiplier(st) * karmaMultiplier(st.ledger));
 }
 
+// ช่องแทนค่าครบทุกตัวในรายการปิดของด่าน build (PLACEHOLDERS) — ตัวที่ไม่เติมจะโผล่เป็น {ชื่อ} ดิบบนการ์ด
+// เกมยังไม่มีชื่อผู้เล่น/ลูก/จังหวัด: ชื่อ = "คุณ" แบบที่การ์ดอื่นเรียกผู้เล่น · จังหวัด = ภาคที่เกิด · คำพูดตามเพศ
+export const FILL = {
+  อายุ: (st) => st.age,
+  ภาค: (st) => regionLabel(st),
+  จังหวัด: (st) => regionLabel(st),
+  เงิน: (st) => Math.round(st.money).toLocaleString('en-US'),
+  ชื่อ: () => 'คุณ',
+  ชื่อลูก: () => 'ลูก',
+  ครับ: (st) => (st.sex === 'หญิง' ? 'ค่ะ' : 'ครับ'),
+  ผม: (st) => (st.sex === 'หญิง' ? 'ฉัน' : 'ผม'),
+};
 export function fill(text, st) {
-  return text
-    .replaceAll('{อายุ}', st.age)
-    .replaceAll('{ภาค}', regionLabel(st))
-    .replaceAll('{เงิน}', Math.round(st.money).toLocaleString('en-US'));
+  return text.replace(/ชื่อ\s*\{ชื่อ\}/g, 'ชื่อของคุณ').replace(/\{([^{}]*)\}/g, (m, k) => (FILL[k] ? String(FILL[k](st)) : m));
 }
 
 export function levelValue(level) {
