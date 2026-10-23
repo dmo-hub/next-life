@@ -231,8 +231,10 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   const sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง';
-  let cls, region, birthYear, parents = null, legacy = null;
+  let cls, region, birthYear, parents = null, legacy = null, occupation = null;
   if (af.path === 'child') {
+    // บ้านของรุ่นถัดไปคือบ้านของคนในชาติก่อน — อาชีพของครอบครัวจึงเป็นงานสุดท้ายของเขา ไม่สุ่มใหม่
+    occupation = st.occupation;
     const kidAge = Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     // ปีเกมไม่เกินปีเกิดสุดท้ายในข้อมูล — เนื้อหา/ข้อมูลยุคครอบถึงช่วงนั้น · หน้าจอไม่แสดงปีอยู่แล้ว
     birthYear = Math.min(lastBirth, st.birthYear + kidAge);
@@ -267,6 +269,7 @@ function makeHeir(af, r) {
     birthYear,
     parents,
     legacy,
+    occupation,
     bonus,
     ledger: carryLedger(st.ledger, net, r),
     carried: r,
