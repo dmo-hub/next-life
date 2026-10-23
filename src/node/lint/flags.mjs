@@ -1,4 +1,4 @@
-// กติกาธง + นัดเหตุการณ์ต่อเนื่อง: ธงที่เงื่อนไขขอใช้ต้องมีคนตั้ง · นัดต้องชี้เหตุการณ์ที่มีจริง
+// กติกาธง + นัดเหตุการณ์ต่อเนื่อง + เรื่องต่อหลังผล: ธงที่เงื่อนไขขอใช้ต้องมีคนตั้ง · นัด/เรื่องต่อต้องชี้เหตุการณ์ที่มีจริง
 import { FLAG_RE, meritCat } from './vocab.mjs';
 import { isObj, isRange, list, effectSites, choicesOf } from './util.mjs';
 
@@ -65,6 +65,24 @@ export const rules = [
             if (s.event !== undefined && !ids.has(s.event)) r(x, p, `นัดเหตุการณ์ "${s.event}" ที่ไม่มีอยู่`);
             if (s.after_years !== undefined && !isRange(s.after_years, 1, 100)) r(x, p, 'after_years ต้องเป็น [จาก, ถึง] 1–100');
           });
+        }
+      }
+    },
+  },
+  {
+    id: 'next-target',
+    desc: 'ผลสุ่มที่มี next ต้องมี text (การ์ดผลมาก่อน) และชี้เหตุการณ์อื่นที่มีจริง ช่วงวัยเดียวกัน ที่ไม่มี at_age/weight/era (ออกได้ทางเรื่องต่อเท่านั้น)',
+    all(events, ctx, r) {
+      const byId = new Map(events.map((x) => [x.e.id, x.e]));
+      for (const x of events) {
+        for (const { node, path } of effectSites(x.e)) {
+          if (!path.includes('outcomes') || node.next === undefined) continue;
+          const p = `${path}.next`;
+          const t = byId.get(node.next);
+          if (typeof node.text !== 'string') r(x, p, 'ผลที่มีเรื่องต่อต้องมี text — เล่าผลก่อนแล้วค่อยให้เลือกต่อ');
+          if (!t || node.next === x.e.id) { r(x, p, `เรื่องต่อ "${node.next}" ไม่มีอยู่ หรือชี้กลับเหตุการณ์ตัวเอง`); continue; }
+          if (t.stage !== x.e.stage) r(x, p, `เรื่องต่อ "${node.next}" อยู่ช่วง${t.stage} ไม่ใช่ช่วง${x.e.stage} — ออกอายุเดียวกันกับการ์ดผล`);
+          if (t.at_age !== undefined || t.weight !== undefined || t.era !== undefined) r(x, p, `เรื่องต่อ "${node.next}" มี at_age/weight/era — จะออกเองนอกเรื่องต่อ`);
         }
       }
     },

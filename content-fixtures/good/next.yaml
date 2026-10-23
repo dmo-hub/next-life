@@ -1,0 +1,27 @@
+# ผลสุ่มชี้เรื่องต่อ: การ์ดผล → การ์ดเลือกของเหตุการณ์ต่ออายุเดียวกัน · เหตุการณ์ต่อไม่มี at_age/weight
+events:
+  - id: work_side_shop_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    text: "เพื่อนชวนลงขันเปิดร้านเล็ก ๆ หน้าตลาด"
+    choices:
+      - text: "ลงขันด้วย"
+        outcomes:
+          - {weight: 1, text: "ร้านขายดีเกินคาด ลูกค้าถามหาของเพิ่ม", next: work_side_shop_grow_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านเงียบ เงินที่ลงไปหายไปครึ่งหนึ่ง", effects: {money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - {text: "ขอดูไปก่อน", merit: [{cat: neutral}]}
+      - {text: "แนะนำคนรู้จักให้แทน", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - {text: "ปฏิเสธ", merit: [{cat: neutral}]}
+  - id: work_side_shop_grow_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ร้านไปได้ดี เพื่อนถามว่าจะขยายร้านไหม"
+    choices:
+      - {text: "ขยายร้าน", effects: {money: {unit: income_x, amount: -1}, happiness: 1}, merit: [{cat: neutral}]}
+      - {text: "ถอนตัว ขายส่วนของตัวเองคืนเพื่อน", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+      - {text: "ทำเท่าเดิม", merit: [{cat: neutral}]}
+      - {text: "ยกร้านให้เพื่อนดูแลทั้งหมด", effects: {relations: 1}, merit: [{cat: neutral}]}

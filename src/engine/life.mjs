@@ -703,17 +703,27 @@ export function choose(st, idx) {
   st.log.push({ id: ev.id, age: st.age, choice: idx, text });
   // ผลสุ่ม: จับทางด้วย rng ของโลก (เป็นผลของการเลือก) แล้วเล่าเป็นการ์ดผลลัพธ์ใบถัดไป
   // น้ำหนักแต่ละทางเอียงตาม multipliers ของทางนั้น — บัญชีอ่านหลังป้ายบุญบาปของตัวเลือกนี้ลงแล้ว (กรรมตามทันทันที)
+  // การ์ดที่ตัวเลือกนี้ก่อ (ผล → เรื่องต่อ → หางาน) เข้าหัวคิวตามลำดับ ก่อนการ์ดอื่นของปีที่รออยู่
+  const after = [];
   if (c.outcomes?.length) {
     const o = weighted(st.rng, c.outcomes, c.outcomes.map((x) => x.weight * poolMultiplier(st, x.multipliers)));
     applyEffects(st, o.effects);
     applyChoice(st, ev, o);
-    if (o.text) st.queue.unshift({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) });
+    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) });
+    // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
+    const follow = o.next && st.content.events.find((e) => e.id === o.next);
+    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when)) {
+      st.done[follow.id] = true;
+      st.fired[follow.id] = { n: (st.fired[follow.id]?.n ?? 0) + 1, age: st.age };
+      after.push({ kind: 'eraEvent', ev: follow, age: st.age });
+    }
   }
-  // เลิกเรียนแล้วหางานทันที — การ์ดหางานต่อจากการ์ดผลของตัวเลือกนี้
+  // เลิกเรียนแล้วหางานทันที
   if (st.needJob) {
     st.needJob = false;
-    st.queue.splice(st.queue[0]?.kind === 'result' ? 1 : 0, 0, { kind: 'eraEvent', ev: jobCard(st), age: st.age });
+    after.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
   }
+  st.queue.unshift(...after);
 }
 
 function deathCard(st) {
