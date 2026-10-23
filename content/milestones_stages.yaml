@@ -1,0 +1,82 @@
+# หลักไมล์บังคับของช่วงวัยที่ยังไม่มี (B06 ชุด 0) — ทุกชีวิตเจอที่อายุนั้น ไม่มี when
+events:
+  - id: milestone_teen_crossroad
+    type: A
+    category: society
+    stage: วัยรุ่น
+    at_age: 17
+    years: [2500, 2650]
+    text: "อายุ {อายุ} ปี ผู้ใหญ่ใน{ภาค}เริ่มถามจริงจังว่าโตขึ้นจะเอายังไงกับชีวิต ต่างคนต่างมีคำแนะนำของตัวเอง"
+    choices:
+      - text: "ตั้งใจหาความรู้ใส่ตัวให้มาก"
+        effects: { knowledge: 2, happiness: -1, health: -1 }
+        merit: [{ cat: neutral }]
+      - text: "หางานพิเศษเก็บเงินไว้เอง"
+        effects: { money: { unit: income_x, amount: 0.5 }, knowledge: -1, network: 1 }
+        merit: [{ cat: neutral }]
+      - text: "ฝากตัวฝึกวิชากับช่างในชุมชน"
+        effects: { knowledge: 1, network: 1, happiness: -1 }
+        merit: [{ cat: neutral }]
+      - text: "ยังไม่รู้ ขอเที่ยวกับเพื่อนก่อน"
+        effects: { happiness: 2, relations: -1 }
+        merit: [{ cat: neutral }]
+  - id: milestone_benchapet
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    at_age: 26
+    years: [2500, 2650]
+    text: "อายุ {อายุ} ปี ผู้ใหญ่ที่นับอายุแบบโบราณทักว่ายังอยู่ในช่วงเบญจเพส ให้ระวังตัวไว้ก่อน บ้างว่าให้ทำบุญ บ้างว่าอย่าเดินทางไกล ส่วนเพื่อนบอกว่าคิดมากไปเอง"
+    choices:
+      - text: "ไปทำบุญสะเดาะเคราะห์ที่วัด"
+        effects: { happiness: 1, money: { unit: income_x, amount: -0.2 } }
+        merit: [{ cat: dana, level: 1 }]
+      - text: "ไม่แตะเหล้าบุหรี่เลยตลอดปีนี้"
+        effects: { health: 1, happiness: -1 }
+        merit: [{ cat: sila, level: 1 }]
+      - text: "ใช้ชีวิตตามปกติ ไม่คิดมาก"
+        effects: { happiness: 1, network: 1, relations: -1 }
+        merit: [{ cat: neutral }]
+      - text: "ไม่ไปไหนไกล อยู่บ้านไว้ก่อน"
+        effects: { relations: 1, happiness: -1, network: -1 }
+        merit: [{ cat: neutral }]
+  - id: milestone_body_signal
+    type: A
+    category: health
+    stage: ทำงาน
+    at_age: 38
+    years: [2500, 2650]
+    text: "อายุ {อายุ} ปี ร่างกายเริ่มส่งสัญญาณ ลุกนั่งทีเข่าลั่นที ตื่นเช้ามาปวดหลัง เหนื่อยง่ายกว่าเมื่อก่อน คนรุ่นเดียวกันเริ่มคุยกันเรื่องโรคมากกว่าเรื่องเที่ยว"
+    choices:
+      - text: "ไปให้หมอตรวจร่างกายให้ละเอียด"
+        effects: { health: 1, knowledge: 1, money: { unit: income_x, amount: -0.3 } }
+        merit: [{ cat: neutral }]
+      - text: "ตื่นเช้าออกกำลังกายทุกวัน"
+        effects: { health: 1, happiness: -1, network: 1 }
+        merit: [{ cat: neutral }]
+      - text: "หาเงินต่อให้เต็มที่ ไว้ค่อยพัก"
+        effects: { money: { unit: income_x, amount: 1 }, health: -2 }
+        merit: [{ cat: neutral }]
+      - text: "ลองยาสมุนไพรที่คนแถวบ้านบอก"
+        effects: { happiness: 1, network: 1, money: { unit: income_x, amount: -0.1 } }
+        merit: [{ cat: neutral }]
+  - id: milestone_fourth_cycle
+    type: A
+    category: family
+    stage: กลางคน
+    at_age: 48
+    years: [2500, 2650]
+    text: "อายุ {อายุ} ปี ครบสี่รอบนักษัตร คนรอบตัวทักว่าเป็นวันเกิดที่ควรทำอะไรให้เป็นเรื่องเป็นราว ส่วนตัวเองนึกย้อนดูว่าที่ผ่านมาได้อะไร และอยากใช้ครึ่งหลังของชีวิตแบบไหน"
+    choices:
+      - text: "เลี้ยงข้าวญาติมิตรให้ครึกครื้น"
+        effects: { relations: 2, money: { unit: income_x, amount: -0.5 } }
+        merit: [{ cat: neutral }]
+      - text: "ทำบุญวันเกิดเงียบ ๆ ที่วัด"
+        effects: { happiness: 1, money: { unit: income_x, amount: -0.2 } }
+        merit: [{ cat: dana, level: 1 }]
+      - text: "เริ่มเรียนสิ่งที่อยากเรียนมานาน"
+        effects: { knowledge: 2, happiness: 1, relations: -1 }
+        merit: [{ cat: neutral }]
+      - text: "นั่งวางแผนเงินไว้ใช้ยามแก่"
+        effects: { money: { unit: income_x, amount: 0.3 }, knowledge: 1, happiness: -1 }
+        merit: [{ cat: neutral }]
