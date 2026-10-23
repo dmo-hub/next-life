@@ -1,4 +1,4 @@
-# การ์ดบ้านเมือง · ภัยพิบัติ/โรคระบาด — 5 เหตุการณ์ × (เด็ก ครอบครัวเลือก + ผู้ใหญ่)
+# การ์ดบ้านเมือง · ภัยพิบัติ/โรคระบาด — 5 เหตุการณ์ × (เด็ก ผู้ใหญ่รับมือ เด็กเลือกว่าตัวเองทำอะไร + ผู้ใหญ่)
 events:
   # ---------- พายุไต้ฝุ่นเกย์ ----------
   - id: era_dis_typhoon_kid_01
@@ -9,24 +9,24 @@ events:
     era: typhoon_gay
     when: {age: [0, 12]}
     title: "ไต้ฝุ่นกลางดึก"
-    text: "พายุเข้าฝั่งตอนตีสอง ลมหอบหลังคาสังกะสีปลิวไปทั้งแผ่น เช้ามาเรือของพ่อที่จอดหน้าบ้านหายไปกับคลื่น พ่อแม่นั่งเงียบอยู่นานว่าจะเอายังไงต่อ"
+    text: "พายุเข้าฝั่งตอนตีสอง ลมหอบหลังคาสังกะสีปลิวไปทั้งแผ่น เช้ามาเรือของพ่อที่จอดหน้าบ้านหายไปกับคลื่น พ่อแม่นั่งเงียบอยู่นาน คุณยืนมองหลังคาที่หายไปแล้วรู้ว่าต้องทำอะไรสักอย่าง"
     choices:
       - id: move_to_town
-        text: "ย้ายไปอาศัยญาติในเมือง"
+        text: "ขอพ่อแม่ไปอยู่กับญาติในเมือง"
         effects: {health: 1, happiness: -1, relations: -1, income_mult: 1.2}
         merit: [{cat: neutral}]
       - id: rebuild_boat
-        text: "กู้เงินต่อเรือใหม่ ออกทะเลต่อ"
+        text: "ช่วยพ่อขนไม้ต่อเรือลำใหม่"
         outcomes:
-          - {weight: 3, ok: true, text: "หลังพายุปลาชุกผิดปกติ เรือลำใหม่ใช้หนี้หมดในปีเดียว", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "เรือรั่วกลางทะเล พ่อกลับมาได้แต่เจ็บหนัก ลูกต้องหยุดเรียนมาช่วยแม่หาเงินใช้หนี้", effects: {happiness: -2, knowledge: -1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "พ่อกู้เงินต่อเรือจนเสร็จ หลังพายุปลาชุกผิดปกติ ใช้หนี้หมดในปีเดียว", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรือรั่วกลางทะเล พ่อกลับมาได้แต่เจ็บหนัก คุณต้องหยุดเรียนมาช่วยแม่หาเงินใช้หนี้", effects: {happiness: -2, knowledge: -1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: shelter_neighbors
-        text: "เปิดบ้านให้เพื่อนบ้านมานอน"
+        text: "แบ่งที่นอนให้เด็กบ้านหลังคาพัง"
         effects: {health: -1, relations: 2, happiness: 1}
-        merit: [{cat: help_others, level: 2}]
+        merit: [{cat: help_others, level: 1}]
       - id: boarding_school
-        text: "ส่งลูกไปเรียนประจำในเมือง"
+        text: "ขอไปเรียนประจำในเมือง"
         effects: {knowledge: 2, relations: -2}
         merit: [{cat: neutral}]
 
@@ -72,27 +72,27 @@ events:
     era: sars
     when: {age: [0, 12]}
     title: "ไอสามวันช่วงโรคระบาด"
-    text: "ข่าวโรคปอดอักเสบปริศนาจากต่างประเทศเต็มจอ ทั้งห้องเรียนใส่หน้ากาก ลูกไอติดกันสามวัน ตัวรุม ๆ พ่อแม่ใจคอไม่ดี"
+    text: "ข่าวโรคปอดอักเสบปริศนาจากต่างประเทศเต็มจอ ทั้งห้องเรียนใส่หน้ากาก คุณไอติดกันสามวัน ตัวรุม ๆ พ่อแม่ใจคอไม่ดี"
     choices:
       - id: private_hospital
-        text: "พาไปโรงพยาบาลเอกชนทันที"
+        text: "บอกแม่ว่าเจ็บหน้าอกเวลาไอ"
         effects: {money: {unit: income_x, amount: -0.5}}
         outcomes:
-          - {weight: 3, text: "หมอบอกแค่หวัดธรรมดา ได้ไอติมปลอบใจขากลับ", effects: {happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ตรวจเจอปอดบวมตั้งแต่เนิ่น ๆ หมอว่าถ้ามาช้ากว่านี้อาจแย่ พ่อแม่กอดลูกแน่นทั้งคืน", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "แม่รีบไปโรงพยาบาลเอกชน หมอบอกแค่หวัดธรรมดา ได้ไอติมปลอบใจขากลับ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตรวจเจอปอดบวมตั้งแต่เนิ่น ๆ หมอว่าถ้ามาช้ากว่านี้อาจแย่ พ่อแม่กอดคุณแน่นทั้งคืน", effects: {relations: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: home_quarantine
-        text: "ให้หยุดเรียนอยู่บ้านสองอาทิตย์"
+        text: "ขอหยุดเรียน ไม่อยากให้เพื่อนติด"
         effects: {health: 1, knowledge: -1, relations: 1}
         merit: [{cat: neutral}]
       - id: herbal_boil
-        text: "ต้มยาสมุนไพรสูตรยายให้กิน"
+        text: "ยอมกินยาต้มขม ๆ สูตรยาย"
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {health: 2}}, text: "หายเองในสองวัน ยายคุยเรื่องนี้ไปอีกสิบปี", effects: {relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ไอยืดเป็นเดือน ไปหาหมอช้าจนปอดอักเสบ", effects: {health: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: school_as_usual
-        text: "ส่งไปโรงเรียนตามปกติ"
+        text: "ซ่อนอาการ ไปโรงเรียนตามปกติ"
         outcomes:
           - {weight: 3, ok: true, multipliers: {stats: {health: 1.5}}, text: "เรียนทันเพื่อน ไม่มีอะไรเกิดขึ้น", effects: {knowledge: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ไข้ขึ้นกลางห้อง ถูกจับแยก เพื่อนตั้งฉายาไปทั้งปี", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
@@ -143,28 +143,28 @@ events:
     era: tsunami
     when: {age: [0, 12]}
     title: "ทะเลถอยหนี"
-    text: "เช้าวันหยุดที่ชายหาด น้ำทะเลลดลงไปไกลผิดปกติ ปลาดิ้นอยู่บนทรายเต็มไปหมด เด็ก ๆ ทั้งหาดวิ่งกรูลงไปเก็บ ลูกกำลังจะวิ่งตามเพื่อน"
+    text: "เช้าวันหยุดที่ชายหาด น้ำทะเลลดลงไปไกลผิดปกติ ปลาดิ้นอยู่บนทรายเต็มไปหมด เด็ก ๆ ทั้งหาดวิ่งกรูลงไปเก็บ คุณกำลังจะวิ่งตามเพื่อน"
     choices:
       - id: run_uphill
-        text: "พ่อแม่หิ้วลูกวิ่งขึ้นเนินทันที"
+        text: "วิ่งกลับไปหาพ่อแม่ก่อน"
         outcomes:
-          - {weight: 2, text: "หนีทันทั้งบ้าน แต่รถกับข้าวของบนหาดถูกคลื่นกวาดไปหมด", effects: {health: 1, happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "พ่อแม่คว้ามือวิ่งขึ้นเนินทันที หนีทันทั้งบ้าน แต่รถกับข้าวของบนหาดถูกคลื่นกวาดไปหมด", effects: {health: 1, happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ขึ้นเนินทันเส้นยาแดง ลูกเห็นคลื่นกวาดหาดกับตา ฝันร้ายไปหลายปี", effects: {happiness: -2, knowledge: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: let_kid_play
-        text: "ปล่อยลูกเก็บปลาอีกแป๊บ"
+        text: "วิ่งตามเพื่อนลงไปเก็บปลา"
         outcomes:
           - {weight: 2, text: "คลื่นก้อนแรกมาถึง พ่อคว้าตัวขึ้นหลังคารถได้ทันเส้นยาแดง", effects: {health: -1, happiness: -2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "คลื่นซัดไปไกลเกือบกิโล รอดเพราะเกาะต้นมะพร้าวไว้ทั้งคืน กลายเป็นข่าวไปทั้งประเทศ", effects: {health: -3, relations: 2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: shout_warning
-        text: "ตะโกนเตือนคนทั้งหาดก่อนหนี"
+        text: "ตะโกนเรียกเพื่อน ๆ กลับขึ้นมา"
         outcomes:
-          - {weight: 2, ok: true, multipliers: {stats: {relations: 2}}, text: "มีคนเชื่อ หนีขึ้นเนินทันกันหลายสิบคน ทุกปีมีคนมากราบขอบคุณ", effects: {relations: 3}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 2}}, text: "เพื่อน ๆ วิ่งตามขึ้นเนินทันกันหลายคน ทุกปีพ่อแม่เพื่อนมาขอบคุณ", effects: {relations: 3}, merit: [{cat: help_others, level: 2}]}
           - {weight: 1, text: "ไม่มีใครฟัง ต้องวิ่งเอาตัวรอดจนหอบ", effects: {health: -1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
       - id: move_inland
-        text: "ย้ายบ้านไปอยู่ไกลทะเลถาวร"
+        text: "ฝันร้าย ขอพ่อแม่ย้ายไปไกลทะเล"
         effects: {health: 1, happiness: -1, income_mult: 0.8}
         merit: [{cat: neutral}]
 
@@ -213,26 +213,26 @@ events:
     era: great_flood
     when: {age: [0, 12]}
     title: "น้ำขึ้นวันละคืบ"
-    text: "น้ำเหนือไหลเข้าเมือง ระดับน้ำขึ้นวันละคืบ ชั้นล่างของบ้านจมไปแล้ว โรงเรียนประกาศปิดไม่มีกำหนด ลูกตื่นเต้นมากกว่ากลัว"
+    text: "น้ำเหนือไหลเข้าเมือง ระดับน้ำขึ้นวันละคืบ ชั้นล่างของบ้านจมไปแล้ว โรงเรียนประกาศปิดไม่มีกำหนด พ่อแม่ขนของขึ้นชั้นสอง ส่วนคุณตื่นเต้นมากกว่ากลัว"
     choices:
       - id: stay_upstairs
-        text: "ขนของขึ้นชั้นสอง อยู่สู้"
+        text: "พายกะละมังไปเล่นบ้านเพื่อน"
         outcomes:
-          - {weight: 2, ok: true, text: "ลูกพายกะละมังไปบ้านเพื่อนทุกวัน เป็นปิดเทอมที่สนุกที่สุดในชีวิต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "พายกะละมังไปบ้านเพื่อนทุกวัน เป็นปิดเทอมที่สนุกที่สุดในชีวิต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เหยียบเศษแก้วใต้น้ำ แผลติดเชื้อต้องนอนโรงพยาบาล", effects: {health: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: evacuate_shelter
-        text: "อพยพไปศูนย์พักพิง"
+        text: "ช่วยแจกข้าวที่ศูนย์พักพิง"
         effects: {happiness: -1, relations: 2, knowledge: 1}
-        merit: [{cat: neutral}]
+        merit: [{cat: help_others, level: 1}]
       - id: relatives_upcountry
-        text: "หนีไปอยู่บ้านญาติต่างจังหวัด"
+        text: "ขอไปอยู่บ้านญาติจนน้ำลด"
         effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
       - id: build_boats
-        text: "พ่อแม่ต่อเรือขายริมถนน"
+        text: "ช่วยพ่อแม่ทาสีเรือขายริมถนน"
         outcomes:
-          - {weight: 2, ok: true, text: "เรือขายดีเป็นเทน้ำเทท่า ลูกได้ช่วยทาสีจนมือเลอะทั้งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "เรือขายดีเป็นเทน้ำเทท่า คุณทาสีจนมือเลอะทั้งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "น้ำลดเร็วกว่าที่คิด เรือค้างเต็มหน้าบ้าน กลายเป็นกระถางต้นไม้", effects: {money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -274,26 +274,26 @@ events:
     era: covid19
     when: {age: [0, 12]}
     title: "เรียนผ่านจอ"
-    text: "โรคระบาดทั่วโลก โรงเรียนปิด ครูสอนผ่านจอ แต่บ้านมีมือถือเครื่องเดียว แม่ต้องใช้ขายของ พ่อต้องใช้รับงาน ลูกต้องใช้เรียน"
+    text: "โรคระบาดทั่วโลก โรงเรียนปิด ครูสอนผ่านจอ แต่บ้านมีมือถือเครื่องเดียว แม่ต้องใช้ขายของ พ่อต้องใช้รับงาน คุณต้องใช้เรียน"
     choices:
       - id: buy_tablet
-        text: "ควักเงินซื้อแท็บเล็ตให้ลูก"
-        requires: {money: {unit: income_x, amount: 0.5}, reason: "เงินไม่พอซื้อแท็บเล็ต"}
+        text: "ขอแท็บเล็ตเป็นของขวัญวันเกิด"
+        requires: {money: {unit: income_x, amount: 0.5}, reason: "ที่บ้านไม่มีเงินพอซื้อแท็บเล็ต"}
         effects: {knowledge: 2, health: -1, money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
       - id: help_live_sell
-        text: "ให้ลูกช่วยแม่ไลฟ์ขายของ"
+        text: "ช่วยแม่ไลฟ์ขายของแทนเรียน"
         effects: {knowledge: -1}
         outcomes:
-          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ลูกพูดเก่งจนคนดูติดงอมแงม ยอดขายพุ่ง ทั้งบ้านเรียกว่าแม่ค้าตัวน้อย", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "พูดเก่งจนคนดูติดงอมแงม ยอดขายพุ่ง ทั้งบ้านเรียกว่าแม่ค้าตัวน้อย", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
           - {weight: 1, text: "คนดูสามคน เป็นยายสองคน แต่ลูกกล้าพูดต่อหน้ากล้องขึ้นเยอะ", effects: {relations: 1}, sets_flags: [online_seller], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: send_to_grandma
-        text: "ส่งไปอยู่กับยายต่างจังหวัด"
+        text: "ขอไปอยู่กับยายต่างจังหวัด"
         effects: {health: 1, knowledge: -1, relations: 1}
         merit: [{cat: neutral}]
       - id: share_phone
-        text: "ผลัดกันใช้มือถือเครื่องเดียว"
+        text: "ยอมผลัดใช้มือถือกับพ่อแม่"
         outcomes:
           - {weight: 2, text: "หลุดเรียนบ่อยจนเกรดร่วง ตามเพื่อนไม่ทันไปอีกหลายปี", effects: {knowledge: -2}, merit: [{cat: neutral}]}
           - {weight: 1, ok: true, multipliers: {stats: {relations: 2}}, text: "ครูเห็นความพยายาม ขี่มอเตอร์ไซค์เอาชีทมาส่งถึงบ้านทุกอาทิตย์", effects: {knowledge: 1, relations: 2}, merit: [{cat: neutral}]}

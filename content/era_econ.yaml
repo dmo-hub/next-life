@@ -1,4 +1,4 @@
-# กลุ่ม era_econ_ · การ์ดบ้านเมืองเศรษฐกิจ 3 เหตุการณ์ × (เด็ก ครอบครัวเลือก + ผู้ใหญ่ + ชรา)
+# กลุ่ม era_econ_ · การ์ดบ้านเมืองเศรษฐกิจ 3 เหตุการณ์ × (เด็ก ผู้ใหญ่รับมือ เด็กเลือกว่าตัวเองทำอะไร + ผู้ใหญ่ + ชรา)
 # การ์ดชราไม่มี income_mult (เกษียณแล้วไม่มีค่าจ้างให้ขึ้นลง) · ไม่ตั้งธงธุรกิจ/หนี้ · พูดถึงหลาน/ญาติ ไม่ใช่ลูก (ไม่ใช่ทุกคนมีลูก)
 # วิกฤตน้ำมันครั้งแรก (2516) ไม่มีการ์ด: ปีเกมทุกปีแม็ปเข้าช่วงปีต้นแบบ era.future (เริ่ม 2520) เหตุการณ์ปีก่อนนั้นจึงไม่เคยเกิด
 # การ์ดเด็กตั้งได้แค่ธง "โตมากับร้านของพ่อแม่" (street_vendor · online_seller) · own_business/in_debt ตั้งเฉพาะการ์ดผู้ใหญ่
@@ -12,20 +12,20 @@ events:
     era: oil_crisis_2
     when: {age: [0, 18]}
     title: "บ้านต้องรัดเข็มขัด"
-    text: "น้ำมันขึ้นอีกรอบ ไฟฟ้าดับบ่อย โรงงานที่พ่อทำงานลดกะเหลือวันเว้นวัน ค่าเทอมงวดหน้ายังไม่รู้จะเอามาจากไหน"
+    text: "น้ำมันขึ้นอีกรอบ ไฟฟ้าดับบ่อย โรงงานที่พ่อทำงานลดกะเหลือวันเว้นวัน ค่าเทอมงวดหน้ายังไม่รู้จะเอามาจากไหน คุณได้ยินพ่อแม่คุยกันตอนดึก"
     choices:
-      - text: "ย้ายลูกไปโรงเรียนวัดใกล้บ้าน"
+      - text: "ขอย้ายไปโรงเรียนวัดใกล้บ้าน"
         effects: {knowledge: -1, relations: 1, money: {unit: income_x, amount: 0.3}}
         merit: [{cat: neutral}]
-      - text: "พ่อลาออกไปเข็นรถขายผลไม้"
+      - text: "ช่วยพ่อเข็นรถขายผลไม้หลังเรียน"
         outcomes:
-          - {weight: 2, ok: true, text: "มะม่วงน้ำปลาหวานขายดีเกินคาด พ่อกลับบ้านพร้อมรอยยิ้มทุกเย็น", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "พ่อลาออกมาขายผลไม้ มะม่วงน้ำปลาหวานขายดีเกินคาด พ่อกลับบ้านพร้อมรอยยิ้มทุกเย็น", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
           - {weight: 1, text: "โดนเทศกิจไล่ที่สามรอบ รถเข็นพังหนึ่งคัน", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - text: "กู้นอกระบบมาจ่ายค่าเทอม"
-        effects: {knowledge: 1, happiness: -1, money: {unit: income_x, amount: -0.5}}
+      - text: "เลิกขอค่าขนม เก็บไว้ให้แม่"
+        effects: {happiness: -1, relations: 1, money: {unit: income_x, amount: 0.1}}
         merit: [{cat: neutral}]
-      - text: "ให้ลูกช่วยปลูกผักไว้กินเอง"
+      - text: "ปลูกผักหลังบ้านไว้กินเอง"
         effects: {health: 1, knowledge: 1, happiness: -1}
         merit: [{cat: neutral}]
 
@@ -70,20 +70,20 @@ events:
     era: tom_yum_kung
     when: {age: [0, 18]}
     title: "ต้มยำกุ้งเดือดทั้งบ้าน"
-    text: "ข่าวค่าเงินบาทลอยตัว พ่อเงียบไปทั้งคืน บริษัทพ่อปิดกะทันหัน หนี้บ้านเพิ่มเท่าตัวในพริบตา แม่ถามลูกว่าอยากย้ายบ้านไหม"
+    text: "ข่าวค่าเงินบาทลอยตัว พ่อเงียบไปทั้งคืน บริษัทพ่อปิดกะทันหัน หนี้บ้านเพิ่มเท่าตัวในพริบตา แม่ถามคุณว่าอยากย้ายบ้านไหม"
     choices:
-      - text: "ขายบ้าน ย้ายไปเช่าห้องแถว"
+      - text: "บอกแม่ว่าย้ายไปห้องแถวก็ได้"
         effects: {happiness: -2, relations: 1, money: {unit: income_x, amount: 0.5}}
         merit: [{cat: neutral}]
-      - text: "พ่อเอาเงินเก็บไปขายแซนด์วิช"
+      - text: "ช่วยพ่อห่อแซนด์วิชไปขายทุกเช้า"
         outcomes:
           - {weight: 2, ok: true, text: "แซนด์วิชของพ่อขายหมดทุกเช้า คนในตึกเรียกพ่อว่าเสี่ยแซนด์วิช", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: 0.5}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
-          - {weight: 1, text: "ขนมปังเหลือทุกวัน ลูกกินแซนด์วิชเป็นข้าวสามมื้อจนโต", effects: {health: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขนมปังเหลือทุกวัน คุณกินแซนด์วิชเป็นข้าวสามมื้อจนโต", effects: {health: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - text: "สู้ผ่อนต่อ กู้ใหม่โปะเก่า"
+      - text: "ร้องไห้ขอแม่อย่าขายบ้าน"
         effects: {happiness: 1, health: -1, money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
-      - text: "ทั้งบ้านกลับไปอยู่กับย่า"
+      - text: "ไปอยู่กับย่า ช่วยย่าทำสวน"
         effects: {health: 1, relations: 2, knowledge: -1}
         merit: [{cat: care_parents, level: 1}]
 
@@ -127,18 +127,18 @@ events:
     title: "ข่าวร้ายจากอีกซีกโลก"
     text: "ธนาคารใหญ่ฝั่งอเมริกาล้ม ออเดอร์โรงงานแถวบ้านหายไปครึ่ง แม่โดนพักงานไม่มีกำหนด ลูกเห็นแม่นั่งดูประกาศรับสมัครงานทุกคืน"
     choices:
-      - text: "แม่โพสต์ขายขนมทางเน็ต"
+      - text: "ชวนแม่ทำขนมขายทางเน็ต"
         outcomes:
           - {weight: 2, ok: true, text: "บราวนี่ถาดแรกถูกจองหมดจากกลุ่มแม่บ้าน ครัวกลายเป็นร้านเล็ก ๆ", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
-          - {weight: 1, text: "เตาอบระเบิด ขนมไหม้ แต่ลูกได้กินขนมไหม้ฟรีเป็นเดือน", effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เตาอบระเบิด ขนมไหม้ แต่คุณได้กินขนมไหม้ฟรีเป็นเดือน", effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - text: "งดเรียนพิเศษ ให้ลูกอ่านเอง"
+      - text: "เลิกเรียนพิเศษ อ่านหนังสือเอง"
         effects: {knowledge: -1, happiness: 1, money: {unit: income_x, amount: 0.2}}
         merit: [{cat: neutral}]
-      - text: "รูดผ่อนของใช้ไปพลาง ๆ"
+      - text: "งอแงขอของเล่นเหมือนเดิม"
         effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
-      - text: "พาลูกไปช่วยงานวัดทุกเสาร์"
+      - text: "ตามแม่ไปช่วยงานวัดทุกเสาร์"
         effects: {relations: 1, happiness: 1, knowledge: 1}
         merit: [{cat: help_others, level: 1}]
 

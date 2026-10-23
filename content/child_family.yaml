@@ -1,4 +1,4 @@
-# กลุ่ม kid_ · ช่วงวัยเด็ก 0–12 · ครอบครัวเลือกแทน · ตั้งธงที่ส่งผลตอนโต (likes_clips good_student sporty bullied) · broken_home ใช้ในไฟล์นี้ (kid_bullied_01)
+# กลุ่ม kid_ · ช่วงวัยเด็ก 0–12 · เด็กเลือกเอง ผู้ใหญ่อยู่ในเนื้อความ/ผลลัพธ์ · ตั้งธงที่ส่งผลตอนโต (likes_clips good_student sporty bullied) · broken_home ใช้ในไฟล์นี้ (kid_bullied_01)
 events:
   - id: kid_clips_01
     type: A
@@ -8,21 +8,21 @@ events:
     weight: 2
     when: {age: [8, 12]}
     title: "ผู้กำกับตัวจิ๋ว"
-    text: "อายุ {อายุ} ขวบ แอบยืมโทรศัพท์แม่ไปถ่ายแมวเต้น ตัดต่อใส่เพลงเองจนตีหนึ่ง เช้ามาพ่อแม่เจอคลิปเต็มเครื่อง"
+    text: "อายุ {อายุ} ขวบ แอบยืมโทรศัพท์แม่ไปถ่ายแมวเต้น ตัดต่อใส่เพลงเองจนตีหนึ่ง เช้ามาพ่อแม่เจอคลิปเต็มเครื่อง ถามว่าจะเอายังไงกับเรื่องนี้"
     choices:
-      - text: "ซื้อมือถือเก่าให้ลูกทำคลิป"
+      - text: "เก็บค่าขนมซื้อมือถือมือสองเอง"
         effects: {knowledge: 1, health: -1, money: {unit: income_x, amount: -0.2}}
         sets_flags: [likes_clips]
         merit: [{cat: neutral}]
-      - text: "ยึดโทรศัพท์ ให้ไปวิ่งเล่น"
+      - text: "คืนโทรศัพท์แม่ ออกไปวิ่งเล่น"
         effects: {health: 1, happiness: -1}
         merit: [{cat: neutral}]
-      - text: "โพสต์คลิปแมวให้ลองดู"
+      - text: "แอบโพสต์คลิปแมวลงเน็ต"
         outcomes:
           - {weight: 1, ok: true, text: "คลิปแมวเต้นยอดวิวทะลุล้าน คนทั้งซอยจำหน้าได้", effects: {happiness: 3}, sets_flags: [likes_clips], next: kid_clips_fame_01, merit: [{cat: neutral}]}
           - {weight: 3, text: "มีคนดูเจ็ดคน หกคนคือญาติ", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - text: "ส่งเรียนวาดรูปแทน"
+      - text: "ขอแม่ไปเรียนวาดรูปแทน"
         effects: {knowledge: 1, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
 
@@ -34,23 +34,23 @@ events:
     weight: 3
     when: {age: [7, 12]}
     title: "คอร์สกวดวิชาสุดสัปดาห์"
-    text: "เพื่อนร่วมห้องทุกคนเรียนพิเศษ เสาร์อาทิตย์หายไปหมด ครูประจำชั้นบอกพ่อแม่ว่าลูกหัวไว แต่ขี้เกียจ"
+    text: "เพื่อนร่วมห้องทุกคนเรียนพิเศษ เสาร์อาทิตย์หายไปหมด ครูประจำชั้นบอกพ่อแม่ว่าคุณหัวไว แต่ขี้เกียจ"
     choices:
-      - text: "ทุ่มเงินส่งเรียนพิเศษเต็มที่"
-        requires: {money: {unit: income_x, amount: 0.8}, reason: "เงินเก็บไม่พอค่าคอร์ส"}
+      - text: "ขอเรียนพิเศษเหมือนเพื่อนทุกคน"
+        requires: {money: {unit: income_x, amount: 0.8}, reason: "ที่บ้านไม่มีเงินพอค่าคอร์ส"}
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {knowledge: 2}}, text: "คะแนนพุ่งติดอันดับต้นของชั้น", effects: {knowledge: 3, happiness: -1}, sets_flags: [good_student], merit: [{cat: neutral}]}
           - {weight: 1, text: "เรียนหนักจนป่วยบ่อย เกลียดหนังสือไปเลย", effects: {health: -2, happiness: -2}, merit: [{cat: neutral}]}
         effects: {money: {unit: income_x, amount: -0.8}}
         merit: [{cat: neutral}]
-      - text: "พ่อแม่สอนการบ้านเองทุกคืน"
+      - text: "นั่งทำการบ้านกับพ่อแม่ทุกคืน"
         effects: {knowledge: 2, relations: 2, happiness: -1}
         sets_flags: [good_student]
         merit: [{cat: neutral}]
-      - text: "ปล่อยให้เล่นตามวัย"
+      - text: "เสาร์อาทิตย์ขอเล่นเต็มที่"
         effects: {happiness: 2, health: 1, knowledge: -1}
         merit: [{cat: neutral}]
-      - text: "ให้ช่วยพ่อแม่หาเงินแทน"
+      - text: "ไปช่วยพ่อแม่ขายของแทน"
         effects: {knowledge: 1, relations: 1, money: {unit: income_x, amount: 0.2}}
         merit: [{cat: neutral}]
 
@@ -62,21 +62,21 @@ events:
     weight: 2
     when: {age: [6, 12]}
     title: "แมวมองข้างสนาม"
-    text: "โค้ชประจำอำเภอเห็นลูกวิ่งไล่หมาทั้งสนามโรงเรียน เลยมาชวนเข้าทีมกีฬา ซ้อมทุกเย็นหกโมงถึงสองทุ่ม"
+    text: "โค้ชประจำอำเภอเห็นคุณวิ่งไล่หมาทั้งสนามโรงเรียน เลยมาชวนเข้าทีมกีฬา ซ้อมทุกเย็นหกโมงถึงสองทุ่ม"
     choices:
-      - text: "ส่งเข้าทีม ซ้อมจริงจัง"
+      - text: "เข้าทีม ซ้อมจริงจังทุกเย็น"
         outcomes:
           - {weight: 3, ok: true, multipliers: {stats: {health: 2}}, text: "ได้เหรียญทองระดับจังหวัด ร่างกายแข็งแรงขึ้นทุกปี", effects: {health: 2, happiness: 2}, sets_flags: [sporty], next: kid_sport_school_01, merit: [{cat: neutral}]}
           - {weight: 1, text: "ล้มเข่าพลิกกลางสนาม ต้องเข้าเฝือกครึ่งปี", effects: {health: -3, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - text: "ให้เล่นแค่สนุก ๆ ตอนเย็น"
+      - text: "เล่นแค่สนุก ๆ กับเพื่อนตอนเย็น"
         effects: {health: 1, happiness: 1}
         sets_flags: [sporty]
         merit: [{cat: neutral}]
-      - text: "ไม่ให้ไป กลัวเสียการเรียน"
+      - text: "ปฏิเสธโค้ช กลัวเรียนไม่ทันเพื่อน"
         effects: {knowledge: 1, health: -1, happiness: -1}
         merit: [{cat: neutral}]
-      - text: "ให้ไปช่วยโค้ชเก็บอุปกรณ์"
+      - text: "อาสาช่วยโค้ชเก็บอุปกรณ์"
         effects: {relations: 2, happiness: -1}
         merit: [{cat: help_others, level: 1}]
 
@@ -89,30 +89,30 @@ events:
     when: {age: [6, 12]}
     multipliers: {flags: {broken_home: 2}}
     title: "กล่องข้าวหายอีกแล้ว"
-    text: "ลูกกลับบ้านมาเงียบผิดปกติ กล่องข้าวหายเป็นวันที่สาม แขนมีรอยช้ำ พอถามก็บอกว่าล้มเอง"
+    text: "กล่องข้าวของคุณหายเป็นวันที่สาม แขนมีรอยช้ำจากเด็กห้องข้าง ๆ ที่ดักรอหลังโรงอาหาร พอแม่ถาม คุณยังไม่ได้ตอบอะไร"
     choices:
-      - text: "ไปโรงเรียนคุยกับครูทันที"
+      - text: "ไปบอกครูประจำชั้นตรง ๆ"
         effects: {relations: 1, happiness: 1}
         sets_flags: [bullied]
         merit: [{cat: neutral}]
-      - text: "ส่งเรียนมวยไทยป้องกันตัว"
+      - text: "ขอไปเรียนมวยไทยป้องกันตัว"
         outcomes:
           - {weight: 2, ok: true, text: "เดือนต่อมาไม่มีใครกล้าแตะกล่องข้าวอีกเลย", effects: {health: 1, happiness: 2}, sets_flags: [bullied, sporty], merit: [{cat: neutral}]}
           - {weight: 1, text: "ต่อยคืนจนโดนเรียกผู้ปกครอง เพื่อนยิ่งเหม็นหน้า", effects: {relations: -2, health: -1}, sets_flags: [bullied], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - text: "บอกให้อดทน เดี๋ยวก็ผ่านไป"
+      - text: "ทนเงียบ บอกแม่ว่าล้มเอง"
         effects: {happiness: -2, relations: -1, health: -1}
         sets_flags: [bullied]
         merit: [{cat: neutral}]
-      - text: "ย้ายโรงเรียนกลางเทอม"
-        requires: {money: {unit: income_x, amount: 0.4}, reason: "เงินไม่พอค่าย้ายโรงเรียน"}
+      - text: "ขอแม่ย้ายโรงเรียนกลางเทอม"
+        requires: {money: {unit: income_x, amount: 0.4}, reason: "ที่บ้านไม่มีเงินค่าย้ายโรงเรียน"}
         effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: -0.4}}
         sets_flags: [bullied]
         merit: [{cat: neutral}]
-      - text: "บุกไปต่อว่าถึงบ้านเด็กคนนั้น"
+      - text: "ชวนเพื่อนไปยืนเผชิญหน้าด้วยกัน"
         outcomes:
-          - {weight: 1, ok: true, multipliers: {karma: 1.4}, text: "พ่อแม่อีกฝ่ายยกมือไหว้ขอโทษ ลูกเขาไม่กล้าแตะอีกเลย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ทะเลาะกันข้ามรั้ว พรุ่งนี้ลูกโดนแกล้งหนักกว่าเดิม", effects: {happiness: -2, relations: -2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {karma: 1.4}, text: "ยืนกันเป็นแถว เด็กคนนั้นถอยแล้วไม่กล้าแตะกล่องข้าวอีกเลย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทะเลาะกันกลางสนาม พรุ่งนี้โดนแกล้งหนักกว่าเดิม", effects: {happiness: -2, relations: -2, health: -1}, merit: [{cat: neutral}]}
         sets_flags: [bullied]
         merit: [{cat: neutral}]
 
@@ -124,22 +124,22 @@ events:
     weight: 2
     when: {age: [3, 12]}
     title: "ขนของขึ้นรถกระบะ"
-    text: "พ่อได้งานใหม่ต่างจังหวัด ค่าแรงดีกว่าเดิมเกือบเท่าตัว แต่ลูกต้องทิ้งเพื่อน โรงเรียน และยายที่เลี้ยงมาตั้งแต่เกิด"
+    text: "พ่อได้งานใหม่ต่างจังหวัด ค่าแรงดีกว่าเดิมเกือบเท่าตัว พ่อแม่ถามคุณว่าอยากไปไหม ถ้าไปต้องทิ้งเพื่อน โรงเรียน และยายที่เลี้ยงมาตั้งแต่เกิด"
     choices:
-      - text: "ย้ายทั้งบ้านตามพ่อไป"
+      - text: "ย้ายตามพ่อไปเข้าโรงเรียนใหม่"
         effects: {income_mult: 1.2, relations: -2, happiness: -1}
         merit: [{cat: neutral}]
-      - text: "พ่อไปคนเดียว กลับเดือนละครั้ง"
+      - text: "อยู่กับแม่ รอพ่อกลับเดือนละครั้ง"
         effects: {money: {unit: income_x, amount: 0.5}, relations: -1, happiness: -1}
         merit: [{cat: neutral}]
-      - text: "พ่อปฏิเสธงาน อยู่กับยายต่อ"
+      - text: "ร้องไห้ขอไม่ย้าย อยู่กับยายต่อ"
         effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.3}}
-        merit: [{cat: care_parents, level: 1}]
-      - text: "พายายย้ายไปด้วยกัน"
+        merit: [{cat: neutral}]
+      - text: "อ้อนให้ยายย้ายไปด้วยกัน"
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ยายปลูกผักหน้าบ้านใหม่ เพื่อนบ้านแวะมาขอทุกเช้า", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ยายไม่ชินอากาศ ล้มป่วยหนักหน้าหนาวแรก", effects: {happiness: -2, money: {unit: income_x, amount: -0.6}}, merit: [{cat: neutral}]}
-        merit: [{cat: care_parents, level: 2}]
+        merit: [{cat: care_parents, level: 1}]
 
   - id: kid_parents_fight_01
     type: A
@@ -149,21 +149,21 @@ events:
     weight: 2
     when: {age: [4, 12]}
     title: "เสียงจานแตกกลางดึก"
-    text: "พ่อแม่ทะเลาะเรื่องเงินทุกคืน ลูกนอนกอดหมอนฟังอยู่หลังประตู เช้ามาทั้งคู่ยิ้มให้เหมือนไม่มีอะไรเกิดขึ้น"
+    text: "พ่อแม่ทะเลาะเรื่องเงินทุกคืน คุณนอนกอดหมอนฟังอยู่หลังประตู เช้ามาทั้งคู่ยิ้มให้เหมือนไม่มีอะไรเกิดขึ้น"
     choices:
-      - text: "ตกลงแยกกันอยู่ด้วยดี"
+      - text: "บอกพ่อแม่ว่าแยกกันก็ได้"
         effects: {happiness: 1, relations: -1, income_mult: 0.85}
         merit: [{cat: neutral}]
-      - text: "ไปหานักจิตบำบัดครอบครัว"
+      - text: "เล่าให้ครูฟัง ครูเชิญพ่อแม่มาคุย"
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {relations: 2}}, text: "พ่อแม่หัดคุยกันดี ๆ บ้านกลับมาหัวเราะได้", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ไปได้สองครั้งก็ทะเลาะกันในห้องบำบัด", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุยได้สองครั้งก็ทะเลาะกันต่อหน้าครู", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - text: "ทนอยู่เพื่อลูก"
+      - text: "ทำเป็นไม่ได้ยิน เก็บไว้คนเดียว"
         effects: {happiness: -2, health: -1, relations: -1}
         sets_flags: [broken_home]
         merit: [{cat: neutral}]
-      - text: "ฝากลูกไว้บ้านตายาย"
+      - text: "ขอไปนอนบ้านตายายสักพัก"
         effects: {relations: 1, happiness: 1, health: 1}
         merit: [{cat: neutral}]
 
@@ -177,18 +177,18 @@ events:
     title: "ปิดเทอมที่บ้านยาย"
     text: "ปิดเทอมนี้พ่อแม่ทำงานไม่มีวันหยุด ยายที่{ภาค}โทรมาบอกว่าคิดถึงหลาน มีเป็ดเกิดใหม่สิบตัวรออยู่"
     choices:
-      - text: "ส่งไปอยู่บ้านยายทั้งเดือน"
+      - text: "ขอไปอยู่บ้านยายทั้งเดือน"
         effects: {health: 1, relations: 2, knowledge: -1}
         merit: [{cat: neutral}]
-      - text: "จ้างพี่เลี้ยงดูอยู่ที่บ้าน"
+      - text: "อยู่บ้านดูทีวีกับพี่เลี้ยง"
         effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
-      - text: "พาไปที่ทำงานด้วยทุกวัน"
+      - text: "ตามพ่อแม่ไปที่ทำงานทุกวัน"
         outcomes:
-          - {weight: 1, ok: true, text: "ลูกจำงานพ่อแม่ได้หมด ลูกค้าชมว่าฉลาด", effects: {knowledge: 2, relations: 1}, sets_flags: [good_student], merit: [{cat: neutral}]}
-          - {weight: 2, text: "ลูกเบื่อจนวิ่งหายในตลาดครึ่งวัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "จำงานพ่อแม่ได้หมด ลูกค้าชมว่าฉลาด", effects: {knowledge: 2, relations: 1}, sets_flags: [good_student], merit: [{cat: neutral}]}
+          - {weight: 2, text: "เบื่อจนวิ่งหายในตลาดครึ่งวัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - text: "ส่งเข้าค่ายฟุตบอลภาคฤดูร้อน"
+      - text: "ขอไปค่ายฟุตบอลภาคฤดูร้อน"
         effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.2}}
         sets_flags: [sporty]
         merit: [{cat: neutral}]
@@ -204,19 +204,19 @@ events:
     choices:
       - text: "รับงานโฆษณา ถ่ายทั้งเสาร์อาทิตย์"
         outcomes:
-          - {weight: 2, ok: true, text: "ถ่ายเสร็จได้ค่าตัวกับอาหารแมวเต็มรถ ลูกเก็บเงินใส่กระปุกเอง", effects: {money: {unit: income_x, amount: 0.4}, happiness: 2}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ถ่ายเสร็จได้ค่าตัวกับอาหารแมวเต็มรถ คุณเก็บเงินใส่กระปุกเอง", effects: {money: {unit: income_x, amount: 0.4}, happiness: 2}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
           - {weight: 1, text: "แมวตื่นกล้องวิ่งหนีเข้าป่าหลังบ้าน หาเจออีกทีสามวันต่อมา งานล่ม", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ให้ญาติยืมแมวไปงานบวชฟรี ๆ"
         effects: {happiness: 1, relations: 2}
         merit: [{cat: help_others, level: 1}]
-      - text: "ปฏิเสธ กลัวลูกเหลิงจนไม่เรียน"
+      - text: "ปฏิเสธ ขอกลับไปตั้งใจเรียน"
         effects: {knowledge: 1, happiness: -1}
         merit: [{cat: neutral}]
-      - text: "ให้ลูกเปิดช่องคลิปจริงจัง"
+      - text: "เปิดช่องคลิปของตัวเองจริงจัง"
         outcomes:
-          - {weight: 1, ok: true, text: "ลูกถ่ายคลิปลงทุกสัปดาห์ คนดูประจำเริ่มรอ เพื่อนที่โรงเรียนมาขอเป็นตัวประกอบ", effects: {happiness: 2, knowledge: 1, health: -1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
-          - {weight: 2, text: "คลิปที่สองไม่มีใครดู ลูกเสียใจจนไม่ยอมแตะกล้องไปทั้งเทอม", effects: {happiness: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ถ่ายคลิปลงทุกสัปดาห์ คนดูประจำเริ่มรอ เพื่อนที่โรงเรียนมาขอเป็นตัวประกอบ", effects: {happiness: 2, knowledge: 1, health: -1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+          - {weight: 2, text: "คลิปที่สองไม่มีใครดู เสียใจจนไม่ยอมแตะกล้องไปทั้งเทอม", effects: {happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   # เรื่องต่อจาก kid_sport_01 (เหรียญทองจังหวัด) — ออกทาง next เท่านั้น
@@ -228,8 +228,8 @@ events:
     title: "จดหมายจากโรงเรียนกีฬา"
     text: "สองวันหลังได้เหรียญ โรงเรียนกีฬาประจำจังหวัดส่งจดหมายมาชวนเข้าเรียนประจำ กินนอนที่หอ ค่าเทอมครึ่งหนึ่ง แต่ได้กลับบ้านเดือนละครั้ง"
     choices:
-      - text: "ส่งไปอยู่หอโรงเรียนกีฬา"
-        requires: {money: {unit: income_x, amount: 0.5}, reason: "เงินเก็บไม่พอค่าเทอมครึ่งหนึ่ง"}
+      - text: "ไปอยู่หอโรงเรียนกีฬา"
+        requires: {money: {unit: income_x, amount: 0.5}, reason: "เงินที่บ้านไม่พอค่าเทอม"}
         effects: {money: {unit: income_x, amount: -0.5}}
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {health: 1.5}}, text: "ซ้อมหนักทุกเช้า ติดทีมเยาวชนเขต ครูโค้ชเขียนชื่อไว้บนกระดานดาวรุ่ง", effects: {health: 2, happiness: 1, relations: -1}, sets_flags: [sporty], merit: [{cat: neutral}]}
@@ -242,7 +242,7 @@ events:
       - text: "เอาเหรียญแขวนผนัง พอแค่นี้"
         effects: {knowledge: 1, happiness: -1}
         merit: [{cat: neutral}]
-      - text: "ให้ลูกสอนน้อง ๆ ในซอยวิ่งด้วย"
+      - text: "สอนน้อง ๆ ในซอยวิ่งด้วย"
         effects: {relations: 2, happiness: 1}
         sets_flags: [sporty]
         merit: [{cat: help_others, level: 1}]
