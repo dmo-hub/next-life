@@ -92,9 +92,9 @@ events:
         text: "ทุ่มยกชุดทุกงวดทั้งปี เอาคืน"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 950, text: "ทั้งปียกชุดมายี่สิบกว่างวด ผิดหมดทุกงวด เงินที่ตั้งใจจะเอาคืนกลับหายเพิ่มอีกก้อน", effects: {happiness: -1, money: {unit: income_x, amount: -0.6}}, merit: [{cat: neutral}]}
+          - {weight: 938, text: "ทั้งปียกชุดมายี่สิบกว่างวด ผิดหมดทุกงวด เงินที่ตั้งใจจะเอาคืนกลับหายเพิ่มอีกก้อน", effects: {happiness: -1, money: {unit: income_x, amount: -0.6}}, merit: [{cat: neutral}]}
           - {weight: 45, ok: true, text: "ปลายปีถูกเลขท้ายสามตัวยกชุด ได้คืนเกือบเท่าที่เสียไปทั้งปี ยิ้มได้ทั้งสัปดาห์", effects: {happiness: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
-          - {weight: 4, ok: true, text: "งวดหนึ่งในปีนั้น ใบที่ห้าในชุดถูกรางวัลที่หนึ่ง ข่าวไปเร็วกว่าที่คิด เย็นนั้นมีรถจากต่างจังหวัดมาจอดหน้าบ้านสามคัน", effects: {happiness: 2, money: {unit: fixed_baht, amount: 6000000, ref_year: 2560}}, next: lot_jackpot_kin_01, merit: [{cat: neutral}]}
+          - {weight: 16, ok: true, text: "งวดหนึ่งในปีนั้น ใบที่ห้าในชุดถูกรางวัลที่หนึ่ง ข่าวไปเร็วกว่าที่คิด เย็นนั้นมีรถจากต่างจังหวัดมาจอดหน้าบ้านสามคัน", effects: {happiness: 2, money: {unit: fixed_baht, amount: 6000000, ref_year: 2560}}, next: lot_jackpot_kin_01, merit: [{cat: neutral}]}
       - id: go_underground
         text: "หันไปแทงหวยใต้ดิน จ่ายเยอะกว่า"
         merit: [{cat: neutral}]

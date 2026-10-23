@@ -87,6 +87,11 @@ rows.push(['ช่องแทนค่าแกนเติมครบ', `${Ob
 
 // การ์ดจัดสรรเงินสร้างในแกน ไม่ผ่านด่านเนื้อหา — ตรวจทุกปีของเกม: ≥4 ตัวเลือก · ยาว · คำต้องห้าม · หุ้นไม่โผล่ก่อน 2518
 const era = loadEra();
+// ปีเกมทุกปีแม็ปเข้าช่วงปีต้นแบบ era.future — การ์ดที่ผูกเหตุการณ์บ้านเมืองซึ่งเริ่มนอกช่วงนี้ไม่มีวันออก
+const eraFrom = new Map(era.events.map((e) => [e.id, e.from]));
+const deadEra = loadEvents().filter((e) => e.era && !(eraFrom.get(e.era) >= era.future.from && eraFrom.get(e.era) <= era.future.to));
+rows.push(['การ์ดบ้านเมืองอยู่ในช่วงปีต้นแบบ', deadEra.length ? `ไม่มีวันออก ${deadEra.length} ใบ` : `ผ่าน (${era.future.from}–${era.future.to})`]);
+for (const e of deadEra) fails.push(`${e.id}: เหตุการณ์ ${e.era} เริ่มปี ${eraFrom.get(e.era)} นอกช่วงปีต้นแบบ ${era.future.from}–${era.future.to} — การ์ดไม่มีวันออก`);
 const seenLabels = new Set();
 for (let y = 2500; y <= 2700; y++) {
   const opts = allocOptions(era, y);

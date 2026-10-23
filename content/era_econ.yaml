@@ -1,59 +1,7 @@
-# กลุ่ม era_econ_ · การ์ดบ้านเมืองเศรษฐกิจ 4 เหตุการณ์ × (เด็ก ครอบครัวเลือก + ผู้ใหญ่)
+# กลุ่ม era_econ_ · การ์ดบ้านเมืองเศรษฐกิจ 3 เหตุการณ์ × (เด็ก ครอบครัวเลือก + ผู้ใหญ่)
+# วิกฤตน้ำมันครั้งแรก (2516) ไม่มีการ์ด: ปีเกมทุกปีแม็ปเข้าช่วงปีต้นแบบ era.future (เริ่ม 2520) เหตุการณ์ปีก่อนนั้นจึงไม่เคยเกิด
 # การ์ดเด็กตั้งได้แค่ธง "โตมากับร้านของพ่อแม่" (street_vendor · online_seller) · own_business/in_debt ตั้งเฉพาะการ์ดผู้ใหญ่
 events:
-  # ── วิกฤตน้ำมันครั้งแรก ──
-  - id: era_econ_oil1_kid_01
-    type: A
-    category: society
-    stage: เด็ก
-    years: [2500, 2650]
-    era: oil_crisis_1
-    when: {age: [0, 18]}
-    title: "น้ำมันแพงข้ามคืน"
-    text: "ปั๊มหน้าบ้านติดป้ายราคาใหม่ทุกเช้า รถเมล์ขึ้นค่าโดยสาร พ่อนั่งคิดเลขบนกระดาษจนดึก ข้าวสารในบ้านเหลือครึ่งถัง"
-    choices:
-      - text: "พ่อขายรถ หันมาปั่นจักรยาน"
-        effects: {health: 1, happiness: -1, money: {unit: income_x, amount: 0.5}}
-        merit: [{cat: neutral}]
-      - text: "แม่ตั้งแผงขายกับข้าวหน้าบ้าน"
-        outcomes:
-          - {weight: 2, ok: true, text: "แกงหม้อแรกหมดก่อนเที่ยง คนงานในซอยมาต่อคิวทุกวัน", effects: {relations: 1, money: {unit: income_x, amount: 0.4}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
-          - {weight: 1, text: "ขายไม่ออก ต้องกินแกงเหลือกันสามวัน ลูกเบื่อแกงไปทั้งชีวิต", effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
-        merit: [{cat: neutral}]
-      - text: "ยืมเงินญาติมาประคองไปก่อน"
-        effects: {relations: -1, happiness: -1, money: {unit: income_x, amount: 0.3}}
-        merit: [{cat: neutral}]
-      - text: "ส่งลูกไปอยู่กับยายต่างจังหวัด"
-        effects: {relations: 2, knowledge: -1, health: 1}
-        merit: [{cat: neutral}]
-
-  - id: era_econ_oil1_adult_01
-    type: A
-    category: society
-    stage: หนุ่มสาว
-    years: [2500, 2650]
-    era: oil_crisis_1
-    when: {age: [19, 59]}
-    title: "คิวยาวที่ปั๊มน้ำมัน"
-    text: "อายุ {อายุ} ต้องตื่นตีห้าไปต่อคิวเติมน้ำมัน ค่าข้าวแกงขึ้นทุกสัปดาห์ ข่าววิทยุบอกว่าโลกขาดน้ำมัน ไม่มีใครรู้ว่าจะจบเมื่อไร"
-    choices:
-      - text: "รับจ้างขี่สามล้อถีบส่งของ"
-        effects: {health: 1, happiness: -1, money: {unit: income_x, amount: 0.3}}
-        merit: [{cat: neutral}]
-      - text: "เปิดร้านซ่อมรถเก่าให้วิ่งได้"
-        outcomes:
-          - {weight: 2, ok: true, multipliers: {occupation: {technician: 2, craft: 1.5}}, text: "ไม่มีใครซื้อรถใหม่ไหว ร้านซ่อมคิวเต็มยาวสองเดือน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
-          - {weight: 1, text: "อะไหล่ขาดตลาด ร้านต้องปิด เหลือแต่เครื่องมือกับหนี้", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
-        merit: [{cat: neutral}]
-      - text: "กักตุนน้ำมันไว้ขายต่อแพง ๆ"
-        outcomes:
-          - {weight: 1, text: "ขายได้กำไรสามเท่า แต่เพื่อนบ้านจำหน้าไว้ทุกคน", effects: {relations: -2, money: {unit: income_x, amount: 1.5}}, merit: [{cat: greed_harm, level: 1}]}
-          - {weight: 1, text: "ถังรั่วกลางดึก ไฟเกือบไหม้ทั้งห้องแถว", effects: {health: -2, relations: -1}, merit: [{cat: greed_harm, level: 1}]}
-        merit: [{cat: greed_harm, level: 1}]
-      - text: "แบ่งน้ำมันให้รถพยาบาลชุมชน"
-        effects: {relations: 2, money: {unit: income_x, amount: -0.2}}
-        merit: [{cat: help_others, level: 2}]
-
   # ── วิกฤตน้ำมันครั้งที่สอง ──
   - id: era_econ_oil2_kid_01
     type: A
