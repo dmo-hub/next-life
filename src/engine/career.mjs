@@ -59,7 +59,8 @@ export function schoolGate(st) {
             { weight: 1, text: 'สอบไม่ติด กลับมาเรียนโรงเรียนใกล้บ้าน', effects: { school: 'lower', happiness: -1 } },
           ],
         },
-        { text: 'บวชเณรเรียนที่วัด', effects: { school: 'lower', relations: -1, network: 1 }, merit: [{ cat: 'sila', level: 1 }] },
+        // บวชเณรได้เฉพาะชาย — ตัวเลือกที่เหลือยังครบขั้นต่ำ 4 ทางสำหรับหญิง
+        ...(st.sex === 'ชาย' ? [{ text: 'บวชเณรเรียนที่วัด', effects: { school: 'lower', relations: -1, network: 1 }, merit: [{ cat: 'sila', level: 1 }] }] : []),
         { text: 'ออกมาช่วยทำงานหาเงิน', effects: { school: 'none', happiness: -1 } },
       ],
     };

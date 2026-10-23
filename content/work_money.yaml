@@ -280,7 +280,7 @@ events:
         requires: {money: {unit: income_x, amount: 8}, reason: "เงินเก็บไม่พอซื้อสต็อก"}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "ไลฟ์คืนแรกขายหมดเกลี้ยง กลายเป็นแม่ทีมในปีเดียว", effects: {happiness: 2, income_mult: 1.6}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ไลฟ์คืนแรกขายหมดเกลี้ยง กลายเป็นหัวหน้าทีมขายในปีเดียว", effects: {happiness: 2, income_mult: 1.6}, sets_flags: [online_seller], merit: [{cat: neutral}]}
           - {weight: 2, text: "ครีมไม่ผ่านมาตรฐาน ลองทาเองหน้าพัง ของค้างเต็มห้อง", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
       - id: own_shop_online
         text: "เปิดร้านออนไลน์ของที่ถนัดเอง"
