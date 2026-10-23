@@ -1,0 +1,23 @@
+# ผิดกติกาเดียว: ตัวเลือกซื้อใบใส่ราคาเอง (ราคาใบต้องมาจาก belief.stake)
+events:
+  - id: bad_case_01
+    type: B
+    stage: ทำงาน
+    years: [2560, 2650]
+    text: "ข้อความการ์ด"
+    category: belief
+    lore_ref: lore-finance-belief.md#B
+    belief:
+      kind: lottery_numen
+      tradition: ผสม
+      outside_canon: [odds_by_merit]
+      trigger: {money_state: tight}
+      cap_per_life: 5
+      prize_table: finance.lottery
+      stake: {unit: fixed_baht, amount: 80}
+      odds_modifier: {source: merit_ledger.net, formula: mult_up_only, max_mult: 4.0, prize_scope: small, direction: up_only, ref_scale: table.merit_ref}
+    choices:
+      - {text: "ตกลง", ticket: true, cost: {unit: fixed_baht, amount: 80}, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

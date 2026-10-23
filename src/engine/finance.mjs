@@ -38,6 +38,26 @@ export const DEBTS = [
 const DEBT_BY_ID = new Map(DEBTS.map((d) => [d.id, d]));
 export const debtName = (id) => DEBT_BY_ID.get(id)?.name ?? id;
 
+// ตารางรางวัลสลากกินแบ่งรัฐบาล (ใบ 11 · ใบ 12 ตรวจกับ glo.or.th แล้ว): จำนวนรางวัลต่อ 1 ชุด 1,000,000 ฉบับ · บาทต่อรางวัล ณ ราคาใบ price
+// ใหญ่ 168 ต่อล้าน + เล็ก 14,000 ต่อล้าน = 1.4168% · เนื้อหาอ้างตารางนี้ด้วยชื่อ finance.lottery ห้ามตั้งตารางเอง
+// ใช้ทุกปีด้วยมูลค่าต่อราคาใบเท่าเดิม — ยุคก่อน 2560 รางวัลครึ่งหนึ่งพร้อมราคาครึ่งหนึ่ง (อนุมาน) ก่อน 2550 ไม่มีข้อมูล
+export const LOTTERY_PRIZES = {
+  per: 1_000_000,
+  price: 80,
+  prizes: [
+    { id: 'first', name: 'รางวัลที่ 1', n: 1, baht: 6_000_000, small: false },
+    { id: 'near_first', name: 'รางวัลข้างเคียงรางวัลที่ 1', n: 2, baht: 100_000, small: false },
+    { id: 'second', name: 'รางวัลที่ 2', n: 5, baht: 200_000, small: false },
+    { id: 'third', name: 'รางวัลที่ 3', n: 10, baht: 80_000, small: false },
+    { id: 'fourth', name: 'รางวัลที่ 4', n: 50, baht: 40_000, small: false },
+    { id: 'fifth', name: 'รางวัลที่ 5', n: 100, baht: 20_000, small: false },
+    { id: 'front3', name: 'รางวัลเลขหน้า 3 ตัว', n: 2_000, baht: 4_000, small: true },
+    { id: 'last3', name: 'รางวัลเลขท้าย 3 ตัว', n: 2_000, baht: 4_000, small: true },
+    { id: 'last2', name: 'รางวัลเลขท้าย 2 ตัว', n: 10_000, baht: 2_000, small: true },
+  ],
+};
+export const PRIZE_TABLES = { 'finance.lottery': LOTTERY_PRIZES };
+
 export function debtOpen(era, id, year) {
   const d = DEBT_BY_ID.get(id);
   if (!d) throw new Error(`หนี้ไม่รู้จัก: ${id}`);

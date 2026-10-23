@@ -1,6 +1,7 @@
 // กติกาส่วนต่อ belief ของใบ 12 ด่าน build ข้อ (ก)–(ช) · (ช) คำต้องห้ามอยู่ใน banned.yaml
 import { BELIEF_KINDS, TRADITIONS, OUTSIDE_CANON, INTENTS, REDEEM, BELIEF_EFFECTS, LOTTERY, VOW_LIGHT_MAX, YEAR_MIN, YEAR_MAX, meritCat } from './vocab.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, same, strings } from './util.mjs';
+import { REF_TABLE } from '../../engine/merit.mjs';
 
 const beliefOf = (e) => (isObj(e.belief) ? e.belief : null);
 const kindOf = (e) => beliefOf(e)?.kind;
@@ -87,7 +88,21 @@ export const rules = [
   lotteryRule('lottery-odds', '(ค) odds_modifier อ่าน merit_ledger.net และมี ref_scale', (e, r) => {
     const o = odds(e);
     if (o.source !== 'merit_ledger.net' || typeof o.ref_scale !== 'string') r('.belief.odds_modifier', 'ต้องมี source: merit_ledger.net และ ref_scale');
+    else if (!(REF_TABLE[o.ref_scale.replace(/^table\./, '')] > 0)) r('.belief.odds_modifier.ref_scale', `ไม่มี ${o.ref_scale} ในตารางกลาง (table.${Object.keys(REF_TABLE).join(' · table.')})`);
   }),
+  {
+    id: 'lottery-ticket',
+    desc: '(ค) หวยสายมูมีตัวเลือกซื้อใบ (ticket: true) ตัวเดียว — แกนเก็บราคาจาก stake และจับรางวัลเอง ตัวเลือกนั้นห้ามมี cost/เงิน/outcomes · ticket ใช้ได้เฉพาะ lottery_numen',
+    event(e, ctx, r) {
+      const tickets = choicesOf(e).filter(({ c }) => c.ticket !== undefined);
+      for (const { c, path } of tickets) {
+        if (c.ticket !== true) r(`${path}.ticket`, 'ticket ต้องเป็น true');
+        if (!lottery(e)) r(`${path}.ticket`, 'ticket ใช้ได้เฉพาะ lottery_numen');
+        if (c.cost !== undefined || c.effects?.money !== undefined || c.outcomes !== undefined) r(path, 'ตัวเลือกซื้อใบห้ามมี cost/effects.money/outcomes — ราคาใบมาจาก belief.stake รางวัลมาจากตาราง');
+      }
+      if (lottery(e) && tickets.length !== 1) r('.choices', `หวยสายมูต้องมีตัวเลือก ticket: true 1 ตัว ได้ ${tickets.length}`);
+    },
+  },
   {
     id: 'ledger-read',
     desc: '(ค) เฉพาะ lottery_numen อ่านบัญชีบุญบาป (merit_ledger / odds_modifier / prize_table) ได้ · กิจกรรมสายมูอื่นห้ามมีตัวคูณกรรม',

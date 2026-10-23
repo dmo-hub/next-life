@@ -4,6 +4,7 @@ import { pickRegion, regionRatio, classOdds, nationalIncome } from './birth.mjs'
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
 import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard } from './career.mjs';
+import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -574,7 +575,8 @@ function emit(st, card) {
 
 // การ์ดเลือกของเหตุการณ์ — ตั้ง pending ไว้ให้ choose อ่าน
 function eventCard(st, ev) {
-  st.pending = ev;
+  // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
+  st.pending = ev.choices.length ? ev : null;
   return emit(st, {
     kind: 'event',
     id: ev.id,
@@ -646,7 +648,7 @@ export function nextCard(st) {
     }
     // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
     const year = st.birthYear + st.age;
-    let ev = st.content.events.find((e) => !st.done[e.id] && (e.age === st.age || isScheduled(st, e.id)) && inYears(e, year) && whenOk(st, e.when));
+    let ev = st.content.events.find((e) => !st.done[e.id] && (e.age === st.age || isScheduled(st, e.id)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
     // กองสุ่มจับได้ปีละครั้ง หลังหลักไมล์/นัดของปีนั้นหมดแล้ว
     if (!ev && st.poolAge !== st.age) {
       st.poolAge = st.age;
@@ -655,6 +657,7 @@ export function nextCard(st) {
     if (ev) {
       st.done[ev.id] = true;
       st.fired[ev.id] = { n: (st.fired[ev.id]?.n ?? 0) + 1, age: st.age };
+      beliefFired(st, ev);
     }
     st.scheduled = st.scheduled.filter((x) => x.age >= st.age && !st.done[x.event]);
     if (ev) {
@@ -669,7 +672,7 @@ export function nextCard(st) {
 // ชีวิตที่เนื้อหาไม่มีกองจึงได้ชะตาเดิมทุกหลัก
 function drawPool(st, year) {
   const stage = stageOf(st.age);
-  const pool = st.content.events.filter((e) => e.weight && e.age === undefined && !e.era && (!st.done[e.id] || canRepeat(st, e)) && e.stage === stage && inYears(e, year) && whenOk(st, e.when));
+  const pool = st.content.events.filter((e) => e.weight && e.age === undefined && !e.era && (!st.done[e.id] || canRepeat(st, e)) && e.stage === stage && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
   if (!pool.length || st.rng.next() >= POOL_CHANCE[stage]) return null;
   return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers)));
 }
@@ -747,7 +750,8 @@ export function choose(st, idx) {
   // ผลสุ่ม: จับทางด้วย rng ของโลก (เป็นผลของการเลือก) แล้วเล่าเป็นการ์ดผลลัพธ์ใบถัดไป
   // น้ำหนักแต่ละทางเอียงตาม multipliers ของทางนั้น — บัญชีอ่านหลังป้ายบุญบาปของตัวเลือกนี้ลงแล้ว (กรรมตามทันทันที)
   // การ์ดที่ตัวเลือกนี้ก่อ (ผล → เรื่องต่อ → หางาน) เข้าหัวคิวตามลำดับ ก่อนการ์ดอื่นของปีที่รออยู่
-  const after = [];
+  // สายมูก่อการ์ดของตัวเองได้ (ผลหวยสายมู) — มาก่อนผลสุ่มของตัวเลือก
+  const after = beliefChoice(st, ev, c);
   if (c.outcomes?.length) {
     const o = weighted(st.rng, c.outcomes, c.outcomes.map((x) => x.weight * poolMultiplier(st, x.multipliers)));
     applyEffects(st, o.effects);
@@ -755,9 +759,10 @@ export function choose(st, idx) {
     if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
-    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when)) {
+    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow)) {
       st.done[follow.id] = true;
       st.fired[follow.id] = { n: (st.fired[follow.id]?.n ?? 0) + 1, age: st.age };
+      beliefFired(st, follow);
       after.push({ kind: 'eraEvent', ev: follow, age: st.age });
     }
   }

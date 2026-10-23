@@ -23,7 +23,7 @@ events:
         direction: up_only
         ref_scale: table.merit_ref
     choices:                                        # เติม
-      - {id: buy, label: ซื้อสลากหนึ่งใบตามความฝัน, merit: [{cat: neutral}]}
+      - {id: buy, label: ซื้อสลากหนึ่งใบตามความฝัน, ticket: true, merit: [{cat: neutral}]}   # เติม ticket (ตัวเลือกที่แกนจับรางวัล)
       - {id: skip, label: จดเลขไว้เฉย ๆ, merit: [{cat: neutral}]}
       - {id: tell, label: เล่าความฝันให้แม่ฟัง, merit: [{cat: neutral}]}       # เติม (ด่านขั้นต่ำ 4 ตัวเลือก)
       - {id: forget, label: ตื่นมาก็ลืมไปแล้ว, merit: [{cat: neutral}]}        # เติม

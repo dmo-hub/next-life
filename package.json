@@ -11,6 +11,7 @@
     "finance": "node harness/finance.mjs --n 50000 --seed 1",
     "lineage": "node harness/lineage.mjs --n 2000 --gens 3 --seed 1",
     "titles": "node harness/titles.mjs --n 2000 --gens 3 --seed 1",
+    "belief": "node harness/belief.mjs --n 20000 --seed 1",
     "fetch:finance": "node scripts/fetch-finance.mjs",
     "check:data": "node scripts/check-data.mjs",
     "lint:test": "node scripts/lint-test.mjs",
