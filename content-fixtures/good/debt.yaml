@@ -11,5 +11,18 @@ events:
       - {text: "ผ่อนรถแทน", effects: {debt: {kind: car, amount: {unit: fixed_baht, amount: 400000, ref_year: 2560}}}, merit: [{cat: neutral}]}
       - {text: "กู้เงินเรียนต่อ", effects: {debt: {kind: student_loan, amount: {unit: income_x, amount: 2}}}, merit: [{cat: neutral}]}
       - {text: "เช่าต่อไป", merit: [{cat: neutral}]}
+      - {text: "กู้นอกระบบมาดาวน์", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 1}}}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
     systems: [student_loan]
     lore_ref: lore-finance-series.html#6
+  - id: good_debt_shark
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2530, 2650]
+    text: "คนปล่อยกู้มาทวงดอกถึงหน้าบ้าน"
+    when: {flags: {has: [loan_shark]}}
+    choices:
+      - {text: "ขายทองปิดหนี้ให้จบ", effects: {settle: informal}, clears_flags: [loan_shark], merit: [{cat: neutral}]}
+      - {text: "ร้องเรียนตำรวจเรื่องดอกโหด", effects: {complain: true, happiness: -1}, merit: [{cat: neutral}]}
+      - {text: "จ่ายดอกต่อไปก่อน", merit: [{cat: neutral}]}
+      - {text: "กู้ธนาคารมาโปะ", effects: {settle: informal, debt: {kind: car, amount: {unit: income_x, amount: 1}}}, clears_flags: [loan_shark], merit: [{cat: neutral}]}

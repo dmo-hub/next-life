@@ -70,6 +70,11 @@ export function payDebt(era, seed, d, year) {
 }
 export const debtDone = (d) => !d.simple && (d.years <= 0 || d.balance <= 0.5);
 
+// ร้องเรียนหนี้นอกระบบ: ดอกลดเหลืออัตราตามกฎหมาย แต่ยังจ่ายแต่ดอกเหมือนเดิม — เงินต้นค้างจนมีการ์ดให้ปิดหนี้
+export function complainDebt(era, d) {
+  if (d.kind === 'informal') d.rate = era.finance.debt.kinds.informal.complaint_rate;
+}
+
 // ผลตอบแทนทั้งปีเป็นสัดส่วน (0.05 = 5%) · สินทรัพย์ที่คิดจากราคาสองปี อ่านปีต้นแบบครั้งเดียวแล้วเทียบกับปีก่อนหน้าของปีต้นแบบ
 export function assetReturn(era, seed, id, year) {
   const f = era.finance;

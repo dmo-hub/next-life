@@ -11,7 +11,7 @@ const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   debt: ['kind', 'amount'],
@@ -296,7 +296,7 @@ export const rules = [
   },
   {
     id: 'debt-shape',
-    desc: `กู้เงิน effects.debt = {kind: ${DEBTS.map((d) => d.id).join('|')}, amount: เงินมีหน่วย amount > 0}`,
+    desc: `กู้เงิน effects.debt = {kind: ${DEBTS.map((d) => d.id).join('|')}, amount: เงินมีหน่วย amount > 0} · ปิดหนี้ effects.settle = ชนิดหนี้ · ร้องเรียนดอกนอกระบบ effects.complain = true`,
     event(e, ctx, r) {
       for (const { node, path } of effectSites(e)) {
         const v = isObj(node.effects) ? node.effects.debt : undefined;
@@ -304,6 +304,11 @@ export const rules = [
         if (!isObj(v) || !DEBTS.some((d) => d.id === v.kind) || !(isMoney(v.amount) && v.amount.amount > 0)) {
           r(`${path}.effects.debt`, `ต้องเป็น {kind: ชนิดหนี้, amount: {unit, amount > 0}} ได้ ${JSON.stringify(v)}`);
         }
+      }
+      for (const { node, path } of effectSites(e)) {
+        const fx = isObj(node.effects) ? node.effects : {};
+        if (fx.settle !== undefined && !DEBTS.some((d) => d.id === fx.settle)) r(`${path}.effects.settle`, `ปิดหนี้ต้องเป็นชนิดหนี้ (${DEBTS.map((d) => d.id).join(' ')}) ได้ ${JSON.stringify(fx.settle)}`);
+        if (fx.complain !== undefined && fx.complain !== true) r(`${path}.effects.complain`, 'complain ต้องเป็น true เท่านั้น');
       }
     },
   },

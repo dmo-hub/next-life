@@ -1,7 +1,7 @@
 import { makeRng } from './rng.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
 import { pickRegion, regionRatio, classOdds } from './birth.mjs';
-import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName } from './finance.mjs';
+import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
 import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard } from './career.mjs';
 
@@ -291,6 +291,8 @@ function fixedFx(ev, c) {
   }
   if (fx.invest) out.push('ลงทุน');
   if (fx.debt) out.push(`กู้${debtName(fx.debt.kind)}`);
+  if (fx.settle) out.push(`ปิด${debtName(fx.settle)}`);
+  if (fx.complain) out.push('ร้องเรียนดอกโหด');
   if (fx.income_mult) out.push(`รายได้\u00a0${fx.income_mult > 1 ? '↑' : '↓'}`);
   for (const [k, v] of Object.entries(fx.chronic ?? {})) out.push(`${STAT_LABELS[k]}\u00a0${v > 0 ? '↑' : '↓'}\u00a0ระยะยาว`);
   return out.join(' · ');
@@ -342,6 +344,8 @@ function applyEffects(st, fx = {}) {
   if (fx.money) st.money += moneyValue(st, fx.money);
   if (fx.invest) invest(st, fx.invest);
   if (fx.debt) borrow(st, fx.debt);
+  if (fx.settle) settle(st, fx.settle);
+  if (fx.complain) for (const d of st.debts) complainDebt(st.content.era, d);
   if (fx.income_mult) st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * fx.income_mult));
   if (fx.school) {
     st.school = fx.school === 'none' ? null : fx.school;
@@ -508,6 +512,12 @@ function borrow(st, { kind, amount }) {
   const baht = moneyValue(st, amount);
   st.money += baht;
   st.debts.push(newDebt(era, st.seed, kind, baht, year));
+}
+
+// ปิดหนี้ทุกก้อนของชนิดนั้นด้วยเงินที่มี · เงินไม่พอ = เงินติดลบ ทบดอกเงินกู้ปกติแทน (ย้ายหนี้ออกจากดอกโหด)
+function settle(st, kind) {
+  for (const d of st.debts) if (d.kind === kind) st.money -= d.balance;
+  st.debts = st.debts.filter((d) => d.kind !== kind);
 }
 
 // การ์ดจัดสรรเงิน (ใบ 11) เล่าผลจริงของช่วงที่ผ่านมาก่อนให้เลือก — ไม่บอกปีถัดไป · ตัวเลือกสร้างตอนออกการ์ด

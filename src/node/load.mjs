@@ -200,6 +200,7 @@ export function loadDebt() {
       ...(k.years !== undefined && { years: num(k.years, `${id}.years`) }),
       ...(k.grace !== undefined && { grace: num(k.grace, `${id}.grace`) }),
       ...(k.simple && { simple: true }),
+      ...(k.complaint_rate !== undefined && { complaint_rate: num(k.complaint_rate, `${id}.complaint_rate`) }),
       ...(k.cap && { cap: { from: num(k.cap.from, `${id}.cap.from`), v: num(k.cap.v, `${id}.cap.v`) } }),
     };
     if (kinds[id].rate === undefined && kinds[id].premium === undefined) throw new Error(`data/debt.json ${id} ต้องมี rate หรือ premium`);
