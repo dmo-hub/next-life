@@ -20,7 +20,7 @@ events:
       - id: roadside_massage
         text: "ลองหมอนวดจับเส้นข้างตลาด"
         outcomes:
-          - {weight: 2, text: "กดจุดเดียวคอกลับมาหมุนได้ เหมือนปาฏิหาริย์", effects: {health: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กดจุดเดียวคอกลับมาหมุนได้ เหมือนปาฏิหาริย์", effects: {health: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "เส้นพลิก ต้องใส่เฝือกคอเดินไปทำงานสองเดือน", effects: {health: -2, chronic: {health: -1}, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: ergonomic_chair
@@ -46,6 +46,7 @@ events:
     choices:
       - id: private_surgery
         text: "ผ่าตัดใส่เหล็กที่ รพ.เอกชน"
+        requires: {money: {unit: income_x, amount: 1.5}, reason: "เงินเก็บไม่พอค่าผ่าตัดเอกชน"}
         effects: {health: 1, money: {unit: income_x, amount: -1.5}}
         merit: [{cat: neutral}]
       - id: public_queue
@@ -55,7 +56,7 @@ events:
       - id: bone_healer
         text: "ไปหมอต่อกระดูกพื้นบ้าน"
         outcomes:
-          - {weight: 1, text: "กระดูกติดสนิท หมอชาวบ้านไม่คิดเงินสักบาท", effects: {health: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กระดูกติดสนิท หมอชาวบ้านไม่คิดเงินสักบาท", effects: {health: 2, relations: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.5}}
           - {weight: 2, text: "กระดูกติดเบี้ยว เดินกะเผลกไปอีกนาน", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: sue_driver
@@ -75,6 +76,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
+    repeat: {gap: 6, max: 3}
     title: "ไฟมอดกลางประชุม"
     text: "กลางประชุมเช้าวันจันทร์ น้ำตาคุณไหลออกมาเองโดยไม่รู้ตัว นอนไม่หลับมาสามเดือน เห็นชื่อหัวหน้าเด้งในแชตแล้วใจสั่น"
     choices:
@@ -99,7 +101,7 @@ events:
       - id: transfer_team
         text: "ขอย้ายไปแผนกอื่น"
         outcomes:
-          - {weight: 1, text: "หัวหน้าใหม่ใจดี ทีมน่ารัก ได้ขึ้นเงินเดือนด้วย", effects: {happiness: 2, income_mult: 1.15}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าใหม่ใจดี ทีมน่ารัก ได้ขึ้นเงินเดือนด้วย", effects: {happiness: 2, income_mult: 1.15}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "หนีเสือปะจระเข้ หัวหน้าใหม่โหดกว่าเดิมสองเท่า", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -116,7 +118,7 @@ events:
       - id: drive_home
         text: "ขับกลับเอง แค่สิบนาที"
         outcomes:
-          - {weight: 2, text: "ถึงบ้านปลอดภัย แต่กล้องหน้าร้านจับภาพไว้ เพื่อนเอาคลิปไปโพสต์", effects: {relations: -1}, merit: [{cat: intoxicants, level: 2}]}
+          - {weight: 2, text: "ถึงบ้านปลอดภัย แต่กล้องหน้าร้านจับภาพไว้ เพื่อนเอาคลิปไปโพสต์", effects: {relations: -1}, merit: [{cat: intoxicants, level: 2}], multipliers: {karma: 1.4}}
           - {weight: 2, text: "เจอด่านตรวจแอลกอฮอล์ โดนยึดใบขับขี่ ค่าปรับอ่วม", effects: {money: {unit: income_x, amount: -0.8}, relations: -1}, merit: [{cat: intoxicants, level: 2}]}
           - {weight: 1, text: "รถพุ่งชนเสาไฟ ตื่นมาในไอซียู", effects: {health: -3, chronic: {health: -1}, money: {unit: income_x, amount: -1}}, merit: [{cat: intoxicants, level: 2}]}
         merit: [{cat: intoxicants, level: 2}]
@@ -132,6 +134,7 @@ events:
         merit: [{cat: neutral}]
       - id: drive_friends
         text: "ยึดกุญแจทุกคน เรียกรถส่งทีละคน"
+        requires: {stats: {relations: {min: 60}}, reason: "เพื่อนไม่ยอมฟังคุณ"}
         effects: {relations: 2, money: {unit: income_x, amount: -0.2}}
         merit: [{cat: help_others, level: 1}]
       - id: quit_tonight
@@ -174,6 +177,7 @@ events:
         merit: [{cat: neutral}]
       - id: weightloss_shot
         text: "จ่ายแพงฉีดยาลดน้ำหนัก"
+        requires: {money: {unit: income_x, amount: 1.2}, reason: "เงินเก็บไม่พอค่ายา"}
         effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -1.2}}
         merit: [{cat: neutral}]
 
@@ -191,7 +195,7 @@ events:
         text: "ไปเอกซเรย์ปอดให้รู้ไปเลย"
         effects: {money: {unit: income_x, amount: -0.2}}
         outcomes:
-          - {weight: 3, text: "แค่หลอดลมอักเสบ หมอให้ยาไปกินสองอาทิตย์ก็หาย", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "แค่หลอดลมอักเสบ หมอให้ยาไปกินสองอาทิตย์ก็หาย", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "เจอเงาเล็ก ๆ ที่ปอด ต้องตามตรวจทุกครึ่งปี", effects: {health: -1, happiness: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: quit_cold
@@ -207,7 +211,7 @@ events:
         text: "ไปคลินิกเลิกบุหรี่ของ รพ."
         clears_flags: [smoker]
         outcomes:
-          - {weight: 1, text: "หมอให้ยาช่วยเลิก ครบหกเดือนไม่แตะบุหรี่อีกเลย", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: sila, level: 1}]}
+          - {weight: 1, text: "หมอให้ยาช่วยเลิก ครบหกเดือนไม่แตะบุหรี่อีกเลย", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: sila, level: 1}], multipliers: {stats: {happiness: 1.5}}}
           - {weight: 1, text: "เลิกได้สามเดือน งานเข้าหนักคืนเดียวก็กลับไปสูบซองละวัน", effects: {happiness: -1}, sets_flags: [smoker], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: switch_vape

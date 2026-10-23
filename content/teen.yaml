@@ -13,13 +13,14 @@ events:
     choices:
       - id: cram_hard
         text: "ลงคอร์สติวหนักจนตาลาย"
+        requires: {money: {unit: income_x, amount: 0.3}, reason: "เงินเก็บไม่พอค่าคอร์สติว"}
         effects: {knowledge: 3, health: -1, happiness: -1, money: {unit: income_x, amount: -0.3}}
         sets_flags: [good_student]
         merit: [{cat: neutral}]
       - id: guess_luck
         text: "ไม่อ่าน ฝนตามดวงเอา"
         outcomes:
-          - {weight: 1, text: "ติดคณะดังแบบงง ๆ ทั้งโรงเรียนแตกตื่น", effects: {knowledge: 1, happiness: 3}, sets_flags: [good_student], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ติดคณะดังแบบงง ๆ ทั้งโรงเรียนแตกตื่น", multipliers: {karma: 1.5}, effects: {knowledge: 1, happiness: 3}, sets_flags: [good_student], merit: [{cat: neutral}]}
           - {weight: 3, text: "ฝนผิดแถวตั้งแต่ข้อแรก รู้ตัวตอนหมดเวลา", effects: {happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: vocational
@@ -113,7 +114,7 @@ events:
         text: "ปฏิเสธเพื่อรักษาเพื่อน"
         outcomes:
           - {weight: 1, text: "เพื่อนเงียบหายไปทั้งเทอม", effects: {relations: -2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "เพื่อนขอบคุณที่จริงใจ กลายเป็นเพื่อนกันตลอดชีวิต", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนขอบคุณที่จริงใจ กลายเป็นเพื่อนกันตลอดชีวิต", multipliers: {stats: {relations: 2}}, effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: secret_date
         text: "แอบคบ ไม่ให้ที่บ้านรู้"
@@ -169,7 +170,7 @@ events:
       - id: take_brand_deal
         text: "รับงานรีวิวเต็มตัว"
         outcomes:
-          - {weight: 2, text: "ค่ารีวิวเดือนเดียวเท่าค่าขนมทั้งปี", effects: {money: {unit: income_x, amount: 1}, happiness: 1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ค่ารีวิวเดือนเดียวเท่าค่าขนมทั้งปี", multipliers: {flags: {scam_aware: 2}}, effects: {money: {unit: income_x, amount: 1}, happiness: 1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
           - {weight: 1, text: "ของที่รีวิวเป็นของปลอม คนแห่ด่าทั้งเน็ต", effects: {happiness: -2, relations: -1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: clip_every_night
@@ -184,6 +185,7 @@ events:
         merit: [{cat: neutral}]
       - id: dance_with_teacher
         text: "ชวนครูมาเต้นคลิปต่อ"
+        requires: {stats: {relations: {min: 60}}, reason: "ยังไม่กล้าพอจะชวนครู"}
         outcomes:
           - {weight: 1, text: "คลิปครูเต้นดังกว่าเดิมสิบเท่า ทั้งโรงเรียนรักครูขึ้น", effects: {relations: 2, happiness: 2}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
           - {weight: 1, text: "ครูโดนผู้บริหารเรียกพบ ไม่มองหน้ากันอีกเลย", effects: {relations: -2}, merit: [{cat: neutral}]}
@@ -206,19 +208,21 @@ events:
       - id: dock_work
         text: "ไปแบกของที่ท่าเรือ"
         outcomes:
-          - {weight: 3, text: "ได้เงินดี กล้ามขึ้นเป็นมัด", effects: {money: {unit: income_x, amount: 1}, health: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ได้เงินดี กล้ามขึ้นเป็นมัด", multipliers: {stats: {health: 2}}, effects: {money: {unit: income_x, amount: 1}, health: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
           - {weight: 1, text: "ลังหล่นทับหลัง นอนซมไปหลายเดือน", effects: {money: {unit: income_x, amount: 0.3}, health: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: sell_online
         text: "ขายเคสมือถือออนไลน์"
+        requires: {money: {unit: income_x, amount: 0.5}, reason: "ไม่มีทุนซื้อของมาขาย"}
         outcomes:
-          - {weight: 1, text: "ขายดีจนต้องจ้างเพื่อนช่วยแพ็กของ", effects: {money: {unit: income_x, amount: 2}, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขายดีจนต้องจ้างเพื่อนช่วยแพ็กของ", multipliers: {stats: {knowledge: 2}}, effects: {money: {unit: income_x, amount: 2}, income_mult: 1.2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ของค้างสต็อกเต็มห้องนอน", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: chase_scholarship
         text: "ไม่ทำ ตั้งใจเรียนชิงทุน"
+        requires: {stats: {knowledge: {min: 60}}, reason: "เกรดยังไม่ถึงเกณฑ์ชิงทุน"}
         outcomes:
-          - {weight: 1, text: "ได้ทุนเรียนฟรีถึงปริญญาตรี", effects: {knowledge: 2, money: {unit: income_x, amount: 1}}, sets_flags: [good_student], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้ทุนเรียนฟรีถึงปริญญาตรี", multipliers: {stats: {knowledge: 2}}, effects: {knowledge: 2, money: {unit: income_x, amount: 1}}, sets_flags: [good_student], merit: [{cat: neutral}]}
           - {weight: 2, text: "ทุนตกไปที่คนอื่นแค่คะแนนเดียว", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -245,12 +249,12 @@ events:
       - id: find_friend
         text: "ลากขาไปตามหาเพื่อนก่อน"
         outcomes:
-          - {weight: 1, text: "เจอเพื่อนสลบในคูน้ำ คุณช่วยชีวิตเขาไว้ได้ทัน", effects: {relations: 3, health: -1}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 1, text: "เจอเพื่อนสลบในคูน้ำ คุณช่วยชีวิตเขาไว้ได้ทัน", multipliers: {karma: 1.4}, effects: {relations: 3, health: -1}, merit: [{cat: help_others, level: 2}]}
           - {weight: 1, text: "เพื่อนหนีกลับบ้านไปแล้ว ทิ้งให้นอนเจ็บคนเดียว", effects: {relations: -2, health: -1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
       - id: call_parents
         text: "โทรให้พ่อแม่มารับ"
         outcomes:
-          - {weight: 2, text: "โดนด่ายับ แต่พ่อแม่พาไปรักษาจนหายดี", effects: {health: 1, relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "โดนด่ายับ แต่พ่อแม่พาไปรักษาจนหายดี", multipliers: {stats: {relations: 2}}, effects: {health: 1, relations: 1, happiness: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "พ่อแม่ยึดทั้งรถทั้งมือถือไปทั้งปี", effects: {health: 1, happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]

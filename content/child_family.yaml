@@ -37,8 +37,9 @@ events:
     text: "เพื่อนร่วมห้องทุกคนเรียนพิเศษ เสาร์อาทิตย์หายไปหมด ครูประจำชั้นบอกพ่อแม่ว่าลูกหัวไว แต่ขี้เกียจ"
     choices:
       - text: "ทุ่มเงินส่งเรียนพิเศษเต็มที่"
+        requires: {money: {unit: income_x, amount: 0.8}, reason: "เงินเก็บไม่พอค่าคอร์ส"}
         outcomes:
-          - {weight: 2, text: "คะแนนพุ่งติดอันดับต้นของชั้น", effects: {knowledge: 3, happiness: -1}, sets_flags: [good_student], merit: [{cat: neutral}]}
+          - {weight: 2, multipliers: {stats: {knowledge: 2}}, text: "คะแนนพุ่งติดอันดับต้นของชั้น", effects: {knowledge: 3, happiness: -1}, sets_flags: [good_student], merit: [{cat: neutral}]}
           - {weight: 1, text: "เรียนหนักจนป่วยบ่อย เกลียดหนังสือไปเลย", effects: {health: -2, happiness: -2}, merit: [{cat: neutral}]}
         effects: {money: {unit: income_x, amount: -0.8}}
         merit: [{cat: neutral}]
@@ -65,7 +66,7 @@ events:
     choices:
       - text: "ส่งเข้าทีม ซ้อมจริงจัง"
         outcomes:
-          - {weight: 3, text: "ได้เหรียญทองระดับจังหวัด ร่างกายแข็งแรงขึ้นทุกปี", effects: {health: 2, happiness: 2}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 3, multipliers: {stats: {health: 2}}, text: "ได้เหรียญทองระดับจังหวัด ร่างกายแข็งแรงขึ้นทุกปี", effects: {health: 2, happiness: 2}, sets_flags: [sporty], merit: [{cat: neutral}]}
           - {weight: 1, text: "ล้มเข่าพลิกกลางสนาม ต้องเข้าเฝือกครึ่งปี", effects: {health: -3, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ให้เล่นแค่สนุก ๆ ตอนเย็น"
@@ -104,12 +105,13 @@ events:
         sets_flags: [bullied]
         merit: [{cat: neutral}]
       - text: "ย้ายโรงเรียนกลางเทอม"
+        requires: {money: {unit: income_x, amount: 0.4}, reason: "เงินไม่พอค่าย้ายโรงเรียน"}
         effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: -0.4}}
         sets_flags: [bullied]
         merit: [{cat: neutral}]
       - text: "บุกไปต่อว่าถึงบ้านเด็กคนนั้น"
         outcomes:
-          - {weight: 1, text: "พ่อแม่อีกฝ่ายยกมือไหว้ขอโทษ ลูกเขาไม่กล้าแตะอีกเลย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {karma: 1.4}, text: "พ่อแม่อีกฝ่ายยกมือไหว้ขอโทษ ลูกเขาไม่กล้าแตะอีกเลย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ทะเลาะกันข้ามรั้ว พรุ่งนี้ลูกโดนแกล้งหนักกว่าเดิม", effects: {happiness: -2, relations: -2, health: -1}, merit: [{cat: neutral}]}
         sets_flags: [bullied]
         merit: [{cat: neutral}]
@@ -135,7 +137,7 @@ events:
         merit: [{cat: care_parents, level: 1}]
       - text: "พายายย้ายไปด้วยกัน"
         outcomes:
-          - {weight: 2, text: "ยายปลูกผักหน้าบ้านใหม่ เพื่อนบ้านแวะมาขอทุกเช้า", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, multipliers: {stats: {relations: 1.5}}, text: "ยายปลูกผักหน้าบ้านใหม่ เพื่อนบ้านแวะมาขอทุกเช้า", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ยายไม่ชินอากาศ ล้มป่วยหนักหน้าหนาวแรก", effects: {happiness: -2, money: {unit: income_x, amount: -0.6}}, merit: [{cat: neutral}]}
         merit: [{cat: care_parents, level: 2}]
 
@@ -154,7 +156,7 @@ events:
         merit: [{cat: neutral}]
       - text: "ไปหานักจิตบำบัดครอบครัว"
         outcomes:
-          - {weight: 2, text: "พ่อแม่หัดคุยกันดี ๆ บ้านกลับมาหัวเราะได้", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, multipliers: {stats: {relations: 2}}, text: "พ่อแม่หัดคุยกันดี ๆ บ้านกลับมาหัวเราะได้", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ไปได้สองครั้งก็ทะเลาะกันในห้องบำบัด", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ทนอยู่เพื่อลูก"

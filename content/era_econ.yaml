@@ -94,13 +94,14 @@ events:
         effects: {happiness: -1, income_mult: 0.85}
         merit: [{cat: neutral}]
       - text: "ไปเสี่ยงโชคทำงานต่างประเทศ"
+        requires: {money: {unit: income_x, amount: 0.5}, reason: "ไม่มีเงินสำรองพอไปตั้งตัวต่างแดน"}
         outcomes:
           - {weight: 2, text: "ได้งานก่อสร้างในทะเลทราย ส่งเงินกลับบ้านทุกเดือน แต่หลังพังตั้งแต่ปีแรก", effects: {health: -2, income_mult: 1.5}, merit: [{cat: neutral}]}
           - {weight: 1, text: "นายหน้าหอบเงินค่าหัวหายไป ต้องกู้มาจ่ายคืนญาติ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "รวมกลุ่มเพื่อนเปิดอู่ทอผ้า"
         outcomes:
-          - {weight: 1, text: "ผ้าทอมือได้ออเดอร์จากร้านในเมือง กลายเป็นเถ้าแก่ตัวเล็ก", effects: {relations: 1, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {relations: 2}}, text: "ผ้าทอมือได้ออเดอร์จากร้านในเมือง กลายเป็นเถ้าแก่ตัวเล็ก", effects: {relations: 1, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 1, text: "ทอเสร็จแต่ไม่มีคนซื้อ ผ้ากองเต็มบ้านจนใช้เป็นผ้าห่ม", effects: {happiness: -1, health: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "กลับบ้านไปทำนากับพ่อแม่"
@@ -149,6 +150,7 @@ events:
           - {weight: 1, text: "ทั้งตลาดก็ขายของมือสองเหมือนกัน กลับบ้านพร้อมของเต็มรถ", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ช้อนซื้อกิจการเจ๊งราคาถูก"
+        requires: {money: {unit: income_x, amount: 1}, reason: "ไม่มีเงินก้อนพอช้อนซื้อ"}
         outcomes:
           - {weight: 1, text: "ฟื้นร้านที่เจ้าของทิ้งได้สำเร็จ สิบปีต่อมาคุณมีร้านสามสาขา", effects: {happiness: 2, income_mult: 1.6, money: {unit: income_x, amount: -1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 2, text: "ราคายังดิ่งไม่หยุด กิจการที่ซื้อมาลากคุณจมไปด้วย", effects: {health: -1, happiness: -2, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
@@ -198,7 +200,7 @@ events:
     choices:
       - text: "รับเงินชดเชย เปิดร้านกาแฟ"
         outcomes:
-          - {weight: 1, text: "ร้านเล็กหน้าออฟฟิศเก่ากลายเป็นที่นั่งประจำของอดีตเพื่อนร่วมงาน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {relations: 2}}, text: "ร้านเล็กหน้าออฟฟิศเก่ากลายเป็นที่นั่งประจำของอดีตเพื่อนร่วมงาน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 1, text: "ร้านกาแฟเปิดใหม่อีกสามร้านในซอยเดียวกัน คุณเจ๊งเป็นร้านแรก", effects: {happiness: -2, money: {unit: income_x, amount: -1.5}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "กัดฟันอยู่ต่อ ทำงานแทนสามคน"
@@ -209,6 +211,7 @@ events:
         sets_flags: [street_vendor]
         merit: [{cat: neutral}]
       - text: "ลาออก ไปเรียนต่อเปลี่ยนสาย"
+        requires: {stats: {knowledge: {min: 60}}, reason: "พื้นความรู้ยังไม่พอสอบเข้า"}
         effects: {knowledge: 2, money: {unit: income_x, amount: -1}}
         outcomes:
           - {weight: 1, text: "เรียนจบพอดีตลาดฟื้น ได้งานสายใหม่เงินดีกว่าเดิม", effects: {happiness: 1, income_mult: 1.3}, merit: [{cat: neutral}]}

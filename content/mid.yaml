@@ -21,7 +21,7 @@ events:
         # outcome ใส่ clears_flags ไม่ได้ (shape.mjs) — ล้างที่ตัวเลือกก่อน แล้วผลร้ายตั้งกลับ (applyChoice ของ outcome รันทีหลัง)
         clears_flags: [in_debt]
         outcomes:
-          - {weight: 1, text: "หมุนทันจริง ๆ งานใหญ่เข้าพอดี ปิดหนี้ได้หมดแบบไม่มีใครเชื่อ", effects: {happiness: 3, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หมุนทันจริง ๆ งานใหญ่เข้าพอดี ปิดหนี้ได้หมดแบบไม่มีใครเชื่อ", effects: {happiness: 3, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}], multipliers: {karma: 1.4}}
           - {weight: 3, text: "ดอกร้อยละยี่สิบต่อเดือน คนแปลกหน้ามายืนหน้าบ้านทุกเย็น", effects: {health: -2, happiness: -2, chronic: {happiness: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: debt_clinic
@@ -37,7 +37,7 @@ events:
       - id: kids_help
         text: "ยอมเล่าให้คนในบ้านฟังทั้งหมด"
         outcomes:
-          - {weight: 2, text: "ทั้งบ้านช่วยกันลงขันคนละนิด คืนนั้นนอนหลับได้เป็นครั้งแรกในรอบหลายเดือน", effects: {relations: 2, happiness: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทั้งบ้านช่วยกันลงขันคนละนิด คืนนั้นนอนหลับได้เป็นครั้งแรกในรอบหลายเดือน", effects: {relations: 2, happiness: 1, health: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "เล่าจบบ้านแตก ทะเลาะกันหนักว่าปิดบังมาได้ยังไงตั้งนาน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: sila, level: 1}]
 
@@ -65,6 +65,7 @@ events:
         merit: [{cat: neutral}]
       - id: fight_court
         text: "สู้คดีให้ลดยอด"
+        requires: {stats: {knowledge: {min: 70}}, reason: "ยังไม่รู้กฎหมายพอจะสู้คดี"}
         effects: {knowledge: 2, health: -1, money: {unit: income_x, amount: -0.5}}
         clears_flags: [guarantor]
         merit: [{cat: neutral}]
@@ -130,12 +131,13 @@ events:
         merit: [{cat: care_parents, level: 3}]
       - id: nursing_home
         text: "จ้างศูนย์ดูแลผู้สูงอายุ"
+        requires: {money: {unit: income_x, amount: 1}, reason: "เงินไม่พอจ้างศูนย์ดูแล"}
         effects: {money: {unit: income_x, amount: -1}, health: 1, happiness: -1}
         merit: [{cat: care_parents, level: 1}]
       - id: share_siblings
         text: "เรียกญาติประชุมแบ่งเวร"
         outcomes:
-          - {weight: 2, text: "แบ่งเวรได้ลงตัว ญาติที่ไม่คุยกันสิบปีกลับมานั่งกินข้าวด้วยกัน", effects: {relations: 3, happiness: 1}, merit: [{cat: care_parents, level: 2}]}
+          - {weight: 2, text: "แบ่งเวรได้ลงตัว ญาติที่ไม่คุยกันสิบปีกลับมานั่งกินข้าวด้วยกัน", effects: {relations: 3, happiness: 1}, merit: [{cat: care_parents, level: 2}], multipliers: {stats: {relations: 2}}}
           - {weight: 2, text: "ประชุมจบที่ทะเลาะเรื่องมรดก สุดท้ายงานทั้งหมดตกที่เราคนเดียว", effects: {relations: -2, health: -1}, merit: [{cat: care_parents, level: 1}]}
         merit: [{cat: care_parents, level: 1}]
       - id: move_in
@@ -160,8 +162,9 @@ events:
     choices:
       - id: big_bike
         text: "ถอยบิ๊กไบค์ออกทริปทั่วไทย"
+        requires: {money: {unit: income_x, amount: 1}, reason: "เงินไม่พอถอยบิ๊กไบค์"}
         outcomes:
-          - {weight: 3, text: "ได้เพื่อนแก๊งใหม่ ขี่ไปถึงปลายด้ามขวาน หัวใจกลับมาเต้นแรงอีกครั้ง", effects: {happiness: 3, health: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ได้เพื่อนแก๊งใหม่ ขี่ไปถึงปลายด้ามขวาน หัวใจกลับมาเต้นแรงอีกครั้ง", effects: {happiness: 3, health: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "ล้มในโค้งแรกของทริปแรก ขาเข้าเฝือกสามเดือน รถยังผ่อนไม่หมด", effects: {health: -3, happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: quit_dream

@@ -15,7 +15,7 @@ events:
       - id: take_scholarship
         text: "รับทุน ไปเรียนต่อ"
         outcomes:
-          - {weight: 3, text: "เรียนจบกลับมา ได้ตำแหน่งที่คนอื่นต้องรอสิบปี", effects: {knowledge: 3, income_mult: 1.4}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "เรียนจบกลับมา ได้ตำแหน่งที่คนอื่นต้องรอสิบปี", multipliers: {stats: {knowledge: 2}}, effects: {knowledge: 3, income_mult: 1.4}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เรียนหนักจนร่างพัง จบช้ากว่าเพื่อนหนึ่งปี", effects: {knowledge: 2, health: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: take_job
@@ -45,13 +45,13 @@ events:
       - id: endure
         text: "ทนเงียบ เก็บแต้มไปก่อน"
         outcomes:
-          - {weight: 2, text: "ผู้บริหารรู้เองว่าใครทำ เรียกไปคุยตัวต่อตัว", effects: {money: {unit: income_x, amount: 1}, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ผู้บริหารรู้เองว่าใครทำ เรียกไปคุยตัวต่อตัว", multipliers: {karma: 1.4}, effects: {money: {unit: income_x, amount: 1}, income_mult: 1.2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ทนจนหมดไฟ ตื่นเช้ามาไม่อยากลุกจากเตียง", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: speak_up
         text: "ยกมือแย้งกลางห้องประชุม"
         outcomes:
-          - {weight: 1, text: "ผู้บริหารชอบความกล้า ข้ามหัวหน้าขึ้นไปเลย", effects: {happiness: 2, income_mult: 1.4}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้บริหารชอบความกล้า ข้ามหัวหน้าขึ้นไปเลย", multipliers: {stats: {knowledge: 2}}, effects: {happiness: 2, income_mult: 1.4}, merit: [{cat: neutral}]}
           - {weight: 2, text: "โดนเขม่นทั้งแผนก สุดท้ายต้องเขียนใบลาออก", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: quit
@@ -75,6 +75,7 @@ events:
     choices:
       - id: big_wedding
         text: "ตกลง จัดงานใหญ่ให้สมหน้า"
+        requires: {money: {unit: income_x, amount: 2}, reason: "เงินเก็บยังไม่พอจัดงานใหญ่"}
         effects: {relations: 2, happiness: 2, money: {unit: income_x, amount: -2}}
         sets_flags: [married]
         merit: [{cat: neutral}]
@@ -93,7 +94,7 @@ events:
       - id: wait
         text: "ขอเวลาคิดก่อนนะ"
         outcomes:
-          - {weight: 1, text: "เขายิ้มแล้วบอกว่ารอได้ ความรักแน่นกว่าเดิม", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขายิ้มแล้วบอกว่ารอได้ ความรักแน่นกว่าเดิม", multipliers: {stats: {relations: 2}}, effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "เขาเก็บแหวนแล้วเดินออกจากร้านไปเลย", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse
@@ -139,6 +140,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 2
+    repeat: {gap: 5, max: 2}
     when: {age: [20, 30], flags: {not: [in_debt]}}
     title: "ไม่ต้องดาวน์สักบาท"
     text: "เซลส์บอกออกรถคันแรกได้ไม่ต้องดาวน์ ยังไม่ทันเซ็น เพื่อนสนิทก็ทักมาขอยืมเงินก้อนใหญ่ สาบานว่าเดือนหน้าคืนแน่นอน"
@@ -151,7 +153,7 @@ events:
       - id: lend_friend
         text: "ให้เพื่อนยืม"
         outcomes:
-          - {weight: 1, text: "เพื่อนคืนครบพร้อมกระเช้าผลไม้ ซึ้งจนพูดไม่ออก", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เพื่อนคืนครบพร้อมกระเช้าผลไม้ ซึ้งจนพูดไม่ออก", multipliers: {stats: {relations: 2}}, effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
           - {weight: 2, text: "เพื่อนบล็อกไลน์ ย้ายบ้านหายเงียบ", effects: {money: {unit: income_x, amount: -1}, happiness: -2, relations: -1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
       - id: loan_shark
@@ -179,7 +181,7 @@ events:
         text: "กู้มาเปิดร้านกาแฟตามฝัน"
         sets_flags: [own_business, in_debt]
         outcomes:
-          - {weight: 2, text: "คนต่อคิวยาวถึงหน้าร้าน กลายเป็นร้านดังของย่าน", effects: {happiness: 2, income_mult: 1.5}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "คนต่อคิวยาวถึงหน้าร้าน กลายเป็นร้านดังของย่าน", multipliers: {stats: {knowledge: 2}}, effects: {happiness: 2, income_mult: 1.5}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ขายได้วันละสิบแก้ว ค่าเช่ากินเงินเก็บหมด", effects: {happiness: -2, money: {unit: income_x, amount: -2}, income_mult: 0.8}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: chicken_rice
@@ -193,7 +195,7 @@ events:
         text: "ชวนเพื่อนลงขันกันคนละครึ่ง"
         sets_flags: [own_business]
         outcomes:
-          - {weight: 1, text: "ช่วยกันจนรุ่ง เปิดสาขาสองในปีเดียว", effects: {relations: 1, income_mult: 1.4}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช่วยกันจนรุ่ง เปิดสาขาสองในปีเดียว", multipliers: {stats: {relations: 2}}, effects: {relations: 1, income_mult: 1.4}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เช้าวันหนึ่งเพื่อนหอบเงินในลิ้นชักหายไปทั้งหมด", effects: {relations: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: pass
@@ -208,6 +210,7 @@ events:
     years: [2500, 2650]
     weight: 3
     multipliers: {flags: {bullied: 0.5, heavy_drinker: 2}}
+    repeat: {gap: 3, max: 2}
     when: {age: [19, 26]}
     title: "ปาร์ตี้คืนวันศุกร์"
     text: "เพื่อนร่วมรุ่นนัดปาร์ตี้ทุกคืนวันศุกร์ เหล้าไม่อั้น บุหรี่ส่งต่อกันทั้งวง ใครขอกลับก่อนโดนแซวว่าไม่เป็นเพื่อน"
@@ -224,6 +227,7 @@ events:
         merit: [{cat: neutral}]
       - id: designated_driver
         text: "จิบน้ำเปล่า ขับไปส่งเพื่อนที่เมา"
+        requires: {flags: {not: [heavy_drinker]}, reason: "คอเหล้าแบบนี้ไม่มีใครฝากกุญแจ"}
         outcomes:
           - {weight: 2, text: "เพื่อนทั้งวงยกให้เป็นที่พึ่งยามดึก", effects: {relations: 2, health: 1}, merit: [{cat: help_others, level: 1}]}
           - {weight: 1, text: "คืนหนึ่งดึงกุญแจจากมือเพื่อนที่เมา ตั้งแต่นั้นเขานับเป็นเพื่อนตาย", effects: {relations: 3, happiness: 1}, merit: [{cat: help_others, level: 2}]}
@@ -262,6 +266,7 @@ events:
         merit: [{cat: greed_harm, level: 1}]
       - id: fundraise
         text: "ใช้ยอดวิวระดมทุนช่วยโรงเรียน"
+        requires: {stats: {relations: {min: 50}}, reason: "คนยังไม่เชื่อใจพอจะร่วมบริจาค"}
         effects: {relations: 2, happiness: 1}
         merit: [{cat: help_others, level: 2}]
       - id: delete
@@ -288,6 +293,7 @@ events:
         merit: [{cat: neutral}]
       - id: legal_route
         text: "เรียนภาษา สอบไปแบบถูกกฎหมาย"
+        requires: {stats: {knowledge: {min: 60}}, reason: "ภาษายังไม่ถึงขั้นสอบผ่าน"}
         effects: {knowledge: 2, happiness: -1, income_mult: 1.3}
         merit: [{cat: neutral}]
       - id: overstay

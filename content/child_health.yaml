@@ -6,6 +6,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 3
+    repeat: {gap: 3, max: 2}
     when: {age: [3, 12]}
     title: "ไข้สูงสามวันไม่ลด"
     text: "อายุ {อายุ} ขวบ ตัวร้อนจี๋ ปวดหัว มีจุดแดงขึ้นแขน ยุงลายในโอ่งหลังบ้านบินว่อน ที่บ้านต้องตัดสินใจคืนนี้"
@@ -16,6 +17,7 @@ events:
         merit: [{cat: neutral}]
       - id: private_hospital
         text: "รีบไป รพ.เอกชน ไม่สนราคา"
+        requires: {money: {unit: income_x, amount: 0.8}}
         effects: {health: 2, money: {unit: income_x, amount: -0.8}}
         merit: [{cat: neutral}]
       - id: herbal_home
@@ -33,7 +35,7 @@ events:
       - id: kill_larvae
         text: "ไป รพ. แล้วชวนทั้งซอยคว่ำโอ่ง"
         outcomes:
-          - {weight: 2, text: "เดินเคาะประตูทั้งซอยจนขาลาก แต่ปีนั้นไม่มีใครในซอยป่วยอีกเลย", effects: {health: 1, relations: 2, happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 2, text: "เดินเคาะประตูทั้งซอยจนขาลาก แต่ปีนั้นไม่มีใครในซอยป่วยอีกเลย", effects: {health: 1, relations: 2, happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: help_others, level: 1}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "เพื่อนบ้านหาว่ายุ่งไม่เข้าเรื่อง โอ่งไม่มีใครคว่ำ แถมโดนนินทาไปทั้งซอย", effects: {health: 1, relations: -1, happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
 
@@ -104,8 +106,9 @@ events:
         merit: [{cat: neutral}]
       - id: gymnastics
         text: "ปีนเก่งขนาดนี้ ส่งไปยิมนาสติก"
+        requires: {stats: {health: {min: 60}}, reason: "ร่างกายยังไม่แข็งแรงพอ"}
         outcomes:
-          - {weight: 1, text: "ครูพละตาลุก ได้ติดทีมโรงเรียน ถ้วยรางวัลเต็มตู้", effects: {health: 1, happiness: 2}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูพละตาลุก ได้ติดทีมโรงเรียน ถ้วยรางวัลเต็มตู้", effects: {health: 1, happiness: 2}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "ซ้อมวันแรกล้มทับแขนข้างเดิม หักซ้ำจุดเดิม", effects: {health: -2, happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -136,7 +139,7 @@ events:
       - id: rally_parents
         text: "ชวนผู้ปกครองทั้งห้องไปฉีดด้วยกัน"
         outcomes:
-          - {weight: 2, text: "โทรตามทีละบ้านจนเหนื่อย แต่ห้องนี้ไม่มีใครติดหัดอีกเลย", effects: {health: 1, relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 2, text: "โทรตามทีละบ้านจนเหนื่อย แต่ห้องนี้ไม่มีใครติดหัดอีกเลย", effects: {health: 1, relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "โดนผู้ปกครองสายต้านวัคซีนด่ากลางกลุ่มแชต ลูกโดนเพื่อนเมินไปพักใหญ่", effects: {health: 1, relations: -2, happiness: -1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
 
@@ -156,6 +159,7 @@ events:
         merit: [{cat: neutral}]
       - id: private_dentist
         text: "ทำฟันคลินิกแพง ๆ พร้อมจัดฟัน"
+        requires: {money: {unit: income_x, amount: 0.6}}
         effects: {health: 1, happiness: 1, relations: 1, money: {unit: income_x, amount: -0.6}}
         merit: [{cat: neutral}]
       - id: wait_adult_teeth
@@ -167,7 +171,7 @@ events:
       - id: sell_candy
         text: "ให้เอาลูกอมไปขายที่โรงเรียน"
         outcomes:
-          - {weight: 2, text: "ขายดีจนเสียดายกำไร ไม่กล้ากินเองอีกเลย", effects: {knowledge: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ขายดีจนเสียดายกำไร ไม่กล้ากินเองอีกเลย", effects: {knowledge: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}], multipliers: {stats: {knowledge: 2}}}
           - {weight: 1, text: "ขายไม่ออก เลยกินเองหมดถุง ฟันผุเพิ่มอีกสองซี่", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: brush_nightly
@@ -191,6 +195,7 @@ events:
         merit: [{cat: neutral}]
       - id: move_house
         text: "ขายบ้านย้ายไปอยู่ที่อากาศดี"
+        requires: {money: {unit: income_x, amount: 1}}
         effects: {health: 2, relations: -2, money: {unit: income_x, amount: -1}}
         merit: [{cat: neutral}]
       - id: swim_lungs
@@ -235,7 +240,7 @@ events:
       - id: swim_team
         text: "ส่งเข้าชมรมว่ายน้ำฝึกปอด"
         outcomes:
-          - {weight: 1, text: "ปีเดียวปอดแข็งแรงกว่าเด็กทั้งห้อง ครูดึงเข้าทีมโรงเรียน", effects: {health: 1, chronic: {health: 1}}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปีเดียวปอดแข็งแรงกว่าเด็กทั้งห้อง ครูดึงเข้าทีมโรงเรียน", effects: {health: 1, chronic: {health: 1}}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {flags: {sporty: 2}}}
           - {weight: 1, text: "หอบกลางสระจนครูต้องกระโดดลงไปช่วย ต้องเลิกว่ายไปเลย", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: herbal_again

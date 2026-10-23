@@ -14,7 +14,7 @@ events:
         text: "เอาเงินชดเชยเปิดร้านเอง"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, text: "ร้านติดตลาด ลูกค้าแน่นทุกเย็น ได้เป็นนายตัวเองสักที", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ร้านติดตลาด ลูกค้าแน่นทุกเย็น ได้เป็นนายตัวเองสักที", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}], multipliers: {stats: {relations: 1.5}}}
           - {weight: 3, text: "ร้านเงียบเหงา เงินชดเชยหมดภายในปีเดียว ต้องกู้มาจ่ายค่าเช่า", effects: {happiness: -2, money: {unit: income_x, amount: -1.5}}, sets_flags: [own_business, in_debt], merit: [{cat: neutral}]}
       - id: beg_to_stay
         text: "ขอทำต่อ ยอมลดเงินเดือน"
@@ -51,9 +51,10 @@ events:
         merit: [{cat: neutral}]
       - id: negotiate_remote
         text: "ต่อรองขอทำงานทางไกล"
+        requires: {stats: {knowledge: {min: 80}}, reason: "ผลงานยังไม่พอจะต่อรอง"}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, text: "ผู้บริหารยอม ได้ทั้งตำแหน่งและอยู่บ้านเดิม", effects: {happiness: 2, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้บริหารยอม ได้ทั้งตำแหน่งและอยู่บ้านเดิม", effects: {happiness: 2, income_mult: 1.3}, merit: [{cat: neutral}], multipliers: {stats: {relations: 1.5}}}
           - {weight: 2, text: "ตำแหน่งตกเป็นของรุ่นน้องที่ไม่ต่อรองสักคำ", effects: {happiness: -2}, merit: [{cat: neutral}]}
       - id: recommend_junior
         text: "เสนอชื่อลูกน้องที่เก่งกว่า"
@@ -67,6 +68,7 @@ events:
     years: [2540, 2650]
     weight: 2
     multipliers: {flags: {online_seller: 1.5}}
+    repeat: {gap: 5, max: 3}
     title: "สายจากเจ้าหน้าที่"
     text: "ปลายสายอ้างเป็นตำรวจ บอกว่าชื่อของคุณพัวพันคดีฟอกเงิน ต้องโอนเงินเก็บก้อนใหญ่มาให้ตรวจสอบภายในหนึ่งชั่วโมง ไม่งั้นออกหมายจับ"
     choices:
@@ -80,6 +82,7 @@ events:
         merit: [{cat: neutral}]
       - id: troll_scammer
         text: "แกล้งคุยยื้อ อัดเสียงไว้"
+        requires: {stats: {happiness: {min: 50}}, reason: "อารมณ์ไม่ดีพอจะเล่นกับมัน"}
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, text: "คลิปแกล้งแก๊งคอลเซ็นเตอร์ดังทั้งประเทศ คนทักมาขอบคุณไม่หยุด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
@@ -104,7 +107,7 @@ events:
         sets_flags: [guarantor]
         merit: [{cat: help_others, level: 1}]
         outcomes:
-          - {weight: 2, text: "เพื่อนผ่อนครบจริง ซึ้งใจจนขอให้เป็นพ่อแม่ทูนหัวของลูก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เพื่อนผ่อนครบจริง ซึ้งใจจนขอให้เป็นพ่อแม่ทูนหัวของลูก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.4}}
           - {weight: 3, text: "สามเดือนต่อมาเพื่อนหายเงียบ จดหมายทวงหนี้ส่งมาที่บ้านคุณแทน", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
       - id: refuse_flat
         text: "ปฏิเสธตรง ๆ ไม่ค้ำใคร"
@@ -135,6 +138,7 @@ events:
     choices:
       - id: house_loan_insured
         text: "กู้ซื้อบ้านเดี่ยว พ่วงประกัน"
+        requires: {money: {unit: income_x, amount: 8}, reason: "ยังไม่มีเงินดาวน์"}
         effects: {happiness: 2, health: -1, money: {unit: income_x, amount: -1.5}}
         sets_flags: [has_kids, in_debt, has_insurance, home_owner]
         merit: [{cat: neutral}]
@@ -149,7 +153,7 @@ events:
         sets_flags: [has_kids]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, text: "ปู่ย่าตายายช่วยเลี้ยงหลาน เงินเหลือเก็บทุกเดือน", effects: {relations: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ปู่ย่าตายายช่วยเลี้ยงหลาน เงินเหลือเก็บทุกเดือน", effects: {relations: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "แม่กับคู่ชีวิตเปิดศึกกันทุกมื้อ บ้านไม่เคยสงบ", effects: {relations: -2, happiness: -2}, merit: [{cat: neutral}]}
       - id: auction_house
         text: "ประมูลบ้านมือสองครึ่งราคา"
@@ -240,7 +244,7 @@ events:
         text: "ลาออก ทำคอนเทนต์เต็มเวลา"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, text: "ผู้ติดตามพุ่ง แบรนด์ต่อคิวจ้างจนต้องปฏิเสธ", effects: {happiness: 2, health: -1, income_mult: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ผู้ติดตามพุ่ง แบรนด์ต่อคิวจ้างจนต้องปฏิเสธ", effects: {happiness: 2, health: -1, income_mult: 2}, merit: [{cat: neutral}], multipliers: {stats: {relations: 1.5}}}
           - {weight: 3, text: "กระแสหมดในสามเดือน จะกลับไปงานเดิมก็ไม่มีที่ว่างแล้ว", effects: {happiness: -2, income_mult: 0.7}, merit: [{cat: neutral}]}
       - id: side_hustle
         text: "ทำคู่กับงานประจำ นอนน้อยหน่อย"
@@ -270,6 +274,7 @@ events:
     choices:
       - id: big_stock
         text: "ทุ่มเงินเก็บซื้อสต็อกล็อตใหญ่"
+        requires: {money: {unit: income_x, amount: 8}, reason: "เงินเก็บไม่พอซื้อสต็อก"}
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, text: "ไลฟ์คืนแรกขายหมดเกลี้ยง กลายเป็นแม่ทีมในปีเดียว", effects: {happiness: 2, income_mult: 1.6}, sets_flags: [online_seller], merit: [{cat: neutral}]}

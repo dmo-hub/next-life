@@ -6,6 +6,7 @@ events:
     stage: ชรา
     years: [2500, 2650]
     weight: 2
+    repeat: {gap: 6, max: 2}
     multipliers: {flags: {smoker: 2, heavy_drinker: 1.5, sporty: 0.5}}
     title: "เช้าที่แขนขวาไม่ฟัง"
     text: "อายุ {อายุ} ตื่นมาแปรงฟันแล้วแปรงหลุดมือ ปากเบี้ยว พูดไม่ชัด หลานตะโกนว่า \"หน้าเบี้ยวแล้ว!\" นาฬิกาเดินไปทีละนาที"
@@ -13,7 +14,7 @@ events:
       - id: call_ambulance
         text: "เรียกรถพยาบาลเดี๋ยวนี้"
         outcomes:
-          - {weight: 3, text: "ถึงทันชั่วโมงทอง หมอฉีดยาสลายลิ่มเลือด เดินออกจากโรงพยาบาลเองได้", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ถึงทันชั่วโมงทอง หมอฉีดยาสลายลิ่มเลือด เดินออกจากโรงพยาบาลเองได้", multipliers: {stats: {health: 2}}, effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "รถติดหนัก ไปถึงช้า ขาขวาลากไปอีกนาน", effects: {health: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: sleep_it_off
@@ -31,7 +32,7 @@ events:
       - id: grandkid_drive
         text: "ให้หลานขับมอเตอร์ไซค์พาไป"
         outcomes:
-          - {weight: 2, text: "หลานซิ่งทะลุไฟแดงสามแยก ถึงก่อนรถพยาบาลเสียอีก", effects: {health: 1, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หลานซิ่งทะลุไฟแดงสามแยก ถึงก่อนรถพยาบาลเสียอีก", multipliers: {stats: {relations: 2}}, effects: {health: 1, relations: 2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ล้มกลางทาง เจ็บซ้ำสองต่อ", effects: {health: -2, relations: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -49,7 +50,7 @@ events:
       - id: get_checked
         text: "ยอมไปตรวจสมองให้รู้เรื่อง"
         outcomes:
-          - {weight: 1, text: "หักมุม! แค่ขาดวิตามินบีสิบสอง กินยาเดือนเดียวความจำกลับมาแจ๋ว", effects: {health: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หักมุม! แค่ขาดวิตามินบีสิบสอง กินยาเดือนเดียวความจำกลับมาแจ๋ว", multipliers: {karma: 1.4}, effects: {health: 2, happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "อัลไซเมอร์ระยะแรก หมอให้ยาชะลอ ได้เวลาเตรียมใจกันทั้งบ้าน", effects: {health: -1, relations: 1, chronic: {knowledge: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: deny_it
@@ -59,7 +60,7 @@ events:
       - id: brain_games
         text: "เล่นหมากรุกกับป้าข้างบ้านทุกเย็น"
         outcomes:
-          - {weight: 2, text: "เดินหมากทุกเย็นจนความจำกลับมาคมขึ้น ชนะป้าติดกันสิบตา", effects: {knowledge: 1, relations: 1, health: 1, chronic: {knowledge: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เดินหมากทุกเย็นจนความจำกลับมาคมขึ้น ชนะป้าติดกันสิบตา", multipliers: {stats: {knowledge: 2}}, effects: {knowledge: 1, relations: 1, health: 1, chronic: {knowledge: 1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ลืมกติกากลางกระดาน เถียงกับป้าจนคว่ำกระดาน ไม่มองหน้ากันเป็นเดือน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: memory_book
@@ -82,7 +83,7 @@ events:
       - id: hip_replace
         text: "ผ่าตัดเปลี่ยนข้อสะโพกเทียม"
         outcomes:
-          - {weight: 3, text: "ข้อใหม่ดีกว่าข้อเก่า สามเดือนต่อมาเดินตลาดได้เอง", effects: {health: 1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ข้อใหม่ดีกว่าข้อเก่า สามเดือนต่อมาเดินตลาดได้เอง", multipliers: {stats: {health: 2}}, effects: {health: 1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "แผลติดเชื้อ ต้องนอนโรงพยาบาลอีกเป็นเดือน", effects: {health: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: bed_rest
@@ -97,6 +98,7 @@ events:
         merit: [{cat: neutral}]
       - id: rebuild_home
         text: "ผ่าตัดแล้วรื้อบ้านติดราวจับ"
+        requires: {money: {unit: income_x, amount: 2}, reason: "เงินเก็บไม่พอรื้อบ้าน"}
         outcomes:
           - {weight: 3, text: "ข้อใหม่บวกราวจับทั้งบ้าน ไม่ล้มอีกเลย ลูกหลานแวะมาช่วยต่อเติมทุกเสาร์", effects: {health: 2, relations: 1, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "แผลติดเชื้อ ราวจับติดเสร็จแต่ยังลุกไม่ไหว เงินหมดไปสองก้อน", effects: {health: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
@@ -114,14 +116,15 @@ events:
     choices:
       - id: full_chemo
         text: "สู้เต็มคอร์ส เคมีบำบัดทุกเข็ม"
+        requires: {money: {unit: income_x, amount: 1}, reason: "เงินไม่พอค่ายาครบคอร์ส"}
         outcomes:
-          - {weight: 2, text: "ผมร่วงหมดหัว แต่ผลสแกนรอบสุดท้ายไม่เจอก้อนแล้ว", effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ผมร่วงหมดหัว แต่ผลสแกนรอบสุดท้ายไม่เจอก้อนแล้ว", multipliers: {stats: {health: 2}}, effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ร่างกายรับยาไม่ไหว ก้อนหดแต่คนก็หดตาม", effects: {health: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: trial_drug
         text: "สมัครเป็นอาสาทดลองยาใหม่"
         outcomes:
-          - {weight: 1, text: "ยาใหม่ได้ผลเกินคาด ชื่ออยู่ในงานวิจัยที่คนทั่วโลกอ้างถึง", effects: {health: 3, knowledge: 1}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 1, text: "ยาใหม่ได้ผลเกินคาด ชื่ออยู่ในงานวิจัยที่คนทั่วโลกอ้างถึง", multipliers: {karma: 1.5}, effects: {health: 3, knowledge: 1}, merit: [{cat: help_others, level: 2}]}
           - {weight: 2, text: "ยาไม่ได้ผลกับตัวเอง แต่ข้อมูลช่วยคนไข้รุ่นหลัง", effects: {health: -2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
       - id: herbal_only
@@ -158,7 +161,7 @@ events:
       - id: child_kidney
         text: "ลูกคนเล็กขอบริจาคไตให้"
         outcomes:
-          - {weight: 2, text: "ไตลูกเข้ากันได้ ผ่าตัดเสร็จ สองคนนอนเตียงติดกันหัวเราะทั้งคืน", effects: {health: 3, relations: 3, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไตลูกเข้ากันได้ ผ่าตัดเสร็จ สองคนนอนเตียงติดกันหัวเราะทั้งคืน", multipliers: {karma: 1.4}, effects: {health: 3, relations: 3, chronic: {health: 1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ผลเลือดไม่เข้ากัน แต่น้ำตาวันนั้นทำให้บ้านคืนดีกันหมด", effects: {health: -1, relations: 2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse
@@ -223,7 +226,7 @@ events:
       - id: lung_rehab
         text: "เข้าคอร์สฝึกหายใจกับเป่าขลุ่ย"
         outcomes:
-          - {weight: 2, text: "ปอดดีขึ้นจนหมองง ได้เป่าขลุ่ยในงานวัดด้วย", effects: {health: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ปอดดีขึ้นจนหมองง ได้เป่าขลุ่ยในงานวัดด้วย", multipliers: {stats: {health: 2}}, effects: {health: 2, happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เป่าได้สามเพลงก็หอบ แต่ได้เพื่อนใหม่ทั้งกลุ่ม", effects: {health: -1, relations: 2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -250,13 +253,13 @@ events:
       - id: transplant_list
         text: "ลงชื่อรอเปลี่ยนตับ"
         outcomes:
-          - {weight: 1, text: "ได้ตับจากผู้บริจาคที่ไม่รู้จักชื่อ ชีวิตเริ่มใหม่ตอนแก่", effects: {health: 3, happiness: 2, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้ตับจากผู้บริจาคที่ไม่รู้จักชื่อ ชีวิตเริ่มใหม่ตอนแก่", multipliers: {karma: 1.5}, effects: {health: 3, happiness: 2, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: neutral}]}
           - {weight: 3, text: "คิวยาวเกินอายุที่เหลือ ได้แต่รอ", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: tell_youngsters
         text: "ไปเล่าให้เด็กในหมู่บ้านฟัง"
         outcomes:
-          - {weight: 1, text: "หนุ่มขี้เมาคนหนึ่งฟังจบแล้วเทเหล้าทิ้งต่อหน้าทุกคน แม่เขามากราบขอบคุณถึงบ้าน", effects: {relations: 3, happiness: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "หนุ่มขี้เมาคนหนึ่งฟังจบแล้วเทเหล้าทิ้งต่อหน้าทุกคน แม่เขามากราบขอบคุณถึงบ้าน", multipliers: {stats: {relations: 2}}, effects: {relations: 3, happiness: 2}, merit: [{cat: help_others, level: 1}]}
           - {weight: 2, text: "เด็ก ๆ ฟังกันตาโต แต่หัวเราะท้องบวมมากกว่าเรื่องที่เล่า", effects: {relations: 1, happiness: 1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
 
@@ -303,8 +306,9 @@ events:
     choices:
       - id: run_race
         text: "ลงแข่ง ไล่ล่าเหรียญทอง"
+        requires: {stats: {health: {min: 60}}, reason: "ร่างกายยังไม่ฟิตพอลงแข่ง"}
         outcomes:
-          - {weight: 2, text: "เข้าเส้นชัยที่หนึ่งของรุ่น รูปขึ้นหน้าเพจจังหวัด", effects: {happiness: 3, health: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เข้าเส้นชัยที่หนึ่งของรุ่น รูปขึ้นหน้าเพจจังหวัด", multipliers: {stats: {health: 2}}, effects: {happiness: 3, health: 1, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "หัวใจเต้นผิดจังหวะกิโลที่ห้า หน่วยแพทย์ช่วยไว้ทัน", effects: {health: -3, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: coach_kids

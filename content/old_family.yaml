@@ -25,7 +25,7 @@ events:
       - id: teach_old_way
         text: "สอนหลานแบบคนรุ่นเก่า"
         outcomes:
-          - {weight: 1, text: "หลานโตมาเป็นคนเดียวในรุ่นที่ทำกับข้าวเป็น ไปไหนใครก็รัก", effects: {relations: 2, knowledge: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลานโตมาเป็นคนเดียวในรุ่นที่ทำกับข้าวเป็น ไปไหนใครก็รัก", effects: {relations: 2, knowledge: 1, health: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 2, text: "หลานเรียกว่า 'คุณครูโหด' แต่ก็ยอมฟัง", effects: {happiness: 1, health: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse_babysit
@@ -82,7 +82,7 @@ events:
       - id: give_all
         text: "ให้ไปทั้งก้อน"
         outcomes:
-          - {weight: 1, text: "ลูกตั้งตัวได้ ปีถัดมาส่งเงินกลับมาเลี้ยงทุกเดือน", effects: {relations: 3, happiness: 2, income_mult: 1.3, money: {unit: income_x, amount: -2}}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 1, text: "ลูกตั้งตัวได้ ปีถัดมาส่งเงินกลับมาเลี้ยงทุกเดือน", effects: {relations: 3, happiness: 2, income_mult: 1.3, money: {unit: income_x, amount: -2}}, merit: [{cat: help_others, level: 2}], multipliers: {karma: 1.3}}
           - {weight: 2, text: "เงินหายไปกับหนี้ก้อนเก่า ลูกยังโทรมาอีก", effects: {happiness: -2, health: -1, income_mult: 0.8, money: {unit: income_x, amount: -2}}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 2}]
       - id: give_half
@@ -92,7 +92,7 @@ events:
       - id: ask_why
         text: "นั่งคุยให้รู้เรื่องก่อน"
         outcomes:
-          - {weight: 2, text: "ลูกยอมเล่าตามจริง สองคนช่วยกันวางแผนใช้หนี้ทีละก้อน", effects: {relations: 2, knowledge: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ลูกยอมเล่าตามจริง สองคนช่วยกันวางแผนใช้หนี้ทีละก้อน", effects: {relations: 2, knowledge: 1, health: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "ลูกงอน วางสายแล้วหายเงียบ", effects: {relations: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse
@@ -107,6 +107,7 @@ events:
     years: [2550, 2650]
     weight: 3
     multipliers: {flags: {in_debt: 1.5, scam_aware: 0.3}}
+    repeat: {gap: 4, max: 3}
     title: "สายจากเจ้าหน้าที่"
     text: "เสียงปลายสายบอกว่าเป็นเจ้าหน้าที่ บัญชีของคุณพัวพันคดีฟอกเงิน ต้องโอนเงินมาตรวจสอบภายในวันนี้ ไม่งั้นโดนจับ"
     choices:
@@ -114,7 +115,7 @@ events:
         text: "รีบโอนตามที่บอก"
         outcomes:
           - {weight: 3, text: "เงินหายทั้งก้อน เบอร์นั้นปิดเครื่องทันที", effects: {happiness: -3, health: -1, money: {unit: income_x, amount: -3}, chronic: {happiness: -1}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ธนาคารโทรมาระงับทัน เพราะยอดโอนแปลก รอดหวุดหวิด", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}], sets_flags: [scam_aware]}
+          - {weight: 1, text: "ธนาคารโทรมาระงับทัน เพราะยอดโอนแปลก รอดหวุดหวิด", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}], sets_flags: [scam_aware], multipliers: {karma: 1.4}}
         merit: [{cat: neutral}]
       - id: hang_up
         text: "วางสายแล้วบล็อกเบอร์"
@@ -124,7 +125,7 @@ events:
       - id: call_grandkid
         text: "โทรถามหลานก่อน"
         outcomes:
-          - {weight: 2, text: "หลานบอกทันทีว่ามิจฉาชีพ แล้วสอนวิธีสังเกตให้อีกชุด", effects: {relations: 1, knowledge: 1}, merit: [{cat: neutral}], sets_flags: [scam_aware]}
+          - {weight: 2, text: "หลานบอกทันทีว่ามิจฉาชีพ แล้วสอนวิธีสังเกตให้อีกชุด", effects: {relations: 1, knowledge: 1}, merit: [{cat: neutral}], sets_flags: [scam_aware], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "หลานไม่รับสาย ระหว่างรอเกือบกดโอนไปแล้ว มือสั่นทั้งวัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: troll_back
@@ -150,8 +151,9 @@ events:
     choices:
       - id: go_abroad
         text: "ไปต่างประเทศกันเลย"
+        requires: {money: {unit: income_x, amount: 1.5}, reason: "เงินเก็บไม่พอค่าตั๋วต่างประเทศ"}
         outcomes:
-          - {weight: 2, text: "ทริปในฝัน ถ่ายรูปกลับมาอวดได้ทั้งปี", effects: {happiness: 3, relations: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทริปในฝัน ถ่ายรูปกลับมาอวดได้ทั้งปี", effects: {happiness: 3, relations: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "ล้มที่สนามบินขาแพลง เที่ยวบนรถเข็นทั้งทริป", effects: {health: -2, happiness: 1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: go_temple_trip
@@ -192,6 +194,7 @@ events:
         merit: [{cat: neutral}]
       - id: learn_language
         text: "เรียนภาษาที่สาม"
+        requires: {stats: {knowledge: {min: 70}}, reason: "พื้นความรู้ยังไม่พอเรียนภาษาใหม่"}
         effects: {knowledge: 2, happiness: 1, relations: -1}
         merit: [{cat: neutral}]
       - id: teach_instead
@@ -216,6 +219,7 @@ events:
     choices:
       - id: go_premium
         text: "เข้าบ้านพักเอกชนอย่างดี"
+        requires: {money: {unit: income_x, amount: 2.5}, reason: "เงินไม่พอค่าบ้านพักเอกชน"}
         effects: {health: 2, happiness: 1, money: {unit: income_x, amount: -2.5}}
         merit: [{cat: neutral}]
       - id: go_public
@@ -227,7 +231,7 @@ events:
       - id: stay_home
         text: "ยืนกรานอยู่บ้านตัวเอง"
         outcomes:
-          - {weight: 2, text: "ญาติกับเพื่อนบ้านผลัดกันแวะมาดู บ้านกลับมาคึกคัก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ญาติกับเพื่อนบ้านผลัดกันแวะมาดู บ้านกลับมาคึกคัก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
           - {weight: 1, text: "ลื่นล้มในห้องน้ำตอนอยู่คนเดียว นอนรอจนเช้ากว่าจะมีคนเห็น", effects: {health: -3, happiness: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: share_house
