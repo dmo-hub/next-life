@@ -47,13 +47,10 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .body .note { font-size:12px; }
 .spark { display:block; width:100%; height:auto; }
 .spark polyline { fill:none; stroke-width:2; stroke-linejoin:round; }
-.spark .real { stroke-width:1.5; stroke-dasharray:4 3; }
 .spark .grid { stroke-width:1; stroke-dasharray:2 3; }
 .spark .zero { stroke-width:1.2; }
 .spark text { font-size:10px; font-family:Sarabun,sans-serif; }
 .spark .ty { text-anchor:end; }
-.spark-key span::before { content:''; display:inline-block; width:14px; margin-right:4px; vertical-align:middle; border-top:2px solid; }
-.spark-key .k-real::before { border-top-style:dashed; border-top-width:1.5px; }
 .choices { padding:8px 20px 20px; display:flex; flex-direction:column; gap:10px; margin-top:auto; }
 .choice { all:unset; box-sizing:border-box; min-height:52px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; cursor:pointer; font-size:15px; }
 .choice .fx { font-size:12px; text-align:right; flex-shrink:0; max-width:50%; }
@@ -86,11 +83,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .a .body p, .a .items, .a .picks { color:var(--ink2); }
 .a .sub, .a .note { color:var(--muted); }
 .a .spark .nom { stroke:var(--green); } .a .spark .dot { fill:var(--green); }
-.a .spark .real { stroke:var(--muted); }
 .a .spark .grid { stroke:var(--rule2); } .a .spark .zero { stroke:var(--ink2); }
 .a .spark .neg { fill:var(--red); fill-opacity:0.08; }
 .a .spark text { fill:var(--muted); }
-.a .spark-key .k-nom::before { border-color:var(--green); } .a .spark-key .k-real::before { border-color:var(--muted); }
 .a .choice { border:1px solid var(--ink); background:#FFFDF7; }
 .a .choice:hover, .a .choice:focus-visible { background:var(--ink); color:var(--paper); outline:none; }
 .a .choice .fx { color:var(--green); } .a .choice:hover .fx, .a .choice:focus-visible .fx { color:#CFE3E0; }
@@ -1098,7 +1093,7 @@ function newLife(seed, content, heir = null) {
   // การ์ดเปิดชีวิตมาก่อนการ์ดมรดกตอนแรกเกิด — ต้องเล่ามรดกก่อน receiveLegacy ล้าง st.legacy
   st.due.push(introCard(st, heir));
   if (st.legacy?.age === 0) receiveLegacy(st, birthYear, stageOf(0));
-  st.trail.push({ year: birthYear, money: Math.round(st.money), real: Math.round(st.money / st.price) });
+  st.trail.push({ year: birthYear, money: Math.round(st.money) });
   st.stageMark = markStage(st);
   return st;
 }
@@ -1125,8 +1120,7 @@ function stageRecap(st, lastAge) {
     toAge: lastAge,
     picks: st.log.filter((x) => x.age >= m.age).map(({ age, text }) => ({ age, text })),
     stats: STAT_KEYS.map((k) => ({ key: k, label: STAT_LABELS[k], from: m[k], to: st[k] })),
-    // ค่าเงินปีเกิดคู่กัน — เงินต้น/ท้ายช่วงเป็นบาทคนละปี เทียบตรง ๆ ไม่ได้
-    money: { from: Math.round(m.money), to: Math.round(st.money), fromAtBirth: Math.round(m.money / m.price), toAtBirth: Math.round(st.money / st.price) },
+    money: { from: Math.round(m.money), to: Math.round(st.money) },
   };
 }
 
@@ -1367,8 +1361,7 @@ function stepYear(st) {
   st.debts = st.debts.filter((d) => !debtDone(d));
   const stage = stageOf(st.age);
   if (st.legacy && st.age >= st.legacy.age) receiveLegacy(st, year, stage);
-  // real = ค่าเงินปีเกิดจาก st.price ที่มีอยู่แล้ว (ไม่ดึงเลขสุ่ม) ให้กราฟวาดเส้นที่สอง
-  st.trail.push({ year, money: Math.round(st.money), real: Math.round(st.money / st.price) });
+  st.trail.push({ year, money: Math.round(st.money) });
 
   checkBankrupt(st, year, stage);
   const tone = omenTone(st.ledger);
@@ -2690,7 +2683,7 @@ function titlesOf(st) {
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.20';
+const APP_VERSION = 'v0.2.21';
 const APP_BUILD = '2026-10-24';
 
 const root = document.getElementById('app');
@@ -2752,9 +2745,7 @@ const svgEl = (tag, attrs, text) => {
 function sparkline(series, fromAge, toAge) {
   if (series.length < 2) return null;
   const nom = series.map((p) => p.money);
-  const real = series.every((p) => p.real != null) ? series.map((p) => p.real) : null;
-  const all = real ? nom.concat(real) : nom;
-  let lo = Math.min(0, ...all), hi = Math.max(0, ...all);
+  let lo = Math.min(0, ...nom), hi = Math.max(0, ...nom);
   if (hi === lo) hi = 1;
   const step = niceStep(hi - lo);
   lo = Math.floor(lo / step) * step;
@@ -2775,16 +2766,9 @@ function sparkline(series, fromAge, toAge) {
   const anchor = (a) => (a === fromAge ? 'start' : a === toAge ? 'end' : 'middle');
   for (const a of ages) svg.append(svgEl('text', { class: 'tx', x: ageX(a), y: H - 6, 'text-anchor': anchor(a) }, `อายุ ${a}`));
   const path = (vals, cls) => svgEl('polyline', { class: cls, points: vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ') });
-  if (real) svg.append(path(real, 'real'));
   svg.append(path(nom, 'nom'));
   for (const i of [0, series.length - 1]) svg.append(svgEl('circle', { class: 'dot', cx: x(i), cy: y(nom[i]), r: 3 }));
   return svg;
-}
-
-function sparkLegend() {
-  const p = el('p', 'note spark-key');
-  p.append(el('span', 'k-nom', 'เงินติดตัว'), ' · ', el('span', 'k-real', 'เทียบค่าเงินปีเกิด'));
-  return p;
 }
 
 function list(items, cls = 'items') {
@@ -2814,9 +2798,8 @@ function recap(r) {
   box.append(grid);
   const m = r.money;
   box.append(el('p', 'sub', `เงิน ${baht(m.from)} → ${baht(m.to)}`));
-  box.append(el('p', 'note', `เทียบค่าเงินปีเกิด ${baht(m.fromAtBirth)} → ${baht(m.toAtBirth)}`));
   const chart = sparkline(r.moneySeries, r.fromAge, r.toAge);
-  if (chart) box.append(chart, sparkLegend());
+  if (chart) box.append(chart);
   if (r.items.length) box.append(list(r.items));
   if (r.disclaimer) box.append(el('p', 'note', r.disclaimer));
   if (r.picks.length) {
@@ -3174,7 +3157,7 @@ function render(card) {
     body.append(el('h3', null, `${st.name} ตายอายุ ${card.age}`));
     body.append(el('p', null, `${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
     const net = card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
-    body.append(el('p', 'sub', `${net} ${baht(card.summary.money)} ≈ ${baht(card.summary.moneyAtBirth)} ค่าเงินปีเกิด`));
+    body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
     if (card.summary.debt) body.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
     if (card.summary.bankruptcies) body.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
     if (card.note) body.append(el('p', 'sub', card.note));

@@ -212,7 +212,7 @@ export function newLife(seed, content, heir = null) {
   // การ์ดเปิดชีวิตมาก่อนการ์ดมรดกตอนแรกเกิด — ต้องเล่ามรดกก่อน receiveLegacy ล้าง st.legacy
   st.due.push(introCard(st, heir));
   if (st.legacy?.age === 0) receiveLegacy(st, birthYear, stageOf(0));
-  st.trail.push({ year: birthYear, money: Math.round(st.money), real: Math.round(st.money / st.price) });
+  st.trail.push({ year: birthYear, money: Math.round(st.money) });
   st.stageMark = markStage(st);
   return st;
 }
@@ -239,8 +239,7 @@ function stageRecap(st, lastAge) {
     toAge: lastAge,
     picks: st.log.filter((x) => x.age >= m.age).map(({ age, text }) => ({ age, text })),
     stats: STAT_KEYS.map((k) => ({ key: k, label: STAT_LABELS[k], from: m[k], to: st[k] })),
-    // ค่าเงินปีเกิดคู่กัน — เงินต้น/ท้ายช่วงเป็นบาทคนละปี เทียบตรง ๆ ไม่ได้
-    money: { from: Math.round(m.money), to: Math.round(st.money), fromAtBirth: Math.round(m.money / m.price), toAtBirth: Math.round(st.money / st.price) },
+    money: { from: Math.round(m.money), to: Math.round(st.money) },
   };
 }
 
@@ -481,8 +480,7 @@ function stepYear(st) {
   st.debts = st.debts.filter((d) => !debtDone(d));
   const stage = stageOf(st.age);
   if (st.legacy && st.age >= st.legacy.age) receiveLegacy(st, year, stage);
-  // real = ค่าเงินปีเกิดจาก st.price ที่มีอยู่แล้ว (ไม่ดึงเลขสุ่ม) ให้กราฟวาดเส้นที่สอง
-  st.trail.push({ year, money: Math.round(st.money), real: Math.round(st.money / st.price) });
+  st.trail.push({ year, money: Math.round(st.money) });
 
   checkBankrupt(st, year, stage);
   const tone = omenTone(st.ledger);

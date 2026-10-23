@@ -1,7 +1,7 @@
 import { newLife, nextCard, choose, statsOf, regionLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.20';
+const APP_VERSION = 'v0.2.21';
 const APP_BUILD = '2026-10-24';
 
 const root = document.getElementById('app');
@@ -63,9 +63,7 @@ const svgEl = (tag, attrs, text) => {
 function sparkline(series, fromAge, toAge) {
   if (series.length < 2) return null;
   const nom = series.map((p) => p.money);
-  const real = series.every((p) => p.real != null) ? series.map((p) => p.real) : null;
-  const all = real ? nom.concat(real) : nom;
-  let lo = Math.min(0, ...all), hi = Math.max(0, ...all);
+  let lo = Math.min(0, ...nom), hi = Math.max(0, ...nom);
   if (hi === lo) hi = 1;
   const step = niceStep(hi - lo);
   lo = Math.floor(lo / step) * step;
@@ -86,16 +84,9 @@ function sparkline(series, fromAge, toAge) {
   const anchor = (a) => (a === fromAge ? 'start' : a === toAge ? 'end' : 'middle');
   for (const a of ages) svg.append(svgEl('text', { class: 'tx', x: ageX(a), y: H - 6, 'text-anchor': anchor(a) }, `อายุ ${a}`));
   const path = (vals, cls) => svgEl('polyline', { class: cls, points: vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ') });
-  if (real) svg.append(path(real, 'real'));
   svg.append(path(nom, 'nom'));
   for (const i of [0, series.length - 1]) svg.append(svgEl('circle', { class: 'dot', cx: x(i), cy: y(nom[i]), r: 3 }));
   return svg;
-}
-
-function sparkLegend() {
-  const p = el('p', 'note spark-key');
-  p.append(el('span', 'k-nom', 'เงินติดตัว'), ' · ', el('span', 'k-real', 'เทียบค่าเงินปีเกิด'));
-  return p;
 }
 
 function list(items, cls = 'items') {
@@ -125,9 +116,8 @@ function recap(r) {
   box.append(grid);
   const m = r.money;
   box.append(el('p', 'sub', `เงิน ${baht(m.from)} → ${baht(m.to)}`));
-  box.append(el('p', 'note', `เทียบค่าเงินปีเกิด ${baht(m.fromAtBirth)} → ${baht(m.toAtBirth)}`));
   const chart = sparkline(r.moneySeries, r.fromAge, r.toAge);
-  if (chart) box.append(chart, sparkLegend());
+  if (chart) box.append(chart);
   if (r.items.length) box.append(list(r.items));
   if (r.disclaimer) box.append(el('p', 'note', r.disclaimer));
   if (r.picks.length) {
@@ -485,7 +475,7 @@ function render(card) {
     body.append(el('h3', null, `${st.name} ตายอายุ ${card.age}`));
     body.append(el('p', null, `${st.sex} · ${regionLabel(st)} · ฐานะ${st.cls} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
     const net = card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
-    body.append(el('p', 'sub', `${net} ${baht(card.summary.money)} ≈ ${baht(card.summary.moneyAtBirth)} ค่าเงินปีเกิด`));
+    body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
     if (card.summary.debt) body.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
     if (card.summary.bankruptcies) body.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
     if (card.note) body.append(el('p', 'sub', card.note));
