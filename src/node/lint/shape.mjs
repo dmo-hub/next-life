@@ -24,7 +24,7 @@ const KEYS = {
   family: ['role', 'age', 'alive', 'health', 'relations'],
   multipliers: ['class', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish'],
   repeat: ['gap', 'max'],
-  requires: ['money', 'stats', 'flags', 'edu', 'reason'],
+  requires: ['money', 'stats', 'flags', 'edu', 'family', 'reason'],
   belief: ['kind', 'tradition', 'outside_canon', 'vow', 'trigger', 'cap_per_life', 'prize_table', 'stake', 'odds_modifier'],
   vow: ['deadline_years', 'due_event', 'redeem_full_cost', 'redeem_light_cost', 'defer_once'],
   trigger: ['money_state'],
@@ -68,6 +68,7 @@ function* shaped(e) {
     yield ['requires', q, `${path}.requires`];
     if (isObj(q.money)) yield ['money', q.money, `${path}.requires.money`];
     if (isObj(q.flags)) yield ['whenFlags', q.flags, `${path}.requires.flags`];
+    for (const [i, f] of list(q.family).entries()) if (isObj(f)) yield ['family', f, `${path}.requires.family[${i}]`];
     if (isObj(q.stats)) {
       yield ['stats', q.stats, `${path}.requires.stats`];
       for (const [k, b] of Object.entries(q.stats)) if (isObj(b)) yield ['bound', b, `${path}.requires.stats.${k}`];
@@ -365,14 +366,16 @@ export const rules = [
   },
   {
     id: 'choice-lock',
-    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
+    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent, alive?, age?}], reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
     event(e, ctx, r) {
       const cs = choicesOf(e);
       for (const { c, path } of cs) {
         const q = c.requires;
         if (q === undefined) continue;
         const at = `${path}.requires`;
-        if (!isObj(q) || !['money', 'stats', 'flags', 'edu'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags หรือ edu อย่างน้อยหนึ่งอย่าง'); continue; }
+        if (!isObj(q) || !['money', 'stats', 'flags', 'edu', 'family'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags edu หรือ family อย่างน้อยหนึ่งอย่าง'); continue; }
+        // ตัวเลือกที่พูดถึงพ่อแม่ล็อกได้เมื่อไม่มีพ่อแม่ที่ยังอยู่ · ระบบครอบครัวมีแค่พ่อแม่ (เหมือน when.family)
+        if (q.family !== undefined && !(Array.isArray(q.family) && q.family.length && q.family.every((f) => isObj(f) && f.role === 'parent' && (f.alive === undefined || typeof f.alive === 'boolean') && (f.age === undefined || isRange(f.age, 0, 120)) && f.health === undefined && f.relations === undefined))) r(`${at}.family`, 'ต้องเป็น [{role: parent, alive?: true/false, age?: [จาก, ถึง]}]');
         if (q.money !== undefined && !(isMoney(q.money) && q.money.amount > 0)) r(`${at}.money`, 'ต้องเป็นเงินมีหน่วย amount > 0');
         if (q.stats !== undefined && (!isObj(q.stats) || Object.entries(q.stats).some(([k, b]) => !STAT_KEYS.includes(k) || !bound(b) || (b.min === undefined && b.max === undefined)))) r(`${at}.stats`, 'ต้องเป็น {ค่าสถานะ: {min, max}} 0–100');
         if (q.flags !== undefined && (!isObj(q.flags) || ['has', 'not'].some((k) => q.flags[k] !== undefined && !Array.isArray(q.flags[k])))) r(`${at}.flags`, 'flags ต้องเป็น {has: [...], not: [...]}');

@@ -74,6 +74,7 @@ events:
         merit: [{cat: neutral}]
       - id: car_for_parents
         text: "ออกรถให้พ่อแม่ใช้ที่บ้าน"
+        requires: {family: [{role: parent, alive: true}]}
         effects: {debt: {kind: car, amount: {unit: income_x, amount: 4}}, money: {unit: income_x, amount: -4}, relations: 2}
         sets_flags: [has_car]
         merit: [{cat: care_parents, level: 1}]

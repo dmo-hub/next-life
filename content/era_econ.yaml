@@ -53,6 +53,7 @@ events:
           - {weight: 1, text: "ทอเสร็จแต่ไม่มีคนซื้อ ผ้ากองเต็มบ้านจนใช้เป็นผ้าห่ม", effects: {happiness: -1, health: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "กลับบ้านไปทำนากับพ่อแม่"
+        requires: {family: [{role: parent, alive: true}]}
         effects: {health: 1, relations: 1, income_mult: 0.8}
         outcomes:
           - {weight: 2, ok: true, multipliers: {occupation: {farmer: 2, labor: 1.5}}, text: "ข้าวปีนั้นราคาดีเกินคาด พ่อตบบ่าบอกว่านาผืนนี้รอคุณมานานแล้ว", effects: {happiness: 1, money: {unit: income_x, amount: 0.4}}, next: era_econ_oil2_farm_01, merit: [{cat: neutral}]}
@@ -222,6 +223,7 @@ events:
         sets_flags: [own_business]
         merit: [{cat: neutral}]
       - text: "กลับบริษัท ให้แม่ดูร้านแทน"
+        requires: {family: [{role: parent, alive: true}]}
         effects: {relations: 1, happiness: -1, money: {unit: income_x, amount: 0.5}}
         merit: [{cat: neutral}]
       - text: "จ้างคนตกงานในซอยมาช่วยชง"

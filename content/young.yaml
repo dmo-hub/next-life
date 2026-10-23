@@ -303,6 +303,7 @@ events:
         merit: [{cat: neutral}]
       - id: stay
         text: "ไม่ไป อยู่ดูแลพ่อแม่ที่บ้าน"
+        requires: {family: [{role: parent, alive: true}]}
         effects: {relations: 2, happiness: 1, health: 1}
         merit: [{cat: care_parents, level: 1}]
 

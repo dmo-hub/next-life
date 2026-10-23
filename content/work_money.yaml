@@ -92,6 +92,7 @@ events:
           - {weight: 1, text: "มันเอาเบอร์ไปขาย โดนโทรก่อกวนทั้งเดือน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
       - id: warn_neighbors
         text: "เตือนพ่อแม่กับคนทั้งซอย"
+        requires: {family: [{role: parent, alive: true}]}
         effects: {relations: 2, happiness: 1}
         merit: [{cat: help_others, level: 1}]
 
@@ -152,6 +153,7 @@ events:
         merit: [{cat: neutral}]
       - id: move_to_parents
         text: "ย้ายไปอยู่บ้านพ่อแม่"
+        requires: {family: [{role: parent, alive: true}]}
         effects: {health: 1}
         sets_flags: [has_kids]
         merit: [{cat: neutral}]

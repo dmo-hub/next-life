@@ -99,7 +99,7 @@ events:
           - {weight: 3, text: "ร้านปิดอยู่ดี เหลือแต่หนี้ดอกรายวันกับเตาอบมือสอง", effects: {happiness: -3, income_mult: 0.8}, merit: [{cat: neutral}]}
       - {text: "ปิดร้าน กลับไปสมัครงานประจำ", effects: {income_mult: 0.9, happiness: -1}, merit: [{cat: neutral}]}
       - {text: "ย้ายไปขายตามตลาดนัดแทน", effects: {happiness: 1, income_mult: 0.95}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
-      - {text: "กลับบ้านขอพ่อแม่ช่วยทุน", effects: {relations: -1, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+      - {text: "กลับบ้านขอพ่อแม่ช่วยทุน", requires: {family: [{role: parent, alive: true}]}, effects: {relations: -1, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
 
   - id: career_transfer_01
     type: A

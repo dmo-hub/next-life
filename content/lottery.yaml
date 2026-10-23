@@ -130,6 +130,7 @@ events:
           - {weight: 1, text: "ลูกพี่ลูกน้องเห็นรถคันใหม่ในโรงจอด เรื่องโกหกแตก ทั้งตระกูลเลิกคบ", effects: {relations: -3, happiness: -2}, merit: [{cat: neutral}]}
       - id: parents_house
         text: "สร้างบ้านให้พ่อแม่ก่อนอย่างอื่น"
+        requires: {family: [{role: parent, alive: true}]}
         effects: {relations: 2, happiness: 2, money: {unit: fixed_baht, amount: -1000000, ref_year: 2560}}
         merit: [{cat: care_parents, level: 3}]
       - id: friend_invest

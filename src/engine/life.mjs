@@ -620,6 +620,7 @@ function lockReason(st, c) {
   }
   if (q.flags && !flagsOk(st, q.flags)) why.push('ยังไม่เข้าเงื่อนไข');
   if (q.edu && eduRank(st.edu) < eduRank(q.edu)) why.push('วุฒิไม่ถึง');
+  if (q.family && !q.family.every((f) => familyOk(st, f))) why.push('พ่อแม่ไม่อยู่แล้ว');
   if (!why.length) return null;
   return q.reason ?? why.join(' · ');
 }

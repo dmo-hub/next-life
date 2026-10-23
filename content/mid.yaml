@@ -324,6 +324,7 @@ events:
         merit: [{cat: neutral}]
       - id: insure_parents
         text: "ทำให้พ่อแม่ก่อนตัวเอง"
+        requires: {family: [{role: parent, alive: true}]}
         effects: {relations: 2, money: {unit: income_x, amount: -0.5}, happiness: -1}
         merit: [{cat: care_parents, level: 2}]
       - id: become_agent
