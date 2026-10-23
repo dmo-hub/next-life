@@ -16,13 +16,59 @@ export const ASSETS = [
 const ASSET_BY_ID = new Map(ASSETS.map((a) => [a.id, a]));
 export const DISCLAIMER = 'เกม ไม่ใช่คำแนะนำการลงทุน';
 
+const systemOpen = (era, id, year) => {
+  const s = era.systems.find((x) => x.id === id);
+  return !!s && s.status === 'open' && year >= s.from && (s.to === undefined || year <= s.to);
+};
+
 export function assetOpen(era, id, year) {
   const a = ASSET_BY_ID.get(id);
   if (!a) throw new Error(`สินทรัพย์ไม่รู้จัก: ${id}`);
-  if (!a.system) return true;
-  const s = era.systems.find((x) => x.id === a.system);
-  return !!s && s.status === 'open' && year >= s.from && (s.to === undefined || year <= s.to);
+  return !a.system || systemOpen(era, a.system, year);
 }
+
+// ชนิดหนี้ (B08b) กั้นปีด้วย system แบบเดียวกับสินทรัพย์ · ดอก/ระยะผ่อนอยู่ใน data/debt.json
+export const DEBTS = [
+  { id: 'student_loan', name: 'กยศ.', system: 'student_loan' },
+  { id: 'mortgage', name: 'ผ่อนบ้าน' },
+  { id: 'car', name: 'ผ่อนรถ' },
+  { id: 'informal', name: 'หนี้นอกระบบ' },
+  { id: 'credit_card', name: 'บัตรเครดิต', system: 'credit_card' },
+];
+const DEBT_BY_ID = new Map(DEBTS.map((d) => [d.id, d]));
+export const debtName = (id) => DEBT_BY_ID.get(id)?.name ?? id;
+
+export function debtOpen(era, id, year) {
+  const d = DEBT_BY_ID.get(id);
+  if (!d) throw new Error(`หนี้ไม่รู้จัก: ${id}`);
+  return !d.system || systemOpen(era, d.system, year);
+}
+
+// ก้อนหนี้ใหม่ · ดอกคงที่ล็อกตั้งแต่วันกู้ · ผ่อนบ้านไม่ล็อก ลอยตามดอกเงินกู้ทุกปี (float)
+export function newDebt(era, seed, kind, amount, year) {
+  const k = era.finance.debt.kinds[kind];
+  const base = () => lendingRate(era, seed, year) + k.premium;
+  let rate = k.rate;
+  if (kind === 'car') rate = k.cap && year >= k.cap.from ? Math.min(base(), k.cap.v) : base();
+  return { kind, balance: amount, rate, float: kind === 'mortgage', premium: k.premium ?? 0, years: k.years ?? null, grace: k.grace ?? 0, simple: !!k.simple };
+}
+
+// ยอดจ่ายของปีนี้ แล้วลดก้อนหนี้ตาม · ปลอดหนี้ = ดอกทบเข้าเงินต้น ไม่จ่าย · ไม่ทบ = จ่ายแต่ดอก เงินต้นค้าง
+// ที่เหลือผ่อนเท่ากันทุกปีแบบลดต้นลดดอก ให้หมดพอดีในปีที่เหลือ
+export function payDebt(era, seed, d, year) {
+  const r = d.float ? lendingRate(era, seed, year) + d.premium : d.rate;
+  if (d.grace > 0) {
+    d.grace--;
+    d.balance *= 1 + r;
+    return 0;
+  }
+  if (d.simple) return d.balance * r;
+  const pay = r ? (d.balance * r) / (1 - (1 + r) ** -d.years) : d.balance / d.years;
+  d.balance = d.balance * (1 + r) - pay;
+  d.years--;
+  return pay;
+}
+export const debtDone = (d) => !d.simple && (d.years <= 0 || d.balance <= 0.5);
 
 // ผลตอบแทนทั้งปีเป็นสัดส่วน (0.05 = 5%) · สินทรัพย์ที่คิดจากราคาสองปี อ่านปีต้นแบบครั้งเดียวแล้วเทียบกับปีก่อนหน้าของปีต้นแบบ
 export function assetReturn(era, seed, id, year) {

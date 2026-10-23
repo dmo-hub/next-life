@@ -25,7 +25,7 @@ function run(content, count) {
   const out = [];
   for (let i = 0; i < count; i++) {
     const { state } = playLife(mixSeed(seed, i), content, randomBot);
-    out.push({ d: CLASSES.indexOf(state.cls), ses: state.ses, decade: Math.floor(state.birthYear / 10) * 10, w: state.estate.moneyAtBirth, occ: state.occupation });
+    out.push({ d: CLASSES.indexOf(state.cls), ses: state.ses, decade: Math.floor(state.birthYear / 10) * 10, w: state.estate.moneyAtBirth, occ: state.occupation, bk: state.bankruptcies });
   }
   return out;
 }
@@ -73,20 +73,35 @@ for (const dec of [...new Set(real.map((x) => x.decade))].sort()) {
 if (badDecades) fails++;
 
 // ทิศเทียบ SES: กทม.+ปริมณฑล ≈ 2.92 เท่าอีสาน (ปี 2541) · Q5/Q1 ≈ 4.60 (ปี 2566) — ดูแค่ว่าไม่ผิดทิศ ไม่ใช่ตรงตัวเลข
-const ratio = (xs, a, b) => median(xs.filter(a).map((x) => x.w)) / median(xs.filter(b).map((x) => x.w));
-const topBottom = (xs) => ratio(xs, (x) => x.d >= 8, (x) => x.d <= 1);
-const bkkIsan = (xs) => ratio(xs, (x) => x.ses === 'bkk', (x) => x.ses === 'northeast');
+// ด่านใช้ส่วนต่างมัธยฐาน ไม่ใช่อัตราส่วน: มีคนตายพร้อมหนี้แล้วมัธยฐานกลุ่มล่างติดลบได้ อัตราส่วนจะกลับเครื่องหมายทั้งที่ทิศถูก
+// อัตราส่วนพิมพ์ไว้เทียบ SES เมื่อตัวหารยังเป็นบวก
+const med = (xs, ok) => median(xs.filter(ok).map((x) => x.w));
+const pair = (xs, a, b) => ({ diff: med(xs, a) - med(xs, b), ratio: med(xs, b) > 0 ? med(xs, a) / med(xs, b) : NaN });
+const topBottom = (xs) => pair(xs, (x) => x.d >= 8, (x) => x.d <= 1);
+const bkkIsan = (xs) => pair(xs, (x) => x.ses === 'bkk', (x) => x.ses === 'northeast');
 const rTB = topBottom(real), rBI = bkkIsan(real);
-console.log(`\nบน 20% ÷ ล่าง 20% = ${f(rTB)} เท่า (SES รายได้ Q5/Q1 ≈ 4.60) → ${rTB > 1 ? 'ทิศถูก' : 'ผิดทิศ'}`);
-console.log(`กทม.+ปริมณฑล ÷ อีสาน = ${f(rBI)} เท่า (SES ปี 2541 ≈ 2.92) → ${rBI > 1 ? 'ทิศถูก' : 'ผิดทิศ'}`);
-if (!(rTB > 1 && rBI > 1)) fails++;
-const neg = real.filter((x) => x.w < 0).length;
-console.log(`ตายพร้อมหนี้ (ทรัพย์ติดลบ) ${f((neg / n) * 100)}%`);
+console.log(`\nบน 20% − ล่าง 20% = ${f(rTB.diff, 0)} บาท (${f(rTB.ratio)} เท่า · SES รายได้ Q5/Q1 ≈ 4.60) → ${rTB.diff > 0 ? 'ทิศถูก' : 'ผิดทิศ'}`);
+console.log(`กทม.+ปริมณฑล − อีสาน = ${f(rBI.diff, 0)} บาท (${f(rBI.ratio)} เท่า · SES ปี 2541 ≈ 2.92) → ${rBI.diff > 0 ? 'ทิศถูก' : 'ผิดทิศ'}`);
+if (!(rTB.diff > 0 && rBI.diff > 0)) fails++;
+
+// กรอบที่เจ้าของเคาะ (B08b): ตายพร้อมหนี้ 15–30% · ล้มละลายอย่างน้อยครั้งหนึ่ง 3–8% — โหดตามหนี้ครัวเรือนไทย
+const DEBT_BAND = [15, 30];
+const BANKRUPT_BAND = [3, 8];
+const pct = (k) => (k / n) * 100;
+const inBand = (v, [lo, hi]) => v >= lo && v <= hi;
+const negP = pct(real.filter((x) => x.w < 0).length);
+const bkP = pct(real.filter((x) => x.bk > 0).length);
+console.log(`ตายพร้อมหนี้ (ทรัพย์สุทธิติดลบ) ${f(negP)}% (กรอบ ${DEBT_BAND.join('–')}%) → ${inBand(negP, DEBT_BAND) ? 'ผ่าน' : 'ตก'}`);
+console.log(`ล้มละลายอย่างน้อย 1 ครั้ง ${f(bkP)}% (กรอบ ${BANKRUPT_BAND.join('–')}%) → ${inBand(bkP, BANKRUPT_BAND) ? 'ผ่าน' : 'ตก'}`);
+if (!inBand(negP, DEBT_BAND)) fails++;
+if (!inBand(bkP, BANKRUPT_BAND)) fails++;
+const share = (xs, ok) => (xs.filter((x) => ok(x.d) && x.w < 0).length / xs.filter((x) => ok(x.d)).length) * 100;
+console.log('ตายพร้อมหนี้ตามฐานะ: ' + BANDS.map(([b, ok]) => `${b} ${f(share(real, ok))}%`).join(' · '));
 
 const ctl = run(flat(content), n);
 const cTB = topBottom(ctl), cBI = bkkIsan(ctl);
-const shrunk = cTB < 1 + (rTB - 1) / 2 && Math.abs(cBI - 1) < Math.abs(rBI - 1) / 2;
-console.log(`\nตัวควบคุม ปิดผลจุดเกิด: บน÷ล่าง ${f(cTB)} เท่า · กทม.÷อีสาน ${f(cBI)} เท่า → ${shrunk ? 'ช่องว่างหดเกินครึ่ง ผ่าน' : 'ไม่หด ตก (ตัววัดไม่ได้จับผลจุดเกิด)'}`);
+const shrunk = cTB.diff < rTB.diff / 2 && Math.abs(cBI.diff) < Math.abs(rBI.diff) / 2;
+console.log(`\nตัวควบคุม ปิดผลจุดเกิด: บน−ล่าง ${f(cTB.diff, 0)} บาท · กทม.−อีสาน ${f(cBI.diff, 0)} บาท → ${shrunk ? 'ช่องว่างหดเกินครึ่ง ผ่าน' : 'ไม่หด ตก (ตัววัดไม่ได้จับผลจุดเกิด)'}`);
 if (!shrunk) fails++;
 
 const a = JSON.stringify(run(content, 300));

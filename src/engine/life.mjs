@@ -1,7 +1,7 @@
 import { makeRng } from './rng.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
 import { pickRegion, regionRatio, classOdds } from './birth.mjs';
-import { monthlyWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER } from './finance.mjs';
+import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName } from './finance.mjs';
 import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard } from './career.mjs';
 
@@ -156,6 +156,13 @@ export function newLife(seed, content) {
     relations: s.relations,
     network: s.network,
     money: 0,
+    // หนี้รายก้อน (B08b) แยกจากเงิน · เงินติดลบยังเป็นหนี้เงินกู้ทบดอกแบบเดิม (จ่ายงวดไม่พอ = เงินติดลบ)
+    debts: [],
+    // ปีติดกันที่หนี้สุทธิเกินเกณฑ์ล้มละลาย · จำนวนครั้งที่ล้มละลาย
+    debtYears: 0,
+    bankruptcies: 0,
+    // รายได้ทั้งปีของปีสุดท้ายที่ทำงาน เป็นบาทค่าเงินปีเกิด — ฐานรายจ่ายหลังเกษียณและเกณฑ์ล้มละลายของคนเกษียณ
+    retireBase: null,
     // เส้นสุขภาพของชีวิตนี้ถ้าไม่มีเหตุการณ์ใดเลย — ตัวคูณการตายวัดจากส่วนต่างกับเส้นนี้
     healthNatural: s.health,
     // บัญชีบุญบาปซ่อน — ห้ามส่งออกไปกับการ์ดหรือ statsOf
@@ -283,6 +290,7 @@ function fixedFx(ev, c) {
     out.push(`${STAT_LABELS[k]}\u00a0${sign > 0 ? '↑' : '↓'}`);
   }
   if (fx.invest) out.push('ลงทุน');
+  if (fx.debt) out.push(`กู้${debtName(fx.debt.kind)}`);
   if (fx.income_mult) out.push(`รายได้\u00a0${fx.income_mult > 1 ? '↑' : '↓'}`);
   for (const [k, v] of Object.entries(fx.chronic ?? {})) out.push(`${STAT_LABELS[k]}\u00a0${v > 0 ? '↑' : '↓'}\u00a0ระยะยาว`);
   return out.join(' · ');
@@ -333,6 +341,7 @@ function applyEffects(st, fx = {}) {
   for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + levelValue(fx[k]));
   if (fx.money) st.money += moneyValue(st, fx.money);
   if (fx.invest) invest(st, fx.invest);
+  if (fx.debt) borrow(st, fx.debt);
   if (fx.income_mult) st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * fx.income_mult));
   if (fx.school) {
     st.school = fx.school === 'none' ? null : fx.school;
@@ -389,6 +398,8 @@ function invest(st, { asset, share }) {
 // เดินหนึ่งปี: ทุกอย่างไหลเป็นรายปีในลูปนี้ที่เดียว การกระโดดหลายปีจึงได้ผลเท่ากับเดินทีละปีเสมอ
 function stepYear(st) {
   const prevStage = stageOf(st.age);
+  // ปีสุดท้ายที่ทำงานต้องวัดก่อนขึ้นอายุ — ขึ้นแล้ว isWorking เป็นเท็จ
+  if (isWorking(st) && st.age + 1 === RETIRE_AGE) st.retireBase = (monthlyIncome(st) * 12) / st.price;
   st.age += 1;
   const year = st.birthYear + st.age;
   st.price *= 1 + inflationRate(st.content.era, st.seed, year) / 100;
@@ -411,9 +422,13 @@ function stepYear(st) {
     }
   } else if (st.money < 0) st.money *= 1 + lendingRate(era, st.seed, year);
   if (isWorking(st)) st.money += yearlySaving(st, year);
+  else if (st.retireBase !== null) st.money -= retireSpend(st, year);
+  for (const d of st.debts) st.money -= payDebt(era, st.seed, d, year);
+  st.debts = st.debts.filter((d) => !debtDone(d));
   st.trail.push({ year, money: Math.round(st.money) });
 
   const stage = stageOf(st.age);
+  checkBankrupt(st, year, stage);
   const tone = omenTone(st.ledger);
   if (!tone) st.omenTone = null;
   else if (tone !== st.omenTone && (st.omenAge === null || st.age - st.omenAge >= OMEN.gap)) {
@@ -449,6 +464,52 @@ function stepYear(st) {
   }
 }
 
+// รายจ่ายหลังเกษียณ/ปี = พื้นค่าครองชีพ (เท่าของค่าแรงขั้นต่ำทั้งปี) + สัดส่วนของรายได้ปีสุดท้าย
+// สัดส่วนล้วนกินเงินเก็บทุกฐานะเท่ากันจนครึ่งล่างแบน · พื้นคงที่ทำให้คนรายได้น้อยกินเงินเก็บเร็วกว่า
+function retireSpend(st, year) {
+  const f = st.content.era.finance;
+  const floor = f.debt.retireFloor * minWage(st.content.era, st.seed, year) * f.daysPerMonth * 12;
+  return floor + f.debt.retireSpend * st.retireBase * st.price;
+}
+
+export const totalDebt = (st) => st.debts.reduce((s, d) => s + d.balance, 0);
+// ทรัพย์สุทธิ = เงิน − หนี้รายก้อน (เงินติดลบนับเป็นหนี้อยู่แล้ว)
+export const netWorth = (st) => st.money - totalDebt(st);
+
+// รายได้ทั้งปีที่ใช้วัดว่าหนี้ท่วมแค่ไหน: ทำงานอยู่ = รายได้ปีนี้ · เกษียณแล้ว = รายได้ปีสุดท้ายปรับเงินเฟ้อ
+// ยังไม่เคยทำงาน (เรียนอยู่ระหว่างปลอดหนี้ กยศ.) ไม่มีฐาน จึงไม่นับ
+function debtIncome(st, year) {
+  if (isWorking(st)) return monthlyIncome(st, year) * 12;
+  return st.retireBase === null ? null : st.retireBase * st.price;
+}
+
+// ล้มละลาย (B08b): หนี้สุทธิเกิน k เท่าของรายได้ทั้งปีติดกัน n ปี → ล้างหนี้ ทรัพย์เหลือ 0 · ไม่แตะสุขภาพ
+function checkBankrupt(st, year, stage) {
+  const { k, n } = st.content.era.finance.debt.bankrupt;
+  const base = debtIncome(st, year);
+  st.debtYears = base !== null && -netWorth(st) > k * base ? st.debtYears + 1 : 0;
+  if (st.debtYears < n) return;
+  st.debtYears = 0;
+  st.bankruptcies++;
+  st.debts = [];
+  st.money = 0;
+  st.alloc = { deposit: 1 };
+  st.flags.bankrupt = true;
+  st.happiness = clamp(st.happiness - LEVELS[2]);
+  st.relations = clamp(st.relations - LEVELS[1]);
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: 'ศาลสั่งล้มละลาย ทรัพย์ที่มีถูกนำไปชำระเจ้าหนี้ หนี้ที่เหลือถูกล้าง เริ่มนับหนึ่งใหม่' });
+}
+
+// กู้ก้อนใหม่: เงินกู้เข้ากระเป๋าทั้งก้อน แล้วผ่อนคืนทุกปีใน stepYear · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
+function borrow(st, { kind, amount }) {
+  const year = st.birthYear + st.age;
+  const era = st.content.era;
+  if (!debtOpen(era, kind, year)) throw new Error(`${debtName(kind)} ยังไม่มีในปี ${year}`);
+  const baht = moneyValue(st, amount);
+  st.money += baht;
+  st.debts.push(newDebt(era, st.seed, kind, baht, year));
+}
+
 // การ์ดสรุปเป็นของคำนวณล้วน ไม่ดึงเลขสุ่มของโลก — เพิ่ม/ลดการ์ดสรุปแล้วชะตาชีวิตต้องเหมือนเดิม
 function summaryCard(st) {
   const from = st.lastCardAge;
@@ -459,6 +520,7 @@ function summaryCard(st) {
   }
   const year = st.birthYear + st.age;
   for (const x of st.returns) items.push(`อายุ ${x.age} ${assetName(x.id)} ${formatReturn(x.r)}`);
+  for (const d of st.debts) items.push(`${debtName(d.kind)} ค้าง ${Math.round(d.balance).toLocaleString('en-US')} บาท`);
   const disclaimer = st.returns.length ? DISCLAIMER : null;
   st.returns = [];
   return {
@@ -691,13 +753,16 @@ function deathCard(st) {
     kind: 'death',
     age: st.age,
     text: `ตายอายุ ${st.age}`,
+    // money = ทรัพย์สุทธิหลังหักหนี้รายก้อน · debt = ยอดหนี้รายก้อนที่ค้าง (ระหว่างชาติ B06 อ่านแยก)
     summary: {
       year,
-      money: Math.round(st.money),
-      moneyAtBirth: Math.round(st.money / priceRatio(era, st.seed, st.birthYear, year)),
+      money: Math.round(netWorth(st)),
+      moneyAtBirth: Math.round(netWorth(st) / priceRatio(era, st.seed, st.birthYear, year)),
+      debt: Math.round(totalDebt(st)),
+      bankruptcies: st.bankruptcies,
     },
   };
-  st.estate = { year, money: card.summary.money, moneyAtBirth: card.summary.moneyAtBirth };
+  st.estate = { year, money: card.summary.money, moneyAtBirth: card.summary.moneyAtBirth, debt: card.summary.debt, bankruptcies: st.bankruptcies };
   // ช่วงวัยสุดท้ายไม่มีการ์ดเปลี่ยนช่วงมาปิด — เล่าบนบันทึกการตายแทน
   card.recap = stageRecap(st, st.age);
   card.job = jobText(st);

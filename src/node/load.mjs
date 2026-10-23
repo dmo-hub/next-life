@@ -7,6 +7,7 @@ import { CLASSES } from '../engine/life.mjs';
 import { lintDocs, formatProblem } from './lint/index.mjs';
 import { MERIT_CATS } from './lint/vocab.mjs';
 import { checkMeritTable } from '../engine/merit.mjs';
+import { DEBTS } from '../engine/finance.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -181,6 +182,37 @@ export function loadFinance() {
   return { era, real, sampleFrom: rules.future.sampleFrom };
 }
 
+// ค่าเลขที่หายจะกลายเป็น NaN ในเงินทุกปีหลังกู้ — ตรวจครบทุกชนิดที่แกนรู้จักตั้งแต่โหลด
+export function loadDebt() {
+  const d = json('data/debt.json');
+  const num = (v, what) => {
+    if (typeof v !== 'number' || !Number.isFinite(v) || v < 0) throw new Error(`data/debt.json ${what} ต้องเป็นตัวเลข ≥ 0 ได้ ${v}`);
+    return v;
+  };
+  const kinds = {};
+  for (const { id } of DEBTS) {
+    const k = d.kinds[id];
+    if (!k) throw new Error(`data/debt.json ไม่มีหนี้ชนิด ${id}`);
+    const rate = typeof k.rate === 'object' ? k.rate.v : k.rate;
+    kinds[id] = {
+      ...(rate !== undefined && { rate: num(rate, `${id}.rate`) }),
+      ...(k.premium !== undefined && { premium: num(k.premium, `${id}.premium`) }),
+      ...(k.years !== undefined && { years: num(k.years, `${id}.years`) }),
+      ...(k.grace !== undefined && { grace: num(k.grace, `${id}.grace`) }),
+      ...(k.simple && { simple: true }),
+      ...(k.cap && { cap: { from: num(k.cap.from, `${id}.cap.from`), v: num(k.cap.v, `${id}.cap.v`) } }),
+    };
+    if (kinds[id].rate === undefined && kinds[id].premium === undefined) throw new Error(`data/debt.json ${id} ต้องมี rate หรือ premium`);
+    if (!kinds[id].simple && !(kinds[id].years >= 1)) throw new Error(`data/debt.json ${id} ผ่อนแบบมีงวดต้องมี years ≥ 1`);
+  }
+  return {
+    retireSpend: num(d.rules.retire_spend.v, 'retire_spend'),
+    retireFloor: num(d.rules.retire_floor.v, 'retire_floor'),
+    bankrupt: { k: num(d.rules.bankrupt.k, 'bankrupt.k'), n: num(d.rules.bankrupt.n, 'bankrupt.n') },
+    kinds,
+  };
+}
+
 export function loadEra() {
   const births = json('data/births.json');
   const pop = new Map(births.population.rows.map((x) => [x.y, x.v]));
@@ -235,7 +267,7 @@ export function loadEra() {
     births: { from: births.cbr.rows[0].y, w },
     cpi,
     future,
-    finance: finance.era,
+    finance: { ...finance.era, debt: loadDebt() },
     systems: json('data/system-starts.json').systems.map(({ id, status, from, to }) => ({ id, status, from, to })),
     mort: {
       from: m.e0.ชาย[0].y,
