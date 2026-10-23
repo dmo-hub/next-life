@@ -1,8 +1,8 @@
 // harness เต็ม (B07 · ใบ 07 + ใบ 12): บอท 6 บุคลิก × (seed ตายตัว + seed สุ่ม) × n ชีวิต รันขนานใน worker
-// + harness เดิมที่มีด่านของตัวเอง (merit · lineage · finance · titles) เป็น process ข้าง ๆ — คำสั่งเดียวได้ทุกด่าน
-// ด่าน (1) titles · (2) ไม่มีเหตุการณ์/ตัวเลือก/ธงตาย · (3a)(3b) อายุ · (4) จำนวนการ์ด · (5) merit · (6) หวยสายมู · (7) belief ไม่แตะอายุ
+// + harness เดิมที่มีด่านของตัวเอง (merit · lineage · finance · titles · belief) เป็น process ข้าง ๆ — คำสั่งเดียวได้ทุกด่าน
+// ด่าน (1) titles · (2) ไม่มีเหตุการณ์/ตัวเลือก/ธงตาย · (3a)(3b) อายุ · (4) จำนวนการ์ด · (5) merit · (6)(7) belief (หวยสายมู · สายมูไม่แตะอายุ)
 // จังหวะบังคับ: เทียบกับ harness/baseline.json (seed ตายตัวชุดเดียวกัน) ชุดใหม่ต้องไม่แย่กว่า · --save เขียนผลรอบนี้เป็นฐานใหม่
-// --release = 100,000 ชีวิตต่อบอท (ก่อนปล่อย) · --seed2 N ระบุ seed สุ่มซ้ำได้ · --control บังคับรันตัวควบคุมด่าน (7) · --solo ไม่รัน harness ข้าง ๆ
+// --release = 100,000 ชีวิตต่อบอท (ก่อนปล่อย) · --seed2 N ระบุ seed สุ่มซ้ำได้ · --solo ไม่รัน harness ข้าง ๆ
 import { Worker } from 'node:worker_threads';
 import { spawn } from 'node:child_process';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -26,8 +26,6 @@ const seed2 = opt('seed2', Math.floor(Math.random() * 0x7fffffff));
 const root = new URL('../', import.meta.url);
 const BASELINE = new URL('harness/baseline.json', root);
 const content = loadContent();
-const beliefEvents = content.events.filter((e) => e.category === 'belief');
-const numenEvents = beliefEvents.filter((e) => e.belief?.kind === 'lottery_numen');
 const f = (v, d = 2) => v.toFixed(d);
 const fails = [];
 const started = Date.now();
@@ -35,15 +33,13 @@ const started = Date.now();
 const stored = existsSync(BASELINE) ? JSON.parse(readFileSync(BASELINE, 'utf8')) : null;
 const prev = stored?.n === n && stored?.seed === seed ? stored : null;
 
-// ---- งาน worker: บอท × seed (+ ตัวควบคุมด่าน 7) ----
+// ---- งาน worker: บอท × seed ----
 const jobs = [];
 for (const s of [seed, seed2]) for (const bot of Object.keys(BOTS)) jobs.push({ bot, seed: s, n });
-const control = beliefEvents.length > 0 || has('control');
-if (control) jobs.push({ bot: 'สุ่ม', seed, n, dropBelief: true });
 
 // ---- harness ข้าง ๆ: อ่านคำสั่งจาก package.json ให้ตรงกับ npm run <ชื่อ> เสมอ ----
 const scripts = JSON.parse(readFileSync(new URL('package.json', root), 'utf8')).scripts;
-const SIDE = has('solo') ? [] : ['merit', 'lineage', 'finance', 'titles'].filter((k) => scripts[k]);
+const SIDE = has('solo') ? [] : ['merit', 'lineage', 'finance', 'titles', 'belief'].filter((k) => scripts[k]);
 const side = SIDE.map((name) => {
   const [, file, ...rest] = scripts[name].split(' ');
   return new Promise((done) => {
@@ -74,7 +70,7 @@ const sideOut = await Promise.all(side);
 const wall = Date.now() - started;
 
 const IDS = content.events.map((e) => e.id);
-const main = results.filter((r) => !r.dropBelief);
+const main = results;
 const of = (bot, s) => main.find((r) => r.bot === bot && r.seed === s);
 
 console.log(`harness เต็ม · ${n.toLocaleString('en-US')} ชีวิตต่อบอท${release ? ' (โหมดก่อนปล่อย)' : ''} · seed ${seed} + seed สุ่ม ${seed2} · บอท ${Object.keys(BOTS).join(' · ')} · เหตุการณ์ ${content.events.length}`);
@@ -151,7 +147,7 @@ for (const s of [seed, seed2]) {
 console.log('\nบอทอื่น (ไม่ตัดสิน): อายุเฉลี่ย · ด่าน 4 % ในช่วง');
 for (const s of [seed, seed2]) console.log(`  seed ${s}: ${Object.keys(BOTS).map((b) => `${b} ${f(of(b, s).ageSum / n)} ปี ${f(gate4(of(b, s).cardsOver60).share * 100, 1)}%`).join(' · ')}`);
 
-// ---- ด่านจาก harness ข้าง ๆ: (1) titles · (5) merit · lineage · finance ----
+// ---- ด่านจาก harness ข้าง ๆ: (1) titles · (5) merit · (6)(7) belief · lineage · finance ----
 const VERDICT = /ด่าน|→|ผ่าน|ตก/;
 for (const x of sideOut) {
   const ok = x.code === 0;
@@ -165,16 +161,8 @@ if (!scripts.titles) console.log('\nด่าน 1 (ลวดลาย/ฉาย
 // ---- ด่าน 5–7 ของใบ 12 บนเนื้อหาจริง ----
 const vowSet = of('สุ่ม', seed).flags.has('vow_broken');
 console.log(`\nด่าน 5 บนเนื้อหาจริง: vow_broken ${vowSet ? 'ตั้งได้' : 'ยังไม่มีใครตั้ง'} (บอทสุ่ม seed ${seed}) · ตัดสินจริงที่ npm run merit ซึ่งเติมเนื้อหาทดสอบ`);
-console.log(`ด่าน 6 (หวยสายมู ×4 เฉพาะรางวัลเล็ก) → ไม่ตัดสิน: ${numenEvents.length ? `มีเหตุการณ์ ${numenEvents.length} ใบ แต่แกนยังไม่บันทึกผลรางวัลต่อใบให้นับ` : 'ยังไม่มีเหตุการณ์ lottery_numen ในเนื้อหา'} (B09)`);
-// ส่วนต่างที่ยอมได้ = สุ่มล้วนของสองรอบคนละชุดชีวิต (SD อายุตาย ~22 ปี ⇒ SE ส่วนต่าง ~0.22 ที่ 20,000) × 2.5
-const ctl = results.find((r) => r.dropBelief);
-if (ctl) {
-  const a = of('สุ่ม', seed).ageSum / n, b = ctl.ageSum / n;
-  const tol = 2.5 * 22 * Math.sqrt(2 / n);
-  const ok = Math.abs(a - b) <= tol;
-  console.log(`ด่าน 7: อายุเฉลี่ยบอทสุ่ม มี belief ${f(a)} vs ถอด belief ${f(b)} ต่าง ${f(a - b)} ปี (ยอม ±${f(tol)}) · belief ${beliefEvents.length} ใบ → ${ok ? 'ผ่าน' : 'ตก'}`);
-  if (!ok) fails.push('ด่าน 7');
-} else console.log('ด่าน 7 → ไม่ตัดสิน: ยังไม่มีเหตุการณ์ category belief (B09) · --control รันตัวควบคุมได้');
+// ด่าน 6–7 ตัดสินที่ npm run belief (ตัวควบคุมถอดสายมู + CI 95%) — ไม่รันซ้ำที่นี่
+if (!scripts.belief) console.log('ด่าน 6–7 → ไม่ตัดสิน: ยังไม่มี npm run belief ในสาขานี้ (B09)');
 
 // ---- รายงาน: ช่องเนื้อหาบาง · แฟนตาซีต่อชีวิต ----
 const STAGES = ['เด็ก', 'วัยรุ่น', 'หนุ่มสาว', 'ทำงาน', 'กลางคน', 'ชรา'];

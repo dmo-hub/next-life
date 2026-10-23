@@ -6,17 +6,15 @@ import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
 import { addGroup, groupKey, cardsInRange } from './gates.mjs';
 
-const { bot, seed, n, dropBelief } = workerData;
+const { bot, seed, n } = workerData;
 const content = loadContent();
-// ตัวควบคุมด่าน (7): ถอดเหตุการณ์ belief ออกทั้งหมด แล้วเทียบอายุเฉลี่ยกับรอบที่มี
-if (dropBelief) content.events = content.events.filter((e) => e.category !== 'belief');
 const era = content.era;
 const INDEX = new Map(content.events.map((e, i) => [e.id, i]));
 const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations', 'network'];
 
 const inc = (m, k, v = 1) => m.set(k, (m.get(k) ?? 0) + v);
 const r = {
-  bot, seed, n, dropBelief: !!dropBelief,
+  bot, seed, n,
   ageSum: 0, statBad: 0,
   groups: new Map(),
   cardsOver60: [],
@@ -47,7 +45,8 @@ for (let i = 0; i < n; i++) {
     if (card.kind !== 'event') return;
     seen.add(card.id);
     if (!seenAt.has(card.id)) seenAt.set(card.id, card.age);
-    const ev = st.pending;
+    // หาจากเนื้อหาด้วย id — การ์ดเล่าเรื่อง (0 ตัวเลือก) ไม่ตั้ง st.pending · การ์ดที่แกนสร้างเอง (หางาน) ไม่อยู่ในเนื้อหา
+    const ev = content.events[INDEX.get(card.id)] ?? {};
     inc(r.cells, `${card.stage}|${ev.category ?? '-'}`);
     if (card.type === 'B') fantasy++;
     if (ev.belief?.kind === 'lottery_numen') r.numen++;
