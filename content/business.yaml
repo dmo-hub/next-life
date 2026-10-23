@@ -86,7 +86,7 @@ events:
         effects: {money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "ขายดีจนเจ้าของตลาดให้ล็อกหัวมุม รายได้เสริมงอกทุกคืน", effects: {happiness: 1, health: -1, income_mult: 1.2}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ขายดีจนเจ้าของตลาดให้ล็อกหัวมุม รายได้เสริมงอกทุกคืน", effects: {happiness: 1, income_mult: 1.2}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
           - {weight: 1, text: "ล็อกอยู่ท้ายตลาด ลมพัดกลิ่นห้องน้ำมาทั้งคืน ขายได้ไม่คุ้มค่าเช่า", effects: {happiness: -1}, merit: [{cat: neutral}]}
       - id: sell_recipe
         text: "ขายสูตรให้ร้านดังในเมือง"

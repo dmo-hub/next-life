@@ -29,7 +29,6 @@ events:
           - {weight: 2, text: "เงินหมดก่อนสอบกลางภาค ต้องยืมเพื่อนกินข้าวจนจบเทอม", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
       - id: work_parttime
         text: "ทำงานพิเศษส่งตัวเอง"
-        effects: {health: -1}
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, text: "เจ้าของร้านที่ทำพาร์ตไทม์ถูกใจ ยื่นข้อเสนองานประจำรอไว้ตั้งแต่ยังไม่จบ", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
@@ -235,7 +234,7 @@ events:
     choices:
       - id: call_shark
         text: "โทรเบอร์เงินด่วนบนเสาไฟ"
-        effects: {debt: {kind: informal, amount: {unit: income_x, amount: 1}}, money: {unit: income_x, amount: -1}, happiness: 1}
+        effects: {debt: {kind: informal, amount: {unit: income_x, amount: 0.8}}, money: {unit: income_x, amount: -0.8}, happiness: 1}
         sets_flags: [loan_shark]
         merit: [{cat: neutral}]
       - id: pawn_gold
@@ -250,7 +249,6 @@ events:
           - {weight: 1, text: "ยืมได้ แต่เรื่องไปถึงหูทั้งตระกูลภายในวันเดียว", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
       - id: overtime
         text: "รับงานเสริมทุกคืนจนครบ"
-        effects: {health: -2}
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, text: "ลูกค้าประจำติดใจ จ้างต่อเป็นงานประจำ", effects: {income_mult: 1.1, network: 1}, merit: [{cat: neutral}]}
@@ -260,7 +258,7 @@ events:
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, text: "ไพ่ขึ้นทุกตา ได้ครบทุกก้อนแถมเหลือกลับบ้าน", effects: {money: {unit: income_x, amount: 1}, happiness: 2}, merit: [{cat: neutral}]}
-          - {weight: 3, text: "หมดตัวก่อนเที่ยงคืน สุดท้ายต้องโทรหาเบอร์บนเสาไฟอยู่ดี แถมยอดมากกว่าเดิม", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 1.5}}, money: {unit: income_x, amount: -1.5}, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+          - {weight: 3, text: "หมดตัวก่อนเที่ยงคืน สุดท้ายต้องโทรหาเบอร์บนเสาไฟอยู่ดี แถมยอดมากกว่าเดิม", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 1.2}}, money: {unit: income_x, amount: -1.2}, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
 
   - id: debt_shark_collect_01
     type: A
@@ -287,7 +285,7 @@ events:
           - {weight: 2, text: "คืนต่อมามีขวดลอยมากระแทกหลังคาบ้าน เสียงหัวเราะดังลั่นปากซอย", effects: {happiness: -2, relations: -1}, next: debt_shark_threat_01, merit: [{cat: neutral}]}
       - id: pay_interest
         text: "จ่ายดอกไปก่อน ต้นค่อยว่ากัน"
-        effects: {happiness: -1, health: -1}
+        effects: {happiness: -1}
         merit: [{cat: neutral}]
       - id: bank_loan
         text: "ยื่นกู้ธนาคารมาโปะ"
@@ -380,7 +378,7 @@ events:
           - {weight: 1, text: "ลูกโกรธจนไม่รับสายไปครึ่งปี หนี้ก็ยังอยู่ที่เดิม", effects: {relations: -2, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
       - id: pay_interest
         text: "จ่ายดอกไปก่อน"
-        effects: {happiness: -1, health: -1}
+        effects: {happiness: -1}
         merit: [{cat: neutral}]
 
   - id: debt_refinance_01
@@ -498,5 +496,5 @@ events:
         merit: [{cat: neutral}]
       - id: pay_interest
         text: "จ่ายดอกไปทีละงวด"
-        effects: {happiness: -1, health: -1}
+        effects: {happiness: -1}
         merit: [{cat: neutral}]
