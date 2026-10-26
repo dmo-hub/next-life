@@ -55,6 +55,12 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .choice { all:unset; box-sizing:border-box; min-height:52px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; cursor:pointer; font-size:15px; }
 .choice .fx { font-size:12px; text-align:right; flex-shrink:0; max-width:50%; }
 .choice .fx span { white-space:nowrap; }
+/* เลขปุ่มลัดเฉพาะจอกว้าง — มือถือไม่มีแป้นเลข เลขจะกินที่ป้ายตัวเลือกเปล่า ๆ */
+@media (min-width:768px) {
+  /* ย่อหน้าแขวน: ป้ายยาวตัดบรรทัดแล้วบรรทัดสองตรงกับข้อความ ไม่มุดใต้เลข · 38px = กรอบเลข 28 + ช่องไฟ 10 */
+  .choice > span[data-key] { padding-left:38px; text-indent:-38px; }
+  .choice > span[data-key]::before { content:attr(data-key); display:inline-block; box-sizing:border-box; width:28px; text-indent:0; margin-right:10px; border:1px solid currentColor; border-radius:3px; font-size:12px; line-height:18px; text-align:center; opacity:0.7; }
+}
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
 .recap .picks { overflow-wrap:anywhere; }

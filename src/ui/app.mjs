@@ -1,7 +1,7 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.24';
+const APP_VERSION = 'v0.2.25';
 const APP_BUILD = '2026-10-26';
 
 const root = document.getElementById('app');
@@ -452,6 +452,36 @@ function button(label, fx, onclick) {
   return b;
 }
 
+// ปุ่มลัด: ตัวเลือกที่ i ได้เลข i+1 (ถึง 9) · Enter กดปุ่มเดินเรื่องปุ่มเดียวของการ์ด
+// เลขต้องติดที่ป้ายด้วย: attr() ใน ::before อ่านจากตัวที่ถือ pseudo (span) ไม่ใช่ปุ่ม
+const keyed = (b, i) => {
+  if (i < 9) b.dataset.key = b.firstChild.dataset.key = String(i + 1);
+  return b;
+};
+const enter = (b) => {
+  b.dataset.enter = '';
+  return b;
+};
+document.addEventListener('keydown', (e) => {
+  // กดค้าง = repeat — ไม่นับ ไม่งั้นเลือกรัวข้ามการ์ด
+  if (e.repeat || e.altKey || e.ctrlKey || e.metaKey || e.isComposing) return;
+  const t = e.target;
+  if (t.closest?.('input, textarea, select, [contenteditable]')) return;
+  let b;
+  if (e.key === 'Enter') {
+    // โฟกัสอยู่ที่ปุ่ม/หัวข้อพับ ให้ Enter ทำงานของตัวนั้น (แชร์ภาพ · สมุดฉายา · ผังตระกูล)
+    if (t.closest?.('button, summary, a')) return;
+    b = root.querySelector('.choices [data-enter]');
+  } else {
+    // อ่านตำแหน่งปุ่ม ไม่ใช่ตัวอักษร — แป้นไทยแถวเลขพิมพ์ ๅ / - ภ ถ ไม่ใช่ 1–5
+    const m = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
+    if (m) b = root.querySelector(`.choices button[data-key="${m[1]}"]`);
+  }
+  if (!b || b.disabled) return;
+  e.preventDefault();
+  b.click();
+});
+
 // แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): ลางกับเหตุการณ์ความเชื่อเป็นทาง B ที่เหลือเป็นทาง A
 const styleOf = (card) => (card.kind === 'omen' || ((card.kind === 'event' || card.kind === 'result') && card.type === 'B') ? 'b' : 'a');
 
@@ -484,7 +514,7 @@ function render(card) {
     if (tree) body.append(tree);
     // บัญชีบุญบาปเฉลยที่การ์ดศาลในระหว่างชาติ ไม่ใช่การ์ดตาย · ตายตอนเด็กได้บันทึกสั้น (ใบ 07) — ไม่มีสรุปช่วงวัย
     if (card.recap && !card.short) body.append(recap(card.recap));
-    choices.append(button('ไปช่วงระหว่างชาติ', null, () => play(T.afterlife)), ...shareButtons(card));
+    choices.append(enter(button('ไปช่วงระหว่างชาติ', null, () => play(T.afterlife))), ...shareButtons(card));
   } else {
     top.append(el('b', null, `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, `${genLabel()}${st.name} · ${provinceLabel(st)}`));
     box.append(top, stats(s));
@@ -516,15 +546,15 @@ function render(card) {
         if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), list(card.lineage, 'picks'));
         body.append(box);
       }
-      choices.append(button('ต่อไป', null, next));
+      choices.append(enter(button('ต่อไป', null, next)));
     } else if (card.kind === 'stage') {
       body.append(el('span', 'stamp', card.text));
       body.append(recap(card.recap));
-      choices.append(button('ต่อไป', null, next));
+      choices.append(enter(button('ต่อไป', null, next)));
     } else if (card.kind === 'era' || card.kind === 'omen' || card.kind === 'result') {
       body.append(el('h3', null, card.text));
       if (card.story) body.append(el('p', null, card.story));
-      choices.append(button('ต่อไป', null, next));
+      choices.append(enter(button('ต่อไป', null, next)));
     } else {
       if (card.title) body.append(el('h3', null, card.title));
       body.append(el(card.title ? 'p' : 'h3', card.title ? null : 'lead', card.text));
@@ -533,12 +563,12 @@ function render(card) {
       card.choices.forEach((c, i) => {
         const why = card.locked?.[i];
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
-        const b = button(c, why ?? card.fx?.[i], () => play(lifePick(i)));
+        const b = keyed(button(c, why ?? card.fx?.[i], () => play(lifePick(i))), i);
         if (why) b.disabled = true;
         choices.append(b);
       });
       // การ์ดเล่าเรื่อง (choices: []) ไม่มีปุ่มให้เลือก — ต้องมีทางไปใบถัดไป
-      if (!card.choices.length) choices.append(button('ต่อไป', null, next));
+      if (!card.choices.length) choices.append(enter(button('ต่อไป', null, next)));
     }
   }
   box.append(body, choices);
@@ -578,16 +608,16 @@ function renderAfter(card) {
   }
   if (card.note) body.append(el('p', 'note', card.note));
   if (card.done) {
-    choices.append(button('ไปเกิด', null, () => play(T.rebirth)));
+    choices.append(enter(button('ไปเกิด', null, () => play(T.rebirth))));
     choices.append(button('เริ่มตระกูลใหม่', null, start));
   } else if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
-      const b = button(c, why ?? card.fx?.[i], () => play(afterPick(i)));
+      const b = keyed(button(c, why ?? card.fx?.[i], () => play(afterPick(i))), i);
       if (why) b.disabled = true;
       choices.append(b);
     });
-  } else choices.append(button('ต่อไป', null, next));
+  } else choices.append(enter(button('ต่อไป', null, next)));
   box.append(top);
   if (court) box.append(courtScene());
   box.append(body, choices);
@@ -715,7 +745,7 @@ function confirmNew(back) {
 function home(card) {
   const where = af ? `ระหว่างชาติ หลังตายอายุ ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
-  choices.append(button('เล่นต่อ', null, () => show(card)), button('เริ่มตระกูลใหม่', null, () => confirmNew(() => home(card))));
+  choices.append(enter(button('เล่นต่อ', null, () => show(card))), button('เริ่มตระกูลใหม่', null, () => confirmNew(() => home(card))));
 }
 
 function boot() {
