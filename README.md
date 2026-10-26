@@ -1,4 +1,4 @@
-# next-life — ชาติหน้า · Next Life
+# next-life — เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด · Next Life
 
 สถานะ: **กำลังออกแบบ** ยังไม่มีตัวเกม · เว็บ: https://dmo-hub.github.io/next-life/
 

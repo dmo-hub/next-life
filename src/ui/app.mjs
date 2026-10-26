@@ -3,6 +3,8 @@ import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KE
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.2.49';
 const APP_BUILD = '2026-10-27';
+// ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
+const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
 
 const root = document.getElementById('app');
 document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`;
@@ -429,7 +431,7 @@ function shareFacts(card) {
 function summaryText(age, realm = null) {
   const t = titlesOf(st);
   return [
-    `ชาติหน้า · ${st.name}`,
+    `${GAME_NAME} · ${st.name}`,
     `เกิดปี ${st.birthYear} · ${provinceLabel(st)}`,
     `ตายอายุ ${age}`,
     `ชีวิตแบบ${(t.pattern ?? NO_PATTERN).name}`,
@@ -501,7 +503,7 @@ async function shareBlob(facts) {
   // ข้อความตัวอย่างต้องครอบทั้ง subset ไทยและละติน — load() โหลดเฉพาะ subset ที่ตัวอย่างใช้ ตัวเลข/อังกฤษจะตกฟอนต์สำรอง
   if (document.fonts) {
     await Promise.race([
-      Promise.all(SHARE_FONTS.map((f) => document.fonts.load(f, 'ชาติหน้า NEXT LIFE 0123456789?'))),
+      Promise.all(SHARE_FONTS.map((f) => document.fonts.load(f, `${GAME_NAME} NEXT LIFE 0123456789?`))),
       new Promise((r) => setTimeout(r, FONT_WAIT_MS)),
     ]).catch(() => {});
   }
@@ -562,7 +564,8 @@ async function shareBlob(facts) {
   };
 
   y = 130;
-  text('ชาติหน้า', '700 110px Srisakdi, serif', c('gold'), 120, 0, 1);
+  // ชื่อยาวแตกสองบรรทัดตรงช่องว่าง — ให้ย่อบรรทัดเดียวจะเล็กจนอ่านยากบนภาพแนวตั้ง
+  for (const part of GAME_NAME.split(' ')) text(part, '700 84px Srisakdi, serif', c('gold'), 96, 0, 1);
   text('NEXT LIFE', '600 28px Sarabun, sans-serif', c('sand'), 44, 0, 1);
   rule(44);
   text(facts.name, '700 72px Srisakdi, serif', c('cream'), 84, 4, 1);
@@ -748,7 +751,7 @@ function shareButtons(card) {
   const share = act('แชร์ภาพการ์ด', async (blob) => {
     const file = new File([blob], name, { type: 'image/png' });
     try {
-      await navigator.share({ files: [file], title: 'ชาติหน้า · Next Life', text: `ชาติหน้า · ${st.name} ตายอายุ ${card.age} — ${SHARE_URL}` });
+      await navigator.share({ files: [file], title: `${GAME_NAME} · Next Life`, text: `${GAME_NAME} · ${st.name} ตายอายุ ${card.age} — ${SHARE_URL}` });
     } catch (e) {
       // ผู้เล่นปิดหน้าแชร์เอง = จบ · แชร์พังด้วยเหตุอื่น เปิดภาพในแท็บใหม่ให้กดค้างบันทึก (มือถือที่โหลดไฟล์ไม่ได้) · แท็บโดนบล็อกจึงโหลดไฟล์
       if (e?.name !== 'AbortError') openOrDownload(blob, name);
@@ -1412,7 +1415,7 @@ function homeCard(title, lines) {
   root.replaceChildren();
   const box = el('article', 'card a');
   const top = el('div', 'top');
-  top.append(el('b', null, 'ชาติหน้า'), el('small', null, title));
+  top.append(el('b', null, GAME_NAME), el('small', null, title));
   const body = el('div', 'body');
   lines.forEach((t, i) => body.append(el(i ? 'p' : 'h3', i ? 'sub' : 'lead', t)));
   const choices = el('div', 'choices');
