@@ -31,6 +31,12 @@ events:
         text: "ติวเองกับเพื่อนสนิท"
         effects: {knowledge: 2, relations: 2, health: 1}
         merit: [{cat: neutral}]
+      - id: cram_hard_rite
+        text: "อ่านหนัก แล้วไหว้พระก่อนสอบ"
+        requires: {money: {unit: income_x, amount: 0.3}, reason: "เงินเก็บไม่พอค่าคอร์สติว"}
+        effects: {knowledge: 3, health: -1, money: {unit: income_x, amount: -0.32}, relations: 1}
+        sets_flags: [good_student]
+        merit: [{cat: neutral}]
 
   - id: teen_gaming_01
     type: A

@@ -148,6 +148,11 @@ events:
         text: "ส่งเงินอย่างเดียว ไม่มีเวลา"
         effects: {money: {unit: income_x, amount: -0.5}, relations: -2, health: 1}
         merit: [{cat: neutral}]
+      - id: move_in_rite
+        text: "รับพ่อแม่มาอยู่ ทำบุญบ้านก่อน"
+        cost: {unit: fixed_baht, amount: 2000, ref_year: 2566}
+        effects: {relations: 2, health: 1}
+        merit: [{cat: care_parents, level: 2}]
 
   - id: mid_crisis_01
     type: A

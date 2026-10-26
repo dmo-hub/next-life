@@ -101,6 +101,12 @@ events:
         text: "ปฏิเสธ ขอไปตามฝันก่อน"
         effects: {happiness: -1, knowledge: 1, relations: -1}
         merit: [{cat: neutral}]
+      - id: big_wedding_rite
+        text: "ดูฤกษ์แต่งก่อน แล้วจัดใหญ่"
+        requires: {money: {unit: income_x, amount: 2}, reason: "เงินเก็บยังไม่พอจัดงานใหญ่"}
+        effects: {relations: 3, happiness: 3, money: {unit: income_x, amount: -2.1}}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
 
   - id: young_baby_01
     type: A
@@ -132,6 +138,14 @@ events:
         text: "ทำงานสองกะเก็บค่านม"
         effects: {money: {unit: income_x, amount: 1.5}, health: -1, relations: -1}
         sets_flags: [has_kids]
+        merit: [{cat: neutral}]
+      - id: ultrasound_rite
+        text: "ทำบุญรับขวัญแล้วไปฟังผล"
+        cost: {unit: fixed_baht, amount: 500, ref_year: 2566}
+        effects: {happiness: 1, relations: 1}
+        outcomes:
+          - {weight: 1, text: "หมอยิ้มแปลก ๆ แล้วชี้จอ มีสองคน! แฝดมาแล้ว", effects: {happiness: 2, health: -1, money: {unit: income_x, amount: -2}}, sets_flags: [has_kids], family: [{add: child, n: 2}], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ลูกคนเดียว แข็งแรงดีทุกอย่าง", effects: {happiness: 2}, sets_flags: [has_kids], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   - id: young_loan_01
@@ -165,6 +179,11 @@ events:
       - id: bike
         text: "ไม่ซื้อ ไม่ให้ยืม ปั่นจักรยานไป"
         effects: {health: 1, money: {unit: income_x, amount: 1}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: new_car_rite
+        text: "ออกรถใหม่ ให้พระเจิมก่อนขับ"
+        effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -1.05}}
+        sets_flags: [in_debt]
         merit: [{cat: neutral}]
 
   - id: young_shop_01
@@ -200,6 +219,14 @@ events:
       - id: pass
         text: "ปล่อยไป ทำงานประจำต่อ"
         effects: {happiness: -1, health: 1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+      - id: chicken_rice_rite
+        text: "เปิดร้านข้าวมันไก่ตามฤกษ์"
+        cost: {unit: fixed_baht, amount: 2000, ref_year: 2566}
+        effects: {happiness: 1, relations: 1}
+        outcomes:
+          - {weight: 3, ok: true, text: "อร่อยจนคนบอกกันปากต่อปาก", effects: {relations: 1, job: service, money: {unit: income_x, amount: 1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขายดีแต่ยืนหน้าเตาจนหลังพัง ต้องเซ้งร้านกลับไปทำงานเดิม", effects: {health: -2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   - id: young_party_01
@@ -308,6 +335,13 @@ events:
         merit: [{cat: care_parents, level: 1}]
 
   # เรื่องต่อของ young_first_boss_01 (ผู้บริหารเรียกคุย) — ออกทาง next เท่านั้น
+      - id: legal_route_rite
+        text: "ไปทางถูกกฎหมาย ทำบุญก่อนบิน"
+        cost: {unit: fixed_baht, amount: 1000, ref_year: 2566}
+        requires: {stats: {knowledge: {min: 60}}, reason: "ภาษายังไม่ถึงขั้นสอบผ่าน"}
+        effects: {knowledge: 2, income_mult: 1.3, relations: 1}
+        merit: [{cat: neutral}]
+
   - id: young_boss_room_01
     type: A
     category: work_money

@@ -96,6 +96,13 @@ events:
         text: "เก็บสูตรไว้ทำกินที่บ้าน"
         effects: {relations: 1}
         merit: [{cat: care_parents, level: 1}]
+      - id: push_cart_rite
+        text: "ดูฤกษ์เข็นรถออกขายวันแรก"
+        effects: {money: {unit: income_x, amount: -0.55}, happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คนงานต่อคิวยาวถึงรั้ว น้ำจิ้มของยายกลายเป็นตำนานหน้าโรงงาน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [street_vendor], merit: [{cat: neutral}], multipliers: {stats: {network: 1.3, relations: 1.3}}}
+          - {weight: 1, text: "โดนเทศกิจยึดรถตั้งแต่วันที่สาม น้ำจิ้มเต็มถังยังไม่ได้เปิดฝา", effects: {happiness: -2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
 
   - id: biz_restaurant_01
     type: A
@@ -130,6 +137,13 @@ events:
         text: "เก็บความฝันไว้ในลิ้นชัก"
         effects: {happiness: -1}
         merit: [{cat: neutral}]
+      - id: open_restaurant_rite
+        text: "เปิดร้านตามฤกษ์ นิมนต์พระ"
+        effects: {money: {unit: income_x, amount: -2.05}, happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คนขับรถทัวร์จอดกินแล้วบอกต่อ วันหยุดคิวยาวถึงปั๊มน้ำมัน", effects: {happiness: 2, job: service}, sets_flags: [own_business], merit: [{cat: neutral}], multipliers: {stats: {network: 1.4}, flags: {street_vendor: 1.5}}}
+          - {weight: 1, text: "หกเดือนแรกขายได้ดี แล้วมีโครงการขยายถนน ปิดหน้าร้านยาวสองปี", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
 
   - id: biz_farm_expand_01
     type: A
@@ -164,6 +178,13 @@ events:
         text: "ช่วยลุงหาคนซื้อราคาดี"
         effects: {relations: 2, network: 1}
         merit: [{cat: help_others, level: 1}]
+      - id: buy_land_rice_rite
+        text: "ซื้อนา ทำขวัญข้าวก่อนลงมือ"
+        effects: {money: {unit: income_x, amount: -1.6}, happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ข้าวปีนั้นราคาดี นาสองแปลงเลี้ยงทั้งบ้านได้สบาย", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ราคาข้าวดิ่งตั้งแต่ปีแรก ได้ที่เพิ่มแต่งานหนักเป็นสองเท่า", effects: {health: -1, income_mult: 0.9}, merit: [{cat: neutral}]}
 
   - id: biz_farm_buyer_01
     type: A
