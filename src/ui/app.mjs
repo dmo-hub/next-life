@@ -1178,7 +1178,8 @@ function noteQuote(label, text) {
 
 // แผงครอบครัว (B36c): คนรอบตัวตอนนี้ แยกจากผังตระกูลที่เล่ารุ่นก่อน · อ่านอย่างเดียว ไม่มี token ในเซฟ
 // ใช้เฉพาะช่องที่ไล่ชื่อไว้ข้างล่าง — แกนเติมช่องใหม่ในสมาชิกก็ไม่หลุดขึ้นจอ · bond บอกเป็นป้ายคำ ไม่ใช่ตัวเลข
-const FAMILY_ORDER = ['parent', 'spouse', 'child', 'grandchild', 'pet', 'peer'];
+const FAMILY_ORDER = ['parent', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'];
+const ANIMAL_ROLES = ['pet', 'herd'];
 const kinWord = (m) => {
   const male = m.sex === 'ชาย';
   if (m.role === 'parent') return male ? 'พ่อ' : 'แม่';
@@ -1186,6 +1187,7 @@ const kinWord = (m) => {
   if (m.role === 'child') return male ? 'ลูกชาย' : 'ลูกสาว';
   if (m.role === 'grandchild') return male ? 'หลานชาย' : 'หลานสาว';
   if (m.role === 'pet') return m.kind ?? 'สัตว์เลี้ยง';
+  if (m.role === 'herd') return `ฝูง${m.kind ?? 'สัตว์'}`;
   return 'เพื่อนรุ่น';
 };
 // พับ/กางค้างไว้ข้ามการ์ด — การ์ดวาดใหม่ทุกใบ ไม่งั้นผู้เล่นต้องกางซ้ำทุกครั้ง (ค่าหน้าจอ ไม่อยู่ในเซฟ)
@@ -1199,17 +1201,23 @@ function familyPanel() {
     .sort((a, b) => rank(a.m) - rank(b.m) || (a.m.order ?? 0) - (b.m.order ?? 0) || a.i - b.i)
     .map(({ m }) => {
       const who = m.name ? `${kinWord(m)} · ${m.name}` : kinWord(m);
+      // ฝูงเป็นทรัพย์สิน นับเป็นหน่วยเดียว — ไม่มีอายุรายตัวหรือความผูกพันให้บอก
+      if (m.role === 'herd') return { text: m.alive && !m.left ? `${who} · เลี้ยงไว้` : `${who} · หมดไปแล้ว`, gone: !m.alive || !!m.left };
       if (!m.alive) return { text: `${who} · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}`, gone: true };
+      if (m.role === 'pet' && m.left) return { text: `${who} · ไม่ได้อยู่กับเราแล้ว`, gone: true };
       const parts = [who, m.age != null && `อายุ ${m.age}`, m.left ? 'แยกทางแล้ว' : m.bondLevel].filter(Boolean);
       return { text: parts.join(' · '), gone: false };
     });
-  const alive = all.filter((m) => m.alive).length;
+  // หัวแผงนับเฉพาะคน — สัตว์บอกแยก ไม่งั้น "ยังอยู่ 3 คน" รวมหมากับฝูงไก่
+  const people = all.filter((m) => !ANIMAL_ROLES.includes(m.role));
+  const alive = people.filter((m) => m.alive).length;
+  const animals = all.filter((m) => ANIMAL_ROLES.includes(m.role) && m.alive && !m.left).length;
   const d = el('details', 'family');
   d.open = familyOpen;
   d.addEventListener('toggle', () => (familyOpen = d.open));
   const ul = el('ul', 'picks');
   for (const r of rows) ul.append(el('li', r.gone ? 'gone' : null, r.text));
-  d.append(el('summary', null, `ครอบครัว · ยังอยู่ ${alive} ${alive === all.length ? 'คน' : `จาก ${all.length} คน`}`), ul);
+  d.append(el('summary', null, `ครอบครัว · ยังอยู่ ${alive} ${alive === people.length ? 'คน' : `จาก ${people.length} คน`}${animals ? ` · สัตว์ ${animals}` : ''}`), ul);
   return d;
 }
 
@@ -1240,6 +1248,20 @@ function standingPanel() {
   return d;
 }
 
+// คู่ใจที่ตายก่อนเรามารอเดินไปปรโลกด้วย (B44) — เฉพาะตัวที่ดูแลดี (ป้าย "สนิท" ขึ้นไปในแผงครอบครัว)
+// ไม่มีผลต่อคำตัดสิน · ไม่ใช่การ์ดใหม่ จึงไม่มี token ในเซฟ · ตัวที่ยกให้คนอื่น/หายไปไม่นับ
+const PET_WAIT_BOND = 60;
+const PET_WAIT_MAX = 3;
+function petsWaiting(s) {
+  const pets = (s.kin ?? []).filter((m) => m.role === 'pet' && !m.alive && !m.left && (m.bond ?? 0) >= PET_WAIT_BOND);
+  if (!pets.length) return null;
+  const call = (m) => (m.name ? `เจ้า${m.name} ${m.kind ?? 'สัตว์'}ที่เคยเลี้ยง` : `${m.kind ?? 'สัตว์'}ที่เคยเลี้ยง`);
+  const shown = pets.slice(-PET_WAIT_MAX).map(call);
+  const more = pets.length - shown.length;
+  const who = more ? `${shown.join(' ')} และอีก ${more} ตัว` : shown.length > 1 ? `${shown.slice(0, -1).join(' ')} กับ${shown.at(-1)}` : shown[0];
+  return `ระหว่างทาง ${who} นั่งรออยู่ข้างทาง แล้วเดินตามไปด้วยจนถึงหน้าปรโลก`;
+}
+
 // ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะ — ชีวิตจบแล้ว
 const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ปรโลก', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ' };
 const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา' };
@@ -1255,6 +1277,10 @@ function renderAfter(card) {
   const court = card.kind === 'verdict' || card.scene === 'devaduta';
   body.append(el('span', 'kicker', card.kind === 'scene' ? AFTER_KICKER[card.scene] : AFTER_TOP[card.kind]));
   if (card.title) body.append(el('h3', null, card.title));
+  if (card.scene === 'devaduta') {
+    const wait = petsWaiting(af.st);
+    if (wait) body.append(el('p', 'sub', wait));
+  }
   if (card.kind === 'verdict') body.append(el('h3', null, `ภูมิ${card.realm}`));
   body.append(el(card.title || card.kind === 'verdict' ? 'p' : 'h3', card.title || card.kind === 'verdict' ? null : 'lead', card.text));
   if (card.reckoning) body.append(reckoningBox(card.reckoning, af.st.deeds));
