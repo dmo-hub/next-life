@@ -607,7 +607,6 @@ function shareFacts(card) {
     stats: (card.life?.stats ?? []).map((p) => Object.fromEntries([['age', p.age], ...STAT_KEYS.map((k) => [k, p[k]])])),
     marks: lifeMarks(card.age).map((m) => m.age),
     note: ((n) => n && { age: n.a, text: n.t })(notePick(st.gen)),
-    standing: standingGens(st.lineage, standingNow(true)).map((g) => ({ age: g.age, broke: !!g.broke, pts: g.pts.map((p) => ({ age: p.age, cls: p.cls })) })),
   };
 }
 
@@ -766,17 +765,9 @@ async function shareBlob(facts) {
     text(facts.title.name, '700 68px Srisakdi, serif', c('gold2'), 84, 0, 1);
     text(facts.title.tier, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 1);
   }
-  // เส้นย่อฐานะตระกูล (B95) แทรกเหนือกราฟทั้งชีวิตโดยเตี้ยกราฟนั้นลง — ที่ว่างขึ้นกับข้อความข้างบน
-  // ลงไม่พอขั้นต่ำก็ไม่วาด กราฟทั้งชีวิตคงขนาดเดิม · บันทึกชีวิตได้ที่เหลือเหนือเส้นย่อ
-  const lifeH = facts.stats.length >= 2 ? 240 : 0;
-  const strip = facts.standing.reduce((n, g) => n + g.pts.length, 0) >= 2 ? standStrip(y, lifeH) : null;
-  const chartH = strip && lifeH ? lifeH - SHARE_STAND_CUT : lifeH;
-  const chartY = SHARE_H - SHARE_CHART_TOP + (lifeH - chartH);
-  // ขอบซ้ายเลื่อนเข้าให้ป้าย "มั่งคั่ง/ยากไร้" ไม่ชนกรอบ · ขอบขวาตรงกับกราฟทั้งชีวิต
-  if (strip) shareStanding(ctx, c, facts.standing, 160, strip.y, SHARE_W - 280, strip.h);
-  if (facts.note) shareNote(ctx, c, facts.note, cx, maxW, y, strip ? strip.y - STAND_HEAD + 56 : chartY);
+  if (facts.note) shareNote(ctx, c, facts.note, cx, maxW, y, SHARE_H - SHARE_CHART_TOP);
   // กราฟอยู่ล่างสุด ยึดจากขอบล่าง — ข้อความข้างบนยาวแค่ไหนก็ไม่ทับกัน (ข้อความถูกจำกัดบรรทัดไว้แล้ว)
-  if (lifeH) shareChart(ctx, c, facts, 120, chartY, SHARE_W - 240, chartH);
+  if (facts.stats.length >= 2) shareChart(ctx, c, facts, 120, SHARE_H - SHARE_CHART_TOP, SHARE_W - 240, 240);
   ctx.font = '400 30px Sarabun, sans-serif';
   ctx.fillStyle = c('sand');
   ctx.fillText(SHARE_URL, cx, SHARE_H - 72);
@@ -785,69 +776,6 @@ async function shareBlob(facts) {
 }
 
 const SHARE_CHART_TOP = 440;
-// เส้นย่อฐานะตระกูลบนภาพ (B95): กราฟทั้งชีวิตเตี้ยลงเท่า CUT เพื่อเปิดที่ · HEAD = หัวเหนือเส้นย่อ · LABEL = เลขรุ่นใต้เส้นย่อ
-const SHARE_STAND_CUT = 70, STAND_HEAD = 44, STAND_LABEL = 40, STAND_MIN = 48, STAND_MAX = 130;
-function standStrip(textEnd, lifeH) {
-  const bottom = SHARE_H - SHARE_CHART_TOP + (lifeH ? SHARE_STAND_CUT : 0) - (lifeH ? 56 + 64 : 0) - STAND_LABEL;
-  const h = Math.min(STAND_MAX, bottom - (textEnd + 36 + STAND_HEAD));
-  return h >= STAND_MIN ? { y: bottom - h, h } : null;
-}
-// สีและรูปจุดชุดเดียวกับ standingChart บนจอ: ขาลงสีแดงเส้นประ · ตายพร้อมหนี้เป็นจุดสี่เหลี่ยม · แกนตั้งบอกแค่บนสุด/ล่างสุด
-// ภาพเล็กกว่าจอมาก วาดทุกช่วงวัยแล้วรก — ย่อเหลือฐานะตอนเกิดของรุ่นแรก + ฐานะตอนตายรุ่นละจุด ระยะห่างเท่ากัน
-function shareStanding(ctx, c, gens, x0, y0, w, h) {
-  const units = gens.length;
-  const pts = [{ u: 0, cls: gens[0].pts[0].cls }, ...gens.map((g, i) => ({ u: i + 1, cls: g.pts.at(-1).cls, g, end: true }))];
-  const x = (u) => x0 + (u / units) * w;
-  const y = (k) => y0 + ((CLASSES.length - 1 - k) / (CLASSES.length - 1)) * h;
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.font = '600 28px Sarabun, sans-serif';
-  ctx.fillStyle = c('gold');
-  ctx.fillText(gens.length > 1 ? `ฐานะตระกูล · ${gens.length} รุ่น` : 'ฐานะตลอดชีวิต', x0 + w / 2, y0 - 16);
-  ctx.font = '400 22px Sarabun, sans-serif';
-  ctx.strokeStyle = c('bronze2');
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 6]);
-  for (const k of [0, CLASSES.length - 1]) {
-    ctx.beginPath();
-    ctx.moveTo(x0, y(k));
-    ctx.lineTo(x0 + w, y(k));
-    ctx.stroke();
-  }
-  ctx.setLineDash([]);
-  // ป้ายใต้จุดตายของแต่ละรุ่น: ช่องกว้างพอ = "รุ่น N" · แคบ = เฉพาะรุ่นแรกกับรุ่นท้าย
-  const bw = w / units;
-  ctx.fillStyle = c('sand');
-  gens.forEach((g, i) => {
-    if (gens.length > 1 && (bw >= 90 || i === 0 || i === gens.length - 1)) ctx.fillText(`รุ่น ${i + 1}`, x(i + 1), y0 + h + 30);
-  });
-  ctx.textAlign = 'right';
-  ctx.fillStyle = c('sand');
-  ctx.fillText(CLASSES.at(-1), x0 - 10, y(CLASSES.length - 1) + 8);
-  ctx.fillText(CLASSES[0], x0 - 10, y(0) + 8);
-  ctx.lineWidth = 5;
-  ctx.lineCap = 'round';
-  for (let i = 1; i < pts.length; i++) {
-    const a = pts[i - 1], b = pts[i];
-    ctx.strokeStyle = b.cls < a.cls ? '#E07A5F' : b.cls > a.cls ? c('gold2') : c('sand');
-    ctx.setLineDash(b.cls < a.cls ? [14, 9] : []);
-    ctx.beginPath();
-    ctx.moveTo(x(a.u), y(a.cls));
-    ctx.lineTo(x(b.u), y(b.cls));
-    ctx.stroke();
-  }
-  ctx.setLineDash([]);
-  for (const p of pts.filter((q) => q.end)) {
-    ctx.fillStyle = p.g.broke ? '#E07A5F' : c('gold2');
-    if (p.g.broke) ctx.fillRect(x(p.u) - 9, y(p.cls) - 9, 18, 18);
-    else {
-      ctx.beginPath();
-      ctx.arc(x(p.u), y(p.cls), 8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-  ctx.restore();
-}
 // หัวกราฟวาดเหนือกรอบกราฟ 56px — บันทึกต้องจบก่อนหัวนั้นพอให้เว้นช่อง
 const NOTE_CLEAR = 100;
 // บันทึกชีวิตบนภาพ (B39): ข้อความผู้เล่นยาวไม่แน่นอน แต่ที่ว่างเหนือกราฟขึ้นกับข้อความข้างบน
