@@ -6,7 +6,7 @@ import { makeRng, mixSeed } from './rng.mjs';
 import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
-import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints } from './life.mjs';
+import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed } from './life.mjs';
 
 // ระดับกรรมที่ปรโลก (−1..1) = บัญชีสุทธิ ÷ ref · ref แยกจากตัวคูณกรรมระหว่างชีวิต (KARMA.ref) เพราะบัญชีทั้งชีวิตสะสมไกลกว่า
 // จุดอิ่มของตัวคูณการตายมาก — ใช้ ref เดียวกันแล้วเกือบทุกคนชนเพดาน ภูมิกับฐานะชาติหน้าจะไม่แยกคน
@@ -200,11 +200,13 @@ export function chooseAfter(af, idx) {
   if (!c) throw new Error('ตัวเลือกไม่ถูกต้อง');
   af.pending = null;
   // บุญบาปในช่วงที่ 7 เข้าบัญชีเดิม: ก่อนปรโลก = เปลี่ยนคำตัดสิน · หลังปรโลก = เปลี่ยนส่วนที่ส่งต่อ (ใบ 09 แก้เพิ่ม)
-  recordMerit(af.st.ledger, c.merit, p.id);
+  // อายุ null = ทำหลังตาย หน้าจอเรียกตามนั้น
+  const text = fill(c.text, af.st);
+  noteDeed(af.st, text, () => recordMerit(af.st.ledger, c.merit, p.id), null);
   addBonus(af, c.effects);
   if (!c.outcomes?.length) return;
   const o = weighted(af.rng, c.outcomes, c.outcomes.map((x) => x.weight * poolMultiplier(af.st, x.multipliers)));
-  recordMerit(af.st.ledger, o.merit, p.id);
+  noteDeed(af.st, text, () => recordMerit(af.st.ledger, o.merit, p.id), null);
   addBonus(af, o.effects);
   if (o.text) af.queue.push({ kind: 'result', type: 'B', text: fill(o.text, af.st), choices: [] });
 }

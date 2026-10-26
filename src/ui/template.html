@@ -150,6 +150,10 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .scale > div.heavy { border-color:var(--gold); }
 .scale b { color:var(--gold2); font-family:Srisakdi,serif; font-size:18px; }
 .scale .sum { font-size:15px; font-weight:600; color:var(--cream); }
+.deeds { display:flex; flex-direction:column; gap:6px; border-top:1px solid var(--bronze); padding-top:8px; }
+.deed { margin:0; display:flex; flex-direction:column; gap:2px; font-size:13px; overflow-wrap:anywhere; color:#E3D6B3; }
+.deed b { color:var(--gold2); font-size:12px; }
+.deed.bad b { color:#E39A8A; }
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
 .a .choice:disabled, .b .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
 </style>

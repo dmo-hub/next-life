@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.2.41';
@@ -207,7 +207,7 @@ function recap(r) {
 
 // เฉลยบัญชีบุญบาปที่ปรโลก (ใบ 09) — ระหว่างชีวิตผู้เล่นไม่เคยเห็นตัวเลขนี้
 // วางเป็นตาชั่งสองฝั่ง (ต้นแบบการ์ดปรโลก) — ฝั่งที่หนักกว่าได้ขอบทอง ผู้เล่นเห็นทิศก่อนอ่านตัวเลข
-function reckoningBox(r) {
+function reckoningBox(r, deeds) {
   const box = el('div', 'recap');
   box.append(el('div', 'h', 'บัญชีบุญบาป เฉลยที่ปรโลก'));
   const scale = el('div', 'scale');
@@ -222,7 +222,29 @@ function reckoningBox(r) {
   box.append(scale);
   box.append(el('p', 'sub', r.lean === 'เสมอ' ? 'บุญบาปพอ ๆ กัน' : `หนักไปทาง${r.lean}`));
   if (!r.top.length) box.append(el('p', 'sub', 'ชีวิตนี้ไม่ได้ทำบุญหรือบาปที่นับได้'));
+  if (deeds.length) box.append(deedsPart(deeds));
   return box;
+}
+
+// ไทม์ไลน์กรรม (B26) — บอกเป็นระดับ ไม่บอกแต้มต่อเรื่อง · เกณฑ์ตรงกับน้ำหนักระดับ 2 และ 3 ของป้ายในเนื้อหา
+const deedLevel = (d) => (d.weight >= MERIT_LEVELS[3] ? (d.bad ? 'หนัก' : 'ใหญ่') : d.weight >= MERIT_LEVELS[2] ? 'กลาง' : d.bad ? 'เบา' : 'เล็ก');
+const deedLine = (d) => `${d.age === null ? 'หลังตาย' : `อายุ ${d.age}`} · ${d.text}`;
+function deedsPart(deeds) {
+  const part = el('div', 'deeds');
+  part.append(el('div', 'h', 'เรื่องที่ชั่งไว้'));
+  // เท่ากันเอาเรื่องที่ทำก่อน — ไม่ขึ้นกับลำดับ sort ของเบราว์เซอร์
+  const top = (bad) => deeds.filter((d) => d.bad === bad).reduce((a, d) => (a && a.weight >= d.weight ? a : d), null);
+  for (const [bad, label] of [[false, 'บุญใหญ่สุด'], [true, 'บาปหนักสุด']]) {
+    const d = top(bad);
+    const row = el('p', bad ? 'deed bad' : 'deed');
+    row.append(el('b', null, label), el('span', null, d ? `${deedLine(d)} (${deedLevel(d)})` : 'ไม่มี'));
+    part.append(row);
+  }
+  const all = el('details', 'all-picks');
+  all.append(el('summary', null, `ดูทั้งหมดตามอายุ (${deeds.length} เรื่อง)`));
+  all.append(list(deeds.map((d) => `${deedLine(d)} · ${d.bad ? 'บาป' : 'บุญ'}${deedLevel(d)}`), 'picks'));
+  part.append(all);
+  return part;
 }
 
 // แถบภาพพิกเซลปรโลก (ต้นแบบการ์ด B2) — ทำเครื่องหมายฉากปรโลกให้ต่างจากการ์ดระหว่างชาติใบอื่น
@@ -722,7 +744,7 @@ function renderAfter(card) {
   if (card.title) body.append(el('h3', null, card.title));
   if (card.kind === 'verdict') body.append(el('h3', null, `ภูมิ${card.realm}`));
   body.append(el(card.title || card.kind === 'verdict' ? 'p' : 'h3', card.title || card.kind === 'verdict' ? null : 'lead', card.text));
-  if (card.reckoning) body.append(reckoningBox(card.reckoning));
+  if (card.reckoning) body.append(reckoningBox(card.reckoning, af.st.deeds));
   if (card.lineage) {
     body.append(el('div', 'kicker', 'ผังตระกูล'));
     body.append(list(card.lineage, 'picks'));

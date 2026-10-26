@@ -179,6 +179,8 @@ export function newLife(seed, content, heir = null) {
     healthNatural: s.health,
     // บัญชีบุญบาปซ่อน — ห้ามส่งออกไปกับการ์ดหรือ statsOf
     ledger: heir?.ledger ?? newLedger(),
+    // ที่มาของบัญชีชาตินี้ตามอายุ (B26) — บัญชีที่พกมาจากชาติก่อนไม่มีรายการ
+    deeds: [],
     // รุ่นที่เท่าไรของตระกูล + บันทึกรุ่นก่อน · มรดกจากรุ่นก่อนที่ยังไม่ถึงอายุรับ (ทางเป็นลูก)
     gen: heir?.gen ?? 1,
     lineage: heir?.lineage ?? [],
@@ -854,10 +856,12 @@ export function whenOk(st, when) {
 }
 
 // ป้ายบุญบาปเข้าบัญชีซ่อน · ธง · นัดเหตุการณ์ต่อเนื่อง (ใบ 07) — นัดสุ่มปีจาก rng ของโลก เพราะเป็นผลของการเลือก
-function applyChoice(st, ev, c) {
+function applyChoice(st, ev, c, text) {
   // คำบนเดียวกันมีหลายการ์ดนัด (ครั้งที่ 1 · ครั้งที่ 2) — ใช้ธงคำบนที่การ์ดปิดเป็นตัวระบุ ไม่ใช่ id การ์ด
   const vow = (c.clears_flags ?? []).find((f) => f.startsWith('vow_open:')) ?? ev.id;
-  for (const f of recordMerit(st.ledger, c.merit, vow)) st.flags[f] = true;
+  noteDeed(st, text, () => {
+    for (const f of recordMerit(st.ledger, c.merit, vow)) st.flags[f] = true;
+  });
   for (const f of c.sets_flags ?? []) {
     st.flags[f] = true;
     st.flagAge[f] ??= st.age;
@@ -865,6 +869,19 @@ function applyChoice(st, ev, c) {
   for (const f of c.clears_flags ?? []) delete st.flags[f];
   applyFamily(st, c, ev.category === 'family' && c.effects?.relations > 0 ? c.effects.relations : 0);
   for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]) });
+}
+
+// รายการบุญบาปตามอายุ (B26) — วัดจากบัญชีที่ขยับจริง ไม่ใช่ป้ายบนตัวเลือก: คำบนที่ผิดซ้ำไม่ทบ จึงไม่ควรขึ้นซ้ำ
+// ผลสุ่มของตัวเลือกเดียวกันรวมเข้ารายการเดิม ผู้เล่นทำเรื่องเดียว · อยู่ใน st ไม่ออกไปกับการ์ด หน้าจออ่านตอนวาดการ์ดปรโลก
+export function noteDeed(st, text, record, age = st.age) {
+  const m0 = st.ledger.merit, s0 = st.ledger.sin;
+  record();
+  for (const [bad, w] of [[false, st.ledger.merit - m0], [true, st.ledger.sin - s0]]) {
+    if (!(w > 0)) continue;
+    const last = st.deeds.at(-1);
+    if (last && last.age === age && last.text === text && last.bad === bad) last.weight += w;
+    else st.deeds.push({ age, text, bad, weight: w });
+  }
 }
 
 export function choose(st, idx) {
@@ -887,13 +904,13 @@ export function choose(st, idx) {
   if (ev.id === FUNERAL.rite) {
     st.funeral = { id: c.id, text, cost: c.effects?.money ? -moneyValue(st, c.effects.money) : 0 };
     // คนมาส่งทำบุญอุทิศให้ — ลงบัญชีก่อนถึงปรโลก
-    addMerit(st.ledger, 'dana', Math.min(FUNERAL.guestMerit.cap, guestBase(st) / FUNERAL.guestMerit.ref));
+    noteDeed(st, 'คนที่มาส่งทำบุญอุทิศให้ในงานศพ', () => addMerit(st.ledger, 'dana', Math.min(FUNERAL.guestMerit.cap, guestBase(st) / FUNERAL.guestMerit.ref)));
   }
   const pool = ev.weight && ev.age === undefined && !ev.era;
   const s = pool ? poolEffectScale(stageOf(st.age)) : 1;
   const ss = pool ? poolStatScale(stageOf(st.age)) : 1;
   applyEffects(st, c.effects, s, ss);
-  applyChoice(st, ev, c);
+  applyChoice(st, ev, c, text);
   st.log.push({ id: ev.id, age: st.age, choice: idx, text });
   // ผลสุ่ม: จับทางด้วย rng ของโลก (เป็นผลของการเลือก) แล้วเล่าเป็นการ์ดผลลัพธ์ใบถัดไป
   // น้ำหนักแต่ละทางเอียงตาม multipliers ของทางนั้น — บัญชีอ่านหลังป้ายบุญบาปของตัวเลือกนี้ลงแล้ว (กรรมตามทันทันที)
@@ -904,7 +921,7 @@ export function choose(st, idx) {
     const o = weighted(st.rng, c.outcomes, c.outcomes.map((x) => x.weight * poolMultiplier(st, x.multipliers)));
     const helper = !o.ok && hurts(st, o.effects) ? kinAid(st) : null;
     applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1);
-    applyChoice(st, ev, o);
+    applyChoice(st, ev, o, text);
     if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
