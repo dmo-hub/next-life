@@ -560,7 +560,10 @@ function render(card) {
     box.append(meta);
     const tree = familyTree();
     if (tree) box.append(tree);
-    body.append(el('span', 'kicker', card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind]));
+    const kicker = card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind];
+    // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
+    body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));
+    if (card.news?.story) body.append(el('p', 'news', card.news.story));
 
     if (card.kind === 'intro') {
       body.append(el('span', 'stamp', 'แรกเกิด'));

@@ -610,7 +610,11 @@ function emit(st, card) {
 }
 
 // การ์ดเลือกของเหตุการณ์ — ตั้ง pending ไว้ให้ choose อ่าน
-function eventCard(st, ev) {
+// ปิด merge = ข่าวกับการ์ดรับมือแยกใบแบบเดิม (ตัวควบคุมของ harness)
+export const ERA_NEWS = { merge: true };
+
+// news = ข่าวบ้านเมืองที่รวมมาเป็นบรรทัดนำ (B58) — การ์ดยังเป็นของเหตุการณ์ ตัวเลือก/เซฟเดินเหมือนเดิม
+function eventCard(st, ev, news = null) {
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
@@ -622,6 +626,7 @@ function eventCard(st, ev) {
     type: ev.type ?? 'A',
     // การ์ดเนื้อหาที่ผูกเหตุการณ์บ้านเมือง — หน้าจอติดป้ายบ้านเมืองแทนช่วงวัย
     national: !!ev.era,
+    ...(news && { news }),
     funeral: ev.id === FUNERAL.wishes || ev.id === FUNERAL.rite,
     age: st.age,
     stage: stageOf(st.age),
@@ -669,6 +674,13 @@ export function nextCard(st) {
   if (st.queue.length) {
     const card = st.queue.shift();
     if (card.kind === 'eraEvent') return eventCard(st, card.ev);
+    // ข่าวบ้านเมืองที่มีการ์ดรับมือของเหตุการณ์เดียวกันต่อท้าย = ใบเดียว (B58) — ไม่งั้นผู้เล่นกด "ต่อไป" ใบเปล่าก่อนเรื่องจริง
+    // ไม่แตะ rng/state ผลเกมจึงเท่าเดิม ต่างแค่จำนวนการ์ด
+    const pair = st.queue[0];
+    if (card.kind === 'era' && ERA_NEWS.merge && pair?.kind === 'eraEvent' && pair.ev.era === card.id) {
+      st.queue.shift();
+      return eventCard(st, pair.ev, { text: card.text, story: card.story });
+    }
     if (card.kind === 'alloc') {
       const options = allocOptions(st.content.era, st.birthYear + st.age);
       card.choices = options.map((o) => o.label);

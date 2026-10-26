@@ -48,6 +48,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .body h3.lead { font-size:19px; font-weight:400; }
 .body p { margin:0; font-size:15px; }
 .kicker { font-size:12px; font-weight:600; letter-spacing:0.06em; }
+.body p.news { margin:0; padding-left:10px; border-left:2px solid currentColor; font-size:14px; opacity:0.8; }
 .items, .picks { margin:0; padding-left:20px; font-size:14px; }
 .body .sub { font-size:14px; }
 .body .note { font-size:12px; }
@@ -1686,7 +1687,11 @@ function emit(st, card) {
 }
 
 // การ์ดเลือกของเหตุการณ์ — ตั้ง pending ไว้ให้ choose อ่าน
-function eventCard(st, ev) {
+// ปิด merge = ข่าวกับการ์ดรับมือแยกใบแบบเดิม (ตัวควบคุมของ harness)
+const ERA_NEWS = { merge: true };
+
+// news = ข่าวบ้านเมืองที่รวมมาเป็นบรรทัดนำ (B58) — การ์ดยังเป็นของเหตุการณ์ ตัวเลือก/เซฟเดินเหมือนเดิม
+function eventCard(st, ev, news = null) {
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
@@ -1698,6 +1703,7 @@ function eventCard(st, ev) {
     type: ev.type ?? 'A',
     // การ์ดเนื้อหาที่ผูกเหตุการณ์บ้านเมือง — หน้าจอติดป้ายบ้านเมืองแทนช่วงวัย
     national: !!ev.era,
+    ...(news && { news }),
     funeral: ev.id === FUNERAL.wishes || ev.id === FUNERAL.rite,
     age: st.age,
     stage: stageOf(st.age),
@@ -1745,6 +1751,13 @@ function nextCard(st) {
   if (st.queue.length) {
     const card = st.queue.shift();
     if (card.kind === 'eraEvent') return eventCard(st, card.ev);
+    // ข่าวบ้านเมืองที่มีการ์ดรับมือของเหตุการณ์เดียวกันต่อท้าย = ใบเดียว (B58) — ไม่งั้นผู้เล่นกด "ต่อไป" ใบเปล่าก่อนเรื่องจริง
+    // ไม่แตะ rng/state ผลเกมจึงเท่าเดิม ต่างแค่จำนวนการ์ด
+    const pair = st.queue[0];
+    if (card.kind === 'era' && ERA_NEWS.merge && pair?.kind === 'eraEvent' && pair.ev.era === card.id) {
+      st.queue.shift();
+      return eventCard(st, pair.ev, { text: card.text, story: card.story });
+    }
     if (card.kind === 'alloc') {
       const options = allocOptions(st.content.era, st.birthYear + st.age);
       card.choices = options.map((o) => o.label);
@@ -3567,7 +3580,10 @@ function render(card) {
     box.append(meta);
     const tree = familyTree();
     if (tree) box.append(tree);
-    body.append(el('span', 'kicker', card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind]));
+    const kicker = card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind];
+    // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
+    body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));
+    if (card.news?.story) body.append(el('p', 'news', card.news.story));
 
     if (card.kind === 'intro') {
       body.append(el('span', 'stamp', 'แรกเกิด'));
