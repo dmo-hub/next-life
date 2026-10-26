@@ -530,7 +530,7 @@ function render(card) {
     if (card.summary.bankruptcies) body.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
     if (card.note) body.append(el('p', 'sub', card.note));
     if (card.funeral) body.append(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
-    if (card.will !== undefined) body.append(el('p', 'sub', card.will ? 'มีพินัยกรรม ลูกหลานแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ลูกหลานแบ่งทรัพย์กันเองจนผิดใจกัน'));
+    if (card.will !== undefined) body.append(el('p', 'sub', card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
     body.append(titlesBox(card));
     const tree = familyTree();
     if (tree) body.append(tree);
