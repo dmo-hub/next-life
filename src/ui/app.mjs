@@ -1,8 +1,8 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.23';
-const APP_BUILD = '2026-10-24';
+const APP_VERSION = 'v0.2.24';
+const APP_BUILD = '2026-10-26';
 
 const root = document.getElementById('app');
 document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`;
@@ -466,7 +466,7 @@ function render(card) {
   const top = el('div', 'top');
   const body = el('div', 'body');
   const choices = el('div', 'choices');
-  const next = () => render(nextCard(st));
+  const next = () => play(T.next);
 
   if (card.kind === 'death') {
     top.append(el('b', null, 'มรณบัตร'), el('small', null, `${genLabel()}${st.name} · สิริอายุ ${card.age} ปี`));
@@ -484,10 +484,7 @@ function render(card) {
     if (tree) body.append(tree);
     // บัญชีบุญบาปเฉลยที่การ์ดศาลในระหว่างชาติ ไม่ใช่การ์ดตาย · ตายตอนเด็กได้บันทึกสั้น (ใบ 07) — ไม่มีสรุปช่วงวัย
     if (card.recap && !card.short) body.append(recap(card.recap));
-    choices.append(button('ไปช่วงระหว่างชาติ', null, () => {
-      af = startAfterlife(st);
-      renderAfter(nextAfterCard(af));
-    }), ...shareButtons(card));
+    choices.append(button('ไปช่วงระหว่างชาติ', null, () => play(T.afterlife)), ...shareButtons(card));
   } else {
     top.append(el('b', null, `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, `${genLabel()}${st.name} · ${provinceLabel(st)}`));
     box.append(top, stats(s));
@@ -536,10 +533,7 @@ function render(card) {
       card.choices.forEach((c, i) => {
         const why = card.locked?.[i];
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
-        const b = button(c, why ?? card.fx?.[i], () => {
-          choose(st, i);
-          next();
-        });
+        const b = button(c, why ?? card.fx?.[i], () => play(lifePick(i)));
         if (why) b.disabled = true;
         choices.append(b);
       });
@@ -571,7 +565,7 @@ function renderAfter(card) {
   top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, `${genLabel()}${st.name} · ตายอายุ ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
-  const next = () => renderAfter(nextAfterCard(af));
+  const next = () => play(T.afterNext);
   const court = card.kind === 'verdict' || card.scene === 'devaduta';
   body.append(el('span', 'kicker', card.kind === 'scene' ? AFTER_KICKER[card.scene] : AFTER_TOP[card.kind]));
   if (card.title) body.append(el('h3', null, card.title));
@@ -584,19 +578,12 @@ function renderAfter(card) {
   }
   if (card.note) body.append(el('p', 'note', card.note));
   if (card.done) {
-    choices.append(button('ไปเกิด', null, () => {
-      st = nextLife(af);
-      af = null;
-      render(nextCard(st));
-    }));
+    choices.append(button('ไปเกิด', null, () => play(T.rebirth)));
     choices.append(button('เริ่มตระกูลใหม่', null, start));
   } else if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
-      const b = button(c, why ?? card.fx?.[i], () => {
-        chooseAfter(af, i);
-        next();
-      });
+      const b = button(c, why ?? card.fx?.[i], () => play(afterPick(i)));
       if (why) b.disabled = true;
       choices.append(b);
     });
@@ -607,11 +594,137 @@ function renderAfter(card) {
   root.append(box);
 }
 
-function start() {
-  // seed จากเวลาเฉพาะฝั่งหน้าเว็บ แกนเกมเองไม่แตะนาฬิกา
-  st = newLife((Date.now() ^ (performance.now() * 1000)) >>> 0, CONTENT);
-  af = null;
-  render(nextCard(st));
+// เซฟ = seed ต้นตระกูล + ลำดับปุ่มที่กด แล้วเล่นซ้ำตอนโหลด — แกนเกมให้ผลเดิมทุกครั้งเมื่อ seed กับการกดเท่ากัน
+// (ทายาทได้ seed จากชาติก่อน) จึงไม่ต้องเก็บ st ที่มี rng ข้างใน และใน storage ไม่มีแต้มบุญบาปให้เปิดอ่าน
+const SAVE_KEY = 'next-life-save-v1';
+// ปุ่มละตัวอักษร: เลือกในชีวิต = 0-9a-z · เลือกระหว่างชาติ = A-Z · ที่เหลือเป็นเครื่องหมาย
+const T = { next: '.', afterlife: '>', afterNext: ',', rebirth: '+' };
+const lifePick = (i) => i.toString(36);
+const afterPick = (i) => String.fromCharCode(65 + i);
+let save = null;
+
+// ทุกปุ่มที่เดินเกมผ่านตรงนี้ทางเดียว — ตอนเล่นจริงกับตอนเล่นซ้ำจากเซฟจึงเดินเหมือนกันทุกก้าว
+function apply(tok) {
+  if (tok === T.next) return nextCard(st);
+  if (tok === T.afterlife) {
+    af = startAfterlife(st);
+    return nextAfterCard(af);
+  }
+  if (tok === T.afterNext) return nextAfterCard(af);
+  if (tok === T.rebirth) {
+    st = nextLife(af);
+    af = null;
+    return nextCard(st);
+  }
+  if (/^[A-Z]$/.test(tok)) {
+    chooseAfter(af, tok.charCodeAt(0) - 65);
+    return nextAfterCard(af);
+  }
+  if (!/^[0-9a-z]$/.test(tok)) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
+  choose(st, parseInt(tok, 36));
+  return nextCard(st);
 }
 
-start();
+// ลายนิ้วมือของการ์ดที่ค้างอยู่ — เนื้อเรื่องเปลี่ยนแล้วเล่นซ้ำได้การ์ดคนละใบ ต้องจับได้ ไม่ใช่พาไปโผล่ชีวิตอื่นเงียบ ๆ
+function fingerprint(card) {
+  const s = JSON.stringify([st.gen, card.kind, card.age ?? st.age, card.title, card.text, card.choices]);
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193);
+  return (h >>> 0).toString(36);
+}
+
+// storage พังได้ (โหมดส่วนตัว · เต็ม · ปิด) — เกมยังเล่นได้ แค่ไม่จำ
+function saveWrite(card) {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ seed: save.seed, log: save.log, fp: fingerprint(card) }));
+  } catch {
+    // เขียนไม่ลงแต่เซฟเก่ายังอยู่ = รีเฟรชแล้วย้อนไปจุดเก่าโดยไม่รู้ตัว — ลบทิ้งดีกว่า
+    saveClear();
+  }
+}
+function saveRead() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SAVE_KEY));
+    return Number.isInteger(s?.seed) && typeof s.log === 'string' && typeof s.fp === 'string' ? s : null;
+  } catch {
+    return null;
+  }
+}
+function saveClear() {
+  try {
+    localStorage.removeItem(SAVE_KEY);
+  } catch {
+    // ไม่มีที่เก็บ ก็ไม่มีเซฟให้ลบ
+  }
+}
+
+const show = (card) => (af ? renderAfter(card) : render(card));
+
+function play(tok) {
+  const card = apply(tok);
+  save.log += tok;
+  saveWrite(card);
+  show(card);
+}
+
+function begin(seed) {
+  st = newLife(seed, CONTENT);
+  af = null;
+  save = { seed, log: '' };
+  return nextCard(st);
+}
+
+function start() {
+  // seed จากเวลาเฉพาะฝั่งหน้าเว็บ แกนเกมเองไม่แตะนาฬิกา
+  const card = begin((Date.now() ^ (performance.now() * 1000)) >>> 0);
+  saveWrite(card);
+  render(card);
+}
+
+// เล่นซ้ำทั้งตระกูลจากเซฟ · ไม่ตรงการ์ดเดิม = null
+function resume(s) {
+  try {
+    let card = begin(s.seed);
+    for (const tok of s.log) card = apply(tok);
+    save.log = s.log;
+    return fingerprint(card) === s.fp ? card : null;
+  } catch {
+    return null;
+  }
+}
+
+function homeCard(title, lines) {
+  root.replaceChildren();
+  const box = el('article', 'card a');
+  const top = el('div', 'top');
+  top.append(el('b', null, 'ชาติหน้า'), el('small', null, title));
+  const body = el('div', 'body');
+  lines.forEach((t, i) => body.append(el(i ? 'p' : 'h3', i ? 'sub' : 'lead', t)));
+  const choices = el('div', 'choices');
+  box.append(top, body, choices);
+  root.append(box);
+  return choices;
+}
+
+// ล้างเซฟ = ลบทั้งตระกูล จึงถามซ้ำก่อน · สมุดฉายาแยก key ไม่โดนล้าง
+function confirmNew(back) {
+  const choices = homeCard('เริ่มตระกูลใหม่', ['ลบชีวิตที่ค้างไว้ทั้งตระกูล?', 'ผังตระกูลและสิ่งที่สืบทอดจะหายทั้งหมด กู้คืนไม่ได้ · สมุดฉายายังอยู่']);
+  choices.append(button('ลบแล้วเริ่มตระกูลใหม่', null, start), button('ยกเลิก', null, back));
+}
+
+function home(card) {
+  const where = af ? `ระหว่างชาติ หลังตายอายุ ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
+  const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
+  choices.append(button('เล่นต่อ', null, () => show(card)), button('เริ่มตระกูลใหม่', null, () => confirmNew(() => home(card))));
+}
+
+function boot() {
+  const s = saveRead();
+  if (!s) return start();
+  const card = resume(s);
+  if (card) return home(card);
+  const choices = homeCard('เซฟเก่า', ['ชีวิตที่ค้างไว้เล่นต่อไม่ได้', 'เกมเปลี่ยนเนื้อเรื่องตั้งแต่เล่นครั้งก่อน ชีวิตเดิมจึงย้อนกลับมาให้ตรงไม่ได้ · สมุดฉายายังอยู่']);
+  choices.append(button('เริ่มตระกูลใหม่', null, start));
+}
+
+boot();
