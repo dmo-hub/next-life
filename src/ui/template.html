@@ -154,6 +154,17 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .b .band0 { fill:var(--bronze); fill-opacity:0.25; } .b .band1 { fill:transparent; }
 .b .ln0 { stroke:#E07A5F; } .b .ln1 { stroke:var(--gold); } .b .ln2 { stroke:#8FB3E0; } .b .ln3 { stroke:#7FC4B8; } .b .ln4 { stroke:var(--cream); }
 .b .lifechart { border:1px solid var(--bronze); background:var(--lacquer2); }
+/* กราฟฐานะตระกูล (B95): ขาลงเส้นประ + สีแดง ขาขึ้นเส้นทึบ — ตาบอดสีก็ยังแยกได้ · ขึ้นได้ทั้งการ์ดทาง A ทาง B และปรโลก */
+.stand-d .lifechart { margin-top:6px; }
+.spark .sg { stroke-width:2.2; stroke-linecap:round; } .spark .sg.sd { stroke-dasharray:5 3; } .spark .sg.se { stroke-width:1.6; }
+.legend .key .sg { stroke-width:2; }
+.a .sg.su { stroke:var(--green); } .a .sg.sd { stroke:var(--red); } .a .sg.se { stroke:var(--ink2); }
+.a .spark .mk.broke rect { fill:var(--red); stroke:var(--ink); stroke-width:1.5; } .a .spark .mk.nx circle { fill:var(--paper); stroke:var(--ink); stroke-dasharray:2 1.5; }
+.a .legend .mk.broke rect { fill:var(--red); stroke:var(--ink); stroke-width:1; }
+.b .sg.su { stroke:var(--gold2); } .b .sg.sd { stroke:#E39A8A; } .b .sg.se { stroke:var(--sand); }
+.b .spark text, .b .mk-cap, .b .lifechart .h { fill:var(--sand); color:var(--sand); } .b .spark .grid { stroke:var(--bronze2); }
+.b .spark .mk.ev circle { fill:var(--lacquer); stroke:var(--gold2); } .b .spark .mk.nx circle { fill:var(--lacquer); stroke:var(--cream); stroke-dasharray:2 1.5; }
+.b .spark .mk.broke rect, .b .legend .mk.broke rect { fill:#E39A8A; stroke:var(--cream); stroke-width:1.5; }
 .a .choice { border:1px solid var(--ink); background:#FFFDF7; }
 .a .choice:hover, .a .choice:focus-visible { background:var(--ink); color:var(--paper); outline:none; }
 .a .choice .fx { color:var(--green); } .a .choice:hover .fx, .a .choice:focus-visible .fx { color:#CFE3E0; }
@@ -247,6 +258,10 @@ html.light { --page:#EDEDED; }
 .light .card:not(.af) .choice { border:1px solid #16181D; background:#FFFFFF; color:#16181D; }
 .light .card:not(.af) .choice:hover, .light .card:not(.af) .choice:focus-visible { background:#16181D; border-color:#16181D; color:#FFFFFF; outline:none; }
 .light .card:not(.af) .choice .fx { color:#1F6B5E; } .light .card:not(.af) .choice:hover .fx, .light .card:not(.af) .choice:focus-visible .fx { color:#CFE3E0; }
+.light .card:not(.af) .sg.su { stroke:#1F6B5E; } .light .card:not(.af) .sg.sd { stroke:#B23A2A; } .light .card:not(.af) .sg.se { stroke:#3A3F4B; }
+.light .card:not(.af) .spark text, .light .card:not(.af) .mk-cap, .light .card:not(.af) .lifechart .h { fill:#3A3F4B; color:#3A3F4B; } .light .card:not(.af) .spark .grid { stroke:#C8C8C8; }
+.light .card:not(.af) .spark .mk.ev circle, .light .card:not(.af) .spark .mk.nx circle { fill:#FFFFFF; stroke:#16181D; }
+.light .card:not(.af) .spark .mk.broke rect, .light .card:not(.af) .legend .mk.broke rect { fill:#B23A2A; stroke:#16181D; }
 .light .card:not(.af) .choice:disabled { opacity:0.45; background:transparent; color:inherit; border-style:dashed; }
 </style>
 </head>

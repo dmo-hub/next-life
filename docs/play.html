@@ -154,6 +154,17 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .b .band0 { fill:var(--bronze); fill-opacity:0.25; } .b .band1 { fill:transparent; }
 .b .ln0 { stroke:#E07A5F; } .b .ln1 { stroke:var(--gold); } .b .ln2 { stroke:#8FB3E0; } .b .ln3 { stroke:#7FC4B8; } .b .ln4 { stroke:var(--cream); }
 .b .lifechart { border:1px solid var(--bronze); background:var(--lacquer2); }
+/* กราฟฐานะตระกูล (B95): ขาลงเส้นประ + สีแดง ขาขึ้นเส้นทึบ — ตาบอดสีก็ยังแยกได้ · ขึ้นได้ทั้งการ์ดทาง A ทาง B และปรโลก */
+.stand-d .lifechart { margin-top:6px; }
+.spark .sg { stroke-width:2.2; stroke-linecap:round; } .spark .sg.sd { stroke-dasharray:5 3; } .spark .sg.se { stroke-width:1.6; }
+.legend .key .sg { stroke-width:2; }
+.a .sg.su { stroke:var(--green); } .a .sg.sd { stroke:var(--red); } .a .sg.se { stroke:var(--ink2); }
+.a .spark .mk.broke rect { fill:var(--red); stroke:var(--ink); stroke-width:1.5; } .a .spark .mk.nx circle { fill:var(--paper); stroke:var(--ink); stroke-dasharray:2 1.5; }
+.a .legend .mk.broke rect { fill:var(--red); stroke:var(--ink); stroke-width:1; }
+.b .sg.su { stroke:var(--gold2); } .b .sg.sd { stroke:#E39A8A; } .b .sg.se { stroke:var(--sand); }
+.b .spark text, .b .mk-cap, .b .lifechart .h { fill:var(--sand); color:var(--sand); } .b .spark .grid { stroke:var(--bronze2); }
+.b .spark .mk.ev circle { fill:var(--lacquer); stroke:var(--gold2); } .b .spark .mk.nx circle { fill:var(--lacquer); stroke:var(--cream); stroke-dasharray:2 1.5; }
+.b .spark .mk.broke rect, .b .legend .mk.broke rect { fill:#E39A8A; stroke:var(--cream); stroke-width:1.5; }
 .a .choice { border:1px solid var(--ink); background:#FFFDF7; }
 .a .choice:hover, .a .choice:focus-visible { background:var(--ink); color:var(--paper); outline:none; }
 .a .choice .fx { color:var(--green); } .a .choice:hover .fx, .a .choice:focus-visible .fx { color:#CFE3E0; }
@@ -247,6 +258,10 @@ html.light { --page:#EDEDED; }
 .light .card:not(.af) .choice { border:1px solid #16181D; background:#FFFFFF; color:#16181D; }
 .light .card:not(.af) .choice:hover, .light .card:not(.af) .choice:focus-visible { background:#16181D; border-color:#16181D; color:#FFFFFF; outline:none; }
 .light .card:not(.af) .choice .fx { color:#1F6B5E; } .light .card:not(.af) .choice:hover .fx, .light .card:not(.af) .choice:focus-visible .fx { color:#CFE3E0; }
+.light .card:not(.af) .sg.su { stroke:#1F6B5E; } .light .card:not(.af) .sg.sd { stroke:#B23A2A; } .light .card:not(.af) .sg.se { stroke:#3A3F4B; }
+.light .card:not(.af) .spark text, .light .card:not(.af) .mk-cap, .light .card:not(.af) .lifechart .h { fill:#3A3F4B; color:#3A3F4B; } .light .card:not(.af) .spark .grid { stroke:#C8C8C8; }
+.light .card:not(.af) .spark .mk.ev circle, .light .card:not(.af) .spark .mk.nx circle { fill:#FFFFFF; stroke:#16181D; }
+.light .card:not(.af) .spark .mk.broke rect, .light .card:not(.af) .legend .mk.broke rect { fill:#B23A2A; stroke:#16181D; }
 .light .card:not(.af) .choice:disabled { opacity:0.45; background:transparent; color:inherit; border-style:dashed; }
 </style>
 </head>
@@ -3597,6 +3612,93 @@ function lifeChart(life, deathAge) {
   return box;
 }
 
+// กราฟฐานะตระกูล (B95): ฐานะ 10 ระดับต้นทุกช่วงวัยทุกรุ่นต่อกันเป็นเส้นเดียว รุ่นละช่องกว้างเท่ากัน 10+ รุ่นก็ไม่ล้น
+// เส้นข้ามรุ่น = ฐานะตอนตาย → ฐานะบ้านที่รุ่นถัดไปเกิด · ขาลงแยกสีและลายเส้น (ไม่พึ่งสีอย่างเดียว) ให้เห็นการตกชั้นชัด
+// ใช้แค่ฐานะ อายุ ชื่อ และการตายพร้อมหนี้ — ไม่มีบัญชีบุญบาป
+function standingGens(lineage, life = null) {
+  const gens = lineage.map((l) => ({ gen: l.gen, name: l.name, age: l.age, broke: l.broke, pts: l.standing ?? [{ age: 0, cls: CLASSES.indexOf(l.cls) }] }));
+  return life ? [...gens, life] : gens;
+}
+// ชีวิตนี้: จุดต้นช่วงวัยที่แกนจดไว้ + ฐานะ ณ ตอนนี้ (หรือตอนตาย) เป็นจุดท้าย
+function standingNow(dead) {
+  const pts = [...st.standing.filter((p) => p.age < st.age), { age: st.age, cls: standingOf(st) }];
+  return { gen: st.gen, name: st.name, age: st.age, live: !dead, pts };
+}
+// ช่องรุ่นถัดไปมีจุดเดียว จึงแคบกว่าช่องรุ่นปกติ
+const NEXT_GEN_W = 0.3;
+function standingLayout(gens, next) {
+  const units = gens.length + (next != null ? NEXT_GEN_W : 0);
+  const pts = gens.flatMap((g, i) => g.pts.map((p) => ({ u: i + 0.06 + (p.age / Math.max(g.age, 1)) * 0.88, cls: p.cls, g, end: p === g.pts.at(-1) })));
+  if (next != null) pts.push({ u: gens.length + NEXT_GEN_W / 2, cls: next, next: true });
+  return { units, pts };
+}
+const standingWord = (p) => (p.next ? `รุ่นถัดไปเกิดฐานะ${CLASSES[p.cls]}` : p.g.live ? `${genWord(p.g.gen)}ตอนนี้ อายุ ${p.g.age} · ฐานะ${CLASSES[p.cls]}`
+  : `${genWord(p.g.gen)}${p.g.name ? `${p.g.name} · ` : ''}ตายอายุ ${p.g.age} · ฐานะตอนตาย${CLASSES[p.cls]}${p.g.broke ? ' · จากไปพร้อมหนี้' : ''}`);
+const genWord = (g) => `รุ่นที่ ${g} · `;
+function standingChart(gens, next = null, head = true) {
+  const { units, pts } = standingLayout(gens, next);
+  if (pts.length < 2) return null;
+  const box = el('div', 'lifechart stand');
+  if (head) box.append(el('div', 'h', gens.length > 1 ? `ฐานะตระกูล · ${gens.length} รุ่น` : 'ฐานะตระกูล'));
+  const W = 320, H = 132, L = 50, R = 8, T = 8, B = 22;
+  const x = (u) => L + (u / units) * (W - L - R);
+  const y = (c) => T + ((CLASSES.length - 1 - c) / (CLASSES.length - 1)) * (H - T - B);
+  const first = pts[0].cls, last = pts.at(-1).cls, peak = Math.max(...pts.map((p) => p.cls));
+  const svg = svgEl('svg', { class: 'spark stand', viewBox: `0 0 ${W} ${H}`, role: 'img',
+    'aria-label': `ฐานะตระกูล ${gens.length} รุ่น · เริ่ม${CLASSES[first]} · สูงสุด${CLASSES[peak]} · ล่าสุด${CLASSES[last]}` });
+  gens.forEach((g, i) => {
+    svg.append(svgEl('rect', { class: `band band${i % 2}`, x: x(i), y: T, width: x(i + 1) - x(i), height: H - T - B }));
+    const w = x(i + 1) - x(i);
+    // ช่องแคบเหลือแค่เลขรุ่น · แคบกว่านั้นติดป้ายเฉพาะรุ่นแรกกับรุ่นท้าย
+    const label = w >= 34 ? `รุ่น ${g.gen}` : w >= 12 || i === 0 || i === gens.length - 1 ? `${g.gen}` : null;
+    if (label) svg.append(svgEl('text', { class: 'tx', x: (x(i) + x(i + 1)) / 2, y: H - 6, 'text-anchor': 'middle' }, label));
+  });
+  // ช่องรุ่นถัดไปแคบเมื่อรุ่นเยอะ ป้ายจะทับเลขรุ่นท้าย — จุดนั้นยังแตะดูได้
+  if (next != null && x(units) - x(gens.length) >= 26) svg.append(svgEl('text', { class: 'tx', x: W - R, y: H - 6, 'text-anchor': 'end' }, 'ถัดไป'));
+  for (const [c, t] of [[CLASSES.length - 1, CLASSES.at(-1)], [5, 'ชั้นกลาง'], [0, CLASSES[0]]]) {
+    svg.append(svgEl('line', { class: 'grid', x1: L, x2: W - R, y1: y(c), y2: y(c) }));
+    svg.append(svgEl('text', { class: 'ty', x: L - 4, y: y(c) + 3.5 }, t));
+  }
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1], b = pts[i];
+    const dir = b.cls > a.cls ? 'su' : b.cls < a.cls ? 'sd' : 'se';
+    svg.append(svgEl('line', { class: `sg ${dir}`, x1: x(a.u).toFixed(1), y1: y(a.cls).toFixed(1), x2: x(b.u).toFixed(1), y2: y(b.cls).toFixed(1) }));
+  }
+  // จุดท้ายของแต่ละรุ่น (ตาย/ตอนนี้) + จุดรุ่นถัดไป แตะดูได้ — มือถือไม่มี hover จึงบอกในบรรทัดใต้กราฟ
+  const cap = el('p', 'mk-cap', 'แตะจุดบนกราฟเพื่อดูฐานะแต่ละรุ่น');
+  cap.setAttribute('aria-live', 'polite');
+  for (const p of pts.filter((q) => q.end || q.next)) {
+    const text = standingWord(p);
+    const g = svgEl('g', { class: `mk ${p.next ? 'nx' : p.g.broke ? 'broke' : 'ev'}`, tabindex: 0, role: 'button', 'aria-label': text });
+    g.append(svgEl('title', {}, text), svgEl(p.g?.broke ? 'rect' : 'circle', p.g?.broke
+      ? { x: x(p.u) - 3.5, y: y(p.cls) - 3.5, width: 7, height: 7 } : { cx: x(p.u), cy: y(p.cls), r: 3.5 }));
+    const show = () => (cap.textContent = text);
+    g.addEventListener('click', show);
+    g.addEventListener('focus', show);
+    g.addEventListener('mouseenter', show);
+    svg.append(g);
+  }
+  const legend = el('ul', 'legend');
+  for (const [cls, label] of [['su', 'ไต่ขึ้น'], ['sd', 'ตกชั้น']]) {
+    const key = svgEl('svg', { class: 'key', viewBox: '0 0 24 8', 'aria-hidden': 'true' });
+    key.append(svgEl('line', { class: `sg ${cls}`, x1: 0, x2: 24, y1: 4, y2: 4 }));
+    const li = el('li');
+    li.append(key, label);
+    legend.append(li);
+  }
+  if (gens.some((g) => g.broke)) {
+    const key = svgEl('svg', { class: 'key', viewBox: '0 0 24 8', 'aria-hidden': 'true' });
+    const g = svgEl('g', { class: 'mk broke' });
+    g.append(svgEl('rect', { x: 8.5, y: 0.5, width: 7, height: 7 }));
+    key.append(g);
+    const li = el('li');
+    li.append(key, 'จากไปพร้อมหนี้');
+    legend.append(li);
+  }
+  box.append(svg, legend, cap);
+  return box;
+}
+
 function list(items, cls = 'items') {
   const ul = el('ul', cls);
   for (const it of items) ul.append(el('li', null, it));
@@ -3906,6 +4008,7 @@ function shareFacts(card) {
     stats: (card.life?.stats ?? []).map((p) => Object.fromEntries([['age', p.age], ...STAT_KEYS.map((k) => [k, p[k]])])),
     marks: lifeMarks(card.age).map((m) => m.age),
     note: ((n) => n && { age: n.a, text: n.t })(notePick(st.gen)),
+    standing: standingGens(st.lineage, standingNow(true)).map((g) => ({ age: g.age, broke: !!g.broke, pts: g.pts.map((p) => ({ age: p.age, cls: p.cls })) })),
   };
 }
 
@@ -4064,9 +4167,17 @@ async function shareBlob(facts) {
     text(facts.title.name, '700 68px Srisakdi, serif', c('gold2'), 84, 0, 1);
     text(facts.title.tier, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 1);
   }
-  if (facts.note) shareNote(ctx, c, facts.note, cx, maxW, y, SHARE_H - SHARE_CHART_TOP);
+  // เส้นย่อฐานะตระกูล (B95) แทรกเหนือกราฟทั้งชีวิตโดยเตี้ยกราฟนั้นลง — ที่ว่างขึ้นกับข้อความข้างบน
+  // ลงไม่พอขั้นต่ำก็ไม่วาด กราฟทั้งชีวิตคงขนาดเดิม · บันทึกชีวิตได้ที่เหลือเหนือเส้นย่อ
+  const lifeH = facts.stats.length >= 2 ? 240 : 0;
+  const strip = facts.standing.reduce((n, g) => n + g.pts.length, 0) >= 2 ? standStrip(y, lifeH) : null;
+  const chartH = strip && lifeH ? lifeH - SHARE_STAND_CUT : lifeH;
+  const chartY = SHARE_H - SHARE_CHART_TOP + (lifeH - chartH);
+  // ขอบซ้ายเลื่อนเข้าให้ป้าย "มั่งคั่ง/ยากไร้" ไม่ชนกรอบ · ขอบขวาตรงกับกราฟทั้งชีวิต
+  if (strip) shareStanding(ctx, c, facts.standing, 160, strip.y, SHARE_W - 280, strip.h);
+  if (facts.note) shareNote(ctx, c, facts.note, cx, maxW, y, strip ? strip.y - STAND_HEAD + 56 : chartY);
   // กราฟอยู่ล่างสุด ยึดจากขอบล่าง — ข้อความข้างบนยาวแค่ไหนก็ไม่ทับกัน (ข้อความถูกจำกัดบรรทัดไว้แล้ว)
-  if (facts.stats.length >= 2) shareChart(ctx, c, facts, 120, SHARE_H - SHARE_CHART_TOP, SHARE_W - 240, 240);
+  if (lifeH) shareChart(ctx, c, facts, 120, chartY, SHARE_W - 240, chartH);
   ctx.font = '400 30px Sarabun, sans-serif';
   ctx.fillStyle = c('sand');
   ctx.fillText(SHARE_URL, cx, SHARE_H - 72);
@@ -4075,6 +4186,69 @@ async function shareBlob(facts) {
 }
 
 const SHARE_CHART_TOP = 440;
+// เส้นย่อฐานะตระกูลบนภาพ (B95): กราฟทั้งชีวิตเตี้ยลงเท่า CUT เพื่อเปิดที่ · HEAD = หัวเหนือเส้นย่อ · LABEL = เลขรุ่นใต้เส้นย่อ
+const SHARE_STAND_CUT = 70, STAND_HEAD = 44, STAND_LABEL = 40, STAND_MIN = 48, STAND_MAX = 130;
+function standStrip(textEnd, lifeH) {
+  const bottom = SHARE_H - SHARE_CHART_TOP + (lifeH ? SHARE_STAND_CUT : 0) - (lifeH ? 56 + 64 : 0) - STAND_LABEL;
+  const h = Math.min(STAND_MAX, bottom - (textEnd + 36 + STAND_HEAD));
+  return h >= STAND_MIN ? { y: bottom - h, h } : null;
+}
+// สีและรูปจุดชุดเดียวกับ standingChart บนจอ: ขาลงสีแดงเส้นประ · ตายพร้อมหนี้เป็นจุดสี่เหลี่ยม · แกนตั้งบอกแค่บนสุด/ล่างสุด
+// ภาพเล็กกว่าจอมาก วาดทุกช่วงวัยแล้วรก — ย่อเหลือฐานะตอนเกิดของรุ่นแรก + ฐานะตอนตายรุ่นละจุด ระยะห่างเท่ากัน
+function shareStanding(ctx, c, gens, x0, y0, w, h) {
+  const units = gens.length;
+  const pts = [{ u: 0, cls: gens[0].pts[0].cls }, ...gens.map((g, i) => ({ u: i + 1, cls: g.pts.at(-1).cls, g, end: true }))];
+  const x = (u) => x0 + (u / units) * w;
+  const y = (k) => y0 + ((CLASSES.length - 1 - k) / (CLASSES.length - 1)) * h;
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.font = '600 28px Sarabun, sans-serif';
+  ctx.fillStyle = c('gold');
+  ctx.fillText(gens.length > 1 ? `ฐานะตระกูล · ${gens.length} รุ่น` : 'ฐานะตลอดชีวิต', x0 + w / 2, y0 - 16);
+  ctx.font = '400 22px Sarabun, sans-serif';
+  ctx.strokeStyle = c('bronze2');
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 6]);
+  for (const k of [0, CLASSES.length - 1]) {
+    ctx.beginPath();
+    ctx.moveTo(x0, y(k));
+    ctx.lineTo(x0 + w, y(k));
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  // ป้ายใต้จุดตายของแต่ละรุ่น: ช่องกว้างพอ = "รุ่น N" · แคบ = เฉพาะรุ่นแรกกับรุ่นท้าย
+  const bw = w / units;
+  ctx.fillStyle = c('sand');
+  gens.forEach((g, i) => {
+    if (gens.length > 1 && (bw >= 90 || i === 0 || i === gens.length - 1)) ctx.fillText(`รุ่น ${i + 1}`, x(i + 1), y0 + h + 30);
+  });
+  ctx.textAlign = 'right';
+  ctx.fillStyle = c('sand');
+  ctx.fillText(CLASSES.at(-1), x0 - 10, y(CLASSES.length - 1) + 8);
+  ctx.fillText(CLASSES[0], x0 - 10, y(0) + 8);
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1], b = pts[i];
+    ctx.strokeStyle = b.cls < a.cls ? '#E07A5F' : b.cls > a.cls ? c('gold2') : c('sand');
+    ctx.setLineDash(b.cls < a.cls ? [14, 9] : []);
+    ctx.beginPath();
+    ctx.moveTo(x(a.u), y(a.cls));
+    ctx.lineTo(x(b.u), y(b.cls));
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  for (const p of pts.filter((q) => q.end)) {
+    ctx.fillStyle = p.g.broke ? '#E07A5F' : c('gold2');
+    if (p.g.broke) ctx.fillRect(x(p.u) - 9, y(p.cls) - 9, 18, 18);
+    else {
+      ctx.beginPath();
+      ctx.arc(x(p.u), y(p.cls), 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
 // หัวกราฟวาดเหนือกรอบกราฟ 56px — บันทึกต้องจบก่อนหัวนั้นพอให้เว้นช่อง
 const NOTE_CLEAR = 100;
 // บันทึกชีวิตบนภาพ (B39): ข้อความผู้เล่นยาวไม่แน่นอน แต่ที่ว่างเหนือกราฟขึ้นกับข้อความข้างบน
@@ -4376,6 +4550,8 @@ function render(card) {
     if (fam) box.append(fam);
     const tree = familyTree();
     if (tree) box.append(tree);
+    const stand = standingPanel();
+    if (stand) box.append(stand);
     const kicker = card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind];
     if (box.classList.contains('cdl')) body.append(flame());
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
@@ -4516,6 +4692,25 @@ function familyTree() {
   return d;
 }
 
+// กราฟฐานะตระกูลพับได้ระหว่างเล่น (B95) — วาดตอนกางเท่านั้น การ์ดส่วนใหญ่ผ่านไปโดยไม่มีใครกาง · พับ/กางค้างข้ามการ์ดแบบแผงครอบครัว
+let standOpen = false;
+function standingPanel() {
+  const d = el('details', 'tree stand-d');
+  const fill = () => {
+    if (!d.open || d.querySelector('.stand')) return;
+    const chart = standingChart(standingGens(st.lineage, standingNow(false)), null, false);
+    d.append(chart ?? el('p', 'sub', 'ยังมีจุดเดียว — กราฟขึ้นเมื่อถึงช่วงวัยถัดไป'));
+  };
+  d.open = standOpen;
+  d.addEventListener('toggle', () => {
+    standOpen = d.open;
+    fill();
+  });
+  d.append(el('summary', null, st.lineage.length ? `กราฟฐานะตระกูล · ${st.lineage.length + 1} รุ่น` : 'กราฟฐานะตระกูล'));
+  fill();
+  return d;
+}
+
 // ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะ — ชีวิตจบแล้ว
 const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ปรโลก', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ' };
 const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา' };
@@ -4536,6 +4731,9 @@ function renderAfter(card) {
   if (card.lineage) {
     body.append(el('div', 'kicker', 'ผังตระกูล'));
     body.append(list(card.lineage, 'picks'));
+    // การ์ดส่งต่อ (B95): ผังตระกูลรวมชีวิตที่เพิ่งจบแล้ว + จุดฐานะบ้านที่รุ่นถัดไปจะเกิด
+    const chart = af.heir && standingChart(standingGens(af.heir.lineage), CLASSES.indexOf(af.heir.cls));
+    if (chart) body.append(chart);
   }
   if (card.note) body.append(el('p', 'note', card.note));
   if (card.done) {
@@ -4708,7 +4906,14 @@ function bookPages(death) {
   const keep = said.length <= BOOK_NOTES ? said : [...said].sort((x, y) => fnv(`${notes.seed}:${x.a}`) - fnv(`${notes.seed}:${y.a}`)).slice(0, BOOK_NOTES).sort((x, y) => x.a - y.a);
   // บันทึกถามตอนต้นช่วงใหม่ จึงวางหลังเรื่องที่อายุเท่ากัน
   const mid = [...bookPicks(BOOK_STORIES - keep.length).map((p) => ({ age: p.card.age, o: 0, draw: (b) => storyPage(b, p) })), ...keep.map((x) => ({ age: x.a, o: 1, draw: (b) => notePage(b, x) }))].sort((a, b) => a.age - b.age || a.o - b.o);
-  return [{ draw: (b) => coverPage(b, death) }, ...mid, { draw: (b) => endPage(b, death) }];
+  return [{ draw: (b) => coverPage(b, death) }, ...mid, { draw: standPage }, { draw: (b) => endPage(b, death) }];
+}
+
+// หน้าฐานะตระกูล (B95) ก่อนหน้าสุดท้าย — รุ่นก่อนทั้งหมด + ชีวิตนี้ถึงวันตาย
+function standPage(body) {
+  body.append(el('span', 'kicker', 'ฐานะตระกูล'), el('h3', null, st.lineage.length ? `ตระกูลนี้ ${st.lineage.length + 1} รุ่น` : 'ฐานะตลอดชีวิตนี้'));
+  const chart = standingChart(standingGens(st.lineage, standingNow(true)), null, false);
+  if (chart) body.append(chart);
 }
 
 function coverPage(body, death) {
