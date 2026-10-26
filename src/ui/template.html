@@ -101,12 +101,15 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .delta { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px 14px; font-size:12px; }
 .delta > div { display:flex; flex-direction:column; gap:4px; }
 .titles .pattern { font-family:Pridi,serif; font-weight:600; font-size:20px; }
-.titles .more { all:unset; align-self:flex-start; min-height:44px; cursor:pointer; font-size:14px; font-weight:600; text-decoration:underline; }
-.titles .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.titles .more, .memo .more, .warn .more { all:unset; align-self:flex-start; min-height:44px; cursor:pointer; font-size:14px; font-weight:600; text-decoration:underline; }
+.titles .more:focus-visible, .memo .more:focus-visible, .warn .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
 .book { font-size:13px; }
 .book summary { cursor:pointer; min-height:44px; display:flex; align-items:center; font-weight:600; }
 .book .h { margin-top:8px; }
 .book .picks { font-size:13px; overflow-wrap:anywhere; }
+.memo { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px; font-size:13px; }
+.memo li { display:flex; align-items:center; justify-content:space-between; gap:8px; overflow-wrap:anywhere; }
+.memo li .more { flex:none; }
 /* บันทึกชีวิต (B39) — ช่องพิมพ์ 16px กัน iOS ซูมหน้าตอนแตะ · ปุ่มบันทึก/ข้ามกว้างเท่ากัน */
 .note-sheet { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .note-sheet .h { font-size:13px; font-weight:600; }
@@ -250,7 +253,7 @@ html.light { --page:#EDEDED; }
 <body>
 <header class="logo"><b>เกิดใหม่ทั้งที <span>ชาตินี้ขอชิงมาเกิด</span></b><small>NEXT LIFE</small><span id="appVer" class="ver" title="เวอร์ชันเดโม"></span><span id="saved" class="saved" aria-live="polite"></span><div id="theme" class="theme" role="group" aria-label="ธีมการ์ด"></div></header>
 <main id="app"></main>
-<footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <a href="about.html">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
+<footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <a href="#" id="memoLink">สมุดอนุสรณ์</a> · <a href="about.html">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
 <script>
 /*__SCRIPT__*/
 </script>

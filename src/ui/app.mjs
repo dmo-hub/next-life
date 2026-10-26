@@ -332,6 +332,7 @@ function lifeTitles(card) {
     const t = titlesOf(st);
     card.lifeTitles = { ...t, pattern: t.pattern ?? NO_PATTERN };
     bookAdd(t);
+    card.memo = memoAdd(t);
   }
   return card.lifeTitles;
 }
@@ -408,6 +409,92 @@ function bookBox() {
   section('ฉายา', [...TITLES].sort((x, y) => TIERS.indexOf(x.tier) - TIERS.indexOf(y.tier)), b.t, (x) => x.tier);
   section('ฉายาตระกูล', FAMILY_TITLES, b.f);
   return d;
+}
+
+// สมุดอนุสรณ์ (B51): สรุปชีวิตที่จบแล้วข้ามการเล่น · key แยกจากเซฟ ล้างตระกูลแล้วยังอยู่
+// ไม่จำกัดจำนวน (คำตัดสินเจ้าของ) จึงเก็บแค่สรุปสั้น · ที่เก็บเต็มต้องบอกผู้เล่นให้ลบเอง ห้ามลบเงียบ
+const MEMO_KEY = 'next-life-memorial-v1';
+const ERA_EVENTS = CONTENT.era.events;
+// การ์ดรับมือที่รวมข่าวบ้านเมือง (B58) ไม่มีการ์ดบ้านเมืองแยก — หาเหตุการณ์จากการ์ดเนื้อหาที่ผูกไว้
+const ERA_OF = new Map(CONTENT.events.filter((c) => c.era).map((c) => [c.id, c.era]));
+const eraName = (id) => ERA_EVENTS.find((e) => e.id === id)?.name ?? id;
+function memoRead() {
+  try {
+    const m = JSON.parse(localStorage.getItem(MEMO_KEY) ?? '{}');
+    return { l: Array.isArray(m.l) ? m.l : [], e: Array.isArray(m.e) ? m.e : [] };
+  } catch {
+    return { l: [], e: [] };
+  }
+}
+// 'ok' · 'full' (ที่เก็บเต็ม ผู้เล่นต้องรู้) · 'off' (ไม่มีที่เก็บ เกมเล่นต่อได้เงียบ ๆ)
+function memoWrite(m) {
+  try {
+    localStorage.setItem(MEMO_KEY, JSON.stringify(m));
+    return 'ok';
+  } catch (e) {
+    return e?.name === 'QuotaExceededError' || e?.name === 'NS_ERROR_DOM_QUOTA_REACHED' || e?.code === 22 ? 'full' : 'off';
+  }
+}
+// เรียกครั้งเดียวต่อการ์ดตาย · รีโหลดที่มรณบัตรแล้ววาดซ้ำ — key ตระกูล:รุ่น กันชีวิตเดียวลงสองแถว
+function memoAdd(t) {
+  const m = memoRead();
+  const k = `${save.seed}:${st.gen}`;
+  if (m.l.some((x) => x.k === k)) return 'ok';
+  m.l.push({ k, n: st.name, g: st.gen, a: st.age, p: provinceLabel(st), s: t.pattern?.name ?? '', t: t.titles[0]?.name ?? '' });
+  for (const x of eraSeen) if (!m.e.includes(x.id)) m.e.push(x.id);
+  return memoWrite(m);
+}
+function eraBox() {
+  const box = el('div', 'recap eras');
+  box.append(el('div', 'h', 'เหตุการณ์ในแผ่นดินที่ได้เห็น'));
+  box.append(eraSeen.length ? list(eraSeen.map((x) => `อายุ ${x.a} · ${eraName(x.id)}`), 'picks') : el('p', 'sub', 'ชีวิตนี้ไม่ทันเห็นเหตุการณ์ใหญ่ของบ้านเมือง'));
+  return box;
+}
+function memoFull() {
+  const box = el('div', 'recap warn');
+  box.append(el('p', 'sub', 'สมุดอนุสรณ์เต็ม ชีวิตนี้ยังไม่ได้ลงสมุด — ลบชีวิตเก่าในสมุดออกบ้างแล้วกลับมาที่หน้านี้อีกครั้ง'));
+  const b = el('button', 'more', 'เปิดสมุดอนุสรณ์');
+  b.onclick = () => openMemo();
+  box.append(b);
+  return box;
+}
+
+// เปิดทับหน้าที่อยู่ แล้วคืนหน้าเดิมทั้งก้อนตอนกลับ — ไม่แตะ st ไม่ลงเซฟ
+function openMemo(prev = [...root.childNodes]) {
+  const m = memoRead();
+  const back = () => root.replaceChildren(...prev);
+  const choices = homeCard('สมุดอนุสรณ์', ['สมุดอนุสรณ์', `ชีวิตที่จบแล้ว ${m.l.length} ชีวิต · เหตุการณ์ในแผ่นดินที่เคยเห็น ${m.e.filter((id) => ERA_EVENTS.some((e) => e.id === id)).length}/${ERA_EVENTS.length}`]);
+  root.firstChild.classList.add('memo-view');
+  const body = root.querySelector('.body');
+  if (m.e.length) body.append(list(ERA_EVENTS.filter((e) => m.e.includes(e.id)).map((e) => e.name), 'picks'));
+  const ul = el('ul', 'memo');
+  // ใหม่สุดก่อน · ลบทีละแถวได้ทันที (สรุปสั้น ไม่ใช่เซฟ ไม่ต้องถามซ้ำ)
+  for (const x of [...m.l].reverse()) {
+    const li = el('li');
+    li.append(el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.n}`, `อายุ ${x.a} ปี`, x.p, x.s && `ชีวิตแบบ${x.s}`, x.t && `ฉายา ${x.t}`].filter(Boolean).join(' · ')));
+    const del = el('button', 'more', 'ลบ');
+    del.setAttribute('aria-label', `ลบ ${x.n} ออกจากสมุด`);
+    del.onclick = () => {
+      const now = memoRead();
+      now.l = now.l.filter((y) => y.k !== x.k);
+      memoWrite(now);
+      openMemo(prev);
+    };
+    li.append(del);
+    ul.append(li);
+  }
+  body.append(m.l.length ? ul : el('p', 'sub', 'ยังไม่มีชีวิตที่จบลงสมุด'));
+  choices.append(enter(button('กลับ', null, back)));
+  if (m.l.length || m.e.length) {
+    choices.append(button('ลบสมุดทั้งเล่ม', null, () => {
+      const c = homeCard('สมุดอนุสรณ์', ['ลบสมุดอนุสรณ์ทั้งเล่ม?', 'ชีวิตที่จบแล้วและเหตุการณ์ที่เคยเห็นจะหายทั้งหมด กู้คืนไม่ได้ · ชีวิตที่เล่นค้างไว้ไม่หาย']);
+      root.firstChild.classList.add('memo-view');
+      c.append(button('ลบทั้งเล่ม', null, () => {
+        memoWrite({ l: [], e: [] });
+        openMemo(prev);
+      }), enter(button('ยกเลิก', null, () => openMemo(prev))));
+    }));
+  }
 }
 
 // ภาพแชร์รับเฉพาะช่องที่ไล่ชื่อไว้ตรงนี้ — บัญชีบุญบาปบนการ์ดตายหลุดลงภาพไม่ได้ แม้แกนเกมจะเติมช่องใหม่ให้การ์ด
@@ -863,6 +950,8 @@ function render(card) {
     const note = notePick(st.gen);
     if (note) body.append(noteQuote(`บันทึกเมื่ออายุ ${note.a}`, note.t));
     body.append(titlesBox(card));
+    if (card.memo === 'full') body.append(memoFull());
+    body.append(eraBox());
     const tree = familyTree();
     if (tree) body.append(tree);
     // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
@@ -1172,6 +1261,8 @@ const BOOK_STORIES = 8;
 const BOOK_PER_STAGE = 2;
 const BOOK_NOTES = 2;
 let bookCards = [];
+// เหตุการณ์บ้านเมืองที่ชีวิตนี้เห็น (B51) — จดตอนการ์ดผ่าน track เหมือนสมุดชีวิต เล่นซ้ำจากเซฟก็ได้ครบ
+let eraSeen = [];
 let bookIntro = null;
 // ลำดับการ์ดที่ผ่านมา — ใช้ดูว่าการ์ดผลตามหลังการ์ดเลือกทันทีหรือไม่
 let bookSeq = 0;
@@ -1189,10 +1280,13 @@ function bookNote(card) {
       : 0;
     if (w) bookCards.push({ card, w, at: st.log.length, next: bookSeq + 1 });
   }
+  const era = card.kind === 'era' ? card.id : card.news && ERA_OF.get(card.id);
+  if (era) eraSeen.push({ id: era, a: card.age });
   bookSeq++;
 }
 const bookReset = () => {
   bookCards = [];
+  eraSeen = [];
   bookIntro = null;
   bookSeq = 0;
 };
@@ -1424,16 +1518,16 @@ function homeCard(title, lines) {
   return choices;
 }
 
-// ล้างเซฟ = ลบทั้งตระกูล จึงถามซ้ำก่อน · สมุดฉายาแยก key ไม่โดนล้าง
+// ล้างเซฟ = ลบทั้งตระกูล จึงถามซ้ำก่อน · สมุดฉายา/สมุดอนุสรณ์แยก key ไม่โดนล้าง
 function confirmNew(back) {
-  const choices = homeCard('เริ่มตระกูลใหม่', ['ลบชีวิตที่ค้างไว้ทั้งตระกูล?', 'ผังตระกูลและสิ่งที่สืบทอดจะหายทั้งหมด กู้คืนไม่ได้ · สมุดฉายายังอยู่']);
+  const choices = homeCard('เริ่มตระกูลใหม่', ['ลบชีวิตที่ค้างไว้ทั้งตระกูล?', 'ผังตระกูลและสิ่งที่สืบทอดจะหายทั้งหมด กู้คืนไม่ได้ · สมุดฉายาและสมุดอนุสรณ์ยังอยู่']);
   choices.append(button('ลบแล้วเริ่มตระกูลใหม่', null, start), button('ยกเลิก', null, back));
 }
 
 function home(card) {
   const where = af ? `ระหว่างชาติ หลังตายอายุ ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
-  choices.append(enter(button('เล่นต่อ', null, () => show(card))), button('เริ่มตระกูลใหม่', null, () => confirmNew(() => home(card))));
+  choices.append(enter(button('เล่นต่อ', null, () => show(card))), button('เริ่มตระกูลใหม่', null, () => confirmNew(() => home(card))), button('สมุดอนุสรณ์', null, () => openMemo()));
 }
 
 // เซฟจากเวอร์ชันที่เนื้อหาต่างกัน (B77): ไม่ทิ้ง — พาไปเล่นต่อในหน้าของเวอร์ชันนั้นที่เก็บไว้ (docs/v/)
@@ -1486,6 +1580,12 @@ async function oldSave(s) {
   const choices = homeCard('เซฟจากเวอร์ชันก่อน', ['มีชีวิตที่เล่นค้างไว้', `เกมอัปเดตเนื้อเรื่องแล้ว ชีวิตนี้เล่นต่อได้ในเวอร์ชัน ${ver} จนจบตระกูล แล้วตระกูลใหม่จะกลับมาเวอร์ชันล่าสุด`]);
   choices.append(enter(button(`เล่นต่อในเวอร์ชัน ${ver}`, null, () => (location.href = `v/${ver}.html`))), button('เริ่มตระกูลใหม่', null, () => confirmNew(() => oldSave(s))));
 }
+
+// ลิงก์ท้ายหน้าเปิดสมุดได้ทุกหน้า (หน้า "เล่นต่อ" ขึ้นเฉพาะตอนมีเซฟ) · เปิดซ้อนตัวเองไม่ได้ ไม่งั้นปุ่มกลับพากลับมาที่สมุด
+document.getElementById('memoLink')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (!root.querySelector('.memo-view')) openMemo();
+});
 
 function boot() {
   if (ARCHIVE) document.getElementById('appVer')?.append(' · เวอร์ชันเก่า');
