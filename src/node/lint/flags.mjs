@@ -54,7 +54,7 @@ export const rules = [
   },
   {
     id: 'schedule-target',
-    desc: 'schedules ชี้เหตุการณ์ที่มีอยู่จริง และ after_years เป็น [จาก, ถึง] 1–100',
+    desc: 'schedules ชี้เหตุการณ์ที่มีอยู่จริง และ after_years เป็น [จาก, ถึง] 0–100 (0 = ตอนต่อไปออกปีเดียวกัน)',
     all(events, ctx, r) {
       const ids = new Set(events.map((x) => x.e.id));
       for (const x of events) {
@@ -63,7 +63,7 @@ export const rules = [
             if (!isObj(s)) return;
             const p = `${path}.schedules[${i}]`;
             if (s.event !== undefined && !ids.has(s.event)) r(x, p, `นัดเหตุการณ์ "${s.event}" ที่ไม่มีอยู่`);
-            if (s.after_years !== undefined && !isRange(s.after_years, 1, 100)) r(x, p, 'after_years ต้องเป็น [จาก, ถึง] 1–100');
+            if (s.after_years !== undefined && !isRange(s.after_years, 0, 100)) r(x, p, 'after_years ต้องเป็น [จาก, ถึง] 0–100');
           });
         }
       }

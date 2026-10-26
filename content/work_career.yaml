@@ -248,10 +248,39 @@ events:
         text: "สอบเลื่อนเป็นช่างเทคนิค"
         requires: {edu: อาชีวะ, reason: "ต้องมีวุฒิอาชีวะ"}
         merit: [{cat: neutral}]
-        outcomes:
-          - {weight: 2, ok: true, text: "สอบผ่านอันดับหนึ่ง ได้ย้ายจากไลน์ผลิตไปห้องซ่อมบำรุง", effects: {job: technician, happiness: 2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ตำแหน่งตกเป็นของหลานผู้จัดการ ทั้งที่คะแนนแพ้", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        schedules: [{event: career_factory_exam_01, after_years: [0, 0]}]
       - {id: stay_ot, text: "ไม่เสี่ยง ทำโอทีต่อไป", effects: {money: {unit: income_x, amount: 0.5}, health: -1}, merit: [{cat: neutral}]}
+
+  # ตอนสองของเรื่องสอบช่างเทคนิค — ออกทางนัดจาก career_factory_tech_01 เท่านั้น (ไม่มี weight) ปีเดียวกัน
+  # ไม่ตั้ง when: นัดปีเดียวกันต้องออกแน่ เรื่องจึงไม่ขาดกลางทาง
+  - id: career_factory_exam_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ห้องสอบช่างเทคนิค"
+    text: "ใบประกาศผลคัดตัวติดหน้าห้องฝ่ายบุคคล มีชื่อ{ชื่อ}อยู่ในรายชื่อเข้าสอบปฏิบัติ คู่แข่งอีกสิบคน ตำแหน่งว่างแค่ที่เดียว"
+    choices:
+      - id: cram
+        text: "อ่านคู่มือเครื่องจักรทุกคืน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.2}}, text: "สอบผ่านอันดับหนึ่ง ได้ย้ายจากไลน์ผลิตไปห้องซ่อมบำรุง", effects: {job: technician, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตำแหน่งตกเป็นของหลานผู้จัดการ ทั้งที่คะแนนแพ้", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: ask_mentor
+        text: "ขอช่างประจำสอนงานหลังเลิกกะ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ช่างประจำพาซ่อมของจริงจนคล่องมือ สอบปฏิบัติผ่านสบาย ได้ย้ายไปห้องซ่อมบำรุง", effects: {job: technician, happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช่างประจำปัดว่ายุ่ง เข้าห้องสอบไปทั้งที่ไม่เคยจับเครื่องจริง สอบตก", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: pay_examiner
+        text: "ใส่ซองให้กรรมการคุมสอบ"
+        cost: {unit: income_x, amount: 0.5}
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ได้ตำแหน่งไปง่าย ๆ แต่เพื่อนร่วมไลน์ที่สอบได้คะแนนสูงกว่ามองหน้าไม่ติด", effects: {job: technician, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กรรมการรับซองแล้วเงียบ ผลออกมาไม่มีชื่อ จะทวงก็ไม่ได้", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - {id: withdraw, text: "ถอนตัว กลับไปทำโอทีเหมือนเดิม", effects: {money: {unit: income_x, amount: 0.5}, health: -1}, merit: [{cat: neutral}]}
 
   - id: career_farm_city_01
     type: A

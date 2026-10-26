@@ -7,6 +7,7 @@ import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, 
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard } from './career.mjs';
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 import { introCard, eraStory } from './intro.mjs';
+import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -374,14 +375,15 @@ export function moneyValue(st, m) {
   throw new Error(`หน่วยเงินไม่รู้จัก: ${m.unit}`);
 }
 
-function applyEffects(st, fx = {}) {
-  for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + levelValue(fx[k]));
-  if (fx.money) st.money += moneyValue(st, fx.money);
+// s = ตัวหรี่ผลของการ์ดกองสุ่มเมื่อจับหลายรอบต่อปี (pace.mjs) · ยอดกู้หรี่ด้วยเพราะการ์ดกู้คู่กับเงินจ่ายออก · ลงทุน/งาน/เรื้อรังเป็นโครงสร้าง ไม่หรี่
+function applyEffects(st, fx = {}, s = 1, ss = s) {
+  for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + levelValue(fx[k]) * ss);
+  if (fx.money) st.money += moneyValue(st, fx.money) * s;
   if (fx.invest) invest(st, fx.invest);
-  if (fx.debt) borrow(st, fx.debt);
+  if (fx.debt) borrow(st, fx.debt, s);
   if (fx.settle) settle(st, fx.settle);
   if (fx.complain) for (const d of st.debts) complainDebt(st.content.era, d);
-  if (fx.income_mult) st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * fx.income_mult));
+  if (fx.income_mult) st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * fx.income_mult ** s));
   if (fx.school) {
     st.school = fx.school === 'none' ? null : fx.school;
     if (!st.school && st.workFrom === null) st.needJob = true;
@@ -570,11 +572,11 @@ function checkBankrupt(st, year, stage) {
 }
 
 // กู้ก้อนใหม่: เงินกู้เข้ากระเป๋าทั้งก้อน แล้วผ่อนคืนทุกปีใน stepYear · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
-function borrow(st, { kind, amount }) {
+function borrow(st, { kind, amount }, s = 1) {
   const year = st.birthYear + st.age;
   const era = st.content.era;
   if (!debtOpen(era, kind, year)) throw new Error(`${debtName(kind)} ยังไม่มีในปี ${year}`);
-  const baht = moneyValue(st, amount);
+  const baht = moneyValue(st, amount) * s;
   st.money += baht;
   st.debts.push(newDebt(era, st.seed, kind, baht, year));
 }
@@ -694,9 +696,13 @@ export function nextCard(st) {
     // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
     const year = st.birthYear + st.age;
     let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
-    // กองสุ่มจับได้ปีละครั้ง หลังหลักไมล์/นัดของปีนั้นหมดแล้ว
-    if (!ev && st.poolAge !== st.age) {
+    // กองสุ่มจับได้ปีละ poolRounds รอบ หลังหลักไมล์/นัดของปีนั้นหมดแล้ว · การ์ดที่จับได้อาจนัดตอนต่อปีเดียวกัน — ค้นนัดก่อนรอบถัดไป
+    if (st.poolAge !== st.age) {
       st.poolAge = st.age;
+      st.poolLeft = poolRounds(stageOf(st.age));
+    }
+    while (!ev && st.poolLeft > 0) {
+      st.poolLeft--;
       ev = drawPool(st, year);
     }
     if (ev) {
@@ -718,8 +724,12 @@ export function nextCard(st) {
 function drawPool(st, year) {
   const stage = stageOf(st.age);
   const pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
+  // รอบที่กองแห้งนับแยกช่วงวัย — harness/pace.mjs อ่านเป็นรายการกองที่ต้องเติม (ไม่ออกไปกับการ์ด)
+  if (!pool.length) (st.poolDry ??= {})[stage] = (st.poolDry[stage] ?? 0) + 1;
   if (!pool.length || st.rng.next() >= POOL_CHANCE[stage]) return null;
-  return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers)));
+  // การ์ดทาง B (สายมู/ลาง) มีเป้าจำนวนต่อชีวิต — จับหลายรอบแล้วหรี่น้ำหนักตามรอบ ไม่ให้ล้นเป้า
+  const b = poolEffectScale(stage);
+  return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers) * (e.type === 'B' ? b : 1)));
 }
 
 // ไล่ทั้งกองเหตุการณ์ทุกปีกินเวลา harness ราวหนึ่งในห้า — จัดกลุ่มครั้งเดียวต่อชุดเนื้อหา (ผูกกับตัวอาเรย์ แทนทั้งอาเรย์ = กลุ่มใหม่)
@@ -819,7 +829,10 @@ export function choose(st, idx) {
     // คนมาส่งทำบุญอุทิศให้ — ลงบัญชีก่อนถึงปรโลก
     addMerit(st.ledger, 'dana', Math.min(FUNERAL.guestMerit.cap, guestBase(st) / FUNERAL.guestMerit.ref));
   }
-  applyEffects(st, c.effects);
+  const pool = ev.weight && ev.age === undefined && !ev.era;
+  const s = pool ? poolEffectScale(stageOf(st.age)) : 1;
+  const ss = pool ? poolStatScale(stageOf(st.age)) : 1;
+  applyEffects(st, c.effects, s, ss);
   applyChoice(st, ev, c);
   st.log.push({ id: ev.id, age: st.age, choice: idx, text });
   // ผลสุ่ม: จับทางด้วย rng ของโลก (เป็นผลของการเลือก) แล้วเล่าเป็นการ์ดผลลัพธ์ใบถัดไป
@@ -829,7 +842,7 @@ export function choose(st, idx) {
   const after = beliefChoice(st, ev, c);
   if (c.outcomes?.length) {
     const o = weighted(st.rng, c.outcomes, c.outcomes.map((x) => x.weight * poolMultiplier(st, x.multipliers)));
-    applyEffects(st, o.effects);
+    applyEffects(st, o.effects, s, ss);
     applyChoice(st, ev, o);
     if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล

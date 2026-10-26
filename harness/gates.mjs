@@ -5,21 +5,29 @@ import { expectedDeathAge, periodE0, qx, e0FromLx, infantMortality, MAX_AGE } fr
 const f = (v) => v.toFixed(2);
 
 // ด่าน 4: จำนวนการ์ดของชีวิตที่ตายหลังอายุ 60 (นับการ์ดเปลี่ยนช่วงและการ์ดตายด้วย)
-// ขอบล่างลดจาก 80 เมื่อเลิกการ์ดสรุปรายปี (สรุปเฉพาะตอนเปลี่ยนช่วงวัย) — ขอบบนคงไว้ให้เนื้อหาเรื่องต่อเติมได้
-export const CARD_MIN = 70, CARD_MAX = 150, CARD_SHARE = 0.9;
+// ช่วงขยับขึ้นเมื่อกองสุ่มจับได้หลายรอบต่อปี (pace.mjs) — 100–180 ครอบชีวิตที่เนื้อหาตอนนี้รับไหว
+// เปิด GATE4_LONG_ON เมื่อเนื้อหาเติมกองพอถึงเป้าเล่นนานขึ้น ~2 เท่า ช่วงจึงเป็น CARD_LONG_*
+export const CARD_LONG_MIN = 150, CARD_LONG_MAX = 260;
+export const GATE4_LONG_ON = false;
+export const [CARD_MIN, CARD_MAX] = GATE4_LONG_ON ? [CARD_LONG_MIN, CARD_LONG_MAX] : [100, 180];
+export const CARD_SHARE = 0.9;
 // พักการตัดสินได้ระหว่างรอเนื้อหา · ยังพิมพ์ตัวเลขทุกรอบเพื่อดูว่าเนื้อหาที่เติมดันขึ้นมาใกล้เกณฑ์แค่ไหน
 export const GATE4_PAUSED = false;
 export const cardsInRange = (c) => c >= CARD_MIN && c <= CARD_MAX;
 
-export function gate4(cardsOver60) {
+function cardGate(cardsOver60, name, min, max, paused, pausedText) {
   const xs = [...cardsOver60].sort((a, b) => a - b);
-  const inRange = xs.filter(cardsInRange).length;
+  const inRange = xs.filter((c) => c >= min && c <= max).length;
   const share = xs.length ? inRange / xs.length : 0;
   const pct = (p) => xs[Math.min(xs.length - 1, Math.floor(p * xs.length))];
   const ok = share >= CARD_SHARE;
-  const line = `ด่าน 4: ชีวิตที่ตายหลัง 60 ยาว ${CARD_MIN}–${CARD_MAX} การ์ด ${f(share * 100)}% (ต้อง ≥${CARD_SHARE * 100}%) · ${xs.length} ชีวิต · การ์ด p5 ${pct(0.05)} · p25 ${pct(0.25)} · p50 ${pct(0.5)} · p75 ${pct(0.75)} · p95 ${pct(0.95)} · ต่ำกว่า ${CARD_MIN} ${xs.filter((c) => c < CARD_MIN).length} · เกิน ${CARD_MAX} ${xs.filter((c) => c > CARD_MAX).length} → ${ok ? 'ผ่าน' : GATE4_PAUSED ? 'ตก (พักการตัดสิน รอกองสุ่มเหตุการณ์)' : 'ตก'}`;
-  return { line, share, fail: !ok && !GATE4_PAUSED };
+  const line = `${name}: ชีวิตที่ตายหลัง 60 ยาว ${min}–${max} การ์ด ${f(share * 100)}% (ต้อง ≥${CARD_SHARE * 100}%) · ${xs.length} ชีวิต · การ์ด p5 ${pct(0.05)} · p25 ${pct(0.25)} · p50 ${pct(0.5)} · p75 ${pct(0.75)} · p95 ${pct(0.95)} · ต่ำกว่า ${min} ${xs.filter((c) => c < min).length} · เกิน ${max} ${xs.filter((c) => c > max).length} → ${ok ? 'ผ่าน' : paused ? `ตก (${pausedText})` : 'ตก'}`;
+  return { line, share, fail: !ok && !paused };
 }
+
+export const gate4 = (cardsOver60) => cardGate(cardsOver60, 'ด่าน 4', CARD_MIN, CARD_MAX, GATE4_PAUSED, 'พักการตัดสิน รอกองสุ่มเหตุการณ์');
+// ระยะห่างจากเป้าเล่นนานขึ้นก่อนเปิด — พิมพ์ดูเฉย ๆ ไม่ตัดสิน (เปิดแล้ว gate4 ตัดสินช่วงนี้เอง)
+export const gate4Long = (cardsOver60) => cardGate(cardsOver60, 'ด่าน 4 เป้าเล่นนาน', CARD_LONG_MIN, CARD_LONG_MAX, true, 'ยังไม่เปิด รอเนื้อหาเติมกอง');
 
 // 3a: ตารางชีพรายปีที่เกมใช้ต้องให้ e0 และอัตราตายทารกตรงข้อมูลจริงของปีนั้น (ไม่ผ่านแกนเกม ไม่ผ่านการสุ่ม)
 // แยกจาก 3b เพราะเป้าของ 3b คำนวณจาก qx ตัวเดียวกับที่เกมใช้ ถ้าตารางชีพผิด 3b ก็ยังผ่าน

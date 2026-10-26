@@ -9,6 +9,8 @@ document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`
 let st;
 // ระหว่างชาติของชีวิตที่เพิ่งจบ (null = ยังมีชีวิต)
 let af = null;
+// อายุของการ์ดใบก่อนในชีวิตนี้ — ปีหนึ่งมีหลายใบได้ (B37a) หัวการ์ดจึงต้องบอกว่ายังเป็นปีเดิม
+let prevAge = null;
 
 function el(tag, cls, text) {
   const e = document.createElement(tag);
@@ -538,7 +540,10 @@ function render(card) {
     if (card.recap && !card.short) body.append(recap(card.recap));
     choices.append(enter(button('ไปช่วงระหว่างชาติ', null, () => play(T.afterlife))), ...shareButtons(card));
   } else {
-    top.append(el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, `${genLabel()}${st.name} · ${provinceLabel(st)}`));
+    const head = el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : `อายุ ${card.age} · ช่วง${card.stage}`);
+    // การ์ดผลเป็นผลของใบก่อนอยู่แล้ว ป้ายซ้ำไม่บอกอะไรเพิ่ม · งานศพเกิดหลังตายจึงไม่ใช่ "ปีเดียวกัน" ของชีวิต
+    if (card.kind !== 'result' && !card.funeral && card.age === prevAge) head.append(el('span', 'same', 'ปีเดียวกัน'));
+    top.append(head, el('small', null, `${genLabel()}${st.name} · ${provinceLabel(st)}`));
     box.append(top, stats(s), statHelp());
     // ไม่มีรายได้ก็ต้องเห็นเงินติดตัวเสมอแม้ 0 · มีงานทำแล้วซ่อนเงินติดตัวเฉพาะตอนเป็น 0 พอดี ติดลบ (หนี้) ยังต้องเห็น
     // เงินกู้เป็นยอดค้างของสัญญา ไม่ใช่เงินติดตัวติดลบ จึงแยกช่อง ไม่หักรวมกัน
@@ -655,8 +660,18 @@ const lifePick = (i) => i.toString(36);
 const afterPick = (i) => String.fromCharCode(65 + i);
 let save = null;
 
+// อายุของการ์ดชีวิตใบก่อน/ใบนี้ — จำใน apply ไม่ใช่ตอนวาด เพราะเล่นซ้ำจากเซฟไม่ได้วาดทุกใบ
+let curAge = null;
+function track(card) {
+  if (af) return card;
+  prevAge = curAge;
+  curAge = card.age;
+  return card;
+}
+
 // ทุกปุ่มที่เดินเกมผ่านตรงนี้ทางเดียว — ตอนเล่นจริงกับตอนเล่นซ้ำจากเซฟจึงเดินเหมือนกันทุกก้าว
-function apply(tok) {
+const apply = (tok) => track(step(tok));
+function step(tok) {
   if (tok === T.next) return nextCard(st);
   if (tok === T.afterlife) {
     af = startAfterlife(st);
@@ -666,6 +681,7 @@ function apply(tok) {
   if (tok === T.rebirth) {
     st = nextLife(af);
     af = null;
+    curAge = null;
     return nextCard(st);
   }
   if (/^[A-Z]$/.test(tok)) {
@@ -723,7 +739,8 @@ function begin(seed) {
   st = newLife(seed, CONTENT);
   af = null;
   save = { seed, log: '' };
-  return nextCard(st);
+  curAge = null;
+  return track(nextCard(st));
 }
 
 function start() {

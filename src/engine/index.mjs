@@ -8,5 +8,6 @@ export * from './life.mjs';
 export * from './afterlife.mjs';
 export * from './intro.mjs';
 export * from './titles.mjs';
+export * from './pace.mjs';
 export * from './belief.mjs';
 export * from './family.mjs';
