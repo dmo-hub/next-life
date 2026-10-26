@@ -86,6 +86,9 @@ export function weighted(rng, items, weights) {
 export const RETIRE_AGE = 60;
 export const isWorking = (st, age = st.age) => st.workFrom !== null && age >= st.workFrom && age < RETIRE_AGE;
 
+// ช่วงเรียนที่การ์ดเห็น: ก่อนวัยเข้าเรียนยังไม่มีช่วงเรียน (ค่าเริ่ม primary รออยู่) · เลิกเรียนแล้ว = none
+export const schoolOf = (st, age = st.age) => (st.school && age >= SCHOOL_FROM ? st.school : 'none');
+
 // ป้ายสถานะงานบนจอ: ก่อนมีงานไม่โชว์อาชีพ (อาชีพตอนเกิดเป็นของครอบครัว ใช้คิดเงินติดตัวเท่านั้น)
 export function jobText(st, age = st.age) {
   if (st.workFrom === null) {
@@ -707,13 +710,22 @@ export function nextCard(st) {
   // การ์ดเปลี่ยนช่วง/เหตุการณ์ยุค/ผลสุ่มเป็นใบของตัวเอง เรียงตามที่ถึงกำหนดในปีนั้น
   if (st.queue.length) {
     const card = st.queue.shift();
-    if (card.kind === 'eraEvent') return eventCard(st, card.ev);
+    if (card.kind === 'eraEvent') {
+      // ใบรับมือยุคถูกเลือกตอนขึ้นปี ก่อนด่านเรียนต่อของปีเดียวกันได้ตอบ — เลิกเรียนไปแล้วใบเรื่องโรงเรียนต้องไม่ออก
+      if (card.ev.era && !whenOk(st, card.ev.when)) {
+        delete st.done[card.ev.id];
+        return nextCard(st);
+      }
+      return eventCard(st, card.ev);
+    }
     // ข่าวบ้านเมืองที่มีการ์ดรับมือของเหตุการณ์เดียวกันต่อท้าย = ใบเดียว (B58) — ไม่งั้นผู้เล่นกด "ต่อไป" ใบเปล่าก่อนเรื่องจริง
     // ไม่แตะ rng/state ผลเกมจึงเท่าเดิม ต่างแค่จำนวนการ์ด
     const pair = st.queue[0];
     if (card.kind === 'era' && ERA_NEWS.merge && pair?.kind === 'eraEvent' && pair.ev.era === card.id) {
       st.queue.shift();
-      return eventCard(st, pair.ev, { text: card.text, story: card.story });
+      if (whenOk(st, pair.ev.when)) return eventCard(st, pair.ev, { text: card.text, story: card.story });
+      // ใบรับมือตกด่าน when ซ้ำ (B59) — ข่าวออกเดี่ยว
+      delete st.done[pair.ev.id];
     }
     if (card.kind === 'alloc') {
       const options = allocOptions(st.content.era, st.birthYear + st.age);
@@ -837,6 +849,7 @@ export function whenOk(st, when) {
   for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;
   // อาชีพนับเมื่อมีงานของตัวเองแล้ว — อาชีพครอบครัวก่อนทำงานไม่ทำให้การ์ดที่ทำงานออก
   if (when.occupation && !(st.workFrom !== null && when.occupation.includes(st.occupation))) return false;
+  if (when.school && !when.school.includes(schoolOf(st))) return false;
   return !when.flags || flagsOk(st, when.flags);
 }
 

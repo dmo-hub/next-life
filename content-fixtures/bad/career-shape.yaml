@@ -1,11 +1,11 @@
-# อาชีพไม่รู้จัก · ช่วงเรียนผิด · ok ไม่ใช่ true · วุฒิผิด · ตัวคูณอาชีพไม่รู้จัก — ใบ ok ใช้ทุกช่องถูกต้อง
+# อาชีพไม่รู้จัก · ช่วงเรียนผิด (ผลและเงื่อนไข) · ok ไม่ใช่ true · วุฒิผิด · ตัวคูณอาชีพไม่รู้จัก — ใบ ok ใช้ทุกช่องถูกต้อง
 events:
   - id: bad_case_01
     type: A
     stage: ทำงาน
     years: [2500, 2650]
     text: "ข้อความการ์ด"
-    when: {occupation: [astronaut]}
+    when: {occupation: [astronaut], school: [phd]}
     multipliers: {occupation: {astronaut: 2}}
     choices:
       - {text: "ทางที่หนึ่ง", effects: {job: astronaut}, merit: [{cat: neutral}]}
@@ -26,7 +26,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     text: "ข้อความการ์ด"
-    when: {occupation: [clerk, manager]}
+    when: {occupation: [clerk, manager], school: [uni, none]}
     multipliers: {occupation: {manager: 1.5}}
     choices:
       - {text: "ทางที่หนึ่ง", effects: {job: technician}, merit: [{cat: neutral}]}

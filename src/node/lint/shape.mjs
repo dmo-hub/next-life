@@ -19,7 +19,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss'],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school'],
   bound: ['min', 'max'],
   whenFlags: ['has', 'not'],
   family: ['role', 'age', 'alive', 'count', 'health', 'relations'],
@@ -406,11 +406,13 @@ export const rules = [
   },
   {
     id: 'career-shape',
-    desc: `อาชีพ/การเรียน (B15): effects.job = id อาชีพใน data/finance.json · effects.school = ${SCHOOL_VALUES.join('|')} · when.occupation = รายการ id อาชีพ · multipliers.occupation = {id อาชีพ: เลขบวก} · requires.edu = ${EDU.join('|')} · outcome ok = true เท่านั้น (ทางสำเร็จที่ใช้คิด %)`,
+    desc: `อาชีพ/การเรียน (B15): effects.job = id อาชีพใน data/finance.json · effects.school = ${SCHOOL_VALUES.join('|')} · when.occupation = รายการ id อาชีพ · when.school = รายการช่วงเรียนที่กำลังเรียน (${SCHOOL_VALUES.join('|')} · none = ยังไม่เข้าเรียน/เลิกเรียนแล้ว) · multipliers.occupation = {id อาชีพ: เลขบวก} · requires.edu = ${EDU.join('|')} · outcome ok = true เท่านั้น (ทางสำเร็จที่ใช้คิด %)`,
     event(e, ctx, r) {
       const occ = ctx.occupations;
       const w = isObj(e.when) ? e.when.occupation : undefined;
       if (w !== undefined && !nonEmptySubset(w, occ)) r('.when.occupation', `ต้องเป็นรายการจาก ${occ.join(' ')}`);
+      const ws = isObj(e.when) ? e.when.school : undefined;
+      if (ws !== undefined && !nonEmptySubset(ws, SCHOOL_VALUES)) r('.when.school', `ต้องเป็นรายการจาก ${SCHOOL_VALUES.join(' ')}`);
       const mults = [[e.multipliers, '.multipliers']];
       for (const { node, path } of effectSites(e)) {
         if (path.includes('outcomes')) {
