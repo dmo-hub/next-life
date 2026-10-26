@@ -71,7 +71,7 @@ events:
       - id: adopt
         text: "พากลับบ้าน ทำแผลให้"
         effects: {happiness: 1, relations: 1}
-        cost: {unit: fixed_baht, amount: 1500, ref_year: 2566}
+        cost: {unit: income_x, amount: 0.05}
         family: [{add: pet, kind: หมา, life: [8, 13]}]
         merit: [{cat: dana, level: 2}]
       - id: call_foundation
@@ -100,7 +100,7 @@ events:
       - id: buy_puppy
         text: "จ่ายมัดจำ เลือกตัวที่ชอบ"
         effects: {happiness: 2}
-        cost: {unit: fixed_baht, amount: 15000, ref_year: 2566}
+        cost: {unit: income_x, amount: 0.4}
         family: [{add: pet, kind: หมาพันธุ์, life: [10, 14]}]
         merit: [{cat: neutral}]
       - id: adopt_instead
@@ -130,7 +130,7 @@ events:
       - id: buy_breed
         text: "พาไปซื้อพันธุ์ที่ลูกอยากได้"
         effects: {happiness: 2, relations: 2}
-        cost: {unit: fixed_baht, amount: 20000, ref_year: 2566}
+        cost: {unit: income_x, amount: 0.3}
         family: [{add: pet, kind: หมาพันธุ์, life: [10, 14]}, {bond: child, d: 5}]
         merit: [{cat: neutral}]
       - id: adopt_shelter
@@ -189,7 +189,7 @@ events:
     choices:
       - id: full_checkup
         text: "ตรวจให้ครบ รักษาเต็มที่"
-        cost: {unit: fixed_baht, amount: 8000, ref_year: 2566}
+        cost: {unit: income_x, amount: 0.2}
         effects: {happiness: 1}
         family: [{bond: pet, d: 8}]
         merit: [{cat: dana, level: 1}]
@@ -222,7 +222,7 @@ events:
     choices:
       - id: buy_meds
         text: "ซื้อยาให้กินทุกวัน"
-        cost: {unit: fixed_baht, amount: 6000, ref_year: 2566}
+        cost: {unit: income_x, amount: 0.15}
         effects: {happiness: 1}
         family: [{bond: pet, d: 8}]
         merit: [{cat: dana, level: 1}]
@@ -320,7 +320,7 @@ events:
         merit: [{cat: neutral}]
       - id: make_merit
         text: "ทำบุญอุทิศให้"
-        cost: {unit: fixed_baht, amount: 500, ref_year: 2566}
+        cost: {unit: income_x, amount: 0.02}
         effects: {happiness: 1}
         merit: [{cat: dana, level: 1}]
       - id: new_friend
@@ -372,19 +372,19 @@ events:
     choices:
       - id: buy_chicks
         text: "ซื้อลูกไก่ไข่ร้อยตัว"
-        cost: {unit: fixed_baht, amount: 8000, ref_year: 2566}
+        cost: {unit: income_x, amount: 0.3}
         effects: {health: -1}
         family: [{add: herd, kind: ไก่, life: [5, 10]}]
         merit: [{cat: neutral}]
       - id: buy_calves
         text: "ซื้อลูกวัวสองตัว"
-        cost: {unit: fixed_baht, amount: 40000, ref_year: 2566}
+        cost: {unit: income_x, amount: 1.2}
         effects: {health: -1}
         family: [{add: herd, kind: วัว, life: [12, 20]}]
         merit: [{cat: neutral}]
       - id: buy_buffalo
         text: "ซื้อควายไว้ไถนาและให้เช่า"
-        cost: {unit: fixed_baht, amount: 35000, ref_year: 2566}
+        cost: {unit: income_x, amount: 1.0}
         effects: {health: -1}
         family: [{add: herd, kind: ควาย, life: [15, 25]}]
         merit: [{cat: neutral}]
@@ -405,7 +405,7 @@ events:
     choices:
       - id: vaccinate
         text: "จ้างหมอมาฉีดยาทั้งคอก"
-        cost: {unit: fixed_baht, amount: 6000, ref_year: 2566}
+        cost: {unit: income_x, amount: 0.15}
         effects: {}
         merit: [{cat: neutral}]
       - id: sell_now

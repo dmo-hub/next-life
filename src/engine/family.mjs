@@ -2,7 +2,7 @@
 // ทุกสุ่มของสมาชิกใหม่มาจาก st.kinRng (stream แยกจากโลกและจาก famRng ของพ่อแม่) — ชีวิตที่ไม่มีครอบครัวของตัวเองไม่ดึงเลขนี้เลย
 // ชะตาการตายของพ่อแม่และลำดับสุ่มของโลกจึงเหมือนก่อนมีระบบนี้ทุกหลัก
 import { makeRng, mixSeed } from './rng.mjs';
-import { lifeQx, priceRatio } from './era.mjs';
+import { lifeQx } from './era.mjs';
 import { pickName } from './birth.mjs';
 
 export const KIN_ROLES = ['spouse', 'child', 'grandchild'];
@@ -29,24 +29,23 @@ export const KIN_AID = { from: 60, base: 50, span: 120, scale: 0.5, roles: ['spo
 // แก่แล้วไม่เหลือคนในบ้านที่ยังอยู่ = เสียความสุข/สุขภาพต่อปี · ปิดไว้ (0) จนเนื้อหามีทางมีลูกมากพอ — ตอนนี้คนแก่ส่วนใหญ่ไม่มีลูก
 export const KIN_LONELY = { from: 65, happiness: 0, health: 0 };
 
-// สัตว์ (B44) — ค่าตั้งของเกม · อายุขัยตามชนิดโดยประมาณ · เงินต่อปีเป็นบาทปี PET_YEAR.ref
+// สัตว์ (B44) — ค่าตั้งของเกม · อายุขัยตามชนิดโดยประมาณ · เงินต่อปีเป็นสัดส่วนของเงินเก็บรายปีของชีวิตนั้น
+// (บาทคงที่บีบส่วนต่างทรัพย์ของชั้นล่างที่ห่างกันน้อยจนลำดับพลิกในด่าน finance)
 // pet = สัตว์คู่ใจ ทีละ 1 ตัว มีชื่อ ชนิดต่างกันให้ค่าสถานะต่างกัน (gives ต่อปี) · cost = ค่าข้าว ยา วัคซีนพื้นฐาน
 export const PET_KINDS = {
-  หมา: { life: [10, 15], cost: 1500, gives: { health: 0.5, relations: 0.3 }, names: ['ดำ', 'ด่าง', 'ขาว', 'บุญมี', 'ตูบ', 'โต้ง', 'มะลิ', 'ถุงทอง', 'แดง', 'ปุยฝ้าย'] },
-  แมว: { life: [12, 18], cost: 1200, gives: { happiness: 1.5 }, names: ['ส้ม', 'มอม', 'ขาวมณี', 'ลายเสือ', 'ทองคำ', 'เหมียว', 'สีสวาด', 'ข้าวตัง'] },
-  นกขุนทอง: { life: [10, 20], cost: 600, gives: { knowledge: 0.5, happiness: 0.5 }, names: ['แก้ว', 'ขุนทอง', 'เจ๊ก', 'ดำดี', 'สาลี'] },
-  หมาพันธุ์: { life: [10, 14], cost: 6000, gives: { health: 0.3, network: 0.3, happiness: 0.5 }, names: ['ลัคกี้', 'โมจิ', 'บราวนี่', 'ช็อกโก้', 'คุกกี้', 'ลาเต้'] },
-  แมวพันธุ์: { life: [12, 16], cost: 5000, gives: { happiness: 1.5, network: 0.2 }, names: ['มิลค์', 'ไข่มุก', 'ซูชิ', 'ลูน่า', 'โอปอ'] },
+  หมา: { life: [10, 15], cost: 0.06, gives: { health: 0.5, relations: 0.3 }, names: ['ดำ', 'ด่าง', 'ขาว', 'บุญมี', 'ตูบ', 'โต้ง', 'มะลิ', 'ถุงทอง', 'แดง', 'ปุยฝ้าย'] },
+  แมว: { life: [12, 18], cost: 0.05, gives: { happiness: 1.5 }, names: ['ส้ม', 'มอม', 'ขาวมณี', 'ลายเสือ', 'ทองคำ', 'เหมียว', 'สีสวาด', 'ข้าวตัง'] },
+  นกขุนทอง: { life: [10, 20], cost: 0.02, gives: { knowledge: 0.5, happiness: 0.5 }, names: ['แก้ว', 'ขุนทอง', 'เจ๊ก', 'ดำดี', 'สาลี'] },
+  หมาพันธุ์: { life: [10, 14], cost: 0.25, gives: { health: 0.3, network: 0.3, happiness: 0.5 }, names: ['ลัคกี้', 'โมจิ', 'บราวนี่', 'ช็อกโก้', 'คุกกี้', 'ลาเต้'] },
+  แมวพันธุ์: { life: [12, 16], cost: 0.2, gives: { happiness: 1.5, network: 0.2 }, names: ['มิลค์', 'ไข่มุก', 'ซูชิ', 'ลูน่า', 'โอปอ'] },
 };
 // herd = ฝูงที่เป็นทรัพย์สิน/อาชีพ (ไข่ นม แรงไถ ขายลูก) นับเป็นหน่วยเดียว ไม่มีชื่อ ไม่ให้ค่าสถานะแบบคู่ใจ · net = เงินสุทธิต่อปีหลังค่าอาหาร
 export const HERD_KINDS = {
-  ไก่: { life: [5, 10], net: 3000 },
-  วัว: { life: [12, 20], net: 8000 },
-  ควาย: { life: [15, 25], net: 4000 },
-  ปลา: { life: [3, 8], net: 1000 },
+  ไก่: { life: [5, 10], net: 0.08 },
+  วัว: { life: [12, 20], net: 0.2 },
+  ควาย: { life: [15, 25], net: 0.12 },
+  ปลา: { life: [3, 8], net: 0.03 },
 };
-// บ้านชั้น ≤ poorTo เลี้ยงด้วยข้าวเหลือ ค่าเลี้ยงคูณ poorScale · ค่าเลี้ยงเต็มเคยดันล้มละลายเกินกรอบด่าน finance
-export const PET_YEAR = { ref: 2566, poorTo: 3, poorScale: 0.5 };
 // ติดบ้านตอนเกิด: บ้านฐานะดี (ชั้น ≥ richFrom) · บ้านในเมือง (ภาค city) · บ้านนอก — [โอกาส, ชนิด] คู่ใจกับฝูงสุ่มแยกกัน ได้ทั้งคู่ก็ได้
 export const PET_AT_BIRTH = {
   richFrom: 7,
@@ -222,27 +221,26 @@ function kinLost(st, m, age, year, out) {
 }
 
 // ผลต่อปีของสัตว์ (B44): คู่ใจให้ค่าสถานะตามชนิด หักค่าเลี้ยง · ฝูงให้เงินสุทธิ · บาทของปีนั้น — ไม่ดึงเลขสุ่ม
-function petYear(st, year) {
+function petYear(st, saving) {
   const live = st.kin.filter((m) => ANIMAL.includes(m.role) && m.alive && !m.left);
   if (!live.length) return;
-  const era = st.content.era;
-  const price = PET_YEAR.ref <= year ? priceRatio(era, st.seed, PET_YEAR.ref, year) : 1 / priceRatio(era, st.seed, year, PET_YEAR.ref);
   for (const m of live) {
     if (m.role === 'herd') {
-      st.money += (HERD_KINDS[m.kind]?.net ?? 0) * price;
+      st.money += (HERD_KINDS[m.kind]?.net ?? 0) * saving;
       continue;
     }
     const k = PET_KINDS[m.kind] ?? {};
     for (const [stat, v] of Object.entries(k.gives ?? {})) st[stat] = bondClamp(st[stat] + v);
-    st.money -= (k.cost ?? 0) * price * (st.petScale ?? 1);
+    st.money -= (k.cost ?? 0) * saving;
   }
 }
 
-export function ageKin(st, year) {
+// saving = เงินเก็บรายปีของชีวิตนี้ (ผู้เรียกคิดให้) ฐานของเงินสัตว์
+export function ageKin(st, year, saving = 0) {
   kinYearlyBond(st);
   const lost = [];
   if (!st.kin.length) return lost;
-  petYear(st, year);
+  petYear(st, saving);
   for (const m of [...st.kin]) {
     if (!m.alive) continue;
     const a = year - m.born - 1;
@@ -303,7 +301,6 @@ export function kinAid(st) {
 // สัตว์ติดบ้านตอนเกิด (B44): ทางในตระกูลได้ตัวที่บ้านเดิมยังเลี้ยงอยู่ (heir.pets) · ที่เหลือสุ่มตามบ้านจาก stream แยก
 // ไม่ดึง rng ของโลก/kinRng — ชีวิตที่ไม่ได้สัตว์ไม่มีอะไรเปลี่ยนจากส่วนนี้
 export function petsAtBirth(st, heir, clsIndex) {
-  st.petScale = clsIndex <= PET_YEAR.poorTo ? PET_YEAR.poorScale : 1;
   if (heir?.pets) {
     // ตัวที่บ้านรับมาหลังทายาทเกิด เข้าบ้านตอนถึงปีของมัน (petArrivals)
     for (const p of heir.pets) if (p.born <= st.birthYear) addMember(st, p.role, p);
