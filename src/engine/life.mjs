@@ -199,6 +199,8 @@ export function newLife(seed, content, heir = null) {
     trail: [],
     // ค่าสถานะรายปีทั้งชีวิต (B38a) — แยกจาก trail เพราะ trail ออกไปกับการ์ดสรุปช่วงวัยอยู่แล้ว
     statTrail: [],
+    // ฐานะ 10 ระดับต้นช่วงวัย (B95 กราฟตระกูล) — จุดแรก = ฐานะบ้านตอนเกิด
+    standing: [{ age: 0, cls: CLASSES.indexOf(cls) }],
     due: [],
     queue: [],
     done: {},
@@ -542,6 +544,8 @@ function stepYear(st) {
     st.due.push({ kind: 'omen', tone, age: st.age, stage, text: omenText(tone, st.seed, st.age) });
   }
   if (stage !== prevStage) {
+    // จุดกราฟฐานะตระกูล (B95) ทุกต้นช่วงวัย — ไม่ออกไปกับการ์ด
+    st.standing.push({ age: st.age, cls: standingOf(st, year) });
     st.due.push({ kind: 'stage', age: st.age, stage, text: `เข้าสู่ช่วง${stage}`, recap: stageRecap(st, st.age - 1) });
     st.stageMark = markStage(st);
   }
@@ -600,6 +604,20 @@ function retireSpend(st, year) {
 export const totalDebt = (st) => st.debts.reduce((s, d) => s + d.balance, 0);
 // ทรัพย์สุทธิ = เงิน − หนี้รายก้อน (เงินติดลบนับเป็นหนี้อยู่แล้ว)
 export const netWorth = (st) => st.money - totalDebt(st);
+
+// ฐานะระหว่างชีวิต (B95): รายได้เทียบเท่าต่อเดือนเทียบรายได้ครัวเรือนของประเทศปีนั้น ตัดด้วยเส้นแบ่ง 10 ระดับชุดเดียวกับฐานะตอนเกิด
+// รายได้เทียบเท่า = รายได้จากงาน × STANDING.household (คนเดียวเทียบรายได้ทั้งบ้าน) + ทรัพย์สุทธิ × STANDING.yield ต่อปี (ติดลบได้)
+// ยังไม่เคยทำงาน = ฐานะของบ้านตอนเกิด · อ่าน state ล้วน ไม่ดึงเลขสุ่ม
+export const STANDING = { household: 1.6, yield: 0.04 };
+export function standingOf(st, year = st.birthYear + st.age) {
+  if (st.workFrom === null) return CLASSES.indexOf(st.cls);
+  const b = st.content.era.birth;
+  const work = isWorking(st) ? monthlyIncome(st, year) : st.retireBase !== null ? (st.retireBase * st.price) / 12 : 0;
+  const eq = work * STANDING.household + (netWorth(st) * STANDING.yield) / 12;
+  if (eq <= 0) return 0;
+  const z = (Math.log(eq / nationalIncome(st.content.era, st.seed, year)) + (b.sigma * b.sigma) / 2) / b.sigma;
+  return b.cutZ.filter((c) => z > c).length;
+}
 
 // รายได้ทั้งปีที่ใช้วัดว่าหนี้ท่วมแค่ไหน: ทำงานอยู่ = รายได้ปีนี้ · เกษียณแล้ว = รายได้ปีสุดท้ายปรับเงินเฟ้อ
 // ยังไม่เคยทำงาน (เรียนอยู่ระหว่างปลอดหนี้ กยศ.) ไม่มีฐาน จึงไม่นับ
