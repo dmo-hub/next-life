@@ -20,6 +20,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .logo b { font-family:Srisakdi,serif; font-weight:700; font-size:34px; line-height:1.2; color:var(--gold); }
 .logo small { display:block; font-size:12px; letter-spacing:0.12em; color:var(--sand); }
 .logo .ver { display:inline-block; margin-top:4px; padding:1px 9px; border:1px solid var(--bronze); border-radius:999px; font-size:11px; font-weight:600; color:var(--sand); white-space:nowrap; }
+.logo .saved { display:inline-block; margin:4px 0 0 6px; font-size:11px; color:var(--sand); white-space:nowrap; }
+.logo .saved:not(:empty)::before { content:'\25CF  '; color:#7FC4B8; }
+.logo .saved.off::before { color:#E07A5F; }
 #app { max-width:460px; margin:0 auto; padding:20px 16px 16px; }
 /* ป้ายเกมไม่ใช่คำแนะนำการลงทุน (ใบ 11) อยู่ทุกหน้าจอ ไม่ใช่แค่การ์ดจัดสรรเงิน */
 .foot { max-width:460px; margin:0 auto; padding:0 16px 40px; font-size:12px; color:var(--muted); text-align:center; }
@@ -152,7 +155,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 </style>
 </head>
 <body>
-<header class="logo"><b>ชาติหน้า</b><small>NEXT LIFE</small><span id="appVer" class="ver" title="เวอร์ชันเดโม"></span></header>
+<header class="logo"><b>ชาติหน้า</b><small>NEXT LIFE</small><span id="appVer" class="ver" title="เวอร์ชันเดโม"></span><span id="saved" class="saved" aria-live="polite"></span></header>
 <main id="app"></main>
 <footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <a href="about.html">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
 <script>
