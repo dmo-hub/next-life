@@ -1,11 +1,12 @@
 // ด่านหน้าเว็บ (B65): ตัวเลขบนหน้าเท่าค่าจริง · build ใหม่แล้วเลขเปลี่ยนตามข้อมูล (ตัวควบคุม) · ลิงก์ในเว็บไม่ตาย
 // · หน้ารวมการ์ดไม่มีผล/บุญบาป/น้ำหนัก · ทุกการ์ดใน content อยู่บนหน้ารวมการ์ด
+// · หน้าเฉลย (B88) ครบทุกการ์ด/ตัวเลือก/ผลสุ่ม และเฉลยจริง — กฎ "ไม่หลุดบุญบาป" ของหน้ารวมการ์ดไม่ใช้กับหน้านี้
 import { readFileSync, existsSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
 import { siteFacts, injectFacts } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
-import { FACT_PAGES } from '../src/site/build.mjs';
-import { meritName, MERIT_WEIGHTS } from '../src/engine/index.mjs';
+import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
+import { meritName, meritId, MERIT_WEIGHTS } from '../src/engine/index.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -18,7 +19,7 @@ const check = (name, bad, extra = '') => {
 };
 
 // 1) ตัวเลขบนหน้า = ค่าที่คิดจากข้อมูลตอนนี้ (หน้าที่ยังไม่ได้ build ใหม่หลังแก้ข้อมูล = ตก)
-const pages = [...FACT_PAGES, 'catalog'];
+const pages = [...FACT_PAGES, ...GEN_PAGES.map(([name]) => name)];
 let seen = 0;
 const wrong = [];
 for (const p of pages) {
@@ -60,6 +61,25 @@ const leaks = leak.filter((re) => re.test(catalogHtml(content))).map(String);
 // ชื่อหมวดบุญบาปภาษาไทยอาจเป็นคำธรรมดาในข้อความการ์ด — นับเฉพาะ id อังกฤษของหมวด
 const ids = cats.filter((s) => /^[a-z_]+$/.test(s) && new RegExp(`\\b${s}\\b`).test(cards));
 check('หน้ารวมการ์ดไม่มีผล/น้ำหนัก/ป้ายบุญบาป', leaks.length || ids.length, leaks.length || ids.length ? ` · เจอ ${[...leaks, ...ids].join(' ')}` : '');
+
+// 5) หน้าเฉลย: นับชิ้นบนหน้าเทียบ content ตรง ๆ — ตัวสร้างทำตกหล่นสักทาง (ตัวเลือกซ่อน · ผลสุ่ม · ป้ายบุญบาป) เลขจะไม่เท่า
+const spoil = read('spoilers.html');
+const nodes = content.events.flatMap((e) => e.choices.flatMap((c) => [c, ...(c.outcomes ?? [])]));
+const want = {
+  การ์ด: content.events.length,
+  ตัวเลือก: content.events.reduce((s, e) => s + e.choices.length, 0),
+  ผลสุ่ม: nodes.filter((n) => n.weight !== undefined).length,
+  ป้ายบุญบาป: nodes.flatMap((n) => n.merit ?? []).filter((t) => meritId(t.cat) !== 'neutral').length,
+};
+const got = {
+  การ์ด: (spoil.match(/<article class="c /g) ?? []).length,
+  ตัวเลือก: (spoil.match(/<p class="ch">/g) ?? []).length,
+  ผลสุ่ม: (spoil.match(/<b class="pct">/g) ?? []).length,
+  ป้ายบุญบาป: (spoil.match(/<span class="m (?:good|sin)">/g) ?? []).length,
+};
+const off = Object.keys(want).filter((k) => want[k] !== got[k] || !want[k]);
+check('หน้าเฉลยครบทุกการ์ด ตัวเลือก ผลสุ่ม ป้ายบุญบาป', off.length, ` ${Object.keys(want).map((k) => `${k} ${got[k]}/${want[k]}`).join(' · ')}`);
+check('หน้ารวมการ์ดลิงก์ไปหน้าเฉลย และหน้าเฉลยมีป้ายเตือนสปอยล์', !cards.includes('href="spoilers.html"') || !spoil.includes('class="warn"'));
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 process.exit(fail ? 1 : 0);
