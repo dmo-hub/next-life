@@ -309,8 +309,8 @@ events:
     category: family
     stage: ทำงาน
     years: [2500, 2650]
-    weight: 6
-    when: {loss: {roles: [pet], within: 0}}
+    weight: 40
+    when: {loss: {roles: [pet], within: 2}}
     title: "บ้านที่เงียบลง"
     text: "หลังจาก{ชื่อผู้จากไป}จากไป เสียงตอนเปิดประตูกลับบ้านก็หายไปด้วย ชามข้าวกับสายจูงยังวางอยู่ที่เดิม"
     choices:
@@ -338,8 +338,8 @@ events:
     category: family
     stage: ชรา
     years: [2500, 2650]
-    weight: 6
-    when: {loss: {roles: [pet], within: 0}}
+    weight: 40
+    when: {loss: {roles: [pet], within: 2}}
     title: "เพื่อนที่ไปก่อน"
     text: "{ชื่อผู้จากไป}อยู่ด้วยกันมาหลายปีจนรู้ว่าคุณตื่นกี่โมง ตอนนี้เก้าอี้หวายหน้าบ้านว่าง เหลือแต่รอยขนติดเบาะ"
     choices:
@@ -359,6 +359,11 @@ events:
         text: "ปลูกต้นไม้ตรงที่มันชอบนอน"
         effects: {health: 1}
         merit: [{cat: neutral}]
+      - id: adopt_old
+        text: "รับแมวแก่จากบ้านพักสัตว์มา"
+        effects: {happiness: 2}
+        family: [{add: pet, kind: แมว, life: [3, 8]}]
+        merit: [{cat: dana, level: 1}]
 
   - id: herd_start_01
     type: A
@@ -424,3 +429,119 @@ events:
         effects: {money: {unit: income_x, amount: 0.4}}
         family: [{leave: herd}]
         merit: [{cat: greed_harm, level: 1}]
+
+  - id: pet_farewell_kid_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 40
+    when: {loss: {roles: [pet], within: 2}}
+    title: "เพื่อนตัวแรกที่จากไป"
+    text: "เช้านี้{ชื่อผู้จากไป}ไม่ลุกมารอที่ประตูเหมือนทุกวัน แม่บอกว่ามันแก่แล้ว ไปสบายแล้ว คุณยังถือถุงขนมที่จะเอาไปให้อยู่ในมือ"
+    choices:
+      - id: bury_with_dad
+        text: "ขุดหลุมฝังกับพ่อใต้ต้นมะม่วง"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: ask_monk
+        text: "ขอแม่ไปใส่บาตรให้มัน"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: draw_picture
+        text: "วาดรูปมันติดไว้ข้างเตียง"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: beg_new
+        text: "ขอพ่อแม่รับตัวใหม่"
+        effects: {happiness: 2}
+        family: [{add: pet, kind: หมา, life: [10, 15]}]
+        merit: [{cat: dana, level: 1}]
+
+  - id: pet_farewell_teen_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 40
+    when: {loss: {roles: [pet], within: 2}}
+    title: "ห้องที่ว่างลง"
+    text: "{ชื่อผู้จากไป}อยู่กับคุณมาตั้งแต่ยังเด็ก คืนนี้ไม่มีใครมานอนทับการบ้านบนโต๊ะแล้ว เพื่อนในกลุ่มส่งสติกเกอร์ปลอบมาเต็มแชท"
+    choices:
+      - id: bury_home
+        text: "ฝังไว้หลังบ้าน ปักป้ายชื่อ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: make_merit
+        text: "ชวนแม่ไปทำบุญให้"
+        cost: {unit: income_x, amount: 0.01}
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: post_photo
+        text: "โพสต์รูปเก่าทั้งอัลบั้ม"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: adopt_new
+        text: "ไปรับลูกแมวจรมาเลี้ยงต่อ"
+        effects: {happiness: 2}
+        family: [{add: pet, kind: แมว, life: [12, 18]}]
+        merit: [{cat: dana, level: 1}]
+
+  - id: pet_farewell_young_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 40
+    when: {loss: {roles: [pet], within: 2}}
+    title: "กล่องใบเล็กหน้าห้อง"
+    text: "คลินิกส่ง{ชื่อผู้จากไป}กลับมาในกล่องใบเล็กพร้อมใบเสร็จ ห้องเช่าที่เคยรกด้วยขนเงียบจนได้ยินเสียงตู้เย็น"
+    choices:
+      - id: cremate
+        text: "ส่งไปเผาที่วัดที่รับสัตว์"
+        cost: {unit: income_x, amount: 0.01}
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: merit_food
+        text: "ซื้ออาหารไปเลี้ยงหมาวัดแทน"
+        cost: {unit: income_x, amount: 0.01}
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: keep_bowl
+        text: "เก็บชามข้าวไว้ ยังไม่พร้อมทิ้ง"
+        effects: {}
+        merit: [{cat: neutral}]
+      - id: adopt_new
+        text: "รับตัวใหม่จากกลุ่มหาบ้าน"
+        effects: {happiness: 2}
+        family: [{add: pet, kind: แมว, life: [12, 18]}]
+        merit: [{cat: dana, level: 1}]
+
+  - id: pet_farewell_mid_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 40
+    when: {loss: {roles: [pet], within: 2}}
+    title: "คนในบ้านเงียบกันหมด"
+    text: "{ชื่อผู้จากไป}จากไปตอนเช้ามืด ลูก ๆ ร้องไห้ไปโรงเรียน คุณเองก็ยืนถือสายจูงอยู่หน้าประตูนานกว่าที่คิด"
+    choices:
+      - id: family_burial
+        text: "ฝังด้วยกันทั้งบ้านตอนเย็น"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: make_merit
+        text: "พาทั้งบ้านไปทำบุญอุทิศให้"
+        cost: {unit: income_x, amount: 0.01}
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: donate_shelter
+        text: "ยกของใช้ให้บ้านพักสัตว์"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: adopt_new
+        text: "รับหมาตัวใหม่ให้ลูก ๆ"
+        effects: {happiness: 2, relations: 1}
+        family: [{add: pet, kind: หมา, life: [10, 15]}]
+        merit: [{cat: dana, level: 1}]

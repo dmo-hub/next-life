@@ -46,6 +46,8 @@ export const HERD_KINDS = {
   ควาย: { life: [15, 25], net: 0.06 },
   ปลา: { life: [3, 8], net: 0.015 },
 };
+// ความสุขที่เสียไปตอนคู่ใจตายตามอายุขัย (ตายจากการ์ดป่วย/หาย การ์ดใบนั้นหักเอง)
+export const PET_GRIEF = 6;
 // ติดบ้านตอนเกิด: บ้านฐานะดี (ชั้น ≥ richFrom) · บ้านในเมือง (ภาค city) · บ้านนอก — [โอกาส, ชนิด] คู่ใจกับฝูงสุ่มแยกกัน ได้ทั้งคู่ก็ได้
 export const PET_AT_BIRTH = {
   richFrom: 7,
@@ -215,6 +217,7 @@ function kinLost(st, m, age, year, out) {
   m.diedAge = age;
   m.alive = false;
   if (!KIN_HOUSEHOLD.includes(m.role) && m.role !== 'herd') return;
+  if (m.role === 'pet') st.happiness = bondClamp(st.happiness - PET_GRIEF);
   const loss = { id: m.id, role: m.role, name: m.name, age, year, ...(m.kind && { kind: m.kind }) };
   st.kinLoss.push(loss);
   out.push(loss);
