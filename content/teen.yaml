@@ -151,6 +151,7 @@ events:
         merit: [{cat: neutral}]
       - id: extort_juniors
         text: "ร่วมไถเงินรุ่นน้อง"
+        sets_flags: [extorted_juniors]
         effects: {money: {unit: income_x, amount: 0.3}, relations: -2, happiness: 1}
         merit: [{cat: greed_harm, level: 1}]
       - id: boxing_camp
@@ -160,6 +161,7 @@ events:
         merit: [{cat: neutral}]
       - id: rescue_junior
         text: "พารุ่นน้องหนีแก๊ง"
+        sets_flags: [rescued_junior]
         outcomes:
           - {weight: 1, text: "โดนรุมกระทืบหน้าปากซอย แต่รุ่นน้องรอด", effects: {health: -2, relations: 1}, merit: [{cat: help_others, level: 2}]}
           - {ok: true, weight: 2, text: "รุ่นน้องคนนั้นกลายเป็นเพื่อนตายไปตลอดชีวิต", effects: {relations: 3}, merit: [{cat: help_others, level: 2}]}

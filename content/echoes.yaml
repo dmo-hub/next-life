@@ -1,0 +1,170 @@
+# ตัวเลือกตรงข้ามมีผลทั้งสองทาง (B98): ตัวเลือกเดิมปลูกธงไว้ทั้งทางเสี่ยงและทางไม่เสี่ยง ผลกลับมาตอนลำบาก (มีหนี้ · สุขภาพทรุด)
+# คนที่เคยช่วย/เคยรังแกกลับมาในชีวิตแบบตาข่าย · ข้อความเล่าที่มาเอง (กลไก echo ของ B35a ยังไม่มี)
+events:
+  - id: echo_lent_friend_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 8
+    when: {flags: {has: [lent_friend, in_debt]}}
+    title: "เพื่อนที่เคยยืมเงิน"
+    text: "เพื่อนที่คุณเคยให้ยืมเงินก้อนใหญ่ตอนหนุ่มสาวโทรมา ได้ข่าวว่าคุณติดหนี้ '{ชื่อ} คราวนั้นมึงไม่ถามสักคำ คราวนี้กูขอบ้าง'"
+    choices:
+      - id: accept_help
+        text: "รับเงินที่เขาเอามาคืน"
+        effects: {money: {unit: income_x, amount: 0.8}, relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: half_only
+        text: "รับแค่ครึ่ง ที่เหลือให้เขาเก็บ"
+        effects: {money: {unit: income_x, amount: 0.4}, relations: 3}
+        merit: [{cat: dana, level: 1}]
+      - id: work_together
+        text: "ขอเป็นงานแทนเงิน"
+        effects: {money: {unit: income_x, amount: 0.3}, network: 2}
+        merit: [{cat: neutral}]
+      - id: too_proud
+        text: "ไม่รับ บอกว่ายังไหว"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: echo_kept_savings_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 8
+    when: {flags: {has: [kept_savings]}, stats: {health: {max: 45}}}
+    title: "เงินก้อนที่ไม่ได้ใช้"
+    text: "หมอบอกว่าต้องผ่าตัดภายในเดือนนี้ เงินก้อนที่เก็บไว้ตั้งแต่วันที่เลือกซื้อแค่มอเตอร์ไซค์แทนรถใหม่ยังอยู่ครบในบัญชี"
+    choices:
+      - id: private_now
+        text: "ผ่าตัดเอกชนทันที"
+        effects: {health: 3, money: {unit: income_x, amount: -0.6}}
+        merit: [{cat: neutral}]
+      - id: public_wait
+        text: "รอคิวรัฐ เก็บเงินไว้ต่อ"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: help_kin_too
+        text: "แบ่งช่วยค่ารักษาญาติด้วย"
+        effects: {health: 2, relations: 2, money: {unit: income_x, amount: -0.8}}
+        merit: [{cat: help_others, level: 1}]
+      - id: invest_instead
+        text: "เอาเงินไปลงทุน หวังได้มากกว่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "กำไรพอจ่ายค่าผ่าตัดทันพอดี", effects: {health: 2, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ขาดทุน ต้องรอคิวรัฐแบบไม่มีเงินสำรอง", effects: {health: -2, money: {unit: income_x, amount: -0.6}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: echo_rescued_junior_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 8
+    when: {flags: {has: [rescued_junior]}, stats: {health: {max: 45}}}
+    title: "พยาบาลเวรดึก"
+    text: "พยาบาลเวรดึกอ่านชื่อในแฟ้มแล้วเงยหน้ามองนาน 'พี่{ชื่อ}ใช่ไหม คนที่ดึงผมออกจากวงแก๊งหน้าโรงเรียน' คืนนั้นเตียงของคุณได้ย้ายไปห้องที่เงียบที่สุด"
+    choices:
+      - id: thank_him
+        text: "ขอบคุณ ชวนกินข้าวตอนหาย"
+        effects: {health: 2, relations: 2}
+        merit: [{cat: neutral}]
+      - id: ask_doctor
+        text: "ขอให้ช่วยฝากหมอเก่ง ๆ"
+        effects: {health: 3, network: 1}
+        merit: [{cat: neutral}]
+      - id: help_his_kid
+        text: "รับปากช่วยหางานให้ลูกเขา"
+        effects: {health: 1, relations: 2, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: no_favor
+        text: "ขอรักษาตามคิวเหมือนคนอื่น"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: sila, level: 1}]
+
+  - id: echo_extorted_juniors_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 8
+    when: {flags: {has: [extorted_juniors, in_debt]}}
+    title: "เจ้าหน้าที่สินเชื่อ"
+    text: "เจ้าหน้าที่สินเชื่อที่ต้องเซ็นอนุมัติขอผ่อนหนี้ เป็นรุ่นน้องที่คุณเคยรีดไถค่าขนมทุกวันตอนมัธยม เขาจำคุณได้ก่อนคุณจำเขาได้"
+    choices:
+      - id: apologize
+        text: "ขอโทษเรื่องเก่าตรง ๆ"
+        outcomes:
+          - {weight: 2, ok: true, text: "เขานิ่งไปนาน แล้วเซ็นให้ 'ผมไม่ได้ทำเพื่อพี่ ผมทำเพราะงาน'", effects: {money: {unit: income_x, amount: 0.3}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาฟังจบแล้วยื่นแฟ้มคืน บอกว่าเอกสารไม่ครบ", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: sila, level: 1}]
+      - id: pretend
+        text: "ทำเป็นจำไม่ได้"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: other_branch
+        text: "ไปยื่นสาขาอื่นแทน"
+        effects: {money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: threaten
+        text: "ขู่ว่าจะแฉเรื่องเก่าของเขา"
+        effects: {relations: -2, network: -1}
+        merit: [{cat: greed_harm, level: 1}]
+
+  - id: echo_spoke_up_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 8
+    when: {flags: {has: [spoke_up, in_debt]}}
+    title: "คนที่เห็นวันนั้น"
+    text: "อดีตเพื่อนร่วมงานที่นั่งในห้องประชุมวันที่คุณลุกขึ้นทวงผลงานคืน ตอนนี้เป็นผู้จัดการแล้ว เขาทักมาว่าทีมใหม่ขาดคนกล้าพูดแบบนั้นอยู่คนหนึ่ง"
+    choices:
+      - id: join_team
+        text: "ย้ายไปอยู่ทีมเขา"
+        effects: {money: {unit: income_x, amount: 0.5}, network: 2}
+        merit: [{cat: neutral}]
+      - id: freelance
+        text: "ขอรับงานเป็นครั้ง ๆ"
+        effects: {money: {unit: income_x, amount: 0.2}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: bring_friend
+        text: "แนะนำเพื่อนที่ตกงานไปแทน"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: stay_put
+        text: "อยู่ที่เดิม กลัวเสียอายุงาน"
+        effects: {}
+        merit: [{cat: neutral}]
+
+  - id: echo_endured_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 8
+    when: {flags: {has: [endured, in_debt]}}
+    title: "หัวหน้าเก่าจำได้"
+    text: "หัวหน้าเก่าที่เคยเอาผลงานของคุณไปพรีเซนต์ ตอนนี้นั่งเป็นผู้อำนวยการ เขาเสนองานสัญญาจ้างก้อนใหญ่ 'ผมรู้ว่าคุณไม่พูดมาก' แล้วยิ้มแบบเดิม"
+    choices:
+      - id: take_contract
+        text: "รับงาน ปิดหนี้ก่อน"
+        effects: {money: {unit: income_x, amount: 0.8}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: take_with_terms
+        text: "รับ แต่ขอชื่อตัวเองในผลงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาหัวเราะแล้วยอม ชื่อคุณขึ้นสไลด์เป็นครั้งแรก", effects: {money: {unit: income_x, amount: 0.6}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาถอนข้อเสนอเงียบ ๆ ภายในวันเดียว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: refuse
+        text: "ปฏิเสธ ไม่อยากกลับไปอีก"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: cover_again
+        text: "รับปากช่วยปิดเรื่องให้เขาอีก"
+        effects: {money: {unit: income_x, amount: 1}, happiness: -2}
+        merit: [{cat: greed_harm, level: 1}]

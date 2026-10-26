@@ -44,12 +44,14 @@ events:
     choices:
       - id: endure
         text: "ทนเงียบ เก็บแต้มไปก่อน"
+        sets_flags: [endured]
         outcomes:
           - {weight: 2, ok: true, text: "ผู้บริหารรู้เองว่าใครทำ เรียกไปคุยตัวต่อตัว", multipliers: {karma: 1.4}, effects: {money: {unit: income_x, amount: 1}}, next: young_boss_room_01, merit: [{cat: neutral}]}
           - {weight: 2, text: "ทนจนหมดไฟ ตื่นเช้ามาไม่อยากลุกจากเตียง", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: speak_up
         text: "ยกมือแย้งกลางห้องประชุม"
+        sets_flags: [spoke_up]
         outcomes:
           - {weight: 1, ok: true, text: "ผู้บริหารชอบความกล้า ข้ามหัวหน้าขึ้นไปเลย", multipliers: {stats: {knowledge: 2}}, effects: {happiness: 2, income_mult: 1.4}, merit: [{cat: neutral}]}
           - {weight: 2, text: "โดนเขม่นทั้งแผนก สุดท้ายต้องเขียนใบลาออก", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
@@ -166,6 +168,7 @@ events:
         merit: [{cat: neutral}]
       - id: lend_friend
         text: "ให้เพื่อนยืม"
+        sets_flags: [lent_friend]
         outcomes:
           - {weight: 1, ok: true, text: "เพื่อนคืนครบพร้อมกระเช้าผลไม้ ซึ้งจนพูดไม่ออก", multipliers: {stats: {relations: 2}}, effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
           - {weight: 2, text: "เพื่อนบล็อกไลน์ ย้ายบ้านหายเงียบ", effects: {money: {unit: income_x, amount: -1}, happiness: -2, relations: -1}, merit: [{cat: help_others, level: 1}]}
@@ -178,6 +181,7 @@ events:
         merit: [{cat: neutral}]
       - id: bike
         text: "ไม่ซื้อ ไม่ให้ยืม ปั่นจักรยานไป"
+        sets_flags: [kept_savings]
         effects: {health: 1, money: {unit: income_x, amount: 1}, relations: -1}
         merit: [{cat: neutral}]
       - id: new_car_rite
