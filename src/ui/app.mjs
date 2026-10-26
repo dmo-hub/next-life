@@ -1046,6 +1046,7 @@ function render(card) {
     if (card.will !== undefined) body.append(el('p', 'sub', card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
     const note = notePick(st.gen);
     if (note) body.append(noteQuote(`บันทึกเมื่ออายุ ${note.a}`, note.t));
+    if (card.pets) body.append(el('p', 'sub', card.pets));
     body.append(titlesBox(card));
     if (card.memo === 'full') body.append(memoFull(card));
     body.append(eraBox());

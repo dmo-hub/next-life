@@ -1,5 +1,5 @@
 import { makeRng } from './rng.mjs';
-import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss } from './family.mjs';
+import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, petCall, lossCall, petArrivals, petArriveText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
@@ -226,6 +226,7 @@ export function newLife(seed, content, heir = null) {
     ...newKin(seed),
   };
   nameParents(st);
+  petsAtBirth(st, heir, CLASSES.indexOf(cls));
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
   // การ์ดเปิดชีวิตมาก่อนการ์ดมรดกตอนแรกเกิด — ต้องเล่ามรดกก่อน receiveLegacy ล้าง st.legacy
   st.due.push(introCard(st, heir));
@@ -370,7 +371,10 @@ export const FILL = {
   ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
   ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
   ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',
-  ชื่อผู้จากไป: (st) => lastLoss(st)?.name ?? 'คนในบ้าน',
+  ชื่อผู้จากไป: (st) => (lastLoss(st) ? lossCall(lastLoss(st)) : 'คนในบ้าน'),
+  ชื่อสัตว์: (st) => (focusOf(st, 'pet') ? petCall(focusOf(st, 'pet')) : 'เจ้าตัวเล็ก'),
+  ชนิดสัตว์: (st) => focusOf(st, 'pet')?.kind ?? 'สัตว์',
+  ชื่อฝูง: (st) => (focusOf(st, 'herd') ? petCall(focusOf(st, 'herd')) : 'สัตว์ในคอก'),
   ครับ: (st) => (st.sex === 'หญิง' ? 'ค่ะ' : 'ครับ'),
   ผม: (st) => (st.sex === 'หญิง' ? 'ฉัน' : 'ผม'),
 };
@@ -517,6 +521,7 @@ function stepYear(st) {
   ageParents(st, year);
   // คนในบ้านจากไปเองปีนี้ = การ์ดแจ้งทุกครั้ง ก่อนเหตุการณ์ของปี
   for (const l of ageKin(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l });
+  for (const m of petArrivals(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: petArriveText(m) });
   // ผลตอบแทนคิดกับเงินต้นปีก่อนเงินเก็บของปีนี้เข้า · ติดลบ = หนี้ ทบดอกเบี้ยเงินกู้ของปีนั้น
   const era = st.content.era;
   if (st.money > 0) {
@@ -1014,6 +1019,8 @@ function deathCard(st) {
     card.note = `ยุคนั้นเด็ก${st.sex}อายุ ${st.age} ปีจากไปราว ${Math.max(1, Math.round(q * 10000))} คนในทุก 10,000 คนต่อปี`;
   }
   if (st.age < STAGES[1].from) card.short = true;
+  const pets = petsAfter(st);
+  if (pets) card.pets = pets;
   if (st.funeral) {
     const { id, text, cost } = st.funeral;
     // แขกมาส่งตามความสัมพันธ์/คอนเน็คชั่น คูณขนาดงาน — ปัดสิบ ไม่ใช่ยอดนับจริง

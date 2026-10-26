@@ -65,6 +65,8 @@ for (const [bot, pick] of Object.entries(BOTS)) {
     lossEvents += st.kinLoss.length;
     for (const m of st.kin) {
       roles[m.role]++;
+      // สัตว์ตายตามอายุขัยของชนิด ไม่ใช่ตารางชีพคน (B44)
+      if (m.role === 'pet' || m.role === 'herd') continue;
       // ความเสี่ยงสะสมปีต่อปีของช่วงที่สมาชิกมีชีวิตระหว่างชีวิตผู้เล่น (ปีเกิดถึงปีตายหรือปีที่ผู้เล่นตาย)
       const end = m.alive ? st.birthYear + st.age : m.born + m.diedAge + 1;
       for (let y = Math.max(m.born, st.birthYear) + 1; y <= end; y++) {
@@ -74,7 +76,8 @@ for (const [bot, pick] of Object.entries(BOTS)) {
       }
       if (!m.alive) died++;
     }
-    const names = [st.name, ...st.parents.map((p) => p.name), ...st.kin.map((m) => m.name)];
+    // ชื่อสัตว์ซ้ำชื่อคนได้ (เจ้าดำ) — นับเฉพาะคน
+    const names = [st.name, ...st.parents.map((p) => p.name), ...st.kin.filter((m) => m.role !== 'pet' && m.role !== 'herd').map((m) => m.name)];
     households++;
     if (new Set(names).size !== names.length) nameDup++;
     if (st.age >= 50) kidsAt50.push(st.kin.filter((m) => m.role === 'child').length);
@@ -120,12 +123,14 @@ check('คนเป้าของการ์ดสุ่มได้ ไม่
 {
   const st = newLife(mixSeed(seed, 99), content);
   const pet = addMember(st, 'pet', { kind: 'หมา', life: [3, 3] });
+  const herd = addMember(st, 'herd', { kind: 'ไก่', life: [2, 2] });
   const peer = addMember(st, 'peer');
   for (let a = 1; a <= 5; a++) {
     st.age = a;
     ageKin(st, st.birthYear + a);
   }
-  check('สัตว์เลี้ยงตายตรงอายุขัย', !pet.alive && pet.diedAge === 3 && pet.name === null && pet.kind === 'หมา' ? 0 : 1);
+  // คู่ใจมีชื่อสุ่มจาก seed · ฝูงไม่มีชื่อ (B44)
+  check('สัตว์เลี้ยงตายตรงอายุขัย', !pet.alive && pet.diedAge === 3 && !!pet.name && pet.kind === 'หมา' && !herd.alive && herd.diedAge === 2 && herd.name === null ? 0 : 1);
   check('เพื่อนรุ่นเกิดปีเดียวกับเรา มีชื่อ', peer.born === st.birthYear && !!peer.name ? 0 : 1);
   check('สัตว์เลี้ยง/เพื่อนรุ่นไม่ตั้งธงครอบครัว', st.flags.married || st.flags.has_kids ? 1 : 0);
 }

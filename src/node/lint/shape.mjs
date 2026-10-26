@@ -6,6 +6,7 @@ import {
 import { INCOME_MULT } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
+import { PET_KINDS, HERD_KINDS } from '../../engine/family.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 
 const KEYS = {
@@ -458,7 +459,7 @@ export const rules = [
   {
     // ผลครอบครัวของตัวเลือก/ผลสุ่ม (B36a · B36a2): เพิ่มสมาชิก · คู่แยกทาง · คนในบ้านจากไป · ความผูกพันขึ้นลง — op ละอย่าง
     id: 'family-ops',
-    desc: 'family = [{add: spouse|child|grandchild|peer, n?: 1–3} | {add: pet, kind, life: [จาก, ถึง], name?} | {leave: spouse} | {die: role} | {bond: role|all, d: ±1–30}] — op ละอย่าง',
+    desc: 'family = [{add: spouse|child|grandchild|peer, n?: 1–3} | {add: pet|herd, kind, life: [จาก, ถึง], name?} | {leave: spouse|pet|herd} | {die: role} | {bond: role|all, d: ±1–30}] — op ละอย่าง',
     event(e, ctx, r) {
       for (const { node, path } of effectSites(e)) {
         if (node.family === undefined) continue;
@@ -467,16 +468,18 @@ export const rules = [
           const p = `${path}.family[${i}]`;
           const kinds = ['add', 'leave', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
           if (kinds.length !== 1) return r(p, 'ต้องมี add leave die หรือ bond อย่างเดียว');
-          if (o.add !== undefined && !['spouse', 'child', 'grandchild', 'pet', 'peer'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น spouse child grandchild pet peer');
-          // สัตว์เลี้ยงไม่มีตารางชีพในข้อมูล — อายุขัยของชนิดต้องมาจากเนื้อหา
-          if (o.add === 'pet' && (typeof o.kind !== 'string' || !o.kind || !isRange(o.life, 1, 40))) r(`${p}`, 'add: pet ต้องมี kind (ชนิด) และ life: [จาก, ถึง] ปี 1–40');
-          if (o.add !== 'pet' && (o.kind !== undefined || o.life !== undefined || o.name !== undefined)) r(`${p}`, 'kind life name ใช้กับ add: pet เท่านั้น');
+          if (o.add !== undefined && !['spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น spouse child grandchild pet herd peer');
+          // สัตว์ไม่มีตารางชีพในข้อมูล — อายุขัยของชนิดต้องมาจากเนื้อหา · ชนิดต้องอยู่ในตารางของแกน (ผลต่อปีอ่านจากตาราง ชนิดสะกดผิด = ไม่มีผลเงียบ)
+          const animals = o.add === 'pet' ? PET_KINDS : o.add === 'herd' ? HERD_KINDS : null;
+          if (animals && (!Object.hasOwn(animals, o.kind) || !isRange(o.life, 1, 40))) r(`${p}`, `add: ${o.add} ต้องมี kind (${Object.keys(animals).join(' ')}) และ life: [จาก, ถึง] ปี 1–40`);
+          if (!animals && (o.kind !== undefined || o.life !== undefined || o.name !== undefined)) r(`${p}`, 'kind life name ใช้กับ add: pet/herd เท่านั้น');
+          if (o.add === 'herd' && o.name !== undefined) r(`${p}.name`, 'ฝูงไม่มีชื่อรายตัว');
           if (o.name !== undefined && (typeof o.name !== 'string' || !o.name)) r(`${p}.name`, 'name ต้องเป็นข้อความ');
           if (o.bond !== undefined && ![...FAMILY_ROLES, 'all'].includes(o.bond)) r(`${p}.bond`, `bond ต้องเป็น ${FAMILY_ROLES.join(' ')} all`);
           if (o.bond !== undefined && (!isInt(o.d) || !o.d || Math.abs(o.d) > 30)) r(`${p}.d`, 'd ใช้กับ bond เป็นจำนวนเต็ม ±1–30');
           if (o.bond === undefined && o.d !== undefined) r(`${p}.d`, 'd ใช้กับ bond เท่านั้น');
           if (o.n !== undefined && (o.add === undefined || !isInt(o.n) || o.n < 1 || o.n > 3)) r(`${p}.n`, 'n ใช้กับ add เป็น 1–3');
-          if (o.leave !== undefined && o.leave !== 'spouse') r(`${p}.leave`, 'leave ใช้ได้กับ spouse');
+          if (o.leave !== undefined && !['spouse', 'pet', 'herd'].includes(o.leave)) r(`${p}.leave`, 'leave ใช้ได้กับ spouse pet herd');
           if (o.die !== undefined && !FAMILY_ROLES.includes(o.die)) r(`${p}.die`, `die ต้องเป็น ${FAMILY_ROLES.join(' ')}`);
         });
       }
@@ -484,7 +487,7 @@ export const rules = [
   },
   {
     id: 'family-system',
-    desc: 'when.family ใช้ role กับ age/alive/count — สุขภาพ/ความสัมพันธ์ของสมาชิกยังไม่มีระบบ ใส่ไปแล้วการ์ดไม่เคยออก · when.loss = {roles?: [spouse|child|grandchild|pet], within?: 0–10}',
+    desc: 'when.family ใช้ role กับ age/alive/count — สุขภาพ/ความสัมพันธ์ของสมาชิกยังไม่มีระบบ ใส่ไปแล้วการ์ดไม่เคยออก · when.loss = {roles?: [spouse|child|grandchild|pet|herd], within?: 0–10}',
     event(e, ctx, r) {
       const fam = isObj(e.when) ? e.when.family : undefined;
       list(fam).forEach((f, i) => {
@@ -494,7 +497,7 @@ export const rules = [
       // การ์ดสูญเสีย (B36a2): แกนจดเฉพาะคนในบ้านที่จากไปเอง — พ่อแม่/เพื่อนรุ่นไม่มีสัญญาณนี้ ใส่ไปการ์ดไม่เคยออก
       const loss = isObj(e.when) ? e.when.loss : undefined;
       if (loss === undefined) return;
-      const LOSS_ROLES = ['spouse', 'child', 'grandchild', 'pet'];
+      const LOSS_ROLES = ['spouse', 'child', 'grandchild', 'pet', 'herd'];
       if (!isObj(loss) || Object.keys(loss).some((k) => k !== 'roles' && k !== 'within')) return r('.when.loss', 'loss ต้องเป็น {roles?, within?}');
       if (loss.roles !== undefined && !(Array.isArray(loss.roles) && loss.roles.length && loss.roles.every((x) => LOSS_ROLES.includes(x)))) r('.when.loss.roles', `roles ต้องเป็นรายการจาก ${LOSS_ROLES.join(' ')}`);
       if (loss.within !== undefined && !(isInt(loss.within) && loss.within >= 0 && loss.within <= 10)) r('.when.loss.within', 'within ต้องเป็นจำนวนปี 0–10');

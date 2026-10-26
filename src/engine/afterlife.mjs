@@ -6,6 +6,7 @@ import { makeRng, mixSeed } from './rng.mjs';
 import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
+import { heirPets } from './family.mjs';
 import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf } from './life.mjs';
 import { ISEKAI, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage } from './isekai.mjs';
 
@@ -408,6 +409,7 @@ function makeHeir(af, r) {
     // ส่วนที่บ้านส่งต่อ แยกจาก bonus (ซึ่งรวมผลกรรม) ให้การ์ดเปิดชีวิตเล่าทิศได้โดยไม่เผยบัญชี
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,
+    pets: heirPets(st, birthYear, tier),
   };
 }
 

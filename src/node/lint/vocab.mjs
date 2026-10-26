@@ -54,6 +54,9 @@ export const PLACEHOLDERS = {
   ชื่อคู่: 'ก'.repeat(20),
   ชื่อหลาน: 'ก'.repeat(20),
   ชื่อผู้จากไป: 'ก'.repeat(20),
+  ชื่อสัตว์: 'ฝูง' + 'ก'.repeat(18),
+  ชนิดสัตว์: 'แมวพันธุ์',
+  ชื่อฝูง: 'สัตว์ในคอก',
   ครับ: 'ครับ',
   ผม: 'ฉัน',
 };
@@ -81,4 +84,4 @@ export const FLAG_RE = /^[a-z][a-z0-9_]*(:[a-z0-9_]+)?$/;
 export const ID_RE = /^[a-z][a-z0-9_]*$/;
 export const YEAR_MIN = 2400;
 export const YEAR_MAX = 2700;
-export const FAMILY_ROLES = ['parent', 'spouse', 'child', 'grandchild', 'pet', 'peer'];
+export const FAMILY_ROLES = ['parent', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'];

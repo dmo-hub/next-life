@@ -1,0 +1,426 @@
+# สัตว์เลี้ยง (B44): ได้มา (รับจร = บุญเล็กน้อย ไม่มีค่าตัว · ซื้อพันธุ์ = เงินออก ไม่มีบุญ) · ป่วย · หาย · ทิ้ง (บาป) · ส่งท้าย
+# ผลรายปี (ความสุข · ค่าเลี้ยง · พาเดิน) แกนคิดเองใน family.mjs · การ์ดนี้มีแค่จังหวะที่ต้องเลือก
+events:
+  - id: pet_stray_kid_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 2
+    when: {family: [{role: pet, alive: true, count: [0, 0]}]}
+    title: "หมาหลงมาหน้าบ้าน"
+    text: "ลูกหมาผอมโซเดินตามคุณกลับจากตลาดจนถึงหน้าบ้าน นั่งกระดิกหางอยู่หน้าประตูไม่ยอมไปไหน แม่ยืนกอดอกมองอยู่ในครัว"
+    choices:
+      - id: beg_keep
+        text: "อ้อนแม่ขอเลี้ยง"
+        effects: {happiness: 2, relations: 1}
+        family: [{add: pet, kind: หมา, life: [10, 15]}]
+        merit: [{cat: dana, level: 1}]
+      - id: feed_only
+        text: "แบ่งข้าวให้กินแล้วไล่ไป"
+        effects: {happiness: -1}
+        merit: [{cat: dana, level: 1}]
+      - id: ignore
+        text: "ปิดประตูไม่สนใจ"
+        effects: {}
+        merit: [{cat: neutral}]
+      - id: ask_neighbor
+        text: "ไปถามข้างบ้านว่าของใคร"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: pet_kitten_gift_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {family: [{role: pet, alive: true, count: [0, 0]}]}
+    title: "เพื่อนแจกลูกแมว"
+    text: "แมวที่ห้องเพื่อนออกลูกห้าตัว เพื่อนส่งรูปมาในแชท '{ชื่อ} เอาไปสักตัวนะ ตัวสีส้มติดคนสุด' ห้องที่อยู่ตอนนี้ก็พอมีมุมให้วางกระบะทราย"
+    choices:
+      - id: take_kitten
+        text: "รับตัวสีส้มมาเลี้ยง"
+        effects: {happiness: 2}
+        family: [{add: pet, kind: แมว, life: [12, 18]}]
+        merit: [{cat: dana, level: 1}]
+      - id: decline
+        text: "ขอผ่าน ยังดูแลตัวเองไม่ไหว"
+        effects: {}
+        merit: [{cat: neutral}]
+      - id: take_shy
+        text: "ขอตัวที่ขี้อายที่สุดในครอก"
+        effects: {happiness: 1, relations: 1}
+        family: [{add: pet, kind: แมว, life: [12, 18]}]
+        merit: [{cat: dana, level: 1}]
+      - id: find_home
+        text: "ช่วยเพื่อนหาบ้านให้ทั้งครอก"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: pet_stray_work_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {family: [{role: pet, alive: true, count: [0, 0]}]}
+    title: "หมาจรหน้าที่ทำงาน"
+    text: "หมาจรขาเจ็บมานอนหลบฝนหน้าที่ทำงานทุกเย็น ยามบอกว่าถ้าไม่มีใครรับไป เทศบาลจะมาจับสัปดาห์หน้า"
+    choices:
+      - id: adopt
+        text: "พากลับบ้าน ทำแผลให้"
+        effects: {happiness: 1, relations: 1}
+        cost: {unit: fixed_baht, amount: 1500, ref_year: 2566}
+        family: [{add: pet, kind: หมา, life: [8, 13]}]
+        merit: [{cat: dana, level: 2}]
+      - id: call_foundation
+        text: "โทรหามูลนิธิให้มารับ"
+        effects: {}
+        merit: [{cat: help_others, level: 1}]
+      - id: leave_it
+        text: "ปล่อยให้เป็นเรื่องของเทศบาล"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: buy_food
+        text: "ซื้ออาหารไปวางให้ทุกเย็น"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+
+  - id: pet_breed_buy_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2540, 2650]
+    weight: 2
+    when: {class: [ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: pet, alive: true, count: [0, 0]}]}
+    title: "ฟาร์มหมาพันธุ์"
+    text: "ฟาร์มหมาพันธุ์ส่งรูปลูกหมาตาแป๋วมาให้ดู มีใบเพ็ดดีกรีครบ ราคาเท่าเงินเดือนคนทั่วไปสองเดือน มัดจำก่อนได้เลือกตัวก่อน"
+    choices:
+      - id: buy_puppy
+        text: "จ่ายมัดจำ เลือกตัวที่ชอบ"
+        effects: {happiness: 2}
+        cost: {unit: fixed_baht, amount: 15000, ref_year: 2566}
+        family: [{add: pet, kind: หมาพันธุ์, life: [10, 14]}]
+        merit: [{cat: neutral}]
+      - id: adopt_instead
+        text: "ไปรับหมาจากมูลนิธิแทน"
+        effects: {happiness: 1}
+        family: [{add: pet, kind: หมา, life: [8, 14]}]
+        merit: [{cat: dana, level: 1}]
+      - id: not_now
+        text: "ยังไม่พร้อมเลี้ยง"
+        effects: {}
+        merit: [{cat: neutral}]
+      - id: ask_price
+        text: "ต่อราคาจนฟาร์มเลิกทัก"
+        effects: {}
+        merit: [{cat: neutral}]
+
+  - id: pet_kid_asks_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 3
+    when: {family: [{role: child, alive: true, age: [5, 14]}, {role: pet, alive: true, count: [0, 0]}]}
+    title: "ลูกขอเลี้ยงหมา"
+    text: "{ชื่อลูก}เขียนสัญญาลายมือเบี้ยวมาวางบนโต๊ะกินข้าว 'จะอาบน้ำให้ทุกวัน จะพาเดินทุกเย็น' แล้วนั่งรอคำตอบตาไม่กะพริบ"
+    choices:
+      - id: buy_breed
+        text: "พาไปซื้อพันธุ์ที่ลูกอยากได้"
+        effects: {happiness: 2, relations: 2}
+        cost: {unit: fixed_baht, amount: 20000, ref_year: 2566}
+        family: [{add: pet, kind: หมาพันธุ์, life: [10, 14]}, {bond: child, d: 5}]
+        merit: [{cat: neutral}]
+      - id: adopt_shelter
+        text: "ไปรับลูกหมาจากบ้านพักสัตว์"
+        effects: {happiness: 2, relations: 2}
+        family: [{add: pet, kind: หมา, life: [10, 15]}, {bond: child, d: 5}]
+        merit: [{cat: dana, level: 1}]
+      - id: say_no
+        text: "บอกว่าบ้านเราไม่พร้อม"
+        effects: {relations: -1}
+        family: [{bond: child, d: -3}]
+        merit: [{cat: neutral}]
+      - id: fish_first
+        text: "ให้เลี้ยงปลาก่อน ดูความรับผิดชอบ"
+        effects: {happiness: 1, relations: 1}
+        family: [{add: herd, kind: ปลา, life: [3, 8]}, {bond: child, d: 2}]
+        merit: [{cat: neutral}]
+
+  - id: pet_old_cat_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 2
+    when: {family: [{role: pet, alive: true, count: [0, 0]}]}
+    title: "แมวจรมานอนตัก"
+    text: "แมวลายสลิดตัวหนึ่งมานั่งรอหน้าบ้านทุกเช้า พอคุณนั่งเก้าอี้หวาย มันก็กระโดดขึ้นตักแล้วหลับไปเฉย ๆ"
+    choices:
+      - id: keep_cat
+        text: "ตั้งชามข้าวให้ประจำ"
+        effects: {happiness: 2, health: 1}
+        family: [{add: pet, kind: แมว, life: [6, 10]}]
+        merit: [{cat: dana, level: 1}]
+      - id: shoo
+        text: "ไล่ไป ขนติดเสื้อ"
+        effects: {}
+        merit: [{cat: neutral}]
+      - id: feed_sometimes
+        text: "ให้ข้าวบ้างแต่ไม่รับเข้าบ้าน"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: call_grandkid
+        text: "โทรเรียกหลานมาดู"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: pet_sick_work_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {family: [{role: pet, alive: true}]}
+    title: "สัตว์ในบ้านป่วย"
+    text: "{ชื่อสัตว์}ซึมไม่ยอมกินอะไรมาสามวันแล้ว คลินิกสัตว์บอกว่าต้องเจาะเลือดกับฉายภาพ ค่าตรวจยังไม่รวมค่ายา"
+    choices:
+      - id: full_checkup
+        text: "ตรวจให้ครบ รักษาเต็มที่"
+        cost: {unit: fixed_baht, amount: 8000, ref_year: 2566}
+        effects: {happiness: 1}
+        family: [{bond: pet, d: 8}]
+        merit: [{cat: dana, level: 1}]
+      - id: home_remedy
+        text: "ซื้อยามาป้อนเอง"
+        outcomes:
+          - {weight: 2, ok: true, text: "สองวันต่อมา{ชื่อสัตว์}ลุกมากินข้าวเต็มชาม", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อาการทรุดลงจนไม่ทันพาไปหาหมอ", effects: {happiness: -3}, family: [{die: pet}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: let_be
+        text: "รอดูอาการไปก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "{ชื่อสัตว์}หายเองแบบงง ๆ", effects: {}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รอนานเกินไป สุดท้ายก็ไม่รอด", effects: {happiness: -3}, family: [{die: pet}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_group
+        text: "ถามในกลุ่มคนเลี้ยงสัตว์"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: pet_sick_old_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 3
+    when: {family: [{role: pet, alive: true}]}
+    title: "เพื่อนแก่ป่วย"
+    text: "{ชื่อสัตว์}เดินกะเผลกมาหลายวัน หมอบอกว่าแก่แล้วข้อเสื่อม ต้องกินยาทุกวัน ค่ายาเดือนละไม่น้อยสำหรับเงินบำนาญ"
+    choices:
+      - id: buy_meds
+        text: "ซื้อยาให้กินทุกวัน"
+        cost: {unit: fixed_baht, amount: 6000, ref_year: 2566}
+        effects: {happiness: 1}
+        family: [{bond: pet, d: 8}]
+        merit: [{cat: dana, level: 1}]
+      - id: massage
+        text: "นวดขาให้ทุกเย็นแทนยา"
+        effects: {happiness: 1, health: 1}
+        family: [{bond: pet, d: 5}]
+        merit: [{cat: neutral}]
+      - id: ask_kids
+        text: "ขอให้ลูกหลานช่วยออกค่ายา"
+        effects: {relations: -1}
+        family: [{bond: pet, d: 5}]
+        merit: [{cat: neutral}]
+      - id: let_go
+        text: "ปล่อยตามอายุ ดูแลให้สบายที่สุด"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: pet_lost_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {family: [{role: pet, alive: true}]}
+    title: "สัตว์ในบ้านหายไป"
+    text: "คืนที่ฟ้าร้องหนัก {ชื่อสัตว์}หายไปจากบ้าน เช้ามาข้างบ้านบอกว่าเห็นวิ่งไปทางถนนใหญ่"
+    choices:
+      - id: search_all
+        text: "ลางานออกตามหาทั้งวัน"
+        outcomes:
+          - {weight: 3, ok: true, text: "เจอ{ชื่อสัตว์}ตัวสั่นอยู่ใต้ศาลาวัด พอเห็นหน้าก็วิ่งมาหาทันที", effects: {happiness: 2}, family: [{bond: pet, d: 10}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตามหาสามวันก็ไม่เจอ ชามข้าวยังวางอยู่ที่เดิม", effects: {happiness: -3}, family: [{die: pet}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: post_online
+        text: "โพสต์ตามหาในกลุ่มหมู่บ้าน"
+        outcomes:
+          - {weight: 2, ok: true, text: "มีคนทักมาตอนดึก เขาเลี้ยงไว้ให้ก่อนแล้ว", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มีแต่คนกดเศร้าให้ ไม่มีใครเห็นเลย", effects: {happiness: -3}, family: [{die: pet}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_home
+        text: "เปิดประตูรอที่บ้าน"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: new_one
+        text: "ทำใจ แล้วรับตัวใหม่มาแทน"
+        effects: {happiness: -1}
+        family: [{leave: pet}, {add: pet, kind: แมว, life: [12, 18]}]
+        merit: [{cat: dana, level: 1}]
+
+  - id: pet_move_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {family: [{role: pet, alive: true}]}
+    title: "ที่ใหม่ห้ามเลี้ยงสัตว์"
+    text: "ได้ย้ายงานไปเมืองใหม่ ห้องเช่าที่ราคาไหวทุกห้องติดป้ายห้ามเลี้ยงสัตว์ ส่วนห้องที่เลี้ยงได้แพงกว่าเกือบครึ่ง"
+    choices:
+      - id: pay_more
+        text: "ยอมจ่ายแพงกว่า พาไปด้วย"
+        effects: {money: {unit: income_x, amount: -0.3}, happiness: 1}
+        family: [{bond: pet, d: 5}]
+        merit: [{cat: neutral}]
+      - id: leave_with_kin
+        text: "ฝากไว้กับญาติที่บ้านเก่า"
+        effects: {happiness: -2}
+        family: [{leave: pet}]
+        merit: [{cat: neutral}]
+      - id: abandon
+        text: "ปล่อยไว้ที่วัด"
+        effects: {happiness: -1}
+        family: [{leave: pet}]
+        merit: [{cat: greed_harm, level: 1}]
+      - id: find_new_home
+        text: "หาบ้านใหม่ที่รักสัตว์ให้"
+        effects: {happiness: -1, relations: 1}
+        family: [{leave: pet}]
+        merit: [{cat: help_others, level: 1}]
+
+  - id: pet_farewell_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 6
+    when: {loss: {roles: [pet], within: 0}}
+    title: "บ้านที่เงียบลง"
+    text: "หลังจาก{ชื่อผู้จากไป}จากไป เสียงตอนเปิดประตูกลับบ้านก็หายไปด้วย ชามข้าวกับสายจูงยังวางอยู่ที่เดิม"
+    choices:
+      - id: bury_tree
+        text: "ฝังไว้ใต้ต้นไม้หลังบ้าน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: make_merit
+        text: "ทำบุญอุทิศให้"
+        cost: {unit: fixed_baht, amount: 500, ref_year: 2566}
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: new_friend
+        text: "รับตัวใหม่จากบ้านพักสัตว์"
+        effects: {happiness: 2}
+        family: [{add: pet, kind: แมว, life: [12, 18]}]
+        merit: [{cat: dana, level: 1}]
+      - id: keep_collar
+        text: "เก็บปลอกคอไว้ในลิ้นชัก"
+        effects: {}
+        merit: [{cat: neutral}]
+
+  - id: pet_farewell_old_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 6
+    when: {loss: {roles: [pet], within: 0}}
+    title: "เพื่อนที่ไปก่อน"
+    text: "{ชื่อผู้จากไป}อยู่ด้วยกันมาหลายปีจนรู้ว่าคุณตื่นกี่โมง ตอนนี้เก้าอี้หวายหน้าบ้านว่าง เหลือแต่รอยขนติดเบาะ"
+    choices:
+      - id: keep_photo
+        text: "ใส่กรอบรูปตั้งไว้หน้าบ้าน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: make_merit
+        text: "ใส่บาตรอุทิศให้"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: tell_grandkids
+        text: "เล่าเรื่องเจ้าตัวนั้นให้หลานฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: plant_tree
+        text: "ปลูกต้นไม้ตรงที่มันชอบนอน"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+
+  - id: herd_start_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้], family: [{role: herd, alive: true, count: [0, 0]}]}
+    title: "เลี้ยงสัตว์เสริมรายได้"
+    text: "ญาติที่ทำฟาร์มบอกว่าลูกไก่ไข่กับลูกวัวรุ่นนี้ราคาถูก ถ้ามีที่ข้างบ้านพอ เลี้ยงไว้ขายไข่ขายลูกได้ทุกปี แต่ต้องตื่นเช้าให้อาหารทุกวัน"
+    choices:
+      - id: buy_chicks
+        text: "ซื้อลูกไก่ไข่ร้อยตัว"
+        cost: {unit: fixed_baht, amount: 8000, ref_year: 2566}
+        effects: {health: -1}
+        family: [{add: herd, kind: ไก่, life: [5, 10]}]
+        merit: [{cat: neutral}]
+      - id: buy_calves
+        text: "ซื้อลูกวัวสองตัว"
+        cost: {unit: fixed_baht, amount: 40000, ref_year: 2566}
+        effects: {health: -1}
+        family: [{add: herd, kind: วัว, life: [12, 20]}]
+        merit: [{cat: neutral}]
+      - id: buy_buffalo
+        text: "ซื้อควายไว้ไถนาและให้เช่า"
+        cost: {unit: fixed_baht, amount: 35000, ref_year: 2566}
+        effects: {health: -1}
+        family: [{add: herd, kind: ควาย, life: [15, 25]}]
+        merit: [{cat: neutral}]
+      - id: no_time
+        text: "ไม่มีเวลา ขอทำงานประจำอย่างเดียว"
+        effects: {}
+        merit: [{cat: neutral}]
+
+  - id: herd_disease_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 3
+    when: {family: [{role: herd, alive: true}]}
+    title: "โรคระบาดในคอก"
+    text: "ปศุสัตว์อำเภอประกาศโรคระบาดสัตว์ในตำบล {ชื่อฝูง}ของคุณเริ่มซึม ถ้าลามทั้งคอกจะเหลือแต่ค่าอาหารที่ลงไป"
+    choices:
+      - id: vaccinate
+        text: "จ้างหมอมาฉีดยาทั้งคอก"
+        cost: {unit: fixed_baht, amount: 6000, ref_year: 2566}
+        effects: {}
+        merit: [{cat: neutral}]
+      - id: sell_now
+        text: "ขายยกคอกก่อนราคาตก"
+        effects: {money: {unit: income_x, amount: 0.3}}
+        family: [{leave: herd}]
+        merit: [{cat: neutral}]
+      - id: wait_luck
+        text: "รอดูอาการ ขอให้รอด"
+        outcomes:
+          - {weight: 1, ok: true, text: "โรคผ่านไปโดยไม่ลามเข้าคอก", effects: {}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โรคลามทั้งคอก ต้องฝังกลบหมด", effects: {happiness: -2}, family: [{die: herd}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sell_sick
+        text: "ขายตัวป่วยให้พ่อค้าเงียบ ๆ"
+        effects: {money: {unit: income_x, amount: 0.4}}
+        family: [{leave: herd}]
+        merit: [{cat: greed_harm, level: 1}]

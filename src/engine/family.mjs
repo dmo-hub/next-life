@@ -2,24 +2,24 @@
 // ทุกสุ่มของสมาชิกใหม่มาจาก st.kinRng (stream แยกจากโลกและจาก famRng ของพ่อแม่) — ชีวิตที่ไม่มีครอบครัวของตัวเองไม่ดึงเลขนี้เลย
 // ชะตาการตายของพ่อแม่และลำดับสุ่มของโลกจึงเหมือนก่อนมีระบบนี้ทุกหลัก
 import { makeRng, mixSeed } from './rng.mjs';
-import { lifeQx } from './era.mjs';
+import { lifeQx, priceRatio } from './era.mjs';
 import { pickName } from './birth.mjs';
 
 export const KIN_ROLES = ['spouse', 'child', 'grandchild'];
-export const FAMILY_ROLE_NAMES = { parent: 'พ่อแม่', spouse: 'คู่ครอง', child: 'ลูก', grandchild: 'หลาน', pet: 'สัตว์เลี้ยง', peer: 'เพื่อนรุ่น' };
+export const FAMILY_ROLE_NAMES = { parent: 'พ่อแม่', spouse: 'คู่ครอง', child: 'ลูก', grandchild: 'หลาน', pet: 'สัตว์คู่ใจ', herd: 'ฝูงสัตว์', peer: 'เพื่อนรุ่น' };
 // ธงเดิมที่เนื้อหาอ่านอยู่ ↔ บทบาทที่ธงนั้นหมายถึง · ตั้งธงจากตัวเลือก = มีสมาชิกคนนั้นเพิ่มขึ้นจริง
 const KIN_FLAG_ROLE = { married: 'spouse', has_kids: 'child', raised_grandkids: 'grandchild' };
 // ลูกที่โตแล้วมีหลานให้เองปีละโอกาสนี้ ช่วงอายุนี้ ไม่เกินจำนวนนี้ต่อคน — ค่าตั้งของเกม (ไม่มีข้อมูลเจริญพันธุ์รายยุคในชุดข้อมูล)
 export const GRANDKID = { from: 22, to: 40, chance: 0.08, max: 3 };
 // คู่ครองอายุห่างจากเราได้เท่านี้ (ปีเกิด) · ค่าตั้งของเกม
 const KIN_SPOUSE_GAP = [-5, 5];
-// pet (B44) · peer (B43) เป็นสมาชิกได้ แต่ไม่ใช่ทายาท ไม่ตั้งธง ไม่มีหลาน — สัตว์ตายตามอายุขัยของชนิด เพื่อนรุ่นตายตามตารางชีพแบบคน
-export const KIN_EXTRA_ROLES = ['pet', 'peer'];
+// pet · herd (B44) · peer (B43) เป็นสมาชิกได้ แต่ไม่ใช่ทายาท ไม่ตั้งธง ไม่มีหลาน — สัตว์ตายตามอายุขัยของชนิด เพื่อนรุ่นตายตามตารางชีพแบบคน
+export const KIN_EXTRA_ROLES = ['pet', 'herd', 'peer'];
 // คนในบ้าน = คนที่การ์ดครอบครัวดูแลถึง และคนที่นับว่า "ยังมีใคร" ตอนแก่ · เพื่อนรุ่นไม่นับ
 const KIN_HOUSEHOLD = ['spouse', 'child', 'grandchild', 'pet'];
 
 // ความผูกพันรายคน 0–100 (B36a2): ปีที่ไม่ได้ดูแลลดเอง 1 แต่การลดเองไม่พาต่ำกว่า floor — ผลร้ายจากเนื้อหาพาต่ำกว่าได้
-export const BOND_START = { parent: 70, spouse: 70, child: 75, grandchild: 60, pet: 65, peer: 50 };
+export const BOND_START = { parent: 70, spouse: 70, child: 75, grandchild: 60, pet: 65, herd: 50, peer: 50 };
 export const BOND_FLOOR = 38;
 export const BOND_LEVELS = [[80, 'ผูกพัน'], [60, 'สนิท'], [40, 'คุ้นเคย'], [20, 'เฉย ๆ'], [0, 'ห่างเหิน']];
 // การ์ดหมวด family ที่ตัวเลือกให้ความสัมพันธ์บวก = ดูแลคนในบ้านปีนั้น · bond ขึ้นเท่านี้ต่อระดับความสัมพันธ์ (1–3)
@@ -28,6 +28,41 @@ const BOND_CARE_PER_REL = 2;
 export const KIN_AID = { from: 60, base: 50, span: 120, scale: 0.5, roles: ['spouse', 'child', 'grandchild'] };
 // แก่แล้วไม่เหลือคนในบ้านที่ยังอยู่ = เสียความสุข/สุขภาพต่อปี · ปิดไว้ (0) จนเนื้อหามีทางมีลูกมากพอ — ตอนนี้คนแก่ส่วนใหญ่ไม่มีลูก
 export const KIN_LONELY = { from: 65, happiness: 0, health: 0 };
+
+// สัตว์ (B44) — ค่าตั้งของเกม · อายุขัยตามชนิดโดยประมาณ · เงินต่อปีเป็นบาทปี PET_YEAR.ref
+// pet = สัตว์คู่ใจ ทีละ 1 ตัว มีชื่อ ชนิดต่างกันให้ค่าสถานะต่างกัน (gives ต่อปี) · cost = ค่าข้าว ยา วัคซีนพื้นฐาน
+export const PET_KINDS = {
+  หมา: { life: [10, 15], cost: 1500, gives: { health: 0.5, relations: 0.3 }, names: ['ดำ', 'ด่าง', 'ขาว', 'บุญมี', 'ตูบ', 'โต้ง', 'มะลิ', 'ถุงทอง', 'แดง', 'ปุยฝ้าย'] },
+  แมว: { life: [12, 18], cost: 1200, gives: { happiness: 1.5 }, names: ['ส้ม', 'มอม', 'ขาวมณี', 'ลายเสือ', 'ทองคำ', 'เหมียว', 'สีสวาด', 'ข้าวตัง'] },
+  นกขุนทอง: { life: [10, 20], cost: 600, gives: { knowledge: 0.5, happiness: 0.5 }, names: ['แก้ว', 'ขุนทอง', 'เจ๊ก', 'ดำดี', 'สาลี'] },
+  หมาพันธุ์: { life: [10, 14], cost: 6000, gives: { health: 0.3, network: 0.3, happiness: 0.5 }, names: ['ลัคกี้', 'โมจิ', 'บราวนี่', 'ช็อกโก้', 'คุกกี้', 'ลาเต้'] },
+  แมวพันธุ์: { life: [12, 16], cost: 5000, gives: { happiness: 1.5, network: 0.2 }, names: ['มิลค์', 'ไข่มุก', 'ซูชิ', 'ลูน่า', 'โอปอ'] },
+};
+// herd = ฝูงที่เป็นทรัพย์สิน/อาชีพ (ไข่ นม แรงไถ ขายลูก) นับเป็นหน่วยเดียว ไม่มีชื่อ ไม่ให้ค่าสถานะแบบคู่ใจ · net = เงินสุทธิต่อปีหลังค่าอาหาร
+export const HERD_KINDS = {
+  ไก่: { life: [5, 10], net: 3000 },
+  วัว: { life: [12, 20], net: 8000 },
+  ควาย: { life: [15, 25], net: 4000 },
+  ปลา: { life: [3, 8], net: 1000 },
+};
+// บ้านชั้น ≤ poorTo เลี้ยงด้วยข้าวเหลือ ค่าเลี้ยงคูณ poorScale · ค่าเลี้ยงเต็มเคยดันล้มละลายเกินกรอบด่าน finance
+export const PET_YEAR = { ref: 2566, poorTo: 3, poorScale: 0.5 };
+// ติดบ้านตอนเกิด: บ้านฐานะดี (ชั้น ≥ richFrom) · บ้านในเมือง (ภาค city) · บ้านนอก — [โอกาส, ชนิด] คู่ใจกับฝูงสุ่มแยกกัน ได้ทั้งคู่ก็ได้
+export const PET_AT_BIRTH = {
+  richFrom: 7,
+  city: 'กรุงเทพฯ และปริมณฑล',
+  rich: { pet: [0.4, ['หมาพันธุ์', 'แมวพันธุ์']], herd: [0, []] },
+  town: { pet: [0.3, ['แมว', 'หมา', 'นกขุนทอง']], herd: [0.1, ['ปลา']] },
+  rural: { pet: [0.35, ['หมา', 'แมว', 'นกขุนทอง']], herd: [0.4, ['ไก่', 'วัว', 'ควาย']] },
+};
+// การ์ดเรียกสัตว์แบบคนเลี้ยงเรียก (เจ้าดำ) · มรณบัตรบอกชนิดด้วย (หมาชื่อดำ) · ฝูงเรียกตามชนิด
+export const petCall = (m) => (m.role === 'herd' ? `ฝูง${m.kind}` : m.name ? `เจ้า${m.name}` : `${m.kind}ที่เลี้ยงไว้`);
+const petLabel = (m) => (m.role === 'herd' ? `ฝูง${m.kind}` : m.name ? `${m.kind}ชื่อ${m.name}` : m.kind);
+const petName = (st, kind, id) => {
+  const names = PET_KINDS[kind]?.names;
+  return names ? names[makeRng(mixSeed(st.seed, 0x9e7 + id)).int(0, names.length - 1)] : null;
+};
+const ANIMAL = ['pet', 'herd'];
 
 export const bondLabel = (b) => BOND_LEVELS.find(([min]) => b >= min)[1];
 const bondClamp = (b) => Math.max(0, Math.min(100, b));
@@ -56,13 +91,15 @@ export function nameParents(st) {
 export function addMember(st, role, extra = {}) {
   const year = kinYearOf(st);
   const id = ++st.kinSeq;
-  const sex = role === 'spouse' ? kinOtherSex(st.sex) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง';
-  const born = role === 'spouse' ? st.birthYear + st.kinRng.int(...KIN_SPOUSE_GAP) : role === 'peer' ? st.birthYear : year;
-  const name = role === 'pet' ? (extra.name ?? null) : pickName(mixSeed(st.seed, 0x4b1d + id), sex, born, st.content.era.names, kinTakenNames(st));
-  const m = { id, role, sex, born, alive: true, diedAge: null, name, bond: BOND_START[role] };
-  if (role === 'pet') {
+  // สัตว์ติดบ้าน/ส่งต่อทายาทส่ง sex born maxAge มาเอง — ไม่ดึง kinRng ลำดับสุ่มของคนในบ้านจึงไม่ขยับ
+  const sex = extra.sex ?? (role === 'spouse' ? kinOtherSex(st.sex) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง');
+  const born = extra.born ?? (role === 'spouse' ? st.birthYear + st.kinRng.int(...KIN_SPOUSE_GAP) : role === 'peer' ? st.birthYear : year);
+  // ชื่อคู่ใจสุ่มจาก seed+id ไม่ดึงเลข · ฝูงไม่มีชื่อ
+  const name = role === 'herd' ? null : role === 'pet' ? (extra.name ?? petName(st, extra.kind, id)) : pickName(mixSeed(st.seed, 0x4b1d + id), sex, born, st.content.era.names, kinTakenNames(st));
+  const m = { id, role, sex, born, alive: true, diedAge: null, name, bond: extra.bond ?? BOND_START[role] };
+  if (ANIMAL.includes(role)) {
     m.kind = extra.kind;
-    m.maxAge = st.kinRng.int(...extra.life);
+    m.maxAge = extra.maxAge ?? st.kinRng.int(...extra.life);
   }
   if (role === 'child') m.order = st.kin.filter((x) => x.role === 'child').length + 1;
   if (role === 'grandchild') {
@@ -84,7 +121,7 @@ export const livingChildren = (st) => (st.kin ? st.kin.filter((m) => m.role === 
 // ทอยเฉพาะบทบาทที่มีคนให้เลือก ≥2 — ชีวิตที่ไม่มีครอบครัว/มีคนเดียวไม่ดึงเลข
 export function pickFocus(st) {
   st.kinFocus = {};
-  for (const role of ['spouse', 'child', 'grandchild', 'pet']) {
+  for (const role of ['spouse', 'child', 'grandchild', 'pet', 'herd']) {
     const live = livingOf(st, role);
     if (live.length) st.kinFocus[role] = (live.length > 1 ? live[st.kinRng.int(0, live.length - 1)] : live[0]).id;
   }
@@ -119,7 +156,9 @@ function bondAdd(st, list, d) {
 export function applyFamily(st, c, care = 0) {
   const ops = c.family ?? [];
   for (const op of ops) {
-    if (op.add) for (let i = 0; i < (op.n ?? 1); i++) addMember(st, op.add, op.add === 'pet' ? { kind: op.kind, life: op.life, name: op.name } : {});
+    // คู่ใจทีละ 1 ตัว — เนื้อหากั้นด้วย when อยู่แล้ว ตรงนี้กันเผื่อหลุด (ไม่เพิ่มตัวที่สอง)
+    if (op.add === 'pet' && livingOf(st, 'pet').length) continue;
+    if (op.add) for (let i = 0; i < (op.n ?? 1); i++) addMember(st, op.add, ANIMAL.includes(op.add) ? { kind: op.kind, life: op.life, name: op.name } : {});
     if (op.bond) bondAdd(st, bondTargets(st, op.bond), op.d);
     if (op.leave) for (const m of livingOf(st, op.leave)) m.left = true;
     if (op.die === 'parent') {
@@ -176,20 +215,38 @@ function kinYearlyBond(st) {
 function kinLost(st, m, age, year, out) {
   m.diedAge = age;
   m.alive = false;
-  if (!KIN_HOUSEHOLD.includes(m.role)) return;
+  if (!KIN_HOUSEHOLD.includes(m.role) && m.role !== 'herd') return;
   const loss = { id: m.id, role: m.role, name: m.name, age, year, ...(m.kind && { kind: m.kind }) };
   st.kinLoss.push(loss);
   out.push(loss);
+}
+
+// ผลต่อปีของสัตว์ (B44): คู่ใจให้ค่าสถานะตามชนิด หักค่าเลี้ยง · ฝูงให้เงินสุทธิ · บาทของปีนั้น — ไม่ดึงเลขสุ่ม
+function petYear(st, year) {
+  const live = st.kin.filter((m) => ANIMAL.includes(m.role) && m.alive && !m.left);
+  if (!live.length) return;
+  const era = st.content.era;
+  const price = PET_YEAR.ref <= year ? priceRatio(era, st.seed, PET_YEAR.ref, year) : 1 / priceRatio(era, st.seed, year, PET_YEAR.ref);
+  for (const m of live) {
+    if (m.role === 'herd') {
+      st.money += (HERD_KINDS[m.kind]?.net ?? 0) * price;
+      continue;
+    }
+    const k = PET_KINDS[m.kind] ?? {};
+    for (const [stat, v] of Object.entries(k.gives ?? {})) st[stat] = bondClamp(st[stat] + v);
+    st.money -= (k.cost ?? 0) * price * (st.petScale ?? 1);
+  }
 }
 
 export function ageKin(st, year) {
   kinYearlyBond(st);
   const lost = [];
   if (!st.kin.length) return lost;
+  petYear(st, year);
   for (const m of [...st.kin]) {
     if (!m.alive) continue;
     const a = year - m.born - 1;
-    if (m.role === 'pet') {
+    if (ANIMAL.includes(m.role)) {
       if (a + 1 >= m.maxAge) kinLost(st, m, a + 1, year, lost);
       continue;
     }
@@ -208,7 +265,8 @@ export function ageKin(st, year) {
 // ข้อความการ์ดแจ้งการจากไป (แกนออกเองทุกครั้ง — เนื้อหาต่อยอดด้วย when.loss ได้)
 const LOSS_WHO = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน' };
 export function lossText(l) {
-  const who = l.role === 'pet' ? `${l.kind}${l.name ?? 'ที่เลี้ยงไว้'}` : `${LOSS_WHO[l.role]}${l.name}`;
+  if (l.role === 'herd') return `ฝูง${l.kind}ที่เลี้ยงไว้ค่อย ๆ หมดไป ไม่ได้เลี้ยงต่อแล้ว`;
+  const who = l.role === 'pet' ? (l.name ? `เจ้า${l.name} ${l.kind}ที่เลี้ยงไว้` : `${l.kind}ที่เลี้ยงไว้`) : `${LOSS_WHO[l.role]}${l.name}`;
   return l.age < 1 ? `${who}จากไปตั้งแต่ยังไม่ทันครบขวบ` : `${who}จากไปแล้ว ด้วยวัย ${l.age} ปี`;
 }
 
@@ -219,6 +277,8 @@ export function lossOk(st, w) {
 }
 // ชื่อคนที่จากไปล่าสุด ให้การ์ดสูญเสียเรียก ({ชื่อผู้จากไป})
 export const lastLoss = (st) => (st.kinLoss ?? []).at(-1) ?? null;
+// ชื่อที่การ์ดสูญเสียเรียก — สัตว์เรียกแบบ petCall
+export const lossCall = (l) => (ANIMAL.includes(l.role) ? petCall(l) : l.name);
 
 // เงื่อนไขครอบครัวของการ์ด (when.family / requires.family): บทบาท · ยังอยู่ · ช่วงอายุ · จำนวน
 // ไม่ใส่ count = ต้องมีอย่างน้อย 1 คนที่ตรง · คู่ที่หย่าแล้วไม่นับเป็นคู่ครอง
@@ -238,6 +298,59 @@ export function kinAid(st) {
   if (!able.length) return null;
   const h = able.reduce((a, b) => (b.bond > a.bond ? b : a));
   return st.kinRng.next() < (h.bond - KIN_AID.base) / KIN_AID.span ? h : null;
+}
+
+// สัตว์ติดบ้านตอนเกิด (B44): ทางในตระกูลได้ตัวที่บ้านเดิมยังเลี้ยงอยู่ (heir.pets) · ที่เหลือสุ่มตามบ้านจาก stream แยก
+// ไม่ดึง rng ของโลก/kinRng — ชีวิตที่ไม่ได้สัตว์ไม่มีอะไรเปลี่ยนจากส่วนนี้
+export function petsAtBirth(st, heir, clsIndex) {
+  st.petScale = clsIndex <= PET_YEAR.poorTo ? PET_YEAR.poorScale : 1;
+  if (heir?.pets) {
+    // ตัวที่บ้านรับมาหลังทายาทเกิด เข้าบ้านตอนถึงปีของมัน (petArrivals)
+    for (const p of heir.pets) if (p.born <= st.birthYear) addMember(st, p.role, p);
+    st.petsLater = heir.pets.filter((p) => p.born > st.birthYear);
+    return;
+  }
+  // เกิดในตระกูลเดิมแต่บ้านไม่มีสัตว์เหลือ = ไม่สุ่มเพิ่ม · เกิดที่อื่นสุ่มตามบ้านใหม่
+  if (heir?.tier) return;
+  const rng = makeRng(st.seed ^ 0x7e7f1a2b);
+  const set = clsIndex >= PET_AT_BIRTH.richFrom ? PET_AT_BIRTH.rich : st.region === PET_AT_BIRTH.city ? PET_AT_BIRTH.town : PET_AT_BIRTH.rural;
+  for (const role of ANIMAL) {
+    const [chance, kinds] = set[role];
+    if (rng.next() >= chance) continue;
+    const kind = kinds[rng.int(0, kinds.length - 1)];
+    const maxAge = rng.int(...(role === 'pet' ? PET_KINDS : HERD_KINDS)[kind].life);
+    // ตัวที่อยู่บ้านมาก่อนเราเกิด อายุสุ่มไม่เกินครึ่งอายุขัย
+    const born = st.birthYear - rng.int(0, Math.floor(maxAge / 2));
+    addMember(st, role, { kind, maxAge, born, sex: rng.next() < 0.5 ? 'ชาย' : 'หญิง' });
+  }
+}
+
+// สัตว์ที่ส่งต่อมาถึงปีเข้าบ้านแล้ว — คืนรายการให้แกนออกการ์ดแจ้ง · ไม่ดึงเลขสุ่ม
+// คู่ใจมีอยู่แล้ว (ได้จากการ์ดระหว่างนั้น) = ตัวที่ส่งต่อไม่เข้าบ้าน
+export function petArrivals(st, year) {
+  if (!st.petsLater?.length) return [];
+  const now = st.petsLater.filter((p) => p.born <= year);
+  st.petsLater = st.petsLater.filter((p) => p.born > year);
+  return now.filter((p) => p.role !== 'pet' || !livingOf(st, 'pet').length).map((p) => addMember(st, p.role, p));
+}
+export const petArriveText = (m) => `บ้านเรารับ${petLabel(m)}มาเลี้ยง`;
+
+// ส่งต่อทายาทในตระกูล: ทุกตัวที่ยังอยู่ตอนเราตาย (ยังอยู่ตลอดตั้งแต่เกิดถึงปีนั้น) · ตัวที่เกิดหลังทายาทเข้าบ้านตอนถึงปีของมัน
+export function heirPets(st, birthYear, tier) {
+  if (!tier || !st.kin) return undefined;
+  const pets = st.kin
+    .filter((m) => ANIMAL.includes(m.role) && m.alive && !m.left)
+    .map(({ role, kind, name, born, maxAge, sex, bond }) => ({ role, kind, name, born, maxAge, sex, bond }));
+  return pets.length ? pets : undefined;
+}
+
+// มรณบัตร: ใครรับเลี้ยงสัตว์ต่อ — คู่ชีวิต > ลูก > หลาน ที่ยังอยู่ ไม่มีใคร = เพื่อนบ้าน
+export function petsAfter(st) {
+  const pets = (st.kin ?? []).filter((m) => ANIMAL.includes(m.role) && m.alive && !m.left);
+  if (!pets.length) return null;
+  const keeper = ['spouse', 'child', 'grandchild'].map((r) => st.kin.find((m) => m.role === r && m.alive && !m.left)).find(Boolean);
+  const who = keeper ? `${LOSS_WHO[keeper.role]}${keeper.name}` : 'เพื่อนบ้าน';
+  return `${pets.map(petLabel).join(' กับ')} ได้${who}รับไปเลี้ยงต่อ`;
 }
 
 // รายชื่อให้แผงครอบครัว (B36c) อ่านอย่างเดียว — ช่องที่ไล่ไว้เท่านั้น ไม่มีค่าบัญชีหรือค่าที่อนุมานกรรมได้
