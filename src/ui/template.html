@@ -37,6 +37,11 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .tree { padding:0 20px 8px; font-size:12px; }
 .tree summary { cursor:pointer; }
 .tree .picks { font-size:12px; }
+.stat-help { padding:0 20px; font-size:12px; color:var(--muted); }
+.stat-help summary { cursor:pointer; min-height:36px; display:flex; align-items:center; text-decoration:underline; text-underline-offset:2px; }
+.stat-help dl { margin:0 0 10px; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 12px; }
+.stat-help dt { font-weight:600; color:var(--ink2); white-space:nowrap; }
+.stat-help dd { margin:0; color:var(--ink2); }
 .body { padding:18px 20px 8px; display:flex; flex-direction:column; gap:8px; }
 .body h3 { margin:0; font-size:24px; line-height:1.35; }
 .body h3.lead { font-size:19px; font-weight:400; }
@@ -103,6 +108,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .b .top { border-bottom:1px solid var(--bronze); }
 .b .top b { font-family:Srisakdi,serif; font-size:20px; color:var(--gold); font-weight:700; }
 .b .top small, .b .stats, .b .meta, .b .sub, .b .note { color:var(--sand); }
+.b .stat-help, .b .stat-help dd { color:var(--sand); } .b .stat-help dt { color:var(--cream); }
 .b .bar { background:#3A2C1F; } .b .bar i { background:var(--gold); } .b .bar b { background:var(--cream); }
 .b .kicker { color:var(--gold); letter-spacing:0.08em; }
 .b .body h3 { font-family:Srisakdi,serif; font-weight:700; color:var(--gold2); font-size:28px; }

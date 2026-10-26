@@ -1,7 +1,7 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.25';
+const APP_VERSION = 'v0.2.26';
 const APP_BUILD = '2026-10-26';
 
 const root = document.getElementById('app');
@@ -34,6 +34,26 @@ function stats(s) {
     box.append(col);
   }
   return box;
+}
+
+// คำอธิบายค่าสถานะ: บอกแค่ทิศว่าค่านั้นไปมีผลกับอะไร — ห้ามตัวเลข เกณฑ์ สูตร และไม่พูดถึงบุญบาป
+// ทุกบรรทัดต้องตรงกับที่แกนเกมอ่านจริง (แก้แกนแล้วทิศเปลี่ยน ต้องแก้ที่นี่ด้วย)
+const STAT_HELP = [
+  ['สุขภาพ', 'ลดลงเองตามวัย · ยิ่งทรุดกว่าที่ร่างกายควรเป็นตามวัยยิ่งเสี่ยงตายในปีนั้น ดูแลจนดีกว่านั้นยิ่งอยู่ยืน · หมดแถบคือตาย'],
+  ['ความสุข', 'ค่อย ๆ กลับสู่ระดับเดิมของตัวเองทุกปี ช่วงสุขหรือทุกข์จึงไม่ค้างนาน · ล้มละลายทำให้ลดลง'],
+  ['ความรู้', 'เพิ่มขึ้นเองทีละน้อยตามวัย · ใช้สอบเข้าเรียนต่อ และช่วยให้ทางที่ต้องใช้หัวสำเร็จง่ายขึ้น'],
+  ['ความสัมพันธ์', 'จางลงเองทีละน้อยถ้าไม่ดูแล · ล้มละลายทำให้ลดลง · ถ้าไปเกิดเป็นลูกหลานในบ้านเดิม ติดตัวไปส่วนหนึ่ง'],
+  ['คอนเน็คชั่น', 'ยิ่งสูงตอนหางาน ยิ่งเจองานค่าแรงดี และสูงพอได้ข้อเสนองานเพิ่ม · ไปเกิดเป็นลูกหลานในบ้านเดิมได้ติดตัวไปส่วนหนึ่ง'],
+  ['เงิน · หนี้', 'เงินเก็บโตหรือหดตามที่เลือกลงทุน · เงินติดตัวติดลบโดนดอกเบี้ยทบ · เงินกู้หักค่างวดทุกปี · หนี้ท่วมรายได้นานหลายปีจะล้มละลาย ทรัพย์เหลือศูนย์'],
+  ['ทุกค่า', 'บางทางเลือกต้องมีค่าถึงก่อนจึงกดได้ (ปุ่มบอกเหตุผล) · ค่าที่สูงหรือต่ำมากทำให้ผลบางเรื่องเอียงดีหรือร้าย และเปลี่ยนเรื่องที่จะเจอ'],
+];
+function statHelp() {
+  const d = el('details', 'stat-help');
+  d.append(el('summary', null, 'ค่าสถานะเหล่านี้หมายถึงอะไร?'));
+  const dl = el('dl');
+  for (const [k, v] of STAT_HELP) dl.append(el('dt', null, k), el('dd', null, v));
+  d.append(dl);
+  return d;
 }
 
 // ป้ายแกนเงินสั้นพอวางข้างกราฟ: 15k · 1.2 ล้าน
@@ -517,7 +537,7 @@ function render(card) {
     choices.append(enter(button('ไปช่วงระหว่างชาติ', null, () => play(T.afterlife))), ...shareButtons(card));
   } else {
     top.append(el('b', null, `อายุ ${card.age} · ช่วง${card.stage}`), el('small', null, `${genLabel()}${st.name} · ${provinceLabel(st)}`));
-    box.append(top, stats(s));
+    box.append(top, stats(s), statHelp());
     // ไม่มีรายได้ก็ต้องเห็นเงินติดตัวเสมอแม้ 0 · มีงานทำแล้วซ่อนเงินติดตัวเฉพาะตอนเป็น 0 พอดี ติดลบ (หนี้) ยังต้องเห็น
     // เงินกู้เป็นยอดค้างของสัญญา ไม่ใช่เงินติดตัวติดลบ จึงแยกช่อง ไม่หักรวมกัน
     const working = isWorking(st, card.age);
