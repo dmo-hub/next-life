@@ -121,6 +121,11 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .a .note-sheet input { border:1px solid var(--ink2); background:#FFFDF7; color:var(--ink); }
 .a .note-sheet input:focus-visible { outline:2px solid var(--ink); outline-offset:1px; }
 .a .life-note { border-left:3px solid var(--red); background:#FBF7EE; } .a .life-note small { color:var(--muted); }
+/* สมุดชีวิต (B48) — หน้าก่อน/ข้ามกว้างเท่ากันใต้ปุ่มพลิกหน้า · ตัวเลือกที่กดเป็นตัวหนังสือเอียงแยกจากเนื้อเรื่อง */
+.lifebook .row { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
+.lifebook .row .choice { justify-content:center; }
+.lifebook .body .pick { font-family:Pridi,serif; font-size:15px; padding-left:10px; border-left:2px solid currentColor; }
+.lifebook .body .dates { margin-top:-6px; font-size:14px; }
 .stamp { align-self:flex-start; font-family:Pridi,serif; font-weight:600; padding:4px 10px; transform:rotate(-3deg); font-size:16px; }
 
 /* ทาง A — ทะเบียนราษฎร์: กระดาษ หมึก ตราประทับแดง */
@@ -4147,7 +4152,12 @@ document.addEventListener('keydown', (e) => {
   }
   if (t.closest?.('input, textarea, select, [contenteditable]')) return;
   let b;
-  if (e.key === 'Enter') {
+  const book = root.querySelector('.lifebook');
+  if (book && (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+    // Space บนปุ่มที่โฟกัสอยู่ให้ปุ่มนั้นทำงานเอง ไม่งั้นกดทีเดียวพลิกสองครั้ง
+    if (e.key === ' ' && t.closest?.('button, summary, a')) return;
+    b = book.querySelector(e.key === 'ArrowLeft' ? '.choices [data-prev]' : '.choices [data-enter]');
+  } else if (e.key === 'Enter') {
     // โฟกัสอยู่ที่ปุ่ม/หัวข้อพับ ให้ Enter ทำงานของตัวนั้น (แชร์ภาพ · สมุดฉายา · ผังตระกูล)
     if (t.closest?.('button, summary, a')) return;
     b = root.querySelector('.choices [data-enter]');
@@ -4211,7 +4221,7 @@ function render(card) {
     // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
     const chart = card.life && lifeChart(card.life, card.age);
     if (chart) body.append(chart);
-    choices.append(enter(button('ไปช่วงระหว่างชาติ', null, () => play(T.afterlife))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
+    choices.append(enter(button('ไปช่วงระหว่างชาติ', null, () => openBook(card))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
   } else {
     const head = el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : `อายุ ${card.age} · ช่วง${card.stage}`);
     // การ์ดผลเป็นผลของใบก่อนอยู่แล้ว ป้ายซ้ำไม่บอกอะไรเพิ่ม · งานศพเกิดหลังตายจึงไม่ใช่ "ปีเดียวกัน" ของชีวิต
@@ -4430,6 +4440,7 @@ function track(card) {
   if (af) return card;
   prevAge = curAge;
   curAge = card.age;
+  bookNote(card);
   if (card.kind === 'stage') {
     noteAsk = askFor(card.recap, card.age, lifeMark);
     lifeMark = markLife();
@@ -4505,6 +4516,121 @@ function askFor(r, age, was) {
   return q ? { g: st.gen, a: age, q } : null;
 }
 
+// สมุดชีวิต (B48): จดการ์ดตอนผ่าน track — เล่นซ้ำจากเซฟก็ผ่านครบทุกใบ แกนเกมจึงไม่ต้องเก็บประวัติเพิ่ม
+// ตัวเลือกที่กดยังไม่รู้ตอนการ์ดออก จำตำแหน่งใน st.log ไว้อ่านตอนเปิดสมุด
+// น้ำหนัก: ผลที่ตามมา > บ้านเมือง > งาน/ครอบครัว > ที่เหลือ · ลาง เงินเก็บ เปลี่ยนช่วงวัย ไม่ขึ้นหน้า (มีสรุปของตัวเองแล้ว)
+const BOOK_W = { result: 5, era: 4, near: 3, other: 1 };
+const BOOK_NEAR = /^(career|work|biz|pet|herd|school|retirement|milestone|child|old)_/;
+const BOOK_STORIES = 8;
+const BOOK_PER_STAGE = 2;
+const BOOK_NOTES = 2;
+let bookCards = [];
+let bookIntro = null;
+// ลำดับการ์ดที่ผ่านมา — ใช้ดูว่าการ์ดผลตามหลังการ์ดเลือกทันทีหรือไม่
+let bookSeq = 0;
+function bookNote(card) {
+  if (card.kind === 'intro') bookIntro = card;
+  const last = bookCards.at(-1);
+  // ผลของตัวเลือกเล่าต่อในหน้าเดียวกับการ์ดที่เลือก ผู้อ่านเห็นเหตุกับผลคู่กัน
+  if (card.kind === 'result' && last?.card.kind === 'event' && last.card.age === card.age && !last.result && last.next === bookSeq) {
+    last.result = card.text;
+    last.w = BOOK_W.result;
+  } else {
+    const w = card.kind === 'result' ? BOOK_W.result
+      : card.kind === 'era' || card.national || card.news ? BOOK_W.era
+      : card.kind === 'event' && !card.funeral ? (BOOK_NEAR.test(card.id) ? BOOK_W.near : BOOK_W.other)
+      : 0;
+    if (w) bookCards.push({ card, w, at: st.log.length, next: bookSeq + 1 });
+  }
+  bookSeq++;
+}
+const bookReset = () => {
+  bookCards = [];
+  bookIntro = null;
+  bookSeq = 0;
+};
+
+// คัดหน้าจากน้ำหนัก เสมอกันใช้เลขจาก seed — เปิดซ้ำได้หน้าเดิม ไม่กินเลขสุ่มของเกม
+// รอบแรกช่วงวัยละไม่เกิน BOOK_PER_STAGE หน้า สมุดจึงเล่าทั้งชีวิต ไม่กองอยู่ช่วงที่การ์ดถี่
+function bookPicks(n) {
+  const key = `${save.seed}:${st.gen}`;
+  const ranked = bookCards.map((p, i) => ({ ...p, i, r: fnv(`${key}:${i}`) })).sort((a, b) => b.w - a.w || a.r - b.r);
+  const per = {};
+  const pick = [];
+  for (const p of ranked) {
+    if (pick.length >= n) break;
+    if ((per[p.card.stage] ?? 0) >= BOOK_PER_STAGE) continue;
+    per[p.card.stage] = (per[p.card.stage] ?? 0) + 1;
+    pick.push(p);
+  }
+  for (const p of ranked) if (pick.length < n && !pick.includes(p)) pick.push(p);
+  return pick.sort((a, b) => a.i - b.i);
+}
+
+function bookPages(death) {
+  const said = notes.n.filter((x) => x.g === st.gen && x.t).sort((x, y) => x.a - y.a);
+  const keep = said.length <= BOOK_NOTES ? said : [...said].sort((x, y) => fnv(`${notes.seed}:${x.a}`) - fnv(`${notes.seed}:${y.a}`)).slice(0, BOOK_NOTES).sort((x, y) => x.a - y.a);
+  // บันทึกถามตอนต้นช่วงใหม่ จึงวางหลังเรื่องที่อายุเท่ากัน
+  const mid = [...bookPicks(BOOK_STORIES - keep.length).map((p) => ({ age: p.card.age, o: 0, draw: (b) => storyPage(b, p) })), ...keep.map((x) => ({ age: x.a, o: 1, draw: (b) => notePage(b, x) }))].sort((a, b) => a.age - b.age || a.o - b.o);
+  return [{ draw: (b) => coverPage(b, death) }, ...mid, { draw: (b) => endPage(b, death) }];
+}
+
+function coverPage(body, death) {
+  body.append(el('span', 'kicker', 'สมุดชีวิต'), el('h3', null, st.name), el('p', 'dates', `${genLabel()}อายุ 0–${death.age} ปี · ${provinceLabel(st)}`));
+  if (bookIntro) body.append(el('p', 'sub', bookIntro.text));
+}
+function storyPage(body, p) {
+  const c = p.card;
+  const kicker = c.kind === 'result' ? KICKER.result : c.kind === 'era' || c.national ? KICKER.era : `ช่วง${c.stage}`;
+  body.append(el('span', 'kicker', `อายุ ${c.age} · ${c.news ? `${kicker} · ${c.news.text}` : kicker}`));
+  if (c.kind === 'event') {
+    if (c.title) body.append(el('h3', null, c.title));
+    body.append(el(c.title ? 'p' : 'h3', c.title ? null : 'lead', c.text));
+    // จับคู่ด้วย id กับอายุ — การ์ดเล่าเรื่องไม่มีตัวเลือก ตำแหน่งเดิมใน log จึงอาจเป็นของใบถัดไป
+    const pick = st.log[p.at];
+    if (pick && pick.id === c.id && pick.age === c.age) body.append(el('p', 'pick', `เลือก “${pick.text}”`));
+    if (p.result) body.append(el('p', 'sub', p.result));
+  } else {
+    body.append(el('h3', c.kind === 'era' ? null : 'lead', c.text));
+    if (c.story) body.append(el('p', null, c.story));
+  }
+}
+function notePage(body, x) {
+  body.append(el('span', 'kicker', `อายุ ${x.a} · บันทึกถึงตัวเอง`), el('p', 'sub', x.q), noteQuote(`บันทึกเมื่ออายุ ${x.a}`, x.t));
+}
+function endPage(body, death) {
+  body.append(el('span', 'kicker', `อายุ ${death.age}`), el('h3', 'lead', `${st.name} จากไปด้วยวัย ${death.age} ปี`));
+  if (death.note) body.append(el('p', 'sub', death.note));
+  if (death.funeral) body.append(el('p', 'sub', `งานศพ: ${death.funeral.text}`));
+}
+
+// พลิกเองทีละหน้า (คำตัดสินเจ้าของ) · เปิดหน้าไหนก็ไม่แตะ st และไม่ลงเซฟ — รีโหลดกลางสมุดกลับไปที่มรณบัตร
+function openBook(death) {
+  const pages = bookPages(death);
+  const done = () => play(T.afterlife);
+  const show = (i) => {
+    root.replaceChildren();
+    const box = el('article', 'card a lifebook');
+    const top = el('div', 'top');
+    top.append(el('b', null, 'สมุดชีวิต'), el('small', null, `หน้า ${i + 1}/${pages.length}`));
+    const body = el('div', 'body');
+    pages[i].draw(body);
+    const choices = el('div', 'choices');
+    const last = i === pages.length - 1;
+    choices.append(enter(button(last ? 'ไปช่วงระหว่างชาติ' : 'พลิกหน้าถัดไป', null, last ? done : () => show(i + 1))));
+    const row = el('div', 'row');
+    const back = button('หน้าก่อน', null, () => show(i - 1));
+    back.dataset.prev = '';
+    back.disabled = i === 0;
+    row.append(back);
+    if (!last) row.append(button('ข้ามสมุด', null, done));
+    choices.append(row);
+    box.append(top, body, choices);
+    root.append(box);
+  };
+  show(0);
+}
+
 // ทุกปุ่มที่เดินเกมผ่านตรงนี้ทางเดียว — ตอนเล่นจริงกับตอนเล่นซ้ำจากเซฟจึงเดินเหมือนกันทุกก้าว
 const apply = (tok) => track(step(tok));
 function step(tok) {
@@ -4519,6 +4645,7 @@ function step(tok) {
     af = null;
     curAge = null;
     lifeMark = markLife();
+    bookReset();
     return nextCard(st);
   }
   if (/^[A-Z]$/.test(tok)) {
@@ -4591,6 +4718,7 @@ function begin(seed) {
   save = { seed, log: '' };
   curAge = null;
   lifeMark = markLife();
+  bookReset();
   notesLoad(seed);
   return track(nextCard(st));
 }
