@@ -293,12 +293,13 @@ events:
     choices: []
 
   # บนบาน/แก้บน — ผลของเรื่องที่บนเป็นอิสระจากการบน · แก้ตามกำลังมีทุกใบ ≤0.05 เท่าเงินเก็บต่อปี · เลื่อนได้ครั้งเดียว
+  # ศาลเจ้าก่อนสอบไม่อยู่ในกองสุ่ม (B63): แกนวางไว้หน้าด่านสอบเข้ามหาวิทยาลัยปีจบ ม.ปลาย/ปวช. · แก้บนทวงเฉพาะคนที่สอบติด (exam_pass:uni)
   - id: bel_vow_exam
     type: B
     category: belief
     stage: วัยรุ่น
     years: [2500, 2650]
-    weight: 2
+    prelude: {before: uni_exam, chance: 0.5}
     title: "ศาลเจ้าก่อนสอบ"
     text: "พรุ่งนี้สอบเข้ามหาวิทยาลัย ผู้ใหญ่ในบ้านพาไปไหว้ศาลเจ้าประจำเมือง คนข้างหน้าจุดประทัดแก้บนดังสนั่นจนสะดุ้ง"
     lore_ref: lore-finance-belief.md#B
@@ -325,7 +326,7 @@ events:
     title: "ถึงเวลาแก้บน"
     text: "คนที่บ้านทักขึ้นมากลางมื้อเย็นว่าที่บนไว้ตอนสอบเข้ายังไม่ได้แก้ ของแก้บนที่ศาลนั้นมีทั้งขนม ประทัด และพวงมาลัย"
     lore_ref: lore-finance-belief.md#B
-    when: {flags: {has: [vow_open:exam]}}
+    when: {flags: {has: [vow_open:exam, exam_pass:uni]}}
     belief: {kind: vow, tradition: ผสม, outside_canon: [vow_broken]}
     choices:
       - {id: full, text: "แก้บนเต็มตามที่บนไว้", redeem: full, cost: {unit: fixed_baht, amount: 1500, ref_year: 2560}, clears_flags: [vow_open:exam], effects: {happiness: 1}, merit: [{cat: neutral}]}
@@ -340,7 +341,7 @@ events:
     title: "คำบนที่ค้างไว้"
     text: "คำบนที่เลื่อนไว้ยังค้างอยู่ ทุกครั้งที่ขับรถผ่านศาลนั้นก็นึกขึ้นมาได้ทุกที"
     lore_ref: lore-finance-belief.md#B
-    when: {flags: {has: [vow_open:exam]}}
+    when: {flags: {has: [vow_open:exam, exam_pass:uni]}}
     belief: {kind: vow, tradition: ผสม, outside_canon: [vow_broken]}
     choices:
       - {id: full, text: "แก้บนเต็มตามที่บนไว้", redeem: full, cost: {unit: fixed_baht, amount: 1500, ref_year: 2560}, clears_flags: [vow_open:exam], effects: {happiness: 1}, merit: [{cat: neutral}]}

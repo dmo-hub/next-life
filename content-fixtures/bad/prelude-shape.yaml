@@ -1,0 +1,38 @@
+# การ์ดนำผูกด่านที่ไม่มี + การ์ดนำที่ยังอยู่ในกองสุ่ม + การ์ดนำช่วงวัยไม่ตรงปีด่าน — การ์ดนำวัยรุ่นก่อนสอบเข้ามหาลัยยังผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    prelude: {before: lower_exam, chance: 0.5}
+    text: "ข้อความการ์ด"
+    choices: []
+  - id: bad_case_02
+    type: A
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    prelude: {before: uni_exam, chance: 0.5}
+    text: "ข้อความการ์ด"
+    choices: []
+  - id: bad_case_03
+    type: A
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    prelude: {before: uni_exam, chance: 1.5}
+    text: "ข้อความการ์ด"
+    choices: []
+  - id: bad_case_04
+    type: A
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    prelude: {before: uni_exam, chance: 0.5}
+    text: "ข้อความการ์ด"
+    choices: []
+  - id: ok_case_01
+    type: A
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    prelude: {before: uni_exam, chance: 0.5}
+    text: "ข้อความการ์ด"
+    choices: []

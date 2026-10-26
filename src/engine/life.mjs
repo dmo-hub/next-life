@@ -549,6 +549,7 @@ function stepYear(st) {
   const track = st.school && TRACKS[st.school];
   if (track && st.age === track.until) {
     if (eduRank(track.edu) > eduRank(st.edu)) st.edu = track.edu;
+    if (track.exam) for (const ev of preludes(st, track.exam, year)) st.due.push({ kind: 'eraEvent', ev, age: st.age });
     if (track.gate) st.due.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
     else {
       st.school = null;
@@ -571,6 +572,21 @@ function stepYear(st) {
       }
     }
   }
+}
+
+// การ์ดนำของด่านสอบ (B63): ไม่อยู่ในกองสุ่ม ออกในคิวก่อนด่านปีเดียวกัน — "พรุ่งนี้สอบ" จึงตามด้วยด่านจริงเสมอ
+// ทอย chance หลังผ่านเงื่อนไขแล้วเท่านั้น ชีวิตที่ไม่เข้าเงื่อนไขจึงไม่กิน rng ของโลก
+function preludes(st, exam, year) {
+  const out = [];
+  for (const ev of st.content.events) {
+    if (ev.prelude?.before !== exam || st.done[ev.id] || !inYears(ev, year) || !whenOk(st, ev.when) || !beliefOk(st, ev)) continue;
+    if (st.rng.next() >= ev.prelude.chance) continue;
+    st.done[ev.id] = true;
+    st.fired[ev.id] = { n: 1, age: st.age };
+    beliefFired(st, ev);
+    out.push(ev);
+  }
+  return out;
 }
 
 // รายจ่ายหลังเกษียณ/ปี = พื้นค่าครองชีพ (เท่าของค่าแรงขั้นต่ำทั้งปี) + สัดส่วนของรายได้ปีสุดท้าย

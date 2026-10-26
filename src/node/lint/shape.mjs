@@ -5,10 +5,11 @@ import {
 } from './vocab.mjs';
 import { INCOME_MULT } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
+import { EXAMS, TRACKS } from '../../engine/career.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm'],
+  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'bond', 'd', 'kind', 'life', 'name'],
@@ -25,6 +26,7 @@ const KEYS = {
   family: ['role', 'age', 'alive', 'count', 'health', 'relations'],
   multipliers: ['class', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish'],
   repeat: ['gap', 'max'],
+  prelude: ['before', 'chance'],
   requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'reason'],
   belief: ['kind', 'tradition', 'outside_canon', 'vow', 'trigger', 'cap_per_life', 'prize_table', 'stake', 'odds_modifier'],
   vow: ['deadline_years', 'due_event', 'redeem_full_cost', 'redeem_light_cost', 'defer_once'],
@@ -62,6 +64,7 @@ function* shaped(e) {
     if (isObj(b.stake)) yield ['money', b.stake, '.belief.stake'];
   }
   if (isObj(e.repeat)) yield ['repeat', e.repeat, '.repeat'];
+  if (isObj(e.prelude)) yield ['prelude', e.prelude, '.prelude'];
   for (const { c, path } of choicesOf(e)) {
     yield ['choice', c, path];
     const q = c.requires;
@@ -378,6 +381,22 @@ export const rules = [
       if (p === undefined) return;
       if (!isObj(p) || !(isInt(p.gap) && p.gap >= 1 && p.gap <= 100) || !(isInt(p.max) && p.max >= 2 && p.max <= 20)) r('.repeat', `ต้องเป็น {gap: 1–100, max: 2–20} ได้ ${JSON.stringify(p)}`);
       if (e.weight === undefined || e.at_age !== undefined || e.era !== undefined) r('.repeat', 'repeat ใช้ได้กับใบในกองสุ่มเท่านั้น (มี weight · ไม่มี at_age · ไม่มี era)');
+    },
+  },
+  {
+    id: 'prelude-shape',
+    desc: `prelude = {before: ด่านสอบ (${EXAMS.join(' ')}), chance: 0–1} · การ์ดนำออกในคิวก่อนด่านปีจบช่วงเรียน — ห้ามมี weight/at_age/era/repeat และ stage ต้องเป็นช่วงวัยของปีด่าน`,
+    event(e, ctx, r) {
+      const p = e.prelude;
+      if (p === undefined) return;
+      if (!isObj(p) || !EXAMS.includes(p.before) || !(typeof p.chance === 'number' && p.chance > 0 && p.chance <= 1)) {
+        r('.prelude', `ต้องเป็น {before: ${EXAMS.join('|')}, chance: 0–1} ได้ ${JSON.stringify(p)}`);
+        return;
+      }
+      if (e.weight !== undefined || e.at_age !== undefined || e.era !== undefined || e.repeat !== undefined) r('.prelude', 'การ์ดนำห้ามมี weight/at_age/era/repeat — ออกได้ทางเดียวคือก่อนด่าน');
+      const ages = Object.values(TRACKS).filter((t) => t.exam === p.before).map((t) => t.until);
+      const span = STAGE_AGES[e.stage];
+      if (span && !ages.some((a) => a >= span[0] && a <= span[1])) r('.stage', `ด่าน ${p.before} อยู่ที่อายุ ${ages.join('/')} ไม่อยู่ในช่วง ${e.stage}`);
     },
   },
   {

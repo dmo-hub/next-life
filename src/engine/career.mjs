@@ -7,14 +7,18 @@ export const EDU = ['ประถม', 'มัธยม', 'อาชีวะ', 
 export const eduRank = (e) => EDU.indexOf(e) + 1;
 
 // ช่วงเรียน: จบที่อายุ until แล้วได้วุฒิ edu · ช่วงที่มี gate = จบแล้วมีด่านเลือกเรียนต่อ ไม่มี = หางานทันที
+// exam = ชื่อด่านสอบที่การ์ดนำ (prelude.before) ผูกได้ — การ์ดนำเข้าคิวก่อนด่านปีเดียวกัน
 export const TRACKS = {
   primary: { name: 'ประถม', until: 12, edu: 'ประถม', gate: true },
   lower: { name: 'มัธยมต้น', until: 15, edu: 'มัธยม', gate: true },
-  upper: { name: 'มัธยมปลาย', until: 18, edu: 'มัธยม', gate: true },
-  voc: { name: 'ปวช.', until: 18, edu: 'อาชีวะ', gate: true },
+  upper: { name: 'มัธยมปลาย', until: 18, edu: 'มัธยม', gate: true, exam: 'uni_exam' },
+  voc: { name: 'ปวช.', until: 18, edu: 'อาชีวะ', gate: true, exam: 'uni_exam' },
   hvoc: { name: 'ปวส.', until: 20, edu: 'อาชีวะ' },
   uni: { name: 'มหาวิทยาลัย', until: 22, edu: 'อุดมศึกษา' },
 };
+export const EXAMS = [...new Set(Object.values(TRACKS).map((t) => t.exam).filter(Boolean))];
+// ธงที่แกนตั้งเมื่อสอบเข้ามหาวิทยาลัยติด (ทุกทางที่มีการสอบ) — การ์ดแก้บนตอนสอบเข้าอ่านธงนี้ ไม่ติด/ไม่ได้สอบ = ไม่ทวง
+export const EXAM_PASS = 'exam_pass:uni';
 export const SCHOOL_FROM = 6;
 
 const cash = (amount) => ({ unit: 'income_x', amount });
@@ -102,7 +106,7 @@ export function schoolGate(st) {
   }
   // จบ ม.ปลาย หรือ ปวช. — ด่านสุดท้ายก่อนมหาวิทยาลัย
   const exam = (multipliers) => [
-    { weight: 1, ok: true, multipliers, text: 'สอบติดมหาวิทยาลัยรัฐ', effects: { school: 'uni', network: 2, ...pay(0.5) } },
+    { weight: 1, ok: true, multipliers, text: 'สอบติดมหาวิทยาลัยรัฐ', sets_flags: [EXAM_PASS], effects: { school: 'uni', network: 2, ...pay(0.5) } },
     { weight: 1, text: 'สอบไม่ติด ต้องออกหางานทำ', effects: { school: 'none', happiness: -1 } },
   ];
   const uniLock = { money: cash(0.5), reason: 'ค่าเทอมมหาวิทยาลัยไม่พอ' };
@@ -117,7 +121,7 @@ export function schoolGate(st) {
         text: 'สอบชิงทุนเรียนมหาวิทยาลัย',
         requires: { stats: { knowledge: { min: 70 } }, reason: 'คะแนนยังไม่ถึงเกณฑ์ทุน' },
         outcomes: [
-          { weight: 1, ok: true, multipliers: { stats: { knowledge: 2 } }, text: 'ได้ทุนเรียนฟรีจนจบ', effects: { school: 'uni', network: 3 } },
+          { weight: 1, ok: true, multipliers: { stats: { knowledge: 2 } }, text: 'ได้ทุนเรียนฟรีจนจบ', sets_flags: [EXAM_PASS], effects: { school: 'uni', network: 3 } },
           { weight: 2, text: 'พลาดทุน ต้องออกหางานทำ', effects: { school: 'none', happiness: -1 } },
         ],
       },
@@ -128,7 +132,7 @@ export function schoolGate(st) {
         effects: pay(1),
         merit: [{ cat: 'greed_harm', level: 2 }],
         outcomes: [
-          { weight: 3, ok: true, text: 'คนสอบแทนทำคะแนนให้จนติด', effects: { school: 'uni', network: 1, ...pay(0.5) } },
+          { weight: 3, ok: true, text: 'คนสอบแทนทำคะแนนให้จนติด', sets_flags: [EXAM_PASS], effects: { school: 'uni', network: 1, ...pay(0.5) } },
           { weight: 1, text: 'กรรมการตรวจบัตรจับได้ ถูกตัดสิทธิ์สอบ', effects: { school: 'none', happiness: -2, relations: -1 } },
         ],
       },
