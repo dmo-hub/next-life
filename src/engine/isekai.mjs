@@ -725,7 +725,8 @@ export function nextIsekaiCard(isk) {
     isk.ending = isekaiEnding(isk);
     isk.step = 'over';
     return isekaiCard(isk, {
-      step: 'end', title: isk.ending.title, text: `${isk.ending.text} · แล้ววันหนึ่งดวงวิญญาณก็ถูกดึงกลับไปยืนหน้าปรโลก`, ending: isk.ending.id,
+      // การ์ดปรโลกใบถัดไปเล่าเรื่องดวงวิญญาณถูกดึงกลับเอง ใบนี้จึงปิดแค่ชีวิตในโลกนี้ · ตอนจบแบบตายเล่าการตายไว้แล้ว
+      step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : `${isk.ending.text} ชีวิตในโลกนี้ดำเนินต่อไปจนถึงวันสุดท้าย`, ending: isk.ending.id,
       choices: [],
       log: isk.log.slice(),
     });
