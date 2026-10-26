@@ -333,6 +333,8 @@ function lifeTitles(card) {
     card.lifeTitles = { ...t, pattern: t.pattern ?? NO_PATTERN };
     bookAdd(t);
     card.memo = memoAdd(t);
+    // สมุดเต็ม: ผู้เล่นลบแถวแล้วกดกลับ หน้าเดิมถูกคืนทั้งก้อน ไม่วาดใหม่ — ต้องลองลงซ้ำเองตอนกลับ
+    if (card.memo === 'full') card.memoRetry = () => (card.memo = memoAdd(t));
   }
   return card.lifeTitles;
 }
@@ -450,19 +452,26 @@ function eraBox() {
   box.append(eraSeen.length ? list(eraSeen.map((x) => `อายุ ${x.a} · ${eraName(x.id)}`), 'picks') : el('p', 'sub', 'ชีวิตนี้ไม่ทันเห็นเหตุการณ์ใหญ่ของบ้านเมือง'));
   return box;
 }
-function memoFull() {
+function memoFull(card) {
   const box = el('div', 'recap warn');
   box.append(el('p', 'sub', 'สมุดอนุสรณ์เต็ม ชีวิตนี้ยังไม่ได้ลงสมุด — ลบชีวิตเก่าในสมุดออกบ้างแล้วกลับมาที่หน้านี้อีกครั้ง'));
   const b = el('button', 'more', 'เปิดสมุดอนุสรณ์');
-  b.onclick = () => openMemo();
+  b.onclick = () =>
+    openMemo(undefined, () => {
+      if (card.memo === 'full') card.memoRetry?.();
+      if (card.memo !== 'full') box.remove();
+    });
   box.append(b);
   return box;
 }
 
 // เปิดทับหน้าที่อยู่ แล้วคืนหน้าเดิมทั้งก้อนตอนกลับ — ไม่แตะ st ไม่ลงเซฟ
-function openMemo(prev = [...root.childNodes]) {
+function openMemo(prev = [...root.childNodes], onBack) {
   const m = memoRead();
-  const back = () => root.replaceChildren(...prev);
+  const back = () => {
+    root.replaceChildren(...prev);
+    onBack?.();
+  };
   const choices = homeCard('สมุดอนุสรณ์', ['สมุดอนุสรณ์', `ชีวิตที่จบแล้ว ${m.l.length} ชีวิต · เหตุการณ์ในแผ่นดินที่เคยเห็น ${m.e.filter((id) => ERA_EVENTS.some((e) => e.id === id)).length}/${ERA_EVENTS.length}`]);
   root.firstChild.classList.add('memo-view');
   const body = root.querySelector('.body');
@@ -478,7 +487,7 @@ function openMemo(prev = [...root.childNodes]) {
       const now = memoRead();
       now.l = now.l.filter((y) => y.k !== x.k);
       memoWrite(now);
-      openMemo(prev);
+      openMemo(prev, onBack);
     };
     li.append(del);
     ul.append(li);
@@ -491,8 +500,8 @@ function openMemo(prev = [...root.childNodes]) {
       root.firstChild.classList.add('memo-view');
       c.append(button('ลบทั้งเล่ม', null, () => {
         memoWrite({ l: [], e: [] });
-        openMemo(prev);
-      }), enter(button('ยกเลิก', null, () => openMemo(prev))));
+        openMemo(prev, onBack);
+      }), enter(button('ยกเลิก', null, () => openMemo(prev, onBack))));
     }));
   }
 }
@@ -950,7 +959,7 @@ function render(card) {
     const note = notePick(st.gen);
     if (note) body.append(noteQuote(`บันทึกเมื่ออายุ ${note.a}`, note.t));
     body.append(titlesBox(card));
-    if (card.memo === 'full') body.append(memoFull());
+    if (card.memo === 'full') body.append(memoFull(card));
     body.append(eraBox());
     const tree = familyTree();
     if (tree) body.append(tree);
