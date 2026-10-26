@@ -1,7 +1,7 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.31';
+const APP_VERSION = 'v0.2.32';
 const APP_BUILD = '2026-10-26';
 
 const root = document.getElementById('app');
