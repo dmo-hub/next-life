@@ -10,7 +10,8 @@
 |---|---|
 | `docs/index.html` | หน้าแรก (GitHub Pages เสิร์ฟจาก `docs/`) |
 | `docs/overview.html` · `about.html` · `otherworld.html` | ภาพรวมระบบ · กลไกในเกม · หน้าอธิบายต่างโลก — เขียนมือ ตัวเลขใน `data-fact` ถูกฉีดตอน `npm run build` (`src/site/facts.mjs`) |
-| `docs/cards.html` | การ์ดทั้งหมดในเกม — **build สร้างจาก `content/` + แม่แบบ `src/site/cards.html` อย่าแก้ตรง** |
+| `docs/catalog.html` | การ์ดทั้งหมดในเกม — **build สร้างจาก `content/` + แม่แบบ `src/site/catalog.html` อย่าแก้ตรง** |
+| `docs/cards.html` | ต้นแบบการ์ด v2 + ธีม ให้เจ้าของเลือกแนวหน้าตา — เขียนมือ ไม่ใช่หน้าตาจริงในเกม (v1 อยู่ `docs/archive/`) |
 | `docs/whatsnew.html` | แพตช์โน้ต (ผู้รวมงานเขียน) |
 | `docs/img/*.webp` | ภาพหน้าจอจริงบนหน้าแรก/หน้าต่างโลก — `npm run shots` ถ่ายใหม่ + ตรวจล้นจอ 390/1280 ทุกหน้า (ต้องมี playwright-core ในเครื่อง ดูหัวไฟล์ `scripts/shots.mjs`) · `npm run site:check` ตัวเลขบนหน้าตรงข้อมูล · ลิงก์ไม่ตาย · หน้ารวมการ์ดครบและไม่หลุดบุญบาป |
 | `docs/archive/` | หน้าเก่าเก็บไว้อ้างอิง: ต้นแบบการ์ด v1 · ภาพรวมรุ่นใบ 01–14 |

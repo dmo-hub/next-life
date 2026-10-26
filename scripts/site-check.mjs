@@ -18,7 +18,7 @@ const check = (name, bad, extra = '') => {
 };
 
 // 1) ตัวเลขบนหน้า = ค่าที่คิดจากข้อมูลตอนนี้ (หน้าที่ยังไม่ได้ build ใหม่หลังแก้ข้อมูล = ตก)
-const pages = [...FACT_PAGES, 'cards'];
+const pages = [...FACT_PAGES, 'catalog'];
 let seen = 0;
 const wrong = [];
 for (const p of pages) {
@@ -37,7 +37,7 @@ const moved = ['cards', 'titles'].every((k) => probe.includes(`data-fact="${k}">
 check('ตัวควบคุม: ข้อมูลเปลี่ยนแล้วเลขบนหน้าเปลี่ยนตาม', !moved, ` (การ์ด ${facts.cards} → ${f2.cards} · ฉายา ${facts.titles} → ${f2.titles})`);
 
 // 3) ลิงก์ภายในเว็บไม่ตาย (ไฟล์ · รูป · ที่มาจากหน้าใน docs/ และ docs/spec/ ที่หน้าเว็บลิงก์ถึง)
-const all = [...pages, 'whatsnew', 'archive/cards-v1', 'archive/overview-v1'];
+const all = [...pages, 'cards', 'whatsnew', 'archive/cards-v1', 'archive/overview-v1'];
 const dead = [];
 for (const p of all) {
   const html = read(`${p}.html`);
@@ -51,7 +51,7 @@ for (const p of all) {
 check('ลิงก์ภายในไม่ตาย', dead.length, ` ${all.length} หน้า${dead.length ? ` · ตาย ${dead.length}: ${dead.slice(0, 6).join(' | ')}` : ''}`);
 
 // 4) หน้ารวมการ์ด: ครบทุกใบ และไม่มีค่าที่ผู้เล่นไม่เห็นบนจอ
-const cards = read('cards.html');
+const cards = read('catalog.html');
 const shown = (cards.match(/<article class="c /g) ?? []).length;
 check('หน้ารวมการ์ดมีครบทุกใบ', shown !== content.events.length, ` ${shown}/${content.events.length}`);
 const cats = Object.keys(MERIT_WEIGHTS).flatMap((id) => [id, meritName(id)]).filter((s) => s && s !== 'neutral' && s.length > 1);

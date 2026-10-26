@@ -16,8 +16,8 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     if (next !== html) writeFileSync(file, next);
     out.push(name);
   }
-  const cards = injectFacts(readFileSync(at('src/site/cards.html'), 'utf8'), facts, 'src/site/cards.html').replace('<!--__CATALOG__-->', () => catalogHtml(content));
-  writeFileSync(at('docs/cards.html'), cards);
-  out.push('cards');
+  const catalog = injectFacts(readFileSync(at('src/site/catalog.html'), 'utf8'), facts, 'src/site/catalog.html').replace('<!--__CATALOG__-->', () => catalogHtml(content));
+  writeFileSync(at('docs/catalog.html'), catalog);
+  out.push('catalog');
   return { facts, pages: out };
 }
