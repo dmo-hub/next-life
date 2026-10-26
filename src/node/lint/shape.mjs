@@ -9,7 +9,7 @@ import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placehold
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain'],
@@ -149,6 +149,18 @@ export const rules = [
     desc: `การ์ดที่มีตัวเลือกต้องมีอย่างน้อย ${MIN_CHOICES} ตัวเลือก · การ์ดเล่าเรื่องใช้ choices: [] ได้`,
     event(e, ctx, r) {
       if (Array.isArray(e.choices) && e.choices.length && e.choices.length < MIN_CHOICES) r('.choices', `มี ${e.choices.length} ตัวเลือก ต้องมีอย่างน้อย ${MIN_CHOICES}`);
+    },
+  },
+  {
+    id: 'choice-hint',
+    desc: 'hint (บรรทัดรองใต้ตัวเลือก) เป็นข้อความไม่ว่าง บอกข้อแลกเป็นทิศ/ความเสี่ยง — ห้ามตัวเลข ห้ามคำบุญ/บาป/กุศล (ผู้เล่นต้องไม่เห็นค่าหรือบัญชีบุญบาปจากปุ่ม)',
+    event(e, ctx, r) {
+      for (const { c, path } of choicesOf(e)) {
+        if (c.hint === undefined) continue;
+        if (typeof c.hint !== 'string' || !c.hint.trim()) { r(`${path}.hint`, 'hint ต้องเป็นข้อความไม่ว่าง'); continue; }
+        if (/[0-9๐-๙]/.test(c.hint)) r(`${path}.hint`, 'hint ห้ามมีตัวเลข — บอกเป็นทิศ เช่น "อาจเสียเงินก้อนใหญ่"');
+        if (/บุญ|บาป|กุศล/.test(c.hint)) r(`${path}.hint`, 'hint ห้ามบอกบุญบาป');
+      }
     },
   },
   {

@@ -28,7 +28,7 @@ export const rules = [
   },
   {
     id: 'text-length',
-    desc: `ความยาวหลังแทนค่าช่องด้วยค่ายาวสุด: หัวเรื่อง ≤${MAX_LEN.title} · ข้อความการ์ด/ผลสุ่ม ≤${MAX_LEN.text} · ตัวเลือก ≤${MAX_LEN.choice} ตัวอักษร`,
+    desc: `ความยาวหลังแทนค่าช่องด้วยค่ายาวสุด: หัวเรื่อง ≤${MAX_LEN.title} · ข้อความการ์ด/ผลสุ่ม ≤${MAX_LEN.text} · ตัวเลือก ≤${MAX_LEN.choice} · บรรทัดรองของตัวเลือก ≤${MAX_LEN.hint} ตัวอักษร`,
     event(e, ctx, r) {
       for (const { kind, path, s } of textsOf(e)) {
         const n = fillLongest(s).length;

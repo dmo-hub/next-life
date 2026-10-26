@@ -507,9 +507,12 @@ function shareButtons(card) {
   return [share, save];
 }
 
-function button(label, fx, onclick) {
+function button(label, fx, onclick, hint = null) {
   const b = el('button', 'choice');
-  b.append(el('span', null, label));
+  const main = el('span', null, label);
+  // อยู่ในก้อนเดียวกับข้อความตัวเลือก ป้ายผลด้านขวาจึงยังชิดขวาเหมือนการ์ดที่ไม่มีบรรทัดรอง
+  if (hint) main.append(el('small', 'hint', hint));
+  b.append(main);
   if (fx) {
     // ป้ายแต่ละค่าเป็นก้อนเดียว ตัดบรรทัดได้แค่ระหว่างก้อน — ไม่งั้นคำไทยหักกลางคำ
     const tag = el('span', 'fx');
@@ -640,7 +643,7 @@ function render(card) {
       card.choices.forEach((c, i) => {
         const why = card.locked?.[i];
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
-        const b = keyed(button(c, why ?? card.fx?.[i], () => play(lifePick(i))), i);
+        const b = keyed(button(c, why ?? card.fx?.[i], () => play(lifePick(i)), card.hints?.[i]), i);
         if (why) b.disabled = true;
         choices.append(b);
       });
@@ -690,7 +693,7 @@ function renderAfter(card) {
   } else if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
-      const b = keyed(button(c, why ?? card.fx?.[i], () => play(afterPick(i))), i);
+      const b = keyed(button(c, why ?? card.fx?.[i], () => play(afterPick(i)), card.hints?.[i]), i);
       if (why) b.disabled = true;
       choices.append(b);
     });

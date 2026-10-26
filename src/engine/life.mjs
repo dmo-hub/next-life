@@ -660,10 +660,17 @@ function eventCard(st, ev, news = null) {
     title: ev.title ? fill(ev.title, st) : null,
     text: fill(ev.text, st),
     choices: ev.choices.map((c) => fill(c.text, st)),
+    ...choiceHints(ev, st),
     fx: ev.choices.map((c) => choiceFx(st, ev, c)),
     // เหตุผลที่ตัวเลือกกดไม่ได้ (null = กดได้) — หน้าจอแสดงเทาพร้อมเหตุผล
     locked: ev.choices.map((c) => lockReason(st, c)),
   });
+}
+
+// บรรทัดรองบอกข้อแลกใต้ตัวเลือก (B52) — ใส่ช่องเฉพาะการ์ดที่มี hint การ์ดเดิมจึงมีรูปเท่าเดิมทุกช่อง
+export function choiceHints(ev, st) {
+  if (!ev.choices.some((c) => c.hint)) return {};
+  return { hints: ev.choices.map((c) => (c.hint ? fill(c.hint, st) : null)) };
 }
 
 // ตัวเลือกที่ต้องมีเงิน/ค่าสถานะ/ธงถึงจะเลือกได้ (B14 A6) · ข้อความเหตุผลจากเนื้อหาทับข้อความตั้งต้น

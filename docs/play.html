@@ -70,6 +70,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .choice { all:unset; box-sizing:border-box; min-height:52px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; cursor:pointer; font-size:15px; }
 .choice .fx { font-size:12px; text-align:right; flex-shrink:0; max-width:50%; }
 .choice .fx span { white-space:nowrap; }
+/* text-indent สืบทอดจากย่อหน้าแขวนของจอกว้าง — ต้องคืนเป็น 0 ไม่งั้นบรรทัดรองมุดไปใต้เลขปุ่มลัด */
+.choice .hint { display:block; text-indent:0; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
 /* เลขปุ่มลัดเฉพาะจอกว้าง — มือถือไม่มีแป้นเลข เลขจะกินที่ป้ายตัวเลือกเปล่า ๆ */
 @media (min-width:768px) {
   /* ย่อหน้าแขวน: ป้ายยาวตัดบรรทัดแล้วบรรทัดสองตรงกับข้อความ ไม่มุดใต้เลข · 38px = กรอบเลข 28 + ช่องไฟ 10 */
@@ -1868,10 +1870,17 @@ function eventCard(st, ev, news = null) {
     title: ev.title ? fill(ev.title, st) : null,
     text: fill(ev.text, st),
     choices: ev.choices.map((c) => fill(c.text, st)),
+    ...choiceHints(ev, st),
     fx: ev.choices.map((c) => choiceFx(st, ev, c)),
     // เหตุผลที่ตัวเลือกกดไม่ได้ (null = กดได้) — หน้าจอแสดงเทาพร้อมเหตุผล
     locked: ev.choices.map((c) => lockReason(st, c)),
   });
+}
+
+// บรรทัดรองบอกข้อแลกใต้ตัวเลือก (B52) — ใส่ช่องเฉพาะการ์ดที่มี hint การ์ดเดิมจึงมีรูปเท่าเดิมทุกช่อง
+function choiceHints(ev, st) {
+  if (!ev.choices.some((c) => c.hint)) return {};
+  return { hints: ev.choices.map((c) => (c.hint ? fill(c.hint, st) : null)) };
 }
 
 // ตัวเลือกที่ต้องมีเงิน/ค่าสถานะ/ธงถึงจะเลือกได้ (B14 A6) · ข้อความเหตุผลจากเนื้อหาทับข้อความตั้งต้น
@@ -2473,6 +2482,7 @@ function sceneCard(af, ev) {
     title: ev.title ? fill(ev.title, af.st) : null,
     text: fill(ev.text, af.st),
     choices: ev.choices.map((c) => fill(c.text, af.st)),
+    ...choiceHints(ev, af.st),
     fx: ev.choices.map(afterFx),
   });
 }
@@ -3688,9 +3698,12 @@ function shareButtons(card) {
   return [share, save];
 }
 
-function button(label, fx, onclick) {
+function button(label, fx, onclick, hint = null) {
   const b = el('button', 'choice');
-  b.append(el('span', null, label));
+  const main = el('span', null, label);
+  // อยู่ในก้อนเดียวกับข้อความตัวเลือก ป้ายผลด้านขวาจึงยังชิดขวาเหมือนการ์ดที่ไม่มีบรรทัดรอง
+  if (hint) main.append(el('small', 'hint', hint));
+  b.append(main);
   if (fx) {
     // ป้ายแต่ละค่าเป็นก้อนเดียว ตัดบรรทัดได้แค่ระหว่างก้อน — ไม่งั้นคำไทยหักกลางคำ
     const tag = el('span', 'fx');
@@ -3821,7 +3834,7 @@ function render(card) {
       card.choices.forEach((c, i) => {
         const why = card.locked?.[i];
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
-        const b = keyed(button(c, why ?? card.fx?.[i], () => play(lifePick(i))), i);
+        const b = keyed(button(c, why ?? card.fx?.[i], () => play(lifePick(i)), card.hints?.[i]), i);
         if (why) b.disabled = true;
         choices.append(b);
       });
@@ -3871,7 +3884,7 @@ function renderAfter(card) {
   } else if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
-      const b = keyed(button(c, why ?? card.fx?.[i], () => play(afterPick(i))), i);
+      const b = keyed(button(c, why ?? card.fx?.[i], () => play(afterPick(i)), card.hints?.[i]), i);
       if (why) b.disabled = true;
       choices.append(b);
     });

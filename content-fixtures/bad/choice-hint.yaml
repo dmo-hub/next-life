@@ -1,0 +1,12 @@
+# ผิดกติกาเดียว: hint บอกตัวเลข บอกบุญ และเป็นข้อความว่าง
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "หนึ่ง", hint: "อาจเสียเงินสองเท่า 2 ปี", merit: [{cat: neutral}]}
+      - {text: "สอง", hint: "ได้บุญแต่เหนื่อย", merit: [{cat: neutral}]}
+      - {text: "สาม", hint: "", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

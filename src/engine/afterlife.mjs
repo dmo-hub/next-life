@@ -6,7 +6,7 @@ import { makeRng, mixSeed } from './rng.mjs';
 import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
-import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes } from './life.mjs';
+import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints } from './life.mjs';
 
 // ระดับกรรมที่ศาล (−1..1) = บัญชีสุทธิ ÷ ref · ref แยกจากตัวคูณกรรมระหว่างชีวิต (KARMA.ref) เพราะบัญชีทั้งชีวิตสะสมไกลกว่า
 // จุดอิ่มของตัวคูณการตายมาก — ใช้ ref เดียวกันแล้วเกือบทุกคนชนเพดาน ภูมิกับฐานะชาติหน้าจะไม่แยกคน
@@ -106,6 +106,7 @@ function sceneCard(af, ev) {
     title: ev.title ? fill(ev.title, af.st) : null,
     text: fill(ev.text, af.st),
     choices: ev.choices.map((c) => fill(c.text, af.st)),
+    ...choiceHints(ev, af.st),
     fx: ev.choices.map(afterFx),
   });
 }

@@ -30,6 +30,7 @@ events:
         merit: [{cat: neutral}]
       - id: help_parents
         text: "เอาเงินไปช่วยพ่อแม่ก่อน"
+        hint: "พ่อแม่สบายใจ แต่เงินเก็บอาจหายไปเกือบหมด"
         effects: {relations: 2, money: {unit: fixed_baht, amount: -20000, ref_year: 2560}}
         merit: [{cat: care_parents, level: 2}, {cat: dana, level: 1}]
         sets_flags: [married]

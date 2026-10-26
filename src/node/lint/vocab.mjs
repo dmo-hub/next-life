@@ -61,7 +61,8 @@ export const PLACEHOLDERS = {
 export const LEDGER_PLACEHOLDER = /บุญ|บาป|บัญชี|กรรม|ledger|merit|mult|odds/i;
 
 // เพดานความยาว วัดจาก docs/cards.html (การ์ด 420×780) แล้วเผื่อ — เจ้าของเคาะตัวเลขแล้ว
-export const MAX_LEN = { title: 30, text: 240, choice: 32 };
+// hint (บรรทัดรองใต้ตัวเลือก) เลนหน้าจอตั้งเอง: ไม่เกิน 2 บรรทัดใต้ข้อความตัวเลือกที่จอ 390
+export const MAX_LEN = { title: 30, text: 240, choice: 32, hint: 50 };
 // เจ้าของเคาะ: การ์ดที่ให้เลือกต้องมีอย่างน้อย 4 ทาง ไม่มีเพดาน · การ์ดเล่าเรื่อง (0 ตัวเลือก ใบ 07) ยกเว้น
 export const MIN_CHOICES = 4;
 
