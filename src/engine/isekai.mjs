@@ -1,8 +1,10 @@
 // ต่างโลก (B68): ทางที่ 3 ของการ์ดทางเกิด — เทพธิดาต่างโลกพาวิญญาณไปใช้ชีวิตสั้น ๆ ในโลกแฟนตาซี
-// เลือกโลก → เลือกสกิลโกง → 4 บท 9 เหตุการณ์ → ตอนจบ → กลับโลกเดิม (เกิดเป็นคนไทยตามกรรม) หรืออยู่ต่างโลกต่อ
+// เลือกโลก → เลือกสกิลโกง → 4 บท 9 เหตุการณ์ → ตอนจบ → กลับไปให้ปรโลกตัดสิน แล้วการ์ดทางเกิดให้เลือกกลับโลกเดิมหรืออยู่ต่างโลกต่อ
 // ใช้ stream สุ่มของตัวเองจาก seed ของชีวิต — ไม่กินเลขของ af.rng ฉากระหว่างชาติกับการส่งต่อจึงสุ่มได้เหมือนไม่มีต่างโลก
-// กรรมจากศาล (ระดับ −1..1) เป็นตัวตั้งของโลก: บุญมากได้สกิลให้เลือกมากขึ้นและค่าเริ่มดีขึ้น · บาปหนักได้น้อยลงและโลกโหดขึ้น · ไม่มีตัวเลขบัญชีบนการ์ด
+// กรรมจากปรโลก (ระดับ −1..1) เป็นตัวตั้งของโลก: บุญมากได้สกิลให้เลือกมากขึ้นและค่าเริ่มดีขึ้น · บาปหนักได้น้อยลงและโลกโหดขึ้น · ไม่มีตัวเลขบัญชีบนการ์ด
+// บัญชีบุญบาปเป็นของดวงวิญญาณ (ส่วนที่ส่งต่อจากชาติก่อน) — ชาติต่างโลกบันทึกต่อลงบัญชีนั้น แล้วปรโลกตัดสินตอนจบชาติ
 import { makeRng, mixSeed } from './rng.mjs';
+import { newLedger } from './merit.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค' };
 const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
@@ -602,16 +604,17 @@ export function isekaiCalled(st) {
   return makeRng(st.seed ^ ISEKAI_SALT).next() < ISEKAI.chance;
 }
 
-// karma = ระดับกรรมที่ศาล (−1..1) · past = ชื่อชาติไทย · run = รอบที่เท่าไรของการอยู่ต่างโลกติดกัน · memory = ค่าที่ติดตัวมาจากรอบก่อน
-export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false }) {
+// karma = ระดับกรรมที่ปรโลก (−1..1) · past = ชื่อชาติไทย · run = รอบที่เท่าไรของการอยู่ต่างโลกติดกัน · memory = ค่าที่ติดตัวมาจากรอบก่อน
+// ledger = บัญชีที่ดวงวิญญาณพกมา · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = บัญชีเปล่า
+export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, ledger = newLedger() }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
   return {
-    rng, karma, past, run, memory, blessed,
+    rng, karma, past, run, memory, blessed, ledger,
     worldOffers: isekaiShuffle(rng, Object.keys(ISEKAI_WORLDS)).slice(0, ISEKAI.worlds + (blessed ? 1 : 0)),
     skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).slice(0, sk),
     world: null, name: '', skills: [], st: null, flags: {}, queue: [], idx: 0,
-    step: 'world', last: null, rbdUsed: false, dead: false, ending: null, exit: null, log: [], cards: 0,
+    step: 'world', last: null, rbdUsed: false, dead: false, ending: null, log: [], cards: 0,
   };
 }
 
@@ -717,17 +720,17 @@ export function nextIsekaiCard(isk) {
     if (isk.step === 'event') isk.idx++;
     return isekaiCard(isk, { step: 'result', title: r.title, text: r.text, ok: r.ok, stat: r.stat, deltas: r.deltas, sys: r.sys, choices: [] });
   }
+  // ตอนจบเป็นใบสุดท้ายของชาติต่างโลก ไม่มีตัวเลือก — กลับหรืออยู่ต่อเลือกที่การ์ดทางเกิดหลังปรโลกตัดสิน
   if (isk.step === 'end') {
     isk.ending = isekaiEnding(isk);
-    const canStay = isk.run < ISEKAI.stay;
+    isk.step = 'over';
     return isekaiCard(isk, {
-      step: 'end', title: isk.ending.title, text: isk.ending.text, ending: isk.ending.id,
-      choices: ['กลับโลกเดิม ไปเกิดเป็นคนตามกรรม', 'อยู่ต่างโลกต่อ ให้เทพธิดาส่งไปเกิดอีกรอบ'],
-      fx: ['', ''],
-      locked: [null, canStay ? null : 'เทพธิดาบอกว่าวิญญาณนี้อยู่ต่างโลกนานพอแล้ว'],
+      step: 'end', title: isk.ending.title, text: `${isk.ending.text} · แล้ววันหนึ่งดวงวิญญาณก็ถูกดึงกลับไปยืนหน้าปรโลก`, ending: isk.ending.id,
+      choices: [],
       log: isk.log.slice(),
     });
   }
+  if (isk.step === 'over') throw new Error('ชาติต่างโลกจบแล้ว — ปรโลกรับช่วงต่อ');
   const ev = isekaiById[isk.queue[isk.idx].id];
   return isekaiCard(isk, {
     step: 'event', id: ev.id, title: ev.title, text: ev.text, finale: !!ev.finale, index: isk.idx + 1, total: isk.queue.length,
@@ -756,12 +759,6 @@ export function chooseIsekai(isk, idx) {
     if (s === 'luck') isk.st.luk += 15;
     isekaiQueue(isk);
     isk.step = 'event';
-    return;
-  }
-  if (isk.step === 'end') {
-    if (idx === 1 && isk.run >= ISEKAI.stay) throw new Error('ตัวเลือกนี้ล็อกอยู่');
-    if (idx !== 0 && idx !== 1) throw new Error('ตัวเลือกไม่ถูกต้อง');
-    isk.exit = idx === 0 ? 'return' : 'stay';
     return;
   }
   if (isk.step !== 'event') throw new Error('การ์ดนี้ไม่มีตัวเลือก');

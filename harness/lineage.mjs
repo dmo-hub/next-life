@@ -88,21 +88,27 @@ for (const [name, pick] of Object.entries(BOTS)) {
       // สำเนาบัญชีตอนการ์ดส่งต่อ (หลังฉากระหว่างชาติปรับบัญชีครบแล้ว) = บัญชีที่ makeHeir ใช้
       let verdict = null;
       let snap = null;
+      let verdicts = 0;
       const af = playAfterlife(st, pick, (card, a) => {
         const { [REVEAL]: reveal, ...rest } = card;
         for (const k of keys(rest)) if (LEAK.test(k)) leaks++;
         if (card.kind === 'verdict') {
           if (reveal) reveals++;
           verdict = a.verdict;
+          verdicts++;
         } else if (reveal !== undefined) leaks++;
         if (card.kind === 'scene') fired.set(card.id, fired.get(card.id) + 1);
+        // บัญชีที่ปรโลกตัดสินรอบสุดท้าย (a.st.ledger บัญชีเดียวของดวงวิญญาณ) — ชาติไทยคือบัญชีของชีวิต · กลับจากต่างโลกคือบัญชีของชาติต่างโลก (B68)
         if (card.kind === 'carry') snap = { merit: a.st.ledger.merit, sin: a.st.ledger.sin, byCat: { ...a.st.ledger.byCat }, broken: {} };
       });
       afterlives++;
       // การ์ดตาย 1 ใบ + การ์ดที่ระหว่างชาติออก (แกนนับ รวมการ์ดผล)
       const len = 1 + af.cards;
-      lens.push(len);
-      if (len < 6 || len > 10) lenBad++;
+      // ไปต่างโลกมีปรโลกรอบที่สองต่อท้าย (B68) — ช่วงที่ 7 ยาว 6–10 วัดเฉพาะชีวิตที่ไม่ข้ามโลก
+      if (!af.isekaiLives.length) {
+        lens.push(len);
+        if (len < 6 || len > 10) lenBad++;
+      }
       r.realms[verdict.realm.name] = (r.realms[verdict.realm.name] ?? 0) + 1;
       r.paths[af.path]++;
       const h = af.heir;
@@ -145,6 +151,8 @@ for (const [name, pick] of Object.entries(BOTS)) {
       wantGen = st.gen + 1 + af.isekaiLives.length;
       if (af.isekaiLives.length) isekaiLives += af.isekaiLives.length;
       if (af.isekaiLives.length && h.lineage.length !== (st.lineage?.length ?? 0) + 1 + af.isekaiLives.length) isekaiBad++;
+      // ปรโลกตัดสินทุกชาติ: ชาติไทย 1 ครั้ง + ชาติต่างโลกละ 1 ครั้ง (B68 วงเดียว)
+      if (verdicts !== 1 + af.isekaiLives.length) isekaiBad++;
       st = nextLife(af);
       if (af.path === 'child' && st.familyOcc !== lastJob) occBad++;
       if (af.path === 'child' && st.province !== lastProv) provBad++;
@@ -182,8 +190,9 @@ const check = (label, bad, extra = '') => {
   if (bad) fails.push(label);
 };
 console.log('');
-check(`ช่วงที่ 7 ยาว 6–10 การ์ด (นับการ์ดตาย) ${afterlives.toLocaleString('en-US')} ครั้ง`, lenBad, ` · p5 ${q(0.05)} · p50 ${q(0.5)} · p95 ${q(0.95)} · สูงสุด ${lens.at(-1)}`);
-check('เฉลยบัญชีบนการ์ดปรโลกทุกครั้ง', afterlives - reveals);
+check(`ช่วงที่ 7 ยาว 6–10 การ์ด (นับการ์ดตาย) ${lens.length.toLocaleString('en-US')} ครั้ง`, lenBad, ` · p5 ${q(0.05)} · p50 ${q(0.5)} · p95 ${q(0.95)} · สูงสุด ${lens.at(-1)}`);
+// การ์ดปรโลก 1 ใบต่อชาติ — ชาติต่างโลกก็เฉลยบัญชีที่ปรโลกเหมือนชาติไทย
+check('เฉลยบัญชีบนการ์ดปรโลกทุกครั้ง', afterlives + isekaiLives - reveals);
 check('ค่าบัญชีไม่ออกนอกการ์ดปรโลก', leaks);
 check(`ส่งต่อ ${CARRY.min * 100}–${CARRY.max * 100}% ตรงสูตร (หักฝั่งที่ชี้ปลายทางก่อน)`, carryBad);
 check('หนี้ไม่ตกถึงลูก · มรดกไม่ติดลบ', debtLeak);
@@ -208,7 +217,7 @@ const desc = (k) => tm.every((t, i) => !i || !(t[k] > tm[i - 1][k]));
 check('ส่งต่อบุญบาป ลูก ≥ หลาน ≥ เหลน', desc('carry') ? 0 : 1);
 check('มรดก ลูก ≥ หลาน ≥ เหลน', desc('legacy') ? 0 : 1);
 check('ความสัมพันธ์/คอนเน็คชั่นจากบ้าน ลูก ≥ หลาน ≥ เหลน', desc('kin') ? 0 : 1);
-check('ต่างโลกเกิดได้จริง แต่ละชีวิตลงผังตระกูลเป็นรุ่นของตัวเอง', isekaiBad + (isekaiLives ? 0 : 1), ` ${isekaiLives} ชีวิต`);
+check('ต่างโลกเกิดได้จริง ลงผังตระกูลรุ่นละชาติ และปรโลกตัดสินทุกชาติ', isekaiBad + (isekaiLives ? 0 : 1), ` ${isekaiLives} ชีวิต`);
 if (!sceneIds.length) fails.push('ไม่มีฉากระหว่างชาติในเนื้อหา');
 if (fails.length) {
   for (const x of fails) console.log(`  ✗ ${x}`);

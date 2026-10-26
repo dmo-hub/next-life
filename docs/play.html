@@ -222,8 +222,32 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .mem .body .dates { margin-top:-6px; }
 .mem .choice { border-color:#1F1F1F; }
 
+/* ทาง C ต่างโลก (B68) — หน้าต่างสถานะแบบเกม: พื้นฟ้ากลางคืน กรอบฟ้าเรือง · ต่างจากสองแนวไทยให้รู้ว่าออกจากวงเวียนเดิมแล้ว */
+.i { background:#161A3A; color:#E8ECFF; border:1px solid #3B4BA8; }
+.i .top { border-bottom:1px solid #3B4BA8; }
+.i .top b { font-family:Pridi,serif; font-size:18px; font-weight:600; color:#6FE3FF; }
+.i .top small, .i .note, .i .tree summary { color:#A6AEDB; }
+.i .kicker { color:#B48CFF; letter-spacing:0.06em; }
+.i .body h3 { font-family:Pridi,serif; font-weight:600; color:#E8ECFF; }
+.i .body p, .i .picks { color:#D3D8F5; }
+.i .choice { border:1px solid #3B4BA8; border-radius:6px; background:#0E1024; color:#E8ECFF; }
+.i .choice:hover, .i .choice:focus-visible { border-color:#6FE3FF; background:#1E2350; outline:none; }
+.i .choice .fx { color:#6FE3FF; }
+.i .idesc { display:block; text-indent:0; margin-top:2px; font-size:12px; color:#A6AEDB; }
+.i .iok { color:#5EE6A0; font-weight:600; } .i .ibad { color:#FF8A8A; font-weight:600; }
+.i .isys { font-size:13px; color:#F2C94C; border:1px dashed #F2C94C; border-radius:6px; padding:6px 10px; }
+.iwin { margin:12px 20px 0; padding:10px 12px; border:1px solid #2A3478; border-radius:8px; background:#0E1024; display:flex; flex-direction:column; gap:8px; font-size:12px; color:#A6AEDB; }
+.irow { display:flex; justify-content:space-between; }
+.ibar { height:8px; border-radius:999px; background:#05060F; overflow:hidden; }
+.ibar i { display:block; height:100%; }
+.ibar.hp i { background:#FF6B6B; } .ibar.goal i { background:#B48CFF; }
+.istats { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:6px; }
+.istats div { display:flex; flex-direction:column; align-items:center; border:1px solid #2A3478; border-radius:6px; padding:2px; }
+.istats b { font-size:16px; color:#E8ECFF; }
+.ichips { display:flex; flex-wrap:wrap; gap:6px; }
+.ichip { padding:1px 8px; border:1px solid #F2C94C; border-radius:999px; color:#F2C94C; }
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
-.a .choice:disabled, .b .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
+.a .choice:disabled, .b .choice:disabled, .i .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
 
 /* ธีมสว่าง (B83b T2 · B83c): ค่าเริ่มตอนมีชีวิต ทับทุกแนวการ์ดยกเว้นปรโลก (.af มืดทองเสมอ) · ทุกกฎขึ้นต้น .light จึงเจาะจงกว่ากฎของแนว และวางท้ายสุด */
 html.light { --page:#EDEDED; }
@@ -234,35 +258,35 @@ html.light { --page:#EDEDED; }
 .light .theme button { border-color:#8A8A8A; color:#3A3F4B; }
 .light .theme button[aria-pressed="true"] { background:#16181D; border-color:#16181D; color:#FFFFFF; }
 .light .theme button:focus-visible { outline-color:#16181D; }
-.light .card:not(.af) { background:#FFFFFF; color:#16181D; border:1px solid #C8C8C8; outline:none; }
-.light .card:not(.af) .top { background:#F0F0F0; color:#16181D; border-bottom:1px solid #C8C8C8; }
-.light .card:not(.af) .top b { font-family:Sarabun,sans-serif; font-size:16px; font-weight:600; color:#16181D; }
-.light .card:not(.af) .top small, .light .card:not(.af) .stats, .light .card:not(.af) .meta, .light .card:not(.af) .sub, .light .card:not(.af) .note, .light .card:not(.af) .body .horo,
-.light .card:not(.af) .stat-help, .light .card:not(.af) .stat-help dd { color:#3A3F4B; }
-.light .card:not(.af) .stat-help dt, .light .card:not(.af) .recap .h { color:#16181D; }
-.light .card:not(.af) .stats { border-bottom:1px solid #E6E6E6; }
-.light .card:not(.af) .bar { background:#E6E6E6; } .light .card:not(.af) .bar i { background:#1F6B5E; } .light .card:not(.af) .bar b { background:#B23A2A; }
-.light .card:not(.af) .kicker { color:#B23A2A; }
-.light .card:not(.af) .body h3 { font-family:Sarabun,sans-serif; font-weight:600; font-size:24px; color:#16181D; }
-.light .card:not(.af) .body h3.lead { font-weight:400; font-size:19px; }
-.light .card:not(.af) .body p, .light .card:not(.af) .items, .light .card:not(.af) .picks, .light .card:not(.af) .tree summary, .light .card:not(.af) .family summary { color:#3A3F4B; }
-.light .card:not(.af) .stamp { border:2px solid #B23A2A; color:#B23A2A; }
-.light .card:not(.af) .recap, .light .card:not(.af) .lifechart { border:1px solid #C8C8C8; background:#FAFAFA; }
-.light .card:not(.af) .scene { background:#F0F0F0; border-bottom-color:#C8C8C8; }
-.light .card:not(.af) .scale > div { border-color:#C8C8C8; } .light .card:not(.af) .scale > div.heavy { border-color:#1F6B5E; }
-.light .card:not(.af) .scale b { font-family:Sarabun,sans-serif; color:#16181D; } .light .card:not(.af) .scale .sum { color:#16181D; }
-.light .card:not(.af) .deeds { border-top-color:#C8C8C8; } .light .card:not(.af) .deed { color:#3A3F4B; }
-.light .card:not(.af) .deed b { color:#1F6B5E; } .light .card:not(.af) .deed.bad b { color:#B23A2A; }
-.light .card:not(.af) .band0 { fill:#F0F0F0; fill-opacity:1; }
-.light .card:not(.af) .ln0 { stroke:var(--red); } .light .card:not(.af) .ln1 { stroke:var(--bronze2); } .light .card:not(.af) .ln2 { stroke:var(--blue); } .light .card:not(.af) .ln3 { stroke:var(--green); } .light .card:not(.af) .ln4 { stroke:#16181D; }
-.light .card:not(.af) .choice { border:1px solid #16181D; background:#FFFFFF; color:#16181D; }
-.light .card:not(.af) .choice:hover, .light .card:not(.af) .choice:focus-visible { background:#16181D; border-color:#16181D; color:#FFFFFF; outline:none; }
-.light .card:not(.af) .choice .fx { color:#1F6B5E; } .light .card:not(.af) .choice:hover .fx, .light .card:not(.af) .choice:focus-visible .fx { color:#CFE3E0; }
-.light .card:not(.af) .sg.su { stroke:#1F6B5E; } .light .card:not(.af) .sg.sd { stroke:#B23A2A; } .light .card:not(.af) .sg.se { stroke:#3A3F4B; }
-.light .card:not(.af) .spark text, .light .card:not(.af) .mk-cap, .light .card:not(.af) .lifechart .h { fill:#3A3F4B; color:#3A3F4B; } .light .card:not(.af) .spark .grid { stroke:#C8C8C8; }
-.light .card:not(.af) .spark .mk.ev circle, .light .card:not(.af) .spark .mk.nx circle { fill:#FFFFFF; stroke:#16181D; }
-.light .card:not(.af) .spark .mk.broke rect, .light .card:not(.af) .legend .mk.broke rect { fill:#B23A2A; stroke:#16181D; }
-.light .card:not(.af) .choice:disabled { opacity:0.45; background:transparent; color:inherit; border-style:dashed; }
+.light .card:not(.af):not(.i) { background:#FFFFFF; color:#16181D; border:1px solid #C8C8C8; outline:none; }
+.light .card:not(.af):not(.i) .top { background:#F0F0F0; color:#16181D; border-bottom:1px solid #C8C8C8; }
+.light .card:not(.af):not(.i) .top b { font-family:Sarabun,sans-serif; font-size:16px; font-weight:600; color:#16181D; }
+.light .card:not(.af):not(.i) .top small, .light .card:not(.af):not(.i) .stats, .light .card:not(.af):not(.i) .meta, .light .card:not(.af):not(.i) .sub, .light .card:not(.af):not(.i) .note, .light .card:not(.af):not(.i) .body .horo,
+.light .card:not(.af):not(.i) .stat-help, .light .card:not(.af):not(.i) .stat-help dd { color:#3A3F4B; }
+.light .card:not(.af):not(.i) .stat-help dt, .light .card:not(.af):not(.i) .recap .h { color:#16181D; }
+.light .card:not(.af):not(.i) .stats { border-bottom:1px solid #E6E6E6; }
+.light .card:not(.af):not(.i) .bar { background:#E6E6E6; } .light .card:not(.af):not(.i) .bar i { background:#1F6B5E; } .light .card:not(.af):not(.i) .bar b { background:#B23A2A; }
+.light .card:not(.af):not(.i) .kicker { color:#B23A2A; }
+.light .card:not(.af):not(.i) .body h3 { font-family:Sarabun,sans-serif; font-weight:600; font-size:24px; color:#16181D; }
+.light .card:not(.af):not(.i) .body h3.lead { font-weight:400; font-size:19px; }
+.light .card:not(.af):not(.i) .body p, .light .card:not(.af):not(.i) .items, .light .card:not(.af):not(.i) .picks, .light .card:not(.af):not(.i) .tree summary, .light .card:not(.af):not(.i) .family summary { color:#3A3F4B; }
+.light .card:not(.af):not(.i) .stamp { border:2px solid #B23A2A; color:#B23A2A; }
+.light .card:not(.af):not(.i) .recap, .light .card:not(.af):not(.i) .lifechart { border:1px solid #C8C8C8; background:#FAFAFA; }
+.light .card:not(.af):not(.i) .scene { background:#F0F0F0; border-bottom-color:#C8C8C8; }
+.light .card:not(.af):not(.i) .scale > div { border-color:#C8C8C8; } .light .card:not(.af):not(.i) .scale > div.heavy { border-color:#1F6B5E; }
+.light .card:not(.af):not(.i) .scale b { font-family:Sarabun,sans-serif; color:#16181D; } .light .card:not(.af):not(.i) .scale .sum { color:#16181D; }
+.light .card:not(.af):not(.i) .deeds { border-top-color:#C8C8C8; } .light .card:not(.af):not(.i) .deed { color:#3A3F4B; }
+.light .card:not(.af):not(.i) .deed b { color:#1F6B5E; } .light .card:not(.af):not(.i) .deed.bad b { color:#B23A2A; }
+.light .card:not(.af):not(.i) .band0 { fill:#F0F0F0; fill-opacity:1; }
+.light .card:not(.af):not(.i) .ln0 { stroke:var(--red); } .light .card:not(.af):not(.i) .ln1 { stroke:var(--bronze2); } .light .card:not(.af):not(.i) .ln2 { stroke:var(--blue); } .light .card:not(.af):not(.i) .ln3 { stroke:var(--green); } .light .card:not(.af):not(.i) .ln4 { stroke:#16181D; }
+.light .card:not(.af):not(.i) .choice { border:1px solid #16181D; background:#FFFFFF; color:#16181D; }
+.light .card:not(.af):not(.i) .choice:hover, .light .card:not(.af):not(.i) .choice:focus-visible { background:#16181D; border-color:#16181D; color:#FFFFFF; outline:none; }
+.light .card:not(.af):not(.i) .choice .fx { color:#1F6B5E; } .light .card:not(.af):not(.i) .choice:hover .fx, .light .card:not(.af):not(.i) .choice:focus-visible .fx { color:#CFE3E0; }
+.light .card:not(.af):not(.i) .sg.su { stroke:#1F6B5E; } .light .card:not(.af):not(.i) .sg.sd { stroke:#B23A2A; } .light .card:not(.af):not(.i) .sg.se { stroke:#3A3F4B; }
+.light .card:not(.af):not(.i) .spark text, .light .card:not(.af):not(.i) .mk-cap, .light .card:not(.af):not(.i) .lifechart .h { fill:#3A3F4B; color:#3A3F4B; } .light .card:not(.af):not(.i) .spark .grid { stroke:#C8C8C8; }
+.light .card:not(.af):not(.i) .spark .mk.ev circle, .light .card:not(.af):not(.i) .spark .mk.nx circle { fill:#FFFFFF; stroke:#16181D; }
+.light .card:not(.af):not(.i) .spark .mk.broke rect, .light .card:not(.af):not(.i) .legend .mk.broke rect { fill:#B23A2A; stroke:#16181D; }
+.light .card:not(.af):not(.i) .choice:disabled { opacity:0.45; background:transparent; color:inherit; border-style:dashed; }
 </style>
 </head>
 <body>
@@ -2568,10 +2592,813 @@ function beliefChoice(st, ev, c) {
 // จำนวนครั้งที่เลือกทำกิจกรรมสายมูในชีวิตนี้ — แกน ④ ทางโลก ↔ ทางธรรม ของฉายา (ใบ 04) อ่าน
 const beliefActs = (st) => st.belief?.acts ?? 0;
 
+// ต่างโลก (B68): ทางที่ 3 ของการ์ดทางเกิด — เทพธิดาต่างโลกพาวิญญาณไปใช้ชีวิตสั้น ๆ ในโลกแฟนตาซี
+// เลือกโลก → เลือกสกิลโกง → 4 บท 9 เหตุการณ์ → ตอนจบ → กลับไปให้ปรโลกตัดสิน แล้วการ์ดทางเกิดให้เลือกกลับโลกเดิมหรืออยู่ต่างโลกต่อ
+// ใช้ stream สุ่มของตัวเองจาก seed ของชีวิต — ไม่กินเลขของ af.rng ฉากระหว่างชาติกับการส่งต่อจึงสุ่มได้เหมือนไม่มีต่างโลก
+// กรรมจากปรโลก (ระดับ −1..1) เป็นตัวตั้งของโลก: บุญมากได้สกิลให้เลือกมากขึ้นและค่าเริ่มดีขึ้น · บาปหนักได้น้อยลงและโลกโหดขึ้น · ไม่มีตัวเลขบัญชีบนการ์ด
+// บัญชีบุญบาปเป็นของดวงวิญญาณ (ส่วนที่ส่งต่อจากชาติก่อน) — ชาติต่างโลกบันทึกต่อลงบัญชีนั้น แล้วปรโลกตัดสินตอนจบชาติ
+
+
+const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค' };
+const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
+// ค่าตั้งของเกม: stay = อยู่ต่างโลกต่อติดกันได้กี่รอบ (กันบอทวนไม่จบ) · chance = โอกาสเทพธิดาโผล่เองตอนถึงทางเกิด
+// karma* = ผลของระดับกรรมต่อโลก · skills = จำนวนสกิลให้เลือกปกติ · memory = ค่าที่ติดตัวไปชาติต่างโลกถัดไป
+const ISEKAI = { stay: 2, chance: 0.2, skills: 3, worlds: 3, karmaStat: 3, karmaDc: 4, karmaSkill: 0.3, memory: 3, events: [1, 3, 3] };
+const ISEKAI_SALT = 0x15e4a1;
+
+const ISEKAI_SKILLS = {
+  appraise: { name: 'ประเมินค่า', desc: 'มองทะลุของและคน · ตัวเลือกสายสังเกต +20%', tag: 'appraise' },
+  storage: { name: 'กล่องมิติไร้ขีดจำกัด', desc: 'เก็บได้ทุกอย่าง · ค้าขาย +20% · ได้ทองเพิ่มครึ่งเท่า', tag: 'trade' },
+  allmagic: { name: 'เวททุกธาตุ', desc: 'ร่ายได้ครบไฟ น้ำ ลม ดิน แสง มืด · ตัวเลือกเวท +20%', tag: 'magic' },
+  sword: { name: 'วิชาดาบศักดิ์สิทธิ์', desc: 'ดาบเดียวผ่าภูเขา · ตัวเลือกต่อสู้ +20%', tag: 'fight' },
+  tongue: { name: 'ลิ้นทองเทวี', desc: 'พูดได้ทุกภาษา คนฟังแล้วเคลิ้ม · ตัวเลือกเจรจา +20%', tag: 'talk' },
+  cook: { name: 'ฝีมือครัวจากโลกเดิม', desc: 'รสมือแม่ค้าตลาดนัด · ตัวเลือกทำอาหาร +25%', tag: 'cook', add: 25 },
+  stealth: { name: 'ซ่อนตัวระดับเทพ', desc: 'ไม่มีใครสังเกตเห็น · ตัวเลือกแอบ/หนี +20%', tag: 'sneak' },
+  regen: { name: 'ฟื้นฟูอัตโนมัติ', desc: 'HP ฟื้น +6 ทุกเหตุการณ์' },
+  exp: { name: 'ประสบการณ์ ×2', desc: 'ค่าสถานะที่ได้เพิ่มเป็นสองเท่า' },
+  luck: { name: 'โชคเทพธิดา', desc: 'โชค +15 ตั้งแต่เกิด' },
+  rbd: { name: 'ย้อนเวลาเมื่อตาย', desc: 'ตายครั้งแรกเวลาจะย้อนกลับ ฟื้นด้วย HP 40' },
+};
+
+const ISEKAI_WORLDS = {
+  hero: {
+    name: 'ผู้กล้าที่ถูกอัญเชิญ', pitch: 'ถูกเรียกมาพร้อมคนแปลกหน้าอีกสามคนจากโลกเดิม พระราชาขอให้ปราบจอมมาร',
+    goal: 'เส้นทางสู่จอมมาร', start: { str: 12, mag: 10, cha: 9, luk: 8, gold: 100 },
+    names: ['ผู้กล้า{p}', 'อัศวินแห่งแสง {p}', '{p} ผู้ถูกเลือก'], intro: 'h0', finale: 'h9', special: ['peacewin', 'peace'],
+    end: {
+      best: ['ผู้กล้าผู้กอบกู้โลก', 'จอมมารล้มลงกลางห้องบัลลังก์ดำ เสียงระฆังดังทั่วทวีป ชื่อคุณถูกสลักไว้บนกำแพงเมืองหลวง'],
+      peace: ['ผู้กล้าผู้ยุติสงครามพันปี', 'ไม่มีใครต้องตาย จอมมารจับมือกับพระราชาต่อหน้าทั้งสองกองทัพ เด็ก ๆ ทั้งสองเผ่าโตมาโดยไม่รู้จักสงคราม'],
+      good: ['ผู้กล้าที่รอดกลับมา', 'จอมมารยังไม่ตาย แต่คุณทำให้มันถอยไปได้อีกร้อยปี ได้บ้านหลังเล็กกับเบี้ยบำนาญที่พอใช้'],
+      bad: ['ผู้กล้าที่ถูกลืม', 'อาณาจักรอัญเชิญผู้กล้าคนใหม่มาแทน คุณกลายเป็นนักผจญภัยแรงค์ C ที่เล่าเรื่องเก่าในโรงเตี๊ยม'],
+    },
+  },
+  noble: {
+    name: 'ลูกขุนนางบ้านนอก', pitch: 'เกิดใหม่เป็นลูกชายคนที่สามของบารอนชายแดน จำชาติก่อนได้ทุกอย่าง',
+    goal: 'ชื่อเสียงตระกูล', start: { str: 9, mag: 12, cha: 10, luk: 9, gold: 200 },
+    names: ['อัลเลน ฟอน ไฮเดล', 'ลูคัส เดอ วาลมอนต์', 'เอริค ฟอน เบิร์ก'], intro: 'n0', finale: 'n9', special: ['princess', 'princess'],
+    end: {
+      best: ['ดยุคคนใหม่แห่งอาณาจักร', 'จากลูกคนที่สามที่ไม่มีใครคาดหวัง คุณได้ดินแดนครึ่งภาคเหนือ ชาวบ้านเรียกยุคนี้ว่ายุคทอง'],
+      princess: ['ราชบุตรเขยผู้ปฏิรูปแผ่นดิน', 'เจ้าหญิงที่เคยปลอมตัวมาเรียนจับมือคุณขึ้นยืนข้างบัลลังก์ อาณาจักรได้ทั้งระบบชลประทานและโรงเรียนสำหรับสามัญชน'],
+      good: ['ลอร์ดผู้ครองเมืองชายแดน', 'ได้ตำแหน่งเจ้าเมืองเล็ก ๆ ที่ข้าวออกรวงดีที่สุดในแคว้น พี่ชายคนโตยอมรับคุณในที่สุด'],
+      bad: ['ลูกขุนนางผู้เกือบดัง', 'ชื่อคุณเกือบถูกจารึก แต่ประวัติศาสตร์จำแค่ชื่อพี่ชาย คุณกลับไปเลี้ยงแกะที่ชายแดน ซึ่งก็ไม่แย่เท่าไร'],
+    },
+  },
+  monster: {
+    name: 'เกิดเป็นสไลม์', pitch: 'ลืมตาไม่ได้ เพราะไม่มีตา ไม่มีแขน ไม่มีขา คุณเป็นสไลม์ในถ้ำชื้น ๆ',
+    goal: 'วิวัฒนาการ', start: { str: 8, mag: 11, cha: 8, luk: 11, gold: 0 },
+    names: ['สไลม์ชื่อ{p}', '{p} เดอะ สไลม์', 'สไลม์ฟ้า{p}'], intro: 'm0', finale: 'm9', special: ['devour', 'devour'],
+    end: {
+      best: ['จอมมารผู้ใจดี', 'สหพันธ์มอนสเตอร์ของคุณมีถนน มีโรงอาบน้ำ และมีสนธิสัญญากับมนุษย์ทุกอาณาจักร คนเรียกคุณว่าจอมมาร แต่เด็ก ๆ เรียกว่าท่านสไลม์'],
+      devour: ['ผู้กลืนกินโลก', 'สองกองทัพหายไปในร่างคุณ สงครามจบ เพราะไม่เหลือใครให้รบ ทุกอาณาจักรส่งเครื่องบรรณาการมาให้ด้วยความกลัว'],
+      good: ['นายท่านของหมู่บ้านก็อบลิน', 'หมู่บ้านเล็กกลางป่าที่ทุกตัวมีชื่อ มีแปลงผัก และมีคุณนอนแผ่อยู่กลางลาน'],
+      bad: ['สไลม์ธรรมดาที่เคยฝัน', 'คุณกลับไปอยู่ถ้ำเดิม ดูดตะไคร่เงียบ ๆ บางคืนยังฝันถึงตึกสูงกับข้าวมันไก่'],
+    },
+  },
+  villainess: {
+    name: 'นางร้ายในเกมจีบหนุ่ม', pitch: 'ตื่นมาเป็นท่านหญิงเรเวียน่า อายุ 8 ขวบ ในเกมที่เคยเล่นจบ ทุกเส้นทางของนางร้ายจบที่ถูกเนรเทศหรือแย่กว่านั้น',
+    goal: 'หนีธงหายนะ', start: { str: 7, mag: 11, cha: 13, luk: 9, gold: 500 },
+    names: ['ท่านหญิงเรเวียน่า', 'เลดี้เรเวียน่า', 'เรเวียน่า ฟอน โรเซนเบิร์ก'], intro: 'v0', finale: 'v9', special: ['heroine', 'heroine'],
+    end: {
+      best: ['ท่านหญิงผู้หักธงทุกเส้น', 'งานเต้นรำจบโดยไม่มีใครถูกประหาร คุณถอนหมั้นอย่างสง่างาม แล้วเปิดบริษัทการค้าที่ใหญ่ที่สุดในเมืองหลวง'],
+      heroine: ['เพื่อนรักของนางเอก', 'นางเอกยืนข้างคุณต่อหน้าทุกคน เกมต้นฉบับไม่เคยมีฉากนี้ ทั้งสองไปเรียนต่อต่างแดนด้วยกัน'],
+      good: ['นางร้ายผู้ทำฟาร์มสุขสันต์', 'ถูกส่งไปอยู่บ้านพักชายแดนตามบท แต่คุณปลูกผัก เลี้ยงไก่ และมีความสุขกว่าตอนอยู่วังทุกวัน'],
+      bad: ['ธงหายนะทำงาน', 'บทเดิมเดินตามทุกฉาก คุณถูกส่งไปอารามบนเขาเย็นเฉียบ อย่างน้อยแม่ชีที่นั่นใจดี'],
+    },
+  },
+  slowlife: {
+    name: 'สโลว์ไลฟ์ชายป่า', pitch: 'เทพธิดาส่งคุณมาผิดคิว เลยชดเชยด้วยบ้านเล็กชายป่ากับคำสัญญาว่าจะได้อยู่สบาย ๆ',
+    goal: 'ร้านในฝัน', start: { str: 9, mag: 9, cha: 12, luk: 12, gold: 150 },
+    names: ['คุณ{p}แห่งชายป่า', 'เจ้าของร้าน{p}', 'แม่ครัว{p}'], intro: 's0', finale: 's9', special: ['fenrir', 'fenrir'],
+    end: {
+      best: ['เจ้าของร้านในตำนาน', 'ร้านเล็กชายป่ามีคิวยาวถึงเมืองหลวง มังกรตัวนั้นกลายเป็นลูกค้าประจำทุกวันพุธ'],
+      fenrir: ['ผู้เลี้ยงหมาป่าเทพ', 'เฟนรีร์นอนเฝ้าหน้าร้าน ไม่มีโจรกล้าเข้าใกล้หมู่บ้านอีกเลย คุณได้นอนกลางวันทุกวันโดยไม่ต้องล็อกประตู'],
+      good: ['ชีวิตชายป่าที่อบอุ่น', 'ร้านไม่ใหญ่ แต่ลูกค้าประจำรู้จักชื่อคุณ ตอนเย็นนั่งดูพระอาทิตย์สองดวงตกพร้อมชาร้อน'],
+      bad: ['สโลว์ไลฟ์ที่ไม่สโลว์', 'ร้านปิด หมู่บ้านต้องย้าย คุณไปตั้งแผงข้าวไข่เจียวใหม่ในเมืองที่ไม่มีใครรู้จักชื่อร้าน'],
+    },
+  },
+};
+const ISEKAI_DEATH = ['ตายอีกครั้งในต่างโลก', 'ร่างนี้จากไปกลางทาง เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ'];
+
+// stat ว่าง = ไม่ทอยเต๋า · need = ต้องมีทองถึงกดได้ · bonus/bonus2 = ธงที่ทำให้ง่ายขึ้น · flag ของตัวเลือกไม่ทอย = ติดทันที
+const ISEKAI_EVENTS = [
+  // ─── ผู้กล้า ───
+  { id: 'h0', worlds: ['hero'], ch: [1], title: 'วงเวทกลางห้องบัลลังก์',
+    text: 'แสงวงเวทจางลง คุณยืนอยู่กลางห้องหินอ่อน พระราชาเคราขาวประกาศว่า "ท่านคือผู้กล้าที่จะปราบจอมมาร" อีกสามคนข้างคุณยังงงไม่ต่างกัน',
+    choices: [
+      { t: '"ข้าจะเป็นผู้กล้า!"', fx: { fame: 10, goal: 10, str: 2 }, text: 'พระราชาพอใจ มอบดาบประจำราชวงศ์ให้ ทื่อไปนิด แต่สวย' },
+      { t: 'ขอเปิดหน้าต่างสถานะดูก่อน', stat: 'mag', tag: 'appraise', dc: 8,
+        win: { fx: { mag: 3, goal: 5 }, flag: 'wary', text: 'คุณเห็นบรรทัดเล็ก ๆ ว่า "อยู่ใต้เวทชักจูงใจ" เลยเริ่มระวังพระราชาตั้งแต่วันแรก' },
+        lose: { fx: { luk: 1 }, text: 'ตัวหนังสือเป็นภาษาของโลกนี้ อ่านไม่ออกสักตัว' } },
+      { t: 'ต่อรองค่าตัวก่อนรับงาน', stat: 'cha', tag: 'talk', dc: 10,
+        win: { fx: { gold: 300 }, text: 'ได้เงินล่วงหน้าเป็นถุงหนัก ขุนนางคลังหน้าซีด' },
+        lose: { fx: { fame: -5 }, text: 'ขุนนางทั้งห้องมองค้อน "ผู้กล้าอะไรเห็นแก่เงิน"' } },
+    ] },
+  { id: 'h1', worlds: ['hero'], ch: [1, 2], title: 'ลานฝึกของอัศวินหญิง',
+    text: 'หัวหน้าอัศวินหญิงโยนดาบไม้มาให้ "ผู้กล้าที่ถือดาบไม่เป็นก็แค่คนธรรมดา"',
+    choices: [
+      { t: 'ฟันกันจริงจัง', stat: 'str', tag: 'fight', dc: 10,
+        win: { fx: { str: 4, fame: 5 }, text: 'คุณปัดดาบเธอหลุดมือ ทั้งลานเงียบกริบ เธอยิ้มเป็นครั้งแรก' },
+        lose: { fx: { hp: -15, str: 1 }, text: 'โดนฟาดหลังจนจุก แต่เริ่มรู้แล้วว่าต้องยืนเท้าแบบไหน' } },
+      { t: 'ขอไปเรียนเวทกับจอมเวทราชสำนักแทน', stat: 'mag', tag: 'magic', dc: 10,
+        win: { fx: { mag: 4 }, text: 'ลูกไฟลูกแรกของคุณเผาหนวดจอมเวทไปครึ่งข้าง เขาภูมิใจมาก' },
+        lose: { fx: { hp: -10, mag: 1 }, text: 'มานาย้อนกลับ ผมคุณตั้งชี้ฟ้าไปสามวัน' } },
+    ] },
+  { id: 'h2', worlds: ['hero'], ch: [2], title: 'เพื่อนร่วมโลกถูกใส่ร้าย',
+    text: 'หนึ่งในสามคนที่ถูกอัญเชิญมาพร้อมคุณได้สกิล "ไร้ประโยชน์" ขุนนางกล่าวหาว่าเขาขโมยของในคลัง และกำลังจะขับไล่',
+    choices: [
+      { t: 'ยืนขึ้นปกป้องเขา', stat: 'cha', tag: 'talk', dc: 14,
+        win: { fx: { cha: 3, goal: 5 }, flag: 'ally', text: 'คุณชี้ว่าคลังถูกงัดก่อนเขามาถึง เขาจับมือคุณแน่น "ข้าจะไม่ลืม"' },
+        lose: { fx: { fame: -10 }, text: 'ไม่มีใครฟัง เขาถูกไล่ออกจากวัง ส่วนคุณโดนจับตามองไปด้วย' } },
+      { t: 'แอบตามหาคนขโมยตัวจริง', stat: 'luk', tag: 'sneak', dc: 14,
+        win: { fx: { luk: 3, goal: 5, fame: 5 }, flag: 'ally', text: 'เจอของกลางในห้องขุนนางคนที่กล่าวหาเอง เรื่องพลิกทั้งวัง' },
+        lose: { fx: { hp: -15 }, text: 'โดนทหารยามจับได้ว่าแอบเข้าห้องเก็บของ โดนโบยสิบที' } },
+      { t: 'เงียบไว้ ไม่ยุ่ง', fx: { gold: 100 }, flag: 'rival', text: 'เขาถูกขับไล่ ข่าวลือว่ากลายเป็นคนเก่งที่สุดในทวีป และเกลียดคุณมาก' },
+    ] },
+  { id: 'h3', worlds: ['hero'], ch: [2, 3], title: 'หมู่บ้านใต้เงาปีศาจ',
+    text: 'ปีศาจหัวควายสามตัวล้อมหมู่บ้านเล็ก ชาวบ้านหลบอยู่ในโบสถ์ เด็กคนหนึ่งร้องเรียกแม่',
+    choices: [
+      { t: 'บุกเข้าไปฟันตรง ๆ', stat: 'str', tag: 'fight', dc: 16,
+        win: { fx: { goal: 15, fame: 10, str: 2 }, text: 'สามตัวล้มในสามดาบ ชาวบ้านสร้างรูปปั้นคุณจากไม้' },
+        lose: { fx: { hp: -25, goal: 5 }, text: 'ไล่ไปได้ แต่ซี่โครงคุณหักสองซี่' } },
+      { t: 'อพยพชาวบ้านออกทางหลังก่อน', stat: 'cha', tag: 'talk', dc: 12,
+        win: { fx: { fame: 15, goal: 5 }, text: 'ทุกคนรอด แม่ของเด็กคนนั้นกอดคุณร้องไห้' },
+        lose: { fx: { hp: -10, fame: -5 }, text: 'ชาวบ้านแตกตื่น หนีกระจัดกระจาย บางคนบาดเจ็บ' } },
+      { t: 'ร่ายเวทวงกว้าง', stat: 'mag', tag: 'magic', dc: 16,
+        win: { fx: { goal: 15, mag: 3 }, text: 'สายฟ้าฟาดลงสามจุดพร้อมกัน โบสถ์ไม่ถลอกสักนิด' },
+        lose: { fx: { hp: -20, fame: -5 }, text: 'เวทพลาด หลังคาโรงนาไหม้ ปีศาจหนีไปได้' } },
+    ] },
+  { id: 'h4', worlds: ['hero'], ch: [3], title: 'แม่ทัพปีศาจขอเจรจา',
+    text: 'แม่ทัพปีศาจหญิงวางอาวุธลงกลางสะพาน "ข้าไม่ได้อยากรบ จอมมารก็ไม่อยาก ใครกันแน่ที่อยากให้สงครามนี้ไม่จบ"',
+    choices: [
+      { t: 'นั่งลงฟังเธอ', stat: 'cha', tag: 'talk', dc: 16,
+        win: { fx: { goal: 15, cha: 3 }, flag: 'peace', text: 'เธอเล่าว่าสงครามเริ่มจากฝั่งมนุษย์ คุณได้จดหมายปิดผนึกจากจอมมารมาหนึ่งฉบับ' },
+        lose: { fx: { goal: 5 }, text: 'คุยกันไม่รู้เรื่อง เธอถอยกลับไปแต่ไม่ได้โจมตี' } },
+      { t: 'จู่โจมตอนเธอวางอาวุธ', stat: 'str', tag: 'fight', dc: 20,
+        win: { fx: { goal: 20, fame: 10, cha: -3 }, text: 'แม่ทัพปีศาจล้มลง ทหารโห่ร้อง แต่สายตาเธอก่อนสิ้นใจติดตาคุณไปอีกนาน' },
+        lose: { fx: { hp: -35 }, text: 'เธอเร็วกว่าที่คิดมาก คุณรอดมาได้เพราะเธอเลือกไม่ฆ่า' } },
+    ] },
+  { id: 'h5', worlds: ['hero'], ch: [3], title: 'ห้องใต้ดินของพระราชา',
+    text: 'กลางดึก คุณได้ยินเสียงสวดจากใต้พระราชวัง วงเวทอัญเชิญวงใหม่กำลังถูกวาด และมีผลึกวิญญาณกองอยู่ข้าง ๆ',
+    choices: [
+      { t: 'แอบลงไปดูให้ชัด', stat: 'luk', tag: 'sneak', dc: 16, bonus: { flag: 'wary', add: 20 },
+        win: { fx: { goal: 10, mag: 3 }, flag: 'truth', text: 'ผลึกพวกนั้นคือวิญญาณของผู้กล้ารุ่นก่อน ๆ คุณรู้แล้วว่าพระราชาต้องการอะไร' },
+        lose: { fx: { hp: -20, fame: -10 }, text: 'องครักษ์ลับเจอคุณ หนีออกมาได้พร้อมแผลที่แขน' } },
+      { t: 'ใช้สกิลมองทะลุกำแพง', stat: 'mag', tag: 'appraise', dc: 16,
+        win: { fx: { goal: 10 }, flag: 'truth', text: 'คุณอ่านวงเวทออก มันเป็นวงเวทดูดวิญญาณ ไม่ใช่วงอัญเชิญ' },
+        lose: { fx: { mag: 1 }, text: 'กำแพงมีเวทกันไว้ มองไม่เห็นอะไรเลย' } },
+      { t: 'ทำเป็นไม่ได้ยิน กลับไปนอน', fx: { gold: 200, hp: 10 }, text: 'เช้ามาพระราชาให้ทองพิเศษ "สำหรับผู้กล้าที่หลับสบาย"' },
+    ] },
+  { id: 'h9', worlds: ['hero'], ch: [4], finale: true, title: 'ปราสาทจอมมาร',
+    text: 'ห้องบัลลังก์ดำทอดยาว จอมมารเอนหลังบนบัลลังก์ "ผู้กล้าคนที่สิบสาม เจ้าจะต่างจากคนก่อน ๆ ไหม"',
+    choices: [
+      { t: 'ดวลตัวต่อตัว', stat: 'str', tag: 'fight', dc: 24,
+        win: { fx: { goal: 20, fame: 20 }, flag: 'won', text: 'ดาบคุณแทงทะลุเกราะดำ จอมมารยิ้ม "ในที่สุด..."' },
+        lose: { fx: { hp: -50 }, text: 'ดาบคุณหัก จอมมารเหวี่ยงคุณกระแทกเสา' } },
+      { t: 'ร่ายเวทผนึกโบราณ', stat: 'mag', tag: 'magic', dc: 24,
+        win: { fx: { goal: 20, fame: 15 }, flag: 'won', text: 'โซ่แสงพันจอมมารจมลงใต้พื้น ผนึกไว้อีกพันปี' },
+        lose: { fx: { hp: -45 }, text: 'วงเวทแตกกลางทาง มานาย้อนเผาตัวคุณเอง' } },
+      { t: 'ยื่นจดหมาย เสนอสันติภาพ', stat: 'cha', tag: 'talk', dc: 26, bonus: { flag: 'peace', add: 30 }, bonus2: { flag: 'truth', add: 15 },
+        win: { fx: { goal: 25, fame: 25 }, flag: 'won', flag2: 'peacewin', text: 'จอมมารอ่านจดหมายของแม่ทัพตัวเอง แล้ววางมงกุฎลงข้างตัว' },
+        lose: { fx: { hp: -40 }, text: '"คำพูดของมนุษย์ ข้าฟังมาพอแล้ว" เปลวไฟดำพุ่งใส่คุณ' } },
+    ] },
+
+  // ─── ลูกขุนนาง ───
+  { id: 'n0', worlds: ['noble'], ch: [1], title: 'ลืมตาเป็นทารก',
+    text: 'เพดานลายทอง แม่นมพูดภาษาที่ไม่เคยได้ยิน คุณพยายามพูด แต่ออกมาเป็น "อ้อแอ้" ความจำชาติก่อนยังอยู่ครบ',
+    choices: [
+      { t: 'แอบฝึกมานาตั้งแต่อยู่ในเปล', stat: 'mag', tag: 'magic', dc: 6,
+        win: { fx: { mag: 6 }, text: 'ฝึกทุกคืนจนมานาหมดแล้วหลับ อายุสามขวบมีมานามากกว่าพ่อ' },
+        lose: { fx: { hp: -10, mag: 2 }, text: 'มานาหมดจนสลบ แม่นมตกใจอุ้มวิ่งไปหาหมอ' } },
+      { t: 'คลานไปห้องสมุดของพ่อ', fx: { mag: 3, luk: 2 }, text: 'คุณอ่านภาษาโลกนี้ออกตอนสองขวบ คนใช้กระซิบกันว่าเป็นเด็กอัจฉริยะ' },
+      { t: 'ทำตัวเป็นเด็กน่ารักธรรมดา', fx: { cha: 4, hp: 10 }, text: 'แม่รักคุณมาก พี่สาวแบ่งขนมให้ทุกวัน' },
+    ] },
+  { id: 'n1', worlds: ['noble'], ch: [1, 2], title: 'พี่ชายคนโตไม่ชอบหน้า',
+    text: 'พี่ชายคนโตผู้จะสืบทอดตระกูลมองคุณเป็นภัย "ลูกคนที่สามมีหน้าที่อยู่เงียบ ๆ"',
+    choices: [
+      { t: 'คุยกันตรง ๆ ว่าไม่อยากได้ตำแหน่ง', stat: 'cha', tag: 'talk', dc: 12,
+        win: { fx: { cha: 3, goal: 5 }, flag: 'brother', text: 'เขาเงียบไปนาน แล้วพูดว่า "งั้นช่วยข้าดูแลที่ดินได้ไหม"' },
+        lose: { fx: { fame: -5 }, text: 'เขาคิดว่าคุณประชด เกลียดหนักกว่าเดิม' } },
+      { t: 'ท้าดวลดาบไม้', stat: 'str', tag: 'fight', dc: 12,
+        win: { fx: { fame: 10, goal: 5, str: 2 }, text: 'ชนะต่อหน้าอัศวินทั้งบ้าน พ่อเริ่มมองคุณใหม่' },
+        lose: { fx: { hp: -15, str: 1 }, text: 'แพ้ราบคาบ พี่ชายหัวเราะ แต่ก็ส่งยามาให้ตอนกลางคืน' } },
+    ] },
+  { id: 'n2', worlds: ['noble'], ch: [2], title: 'สอบเข้าสถาบันเวทหลวง',
+    text: 'ลูกขุนนางทั้งอาณาจักรมารวมกัน ลูกแก้ววัดมานาวางอยู่กลางห้องสอบ ข้อสอบข้อเขียนก็ยากพอกัน',
+    choices: [
+      { t: 'วางมือบนลูกแก้วเต็มกำลัง', stat: 'mag', tag: 'magic', dc: 14,
+        win: { fx: { goal: 15, fame: 10 }, text: 'ลูกแก้วแตกเป็นเสี่ยง กรรมการประกาศ "คะแนนสูงสุดในรอบร้อยปี"' },
+        lose: { fx: { goal: 5 }, text: 'ได้ห้อง F ห้องของพวกที่ถูกทิ้ง แต่เพื่อนในห้องนิสัยดีทุกคน' } },
+      { t: 'ทำข้อเขียนด้วยคณิตจากโลกเดิม', stat: 'mag', tag: 'appraise', dc: 10,
+        win: { fx: { goal: 12, mag: 2 }, text: 'สมการกำลังสองที่นี่ยังไม่มีใครรู้จัก อาจารย์ขอให้คุณช่วยสอน' },
+        lose: { fx: { goal: 3 }, text: 'ลืมไปว่าที่นี่ใช้เลขฐานสิบสอง คำตอบผิดทั้งหน้า' } },
+    ] },
+  { id: 'n3', worlds: ['noble'], ch: [2, 3], title: 'ที่ดินแห้งแล้งของพ่อ',
+    text: 'ปีนี้ข้าวในที่ดินของตระกูลไม่ออกรวง ชาวนาจะไม่มีกิน พ่อถอนใจทั้งคืน',
+    choices: [
+      { t: 'สอนปลูกพืชหมุนเวียนกับทำปุ๋ยหมัก', stat: 'luk', tag: 'trade', dc: 12,
+        win: { fx: { gold: 500, goal: 10, fame: 5 }, text: 'ปีถัดมาผลผลิตเพิ่มเท่าตัว ชาวนาเรียกคุณว่า "นายน้อยผู้เรียกฝน"' },
+        lose: { fx: { gold: -150 }, text: 'ปุ๋ยหมักเหม็นทั้งหมู่บ้าน ผลยังไม่ทันออก' } },
+      { t: 'ขุดคลองส่งน้ำด้วยเวทดิน', stat: 'mag', tag: 'magic', dc: 14,
+        win: { fx: { goal: 12, mag: 2 }, text: 'คลองยาวสามกิโลเสร็จในคืนเดียว ชาวบ้านตื่นมานึกว่าฝันไป' },
+        lose: { fx: { hp: -15 }, text: 'มานาหมดกลางทาง คลองได้แค่ครึ่ง ใช้เลี้ยงเป็ดได้' } },
+    ] },
+  { id: 'n4', worlds: ['noble'], ch: [3], title: 'เพื่อนร่วมห้องที่ไม่ธรรมดา',
+    text: 'เด็กสาวผมสั้นในห้องคุณใส่ชุดสามัญชน แต่ถือมีดปอกผลไม้แบบคนไม่เคยปอกเอง และมีราชลัญจกรห้อยคอ',
+    choices: [
+      { t: 'ทำเป็นไม่รู้ แต่ช่วยเธอเนียน ๆ', stat: 'cha', tag: 'talk', dc: 14,
+        win: { fx: { goal: 15, cha: 3 }, flag: 'princess', text: 'เธอรู้ว่าคุณรู้ และขอบคุณที่ไม่บอกใคร เจ้าหญิงมีเพื่อนคนแรก' },
+        lose: { fx: { fame: -5 }, text: 'ทำเนียนไม่เนียน เธอคิดว่าคุณเป็นสายลับ เลยหลบหน้า' } },
+      { t: 'อยู่ห่าง ๆ ไว้ เรื่องราชวงศ์อันตราย', fx: { luk: 3, hp: 5 }, text: 'ชีวิตเรียนสงบดี ไม่มีอะไรตื่นเต้น' },
+    ] },
+  { id: 'n5', worlds: ['noble'], ch: [3], title: 'แผนกบฏของดยุค',
+    text: 'คุณได้ยินดยุคฝ่ายเหนือคุยกับนักฆ่าในห้องสมุด แผนการคืนงานเลี้ยงราชสำนัก',
+    choices: [
+      { t: 'แอบขโมยจดหมายสั่งการ', stat: 'luk', tag: 'sneak', dc: 16,
+        win: { fx: { goal: 15, fame: 10 }, flag: 'evidence', text: 'ได้จดหมายที่มีตราประทับของดยุคมาเต็มมือ' },
+        lose: { fx: { hp: -30 }, text: 'นักฆ่าเห็นคุณ มีดบินมาเฉียดคอ คุณหนีรอดแบบหวุดหวิด' } },
+      { t: 'จดจำทุกคำด้วยสกิลประเมิน', stat: 'mag', tag: 'appraise', dc: 14,
+        win: { fx: { goal: 12 }, flag: 'evidence', text: 'คุณจำได้ทุกชื่อ ทุกเวลา ทุกประตูที่จะเปิด' },
+        lose: { fx: { goal: 3 }, text: 'ได้ยินไม่ครบ รู้แค่ว่าจะเกิดอะไรขึ้นในงานเลี้ยง' } },
+    ] },
+  { id: 'n9', worlds: ['noble'], ch: [4], finale: true, title: 'คืนงานเลี้ยงราชสำนัก',
+    text: 'ดนตรีกำลังบรรเลง โคมระย้ากระพริบ คุณเห็นเงาคนถือมีดที่ระเบียงด้านหลังพระราชา',
+    choices: [
+      { t: 'พุ่งเข้าขวางนักฆ่า', stat: 'str', tag: 'fight', dc: 24,
+        win: { fx: { goal: 20, fame: 20 }, flag: 'won', text: 'คุณปัดมีดหลุดมือกลางห้องโถง พระราชามองคุณนิ่ง ๆ แล้วพยักหน้า' },
+        lose: { fx: { hp: -50 }, text: 'มีดเฉือนสีข้างคุณ พระราชารอด แต่คุณล้มกลางพื้นหินอ่อน' } },
+      { t: 'เปิดโปงดยุคกลางงาน', stat: 'cha', tag: 'talk', dc: 26, bonus: { flag: 'evidence', add: 25 }, bonus2: { flag: 'princess', add: 15 },
+        win: { fx: { goal: 25, fame: 20 }, flag: 'won', text: 'คุณชูหลักฐานขึ้น ทุกสายตาหันไปที่ดยุค เขาหน้าซีดจนไม่ต้องตัดสิน' },
+        lose: { fx: { hp: -30, fame: -15 }, text: 'ไม่มีใครเชื่อลูกบารอนบ้านนอก ทหารลากคุณออกจากงาน' } },
+      { t: 'ร่ายบาเรียรอบพระราชา', stat: 'mag', tag: 'magic', dc: 24,
+        win: { fx: { goal: 20, fame: 15 }, flag: 'won', text: 'มีดกระทบบาเรียแสงดังเคร้ง นักฆ่าถูกจับได้คาที่' },
+        lose: { fx: { hp: -40 }, text: 'บาเรียบางเกินไป มีดทะลุมาโดนไหล่คุณแทน' } },
+    ] },
+
+  // ─── สไลม์ ───
+  { id: 'm0', worlds: ['monster'], ch: [1], title: 'ลืมตาไม่ได้ เพราะไม่มีตา',
+    text: 'คุณรับรู้ได้ด้วยผิวทั้งตัว เย็น ชื้น เหนียว หน้าต่างสถานะเด้งขึ้น "เผ่าพันธุ์: สไลม์"',
+    choices: [
+      { t: 'ดูดกินสมุนไพรรอบตัว', fx: { hp: 10, mag: 3 }, text: 'ได้สกิลสร้างยารักษาติดตัว รสชาติเหมือนใบบัวบก' },
+      { t: 'ดูดซากก็อบลินที่ตายอยู่', stat: 'str', tag: 'fight', dc: 6,
+        win: { fx: { str: 5 }, text: 'ร่างคุณใหญ่ขึ้นนิดหน่อย และได้สกิลพุ่งชน' },
+        lose: { fx: { hp: -10, str: 2 }, text: 'ย่อยไม่หมด ปวดท้องที่ไม่มีอยู่สามวัน' } },
+      { t: 'นิ่ง ๆ รอดูโลกไปก่อน', stat: 'luk', tag: 'sneak', dc: 6,
+        win: { fx: { luk: 4, mag: 2 }, text: 'มังกรตัวใหญ่ที่ถูกผนึกในถ้ำเดียวกันทักคุณ และสอนภาษาให้' },
+        lose: { fx: { luk: 1 }, text: 'สามเดือนผ่านไป ไม่มีอะไรเกิดขึ้นเลย' } },
+    ] },
+  { id: 'm1', worlds: ['monster'], ch: [1, 2], title: 'ก็อบลินขอความช่วยเหลือ',
+    text: 'ฝูงก็อบลินผอมโซคุกเข่าตรงหน้า "ท่านผู้ยิ่งใหญ่ หมาป่าจะมากินหมู่บ้านเราคืนนี้"',
+    choices: [
+      { t: 'ตั้งชื่อให้ทุกตัวแล้วนำทัพ', stat: 'cha', tag: 'talk', dc: 10,
+        win: { fx: { goal: 15, cha: 3, hp: -10 }, flag: 'named', text: 'ก็อบลินที่ได้ชื่อวิวัฒน์ทันที คุณมานาหมดจนหลับไปสองวัน ตื่นมามีลูกน้องสามสิบ' },
+        lose: { fx: { goal: 5, hp: -10 }, text: 'ตั้งชื่อได้ห้าตัวก็มานาหมด แต่ห้าตัวนั้นภักดีที่สุดในโลก' } },
+      { t: 'ไปสู้หมาป่าเอง', stat: 'str', tag: 'fight', dc: 12,
+        win: { fx: { goal: 10, str: 3 }, text: 'ดูดหัวหน้าหมาป่าเข้าไปทั้งตัว ฝูงที่เหลือยอมสยบ' },
+        lose: { fx: { hp: -20 }, text: 'โดนกัดขาดไปครึ่งร่าง ดีที่สไลม์งอกใหม่ได้' } },
+    ] },
+  { id: 'm2', worlds: ['monster'], ch: [2], title: 'นักผจญภัยมาล่าแต้ม',
+    text: 'ปาร์ตี้นักผจญภัยสามคนเดินเข้าถ้ำ "สไลม์สีฟ้าตัวนี้แปลก ๆ แฮะ"',
+    choices: [
+      { t: 'สู้', stat: 'str', tag: 'fight', dc: 14,
+        win: { fx: { str: 4, goal: 10 }, text: 'พวกเขาหนีไปพร้อมเล่าเรื่องสไลม์ปีศาจให้ทั้งกิลด์ฟัง' },
+        lose: { fx: { hp: -25 }, text: 'โดนไฟเผาไปครึ่งตัว คุณไหลหนีลงซอกหิน' } },
+      { t: 'ทักทายเป็นภาษาคน', stat: 'cha', tag: 'talk', dc: 14,
+        win: { fx: { fame: 10, cha: 3 }, flag: 'humanfriend', text: '"สไลม์พูดได้!" สุดท้ายพวกเขากลายเป็นเพื่อนคนแรกฝั่งมนุษย์' },
+        lose: { fx: { hp: -15 }, text: 'พวกเขาตกใจ ปาไฟใส่ก่อนวิ่งหนี' } },
+      { t: 'ทำตัวเป็นสไลม์โง่ ๆ', stat: 'luk', tag: 'sneak', dc: 10,
+        win: { fx: { luk: 3 }, text: 'พวกเขาเมิน เดินผ่านไป คุณขโมยข้าวกล่องเขามาด้วย' },
+        lose: { fx: { hp: -10 }, text: 'โดนเตะเล่นสองที' } },
+    ] },
+  { id: 'm3', worlds: ['monster'], ch: [2, 3], title: 'วิวัฒนาการครั้งแรก',
+    text: 'เสียงระบบดังในหัว "ค่าประสบการณ์ถึงเกณฑ์ เลือกเส้นทางวิวัฒนาการ"',
+    choices: [
+      { t: 'ร่างมนุษย์', fx: { cha: 6, goal: 10 }, text: 'ได้ร่างเด็กหน้าตาจิ้มลิ้ม เดินเข้าเมืองมนุษย์ได้แล้ว' },
+      { t: 'ร่างมังกรน้อย', fx: { str: 6, goal: 10 }, text: 'มีปีก มีเขา พ่นไฟได้นิดหน่อย ยังตัวเท่าแมว' },
+      { t: 'ร่างจอมเวทเหลว', fx: { mag: 6, goal: 10 }, text: 'ร่างกายเป็นมานาบริสุทธิ์ ร่ายเวทได้สิบวงพร้อมกัน' },
+    ] },
+  { id: 'm4', worlds: ['monster'], ch: [3], title: 'สร้างเมืองมอนสเตอร์',
+    text: 'ลูกน้องเพิ่มเป็นร้อย ทั้งก็อบลิน หมาป่า คนแคระที่หนีมา ทุกตัวมองคุณ "นายท่าน เราจะสร้างอะไรดี"',
+    choices: [
+      { t: 'ถนน ประปา โรงอาบน้ำ แบบโลกเดิม', stat: 'luk', tag: 'trade', dc: 16,
+        win: { fx: { goal: 20, gold: 500 }, text: 'เมืองมอนสเตอร์มีน้ำร้อนใช้ก่อนเมืองหลวงมนุษย์ พ่อค้าเริ่มแวะมา' },
+        lose: { fx: { goal: 5, gold: -100 }, text: 'ท่อแตก น้ำท่วมโรงเก็บอาหาร แต่ทุกตัวสนุก' } },
+      { t: 'กำแพงกับป้อมก่อน', stat: 'str', tag: 'fight', dc: 14,
+        win: { fx: { goal: 15, str: 3 }, text: 'กำแพงหินสูงห้าเมตรเสร็จในเดือนเดียว ไม่มีใครกล้ารุก' },
+        lose: { fx: { goal: 5, hp: -10 }, text: 'กำแพงถล่มทับคุณ ดีที่เป็นสไลม์' } },
+    ] },
+  { id: 'm5', worlds: ['monster'], ch: [3], title: 'ราชาปีศาจอีกตนมาเยือน',
+    text: 'ราชาปีศาจผมแดงลอยลงกลางเมือง "สไลม์ตัวเดียวสร้างเมืองได้ น่าสนใจ หรือน่ากำจัด"',
+    choices: [
+      { t: 'เชิญดื่มชา คุยกันดี ๆ', stat: 'cha', tag: 'talk', dc: 18,
+        win: { fx: { goal: 10, cha: 3 }, flag: 'pact', text: 'นางดื่มชาสามกา แล้วประกาศเป็นเพื่อนสนิท ไม่ว่าคุณจะอยากหรือไม่' },
+        lose: { fx: { hp: -20 }, text: 'นางไม่ชอบรสชา ระเบิดโต๊ะทิ้งก่อนกลับ' } },
+      { t: 'ท้าสู้', stat: 'str', tag: 'fight', dc: 22,
+        win: { fx: { goal: 20, fame: 15 }, text: 'สู้กันสามวันสามคืน จบด้วยนางหัวเราะ "เจ้าแข็งแกร่งพอ"' },
+        lose: { fx: { hp: -35 }, text: 'นางเอานิ้วเดียวจิ้มคุณกระเด็นข้ามภูเขา' } },
+    ] },
+  { id: 'm9', worlds: ['monster'], ch: [4], finale: true, title: 'สองกองทัพที่หน้าประตูเมือง',
+    text: 'กองทัพมนุษย์ทางใต้ กองทัพปีศาจทางเหนือ ทั้งคู่มาเพื่อยึดเมืองของคุณ ลูกน้องทุกตัวรอคำสั่ง',
+    choices: [
+      { t: 'ยืนกลางสนามรบ ขอให้หยุด', stat: 'cha', tag: 'talk', dc: 26, bonus: { flag: 'humanfriend', add: 20 }, bonus2: { flag: 'pact', add: 20 },
+        win: { fx: { goal: 25, fame: 25 }, flag: 'won', text: 'เพื่อนมนุษย์กับราชาปีศาจผมแดงเดินมายืนข้างคุณ ทั้งสองกองทัพลดอาวุธลง' },
+        lose: { fx: { hp: -45 }, text: 'ลูกธนูนับร้อยพุ่งใส่คุณจากทั้งสองฝั่ง' } },
+      { t: 'กลืนกินทั้งสองกองทัพ', stat: 'str', tag: 'fight', dc: 26,
+        win: { fx: { goal: 25, cha: -10 }, flag: 'won', flag2: 'devour', text: 'ร่างคุณขยายจนบังฟ้า แล้วทุกอย่างก็เงียบ' },
+        lose: { fx: { hp: -50 }, text: 'ย่อยไม่ไหว ร่างแตกกระจายเป็นร้อยชิ้น' } },
+      { t: 'ร่ายบาเรียครอบเมืองทั้งเมือง', stat: 'mag', tag: 'magic', dc: 24,
+        win: { fx: { goal: 20, fame: 15 }, flag: 'won', text: 'โดมแสงครอบเมืองเจ็ดวัน ทั้งสองกองทัพเสบียงหมด ต้องถอยไปเอง' },
+        lose: { fx: { hp: -40 }, text: 'โดมร้าวตอนวันที่สาม คุณกลั้นไว้จนตัวแห้ง' } },
+    ] },
+
+  // ─── นางร้าย ───
+  { id: 'v0', worlds: ['villainess'], ch: [1], title: 'ตื่นมาเป็นนางร้าย',
+    text: 'กระจกบานใหญ่สะท้อนเด็กหญิงผมม้วนสีทองกับตาสีม่วงเฉียบ คุณจำหน้านี้ได้ นี่คือนางร้ายในเกมที่เคยเล่นจนจบทุกเส้นทาง',
+    choices: [
+      { t: 'เขียนสมุดธงหายนะทุกเส้นทาง', stat: 'mag', tag: 'appraise', dc: 6,
+        win: { fx: { goal: 10, mag: 3 }, text: 'สมุดสามเล่ม ครบทุกฉาก ทุกตัวละคร ทุกบทพูดที่ต้องห้าม' },
+        lose: { fx: { goal: 4 }, text: 'จำได้แค่เส้นทางเจ้าชาย อีกสี่เส้นจำลาง ๆ' } },
+      { t: 'ขอโทษสาวใช้ที่ "ตัวเดิม" เคยรังแก', fx: { goal: 8, cha: 3 }, text: 'สาวใช้ร้องไห้ ข่าวลือว่าท่านหญิงเปลี่ยนไปกระจายทั่วคฤหาสน์' },
+      { t: 'ฝึกดาบไว้ เผื่อต้องหนี', fx: { str: 5 }, text: 'อัศวินประจำบ้านตกใจ แต่ยอมสอน ท่านหญิงฟันไม้ได้ทุกเช้า' },
+    ] },
+  { id: 'v1', worlds: ['villainess'], ch: [1, 2], title: 'พบเจ้าชายคู่หมั้นครั้งแรก',
+    text: 'เจ้าชายวัยสิบขวบยื่นดอกกุหลาบให้ ในเกม ฉากนี้คือจุดเริ่มต้นของทุกหายนะ',
+    choices: [
+      { t: 'ขอถอนหมั้นตั้งแต่วันนี้', stat: 'cha', tag: 'talk', dc: 14,
+        win: { fx: { goal: 15 }, text: 'เจ้าชายงง แต่ยอมเลื่อนประกาศหมั้นออกไปก่อน ธงแรกหักได้' },
+        lose: { fx: { goal: -5, cha: 2 }, text: '"น่าสนใจ ไม่มีใครเคยปฏิเสธข้า" ไม่นะ เขาสนใจคุณมากขึ้น' } },
+      { t: 'ทำตัวน่าเบื่อที่สุดในโลก', stat: 'luk', tag: 'sneak', dc: 10,
+        win: { fx: { goal: 10, luk: 2 }, text: 'คุณเล่าเรื่องดินปลูกผักสองชั่วโมง เจ้าชายหลับคาเก้าอี้' },
+        lose: { fx: { goal: -3 }, text: 'เขาบอกว่าชอบผักเหมือนกัน แย่แล้ว' } },
+    ] },
+  { id: 'v2', worlds: ['villainess'], ch: [2], title: 'นางเอกตัวจริงเข้าเรียน',
+    text: 'สาวสามัญชนผมชมพูหกล้มต่อหน้าคุณที่ประตูสถาบัน ทุกคนหันมามอง ในเกม คุณต้องหัวเราะเยาะตรงนี้',
+    choices: [
+      { t: 'ยื่นมือช่วยพยุงขึ้น', stat: 'cha', tag: 'talk', dc: 12,
+        win: { fx: { goal: 15, cha: 3 }, flag: 'heroine', text: 'เธอยิ้มกว้าง "ท่านหญิงใจดีจัง" คนที่มุงอยู่หันมองหน้ากันเลิ่กลั่ก' },
+        lose: { fx: { goal: 5 }, text: 'มือคุณลื่น เธอล้มซ้ำ ทุกคนคิดว่าคุณผลัก' } },
+      { t: 'เตือนเธอเรื่องอีเวนต์ที่จะเกิด', stat: 'mag', tag: 'appraise', dc: 14,
+        win: { fx: { goal: 12 }, flag: 'heroine', text: '"ทำไมท่านรู้ว่าจะมีคนเอาหนังสือฉันไปซ่อน" เธอเริ่มไว้ใจคุณ' },
+        lose: { fx: { goal: 3 }, text: 'เธอคิดว่าคุณขู่ เลยหลบหน้าทั้งเทอม' } },
+      { t: 'เดินผ่านไปเฉย ๆ', fx: { goal: 5, luk: 2 }, text: 'ไม่ช่วย ไม่ซ้ำ บทของเกมงงไปพักหนึ่ง' },
+    ] },
+  { id: 'v3', worlds: ['villainess'], ch: [2, 3], title: 'แปลงผักหลังคฤหาสน์',
+    text: 'คุณขอที่หลังคฤหาสน์มาปลูกผัก คนสวนคิดว่าท่านหญิงคงเบื่อในสามวัน',
+    choices: [
+      { t: 'ปลูกพริกกับกะเพราจากเมล็ดที่หาเจอ', stat: 'luk', tag: 'trade', dc: 10,
+        win: { fx: { gold: 300, cha: 3, goal: 5 }, text: 'พ่อค้าแย่งซื้อกะเพรา เมนูผัดกะเพราของท่านหญิงดังทั้งเมืองหลวง' },
+        lose: { fx: { gold: -50 }, text: 'หนอนกินหมด แต่คนสวนเริ่มนับถือที่คุณไม่ยอมแพ้' } },
+      { t: 'เปิดร้านขนมหน้าโรงเรียน', stat: 'cha', tag: 'cook', dc: 12,
+        win: { fx: { gold: 500, fame: 10 }, text: 'ขนมชั้นสูตรยายขายหมดทุกวัน ลูกขุนนางต่อคิว' },
+        lose: { fx: { fame: -5 }, text: 'ขนมแข็งเหมือนหิน แต่มีคนซื้อไปใช้ทับกระดาษ' } },
+    ] },
+  { id: 'v4', worlds: ['villainess'], ch: [3], title: 'หลักฐานปลอม',
+    text: 'สมุดนางเอกถูกฉีก มีคนเห็น "ผมม้วนสีทอง" เดินออกจากห้อง ทั้งที่ตอนนั้นคุณอยู่ห้องสมุด',
+    choices: [
+      { t: 'สืบหาตัวคนร้ายเอง', stat: 'luk', tag: 'sneak', dc: 16,
+        win: { fx: { goal: 15 }, flag: 'evidence', text: 'เจอวิกผมสีทองในห้องลูกสาวเคานต์ที่อยากเป็นคู่หมั้นเจ้าชาย' },
+        lose: { fx: { goal: -10, hp: -10 }, text: 'ยิ่งสืบยิ่งดูเหมือนแก้ตัว ข่าวลือหนักขึ้น' } },
+      { t: 'ขอให้นางเอกเป็นพยาน', stat: 'cha', tag: 'talk', dc: 22, bonus: { flag: 'heroine', add: 35 },
+        win: { fx: { goal: 15, cha: 2 }, flag: 'evidence', text: 'นางเอกยืนยันว่าเห็นคุณในห้องสมุดตลอด ข่าวลือจบในวันเดียว' },
+        lose: { fx: { goal: -8 }, text: 'นางเอกไม่กล้ายืนยันต่อหน้าทุกคน' } },
+    ] },
+  { id: 'v5', worlds: ['villainess'], ch: [3], title: 'คนที่ควรเป็นศัตรู',
+    text: 'ในเกม พี่ชายบุญธรรมกับอัศวินองครักษ์คือคนที่ลากคุณไปลงโทษ ตอนนี้ทั้งคู่ยืนลังเลอยู่หน้าห้องคุณ',
+    choices: [
+      { t: 'ชวนดื่มชา เล่าความจริงบางส่วน', stat: 'cha', tag: 'talk', dc: 14,
+        win: { fx: { goal: 12, cha: 3 }, flag: 'allies', text: 'ทั้งคู่สาบานว่าจะไม่ปล่อยให้บทเดิมเกิดขึ้น' },
+        lose: { fx: { goal: -3 }, text: 'พูดมากไป ทั้งคู่คิดว่าคุณป่วย ส่งหมอมาทุกวัน' } },
+      { t: 'ช่วยพี่ชายแก้หนี้ของเขาแบบลับ ๆ', need: { gold: 400 }, fx: { gold: -400, goal: 12 }, flag: 'allies', text: 'เขารู้ทีหลังว่าใครจ่าย และไม่พูดอะไร แค่ยืนข้างคุณตลอดมา' },
+    ] },
+  { id: 'v9', worlds: ['villainess'], ch: [4], finale: true, title: 'งานเต้นรำวันจบการศึกษา',
+    text: 'เจ้าชายยกมือขึ้นกลางห้องโถง "เรเวียน่า ข้าขอประกาศ..." นี่คือฉากที่ทุกเส้นทางเคยจบไม่สวย',
+    choices: [
+      { t: 'ชิงพูดก่อน แสดงหลักฐานทุกชิ้น', stat: 'mag', tag: 'appraise', dc: 24, bonus: { flag: 'evidence', add: 25 },
+        win: { fx: { goal: 25, fame: 20 }, flag: 'won', text: 'หลักฐานกางเต็มโต๊ะ เจ้าชายลดมือลงช้า ๆ คนร้ายตัวจริงถูกพาออกไป' },
+        lose: { fx: { goal: -15, hp: -20 }, text: 'หลักฐานไม่พอ เสียงซุบซิบดังขึ้นทั่วห้อง' } },
+      { t: 'มองหาคนที่เคยช่วยไว้', stat: 'cha', tag: 'talk', dc: 26, bonus: { flag: 'allies', add: 20 }, bonus2: { flag: 'heroine', add: 20 },
+        win: { fx: { goal: 25, cha: 3 }, flag: 'won', text: 'พี่ชาย อัศวิน และนางเอกเดินมายืนข้างคุณ เจ้าชายพูดต่อไม่ออก' },
+        lose: { fx: { goal: -15 }, text: 'ไม่มีใครก้าวออกมา คุณยืนคนเดียวกลางห้อง' } },
+      { t: 'ถอนหมั้นเองก่อน แล้วเดินออกอย่างสง่า', stat: 'luk', tag: 'sneak', dc: 20,
+        win: { fx: { goal: 20 }, flag: 'won', text: '"ข้าขอถอนหมั้นเพคะ ขอให้ทรงพระเจริญ" คุณเดินออกไปท่ามกลางเสียงปรบมือ' },
+        lose: { fx: { goal: -10, hp: -15 }, text: 'ส้นรองเท้าหัก ล้มกลางบันได ดราม่ากว่าที่ตั้งใจ' } },
+    ] },
+
+  // ─── สโลว์ไลฟ์ ───
+  { id: 's0', worlds: ['slowlife'], ch: [1], title: 'บ้านเล็กชายป่า',
+    text: 'เทพธิดาก้มหัวขอโทษห้าครั้งที่ส่งคุณมาผิดคิว ชดเชยด้วยบ้านไม้หลังเล็ก บ่อน้ำ และแปลงดินว่างเปล่า',
+    choices: [
+      { t: 'ปลูกผักก่อนเลย', stat: 'luk', tag: 'trade', dc: 6,
+        win: { fx: { goal: 8, gold: 100 }, text: 'ดินที่นี่ดีมาก แตงกวาโตเท่าแขนในสามวัน' },
+        lose: { fx: { goal: 3 }, text: 'ปลูกผิดฤดู งอกขึ้นมาสองต้น' } },
+      { t: 'เปิดแผงขายข้าวไข่เจียวในหมู่บ้าน', stat: 'cha', tag: 'cook', dc: 8,
+        win: { fx: { gold: 200, fame: 5, goal: 8 }, text: 'ไข่เจียวฟูกรอบราดซอสพริก คนทั้งหมู่บ้านไม่เคยกินมาก่อน' },
+        lose: { fx: { gold: -30 }, text: 'น้ำมันที่นี่กลิ่นแรงมาก ไข่เจียวกลิ่นเหมือนตะเกียง' } },
+      { t: 'เดินสำรวจป่า', stat: 'str', tag: 'fight', dc: 8,
+        win: { fx: { str: 3, luk: 2 }, text: 'เจอต้นมะม่วงกับรังผึ้ง ป่านี้ใจดีกว่าที่คิด' },
+        lose: { fx: { hp: -10 }, text: 'หลงป่าสองวัน กลับมาพร้อมยุงกัดทั้งตัว' } },
+    ] },
+  { id: 's1', worlds: ['slowlife'], ch: [1, 2], title: 'หมาป่าสีเงินบาดเจ็บ',
+    text: 'หมาป่าตัวใหญ่ขนาดม้านอนเลือดออกหน้าบ้าน ดวงตาสีทองมองคุณอย่างระแวง',
+    choices: [
+      { t: 'ใช้เวทรักษา', stat: 'mag', tag: 'magic', dc: 10,
+        win: { fx: { goal: 10, mag: 3 }, flag: 'fenrir', text: 'แผลปิดสนิท มันเลียหน้าคุณ หน้าต่างสถานะขึ้น "ทำสัญญากับเฟนรีร์"' },
+        lose: { fx: { hp: -15 }, text: 'เวทไม่ติด มันขู่แล้วกัดแขนคุณ ก่อนหายเข้าป่า' } },
+      { t: 'ต้มซุปกระดูกให้กิน', stat: 'cha', tag: 'cook', dc: 8,
+        win: { fx: { goal: 10 }, flag: 'fenrir', text: 'มันกินหมดหม้อ แล้วนอนหน้าบ้านไม่ยอมไปไหน' },
+        lose: { fx: { gold: -20 }, text: 'ซุปเค็มเกิน มันดมแล้วเดินหนี' } },
+    ] },
+  { id: 's2', worlds: ['slowlife'], ch: [2], title: 'ร้านเปิดวันแรก',
+    text: 'ป้ายไม้แกะเองเขียนว่า "ร้านข้าวชายป่า" ลูกค้าคนแรกคือพ่อค้าเร่ที่หิวจนตาลาย',
+    choices: [
+      { t: 'ข้าวผัดกะเพราไข่ดาว', stat: 'cha', tag: 'cook', dc: 12,
+        win: { fx: { gold: 400, goal: 15, fame: 10 }, text: 'พ่อค้าเล่าต่อทั้งเส้นทางการค้า อาทิตย์ต่อมาคิวยาวถึงลำธาร' },
+        lose: { fx: { gold: -100, goal: 3 }, text: 'ใบกะเพราที่นี่ขมมาก ต้องเททิ้งทั้งกระทะ' } },
+      { t: 'ต้มยำกุ้งน้ำข้น เสี่ยงหน่อย', stat: 'cha', tag: 'cook', dc: 16,
+        win: { fx: { gold: 600, goal: 20, fame: 15 }, text: 'ลูกค้าเหงื่อแตก ร้องไห้ แล้วสั่งเพิ่มอีกสามชาม' },
+        lose: { fx: { fame: -10 }, text: 'เผ็ดจนพ่อค้าเป็นลม ข่าวลือว่าร้านนี้วางยาพิษ' } },
+    ] },
+  { id: 's3', worlds: ['slowlife'], ch: [2, 3], title: 'ผู้กล้ามาขอยืมพลัง',
+    text: 'ผู้กล้าที่ถูกอัญเชิญมาจากโลกเดิมเหมือนกันมาที่ร้าน "ได้ยินว่าคุณเก่ง มาช่วยปราบจอมมารกัน"',
+    choices: [
+      { t: 'ปฏิเสธ ฉันมาเพื่อสโลว์ไลฟ์', fx: { goal: 10, fame: -5 }, text: 'เขาผิดหวัง แต่กินข้าวหมดจาน และทิ้งทิปไว้ใต้ชาม' },
+      { t: 'ช่วยแบบลับ ๆ ทำเสบียงให้', stat: 'cha', tag: 'cook', dc: 12,
+        win: { fx: { goal: 8, fame: 10, gold: 200 }, text: 'เสบียงของคุณทำให้ทัพผู้กล้าเดินได้ไกลกว่าเดิมสองเท่า' },
+        lose: { fx: { gold: -100 }, text: 'อาหารบูดกลางทาง ผู้กล้าท้องเสียทั้งทัพ' } },
+      { t: 'ตามไปด้วยเลย', stat: 'str', tag: 'fight', dc: 16,
+        win: { fx: { fame: 20, str: 4, goal: -10 }, text: 'ช่วยล้มแม่ทัพปีศาจได้หนึ่งตัว แต่ร้านปิดไปสองเดือน' },
+        lose: { fx: { hp: -30, goal: -10 }, text: 'เกือบตายในด่านแรก กลับบ้านพร้อมแผลเต็มตัว' } },
+    ] },
+  { id: 's4', worlds: ['slowlife'], ch: [3], title: 'พ่อค้าใหญ่ขอซื้อสูตร',
+    text: 'พ่อค้าจากเมืองหลวงวางถุงทองบนโต๊ะ "ขายสูตรน้ำปลาให้ข้า แล้วท่านไม่ต้องทำงานอีกเลย"',
+    choices: [
+      { t: 'ต่อรองเป็นหุ้นส่วนแทน', stat: 'luk', tag: 'trade', dc: 14,
+        win: { fx: { gold: 800, goal: 10 }, text: 'ได้ส่วนแบ่งทุกขวดที่ขายทั่วทวีป ร้านยังเป็นของคุณ' },
+        lose: { fx: { gold: 200 }, text: 'เขาให้แค่ค่าที่ปรึกษา แต่ก็ยังดี' } },
+      { t: 'ไม่ขาย', fx: { goal: 12, cha: 2 }, text: 'ลูกค้าประจำรู้ข่าว ยิ่งรักร้านคุณขึ้นไปอีก' },
+    ] },
+  { id: 's5', worlds: ['slowlife'], ch: [3], title: 'ขุนนางขึ้นภาษี',
+    text: 'ทหารของขุนนางเจ้าเมืองมาติดประกาศ ภาษีร้านค้าชายป่าขึ้นสามเท่า มีผลพรุ่งนี้',
+    choices: [
+      { t: 'ไปเจรจาที่คฤหาสน์', stat: 'cha', tag: 'talk', dc: 16,
+        win: { fx: { goal: 10, fame: 10 }, text: 'ขุนนางชิมข้าวผัดของคุณ แล้วยกเลิกภาษีพร้อมขอเป็นลูกค้า' },
+        lose: { fx: { gold: -200 }, text: 'โดนไล่กลับมา ต้องจ่ายตามประกาศ' } },
+      { t: 'ให้เฟนรีร์ไปยืนหน้าคฤหาสน์', stat: 'str', tag: 'fight', dc: 24, bonus: { flag: 'fenrir', add: 40 },
+        win: { fx: { goal: 10 }, text: 'ขุนนางเห็นหมาป่าขนาดม้าแล้วประกาศว่าชายป่าได้รับยกเว้นภาษีตลอดกาล' },
+        lose: { fx: { hp: -20, gold: -200 }, text: 'ทหารเยอะกว่าที่คิด ต้องจ่ายภาษีพร้อมค่าปรับ' } },
+      { t: 'จ่ายไปเงียบ ๆ', need: { gold: 300 }, fx: { gold: -300, hp: 5 }, text: 'เงินหาย แต่ใจสงบ' },
+    ] },
+  { id: 's9', worlds: ['slowlife'], ch: [4], finale: true, title: 'มังกรบุกหมู่บ้าน',
+    text: 'เงาดำทาบทั้งหมู่บ้าน มังกรแดงร่อนลงกลางลาน แล้วยื่นจมูกเข้ามาที่หน้าต่างร้านคุณ ดูเหมือนมันได้กลิ่นอะไรบางอย่าง',
+    choices: [
+      { t: 'เลี้ยงข้าวมังกร', stat: 'cha', tag: 'cook', dc: 22,
+        win: { fx: { goal: 25, fame: 20 }, flag: 'won', text: 'หมูกระทะชุดใหญ่สิบเตา มังกรกินจนหลับคาลาน ตื่นมาขอจองโต๊ะทุกอาทิตย์' },
+        lose: { fx: { hp: -40 }, text: 'มันไม่ชอบผักชี พ่นไฟใส่ร้านครึ่งหลัง' } },
+      { t: 'ไล่ด้วยกำลัง', stat: 'str', tag: 'fight', dc: 26, bonus: { flag: 'fenrir', add: 25 },
+        win: { fx: { goal: 20, fame: 15 }, flag: 'won', text: 'คุณกับเฟนรีร์ไล่มันกลับขึ้นเขา หมู่บ้านจัดงานเลี้ยงสามวัน' },
+        lose: { fx: { hp: -50 }, text: 'หางมังกรฟาดคุณกระเด็นข้ามแม่น้ำ' } },
+      { t: 'กางบาเรียคลุมหมู่บ้าน', stat: 'mag', tag: 'magic', dc: 24,
+        win: { fx: { goal: 20 }, flag: 'won', text: 'มันเคาะบาเรียสองสามที แล้วบินจากไปอย่างหงุดหงิด' },
+        lose: { fx: { hp: -40, gold: -300 }, text: 'บาเรียแตก ร้านไหม้ไปครึ่งหนึ่ง' } },
+    ] },
+
+  // ─── ทุกโลก (worlds ว่าง = ทุกโลก) ───
+  { id: 'g_guild', worlds: ['hero', 'noble', 'slowlife'], ch: [1, 2], title: 'ลงทะเบียนกิลด์นักผจญภัย',
+    text: 'พนักงานสาวหูแมวยื่นแผ่นวัดพลังมาให้ "วางมือได้เลยค่ะ ปกติจะขึ้นแรงค์ F"',
+    choices: [
+      { t: 'วางมือเต็มกำลัง', stat: 'mag', tag: 'magic', dc: 10,
+        win: { fx: { fame: 12, gold: 100 }, text: 'แผ่นวัดแตกกลางโต๊ะ ทั้งกิลด์เงียบ แล้วก็มีคนตะโกนว่า "แรงค์ S!"' },
+        lose: { fx: { gold: -100 }, text: 'แผ่นวัดแตกเพราะคุณกดแรงเกิน ต้องจ่ายค่าซ่อม' } },
+      { t: 'กดเบา ๆ ขอแรงค์ F พอ', fx: { luk: 3, hp: 5 }, text: 'ไม่มีใครสนใจ ได้รับงานเก็บสมุนไพรเงียบ ๆ ชีวิตสงบดี' },
+    ] },
+  { id: 'g_goblin', worlds: ['hero', 'noble', 'slowlife', 'villainess'], ch: [1, 2], title: 'ก็อบลินดักปล้นรถม้า',
+    text: 'กลางทางป่า ก็อบลินสิบกว่าตัวกระโดดออกมาล้อมรถม้า สารถีตัวสั่น',
+    choices: [
+      { t: 'ลงไปสู้', stat: 'str', tag: 'fight', dc: 10,
+        win: { fx: { gold: 150, str: 2, fame: 5 }, text: 'ล้มหมดในสองนาที เจอถุงทองที่มันปล้นมาก่อนหน้า' },
+        lose: { fx: { hp: -20 }, text: 'ชนะ แต่โดนกระบองไม้ฟาดหัว' } },
+      { t: 'ร่ายเวทไฟ', stat: 'mag', tag: 'magic', dc: 10,
+        win: { fx: { gold: 150, mag: 2 }, text: 'ไฟวงเดียว ก็อบลินวิ่งหนีกระเจิง' },
+        lose: { fx: { hp: -15 }, text: 'ไฟลามมาโดนผ้าคลุมรถม้า' } },
+      { t: 'สั่งสารถีควบหนี', stat: 'luk', tag: 'sneak', dc: 8,
+        win: { fx: { luk: 2 }, text: 'รถม้าพุ่งทะลุวงล้อมไปได้' },
+        lose: { fx: { hp: -10, gold: -50 }, text: 'ล้อหลุด ต้องทิ้งของบางส่วนไว้' } },
+    ] },
+  { id: 'g_shop', worlds: ['hero', 'noble', 'slowlife', 'villainess'], ch: [2, 3], title: 'ร้านของเก่าในตรอก',
+    text: 'ยายแก่ขายของในตรอกมืดชี้ไปที่ดาบสนิมเขรอะ "ร้อยเหรียญ ไม่ต่อ"',
+    choices: [
+      { t: 'ส่องดูให้ดีก่อนซื้อ', stat: 'mag', tag: 'appraise', dc: 12, need: { gold: 100 },
+        win: { fx: { gold: -100, str: 6 }, text: 'ใต้สนิมคือดาบในตำนานที่หายไปห้าร้อยปี ยายแก่ยิ้มแปลก ๆ แล้วหายไป' },
+        lose: { fx: { gold: -100 }, text: 'ดาบสนิมธรรมดา ใช้หั่นผักยังไม่ได้' } },
+      { t: 'ซื้อสร้อยที่ยายแถมให้แทน', fx: { luk: 4 }, text: 'สร้อยเรืองแสงเบา ๆ ตอนกลางคืน รู้สึกโชคดีขึ้นมานิดหนึ่ง' },
+    ] },
+  { id: 'g_slave', worlds: ['hero', 'noble', 'slowlife'], ch: [2, 3], title: 'ตลาดค้าทาส',
+    text: 'เด็กสาวเผ่าหูจิ้งจอกถูกล่ามโซ่อยู่ในกรง ป้ายราคาเขียนว่า 300 เหรียญ คนขายยิ้มเห็นฟันทอง',
+    choices: [
+      { t: 'จ่ายไถ่ตัวแล้วปล่อยเป็นอิสระ', need: { gold: 300 }, fx: { gold: -300, cha: 4, fame: 5 }, flag: 'companion', text: 'เธอไม่ยอมไปไหน "ข้าจะตามท่านไปจนกว่าจะใช้หนี้หมด" ทั้งที่คุณบอกว่าไม่มีหนี้' },
+      { t: 'แจ้งกองทหารเรื่องค้าคนผิดกฎหมาย', stat: 'cha', tag: 'talk', dc: 14,
+        win: { fx: { fame: 15, cha: 2 }, text: 'ทหารบุกตลาด ปล่อยทุกคนในกรง คุณได้คำขอบคุณจากเผ่าจิ้งจอกทั้งเผ่า' },
+        lose: { fx: { hp: -15 }, text: 'ทหารคนนั้นรับส่วยจากตลาด คุณโดนอันธพาลรุมตอนกลางคืน' } },
+      { t: 'เดินผ่านไป', fx: { luk: -3 }, text: 'สายตาเด็กคนนั้นตามคุณไปจนถึงปลายตลาด' },
+    ] },
+  { id: 'g_dragon', worlds: null, ch: [2, 3], title: 'มังกรแก่ในถ้ำทอง',
+    text: 'มังกรสีมรกตนอนขดบนกองทอง ลืมตาข้างเดียว "สิ่งมีชีวิตจากต่างโลก กลิ่นของเจ้าแปลกดี"',
+    choices: [
+      { t: 'นั่งคุยกับมัน', stat: 'cha', tag: 'talk', dc: 16,
+        win: { fx: { mag: 5, goal: 5 }, flag: 'dragonfriend', text: 'มันเล่าประวัติโลกนี้ให้ฟังหนึ่งคืน แล้วสอนเวทโบราณให้หนึ่งบท' },
+        lose: { fx: { hp: -10 }, text: 'มันเบื่อ เป่าลมใส่จนคุณกลิ้งออกจากถ้ำ' } },
+      { t: 'แอบหยิบทองตอนมันหลับต่อ', stat: 'luk', tag: 'sneak', dc: 18,
+        win: { fx: { gold: 1000 }, text: 'ได้ทองเต็มกระเป๋า มันกรนต่อไม่รู้ตัว หรือแกล้งไม่รู้' },
+        lose: { fx: { hp: -40 }, text: 'ตามันเปิดทั้งสองข้าง คุณรอดมาได้ แต่ไม่ใช่ทั้งตัว' } },
+      { t: 'ค่อย ๆ ถอยออกมา', fx: { luk: 2 }, text: 'ออกมามือเปล่า แต่แขนขายังครบ' },
+    ] },
+  { id: 'g_festival', worlds: ['hero', 'noble', 'slowlife', 'villainess'], ch: [2, 3], title: 'เทศกาลแข่งทำอาหาร',
+    text: 'เมืองจัดเทศกาลเก็บเกี่ยว มีแข่งทำอาหาร รางวัลคือทอง 500 เหรียญ คุณมองวัตถุดิบแล้วนึกถึงตลาดสดที่บ้าน',
+    choices: [
+      { t: 'ส้มตำปูปลาร้า (ปลาร้าหมักเอง)', stat: 'cha', tag: 'cook', dc: 14,
+        win: { fx: { gold: 500, fame: 12 }, text: 'กรรมการร้องไห้ทั้งแถว ไม่รู้เพราะเผ็ดหรือเพราะอร่อย ได้รางวัลที่หนึ่ง' },
+        lose: { fx: { fame: -8 }, text: 'กลิ่นปลาร้าทำให้กรรมการลุกหนี ถูกตัดสิทธิ์' } },
+      { t: 'ข้าวมันไก่ ปลอดภัยไว้ก่อน', stat: 'cha', tag: 'cook', dc: 10,
+        win: { fx: { gold: 250, fame: 6 }, text: 'ได้ที่สอง และได้แฟนคลับข้าวมันไก่ทั้งเมือง' },
+        lose: { fx: { gold: -50 }, text: 'ข้าวแฉะ ไก่ไม่สุก จบอันดับท้าย' } },
+    ] },
+  { id: 'g_goddess', worlds: null, ch: [2, 3], title: 'เทพธิดาโผล่มาในฝัน',
+    text: 'เทพธิดาที่ส่งคุณมาโผล่ในฝัน กำลังกินมันฝรั่งทอด "เป็นยังไงบ้าง มีอะไรอยากขอไหม"',
+    choices: [
+      { t: 'ขอสกิลเพิ่มอีกอัน', stat: 'luk', dc: 14,
+        win: { fx: {}, skill: true, text: 'เธอโยนสกิลมาให้อันหนึ่ง "อย่าบอกท่านพ่อนะ"' },
+        lose: { fx: { luk: -2 }, text: 'เธอหลับคาฝันก่อนคุณพูดจบ' } },
+      { t: 'ถามว่าครอบครัวที่โลกเดิมเป็นยังไง', fx: { cha: 3, luk: 3, hp: 10 }, text: 'เธอยิ้มแล้วโชว์ภาพ คนที่บ้านทำบุญให้คุณทุกวันพระ และยังอยู่กันพร้อมหน้า คุณตื่นมาน้ำตาเปียกหมอน' },
+      { t: 'ขอทางกลับโลกเดิม', fx: { mag: 3 }, flag: 'homeway', text: '"มีทางนะ แต่ยังไม่ใช่ตอนนี้" เธอทิ้งแผนที่ดาวไว้ข้างหมอนคุณ' },
+    ] },
+  { id: 'g_home', worlds: null, ch: [1, 2, 3], title: 'คิดถึงรสชาติบ้าน',
+    text: 'อาหารที่นี่มีแต่ขนมปังแข็งกับซุปจืด คุณนึกถึงข้าวเหนียวหมูปิ้งตอนเช้าที่ปากซอย',
+    choices: [
+      { t: 'ประดิษฐ์มายองเนส', stat: 'luk', tag: 'trade', dc: 10,
+        win: { fx: { gold: 300, fame: 5 }, text: 'มายองเนสระบาดทั้งเมือง พ่อค้าแย่งสูตรกัน' },
+        lose: { fx: { hp: -10 }, text: 'ไข่ที่นี่ไม่สด ท้องเสียสามวัน' } },
+      { t: 'หมักน้ำปลาจากปลาท้องถิ่น', stat: 'cha', tag: 'cook', dc: 12,
+        win: { fx: { gold: 200, cha: 3 }, text: 'สามเดือนต่อมา น้ำปลาขวดแรกของโลกนี้ถือกำเนิด' },
+        lose: { fx: { fame: -5 }, text: 'เพื่อนบ้านร้องเรียนเรื่องกลิ่นจนต้องเททิ้ง' } },
+      { t: 'ร้องไห้เงียบ ๆ คืนเดียว', fx: { hp: 10, cha: 2 }, text: 'เช้ามาตาบวม แต่ใจเบาขึ้น โลกนี้ก็มีพระอาทิตย์ขึ้นเหมือนกัน' },
+    ] },
+  { id: 'g_dungeon', worlds: ['hero', 'noble', 'monster', 'slowlife'], ch: [2, 3], title: 'ดันเจี้ยนเปิดใหม่',
+    text: 'ประตูหินโผล่กลางทุ่งเมื่อคืน ข้างในมีเสียงเหรียญกระทบกัน และเสียงคำราม',
+    choices: [
+      { t: 'บุกลึกถึงชั้นบอส', stat: 'str', tag: 'fight', dc: 16,
+        win: { fx: { gold: 500, str: 4 }, text: 'ล้มมิโนทอร์ชั้นสิบ ได้หีบสมบัติกับขวานยักษ์' },
+        lose: { fx: { hp: -30 }, text: 'มิโนทอร์เร็วกว่าที่คิด คุณคลานออกมาเกือบไม่รอด' } },
+      { t: 'ไล่อ่านกับดักด้วยเวท', stat: 'mag', tag: 'appraise', dc: 14,
+        win: { fx: { gold: 350, mag: 3 }, text: 'เดินผ่านกับดักทุกตัว เจอห้องลับที่ไม่มีใครเคยเห็น' },
+        lose: { fx: { hp: -20 }, text: 'พื้นถล่ม ตกลงไปชั้นล่างทั้งตัว' } },
+      { t: 'เก็บแค่ชั้นแรกพอ', fx: { gold: 80, luk: 1 }, text: 'ได้ของนิดหน่อย กลับบ้านทันข้าวเย็น' },
+    ] },
+  { id: 'g_thai', worlds: ['hero', 'noble', 'slowlife', 'villainess'], ch: [2, 3], title: 'เสียงบ่นภาษาไทย',
+    text: 'กลางตลาด มีคนบ่นดัง ๆ ว่า "ร้อนจะตายอยู่แล้ว อยากกินชาเย็น" เป็นภาษาไทยชัดแจ๋ว',
+    choices: [
+      { t: 'ทักว่า "สวัสดี"', stat: 'cha', tag: 'talk', dc: 8,
+        win: { fx: { cha: 3, luk: 3 }, flag: 'thaifriend', text: 'เขาตกใจจนทำแอปเปิ้ลหล่น สองคนนั่งคุยถึงหมูกระทะจนตลาดวาย' },
+        lose: { fx: { luk: 1 }, text: 'เขาวิ่งหนี คิดว่าคุณเป็นผีจากโลกเดิม' } },
+      { t: 'แอบตามดูก่อนว่าเป็นใคร', stat: 'luk', tag: 'sneak', dc: 12,
+        win: { fx: { luk: 3, gold: 150 }, text: 'เขาเป็นพ่อค้าที่รวยที่สุดในเมือง และเปิดตลาดนัดคลองถมจำลอง' },
+        lose: { fx: { hp: -5 }, text: 'ตามจนหลง เดินชนแผงผลไม้' } },
+    ] },
+  { id: 'g_fairy', worlds: null, ch: [1, 2], title: 'ภูตจิ๋วติดใยแมงมุม',
+    text: 'ภูตตัวเท่านิ้วโป้งดิ้นอยู่ในใยแมงมุม ปีกใสสะท้อนแสงเจ็ดสี',
+    choices: [
+      { t: 'ช่วยปลดออก', fx: { luk: 5 }, flag: 'fairy', text: 'ภูตบินวนหัวคุณสามรอบ แล้วนั่งบนไหล่ไม่ยอมไปไหน' },
+      { t: 'จับใส่ขวดไปขาย', fx: { gold: 200, luk: -5 }, text: 'ได้เงินดี แต่คืนนั้นฝันร้ายตลอดคืน' },
+    ] },
+  { id: 'g_storm', worlds: null, ch: [3], title: 'พายุมานา',
+    text: 'ฟ้ากลายเป็นสีม่วง มานาในอากาศปั่นป่วน สัตว์ป่าคลั่ง ผู้คนวิ่งหาที่หลบ',
+    choices: [
+      { t: 'ดูดซับมานาส่วนเกินเข้าตัว', stat: 'mag', tag: 'magic', dc: 16,
+        win: { fx: { mag: 6, goal: 5 }, text: 'มานาไหลเข้าตัวจนผมเรืองแสง พายุสงบลงเร็วกว่าที่ควร' },
+        lose: { fx: { hp: -30 }, text: 'รับไม่ไหว เส้นมานาไหม้ ไข้ขึ้นสามวัน' } },
+      { t: 'พาคนแถวนั้นหลบเข้าถ้ำ', stat: 'cha', tag: 'talk', dc: 12,
+        win: { fx: { fame: 10, cha: 2 }, text: 'ทุกคนรอด เด็ก ๆ เรียกคุณว่าพี่ใหญ่' },
+        lose: { fx: { hp: -15 }, text: 'ถ้ำมีหมีอยู่ก่อนแล้ว' } },
+    ] },
+];
+const isekaiById = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
+
+const isekaiClamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+function isekaiShuffle(rng, arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = rng.int(0, i);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ทางที่สามของการ์ดทางเกิด: เทพธิดาโผล่เอง (สุ่ม) หรือชีวิตนี้ตายแบบฉบับต่างโลก (ธง isekai_call) = ได้ของแถม · stream แยกจาก af.rng
+function isekaiCalled(st) {
+  if (st.flags?.isekai_call) return true;
+  return makeRng(st.seed ^ ISEKAI_SALT).next() < ISEKAI.chance;
+}
+
+// karma = ระดับกรรมที่ปรโลก (−1..1) · past = ชื่อชาติไทย · run = รอบที่เท่าไรของการอยู่ต่างโลกติดกัน · memory = ค่าที่ติดตัวมาจากรอบก่อน
+// ledger = บัญชีที่ดวงวิญญาณพกมา · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = บัญชีเปล่า
+function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, ledger = newLedger() }) {
+  const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
+  const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
+  return {
+    rng, karma, past, run, memory, blessed, ledger,
+    worldOffers: isekaiShuffle(rng, Object.keys(ISEKAI_WORLDS)).slice(0, ISEKAI.worlds + (blessed ? 1 : 0)),
+    skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).slice(0, sk),
+    world: null, name: '', skills: [], st: null, flags: {}, queue: [], idx: 0,
+    step: 'world', last: null, rbdUsed: false, dead: false, ending: null, log: [], cards: 0,
+  };
+}
+
+const isekaiHas = (isk, s) => isk.skills.includes(s);
+// บาปหนักทำให้ทุกด่านยากขึ้น — บุญไม่ทำให้ง่ายลง (บุญได้ทางค่าเริ่มกับสกิลแล้ว)
+const isekaiDc = (isk, c) => c.dc + (isk.karma < 0 ? Math.round(-isk.karma * ISEKAI.karmaDc) : 0);
+
+function isekaiChance(isk, c) {
+  if (!c.stat) return null;
+  let v = 50 + (isk.st[c.stat] - isekaiDc(isk, c)) * 4;
+  for (const s of isk.skills) if (ISEKAI_SKILLS[s].tag && ISEKAI_SKILLS[s].tag === c.tag) v += ISEKAI_SKILLS[s].add ?? 20;
+  for (const b of [c.bonus, c.bonus2]) if (b && isk.flags[b.flag]) v += b.add;
+  return isekaiClamp(Math.round(v), 5, 95);
+}
+
+function isekaiStart(isk, wid) {
+  const w = ISEKAI_WORLDS[wid];
+  isk.world = wid;
+  isk.name = isk.rng.pick(w.names).replace('{p}', isk.past);
+  const shift = Math.round(isk.karma * ISEKAI.karmaStat);
+  isk.st = { hp: 100, gold: w.start.gold, fame: 0, goal: 0 };
+  for (const k of Object.keys(ISEKAI_STAT)) isk.st[k] = Math.max(1, w.start[k] + shift);
+  if (isk.memory) isk.st[isk.memory] += ISEKAI.memory;
+}
+
+function isekaiQueue(isk) {
+  const w = ISEKAI_WORLDS[isk.world];
+  const used = new Set([w.intro, w.finale]);
+  const fits = (e, c) => !e.finale && e.id !== w.intro && (!e.worlds || e.worlds.includes(isk.world)) && e.ch.includes(c);
+  const take = (c, n) => {
+    // เหตุการณ์ของโลกตัวเองมาก่อน เรื่องจะเดินตามแนวที่เลือก · ที่เหลือเติมจากกองทุกโลก
+    const pool = isekaiShuffle(isk.rng, ISEKAI_EVENTS.filter((e) => fits(e, c) && !used.has(e.id)));
+    pool.sort((a, b) => (a.worlds?.length === 1 ? 0 : 1) - (b.worlds?.length === 1 ? 0 : 1));
+    const out = pool.slice(0, n);
+    for (const e of out) used.add(e.id);
+    return isekaiShuffle(isk.rng, out).map((e) => ({ id: e.id, ch: c }));
+  };
+  const [c1, c2, c3] = ISEKAI.events;
+  isk.queue = [{ id: w.intro, ch: 1 }, ...take(1, c1), ...take(2, c2), ...take(3, c3), { id: w.finale, ch: 4 }];
+  isk.idx = 0;
+}
+
+function isekaiApply(isk, fx = {}) {
+  const out = {};
+  for (const [k, raw] of Object.entries(fx)) {
+    let v = raw;
+    if (isekaiHas(isk, 'exp') && v > 0 && ISEKAI_STAT[k]) v *= 2;
+    if (isekaiHas(isk, 'storage') && k === 'gold' && v > 0) v = Math.round(v * 1.5);
+    if (k === 'goal' || k === 'hp') isk.st[k] = isekaiClamp(isk.st[k] + v, 0, 100);
+    else isk.st[k] = Math.max(0, isk.st[k] + v);
+    if (v) out[k] = v;
+  }
+  return out;
+}
+
+function isekaiStatus(isk) {
+  if (!isk.st) return null;
+  const w = ISEKAI_WORLDS[isk.world];
+  return { name: isk.name, world: w.name, goalName: w.goal, ...isk.st, skills: isk.skills.map((s) => ISEKAI_SKILLS[s].name), chapter: isk.queue[isk.idx]?.ch ?? 4 };
+}
+
+function isekaiEnding(isk) {
+  if (isk.dead) return { id: 'death', title: ISEKAI_DEATH[0], text: ISEKAI_DEATH[1] };
+  const w = ISEKAI_WORLDS[isk.world];
+  const won = !!isk.flags.won;
+  let tier = won && isk.st.goal >= 50 ? 'best' : won || isk.st.goal >= 50 ? 'good' : 'bad';
+  // ตอนจบพิเศษต้องชนะฉากสุดท้ายด้วยทางที่ธงปูไว้ · กลืนกินของสไลม์ไม่ดูเกณฑ์ goal เพราะเป็นการเลือกจบ
+  const [flag, key] = w.special;
+  if (won && isk.flags[flag] && (tier === 'best' || flag === 'devour')) tier = key;
+  const [title, text] = w.end[tier];
+  return { id: tier, title, text };
+}
+
+const isekaiCard = (isk, card) => {
+  isk.cards++;
+  return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, ...card };
+};
+
+// การ์ดถัดไป · การ์ดที่มีตัวเลือกรอ chooseIsekai · ใบที่ไม่มีตัวเลือก (ผลลัพธ์) เรียกการ์ดถัดไปได้เลย
+function nextIsekaiCard(isk) {
+  if (isk.step === 'world') {
+    return isekaiCard(isk, {
+      step: 'world', title: 'ห้องสีขาว',
+      text: `เทพธิดาผมสีเงินก้มหัวให้ "${isk.past ? `${isk.past} ` : ''}มาทางนี้ก่อน" แล้วกางแผนที่โลกตรงหน้า${isk.blessed ? ' วันนี้เธออารมณ์ดีเป็นพิเศษ เลยเปิดให้เลือกเพิ่มอีกโลก' : ''}`,
+      choices: isk.worldOffers.map((w) => ISEKAI_WORLDS[w].name),
+      desc: isk.worldOffers.map((w) => ISEKAI_WORLDS[w].pitch),
+      fx: isk.worldOffers.map(() => ''),
+      ...(isk.memory && { note: `ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา · ${ISEKAI_STAT[isk.memory]} +${ISEKAI.memory}` }),
+    });
+  }
+  if (isk.step === 'skill') {
+    return isekaiCard(isk, {
+      step: 'skill', title: 'ของขวัญจากเทพธิดา',
+      text: `"เอาไปหนึ่งอย่าง ใช้ให้คุ้มนะ" แผ่นแสง ${isk.skillOffers.length} แผ่นลอยตรงหน้า`,
+      choices: isk.skillOffers.map((s) => ISEKAI_SKILLS[s].name),
+      desc: isk.skillOffers.map((s) => ISEKAI_SKILLS[s].desc),
+      fx: isk.skillOffers.map(() => ''),
+    });
+  }
+  if (isk.step === 'result') {
+    const r = isk.last;
+    isk.step = isk.dead || isk.idx >= isk.queue.length - 1 ? 'end' : 'event';
+    if (isk.step === 'event') isk.idx++;
+    return isekaiCard(isk, { step: 'result', title: r.title, text: r.text, ok: r.ok, stat: r.stat, deltas: r.deltas, sys: r.sys, choices: [] });
+  }
+  // ตอนจบเป็นใบสุดท้ายของชาติต่างโลก ไม่มีตัวเลือก — กลับหรืออยู่ต่อเลือกที่การ์ดทางเกิดหลังปรโลกตัดสิน
+  if (isk.step === 'end') {
+    isk.ending = isekaiEnding(isk);
+    isk.step = 'over';
+    return isekaiCard(isk, {
+      step: 'end', title: isk.ending.title, text: `${isk.ending.text} · แล้ววันหนึ่งดวงวิญญาณก็ถูกดึงกลับไปยืนหน้าปรโลก`, ending: isk.ending.id,
+      choices: [],
+      log: isk.log.slice(),
+    });
+  }
+  if (isk.step === 'over') throw new Error('ชาติต่างโลกจบแล้ว — ปรโลกรับช่วงต่อ');
+  const ev = isekaiById[isk.queue[isk.idx].id];
+  return isekaiCard(isk, {
+    step: 'event', id: ev.id, title: ev.title, text: ev.text, finale: !!ev.finale, index: isk.idx + 1, total: isk.queue.length,
+    choices: ev.choices.map((c) => c.t),
+    fx: ev.choices.map((c) => {
+      if (c.need && isk.st.gold < c.need.gold) return '';
+      const p = isekaiChance(isk, c);
+      return p === null ? (c.need ? `ใช้ทอง ${c.need.gold}` : '') : `${ISEKAI_STAT[c.stat]} ${p}%`;
+    }),
+    locked: ev.choices.map((c) => (c.need && isk.st.gold < c.need.gold ? `ต้องมีทอง ${c.need.gold}` : null)),
+  });
+}
+
+function chooseIsekai(isk, idx) {
+  if (isk.step === 'world') {
+    const w = isk.worldOffers[idx];
+    if (!w) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    isekaiStart(isk, w);
+    isk.step = 'skill';
+    return;
+  }
+  if (isk.step === 'skill') {
+    const s = isk.skillOffers[idx];
+    if (!s) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    isk.skills.push(s);
+    if (s === 'luck') isk.st.luk += 15;
+    isekaiQueue(isk);
+    isk.step = 'event';
+    return;
+  }
+  if (isk.step !== 'event') throw new Error('การ์ดนี้ไม่มีตัวเลือก');
+  const ev = isekaiById[isk.queue[isk.idx].id];
+  const c = ev.choices[idx];
+  if (!c) throw new Error('ตัวเลือกไม่ถูกต้อง');
+  if (c.need && isk.st.gold < c.need.gold) throw new Error('ตัวเลือกนี้ล็อกอยู่');
+  let ok = true, out = c;
+  if (c.stat) {
+    ok = isk.rng.next() * 100 < isekaiChance(isk, c);
+    out = ok ? c.win : c.lose;
+  }
+  const deltas = isekaiApply(isk, out.fx);
+  for (const f of [out.flag, out.flag2]) if (f) isk.flags[f] = true;
+  let sys = null;
+  if (out.skill) {
+    const rest = Object.keys(ISEKAI_SKILLS).filter((k) => !isekaiHas(isk, k) && k !== 'luck');
+    if (rest.length) {
+      const s = isk.rng.pick(rest);
+      isk.skills.push(s);
+      sys = `ได้รับสกิลใหม่ · ${ISEKAI_SKILLS[s].name}`;
+    }
+  }
+  if (isekaiHas(isk, 'regen') && isk.st.hp > 0) isk.st.hp = isekaiClamp(isk.st.hp + 6, 0, 100);
+  if (isk.st.hp <= 0) {
+    if (isekaiHas(isk, 'rbd') && !isk.rbdUsed) {
+      isk.rbdUsed = true;
+      isk.st.hp = 40;
+      sys = 'เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว';
+    } else isk.dead = true;
+  }
+  isk.log.push(`${ev.title} · ${c.t}${c.stat ? (ok ? ' (สำเร็จ)' : ' (พลาด)') : ''}`);
+  isk.last = { title: ev.title, text: out.text, ok: c.stat ? ok : null, stat: c.stat ? ISEKAI_STAT[c.stat] : null, deltas, sys };
+  isk.step = 'result';
+}
+
+// ค่าที่ติดตัวไปชาติต่างโลกถัดไป = ค่าสถานะที่สูงสุดของรอบนี้
+const isekaiMemory = (isk) => Object.keys(ISEKAI_STAT).reduce((a, b) => (isk.st[b] > isk.st[a] ? b : a));
+
+// แถวในผังตระกูล — ไม่มีจังหวัด/ฐานะ/อายุแบบชาติไทย ผู้อ่าน lineage ต้องดู isekai ก่อน
+const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world: ISEKAI_WORLDS[isk.world].name, ending: isk.ending.title, path: 'isekai', realm: 'ต่างโลก', broke: false });
+
 // ช่วงระหว่างชาติ (ใบ 05 · 09) + ส่งต่อรุ่นถัดไป — ลำดับตามใบ 09:
 // บันทึกการตาย → ส่วนบุญ/อนุโมทนา → เทวทูต 5 → ปรโลกเปิดบัญชีชี้ปลายทาง → ทางเกิด → ภูมิปลายทาง หรือ ผีบรรพบุรุษ → ส่งต่อ 30–70% → รุ่นถัดไป
 // ฉากเป็นเนื้อหา (stage ระหว่างชาติ + scene) ผ่านด่าน build ชุดเดียวกับการ์ดชีวิต · ปรโลก/ทางเกิด/ส่งต่อเป็นการ์ดที่แกนสร้าง
 // ใช้ stream สุ่มของตัวเอง — ระหว่างชาติไม่กินเลขสุ่มของโลกของชีวิตใด · ชีวิตที่มี heir ดึงเลขสุ่มของโลกตำแหน่งเดียวกับชีวิตแรก (harness/lineage ตรวจ)
+
 
 
 
@@ -2637,6 +3464,13 @@ function startAfterlife(st) {
     path: null,
     heir: null,
     cards: 0,
+    // ต่างโลก (B68): ชีวิตที่กำลังเล่น · แถว lineage ของชีวิตต่างโลกที่จบแล้ว · เทพธิดาโผล่เอง/ตายแบบต่างโลก = ได้ของแถม
+    isekai: null,
+    isekaiLives: [],
+    blessed: isekaiCalled(st),
+    // ชาติต่างโลกล่าสุดที่จบแล้ว (รอบปรโลกของชาตินั้น) · คำตัดสินของชาติไทย — แถวชาติไทยในผังตระกูลบันทึกภูมิของชาติไทย
+    from: null,
+    thaiVerdict: null,
   };
 }
 
@@ -2681,38 +3515,55 @@ function sceneCard(af, ev) {
 }
 
 function verdictCard(af) {
-  const st = af.st;
-  const x = verdictLevel(st.ledger);
+  const ledger = af.st.ledger;
+  const x = verdictLevel(ledger);
   const realm = realmOf(x);
   // กำหนดเวลาในภูมิ (ใบ 02: โทษมีกำหนดเวลา) เป็นสีสันของการ์ด — เวลานรกเทียบเวลามนุษย์ไม่ได้ จึงไม่ผูกปีเกิดชาติหน้า
-  const term = realm.id === 'human' ? 0 : Math.max(1, Math.round(Math.abs(netLedger(st.ledger)) * 10));
-  af.verdict = { x, net: netLedger(st.ledger), realm, term };
+  const term = realm.id === 'human' ? 0 : Math.max(1, Math.round(Math.abs(netLedger(ledger)) * 10));
+  af.verdict = { x, net: netLedger(ledger), realm, term };
+  af.thaiVerdict ??= af.verdict;
   const where = realm.id === 'human' ? 'ไปเกิดเป็นมนุษย์ทันที ไม่ต้องรอ' : `ไปภูมิ${realm.name} กำหนด ${term} ปีของภูมินั้น`;
+  const back = af.from ? `ดวงวิญญาณของ${af.from.name}ถูกดึงกลับจากต่างโลกมายืนหน้าปรโลกอีกครั้ง ` : '';
   return emitAfter(af, {
     kind: 'verdict',
     type: 'B',
     realm: realm.name,
-    text: `เทวดาผู้ถือบัญชีชักบุญกับบาปมาดูทั้งสองฝ่าย ฝ่ายใดหนักก็ไปฝ่ายนั้น พญายมชี้ว่า${where}`,
-    reckoning: reckoning(st.ledger),
+    text: `${back}เทวดาผู้ถือบัญชีชักบุญกับบาปมาดูทั้งสองฝ่าย ฝ่ายใดหนักก็ไปฝ่ายนั้น พญายมชี้ว่า${where}`,
+    reckoning: reckoning(ledger),
     note: 'กติกาแฟนตาซีของเกม ได้แรงบันดาลใจจากไตรภูมิพระร่วงและคติไทย',
     choices: [],
   });
 }
 
 // ทางเกิด (ใบ 05): เป็นลูก (รับมรดกต่อ · ผีบรรพบุรุษเฝ้า) หรือเกิดใหม่ตามกรรม · ไม่มีลูกยังเล่นต่อได้ทางเกิดใหม่
-// การ์ดนี้เป็นทางแยกของเกม ไม่ใช่เหตุการณ์ จึงมีแค่สองทาง (ยกเว้นกติกา ≥4 ตัวเลือกของเนื้อหา)
+// การ์ดนี้เป็นทางแยกของเกม ไม่ใช่เหตุการณ์ จึงไม่ต้องมี 4 ตัวเลือกตามกติกาเนื้อหา · ทางที่ 3 ต่างโลก (B68) เลือกได้เสมอ
 const PATHS = [
   { id: 'child', text: 'เฝ้าลูกหลาน แล้วกลับมาเกิดในตระกูลเดิม เป็นลูก หลาน หรือเหลน' },
   { id: 'reborn', text: 'ไปตามกรรม แล้วเกิดใหม่ที่ไหนก็ได้' },
+  { id: 'isekai', text: 'ตามเทพธิดาต่างโลกไปเกิดในโลกแฟนตาซีก่อน' },
 ];
+// กลับจากต่างโลก: ลูกหลานชาติไทยห่างไปหลายรุ่นแล้ว จึงกลับได้ทางตามกรรมเท่านั้น · ทางที่ 3 = อยู่ต่างโลกต่อ ติดเพดานชาติติดกัน
+const FROM_ISEKAI_PATHS = {
+  child: 'เฝ้าลูกหลานในโลกเดิม',
+  reborn: 'กลับโลกเดิม ไปเกิดเป็นคนตามกรรม',
+  isekai: 'อยู่ต่างโลกต่อ ให้เทพธิดาส่งไปเกิดอีกรอบ',
+};
+const pathLocked = (af, id) => {
+  if (id === 'child') return af.from ? 'ลูกหลานในโลกเดิมห่างไปหลายรุ่นแล้ว' : hasKids(af.st) ? null : 'ไม่มีลูกหลานให้กลับไปเกิด';
+  if (id === 'isekai' && af.from && af.from.run >= ISEKAI.stay) return 'เทพธิดาบอกว่าวิญญาณนี้อยู่ต่างโลกนานพอแล้ว';
+  return null;
+};
 function pathCard(af) {
   af.pending = { path: true, choices: PATHS.map(() => ({ merit: [] })) };
+  const base = af.from
+    ? 'เทพธิดาต่างโลกยืนรออยู่ข้างพญายม ถามว่าจะกลับไปเกิดในโลกเดิม หรือจะไปต่างโลกอีกรอบ'
+    : hasKids(af.st) ? 'ก่อนไปตามคำตัดสิน ดวงวิญญาณเลือกได้ว่าจะกลับไปใกล้ลูกหลาน หรือปล่อยวางแล้วไปเกิดตามกรรม' : 'ไม่มีลูกหลานให้เฝ้า ดวงวิญญาณไปเกิดตามกรรม';
   return emitAfter(af, {
     kind: 'path',
     type: 'B',
-    text: hasKids(af.st) ? 'ก่อนไปตามคำตัดสิน ดวงวิญญาณเลือกได้ว่าจะกลับไปใกล้ลูกหลาน หรือปล่อยวางแล้วไปเกิดตามกรรม' : 'ไม่มีลูกหลานให้เฝ้า ดวงวิญญาณไปเกิดตามกรรม',
-    choices: PATHS.map((p) => p.text),
-    locked: PATHS.map((p) => (p.id === 'child' && !hasKids(af.st) ? 'ไม่มีลูกหลานให้กลับไปเกิด' : null)),
+    text: af.blessed && !af.from ? `${base} · มีหญิงผมสีเงินยืนโบกมือรออยู่ข้างทาง บอกว่าเป็นเทพธิดาจากอีกโลกหนึ่ง` : base,
+    choices: PATHS.map((p) => (af.from ? FROM_ISEKAI_PATHS[p.id] : p.text)),
+    locked: PATHS.map((p) => pathLocked(af, p.id)),
   });
 }
 
@@ -2724,7 +3575,7 @@ function carryCard(af) {
   af.heir = makeHeir(af, r);
   const h = af.heir;
   const amount = carryAmount(h.carried);
-  const who = af.path === 'child' ? `กลับมาเกิดเป็น${kinTier(h.tier).name}ของตัวเอง` : 'ไปเกิดใหม่';
+  const who = af.path === 'child' ? `กลับมาเกิดเป็น${kinTier(h.tier).name}ของตัวเอง` : af.from ? 'กลับจากต่างโลกมาเกิดใหม่' : 'ไปเกิดใหม่';
   return emitAfter(af, {
     kind: 'carry',
     type: 'B',
@@ -2737,11 +3588,43 @@ function carryCard(af) {
 }
 
 // ผังตระกูล (ใบ 05: เลิกเมื่อไรก็ดูได้) — หน้าจอวาดระหว่างชีวิตจาก st.lineage และบนการ์ดส่งต่อ
-const lineageText = (lineage) => lineage.map((l) => `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ${l.province ? `${placeName(l.province)} · ` : ''}ฐานะ${l.cls} · ตายอายุ ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${kinTier(l.tier).name}` : ''}`);
+const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่นที่ ${l.gen} · ${l.name} · ต่างโลก (${l.world}) · ${l.ending}` : `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ${l.province ? `${placeName(l.province)} · ` : ''}ฐานะ${l.cls} · ตายอายุ ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${kinTier(l.tier).name}` : ''}`);
+
+// ชาติต่างโลกจบ (การ์ดตอนจบออกไปแล้ว): ลงผังตระกูลเป็นรุ่นของตัวเอง แล้วเปิดปรโลกรอบใหม่ให้ชาตินั้น
+// ยมทูต/เทวทูตเป็นฉากของชีวิตไทย (เนื้อหาอ่านค่าชาติไทย) จึงเริ่มที่คำตัดสิน
+function closeIsekai(af) {
+  const isk = af.isekai;
+  af.isekaiLives.push(isekaiLineage(isk, (af.st.gen ?? 1) + 1 + af.isekaiLives.length));
+  // บัญชีเดียวของดวงวิญญาณ (B26 · B68a-2): ชาติต่างโลกที่จบแล้วเขียนกลับลง af.st.ledger ปรโลกรอบใหม่และบันทึกการกระทำ (noteDeed) จึงอ่านที่เดียวกัน
+  af.st.ledger = isk.ledger;
+  af.from = { name: isk.name, run: isk.run, memory: isekaiMemory(isk) };
+  af.isekai = null;
+  af.path = null;
+  af.steps = ['verdict', 'path', 'scene', 'carry'];
+  af.i = 0;
+}
+
+// ส่งดวงวิญญาณไปต่างโลก: กรรมที่ติดตัวไปคิดแบบเดียวกับการเกิดใหม่ (หักฝั่งที่ชี้ปลายทาง แล้วสุ่มสัดส่วน) — ไปต่างโลกไม่ใช่ทางลบบาป
+function sendToIsekai(af) {
+  const r = CARRY.min + af.rng.next() * (CARRY.max - CARRY.min);
+  const prev = af.from;
+  af.isekai = startIsekai({
+    seed: af.st.seed,
+    karma: af.verdict.x,
+    past: af.st.name,
+    ledger: carryLedger(af.st.ledger, af.verdict.net, r),
+    blessed: !prev && af.blessed,
+    run: prev ? prev.run + 1 : 0,
+    memory: prev?.memory ?? null,
+  });
+}
 
 // การ์ดถัดไปของช่วงที่ 7 · การ์ด carry (done) เป็นใบสุดท้าย แล้วผู้เรียกต่อ nextLife
 function nextAfterCard(af) {
   if (af.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
+  if (af.isekai?.ending) closeIsekai(af);
+  // การ์ดต่างโลกไม่นับใน af.cards — ความยาวช่วงที่ 7 (ด่าน lineage) วัดเฉพาะการ์ดระหว่างชาติ
+  if (af.isekai) return { stage: AFTERLIFE_STAGE, ...nextIsekaiCard(af.isekai) };
   if (af.queue.length) return emitAfter(af, af.queue.shift());
   const step = af.steps[af.i++];
   if (step === 'transfer' || step === 'devaduta') return sceneCard(af, pickScene(af, step));
@@ -2757,12 +3640,14 @@ function addBonus(af, fx = {}) {
 }
 
 function chooseAfter(af, idx) {
+  if (af.isekai) return chooseIsekai(af.isekai, idx);
   const p = af.pending;
   if (p?.path) {
     const path = PATHS[idx];
-    if (!path || (path.id === 'child' && !hasKids(af.st))) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    if (!path || pathLocked(af, path.id)) throw new Error('ตัวเลือกไม่ถูกต้อง');
     af.pending = null;
     af.path = path.id;
+    if (path.id === 'isekai') sendToIsekai(af);
     return;
   }
   const c = p?.choices[idx];
@@ -2822,7 +3707,7 @@ const elderWord = (tier, linkSex, sex) => (tier === 3 ? 'ทวด' : tier === 1
 function makeHeir(af, r) {
   const st = af.st;
   const era = st.content.era;
-  const { x, net, realm } = af.verdict;
+  const { x, net } = af.verdict;
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
@@ -2895,11 +3780,13 @@ function makeHeir(af, r) {
   const bonus = Object.fromEntries(STAT_KEYS.map((k) => [k, x * FATE.stat + (af.bonus[k] ?? 0) + kin(k)]));
   const gen = st.gen ?? 1;
   // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน · tier = กลับมาเกิดเป็นชั้นไหนของตัวเอง (ทางเป็นลูก)
-  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: realm.name, path: af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: standingOf(st) }] }];
+  // ชีวิตต่างโลกต่อท้ายเป็นรุ่นของตัวเอง (B68) — แถวชาติไทยบันทึกทางว่าไปต่างโลกกับภูมิที่ปรโลกชี้ให้ชาติไทย แม้ขากลับจะเกิดใหม่ตามกรรมของชาติต่างโลก
+  const thai = af.thaiVerdict ?? af.verdict;
+  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: standingOf(st) }] }, ...af.isekaiLives];
   const carried = r * (tier?.carry ?? 1);
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
-    gen: gen + 1,
+    gen: gen + 1 + af.isekaiLives.length,
     sex,
     name,
     cls,
@@ -2910,7 +3797,7 @@ function makeHeir(af, r) {
     legacy,
     occupation,
     bonus,
-    ledger: carryLedger(st.ledger, net, carried),
+    ledger: carryLedger(af.st.ledger, net, carried),
     carried,
     tier: tier?.tier ?? null,
     // ส่วนที่บ้านส่งต่อ แยกจาก bonus (ซึ่งรวมผลกรรม) ให้การ์ดเปิดชีวิตเล่าทิศได้โดยไม่เผยบัญชี
@@ -2993,12 +3880,15 @@ function kinText(k, v, who) {
 
 // สิ่งที่สืบทอด (รุ่นที่ 2 ขึ้นไป) อ่านจาก heir ที่การ์ดส่งต่อสร้าง — เลือกช่องเองทีละช่อง ไม่ส่ง heir ทั้งก้อน (มีบัญชีที่ส่งต่อ)
 function inheritText(st, heir) {
-  const prev = st.lineage.at(-1);
+  // ฐานะเทียบกับชาติไทยล่าสุด — แถวต่างโลก (B68) ไม่มีฐานะ
+  const prev = st.lineage.findLast((l) => !l.isekai);
+  const away = st.lineage.slice(st.lineage.indexOf(prev) + 1);
   const out = [];
   const ancestor = st.parents.find((p) => p.ancestor);
   // เซฟก่อน B18 ไม่มี legacy.from — ทางเป็นลูกชั้นเดียวยังมีพ่อ/แม่ที่เป็นชาติก่อนให้เรียก
   const who = heir.legacy?.from ?? (ancestor ? parentWord(ancestor) : null);
   if (prev.path === 'child' && who) out.push(`ชาติก่อนเฝ้าลูกหลานไว้ แล้วกลับมาเกิดเป็น${kinTier(prev.tier).name}ของตัวเอง — ${who}ของคุณคือคุณในชาติก่อน`);
+  else if (away.length) out.push(`ชาติก่อนตามเทพธิดาไปต่างโลก ${away.length} ชาติ (ล่าสุด: ${away.at(-1).name} · ${away.at(-1).ending}) แล้วกลับมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม`);
   else out.push('ชาติก่อนไปตามกรรม แล้วมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม');
   out.push(`กรรมที่ติดตัวมาจากชาติก่อน${carryAmount(heir.carried)}`);
   const d = CLASSES.indexOf(st.cls) - CLASSES.indexOf(prev.cls);
@@ -3395,8 +4285,10 @@ function titlesOf(st) {
   const f = lifeFacts(st);
   const pick = ({ id, name, tier, hint }) => ({ id, name, tier, hint });
   const titles = TITLES.filter((t) => t.test(f)).sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier)).map(pick);
-  const chain = [...st.lineage, { gen: st.gen, sex: st.sex, cls: st.cls, age: st.age, broke: f.worth < 0 }];
-  const family = FAMILY_TITLES.filter((t) => t.test(chain, st.lineage)).map(({ id, name, hint }) => ({ id, name, tier: 'ตระกูล', hint }));
+  // แถวต่างโลก (B68) ไม่มีฐานะ/อายุ/ภูมิแบบชาติไทย — ฉายาตระกูลนับเฉพาะชาติไทย
+  const thai = st.lineage.filter((l) => !l.isekai);
+  const chain = [...thai, { gen: st.gen, sex: st.sex, cls: st.cls, age: st.age, broke: f.worth < 0 }];
+  const family = FAMILY_TITLES.filter((t) => t.test(chain, thai)).map(({ id, name, hint }) => ({ id, name, tier: 'ตระกูล', hint }));
   return { pattern: pattern && { id: pattern.id, name: pattern.name, hint: pattern.hint }, titles, family };
 }
 
@@ -4643,6 +5535,7 @@ function standingPanel() {
 const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ปรโลก', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ' };
 const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา' };
 function renderAfter(card) {
+  if (card.kind === 'isekai') return renderIsekai(card);
   root.replaceChildren();
   const box = el('article', 'card b af');
   const top = el('div', 'top');
@@ -4678,6 +5571,74 @@ function renderAfter(card) {
   if (card.kind === 'verdict') choices.append(copyButton(() => summaryText(st.age, card.realm)));
   box.append(top);
   if (court) box.append(courtScene());
+  box.append(body, choices);
+  root.append(box);
+}
+
+// ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
+const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกโลก', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก' };
+function isekaiMeter(label, v, cls) {
+  const m = el('div', 'imeter');
+  const row = el('div', 'irow');
+  row.append(el('span', null, label), el('span', null, `${v}/100`));
+  const bar = el('div', `ibar ${cls}`);
+  const fill = el('i');
+  fill.style.width = `${v}%`;
+  bar.append(fill);
+  m.append(row, bar);
+  return m;
+}
+function isekaiStatusBox(s) {
+  const box = el('div', 'iwin');
+  box.append(isekaiMeter('HP', s.hp, 'hp'), isekaiMeter(s.goalName, s.goal, 'goal'));
+  const grid = el('div', 'istats');
+  for (const [k, label] of Object.entries(ISEKAI_STAT)) {
+    const d = el('div');
+    d.append(el('span', null, label), el('b', null, String(s[k])));
+    grid.append(d);
+  }
+  box.append(grid, el('div', null, `ทอง ${s.gold.toLocaleString('en-US')} · ชื่อเสียง ${s.fame} · ${s.world}`));
+  if (s.skills.length) {
+    const chips = el('div', 'ichips');
+    for (const name of s.skills) chips.append(el('span', 'ichip', name));
+    box.append(chips);
+  }
+  return box;
+}
+function renderIsekai(card) {
+  root.replaceChildren();
+  const box = el('article', 'card i');
+  const top = el('div', 'top');
+  const s = card.status;
+  top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ชาติต่างโลกที่ ${card.run + 1} · ${s.name}` : `${genLabel()}${st.name} · ตายอายุ ${st.age}`));
+  const body = el('div', 'body');
+  const choices = el('div', 'choices');
+  body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} ${card.index}/${card.total}` : ISEKAI_KICKER[card.step]));
+  body.append(el('h3', null, card.title), el('p', null, card.text));
+  if (card.step === 'result' && card.ok !== null) body.append(el('p', card.ok ? 'iok' : 'ibad', `${card.ok ? 'สำเร็จ' : 'พลาด'} · ${card.stat}`));
+  const deltas = Object.entries(card.deltas ?? {});
+  if (deltas.length) {
+    const label = { hp: 'HP', gold: 'ทอง', fame: 'ชื่อเสียง', goal: s.goalName, ...ISEKAI_STAT };
+    body.append(el('p', 'note', deltas.map(([k, v]) => `${label[k]} ${v > 0 ? '+' : ''}${v}`).join(' · ')));
+  }
+  if (card.sys) body.append(el('p', 'isys', card.sys));
+  if (card.note) body.append(el('p', 'isys', card.note));
+  if (card.log?.length) {
+    const d = el('details', 'tree');
+    d.append(el('summary', null, `เส้นทางที่เลือก ${card.log.length} เหตุการณ์`), list(card.log, 'picks'));
+    body.append(d);
+  }
+  if (card.choices.length) {
+    card.choices.forEach((c, i) => {
+      const why = card.locked?.[i];
+      const b = keyed(button(c, why ?? card.fx?.[i], () => play(afterPick(i))), i);
+      if (card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
+      if (why) b.disabled = true;
+      choices.append(b);
+    });
+  } else choices.append(enter(button('ต่อไป', null, () => play(T.afterNext))));
+  box.append(top);
+  if (s) box.append(isekaiStatusBox(s));
   box.append(body, choices);
   root.append(box);
 }

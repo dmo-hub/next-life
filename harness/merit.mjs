@@ -26,9 +26,11 @@ const score = (c) =>
   }, 0);
 const extreme = (sign) => (card, rng, st) => {
   // การ์ดจัดสรรเงินไม่มีป้ายบุญบาป — เลือกตัวแรกโดยไม่ดึงเลขสุ่ม ลำดับการเลือกของบอทจึงเหมือนก่อนมีการ์ดนี้
-  if (st.pending.alloc) return 0;
+  if (st.pending?.alloc) return 0;
   // ตัวเลือกที่ล็อกอยู่ผู้เล่นกดไม่ได้ บอทก็ห้ามเลือก
   const open = openChoices(card);
+  // การ์ดต่างโลก (B68) ไม่มีป้ายบุญบาป — สุ่มแบบบอทสุ่ม
+  if (!st.pending) return open[rng.int(0, open.length - 1)];
   const s = open.map((i) => sign * score(st.pending.choices[i]));
   const best = Math.max(...s);
   const ties = open.filter((_, j) => s[j] === best);
@@ -56,7 +58,7 @@ function* keys(v) {
 const f = (v, d = 2) => v.toFixed(d);
 const q = (xs, p) => xs[Math.min(xs.length - 1, Math.floor(p * xs.length))];
 const out = {};
-let leaks = 0, cardsSeen = 0, reveals = 0;
+let leaks = 0, cardsSeen = 0, reveals = 0, verdicts = 0;
 for (const [name, pick] of Object.entries(BOTS)) {
   const r = { nets: [], ageDiff: 0, age: 0, vow: 0, omen: { good: 0, bad: 0 }, omenLives: 0, mult: 0 };
   for (let i = 0; i < n; i++) {
@@ -65,7 +67,10 @@ for (const [name, pick] of Object.entries(BOTS)) {
       cardsSeen++;
       const { [REVEAL]: reveal, ...rest } = card;
       for (const k of keys(rest)) if (LEAK.test(k)) leaks++;
-      if (card.kind === 'verdict') reveals += reveal ? 1 : 0;
+      if (card.kind === 'verdict') {
+        verdicts++;
+        reveals += reveal ? 1 : 0;
+      }
       else if (reveal !== undefined) leaks++;
       const shown = Object.keys(statsOf(st));
       if (shown.length !== STAT_SHOWN.length || shown.some((k) => !STAT_SHOWN.includes(k))) leaks++;
@@ -109,6 +114,9 @@ if (!(out['สุ่ม'].vow > 0)) fail++;
 console.log(`ค่าบัญชีไม่ออกไปกับการ์ด/ค่าที่หน้าจอวาด: ตรวจ ${cardsSeen.toLocaleString('en-US')} การ์ด รั่ว ${leaks} → ${leaks ? 'ตก' : 'ผ่าน'}`);
 if (leaks) fail++;
 // ข้อยกเว้นต้องไม่ว่าง — ทุกชีวิตต้องมีเฉลยที่ปรโลก ไม่งั้นด่านรั่วผ่านเพราะไม่มีอะไรให้ยกเว้น
-console.log(`เฉลยบัญชีบนการ์ดปรโลก: ${reveals.toLocaleString('en-US')} จาก ${(n * Object.keys(BOTS).length).toLocaleString('en-US')} ชีวิต → ${reveals === n * Object.keys(BOTS).length ? 'ผ่าน' : 'ตก'}`);
-if (reveals !== n * Object.keys(BOTS).length) fail++;
+// ทุกชีวิตผ่านปรโลกอย่างน้อยครั้งเดียว · ชาติต่างโลก (B68) ได้การ์ดปรโลกเพิ่ม ทุกใบต้องเฉลย
+const lives = n * Object.keys(BOTS).length;
+const revealOk = reveals === verdicts && verdicts >= lives;
+console.log(`เฉลยบัญชีบนการ์ดปรโลก: ${reveals.toLocaleString('en-US')} จาก ${verdicts.toLocaleString('en-US')} ใบ (${lives.toLocaleString('en-US')} ชีวิต) → ${revealOk ? 'ผ่าน' : 'ตก'}`);
+if (!revealOk) fail++;
 if (fail) process.exitCode = 1;
