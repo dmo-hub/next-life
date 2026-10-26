@@ -21,7 +21,7 @@ export const rules = [
       if (!SCENES.includes(e.scene)) r('.scene', `scene ต้องเป็น ${SCENES.join('|')} ได้ ${JSON.stringify(e.scene)}`);
       if (e.type !== 'B') r('.type', 'ฉากระหว่างชาติเป็นการ์ดลายรดน้ำ type B (ใบ 06)');
       if (e.realm !== undefined) {
-        if (!REALM_SCENES.includes(e.scene)) r('.realm', `realm ใช้ได้เฉพาะ scene ${REALM_SCENES.join('|')} — ก่อนศาลยังไม่รู้ภูมิ`);
+        if (!REALM_SCENES.includes(e.scene)) r('.realm', `realm ใช้ได้เฉพาะ scene ${REALM_SCENES.join('|')} — ก่อนปรโลกยังไม่รู้ภูมิ`);
         if (!(Array.isArray(e.realm) && e.realm.length && e.realm.every((x) => REALM_IDS.includes(x)))) r('.realm', `realm ต้องเป็นรายการจาก ${REALM_IDS.join(' ')}`);
       }
       for (const k of DEAD_EVENT_KEYS) if (e[k] !== undefined) r(`.${k}`, `ฉากระหว่างชาติไม่มี ${k}`);

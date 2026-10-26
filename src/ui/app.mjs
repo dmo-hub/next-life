@@ -205,11 +205,11 @@ function recap(r) {
   return box;
 }
 
-// เฉลยบัญชีบุญบาปที่ศาลพญายม (ใบ 09) — ระหว่างชีวิตผู้เล่นไม่เคยเห็นตัวเลขนี้
-// วางเป็นตาชั่งสองฝั่ง (ต้นแบบการ์ดศาล) — ฝั่งที่หนักกว่าได้ขอบทอง ผู้เล่นเห็นทิศก่อนอ่านตัวเลข
+// เฉลยบัญชีบุญบาปที่ปรโลก (ใบ 09) — ระหว่างชีวิตผู้เล่นไม่เคยเห็นตัวเลขนี้
+// วางเป็นตาชั่งสองฝั่ง (ต้นแบบการ์ดปรโลก) — ฝั่งที่หนักกว่าได้ขอบทอง ผู้เล่นเห็นทิศก่อนอ่านตัวเลข
 function reckoningBox(r) {
   const box = el('div', 'recap');
-  box.append(el('div', 'h', 'บัญชีบุญบาป เฉลยที่ศาลพญายม'));
+  box.append(el('div', 'h', 'บัญชีบุญบาป เฉลยที่ปรโลก'));
   const scale = el('div', 'scale');
   for (const [side, total, bad] of [['บุญ', r.good, false], ['บาป', r.bad, true]]) {
     const pan = el('div', r.lean === side ? 'heavy' : null);
@@ -225,7 +225,7 @@ function reckoningBox(r) {
   return box;
 }
 
-// แถบภาพพิกเซลศาลพญายม (ต้นแบบการ์ด B2) — ทำเครื่องหมายฉากศาลให้ต่างจากการ์ดระหว่างชาติใบอื่น
+// แถบภาพพิกเซลปรโลก (ต้นแบบการ์ด B2) — ทำเครื่องหมายฉากปรโลกให้ต่างจากการ์ดระหว่างชาติใบอื่น
 const COURT_PX = [
   [0, 25, 76, 5, '#3A2C1F'], [30, 6, 16, 19, '#5A1A14'], [28, 4, 20, 3, '#D9B45A'], [34, 1, 8, 3, '#F0D78C'],
   [36, 10, 4, 4, '#C98A5A'], [35, 14, 6, 7, '#2F2A6B'], [36, 9, 4, 1, '#F0D78C'],
@@ -248,9 +248,9 @@ function courtScene() {
   return wrap;
 }
 
-// ตายก่อนมีตัวเลือกหลังอายุ 18 พอ = ไม่มีลวดลาย (titles.mjs) — บอกเหตุแทนช่องว่าง
-const NO_PATTERN = { name: 'ยังไม่ทันเห็นลวดลาย', hint: 'ชีวิตนี้สั้นเกินกว่าจะเห็นว่าเดินทางไหน' };
-// ลวดลาย/ฉายาคิดครั้งเดียวต่อการ์ดตาย แล้วลงสมุดฉายา — กดย้อน/วาดซ้ำไม่นับซ้ำ
+// ตายก่อนมีตัวเลือกหลังอายุ 18 พอ = ไม่มีแบบชีวิต (titles.mjs) — บอกเหตุแทนช่องว่าง
+const NO_PATTERN = { name: 'ยังบอกไม่ได้', hint: 'ชีวิตนี้สั้นเกินกว่าจะเห็นว่าเดินทางไหน' };
+// แบบชีวิต/ฉายาคิดครั้งเดียวต่อการ์ดตาย แล้วลงสมุดฉายา — กดย้อน/วาดซ้ำไม่นับซ้ำ
 function lifeTitles(card) {
   if (!card.lifeTitles) {
     const t = titlesOf(st);
@@ -261,11 +261,11 @@ function lifeTitles(card) {
 }
 const TITLES_SHOWN = 3;
 
-// บันทึกการตาย (ใบ 04): ลวดลาย 1 + ฉายาเด่น 3 + ปุ่มดูทั้งหมด · ฉายาตระกูลแยกหัวข้อ
+// บันทึกการตาย (ใบ 04): แบบชีวิต 1 + ฉายาเด่น 3 + ปุ่มดูทั้งหมด · ฉายาตระกูลแยกหัวข้อ
 function titlesBox(card) {
   const { pattern, titles, family } = lifeTitles(card);
   const box = el('div', 'recap titles');
-  box.append(el('div', 'h', 'ลวดลายชีวิต'));
+  box.append(el('div', 'h', 'ชีวิตแบบ'));
   box.append(el('p', 'pattern', pattern.name));
   if (pattern.hint) box.append(el('p', 'note', pattern.hint));
   box.append(el('div', 'h', 'ฉายาเด่น'));
@@ -328,7 +328,7 @@ function bookBox() {
       return got.includes(x.id) ? `${x.name}${tier}` : `???${tier} — ${x.hint}`;
     }), 'picks'));
   };
-  section('ลวดลายชีวิต', ALL_PATTERNS, b.p);
+  section('ชีวิตแบบที่เคยได้', ALL_PATTERNS, b.p);
   section('ฉายา', [...TITLES].sort((x, y) => TIERS.indexOf(x.tier) - TIERS.indexOf(y.tier)), b.t, (x) => x.tier);
   section('ฉายาตระกูล', FAMILY_TITLES, b.f);
   return d;
@@ -436,7 +436,7 @@ async function shareBlob(facts) {
   text(facts.who, '400 40px Sarabun, sans-serif', c('cream'), 58);
   text(facts.job, '400 36px Sarabun, sans-serif', c('sand'), 52);
   rule(44);
-  text('ลวดลายชีวิต', '600 30px Sarabun, sans-serif', c('gold'), 44);
+  text('ชีวิตแบบ', '600 30px Sarabun, sans-serif', c('gold'), 44);
   text(facts.pattern.name, '700 76px Srisakdi, serif', c('gold2'), 92);
   if (facts.pattern.hint) text(facts.pattern.hint, '400 32px Sarabun, sans-serif', c('sand'), 48);
   if (facts.title) {
@@ -668,8 +668,8 @@ function familyTree() {
 }
 
 // ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะ — ชีวิตจบแล้ว
-const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ศาลพญายม', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ' };
-const AFTER_TOP = { verdict: 'ศาลพญายม', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา' };
+const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ปรโลก', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ' };
+const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา' };
 function renderAfter(card) {
   root.replaceChildren();
   const box = el('article', 'card b');

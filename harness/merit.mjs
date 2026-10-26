@@ -46,7 +46,7 @@ const BOTS = {
 // ค่าบัญชีห้ามออกไปกับการ์ดหรือค่าที่หน้าจอวาด — ตรวจทุก key ทุกชั้น
 const LEAK = /ledger|merit|sin|karma|byCat|broken|omenTone|omenAge/i;
 const STAT_SHOWN = ['health', 'happiness', 'knowledge', 'relations', 'network', 'money'];
-// ข้อยกเว้นช่องเดียว: เฉลยบัญชีบนการ์ดศาลพญายมในระหว่างชาติ (ใบ 09) · โผล่บนการ์ดอื่นรวมการ์ดตาย = รั่ว
+// ข้อยกเว้นช่องเดียว: เฉลยบัญชีบนการ์ดปรโลกในระหว่างชาติ (ใบ 09) · โผล่บนการ์ดอื่นรวมการ์ดตาย = รั่ว
 const REVEAL = 'reckoning';
 function* keys(v) {
   if (Array.isArray(v)) for (const x of v) yield* keys(x);
@@ -108,7 +108,7 @@ console.log(`ด่าน 5: vow_broken ตั้งได้จริง ${vowS
 if (!(out['สุ่ม'].vow > 0)) fail++;
 console.log(`ค่าบัญชีไม่ออกไปกับการ์ด/ค่าที่หน้าจอวาด: ตรวจ ${cardsSeen.toLocaleString('en-US')} การ์ด รั่ว ${leaks} → ${leaks ? 'ตก' : 'ผ่าน'}`);
 if (leaks) fail++;
-// ข้อยกเว้นต้องไม่ว่าง — ทุกชีวิตต้องมีเฉลยที่ศาล ไม่งั้นด่านรั่วผ่านเพราะไม่มีอะไรให้ยกเว้น
-console.log(`เฉลยบัญชีบนการ์ดศาล: ${reveals.toLocaleString('en-US')} จาก ${(n * Object.keys(BOTS).length).toLocaleString('en-US')} ชีวิต → ${reveals === n * Object.keys(BOTS).length ? 'ผ่าน' : 'ตก'}`);
+// ข้อยกเว้นต้องไม่ว่าง — ทุกชีวิตต้องมีเฉลยที่ปรโลก ไม่งั้นด่านรั่วผ่านเพราะไม่มีอะไรให้ยกเว้น
+console.log(`เฉลยบัญชีบนการ์ดปรโลก: ${reveals.toLocaleString('en-US')} จาก ${(n * Object.keys(BOTS).length).toLocaleString('en-US')} ชีวิต → ${reveals === n * Object.keys(BOTS).length ? 'ผ่าน' : 'ตก'}`);
 if (reveals !== n * Object.keys(BOTS).length) fail++;
 if (fail) process.exitCode = 1;

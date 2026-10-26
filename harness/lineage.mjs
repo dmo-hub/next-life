@@ -1,5 +1,5 @@
 // harness ระหว่างชาติ + หลายรุ่น (B06): บอท 3 บุคลิกเล่นตระกูลละหลายรุ่นผ่านฟังก์ชันชุดเดียวกับหน้าเว็บ
-// ด่าน: เล่นครบทุกรุ่น · ช่วงที่ 7 ยาว 6–10 การ์ด · ศาลเฉลยบัญชีทุกครั้งและที่เดียว · ส่งต่อ 30–70% ตรงสูตร
+// ด่าน: เล่นครบทุกรุ่น · ช่วงที่ 7 ยาว 6–10 การ์ด · ปรโลกเฉลยบัญชีทุกครั้งและที่เดียว · ส่งต่อ 30–70% ตรงสูตร
 // · ฐานะชาติหน้าขยับตามกรรมทั้งสองทาง (ใบ 05 แรงทุกทาง) · หนี้ไม่ตกถึงลูก · ทุกฉากในเนื้อหาออกได้จริง · ค่าแถบไม่หลุด
 import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
@@ -115,7 +115,7 @@ for (const [name, pick] of Object.entries(BOTS)) {
       }
       const want = carryLedger(snap, verdict.net, h.carried);
       if (!near(want.merit, h.ledger.merit) || !near(want.sin, h.ledger.sin)) carryBad++;
-      // สูตรเขียนซ้ำอิสระจากแกน: ฝั่งที่ชนะที่ศาลถูกหัก spend × |สุทธิ| (ไม่ติดลบ) ฝั่งแพ้ไม่ถูกหัก แล้วคูณ r
+      // สูตรเขียนซ้ำอิสระจากแกน: ฝั่งที่ชนะที่ปรโลกถูกหัก spend × |สุทธิ| (ไม่ติดลบ) ฝั่งแพ้ไม่ถูกหัก แล้วคูณ r
       const win = verdict.net >= 0 ? 'merit' : 'sin', lose = win === 'merit' ? 'sin' : 'merit';
       if (!near(h.ledger[win], Math.max(0, snap[win] - CARRY.spend * Math.abs(verdict.net)) * h.carried) || !near(h.ledger[lose], snap[lose] * h.carried)) carryBad++;
       if (h.ledger.merit > snap.merit + 1e-9 || h.ledger.sin > snap.sin + 1e-9) carryBad++;
@@ -158,8 +158,8 @@ for (const [name, r] of Object.entries(out)) {
   console.log(`${name.padEnd(6)} ${ages.padEnd(26)} ${realms}   ${r.paths.child}/${r.paths.reborn}   ${r.legacy[1] ? f(r.legacy[0] / r.legacy[1]) : '-'}`);
 }
 
-// ฐานะชาติหน้าเฉลี่ย (ดัชนี 0–9) ตามระดับกรรมที่ศาล: บาป ≤ −0.2 · กลาง · บุญ ≥ 0.3 — ต้องเรียงขึ้นทั้งทางเป็นลูกและเกิดใหม่
-console.log('\nฐานะชาติหน้าเฉลี่ย (0 = ยากไร้ · 9 = มั่งคั่ง) ตามกรรมที่ศาล   บาป   กลาง   บุญ');
+// ฐานะชาติหน้าเฉลี่ย (ดัชนี 0–9) ตามระดับกรรมที่ปรโลก: บาป ≤ −0.2 · กลาง · บุญ ≥ 0.3 — ต้องเรียงขึ้นทั้งทางเป็นลูกและเกิดใหม่
+console.log('\nฐานะชาติหน้าเฉลี่ย (0 = ยากไร้ · 9 = มั่งคั่ง) ตามกรรมที่ปรโลก   บาป   กลาง   บุญ');
 for (const path of ['reborn', 'child']) {
   const cells = [0, 1, 2].map((b) => Object.values(out).reduce((s, r) => [s[0] + r.byX[path][b][0], s[1] + r.byX[path][b][1]], [0, 0]));
   const means = cells.map(([s, c]) => (c ? s / c : NaN));
@@ -176,8 +176,8 @@ const check = (label, bad, extra = '') => {
 };
 console.log('');
 check(`ช่วงที่ 7 ยาว 6–10 การ์ด (นับการ์ดตาย) ${afterlives.toLocaleString('en-US')} ครั้ง`, lenBad, ` · p5 ${q(0.05)} · p50 ${q(0.5)} · p95 ${q(0.95)} · สูงสุด ${lens.at(-1)}`);
-check('เฉลยบัญชีบนการ์ดศาลทุกครั้ง', afterlives - reveals);
-check('ค่าบัญชีไม่ออกนอกการ์ดศาล', leaks);
+check('เฉลยบัญชีบนการ์ดปรโลกทุกครั้ง', afterlives - reveals);
+check('ค่าบัญชีไม่ออกนอกการ์ดปรโลก', leaks);
 check(`ส่งต่อ ${CARRY.min * 100}–${CARRY.max * 100}% ตรงสูตร (หักฝั่งที่ชี้ปลายทางก่อน)`, carryBad);
 check('หนี้ไม่ตกถึงลูก · มรดกไม่ติดลบ', debtLeak);
 check('ค่าแถบ 0–100 ทุกการ์ดทุกรุ่น', statBad);

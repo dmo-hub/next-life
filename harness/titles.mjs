@@ -1,6 +1,6 @@
-// harness ของลวดลาย + ฉายา (B10 · ใบ 04): บอทหลายบุคลิกเล่นต่อกันหลายรุ่น แล้วนับว่าแต่ละตัวออกกี่ %
-// ด่าน (1) ใบ 07: ลวดลาย 17 แบบ + ฉายาทุกตัว (รวมฉายาตระกูล) ≥ MIN_RATE ของชีวิตทั้งหมดรวมทุกบุคลิก
-// · ผลของ titlesOf ไม่มีค่าบัญชีบุญบาป (ขึ้นบนการ์ดตายก่อนศาลเฉลย) · พิมพ์ค่ากลาง/ช่วงแกนของบอทสุ่มให้ตั้ง AXES
+// harness ของแบบชีวิต + ฉายา (B10 · ใบ 04): บอทหลายบุคลิกเล่นต่อกันหลายรุ่น แล้วนับว่าแต่ละตัวออกกี่ %
+// ด่าน (1) ใบ 07: แบบชีวิต 17 แบบ + ฉายาทุกตัว (รวมฉายาตระกูล) ≥ MIN_RATE ของชีวิตทั้งหมดรวมทุกบุคลิก
+// · ผลของ titlesOf ไม่มีค่าบัญชีบุญบาป (ขึ้นบนการ์ดตายก่อนปรโลกเฉลย) · พิมพ์ค่ากลาง/ช่วงแกนของบอทสุ่มให้ตั้ง AXES
 import { playLife, playAfterlife, nextLife, mixSeed } from '../src/engine/index.mjs';
 import { titlesOf, axisRaw, ALL_PATTERNS, TITLES, FAMILY_TITLES, AXES, PATTERN_MIN_PICKS } from '../src/engine/titles.mjs';
 import { loadContent } from '../src/node/load.mjs';
@@ -57,7 +57,7 @@ const line = (label, id, tier = '') => {
   console.log(`${ok ? ' ' : '✗'} ${label.padEnd(28)} ${tier.padEnd(7)} ${String(c).padStart(6)} ${pct(c).padStart(7)}`);
 };
 console.log(`ชีวิต ${lives} (${Object.keys(BOTS).join(' · ')} × ${n} ตระกูล × ${gens} รุ่น) · seed ${seed} · ${((Date.now() - started) / 1000).toFixed(0)} วิ`);
-console.log(`ไม่มีลวดลาย (ตัวเลือกหลังอายุ 18 ไม่ถึง ${PATTERN_MIN_PICKS}) ${pct(noPattern)}\n\nลวดลาย`);
+console.log(`ไม่มีแบบชีวิต (ตัวเลือกหลังอายุ 18 ไม่ถึง ${PATTERN_MIN_PICKS}) ${pct(noPattern)}\n\nแบบชีวิต`);
 for (const p of ALL_PATTERNS) line(p.name, `p:${p.id}`);
 console.log('\nฉายา');
 for (const t of TITLES) line(t.name, `t:${t.id}`, t.tier);
@@ -73,5 +73,5 @@ for (const a of AXES) {
 }
 
 console.log(`\nผลของ titlesOf ไม่มีช่องบัญชีบุญบาป: ${leak ? `รั่ว ${leak} → ตก` : 'ผ่าน'}`);
-console.log(fail ? `ด่าน (1) ตก ${fail} ตัวต่ำกว่า ${MIN_RATE * 100}%` : `ด่าน (1) ผ่าน: ลวดลาย ${ALL_PATTERNS.length} แบบ + ฉายา ${TITLES.length} + ตระกูล ${FAMILY_TITLES.length} ตัว ≥ ${MIN_RATE * 100}% ทุกตัว`);
+console.log(fail ? `ด่าน (1) ตก ${fail} ตัวต่ำกว่า ${MIN_RATE * 100}%` : `ด่าน (1) ผ่าน: แบบชีวิต ${ALL_PATTERNS.length} แบบ + ฉายา ${TITLES.length} + ตระกูล ${FAMILY_TITLES.length} ตัว ≥ ${MIN_RATE * 100}% ทุกตัว`);
 if (fail || leak) process.exitCode = 1;

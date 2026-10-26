@@ -1000,8 +1000,8 @@ function queueFuneral(st) {
   return true;
 }
 
-// เฉลยบัญชีบุญบาป (ใบ 09 "เฉลยที่ศาลพญายม") — ออกบนการ์ดศาลในระหว่างชาติใบเดียว (afterlife.mjs)
-// ชื่อ key เลี่ยงคำที่ด่านรั่วของ harness จับ · harness ยกเว้นช่องนี้บนการ์ดศาลช่องเดียว
+// เฉลยบัญชีบุญบาป (ใบ 09 "เฉลยที่ปรโลก") — ออกบนการ์ดปรโลกในระหว่างชาติใบเดียว (afterlife.mjs)
+// ชื่อ key เลี่ยงคำที่ด่านรั่วของ harness จับ · harness ยกเว้นช่องนี้บนการ์ดปรโลกช่องเดียว
 export const RECKON_TOP = 3;
 export function reckoning(ledger) {
   const r1 = (v) => Math.round(v * 10) / 10;
