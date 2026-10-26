@@ -19,7 +19,9 @@
     "check:data": "node scripts/check-data.mjs",
     "lint:test": "node scripts/lint-test.mjs",
     "harness:test": "node scripts/harness-test.mjs",
-    "fetch:data": "node scripts/fetch-data.mjs"
+    "fetch:data": "node scripts/fetch-data.mjs",
+    "site:check": "node scripts/site-check.mjs",
+    "shots": "node scripts/shots.mjs"
   },
   "dependencies": {
     "yaml": "2.8.1"

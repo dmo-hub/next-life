@@ -4,22 +4,30 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชาติหน้า · Next Life — เกมจำลองชีวิตคนไทยหลายรุ่น</title>
-<meta name="description" content="เกมจำลองชีวิตคนไทยหลายรุ่น เกิดแบบสุ่มตามสถิติจริงปี 2500–2569 พร้อมแฟนตาซีคติไทย — เล่นได้บนเบราว์เซอร์ เกม ไม่ใช่คำแนะนำการลงทุน">
+<meta name="description" content="เกมจำลองชีวิตคนไทยหลายรุ่น เกิดแบบสุ่มตามสถิติจริงของไทย ตายแล้วไปปรโลก เกิดเป็นลูกหลานหรือเกิดใหม่ตามกรรม และมีต่างโลกเป็นโลกที่สอง เล่นได้บนเบราว์เซอร์ เกม ไม่ใช่คำแนะนำการลงทุน">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi:wght@400;600&family=Sarabun:wght@400;600&family=Srisakdi:wght@700&display=swap">
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
   header { background: #1F2430; color: #F4EFE3; padding: 48px 16px 40px; }
-  .w { max-width: 860px; margin: 0 auto; }
+  .w { max-width: 960px; margin: 0 auto; }
   h1 { font-family: Pridi, serif; font-size: clamp(28px, 6vw, 44px); margin: 0 0 8px; line-height: 1.25; }
   .tag { display: inline-block; border: 2px solid #A23B2C; color: #F4EFE3; background: #A23B2C; padding: 2px 10px; font-size: 13px; margin-bottom: 16px; }
-  header p { margin: 0; max-width: 640px; color: #E3DDD0; }
-  a.play { display: inline-block; margin: 24px 0 8px; padding: 12px 28px; min-height: 44px; background: #A23B2C; color: #F4EFE3; font-family: Pridi, serif; font-size: 20px; text-decoration: none; border: 2px solid #A23B2C; }
+  header p { margin: 0; max-width: 680px; color: #E3DDD0; }
+  a.play { display: inline-block; margin: 24px 12px 8px 0; padding: 12px 28px; min-height: 44px; background: #A23B2C; color: #F4EFE3; font-family: Pridi, serif; font-size: 20px; text-decoration: none; border: 2px solid #A23B2C; }
+  a.play.alt { background: #17110D; border-color: #5A4630; color: #F0D78C; font-size: 18px; }
   a.play:hover, a.play:focus-visible { background: transparent; outline: none; }
-  small.demo { display: block; color: #B9B3A6; font-size: 13px; }
+  small.demo { display: block; color: #B9B3A6; font-size: 13px; max-width: 680px; }
   main { padding: 24px 16px 64px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 0 0 32px; }
+  .worlds { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 0 0 32px; }
+  .world { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 18px 20px; }
+  .world.dark { background: #17110D; color: #EFE3C2; border-color: #5A4630; }
+  .world h2 { margin-top: 0; }
+  .world.dark h2 { font-family: Srisakdi, serif; color: #F0D78C; }
+  .world p { margin: 0 0 8px; }
+  .world .state { font-size: 13px; opacity: .85; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 0 0 32px; }
   a.card { display: block; text-decoration: none; color: inherit; background: #F4EFE3; border: 1px solid #C9BFA9; padding: 18px 20px; min-height: 44px; }
   a.card:hover, a.card:focus-visible { border-color: #1F2430; outline: none; }
   a.card.dark { background: #17110D; color: #EFE3C2; border-color: #5A4630; }
@@ -27,34 +35,62 @@
   a.card b { font-family: Pridi, serif; font-size: 20px; display: block; margin-bottom: 4px; }
   a.card.dark b { font-family: Srisakdi, serif; color: #F0D78C; }
   h2 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 8px; }
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 0 0 32px; }
+  figure { margin: 0; }
+  figure img { display: block; width: 100%; height: auto; border: 1px solid #C9BFA9; background: #F4EFE3; }
+  figcaption { font-size: 13px; color: #4A4F5C; margin-top: 4px; }
   ul { padding-left: 22px; margin: 0 0 24px; }
   footer { font-size: 13px; color: #4A4F5C; }
 </style>
 </head>
 <body>
 <header><div class="w">
-  <span class="tag">เล่นได้ · เวอร์ชันแรก</span>
-  <h1>ชาติหน้า · Next Life<br>เกมจำลองชีวิตคนไทยหลายรุ่น</h1>
-  <p>เกิดแบบสุ่มเป็นคนไทยหนึ่งคน ปี 2500–2569 ตามสถิติจริง (จังหวัด · ฐานะ · อายุคาด · เงินเฟ้อ) ใช้ชีวิต 15–20 นาที ตายแล้วไปปรโลก เปิดบัญชีบุญบาป แล้วเกิดเป็นลูกหลานหรือเกิดใหม่ตามกรรม</p>
-  <a class="play" href="play.html">เริ่มเล่น →</a>
+  <span class="tag">เล่นได้ · <span data-fact="version">v0.2.40</span> · <span data-fact="build">2026-10-26</span></span>
+  <h1>ชาติหน้า · Next Life<br>ชีวิตคนไทยหลายรุ่น กับต่างโลกอีกหนึ่งโลก</h1>
+  <p>เกิดแบบสุ่มเป็นคนไทยหนึ่งคน ปี <span data-fact="yearFrom">2500</span>–<span data-fact="yearTo">2569</span> ตามสถิติจริง ใช้ชีวิตไปทีละการ์ด ตายแล้วไปปรโลก เปิดบัญชีบุญบาป แล้วเกิดเป็นลูกหลานหรือเกิดใหม่ตามกรรม · บางชาติวิญญาณอาจถูกพาไปเกิดในต่างโลก</p>
+  <a class="play" href="play.html">เริ่มเล่น →</a><a class="play alt" href="otherworld.html">ต่างโลกคืออะไร</a>
   <small class="demo">เล่นต่อได้หลายรุ่น · ชีวิตที่กำลังเล่นบันทึกไว้ในเบราว์เซอร์เครื่องนี้ ปิดหน้าแล้วกลับมาเล่นต่อได้ · สมุดฉายาจำไว้ในเบราว์เซอร์เครื่องนี้ · ตายแล้วแชร์ภาพการ์ดได้ (มือถือแชร์ตรง · คอมบันทึกเป็นไฟล์) · เกม ไม่ใช่คำแนะนำการลงทุน</small>
 </div></header>
 <main><div class="w">
+  <div class="worlds">
+    <section class="world">
+      <h2>ชาติไทย</h2>
+      <p>เกิดใน <span data-fact="provinces">77</span> จังหวัด ฐานะ <span data-fact="classes">10</span> ระดับตามยุคจริง เจอเหตุการณ์บ้านเมืองจริงอย่างต้มยำกุ้งหรือน้ำท่วมใหญ่ เรียน ทำงาน มีครอบครัว เก็บเงินลงทุน แล้วตายตามตารางชีพจริง</p>
+      <p>ตายแล้วไปปรโลก บัญชีบุญบาปเฉลยที่นั่นที่เดียว ได้ภูมิปลายทาง 1 ใน <span data-fact="realms">5</span> แล้วเลือกเฝ้าลูกหลานหรือเกิดใหม่</p>
+      <p class="state">การ์ดในเกม <span data-fact="cards">242</span> ใบ · <a href="cards.html">ดูการ์ดทั้งหมด</a></p>
+    </section>
+    <section class="world dark">
+      <h2>ต่างโลก</h2>
+      <p>โลกแฟนตาซีที่เทพธิดาต่างโลกพาวิญญาณไปเกิด เลือกบทบาท รับสกิลโกง ไต่แรงค์กิลด์ แล้วตายกลับมาให้ปรโลกเดิมตัดสิน กรรมเป็นบัญชีเดียวทั้งสองโลก</p>
+      <p class="state">ตอนนี้เป็นเกมสั้นแยกต่างหาก กำลังย้ายเข้าเกมหลัก · <a href="isekai.html" style="color:#F0D78C">เล่นเกมสั้น</a> · <a href="otherworld.html" style="color:#F0D78C">อ่านรายละเอียด</a></p>
+    </section>
+  </div>
+
+  <h2>หน้าตาเกมจริง</h2>
+  <div class="shots">
+    <figure><img src="img/thai-birth.webp" alt="การ์ดเกิด บอกปีเกิด จังหวัด ฐานะ และชื่อเล่น" width="390" height="760" loading="lazy"><figcaption>การ์ดเกิด</figcaption></figure>
+    <figure><img src="img/thai-choice.webp" alt="การ์ดเหตุการณ์ที่มีตัวเลือก" width="390" height="760" loading="lazy"><figcaption>การ์ดเลือกทางชีวิต</figcaption></figure>
+    <figure><img src="img/thai-death.webp" alt="การ์ดตาย มีกราฟทั้งชีวิตและฉายา" width="390" height="760" loading="lazy"><figcaption>การ์ดตาย</figcaption></figure>
+    <figure><img src="img/thai-afterlife.webp" alt="ฉากที่ปรโลก เฉลยบัญชีบุญบาป" width="390" height="760" loading="lazy"><figcaption>ปรโลก</figcaption></figure>
+  </div>
+  <p style="font-size:13px;color:#4A4F5C;margin:-24px 0 32px">ภาพจากหน้าเกมจริง ถ่ายใหม่ทุกครั้งที่เว็บอัปเดต</p>
+
   <div class="grid">
     <a class="card" href="whatsnew.html"><b>แพตช์โน้ต</b>การเปลี่ยนแปลงแต่ละเวอร์ชัน · กติกาที่เปลี่ยน · ระบบที่กำลังทำ</a>
-    <a class="card dark" href="isekai.html"><b>ต่างโลก · Isekai</b>เกมสั้นแยกต่างหาก ตายแล้วเทพธิดาส่งไปเกิดในโลกแฟนตาซี เลือกเป็นผู้กล้า ลูกขุนนาง สไลม์ นางร้าย หรือสโลว์ไลฟ์</a>
     <a class="card" href="about.html"><b>กลไกในเกม</b>อะไรมาจากข้อมูลจริง · อะไรเป็นสมมติฐานเกม · อะไรเป็นกติกานอกคัมภีร์</a>
-    <a class="card" href="overview.html"><b>ภาพรวมการออกแบบ</b>คำตัดสินทุกข้อ · ใบงานที่ปิดแล้วและยังเปิด · ไฟล์รีเสิร์ช</a>
-    <a class="card dark" href="cards.html"><b>ต้นแบบการ์ด</b>หน้าตา 2 แนว (ทะเบียนราษฎร์ · ลายรดน้ำ) สลับตามประเภทเหตุการณ์</a>
-    <a class="card" href="https://github.com/dmo-hub/next-life/tree/main/docs/spec"><b>สเปกและรีเสิร์ช</b>MAP · ใบงาน · ข้อมูลคติไทย การเงิน และข้อมูลตามยุคพร้อมแหล่งอ้างอิง</a>
+    <a class="card dark" href="otherworld.html"><b>ต่างโลก</b>ทางเข้า บทบาท ค่าสถานะ กิลด์ บุญบาปต่างโลก และกลับโลกเดิมได้อะไร</a>
+    <a class="card" href="cards.html"><b>การ์ดทั้งหมด</b>การ์ดทุกใบในเกม แยกตามช่วงวัย พร้อมข้อความและตัวเลือก</a>
+    <a class="card" href="overview.html"><b>ภาพรวมการออกแบบ</b>ระบบในเกมทีละหมวด กับคำตัดสินหลักของแต่ละเรื่อง</a>
+    <a class="card" href="https://github.com/dmo-hub/next-life/tree/main/docs/spec"><b>สเปกและรีเสิร์ช</b>ข้อมูลคติไทย การเงิน และข้อมูลตามยุคพร้อมแหล่งอ้างอิง</a>
   </div>
-  <h2>ระบบหลักที่ตัดสินแล้ว</h2>
+  <h2>ระบบหลัก</h2>
   <ul>
-    <li>ค่าสถานะ 5 ตัว (สุขภาพ · ความสุข · ความรู้ · ความสัมพันธ์ · คอนเน็คชั่น) + เงินเป็นบาท · บอกผลของตัวเลือกแค่ทิศทาง</li>
-    <li>ตายจากตารางชีพจริงรายปี × สุขภาพ × กรรม · ไม่มีเพดานอายุแข็ง</li>
-    <li>บัญชีบุญบาปซ่อนไว้ เฉลยที่ปรโลก (อิงไตรภูมิพระร่วง) · กรรมตามทันในชาตินี้</li>
-    <li>การเงิน: เงินฝาก หุ้น ทอง ที่ดิน ธุรกิจ หนี้ — ผลตอบแทนปีอดีตใช้ค่าจริง</li>
-    <li>ฉายา 2 ชั้น: ชีวิต 17 แบบ + ฉายาตามเงื่อนไข 28 ตัว + ฉายาตระกูล 7 ตัว · สมุดฉายาเก็บตัวที่เคยได้</li>
+    <li>ค่าสถานะ 5 ตัว (สุขภาพ · ความสุข · ความรู้ · ความสัมพันธ์ · คอนเน็คชั่น) กับเงินเป็นบาท · ตัวเลือกบอกผลแค่ทิศทาง</li>
+    <li>ตายตามตารางชีพจริงรายปี สุขภาพ และกรรม · ไม่มีเพดานอายุตายตัว</li>
+    <li>บัญชีบุญบาปซ่อนไว้ เฉลยที่ปรโลก (ได้แรงบันดาลใจจากไตรภูมิพระร่วง) · กรรมตามทันได้ในชาตินี้</li>
+    <li>ครอบครัวมีชื่อ อายุ และความผูกพันรายคน ตายแล้วเกิดเป็น<span data-fact="kinNames">ลูก · หลาน · เหลน</span>ของตัวเองได้</li>
+    <li>การเงิน: เงินฝาก หุ้น ทอง ที่ดิน ธุรกิจ หนี้ · ผลตอบแทนปีอดีตใช้ค่าจริง</li>
+    <li>ชีวิต <span data-fact="patterns">17</span> แบบ ฉายา <span data-fact="titles">28</span> ตัว และฉายาตระกูล <span data-fact="familyTitles">7</span> ตัว · สมุดฉายาเก็บตัวที่เคยได้</li>
   </ul>
   <footer>โปรเจกต์ส่วนตัว · ข้อมูลการเงินในเกมเป็นข้อมูลเพื่อออกแบบเกม ไม่ใช่คำแนะนำการลงทุน · แฟนตาซีในเกมได้แรงบันดาลใจจากคติไทย ไม่ได้อ้างว่าเป็นคำสอน</footer>
 </div></main>

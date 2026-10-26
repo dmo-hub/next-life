@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { loadContent } from './src/node/load.mjs';
+import { buildSite } from './src/site/build.mjs';
 
 const read = (p) => readFileSync(new URL(p, import.meta.url), 'utf8');
 
@@ -23,3 +24,5 @@ const script = `(() => {\n${data}${code}\n})();`.replace(/<\/script/gi, '<\\/scr
 
 writeFileSync(new URL('./docs/play.html', import.meta.url), read('./src/ui/template.html').replace('/*__SCRIPT__*/', () => script));
 console.log(`docs/play.html: ${content.events.length} เหตุการณ์ · ข้อมูลยุค ${JSON.stringify(content.era).length.toLocaleString('en-US')} ตัวอักษร`);
+const site = buildSite(content);
+console.log(`docs/ หน้าเว็บ: ${site.pages.join(' · ')} · ${site.facts.version}`);
