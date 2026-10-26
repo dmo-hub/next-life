@@ -50,6 +50,8 @@ export function addMember(st, role, extra = {}) {
 }
 
 const livingOf = (st, role) => st.kin.filter((m) => m.role === role && m.alive && !m.left);
+// ลูกที่ยังมีชีวิต นับแบบเดียวกับที่ afterlife.mjs หารมรดก (ย้ายออกไปแล้วยังเป็นทายาท) · ไม่มีระบบครอบครัว = null
+export const livingChildren = (st) => (st.kin ? st.kin.filter((m) => m.role === 'child' && m.alive).length : null);
 // คนที่การ์ดเรียกชื่อ/คนที่ผลการ์ดกระทบ: คนล่าสุดที่ยังอยู่ของบทบาทนั้น (ลูกคนเล็ก · หลานคนเล็ก · คู่ปัจจุบัน)
 export const focusOf = (st, role) => livingOf(st, role).at(-1) ?? null;
 

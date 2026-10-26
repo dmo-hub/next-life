@@ -1,9 +1,9 @@
 import { makeRng } from './rng.mjs';
-import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf } from './family.mjs';
+import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
-import { newLedger, recordMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
+import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard } from './career.mjs';
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 import { introCard, eraStory } from './intro.mjs';
@@ -611,6 +611,8 @@ function emit(st, card) {
 function eventCard(st, ev) {
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
+  // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
+  if (ev.id === FUNERAL.rite) st.funeralPick ??= pickRite(st, ev);
   return emit(st, {
     kind: 'event',
     id: ev.id,
@@ -632,6 +634,7 @@ function eventCard(st, ev) {
 
 // ตัวเลือกที่ต้องมีเงิน/ค่าสถานะ/ธงถึงจะเลือกได้ (B14 A6) · ข้อความเหตุผลจากเนื้อหาทับข้อความตั้งต้น
 function lockReason(st, c) {
+  if (st.pending?.id === FUNERAL.rite && st.funeralPick && c.id !== st.funeralPick) return 'ไม่ใช่แบบที่ตกลงกัน';
   const q = c.requires;
   if (!q) return null;
   // อายุตามกฎหมายบอกเหตุผลของตัวเอง — reason ของเนื้อหาเขียนไว้ให้เงื่อนไขอื่น (เช่น "สั่งไว้แล้ว")
@@ -639,7 +642,7 @@ function lockReason(st, c) {
   if (q.age && st.age > (q.age.max ?? Infinity)) return `อายุเกิน ${q.age.max} ปี`;
   const why = [];
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
-  const purse = st.dead ? Math.min(st.money, netWorth(st)) : st.money;
+  const purse = st.dead ? deadPurse(st) : st.money;
   if (q.money && purse < moneyValue(st, q.money)) why.push('เงินไม่พอ');
   for (const [k, b] of Object.entries(q.stats ?? {})) {
     if (b.min !== undefined && st[k] < b.min) why.push(`${STAT_LABELS[k]}ไม่ถึง`);
@@ -811,7 +814,11 @@ export function choose(st, idx) {
   // เติมข้อความก่อนผลลง — {เงิน} ต้องเป็นยอดตอนที่ผู้เล่นเห็นตัวเลือก
   const text = fill(ev.choices[idx].text, st);
   const c = ev.choices[idx];
-  if (ev.id === FUNERAL.rite) st.funeral = { id: c.id, text, cost: c.effects?.money ? -moneyValue(st, c.effects.money) : 0 };
+  if (ev.id === FUNERAL.rite) {
+    st.funeral = { id: c.id, text, cost: c.effects?.money ? -moneyValue(st, c.effects.money) : 0 };
+    // คนมาส่งทำบุญอุทิศให้ — ลงบัญชีก่อนถึงปรโลก
+    addMerit(st.ledger, 'dana', Math.min(FUNERAL.guestMerit.cap, guestBase(st) / FUNERAL.guestMerit.ref));
+  }
   applyEffects(st, c.effects);
   applyChoice(st, ev, c);
   st.log.push({ id: ev.id, age: st.age, choice: idx, text });
@@ -877,11 +884,11 @@ function deathCard(st) {
   if (st.funeral) {
     const { id, text, cost } = st.funeral;
     // แขกมาส่งตามความสัมพันธ์/คอนเน็คชั่น คูณขนาดงาน — ปัดสิบ ไม่ใช่ยอดนับจริง
-    const guests = Math.round((FUNERAL.guests[id] ?? 1) * (20 + st.relations * 2 + st.network * 3) / 10) * 10;
+    const guests = Math.round((FUNERAL.guests[id] ?? 1) * guestBase(st) / 10) * 10;
     card.funeral = { text, guests, cost: Math.round(cost) };
   }
-  // ไม่มีพินัยกรรม + มีทรัพย์ให้แบ่ง = ลูกหลานแบ่งกันเอง (afterlife.mjs หักส่วนที่เสียไปกับการทะเลาะ)
-  if (card.summary.money > 0 && !card.short) card.will = !!st.flags.wish_will;
+  // มีทรัพย์ให้แบ่ง + ลูกที่ยังอยู่ถึงเกณฑ์ = เรื่องพินัยกรรม (afterlife.mjs หักส่วนที่เสียไปกับการทะเลาะ) · ลูกคนเดียวไม่มีใครให้ทะเลาะด้วย
+  if (card.summary.money > 0 && !card.short && disputes(st)) card.will = !!st.flags.wish_will;
   return card;
 }
 
@@ -891,7 +898,34 @@ export const FUNERAL = {
   wishes: 'funeral_wishes_01',
   rite: 'funeral_rite_01',
   guests: { one_day: 0.3, chant_3: 0.7, chant_7: 1, grand: 1.6, body: 0.2, temple: 0.4 },
+  // B25b ค่าตั้งของเกม: บุญจากแขกคิดจากฐานแขกไม่คูณขนาดงาน (กันซื้อบุญด้วยเงิน) หารด้วย ref เพดาน cap (= บาประดับ 1 ของงานใหญ่)
+  guestMerit: { ref: 500, cap: 1 },
+  // คนข้างหลังเลือกแบบงานตามความสัมพันธ์: ถึง high = งานแพงที่จ่ายไหว · ต่ำกว่า low = เผาวันเดียว · ระหว่างนั้น = สวด 3 คืน
+  love: { high: 70, low: 40 },
+  // ลูกที่ยังอยู่ตั้งแต่เท่านี้ถึงมีการแบ่งมรดกกันเอง (เจ้าของเคาะ A9)
+  disputeKids: 2,
 };
+const guestBase = (st) => 20 + st.relations * 2 + st.network * 3;
+// state ก่อนมีระบบครอบครัว (ไม่มี kin) ถือว่าถึงเกณฑ์ — ตรงกับ LEGACY.kids ของ afterlife.mjs
+export const disputes = (st) => (livingChildren(st) ?? FUNERAL.disputeKids) >= FUNERAL.disputeKids;
+const deadPurse = (st) => Math.min(st.money, netWorth(st));
+
+// แบบงานศพที่คนข้างหลังเลือก (B25b) · คำสั่งบริจาคร่างทับทุกอย่าง · ไม่มีลูกหลานหรือจ่ายแบบไหนไม่ไหว = วัด/มูลนิธิจัดให้
+// สุ่มจาก rng ของชีวิตครั้งเดียวเฉพาะตอนต้องเลือกระหว่างงานใหญ่กับสวด 7 คืน
+function pickRite(st, ev) {
+  if (st.flags.wish_body) return 'body';
+  const heirs = st.kin ? st.kin.some((m) => (m.role === 'child' || m.role === 'grandchild') && m.alive) : !!st.flags.has_kids;
+  if (!heirs) return 'temple';
+  const purse = deadPurse(st);
+  const ok = (id) => {
+    const c = ev.choices.find((x) => x.id === id);
+    return !!c && (!c.requires?.money || purse >= moneyValue(st, c.requires.money));
+  };
+  let want = ['one_day'];
+  if (st.relations >= FUNERAL.love.high) want = [...(st.rng.next() < 0.5 ? ['grand', 'chant_7'] : ['chant_7', 'grand']), 'chant_3', 'one_day'];
+  else if (st.relations >= FUNERAL.love.low) want = ['chant_3', 'one_day'];
+  return want.find(ok) ?? 'temple';
+}
 function queueFuneral(st) {
   if (st.age < STAGES[1].from) return false;
   const evs = [FUNERAL.wishes, FUNERAL.rite].map((id) => st.content.events.find((e) => e.id === id)).filter(Boolean);

@@ -88,6 +88,16 @@ export function recordMerit(ledger, tags = [], key = '') {
   return flags;
 }
 
+// ค่าที่แกนคิดเองไม่ผ่านระดับ 1–3 ของเนื้อหา (เช่น บุญจากแขกงานศพ B25b) · เพดานเป็นหน้าที่ของผู้เรียก
+export function addMerit(ledger, cat, v) {
+  const id = meritId(cat);
+  if (!(v > 0) || id === 'neutral') return;
+  if (MERIT_WEIGHTS[id] === undefined || FLAG_CATS.includes(id)) throw new Error(`หมวดบุญบาปใช้กับค่าที่แกนคิดไม่ได้: ${cat}`);
+  ledger.byCat[id] = (ledger.byCat[id] ?? 0) + v;
+  if (SIN_CATS.includes(id)) ledger.sin += v;
+  else ledger.merit += v;
+}
+
 export const netLedger = (ledger) => ledger.merit - ledger.sin;
 export const ledgerLevel = (ledger) => Math.max(-1, Math.min(1, netLedger(ledger) / KARMA.ref));
 

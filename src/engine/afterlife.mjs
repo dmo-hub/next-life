@@ -6,7 +6,7 @@ import { makeRng, mixSeed } from './rng.mjs';
 import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
-import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE } from './life.mjs';
+import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes } from './life.mjs';
 
 // ระดับกรรมที่ศาล (−1..1) = บัญชีสุทธิ ÷ ref · ref แยกจากตัวคูณกรรมระหว่างชีวิต (KARMA.ref) เพราะบัญชีทั้งชีวิตสะสมไกลกว่า
 // จุดอิ่มของตัวคูณการตายมาก — ใช้ ref เดียวกันแล้วเกือบทุกคนชนเพดาน ภูมิกับฐานะชาติหน้าจะไม่แยกคน
@@ -232,8 +232,8 @@ export function legacyUnits(st, kids = LEGACY.kids) {
   const e = st.estate;
   if (!e || e.money <= 0) return 0;
   let share = e.money / Math.max(1, kids);
-  // ผ่านฉากงานศพแล้วไม่ได้ทำพินัยกรรม — ชีวิตที่ไม่ได้ผ่านฉากนี้ (ตายตอนเด็ก) ไม่หัก
-  if (st.funeral && !st.flags?.wish_will) share *= 1 - LEGACY.dispute;
+  // ผ่านฉากงานศพแล้วไม่ได้ทำพินัยกรรม และมีลูกพอจะแบ่งกันเอง — ตายตอนเด็ก/ลูกคนเดียวไม่หัก
+  if (st.funeral && !st.flags?.wish_will && disputes(st)) share *= 1 - LEGACY.dispute;
   if (e.year >= LEGACY.taxYear && share > LEGACY.taxFrom) share -= (share - LEGACY.taxFrom) * LEGACY.tax;
   return share / (nationalIncome(st.content.era, st.seed, e.year) * 12);
 }
