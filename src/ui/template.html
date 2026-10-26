@@ -222,8 +222,32 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .mem .body .dates { margin-top:-6px; }
 .mem .choice { border-color:#1F1F1F; }
 
+/* ทาง C ต่างโลก (B68) — หน้าต่างสถานะแบบเกม: พื้นฟ้ากลางคืน กรอบฟ้าเรือง · ต่างจากสองแนวไทยให้รู้ว่าออกจากวงเวียนเดิมแล้ว */
+.i { background:#161A3A; color:#E8ECFF; border:1px solid #3B4BA8; }
+.i .top { border-bottom:1px solid #3B4BA8; }
+.i .top b { font-family:Pridi,serif; font-size:18px; font-weight:600; color:#6FE3FF; }
+.i .top small, .i .note, .i .tree summary { color:#A6AEDB; }
+.i .kicker { color:#B48CFF; letter-spacing:0.06em; }
+.i .body h3 { font-family:Pridi,serif; font-weight:600; color:#E8ECFF; }
+.i .body p, .i .picks { color:#D3D8F5; }
+.i .choice { border:1px solid #3B4BA8; border-radius:6px; background:#0E1024; color:#E8ECFF; }
+.i .choice:hover, .i .choice:focus-visible { border-color:#6FE3FF; background:#1E2350; outline:none; }
+.i .choice .fx { color:#6FE3FF; }
+.i .idesc { display:block; text-indent:0; margin-top:2px; font-size:12px; color:#A6AEDB; }
+.i .iok { color:#5EE6A0; font-weight:600; } .i .ibad { color:#FF8A8A; font-weight:600; }
+.i .isys { font-size:13px; color:#F2C94C; border:1px dashed #F2C94C; border-radius:6px; padding:6px 10px; }
+.iwin { margin:12px 20px 0; padding:10px 12px; border:1px solid #2A3478; border-radius:8px; background:#0E1024; display:flex; flex-direction:column; gap:8px; font-size:12px; color:#A6AEDB; }
+.irow { display:flex; justify-content:space-between; }
+.ibar { height:8px; border-radius:999px; background:#05060F; overflow:hidden; }
+.ibar i { display:block; height:100%; }
+.ibar.hp i { background:#FF6B6B; } .ibar.goal i { background:#B48CFF; }
+.istats { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:6px; }
+.istats div { display:flex; flex-direction:column; align-items:center; border:1px solid #2A3478; border-radius:6px; padding:2px; }
+.istats b { font-size:16px; color:#E8ECFF; }
+.ichips { display:flex; flex-wrap:wrap; gap:6px; }
+.ichip { padding:1px 8px; border:1px solid #F2C94C; border-radius:999px; color:#F2C94C; }
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
-.a .choice:disabled, .b .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
+.a .choice:disabled, .b .choice:disabled, .i .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
 
 /* ธีมสว่าง (B83b T2 · B83c): ค่าเริ่มตอนมีชีวิต ทับทุกแนวการ์ดยกเว้นปรโลก (.af มืดทองเสมอ) · ทุกกฎขึ้นต้น .light จึงเจาะจงกว่ากฎของแนว และวางท้ายสุด */
 html.light { --page:#EDEDED; }
@@ -234,35 +258,35 @@ html.light { --page:#EDEDED; }
 .light .theme button { border-color:#8A8A8A; color:#3A3F4B; }
 .light .theme button[aria-pressed="true"] { background:#16181D; border-color:#16181D; color:#FFFFFF; }
 .light .theme button:focus-visible { outline-color:#16181D; }
-.light .card:not(.af) { background:#FFFFFF; color:#16181D; border:1px solid #C8C8C8; outline:none; }
-.light .card:not(.af) .top { background:#F0F0F0; color:#16181D; border-bottom:1px solid #C8C8C8; }
-.light .card:not(.af) .top b { font-family:Sarabun,sans-serif; font-size:16px; font-weight:600; color:#16181D; }
-.light .card:not(.af) .top small, .light .card:not(.af) .stats, .light .card:not(.af) .meta, .light .card:not(.af) .sub, .light .card:not(.af) .note, .light .card:not(.af) .body .horo,
-.light .card:not(.af) .stat-help, .light .card:not(.af) .stat-help dd { color:#3A3F4B; }
-.light .card:not(.af) .stat-help dt, .light .card:not(.af) .recap .h { color:#16181D; }
-.light .card:not(.af) .stats { border-bottom:1px solid #E6E6E6; }
-.light .card:not(.af) .bar { background:#E6E6E6; } .light .card:not(.af) .bar i { background:#1F6B5E; } .light .card:not(.af) .bar b { background:#B23A2A; }
-.light .card:not(.af) .kicker { color:#B23A2A; }
-.light .card:not(.af) .body h3 { font-family:Sarabun,sans-serif; font-weight:600; font-size:24px; color:#16181D; }
-.light .card:not(.af) .body h3.lead { font-weight:400; font-size:19px; }
-.light .card:not(.af) .body p, .light .card:not(.af) .items, .light .card:not(.af) .picks, .light .card:not(.af) .tree summary, .light .card:not(.af) .family summary { color:#3A3F4B; }
-.light .card:not(.af) .stamp { border:2px solid #B23A2A; color:#B23A2A; }
-.light .card:not(.af) .recap, .light .card:not(.af) .lifechart { border:1px solid #C8C8C8; background:#FAFAFA; }
-.light .card:not(.af) .scene { background:#F0F0F0; border-bottom-color:#C8C8C8; }
-.light .card:not(.af) .scale > div { border-color:#C8C8C8; } .light .card:not(.af) .scale > div.heavy { border-color:#1F6B5E; }
-.light .card:not(.af) .scale b { font-family:Sarabun,sans-serif; color:#16181D; } .light .card:not(.af) .scale .sum { color:#16181D; }
-.light .card:not(.af) .deeds { border-top-color:#C8C8C8; } .light .card:not(.af) .deed { color:#3A3F4B; }
-.light .card:not(.af) .deed b { color:#1F6B5E; } .light .card:not(.af) .deed.bad b { color:#B23A2A; }
-.light .card:not(.af) .band0 { fill:#F0F0F0; fill-opacity:1; }
-.light .card:not(.af) .ln0 { stroke:var(--red); } .light .card:not(.af) .ln1 { stroke:var(--bronze2); } .light .card:not(.af) .ln2 { stroke:var(--blue); } .light .card:not(.af) .ln3 { stroke:var(--green); } .light .card:not(.af) .ln4 { stroke:#16181D; }
-.light .card:not(.af) .choice { border:1px solid #16181D; background:#FFFFFF; color:#16181D; }
-.light .card:not(.af) .choice:hover, .light .card:not(.af) .choice:focus-visible { background:#16181D; border-color:#16181D; color:#FFFFFF; outline:none; }
-.light .card:not(.af) .choice .fx { color:#1F6B5E; } .light .card:not(.af) .choice:hover .fx, .light .card:not(.af) .choice:focus-visible .fx { color:#CFE3E0; }
-.light .card:not(.af) .sg.su { stroke:#1F6B5E; } .light .card:not(.af) .sg.sd { stroke:#B23A2A; } .light .card:not(.af) .sg.se { stroke:#3A3F4B; }
-.light .card:not(.af) .spark text, .light .card:not(.af) .mk-cap, .light .card:not(.af) .lifechart .h { fill:#3A3F4B; color:#3A3F4B; } .light .card:not(.af) .spark .grid { stroke:#C8C8C8; }
-.light .card:not(.af) .spark .mk.ev circle, .light .card:not(.af) .spark .mk.nx circle { fill:#FFFFFF; stroke:#16181D; }
-.light .card:not(.af) .spark .mk.broke rect, .light .card:not(.af) .legend .mk.broke rect { fill:#B23A2A; stroke:#16181D; }
-.light .card:not(.af) .choice:disabled { opacity:0.45; background:transparent; color:inherit; border-style:dashed; }
+.light .card:not(.af):not(.i) { background:#FFFFFF; color:#16181D; border:1px solid #C8C8C8; outline:none; }
+.light .card:not(.af):not(.i) .top { background:#F0F0F0; color:#16181D; border-bottom:1px solid #C8C8C8; }
+.light .card:not(.af):not(.i) .top b { font-family:Sarabun,sans-serif; font-size:16px; font-weight:600; color:#16181D; }
+.light .card:not(.af):not(.i) .top small, .light .card:not(.af):not(.i) .stats, .light .card:not(.af):not(.i) .meta, .light .card:not(.af):not(.i) .sub, .light .card:not(.af):not(.i) .note, .light .card:not(.af):not(.i) .body .horo,
+.light .card:not(.af):not(.i) .stat-help, .light .card:not(.af):not(.i) .stat-help dd { color:#3A3F4B; }
+.light .card:not(.af):not(.i) .stat-help dt, .light .card:not(.af):not(.i) .recap .h { color:#16181D; }
+.light .card:not(.af):not(.i) .stats { border-bottom:1px solid #E6E6E6; }
+.light .card:not(.af):not(.i) .bar { background:#E6E6E6; } .light .card:not(.af):not(.i) .bar i { background:#1F6B5E; } .light .card:not(.af):not(.i) .bar b { background:#B23A2A; }
+.light .card:not(.af):not(.i) .kicker { color:#B23A2A; }
+.light .card:not(.af):not(.i) .body h3 { font-family:Sarabun,sans-serif; font-weight:600; font-size:24px; color:#16181D; }
+.light .card:not(.af):not(.i) .body h3.lead { font-weight:400; font-size:19px; }
+.light .card:not(.af):not(.i) .body p, .light .card:not(.af):not(.i) .items, .light .card:not(.af):not(.i) .picks, .light .card:not(.af):not(.i) .tree summary, .light .card:not(.af):not(.i) .family summary { color:#3A3F4B; }
+.light .card:not(.af):not(.i) .stamp { border:2px solid #B23A2A; color:#B23A2A; }
+.light .card:not(.af):not(.i) .recap, .light .card:not(.af):not(.i) .lifechart { border:1px solid #C8C8C8; background:#FAFAFA; }
+.light .card:not(.af):not(.i) .scene { background:#F0F0F0; border-bottom-color:#C8C8C8; }
+.light .card:not(.af):not(.i) .scale > div { border-color:#C8C8C8; } .light .card:not(.af):not(.i) .scale > div.heavy { border-color:#1F6B5E; }
+.light .card:not(.af):not(.i) .scale b { font-family:Sarabun,sans-serif; color:#16181D; } .light .card:not(.af):not(.i) .scale .sum { color:#16181D; }
+.light .card:not(.af):not(.i) .deeds { border-top-color:#C8C8C8; } .light .card:not(.af):not(.i) .deed { color:#3A3F4B; }
+.light .card:not(.af):not(.i) .deed b { color:#1F6B5E; } .light .card:not(.af):not(.i) .deed.bad b { color:#B23A2A; }
+.light .card:not(.af):not(.i) .band0 { fill:#F0F0F0; fill-opacity:1; }
+.light .card:not(.af):not(.i) .ln0 { stroke:var(--red); } .light .card:not(.af):not(.i) .ln1 { stroke:var(--bronze2); } .light .card:not(.af):not(.i) .ln2 { stroke:var(--blue); } .light .card:not(.af):not(.i) .ln3 { stroke:var(--green); } .light .card:not(.af):not(.i) .ln4 { stroke:#16181D; }
+.light .card:not(.af):not(.i) .choice { border:1px solid #16181D; background:#FFFFFF; color:#16181D; }
+.light .card:not(.af):not(.i) .choice:hover, .light .card:not(.af):not(.i) .choice:focus-visible { background:#16181D; border-color:#16181D; color:#FFFFFF; outline:none; }
+.light .card:not(.af):not(.i) .choice .fx { color:#1F6B5E; } .light .card:not(.af):not(.i) .choice:hover .fx, .light .card:not(.af):not(.i) .choice:focus-visible .fx { color:#CFE3E0; }
+.light .card:not(.af):not(.i) .sg.su { stroke:#1F6B5E; } .light .card:not(.af):not(.i) .sg.sd { stroke:#B23A2A; } .light .card:not(.af):not(.i) .sg.se { stroke:#3A3F4B; }
+.light .card:not(.af):not(.i) .spark text, .light .card:not(.af):not(.i) .mk-cap, .light .card:not(.af):not(.i) .lifechart .h { fill:#3A3F4B; color:#3A3F4B; } .light .card:not(.af):not(.i) .spark .grid { stroke:#C8C8C8; }
+.light .card:not(.af):not(.i) .spark .mk.ev circle, .light .card:not(.af):not(.i) .spark .mk.nx circle { fill:#FFFFFF; stroke:#16181D; }
+.light .card:not(.af):not(.i) .spark .mk.broke rect, .light .card:not(.af):not(.i) .legend .mk.broke rect { fill:#B23A2A; stroke:#16181D; }
+.light .card:not(.af):not(.i) .choice:disabled { opacity:0.45; background:transparent; color:inherit; border-style:dashed; }
 </style>
 </head>
 <body>

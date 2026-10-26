@@ -56,12 +56,15 @@ function kinText(k, v, who) {
 
 // สิ่งที่สืบทอด (รุ่นที่ 2 ขึ้นไป) อ่านจาก heir ที่การ์ดส่งต่อสร้าง — เลือกช่องเองทีละช่อง ไม่ส่ง heir ทั้งก้อน (มีบัญชีที่ส่งต่อ)
 function inheritText(st, heir) {
-  const prev = st.lineage.at(-1);
+  // ฐานะเทียบกับชาติไทยล่าสุด — แถวต่างโลก (B68) ไม่มีฐานะ
+  const prev = st.lineage.findLast((l) => !l.isekai);
+  const away = st.lineage.slice(st.lineage.indexOf(prev) + 1);
   const out = [];
   const ancestor = st.parents.find((p) => p.ancestor);
   // เซฟก่อน B18 ไม่มี legacy.from — ทางเป็นลูกชั้นเดียวยังมีพ่อ/แม่ที่เป็นชาติก่อนให้เรียก
   const who = heir.legacy?.from ?? (ancestor ? parentWord(ancestor) : null);
   if (prev.path === 'child' && who) out.push(`ชาติก่อนเฝ้าลูกหลานไว้ แล้วกลับมาเกิดเป็น${kinTier(prev.tier).name}ของตัวเอง — ${who}ของคุณคือคุณในชาติก่อน`);
+  else if (away.length) out.push(`ชาติก่อนตามเทพธิดาไปต่างโลก ${away.length} ชาติ (ล่าสุด: ${away.at(-1).name} · ${away.at(-1).ending}) แล้วกลับมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม`);
   else out.push('ชาติก่อนไปตามกรรม แล้วมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม');
   out.push(`กรรมที่ติดตัวมาจากชาติก่อน${carryAmount(heir.carried)}`);
   const d = CLASSES.indexOf(st.cls) - CLASSES.indexOf(prev.cls);

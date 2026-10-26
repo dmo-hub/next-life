@@ -7,6 +7,7 @@ import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
 import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf } from './life.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage } from './isekai.mjs';
 
 // ระดับกรรมที่ปรโลก (−1..1) = บัญชีสุทธิ ÷ ref · ref แยกจากตัวคูณกรรมระหว่างชีวิต (KARMA.ref) เพราะบัญชีทั้งชีวิตสะสมไกลกว่า
 // จุดอิ่มของตัวคูณการตายมาก — ใช้ ref เดียวกันแล้วเกือบทุกคนชนเพดาน ภูมิกับฐานะชาติหน้าจะไม่แยกคน
@@ -68,6 +69,10 @@ export function startAfterlife(st) {
     path: null,
     heir: null,
     cards: 0,
+    // ต่างโลก (B68): ชีวิตที่กำลังเล่น · แถว lineage ของชีวิตต่างโลกที่จบแล้ว · เทพธิดาโผล่เอง/ตายแบบต่างโลก = ได้ของแถม
+    isekai: null,
+    isekaiLives: [],
+    blessed: isekaiCalled(st),
   };
 }
 
@@ -131,17 +136,19 @@ function verdictCard(af) {
 }
 
 // ทางเกิด (ใบ 05): เป็นลูก (รับมรดกต่อ · ผีบรรพบุรุษเฝ้า) หรือเกิดใหม่ตามกรรม · ไม่มีลูกยังเล่นต่อได้ทางเกิดใหม่
-// การ์ดนี้เป็นทางแยกของเกม ไม่ใช่เหตุการณ์ จึงมีแค่สองทาง (ยกเว้นกติกา ≥4 ตัวเลือกของเนื้อหา)
+// การ์ดนี้เป็นทางแยกของเกม ไม่ใช่เหตุการณ์ จึงไม่ต้องมี 4 ตัวเลือกตามกติกาเนื้อหา · ทางที่ 3 ต่างโลก (B68) เลือกได้เสมอ
 export const PATHS = [
   { id: 'child', text: 'เฝ้าลูกหลาน แล้วกลับมาเกิดในตระกูลเดิม เป็นลูก หลาน หรือเหลน' },
   { id: 'reborn', text: 'ไปตามกรรม แล้วเกิดใหม่ที่ไหนก็ได้' },
+  { id: 'isekai', text: 'ตามเทพธิดาต่างโลกไปเกิดในโลกแฟนตาซีก่อน' },
 ];
 function pathCard(af) {
   af.pending = { path: true, choices: PATHS.map(() => ({ merit: [] })) };
+  const base = hasKids(af.st) ? 'ก่อนไปตามคำตัดสิน ดวงวิญญาณเลือกได้ว่าจะกลับไปใกล้ลูกหลาน หรือปล่อยวางแล้วไปเกิดตามกรรม' : 'ไม่มีลูกหลานให้เฝ้า ดวงวิญญาณไปเกิดตามกรรม';
   return emitAfter(af, {
     kind: 'path',
     type: 'B',
-    text: hasKids(af.st) ? 'ก่อนไปตามคำตัดสิน ดวงวิญญาณเลือกได้ว่าจะกลับไปใกล้ลูกหลาน หรือปล่อยวางแล้วไปเกิดตามกรรม' : 'ไม่มีลูกหลานให้เฝ้า ดวงวิญญาณไปเกิดตามกรรม',
+    text: af.blessed ? `${base} · มีหญิงผมสีเงินยืนโบกมือรออยู่ข้างทาง บอกว่าเป็นเทพธิดาจากอีกโลกหนึ่ง` : base,
     choices: PATHS.map((p) => p.text),
     locked: PATHS.map((p) => (p.id === 'child' && !hasKids(af.st) ? 'ไม่มีลูกหลานให้กลับไปเกิด' : null)),
   });
@@ -155,7 +162,7 @@ function carryCard(af) {
   af.heir = makeHeir(af, r);
   const h = af.heir;
   const amount = carryAmount(h.carried);
-  const who = af.path === 'child' ? `กลับมาเกิดเป็น${kinTier(h.tier).name}ของตัวเอง` : 'ไปเกิดใหม่';
+  const who = af.path === 'child' ? `กลับมาเกิดเป็น${kinTier(h.tier).name}ของตัวเอง` : af.isekaiLives.length ? 'กลับจากต่างโลกมาเกิดใหม่' : 'ไปเกิดใหม่';
   return emitAfter(af, {
     kind: 'carry',
     type: 'B',
@@ -168,11 +175,13 @@ function carryCard(af) {
 }
 
 // ผังตระกูล (ใบ 05: เลิกเมื่อไรก็ดูได้) — หน้าจอวาดระหว่างชีวิตจาก st.lineage และบนการ์ดส่งต่อ
-export const lineageText = (lineage) => lineage.map((l) => `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ${l.province ? `${placeName(l.province)} · ` : ''}ฐานะ${l.cls} · ตายอายุ ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${kinTier(l.tier).name}` : ''}`);
+export const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่นที่ ${l.gen} · ${l.name} · ต่างโลก (${l.world}) · ${l.ending}` : `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ${l.province ? `${placeName(l.province)} · ` : ''}ฐานะ${l.cls} · ตายอายุ ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${kinTier(l.tier).name}` : ''}`);
 
 // การ์ดถัดไปของช่วงที่ 7 · การ์ด carry (done) เป็นใบสุดท้าย แล้วผู้เรียกต่อ nextLife
 export function nextAfterCard(af) {
   if (af.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
+  // การ์ดต่างโลกไม่นับใน af.cards — ความยาวช่วงที่ 7 (ด่าน lineage) วัดเฉพาะการ์ดระหว่างชาติ
+  if (af.isekai) return { stage: AFTERLIFE_STAGE, ...nextIsekaiCard(af.isekai) };
   if (af.queue.length) return emitAfter(af, af.queue.shift());
   const step = af.steps[af.i++];
   if (step === 'transfer' || step === 'devaduta') return sceneCard(af, pickScene(af, step));
@@ -187,13 +196,28 @@ function addBonus(af, fx = {}) {
   for (const k of STAT_KEYS) if (fx[k]) af.bonus[k] = Math.max(-FATE.bonusCap, Math.min(FATE.bonusCap, (af.bonus[k] ?? 0) + levelValue(fx[k])));
 }
 
+// จบชีวิตต่างโลก: ลงผังตระกูลเป็นรุ่นของตัวเอง แล้วอยู่ต่อ (รอบใหม่ติดค่าสูงสุดไปด้วย) หรือกลับไปเกิดตามกรรมทางเกิดใหม่
+function isekaiChoose(af, idx) {
+  const isk = af.isekai;
+  chooseIsekai(isk, idx);
+  if (!isk.exit) return;
+  af.isekaiLives.push(isekaiLineage(isk, (af.st.gen ?? 1) + 1 + af.isekaiLives.length));
+  if (isk.exit === 'stay') af.isekai = startIsekai({ seed: af.st.seed, karma: af.verdict.x, past: af.st.name, run: isk.run + 1, memory: isekaiMemory(isk) });
+  else {
+    af.isekai = null;
+    af.path = 'reborn';
+  }
+}
+
 export function chooseAfter(af, idx) {
+  if (af.isekai) return isekaiChoose(af, idx);
   const p = af.pending;
   if (p?.path) {
     const path = PATHS[idx];
     if (!path || (path.id === 'child' && !hasKids(af.st))) throw new Error('ตัวเลือกไม่ถูกต้อง');
     af.pending = null;
     af.path = path.id;
+    if (path.id === 'isekai') af.isekai = startIsekai({ seed: af.st.seed, karma: af.verdict.x, past: af.st.name, blessed: af.blessed });
     return;
   }
   const c = p?.choices[idx];
@@ -326,11 +350,12 @@ function makeHeir(af, r) {
   const bonus = Object.fromEntries(STAT_KEYS.map((k) => [k, x * FATE.stat + (af.bonus[k] ?? 0) + kin(k)]));
   const gen = st.gen ?? 1;
   // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน · tier = กลับมาเกิดเป็นชั้นไหนของตัวเอง (ทางเป็นลูก)
-  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: realm.name, path: af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: standingOf(st) }] }];
+  // ชีวิตต่างโลกต่อท้ายเป็นรุ่นของตัวเอง (B68) — แถวชาติไทยบันทึกทางว่าไปต่างโลก แม้ขากลับจะเกิดใหม่ตามกรรม
+  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: standingOf(st) }] }, ...af.isekaiLives];
   const carried = r * (tier?.carry ?? 1);
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
-    gen: gen + 1,
+    gen: gen + 1 + af.isekaiLives.length,
     sex,
     name,
     cls,

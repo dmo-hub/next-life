@@ -333,7 +333,9 @@ export function titlesOf(st) {
   const f = lifeFacts(st);
   const pick = ({ id, name, tier, hint }) => ({ id, name, tier, hint });
   const titles = TITLES.filter((t) => t.test(f)).sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier)).map(pick);
-  const chain = [...st.lineage, { gen: st.gen, sex: st.sex, cls: st.cls, age: st.age, broke: f.worth < 0 }];
-  const family = FAMILY_TITLES.filter((t) => t.test(chain, st.lineage)).map(({ id, name, hint }) => ({ id, name, tier: 'ตระกูล', hint }));
+  // แถวต่างโลก (B68) ไม่มีฐานะ/อายุ/ภูมิแบบชาติไทย — ฉายาตระกูลนับเฉพาะชาติไทย
+  const thai = st.lineage.filter((l) => !l.isekai);
+  const chain = [...thai, { gen: st.gen, sex: st.sex, cls: st.cls, age: st.age, broke: f.worth < 0 }];
+  const family = FAMILY_TITLES.filter((t) => t.test(chain, thai)).map(({ id, name, hint }) => ({ id, name, tier: 'ตระกูล', hint }));
   return { pattern: pattern && { id: pattern.id, name: pattern.name, hint: pattern.hint }, titles, family };
 }

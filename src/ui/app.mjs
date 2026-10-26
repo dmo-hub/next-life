@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.2.53';
@@ -1242,6 +1242,7 @@ function standingPanel() {
 const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ปรโลก', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ' };
 const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา' };
 function renderAfter(card) {
+  if (card.kind === 'isekai') return renderIsekai(card);
   root.replaceChildren();
   const box = el('article', 'card b af');
   const top = el('div', 'top');
@@ -1277,6 +1278,74 @@ function renderAfter(card) {
   if (card.kind === 'verdict') choices.append(copyButton(() => summaryText(st.age, card.realm)));
   box.append(top);
   if (court) box.append(courtScene());
+  box.append(body, choices);
+  root.append(box);
+}
+
+// ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
+const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกโลก', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก' };
+function isekaiMeter(label, v, cls) {
+  const m = el('div', 'imeter');
+  const row = el('div', 'irow');
+  row.append(el('span', null, label), el('span', null, `${v}/100`));
+  const bar = el('div', `ibar ${cls}`);
+  const fill = el('i');
+  fill.style.width = `${v}%`;
+  bar.append(fill);
+  m.append(row, bar);
+  return m;
+}
+function isekaiStatusBox(s) {
+  const box = el('div', 'iwin');
+  box.append(isekaiMeter('HP', s.hp, 'hp'), isekaiMeter(s.goalName, s.goal, 'goal'));
+  const grid = el('div', 'istats');
+  for (const [k, label] of Object.entries(ISEKAI_STAT)) {
+    const d = el('div');
+    d.append(el('span', null, label), el('b', null, String(s[k])));
+    grid.append(d);
+  }
+  box.append(grid, el('div', null, `ทอง ${s.gold.toLocaleString('en-US')} · ชื่อเสียง ${s.fame} · ${s.world}`));
+  if (s.skills.length) {
+    const chips = el('div', 'ichips');
+    for (const name of s.skills) chips.append(el('span', 'ichip', name));
+    box.append(chips);
+  }
+  return box;
+}
+function renderIsekai(card) {
+  root.replaceChildren();
+  const box = el('article', 'card i');
+  const top = el('div', 'top');
+  const s = card.status;
+  top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ชาติต่างโลกที่ ${card.run + 1} · ${s.name}` : `${genLabel()}${st.name} · ตายอายุ ${st.age}`));
+  const body = el('div', 'body');
+  const choices = el('div', 'choices');
+  body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} ${card.index}/${card.total}` : ISEKAI_KICKER[card.step]));
+  body.append(el('h3', null, card.title), el('p', null, card.text));
+  if (card.step === 'result' && card.ok !== null) body.append(el('p', card.ok ? 'iok' : 'ibad', `${card.ok ? 'สำเร็จ' : 'พลาด'} · ${card.stat}`));
+  const deltas = Object.entries(card.deltas ?? {});
+  if (deltas.length) {
+    const label = { hp: 'HP', gold: 'ทอง', fame: 'ชื่อเสียง', goal: s.goalName, ...ISEKAI_STAT };
+    body.append(el('p', 'note', deltas.map(([k, v]) => `${label[k]} ${v > 0 ? '+' : ''}${v}`).join(' · ')));
+  }
+  if (card.sys) body.append(el('p', 'isys', card.sys));
+  if (card.note) body.append(el('p', 'isys', card.note));
+  if (card.log?.length) {
+    const d = el('details', 'tree');
+    d.append(el('summary', null, `เส้นทางที่เลือก ${card.log.length} เหตุการณ์`), list(card.log, 'picks'));
+    body.append(d);
+  }
+  if (card.choices.length) {
+    card.choices.forEach((c, i) => {
+      const why = card.locked?.[i];
+      const b = keyed(button(c, why ?? card.fx?.[i], () => play(afterPick(i))), i);
+      if (card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
+      if (why) b.disabled = true;
+      choices.append(b);
+    });
+  } else choices.append(enter(button('ต่อไป', null, () => play(T.afterNext))));
+  box.append(top);
+  if (s) box.append(isekaiStatusBox(s));
   box.append(body, choices);
   root.append(box);
 }

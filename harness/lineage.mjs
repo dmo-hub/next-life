@@ -23,8 +23,10 @@ const score = (c) =>
     return s + (SIN_CATS.includes(id) ? -v : v);
   }, 0);
 const extreme = (sign) => (card, rng, h) => {
-  if (h.pending.alloc) return 0;
+  if (h.pending?.alloc) return 0;
   const open = openChoices(card);
+  // การ์ดต่างโลก (B68) ไม่มีป้ายบุญบาป — สุ่มแบบ bots.mjs
+  if (!h.pending) return open[rng.int(0, open.length - 1)];
   const s = open.map((i) => sign * score(h.pending.choices[i]));
   const best = Math.max(...s);
   const ties = open.filter((_, j) => s[j] === best);
@@ -54,7 +56,7 @@ const near = (a, b) => Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.a
 
 const out = {};
 let streamBad = 0, streamChecks = 0, childDeaths = 0, childBad = 0, occBad = 0, provBad = 0, provSame = 0, rebirths = 0;
-let leaks = 0, reveals = 0, afterlives = 0, statBad = 0, carryBad = 0, debtLeak = 0, lenBad = 0;
+let leaks = 0, reveals = 0, afterlives = 0, statBad = 0, carryBad = 0, debtLeak = 0, lenBad = 0, isekaiLives = 0, isekaiBad = 0;
 const lens = [];
 // ทางในตระกูลแยกชั้น (B18): จำนวน · ผลรวมสัดส่วนส่งต่อ · มรดก (เท่ารายได้ปี) · |ส่วนต่างความสัมพันธ์+คอนเน็คชั่นจากบ้าน|
 const tiers = KIN_TIERS.map(() => ({ n: 0, carry: 0, legacy: 0, kin: 0 }));
@@ -62,6 +64,8 @@ for (const [name, pick] of Object.entries(BOTS)) {
   const r = { realms: {}, paths: { child: 0, reborn: 0 }, byX: { child: [[0, 0], [0, 0], [0, 0]], reborn: [[0, 0], [0, 0], [0, 0]] }, ages: Array.from({ length: gens }, () => [0, 0]), legacy: [0, 0] };
   for (let i = 0; i < n; i++) {
     let st = null;
+    // ชีวิตต่างโลก (B68) นับเป็นรุ่นของตัวเอง — รุ่นที่ g ของบอทอาจได้ gen มากกว่า g + 1
+    let wantGen = 1;
     for (let g = 0; g < gens; g++) {
       const lifeSeed = st ? st.seed : mixSeed(seed, i);
       let deathCard = null;
@@ -78,7 +82,7 @@ for (const [name, pick] of Object.entries(BOTS)) {
         childDeaths++;
         if (!(deathCard?.short && deathCard.note)) childBad++;
       }
-      if (st.gen !== g + 1) fails.push(`ตระกูล ${i} รุ่นที่ ${g + 1} ได้ gen ${st.gen}`);
+      if (st.gen !== wantGen) fails.push(`ตระกูล ${i} รุ่นที่ ${g + 1} ได้ gen ${st.gen} (ควรเป็น ${wantGen})`);
       r.ages[g][0] += life.age;
       r.ages[g][1]++;
       // สำเนาบัญชีตอนการ์ดส่งต่อ (หลังฉากระหว่างชาติปรับบัญชีครบแล้ว) = บัญชีที่ makeHeir ใช้
@@ -138,6 +142,9 @@ for (const [name, pick] of Object.entries(BOTS)) {
         streamChecks++;
       }
       const lastJob = st.occupation, lastProv = st.province;
+      wantGen = st.gen + 1 + af.isekaiLives.length;
+      if (af.isekaiLives.length) isekaiLives += af.isekaiLives.length;
+      if (af.isekaiLives.length && h.lineage.length !== (st.lineage?.length ?? 0) + 1 + af.isekaiLives.length) isekaiBad++;
       st = nextLife(af);
       if (af.path === 'child' && st.familyOcc !== lastJob) occBad++;
       if (af.path === 'child' && st.province !== lastProv) provBad++;
@@ -201,6 +208,7 @@ const desc = (k) => tm.every((t, i) => !i || !(t[k] > tm[i - 1][k]));
 check('ส่งต่อบุญบาป ลูก ≥ หลาน ≥ เหลน', desc('carry') ? 0 : 1);
 check('มรดก ลูก ≥ หลาน ≥ เหลน', desc('legacy') ? 0 : 1);
 check('ความสัมพันธ์/คอนเน็คชั่นจากบ้าน ลูก ≥ หลาน ≥ เหลน', desc('kin') ? 0 : 1);
+check('ต่างโลกเกิดได้จริง แต่ละชีวิตลงผังตระกูลเป็นรุ่นของตัวเอง', isekaiBad + (isekaiLives ? 0 : 1), ` ${isekaiLives} ชีวิต`);
 if (!sceneIds.length) fails.push('ไม่มีฉากระหว่างชาติในเนื้อหา');
 if (fails.length) {
   for (const x of fails) console.log(`  ✗ ${x}`);
