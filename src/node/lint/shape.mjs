@@ -14,18 +14,18 @@ const KEYS = {
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'bond', 'd', 'kind', 'life', 'name'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain', 'severance'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   debt: ['kind', 'amount'],
   money: ['unit', 'amount', 'ref_year'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school'],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder'],
   bound: ['min', 'max'],
   whenFlags: ['has', 'not'],
   family: ['role', 'age', 'alive', 'count', 'health', 'relations'],
-  multipliers: ['class', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish'],
+  multipliers: ['class', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish', 'rank'],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
   requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'reason'],
@@ -453,6 +453,25 @@ export const rules = [
       }
       for (const { c, path } of choicesOf(e)) {
         if (Array.isArray(c.outcomes) && c.outcomes.length && c.outcomes.every((o) => isObj(o) && o.ok === true)) r(`${path}.outcomes`, 'ทุกทางเป็น ok — % สำเร็จจะเป็น 100 เสมอ ไม่ต้องเป็นผลสุ่ม');
+      }
+    },
+  },
+  {
+    id: 'rank-shape',
+    desc: 'สายยศ (B40): effects.severance = true (จ่ายเงินชดเชยเลิกจ้างตามอายุงาน) · when.ladder = รายการ id สายใน data/careers.json หรือ none · multipliers.rank = เลขบวก (คูณยกกำลังตามขั้นยศ+ตำแหน่ง)',
+    event(e, ctx, r) {
+      const ids = [...ctx.ladders, 'none'];
+      const wl = isObj(e.when) ? e.when.ladder : undefined;
+      if (wl !== undefined && !nonEmptySubset(wl, ids)) r('.when.ladder', `ต้องเป็นรายการจาก ${ids.join(' ')}`);
+      const mults = [[e.multipliers, '.multipliers']];
+      for (const { node, path } of effectSites(e)) {
+        if (path.includes('outcomes')) mults.push([node.multipliers, `${path}.multipliers`]);
+        const fx = isObj(node.effects) ? node.effects : {};
+        if (fx.severance !== undefined && fx.severance !== true) r(`${path}.effects.severance`, 'ใช้ได้แค่ true');
+      }
+      for (const [m, at] of mults) {
+        const v = isObj(m) ? m.rank : undefined;
+        if (v !== undefined && !positive(v)) r(`${at}.rank`, 'ต้องเป็นเลขบวก');
       }
     },
   },

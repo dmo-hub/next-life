@@ -303,6 +303,7 @@ export function loadEra() {
     cpi,
     future,
     finance: { ...finance.era, debt: loadDebt() },
+    careers: loadCareers(finance.era),
     systems: json('data/system-starts.json').systems.map(({ id, status, from, to }) => ({ id, status, from, to })),
     mort: {
       from: m.e0.ชาย[0].y,
@@ -315,6 +316,27 @@ export function loadEra() {
     events,
     birth: loadBirth(),
   };
+}
+
+// สายยศ (B40): เงินเดือนตามบัญชีของปีที่ประกาศ → บาทของปีอ้างอิงค่าจ้าง ด้วยค่าแรงขั้นต่ำจริง (แกนปรับต่อแบบเดียวกับอาชีพ)
+// อาชีพที่ขั้นอ้างต้องมีอยู่จริง ไม่งั้นการ์ดที่กรองด้วยอาชีพหาคนในสายไม่เจอเงียบ
+export function loadCareers(fin) {
+  const c = json('data/careers.json');
+  const mw = (y) => {
+    const v = fin.minWage.v[y - fin.minWage.from];
+    if (v === undefined) throw new Error(`ไม่มีค่าแรงขั้นต่ำปี ${y} ให้ปรับเงินเดือนสายยศ`);
+    return v;
+  };
+  const occIds = new Set(fin.occupations.map((o) => o.id));
+  const step = ({ name, occ, mul, suffix, full, pay }) => {
+    if (occ && !occIds.has(occ)) throw new Error(`ขั้น ${name} อ้างอาชีพที่ไม่มี: ${occ}`);
+    return { name, occ, mul, suffix, full, ...(pay && { pay: pay.v * (mw(fin.refYear) / mw(pay.y)) }) };
+  };
+  const ladders = Object.fromEntries(Object.entries(c.ladders).map(([id, l]) => {
+    for (const o of l.occs ?? []) if (!occIds.has(o)) throw new Error(`สาย ${id} อ้างอาชีพที่ไม่มี: ${o}`);
+    return [id, { name: l.name, occs: l.occs, start: l.start, pension: !!l.pension, steps: l.steps.map(step) }];
+  }));
+  return { ladders, office: { steps: c.office.steps.map(step) }, pension: { div: c.pension.div, cap: c.pension.cap }, severance: c.severance.rows };
 }
 
 export const loadContent = () => ({ events: loadEvents(), era: loadEra() });

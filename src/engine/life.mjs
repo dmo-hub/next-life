@@ -4,7 +4,8 @@ import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraE
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
-import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard } from './career.mjs';
+import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './career.mjs';
+import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
@@ -72,6 +73,16 @@ const CHRONIC_FADE = 5;
 const STAT_HIGH = 70;
 const STAT_LOW = 30;
 const clamp = (v) => Math.max(0, Math.min(100, v));
+// สุขต่ำมากทำอะไรก็ไม่เข้าหัว (B40): ความรู้ที่งอกเองรายปี + โอกาสสำเร็จของการ์ดเรียน/งาน คูณตามขั้น · เกณฑ์ = ต่ำกว่าค่าแรก
+export const MOOD = [[15, 0.5], [30, 0.7]];
+export const moodMul = (st) => MOOD.find(([below]) => st.happiness < below)?.[1] ?? 1;
+const MOOD_CATS = ['work_money', 'study'];
+// การ์ดที่แกนสร้าง (หางาน · ด่านเรียนต่อ) ไม่มีหมวด — นับเป็นเรียน/งานด้วย id
+const moodCard = (ev) => !!ev && (MOOD_CATS.includes(ev.category) || ev.id === 'first_job' || ev.id?.startsWith('school_gate_'));
+const outcomeWeights = (st, ev, c) => {
+  const m = moodCard(ev) ? moodMul(st) : 1;
+  return c.outcomes.map((o) => o.weight * poolMultiplier(st, o.multipliers) * (o.ok ? m : 1));
+};
 
 export function weighted(rng, items, weights) {
   let r = rng.next() * weights.reduce((s, w) => s + w, 0);
@@ -84,7 +95,8 @@ export function weighted(rng, items, weights) {
 
 // เริ่มทำงานเมื่อได้งานแรก (เลิกเรียนอายุไหนก็เริ่มอายุนั้น) จนเกษียณ — แกนเติมเงินเก็บและหน้าจอแสดงรายได้จากเกณฑ์เดียวกัน
 export const RETIRE_AGE = 60;
-export const isWorking = (st, age = st.age) => st.workFrom !== null && age >= st.workFrom && age < RETIRE_AGE;
+// ตำแหน่งการเมืองเต็มเวลา (B40) ไม่เกษียณตามอายุ — ทำงานต่อจนแพ้เลือกตั้งหรือวางมือ
+export const isWorking = (st, age = st.age) => st.workFrom !== null && age >= st.workFrom && age < (st.retiredAt ?? Infinity) && (age < RETIRE_AGE || officeFull(st));
 
 // ช่วงเรียนที่การ์ดเห็น: ก่อนวัยเข้าเรียนยังไม่มีช่วงเรียน (ค่าเริ่ม primary รออยู่) · เลิกเรียนแล้ว = none
 export const schoolOf = (st, age = st.age) => (st.school && age >= SCHOOL_FROM ? st.school : 'none');
@@ -95,7 +107,7 @@ export function jobText(st, age = st.age) {
     if (st.school && age >= SCHOOL_FROM) return `กำลังเรียน${TRACKS[st.school].name}`;
     return age < SCHOOL_FROM ? 'ยังไม่เข้าเรียน' : 'ยังไม่ทำงาน';
   }
-  return age >= RETIRE_AGE ? `เกษียณ (เคยเป็น${st.occupationName})` : st.occupationName;
+  return isWorking(st, age) || age < RETIRE_AGE ? rankName(st) : `เกษียณ (เคยเป็น${rankName({ ...st, office: null })})`;
 }
 
 // เงินเก็บต่อปี เป็นบาทของปีนั้น: ค่าจ้างตามอาชีพ × ภาค ทั้งปี × อัตราออม (ใบ 14)
@@ -105,9 +117,14 @@ export function yearlySaving(st, year = st.birthYear + st.age) {
 }
 
 // รายได้/เดือนของชีวิตนี้: ค่าจ้างอาชีพ × ตัวคูณรายได้ถาวรจากเหตุการณ์
+// รายได้/เดือนของชีวิตนี้: ค่าจ้างงาน (ขั้นในสายยศทับค่าจ้างอาชีพ) × ตัวคูณรายได้ถาวร
+// ตำแหน่งการเมือง: ท้องถิ่นได้ค่าตอบแทนบวกจากงาน · เต็มเวลาได้อย่างที่มากกว่า (ลาออกจากงานเดิมไปนั่งตำแหน่ง)
 export function monthlyIncome(st, year = st.birthYear + st.age) {
-  return monthlyWage(st.content.era, st.seed, st.occupation, st.ses, year) * st.incomeMult;
+  const job = jobWage(st, year) * st.incomeMult;
+  if (!st.office) return job;
+  return officeFull(st) ? Math.max(job, officePay(st, year)) : job + officePay(st, year);
 }
+
 
 // heir = รุ่นถัดไปจากระหว่างชาติ (afterlife.mjs): จุดเกิด/ฐานะ/ค่าเริ่ม/บัญชีที่ส่งต่อ ทับค่าที่สุ่ม
 // ยังดึงเลขสุ่มของโลกครบชุดเดิมก่อนทับ — ตำแหน่ง stream ของรุ่นถัดไปเหมือนชีวิตแรกทุกประการ
@@ -152,6 +169,10 @@ export function newLife(seed, content, heir = null) {
     occupationName: occupation.name,
     familyOcc: occupation.id,
     workFrom: null,
+    // สายยศ/ตำแหน่ง (B40 · rank.mjs): ขั้นในสายอาชีพ · ตำแหน่งการเมือง · บำนาญต่อปีเป็นบาทค่าเงินปีเกิด
+    ladder: null,
+    office: null,
+    pension: 0,
     // ช่วงเรียนปัจจุบัน (null = เลิกเรียนแล้ว) · วุฒิที่จบจริง (null = ยังไม่จบอะไร)
     school: 'primary',
     edu: null,
@@ -301,26 +322,26 @@ function choiceFx(st, ev, c) {
   if (ev.belief?.kind === 'lottery_numen') return '?';
   const fixed = fixedFx(ev, c);
   if (!c.outcomes?.length) return fixed;
-  return [fixed, outcomeFx(st, c)].filter(Boolean).join(' · ');
+  return [fixed, outcomeFx(st, c, ev)].filter(Boolean).join(' · ');
 }
 
 // ทางที่เอียงด้วยบัญชีบุญบาปโชว์ ? — % จะบอกยอดบัญชีที่ต้องซ่อนจนตาย
-function outcomeFx(st, c) {
+function outcomeFx(st, c, ev) {
   if (!c.outcomes.some((o) => o.ok)) return riskLabel(c.outcomes);
   if (c.outcomes.some((o) => o.multipliers?.karma || o.multipliers?.wish)) return 'สำเร็จ ?';
-  return `สำเร็จ ~${successPct(st, c)}%`;
+  return `สำเร็จ ~${successPct(st, c, ev)}%`;
 }
 
 // โอกาสได้ทางสำเร็จ ปัดเป็นขั้น PCT_STEP ไม่โชว์ 0/100 · ผลของตัวเลือกลงก่อนสุ่มทาง (choose)
 // จึงคิดบนค่าหลังผลตัวเลือกในสำเนา ไม่แตะ state จริง
 export const PCT_STEP = 5;
-export function successPct(st, c) {
+export function successPct(st, c, ev = null) {
   const fx = c.effects ?? {};
   const p = { ...st, flags: { ...st.flags } };
   for (const k of STAT_KEYS) if (fx[k]) p[k] = clamp(p[k] + levelValue(fx[k]));
   for (const f of c.sets_flags ?? []) p.flags[f] = true;
   for (const f of c.clears_flags ?? []) delete p.flags[f];
-  const w = c.outcomes.map((o) => o.weight * poolMultiplier(p, o.multipliers));
+  const w = outcomeWeights(p, ev, c);
   const r = w.reduce((s, x, i) => s + (c.outcomes[i].ok ? x : 0), 0) / w.reduce((s, x) => s + x, 0);
   return Math.max(PCT_STEP, Math.min(100 - PCT_STEP, Math.round((r * 100) / PCT_STEP) * PCT_STEP));
 }
@@ -341,6 +362,8 @@ function fixedFx(ev, c) {
   if (fx.settle) out.push(`ปิด${debtName(fx.settle)}`);
   if (fx.complain) out.push('ร้องเรียนดอกโหด');
   if (fx.income_mult) out.push(`รายได้\u00a0${fx.income_mult > 1 ? '↑' : '↓'}`);
+  if (fx.severance) out.push('ได้เงินชดเชย');
+  if (fx.retire) out.push('เกษียณ');
   for (const [k, v] of Object.entries(fx.chronic ?? {})) out.push(`${STAT_LABELS[k]}\u00a0${v > 0 ? '↑' : '↓'}\u00a0ระยะยาว`);
   return out.join(' · ');
 }
@@ -414,6 +437,12 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
   const cut = (v) => (v < 0 ? v * hurt : v);
   for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + cut(levelValue(fx[k]) * ss));
   if (fx.money) st.money += cut(moneyValue(st, fx.money) * s);
+  // เงินชดเชยคิดจากงานเดิม — ต้องลงก่อนผลเปลี่ยนงานในก้อนเดียวกัน
+  if (fx.severance && isWorking(st)) st.money += (severanceDays(st) * monthlyIncome(st)) / 30;
+  if (fx.retire && isWorking(st)) {
+    st.retireBase = (monthlyIncome(st) * 12) / st.price;
+    st.retiredAt = st.age + 1;
+  }
   if (fx.invest) invest(st, fx.invest);
   if (fx.debt) borrow(st, fx.debt, s);
   if (fx.settle) settle(st, fx.settle);
@@ -431,7 +460,17 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
     if (st.workFrom === null) st.workFrom = st.age;
     // ตัวคูณรายได้ผูกกับงานเดิม เปลี่ยนงานแล้วเริ่มนับใหม่
     st.incomeMult = 1;
+    st.jobSince = st.age;
+    enterByJob(st, o.id);
   }
+  if (fx.ladder) {
+    if (st.workFrom === null) st.workFrom = st.age;
+    st.incomeMult = 1;
+    st.jobSince = st.age;
+    enterLadder(st, fx.ladder);
+  }
+  if (fx.promote !== undefined) promote(st, fx.promote);
+  if (fx.office !== undefined) setOffice(st, fx.office);
   for (const [k, v] of Object.entries(fx.chronic ?? {})) {
     const lv = Math.max(-CHRONIC_MAX, Math.min(CHRONIC_MAX, (st.chronic[k] ?? 0) + v));
     if (lv) st.chronic[k] = lv;
@@ -506,7 +545,14 @@ function invest(st, { asset, share }) {
 function stepYear(st) {
   const prevStage = stageOf(st.age);
   // ปีสุดท้ายที่ทำงานต้องวัดก่อนขึ้นอายุ — ขึ้นแล้ว isWorking เป็นเท็จ
-  if (isWorking(st) && st.age + 1 === RETIRE_AGE) st.retireBase = (monthlyIncome(st) * 12) / st.price;
+  // คนที่ยังนั่งตำแหน่งเต็มเวลาหลังเกษียณวัดใหม่ทุกปีจนเลิกทำงาน — ปีที่ปกติถึงเกษียณได้ค่าเดิม
+  if (isWorking(st) && st.age + 1 >= RETIRE_AGE) {
+    st.retireBase = (monthlyIncome(st) * 12) / st.price;
+    // บำนาญข้าราชการ (B40): ค่าจ้างสุดท้าย × ปีรับราชการ ÷ div ไม่เกิน cap เท่าของค่าจ้างสุดท้าย
+    const pen = st.content.era.careers.pension;
+    st.pension = ladderOf(st)?.pension ? Math.min(pen.cap, (st.age + 1 - st.ladder.from) / pen.div) * jobWage(st, st.birthYear + st.age) * 12 / st.price : 0;
+  }
+
   st.age += 1;
   const year = st.birthYear + st.age;
   st.price *= 1 + inflationRate(st.content.era, st.seed, year) / 100;
@@ -515,7 +561,7 @@ function stepYear(st) {
   st.health = clamp(st.health * (1 - r));
   st.healthNatural *= 1 - r;
   st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
-  st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * (100 - st.knowledge)) / 100);
+  st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * moodMul(st) * (100 - st.knowledge)) / 100);
   st.relations = clamp(st.relations * (1 - RELATION_FADE));
   flowChronic(st);
   ageParents(st, year);
@@ -532,7 +578,7 @@ function stepYear(st) {
     }
   } else if (st.money < 0) st.money *= 1 + lendingRate(era, st.seed, year);
   if (isWorking(st)) st.money += yearlySaving(st, year);
-  else if (st.retireBase !== null) st.money -= retireSpend(st, year);
+  else if (st.retireBase !== null) st.money -= retireSpend(st, year) - st.pension * st.price;
   for (const d of st.debts) st.money -= payDebt(era, st.seed, d, year);
   st.debts = st.debts.filter((d) => !debtDone(d));
   const stage = stageOf(st.age);
@@ -562,9 +608,23 @@ function stepYear(st) {
     if (track.gate) st.due.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
     else {
       st.school = null;
-      st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
+      if (track.ladder) applyEffects(st, { ladder: track.ladder });
+      else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
     }
   }
+  // สายยศ (B40): ปีในขั้นนับตามความสุข ถึงคิวแล้วการ์ดเลื่อนขั้น · ผู้ใหญ่บ้าน/กำนันพ้นตำแหน่งตอนเกษียณ · ครบวาระ/ถูกชวนลงสมัคร = การ์ดเลือกตั้ง
+  if (isWorking(st)) {
+    ageRank(st, moodMul(st));
+    if (promoDue(st)) st.due.push({ kind: 'eraEvent', ev: promoCard(st), age: st.age });
+  }
+  if (st.office && !officeFull(st) && st.age >= RETIRE_AGE) {
+    st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeStep(st).name}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง` });
+    st.office = null;
+  }
+  if (budgetDue(st)) st.due.push({ kind: 'eraEvent', ev: budgetCard(st), age: st.age });
+  if (officeDue(st)) st.due.push({ kind: 'eraEvent', ev: officeCard(st), age: st.age });
+  if (recruitDue(st)) st.due.push({ kind: 'eraEvent', ev: recruitCard(st), age: st.age });
+  if (isWorking(st) && earlyDue(st)) st.due.push({ kind: 'eraEvent', ev: earlyCard(st), age: st.age });
   if (isAllocAge(st.age)) st.due.push(allocCard(st, year, stage));
   // ทุกภาคเจอได้ เกิดซ้ำได้ (B14 ข้อ 13) · เว้นอย่างน้อย ERA_GAP ปีไม่ให้ถี่จนกลบเรื่องชีวิต — ปีที่เว้น เงินยังเสียตามปีต้นแบบ
   const eras = eraEventsAt(st.content.era, st.seed, year);
@@ -735,8 +795,27 @@ function moneyShort(ev, st) {
 
 // บรรทัดรองบอกข้อแลกใต้ตัวเลือก (B52) — ใส่ช่องเฉพาะการ์ดที่มี hint การ์ดเดิมจึงมีรูปเท่าเดิมทุกช่อง
 export function choiceHints(ev, st) {
-  if (!ev.choices.some((c) => c.hint)) return {};
-  return { hints: ev.choices.map((c) => (c.hint ? fill(c.hint, st) : null)) };
+  const auto = ev.choices.map((c) => jobHint(st, c));
+  if (!ev.choices.some((c, i) => c.hint || auto[i])) return {};
+  return { hints: ev.choices.map((c, i) => (c.hint ? fill(c.hint, st) : auto[i])) };
+}
+
+// ตัวเลือกที่พาไปงานใหม่บอกช่วงรายได้ (B40) — ค่าจ้างอาชีพ×ภาคของปีนี้ บอกเป็นช่วงไม่ใช่เลขเป๊ะ ผู้เล่นจึงชั่งได้แต่เดาผลไม่ได้
+// มีงานอยู่แล้วต่อท้ายช่วงของงานเดิมให้เทียบ · เปลี่ยนงานแล้วตัวคูณรายได้เริ่มนับใหม่ ช่วงงานใหม่จึงไม่คูณ
+export const PAY_BAND = [0.8, 1.25];
+const twoDigits = (v) => {
+  const p = 10 ** Math.max(0, Math.floor(Math.log10(Math.max(1, v))) - 1);
+  return (Math.round(v / p) * p).toLocaleString('en-US');
+};
+function jobHint(st, c) {
+  const fx = c.effects?.job || c.effects?.ladder ? c.effects : c.outcomes?.find((o) => o.ok && (o.effects?.job || o.effects?.ladder))?.effects;
+  const id = fx?.job;
+  if (!fx || st.dead || (id && id === st.occupation && st.workFrom !== null)) return null;
+  const year = st.birthYear + st.age;
+  const band = (w) => `${twoDigits(w * PAY_BAND[0])}–${twoDigits(w * PAY_BAND[1])}`;
+  const next = id ? monthlyWage(st.content.era, st.seed, id, st.ses, year) : ladderStartPay(st, fx.ladder, year);
+  const now = isWorking(st) ? ` · งานเดิมราว ${band(monthlyIncome(st, year))}` : '';
+  return `รายได้ราว ${band(next)} บาท/เดือน${now}`;
 }
 
 // ตัวเลือกที่ต้องมีเงิน/ค่าสถานะ/ธงถึงจะเลือกได้ (B14 A6) · ข้อความเหตุผลจากเนื้อหาทับข้อความตั้งต้น
@@ -892,6 +971,7 @@ export function poolMultiplier(st, m) {
   if (m.wish) x *= m.wish ** ledgerLevel(st.ledger);
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
+  if (m.rank) x *= m.rank ** rankLevel(st);
   return x;
 }
 
@@ -913,6 +993,7 @@ export function whenOk(st, when) {
   // อาชีพนับเมื่อมีงานของตัวเองแล้ว — อาชีพครอบครัวก่อนทำงานไม่ทำให้การ์ดที่ทำงานออก
   if (when.occupation && !(st.workFrom !== null && when.occupation.includes(st.occupation))) return false;
   if (when.school && !when.school.includes(schoolOf(st))) return false;
+  if (when.ladder && !when.ladder.includes(st.ladder?.id ?? 'none')) return false;
   return !when.flags || flagsOk(st, when.flags);
 }
 
@@ -979,11 +1060,11 @@ export function choose(st, idx) {
   // สายมูก่อการ์ดของตัวเองได้ (ผลหวยสายมู) — มาก่อนผลสุ่มของตัวเลือก
   const after = beliefChoice(st, ev, c);
   if (c.outcomes?.length) {
-    const o = weighted(st.rng, c.outcomes, c.outcomes.map((x) => x.weight * poolMultiplier(st, x.multipliers)));
-    const helper = !o.ok && hurts(st, o.effects) ? kinAid(st) : null;
+    const o = weighted(st.rng, c.outcomes, outcomeWeights(st, ev, c));
+    const helper = !o.ok && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
     applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1);
     applyChoice(st, ev, o, text);
-    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') });
+    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
     if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow)) {

@@ -1,0 +1,343 @@
+{
+  "title": "สายยศ/ตำแหน่ง (B40) — ชื่อขั้น + ค่าจ้างต่อเดือนตามบัญชีจริง",
+  "pay_unit": "บาท/เดือน ของปีที่ระบุใน y (loader ปรับเป็นปีอ้างอิงค่าจ้างด้วยค่าแรงขั้นต่ำจริง)",
+  "ladders": {
+    "gov": {
+      "name": "ราชการ",
+      "pension": true,
+      "steps": [
+        {
+          "name": "ข้าราชการระดับปฏิบัติการ",
+          "occ": "professional",
+          "pay": {
+            "v": 17300,
+            "y": 2567,
+            "source": "https://th.jobsdb.com/th/career-advice/article/government-officer-salary-rates",
+            "note": "กลางช่วงแรกบรรจุ ป.ตรี 16,500–18,150"
+          }
+        },
+        {
+          "name": "ข้าราชการระดับชำนาญการ",
+          "occ": "professional",
+          "pay": {
+            "v": 33500,
+            "y": 2567,
+            "source": "https://www.thansettakij.com/business/592292",
+            "note": "เงินเดือนกลางช่วง ~30,000 (ค่าตั้ง) + เงินประจำตำแหน่ง 3,500"
+          }
+        },
+        {
+          "name": "ผู้อำนวยการกอง",
+          "occ": "manager",
+          "pay": {
+            "v": 48600,
+            "y": 2567,
+            "source": "https://www.thansettakij.com/business/592292",
+            "note": "อำนวยการต้น กลางช่วง 26,660–59,500 + ประจำตำแหน่ง 5,600"
+          }
+        },
+        {
+          "name": "อธิบดี",
+          "occ": "manager",
+          "pay": {
+            "v": 81100,
+            "y": 2567,
+            "source": "https://www.thansettakij.com/business/592292",
+            "note": "บริหารสูง กลางช่วง 56,380–76,800 + ประจำตำแหน่ง 14,500"
+          }
+        },
+        {
+          "name": "ปลัดกระทรวง",
+          "occ": "manager",
+          "pay": {
+            "v": 97800,
+            "y": 2567,
+            "source": "https://www.thansettakij.com/business/592292",
+            "note": "บริหารสูงขั้นสูงสุด 76,800 + ประจำตำแหน่ง 21,000"
+          }
+        }
+      ]
+    },
+    "army": {
+      "name": "ทหาร",
+      "pension": true,
+      "steps": [
+        {
+          "name": "ร้อยตรี",
+          "occ": "professional",
+          "pay": {
+            "v": 17400,
+            "y": 2567,
+            "source": "https://www.thansettakij.com/economy/622508",
+            "note": "กลางช่วงแรกบรรจุนายทหาร ป.ตรี 16,550–18,230"
+          }
+        },
+        {
+          "name": "ร้อยเอก",
+          "occ": "professional",
+          "pay": {
+            "v": 30000,
+            "y": 2567,
+            "source": "https://www.ktc.co.th/article/knowledge/salary-man/update-the-salary-police-man",
+            "note": "ค่าตั้ง — เทียบชั้น ส.1 ของตำรวจ 12,530–54,820"
+          }
+        },
+        {
+          "name": "พันเอก",
+          "occ": "manager",
+          "pay": {
+            "v": 52100,
+            "y": 2567,
+            "source": "https://www.ktc.co.th/article/knowledge/salary-man/update-the-salary-police-man",
+            "note": "เทียบ พ.ต.อ. (ส.4) กลางช่วง 22,700–70,360 + ประจำตำแหน่ง 5,600"
+          }
+        },
+        {
+          "name": "พลตรี",
+          "occ": "manager",
+          "pay": {
+            "v": 67900,
+            "y": 2567,
+            "source": "https://www.ktc.co.th/article/knowledge/salary-man/update-the-salary-police-man",
+            "note": "เทียบ พล.ต.ต. (ส.6) กลางช่วง 29,980–76,800 + ประจำตำแหน่ง 14,500"
+          }
+        },
+        {
+          "name": "พลเอก",
+          "occ": "manager",
+          "pay": {
+            "v": 97800,
+            "y": 2567,
+            "source": "https://www.ktc.co.th/article/knowledge/salary-man/update-the-salary-police-man",
+            "note": "เทียบ พล.ต.อ. (ส.8) ขั้นสูงสุด 76,800 + ประจำตำแหน่ง 21,000"
+          }
+        }
+      ]
+    },
+    "police": {
+      "name": "ตำรวจ",
+      "pension": true,
+      "steps": [
+        {
+          "name": "ร้อยตำรวจตรี",
+          "occ": "professional",
+          "pay": {
+            "v": 17400,
+            "y": 2567,
+            "source": "https://www.thansettakij.com/economy/622508",
+            "note": "เทียบแรกบรรจุ ป.ตรี 16,550–18,230"
+          }
+        },
+        {
+          "name": "ร้อยตำรวจเอก",
+          "occ": "professional",
+          "pay": {
+            "v": 30000,
+            "y": 2567,
+            "source": "https://www.ktc.co.th/article/knowledge/salary-man/update-the-salary-police-man",
+            "note": "ค่าตั้ง — ส.1 ช่วง 12,530–54,820"
+          }
+        },
+        {
+          "name": "พันตำรวจเอก",
+          "occ": "manager",
+          "pay": {
+            "v": 52100,
+            "y": 2567,
+            "source": "https://www.ktc.co.th/article/knowledge/salary-man/update-the-salary-police-man",
+            "note": "ส.4 กลางช่วง 22,700–70,360 + ประจำตำแหน่ง 5,600"
+          }
+        },
+        {
+          "name": "พลตำรวจตรี",
+          "occ": "manager",
+          "pay": {
+            "v": 67900,
+            "y": 2567,
+            "source": "https://www.ktc.co.th/article/knowledge/salary-man/update-the-salary-police-man",
+            "note": "ส.6 กลางช่วง 29,980–76,800 + ประจำตำแหน่ง 14,500"
+          }
+        },
+        {
+          "name": "พลตำรวจเอก",
+          "occ": "manager",
+          "pay": {
+            "v": 97800,
+            "y": 2567,
+            "source": "https://www.ktc.co.th/article/knowledge/salary-man/update-the-salary-police-man",
+            "note": "ส.8 ขั้นสูงสุด 76,800 + ประจำตำแหน่ง 21,000"
+          }
+        }
+      ]
+    },
+    "private": {
+      "name": "เอกชน",
+      "occs": [
+        "clerk",
+        "technician",
+        "professional",
+        "manager"
+      ],
+      "start": {
+        "manager": 2
+      },
+      "steps": [
+        {
+          "mul": 1
+        },
+        {
+          "name": "หัวหน้างาน",
+          "mul": 1.3,
+          "pay": {
+            "v": 40000,
+            "y": 2567,
+            "source": "https://ratings.koha-community.org/en/average-salary-thailand.html",
+            "note": "ค่าตั้ง — แหล่งรวมผลสำรวจเงินเดือน ไม่เห็นผลสำรวจต้นทาง"
+          }
+        },
+        {
+          "name": "ผู้จัดการ",
+          "mul": 1,
+          "pay": {
+            "v": 90000,
+            "y": 2567,
+            "source": "https://ratings.koha-community.org/en/average-salary-thailand.html",
+            "note": "ค่าตั้ง — senior manager 85,000–150,000"
+          }
+        },
+        {
+          "name": "ผู้อำนวยการ",
+          "mul": 1,
+          "pay": {
+            "v": 200000,
+            "y": 2567,
+            "source": "https://ratings.koha-community.org/en/average-salary-thailand.html",
+            "note": "ค่าตั้ง — director ถึง 350,000+"
+          }
+        },
+        {
+          "name": "ประธานเจ้าหน้าที่บริหาร (CEO)",
+          "mul": 1,
+          "pay": {
+            "v": 500000,
+            "y": 2567,
+            "source": "https://ratings.koha-community.org/en/average-salary-thailand.html",
+            "note": "ค่าตั้ง — CEO บริษัทใหญ่ไม่มีตัวเลขเปิดเผยที่หาได้"
+          }
+        }
+      ]
+    },
+    "trade": {
+      "name": "สายอาชีพ",
+      "occs": [
+        "farmer",
+        "labor",
+        "factory",
+        "craft",
+        "service"
+      ],
+      "steps": [
+        {
+          "mul": 1
+        },
+        {
+          "suffix": "มือเก๋า",
+          "mul": 1.05
+        },
+        {
+          "suffix": "ระดับหัวหน้า",
+          "mul": 1.15
+        }
+      ]
+    }
+  },
+  "office": {
+    "name": "การเมือง",
+    "steps": [
+      {
+        "name": "ผู้ใหญ่บ้าน",
+        "pay": {
+          "v": 10000,
+          "y": 2566,
+          "source": "https://www.thaipbs.or.th/news/content/331385",
+          "note": "ค่าตอบแทนหลังปรับ 1 ต.ค. 2566"
+        }
+      },
+      {
+        "name": "กำนัน",
+        "pay": {
+          "v": 12000,
+          "y": 2566,
+          "source": "https://www.prachachat.net/politics/news-1231609",
+          "note": "ค่าตอบแทนหลังปรับ 1 ต.ค. 2566"
+        }
+      },
+      {
+        "name": "นายก อบต.",
+        "pay": {
+          "v": 46000,
+          "y": 2566,
+          "source": "https://www.prachachat.net/politics/news-1231609",
+          "note": "ขั้นกลางของ 6 ขั้นตามรายได้ อบต. 25,800–75,530"
+        }
+      },
+      {
+        "name": "ส.ส.",
+        "full": true,
+        "pay": {
+          "v": 113560,
+          "y": 2556,
+          "source": "https://www.thaipbs.or.th/now/content/172",
+          "note": "เงินประจำตำแหน่ง 71,230 + เงินเพิ่ม 42,330"
+        }
+      },
+      {
+        "name": "นายกรัฐมนตรี",
+        "full": true,
+        "pay": {
+          "v": 125590,
+          "y": 2562,
+          "source": "https://www.thaipbs.or.th/now/content/294",
+          "note": "เงินเดือน 75,590 + เงินประจำตำแหน่ง 50,000"
+        }
+      }
+    ]
+  },
+  "pension": {
+    "div": 50,
+    "cap": 1,
+    "source": "https://www.bangkokbiznews.com/news/826680",
+    "note": "บำนาญแบบเดิม: เงินเดือนสุดท้าย × ปีราชการ ÷ 50 ไม่เกินเงินเดือนสุดท้าย"
+  },
+  "severance": {
+    "rows": [
+      [
+        120,
+        30
+      ],
+      [
+        365,
+        90
+      ],
+      [
+        1095,
+        180
+      ],
+      [
+        2190,
+        240
+      ],
+      [
+        3650,
+        300
+      ],
+      [
+        7300,
+        400
+      ]
+    ],
+    "unit": "[อายุงานขั้นต่ำ (วัน), ค่าชดเชย (วันของค่าจ้างสุดท้าย)]",
+    "source": "https://www.prd.go.th/th/content/category/detail/id/31/iid/280968",
+    "note": "พ.ร.บ.คุ้มครองแรงงาน ม.118 แก้ไข ฉบับ 7 พ.ศ. 2562"
+  }
+}

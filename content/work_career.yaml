@@ -193,29 +193,32 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 1
-    when: {occupation: [factory, clerk, technician, manager, professional]}
+    when: {occupation: [factory, clerk, technician, manager, professional], ladder: [none, private, trade]}
     multipliers: {flags: {took_bribe: 1.5, caught_fraud: 2}}
     title: "เริ่มนับหนึ่งตอนห้าสิบ"
     text: "บริษัทปรับโครงสร้าง ชื่อ{ชื่อ}วัย {อายุ} อยู่ในรายชื่อชุดแรก ใบสมัครงานที่ยื่นไปสิบกว่าแห่งเงียบกริบ เพราะทุกที่อยากได้คนอายุน้อยกว่า"
     choices:
       - id: drive_hire
         text: "ขับรถรับจ้างไปก่อน"
-        effects: {job: labor, happiness: -1, health: -1}
+        effects: {severance: true, job: labor, happiness: -1, health: -1}
         merit: [{cat: neutral}]
       - id: learn_craft
         text: "ไปเรียนช่างใหม่ตั้งแต่ศูนย์"
+        effects: {severance: true}
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "มือยังไวกว่าที่คิด รับงานซ่อมจนคิวเต็มทุกสุดสัปดาห์", effects: {job: craft, happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "เรียนจบแต่ไม่มีใครกล้าจ้างช่างมือใหม่วัยนี้", effects: {job: labor, money: {unit: income_x, amount: -1}, happiness: -2}, merit: [{cat: neutral}]}
       - id: severance_shop
         text: "เอาเงินชดเชยเปิดร้านอาหาร"
+        effects: {severance: true}
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, text: "สูตรแกงของแม่ขายดีเกินคาด ลูกค้าต่อคิวตั้งแต่สิบโมง", effects: {job: service, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 3, text: "ร้านเปิดผิดทำเล ขาดทุนจนเงินชดเชยหมดในปีเดียว", effects: {job: labor, money: {unit: income_x, amount: -2.5}, happiness: -2}, sets_flags: [own_business], merit: [{cat: neutral}]}
       - id: call_old_friend
         text: "โทรหาคนรู้จักเก่าทุกคน"
+        effects: {severance: true}
         requires: {stats: {network: {min: 50}}, reason: "คนรู้จักยังน้อยเกินไป"}
         merit: [{cat: neutral}]
         outcomes:

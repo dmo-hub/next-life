@@ -1,6 +1,7 @@
 // การเรียนต่อเนื่อง + งานแรก (B15): การ์ดที่แกนสร้างเป็น event object รูปเดียวกับเนื้อหา — วิ่งผ่าน eventCard/choose
 // ได้ล็อก · ผลสุ่ม · ป้ายบุญบาป · ป้าย % ชุดเดียวกับการ์ดเนื้อหา · ฟังก์ชันล้วน อ่าน state ไม่แก้
 import { makeRng } from './rng.mjs';
+import { pickName } from './birth.mjs';
 
 // วุฒิเรียงต่ำไปสูง ตรงกับ edu ของอาชีพใน data/finance.json — อาชีพที่วุฒิสูงกว่าที่มีล็อก
 export const EDU = ['ประถม', 'มัธยม', 'อาชีวะ', 'อุดมศึกษา'];
@@ -15,10 +16,15 @@ export const TRACKS = {
   voc: { name: 'ปวช.', until: 18, edu: 'อาชีวะ', gate: true, exam: 'uni_exam' },
   hvoc: { name: 'ปวส.', until: 20, edu: 'อาชีวะ' },
   uni: { name: 'มหาวิทยาลัย', until: 22, edu: 'อุดมศึกษา' },
+  // จบแล้วติดยศเข้าสายทันที ไม่ต้องหางาน (B40)
+  cadet: { name: 'โรงเรียนนายร้อย', until: 22, edu: 'อุดมศึกษา', ladder: 'army' },
+  police_cadet: { name: 'โรงเรียนนายร้อยตำรวจ', until: 22, edu: 'อุดมศึกษา', ladder: 'police' },
 };
 export const EXAMS = [...new Set(Object.values(TRACKS).map((t) => t.exam).filter(Boolean))];
 // ธงที่แกนตั้งเมื่อสอบเข้ามหาวิทยาลัยติด (ทุกทางที่มีการสอบ) — การ์ดแก้บนตอนสอบเข้าอ่านธงนี้ ไม่ติด/ไม่ได้สอบ = ไม่ทวง
 export const EXAM_PASS = 'exam_pass:uni';
+// สอบเข้าโรงเรียนนายร้อยต้องผ่านทั้งข้อเขียนและร่างกาย · สอบ ก.พ. ต้องจบปริญญา (B40)
+const CADET_NEED = { stats: { knowledge: { min: 45 }, health: { min: 50 } }, reason: 'ความรู้หรือสุขภาพยังไม่ถึงเกณฑ์สอบ' };
 export const SCHOOL_FROM = 6;
 
 const cash = (amount) => ({ unit: 'income_x', amount });
@@ -137,6 +143,14 @@ export function schoolGate(st) {
         ],
       },
       { text: 'ขอพรก่อนสอบมหาวิทยาลัยรัฐ', requires: uniLock, outcomes: exam({ wish: WISH, stats: { knowledge: 3, network: 1.5 } }) },
+      ...[['cadet', 'สอบเข้าโรงเรียนนายร้อย'], ['police_cadet', 'สอบเข้าโรงเรียนนายร้อยตำรวจ']].map(([school, text]) => ({
+        text,
+        requires: CADET_NEED,
+        outcomes: [
+          { weight: 1, ok: true, multipliers: { stats: { knowledge: 2, health: 1.5 } }, text: `สอบติด ได้เข้า${TRACKS[school].name}`, effects: { school, network: 1 } },
+          { weight: 1.2, text: 'สอบไม่ติด ต้องออกหางานทำ', effects: { school: 'none', happiness: -1 } },
+        ],
+      })),
       { text: 'ออกไปหางานทำ', effects: { school: 'none' } },
     ],
   };
@@ -183,6 +197,15 @@ export function jobCard(st) {
   const fam = occs.find((o) => o.id === st.familyOcc);
   if (fam.id !== 'labor') choices.push({ text: `สืบต่องานบ้าน ${fam.name}`, effects: { job: fam.id, relations: 1 } });
   choices.push({ text: 'รับจ้างทั่วไปไปก่อน', effects: { job: 'labor' } });
+  if (eduRank(st.edu) >= eduRank('อุดมศึกษา')) {
+    choices.push({
+      text: 'สอบ ก.พ. เข้ารับราชการ',
+      outcomes: [
+        { weight: 1.5, ok: true, multipliers: { stats: { knowledge: 1.6 } }, text: 'สอบผ่าน ได้บรรจุเป็นข้าราชการ', effects: { ladder: 'gov' } },
+        { weight: 1, text: 'สอบไม่ผ่าน ต้องรับจ้างทั่วไปไปก่อน', effects: { job: 'labor', happiness: -1 } },
+      ],
+    });
+  }
   // ทางพิเศษเล็งงานที่ดีที่สุดที่วุฒิถึง · ไม่มีงานไหนวุฒิถึงเลย = ไม่มีทางพิเศษ
   const target = picked.filter((o) => !tooLow(o)).at(-1);
   if (target) {
@@ -207,4 +230,20 @@ export function jobCard(st) {
     text: `อายุ ${st.age} ปี ${st.edu ? `วุฒิ${st.edu}` : 'ไม่มีวุฒิ'} ถึงเวลาหางานทำ เงินติดตัว {เงิน} บาท`,
     choices,
   };
+}
+
+// คนรู้จักช่วยรับวิกฤต (B40): คอนเน็คชั่นตั้งแต่ from โอกาส (คอนเน็คชั่น − base) / span · ช่วยแล้วผลร้ายเหลือครึ่งแบบญาติช่วย
+// วิกฤต = การ์ดรับมือเหตุบ้านเมือง · การ์ดสุขภาพ · ผลที่ทำให้คนมีงานตกไปรับจ้างทั่วไป · ทอยด้วย stream แยก เฉพาะตอนเข้าเกณฑ์
+export const NET_AID = { from: 60, base: 50, span: 120 };
+const NET_WHO = { health: 'หมอรุ่นพี่ที่รู้จักกัน', job: 'อดีตหัวหน้าเก่า', era: 'เพื่อนเก่าที่ทำงาน' };
+export function netAid(st, ev, o) {
+  // คนรู้จักในที่นี้มาจากที่ทำงาน — ยังไม่เคยทำงานไม่มีใครให้พึ่ง
+  if (st.network < NET_AID.from || st.workFrom === null) return null;
+  const kind = o.effects?.job === 'labor' && st.workFrom !== null && st.occupation !== 'labor' ? 'job' : ev.category === 'health' ? 'health' : ev.era ? 'era' : null;
+  if (!kind) return null;
+  st.netRng ??= makeRng((st.seed ^ 0x9b05688c) >>> 0);
+  if (st.netRng.next() >= (st.network - NET_AID.base) / NET_AID.span) return null;
+  const sex = st.netRng.next() < 0.5 ? 'ชาย' : 'หญิง';
+  const taken = [st.name, ...(st.kin ?? []).map((m) => m.name)];
+  return { who: NET_WHO[kind], name: pickName(st.netRng.int(1, 0x7fffffff), sex, st.birthYear, st.content.era.names, taken) };
 }

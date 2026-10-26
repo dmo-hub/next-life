@@ -7,7 +7,7 @@ events:
     years: [2500, 2650]
     weight: 2
     when: {occupation: [clerk, manager, professional]}
-    multipliers: {occupation: {manager: 1.5}, flags: {in_debt: 1.5}}
+    multipliers: {rank: 1.3, occupation: {manager: 1.5}, flags: {in_debt: 1.5}}
     title: "ซองสีน้ำตาลบนโต๊ะ"
     text: "ผู้รับเหมาวางซองหนาเตอะไว้ข้างแฟ้ม ยิ้มบอกว่าแค่เซ็นผ่านงานที่วัสดุไม่ตรงสเปก ใครเขาก็ทำกัน ในซองเท่าเงินเดือนหลายเดือน"
     choices:
@@ -74,7 +74,7 @@ events:
     years: [2500, 2650]
     weight: 2
     when: {occupation: [service, craft, technician, manager]}
-    multipliers: {flags: {own_business: 1.5, took_bribe: 1.3}, stats: {network: 1.2}}
+    multipliers: {rank: 1.3, flags: {own_business: 1.5, took_bribe: 1.3}, stats: {network: 1.2}}
     title: "ค่าน้ำร้อนน้ำชา"
     text: "งานประมูลก้อนใหญ่ที่รอมาทั้งปีเปิดแล้ว คนในกระซิบว่าราคาไม่สำคัญเท่าไหร่ ใครจ่ายสิบเปอร์เซ็นต์ใต้โต๊ะก่อนคนนั้นได้"
     choices:
@@ -211,7 +211,7 @@ events:
     stage: กลางคน
     years: [2545, 2650]
     weight: 1
-    multipliers: {occupation: {farmer: 1.5, labor: 1.3}, stats: {relations: 1.2}, flags: {in_debt: 1.5, loan_shark: 1.5}}
+    multipliers: {rank: 1.3, occupation: {farmer: 1.5, labor: 1.3}, stats: {relations: 1.2}, flags: {in_debt: 1.5, loan_shark: 1.5}}
     title: "เหรัญญิกกองทุนหมู่บ้าน"
     text: "ชาวบ้านเลือกให้เป็นเหรัญญิกกองทุนหมู่บ้าน สมุดบัญชีอยู่ในลิ้นชักบ้านเรา ไม่มีใครเปิดดูมาสามปีแล้ว ยอดในสมุดมากกว่าเงินเก็บทั้งชีวิตของเราหลายเท่า"
     choices:
@@ -273,7 +273,7 @@ events:
     years: [2500, 2650]
     weight: 2
     when: {occupation: [manager]}
-    multipliers: {flags: {in_debt: 1.3}}
+    multipliers: {rank: 1.3, flags: {in_debt: 1.3}}
     title: "โบนัสแลกโอที"
     text: "เจ้าของบริษัทยื่นข้อเสนอ ถ้าตัดโอทีลูกน้องทั้งแผนกได้ครบปีนี้ โบนัสก้อนใหญ่เป็นของคุณ ลูกน้องหลายคนผ่อนบ้านผ่อนรถอยู่"
     choices:

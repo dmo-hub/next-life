@@ -1,0 +1,26 @@
+# สายยศไม่รู้จัก · severance ไม่ใช่ true · ตัวคูณขั้นยศไม่ใช่เลขบวก — ใบ ok ใช้ทุกช่องถูกต้อง
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    when: {ladder: [navy]}
+    multipliers: {rank: 0}
+    choices:
+      - {text: "ทางที่หนึ่ง", effects: {severance: 2}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: ok_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    when: {ladder: [none, private]}
+    multipliers: {rank: 1.3}
+    choices:
+      - {text: "ทางที่หนึ่ง", effects: {severance: true}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}

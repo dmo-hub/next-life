@@ -6,13 +6,14 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [clerk, technician, professional, manager, factory]}
+    when: {occupation: [clerk, technician, professional, manager, factory], ladder: [none, private, trade]}
     multipliers: {flags: {in_debt: 1.5}, occupation: {factory: 1.5, clerk: 1.3}}
     title: "กล่องกระดาษใบนั้น"
     text: "เช้าวันจันทร์ HR เรียกเข้าห้องประชุม บนโต๊ะมีซองเงินชดเชยกับกล่องกระดาษเปล่าวางรออยู่ อายุ {อายุ} ปี เพิ่งถูกเลย์ออฟ"
     choices:
       - id: open_shop
         text: "เอาเงินชดเชยเปิดร้านเอง"
+        effects: {severance: true}
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, text: "ร้านติดตลาด ลูกค้าแน่นทุกเย็น ได้เป็นนายตัวเองสักที", effects: {happiness: 2, income_mult: 1.3, money: {unit: income_x, amount: 1}}, sets_flags: [own_business], merit: [{cat: neutral}], multipliers: {stats: {relations: 1.5, network: 1.3}}}
@@ -23,10 +24,11 @@ events:
         merit: [{cat: neutral}]
       - id: go_home_farm
         text: "กลับบ้านเกิดไปทำสวน"
-        effects: {job: farmer, health: 2, relations: 1, happiness: 1, money: {unit: income_x, amount: 2}}
+        effects: {severance: true, job: farmer, health: 2, relations: 1, happiness: 1}
         merit: [{cat: neutral}]
       - id: rant_live
         text: "ไลฟ์ระบายความในใจลงเน็ต"
+        effects: {severance: true}
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, text: "คลิปไวรัล บริษัทคู่แข่งทักมาเสนองานที่เงินดีกว่าเดิม", effects: {happiness: 2, income_mult: 1.4}, merit: [{cat: neutral}]}

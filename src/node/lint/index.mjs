@@ -26,9 +26,10 @@ export function lintContext() {
   }
   const eras = new Set(JSON.parse(read('data/era-events.json')).events.map((x) => x.id));
   const occupations = JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id);
+  const ladders = Object.keys(JSON.parse(read('data/careers.json')).ladders);
   const reg = parse(read('content/rules/flags.yaml'));
   const flags = { flags: new Set(Object.keys(reg.flags)), prefixes: new Set(Object.keys(reg.prefixes)) };
-  return { regions, systems, eras, occupations, lore, flags, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
+  return { regions, systems, eras, occupations, ladders, lore, flags, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]
