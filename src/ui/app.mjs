@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.2.31';
@@ -80,9 +80,20 @@ const svgEl = (tag, attrs, text) => {
   return n;
 };
 
+// แถบช่วงวัยเป็นพื้นหลังกราฟ (B38a) — x(age) ของกราฟนั้นเอง กราฟค่าสถานะกับกราฟเงินจึงแบ่งช่วงตรงกัน
+function stageBands(svg, ageX, fromAge, toAge, top, bottom, labels) {
+  STAGES.forEach((s, i) => {
+    const a = Math.max(s.from, fromAge), b = Math.min(STAGES[i + 1]?.from ?? Infinity, toAge);
+    if (b <= a) return;
+    svg.append(svgEl('rect', { class: `band band${i % 2}`, x: ageX(a), y: top, width: ageX(b) - ageX(a), height: bottom - top }));
+    // ช่วงแคบเกินป้ายจะทับกัน — ชื่อช่วงยังอ่านได้จากแถบสลับสีกับแกนอายุ
+    if (labels && ageX(b) - ageX(a) >= 34) svg.append(svgEl('text', { class: 'tb', x: (ageX(a) + ageX(b)) / 2, y: top - 4, 'text-anchor': 'middle' }, s.name));
+  });
+}
+
 // กราฟเงินของช่วงที่ผ่านไป — แกนตั้งรวมศูนย์เสมอ ส่วนต่างเล็กจึงดูเล็ก · viewBox คงสัดส่วนให้ตัวหนังสือไม่บิด
-// จุดเดียวไม่มีเส้นให้วาด
-function sparkline(series, fromAge, toAge) {
+// จุดเดียวไม่มีเส้นให้วาด · bands = แถบช่วงวัยพื้นหลัง (กราฟทั้งชีวิต)
+function sparkline(series, fromAge, toAge, bands = false) {
   if (series.length < 2) return null;
   const nom = series.map((p) => p.money);
   let lo = Math.min(0, ...nom), hi = Math.max(0, ...nom);
@@ -95,13 +106,14 @@ function sparkline(series, fromAge, toAge) {
   const y = (v) => T + ((hi - v) / (hi - lo)) * (H - T - B);
   const svg = svgEl('svg', { class: 'spark', viewBox: `0 0 ${W} ${H}`, role: 'img',
     'aria-label': `เงินติดตัว ${baht(nom[0])} → ${baht(nom.at(-1))}` });
+  // จุดสุดท้ายคือเงินตอนสิ้นอายุ toAge — ป้ายจึงยึดช่วงอายุเดียวกับหัวกล่อง ไม่นับจากจำนวนจุด
+  const ageX = (a) => L + ((a - fromAge) / Math.max(toAge - fromAge, 1)) * (W - L - R);
+  if (bands) stageBands(svg, ageX, fromAge, toAge, T, H - B, false);
   if (lo < 0) svg.append(svgEl('rect', { class: 'neg', x: L, y: y(0), width: W - L - R, height: y(lo) - y(0) }));
   for (let v = lo; v <= hi + step / 2; v += step) {
     svg.append(svgEl('line', { class: v === 0 ? 'zero' : 'grid', x1: L, x2: W - R, y1: y(v), y2: y(v) }));
     svg.append(svgEl('text', { class: 'ty', x: L - 4, y: y(v) + 3.5 }, v === 0 ? '0' : shortBaht(v)));
   }
-  // จุดสุดท้ายคือเงินตอนสิ้นอายุ toAge — ป้ายจึงยึดช่วงอายุเดียวกับหัวกล่อง ไม่นับจากจำนวนจุด
-  const ageX = (a) => L + ((a - fromAge) / Math.max(toAge - fromAge, 1)) * (W - L - R);
   const ages = toAge - fromAge >= 10 ? [fromAge, Math.round((fromAge + toAge) / 2), toAge] : [fromAge, toAge];
   const anchor = (a) => (a === fromAge ? 'start' : a === toAge ? 'end' : 'middle');
   for (const a of ages) svg.append(svgEl('text', { class: 'tx', x: ageX(a), y: H - 6, 'text-anchor': anchor(a) }, `อายุ ${a}`));
@@ -109,6 +121,40 @@ function sparkline(series, fromAge, toAge) {
   svg.append(path(nom, 'nom'));
   for (const i of [0, series.length - 1]) svg.append(svgEl('circle', { class: 'dot', cx: x(i), cy: y(nom[i]), r: 3 }));
   return svg;
+}
+
+// กราฟทั้งชีวิตบนบันทึกการตาย (B38a): ค่าสถานะ 5 เส้นสเกลเดียวกัน + เงินแยกใต้ แกนอายุเดียวกัน
+// เส้นแยกด้วยสีและลายเส้น (ไม่พึ่งสีอย่างเดียว) · ค่าสถานะไม่มีตัวเลขบนจอ (บอกแค่ทิศ) แกนตั้งจึงเป็นคำ
+const LINE_DASH = ['', '7 3', '2 3', '9 3 2 3', '4 2'];
+function lifeChart(life, deathAge) {
+  if (life.stats.length < 2) return null;
+  const box = el('div', 'lifechart');
+  box.append(el('div', 'h', `ทั้งชีวิต · อายุ 0–${deathAge}`));
+  const W = 320, H = 158, L = 46, R = 8, T = 18, B = 20;
+  const x = (a) => L + (a / Math.max(deathAge, 1)) * (W - L - R);
+  const y = (v) => T + ((100 - v) / 100) * (H - T - B);
+  const svg = svgEl('svg', { class: 'spark life', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `ค่าสถานะตลอดชีวิต อายุ 0 ถึง ${deathAge}` });
+  stageBands(svg, x, 0, deathAge, T, H - B, true);
+  for (const [v, t] of [[100, 'สูง'], [50, ''], [0, 'ต่ำ']]) {
+    svg.append(svgEl('line', { class: 'grid', x1: L, x2: W - R, y1: y(v), y2: y(v) }));
+    if (t) svg.append(svgEl('text', { class: 'ty', x: L - 4, y: y(v) + 3.5 }, t));
+  }
+  const ages = deathAge >= 10 ? [0, Math.round(deathAge / 2), deathAge] : [0, deathAge];
+  for (const a of ages) svg.append(svgEl('text', { class: 'tx', x: x(a), y: H - 6, 'text-anchor': a === 0 ? 'start' : a === deathAge ? 'end' : 'middle' }, `อายุ ${a}`));
+  const legend = el('ul', 'legend');
+  STAT_KEYS.forEach((k, i) => {
+    const pts = life.stats.map((p) => `${x(p.age).toFixed(1)},${y(p[k]).toFixed(1)}`).join(' ');
+    svg.append(svgEl('polyline', { class: `ln ln${i}`, points: pts, 'stroke-dasharray': LINE_DASH[i] }));
+    const key = svgEl('svg', { class: 'key', viewBox: '0 0 24 8', 'aria-hidden': 'true' });
+    key.append(svgEl('line', { class: `ln ln${i}`, x1: 0, x2: 24, y1: 4, y2: 4, 'stroke-dasharray': LINE_DASH[i] }));
+    const li = el('li');
+    li.append(key, STAT_LABELS[k]);
+    legend.append(li);
+  });
+  box.append(svg, legend);
+  const money = sparkline(life.money, 0, deathAge, true);
+  if (money) box.append(el('div', 'h', 'เงินติดตัว'), money);
+  return box;
 }
 
 function list(items, cls = 'items') {
@@ -536,8 +582,9 @@ function render(card) {
     body.append(titlesBox(card));
     const tree = familyTree();
     if (tree) body.append(tree);
-    // บัญชีบุญบาปเฉลยที่การ์ดศาลในระหว่างชาติ ไม่ใช่การ์ดตาย · ตายตอนเด็กได้บันทึกสั้น (ใบ 07) — ไม่มีสรุปช่วงวัย
-    if (card.recap && !card.short) body.append(recap(card.recap));
+    // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
+    const chart = card.life && lifeChart(card.life, card.age);
+    if (chart) body.append(chart);
     choices.append(enter(button('ไปช่วงระหว่างชาติ', null, () => play(T.afterlife))), ...shareButtons(card));
   } else {
     const head = el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : `อายุ ${card.age} · ช่วง${card.stage}`);

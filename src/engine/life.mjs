@@ -192,6 +192,8 @@ export function newLife(seed, content, heir = null) {
     // ผลตอบแทนจริงรายปีของสินทรัพย์เสี่ยงที่ถือ ตั้งแต่ต้นช่วงวัย — การ์ดเปลี่ยนช่วงเล่าย้อนหลังแล้วล้าง
     returns: [],
     trail: [],
+    // ค่าสถานะรายปีทั้งชีวิต (B38a) — แยกจาก trail เพราะ trail ออกไปกับการ์ดสรุปช่วงวัยอยู่แล้ว
+    statTrail: [],
     due: [],
     queue: [],
     done: {},
@@ -222,8 +224,21 @@ export function newLife(seed, content, heir = null) {
   st.due.push(introCard(st, heir));
   if (st.legacy?.age === 0) receiveLegacy(st, birthYear, stageOf(0));
   st.trail.push({ year: birthYear, money: Math.round(st.money) });
+  st.statTrail.push(statPoint(st));
   st.stageMark = markStage(st);
   return st;
+}
+
+const statPoint = (st) => ({ age: st.age, ...Object.fromEntries(STAT_KEYS.map((k) => [k, Math.round(st[k])])) });
+
+// กราฟทั้งชีวิตบนบันทึกการตาย (B38a): ค่าสถานะ + เงินรายปีตั้งแต่เกิดถึงตาย · จุดเก็บตอนขึ้นอายุ
+// จุดสุดท้ายแทนด้วยค่า ณ ตอนตาย — เหตุการณ์ปีสุดท้ายจึงไม่หายจากกราฟ · ไม่แตะ state การ์ดตายสร้างซ้ำได้
+function lifeSeries(st) {
+  const stats = st.statTrail.filter((p) => p.age < st.age);
+  stats.push(statPoint(st));
+  const money = st.trail.map((p) => ({ age: p.year - st.birthYear, money: p.money })).filter((p) => p.age < st.age);
+  money.push({ age: st.age, money: Math.round(st.money) });
+  return { stats, money };
 }
 
 function markStage(st) {
@@ -494,6 +509,7 @@ function stepYear(st) {
   const stage = stageOf(st.age);
   if (st.legacy && st.age >= st.legacy.age) receiveLegacy(st, year, stage);
   st.trail.push({ year, money: Math.round(st.money) });
+  st.statTrail.push(statPoint(st));
 
   checkBankrupt(st, year, stage);
   const tone = omenTone(st.ledger);
@@ -895,6 +911,7 @@ function deathCard(st) {
   st.estate = { year, money: card.summary.money, moneyAtBirth: card.summary.moneyAtBirth, debt: card.summary.debt, bankruptcies: st.bankruptcies };
   // ช่วงวัยสุดท้ายไม่มีการ์ดเปลี่ยนช่วงมาปิด — เล่าบนบันทึกการตายแทน
   card.recap = stageRecap(st, st.age);
+  card.life = lifeSeries(st);
   card.job = jobText(st);
   card.gen = st.gen;
   // ใบ 07: ตายตอนเด็กได้บันทึกสั้นบอกสถิติยุคนั้น (ทารกใช้อัตราตายทารก · เด็กโตใช้โอกาสตายรายปีของอายุนั้น) แล้วเข้าช่วงที่ 7 ตามปกติ
