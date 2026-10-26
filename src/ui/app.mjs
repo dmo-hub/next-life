@@ -387,6 +387,7 @@ function shareFacts(card) {
     // กราฟบนภาพใช้แค่ค่าสถานะรายปี (ค่าที่จอเห็นอยู่แล้ว) ไล่ช่องเอง ไม่ส่งก้อน card.life ทั้งก้อน
     stats: (card.life?.stats ?? []).map((p) => Object.fromEntries([['age', p.age], ...STAT_KEYS.map((k) => [k, p[k]])])),
     marks: lifeMarks(card.age).map((m) => m.age),
+    note: ((n) => n && { age: n.a, text: n.t })(notePick(st.gen)),
   };
 }
 
@@ -544,13 +545,40 @@ async function shareBlob(facts) {
     text(facts.title.name, '700 68px Srisakdi, serif', c('gold2'), 84, 0, 1);
     text(facts.title.tier, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 1);
   }
+  if (facts.note) shareNote(ctx, c, facts.note, cx, maxW, y, SHARE_H - SHARE_CHART_TOP);
   // กราฟอยู่ล่างสุด ยึดจากขอบล่าง — ข้อความข้างบนยาวแค่ไหนก็ไม่ทับกัน (ข้อความถูกจำกัดบรรทัดไว้แล้ว)
-  if (facts.stats.length >= 2) shareChart(ctx, c, facts, 120, SHARE_H - 440, SHARE_W - 240, 240);
+  if (facts.stats.length >= 2) shareChart(ctx, c, facts, 120, SHARE_H - SHARE_CHART_TOP, SHARE_W - 240, 240);
   ctx.font = '400 30px Sarabun, sans-serif';
   ctx.fillStyle = c('sand');
   ctx.fillText(SHARE_URL, cx, SHARE_H - 72);
 
   return new Promise((ok, fail) => cv.toBlob((b) => (b ? ok(b) : fail(new Error('canvas toBlob ว่าง'))), 'image/png'));
+}
+
+const SHARE_CHART_TOP = 440;
+// หัวกราฟวาดเหนือกรอบกราฟ 56px — บันทึกต้องจบก่อนหัวนั้นพอให้เว้นช่อง
+const NOTE_CLEAR = 100;
+// บันทึกชีวิตบนภาพ (B39): ข้อความผู้เล่นยาวไม่แน่นอน แต่ที่ว่างเหนือกราฟขึ้นกับข้อความข้างบน
+// จึงนับบรรทัดที่ลงได้จริง เกินตัดท้ายด้วย … · ลงไม่ได้สักบรรทัดก็ไม่วาด (ภาพไม่ทับกราฟ)
+function shareNote(ctx, c, note, cx, maxW, y, chartY) {
+  const LABEL = 44, LINE = 50;
+  const max = Math.min(3, Math.floor((chartY - NOTE_CLEAR - (y + 36 + LABEL)) / LINE));
+  if (max < 1) return;
+  ctx.font = '400 34px Sarabun, sans-serif';
+  let lines = wrapThai(ctx, `“${note.text}”`, maxW);
+  if (lines.length > max) {
+    lines = lines.slice(0, max);
+    let last = lines[max - 1];
+    while (last && ctx.measureText(`${last}…”`).width > maxW) last = [...last].slice(0, -1).join('');
+    lines[max - 1] = `${last.trimEnd()}…”`;
+  }
+  y += 36 + LABEL;
+  ctx.font = '600 30px Sarabun, sans-serif';
+  ctx.fillStyle = c('gold');
+  ctx.fillText(`บันทึกเมื่ออายุ ${note.age}`, cx, y);
+  ctx.font = '400 34px Sarabun, sans-serif';
+  ctx.fillStyle = c('cream');
+  for (const l of lines) ctx.fillText(l, cx, (y += LINE));
 }
 
 // กราฟทั้งชีวิตบนภาพ (B38) — แบบเดียวกับ lifeChart บนจอ: แถบช่วงวัย · 5 เส้นสี+ลายเส้น · จุดเรื่องเด่น · จุดตาย · ไม่มีตัวเลขค่าสถานะ
@@ -725,6 +753,13 @@ document.addEventListener('keydown', (e) => {
   // กดค้าง = repeat — ไม่นับ ไม่งั้นเลือกรัวข้ามการ์ด
   if (e.repeat || e.altKey || e.ctrlKey || e.metaKey || e.isComposing) return;
   const t = e.target;
+  // Esc ปิดแผ่นบันทึกชีวิตได้แม้กำลังพิมพ์อยู่
+  const skip = e.key === 'Escape' && root.querySelector('.note-sheet [data-skip]');
+  if (skip) {
+    e.preventDefault();
+    skip.click();
+    return;
+  }
   if (t.closest?.('input, textarea, select, [contenteditable]')) return;
   let b;
   if (e.key === 'Enter') {
@@ -770,6 +805,8 @@ function render(card) {
     if (card.note) body.append(el('p', 'sub', card.note));
     if (card.funeral) body.append(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
     if (card.will !== undefined) body.append(el('p', 'sub', card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
+    const note = notePick(st.gen);
+    if (note) body.append(noteQuote(`บันทึกเมื่ออายุ ${note.a}`, note.t));
     body.append(titlesBox(card));
     const tree = familyTree();
     if (tree) body.append(tree);
@@ -814,6 +851,10 @@ function render(card) {
       if (card.inherit.length) {
         const box = el('div', 'recap');
         box.append(el('div', 'h', 'สิ่งที่สืบทอดจากชาติก่อน'), list(card.inherit, 'picks'));
+        // บันทึกของชาติก่อนตามมาเฉพาะทางที่กลับมาเกิดในตระกูลเดิม · ใบเดียวกับที่ขึ้นบนมรณบัตรของชาตินั้น
+        const prev = st.lineage.at(-1);
+        const note = prev.path === 'child' && notePick(prev.gen);
+        if (note) box.append(noteQuote(`บันทึกของบรรพบุรุษ · ${prev.name ? `${prev.name} ` : ''}เมื่ออายุ ${note.a}`, note.t));
         if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), list(card.lineage, 'picks'));
         body.append(box);
       }
@@ -822,7 +863,13 @@ function render(card) {
     } else if (card.kind === 'stage') {
       body.append(el('span', 'stamp', card.text));
       body.append(recap(card.recap));
-      choices.append(enter(button('ต่อไป', null, next)));
+      const go = () => choices.replaceChildren(enter(button('ต่อไป', null, next)));
+      // ต้องตอบหรือข้ามก่อนเดินต่อ — ปุ่มต่อไปขึ้นหลังปิดแผ่นคำถาม
+      if (noteAsk && !noteOf(noteAsk)) choices.append(noteSheet(noteAsk, () => {
+        go();
+        choices.firstChild.focus();
+      }));
+      else go();
     } else if (card.kind === 'era' || card.kind === 'omen' || card.kind === 'result') {
       body.append(el('h3', null, card.text));
       if (card.story) body.append(el('p', null, card.story));
@@ -848,6 +895,41 @@ function render(card) {
 }
 
 const genLabel = () => (st.gen > 1 ? `รุ่นที่ ${st.gen} · ` : '');
+
+// แผ่นคำถามบันทึกชีวิต: บันทึกกับข้ามขนาดเท่ากัน · Enter ในช่องพิมพ์ = บันทึก · Enter นอกช่อง/Esc = ข้าม
+// ข้ามกดง่ายเท่ากดต่อไป คนที่เล่นรวดด้วยแป้นจึงไม่ติด
+function noteSheet(ask, done) {
+  const f = el('form', 'note-sheet');
+  const id = `note-${ask.g}-${ask.a}`;
+  const q = el('label', 'q', ask.q);
+  q.htmlFor = id;
+  const inp = el('input');
+  Object.assign(inp, { id, type: 'text', maxLength: NOTE_MAX, autocomplete: 'off', placeholder: `พิมพ์สั้น ๆ ไม่เกิน ${NOTE_MAX} ตัวอักษร` });
+  const keep = button('บันทึก', null, null);
+  keep.type = 'submit';
+  const skip = enter(button('ข้าม', null, () => {
+    notePut(ask, '');
+    done();
+  }));
+  skip.type = 'button';
+  skip.dataset.skip = '';
+  f.onsubmit = (e) => {
+    e.preventDefault();
+    notePut(ask, inp.value);
+    done();
+  };
+  const row = el('div', 'row');
+  row.append(keep, skip);
+  f.append(el('div', 'h', `บันทึกถึงตัวเอง · อายุ ${ask.a}`), q, inp, row);
+  return f;
+}
+
+// ข้อความที่ผู้เล่นพิมพ์เป็นข้อความดิบ — ใส่ด้วย textContent (el) เท่านั้น
+function noteQuote(label, text) {
+  const q = el('blockquote', 'life-note');
+  q.append(el('small', null, label), el('p', null, `“${text}”`));
+  return q;
+}
 
 // แผงครอบครัว (B36c): คนรอบตัวตอนนี้ แยกจากผังตระกูลที่เล่ารุ่นก่อน · อ่านอย่างเดียว ไม่มี token ในเซฟ
 // ใช้เฉพาะช่องที่ไล่ชื่อไว้ข้างล่าง — แกนเติมช่องใหม่ในสมาชิกก็ไม่หลุดขึ้นจอ · bond บอกเป็นป้ายคำ ไม่ใช่ตัวเลข
@@ -949,7 +1031,79 @@ function track(card) {
   if (af) return card;
   prevAge = curAge;
   curAge = card.age;
+  if (card.kind === 'stage') {
+    noteAsk = askFor(card.recap, card.age, lifeMark);
+    lifeMark = markLife();
+  }
   return card;
+}
+
+// บันทึกชีวิต (B39): ถามบนการ์ดเปลี่ยนช่วงวัย ผู้เล่นพิมพ์ตอบหรือข้าม · ข้อความดิบไม่อยู่ในเซฟ (เซฟเล่นซ้ำจาก seed กับปุ่มเท่านั้น)
+// จึงเก็บแยก key ผูก seed ต้นตระกูล — ตระกูลใหม่ไม่เห็นของเก่า · ตอบหรือข้ามไม่แตะ st ผลเกมจึงเท่าเดิม
+const NOTES_KEY = 'next-life-notes-v1';
+const NOTE_MAX = 160;
+let notes = { seed: null, n: [] };
+function notesLoad(seed) {
+  notes = { seed, n: [] };
+  try {
+    const v = JSON.parse(localStorage.getItem(NOTES_KEY));
+    if (v?.seed === seed && Array.isArray(v.n)) notes.n = v.n.filter((x) => Number.isInteger(x?.g) && Number.isInteger(x?.a) && typeof x.t === 'string');
+  } catch {
+    // ไม่มีที่เก็บ/ข้อมูลเสีย — เริ่มสมุดเปล่า
+  }
+}
+// ข้าม = เก็บข้อความว่าง การ์ดเดิมที่เปิดซ้ำ (รีโหลด/เล่นต่อ) จึงไม่ถามซ้ำ
+function notePut(ask, text) {
+  notes.n = [...notes.n.filter((x) => !(x.g === ask.g && x.a === ask.a)), { g: ask.g, a: ask.a, q: ask.q, t: text.trim().slice(0, NOTE_MAX) }];
+  try {
+    localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+  } catch {
+    // เก็บไม่ได้ยังจำในหน้านี้จนปิด
+  }
+}
+const noteOf = (ask) => notes.n.find((x) => x.g === ask.g && x.a === ask.a);
+// สุ่ม 1 บันทึกของรุ่นนั้นจาก seed — เปิดการ์ดตายซ้ำหรือรุ่นถัดไปเห็นบันทึกเดียวกัน ไม่กินเลขสุ่มของเกม
+function notePick(g) {
+  const xs = notes.n.filter((x) => x.g === g && x.t).sort((x, y) => x.a - y.a);
+  return xs.length ? xs[fnv(`${notes.seed}:${g}`) % xs.length] : null;
+}
+
+// คำถามตามสิ่งที่เกิดในช่วงที่เพิ่งจบ: เทียบคนในบ้าน/การล้มละลาย ต้นช่วงกับตอนนี้
+// จดตอนผ่านการ์ด (track) ซึ่งเล่นซ้ำจากเซฟก็ผ่านครบทุกใบ — ไม่ต้องเพิ่มช่องในแกนเกม
+let lifeMark = null;
+let noteAsk = null;
+const markLife = () => ({
+  parents: st.parents.map((p) => p.alive),
+  kin: Object.fromEntries((st.kin ?? []).filter((m) => m.role !== 'pet' && m.role !== 'peer').map((m) => [m.id, { role: m.role, alive: m.alive, left: !!m.left }])),
+  broke: st.bankruptcies,
+});
+const STAGE_ASK = {
+  'เด็ก': 'วัยเด็กจบแล้ว โตขึ้นอยากเป็นอะไร',
+  'วัยรุ่น': 'พ้นวัยรุ่นแล้ว มีอะไรอยากบอกตัวเองตอนเด็กไหม',
+  'หนุ่มสาว': 'ผ่านวัยหนุ่มสาวมาแล้ว ตอนนี้อะไรสำคัญกับคุณที่สุด',
+  'ทำงาน': 'ทำงานมาหลายปี ที่ผ่านมาคุ้มไหม',
+  'กลางคน': 'ใกล้วัยชราแล้ว อยากใช้เวลาที่เหลืออย่างไร',
+};
+// อายุของบันทึก = อายุบนหัวการ์ดที่ถาม (ต้นช่วงใหม่) ไม่ใช่ปลายช่วงที่เพิ่งจบ — ผู้เล่นเห็นเลขเดียวกันทั้งแผ่นและหัวการ์ด
+function askFor(r, age, was) {
+  const now = markLife();
+  const kinNow = Object.entries(now.kin);
+  const lost = (role) => was && kinNow.some(([id, m]) => m.role === role && !m.alive && was.kin[id]?.alive);
+  const got = (role) => was && kinNow.some(([id, m]) => m.role === role && m.alive && !m.left && !was.kin[id]);
+  const parent = was ? now.parents.findIndex((alive, i) => !alive && was.parents[i]) : -1;
+  let q;
+  if (parent >= 0) q = `${st.parents[parent].sex === 'ชาย' ? 'พ่อ' : 'แม่'}จากไปแล้ว ถ้าได้บอกอะไรอีกสักประโยค จะบอกว่าอะไร`;
+  else if (lost('spouse')) q = 'คู่ชีวิตจากไปแล้ว อยากบอกอะไรเขาเป็นครั้งสุดท้าย';
+  else if (lost('child')) q = 'ลูกจากไปก่อน มีอะไรค้างในใจที่อยากเขียนไว้ไหม';
+  else if (got('child')) q = 'เพิ่งมีลูก อยากให้ลูกรู้อะไรตอนเขาโตขึ้น';
+  else if (got('spouse')) q = 'เพิ่งได้คู่ชีวิต อยากจำช่วงนี้ไว้ว่าอย่างไร';
+  else if (was && now.broke > was.broke) q = 'เพิ่งล้มละลาย อยากบอกอะไรกับตัวเองที่ต้องเริ่มใหม่';
+  else {
+    // เรื่องเด่นชุดเดียวกับบนการ์ดนี้ — ผู้เล่นเพิ่งเห็น ไม่มีอะไรใหม่ให้รั่ว
+    const h = stageSummary(st, r.stage, r.fromAge, r.toAge).highlights.at(-1);
+    q = h ? `ตอนอายุ ${h.age} คุณเลือก “${h.text}” ถ้าย้อนไปได้ จะบอกตัวเองตอนนั้นว่าอะไร` : STAGE_ASK[r.stage];
+  }
+  return q ? { g: st.gen, a: age, q } : null;
 }
 
 // ทุกปุ่มที่เดินเกมผ่านตรงนี้ทางเดียว — ตอนเล่นจริงกับตอนเล่นซ้ำจากเซฟจึงเดินเหมือนกันทุกก้าว
@@ -965,6 +1119,7 @@ function step(tok) {
     st = nextLife(af);
     af = null;
     curAge = null;
+    lifeMark = markLife();
     return nextCard(st);
   }
   if (/^[A-Z]$/.test(tok)) {
@@ -976,12 +1131,15 @@ function step(tok) {
   return nextCard(st);
 }
 
-// ลายนิ้วมือของการ์ดที่ค้างอยู่ — เนื้อเรื่องเปลี่ยนแล้วเล่นซ้ำได้การ์ดคนละใบ ต้องจับได้ ไม่ใช่พาไปโผล่ชีวิตอื่นเงียบ ๆ
-function fingerprint(card) {
-  const s = JSON.stringify([st.gen, card.kind, card.age ?? st.age, card.title, card.text, card.choices]);
+function fnv(s) {
   let h = 0x811c9dc5;
   for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193);
-  return (h >>> 0).toString(36);
+  return h >>> 0;
+}
+
+// ลายนิ้วมือของการ์ดที่ค้างอยู่ — เนื้อเรื่องเปลี่ยนแล้วเล่นซ้ำได้การ์ดคนละใบ ต้องจับได้ ไม่ใช่พาไปโผล่ชีวิตอื่นเงียบ ๆ
+function fingerprint(card) {
+  return fnv(JSON.stringify([st.gen, card.kind, card.age ?? st.age, card.title, card.text, card.choices])).toString(36);
 }
 
 // storage พังได้ (โหมดส่วนตัว · เต็ม · ปิด) — เกมยังเล่นได้ แค่ไม่จำ · ป้ายหัวเว็บบอกผู้เล่นว่าจำอยู่หรือไม่ (B77)
@@ -1033,6 +1191,8 @@ function begin(seed) {
   af = null;
   save = { seed, log: '' };
   curAge = null;
+  lifeMark = markLife();
+  notesLoad(seed);
   return track(nextCard(st));
 }
 
