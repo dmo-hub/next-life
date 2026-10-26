@@ -36,6 +36,11 @@ export const CARRY = { spend: 0.5, min: 0.3, max: 0.7 };
 // stat = ค่าเริ่มเลื่อนสูงสุดเมื่อบัญชีสุดขั้ว · bonusCap = เพดานผลรวมจากฉากระหว่างชาติต่อค่า
 // kin = ทางเป็นลูกรับความสัมพันธ์/คอนเน็คชั่นของบ้านต่อ (ใบ 05) เป็นสัดส่วนของส่วนต่างจากค่ากลาง 50 ตอนพ่อแม่ตาย เพดาน bonusCap · หลาน/เหลนคูณ KIN_TIERS.kin
 export const FATE = { sd: 1.2, childStep: 3, stat: 10, bonusCap: 12, kin: 0.3 };
+// ฐานะตอนตายส่งต่อรุ่นถัดไป (B95b · เจ้าของเคาะ 50/50) ทั้งทางเป็นลูกและเกิดใหม่บ้านอื่น — ผสมกับชั้นที่กรรม/สุ่มเดิมให้
+// ตายพร้อมหนี้ = ชั้นล่างสุด ⇒ รุ่นถัดไปตกชั้นได้จริง · ไม่ดึงเลขสุ่มเพิ่ม (รุ่นแรกเท่า main)
+export const STAND_MIX = 0.5;
+const deathStanding = (st) => ((st.estate?.money ?? 0) < 0 ? 0 : standingOf(st));
+const mixStanding = (death, fate) => clampIdx(Math.round(STAND_MIX * death + (1 - STAND_MIX) * fate));
 // มรดก (ใบ 05 · lore-finance-belief): แบ่งตามจำนวนลูก · ภาษีการรับมรดก 5% ส่วนที่เกิน 100 ล้าน ตั้งแต่ปีที่กฎหมายมีผล
 // จำนวนลูกเป็นค่าตั้งของเกม — ธง has_kids ไม่ได้บอกว่ากี่คน
 // dispute = ส่วนของมรดกที่เสียไปกับการทะเลาะแบ่งกันเองเมื่อไม่มีพินัยกรรม (B25 · ค่าตั้งของเกม)
@@ -318,6 +323,7 @@ function makeHeir(af, r) {
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
   let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, province = null;
+  const death = deathStanding(st);
   if (af.path === 'child') {
     // บ้านของรุ่นถัดไปคือบ้านของคนในชาติก่อน — อาชีพของครอบครัวจึงเป็นงานสุดท้ายของเขา ไม่สุ่มใหม่
     occupation = st.occupation;
@@ -338,7 +344,7 @@ function makeHeir(af, r) {
     const units = st.kin ? legacyUnits(st, kids.length) * (tier.tier === 1 ? 1 : sibs ? 1 / sibs : tier.legacy) : legacyUnits(st) * tier.legacy;
     const rich = LEGACY.richUnits.filter((u) => units >= u).length;
     const wealth = st.estate?.money < 0 ? -1 : rich;
-    cls = CLASSES[clampIdx(CLASSES.indexOf(st.cls) + wealth + Math.round(x * FATE.childStep))];
+    cls = CLASSES[mixStanding(death, clampIdx(CLASSES.indexOf(st.cls) + wealth + Math.round(x * FATE.childStep)))];
     const debt = st.estate?.money < 0;
     let year = st.birthYear + kidAge;
     if (tier.tier === 1) {
@@ -380,7 +386,7 @@ function makeHeir(af, r) {
   } else {
     birthYear = pickBirthYear(rng, era);
     region = pickRegion(rng, era.birth);
-    cls = CLASSES[clampIdx(Math.round(4.5 + 4.5 * x + gauss(rng) * FATE.sd))];
+    cls = CLASSES[mixStanding(death, clampIdx(Math.round(4.5 + 4.5 * x + gauss(rng) * FATE.sd)))];
   }
   const kin = (k) => (tier && (k === 'relations' || k === 'network') ? Math.max(-FATE.bonusCap, Math.min(FATE.bonusCap, (st[k] - 50) * FATE.kin * tier.kin)) : 0);
   const bonus = Object.fromEntries(STAT_KEYS.map((k) => [k, x * FATE.stat + (af.bonus[k] ?? 0) + kin(k)]));
@@ -388,7 +394,7 @@ function makeHeir(af, r) {
   // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน · tier = กลับมาเกิดเป็นชั้นไหนของตัวเอง (ทางเป็นลูก)
   // ชีวิตต่างโลกต่อท้ายเป็นรุ่นของตัวเอง (B68) — แถวชาติไทยบันทึกทางว่าไปต่างโลกกับภูมิที่ปรโลกชี้ให้ชาติไทย แม้ขากลับจะเกิดใหม่ตามกรรมของชาติต่างโลก
   const thai = af.thaiVerdict ?? af.verdict;
-  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: standingOf(st) }] }, ...af.isekaiLives];
+  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }] }, ...af.isekaiLives];
   const carried = r * (tier?.carry ?? 1);
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
