@@ -36,7 +36,8 @@ export const CARRY = { spend: 0.5, min: 0.3, max: 0.7 };
 export const FATE = { sd: 1.2, childStep: 3, stat: 10, bonusCap: 12, kin: 0.3 };
 // มรดก (ใบ 05 · lore-finance-belief): แบ่งตามจำนวนลูก · ภาษีการรับมรดก 5% ส่วนที่เกิน 100 ล้าน ตั้งแต่ปีที่กฎหมายมีผล
 // จำนวนลูกเป็นค่าตั้งของเกม — ธง has_kids ไม่ได้บอกว่ากี่คน
-export const LEGACY = { kids: 2, taxFrom: 100e6, tax: 0.05, taxYear: 2559, richUnits: [10, 40] };
+// dispute = ส่วนของมรดกที่เสียไปกับการทะเลาะแบ่งกันเองเมื่อไม่มีพินัยกรรม (B25 · ค่าตั้งของเกม)
+export const LEGACY = { kids: 2, taxFrom: 100e6, tax: 0.05, taxYear: 2559, richUnits: [10, 40], dispute: 0.1 };
 // ทางในตระกูล (B18): เกิดเป็นลูก/หลาน/เหลน ยิ่งห่างสายเลือดยิ่งได้ต่อน้อย — ค่าตั้งของเกม
 // w = น้ำหนักสุ่มชั้น · carry คูณสัดส่วนส่งต่อบุญบาป (ลูก 1 = กรอบ CARRY เดิม) · kin คูณความสัมพันธ์/คอนเน็คชั่นของบ้าน
 // legacy คูณมรดกต่อหัว: หลานได้ส่วนของพ่อแม่ที่แบ่งต่อให้ลูก LEGACY.kids คนอีกทอด เหลนอีกทอด
@@ -231,6 +232,8 @@ export function legacyUnits(st, kids = LEGACY.kids) {
   const e = st.estate;
   if (!e || e.money <= 0) return 0;
   let share = e.money / Math.max(1, kids);
+  // ผ่านฉากงานศพแล้วไม่ได้ทำพินัยกรรม — ชีวิตที่ไม่ได้ผ่านฉากนี้ (ตายตอนเด็ก) ไม่หัก
+  if (st.funeral && !st.flags?.wish_will) share *= 1 - LEGACY.dispute;
   if (e.year >= LEGACY.taxYear && share > LEGACY.taxFrom) share -= (share - LEGACY.taxFrom) * LEGACY.tax;
   return share / (nationalIncome(st.content.era, st.seed, e.year) * 12);
 }

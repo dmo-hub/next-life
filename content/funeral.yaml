@@ -1,0 +1,71 @@
+# งานศพ (B25) — ไม่อยู่ในกองสุ่ม · แกนเรียกตอนตายหลังพ้นวัยเด็ก ก่อนการ์ดมรณบัตร (FUNERAL ใน life.mjs)
+# คำสั่งเสีย: ตัวเลือกที่ตั้งธง wish_ ทำให้การ์ดกลับมาอีกรอบ (เลือกได้หลายข้อ) จนกด "พอแค่นี้"
+# แบบงานศพ: ค่าใช้จ่ายเป็นบาทปี 2566 ปรับตามเงินเฟ้อ หักจากเงินที่ทิ้งไว้ · ล็อกเมื่อเงินไม่พอ หนี้งานศพจึงไม่เกิด
+# stage ใส่ไว้ตามกติกาโครงข้อมูล — แกนไม่อ่าน (ตายวัยไหนก็ได้การ์ดชุดนี้)
+events:
+  - id: funeral_wishes_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    title: "คำสั่งเสีย"
+    text: "ลมหายใจสุดท้ายใกล้เข้ามา คนข้างเตียงก้มลงฟังว่า{ชื่อ}อยากให้ทำอะไรหลังจากนี้ สั่งได้หลายเรื่อง หรือไม่สั่งอะไรเลยก็ได้"
+    choices:
+      - id: will
+        text: "ทำพินัยกรรมแบ่งทรัพย์ให้ชัด"
+        requires: {flags: {not: [wish_will]}, reason: "สั่งไว้แล้ว"}
+        sets_flags: [wish_will]
+        merit: [{cat: neutral}]
+      - id: organs
+        text: "แสดงเจตนาบริจาคอวัยวะ"
+        requires: {flags: {not: [wish_organ]}, reason: "สั่งไว้แล้ว"}
+        sets_flags: [wish_organ]
+        merit: [{cat: dana, level: 2}]
+      - id: ashes
+        text: "ขอให้ลอยอังคารที่บ้านเกิด"
+        requires: {flags: {not: [wish_ashes]}, reason: "สั่งไว้แล้ว"}
+        sets_flags: [wish_ashes]
+        merit: [{cat: neutral}]
+      - id: no_wreath
+        text: "ขอให้บริจาคแทนซื้อพวงหรีด"
+        requires: {flags: {not: [wish_no_wreath]}, reason: "สั่งไว้แล้ว"}
+        sets_flags: [wish_no_wreath]
+        merit: [{cat: dana, level: 1}]
+      - id: enough
+        text: "พอแค่นี้ ไม่มีอะไรค้างใจแล้ว"
+        merit: [{cat: neutral}]
+
+  - id: funeral_rite_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    title: "งานศพ"
+    text: "ดวงวิญญาณของ{ชื่อ}ยังวนเวียนอยู่ในบ้าน ได้ยินลูกหลานปรึกษากันเรื่องงานศพ ค่าใช้จ่ายทั้งหมดจะหักจากเงินที่ทิ้งไว้ คุณอยากให้เป็นแบบไหน"
+    choices:
+      - id: one_day
+        text: "เผาวันเดียว ไม่ต้องตั้งสวด"
+        requires: {money: {unit: fixed_baht, amount: 30000, ref_year: 2566}, reason: "เงินที่ทิ้งไว้ไม่พอ"}
+        effects: {money: {unit: fixed_baht, amount: -30000, ref_year: 2566}}
+        merit: [{cat: neutral}]
+      - id: chant_3
+        text: "สวดพระอภิธรรม 3 คืนแล้วเผา"
+        requires: {money: {unit: fixed_baht, amount: 120000, ref_year: 2566}, reason: "เงินที่ทิ้งไว้ไม่พอ"}
+        effects: {money: {unit: fixed_baht, amount: -120000, ref_year: 2566}}
+        merit: [{cat: neutral}]
+      - id: chant_7
+        text: "สวด 7 คืน ทำบุญครบ 7 วัน"
+        requires: {money: {unit: fixed_baht, amount: 300000, ref_year: 2566}, reason: "เงินที่ทิ้งไว้ไม่พอ"}
+        effects: {money: {unit: fixed_baht, amount: -300000, ref_year: 2566}}
+        merit: [{cat: neutral}]
+      - id: grand
+        text: "งานใหญ่ เชิญแขกทั้งอำเภอ"
+        requires: {money: {unit: fixed_baht, amount: 1500000, ref_year: 2566}, reason: "เงินที่ทิ้งไว้ไม่พอ"}
+        effects: {money: {unit: fixed_baht, amount: -1500000, ref_year: 2566}}
+        merit: [{cat: neutral}]
+      - id: body
+        text: "บริจาคร่างให้โรงเรียนแพทย์"
+        merit: [{cat: dana, level: 3}]
+      - id: temple
+        text: "ให้วัดหรือมูลนิธิช่วยจัดให้"
+        merit: [{cat: neutral}]

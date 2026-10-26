@@ -618,6 +618,7 @@ function eventCard(st, ev) {
     type: ev.type ?? 'A',
     // การ์ดเนื้อหาที่ผูกเหตุการณ์บ้านเมือง — หน้าจอติดป้ายบ้านเมืองแทนช่วงวัย
     national: !!ev.era,
+    funeral: ev.id === FUNERAL.wishes || ev.id === FUNERAL.rite,
     age: st.age,
     stage: stageOf(st.age),
     title: ev.title ? fill(ev.title, st) : null,
@@ -634,7 +635,9 @@ function lockReason(st, c) {
   const q = c.requires;
   if (!q) return null;
   const why = [];
-  if (q.money && st.money < moneyValue(st, q.money)) why.push('เงินไม่พอ');
+  // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
+  const purse = st.dead ? Math.min(st.money, netWorth(st)) : st.money;
+  if (q.money && purse < moneyValue(st, q.money)) why.push('เงินไม่พอ');
   for (const [k, b] of Object.entries(q.stats ?? {})) {
     if (b.min !== undefined && st[k] < b.min) why.push(`${STAT_LABELS[k]}ไม่ถึง`);
     if (b.max !== undefined && st[k] > b.max) why.push(`${STAT_LABELS[k]}มากเกินไป`);
@@ -652,7 +655,8 @@ export const openChoices = (card) => card.choices.map((_, i) => i).filter((i) =>
 // เดินปีละครั้งจนมีการ์ดถึงกำหนดหรือตาย คืนการ์ดใบถัดไป
 export function nextCard(st) {
   if (st.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
-  if (st.dead) return deathCard(st);
+  // คิวมาก่อนการตาย — การ์ดงานศพเข้าคิวตอนตายแล้วต้องออกก่อนมรณบัตร
+  if (st.dead && !st.queue.length) return deathCard(st);
   // การ์ดเปลี่ยนช่วง/เหตุการณ์ยุค/ผลสุ่มเป็นใบของตัวเอง เรียงตามที่ถึงกำหนดในปีนั้น
   if (st.queue.length) {
     const card = st.queue.shift();
@@ -669,7 +673,7 @@ export function nextCard(st) {
       // สุ่มตายของปีที่อายุ st.age ก่อนขึ้นปีใหม่ — ทารกจึงตายได้ตั้งแต่ขวบปีแรกตามอัตราตายทารกจริง และอายุบนการ์ดตายเป็นปีเต็ม
       if (st.health <= 0 || st.rng.next() < deathChance(st)) {
         st.dead = true;
-        return deathCard(st);
+        return queueFuneral(st) ? nextCard(st) : deathCard(st);
       }
       stepYear(st);
     }
@@ -804,6 +808,7 @@ export function choose(st, idx) {
   // เติมข้อความก่อนผลลง — {เงิน} ต้องเป็นยอดตอนที่ผู้เล่นเห็นตัวเลือก
   const text = fill(ev.choices[idx].text, st);
   const c = ev.choices[idx];
+  if (ev.id === FUNERAL.rite) st.funeral = { id: c.id, text, cost: c.effects?.money ? -moneyValue(st, c.effects.money) : 0 };
   applyEffects(st, c.effects);
   applyChoice(st, ev, c);
   st.log.push({ id: ev.id, age: st.age, choice: idx, text });
@@ -826,6 +831,8 @@ export function choose(st, idx) {
       after.push({ kind: 'eraEvent', ev: follow, age: st.age });
     }
   }
+  // คำสั่งเสียเลือกได้หลายข้อ: สั่งเรื่องหนึ่งแล้วการ์ดกลับมาให้สั่งต่อ ข้อที่สั่งแล้วล็อกด้วยธงของมันเอง
+  if (ev.id === FUNERAL.wishes && (c.sets_flags ?? []).some((f) => f.startsWith('wish_'))) after.push({ kind: 'eraEvent', ev, age: st.age });
   // เลิกเรียนแล้วหางานทันที
   if (st.needJob) {
     st.needJob = false;
@@ -864,7 +871,34 @@ function deathCard(st) {
     card.note = `ยุคนั้นเด็ก${st.sex}อายุ ${st.age} ปีจากไปราว ${Math.max(1, Math.round(q * 10000))} คนในทุก 10,000 คนต่อปี`;
   }
   if (st.age < STAGES[1].from) card.short = true;
+  if (st.funeral) {
+    const { id, text, cost } = st.funeral;
+    // แขกมาส่งตามความสัมพันธ์/คอนเน็คชั่น คูณขนาดงาน — ปัดสิบ ไม่ใช่ยอดนับจริง
+    const guests = Math.round((FUNERAL.guests[id] ?? 1) * (20 + st.relations * 2 + st.network * 3) / 10) * 10;
+    card.funeral = { text, guests, cost: Math.round(cost) };
+  }
+  // ไม่มีพินัยกรรม + มีทรัพย์ให้แบ่ง = ลูกหลานแบ่งกันเอง (afterlife.mjs หักส่วนที่เสียไปกับการทะเลาะ)
+  if (card.summary.money > 0 && !card.short) card.will = !!st.flags.wish_will;
   return card;
+}
+
+// งานศพ (B25): ตายหลังพ้นวัยเด็ก → การ์ดคำสั่งเสีย (วนจนกด "พอ") แล้วการ์ดแบบงานศพ ก่อนมรณบัตร
+// ตายตอนเด็กข้ามฉากนี้ — มรณบัตรเด็กเป็นบันทึกสั้น (ใบ 07) · ตัวคูณแขกผูกกับ id ตัวเลือกใน content/funeral.yaml
+export const FUNERAL = {
+  wishes: 'funeral_wishes_01',
+  rite: 'funeral_rite_01',
+  guests: { one_day: 0.3, chant_3: 0.7, chant_7: 1, grand: 1.6, body: 0.2, temple: 0.4 },
+};
+function queueFuneral(st) {
+  if (st.age < STAGES[1].from) return false;
+  const evs = [FUNERAL.wishes, FUNERAL.rite].map((id) => st.content.events.find((e) => e.id === id)).filter(Boolean);
+  if (!evs.length) return false;
+  for (const ev of evs) {
+    st.done[ev.id] = true;
+    st.fired[ev.id] = { n: 1, age: st.age };
+    st.queue.push({ kind: 'eraEvent', ev, age: st.age });
+  }
+  return true;
 }
 
 // เฉลยบัญชีบุญบาป (ใบ 09 "เฉลยที่ศาลพญายม") — ออกบนการ์ดศาลในระหว่างชาติใบเดียว (afterlife.mjs)
