@@ -1,4 +1,4 @@
-# ล็อกทุกตัวเลือก · ล็อกด้วยธงไม่มี reason · requires ว่าง · family ที่ไม่ใช่พ่อแม่ — การ์ดที่ล็อกบางตัวด้วยเงิน/ค่าสถานะยังผ่าน
+# ล็อกทุกตัวเลือก · ล็อกด้วยธงไม่มี reason · requires ว่าง · family ที่บทบาทไม่มีในบ้าน — การ์ดที่ล็อกบางตัวด้วยเงิน/ค่าสถานะยังผ่าน
 events:
   - id: bad_case_01
     type: A
@@ -10,7 +10,7 @@ events:
       - {text: "ทางที่สอง", requires: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
       - {text: "ทางที่สาม", requires: {flags: {has: [married]}}, sets_flags: [married], merit: [{cat: neutral}]}
       - {text: "ทางที่สี่", requires: {reason: "ไม่มีเงื่อนไข"}, merit: [{cat: neutral}]}
-      - {text: "ทางที่ห้า", requires: {family: [{role: spouse}]}, merit: [{cat: neutral}]}
+      - {text: "ทางที่ห้า", requires: {family: [{role: cousin}]}, merit: [{cat: neutral}]}
   - id: ok_case_01
     type: A
     stage: ทำงาน

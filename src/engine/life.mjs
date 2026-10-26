@@ -1,4 +1,5 @@
 import { makeRng } from './rng.mjs';
+import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
@@ -136,7 +137,8 @@ export function newLife(seed, content, heir = null) {
     birthYear,
     sex,
     // heir ของ harness ไม่มี lineage — ไม่มีรุ่นก่อนให้เลี่ยงชื่อ
-    name: pickName(seed, sex, birthYear, era.names, (heir?.lineage ?? []).map((l) => l.name)),
+    // ทางในตระกูลเกิดเป็นลูก/หลานจริงที่มีชื่ออยู่แล้ว (B36a) — คงชื่อเดิมของเขา
+    name: heir?.name ?? pickName(seed, sex, birthYear, era.names, (heir?.lineage ?? []).map((l) => l.name)),
     region: region.name,
     province,
     ses: region.ses,
@@ -210,7 +212,10 @@ export function newLife(seed, content, heir = null) {
     fired: {},
     parents,
     famRng,
+    // คู่ครอง/ลูก/หลานที่เป็นคนจริง (B36a · family.mjs) — stream kinRng แยกจากโลกและจากพ่อแม่
+    ...newKin(seed),
   };
+  nameParents(st);
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
   // การ์ดเปิดชีวิตมาก่อนการ์ดมรดกตอนแรกเกิด — ต้องเล่ามรดกก่อน receiveLegacy ล้าง st.legacy
   st.due.push(introCard(st, heir));
@@ -339,7 +344,9 @@ export const FILL = {
   จังหวัด: (st) => provinceLabel(st),
   เงิน: (st) => Math.round(st.money).toLocaleString('en-US'),
   ชื่อ: (st) => st.name,
-  ชื่อลูก: () => 'ลูก',
+  ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
+  ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
+  ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',
   ครับ: (st) => (st.sex === 'หญิง' ? 'ค่ะ' : 'ครับ'),
   ผม: (st) => (st.sex === 'หญิง' ? 'ฉัน' : 'ผม'),
 };
@@ -468,6 +475,7 @@ function stepYear(st) {
   st.relations = clamp(st.relations * (1 - RELATION_FADE));
   flowChronic(st);
   ageParents(st, year);
+  ageKin(st, year);
   // ผลตอบแทนคิดกับเงินต้นปีก่อนเงินเก็บของปีนี้เข้า · ติดลบ = หนี้ ทบดอกเบี้ยเงินกู้ของปีนั้น
   const era = st.content.era;
   if (st.money > 0) {
@@ -633,7 +641,7 @@ function lockReason(st, c) {
   }
   if (q.flags && !flagsOk(st, q.flags)) why.push('ยังไม่เข้าเงื่อนไข');
   if (q.edu && eduRank(st.edu) < eduRank(q.edu)) why.push('วุฒิไม่ถึง');
-  if (q.family && !q.family.every((f) => familyOk(st, f))) why.push('พ่อแม่ไม่อยู่แล้ว');
+  if (q.family && !q.family.every((f) => familyOk(st, f))) why.push(q.family.every((f) => f.role === 'parent') ? 'พ่อแม่ไม่อยู่แล้ว' : 'ครอบครัวยังไม่เข้าเงื่อนไข');
   if (!why.length) return null;
   return q.reason ?? why.join(' · ');
 }
@@ -751,7 +759,6 @@ const inRange = (v, r) => !r || (v >= r[0] && v <= r[1]);
 const inBound = (v, b) => !b || ((b.min === undefined || v >= b.min) && (b.max === undefined || v <= b.max));
 const flagsOk = (st, f) => (f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]);
 // ครอบครัวมีแค่พ่อแม่ (ด่าน family-system กั้นบทบาทอื่นไว้) · เงื่อนไขผ่านเมื่อพ่อหรือแม่คนใดคนหนึ่งตรง
-const familyOk = (st, f) => f.role === 'parent' && st.parents.some((p) => (f.alive === undefined || p.alive === f.alive) && inRange(p.age, f.age));
 // เงื่อนไขเกิดแบบประกาศทุกฟิลด์ (ใบ 07)
 export function whenOk(st, when) {
   if (!when) return true;
@@ -776,6 +783,7 @@ function applyChoice(st, ev, c) {
     st.flagAge[f] ??= st.age;
   }
   for (const f of c.clears_flags ?? []) delete st.flags[f];
+  applyFamily(st, c);
   for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]) });
 }
 

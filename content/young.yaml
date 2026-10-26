@@ -125,7 +125,7 @@ events:
       - id: ultrasound
         text: "ลุ้นผลอัลตราซาวด์"
         outcomes:
-          - {weight: 1, text: "หมอยิ้มแปลก ๆ แล้วชี้จอ มีสองคน! แฝดมาแล้ว", effects: {happiness: 2, health: -1, money: {unit: income_x, amount: -2}}, sets_flags: [has_kids], merit: [{cat: neutral}]}
+          - {weight: 1, text: "หมอยิ้มแปลก ๆ แล้วชี้จอ มีสองคน! แฝดมาแล้ว", effects: {happiness: 2, health: -1, money: {unit: income_x, amount: -2}}, sets_flags: [has_kids], family: [{add: child, n: 2}], merit: [{cat: neutral}]}
           - {weight: 3, text: "ลูกคนเดียว แข็งแรงดีทุกอย่าง", effects: {happiness: 2}, sets_flags: [has_kids], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: two_shifts

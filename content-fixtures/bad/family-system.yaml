@@ -1,4 +1,4 @@
-# อ้างคู่ครอง/สุขภาพของพ่อแม่ซึ่งยังไม่มีระบบ — พ่อแม่ยังมีชีวิตตามอายุยังผ่าน
+# อ้างสุขภาพของพ่อแม่ซึ่งยังไม่มีระบบ — คู่ครอง/พ่อแม่ตามอายุ/จำนวนลูกยังผ่าน
 events:
   - id: bad_case_01
     type: A
@@ -11,6 +11,6 @@ events:
     type: A
     stage: กลางคน
     years: [2500, 2650]
-    when: {family: [{role: parent, age: [70, 120], alive: true}]}
+    when: {family: [{role: parent, age: [70, 120], alive: true}, {role: spouse, alive: true}, {role: child, count: [2, 5]}]}
     text: "ข้อความการ์ด"
     choices: []

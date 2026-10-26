@@ -1,0 +1,22 @@
+# ผลครอบครัวผิดรูป: op สองอย่างในตัวเดียว · add บทบาทที่เพิ่มไม่ได้ · n เกิน · leave คนที่ไม่ใช่คู่ — เพิ่มลูกแฝด/คู่แยกทาง/คนในบ้านจากไปยังผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", family: [{add: child, die: spouse}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", family: [{add: parent}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", family: [{add: child, n: 5}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", family: [{leave: child}], merit: [{cat: neutral}]}
+  - id: ok_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", family: [{add: child, n: 2}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", family: [{leave: spouse}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", family: [{die: parent}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}

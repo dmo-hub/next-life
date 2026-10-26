@@ -9,8 +9,9 @@ import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placehold
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket'],
-  outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family'],
+  outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
+  familyOp: ['add', 'n', 'leave', 'die'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
@@ -21,7 +22,7 @@ const KEYS = {
   when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation'],
   bound: ['min', 'max'],
   whenFlags: ['has', 'not'],
-  family: ['role', 'age', 'alive', 'health', 'relations'],
+  family: ['role', 'age', 'alive', 'count', 'health', 'relations'],
   multipliers: ['class', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish'],
   repeat: ['gap', 'max'],
   requires: ['money', 'stats', 'flags', 'edu', 'family', 'reason'],
@@ -92,6 +93,7 @@ function* shaped(e) {
     if (isObj(node.cost)) yield ['money', node.cost, `${path}.cost`];
     for (const [i, m] of list(node.merit).entries()) if (isObj(m)) yield ['merit', m, `${path}.merit[${i}]`];
     for (const [i, s] of list(node.schedules).entries()) if (isObj(s)) yield ['schedule', s, `${path}.schedules[${i}]`];
+    for (const [i, o] of list(node.family).entries()) if (isObj(o)) yield ['familyOp', o, `${path}.family[${i}]`];
   }
 }
 
@@ -243,6 +245,7 @@ export const rules = [
           if (!isObj(f) || !FAMILY_ROLES.includes(f.role)) return r(p, `role ต้องเป็น ${FAMILY_ROLES.join(' ')}`);
           if (f.age !== undefined && !isRange(f.age, 0, 120)) r(`${p}.age`, 'age ต้องเป็น [จาก, ถึง] 0–120');
           if (f.alive !== undefined && typeof f.alive !== 'boolean') r(`${p}.alive`, 'alive ต้องเป็น true/false');
+          if (f.count !== undefined && !isRange(f.count, 0, 20)) r(`${p}.count`, 'count ต้องเป็น [จาก, ถึง] 0–20');
           for (const k of ['health', 'relations']) if (f[k] !== undefined && !bound(f[k])) r(`${p}.${k}`, 'ต้องเป็น {min, max} 0–100');
         });
       }
@@ -366,7 +369,7 @@ export const rules = [
   },
   {
     id: 'choice-lock',
-    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent, alive?, age?}], reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
+    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, alive?, age?, count?}], reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
     event(e, ctx, r) {
       const cs = choicesOf(e);
       for (const { c, path } of cs) {
@@ -374,8 +377,8 @@ export const rules = [
         if (q === undefined) continue;
         const at = `${path}.requires`;
         if (!isObj(q) || !['money', 'stats', 'flags', 'edu', 'family'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags edu หรือ family อย่างน้อยหนึ่งอย่าง'); continue; }
-        // ตัวเลือกที่พูดถึงพ่อแม่ล็อกได้เมื่อไม่มีพ่อแม่ที่ยังอยู่ · ระบบครอบครัวมีแค่พ่อแม่ (เหมือน when.family)
-        if (q.family !== undefined && !(Array.isArray(q.family) && q.family.length && q.family.every((f) => isObj(f) && f.role === 'parent' && (f.alive === undefined || typeof f.alive === 'boolean') && (f.age === undefined || isRange(f.age, 0, 120)) && f.health === undefined && f.relations === undefined))) r(`${at}.family`, 'ต้องเป็น [{role: parent, alive?: true/false, age?: [จาก, ถึง]}]');
+        // ตัวเลือกที่พูดถึงคนในบ้านล็อกได้เมื่อไม่มีคนนั้น (เงื่อนไขชุดเดียวกับ when.family)
+        if (q.family !== undefined && !(Array.isArray(q.family) && q.family.length && q.family.every((f) => isObj(f) && FAMILY_ROLES.includes(f.role) && (f.alive === undefined || typeof f.alive === 'boolean') && (f.age === undefined || isRange(f.age, 0, 120)) && (f.count === undefined || isRange(f.count, 0, 20)) && f.health === undefined && f.relations === undefined))) r(`${at}.family`, 'ต้องเป็น [{role: parent|spouse|child|grandchild, alive?: true/false, age?: [จาก, ถึง], count?: [จาก, ถึง]}]');
         if (q.money !== undefined && !(isMoney(q.money) && q.money.amount > 0)) r(`${at}.money`, 'ต้องเป็นเงินมีหน่วย amount > 0');
         if (q.stats !== undefined && (!isObj(q.stats) || Object.entries(q.stats).some(([k, b]) => !STAT_KEYS.includes(k) || !bound(b) || (b.min === undefined && b.max === undefined)))) r(`${at}.stats`, 'ต้องเป็น {ค่าสถานะ: {min, max}} 0–100');
         if (q.flags !== undefined && (!isObj(q.flags) || ['has', 'not'].some((k) => q.flags[k] !== undefined && !Array.isArray(q.flags[k])))) r(`${at}.flags`, 'flags ต้องเป็น {has: [...], not: [...]}');
@@ -417,13 +420,32 @@ export const rules = [
     },
   },
   {
+    // ผลครอบครัวของตัวเลือก/ผลสุ่ม (B36a): เพิ่มสมาชิก · คู่แยกทาง · คนในบ้านจากไป — op ละอย่าง
+    id: 'family-ops',
+    desc: 'family = [{add: spouse|child|grandchild, n?: 1–3} | {leave: spouse} | {die: parent|spouse|child|grandchild}] — op ละอย่าง',
+    event(e, ctx, r) {
+      for (const { node, path } of effectSites(e)) {
+        if (node.family === undefined) continue;
+        if (!Array.isArray(node.family) || !node.family.length) { r(`${path}.family`, 'family ต้องเป็นรายการไม่ว่าง'); continue; }
+        node.family.forEach((o, i) => {
+          const p = `${path}.family[${i}]`;
+          const kinds = ['add', 'leave', 'die'].filter((k) => isObj(o) && o[k] !== undefined);
+          if (kinds.length !== 1) return r(p, 'ต้องมี add leave หรือ die อย่างเดียว');
+          if (o.add !== undefined && !['spouse', 'child', 'grandchild'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น spouse child grandchild');
+          if (o.n !== undefined && (o.add === undefined || !isInt(o.n) || o.n < 1 || o.n > 3)) r(`${p}.n`, 'n ใช้กับ add เป็น 1–3');
+          if (o.leave !== undefined && o.leave !== 'spouse') r(`${p}.leave`, 'leave ใช้ได้กับ spouse');
+          if (o.die !== undefined && !FAMILY_ROLES.includes(o.die)) r(`${p}.die`, `die ต้องเป็น ${FAMILY_ROLES.join(' ')}`);
+        });
+      }
+    },
+  },
+  {
     id: 'family-system',
-    desc: 'when.family ใช้ได้แค่ role parent กับ age/alive — คู่ครอง ลูก สุขภาพ/ความสัมพันธ์ของสมาชิกยังไม่มีระบบ ใส่ไปแล้วการ์ดไม่เคยออก',
+    desc: 'when.family ใช้ role parent|spouse|child|grandchild กับ age/alive/count — สุขภาพ/ความสัมพันธ์ของสมาชิกยังไม่มีระบบ ใส่ไปแล้วการ์ดไม่เคยออก',
     event(e, ctx, r) {
       const fam = isObj(e.when) ? e.when.family : undefined;
       list(fam).forEach((f, i) => {
         if (!isObj(f)) return;
-        if (f.role !== undefined && f.role !== 'parent') r(`.when.family[${i}].role`, `role ${f.role} ยังไม่มีระบบ (ใช้ได้แค่ parent)`);
         for (const k of ['health', 'relations']) if (f[k] !== undefined) r(`.when.family[${i}].${k}`, `${k} ของสมาชิกครอบครัวยังไม่มีระบบ`);
       });
     },

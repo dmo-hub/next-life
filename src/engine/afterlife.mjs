@@ -70,7 +70,9 @@ export function startAfterlife(st) {
   };
 }
 
-const hasKids = (st) => !!st.flags.has_kids;
+// ลูกหลานที่ยังอยู่ตอนตาย (B36a) — state ก่อนมีระบบครอบครัว (ไม่มี kin) ใช้ธงเดิม
+const livingKin = (st, role) => (st.kin ?? []).filter((m) => m.role === role && m.alive);
+const hasKids = (st) => (st.kin ? livingKin(st, 'child').length + livingKin(st, 'grandchild').length > 0 : !!st.flags.has_kids);
 
 // ฉากของช่วงที่ 7: เนื้อหาที่ตรงเงื่อนไขของผู้ตาย สุ่มตามน้ำหนัก · ด่าน afterlife-coverage รับประกันว่ามีใบไม่มีเงื่อนไขเสมอ
 function pickScene(af, scene) {
@@ -224,10 +226,11 @@ export function carryLedger(ledger, net, r) {
 
 // มรดกต่อลูกหนึ่งคน เป็นจำนวนเท่าของรายได้ครัวเรือนทั้งปีของทั้งประเทศตอนตาย — ชีวิตลูกเดินเงินเฟ้อคนละชุด (seed ต่างกัน)
 // จึงส่งต่อเป็นสัดส่วนของรายได้ แล้วแปลงกลับเป็นบาทในปีที่ลูกได้รับ · ทรัพย์สุทธิติดลบ = หนี้ไม่ตกถึงลูก (ป.พ.พ. ม.1601)
-export function legacyUnits(st) {
+// kids = จำนวนลูกที่ยังอยู่จริง (B36a) · ไม่รู้จำนวน (harness/state เก่า) ใช้ LEGACY.kids
+export function legacyUnits(st, kids = LEGACY.kids) {
   const e = st.estate;
   if (!e || e.money <= 0) return 0;
-  let share = e.money / LEGACY.kids;
+  let share = e.money / Math.max(1, kids);
   if (e.year >= LEGACY.taxYear && share > LEGACY.taxFrom) share -= (share - LEGACY.taxFrom) * LEGACY.tax;
   return share / (nationalIncome(st.content.era, st.seed, e.year) * 12);
 }
@@ -247,16 +250,26 @@ function makeHeir(af, r) {
   const { x, net, realm } = af.verdict;
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
-  const sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง';
+  let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
   let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, province = null;
   if (af.path === 'child') {
     // บ้านของรุ่นถัดไปคือบ้านของคนในชาติก่อน — อาชีพของครอบครัวจึงเป็นงานสุดท้ายของเขา ไม่สุ่มใหม่
     occupation = st.occupation;
     tier = weighted(rng, KIN_TIERS, KIN_TIERS.map((t) => t.w));
-    const kidAge = Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
+    // ลูก/หลานที่ยังอยู่จริง (B36a): เกิดเป็นคนหนึ่งในนั้น · ไม่มีลูกเหลือแต่มีหลาน = ชั้นลูกเลื่อนเป็นหลาน · สุ่มเลือกคนจาก kinRng ของชีวิตก่อน
+    const kids = livingKin(st, 'child'), grand = livingKin(st, 'grandchild');
+    if (st.kin && tier.tier === 1 && !kids.length) tier = KIN_TIERS[1];
+    const pickOne = (list) => (list.length ? list[st.kinRng.int(0, list.length - 1)] : null);
+    const me = st.kin ? (tier.tier === 1 ? pickOne(kids) : tier.tier === 2 ? pickOne(grand) : null) : null;
+    const link = me?.role === 'grandchild' ? st.kin.find((m) => m.id === me.of) ?? null : tier.tier > 1 ? pickOne(kids) : null;
+    const spouse = (st.kin ?? []).filter((m) => m.role === 'spouse').at(-1) ?? null;
+    if (me) ({ sex, name } = me);
+    const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
-    const units = legacyUnits(st) * tier.legacy;
+    // ชั้นลูกหารด้วยลูกที่ยังอยู่จริง · หลานจริงหารต่อด้วยพี่น้องของเขา · ชั้นที่ไม่มีคนจริงใช้ตัวคูณเดิมของชั้น
+    const sibs = me?.role === 'grandchild' ? grand.filter((g) => g.of === me.of).length : 0;
+    const units = st.kin ? legacyUnits(st, kids.length) * (tier.tier === 1 ? 1 : sibs ? 1 / sibs : tier.legacy) : legacyUnits(st) * tier.legacy;
     const rich = LEGACY.richUnits.filter((u) => units >= u).length;
     const wealth = st.estate?.money < 0 ? -1 : rich;
     cls = CLASSES[clampIdx(CLASSES.indexOf(st.cls) + wealth + Math.round(x * FATE.childStep))];
@@ -264,21 +277,33 @@ function makeHeir(af, r) {
     let year = st.birthYear + kidAge;
     if (tier.tier === 1) {
       // ผู้เล่นรุ่นก่อนตายตามชะตาเดิมของตัวเอง (diesAt) · อีกคนแก่และตายตามตารางชีพแบบพ่อแม่ทั่วไป
+      // คู่ครองจริงเป็นพ่อ/แม่อีกคน: อายุตอนลูกเกิดจากปีเกิดจริง · ตายไปแล้วตอนเราตาย = ตายที่อายุนั้น · ไม่มีคู่จริง = สร้างแบบเดิม
+      const year0 = st.birthYear + kidAge;
       parents = [
-        { sex: st.sex, age: kidAge, alive: true, diesAt: st.age, ancestor: true },
-        { sex: otherSex(st.sex), age: spouseAge(rng, st.sex, kidAge), alive: true },
+        { sex: st.sex, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name },
+        spouse && spouse.born <= year0
+          ? { sex: spouse.sex, age: year0 - spouse.born, alive: spouse.diedAge === null || spouse.diedAge > year0 - spouse.born, ...(spouse.diedAge !== null && { diesAt: spouse.diedAge }), name: spouse.name }
+          : { sex: otherSex(st.sex), age: spouseAge(rng, st.sex, kidAge), alive: true },
       ];
       legacy = { age: st.age - kidAge, units, debt, from: elderWord(1, null, st.sex) };
     } else {
       // รุ่นคั่นกลางเกิดห่างกันตามช่วงอายุแม่ตอนคลอด · พ่อ/แม่ของผู้เล่นใหม่เป็นลูก (หรือหลาน) ของรุ่นก่อน แก่และตายตามตารางชีพ
+      // หลานจริง = เกิดปีของเขา พ่อ/แม่สายเลือดคือลูกจริงที่ให้กำเนิด · ไม่มีคนจริง = ห่างรุ่นสุ่มแบบเดิม (เริ่มจากปีเกิดลูกจริงถ้ามี)
       let gap = 0;
-      for (let i = 1; i < tier.tier; i++) {
-        gap = rng.int(...GEN_GAP);
-        year += gap;
+      if (me) {
+        gap = me.born - (link?.born ?? year);
+        year = me.born;
+      } else {
+        for (let i = 1; i < tier.tier; i++) {
+          gap = rng.int(...GEN_GAP);
+          year += gap;
+        }
       }
-      const linkSex = rng.next() < 0.5 ? 'หญิง' : 'ชาย';
+      const linkSex = link?.sex ?? (rng.next() < 0.5 ? 'หญิง' : 'ชาย');
+      // ลูกจริงเป็นพ่อ/แม่ได้ตรง ๆ เฉพาะชั้นหลาน · เหลนมีรุ่นคั่นที่ยังไม่มีตัวตน
+      const direct = link && tier.tier === 2;
       parents = [
-        { sex: linkSex, age: gap, alive: true },
+        direct ? { sex: link.sex, age: gap, alive: link.diedAge === null || link.diedAge > gap, ...(link.diedAge !== null && { diesAt: link.diedAge }), name: link.name } : { sex: linkSex, age: gap, alive: true },
         { sex: otherSex(linkSex), age: spouseAge(rng, linkSex, gap), alive: true },
       ];
       // รุ่นก่อนไม่อยู่ในพ่อแม่ — มรดกตกทอดปีที่รุ่นก่อนตาย ตายก่อนเกิดก็ได้รับตอนแรกเกิด
@@ -301,6 +326,7 @@ function makeHeir(af, r) {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1,
     sex,
+    name,
     cls,
     region,
     province,
