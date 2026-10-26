@@ -23,6 +23,10 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .logo .saved { display:inline-block; margin:4px 0 0 6px; font-size:11px; color:var(--sand); white-space:nowrap; }
 .logo .saved:not(:empty)::before { content:'\25CF  '; color:#7FC4B8; }
 .logo .saved.off::before { color:#E07A5F; }
+.theme { display:flex; justify-content:center; gap:6px; margin-top:6px; }
+.theme button { all:unset; box-sizing:border-box; min-height:36px; min-width:72px; padding:0 12px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--bronze2); border-radius:999px; font-size:13px; color:var(--sand); cursor:pointer; }
+.theme button[aria-pressed="true"] { background:var(--gold); border-color:var(--gold); color:var(--lacquer); font-weight:600; }
+.theme button:focus-visible { outline:2px solid var(--gold2); outline-offset:2px; }
 #app { max-width:460px; margin:0 auto; padding:20px 16px 16px; }
 /* ป้ายเกมไม่ใช่คำแนะนำการลงทุน (ใบ 11) อยู่ทุกหน้าจอ ไม่ใช่แค่การ์ดจัดสรรเงิน */
 .foot { max-width:460px; margin:0 auto; padding:0 16px 40px; font-size:12px; color:var(--muted); text-align:center; }
@@ -175,12 +179,63 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .deed { margin:0; display:flex; flex-direction:column; gap:2px; font-size:13px; overflow-wrap:anywhere; color:#E3D6B3; }
 .deed b { color:var(--gold2); font-size:12px; }
 .deed.bad b { color:#E39A8A; }
+/* ลาง/ความเชื่อ — แสงเทียน (B83b D2 ทาง C): ฐานสีรักดำของทาง B · เปลี่ยนพื้น หัว และจัดเนื้อเรื่องกลางใบ */
+.b.cdl { background:radial-gradient(circle at 50% 30%, #4A3216 0%, #1A120B 55%, #0D0906 100%); border-color:#3A2A18; }
+.cdl .top { border-bottom-color:#3A2A18; }
+.cdl .top b { font-family:Pridi,serif; font-size:16px; font-weight:600; color:#F6C66A; }
+.cdl .top small { color:#BFA57A; }
+.flame { align-self:center; width:40px; height:56px; shape-rendering:crispEdges; }
+.cdl .body > .kicker, .cdl .body > h3, .cdl .body > p { text-align:center; }
+.cdl .kicker { color:#F6C66A; }
+.cdl .body h3 { font-family:Pridi,serif; font-weight:600; font-size:24px; color:#FFE3A6; }
+.cdl .body p { color:#E6D3AE; }
+.cdl .choice { border-color:rgba(246,198,106,0.45); background:rgba(0,0,0,0.35); }
+.cdl .choice .fx { color:#F6C66A; }
+
+/* มรณบัตร — หนังสืองานศพ (B83b D3 ทาง B): ขาวดำ กรอบหนา รูปกลางใบ · กราฟกับสรุปข้างในคงสีทาง A */
+.a.mem { background:#FFFFFF; border:12px solid #1F1F1F; outline:1px solid #8A8A8A; outline-offset:-6px; color:#1F1F1F; }
+.mem .top { background:transparent; color:#1F1F1F; justify-content:center; padding-top:18px; }
+.mem .top b { font-family:Srisakdi,serif; font-size:22px; font-weight:700; }
+.por { align-self:center; width:84px; height:96px; border:1px solid #1F1F1F; padding:4px; shape-rendering:crispEdges; }
+.mem .body > h3, .mem .body > .dates { text-align:center; }
+.mem .body h3 { font-family:Srisakdi,serif; font-size:30px; font-weight:700; color:#1F1F1F; }
+.mem .body .dates { margin-top:-6px; }
+.mem .choice { border-color:#1F1F1F; }
+
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
 .a .choice:disabled, .b .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
+
+/* ธีมสว่าง (B83b T2): ผู้เล่นเลือกเอง ทับทุกแนวการ์ดรวมปรโลก · ทุกกฎขึ้นต้น .light จึงเจาะจงกว่ากฎของแนว และวางท้ายสุด */
+html.light { --page:#EDEDED; }
+.light .card { background:#FFFFFF; color:#16181D; border:1px solid #C8C8C8; outline:none; }
+.light .card .top { background:#F0F0F0; color:#16181D; border-bottom:1px solid #C8C8C8; }
+.light .card .top b { font-family:Sarabun,sans-serif; font-size:16px; font-weight:600; color:#16181D; }
+.light .card .top small, .light .card .stats, .light .card .meta, .light .card .sub, .light .card .note, .light .card .body .horo,
+.light .card .stat-help, .light .card .stat-help dd { color:#3A3F4B; }
+.light .card .stat-help dt, .light .card .recap .h { color:#16181D; }
+.light .card .stats { border-bottom:1px solid #E6E6E6; }
+.light .card .bar { background:#E6E6E6; } .light .card .bar i { background:#1F6B5E; } .light .card .bar b { background:#B23A2A; }
+.light .card .kicker { color:#B23A2A; }
+.light .card .body h3 { font-family:Sarabun,sans-serif; font-weight:600; font-size:24px; color:#16181D; }
+.light .card .body h3.lead { font-weight:400; font-size:19px; }
+.light .card .body p, .light .card .items, .light .card .picks, .light .card .tree summary, .light .card .family summary { color:#3A3F4B; }
+.light .card .stamp { border:2px solid #B23A2A; color:#B23A2A; }
+.light .card .recap, .light .card .lifechart { border:1px solid #C8C8C8; background:#FAFAFA; }
+.light .card .scene { background:#F0F0F0; border-bottom-color:#C8C8C8; }
+.light .card .scale > div { border-color:#C8C8C8; } .light .card .scale > div.heavy { border-color:#1F6B5E; }
+.light .card .scale b { font-family:Sarabun,sans-serif; color:#16181D; } .light .card .scale .sum { color:#16181D; }
+.light .card .deeds { border-top-color:#C8C8C8; } .light .card .deed { color:#3A3F4B; }
+.light .card .deed b { color:#1F6B5E; } .light .card .deed.bad b { color:#B23A2A; }
+.light .card .band0 { fill:#F0F0F0; fill-opacity:1; }
+.light .card .ln0 { stroke:var(--red); } .light .card .ln1 { stroke:var(--bronze2); } .light .card .ln2 { stroke:var(--blue); } .light .card .ln3 { stroke:var(--green); } .light .card .ln4 { stroke:#16181D; }
+.light .card .choice { border:1px solid #16181D; background:#FFFFFF; color:#16181D; }
+.light .card .choice:hover, .light .card .choice:focus-visible { background:#16181D; border-color:#16181D; color:#FFFFFF; outline:none; }
+.light .card .choice .fx { color:#1F6B5E; } .light .card .choice:hover .fx, .light .card .choice:focus-visible .fx { color:#CFE3E0; }
+.light .card .choice:disabled { opacity:0.45; background:transparent; color:inherit; border-style:dashed; }
 </style>
 </head>
 <body>
-<header class="logo"><b>ชาติหน้า</b><small>NEXT LIFE</small><span id="appVer" class="ver" title="เวอร์ชันเดโม"></span><span id="saved" class="saved" aria-live="polite"></span></header>
+<header class="logo"><b>ชาติหน้า</b><small>NEXT LIFE</small><span id="appVer" class="ver" title="เวอร์ชันเดโม"></span><span id="saved" class="saved" aria-live="polite"></span><div id="theme" class="theme" role="group" aria-label="ธีมการ์ด"></div></header>
 <main id="app"></main>
 <footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <a href="about.html">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
 <script>

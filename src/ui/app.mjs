@@ -6,6 +6,39 @@ const APP_BUILD = '2026-10-27';
 
 const root = document.getElementById('app');
 document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`;
+
+// ธีม (B83b): "ตามฉาก" = แต่ละแนวการ์ดใช้สีของตัวเอง · "สว่าง" ทับทุกฉาก รวมปรโลก (เจ้าของเลือก T3 ทาง A)
+// ค่าหน้าจอล้วน ไม่ใช่การกระทำในเกม จึงไม่ผ่าน play() และไม่อยู่ในเซฟ — จำแยก key ในเครื่อง
+const THEME_KEY = 'next-life-theme-v1';
+const THEMES = [['scene', 'ตามฉาก'], ['light', 'สว่าง']];
+function setTheme(id, keep) {
+  document.documentElement.classList.toggle('light', id === 'light');
+  for (const b of document.querySelectorAll('#theme button')) b.setAttribute('aria-pressed', String(b.dataset.theme === id));
+  if (!keep) return;
+  try {
+    localStorage.setItem(THEME_KEY, id);
+  } catch {
+    // เก็บไม่ได้ก็ยังเปลี่ยนในหน้านี้
+  }
+}
+(() => {
+  const box = document.getElementById('theme');
+  for (const [id, label] of THEMES) {
+    const b = el('button', null, label);
+    b.type = 'button';
+    b.dataset.theme = id;
+    b.onclick = () => setTheme(id, true);
+    box.append(b);
+  }
+  let saved = null;
+  try {
+    saved = localStorage.getItem(THEME_KEY);
+  } catch {
+    // ไม่มีที่เก็บ — ใช้ค่าเริ่ม
+  }
+  setTheme(THEMES.some(([id]) => id === saved) ? saved : 'scene', false);
+})();
+
 let st;
 // ระหว่างชาติของชีวิตที่เพิ่งจบ (null = ยังมีชีวิต)
 let af = null;
@@ -776,8 +809,21 @@ document.addEventListener('keydown', (e) => {
   b.click();
 });
 
-// แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06): ลางกับเหตุการณ์ความเชื่อเป็นทาง B ที่เหลือเป็นทาง A
-const styleOf = (card) => (card.kind === 'omen' || ((card.kind === 'event' || card.kind === 'result') && card.type === 'B') ? 'b' : 'a');
+// แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06 · หน้าตา v2 B83b): ลางกับเหตุการณ์ความเชื่อ = แสงเทียน (ฐานสีรักดำของทาง B)
+// · มรณบัตร = หนังสืองานศพ (ฐานทาง A — กราฟกับสรุปข้างในใช้สีชุดเดียวกับการ์ดชีวิต) · ที่เหลือทาง A
+const styleOf = (card) => {
+  if (card.kind === 'death') return 'a mem';
+  return card.kind === 'omen' || ((card.kind === 'event' || card.kind === 'result') && card.type === 'B') ? 'b cdl' : 'a';
+};
+
+// ภาพพิกเซลเล็กบนการ์ด — [x, y, กว้าง, สูง, สี] ต่อสี่เหลี่ยม · ภาพประกอบล้วน ซ่อนจากโปรแกรมอ่านจอ
+function pixels(cls, w, h, rects) {
+  const svg = svgEl('svg', { class: cls, viewBox: `0 0 ${w} ${h}`, 'aria-hidden': 'true' });
+  for (const [x, y, rw, rh, fill] of rects) svg.append(svgEl('rect', { x, y, width: rw, height: rh, fill }));
+  return svg;
+}
+const flame = () => pixels('flame', 10, 14, [[4, 0, 2, 2, '#FFE3A6'], [3, 2, 4, 3, '#F6C66A'], [4, 5, 2, 1, '#E07A2F'], [2, 6, 6, 8, '#EFE3C2']]);
+const portrait = () => pixels('por', 20, 24, [[0, 0, 20, 24, '#E8E8E8'], [7, 2, 6, 6, '#B8B8B8'], [7, 1, 6, 2, '#1F1F1F'], [5, 8, 10, 8, '#5A5A5A'], [6, 16, 3, 6, '#1F1F1F'], [11, 16, 3, 6, '#1F1F1F']]);
 
 const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
 
@@ -793,10 +839,10 @@ function render(card) {
   const next = () => play(T.next);
 
   if (card.kind === 'death') {
-    top.append(el('b', null, 'มรณบัตร'), el('small', null, `${genLabel()}${st.name} · สิริอายุ ${card.age} ปี`));
+    top.append(el('b', null, 'ด้วยรักและอาลัย'));
     box.append(top);
-    body.append(el('span', 'stamp', 'ถึงแก่กรรม'));
-    body.append(el('h3', null, `${st.name} ตายอายุ ${card.age}`));
+    // หนังสืองานศพบอกอายุ ไม่บอกปี พ.ศ. — ปีเกมไม่ขึ้นจอ (B14 ข้อ 12)
+    body.append(portrait(), el('h3', null, st.name), el('p', 'dates', `${genLabel()}สิริอายุ ${card.age} ปี`));
     body.append(el('p', null, `${st.sex} · ${provinceLabel(st)} · ฐานะ${st.cls} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
     const net = card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
     body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
@@ -838,6 +884,7 @@ function render(card) {
     const tree = familyTree();
     if (tree) box.append(tree);
     const kicker = card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind];
+    if (box.classList.contains('cdl')) body.append(flame());
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
     body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));
     if (card.news?.story) body.append(el('p', 'news', card.news.story));
