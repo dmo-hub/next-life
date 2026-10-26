@@ -53,6 +53,7 @@ export const PLACEHOLDERS = {
   ชื่อลูก: 'ก'.repeat(20),
   ชื่อคู่: 'ก'.repeat(20),
   ชื่อหลาน: 'ก'.repeat(20),
+  ชื่อผู้จากไป: 'ก'.repeat(20),
   ครับ: 'ครับ',
   ผม: 'ฉัน',
 };
@@ -79,4 +80,4 @@ export const FLAG_RE = /^[a-z][a-z0-9_]*(:[a-z0-9_]+)?$/;
 export const ID_RE = /^[a-z][a-z0-9_]*$/;
 export const YEAR_MIN = 2400;
 export const YEAR_MAX = 2700;
-export const FAMILY_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
+export const FAMILY_ROLES = ['parent', 'spouse', 'child', 'grandchild', 'pet', 'peer'];

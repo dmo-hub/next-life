@@ -14,3 +14,18 @@ events:
     when: {family: [{role: parent, age: [70, 120], alive: true}, {role: spouse, alive: true}, {role: child, count: [2, 5]}]}
     text: "ข้อความการ์ด"
     choices: []
+  # การ์ดสูญเสียอ้างพ่อแม่ (ไม่มีสัญญาณ) — การ์ดสูญเสียลูก/สัตว์ย้อนหลัง 2 ปียังผ่าน
+  - id: bad_case_02
+    type: A
+    stage: กลางคน
+    years: [2500, 2650]
+    when: {loss: {roles: [parent]}}
+    text: "ข้อความการ์ด"
+    choices: []
+  - id: ok_case_02
+    type: A
+    stage: กลางคน
+    years: [2500, 2650]
+    when: {loss: {roles: [child, pet], within: 2}}
+    text: "{ชื่อผู้จากไป}"
+    choices: []

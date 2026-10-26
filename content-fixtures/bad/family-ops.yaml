@@ -20,3 +20,24 @@ events:
       - {text: "ทางที่สอง", family: [{leave: spouse}], merit: [{cat: neutral}]}
       - {text: "ทางที่สาม", family: [{die: parent}], merit: [{cat: neutral}]}
       - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  # B36a2: สัตว์ไม่มีอายุขัย · bond ไม่มีค่า d · d ลอยไม่มี bond · ชนิดสัตว์ติดบทบาทคน — รับสัตว์ครบรูป/เพื่อนรุ่น/bond ขึ้นลงยังผ่าน
+  - id: bad_case_02
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", family: [{add: pet, kind: หมา}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", family: [{bond: child, d: 0}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", family: [{die: child, d: 5}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", family: [{add: child, kind: หมา}], merit: [{cat: neutral}]}
+  - id: ok_case_02
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", family: [{add: pet, kind: หมา, life: [10, 15], name: ดำ}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", family: [{add: peer}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", family: [{bond: all, d: 5}, {bond: spouse, d: -10}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", family: [{bond: parent, d: 3}], merit: [{cat: neutral}]}

@@ -2,7 +2,9 @@
 // ด่าน: จำนวนลูกต่อชีวิตอยู่ในกรอบ · สมาชิกตายตามตารางชีพ (ตายจริง/คาดจาก qx ใกล้ 1 · ตัวควบคุมใช้ qx อายุ +20 ต้องหลุด)
 // · คนที่จากไปไม่กลับมามีชีวิต และไม่ถูกการ์ดเรียกชื่อ · ชื่อในบ้านไม่ซ้ำ · ธง married/has_kids ตรงกับสมาชิกจริงทุกการ์ด
 // · ทางในตระกูลเกิดเป็นลูก/หลานจริงที่ยังอยู่ (ชื่อ/เพศ/ปีเกิดตรง)
-import { playLife, playAfterlife, nextLife, mixSeed, lifeQx, focusOf, memberAge } from '../src/engine/index.mjs';
+// B36a2: คนในบ้านจากไปเองมีการ์ดแจ้งครบ · คนเป้าของการ์ดสุ่ม · bond อยู่ใน floor–100 ทุกการ์ด (เนื้อหายังไม่มี op ลด bond) · การ์ดดูแลพา bond ขึ้นเกินค่าเริ่มได้จริง · ญาติช่วยเกิดได้จริง
+// · สัตว์เลี้ยงตายตรงอายุขัย · เพื่อนรุ่นเกิดปีเดียวกับเรา · สองบทบาทนี้ไม่ตั้งธง
+import { playLife, playAfterlife, nextLife, mixSeed, lifeQx, focusOf, memberAge, newLife, addMember, ageKin, BOND_START, BOND_FLOOR } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
 
@@ -24,6 +26,8 @@ const lastBirth = era.births.from + era.births.w.length - 1;
 let revive = 0, deadNamed = 0, flagBad = 0, nameDup = 0, households = 0, cards = 0;
 let died = 0, expected = 0, expectedShift = 0;
 let heirChecks = 0, heirBad = 0;
+let bondBad = 0, bondUp = 0, aided = 0;
+let lossCards = 0, lossEvents = 0, multiKid = 0, notLatest = 0;
 const kidsAt50 = [];
 const roles = { spouse: 0, child: 0, grandchild: 0 };
 const fmt = (v) => v.toFixed(2);
@@ -33,19 +37,32 @@ for (const [bot, pick] of Object.entries(BOTS)) {
     const was = new Map();
     const check = (card, st) => {
       cards++;
+      if (card.kind === 'result' && card.text.includes('มาช่วยประคอง')) aided++;
+      for (const m of [...st.parents, ...st.kin]) if (m.alive && !(m.bond >= BOND_FLOOR && m.bond <= 100)) bondBad++;
       for (const m of st.kin) {
         if (was.get(m.id) === false && m.alive) revive++;
         was.set(m.id, m.alive);
       }
-      for (const r of ['spouse', 'child', 'grandchild']) {
-        const f = focusOf(st, r);
-        if (f && !f.alive) deadNamed++;
+      if (card.loss) lossCards++;
+      // คนเป้าสุ่มตอนการ์ดเลือกขึ้น — การ์ดผลใบถัดมายังเรียกคนเดิมได้แม้ผลทำให้เขาจากไป จึงตรวจเฉพาะการ์ดเลือก
+      if (card.kind === 'event') {
+        for (const r of ['spouse', 'child', 'grandchild']) {
+          const f = focusOf(st, r);
+          if (f && !f.alive) deadNamed++;
+        }
+        const kids = st.kin.filter((m) => m.role === 'child' && m.alive && !m.left);
+        if (kids.length > 1) {
+          multiKid++;
+          if (focusOf(st, 'child').id !== kids.at(-1).id) notLatest++;
+        }
       }
       const has = (role) => st.kin.some((m) => m.role === role && m.alive && !m.left);
       if (st.kin.some((m) => m.role === 'spouse') && !!st.flags.married !== has('spouse')) flagBad++;
       if (st.kin.some((m) => m.role === 'child') && !!st.flags.has_kids !== has('child')) flagBad++;
     };
     const { state: st } = playLife(mixSeed(seed, i * 7 + 1), content, pick, check);
+    for (const m of [...st.parents, ...st.kin]) if (m.bond > BOND_START[m.role ?? 'parent']) bondUp++;
+    lossEvents += st.kinLoss.length;
     for (const m of st.kin) {
       roles[m.role]++;
       // ความเสี่ยงสะสมปีต่อปีของช่วงที่สมาชิกมีชีวิตระหว่างชีวิตผู้เล่น (ปีเกิดถึงปีตายหรือปีที่ผู้เล่นตาย)
@@ -93,5 +110,24 @@ check('การ์ดไม่เรียกชื่อคนที่จา�
 check(`ชื่อในบ้านไม่ซ้ำ (${households} บ้าน)`, nameDup);
 check('ธง married/has_kids ตรงสมาชิกจริงทุกการ์ด', flagBad);
 check('ทางในตระกูลเกิดเป็นลูก/หลานจริง', heirChecks ? heirBad : 1, ` ${heirChecks - heirBad}/${heirChecks}`);
+check(`bond อยู่ใน ${BOND_FLOOR}–100 ทุกการ์ด`, bondBad);
+check('การ์ดดูแลพา bond เกินค่าเริ่มได้', bondUp ? 0 : 1, ` ${bondUp} คน`);
+check('ญาติช่วยประคองเกิดได้', aided ? 0 : 1, ` ${aided} ครั้ง`);
+check('คนในบ้านจากไปเองทุกครั้งมีการ์ดแจ้ง', lossEvents && lossCards === lossEvents ? 0 : 1, ` ${lossCards}/${lossEvents}`);
+check('คนเป้าของการ์ดสุ่มได้ ไม่ใช่ลูกคนเล็กเสมอ', multiKid && notLatest ? 0 : 1, ` ${notLatest}/${multiKid} การ์ด`);
+
+// สัตว์เลี้ยง/เพื่อนรุ่น: ยังไม่มีเนื้อหาใช้ — ทดสอบกับชีวิตจริงที่เติมสมาชิกเอง
+{
+  const st = newLife(mixSeed(seed, 99), content);
+  const pet = addMember(st, 'pet', { kind: 'หมา', life: [3, 3] });
+  const peer = addMember(st, 'peer');
+  for (let a = 1; a <= 5; a++) {
+    st.age = a;
+    ageKin(st, st.birthYear + a);
+  }
+  check('สัตว์เลี้ยงตายตรงอายุขัย', !pet.alive && pet.diedAge === 3 && pet.name === null && pet.kind === 'หมา' ? 0 : 1);
+  check('เพื่อนรุ่นเกิดปีเดียวกับเรา มีชื่อ', peer.born === st.birthYear && !!peer.name ? 0 : 1);
+  check('สัตว์เลี้ยง/เพื่อนรุ่นไม่ตั้งธงครอบครัว', st.flags.married || st.flags.has_kids ? 1 : 0);
+}
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 if (fail) process.exitCode = 1;

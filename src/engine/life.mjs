@@ -1,5 +1,5 @@
 import { makeRng } from './rng.mjs';
-import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren } from './family.mjs';
+import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
@@ -363,6 +363,7 @@ export const FILL = {
   ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
   ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
   ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',
+  ชื่อผู้จากไป: (st) => lastLoss(st)?.name ?? 'คนในบ้าน',
   ครับ: (st) => (st.sex === 'หญิง' ? 'ค่ะ' : 'ครับ'),
   ผม: (st) => (st.sex === 'หญิง' ? 'ฉัน' : 'ผม'),
 };
@@ -390,10 +391,18 @@ export function moneyValue(st, m) {
   throw new Error(`หน่วยเงินไม่รู้จัก: ${m.unit}`);
 }
 
+// ผลสุ่มที่เป็นผลร้าย = ไม่ใช่ทางสำเร็จ และมีค่าหรือเงินติดลบ — ญาติช่วยได้เฉพาะแบบนี้
+function hurts(st, fx) {
+  return !!fx && (STAT_KEYS.some((k) => fx[k] < 0) || (fx.money !== undefined && moneyValue(st, fx.money) < 0));
+}
+const AID_WHO = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน' };
+
 // s = ตัวหรี่ผลของการ์ดกองสุ่มเมื่อจับหลายรอบต่อปี (pace.mjs) · ยอดกู้หรี่ด้วยเพราะการ์ดกู้คู่กับเงินจ่ายออก · ลงทุน/งาน/เรื้อรังเป็นโครงสร้าง ไม่หรี่
-function applyEffects(st, fx = {}, s = 1, ss = s) {
-  for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + levelValue(fx[k]) * ss);
-  if (fx.money) st.money += moneyValue(st, fx.money) * s;
+// hurt = ตัวคูณส่วนที่ติดลบของค่าและเงิน (ญาติช่วยประคองตอนเจอผลร้าย) · ส่วนที่เป็นบวกไม่แตะ
+function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
+  const cut = (v) => (v < 0 ? v * hurt : v);
+  for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + cut(levelValue(fx[k]) * ss));
+  if (fx.money) st.money += cut(moneyValue(st, fx.money) * s);
   if (fx.invest) invest(st, fx.invest);
   if (fx.debt) borrow(st, fx.debt, s);
   if (fx.settle) settle(st, fx.settle);
@@ -492,7 +501,8 @@ function stepYear(st) {
   st.relations = clamp(st.relations * (1 - RELATION_FADE));
   flowChronic(st);
   ageParents(st, year);
-  ageKin(st, year);
+  // คนในบ้านจากไปเองปีนี้ = การ์ดแจ้งทุกครั้ง ก่อนเหตุการณ์ของปี
+  for (const l of ageKin(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l });
   // ผลตอบแทนคิดกับเงินต้นปีก่อนเงินเก็บของปีนี้เข้า · ติดลบ = หนี้ ทบดอกเบี้ยเงินกู้ของปีนั้น
   const era = st.content.era;
   if (st.money > 0) {
@@ -631,6 +641,7 @@ export const ERA_NEWS = { merge: true };
 
 // news = ข่าวบ้านเมืองที่รวมมาเป็นบรรทัดนำ (B58) — การ์ดยังเป็นของเหตุการณ์ ตัวเลือก/เซฟเดินเหมือนเดิม
 function eventCard(st, ev, news = null) {
+  pickFocus(st);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
@@ -811,6 +822,7 @@ const flagsOk = (st, f) => (f.has ?? []).every((k) => st.flags[k]) && !(f.not ??
 export function whenOk(st, when) {
   if (!when) return true;
   if (when.family && !when.family.every((f) => familyOk(st, f))) return false;
+  if (when.loss && !lossOk(st, when.loss)) return false;
   if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
   if (when.class && !when.class.includes(st.cls)) return false;
   if (when.region && !when.region.includes(st.region)) return false;
@@ -831,7 +843,7 @@ function applyChoice(st, ev, c) {
     st.flagAge[f] ??= st.age;
   }
   for (const f of c.clears_flags ?? []) delete st.flags[f];
-  applyFamily(st, c);
+  applyFamily(st, c, ev.category === 'family' && c.effects?.relations > 0 ? c.effects.relations : 0);
   for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]) });
 }
 
@@ -870,9 +882,10 @@ export function choose(st, idx) {
   const after = beliefChoice(st, ev, c);
   if (c.outcomes?.length) {
     const o = weighted(st.rng, c.outcomes, c.outcomes.map((x) => x.weight * poolMultiplier(st, x.multipliers)));
-    applyEffects(st, o.effects, s, ss);
+    const helper = !o.ok && hurts(st, o.effects) ? kinAid(st) : null;
+    applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1);
     applyChoice(st, ev, o);
-    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) });
+    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
     if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow)) {
