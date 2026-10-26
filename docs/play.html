@@ -210,33 +210,40 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
 .a .choice:disabled, .b .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
 
-/* ธีมสว่าง (B83b T2): ผู้เล่นเลือกเอง ทับทุกแนวการ์ดรวมปรโลก · ทุกกฎขึ้นต้น .light จึงเจาะจงกว่ากฎของแนว และวางท้ายสุด */
+/* ธีมสว่าง (B83b T2 · B83c): ค่าเริ่มตอนมีชีวิต ทับทุกแนวการ์ดยกเว้นปรโลก (.af มืดทองเสมอ) · ทุกกฎขึ้นต้น .light จึงเจาะจงกว่ากฎของแนว และวางท้ายสุด */
 html.light { --page:#EDEDED; }
-.light .card { background:#FFFFFF; color:#16181D; border:1px solid #C8C8C8; outline:none; }
-.light .card .top { background:#F0F0F0; color:#16181D; border-bottom:1px solid #C8C8C8; }
-.light .card .top b { font-family:Sarabun,sans-serif; font-size:16px; font-weight:600; color:#16181D; }
-.light .card .top small, .light .card .stats, .light .card .meta, .light .card .sub, .light .card .note, .light .card .body .horo,
-.light .card .stat-help, .light .card .stat-help dd { color:#3A3F4B; }
-.light .card .stat-help dt, .light .card .recap .h { color:#16181D; }
-.light .card .stats { border-bottom:1px solid #E6E6E6; }
-.light .card .bar { background:#E6E6E6; } .light .card .bar i { background:#1F6B5E; } .light .card .bar b { background:#B23A2A; }
-.light .card .kicker { color:#B23A2A; }
-.light .card .body h3 { font-family:Sarabun,sans-serif; font-weight:600; font-size:24px; color:#16181D; }
-.light .card .body h3.lead { font-weight:400; font-size:19px; }
-.light .card .body p, .light .card .items, .light .card .picks, .light .card .tree summary, .light .card .family summary { color:#3A3F4B; }
-.light .card .stamp { border:2px solid #B23A2A; color:#B23A2A; }
-.light .card .recap, .light .card .lifechart { border:1px solid #C8C8C8; background:#FAFAFA; }
-.light .card .scene { background:#F0F0F0; border-bottom-color:#C8C8C8; }
-.light .card .scale > div { border-color:#C8C8C8; } .light .card .scale > div.heavy { border-color:#1F6B5E; }
-.light .card .scale b { font-family:Sarabun,sans-serif; color:#16181D; } .light .card .scale .sum { color:#16181D; }
-.light .card .deeds { border-top-color:#C8C8C8; } .light .card .deed { color:#3A3F4B; }
-.light .card .deed b { color:#1F6B5E; } .light .card .deed.bad b { color:#B23A2A; }
-.light .card .band0 { fill:#F0F0F0; fill-opacity:1; }
-.light .card .ln0 { stroke:var(--red); } .light .card .ln1 { stroke:var(--bronze2); } .light .card .ln2 { stroke:var(--blue); } .light .card .ln3 { stroke:var(--green); } .light .card .ln4 { stroke:#16181D; }
-.light .card .choice { border:1px solid #16181D; background:#FFFFFF; color:#16181D; }
-.light .card .choice:hover, .light .card .choice:focus-visible { background:#16181D; border-color:#16181D; color:#FFFFFF; outline:none; }
-.light .card .choice .fx { color:#1F6B5E; } .light .card .choice:hover .fx, .light .card .choice:focus-visible .fx { color:#CFE3E0; }
-.light .card .choice:disabled { opacity:0.45; background:transparent; color:inherit; border-style:dashed; }
+/* หัวจอตามธีมสว่างด้วย (B83c) — มืดทองเหลือแค่การ์ดปรโลก */
+.light .logo { background:#FFFFFF; border-bottom-color:#C8C8C8; }
+.light .logo b { color:#16181D; }
+.light .logo small, .light .logo .ver, .light .logo .saved { color:#3A3F4B; } .light .logo .ver { border-color:#C8C8C8; }
+.light .theme button { border-color:#8A8A8A; color:#3A3F4B; }
+.light .theme button[aria-pressed="true"] { background:#16181D; border-color:#16181D; color:#FFFFFF; }
+.light .theme button:focus-visible { outline-color:#16181D; }
+.light .card:not(.af) { background:#FFFFFF; color:#16181D; border:1px solid #C8C8C8; outline:none; }
+.light .card:not(.af) .top { background:#F0F0F0; color:#16181D; border-bottom:1px solid #C8C8C8; }
+.light .card:not(.af) .top b { font-family:Sarabun,sans-serif; font-size:16px; font-weight:600; color:#16181D; }
+.light .card:not(.af) .top small, .light .card:not(.af) .stats, .light .card:not(.af) .meta, .light .card:not(.af) .sub, .light .card:not(.af) .note, .light .card:not(.af) .body .horo,
+.light .card:not(.af) .stat-help, .light .card:not(.af) .stat-help dd { color:#3A3F4B; }
+.light .card:not(.af) .stat-help dt, .light .card:not(.af) .recap .h { color:#16181D; }
+.light .card:not(.af) .stats { border-bottom:1px solid #E6E6E6; }
+.light .card:not(.af) .bar { background:#E6E6E6; } .light .card:not(.af) .bar i { background:#1F6B5E; } .light .card:not(.af) .bar b { background:#B23A2A; }
+.light .card:not(.af) .kicker { color:#B23A2A; }
+.light .card:not(.af) .body h3 { font-family:Sarabun,sans-serif; font-weight:600; font-size:24px; color:#16181D; }
+.light .card:not(.af) .body h3.lead { font-weight:400; font-size:19px; }
+.light .card:not(.af) .body p, .light .card:not(.af) .items, .light .card:not(.af) .picks, .light .card:not(.af) .tree summary, .light .card:not(.af) .family summary { color:#3A3F4B; }
+.light .card:not(.af) .stamp { border:2px solid #B23A2A; color:#B23A2A; }
+.light .card:not(.af) .recap, .light .card:not(.af) .lifechart { border:1px solid #C8C8C8; background:#FAFAFA; }
+.light .card:not(.af) .scene { background:#F0F0F0; border-bottom-color:#C8C8C8; }
+.light .card:not(.af) .scale > div { border-color:#C8C8C8; } .light .card:not(.af) .scale > div.heavy { border-color:#1F6B5E; }
+.light .card:not(.af) .scale b { font-family:Sarabun,sans-serif; color:#16181D; } .light .card:not(.af) .scale .sum { color:#16181D; }
+.light .card:not(.af) .deeds { border-top-color:#C8C8C8; } .light .card:not(.af) .deed { color:#3A3F4B; }
+.light .card:not(.af) .deed b { color:#1F6B5E; } .light .card:not(.af) .deed.bad b { color:#B23A2A; }
+.light .card:not(.af) .band0 { fill:#F0F0F0; fill-opacity:1; }
+.light .card:not(.af) .ln0 { stroke:var(--red); } .light .card:not(.af) .ln1 { stroke:var(--bronze2); } .light .card:not(.af) .ln2 { stroke:var(--blue); } .light .card:not(.af) .ln3 { stroke:var(--green); } .light .card:not(.af) .ln4 { stroke:#16181D; }
+.light .card:not(.af) .choice { border:1px solid #16181D; background:#FFFFFF; color:#16181D; }
+.light .card:not(.af) .choice:hover, .light .card:not(.af) .choice:focus-visible { background:#16181D; border-color:#16181D; color:#FFFFFF; outline:none; }
+.light .card:not(.af) .choice .fx { color:#1F6B5E; } .light .card:not(.af) .choice:hover .fx, .light .card:not(.af) .choice:focus-visible .fx { color:#CFE3E0; }
+.light .card:not(.af) .choice:disabled { opacity:0.45; background:transparent; color:inherit; border-style:dashed; }
 </style>
 </head>
 <body>
@@ -3364,10 +3371,11 @@ const APP_BUILD = '2026-10-27';
 const root = document.getElementById('app');
 document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`;
 
-// ธีม (B83b): "ตามฉาก" = แต่ละแนวการ์ดใช้สีของตัวเอง · "สว่าง" ทับทุกฉาก รวมปรโลก (เจ้าของเลือก T3 ทาง A)
+// ธีม (B83b · B83c): "สว่าง" = ค่าเริ่ม ทับทุกแนวการ์ดตอนมีชีวิต · "ตามฉาก" = แต่ละแนวใช้สีของตัวเอง
+// · ปรโลกมืดทองเสมอ ปุ่มธีมไม่ทับ (เจ้าของเคาะ B83c แก้ T3 ทาง A เฉพาะปรโลก)
 // ค่าหน้าจอล้วน ไม่ใช่การกระทำในเกม จึงไม่ผ่าน play() และไม่อยู่ในเซฟ — จำแยก key ในเครื่อง
 const THEME_KEY = 'next-life-theme-v1';
-const THEMES = [['scene', 'ตามฉาก'], ['light', 'สว่าง']];
+const THEMES = [['light', 'สว่าง'], ['scene', 'ตามฉาก']];
 function setTheme(id, keep) {
   document.documentElement.classList.toggle('light', id === 'light');
   for (const b of document.querySelectorAll('#theme button')) b.setAttribute('aria-pressed', String(b.dataset.theme === id));
@@ -3393,7 +3401,7 @@ function setTheme(id, keep) {
   } catch {
     // ไม่มีที่เก็บ — ใช้ค่าเริ่ม
   }
-  setTheme(THEMES.some(([id]) => id === saved) ? saved : 'scene', false);
+  setTheme(THEMES.some(([id]) => id === saved) ? saved : 'light', false);
 })();
 
 let st;
@@ -4390,7 +4398,7 @@ const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้า�
 const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา' };
 function renderAfter(card) {
   root.replaceChildren();
-  const box = el('article', 'card b');
+  const box = el('article', 'card b af');
   const top = el('div', 'top');
   top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, `${genLabel()}${st.name} · ตายอายุ ${st.age}`));
   const body = el('div', 'body');

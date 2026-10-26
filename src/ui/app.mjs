@@ -7,10 +7,11 @@ const APP_BUILD = '2026-10-27';
 const root = document.getElementById('app');
 document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`;
 
-// ธีม (B83b): "ตามฉาก" = แต่ละแนวการ์ดใช้สีของตัวเอง · "สว่าง" ทับทุกฉาก รวมปรโลก (เจ้าของเลือก T3 ทาง A)
+// ธีม (B83b · B83c): "สว่าง" = ค่าเริ่ม ทับทุกแนวการ์ดตอนมีชีวิต · "ตามฉาก" = แต่ละแนวใช้สีของตัวเอง
+// · ปรโลกมืดทองเสมอ ปุ่มธีมไม่ทับ (เจ้าของเคาะ B83c แก้ T3 ทาง A เฉพาะปรโลก)
 // ค่าหน้าจอล้วน ไม่ใช่การกระทำในเกม จึงไม่ผ่าน play() และไม่อยู่ในเซฟ — จำแยก key ในเครื่อง
 const THEME_KEY = 'next-life-theme-v1';
-const THEMES = [['scene', 'ตามฉาก'], ['light', 'สว่าง']];
+const THEMES = [['light', 'สว่าง'], ['scene', 'ตามฉาก']];
 function setTheme(id, keep) {
   document.documentElement.classList.toggle('light', id === 'light');
   for (const b of document.querySelectorAll('#theme button')) b.setAttribute('aria-pressed', String(b.dataset.theme === id));
@@ -36,7 +37,7 @@ function setTheme(id, keep) {
   } catch {
     // ไม่มีที่เก็บ — ใช้ค่าเริ่ม
   }
-  setTheme(THEMES.some(([id]) => id === saved) ? saved : 'scene', false);
+  setTheme(THEMES.some(([id]) => id === saved) ? saved : 'light', false);
 })();
 
 let st;
@@ -1033,7 +1034,7 @@ const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้า�
 const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา' };
 function renderAfter(card) {
   root.replaceChildren();
-  const box = el('article', 'card b');
+  const box = el('article', 'card b af');
   const top = el('div', 'top');
   top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, `${genLabel()}${st.name} · ตายอายุ ${st.age}`));
   const body = el('div', 'body');
