@@ -5,7 +5,7 @@ events:
     category: study
     stage: วัยรุ่น
     years: [2500, 2650]
-    when: {age: [15, 18]}
+    when: {age: [17, 18], school: [upper]}
     weight: 3
     multipliers: {flags: {good_student: 2}}
     title: "สนามสอบเข้า"
@@ -38,6 +38,7 @@ events:
     stage: วัยรุ่น
     years: [2500, 2650]
     weight: 2
+    when: {school: [lower, upper, voc]}
     title: "ศึกร้านเกม"
     text: "ร้านเกมหน้าโรงเรียนเปิดศึกแข่งทีม เงินรางวัลเท่าค่าเทอมทั้งปี ทีมเพื่อนขาดอีกคนเดียว และทุกคนหันมามองคุณ"
     choices:
@@ -67,6 +68,7 @@ events:
     stage: วัยรุ่น
     years: [2500, 2650]
     weight: 2
+    when: {school: [lower, upper, voc]}
     title: "บุหรี่มวนแรก"
     text: "หลังเลิกเรียน รุ่นพี่ยื่นบุหรี่มวนหนึ่งมาให้ ทั้งวงเงียบกริบ จ้องรอดูว่าจะกล้าสูบไหม"
     choices:
@@ -99,7 +101,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2500, 2650]
-    when: {age: [14, 18]}
+    when: {age: [14, 18], school: [lower, upper, voc]}
     weight: 2
     title: "จดหมายใต้โต๊ะ"
     text: "มีจดหมายสอดไว้ใต้โต๊ะ ลงท้ายว่า 'ชอบมานานแล้ว' ลายมือคุ้นตาเหมือนของเพื่อนสนิทที่สุดของคุณ"
@@ -164,6 +166,7 @@ events:
     years: [2500, 2650]
     weight: 2
     multipliers: {flags: {likes_clips: 3}}
+    when: {school: [lower, upper, voc]}
     title: "คลิปเต้นดังข้ามคืน"
     text: "คลิปเต้นที่ถ่ายเล่นในห้องเรียนยอดวิวทะลุแสน แบรนด์ทักมาขอจ้างรีวิว ส่วนครูประจำชั้นก็เพิ่งเห็นคลิปเหมือนกัน"
     choices:
@@ -264,6 +267,7 @@ events:
     category: work_money
     stage: วัยรุ่น
     years: [2500, 2650]
+    when: {school: [lower, upper, voc]}
     title: "สัญญาจากแมวมอง"
     text: "แมวมองยื่นสัญญาเข้าบ้านทีม กินนอนซ้อมวันละสิบสองชั่วโมง มีเงินเดือนให้ แต่ต้องพักการเรียนทันที ที่บ้านยังไม่รู้เรื่องนี้เลย"
     choices:

@@ -27,9 +27,9 @@ events:
           - {weight: 1, text: "วันที่สี่ไข้ลดแต่ช็อก ผู้ใหญ่หามส่งห้องฉุกเฉินกลางดึก รอดหวุดหวิด", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: shop_pill
-        text: "บอกว่าหายแล้ว จะไปโรงเรียน"
+        text: "บอกว่าหายแล้ว จะออกไปวิ่งเล่น"
         outcomes:
-          - {weight: 1, ok: true, text: "ครูเห็นหน้าซีด โทรตามแม่มารับทันก่อนอาการทรุด", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ป้าข้างบ้านเห็นหน้าซีด ตะโกนเรียกแม่มาอุ้มไปหาหมอทันก่อนอาการทรุด", effects: {health: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ไข้ขึ้นกลางห้อง เลือดกำเดาไหลไม่หยุด ต้องนอนโรงพยาบาลเป็นอาทิตย์", effects: {health: -2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: kill_larvae
@@ -108,7 +108,7 @@ events:
         text: "ปีนเก่งขนาดนี้ ขอเรียนยิมนาสติก"
         requires: {stats: {health: {min: 60}}, reason: "ร่างกายยังไม่แข็งแรงพอ"}
         outcomes:
-          - {weight: 1, ok: true, text: "ครูพละตาลุก ได้ติดทีมโรงเรียน ถ้วยรางวัลเต็มตู้", next: child_gym_team_01, effects: {health: 1, happiness: 2}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
+          - {weight: 1, ok: true, text: "โค้ชยิมในเมืองตาลุก ได้ติดทีมเด็ก ถ้วยรางวัลเต็มตู้", next: child_gym_team_01, effects: {health: 1, happiness: 2}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
           - {weight: 1, text: "ซ้อมวันแรกล้มทับแขนข้างเดิม หักซ้ำจุดเดิม", effects: {health: -2, happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -118,7 +118,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [4, 8]}
+    when: {age: [6, 8], school: [primary]}
     title: "หัดระบาดทั้งโรงเรียน"
     text: "อายุ {อายุ} ขวบ เพื่อนร่วมห้องขึ้นผื่นแดงไปครึ่งห้อง ครูนัดเด็กทุกคนไปฉีดวัคซีนที่อนามัย ข้างบ้านลือว่าฉีดแล้วไข้ขึ้น ส่วนคุณกลัวเข็มที่สุดในโลก"
     choices:
@@ -166,12 +166,12 @@ events:
         text: "ไม่ยอมอ้าปากให้ใครดูฟัน"
         outcomes:
           - {weight: 1, ok: true, text: "ฟันน้ำนมหลุดเอง ฟันแท้ขึ้นมาขาวสวยราวปาฏิหาริย์", effects: {happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ฟันแท้ผุตามติด ๆ ปวดจนเรียนไม่รู้เรื่องไปทั้งเทอม", effects: {health: -2, knowledge: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ฟันซี่ใหม่ผุตามติด ๆ ปวดจนกินข้าวไม่ลงไปหลายเดือน", effects: {health: -2, knowledge: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: sell_candy
-        text: "เอาลูกอมไปขายเพื่อนที่โรงเรียน"
+        text: "เอาลูกอมไปขายเพื่อน ๆ"
         outcomes:
-          - {weight: 2, ok: true, text: "ขายดีจนเสียดายกำไร ไม่กล้ากินเองอีกเลย แต่ข่าวลือเริ่มไปถึงหูครู", next: child_candy_shop_01, effects: {knowledge: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}], multipliers: {stats: {knowledge: 2}}}
+          - {weight: 2, ok: true, text: "ขายดีจนเสียดายกำไร ไม่กล้ากินเองอีกเลย แต่ข่าวเริ่มไปถึงหูผู้ใหญ่", next: child_candy_shop_01, effects: {knowledge: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}], multipliers: {stats: {knowledge: 2}}}
           - {weight: 1, text: "ขายไม่ออก เลยกินเองหมดถุง ฟันผุเพิ่มอีกสองซี่", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: brush_nightly
@@ -239,8 +239,8 @@ events:
       - id: swim_team
         text: "สมัครชมรมว่ายน้ำฝึกปอดเอง"
         outcomes:
-          - {weight: 1, ok: true, text: "ปีเดียวปอดแข็งแรงกว่าเด็กทั้งห้อง ครูดึงเข้าทีมโรงเรียน", effects: {health: 1, chronic: {health: 1}}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {flags: {sporty: 2}}}
-          - {weight: 1, text: "หอบกลางสระจนครูต้องกระโดดลงไปช่วย ต้องเลิกว่ายไปเลย", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ปีเดียวปอดแข็งแรงกว่าเด็กรุ่นเดียวกัน โค้ชดึงเข้าทีมว่ายน้ำ", effects: {health: 1, chronic: {health: 1}}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {flags: {sporty: 2}}}
+          - {weight: 1, text: "หอบกลางสระจนโค้ชต้องกระโดดลงไปช่วย ต้องเลิกว่ายไปเลย", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: herbal_again
         text: "อ้อนยายต้มยาหม้อสูตรเดิม"
@@ -259,6 +259,7 @@ events:
     category: health
     stage: เด็ก
     years: [2500, 2650]
+    when: {school: [primary, lower]}
     title: "โค้ชจังหวัดมาจับตัว"
     text: "แข่งจบไม่ทันข้ามวัน โค้ชทีมจังหวัดมาเคาะประตูบ้าน ขอตัวคุณไปเข้าค่ายเก็บตัว ซ้อมทุกเย็นจนค่ำ เสาร์อาทิตย์ไม่ได้กลับบ้าน พ่อแม่บอกให้คุณเลือกเอง"
     choices:
@@ -288,6 +289,7 @@ events:
     category: work_money
     stage: เด็ก
     years: [2500, 2650]
+    when: {school: [primary, lower]}
     title: "ครูเรียกพบเรื่องลูกอม"
     text: "แผงลูกอมใต้โต๊ะขายดีจนเพื่อนต่อคิวถึงหน้าห้อง ครูฝ่ายปกครองยืนกอดอกรออยู่ที่ประตู ถามคำเดียวว่าจะเลิกหรือจะดื้อต่อ"
     choices:

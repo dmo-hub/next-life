@@ -10,7 +10,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: oil_crisis_2
-    when: {age: [0, 18]}
+    when: {age: [6, 18], school: [primary, lower, upper, voc]}
     title: "บ้านต้องรัดเข็มขัด"
     text: "น้ำมันขึ้นอีกรอบ ไฟฟ้าดับบ่อย โรงงานที่พ่อทำงานลดกะเหลือวันเว้นวัน ค่าเทอมงวดหน้ายังไม่รู้จะเอามาจากไหน คุณได้ยินพ่อแม่คุยกันตอนดึก"
     choices:
@@ -26,6 +26,35 @@ events:
         effects: {happiness: -1, relations: 1, money: {unit: income_x, amount: 0.1}}
         merit: [{cat: neutral}]
       - text: "ปลูกผักหลังบ้านไว้กินเอง"
+        effects: {health: 1, knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: era_econ_oil2_small_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: oil_crisis_2
+    when: {age: [0, 5]}
+    title: "จุดเทียนกินข้าว"
+    text: "น้ำมันขึ้นอีกรอบ ไฟฟ้าดับบ่อย โรงงานที่พ่อทำงานลดกะเหลือวันเว้นวัน แม่จุดเทียนกินข้าวแทบทุกคืน คุณได้ยินพ่อแม่คุยกันเรื่องเงินตอนดึก"
+    choices:
+      - id: no_snack_money
+        text: "เลิกขอขนม เก็บไว้ให้แม่"
+        effects: {happiness: -1, relations: 1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: ride_fruit_cart
+        text: "นั่งรถเข็นตามพ่อไปขายผลไม้"
+        outcomes:
+          - {weight: 2, ok: true, text: "พ่อลาออกมาขายผลไม้ มะม่วงน้ำปลาหวานขายดีเกินคาด พ่อกลับบ้านพร้อมรอยยิ้มทุกเย็น", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 1, text: "โดนเทศกิจไล่ที่สามรอบ รถเข็นพังหนึ่งคัน", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: cry_cartoon
+        text: "ร้องจะดูการ์ตูนตอนไฟดับ"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: water_veggies
+        text: "ช่วยแม่รดผักหลังบ้าน"
         effects: {health: 1, knowledge: 1, happiness: -1}
         merit: [{cat: neutral}]
 
@@ -123,7 +152,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: global_financial_crisis
-    when: {age: [0, 18]}
+    when: {age: [6, 18], school: [primary, lower, upper, voc]}
     title: "ข่าวร้ายจากอีกซีกโลก"
     text: "ธนาคารใหญ่ฝั่งอเมริกาล้ม ออเดอร์โรงงานแถวบ้านหายไปครึ่ง แม่โดนพักงานไม่มีกำหนด ลูกเห็นแม่นั่งดูประกาศรับสมัครงานทุกคืน"
     choices:
@@ -141,6 +170,35 @@ events:
       - text: "ตามแม่ไปช่วยงานวัดทุกเสาร์"
         effects: {relations: 1, happiness: 1, knowledge: 1}
         merit: [{cat: help_others, level: 1}]
+
+  - id: era_econ_gfc_small_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: global_financial_crisis
+    when: {age: [0, 5]}
+    title: "แม่อยู่บ้านทุกวัน"
+    text: "ธนาคารใหญ่ฝั่งอเมริกาล้ม ออเดอร์โรงงานแถวบ้านหายไปครึ่ง แม่โดนพักงานไม่มีกำหนด คุณดีใจที่แม่อยู่บ้านทุกวัน ส่วนแม่นั่งดูประกาศรับสมัครงานทุกคืน"
+    choices:
+      - id: bake_with_mom
+        text: "ชวนแม่ทำขนมเล่นในครัว"
+        outcomes:
+          - {weight: 2, ok: true, text: "บราวนี่ถาดแรกถูกจองหมดจากกลุ่มแม่บ้าน ครัวกลายเป็นร้านเล็ก ๆ", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 1, text: "เตาอบระเบิด ขนมไหม้ แต่คุณได้กินขนมไหม้ฟรีเป็นเดือน", effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: want_toys
+        text: "งอแงขอของเล่นเหมือนเดิม"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: temple_saturday
+        text: "ตามแม่ไปช่วยงานวัดทุกเสาร์"
+        effects: {relations: 1, happiness: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hug_mom
+        text: "นอนกอดแม่ตอนแม่เครียด"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
 
   - id: era_econ_gfc_adult_01
     type: A

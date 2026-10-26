@@ -7,7 +7,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: typhoon_gay
-    when: {age: [0, 12]}
+    when: {age: [6, 12], school: [primary, lower]}
     title: "ไต้ฝุ่นกลางดึก"
     text: "พายุเข้าฝั่งตอนตีสอง ลมหอบหลังคาสังกะสีปลิวไปทั้งแผ่น เช้ามาเรือของพ่อที่จอดหน้าบ้านหายไปกับคลื่น พ่อแม่นั่งเงียบอยู่นาน คุณยืนมองหลังคาที่หายไปแล้วรู้ว่าต้องทำอะไรสักอย่าง"
     choices:
@@ -29,6 +29,35 @@ events:
         text: "ขอไปเรียนประจำในเมือง"
         effects: {knowledge: 2, relations: -2}
         merit: [{cat: neutral}]
+
+  - id: era_dis_typhoon_small_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: typhoon_gay
+    when: {age: [0, 5]}
+    title: "ลมพัดหลังคาหาย"
+    text: "พายุเข้าฝั่งตอนตีสอง ลมหอบหลังคาสังกะสีปลิวไปทั้งแผ่น แม่อุ้มคุณไว้แน่นทั้งคืน เช้ามาเรือของพ่อที่จอดหน้าบ้านหายไปกับคลื่น พ่อนั่งเงียบอยู่นาน"
+    choices:
+      - id: cry_for_doll
+        text: "ร้องหาตุ๊กตาที่ลอยไปกับน้ำ"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: follow_to_town
+        text: "ตามแม่ไปอยู่บ้านญาติในเมือง"
+        effects: {health: 1, happiness: -1, relations: -1, income_mult: 1.2}
+        merit: [{cat: neutral}]
+      - id: watch_boat
+        text: "นั่งดูพ่อต่อเรือลำใหม่"
+        outcomes:
+          - {weight: 3, ok: true, text: "พ่อกู้เงินต่อเรือจนเสร็จ หลังพายุปลาชุกผิดปกติ ใช้หนี้หมดในปีเดียว", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรือรั่วกลางทะเล พ่อกลับมาได้แต่เจ็บหนัก แม่ต้องรับจ้างเพิ่มอีกงาน", effects: {happiness: -2, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: share_blanket
+        text: "แบ่งผ้าห่มให้เด็กบ้านหลังคาพัง"
+        effects: {health: -1, relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
 
   - id: era_dis_typhoon_adult_01
     type: A
@@ -70,7 +99,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: sars
-    when: {age: [0, 12]}
+    when: {age: [6, 12], school: [primary, lower]}
     title: "ไอสามวันช่วงโรคระบาด"
     text: "ข่าวโรคปอดอักเสบปริศนาจากต่างประเทศเต็มจอ ทั้งห้องเรียนใส่หน้ากาก คุณไอติดกันสามวัน ตัวรุม ๆ พ่อแม่ใจคอไม่ดี"
     choices:
@@ -96,6 +125,37 @@ events:
         outcomes:
           - {weight: 3, ok: true, multipliers: {stats: {health: 1.5}}, text: "เรียนทันเพื่อน ไม่มีอะไรเกิดขึ้น", effects: {knowledge: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ไข้ขึ้นกลางห้อง ถูกจับแยก เพื่อนตั้งฉายาไปทั้งปี", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: era_dis_sars_small_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    era: sars
+    when: {age: [0, 5]}
+    title: "หน้ากากเต็มบ้าน"
+    text: "ข่าวโรคปอดอักเสบปริศนาจากต่างประเทศเต็มจอ แม่ซื้อหน้ากากมาตุนไว้กล่องใหญ่ คืนนี้คุณไอไม่หยุด ตัวรุม ๆ พ่อแม่ผลัดกันนั่งเฝ้าไม่ยอมนอน"
+    choices:
+      - id: refuse_doctor
+        text: "ร้องไห้ไม่ยอมไปหาหมอ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {health: 2}}, text: "หลับไปจนเช้า ไข้ลดเอง แม่ถอนหายใจยาว", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เช้ามาไข้ขึ้นสูง แม่อุ้มไปโรงพยาบาลเอกชน หมอว่าเป็นหวัด แต่ค่าหมอแพงกว่าที่คิด", effects: {money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: herbal_boil
+        text: "ยอมกินยาต้มขม ๆ สูตรยาย"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 2}}, text: "หายเองในสองวัน ยายคุยเรื่องนี้ไปอีกสิบปี", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไอยืดเป็นเดือน ไปหาหมอช้าจนปอดอักเสบ", effects: {health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hug_mom
+        text: "กอดแม่ไว้ทั้งคืน"
+        effects: {relations: 2}
+        merit: [{cat: neutral}]
+      - id: play_doctor
+        text: "ใส่หน้ากากเล่นเป็นหมอ"
+        effects: {health: 1, happiness: 1}
         merit: [{cat: neutral}]
 
   - id: era_dis_sars_adult_01
@@ -211,7 +271,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: great_flood
-    when: {age: [0, 12]}
+    when: {age: [6, 12], school: [primary, lower]}
     title: "น้ำขึ้นวันละคืบ"
     text: "น้ำเหนือไหลเข้าเมือง ระดับน้ำขึ้นวันละคืบ ชั้นล่างของบ้านจมไปแล้ว โรงเรียนประกาศปิดไม่มีกำหนด พ่อแม่ขนของขึ้นชั้นสอง ส่วนคุณตื่นเต้นมากกว่ากลัว"
     choices:
@@ -235,6 +295,35 @@ events:
           - {weight: 2, ok: true, text: "เรือขายดีเป็นเทน้ำเทท่า คุณทาสีจนมือเลอะทั้งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "น้ำลดเร็วกว่าที่คิด เรือค้างเต็มหน้าบ้าน กลายเป็นกระถางต้นไม้", effects: {money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
+
+  - id: era_dis_flood_small_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: great_flood
+    when: {age: [0, 5]}
+    title: "บ้านกลายเป็นเกาะ"
+    text: "น้ำเหนือไหลเข้าเมือง ชั้นล่างของบ้านจมไปแล้ว พ่อแม่ขนของขึ้นชั้นสองกันทั้งคืน ส่วนคุณนั่งมองปลาว่ายผ่านประตูบ้าน ตื่นเต้นมากกว่ากลัว"
+    choices:
+      - id: basin_ride
+        text: "ขอนั่งกะละมังลอยในบ้าน"
+        outcomes:
+          - {weight: 2, ok: true, text: "พ่อจับกะละมังไว้ไม่ปล่อย ทั้งบ้านได้หัวเราะในวันที่ทุกคนเครียด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กะละมังคว่ำ สำลักน้ำ พ่อแม่ไม่ให้ลงชั้นล่างอีกเลย", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: carry_toys
+        text: "ช่วยแม่ถือของเล่นขึ้นชั้นบน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: to_grandma
+        text: "ไปอยู่บ้านยายที่น้ำไม่ท่วม"
+        effects: {health: 1, happiness: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: feed_dog
+        text: "แบ่งข้าวให้หมาข้างบ้านที่ติดน้ำ"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
 
   - id: era_dis_flood_adult_01
     type: A
@@ -272,7 +361,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: covid19
-    when: {age: [0, 12]}
+    when: {age: [6, 12], school: [primary, lower]}
     title: "เรียนผ่านจอ"
     text: "โรคระบาดทั่วโลก โรงเรียนปิด ครูสอนผ่านจอ แต่บ้านมีมือถือเครื่องเดียว แม่ต้องใช้ขายของ พ่อต้องใช้รับงาน คุณต้องใช้เรียน"
     choices:
@@ -298,6 +387,37 @@ events:
           - {weight: 2, text: "หลุดเรียนบ่อยจนเกรดร่วง ตามเพื่อนไม่ทันไปอีกหลายปี", effects: {knowledge: -2}, merit: [{cat: neutral}]}
           - {weight: 1, ok: true, multipliers: {stats: {relations: 2}}, text: "ครูเห็นความพยายาม ขี่มอเตอร์ไซค์เอาชีทมาส่งถึงบ้านทุกอาทิตย์", effects: {knowledge: 1, relations: 2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
+
+  - id: era_dis_covid_small_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    era: covid19
+    when: {age: [0, 5]}
+    title: "หน้ากากใบจิ๋ว"
+    text: "โรคระบาดทั่วโลก ผู้ใหญ่ทุกคนใส่หน้ากาก ตลาดหน้าบ้านปิด พ่อไม่ได้ออกไปทำงานมาสองเดือน ทั้งบ้านอยู่แต่ในห้อง คุณรู้แค่ว่าออกไปเล่นข้างนอกไม่ได้แล้ว"
+    choices:
+      - id: tiny_mask
+        text: "ยอมใส่หน้ากากใบจิ๋วตามแม่"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: cry_outside
+        text: "ร้องจะออกไปเล่นหน้าบ้าน"
+        outcomes:
+          - {weight: 2, ok: true, text: "แม่พาเดินเล่นในซอยตอนเช้าที่ไม่มีคน ทั้งบ้านได้หายใจ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปเล่นกับเด็กข้างบ้านจนติดไข้ ทั้งบ้านต้องกักตัวสองอาทิตย์", effects: {health: -2, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: live_cameo
+        text: "แทรกหน้าตอนแม่ไลฟ์ขายของ"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "คนดูขำจนยอดขายวันนั้นดีกว่าทุกวัน แม่ให้คุณนั่งข้างกล้องทุกคืน", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปัดมือถือหล่นกลางไลฟ์ คนดูหายไปครึ่ง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: snack_for_dad
+        text: "แบ่งขนมให้พ่อที่นั่งเครียด"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: care_parents, level: 1}]
 
   - id: era_dis_covid_adult_01
     type: A

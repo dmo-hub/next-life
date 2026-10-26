@@ -7,7 +7,7 @@ events:
     years: [2539, 2650]
     systems: [student_loan]
     lore_ref: lore-finance-series.html#6
-    when: {age: [19, 22]}
+    when: {age: [19, 22], school: [uni, hvoc]}
     weight: 2
     multipliers: {flags: {good_student: 1.3}}
     title: "ใบสมัคร กยศ."

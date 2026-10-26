@@ -32,7 +32,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 3
-    when: {age: [7, 12]}
+    when: {age: [7, 12], school: [primary, lower]}
     title: "คอร์สกวดวิชาสุดสัปดาห์"
     text: "เพื่อนร่วมห้องทุกคนเรียนพิเศษ เสาร์อาทิตย์หายไปหมด ครูประจำชั้นบอกพ่อแม่ว่าคุณหัวไว แต่ขี้เกียจ"
     choices:
@@ -60,7 +60,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [6, 12]}
+    when: {age: [6, 12], school: [primary, lower]}
     title: "แมวมองข้างสนาม"
     text: "โค้ชประจำอำเภอเห็นคุณวิ่งไล่หมาทั้งสนามโรงเรียน เลยมาชวนเข้าทีมกีฬา ซ้อมทุกเย็นหกโมงถึงสองทุ่ม"
     choices:
@@ -86,7 +86,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [6, 12]}
+    when: {age: [6, 12], school: [primary, lower]}
     multipliers: {flags: {broken_home: 2}}
     title: "กล่องข้าวหายอีกแล้ว"
     text: "กล่องข้าวของคุณหายเป็นวันที่สาม แขนมีรอยช้ำจากเด็กห้องข้าง ๆ ที่ดักรอหลังโรงอาหาร พอแม่ถาม คุณยังไม่ได้ตอบอะไร"
@@ -124,9 +124,9 @@ events:
     weight: 2
     when: {age: [3, 12]}
     title: "ขนของขึ้นรถกระบะ"
-    text: "พ่อได้งานใหม่ต่างจังหวัด ค่าแรงดีกว่าเดิมเกือบเท่าตัว พ่อแม่ถามคุณว่าอยากไปไหม ถ้าไปต้องทิ้งเพื่อน โรงเรียน และยายที่เลี้ยงมาตั้งแต่เกิด"
+    text: "พ่อได้งานใหม่ต่างจังหวัด ค่าแรงดีกว่าเดิมเกือบเท่าตัว พ่อแม่ถามคุณว่าอยากไปไหม ถ้าไปต้องทิ้งเพื่อนแถวบ้าน และยายที่เลี้ยงมาตั้งแต่เกิด"
     choices:
-      - text: "ย้ายตามพ่อไปเข้าโรงเรียนใหม่"
+      - text: "ย้ายตามพ่อไปเริ่มใหม่ที่นั่น"
         effects: {income_mult: 1.2, relations: -2, happiness: -1}
         merit: [{cat: neutral}]
       - text: "อยู่กับแม่ รอพ่อกลับเดือนละครั้ง"
@@ -154,10 +154,10 @@ events:
       - text: "บอกพ่อแม่ว่าแยกกันก็ได้"
         effects: {happiness: 1, relations: -1, income_mult: 0.85}
         merit: [{cat: neutral}]
-      - text: "เล่าให้ครูฟัง ครูเชิญพ่อแม่มาคุย"
+      - text: "ขอป้าข้างบ้านมาช่วยคุยกับพ่อแม่"
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {relations: 2}}, text: "พ่อแม่หัดคุยกันดี ๆ บ้านกลับมาหัวเราะได้", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "คุยได้สองครั้งก็ทะเลาะกันต่อหน้าครู", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุยได้สองครั้งก็ทะเลาะกันต่อหน้าป้า", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ทำเป็นไม่ได้ยิน เก็บไว้คนเดียว"
         effects: {happiness: -2, health: -1, relations: -1}
@@ -174,8 +174,8 @@ events:
     years: [2500, 2650]
     weight: 1
     when: {age: [5, 10]}
-    title: "ปิดเทอมที่บ้านยาย"
-    text: "ปิดเทอมนี้พ่อแม่ทำงานไม่มีวันหยุด ยายที่{ภาค}โทรมาบอกว่าคิดถึงหลาน มีเป็ดเกิดใหม่สิบตัวรออยู่"
+    title: "หน้าร้อนที่บ้านยาย"
+    text: "หน้าร้อนนี้พ่อแม่ทำงานไม่มีวันหยุด ยายที่{ภาค}โทรมาบอกว่าคิดถึงหลาน มีเป็ดเกิดใหม่สิบตัวรออยู่"
     choices:
       - text: "ขอไปอยู่บ้านยายทั้งเดือน"
         effects: {health: 1, relations: 2, knowledge: -1}
@@ -215,8 +215,8 @@ events:
         merit: [{cat: neutral}]
       - text: "เปิดช่องคลิปของตัวเองจริงจัง"
         outcomes:
-          - {weight: 1, ok: true, text: "ถ่ายคลิปลงทุกสัปดาห์ คนดูประจำเริ่มรอ เพื่อนที่โรงเรียนมาขอเป็นตัวประกอบ", effects: {happiness: 2, knowledge: 1, health: -1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
-          - {weight: 2, text: "คลิปที่สองไม่มีใครดู เสียใจจนไม่ยอมแตะกล้องไปทั้งเทอม", effects: {happiness: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ถ่ายคลิปลงทุกสัปดาห์ คนดูประจำเริ่มรอ เด็กในซอยมาขอเป็นตัวประกอบ", effects: {happiness: 2, knowledge: 1, health: -1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+          - {weight: 2, text: "คลิปที่สองไม่มีใครดู เสียใจจนไม่ยอมแตะกล้องไปหลายเดือน", effects: {happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   # เรื่องต่อจาก kid_sport_01 (เหรียญทองจังหวัด) — ออกทาง next เท่านั้น
@@ -225,6 +225,7 @@ events:
     category: family
     stage: เด็ก
     years: [2500, 2650]
+    when: {school: [primary, lower]}
     title: "จดหมายจากโรงเรียนกีฬา"
     text: "สองวันหลังได้เหรียญ โรงเรียนกีฬาประจำจังหวัดส่งจดหมายมาชวนเข้าเรียนประจำ กินนอนที่หอ ค่าเทอมครึ่งหนึ่ง แต่ได้กลับบ้านเดือนละครั้ง"
     choices:
