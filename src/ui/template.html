@@ -71,6 +71,12 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .legend li { display:flex; align-items:center; gap:4px; white-space:nowrap; }
 .legend .key { width:24px; height:8px; }
 .legend .key line { stroke-width:2; }
+.spark .mk { cursor:pointer; outline:none; }
+.spark .mk circle { stroke-width:1.5; }
+.spark .mk:focus-visible circle, .spark .mk:hover circle { stroke-width:3; }
+.mk-cap { margin:0; font-size:12px; min-height:1.5em; overflow-wrap:anywhere; }
+.a .spark .mk.ev circle { fill:var(--paper); stroke:var(--ink2); } .a .spark .mk.death circle { fill:var(--red); stroke:var(--ink); }
+.a .mk-cap { color:var(--muted); }
 .choices { padding:8px 20px 20px; display:flex; flex-direction:column; gap:10px; margin-top:auto; }
 .choice { all:unset; box-sizing:border-box; min-height:52px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; cursor:pointer; font-size:15px; }
 .choice .fx { font-size:12px; text-align:right; flex-shrink:0; max-width:50%; }

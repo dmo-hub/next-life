@@ -126,6 +126,10 @@ function sparkline(series, fromAge, toAge, bands = false) {
 // กราฟทั้งชีวิตบนบันทึกการตาย (B38a): ค่าสถานะ 5 เส้นสเกลเดียวกัน + เงินแยกใต้ แกนอายุเดียวกัน
 // เส้นแยกด้วยสีและลายเส้น (ไม่พึ่งสีอย่างเดียว) · ค่าสถานะไม่มีตัวเลขบนจอ (บอกแค่ทิศ) แกนตั้งจึงเป็นคำ
 const LINE_DASH = ['', '7 3', '2 3', '9 3 2 3', '4 2'];
+// เรื่องเด่นทั้งชีวิต = เรื่องเด่นของแต่ละช่วงวัยชุดเดียวกับการ์ดเปลี่ยนช่วง (ผู้เล่นเคยเห็นแล้ว ไม่มีของใหม่ให้รั่ว)
+function lifeMarks(deathAge) {
+  return STAGES.flatMap((s, i) => (s.from > deathAge ? [] : stageSummary(st, s.name, s.from, Math.min((STAGES[i + 1]?.from ?? Infinity) - 1, deathAge)).highlights));
+}
 function lifeChart(life, deathAge) {
   if (life.stats.length < 2) return null;
   const box = el('div', 'lifechart');
@@ -151,7 +155,21 @@ function lifeChart(life, deathAge) {
     li.append(key, STAT_LABELS[k]);
     legend.append(li);
   });
-  box.append(svg, legend);
+  // จุดเรื่องเด่น + จุดตาย (B38): ชี้/แตะ/โฟกัสแล้วบรรทัดใต้กราฟบอกเรื่อง — มือถือไม่มี hover <title> อย่างเดียวไม่พอ
+  const cap = el('p', 'mk-cap', 'แตะจุดบนกราฟเพื่อดูเรื่องในปีนั้น');
+  cap.setAttribute('aria-live', 'polite');
+  const mark = (a, text, cls) => {
+    const g = svgEl('g', { class: `mk ${cls}`, tabindex: 0, role: 'button', 'aria-label': text });
+    g.append(svgEl('title', {}, text), svgEl('circle', { cx: x(a), cy: H - B - 5, r: 4 }));
+    const show = () => (cap.textContent = text);
+    g.addEventListener('click', show);
+    g.addEventListener('focus', show);
+    g.addEventListener('mouseenter', show);
+    svg.append(g);
+  };
+  for (const m of lifeMarks(deathAge)) mark(m.age, `อายุ ${m.age} · ${m.text}`, 'ev');
+  mark(deathAge, `ตายอายุ ${deathAge}`, 'death');
+  box.append(svg, legend, cap);
   const money = sparkline(life.money, 0, deathAge, true);
   if (money) box.append(el('div', 'h', 'เงินติดตัว'), money);
   return box;
@@ -366,20 +384,71 @@ function shareFacts(card) {
     job: `${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`,
     pattern: { name: pattern.name, hint: pattern.hint ?? '' },
     title: titles[0] ? { name: titles[0].name, tier: titles[0].tier } : null,
+    // กราฟบนภาพใช้แค่ค่าสถานะรายปี (ค่าที่จอเห็นอยู่แล้ว) ไล่ช่องเอง ไม่ส่งก้อน card.life ทั้งก้อน
+    stats: (card.life?.stats ?? []).map((p) => Object.fromEntries([['age', p.age], ...STAT_KEYS.map((k) => [k, p[k]])])),
+    marks: lifeMarks(card.age).map((m) => m.age),
   };
+}
+
+// สรุปเป็นข้อความ (B38) — การ์ดตายยังไม่รู้ภพ (รู้ = เผยทิศบัญชีก่อนปรโลก) · การ์ดปรโลกส่ง realm มาเพิ่มบรรทัด
+function summaryText(age, realm = null) {
+  const t = titlesOf(st);
+  return [
+    `ชาติหน้า · ${st.name}`,
+    `เกิดปี ${st.birthYear} · ${provinceLabel(st)}`,
+    `ตายอายุ ${age}`,
+    `ชีวิตแบบ${(t.pattern ?? NO_PATTERN).name}`,
+    t.titles[0] ? `ฉายา ${t.titles[0].name} (${t.titles[0].tier})` : 'ยังไม่ได้ฉายา',
+    realm && `ไปภูมิ${realm}`,
+    `https://${SHARE_URL}`,
+  ].filter(Boolean).join('\n');
+}
+
+// clipboard API ใช้ไม่ได้บนไฟล์ในเครื่อง/เบราว์เซอร์เก่า — ถอยไปเลือกข้อความใน textarea แล้วสั่งคัดลอก
+async function copyText(s) {
+  try {
+    await navigator.clipboard.writeText(s);
+    return true;
+  } catch {
+    const ta = el('textarea');
+    ta.value = s;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.append(ta);
+    ta.select();
+    let ok = false;
+    try {
+      ok = document.execCommand('copy');
+    } catch {
+      ok = false;
+    }
+    ta.remove();
+    return ok;
+  }
+}
+function copyButton(text) {
+  const b = button('คัดลอกสรุป', null, async () => {
+    b.firstChild.textContent = (await copyText(text())) ? 'คัดลอกแล้ว' : 'คัดลอกไม่ได้';
+  });
+  return b;
 }
 
 // URL คงที่ ไม่ใช้ location.href — เปิดจากไฟล์ในเครื่องแล้ว path ในเครื่องจะติดไปกับภาพ
 const SHARE_URL = 'dmo-hub.github.io/next-life';
-const SHARE_W = 1080, SHARE_H = 1350;
+// 9:16 (สตอรี่) — 4:5 เดิมไม่มีที่ให้กราฟ
+const SHARE_W = 1080, SHARE_H = 1920;
+// สีเส้นชุดเดียวกับ .b .ln0–4 ใน template — canvas อ่าน class ไม่ได้
+const SHARE_LINES = ['#E07A5F', '#D9B45A', '#8FB3E0', '#7FC4B8', '#EFE3C2'];
 const SHARE_FONTS = ['700 110px Srisakdi', '400 40px Sarabun', '600 30px Sarabun'];
 const FONT_WAIT_MS = 3000;
 
-// ไทยไม่เว้นวรรคระหว่างคำ ตัดบรรทัดตามขอบเขตคำจาก Intl.Segmenter · เบราว์เซอร์ที่ไม่มีตัดรายตัวอักษร
+// ไทยไม่เว้นวรรคระหว่างคำ ตัดบรรทัดตามขอบเขตคำจาก Intl.Segmenter · เบราว์เซอร์ที่ไม่มีตัดรายพยัญชนะ
+// โดยพาสระตาม (ะ า อำ) สระบน/ล่าง/วรรณยุกต์ และสระหน้า (เ แ โ ใ ไ) ติดพยัญชนะ — ตัดรายตัวอักษรตรง ๆ ได้สระลอยต้นบรรทัด
+const THAI_CLUSTER = /[\u0E40-\u0E44]?.[\u0E30-\u0E3A\u0E45\u0E47-\u0E4E]*/gsu;
 function wrapThai(ctx, text, maxW) {
   const parts = typeof Intl.Segmenter === 'function'
     ? [...new Intl.Segmenter('th', { granularity: 'word' }).segment(text)].map((s) => s.segment)
-    : [...text];
+    : text.match(THAI_CLUSTER) ?? [];
   const lines = [];
   let line = '';
   for (const p of parts) {
@@ -429,11 +498,19 @@ async function shareBlob(facts) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
   let y = 0;
-  const text = (s, font, color, lineH, gap = 0) => {
-    ctx.font = font;
+  // ข้อความยาวกว่ากรอบ (ชื่อ/ฉายายาว · คำเดียวยาวเกินบรรทัด) ย่อฟอนต์ลงทีละขั้นจนได้ไม่เกิน maxLines และไม่มีบรรทัดล้น
+  // ถึงขั้นต่ำแล้วยังไม่พอก็วาดที่ขั้นต่ำ — ดีกว่าตัดข้อความทิ้ง
+  const text = (s, font, color, lineH, gap = 0, maxLines = 2) => {
+    const px = Number(font.match(/(\d+)px/)[1]);
+    let k = 1, lines;
+    for (;; k -= 0.05) {
+      ctx.font = font.replace(/\d+px/, `${Math.round(px * k)}px`);
+      lines = wrapThai(ctx, s, maxW);
+      if (k <= 0.6 || (lines.length <= maxLines && lines.every((l) => ctx.measureText(l).width <= maxW))) break;
+    }
     ctx.fillStyle = color;
-    for (const line of wrapThai(ctx, s, maxW)) {
-      y += lineH;
+    for (const line of lines) {
+      y += lineH * k;
       ctx.fillText(line, cx, y);
     }
     y += gap;
@@ -449,29 +526,109 @@ async function shareBlob(facts) {
     y += gap;
   };
 
-  y = 110;
-  text('ชาติหน้า', '700 110px Srisakdi, serif', c('gold'), 120);
-  text('NEXT LIFE', '600 28px Sarabun, sans-serif', c('sand'), 44);
+  y = 130;
+  text('ชาติหน้า', '700 110px Srisakdi, serif', c('gold'), 120, 0, 1);
+  text('NEXT LIFE', '600 28px Sarabun, sans-serif', c('sand'), 44, 0, 1);
   rule(44);
-  text(facts.name, '700 72px Srisakdi, serif', c('cream'), 84, 4);
-  text(`ตายอายุ ${facts.age}`, '700 96px Srisakdi, serif', c('gold2'), 110, 16);
+  text(facts.name, '700 72px Srisakdi, serif', c('cream'), 84, 4, 1);
+  text(`ตายอายุ ${facts.age}`, '700 96px Srisakdi, serif', c('gold2'), 110, 16, 1);
   text(facts.who, '400 40px Sarabun, sans-serif', c('cream'), 58);
   text(facts.job, '400 36px Sarabun, sans-serif', c('sand'), 52);
   rule(44);
-  text('ชีวิตแบบ', '600 30px Sarabun, sans-serif', c('gold'), 44);
-  text(facts.pattern.name, '700 76px Srisakdi, serif', c('gold2'), 92);
-  if (facts.pattern.hint) text(facts.pattern.hint, '400 32px Sarabun, sans-serif', c('sand'), 48);
+  text('ชีวิตแบบ', '600 30px Sarabun, sans-serif', c('gold'), 44, 0, 1);
+  text(facts.pattern.name, '700 76px Srisakdi, serif', c('gold2'), 92, 0, 1);
+  if (facts.pattern.hint) text(facts.pattern.hint, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 3);
   if (facts.title) {
     y += 36;
-    text('ฉายาหายากที่สุด', '600 30px Sarabun, sans-serif', c('gold'), 44);
-    text(facts.title.name, '700 68px Srisakdi, serif', c('gold2'), 84);
-    text(facts.title.tier, '400 32px Sarabun, sans-serif', c('sand'), 48);
+    text('ฉายาหายากที่สุด', '600 30px Sarabun, sans-serif', c('gold'), 44, 0, 1);
+    text(facts.title.name, '700 68px Srisakdi, serif', c('gold2'), 84, 0, 1);
+    text(facts.title.tier, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 1);
   }
+  // กราฟอยู่ล่างสุด ยึดจากขอบล่าง — ข้อความข้างบนยาวแค่ไหนก็ไม่ทับกัน (ข้อความถูกจำกัดบรรทัดไว้แล้ว)
+  if (facts.stats.length >= 2) shareChart(ctx, c, facts, 120, SHARE_H - 440, SHARE_W - 240, 240);
   ctx.font = '400 30px Sarabun, sans-serif';
   ctx.fillStyle = c('sand');
-  ctx.fillText(SHARE_URL, cx, SHARE_H - 96);
+  ctx.fillText(SHARE_URL, cx, SHARE_H - 72);
 
   return new Promise((ok, fail) => cv.toBlob((b) => (b ? ok(b) : fail(new Error('canvas toBlob ว่าง'))), 'image/png'));
+}
+
+// กราฟทั้งชีวิตบนภาพ (B38) — แบบเดียวกับ lifeChart บนจอ: แถบช่วงวัย · 5 เส้นสี+ลายเส้น · จุดเรื่องเด่น · จุดตาย · ไม่มีตัวเลขค่าสถานะ
+function shareChart(ctx, c, facts, x0, y0, w, h) {
+  const end = Math.max(facts.age, 1);
+  const x = (a) => x0 + (a / end) * w;
+  const y = (v) => y0 + ((100 - v) / 100) * h;
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.font = '600 28px Sarabun, sans-serif';
+  ctx.fillStyle = c('gold');
+  ctx.fillText(`ทั้งชีวิต · อายุ 0–${facts.age}`, x0 + w / 2, y0 - 56);
+  ctx.font = '400 22px Sarabun, sans-serif';
+  STAGES.forEach((s, i) => {
+    const a = s.from, b = Math.min(STAGES[i + 1]?.from ?? Infinity, facts.age);
+    if (b <= a) return;
+    if (i % 2 === 0) {
+      ctx.fillStyle = 'rgba(90, 70, 48, 0.35)';
+      ctx.fillRect(x(a), y0, x(b) - x(a), h);
+    }
+    if (x(b) - x(a) >= 90) {
+      ctx.fillStyle = c('sand');
+      ctx.fillText(s.name, (x(a) + x(b)) / 2, y0 - 12);
+    }
+  });
+  ctx.strokeStyle = c('bronze2');
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 6]);
+  for (const v of [0, 50, 100]) {
+    ctx.beginPath();
+    ctx.moveTo(x0, y(v));
+    ctx.lineTo(x0 + w, y(v));
+    ctx.stroke();
+  }
+  ctx.lineWidth = 4;
+  ctx.lineJoin = 'round';
+  STAT_KEYS.forEach((k, i) => {
+    ctx.strokeStyle = SHARE_LINES[i];
+    ctx.setLineDash(LINE_DASH[i] ? LINE_DASH[i].split(' ').map((n) => Number(n) * 2.5) : []);
+    ctx.beginPath();
+    facts.stats.forEach((p, j) => (j ? ctx.lineTo(x(p.age), y(p[k])) : ctx.moveTo(x(p.age), y(p[k]))));
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  ctx.fillStyle = c('gold2');
+  for (const a of facts.marks) {
+    ctx.beginPath();
+    ctx.arc(x(a), y0 + h - 12, 8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = '#E07A5F';
+  ctx.beginPath();
+  ctx.arc(x(facts.age), y0 + h - 12, 11, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = c('sand');
+  for (const [a, al] of [[0, 'left'], [facts.age, 'right']]) {
+    ctx.textAlign = al;
+    ctx.fillText(`อายุ ${a}`, x(a), y0 + h + 34);
+  }
+  // คำอธิบายเส้นแถวเดียว จัดกลาง — ความกว้างวัดจริง ฟอนต์สำรองกว้างต่างกัน
+  ctx.font = '400 24px Sarabun, sans-serif';
+  const items = STAT_KEYS.map((k, i) => ({ i, label: STAT_LABELS[k], w: 44 + ctx.measureText(STAT_LABELS[k]).width + 28 }));
+  let lx = x0 + w / 2 - items.reduce((s, it) => s + it.w, 0) / 2;
+  const ly = y0 + h + 76;
+  ctx.textAlign = 'left';
+  ctx.lineWidth = 4;
+  for (const it of items) {
+    ctx.strokeStyle = SHARE_LINES[it.i];
+    ctx.setLineDash(LINE_DASH[it.i] ? LINE_DASH[it.i].split(' ').map((n) => Number(n) * 1.5) : []);
+    ctx.beginPath();
+    ctx.moveTo(lx, ly - 8);
+    ctx.lineTo(lx + 36, ly - 8);
+    ctx.stroke();
+    ctx.fillStyle = c('cream');
+    ctx.fillText(it.label, lx + 44, ly);
+    lx += it.w;
+  }
+  ctx.restore();
 }
 
 function downloadBlob(blob, name) {
@@ -482,6 +639,15 @@ function downloadBlob(blob, name) {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+}
+
+function openOrDownload(blob, name) {
+  const url = URL.createObjectURL(blob);
+  if (window.open(url, '_blank')) setTimeout(() => URL.revokeObjectURL(url), 60000);
+  else {
+    URL.revokeObjectURL(url);
+    downloadBlob(blob, name);
+  }
 }
 
 // ตรวจด้วยไฟล์เปล่า: เดสก์ท็อปหลายตัวมี navigator.share แต่ส่งไฟล์ไม่ได้
@@ -522,8 +688,8 @@ function shareButtons(card) {
     try {
       await navigator.share({ files: [file], title: 'ชาติหน้า · Next Life', text: `ชาติหน้า · ${st.name} ตายอายุ ${card.age} — ${SHARE_URL}` });
     } catch (e) {
-      // ผู้เล่นปิดหน้าแชร์เอง = จบ · แชร์พังด้วยเหตุอื่นให้ได้ไฟล์แทน
-      if (e?.name !== 'AbortError') downloadBlob(blob, name);
+      // ผู้เล่นปิดหน้าแชร์เอง = จบ · แชร์พังด้วยเหตุอื่น เปิดภาพในแท็บใหม่ให้กดค้างบันทึก (มือถือที่โหลดไฟล์ไม่ได้) · แท็บโดนบล็อกจึงโหลดไฟล์
+      if (e?.name !== 'AbortError') openOrDownload(blob, name);
     }
   });
   return [share, save];
@@ -610,7 +776,7 @@ function render(card) {
     // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
     const chart = card.life && lifeChart(card.life, card.age);
     if (chart) body.append(chart);
-    choices.append(enter(button('ไปช่วงระหว่างชาติ', null, () => play(T.afterlife))), ...shareButtons(card));
+    choices.append(enter(button('ไปช่วงระหว่างชาติ', null, () => play(T.afterlife))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
   } else {
     const head = el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : `อายุ ${card.age} · ช่วง${card.stage}`);
     // การ์ดผลเป็นผลของใบก่อนอยู่แล้ว ป้ายซ้ำไม่บอกอะไรเพิ่ม · งานศพเกิดหลังตายจึงไม่ใช่ "ปีเดียวกัน" ของชีวิต
@@ -761,6 +927,7 @@ function renderAfter(card) {
       choices.append(b);
     });
   } else choices.append(enter(button('ต่อไป', null, next)));
+  if (card.kind === 'verdict') choices.append(copyButton(() => summaryText(st.age, card.realm)));
   box.append(top);
   if (court) box.append(courtScene());
   box.append(body, choices);
