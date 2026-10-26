@@ -454,7 +454,10 @@ function ageParents(st, year) {
     if (!p.alive) continue;
     p.age += 1;
     const roll = st.famRng.next();
-    if (p.diesAt !== undefined ? p.age >= p.diesAt : roll < lifeQx(st.content.era, st.seed, p.sex, year, p.age)) p.alive = false;
+    if (p.diesAt !== undefined ? p.age >= p.diesAt : roll < lifeQx(st.content.era, st.seed, p.sex, year, p.age)) {
+      p.alive = false;
+      p.diedAge = p.age;
+    }
   }
 }
 
@@ -463,7 +466,11 @@ function receiveLegacy(st, year, stage) {
   const { units, debt, from } = st.legacy;
   st.legacy = null;
   // มรดกมาพร้อมการจากไป — มรดกตอนแรกเกิด (ตายปีที่ลูกเกิด) ต้องปิดชีวิตพ่อ/แม่ตรงนี้ ageParents ยังไม่เคยเดิน
-  for (const p of st.parents) if (p.ancestor) p.alive = false;
+  for (const p of st.parents) {
+    if (!p.ancestor) continue;
+    p.alive = false;
+    p.diedAge ??= p.diesAt ?? p.age;
+  }
   const baht = units * nationalIncome(st.content.era, st.seed, year) * 12;
   st.money += baht;
   const ancestor = st.parents.find((p) => p.ancestor);

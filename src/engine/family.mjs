@@ -247,7 +247,9 @@ export function familyOf(st) {
     const b = m.bond ?? BOND_START[m.role ?? 'parent'];
     return { bond: b, bondLevel: bondLabel(b) };
   };
-  const parents = st.parents.map((p) => ({ role: 'parent', name: p.name ?? null, sex: p.sex, age: p.alive ? p.age : (p.diedAge ?? null), alive: p.alive, diedAge: p.alive ? null : (p.diedAge ?? null), ...bondOf(p) }));
+  // พ่อแม่ที่ตายก่อนเราเกิด (คู่ของรุ่นก่อนในทางตระกูล) ไม่เคยผ่าน ageParents — อายุตอนตายอยู่ที่ diesAt
+  const diedOf = (p) => (p.alive ? null : (p.diedAge ?? p.diesAt ?? null));
+  const parents = st.parents.map((p) => ({ role: 'parent', name: p.name ?? null, sex: p.sex, age: p.alive ? p.age : diedOf(p), alive: p.alive, diedAge: diedOf(p), ...bondOf(p) }));
   const kin = (st.kin ?? []).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...bondOf(m), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }) }));
   return [...parents, ...kin];
 }
