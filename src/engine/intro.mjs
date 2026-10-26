@@ -1,6 +1,7 @@
 // การ์ดเปิดชีวิต (B16) + บรรทัดเล่าของการ์ดบ้านเมือง — อ่าน state ล้วน ไม่ดึงเลขสุ่มของโลก ลำดับสุ่มของชีวิตจึงเหมือนก่อนมีการ์ดนี้
 // ไม่มีค่าบัญชีบุญบาป: กรรมที่ติดมาเล่าเป็นปริมาณคำเดียวกับการ์ดส่งต่อ ฐานะ/ญาติบอกแค่ทิศ ↑/↓
 import { infantMortality, protoYear } from './era.mjs';
+import { makeRng } from './rng.mjs';
 import { CLASSES, STAT_LABELS, provinceLabel, areaLabel, stageOf } from './life.mjs';
 import { LEGACY, lineageText, carryAmount, kinTier } from './afterlife.mjs';
 
@@ -97,6 +98,20 @@ export function introCard(st, heir) {
     lineage: lineageBrief(st.lineage),
     choices: [],
   };
+}
+
+// ดวงไทยบรรทัดเดียวบนการ์ดเกิด (B55) — สีสันล้วน ไม่มีผลต่อเกม · หน้าจอเรียกตอนวาด ไม่ใส่ในการ์ด
+// การ์ดจึงเหมือนก่อนมีดวงทุกช่อง · วันเกิดสุ่มจาก stream แยกของ seed ชีวิตนั้น ไม่กินเลขสุ่มของโลก
+// ปีนักษัตรนับตามปีปฏิทิน ไม่ตัดที่สงกรานต์/ตรุษจีน — เกมไม่มีเดือนเกิดให้ตัดอยู่แล้ว
+const WEEKDAYS = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+const ZODIAC = ['ชวด', 'ฉลู', 'ขาล', 'เถาะ', 'มะโรง', 'มะเส็ง', 'มะเมีย', 'มะแม', 'วอก', 'ระกา', 'จอ', 'กุน'];
+export function horoscope(st) {
+  const ce = st.birthYear - 543;
+  const jan1 = Date.UTC(ce, 0, 1);
+  const days = (Date.UTC(ce + 1, 0, 1) - jan1) / 86400000;
+  const day = makeRng(st.seed ^ 0x9b05688c).int(0, days - 1);
+  const weekday = new Date(jan1 + day * 86400000).getUTCDay();
+  return `เกิดวัน${WEEKDAYS[weekday]} ปี${ZODIAC[(((ce - 4) % 12) + 12) % 12]}`;
 }
 
 const placeLabel = (name) => (name.startsWith('กรุงเทพ') ? name : `ภาค${name}`);

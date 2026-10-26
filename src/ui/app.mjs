@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.2.35';
@@ -618,6 +618,7 @@ function render(card) {
     if (card.kind === 'intro') {
       body.append(el('span', 'stamp', 'แรกเกิด'));
       body.append(el('h3', 'lead', card.text));
+      body.append(el('p', 'horo', horoscope(st)));
       // บรรทัดแรกเป็นเรื่องของบ้าน · ที่เหลือเป็นบรรยากาศยุค ตัวรอง
       card.story.forEach((p, i) => body.append(el('p', i ? 'sub' : null, p)));
       if (card.inherit.length) {
@@ -627,6 +628,7 @@ function render(card) {
         body.append(box);
       }
       choices.append(enter(button('ต่อไป', null, next)));
+      if (canReroll()) choices.append(button('ขอเกิดใหม่', 'ได้ครั้งเดียว', reroll));
     } else if (card.kind === 'stage') {
       body.append(el('span', 'stamp', card.text));
       body.append(recap(card.recap));
@@ -757,7 +759,7 @@ function fingerprint(card) {
 // storage พังได้ (โหมดส่วนตัว · เต็ม · ปิด) — เกมยังเล่นได้ แค่ไม่จำ
 function saveWrite(card) {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({ seed: save.seed, log: save.log, fp: fingerprint(card) }));
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ seed: save.seed, log: save.log, fp: fingerprint(card), ...(save.rr && { rr: 1 }) }));
   } catch {
     // เขียนไม่ลงแต่เซฟเก่ายังอยู่ = รีเฟรชแล้วย้อนไปจุดเก่าโดยไม่รู้ตัว — ลบทิ้งดีกว่า
     saveClear();
@@ -796,9 +798,22 @@ function begin(seed) {
   return track(nextCard(st));
 }
 
+// seed จากเวลาเฉพาะฝั่งหน้าเว็บ แกนเกมเองไม่แตะนาฬิกา
+const freshSeed = () => (Date.now() ^ (performance.now() * 1000)) >>> 0;
+
 function start() {
-  // seed จากเวลาเฉพาะฝั่งหน้าเว็บ แกนเกมเองไม่แตะนาฬิกา
-  const card = begin((Date.now() ^ (performance.now() * 1000)) >>> 0);
+  const card = begin(freshSeed());
+  saveWrite(card);
+  render(card);
+}
+
+// ขอเกิดใหม่ (B55): เฉพาะชีวิตแรกของตระกูล ก่อนกดอะไร และได้ครั้งเดียว — รุ่นถัดไปเกิดตามกรรม ต้องรับ
+// เปลี่ยนแค่ seed ของเซฟ ไม่เป็น token ใน log · rr จำไว้ในเซฟ รีโหลดแล้วปุ่มจึงไม่กลับมา
+const canReroll = () => st.gen === 1 && !af && save.log === '' && !save.rr;
+function reroll() {
+  if (!canReroll()) return;
+  const card = begin(freshSeed());
+  save.rr = 1;
   saveWrite(card);
   render(card);
 }
@@ -807,6 +822,7 @@ function start() {
 function resume(s) {
   try {
     let card = begin(s.seed);
+    if (s.rr) save.rr = 1;
     for (const tok of s.log) card = apply(tok);
     save.log = s.log;
     return fingerprint(card) === s.fp ? card : null;

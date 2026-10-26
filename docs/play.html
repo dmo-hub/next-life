@@ -52,6 +52,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .items, .picks { margin:0; padding-left:20px; font-size:14px; }
 .body .sub { font-size:14px; }
 .body .note { font-size:12px; }
+.body .horo { font-family:Pridi,serif; font-size:14px; margin-top:-4px; }
 .spark { display:block; width:100%; height:auto; }
 .spark polyline { fill:none; stroke-width:2; stroke-linejoin:round; }
 .spark .grid { stroke-width:1; stroke-dasharray:2 3; }
@@ -104,7 +105,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .a .body h3 { font-family:Pridi,serif; font-weight:600; }
 .a .body h3.lead { font-family:Sarabun,sans-serif; }
 .a .body p, .a .items, .a .picks { color:var(--ink2); }
-.a .sub, .a .note { color:var(--muted); }
+.a .sub, .a .note, .a .body .horo { color:var(--muted); }
 .a .spark .nom { stroke:var(--green); } .a .spark .dot { fill:var(--green); }
 .a .spark .grid { stroke:var(--rule2); } .a .spark .zero { stroke:var(--ink2); }
 .a .spark .neg { fill:var(--red); fill-opacity:0.08; }
@@ -2746,6 +2747,7 @@ function playAfterlife(st, pickChoice, onCard) {
 
 
 
+
 // สัดส่วนจำนวนเกิดปีนั้นเทียบปีที่เกิดมากที่สุดในข้อมูล — แบ่งบรรยากาศรุ่นเป็น 3 ขั้น (ค่าตั้งของเกม)
 const COHORT = [
   [0.9, 'เกิดในยุคที่เด็กเกิดปีละมากที่สุดยุคหนึ่ง ห้องเรียนแน่น เพื่อนร่วมรุ่นเต็มไปหมด'],
@@ -2839,6 +2841,20 @@ function introCard(st, heir) {
     lineage: lineageBrief(st.lineage),
     choices: [],
   };
+}
+
+// ดวงไทยบรรทัดเดียวบนการ์ดเกิด (B55) — สีสันล้วน ไม่มีผลต่อเกม · หน้าจอเรียกตอนวาด ไม่ใส่ในการ์ด
+// การ์ดจึงเหมือนก่อนมีดวงทุกช่อง · วันเกิดสุ่มจาก stream แยกของ seed ชีวิตนั้น ไม่กินเลขสุ่มของโลก
+// ปีนักษัตรนับตามปีปฏิทิน ไม่ตัดที่สงกรานต์/ตรุษจีน — เกมไม่มีเดือนเกิดให้ตัดอยู่แล้ว
+const WEEKDAYS = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+const ZODIAC = ['ชวด', 'ฉลู', 'ขาล', 'เถาะ', 'มะโรง', 'มะเส็ง', 'มะเมีย', 'มะแม', 'วอก', 'ระกา', 'จอ', 'กุน'];
+function horoscope(st) {
+  const ce = st.birthYear - 543;
+  const jan1 = Date.UTC(ce, 0, 1);
+  const days = (Date.UTC(ce + 1, 0, 1) - jan1) / 86400000;
+  const day = makeRng(st.seed ^ 0x9b05688c).int(0, days - 1);
+  const weekday = new Date(jan1 + day * 86400000).getUTCDay();
+  return `เกิดวัน${WEEKDAYS[weekday]} ปี${ZODIAC[(((ce - 4) % 12) + 12) % 12]}`;
 }
 
 const placeLabel = (name) => (name.startsWith('กรุงเทพ') ? name : `ภาค${name}`);
@@ -3809,6 +3825,7 @@ function render(card) {
     if (card.kind === 'intro') {
       body.append(el('span', 'stamp', 'แรกเกิด'));
       body.append(el('h3', 'lead', card.text));
+      body.append(el('p', 'horo', horoscope(st)));
       // บรรทัดแรกเป็นเรื่องของบ้าน · ที่เหลือเป็นบรรยากาศยุค ตัวรอง
       card.story.forEach((p, i) => body.append(el('p', i ? 'sub' : null, p)));
       if (card.inherit.length) {
@@ -3818,6 +3835,7 @@ function render(card) {
         body.append(box);
       }
       choices.append(enter(button('ต่อไป', null, next)));
+      if (canReroll()) choices.append(button('ขอเกิดใหม่', 'ได้ครั้งเดียว', reroll));
     } else if (card.kind === 'stage') {
       body.append(el('span', 'stamp', card.text));
       body.append(recap(card.recap));
@@ -3948,7 +3966,7 @@ function fingerprint(card) {
 // storage พังได้ (โหมดส่วนตัว · เต็ม · ปิด) — เกมยังเล่นได้ แค่ไม่จำ
 function saveWrite(card) {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({ seed: save.seed, log: save.log, fp: fingerprint(card) }));
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ seed: save.seed, log: save.log, fp: fingerprint(card), ...(save.rr && { rr: 1 }) }));
   } catch {
     // เขียนไม่ลงแต่เซฟเก่ายังอยู่ = รีเฟรชแล้วย้อนไปจุดเก่าโดยไม่รู้ตัว — ลบทิ้งดีกว่า
     saveClear();
@@ -3987,9 +4005,22 @@ function begin(seed) {
   return track(nextCard(st));
 }
 
+// seed จากเวลาเฉพาะฝั่งหน้าเว็บ แกนเกมเองไม่แตะนาฬิกา
+const freshSeed = () => (Date.now() ^ (performance.now() * 1000)) >>> 0;
+
 function start() {
-  // seed จากเวลาเฉพาะฝั่งหน้าเว็บ แกนเกมเองไม่แตะนาฬิกา
-  const card = begin((Date.now() ^ (performance.now() * 1000)) >>> 0);
+  const card = begin(freshSeed());
+  saveWrite(card);
+  render(card);
+}
+
+// ขอเกิดใหม่ (B55): เฉพาะชีวิตแรกของตระกูล ก่อนกดอะไร และได้ครั้งเดียว — รุ่นถัดไปเกิดตามกรรม ต้องรับ
+// เปลี่ยนแค่ seed ของเซฟ ไม่เป็น token ใน log · rr จำไว้ในเซฟ รีโหลดแล้วปุ่มจึงไม่กลับมา
+const canReroll = () => st.gen === 1 && !af && save.log === '' && !save.rr;
+function reroll() {
+  if (!canReroll()) return;
+  const card = begin(freshSeed());
+  save.rr = 1;
   saveWrite(card);
   render(card);
 }
@@ -3998,6 +4029,7 @@ function start() {
 function resume(s) {
   try {
     let card = begin(s.seed);
+    if (s.rr) save.rr = 1;
     for (const tok of s.log) card = apply(tok);
     save.log = s.log;
     return fingerprint(card) === s.fp ? card : null;
