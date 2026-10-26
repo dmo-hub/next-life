@@ -13,7 +13,8 @@ events:
     choices:
       - id: will
         text: "ทำพินัยกรรมแบ่งทรัพย์ให้ชัด"
-        requires: {flags: {not: [wish_will]}, reason: "สั่งไว้แล้ว"}
+        # ป.พ.พ. ม.1703 — ผู้เยาว์อายุไม่ครบ 15 ปีทำพินัยกรรมไม่ได้
+        requires: {flags: {not: [wish_will]}, age: {min: 15}, reason: "สั่งไว้แล้ว"}
         sets_flags: [wish_will]
         merit: [{cat: neutral}]
       - id: organs
