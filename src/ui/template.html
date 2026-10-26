@@ -35,9 +35,10 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .bar b { position:absolute; top:-3px; width:2px; height:12px; margin-left:-1px; }
 .meta { padding:0 20px 8px; font-size:12px; }
 .meta span { white-space:nowrap; }
-.tree { padding:0 20px 8px; font-size:12px; }
-.tree summary { cursor:pointer; }
-.tree .picks { font-size:12px; }
+.tree, .family { padding:0 20px 8px; font-size:12px; }
+.tree summary, .family summary { cursor:pointer; }
+.tree .picks, .family .picks { font-size:12px; }
+.family li.gone { opacity:0.55; }
 .stat-help { padding:0 20px; font-size:12px; color:var(--muted); }
 .stat-help summary { cursor:pointer; min-height:36px; display:flex; align-items:center; text-decoration:underline; text-underline-offset:2px; }
 .stat-help dl { margin:0 0 10px; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 12px; }
@@ -136,7 +137,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .b .choice { border:1px solid var(--bronze2); background:var(--lacquer2); color:var(--cream); }
 .b .choice:hover, .b .choice:focus-visible { border-color:var(--gold); background:#2E2218; outline:none; }
 .b .choice .fx { color:var(--gold); }
-.b .picks, .b .tree summary { color:#E3D6B3; }
+.b .picks, .b .tree summary, .b .family summary { color:#E3D6B3; }
 .b .recap { border:1px solid var(--bronze); background:var(--lacquer2); }
 .b .recap .h { color:var(--gold); }
 .scene { height:96px; background:var(--lacquer2); border-bottom:1px solid var(--bronze); }

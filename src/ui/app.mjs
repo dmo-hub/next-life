@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf } from '../engine/index.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.2.37';
@@ -608,6 +608,8 @@ function render(card) {
     // จอแคบให้ตัดบรรทัดได้แค่ที่ตัวคั่น — เบราว์เซอร์ตัดคำไทยกลาง "ราย|ได้" ได้แม้เว้นวรรคแบบไม่ตัด จึงต้องห่อ span
     for (const t of purse) meta.append(' · ', el('span', null, t));
     box.append(meta);
+    const fam = familyPanel();
+    if (fam) box.append(fam);
     const tree = familyTree();
     if (tree) box.append(tree);
     const kicker = card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind];
@@ -658,6 +660,43 @@ function render(card) {
 }
 
 const genLabel = () => (st.gen > 1 ? `รุ่นที่ ${st.gen} · ` : '');
+
+// แผงครอบครัว (B36c): คนรอบตัวตอนนี้ แยกจากผังตระกูลที่เล่ารุ่นก่อน · อ่านอย่างเดียว ไม่มี token ในเซฟ
+// ใช้เฉพาะช่องที่ไล่ชื่อไว้ข้างล่าง — แกนเติมช่องใหม่ในสมาชิกก็ไม่หลุดขึ้นจอ · bond บอกเป็นป้ายคำ ไม่ใช่ตัวเลข
+const FAMILY_ORDER = ['parent', 'spouse', 'child', 'grandchild', 'pet', 'peer'];
+const kinWord = (m) => {
+  const male = m.sex === 'ชาย';
+  if (m.role === 'parent') return male ? 'พ่อ' : 'แม่';
+  if (m.role === 'spouse') return m.left ? 'อดีตคู่' : male ? 'สามี' : 'ภรรยา';
+  if (m.role === 'child') return male ? 'ลูกชาย' : 'ลูกสาว';
+  if (m.role === 'grandchild') return male ? 'หลานชาย' : 'หลานสาว';
+  if (m.role === 'pet') return m.kind ?? 'สัตว์เลี้ยง';
+  return 'เพื่อนรุ่น';
+};
+// พับ/กางค้างไว้ข้ามการ์ด — การ์ดวาดใหม่ทุกใบ ไม่งั้นผู้เล่นต้องกางซ้ำทุกครั้ง (ค่าหน้าจอ ไม่อยู่ในเซฟ)
+let familyOpen = false;
+function familyPanel() {
+  const all = familyOf(st);
+  if (!all.length) return null;
+  const rank = (m) => FAMILY_ORDER.indexOf(m.role) * 2 + (m.alive ? 0 : 1);
+  const rows = all
+    .map((m, i) => ({ m, i }))
+    .sort((a, b) => rank(a.m) - rank(b.m) || (a.m.order ?? 0) - (b.m.order ?? 0) || a.i - b.i)
+    .map(({ m }) => {
+      const who = m.name ? `${kinWord(m)} · ${m.name}` : kinWord(m);
+      if (!m.alive) return { text: `${who} · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}`, gone: true };
+      const parts = [who, m.age != null && `อายุ ${m.age}`, m.left ? 'แยกทางแล้ว' : m.bondLevel].filter(Boolean);
+      return { text: parts.join(' · '), gone: false };
+    });
+  const alive = all.filter((m) => m.alive).length;
+  const d = el('details', 'family');
+  d.open = familyOpen;
+  d.addEventListener('toggle', () => (familyOpen = d.open));
+  const ul = el('ul', 'picks');
+  for (const r of rows) ul.append(el('li', r.gone ? 'gone' : null, r.text));
+  d.append(el('summary', null, `ครอบครัว · ยังอยู่ ${alive} ${alive === all.length ? 'คน' : `จาก ${all.length} คน`}`), ul);
+  return d;
+}
 
 // ผังตระกูลพับได้ (ใบ 05 เลิกเมื่อไรก็ดูได้) — มีเมื่อเป็นรุ่นที่ 2 ขึ้นไป
 function familyTree() {
