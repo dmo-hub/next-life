@@ -180,7 +180,7 @@ export function loadFinance() {
     occByClass,
   };
   const real = [era.deposit, era.lending, era.fx, era.gold, era.setClose, era.house];
-  return { era, real, sampleFrom: rules.future.sampleFrom };
+  return { era, real, sampleFrom: rules.future.sampleFrom, futureFrom: rules.future.futureFrom };
 }
 
 // ค่าเลขที่หายจะกลายเป็น NaN ในเงินทุกปีหลังกู้ — ตรวจครบทุกชนิดที่แกนรู้จักตั้งแต่โหลด
@@ -256,8 +256,9 @@ export function loadEra() {
   const finance = loadFinance();
   // ปีต้นแบบของอนาคตต้องมีค่าจริงครบทุกชุด จึงจบที่ชุดที่จบเร็วสุด
   const lastOf = (s) => s.from + s.v.length - 1;
-  const future = { from: finance.sampleFrom, to: Math.min(lastOf(cpi), ...finance.real.map(lastOf)) };
+  const future = { from: finance.sampleFrom, recent: finance.futureFrom, to: Math.min(lastOf(cpi), ...finance.real.map(lastOf)) };
   if (future.from < cpi.from + 1 || future.from >= future.to) throw new Error(`ช่วงปีต้นแบบอนาคตใช้ไม่ได้ ${future.from}–${future.to}`);
+  if (!(future.recent >= future.from && future.recent < future.to)) throw new Error(`futureFrom ใช้ไม่ได้ ${future.recent}`);
   // ทุกปีเกมอ่านปีต้นแบบ (B14) — ค่าแรงต้องมีปีก่อนหน้าเพื่อคิดอัตราโต · ปีอ้างอิงต้องอยู่ในข้อมูล
   const mw = finance.era.minWage;
   if (mw.from > future.from - 1 || lastOf(mw) < future.to) throw new Error(`ค่าแรงขั้นต่ำ ${mw.from}–${lastOf(mw)} ไม่ครอบปีต้นแบบ ${future.from - 1}–${future.to}`);

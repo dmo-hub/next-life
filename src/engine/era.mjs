@@ -76,7 +76,9 @@ export const infantMortality = (era, sex, year) => at(era.mort.imr[sex], year);
 // อ่านค่าของปีนั้นพร้อมกัน — ผู้เล่นเดาไม่ได้ว่าวิกฤตมาเมื่อไร แต่ความสัมพันธ์ข้ามชุดของปีจริงยังอยู่
 // hash ของ seed กับปี ชีวิตเดิมได้ชุดปีเดิม และไม่กินลำดับสุ่มของโลก
 export function protoYear(era, seed, year) {
-  const { from, to } = era.future;
+  // ปีหลังข้อมูลจริงยืมเฉพาะช่วงกรอบเป้าเงินเฟ้อ (recent) — ยืมทั้งช่วงแล้วคนตายปลายศตวรรษเจอราคาพอง ~25 เท่า
+  const { to } = era.future;
+  const from = year > to ? era.future.recent : era.future.from;
   let h = Math.imul((seed ^ Math.imul(year, 0x9e3779b1)) >>> 0, 0x85ebca6b) >>> 0;
   h ^= h >>> 13;
   return from + ((h >>> 0) % (to - from + 1));

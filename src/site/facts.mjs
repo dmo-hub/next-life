@@ -16,6 +16,7 @@ export function siteFacts(content, appSrc = readFileSync(new URL('../ui/app.mjs'
     version: pick(/APP_VERSION = '([^']+)'/),
     build: pick(/APP_BUILD = '([^']+)'/),
     yearFrom: String(era.births.from),
+    futureFrom: String(era.future.recent),
     yearTo: String(era.births.from + era.births.w.length - 1),
     regions: String(regions.length),
     provinces: String(regions.reduce((s, r) => s + r.provinces.length, 0)),
