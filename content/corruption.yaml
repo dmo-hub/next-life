@@ -351,7 +351,7 @@ events:
         text: "เล่าความจริงทั้งหมด"
         merit: [{cat: sila, level: 1}]
         outcomes:
-          - {weight: 2, ok: true, text: "หลานนิ่งไปนาน แล้วช่วยวางแผนผ่อนคืนเจ้าของเงินทีละน้อย ความลับที่แบกมาเบาลงทั้งบ้าน", effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "หลานนิ่งไปนาน แล้วช่วยวางแผนผ่อนคืนเจ้าของเงินทีละน้อย ความลับที่แบกมาเบาลงทั้งบ้าน", effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "หลานรับไม่ได้ เล่าให้ทั้งตระกูลฟัง วันรวมญาติปีนี้ไม่มีใครนั่งข้างเรา", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
       - id: return_anon
         text: "ใส่ซองคืนเงินแบบไม่ลงชื่อ"

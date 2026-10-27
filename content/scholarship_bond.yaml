@@ -21,7 +21,7 @@ events:
         requires: {stats: {network: {min: 50}}, reason: "ไม่มีคนรู้จักช่วยเรื่องย้าย"}
         clears_flags: [scholar_bond]
         outcomes:
-          - {weight: 1, ok: true, text: "ได้ย้ายกลับมาใช้ทุนใกล้บ้าน กินข้าวเย็นกับที่บ้านได้ทุกวัน", effects: {money: {unit: income_x, amount: -0.5}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "ได้ย้ายกลับมาใช้ทุนใกล้บ้าน กินข้าวเย็นกับที่บ้านได้ทุกวัน", effects: {money: {unit: income_x, amount: -0.5}, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เรื่องย้ายเงียบหาย ต้องไปใช้ทุนต่างจังหวัดตามเดิม", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: buy_out

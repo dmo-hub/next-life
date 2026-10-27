@@ -90,7 +90,7 @@ events:
         text: "ตกลง แล้วกู้มาจ่ายสินสอด"
         sets_flags: [married]
         outcomes:
-          - {weight: 1, ok: true, text: "ช่วยกันผ่อนจนปิดหนี้ได้ งานใหญ่สมหน้าทั้งสองบ้าน", effects: {happiness: 2, relations: 2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ช่วยกันผ่อนจนปิดหนี้ได้ งานใหญ่สมหน้าทั้งสองบ้าน", effects: {happiness: 2, relations: 2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ดอกบานทุกเดือน ทะเลาะกันเรื่องเงินตั้งแต่ยังไม่ครบปี", effects: {happiness: 1, relations: -1}, sets_flags: [in_debt], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: wait

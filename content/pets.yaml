@@ -260,7 +260,7 @@ events:
       - id: post_online
         text: "โพสต์ตามหาในกลุ่มหมู่บ้าน"
         outcomes:
-          - {weight: 2, ok: true, text: "มีคนทักมาตอนดึก เขาเลี้ยงไว้ให้ก่อนแล้ว", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.5}}, text: "มีคนทักมาตอนดึก เขาเลี้ยงไว้ให้ก่อนแล้ว", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "มีแต่คนกดเศร้าให้ ไม่มีใครเห็นเลย", effects: {happiness: -3}, family: [{die: pet}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: wait_home

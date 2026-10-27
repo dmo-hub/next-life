@@ -97,7 +97,7 @@ events:
         merit: [{cat: neutral}]
       - text: "ขอไปเรียนมวยไทยป้องกันตัว"
         outcomes:
-          - {weight: 2, ok: true, text: "เดือนต่อมาไม่มีใครกล้าแตะกล่องข้าวอีกเลย", effects: {health: 1, happiness: 2}, sets_flags: [bullied, sporty], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "เดือนต่อมาไม่มีใครกล้าแตะกล่องข้าวอีกเลย", effects: {health: 1, happiness: 2}, sets_flags: [bullied, sporty], merit: [{cat: neutral}]}
           - {weight: 1, text: "ต่อยคืนจนโดนเรียกผู้ปกครอง เพื่อนยิ่งเหม็นหน้า", effects: {relations: -2, health: -1}, sets_flags: [bullied], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ทนเงียบ บอกแม่ว่าล้มเอง"
@@ -111,7 +111,7 @@ events:
         merit: [{cat: neutral}]
       - text: "ชวนเพื่อนไปยืนเผชิญหน้าด้วยกัน"
         outcomes:
-          - {weight: 1, ok: true, multipliers: {karma: 1.4}, text: "ยืนกันเป็นแถว เด็กคนนั้นถอยแล้วไม่กล้าแตะกล่องข้าวอีกเลย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}, karma: 1.4}, text: "ยืนกันเป็นแถว เด็กคนนั้นถอยแล้วไม่กล้าแตะกล่องข้าวอีกเลย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ทะเลาะกันกลางสนาม พรุ่งนี้โดนแกล้งหนักกว่าเดิม", effects: {happiness: -2, relations: -2, health: -1}, merit: [{cat: neutral}]}
         sets_flags: [bullied]
         merit: [{cat: neutral}]
@@ -185,7 +185,7 @@ events:
         merit: [{cat: neutral}]
       - text: "ตามพ่อแม่ไปที่ทำงานทุกวัน"
         outcomes:
-          - {weight: 1, ok: true, text: "จำงานพ่อแม่ได้หมด ลูกค้าชมว่าฉลาด", effects: {knowledge: 2, relations: 1}, sets_flags: [good_student], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "จำงานพ่อแม่ได้หมด ลูกค้าชมว่าฉลาด", effects: {knowledge: 2, relations: 1}, sets_flags: [good_student], merit: [{cat: neutral}]}
           - {weight: 2, text: "เบื่อจนวิ่งหายในตลาดครึ่งวัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ขอไปค่ายฟุตบอลภาคฤดูร้อน"
@@ -215,7 +215,7 @@ events:
         merit: [{cat: neutral}]
       - text: "เปิดช่องคลิปของตัวเองจริงจัง"
         outcomes:
-          - {weight: 1, ok: true, text: "ถ่ายคลิปลงทุกสัปดาห์ คนดูประจำเริ่มรอ เด็กในซอยมาขอเป็นตัวประกอบ", effects: {happiness: 2, knowledge: 1, health: -1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "ถ่ายคลิปลงทุกสัปดาห์ คนดูประจำเริ่มรอ เด็กในซอยมาขอเป็นตัวประกอบ", effects: {happiness: 2, knowledge: 1, health: -1}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
           - {weight: 2, text: "คลิปที่สองไม่มีใครดู เสียใจจนไม่ยอมแตะกล้องไปหลายเดือน", effects: {happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
