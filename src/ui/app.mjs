@@ -178,11 +178,21 @@ function lifeChart(life, deathAge) {
 }
 // แผงย่อยบนมรณบัตรพับไว้ก่อน หัวข้อยังเห็น แตะเพื่อเปิด — การ์ดยาวจนปุ่มไปต่อจมใต้จอ
 // เนื้อในห่อ div แยก: details ตั้ง display:flex ไม่ได้ทุกเบราว์เซอร์ ระยะห่างแบบ flex ของแผงจึงอยู่ที่ตัวห่อ
-function fold(box, label) {
+// fresh = ป้ายอ่านจอของจุดแดง "ใหม่" บนหัวแผง · เปิดแผงแล้วจุดหายและเรียก onOpen ครั้งเดียว
+function fold(box, label, fresh = null, onOpen = null) {
   const d = el('details', 'fold');
   const inner = el('div', 'fold-in');
   inner.append(...box.childNodes);
-  d.append(el('summary', null, label), inner);
+  const sum = el('summary', null, label);
+  if (fresh) {
+    sum.append(newDot(fresh));
+    d.addEventListener('toggle', () => {
+      if (!d.open || !sum.lastChild?.classList?.contains('new-dot')) return;
+      sum.lastChild.remove();
+      onOpen?.();
+    });
+  }
+  d.append(sum, inner);
   box.replaceChildren(d);
   return box;
 }
@@ -408,14 +418,24 @@ const TITLES_SHOWN = 3;
 // บันทึกการตาย (ใบ 04): แบบชีวิต 1 + ฉายาเด่น 3 + ปุ่มดูทั้งหมด · ฉายาตระกูลแยกหัวข้อ
 function titlesBox(card) {
   const { pattern, titles, family } = lifeTitles(card);
+  // ของชีวิตนี้ที่เพิ่งเปิดครั้งแรกในสมุด — อ่านจากที่เก็บ ไม่ใช่ตอนลงสมุด รีโหลดที่มรณบัตรจึงยังเห็นจุด
+  const unseen = bookRead().n;
+  const mine = [pattern.id && newKey('p', pattern.id), ...titles.map((t) => newKey('t', t.id)), ...family.map((t) => newKey('f', t.id))].filter((k) => k && unseen.includes(k));
+  const isNew = (k) => mine.includes(k);
   const box = el('div', 'recap titles');
   box.append(el('div', 'h', 'ชีวิตแบบ'));
-  box.append(el('p', 'pattern', pattern.name));
+  const pat = el('p', 'pattern', pattern.name);
+  if (pattern.id && isNew(newKey('p', pattern.id))) pat.append(newTag());
+  box.append(pat);
   if (pattern.hint) box.append(el('p', 'note', pattern.hint));
   box.append(el('div', 'h', 'ฉายาเด่น'));
   if (!titles.length) box.append(el('p', 'sub', 'ชีวิตนี้ยังไม่ได้ฉายา'));
   const ul = el('ul', 'picks');
-  const rows = titles.map((t) => el('li', null, `${t.name} · ${t.tier}`));
+  const rows = titles.map((t) => {
+    const li = el('li', null, `${t.name} · ${t.tier}`);
+    if (isNew(newKey('t', t.id))) li.append(newTag());
+    return li;
+  });
   rows.forEach((li, i) => {
     li.hidden = i >= TITLES_SHOWN;
     ul.append(li);
@@ -431,11 +451,21 @@ function titlesBox(card) {
   }
   if (family.length) {
     box.append(el('div', 'h', 'ฉายาตระกูล'));
-    box.append(list(family.map((t) => t.name), 'picks'));
+    const fl = el('ul', 'picks');
+    for (const t of family) {
+      const li = el('li', null, t.name);
+      if (isNew(newKey('f', t.id))) li.append(newTag());
+      fl.append(li);
+    }
+    box.append(fl);
   }
   clueRow(box, lifeTitles(card).clue);
   box.append(bookBox());
-  return fold(box, 'ชีวิตแบบและฉายา');
+  // เปิดแผงแล้วนับว่าเห็นของชีวิตนี้ · จุดบนสมุดฉายาข้างในยังอยู่ถ้ามีของชีวิตก่อนที่ยังไม่ได้ดู
+  return fold(box, 'ชีวิตแบบและฉายา', mine.length ? `ได้ฉายาใหม่ ${mine.length}` : null, () => {
+    bookSeen(mine);
+    if (!bookRead().n.length) box.querySelector('.book summary .new-dot')?.remove();
+  });
 }
 
 // เบาะแสฉายาที่ยังไม่เคยได้ 1 อัน (B108) — คำใบ้ชุดเดียวกับ ??? ในสมุด จึงไม่บอกมากกว่าที่สมุดบอกอยู่แล้ว
@@ -466,38 +496,70 @@ const BOOK_KEY = 'next-life-book-v1';
 function bookRead() {
   try {
     const b = JSON.parse(localStorage.getItem(BOOK_KEY) ?? '{}');
-    return { p: b.p ?? [], t: b.t ?? [], f: b.f ?? [] };
+    return { p: b.p ?? [], t: b.t ?? [], f: b.f ?? [], n: Array.isArray(b.n) ? b.n : [] };
   } catch {
-    return { p: [], t: [], f: [] };
+    return { p: [], t: [], f: [], n: [] };
   }
 }
-function bookAdd(t) {
-  const b = bookRead();
-  const add = (xs, id) => (xs.includes(id) ? xs : [...xs, id]);
-  if (t.pattern) b.p = add(b.p, t.pattern.id);
-  for (const x of t.titles) b.t = add(b.t, x.id);
-  for (const x of t.family) b.f = add(b.f, x.id);
+function bookWrite(b) {
   try {
     localStorage.setItem(BOOK_KEY, JSON.stringify(b));
   } catch {
     // ไม่มีที่เก็บ — สมุดเห็นแค่ชีวิตนี้
   }
 }
+// n = รายการที่เพิ่งเปิดแต่ผู้เล่นยังไม่ได้ดู (จุดแดง B116) · id ฉายากับชีวิตแบบคนละกลุ่มกัน จึงติดหัวกลุ่มกันชนชื่อ
+const newKey = (group, id) => `${group}:${id}`;
+function bookAdd(t) {
+  const b = bookRead();
+  const add = (group, xs, id) => {
+    if (xs.includes(id)) return xs;
+    b.n.push(newKey(group, id));
+    return [...xs, id];
+  };
+  if (t.pattern) b.p = add('p', b.p, t.pattern.id);
+  for (const x of t.titles) b.t = add('t', b.t, x.id);
+  for (const x of t.family) b.f = add('f', b.f, x.id);
+  bookWrite(b);
+}
+function bookSeen(keys = null) {
+  const b = bookRead();
+  b.n = keys ? b.n.filter((k) => !keys.includes(k)) : [];
+  bookWrite(b);
+}
+function newDot(label) {
+  const d = el('span', 'new-dot');
+  d.append(el('span', 'sr', label));
+  return d;
+}
+const newTag = () => el('span', 'new-tag', 'ใหม่');
 function bookBox() {
   const b = bookRead();
   const d = el('details', 'book');
   const all = ALL_PATTERNS.length + TITLES.length + FAMILY_TITLES.length;
-  d.append(el('summary', null, `สมุดฉายา · เปิดแล้ว ${b.p.length + b.t.length + b.f.length}/${all}`));
-  const section = (head, items, got, tierOf) => {
+  const sum = el('summary', null, `สมุดฉายา · เปิดแล้ว ${b.p.length + b.t.length + b.f.length}/${all}`);
+  if (b.n.length) sum.append(newDot(`มีรายการใหม่ ${b.n.length}`));
+  d.append(sum);
+  // เปิดดูแล้ว = เห็นครบ ล้างจุดในที่เก็บ · ป้าย "ใหม่" ในแถวคงไว้จนการ์ดเปลี่ยน ให้ยังหาเจอว่าตัวไหน
+  d.addEventListener('toggle', () => {
+    if (!d.open) return;
+    bookSeen();
+    sum.querySelector('.new-dot')?.remove();
+  });
+  const section = (head, group, items, got, tierOf) => {
     d.append(el('div', 'h', head));
-    d.append(list(items.map((x) => {
+    const ul = el('ul', 'picks');
+    for (const x of items) {
       const tier = tierOf ? ` · ${tierOf(x)}` : '';
-      return got.includes(x.id) ? `${x.name}${tier}` : `???${tier} — ${x.hint}`;
-    }), 'picks'));
+      const li = el('li', null, got.includes(x.id) ? `${x.name}${tier}` : `???${tier} — ${x.hint}`);
+      if (b.n.includes(newKey(group, x.id))) li.append(newTag());
+      ul.append(li);
+    }
+    d.append(ul);
   };
-  section('ชีวิตแบบที่เคยได้', ALL_PATTERNS, b.p);
-  section('ฉายา', [...TITLES].sort((x, y) => TIERS.indexOf(x.tier) - TIERS.indexOf(y.tier)), b.t, (x) => x.tier);
-  section('ฉายาตระกูล', FAMILY_TITLES, b.f);
+  section('ชีวิตแบบที่เคยได้', 'p', ALL_PATTERNS, b.p);
+  section('ฉายา', 't', [...TITLES].sort((x, y) => TIERS.indexOf(x.tier) - TIERS.indexOf(y.tier)), b.t, (x) => x.tier);
+  section('ฉายาตระกูล', 'f', FAMILY_TITLES, b.f);
   return d;
 }
 
@@ -532,7 +594,40 @@ function memoAdd(t) {
   if (m.l.some((x) => x.k === k)) return 'ok';
   m.l.push({ k, n: st.name, g: st.gen, a: st.age, p: provinceLabel(st), s: t.pattern?.name ?? '', t: t.titles[0]?.name ?? '' });
   for (const x of eraSeen) if (!m.e.includes(x.id)) m.e.push(x.id);
-  return memoWrite(m);
+  const r = memoWrite(m);
+  memoDot();
+  return r;
+}
+// แถวสมุดอนุสรณ์ที่ผู้เล่นเปิดดูแล้ว (จุดแดงที่ลิงก์ท้ายหน้า B116) — key แยก รูปเก็บของสมุดเดิมไม่เปลี่ยน
+const MEMO_SEEN_KEY = 'next-life-memorial-seen-v1';
+function memoSeenRead() {
+  try {
+    const s = JSON.parse(localStorage.getItem(MEMO_SEEN_KEY));
+    return Array.isArray(s) ? s : null;
+  } catch {
+    return null;
+  }
+}
+function memoSeenWrite(ks) {
+  try {
+    localStorage.setItem(MEMO_SEEN_KEY, JSON.stringify(ks));
+  } catch {
+    // ไม่มีที่เก็บ — ไม่มีจุดแดง
+  }
+}
+function memoUnseen() {
+  const ks = memoRead().l.map((x) => x.k);
+  let seen = memoSeenRead();
+  // ผู้เล่นที่มีสมุดอยู่ก่อนมีจุดแดง: ของเดิมถือว่าเห็นแล้ว ไม่งั้นจุดขึ้นทั้งที่ไม่มีอะไรใหม่
+  if (!seen) memoSeenWrite((seen = ks));
+  return ks.filter((k) => !seen.includes(k));
+}
+function memoDot() {
+  const a = document.getElementById('memoLink');
+  if (!a) return;
+  const fresh = memoUnseen().length;
+  a.querySelector('.new-dot')?.remove();
+  if (fresh) a.append(newDot(`มีชีวิตใหม่ในสมุด ${fresh}`));
 }
 function eraBox() {
   const box = el('div', 'recap eras');
@@ -553,8 +648,10 @@ function memoFull(card) {
 }
 
 // เปิดทับหน้าที่อยู่ แล้วคืนหน้าเดิมทั้งก้อนตอนกลับ — ไม่แตะ st ไม่ลงเซฟ
-function openMemo(prev = [...root.childNodes], onBack) {
+function openMemo(prev = [...root.childNodes], onBack, fresh = memoUnseen()) {
   const m = memoRead();
+  memoSeenWrite(m.l.map((x) => x.k));
+  memoDot();
   const back = () => {
     root.replaceChildren(...prev);
     onBack?.();
@@ -567,14 +664,16 @@ function openMemo(prev = [...root.childNodes], onBack) {
   // ใหม่สุดก่อน · ลบทีละแถวได้ทันที (สรุปสั้น ไม่ใช่เซฟ ไม่ต้องถามซ้ำ)
   for (const x of [...m.l].reverse()) {
     const li = el('li');
-    li.append(el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.n}`, `อายุ ${x.a} ปี`, x.p, x.s && `ชีวิตแบบ${x.s}`, x.t && `ฉายา ${x.t}`].filter(Boolean).join(' · ')));
+    const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.n}`, `อายุ ${x.a} ปี`, x.p, x.s && `ชีวิตแบบ${x.s}`, x.t && `ฉายา ${x.t}`].filter(Boolean).join(' · '));
+    if (fresh.includes(x.k)) txt.append(newTag());
+    li.append(txt);
     const del = el('button', 'more', 'ลบ');
     del.setAttribute('aria-label', `ลบ ${x.n} ออกจากสมุด`);
     del.onclick = () => {
       const now = memoRead();
       now.l = now.l.filter((y) => y.k !== x.k);
       memoWrite(now);
-      openMemo(prev, onBack);
+      openMemo(prev, onBack, fresh);
     };
     li.append(del);
     ul.append(li);
@@ -587,8 +686,8 @@ function openMemo(prev = [...root.childNodes], onBack) {
       root.firstChild.classList.add('memo-view');
       c.append(button('ลบทั้งเล่ม', null, () => {
         memoWrite({ l: [], e: [] });
-        openMemo(prev, onBack);
-      }), enter(button('ยกเลิก', null, () => openMemo(prev, onBack))));
+        openMemo(prev, onBack, fresh);
+      }), enter(button('ยกเลิก', null, () => openMemo(prev, onBack, fresh))));
     }));
   }
 }
@@ -961,6 +1060,37 @@ function lockText(card, i) {
   return parts.join(' · ');
 }
 
+// ลูกศรบนป้ายผลโปรแกรมอ่านจออ่านเป็น "upwards arrow" — ซ่อนลูกศรแล้วอ่านเป็นคำแทน ตาเห็นเหมือนเดิม
+const ARROW_WORD = { '↑': 'เพิ่ม', '↓': 'ลด' };
+function fxPart(text) {
+  const s = el('span');
+  for (const bit of text.split(/([↑↓])/)) {
+    if (!ARROW_WORD[bit]) {
+      if (bit) s.append(bit);
+      continue;
+    }
+    const a = el('span', null, bit);
+    a.setAttribute('aria-hidden', 'true');
+    s.append(a, el('span', 'sr', ARROW_WORD[bit]));
+  }
+  return s;
+}
+
+// ป้าย "ฟรี" (B116): ทางที่ไม่แตะเงินเลยทุกผลลัพธ์ บนการ์ดที่มีทางอื่นต้องจ่าย · การ์ดที่ไม่มีใครจ่ายไม่ติด ไม่งั้นทุกปุ่มขึ้น "ฟรี" จนไม่บอกอะไร
+// อ่านเหตุการณ์ดิบจาก st.pending (ตัวที่การ์ดนี้ตั้งไว้) อย่างเดียว · เงินที่เหตุการณ์ซ่อน (?) นับว่าอาจจ่าย — ห้ามติดฟรีแล้วเฉลยค่าที่ซ่อน
+const moneySign = (m) => Math.sign(typeof m === 'object' ? m.amount : m);
+// กู้ = จ่ายคืนทีหลัง · ปิดหนี้ = จ่ายก้อน — ทั้งคู่ไม่ใช่ "ฟรี" แม้ช่องเงินจะไม่ติดลบ
+const paysOut = (fx) => !!fx && ((fx.money !== undefined && moneySign(fx.money) < 0) || !!fx.invest || !!fx.debt || !!fx.settle);
+function freeChoices(card) {
+  // การ์ดจัดสรรเงิน/ต่างโลกเข้า branch เดียวกันแต่ไม่มี id — id ว่างเท่ากันได้ จึงเช็กชนิดก่อน
+  const ev = card.kind === 'event' && card.id && st.pending?.id === card.id ? st.pending : null;
+  if (!Array.isArray(ev?.choices)) return null;
+  const hidden = (c) => [...(ev.hidden ?? []), ...(c.hidden ?? [])].includes('money');
+  const pays = ev.choices.map((c) => hidden(c) || !!c.requires?.money || paysOut(c.effects) || (c.outcomes ?? []).some((o) => paysOut(o.effects)));
+  if (!pays.some(Boolean)) return null;
+  return pays.map((p) => !p);
+}
+
 function button(label, fx, onclick, hint = null) {
   const b = el('button', 'choice');
   const main = el('span', null, label);
@@ -970,7 +1100,7 @@ function button(label, fx, onclick, hint = null) {
   if (fx) {
     // ป้ายแต่ละค่าเป็นก้อนเดียว ตัดบรรทัดได้แค่ระหว่างก้อน — ไม่งั้นคำไทยหักกลางคำ
     const tag = el('span', 'fx');
-    fx.split(' · ').forEach((part, i) => tag.append(...(i ? [' · '] : []), el('span', null, part)));
+    fx.split(' · ').forEach((part, i) => tag.append(...(i ? [' · '] : []), fxPart(part)));
     b.append(tag);
   }
   b.onclick = onclick;
@@ -1177,10 +1307,12 @@ function render(card) {
       body.append(el(card.title ? 'p' : 'h3', card.title ? null : 'lead', card.text));
       if (card.items?.length) body.append(list(card.items));
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
+      const free = freeChoices(card);
       card.choices.forEach((c, i) => {
         const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
-        const b = keyed(button(c, why ?? card.fx?.[i], () => play(lifePick(i)), card.hints?.[i]), i);
+        const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);
+        const b = keyed(button(c, fx, () => play(lifePick(i)), card.hints?.[i]), i);
         if (why) b.disabled = true;
         choices.append(b);
       });
@@ -1933,6 +2065,12 @@ document.getElementById('memoLink')?.addEventListener('click', (e) => {
   e.preventDefault();
   if (!root.querySelector('.memo-view')) openMemo();
 });
+memoDot();
+// เพดานความสูงการ์ด (B116) หักหัวเว็บ — ชื่อเกมตัดสองบรรทัดบนจอแคบ หัวจึงสูงไม่ตายตัว วัดจริงแทนเดาค่าเดียว · 20 = ระยะบนของ #app
+const chromeH = () => document.documentElement.style.setProperty('--chrome', `${(document.querySelector('.logo')?.offsetHeight ?? 116) + 20}px`);
+chromeH();
+addEventListener('resize', chromeH);
+document.fonts?.ready.then(chromeH);
 
 function boot() {
   if (ARCHIVE) document.getElementById('appVer')?.append(' · เวอร์ชันเก่า');
