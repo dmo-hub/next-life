@@ -15,6 +15,26 @@ export const CARD_SHARE = 0.9;
 export const GATE4_PAUSED = false;
 export const cardsInRange = (c) => c >= CARD_MIN && c <= CARD_MAX;
 
+// ด่าน 2 + เทียบรอบก่อน: ตัวเลือกที่ไม่มีใครเลือกนับว่าตายเมื่อการ์ดขึ้นพอให้ตัวเลือกนั้นควรถูกเลือกแล้วเท่านั้น
+// คาดยอดเลือก = ชีวิตของบอทสุ่มที่เจอการ์ด (explored) / จำนวนตัวเลือก — บอทบุคลิกเลือกตามคะแนน ตัวเลือกที่ไม่มีบุคลิกไหนชอบ
+// (เช่นไม่มีป้ายผล) จึงได้แค่จากบอทสุ่ม · ต่ำกว่าเกณฑ์ ศูนย์ครั้งเป็นแค่ rng ที่เลื่อนตามเนื้อหาที่เพิ่ม — รายงาน ⚠ ไม่ตก
+export const MIN_EXPECTED_PICKS = 10;
+export function splitDeadChoices(events, fired, explored, picks, min = MIN_EXPECTED_PICKS) {
+  const dead = [], thin = [];
+  // ตัวเลือกของเหตุการณ์ที่ตายนับในเหตุการณ์แล้ว ไม่ซ้ำที่นี่
+  for (const e of events) {
+    if (!fired.has(e.id)) continue;
+    const expected = (explored.get(e.id) ?? 0) / e.choices.length;
+    e.choices.forEach((c, i) => {
+      if (picks.has(`${e.id}#${i}`)) return;
+      const id = `${e.id}#${c.id ?? i}`;
+      if (expected >= min) dead.push(id);
+      else thin.push({ id, expected });
+    });
+  }
+  return { dead, thin };
+}
+
 function cardGate(cardsOver60, name, min, max, paused, pausedText) {
   const xs = [...cardsOver60].sort((a, b) => a - b);
   const inRange = xs.filter((c) => c >= min && c <= max).length;
@@ -55,27 +75,35 @@ export function gate3a(era) {
 }
 
 // 3b (ใบ 07 + MAP: ตายตามแนวชีวิต): อายุเฉลี่ยของบอทสุ่ม vs อายุตายที่ข้อมูลคาดตามแนวชีวิต (ตารางชีพของแต่ละปีที่ผ่าน) ไม่ใช่ e0 ปีเกิด
-// กลุ่ม = ทศวรรษเกิด × เพศ · ค่า [ผลรวมอายุจริง, ผลรวมอายุที่ข้อมูลคาด, ผลรวม e0 ปีเกิด, จำนวน]
+// กลุ่ม = ทศวรรษเกิด × เพศ · ค่า [ผลรวมอายุจริง, ผลรวมอายุที่ข้อมูลคาด, ผลรวม e0 ปีเกิด, จำนวน, ผลรวมกำลังสองของส่วนต่าง]
 export const AGE_TOL = 3;
 // กลุ่มเล็กกว่านี้ค่าเฉลี่ยแกว่งเกิน ±1 ปีจากสุ่มล้วน (อายุตาย SD ราว 22 ปี) ตัดสินไม่ได้
 export const MIN_LIVES = 500;
+// SD ของส่วนต่างต่อชีวิตเมื่อกลุ่มไม่ได้เก็บผลรวมกำลังสองมา (กลุ่มที่สร้างมือในชุดทดสอบ)
+const AGE_SD = 22;
+const groupSe = ([real, exp, , c, sq]) => {
+  const mean = (real - exp) / c;
+  const sd = sq === undefined ? AGE_SD : Math.sqrt(Math.max(0, sq / c - mean * mean));
+  return sd / Math.sqrt(c);
+};
 export const groupKey = (st) => `${Math.floor(st.birthYear / 10) * 10}|${st.sex}`;
 // คืนส่วนต่างอายุจริงกับที่ข้อมูลคาดของชีวิตนี้ — harness เต็มใช้ชี้เหตุการณ์ต้นเหตุ
 export function addGroup(groups, era, st, age) {
   const key = groupKey(st);
-  const g = groups.get(key) ?? [0, 0, 0, 0];
+  const g = groups.get(key) ?? [0, 0, 0, 0, 0];
   const exp = expectedDeathAge(era, st.sex, st.birthYear, st.seed);
   g[0] += age;
   g[1] += exp;
   g[2] += periodE0(era, st.sex, st.birthYear);
   g[3]++;
+  g[4] += (age - exp) ** 2;
   groups.set(key, g);
   return age - exp;
 }
 export function gate3b(groups) {
   const lines = [`\nด่าน 3b: อายุเฉลี่ยห่างค่าที่ข้อมูลคาดตามแนวชีวิต ไม่เกิน ±${AGE_TOL} ปี`, 'ทศวรรษเกิด เพศ   ชีวิต  อายุเฉลี่ย  ข้อมูลคาด  ต่าง   (e0 ปีเกิด)'];
   const failed = [];
-  let small = 0, worst = 0;
+  let small = 0, worst = 0, worstSe = 0;
   for (const key of [...groups.keys()].sort()) {
     const [dec, sex] = key.split('|');
     const [real, exp, e0, c] = groups.get(key);
@@ -84,7 +112,7 @@ export function gate3b(groups) {
     const judged = c >= MIN_LIVES;
     if (!judged) small++;
     else {
-      worst = Math.max(worst, Math.abs(diff));
+      if (Math.abs(diff) > worst) [worst, worstSe] = [Math.abs(diff), groupSe(groups.get(key))];
       if (!ok) failed.push({ key, diff });
     }
     const verdict = !judged ? 'ไม่ตัดสิน (ชีวิตน้อย)' : ok ? 'ผ่าน' : 'ตก';
@@ -93,7 +121,7 @@ export function gate3b(groups) {
   if (failed.length) lines.push(`ด่าน 3b ตก ${failed.length} กลุ่ม`);
   else if (small) lines.push(`ด่าน 3b ยังไม่ตัดสิน: ${small} กลุ่มมีไม่ถึง ${MIN_LIVES} ชีวิต — รัน npm run gate (20,000 ชีวิต)`);
   else lines.push('ด่าน 3b ผ่านทุกกลุ่ม');
-  return { lines, fail: failed.length > 0, failed, worst };
+  return { lines, fail: failed.length > 0, failed, worst, worstSe };
 }
 
 // ชี้ id ต้นเหตุเมื่อด่านตก: คนที่เจอเหตุการณ์ตอนอายุ a เทียบกับค่าเฉลี่ยของคนไม่เจอที่ยังมีชีวิตที่อายุ a
@@ -145,6 +173,13 @@ export function blame(lives, ids, sign, top = 5) {
 // จังหวะบังคับ (ใบ 07): ผลรอบนี้ต้องไม่แย่กว่าฐาน (seed ตายตัวชุดเดียวกัน) · คืนรายการที่แย่ลง ว่าง = ผ่าน
 // ส่วนต่างเล็กกว่า SLACK เป็นแค่เลขสุ่มที่ขยับตามเนื้อหาที่เพิ่ม ไม่นับว่าแย่ลง
 export const SLACK = { gate4Share: 0.005, gate3bWorst: 0.25 };
+// 3b ห่างสุดเป็นค่าเฉลี่ยของกลุ่มเดียว (หลักร้อยชีวิต SE เกือบ 1 ปี) — ขยับเกิน SLACK ได้จากเนื้อหาที่สับเส้นทางชีวิตล้วน ๆ
+// ตกเมื่อเพิ่มเกินช่วง 95% ของผลต่างสองค่าเฉลี่ย · ฐานที่ยังไม่เก็บ SE ใช้ SE รอบนี้แทน
+export const GATE3B_Z = 1.96;
+export const gate3bTol = (prev, now) => {
+  const a = prev.gate3bWorstSe ?? now.gate3bWorstSe ?? 0, b = now.gate3bWorstSe ?? 0;
+  return Math.max(SLACK.gate3bWorst, GATE3B_Z * Math.sqrt(a * a + b * b));
+};
 export function compareBaseline(prev, now) {
   const worse = [];
   for (const k of ['deadEvents', 'deadChoices', 'deadFlags']) {
@@ -153,6 +188,7 @@ export function compareBaseline(prev, now) {
   }
   if (now.statBad > prev.statBad) worse.push(`statBad ${prev.statBad} → ${now.statBad}`);
   if (now.gate4Share < prev.gate4Share - SLACK.gate4Share) worse.push(`ด่าน 4 ${f(prev.gate4Share * 100)}% → ${f(now.gate4Share * 100)}%`);
-  if (now.gate3bWorst > prev.gate3bWorst + SLACK.gate3bWorst) worse.push(`ด่าน 3b ห่างสุด ${prev.gate3bWorst} → ${now.gate3bWorst} ปี`);
+  const tol = gate3bTol(prev, now);
+  if (now.gate3bWorst > prev.gate3bWorst + tol) worse.push(`ด่าน 3b ห่างสุด ${prev.gate3bWorst} → ${now.gate3bWorst} ปี (ยอม +${f(tol)})`);
   return worse;
 }

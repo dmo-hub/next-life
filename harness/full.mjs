@@ -10,7 +10,7 @@ import { availableParallelism } from 'node:os';
 import { parse } from 'yaml';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
-import { gate3a, gate3b, gate4, blame, compareBaseline } from './gates.mjs';
+import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS } from './gates.mjs';
 
 const args = process.argv.slice(2);
 const has = (name) => args.includes(`--${name}`);
@@ -98,17 +98,18 @@ function deadOf(runs) {
     for (const k of r.picks.keys()) picks.add(k);
     for (const x of r.flags) flags.add(x);
   }
+  const explored = new Map();
+  for (const r of runs) if (r.bot === 'สุ่ม') for (const [k, v] of r.fired) explored.set(k, (explored.get(k) ?? 0) + v);
+  const { dead, thin } = splitDeadChoices(content.events, fired, explored, picks);
   return {
     fired,
     events: content.events.filter((e) => !fired.has(e.id)).map((e) => e.id),
-    // ตัวเลือกของเหตุการณ์ที่ตายนับในเหตุการณ์แล้ว ไม่ซ้ำที่นี่
-    choices: content.events
-      .filter((e) => fired.has(e.id))
-      .flatMap((e) => e.choices.map((c, i) => ({ c, i })).filter(({ i }) => !picks.has(`${e.id}#${i}`)).map(({ c, i }) => `${e.id}#${c.id ?? i}`)),
+    choices: dead,
+    thinChoices: thin,
     flags: FLAGS.filter((x) => !flags.has(x)),
   };
 }
-const { fired, events: deadEvents, choices: deadChoices, flags: deadFlags } = deadOf(main);
+const { fired, events: deadEvents, choices: deadChoices, thinChoices, flags: deadFlags } = deadOf(main);
 const lives = main.reduce((a, r) => a + r.n, 0);
 console.log(`\nด่าน 2: ${lives.toLocaleString('en-US')} ชีวิต · ไม่มีใครถึง — เหตุการณ์ ${deadEvents.length} · ตัวเลือก ${deadChoices.length} · ธง ${deadFlags.length} → ${deadEvents.length + deadChoices.length + deadFlags.length ? 'ตก' : 'ผ่าน'}`);
 for (const [label, xs] of [['เหตุการณ์', deadEvents], ['ตัวเลือก', deadChoices], ['ธง', deadFlags]]) if (xs.length) console.log(`  ✗ ${label}: ${xs.join(' · ')}`);
@@ -118,6 +119,7 @@ else if (deadEvents.length + deadChoices.length + deadFlags.length) console.log(
 // เกือบตาย: เจอน้อยกว่า 1 ใน 10,000 ชีวิต — ผ่านด่านแต่ seed ใหม่อาจไม่ถึง
 const rare = content.events.filter((e) => fired.has(e.id) && fired.get(e.id) / lives < 1e-4).map((e) => `${e.id} (${fired.get(e.id)})`);
 if (rare.length) console.log(`  ⚠ เหตุการณ์ที่เจอไม่ถึง 1 ใน 10,000 ชีวิต: ${rare.join(' · ')}`);
+if (thinChoices.length) console.log(`  ⚠ ตัวเลือกที่ไม่มีใครเลือกแต่การ์ดขึ้นน้อยเกินตัดสิน (คาดยอดเลือก < ${MIN_EXPECTED_PICKS}): ${thinChoices.map((x) => `${x.id} (คาด ${f(x.expected, 1)})`).join(' · ')}`);
 
 // ---- ด่าน 3a (ไม่ผ่านการสุ่ม) · 3b + 4 บอทสุ่ม ทั้งสอง seed ----
 const g3a = gate3a(content.era);
@@ -203,18 +205,24 @@ for (const b of Object.keys(BOTS)) {
 }
 
 // ---- จังหวะบังคับ: เทียบรอบก่อน (seed ตายตัวเท่านั้น — seed สุ่มเปลี่ยนทุกรอบ) ----
+const fixedDead = deadOf(main.filter((r) => r.seed === seed));
 const now = {
   n, seed,
-  ...(({ events, choices, flags }) => ({ deadEvents: events, deadChoices: choices, deadFlags: flags }))(deadOf(main.filter((r) => r.seed === seed))),
+  deadEvents: fixedDead.events, deadChoices: fixedDead.choices, deadFlags: fixedDead.flags,
   statBad,
   gate4Share: Number(f(judged[seed].g4.share, 4)),
   gate3bWorst: Number(f(judged[seed].g3b.worst, 3)),
+  gate3bWorstSe: Number(f(judged[seed].g3b.worstSe, 3)),
   ageMean: Object.fromEntries(Object.keys(BOTS).map((b) => [b, Number(f(of(b, seed).ageSum / n, 3))])),
 };
 if (prev) {
   const worse = compareBaseline(prev, now);
   console.log(`\nเทียบรอบก่อน (${prev.at ?? '?'}): ${worse.length ? `แย่ลง ${worse.length} ข้อ → ตก` : 'ไม่แย่กว่า → ผ่าน'}`);
   for (const w of worse) console.log(`  ✗ ${w}`);
+  // ตัวที่ไม่นับต้องเห็น — ไม่งั้นการ์ดหายากที่ตายจริงจะผ่านเงียบไปทุกรอบ
+  const excused = fixedDead.thinChoices.filter((x) => !prev.deadChoices.includes(x.id));
+  if (excused.length) console.log(`  ⚠ ตัวเลือกไม่มีใครเลือกแต่ไม่นับ (บอทสุ่มเจอการ์ดน้อย คาด < ${MIN_EXPECTED_PICKS}): ${excused.map((x) => `${x.id} (คาด ${f(x.expected, 1)})`).join(' · ')}`);
+  console.log(`  3b ห่างสุด ${prev.gate3bWorst} → ${now.gate3bWorst} ปี · ยอมเพิ่ม ${f(gate3bTol(prev, now))} (SE ${prev.gate3bWorstSe ?? '-'} → ${now.gate3bWorstSe})`);
   const ages = Object.keys(now.ageMean).map((b) => `${b} ${prev.ageMean[b] ?? '?'}→${now.ageMean[b]}`).join(' · ');
   console.log(`  อายุเฉลี่ย: ${ages}`);
   if (worse.length) fails.push('เทียบรอบก่อน');
