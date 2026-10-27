@@ -704,7 +704,7 @@ export function entryCard(st, stage) {
   const e = ENTRY_EVENTS[o.id];
   st.pending = { entry: o.id, choices: e.choices.map((text) => ({ text })) };
   return {
-    kind: 'event', id: `isekai_${o.id}`, entry: o.id, type: 'B', national: false, funeral: false,
+    kind: 'event', id: `isekai_${o.id}`, entry: o.id, gone: !!e.gone, type: 'B', national: false, funeral: false,
     age: st.age, stage, title: null, text: e.text, choices: [...e.choices],
     fx: ['ชีวิตนี้จบตรงนี้ ไปต่างโลก', ''], locked: [null, null],
   };
@@ -862,6 +862,8 @@ export function nextIsekaiCard(isk) {
       step: 'end', title: isk.ending.title, text: `${isk.dead ? isk.ending.text : `${isk.ending.text} ชีวิตในโลกนี้ดำเนินต่อไปจนถึงวันสุดท้าย`}${vowLine}`, ending: isk.ending.id,
       choices: [],
       log: isk.log.slice(),
+      // แผงคำสัญญาบนจอ (เลน C) · ข้อความรักษา/ผิดยังต่อท้าย text ไว้จนจอใหม่ขึ้น
+      ...(isk.vow && { vow: { text: GODDESS_VOWS.find((v) => v.id === isk.vow).text, kept: isk.vowKept } }),
       // ใส่ช่องเฉพาะชาติที่สกิลเคยช่วยไว้ — การ์ดจบของชาติอื่นรูปเดิม
       ...(isk.saves && { saves: isk.saves }),
     });
