@@ -154,7 +154,6 @@ function lifeMarks(deathAge) {
 function lifeChart(life, deathAge) {
   if (life.stats.length < 2) return null;
   const box = el('div', 'lifechart');
-  box.append(el('div', 'h', `ทั้งชีวิต · อายุ 0–${deathAge}`));
   const W = 320, H = 158, L = 46, R = 8, T = 18, B = 20;
   const x = (a) => L + (a / Math.max(deathAge, 1)) * (W - L - R);
   const y = (v) => T + ((100 - v) / 100) * (H - T - B);
@@ -181,6 +180,16 @@ function lifeChart(life, deathAge) {
   box.append(svg, legend, cap);
   const money = sparkline(life.money, 0, deathAge, true);
   if (money) box.append(el('div', 'h', 'เงินติดตัว'), money);
+  return fold(box, `ทั้งชีวิต · อายุ 0–${deathAge}`);
+}
+// แผงย่อยบนมรณบัตรพับไว้ก่อน หัวข้อยังเห็น แตะเพื่อเปิด — การ์ดยาวจนปุ่มไปต่อจมใต้จอ
+// เนื้อในห่อ div แยก: details ตั้ง display:flex ไม่ได้ทุกเบราว์เซอร์ ระยะห่างแบบ flex ของแผงจึงอยู่ที่ตัวห่อ
+function fold(box, label) {
+  const d = el('details', 'fold');
+  const inner = el('div', 'fold-in');
+  inner.append(...box.childNodes);
+  d.append(el('summary', null, label), inner);
+  box.replaceChildren(d);
   return box;
 }
 
@@ -432,7 +441,7 @@ function titlesBox(card) {
   }
   clueRow(box, lifeTitles(card).clue);
   box.append(bookBox());
-  return box;
+  return fold(box, 'ชีวิตแบบและฉายา');
 }
 
 // เบาะแสฉายาที่ยังไม่เคยได้ 1 อัน (B108) — คำใบ้ชุดเดียวกับ ??? ในสมุด จึงไม่บอกมากกว่าที่สมุดบอกอยู่แล้ว
@@ -533,9 +542,8 @@ function memoAdd(t) {
 }
 function eraBox() {
   const box = el('div', 'recap eras');
-  box.append(el('div', 'h', 'เหตุการณ์ในแผ่นดินที่ได้เห็น'));
   box.append(eraSeen.length ? list(eraSeen.map((x) => `อายุ ${x.a} · ${eraName(x.id)}`), 'picks') : el('p', 'sub', 'ชีวิตนี้ไม่ทันเห็นเหตุการณ์ใหญ่ของบ้านเมือง'));
-  return box;
+  return fold(box, `เหตุการณ์ในแผ่นดินที่ได้เห็น (${eraSeen.length})`);
 }
 function memoFull(card) {
   const box = el('div', 'recap warn');
