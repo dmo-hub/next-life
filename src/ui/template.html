@@ -39,6 +39,18 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 /* จุดแดง "ใหม่" (B116): สมุดอนุสรณ์ · แผงฉายา · สมุดฉายา — ป้ายอ่านจอบอกความหมายแทนสี */
 .new-dot { display:inline-block; width:8px; height:8px; margin-left:6px; border-radius:50%; background:var(--red); vertical-align:middle; flex:none; }
 .new-tag { margin-left:6px; padding:0 5px; border:1px solid var(--red); border-radius:3px; color:var(--red); font-size:11px; font-weight:600; white-space:nowrap; }
+/* .body/.choices ตั้ง display:flex ทับ hidden ของเบราว์เซอร์ — การ์ดที่พับไว้ (B117) ต้องหายจริง */
+.card [hidden] { display:none !important; }
+/* กล่องกระซิบ (B117): เส้นประ ตัวเอียง แยกจากเนื้อเรื่องของการ์ด · ปุ่มเป็นลิงก์เล็ก ไม่ปนกับตัวเลือกของเกม */
+.whisper { margin-top:4px; padding:8px 12px; border:1px dashed var(--rule); background:#FBF7EE; display:flex; flex-direction:column; gap:4px; }
+.whisper .h { font-size:12px; font-weight:600; color:var(--red); }
+.whisper p { font-family:Pridi,serif; font-size:14px; color:var(--ink2); }
+.whisper-row { display:flex; flex-wrap:wrap; gap:0 16px; }
+.whisper .more, .choices .later { all:unset; min-height:44px; cursor:pointer; font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:2px; }
+.choices .later { align-self:flex-start; }
+.whisper .more:focus-visible, .choices .later:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.choices.folded { margin-top:0; }
+.choices.folded .note { margin:0; font-size:13px; color:var(--muted); overflow-wrap:anywhere; }
 .top { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 20px; }
 .top small { font-size:12px; letter-spacing:0.04em; text-align:right; }
 /* รูปตัวละคร (B56): วงกลมมุมซ้ายหัวการ์ด · clip-path ตัดเสื้อที่ยื่นเลยวงกลม (ภาพแชร์ตัดด้วย arc แบบเดียวกัน) */

@@ -1144,7 +1144,8 @@ document.addEventListener('keydown', (e) => {
     const m = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
     if (m) b = root.querySelector(`.choices button[data-key="${m[1]}"]`);
   }
-  if (!b || b.disabled) return;
+  // การ์ดที่พับไว้ (B117) ปุ่มยังอยู่ใน DOM แค่ซ่อน — เลขลัดต้องไม่กดตัวเลือกที่มองไม่เห็น
+  if (!b || b.disabled || b.closest('[hidden]')) return;
   e.preventDefault();
   b.click();
 });
@@ -1318,10 +1319,96 @@ function render(card) {
       });
       // การ์ดเล่าเรื่อง (choices: []) ไม่มีปุ่มให้เลือก — ต้องมีทางไปใบถัดไป
       if (!card.choices.length) choices.append(enter(button(BTN.next, null, next)));
+      const tip = whisperFor(card, free);
+      if (tip) body.append(tip);
+      if (card.choices.length > 1) choices.append(foldLater(box, body, choices, card));
     }
   }
   box.append(body, choices);
   root.append(box);
+}
+
+// กล่องกระซิบ (B117): สอนระบบที่เพิ่งโผล่ครั้งแรกตามวัย ในเสียงยาย · บอกแค่ทิศ ไม่บอกตัวเลข/สูตร/บัญชีบุญบาป (กติกาเดียวกับ B31)
+// ค่าสถานะแต่ละตัวอธิบายอยู่ที่ "ค่าสถานะเหล่านี้หมายถึงอะไร?" แล้ว (B31) — ที่นี่สอนเฉพาะกลไกบนการ์ด
+// อ่านการ์ดอย่างเดียว ไม่มี token ในเซฟ ⇒ ผลเกม/บอทไม่ขยับ
+const WHISPER_KEY = 'next-life-whisper-v1';
+const WHISPERS = [
+  ['locked', (c) => c.locked?.some(Boolean), 'ปุ่มจาง ๆ คือทางที่ตอนนี้ยังไปไม่ได้ เหตุผลเขียนไว้บนปุ่ม บางทางแค่รอโตอีกหน่อยหรือมีเงินพอ'],
+  ['chance', (c) => c.fx?.some((f) => /สำเร็จ|เสี่ยง/.test(f ?? '')), 'ทางที่บอกโอกาสสำเร็จหรือความเสี่ยงไว้ ผลยังไม่แน่นอน ค่าสถานะตอนนี้ช่วยเอียงผลได้บ้าง'],
+  ['free', (c, free) => free?.some(Boolean), 'ป้าย "ฟรี" คือทางที่ไม่ต้องควักเงินเลย ไม่ว่าผลจะออกมาทางไหน'],
+  ['school', (c) => c.id?.startsWith('school_gate_'), 'เรียนจบชั้นหนึ่งแล้วจะเรียนต่อหรือออกมาทำงานก็ได้ ความรู้ช่วยสอบเข้าที่ดี ส่วนเงินที่บ้านตัดสินว่าที่ไหนส่งไหว'],
+  ['job', (c) => c.id === 'first_job', 'งานแรกขึ้นกับวุฒิที่มี คนรู้จักเยอะยิ่งเจองานค่าแรงดี รายได้ต่อเดือนจะขึ้นใต้แถบค่าสถานะ'],
+  ['alloc', (c) => c.kind === 'alloc', 'ทุกช่วงได้ทบทวนเงินเก็บ ตัวเลขที่เห็นเป็นผลของช่วงที่ผ่านมา ไม่ได้บอกช่วงหน้า และของแพงขึ้นทุกปี เงินที่เก็บเฉย ๆ จึงซื้อของได้น้อยลง'],
+  ['debt', (c) => c.fx?.some((f) => /กู้/.test(f ?? '')), 'กู้มาแล้วต้องผ่อนทุกปี หนี้ที่ท่วมรายได้อยู่นาน ๆ พาไปถึงล้มละลายได้'],
+];
+function whisperRead() {
+  try {
+    const w = JSON.parse(localStorage.getItem(WHISPER_KEY) ?? '{}');
+    return { seen: Array.isArray(w.seen) ? w.seen : [], off: Array.isArray(w.off) ? w.off : [] };
+  } catch {
+    return { seen: [], off: [] };
+  }
+}
+function whisperWrite(w) {
+  try {
+    localStorage.setItem(WHISPER_KEY, JSON.stringify(w));
+  } catch {
+    // ไม่มีที่เก็บ — กระซิบซ้ำได้ทุกครั้งที่เจอ ดีกว่าไม่สอนเลย
+  }
+}
+// เรื่องที่เคยกระซิบแล้วไม่กระซิบซ้ำทุกชาติ (เห็นครั้งเดียวต่อเครื่อง) · ปุ่มปิดมีผลแค่ชาตินี้ ชาติหน้าเรื่องที่ยังไม่เคยเห็นกลับมาสอนต่อ
+// เก็บชาติที่ปิดไว้แค่ไม่กี่ชาติล่าสุด — ชาติเก่ากว่านั้นไม่มีทางกลับไปเล่นแล้ว
+const WHISPER_OFF_KEEP = 8;
+const lifeKey = () => `${save?.seed}:${st.gen}`;
+function whisperFor(card, free) {
+  const w = whisperRead();
+  if (w.off.includes(lifeKey())) return null;
+  const hit = WHISPERS.find(([id, when]) => !w.seen.includes(id) && when(card, free));
+  if (!hit) return null;
+  // นับว่าเห็นตั้งแต่ขึ้นจอ: กดตัวเลือกไปเลยโดยไม่ปิดกล่องก็ไม่กระซิบเรื่องเดิมซ้ำ
+  w.seen.push(hit[0]);
+  whisperWrite(w);
+  const box = el('aside', 'whisper');
+  box.setAttribute('aria-label', 'ยายกระซิบ');
+  box.append(el('div', 'h', 'ยายกระซิบ'), el('p', null, hit[2]));
+  const row = el('div', 'whisper-row');
+  const ok = el('button', 'more', 'รู้แล้ว');
+  ok.onclick = () => box.remove();
+  const mute = el('button', 'more', 'ชาตินี้ไม่ต้องแนะนำแล้ว');
+  mute.onclick = () => {
+    const now = whisperRead();
+    now.off = [...now.off.filter((k) => k !== lifeKey()), lifeKey()].slice(-WHISPER_OFF_KEEP);
+    whisperWrite(now);
+    box.remove();
+  };
+  row.append(ok, mute);
+  box.append(row);
+  return box;
+}
+
+// ปุ่ม "พับไว้ก่อน" (B117): ซ่อนเรื่องกับตัวเลือก กางแผงสถานะทั้งหมดให้ดูรวดเดียว แล้วกลับมาเลือกที่การ์ดเดิม
+// ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ · ตอนกลับคืนแผงที่กางไว้ให้เป็นอย่างเดิม
+function foldLater(box, body, choices, card) {
+  const later = el('button', 'more later', 'พับไว้ก่อน ไปดูสถานะ');
+  later.onclick = () => {
+    const panels = [...box.querySelectorAll(':scope > details')];
+    const was = panels.map((d) => d.open);
+    panels.forEach((d) => (d.open = true));
+    body.hidden = choices.hidden = true;
+    const bar = el('div', 'choices folded');
+    bar.append(el('p', 'note', `การ์ดรอให้เลือกอยู่ · ${clip(card.title ?? card.text, 48)}`));
+    const back = enter(button('กลับมาเลือก', null, () => {
+      panels.forEach((d, i) => (d.open = was[i]));
+      bar.remove();
+      body.hidden = choices.hidden = false;
+      choices.querySelector('button.choice:not(:disabled)')?.focus();
+    }));
+    bar.append(back);
+    box.append(bar);
+    scrollTo(0, 0);
+    back.focus({ preventScroll: true });
+  };
+  return later;
 }
 
 const genLabel = () => (st.gen > 1 ? `รุ่นที่ ${st.gen} · ` : '');
