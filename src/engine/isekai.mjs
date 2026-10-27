@@ -4,13 +4,21 @@
 // กรรมจากปรโลก (ระดับ −1..1) เป็นตัวตั้งของโลก: บุญมากได้สกิลให้เลือกมากขึ้นและค่าเริ่มดีขึ้น · บาปหนักได้น้อยลงและโลกโหดขึ้น · ไม่มีตัวเลขบัญชีบนการ์ด
 // บัญชีบุญบาปเป็นของดวงวิญญาณ (ส่วนที่ส่งต่อจากชาติก่อน) — ชาติต่างโลกบันทึกต่อลงบัญชีนั้น แล้วปรโลกตัดสินตอนจบชาติ
 import { makeRng, mixSeed } from './rng.mjs';
-import { newLedger, recordMerit } from './merit.mjs';
+import { newLedger, recordMerit, ledgerLevel } from './merit.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค' };
 export const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
 // ค่าตั้งของเกม: stay = อยู่ต่างโลกต่อติดกันได้กี่รอบ (กันบอทวนไม่จบ) · chance = โอกาสเทพธิดาโผล่เองตอนถึงทางเกิด
 // karma* = ผลของระดับกรรมต่อโลก · skills = จำนวนสกิลให้เลือกปกติ · memory = ค่าที่ติดตัวไปชาติต่างโลกถัดไป
 export const ISEKAI = { stay: 2, chance: 0.2, skills: 3, worlds: 3, karmaStat: 3, karmaDc: 4, karmaSkill: 0.3, memory: 3, events: [1, 3, 3] };
+// เทพธิดาโผล่ถี่ตามกรรม (B68e · เจ้าของเคาะ): chance × (1 + ระดับกรรมสุทธิ) ไม่ต่ำกว่า chanceMin ⇒ บุญเต็ม 40% กลาง 20% บาปเต็ม 5%
+// ตายแบบต่างโลกได้โชคเพิ่ม fatedLuck · คำสัญญาที่ฝากไว้: รักษาได้ = บุญระดับ vowLevel · ผิด = ธงบนแล้วไม่แก้
+export const GODDESS = { chanceMin: 0.05, fatedLuck: 10, vowLevel: 1 };
+// คำสัญญา 1 ข้อต่อรอบที่เทพธิดาโผล่ · เลือกจาก seed ไม่ดึงเลขสุ่มของรอบ · ผิด/รักษาวัดจากป้ายบุญบาปของตัวเลือกที่กด
+export const GODDESS_VOWS = [
+  { id: 'no_kill', text: 'สัญญากันข้อเดียวนะ อย่าฆ่าใครเพื่อเอาแต้มหรือของ', breaks: 'kill_for_gain' },
+  { id: 'help', text: 'สัญญากันข้อเดียวนะ ไปถึงแล้วช่วยใครสักคนด้วยมือตัวเองบ้าง', needs: 'help_others' },
+];
 const ISEKAI_SALT = 0x15e4a1;
 
 export const ISEKAI_SKILLS = {
@@ -630,16 +638,19 @@ function isekaiShuffle(rng, arr) {
 // ทางที่สามของการ์ดทางเกิด: เทพธิดาโผล่เอง (สุ่ม) หรือชีวิตนี้ตายแบบฉบับต่างโลก (ธง isekai_call) = ได้ของแถม · stream แยกจาก af.rng
 export function isekaiCalled(st) {
   if (st.flags?.isekai_call) return true;
-  return makeRng(st.seed ^ ISEKAI_SALT).next() < ISEKAI.chance;
+  const p = Math.max(GODDESS.chanceMin, ISEKAI.chance * (1 + (st.ledger ? ledgerLevel(st.ledger) : 0)));
+  return makeRng(st.seed ^ ISEKAI_SALT).next() < p;
 }
 
 // karma = ระดับกรรมที่ปรโลก (−1..1) · past = ชื่อชาติไทย · run = รอบที่เท่าไรของการอยู่ต่างโลกติดกัน · memory = ค่าที่ติดตัวมาจากรอบก่อน
 // ledger = บัญชีที่ดวงวิญญาณพกมา · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = บัญชีเปล่า
-export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, ledger = newLedger() }) {
+// fated = ชีวิตนี้ตายแบบฉบับต่างโลก (ธง isekai_call) — เทพธิดาโผล่แน่นอนแล้ว ได้โชคเพิ่ม
+export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger() }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
+  const vow = blessed ? GODDESS_VOWS[(seed >>> 0) % GODDESS_VOWS.length].id : null;
   return {
-    rng, karma, past, run, memory, blessed, ledger,
+    rng, karma, past, run, memory, blessed, fated, ledger, vow, vowKept: null, vowHit: false,
     worldOffers: isekaiShuffle(rng, Object.keys(ISEKAI_WORLDS)).slice(0, ISEKAI.worlds + (blessed ? 1 : 0)),
     skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).slice(0, sk),
     world: null, name: '', skills: [], st: null, flags: {}, queue: [], idx: 0,
@@ -671,6 +682,25 @@ function isekaiStart(isk, wid) {
   isk.st = { hp: 100, gold: w.start.gold, fame: 0, goal: 0 };
   for (const k of Object.keys(ISEKAI_STAT)) isk.st[k] = Math.max(1, w.start[k] + shift);
   if (isk.memory) isk.st[isk.memory] += ISEKAI.memory;
+  if (isk.fated) isk.st.luk += GODDESS.fatedLuck;
+}
+
+// คำสัญญาเทพธิดา: ผิดทันทีที่กดตัวเลือกที่มีหมวดต้องห้าม · ข้อที่ต้องทำ ตัดสินตอนจบรอบ
+function vowTrack(isk, tags = []) {
+  const v = GODDESS_VOWS.find((x) => x.id === isk.vow);
+  if (!v || isk.vowKept === false) return;
+  if (v.breaks && tags.some((t) => t.cat === v.breaks)) {
+    isk.vowKept = false;
+    recordMerit(isk.ledger, [{ cat: 'vow_broken' }], 'goddess');
+  }
+  if (v.needs && tags.some((t) => t.cat === v.needs)) isk.vowHit = true;
+}
+
+function vowSettle(isk) {
+  const v = GODDESS_VOWS.find((x) => x.id === isk.vow);
+  if (!v || isk.vowKept === false) return;
+  isk.vowKept = v.needs ? isk.vowHit : true;
+  recordMerit(isk.ledger, [isk.vowKept ? { cat: 'keep_goddess_vow', level: GODDESS.vowLevel } : { cat: 'vow_broken' }], 'goddess');
 }
 
 function isekaiQueue(isk) {
@@ -731,7 +761,7 @@ export function nextIsekaiCard(isk) {
   if (isk.step === 'world') {
     return isekaiCard(isk, {
       step: 'world', title: 'ห้องสีขาว',
-      text: `เทพธิดาผมสีเงินก้มหัวให้ "${isk.past ? `${isk.past} ` : ''}มาทางนี้ก่อน" แล้วกางแผนที่โลกตรงหน้า${isk.blessed ? ' วันนี้เธออารมณ์ดีเป็นพิเศษ เลยเปิดให้เลือกเพิ่มอีกโลก' : ''}`,
+      text: `เทพธิดาผมสีเงินก้มหัวให้ "${isk.past ? `${isk.past} ` : ''}มาทางนี้ก่อน" แล้วกางแผนที่โลกตรงหน้า${isk.blessed ? ' วันนี้เธออารมณ์ดีเป็นพิเศษ เลยเปิดให้เลือกเพิ่มอีกโลก' : ''}${isk.vow ? ` ก่อนส่งไปเธอกระซิบว่า "${GODDESS_VOWS.find((v) => v.id === isk.vow).text}"` : ''}${isk.fated ? ' เธอบอกว่าคนที่ตายแบบในนิยายต่างโลกเป๊ะ ๆ ได้โชคแถมทุกคน' : ''}`,
       choices: isk.worldOffers.map((w) => ISEKAI_WORLDS[w].name),
       desc: isk.worldOffers.map((w) => ISEKAI_WORLDS[w].pitch),
       fx: isk.worldOffers.map(() => ''),
@@ -757,9 +787,11 @@ export function nextIsekaiCard(isk) {
   if (isk.step === 'end') {
     isk.ending = isekaiEnding(isk);
     isk.step = 'over';
+    vowSettle(isk);
+    const vowLine = isk.vow ? (isk.vowKept ? ' คุณรักษาคำสัญญากับเทพธิดาไว้ได้' : ' คุณผิดคำสัญญาที่ให้ไว้กับเทพธิดา') : '';
     return isekaiCard(isk, {
       // การ์ดปรโลกใบถัดไปเล่าเรื่องดวงวิญญาณถูกดึงกลับเอง ใบนี้จึงปิดแค่ชีวิตในโลกนี้ · ตอนจบแบบตายเล่าการตายไว้แล้ว
-      step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : `${isk.ending.text} ชีวิตในโลกนี้ดำเนินต่อไปจนถึงวันสุดท้าย`, ending: isk.ending.id,
+      step: 'end', title: isk.ending.title, text: `${isk.dead ? isk.ending.text : `${isk.ending.text} ชีวิตในโลกนี้ดำเนินต่อไปจนถึงวันสุดท้าย`}${vowLine}`, ending: isk.ending.id,
       choices: [],
       log: isk.log.slice(),
       // ใส่ช่องเฉพาะชาติที่สกิลเคยช่วยไว้ — การ์ดจบของชาติอื่นรูปเดิม
@@ -820,6 +852,7 @@ export function chooseIsekai(isk, idx) {
   for (const f of [out.flag, out.flag2]) if (f) isk.flags[f] = true;
   // ลงบัญชีที่ดวงวิญญาณพกมา (ไม่ดึงเลขสุ่ม ⇒ ลำดับเหตุการณ์เท่าเดิม) · ธงคำบนที่ผิดติดเป็นธงของรอบต่างโลก
   for (const f of recordMerit(isk.ledger, ISEKAI_MERIT[ev.id]?.[idx], ev.id)) isk.flags[f] = true;
+  vowTrack(isk, ISEKAI_MERIT[ev.id]?.[idx]);
   let sys = null;
   if (out.skill) {
     const rest = Object.keys(ISEKAI_SKILLS).filter((k) => !isekaiHas(isk, k) && k !== 'luck');

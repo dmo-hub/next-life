@@ -232,6 +232,7 @@ function sendToIsekai(af) {
     past: af.st.name,
     ledger: carryLedger(af.st.ledger, af.verdict.net, r),
     blessed: !prev && af.blessed,
+    fated: !prev && !!af.st.flags?.isekai_call,
     run: prev ? prev.run + 1 : 0,
     memory: prev?.memory ?? null,
   });
