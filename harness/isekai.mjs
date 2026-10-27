@@ -1,8 +1,8 @@
 // harness ต่างโลก (B68a): เรียก isekai.mjs ตรง ไม่ผ่านปรโลก · บอท 6 บุคลิกชุดเดียวกับ bots.mjs
-// ด่าน: seed เดิมผลเดิม (รวดเดียว + เซฟ/โหลดกลางทาง) · จบได้ทุกชีวิตภายในเพดานการ์ด · ตอนจบ/โลก/สกิล/เหตุการณ์มีบอทถึง
+// ด่าน: seed เดิมผลเดิม (รวดเดียว + เซฟ/โหลดกลางทาง) · จบได้ทุกชีวิตภายในเพดานการ์ด · ตอนจบ/บทบาท/สกิล/เหตุการณ์มีบอทถึง
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
-import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_WORLDS, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ENTRY, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 
@@ -14,11 +14,13 @@ const opt = (name, def) => {
 const n = opt('n', 2000);
 const seed = opt('seed', 1);
 const lives = opt('lives', 40);
-// ชาติต่างโลกเต็มคิวมี 9 เหตุการณ์ × (การ์ด + ผล) + โลก + สกิล + ตอนจบ = 21 ใบ — เพดานเผื่อเท่าตัว
-const CARD_CAP = 42;
+// ชาติต่างโลกเวลาเดินเอง (B68b): ใบตาละปีถึงวัยชรา + ตาละ 5 ปีหลังชรา + เหตุการณ์ × (การ์ด + ผล) + ทุ่มเทต่อช่วงวัย ≈ 100 ใบ
+// เอลฟ์แก่ช้าแต่ตาละ 3 ปี จำนวนตาเท่ามนุษย์ — เพดานเผื่อเท่าตัว
+const CARD_CAP = 240;
 
 // กติกาเดียวกับ harness/merit.mjs: key ของบัญชีห้ามออกไปกับการ์ด · เพิ่มฝั่งข้อความ = คำบุญ/บาปติดตัวเลข
-const LEAK = /ledger|merit|sin|karma|byCat|broken|omenTone|omenAge/i;
+// สุข/รู้ของต่างโลก (joy · wit · inner) เป็นค่าซ่อน (เจ้าของเคาะ) — ห้ามออกไปกับการ์ดเหมือนบัญชี
+const LEAK = /ledger|merit|sin|karma|byCat|broken|omenTone|omenAge|^joy$|^wit$|^inner$/i;
 const LEAK_TEXT = /(บุญ|บาป)\s*[+\-−]?\s*\d/;
 function* keys(v) {
   if (Array.isArray(v)) for (const x of v) yield* keys(x);
@@ -66,6 +68,7 @@ function play(cfg, bot, botRng, picks = []) {
     if (!card.choices.length) continue;
     const k = used.length < picks.length ? picks[used.length] : bot(card, botRng, {});
     used.push(k);
+    card.pick = k;
     chooseIsekai(isk, k);
   }
   return { isk, trace, cards, picks: used, ended: false };
@@ -78,9 +81,12 @@ const check = (label, bad, detail = '') => {
   if (bad) fail.push(label);
 };
 
-const seen = { end: new Set(), world: new Set(), skill: new Set(), event: new Set(), choice: new Set() };
+const seen = { end: new Set(), role: new Set(), skill: new Set(), event: new Set(), choice: new Set() };
 let mismatch = 0, resumeBad = 0, stuck = 0, leaks = 0, rangeBad = 0, cardsSeen = 0;
-const lens = [];
+// เวลาเดินเอง (B68b): ใบตาไม่มีตัวเลือก แต่บอกสิ่งที่ทุ่มเทได้ · การ์ดบทบาทมีคนธรรมดาเสมอ · สิ้นอายุเฉพาะหลังวัยชรา
+let tickBad = 0, roleBad = 0, oldBad = 0;
+const lens = [], clicks = [], humanAges = [];
+const commonerName = roleInfo('commoner').name;
 Object.values(BOTS).forEach((bot, b) => {
   for (let i = 0; i < n; i++) {
     const cfg = setup(i);
@@ -96,36 +102,50 @@ Object.values(BOTS).forEach((bot, b) => {
     if (resumed.trace.join('\n') !== a.trace.join('\n')) resumeBad++;
 
     lens.push(a.cards.length);
+    clicks.push(a.picks.length);
     for (const card of a.cards) {
       cardsSeen++;
       leaks += leakOf(card);
       rangeBad += rangeOf(card.status);
-      if (card.step === 'event') seen.event.add(card.id);
+      if (card.step === 'event') {
+        seen.event.add(card.id);
+        seen.choice.add(`${card.id}#${card.pick}`);
+      }
+      if (card.step === 'tick' && (card.choices.length || card.focusChoices.length < 2 || !(card.focus >= 0))) tickBad++;
     }
+    if (!a.cards[0].choices.includes(commonerName)) roleBad++;
     const { isk } = a;
-    seen.end.add(`${isk.world}:${isk.ending.id}`);
-    seen.world.add(isk.world);
+    const pace = ISEKAI_ROLES[isk.role].pace ?? 1;
+    if (isk.natural && isk.age < ISEKAI_STAGES.at(-1).from * pace) oldBad++;
+    if (isk.natural && pace === 1) humanAges.push(isk.age);
+    seen.end.add(`${isk.role}:${isk.ending.id}`);
+    seen.role.add(isk.role);
     for (const s of isk.skills) seen.skill.add(s);
-    let e = 0;
-    for (const card of a.cards) if (card.step === 'event') seen.choice.add(`${card.id}#${a.picks[2 + e++]}`);
   }
 });
 
 const total = n * Object.keys(BOTS).length;
-lens.sort((x, y) => x - y);
-console.log(`ชาติต่างโลก ${n} ต่อบอท × ${Object.keys(BOTS).length} บอท · seed ${seed} · การ์ด min/p50/max ${lens[0]}/${lens[lens.length >> 1]}/${lens.at(-1)}`);
+for (const xs of [lens, clicks, humanAges]) xs.sort((x, y) => x - y);
+const p50 = (xs) => xs[xs.length >> 1];
+console.log(`ชาติต่างโลก ${n} ต่อบอท × ${Object.keys(BOTS).length} บอท · seed ${seed} · การ์ด min/p50/max ${lens[0]}/${p50(lens)}/${lens.at(-1)} · กดต่อชาติ p50 ${p50(clicks)} · สิ้นอายุ (มนุษย์) p50 ${p50(humanAges)}`);
 check('seed เดิมผลเดิม (รวดเดียว)', mismatch, `${total} ชาติ`);
 check('เซฟ/โหลดกลางทางได้การ์ดเดิม', resumeBad);
 check(`จบได้ทุกชีวิต ภายใน ${CARD_CAP} การ์ด`, stuck);
 check('การ์ดไม่เผยบุญบาป', leaks, `${cardsSeen.toLocaleString('en-US')} การ์ด`);
 check('ค่าบนหน้าต่างสถานะอยู่ในช่วง', rangeBad);
+check('ใบตาเวลาเดินเอง ไม่มีตัวเลือก แต่เปลี่ยนสิ่งที่ทุ่มเทได้', tickBad);
+check('เทพธิดายื่นบทบาทคนธรรมดามีอาชีพทุกครั้ง', roleBad);
+check('สิ้นอายุเฉพาะหลังวัยชรา', oldBad);
+// กดน้อยกว่าชาติไทยชัดเจน (เจ้าของเคาะ) · อายุขัยแบบมนุษย์ ไม่สั้นจนวัยชราหาย ไม่ยาวจนวัยชราน่าเบื่อ
+check('กดต่อชาติ p50 ไม่เกิน 40', p50(clicks) > 40 ? 1 : 0, `p50 ${p50(clicks)}`);
+check('สิ้นอายุ (มนุษย์) p50 อยู่ในช่วง 65–95', p50(humanAges) < 65 || p50(humanAges) > 95 ? 1 : 0, `p50 ${p50(humanAges)}`);
 
-// ทางแยกที่ต้องมีบอทถึง: ตอนจบทุกแบบของทุกโลก (+ ตายกลางทาง) · ทุกโลก · ทุกสกิล · ทุกเหตุการณ์ · ทุกตัวเลือก
+// ทางแยกที่ต้องมีบอทถึง: ตอนจบทุกแบบของทุกบทบาท (+ ตายกลางทาง) · ทุกบทบาท · ทุกสกิล · ทุกเหตุการณ์ · ทุกตัวเลือก
 const missing = (want, got) => want.filter((x) => !got.has(x));
-const wantEnd = Object.entries(ISEKAI_WORLDS).flatMap(([w, d]) => Object.keys(d.end).map((t) => `${w}:${t}`).concat(`${w}:death`));
+const wantEnd = Object.keys(ISEKAI_ROLES).flatMap((r) => Object.keys(roleInfo(r).end).map((t) => `${r}:${t}`).concat(`${r}:death`));
 const reach = {
   ตอนจบ: missing(wantEnd, seen.end),
-  โลก: missing(Object.keys(ISEKAI_WORLDS), seen.world),
+  บทบาท: missing(Object.keys(ISEKAI_ROLES), seen.role),
   สกิล: missing(Object.keys(ISEKAI_SKILLS), seen.skill),
   เหตุการณ์: missing(ISEKAI_EVENTS.map((e) => e.id), seen.event),
   ตัวเลือก: missing(ISEKAI_EVENTS.flatMap((e) => e.choices.map((_, j) => `${e.id}#${j}`)), seen.choice),
@@ -144,7 +164,7 @@ for (let i = 0; i < lives; i++) {
     const { state } = playLife(mixSeed(seed, 9000 + i), content, BOTS.สุ่ม);
     const af = startAfterlife(state);
     let verdicts = 0, locked = 0;
-    for (let guard = 0; guard < 400; guard++) {
+    for (let guard = 0; guard < 1200; guard++) {
       const card = nextAfterCard(af);
       if (card.kind === 'verdict') verdicts++;
       if (card.kind === 'path' && af.from && card.locked?.[PATH_ISEKAI]) locked++;
