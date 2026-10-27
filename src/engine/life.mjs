@@ -2,7 +2,7 @@ import { makeRng } from './rng.mjs';
 import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, petCall, lossCall, petArrivals, petArriveText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
-import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetReturn, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
+import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './career.mjs';
 import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
@@ -217,8 +217,6 @@ export function newLife(seed, content, heir = null) {
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
     price: 1,
-    // ผลตอบแทนจริงรายปีของสินทรัพย์เสี่ยงที่ถือ ตั้งแต่ต้นช่วงวัย — การ์ดเปลี่ยนช่วงเล่าย้อนหลังแล้วล้าง
-    returns: [],
     trail: [],
     // ค่าสถานะรายปีทั้งชีวิต (B38a) — แยกจาก trail เพราะ trail ออกไปกับการ์ดสรุปช่วงวัยอยู่แล้ว
     statTrail: [],
@@ -281,13 +279,10 @@ function markStage(st) {
 // lastAge = อายุสุดท้ายของช่วง: การ์ดเปลี่ยนช่วงออกตอนขึ้นอายุแรกของช่วงใหม่แล้ว
 function stageRecap(st, lastAge) {
   const m = st.stageMark;
-  const items = st.returns.map((x) => `อายุ ${x.age} ${assetName(x.id)} ${formatReturn(x.r)}`);
-  for (const d of st.debts) items.push(`${debtName(d.kind)} ค้าง ${Math.round(d.balance).toLocaleString('en-US')} บาท`);
-  const disclaimer = st.returns.length ? DISCLAIMER : null;
-  st.returns = [];
+  // ไม่เล่าผลตอบแทนรายปีของสินทรัพย์ — ตัวเลขรายปีอ่านเหมือนคำแนะนำลงทุน · ผลรวมยังเห็นในเงินต้นช่วง → ตอนนี้
+  const items = st.debts.map((d) => `${debtName(d.kind)} ค้าง ${Math.round(d.balance).toLocaleString('en-US')} บาท`);
   return {
     items,
-    disclaimer,
     moneySeries: st.trail.filter((p) => p.year >= st.birthYear + m.age),
     stage: m.stage,
     fromAge: m.age,
@@ -574,10 +569,6 @@ function stepYear(st) {
   const era = st.content.era;
   if (st.money > 0) {
     st.money *= 1 + portfolioReturn(era, st.seed, st.alloc, year);
-    for (const id of Object.keys(st.alloc)) {
-      if (id === 'cash' || id === 'deposit' || !assetOpen(era, id, year)) continue;
-      st.returns.push({ age: st.age, id, r: assetReturn(era, st.seed, id, year) });
-    }
   } else if (st.money < 0) st.money *= 1 + lendingRate(era, st.seed, year);
   if (isWorking(st)) st.money += yearlySaving(st, year);
   else if (st.retireBase !== null) st.money -= retireSpend(st, year) - st.pension * st.price;

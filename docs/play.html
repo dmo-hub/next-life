@@ -2070,8 +2070,6 @@ function newLife(seed, content, heir = null) {
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
     price: 1,
-    // ผลตอบแทนจริงรายปีของสินทรัพย์เสี่ยงที่ถือ ตั้งแต่ต้นช่วงวัย — การ์ดเปลี่ยนช่วงเล่าย้อนหลังแล้วล้าง
-    returns: [],
     trail: [],
     // ค่าสถานะรายปีทั้งชีวิต (B38a) — แยกจาก trail เพราะ trail ออกไปกับการ์ดสรุปช่วงวัยอยู่แล้ว
     statTrail: [],
@@ -2134,13 +2132,10 @@ function markStage(st) {
 // lastAge = อายุสุดท้ายของช่วง: การ์ดเปลี่ยนช่วงออกตอนขึ้นอายุแรกของช่วงใหม่แล้ว
 function stageRecap(st, lastAge) {
   const m = st.stageMark;
-  const items = st.returns.map((x) => `อายุ ${x.age} ${assetName(x.id)} ${formatReturn(x.r)}`);
-  for (const d of st.debts) items.push(`${debtName(d.kind)} ค้าง ${Math.round(d.balance).toLocaleString('en-US')} บาท`);
-  const disclaimer = st.returns.length ? DISCLAIMER : null;
-  st.returns = [];
+  // ไม่เล่าผลตอบแทนรายปีของสินทรัพย์ — ตัวเลขรายปีอ่านเหมือนคำแนะนำลงทุน · ผลรวมยังเห็นในเงินต้นช่วง → ตอนนี้
+  const items = st.debts.map((d) => `${debtName(d.kind)} ค้าง ${Math.round(d.balance).toLocaleString('en-US')} บาท`);
   return {
     items,
-    disclaimer,
     moneySeries: st.trail.filter((p) => p.year >= st.birthYear + m.age),
     stage: m.stage,
     fromAge: m.age,
@@ -2427,10 +2422,6 @@ function stepYear(st) {
   const era = st.content.era;
   if (st.money > 0) {
     st.money *= 1 + portfolioReturn(era, st.seed, st.alloc, year);
-    for (const id of Object.keys(st.alloc)) {
-      if (id === 'cash' || id === 'deposit' || !assetOpen(era, id, year)) continue;
-      st.returns.push({ age: st.age, id, r: assetReturn(era, st.seed, id, year) });
-    }
   } else if (st.money < 0) st.money *= 1 + lendingRate(era, st.seed, year);
   if (isWorking(st)) st.money += yearlySaving(st, year);
   else if (st.retireBase !== null) st.money -= retireSpend(st, year) - st.pension * st.price;
