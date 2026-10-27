@@ -312,7 +312,7 @@ events:
     weight: 40
     when: {loss: {roles: [pet], within: 2}}
     title: "บ้านที่เงียบลง"
-    text: "หลังจาก{ชื่อผู้จากไป}จากไป เสียงตอนเปิดประตูกลับบ้านก็หายไปด้วย ชามข้าวกับสายจูงยังวางอยู่ที่เดิม"
+    text: "หลังจาก{ชื่อผู้จากไป}จากไป เสียงตอนเปิดประตูกลับบ้านก็หายไปด้วย ชามข้าวกับที่นอนของมันยังวางอยู่ที่เดิม"
     choices:
       - id: bury_tree
         text: "ฝังไว้ใต้ต้นไม้หลังบ้าน"
@@ -352,7 +352,7 @@ events:
         effects: {happiness: 1}
         merit: [{cat: dana, level: 1}]
       - id: tell_grandkids
-        text: "เล่าเรื่องเจ้าตัวนั้นให้หลานฟัง"
+        text: "เล่าเรื่องมันให้คนที่แวะมาฟัง"
         effects: {relations: 1}
         merit: [{cat: neutral}]
       - id: plant_tree
@@ -438,14 +438,14 @@ events:
     weight: 40
     when: {loss: {roles: [pet], within: 2}}
     title: "เพื่อนตัวแรกที่จากไป"
-    text: "เช้านี้{ชื่อผู้จากไป}ไม่ลุกมารอที่ประตูเหมือนทุกวัน แม่บอกว่ามันแก่แล้ว ไปสบายแล้ว คุณยังถือถุงขนมที่จะเอาไปให้อยู่ในมือ"
+    text: "เช้านี้{ชื่อผู้จากไป}ไม่ลุกมารอที่ประตูเหมือนทุกวัน ผู้ใหญ่ในบ้านบอกว่ามันแก่แล้ว ไปสบายแล้ว คุณยังถือถุงขนมที่จะเอาไปให้อยู่ในมือ"
     choices:
       - id: bury_with_dad
-        text: "ขุดหลุมฝังกับพ่อใต้ต้นมะม่วง"
+        text: "ขุดหลุมฝังใต้ต้นมะม่วงหลังบ้าน"
         effects: {happiness: 1, relations: 1}
         merit: [{cat: neutral}]
       - id: ask_monk
-        text: "ขอแม่ไปใส่บาตรให้มัน"
+        text: "ขอที่บ้านไปใส่บาตรให้มัน"
         effects: {happiness: 1}
         merit: [{cat: dana, level: 1}]
       - id: draw_picture
@@ -453,7 +453,7 @@ events:
         effects: {happiness: 1, knowledge: 1}
         merit: [{cat: neutral}]
       - id: beg_new
-        text: "ขอพ่อแม่รับตัวใหม่"
+        text: "ขอที่บ้านรับตัวใหม่"
         effects: {happiness: 2}
         family: [{add: pet, kind: หมา, life: [10, 15]}]
         merit: [{cat: dana, level: 1}]
@@ -473,7 +473,7 @@ events:
         effects: {happiness: 1}
         merit: [{cat: neutral}]
       - id: make_merit
-        text: "ชวนแม่ไปทำบุญให้"
+        text: "ชวนคนในบ้านไปทำบุญให้"
         cost: {unit: income_x, amount: 0.01}
         effects: {happiness: 1, relations: 1}
         merit: [{cat: dana, level: 1}]
@@ -523,9 +523,10 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 40
-    when: {loss: {roles: [pet], within: 2}}
+    # ข้อความพูดถึงลูกวัยเรียน — กั้นด้วยลูกที่ยังอยู่อายุ 6–18 · ไม่มีลูกวัยนั้นได้ pet_farewell_mid_02 แทน
+    when: {loss: {roles: [pet], within: 2}, family: [{role: child, alive: true, age: [6, 18]}]}
     title: "คนในบ้านเงียบกันหมด"
-    text: "{ชื่อผู้จากไป}จากไปตอนเช้ามืด ลูก ๆ ร้องไห้ไปโรงเรียน คุณเองก็ยืนถือสายจูงอยู่หน้าประตูนานกว่าที่คิด"
+    text: "{ชื่อผู้จากไป}จากไปตอนเช้ามืด ลูก ๆ ร้องไห้ไปโรงเรียน คุณเองก็ยืนมองที่นอนของมันอยู่หน้าประตูนานกว่าที่คิด"
     choices:
       - id: family_burial
         text: "ฝังด้วยกันทั้งบ้านตอนเย็น"
@@ -541,7 +542,36 @@ events:
         effects: {happiness: 1}
         merit: [{cat: dana, level: 1}]
       - id: adopt_new
-        text: "รับหมาตัวใหม่ให้ลูก ๆ"
+        text: "รับตัวใหม่ให้ลูก ๆ"
         effects: {happiness: 2, relations: 1}
         family: [{add: pet, kind: หมา, life: [10, 15]}]
+        merit: [{cat: dana, level: 1}]
+
+  - id: pet_farewell_mid_02
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 40
+    when: {loss: {roles: [pet], within: 2}, family: [{role: child, alive: true, age: [6, 18], count: [0, 0]}]}
+    title: "บ้านที่ไม่มีใครรอ"
+    text: "{ชื่อผู้จากไป}จากไปตอนเช้ามืด เย็นนี้กลับถึงบ้านก็ยังเผลอเรียกชื่อตอนไขกุญแจ ที่นอนของมันยังมีรอยบุ๋มอยู่มุมเดิม"
+    choices:
+      - id: bury_garden
+        text: "ฝังไว้ใต้ต้นไม้หน้าบ้าน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: make_merit
+        text: "ไปทำบุญอุทิศให้ที่วัด"
+        cost: {unit: income_x, amount: 0.01}
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: donate_shelter
+        text: "ยกของใช้ให้บ้านพักสัตว์"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: adopt_new
+        text: "รับตัวใหม่จากบ้านพักสัตว์"
+        effects: {happiness: 2}
+        family: [{add: pet, kind: แมว, life: [12, 18]}]
         merit: [{cat: dana, level: 1}]
