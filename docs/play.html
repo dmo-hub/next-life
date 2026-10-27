@@ -293,6 +293,10 @@ function makeRng(seed) {
   };
   return {
     next,
+    // สถานะภายใน — เซฟ (B128) เก็บเลขนี้แล้วคืนด้วย makeRng(state) เดินต่อจากจุดเดิมพอดี (ค่าเริ่ม a = seed)
+    get state() {
+      return a;
+    },
     int: (lo, hi) => lo + Math.floor(next() * (hi - lo + 1)),
     pick: (arr) => arr[Math.floor(next() * arr.length)],
   };
@@ -4946,6 +4950,80 @@ function titlesOf(st) {
   const chain = familyChain(st, f.worth < 0);
   const family = [...FAMILY_TITLES, ...FAMILY_GOALS].filter((t) => t.test(chain, thai)).map(({ id, name, hint }) => ({ id, name, tier: 'ตระกูล', hint }));
   return { pattern: pattern && { id: pattern.id, name: pattern.name, hint: pattern.hint }, titles, family };
+}
+
+// เซฟแบบภาพถ่ายสถานะ (B128): เก็บสถานะชีวิตจริงแทน seed + ลำดับปุ่ม — อัปเดตเนื้อหาแล้วชีวิตที่ค้างยังเล่นต่อได้
+// เดินทั้งก้อนครั้งเดียว: เนื้อหาเกมไม่เก็บ (ผูกกลับตอนโหลด) · การ์ดเนื้อหาเก็บแค่ id · ตัวสุ่มเก็บสถานะภายใน
+// object ที่ถูกอ้างหลายที่ (af.st = st · kinLoss ชี้คนใน kin · thaiVerdict) เก็บครั้งเดียวแล้วอ้างด้วยเลข — ต่อกลับเป็นตัวเดียวกัน
+
+const SNAP_V = 1;
+const isRng = (v) => typeof v.next === 'function' && typeof v.int === 'function';
+
+function snapshot(root, content) {
+  const events = new Set(content.events);
+  const seen = new Map();
+  const count = (v) => {
+    if (v === null || typeof v !== 'object' || v === content || events.has(v) || isRng(v)) return;
+    const n = seen.get(v) ?? 0;
+    seen.set(v, n + 1);
+    if (n) return;
+    for (const x of Array.isArray(v) ? v : Object.values(v)) count(x);
+  };
+  count(root);
+  const ids = new Map();
+  const enc = (v) => {
+    if (v === null || typeof v !== 'object') return v;
+    if (v === content) return { $c: 1 };
+    if (events.has(v)) return { $ev: v.id };
+    if (isRng(v)) return { $rng: v.state };
+    if (ids.has(v)) return { $ref: ids.get(v) };
+    const shared = seen.get(v) > 1;
+    if (shared) ids.set(v, ids.size);
+    const body = Array.isArray(v) ? v.map(enc) : Object.fromEntries(Object.entries(v).map(([k, x]) => [k, enc(x)]));
+    return shared ? { $id: ids.get(v), $v: body } : body;
+  };
+  return JSON.stringify({ v: SNAP_V, root: enc(root) });
+}
+
+// การ์ดเนื้อหาที่ id หายจากเนื้อหาใหม่ = null (ผู้เรียกทิ้งแล้วจั่วใหม่) · ตัวสุ่มคืนเป็นตัวใหม่ที่เดินต่อจากเลขเดิม
+function restore(text, content) {
+  const snap = JSON.parse(text);
+  if (snap?.v !== SNAP_V) throw new Error('เซฟรูปแบบอื่น');
+  const byId = new Map(content.events.map((e) => [e.id, e]));
+  const table = [];
+  const dec = (v) => {
+    if (v === null || typeof v !== 'object') return v;
+    if (Array.isArray(v)) return v.map(dec);
+    if (v.$c) return content;
+    if ('$ev' in v) return byId.get(v.$ev) ?? null;
+    if ('$rng' in v) return makeRng(v.$rng);
+    if ('$ref' in v) return table[v.$ref];
+    if ('$id' in v) {
+      // จองช่องก่อนถอดตัวใน — ลูกที่อ้างกลับมาหาพ่อ (วน) ได้ตัวเดียวกัน
+      const out = Array.isArray(v.$v) ? [] : {};
+      table[v.$id] = out;
+      if (Array.isArray(out)) out.push(...v.$v.map(dec));
+      else for (const [k, x] of Object.entries(v.$v)) out[k] = dec(x);
+      return out;
+    }
+    return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, dec(x)]));
+  };
+  return dec(snap.root);
+}
+
+// ซ่อมสถานะชีวิตหลังโหลดบนเนื้อหาใหม่: ของที่อ้าง id แล้ว id หาย ให้ทางปลอดภัยแทนการพัง
+// card = การ์ดที่ค้างบนจอตอนเซฟ · คืน true = การ์ดนั้นใช้ไม่ได้แล้ว (การ์ดเนื้อหาหาย/จำนวนตัวเลือกเปลี่ยน) ผู้เรียกจั่วใบถัดไปใหม่
+function repairLife(st, card) {
+  const ev = st.pending && !st.pending.alloc ? st.pending : null;
+  const stale = !!card?.choices?.length && (!st.pending || (ev && ev.choices.length !== card.choices.length));
+  if (stale) st.pending = null;
+  const q = st.queue ?? [];
+  st.queue = q.filter((c) => !('ev' in c) || c.ev);
+  const occ = st.content.era.finance.occupations;
+  if (st.occupation && !occ.some((o) => o.id === st.occupation)) st.occupation = occ[0].id;
+  const ladders = st.content.era.careers?.ladders;
+  if (st.ladder && ladders && !ladders[st.ladder.id]) st.ladder = null;
+  return stale;
 }
 
 // ภาพประกอบวาดด้วยโค้ด (B56): ข้อมูลรูปทรงล้วน ไม่แตะ DOM — จอวาดเป็น SVG ภาพแชร์วาดด้วย Path2D จากชุดเดียวกัน

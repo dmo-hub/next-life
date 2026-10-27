@@ -10,6 +10,10 @@ export function makeRng(seed) {
   };
   return {
     next,
+    // สถานะภายใน — เซฟ (B128) เก็บเลขนี้แล้วคืนด้วย makeRng(state) เดินต่อจากจุดเดิมพอดี (ค่าเริ่ม a = seed)
+    get state() {
+      return a;
+    },
     int: (lo, hi) => lo + Math.floor(next() * (hi - lo + 1)),
     pick: (arr) => arr[Math.floor(next() * arr.length)],
   };
