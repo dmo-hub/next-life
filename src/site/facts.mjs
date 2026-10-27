@@ -1,7 +1,7 @@
 // ตัวเลขบนหน้าเว็บ (B65) — คิดจากข้อมูล/โค้ดชุดเดียวกับเกมทุกครั้งที่ build หน้าเว็บจึงไม่ค้างเลขเก่าเมื่อระบบเปลี่ยน
 // หน้า docs อ้างด้วย <span data-fact="ชื่อ">…</span> · ห้ามมีค่าบัญชีบุญบาปรายชีวิต มีแต่กติกาที่ผู้เล่นอ่านได้อยู่แล้ว
 import { readFileSync } from 'node:fs';
-import { ALL_PATTERNS, TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, ISEKAI_CATS, LEGACY, PATTERN_FROM } from '../engine/index.mjs';
+import { ALL_PATTERNS, TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, ISEKAI_CATS, LEGACY, PATTERN_FROM, ENTRY, ENTRY_EVENTS, GODDESS, GODDESS_VOWS } from '../engine/index.mjs';
 import { isekaiCardCount } from './otherworld.mjs';
 
 const th = (n) => n.toLocaleString('en-US');
@@ -51,6 +51,15 @@ export function siteFacts(content, appSrc = readFileSync(new URL('../ui/app.mjs'
     taxPct: String(Math.round(LEGACY.tax * 100)),
     taxFrom: th(LEGACY.taxFrom / 1e6),
     taxYear: String(LEGACY.taxYear),
+    // ทางเข้าต่างโลก (B68d/e) — ช่วงอายุ จำนวนแบบ และของแถมอ่านได้ · ความถี่เทพธิดาตามกรรมเขียนเป็นทิศบนหน้า ไม่ฉีดเลข
+    entryFirst: `${ENTRY.bands[0].from}–${ENTRY.bands[0].to}`,
+    entryLater: ENTRY.bands.slice(1).map((b) => `${b.from}–${b.to}`).join(' และ '),
+    entryLaterPct: String(Math.round(ENTRY.bands[1].p * 100)),
+    entryMax: String(ENTRY.bands.length),
+    entryKinds: String(Object.keys(ENTRY_EVENTS).length),
+    entryGone: String(Object.values(ENTRY_EVENTS).filter((e) => e.gone).length),
+    vowCount: String(GODDESS_VOWS.length),
+    fatedLuck: String(GODDESS.fatedLuck),
   };
 }
 

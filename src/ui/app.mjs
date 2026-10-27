@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY } from '../engine/index.mjs';
 import { eraArt, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
@@ -1305,6 +1305,8 @@ function render(card) {
       body.append(el('h3', null, card.text));
       if (card.story) body.append(el('p', null, card.story));
       choices.append(enter(button(BTN.next, null, next)));
+    } else if (card.entry) {
+      entryOffer(card, body, choices);
     } else {
       if (card.title) body.append(el('h3', null, card.title));
       body.append(el(card.title ? 'p' : 'h3', card.title ? null : 'lead', card.text));
@@ -1414,6 +1416,29 @@ function foldLater(box, body, choices, card) {
 }
 
 const genLabel = () => (st.gen > 1 ? `รุ่นที่ ${st.gen} · ` : '');
+
+// การ์ดชวนไปต่างโลก (B68d): กรอบสีต่างโลกโผล่กลางการ์ดชีวิต · กดรับ = ชีวิตนี้จบ จึงถามซ้ำก่อนส่งให้เอนจิน
+// การถามซ้ำอยู่ที่จอล้วน ไม่ลงเซฟ — เซฟเก็บเฉพาะปุ่มที่ไปถึงเอนจิน · ปฏิเสธกดทีเดียวพอ
+function entryOffer(card, body, choices) {
+  const gate = el('div', 'ix');
+  // ข้อความในกรอบเป็น div ไม่ใช่ h3/p — กฎสีของแนวการ์ดไทยจับ .body h3/.body p แล้วจะทับสีต่างโลก
+  gate.append(el('span', 'ix-k', 'เสียงเรียกจากต่างโลก'), el('div', 'ix-t', card.text));
+  gate.append(el('div', 'ix-n', card.gone ? 'ถ้ารับ คุณจะหายตัวไปจากโลกนี้' : 'ถ้ารับ ชีวิตในโลกนี้จะจบลงตรงนี้'));
+  body.append(gate);
+  const offer = () => choices.replaceChildren(...card.choices.map((c, i) => keyed(button(c, card.fx?.[i], () => (i === ENTRY.accept ? ask() : play(lifePick(i)))), i)));
+  const ask = () => {
+    choices.replaceChildren(
+      el('p', 'ix-ask', card.gone ? 'แน่ใจนะ หายตัวไปแล้วกลับมาเล่นชีวิตนี้ต่อไม่ได้' : 'แน่ใจนะ ชีวิตนี้จบแล้วกลับมาเล่นต่อไม่ได้'),
+      keyed(button('ยืนยัน ไปต่างโลก', null, () => play(lifePick(ENTRY.accept))), 0),
+      keyed(button('ยังก่อน', null, () => {
+        offer();
+        choices.querySelector('button').focus();
+      }), 1),
+    );
+    choices.querySelector('button').focus();
+  };
+  offer();
+}
 
 // แผ่นคำถามบันทึกชีวิต: บันทึกกับข้ามขนาดเท่ากัน · Enter ในช่องพิมพ์ = บันทึก · Enter นอกช่อง/Esc = ข้าม
 // ข้ามกดง่ายเท่ากดต่อไป คนที่เล่นรวดด้วยแป้นจึงไม่ติด
@@ -1700,6 +1725,12 @@ function renderIsekai(card) {
   if (card.sys) body.append(el('p', 'isys', card.sys));
   if (card.note) body.append(el('p', 'isys', card.note));
   if (card.saves) body.append(el('p', 'isys', `สกิลช่วยไว้ ${card.saves} ครั้งในชาตินี้`));
+  // คำสัญญาที่เทพธิดาฝากไว้ (B68e) — บอกแค่รักษาได้หรือไม่ บุญบาปของมันไปเฉลยที่ปรโลก
+  if (card.step === 'end' && card.vow) {
+    const v = el('div', `ivow ${card.vow.kept ? 'kept' : 'broke'}`);
+    v.append(el('span', 'h', 'คำสัญญากับเทพธิดา'), el('blockquote', null, card.vow.text), el('b', null, card.vow.kept ? 'รักษาไว้ได้' : 'ผิดคำสัญญา'));
+    body.append(v);
+  }
   // ต่างโลกไม่มีฉายาของตัวเอง — เบาะแสชี้ฉายาของโลกเดิมที่ชาติหน้ายังไปเก็บได้ (B108 ใช้สองโลก)
   if (card.step === 'end') clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
   if (card.highlights?.length) body.append(el('p', 'isys', 'ฉากที่จำได้ไม่ลืม'), list(card.highlights, 'picks'));
