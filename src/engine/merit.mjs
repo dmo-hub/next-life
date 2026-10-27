@@ -4,7 +4,8 @@
 // น้ำหนักต่อระดับ 1–3 ไม่เป็นเส้นตรง ให้ป้ายระดับ 3 เป็นเรื่องใหญ่จริง แบบเดียวกับ LEVELS ของค่าสถานะ
 export const MERIT_LEVELS = { 1: 1, 2: 2.5, 3: 4 };
 // น้ำหนักต่อหมวด: คติไม่ได้จัดลำดับความหนักของบาป 8 หมวด จึงเท่ากันหมด · vow_broken เป็นธงไม่มีระดับ น้ำหนักทั้งก้อน
-// และต้องเบากว่าระดับ 1 ของทุกหมวดเดิม (ใบ 09/12 — เป็นกลไกที่เกมตั้งเอง ห้ามหนักเท่าบาปตามคติ)
+// หมวดที่เป็นกลไกเกมตั้งเอง (GAME_CATS) ต้องเบากว่าระดับ 1 ของหมวดตามคติทุกหมวด (ใบ 09/12 — ห้ามหนักเท่าบาปตามคติ)
+// สามหมวดท้ายเป็นของต่างโลก (B68c) · ฆ่าเพื่อแต้มเป็นปาณาติบาตตามคติ จึงหนักเท่าหมวดเดิม
 export const MERIT_WEIGHTS = {
   greed_harm: 1,
   disturb_monk: 1,
@@ -20,14 +21,21 @@ export const MERIT_WEIGHTS = {
   bhavana: 1,
   care_parents: 1,
   help_others: 1,
+  kill_for_gain: 1,
+  cheat_exploit: 0.5,
+  keep_goddess_vow: 0.5,
 };
-export const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'vow_broken'];
+export const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'vow_broken', 'kill_for_gain', 'cheat_exploit'];
 export const FLAG_CATS = ['vow_broken'];
+export const GAME_CATS = ['vow_broken', 'cheat_exploit', 'keep_goddess_vow'];
+// หมวดที่ใช้เฉพาะต่างโลก — ไม่นับเป็นบาปตามคติพระมาลัยที่หน้าเว็บอ้าง
+export const ISEKAI_CATS = ['kill_for_gain', 'cheat_exploit', 'keep_goddess_vow'];
 // ชื่อไทยที่เนื้อหาใช้แทน id ได้ (ใบ 12 เขียนหมวดเป็นไทย) — ต้องตรงกับ vocab ของด่าน build
 const TH = {
   โลภจนเบียดเบียน: 'greed_harm', รบกวนนักบวช: 'disturb_monk', ด่าตีพ่อแม่ผู้ใหญ่: 'abuse_elders', ตัดสินไม่เป็นธรรม: 'unjust_judgment',
   ผิดเมียผู้อื่น: 'adultery', เสน่ห์ยาแฝด: 'love_charm', กดขี่ผู้ใต้ปกครอง: 'oppress_subjects', ดื่มสุรา: 'intoxicants', บนแล้วไม่แก้: 'vow_broken',
   ทาน: 'dana', ศีล: 'sila', ภาวนา: 'bhavana', ดูแลพ่อแม่: 'care_parents', ช่วยคน: 'help_others', กลาง: 'neutral',
+  ฆ่าเพื่อแต้ม: 'kill_for_gain', ใช้สกิลโกงเอาเปรียบ: 'cheat_exploit', รักษาสัญญาเทพธิดา: 'keep_goddess_vow',
 };
 export const meritId = (cat) => TH[cat] ?? cat;
 const TH_BY_ID = Object.fromEntries(Object.entries(TH).map(([th, id]) => [id, th]));
@@ -122,7 +130,7 @@ export function omenText(tone, seed, age) {
 
 // ด่านตารางกลาง: หมวดครบตามรายการ · vow_broken ต้องเบากว่าระดับ 1 ของทุกหมวดเดิม · ตัวคูณกรรมอยู่ข้างที่ถูก
 // cats = รายการหมวดของด่าน build [{id, th, kind}] — ตารางนี้กับด่านต้องรู้จักหมวดชุดเดียวกัน ชื่อไทยแปลงได้ตรงกัน
-export function checkMeritTable(cats, weights = MERIT_WEIGHTS, levels = MERIT_LEVELS, karma = KARMA) {
+export function checkMeritTable(cats, weights = MERIT_WEIGHTS, levels = MERIT_LEVELS, karma = KARMA, game = GAME_CATS) {
   const out = [];
   for (const c of cats) {
     if (c.kind !== 'neutral' && !(weights[c.id] > 0)) out.push(`หมวด ${c.id} ไม่มีน้ำหนักบวกในตารางกลาง`);
@@ -132,8 +140,9 @@ export function checkMeritTable(cats, weights = MERIT_WEIGHTS, levels = MERIT_LE
   }
   for (const c of Object.keys(weights)) if (!cats.some((x) => x.id === c)) out.push(`ตารางกลางมีหมวด ${c} ที่ไม่อยู่ในรายการของด่าน`);
   if (!(levels[1] > 0 && levels[1] < levels[2] && levels[2] < levels[3])) out.push('น้ำหนักระดับต้องเป็นบวกและเรียง 1 < 2 < 3');
-  const min1 = Math.min(...Object.keys(weights).filter((c) => !FLAG_CATS.includes(c)).map((c) => weights[c] * levels[1]));
-  for (const c of FLAG_CATS) if (!(weights[c] < min1)) out.push(`${c} (${weights[c]}) ต้องเบากว่าระดับ 1 ของทุกหมวดเดิม (${min1})`);
+  // เทียบกับหมวดตามคติเท่านั้น — หมวดกลไกเกมด้วยกันหนักเท่ากันได้
+  const min1 = Math.min(...Object.keys(weights).filter((c) => !game.includes(c)).map((c) => weights[c] * levels[1]));
+  for (const c of game) if (!(weights[c] < min1)) out.push(`${c} (${weights[c]}) ต้องเบากว่าระดับ 1 ของทุกหมวดตามคติ (${min1})`);
   if (!(karma.sinMax >= 1 && karma.meritMin > 0 && karma.meritMin <= 1 && karma.ref > 0)) out.push('ตัวคูณกรรม: sinMax ≥ 1 · 0 < meritMin ≤ 1 · ref > 0');
   return out;
 }

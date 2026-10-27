@@ -36,6 +36,10 @@ export const MERIT_CATS = [
   { id: 'bhavana', th: 'ภาวนา', kind: 'merit' },
   { id: 'care_parents', th: 'ดูแลพ่อแม่', kind: 'merit' },
   { id: 'help_others', th: 'ช่วยคน', kind: 'merit' },
+  // ต่างโลก (B68c) — ฆ่ามอนสเตอร์เพื่อปกป้องคนใช้ "กลาง" · ปกป้องผู้อ่อนแอใช้ "ช่วยคน" · ผิดสัญญาเทพธิดาใช้ "บนแล้วไม่แก้"
+  { id: 'kill_for_gain', th: 'ฆ่าเพื่อแต้ม', kind: 'sin' },
+  { id: 'cheat_exploit', th: 'ใช้สกิลโกงเอาเปรียบ', kind: 'sin' },
+  { id: 'keep_goddess_vow', th: 'รักษาสัญญาเทพธิดา', kind: 'merit' },
   { id: 'neutral', th: 'กลาง', kind: 'neutral' },
 ];
 const CAT_BY_NAME = new Map(MERIT_CATS.flatMap((c) => [[c.id, c], [c.th, c]]));

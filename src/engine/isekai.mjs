@@ -4,7 +4,7 @@
 // กรรมจากปรโลก (ระดับ −1..1) เป็นตัวตั้งของโลก: บุญมากได้สกิลให้เลือกมากขึ้นและค่าเริ่มดีขึ้น · บาปหนักได้น้อยลงและโลกโหดขึ้น · ไม่มีตัวเลขบัญชีบนการ์ด
 // บัญชีบุญบาปเป็นของดวงวิญญาณ (ส่วนที่ส่งต่อจากชาติก่อน) — ชาติต่างโลกบันทึกต่อลงบัญชีนั้น แล้วปรโลกตัดสินตอนจบชาติ
 import { makeRng, mixSeed } from './rng.mjs';
-import { newLedger } from './merit.mjs';
+import { newLedger, recordMerit } from './merit.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค' };
 export const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
@@ -588,6 +588,35 @@ export const ISEKAI_EVENTS = [
 ];
 const isekaiById = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
 
+// ป้ายบุญบาปต่างโลก (B68c) ตามเจตนาของตัวเลือก ไม่ตามผลทอย · id เหตุการณ์ → ลำดับตัวเลือก → [หมวด, ระดับ]
+// ฆ่าเพื่อปกป้องคน = กลาง · ชื่อเสียง (fame) เป็นอีกแกน ไม่ลงบัญชีนี้
+const M = (cat, level) => ({ cat, level });
+export const ISEKAI_MERIT = {
+  h2: { 0: [M('help_others', 2)], 1: [M('help_others', 1)], 2: [M('greed_harm', 1)] },
+  h3: { 0: [M('neutral')], 1: [M('help_others', 2)], 2: [M('neutral')] },
+  h4: { 1: [M('kill_for_gain', 3)] },
+  h5: { 2: [M('greed_harm', 2)] },
+  h9: { 0: [M('neutral')] },
+  n2: { 1: [M('cheat_exploit', 1)] },
+  n3: { 0: [M('help_others', 2)], 1: [M('help_others', 1)] },
+  n9: { 0: [M('help_others', 2)], 2: [M('help_others', 1)] },
+  m1: { 0: [M('help_others', 2)], 1: [M('neutral')] },
+  m2: { 0: [M('neutral')], 2: [M('greed_harm', 1)] },
+  m9: { 0: [M('help_others', 3)], 1: [M('kill_for_gain', 3)], 2: [M('help_others', 2)] },
+  v0: { 1: [M('sila', 1)] },
+  v2: { 0: [M('help_others', 1)], 1: [M('help_others', 1)] },
+  v5: { 1: [M('dana', 2), M('help_others', 1)] },
+  s1: { 0: [M('help_others', 2)], 1: [M('help_others', 1)] },
+  s9: { 1: [M('neutral')], 2: [M('help_others', 1)] },
+  g_goblin: { 0: [M('neutral')], 1: [M('neutral')] },
+  g_slave: { 0: [M('help_others', 3), M('dana', 1)], 1: [M('help_others', 2)] },
+  g_dragon: { 1: [M('greed_harm', 1)] },
+  g_goddess: { 1: [M('care_parents', 1)] },
+  g_dungeon: { 0: [M('kill_for_gain', 1)], 2: [M('sila', 1)] },
+  g_fairy: { 0: [M('help_others', 1)], 1: [M('greed_harm', 2), M('kill_for_gain', 1)] },
+  g_storm: { 1: [M('help_others', 2)] },
+};
+
 const isekaiClamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 function isekaiShuffle(rng, arr) {
   const a = [...arr];
@@ -789,6 +818,8 @@ export function chooseIsekai(isk, idx) {
   }
   const deltas = isekaiApply(isk, out.fx);
   for (const f of [out.flag, out.flag2]) if (f) isk.flags[f] = true;
+  // ลงบัญชีที่ดวงวิญญาณพกมา (ไม่ดึงเลขสุ่ม ⇒ ลำดับเหตุการณ์เท่าเดิม) · ธงคำบนที่ผิดติดเป็นธงของรอบต่างโลก
+  for (const f of recordMerit(isk.ledger, ISEKAI_MERIT[ev.id]?.[idx], ev.id)) isk.flags[f] = true;
   let sys = null;
   if (out.skill) {
     const rest = Object.keys(ISEKAI_SKILLS).filter((k) => !isekaiHas(isk, k) && k !== 'luck');

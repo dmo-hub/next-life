@@ -11,6 +11,7 @@ import { newLife, CLASSES, SEXES, fill } from '../src/engine/life.mjs';
 import { MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
 import { SCENES } from '../src/engine/afterlife.mjs';
 import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenText } from '../src/engine/merit.mjs';
+import { ISEKAI_EVENTS, ISEKAI_MERIT } from '../src/engine/isekai.mjs';
 
 const root = new URL('../', import.meta.url);
 const dir = (d) => readdirSync(new URL(d, root)).filter((n) => n.endsWith('.yaml')).sort();
@@ -55,6 +56,7 @@ rows.push(['merit-table', table.length ? `ตก ${table.length} ข้อ` : '�
 for (const t of table) fails.push(`merit-table: ${t}`);
 const controls = {
   'vow_broken หนักเท่าระดับ 1': [MERIT_CATS, { ...MERIT_WEIGHTS, vow_broken: 1 }],
+  'หมวดกลไกเกมหนักเท่าหมวดตามคติ': [MERIT_CATS, { ...MERIT_WEIGHTS, cheat_exploit: 1 }],
   'ขาดหมวด dana': [MERIT_CATS, Object.fromEntries(Object.entries(MERIT_WEIGHTS).filter(([k]) => k !== 'dana'))],
   'หมวดเกินจากด่าน': [MERIT_CATS.filter((c) => c.id !== 'sila'), MERIT_WEIGHTS],
   'ด่านว่าเป็นธงแต่แกนไม่รู้': [MERIT_CATS.map((c) => (c.id === 'adultery' ? { ...c, flag: true } : c)), MERIT_WEIGHTS],
@@ -63,6 +65,19 @@ const controls = {
 };
 for (const [name, args] of Object.entries(controls)) if (!checkMeritTable(...args).length) fails.push(`merit-table ตัวควบคุม "${name}" ไม่ตก`);
 rows.push(['merit-table ตัวควบคุม', `${Object.keys(controls).length} แบบ`]);
+// ป้ายบุญบาปต่างโลก (B68c) อยู่นอก yaml ไม่ผ่านด่านเนื้อหา — ตรวจ id/ลำดับตัวเลือก/หมวด/ระดับ ที่นี่แทน
+const iskById = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
+let iskTags = 0;
+for (const [id, byIdx] of Object.entries(ISEKAI_MERIT)) for (const [i, tags] of Object.entries(byIdx)) {
+  if (!iskById[id]?.choices?.[i]) { fails.push(`isekai-merit: ไม่มีตัวเลือก ${id} #${i}`); continue; }
+  for (const t of tags) {
+    iskTags++;
+    const cat = MERIT_CATS.find((c) => c.id === t.cat);
+    if (!cat) fails.push(`isekai-merit: ${id} #${i} หมวดไม่รู้จัก ${t.cat}`);
+    else if (cat.kind === 'neutral' || cat.flag ? t.level !== undefined : !MERIT_LEVELS[t.level]) fails.push(`isekai-merit: ${id} #${i} ระดับ ${t.level} ไม่เข้ากับหมวด ${t.cat}`);
+  }
+}
+rows.push(['isekai-merit', `${iskTags} ป้าย`]);
 // ข้อความลางอยู่ในแกน ไม่ผ่านด่านเนื้อหา — ตรวจคำต้องห้าม · ความยาว · ไม่มีตัวเลข ที่นี่แทน
 for (const [tone, xs] of Object.entries(OMEN_TEXT)) for (const s of xs) {
   for (const b of ctx.banned) if (b.re.test(s)) fails.push(`ลาง ${tone}: โดนคำต้องห้าม ${b.id} "${s}"`);
