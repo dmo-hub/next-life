@@ -1,7 +1,7 @@
 // ตัวเลขบนหน้าเว็บ (B65) — คิดจากข้อมูล/โค้ดชุดเดียวกับเกมทุกครั้งที่ build หน้าเว็บจึงไม่ค้างเลขเก่าเมื่อระบบเปลี่ยน
 // หน้า docs อ้างด้วย <span data-fact="ชื่อ">…</span> · ห้ามมีค่าบัญชีบุญบาปรายชีวิต มีแต่กติกาที่ผู้เล่นอ่านได้อยู่แล้ว
 import { readFileSync } from 'node:fs';
-import { ALL_PATTERNS, TITLES, FAMILY_TITLES, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, LEGACY, PATTERN_FROM } from '../engine/index.mjs';
+import { ALL_PATTERNS, TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, LEGACY, PATTERN_FROM } from '../engine/index.mjs';
 import { isekaiCardCount } from './otherworld.mjs';
 
 const th = (n) => n.toLocaleString('en-US');
@@ -27,7 +27,10 @@ export function siteFacts(content, appSrc = readFileSync(new URL('../ui/app.mjs'
     eraEvents: th(era.events.length),
     patterns: String(ALL_PATTERNS.length),
     titles: String(TITLES.length),
-    familyTitles: String(FAMILY_TITLES.length),
+    familyTitles: String(FAMILY_TITLES.length + FAMILY_GOALS.length),
+    standMix: String(Math.round(STAND_MIX * 100)),
+    fameLevels: String(FAME.names.length),
+    fameNames: FAME.names.join(' · '),
     realms: String(REALMS.length),
     realmNames: REALMS.map((r) => r.name).join(' · '),
     carryMin: String(Math.round(CARRY.min * 100)),
