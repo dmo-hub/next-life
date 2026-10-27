@@ -10,6 +10,9 @@ import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
 import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_WORLDS, ISEKAI_SKILLS } from '../src/engine/index.mjs';
 import { isekaiCardCount, ISEKAI_SECTION } from '../src/site/otherworld.mjs';
 import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR } from '../src/site/spec.mjs';
+import { BTN } from '../src/ui/labels.mjs';
+import { BTN_HELP } from '../src/site/guide.mjs';
+import { injectDemo, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -134,6 +137,31 @@ const caught = firstUrl && urlsIn(new Set([...specHref].filter((h) => h !== firs
 check('หน้าสเปกครบทุกไฟล์และลิงก์อ้างอิงกดได้', noDoc.length || noHtml.length || unlinked.length || !caught, ` ไฟล์ ${specFiles().length - noDoc.length}/${specFiles().length} · URL ไม่เป็นลิงก์ ${unlinked.length}${unlinked.length ? `: ${unlinked.slice(0, 3).join(' | ')}` : ''}${noHtml.length ? ` · ไม่มีลิงก์ ${noHtml.join(' ')}` : ''} · ตัวควบคุม${caught ? 'จับได้' : 'จับไม่ได้'}`);
 const gh = all.flatMap((p) => [...read(`${p}.html`).matchAll(/https?:\/\/github\.com\/[^"\s]*\/(?:tree|blob)\/[^"\s]*/g)].map((m) => `${p}.html → ${m[0]}`));
 check('หน้าเว็บไม่ลิงก์ไปหน้า tree/blob บน GitHub', gh.length, ` ${all.length} หน้า${gh.length ? ` · เจอ ${gh.slice(0, 3).join(' | ')}` : ''}`);
+
+// 8) คู่มือ (B121): ป้ายปุ่มทุกตัวในค่ากลางขึ้นคู่มือพร้อมคำอธิบาย · หน้าจอเกมไม่เขียนป้ายเหล่านั้นตรงซ้ำ (ไม่งั้นแก้ค่ากลางแล้วเกมไม่ตาม)
+const guide = read('guide.html');
+const appSrc = readFileSync(new URL('../src/ui/app.mjs', import.meta.url), 'utf8');
+const literal = (src) => Object.values(BTN).filter((v) => src.includes(`button('${v}'`));
+const noGuide = Object.entries(BTN).filter(([k, v]) => !guide.includes(`<b class="btn">${v}</b>`) || !BTN_HELP[k]);
+// ตัวควบคุม: ซอร์สที่เขียนป้ายตรงต้องถูกจับ
+const litCaught = literal(`button('${BTN.next}', null, f)`).length === 1;
+check('คู่มือมีป้ายปุ่มจากค่ากลางครบ และเกมไม่เขียนป้ายซ้ำ', noGuide.length || literal(appSrc).length || !litCaught, ` ปุ่ม ${Object.keys(BTN).length - noGuide.length}/${Object.keys(BTN).length}${literal(appSrc).length ? ` · เขียนตรง: ${literal(appSrc).join(' ')}` : ''} · ตัวควบคุม${litCaught ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 9) เลขรุ่นในเกมลิงก์แพตช์โน้ต (B121): text fragment เลื่อนไปที่คำแรกที่ตรง ⇒ เลขรุ่นแต่ละตัวต้องโผล่ครั้งแรกที่หัวข้อของรุ่นนั้น
+const play = read('play.html');
+const notes = read('whatsnew.html');
+const vers = [...notes.matchAll(/<h3>(v\d+\.\d+\.\d+)/g)].map((m) => [m[1], m.index + 4]);
+const early = vers.filter(([v, at]) => notes.search(new RegExp(`${v.replace(/\./g, '\\.')}(?!\\d)`)) !== at).map(([v]) => v);
+check('เลขรุ่นในเกมเป็นลิงก์แพตช์โน้ต และหัวข้อแต่ละรุ่นเป็นจุดแรกที่เลขนั้นโผล่', !play.includes('whatsnew.html#:~:text=') || !play.includes('<a id="appVer"') || !vers.length || early.length, ` ${vers.length} รุ่น${early.length ? ` · โผล่ก่อนหัวข้อ: ${early.slice(0, 5).join(' ')}` : ''}`);
+
+// 10) เดโมการ์ดหน้าแรก (B121): ทุกทางมีผลให้อ่าน มีข้อความผลจริงอย่างน้อยหนึ่งทาง ไม่แตะ storage/network · build ซ้ำได้หน้าเดิม
+const index = read('index.html');
+const demo = index.slice(index.indexOf(DEMO_START), index.indexOf(DEMO_END));
+const res = [...demo.matchAll(/data-res="([^"]*)"/g)].map((m) => m[1]);
+const real = res.filter((r) => !r.startsWith('ผลลงที่ค่าสถานะ')).length;
+const touches = /localStorage|sessionStorage|indexedDB|fetch\(|XMLHttpRequest/.test(demo);
+const same = injectDemo(index, content) === index;
+check('เดโมการ์ดหน้าแรกกดได้ครบทุกทาง ไม่แตะเซฟ', res.length < 3 || res.some((r) => !r) || !real || touches || !same, ` ทาง ${res.length} · ข้อความผลจริง ${real}${touches ? ' · แตะ storage/network' : ''}${same ? '' : ' · build ใหม่แล้วหน้าเปลี่ยน (ยังไม่ได้ build?)'}`);
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 process.exit(fail ? 1 : 0);

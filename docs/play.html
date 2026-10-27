@@ -20,7 +20,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .logo b { font-family:Srisakdi,serif; font-weight:700; font-size:34px; line-height:1.2; color:var(--gold); }
 .logo b span { display:inline-block; }
 .logo small { display:block; font-size:12px; letter-spacing:0.12em; color:var(--sand); }
-.logo .ver { display:inline-block; margin-top:4px; padding:1px 9px; border:1px solid var(--bronze); border-radius:999px; font-size:11px; font-weight:600; color:var(--sand); white-space:nowrap; }
+.logo .ver { text-decoration:none; display:inline-block; margin-top:4px; padding:1px 9px; border:1px solid var(--bronze); border-radius:999px; font-size:11px; font-weight:600; color:var(--sand); white-space:nowrap; }
+.logo a.ver:hover, .logo a.ver:focus-visible { text-decoration:underline; outline:none; }
 .logo .saved { display:inline-block; margin:4px 0 0 6px; font-size:11px; color:var(--sand); white-space:nowrap; }
 .logo .saved:not(:empty)::before { content:'\25CF  '; color:#7FC4B8; }
 .logo .saved.off::before { color:#E07A5F; }
@@ -253,7 +254,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 </style>
 </head>
 <body>
-<header class="logo"><b>เกิดใหม่ทั้งที <span>ชาตินี้ขอชิงมาเกิด</span></b><small>NEXT LIFE</small><span id="appVer" class="ver" title="เวอร์ชันเดโม"></span><span id="saved" class="saved" aria-live="polite"></span></header>
+<header class="logo"><b>เกิดใหม่ทั้งที <span>ชาตินี้ขอชิงมาเกิด</span></b><small>NEXT LIFE</small><a id="appVer" class="ver" title="เวอร์ชันเดโม · แพตช์โน้ตของเวอร์ชันนี้"></a><span id="saved" class="saved" aria-live="polite"></span></header>
 <main id="app"></main>
 <footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <a href="#" id="memoLink">สมุดอนุสรณ์</a> · <a href="about.html">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
 <script>
@@ -5087,6 +5088,35 @@ function avatarArt(stage, sex, tier) {
   return parts;
 }
 
+// ค่ากลางของป้ายบนจอ (B121) — เกมกับหน้าคู่มือ (src/site/guide.mjs) อ่านที่เดียวกัน แก้ป้ายที่นี่แล้วคู่มือตามเอง
+// build.mjs ต่อไฟล์นี้ก่อน app.mjs ในสคริปต์เดียว · ห้ามอ้าง document/window เพราะ Node import ตอนสร้างหน้าเว็บ
+
+// ป้ายปุ่มเดินเรื่องที่คู่มืออธิบาย — ปุ่มที่ผูกกับสถานการณ์เฉพาะ (ลบสมุด · ยกเลิก) ยังเขียนตรงในหน้าจอ
+const BTN = {
+  next: 'ต่อไป',
+  reroll: 'ขอเกิดใหม่',
+  toAfter: 'ไปช่วงระหว่างชาติ',
+  rebirth: 'ไปเกิด',
+  newFamily: 'เริ่มตระกูลใหม่',
+  resume: 'เล่นต่อ',
+  memorial: 'สมุดอนุสรณ์',
+  copy: 'คัดลอกสรุป',
+  skip: 'ข้าม',
+};
+
+// คำอธิบายค่าสถานะ: บอกแค่ทิศว่าค่านั้นไปมีผลกับอะไร — ห้ามตัวเลข เกณฑ์ สูตร และไม่พูดถึงบุญบาป
+// ทุกบรรทัดต้องตรงกับที่แกนเกมอ่านจริง (แก้แกนแล้วทิศเปลี่ยน ต้องแก้ที่นี่ด้วย)
+const STAT_HELP = [
+  ['สุขภาพ', 'ลดลงเองตามวัย · ยิ่งทรุดกว่าที่ร่างกายควรเป็นตามวัยยิ่งเสี่ยงตายในปีนั้น ดูแลจนดีกว่านั้นยิ่งอยู่ยืน · หมดแถบคือตาย'],
+  ['ความสุข', 'ค่อย ๆ กลับสู่ระดับเดิมของตัวเองทุกปี ช่วงสุขหรือทุกข์จึงไม่ค้างนาน · ล้มละลายทำให้ลดลง'],
+  ['ความรู้', 'เพิ่มขึ้นเองทีละน้อยตามวัย · ใช้สอบเข้าเรียนต่อ และช่วยให้ทางที่ต้องใช้หัวสำเร็จง่ายขึ้น'],
+  ['ความสัมพันธ์', 'จางลงเองทีละน้อยถ้าไม่ดูแล · ล้มละลายทำให้ลดลง · ถ้าไปเกิดเป็นลูกหลานในบ้านเดิม ติดตัวไปส่วนหนึ่ง'],
+  ['คอนเน็คชั่น', 'ยิ่งสูงตอนหางาน ยิ่งเจองานค่าแรงดี และสูงพอได้ข้อเสนองานเพิ่ม · ไปเกิดเป็นลูกหลานในบ้านเดิมได้ติดตัวไปส่วนหนึ่ง'],
+  ['เงิน · หนี้', 'เงินเก็บโตหรือหดตามที่เลือกลงทุน · เงินติดตัวติดลบโดนดอกเบี้ยทบ · เงินกู้หักค่างวดทุกปี · หนี้ท่วมรายได้นานหลายปีจะล้มละลาย ทรัพย์เหลือศูนย์'],
+  ['ทุกค่า', 'บางทางเลือกต้องมีค่าถึงก่อนจึงกดได้ (ปุ่มบอกเหตุผล) · ค่าที่สูงหรือต่ำมากทำให้ผลบางเรื่องเอียงดีหรือร้าย และเปลี่ยนเรื่องที่จะเจอ'],
+];
+
+
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
@@ -5096,7 +5126,11 @@ const APP_BUILD = '2026-10-27';
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
 
 const root = document.getElementById('app');
-document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`;
+const appVer = document.getElementById('appVer');
+appVer.textContent = `${APP_VERSION} · ${APP_BUILD}`;
+// เลขรุ่นพาไปแพตช์โน้ตของรุ่นนั้น (B121) — หน้า whatsnew ไม่มี id ต่อรุ่น จึงเลื่อนด้วย text fragment ซึ่งตกไปหัวหน้าเองถ้าเบราว์เซอร์ไม่รองรับ
+// หน้าเวอร์ชันเก่าอยู่ใน docs/v/ ต้องถอยขึ้นหนึ่งชั้น
+appVer.href = `${/\/v\/v\d+\.\d+\.\d+\.html$/.test(location.pathname) ? '../' : ''}whatsnew.html#:~:text=${APP_VERSION}`;
 
 let st;
 // ระหว่างชาติของชีวิตที่เพิ่งจบ (null = ยังมีชีวิต)
@@ -5130,17 +5164,6 @@ function stats(s) {
   return box;
 }
 
-// คำอธิบายค่าสถานะ: บอกแค่ทิศว่าค่านั้นไปมีผลกับอะไร — ห้ามตัวเลข เกณฑ์ สูตร และไม่พูดถึงบุญบาป
-// ทุกบรรทัดต้องตรงกับที่แกนเกมอ่านจริง (แก้แกนแล้วทิศเปลี่ยน ต้องแก้ที่นี่ด้วย)
-const STAT_HELP = [
-  ['สุขภาพ', 'ลดลงเองตามวัย · ยิ่งทรุดกว่าที่ร่างกายควรเป็นตามวัยยิ่งเสี่ยงตายในปีนั้น ดูแลจนดีกว่านั้นยิ่งอยู่ยืน · หมดแถบคือตาย'],
-  ['ความสุข', 'ค่อย ๆ กลับสู่ระดับเดิมของตัวเองทุกปี ช่วงสุขหรือทุกข์จึงไม่ค้างนาน · ล้มละลายทำให้ลดลง'],
-  ['ความรู้', 'เพิ่มขึ้นเองทีละน้อยตามวัย · ใช้สอบเข้าเรียนต่อ และช่วยให้ทางที่ต้องใช้หัวสำเร็จง่ายขึ้น'],
-  ['ความสัมพันธ์', 'จางลงเองทีละน้อยถ้าไม่ดูแล · ล้มละลายทำให้ลดลง · ถ้าไปเกิดเป็นลูกหลานในบ้านเดิม ติดตัวไปส่วนหนึ่ง'],
-  ['คอนเน็คชั่น', 'ยิ่งสูงตอนหางาน ยิ่งเจองานค่าแรงดี และสูงพอได้ข้อเสนองานเพิ่ม · ไปเกิดเป็นลูกหลานในบ้านเดิมได้ติดตัวไปส่วนหนึ่ง'],
-  ['เงิน · หนี้', 'เงินเก็บโตหรือหดตามที่เลือกลงทุน · เงินติดตัวติดลบโดนดอกเบี้ยทบ · เงินกู้หักค่างวดทุกปี · หนี้ท่วมรายได้นานหลายปีจะล้มละลาย ทรัพย์เหลือศูนย์'],
-  ['ทุกค่า', 'บางทางเลือกต้องมีค่าถึงก่อนจึงกดได้ (ปุ่มบอกเหตุผล) · ค่าที่สูงหรือต่ำมากทำให้ผลบางเรื่องเอียงดีหรือร้าย และเปลี่ยนเรื่องที่จะเจอ'],
-];
 function statHelp() {
   const d = el('details', 'stat-help');
   d.append(el('summary', null, 'ค่าสถานะเหล่านี้หมายถึงอะไร?'));
@@ -5742,7 +5765,7 @@ async function copyText(s) {
   }
 }
 function copyButton(text) {
-  const b = button('คัดลอกสรุป', null, async () => {
+  const b = button(BTN.copy, null, async () => {
     b.firstChild.textContent = (await copyText(text())) ? 'คัดลอกแล้ว' : 'คัดลอกไม่ได้';
   });
   return b;
@@ -6195,7 +6218,7 @@ function render(card) {
     // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
     const chart = card.life && lifeChart(card.life, card.age);
     if (chart) body.append(chart);
-    choices.append(enter(button('ไปช่วงระหว่างชาติ', null, () => openBook(card))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
+    choices.append(enter(button(BTN.toAfter, null, () => openBook(card))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
   } else {
     const head = el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : `อายุ ${card.age} · ช่วง${card.stage}`);
     // การ์ดผลเป็นผลของใบก่อนอยู่แล้ว ป้ายซ้ำไม่บอกอะไรเพิ่ม · งานศพเกิดหลังตายจึงไม่ใช่ "ปีเดียวกัน" ของชีวิต
@@ -6248,14 +6271,14 @@ function render(card) {
         if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), list(card.lineage, 'picks'));
         body.append(box);
       }
-      choices.append(enter(button('ต่อไป', null, next)));
-      if (canReroll()) choices.append(button('ขอเกิดใหม่', 'ได้ครั้งเดียว', reroll));
+      choices.append(enter(button(BTN.next, null, next)));
+      if (canReroll()) choices.append(button(BTN.reroll, 'ได้ครั้งเดียว', reroll));
     } else if (card.kind === 'stage') {
       body.append(el('span', 'stamp', card.text));
       const grow = el('p', 'grow');
       grow.append(avatar(card.age), el('span', null, growLabel(card.stage)));
       body.append(grow, recap(card.recap));
-      const go = () => choices.replaceChildren(enter(button('ต่อไป', null, next)));
+      const go = () => choices.replaceChildren(enter(button(BTN.next, null, next)));
       // ต้องตอบหรือข้ามก่อนเดินต่อ — ปุ่มต่อไปขึ้นหลังปิดแผ่นคำถาม
       if (noteAsk && !noteOf(noteAsk)) choices.append(noteSheet(noteAsk, () => {
         go();
@@ -6265,7 +6288,7 @@ function render(card) {
     } else if (card.kind === 'era' || card.kind === 'omen' || card.kind === 'result') {
       body.append(el('h3', null, card.text));
       if (card.story) body.append(el('p', null, card.story));
-      choices.append(enter(button('ต่อไป', null, next)));
+      choices.append(enter(button(BTN.next, null, next)));
     } else {
       if (card.title) body.append(el('h3', null, card.title));
       body.append(el(card.title ? 'p' : 'h3', card.title ? null : 'lead', card.text));
@@ -6279,7 +6302,7 @@ function render(card) {
         choices.append(b);
       });
       // การ์ดเล่าเรื่อง (choices: []) ไม่มีปุ่มให้เลือก — ต้องมีทางไปใบถัดไป
-      if (!card.choices.length) choices.append(enter(button('ต่อไป', null, next)));
+      if (!card.choices.length) choices.append(enter(button(BTN.next, null, next)));
     }
   }
   box.append(body, choices);
@@ -6299,7 +6322,7 @@ function noteSheet(ask, done) {
   Object.assign(inp, { id, type: 'text', maxLength: NOTE_MAX, autocomplete: 'off', placeholder: `พิมพ์สั้น ๆ ไม่เกิน ${NOTE_MAX} ตัวอักษร` });
   const keep = button('บันทึก', null, null);
   keep.type = 'submit';
-  const skip = enter(button('ข้าม', null, () => {
+  const skip = enter(button(BTN.skip, null, () => {
     notePut(ask, '');
     done();
   }));
@@ -6507,8 +6530,8 @@ function renderAfter(card) {
   }
   if (card.note) body.append(el('p', 'note', card.note));
   if (card.done) {
-    choices.append(enter(button('ไปเกิด', null, () => play(T.rebirth))));
-    choices.append(button('เริ่มตระกูลใหม่', null, start));
+    choices.append(enter(button(BTN.rebirth, null, () => play(T.rebirth))));
+    choices.append(button(BTN.newFamily, null, start));
   } else if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = lockText(card, i);
@@ -6516,7 +6539,7 @@ function renderAfter(card) {
       if (why) b.disabled = true;
       choices.append(b);
     });
-  } else choices.append(enter(button('ต่อไป', null, next)));
+  } else choices.append(enter(button(BTN.next, null, next)));
   if (card.kind === 'verdict') choices.append(copyButton(() => summaryText(st.age, card.realm)));
   box.append(top);
   if (court) box.append(courtScene());
@@ -6588,7 +6611,7 @@ function renderIsekai(card) {
       if (why) b.disabled = true;
       choices.append(b);
     });
-  } else choices.append(enter(button('ต่อไป', null, () => play(T.afterNext))));
+  } else choices.append(enter(button(BTN.next, null, () => play(T.afterNext))));
   box.append(top);
   if (s) box.append(isekaiStatusBox(s));
   box.append(body, choices);
@@ -6799,7 +6822,7 @@ function openBook(death) {
     pages[i].draw(body);
     const choices = el('div', 'choices');
     const last = i === pages.length - 1;
-    choices.append(enter(button(last ? 'ไปช่วงระหว่างชาติ' : 'พลิกหน้าถัดไป', null, last ? done : () => show(i + 1))));
+    choices.append(enter(button(last ? BTN.toAfter : 'พลิกหน้าถัดไป', null, last ? done : () => show(i + 1))));
     const row = el('div', 'row');
     const back = button('หน้าก่อน', null, () => show(i - 1));
     back.dataset.prev = '';
@@ -6968,7 +6991,7 @@ function confirmNew(back) {
 function home(card) {
   const where = af ? `ระหว่างชาติ หลังตายอายุ ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
-  choices.append(enter(button('เล่นต่อ', null, () => show(card))), button('เริ่มตระกูลใหม่', null, () => confirmNew(() => home(card))), button('สมุดอนุสรณ์', null, () => openMemo()));
+  choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.memorial, null, () => openMemo()));
 }
 
 // เซฟจากเวอร์ชันที่เนื้อหาต่างกัน (B77): ไม่ทิ้ง — พาไปเล่นต่อในหน้าของเวอร์ชันนั้นที่เก็บไว้ (docs/v/)
@@ -7010,7 +7033,7 @@ function probe(ver) {
 async function oldSave(s) {
   const lost = () => {
     const choices = homeCard('เซฟเก่า', ['ชีวิตที่ค้างไว้เล่นต่อไม่ได้', 'หาหน้าเกมเวอร์ชันที่เล่นค้างไว้ไม่เจอ · สมุดฉายายังอยู่']);
-    choices.append(button('เริ่มตระกูลใหม่', null, () => confirmNew(() => oldSave(s))));
+    choices.append(button(BTN.newFamily, null, () => confirmNew(() => oldSave(s))));
   };
   if (ARCHIVE) return lost();
   homeCard('เซฟจากเวอร์ชันก่อน', ['กำลังหาชีวิตที่เล่นค้างไว้…', 'เกมอัปเดตเนื้อเรื่องตั้งแต่เล่นครั้งก่อน']);
@@ -7019,7 +7042,7 @@ async function oldSave(s) {
   if (!ver && !s.v) for (const v of list) if (await probe(v)) { ver = v; break; }
   if (!ver) return lost();
   const choices = homeCard('เซฟจากเวอร์ชันก่อน', ['มีชีวิตที่เล่นค้างไว้', `เกมอัปเดตเนื้อเรื่องแล้ว ชีวิตนี้เล่นต่อได้ในเวอร์ชัน ${ver} จนจบตระกูล แล้วตระกูลใหม่จะกลับมาเวอร์ชันล่าสุด`]);
-  choices.append(enter(button(`เล่นต่อในเวอร์ชัน ${ver}`, null, () => (location.href = `v/${ver}.html`))), button('เริ่มตระกูลใหม่', null, () => confirmNew(() => oldSave(s))));
+  choices.append(enter(button(`เล่นต่อในเวอร์ชัน ${ver}`, null, () => (location.href = `v/${ver}.html`))), button(BTN.newFamily, null, () => confirmNew(() => oldSave(s))));
 }
 
 // ลิงก์ท้ายหน้าเปิดสมุดได้ทุกหน้า (หน้า "เล่นต่อ" ขึ้นเฉพาะตอนมีเซฟ) · เปิดซ้อนตัวเองไม่ได้ ไม่งั้นปุ่มกลับพากลับมาที่สมุด

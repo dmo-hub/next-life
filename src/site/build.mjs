@@ -4,6 +4,8 @@ import { siteFacts, injectFacts } from './facts.mjs';
 import { catalogHtml } from './catalog.mjs';
 import { spoilersHtml } from './spoilers.mjs';
 import { specHtml } from './spec.mjs';
+import { guideHtml } from './guide.mjs';
+import { injectDemo } from './demo.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · isekai.html (ตัวเกมเลน D) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'overview', 'otherworld'];
@@ -13,6 +15,8 @@ export const GEN_PAGES = [
   ['spoilers', '<!--__SPOILERS__-->', spoilersHtml],
   // หน้าสเปก (B115) แปลงจาก docs/spec/*.md — แทนลิงก์ไปหน้า tree บน GitHub
   ['spec', '<!--__SPEC__-->', specHtml],
+  // คู่มือสั้น (B121) ป้ายปุ่มดึงจาก src/ui/labels.mjs ที่เกมใช้
+  ['guide', '<!--__GUIDE__-->', guideHtml],
 ];
 
 export function buildSite(content, root = new URL('../../', import.meta.url), facts = siteFacts(content)) {
@@ -21,7 +25,9 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   for (const name of FACT_PAGES) {
     const file = at(`docs/${name}.html`);
     const html = readFileSync(file, 'utf8');
-    const next = injectFacts(html, facts, `docs/${name}.html`);
+    // หน้าแรกมีเดโมการ์ดจากแกนเกม (B121) สร้างใหม่ทุก build
+    const faced = injectFacts(html, facts, `docs/${name}.html`);
+    const next = name === 'index' ? injectDemo(faced, content) : faced;
     if (next !== html) writeFileSync(file, next);
     out.push(name);
   }

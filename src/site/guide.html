@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>วิธีเล่น · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<meta name="description" content="คู่มือสั้นของเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด — การ์ดกับตัวเลือก ป้ายผล ช่วงชีวิต ปุ่ม ค่าสถานะ แป้นพิมพ์ และเซฟ">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi:wght@400;600&family=Sarabun:wght@400;600&display=swap">
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: 12px; }
+  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
+  header { background: #1F2430; color: #F4EFE3; padding: 32px 16px 28px; }
+  .w { max-width: 960px; margin: 0 auto; }
+  h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
+  header p { margin: 0 0 6px; color: #E3DDD0; max-width: 680px; }
+  header a { color: #F4EFE3; }
+  main { padding: 20px 16px 64px; }
+  a { color: #7A2E22; }
+  .toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin: 0 0 28px; }
+  .toc section { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 14px 16px; }
+  .toc h2 { font-family: Pridi, serif; font-size: 20px; margin: 0 0 6px; }
+  .toc ol { margin: 0; padding-left: 22px; }
+  .toc li { margin: 0 0 6px; }
+  .toc li > a { color: #1F2430; font-weight: 600; line-height: 1.5; padding: 4px 0; display: inline; }
+  .toc small { color: #4A4F5C; }
+  .toc .sub { font-size: 14px; line-height: 1.5; }
+  .toc .sub a { display: block; color: #4A4F5C; padding: 3px 0; }
+  .doc { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 18px 20px; margin: 0 0 20px; overflow-wrap: anywhere; }
+  .doc > h2 { font-family: Pridi, serif; font-size: clamp(22px, 4vw, 28px); line-height: 1.35; margin: 0 0 4px; }
+  .doc h3 { font-family: Pridi, serif; font-size: 21px; margin: 24px 0 6px; border-bottom: 1px solid #C9BFA9; padding-bottom: 2px; }
+  .doc h4 { font-family: Pridi, serif; font-size: 18px; margin: 18px 0 4px; }
+  .doc h5 { font-size: 16px; margin: 14px 0 4px; }
+  .doc p { margin: 0 0 10px; }
+  .doc ul, .doc ol { margin: 0 0 10px; padding-left: 22px; }
+  .doc li { margin: 0 0 4px; }
+  .doc li ul, .doc li ol { margin: 4px 0 0; }
+  .src { font-size: 13px; color: #4A4F5C; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: .88em; background: #E6E0D3; padding: 0 4px; }
+  pre { background: #1F2430; color: #F4EFE3; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .tw { overflow-x: auto; margin: 0 0 12px; }
+  table { border-collapse: collapse; font-size: 14px; background: #FBF8F1; min-width: 100%; }
+  th, td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; overflow-wrap: normal; }
+  th { background: #E6E0D3; font-weight: 600; }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; }
+  .toc a { display: inline-block; padding: 8px 12px; min-height: 44px; line-height: 28px; background: #F4EFE3; border: 1px solid #C9BFA9; color: #1F2430; text-decoration: none; }
+  .toc a:hover, .toc a:focus-visible { border-color: #1F2430; outline: none; }
+  main section { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 16px 20px; margin: 0 0 16px; }
+  main section h2 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 8px; }
+  main section p, main section ul, main section ol { margin: 0 0 8px; }
+  main section ul, main section ol { padding-left: 22px; }
+  .stages small { color: #4A4F5C; }
+  .fx { white-space: nowrap; font-size: 14px; border: 1px solid #C9BFA9; padding: 0 6px; background: #FBF8F1; }
+  b.btn { display: inline-block; font-weight: 600; border: 1px solid #1F2430; padding: 0 8px; background: #FBF8F1; white-space: nowrap; }
+  dl { margin: 0; } dt { font-weight: 600; margin-top: 8px; } dd { margin: 0 0 4px; }
+  kbd { font-family: ui-monospace, Consolas, monospace; font-size: 13px; border: 1px solid #8E8574; border-bottom-width: 2px; padding: 0 5px; background: #FBF8F1; }
+  footer { font-size: 13px; color: #4A4F5C; margin-top: 32px; }
+</style>
+</head>
+<body>
+<header><div class="w">
+  <h1>วิธีเล่น</h1>
+  <p>คู่มือสั้นสำหรับเริ่มเล่น ป้ายปุ่มและคำอธิบายค่าสถานะบนหน้านี้ดึงจากชุดเดียวกับในเกม จึงตรงกับที่เห็นบนจอเสมอ</p>
+  <p>เวอร์ชัน <span data-fact="version">v0</span> · <a href="index.html">หน้าแรก</a> · <a href="overview.html">ภาพรวมการออกแบบ</a> · <a href="play.html">เล่นเกม</a></p>
+</div></header>
+<main><div class="w">
+<!--__GUIDE__-->
+  <footer>อยากรู้ว่าอะไรมาจากข้อมูลจริง อะไรเป็นสมมติฐานเกม → <a href="about.html">กลไกในเกม</a> · ของใหม่แต่ละเวอร์ชัน → <a href="whatsnew.html">แพตช์โน้ต</a> · เกมนี้ไม่ใช่คำแนะนำการลงทุน</footer>
+</div></main>
+</body>
+</html>

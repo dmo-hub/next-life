@@ -114,7 +114,7 @@ if (!checkOnly) {
 }
 
 // ทุกหน้าเว็บ 390/1280: ล้นแนวนอน 0 · console error 0
-for (const p of ['index', 'about', 'overview', 'otherworld', 'catalog', 'cards', 'whatsnew', 'spec']) {
+for (const p of ['index', 'about', 'overview', 'otherworld', 'catalog', 'cards', 'whatsnew', 'spec', 'guide']) {
   for (const w of [390, 1280]) {
     const { page, errors } = await open(`${p}.html`, w);
     await page.waitForLoadState('load');

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>วิธีเล่น · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<meta name="description" content="คู่มือสั้นของเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด — การ์ดกับตัวเลือก ป้ายผล ช่วงชีวิต ปุ่ม ค่าสถานะ แป้นพิมพ์ และเซฟ">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi:wght@400;600&family=Sarabun:wght@400;600&display=swap">
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: 12px; }
+  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
+  header { background: #1F2430; color: #F4EFE3; padding: 32px 16px 28px; }
+  .w { max-width: 960px; margin: 0 auto; }
+  h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
+  header p { margin: 0 0 6px; color: #E3DDD0; max-width: 680px; }
+  header a { color: #F4EFE3; }
+  main { padding: 20px 16px 64px; }
+  a { color: #7A2E22; }
+  .toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin: 0 0 28px; }
+  .toc section { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 14px 16px; }
+  .toc h2 { font-family: Pridi, serif; font-size: 20px; margin: 0 0 6px; }
+  .toc ol { margin: 0; padding-left: 22px; }
+  .toc li { margin: 0 0 6px; }
+  .toc li > a { color: #1F2430; font-weight: 600; line-height: 1.5; padding: 4px 0; display: inline; }
+  .toc small { color: #4A4F5C; }
+  .toc .sub { font-size: 14px; line-height: 1.5; }
+  .toc .sub a { display: block; color: #4A4F5C; padding: 3px 0; }
+  .doc { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 18px 20px; margin: 0 0 20px; overflow-wrap: anywhere; }
+  .doc > h2 { font-family: Pridi, serif; font-size: clamp(22px, 4vw, 28px); line-height: 1.35; margin: 0 0 4px; }
+  .doc h3 { font-family: Pridi, serif; font-size: 21px; margin: 24px 0 6px; border-bottom: 1px solid #C9BFA9; padding-bottom: 2px; }
+  .doc h4 { font-family: Pridi, serif; font-size: 18px; margin: 18px 0 4px; }
+  .doc h5 { font-size: 16px; margin: 14px 0 4px; }
+  .doc p { margin: 0 0 10px; }
+  .doc ul, .doc ol { margin: 0 0 10px; padding-left: 22px; }
+  .doc li { margin: 0 0 4px; }
+  .doc li ul, .doc li ol { margin: 4px 0 0; }
+  .src { font-size: 13px; color: #4A4F5C; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: .88em; background: #E6E0D3; padding: 0 4px; }
+  pre { background: #1F2430; color: #F4EFE3; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .tw { overflow-x: auto; margin: 0 0 12px; }
+  table { border-collapse: collapse; font-size: 14px; background: #FBF8F1; min-width: 100%; }
+  th, td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; overflow-wrap: normal; }
+  th { background: #E6E0D3; font-weight: 600; }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; }
+  .toc a { display: inline-block; padding: 8px 12px; min-height: 44px; line-height: 28px; background: #F4EFE3; border: 1px solid #C9BFA9; color: #1F2430; text-decoration: none; }
+  .toc a:hover, .toc a:focus-visible { border-color: #1F2430; outline: none; }
+  main section { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 16px 20px; margin: 0 0 16px; }
+  main section h2 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 8px; }
+  main section p, main section ul, main section ol { margin: 0 0 8px; }
+  main section ul, main section ol { padding-left: 22px; }
+  .stages small { color: #4A4F5C; }
+  .fx { white-space: nowrap; font-size: 14px; border: 1px solid #C9BFA9; padding: 0 6px; background: #FBF8F1; }
+  b.btn { display: inline-block; font-weight: 600; border: 1px solid #1F2430; padding: 0 8px; background: #FBF8F1; white-space: nowrap; }
+  dl { margin: 0; } dt { font-weight: 600; margin-top: 8px; } dd { margin: 0 0 4px; }
+  kbd { font-family: ui-monospace, Consolas, monospace; font-size: 13px; border: 1px solid #8E8574; border-bottom-width: 2px; padding: 0 5px; background: #FBF8F1; }
+  footer { font-size: 13px; color: #4A4F5C; margin-top: 32px; }
+</style>
+</head>
+<body>
+<header><div class="w">
+  <h1>วิธีเล่น</h1>
+  <p>คู่มือสั้นสำหรับเริ่มเล่น ป้ายปุ่มและคำอธิบายค่าสถานะบนหน้านี้ดึงจากชุดเดียวกับในเกม จึงตรงกับที่เห็นบนจอเสมอ</p>
+  <p>เวอร์ชัน <span data-fact="version">v0.2.61</span> · <a href="index.html">หน้าแรก</a> · <a href="overview.html">ภาพรวมการออกแบบ</a> · <a href="play.html">เล่นเกม</a></p>
+</div></header>
+<main><div class="w">
+
+<nav class="toc" aria-label="สารบัญ"><a href="#goal">เล่นยังไง</a><a href="#card">การ์ดกับตัวเลือก</a><a href="#stages">ช่วงชีวิต</a><a href="#buttons">ปุ่ม</a><a href="#stats">ค่าสถานะ</a><a href="#keys">แป้นพิมพ์</a><a href="#save">เซฟและเวอร์ชัน</a></nav>
+<section id="goal"><h2>เล่นยังไง</h2>
+<p>เกิดแบบสุ่มเป็นคนไทยหนึ่งคน อ่านการ์ดทีละใบแล้วเลือกทาง ชีวิตเดินไปตามปีจนตาย ไม่มีชนะหรือแพ้ ตายแล้วไปปรโลก รู้ผลบุญบาปที่นั่น แล้วไปเกิดต่อเป็นลูกหลานของตัวเองหรือเกิดใหม่ตามกรรม เล่นต่อได้หลายรุ่น</p></section>
+<section id="card"><h2>การ์ดกับตัวเลือก</h2><ul>
+<li>แตะตัวเลือกที่ต้องการ · ป้ายด้านขวาบอกแค่ทิศทาง เช่น <span class="fx">ความสุข&nbsp;↑ · เงิน&nbsp;↓</span> ไม่บอกตัวเลข</li>
+<li><span class="fx">สำเร็จ ~60%</span> คือทางที่อาจพลาดได้ ตัวเลขเป็นโอกาสโดยประมาณจากค่าสถานะตอนนี้ · <span class="fx">สำเร็จ ?</span> คือทางที่โชคเอียงด้วยสิ่งที่มองไม่เห็น</li>
+<li>ปุ่มสีเทากดไม่ได้ และบอกเหตุผลแทนป้ายผล เช่น อายุยังไม่ถึงหรือเงินไม่พอ (บอกยอดที่ขาด)</li>
+<li>การ์ดที่ไม่มีให้เลือกเป็นการ์ดเล่าเรื่อง กด <b class="btn">ต่อไป</b> เพื่อไปต่อ</li>
+</ul></section>
+<section id="stages"><h2>ช่วงชีวิต</h2><p>การ์ดแต่ละใบออกตามช่วงวัย หลังตายเป็นช่วงระหว่างชาติ</p><ol class="stages"><li>เด็ก <small>0–12 ปี</small></li><li>วัยรุ่น <small>13–18 ปี</small></li><li>หนุ่มสาว <small>19–30 ปี</small></li><li>ทำงาน <small>31–45 ปี</small></li><li>กลางคน <small>46–59 ปี</small></li><li>ชรา <small>60+ ปี</small></li></ol></section>
+<section id="buttons"><h2>ปุ่มเดินเรื่อง</h2><div class="tw"><table><thead><tr><th>ปุ่ม</th><th>ทำอะไร</th></tr></thead><tbody><tr><td><b class="btn">ต่อไป</b></td><td>ไปการ์ดถัดไป บนการ์ดเล่าเรื่องที่ไม่มีให้เลือก</td></tr><tr><td><b class="btn">ขอเกิดใหม่</b></td><td>บนการ์ดเกิดของรุ่นแรก ก่อนเลือกอะไร ขอสุ่มชีวิตใหม่ได้ครั้งเดียว</td></tr><tr><td><b class="btn">ไปช่วงระหว่างชาติ</b></td><td>หลังการ์ดตาย เปิดสมุดชีวิตแล้วไปปรโลก</td></tr><tr><td><b class="btn">ไปเกิด</b></td><td>จบฉากปรโลก ไปเกิดเป็นลูกหลานหรือเกิดใหม่ตามกรรม</td></tr><tr><td><b class="btn">เริ่มตระกูลใหม่</b></td><td>ลบชีวิตที่ค้างไว้ทั้งตระกูลแล้วเริ่มจากรุ่นแรก (ถามยืนยันก่อน)</td></tr><tr><td><b class="btn">เล่นต่อ</b></td><td>เปิดเกมอีกครั้งแล้วเล่นชีวิตที่ค้างไว้ต่อ</td></tr><tr><td><b class="btn">สมุดอนุสรณ์</b></td><td>ดูชีวิตที่จบไปแล้วของเครื่องนี้</td></tr><tr><td><b class="btn">คัดลอกสรุป</b></td><td>คัดลอกสรุปชีวิตเป็นข้อความไว้แปะที่อื่น</td></tr><tr><td><b class="btn">ข้าม</b></td><td>ข้ามแผ่นบันทึกชีวิตโดยไม่เขียนอะไร</td></tr></tbody></table></div></section>
+<section id="stats"><h2>ค่าสถานะ</h2><p>ข้อความชุดเดียวกับที่กด "ค่าสถานะเหล่านี้หมายถึงอะไร?" ในเกม</p><dl><dt>สุขภาพ</dt><dd>ลดลงเองตามวัย · ยิ่งทรุดกว่าที่ร่างกายควรเป็นตามวัยยิ่งเสี่ยงตายในปีนั้น ดูแลจนดีกว่านั้นยิ่งอยู่ยืน · หมดแถบคือตาย</dd><dt>ความสุข</dt><dd>ค่อย ๆ กลับสู่ระดับเดิมของตัวเองทุกปี ช่วงสุขหรือทุกข์จึงไม่ค้างนาน · ล้มละลายทำให้ลดลง</dd><dt>ความรู้</dt><dd>เพิ่มขึ้นเองทีละน้อยตามวัย · ใช้สอบเข้าเรียนต่อ และช่วยให้ทางที่ต้องใช้หัวสำเร็จง่ายขึ้น</dd><dt>ความสัมพันธ์</dt><dd>จางลงเองทีละน้อยถ้าไม่ดูแล · ล้มละลายทำให้ลดลง · ถ้าไปเกิดเป็นลูกหลานในบ้านเดิม ติดตัวไปส่วนหนึ่ง</dd><dt>คอนเน็คชั่น</dt><dd>ยิ่งสูงตอนหางาน ยิ่งเจองานค่าแรงดี และสูงพอได้ข้อเสนองานเพิ่ม · ไปเกิดเป็นลูกหลานในบ้านเดิมได้ติดตัวไปส่วนหนึ่ง</dd><dt>เงิน · หนี้</dt><dd>เงินเก็บโตหรือหดตามที่เลือกลงทุน · เงินติดตัวติดลบโดนดอกเบี้ยทบ · เงินกู้หักค่างวดทุกปี · หนี้ท่วมรายได้นานหลายปีจะล้มละลาย ทรัพย์เหลือศูนย์</dd><dt>ทุกค่า</dt><dd>บางทางเลือกต้องมีค่าถึงก่อนจึงกดได้ (ปุ่มบอกเหตุผล) · ค่าที่สูงหรือต่ำมากทำให้ผลบางเรื่องเอียงดีหรือร้าย และเปลี่ยนเรื่องที่จะเจอ</dd></dl></section>
+<section id="keys"><h2>แป้นพิมพ์</h2><ul>
+<li><kbd>1</kbd>–<kbd>9</kbd> เลือกตัวเลือกตามเลขบนปุ่ม (อ่านตำแหน่งแป้น ใช้ได้แม้แป้นเป็นภาษาไทย)</li>
+<li><kbd>Enter</kbd> กดปุ่มเดินเรื่องของการ์ด เช่น <b class="btn">ต่อไป</b></li>
+<li><kbd>←</kbd> <kbd>→</kbd> หรือ <kbd>Space</kbd> พลิกหน้าสมุดชีวิต · <kbd>Esc</kbd> ปิดแผ่นบันทึก</li>
+</ul></section>
+<section id="save"><h2>เซฟและเวอร์ชัน</h2><ul>
+<li>เกมบันทึกเองทุกครั้งที่เลือก เก็บไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น ไม่มีบัญชีผู้ใช้ · เปิดใหม่จะเห็นปุ่ม <b class="btn">เล่นต่อ</b></li>
+<li>ล้างข้อมูลเบราว์เซอร์หรือเปิดโหมดส่วนตัว เซฟจะหาย · <b class="btn">เริ่มตระกูลใหม่</b> ลบทั้งตระกูล</li>
+<li>เกมอัปเดตเนื้อเรื่องแล้วชีวิตเก่ายังเล่นต่อได้ในหน้าเวอร์ชันเดิม เกมจะพาไปเอง</li>
+<li>เลขเวอร์ชันมุมบนของเกมกดได้ พาไปแพตช์โน้ตของเวอร์ชันนั้น</li>
+</ul></section>
+  <footer>อยากรู้ว่าอะไรมาจากข้อมูลจริง อะไรเป็นสมมติฐานเกม → <a href="about.html">กลไกในเกม</a> · ของใหม่แต่ละเวอร์ชัน → <a href="whatsnew.html">แพตช์โน้ต</a> · เกมนี้ไม่ใช่คำแนะนำการลงทุน</footer>
+</div></main>
+</body>
+</html>
