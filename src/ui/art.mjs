@@ -104,6 +104,213 @@ export function eraArt(id) {
   return scene ? [...ERA_FRAME, ...scene] : null;
 }
 
+const artPerson = (x, base, s = 1) => [
+  artLine(artCirc(x, base - 16 * s, 3 * s), { w: 1.2 }),
+  artLine(`M${x} ${base - 13 * s}v${7 * s}l${-3 * s} ${6 * s}M${x} ${base - 6 * s}l${3 * s} ${6 * s}M${x - 4 * s} ${base - 10 * s}h${8 * s}`, { w: 1.2 }),
+];
+const artFlame = (x, y) => artFill(`M${x} ${y}c3 4 4 7 0 9c-4-2-3-5 0-9z`);
+const artBox = (x, y, w, h) => artLine(`M${x} ${y}h${w}v${h}h${-w}zM${x + w / 2} ${y}v${h * 0.4}`, { w: 1.2 });
+const artBag = (x, y) => artLine(`M${x} ${y}h12q2 0 2 3t-2 3h-12q-2 0-2-3t2-3z`, { w: 1 });
+const artFish = (x, y) => [artFill(`M${x} ${y}q8-6 16 0q-8 6-16 0zM${x} ${y}l-5-4v8z`), artFill(artCirc(x + 12, y - 1, 0.9), ART_INK.lacquer2)];
+const artPlane = (x, y) => artLine(`M${x} ${y}h26q6 0 8 3q-2 3-8 3h-26zM${x + 4} ${y}l-4-8h4l6 8M${x + 12} ${y + 3}l6 8h4l-2-8`, { w: 1.2 });
+const artPalm = (x, base) => [artLine(`M${x} ${base}q-2-18 8-32`, { w: 2 }), artLine(`M${x + 8} ${base - 32}q-12-4-18 6M${x + 8} ${base - 32}q12-6 18 4M${x + 8} ${base - 32}q-4-10-14-10`)];
+const artStilt = (x) => artLine(`M${x - 2} 40l14-12l14 12zM${x} 40v12h24v-12M${x + 2} 52v10M${x + 22} 52v10M${x + 9} 52v-7h6v7`, { w: 1.2 });
+const artWheel = (cx, cy, r) => artLine(artCirc(cx, cy, r), { w: 1.2 });
+
+// สมุดภาพบ้านเมือง (B130): ภาพละช่อง ปลดตามวัยที่เจอการ์ดของเหตุการณ์ หรือการ์ดตามมา (sp) · กรอบเดียวกับภาพยุค
+// [ช่อง, ป้ายช่อง, คำบรรยายภาพ, รูปทรง] · ภาพหลักของเหตุการณ์คือภาพยุคเดิม ไม่อยู่ในรายการนี้
+export const ERA_PICS = {
+  oil_crisis_2: [
+    ['kid', 'วัยเด็ก', 'ตะเกียงบนโต๊ะกินข้าว ไฟดับทั้งซอย', [
+      artLine('M40 52h70M46 52v14M104 52v14'),
+      artLine('M48 52q5 5 10 0M92 52q5 5 10 0', { w: 1.2 }),
+      artLine('M68 52h14l-2-4h-10zM70 48q-3-8 2-14h6q5 6 2 14zM70 34q5-8 10 0', { w: 1.2 }),
+      artFlame(75, 37),
+      artLine('M60 32l-5-3M90 32l5-3M75 26v-5', { stroke: ART_INK.cream, w: 1 }),
+      artHouse(130, 66), artHouse(156, 66, 0.8),
+      artFill('M168 14a7 7 0 1 0 6 11a6 6 0 1 1-6-11z', ART_INK.cream),
+    ]],
+    ['adult', 'วัยทำงาน', 'ประตูโรงงานติดป้ายลดกะ', [
+      ART_GROUND,
+      artLine('M30 66V40l14-10v10l14-10v10l14-10v10l14-10V66M92 66V20h8v46'),
+      artLine('M110 66V44h56v22M118 44v22M126 44v22M134 44v22M142 44v22M150 44v22M158 44v22', { w: 1.2 }),
+      { d: 'M118 28h40v13h-40z', fill: ART_INK.cream },
+      { d: 'M122 32h32M122 37h20', stroke: ART_INK.lacquer2, w: 1.4 },
+    ]],
+    ['old', 'วัยชรา', 'บิลค่าไฟกับเทียนบนหิ้ง', [
+      artLine('M36 38h86M44 38v6M114 38v6', { stroke: ART_INK.bronze2 }),
+      artLine('M54 38v-14h6v14z', { w: 1.2 }), artFlame(57, 15),
+      { d: 'M78 38l4-22h24l-4 22z', fill: ART_INK.cream },
+      { d: 'M85 22h15M84 27h13M83 32h8', stroke: ART_INK.lacquer2, w: 1.2 },
+      artFill('M152 16l-12 22h10l-6 22l16-28h-10l6-16z'),
+      ART_GROUND,
+      artLine('M58 66v-12h20v12M58 62h20M58 58h20', { w: 1.2 }),
+    ]],
+    ['sp', 'พิเศษ · นาผืนเก่า', 'ทุ่งนากับควาย คนกลับบ้านทำนา', [
+      ART_GROUND,
+      artLine([30, 42, 54, 66, 78].map((x) => `M${x} 66v-8M${x} 61l-4-4M${x} 61l4-4`).join(''), { w: 1 }),
+      ...artPerson(98, 66), artFill('M91 50l7-5l7 5z'),
+      artLine('M122 44h30q6 0 6 6v4q0 4-4 4h-32q-4 0-4-4v-4q0-6 4-6zM126 58v8M134 58v8M146 58v8M154 58v8M152 44l10-2q4 4 0 10h-6M160 42q6-6 12-2M122 46q-4 4-2 10'),
+      artFill(artCirc(40, 22, 6), ART_INK.gold),
+    ]],
+  ],
+  typhoon_gay: [
+    ['kid', 'วัยเด็ก', 'หลังคาสังกะสีปลิวกลางลม', [
+      ART_GROUND,
+      artLine('M40 66V42h36v24M52 66V54h10v12'),
+      artLine('M88 30l30-10l4 8l-30 10z'),
+      artLine('M94 28l3 7M101 26l3 7M108 23l3 7M115 21l3 7', { w: 0.8 }),
+      artLine('M130 30q16-4 30 2M126 42q20-4 42 2M134 54q14-2 28 2', { stroke: ART_INK.cream, w: 1.2 }),
+    ]],
+    ['adult', 'วัยทำงาน', 'เรือประมงคว่ำบนหาด', [
+      artLine('M24 60q70-8 152 2', { stroke: ART_INK.bronze2, w: 1 }),
+      artLine(artWave(24, 72, 66, 12, 4), { stroke: ART_INK.cream, w: 1.2 }),
+      artLine('M68 56q30-22 62 0zM99 45v-6M130 56l6-3'),
+      ...artPalm(154, 62),
+      artLine('M30 22h24M36 30h20', { stroke: ART_INK.cream, w: 1.2 }),
+    ]],
+  ],
+  tom_yum_kung: [
+    ['kid', 'วัยเด็ก', 'กล่องย้ายบ้านหน้าห้องแถว', [
+      ART_GROUND,
+      artLine('M30 66V26h90v40M60 26v40M90 26v40'),
+      artLine('M34 46h22M34 51h22M34 56h22M34 61h22M64 46h22M64 51h22M64 56h22M64 61h22', { stroke: ART_INK.bronze2, w: 0.8 }),
+      artLine('M34 30h22v8h-22zM64 30h22v8h-22zM94 30h22v8h-22z', { w: 1 }),
+      artBox(128, 50, 20, 16), artBox(150, 50, 20, 16), artBox(139, 34, 20, 16),
+    ]],
+    ['adult', 'วัยทำงาน', 'เปิดท้ายขายของมือสอง', [
+      ART_GROUND,
+      artLine('M36 60V48h40v12M76 60V40h14l10 10v10zM36 60l-10 4'),
+      artWheel(48, 61, 4), artWheel(90, 61, 4),
+      artLine('M42 48v-8h12v8M56 48v-6h14v6', { w: 1 }),
+      artLine('M120 66v-14M114 52h12l-3-7h-6zM134 66v-4h-2v-14h22v14h-2v4zM134 52h14v8h-14z', { w: 1.2 }),
+      { d: 'M158 40l8-8h8v8l-8 8z', fill: ART_INK.cream },
+      artFill(artCirc(170, 36, 1.4), ART_INK.lacquer2),
+    ]],
+    ['old', 'วัยชรา', 'สร้อยทองบนตาชั่งร้านทอง', [
+      artLine('M24 66h152', { stroke: ART_INK.bronze2, w: 1 }),
+      artLine('M100 64V22M86 64h28M70 26h60M72 26l-6 18M72 26l6 18M128 26l-6 18M128 26l6 18M62 44q10 6 20 0zM118 44q10 6 20 0z'),
+      artFill(artCirc(100, 22, 2.2)),
+      artFill([66, 70, 74, 78, 68, 76].map((x, i) => artCirc(x, i < 4 ? 42 : 39, 1.8)).join('')),
+      artFill('M124 42h6v-4h-6zM131 42h5v-3h-5z', ART_INK.gold),
+    ]],
+  ],
+  sars: [
+    ['kid', 'วัยเด็ก', 'ปรอทวัดไข้กับหน้ากาก', [
+      artLine('M60 56l38-28', { w: 4 }),
+      artFill(artCirc(57, 58, 5)),
+      artLine('M72 42l3 3M80 36l3 3M88 30l3 3', { stroke: ART_INK.cream, w: 1 }),
+      { d: 'M112 34q20-8 40 0v14q-20 10-40 0z', fill: ART_INK.cream },
+      { d: 'M114 39q18-6 36 0M114 45q18-6 36 0', stroke: ART_INK.lacquer2, w: 1 },
+      artLine('M112 36q-8 5 0 12M152 36q8 5 0 12', { w: 1.2 }),
+    ]],
+    ['adult', 'หนุ่มสาว', 'สนามบินว่าง เครื่องบินจอดเรียง', [
+      ART_GROUND,
+      artPlane(28, 52), artPlane(68, 52), artPlane(108, 52),
+      artLine('M158 66V32h-4l4-10h12l4 10h-4v34', { w: 1.2 }),
+      artLine('M40 22q4-6 10-2q6-4 10 2z', { stroke: ART_INK.cream, w: 1 }),
+    ]],
+  ],
+  tsunami: [
+    ['kid', 'วัยเด็ก', 'ทะเลถอย ปลาดิ้นบนทราย', [
+      artLine(artWave(24, 176, 24, 12, 3), { stroke: ART_INK.cream, w: 1.2 }),
+      artLine('M24 38q76-6 152 0', { stroke: ART_INK.bronze2, w: 1 }),
+      ...artFish(44, 52), ...artFish(84, 60), ...artFish(118, 48), ...artFish(146, 60),
+      artLine('M66 46q3-3 6 0M104 62q3-3 6 0', { w: 1 }),
+    ]],
+    ['adult', 'วัยทำงาน', 'ป้ายเส้นทางหนีคลื่น', [
+      ART_GROUND,
+      artLine('M70 66V36'),
+      { d: 'M44 16h52v20h-52z', fill: ART_INK.cream },
+      { d: 'M50 30q4-6 8 0t8 0M72 32l12-8M78 24h6v6', stroke: ART_INK.lacquer2, w: 1.4 },
+      artLine('M96 60l24-12M114 46l6 2l-2 6', { stroke: ART_INK.cream }),
+      artLine('M120 66q20-36 56-40'),
+    ]],
+    ['sp', 'พิเศษ · นายหน้าเคาะประตู', 'บังกะโลริมหาดสร้างใหม่', [
+      artLine(artWave(24, 176, 66, 12, 3), { stroke: ART_INK.bronze2, w: 1 }),
+      artStilt(36), artStilt(74),
+      artLine('M118 62V30h24v32M118 40h24M118 50h24M118 30l24 10M118 40l24 10', { w: 1 }),
+      ...artPalm(160, 62),
+    ]],
+  ],
+  global_financial_crisis: [
+    ['kid', 'วัยเด็ก', 'ขนมทำเองในกล่องส่งของ', [
+      ART_GROUND,
+      artFill(artCirc(70, 44, 5) + artCirc(84, 42, 5) + artCirc(98, 44, 5), ART_INK.gold),
+      artLine('M60 46h50v20h-50zM60 46l-8-10M110 46l8-10M85 46v20'),
+      artLine('M134 22h22v40h-22zM142 58h6', { w: 1.2 }),
+      artFill('M139 30h12v7h-8l-4 3z'),
+    ]],
+    ['adult', 'วัยทำงาน', 'กล่องของบนโต๊ะทำงานว่าง', [
+      ART_GROUND,
+      artLine('M36 54h94M42 54v12M124 54v12'),
+      artLine('M58 54V40h34v14zM58 40l6-6h22l6 6', { w: 1.2 }),
+      artLine('M72 34q-2-10 6-14M78 34q4-8 10-8', { stroke: ART_INK.cream, w: 1 }),
+      artLine('M144 50h18M144 50V30M146 50v16M160 50v16', { w: 1.2 }),
+    ]],
+    ['old', 'วัยชรา', 'ศาลาวัดกับหลานตัวเล็ก', [
+      ART_GROUND,
+      artLine('M36 36l40-22l40 22zM48 36l28-14l28 14M36 36q-4-6 0-10M116 36q4-6 0-10M46 36v30M106 36v30M76 36v30'),
+      ...artPerson(144, 66, 1.1), artLine('M149 54l4 12', { w: 1.2 }),
+      ...artPerson(162, 66, 0.7),
+    ]],
+    ['sp', 'พิเศษ · กาแฟแก้วนี้ขายได้', 'รถเข็นกาแฟหน้าตึก', [
+      ART_GROUND,
+      artLine('M112 66V14h50v52', { stroke: ART_INK.bronze2, w: 1 }),
+      artFill('M120 22h4v4h-4zM132 22h4v4h-4zM144 22h4v4h-4zM120 34h4v4h-4zM144 34h4v4h-4zM132 46h4v4h-4z', ART_INK.bronze2),
+      artLine('M40 50h50v12h-50zM38 30q27-18 54 0zM65 30v20'),
+      artWheel(48, 63, 3), artWheel(82, 63, 3),
+      artLine('M70 44h8l-1 6h-6z', { w: 1.2 }),
+      artLine('M72 42q-2-3 0-6M76 42q2-3 0-6', { stroke: ART_INK.cream, w: 1 }),
+    ]],
+  ],
+  great_flood: [
+    ['kid', 'วัยเด็ก', 'กะละมังลอยในบ้าน', [
+      artLine('M120 18h30v20h-30zM135 18v20M120 28h30', { w: 1.2 }),
+      artLine('M50 46h40l-6 10h-28z'),
+      ...artPerson(70, 48, 0.6),
+      artLine(artWave(24, 176, 52, 12, 3), { stroke: ART_INK.cream, w: 1.2 }),
+      artLine(artWave(24, 176, 62, 12, 3)),
+      artLine('M110 50h10q2 0 2 2h-12z', { w: 1 }),
+    ]],
+    ['adult', 'วัยทำงาน', 'กำแพงถุงทรายหน้าบ้าน', [
+      artHouse(118, 66, 1.3),
+      ...[[62, 60], [76, 60], [90, 60], [69, 54], [83, 54], [76, 48]].map(([x, y]) => artBag(x, y)),
+      artLine(artWave(24, 56, 60, 8, 3), { stroke: ART_INK.cream, w: 1.2 }),
+      artLine(artWave(24, 56, 66, 8, 3)),
+      ART_GROUND,
+    ]],
+  ],
+  covid19: [
+    ['kid', 'วัยเด็ก', 'แท็บเล็ตเรียนออนไลน์บนโต๊ะ', [
+      artLine('M36 62h128'),
+      artLine('M68 22h64v36h-64zM96 58l-6 4M104 58l6 4', { w: 1.2 }),
+      artFill([0, 1, 2].flatMap((i) => [0, 1].map((j) => artCirc(80 + i * 20, 30 + j * 15, 2.6))).join('')),
+      artLine([0, 1, 2].flatMap((i) => [0, 1].map((j) => `M${75 + i * 20} ${38 + j * 15}q5-4 10 0`)).join(''), { w: 1 }),
+      artLine('M144 62v-10h8v10', { w: 1.2 }),
+    ]],
+    ['adult', 'วัยทำงาน', 'ไรเดอร์บนถนนว่าง', [
+      ART_GROUND,
+      artLine('M30 66h10M56 66h10M134 66h10M160 66h10', { stroke: ART_INK.cream, w: 1.4 }),
+      artLine('M28 50V24h20v26M152 50V28h22v22', { stroke: ART_INK.bronze2, w: 1 }),
+      artWheel(78, 58, 5), artWheel(106, 58, 5),
+      artLine('M78 58l10-10h12l6 10M96 48l-4-8l-6 6', { w: 1.2 }),
+      artFill('M70 34h14v12h-14z'),
+      artLine(artCirc(94, 34, 3), { w: 1.2 }),
+    ]],
+    ['sp', 'พิเศษ · ออเดอร์ล้นห้อง', 'กล่องพัสดุกองล้นห้อง', [
+      ART_GROUND,
+      artLine('M150 66V24h22v42M166 46h2', { w: 1.2 }),
+      ...[[30, 52], [52, 52], [74, 52], [96, 52], [118, 52], [41, 38], [63, 38], [85, 38], [107, 38], [52, 24], [74, 24], [96, 24]].map(([x, y]) => artBox(x, y, 20, 14)),
+    ]],
+  ],
+};
+
+export function eraPicArt(id, slot) {
+  const pic = ERA_PICS[id]?.find(([k]) => k === slot);
+  return pic ? [...ERA_FRAME, ...pic[3]] : null;
+}
+
 // ฐานะ 10 ระดับของ standingOf → จน/กลาง/รวย ตามชื่อระดับ (ยากไร้–ค่อนข้างจน · ชนชั้นกลางล่าง–กลางบน · มีอันจะกิน–มั่งคั่ง)
 export const artTier = (level) => (level <= 3 ? 0 : level <= 6 ? 1 : 2);
 

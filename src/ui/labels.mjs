@@ -9,7 +9,7 @@ export const BTN = {
   rebirth: 'ไปเกิด',
   newFamily: 'เริ่มตระกูลใหม่',
   resume: 'เล่นต่อ',
-  memorial: 'สมุดอนุสรณ์',
+  shelf: 'ชั้นสมุด',
   copy: 'คัดลอกสรุป',
   skip: 'ข้าม',
 };

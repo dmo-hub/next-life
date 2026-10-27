@@ -1,5 +1,5 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY } from '../engine/index.mjs';
-import { eraArt, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
+import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
@@ -406,6 +406,7 @@ function lifeTitles(card) {
     card.lifeTitles = { ...t, pattern: t.pattern ?? NO_PATTERN };
     bookAdd(t);
     card.lifeTitles.clue = titleClue(`${st.seed}:${st.gen}`, t);
+    picsAdd();
     card.memo = memoAdd(t);
     // สมุดเต็ม: ผู้เล่นลบแถวแล้วกดกลับ หน้าเดิมถูกคืนทั้งก้อน ไม่วาดใหม่ — ต้องลองลงซ้ำเองตอนกลับ
     if (card.memo === 'full') card.memoRetry = () => (card.memo = memoAdd(t));
@@ -415,6 +416,7 @@ function lifeTitles(card) {
 const TITLES_SHOWN = 3;
 
 // บันทึกการตาย (ใบ 04): แบบชีวิต 1 + ฉายาเด่น 3 + ปุ่มดูทั้งหมด · ฉายาตระกูลแยกหัวข้อ
+// แผงนี้มีแต่ของชีวิตนี้ (B130) — ของสะสมทุกชีวิตอยู่ในชั้นสมุด หัวข้อจึงย้ำ "ชีวิตนี้" ไม่ให้ปนกับสมุด
 function titlesBox(card) {
   const { pattern, titles, family } = lifeTitles(card);
   // ของชีวิตนี้ที่เพิ่งเปิดครั้งแรกในสมุด — อ่านจากที่เก็บ ไม่ใช่ตอนลงสมุด รีโหลดที่มรณบัตรจึงยังเห็นจุด
@@ -422,12 +424,12 @@ function titlesBox(card) {
   const mine = [pattern.id && newKey('p', pattern.id), ...titles.map((t) => newKey('t', t.id)), ...family.map((t) => newKey('f', t.id))].filter((k) => k && unseen.includes(k));
   const isNew = (k) => mine.includes(k);
   const box = el('div', 'recap titles');
-  box.append(el('div', 'h', 'ชีวิตแบบ'));
+  box.append(el('div', 'h', 'แบบชีวิตนี้'));
   const pat = el('p', 'pattern', pattern.name);
   if (pattern.id && isNew(newKey('p', pattern.id))) pat.append(newTag());
   box.append(pat);
   if (pattern.hint) box.append(el('p', 'note', pattern.hint));
-  box.append(el('div', 'h', 'ฉายาเด่น'));
+  box.append(el('div', 'h', 'ฉายาที่ได้ชีวิตนี้'));
   if (!titles.length) box.append(el('p', 'sub', 'ชีวิตนี้ยังไม่ได้ฉายา'));
   const ul = el('ul', 'picks');
   const rows = titles.map((t) => {
@@ -449,7 +451,7 @@ function titlesBox(card) {
     box.append(more);
   }
   if (family.length) {
-    box.append(el('div', 'h', 'ฉายาตระกูล'));
+    box.append(el('div', 'h', 'ฉายาตระกูลที่ได้ชีวิตนี้'));
     const fl = el('ul', 'picks');
     for (const t of family) {
       const li = el('li', null, t.name);
@@ -458,12 +460,13 @@ function titlesBox(card) {
     }
     box.append(fl);
   }
-  clueRow(box, lifeTitles(card).clue);
-  box.append(bookBox());
-  // เปิดแผงแล้วนับว่าเห็นของชีวิตนี้ · จุดบนสมุดฉายาข้างในยังอยู่ถ้ามีของชีวิตก่อนที่ยังไม่ได้ดู
-  return fold(box, 'ชีวิตแบบและฉายา', mine.length ? `ได้ฉายาใหม่ ${mine.length}` : null, () => {
+  clueRow(box, lifeTitles(card).clue, 'คำใบ้ฉายาที่ยังไม่เคยได้');
+  const b = bookRead();
+  box.append(shelfButton(`เปิดชั้นสมุด · ฉายา ${b.p.length + b.t.length + b.f.length}/${BOOK_ALL}`, 't'));
+  // เปิดแผงแล้วนับว่าเห็นของชีวิตนี้ · ของชีวิตก่อนที่ยังไม่ได้ดูยังติดจุดที่ชั้นสมุด
+  return fold(box, 'ฉายาชีวิตนี้', mine.length ? `ได้ฉายาใหม่ ${mine.length}` : null, () => {
     bookSeen(mine);
-    if (!bookRead().n.length) box.querySelector('.book summary .new-dot')?.remove();
+    shelfDot();
   });
 }
 
@@ -483,9 +486,9 @@ function titleClue(key, got = { titles: [], family: [] }) {
   const x = pool[fnv(key) % pool.length];
   return { hint: x.hint, tier: x.tier ?? null };
 }
-function clueRow(box, clue) {
+function clueRow(box, clue, head = 'คำใบ้ฉายา') {
   if (!clue) return;
-  box.append(el('div', 'h', 'คำใบ้ฉายา'));
+  box.append(el('div', 'h', head));
   box.append(el('p', 'note clue', `??? ${clue.tier ? `· ${clue.tier} ` : ''}— ${clue.hint}`));
 }
 
@@ -532,34 +535,53 @@ function newDot(label) {
   return d;
 }
 const newTag = () => el('span', 'new-tag', 'ใหม่');
-function bookBox() {
+const BOOK_ALL = ALL_PATTERNS.length + TITLES.length + FAMILY_TITLES.length;
+const bookGot = (b) => b.p.length + b.t.length + b.f.length;
+
+// แถบความคืบหน้าในชั้นสมุด — ตัวเลข x/y อยู่ในหัวข้อแล้ว แถบจึงซ่อนจากโปรแกรมอ่านจอ
+function shelfBar(got, all) {
+  const b = el('div', 'bk-bar');
+  b.setAttribute('aria-hidden', 'true');
+  const i = el('i');
+  i.style.width = `${all ? Math.round((got / all) * 100) : 0}%`;
+  b.append(i);
+  return b;
+}
+function shelfSec(title, got, all, intro) {
+  const s = el('section', 'bk-sec');
+  const h = el('div', 'h', title);
+  h.append(el('small', null, `${got}/${all}`));
+  s.append(h, shelfBar(got, all));
+  if (intro) s.append(el('p', 'bk-intro', intro));
+  return s;
+}
+
+// แท็บฉายาของชั้นสมุด (B130): สะสมทุกชีวิต · ตัวที่ยังไม่เคยได้เป็น ??? พร้อมคำใบ้ · ป้าย "ใหม่" อ่านจากภาพตอนเปิดชั้น
+function titleShelf(body, fresh) {
   const b = bookRead();
-  const d = el('details', 'book');
-  const all = ALL_PATTERNS.length + TITLES.length + FAMILY_TITLES.length;
-  const sum = el('summary', null, `สมุดฉายา · เปิดแล้ว ${b.p.length + b.t.length + b.f.length}/${all}`);
-  if (b.n.length) sum.append(newDot(`มีรายการใหม่ ${b.n.length}`));
-  d.append(sum);
-  // เปิดดูแล้ว = เห็นครบ ล้างจุดในที่เก็บ · ป้าย "ใหม่" ในแถวคงไว้จนการ์ดเปลี่ยน ให้ยังหาเจอว่าตัวไหน
-  d.addEventListener('toggle', () => {
-    if (!d.open) return;
-    bookSeen();
-    sum.querySelector('.new-dot')?.remove();
-  });
-  const section = (head, group, items, got, tierOf) => {
-    d.append(el('div', 'h', head));
-    const ul = el('ul', 'picks');
+  body.append(el('p', 'bk-intro', `สะสมจากทุกชีวิตที่เคยเล่น · เปิดแล้ว ${bookGot(b)}/${BOOK_ALL} · ตัวที่ยังไม่ได้เป็น ??? พร้อมคำใบ้`));
+  const rows = (group, items, got) => {
+    const ul = el('ul', 'bk-list');
     for (const x of items) {
-      const tier = tierOf ? ` · ${tierOf(x)}` : '';
-      const li = el('li', null, got.includes(x.id) ? `${x.name}${tier}` : `???${tier} — ${x.hint}`);
-      if (b.n.includes(newKey(group, x.id))) li.append(newTag());
+      const li = el('li', got.includes(x.id) ? 'got' : 'lock');
+      if (got.includes(x.id)) li.textContent = x.name;
+      else li.append(el('b', null, '???'), x.hint);
+      if (fresh.includes(newKey(group, x.id))) li.append(newTag());
       ul.append(li);
     }
-    d.append(ul);
+    return ul;
   };
-  section('ชีวิตแบบที่เคยได้', 'p', ALL_PATTERNS, b.p);
-  section('ฉายา', 't', [...TITLES].sort((x, y) => TIERS.indexOf(x.tier) - TIERS.indexOf(y.tier)), b.t, (x) => x.tier);
-  section('ฉายาตระกูล', 'f', FAMILY_TITLES, b.f);
-  return d;
+  const s1 = shelfSec('แบบชีวิต', b.p.length, ALL_PATTERNS.length, 'ทางที่ชีวิตหนึ่งเดินจนจบ — ชีวิตละ 1 แบบ');
+  s1.append(rows('p', ALL_PATTERNS, b.p));
+  const s2 = shelfSec('ฉายาประจำตัว', b.t.length, TITLES.length, 'ได้จากสิ่งที่ทำในชีวิตเดียว — ชีวิตหนึ่งได้หลายฉายา');
+  for (const tier of TIERS) {
+    const xs = TITLES.filter((x) => x.tier === tier);
+    s2.append(el('div', 'bk-tier', `${tier} · ${xs.filter((x) => b.t.includes(x.id)).length}/${xs.length}`), rows('t', xs, b.t));
+  }
+  const s3 = shelfSec('ฉายาตระกูล', b.f.length, FAMILY_TITLES.length, 'ได้จากหลายรุ่นต่อกันในตระกูลเดียว');
+  s3.append(rows('f', FAMILY_TITLES, b.f));
+  body.append(s1, s2, s3);
+  bookSeen();
 }
 
 // สมุดอนุสรณ์ (B51): สรุปชีวิตที่จบแล้วข้ามการเล่น · key แยกจากเซฟ ล้างตระกูลแล้วยังอยู่
@@ -594,7 +616,7 @@ function memoAdd(t) {
   m.l.push({ k, n: st.name, g: st.gen, a: st.age, p: provinceLabel(st), s: t.pattern?.name ?? '', t: t.titles[0]?.name ?? '' });
   for (const x of eraSeen) if (!m.e.includes(x.id)) m.e.push(x.id);
   const r = memoWrite(m);
-  memoDot();
+  shelfDot();
   return r;
 }
 // แถวสมุดอนุสรณ์ที่ผู้เล่นเปิดดูแล้ว (จุดแดงที่ลิงก์ท้ายหน้า B116) — key แยก รูปเก็บของสมุดเดิมไม่เปลี่ยน
@@ -621,46 +643,139 @@ function memoUnseen() {
   if (!seen) memoSeenWrite((seen = ks));
   return ks.filter((k) => !seen.includes(k));
 }
-function memoDot() {
-  const a = document.getElementById('memoLink');
+// สมุดภาพบ้านเมือง (B130): ภาพหลักของเหตุการณ์ (e) + ภาพตามวัย/ตามมา (s = "เหตุการณ์:ช่อง") สะสมข้ามชีวิต
+// key แยกจากสมุดอนุสรณ์ เพราะ "ลบสมุดอนุสรณ์ทั้งเล่ม" ล้างเหตุการณ์ที่เคยเห็นด้วย · อ่านครั้งแรกสำเนาเหตุการณ์จากสมุดอนุสรณ์
+// ผู้เล่นเดิมจึงได้ภาพหลักย้อนหลัง · n = ภาพที่เพิ่งได้แต่ยังไม่เปิดดู (จุดแดงแบบสมุดฉายา)
+const PICS_KEY = 'next-life-pics-v1';
+// วิกฤตน้ำมันครั้งแรกเกิดก่อนปีเกิดแรกสุดของเกม ไม่มีชีวิตไหนทันเห็น — ไม่ตั้งช่องที่ปลดไม่ได้ตลอดกาล
+const PIC_EVENTS = ERA_EVENTS.filter((e) => ERA_PICS[e.id]);
+const PIC_ALL = PIC_EVENTS.reduce((n, e) => n + 1 + ERA_PICS[e.id].length, 0);
+// การ์ดตามมาของเหตุการณ์ไม่มีช่อง era ในเนื้อหา จึงผูกด้วย id การ์ด · การ์ดยุคใช้ช่วงวัยของการ์ดเป็นช่อง
+const PIC_FOLLOW = { era_econ_oil2_farm_01: 'oil_crisis_2', era_dis_tsunami_land_offer_01: 'tsunami', era_econ_gfc_cafe_01: 'global_financial_crisis', era_dis_covid_shop_boom_01: 'covid19' };
+const PIC_STAGE = { เด็ก: 'kid', ชรา: 'old' };
+const PIC_OF = new Map(
+  CONTENT.events
+    .map((c) => [c.id, c.era ? `${c.era}:${PIC_STAGE[c.stage] ?? 'adult'}` : PIC_FOLLOW[c.id] && `${PIC_FOLLOW[c.id]}:sp`])
+    .filter(([, k]) => k && ERA_PICS[k.split(':')[0]]?.some(([s]) => s === k.split(':')[1])),
+);
+function picsRead() {
+  try {
+    const raw = localStorage.getItem(PICS_KEY);
+    if (raw === null) {
+      const p = { e: memoRead().e.filter((id) => ERA_PICS[id]), s: [], n: [] };
+      picsWrite(p);
+      return p;
+    }
+    const p = JSON.parse(raw) ?? {};
+    return { e: Array.isArray(p.e) ? p.e : [], s: Array.isArray(p.s) ? p.s : [], n: Array.isArray(p.n) ? p.n : [] };
+  } catch {
+    return { e: [], s: [], n: [] };
+  }
+}
+function picsWrite(p) {
+  try {
+    localStorage.setItem(PICS_KEY, JSON.stringify(p));
+  } catch {
+    // ไม่มีที่เก็บ — สมุดภาพเห็นแค่ชีวิตนี้
+  }
+}
+const picsGot = (p) => PIC_EVENTS.reduce((n, e) => n + (p.e.includes(e.id) ? 1 : 0) + ERA_PICS[e.id].filter(([k]) => p.s.includes(`${e.id}:${k}`)).length, 0);
+// เรียกครั้งเดียวต่อการ์ดตาย (lifeTitles) · ภาพที่ชีวิตนี้เพิ่งได้ = ป้าย "ใหม่" ในแผงเหตุการณ์ของการ์ดตาย
+function picsAdd() {
+  const p = picsRead();
+  for (const k of picSeen) {
+    const [kind, id] = [k.slice(0, 1), k.slice(2)];
+    const xs = kind === 'e' ? p.e : p.s;
+    if (xs.includes(id)) continue;
+    xs.push(id);
+    p.n.push(k);
+  }
+  picsWrite(p);
+}
+function picsSeen() {
+  const p = picsRead();
+  p.n = [];
+  picsWrite(p);
+}
+
+// จุดแดงที่ลิงก์ชั้นสมุด (B116 → B130): ชีวิตใหม่ในสมุดอนุสรณ์ · ฉายาใหม่ · ภาพใหม่ ที่ยังไม่เปิดดู
+const shelfFresh = () => ({ m: memoUnseen(), t: bookRead().n, p: picsRead().n });
+function shelfDot() {
+  const a = document.getElementById('shelfLink');
   if (!a) return;
-  const fresh = memoUnseen().length;
+  const f = shelfFresh();
+  const n = f.m.length + f.t.length + f.p.length;
   a.querySelector('.new-dot')?.remove();
-  if (fresh) a.append(newDot(`มีชีวิตใหม่ในสมุด ${fresh}`));
+  if (n) a.append(newDot(`มีของใหม่ในชั้นสมุด ${n}`));
+}
+// ปุ่มเปิดชั้นสมุดจากการ์ดตาย — กลับมาแล้วคืนการ์ดเดิมทั้งก้อน
+function shelfButton(label, tab, onBack) {
+  const b = el('button', 'more', label);
+  b.onclick = () => openShelf(tab, undefined, onBack);
+  return b;
 }
 function eraBox() {
   const box = el('div', 'recap eras');
   box.append(eraSeen.length ? list(eraSeen.map((x) => `อายุ ${x.a} · ${eraName(x.id)}`), 'picks') : el('p', 'sub', 'ชีวิตนี้ไม่ทันเห็นเหตุการณ์ใหญ่ของบ้านเมือง'));
-  return fold(box, `เหตุการณ์ในแผ่นดินที่ได้เห็น (${eraSeen.length})`);
+  // ภาพที่ชีวิตนี้เพิ่งได้ อ่านจากที่เก็บ (แบบจุดฉายา) รีโหลดที่มรณบัตรจึงยังบอกได้
+  const fresh = picsRead().n.filter((k) => picSeen.includes(k)).length;
+  if (fresh) box.append(el('p', 'note', `ได้ภาพใหม่ในสมุดภาพบ้านเมือง ${fresh} ภาพ`));
+  box.append(shelfButton(`เปิดชั้นสมุด · ภาพบ้านเมือง ${picsGot(picsRead())}/${PIC_ALL}`, 'p'));
+  return fold(box, `เหตุการณ์ในแผ่นดินที่ได้เห็น (${eraSeen.length})`, fresh ? `ได้ภาพใหม่ ${fresh}` : null);
 }
 function memoFull(card) {
   const box = el('div', 'recap warn');
   box.append(el('p', 'sub', 'สมุดอนุสรณ์เต็ม ชีวิตนี้ยังไม่ได้ลงสมุด — ลบชีวิตเก่าในสมุดออกบ้างแล้วกลับมาที่หน้านี้อีกครั้ง'));
-  const b = el('button', 'more', 'เปิดสมุดอนุสรณ์');
-  b.onclick = () =>
-    openMemo(undefined, () => {
-      if (card.memo === 'full') card.memoRetry?.();
-      if (card.memo !== 'full') box.remove();
-    });
-  box.append(b);
+  box.append(shelfButton('เปิดสมุดอนุสรณ์', 'm', () => {
+    if (card.memo === 'full') card.memoRetry?.();
+    if (card.memo !== 'full') box.remove();
+  }));
   return box;
 }
 
-// เปิดทับหน้าที่อยู่ แล้วคืนหน้าเดิมทั้งก้อนตอนกลับ — ไม่แตะ st ไม่ลงเซฟ
-function openMemo(prev = [...root.childNodes], onBack, fresh = memoUnseen()) {
-  const m = memoRead();
-  memoSeenWrite(m.l.map((x) => x.k));
-  memoDot();
+// ชั้นสมุด (B130): เล่มเดียว 3 แท็บ อนุสรณ์ · ฉายา · ภาพบ้านเมือง · เปิดทับหน้าที่อยู่ แล้วคืนหน้าเดิมทั้งก้อนตอนกลับ — ไม่แตะ st ไม่ลงเซฟ
+// fresh = ของใหม่ตอนเปิดชั้นครั้งแรก — เปิดแท็บแล้วล้างจุดในที่เก็บ แต่ป้าย "ใหม่" ยังอยู่จนออกจากชั้น สลับแท็บไปมาก็ยังหาเจอ
+const SHELF_TABS = [['m', 'อนุสรณ์'], ['t', 'ฉายา'], ['p', 'ภาพบ้านเมือง']];
+function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh()) {
+  // เปิดจากท้ายหน้า/หน้าเล่นต่อ: ไปแท็บที่มีของใหม่ก่อน
+  tab ??= SHELF_TABS.find(([k]) => fresh[k].length)?.[0] ?? 'm';
+  const again = (t = tab) => openShelf(t, prev, onBack, fresh);
   const back = () => {
     root.replaceChildren(...prev);
     onBack?.();
   };
-  const choices = homeCard('สมุดอนุสรณ์', ['สมุดอนุสรณ์', `ชีวิตที่จบแล้ว ${m.l.length} ชีวิต · เหตุการณ์ในแผ่นดินที่เคยเห็น ${m.e.filter((id) => ERA_EVENTS.some((e) => e.id === id)).length}/${ERA_EVENTS.length}`]);
-  root.firstChild.classList.add('memo-view');
+  const m = memoRead();
+  const b = bookRead();
+  const p = picsRead();
+  const count = { m: `${m.l.length}`, t: `${bookGot(b)}/${BOOK_ALL}`, p: `${picsGot(p)}/${PIC_ALL}` };
+  const choices = homeCard('ชั้นสมุด', ['ชั้นสมุด']);
+  root.firstChild.classList.add('shelf-view');
   const body = root.querySelector('.body');
-  if (m.e.length) body.append(list(ERA_EVENTS.filter((e) => m.e.includes(e.id)).map((e) => e.name), 'picks'));
+  const tabs = el('div', 'bk-tabs');
+  tabs.setAttribute('role', 'group');
+  tabs.setAttribute('aria-label', 'เล่มในชั้นสมุด');
+  for (const [k, label] of SHELF_TABS) {
+    const x = el('button', null, `${label} ${count[k]}`);
+    x.setAttribute('aria-pressed', String(k === tab));
+    // จุดบนแท็บอื่นที่ยังไม่ได้เปิด — แท็บที่เปิดอยู่ล้างจุดแล้ว
+    if (k !== tab && (k === 'm' ? memoUnseen() : k === 't' ? bookRead().n : picsRead().n).length) x.append(newDot('มีของใหม่'));
+    x.onclick = () => again(k);
+    tabs.append(x);
+  }
+  body.append(tabs);
+  if (tab === 't') titleShelf(body, fresh.t);
+  else if (tab === 'p') picShelf(body, fresh.p);
+  else memoShelf(body, choices, fresh.m, again);
+  shelfDot();
+  choices.prepend(enter(button('กลับ', null, back)));
+}
+// แท็บอนุสรณ์: รายชื่อชีวิตที่จบแล้ว ใหม่สุดก่อน · เหตุการณ์ที่เคยเห็นย้ายไปอยู่สมุดภาพแล้ว
+function memoShelf(body, choices, fresh, again) {
+  const m = memoRead();
+  memoSeenWrite(m.l.map((x) => x.k));
+  body.append(el('p', 'bk-intro', `ชีวิตที่จบแล้ว ${m.l.length} ชีวิต`));
   const ul = el('ul', 'memo');
-  // ใหม่สุดก่อน · ลบทีละแถวได้ทันที (สรุปสั้น ไม่ใช่เซฟ ไม่ต้องถามซ้ำ)
+  // ลบทีละแถวได้ทันที (สรุปสั้น ไม่ใช่เซฟ ไม่ต้องถามซ้ำ)
   for (const x of [...m.l].reverse()) {
     const li = el('li');
     const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.n}`, `อายุ ${x.a} ปี`, x.p, x.s && `ชีวิตแบบ${x.s}`, x.t && `ฉายา ${x.t}`].filter(Boolean).join(' · '));
@@ -672,23 +787,62 @@ function openMemo(prev = [...root.childNodes], onBack, fresh = memoUnseen()) {
       const now = memoRead();
       now.l = now.l.filter((y) => y.k !== x.k);
       memoWrite(now);
-      openMemo(prev, onBack, fresh);
+      again('m');
     };
     li.append(del);
     ul.append(li);
   }
   body.append(m.l.length ? ul : el('p', 'sub', 'ยังไม่มีชีวิตที่จบลงสมุด'));
-  choices.append(enter(button('กลับ', null, back)));
-  if (m.l.length || m.e.length) {
-    choices.append(button('ลบสมุดทั้งเล่ม', null, () => {
-      const c = homeCard('สมุดอนุสรณ์', ['ลบสมุดอนุสรณ์ทั้งเล่ม?', 'ชีวิตที่จบแล้วและเหตุการณ์ที่เคยเห็นจะหายทั้งหมด กู้คืนไม่ได้ · ชีวิตที่เล่นค้างไว้ไม่หาย']);
-      root.firstChild.classList.add('memo-view');
-      c.append(button('ลบทั้งเล่ม', null, () => {
-        memoWrite({ l: [], e: [] });
-        openMemo(prev, onBack, fresh);
-      }), enter(button('ยกเลิก', null, () => openMemo(prev, onBack, fresh))));
-    }));
+  if (!m.l.length && !m.e.length) return;
+  choices.append(button('ลบสมุดอนุสรณ์ทั้งเล่ม', null, () => {
+    const c = homeCard('ชั้นสมุด', ['ลบสมุดอนุสรณ์ทั้งเล่ม?', 'ชีวิตที่จบแล้วจะหายทั้งหมด กู้คืนไม่ได้ · ฉายา ภาพบ้านเมือง และชีวิตที่เล่นค้างไว้ไม่หาย']);
+    root.firstChild.classList.add('shelf-view');
+    c.append(button('ลบทั้งเล่ม', null, () => {
+      memoWrite({ l: [], e: [] });
+      again('m');
+    }), enter(button('ยกเลิก', null, () => again('m'))));
+  }));
+}
+// แท็บภาพบ้านเมือง: เหตุการณ์ละแผ่น ภาพหลักเต็มแถว ภาพตามวัย/ตามมาเป็นช่องเล็ก · ยังไม่เจอ = ??? + ทางปลด
+function picShelf(body, fresh) {
+  const p = picsRead();
+  body.append(el('p', 'bk-intro', `ภาพเหตุการณ์ภัยพิบัติและเศรษฐกิจที่เคยผ่าน สะสมข้ามชีวิต · ได้แล้ว ${picsGot(p)}/${PIC_ALL} ภาพ`), shelfBar(picsGot(p), PIC_ALL));
+  for (const e of PIC_EVENTS) {
+    const s = el('section', 'pic-ev');
+    const met = p.e.includes(e.id);
+    const slots = ERA_PICS[e.id];
+    const n = (met ? 1 : 0) + slots.filter(([k]) => p.s.includes(`${e.id}:${k}`)).length;
+    const h = el('div', 'h', met ? e.name : '???');
+    if (met && fresh.includes(`e:${e.id}`)) h.firstChild.after(newTag());
+    h.append(el('small', null, `${n}/${1 + slots.length}`));
+    s.append(h, el('div', 'yr', `${e.kind === 'economy' ? 'เศรษฐกิจ' : 'ภัยพิบัติ'} · พ.ศ. ${e.from}${e.to !== e.from ? `–${e.to}` : ''}`));
+    const grid = el('div', 'pic-slots');
+    const main = el('div', `pic-slot main${met ? '' : ' lock'}`);
+    if (met) main.append(artSvg('era-art', ERA_ART_W, ERA_ART_H, eraArt(e.id)));
+    else main.append(el('b', null, '???'), el('span', null, 'ยังไม่เคยมีชีวิตไหนทันเห็น'));
+    grid.append(main);
+    for (const [k, label, cap] of slots) {
+      const key = `${e.id}:${k}`;
+      const ok = p.s.includes(key);
+      const slot = el('figure', `pic-slot${ok ? '' : ' lock'}`);
+      if (ok) {
+        const svg = artSvg('era-art', ERA_ART_W, ERA_ART_H, eraPicArt(e.id, k));
+        svg.removeAttribute('aria-hidden');
+        svg.setAttribute('role', 'img');
+        svg.setAttribute('aria-label', cap);
+        slot.append(svg);
+        const fc = el('figcaption', null, `${label} · ${cap}`);
+        if (fresh.includes(`s:${key}`)) fc.append(newTag());
+        slot.append(fc);
+      } else {
+        slot.append(el('b', null, '???'), el('span', null, k === 'sp' ? 'เจอเรื่องพิเศษของเหตุการณ์นี้' : `เจอเหตุการณ์นี้ตอน${label}`));
+      }
+      grid.append(slot);
+    }
+    s.append(grid);
+    body.append(s);
   }
+  picsSeen();
 }
 
 // ภาพแชร์รับเฉพาะช่องที่ไล่ชื่อไว้ตรงนี้ — บัญชีบุญบาปบนการ์ดตายหลุดลงภาพไม่ได้ แม้แกนเกมจะเติมช่องใหม่ให้การ์ด
@@ -1868,6 +2022,9 @@ const BOOK_NOTES = 2;
 let bookCards = [];
 // เหตุการณ์บ้านเมืองที่ชีวิตนี้เห็น (B51) — จดตอนการ์ดผ่าน track เหมือนสมุดชีวิต เล่นซ้ำจากเซฟก็ได้ครบ
 let eraSeen = [];
+// ภาพในสมุดภาพบ้านเมืองที่ชีวิตนี้ปลด (B130): "e:<เหตุการณ์>" ภาพหลัก · "s:<เหตุการณ์>:<ช่อง>" ภาพตามวัย/ตามมา
+// ลงสมุดตอนการ์ดตาย (picsAdd) — ชีวิตที่ยังไม่จบยังไม่นับ แบบเดียวกับสมุดฉายา
+let picSeen = [];
 let bookIntro = null;
 // ลำดับการ์ดที่ผ่านมา — ใช้ดูว่าการ์ดผลตามหลังการ์ดเลือกทันทีหรือไม่
 let bookSeq = 0;
@@ -1887,11 +2044,16 @@ function bookNote(card) {
   }
   const era = card.kind === 'era' ? card.id : card.news && ERA_OF.get(card.id);
   if (era) eraSeen.push({ id: era, a: card.age });
+  // ภาพหลักนับทุกการ์ดของเหตุการณ์ ไม่ใช่แค่ใบที่มีข่าวนำ — ผู้เล่นเห็นภาพยุคบนการ์ดใบนั้นแล้ว
+  const pe = card.kind === 'era' ? card.id : ERA_OF.get(card.id);
+  const ps = card.kind === 'event' && PIC_OF.get(card.id);
+  for (const k of [pe && ERA_PICS[pe] && `e:${pe}`, ps && `s:${ps}`]) if (k && !picSeen.includes(k)) picSeen.push(k);
   bookSeq++;
 }
 const bookReset = () => {
   bookCards = [];
   eraSeen = [];
+  picSeen = [];
   bookIntro = null;
   bookSeq = 0;
 };
@@ -2150,31 +2312,31 @@ function homeCard(title, lines) {
   return choices;
 }
 
-// ล้างเซฟ = ลบทั้งตระกูล จึงถามซ้ำก่อน · สมุดฉายา/สมุดอนุสรณ์แยก key ไม่โดนล้าง
+// ล้างเซฟ = ลบทั้งตระกูล จึงถามซ้ำก่อน · สมุดทุกเล่มในชั้นสมุดแยก key ไม่โดนล้าง
 function confirmNew(back) {
-  const choices = homeCard('เริ่มตระกูลใหม่', ['ลบชีวิตที่ค้างไว้ทั้งตระกูล?', 'ผังตระกูลและสิ่งที่สืบทอดจะหายทั้งหมด กู้คืนไม่ได้ · สมุดฉายาและสมุดอนุสรณ์ยังอยู่']);
+  const choices = homeCard('เริ่มตระกูลใหม่', ['ลบชีวิตที่ค้างไว้ทั้งตระกูล?', 'ผังตระกูลและสิ่งที่สืบทอดจะหายทั้งหมด กู้คืนไม่ได้ · สมุดในชั้นสมุดยังอยู่ครบ']);
   choices.append(button('ลบแล้วเริ่มตระกูลใหม่', null, start), button('ยกเลิก', null, back));
 }
 
 function home(card) {
   const where = af ? `ระหว่างชาติ หลัง${lifeEndWord(isGone(st))} ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
-  choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.memorial, null, () => openMemo()));
+  choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.shelf, null, () => openShelf()));
 }
 
 // เซฟจากเวอร์ชันที่เนื้อหาต่างกัน (B122): เซฟคือ seed + ลำดับปุ่ม เล่นซ้ำบนเนื้อหาใหม่ไม่ได้ชีวิตเดิม จึงเริ่มชีวิตใหม่
-// สมุดฉายา สมุดอนุสรณ์ และบันทึกชีวิตแยก key ไว้ ไม่โดนล้าง
+// สมุดทุกเล่มในชั้นสมุดและบันทึกชีวิตแยก key ไว้ ไม่โดนล้าง
 function staleSave() {
-  const choices = homeCard('เกมอัปเดตแล้ว', ['ชีวิตที่ค้างไว้เล่นต่อไม่ได้', 'เนื้อเรื่องเปลี่ยนตั้งแต่เล่นครั้งก่อน เริ่มชีวิตใหม่ในเวอร์ชันนี้ได้เลย · สมุดฉายาและสมุดอนุสรณ์ยังอยู่']);
-  choices.append(enter(button('เริ่มชีวิตใหม่', null, start)), button(BTN.memorial, null, () => openMemo()));
+  const choices = homeCard('เกมอัปเดตแล้ว', ['ชีวิตที่ค้างไว้เล่นต่อไม่ได้', 'เนื้อเรื่องเปลี่ยนตั้งแต่เล่นครั้งก่อน เริ่มชีวิตใหม่ในเวอร์ชันนี้ได้เลย · สมุดในชั้นสมุดยังอยู่ครบ']);
+  choices.append(enter(button('เริ่มชีวิตใหม่', null, start)), button(BTN.shelf, null, () => openShelf()));
 }
 
-// ลิงก์ท้ายหน้าเปิดสมุดได้ทุกหน้า (หน้า "เล่นต่อ" ขึ้นเฉพาะตอนมีเซฟ) · เปิดซ้อนตัวเองไม่ได้ ไม่งั้นปุ่มกลับพากลับมาที่สมุด
-document.getElementById('memoLink')?.addEventListener('click', (e) => {
+// ลิงก์ท้ายหน้าเปิดชั้นสมุดได้ทุกหน้า (หน้า "เล่นต่อ" ขึ้นเฉพาะตอนมีเซฟ) · เปิดซ้อนตัวเองไม่ได้ ไม่งั้นปุ่มกลับพากลับมาที่ชั้นสมุด
+document.getElementById('shelfLink')?.addEventListener('click', (e) => {
   e.preventDefault();
-  if (!root.querySelector('.memo-view')) openMemo();
+  if (!root.querySelector('.shelf-view')) openShelf();
 });
-memoDot();
+shelfDot();
 // เพดานความสูงการ์ด (B116) หักหัวเว็บ — ชื่อเกมตัดสองบรรทัดบนจอแคบ หัวจึงสูงไม่ตายตัว วัดจริงแทนเดาค่าเดียว · 20 = ระยะบนของ #app
 const chromeH = () => document.documentElement.style.setProperty('--chrome', `${(document.querySelector('.logo')?.offsetHeight ?? 116) + 20}px`);
 chromeH();
