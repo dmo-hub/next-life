@@ -8,7 +8,7 @@ import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
 import { goalsMet } from './titles.mjs';
 import { heirPets } from './family.mjs';
-import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests } from './life.mjs';
+import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, netWorth } from './life.mjs';
 import { ISEKAI, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 
@@ -215,7 +215,7 @@ function closeIsekai(af) {
   af.isekaiLives.push(isekaiLineage(isk, (af.st.gen ?? 1) + 1 + af.isekaiLives.length));
   // บัญชีเดียวของดวงวิญญาณ (B26 · B68a-2): ชาติต่างโลกที่จบแล้วเขียนกลับลง af.st.ledger ปรโลกรอบใหม่และบันทึกการกระทำ (noteDeed) จึงอ่านที่เดียวกัน
   af.st.ledger = isk.ledger;
-  af.from = { name: isk.name, run: isk.run, memory: isekaiMemory(isk) };
+  af.from = { name: isk.name, run: isk.run, memory: isekaiMemory(isk), real: isk.real };
   af.isekai = null;
   af.path = null;
   af.steps = ['verdict', 'path', 'scene', 'carry'];
@@ -223,6 +223,7 @@ function closeIsekai(af) {
 }
 
 // ส่งดวงวิญญาณไปต่างโลก: กรรมที่ติดตัวไปคิดแบบเดียวกับการเกิดใหม่ (หักฝั่งที่ชี้ปลายทาง แล้วสุ่มสัดส่วน) — ไปต่างโลกไม่ใช่ทางลบบาป
+const realAt = (st) => ({ stats: Object.fromEntries(STAT_KEYS.map((k) => [k, st[k]])), money: netWorth(st), unit: nationalIncome(st.content.era, st.seed, st.birthYear + st.age) * 12, age: st.age });
 function sendToIsekai(af) {
   const r = CARRY.min + af.rng.next() * (CARRY.max - CARRY.min);
   const prev = af.from;
@@ -235,6 +236,8 @@ function sendToIsekai(af) {
     fated: !prev && !!af.st.flags?.isekai_call,
     run: prev ? prev.run + 1 : 0,
     memory: prev?.memory ?? null,
+    // ค่าโลกจริงตอนข้าม (B100) — รอบต่างโลกติดกันใช้ค่าจริงที่สะท้อนมาจากรอบก่อน
+    real: prev?.real ?? realAt(af.st),
   });
 }
 

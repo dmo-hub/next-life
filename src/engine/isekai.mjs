@@ -10,6 +10,11 @@ export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'เส
 export const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
 // ค่าตั้งของเกม: stay = อยู่ต่างโลกต่อติดกันได้กี่รอบ (กันบอทวนไม่จบ) · chance = โอกาสเทพธิดาโผล่เองตอนถึงทางเกิด
 // karma* = ผลของระดับกรรมต่อโลก · skills = จำนวนสกิลให้เลือกปกติ · memory = ค่าที่ติดตัวไปชาติต่างโลกถัดไป
+// ค่าสถานะสองโลกผูกกัน (B100 · เจ้าของเคาะ 1ก 2ก 3ก) — ต่างโลก = ฐานของโลก + น้ำหนัก × (ค่าจริง − 50) ÷ div ส่วนจริงไม่เกิน ±part
+// น้ำหนัก = อายุบนโลกเดิมตอนข้าม ÷ age ไม่เกิน 1 · HP หักเฉพาะสุขภาพต่ำกว่า 50 ไม่เกิน hpCut (สุขภาพตอนข้าม = ตอนตาย ซึ่งต่ำแทบทุกคน · ผูก 1:1 ตายต่างโลก 45% · เจ้าของเคาะ) ขากลับ HP สะท้อนสุขภาพ 1:1 · ทอง: เงินสุทธิเท่ารายได้ครัวเรือนประเทศ 1 ปี = gold ทอง ไม่เกิน goldCap เท่าทองตั้งต้น
+// หลังข้าม ผลการ์ดต่างโลกสะท้อนกลับค่าจริงชุดที่พกมา (ต่างโลก 1 = จริง div) · ชนเพดานฝั่งไหน ส่วนเกินไม่สะท้อน
+export const ISEKAI_LINK = { str: 'health', mag: 'knowledge', cha: 'relations', luk: 'happiness', fame: 'network' };
+export const LINK = { div: 10, part: 5, age: 40, gold: 100, goldCap: 3, hpCut: 30 };
 export const ISEKAI = { stay: 2, chance: 0.2, skills: 3, worlds: 3, karmaStat: 3, karmaDc: 4, karmaSkill: 0.3, memory: 3, events: [1, 3, 3] };
 // เทพธิดาโผล่ถี่ตามกรรม (B68e · เจ้าของเคาะ): chance × (1 + ระดับกรรมสุทธิ) ไม่ต่ำกว่า chanceMin ⇒ บุญเต็ม 40% กลาง 20% บาปเต็ม 5%
 // ตายแบบต่างโลกได้โชคเพิ่ม fatedLuck · คำสัญญาที่ฝากไว้: รักษาได้ = บุญระดับ vowLevel · ผิด = ธงบนแล้วไม่แก้
@@ -730,12 +735,14 @@ export function entryCard(st, stage) {
 // karma = ระดับกรรมที่ปรโลก (−1..1) · past = ชื่อชาติไทย · run = รอบที่เท่าไรของการอยู่ต่างโลกติดกัน · memory = ค่าที่ติดตัวมาจากรอบก่อน
 // ledger = บัญชีที่ดวงวิญญาณพกมา · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = บัญชีเปล่า
 // fated = ชีวิตนี้ถูกเรียกข้ามโลกจากการ์ดชวน (ธง isekai_call · ตายหรือหายตัว) — เทพธิดาโผล่แน่นอนแล้ว ได้โชคเพิ่ม
-export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger() }) {
+// real = ค่าโลกจริงตอนข้าม { stats, money, unit (รายได้ครัวเรือนประเทศต่อปี), age } · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = ค่าตั้งต้นของโลกล้วน
+export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
   const vow = blessed ? GODDESS_VOWS[(seed >>> 0) % GODDESS_VOWS.length].id : null;
   return {
     rng, karma, past, run, memory, blessed, fated, ledger, vow, vowKept: null, vowHit: false,
+    real: real && { ...real, stats: { ...real.stats } },
     worldOffers: isekaiShuffle(rng, Object.keys(ISEKAI_WORLDS)).slice(0, ISEKAI.worlds + (blessed ? 1 : 0)),
     skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).slice(0, sk),
     world: null, name: '', skills: [], st: null, flags: {}, queue: [], idx: 0,
@@ -768,6 +775,23 @@ function isekaiStart(isk, wid) {
   for (const k of Object.keys(ISEKAI_STAT)) isk.st[k] = Math.max(1, w.start[k] + shift);
   if (isk.memory) isk.st[isk.memory] += ISEKAI.memory;
   if (isk.fated) isk.st.luk += GODDESS.fatedLuck;
+  if (isk.real) linkStart(isk, w);
+}
+
+function linkStart(isk, w) {
+  const { stats, money, unit, age } = isk.real;
+  const wt = Math.min(1, age / LINK.age);
+  for (const [k, r] of Object.entries(ISEKAI_LINK)) isk.st[k] = Math.max(k === 'fame' ? 0 : 1, isk.st[k] + Math.round(isekaiClamp((wt * (stats[r] - 50)) / LINK.div, -LINK.part, LINK.part)));
+  isk.st.hp = Math.round(100 - Math.min(LINK.hpCut, wt * Math.max(0, 50 - stats.health)));
+  isk.st.gold = isekaiClamp(Math.round(w.start.gold + (wt * money * LINK.gold) / unit), 0, w.start.gold * LINK.goldCap);
+}
+
+// ส่วนต่างที่เกิดจริงฝั่งต่างโลก (หลังชนเพดานแล้ว) สะท้อนกลับค่าจริง · ค่าจริงชนเพดานก็ตัดส่วนเกิน
+function linkBack(isk, k, d) {
+  const s = isk.real.stats;
+  if (k === 'hp') s.health = isekaiClamp(s.health + d, 0, 100);
+  else if (k === 'gold') isk.real.money += (d * isk.real.unit) / LINK.gold;
+  else if (ISEKAI_LINK[k]) s[ISEKAI_LINK[k]] = isekaiClamp(s[ISEKAI_LINK[k]] + d * LINK.div, 0, 100);
 }
 
 // คำสัญญาเทพธิดา: ผิดทันทีที่กดตัวเลือกที่มีหมวดต้องห้าม · ข้อที่ต้องทำ ตัดสินตอนจบรอบ
@@ -811,8 +835,10 @@ function isekaiApply(isk, fx = {}) {
     let v = raw;
     if (isekaiHas(isk, 'exp') && v > 0 && ISEKAI_STAT[k]) v *= 2;
     if (isekaiHas(isk, 'storage') && k === 'gold' && v > 0) v = Math.round(v * 1.5);
+    const was = isk.st[k];
     if (k === 'goal' || k === 'hp') isk.st[k] = isekaiClamp(isk.st[k] + v, 0, 100);
     else isk.st[k] = Math.max(0, isk.st[k] + v);
+    if (isk.real && isk.st[k] !== was) linkBack(isk, k, isk.st[k] - was);
     if (v) out[k] = v;
   }
   return out;
