@@ -9,7 +9,8 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { parse } from 'yaml';
 import { loadContent } from '../src/node/load.mjs';
-import { BOTS } from './bots.mjs';
+import { BOTS, isekaiBot } from './bots.mjs';
+import { playLife, mixSeed } from '../src/engine/index.mjs';
 import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS } from './gates.mjs';
 
 const args = process.argv.slice(2);
@@ -90,6 +91,15 @@ if (statBad) fails.push('ค่าสถานะ');
 // ---- ด่าน 2: ไม่มีเหตุการณ์/ตัวเลือก/ธงตาย (รวมทุกบอท ทั้งสอง seed) ----
 const reg = parse(readFileSync(new URL('content/rules/flags.yaml', root), 'utf8'));
 const FLAGS = [...Object.keys(reg.flags ?? {}), ...Object.keys(reg.prefixes ?? {})];
+// ธงที่บอทหลักไม่มีทางตั้งโดยกติกา: isekai_call ตั้งเมื่อกดรับการ์ดชวนไปต่างโลกเท่านั้น และบอทที่ไม่ประกาศ isekai ปฏิเสธโดยไม่ดึงเลขสุ่ม
+// (B68d · ชีวิตไทยของบอทหลักจึงเท่าเดิมทุกหลัก) ⇒ ใส่บอทสายต่างโลกในชุดหลักไม่ได้ ต้องพิสูจน์ว่าถึงได้ด้วยรอบเล็กของบอทสายต่างโลกแยก
+// รอบเล็กหาไม่เจอ = ธงตายจริง ตกด่านตามเดิม
+const SIDE_REACH = { isekai_call: isekaiBot };
+const sideFlags = new Set();
+for (const [flag, bot] of Object.entries(SIDE_REACH)) {
+  for (let i = 0; i < 200 && !sideFlags.has(flag); i++) if (playLife(mixSeed(seed, 9500 + i), content, bot).state.flags?.[flag]) sideFlags.add(flag);
+  console.log(`ธงที่บอทหลักไม่ตั้งโดยกติกา · ${flag}: บอทสายต่างโลก${sideFlags.has(flag) ? 'ถึง' : 'ไม่ถึง'}`);
+}
 // ฐานเทียบรอบก่อนคิดจาก seed ตายตัวเท่านั้น — รวม seed สุ่มแล้วตัวที่รอดเพราะ seed สุ่มจะกลายเป็น "ตายใหม่" ในรอบหน้า
 function deadOf(runs) {
   const fired = new Map(), picks = new Set(), flags = new Set();
@@ -106,7 +116,7 @@ function deadOf(runs) {
     events: content.events.filter((e) => !fired.has(e.id)).map((e) => e.id),
     choices: dead,
     thinChoices: thin,
-    flags: FLAGS.filter((x) => !flags.has(x)),
+    flags: FLAGS.filter((x) => !flags.has(x) && !sideFlags.has(x)),
   };
 }
 const { fired, events: deadEvents, choices: deadChoices, thinChoices, flags: deadFlags } = deadOf(main);
