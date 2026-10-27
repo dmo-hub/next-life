@@ -1483,7 +1483,7 @@ function render(card) {
     }
   }
   box.append(body, choices);
-  root.append(box);
+  root.append(panels(box));
 }
 
 // กล่องกระซิบ (B117): สอนระบบที่เพิ่งโผล่ครั้งแรกตามวัย ในเสียงยาย · บอกแค่ทิศ ไม่บอกตัวเลข/สูตร/บัญชีบุญบาป (กติกาเดียวกับ B31)
@@ -1549,24 +1549,48 @@ function whisperFor(card, free) {
 function foldLater(box, body, choices, card) {
   const later = el('button', 'more later', 'พับไว้ก่อน ไปดูสถานะ');
   later.onclick = () => {
-    const panels = [...box.querySelectorAll(':scope > details')];
-    const was = panels.map((d) => d.open);
-    panels.forEach((d) => (d.open = true));
+    const folds = [...box.querySelectorAll(':scope > .p-left > details')];
+    const was = folds.map((d) => d.open);
+    folds.forEach((d) => (d.open = true));
     body.hidden = choices.hidden = true;
     const bar = el('div', 'choices folded');
     bar.append(el('p', 'note', `การ์ดรอให้เลือกอยู่ · ${clip(card.title ?? card.text, 48)}`));
     const back = enter(button('กลับมาเลือก', null, () => {
-      panels.forEach((d, i) => (d.open = was[i]));
+      folds.forEach((d, i) => (d.open = was[i]));
       bar.remove();
       body.hidden = choices.hidden = false;
       choices.querySelector('button.choice:not(:disabled)')?.focus();
     }));
     bar.append(back);
-    box.append(bar);
+    // ต่อท้ายพาแนลกลาง (ที่เดียวกับปุ่มเดิม) — ต่อท้ายการ์ดตรง ๆ จอแนวนอนจะไปตกช่องกริดที่ไม่ได้จองไว้
+    body.parentElement.append(bar);
     scrollTo(0, 0);
     back.focus({ preventScroll: true });
   };
   return later;
+}
+
+// จอแนวนอนเตี้ย (B131 แบบ C2): ห่อลูกการ์ดเป็นพาแนลซ้าย (หัว ค่าสถานะ แผง) · กลาง (เรื่องต่อด้วยปุ่ม) · ขวา (สมุด · ฉายา)
+// จอตั้งตัวห่อเป็น display:contents และพาแนลขวาซ่อน ⇒ หน้าตาเดิม · ห่อทุกขนาดจอ หมุนจอกลางเกมจึงไม่ต้องวาดการ์ดใหม่
+// กริดวางหลายลูกต่อกันในคอลัมน์เดียวโดยแถวไม่สูงตามคอลัมน์ข้าง ๆ ไม่ได้ จึงต้องมีตัวห่อ
+function panels(box) {
+  const left = el('div', 'p-left');
+  const mid = el('div', 'p-mid');
+  for (const k of [...box.children]) (k.classList.contains('body') || k.classList.contains('choices') ? mid : left).append(k);
+  box.classList.add('pn');
+  box.append(left, mid, sidePanel());
+  return box;
+}
+// พาแนลขวา: ทางเข้าชั้นสมุด + ความคืบหน้าสมุดฉายา · กระเป๋ายังไม่มีระบบ จึงยังไม่มีช่อง (เพิ่มเมื่อมีของ)
+// ปุ่มเป็นลิงก์ ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด เปิดชั้นสมุดแล้วกลับมาการ์ดเดิม
+function sidePanel() {
+  const side = el('aside', 'p-side');
+  side.setAttribute('aria-label', 'สมุดและฉายา');
+  const b = bookRead();
+  const p = picsRead();
+  side.append(el('div', 'h', 'สมุด'), el('p', 'note', `อนุสรณ์ ${memoRead().l.length} ชีวิต · ภาพบ้านเมือง ${picsGot(p)}/${PIC_ALL}`), shelfButton('เปิดชั้นสมุด'));
+  side.append(el('div', 'h', 'ฉายา'), el('p', 'note', `สะสมแล้ว ${bookGot(b)}/${BOOK_ALL}`), shelfBar(bookGot(b), BOOK_ALL), shelfButton('ดูสมุดฉายา', 't'));
+  return side;
 }
 
 const genLabel = () => (st.gen > 1 ? `รุ่นที่ ${st.gen} · ` : '');
@@ -1827,7 +1851,7 @@ function renderAfter(card) {
   box.append(top);
   if (court) box.append(courtScene());
   box.append(body, choices);
-  root.append(box);
+  root.append(panels(box));
 }
 
 // ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
@@ -1905,7 +1929,7 @@ function renderIsekai(card) {
   box.append(top);
   if (s) box.append(isekaiStatusBox(s));
   box.append(body, choices);
-  root.append(box);
+  root.append(panels(box));
 }
 
 // เซฟรุ่นเก่า (v1) = seed ต้นตระกูล + ลำดับปุ่มที่กด แล้วเล่นซ้ำตอนโหลด — เนื้อหาเปลี่ยนแล้วเล่นซ้ำได้คนละชีวิต
@@ -2141,7 +2165,7 @@ function openBook(death) {
     if (!last) row.append(button('ข้ามสมุด', null, done));
     choices.append(row);
     box.append(top, body, choices);
-    root.append(box);
+    root.append(panels(box));
   };
   show(0);
 }
