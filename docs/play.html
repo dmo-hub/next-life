@@ -5150,8 +5150,7 @@ const root = document.getElementById('app');
 const appVer = document.getElementById('appVer');
 appVer.textContent = `${APP_VERSION} · ${APP_BUILD}`;
 // เลขรุ่นพาไปแพตช์โน้ตของรุ่นนั้น (B121) — หน้า whatsnew ไม่มี id ต่อรุ่น จึงเลื่อนด้วย text fragment ซึ่งตกไปหัวหน้าเองถ้าเบราว์เซอร์ไม่รองรับ
-// หน้าเวอร์ชันเก่าอยู่ใน docs/v/ ต้องถอยขึ้นหนึ่งชั้น
-appVer.href = `${/\/v\/v\d+\.\d+\.\d+\.html$/.test(location.pathname) ? '../' : ''}whatsnew.html#:~:text=${APP_VERSION}`;
+appVer.href = `whatsnew.html#:~:text=${APP_VERSION}`;
 
 let st;
 // ระหว่างชาติของชีวิตที่เพิ่งจบ (null = ยังมีชีวิต)
@@ -7114,7 +7113,7 @@ function fingerprint(card) {
 }
 
 // storage พังได้ (โหมดส่วนตัว · เต็ม · ปิด) — เกมยังเล่นได้ แค่ไม่จำ · ป้ายหัวเว็บบอกผู้เล่นว่าจำอยู่หรือไม่ (B77)
-// v = เวอร์ชันที่เขียน — เนื้อหาเปลี่ยนแล้วเซฟเล่นซ้ำไม่ตรง ต้องรู้ว่าจะพากลับไปหน้าเวอร์ชันไหน
+// v = เวอร์ชันที่เขียน — ไว้ดูตอนไล่เซฟที่เล่นซ้ำไม่ตรง
 function saveWrite(card) {
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify({ seed: save.seed, log: save.log, fp: fingerprint(card), v: APP_VERSION, ...(save.rr && { rr: 1 }) }));
@@ -7171,15 +7170,7 @@ function begin(seed) {
 // seed จากเวลาเฉพาะฝั่งหน้าเว็บ แกนเกมเองไม่แตะนาฬิกา
 const freshSeed = () => (Date.now() ^ (performance.now() * 1000)) >>> 0;
 
-// หน้าเวอร์ชันเก่า (docs/v/) มีไว้เล่นตระกูลที่ค้างให้จบ — ตระกูลใหม่ต้องเริ่มที่เวอร์ชันล่าสุด
-// ไม่งั้นเซฟใหม่ติดเลขเวอร์ชันเก่า หน้าล่าสุดจะส่งกลับมาที่นี่วนไป
-const ARCHIVE = /\/v\/v\d+\.\d+\.\d+\.html$/.test(location.pathname);
 function start() {
-  if (ARCHIVE) {
-    saveClear();
-    location.href = '../play.html';
-    return;
-  }
   const card = begin(freshSeed());
   saveWrite(card);
   render(card);
@@ -7234,55 +7225,11 @@ function home(card) {
   choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.memorial, null, () => openMemo()));
 }
 
-// เซฟจากเวอร์ชันที่เนื้อหาต่างกัน (B77): ไม่ทิ้ง — พาไปเล่นต่อในหน้าของเวอร์ชันนั้นที่เก็บไว้ (docs/v/)
-// เซฟก่อนมีเลขเวอร์ชัน: ลองเปิดหน้าเก่าทีละเวอร์ชัน (ใหม่ → เก่า) ใน iframe ซ่อน หน้าที่ขึ้น "เล่นต่อ" คือเวอร์ชันของเซฟ
-// หน้าเก่าเปิดเซฟที่ไม่ใช่ของตัวเองแล้วแค่วาดการ์ด ไม่เขียนทับ — ลองได้โดยเซฟไม่เสีย
-const PROBE_MS = 20000;
-async function archiveList() {
-  try {
-    const r = await fetch('v/index.json', { cache: 'no-store' });
-    return r.ok ? await r.json() : [];
-  } catch {
-    return [];
-  }
-}
-function probe(ver) {
-  return new Promise((ok) => {
-    const f = el('iframe');
-    f.hidden = true;
-    f.setAttribute('aria-hidden', 'true');
-    const done = (hit) => {
-      clearTimeout(t);
-      f.remove();
-      ok(hit);
-    };
-    const t = setTimeout(() => done(false), PROBE_MS);
-    f.onload = () => {
-      let hit = false;
-      try {
-        hit = f.contentDocument.querySelector('.card .top small')?.textContent === 'เล่นต่อ';
-      } catch {
-        // เปิดจากไฟล์ในเครื่อง iframe อ่านข้ามกันไม่ได้
-      }
-      done(hit);
-    };
-    f.src = `v/${ver}.html`;
-    document.body.append(f);
-  });
-}
-async function oldSave(s) {
-  const lost = () => {
-    const choices = homeCard('เซฟเก่า', ['ชีวิตที่ค้างไว้เล่นต่อไม่ได้', 'หาหน้าเกมเวอร์ชันที่เล่นค้างไว้ไม่เจอ · สมุดฉายายังอยู่']);
-    choices.append(button(BTN.newFamily, null, () => confirmNew(() => oldSave(s))));
-  };
-  if (ARCHIVE) return lost();
-  homeCard('เซฟจากเวอร์ชันก่อน', ['กำลังหาชีวิตที่เล่นค้างไว้…', 'เกมอัปเดตเนื้อเรื่องตั้งแต่เล่นครั้งก่อน']);
-  const list = (await archiveList()).filter((v) => v !== APP_VERSION);
-  let ver = s.v && list.includes(s.v) ? s.v : null;
-  if (!ver && !s.v) for (const v of list) if (await probe(v)) { ver = v; break; }
-  if (!ver) return lost();
-  const choices = homeCard('เซฟจากเวอร์ชันก่อน', ['มีชีวิตที่เล่นค้างไว้', `เกมอัปเดตเนื้อเรื่องแล้ว ชีวิตนี้เล่นต่อได้ในเวอร์ชัน ${ver} จนจบตระกูล แล้วตระกูลใหม่จะกลับมาเวอร์ชันล่าสุด`]);
-  choices.append(enter(button(`เล่นต่อในเวอร์ชัน ${ver}`, null, () => (location.href = `v/${ver}.html`))), button(BTN.newFamily, null, () => confirmNew(() => oldSave(s))));
+// เซฟจากเวอร์ชันที่เนื้อหาต่างกัน (B122): เซฟคือ seed + ลำดับปุ่ม เล่นซ้ำบนเนื้อหาใหม่ไม่ได้ชีวิตเดิม จึงเริ่มชีวิตใหม่
+// สมุดฉายา สมุดอนุสรณ์ และบันทึกชีวิตแยก key ไว้ ไม่โดนล้าง
+function staleSave() {
+  const choices = homeCard('เกมอัปเดตแล้ว', ['ชีวิตที่ค้างไว้เล่นต่อไม่ได้', 'เนื้อเรื่องเปลี่ยนตั้งแต่เล่นครั้งก่อน เริ่มชีวิตใหม่ในเวอร์ชันนี้ได้เลย · สมุดฉายาและสมุดอนุสรณ์ยังอยู่']);
+  choices.append(enter(button('เริ่มชีวิตใหม่', null, start)), button(BTN.memorial, null, () => openMemo()));
 }
 
 // ลิงก์ท้ายหน้าเปิดสมุดได้ทุกหน้า (หน้า "เล่นต่อ" ขึ้นเฉพาะตอนมีเซฟ) · เปิดซ้อนตัวเองไม่ได้ ไม่งั้นปุ่มกลับพากลับมาที่สมุด
@@ -7298,7 +7245,6 @@ addEventListener('resize', chromeH);
 document.fonts?.ready.then(chromeH);
 
 function boot() {
-  if (ARCHIVE) document.getElementById('appVer')?.append(' · เวอร์ชันเก่า');
   const s = saveRead();
   if (!s) return start();
   const card = resume(s);
@@ -7306,7 +7252,7 @@ function boot() {
     savedMark(true);
     return home(card);
   }
-  oldSave(s);
+  staleSave();
 }
 
 boot();

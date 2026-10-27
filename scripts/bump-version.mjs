@@ -18,6 +18,3 @@ writeFileSync(file, src.replace(VER, `const APP_VERSION = '${next}';`).replace(B
 console.log(`version: v${m.slice(1).join('.')} → ${next} · build ${today}`);
 // build ต่อทันที — เลขใน play.html ต้องตรงกับซอร์ส ไม่งั้น Pages โชว์เลขเก่า
 await import('../build.mjs');
-// เก็บหน้าของเวอร์ชันนี้ไว้ให้เซฟของมันกลับมาเล่นต่อได้หลังเนื้อหาเปลี่ยน (B77)
-const { archive } = await import('./archive-version.mjs');
-console.log(`archived ${archive(readFileSync(new URL('../docs/play.html', import.meta.url), 'utf8'))}`);
