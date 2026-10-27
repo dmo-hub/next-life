@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, snapshot, restore, repairLife } from '../engine/index.mjs';
 import { eraArt, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
@@ -1719,9 +1719,11 @@ function renderIsekai(card) {
   root.append(box);
 }
 
-// เซฟ = seed ต้นตระกูล + ลำดับปุ่มที่กด แล้วเล่นซ้ำตอนโหลด — แกนเกมให้ผลเดิมทุกครั้งเมื่อ seed กับการกดเท่ากัน
-// (ทายาทได้ seed จากชาติก่อน) จึงไม่ต้องเก็บ st ที่มี rng ข้างใน และใน storage ไม่มีแต้มบุญบาปให้เปิดอ่าน
+// เซฟรุ่นเก่า (v1) = seed ต้นตระกูล + ลำดับปุ่มที่กด แล้วเล่นซ้ำตอนโหลด — เนื้อหาเปลี่ยนแล้วเล่นซ้ำได้คนละชีวิต
+// เซฟรุ่นใหม่ (v2 · B128) = ภาพถ่ายสถานะจริง (engine snapshot) + สถานะหน้าจอ — อัปเดตเกมแล้วชีวิตที่ค้างยังเล่นต่อได้
+// v1 ยังอ่านได้: เล่นซ้ำตรงการ์ดเดิม = เล่นต่อแล้วเขียนทับเป็น v2 ทันที
 const SAVE_KEY = 'next-life-save-v1';
+const SNAP_KEY = 'next-life-save-v2';
 // ปุ่มละตัวอักษร: เลือกในชีวิต = 0-9a-z · เลือกระหว่างชาติ = A-Z · ที่เหลือเป็นเครื่องหมาย
 const T = { next: '.', afterlife: '>', afterNext: ',', rebirth: '+' };
 const lifePick = (i) => i.toString(36);
@@ -1976,9 +1978,12 @@ function fingerprint(card) {
 
 // storage พังได้ (โหมดส่วนตัว · เต็ม · ปิด) — เกมยังเล่นได้ แค่ไม่จำ · ป้ายหัวเว็บบอกผู้เล่นว่าจำอยู่หรือไม่ (B77)
 // v = เวอร์ชันที่เขียน — ไว้ดูตอนไล่เซฟที่เล่นซ้ำไม่ตรง
+// สถานะหน้าจอที่การ์ดถัดไปอ่านต่อ (อายุใบก่อน · บันทึกชีวิต · สมุดชีวิต) — เดิมได้จากการเล่นซ้ำ ตอนนี้เก็บไปกับภาพถ่าย
+const uiState = () => ({ save, prevAge, curAge, lifeMark, noteAsk, bookCards, eraSeen, bookIntro, bookSeq });
 function saveWrite(card) {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({ seed: save.seed, log: save.log, fp: fingerprint(card), v: APP_VERSION, ...(save.rr && { rr: 1 }) }));
+    localStorage.setItem(SNAP_KEY, JSON.stringify({ v: APP_VERSION, snap: snapshot({ st, af, card, ui: uiState() }, CONTENT) }));
+    localStorage.removeItem(SAVE_KEY);
     savedMark(true);
   } catch {
     // เขียนไม่ลงแต่เซฟเก่ายังอยู่ = รีเฟรชแล้วย้อนไปจุดเก่าโดยไม่รู้ตัว — ลบทิ้งดีกว่า
@@ -2001,9 +2006,34 @@ function saveRead() {
     return null;
   }
 }
+const snapExists = () => {
+  try {
+    return !!localStorage.getItem(SNAP_KEY);
+  } catch {
+    return false;
+  }
+};
+// ภาพถ่าย v2 → คืนสถานะทั้งเกมบนเนื้อหาปัจจุบัน · การ์ดที่ค้างใช้ไม่ได้แล้ว (เนื้อหาเปลี่ยน) = จั่วใบถัดไป · อ่านไม่ได้ = null
+function snapRead() {
+  try {
+    const raw = localStorage.getItem(SNAP_KEY);
+    if (!raw) return null;
+    const root = restore(JSON.parse(raw).snap, CONTENT);
+    ({ st, af } = root);
+    ({ save, prevAge, curAge, lifeMark, noteAsk, bookCards, eraSeen, bookIntro, bookSeq } = root.ui);
+    notesLoad(save.seed);
+    let card = root.card;
+    if (!af && repairLife(st, card)) card = track(nextCard(st));
+    else if (af && card.choices?.length && !af.pending) card = nextAfterCard(af);
+    return card;
+  } catch {
+    return null;
+  }
+}
 function saveClear() {
   try {
     localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem(SNAP_KEY);
   } catch {
     // ไม่มีที่เก็บ ก็ไม่มีเซฟให้ลบ
   }
@@ -2106,15 +2136,18 @@ chromeH();
 addEventListener('resize', chromeH);
 document.fonts?.ready.then(chromeH);
 
+// ภาพถ่าย v2 ก่อน · ไม่มีจึงลองเซฟ v1 (เล่นซ้ำตรงการ์ดเดิม = เขียนทับเป็น v2 ทันที) · v1 ไม่ตรง/เซฟเสีย = หน้าเกมอัปเดต
 function boot() {
-  const s = saveRead();
-  if (!s) return start();
-  const card = resume(s);
-  if (card) {
-    savedMark(true);
-    return home(card);
+  let card = snapRead();
+  if (!card) {
+    const s = saveRead();
+    if (!s && !snapExists()) return start();
+    card = s && resume(s);
+    if (!card) return staleSave();
+    saveWrite(card);
   }
-  staleSave();
+  savedMark(true);
+  home(card);
 }
 
 boot();
