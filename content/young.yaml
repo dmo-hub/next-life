@@ -38,7 +38,7 @@ events:
     years: [2500, 2650]
     weight: 2
     multipliers: {flags: {bullied: 2}, occupation: {clerk: 1.5}}
-    when: {age: [21, 28], occupation: [clerk, technician, professional, manager]}
+    when: {age: [21, 28], occupation: [clerk, technician, professional, manager], ladder: [none, private, trade]}
     title: "หัวหน้าขโมยผลงาน"
     text: "งานแรกปีแรก หัวหน้าโยนงานให้จนดึกทุกคืน แล้วเช้าวันประชุมก็เอาผลงานของคุณขึ้นพรีเซนต์ต่อหน้าผู้บริหารเป็นของตัวเองหน้าตาเฉย"
     choices:
@@ -351,7 +351,7 @@ events:
     category: work_money
     stage: หนุ่มสาว
     years: [2500, 2650]
-    when: {occupation: [clerk, technician, professional, manager]}
+    when: {occupation: [clerk, technician, professional, manager], ladder: [none, private, trade]}
     title: "แฟ้มลับในห้องผู้บริหาร"
     text: "ผู้บริหารปิดประตูแล้ววางแฟ้มลงตรงหน้า ข้างในคือใบเบิกปลอมที่หัวหน้าเซ็นมาสองปีเต็ม เขาถามเรียบ ๆ ว่าเรื่องนี้คุณอยากให้จบแบบไหน"
     choices:

@@ -349,7 +349,7 @@ events:
     category: society
     stage: ทำงาน
     years: [2500, 2650]
-    when: {age: [19, 59], occupation: [factory, craft, service, clerk, technician, professional, manager]}
+    when: {age: [19, 59], occupation: [factory, craft, service, clerk, technician, professional, manager], ladder: [none, private, trade]}
     title: "กาแฟแก้วนี้ขายได้"
     text: "ร้านกาแฟเล็กของคุณติดปากคนทั้งย่าน มีคนตกงานมาขอซื้อสูตรไปเปิดเอง ส่วนบริษัทเก่าโทรมาชวนกลับไปทำตำแหน่งเดิม"
     choices:

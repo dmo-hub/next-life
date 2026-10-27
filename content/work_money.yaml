@@ -40,7 +40,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [professional]}
+    when: {occupation: [professional], ladder: [none, private, trade]}
     multipliers: {stats: {network: 1.3}, flags: {good_student: 1.5}}
     title: "เก้าอี้ผู้จัดการ"
     text: "หัวหน้าเกษียณ ผู้บริหารยื่นข้อเสนอให้ขึ้นเป็นผู้จัดการ เงินเดือนเกือบสองเท่า แต่มีเงื่อนไขเดียว ต้องย้ายไปประจำสาขาต่างจังหวัด"

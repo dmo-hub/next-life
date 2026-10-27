@@ -1,0 +1,291 @@
+# กลุ่มงานในสายราชการ · ทหาร · ตำรวจ (B40) · ช่วงทำงาน (31–45) + กลางคน (46–59)
+# คนในสายนี้ถูกตั้งอาชีพเป็น professional/manager ตามขั้นยศ การ์ดเรื่องบริษัทจึงกั้นด้วย ladder แล้ว ⇒ ชีวิตช่วงทำงานของสายนี้มาจากไฟล์นี้
+events:
+  - id: army_border_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {ladder: [army]}
+    title: "คำสั่งไปประจำชายแดน"
+    text: "คำสั่งลงมาเช้าวันจันทร์ ให้ไปคุมกำลังที่ฐานปฏิบัติการชายแดนสองปี ที่นั่นสัญญาณโทรศัพท์ขึ้นแค่บนเนินหลังค่าย"
+    choices:
+      - id: go_alone
+        text: "ไปคนเดียว ส่งเงินกลับบ้าน"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ครบสองปีกลับมาพร้อมเบี้ยเลี้ยงสะสมก้อนหนึ่ง ผู้บังคับบัญชาจำชื่อได้", effects: {money: {unit: income_x, amount: 1}, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กลับมาลูกพูดกับเราเหมือนคนแปลกหน้า ต้องเริ่มทำความรู้จักกันใหม่", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: bring_family
+        text: "ขนครอบครัวไปอยู่บ้านพักในค่าย"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ลูกได้วิ่งเล่นในป่ากับลูกทหารคนอื่น ทั้งบ้านจำสองปีนั้นได้ดีกว่าที่คิด", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกเป็นไข้มาลาเรียหนักจนต้องส่งตัวลงเมือง", effects: {happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+      - id: pull_strings
+        text: "ฝากผู้ใหญ่ขอยกเว้นคำสั่ง"
+        requires: {stats: {network: {min: 45}}, reason: "ไม่มีผู้ใหญ่ให้ฝาก"}
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ชื่อถูกถอนออกเงียบ ๆ เพื่อนร่วมรุ่นคนหนึ่งต้องไปแทน", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ใหญ่ไม่รับฝาก แถมจำได้ว่าเราเคยพยายามเลี่ยงงาน", effects: {network: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: desk_job
+        text: "ขอย้ายไปงานธุรการในกรม"
+        effects: {income_mult: 0.9, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: army_batman_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {ladder: [army], age: [33, 59]}
+    multipliers: {rank: 1.3}
+    title: "พลทหารประจำบ้าน"
+    text: "หน่วยส่งพลทหารเกณฑ์สองคนมาประจำบ้านพัก ภรรยานายคนก่อนใช้ให้ซักผ้า ล้างรถ ไปส่งลูกที่โรงเรียนจนเป็นเรื่องปกติ"
+    choices:
+      - id: use_fully
+        text: "ใช้งานเหมือนที่คนก่อนใช้"
+        merit: [{cat: oppress_subjects, level: 2}]
+        outcomes:
+          - {weight: 3, ok: true, text: "บ้านเรียบร้อยทุกวัน พลทหารไม่เคยปริปาก จนปลดประจำการแล้วไม่หันมาไหว้สักคน", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คลิปพลทหารล้างรถให้ลูกเราหลุดไปในโซเชียล ถูกเรียกไปชี้แจงต่อหน้าผู้บังคับบัญชา", effects: {happiness: -2, network: -1}, merit: [{cat: neutral}]}
+      - id: send_back
+        text: "ส่งกลับหน่วย ให้ฝึกตามหน้าที่"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: pay_extra
+        text: "ใช้งานบ้าน แต่จ่ายค่าขนมให้"
+        effects: {money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: oppress_subjects, level: 1}]
+      - id: teach_trade
+        text: "ส่งไปเรียนช่างตอนเย็นแทน"
+        effects: {money: {unit: income_x, amount: -0.2}, relations: 1}
+        merit: [{cat: help_others, level: 2}]
+        outcomes:
+          - {weight: 2, ok: true, text: "หลายปีต่อมาพลทหารคนนั้นเปิดอู่ของตัวเอง ส่งของฝากมาให้ทุกปีใหม่", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นายรุ่นเดียวกันหัวเราะว่าเลี้ยงลูกน้องเสียคน", effects: {network: -1}, merit: [{cat: neutral}]}
+
+  - id: service_procure_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 3
+    when: {ladder: [army, police]}
+    multipliers: {rank: 1.5, flags: {in_debt: 1.3}}
+    title: "สเปกที่มีเจ้าเดียวขายได้"
+    text: "คณะกรรมการจัดซื้อมีชื่อคุณอยู่ด้วย ตัวแทนบริษัทหนึ่งนัดกินข้าว ขอแค่เขียนสเปกให้ตรงกับเครื่องรุ่นที่เขาขายได้เจ้าเดียว ราคาแพงกว่าตลาดเกือบเท่าตัว"
+    choices:
+      - id: write_spec
+        text: "เขียนสเปกให้ รับส่วนแบ่ง"
+        sets_flags: [took_bribe]
+        merit: [{cat: greed_harm, level: 3}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ส่วนแบ่งเข้าบัญชีญาติเป็นงวด ๆ เครื่องที่ซื้อมาใช้ได้ไม่ถึงครึ่งของที่โฆษณา", effects: {money: {unit: income_x, amount: 3}, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นักข่าวเทียบราคากับตลาดแล้วลงข่าวเต็มหน้า กรรมการทุกคนถูกตั้งสอบ ออกจากราชการพร้อมคดี", effects: {job: labor, money: {unit: income_x, amount: -2}, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: open_spec
+        text: "เขียนสเปกกลาง ให้หลายเจ้าแข่งกัน"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ได้ของราคาถูกลงเกือบครึ่ง งบที่เหลือเอาไปซ่อมโรงนอนพลทหาร", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถูกถอดชื่อจากกรรมการชุดถัดไป เส้นทางเลื่อนขั้นช้าลงไปหลายปี", effects: {network: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: recuse
+        text: "ขอถอนตัวจากกรรมการ"
+        effects: {network: -1}
+        merit: [{cat: neutral}]
+      - id: report_it
+        text: "เก็บหลักฐานส่งหน่วยตรวจสอบ"
+        merit: [{cat: help_others, level: 2}]
+        outcomes:
+          - {weight: 1, ok: true, text: "การจัดซื้อถูกระงับ ชื่อคุณไม่ปรากฏในข่าว แต่คนในรู้กันว่าใครส่ง", effects: {relations: 1, network: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เรื่องเงียบหาย อีกสามเดือนคุณถูกย้ายไปประจำหน่วยที่ไกลที่สุด", effects: {happiness: -2, income_mult: 0.9}, merit: [{cat: neutral}]}
+
+  - id: police_envelope_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {ladder: [police]}
+    multipliers: {rank: 1.3, flags: {in_debt: 1.5}}
+    title: "ซองต้นเดือน"
+    text: "ต้นเดือนร้านในเขตส่งซองมาที่โต๊ะ หัวหน้าบอกว่าเก็บรวมแล้วส่งขึ้นไปตามระบบ ส่วนหนึ่งเป็นของคนเก็บ"
+    choices:
+      - id: collect
+        text: "เก็บส่งตามระบบ"
+        sets_flags: [took_bribe]
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 3, ok: true, text: "รายได้เสริมเข้ามาทุกเดือนจนชิน หัวหน้าชมว่าทำงานเข้าขา", effects: {income_mult: 1.2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านหนึ่งแอบถ่ายคลิปตอนส่งซอง ถูกสั่งพักราชการแล้วให้ออก", effects: {job: labor, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: refuse
+        text: "ไม่รับ ขอย้ายไปงานสอบสวน"
+        effects: {income_mult: 0.95, happiness: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: keep_quiet_cut
+        text: "รับมาแต่ไม่ส่งต่อ เก็บไว้คนเดียว"
+        sets_flags: [took_bribe]
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 1, ok: true, text: "สองเดือนแรกไม่มีใครถาม เงินก้อนพอผ่อนรถได้สบาย", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หัวหน้ารู้ตั้งแต่เดือนแรก ถูกย้ายไปอยู่โรงพักที่ไกลที่สุดของจังหวัด", effects: {happiness: -2, network: -1}, merit: [{cat: neutral}]}
+      - id: report_up
+        text: "ร้องเรียนผู้ตรวจ"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "มีการสอบจริง หัวหน้าถูกย้าย ร้านแถวนั้นยกมือไหว้เมื่อเดินผ่าน", effects: {relations: 2, network: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เรื่องถูกส่งกลับมาให้หัวหน้าสอบเอง ทั้งโรงพักไม่มีใครคุยด้วย", effects: {relations: -2, happiness: -2}, merit: [{cat: neutral}]}
+
+  - id: police_swap_driver_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {ladder: [police], age: [31, 59]}
+    multipliers: {rank: 1.2}
+    title: "คนขับตัวจริง"
+    text: "รถหรูชนคนขี่มอเตอร์ไซค์บาดเจ็บสาหัสกลางดึก โทรศัพท์จากผู้ใหญ่ดังก่อนสำนวนจะเสร็จ ขอให้คนขับเป็นคนงานของบ้านแทนลูกชาย"
+    choices:
+      - id: swap
+        text: "เปลี่ยนตัวคนขับตามที่ขอ"
+        sets_flags: [took_bribe]
+        merit: [{cat: unjust_judgment, level: 3}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คดีจบเร็ว ผู้ใหญ่ฝากขอบคุณมาพร้อมของก้อนหนึ่ง คนงานคนนั้นติดคุกแทน", effects: {money: {unit: income_x, amount: 2}, network: 1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กล้องหน้ารถคันหลังเห็นหน้าคนขับชัด คลิปออกข่าว ถูกไล่ออกพร้อมคดีทำสำนวนเท็จ", effects: {job: labor, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: by_the_book
+        text: "ทำสำนวนตามหลักฐาน"
+        merit: [{cat: sila, level: 2}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ศาลตัดสินตามสำนวน ครอบครัวผู้บาดเจ็บมากราบที่โรงพัก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สำนวนเสร็จก็ได้คำสั่งย้ายไปประจำด่านชายแดน", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+      - id: hand_off
+        text: "ขอโอนคดีให้คนอื่นทำ"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: tip_press
+        text: "แอบส่งภาพจากกล้องให้นักข่าว"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ข่าวใหญ่จนผู้ใหญ่ไม่กล้าโทรมาอีก คดีเดินตามจริง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถูกสอบว่าใครปล่อยภาพ หาตัวไม่ได้ แต่ชื่อคุณอยู่ในรายชื่อที่ไม่มีใครไว้ใจ", effects: {network: -2}, merit: [{cat: neutral}]}
+
+  - id: police_night_shift_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {ladder: [police]}
+    title: "เวรดึกที่ด่านตรวจ"
+    text: "ตั้งด่านกลางดึกติดกันมาสามเดือน กินข้าวตีสอง นอนตอนกลางวันไม่เคยเต็มอิ่ม หมอบอกความดันขึ้นเกินวัย"
+    choices:
+      - {id: ask_day, text: "ขอย้ายไปเวรกลางวัน", effects: {income_mult: 0.95, health: 1}, merit: [{cat: neutral}]}
+      - {id: coffee_on, text: "กินกาแฟสู้ต่อ", effects: {health: -2, income_mult: 1.05}, merit: [{cat: neutral}]}
+      - {id: exercise, text: "ตื่นมาวิ่งก่อนเข้าเวรทุกวัน", effects: {health: 1, happiness: -1}, merit: [{cat: neutral}]}
+      - {id: drink_off, text: "ลงเวรแล้วตั้งวงกับเพื่อน", effects: {health: -1, relations: 1}, merit: [{cat: intoxicants, level: 1}]}
+
+  - id: gov_transfer_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {ladder: [gov]}
+    title: "คำสั่งย้ายข้ามจังหวัด"
+    text: "บัญชีโยกย้ายประจำปีออกแล้ว ชื่อ{ชื่อ}ถูกย้ายไปประจำอำเภอชายขอบอีกจังหวัด ได้ตำแหน่งเท่าเดิม ห่างบ้านห้าร้อยกิโล"
+    choices:
+      - id: go
+        text: "ไปตามคำสั่ง กลับบ้านเดือนละครั้ง"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "งานที่อำเภอเล็กได้ตัดสินใจเองหลายเรื่อง ผลงานเข้าตาผู้ใหญ่", effects: {knowledge: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ค่ารถไปกลับกินเงินเดือนไปเกือบครึ่ง เหนื่อยทั้งตัวทั้งใจ", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
+      - id: swap_post
+        text: "หาคนยื่นขอสับเปลี่ยนตำแหน่ง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอคนที่อยากกลับบ้านพอดี ยื่นเรื่องคู่กันผ่านในรอบเดียว", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไม่มีใครอยากสลับ ต้องไปตามคำสั่งอยู่ดี ช้ากว่าคนอื่นหนึ่งเดือน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: envelope
+        text: "ฝากซองผู้ใหญ่ ขอยกเลิกคำสั่ง"
+        requires: {money: {unit: income_x, amount: 1}, reason: "เงินไม่พอใส่ซอง"}
+        effects: {money: {unit: income_x, amount: -1}}
+        sets_flags: [took_bribe]
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ชื่อหายจากบัญชีรอบแก้ไข คนอื่นต้องไปแทน", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ใหญ่รับซองแต่คำสั่งไม่เปลี่ยน ทวงคืนก็ไม่ได้", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: resign
+        text: "ลาออกจากราชการ หางานใกล้บ้าน"
+        effects: {job: clerk, happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: gov_budget_rush_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {ladder: [gov], age: [31, 59]}
+    multipliers: {rank: 1.2}
+    title: "งบต้องหมดก่อนสิ้นเดือนกันยา"
+    text: "เหลืออีกสามสัปดาห์จะสิ้นปีงบประมาณ งบของกองยังเหลือหลายแสน ถ้าใช้ไม่หมด ปีหน้าจะถูกตัดตามที่เหลือ"
+    choices:
+      - id: buy_stuff
+        text: "ซื้อครุภัณฑ์ที่ไม่จำเป็นให้หมด"
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - id: study_trip
+        text: "จัดดูงานต่างจังหวัดทั้งกอง"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: greed_harm, level: 1}]
+      - id: return_budget
+        text: "คืนงบที่เหลือ เขียนเหตุผลแนบ"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ตรวจชมในรายงาน แต่ปีหน้างบถูกหั่นจริง ลูกน้องบ่นกันทั้งกอง", effects: {relations: -1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าเรียกไปถามว่าทำให้ทั้งกองเดือดร้อนทำไม", effects: {network: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: fix_school
+        text: "เอาไปซ่อมห้องน้ำโรงเรียนในเขต"
+        effects: {happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: gov_hire_nephew_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 3
+    when: {ladder: [gov]}
+    multipliers: {rank: 1.3}
+    title: "หลานของผู้ใหญ่"
+    text: "สอบบรรจุพนักงานรอบนี้ผลออกแล้ว ผู้ใหญ่ในกระทรวงโทรมาฝากหลานที่สอบได้ลำดับสิบสอง ตำแหน่งว่างมีห้าที่ และคุณเป็นประธานกรรมการสัมภาษณ์"
+    choices:
+      - id: bump_nephew
+        text: "ดันคะแนนหลานให้ติดห้าคนแรก"
+        merit: [{cat: unjust_judgment, level: 2}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ผู้ใหญ่จำบุญคุณ รอบประเมินถัดไปชื่อคุณอยู่บนสุด คนที่หลุดลำดับไปสอบที่อื่นแทน", effects: {network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้สมัครที่หลุดยื่นขอดูคะแนน เรื่องไปถึงศาลปกครอง", effects: {network: -1, happiness: -2}, merit: [{cat: neutral}]}
+      - id: by_score
+        text: "ให้คะแนนตามที่ตอบจริง"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "หลานได้คะแนนตามจริง ไม่ติด ผู้ใหญ่ไม่โทรมาอีกเลย", effects: {network: -1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลานสัมภาษณ์ดีจริงจนติดเองโดยไม่ต้องช่วย ผู้ใหญ่คิดว่าเราช่วย", effects: {network: 1}, merit: [{cat: neutral}]}
+      - id: step_down
+        text: "ขอถอนตัว อ้างว่ารู้จักผู้สมัคร"
+        effects: {network: -1}
+        merit: [{cat: neutral}]
+      - id: trade_favor
+        text: "ช่วยหลาน แลกให้ลูกย้ายเข้ากรุง"
+        merit: [{cat: unjust_judgment, level: 2}]
+        effects: {network: 1, relations: 1}

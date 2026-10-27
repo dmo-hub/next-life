@@ -73,7 +73,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [service, craft, technician, manager]}
+    when: {occupation: [service, craft, technician, manager], ladder: [none, private, trade]}
     multipliers: {rank: 1.3, flags: {own_business: 1.5, took_bribe: 1.3}, stats: {network: 1.2}}
     title: "ค่าน้ำร้อนน้ำชา"
     text: "งานประมูลก้อนใหญ่ที่รอมาทั้งปีเปิดแล้ว คนในกระซิบว่าราคาไม่สำคัญเท่าไหร่ ใครจ่ายสิบเปอร์เซ็นต์ใต้โต๊ะก่อนคนนั้นได้"
@@ -272,7 +272,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [manager]}
+    when: {occupation: [manager], ladder: [none, private, trade]}
     multipliers: {rank: 1.3, flags: {in_debt: 1.3}}
     title: "โบนัสแลกโอที"
     text: "เจ้าของบริษัทยื่นข้อเสนอ ถ้าตัดโอทีลูกน้องทั้งแผนกได้ครบปีนี้ โบนัสก้อนใหญ่เป็นของคุณ ลูกน้องหลายคนผ่อนบ้านผ่อนรถอยู่"
