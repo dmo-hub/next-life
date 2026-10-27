@@ -35,8 +35,10 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .card { display:flex; flex-direction:column; min-height:560px; }
 .top { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 20px; }
 .top small { font-size:12px; letter-spacing:0.04em; text-align:right; }
-/* รูปตัวละคร (B56): วงกลม 40px มุมซ้ายหัวการ์ด · clip-path ตัดเสื้อที่ยื่นเลยวงกลม (ภาพแชร์ตัดด้วย arc แบบเดียวกัน) */
+/* รูปตัวละคร (B56): วงกลมมุมซ้ายหัวการ์ด · clip-path ตัดเสื้อที่ยื่นเลยวงกลม (ภาพแชร์ตัดด้วย arc แบบเดียวกัน) */
 .av { flex:none; display:block; width:40px; height:40px; clip-path:circle(50%); }
+/* หัวการ์ดแถวเดียวต้องสูงเท่าเดิม 55px (A13): margin ติดลบให้รูปล้นเข้า padding แทนดันหัวให้สูง · gap ข้างรูปแคบกว่า gap หัวการ์ด ให้ตัวอายุมีที่ไม่ตกบรรทัด */
+.top .av { width:32px; height:32px; margin:-3px -6px -3px 0; }
 .top .av + b { flex:1; min-width:0; }
 .grow { display:flex; align-items:center; gap:10px; font-weight:600; }
 .grow .av { width:56px; height:56px; }
