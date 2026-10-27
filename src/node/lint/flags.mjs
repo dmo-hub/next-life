@@ -88,4 +88,31 @@ export const rules = [
       }
     },
   },
+  {
+    id: 'next-cycle',
+    desc: 'เรื่องต่อห้ามวนกลับใบที่อยู่ในสายเดียวกัน (ก → ข → ก) — การ์ดเรื่องต่อไม่นับ done/repeat และออกอายุเดียวกันทั้งสาย สายวนจึงซ้ำได้ไม่มีเพดานในปีเดียว',
+    all(events, ctx, r) {
+      const nexts = new Map();
+      for (const x of events) {
+        const out = [];
+        for (const { node, path } of effectSites(x.e)) if (path.includes('outcomes') && typeof node.next === 'string' && node.next !== x.e.id) out.push({ to: node.next, path: `${path}.next` });
+        nexts.set(x.e.id, { x, out });
+      }
+      // เดินลึกจากทุกใบ · สีเทา = อยู่บนทางเดินตอนนี้ เจอซ้ำ = วง · รายงานที่ขอบที่ปิดวงครั้งเดียวต่อขอบ
+      const color = new Map();
+      const seen = new Set();
+      const walk = (id) => {
+        color.set(id, 1);
+        for (const { to, path } of nexts.get(id)?.out ?? []) {
+          if (!nexts.has(to)) continue;
+          if (color.get(to) === 1) {
+            const k = `${id}>${path}`;
+            if (!seen.has(k)) { seen.add(k); r(nexts.get(id).x, path, `เรื่องต่อ "${to}" วนกลับใบที่อยู่ในสายเดียวกัน — ตัดวงหรือจบสายด้วยการ์ดที่ไม่มี next`); }
+          } else if (!color.has(to)) walk(to);
+        }
+        color.set(id, 2);
+      };
+      for (const id of nexts.keys()) if (!color.has(id)) walk(id);
+    },
+  },
 ];

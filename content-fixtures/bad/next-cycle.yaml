@@ -1,0 +1,30 @@
+# ผิดกติกาเดียว: เรื่องต่อสองใบชี้กันไปมา (ก → ข → ก)
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - text: "ลองดู"
+        outcomes:
+          - {weight: 1, text: "ได้ผล", next: bad_case_02, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่ได้ผล", merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - text: "ลองดู"
+        outcomes:
+          - {weight: 1, text: "ได้ผล", next: bad_case_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่ได้ผล", merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
