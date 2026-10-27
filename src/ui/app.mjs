@@ -1,4 +1,5 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT } from '../engine/index.mjs';
+import { eraArt, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.2.58';
@@ -637,6 +638,7 @@ function shareFacts(card) {
     stats: (card.life?.stats ?? []).map((p) => Object.fromEntries([['age', p.age], ...STAT_KEYS.map((k) => [k, p[k]])])),
     marks: lifeMarks(card.age).map((m) => m.age),
     note: ((n) => n && { age: n.a, text: n.t })(notePick(st.gen)),
+    avatar: avatarParts(card.age),
   };
 }
 
@@ -780,7 +782,11 @@ async function shareBlob(facts) {
   // ชื่อยาวแตกสองบรรทัดตรงช่องว่าง — ให้ย่อบรรทัดเดียวจะเล็กจนอ่านยากบนภาพแนวตั้ง
   for (const part of GAME_NAME.split(' ')) text(part, '700 84px Srisakdi, serif', c('gold'), 96, 0, 1);
   text('NEXT LIFE', '600 28px Sarabun, sans-serif', c('sand'), 44, 0, 1);
+  // รูปวัยสุดท้ายนั่งกลางเส้นคั่นแรก (B56) — ไม่กินที่เพิ่ม ข้อความข้างล่างจึงไม่ไหลเข้าหากราฟ
   rule(44);
+  ctx.fillStyle = c('lacquer');
+  ctx.fillRect(cx - 54, y - 44 - 6, 108, 12);
+  artDraw(ctx, facts.avatar, cx - 42, y - 44 - 42, 84);
   text(facts.name, '700 72px Srisakdi, serif', c('cream'), 84, 4, 1);
   text(`ตายอายุ ${facts.age}`, '700 96px Srisakdi, serif', c('gold2'), 110, 16, 1);
   text(facts.who, '400 40px Sarabun, sans-serif', c('cream'), 58);
@@ -1057,6 +1063,39 @@ function pixels(cls, w, h, rects) {
   for (const [x, y, rw, rh, fill] of rects) svg.append(svgEl('rect', { x, y, width: rw, height: rh, fill }));
   return svg;
 }
+// ภาพจาก art.mjs (B56) วาดเป็น SVG — ชุดรูปทรงเดียวกับที่ภาพแชร์วาดลง canvas
+function artSvg(cls, w, h, parts) {
+  const svg = svgEl('svg', { class: cls, viewBox: `0 0 ${w} ${h}`, 'aria-hidden': 'true' });
+  for (const p of parts) svg.append(svgEl('path', { d: p.d, fill: p.fill ?? 'none', ...(p.stroke && { stroke: p.stroke, 'stroke-width': p.w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }) }));
+  return svg;
+}
+function artDraw(ctx, parts, x, y, size) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(size / AVATAR_SIZE, size / AVATAR_SIZE);
+  ctx.beginPath();
+  ctx.arc(AVATAR_SIZE / 2, AVATAR_SIZE / 2, AVATAR_SIZE / 2, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.lineCap = ctx.lineJoin = 'round';
+  for (const p of parts) {
+    const path = new Path2D(p.d);
+    if (p.fill) {
+      ctx.fillStyle = p.fill;
+      ctx.fill(path);
+    }
+    if (p.stroke) {
+      ctx.strokeStyle = p.stroke;
+      ctx.lineWidth = p.w;
+      ctx.stroke(path);
+    }
+  }
+  ctx.restore();
+}
+// รูปตัวละครอ่านฐานะ ณ ตอนนี้ (standingOf ตัวเดียวกับกราฟฐานะ) — อ่านอย่างเดียว ไม่แตะเซฟ
+const avatarParts = (age) => avatarArt(Math.max(0, STAGES.findLastIndex((s) => age >= s.from)), st.sex, artTier(standingOf(st)));
+const avatar = (age) => artSvg('av', AVATAR_SIZE, AVATAR_SIZE, avatarParts(age));
+// ชราไม่ได้ "เติบโต" แล้ว แต่คงรูปประโยคเดียวกันให้ป้ายทุกช่วงอ่านเป็นชุด
+const growLabel = (stage) => `เติบโตเป็น${stage === 'หนุ่มสาว' ? (st.sex === 'หญิง' ? 'สาว' : 'หนุ่ม') : stage === 'ชรา' ? 'ผู้สูงวัย' : stage === 'วัยรุ่น' ? 'วัยรุ่น' : `วัย${stage}`}`;
 const flame = () => pixels('flame', 10, 14, [[4, 0, 2, 2, '#FFE3A6'], [3, 2, 4, 3, '#F6C66A'], [4, 5, 2, 1, '#E07A2F'], [2, 6, 6, 8, '#EFE3C2']]);
 const portrait = () => pixels('por', 20, 24, [[0, 0, 20, 24, '#E8E8E8'], [7, 2, 6, 6, '#B8B8B8'], [7, 1, 6, 2, '#1F1F1F'], [5, 8, 10, 8, '#5A5A5A'], [6, 16, 3, 6, '#1F1F1F'], [11, 16, 3, 6, '#1F1F1F']]);
 
@@ -1102,7 +1141,7 @@ function render(card) {
     const head = el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : `อายุ ${card.age} · ช่วง${card.stage}`);
     // การ์ดผลเป็นผลของใบก่อนอยู่แล้ว ป้ายซ้ำไม่บอกอะไรเพิ่ม · งานศพเกิดหลังตายจึงไม่ใช่ "ปีเดียวกัน" ของชีวิต
     if (card.kind !== 'result' && !card.funeral && card.age === prevAge) head.append(el('span', 'same', 'ปีเดียวกัน'));
-    top.append(head, el('small', null, `${genLabel()}${st.name} · ${provinceLabel(st)}`));
+    top.append(avatar(card.age), head, el('small', null, `${genLabel()}${st.name} · ${provinceLabel(st)}`));
     box.append(top, stats(s), statHelp());
     // ไม่มีรายได้ก็ต้องเห็นเงินติดตัวเสมอแม้ 0 · มีงานทำแล้วซ่อนเงินติดตัวเฉพาะตอนเป็น 0 พอดี ติดลบ (หนี้) ยังต้องเห็น
     // เงินกู้เป็นยอดค้างของสัญญา ไม่ใช่เงินติดตัวติดลบ จึงแยกช่อง ไม่หักรวมกัน
@@ -1126,6 +1165,9 @@ function render(card) {
     const stand = standingPanel();
     if (stand) box.append(stand);
     const kicker = card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind];
+    // ภาพยุค (B56): การ์ดบ้านเมือง + การ์ดรับมือที่ผูกยุคไว้ (B58) ได้ภาพของยุคนั้น · ยุคที่ไม่มีภาพ = หน้าตาเดิม
+    const eraPic = eraArt(card.kind === 'era' ? card.id : card.kind === 'event' ? ERA_OF.get(card.id) : null);
+    if (eraPic) body.append(artSvg('era-art', ERA_ART_W, ERA_ART_H, eraPic));
     if (box.classList.contains('cdl')) body.append(flame());
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
     body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));
@@ -1151,7 +1193,9 @@ function render(card) {
       if (canReroll()) choices.append(button('ขอเกิดใหม่', 'ได้ครั้งเดียว', reroll));
     } else if (card.kind === 'stage') {
       body.append(el('span', 'stamp', card.text));
-      body.append(recap(card.recap));
+      const grow = el('p', 'grow');
+      grow.append(avatar(card.age), el('span', null, growLabel(card.stage)));
+      body.append(grow, recap(card.recap));
       const go = () => choices.replaceChildren(enter(button('ต่อไป', null, next)));
       // ต้องตอบหรือข้ามก่อนเดินต่อ — ปุ่มต่อไปขึ้นหลังปิดแผ่นคำถาม
       if (noteAsk && !noteOf(noteAsk)) choices.append(noteSheet(noteAsk, () => {

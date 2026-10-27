@@ -35,6 +35,13 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .card { display:flex; flex-direction:column; min-height:560px; }
 .top { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 20px; }
 .top small { font-size:12px; letter-spacing:0.04em; text-align:right; }
+/* รูปตัวละคร (B56): วงกลม 40px มุมซ้ายหัวการ์ด · clip-path ตัดเสื้อที่ยื่นเลยวงกลม (ภาพแชร์ตัดด้วย arc แบบเดียวกัน) */
+.av { flex:none; display:block; width:40px; height:40px; clip-path:circle(50%); }
+.top .av + b { flex:1; min-width:0; }
+.grow { display:flex; align-items:center; gap:10px; font-weight:600; }
+.grow .av { width:56px; height:56px; }
+/* แผ่นภาพยุค: รักดำ+ทองทุกธีม (สีอยู่ในตัวภาพ) — ธีมสว่างจึงเป็นแผ่นเข้มบนพื้นขาวเหมือนกรอบภาพ */
+.era-art { display:block; width:100%; height:auto; aspect-ratio:5 / 2; }
 .top .same { margin-left:8px; padding:1px 6px; border:1px solid currentColor; border-radius:3px; font:400 11px/1.4 Sarabun,"Noto Sans Thai",system-ui,sans-serif; white-space:nowrap; opacity:0.85; vertical-align:2px; }
 .stats { display:flex; gap:10px; padding:12px 20px; font-size:12px; }
 .stats > div { display:flex; flex-direction:column; gap:4px; flex:1; min-width:0; }
