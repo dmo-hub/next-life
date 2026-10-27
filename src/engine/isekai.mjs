@@ -622,10 +622,14 @@ const isekaiHas = (isk, s) => isk.skills.includes(s);
 // บาปหนักทำให้ทุกด่านยากขึ้น — บุญไม่ทำให้ง่ายลง (บุญได้ทางค่าเริ่มกับสกิลแล้ว)
 const isekaiDc = (isk, c) => c.dc + (isk.karma < 0 ? Math.round(-isk.karma * ISEKAI.karmaDc) : 0);
 
-export function isekaiChance(isk, c) {
+// สกิลที่ตรงสายของตัวเลือก — ป้าย % กับบันทึก "ช่วยไว้" ใช้ชุดเดียวกับที่บวกโอกาสจริง (B107b)
+const isekaiAids = (isk, c) => isk.skills.filter((s) => ISEKAI_SKILLS[s].tag && ISEKAI_SKILLS[s].tag === c.tag);
+
+// withSkills = false คือโอกาสถ้าไม่มีสกิล — ใช้เทียบว่าสกิลเพิ่มจริงเท่าไรหลังตัดเพดาน 5–95
+export function isekaiChance(isk, c, withSkills = true) {
   if (!c.stat) return null;
   let v = 50 + (isk.st[c.stat] - isekaiDc(isk, c)) * 4;
-  for (const s of isk.skills) if (ISEKAI_SKILLS[s].tag && ISEKAI_SKILLS[s].tag === c.tag) v += ISEKAI_SKILLS[s].add ?? 20;
+  if (withSkills) for (const s of isekaiAids(isk, c)) v += ISEKAI_SKILLS[s].add ?? 20;
   for (const b of [c.bonus, c.bonus2]) if (b && isk.flags[b.flag]) v += b.add;
   return isekaiClamp(Math.round(v), 5, 95);
 }
@@ -729,6 +733,8 @@ export function nextIsekaiCard(isk) {
       step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : `${isk.ending.text} ชีวิตในโลกนี้ดำเนินต่อไปจนถึงวันสุดท้าย`, ending: isk.ending.id,
       choices: [],
       log: isk.log.slice(),
+      // ใส่ช่องเฉพาะชาติที่สกิลเคยช่วยไว้ — การ์ดจบของชาติอื่นรูปเดิม
+      ...(isk.saves && { saves: isk.saves }),
     });
   }
   if (isk.step === 'over') throw new Error('ชาติต่างโลกจบแล้ว — ปรโลกรับช่วงต่อ');
@@ -739,9 +745,12 @@ export function nextIsekaiCard(isk) {
     fx: ev.choices.map((c) => {
       if (c.need && isk.st.gold < c.need.gold) return '';
       const p = isekaiChance(isk, c);
-      return p === null ? (c.need ? `ใช้ทอง ${c.need.gold}` : '') : `${ISEKAI_STAT[c.stat]} ${p}%`;
+      if (p === null) return c.need ? `ใช้ทอง ${c.need.gold}` : '';
+      const aid = p - isekaiChance(isk, c, false);
+      const names = isekaiAids(isk, c).map((s) => ISEKAI_SKILLS[s].name).join(' + ');
+      return `${ISEKAI_STAT[c.stat]} ${p}%${aid > 0 ? ` · ${names} +${aid}%` : ''}`;
     }),
-    locked: ev.choices.map((c) => (c.need && isk.st.gold < c.need.gold ? `ต้องมีทอง ${c.need.gold}` : null)),
+    locked: ev.choices.map((c) => (c.need && isk.st.gold < c.need.gold ? `ต้องมีทอง ${c.need.gold} · ขาดอีก ${Math.ceil(c.need.gold - isk.st.gold)}` : null)),
   });
 }
 
@@ -767,10 +776,16 @@ export function chooseIsekai(isk, idx) {
   const c = ev.choices[idx];
   if (!c) throw new Error('ตัวเลือกไม่ถูกต้อง');
   if (c.need && isk.st.gold < c.need.gold) throw new Error('ตัวเลือกนี้ล็อกอยู่');
-  let ok = true, out = c;
+  let ok = true, out = c, aid = null;
   if (c.stat) {
-    ok = isk.rng.next() * 100 < isekaiChance(isk, c);
+    // ทอยครั้งเดียวเท่าเดิม — สำเร็จแต่ทอยเกินโอกาสแบบไม่มีสกิล = สกิลช่วยไว้ (ไม่ดึงเลขสุ่มเพิ่ม ผลเกมจึงเท่าเดิม)
+    const roll = isk.rng.next() * 100;
+    ok = roll < isekaiChance(isk, c);
     out = ok ? c.win : c.lose;
+    if (ok && roll >= isekaiChance(isk, c, false)) {
+      aid = isekaiAids(isk, c).map((s) => ISEKAI_SKILLS[s].name).join(' + ');
+      isk.saves = (isk.saves ?? 0) + 1;
+    }
   }
   const deltas = isekaiApply(isk, out.fx);
   for (const f of [out.flag, out.flag2]) if (f) isk.flags[f] = true;
@@ -791,7 +806,7 @@ export function chooseIsekai(isk, idx) {
       sys = 'เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว';
     } else isk.dead = true;
   }
-  isk.log.push(`${ev.title} · ${c.t}${c.stat ? (ok ? ' (สำเร็จ)' : ' (พลาด)') : ''}`);
+  isk.log.push(`${ev.title} · ${c.t}${c.stat ? (ok ? (aid ? ` (สำเร็จ · ${aid}ช่วยไว้)` : ' (สำเร็จ)') : ' (พลาด)') : ''}`);
   isk.last = { title: ev.title, text: out.text, ok: c.stat ? ok : null, stat: c.stat ? ISEKAI_STAT[c.stat] : null, deltas, sys };
   isk.step = 'result';
 }

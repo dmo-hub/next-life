@@ -1469,6 +1469,7 @@ function renderIsekai(card) {
   }
   if (card.sys) body.append(el('p', 'isys', card.sys));
   if (card.note) body.append(el('p', 'isys', card.note));
+  if (card.saves) body.append(el('p', 'isys', `สกิลช่วยไว้ ${card.saves} ครั้งในชาตินี้`));
   // ต่างโลกไม่มีฉายาของตัวเอง — เบาะแสชี้ฉายาของโลกเดิมที่ชาติหน้ายังไปเก็บได้ (B108 ใช้สองโลก)
   if (card.step === 'end') clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
   if (card.log?.length) {
