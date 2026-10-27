@@ -1,0 +1,13 @@
+# เพศมีผลต่อการ์ด (B109): multipliers.sex ระดับการ์ด/ทางผล คู่กับ when.sex
+events:
+  - id: good_sex_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    multipliers: {sex: {ชาย: 1.5, หญิง: 0.8}}
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, outcomes: [{weight: 1, ok: true, multipliers: {sex: {หญิง: 1.2}}, text: "สำเร็จ"}, {weight: 1, text: "ไม่สำเร็จ"}], merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

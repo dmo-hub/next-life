@@ -2815,7 +2815,8 @@ const canRepeat = (st, e) => e.repeat && st.fired[e.id].n < e.repeat.max && st.a
 // ชื่อเสียงตระกูลยังไม่มีระบบ คูณ 1
 function poolMultiplier(st, m) {
   if (!m) return 1;
-  let x = m.class?.[st.cls] ?? 1;
+  // เพศมีผลต่อโอกาสการ์ด (B109 · เจ้าของเคาะ) — เพศกำเนิด ชาย/หญิง · when.sex มีอยู่แล้ว
+  let x = (m.class?.[st.cls] ?? 1) * (m.sex?.[st.sex] ?? 1);
   for (const [k, v] of Object.entries(m.stats ?? {})) x *= st[k] >= STAT_HIGH ? v : st[k] <= STAT_LOW ? 1 / v : 1;
   if (m.karma) x *= m.karma ** Math.sign(netLedger(st.ledger));
   // ขอพร: เอียงตามบัญชีแบบต่อเนื่อง บุญน้อยเอียงน้อย บาปหนักกลับทิศ

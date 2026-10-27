@@ -25,7 +25,7 @@ const KEYS = {
   bound: ['min', 'max'],
   whenFlags: ['has', 'not'],
   family: ['role', 'age', 'alive', 'count', 'health', 'relations'],
-  multipliers: ['class', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish', 'rank'],
+  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish', 'rank'],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
   requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'reason'],
@@ -109,7 +109,7 @@ const positive = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
 function checkMultipliers(m, at, r) {
   if (m === undefined) return;
   if (!isObj(m)) return r(at, 'multipliers ต้องเป็น object');
-  for (const [k, of] of [['class', CLASSES], ['stats', STAT_KEYS]]) {
+  for (const [k, of] of [['class', CLASSES], ['sex', SEXES], ['stats', STAT_KEYS]]) {
     if (m[k] === undefined) continue;
     if (!isObj(m[k]) || Object.entries(m[k]).some(([kk, v]) => !of.includes(kk) || !positive(v))) r(`${at}.${k}`, `ต้องเป็น {${of.join('|')}: เลขบวก}`);
   }
