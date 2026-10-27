@@ -321,7 +321,7 @@ events:
         text: "เดินหน้าคดีต่อ ไม่ยอม"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "กล้องหน้าบ้านข้าง ๆ จับหน้าคนพ่นสีได้ชัด คนพ่นโดนจับ เพื่อนบ้านกลับมาทัก เหลือแต่เงินต้นที่ยังต้องคืน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "กล้องหน้าบ้านข้าง ๆ จับหน้าคนพ่นสีได้ชัด คนพ่นโดนจับ เพื่อนบ้านกลับมาทัก เหลือแต่เงินต้นที่ยังต้องคืน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "คดีเงียบหาย คนทวงกลับมายืนหน้าบ้านทุกเย็นเหมือนไม่มีอะไรเกิดขึ้น", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
       - id: pay_principal
         text: "ยอมจ่ายต้นคืนให้จบ"

@@ -236,7 +236,7 @@ events:
         text: "ขอให้ชาวบ้านเลือกคนตรวจบัญชี"
         merit: [{cat: sila, level: 1}]
         outcomes:
-          - {weight: 2, ok: true, text: "หักมุม คนตรวจเจอว่าเหรัญญิกคนก่อนยักยอกไว้ก้อนใหญ่ ได้เงินคืนกองทุน ชาวบ้านยกย่องเราทั้งหมู่บ้าน", effects: {relations: 3, network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "หักมุม คนตรวจเจอว่าเหรัญญิกคนก่อนยักยอกไว้ก้อนใหญ่ ได้เงินคืนกองทุน ชาวบ้านยกย่องเราทั้งหมู่บ้าน", effects: {relations: 3, network: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "คนตรวจเป็นญาติผู้ใหญ่บ้าน หาว่าเราไม่ไว้ใจเพื่อนบ้าน งานบุญปีนี้ไม่มีใครชวน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
 
   - id: fraud_village_meeting_01

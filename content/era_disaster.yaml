@@ -171,7 +171,7 @@ events:
       - id: cheap_trip
         text: "คว้าตั๋วถูกไปเที่ยวนอก"
         outcomes:
-          - {weight: 3, ok: true, text: "ทริปคุ้มที่สุดในชีวิต ถ่ายรูปสถานที่ดังได้โดยไม่มีคนติดเฟรม", effects: {happiness: 3, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, multipliers: {stats: {health: 1.3}}, text: "ทริปคุ้มที่สุดในชีวิต ถ่ายรูปสถานที่ดังได้โดยไม่มีคนติดเฟรม", effects: {happiness: 3, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ไข้ขึ้นที่สนามบินขากลับ ถูกกักตัวสิบสี่วัน ทั้งที่สุดท้ายเป็นแค่หวัด", effects: {health: -1, happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: hoard_masks
@@ -278,7 +278,7 @@ events:
       - id: stay_upstairs
         text: "พายกะละมังไปเล่นบ้านเพื่อน"
         outcomes:
-          - {weight: 2, ok: true, text: "พายกะละมังไปบ้านเพื่อนทุกวัน เป็นปิดเทอมที่สนุกที่สุดในชีวิต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "พายกะละมังไปบ้านเพื่อนทุกวัน เป็นปิดเทอมที่สนุกที่สุดในชีวิต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เหยียบเศษแก้วใต้น้ำ แผลติดเชื้อต้องนอนโรงพยาบาล", effects: {health: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: evacuate_shelter
