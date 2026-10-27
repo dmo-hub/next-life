@@ -1,6 +1,7 @@
 // หน้ารวมการ์ด (B65): สร้างจาก content ทุกครั้งที่ build — การ์ดใหม่ขึ้นหน้าเว็บเองไม่ต้องเขียนมือ
 // แสดงแค่สิ่งที่ผู้เล่นเห็นบนจอ (ชื่อ ข้อความ ตัวเลือก) — ไม่มีผลลัพธ์ ผลต่อค่า เงิน น้ำหนัก หรือป้ายบุญบาป (กติกา merit ใบ 12)
 import { STAGES } from '../engine/index.mjs';
+import { isekaiCatalogHtml, isekaiNav } from './otherworld.mjs';
 
 export const CATEGORY = { family: 'ครอบครัว', study: 'การเรียน', work_money: 'งานและเงิน', health: 'สุขภาพ', society: 'สังคม', belief: 'ความเชื่อ' };
 export const AFTER = 'ระหว่างชาติ';
@@ -29,5 +30,5 @@ export function catalogHtml(content) {
   const body = groups
     .map((g, i) => `<details id="s${i}"${i === 0 ? ' open' : ''}><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map(card).join('')}</div></details>`)
     .join('\n');
-  return `<nav class="toc">${nav}</nav>\n${body}`;
+  return `<nav class="toc">${nav}${isekaiNav(groups.length)}</nav>\n${body}\n${isekaiCatalogHtml(groups.length)}`;
 }

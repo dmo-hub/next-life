@@ -1,12 +1,14 @@
 // ด่านหน้าเว็บ (B65): ตัวเลขบนหน้าเท่าค่าจริง · build ใหม่แล้วเลขเปลี่ยนตามข้อมูล (ตัวควบคุม) · ลิงก์ในเว็บไม่ตาย
 // · หน้ารวมการ์ดไม่มีผล/บุญบาป/น้ำหนัก · ทุกการ์ดใน content อยู่บนหน้ารวมการ์ด
+// · ส่วนต่างโลก (B88b) ทั้งสองหน้าครบทุกการ์ด · หน้ารวมการ์ดไม่มีผลสำเร็จ/พลาด ความยาก หรือตอนจบ
 // · หน้าเฉลย (B88) ครบทุกการ์ด/ตัวเลือก/ผลสุ่ม และเฉลยจริง — กฎ "ไม่หลุดบุญบาป" ของหน้ารวมการ์ดไม่ใช้กับหน้านี้
 import { readFileSync, existsSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
 import { siteFacts, injectFacts } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
 import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
-import { meritName, meritId, MERIT_WEIGHTS } from '../src/engine/index.mjs';
+import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_WORLDS, ISEKAI_SKILLS } from '../src/engine/index.mjs';
+import { isekaiCardCount, ISEKAI_SECTION } from '../src/site/otherworld.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -52,8 +54,15 @@ for (const p of all) {
 check('ลิงก์ภายในไม่ตาย', dead.length, ` ${all.length} หน้า${dead.length ? ` · ตาย ${dead.length}: ${dead.slice(0, 6).join(' | ')}` : ''}`);
 
 // 4) หน้ารวมการ์ด: ครบทุกใบ และไม่มีค่าที่ผู้เล่นไม่เห็นบนจอ
+// ส่วนต่างโลกต่อท้ายหน้า (otherworld.mjs) — แยกนับที่หัวข้อนั้น ไม่ให้เลขการ์ดชาติไทยปนการ์ดต่างโลก
+const cut = (html) => {
+  const i = html.indexOf(`<summary>${ISEKAI_SECTION} `);
+  return i < 0 ? [html, ''] : [html.slice(0, i), html.slice(i)];
+};
+const escHtml = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const cards = read('catalog.html');
-const shown = (cards.match(/<article class="c /g) ?? []).length;
+const [cardsTh, cardsIsk] = cut(cards);
+const shown = (cardsTh.match(/<article class="c /g) ?? []).length;
 check('หน้ารวมการ์ดมีครบทุกใบ', shown !== content.events.length, ` ${shown}/${content.events.length}`);
 const cats = Object.keys(MERIT_WEIGHTS).flatMap((id) => [id, meritName(id)]).filter((s) => s && s !== 'neutral' && s.length > 1);
 const leak = [/"weight"|multipliers|"merit"|outcomes/, /บัญชีบุญบาป\s*[-+]?\d/, /[+-]\d+\s*(?:สุขภาพ|ความสุข|ความรู้|ความสัมพันธ์|คอนเน็คชั่น)/];
@@ -64,6 +73,7 @@ check('หน้ารวมการ์ดไม่มีผล/น้ำหน
 
 // 5) หน้าเฉลย: นับชิ้นบนหน้าเทียบ content ตรง ๆ — ตัวสร้างทำตกหล่นสักทาง (ตัวเลือกซ่อน · ผลสุ่ม · ป้ายบุญบาป) เลขจะไม่เท่า
 const spoil = read('spoilers.html');
+const [spoilTh, spoilIsk] = cut(spoil);
 const nodes = content.events.flatMap((e) => e.choices.flatMap((c) => [c, ...(c.outcomes ?? [])]));
 const want = {
   การ์ด: content.events.length,
@@ -72,13 +82,42 @@ const want = {
   ป้ายบุญบาป: nodes.flatMap((n) => n.merit ?? []).filter((t) => meritId(t.cat) !== 'neutral').length,
 };
 const got = {
-  การ์ด: (spoil.match(/<article class="c /g) ?? []).length,
-  ตัวเลือก: (spoil.match(/<p class="ch">/g) ?? []).length,
-  ผลสุ่ม: (spoil.match(/<b class="pct">/g) ?? []).length,
-  ป้ายบุญบาป: (spoil.match(/<span class="m (?:good|sin)">/g) ?? []).length,
+  การ์ด: (spoilTh.match(/<article class="c /g) ?? []).length,
+  ตัวเลือก: (spoilTh.match(/<p class="ch">/g) ?? []).length,
+  ผลสุ่ม: (spoilTh.match(/<b class="pct">/g) ?? []).length,
+  ป้ายบุญบาป: (spoilTh.match(/<span class="m (?:good|sin)">/g) ?? []).length,
 };
 const off = Object.keys(want).filter((k) => want[k] !== got[k] || !want[k]);
 check('หน้าเฉลยครบทุกการ์ด ตัวเลือก ผลสุ่ม ป้ายบุญบาป', off.length, ` ${Object.keys(want).map((k) => `${k} ${got[k]}/${want[k]}`).join(' · ')}`);
+// 6) ส่วนต่างโลก: นับเทียบโมดูลในเอนจินตรง ๆ · หน้ารวมการ์ดห้ามมีข้อความผลสำเร็จ/พลาด ชื่อตอนจบ หรือความยาก
+const iskWant = {
+  การ์ด: isekaiCardCount(),
+  ตัวเลือก: ISEKAI_EVENTS.reduce((s, e) => s + e.choices.length, 0),
+  ผล: ISEKAI_EVENTS.reduce((s, e) => s + e.choices.reduce((n, c) => n + (c.stat ? 2 : 1), 0), 0),
+  ตอนจบ: Object.values(ISEKAI_WORLDS).reduce((s, w) => s + new Set(['best', 'good', 'bad', w.special[1]]).size, 0),
+  โลก: Object.keys(ISEKAI_WORLDS).length,
+  สกิล: Object.keys(ISEKAI_SKILLS).length,
+};
+const iskGot = {
+  การ์ด: (spoilIsk.match(/<article class="c x"/g) ?? []).length,
+  ตัวเลือก: (spoilIsk.match(/<p class="ch">/g) ?? []).length,
+  ผล: (spoilIsk.match(/<b class="rk">/g) ?? []).length,
+  ตอนจบ: (spoilIsk.match(/<li class="end">/g) ?? []).length,
+  โลก: Object.values(ISEKAI_WORLDS).filter((w) => spoilIsk.includes(`<b>${escHtml(w.name)}</b>`)).length,
+  สกิล: Object.values(ISEKAI_SKILLS).filter((x) => spoilIsk.includes(`<b>${escHtml(x.name)}</b>`)).length,
+};
+const iskOff = Object.keys(iskWant).filter((k) => iskWant[k] !== iskGot[k] || !iskWant[k]);
+check('หน้าเฉลยส่วนต่างโลกครบ', iskOff.length, ` ${Object.keys(iskWant).map((k) => `${k} ${iskGot[k]}/${iskWant[k]}`).join(' · ')}`);
+const catIsk = (cardsIsk.match(/<article class="c x"/g) ?? []).length;
+const catFull = ISEKAI_EVENTS.filter((e) => cardsIsk.includes(`<h4>${escHtml(e.title)}</h4>`) && e.choices.every((c) => cardsIsk.includes(`<li>${escHtml(c.t)}</li>`))).length;
+check('หน้ารวมการ์ดมีส่วนต่างโลกครบ', catIsk !== isekaiCardCount() || catFull !== ISEKAI_EVENTS.length, ` การ์ด ${catIsk}/${isekaiCardCount()} · เหตุการณ์ที่ชื่อและตัวเลือกครบ ${catFull}/${ISEKAI_EVENTS.length}`);
+const hidden = [
+  ...ISEKAI_EVENTS.flatMap((e) => e.choices.flatMap((c) => (c.stat ? [c.win.text, c.lose.text] : [c.text]))),
+  ...Object.values(ISEKAI_WORLDS).flatMap((w) => Object.values(w.end).map(([title]) => title)),
+];
+const iskLeak = hidden.filter((t) => cards.includes(escHtml(t)));
+if (/ความยาก|class="rk"/.test(cardsIsk)) iskLeak.push('ความยาก/ผล');
+check('หน้ารวมการ์ดส่วนต่างโลกไม่เฉลยผลหรือตอนจบ', iskLeak.length || !cardsIsk, iskLeak.length ? ` · เจอ ${iskLeak.slice(0, 3).join(' | ')}` : ` (ตรวจ ${hidden.length} ข้อความ)`);
 check('หน้ารวมการ์ดลิงก์ไปหน้าเฉลย และหน้าเฉลยมีป้ายเตือนสปอยล์', !cards.includes('href="spoilers.html"') || !spoil.includes('class="warn"'));
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');

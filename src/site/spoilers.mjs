@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 import { STAGES, STAT_LABELS, MERIT_LEVELS, MERIT_WEIGHTS, SIN_CATS, FLAG_CATS, TRACKS, REALMS, FAMILY_ROLE_NAMES, meritId, meritName, debtName, assetName, EXAM_PASS } from '../engine/index.mjs';
 import { AFTER, CATEGORY, esc, text, choiceText } from './catalog.mjs';
+import { isekaiSpoilersHtml, isekaiNav } from './otherworld.mjs';
 
 const YEAR_ALL = [2400, 2700];
 const sgn = (n) => (n > 0 ? `+${n}` : String(n).replace('-', '−'));
@@ -235,5 +236,5 @@ export function spoilersHtml(content, flags = flagNames(), systems = systemNames
   const body = groups
     .map((g, i) => `<details id="s${i}"><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map((e) => card(e, L, byId)).join('')}</div></details>`)
     .join('\n');
-  return `<nav class="toc">${nav}</nav>\n${body}`;
+  return `<nav class="toc">${nav}${isekaiNav(groups.length)}</nav>\n${body}\n${isekaiSpoilersHtml(groups.length)}`;
 }

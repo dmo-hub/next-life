@@ -7,7 +7,7 @@ import { makeRng, mixSeed } from './rng.mjs';
 import { newLedger } from './merit.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค' };
-const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
+export const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
 // ค่าตั้งของเกม: stay = อยู่ต่างโลกต่อติดกันได้กี่รอบ (กันบอทวนไม่จบ) · chance = โอกาสเทพธิดาโผล่เองตอนถึงทางเกิด
 // karma* = ผลของระดับกรรมต่อโลก · skills = จำนวนสกิลให้เลือกปกติ · memory = ค่าที่ติดตัวไปชาติต่างโลกถัดไป
 export const ISEKAI = { stay: 2, chance: 0.2, skills: 3, worlds: 3, karmaStat: 3, karmaDc: 4, karmaSkill: 0.3, memory: 3, events: [1, 3, 3] };

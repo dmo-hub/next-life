@@ -2,6 +2,7 @@
 // หน้า docs อ้างด้วย <span data-fact="ชื่อ">…</span> · ห้ามมีค่าบัญชีบุญบาปรายชีวิต มีแต่กติกาที่ผู้เล่นอ่านได้อยู่แล้ว
 import { readFileSync } from 'node:fs';
 import { ALL_PATTERNS, TITLES, FAMILY_TITLES, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, LEGACY, PATTERN_FROM } from '../engine/index.mjs';
+import { isekaiCardCount } from './otherworld.mjs';
 
 const th = (n) => n.toLocaleString('en-US');
 
@@ -22,6 +23,7 @@ export function siteFacts(content, appSrc = readFileSync(new URL('../ui/app.mjs'
     lifeCards: th(life.length),
     eraCards: th(life.filter((e) => e.era).length),
     afterCards: th(content.events.length - life.length),
+    isekaiCards: th(isekaiCardCount()),
     eraEvents: th(era.events.length),
     patterns: String(ALL_PATTERNS.length),
     titles: String(TITLES.length),
