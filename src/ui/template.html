@@ -156,6 +156,12 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .b .lifechart { border:1px solid var(--bronze); background:var(--lacquer2); }
 /* กราฟฐานะตระกูล (B95): ขาลงเส้นประ + สีแดง ขาขึ้นเส้นทึบ — ตาบอดสีก็ยังแยกได้ · ขึ้นได้ทั้งการ์ดทาง A ทาง B และปรโลก */
 .stand-d .lifechart { margin-top:6px; }
+/* แถบชีวิตสด (B53): อยู่บนการ์ดทุกใบ จึงต้องเตี้ย — บรรทัดเรื่องไม่จองที่จนกว่าจะแตะหมุด */
+.strip-d .spark.strip { margin-top:4px; }
+.spark.strip polyline { stroke-width:1.6; }
+.strip-d .legend { display:inline-flex; margin-left:12px; vertical-align:middle; font-size:11px; }
+.strip-d .mk-cap { min-height:0; }
+.strip-d .mk-cap:empty { display:none; }
 .spark .sg { stroke-width:2.2; stroke-linecap:round; } .spark .sg.sd { stroke-dasharray:5 3; } .spark .sg.se { stroke-width:1.6; }
 .legend .key .sg { stroke-width:2; }
 .a .sg.su { stroke:var(--green); } .a .sg.sd { stroke:var(--red); } .a .sg.se { stroke:var(--ink2); }

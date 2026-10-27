@@ -156,6 +156,12 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .b .lifechart { border:1px solid var(--bronze); background:var(--lacquer2); }
 /* กราฟฐานะตระกูล (B95): ขาลงเส้นประ + สีแดง ขาขึ้นเส้นทึบ — ตาบอดสีก็ยังแยกได้ · ขึ้นได้ทั้งการ์ดทาง A ทาง B และปรโลก */
 .stand-d .lifechart { margin-top:6px; }
+/* แถบชีวิตสด (B53): อยู่บนการ์ดทุกใบ จึงต้องเตี้ย — บรรทัดเรื่องไม่จองที่จนกว่าจะแตะหมุด */
+.strip-d .spark.strip { margin-top:4px; }
+.spark.strip polyline { stroke-width:1.6; }
+.strip-d .legend { display:inline-flex; margin-left:12px; vertical-align:middle; font-size:11px; }
+.strip-d .mk-cap { min-height:0; }
+.strip-d .mk-cap:empty { display:none; }
 .spark .sg { stroke-width:2.2; stroke-linecap:round; } .spark .sg.sd { stroke-dasharray:5 3; } .spark .sg.se { stroke-width:1.6; }
 .legend .key .sg { stroke-width:2; }
 .a .sg.su { stroke:var(--green); } .a .sg.sd { stroke:var(--red); } .a .sg.se { stroke:var(--ink2); }
@@ -4578,6 +4584,23 @@ function sparkline(series, fromAge, toAge, bands = false) {
 // กราฟทั้งชีวิตบนบันทึกการตาย (B38a): ค่าสถานะ 5 เส้นสเกลเดียวกัน + เงินแยกใต้ แกนอายุเดียวกัน
 // เส้นแยกด้วยสีและลายเส้น (ไม่พึ่งสีอย่างเดียว) · ค่าสถานะไม่มีตัวเลขบนจอ (บอกแค่ทิศ) แกนตั้งจึงเป็นคำ
 const LINE_DASH = ['', '7 3', '2 3', '9 3 2 3', '4 2'];
+function legendItem(i, label) {
+  const key = svgEl('svg', { class: 'key', viewBox: '0 0 24 8', 'aria-hidden': 'true' });
+  key.append(svgEl('line', { class: `ln ln${i}`, x1: 0, x2: 24, y1: 4, y2: 4, 'stroke-dasharray': LINE_DASH[i] }));
+  const li = el('li');
+  li.append(key, label);
+  return li;
+}
+// หมุดบนกราฟ: ชี้/แตะ/โฟกัสแล้วบรรทัดใต้กราฟบอกเรื่อง — มือถือไม่มี hover <title> อย่างเดียวไม่พอ
+function markDot(svg, cap, cx, cy, r, text, cls) {
+  const g = svgEl('g', { class: `mk ${cls}`, tabindex: 0, role: 'button', 'aria-label': text });
+  g.append(svgEl('title', {}, text), svgEl('circle', { cx, cy, r }));
+  const show = () => (cap.textContent = text);
+  g.addEventListener('click', show);
+  g.addEventListener('focus', show);
+  g.addEventListener('mouseenter', show);
+  svg.append(g);
+}
 // เรื่องเด่นทั้งชีวิต = เรื่องเด่นของแต่ละช่วงวัยชุดเดียวกับการ์ดเปลี่ยนช่วง (ผู้เล่นเคยเห็นแล้ว ไม่มีของใหม่ให้รั่ว)
 function lifeMarks(deathAge) {
   return STAGES.flatMap((s, i) => (s.from > deathAge ? [] : stageSummary(st, s.name, s.from, Math.min((STAGES[i + 1]?.from ?? Infinity) - 1, deathAge)).highlights));
@@ -4601,24 +4624,12 @@ function lifeChart(life, deathAge) {
   STAT_KEYS.forEach((k, i) => {
     const pts = life.stats.map((p) => `${x(p.age).toFixed(1)},${y(p[k]).toFixed(1)}`).join(' ');
     svg.append(svgEl('polyline', { class: `ln ln${i}`, points: pts, 'stroke-dasharray': LINE_DASH[i] }));
-    const key = svgEl('svg', { class: 'key', viewBox: '0 0 24 8', 'aria-hidden': 'true' });
-    key.append(svgEl('line', { class: `ln ln${i}`, x1: 0, x2: 24, y1: 4, y2: 4, 'stroke-dasharray': LINE_DASH[i] }));
-    const li = el('li');
-    li.append(key, STAT_LABELS[k]);
-    legend.append(li);
+    legend.append(legendItem(i, STAT_LABELS[k]));
   });
-  // จุดเรื่องเด่น + จุดตาย (B38): ชี้/แตะ/โฟกัสแล้วบรรทัดใต้กราฟบอกเรื่อง — มือถือไม่มี hover <title> อย่างเดียวไม่พอ
+  // จุดเรื่องเด่น + จุดตาย (B38)
   const cap = el('p', 'mk-cap', 'แตะจุดบนกราฟเพื่อดูเรื่องในปีนั้น');
   cap.setAttribute('aria-live', 'polite');
-  const mark = (a, text, cls) => {
-    const g = svgEl('g', { class: `mk ${cls}`, tabindex: 0, role: 'button', 'aria-label': text });
-    g.append(svgEl('title', {}, text), svgEl('circle', { cx: x(a), cy: H - B - 5, r: 4 }));
-    const show = () => (cap.textContent = text);
-    g.addEventListener('click', show);
-    g.addEventListener('focus', show);
-    g.addEventListener('mouseenter', show);
-    svg.append(g);
-  };
+  const mark = (a, text, cls) => markDot(svg, cap, x(a), H - B - 5, 4, text, cls);
   for (const m of lifeMarks(deathAge)) mark(m.age, `อายุ ${m.age} · ${m.text}`, 'ev');
   mark(deathAge, `ตายอายุ ${deathAge}`, 'death');
   box.append(svg, legend, cap);
@@ -5491,6 +5502,8 @@ function render(card) {
     // จอแคบให้ตัดบรรทัดได้แค่ที่ตัวคั่น — เบราว์เซอร์ตัดคำไทยกลาง "ราย|ได้" ได้แม้เว้นวรรคแบบไม่ตัด จึงต้องห่อ span
     for (const t of purse) meta.append(' · ', el('span', null, t));
     box.append(meta);
+    const strip = lifeStrip();
+    if (strip) box.append(strip);
     const fam = familyPanel();
     if (fam) box.append(fam);
     const tree = familyTree();
@@ -5676,6 +5689,73 @@ function petsWaiting(s) {
   const more = pets.length - shown.length;
   const who = more ? `${shown.join(' ')} และอีก ${more} ตัว` : shown.length > 1 ? `${shown.slice(0, -1).join(' ')} กับ${shown.at(-1)}` : shown[0];
   return `ระหว่างทาง ${who} นั่งรออยู่ข้างทาง แล้วเดินตามไปด้วยจนถึงหน้าปรโลก`;
+}
+
+// แถบชีวิตสดระหว่างเล่น (B53): เงิน · สุขภาพ · ความสุข ตั้งแต่เกิดถึงตอนนี้ + หมุดเรื่องที่ผ่านมา
+// อ่านจุดรายปีที่แกนจดไว้แล้วชุดเดียวกับกราฟการ์ดตาย — โหลดเซฟเล่นซ้ำได้รูปเดิม ไม่เก็บอะไรเพิ่ม
+// ระหว่างชีวิตห้ามบอกค่าเป็นตัวเลข: ไม่มีแกนตั้ง เงินวัดเทียบกับต่ำสุด–สูงสุดของชีวิตนี้เอง
+const STRIP_LINES = [['money', 2], ['health', 0], ['happiness', 1]];
+let stripOpen = true;
+function stripPoints() {
+  const stats = st.statTrail.filter((p) => p.age < st.age);
+  stats.push({ age: st.age, ...Object.fromEntries(STAT_KEYS.map((k) => [k, Math.round(st[k])])) });
+  const money = st.trail.map((p) => ({ age: p.year - st.birthYear, money: p.money })).filter((p) => p.age < st.age);
+  money.push({ age: st.age, money: Math.round(st.money) });
+  return { stats, money };
+}
+const clip = (t, n) => (t.length > n ? `${t.slice(0, n - 1)}…` : t);
+// หมุดที่ใกล้กันกว่านี้ (หน่วย viewBox ≈ px ที่จอ 390) รวมเป็นหมุดเดียว — ชีวิตยาวมีเรื่องหลายสิบเรื่อง นิ้วแตะแยกไม่ได้
+const STRIP_GAP = 10;
+function stripMarks(x) {
+  const ms = [];
+  for (const p of bookCards) {
+    // หมุดเอาแค่เรื่องบ้านเมืองกับงาน/ครอบครัว — เรื่องจิปาถะทุกปีทำให้หมุดแน่นเกิน
+    if (p.w < BOOK_W.near) continue;
+    const c = p.card;
+    const t = clip(c.news?.text ?? c.title ?? c.text, 60);
+    const last = ms.at(-1);
+    if (last && x(c.age) - x(last.from) < STRIP_GAP) {
+      last.to = c.age;
+      last.ts.push(t);
+    } else ms.push({ from: c.age, to: c.age, ts: [t] });
+  }
+  return ms.map((m) => ({
+    age: m.from,
+    text: `อายุ ${m.from === m.to ? m.from : `${m.from}–${m.to}`} · ${m.ts.slice(0, 2).join(' / ')}${m.ts.length > 2 ? ` และอีก ${m.ts.length - 2} เรื่อง` : ''}`,
+  }));
+}
+function lifeStrip() {
+  const { stats, money } = stripPoints();
+  if (stats.length < 2) return null;
+  // ขอบซ้ายขวาเผื่อรัศมีหมุด — หมุดปีปัจจุบันอยู่ชิดขวาสุดเสมอ
+  const W = 320, H = 46, T = 3, B = 8, L = 4, R = 4;
+  const x = (a) => L + (a / Math.max(st.age, 1)) * (W - L - R);
+  const y = (f) => T + (1 - f) * (H - T - B);
+  const svg = svgEl('svg', { class: 'spark strip', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `เงิน สุขภาพ และความสุข อายุ 0 ถึง ${st.age}` });
+  stageBands(svg, x, 0, st.age, T, H - B, false);
+  const nom = money.map((p) => p.money);
+  let lo = Math.min(...nom), hi = Math.max(...nom);
+  if (hi === lo) hi = lo + 1;
+  const frac = { money: (v) => (v - lo) / (hi - lo), health: (v) => v / 100, happiness: (v) => v / 100 };
+  if (lo < 0 && hi > 0) svg.append(svgEl('line', { class: 'zero', x1: L, x2: W - R, y1: y(frac.money(0)), y2: y(frac.money(0)) }));
+  const legend = el('ul', 'legend');
+  for (const [k, i] of STRIP_LINES) {
+    const pts = (k === 'money' ? money : stats).map((p) => `${x(p.age).toFixed(1)},${y(frac[k](p[k])).toFixed(1)}`).join(' ');
+    svg.append(svgEl('polyline', { class: `ln ln${i}`, points: pts, 'stroke-dasharray': LINE_DASH[i] }));
+    legend.append(legendItem(i, STAT_LABELS[k]));
+  }
+  // บรรทัดเรื่องว่างไว้จนแตะหมุด แถบจึงเตี้ยพอบนจอแคบ
+  const cap = el('p', 'mk-cap');
+  cap.setAttribute('aria-live', 'polite');
+  for (const m of stripMarks(x)) markDot(svg, cap, x(m.age), H - B / 2, 3, m.text, 'ev');
+  const d = el('details', 'tree strip-d');
+  d.open = stripOpen;
+  d.addEventListener('toggle', () => (stripOpen = d.open));
+  // ป้ายเส้นอยู่บรรทัดเดียวกับหัวแผง ไม่กินอีกบรรทัด
+  const sum = el('summary', null, 'ชีวิตนี้');
+  sum.append(legend);
+  d.append(sum, svg, cap);
+  return d;
 }
 
 // ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะ — ชีวิตจบแล้ว
