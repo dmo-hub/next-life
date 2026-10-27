@@ -3374,6 +3374,14 @@ const ISEKAI_WORLDS = {
   },
 };
 const ISEKAI_DEATH = ['ตายอีกครั้งในต่างโลก', 'ร่างนี้จากไปกลางทาง เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ'];
+// ตายกลางทางเล่าตามโลกที่เลือก · โลกที่ไม่มีในนี้ใช้ข้อความกลางข้างบน
+const ISEKAI_DEATH_BY = {
+  hero: 'ผู้กล้าล้มลงกลางสนามรบ ดาบที่พระราชาให้มายังไม่ทันได้ลับเลย เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+  noble: 'ตระกูลจัดงานศพสมฐานะ คนที่ร้องไห้จริง ๆ มีแค่แม่นมคนเดียว เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+  monster: 'ร่างสไลม์แตกเป็นหยดเล็ก ๆ ก็อบลินตัวหนึ่งนั่งเฝ้าแอ่งนั้นอยู่ทั้งคืน เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+  villainess: 'เรื่องจบเร็วกว่าบทในเกมที่เคยเล่น หน้าสุดท้ายยังว่างอยู่ เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+  slowlife: 'บ้านเล็กชายป่าเงียบลง หมาป่าสีเงินนอนรออยู่หน้าประตูไม่ยอมไปไหน เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+};
 
 // stat ว่าง = ไม่ทอยเต๋า · need = ต้องมีทองถึงกดได้ · bonus/bonus2 = ธงที่ทำให้ง่ายขึ้น · flag ของตัวเลือกไม่ทอย = ติดทันที
 const ISEKAI_EVENTS = [
@@ -3852,11 +3860,20 @@ const ISEKAI_EVENTS = [
     text: 'กลางตลาด มีคนบ่นดัง ๆ ว่า "ร้อนจะตายอยู่แล้ว อยากกินชาเย็น" เป็นภาษาไทยชัดแจ๋ว',
     choices: [
       { t: 'ทักว่า "สวัสดี"', stat: 'cha', tag: 'talk', dc: 8,
-        win: { fx: { cha: 3, luk: 3 }, flag: 'thaifriend', text: 'เขาตกใจจนทำแอปเปิ้ลหล่น สองคนนั่งคุยถึงหมูกระทะจนตลาดวาย' },
+        win: { fx: { cha: 3, luk: 3 }, flag: 'thaifriend', next: 'g_thai2', text: 'เขาตกใจจนทำแอปเปิ้ลหล่น สองคนนั่งคุยถึงหมูกระทะจนตลาดวาย' },
         lose: { fx: { luk: 1 }, text: 'เขาวิ่งหนี คิดว่าคุณเป็นผีจากโลกเดิม' } },
       { t: 'แอบตามดูก่อนว่าเป็นใคร', stat: 'luk', tag: 'sneak', dc: 12,
         win: { fx: { luk: 3, gold: 150 }, text: 'เขาเป็นพ่อค้าที่รวยที่สุดในเมือง และเปิดตลาดนัดคลองถมจำลอง' },
         lose: { fx: { hp: -5 }, text: 'ตามจนหลง เดินชนแผงผลไม้' } },
+    ] },
+  // ใบตามของ g_thai — follow = ไม่อยู่ในกองสุ่ม · เข้าคิวก่อนฉากสุดท้ายเมื่อได้ธง thaifriend
+  { id: 'g_thai2', worlds: ['hero', 'noble', 'slowlife', 'villainess'], ch: [3], follow: true, title: 'ข้าวเหนียวมะม่วงต่างโลก',
+    text: 'คนไทยจากตลาดวันนั้นมาเคาะประตู ถือห่อใบตองมาด้วย "ลองทำข้าวเหนียวมะม่วงดู มะม่วงที่นี่รสแปลก ๆ หน่อยนะ"',
+    choices: [
+      { t: 'ชวนเปิดร้านอาหารไทยด้วยกัน', stat: 'cha', tag: 'talk', dc: 10,
+        win: { fx: { gold: 300, fame: 5 }, text: 'ร้านส้มตำต่างโลกคิวยาวถึงหัวถนน คนแถวนี้เผ็ดจนน้ำตาไหลแต่ก็กลับมาทุกวัน' },
+        lose: { fx: { gold: -50 }, text: 'พริกที่นี่เผ็ดเกินไป ลูกค้าคนแรกพ่นไฟออกมาจริง ๆ ต้องปิดร้านซ่อมหลังคา' } },
+      { t: 'นั่งกินด้วยกัน คุยเรื่องบ้าน', fx: { hp: 10, luk: 3 }, text: 'สองคนนั่งเงียบไปพักหนึ่ง แล้วหัวเราะพร้อมกันตอนนึกถึงเสียงรถสองแถว' },
     ] },
   { id: 'g_fairy', worlds: null, ch: [1, 2], title: 'ภูตจิ๋วติดใยแมงมุม',
     text: 'ภูตตัวเท่านิ้วโป้งดิ้นอยู่ในใยแมงมุม ปีกใสสะท้อนแสงเจ็ดสี',
@@ -4055,7 +4072,7 @@ function vowSettle(isk) {
 function isekaiQueue(isk) {
   const w = ISEKAI_WORLDS[isk.world];
   const used = new Set([w.intro, w.finale]);
-  const fits = (e, c) => !e.finale && e.id !== w.intro && (!e.worlds || e.worlds.includes(isk.world)) && e.ch.includes(c);
+  const fits = (e, c) => !e.finale && !e.follow && e.id !== w.intro && (!e.worlds || e.worlds.includes(isk.world)) && e.ch.includes(c);
   const take = (c, n) => {
     // เหตุการณ์ของโลกตัวเองมาก่อน เรื่องจะเดินตามแนวที่เลือก · ที่เหลือเติมจากกองทุกโลก
     const pool = isekaiShuffle(isk.rng, ISEKAI_EVENTS.filter((e) => fits(e, c) && !used.has(e.id)));
@@ -4088,8 +4105,12 @@ function isekaiStatus(isk) {
   return { name: isk.name, world: w.name, goalName: w.goal, ...isk.st, skills: isk.skills.map((s) => ISEKAI_SKILLS[s].name), chapter: isk.queue[isk.idx]?.ch ?? 4 };
 }
 
+const ISEKAI_HIGHLIGHTS = 3;
+// เรียงตามเวลาที่เกิด ไม่ใช่ตามน้ำหนัก — อ่านเป็นเรื่องเล่า
+const isekaiHighlights = (isk) => (isk.marks ?? []).map((m, i) => ({ ...m, i })).sort((a, b) => b.weight - a.weight || a.i - b.i).slice(0, ISEKAI_HIGHLIGHTS).sort((a, b) => a.i - b.i).map((m) => m.text);
+
 function isekaiEnding(isk) {
-  if (isk.dead) return { id: 'death', title: ISEKAI_DEATH[0], text: ISEKAI_DEATH[1] };
+  if (isk.dead) return { id: 'death', title: ISEKAI_DEATH[0], text: ISEKAI_DEATH_BY[isk.world] ?? ISEKAI_DEATH[1] };
   const w = ISEKAI_WORLDS[isk.world];
   const won = !!isk.flags.won;
   let tier = won && isk.st.goal >= 50 ? 'best' : won || isk.st.goal >= 50 ? 'good' : 'bad';
@@ -4145,6 +4166,7 @@ function nextIsekaiCard(isk) {
       log: isk.log.slice(),
       // แผงคำสัญญาบนจอ (เลน C) · ข้อความรักษา/ผิดยังต่อท้าย text ไว้จนจอใหม่ขึ้น
       ...(isk.vow && { vow: { text: GODDESS_VOWS.find((v) => v.id === isk.vow).text, kept: isk.vowKept } }),
+      highlights: isekaiHighlights(isk),
       // ใส่ช่องเฉพาะชาติที่สกิลเคยช่วยไว้ — การ์ดจบของชาติอื่นรูปเดิม
       ...(isk.saves && { saves: isk.saves }),
     });
@@ -4204,6 +4226,8 @@ function chooseIsekai(isk, idx) {
   // ลงบัญชีที่ดวงวิญญาณพกมา (ไม่ดึงเลขสุ่ม ⇒ ลำดับเหตุการณ์เท่าเดิม) · ธงคำบนที่ผิดติดเป็นธงของรอบต่างโลก
   for (const f of recordMerit(isk.ledger, ISEKAI_MERIT[ev.id]?.[idx], ev.id)) isk.flags[f] = true;
   vowTrack(isk, ISEKAI_MERIT[ev.id]?.[idx]);
+  // เรื่องต่อแทรกก่อนฉากสุดท้าย ไม่ดึงเลขสุ่ม
+  if (out.next && !isk.queue.some((q) => q.id === out.next)) isk.queue.splice(isk.queue.length - 1, 0, { id: out.next, ch: 3 });
   let sys = null;
   if (out.skill) {
     const rest = Object.keys(ISEKAI_SKILLS).filter((k) => !isekaiHas(isk, k) && k !== 'luck');
@@ -4221,6 +4245,9 @@ function chooseIsekai(isk, idx) {
       sys = 'เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว';
     } else isk.dead = true;
   }
+  // ฉากเด่นบนการ์ดจบ: ผลที่ขยับค่ามากสุด · ทองหารห้าสิบให้ชั่งกับค่าอื่นได้ · สกิลช่วยไว้/ตายนับเพิ่ม
+  const weight = Object.entries(deltas).reduce((s, [k, v]) => s + Math.abs(k === 'gold' ? v / 50 : v), 0) + (aid ? 10 : 0) + (isk.dead ? 50 : 0);
+  (isk.marks ??= []).push({ text: `${ev.title} · ${out.text}`, weight });
   isk.log.push(`${ev.title} · ${c.t}${c.stat ? (ok ? (aid ? ` (สำเร็จ · ${aid}ช่วยไว้)` : ' (สำเร็จ)') : ' (พลาด)') : ''}`);
   isk.last = { title: ev.title, text: out.text, ok: c.stat ? ok : null, stat: c.stat ? ISEKAI_STAT[c.stat] : null, deltas, sys };
   isk.step = 'result';
@@ -7150,6 +7177,7 @@ function renderIsekai(card) {
   if (card.saves) body.append(el('p', 'isys', `สกิลช่วยไว้ ${card.saves} ครั้งในชาตินี้`));
   // ต่างโลกไม่มีฉายาของตัวเอง — เบาะแสชี้ฉายาของโลกเดิมที่ชาติหน้ายังไปเก็บได้ (B108 ใช้สองโลก)
   if (card.step === 'end') clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
+  if (card.highlights?.length) body.append(el('p', 'isys', 'ฉากที่จำได้ไม่ลืม'), list(card.highlights, 'picks'));
   if (card.log?.length) {
     const d = el('details', 'tree');
     d.append(el('summary', null, `เส้นทางที่เลือก ${card.log.length} เหตุการณ์`), list(card.log, 'picks'));
