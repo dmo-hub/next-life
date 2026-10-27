@@ -877,13 +877,12 @@ export function nextIsekaiCard(isk) {
     isk.ending = isekaiEnding(isk);
     isk.step = 'over';
     vowSettle(isk);
-    const vowLine = isk.vow ? (isk.vowKept ? ' คุณรักษาคำสัญญากับเทพธิดาไว้ได้' : ' คุณผิดคำสัญญาที่ให้ไว้กับเทพธิดา') : '';
     return isekaiCard(isk, {
       // การ์ดปรโลกใบถัดไปเล่าเรื่องดวงวิญญาณถูกดึงกลับเอง ใบนี้จึงปิดแค่ชีวิตในโลกนี้ · ตอนจบแบบตายเล่าการตายไว้แล้ว
-      step: 'end', title: isk.ending.title, text: `${isk.dead ? isk.ending.text : `${isk.ending.text} ชีวิตในโลกนี้ดำเนินต่อไปจนถึงวันสุดท้าย`}${vowLine}`, ending: isk.ending.id,
+      step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : `${isk.ending.text} ชีวิตในโลกนี้ดำเนินต่อไปจนถึงวันสุดท้าย`, ending: isk.ending.id,
       choices: [],
       log: isk.log.slice(),
-      // แผงคำสัญญาบนจอ (เลน C) · ข้อความรักษา/ผิดยังต่อท้าย text ไว้จนจอใหม่ขึ้น
+      // ผลคำสัญญาขึ้นเป็นแผงบนจอ (เลน C) ไม่ต่อท้าย text
       ...(isk.vow && { vow: { text: GODDESS_VOWS.find((v) => v.id === isk.vow).text, kept: isk.vowKept } }),
       highlights: isekaiHighlights(isk),
       // ใส่ช่องเฉพาะชาติที่สกิลเคยช่วยไว้ — การ์ดจบของชาติอื่นรูปเดิม
