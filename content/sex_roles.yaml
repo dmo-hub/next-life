@@ -1,0 +1,149 @@
+# การ์ดเฉพาะเพศ + ความคาดหวังทางสังคมตามเพศ/ยุค (B109) — เพศกำเนิดจาก st.sex · ไม่มีตัวเลือกไหนผิดเพราะเป็นเพศนั้น
+# ผลต่างตามยุคเขียนด้วย when.year (ช่องว่างค่าแรงยุคก่อน 2540) · การ์ดอัตลักษณ์รอ state identity ของแกน
+events:
+  - id: sex_lottery_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [21, 21], sex: [ชาย]}
+    title: "วันจับใบดำใบแดง"
+    text: "อายุ {อายุ} หน้าที่ว่าการอำเภอเช้านี้มีแต่ผู้ชายรุ่นเดียวกันยืนเข้าแถว บางคนพกพระเต็มคอ บางคนแม่มายืนกุมมือรอข้างรั้ว ชื่อ {ชื่อ} อยู่คิวที่สามสิบเจ็ด"
+    choices:
+      - id: draw
+        text: "รอจับตามคิว ลุ้นที่โต๊ะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "มือล้วงขึ้นมาเป็นใบดำ เพื่อนในแถวตะโกนเฮ แม่ที่รั้วยกมือไหว้ฟ้า", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ใบแดง ต้องไปเป็นทหารเกณฑ์สองปี ตัดผมเกรียนพรุ่งนี้เช้า", effects: {health: 1, network: 1, happiness: -1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: volunteer
+        text: "สมัครเองก่อนจับ เป็นแค่ปีเดียว"
+        effects: {health: 1, network: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: defer
+        text: "ยื่นผ่อนผันไว้เรียนต่อ"
+        effects: {knowledge: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: string_pull
+        text: "ฝากชื่อให้คนรู้จักเดินเรื่อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่ต้องไป ส่วนคนที่ไปแทนในหมู่บ้านคือลูกชายร้านข้าวมันไก่", effects: {happiness: 1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 1, text: "เสียเงินแล้วเรื่องไม่เดิน สุดท้ายก็ต้องไปจับเหมือนคนอื่น", effects: {happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: greed_harm, level: 1}]}
+        merit: [{cat: greed_harm, level: 1}]
+
+  - id: sex_ordain_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [20, 30], sex: [ชาย], flags: {not: [married]}, family: [{role: parent, alive: true}]}
+    title: "แม่อยากเกาะชายผ้าเหลือง"
+    text: "แม่ไม่เคยพูดตรง ๆ แต่ทุกครั้งที่มีงานบวชลูกบ้านข้าง ๆ แม่จะกลับมานั่งเงียบนาน วันนี้ป้าข้างบ้านพูดแทนให้ 'ลูกผู้ชายบวชให้แม่สักพรรษา แม่จะได้ขึ้นสวรรค์'"
+    choices:
+      - id: full_lent
+        text: "ลางานบวชหนึ่งพรรษา"
+        effects: {happiness: 1, relations: 2, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: sila, level: 2}, {cat: care_parents, level: 1}]
+      - id: short
+        text: "บวชเจ็ดวันช่วงสงกรานต์"
+        effects: {relations: 1}
+        merit: [{cat: sila, level: 1}, {cat: care_parents, level: 1}]
+      - id: with_friends
+        text: "ชวนเพื่อนสนิทบวชนาคหมู่"
+        effects: {relations: 1, network: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: sila, level: 1}]
+      - id: decline
+        text: "บอกแม่ว่ายังไม่พร้อม ขอทำบุญแทน"
+        effects: {relations: -1}
+        merit: [{cat: dana, level: 1}]
+
+  - id: sex_daughter_care_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [30, 55], sex: [หญิง], flags: {not: [married]}, family: [{role: parent, alive: true, age: [65, 120]}]}
+    title: "ทุกคนหันมามองลูกสาวคนที่ยังโสด"
+    text: "พ่อล้มในห้องน้ำ หมอบอกว่าต่อจากนี้ต้องมีคนอยู่ด้วยตลอด วงประชุมญาติเงียบไปพักหนึ่ง แล้วน้าก็พูดขึ้นมา 'ก็{ชื่อ}ไง ยังไม่มีครอบครัว ลูกสาวดูแลพ่อแม่ได้ดีกว่าลูกชายอยู่แล้ว'"
+    choices:
+      - id: move_home
+        text: "ลาออกกลับบ้านไปดูแลเอง"
+        effects: {relations: 2, happiness: -1, money: {unit: income_x, amount: -1}}
+        merit: [{cat: care_parents, level: 2}]
+      - id: share_shifts
+        text: "ให้พี่น้องแบ่งเวรเท่า ๆ กัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่ชายเงียบไปพักหนึ่งแล้วรับเวรวันเสาร์อาทิตย์ ตารางติดตู้เย็นใบแรกในบ้าน", effects: {relations: 1, happiness: 1}, merit: [{cat: care_parents, level: 1}]}
+          - {weight: 1, text: "ทุกคนรับปาก แต่พอถึงเวรก็มีธุระ เวรที่ว่างกลับมาตกที่คุณอยู่ดี", effects: {relations: -1, happiness: -1}, merit: [{cat: care_parents, level: 1}]}
+        merit: [{cat: care_parents, level: 1}]
+      - id: hire_carer
+        text: "จ้างคนดูแล กลับบ้านวันหยุด"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.8}}
+        merit: [{cat: care_parents, level: 1}]
+      - id: bring_to_city
+        text: "พาพ่อแม่มาอยู่ด้วยในเมือง"
+        effects: {relations: 1, happiness: -1, health: -1}
+        merit: [{cat: care_parents, level: 1}]
+
+  - id: sex_menopause_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [45, 55], sex: [หญิง]}
+    title: "ร้อนวูบวาบกลางห้องประชุม"
+    text: "อายุ {อายุ} ร้อนวูบขึ้นมาจากอกทั้งที่แอร์เย็นเฉียบ คืนนี้ก็นอนไม่หลับเป็นคืนที่สี่ เพื่อนร่วมงานรุ่นเดียวกันยิ้มรู้กัน 'ยินดีต้อนรับสู่วัยทอง'"
+    choices:
+      - id: see_doctor
+        text: "ไปหาหมอ คุยให้รู้เรื่อง"
+        effects: {health: 1, knowledge: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: friends_group
+        text: "ตั้งวงคุยกับเพื่อนวัยเดียวกัน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: exercise
+        text: "เริ่มเดินเร็วตอนเช้าทุกวัน"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: endure
+        text: "ทนเงียบ ๆ ไม่อยากให้ใครรู้"
+        effects: {happiness: -1, health: -1}
+        merit: [{cat: neutral}]
+
+  - id: sex_pay_gap_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [25, 45], year: [2500, 2540], sex: [หญิง]}
+    title: "ซองเงินเดือนที่วางผิดโต๊ะ"
+    text: "ซองเงินเดือนของเพื่อนผู้ชายที่เข้ามาพร้อมกันวางผิดโต๊ะ ตำแหน่งเดียวกัน งานเท่ากัน แต่ตัวเลขในซองมากกว่าของคุณเกือบครึ่ง หัวหน้าเคยบอกว่า 'ผู้หญิงเดี๋ยวก็แต่งงานออกไป'"
+    choices:
+      - id: ask_raise
+        text: "ถือซองไปขอขึ้นเงินเดือนตรง ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวหน้าอึกอักแล้วยอมปรับให้ เพื่อนผู้หญิงทั้งแผนกมากระซิบถามว่าพูดยังไง", effects: {happiness: 1, network: 1, income_mult: 1.15}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้คำตอบว่า 'บริษัทมีโครงสร้างอยู่แล้ว' แล้วโดนย้ายไปนั่งใกล้ห้องเก็บของ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: band_together
+        text: "ชวนผู้หญิงทั้งแผนกร้องเรียน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝ่ายบุคคลเรียกประชุม ปีถัดมาบริษัทเปลี่ยนตารางเงินเดือนทั้งแผนก", effects: {relations: 2, network: 1, income_mult: 1.1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เรื่องเงียบหาย มีแค่ชื่อคุณที่หัวหน้าจำได้", effects: {relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: switch_job
+        text: "แอบสมัครงานที่จ่ายตามตำแหน่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้งานใหม่ เงินเดือนเท่าเพื่อนผู้ชายในซองนั้นพอดี", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "สัมภาษณ์ไปห้าที่ ทุกที่ถามว่าวางแผนจะมีลูกเมื่อไหร่", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: let_it_go
+        text: "วางซองคืนที่เดิม แล้วทำงานต่อ"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
