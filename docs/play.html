@@ -6947,6 +6947,16 @@ function renderIsekai(card) {
 // v1 ยังอ่านได้: เล่นซ้ำตรงการ์ดเดิม = เล่นต่อแล้วเขียนทับเป็น v2 ทันที
 const SAVE_KEY = 'next-life-save-v1';
 const SNAP_KEY = 'next-life-save-v2';
+// ภาพถ่ายมีบัญชีบุญบาปข้างใน — xor รหัสตัวอักษรกับกุญแจคงที่ (7 บิตล่าง ไม่ข้ามช่วงอักษร ขนาดเท่าเดิม) กันเปิดดูใน storage เฉย ๆ
+// เจ้าของเคาะ · ไม่ได้กันคนตั้งใจแกะ · base64 ทำให้เซฟโตสองเท่า (ไทย 3 ไบต์ต่อตัว) จึงไม่ใช้
+const SNAP_XOR = [0x6e, 0x6c, 0x69, 0x66, 0x65, 0x32, 0x38];
+const snapXor = (t) => {
+  let out = '';
+  for (let i = 0; i < t.length; i++) out += String.fromCharCode(t.charCodeAt(i) ^ SNAP_XOR[i % SNAP_XOR.length]);
+  return out;
+};
+const snapHide = snapXor;
+const snapShow = snapXor;
 // ปุ่มละตัวอักษร: เลือกในชีวิต = 0-9a-z · เลือกระหว่างชาติ = A-Z · ที่เหลือเป็นเครื่องหมาย
 const T = { next: '.', afterlife: '>', afterNext: ',', rebirth: '+' };
 const lifePick = (i) => i.toString(36);
@@ -7205,7 +7215,7 @@ function fingerprint(card) {
 const uiState = () => ({ save, prevAge, curAge, lifeMark, noteAsk, bookCards, eraSeen, bookIntro, bookSeq });
 function saveWrite(card) {
   try {
-    localStorage.setItem(SNAP_KEY, JSON.stringify({ v: APP_VERSION, snap: snapshot({ st, af, card, ui: uiState() }, CONTENT) }));
+    localStorage.setItem(SNAP_KEY, snapHide(JSON.stringify({ v: APP_VERSION, snap: snapshot({ st, af, card, ui: uiState() }, CONTENT) })));
     localStorage.removeItem(SAVE_KEY);
     savedMark(true);
   } catch {
@@ -7241,7 +7251,7 @@ function snapRead() {
   try {
     const raw = localStorage.getItem(SNAP_KEY);
     if (!raw) return null;
-    const root = restore(JSON.parse(raw).snap, CONTENT);
+    const root = restore(JSON.parse(snapShow(raw)).snap, CONTENT);
     ({ st, af } = root);
     ({ save, prevAge, curAge, lifeMark, noteAsk, bookCards, eraSeen, bookIntro, bookSeq } = root.ui);
     notesLoad(save.seed);
