@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { siteFacts, injectFacts } from './facts.mjs';
 import { catalogHtml } from './catalog.mjs';
 import { spoilersHtml } from './spoilers.mjs';
+import { specHtml } from './spec.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · isekai.html (ตัวเกมเลน D) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'overview', 'otherworld'];
@@ -10,6 +11,8 @@ export const FACT_PAGES = ['index', 'about', 'overview', 'otherworld'];
 export const GEN_PAGES = [
   ['catalog', '<!--__CATALOG__-->', catalogHtml],
   ['spoilers', '<!--__SPOILERS__-->', spoilersHtml],
+  // หน้าสเปก (B115) แปลงจาก docs/spec/*.md — แทนลิงก์ไปหน้า tree บน GitHub
+  ['spec', '<!--__SPEC__-->', specHtml],
 ];
 
 export function buildSite(content, root = new URL('../../', import.meta.url), facts = siteFacts(content)) {
