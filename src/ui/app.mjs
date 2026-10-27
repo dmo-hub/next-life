@@ -215,7 +215,8 @@ function lifeChart(life, deathAge) {
 // เส้นข้ามรุ่น = ฐานะตอนตาย → ฐานะบ้านที่รุ่นถัดไปเกิด · ขาลงแยกสีและลายเส้น (ไม่พึ่งสีอย่างเดียว) ให้เห็นการตกชั้นชัด
 // ใช้แค่ฐานะ อายุ ชื่อ และการตายพร้อมหนี้ — ไม่มีบัญชีบุญบาป
 function standingGens(lineage, life = null) {
-  const gens = lineage.map((l) => ({ gen: l.gen, name: l.name, age: l.age, broke: l.broke, pts: l.standing ?? [{ age: 0, cls: CLASSES.indexOf(l.cls) }] }));
+  // รุ่นต่างโลก (B68a) ไม่มีฐานะไทยให้วาด — ข้ามไป เส้นต่อจากชาติไทยก่อนหน้าไปรุ่นไทยถัดไป
+  const gens = lineage.filter((l) => !l.isekai).map((l) => ({ gen: l.gen, name: l.name, age: l.age, broke: l.broke, pts: l.standing ?? [{ age: 0, cls: CLASSES.indexOf(l.cls) }] }));
   return life ? [...gens, life] : gens;
 }
 // ชีวิตนี้: จุดต้นช่วงวัยที่แกนจดไว้ + ฐานะ ณ ตอนนี้ (หรือตอนตาย) เป็นจุดท้าย
