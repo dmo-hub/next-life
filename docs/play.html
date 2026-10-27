@@ -2074,6 +2074,8 @@ function newLife(seed, content, heir = null) {
     deeds: [],
     // รุ่นที่เท่าไรของตระกูล + บันทึกรุ่นก่อน · มรดกจากรุ่นก่อนที่ยังไม่ถึงอายุรับ (ทางเป็นลูก)
     gen: heir?.gen ?? 1,
+    // ชื่อเสียงตระกูล 0–3 (B95b) ส่งต่อจากรุ่นก่อน · การ์ดเอียงตาม multipliers.family_fame
+    fame: heir?.fame ?? 0,
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // อายุที่ธงแต่ละตัวติดครั้งแรก — ระหว่างชาติอ่านอายุตอนมีลูก
@@ -2839,6 +2841,7 @@ function poolMultiplier(st, m) {
   if (m.karma) x *= m.karma ** Math.sign(netLedger(st.ledger));
   // ขอพร: เอียงตามบัญชีแบบต่อเนื่อง บุญน้อยเอียงน้อย บาปหนักกลับทิศ
   if (m.wish) x *= m.wish ** ledgerLevel(st.ledger);
+  if (m.family_fame) x *= m.family_fame ** (st.fame ?? 0);
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
   if (m.rank) x *= m.rank ** rankLevel(st);
@@ -2988,10 +2991,8 @@ function deathCard(st) {
   const pets = petsAfter(st);
   if (pets) card.pets = pets;
   if (st.funeral) {
-    const { id, text, cost } = st.funeral;
-    // แขกมาส่งตามความสัมพันธ์/คอนเน็คชั่น คูณขนาดงาน — ปัดสิบ ไม่ใช่ยอดนับจริง
-    const guests = Math.round((FUNERAL.guests[id] ?? 1) * guestBase(st) / 10) * 10;
-    card.funeral = { text, guests, cost: Math.round(cost) };
+    const { text, cost } = st.funeral;
+    card.funeral = { text, guests: funeralGuests(st), cost: Math.round(cost) };
   }
   // มีทรัพย์ให้แบ่ง + ลูกที่ยังอยู่ถึงเกณฑ์ = เรื่องพินัยกรรม (afterlife.mjs หักส่วนที่เสียไปกับการทะเลาะ) · ลูกคนเดียวไม่มีใครให้ทะเลาะด้วย
   if (card.summary.money > 0 && !card.short && disputes(st)) card.will = !!st.flags.wish_will;
@@ -3012,6 +3013,8 @@ const FUNERAL = {
   disputeKids: 2,
 };
 const guestBase = (st) => 20 + st.relations * 2 + st.network * 3;
+// แขกมาส่งตามความสัมพันธ์/คอนเน็คชั่น คูณขนาดงาน — ปัดสิบ ไม่ใช่ยอดนับจริง · ไม่มีงานศพ = 0
+const funeralGuests = (st) => (st.funeral ? Math.round(((FUNERAL.guests[st.funeral.id] ?? 1) * guestBase(st)) / 10) * 10 : 0);
 // state ก่อนมีระบบครอบครัว (ไม่มี kin) ถือว่าถึงเกณฑ์ — ตรงกับ LEGACY.kids ของ afterlife.mjs
 const disputes = (st) => (livingChildren(st) ?? FUNERAL.disputeKids) >= FUNERAL.disputeKids;
 const deadPurse = (st) => Math.min(st.money, netWorth(st));
@@ -4038,6 +4041,7 @@ const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world:
 
 
 
+
 // ระดับกรรมที่ปรโลก (−1..1) = บัญชีสุทธิ ÷ ref · ref แยกจากตัวคูณกรรมระหว่างชีวิต (KARMA.ref) เพราะบัญชีทั้งชีวิตสะสมไกลกว่า
 // จุดอิ่มของตัวคูณการตายมาก — ใช้ ref เดียวกันแล้วเกือบทุกคนชนเพดาน ภูมิกับฐานะชาติหน้าจะไม่แยกคน
 const VERDICT_REF = 30;
@@ -4064,6 +4068,16 @@ const CARRY = { spend: 0.5, min: 0.3, max: 0.7 };
 // stat = ค่าเริ่มเลื่อนสูงสุดเมื่อบัญชีสุดขั้ว · bonusCap = เพดานผลรวมจากฉากระหว่างชาติต่อค่า
 // kin = ทางเป็นลูกรับความสัมพันธ์/คอนเน็คชั่นของบ้านต่อ (ใบ 05) เป็นสัดส่วนของส่วนต่างจากค่ากลาง 50 ตอนพ่อแม่ตาย เพดาน bonusCap · หลาน/เหลนคูณ KIN_TIERS.kin
 const FATE = { sd: 1.2, childStep: 3, stat: 10, bonusCap: 12, kin: 0.3 };
+// ฐานะตอนตายส่งต่อรุ่นถัดไป (B95b · เจ้าของเคาะ 50/50) ทั้งทางเป็นลูกและเกิดใหม่บ้านอื่น — ผสมกับชั้นที่กรรม/สุ่มเดิมให้
+// ตายพร้อมหนี้ = ชั้นล่างสุด ⇒ รุ่นถัดไปตกชั้นได้จริง · ไม่ดึงเลขสุ่มเพิ่ม (รุ่นแรกเท่า main)
+const STAND_MIX = 0.5;
+const deathStanding = (st) => ((st.estate?.money ?? 0) < 0 ? 0 : standingOf(st));
+// ชื่อเสียงตระกูล (B95b · เจ้าของเคาะ 4 ขั้น) — แต้มของรุ่นที่เพิ่งจบ บวกกับครึ่งหนึ่งของขั้นเดิม ปัดครึ่งลง (ปัดขึ้นแล้วขั้น 1 ไม่จางเลย) ⇒ ไม่ทำอะไรต่อสองสามรุ่นก็จางเอง
+// rich = ฐานะตอนตายตั้งแต่ระดับ 8 (index 7) · guests = แขกงานศพที่นับว่างานใหญ่ · network = คอนเน็คชั่นตั้งต้นของทายาทต่อขั้น
+const FAME = { names: ['ไร้ชื่อ', 'มีหน้ามีตา', 'ผู้มีบารมีในถิ่น', 'ตระกูลใหญ่'], decay: 0.5, rich: 7, guests: 300, network: 5 };
+const famePoints = (st, death) => (death >= FAME.rich ? 1 : 0) + (funeralGuests(st) >= FAME.guests ? 1 : 0) - (st.bankruptcies > 0 ? 1 : 0) - ((st.estate?.money ?? 0) < 0 ? 1 : 0);
+const nextFame = (st, death) => Math.max(0, Math.min(FAME.names.length - 1, Math.ceil((st.fame ?? 0) * FAME.decay + famePoints(st, death) - 0.5)));
+const mixStanding = (death, fate) => clampIdx(Math.round(STAND_MIX * death + (1 - STAND_MIX) * fate));
 // มรดก (ใบ 05 · lore-finance-belief): แบ่งตามจำนวนลูก · ภาษีการรับมรดก 5% ส่วนที่เกิน 100 ล้าน ตั้งแต่ปีที่กฎหมายมีผล
 // จำนวนลูกเป็นค่าตั้งของเกม — ธง has_kids ไม่ได้บอกว่ากี่คน
 // dispute = ส่วนของมรดกที่เสียไปกับการทะเลาะแบ่งกันเองเมื่อไม่มีพินัยกรรม (B25 · ค่าตั้งของเกม)
@@ -4346,6 +4360,10 @@ function makeHeir(af, r) {
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
   let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, province = null;
+  const death = deathStanding(st);
+  // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
+  const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
+  const fame = Math.min(FAME.names.length - 1, nextFame(st, death) + goals.length);
   if (af.path === 'child') {
     // บ้านของรุ่นถัดไปคือบ้านของคนในชาติก่อน — อาชีพของครอบครัวจึงเป็นงานสุดท้ายของเขา ไม่สุ่มใหม่
     occupation = st.occupation;
@@ -4366,7 +4384,7 @@ function makeHeir(af, r) {
     const units = st.kin ? legacyUnits(st, kids.length) * (tier.tier === 1 ? 1 : sibs ? 1 / sibs : tier.legacy) : legacyUnits(st) * tier.legacy;
     const rich = LEGACY.richUnits.filter((u) => units >= u).length;
     const wealth = st.estate?.money < 0 ? -1 : rich;
-    cls = CLASSES[clampIdx(CLASSES.indexOf(st.cls) + wealth + Math.round(x * FATE.childStep))];
+    cls = CLASSES[mixStanding(death, clampIdx(CLASSES.indexOf(st.cls) + wealth + Math.round(x * FATE.childStep)))];
     const debt = st.estate?.money < 0;
     let year = st.birthYear + kidAge;
     if (tier.tier === 1) {
@@ -4408,15 +4426,15 @@ function makeHeir(af, r) {
   } else {
     birthYear = pickBirthYear(rng, era);
     region = pickRegion(rng, era.birth);
-    cls = CLASSES[clampIdx(Math.round(4.5 + 4.5 * x + gauss(rng) * FATE.sd))];
+    cls = CLASSES[mixStanding(death, clampIdx(Math.round(4.5 + 4.5 * x + gauss(rng) * FATE.sd)))];
   }
   const kin = (k) => (tier && (k === 'relations' || k === 'network') ? Math.max(-FATE.bonusCap, Math.min(FATE.bonusCap, (st[k] - 50) * FATE.kin * tier.kin)) : 0);
-  const bonus = Object.fromEntries(STAT_KEYS.map((k) => [k, x * FATE.stat + (af.bonus[k] ?? 0) + kin(k)]));
+  const bonus = Object.fromEntries(STAT_KEYS.map((k) => [k, x * FATE.stat + (af.bonus[k] ?? 0) + kin(k) + (k === 'network' ? fame * FAME.network : 0)]));
   const gen = st.gen ?? 1;
   // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน · tier = กลับมาเกิดเป็นชั้นไหนของตัวเอง (ทางเป็นลูก)
   // ชีวิตต่างโลกต่อท้ายเป็นรุ่นของตัวเอง (B68) — แถวชาติไทยบันทึกทางว่าไปต่างโลกกับภูมิที่ปรโลกชี้ให้ชาติไทย แม้ขากลับจะเกิดใหม่ตามกรรมของชาติต่างโลก
   const thai = af.thaiVerdict ?? af.verdict;
-  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: standingOf(st) }] }, ...af.isekaiLives];
+  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }], fame, ...(goals.length && { goals }) }, ...af.isekaiLives];
   const carried = r * (tier?.carry ?? 1);
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
@@ -4438,6 +4456,7 @@ function makeHeir(af, r) {
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,
     pets: heirPets(st, birthYear, tier),
+    fame,
   };
 }
 
@@ -4903,6 +4922,22 @@ const climb = (ch) => {
   return lo >= 0 && ch.slice(lo + 1).some((l) => CLASSES.indexOf(l.cls) >= CLIMB.to);
 };
 const lastN = (xs, n, ok) => xs.length >= n && xs.slice(-n).every(ok);
+// เป้าตระกูล (B95b · เจ้าของเคาะ) — ได้ฉายาทุกรุ่นที่ยังเข้าเงื่อนไข · ชื่อเสียง +1 ครั้งเดียวต่อตระกูล (afterlife.mjs นับจาก lineage[].goals)
+// ฐานะตอนตายอ่านจากจุดท้ายของ standing · rags = เกิดชั้น 1–2 แล้วภายในสามรุ่น (นับรุ่นนั้นด้วย) มีคนตายในฐานะ 9–10
+const deathCls = (l) => l.standing?.at(-1)?.cls ?? CLASSES.indexOf(l.cls);
+const RAGS = { from: 1, to: 8, within: 3 };
+const rags = (ch) => ch.some((l, i) => CLASSES.indexOf(l.cls) <= RAGS.from && ch.slice(i, i + RAGS.within).some((m) => deathCls(m) >= RAGS.to));
+const FAMILY_GOALS = [
+  { id: 'goal_rags', name: 'จากยากไร้สู่มั่งคั่ง', hint: 'รุ่นที่เกิดมายากไร้ ภายในสามรุ่นมีคนจากไปอย่างมั่งคั่ง', test: (ch) => rags(ch) },
+  { id: 'goal_great', name: 'ตระกูลใหญ่', hint: 'ชื่อเสียงตระกูลขึ้นถึงขั้นสูงสุด', test: (ch) => ch.some((l) => (l.fame ?? 0) >= 3) },
+];
+// ผังตระกูลรวมชีวิตนี้ตอนตาย — แถวท้ายมีฐานะตอนตาย (ตายพร้อมหนี้ = 0) กับชื่อเสียงที่รับมา
+const familyChain = (st, broke) => [...st.lineage.filter((l) => !l.isekai), { gen: st.gen, sex: st.sex, cls: st.cls, age: st.age, broke, fame: st.fame ?? 0, standing: [{ age: st.age, cls: broke ? 0 : standingOf(st) }] }];
+const goalsMet = (st, broke) => {
+  const ch = familyChain(st, broke);
+  const had = new Set(st.lineage.flatMap((l) => l.goals ?? []));
+  return FAMILY_GOALS.filter((g) => !had.has(g.id) && g.test(ch)).map((g) => g.id);
+};
 const FAMILY_TITLES = [
   { id: 'fam_climb', name: 'ตระกูลไต่บันได', hint: 'จากรุ่นที่ลำบาก ลูกหลานไต่ขึ้นไปถึงชนชั้นกลางบน', test: (ch) => climb(ch) },
   { id: 'fam_no_hell', name: 'บรรพบุรุษไม่เคยตกนรก', hint: 'สองรุ่นก่อนหน้าไม่มีใครไปภูมินรก', test: (ch, lin) => lastN(lin, 2, (l) => l.realm !== 'นรก') },
@@ -4922,8 +4957,8 @@ function titlesOf(st) {
   const titles = TITLES.filter((t) => t.test(f)).sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier)).map(pick);
   // แถวต่างโลก (B68) ไม่มีฐานะ/อายุ/ภูมิแบบชาติไทย — ฉายาตระกูลนับเฉพาะชาติไทย
   const thai = st.lineage.filter((l) => !l.isekai);
-  const chain = [...thai, { gen: st.gen, sex: st.sex, cls: st.cls, age: st.age, broke: f.worth < 0 }];
-  const family = FAMILY_TITLES.filter((t) => t.test(chain, thai)).map(({ id, name, hint }) => ({ id, name, tier: 'ตระกูล', hint }));
+  const chain = familyChain(st, f.worth < 0);
+  const family = [...FAMILY_TITLES, ...FAMILY_GOALS].filter((t) => t.test(chain, thai)).map(({ id, name, hint }) => ({ id, name, tier: 'ตระกูล', hint }));
   return { pattern: pattern && { id: pattern.id, name: pattern.name, hint: pattern.hint }, titles, family };
 }
 

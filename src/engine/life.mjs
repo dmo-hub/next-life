@@ -204,6 +204,8 @@ export function newLife(seed, content, heir = null) {
     deeds: [],
     // รุ่นที่เท่าไรของตระกูล + บันทึกรุ่นก่อน · มรดกจากรุ่นก่อนที่ยังไม่ถึงอายุรับ (ทางเป็นลูก)
     gen: heir?.gen ?? 1,
+    // ชื่อเสียงตระกูล 0–3 (B95b) ส่งต่อจากรุ่นก่อน · การ์ดเอียงตาม multipliers.family_fame
+    fame: heir?.fame ?? 0,
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // อายุที่ธงแต่ละตัวติดครั้งแรก — ระหว่างชาติอ่านอายุตอนมีลูก
@@ -969,6 +971,7 @@ export function poolMultiplier(st, m) {
   if (m.karma) x *= m.karma ** Math.sign(netLedger(st.ledger));
   // ขอพร: เอียงตามบัญชีแบบต่อเนื่อง บุญน้อยเอียงน้อย บาปหนักกลับทิศ
   if (m.wish) x *= m.wish ** ledgerLevel(st.ledger);
+  if (m.family_fame) x *= m.family_fame ** (st.fame ?? 0);
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
   if (m.rank) x *= m.rank ** rankLevel(st);
@@ -1118,10 +1121,8 @@ function deathCard(st) {
   const pets = petsAfter(st);
   if (pets) card.pets = pets;
   if (st.funeral) {
-    const { id, text, cost } = st.funeral;
-    // แขกมาส่งตามความสัมพันธ์/คอนเน็คชั่น คูณขนาดงาน — ปัดสิบ ไม่ใช่ยอดนับจริง
-    const guests = Math.round((FUNERAL.guests[id] ?? 1) * guestBase(st) / 10) * 10;
-    card.funeral = { text, guests, cost: Math.round(cost) };
+    const { text, cost } = st.funeral;
+    card.funeral = { text, guests: funeralGuests(st), cost: Math.round(cost) };
   }
   // มีทรัพย์ให้แบ่ง + ลูกที่ยังอยู่ถึงเกณฑ์ = เรื่องพินัยกรรม (afterlife.mjs หักส่วนที่เสียไปกับการทะเลาะ) · ลูกคนเดียวไม่มีใครให้ทะเลาะด้วย
   if (card.summary.money > 0 && !card.short && disputes(st)) card.will = !!st.flags.wish_will;
@@ -1142,6 +1143,8 @@ export const FUNERAL = {
   disputeKids: 2,
 };
 const guestBase = (st) => 20 + st.relations * 2 + st.network * 3;
+// แขกมาส่งตามความสัมพันธ์/คอนเน็คชั่น คูณขนาดงาน — ปัดสิบ ไม่ใช่ยอดนับจริง · ไม่มีงานศพ = 0
+export const funeralGuests = (st) => (st.funeral ? Math.round(((FUNERAL.guests[st.funeral.id] ?? 1) * guestBase(st)) / 10) * 10 : 0);
 // state ก่อนมีระบบครอบครัว (ไม่มี kin) ถือว่าถึงเกณฑ์ — ตรงกับ LEGACY.kids ของ afterlife.mjs
 export const disputes = (st) => (livingChildren(st) ?? FUNERAL.disputeKids) >= FUNERAL.disputeKids;
 const deadPurse = (st) => Math.min(st.money, netWorth(st));
