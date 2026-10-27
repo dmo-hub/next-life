@@ -25,6 +25,25 @@ const checkStats = (card, st) => {
     if (!(st[k] >= 0 && st[k] <= 100)) statBad++;
   }
   if (!Number.isFinite(st.money)) statBad++;
+  checkSector(card, st);
+};
+
+// การ์ดต้องตรงสายงานตอนที่โชว์จริง (B126): ใบที่กั้น when.ladder / when.occupation ไว้ ห้ามออกให้คนนอกสาย
+// สายราชการ/ทหาร/ตำรวจซิงก์อาชีพตามยศ (นายพล = manager) ⇒ ใบผู้บริหารบริษัทที่กั้นแค่อาชีพจะหลุดถึงนายพลได้
+// เช็กเฉพาะสองคีย์นี้ — ธง/ค่าแถบขยับได้ระหว่างการ์ดในปีเดียวกันโดยชอบ ไม่ใช่การหลุดสาย
+const EVENTS = new Map(content.events.map((e) => [e.id, e]));
+let sectorShown = 0;
+const sectorLeaks = new Map();
+const checkSector = (card, st) => {
+  const w = EVENTS.get(card.ev?.id ?? card.id)?.when;
+  if (!w?.ladder && !w?.occupation) return;
+  sectorShown++;
+  const lad = st.ladder?.id ?? 'none';
+  const badLadder = w.ladder && !w.ladder.includes(lad);
+  const badOcc = w.occupation && !(st.workFrom !== null && w.occupation.includes(st.occupation));
+  if (!badLadder && !badOcc) return;
+  const k = `${card.ev?.id ?? card.id} (สาย ${lad} · อาชีพ ${st.occupation})`;
+  sectorLeaks.set(k, (sectorLeaks.get(k) ?? 0) + 1);
 };
 const cardsOver60 = [];
 const bySex = { ชาย: [0, 0], หญิง: [0, 0] };
@@ -52,6 +71,11 @@ for (const [s, [t, c]] of Object.entries(bySex)) console.log(`${s}: อายุ
 console.log(`
 ค่าสถานะ: ตรวจ ${statChecks.toLocaleString('en-US')} ค่า · การ์ดสรุปครอบ ${yearsCovered.toLocaleString('en-US')} จาก ${yearsLived.toLocaleString('en-US')} ปีที่มีชีวิต · หลุด 0–100/ไม่ใช่ตัวเลข ${statBad} → ${statBad ? 'ตก' : 'ผ่าน'}`);
 if (statBad) process.exitCode = 1;
+
+const leakTotal = [...sectorLeaks.values()].reduce((a, b) => a + b, 0);
+console.log(`การ์ดตรงสายงาน: ตรวจ ${sectorShown.toLocaleString('en-US')} ใบที่มีเงื่อนไข · หลุดสาย/อาชีพ ${leakTotal} → ${leakTotal ? 'ตก' : 'ผ่าน'}`);
+for (const [k, v] of [...sectorLeaks].sort((a, b) => b[1] - a[1]).slice(0, 10)) console.log(`  ${v} ${k}`);
+if (leakTotal) process.exitCode = 1;
 
 const g4 = gate4(cardsOver60);
 console.log(g4.line);
