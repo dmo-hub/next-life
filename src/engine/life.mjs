@@ -9,6 +9,7 @@ import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, prom
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
+import { entryCard, ENTRY, ENTRY_EVENTS } from './isekai.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -879,6 +880,12 @@ export function nextCard(st) {
       stepYear(st);
     }
     st.advance = true;
+    // การ์ดชวนไปต่างโลก (B68d) ออกต้นปี ใบถัดไปต้องไม่เดินเวลา
+    const offer = entryCard(st, stageOf(st.age));
+    if (offer) {
+      st.advance = false;
+      return offer;
+    }
     if (st.due.length) {
       // เหตุการณ์ของอายุนี้ยังรอ: การ์ดใบถัดไปต้องไม่เดินเวลา · เงิน/ผลตอบแทน/หนี้ไปสรุปรวมที่การ์ดเปลี่ยนช่วงวัย
       st.advance = false;
@@ -1032,6 +1039,19 @@ export function choose(st, idx) {
     st.log.push({ id: 'alloc', age: st.age, choice: idx, text: opt.label });
     return;
   }
+  if (ev?.entry) {
+    if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    st.pending = null;
+    // ปฏิเสธ = ไม่แตะอะไรเลย · กดรับ = จบชีวิตตรงนี้ งานศพตามปกติ แล้วปรโลกส่งข้ามโลก (ธง isekai_call)
+    if (idx === ENTRY.accept) {
+      st.flags.isekai_call = true;
+      st.isekaiVia = ev.entry;
+      st.log.push({ id: `isekai_${ev.entry}`, age: st.age, choice: idx, text: ev.choices[idx].text });
+      st.dead = true;
+      queueFuneral(st);
+    }
+    return;
+  }
   if (!ev || !ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
   if (lockReason(st, ev.choices[idx])) throw new Error('ตัวเลือกนี้ล็อกอยู่');
   st.pending = null;
@@ -1085,7 +1105,7 @@ function deathCard(st) {
   const card = {
     kind: 'death',
     age: st.age,
-    text: `ตายอายุ ${st.age}`,
+    text: ENTRY_EVENTS[st.isekaiVia]?.gone ? `หายตัวไปตอนอายุ ${st.age}` : `ตายอายุ ${st.age}`,
     // money = ทรัพย์สุทธิหลังหักหนี้รายก้อน · debt = ยอดหนี้รายก้อนที่ค้าง (ระหว่างชาติ B06 อ่านแยก)
     summary: {
       year,
@@ -1207,6 +1227,7 @@ export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, c
     const card = nextCard(st);
     onCard?.(card, st);
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
-    if (card.choices?.length) choose(st, pickChoice(card, bot, st));
+    // บอทที่ไม่ได้ประกาศ isekai ปฏิเสธการ์ดชวนโดยไม่ดึงเลขสุ่ม ⇒ ชีวิตเดินเท่าเดิม
+    if (card.choices?.length) choose(st, card.entry && !pickChoice.isekai ? ENTRY.decline : pickChoice(card, bot, st));
   }
 }

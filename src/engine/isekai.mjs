@@ -642,6 +642,70 @@ export function isekaiCalled(st) {
   return makeRng(st.seed ^ ISEKAI_SALT).next() < p;
 }
 
+// ทางเข้าจากเหตุการณ์ในชีวิต (B68d · เจ้าของเคาะ): ชีวิตละ 1–3 ครั้งต่างช่วงวัย ปฏิเสธได้ · กดรับ = ชีวิตจบ มีงานศพ แล้ววาร์ปข้ามโลก
+// ตารางนัดสุ่มจาก stream แยกตอนเกิด ดึงเลขครบทุกช่วงแม้ไม่ได้นัด ⇒ ชีวิตที่ปฏิเสธเดินเท่าเดิมทุกหลัก
+// ช่วงแรกเริ่มวัยรุ่น เพราะงานศพมีตั้งแต่ช่วงวัยรุ่น · gone = หายตัวไปทั้งที่ยังไม่ตาย
+export const ENTRY = { salt: 0x6a7e5d1, accept: 0, decline: 1, bands: [{ from: 13, to: 18, p: 1 }, { from: 25, to: 45, p: 0.5 }, { from: 50, to: 75, p: 0.5 }] };
+export const ENTRY_EVENTS = {
+  circle: {
+    bands: [0, 1, 2], gone: true,
+    text: 'เดินกลับบ้านตอนค่ำ จู่ ๆ ใต้เท้าก็มีวงกลมเรืองแสงสีฟ้าขึ้นมา มีเสียงผู้หญิงเรียกชื่อคุณอยู่ในวง',
+    choices: ['ก้าวเข้าไปในวง', 'ถอยออกมาแล้วรีบเดินกลับบ้าน'],
+  },
+  puzzle: {
+    bands: [0], gone: true,
+    text: 'เกมมือถือที่ไม่เคยโหลดโผล่ขึ้นมาในเครื่อง ด่านสุดท้ายถามว่าถ้าแก้ปริศนาข้อนี้ได้ จะยอมไปช่วยโลกอื่นไหม',
+    choices: ['พิมพ์คำตอบแล้วกดยอม', 'ลบแอปทิ้ง'],
+  },
+  rescue: {
+    bands: [0, 1, 2],
+    text: 'เด็กคนหนึ่งวิ่งตามลูกบอลลงไปกลางถนน รถกำลังมา ไม่มีใครอยู่ใกล้กว่าคุณ',
+    choices: ['วิ่งเข้าไปผลักเด็กออก', 'ตะโกนเรียก เด็กหันมาทันพอดี'],
+  },
+  overwork: {
+    bands: [1],
+    text: 'ทำงานติดกันมาเป็นเดือน คืนนี้ง่วงจนตาจะปิด รู้สึกแปลก ๆ ว่าถ้าหลับตอนนี้คงไม่ได้ตื่นที่เดิม',
+    choices: ['ปล่อยให้หลับไป', 'ลุกไปล้างหน้า พรุ่งนี้ขอลาพัก'],
+  },
+  dream: {
+    bands: [2],
+    text: 'คืนนี้หลับสบายเป็นพิเศษ ในฝันมีประตูไม้บานหนึ่งแง้มอยู่ แสงอุ่น ๆ ลอดออกมา',
+    choices: ['เดินเข้าประตู', 'หันหลังกลับ ตื่นมาตอนเช้าตามปกติ'],
+  },
+  truck: {
+    bands: [1, 2],
+    text: 'รถบรรทุกคันหนึ่งพุ่งมาทางม้าลาย ในหัวแวบขึ้นมาว่า แบบนี้ในนิยายเขาได้ไปต่างโลกกันนี่นา',
+    choices: ['ยืนนิ่ง ลองดูสักตั้ง', 'กระโดดหลบตามสัญชาตญาณ'],
+  },
+};
+
+export function entryOffers(seed) {
+  const rng = makeRng(seed ^ ENTRY.salt);
+  const out = [];
+  ENTRY.bands.forEach((b, i) => {
+    const hit = rng.next() < b.p;
+    const age = rng.int(b.from, b.to);
+    const id = rng.pick(Object.keys(ENTRY_EVENTS).filter((k) => ENTRY_EVENTS[k].bands.includes(i)));
+    if (hit) out.push({ age, id });
+  });
+  return out;
+}
+
+// การ์ดชวนของอายุนี้ (ใบละครั้ง) · ไม่ผ่าน emit ⇒ เลขการ์ดของชีวิตไม่เลื่อน
+export function entryCard(st, stage) {
+  st.isekaiEntry ??= entryOffers(st.seed);
+  const o = st.isekaiEntry.find((x) => x.age === st.age && !x.seen);
+  if (!o) return null;
+  o.seen = true;
+  const e = ENTRY_EVENTS[o.id];
+  st.pending = { entry: o.id, choices: e.choices.map((text) => ({ text })) };
+  return {
+    kind: 'event', id: `isekai_${o.id}`, entry: o.id, type: 'B', national: false, funeral: false,
+    age: st.age, stage, title: null, text: e.text, choices: [...e.choices],
+    fx: ['ชีวิตนี้จบตรงนี้ ไปต่างโลก', ''], locked: [null, null],
+  };
+}
+
 // karma = ระดับกรรมที่ปรโลก (−1..1) · past = ชื่อชาติไทย · run = รอบที่เท่าไรของการอยู่ต่างโลกติดกัน · memory = ค่าที่ติดตัวมาจากรอบก่อน
 // ledger = บัญชีที่ดวงวิญญาณพกมา · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = บัญชีเปล่า
 // fated = ชีวิตนี้ตายแบบฉบับต่างโลก (ธง isekai_call) — เทพธิดาโผล่แน่นอนแล้ว ได้โชคเพิ่ม

@@ -67,6 +67,10 @@ const money = (card, rng, h) => {
 
 const labelBot = (w) => (card, rng, h) => (h.pending?.alloc ? random(card, rng) : best(card, rng, byLabel(w)(card)));
 
+// สายต่างโลก (B68d): กดรับการ์ดชวนไปต่างโลกใบแรก การ์ดอื่นสุ่ม · ประกาศ isekai ให้ playLife ส่งการ์ดชวนมาให้เลือก
+// บอทใน BOTS ไม่ประกาศ ⇒ ปฏิเสธทุกใบโดยไม่ดึงเลขสุ่ม ชีวิตจึงเดินเท่าเดิม
+export const isekaiBot = Object.assign((card, rng, h) => (card.entry ? 0 : random(card, rng, h)), { isekai: true });
+
 export const BOTS = {
   สุ่ม: random,
   สายบุญ: extreme(1),

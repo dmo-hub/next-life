@@ -2,9 +2,9 @@
 // ด่าน: seed เดิมผลเดิม (รวดเดียว + เซฟ/โหลดกลางทาง) · จบได้ทุกชีวิตภายในเพดานการ์ด · ตอนจบ/โลก/สกิล/เหตุการณ์มีบอทถึง
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
-import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_WORLDS, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_WORLDS, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ENTRY, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
-import { BOTS } from './bots.mjs';
+import { BOTS, isekaiBot } from './bots.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
@@ -161,6 +161,34 @@ for (let i = 0; i < lives; i++) {
 }
 check(`อยู่ต่อติดเพดาน ${ISEKAI.stay + 1} ชาติ แล้วปรโลกตัดสินทุกชาติ`, stayBad, `${lives} ชีวิต × 2 แบบ`);
 check('กลับโลกเดิมลงผังตระกูลครบ', backBad);
+
+// ทางเข้าจากเหตุการณ์ในชีวิต (B68d): บอทสายต่างโลกกดรับการ์ดชวนใบแรก
+// อยู่ถึงอายุนัดแรก = เจอการ์ดชวน · กดรับแล้วมีงานศพ · ปรโลกไม่มีการ์ดทางเกิด · เข้าต่างโลกแบบ fated · บอทสุ่มไม่เคยกดรับ
+let entryBad = 0, entryLives = 0, declineBad = 0;
+for (let i = 0; i < lives; i++) {
+  let offers = 0, funeral = false;
+  const r = playLife(mixSeed(seed, 9500 + i), content, isekaiBot, (c) => {
+    if (c.entry) offers++;
+    if (c.funeral) funeral = true;
+  });
+  if (r.age < (r.state.isekaiEntry?.[0]?.age ?? Infinity)) continue;
+  entryLives++;
+  if (offers !== 1 || !r.state.flags.isekai_call || !funeral) {
+    entryBad++;
+    continue;
+  }
+  const af = startAfterlife(r.state);
+  let paths = 0;
+  for (let guard = 0; guard < 50 && !af.isekai; guard++) {
+    const card = nextAfterCard(af);
+    if (card.kind === 'path') paths++;
+    if (card.choices?.length) chooseAfter(af, BOTS.สุ่ม(card, af.botRng, af));
+  }
+  if (paths || !af.isekai?.fated) entryBad++;
+  if (playLife(mixSeed(seed, 9500 + i), content, BOTS.สุ่ม).state.flags.isekai_call) declineBad++;
+}
+check('การ์ดชวนในชีวิต กดรับแล้วงานศพ + วาร์ปข้ามโลก', entryBad, `${entryLives} ชีวิต · นัด ${ENTRY.bands.length} ช่วงวัย`);
+check('บอทที่ไม่ประกาศ isekai ไม่เคยกดรับ', declineBad);
 
 // ตัวควบคุม: ตัววัดต้องจับของเสียที่ปลูกไว้ได้ — ไม่งั้นด่านผ่านเพราะวัดไม่เป็น
 const ctl = [

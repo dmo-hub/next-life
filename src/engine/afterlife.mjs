@@ -248,6 +248,12 @@ export function nextAfterCard(af) {
   const step = af.steps[af.i++];
   if (step === 'transfer' || step === 'devaduta') return sceneCard(af, pickScene(af, step));
   if (step === 'verdict') return verdictCard(af);
+  // กดรับการ์ดชวนในชีวิต (B68d) = ถูกเรียกไปแล้ว ไม่มีการ์ดเลือกทางเกิด
+  if (step === 'path' && af.st.flags?.isekai_call && !af.from) {
+    af.path = 'isekai';
+    sendToIsekai(af);
+    return nextAfterCard(af);
+  }
   if (step === 'path') return pathCard(af);
   if (step === 'scene') return sceneCard(af, pickScene(af, af.path === 'child' ? 'ancestor' : 'realm'));
   if (step === 'carry') return carryCard(af);
