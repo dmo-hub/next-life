@@ -1549,7 +1549,7 @@ PROMO.police = [
 const RETIRE_AT = 60;
 // net = ส่วนของค่าตอบแทนท้องถิ่นที่เหลือจริง · ติดลบ = ควักเนื้อเกินค่าตอบแทน (−0.25 = ขาดทุนหนึ่งในสี่ของค่าตอบแทน · −0.5 ขึ้นไปล้มละลายเกิน 8% บนฐานที่มีเงินสัตว์ B44) — ผู้ใหญ่บ้าน/กำนันต้องช่วยงานบวช งานศพ ค่าน้ำมันวิ่งงานชาวบ้าน (ค่าตั้ง)
 // campaign = ค่าหาเสียงต่อการลงสมัคร เป็นเท่าของเงินเก็บต่อปี × (ขั้น+1)
-const OFFICE = { net: -0.25, campaign: 1.5, term: 4, entry: 0.2, minNet: 45, ageFrom: 25, ageTo: RETIRE_AT - 1, keep: 2.5, odds: [2, 1.2, 0.8, 0.5, 0.018] };
+const OFFICE = { net: -0.25, campaign: 1.5, term: 4, entry: 0.2, minNet: 45, ageFrom: 25, ageTo: RETIRE_AT - 1, keep: 2.5, fame: 0.5, odds: [2, 1.2, 0.8, 0.5, 0.018] };
 
 const ladderOf = (st) => st.ladder && st.content.era.careers.ladders[st.ladder.id];
 const stepOf = (st) => ladderOf(st).steps[st.ladder.rank];
@@ -1617,6 +1617,8 @@ function promote(st, n) {
 // ผลของการ์ดเลือกตั้ง: เลขขั้นที่ได้ · -1 = หลุดจากตำแหน่ง
 function setOffice(st, rank) {
   st.office = rank < 0 ? null : { rank, since: st.age, next: st.age + OFFICE.term };
+  // ตำแหน่งสูงสุดที่เคยได้ — ชื่อเสียงตระกูล/เป้าตระกูลการเมืองอ่านตอนตาย (ตำแหน่งปัจจุบันหายเมื่อแพ้)
+  if (rank >= 0) st.officeTop = Math.max(st.officeTop ?? -1, rank);
 }
 
 // สุขต่ำทำให้ปีในขั้นนับช้าลง (ตัวคูณเดียวกับการเรียน) — ผู้เรียกส่งตัวคูณเข้ามา
@@ -1685,7 +1687,8 @@ function officeDue(st) {
   // เคยโดนใบแดง/คดีทุจริต = ถูกตัดสิทธิ์ ไม่มีใครมาชวนอีก
   if (st.flags.caught_fraud || st.workFrom === null || st.age < OFFICE.ageFrom || st.age > OFFICE.ageTo || st.network < OFFICE.minNet) return false;
   st.rankRng ??= makeRng((st.seed ^ 0x1f83d9ab ^ 0x5be0cd19) >>> 0);
-  return st.rankRng.next() < OFFICE.entry;
+  // ลูกหลานตระกูลดังถูกชวนบ่อยขึ้น (B95b · เจ้าของเคาะ) — ×(1 + 0.5 × ขั้นชื่อเสียง)
+  return st.rankRng.next() < OFFICE.entry * (1 + OFFICE.fame * (st.fame ?? 0));
 }
 
 // การ์ดเลือกตั้ง: ชิงขั้นถัดไป · รักษาตำแหน่งเดิม · ซื้อเสียง (บาปหนัก โดนใบแดงหลุดตำแหน่ง) · ขอพร · วางมือ
@@ -4042,6 +4045,7 @@ const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world:
 
 
 
+
 // ระดับกรรมที่ปรโลก (−1..1) = บัญชีสุทธิ ÷ ref · ref แยกจากตัวคูณกรรมระหว่างชีวิต (KARMA.ref) เพราะบัญชีทั้งชีวิตสะสมไกลกว่า
 // จุดอิ่มของตัวคูณการตายมาก — ใช้ ref เดียวกันแล้วเกือบทุกคนชนเพดาน ภูมิกับฐานะชาติหน้าจะไม่แยกคน
 const VERDICT_REF = 30;
@@ -4073,9 +4077,9 @@ const FATE = { sd: 1.2, childStep: 3, stat: 10, bonusCap: 12, kin: 0.3 };
 const STAND_MIX = 0.5;
 const deathStanding = (st) => ((st.estate?.money ?? 0) < 0 ? 0 : standingOf(st));
 // ชื่อเสียงตระกูล (B95b · เจ้าของเคาะ 4 ขั้น) — แต้มของรุ่นที่เพิ่งจบ บวกกับครึ่งหนึ่งของขั้นเดิม ปัดครึ่งลง (ปัดขึ้นแล้วขั้น 1 ไม่จางเลย) ⇒ ไม่ทำอะไรต่อสองสามรุ่นก็จางเอง
-// rich = ฐานะตอนตายตั้งแต่ระดับ 8 (index 7) · guests = แขกงานศพที่นับว่างานใหญ่ · network = คอนเน็คชั่นตั้งต้นของทายาทต่อขั้น
-const FAME = { names: ['ไร้ชื่อ', 'มีหน้ามีตา', 'ผู้มีบารมีในถิ่น', 'ตระกูลใหญ่'], decay: 0.5, rich: 7, guests: 300, network: 5 };
-const famePoints = (st, death) => (death >= FAME.rich ? 1 : 0) + (funeralGuests(st) >= FAME.guests ? 1 : 0) - (st.bankruptcies > 0 ? 1 : 0) - ((st.estate?.money ?? 0) < 0 ? 1 : 0);
+// office = แต้มตามตำแหน่งสูงสุดที่เคยได้ (ผู้ใหญ่บ้าน กำนัน นายก อบต. ส.ส. นายกฯ) · rich = ฐานะตอนตายตั้งแต่ระดับ 8 (index 7) · guests = แขกงานศพที่นับว่างานใหญ่ · network = คอนเน็คชั่นตั้งต้นของทายาทต่อขั้น
+const FAME = { names: ['ไร้ชื่อ', 'มีหน้ามีตา', 'ผู้มีบารมีในถิ่น', 'ตระกูลใหญ่'], decay: 0.5, rich: 7, guests: 300, network: 5, office: [0, 0, 1, 2, 3] };
+const famePoints = (st, death) => (FAME.office[st.officeTop ?? -1] ?? 0) - (st.flags?.caught_fraud ? 1 : 0) + (death >= FAME.rich ? 1 : 0) + (funeralGuests(st) >= FAME.guests ? 1 : 0) - (st.bankruptcies > 0 ? 1 : 0) - ((st.estate?.money ?? 0) < 0 ? 1 : 0);
 const nextFame = (st, death) => Math.max(0, Math.min(FAME.names.length - 1, Math.ceil((st.fame ?? 0) * FAME.decay + famePoints(st, death) - 0.5)));
 const mixStanding = (death, fate) => clampIdx(Math.round(STAND_MIX * death + (1 - STAND_MIX) * fate));
 // มรดก (ใบ 05 · lore-finance-belief): แบ่งตามจำนวนลูก · ภาษีการรับมรดก 5% ส่วนที่เกิน 100 ล้าน ตั้งแต่ปีที่กฎหมายมีผล
@@ -4434,7 +4438,7 @@ function makeHeir(af, r) {
   // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน · tier = กลับมาเกิดเป็นชั้นไหนของตัวเอง (ทางเป็นลูก)
   // ชีวิตต่างโลกต่อท้ายเป็นรุ่นของตัวเอง (B68) — แถวชาติไทยบันทึกทางว่าไปต่างโลกกับภูมิที่ปรโลกชี้ให้ชาติไทย แม้ขากลับจะเกิดใหม่ตามกรรมของชาติต่างโลก
   const thai = af.thaiVerdict ?? af.verdict;
-  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }], fame, ...(goals.length && { goals }) }, ...af.isekaiLives];
+  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }], fame, ...(goals.length && { goals }), ...(st.officeTop >= 0 && { office: st.officeTop }), ...(ladderOf(st)?.pension && { service: true }) }, ...af.isekaiLives];
   const carried = r * (tier?.carry ?? 1);
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
@@ -4609,6 +4613,7 @@ function eraStory(st, e) {
 // คิดย้อนหลังตอนตายจากสิ่งที่ชีวิตนั้นเลือกจริง (st.log) + สถานะท้ายชีวิต — ไม่เก็บอะไรเพิ่มระหว่างเล่น ไม่ดึงเลขสุ่ม
 // ห้ามอ่านยอดบัญชีบุญบาป (ledger) — แบบชีวิต/ฉายาขึ้นบนการ์ดตายก่อนปรโลกเฉลยบัญชี · อ่านได้เฉพาะป้ายของตัวเลือกที่ผู้เล่นกดเอง
 // (การกระทำนั้นผู้เล่นเห็นในข้อความอยู่แล้ว) ไม่รวมยอด ไม่หักกลบ ไม่บอกฝั่งที่หนักกว่า
+
 
 
 
@@ -4925,14 +4930,18 @@ const lastN = (xs, n, ok) => xs.length >= n && xs.slice(-n).every(ok);
 // เป้าตระกูล (B95b · เจ้าของเคาะ) — ได้ฉายาทุกรุ่นที่ยังเข้าเงื่อนไข · ชื่อเสียง +1 ครั้งเดียวต่อตระกูล (afterlife.mjs นับจาก lineage[].goals)
 // ฐานะตอนตายอ่านจากจุดท้ายของ standing · rags = เกิดชั้น 1–2 แล้วภายในสามรุ่น (นับรุ่นนั้นด้วย) มีคนตายในฐานะ 9–10
 const deathCls = (l) => l.standing?.at(-1)?.cls ?? CLASSES.indexOf(l.cls);
+// service = รับราชการสายที่มีบำนาญ (พลเรือน ทหาร ตำรวจ) · office 2 = นายก อบต.
 const RAGS = { from: 1, to: 8, within: 3 };
+const runOf = (ch, n, ok) => ch.some((_, i) => i + n <= ch.length && ch.slice(i, i + n).every(ok));
 const rags = (ch) => ch.some((l, i) => CLASSES.indexOf(l.cls) <= RAGS.from && ch.slice(i, i + RAGS.within).some((m) => deathCls(m) >= RAGS.to));
 const FAMILY_GOALS = [
   { id: 'goal_rags', name: 'จากยากไร้สู่มั่งคั่ง', hint: 'รุ่นที่เกิดมายากไร้ ภายในสามรุ่นมีคนจากไปอย่างมั่งคั่ง', test: (ch) => rags(ch) },
+  { id: 'goal_service', name: 'สามรุ่นรับราชการ', hint: 'สามรุ่นติดกันรับราชการจนมีบำนาญ', test: (ch) => runOf(ch, 3, (l) => l.service) },
+  { id: 'goal_politics', name: 'ตระกูลการเมือง', hint: 'สองรุ่นได้ตำแหน่งตั้งแต่นายก อบต. ขึ้นไป', test: (ch) => ch.filter((l) => (l.office ?? -1) >= 2).length >= 2 },
   { id: 'goal_great', name: 'ตระกูลใหญ่', hint: 'ชื่อเสียงตระกูลขึ้นถึงขั้นสูงสุด', test: (ch) => ch.some((l) => (l.fame ?? 0) >= 3) },
 ];
 // ผังตระกูลรวมชีวิตนี้ตอนตาย — แถวท้ายมีฐานะตอนตาย (ตายพร้อมหนี้ = 0) กับชื่อเสียงที่รับมา
-const familyChain = (st, broke) => [...st.lineage.filter((l) => !l.isekai), { gen: st.gen, sex: st.sex, cls: st.cls, age: st.age, broke, fame: st.fame ?? 0, standing: [{ age: st.age, cls: broke ? 0 : standingOf(st) }] }];
+const familyChain = (st, broke) => [...st.lineage.filter((l) => !l.isekai), { gen: st.gen, sex: st.sex, cls: st.cls, age: st.age, broke, fame: st.fame ?? 0, standing: [{ age: st.age, cls: broke ? 0 : standingOf(st) }], ...(st.officeTop >= 0 && { office: st.officeTop }), ...(ladderOf(st)?.pension && { service: true }) }];
 const goalsMet = (st, broke) => {
   const ch = familyChain(st, broke);
   const had = new Set(st.lineage.flatMap((l) => l.goals ?? []));

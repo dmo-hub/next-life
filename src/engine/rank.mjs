@@ -48,7 +48,7 @@ PROMO.police = [
 const RETIRE_AT = 60;
 // net = ส่วนของค่าตอบแทนท้องถิ่นที่เหลือจริง · ติดลบ = ควักเนื้อเกินค่าตอบแทน (−0.25 = ขาดทุนหนึ่งในสี่ของค่าตอบแทน · −0.5 ขึ้นไปล้มละลายเกิน 8% บนฐานที่มีเงินสัตว์ B44) — ผู้ใหญ่บ้าน/กำนันต้องช่วยงานบวช งานศพ ค่าน้ำมันวิ่งงานชาวบ้าน (ค่าตั้ง)
 // campaign = ค่าหาเสียงต่อการลงสมัคร เป็นเท่าของเงินเก็บต่อปี × (ขั้น+1)
-export const OFFICE = { net: -0.25, campaign: 1.5, term: 4, entry: 0.2, minNet: 45, ageFrom: 25, ageTo: RETIRE_AT - 1, keep: 2.5, odds: [2, 1.2, 0.8, 0.5, 0.018] };
+export const OFFICE = { net: -0.25, campaign: 1.5, term: 4, entry: 0.2, minNet: 45, ageFrom: 25, ageTo: RETIRE_AT - 1, keep: 2.5, fame: 0.5, odds: [2, 1.2, 0.8, 0.5, 0.018] };
 
 export const ladderOf = (st) => st.ladder && st.content.era.careers.ladders[st.ladder.id];
 const stepOf = (st) => ladderOf(st).steps[st.ladder.rank];
@@ -116,6 +116,8 @@ export function promote(st, n) {
 // ผลของการ์ดเลือกตั้ง: เลขขั้นที่ได้ · -1 = หลุดจากตำแหน่ง
 export function setOffice(st, rank) {
   st.office = rank < 0 ? null : { rank, since: st.age, next: st.age + OFFICE.term };
+  // ตำแหน่งสูงสุดที่เคยได้ — ชื่อเสียงตระกูล/เป้าตระกูลการเมืองอ่านตอนตาย (ตำแหน่งปัจจุบันหายเมื่อแพ้)
+  if (rank >= 0) st.officeTop = Math.max(st.officeTop ?? -1, rank);
 }
 
 // สุขต่ำทำให้ปีในขั้นนับช้าลง (ตัวคูณเดียวกับการเรียน) — ผู้เรียกส่งตัวคูณเข้ามา
@@ -184,7 +186,8 @@ export function officeDue(st) {
   // เคยโดนใบแดง/คดีทุจริต = ถูกตัดสิทธิ์ ไม่มีใครมาชวนอีก
   if (st.flags.caught_fraud || st.workFrom === null || st.age < OFFICE.ageFrom || st.age > OFFICE.ageTo || st.network < OFFICE.minNet) return false;
   st.rankRng ??= makeRng((st.seed ^ 0x1f83d9ab ^ 0x5be0cd19) >>> 0);
-  return st.rankRng.next() < OFFICE.entry;
+  // ลูกหลานตระกูลดังถูกชวนบ่อยขึ้น (B95b · เจ้าของเคาะ) — ×(1 + 0.5 × ขั้นชื่อเสียง)
+  return st.rankRng.next() < OFFICE.entry * (1 + OFFICE.fame * (st.fame ?? 0));
 }
 
 // การ์ดเลือกตั้ง: ชิงขั้นถัดไป · รักษาตำแหน่งเดิม · ซื้อเสียง (บาปหนัก โดนใบแดงหลุดตำแหน่ง) · ขอพร · วางมือ

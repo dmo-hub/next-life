@@ -7,6 +7,7 @@ import { meritId, SIN_CATS } from './merit.mjs';
 import { CLASSES, LEVELS, RETIRE_AGE, riskLabel, netWorth, totalDebt, standingOf } from './life.mjs';
 import { expectedDeathAge, eraEventsAt, protoYear } from './era.mjs';
 import { nationalIncome } from './birth.mjs';
+import { ladderOf } from './rank.mjs';
 
 // ใบ 04: แบบชีวิตคิดจากเหตุการณ์ที่เกิดจริงหลังอายุ 18
 export const PATTERN_FROM = 18;
@@ -319,14 +320,18 @@ const lastN = (xs, n, ok) => xs.length >= n && xs.slice(-n).every(ok);
 // เป้าตระกูล (B95b · เจ้าของเคาะ) — ได้ฉายาทุกรุ่นที่ยังเข้าเงื่อนไข · ชื่อเสียง +1 ครั้งเดียวต่อตระกูล (afterlife.mjs นับจาก lineage[].goals)
 // ฐานะตอนตายอ่านจากจุดท้ายของ standing · rags = เกิดชั้น 1–2 แล้วภายในสามรุ่น (นับรุ่นนั้นด้วย) มีคนตายในฐานะ 9–10
 const deathCls = (l) => l.standing?.at(-1)?.cls ?? CLASSES.indexOf(l.cls);
+// service = รับราชการสายที่มีบำนาญ (พลเรือน ทหาร ตำรวจ) · office 2 = นายก อบต.
 const RAGS = { from: 1, to: 8, within: 3 };
+const runOf = (ch, n, ok) => ch.some((_, i) => i + n <= ch.length && ch.slice(i, i + n).every(ok));
 const rags = (ch) => ch.some((l, i) => CLASSES.indexOf(l.cls) <= RAGS.from && ch.slice(i, i + RAGS.within).some((m) => deathCls(m) >= RAGS.to));
 export const FAMILY_GOALS = [
   { id: 'goal_rags', name: 'จากยากไร้สู่มั่งคั่ง', hint: 'รุ่นที่เกิดมายากไร้ ภายในสามรุ่นมีคนจากไปอย่างมั่งคั่ง', test: (ch) => rags(ch) },
+  { id: 'goal_service', name: 'สามรุ่นรับราชการ', hint: 'สามรุ่นติดกันรับราชการจนมีบำนาญ', test: (ch) => runOf(ch, 3, (l) => l.service) },
+  { id: 'goal_politics', name: 'ตระกูลการเมือง', hint: 'สองรุ่นได้ตำแหน่งตั้งแต่นายก อบต. ขึ้นไป', test: (ch) => ch.filter((l) => (l.office ?? -1) >= 2).length >= 2 },
   { id: 'goal_great', name: 'ตระกูลใหญ่', hint: 'ชื่อเสียงตระกูลขึ้นถึงขั้นสูงสุด', test: (ch) => ch.some((l) => (l.fame ?? 0) >= 3) },
 ];
 // ผังตระกูลรวมชีวิตนี้ตอนตาย — แถวท้ายมีฐานะตอนตาย (ตายพร้อมหนี้ = 0) กับชื่อเสียงที่รับมา
-export const familyChain = (st, broke) => [...st.lineage.filter((l) => !l.isekai), { gen: st.gen, sex: st.sex, cls: st.cls, age: st.age, broke, fame: st.fame ?? 0, standing: [{ age: st.age, cls: broke ? 0 : standingOf(st) }] }];
+export const familyChain = (st, broke) => [...st.lineage.filter((l) => !l.isekai), { gen: st.gen, sex: st.sex, cls: st.cls, age: st.age, broke, fame: st.fame ?? 0, standing: [{ age: st.age, cls: broke ? 0 : standingOf(st) }], ...(st.officeTop >= 0 && { office: st.officeTop }), ...(ladderOf(st)?.pension && { service: true }) }];
 export const goalsMet = (st, broke) => {
   const ch = familyChain(st, broke);
   const had = new Set(st.lineage.flatMap((l) => l.goals ?? []));

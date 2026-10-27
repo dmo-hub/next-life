@@ -10,6 +10,7 @@ import { goalsMet } from './titles.mjs';
 import { heirPets } from './family.mjs';
 import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests } from './life.mjs';
 import { ISEKAI, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage } from './isekai.mjs';
+import { ladderOf } from './rank.mjs';
 
 // ระดับกรรมที่ปรโลก (−1..1) = บัญชีสุทธิ ÷ ref · ref แยกจากตัวคูณกรรมระหว่างชีวิต (KARMA.ref) เพราะบัญชีทั้งชีวิตสะสมไกลกว่า
 // จุดอิ่มของตัวคูณการตายมาก — ใช้ ref เดียวกันแล้วเกือบทุกคนชนเพดาน ภูมิกับฐานะชาติหน้าจะไม่แยกคน
@@ -42,9 +43,9 @@ export const FATE = { sd: 1.2, childStep: 3, stat: 10, bonusCap: 12, kin: 0.3 };
 export const STAND_MIX = 0.5;
 const deathStanding = (st) => ((st.estate?.money ?? 0) < 0 ? 0 : standingOf(st));
 // ชื่อเสียงตระกูล (B95b · เจ้าของเคาะ 4 ขั้น) — แต้มของรุ่นที่เพิ่งจบ บวกกับครึ่งหนึ่งของขั้นเดิม ปัดครึ่งลง (ปัดขึ้นแล้วขั้น 1 ไม่จางเลย) ⇒ ไม่ทำอะไรต่อสองสามรุ่นก็จางเอง
-// rich = ฐานะตอนตายตั้งแต่ระดับ 8 (index 7) · guests = แขกงานศพที่นับว่างานใหญ่ · network = คอนเน็คชั่นตั้งต้นของทายาทต่อขั้น
-export const FAME = { names: ['ไร้ชื่อ', 'มีหน้ามีตา', 'ผู้มีบารมีในถิ่น', 'ตระกูลใหญ่'], decay: 0.5, rich: 7, guests: 300, network: 5 };
-export const famePoints = (st, death) => (death >= FAME.rich ? 1 : 0) + (funeralGuests(st) >= FAME.guests ? 1 : 0) - (st.bankruptcies > 0 ? 1 : 0) - ((st.estate?.money ?? 0) < 0 ? 1 : 0);
+// office = แต้มตามตำแหน่งสูงสุดที่เคยได้ (ผู้ใหญ่บ้าน กำนัน นายก อบต. ส.ส. นายกฯ) · rich = ฐานะตอนตายตั้งแต่ระดับ 8 (index 7) · guests = แขกงานศพที่นับว่างานใหญ่ · network = คอนเน็คชั่นตั้งต้นของทายาทต่อขั้น
+export const FAME = { names: ['ไร้ชื่อ', 'มีหน้ามีตา', 'ผู้มีบารมีในถิ่น', 'ตระกูลใหญ่'], decay: 0.5, rich: 7, guests: 300, network: 5, office: [0, 0, 1, 2, 3] };
+export const famePoints = (st, death) => (FAME.office[st.officeTop ?? -1] ?? 0) - (st.flags?.caught_fraud ? 1 : 0) + (death >= FAME.rich ? 1 : 0) + (funeralGuests(st) >= FAME.guests ? 1 : 0) - (st.bankruptcies > 0 ? 1 : 0) - ((st.estate?.money ?? 0) < 0 ? 1 : 0);
 export const nextFame = (st, death) => Math.max(0, Math.min(FAME.names.length - 1, Math.ceil((st.fame ?? 0) * FAME.decay + famePoints(st, death) - 0.5)));
 const mixStanding = (death, fate) => clampIdx(Math.round(STAND_MIX * death + (1 - STAND_MIX) * fate));
 // มรดก (ใบ 05 · lore-finance-belief): แบ่งตามจำนวนลูก · ภาษีการรับมรดก 5% ส่วนที่เกิน 100 ล้าน ตั้งแต่ปีที่กฎหมายมีผล
@@ -403,7 +404,7 @@ function makeHeir(af, r) {
   // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน · tier = กลับมาเกิดเป็นชั้นไหนของตัวเอง (ทางเป็นลูก)
   // ชีวิตต่างโลกต่อท้ายเป็นรุ่นของตัวเอง (B68) — แถวชาติไทยบันทึกทางว่าไปต่างโลกกับภูมิที่ปรโลกชี้ให้ชาติไทย แม้ขากลับจะเกิดใหม่ตามกรรมของชาติต่างโลก
   const thai = af.thaiVerdict ?? af.verdict;
-  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }], fame, ...(goals.length && { goals }) }, ...af.isekaiLives];
+  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }], fame, ...(goals.length && { goals }), ...(st.officeTop >= 0 && { office: st.officeTop }), ...(ladderOf(st)?.pension && { service: true }) }, ...af.isekaiLives];
   const carried = r * (tier?.carry ?? 1);
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
