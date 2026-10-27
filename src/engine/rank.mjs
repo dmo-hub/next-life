@@ -48,7 +48,7 @@ PROMO.police = [
 const RETIRE_AT = 60;
 // net = ส่วนของค่าตอบแทนท้องถิ่นที่เหลือจริง — ผู้ใหญ่บ้าน/กำนันต้องช่วยงานบวช งานศพ ค่าน้ำมันวิ่งงานชาวบ้าน (ค่าตั้ง)
 // campaign = ค่าหาเสียงต่อการลงสมัคร เป็นเท่าของเงินเก็บต่อปี × (ขั้น+1)
-export const OFFICE = { net: 0.25, campaign: 0.3, term: 4, entry: 0.2, minNet: 45, ageFrom: 25, ageTo: RETIRE_AT - 1, keep: 2.5, odds: [2, 1.2, 0.8, 0.5, 0.03] };
+export const OFFICE = { net: 0, campaign: 1.5, term: 4, entry: 0.2, minNet: 45, ageFrom: 25, ageTo: RETIRE_AT - 1, keep: 2.5, odds: [2, 1.2, 0.8, 0.5, 0.018] };
 
 export const ladderOf = (st) => st.ladder && st.content.era.careers.ladders[st.ladder.id];
 const stepOf = (st) => ladderOf(st).steps[st.ladder.rank];
@@ -251,12 +251,12 @@ export function recruitCard(st) {
     type: 'A',
     text: `อายุ ${st.age} ปี มีประกาศรับสมัครสอบเข้ารับราชการ`,
     choices: [
-      { text: 'สมัครสอบข้าราชการพลเรือน', outcomes: join('gov', RECRUIT.odds, lift, 'สอบผ่าน ได้บรรจุเป็นข้าราชการ') },
+      { text: 'สมัครสอบข้าราชการพลเรือน', requires: { edu: 'อาชีวะ', reason: 'ต้องจบ ปวช. ขึ้นไป' }, outcomes: join('gov', RECRUIT.odds, lift, 'สอบผ่าน ได้บรรจุเป็นข้าราชการ') },
       { text: 'สมัครสอบนายทหารจากบุคคลภายนอก', requires: { stats: { health: { min: 55 } }, edu: 'อุดมศึกษา', reason: 'ต้องจบปริญญาและร่างกายผ่านเกณฑ์' }, outcomes: join('army', RECRUIT.odds, { stats: { health: 1.5, knowledge: 1.3 } }, 'ผ่านการคัดเลือก ได้ติดยศนายทหาร') },
-      { text: 'สมัครสอบเป็นตำรวจ', requires: { stats: { health: { min: 50 } }, reason: 'สุขภาพยังไม่ถึงเกณฑ์ทดสอบร่างกาย' }, outcomes: join('police', RECRUIT.odds, { stats: { health: 1.5, knowledge: 1.3 } }, 'ผ่านทั้งข้อเขียนและร่างกาย ได้ติดยศตำรวจ') },
+      { text: 'สมัครสอบเป็นตำรวจ', requires: { stats: { health: { min: 50 } }, edu: 'มัธยม', reason: 'ต้องจบมัธยมและร่างกายผ่านเกณฑ์' }, outcomes: join('police', RECRUIT.odds, { stats: { health: 1.5, knowledge: 1.3 } }, 'ผ่านทั้งข้อเขียนและร่างกาย ได้ติดยศตำรวจ') },
       {
         text: 'ฝากเส้นผู้ใหญ่ให้ช่วยดู',
-        requires: { stats: { network: { min: 50 } }, reason: 'ไม่มีคนรู้จักให้ฝาก' },
+        requires: { stats: { network: { min: 50 } }, edu: 'มัธยม', reason: 'ต้องจบมัธยมและมีคนรู้จักให้ฝาก' },
         merit: BRIBE,
         outcomes: [
           { weight: RECRUIT.odds * 3, ok: true, text: 'ชื่อผ่านตามที่ฝากไว้ ได้บรรจุเป็นข้าราชการ', effects: { ladder: 'gov' } },
