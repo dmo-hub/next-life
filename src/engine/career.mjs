@@ -17,7 +17,7 @@ export const TRACKS = {
   hvoc: { name: 'ปวส.', until: 20, edu: 'อาชีวะ' },
   uni: { name: 'มหาวิทยาลัย', until: 22, edu: 'อุดมศึกษา' },
   // จบแล้วติดยศเข้าสายทันที ไม่ต้องหางาน (B40)
-  cadet: { name: 'โรงเรียนนายร้อย', until: 22, edu: 'อุดมศึกษา', ladder: 'army' },
+  cadet: { name: 'โรงเรียนนายร้อย จปร.', until: 22, edu: 'อุดมศึกษา', ladder: 'army' },
   police_cadet: { name: 'โรงเรียนนายร้อยตำรวจ', until: 22, edu: 'อุดมศึกษา', ladder: 'police' },
 };
 export const EXAMS = [...new Set(Object.values(TRACKS).map((t) => t.exam).filter(Boolean))];
@@ -151,8 +151,13 @@ export function schoolGate(st) {
         ],
       },
       { text: 'ขอพรก่อนสอบมหาวิทยาลัยรัฐ', hint: uniHint, requires: uniLock, outcomes: exam({ wish: WISH, stats: { knowledge: 3, network: 1.5 } }) },
-      ...[['cadet', 'สอบเข้าโรงเรียนนายร้อย'], ['police_cadet', 'สอบเข้าโรงเรียนนายร้อยตำรวจ']].map(([school, text]) => ({
+      // ชื่อปุ่มสองโรงเรียนต้องแยกกันออกตั้งแต่อ่านครั้งแรก — ต่อกันแค่คำว่า "ตำรวจ" ผู้เล่นเดาไม่ออกว่าอันแรกคือทหาร (B125)
+      ...[
+        ['cadet', 'สอบเข้านายร้อย จปร. (ทหารบก)', 'ไม่เสียค่าเทอม · จบแล้วติดยศร้อยตรี'],
+        ['police_cadet', 'สอบเข้านายร้อยตำรวจ (สามพราน)', 'ไม่เสียค่าเทอม · จบแล้วติดยศร้อยตำรวจตรี'],
+      ].map(([school, text, hint]) => ({
         text,
+        hint,
         requires: CADET_NEED,
         outcomes: [
           { weight: 1, ok: true, multipliers: { stats: { knowledge: 2, health: 1.5 } }, text: `สอบติด ได้เข้า${TRACKS[school].name}`, effects: { school, network: 1 } },
