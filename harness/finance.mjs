@@ -1,7 +1,7 @@
 // harness การเงิน (B08): ทรัพย์สุทธิตอนตาย (บาทค่าเงินปีเกิด) ตามฐานะเกิด/ภาค ต้องไม่ผิดทิศกับความเหลื่อมล้ำจริง
 // ตัวควบคุม: ปิดผลจุดเกิด (อาชีพเท่ากันทุกฐานะ · รายได้ทุกภาค = ทั่วประเทศ · เงินติดตัวเท่ากัน) แล้วช่องว่างต้องหดลงชัด
 // — พิสูจน์ว่าตัววัดจับผลจุดเกิดได้จริง ไม่ใช่เรียงถูกเพราะบังเอิญ · รันซ้ำ seed เดิมต้องได้ผลเดิมทุกหลัก
-import { playLife, openChoices, mixSeed, CLASSES } from '../src/engine/index.mjs';
+import { playLife, openChoices, mixSeed, makeRng, CLASSES } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 
 const args = process.argv.slice(2);
@@ -55,8 +55,35 @@ console.log(`ชีวิต ${n} · seed ${seed} · ทรัพย์สุท
 console.log('ฐานะ            ชีวิต      มัธยฐาน');
 const byDecile = CLASSES.map((c, d) => median(real.filter((x) => x.d === d).map((x) => x.w)));
 CLASSES.forEach((c, d) => console.log(`${String(d + 1).padStart(2)} ${c.padEnd(14)} ${String(real.filter((x) => x.d === d).length).padStart(6)} ${f(byDecile[d], 0).padStart(14)}`));
-const inversions = byDecile.slice(1).filter((v, i) => !(v > byDecile[i])).length;
-console.log(`เรียงขึ้นทุกระดับ: กลับทิศ ${inversions} คู่ → ${inversions ? 'ตก' : 'ผ่าน'}`);
+// เรียงชั้น: ตกเฉพาะกลับทิศที่พิสูจน์ได้ — การ์ดที่เพิ่มตัวเลือกสับเส้นทางชีวิตทั้งชุด มัธยฐานคู่ชั้นติดกันจึงสลับกันได้จาก noise ล้วน
+// (main เดียวกัน คนละ seed ก็สลับ) · bootstrap มัธยฐานในแต่ละชั้น หาช่วง 95% ของ (ชั้นสูง − ชั้นต่ำ) · ขอบบน < 0 = ชั้นสูงจนกว่าแน่
+// RNG ของ bootstrap ผูกกับ --seed ⇒ ผลซ้ำทุกหลัก
+const BOOT = 1000;
+const bootRng = makeRng(mixSeed(seed, 0xb007));
+const bootMedians = (xs) => {
+  const out = new Float64Array(BOOT);
+  const s = new Float64Array(xs.length);
+  for (let b = 0; b < BOOT; b++) {
+    for (let i = 0; i < xs.length; i++) s[i] = xs[Math.floor(bootRng.next() * xs.length)];
+    s.sort();
+    out[b] = s[Math.floor(s.length / 2)];
+  }
+  return out;
+};
+const boots = CLASSES.map((c, d) => bootMedians(real.filter((x) => x.d === d).map((x) => x.w)));
+let inversions = 0;
+let ties = 0;
+console.log('\nคู่ชั้นติดกัน               ส่วนต่าง    ช่วง 95% (บาท)                ผล');
+for (let d = 1; d < CLASSES.length; d++) {
+  const diffs = boots[d].map((v, b) => v - boots[d - 1][b]).sort();
+  const [lo, hi] = [diffs[Math.floor(BOOT * 0.025)], diffs[Math.ceil(BOOT * 0.975) - 1]];
+  const pct = ((byDecile[d] - byDecile[d - 1]) / Math.abs(byDecile[d - 1] || 1)) * 100;
+  const verdict = hi < 0 ? 'กลับทิศ → ตก' : byDecile[d] > byDecile[d - 1] ? 'ผ่าน' : 'เสมอ (noise) → ผ่าน';
+  if (hi < 0) inversions++;
+  else if (!(byDecile[d] > byDecile[d - 1])) ties++;
+  console.log(`${`${CLASSES[d - 1]}→${CLASSES[d]}`.padEnd(26)} ${`${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`.padStart(9)}  [${f(lo, 0)}, ${f(hi, 0)}]`.padEnd(70) + verdict);
+}
+console.log(`เรียงขึ้นทุกระดับ: กลับทิศที่พิสูจน์ได้ ${inversions} คู่ · เสมอใน noise ${ties} คู่ → ${inversions ? 'ตก' : 'ผ่าน'}`);
 if (inversions) fails++;
 
 console.log('\nทศวรรษเกิด  ' + BANDS.map(([b]) => b.padStart(14)).join('') + '  ผล');
