@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, snapshot, restore, repairLife, nextGoal } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, snapshot, restore, repairLife, nextGoal, schoolOf } from '../engine/index.mjs';
 import { eraArt, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
@@ -1246,9 +1246,12 @@ function render(card) {
       (!working || s.money !== 0) && `เงินติดตัว ${baht(s.money)}`,
       working && `รายได้ ${baht(monthlyIncome(st, year))}/เดือน`,
       debt > 0 && `เงินกู้ ${baht(debt)}`,
-      nextGoal(st),
     ].filter(Boolean);
-    const meta = el('div', 'meta', `ฐานะ${st.cls} · ${jobText(st, card.age)}`);
+    // ช่วงเรียน ป้ายเรียนแทนช่อง "กำลังเรียน…" ที่บอกเรื่องเดียวกัน — ต่อท้ายแยกแล้วแถบตกบรรทัดบนจอแคบ
+    const goal = nextGoal(st);
+    const school = goal && schoolOf(st) !== 'none';
+    if (goal && !school) purse.push(goal);
+    const meta = el('div', 'meta', `ฐานะ${st.cls} · ${school ? goal : jobText(st, card.age)}`);
     // จอแคบให้ตัดบรรทัดได้แค่ที่ตัวคั่น — เบราว์เซอร์ตัดคำไทยกลาง "ราย|ได้" ได้แม้เว้นวรรคแบบไม่ตัด จึงต้องห่อ span
     for (const t of purse) meta.append(' · ', el('span', null, t));
     box.append(meta);
