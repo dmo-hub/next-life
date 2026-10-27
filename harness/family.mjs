@@ -45,7 +45,8 @@ for (const [bot, pick] of Object.entries(BOTS)) {
       }
       if (card.loss) lossCards++;
       // คนเป้าสุ่มตอนการ์ดเลือกขึ้น — การ์ดผลใบถัดมายังเรียกคนเดิมได้แม้ผลทำให้เขาจากไป จึงตรวจเฉพาะการ์ดเลือก
-      if (card.kind === 'event') {
+      // การ์ดชวนไปต่างโลก (B68d) ไม่ผ่านการเลือกคนเป้าและข้อความไม่เรียกชื่อใคร — คนเป้าที่ค้างจากการ์ดก่อนหน้าจึงไม่ใช่คนที่การ์ดนี้เรียก
+      if (card.kind === 'event' && !card.entry) {
         for (const r of ['spouse', 'child', 'grandchild']) {
           const f = focusOf(st, r);
           if (f && !f.alive) deadNamed++;
