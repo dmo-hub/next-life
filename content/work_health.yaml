@@ -57,7 +57,7 @@ events:
       - id: bone_healer
         text: "ไปหมอต่อกระดูกพื้นบ้าน"
         outcomes:
-          - {weight: 1, ok: true, text: "กระดูกติดสนิท หมอชาวบ้านไม่คิดเงินสักบาท แถมกวักมือเรียกคุณเข้าไปคุยหลังบ้าน", effects: {health: 2, relations: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.5}, next: workh_bone_healer_call_01}
+          - {weight: 1, ok: true, text: "กระดูกติดสนิท หมอชาวบ้านไม่คิดเงินสักบาท แถมกวักมือเรียกคุณเข้าไปคุยหลังบ้าน", effects: {health: 2, relations: 1}, merit: [{cat: neutral}], multipliers: {stats: {health: 1.3}, karma: 1.5}, next: workh_bone_healer_call_01}
           - {weight: 2, text: "กระดูกติดเบี้ยว เดินกะเผลกไปอีกนาน", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: sue_driver
@@ -86,7 +86,7 @@ events:
       - id: vent_online
         text: "ระบายลงโซเชียลแบบไม่เซ็นเซอร์"
         outcomes:
-          - {weight: 1, ok: true, text: "โพสต์ไวรัลข้ามคืน ยอดแชร์ทะลุแสน กล่องข้อความเด้งไม่หยุด มีทั้งคนให้กำลังใจและบริษัทคู่แข่งทักมาชวนไปทำงาน", effects: {happiness: 2}, merit: [{cat: neutral}], next: workh_viral_offer_01}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "โพสต์ไวรัลข้ามคืน ยอดแชร์ทะลุแสน กล่องข้อความเด้งไม่หยุด มีทั้งคนให้กำลังใจและบริษัทคู่แข่งทักมาชวนไปทำงาน", effects: {happiness: 2}, merit: [{cat: neutral}], next: workh_viral_offer_01}
           - {weight: 1, text: "หัวหน้าเห็นโพสต์ โดนกดดันจนต้องเขียนใบลาออก", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: grind_bonus
@@ -237,19 +237,19 @@ events:
       - id: jump_ship
         text: "ย้ายไปบริษัทคู่แข่งทันที"
         outcomes:
-          - {weight: 2, ok: true, text: "ที่ใหม่ให้ทำงานแค่แปดโมงถึงห้าโมงจริง ๆ นอนหลับยาวครั้งแรกในรอบปี", effects: {happiness: 2, health: 1, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ที่ใหม่ให้ทำงานแค่แปดโมงถึงห้าโมงจริง ๆ นอนหลับยาวครั้งแรกในรอบปี", effects: {happiness: 2, health: 1, income_mult: 1.3}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เขาแค่อยากได้ข่าว ผ่านไปสามเดือนก็ไม่ผ่านทดลองงาน", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: counter_offer
         text: "เอาข้อเสนอไปต่อรองหัวหน้า"
         outcomes:
-          - {weight: 1, ok: true, text: "หัวหน้ายอมขึ้นเงินเดือน แถมตัดงานด่วนออกให้ครึ่งหนึ่ง", effects: {happiness: 1, income_mult: 1.15}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "หัวหน้ายอมขึ้นเงินเดือน แถมตัดงานด่วนออกให้ครึ่งหนึ่ง", effects: {happiness: 1, income_mult: 1.15}, merit: [{cat: neutral}]}
           - {weight: 1, text: "หัวหน้ายิ้มเย็น ๆ แล้วบอกว่า งั้นก็ไปเลย ที่ใหม่ก็เงียบหายไปพอดี", effects: {happiness: -2, money: {unit: income_x, amount: -0.8}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: start_page
         text: "เปิดเพจเล่าชีวิตมนุษย์เงินเดือน"
         outcomes:
-          - {weight: 1, ok: true, text: "คนตามหลักแสน สปอนเซอร์จ้างรีวิวทุกเดือน กลายเป็นรายได้เสริมงอกเงย", effects: {happiness: 2, network: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "คนตามหลักแสน สปอนเซอร์จ้างรีวิวทุกเดือน กลายเป็นรายได้เสริมงอกเงย", effects: {happiness: 2, network: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "กระแสหายในสองอาทิตย์ เหลือคนกดไลก์แค่แม่กับป้า", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: delete_post
@@ -273,7 +273,7 @@ events:
         text: "ลาออกมาเป็นหมอพื้นบ้าน"
         effects: {job: service}
         outcomes:
-          - {weight: 1, ok: true, text: "คนไข้ต่อคิวยาวถึงปากซอย ใครหายแล้วก็หิ้วผลไม้มาฝาก", effects: {relations: 2, happiness: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "คนไข้ต่อคิวยาวถึงปากซอย ใครหายแล้วก็หิ้วผลไม้มาฝาก", effects: {relations: 2, happiness: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
           - {weight: 1, text: "ต่อกระดูกคนไข้รายแรกเบี้ยว ญาติเขาขู่ฟ้องจนต้องจ่ายค่าทำขวัญ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: offer_teacher_fee
@@ -283,7 +283,7 @@ events:
       - id: film_healer
         text: "ถ่ายคลิปหมอลงโซเชียล"
         outcomes:
-          - {weight: 1, ok: true, text: "คนแห่มารักษา หมอยิ้มไม่หุบ ส่งยาหม่องสูตรลับมาให้ทุกปีใหม่", effects: {relations: 1, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "คนแห่มารักษา หมอยิ้มไม่หุบ ส่งยาหม่องสูตรลับมาให้ทุกปีใหม่", effects: {relations: 1, network: 1}, merit: [{cat: help_others, level: 1}]}
           - {weight: 1, text: "เจ้าหน้าที่มาตรวจว่าไม่มีใบอนุญาต หมอโดนสั่งหยุดรักษา มองหน้าคุณไม่ติด", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: just_thanks

@@ -66,7 +66,7 @@ events:
       - id: memory_book
         text: "เขียนบันทึกชีวิตไว้ให้หลาน"
         outcomes:
-          - {weight: 2, ok: true, text: "สมุดเล่มนั้นกลายเป็นของรักที่สุดในบ้าน หลานอ่านซ้ำจนปกขาด", effects: {relations: 3, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "สมุดเล่มนั้นกลายเป็นของรักที่สุดในบ้าน หลานอ่านซ้ำจนปกขาด", effects: {relations: 3, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เขียนเรื่องเดิมซ้ำสิบหน้า แต่ทุกคนก็อ่านจนจบ", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -93,14 +93,14 @@ events:
       - id: folk_healer
         text: "ไปหมอกระดูกพื้นบ้านต่างจังหวัด"
         outcomes:
-          - {weight: 1, ok: true, text: "เข้าเฝือกไม้ไผ่กับยาพอกสมุนไพร กระดูกติดเองแบบหมอยังงง", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "เข้าเฝือกไม้ไผ่กับยาพอกสมุนไพร กระดูกติดเองแบบหมอยังงง", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "กระดูกติดเบี้ยว เดินกะเผลกไปตลอด", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: rebuild_home
         text: "ผ่าตัดแล้วรื้อบ้านติดราวจับ"
         requires: {money: {unit: income_x, amount: 2}, reason: "เงินเก็บไม่พอรื้อบ้าน"}
         outcomes:
-          - {weight: 3, ok: true, text: "ข้อใหม่บวกราวจับทั้งบ้าน ไม่ล้มอีกเลย ลูกหลานแวะมาช่วยต่อเติมทุกเสาร์", effects: {health: 2, relations: 1, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, multipliers: {stats: {health: 1.3}}, text: "ข้อใหม่บวกราวจับทั้งบ้าน ไม่ล้มอีกเลย ลูกหลานแวะมาช่วยต่อเติมทุกเสาร์", effects: {health: 2, relations: 1, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "แผลติดเชื้อ ราวจับติดเสร็จแต่ยังลุกไม่ไหว เงินหมดไปสองก้อน", effects: {health: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -155,7 +155,7 @@ events:
       - id: home_pd
         text: "ล้างไตทางหน้าท้องเองที่บ้าน"
         outcomes:
-          - {weight: 3, ok: true, text: "คล่องมือในเดือนเดียว ยังได้นั่งขายของหน้าบ้านเหมือนเดิม", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "คล่องมือในเดือนเดียว ยังได้นั่งขายของหน้าบ้านเหมือนเดิม", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ติดเชื้อในช่องท้อง นอนไอซียูหลายคืน", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: child_kidney
@@ -182,7 +182,7 @@ events:
       - id: surgery
         text: "ผ่าตัดเปลี่ยนเลนส์แก้วตา"
         outcomes:
-          - {weight: 4, ok: true, text: "เปิดผ้าปิดตาแล้วร้องไห้ โลกมีสีสดขนาดนี้มาตลอดเลยเหรอ", effects: {health: 1, happiness: 3}, merit: [{cat: neutral}]}
+          - {weight: 4, ok: true, multipliers: {stats: {health: 1.3}}, text: "เปิดผ้าปิดตาแล้วร้องไห้ โลกมีสีสดขนาดนี้มาตลอดเลยเหรอ", effects: {health: 1, happiness: 3}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ตาอักเสบหลังผ่า ต้องหยอดยาเป็นเดือน แต่สุดท้ายก็เห็นชัด", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: wait
@@ -282,7 +282,7 @@ events:
       - id: cash_out
         text: "นอนห้องรวม เก็บค่าชดเชยไว้"
         outcomes:
-          - {weight: 2, ok: true, text: "ได้เงินชดเชยรายวันก้อนโต พอซื้อทองให้หลานคนละเส้น", effects: {relations: 1, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "ได้เงินชดเชยรายวันก้อนโต พอซื้อทองให้หลานคนละเส้น", effects: {relations: 1, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ติดหวัดจากเตียงข้าง ๆ ต้องนอนต่ออีกสัปดาห์", effects: {health: -2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: full_checkup
@@ -324,7 +324,7 @@ events:
       - id: push_limit
         text: "ปั่นจักรยานขึ้นดอยให้สุด"
         outcomes:
-          - {weight: 1, ok: true, text: "พิชิตยอดดอยในวัยที่คนอื่นนั่งรถเข็น", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.5}}, text: "พิชิตยอดดอยในวัยที่คนอื่นนั่งรถเข็น", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "เข่าพังลงดอยไม่ไหว เข่าเสื่อมติดตัวไปตลอด", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -340,7 +340,7 @@ events:
       - id: visit_mother
         text: "นั่งรถไปกราบแม่เขาถึงบ้าน"
         outcomes:
-          - {weight: 2, ok: true, text: "แม่เขากอดแน่นแล้วหัวเราะทั้งน้ำตา จากนั้นสองบ้านไปมาหาสู่กันทุกสงกรานต์", effects: {relations: 3, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "แม่เขากอดแน่นแล้วหัวเราะทั้งน้ำตา จากนั้นสองบ้านไปมาหาสู่กันทุกสงกรานต์", effects: {relations: 3, happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เจอหน้าแล้วพูดอะไรไม่ออก แม่เขาเดินหนีเข้าห้อง กลับบ้านมาซึมไปหลายวัน", effects: {happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: pledge_donor
@@ -354,7 +354,7 @@ events:
       - id: swear_sober
         text: "สาบานต่อหน้าแม่เขาว่าเลิกเหล้า"
         outcomes:
-          - {weight: 2, ok: true, text: "ทำได้จริงจนแม่เขามาเป็นแขกในงานวันเกิดครบรอบปีของตับใหม่", effects: {health: 2, relations: 2, chronic: {health: 1}}, merit: [{cat: sila, level: 2}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ทำได้จริงจนแม่เขามาเป็นแขกในงานวันเกิดครบรอบปีของตับใหม่", effects: {health: 2, relations: 2, chronic: {health: 1}}, merit: [{cat: sila, level: 2}]}
           - {weight: 1, text: "ผิดคำสาบานในงานบวชหลาน แม่เขารู้ข่าวแล้วไม่ตอบจดหมายอีก", effects: {health: -2, relations: -2}, merit: [{cat: intoxicants, level: 1}]}
         merit: [{cat: sila, level: 1}]
       - id: write_back
@@ -373,14 +373,14 @@ events:
       - id: shoot_ad
         text: "รับเล่นโฆษณา เอาค่าตัว"
         outcomes:
-          - {weight: 2, ok: true, text: "ได้ค่าตัวก้อนแรกในชีวิต ซื้อรองเท้าวิ่งแจกเด็กทั้งหมู่บ้าน", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: 1}}, merit: [{cat: dana, level: 1}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "ได้ค่าตัวก้อนแรกในชีวิต ซื้อรองเท้าวิ่งแจกเด็กทั้งหมู่บ้าน", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: 1}}, merit: [{cat: dana, level: 1}]}
           - {weight: 1, text: "ถ่ายกลางแดดสิบชั่วโมง เป็นลมคากองถ่าย จ่ายค่าหมอแล้วเหลือติดมือนิดหน่อย", effects: {health: -2, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: race_abroad
         text: "บินไปแข่งต่างประเทศ"
         requires: {money: {unit: income_x, amount: 1}, reason: "เงินเก็บไม่พอค่าตั๋วกับที่พัก"}
         outcomes:
-          - {weight: 1, ok: true, text: "คว้าเหรียญทองแดงกลับมา คนทั้งหมู่บ้านเหมารถไปรับถึงสนามบิน", effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.5}}, text: "คว้าเหรียญทองแดงกลับมา คนทั้งหมู่บ้านเหมารถไปรับถึงสนามบิน", effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "อากาศหนาวจัด ข้อเท้าพลิกตั้งแต่กิโลแรก กลับมาพร้อมไม้ค้ำ", effects: {health: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: start_club

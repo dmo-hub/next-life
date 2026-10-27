@@ -226,7 +226,7 @@ events:
       - id: go_public
         text: "เข้าสถานสงเคราะห์ของรัฐ"
         outcomes:
-          - {weight: 2, ok: true, text: "เจอเพื่อนรุ่นเดียวกันเพียบ ตั้งวงหมากรุกทุกบ่าย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "เจอเพื่อนรุ่นเดียวกันเพียบ ตั้งวงหมากรุกทุกบ่าย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ห้องรวมเสียงดังทั้งคืน นอนไม่หลับจนทรุด", effects: {health: -2, happiness: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: stay_home

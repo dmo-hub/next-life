@@ -92,7 +92,7 @@ events:
       - id: refuse_walk
         text: "ปฏิเสธแล้วเดินหนี"
         outcomes:
-          - {ok: true, weight: 2, text: "รุ่นพี่ยักไหล่ ไม่ว่าอะไร", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 2, multipliers: {stats: {network: 1.3}}, text: "รุ่นพี่ยักไหล่ ไม่ว่าอะไร", effects: {health: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "รุ่นพี่ล้อว่าลูกแหง่ไปทั้งเทอม", effects: {health: 1, happiness: -2}, sets_flags: [bullied], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: tell_teacher
@@ -254,7 +254,7 @@ events:
       - id: folk_massage
         text: "ไปหาหมอนวดพื้นบ้าน"
         outcomes:
-          - {ok: true, weight: 1, text: "นวดไม่กี่ครั้งก็เดินฉิว ประหยัดไปเยอะ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 1, multipliers: {stats: {health: 1.3}}, text: "นวดไม่กี่ครั้งก็เดินฉิว ประหยัดไปเยอะ", effects: {happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "กระดูกติดผิดรูป เดินกะเผลกไปอีกนาน", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: find_friend

@@ -23,7 +23,7 @@ events:
       - id: herbal_home
         text: "ยอมกินบอระเพ็ดขม ๆ ของยาย"
         outcomes:
-          - {weight: 2, ok: true, text: "ไข้ลดเอง ยายภูมิใจในสูตรยาหม้อไปอีกสิบปี", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "ไข้ลดเอง ยายภูมิใจในสูตรยาหม้อไปอีกสิบปี", effects: {happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "วันที่สี่ไข้ลดแต่ช็อก ผู้ใหญ่หามส่งห้องฉุกเฉินกลางดึก รอดหวุดหวิด", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: shop_pill
@@ -62,7 +62,7 @@ events:
       - id: lung_check
         text: "บอกแม่ว่าเจ็บหน้าอกตอนหายใจ"
         outcomes:
-          - {weight: 2, ok: true, text: "หมอเอกซเรย์แล้วปอดสะอาด ชมว่าลุงช่วยได้ไวมาก", effects: {money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "หมอเอกซเรย์แล้วปอดสะอาด ชมว่าลุงช่วยได้ไวมาก", effects: {money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "หมอเจอปอดอักเสบจากน้ำคลองแต่เนิ่น ๆ ฉีดยาไม่กี่วันก็หาย", effects: {health: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: thank_uncle
@@ -72,7 +72,7 @@ events:
       - id: let_play
         text: "แอบกลับไปเล่นน้ำคลองอีก"
         outcomes:
-          - {weight: 1, ok: true, text: "ตกบ่อยจนว่ายเป็นเอง กลายเป็นเจ้าแห่งคลองประจำซอย", effects: {health: 1, happiness: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "ตกบ่อยจนว่ายเป็นเอง กลายเป็นเจ้าแห่งคลองประจำซอย", effects: {health: 1, happiness: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
           - {weight: 2, text: "อาทิตย์ต่อมาจมซ้ำที่เดิม รอบนี้ไม่มีใครอยู่ใกล้ ลอยไปติดตอม่อถึงรอด", effects: {health: -3, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -89,7 +89,7 @@ events:
       - id: folk_bonesetter
         text: "ยอมให้หมอพื้นบ้านดัดแขน"
         outcomes:
-          - {weight: 2, ok: true, text: "น้ำมันสมุนไพรกับเฝือกไม้ไผ่ หายดีในเดือนเดียว", effects: {health: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "น้ำมันสมุนไพรกับเฝือกไม้ไผ่ หายดีในเดือนเดียว", effects: {health: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "กระดูกติดเบี้ยวนิด ๆ ยกแขนสุดไม่ได้ แต่ดันโยนลูกเปตองแม่นผิดคน", effects: {health: -2, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: hospital_cast
@@ -133,7 +133,7 @@ events:
       - id: measles_party
         text: "แอบไปเล่นกับเพื่อนที่เป็นหัด"
         outcomes:
-          - {weight: 1, ok: true, text: "ผื่นขึ้นสามวันแล้วหาย ข้างบ้านยกให้เป็นเด็กดวงแข็ง", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "ผื่นขึ้นสามวันแล้วหาย ข้างบ้านยกให้เป็นเด็กดวงแข็ง", effects: {health: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "หัดลงปอด นอนโรงพยาบาลจนเกือบไม่รอด ปอดไม่เหมือนเดิมอีกเลย", effects: {health: -3, chronic: {health: -1}, money: {unit: income_x, amount: -0.5}}, sets_flags: [weak_lungs], schedules: [{event: child_lungs_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: rally_parents
@@ -200,7 +200,7 @@ events:
       - id: swim_lungs
         text: "ขอไปว่ายน้ำฝึกปอด"
         outcomes:
-          - {weight: 2, ok: true, text: "ปอดแข็งแรงขึ้นจนลืมไปเลยว่าเคยหอบ ได้เหรียญว่ายน้ำมาด้วย", effects: {health: 2}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.5}}, text: "ปอดแข็งแรงขึ้นจนลืมไปเลยว่าเคยหอบ ได้เหรียญว่ายน้ำมาด้วย", effects: {health: 2}, sets_flags: [sporty], merit: [{cat: neutral}]}
           - {weight: 1, text: "กลิ่นคลอรีนในสระกระตุ้นหอบหนักกว่าเดิม ต้องเลิกกลางคัน", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: grandma_remedy
@@ -239,7 +239,7 @@ events:
       - id: swim_team
         text: "สมัครชมรมว่ายน้ำฝึกปอดเอง"
         outcomes:
-          - {weight: 1, ok: true, text: "ปีเดียวปอดแข็งแรงกว่าเด็กรุ่นเดียวกัน โค้ชดึงเข้าทีมว่ายน้ำ", effects: {health: 1, chronic: {health: 1}}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {flags: {sporty: 2}}}
+          - {weight: 1, ok: true, text: "ปีเดียวปอดแข็งแรงกว่าเด็กรุ่นเดียวกัน โค้ชดึงเข้าทีมว่ายน้ำ", effects: {health: 1, chronic: {health: 1}}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {stats: {health: 1.5}, flags: {sporty: 2}}}
           - {weight: 1, text: "หอบกลางสระจนโค้ชต้องกระโดดลงไปช่วย ต้องเลิกว่ายไปเลย", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: herbal_again
