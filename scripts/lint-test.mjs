@@ -6,7 +6,7 @@ import { RULES, DOC_SHAPE, lintContext, lintDocs, formatProblem } from '../src/n
 import { strings } from '../src/node/lint/util.mjs';
 import { loadEvents, loadEra, loadContent, checkNames } from '../src/node/load.mjs';
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
-import { schoolGate, jobCard, TRACKS, EDU } from '../src/engine/career.mjs';
+import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT } from '../src/engine/career.mjs';
 import { newLife, CLASSES, SEXES, fill } from '../src/engine/life.mjs';
 import { MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
 import { SCENES } from '../src/engine/afterlife.mjs';
@@ -175,6 +175,8 @@ const stale = [...ctx.flags.flags, ...ctx.flags.prefixes].filter((f) => !used.ha
 rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${ctx.flags.prefixes.size} ชื่อหน้า · ค้าง ${stale.length}`]);
 // ธงมีพารามิเตอร์ยังไม่มีเนื้อหาจริงใช้ (มีแค่ใน fixture สายมู) จึงไม่นับว่าค้าง
 for (const f of stale) if (!ctx.flags.prefixes.has(f)) fails.push(`ทะเบียนธง: "${f}" ไม่มีเนื้อหาใน content/ ใช้`);
+// แกนนัดการ์ดชดใช้ทุนด้วย id — ไม่มีใน content = dueAt ข้ามเงียบ ทุนกลับเป็นของฟรี
+if (!realDocs.some(({ doc }) => (doc.events ?? []).some((e) => e.id === BOND_EVENT))) fails.push(`การ์ดชดใช้ทุน "${BOND_EVENT}" ไม่มีใน content/`);
 
 try {
   const real = loadEvents();

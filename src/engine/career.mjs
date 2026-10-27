@@ -26,6 +26,10 @@ export const EXAM_PASS = 'exam_pass:uni';
 // สอบเข้าโรงเรียนนายร้อยต้องผ่านทั้งข้อเขียนและร่างกาย · สอบ ก.พ. ต้องจบปริญญา (B40)
 const CADET_NEED = { stats: { knowledge: { min: 45 }, health: { min: 50 } }, reason: 'ความรู้หรือสุขภาพยังไม่ถึงเกณฑ์สอบ' };
 export const SCHOOL_FROM = 6;
+// ทุนสอบชิงมีภาระใช้ทุน (B118): ธงค้างจนการ์ดชดใช้ทุนเคลียร์ · การ์ดอยู่ใน content/scholarship_bond.yaml
+export const BOND_FLAG = 'scholar_bond';
+export const BOND_EVENT = 'scholar_bond_due';
+const UNI_YEARS = TRACKS.uni.until - TRACKS.upper.until;
 
 const cash = (amount) => ({ unit: 'income_x', amount });
 const pay = (amount) => ({ money: cash(-amount) });
@@ -116,22 +120,26 @@ export function schoolGate(st) {
     { weight: 1, text: 'สอบไม่ติด ต้องออกหางานทำ', effects: { school: 'none', happiness: -1 } },
   ];
   const uniLock = { money: cash(0.5), reason: 'ค่าเทอมมหาวิทยาลัยไม่พอ' };
+  // hint แยกรายการค่าเรียน (B118) — บอกว่าเงินก้อนนี้ไปกับอะไรบ้าง ยอดรวมเท่าเดิม
+  const uniHint = 'ค่าเทอม · ค่าสมัครสอบ · หอพักถ้าติดไกลบ้าน';
   return {
     ...base,
     choices: [
-      { text: 'สอบเข้ามหาวิทยาลัยรัฐ', requires: uniLock, outcomes: exam({ stats: { knowledge: 3, network: 1.5 } }) },
-      { text: 'เข้ามหาวิทยาลัยเอกชน', requires: { money: cash(2), reason: 'ค่าเทอมเอกชนไม่พอ' }, effects: { school: 'uni', network: 1, ...pay(2) } },
-      { text: 'เรียนมหาวิทยาลัยเปิด', requires: { money: cash(0.15), reason: 'ค่าลงทะเบียนไม่พอ' }, effects: { school: 'uni', knowledge: 1, ...pay(0.15) } },
-      { text: 'เรียนต่อ ปวส.', requires: { money: cash(0.3), reason: 'ค่าเทอมไม่พอ' }, effects: { school: 'hvoc', network: 1, ...pay(0.3) } },
+      { text: 'สอบเข้ามหาวิทยาลัยรัฐ', hint: uniHint, requires: uniLock, outcomes: exam({ stats: { knowledge: 3, network: 1.5 } }) },
+      { text: 'เข้ามหาวิทยาลัยเอกชน', hint: 'ค่าเทอมแพง · หอพัก · ค่ารถ', requires: { money: cash(2), reason: 'ค่าเทอมเอกชนไม่พอ' }, effects: { school: 'uni', network: 1, ...pay(2) } },
+      { text: 'เรียนมหาวิทยาลัยเปิด', hint: 'ค่าลงทะเบียน · ค่าตำรา · อ่านเองที่บ้านไม่ต้องเช่าหอ', requires: { money: cash(0.15), reason: 'ค่าลงทะเบียนไม่พอ' }, effects: { school: 'uni', knowledge: 1, ...pay(0.15) } },
+      { text: 'เรียนต่อ ปวส.', hint: 'ค่าเทอม · ค่าอุปกรณ์ฝึกงาน · ค่ารถไปกลับ', requires: { money: cash(0.3), reason: 'ค่าเทอมไม่พอ' }, effects: { school: 'hvoc', network: 1, ...pay(0.3) } },
       {
         text: 'สอบชิงทุนเรียนมหาวิทยาลัย',
+        hint: 'ไม่เสียค่าเทอม แต่เรียนจบต้องใช้ทุน',
         requires: { stats: { knowledge: { min: 70 } }, reason: 'คะแนนยังไม่ถึงเกณฑ์ทุน' },
         outcomes: [
-          { weight: 1, ok: true, multipliers: { stats: { knowledge: 2 } }, text: 'ได้ทุนเรียนฟรีจนจบ', sets_flags: [EXAM_PASS], effects: { school: 'uni', network: 3 } },
+          // ทุนรัฐมีสัญญาใช้ทุน — การ์ดชดใช้ทุนออกปีที่เรียนจบ (TRACKS.uni.until)
+          { weight: 1, ok: true, multipliers: { stats: { knowledge: 2 } }, text: 'ได้ทุนเรียนฟรีจนจบ แลกกับสัญญาใช้ทุนหลังเรียนจบ', sets_flags: [EXAM_PASS, BOND_FLAG], schedules: [{ event: BOND_EVENT, after_years: [UNI_YEARS, UNI_YEARS] }], effects: { school: 'uni', network: 3 } },
           { weight: 2, text: 'พลาดทุน ต้องออกหางานทำ', effects: { school: 'none', happiness: -1 } },
         ],
       },
-      { text: 'ใช้ทุนที่ได้ไว้เรียนต่อ', requires: { flags: { has: ['scholarship'] }, reason: 'ยังไม่มีทุน' }, clears_flags: ['scholarship'], effects: { school: 'uni', network: 2 } },
+      { text: 'ใช้ทุนที่ได้ไว้เรียนต่อ', hint: 'ทุนจ่ายค่าเทอมให้', requires: { flags: { has: ['scholarship'] }, reason: 'ยังไม่มีทุน' }, clears_flags: ['scholarship'], effects: { school: 'uni', network: 2 } },
       {
         text: 'จ้างคนเข้าห้องสอบแทน',
         requires: { money: cash(1.5), reason: 'เงินไม่พอจ้างมือปืนรับจ้างสอบ' },
@@ -142,7 +150,7 @@ export function schoolGate(st) {
           { weight: 1, text: 'กรรมการตรวจบัตรจับได้ ถูกตัดสิทธิ์สอบ', effects: { school: 'none', happiness: -2, relations: -1 } },
         ],
       },
-      { text: 'ขอพรก่อนสอบมหาวิทยาลัยรัฐ', requires: uniLock, outcomes: exam({ wish: WISH, stats: { knowledge: 3, network: 1.5 } }) },
+      { text: 'ขอพรก่อนสอบมหาวิทยาลัยรัฐ', hint: uniHint, requires: uniLock, outcomes: exam({ wish: WISH, stats: { knowledge: 3, network: 1.5 } }) },
       ...[['cadet', 'สอบเข้าโรงเรียนนายร้อย'], ['police_cadet', 'สอบเข้าโรงเรียนนายร้อยตำรวจ']].map(([school, text]) => ({
         text,
         requires: CADET_NEED,

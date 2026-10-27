@@ -1,0 +1,42 @@
+# การ์ดชดใช้ทุน (B118) — ออกทางนัดจากทุนสอบชิงในด่านเรียนต่อของแกน (career.mjs) ปีที่เรียนจบเท่านั้น
+# รับใช้ทุน = รายได้ช่วงใช้ทุนหายไปส่วนหนึ่ง คิดเป็นเงินก้อนตอนเริ่ม (ตัวคูณรายได้รีเซ็ตเมื่อเปลี่ยนงาน ใช้แทนไม่ได้)
+events:
+  - id: scholar_bond_due
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "สัญญาใช้ทุน"
+    text: "เรียนจบวันแรก หนังสือจากต้นสังกัดทุนก็มาถึงบ้าน แจ้งหน่วยงานที่ต้องไปรายงานตัวใช้ทุนสองปี เงินเดือนน้อยกว่าที่เพื่อนได้จากบริษัทเอกชน"
+    when: {flags: {has: [scholar_bond]}}
+    choices:
+      - id: serve
+        text: "ไปใช้ทุนตามสัญญาสองปี"
+        hint: "เงินเดือนช่วงใช้ทุนน้อยกว่าเพื่อน แต่ได้ประสบการณ์"
+        clears_flags: [scholar_bond]
+        effects: {money: {unit: income_x, amount: -0.5}, knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: serve_near_home
+        text: "วิ่งเต้นขอใช้ทุนใกล้บ้าน"
+        requires: {stats: {network: {min: 50}}, reason: "ไม่มีคนรู้จักช่วยเรื่องย้าย"}
+        clears_flags: [scholar_bond]
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ย้ายกลับมาใช้ทุนใกล้บ้าน กินข้าวเย็นกับที่บ้านได้ทุกวัน", effects: {money: {unit: income_x, amount: -0.5}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรื่องย้ายเงียบหาย ต้องไปใช้ทุนต่างจังหวัดตามเดิม", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: buy_out
+        text: "จ่ายคืนทุนพร้อมเบี้ยปรับ"
+        hint: "หมดภาระทันที แต่เสียเงินก้อนใหญ่"
+        requires: {money: {unit: income_x, amount: 1.5}, reason: "เงินไม่พอจ่ายคืนทุน"}
+        cost: {unit: income_x, amount: 1.5}
+        clears_flags: [scholar_bond]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: skip_out
+        text: "เบี้ยวทุน ไม่ไปรายงานตัว"
+        hint: "อาจถูกฟ้องจนผู้ค้ำเดือดร้อน"
+        clears_flags: [scholar_bond]
+        outcomes:
+          - {weight: 1, ok: true, text: "เรื่องเงียบไปหลายปี ไม่มีใครตามทวง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ต้นสังกัดฟ้องเรียกเงินทุนคืนพร้อมเบี้ยปรับ คนค้ำประกันที่บ้านโดนหมายศาลไปด้วย", effects: {money: {unit: income_x, amount: -2}, relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: greed_harm, level: 1}]
