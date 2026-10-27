@@ -2444,7 +2444,12 @@ function stepYear(st) {
   } else if (st.money < 0) st.money *= 1 + lendingRate(era, st.seed, year);
   if (isWorking(st)) st.money += yearlySaving(st, year);
   else if (st.retireBase !== null) st.money -= retireSpend(st, year) - st.pension * st.price;
-  for (const d of st.debts) st.money -= payDebt(era, st.seed, d, year);
+  let paid = 0;
+  for (const d of st.debts) {
+    const p = payDebt(era, st.seed, d, year);
+    st.money -= p;
+    paid += p;
+  }
   st.debts = st.debts.filter((d) => !debtDone(d));
   const stage = stageOf(st.age);
   if (st.legacy && st.age >= st.legacy.age) receiveLegacy(st, year, stage);
@@ -2452,6 +2457,7 @@ function stepYear(st) {
   st.statTrail.push(statPoint(st));
 
   checkBankrupt(st, year, stage);
+  debtLoad(st, year, paid);
   const tone = omenTone(st.ledger);
   if (!tone) st.omenTone = null;
   else if (tone !== st.omenTone && (st.omenAge === null || st.age - st.omenAge >= OMEN.gap)) {
@@ -2554,6 +2560,24 @@ function standingOf(st, year = st.birthYear + st.age) {
 function debtIncome(st, year) {
   if (isWorking(st)) return monthlyIncome(st, year) * 12;
   return st.retireBase === null ? null : st.retireBase * st.price;
+}
+
+// หนี้เกินกำลัง (B111 · เจ้าของเคาะ) — ธง in_debt คิดใหม่ทุกปีจากยอดจริง ไม่ค้างจากการ์ดเก่า (บั๊ก: "หนี้ล้นตัว" ออกตอนมีเงิน 3.8 ล้าน)
+// ติด: ผ่อนต่อปี > pay ของรายได้ปี หรือหนี้สุทธิ > net เท่ารายได้ปี · ล้าง: ต่ำกว่า payOff และ netOff · ช่วงกลางคงค่าเดิม กันธงกระพริบ
+// ยังไม่มีฐานรายได้ (เรียน/ไม่เคยทำงาน) = ล้างเมื่อไม่มีหนี้เหลือ ไม่งั้นคงตามเดิม
+const DEBT_LOAD = { pay: 0.4, net: 2, payOff: 0.3, netOff: 1.5 };
+function debtLoad(st, year, paid) {
+  const owe = totalDebt(st) - Math.max(0, st.money);
+  const base = debtIncome(st, year);
+  const was = !!st.flags.in_debt;
+  let on = was;
+  if (base === null || base <= 0) on = was && totalDebt(st) > 0;
+  else if (paid > DEBT_LOAD.pay * base || owe > DEBT_LOAD.net * base) on = true;
+  else if (paid < DEBT_LOAD.payOff * base && owe < DEBT_LOAD.netOff * base) on = false;
+  if (on && !was) {
+    st.flags.in_debt = true;
+    st.flagAge.in_debt ??= st.age;
+  } else if (!on && was) delete st.flags.in_debt;
 }
 
 // ล้มละลาย (B08b): หนี้สุทธิเกิน k เท่าของรายได้ทั้งปีติดกัน n ปี → ล้างหนี้ ทรัพย์เหลือ 0 · ไม่แตะสุขภาพ
