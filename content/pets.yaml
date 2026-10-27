@@ -9,10 +9,10 @@ events:
     weight: 2
     when: {family: [{role: pet, alive: true, count: [0, 0]}]}
     title: "หมาหลงมาหน้าบ้าน"
-    text: "ลูกหมาผอมโซเดินตามคุณกลับจากตลาดจนถึงหน้าบ้าน นั่งกระดิกหางอยู่หน้าประตูไม่ยอมไปไหน แม่ยืนกอดอกมองอยู่ในครัว"
+    text: "ลูกหมาผอมโซเดินตามคุณกลับจากตลาดจนถึงหน้าบ้าน นั่งกระดิกหางอยู่หน้าประตูไม่ยอมไปไหน ผู้ใหญ่ในบ้านยืนกอดอกมองอยู่ที่ชาน"
     choices:
       - id: beg_keep
-        text: "อ้อนแม่ขอเลี้ยง"
+        text: "อ้อนที่บ้านขอเลี้ยง"
         effects: {happiness: 2, relations: 1}
         family: [{add: pet, kind: หมา, life: [10, 15]}]
         merit: [{cat: dana, level: 1}]
@@ -173,7 +173,7 @@ events:
         effects: {happiness: 1}
         merit: [{cat: dana, level: 1}]
       - id: call_grandkid
-        text: "โทรเรียกหลานมาดู"
+        text: "ถ่ายรูปส่งให้เพื่อนในกลุ่มดู"
         effects: {relations: 1, happiness: 1}
         merit: [{cat: neutral}]
 
@@ -232,7 +232,7 @@ events:
         family: [{bond: pet, d: 5}]
         merit: [{cat: neutral}]
       - id: ask_kids
-        text: "ขอให้ลูกหลานช่วยออกค่ายา"
+        text: "ขอญาติช่วยหารค่ายา"
         effects: {relations: -1}
         family: [{bond: pet, d: 5}]
         merit: [{cat: neutral}]
