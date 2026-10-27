@@ -4862,6 +4862,7 @@ function lifeTitles(card) {
     const t = titlesOf(st);
     card.lifeTitles = { ...t, pattern: t.pattern ?? NO_PATTERN };
     bookAdd(t);
+    card.lifeTitles.clue = titleClue(`${st.seed}:${st.gen}`, t);
     card.memo = memoAdd(t);
     // สมุดเต็ม: ผู้เล่นลบแถวแล้วกดกลับ หน้าเดิมถูกคืนทั้งก้อน ไม่วาดใหม่ — ต้องลองลงซ้ำเองตอนกลับ
     if (card.memo === 'full') card.memoRetry = () => (card.memo = memoAdd(t));
@@ -4898,8 +4899,31 @@ function titlesBox(card) {
     box.append(el('div', 'h', 'ฉายาตระกูล'));
     box.append(list(family.map((t) => t.name), 'picks'));
   }
+  clueRow(box, lifeTitles(card).clue);
   box.append(bookBox());
   return box;
+}
+
+// เบาะแสฉายาที่ยังไม่เคยได้ 1 อัน (B108) — คำใบ้ชุดเดียวกับ ??? ในสมุด จึงไม่บอกมากกว่าที่สมุดบอกอยู่แล้ว
+// ระดับง่ายก่อน (ชาติหน้าไปถึงได้จริง) · ในระดับเดียวกันเลือกด้วย hash ของชีวิต ไม่ใช้ rng ของเกม
+// ⇒ ผลเกมไม่ขยับ และรีโหลดเซฟได้ตัวเดิม · ตัดฉายาที่ชีวิตนี้เพิ่งได้เอง เผื่อ storage ปิดจนสมุดไม่จำ
+function titleClue(key, got = { titles: [], family: [] }) {
+  const b = bookRead();
+  const seen = new Set([...b.t, ...b.f, ...got.titles.map((x) => x.id), ...got.family.map((x) => x.id)]);
+  let pool = TITLES.filter((x) => !seen.has(x.id));
+  if (pool.length) {
+    // TIERS เรียงหายากก่อน — ระดับง่ายสุดคือ index มากสุด
+    const top = Math.max(...pool.map((x) => TIERS.indexOf(x.tier)));
+    pool = pool.filter((x) => TIERS.indexOf(x.tier) === top);
+  } else pool = FAMILY_TITLES.filter((x) => !seen.has(x.id));
+  if (!pool.length) return null;
+  const x = pool[fnv(key) % pool.length];
+  return { hint: x.hint, tier: x.tier ?? null };
+}
+function clueRow(box, clue) {
+  if (!clue) return;
+  box.append(el('div', 'h', 'ฉายาที่ยังไม่เคยได้'));
+  box.append(el('p', 'note clue', `??? ${clue.tier ? `· ${clue.tier} ` : ''}— ${clue.hint}`));
 }
 
 // สมุดฉายา (ใบ 04): เก็บในเครื่องผู้เล่น · ตัวที่ยังไม่เคยได้เป็น ??? พร้อมคำใบ้
@@ -5882,6 +5906,8 @@ function renderIsekai(card) {
   }
   if (card.sys) body.append(el('p', 'isys', card.sys));
   if (card.note) body.append(el('p', 'isys', card.note));
+  // ต่างโลกไม่มีฉายาของตัวเอง — เบาะแสชี้ฉายาของโลกเดิมที่ชาติหน้ายังไปเก็บได้ (B108 ใช้สองโลก)
+  if (card.step === 'end') clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
   if (card.log?.length) {
     const d = el('details', 'tree');
     d.append(el('summary', null, `เส้นทางที่เลือก ${card.log.length} เหตุการณ์`), list(card.log, 'picks'));
