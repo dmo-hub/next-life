@@ -10,39 +10,6 @@ const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี
 const root = document.getElementById('app');
 document.getElementById('appVer').textContent = `${APP_VERSION} · ${APP_BUILD}`;
 
-// ธีม (B83b · B83c): "สว่าง" = ค่าเริ่ม ทับทุกแนวการ์ดตอนมีชีวิต · "กระดาษเก่า" = แต่ละแนวใช้สีของตัวเอง (กระดาษครีม · ลางแสงเทียน)
-// · ปรโลกมืดทองเสมอ ปุ่มธีมไม่ทับ (เจ้าของเคาะ B83c แก้ T3 ทาง A เฉพาะปรโลก)
-// ค่าหน้าจอล้วน ไม่ใช่การกระทำในเกม จึงไม่ผ่าน play() และไม่อยู่ในเซฟ — จำแยก key ในเครื่อง
-const THEME_KEY = 'next-life-theme-v1';
-const THEMES = [['light', 'สว่าง'], ['scene', 'กระดาษเก่า']];
-function setTheme(id, keep) {
-  document.documentElement.classList.toggle('light', id === 'light');
-  for (const b of document.querySelectorAll('#theme button')) b.setAttribute('aria-pressed', String(b.dataset.theme === id));
-  if (!keep) return;
-  try {
-    localStorage.setItem(THEME_KEY, id);
-  } catch {
-    // เก็บไม่ได้ก็ยังเปลี่ยนในหน้านี้
-  }
-}
-(() => {
-  const box = document.getElementById('theme');
-  for (const [id, label] of THEMES) {
-    const b = el('button', null, label);
-    b.type = 'button';
-    b.dataset.theme = id;
-    b.onclick = () => setTheme(id, true);
-    box.append(b);
-  }
-  let saved = null;
-  try {
-    saved = localStorage.getItem(THEME_KEY);
-  } catch {
-    // ไม่มีที่เก็บ — ใช้ค่าเริ่ม
-  }
-  setTheme(THEMES.some(([id]) => id === saved) ? saved : 'light', false);
-})();
-
 let st;
 // ระหว่างชาติของชีวิตที่เพิ่งจบ (null = ยังมีชีวิต)
 let af = null;
@@ -1050,12 +1017,9 @@ document.addEventListener('keydown', (e) => {
   b.click();
 });
 
-// แนวการ์ดตามประเภทเหตุการณ์ (ใบ 06 · หน้าตา v2 B83b): ลางกับเหตุการณ์ความเชื่อ = แสงเทียน (ฐานสีรักดำของทาง B)
-// · มรณบัตร = หนังสืองานศพ (ฐานทาง A — กราฟกับสรุปข้างในใช้สีชุดเดียวกับการ์ดชีวิต) · ที่เหลือทาง A
-const styleOf = (card) => {
-  if (card.kind === 'death') return 'a mem';
-  return card.kind === 'omen' || ((card.kind === 'event' || card.kind === 'result') && card.type === 'B') ? 'b cdl' : 'a';
-};
+// แนวการ์ดของโลกนี้ทางเดียว (ทาง A กระดาษเก่า) — โลกละธีม: ลางกับเหตุการณ์ความเชื่อไม่แยกเป็นแสงเทียนแล้ว
+// สีมืดทองเป็นของปรโลกที่เดียว (renderAfter) · ต่างโลกมีธีมของตัวเอง · มรณบัตร = หนังสืองานศพบนฐานทาง A
+const styleOf = (card) => (card.kind === 'death' ? 'a mem' : 'a');
 
 // ภาพพิกเซลเล็กบนการ์ด — [x, y, กว้าง, สูง, สี] ต่อสี่เหลี่ยม · ภาพประกอบล้วน ซ่อนจากโปรแกรมอ่านจอ
 function pixels(cls, w, h, rects) {
@@ -1096,7 +1060,6 @@ const avatarParts = (age) => avatarArt(Math.max(0, STAGES.findLastIndex((s) => a
 const avatar = (age) => artSvg('av', AVATAR_SIZE, AVATAR_SIZE, avatarParts(age));
 // ชราไม่ได้ "เติบโต" แล้ว แต่คงรูปประโยคเดียวกันให้ป้ายทุกช่วงอ่านเป็นชุด
 const growLabel = (stage) => `เติบโตเป็น${stage === 'หนุ่มสาว' ? (st.sex === 'หญิง' ? 'สาว' : 'หนุ่ม') : stage === 'ชรา' ? 'ผู้สูงวัย' : stage === 'วัยรุ่น' ? 'วัยรุ่น' : `วัย${stage}`}`;
-const flame = () => pixels('flame', 10, 14, [[4, 0, 2, 2, '#FFE3A6'], [3, 2, 4, 3, '#F6C66A'], [4, 5, 2, 1, '#E07A2F'], [2, 6, 6, 8, '#EFE3C2']]);
 const portrait = () => pixels('por', 20, 24, [[0, 0, 20, 24, '#E8E8E8'], [7, 2, 6, 6, '#B8B8B8'], [7, 1, 6, 2, '#1F1F1F'], [5, 8, 10, 8, '#5A5A5A'], [6, 16, 3, 6, '#1F1F1F'], [11, 16, 3, 6, '#1F1F1F']]);
 
 const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
@@ -1169,7 +1132,6 @@ function render(card) {
     // ภาพยุค (B56): การ์ดบ้านเมือง + การ์ดรับมือที่ผูกยุคไว้ (B58) ได้ภาพของยุคนั้น · ยุคที่ไม่มีภาพ = หน้าตาเดิม
     const eraPic = eraArt(card.kind === 'era' ? card.id : card.kind === 'event' ? ERA_OF.get(card.id) : null);
     if (eraPic) body.append(artSvg('era-art', ERA_ART_W, ERA_ART_H, eraPic));
-    if (box.classList.contains('cdl')) body.append(flame());
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
     body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));
     if (card.news?.story) body.append(el('p', 'news', card.news.story));

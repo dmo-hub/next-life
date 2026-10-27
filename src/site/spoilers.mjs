@@ -218,7 +218,7 @@ function card(e, L, byId) {
     .join('');
   const cond = conditions(e, L);
   return [
-    `<article class="c ${e.type === 'B' ? 'b' : 'a'}" id="${esc(e.id)}">`,
+    `<article class="c a" id="${esc(e.id)}">`,
     `<h4>${text(e.title ?? 'ไม่มีชื่อการ์ด')}</h4>`,
     tags.length ? `<p class="tags">${tags.map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : '',
     cond.length ? `<p class="when">ออกเมื่อ: ${cond.join(' · ')}</p>` : '',

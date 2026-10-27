@@ -15,7 +15,7 @@ function card(e) {
   const tags = [e.era ? 'บ้านเมือง' : CATEGORY[e.category], e.belief ? 'ความเชื่อ' : null].filter((t, i, a) => t && a.indexOf(t) === i);
   const choices = (e.choices ?? []).filter((c) => !c.hidden).map((c) => `<li>${text(choiceText(c))}</li>`).join('');
   return [
-    `<article class="c ${e.type === 'B' ? 'b' : 'a'}">`,
+    '<article class="c a">',
     `<h4>${text(e.title ?? 'ไม่มีชื่อการ์ด')}</h4>`,
     tags.length ? `<p class="tags">${tags.map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : '',
     `<p>${text(e.text)}</p>`,
