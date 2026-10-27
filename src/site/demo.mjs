@@ -21,7 +21,8 @@ function findCard(content) {
     let hit = null;
     try {
       playLife(seed, content, pick, (card) => {
-        if (!card.choices?.length) return;
+        // การ์ดชวนไปต่างโลก (B68d) playLife ปฏิเสธเองโดยไม่เรียกบอท — ไม่นับ ไม่งั้นลำดับไม่ตรงกับตอนเล่นซ้ำ
+        if (!card.choices?.length || card.entry) return;
         const nth = k++;
         if (fits(card) && (!want || card.id === want)) {
           hit = { seed, nth, card };
