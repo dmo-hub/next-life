@@ -24,7 +24,7 @@ export const EXAMS = [...new Set(Object.values(TRACKS).map((t) => t.exam).filter
 // ธงที่แกนตั้งเมื่อสอบเข้ามหาวิทยาลัยติด (ทุกทางที่มีการสอบ) — การ์ดแก้บนตอนสอบเข้าอ่านธงนี้ ไม่ติด/ไม่ได้สอบ = ไม่ทวง
 export const EXAM_PASS = 'exam_pass:uni';
 // สอบเข้าโรงเรียนนายร้อยต้องผ่านทั้งข้อเขียนและร่างกาย · สอบ ก.พ. ต้องจบปริญญา (B40)
-const CADET_NEED = { stats: { knowledge: { min: 45 }, health: { min: 50 } }, reason: 'ความรู้หรือสุขภาพยังไม่ถึงเกณฑ์สอบ' };
+export const CADET_NEED = { stats: { knowledge: { min: 45 }, health: { min: 50 } }, reason: 'ความรู้หรือสุขภาพยังไม่ถึงเกณฑ์สอบ' };
 export const SCHOOL_FROM = 6;
 // ทุนสอบชิงมีภาระใช้ทุน (B118): ธงค้างจนการ์ดชดใช้ทุนเคลียร์ · การ์ดอยู่ใน content/scholarship_bond.yaml
 export const BOND_FLAG = 'scholar_bond';

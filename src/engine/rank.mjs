@@ -71,7 +71,7 @@ export function jobWage(st, year) {
 export const officePay = (st, year) => (st.office ? scaled(st, officeStep(st).pay, year) * (officeFull(st) ? 1 : OFFICE.net) : 0);
 
 // ชื่อขั้น: ขั้นที่มีชื่อแทนชื่ออาชีพ · ขั้นไม่มีชื่อ = ชื่ออาชีพ (+คำต่อท้ายของสายอาชีพ)
-const stepName = (st, rank) => {
+export const stepName = (st, rank) => {
   const s = ladderOf(st).steps[rank];
   return s.name ?? `${st.occupationName}${s.suffix ?? ''}`;
 };
