@@ -9,7 +9,7 @@ import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, prom
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
-import { entryCard, ENTRY, ENTRY_EVENTS } from './isekai.mjs';
+import { entryCard, ENTRY, lifeEndWord, isGone } from './isekai.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -1105,7 +1105,7 @@ function deathCard(st) {
   const card = {
     kind: 'death',
     age: st.age,
-    text: ENTRY_EVENTS[st.isekaiVia]?.gone ? `หายตัวไปตอนอายุ ${st.age}` : `ตายอายุ ${st.age}`,
+    text: `${lifeEndWord(isGone(st))} ${st.age}`,
     // money = ทรัพย์สุทธิหลังหักหนี้รายก้อน · debt = ยอดหนี้รายก้อนที่ค้าง (ระหว่างชาติ B06 อ่านแยก)
     summary: {
       year,

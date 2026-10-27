@@ -1881,6 +1881,7 @@ const poolStatScale = (stage) => poolRounds(stage) ** -PACE.statDamp;
 
 
 
+
 const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
 // ชื่อเดิม 3 ระดับ (ยากจน · ชนชั้นกลาง · ร่ำรวย) คงไว้ที่ระดับ 3 · 6 · 9 เนื้อหาที่อ้างชื่อเดิมจึงยังใช้ได้
@@ -2975,7 +2976,7 @@ function deathCard(st) {
   const card = {
     kind: 'death',
     age: st.age,
-    text: ENTRY_EVENTS[st.isekaiVia]?.gone ? `หายตัวไปตอนอายุ ${st.age}` : `ตายอายุ ${st.age}`,
+    text: `${lifeEndWord(isGone(st))} ${st.age}`,
     // money = ทรัพย์สุทธิหลังหักหนี้รายก้อน · debt = ยอดหนี้รายก้อนที่ค้าง (ระหว่างชาติ B06 อ่านแยก)
     summary: {
       year,
@@ -3915,7 +3916,7 @@ function isekaiShuffle(rng, arr) {
   return a;
 }
 
-// ทางที่สามของการ์ดทางเกิด: เทพธิดาโผล่เอง (สุ่ม) หรือชีวิตนี้ตายแบบฉบับต่างโลก (ธง isekai_call) = ได้ของแถม · stream แยกจาก af.rng
+// ทางที่สามของการ์ดทางเกิด: เทพธิดาโผล่เอง (สุ่ม) หรือชีวิตนี้ถูกเรียกข้ามโลกจากการ์ดชวน (ธง isekai_call · ตายหรือหายตัว) = ได้ของแถม · stream แยกจาก af.rng
 function isekaiCalled(st) {
   if (st.flags?.isekai_call) return true;
   const p = Math.max(GODDESS.chanceMin, ISEKAI.chance * (1 + (st.ledger ? ledgerLevel(st.ledger) : 0)));
@@ -3959,6 +3960,10 @@ const ENTRY_EVENTS = {
   },
 };
 
+// ไปต่างโลกได้ 2 แบบ (เจ้าของเคาะ): ตาย กับหายตัว — ป้ายอายุตอนจบทุกจุดแยกตามแบบ
+const lifeEndWord = (gone) => (gone ? 'หายตัวไปตอนอายุ' : 'ตายอายุ');
+const isGone = (st) => !!ENTRY_EVENTS[st?.isekaiVia]?.gone;
+
 function entryOffers(seed) {
   const rng = makeRng(seed ^ ENTRY.salt);
   const out = [];
@@ -3988,7 +3993,7 @@ function entryCard(st, stage) {
 
 // karma = ระดับกรรมที่ปรโลก (−1..1) · past = ชื่อชาติไทย · run = รอบที่เท่าไรของการอยู่ต่างโลกติดกัน · memory = ค่าที่ติดตัวมาจากรอบก่อน
 // ledger = บัญชีที่ดวงวิญญาณพกมา · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = บัญชีเปล่า
-// fated = ชีวิตนี้ตายแบบฉบับต่างโลก (ธง isekai_call) — เทพธิดาโผล่แน่นอนแล้ว ได้โชคเพิ่ม
+// fated = ชีวิตนี้ถูกเรียกข้ามโลกจากการ์ดชวน (ธง isekai_call · ตายหรือหายตัว) — เทพธิดาโผล่แน่นอนแล้ว ได้โชคเพิ่ม
 function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger() }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
@@ -4105,7 +4110,7 @@ function nextIsekaiCard(isk) {
   if (isk.step === 'world') {
     return isekaiCard(isk, {
       step: 'world', title: 'ห้องสีขาว',
-      text: `เทพธิดาผมสีเงินก้มหัวให้ "${isk.past ? `${isk.past} ` : ''}มาทางนี้ก่อน" แล้วกางแผนที่โลกตรงหน้า${isk.blessed ? ' วันนี้เธออารมณ์ดีเป็นพิเศษ เลยเปิดให้เลือกเพิ่มอีกโลก' : ''}${isk.vow ? ` ก่อนส่งไปเธอกระซิบว่า "${GODDESS_VOWS.find((v) => v.id === isk.vow).text}"` : ''}${isk.fated ? ' เธอบอกว่าคนที่ตายแบบในนิยายต่างโลกเป๊ะ ๆ ได้โชคแถมทุกคน' : ''}`,
+      text: `เทพธิดาผมสีเงินก้มหัวให้ "${isk.past ? `${isk.past} ` : ''}มาทางนี้ก่อน" แล้วกางแผนที่โลกตรงหน้า${isk.blessed ? ' วันนี้เธออารมณ์ดีเป็นพิเศษ เลยเปิดให้เลือกเพิ่มอีกโลก' : ''}${isk.vow ? ` ก่อนส่งไปเธอกระซิบว่า "${GODDESS_VOWS.find((v) => v.id === isk.vow).text}"` : ''}${isk.fated ? ' เธอบอกว่าคนที่ข้ามมาแบบในนิยายต่างโลกเป๊ะ ๆ ได้โชคแถมทุกคน' : ''}`,
       choices: isk.worldOffers.map((w) => ISEKAI_WORLDS[w].name),
       desc: isk.worldOffers.map((w) => ISEKAI_WORLDS[w].pitch),
       fx: isk.worldOffers.map(() => ''),
@@ -4432,7 +4437,7 @@ function carryCard(af) {
 }
 
 // ผังตระกูล (ใบ 05: เลิกเมื่อไรก็ดูได้) — หน้าจอวาดระหว่างชีวิตจาก st.lineage และบนการ์ดส่งต่อ
-const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่นที่ ${l.gen} · ${l.name} · ต่างโลก (${l.world}) · ${l.ending}` : `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ${l.province ? `${placeName(l.province)} · ` : ''}ฐานะ${l.cls} · ตายอายุ ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${kinTier(l.tier).name}` : ''}`);
+const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่นที่ ${l.gen} · ${l.name} · ต่างโลก (${l.world}) · ${l.ending}` : `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ${l.province ? `${placeName(l.province)} · ` : ''}ฐานะ${l.cls} · ${lifeEndWord(l.gone)} ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${kinTier(l.tier).name}` : ''}`);
 
 // ชาติต่างโลกจบ (การ์ดตอนจบออกไปแล้ว): ลงผังตระกูลเป็นรุ่นของตัวเอง แล้วเปิดปรโลกรอบใหม่ให้ชาตินั้น
 // ยมทูต/เทวทูตเป็นฉากของชีวิตไทย (เนื้อหาอ่านค่าชาติไทย) จึงเริ่มที่คำตัดสิน
@@ -4637,7 +4642,7 @@ function makeHeir(af, r) {
   // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน · tier = กลับมาเกิดเป็นชั้นไหนของตัวเอง (ทางเป็นลูก)
   // ชีวิตต่างโลกต่อท้ายเป็นรุ่นของตัวเอง (B68) — แถวชาติไทยบันทึกทางว่าไปต่างโลกกับภูมิที่ปรโลกชี้ให้ชาติไทย แม้ขากลับจะเกิดใหม่ตามกรรมของชาติต่างโลก
   const thai = af.thaiVerdict ?? af.verdict;
-  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }], fame, ...(goals.length && { goals }), ...(st.officeTop >= 0 && { office: st.officeTop }), ...(ladderOf(st)?.pension && { service: true }) }, ...af.isekaiLives];
+  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, ...(isGone(st) && { gone: true }), realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }], fame, ...(goals.length && { goals }), ...(st.officeTop >= 0 && { office: st.officeTop }), ...(ladderOf(st)?.pension && { service: true }) }, ...af.isekaiLives];
   const carried = r * (tier?.carry ?? 1);
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
@@ -5610,7 +5615,7 @@ function lifeChart(life, deathAge) {
   cap.setAttribute('aria-live', 'polite');
   const mark = (a, text, cls) => markDot(svg, cap, x(a), H - B - 5, 4, text, cls);
   for (const m of lifeMarks(deathAge)) mark(m.age, `อายุ ${m.age} · ${m.text}`, 'ev');
-  mark(deathAge, `ตายอายุ ${deathAge}`, 'death');
+  mark(deathAge, `${lifeEndWord(isGone(st))} ${deathAge}`, 'death');
   box.append(svg, legend, cap);
   const money = sparkline(life.money, 0, deathAge, true);
   if (money) box.append(el('div', 'h', 'เงินติดตัว'), money);
@@ -5642,7 +5647,7 @@ function fold(box, label, fresh = null, onOpen = null) {
 // ใช้แค่ฐานะ อายุ ชื่อ และการตายพร้อมหนี้ — ไม่มีบัญชีบุญบาป
 function standingGens(lineage, life = null) {
   // รุ่นต่างโลก (B68a) ไม่มีฐานะไทยให้วาด — ข้ามไป เส้นต่อจากชาติไทยก่อนหน้าไปรุ่นไทยถัดไป
-  const gens = lineage.filter((l) => !l.isekai).map((l) => ({ gen: l.gen, name: l.name, age: l.age, broke: l.broke, pts: l.standing ?? [{ age: 0, cls: CLASSES.indexOf(l.cls) }] }));
+  const gens = lineage.filter((l) => !l.isekai).map((l) => ({ gen: l.gen, name: l.name, age: l.age, gone: l.gone, broke: l.broke, pts: l.standing ?? [{ age: 0, cls: CLASSES.indexOf(l.cls) }] }));
   return life ? [...gens, life] : gens;
 }
 // ชีวิตนี้: จุดต้นช่วงวัยที่แกนจดไว้ + ฐานะ ณ ตอนนี้ (หรือตอนตาย) เป็นจุดท้าย
@@ -5659,7 +5664,7 @@ function standingLayout(gens, next) {
   return { units, pts };
 }
 const standingWord = (p) => (p.next ? `รุ่นถัดไปเกิดฐานะ${CLASSES[p.cls]}` : p.g.live ? `${genWord(p.g.gen)}ตอนนี้ อายุ ${p.g.age} · ฐานะ${CLASSES[p.cls]}`
-  : `${genWord(p.g.gen)}${p.g.name ? `${p.g.name} · ` : ''}ตายอายุ ${p.g.age} · ฐานะตอนตาย${CLASSES[p.cls]}${p.g.broke ? ' · จากไปพร้อมหนี้' : ''}`);
+  : `${genWord(p.g.gen)}${p.g.name ? `${p.g.name} · ` : ''}${lifeEndWord(p.g.gone)} ${p.g.age} · ฐานะตอน${p.g.gone ? 'หายตัว' : 'ตาย'}${CLASSES[p.cls]}${p.g.broke ? ' · จากไปพร้อมหนี้' : ''}`);
 const genWord = (g) => `รุ่นที่ ${g} · `;
 function standingChart(gens, next = null, head = true) {
   const { units, pts } = standingLayout(gens, next);
@@ -6156,7 +6161,7 @@ function summaryText(age, realm = null) {
   return [
     `${GAME_NAME} · ${st.name}`,
     `เกิดปี ${st.birthYear} · ${provinceLabel(st)}`,
-    `ตายอายุ ${age}`,
+    `${lifeEndWord(isGone(st))} ${age}`,
     `ชีวิตแบบ${(t.pattern ?? NO_PATTERN).name}`,
     t.titles[0] ? `ฉายา ${t.titles[0].name} (${t.titles[0].tier})` : 'ยังไม่ได้ฉายา',
     realm && `ไปภูมิ${realm}`,
@@ -6296,7 +6301,7 @@ async function shareBlob(facts) {
   ctx.fillRect(cx - 54, y - 44 - 6, 108, 12);
   artDraw(ctx, facts.avatar, cx - 42, y - 44 - 42, 84);
   text(facts.name, '700 72px Srisakdi, serif', c('cream'), 84, 4, 1);
-  text(`ตายอายุ ${facts.age}`, '700 96px Srisakdi, serif', c('gold2'), 110, 16, 1);
+  text(`${lifeEndWord(isGone(st))} ${facts.age}`, '700 96px Srisakdi, serif', c('gold2'), 110, 16, 1);
   text(facts.who, '400 40px Sarabun, sans-serif', c('cream'), 58);
   text(facts.job, '400 36px Sarabun, sans-serif', c('sand'), 52);
   rule(44);
@@ -6478,7 +6483,7 @@ function shareButtons(card) {
   const share = act('แชร์ภาพการ์ด', async (blob) => {
     const file = new File([blob], name, { type: 'image/png' });
     try {
-      await navigator.share({ files: [file], title: `${GAME_NAME} · Next Life`, text: `${GAME_NAME} · ${st.name} ตายอายุ ${card.age} — ${SHARE_URL}` });
+      await navigator.share({ files: [file], title: `${GAME_NAME} · Next Life`, text: `${GAME_NAME} · ${st.name} ${lifeEndWord(isGone(st))} ${card.age} — ${SHARE_URL}` });
     } catch (e) {
       // ผู้เล่นปิดหน้าแชร์เอง = จบ · แชร์พังด้วยเหตุอื่น เปิดภาพในแท็บใหม่ให้กดค้างบันทึก (มือถือที่โหลดไฟล์ไม่ได้) · แท็บโดนบล็อกจึงโหลดไฟล์
       if (e?.name !== 'AbortError') openOrDownload(blob, name);
@@ -7052,7 +7057,7 @@ function renderAfter(card) {
   root.replaceChildren();
   const box = el('article', 'card b af');
   const top = el('div', 'top');
-  top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, `${genLabel()}${st.name} · ตายอายุ ${st.age}`));
+  top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
   const next = () => play(T.afterNext);
@@ -7127,7 +7132,7 @@ function renderIsekai(card) {
   const box = el('article', 'card i');
   const top = el('div', 'top');
   const s = card.status;
-  top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ชาติต่างโลกที่ ${card.run + 1} · ${s.name}` : `${genLabel()}${st.name} · ตายอายุ ${st.age}`));
+  top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ชาติต่างโลกที่ ${card.run + 1} · ${s.name}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
   body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} ${card.index}/${card.total}` : ISEKAI_KICKER[card.step]));
@@ -7566,7 +7571,7 @@ function confirmNew(back) {
 }
 
 function home(card) {
-  const where = af ? `ระหว่างชาติ หลังตายอายุ ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
+  const where = af ? `ระหว่างชาติ หลัง${lifeEndWord(isGone(st))} ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
   choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.memorial, null, () => openMemo()));
 }

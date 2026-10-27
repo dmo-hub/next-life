@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, snapshot, restore, repairLife, nextGoal, schoolOf } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone } from '../engine/index.mjs';
 import { eraArt, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
@@ -169,7 +169,7 @@ function lifeChart(life, deathAge) {
   cap.setAttribute('aria-live', 'polite');
   const mark = (a, text, cls) => markDot(svg, cap, x(a), H - B - 5, 4, text, cls);
   for (const m of lifeMarks(deathAge)) mark(m.age, `อายุ ${m.age} · ${m.text}`, 'ev');
-  mark(deathAge, `ตายอายุ ${deathAge}`, 'death');
+  mark(deathAge, `${lifeEndWord(isGone(st))} ${deathAge}`, 'death');
   box.append(svg, legend, cap);
   const money = sparkline(life.money, 0, deathAge, true);
   if (money) box.append(el('div', 'h', 'เงินติดตัว'), money);
@@ -201,7 +201,7 @@ function fold(box, label, fresh = null, onOpen = null) {
 // ใช้แค่ฐานะ อายุ ชื่อ และการตายพร้อมหนี้ — ไม่มีบัญชีบุญบาป
 function standingGens(lineage, life = null) {
   // รุ่นต่างโลก (B68a) ไม่มีฐานะไทยให้วาด — ข้ามไป เส้นต่อจากชาติไทยก่อนหน้าไปรุ่นไทยถัดไป
-  const gens = lineage.filter((l) => !l.isekai).map((l) => ({ gen: l.gen, name: l.name, age: l.age, broke: l.broke, pts: l.standing ?? [{ age: 0, cls: CLASSES.indexOf(l.cls) }] }));
+  const gens = lineage.filter((l) => !l.isekai).map((l) => ({ gen: l.gen, name: l.name, age: l.age, gone: l.gone, broke: l.broke, pts: l.standing ?? [{ age: 0, cls: CLASSES.indexOf(l.cls) }] }));
   return life ? [...gens, life] : gens;
 }
 // ชีวิตนี้: จุดต้นช่วงวัยที่แกนจดไว้ + ฐานะ ณ ตอนนี้ (หรือตอนตาย) เป็นจุดท้าย
@@ -218,7 +218,7 @@ function standingLayout(gens, next) {
   return { units, pts };
 }
 const standingWord = (p) => (p.next ? `รุ่นถัดไปเกิดฐานะ${CLASSES[p.cls]}` : p.g.live ? `${genWord(p.g.gen)}ตอนนี้ อายุ ${p.g.age} · ฐานะ${CLASSES[p.cls]}`
-  : `${genWord(p.g.gen)}${p.g.name ? `${p.g.name} · ` : ''}ตายอายุ ${p.g.age} · ฐานะตอนตาย${CLASSES[p.cls]}${p.g.broke ? ' · จากไปพร้อมหนี้' : ''}`);
+  : `${genWord(p.g.gen)}${p.g.name ? `${p.g.name} · ` : ''}${lifeEndWord(p.g.gone)} ${p.g.age} · ฐานะตอน${p.g.gone ? 'หายตัว' : 'ตาย'}${CLASSES[p.cls]}${p.g.broke ? ' · จากไปพร้อมหนี้' : ''}`);
 const genWord = (g) => `รุ่นที่ ${g} · `;
 function standingChart(gens, next = null, head = true) {
   const { units, pts } = standingLayout(gens, next);
@@ -715,7 +715,7 @@ function summaryText(age, realm = null) {
   return [
     `${GAME_NAME} · ${st.name}`,
     `เกิดปี ${st.birthYear} · ${provinceLabel(st)}`,
-    `ตายอายุ ${age}`,
+    `${lifeEndWord(isGone(st))} ${age}`,
     `ชีวิตแบบ${(t.pattern ?? NO_PATTERN).name}`,
     t.titles[0] ? `ฉายา ${t.titles[0].name} (${t.titles[0].tier})` : 'ยังไม่ได้ฉายา',
     realm && `ไปภูมิ${realm}`,
@@ -855,7 +855,7 @@ async function shareBlob(facts) {
   ctx.fillRect(cx - 54, y - 44 - 6, 108, 12);
   artDraw(ctx, facts.avatar, cx - 42, y - 44 - 42, 84);
   text(facts.name, '700 72px Srisakdi, serif', c('cream'), 84, 4, 1);
-  text(`ตายอายุ ${facts.age}`, '700 96px Srisakdi, serif', c('gold2'), 110, 16, 1);
+  text(`${lifeEndWord(isGone(st))} ${facts.age}`, '700 96px Srisakdi, serif', c('gold2'), 110, 16, 1);
   text(facts.who, '400 40px Sarabun, sans-serif', c('cream'), 58);
   text(facts.job, '400 36px Sarabun, sans-serif', c('sand'), 52);
   rule(44);
@@ -1037,7 +1037,7 @@ function shareButtons(card) {
   const share = act('แชร์ภาพการ์ด', async (blob) => {
     const file = new File([blob], name, { type: 'image/png' });
     try {
-      await navigator.share({ files: [file], title: `${GAME_NAME} · Next Life`, text: `${GAME_NAME} · ${st.name} ตายอายุ ${card.age} — ${SHARE_URL}` });
+      await navigator.share({ files: [file], title: `${GAME_NAME} · Next Life`, text: `${GAME_NAME} · ${st.name} ${lifeEndWord(isGone(st))} ${card.age} — ${SHARE_URL}` });
     } catch (e) {
       // ผู้เล่นปิดหน้าแชร์เอง = จบ · แชร์พังด้วยเหตุอื่น เปิดภาพในแท็บใหม่ให้กดค้างบันทึก (มือถือที่โหลดไฟล์ไม่ได้) · แท็บโดนบล็อกจึงโหลดไฟล์
       if (e?.name !== 'AbortError') openOrDownload(blob, name);
@@ -1611,7 +1611,7 @@ function renderAfter(card) {
   root.replaceChildren();
   const box = el('article', 'card b af');
   const top = el('div', 'top');
-  top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, `${genLabel()}${st.name} · ตายอายุ ${st.age}`));
+  top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
   const next = () => play(T.afterNext);
@@ -1686,7 +1686,7 @@ function renderIsekai(card) {
   const box = el('article', 'card i');
   const top = el('div', 'top');
   const s = card.status;
-  top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ชาติต่างโลกที่ ${card.run + 1} · ${s.name}` : `${genLabel()}${st.name} · ตายอายุ ${st.age}`));
+  top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ชาติต่างโลกที่ ${card.run + 1} · ${s.name}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
   body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} ${card.index}/${card.total}` : ISEKAI_KICKER[card.step]));
@@ -2125,7 +2125,7 @@ function confirmNew(back) {
 }
 
 function home(card) {
-  const where = af ? `ระหว่างชาติ หลังตายอายุ ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
+  const where = af ? `ระหว่างชาติ หลัง${lifeEndWord(isGone(st))} ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
   choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.memorial, null, () => openMemo()));
 }

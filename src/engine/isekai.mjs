@@ -635,7 +635,7 @@ function isekaiShuffle(rng, arr) {
   return a;
 }
 
-// ทางที่สามของการ์ดทางเกิด: เทพธิดาโผล่เอง (สุ่ม) หรือชีวิตนี้ตายแบบฉบับต่างโลก (ธง isekai_call) = ได้ของแถม · stream แยกจาก af.rng
+// ทางที่สามของการ์ดทางเกิด: เทพธิดาโผล่เอง (สุ่ม) หรือชีวิตนี้ถูกเรียกข้ามโลกจากการ์ดชวน (ธง isekai_call · ตายหรือหายตัว) = ได้ของแถม · stream แยกจาก af.rng
 export function isekaiCalled(st) {
   if (st.flags?.isekai_call) return true;
   const p = Math.max(GODDESS.chanceMin, ISEKAI.chance * (1 + (st.ledger ? ledgerLevel(st.ledger) : 0)));
@@ -679,6 +679,10 @@ export const ENTRY_EVENTS = {
   },
 };
 
+// ไปต่างโลกได้ 2 แบบ (เจ้าของเคาะ): ตาย กับหายตัว — ป้ายอายุตอนจบทุกจุดแยกตามแบบ
+export const lifeEndWord = (gone) => (gone ? 'หายตัวไปตอนอายุ' : 'ตายอายุ');
+export const isGone = (st) => !!ENTRY_EVENTS[st?.isekaiVia]?.gone;
+
 export function entryOffers(seed) {
   const rng = makeRng(seed ^ ENTRY.salt);
   const out = [];
@@ -708,7 +712,7 @@ export function entryCard(st, stage) {
 
 // karma = ระดับกรรมที่ปรโลก (−1..1) · past = ชื่อชาติไทย · run = รอบที่เท่าไรของการอยู่ต่างโลกติดกัน · memory = ค่าที่ติดตัวมาจากรอบก่อน
 // ledger = บัญชีที่ดวงวิญญาณพกมา · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = บัญชีเปล่า
-// fated = ชีวิตนี้ตายแบบฉบับต่างโลก (ธง isekai_call) — เทพธิดาโผล่แน่นอนแล้ว ได้โชคเพิ่ม
+// fated = ชีวิตนี้ถูกเรียกข้ามโลกจากการ์ดชวน (ธง isekai_call · ตายหรือหายตัว) — เทพธิดาโผล่แน่นอนแล้ว ได้โชคเพิ่ม
 export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger() }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
@@ -825,7 +829,7 @@ export function nextIsekaiCard(isk) {
   if (isk.step === 'world') {
     return isekaiCard(isk, {
       step: 'world', title: 'ห้องสีขาว',
-      text: `เทพธิดาผมสีเงินก้มหัวให้ "${isk.past ? `${isk.past} ` : ''}มาทางนี้ก่อน" แล้วกางแผนที่โลกตรงหน้า${isk.blessed ? ' วันนี้เธออารมณ์ดีเป็นพิเศษ เลยเปิดให้เลือกเพิ่มอีกโลก' : ''}${isk.vow ? ` ก่อนส่งไปเธอกระซิบว่า "${GODDESS_VOWS.find((v) => v.id === isk.vow).text}"` : ''}${isk.fated ? ' เธอบอกว่าคนที่ตายแบบในนิยายต่างโลกเป๊ะ ๆ ได้โชคแถมทุกคน' : ''}`,
+      text: `เทพธิดาผมสีเงินก้มหัวให้ "${isk.past ? `${isk.past} ` : ''}มาทางนี้ก่อน" แล้วกางแผนที่โลกตรงหน้า${isk.blessed ? ' วันนี้เธออารมณ์ดีเป็นพิเศษ เลยเปิดให้เลือกเพิ่มอีกโลก' : ''}${isk.vow ? ` ก่อนส่งไปเธอกระซิบว่า "${GODDESS_VOWS.find((v) => v.id === isk.vow).text}"` : ''}${isk.fated ? ' เธอบอกว่าคนที่ข้ามมาแบบในนิยายต่างโลกเป๊ะ ๆ ได้โชคแถมทุกคน' : ''}`,
       choices: isk.worldOffers.map((w) => ISEKAI_WORLDS[w].name),
       desc: isk.worldOffers.map((w) => ISEKAI_WORLDS[w].pitch),
       fx: isk.worldOffers.map(() => ''),
