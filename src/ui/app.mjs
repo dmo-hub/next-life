@@ -949,6 +949,19 @@ function shareButtons(card) {
   return [share, save];
 }
 
+// เหตุผลล็อก + ยอดเงินที่ขาด (B107) · ท่อนตั้งต้น "เงินไม่พอ" กลายเป็นยอด · reason ของเนื้อหา
+// พูดเรื่องเงินอยู่แล้ว (เช่น "เงินไม่พอจ่ายแป๊ะเจี๊ยะ") จึงต่อท้ายแค่ยอด ไม่แทนกลางประโยค
+function lockText(card, i) {
+  const why = card.locked?.[i];
+  const gap = card.moneyGap?.[i];
+  if (!why || !gap) return why;
+  const parts = why.split(' · ');
+  const at = parts.indexOf('เงินไม่พอ');
+  if (at < 0) return `${why} · ขาดอีก ${baht(gap)}`;
+  parts[at] = `ขาดเงินอีก ${baht(gap)}`;
+  return parts.join(' · ');
+}
+
 function button(label, fx, onclick, hint = null) {
   const b = el('button', 'choice');
   const main = el('span', null, label);
@@ -1132,7 +1145,7 @@ function render(card) {
       if (card.items?.length) body.append(list(card.items));
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
       card.choices.forEach((c, i) => {
-        const why = card.locked?.[i];
+        const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
         const b = keyed(button(c, why ?? card.fx?.[i], () => play(lifePick(i)), card.hints?.[i]), i);
         if (why) b.disabled = true;
@@ -1371,7 +1384,7 @@ function renderAfter(card) {
     choices.append(button('เริ่มตระกูลใหม่', null, start));
   } else if (card.choices.length) {
     card.choices.forEach((c, i) => {
-      const why = card.locked?.[i];
+      const why = lockText(card, i);
       const b = keyed(button(c, why ?? card.fx?.[i], () => play(afterPick(i)), card.hints?.[i]), i);
       if (why) b.disabled = true;
       choices.append(b);

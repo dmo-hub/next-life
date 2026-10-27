@@ -715,7 +715,22 @@ function eventCard(st, ev, news = null) {
     fx: ev.choices.map((c) => choiceFx(st, ev, c)),
     // เหตุผลที่ตัวเลือกกดไม่ได้ (null = กดได้) — หน้าจอแสดงเทาพร้อมเหตุผล
     locked: ev.choices.map((c) => lockReason(st, c)),
+    ...moneyShort(ev, st),
   });
+}
+
+// ตัวเลือกที่ล็อกเพราะเงินบอกยอดที่ขาด (B107) — ใส่ช่องเฉพาะการ์ดที่มีตัวนั้น การ์ดอื่นรูปเดิมทุกช่อง
+// ล็อกด้วยเหตุที่ชนะเงินก่อน (อายุ · แบบงานศพที่ตกลงไว้) ไม่บอกยอด — เติมเงินก็ยังกดไม่ได้
+function moneyShort(ev, st) {
+  const moneyGap = ev.choices.map((c) => {
+    const q = c.requires;
+    if (!q?.money || lockReason(st, c) === null) return null;
+    if (st.pending?.id === FUNERAL.rite && st.funeralPick && c.id !== st.funeralPick) return null;
+    if (q.age && (st.age < (q.age.min ?? 0) || st.age > (q.age.max ?? Infinity))) return null;
+    const gap = moneyValue(st, q.money) - (st.dead ? deadPurse(st) : st.money);
+    return gap > 0 ? gap : null;
+  });
+  return moneyGap.some((v) => v !== null) ? { moneyGap } : {};
 }
 
 // บรรทัดรองบอกข้อแลกใต้ตัวเลือก (B52) — ใส่ช่องเฉพาะการ์ดที่มี hint การ์ดเดิมจึงมีรูปเท่าเดิมทุกช่อง
