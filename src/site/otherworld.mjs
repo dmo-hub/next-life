@@ -1,6 +1,6 @@
 // ส่วนต่างโลกของหน้ารวมการ์ดและหน้าเฉลย (B88b): สร้างจากโมดูลต่างโลกในเอนจินทุกครั้งที่ build — การ์ดต่างโลกใบใหม่ขึ้นหน้าเว็บเอง
 // หน้ารวมการ์ดได้แค่สิ่งที่จอแสดง (ชื่อโลก/สกิลพร้อมคำอธิบาย · ข้อความเหตุการณ์ · ตัวเลือก) · หน้าเฉลยได้ความยาก ผลสำเร็จ/พลาด ค่าที่ขยับ ธง และตอนจบ
-import { ISEKAI, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_DEATH, ISEKAI_EVENTS, PATHS } from '../engine/index.mjs';
+import { ISEKAI, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, GODDESS, GODDESS_VOWS, PATHS, meritName } from '../engine/index.mjs';
 import { esc, text } from './catalog.mjs';
 
 export const ISEKAI_SECTION = 'ต่างโลก';
@@ -79,13 +79,16 @@ function rollLine(c, src) {
   return out;
 }
 
-function spoilEvent(e, src) {
+// ป้ายบุญบาปผูกเจตนาของตัวเลือก ไม่ผูกผลทอย จึงอยู่ระดับตัวเลือกบรรทัดเดียว · ตัวเลือกไม่มีป้าย = ไม่ลงบัญชี
+function spoilEvent(e, src, meritTags) {
   const goalName = e.worlds?.length === 1 ? `ความคืบหน้า${ISEKAI_WORLDS[e.worlds[0]].goal}` : 'ความคืบหน้าเป้าหมายของโลก';
   const choices = e.choices
-    .map((c) => {
+    .map((c, i) => {
       const lock = c.need ? `<p class="lock">ต้องมีทอง ${c.need.gold} ถึงกดได้</p>` : '';
       const res = c.stat ? resultLine('สำเร็จ', c.win, goalName) + resultLine('พลาด', c.lose, goalName) : resultLine('ผล', c, goalName);
-      return `<li><p class="ch">${text(c.t)}</p>${lock}${c.stat ? `<p class="mul">${rollLine(c, src).join(' · ')}</p>` : '<p class="mul">ไม่ต้องทอย ได้ผลนี้ทุกครั้ง</p>'}<ol class="out">${res}</ol></li>`;
+      const m = meritTags(ISEKAI_MERIT[e.id]?.[i]);
+      const merit = m.length ? `<p class="fx">${m.join(' · ')}</p>` : '<p class="nm">ไม่มีบุญบาป ไม่ว่าผลออกทางไหน</p>';
+      return `<li><p class="ch">${text(c.t)}</p>${lock}${merit}${c.stat ? `<p class="mul">${rollLine(c, src).join(' · ')}</p>` : '<p class="mul">ไม่ต้องทอย ได้ผลนี้ทุกครั้ง</p>'}<ol class="out">${res}</ol></li>`;
     })
     .join('');
   return [`<article class="c x" id="isk-${esc(e.id)}">`, `<h4>${esc(e.title)}</h4>`, tagLine(tags(e)), `<p>${text(e.text)}</p>`, `<ol class="chs">${choices}</ol>`, '</article>'].join('');
@@ -113,10 +116,18 @@ function worldSpoil(id, w) {
 // การ์ดที่ให้สกิลสุ่มไม่สุ่มโชคเทพธิดา (chooseIsekai) — สกิลอื่นได้ระหว่างทางด้วย
 const skillSpoil = (id) => (id === 'luck' ? '<p class="ex">ได้ตอนเลือกที่ห้องสีขาวเท่านั้น</p>' : '<p class="ex">ได้ระหว่างทางด้วย ถ้าการ์ดให้สกิลสุ่ม</p>');
 
-function rules() {
+// โอกาสเทพธิดาโผล่ตามกรรมสุทธิ (isekaiCalled) · คำสัญญาตัดสินด้วยป้ายบุญบาปของตัวเลือกที่กด (vowTrack/vowSettle)
+const pct = (p) => `${Math.round(p * 100)}%`;
+const vowRule = (v) =>`"${esc(v.text.replace(/^สัญญากันข้อเดียวนะ /, ''))}" ${v.breaks ? `ผิดทันทีที่กดตัวเลือกที่มีบาป${esc(meritName(v.breaks))}` : `ต้องกดตัวเลือกที่มีบุญ${esc(meritName(v.needs))}อย่างน้อยครั้งหนึ่งก่อนจบรอบ`}`;
+function rules(meritTags) {
   const k = ISEKAI;
+  const at = (lv) => pct(Math.max(GODDESS.chanceMin, k.chance * (1 + lv)));
+  const keep = meritTags([{ cat: 'keep_goddess_vow', level: GODDESS.vowLevel }]).join('');
+  const broke = meritTags([{ cat: 'vow_broken' }]).join('');
   return `<ul class="rules">${[
-    `ทางเกิดที่ 3 เปิดทุกชาติ · โอกาส ${Math.round(k.chance * 100)}% ต่อชีวิตที่เทพธิดาอารมณ์ดี มายืนรอข้างทาง = ได้เลือกโลกเพิ่ม 1 และสกิลเพิ่ม 1 (เฉพาะรอบแรกที่ไป)`,
+    `ทางเกิดที่ 3 เปิดทุกชาติ · เทพธิดาอารมณ์ดีมายืนรอข้างทาง โอกาสตามกรรมจากปรโลก: บุญเต็ม ${at(1)} · กลาง ${at(0)} · บาปเต็ม ${at(-1)} (ไม่ต่ำกว่า ${pct(GODDESS.chanceMin)}) = ได้เลือกโลกเพิ่ม 1 และสกิลเพิ่ม 1 (เฉพาะรอบแรกที่ไป) และฝากคำสัญญา 1 ข้อ`,
+    `ชีวิตที่รับการ์ดชวนข้ามโลกระหว่างมีชีวิต (ตายหรือหายตัว) เจอเทพธิดาแน่นอน และได้โชคเพิ่ม ${GODDESS.fatedLuck}`,
+    `คำสัญญา (ชีวิตละข้อเดียว เทพธิดาเลือกให้):${GODDESS_VOWS.map(vowRule).join(' · ')} — รักษาได้ ${keep} · ผิด ${broke} (เฉลยที่ปรโลก)`,
     `อยู่ต่างโลกต่อติดกันได้ ${k.stay} รอบ แล้วต้องกลับโลกเดิมตามกรรม`,
     `กรรมจากปรโลก (−1 ถึง 1): ค่าเริ่มทุกตัวขยับ กรรม × ${k.karmaStat} (ปัดเศษ) · กรรม ≥ ${k.karmaSkill} ได้สกิลให้เลือกเพิ่ม 1 · ≤ −${k.karmaSkill} ลดลง 1 · บาปทำให้ทุกด่านยากขึ้นสูงสุด ${k.karmaDc}`,
     'โอกาสสำเร็จ = 50 + (ค่าที่ทอย − ความยาก) × 4 + สกิลตรงสาย + ธงที่ปูไว้ แล้วตัดให้อยู่ระหว่าง 5% ถึง 95%',
@@ -125,12 +136,13 @@ function rules() {
   ].map((s) => `<li>${s}</li>`).join('')}</ul>`;
 }
 
-export function isekaiSpoilersHtml(n) {
+// meritTags = ตัววาดป้ายบุญบาปของหน้าเฉลยไทย — ส่งเข้ามาแทน import กลับ เพื่อให้ป้ายสองโลกหน้าตา/แต้มเดียวกัน
+export function isekaiSpoilersHtml(n, meritTags) {
   const src = flagSources();
   const body = [
-    rules(),
+    rules(meritTags),
     `<h3>ก่อนเริ่มชาติ</h3><div class="grid">${worldPick(worldSpoil)}${skillPick(skillSpoil)}</div>`,
-    ...groups().map((g) => `<h3>บทที่ ${g.ch} <small>${g.events.length} ใบ</small></h3><div class="grid">${g.events.map((e) => spoilEvent(e, src)).join('')}</div>`),
+    ...groups().map((g) => `<h3>บทที่ ${g.ch} <small>${g.events.length} ใบ</small></h3><div class="grid">${g.events.map((e) => spoilEvent(e, src, meritTags)).join('')}</div>`),
     `<p class="ex">ตอนจบแบบตาย: <b>${esc(ISEKAI_DEATH[0])}</b> — ${esc(ISEKAI_DEATH[1])}</p>`,
   ].join('');
   return section(n, body);
