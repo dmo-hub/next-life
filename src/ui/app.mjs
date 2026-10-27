@@ -462,7 +462,7 @@ function titleClue(key, got = { titles: [], family: [] }) {
 }
 function clueRow(box, clue) {
   if (!clue) return;
-  box.append(el('div', 'h', 'ฉายาที่ยังไม่เคยได้'));
+  box.append(el('div', 'h', 'คำใบ้ฉายา'));
   box.append(el('p', 'note clue', `??? ${clue.tier ? `· ${clue.tier} ` : ''}— ${clue.hint}`));
 }
 
