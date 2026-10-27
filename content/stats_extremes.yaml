@@ -1,0 +1,143 @@
+# การ์ดที่ออกเฉพาะเมื่อค่าสถานะสุดทาง (B112) — ค่าต่ำมาก/สูงมากต้องเปิดเรื่องที่ชีวิตค่ากลางไม่เจอ
+# เกณฑ์ when.stats ตั้งจากการกระจายของบอทสุ่ม: ต่ำมากราว 4–6% ของชีวิต สูงมากเลือกเพดานที่ไม่ใช่ครึ่งหนึ่งของชีวิต
+events:
+  - id: stats_low_happiness_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 14
+    when: {stats: {happiness: {max: 25}}}
+    title: "เช้าที่ลุกไม่ไหว"
+    text: "หลายเดือนมานี้ตื่นมาแล้วไม่อยากทำอะไรเลย ของที่เคยชอบก็เฉย ๆ เพื่อนส่งลิงก์สายด่วนสุขภาพจิต 1323 มาให้ บอกว่าโทรได้ทั้งวันทั้งคืน ไม่ต้องรอให้หนักก่อน"
+    choices:
+      - id: call_1323
+        text: "โทร 1323 คุยกับคนที่ฟัง"
+        effects: {happiness: 3, health: 1}
+        merit: [{cat: neutral}]
+      - id: see_doctor
+        text: "ไปหาหมอจิตเวชที่โรงพยาบาล"
+        effects: {happiness: 3, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: tell_someone
+        text: "บอกคนที่ไว้ใจว่าไม่ไหว"
+        effects: {happiness: 2, relations: 2}
+        merit: [{cat: neutral}]
+      - id: keep_quiet
+        text: "เก็บไว้คนเดียว ทำงานต่อ"
+        effects: {happiness: -1, health: -1}
+        merit: [{cat: neutral}]
+
+  - id: stats_low_relations_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 14
+    when: {stats: {relations: {max: 20}}}
+    title: "โต๊ะกินข้าวตัวเดียว"
+    text: "วันเกิดปีนี้ไม่มีใครทักมาสักคน นอกจากข้อความอวยพรอัตโนมัติจากธนาคาร คุณนั่งกินข้าวกล่องหน้าทีวี นึกไม่ออกว่าคุยกับใครยาวเกินห้านาทีครั้งสุดท้ายเมื่อไร"
+    choices:
+      - id: call_old_friend
+        text: "โทรหาเพื่อนเก่าที่เงียบไป"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "เพื่อนรับสายแล้วคุยยาวเป็นชั่วโมง นัดกินข้าวกันอาทิตย์หน้า", effects: {relations: 3, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เบอร์เก่าเปลี่ยนเจ้าของไปแล้ว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: join_group
+        text: "สมัครชมรมเดินเช้าแถวบ้าน"
+        effects: {relations: 2, health: 1}
+        merit: [{cat: neutral}]
+      - id: temple_volunteer
+        text: "ไปช่วยงานวัดทุกวันพระ"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: used_to_it
+        text: "อยู่คนเดียวก็ดี ไม่วุ่นวาย"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: stats_high_knowledge_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 10
+    when: {stats: {knowledge: {min: 95}}}
+    title: "จดหมายจากกองทุน"
+    text: "ครูแนะแนวส่งชื่อคุณเข้าชิงทุนเรียนมหาวิทยาลัยเต็มจำนวนโดยไม่บอกก่อน จดหมายแจ้งว่าผ่านรอบเอกสารแล้ว เหลือสอบสัมภาษณ์รอบเดียว แต่ทุนมีเงื่อนไขต้องกลับมาใช้ทุนหลายปี"
+    choices:
+      - id: go_interview
+        text: "ไปสัมภาษณ์ เอาทุนให้ได้"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ได้ทุน ค่าเทอมกับค่าหอครบจนจบปริญญา", effects: {knowledge: 3, network: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตกรอบสัมภาษณ์ กรรมการเลือกคนที่มีผลงานวิจัยมากกว่า", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: give_to_friend
+        text: "ถอนตัว ให้เพื่อนที่จนกว่าได้"
+        effects: {relations: 3, happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: work_first
+        text: "ขอสอบเข้าเองด้วยคะแนนล้วน"
+        effects: {knowledge: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: study_local
+        text: "เรียนมหาวิทยาลัยใกล้บ้าน"
+        effects: {knowledge: 2, relations: 2}
+        merit: [{cat: care_parents, level: 1}]
+
+  - id: stats_high_network_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 10
+    when: {stats: {network: {min: 85}}}
+    title: "สายที่ไม่ได้สมัคร"
+    text: "คนรู้จักจากงานเลี้ยงรุ่นเมื่อปีก่อนโทรมาชวนไปคุมงานบริษัทที่เพิ่งระดมทุนได้ เงินเดือนสูงกว่าที่เดิมเกือบครึ่ง เขาบอกว่าชื่อคุณถูกพูดถึงในวงประชุมสามคนติด"
+    choices:
+      - id: take_offer
+        text: "ย้ายไปรับตำแหน่งใหม่"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.4}}, text: "งานใหม่เข้ามือ ทีมเชื่อคุณตั้งแต่วันแรก", effects: {income_mult: 1.3, network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บริษัทเงินทุนหมดในปีเดียว ต้องหางานใหม่", effects: {happiness: -2, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: raise_at_home
+        text: "เอาข้อเสนอไปต่อรองที่เดิม"
+        effects: {income_mult: 1.1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: refer_junior
+        text: "แนะนำรุ่นน้องที่เก่งไปแทน"
+        effects: {relations: 2, network: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: stay_loyal
+        text: "ขอบคุณ แต่อยู่ที่เดิมต่อ"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: stats_high_health_old_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 10
+    when: {stats: {health: {min: 85}}}
+    title: "หมอดูผลเลือดสองรอบ"
+    text: "ตรวจสุขภาพประจำปี หมอดูผลเลือดแล้วถามอายุซ้ำ ค่าทุกตัวอยู่ในเกณฑ์คนอายุน้อยกว่าคุณสิบปี ลูกหลานเริ่มชวนไปเดินเขาด้วยกันแทนที่จะเป็นฝ่ายห่วง"
+    choices:
+      - id: hike_family
+        text: "ไปเดินเขากับลูกหลาน"
+        effects: {relations: 2, happiness: 2}
+        merit: [{cat: neutral}]
+      - id: teach_exercise
+        text: "เปิดสอนรำไม้พลองที่ลานวัด"
+        effects: {relations: 2, network: 1, health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: work_again
+        text: "กลับไปรับงานพาร์ตไทม์"
+        effects: {money: {unit: income_x, amount: 0.2}, network: 1}
+        merit: [{cat: neutral}]
+      - id: ordain_short
+        text: "ไปปฏิบัติธรรมที่วัดสักพรรษา"
+        effects: {happiness: 2}
+        merit: [{cat: bhavana, level: 1}]
