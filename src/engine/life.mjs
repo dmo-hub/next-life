@@ -713,11 +713,12 @@ export function moneyRatios(st, year = st.birthYear + st.age) {
 // ยังไม่มีฐานรายได้ (เรียน/ไม่เคยทำงาน) = ล้างเมื่อไม่มีหนี้เหลือ ไม่งั้นคงตามเดิม
 export const DEBT_LOAD = { pay: 0.4, net: 2, payOff: 0.3, netOff: 1.5 };
 function debtLoad(st, year, paid) {
-  const owe = totalDebt(st) - Math.max(0, st.money);
+  // หนี้สุทธิแบบเดียวกับ debt_x และด่านล้มละลาย: เงินติดลบ (ทบดอกเงินกู้ทุกปี) นับเป็นหนี้ด้วย
+  const owe = -netWorth(st);
   const base = debtIncome(st, year);
   const was = !!st.flags.in_debt;
   let on = was;
-  if (base === null || base <= 0) on = was && totalDebt(st) > 0;
+  if (base === null || base <= 0) on = was && owe > 0;
   else if (paid > DEBT_LOAD.pay * base || owe > DEBT_LOAD.net * base) on = true;
   else if (paid < DEBT_LOAD.payOff * base && owe < DEBT_LOAD.netOff * base) on = false;
   if (on && !was) {
