@@ -1924,7 +1924,9 @@ function renderIsekai(card) {
   }
   if (card.chronicle?.length) {
     const d = el('details', 'tree');
-    d.append(el('summary', null, `จดหมายเหตุทั้งชีวิต ${card.chronicle.length} บรรทัด`), list(card.chronicle, 'picks'));
+    // จอขั้นต่ำ: บรรทัด object เรียงเป็นข้อความเดิม (chip ±ค่า แบ่งช่วงวัย = จอเลน C) · เซฟเก่าเป็นสตริงอยู่แล้ว
+    const line = (c) => (typeof c === 'string' ? c : c.kind === 'lore' ? c.text : `อายุ ${c.until ? `${c.age}–${c.until}` : c.age} · ${c.text}`);
+    d.append(el('summary', null, `จดหมายเหตุทั้งชีวิต ${card.chronicle.length} บรรทัด`), list(card.chronicle.map(line), 'picks'));
     body.append(d);
   }
   // ใบตา (B68b): เปลี่ยนสิ่งที่ทุ่มเทได้โดยไม่ต้องรอช่วงวัยใหม่ — ปุ่มเดินผ่าน afterPick เซฟจึงเล่นซ้ำได้ · ตัวจับเวลาเดินเองเป็นงานเลน C

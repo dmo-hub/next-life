@@ -1641,6 +1641,7 @@ export function nextIsekaiCard(isk) {
       ...(isk.home && { home: true }),
       choices: [],
       log: isk.log.slice(),
+      // บรรทัดละ { age, until?, stage, kind: tick|event|lore, text, deltas } · เซฟเก่าอาจยังมีบรรทัดสตริงปน
       chronicle: isk.chron.slice(),
       // ผลคำสัญญาขึ้นเป็นแผงบนจอ (เลน C) ไม่ต่อท้าย text
       ...(isk.vow && { vow: { text: GODDESS_VOWS.find((v) => v.id === isk.vow).text, kept: isk.vowKept } }),
@@ -1692,7 +1693,7 @@ export function nextIsekaiCard(isk) {
     if (d) deltas[k] = d;
   }
   const title = years > 1 ? `อายุ ${from}–${isk.age - 1}` : `อายุ ${from}`;
-  isk.chron.push(`${title} · ${text}`);
+  isk.chron.push({ age: from, ...(years > 1 && { until: isk.age - 1 }), stage: stage.id, kind: 'tick', text, deltas });
   return isekaiCard(isk, {
     step: 'tick', title, text, age: from, years, stage: stage.name, deltas,
     ...(revived && { sys: 'เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว' }),
@@ -1742,7 +1743,7 @@ export function chooseIsekai(isk, idx) {
     if (!s) throw new Error('ตัวเลือกไม่ถูกต้อง');
     isk.skills.push(s);
     if (s === 'luck') isk.st.luk += 15;
-    if (isk.worldLore.length) isk.chron.push(isekaiLoreLine(isk));
+    if (isk.worldLore.length) isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'lore', text: isekaiLoreLine(isk), deltas: {} });
     // ฉากเปิดของเนื้อเรื่องมาก่อนตาแรก
     const intro = roleInfo(isk.role).intro;
     if (intro) isk.due = (isk.used.push(intro), intro);
@@ -1817,7 +1818,7 @@ export function chooseIsekai(isk, idx) {
   const weight = Object.entries(deltas).reduce((s, [k, v]) => s + Math.abs(k === 'gold' ? v / 50 : v), 0) + (aid ? 10 : 0) + (isk.dead ? 50 : 0);
   (isk.marks ??= []).push({ text: `${ev.title} · ${out.text}`, weight });
   isk.log.push(`อายุ ${isk.age} · ${ev.title} · ${c.t}${rolled ? (ok ? (aid ? ` (สำเร็จ · ${aid}ช่วยไว้)` : ' (สำเร็จ)') : ' (พลาด)') : ''}`);
-  isk.chron.push(`อายุ ${isk.age} · ${ev.title} · ${out.text}`);
+  isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'event', text: `${ev.title} · ${out.text}`, deltas: { ...deltas } });
   isk.last = { title: ev.title, text: out.text, ok: rolled ? ok : null, stat: rolled ? isekaiCheckName(c) : null, deltas, sys };
   isk.due = null;
   isk.step = 'result';
