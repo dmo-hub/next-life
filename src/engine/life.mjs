@@ -9,7 +9,7 @@ import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, prom
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
-import { entryCard, ENTRY, lifeEndWord, isGone } from './isekai.mjs';
+import { entryCard, ENTRY, lifeEndWord, isGone, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore } from './isekai.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -374,8 +374,9 @@ export function healthMultiplier(st) {
   return d < 0 ? 1 - d / 50 : Math.max(0.6, 1 - d / 150);
 }
 
+// อายุร่างกาย = อายุไทย + ปีที่อยู่ต่างโลก (B68m) — ปีปฏิทินยังตามอายุไทย · ชีวิตที่ไม่ข้ามโลกไม่มี st.away
 export function deathChance(st) {
-  const base = lifeQx(st.content.era, st.seed, st.sex, st.birthYear + st.age, st.age);
+  const base = lifeQx(st.content.era, st.seed, st.sex, st.birthYear + st.age, st.age + (st.away ?? 0));
   if (base >= 1) return 1;
   return Math.min(1, base * healthMultiplier(st) * karmaMultiplier(st.ledger));
 }
@@ -864,6 +865,10 @@ export const openChoices = (card) => card.choices.map((_, i) => i).filter((i) =>
 
 // เดินปีละครั้งจนมีการ์ดถึงกำหนดหรือตาย คืนการ์ดใบถัดไป
 export function nextCard(st) {
+  if (st.trip) {
+    if (st.trip.step !== 'over') return { ...nextIsekaiCard(st.trip), trip: true, life: st.age };
+    return tripBack(st);
+  }
   if (st.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
   // คิวมาก่อนการตาย — การ์ดงานศพเข้าคิวตอนตายแล้วต้องออกก่อนมรณบัตร
   if (st.dead && !st.queue.length) return deathCard(st);
@@ -1053,6 +1058,7 @@ export function noteDeed(st, text, record, age = st.age) {
 }
 
 export function choose(st, idx) {
+  if (st.trip) return chooseIsekai(st.trip, idx);
   const ev = st.pending;
   if (ev?.alloc) {
     const opt = ev.alloc[idx];
@@ -1067,6 +1073,18 @@ export function choose(st, idx) {
     if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
     // ปฏิเสธ = ไม่แตะอะไรเลย · กดรับ = จบชีวิตตรงนี้ งานศพตามปกติ แล้วปรโลกส่งข้ามโลก (ธง isekai_call)
+    // ทางที่ได้กลับ (B68m) = ไปต่างโลกทั้งตัวกลางชีวิต ไม่ตั้งธง · บัญชีบุญบาปส่งตัวเดียวกันเข้าไป
+    const n = st.trips?.length ?? 0;
+    const trip = idx === ENTRY.accept && tripRoll(st.seed, ev.entry, n);
+    if (trip) {
+      st.log.push({ id: `isekai_${ev.entry}`, age: st.age, choice: idx, text: ev.choices[idx].text });
+      st.trip = startIsekai({
+        seed: (st.seed ^ TRIP.salt ^ Math.imul(n + 1, 0x9e3779b1)) >>> 0, past: st.name, ledger: st.ledger,
+        lore: isekaiWorldLore([...(st.lineage ?? []), { trips: st.trips }]),
+        trip: { ...trip, age: st.age, wit: st.knowledge / TRIP.wit },
+      });
+      return;
+    }
     if (idx === ENTRY.accept) {
       st.flags.isekai_call = true;
       st.isekaiVia = ev.entry;
@@ -1201,6 +1219,32 @@ function pickRite(st, ev) {
   else if (st.relations >= FUNERAL.love.low) want = ['chant_3', 'one_day'];
   return want.find(ok) ?? 'temple';
 }
+// ทริปจบ (การ์ดจบออกไปแล้ว): ตายในต่างโลก = ชีวิตไทยจบแบบหายตัว · กลับบ้าน = เวลาไทยเดินตามที่ทอยไว้แล้วเล่าการกลับ
+// ปีที่หายไปเดินด้วย stepYear ปกติ (เงิน คนในบ้าน ด่านเรียน) แต่ไม่ทอยตายและไม่จับกอง — ตัวไม่อยู่ เรื่องของปีนั้นจึงมาเป็นข่าวหลังกลับ
+function tripBack(st) {
+  const isk = st.trip;
+  st.trip = null;
+  (st.trips ??= []).push(tripLineage(isk));
+  if (!isk.home) {
+    st.tripLost = true;
+    st.dead = true;
+    return queueFuneral(st) ? nextCard(st) : deathCard(st);
+  }
+  const away = isk.age - isk.trip.from;
+  const c = tripCarry(isk);
+  st.money += c.gold * st.price;
+  st.network = clamp(st.network + c.network);
+  st.knowledge = clamp(st.knowledge + c.knowledge);
+  for (let i = 0; i < isk.trip.thai; i++) stepYear(st);
+  // ใบตัดสินใจที่ถึงกำหนดทุกปี (เลื่อนขั้น ทบทวนเงิน ช่วงวัย) ซ้อนกันหลายใบ — เก็บใบล่าสุดของแต่ละเรื่อง ใบเก่าสร้างจากสถานะที่ไม่ใช่แล้ว
+  const key = (c) => (c.kind === 'eraEvent' ? `e:${c.ev.id}` : ['alloc', 'stage', 'omen'].includes(c.kind) ? c.kind : null);
+  st.due = st.due.filter((c, i) => !key(c) || !st.due.slice(i + 1).some((d) => key(d) === key(c))).map((c) => ({ ...c, age: st.age }));
+  st.away = (st.away ?? 0) + away - isk.trip.thai;
+  st.advance = false;
+  const when = isk.trip.thai ? `ผ่านไป ${isk.trip.thai} ปี` : 'ผ่านไปแค่ไม่กี่เดือน';
+  return emit(st, { kind: 'result', type: 'B', trip: true, age: st.age, stage: stageOf(st.age), text: `ลืมตาอีกทีก็ยืนอยู่หน้าบ้านหลังเดิม ในต่างโลกคุณอยู่มา ${away} ปี แต่ที่นี่${when} คนที่บ้านนึกว่าคุณหายตัวไป` });
+}
+
 function queueFuneral(st) {
   if (st.age < STAGES[1].from) return false;
   const evs = [FUNERAL.wishes, FUNERAL.rite].map((id) => st.content.events.find((e) => e.id === id)).filter(Boolean);
@@ -1245,6 +1289,11 @@ export function statsOf(st) {
 // บอทได้ st เพื่ออ่านป้ายบุญบาปของตัวเลือกแทนการอ่านความหมายของข้อความแบบที่ผู้เล่นทำ — ห้ามอ่านบัญชีเอง
 // stream ของบอทแยกจาก rng ของแกนเกม เพื่อไม่ให้การเลือกไปเปลี่ยนลำดับสุ่มของโลก
 // st ส่งเข้ามาได้ = เล่นชีวิตรุ่นถัดไปที่ระหว่างชาติสร้างไว้
+const tripAny = (card, rng) => {
+  const open = card.choices.map((_, i) => i).filter((i) => !card.locked?.[i]);
+  return open[Math.floor(rng.next() * open.length)];
+};
+
 export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, content)) {
   const bot = makeRng(seed ^ 0x5bd1e995);
   for (;;) {
@@ -1252,6 +1301,11 @@ export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, c
     onCard?.(card, st);
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
     // บอทที่ไม่ได้ประกาศ isekai ปฏิเสธการ์ดชวนโดยไม่ดึงเลขสุ่ม ⇒ ชีวิตเดินเท่าเดิม
+    // การ์ดในทริป (B68m) ไม่มีป้ายบุญบาปแบบชีวิตไทย — บอทที่ประกาศ trip เลือกเอง ที่เหลือสุ่มตัวที่ไม่ล็อก
+    if (card.trip && card.kind === 'isekai') {
+      if (card.choices.length) choose(st, pickChoice.trip ? pickChoice.trip(card, bot) : tripAny(card, bot));
+      continue;
+    }
     if (card.choices?.length) choose(st, card.entry && !pickChoice.isekai ? ENTRY.decline : pickChoice(card, bot, st));
   }
 }

@@ -18,7 +18,7 @@ export const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha:
 export const ISEKAI_LINK = { str: 'health', mag: 'knowledge', cha: 'relations', luk: 'happiness', fame: 'network' };
 export const LINK = { div: 10, part: 5, age: 40, gold: 100, goldCap: 3, hpCut: 30 };
 // worlds = จำนวนการ์ดบทบาทที่เทพธิดายื่น (ชื่อเดิมจากตอนที่ยังเลือกโลก) · roleLean = กรรมเอียงโอกาสบทบาทได้แค่ไหน
-export const ISEKAI = { stay: 2, chance: 0.2, skills: 3, worlds: 3, karmaStat: 3, karmaDc: 4, karmaSkill: 0.3, memory: 3, roleLean: 0.6 };
+export const ISEKAI = { stay: 4, chance: 0.2, skills: 3, worlds: 3, karmaStat: 3, karmaDc: 4, karmaSkill: 0.3, memory: 3, roleLean: 0.6 };
 // เวลาเดิน (B68b · เจ้าของเคาะ ตาละ 1 ปี วัยชราตาละ 5 ปี): ตัวเลขปีคูณ pace ของบทบาท (เอลฟ์แก่ช้า)
 // eventP = โอกาสมีเรื่องให้ตัดสินต่อตา · quiet = อายุก่อนหน้านี้ไม่มีเรื่องสุ่ม (เด็กเล็ก) · regen/decay = HP ต่อปีก่อนและหลังวัยชรา
 // gainK = ค่ายิ่งสูงยิ่งฝึกขึ้นช้า (ค่าที่ 20 ขึ้นครึ่งหนึ่งของค่าที่ 0) · later = เรื่องต่อมาถึงกี่ปีหลังเรื่องแรก · cap = อายุเกินวัยชราเท่านี้ร่างหมดแรงแน่
@@ -1112,11 +1112,48 @@ export const ENTRY_EVENTS = {
     text: 'รถบรรทุกคันหนึ่งพุ่งมาทางม้าลาย ในหัวแวบขึ้นมาว่า แบบนี้ในนิยายเขาได้ไปต่างโลกกันนี่นา',
     choices: ['ยืนนิ่ง ลองดูสักตั้ง', 'กระโดดหลบตามสัญชาตญาณ'],
   },
+  door: {
+    bands: [1, 2], trip: true,
+    text: 'ประตูห้องเก็บของที่ปิดตายมาหลายปีแง้มออกเอง ข้างในเป็นทุ่งหญ้ากับท้องฟ้าที่มีดวงจันทร์สองดวง ลมพัดกลิ่นดอกไม้แปลก ๆ ออกมา',
+    choices: ['ก้าวข้ามธรณีประตูไปดู', 'ปิดประตูแล้วล็อกกุญแจ'],
+  },
 };
 
-// ไปต่างโลกได้ 2 แบบ (เจ้าของเคาะ): ตาย กับหายตัว — ป้ายอายุตอนจบทุกจุดแยกตามแบบ
+// ไปกลับกลางชีวิต (B68m): ร่างเดิมข้ามไปทั้งตัว ไม่เกิดใหม่ · stream แยกตอนกดรับ ⇒ ชีวิตที่ปฏิเสธเดินเท่าเดิม
+// years = ปีที่อยู่ต่างโลก · thai = น้ำหนักจำนวนปีไทยที่ผ่านไป (ช่องที่ i = i ปี · 0 = ไม่กี่เดือน) · back = โอกาสได้กลับของการ์ดหายตัว
+// roles = บทบาทที่เนื้อเรื่องเป็นคนถูกส่งข้ามไป · finale = ฉากสุดท้ายห่างจากวันมาถึงเท่ากับระยะเดิมของบทบาท
+// wit/gold/fame/know = ตัวหารแปลงค่าข้ามโลก (ความรู้ไทย→wit · ทอง→เงินต่อดัชนีราคา · ชื่อเสียง→เครือข่าย · ความรู้โลกเดิม→ความรู้)
+export const TRIP = { salt: 0x7219b3, years: [3, 12], thai: [6, 3, 2, 1], back: 0.5, roles: ['hero', 'slowlife'], wit: 10, gold: 20, fame: 5, know: 15, cap: 10 };
+
+// ไปต่างโลกได้ 2 แบบ (เจ้าของเคาะ): ตาย กับหายตัว — ป้ายอายุตอนจบทุกจุดแยกตามแบบ · ไปกลับแล้วตายในต่างโลก = หายตัว
 export const lifeEndWord = (gone) => (gone ? 'หายตัวไปตอนอายุ' : 'ตายอายุ');
-export const isGone = (st) => !!ENTRY_EVENTS[st?.isekaiVia]?.gone;
+export const isGone = (st) => !!ENTRY_EVENTS[st?.isekaiVia]?.gone || !!st?.tripLost;
+
+// ทอยตอนกดรับ: ได้ไปกลับไหม · กี่ปีต่างโลก · กี่ปีไทย — ดึงเลขครบทุกครั้งแม้ไม่ได้กลับ ลำดับจึงไม่ขึ้นกับผล
+export function tripRoll(seed, id, n = 0) {
+  const rng = makeRng(mixSeed(seed ^ TRIP.salt, n));
+  const back = rng.next() < TRIP.back;
+  const years = rng.int(TRIP.years[0], TRIP.years[1]);
+  let x = rng.next() * TRIP.thai.reduce((s, w) => s + w, 0);
+  const thai = Math.max(0, TRIP.thai.findIndex((w) => (x -= w) < 0));
+  const role = rng.pick(TRIP.roles);
+  const e = ENTRY_EVENTS[id];
+  return e.trip || (e.gone && back) ? { years, thai, role } : null;
+}
+
+// ทางเข้ามีหลายแบบ (ประตู วงเวท เกม ความฝัน) — ทางกลับจึงไม่เล่าว่าเป็นอะไร
+const TRIP_HOME = 'แล้ววันหนึ่งทางกลับบ้านก็เปิดขึ้นตรงหน้า';
+// ของที่พกกลับบ้าน — ค่าดิบต่อหน่วยของชีวิตไทย (ผู้เรียกคูณดัชนีราคาเอง) · ความรู้โลกเดิมรวมทุกหมวด
+export function tripCarry(isk) {
+  const know = Object.values(isk.know).reduce((s, v) => s + v, 0);
+  return {
+    gold: Math.max(0, isk.st.gold) * TRIP.gold,
+    network: Math.min(TRIP.cap, Math.max(0, isk.st.fame) / TRIP.fame),
+    knowledge: Math.min(TRIP.cap, know / TRIP.know),
+  };
+}
+// แถวทริปในผังตระกูลของชาติไทย — lore รูปเดียวกับแถวชาติต่างโลก ให้ isekaiWorldLore อ่านได้ทางเดียว
+export const tripLineage = (isk) => ({ world: roleInfo(isk.role).name, age: isk.trip.from, years: isk.age - isk.trip.from, ending: isk.ending.title, ...(isk.home && { home: true }), ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }) });
 
 export function entryOffers(seed) {
   const rng = makeRng(seed ^ ENTRY.salt);
@@ -1139,9 +1176,9 @@ export function entryCard(st, stage) {
   const e = ENTRY_EVENTS[o.id];
   st.pending = { entry: o.id, choices: e.choices.map((text) => ({ text })) };
   return {
-    kind: 'event', id: `isekai_${o.id}`, entry: o.id, gone: !!e.gone, type: 'B', national: false, funeral: false,
+    kind: 'event', id: `isekai_${o.id}`, entry: o.id, gone: !!e.gone, ...(e.trip && { trip: true }), type: 'B', national: false, funeral: false,
     age: st.age, stage, title: null, text: e.text, choices: [...e.choices],
-    fx: ['ชีวิตนี้จบตรงนี้ ไปต่างโลก', ''], locked: [null, null],
+    fx: [e.trip ? 'ไปต่างโลกช่วงหนึ่ง แล้วกลับมาชีวิตเดิม' : e.gone ? 'ไปต่างโลก อาจไม่ได้กลับมาอีก' : 'ชีวิตนี้จบตรงนี้ ไปต่างโลก', ''], locked: [null, null],
   };
 }
 
@@ -1150,11 +1187,12 @@ export function entryCard(st, stage) {
 // fated = ชีวิตนี้ถูกเรียกข้ามโลกจากการ์ดชวน (ธง isekai_call · ตายหรือหายตัว) — เทพธิดาโผล่แน่นอนแล้ว ได้โชคเพิ่ม
 // real = ค่าโลกจริงตอนข้าม { stats, money, unit (รายได้ครัวเรือนประเทศต่อปี), age } · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = ค่าตั้งต้นของโลกล้วน
 // lore = ของที่แต่ละโลกจำได้จากชาติก่อน ๆ ทั้งเซฟ ({ world: [id] } จาก isekaiWorldLore)
-export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {} }) {
+// trip = ไปกลับกลางชีวิต (B68m · tripRoll + age/wit จากชีวิตไทย) — ข้ามห้องสีขาว บทบาทมาจากการทอย เริ่มที่อายุไทย ถึงปีกลับ = จบแบบกลับบ้าน
+export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, trip = null }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
   const vow = blessed ? GODDESS_VOWS[(seed >>> 0) % GODDESS_VOWS.length].id : null;
-  return {
+  const isk = {
     rng, karma, past, run, memory, blessed, fated, ledger, vow, vowKept: null, vowHit: false,
     real: real && { ...real, stats: { ...real.stats } },
     worldOffers: isekaiRoleOffers(rng, karma, ISEKAI.worlds + (blessed ? 1 : 0)),
@@ -1164,6 +1202,14 @@ export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null
     age: 0, focus: null, focusOffers: [], stageShown: null, due: null, used: [], later: [], finaleDone: false,
     step: 'world', last: null, rbdUsed: false, dead: false, natural: false, ending: null, log: [], chron: [], cards: 0,
   };
+  if (trip) {
+    isk.trip = { ...trip, from: trip.age, until: trip.age + trip.years };
+    isekaiStart(isk, trip.role);
+    isk.age = trip.age;
+    isk.inner.wit += trip.wit ?? 0;
+    isk.step = 'skill';
+  }
+  return isk;
 }
 
 // สุ่มบทบาทไม่ซ้ำตามน้ำหนัก · กรรมเอียงน้ำหนักแต่ไม่ตัดบทบาทไหนทิ้ง · ชุดที่ไม่มีคนธรรมดา = แทนใบสุดท้าย
@@ -1253,7 +1299,7 @@ function linkBack(isk, k, d) {
 // โลกจำ (B68h · เจ้าของเคาะ ทั้งเซฟ ต่อโลก): อ่านจากแถวผังตระกูลต่างโลก ซึ่งส่งต่อทุกชาติอยู่แล้ว ⇒ ไม่ต้องมีที่เก็บใหม่ในเซฟ
 export function isekaiWorldLore(rows = []) {
   const out = {};
-  for (const l of rows) if (l.lore) out[l.lore.world] = [...new Set([...(out[l.lore.world] ?? []), ...l.lore.ids])];
+  for (const l of rows.flatMap((r) => [r, ...(r.trips ?? [])])) if (l.lore) out[l.lore.world] = [...new Set([...(out[l.lore.world] ?? []), ...l.lore.ids])];
   return out;
 }
 
@@ -1339,6 +1385,7 @@ function isekaiYear(isk) {
   isk.inner.joy = isekaiClamp(isk.inner.joy + (50 - isk.inner.joy) * Math.min(1, 0.1 * units), 0, 100);
   isk.age += units * p;
   if (isk.age >= oldAt + T.cap * p) isk.st.hp = 0;
+  if (isk.trip && isk.age >= isk.trip.until && isk.st.hp > 0) isk.home = true;
   return units * p;
 }
 
@@ -1354,7 +1401,8 @@ function isekaiDue(isk) {
   const T = ISEKAI_TIME;
   const w = roleInfo(isk.role);
   const take = (id) => (isk.used.push(id), id);
-  if (w.finale && !isk.finaleDone && isk.age >= w.finaleAge * isekaiPace(isk)) return take(w.finale);
+  const finaleAt = isk.trip ? isk.trip.from + w.finaleAge - w.startAge : w.finaleAge * isekaiPace(isk);
+  if (w.finale && !isk.finaleDone && isk.age >= finaleAt) return take(w.finale);
   const li = isk.later.findIndex((l) => l.age <= isk.age);
   if (li >= 0) return take(isk.later.splice(li, 1)[0].id);
   const roll = isk.rng.next();
@@ -1434,7 +1482,7 @@ export function nextIsekaiCard(isk) {
   if (isk.step === 'over') throw new Error('ชาติต่างโลกจบแล้ว — ปรโลกรับช่วงต่อ');
   if (isk.step === 'tick' && isk.due) isk.step = 'event';
   if (isk.step === 'event') return isekaiEventCard(isk, isekaiById[isk.due]);
-  if (isk.step === 'tick' && (isk.dead || isk.natural)) isk.step = 'end';
+  if (isk.step === 'tick' && (isk.dead || isk.natural || isk.home)) isk.step = 'end';
   // ตอนจบเป็นใบสุดท้ายของชาติต่างโลก ไม่มีตัวเลือก — กลับหรืออยู่ต่อเลือกที่การ์ดทางเกิดหลังปรโลกตัดสิน
   if (isk.step === 'end') {
     isk.ending = isekaiEnding(isk);
@@ -1442,7 +1490,8 @@ export function nextIsekaiCard(isk) {
     vowSettle(isk);
     return isekaiCard(isk, {
       // การ์ดปรโลกใบถัดไปเล่าเรื่องดวงวิญญาณถูกดึงกลับเอง ใบนี้จึงปิดแค่ชีวิตในโลกนี้ · ตอนจบแบบตายเล่าการตายไว้แล้ว
-      step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : `${isk.ending.text} แล้วจากไปอย่างสงบตอนอายุ ${isk.age}`, ending: isk.ending.id, age: isk.age,
+      step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : isk.home ? `${isk.ending.text} ${TRIP_HOME}` : `${isk.ending.text} แล้วจากไปอย่างสงบตอนอายุ ${isk.age}`, ending: isk.ending.id, age: isk.age,
+      ...(isk.home && { home: true }),
       choices: [],
       log: isk.log.slice(),
       chronicle: isk.chron.slice(),
@@ -1484,7 +1533,7 @@ export function nextIsekaiCard(isk) {
       revived = true;
     } else isk.dead = true;
   }
-  if (!isk.dead && !isk.natural) isk.due = isekaiDue(isk);
+  if (!isk.dead && !isk.natural && !isk.home) isk.due = isekaiDue(isk);
   // ความรู้ถึงเกณฑ์กลางช่วงวัย: ทางลัดต่อท้ายรายการทันที ไม่ต้องรอช่วงวัยถัดไป (ลำดับเดิมไม่เลื่อน เซฟที่เล่นซ้ำจึงตรง)
   const opened = isekaiKnowOffers(isk, stage).filter((id) => !isk.focusOffers.includes(id));
   isk.focusOffers.push(...opened);
