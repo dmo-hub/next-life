@@ -1887,10 +1887,11 @@ function isekaiMeter(label, v, cls) {
   return m;
 }
 // จดหมายเหตุบนการ์ดจบ (B68b ชิ้น 3): แบ่งตามช่วงวัย เก่าอยู่บน ช่วงสุดท้ายเปิดค้าง (เจ้าของเคาะ)
-// บรรทัดรับได้ทั้งสตริง "อายุ N · …" ของ engine เดิม และ { age, stage, kind, text, deltas } ที่ขอเลน D ไว้ — มี deltas ถึงขึ้น chip
+// บรรทัดรับได้ทั้งสตริง "อายุ N · …" ของเซฟเก่า และ { age, until?, stage, kind, text, deltas } ของ engine — มี deltas ถึงขึ้น chip
+// ตาหลายปีของ engine บอกปลายช่วงเป็น until · จอใช้ชื่อ to ชุดเดียวกับที่แยกจากสตริง
 const CHRON_AGE = /^อายุ (\d+)(?:–(\d+))? · (.*)$/;
 function chronEntry(x) {
-  if (typeof x !== 'string') return x;
+  if (typeof x !== 'string') return { ...x, to: x.until ?? null };
   const m = CHRON_AGE.exec(x);
   // บรรทัดเหตุการณ์มีหัวเรื่องคั่น · ส่วนบรรทัดทุ่มเทเป็นประโยคเดียว · ไม่มีอายุ = บรรทัดระบบตอนเข้าโลก
   if (!m) return { age: null, kind: 'lore', text: x };
@@ -1925,7 +1926,8 @@ function chronicleBox(lines, s) {
     const ol = el('ol', 'ilog');
     for (const e of rows) {
       const li = el('li', e.kind);
-      if (e.age !== null) li.append(el('b', null, e.to ? `${e.age}–${e.to}` : String(e.age)));
+      // บรรทัดเข้าโลกมีอายุไว้จัดช่วงวัย แต่เป็นเรื่องของโลก ไม่ใช่ปีของตัวละคร — ไม่ขึ้นเลขอายุ
+      if (e.age !== null && e.kind !== 'lore') li.append(el('b', null, e.to ? `${e.age}–${e.to}` : String(e.age)));
       li.append(el('span', null, e.text));
       for (const [k, v] of Object.entries(e.deltas ?? {})) if (label[k] && v) li.append(el('small', v > 0 ? 'up' : 'down', `${label[k]} ${v > 0 ? '+' : ''}${v}`));
       ol.append(li);
