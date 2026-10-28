@@ -303,6 +303,50 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .ix-ask { margin:0 0 4px; font-size:14px; font-weight:600; }
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
 .a .choice:disabled, .b .choice:disabled, .i .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
+/* พาแนลการ์ด (B131): จอตั้งไม่มีพาแนล — ตัวห่อหายไปจากเลย์เอาต์ ลูกเรียงในการ์ดแบบเดิม */
+.p-left, .p-mid { display:contents; }
+.p-side { display:none; }
+/* จอแนวนอนเตี้ย (มือถือหมุนจอ · B131 แบบ C2 ที่เจ้าของเคาะ) — แท็บเล็ต 768 สูงพอ ไม่เข้าเงื่อนไข หน้าตาเดิม
+   · ซ้าย = หัวการ์ด ค่าสถานะ แผง · กลาง = เรื่องต่อด้วยปุ่ม · ขวา = สมุด/ฉายา (ติดจอ)
+   · หัวเว็บย่อเป็นแถบบาง ชื่อเกมบรรทัดเดียว — จอสูง ~390 หัวเว็บเต็มกินเกือบครึ่งจอ */
+@media (orientation: landscape) and (max-height: 540px) {
+  .logo { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:0 10px; padding:calc(4px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 4px max(16px, env(safe-area-inset-left)); }
+  .logo b { font-size:18px; line-height:1.3; white-space:nowrap; }
+  .logo small { display:none; }
+  .logo .ver, .logo .saved { margin-top:0; }
+  #app, .foot { max-width:1100px; }
+  #app { padding-top:8px; }
+  .card:not(.pn) { max-width:460px; margin:0 auto; }
+  .card.pn { display:grid; grid-template-columns:minmax(0, 0.9fr) minmax(0, 1.35fr) minmax(0, 0.75fr); align-items:start; min-height:0; }
+  .p-left, .p-mid { display:flex; flex-direction:column; min-width:0; }
+  .p-left { grid-column:1; }
+  .p-mid { grid-column:2; border-left:1px dashed color-mix(in srgb, currentColor 30%, transparent); }
+  .p-mid > .choices { margin-top:0; padding-top:4px; }
+  .p-side { grid-column:3; grid-row:1; position:sticky; top:8px; margin:12px; padding:10px 12px; display:flex; flex-direction:column; gap:4px; border:1px dashed color-mix(in srgb, currentColor 35%, transparent); border-radius:6px; font-size:13px; }
+  .p-side .h { font-weight:600; }
+  .p-side .h ~ .h { margin-top:8px; }
+  .p-side .note { margin:0; font-size:12px; opacity:0.8; overflow-wrap:anywhere; }
+  .p-side .more { all:unset; align-self:flex-start; min-height:44px; cursor:pointer; font-size:13px; font-weight:600; text-decoration:underline; }
+  .p-side .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+  .top { padding:8px 16px; }
+  .stats { padding:6px 12px; }
+  .meta, .tree, .family, .stat-help { padding-left:12px; padding-right:12px; }
+  /* พาแนลซ้ายแคบ: หัวการ์ดตัดบรรทัดเป็นแถว (ไม่งั้นอายุเหลือคำละบรรทัด) · ค่าสถานะ 3 ช่องต่อแถว ป้าย "ความสุข" ไม่ขาดกลางคำ */
+  .p-left .top { flex-wrap:wrap; gap:4px 10px; }
+  .p-left .top small { flex-basis:100%; text-align:left; }
+  .p-left .stats { flex-wrap:wrap; gap:6px 10px; }
+  .p-left .stats > div { flex:1 1 calc(33% - 10px); }
+  /* พาแนลกลาง: เรื่องกับปุ่มอยู่คอลัมน์เดียว — บีบภาพ ระยะ และตัวอักษรให้ปุ่มขึ้นในจอแรกให้มากที่สุด */
+  .p-mid .body { padding:10px 16px 6px; gap:6px; }
+  .p-mid .body h3 { font-size:20px; }
+  .p-mid .body h3.lead { font-size:17px; }
+  .p-mid .body p { font-size:14px; }
+  .p-mid .choice { min-height:44px; padding:6px 12px; font-size:14px; }
+  .era-art { width:min(100%, 160px); }
+  .scene { height:64px; }
+  .spark.strip { width:min(100%, 360px); }
+  .choice .fx span { white-space:normal; }
+}
 </style>
 </head>
 <body>
@@ -5768,7 +5812,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.83';
+const APP_VERSION = 'v0.2.84';
 const APP_BUILD = '2026-10-28';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
@@ -7248,7 +7292,7 @@ function render(card) {
     }
   }
   box.append(body, choices);
-  root.append(box);
+  root.append(panels(box));
 }
 
 // กล่องกระซิบ (B117): สอนระบบที่เพิ่งโผล่ครั้งแรกตามวัย ในเสียงยาย · บอกแค่ทิศ ไม่บอกตัวเลข/สูตร/บัญชีบุญบาป (กติกาเดียวกับ B31)
@@ -7314,24 +7358,48 @@ function whisperFor(card, free) {
 function foldLater(box, body, choices, card) {
   const later = el('button', 'more later', 'พับไว้ก่อน ไปดูสถานะ');
   later.onclick = () => {
-    const panels = [...box.querySelectorAll(':scope > details')];
-    const was = panels.map((d) => d.open);
-    panels.forEach((d) => (d.open = true));
+    const folds = [...box.querySelectorAll(':scope > .p-left > details')];
+    const was = folds.map((d) => d.open);
+    folds.forEach((d) => (d.open = true));
     body.hidden = choices.hidden = true;
     const bar = el('div', 'choices folded');
     bar.append(el('p', 'note', `การ์ดรอให้เลือกอยู่ · ${clip(card.title ?? card.text, 48)}`));
     const back = enter(button('กลับมาเลือก', null, () => {
-      panels.forEach((d, i) => (d.open = was[i]));
+      folds.forEach((d, i) => (d.open = was[i]));
       bar.remove();
       body.hidden = choices.hidden = false;
       choices.querySelector('button.choice:not(:disabled)')?.focus();
     }));
     bar.append(back);
-    box.append(bar);
+    // ต่อท้ายพาแนลกลาง (ที่เดียวกับปุ่มเดิม) — ต่อท้ายการ์ดตรง ๆ จอแนวนอนจะไปตกช่องกริดที่ไม่ได้จองไว้
+    body.parentElement.append(bar);
     scrollTo(0, 0);
     back.focus({ preventScroll: true });
   };
   return later;
+}
+
+// จอแนวนอนเตี้ย (B131 แบบ C2): ห่อลูกการ์ดเป็นพาแนลซ้าย (หัว ค่าสถานะ แผง) · กลาง (เรื่องต่อด้วยปุ่ม) · ขวา (สมุด · ฉายา)
+// จอตั้งตัวห่อเป็น display:contents และพาแนลขวาซ่อน ⇒ หน้าตาเดิม · ห่อทุกขนาดจอ หมุนจอกลางเกมจึงไม่ต้องวาดการ์ดใหม่
+// กริดวางหลายลูกต่อกันในคอลัมน์เดียวโดยแถวไม่สูงตามคอลัมน์ข้าง ๆ ไม่ได้ จึงต้องมีตัวห่อ
+function panels(box) {
+  const left = el('div', 'p-left');
+  const mid = el('div', 'p-mid');
+  for (const k of [...box.children]) (k.classList.contains('body') || k.classList.contains('choices') ? mid : left).append(k);
+  box.classList.add('pn');
+  box.append(left, mid, sidePanel());
+  return box;
+}
+// พาแนลขวา: ทางเข้าชั้นสมุด + ความคืบหน้าสมุดฉายา · กระเป๋ายังไม่มีระบบ จึงยังไม่มีช่อง (เพิ่มเมื่อมีของ)
+// ปุ่มเป็นลิงก์ ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด เปิดชั้นสมุดแล้วกลับมาการ์ดเดิม
+function sidePanel() {
+  const side = el('aside', 'p-side');
+  side.setAttribute('aria-label', 'สมุดและฉายา');
+  const b = bookRead();
+  const p = picsRead();
+  side.append(el('div', 'h', 'สมุด'), el('p', 'note', `อนุสรณ์ ${memoRead().l.length} ชีวิต · ภาพบ้านเมือง ${picsGot(p)}/${PIC_ALL}`), shelfButton('เปิดชั้นสมุด'));
+  side.append(el('div', 'h', 'ฉายา'), el('p', 'note', `สะสมแล้ว ${bookGot(b)}/${BOOK_ALL}`), shelfBar(bookGot(b), BOOK_ALL), shelfButton('ดูสมุดฉายา', 't'));
+  return side;
 }
 
 const genLabel = () => (st.gen > 1 ? `รุ่นที่ ${st.gen} · ` : '');
@@ -7592,7 +7660,7 @@ function renderAfter(card) {
   box.append(top);
   if (court) box.append(courtScene());
   box.append(body, choices);
-  root.append(box);
+  root.append(panels(box));
 }
 
 // ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
@@ -7670,7 +7738,7 @@ function renderIsekai(card) {
   box.append(top);
   if (s) box.append(isekaiStatusBox(s));
   box.append(body, choices);
-  root.append(box);
+  root.append(panels(box));
 }
 
 // เซฟรุ่นเก่า (v1) = seed ต้นตระกูล + ลำดับปุ่มที่กด แล้วเล่นซ้ำตอนโหลด — เนื้อหาเปลี่ยนแล้วเล่นซ้ำได้คนละชีวิต
@@ -7906,7 +7974,7 @@ function openBook(death) {
     if (!last) row.append(button('ข้ามสมุด', null, done));
     choices.append(row);
     box.append(top, body, choices);
-    root.append(box);
+    root.append(panels(box));
   };
   show(0);
 }
