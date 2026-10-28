@@ -1,0 +1,122 @@
+# การ์ดเลือกยาก (B98): ไม่มีทางสะอาด ทุกตัวเลือกได้บุญหมวดหนึ่งและบาปอีกหมวดหนึ่ง · ข้อความไม่ตัดสินว่าทางไหนผิด ผลไปอยู่ที่ครอบครัว/เงิน/สุขภาพ
+# หมวดบาปเลือกจากว่าใครเป็นคนเจ็บ:
+#   abuse_elders     พ่อแม่/ผู้ใหญ่ถูกทิ้ง ถูกข้ามความต้องการ หรือเจ็บใจจากเรา
+#   oppress_subjects ภาระตกไปที่คนที่อยู่ใต้การดูแลหรืออำนาจเรา (ลูก · คู่ชีวิตที่ต้องแบกแทน · คนที่เราจ้าง)
+#   unjust_judgment  เราตัดสินแทนคนอื่น หรือเลือกว่าใครต้องรับเคราะห์
+#   greed_harm       เอาประโยชน์ฝั่งเราไปเบียดคนอื่นที่ไม่ได้ยินยอม
+events:
+  - id: dilemma_mother_or_tuition_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2540, 2650]
+    systems: [student_loan]
+    lore_ref: lore-finance-series.html#6
+    weight: 6
+    when: {family: [{role: parent, sex: หญิง, alive: true}, {role: child, alive: true, age: [17, 19]}]}
+    title: "เงินก้อนเดียว"
+    text: "หมอบอกว่าแม่ต้องผ่าตัดหัวใจ ส่วนที่สิทธิรักษาไม่ครอบคลุมต้องจ่ายเอง ปีเดียวกับที่ลูกสอบติดคณะที่ฝันมาตลอด เงินเก็บที่มีพอสำหรับทางเดียว"
+    choices:
+      - id: mother_first
+        text: "จ่ายค่าผ่าตัดแม่ ลูกรอปีหน้า"
+        effects: {money: {unit: income_x, amount: -1.5}, relations: -1, happiness: -1}
+        merit: [{cat: care_parents, level: 2}, {cat: oppress_subjects, level: 1}]
+      - id: child_first
+        text: "ส่งลูกเรียน แม่รอคิวรัฐ"
+        outcomes:
+          - {weight: 1, text: "แม่ได้คิวผ่าตัดในอีกแปดเดือน ระหว่างรอต้องพาเข้าโรงพยาบาลกลางดึกสองครั้ง", effects: {money: {unit: income_x, amount: -1.5}, happiness: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แม่ได้คิวเร็วกว่าที่คิด ผ่าตัดเสร็จทันก่อนลูกเปิดเทอม", effects: {money: {unit: income_x, amount: -1.5}, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: help_others, level: 2}, {cat: abuse_elders, level: 1}]
+      - id: child_loan
+        text: "จ่ายค่าแม่ ให้ลูกกู้ กยศ."
+        effects: {money: {unit: income_x, amount: -1.5}, happiness: -1}
+        merit: [{cat: care_parents, level: 1}, {cat: help_others, level: 1}, {cat: oppress_subjects, level: 1}]
+      - id: sell_land
+        text: "ขายที่ดินที่แม่หวงไว้"
+        effects: {money: {unit: income_x, amount: 0.5}, relations: -2, happiness: -1}
+        merit: [{cat: care_parents, level: 1}, {cat: help_others, level: 1}, {cat: abuse_elders, level: 1}]
+
+  - id: dilemma_father_diagnosis_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 6
+    when: {family: [{role: parent, sex: ชาย, alive: true}]}
+    title: "หมอเรียกคุยคนเดียว"
+    text: "ผลชิ้นเนื้อของพ่อออกแล้ว หมอเรียกคุณเข้าไปคุยคนเดียว มะเร็งระยะท้าย เหลือเวลาราวหนึ่งปี พอเปิดประตูออกมา พ่อถามทันทีว่าหมอว่ายังไง"
+    choices:
+      - id: tell_all
+        text: "บอกพ่อตรง ๆ ทั้งหมด"
+        effects: {happiness: -2, relations: 1}
+        merit: [{cat: sila, level: 1}, {cat: abuse_elders, level: 1}]
+      - id: soften
+        text: "บอกแค่ว่าต้องรักษาต่อ"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: care_parents, level: 1}, {cat: unjust_judgment, level: 1}]
+      - id: trip_first
+        text: "พาพ่อเที่ยวก่อน ค่อยบอก"
+        effects: {money: {unit: income_x, amount: -0.5}, happiness: 1, relations: 1}
+        merit: [{cat: care_parents, level: 2}, {cat: unjust_judgment, level: 1}]
+      - id: doctor_tells
+        text: "ขอให้หมอเป็นคนบอก"
+        effects: {happiness: -1}
+        merit: [{cat: bhavana, level: 1}, {cat: abuse_elders, level: 1}]
+
+  - id: dilemma_team_cut_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [28, 55]}
+    title: "ต้องมีชื่อหนึ่งชื่อ"
+    text: "บริษัทต้องลดคนในทีมหนึ่งคน หัวหน้าขอให้คุณเสนอชื่อภายในพรุ่งนี้ ตัวเลือกคือรุ่นพี่ที่ทำงานช้าลงแต่หาเลี้ยงบ้านคนเดียว กับน้องใหม่ฝีมือดีที่เพิ่งย้ายมาจากต่างจังหวัด"
+    choices:
+      - id: name_senior
+        text: "เสนอชื่อรุ่นพี่"
+        effects: {network: 1, relations: -1, happiness: -1}
+        merit: [{cat: help_others, level: 1}, {cat: unjust_judgment, level: 1}]
+      - id: name_junior
+        text: "เสนอชื่อน้องใหม่"
+        effects: {network: -1, relations: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}, {cat: unjust_judgment, level: 1}]
+      - id: cut_all_pay
+        text: "เสนอลดเงินเดือนทั้งทีมแทน"
+        outcomes:
+          - {weight: 1, text: "หัวหน้ารับข้อเสนอ ทั้งทีมได้อยู่ต่อแต่เงินหายไปคนละก้อน หลายคนไม่ทักคุณไปหลายเดือน", effects: {money: {unit: income_x, amount: -0.3}, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าไม่รับ ขอชื่อคนเดิมภายในเย็นนี้ และจำได้ว่าคุณเลี่ยงงาน", effects: {network: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: help_others, level: 1}, {cat: greed_harm, level: 1}]
+      - id: name_self
+        text: "เสนอชื่อตัวเอง"
+        effects: {money: {unit: income_x, amount: -1}, network: 2, happiness: -1}
+        merit: [{cat: help_others, level: 2}, {cat: oppress_subjects, level: 1}]
+
+  - id: dilemma_father_care_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2530, 2650]
+    weight: 6
+    when: {flags: {has: [married]}, family: [{role: parent, sex: ชาย, alive: true}, {role: spouse, alive: true}]}
+    title: "เดินออกจากบ้านกลางดึก"
+    text: "พ่อหลงลืมหนักขึ้น เดือนนี้เดินออกจากบ้านกลางดึกไปแล้วสองครั้ง ครั้งล่าสุดคนขายข้าวต้มต้องโทรตามให้ไปรับ คู่ชีวิตของคุณบอกตรง ๆ ว่าดูแลคนเดียวไม่ไหวแล้ว"
+    choices:
+      - id: care_home
+        text: "ส่งพ่อเข้าบ้านพักคนชรา"
+        effects: {money: {unit: income_x, amount: -0.8}, happiness: -1, relations: 1}
+        merit: [{cat: help_others, level: 1}, {cat: abuse_elders, level: 1}]
+      - id: quit_self
+        text: "ลาออกมาดูแลพ่อเอง"
+        effects: {money: {unit: income_x, amount: -1.5}, happiness: -1, health: -1, relations: 1}
+        merit: [{cat: care_parents, level: 2}, {cat: oppress_subjects, level: 1}]
+      - id: spouse_quits
+        text: "ขอให้คู่ชีวิตออกจากงาน"
+        effects: {money: {unit: income_x, amount: -1}, relations: -2}
+        merit: [{cat: care_parents, level: 1}, {cat: oppress_subjects, level: 2}]
+      - id: cheap_carer
+        text: "จ้างคนดูแลค่าแรงถูก ไม่มีวันหยุด"
+        outcomes:
+          - {weight: 2, text: "คนดูแลอยู่ได้ครึ่งปี พ่อเรียกชื่อเธอได้ทุกเช้า", effects: {money: {unit: income_x, amount: -0.5}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนดูแลหนีกลับบ้านตอนตีสี่ ทิ้งพ่อไว้กับประตูที่ไม่ได้ล็อก", effects: {money: {unit: income_x, amount: -0.3}, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: care_parents, level: 1}, {cat: oppress_subjects, level: 1}]
