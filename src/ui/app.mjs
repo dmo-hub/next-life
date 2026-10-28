@@ -1471,8 +1471,6 @@ function render(card) {
     // จอแคบให้ตัดบรรทัดได้แค่ที่ตัวคั่น — เบราว์เซอร์ตัดคำไทยกลาง "ราย|ได้" ได้แม้เว้นวรรคแบบไม่ตัด จึงต้องห่อ span
     for (const t of purse) meta.append(' · ', el('span', null, t));
     box.append(meta);
-    const strip = lifeStrip();
-    if (strip) box.append(strip);
     const fam = familyPanel();
     if (fam) box.append(fam);
     const tree = familyTree();
@@ -1810,72 +1808,7 @@ function petsWaiting(s) {
   return `ระหว่างทาง ${who} นั่งรออยู่ข้างทาง แล้วเดินตามไปด้วยจนถึงหน้าปรโลก`;
 }
 
-// แถบชีวิตสดระหว่างเล่น (B53): เงิน · สุขภาพ · ความสุข ตั้งแต่เกิดถึงตอนนี้ + หมุดเรื่องที่ผ่านมา
-// อ่านจุดรายปีที่แกนจดไว้แล้วชุดเดียวกับกราฟการ์ดตาย — โหลดเซฟเล่นซ้ำได้รูปเดิม ไม่เก็บอะไรเพิ่ม
-// ระหว่างชีวิตห้ามบอกค่าเป็นตัวเลข: ไม่มีแกนตั้ง เงินวัดเทียบกับต่ำสุด–สูงสุดของชีวิตนี้เอง
-const STRIP_LINES = [['money', 2], ['health', 0], ['happiness', 1]];
-let stripOpen = true;
-function stripPoints() {
-  const stats = st.statTrail.filter((p) => p.age < st.age);
-  stats.push({ age: st.age, ...Object.fromEntries(STAT_KEYS.map((k) => [k, Math.round(st[k])])) });
-  const money = st.trail.map((p) => ({ age: p.year - st.birthYear, money: p.money })).filter((p) => p.age < st.age);
-  money.push({ age: st.age, money: Math.round(st.money) });
-  return { stats, money };
-}
 const clip = (t, n) => (t.length > n ? `${t.slice(0, n - 1)}…` : t);
-// หมุดที่ใกล้กันกว่านี้ (หน่วย viewBox ≈ px ที่จอ 390) รวมเป็นหมุดเดียว — ชีวิตยาวมีเรื่องหลายสิบเรื่อง นิ้วแตะแยกไม่ได้
-const STRIP_GAP = 10;
-function stripMarks(x) {
-  const ms = [];
-  for (const p of bookCards) {
-    // หมุดเอาแค่เรื่องบ้านเมืองกับงาน/ครอบครัว — เรื่องจิปาถะทุกปีทำให้หมุดแน่นเกิน
-    if (p.w < BOOK_W.near) continue;
-    const c = p.card;
-    const t = clip(c.news?.text ?? c.title ?? c.text, 60);
-    const last = ms.at(-1);
-    if (last && x(c.age) - x(last.from) < STRIP_GAP) {
-      last.to = c.age;
-      last.ts.push(t);
-    } else ms.push({ from: c.age, to: c.age, ts: [t] });
-  }
-  return ms.map((m) => ({
-    age: m.from,
-    text: `อายุ ${m.from === m.to ? m.from : `${m.from}–${m.to}`} · ${m.ts.slice(0, 2).join(' / ')}${m.ts.length > 2 ? ` และอีก ${m.ts.length - 2} เรื่อง` : ''}`,
-  }));
-}
-function lifeStrip() {
-  const { stats, money } = stripPoints();
-  if (stats.length < 2) return null;
-  // ขอบซ้ายขวาเผื่อรัศมีหมุด — หมุดปีปัจจุบันอยู่ชิดขวาสุดเสมอ
-  const W = 320, H = 46, T = 3, B = 8, L = 4, R = 4;
-  const x = (a) => L + (a / Math.max(st.age, 1)) * (W - L - R);
-  const y = (f) => T + (1 - f) * (H - T - B);
-  const svg = svgEl('svg', { class: 'spark strip', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `เงิน สุขภาพ และความสุข อายุ 0 ถึง ${st.age}` });
-  stageBands(svg, x, 0, st.age, T, H - B, false);
-  const nom = money.map((p) => p.money);
-  let lo = Math.min(...nom), hi = Math.max(...nom);
-  if (hi === lo) hi = lo + 1;
-  const frac = { money: (v) => (v - lo) / (hi - lo), health: (v) => v / 100, happiness: (v) => v / 100 };
-  if (lo < 0 && hi > 0) svg.append(svgEl('line', { class: 'zero', x1: L, x2: W - R, y1: y(frac.money(0)), y2: y(frac.money(0)) }));
-  const legend = el('ul', 'legend');
-  for (const [k, i] of STRIP_LINES) {
-    const pts = (k === 'money' ? money : stats).map((p) => `${x(p.age).toFixed(1)},${y(frac[k](p[k])).toFixed(1)}`).join(' ');
-    svg.append(svgEl('polyline', { class: `ln ln${i}`, points: pts, 'stroke-dasharray': LINE_DASH[i] }));
-    legend.append(legendItem(i, STAT_LABELS[k]));
-  }
-  // บรรทัดเรื่องว่างไว้จนแตะหมุด แถบจึงเตี้ยพอบนจอแคบ
-  const cap = el('p', 'mk-cap');
-  cap.setAttribute('aria-live', 'polite');
-  for (const m of stripMarks(x)) markDot(svg, cap, x(m.age), H - B / 2, 3, m.text, 'ev');
-  const d = el('details', 'tree strip-d');
-  d.open = stripOpen;
-  d.addEventListener('toggle', () => (stripOpen = d.open));
-  // ป้ายเส้นอยู่บรรทัดเดียวกับหัวแผง ไม่กินอีกบรรทัด
-  const sum = el('summary', null, 'ชีวิตนี้');
-  sum.append(legend);
-  d.append(sum, svg, cap);
-  return d;
-}
 
 // ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะ — ชีวิตจบแล้ว
 const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ปรโลก', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ' };
