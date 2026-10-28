@@ -74,13 +74,14 @@ function fxLine(fx, goalName) {
 }
 
 // เงื่อนไขของเรื่องความรู้โลกเดิม (B68h) — หน้ารวมการ์ดไม่บอก เพราะจอไม่บอก
-const knowTags = (e) => [e.know && `ความรู้${ISEKAI_KNOW[e.know.cat].name}${e.know.min ? ` ถึง ${e.know.min}` : ''}`, e.adult && 'วัยผู้ใหญ่ขึ้นไป', e.loreOf && `ไม่มาในโลกที่จำ${ISEKAI_LORE[e.loreOf]}แล้ว`, e.legend && `มาเฉพาะโลกที่จำคนต่างโลกรุ่นก่อนเป็น${e.legend === 'dark' ? 'คนร้าย' : 'วีรบุรุษ'}`, e.bless && 'มาเฉพาะคนที่กรรมเป็นบวกหรือเทพธิดาอารมณ์ดี'].filter(Boolean);
+const knowTags = (e) => [e.know && `ความรู้${ISEKAI_KNOW[e.know.cat].name}${e.know.min ? ` ถึง ${e.know.min}` : ''}`, e.adult && 'วัยผู้ใหญ่ขึ้นไป', e.loreOf && `ไม่มาในโลกที่จำ${ISEKAI_LORE[e.loreOf]}แล้ว`, e.legend && `มาเฉพาะโลกที่จำคนต่างโลกรุ่นก่อนเป็น${e.legend === 'dark' ? 'คนร้าย' : 'วีรบุรุษ'}`, e.bless && 'มาเฉพาะคนที่กรรมเป็นบวกหรือเทพธิดาอารมณ์ดี', e.trip === 'quest' && 'มาเมื่อตามหาทางกลับบ้านครบปี (เฉพาะคนที่ข้ามมาทั้งตัว)', e.trip === 'event' && 'มาเฉพาะคนที่ข้ามมาทั้งตัว หลังอยู่ครบปีที่บ้านผ่านไป'].filter(Boolean);
 
 function resultLine(kind, o, goalName) {
   const ex = [...fxLine(o.fx, goalName)];
   if (o.lore) ex.push(esc(`โลกจำ${ISEKAI_LORE[o.lore]}ถ้าชื่อเสียงถึง ${ISEKAI_KNOW_T.loreFame}`));
   for (const f of [o.flag, o.flag2]) if (f) ex.push(f === 'won' ? 'ชนะฉากสุดท้าย' : `ติด${flag(f)}`);
   if (o.skill) ex.push('ได้สกิลสุ่ม 1 อย่างที่ยังไม่มี');
+  if (o.home) ex.push('กลับบ้าน ชีวิตเดิมเดินต่อ');
   if (o.potion) ex.push(esc(`ดื่มยาต่ออายุทันที อายุขัย +${ISEKAI_POTION.years} ปี (รวมไม่เกิน ${ISEKAI_POTION.cap} ปีต่อชาติ) · ขวดที่ ${ISEKAI_POTION.free + 1} ขึ้นไปลงบาป${meritName('against_nature')}`));
   return `<li><p><b class="rk">${kind}</b> ${text(o.text)}</p>${ex.length ? `<p class="fx">${ex.join(' · ')}</p>` : ''}</li>`;
 }
