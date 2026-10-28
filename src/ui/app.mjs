@@ -901,6 +901,8 @@ function shareFacts(card) {
     pattern: { name: pattern.name, hint: pattern.hint ?? '' },
     title: titles[0] ? { name: titles[0].name, tier: titles[0].tier } : null,
     avatar: avatarParts(card.age),
+    // ชาติประจำวันกำหนดแค่ชีวิตแรก · ลิงก์เพื่อนไม่ใส่ป้ายบนภาพ (การ์ดตายบอกอยู่แล้ว)
+    day: st.gen === 1 && save.from?.day ? save.from.day : null,
   };
 }
 
@@ -1053,6 +1055,11 @@ async function shareBlob(facts) {
     // ชื่อยาวแตกสองบรรทัดตรงช่องว่าง — ให้ย่อบรรทัดเดียวจะเล็กจนอ่านยากบนภาพแนวตั้ง
     for (const part of GAME_NAME.split(' ')) text(part, '700 84px Srisakdi, serif', c('gold'), 96, 0, 1);
     text('NEXT LIFE', '600 28px Sarabun, sans-serif', c('sand'), 44, 0, 1);
+    // ใต้ชื่อเกม = เห็นก่อนเนื้อชีวิต คนที่เห็นภาพรู้ว่าเกิดชีวิตเดียวกันได้วันนี้
+    if (facts.day) {
+      y += 18;
+      text(`ชาติประจำวัน ${facts.day}`, '600 46px Sarabun, sans-serif', c('gold2'), 60, 28, 1);
+    }
     // รูปวัยสุดท้ายนั่งกลางเส้นคั่นแรก (B56) — ไม่กินที่เพิ่ม
     rule(44);
     if (draw) {
