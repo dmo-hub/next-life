@@ -2,7 +2,7 @@
 // ด่าน: seed เดิมผลเดิม (รวดเดียว + เซฟ/โหลดกลางทาง) · จบได้ทุกชีวิตภายในเพดานการ์ด · ตอนจบ/บทบาท/สกิล/เหตุการณ์มีบอทถึง
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
-import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_TIME, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 
@@ -99,6 +99,8 @@ const SHORTCUT = Object.fromEntries(Object.entries(ISEKAI_KNOW).map(([k, v]) => 
 let knowAdultBad = 0, loreSys = 0, loreBad = 0, loreGot = 0;
 // ตำนาน (B68i): เหตุการณ์ตำนานมาเฉพาะโลกที่จำแบบนั้น เรียกชื่อถูก ไม่เหลือ {legend} · การ์ดจบมีช่องตำนานตรงเกณฑ์
 let legendEvBad = 0, legendTextBad = 0, legendEndBad = 0, legendGot = 0, legendDark = 0;
+let potionBad = 0, potionOver = 0;
+const potionFrom = [], potionAdd = {};
 // เวลาเดินเอง (B68b): ใบตาไม่มีตัวเลือก แต่บอกสิ่งที่ทุ่มเทได้ · การ์ดบทบาทมีคนธรรมดาเสมอ · สิ้นอายุเฉพาะหลังวัยชรา
 let tickBad = 0, roleBad = 0, oldBad = 0;
 const lens = [], clicks = [], humanAges = [];
@@ -160,6 +162,17 @@ Object.values(BOTS).forEach((bot, b) => {
     seen.end.add(`${isk.role}:${isk.ending.id}`);
     seen.role.add(isk.role);
     for (const s of isk.skills) seen.skill.add(s);
+    // ยาต่ออายุ (B68k): อายุที่ต่อตรงกับจำนวนขวดแต่ไม่เกินเพดาน · บาปฝืนธรรมชาติเฉพาะขวดที่เกิน free · ตายจากความแก่ไม่เกินเพดานใหม่
+    const P = ISEKAI_POTION;
+    const drunk = isk.potions.length;
+    if (isk.lifeAdd !== Math.min(P.cap, drunk * P.years) || (isk.ledger.byCat.against_nature ?? 0) !== Math.max(0, drunk - P.free) * 0.5 * P.level) potionBad++;
+    if (isk.age > (ISEKAI_STAGES.at(-1).from + isk.lifeAdd + ISEKAI_TIME.cap + ISEKAI_TIME.oldStep) * pace) potionBad++;
+    for (const id of isk.potions) (potionFrom[b] ??= new Set()).add(id);
+    if (drunk) {
+      const g = isk.potions.every((id) => id === 'pt_shop') ? 'shop' : isk.potions.includes('pt_shop') ? 'mix' : 'other';
+      (potionAdd[g] ??= []).push(isk.lifeAdd);
+    }
+    if (drunk > P.free) potionOver++;
   }
 });
 
@@ -182,6 +195,14 @@ check('ความรู้อันตรายเฉพาะวัยผู�
 // ทุกครั้งที่บอกว่าโลกจะจำ ต้องลงรายการจริง และชื่อเสียงถึงเกณฑ์ (สำเร็จ + คนยอมรับ)
 check('โลกจำเฉพาะที่ชื่อเสียงถึง', loreBad + (loreSys !== loreGot ? 1 : 0), `${loreGot} รายการ`);
 check('เหตุการณ์ตำนานมาเฉพาะโลกที่จำแบบนั้น + เรียกชื่อคนในตำนาน', legendEvBad + legendTextBad);
+// ยาต่ออายุ (B68k): ทุกบอทได้ยาครบทุกทาง · ต้องมีชาติที่ดื่มเกิน free ให้ด่านบาปได้ตรวจจริง
+// ซื้อร้านอย่างเดียวไม่ได้อายุเกินทางอื่นมาก (เฉลี่ยไม่เกิน 1.5 เท่า)
+const POTION_SRC = ISEKAI_EVENTS.filter((e) => e.choices.some((c) => c.potion || c.win?.potion)).map((e) => e.id);
+const potionMiss = Object.keys(BOTS).flatMap((name, b) => POTION_SRC.filter((id) => !potionFrom[b]?.has(id)).map((id) => `${name}:${id}`));
+const avg = (xs = []) => (xs.length ? xs.reduce((s, v) => s + v, 0) / xs.length : 0);
+const shopAvg = avg(potionAdd.shop), otherAvg = avg(potionAdd.other);
+check('ยาต่ออายุ: อายุที่ต่อไม่เกินเพดาน · บาปเฉพาะขวดที่เกิน · ทุกบอทได้ทุกทาง', potionBad + potionMiss.length + (potionOver ? 0 : 1), `${POTION_SRC.length} ทาง · ดื่มเกิน ${ISEKAI_POTION.free} ขวด ${potionOver} ชาติ${potionMiss.length ? ` · ขาด ${potionMiss.slice(0, 6).join(' ')}` : ''}`);
+check('ซื้อร้านอย่างเดียวไม่ชนะขาด', !otherAvg || shopAvg > otherAvg * 1.5 ? 1 : 0, `ต่อเฉลี่ย ร้าน ${shopAvg.toFixed(1)} · ทางอื่น ${otherAvg.toFixed(1)} · ปน ${avg(potionAdd.mix).toFixed(1)} ปี`);
 // ทางคนร้ายหายากกว่าวีรบุรุษ — ต้องเจอทั้งสองแบบ ไม่งั้นด่านผ่านทั้งที่ไม่ได้ตรวจ
 check(`ดังถึง ${ISEKAI_FAME.legend} = โลกจำชื่อ · คนร้ายตามชื่อเสียงจากทางบาป`, legendEndBad + (legendGot - legendDark ? 0 : 1) + (legendDark ? 0 : 1), `${legendGot} ชาติ · คนร้าย ${legendDark}`);
 

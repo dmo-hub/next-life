@@ -42,6 +42,8 @@ export const MERIT_CATS = [
   { id: 'keep_goddess_vow', th: 'รักษาสัญญาเทพธิดา', kind: 'merit' },
   // ความรู้อันตรายจากโลกเดิม (B68h) — ดินปืน ยาพิษ อาวุธ
   { id: 'forbidden_knowledge', th: 'ความรู้อันตราย', kind: 'sin' },
+  // ดื่มยาต่ออายุเกินที่ร่างกายรับ (B68k)
+  { id: 'against_nature', th: 'ฝืนธรรมชาติ', kind: 'sin' },
   { id: 'neutral', th: 'กลาง', kind: 'neutral' },
 ];
 const CAT_BY_NAME = new Map(MERIT_CATS.flatMap((c) => [[c.id, c], [c.th, c]]));
