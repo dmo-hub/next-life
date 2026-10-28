@@ -1242,19 +1242,21 @@ const MERIT_WEIGHTS = {
   keep_goddess_vow: 0.5,
   // ความรู้อันตรายจากโลกเดิม (B68h) — กลไกเกมตั้งเอง ไม่มีในคติ จึงเบากว่าระดับ 1 ของหมวดตามคติ
   forbidden_knowledge: 0.5,
+  // ดื่มยาต่ออายุเกินที่ร่างกายรับ (B68k) — กลไกเกมตั้งเอง เบาเท่าหมวดเกมอื่น
+  against_nature: 0.5,
 };
-const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'vow_broken', 'kill_for_gain', 'cheat_exploit', 'forbidden_knowledge'];
+const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'vow_broken', 'kill_for_gain', 'cheat_exploit', 'forbidden_knowledge', 'against_nature'];
 const FLAG_CATS = ['vow_broken'];
-const GAME_CATS = ['vow_broken', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge'];
+const GAME_CATS = ['vow_broken', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge', 'against_nature'];
 // หมวดที่ใช้เฉพาะต่างโลก — ไม่นับเป็นบาปตามคติพระมาลัยที่หน้าเว็บอ้าง
-const ISEKAI_CATS = ['kill_for_gain', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge'];
+const ISEKAI_CATS = ['kill_for_gain', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge', 'against_nature'];
 // ชื่อไทยที่เนื้อหาใช้แทน id ได้ (ใบ 12 เขียนหมวดเป็นไทย) — ต้องตรงกับ vocab ของด่าน build
 const TH = {
   โลภจนเบียดเบียน: 'greed_harm', รบกวนนักบวช: 'disturb_monk', ด่าตีพ่อแม่ผู้ใหญ่: 'abuse_elders', ตัดสินไม่เป็นธรรม: 'unjust_judgment',
   ผิดเมียผู้อื่น: 'adultery', เสน่ห์ยาแฝด: 'love_charm', กดขี่ผู้ใต้ปกครอง: 'oppress_subjects', ดื่มสุรา: 'intoxicants', บนแล้วไม่แก้: 'vow_broken',
   ทาน: 'dana', ศีล: 'sila', ภาวนา: 'bhavana', ดูแลพ่อแม่: 'care_parents', ช่วยคน: 'help_others', กลาง: 'neutral',
   ฆ่าเพื่อแต้ม: 'kill_for_gain', ใช้สกิลโกงเอาเปรียบ: 'cheat_exploit', รักษาสัญญาเทพธิดา: 'keep_goddess_vow',
-  ความรู้อันตราย: 'forbidden_knowledge',
+  ความรู้อันตราย: 'forbidden_knowledge', ฝืนธรรมชาติ: 'against_nature',
 };
 const meritId = (cat) => TH[cat] ?? cat;
 const TH_BY_ID = Object.fromEntries(Object.entries(TH).map(([th, id]) => [id, th]));
@@ -4043,6 +4045,9 @@ const ISEKAI_LORE = {
 // chaPer/chaCap = ตัวเลือกทอยเสน่ห์ได้ +1% ต่อชื่อเสียงทุก chaPer สูงสุด chaCap · dark = ยากขึ้นเท่านี้ในโลกที่จำคนร้ายมากกว่าวีรบุรุษ
 // lines = บรรทัดตำนานบนใบทุ่มเทแรก เล่าแค่รุ่นล่าสุดเท่านี้ (เซฟยาวมีหลายสิบชาติ)
 const ISEKAI_FAME = { legend: 20, chaPer: 5, chaCap: 10, dark: 10, lines: 2 };
+// ยาต่ออายุ (B68k · เจ้าของเคาะ): ขวดละ years ปี (คูณจังหวะเวลาบทบาท) เพดานรวม cap ปีต่อชาติ · ขวดที่เกิน free = ฝืนธรรมชาติ บาปเล็ก
+// ดื่มทันทีที่ได้ ไม่ส่งต่อชาติหน้า · bless = เรื่องที่มาเฉพาะคนที่กรรมเป็นบวกหรือเทพธิดาอารมณ์ดี
+const ISEKAI_POTION = { years: 5, cap: 15, free: 2, level: 1 };
 
 // stat ว่าง = ไม่ทอยเต๋า · need = ต้องมีทองถึงกดได้ · bonus/bonus2 = ธงที่ทำให้ง่ายขึ้น · flag ของตัวเลือกไม่ทอย = ติดทันที
 const ISEKAI_EVENTS = [
@@ -4750,6 +4755,46 @@ const ISEKAI_EVENTS = [
         win: { fx: { mag: 3, goal: 5 }, text: 'สมุดบันทึกเล่มสุดท้ายเขียนด้วยภาษาไทย อ่านแล้วนอนไม่หลับไปหลายคืน' },
         lose: { fx: { hp: -10 }, text: 'พื้นห้องผุพังลงไปทั้งแผ่น' } },
     ] },
+  // ─── ยาต่ออายุ (B68k) ───
+  // potion = ได้ยาแล้วดื่มทันที (isekaiDrink) · 4 ทาง: ดรอปจากการผจญภัย · ปรุงเอง (เวท/ความรู้แพทย์) · รางวัลของคนบุญถึง (bless) · ร้าน
+  { id: 'pt_drop', worlds: null, ch: [2, 3], title: 'ขวดแก้วในถ้ำงู',
+    text: 'ข้างโครงกระดูกนักผจญภัยมีกระเป๋าหนังเก่า ในนั้นมีขวดแก้วสีทองใสยังไม่แตก แต่งูใหญ่ขดตัวอยู่บนกระเป๋า',
+    choices: [
+      { t: 'ไล่งูออกไปแล้วเอากระเป๋ามา', stat: 'str', tag: 'fight', dc: 14,
+        win: { fx: { str: 1 }, potion: true, text: 'งูเลื้อยหนีเข้าซอกหิน ยาในขวดหวานเหมือนน้ำผึ้ง ขาที่เคยปวดตอนเช้าหายเป็นปลิดทิ้ง' },
+        lose: { fx: { hp: -20 }, text: 'งูฉกเข้าที่แขน คุณต้องทิ้งกระเป๋าแล้ววิ่งออกจากถ้ำ' } },
+      { t: 'รอจนงูหลับแล้วค่อยหยิบ', stat: 'luk', tag: 'sneak', dc: 15,
+        win: { fx: {}, potion: true, text: 'สามชั่วโมงผ่านไป งูไม่ขยับเลย มือคุณสั่นตอนดึงสายกระเป๋า แต่ได้มาจนได้' },
+        lose: { fx: { hp: -10 }, text: 'กิ่งไม้หักใต้เท้า งูตื่นพอดี' } },
+      { t: 'ฝังกระดูกให้เขาแล้วออกไป', fx: { luk: 2 }, text: 'คุณกองหินทับหลุมไว้ ขาออกรู้สึกตัวเบาแปลก ๆ' },
+    ] },
+  { id: 'pt_brew', worlds: null, ch: [2, 3], title: 'ตำรายาของหมอแก่',
+    text: 'หมอยาในหมู่บ้านตายไปเมื่อหน้าหนาว ลูกสาวยกหีบตำราให้คุณ หน้าสุดท้ายเขียนสูตรยาที่ว่ากินแล้วอายุยืน แต่ยังไม่มีใครปรุงสำเร็จ',
+    choices: [
+      { t: 'ร่ายเวทเร่งให้สมุนไพรเข้ากัน', stat: 'mag', tag: 'magic', dc: 15,
+        win: { fx: { mag: 2 }, potion: true, text: 'น้ำยาเปลี่ยนเป็นสีเขียวใสตอนรุ่งสาง คุณจิบไปครึ่งแก้วแล้วนอนหลับยาวที่สุดในรอบหลายปี' },
+        lose: { fx: { hp: -10 }, text: 'หม้อแตกกลางเวท ห้องเต็มไปด้วยควันขม' } },
+      { t: 'ต้มแบบที่หมอบ้านเกิดสอน กรอง ชั่ง จดทุกขั้น', know: 'medic', dc: 6,
+        win: { fx: { cha: 1 }, potion: true, text: 'ครั้งที่เจ็ดได้ยาที่ไม่ขมและไม่ทำให้ท้องเสีย ลูกสาวหมอร้องไห้ตอนเห็นคุณดื่ม' },
+        lose: { fx: { hp: -5 }, text: 'ยังขาดอะไรบางอย่างที่ตำราไม่ได้เขียน' } },
+      { t: 'คืนตำราให้ลูกสาวเก็บไว้', fx: { cha: 2 }, text: 'เธอบอกว่าพ่อคงดีใจที่มีคนอ่านจนจบ' },
+    ] },
+  { id: 'pt_shrine', worlds: null, ch: [2, 3], bless: true, title: 'น้ำพุหลังศาลร้าง',
+    text: 'คุณหลบฝนเข้าศาลร้างกลางป่า หลังแท่นบูชามีน้ำพุเล็ก ๆ ไหลอยู่ ยายเฝ้าศาลบอกว่าน้ำนี้ตักได้แค่คนที่เทพธิดาเอ็นดู',
+    choices: [
+      { t: 'ตักน้ำมาดื่ม', fx: {}, potion: true, text: 'น้ำเย็นจนฟันชา ยายพยักหน้าเหมือนรู้อยู่แล้ว' },
+      { t: 'ตักใส่ขวดไปให้คนป่วยในหมู่บ้าน', fx: { cha: 2, fame: 3 }, text: 'ไข้ของเด็กคนนั้นลดลงตั้งแต่คืนแรก' },
+      { t: 'ซ่อมหลังคาศาลให้ยายก่อน', fx: { str: 1, luk: 2 }, text: 'ฝนหยุดพอดีตอนตอกตะปูตัวสุดท้าย' },
+    ] },
+  { id: 'pt_shop', worlds: null, ch: [2, 3], adult: true, title: 'ร้านยาหลังหอนาฬิกา',
+    text: 'ร้านแคบ ๆ มีขวดเรียงถึงเพดาน ป้ายเขียนว่า ยาต่ออายุ ขวดละสี่ร้อย ไม่ต่อราคา คนแก่สองคนต่อแถวรออยู่หน้าร้าน',
+    choices: [
+      { t: 'ซื้อหนึ่งขวด', need: { gold: 400 }, fx: { gold: -400 }, potion: true, text: 'เจ้าของร้านห่อขวดด้วยกระดาษสีน้ำตาล แล้วกำชับว่าอย่าดื่มเกินสองขวดในชีวิตเดียว' },
+      { t: 'ดูว่าร้านนี้ของจริงไหม', stat: 'mag', tag: 'appraise', dc: 13,
+        win: { fx: { mag: 1 }, text: 'ยาเป็นของจริง แต่คนต่อแถวบางคนดื่มมาแล้วหลายขวด ผิวขาวซีดเหมือนขี้ผึ้ง' },
+        lose: { fx: {}, text: 'ดูยังไงก็เป็นแค่น้ำสีทองในขวด' } },
+      { t: 'เดินผ่านไป', fx: {}, text: 'อายุเท่าที่มีก็พอแล้ว' },
+    ] },
   // ─── ความรู้จากโลกเดิม (B68h) ───
   // know = { หมวด, ความรู้ขั้นต่ำที่เรื่องนี้จะมาหา } · ตัวเลือกที่มี know ทอยด้วยความรู้หมวดนั้น · fx.know = ความรู้หมวดของเรื่องที่ขึ้นลง
   // ล้มเหลวยังได้ความรู้เล็กน้อย (ลองใหม่ได้ในเรื่องถัดไปของหมวด) · lore = ของที่โลกนี้จะจำถ้าชื่อเสียงถึง · loreOf = โลกจำแล้ว เรื่องนี้ไม่มาอีก
@@ -5193,7 +5238,7 @@ function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, bless
     skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).slice(0, sk),
     role: null, world: null, name: '', skills: [], st: null, inner: null, flags: {},
     know: null, knowLast: null, loreAll: lore, worldLore: [], lore: [],
-    legendAll: legends, worldLegends: [], legend: null, fameDark: 0,
+    legendAll: legends, worldLegends: [], legend: null, fameDark: 0, potions: [], lifeAdd: 0,
     age: 0, focus: null, focusOffers: [], stageShown: null, due: null, used: [], later: [], finaleDone: false,
     step: 'world', last: null, rbdUsed: false, dead: false, natural: false, ending: null, log: [], chron: [], cards: 0,
   };
@@ -5247,7 +5292,8 @@ const isekaiFameCha = (isk) => {
 };
 
 const isekaiPace = (isk) => ISEKAI_ROLES[isk.role].pace ?? 1;
-const isekaiOldAge = (isk) => ISEKAI_STAGES.at(-1).from * isekaiPace(isk);
+// ยาต่ออายุ (B68k) เลื่อนจุดที่ร่างกายเริ่มเสื่อมกับเพดานอายุไปพร้อมกัน · ป้ายช่วงวัยไม่เลื่อน · เซฟก่อน B68k ไม่มี lifeAdd
+const isekaiOldAge = (isk) => (ISEKAI_STAGES.at(-1).from + (isk.lifeAdd ?? 0)) * isekaiPace(isk);
 const isekaiStageOf = (isk) => ISEKAI_STAGES.findLast((s) => isk.age >= s.from * isekaiPace(isk));
 // ทางลัดความรู้ใช้ id 'k:<หมวด>' · kc = หมวดที่ทางลัดนี้เติมความรู้และดึงเหตุการณ์
 const isekaiFocusDef = (isk, id) => {
@@ -5406,9 +5452,22 @@ function isekaiYear(isk) {
   return units * p;
 }
 
+// ดื่มยาต่ออายุ (B68k): ขวดเกิน free ลงบาปฝืนธรรมชาติก่อน แล้วค่อยดูเพดาน — ดื่มตอนชนเพดานแล้วก็ยังเป็นการฝืน
+// ข้อความบอกแค่สิ่งที่ร่างกายรู้สึก ไม่บอกบาป (การ์ดไม่เผยบุญบาป)
+function isekaiDrink(isk, id) {
+  const P = ISEKAI_POTION;
+  (isk.potions ??= []).push(id);
+  const n = isk.potions.length;
+  if (n > P.free) recordMerit(isk.ledger, [M('against_nature', P.level)], id);
+  const add = Math.min(P.years, P.cap - (isk.lifeAdd ?? 0));
+  isk.lifeAdd = (isk.lifeAdd ?? 0) + add;
+  if (add <= 0) return 'ยาไหลลงคอเหมือนน้ำเปล่า ร่างกายนี้ยืดออกไปไม่ได้อีกแล้ว';
+  return n > P.free ? 'อายุขัยยืดออกไปอีก แต่คืนนั้นคุณฝันว่ามองกระจกแล้วไม่เห็นหน้าตัวเอง' : 'อายุขัยยืดออกไปอีก ตัวเบาเหมือนอายุน้อยลงหลายปี';
+}
+
 // เหตุการณ์ความรู้มาหาเมื่อรู้ถึงขั้นของเรื่อง · ความรู้อันตรายเฉพาะวัยผู้ใหญ่ขึ้นไป · ของที่โลกนี้จำแล้วไม่ต้องคิดค้นซ้ำ
 const ISEKAI_ADULT = ['adult', 'middle', 'old'];
-const isekaiKnowOpen = (isk, e, stage) => (!e.know || isk.know[e.know.cat] >= e.know.min) && (!e.adult || ISEKAI_ADULT.includes(stage.id)) && (!e.loreOf || !isk.worldLore.includes(e.loreOf)) && (!e.legend || isekaiLegends(isk).some((l) => isekaiLegendKind(l) === e.legend));
+const isekaiKnowOpen = (isk, e, stage) => (!e.know || isk.know[e.know.cat] >= e.know.min) && (!e.adult || ISEKAI_ADULT.includes(stage.id)) && (!e.loreOf || !isk.worldLore.includes(e.loreOf)) && (!e.legend || isekaiLegends(isk).some((l) => isekaiLegendKind(l) === e.legend)) && (!e.bless || isk.karma > 0 || isk.blessed);
 
 const isekaiFitsRole = (isk, e) => !e.worlds || e.worlds.includes(isk.world) || (e.worlds.length > 1 && e.worlds.includes(ISEKAI_ROLES[isk.role].like));
 
@@ -5679,6 +5738,7 @@ function chooseIsekai(isk, idx) {
   // ลงบัญชีที่ดวงวิญญาณพกมา (ไม่ดึงเลขสุ่ม ⇒ ลำดับเหตุการณ์เท่าเดิม) · ธงคำบนที่ผิดติดเป็นธงของรอบต่างโลก
   for (const f of recordMerit(isk.ledger, tags, ev.id)) isk.flags[f] = true;
   vowTrack(isk, tags);
+  if (out.potion) sys = isekaiDrink(isk, ev.id);
   // เรื่องต่อมาถึงอีกไม่กี่ปีให้หลัง ไม่ดึงเลขสุ่ม
   // เรื่องต่อที่คิดค้นของที่โลกนี้จำอยู่แล้วไม่ต้องนัด (B68h) — นัดข้ามตัวกรองกอง จึงกันที่นี่
   if (out.next && !isk.used.includes(out.next) && !isk.later.some((l) => l.id === out.next) && !isk.worldLore.includes(isekaiById[out.next].loreOf)) isk.later.push({ id: out.next, age: isk.age + ISEKAI_TIME.later * isekaiPace(isk) });
@@ -7159,7 +7219,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.95';
+const APP_VERSION = 'v0.2.96';
 const APP_BUILD = '2026-10-28';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
