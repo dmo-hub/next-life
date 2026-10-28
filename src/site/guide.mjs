@@ -36,7 +36,6 @@ export function guideHtml() {
 <section id="buttons"><h2>ปุ่มเดินเรื่อง</h2><div class="tw"><table><thead><tr><th>ปุ่ม</th><th>ทำอะไร</th></tr></thead><tbody>${rows}</tbody></table></div></section>
 <section id="stats"><h2>ค่าสถานะ</h2><p>ข้อความชุดเดียวกับที่กด "ค่าสถานะเหล่านี้หมายถึงอะไร?" ในเกม</p><dl>${help}</dl></section>
 <section id="keys"><h2>แป้นพิมพ์</h2><ul>
-<li><kbd>1</kbd>–<kbd>9</kbd> เลือกตัวเลือกตามเลขบนปุ่ม (อ่านตำแหน่งแป้น ใช้ได้แม้แป้นเป็นภาษาไทย)</li>
 <li><kbd>Enter</kbd> กดปุ่มเดินเรื่องของการ์ด เช่น ${btn('next')}</li>
 <li><kbd>←</kbd> <kbd>→</kbd> หรือ <kbd>Space</kbd> พลิกหน้าสมุดชีวิต</li>
 </ul></section>

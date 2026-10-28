@@ -1204,12 +1204,7 @@ function button(label, fx, onclick, hint = null) {
   return b;
 }
 
-// ปุ่มลัด: ตัวเลือกที่ i ได้เลข i+1 (ถึง 9) · Enter กดปุ่มเดินเรื่องปุ่มเดียวของการ์ด
-// เลขต้องติดที่ป้ายด้วย: attr() ใน ::before อ่านจากตัวที่ถือ pseudo (span) ไม่ใช่ปุ่ม
-const keyed = (b, i) => {
-  if (i < 9) b.dataset.key = b.firstChild.dataset.key = String(i + 1);
-  return b;
-};
+// ปุ่มลัด: Enter กดปุ่มเดินเรื่องปุ่มเดียวของการ์ด
 const enter = (b) => {
   b.dataset.enter = '';
   return b;
@@ -1229,12 +1224,8 @@ document.addEventListener('keydown', (e) => {
     // โฟกัสอยู่ที่ปุ่ม/หัวข้อพับ ให้ Enter ทำงานของตัวนั้น (แชร์ภาพ · สมุดฉายา · ผังตระกูล)
     if (t.closest?.('button, summary, a')) return;
     b = root.querySelector('.choices [data-enter]');
-  } else {
-    // อ่านตำแหน่งปุ่ม ไม่ใช่ตัวอักษร — แป้นไทยแถวเลขพิมพ์ ๅ / - ภ ถ ไม่ใช่ 1–5
-    const m = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
-    if (m) b = root.querySelector(`.choices button[data-key="${m[1]}"]`);
   }
-  // การ์ดที่พับไว้ (B117) ปุ่มยังอยู่ใน DOM แค่ซ่อน — เลขลัดต้องไม่กดตัวเลือกที่มองไม่เห็น
+  // การ์ดที่พับไว้ (B117) ปุ่มยังอยู่ใน DOM แค่ซ่อน — ปุ่มลัดต้องไม่กดปุ่มที่มองไม่เห็น
   if (!b || b.disabled || b.closest('[hidden]')) return;
   e.preventDefault();
   b.click();
@@ -1506,7 +1497,7 @@ function render(card) {
         const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
         const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);
-        const b = keyed(button(c, fx, () => play(lifePick(i)), card.hints?.[i]), i);
+        const b = button(c, fx, () => play(lifePick(i)), card.hints?.[i]);
         if (why) b.disabled = true;
         choices.append(b, ...loanButtons(card, i));
       });
@@ -1638,15 +1629,15 @@ function entryOffer(card, body, choices) {
   gate.append(el('span', 'ix-k', 'เสียงเรียกจากต่างโลก'), el('div', 'ix-t', card.text));
   gate.append(el('div', 'ix-n', card.gone ? 'ถ้ารับ คุณจะหายตัวไปจากโลกนี้' : 'ถ้ารับ ชีวิตในโลกนี้จะจบลงตรงนี้'));
   body.append(gate);
-  const offer = () => choices.replaceChildren(...card.choices.map((c, i) => keyed(button(c, card.fx?.[i], () => (i === ENTRY.accept ? ask() : play(lifePick(i)))), i)));
+  const offer = () => choices.replaceChildren(...card.choices.map((c, i) => button(c, card.fx?.[i], () => (i === ENTRY.accept ? ask() : play(lifePick(i))))));
   const ask = () => {
     choices.replaceChildren(
       el('p', 'ix-ask', card.gone ? 'แน่ใจนะ หายตัวไปแล้วกลับมาเล่นชีวิตนี้ต่อไม่ได้' : 'แน่ใจนะ ชีวิตนี้จบแล้วกลับมาเล่นต่อไม่ได้'),
-      keyed(button('ยืนยัน ไปต่างโลก', null, () => play(lifePick(ENTRY.accept))), 0),
-      keyed(button('ยังก่อน', null, () => {
+      button('ยืนยัน ไปต่างโลก', null, () => play(lifePick(ENTRY.accept))),
+      button('ยังก่อน', null, () => {
         offer();
         choices.querySelector('button').focus();
-      }), 1),
+      }),
     );
     choices.querySelector('button').focus();
   };
@@ -1777,7 +1768,7 @@ function renderAfter(card) {
   } else if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = lockText(card, i);
-      const b = keyed(button(c, why ?? card.fx?.[i], () => play(afterPick(i)), card.hints?.[i]), i);
+      const b = button(c, why ?? card.fx?.[i], () => play(afterPick(i)), card.hints?.[i]);
       if (why) b.disabled = true;
       choices.append(b);
     });
@@ -1987,7 +1978,7 @@ function renderIsekai(card) {
   if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
-      const b = keyed(button(c, why ?? (card.step === 'focus' && i === card.current ? [card.fx?.[i], 'ทำอยู่'].filter(Boolean).join(' · ') : card.fx?.[i]), () => play(pick(i))), i);
+      const b = button(c, why ?? (card.step === 'focus' && i === card.current ? [card.fx?.[i], 'ทำอยู่'].filter(Boolean).join(' · ') : card.fx?.[i]), () => play(pick(i)));
       if (card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
       if (why) b.disabled = true;
       choices.append(b);

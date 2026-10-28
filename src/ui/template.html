@@ -120,14 +120,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .choice .fx span { white-space:nowrap; }
 /* ปุ่มกู้มาจ่าย (B111) ห้อยใต้ตัวเลือกที่ขาดเงิน — ย่อและเยื้องให้เห็นว่าเป็นทางของปุ่มบน ไม่ใช่ตัวเลือกใหม่ */
 .choice.loan { min-height:40px; margin:-4px 0 0 24px; padding:6px 12px; font-size:13.5px; }
-/* text-indent สืบทอดจากย่อหน้าแขวนของจอกว้าง — ต้องคืนเป็น 0 ไม่งั้นบรรทัดรองมุดไปใต้เลขปุ่มลัด */
-.choice .hint { display:block; text-indent:0; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
-/* เลขปุ่มลัดเฉพาะจอกว้าง — มือถือไม่มีแป้นเลข เลขจะกินที่ป้ายตัวเลือกเปล่า ๆ */
-@media (min-width:768px) {
-  /* ย่อหน้าแขวน: ป้ายยาวตัดบรรทัดแล้วบรรทัดสองตรงกับข้อความ ไม่มุดใต้เลข · 38px = กรอบเลข 28 + ช่องไฟ 10 */
-  .choice > span[data-key] { padding-left:38px; text-indent:-38px; }
-  .choice > span[data-key]::before { content:attr(data-key); display:inline-block; box-sizing:border-box; width:28px; text-indent:0; margin-right:10px; border:1px solid currentColor; border-radius:3px; font-size:12px; line-height:18px; text-align:center; opacity:0.7; }
-}
+.choice .hint { display:block; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
 .recap .picks { overflow-wrap:anywhere; }
