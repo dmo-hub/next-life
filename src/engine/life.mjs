@@ -10,7 +10,7 @@ import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, prom
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
-import { entryCard, ENTRY, lifeEndWord, isGone, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore } from './isekai.mjs';
+import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore } from './isekai.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -911,6 +911,18 @@ function emit(st, card) {
   return card;
 }
 
+// ใบคนที่บ้านตามหา (B137) ออกครั้งเดียวแทนงานศพของทางหายตัว · ไม่มีญาติให้เรียกชื่อ ⇒ ล้าง kinFocus ที่ค้างจากใบก่อน
+function goneSearchCard(st) {
+  st.searched = true;
+  st.kinFocus = {};
+  st.pending = { search: true, choices: GONE_SEARCH.choices };
+  return emit(st, {
+    kind: 'event', id: GONE_SEARCH.id, search: true, type: 'B', national: false, funeral: false,
+    age: st.age, stage: stageOf(st.age), title: null, text: GONE_SEARCH.text,
+    choices: GONE_SEARCH.choices.map((c) => c.text), fx: GONE_SEARCH.choices.map(() => ''), locked: GONE_SEARCH.choices.map(() => null),
+  });
+}
+
 // การ์ดเลือกของเหตุการณ์ — ตั้ง pending ไว้ให้ choose อ่าน
 // ปิด merge = ข่าวกับการ์ดรับมือแยกใบแบบเดิม (ตัวควบคุมของ harness)
 export const ERA_NEWS = { merge: true };
@@ -1018,6 +1030,7 @@ export function nextCard(st) {
   }
   if (st.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
   // คิวมาก่อนการตาย — การ์ดงานศพเข้าคิวตอนตายแล้วต้องออกก่อนมรณบัตร
+  if (st.dead && !st.queue.length && isGone(st) && !st.searched) return goneSearchCard(st);
   if (st.dead && !st.queue.length) return deathCard(st);
   // การ์ดเปลี่ยนช่วง/เหตุการณ์ยุค/ผลสุ่มเป็นใบของตัวเอง เรียงตามที่ถึงกำหนดในปีนั้น
   if (st.queue.length) {
@@ -1232,10 +1245,18 @@ export function choose(st, idx, loan) {
     st.log.push({ id: 'alloc', age: st.age, choice: idx, text: opt.label });
     return;
   }
+  if (ev?.search) {
+    const c = ev.choices[idx];
+    if (!c) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    st.pending = null;
+    st.log.push({ id: GONE_SEARCH.id, age: st.age, choice: idx, text: c.text });
+    st.queue.push({ kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: c.reply });
+    return;
+  }
   if (ev?.entry) {
     if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
-    // ปฏิเสธ = ไม่แตะอะไรเลย · กดรับ = จบชีวิตตรงนี้ งานศพตามปกติ แล้วปรโลกส่งข้ามโลก (ธง isekai_call)
+    // ปฏิเสธ = ไม่แตะอะไรเลย · กดรับ = จบชีวิตตรงนี้ แล้วปรโลกส่งข้ามโลก (ธง isekai_call) · ตาย = งานศพตามปกติ · หายตัว = ใบคนที่บ้านตามหาแทน (B137)
     // ทางที่ได้กลับ (B68m) = ไปต่างโลกทั้งตัวกลางชีวิต ไม่ตั้งธง · บัญชีบุญบาปส่งตัวเดียวกันเข้าไป
     const n = st.trips?.length ?? 0;
     const trip = idx === ENTRY.accept && tripRoll(st.seed, ev.entry, n);
@@ -1253,7 +1274,7 @@ export function choose(st, idx, loan) {
       st.isekaiVia = ev.entry;
       st.log.push({ id: `isekai_${ev.entry}`, age: st.age, choice: idx, text: ev.choices[idx].text });
       st.dead = true;
-      queueFuneral(st);
+      if (!isGone(st)) queueFuneral(st);
     }
     return;
   }
@@ -1393,7 +1414,7 @@ function tripBack(st) {
   if (!isk.home) {
     st.tripLost = true;
     st.dead = true;
-    return queueFuneral(st) ? nextCard(st) : deathCard(st);
+    return nextCard(st);
   }
   const away = isk.age - isk.trip.from;
   const c = tripCarry(isk);

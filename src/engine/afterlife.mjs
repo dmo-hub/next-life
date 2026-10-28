@@ -186,13 +186,16 @@ function pathCard(af) {
 }
 
 // การ์ดเปิดชีวิตของรุ่นถัดไปเล่าคำเดียวกัน — ผู้เล่นเห็นสองใบตรงกัน
-export const carryAmount = (r) => (r >= 0.55 ? 'มาก' : r >= 0.45 ? 'พอประมาณ' : 'น้อย');
+// คำบอกขนาดบุญ+บาปที่ส่งต่อจริง (B137) ไม่ใช่สัดส่วนที่สุ่ม — สัดส่วนสูงของบัญชีว่างยังเท่ากับไม่มีอะไรติดตัว
+// เกณฑ์วางให้ชีวิตทั่วไปตกช่วงกลาง (วัด 300 ชีวิตบอทสุ่ม: p25 ≈ 10 · p50 ≈ 14 · p75 ≈ 18) · เซฟเก่าไม่มี kept ใช้คำตามสัดส่วนแบบเดิม
+export const CARRY_WORDS = [[1, 'แทบไม่มี'], [8, 'น้อย'], [18, 'พอประมาณ']];
+export const carryAmount = (h) => (h.kept === undefined ? (h.carried >= 0.55 ? 'มาก' : h.carried >= 0.45 ? 'พอประมาณ' : 'น้อย') : (CARRY_WORDS.find(([cut]) => h.kept < cut)?.[1] ?? 'มาก'));
 
 function carryCard(af) {
   const r = CARRY.min + af.rng.next() * (CARRY.max - CARRY.min);
   af.heir = makeHeir(af, r);
   const h = af.heir;
-  const amount = carryAmount(h.carried);
+  const amount = carryAmount(h);
   const who = af.path === 'child' ? `กลับมาเกิดเป็น${kinTier(h.tier).name}ของตัวเอง` : af.from ? 'กลับจากต่างโลกมาเกิดใหม่' : 'ไปเกิดใหม่';
   return emitAfter(af, {
     kind: 'carry',
@@ -419,6 +422,7 @@ function makeHeir(af, r) {
   const thai = af.thaiVerdict ?? af.verdict;
   const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, ...(isGone(st) && { gone: true }), realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }], fame, ...(goals.length && { goals }), ...(st.officeTop >= 0 && { office: st.officeTop }), ...(ladderOf(st)?.pension && { service: true }), ...(st.trips?.length && { trips: st.trips }) }, ...af.isekaiLives];
   const carried = r * (tier?.carry ?? 1);
+  const ledger = carryLedger(af.st.ledger, net, carried);
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1 + af.isekaiLives.length,
@@ -432,8 +436,9 @@ function makeHeir(af, r) {
     legacy,
     occupation,
     bonus,
-    ledger: carryLedger(af.st.ledger, net, carried),
+    ledger,
     carried,
+    kept: ledger.merit + ledger.sin,
     tier: tier?.tier ?? null,
     // ส่วนที่บ้านส่งต่อ แยกจาก bonus (ซึ่งรวมผลกรรม) ให้การ์ดเปิดชีวิตเล่าทิศได้โดยไม่เผยบัญชี
     kin: { relations: kin('relations'), network: kin('network') },

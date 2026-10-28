@@ -2,7 +2,7 @@
 // ด่าน: seed เดิมผลเดิม (รวดเดียว + เซฟ/โหลดกลางทาง) · จบได้ทุกชีวิตภายในเพดานการ์ด · ตอนจบ/บทบาท/สกิล/เหตุการณ์มีบอทถึง
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
-import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, isekaiLineage, isekaiWorldLore, ENTRY_EVENTS, TRIP, tripRoll, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, isekaiLineage, isekaiWorldLore, ENTRY_EVENTS, TRIP, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 
@@ -223,19 +223,23 @@ const tripBad = (JSON.stringify(trip) !== JSON.stringify({ commoner: ['soap', 'l
 check('โลกที่จำแล้วไม่ต้องคิดค้นซ้ำ + บอกในใบทุ่มเทแรก', loreSkipBad + loreLineBad + tripBad, `${lives * 5} ชาติ`);
 
 // ทางเข้าจากเหตุการณ์ในชีวิต (B68d): บอทสายต่างโลกกดรับการ์ดชวนใบแรก
-// อยู่ถึงอายุนัดแรก = เจอการ์ดชวน · กดรับแล้วมีงานศพ · ปรโลกไม่มีการ์ดทางเกิด · เข้าต่างโลกแบบ fated · บอทสุ่มไม่เคยกดรับ
-let entryBad = 0, entryLives = 0, declineBad = 0;
+// อยู่ถึงอายุนัดแรก = เจอการ์ดชวน · กดรับแบบตายมีงานศพ · แบบหายตัวไม่มีงานศพ มีใบตามหาใบเดียว (B137)
+// ปรโลกไม่มีการ์ดทางเกิด · เข้าต่างโลกแบบ fated · บอทสุ่มไม่เคยกดรับ
+let entryBad = 0, entryLives = 0, entryGone = 0, declineBad = 0;
 for (let i = 0; i < lives; i++) {
-  let offers = 0, funeral = false;
+  let offers = 0, funeral = false, search = 0;
   const r = playLife(mixSeed(seed, 9500 + i), content, isekaiBot, (c) => {
     if (c.entry) offers++;
     if (c.funeral) funeral = true;
+    if (c.id === GONE_SEARCH.id) search++;
   });
   if (r.age < (r.state.isekaiEntry?.[0]?.age ?? Infinity)) continue;
   // ได้ไปกลับ (B68m) ตรวจในด่านทริปข้างล่าง
   if (r.state.trips?.length) continue;
   entryLives++;
-  if (offers !== 1 || !r.state.flags.isekai_call || !funeral) {
+  const gone = !!ENTRY_EVENTS[r.state.isekaiVia]?.gone;
+  if (gone) entryGone++;
+  if (offers !== 1 || !r.state.flags.isekai_call || funeral === gone || search !== (gone ? 1 : 0)) {
     entryBad++;
     continue;
   }
@@ -249,11 +253,11 @@ for (let i = 0; i < lives; i++) {
   if (paths || !af.isekai?.fated) entryBad++;
   if (playLife(mixSeed(seed, 9500 + i), content, BOTS.สุ่ม).state.flags.isekai_call) declineBad++;
 }
-check('การ์ดชวนในชีวิต กดรับแล้วงานศพ + วาร์ปข้ามโลก', entryBad, `${entryLives} ชีวิต · นัด ${ENTRY.bands.length} ช่วงวัย`);
+check('การ์ดชวนในชีวิต กดรับ: ตาย = งานศพ · หายตัว = ใบตามหา + วาร์ปข้ามโลก', entryBad + (entryGone && entryGone < entryLives ? 0 : 1), `${entryLives} ชีวิต · หายตัว ${entryGone} · นัด ${ENTRY.bands.length} ช่วงวัย`);
 check('บอทที่ไม่ประกาศ isekai ไม่เคยกดรับ', declineBad);
 
 // ไปกลับกลางชีวิต (B68m): การ์ดประตูได้กลับทุกครั้ง · การ์ดหายตัวได้กลับบางที · การ์ดตายไม่เคย
-// ทริปจบแบบกลับบ้าน = ชีวิตไทยเดินต่อ อายุร่างกายนับปีต่างโลก · ตายในต่างโลก = หายตัว + งานศพ · เวลาไทยผ่านไปตามที่ทอย
+// ทริปจบแบบกลับบ้าน = ชีวิตไทยเดินต่อ อายุร่างกายนับปีต่างโลก · ตายในต่างโลก = หายตัว ไม่มีงานศพ มีใบตามหา (B137) · เวลาไทยผ่านไปตามที่ทอย
 // seed เดิมผลเดิม + เล่นซ้ำจากลำดับปุ่ม (แบบเซฟ) ได้การ์ดเดิม · การ์ดทริปไม่เผยบุญบาป · โลกจำจากทริปลงผังตระกูลชาติไทย
 let tripLives = 0, tripHome = 0, tripLost = 0, tripFail = 0, tripReplayBad = 0, tripLeak = 0, tripCards = 0, tripLoreBad = 0;
 const rollBad = Object.keys(ENTRY_EVENTS).filter((id) => {
@@ -302,16 +306,54 @@ for (let i = 0; i < lives * 10; i++) {
   // หายตัวต้องเป็นทริปสุดท้าย · ชีวิตที่กลับบ้านครบอายุร่างกาย ≥ อายุไทย · การ์ดกลับบ้านมีทุกทริปที่กลับ
   if (t.slice(0, -1).some((x) => !x.home) || (lost && !st.tripLost) || (!lost && st.tripLost) || (st.away ?? 0) < 0) tripFail++;
   if (a.out.filter((x) => x.includes('"trip":true') && x.includes('"kind":"result"')).length !== t.filter((x) => x.home).length) tripFail++;
-  if (lost && !a.out.some((x) => x.includes('"funeral":true'))) tripFail++;
+  if (lost && (a.out.some((x) => x.includes('"funeral":true')) || a.out.filter((x) => x.includes(`"id":"${GONE_SEARCH.id}"`)).length !== 1)) tripFail++;
   // แถวทริปที่มีของให้โลกจำ อ่านกลับได้จาก isekaiWorldLore
   const want = t.filter((x) => x.lore);
   const got = isekaiWorldLore([{ trips: t }]);
   if (want.some((x) => !x.lore.ids.every((id) => got[x.lore.world]?.includes(id)))) tripLoreBad++;
 }
-check('ไปกลับกลางชีวิต: กลับบ้านเดินต่อ · ตายในต่างโลกหายตัว + งานศพ', tripFail + (tripLives && tripHome ? 0 : 1), `${tripLives} ชีวิต · กลับ ${tripHome} · หายตัว ${tripLost}`);
+check('ไปกลับกลางชีวิต: กลับบ้านเดินต่อ · ตายในต่างโลกหายตัว + ใบตามหา ไม่มีงานศพ', tripFail + (tripLives && tripHome ? 0 : 1), `${tripLives} ชีวิต · กลับ ${tripHome} · หายตัว ${tripLost}`);
 check('ทริป seed เดิมผลเดิม + เล่นซ้ำจากลำดับปุ่ม', tripReplayBad);
 check('การ์ดทริปไม่เผยบุญบาป', tripLeak, `${tripCards.toLocaleString('en-US')} การ์ด`);
 check('โลกจำจากทริปอ่านกลับได้', tripLoreBad);
+// ทริปหาย (ตายในต่างโลก) ราว 1 ใน 90 ทริป — ลูปข้างบนอาจไม่เจอสักชีวิต ⇒ ไล่ seed ต่อจนเจอ 5 ชีวิต แล้วตรวจว่าไม่มีงานศพ มีใบตามหาใบเดียว (B137)
+let lostSeen = 0, lostBad = 0;
+const tripBot = Object.assign((c, r, h) => isekaiBot(c, r, h), { isekai: true, trip: (card, rng) => {
+  const open = card.choices.map((_, k) => k).filter((k) => !card.locked?.[k]);
+  return open[Math.floor(rng.next() * open.length)];
+} });
+for (let i = 0; i < lives * 200 && lostSeen < 5; i++) {
+  let funeral = 0, search = 0;
+  const r = playLife(mixSeed(seed, 9700 + i), content, tripBot, (c) => {
+    if (c.funeral) funeral++;
+    if (c.id === GONE_SEARCH.id) search++;
+  });
+  if (!r.state.tripLost) continue;
+  lostSeen++;
+  if (funeral || search !== 1) lostBad++;
+}
+check('ทริปหาย: ไม่มีงานศพ · ใบตามหาใบเดียว', lostBad + (lostSeen ? 0 : 1), `${lostSeen} ชีวิต`);
+
+// คำกรรมที่ส่งต่อ (B137): การ์ดส่งต่อบอกคำตามบุญ+บาปที่ติดตัวไปจริง ไม่ใช่สัดส่วนที่สุ่ม · บัญชีว่าง = แทบไม่มี
+let carryBad = 0;
+const carryWords = new Set();
+for (let i = 0; i < lives; i++) {
+  const { state } = playLife(mixSeed(seed, 9900 + i), content, BOTS.สุ่ม);
+  const af = startAfterlife(state);
+  for (let guard = 0; guard < 200; guard++) {
+    const card = nextAfterCard(af);
+    if (card.kind === 'carry') {
+      const l = af.heir.ledger;
+      const want = CARRY_WORDS.find(([cut]) => l.merit + l.sin < cut)?.[1] ?? 'มาก';
+      carryWords.add(want);
+      if (!card.text.includes(`ติดตัวไปครั้งนี้${want} `)) carryBad++;
+    }
+    if (card.choices?.length) chooseAfter(af, BOTS.สุ่ม(card, af.botRng, af));
+    if (card.done) break;
+  }
+}
+const carryCtl = carryAmount({ kept: 0, carried: 0.7 }) === 'แทบไม่มี' && carryAmount({ carried: 0.7 }) === 'มาก' ? 0 : 1;
+check('คำกรรมที่ส่งต่ออ่านขนาดกรรมจริง', carryBad + carryCtl, `${lives} ชีวิต · คำที่เจอ ${[...carryWords].join(' ')}`);
 
 // ตัวควบคุม: ตัววัดต้องจับของเสียที่ปลูกไว้ได้ — ไม่งั้นด่านผ่านเพราะวัดไม่เป็น
 const ctl = [
