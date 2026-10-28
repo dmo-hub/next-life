@@ -1388,6 +1388,14 @@ const growLabel = (stage) => `เติบโตเป็น${stage === 'หน�
 const portrait = () => pixels('por', 20, 24, [[0, 0, 20, 24, '#E8E8E8'], [7, 2, 6, 6, '#B8B8B8'], [7, 1, 6, 2, '#1F1F1F'], [5, 8, 10, 8, '#5A5A5A'], [6, 16, 3, 6, '#1F1F1F'], [11, 16, 3, 6, '#1F1F1F']]);
 
 const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
+// ป้ายคนหาย (B139) — ถ้อยคำของคนที่บ้านที่ยังรอ: ไม่อาลัย ไม่บอกเหตุ (B110) · will[0] ไม่มีพินัยกรรม · will[1] มี
+const LOST = {
+  head: 'ประกาศตามหาคนหาย',
+  money: 'ทรัพย์ที่ทิ้งไว้',
+  debt: 'หนี้ที่ทิ้งไว้',
+  will: ['ไม่ได้สั่งเรื่องทรัพย์ไว้ คนที่บ้านแบ่งกันเองจนผิดใจกัน', 'คนที่บ้านพบพินัยกรรมที่เขียนไว้ จึงแบ่งทรัพย์ตามนั้น'],
+  call: 'ใครพบเห็น โปรดแจ้งคนที่บ้าน ทุกคนยังรออยู่',
+};
 
 function render(card) {
   // ไปกลับกลางชีวิต (B68m): ทริปยังเป็นชีวิตนี้ ปุ่มจึงเดินผ่านปุ่มชีวิต — จอเต็มของทริปเป็นงานเลน C
@@ -1403,20 +1411,25 @@ function render(card) {
   const next = () => play(T.next);
 
   if (card.kind === 'death') {
-    top.append(el('b', null, 'ด้วยรักและอาลัย'));
+    // หายตัวไม่มีศพ (B137) จึงไม่มีหนังสืองานศพ — คนที่บ้านยังเชื่อว่ามีชีวิตอยู่ ใบนี้เป็นป้ายตามหาคนหาย ไม่มีคำอาลัย (B139)
+    const gone = isGone(st);
+    if (gone) box.classList.add('lost');
+    top.append(el('b', null, gone ? LOST.head : 'ด้วยรักและอาลัย'));
     box.append(top);
     // หนังสืองานศพบอกอายุ ไม่บอกปี พ.ศ. — ปีเกมไม่ขึ้นจอ (B14 ข้อ 12)
-    body.append(portrait(), el('h3', null, st.name), el('p', 'dates', `${genLabel()}สิริอายุ ${card.age} ปี`));
+    body.append(portrait(), el('h3', null, st.name), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
     const why = causeOf(card.cause, card.age);
     if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
     body.append(el('p', null, `${st.sex} · ${provinceLabel(st)} · ฐานะ${classNow(st)} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
-    const net = card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
+    const net = gone ? (card.summary.money < 0 ? LOST.debt : LOST.money) : card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
     body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
     if (card.summary.debt) body.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
     if (card.summary.bankruptcies) body.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
-    if (card.note) body.append(el('p', 'sub', card.note));
+    // บันทึกเด็กเป็นสถิติการตายของยุค — ไม่ใช่เรื่องของคนหาย
+    if (card.note && !gone) body.append(el('p', 'sub', card.note));
     if (card.funeral) body.append(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
-    if (card.will !== undefined) body.append(el('p', 'sub', card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
+    if (card.will !== undefined) body.append(el('p', 'sub', gone ? LOST.will[card.will ? 1 : 0] : card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
+    if (gone) body.append(el('p', 'call', LOST.call));
     const note = notePick(st.gen);
     if (note) body.append(noteQuote(`บันทึกเมื่ออายุ ${note.a}`, note.t));
     if (card.pets) body.append(el('p', 'sub', card.pets));
