@@ -1351,6 +1351,8 @@ const portrait = () => pixels('por', 20, 24, [[0, 0, 20, 24, '#E8E8E8'], [7, 2, 
 const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
 
 function render(card) {
+  // ไปกลับกลางชีวิต (B68m): ทริปยังเป็นชีวิตนี้ ปุ่มจึงเดินผ่านปุ่มชีวิต — จอเต็มของทริปเป็นงานเลน C
+  if (card.kind === 'isekai') return renderIsekai(card);
   root.replaceChildren();
   const s = statsOf(st);
   // ปีเกมใช้ภายในเท่านั้น หน้าจอบอกแค่อายุ (B14 ข้อ 12)
@@ -1890,7 +1892,9 @@ function renderIsekai(card) {
   const box = el('article', 'card i');
   const top = el('div', 'top');
   const s = card.status;
-  top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ชาติต่างโลกที่ ${card.run + 1} · ${s.name}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
+  const pick = card.trip ? lifePick : afterPick;
+  const where = card.trip ? `ข้ามมาตอนอายุ ${card.life}` : `ชาติต่างโลกที่ ${card.run + 1}`;
+  top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ${where} · ${s.name}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
   body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} · อายุ ${card.age}` : ISEKAI_KICKER[card.step]));
@@ -1911,7 +1915,7 @@ function renderIsekai(card) {
     body.append(v);
   }
   // ต่างโลกไม่มีฉายาของตัวเอง — เบาะแสชี้ฉายาของโลกเดิมที่ชาติหน้ายังไปเก็บได้ (B108 ใช้สองโลก)
-  if (card.step === 'end') clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
+  if (card.step === 'end' && !card.trip) clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
   if (card.highlights?.length) body.append(el('p', 'isys', 'ฉากที่จำได้ไม่ลืม'), list(card.highlights, 'picks'));
   if (card.log?.length) {
     const d = el('details', 'tree');
@@ -1929,7 +1933,7 @@ function renderIsekai(card) {
     d.append(el('summary', null, 'เปลี่ยนสิ่งที่ทุ่มเท'));
     const row = el('div', 'choices');
     card.focusChoices.forEach((c, i) => {
-      const b = button(c, i === card.focus ? 'ทำอยู่' : null, () => play(afterPick(i)));
+      const b = button(c, i === card.focus ? 'ทำอยู่' : null, () => play(pick(i)));
       if (i === card.focus) b.disabled = true;
       row.append(b);
     });
@@ -1939,12 +1943,12 @@ function renderIsekai(card) {
   if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
-      const b = keyed(button(c, why ?? (card.step === 'focus' && i === card.current ? [card.fx?.[i], 'ทำอยู่'].filter(Boolean).join(' · ') : card.fx?.[i]), () => play(afterPick(i))), i);
+      const b = keyed(button(c, why ?? (card.step === 'focus' && i === card.current ? [card.fx?.[i], 'ทำอยู่'].filter(Boolean).join(' · ') : card.fx?.[i]), () => play(pick(i))), i);
       if (card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
       if (why) b.disabled = true;
       choices.append(b);
     });
-  } else choices.append(enter(button(BTN.next, null, () => play(T.afterNext))));
+  } else choices.append(enter(button(BTN.next, null, () => play(card.trip ? T.next : T.afterNext))));
   box.append(top);
   if (s) box.append(isekaiStatusBox(s));
   box.append(body, choices);
@@ -1975,7 +1979,8 @@ let save = null;
 // อายุของการ์ดชีวิตใบก่อน/ใบนี้ — จำใน apply ไม่ใช่ตอนวาด เพราะเล่นซ้ำจากเซฟไม่ได้วาดทุกใบ
 let curAge = null;
 function track(card) {
-  if (af) return card;
+  // อายุบนการ์ดทริปเป็นอายุร่างกายในต่างโลก ไม่ใช่อายุชีวิตไทย
+  if (af || card.kind === 'isekai') return card;
   prevAge = curAge;
   curAge = card.age;
   bookNote(card);
