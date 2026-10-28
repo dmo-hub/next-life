@@ -120,14 +120,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .choice .fx span { white-space:nowrap; }
 /* ปุ่มกู้มาจ่าย (B111) ห้อยใต้ตัวเลือกที่ขาดเงิน — ย่อและเยื้องให้เห็นว่าเป็นทางของปุ่มบน ไม่ใช่ตัวเลือกใหม่ */
 .choice.loan { min-height:40px; margin:-4px 0 0 24px; padding:6px 12px; font-size:13.5px; }
-/* text-indent สืบทอดจากย่อหน้าแขวนของจอกว้าง — ต้องคืนเป็น 0 ไม่งั้นบรรทัดรองมุดไปใต้เลขปุ่มลัด */
-.choice .hint { display:block; text-indent:0; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
-/* เลขปุ่มลัดเฉพาะจอกว้าง — มือถือไม่มีแป้นเลข เลขจะกินที่ป้ายตัวเลือกเปล่า ๆ */
-@media (min-width:768px) {
-  /* ย่อหน้าแขวน: ป้ายยาวตัดบรรทัดแล้วบรรทัดสองตรงกับข้อความ ไม่มุดใต้เลข · 38px = กรอบเลข 28 + ช่องไฟ 10 */
-  .choice > span[data-key] { padding-left:38px; text-indent:-38px; }
-  .choice > span[data-key]::before { content:attr(data-key); display:inline-block; box-sizing:border-box; width:28px; text-indent:0; margin-right:10px; border:1px solid currentColor; border-radius:3px; font-size:12px; line-height:18px; text-align:center; opacity:0.7; }
-}
+.choice .hint { display:block; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
 .recap .picks { overflow-wrap:anywhere; }
@@ -7404,7 +7397,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.3.10';
+const APP_VERSION = 'v0.3.11';
 const APP_BUILD = '2026-10-28';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
@@ -8605,12 +8598,7 @@ function button(label, fx, onclick, hint = null) {
   return b;
 }
 
-// ปุ่มลัด: ตัวเลือกที่ i ได้เลข i+1 (ถึง 9) · Enter กดปุ่มเดินเรื่องปุ่มเดียวของการ์ด
-// เลขต้องติดที่ป้ายด้วย: attr() ใน ::before อ่านจากตัวที่ถือ pseudo (span) ไม่ใช่ปุ่ม
-const keyed = (b, i) => {
-  if (i < 9) b.dataset.key = b.firstChild.dataset.key = String(i + 1);
-  return b;
-};
+// ปุ่มลัด: Enter กดปุ่มเดินเรื่องปุ่มเดียวของการ์ด
 const enter = (b) => {
   b.dataset.enter = '';
   return b;
@@ -8630,12 +8618,8 @@ document.addEventListener('keydown', (e) => {
     // โฟกัสอยู่ที่ปุ่ม/หัวข้อพับ ให้ Enter ทำงานของตัวนั้น (แชร์ภาพ · สมุดฉายา · ผังตระกูล)
     if (t.closest?.('button, summary, a')) return;
     b = root.querySelector('.choices [data-enter]');
-  } else {
-    // อ่านตำแหน่งปุ่ม ไม่ใช่ตัวอักษร — แป้นไทยแถวเลขพิมพ์ ๅ / - ภ ถ ไม่ใช่ 1–5
-    const m = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
-    if (m) b = root.querySelector(`.choices button[data-key="${m[1]}"]`);
   }
-  // การ์ดที่พับไว้ (B117) ปุ่มยังอยู่ใน DOM แค่ซ่อน — เลขลัดต้องไม่กดตัวเลือกที่มองไม่เห็น
+  // การ์ดที่พับไว้ (B117) ปุ่มยังอยู่ใน DOM แค่ซ่อน — ปุ่มลัดต้องไม่กดปุ่มที่มองไม่เห็น
   if (!b || b.disabled || b.closest('[hidden]')) return;
   e.preventDefault();
   b.click();
@@ -8907,7 +8891,7 @@ function render(card) {
         const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
         const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);
-        const b = keyed(button(c, fx, () => play(lifePick(i)), card.hints?.[i]), i);
+        const b = button(c, fx, () => play(lifePick(i)), card.hints?.[i]);
         if (why) b.disabled = true;
         choices.append(b, ...loanButtons(card, i));
       });
@@ -9039,15 +9023,15 @@ function entryOffer(card, body, choices) {
   gate.append(el('span', 'ix-k', 'เสียงเรียกจากต่างโลก'), el('div', 'ix-t', card.text));
   gate.append(el('div', 'ix-n', card.gone ? 'ถ้ารับ คุณจะหายตัวไปจากโลกนี้' : 'ถ้ารับ ชีวิตในโลกนี้จะจบลงตรงนี้'));
   body.append(gate);
-  const offer = () => choices.replaceChildren(...card.choices.map((c, i) => keyed(button(c, card.fx?.[i], () => (i === ENTRY.accept ? ask() : play(lifePick(i)))), i)));
+  const offer = () => choices.replaceChildren(...card.choices.map((c, i) => button(c, card.fx?.[i], () => (i === ENTRY.accept ? ask() : play(lifePick(i))))));
   const ask = () => {
     choices.replaceChildren(
       el('p', 'ix-ask', card.gone ? 'แน่ใจนะ หายตัวไปแล้วกลับมาเล่นชีวิตนี้ต่อไม่ได้' : 'แน่ใจนะ ชีวิตนี้จบแล้วกลับมาเล่นต่อไม่ได้'),
-      keyed(button('ยืนยัน ไปต่างโลก', null, () => play(lifePick(ENTRY.accept))), 0),
-      keyed(button('ยังก่อน', null, () => {
+      button('ยืนยัน ไปต่างโลก', null, () => play(lifePick(ENTRY.accept))),
+      button('ยังก่อน', null, () => {
         offer();
         choices.querySelector('button').focus();
-      }), 1),
+      }),
     );
     choices.querySelector('button').focus();
   };
@@ -9178,7 +9162,7 @@ function renderAfter(card) {
   } else if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = lockText(card, i);
-      const b = keyed(button(c, why ?? card.fx?.[i], () => play(afterPick(i)), card.hints?.[i]), i);
+      const b = button(c, why ?? card.fx?.[i], () => play(afterPick(i)), card.hints?.[i]);
       if (why) b.disabled = true;
       choices.append(b);
     });
@@ -9388,7 +9372,7 @@ function renderIsekai(card) {
   if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
-      const b = keyed(button(c, why ?? (card.step === 'focus' && i === card.current ? [card.fx?.[i], 'ทำอยู่'].filter(Boolean).join(' · ') : card.fx?.[i]), () => play(pick(i))), i);
+      const b = button(c, why ?? (card.step === 'focus' && i === card.current ? [card.fx?.[i], 'ทำอยู่'].filter(Boolean).join(' · ') : card.fx?.[i]), () => play(pick(i)));
       if (card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
       if (why) b.disabled = true;
       choices.append(b);
