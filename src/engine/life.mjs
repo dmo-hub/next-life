@@ -1,7 +1,7 @@
 import { makeRng } from './rng.mjs';
 import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
-import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit } from './death.mjs';
+import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt, firstPay } from './finance.mjs';
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
@@ -650,7 +650,7 @@ function stepYear(st) {
   flowChronic(st);
   ageParents(st, year);
   // คนในบ้านจากไปเองปีนี้ = การ์ดแจ้งทุกครั้ง ก่อนเหตุการณ์ของปี
-  for (const l of ageKin(st, year, yearlySaving(st))) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l });
+  for (const l of ageKin(st, year, yearlySaving(st))) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l, ...(careHelp(l.cause) && { help: careHelp(l.cause) }) });
   for (const n of kinIllNews(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), ...n });
   for (const m of petArrivals(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: petArriveText(m) });
   if (st.terminal && !st.terminal.told) {
@@ -1366,6 +1366,7 @@ function deathCard(st) {
     age: st.age,
     text: `${lifeEndWord(isGone(st))} ${st.age}`,
     cause: st.cause ?? 'other',
+    ...(careHelp(st.cause) && { help: careHelp(st.cause) }),
     // money = ทรัพย์สุทธิหลังหักหนี้รายก้อน · debt = ยอดหนี้รายก้อนที่ค้าง (ระหว่างชาติ B06 อ่านแยก)
     summary: {
       year,

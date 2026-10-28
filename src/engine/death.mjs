@@ -93,6 +93,16 @@ export function kinCause(era, seed, rng, sex, year, age) {
   return pickCause(rng, era.causes.keys, causeShares(era, sex, protoYear(era, seed, year), age));
 }
 
+// ทำร้ายตัวเอง (เจ้าของเคาะ): ไม่บอกวิธี ไม่มีการ์ดชวน · การ์ดที่บอกสาเหตุนี้ (ตายเอง · คนในบ้านจากไป) พา help ไปให้จอขึ้นสายด่วนเสมอ
+// label = [คำเชื่อม, คำนาม] รูปเดียวกับป้ายสาเหตุของจอ · เนื้อหาสั่งตายด้วยสาเหตุนี้ไม่ได้ (lint family-ops)
+export const CARE_CAUSES = {
+  self_harm: {
+    label: ['จาก', 'การทำร้ายตัวเอง'],
+    help: { phone: '1323', text: 'ถ้าคุณหรือคนใกล้ตัวกำลังรู้สึกแย่ หรือมีความคิดอยากทำร้ายตัวเอง โทรสายด่วนสุขภาพจิต 1323 ได้ฟรีตลอด 24 ชั่วโมง' },
+  },
+};
+export const careHelp = (cause) => CARE_CAUSES[cause]?.help;
+
 // ข้อความแกนตอนญาติตรวจเจอโรคเรื้อรัง — เลน A ต่อยอดด้วยการ์ด when.kin_illness
 export const KIN_ILL_TEXT = {
   heart: (who) => `${who}ตรวจพบว่าหัวใจไม่ค่อยดีแล้ว หมอให้กินยาและระวังตัวไปตลอด`,

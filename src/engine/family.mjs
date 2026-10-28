@@ -133,10 +133,21 @@ export function focusOf(st, role) {
   return (id !== undefined && st.kin.find((m) => m.id === id)) || livingOf(st, role).at(-1) || null;
 }
 
-function kinDie(st, m) {
+// cause = สาเหตุที่การ์ดเนื้อหาเล่าเอง (เช่น เมาแล้วขับ = road) ไม่ดึงเลขสุ่ม · ไม่ใส่ = สุ่มตามสัดส่วนของอายุนั้น
+function kinDie(st, m, cause) {
   m.diedAge = kinYearOf(st) - m.born;
   m.alive = false;
-  if (!ANIMAL.includes(m.role)) m.cause = kinCause(st.content.era, st.seed, st.kinCauseRng, m.sex, kinYearOf(st), m.diedAge);
+  if (m.role === 'pet') m.cause = cause ?? petCause(st, m);
+  else if (m.role !== 'herd') m.cause = cause ?? kinCause(st.content.era, st.seed, st.kinCauseRng, m.sex, kinYearOf(st), m.diedAge);
+}
+
+// สัตว์คู่ใจ (B110 ชิ้น 3): แก่ · ป่วย · อุบัติเหตุ — ค่าตั้งของเกม (ไม่มีสถิติสาเหตุตายของสัตว์เลี้ยงไทย)
+// ทอยจาก seed+id ของตัวนั้น ไม่ดึง kinRng/kinCauseRng ลำดับสุ่มของคนในบ้านจึงไม่ขยับ · ฝูงนับเป็นหน่วยเดียว ไม่มีสาเหตุรายตัว
+export const PET_CAUSES = { old: 0.7, sick: 0.2, accident: 0.1 };
+function petCause(st, m) {
+  let u = makeRng(mixSeed(st.seed, 0xde7d + m.id)).next();
+  for (const [k, w] of Object.entries(PET_CAUSES)) if ((u -= w) < 0) return k;
+  return 'old';
 }
 
 // พ่อ/แม่จากไป: สาเหตุที่รู้อยู่แล้ว (ผู้เล่นรุ่นก่อน/นัดป่วย) หรือสุ่มตามสัดส่วนของอายุนั้น · โรคที่ถ่ายทอดได้จดเป็นประวัติครอบครัว
@@ -177,11 +188,12 @@ export function applyFamily(st, c, care = 0) {
       const p = st.parents.find((x) => x.alive);
       if (p) {
         p.diedAge = p.age;
+        if (op.cause) p.cause = op.cause;
         parentDied(st, p, kinYearOf(st));
       }
     } else if (op.die) {
       const m = focusOf(st, op.die);
-      if (m?.alive) kinDie(st, m);
+      if (m?.alive) kinDie(st, m, op.cause);
     }
   }
   for (const f of c.sets_flags ?? []) {
@@ -259,7 +271,10 @@ export function ageKin(st, year, saving = 0) {
     if (!m.alive) continue;
     const a = year - m.born - 1;
     if (ANIMAL.includes(m.role)) {
-      if (a + 1 >= m.maxAge) kinLost(st, m, a + 1, year, lost);
+      if (a + 1 >= m.maxAge) {
+        if (m.role === 'pet') m.cause = petCause(st, m);
+        kinLost(st, m, a + 1, year, lost);
+      }
       continue;
     }
     const cause = kinDeathRoll(st.content.era, st.seed, st.kinCauseRng, m, year, a, st.kinRng.next());
@@ -278,9 +293,15 @@ export function ageKin(st, year, saving = 0) {
 
 // ข้อความการ์ดแจ้งการจากไป (แกนออกเองทุกครั้ง — เนื้อหาต่อยอดด้วย when.loss ได้)
 const LOSS_WHO = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน' };
+const PET_LOSS_TEXT = {
+  old: (who, age) => `${who}หลับไปอย่างสงบตามวัย ด้วยวัย ${age} ปี`,
+  sick: (who, age) => `${who}ป่วยหนักแล้วจากไป ด้วยวัย ${age} ปี`,
+  accident: (who, age) => `${who}ประสบอุบัติเหตุจากไปกะทันหัน ตอนอายุ ${age} ปี`,
+};
 export function lossText(l) {
   if (l.role === 'herd') return `ฝูง${l.kind}ที่เลี้ยงไว้ค่อย ๆ หมดไป ไม่ได้เลี้ยงต่อแล้ว`;
   const who = l.role === 'pet' ? (l.name ? `เจ้า${l.name} ${l.kind}ที่เลี้ยงไว้` : `${l.kind}ที่เลี้ยงไว้`) : `${LOSS_WHO[l.role]}${l.name}`;
+  if (l.role === 'pet' && PET_LOSS_TEXT[l.cause]) return PET_LOSS_TEXT[l.cause](who, l.age);
   return l.age < 1 ? `${who}จากไปตั้งแต่ยังไม่ทันครบขวบ` : `${who}จากไปแล้ว ด้วยวัย ${l.age} ปี`;
 }
 

@@ -41,3 +41,24 @@ events:
       - {text: "ทางที่สอง", family: [{add: peer}], merit: [{cat: neutral}]}
       - {text: "ทางที่สาม", family: [{bond: all, d: 5}, {bond: spouse, d: -10}], merit: [{cat: neutral}]}
       - {text: "ทางที่สี่", family: [{bond: parent, d: 3}], merit: [{cat: neutral}]}
+  # B110 ชิ้น 3: สาเหตุที่การ์ดเล่า — self_harm สั่งไม่ได้ · ฝูงไม่มีสาเหตุ · สัตว์ใช้สาเหตุคน · คีย์สะกดผิด — เมาแล้วขับชน (road) · สัตว์ป่วย ยังผ่าน
+  - id: bad_case_03
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", family: [{die: spouse, cause: self_harm}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", family: [{die: herd, cause: old}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", family: [{die: pet, cause: road}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", family: [{die: child, cause: crash}], merit: [{cat: neutral}]}
+  - id: ok_case_03
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", family: [{die: spouse, cause: road}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", family: [{die: pet, cause: sick}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", family: [{die: parent, cause: road}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}

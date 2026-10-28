@@ -6,8 +6,8 @@ import {
 import { INCOME_MULT, MONEY_KEYS } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
-import { PET_KINDS, HERD_KINDS } from '../../engine/family.mjs';
-import { CHRONIC, ILL_YEARS, HEREDITARY } from '../../engine/death.mjs';
+import { PET_KINDS, HERD_KINDS, PET_CAUSES } from '../../engine/family.mjs';
+import { CHRONIC, ILL_YEARS, HEREDITARY, CARE_CAUSES } from '../../engine/death.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 // คนที่ when.kin_illness เลือกได้ = พ่อแม่ + คนในบ้านที่แกนออกการ์ดแจ้งป่วย (เพื่อนรุ่นไม่แจ้ง)
 const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
@@ -16,7 +16,7 @@ const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
-  familyOp: ['add', 'n', 'leave', 'die', 'bond', 'd', 'kind', 'life', 'name'],
+  familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain', 'severance'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
@@ -495,7 +495,7 @@ export const rules = [
   {
     // ผลครอบครัวของตัวเลือก/ผลสุ่ม (B36a · B36a2): เพิ่มสมาชิก · คู่แยกทาง · คนในบ้านจากไป · ความผูกพันขึ้นลง — op ละอย่าง
     id: 'family-ops',
-    desc: 'family = [{add: spouse|child|grandchild|peer, n?: 1–3} | {add: pet|herd, kind, life: [จาก, ถึง], name?} | {leave: spouse|pet|herd} | {die: role} | {bond: role|all, d: ±1–30}] — op ละอย่าง',
+    desc: 'family = [{add: spouse|child|grandchild|peer, n?: 1–3} | {add: pet|herd, kind, life: [จาก, ถึง], name?} | {leave: spouse|pet|herd} | {die: role, cause?} | {bond: role|all, d: ±1–30}] — op ละอย่าง · cause = สาเหตุที่การ์ดเล่า (คน: กลุ่มใน data/death-causes.json ยกเว้น self_harm · pet: old|sick|accident · herd ไม่มี)',
     event(e, ctx, r) {
       for (const { node, path } of effectSites(e)) {
         if (node.family === undefined) continue;
@@ -517,6 +517,11 @@ export const rules = [
           if (o.n !== undefined && (o.add === undefined || !isInt(o.n) || o.n < 1 || o.n > 3)) r(`${p}.n`, 'n ใช้กับ add เป็น 1–3');
           if (o.leave !== undefined && !['spouse', 'pet', 'herd'].includes(o.leave)) r(`${p}.leave`, 'leave ใช้ได้กับ spouse pet herd');
           if (o.die !== undefined && !FAMILY_ROLES.includes(o.die)) r(`${p}.die`, `die ต้องเป็น ${FAMILY_ROLES.join(' ')}`);
+          // สาเหตุที่จอต้องพาสายด่วน (self_harm) ห้ามเนื้อหาสั่ง — เจ้าของไม่ให้มีการ์ดที่พาไปสู่การทำร้ายตัวเอง
+          if (o.cause !== undefined) {
+            const ok = o.die === 'pet' ? Object.keys(PET_CAUSES) : o.die === undefined || o.die === 'herd' ? [] : (ctx.causes ?? []).filter((k) => !CARE_CAUSES[k]);
+            if (!ok.includes(o.cause)) r(`${p}.cause`, ok.length ? `cause ของ die: ${o.die} ต้องเป็น ${ok.join(' ')}` : 'cause ใช้กับ die ของคนหรือสัตว์คู่ใจเท่านั้น');
+          }
         });
       }
     },

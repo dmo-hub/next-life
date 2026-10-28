@@ -5,7 +5,8 @@
 // อายุเฉลี่ยทั้งประชากรเทียบตารางชีพอยู่ในด่าน 3b (npm run gate) ไม่ซ้ำที่นี่
 // ชิ้น 2: พ่อแม่/ญาติที่จากไปมีสาเหตุทุกคน สัดส่วนใกล้ค่าคาดจากอายุ/ปีของเขาเอง · ญาติที่ตายตามนัดโรคเรื้อรังมีการ์ดแจ้งก่อน
 // · พ่อ/แม่ตายด้วยโรคถ่ายทอดได้ ⇒ ชีวิตนั้นจดประวัติครอบครัว และตายด้วยโรคนั้นบ่อยกว่าคนไม่มีประวัติ
-import { playLife, mixSeed, protoYear, causeShares, CHRONIC, DEATH_RISK, HEREDITARY, MAX_AGE } from '../src/engine/index.mjs';
+// ชิ้น 3: ทำร้ายตัวเองพาสายด่วน 1323 · สัตว์คู่ใจมีสาเหตุ · การ์ดสั่งตายพร้อมสาเหตุได้สาเหตุนั้นโดยไม่ดึงเลขสุ่ม
+import { playLife, newLife, applyFamily, mixSeed, protoYear, causeShares, CHRONIC, DEATH_RISK, HEREDITARY, MAX_AGE, PET_CAUSES } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { random } from './bots.mjs';
 
@@ -41,6 +42,8 @@ let kinNoCause = 0, kinIllDeaths = 0, kinIllUntold = 0, kinIllCards = 0, kinChro
 // คู่ (ชีวิต × โรคถ่ายทอดได้) ที่อยู่ถึง 30: [ตายด้วยโรคนั้นจริง, ค่าคาดจากอายุ/ปีที่ตาย] แยกตามมีประวัติครอบครัวโรคนั้นหรือไม่
 // เทียบสัดส่วน จริง÷คาด — คนมีประวัติครอบครัวมักอายุยืนกว่า (พ่อแม่ต้องตายก่อน) เทียบดิบจะได้ผลของอายุปน
 const hered = { yes: [0, 0], no: [0, 0] };
+// ชิ้น 3: การ์ดที่บอกว่าทำร้ายตัวเองต้องพาสายด่วน · สายด่วนไม่หลุดไปการ์ดอื่น · สัตว์คู่ใจที่จากไปมีสาเหตุของสัตว์
+let careCards = 0, careNoHelp = 0, careStray = 0, petLoss = 0, petNoCause = 0;
 let noCause = 0, cardMismatch = 0, chronicDeaths = 0, chronicUntold = 0, illCards = 0, illWrong = 0;
 const life30 = { none: [0, 0], smoker: [0, 0] };
 const smokeShare = { none: [0, 0], smoker: [0, 0] };
@@ -61,6 +64,15 @@ for (let i = 0; i < n; i++) {
     if (card.kind === 'death') {
       if (card.cause !== st.cause) cardMismatch++;
       healthDeath = st.health <= 0;
+    }
+    const said = card.kind === 'death' ? card.cause : card.loss?.cause;
+    if (said === 'self_harm') {
+      careCards++;
+      if (card.help?.phone !== '1323') careNoHelp++;
+    } else if (card.help) careStray++;
+    if (card.loss?.role === 'pet') {
+      petLoss++;
+      if (!Object.hasOwn(PET_CAUSES, card.loss.cause)) petNoCause++;
     }
   });
   const st = r.state;
@@ -181,5 +193,27 @@ check('  ตัวควบคุม สัดส่วนของอายุ 
 check('คนในบ้านที่ตายตามนัดโรคเรื้อรังมีการ์ดแจ้งก่อนทุกคน', kinIllDeaths ? kinIllUntold : 1, ` ${kinIllDeaths - kinIllUntold}/${kinIllDeaths} · การ์ดแจ้ง ${kinIllCards} ใบ · เรื้อรังไม่ผ่านนัด (การ์ดสั่งตาย/ทารก) ${kinChronicOther}`);
 check('พ่อ/แม่ตายด้วยโรคถ่ายทอดได้ ⇒ มีในประวัติครอบครัว', heirMissing, ` (ขาด ${heirMissing})`);
 check('มีประวัติครอบครัว ⇒ ตายด้วยโรคนั้นเกินค่าคาดมากกว่า', mean(hered.yes) > mean(hered.no) ? 0 : 1, ` จริง÷คาด ${fmt(mean(hered.yes))} vs ${fmt(mean(hered.no))} (ตาย ${hered.yes[0]}/${hered.no[0]} ราย)`);
+console.log('ชิ้น 3');
+check('ตาย/จากไปด้วยการทำร้ายตัวเอง ⇒ การ์ดมีสายด่วน 1323', careCards ? careNoHelp : 1, ` ${careCards - careNoHelp}/${careCards} ใบ`);
+check('สายด่วนไม่ขึ้นบนการ์ดสาเหตุอื่น', careStray, ` (หลุด ${careStray})`);
+check('สัตว์คู่ใจที่จากไปมีสาเหตุ แก่/ป่วย/อุบัติเหตุ', petLoss ? petNoCause : 1, ` ${petLoss - petNoCause}/${petLoss} ตัว`);
+// การ์ดเนื้อหาสั่งตายพร้อมสาเหตุ (เมาแล้วขับ = road): สาเหตุตรงตามการ์ด และไม่ดึงเลขจาก kinCauseRng · ตัวควบคุม: ไม่ใส่ cause ต้องดึง
+{
+  const st = newLife(mixSeed(seed, 7), content);
+  applyFamily(st, { family: [{ add: 'spouse' }, { add: 'pet', kind: 'หมา', life: [10, 15] }] });
+  const draw = (fn) => {
+    const before = st.kinCauseRng.state;
+    fn();
+    return before !== st.kinCauseRng.state;
+  };
+  const spouse = st.kin.find((m) => m.role === 'spouse');
+  const pet = st.kin.find((m) => m.role === 'pet');
+  const parent = st.parents.find((p) => p.alive);
+  const d1 = draw(() => applyFamily(st, { family: [{ die: 'spouse', cause: 'road' }, { die: 'pet', cause: 'accident' }, { die: 'parent', cause: 'road' }] }));
+  check('การ์ดสั่งตายพร้อมสาเหตุ ⇒ สาเหตุตามการ์ด ไม่ดึงเลขสุ่ม', spouse.cause === 'road' && pet.cause === 'accident' && parent.cause === 'road' && !d1 ? 0 : 1, ` คู่ ${spouse.cause} · สัตว์ ${pet.cause} · พ่อแม่ ${parent.cause} · ดึงเลข ${d1}`);
+  const other = st.parents.find((p) => p.alive);
+  const d2 = other ? draw(() => applyFamily(st, { family: [{ die: 'parent' }] })) : false;
+  check('  ตัวควบคุม ไม่ใส่สาเหตุ ⇒ สุ่มจาก kinCauseRng', other && d2 && keys.includes(other.cause) ? 0 : 1, ` (${other?.cause} · ดึงเลข ${d2})`);
+}
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 if (fail) process.exitCode = 1;

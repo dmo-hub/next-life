@@ -29,7 +29,8 @@ export function lintContext() {
   const ladders = Object.keys(JSON.parse(read('data/careers.json')).ladders);
   const reg = parse(read('content/rules/flags.yaml'));
   const flags = { flags: new Set(Object.keys(reg.flags)), prefixes: new Set(Object.keys(reg.prefixes)) };
-  return { regions, systems, eras, occupations, ladders, lore, flags, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
+  const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
+  return { regions, systems, eras, occupations, ladders, lore, flags, causes, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]
