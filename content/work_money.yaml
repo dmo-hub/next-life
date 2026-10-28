@@ -113,7 +113,7 @@ events:
         sets_flags: [guarantor]
         merit: [{cat: help_others, level: 1}]
         outcomes:
-          - {weight: 2, ok: true, text: "เพื่อนผ่อนครบจริง ซึ้งใจจนขอให้เป็นพ่อแม่ทูนหัวของลูก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.4}}
+          - {weight: 2, ok: true, text: "เพื่อนผ่อนครบจริง ซึ้งใจจนขอให้เป็นพ่อแม่ทูนหัวของลูกเขา", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.4}}
           - {weight: 3, text: "สามเดือนต่อมาเพื่อนหายเงียบ จดหมายทวงหนี้ส่งมาที่บ้านคุณแทน", effects: {happiness: -2, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}], next: work_guarantor_chase_01}
       - id: refuse_flat
         text: "ปฏิเสธตรง ๆ ไม่ค้ำใคร"
@@ -161,7 +161,7 @@ events:
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, text: "พ่อแม่ช่วยทำกับข้าวช่วยดูบ้าน เงินเหลือเก็บทุกเดือน", effects: {relations: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
-          - {weight: 1, text: "แม่กับคู่ชีวิตเปิดศึกกันทุกมื้อ บ้านไม่เคยสงบ", effects: {relations: -2, happiness: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พ่อแม่กับคู่ชีวิตเปิดศึกกันทุกมื้อ บ้านไม่เคยสงบ", effects: {relations: -2, happiness: -2}, merit: [{cat: neutral}]}
       - id: auction_house
         text: "ประมูลบ้านมือสองครึ่งราคา"
         sets_flags: [has_kids, home_owner]

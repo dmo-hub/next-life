@@ -6,7 +6,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [8, 12]}
+    when: {age: [8, 12], family: [{role: parent, sex: หญิง, alive: true}]}
     title: "ผู้กำกับตัวจิ๋ว"
     text: "อายุ {อายุ} ขวบ แอบยืมโทรศัพท์แม่ไปถ่ายแมวเต้น ตัดต่อใส่เพลงเองจนตีหนึ่ง เช้ามาพ่อแม่เจอคลิปเต็มเครื่อง ถามว่าจะเอายังไงกับเรื่องนี้"
     choices:
@@ -32,7 +32,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 3
-    when: {age: [7, 12], school: [primary, lower]}
+    when: {age: [7, 12], school: [primary, lower], family: [{role: parent, alive: true}]}
     title: "คอร์สกวดวิชาสุดสัปดาห์"
     text: "เพื่อนร่วมห้องทุกคนเรียนพิเศษ เสาร์อาทิตย์หายไปหมด ครูประจำชั้นบอกพ่อแม่ว่า '{ชื่อ}หัวไว แต่ขี้เกียจ'"
     choices:
@@ -86,7 +86,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [6, 12], school: [primary, lower]}
+    when: {age: [6, 12], school: [primary, lower], family: [{role: parent, sex: หญิง, alive: true}]}
     multipliers: {flags: {broken_home: 2}}
     title: "กล่องข้าวหายอีกแล้ว"
     text: "กล่องข้าวของคุณหายเป็นวันที่สาม แขนมีรอยช้ำจากเด็กห้องข้าง ๆ ที่ดักรอหลังโรงอาหาร แม่จับแขนถามว่า '{ชื่อ} ไปโดนอะไรมา' คุณยังไม่ได้ตอบอะไร"
@@ -122,7 +122,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [3, 12]}
+    when: {age: [3, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ขนของขึ้นรถกระบะ"
     text: "พ่อได้งานใหม่ต่างจังหวัด ค่าแรงดีกว่าเดิมเกือบเท่าตัว พ่อแม่ถามคุณว่าอยากไปไหม ถ้าไปต้องทิ้งเพื่อนแถวบ้าน และยายที่เลี้ยงมาตั้งแต่เกิด"
     choices:
@@ -147,7 +147,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [4, 12]}
+    when: {age: [4, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "เสียงจานแตกกลางดึก"
     text: "พ่อแม่ทะเลาะเรื่องเงินทุกคืน คุณนอนกอดหมอนฟังอยู่หลังประตู เช้ามาทั้งคู่ยิ้มให้เหมือนไม่มีอะไรเกิดขึ้น"
     choices:
@@ -173,7 +173,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 1
-    when: {age: [5, 10]}
+    when: {age: [5, 10], family: [{role: parent, alive: true}]}
     title: "หน้าร้อนที่บ้านยาย"
     text: "หน้าร้อนนี้พ่อแม่ทำงานไม่มีวันหยุด ยายที่{ภาค}โทรมาบอกว่าคิดถึงหลาน มีเป็ดเกิดใหม่สิบตัวรออยู่"
     choices:

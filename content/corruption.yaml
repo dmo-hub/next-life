@@ -226,7 +226,7 @@ events:
         sets_flags: [embezzler]
         merit: [{cat: greed_harm, level: 3}]
         outcomes:
-          - {weight: 2, text: "ได้เงินก้อนตั้งตัวใหม่ แต่กลับบ้านเกิดไม่ได้อีกแล้ว แม่โทรมาร้องไห้ทุกเดือน", effects: {money: {unit: income_x, amount: 3}, relations: -3, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้เงินก้อนตั้งตัวใหม่ แต่กลับบ้านเกิดไม่ได้อีกแล้ว คนที่บ้านโทรมาร้องไห้ทุกเดือน", effects: {money: {unit: income_x, amount: 3}, relations: -3, happiness: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ตำรวจตามเจอที่ห้องเช่าในอาทิตย์เดียว ต้องขายทุกอย่างใช้คืนพร้อมค่าทนาย", effects: {money: {unit: income_x, amount: -2}, relations: -3, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: open_books
         text: "ปิดประกาศบัญชีให้ทุกคนดู"

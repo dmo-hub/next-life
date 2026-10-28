@@ -10,7 +10,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: oil_crisis_2
-    when: {age: [6, 18], school: [primary, lower, upper, voc]}
+    when: {age: [6, 18], school: [primary, lower, upper, voc], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "บ้านต้องรัดเข็มขัด"
     text: "น้ำมันขึ้นอีกรอบ ไฟฟ้าดับบ่อย โรงงานที่พ่อทำงานลดกะเหลือวันเว้นวัน ค่าเทอมงวดหน้ายังไม่รู้จะเอามาจากไหน คุณได้ยินพ่อแม่คุยกันตอนดึก"
     choices:
@@ -35,7 +35,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: oil_crisis_2
-    when: {age: [0, 5]}
+    when: {age: [0, 5], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "จุดเทียนกินข้าว"
     text: "น้ำมันขึ้นอีกรอบ ไฟฟ้าดับบ่อย โรงงานที่พ่อทำงานลดกะเหลือวันเว้นวัน แม่จุดเทียนกินข้าวแทบทุกคืน คุณได้ยินพ่อแม่คุยกันเรื่องเงินตอนดึก"
     choices:
@@ -86,7 +86,7 @@ events:
         requires: {family: [{role: parent, alive: true}]}
         effects: {health: 1, relations: 1, income_mult: 0.8}
         outcomes:
-          - {weight: 2, ok: true, multipliers: {occupation: {farmer: 2, labor: 1.5}}, text: "ข้าวปีนั้นราคาดีเกินคาด พ่อตบบ่าบอกว่านาผืนนี้รอคุณมานานแล้ว", effects: {happiness: 1, money: {unit: income_x, amount: 0.4}}, next: era_econ_oil2_farm_01, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {occupation: {farmer: 2, labor: 1.5}}, text: "ข้าวปีนั้นราคาดีเกินคาด พ่อแม่ยิ้มบอกว่านาผืนนี้รอคุณมานานแล้ว", effects: {happiness: 1, money: {unit: income_x, amount: 0.4}}, next: era_econ_oil2_farm_01, merit: [{cat: neutral}]}
           - {weight: 1, text: "ฝนทิ้งช่วงทั้งปี ต้นข้าวเหลืองตายคานา ต้องกลับเข้าเมืองไปหางานใหม่", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: care_parents, level: 1}]
 
@@ -97,7 +97,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: tom_yum_kung
-    when: {age: [0, 18]}
+    when: {age: [0, 18], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ต้มยำกุ้งเดือดทั้งบ้าน"
     text: "ข่าวค่าเงินบาทลอยตัว พ่อเงียบไปทั้งคืน บริษัทพ่อปิดกะทันหัน หนี้บ้านเพิ่มเท่าตัวในพริบตา แม่ถามคุณว่าอยากย้ายบ้านไหม"
     choices:
@@ -152,7 +152,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: global_financial_crisis
-    when: {age: [6, 18], school: [primary, lower, upper, voc]}
+    when: {age: [6, 18], school: [primary, lower, upper, voc], family: [{role: parent, sex: หญิง, alive: true}]}
     title: "ข่าวร้ายจากอีกซีกโลก"
     text: "ธนาคารใหญ่ฝั่งอเมริกาล้ม ออเดอร์โรงงานแถวบ้านหายไปครึ่ง แม่โดนพักงานไม่มีกำหนด ลูกเห็นแม่นั่งดูประกาศรับสมัครงานทุกคืน"
     choices:
@@ -177,7 +177,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: global_financial_crisis
-    when: {age: [0, 5]}
+    when: {age: [0, 5], family: [{role: parent, sex: หญิง, alive: true}]}
     title: "แม่อยู่บ้านทุกวัน"
     text: "ธนาคารใหญ่ฝั่งอเมริกาล้ม ออเดอร์โรงงานแถวบ้านหายไปครึ่ง แม่โดนพักงานไม่มีกำหนด คุณดีใจที่แม่อยู่บ้านทุกวัน ส่วนแม่นั่งดูประกาศรับสมัครงานทุกคืน"
     choices:
@@ -321,7 +321,7 @@ events:
     category: society
     stage: ทำงาน
     years: [2500, 2650]
-    when: {age: [19, 59], occupation: [labor, factory, craft, service]}
+    when: {age: [19, 59], occupation: [labor, factory, craft, service], family: [{role: parent, sex: ชาย, alive: true}]}
     title: "นาผืนเก่าเรียกกลับ"
     text: "ข้าวขายได้ราคา พ่อเริ่มเหนื่อยง่าย เพื่อนในเมืองส่งจดหมายมาว่าโรงงานกลับมาเปิดกะแล้ว คนทั้งหมู่บ้านรอดูว่าคุณจะอยู่หรือไป"
     choices:
@@ -363,7 +363,7 @@ events:
         sets_flags: [own_business]
         merit: [{cat: neutral}]
       - text: "กลับบริษัท ให้แม่ดูร้านแทน"
-        requires: {family: [{role: parent, alive: true}]}
+        requires: {family: [{role: parent, sex: หญิง, alive: true}]}
         effects: {relations: 1, happiness: -1, money: {unit: income_x, amount: 0.5}}
         merit: [{cat: neutral}]
       - text: "จ้างคนตกงานในซอยมาช่วยชง"

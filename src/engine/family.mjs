@@ -281,14 +281,15 @@ export const lastLoss = (st) => (st.kinLoss ?? []).at(-1) ?? null;
 // ชื่อที่การ์ดสูญเสียเรียก — สัตว์เรียกแบบ petCall
 export const lossCall = (l) => (ANIMAL.includes(l.role) ? petCall(l) : l.name);
 
-// เงื่อนไขครอบครัวของการ์ด (when.family / requires.family): บทบาท · ยังอยู่ · ช่วงอายุ · จำนวน
+// เงื่อนไขครอบครัวของการ์ด (when.family / requires.family): บทบาท · เพศ · ยังอยู่ · ช่วงอายุ · จำนวน
 // ไม่ใส่ count = ต้องมีอย่างน้อย 1 คนที่ตรง · คู่ที่หย่าแล้วไม่นับเป็นคู่ครอง
+// sex แยกพ่อกับแม่ — ข้อความที่เอ่ย "แม่" ต้องไม่ผ่านเพราะพ่อยังอยู่ (B138)
 export function familyOk(st, f) {
   const year = kinYearOf(st);
   const pool = f.role === 'parent'
-    ? st.parents.map((p) => ({ alive: p.alive, age: p.age }))
-    : (st.kin ?? []).filter((m) => m.role === f.role && !m.left).map((m) => ({ alive: m.alive, age: memberAge(st, m, year) }));
-  const n = pool.filter((m) => (f.alive === undefined || m.alive === f.alive) && kinInRange(m.age, f.age)).length;
+    ? st.parents.map((p) => ({ alive: p.alive, age: p.age, sex: p.sex }))
+    : (st.kin ?? []).filter((m) => m.role === f.role && !m.left).map((m) => ({ alive: m.alive, age: memberAge(st, m, year), sex: m.sex }));
+  const n = pool.filter((m) => (f.alive === undefined || m.alive === f.alive) && (f.sex === undefined || m.sex === f.sex) && kinInRange(m.age, f.age)).length;
   return f.count ? kinInRange(n, f.count) : n > 0;
 }
 

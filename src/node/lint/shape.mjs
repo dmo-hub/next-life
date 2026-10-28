@@ -26,7 +26,7 @@ const KEYS = {
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
-  family: ['role', 'age', 'alive', 'count', 'health', 'relations'],
+  family: ['role', 'sex', 'age', 'alive', 'count', 'health', 'relations'],
   multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish', 'rank', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
@@ -276,6 +276,7 @@ export const rules = [
           if (!isObj(f) || !FAMILY_ROLES.includes(f.role)) return r(p, `role ต้องเป็น ${FAMILY_ROLES.join(' ')}`);
           if (f.age !== undefined && !isRange(f.age, 0, 120)) r(`${p}.age`, 'age ต้องเป็น [จาก, ถึง] 0–120');
           if (f.alive !== undefined && typeof f.alive !== 'boolean') r(`${p}.alive`, 'alive ต้องเป็น true/false');
+          if (f.sex !== undefined && !SEXES.includes(f.sex)) r(`${p}.sex`, `sex ต้องเป็น ${SEXES.join(' ')}`);
           if (f.count !== undefined && !isRange(f.count, 0, 20)) r(`${p}.count`, 'count ต้องเป็น [จาก, ถึง] 0–20');
           for (const k of ['health', 'relations']) if (f[k] !== undefined && !bound(f[k])) r(`${p}.${k}`, 'ต้องเป็น {min, max} 0–100');
         });
@@ -416,7 +417,7 @@ export const rules = [
   },
   {
     id: 'choice-lock',
-    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
+    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, sex?, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
     event(e, ctx, r) {
       const cs = choicesOf(e);
       for (const { c, path } of cs) {
@@ -427,7 +428,7 @@ export const rules = [
         // อายุตามกฎหมาย (เช่น พินัยกรรม 15 ปีขึ้นไป) — แกนเขียนเหตุผล "อายุยังไม่ถึง N ปี" เอง
         if (q.age !== undefined && !(isObj(q.age) && (q.age.min !== undefined || q.age.max !== undefined) && [q.age.min, q.age.max].every((v) => v === undefined || (Number.isInteger(v) && v >= 0 && v <= 120)))) r(`${at}.age`, 'ต้องเป็น {min, max} จำนวนเต็ม 0–120');
         // ตัวเลือกที่พูดถึงคนในบ้านล็อกได้เมื่อไม่มีคนนั้น (เงื่อนไขชุดเดียวกับ when.family)
-        if (q.family !== undefined && !(Array.isArray(q.family) && q.family.length && q.family.every((f) => isObj(f) && FAMILY_ROLES.includes(f.role) && (f.alive === undefined || typeof f.alive === 'boolean') && (f.age === undefined || isRange(f.age, 0, 120)) && (f.count === undefined || isRange(f.count, 0, 20)) && f.health === undefined && f.relations === undefined))) r(`${at}.family`, 'ต้องเป็น [{role: parent|spouse|child|grandchild, alive?: true/false, age?: [จาก, ถึง], count?: [จาก, ถึง]}]');
+        if (q.family !== undefined && !(Array.isArray(q.family) && q.family.length && q.family.every((f) => isObj(f) && FAMILY_ROLES.includes(f.role) && (f.alive === undefined || typeof f.alive === 'boolean') && (f.sex === undefined || SEXES.includes(f.sex)) && (f.age === undefined || isRange(f.age, 0, 120)) && (f.count === undefined || isRange(f.count, 0, 20)) && f.health === undefined && f.relations === undefined))) r(`${at}.family`, `ต้องเป็น [{role: parent|spouse|child|grandchild, sex?: ${SEXES.join('|')}, alive?: true/false, age?: [จาก, ถึง], count?: [จาก, ถึง]}]`);
         if (q.money !== undefined && !(isMoney(q.money) && q.money.amount > 0)) r(`${at}.money`, 'ต้องเป็นเงินมีหน่วย amount > 0');
         if (q.stats !== undefined && (!isObj(q.stats) || Object.entries(q.stats).some(([k, b]) => !STAT_KEYS.includes(k) || !bound(b) || (b.min === undefined && b.max === undefined)))) r(`${at}.stats`, 'ต้องเป็น {ค่าสถานะ: {min, max}} 0–100');
         if (q.flags !== undefined && (!isObj(q.flags) || ['has', 'not'].some((k) => q.flags[k] !== undefined && !Array.isArray(q.flags[k])))) r(`${at}.flags`, 'flags ต้องเป็น {has: [...], not: [...]}');

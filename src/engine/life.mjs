@@ -995,6 +995,13 @@ function jobHint(st, c) {
   return `รายได้ราว ${band(next)} บาท/เดือน${now}`;
 }
 
+// เหตุผลตั้งต้นของตัวเลือกที่ล็อกด้วยครอบครัว — เงื่อนไขพ่อ/แม่ล้วนบอกตัวคนที่ไม่อยู่ ที่เหลือเนื้อหาใส่ reason เอง
+function familyWhy(fs) {
+  if (!fs.every((f) => f.role === 'parent')) return 'ครอบครัวยังไม่เข้าเงื่อนไข';
+  const sexes = new Set(fs.map((f) => f.sex));
+  return sexes.size > 1 || sexes.has(undefined) ? 'พ่อแม่ไม่อยู่แล้ว' : sexes.has('หญิง') ? 'แม่ไม่อยู่แล้ว' : 'พ่อไม่อยู่แล้ว';
+}
+
 // ตัวเลือกที่ต้องมีเงิน/ค่าสถานะ/ธงถึงจะเลือกได้ (B14 A6) · ข้อความเหตุผลจากเนื้อหาทับข้อความตั้งต้น
 // extra = เงินที่จะกู้มาเติม — ถามว่ากู้แล้วกดได้ไหม โดยไม่แตะ state
 function lockReason(st, c, extra = 0) {
@@ -1014,7 +1021,7 @@ function lockReason(st, c, extra = 0) {
   }
   if (q.flags && !flagsOk(st, q.flags)) why.push('ยังไม่เข้าเงื่อนไข');
   if (q.edu && eduRank(st.edu) < eduRank(q.edu)) why.push('วุฒิไม่ถึง');
-  if (q.family && !q.family.every((f) => familyOk(st, f))) why.push(q.family.every((f) => f.role === 'parent') ? 'พ่อแม่ไม่อยู่แล้ว' : 'ครอบครัวยังไม่เข้าเงื่อนไข');
+  if (q.family && !q.family.every((f) => familyOk(st, f))) why.push(familyWhy(q.family));
   if (!why.length) return null;
   return q.reason ?? why.join(' · ');
 }

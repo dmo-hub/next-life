@@ -14,7 +14,7 @@ events:
       - id: draw
         text: "รอจับตามคิว ลุ้นที่โต๊ะ"
         outcomes:
-          - {weight: 1, ok: true, text: "มือล้วงขึ้นมาเป็นใบดำ เพื่อนในแถวตะโกนเฮ แม่ที่รั้วยกมือไหว้ฟ้า", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "มือล้วงขึ้นมาเป็นใบดำ เพื่อนในแถวตะโกนเฮ แม่ใครสักคนที่รั้วยกมือไหว้ฟ้า", effects: {happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ใบแดง ต้องไปเป็นทหารเกณฑ์สองปี ตัดผมเกรียนพรุ่งนี้เช้า", effects: {health: 1, network: 1, happiness: -1, knowledge: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: volunteer
@@ -38,7 +38,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 3
-    when: {age: [20, 30], sex: [ชาย], flags: {not: [married]}, family: [{role: parent, alive: true}]}
+    when: {age: [20, 30], sex: [ชาย], flags: {not: [married]}, family: [{role: parent, sex: หญิง, alive: true}]}
     title: "แม่อยากเกาะชายผ้าเหลือง"
     text: "แม่ไม่เคยพูดตรง ๆ แต่ทุกครั้งที่มีงานบวชลูกบ้านข้าง ๆ แม่จะกลับมานั่งเงียบนาน วันนี้ป้าข้างบ้านพูดแทนให้ 'ลูกผู้ชายบวชให้แม่สักพรรษา แม่จะได้ขึ้นสวรรค์'"
     choices:
@@ -65,9 +65,9 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 3
-    when: {age: [30, 55], sex: [หญิง], flags: {not: [married]}, family: [{role: parent, alive: true, age: [65, 120]}]}
+    when: {age: [30, 55], sex: [หญิง], flags: {not: [married]}, family: [{role: parent, sex: ชาย, alive: true, age: [65, 120]}]}
     title: "ทุกคนหันมามองลูกสาวคนที่ยังโสด"
-    text: "พ่อล้มในห้องน้ำ หมอบอกว่าต่อจากนี้ต้องมีคนอยู่ด้วยตลอด วงประชุมญาติเงียบไปพักหนึ่ง แล้วน้าก็พูดขึ้นมา 'ก็{ชื่อ}ไง ยังไม่มีครอบครัว ลูกสาวดูแลพ่อแม่ได้ดีกว่าลูกชายอยู่แล้ว'"
+    text: "พ่อล้มในห้องน้ำ หมอบอกว่าต่อจากนี้ต้องมีคนอยู่ด้วยตลอด วงประชุมญาติเงียบไปพักหนึ่ง แล้วน้าก็พูดขึ้นมา 'ก็{ชื่อ}ไง ยังไม่มีครอบครัว ผู้หญิงดูแลพ่อแม่ได้ดีกว่าผู้ชายอยู่แล้ว'"
     choices:
       - id: move_home
         text: "ลาออกกลับบ้านไปดูแลเอง"

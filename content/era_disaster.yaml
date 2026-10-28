@@ -7,7 +7,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: typhoon_gay
-    when: {age: [6, 12], school: [primary, lower]}
+    when: {age: [6, 12], school: [primary, lower], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ไต้ฝุ่นกลางดึก"
     text: "พายุเข้าฝั่งตอนตีสอง ลมหอบหลังคาสังกะสีปลิวไปทั้งแผ่น เช้ามาเรือของพ่อที่จอดหน้าบ้านหายไปกับคลื่น พ่อแม่นั่งเงียบอยู่นาน คุณยืนมองหลังคาที่หายไปแล้วรู้ว่าต้องทำอะไรสักอย่าง"
     choices:
@@ -36,7 +36,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: typhoon_gay
-    when: {age: [0, 5]}
+    when: {age: [0, 5], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ลมพัดหลังคาหาย"
     text: "พายุเข้าฝั่งตอนตีสอง ลมหอบหลังคาสังกะสีปลิวไปทั้งแผ่น แม่อุ้มคุณไว้แน่นทั้งคืน เช้ามาเรือของพ่อที่จอดหน้าบ้านหายไปกับคลื่น พ่อนั่งเงียบอยู่นาน"
     choices:
@@ -99,12 +99,13 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: sars
-    when: {age: [6, 12], school: [primary, lower]}
+    when: {age: [6, 12], school: [primary, lower], family: [{role: parent, alive: true}]}
     title: "ไอสามวันช่วงโรคระบาด"
     text: "ข่าวโรคปอดอักเสบปริศนาจากต่างประเทศเต็มจอ ทั้งห้องเรียนใส่หน้ากาก คุณไอติดกันสามวัน ตัวรุม ๆ พ่อแม่ใจคอไม่ดี"
     choices:
       - id: private_hospital
         text: "บอกแม่ว่าเจ็บหน้าอกเวลาไอ"
+        requires: {family: [{role: parent, sex: หญิง, alive: true}]}
         effects: {money: {unit: income_x, amount: -0.5}}
         outcomes:
           - {weight: 3, text: "แม่รีบไปโรงพยาบาลเอกชน หมอบอกแค่หวัดธรรมดา ได้ไอติมปลอบใจขากลับ", effects: {happiness: 1}, merit: [{cat: neutral}]}
@@ -133,7 +134,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: sars
-    when: {age: [0, 5]}
+    when: {age: [0, 5], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "หน้ากากเต็มบ้าน"
     text: "ข่าวโรคปอดอักเสบปริศนาจากต่างประเทศเต็มจอ แม่ซื้อหน้ากากมาตุนไว้กล่องใหญ่ คืนนี้คุณไอไม่หยุด ตัวรุม ๆ พ่อแม่ผลัดกันนั่งเฝ้าไม่ยอมนอน"
     choices:
@@ -201,7 +202,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: tsunami
-    when: {age: [0, 12]}
+    when: {age: [0, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ทะเลถอยหนี"
     text: "เช้าวันหยุดที่ชายหาด น้ำทะเลลดลงไปไกลผิดปกติ ปลาดิ้นอยู่บนทรายเต็มไปหมด เด็ก ๆ ทั้งหาดวิ่งกรูลงไปเก็บ คุณกำลังจะวิ่งตามเพื่อน"
     choices:
@@ -271,7 +272,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: great_flood
-    when: {age: [6, 12], school: [primary, lower]}
+    when: {age: [6, 12], school: [primary, lower], family: [{role: parent, alive: true}]}
     title: "น้ำขึ้นวันละคืบ"
     text: "น้ำเหนือไหลเข้าเมือง ระดับน้ำขึ้นวันละคืบ ชั้นล่างของบ้านจมไปแล้ว โรงเรียนประกาศปิดไม่มีกำหนด พ่อแม่ขนของขึ้นชั้นสอง ส่วนคุณตื่นเต้นมากกว่ากลัว"
     choices:
@@ -302,7 +303,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: great_flood
-    when: {age: [0, 5]}
+    when: {age: [0, 5], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "บ้านกลายเป็นเกาะ"
     text: "น้ำเหนือไหลเข้าเมือง ชั้นล่างของบ้านจมไปแล้ว พ่อแม่ขนของขึ้นชั้นสองกันทั้งคืน ส่วนคุณนั่งมองปลาว่ายผ่านประตูบ้าน ตื่นเต้นมากกว่ากลัว"
     choices:
@@ -361,7 +362,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: covid19
-    when: {age: [6, 12], school: [primary, lower]}
+    when: {age: [6, 12], school: [primary, lower], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "เรียนผ่านจอ"
     text: "โรคระบาดทั่วโลก โรงเรียนปิด ครูสอนผ่านจอ แต่บ้านมีมือถือเครื่องเดียว แม่ต้องใช้ขายของ พ่อต้องใช้รับงาน คุณต้องใช้เรียน"
     choices:
@@ -394,7 +395,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: covid19
-    when: {age: [0, 5]}
+    when: {age: [0, 5], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "หน้ากากใบจิ๋ว"
     text: "โรคระบาดทั่วโลก ผู้ใหญ่ทุกคนใส่หน้ากาก ตลาดหน้าบ้านปิด พ่อไม่ได้ออกไปทำงานมาสองเดือน ทั้งบ้านอยู่แต่ในห้อง คุณรู้แค่ว่าออกไปเล่นข้างนอกไม่ได้แล้ว"
     choices:

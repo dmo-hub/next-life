@@ -7,6 +7,7 @@
 import { playLife, playAfterlife, nextLife, mixSeed, lifeQx, focusOf, memberAge, newLife, addMember, ageKin, BOND_START, BOND_FLOOR } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
+import { kinGaps, kinDeadRefs, familyLockShort, FAMILY_OPEN_MIN } from './kin.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
@@ -17,12 +18,14 @@ const n = opt('n', 5000);
 const seed = opt('seed', 1);
 const content = loadContent();
 const era = content.era;
+const eventById = new Map(content.events.map((e) => [e.id, e]));
 // กรอบจำนวนลูกเฉลี่ยของคนที่อยู่ถึง 50 — ค่าตั้งของเกม (ไม่มีอัตราเจริญพันธุ์รวมรายยุคในชุดข้อมูล) · ลูกมาจากตัวเลือกของผู้เล่นเท่านั้น
 // ขอบล่างต่ำเพราะเนื้อหายังมีทางมีลูกน้อย (การ์ดถามมีลูกเพิ่มอยู่ในงานเนื้อหาครอบครัว) — ขอบนี้กันแค่ "ไม่มีใครมีลูกเลย"
 const KIDS_BAND = [0.05, 3];
 // ปีเกิดของรุ่นถัดไปถูกตัดที่ปีเกิดสุดท้ายในข้อมูล (ทางในตระกูลเดิม) — ลูกจริงที่เกิดหลังจากนั้นเทียบหลังตัด
 const lastBirth = era.births.from + era.births.w.length - 1;
 
+const kinDead = new Map();
 let revive = 0, deadNamed = 0, flagBad = 0, nameDup = 0, households = 0, cards = 0;
 let died = 0, expected = 0, expectedShift = 0;
 let heirChecks = 0, heirBad = 0;
@@ -47,6 +50,9 @@ for (const [bot, pick] of Object.entries(BOTS)) {
       // คนเป้าสุ่มตอนการ์ดเลือกขึ้น — การ์ดผลใบถัดมายังเรียกคนเดิมได้แม้ผลทำให้เขาจากไป จึงตรวจเฉพาะการ์ดเลือก
       // การ์ดชวนไปต่างโลก (B68d) ไม่ผ่านการเลือกคนเป้าและข้อความไม่เรียกชื่อใคร — คนเป้าที่ค้างจากการ์ดก่อนหน้าจึงไม่ใช่คนที่การ์ดนี้เรียก
       if (card.kind === 'event' && !card.entry) {
+        // B138: ข้อความที่ยังเปิดอยู่เอ่ยถึงแม่ พ่อ คู่ ลูก สัตว์เลี้ยง ที่ไม่มีชีวิตแล้ว
+        const ev = eventById.get(card.id);
+        if (ev) for (const k of kinDeadRefs(card, ev, st)) kinDead.set(k, (kinDead.get(k) ?? 0) + 1);
         for (const r of ['spouse', 'child', 'grandchild']) {
           const f = focusOf(st, r);
           if (f && !f.alive) deadNamed++;
@@ -111,6 +117,15 @@ check('สมาชิกตายตามตารางชีพ (ตาย�
 check('  ตัวควบคุม qx อายุ +20 ต้องหลุดกรอบ', ratioShift >= 0.9 && ratioShift <= 1.1 ? 1 : 0, ` ${fmt(ratioShift)}`);
 check('คนที่จากไปไม่กลับมามีชีวิต', revive);
 check('การ์ดไม่เรียกชื่อคนที่จากไป', deadNamed);
+// B138: ด่านคงที่ไล่ทุกการ์ด (ครอบการ์ดที่บอทยังไม่เคยเจอ) + ด่านตอนเล่นจริง (จับเงื่อนไขที่เขียนไว้แต่ไม่ตรงคนที่เอ่ยถึง)
+{
+  const gaps = kinGaps(content.events);
+  check('ข้อความที่เอ่ยถึงคนในบ้านมีเงื่อนไขให้เขายังอยู่', gaps.length, gaps.length ? ` · ${gaps.slice(0, 5).map((g) => `${g.id} ${g.at} ${g.who} «${g.text}»`).join(' · ')}` : '');
+  const short = familyLockShort(content.events);
+  check(`ล็อกด้วยครอบครัวแล้วยังกดได้ ≥ ${FAMILY_OPEN_MIN} ตัวเลือก`, short.length, short.length ? ` · ${short.map((x) => `${x.id} ${x.open}/${x.of}`).join(' · ')}` : '');
+  const dead = [...kinDead].sort((a, b) => b[1] - a[1]);
+  check('การ์ดที่ขึ้นไม่เอ่ยถึงคนในบ้านที่ไม่อยู่แล้ว', dead.reduce((t, [, v]) => t + v, 0), dead.length ? ` · ${dead.slice(0, 5).map(([k, v]) => `${k} ×${v}`).join(' · ')}` : '');
+}
 check(`ชื่อในบ้านไม่ซ้ำ (${households} บ้าน)`, nameDup);
 check('ธง married/has_kids ตรงสมาชิกจริงทุกการ์ด', flagBad);
 check('ทางในตระกูลเกิดเป็นลูก/หลานจริง', heirChecks ? heirBad : 1, ` ${heirChecks - heirBad}/${heirChecks}`);

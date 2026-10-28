@@ -147,7 +147,7 @@ events:
         text: "เข้าแก๊ง ซิ่งทุกคืน"
         outcomes:
           - {ok: true, weight: 2, text: "มีพวกพ้องเต็มซอย ไม่มีใครกล้าแตะ", effects: {happiness: 2, relations: 1, health: -1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ด่านตำรวจรวบทั้งแก๊ง พ่อแม่ต้องมาประกันตัว", effects: {relations: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ด่านตำรวจรวบทั้งแก๊ง ผู้ปกครองต้องมาประกันตัว", effects: {relations: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: extort_juniors
         text: "ร่วมไถเงินรุ่นน้อง"
@@ -265,6 +265,7 @@ events:
         merit: [{cat: help_others, level: 1}]
       - id: call_parents
         text: "โทรให้พ่อแม่มารับ"
+        requires: {family: [{role: parent, alive: true}]}
         outcomes:
           - {ok: true, weight: 2, text: "โดนด่ายับ แต่พ่อแม่พาไปรักษาจนหายดี", multipliers: {stats: {relations: 2}}, effects: {health: 1, relations: 1, happiness: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "พ่อแม่ยึดทั้งรถทั้งมือถือไปทั้งปี", effects: {health: 1, happiness: -2}, merit: [{cat: neutral}]}
@@ -294,9 +295,10 @@ events:
         merit: [{cat: neutral}]
       - id: ask_parents_scout
         text: "พาแมวมองไปคุยกับพ่อแม่"
+        requires: {family: [{role: parent, alive: true}]}
         outcomes:
           - {ok: true, weight: 1, text: "พ่อแม่ยอมให้ลองหนึ่งปี ขอแค่เกรดห้ามตก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "พ่อไล่แมวมองออกจากบ้าน แล้วยกคอมไปขายทิ้งต่อหน้า", effects: {relations: -1, happiness: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ที่บ้านไล่แมวมองออกจากบ้าน แล้วยกคอมไปขายทิ้งต่อหน้า", effects: {relations: -1, happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse_scout
         text: "ปฏิเสธ กลับไปตั้งใจเรียน"

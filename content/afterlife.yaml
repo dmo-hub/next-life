@@ -157,7 +157,7 @@ events:
     years: [2400, 2700]
     lore_ref: lore-afterlife.md#3
     weight: 3
-    when: {age: [0, 12]}
+    when: {age: [0, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ขนมกับตุ๊กตา"
     text: "พ่อแม่ถือขนมที่คุณชอบกับตุ๊กตาตัวโปรดไปวางหน้าศาลา แม่กรวดน้ำมือสั่นจนน้ำหกเลอะกระโปรง พ่อเอ่ยชื่อเล่นของคุณซ้ำ ๆ เหมือนกลัวส่วนบุญจะหลงทาง"
     choices:
@@ -354,7 +354,7 @@ events:
       - text: "หนูจะจำไว้ เกิดใหม่จะจำ"
         merit: [{cat: bhavana, level: 1}]
         effects: {knowledge: 1}
-      - text: "หนูอยากกลับไปหาแม่"
+      - text: "หนูอยากกลับไปหาคนที่บ้าน"
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, text: "พญายมลูบหัวเบา ๆ 'คนที่บ้านยังคิดถึงหนูอยู่นะ'", effects: {relations: 1}, merit: [{cat: neutral}]}
@@ -678,6 +678,7 @@ events:
     years: [2400, 2700]
     lore_ref: lore-afterlife.md#3
     weight: 3
+    when: {family: [{role: child, alive: true}]}
     title: "เฝ้าได้แค่นอกรั้ว"
     text: "ตามคติผีเรือน บรรพบุรุษเฝ้าลูกหลานในบ้าน แต่ผู้ที่กรรมยังค้างได้แค่ยืนนอกรั้ว วันที่ประตูเปิดให้กลับมา คุณยืนอยู่ปลายรั้ว เห็นลูกวิ่งเล่นอยู่ไกล ๆ เรียกเท่าไรก็ไม่ได้ยิน"
     choices:
@@ -702,7 +703,7 @@ events:
     scene: ancestor
     years: [2400, 2700]
     lore_ref: lore-afterlife.md#3
-    when: {flags: {has: [in_debt]}}
+    when: {flags: {has: [in_debt]}, family: [{role: child, alive: true}]}
     title: "ห่วงหนี้ที่ทิ้งไว้"
     text: "ผีบ้านผีเรือนว่ากันว่าห่วงคนในบ้านที่สุด แต่สิ่งที่คุณห่วงกว่าคือหนี้ก้อนที่ยังไม่ได้ปิด จดหมายทวงหนี้ยังมาส่งที่บ้านทุกเดือน ส่วนลูกน้อยของคุณเริ่มนับเหรียญเป็นแล้ว"
     choices:
@@ -727,7 +728,7 @@ events:
     scene: ancestor
     years: [2400, 2700]
     lore_ref: lore-afterlife.md#3
-    when: {stats: {relations: {max: 30}}}
+    when: {stats: {relations: {max: 30}}, family: [{role: child, alive: true}]}
     title: "บ้านที่ไม่ค่อยคุยกัน"
     text: "ผีเรือนอย่างคุณได้กลับมาเฝ้าบ้านหลังเดิม ผู้ใหญ่ในบ้านยังไม่ค่อยคุยกันเหมือนตอนคุณอยู่ กินข้าวคนละเวลา ทักกันแค่ในกลุ่มแชต มีลูกคนเล็กของคุณนั่งมองทุกคนเงียบ ๆ"
     choices:

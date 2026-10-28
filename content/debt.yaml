@@ -37,8 +37,8 @@ events:
         text: "โทรขอเงินที่บ้านเพิ่ม"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "แม่บอกปีนี้ขายของได้ราคา โอนมาเกินที่ขอแถมกำชับให้กินดี ๆ", effects: {happiness: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ได้เงินครบ มารู้ทีหลังว่าพ่อเอาโฉนดที่นาไปจำนำมาให้", effects: {relations: 2, happiness: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ที่บ้านบอกปีนี้ขายของได้ราคา โอนมาเกินที่ขอแถมกำชับให้กินดี ๆ", effects: {happiness: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้เงินครบ มารู้ทีหลังว่าที่บ้านเอาโฉนดที่นาไปจำนำมาให้", effects: {relations: 2, happiness: -2}, merit: [{cat: neutral}]}
 
   - id: debt_car_buy_01
     type: A

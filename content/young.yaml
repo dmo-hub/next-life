@@ -317,7 +317,7 @@ events:
       - id: agent
         text: "จ่ายนายหน้า ไปทำงานโรงงาน"
         outcomes:
-          - {weight: 3, ok: true, text: "ทำงานหนักสามปี ส่งเงินกลับมาสร้างบ้านให้พ่อแม่", effects: {money: {unit: income_x, amount: 3}, health: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "ทำงานหนักสามปี ส่งเงินกลับมาสร้างบ้านให้ครอบครัว", effects: {money: {unit: income_x, amount: 3}, health: -1, relations: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ไปถึงแล้วไม่มีงานจริง นายหน้าปิดเบอร์หนี", effects: {debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}, happiness: -3}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: legal_route

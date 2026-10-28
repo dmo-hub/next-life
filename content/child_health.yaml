@@ -7,7 +7,7 @@ events:
     years: [2500, 2650]
     weight: 3
     repeat: {gap: 3, max: 2}
-    when: {age: [3, 12]}
+    when: {age: [3, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ไข้สูงสามวันไม่ลด"
     text: "อายุ {อายุ} ขวบ ตัวร้อนจี๋ ปวดหัว มีจุดแดงขึ้นแขน ยุงลายในโอ่งหลังบ้านบินว่อน แม่เอามือแตะหน้าผากคุณแล้วหน้าเสีย รพ.รัฐคิวยาวถึงเช้า เอกชนก็แพงจนพ่อเงียบ"
     choices:
@@ -45,7 +45,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [3, 10]}
+    when: {age: [3, 10], family: [{role: parent, sex: หญิง, alive: true}]}
     title: "พลัดตกคลองหลังบ้าน"
     text: "อายุ {อายุ} ขวบ วิ่งไล่จับปลาแล้วลื่นตกคลอง ลุงข้างบ้านกระโดดลงไปคว้าขึ้นมาทัน ตัวเปียกโชก ไอสำลักน้ำ แม่วิ่งมากอดคุณตัวสั่น เรียก '{ชื่อ} {ชื่อ}' ไม่หยุด"
     choices:
@@ -82,7 +82,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [5, 12]}
+    when: {age: [5, 12], family: [{role: parent, alive: true}]}
     title: "ตกต้นมะม่วง"
     text: "อายุ {อายุ} ขวบ ปีนขึ้นไปเก็บมะม่วงกิ่งบนสุด กิ่งหัก ร่วงลงมาแขนบวมเป่ง เพื่อน ๆ วิ่งไปตามพ่อแม่"
     choices:
@@ -102,6 +102,7 @@ events:
         merit: [{cat: neutral}]
       - id: scold
         text: "ซ่อนแขนบวม บอกแม่ว่าไม่เป็นไร"
+        requires: {family: [{role: parent, sex: หญิง, alive: true}]}
         effects: {health: -1, relations: -2}
         merit: [{cat: neutral}]
       - id: gymnastics
@@ -176,6 +177,7 @@ events:
         merit: [{cat: neutral}]
       - id: brush_nightly
         text: "ยอมให้แม่แปรงฟันให้ทุกคืน"
+        requires: {family: [{role: parent, sex: หญิง, alive: true}]}
         effects: {health: 1, relations: 1}
         merit: [{cat: neutral}]
 
@@ -185,7 +187,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [2, 11]}
+    when: {age: [2, 11], family: [{role: parent, sex: หญิง, alive: true}]}
     title: "หอบทุกหน้าหนาว"
     text: "อายุ {อายุ} ขวบ ไอหอบหวีดทุกครั้งที่ฝุ่นควันลง หมอบอกแม่ว่าคุณเป็นหอบหืดกับภูมิแพ้ ต้องอยู่กับมันไปอีกนาน"
     choices:
@@ -259,7 +261,7 @@ events:
     category: health
     stage: เด็ก
     years: [2500, 2650]
-    when: {school: [primary, lower]}
+    when: {school: [primary, lower], family: [{role: parent, alive: true}]}
     title: "โค้ชจังหวัดมาจับตัว"
     text: "แข่งจบไม่ทันข้ามวัน โค้ชทีมจังหวัดมาเคาะประตูบ้าน ขอตัวคุณไปเข้าค่ายเก็บตัว ซ้อมทุกเย็นจนค่ำ เสาร์อาทิตย์ไม่ได้กลับบ้าน พ่อแม่บอกให้คุณเลือกเอง"
     choices:
@@ -297,7 +299,7 @@ events:
         text: "ขอครูเปิดบูธในงานโรงเรียน"
         outcomes:
           - {weight: 2, ok: true, text: "ครูหัวเราะแล้วให้ตั้งโต๊ะงานวันเด็ก ขายหมดเกลี้ยงก่อนเที่ยง ได้ฉายาเถ้าแก่น้อย", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
-          - {weight: 1, text: "ครูไม่ขำด้วย ยึดลูกอมทั้งกล่อง เรียกพ่อแม่มาเซ็นรับทราบ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูไม่ขำด้วย ยึดลูกอมทั้งกล่อง เรียกผู้ปกครองมาเซ็นรับทราบ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: sell_secretly
         text: "แอบขายต่อหลังห้องน้ำ"

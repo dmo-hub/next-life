@@ -250,7 +250,7 @@ events:
         text: "เปิดเพจเล่าชีวิตมนุษย์เงินเดือน"
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "คนตามหลักแสน สปอนเซอร์จ้างรีวิวทุกเดือน กลายเป็นรายได้เสริมงอกเงย", effects: {happiness: 2, network: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "กระแสหายในสองอาทิตย์ เหลือคนกดไลก์แค่แม่กับป้า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กระแสหายในสองอาทิตย์ เหลือคนกดไลก์แค่ป้ากับน้า", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: delete_post
         text: "ลบโพสต์ แล้วกลับไปทำงานเงียบ ๆ"
