@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
@@ -1397,6 +1397,16 @@ const LOST = {
   call: 'ใครพบเห็น โปรดแจ้งคนที่บ้าน ทุกคนยังรออยู่',
 };
 
+// คนรุ่นเดียวกันที่อยู่เลยอายุนี้ (B142) — ตารางชีพเดียวกับที่ชีวิตนี้ทอยตาย (ปีต้นแบบของ seed นี้) ไม่ใช่สถิติผู้เล่น
+// lifeQx อ่าน hash ไม่ดึงเลขสุ่ม ผลเกมจึงไม่ขยับ · ตายอายุ N = ไม่ถึงวันเกิดปีที่ N+1 ⇒ นับคนที่รอดถึง N+1
+function outliveLine(age) {
+  let alive = 1;
+  for (let a = 0; a <= age && a < MAX_AGE; a++) alive *= 1 - lifeQx(st.content.era, st.seed, st.sex, st.birthYear + a, a);
+  const pct = alive * 100;
+  const shown = pct < 1 ? 'ไม่ถึง 1%' : pct > 99 ? 'กว่า 99%' : `${Math.round(pct)}%`;
+  return `${st.sex}ไทยที่เกิดปีเดียวกัน ${shown} อยู่ได้นานกว่าคุณ`;
+}
+
 function render(card) {
   // ไปกลับกลางชีวิต (B68m): ทริปยังเป็นชีวิตนี้ ปุ่มจึงเดินผ่านปุ่มชีวิต — จอเต็มของทริปเป็นงานเลน C
   if (card.kind === 'isekai') return renderIsekai(card);
@@ -1420,7 +1430,9 @@ function render(card) {
     body.append(portrait(), el('h3', null, st.name), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
     const why = causeOf(card.cause, card.age);
     if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
-    body.append(el('p', null, `${st.sex} · ${provinceLabel(st)} · ฐานะ${classNow(st)} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
+    // คนหายไม่รู้อายุตาย จึงเทียบรุ่นไม่ได้ (B142)
+    if (!gone) body.append(el('p', 'sub', outliveLine(card.age)));
+    body.append(el('p', null, `${st.sex} ·${provinceLabel(st)} · ฐานะ${classNow(st)} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
     const net = gone ? (card.summary.money < 0 ? LOST.debt : LOST.money) : card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
     body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
     if (card.summary.debt) body.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
