@@ -787,6 +787,8 @@ export function moneyRatios(st, year = st.birthYear + st.age) {
 // ติด: ผ่อนต่อปี > pay ของรายได้ปี หรือหนี้สุทธิ > net เท่ารายได้ปี · ล้าง: ต่ำกว่า payOff และ netOff · ช่วงกลางคงค่าเดิม กันธงกระพริบ
 // ยังไม่มีฐานรายได้ (เรียน/ไม่เคยทำงาน) = ล้างเมื่อไม่มีหนี้เหลือ ไม่งั้นคงตามเดิม
 export const DEBT_LOAD = { pay: 0.4, net: 2, payOff: 0.3, netOff: 1.5 };
+// ธงที่ engine ตั้งเอง (debtLoad · informalFlag) — lint flag-unset นับเป็นธงที่มีคนตั้ง การ์ดไม่ต้องตั้งเองก็อ่านได้
+export const DEBT_FLAGS = ['in_debt', 'informal_debt'];
 function debtLoad(st, year, paid) {
   // หนี้สุทธิแบบเดียวกับ debt_x และด่านล้มละลาย: เงินติดลบ (ทบดอกเงินกู้ทุกปี) นับเป็นหนี้ด้วย
   const owe = -netWorth(st);

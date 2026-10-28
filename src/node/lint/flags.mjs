@@ -1,6 +1,7 @@
 // กติกาธง + นัดเหตุการณ์ต่อเนื่อง + เรื่องต่อหลังผล: ธงที่เงื่อนไขขอใช้ต้องมีคนตั้ง · นัด/เรื่องต่อต้องชี้เหตุการณ์ที่มีจริง
 import { FLAG_RE, meritCat } from './vocab.mjs';
 import { EXAM_PASS, BOND_FLAG } from '../../engine/career.mjs';
+import { DEBT_FLAGS } from '../../engine/life.mjs';
 import { isObj, isRange, list, effectSites, choicesOf } from './util.mjs';
 
 function flagRefs(e) {
@@ -32,9 +33,9 @@ export const rules = [
   },
   {
     id: 'flag-unset',
-    desc: 'ธงที่ when.flags อ้าง ต้องมีตัวเลือกใดตั้ง (sets_flags) หรือแกนตั้งให้จากป้ายธง (vow_broken) หรือด่านเรียนต่อ (exam_pass:uni · scholar_bond)',
+    desc: 'ธงที่ when.flags อ้าง ต้องมีตัวเลือกใดตั้ง (sets_flags) หรือแกนตั้งให้จากป้ายธง (vow_broken) หรือด่านเรียนต่อ (exam_pass:uni · scholar_bond) หรือยอดหนี้ (in_debt · informal_debt)',
     all(events, ctx, r) {
-      const set = new Set([EXAM_PASS, BOND_FLAG]);
+      const set = new Set([EXAM_PASS, BOND_FLAG, ...DEBT_FLAGS]);
       for (const { e } of events) {
         for (const x of flagRefs(e)) if (x.set) set.add(x.f);
         for (const { node } of effectSites(e)) for (const m of list(node.merit)) if (meritCat(m?.cat)?.flag) set.add(meritCat(m.cat).id);
