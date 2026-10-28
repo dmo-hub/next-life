@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
@@ -877,7 +877,7 @@ function shareFacts(card) {
   return {
     age: card.age,
     name: st.name,
-    who: `${st.sex} · ${provinceLabel(st)} · ฐานะ${st.cls}`,
+    who: `${st.sex} · ${provinceLabel(st)} · ฐานะ${classNow(st)}`,
     job: `${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`,
     pattern: { name: pattern.name, hint: pattern.hint ?? '' },
     title: titles[0] ? { name: titles[0].name, tier: titles[0].tier } : null,
@@ -1409,7 +1409,7 @@ function render(card) {
     body.append(portrait(), el('h3', null, st.name), el('p', 'dates', `${genLabel()}สิริอายุ ${card.age} ปี`));
     const why = causeOf(card.cause, card.age);
     if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
-    body.append(el('p', null, `${st.sex} · ${provinceLabel(st)} · ฐานะ${st.cls} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
+    body.append(el('p', null, `${st.sex} · ${provinceLabel(st)} · ฐานะ${classNow(st)} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
     const net = card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
     body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
     if (card.summary.debt) body.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
@@ -1448,7 +1448,8 @@ function render(card) {
     const goal = nextGoal(st);
     const school = goal && schoolOf(st) !== 'none';
     if (goal && !school) purse.push(goal);
-    const meta = el('div', 'meta', `ฐานะ${st.cls} · ${school ? goal : jobText(st, card.age)}`);
+    // ฐานะ ณ ปีนี้ (ตัวเดียวกับที่การ์ดเช็กชนชั้น) ไม่ใช่ชนชั้นตอนเกิด — ฐานะตอนเกิดยังดูได้ที่กราฟฐานะตระกูล
+    const meta = el('div', 'meta', `ฐานะ${classNow(st)} · ${school ? goal : jobText(st, card.age)}`);
     // จอแคบให้ตัดบรรทัดได้แค่ที่ตัวคั่น — เบราว์เซอร์ตัดคำไทยกลาง "ราย|ได้" ได้แม้เว้นวรรคแบบไม่ตัด จึงต้องห่อ span
     for (const t of purse) meta.append(' · ', el('span', null, t));
     box.append(meta);
