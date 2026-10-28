@@ -294,6 +294,21 @@ export function loadEra() {
     exercise: { ชาย: points(hs.exercise.ชาย), หญิง: points(hs.exercise.หญิง) },
   };
 
+  // สาเหตุการตาย (B110): v[ปี][กลุ่ม][ช่วงอายุ] เรียงตาม keys · ปีต้องต่อเนื่อง เพราะแกนอ่านด้วยดัชนีปี
+  const dc = json('data/death-causes.json');
+  const causeKeys = Object.keys(dc.groups);
+  const causes = { keys: causeKeys, ages: dc.ages, from: dc.ชาย[0].y, norm: Object.fromEntries(SEXES.map((s) => [s, dc.norm?.[s] ?? {}])) };
+  for (const s of SEXES) {
+    causes[s] = dc[s].map((row, i) => {
+      if (row.y !== causes.from + i) throw new Error(`death-causes ${s} ปี ${row.y} ไม่ต่อเนื่อง`);
+      return causeKeys.map((k) => {
+        const v = row.shares[k];
+        if (!v || v.length !== dc.ages.length) throw new Error(`death-causes ${s} ${row.y} กลุ่ม ${k} ช่วงอายุไม่ครบ`);
+        return v;
+      });
+    });
+  }
+
   const events = json('data/era-events.json').events.map(({ id, from, to, name, kind, regions }) => ({ id, from, to, name, kind, regions }));
 
   const names = json('data/names.json');
@@ -316,6 +331,7 @@ export function loadEra() {
       imr: Object.fromEntries(SEXES.map((s) => [s, series(m.imr[s])])),
     },
     habits,
+    causes,
     events,
     birth: loadBirth(),
   };

@@ -71,5 +71,8 @@ export function repairLife(st, card) {
   if (st.occupation && !occ.some((o) => o.id === st.occupation)) st.occupation = occ[0].id;
   const ladders = st.content.era.careers?.ladders;
   if (st.ladder && ladders && !ladders[st.ladder.id]) st.ladder = null;
+  // เซฟก่อนมีสาเหตุตาย (B110) — เริ่ม stream ใหม่จาก seed เหมือนชีวิตที่เกิดใหม่
+  st.causeRng ??= makeRng(st.seed ^ 0x9b05688c);
+  st.terminal ??= null;
   return stale;
 }

@@ -7,6 +7,7 @@ import { INCOME_MULT, MONEY_KEYS } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
 import { PET_KINDS, HERD_KINDS } from '../../engine/family.mjs';
+import { CHRONIC, ILL_YEARS } from '../../engine/death.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 
 const KEYS = {
@@ -21,7 +22,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', ...MONEY_KEYS],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
@@ -533,6 +534,17 @@ export const rules = [
       if (!isObj(loss) || Object.keys(loss).some((k) => k !== 'roles' && k !== 'within')) return r('.when.loss', 'loss ต้องเป็น {roles?, within?}');
       if (loss.roles !== undefined && !(Array.isArray(loss.roles) && loss.roles.length && loss.roles.every((x) => LOSS_ROLES.includes(x)))) r('.when.loss.roles', `roles ต้องเป็นรายการจาก ${LOSS_ROLES.join(' ')}`);
       if (loss.within !== undefined && !(isInt(loss.within) && loss.within >= 0 && loss.within <= 10)) r('.when.loss.within', 'within ต้องเป็นจำนวนปี 0–10');
+    },
+  },
+  {
+    id: 'illness',
+    desc: `when.illness = {causes?: [${CHRONIC.join('|')}], left?: [lo, hi] ปีที่เหลือก่อนตาย 0–${ILL_YEARS[1] - 1}} — มีแค่โรคเรื้อรังที่ตรวจเจอก่อนตาย อุบัติเหตุ/ติดเชื้อมาไม่บอกล่วงหน้า`,
+    event(e, ctx, r) {
+      const ill = isObj(e.when) ? e.when.illness : undefined;
+      if (ill === undefined) return;
+      if (!isObj(ill) || Object.keys(ill).some((k) => k !== 'causes' && k !== 'left')) return r('.when.illness', 'illness ต้องเป็น {causes?, left?}');
+      if (ill.causes !== undefined && !(Array.isArray(ill.causes) && ill.causes.length && ill.causes.every((x) => CHRONIC.includes(x)))) r('.when.illness.causes', `causes ต้องเป็นรายการจาก ${CHRONIC.join(' ')}`);
+      if (ill.left !== undefined && !isRange(ill.left, 0, ILL_YEARS[1] - 1)) r('.when.illness.left', `left ต้องเป็น [lo, hi] ใน 0–${ILL_YEARS[1] - 1}`);
     },
   },
 ];

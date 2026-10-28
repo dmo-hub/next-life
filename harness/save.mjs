@@ -56,7 +56,8 @@ for (const [name, bot] of Object.entries(BOTS)) {
     }
     if (k < 3) {
       ctlRuns++;
-      if (run(s, bot, Math.floor(base.cards / 2), true).hash !== base.hash) ctlCaught++;
+      // ตัดต้นชีวิต: จุดกลางอาจตกปลายชีวิตที่ตายเพราะสุขภาพหมด (ไม่อ่านตัวสุ่มอีก) ตัวควบคุมจะจับไม่ได้ทั้งที่เซฟพังจริง
+      if (run(s, bot, 5, true).hash !== base.hash) ctlCaught++;
     }
   }
 }

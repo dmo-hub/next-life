@@ -1,6 +1,7 @@
 import { makeRng } from './rng.mjs';
 import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, petCall, lossCall, petArrivals, petArriveText } from './family.mjs';
-import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
+import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
+import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt, firstPay } from './finance.mjs';
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
@@ -255,6 +256,10 @@ export function newLife(seed, content, heir = null) {
     fired: {},
     parents,
     famRng,
+    // สาเหตุตาย + นัดป่วยก่อนตาย (B110) — stream แยก ชีวิตที่รอดทุกปีไม่ทำให้ลำดับสุ่มของโลกขยับ
+    causeRng: makeRng(seed ^ 0x9b05688c),
+    terminal: null,
+    cause: null,
     // คู่ครอง/ลูก/หลานที่เป็นคนจริง (B36a · family.mjs) — stream kinRng แยกจากโลกและจากพ่อแม่
     ...newKin(seed),
   };
@@ -386,11 +391,66 @@ export function healthMultiplier(st) {
 }
 
 // อายุร่างกาย = อายุไทย + ปีที่อยู่ต่างโลก (B68m) — ปีปฏิทินยังตามอายุไทย · ชีวิตที่ไม่ข้ามโลกไม่มี st.away
+// ทุกที่ที่อ่านตารางชีพ/สัดส่วนสาเหตุ/ช่วงป่วยใช้อายุนี้ (B110) ไม่งั้นคนกลับจากต่างโลกตายตามอายุไทย
+const bodyAge = (st) => st.age + (st.away ?? 0);
+
+// ผลรวมทุกสาเหตุ (B110) — ปัจจัยเสี่ยงเอียงทั้งสาเหตุและโอกาสตายรวม
 export function deathChance(st) {
-  const base = lifeQx(st.content.era, st.seed, st.sex, st.birthYear + st.age, st.age + (st.away ?? 0));
-  if (base >= 1) return 1;
-  return Math.min(1, base * healthMultiplier(st) * karmaMultiplier(st.ledger));
+  const py = protoYear(st.content.era, st.seed, st.birthYear + st.age);
+  const age = bodyAge(st);
+  if (qx(st.content.era, st.sex, py, age) >= 1) return 1;
+  return Math.min(1, causeHazards(st, py, age, healthMultiplier(st) * karmaMultiplier(st.ledger)).reduce((s, x) => s + x, 0));
 }
+
+// ตายปีนี้ด้วยสาเหตุอะไร · null = รอด — ดึง st.rng ครั้งเดียวต่อปีเท่าเดิม สาเหตุและนัดป่วยใช้ causeRng แยก
+// โรคเรื้อรังไม่ตายปีที่สุ่มโดน แต่นัดตายอีก 1–3 ปีข้างหน้าด้วยโอกาสของอายุนั้น (scheduleIllness) — ผลรวมยังตรงตารางชีพ
+function deathRoll(st) {
+  const u = st.rng.next();
+  if (st.terminal && st.age >= st.terminal.age) return st.terminal.cause;
+  const era = st.content.era;
+  const py = protoYear(era, st.seed, st.birthYear + st.age);
+  const age = bodyAge(st);
+  if (qx(era, st.sex, py, age) >= 1) return 'other';
+  const keys = era.causes.keys;
+  const hz = causeHazards(st, py, age, healthMultiplier(st) * karmaMultiplier(st.ledger));
+  // เด็กเล็กยังไม่มีนัดจากปีก่อนครบทุกระยะ — ส่วนที่นัดไม่ถึงของโรคเรื้อรังตายปีนี้เลย
+  const span = ILL_YEARS[1] - ILL_YEARS[0] + 1;
+  const unscheduled = (span - Math.max(0, Math.min(span, age - ILL_YEARS[0] + 1))) / span;
+  const now = hz.map((x, j) => (CHRONIC.includes(keys[j]) ? x * unscheduled : x));
+  if (u < now.reduce((s, x) => s + x, 0)) return pickCause(st.causeRng, keys, now);
+  if (!st.terminal) scheduleIllness(st);
+  return null;
+}
+
+function scheduleIllness(st) {
+  const era = st.content.era;
+  const years = st.causeRng.int(...ILL_YEARS);
+  // นัดเก็บเป็นอายุไทย (ตัวนับที่ deathRoll เทียบ) · โอกาสอ่านด้วยอายุร่างกาย ณ วันนัด
+  const age = st.age + years;
+  const body = bodyAge(st) + years;
+  const py = protoYear(era, st.seed, st.birthYear + age);
+  if (body >= MAX_AGE || qx(era, st.sex, py, body) >= 1) return;
+  const keys = era.causes.keys;
+  const ch = causeHazards(st, py, body, healthMultiplier(st) * karmaMultiplier(st.ledger)).map((x, j) => (CHRONIC.includes(keys[j]) ? x : 0));
+  if (!(st.causeRng.next() < ch.reduce((s, x) => s + x, 0))) return;
+  st.terminal = { cause: pickCause(st.causeRng, keys, ch), age, told: false };
+}
+
+function healthCause(st) {
+  const era = st.content.era;
+  const py = protoYear(era, st.seed, st.birthYear + st.age);
+  return pickCause(st.causeRng, era.causes.keys, causeShares(era, st.sex, py, bodyAge(st)));
+}
+
+// ข้อความแกนตอนตรวจเจอ — เลน A ต่อยอดด้วยการ์ด when.illness (ดูแล/ค่ารักษา/บอกลา)
+export const ILL_TEXT = {
+  heart: 'หมอตรวจพบว่าหัวใจไม่ค่อยดีแล้ว ต้องกินยาและระวังตัวไปตลอด',
+  stroke: 'เส้นเลือดในสมองตีบจนต้องนอนโรงพยาบาล ออกมาแล้วร่างกายไม่เหมือนเดิม',
+  cancer: 'ผลตรวจออกมาว่าเป็นมะเร็ง หมอเริ่มพูดถึงการรักษาที่ยาวและหนัก',
+  diabetes_kidney: 'เบาหวานกับไตทรุดลงจนหมอนัดตรวจถี่ขึ้นทุกเดือน',
+  liver: 'หมอบอกว่าตับเริ่มแข็ง ต้องเลิกเหล้าและดูแลตัวเองอย่างจริงจัง',
+  chronic_resp: 'หายใจหอบเหนื่อยง่ายขึ้นทุกวัน หมอบอกว่าปอดเสื่อมเรื้อรัง',
+};
 
 // ช่องแทนค่าครบทุกตัวในรายการปิดของด่าน build (PLACEHOLDERS) — ตัวที่ไม่เติมจะโผล่เป็น {ชื่อ} ดิบบนการ์ด
 // ชื่อ = ชื่อเล่นที่สุ่มตอนเกิด (คำบรรยายยังเรียกผู้เล่นว่า "คุณ") · ลูกยังไม่มีชื่อ: เพศลูกรู้ตอนส่งไปเกิด ชื่อจึงตั้งที่รุ่นถัดไป
@@ -578,6 +638,10 @@ function stepYear(st) {
   // คนในบ้านจากไปเองปีนี้ = การ์ดแจ้งทุกครั้ง ก่อนเหตุการณ์ของปี
   for (const l of ageKin(st, year, yearlySaving(st))) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l });
   for (const m of petArrivals(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: petArriveText(m) });
+  if (st.terminal && !st.terminal.told) {
+    st.terminal.told = true;
+    st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: ILL_TEXT[st.terminal.cause], illness: { cause: st.terminal.cause, left: st.terminal.age - st.age } });
+  }
   // ผลตอบแทนคิดกับเงินต้นปีก่อนเงินเก็บของปีนี้เข้า · ติดลบ = หนี้ ทบดอกเบี้ยเงินกู้ของปีนั้น
   const era = st.content.era;
   if (st.money > 0) {
@@ -983,8 +1047,11 @@ export function nextCard(st) {
   for (;;) {
     if (st.advance) {
       // สุ่มตายของปีที่อายุ st.age ก่อนขึ้นปีใหม่ — ทารกจึงตายได้ตั้งแต่ขวบปีแรกตามอัตราตายทารกจริง และอายุบนการ์ดตายเป็นปีเต็ม
-      if (st.health <= 0 || st.rng.next() < deathChance(st)) {
+      // สุขภาพหมดตัว = ตายด้วยสาเหตุตามสัดส่วนของอายุนั้น ไม่มีช่วงป่วย
+      const cause = st.health <= 0 ? healthCause(st) : deathRoll(st);
+      if (cause) {
         st.dead = true;
+        st.cause = cause;
         return queueFuneral(st) ? nextCard(st) : deathCard(st);
       }
       stepYear(st);
@@ -1094,6 +1161,8 @@ export function poolMultiplier(st, m) {
 
 const inYears = (e, year) => !e.years || (year >= e.years[0] && year <= e.years[1]);
 const inRange = (v, r) => !r || (v >= r[0] && v <= r[1]);
+// การ์ดช่วงป่วยก่อนตาย (B110): ผ่านเมื่อตรวจเจอโรคเรื้อรังแล้ว · causes = กลุ่มโรค · left = ปีที่เหลือก่อนถึงนัด (0 = ปีสุดท้าย)
+export const illnessOk = (st, w) => !!st.terminal?.told && (!w.causes || w.causes.includes(st.terminal.cause)) && inRange(st.terminal.age - st.age, w.left);
 const inBound = (v, b) => !b || ((b.min === undefined || v >= b.min) && (b.max === undefined || v <= b.max));
 const flagsOk = (st, f) => (f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]);
 // ครอบครัวมีแค่พ่อแม่ (ด่าน family-system กั้นบทบาทอื่นไว้) · เงื่อนไขผ่านเมื่อพ่อหรือแม่คนใดคนหนึ่งตรง
@@ -1102,6 +1171,7 @@ export function whenOk(st, when) {
   if (!when) return true;
   if (when.family && !when.family.every((f) => familyOk(st, f))) return false;
   if (when.loss && !lossOk(st, when.loss)) return false;
+  if (when.illness && !illnessOk(st, when.illness)) return false;
   if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
   if (when.class && !when.class.includes(classNow(st))) return false;
   if (when.region && !when.region.includes(st.region)) return false;
@@ -1240,6 +1310,7 @@ function deathCard(st) {
     kind: 'death',
     age: st.age,
     text: `${lifeEndWord(isGone(st))} ${st.age}`,
+    cause: st.cause ?? 'other',
     // money = ทรัพย์สุทธิหลังหักหนี้รายก้อน · debt = ยอดหนี้รายก้อนที่ค้าง (ระหว่างชาติ B06 อ่านแยก)
     summary: {
       year,
