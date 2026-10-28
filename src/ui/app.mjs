@@ -1928,7 +1928,8 @@ function speedWrite(v) {
   }
 }
 // พักไว้ระหว่างแผงเปลี่ยนสิ่งที่ทุ่มเทเปิดอยู่หรือแท็บถูกซ่อน — ไม่ให้ใบเปลี่ยนใต้มือผู้เล่น · ใบหลุดจากจอแล้ว (ไปหน้าอื่น) ไม่กด
-function armTick(box, panel, bar) {
+// tok = token ของปุ่ม "ต่อ" ใบนั้น — ใบตาทริปกลางชีวิตเดินด้วย token ชีวิต ไม่ใช่ token ระหว่างชาติ
+function armTick(box, panel, bar, tok) {
   clearTimeout(tickTimer);
   bar.style.animation = 'none';
   if (!speed) return;
@@ -1937,8 +1938,8 @@ function armTick(box, panel, bar) {
   bar.style.animation = `itick ${ms}ms linear forwards`;
   tickTimer = setTimeout(() => {
     if (!box.isConnected) return;
-    if (panel.open || document.hidden) return armTick(box, panel, bar);
-    play(T.afterNext);
+    if (panel.open || document.hidden) return armTick(box, panel, bar, tok);
+    play(tok);
   }, ms);
 }
 function speedRow(onChange) {
@@ -2025,21 +2026,23 @@ function renderIsekai(card) {
       if (why) b.disabled = true;
       choices.append(b);
     });
-  } else choices.append(enter(button(BTN.next, null, () => play(card.trip ? T.next : T.afterNext))));
+  }
+  const nextTok = card.trip ? T.next : T.afterNext;
+  if (!card.choices.length) choices.append(enter(button(BTN.next, null, () => play(nextTok))));
   box.append(top);
   if (s) box.append(isekaiStatusBox(s));
   // ใบผลลัพธ์/ใบเลือกหยุดรอเสมอ (เจ้าของเคาะ) — แถบความเร็วยังโชว์ให้ตั้งไว้ก่อนเดินต่อ
   if (s && card.step !== 'end') {
     const bar = el('i');
     const walk = panel && !card.choices.length;
-    const row = speedRow(() => walk && armTick(box, panel, bar));
+    const row = speedRow(() => walk && armTick(box, panel, bar, nextTok));
     if (walk) {
       const t = el('div', 'itimer');
       t.append(bar);
       row.append(t);
     }
     box.append(row);
-    if (walk) armTick(box, panel, bar);
+    if (walk) armTick(box, panel, bar, nextTok);
   }
   box.append(body, choices);
   root.append(panels(box));
