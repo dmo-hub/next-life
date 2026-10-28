@@ -658,7 +658,7 @@ function memoAdd(t) {
   const m = memoRead();
   const k = `${save.seed}:${st.gen}`;
   if (m.l.some((x) => x.k === k)) return 'ok';
-  m.l.push({ k, n: st.name, g: st.gen, a: st.age, p: provinceLabel(st), s: t.pattern?.name ?? '', t: t.titles[0]?.name ?? '' });
+  m.l.push({ k, n: st.name, r: fullName(), g: st.gen, a: st.age, p: provinceLabel(st), s: t.pattern?.name ?? '', t: t.titles[0]?.name ?? '' });
   for (const x of eraSeen) if (!m.e.includes(x.id)) m.e.push(x.id);
   const r = memoWrite(m);
   shelfDot();
@@ -823,11 +823,11 @@ function memoShelf(body, choices, fresh, again) {
   // ลบทีละแถวได้ทันที (สรุปสั้น ไม่ใช่เซฟ ไม่ต้องถามซ้ำ)
   for (const x of [...m.l].reverse()) {
     const li = el('li');
-    const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.n}`, `อายุ ${x.a} ปี`, x.p, x.s && `ชีวิตแบบ${x.s}`, x.t && `ฉายา ${x.t}`].filter(Boolean).join(' · '));
+    const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.r || x.n}`, `อายุ ${x.a} ปี`, x.p, x.s && `ชีวิตแบบ${x.s}`, x.t && `ฉายา ${x.t}`].filter(Boolean).join(' · '));
     if (fresh.includes(x.k)) txt.append(newTag());
     li.append(txt);
     const del = el('button', 'more', 'ลบ');
-    del.setAttribute('aria-label', `ลบ ${x.n} ออกจากสมุด`);
+    del.setAttribute('aria-label', `ลบ ${x.r || x.n} ออกจากสมุด`);
     del.onclick = () => {
       const now = memoRead();
       now.l = now.l.filter((y) => y.k !== x.k);
@@ -1410,7 +1410,7 @@ function render(card) {
     top.append(el('b', null, gone ? LOST.head : 'ด้วยรักและอาลัย'));
     box.append(top);
     // หนังสืองานศพบอกอายุ ไม่บอกปี พ.ศ. — ปีเกมไม่ขึ้นจอ (B14 ข้อ 12)
-    body.append(portrait(card.age), el('h3', null, st.name), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
+    body.append(portrait(card.age), el('h3', null, fullName()), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
     const why = causeOf(card.cause, card.age);
     if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
     // คนหายไม่รู้อายุตาย จึงเทียบรุ่นไม่ได้ (B142)
@@ -1645,6 +1645,9 @@ function sidePanel() {
 }
 
 const genLabel = () => (st.gen > 1 ? `รุ่นที่ ${st.gen} · ` : '');
+// ฉากจริงจังใช้ชื่อจริง ที่เหลือคงชื่อเล่นให้ขำ · เซฟค้างระหว่างชาติจาก build เก่าไม่มี realName จึงตกไปชื่อเล่นล้วน ไม่มีวงเล็บว่าง
+const realName = () => st.realName ?? st.name;
+const fullName = () => (st.realName && st.realName !== st.name ? `${st.realName} (${st.name})` : st.name);
 
 // การ์ดชวนไปต่างโลก (B68d): กรอบสีต่างโลกโผล่กลางการ์ดชีวิต · กดรับ = ชีวิตนี้จบ จึงถามซ้ำก่อนส่งให้เอนจิน
 // การถามซ้ำอยู่ที่จอล้วน ไม่ลงเซฟ — เซฟเก็บเฉพาะปุ่มที่ไปถึงเอนจิน · ปฏิเสธกดทีเดียวพอ
@@ -2126,11 +2129,11 @@ function standPage(body) {
 }
 
 function coverPage(body, death) {
-  body.append(el('span', 'kicker', 'สมุดชีวิต'), el('h3', null, st.name), el('p', 'dates', `${genLabel()}อายุ 0–${death.age} ปี · ${provinceLabel(st)}`));
+  body.append(el('span', 'kicker', 'สมุดชีวิต'), el('h3', null, fullName()), el('p', 'dates', `${genLabel()}อายุ 0–${death.age} ปี · ${provinceLabel(st)}`));
   if (bookIntro) body.append(el('p', 'sub', bookIntro.text));
 }
 function endPage(body, death) {
-  body.append(el('span', 'kicker', `อายุ ${death.age}`), el('h3', 'lead', `${st.name} จากไปด้วยวัย ${death.age} ปี`));
+  body.append(el('span', 'kicker', `อายุ ${death.age}`), el('h3', 'lead', `${realName()} จากไปด้วยวัย ${death.age} ปี`));
   if (death.note) body.append(el('p', 'sub', death.note));
   if (death.funeral) body.append(el('p', 'sub', `งานศพ: ${death.funeral.text}`));
 }
