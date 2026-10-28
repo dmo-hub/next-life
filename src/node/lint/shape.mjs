@@ -7,8 +7,10 @@ import { INCOME_MULT, MONEY_KEYS } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
 import { PET_KINDS, HERD_KINDS } from '../../engine/family.mjs';
-import { CHRONIC, ILL_YEARS } from '../../engine/death.mjs';
+import { CHRONIC, ILL_YEARS, HEREDITARY } from '../../engine/death.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
+// คนที่ when.kin_illness เลือกได้ = พ่อแม่ + คนในบ้านที่แกนออกการ์ดแจ้งป่วย (เพื่อนรุ่นไม่แจ้ง)
+const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude'],
@@ -22,7 +24,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', ...MONEY_KEYS],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
@@ -546,6 +548,28 @@ export const rules = [
       if (!isObj(ill) || Object.keys(ill).some((k) => k !== 'causes' && k !== 'left')) return r('.when.illness', 'illness ต้องเป็น {causes?, left?}');
       if (ill.causes !== undefined && !(Array.isArray(ill.causes) && ill.causes.length && ill.causes.every((x) => CHRONIC.includes(x)))) r('.when.illness.causes', `causes ต้องเป็นรายการจาก ${CHRONIC.join(' ')}`);
       if (ill.left !== undefined && !isRange(ill.left, 0, ILL_YEARS[1] - 1)) r('.when.illness.left', `left ต้องเป็น [lo, hi] ใน 0–${ILL_YEARS[1] - 1}`);
+    },
+  },
+  {
+    id: 'kin-illness',
+    desc: `when.kin_illness = {roles?: [${KIN_ILL_ROLES.join('|')}], causes?: [${CHRONIC.join('|')}], left?: [lo, hi] 0–${ILL_YEARS[1] - 1}} — พ่อแม่/คนในบ้านที่รู้แล้วว่าป่วยโรคเรื้อรังที่นัดตาย`,
+    event(e, ctx, r) {
+      const ill = isObj(e.when) ? e.when.kin_illness : undefined;
+      if (ill === undefined) return;
+      if (!isObj(ill) || Object.keys(ill).some((k) => !['roles', 'causes', 'left'].includes(k))) return r('.when.kin_illness', 'kin_illness ต้องเป็น {roles?, causes?, left?}');
+      if (ill.roles !== undefined && !(Array.isArray(ill.roles) && ill.roles.length && ill.roles.every((x) => KIN_ILL_ROLES.includes(x)))) r('.when.kin_illness.roles', `roles ต้องเป็นรายการจาก ${KIN_ILL_ROLES.join(' ')}`);
+      if (ill.causes !== undefined && !(Array.isArray(ill.causes) && ill.causes.length && ill.causes.every((x) => CHRONIC.includes(x)))) r('.when.kin_illness.causes', `causes ต้องเป็นรายการจาก ${CHRONIC.join(' ')}`);
+      if (ill.left !== undefined && !isRange(ill.left, 0, ILL_YEARS[1] - 1)) r('.when.kin_illness.left', `left ต้องเป็น [lo, hi] ใน 0–${ILL_YEARS[1] - 1}`);
+    },
+  },
+  {
+    id: 'heredity',
+    desc: `when.heredity = {causes?: [${HEREDITARY.join('|')}]} — พ่อ/แม่จากไปด้วยโรคที่ถ่ายทอดได้แล้ว (การ์ดตรวจสุขภาพเตือน)`,
+    event(e, ctx, r) {
+      const h = isObj(e.when) ? e.when.heredity : undefined;
+      if (h === undefined) return;
+      if (!isObj(h) || Object.keys(h).some((k) => k !== 'causes')) return r('.when.heredity', 'heredity ต้องเป็น {causes?}');
+      if (h.causes !== undefined && !(Array.isArray(h.causes) && h.causes.length && h.causes.every((x) => HEREDITARY.includes(x)))) r('.when.heredity.causes', `causes ต้องเป็นรายการจาก ${HEREDITARY.join(' ')}`);
     },
   },
 ];

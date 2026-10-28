@@ -2,8 +2,8 @@
 // ทุกสุ่มของสมาชิกใหม่มาจาก st.kinRng (stream แยกจากโลกและจาก famRng ของพ่อแม่) — ชีวิตที่ไม่มีครอบครัวของตัวเองไม่ดึงเลขนี้เลย
 // ชะตาการตายของพ่อแม่และลำดับสุ่มของโลกจึงเหมือนก่อนมีระบบนี้ทุกหลัก
 import { makeRng, mixSeed } from './rng.mjs';
-import { lifeQx } from './era.mjs';
 import { pickName } from './birth.mjs';
+import { kinDeathRoll, kinCause, inherit, KIN_ILL_TEXT } from './death.mjs';
 
 export const KIN_ROLES = ['spouse', 'child', 'grandchild'];
 export const FAMILY_ROLE_NAMES = { parent: 'พ่อแม่', spouse: 'คู่ครอง', child: 'ลูก', grandchild: 'หลาน', pet: 'สัตว์คู่ใจ', herd: 'ฝูงสัตว์', peer: 'เพื่อนรุ่น' };
@@ -136,6 +136,17 @@ export function focusOf(st, role) {
 function kinDie(st, m) {
   m.diedAge = kinYearOf(st) - m.born;
   m.alive = false;
+  if (!ANIMAL.includes(m.role)) m.cause = kinCause(st.content.era, st.seed, st.kinCauseRng, m.sex, kinYearOf(st), m.diedAge);
+}
+
+// พ่อ/แม่จากไป: สาเหตุที่รู้อยู่แล้ว (ผู้เล่นรุ่นก่อน/นัดป่วย) หรือสุ่มตามสัดส่วนของอายุนั้น · โรคที่ถ่ายทอดได้จดเป็นประวัติครอบครัว
+// ผู้เล่นรุ่นก่อนที่หายไปต่างโลก (gone) ไม่มีศพ จึงไม่มีสาเหตุ
+export function parentDied(st, p, year) {
+  p.alive = false;
+  p.diedAge ??= p.diesAt ?? p.age;
+  if (p.gone) return;
+  p.cause ??= kinCause(st.content.era, st.seed, st.kinCauseRng, p.sex, year, p.diedAge);
+  inherit(st, p.cause);
 }
 
 // คนที่ op bond กระทบ: parent = พ่อแม่ที่ยังอยู่ทุกคน · all = คนในบ้านที่ยังอยู่ทุกคน (รวมพ่อแม่) · บทบาทอื่น = คนล่าสุดของบทบาท
@@ -165,8 +176,8 @@ export function applyFamily(st, c, care = 0) {
     if (op.die === 'parent') {
       const p = st.parents.find((x) => x.alive);
       if (p) {
-        p.alive = false;
         p.diedAge = p.age;
+        parentDied(st, p, kinYearOf(st));
       }
     } else if (op.die) {
       const m = focusOf(st, op.die);
@@ -218,7 +229,7 @@ function kinLost(st, m, age, year, out) {
   m.alive = false;
   if (!KIN_HOUSEHOLD.includes(m.role) && m.role !== 'herd') return;
   if (m.role === 'pet') st.happiness = bondClamp(st.happiness - PET_GRIEF);
-  const loss = { id: m.id, role: m.role, name: m.name, age, year, ...(m.kind && { kind: m.kind }) };
+  const loss = { id: m.id, role: m.role, name: m.name, age, year, ...(m.kind && { kind: m.kind }), ...(m.cause && { cause: m.cause }) };
   st.kinLoss.push(loss);
   out.push(loss);
 }
@@ -251,7 +262,9 @@ export function ageKin(st, year, saving = 0) {
       if (a + 1 >= m.maxAge) kinLost(st, m, a + 1, year, lost);
       continue;
     }
-    if (st.kinRng.next() < lifeQx(st.content.era, st.seed, m.sex, year, a)) {
+    const cause = kinDeathRoll(st.content.era, st.seed, st.kinCauseRng, m, year, a, st.kinRng.next());
+    if (cause) {
+      m.cause = cause;
       kinLost(st, m, a, year, lost);
       continue;
     }
@@ -269,6 +282,28 @@ export function lossText(l) {
   if (l.role === 'herd') return `ฝูง${l.kind}ที่เลี้ยงไว้ค่อย ๆ หมดไป ไม่ได้เลี้ยงต่อแล้ว`;
   const who = l.role === 'pet' ? (l.name ? `เจ้า${l.name} ${l.kind}ที่เลี้ยงไว้` : `${l.kind}ที่เลี้ยงไว้`) : `${LOSS_WHO[l.role]}${l.name}`;
   return l.age < 1 ? `${who}จากไปตั้งแต่ยังไม่ทันครบขวบ` : `${who}จากไปแล้ว ด้วยวัย ${l.age} ปี`;
+}
+
+// พ่อแม่/คนในบ้านที่ถึงปีรู้ว่าป่วยโรคเรื้อรังที่นัดตาย (B110 ชิ้น 2) → คืนการ์ดให้แกนออกแจ้ง · เพื่อนรุ่นไม่แจ้ง (ไม่ใช่คนในบ้าน)
+// ill.from = อายุที่รู้ (พ่อ/แม่ที่เป็นผู้เล่นรุ่นก่อนรู้ตามชาติที่เล่นไปแล้ว) · ไม่มี = รู้ปีที่นัด
+// left = ปีที่เหลือหลังปีนี้ก่อนถึงนัด (นับแบบ when.illness ของตัวเอง)
+const illPeople = (st, year) => [
+  ...st.parents.filter((p) => p.alive && p.ill).map((p) => ({ p, role: 'parent', cur: p.age, who: p.sex === 'หญิง' ? 'แม่' : 'พ่อ' })),
+  ...(st.kin ?? []).filter((m) => LOSS_WHO[m.role] && m.alive && !m.left && m.ill).map((m) => ({ p: m, role: m.role, cur: year - m.born - 1, who: `${LOSS_WHO[m.role]}${m.name}` })),
+];
+export function kinIllNews(st, year) {
+  const out = [];
+  for (const { p, role, cur, who } of illPeople(st, year)) {
+    if (p.ill.toldAt !== undefined || (p.ill.from !== undefined && cur < p.ill.from)) continue;
+    p.ill.toldAt = cur;
+    out.push({ text: KIN_ILL_TEXT[p.ill.cause](who), kinIllness: { role, ...(p.id !== undefined && { id: p.id }), cause: p.ill.cause, left: Math.max(0, p.ill.age - cur - 1) } });
+  }
+  return out;
+}
+// เงื่อนไขการ์ดช่วงญาติป่วย (when.kin_illness): มีพ่อแม่/คนในบ้านที่ยังอยู่และรู้แล้วว่าป่วย · roles · causes · left แบบ when.illness
+export function kinIllOk(st, w) {
+  const year = kinYearOf(st);
+  return illPeople(st, year).some(({ p, role, cur }) => p.ill.toldAt !== undefined && (!w.roles || w.roles.includes(role)) && (!w.causes || w.causes.includes(p.ill.cause)) && kinInRange(Math.max(0, p.ill.age - cur - 1), w.left));
 }
 
 // เงื่อนไขการ์ดสูญเสีย (when.loss): มีคนในบ้านบทบาทที่ระบุ (ไม่ใส่ = ทุกบทบาท) จากไปเองภายใน within ปีที่ผ่านมา (ไม่ใส่ = ปีนี้)
@@ -363,7 +398,9 @@ export function familyOf(st) {
   };
   // พ่อแม่ที่ตายก่อนเราเกิด (คู่ของรุ่นก่อนในทางตระกูล) ไม่เคยผ่าน ageParents — อายุตอนตายอยู่ที่ diesAt
   const diedOf = (p) => (p.alive ? null : (p.diedAge ?? p.diesAt ?? null));
-  const parents = st.parents.map((p) => ({ role: 'parent', name: p.name ?? null, sex: p.sex, age: p.alive ? p.age : diedOf(p), alive: p.alive, diedAge: diedOf(p), ...bondOf(p) }));
-  const kin = (st.kin ?? []).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...bondOf(m), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }) }));
+  // สาเหตุตาย (B110) ให้ผังตระกูลแสดง — มีเฉพาะคนที่จากไปแล้ว · เซฟก่อนมีสาเหตุไม่มีช่องนี้
+  const causeOf = (m) => (!m.alive && m.cause ? { cause: m.cause } : {});
+  const parents = st.parents.map((p) => ({ role: 'parent', name: p.name ?? null, sex: p.sex, age: p.alive ? p.age : diedOf(p), alive: p.alive, diedAge: diedOf(p), ...causeOf(p), ...bondOf(p) }));
+  const kin = (st.kin ?? []).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...bondOf(m), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }) }));
   return [...parents, ...kin];
 }

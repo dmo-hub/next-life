@@ -1,7 +1,7 @@
 import { makeRng } from './rng.mjs';
-import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, petCall, lossCall, petArrivals, petArriveText } from './family.mjs';
+import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
-import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause } from './death.mjs';
+import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt, firstPay } from './finance.mjs';
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
@@ -260,10 +260,16 @@ export function newLife(seed, content, heir = null) {
     causeRng: makeRng(seed ^ 0x9b05688c),
     terminal: null,
     cause: null,
+    // สาเหตุ+นัดป่วยของพ่อแม่/ญาติ (B110 ชิ้น 2) — stream แยกจาก famRng/kinRng ที่ตัดสินว่าตายปีไหน ลำดับสุ่มเดิมจึงไม่ขยับ
+    kinCauseRng: makeRng(seed ^ 0xc1059ed8),
+    // โรคที่พ่อ/แม่จากไปด้วยและถ่ายทอดได้ (HEREDITARY) — คูณความเสี่ยงโรคนั้นของชีวิตนี้
+    heredity: [],
     // คู่ครอง/ลูก/หลานที่เป็นคนจริง (B36a · family.mjs) — stream kinRng แยกจากโลกและจากพ่อแม่
     ...newKin(seed),
   };
   nameParents(st);
+  // พ่อ/แม่ที่จากไปก่อนเราเกิด (ทางในตระกูล) เป็นประวัติครอบครัวตั้งแต่แรก
+  for (const p of st.parents) if (!p.alive) inherit(st, p.cause);
   petsAtBirth(st, heir, CLASSES.indexOf(cls));
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
   // การ์ดเปิดชีวิตมาก่อนการ์ดมรดกตอนแรกเกิด — ต้องเล่ามรดกก่อน receiveLegacy ล้าง st.legacy
@@ -562,16 +568,25 @@ function flowChronic(st) {
   }
 }
 
-// พ่อแม่แก่และตายตามตารางชีพเดียวกับตัวเอง (แนวชีวิตของปีปฏิทินนั้น) ด้วย stream ของครอบครัว
-// พ่อ/แม่ที่เป็นผู้เล่นรุ่นก่อน (diesAt) ตายตามชะตาที่เล่นไปแล้ว ไม่สุ่มซ้ำ
+// พ่อแม่แก่และตายตามตารางชีพเดียวกับตัวเอง (แนวชีวิตของปีปฏิทินนั้น) ด้วย stream ของครอบครัว · สาเหตุ+นัดป่วยจาก kinCauseRng (B110)
+// พ่อ/แม่ที่เป็นผู้เล่นรุ่นก่อน (diesAt) ตายตามชะตาที่เล่นไปแล้ว ไม่สุ่มซ้ำ · สาเหตุติดมากับ heir
 function ageParents(st, year) {
   for (const p of st.parents) {
     if (!p.alive) continue;
     p.age += 1;
     const roll = st.famRng.next();
-    if (p.diesAt !== undefined ? p.age >= p.diesAt : roll < lifeQx(st.content.era, st.seed, p.sex, year, p.age)) {
-      p.alive = false;
+    if (p.diesAt !== undefined) {
+      if (p.age >= p.diesAt) {
+        p.diedAge = p.age;
+        parentDied(st, p, year);
+      }
+      continue;
+    }
+    const cause = kinDeathRoll(st.content.era, st.seed, st.kinCauseRng, p, year, p.age, roll);
+    if (cause) {
       p.diedAge = p.age;
+      p.cause = cause;
+      parentDied(st, p, year);
     }
   }
 }
@@ -582,9 +597,8 @@ function receiveLegacy(st, year, stage) {
   st.legacy = null;
   // มรดกมาพร้อมการจากไป — มรดกตอนแรกเกิด (ตายปีที่ลูกเกิด) ต้องปิดชีวิตพ่อ/แม่ตรงนี้ ageParents ยังไม่เคยเดิน
   for (const p of st.parents) {
-    if (!p.ancestor) continue;
-    p.alive = false;
-    p.diedAge ??= p.diesAt ?? p.age;
+    if (!p.ancestor || !p.alive) continue;
+    parentDied(st, p, year);
   }
   const baht = units * nationalIncome(st.content.era, st.seed, year) * 12;
   st.money += baht;
@@ -637,9 +651,11 @@ function stepYear(st) {
   ageParents(st, year);
   // คนในบ้านจากไปเองปีนี้ = การ์ดแจ้งทุกครั้ง ก่อนเหตุการณ์ของปี
   for (const l of ageKin(st, year, yearlySaving(st))) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l });
+  for (const n of kinIllNews(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), ...n });
   for (const m of petArrivals(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: petArriveText(m) });
   if (st.terminal && !st.terminal.told) {
     st.terminal.told = true;
+    st.terminal.toldAge = st.age;
     st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: ILL_TEXT[st.terminal.cause], illness: { cause: st.terminal.cause, left: st.terminal.age - st.age } });
   }
   // ผลตอบแทนคิดกับเงินต้นปีก่อนเงินเก็บของปีนี้เข้า · ติดลบ = หนี้ ทบดอกเบี้ยเงินกู้ของปีนั้น
@@ -1187,6 +1203,8 @@ const inYears = (e, year) => !e.years || (year >= e.years[0] && year <= e.years[
 const inRange = (v, r) => !r || (v >= r[0] && v <= r[1]);
 // การ์ดช่วงป่วยก่อนตาย (B110): ผ่านเมื่อตรวจเจอโรคเรื้อรังแล้ว · causes = กลุ่มโรค · left = ปีที่เหลือก่อนถึงนัด (0 = ปีสุดท้าย)
 export const illnessOk = (st, w) => !!st.terminal?.told && (!w.causes || w.causes.includes(st.terminal.cause)) && inRange(st.terminal.age - st.age, w.left);
+// การ์ดตรวจสุขภาพจากประวัติครอบครัว (B110 ชิ้น 2): พ่อ/แม่จากไปด้วยโรคที่ถ่ายทอดได้แล้ว · causes = โรคไหนบ้าง (ไม่ใส่ = โรคใดก็ได้)
+export const heredityOk = (st, w) => (st.heredity ?? []).some((k) => !w.causes || w.causes.includes(k));
 const inBound = (v, b) => !b || ((b.min === undefined || v >= b.min) && (b.max === undefined || v <= b.max));
 const flagsOk = (st, f) => (f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]);
 // ครอบครัวมีแค่พ่อแม่ (ด่าน family-system กั้นบทบาทอื่นไว้) · เงื่อนไขผ่านเมื่อพ่อหรือแม่คนใดคนหนึ่งตรง
@@ -1196,6 +1214,8 @@ export function whenOk(st, when) {
   if (when.family && !when.family.every((f) => familyOk(st, f))) return false;
   if (when.loss && !lossOk(st, when.loss)) return false;
   if (when.illness && !illnessOk(st, when.illness)) return false;
+  if (when.kin_illness && !kinIllOk(st, when.kin_illness)) return false;
+  if (when.heredity && !heredityOk(st, when.heredity)) return false;
   if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
   if (when.class && !when.class.includes(classNow(st))) return false;
   if (when.region && !when.region.includes(st.region)) return false;

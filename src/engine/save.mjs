@@ -74,5 +74,8 @@ export function repairLife(st, card) {
   // เซฟก่อนมีสาเหตุตาย (B110) — เริ่ม stream ใหม่จาก seed เหมือนชีวิตที่เกิดใหม่
   st.causeRng ??= makeRng(st.seed ^ 0x9b05688c);
   st.terminal ??= null;
+  // เซฟก่อนญาติมีสาเหตุ (B110 ชิ้น 2) — ญาติที่จากไปแล้วไม่มีสาเหตุย้อนหลัง · คนที่ยังอยู่เริ่มนับจากนี้
+  st.kinCauseRng ??= makeRng(st.seed ^ 0xc1059ed8);
+  st.heredity ??= [];
   return stale;
 }
