@@ -1552,6 +1552,7 @@ export function nextIsekaiCard(isk) {
     ...(!revived && opened.length && { sys: `ความรู้จากโลกเดิมมากพอแล้ว ทุ่มเทได้อีกทาง · ${opened.map((id) => isekaiFocusDef(isk, id).name).join(' · ')}` }),
     focus: isk.focusOffers.indexOf(isk.focus),
     focusChoices: isk.focusOffers.map((id) => isekaiFocusDef(isk, id).name),
+    focusFx: isk.focusOffers.map((id) => isekaiFocusFx(isk, id)),
     choices: [],
   });
 }
