@@ -270,6 +270,13 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .mem .body h3 { font-family:Srisakdi,serif; font-size:30px; font-weight:700; color:#1F1F1F; }
 .mem .body .dates { margin-top:-6px; }
 .mem .choice { border-color:#1F1F1F; }
+/* ป้ายตามหาคนหาย (B139): กระดาษประกาศติดเสา หัวแดงตัวหนา — ต่างจากหนังสืองานศพขาวดำ ให้รู้ว่ายังไม่มีใครถือว่าจากไป */
+.a.mem.lost { background:#FFF8E1; border:3px dashed #B3261E; outline:none; }
+.lost .top { padding-top:20px; }
+.lost .top b { font-family:Sarabun,sans-serif; font-size:24px; font-weight:800; color:#B3261E; letter-spacing:0.02em; }
+.lost .por { border:2px solid #1F1F1F; }
+.lost .call { margin:0; padding:8px 10px; border:2px solid #B3261E; color:#B3261E; font-weight:700; text-align:center; }
+.lost .choice { border-color:#B3261E; }
 
 /* ทาง C ต่างโลก (B68) — หน้าต่างสถานะแบบเกม: พื้นฟ้ากลางคืน กรอบฟ้าเรือง · ต่างจากสองแนวไทยให้รู้ว่าออกจากวงเวียนเดิมแล้ว */
 .i { background:#161A3A; color:#E8ECFF; border:1px solid #3B4BA8; }
@@ -2980,6 +2987,18 @@ function emit(st, card) {
   return card;
 }
 
+// ใบคนที่บ้านตามหา (B137) ออกครั้งเดียวแทนงานศพของทางหายตัว · ไม่มีญาติให้เรียกชื่อ ⇒ ล้าง kinFocus ที่ค้างจากใบก่อน
+function goneSearchCard(st) {
+  st.searched = true;
+  st.kinFocus = {};
+  st.pending = { search: true, choices: GONE_SEARCH.choices };
+  return emit(st, {
+    kind: 'event', id: GONE_SEARCH.id, search: true, type: 'B', national: false, funeral: false,
+    age: st.age, stage: stageOf(st.age), title: null, text: GONE_SEARCH.text,
+    choices: GONE_SEARCH.choices.map((c) => c.text), fx: GONE_SEARCH.choices.map(() => ''), locked: GONE_SEARCH.choices.map(() => null),
+  });
+}
+
 // การ์ดเลือกของเหตุการณ์ — ตั้ง pending ไว้ให้ choose อ่าน
 // ปิด merge = ข่าวกับการ์ดรับมือแยกใบแบบเดิม (ตัวควบคุมของ harness)
 const ERA_NEWS = { merge: true };
@@ -3087,6 +3106,7 @@ function nextCard(st) {
   }
   if (st.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
   // คิวมาก่อนการตาย — การ์ดงานศพเข้าคิวตอนตายแล้วต้องออกก่อนมรณบัตร
+  if (st.dead && !st.queue.length && isGone(st) && !st.searched) return goneSearchCard(st);
   if (st.dead && !st.queue.length) return deathCard(st);
   // การ์ดเปลี่ยนช่วง/เหตุการณ์ยุค/ผลสุ่มเป็นใบของตัวเอง เรียงตามที่ถึงกำหนดในปีนั้น
   if (st.queue.length) {
@@ -3301,10 +3321,18 @@ function choose(st, idx, loan) {
     st.log.push({ id: 'alloc', age: st.age, choice: idx, text: opt.label });
     return;
   }
+  if (ev?.search) {
+    const c = ev.choices[idx];
+    if (!c) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    st.pending = null;
+    st.log.push({ id: GONE_SEARCH.id, age: st.age, choice: idx, text: c.text });
+    st.queue.push({ kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: c.reply });
+    return;
+  }
   if (ev?.entry) {
     if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
-    // ปฏิเสธ = ไม่แตะอะไรเลย · กดรับ = จบชีวิตตรงนี้ งานศพตามปกติ แล้วปรโลกส่งข้ามโลก (ธง isekai_call)
+    // ปฏิเสธ = ไม่แตะอะไรเลย · กดรับ = จบชีวิตตรงนี้ แล้วปรโลกส่งข้ามโลก (ธง isekai_call) · ตาย = งานศพตามปกติ · หายตัว = ใบคนที่บ้านตามหาแทน (B137)
     // ทางที่ได้กลับ (B68m) = ไปต่างโลกทั้งตัวกลางชีวิต ไม่ตั้งธง · บัญชีบุญบาปส่งตัวเดียวกันเข้าไป
     const n = st.trips?.length ?? 0;
     const trip = idx === ENTRY.accept && tripRoll(st.seed, ev.entry, n);
@@ -3322,7 +3350,7 @@ function choose(st, idx, loan) {
       st.isekaiVia = ev.entry;
       st.log.push({ id: `isekai_${ev.entry}`, age: st.age, choice: idx, text: ev.choices[idx].text });
       st.dead = true;
-      queueFuneral(st);
+      if (!isGone(st)) queueFuneral(st);
     }
     return;
   }
@@ -3462,7 +3490,7 @@ function tripBack(st) {
   if (!isk.home) {
     st.tripLost = true;
     st.dead = true;
-    return queueFuneral(st) ? nextCard(st) : deathCard(st);
+    return nextCard(st);
   }
   const away = isk.age - isk.trip.from;
   const c = tripCarry(isk);
@@ -4951,7 +4979,7 @@ function isekaiCalled(st) {
   return makeRng(st.seed ^ ISEKAI_SALT).next() < p;
 }
 
-// ทางเข้าจากเหตุการณ์ในชีวิต (B68d · เจ้าของเคาะ): ชีวิตละ 1–3 ครั้งต่างช่วงวัย ปฏิเสธได้ · กดรับ = ชีวิตจบ มีงานศพ แล้ววาร์ปข้ามโลก
+// ทางเข้าจากเหตุการณ์ในชีวิต (B68d · เจ้าของเคาะ): ชีวิตละ 1–3 ครั้งต่างช่วงวัย ปฏิเสธได้ · กดรับ = ชีวิตจบ (ตาย = มีงานศพ · หายตัว = ใบตามหา) แล้ววาร์ปข้ามโลก
 // ตารางนัดสุ่มจาก stream แยกตอนเกิด ดึงเลขครบทุกช่วงแม้ไม่ได้นัด ⇒ ชีวิตที่ปฏิเสธเดินเท่าเดิมทุกหลัก
 // ช่วงแรกเริ่มวัยรุ่น เพราะงานศพมีตั้งแต่ช่วงวัยรุ่น · gone = หายตัวไปทั้งที่ยังไม่ตาย
 const ENTRY = { salt: 0x6a7e5d1, accept: 0, decline: 1, bands: [{ from: 13, to: 18, p: 1 }, { from: 25, to: 45, p: 0.5 }, { from: 50, to: 75, p: 0.5 }] };
@@ -5002,6 +5030,19 @@ const TRIP = { salt: 0x7219b3, years: [3, 12], thai: [6, 3, 2, 1], back: 0.5, ro
 // ไปต่างโลกได้ 2 แบบ (เจ้าของเคาะ): ตาย กับหายตัว — ป้ายอายุตอนจบทุกจุดแยกตามแบบ · ไปกลับแล้วตายในต่างโลก = หายตัว
 const lifeEndWord = (gone) => (gone ? 'หายตัวไปตอนอายุ' : 'ตายอายุ');
 const isGone = (st) => !!ENTRY_EVENTS[st?.isekaiVia]?.gone || !!st?.tripLost;
+
+// หายตัวไม่มีศพ จึงไม่มีงานศพ/คำสั่งเสีย (B137 · เจ้าของเคาะทับ B68d) — แทนด้วยใบคนที่บ้านออกตามหา ให้ผู้เล่นตอบว่ารู้สึกอย่างไร
+// ตัวเลือกไม่มีผลกับค่าหรือบัญชี (ชีวิตจบแล้ว) · reply = การ์ดผลใบถัดไป ก่อนมรณบัตร
+const GONE_SEARCH = {
+  id: 'gone_search',
+  text: 'คนที่บ้านติดประกาศคนหายไว้ทั่วตลาด แจ้งความไว้ทุกโรงพัก ไฟหน้าบ้านยังเปิดทิ้งไว้ทุกคืน คุณมองเห็นทุกอย่างจากที่ที่ไกลมาก',
+  choices: [
+    { text: 'อยากบอกพวกเขาว่าไม่ต้องรอแล้ว', reply: 'เสียงของคุณไปไม่ถึง แต่คืนหนึ่งไฟหน้าบ้านก็ดับลงเอง' },
+    { text: 'ดีใจที่ยังมีคนตามหา', reply: 'รูปของคุณบนประกาศซีดลงทุกปี แต่ไม่เคยมีใครดึงออก' },
+    { text: 'เสียดายเรื่องที่ยังไม่ได้ทำ', reply: 'เรื่องที่ค้างไว้มีคนในบ้านเก็บไปทำต่อทีละเรื่อง' },
+    { text: 'ปล่อยวาง ทุกอย่างผ่านไปแล้ว', reply: 'ภาพบ้านหลังนั้นค่อย ๆ จางลง จนเหลือแค่แสงสีขาว' },
+  ],
+};
 
 // ทอยตอนกดรับ: ได้ไปกลับไหม · กี่ปีต่างโลก · กี่ปีไทย — ดึงเลขครบทุกครั้งแม้ไม่ได้กลับ ลำดับจึงไม่ขึ้นกับผล
 function tripRoll(seed, id, n = 0) {
@@ -5745,13 +5786,16 @@ function pathCard(af) {
 }
 
 // การ์ดเปิดชีวิตของรุ่นถัดไปเล่าคำเดียวกัน — ผู้เล่นเห็นสองใบตรงกัน
-const carryAmount = (r) => (r >= 0.55 ? 'มาก' : r >= 0.45 ? 'พอประมาณ' : 'น้อย');
+// คำบอกขนาดบุญ+บาปที่ส่งต่อจริง (B137) ไม่ใช่สัดส่วนที่สุ่ม — สัดส่วนสูงของบัญชีว่างยังเท่ากับไม่มีอะไรติดตัว
+// เกณฑ์วางให้ชีวิตทั่วไปตกช่วงกลาง (วัด 300 ชีวิตบอทสุ่ม: p25 ≈ 10 · p50 ≈ 14 · p75 ≈ 18) · เซฟเก่าไม่มี kept ใช้คำตามสัดส่วนแบบเดิม
+const CARRY_WORDS = [[1, 'แทบไม่มี'], [8, 'น้อย'], [18, 'พอประมาณ']];
+const carryAmount = (h) => (h.kept === undefined ? (h.carried >= 0.55 ? 'มาก' : h.carried >= 0.45 ? 'พอประมาณ' : 'น้อย') : (CARRY_WORDS.find(([cut]) => h.kept < cut)?.[1] ?? 'มาก'));
 
 function carryCard(af) {
   const r = CARRY.min + af.rng.next() * (CARRY.max - CARRY.min);
   af.heir = makeHeir(af, r);
   const h = af.heir;
-  const amount = carryAmount(h.carried);
+  const amount = carryAmount(h);
   const who = af.path === 'child' ? `กลับมาเกิดเป็น${kinTier(h.tier).name}ของตัวเอง` : af.from ? 'กลับจากต่างโลกมาเกิดใหม่' : 'ไปเกิดใหม่';
   return emitAfter(af, {
     kind: 'carry',
@@ -5978,6 +6022,7 @@ function makeHeir(af, r) {
   const thai = af.thaiVerdict ?? af.verdict;
   const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, ...(isGone(st) && { gone: true }), realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }], fame, ...(goals.length && { goals }), ...(st.officeTop >= 0 && { office: st.officeTop }), ...(ladderOf(st)?.pension && { service: true }), ...(st.trips?.length && { trips: st.trips }) }, ...af.isekaiLives];
   const carried = r * (tier?.carry ?? 1);
+  const ledger = carryLedger(af.st.ledger, net, carried);
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1 + af.isekaiLives.length,
@@ -5991,8 +6036,9 @@ function makeHeir(af, r) {
     legacy,
     occupation,
     bonus,
-    ledger: carryLedger(af.st.ledger, net, carried),
+    ledger,
     carried,
+    kept: ledger.merit + ledger.sin,
     tier: tier?.tier ?? null,
     // ส่วนที่บ้านส่งต่อ แยกจาก bonus (ซึ่งรวมผลกรรม) ให้การ์ดเปิดชีวิตเล่าทิศได้โดยไม่เผยบัญชี
     kin: { relations: kin('relations'), network: kin('network') },
@@ -6086,7 +6132,7 @@ function inheritText(st, heir) {
   if (prev.path === 'child' && who) out.push(`ชาติก่อนเฝ้าลูกหลานไว้ แล้วกลับมาเกิดเป็น${kinTier(prev.tier).name}ของตัวเอง — ${who}ของคุณคือคุณในชาติก่อน`);
   else if (away.length) out.push(`ชาติก่อนตามเทพธิดาไปต่างโลก ${away.length} ชาติ (ล่าสุด: ${away.at(-1).name} · ${away.at(-1).ending}) แล้วกลับมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม`);
   else out.push('ชาติก่อนไปตามกรรม แล้วมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม');
-  out.push(`กรรมที่ติดตัวมาจากชาติก่อน${carryAmount(heir.carried)}`);
+  out.push(`กรรมที่ติดตัวมาจากชาติก่อน${carryAmount(heir)}`);
   const d = CLASSES.indexOf(st.cls) - CLASSES.indexOf(prev.cls);
   out.push(d ? `ฐานะ ${d > 0 ? '↑' : '↓'} — เกิดในบ้านที่ฐานะ${d > 0 ? 'ดีกว่า' : 'ด้อยกว่า'}ชาติก่อน (ชาติก่อนฐานะ${prev.cls})` : `ฐานะ — ใกล้เคียงชาติก่อน (ฐานะ${prev.cls})`);
   if (who && heir.legacy) {
@@ -6994,7 +7040,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.90';
+const APP_VERSION = 'v0.2.91';
 const APP_BUILD = '2026-10-28';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
@@ -8379,6 +8425,14 @@ const growLabel = (stage) => `เติบโตเป็น${stage === 'หน�
 const portrait = () => pixels('por', 20, 24, [[0, 0, 20, 24, '#E8E8E8'], [7, 2, 6, 6, '#B8B8B8'], [7, 1, 6, 2, '#1F1F1F'], [5, 8, 10, 8, '#5A5A5A'], [6, 16, 3, 6, '#1F1F1F'], [11, 16, 3, 6, '#1F1F1F']]);
 
 const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
+// ป้ายคนหาย (B139) — ถ้อยคำของคนที่บ้านที่ยังรอ: ไม่อาลัย ไม่บอกเหตุ (B110) · will[0] ไม่มีพินัยกรรม · will[1] มี
+const LOST = {
+  head: 'ประกาศตามหาคนหาย',
+  money: 'ทรัพย์ที่ทิ้งไว้',
+  debt: 'หนี้ที่ทิ้งไว้',
+  will: ['ไม่ได้สั่งเรื่องทรัพย์ไว้ คนที่บ้านแบ่งกันเองจนผิดใจกัน', 'คนที่บ้านพบพินัยกรรมที่เขียนไว้ จึงแบ่งทรัพย์ตามนั้น'],
+  call: 'ใครพบเห็น โปรดแจ้งคนที่บ้าน ทุกคนยังรออยู่',
+};
 
 function render(card) {
   // ไปกลับกลางชีวิต (B68m): ทริปยังเป็นชีวิตนี้ ปุ่มจึงเดินผ่านปุ่มชีวิต — จอเต็มของทริปเป็นงานเลน C
@@ -8394,20 +8448,25 @@ function render(card) {
   const next = () => play(T.next);
 
   if (card.kind === 'death') {
-    top.append(el('b', null, 'ด้วยรักและอาลัย'));
+    // หายตัวไม่มีศพ (B137) จึงไม่มีหนังสืองานศพ — คนที่บ้านยังเชื่อว่ามีชีวิตอยู่ ใบนี้เป็นป้ายตามหาคนหาย ไม่มีคำอาลัย (B139)
+    const gone = isGone(st);
+    if (gone) box.classList.add('lost');
+    top.append(el('b', null, gone ? LOST.head : 'ด้วยรักและอาลัย'));
     box.append(top);
     // หนังสืองานศพบอกอายุ ไม่บอกปี พ.ศ. — ปีเกมไม่ขึ้นจอ (B14 ข้อ 12)
-    body.append(portrait(), el('h3', null, st.name), el('p', 'dates', `${genLabel()}สิริอายุ ${card.age} ปี`));
+    body.append(portrait(), el('h3', null, st.name), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
     const why = causeOf(card.cause, card.age);
     if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
     body.append(el('p', null, `${st.sex} · ${provinceLabel(st)} · ฐานะ${classNow(st)} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
-    const net = card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
+    const net = gone ? (card.summary.money < 0 ? LOST.debt : LOST.money) : card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
     body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
     if (card.summary.debt) body.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
     if (card.summary.bankruptcies) body.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
-    if (card.note) body.append(el('p', 'sub', card.note));
+    // บันทึกเด็กเป็นสถิติการตายของยุค — ไม่ใช่เรื่องของคนหาย
+    if (card.note && !gone) body.append(el('p', 'sub', card.note));
     if (card.funeral) body.append(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
-    if (card.will !== undefined) body.append(el('p', 'sub', card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
+    if (card.will !== undefined) body.append(el('p', 'sub', gone ? LOST.will[card.will ? 1 : 0] : card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
+    if (gone) body.append(el('p', 'call', LOST.call));
     const note = notePick(st.gen);
     if (note) body.append(noteQuote(`บันทึกเมื่ออายุ ${note.a}`, note.t));
     if (card.pets) body.append(el('p', 'sub', card.pets));
