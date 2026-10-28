@@ -684,6 +684,9 @@ export function standingOf(st, year = st.birthYear + st.age) {
   const z = (Math.log(eq / nationalIncome(st.content.era, st.seed, year)) + (b.sigma * b.sigma) / 2) / b.sigma;
   return b.cutZ.filter((c) => z > c).length;
 }
+// ชนชั้นที่การ์ดเช็ก (when.class · multipliers.class · B111 เจ้าของเคาะ): ฐานะตอนเกิดมีผลถึงก่อนเริ่มทำงาน หลังจากนั้นอ่านฐานะปีนั้น
+// ไม่งั้นคนเกิดจนที่รวยแล้วไม่เจอการ์ดคนรวยตลอดชีวิต · standingOf คืนฐานะตอนเกิดให้เองเมื่อยังไม่เคยทำงาน
+export const classNow = (st) => CLASSES[standingOf(st)];
 
 // รายได้ทั้งปีที่ใช้วัดว่าหนี้ท่วมแค่ไหน: ทำงานอยู่ = รายได้ปีนี้ · เกษียณแล้ว = รายได้ปีสุดท้ายปรับเงินเฟ้อ
 // ยังไม่เคยทำงาน (เรียนอยู่ระหว่างปลอดหนี้ กยศ.) ไม่มีฐาน จึงไม่นับ
@@ -994,7 +997,7 @@ const canRepeat = (st, e) => e.repeat && st.fired[e.id].n < e.repeat.max && st.a
 export function poolMultiplier(st, m) {
   if (!m) return 1;
   // เพศมีผลต่อโอกาสการ์ด (B109 · เจ้าของเคาะ) — เพศกำเนิด ชาย/หญิง · when.sex มีอยู่แล้ว
-  let x = (m.class?.[st.cls] ?? 1) * (m.sex?.[st.sex] ?? 1);
+  let x = (m.class ? (m.class[classNow(st)] ?? 1) : 1) * (m.sex?.[st.sex] ?? 1);
   for (const [k, v] of Object.entries(m.stats ?? {})) x *= st[k] >= STAT_HIGH ? v : st[k] <= STAT_LOW ? 1 / v : 1;
   if (m.karma) x *= m.karma ** Math.sign(netLedger(st.ledger));
   // ขอพร: เอียงตามบัญชีแบบต่อเนื่อง บุญน้อยเอียงน้อย บาปหนักกลับทิศ
@@ -1017,7 +1020,7 @@ export function whenOk(st, when) {
   if (when.family && !when.family.every((f) => familyOk(st, f))) return false;
   if (when.loss && !lossOk(st, when.loss)) return false;
   if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
-  if (when.class && !when.class.includes(st.cls)) return false;
+  if (when.class && !when.class.includes(classNow(st))) return false;
   if (when.region && !when.region.includes(st.region)) return false;
   if (when.sex && !when.sex.includes(st.sex)) return false;
   for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;

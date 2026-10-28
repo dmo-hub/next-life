@@ -1,7 +1,7 @@
 // harness การเงิน (B08): ทรัพย์สุทธิตอนตาย (บาทค่าเงินปีเกิด) ตามฐานะเกิด/ภาค ต้องไม่ผิดทิศกับความเหลื่อมล้ำจริง
 // ตัวควบคุม: ปิดผลจุดเกิด (อาชีพเท่ากันทุกฐานะ · รายได้ทุกภาค = ทั่วประเทศ · เงินติดตัวเท่ากัน) แล้วช่องว่างต้องหดลงชัด
 // — พิสูจน์ว่าตัววัดจับผลจุดเกิดได้จริง ไม่ใช่เรียงถูกเพราะบังเอิญ · รันซ้ำ seed เดิมต้องได้ผลเดิมทุกหลัก
-import { playLife, openChoices, mixSeed, makeRng, CLASSES } from '../src/engine/index.mjs';
+import { playLife, openChoices, mixSeed, makeRng, CLASSES, standingOf } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 
 const args = process.argv.slice(2);
@@ -135,6 +135,24 @@ const a = JSON.stringify(run(content, 300));
 const b = JSON.stringify(run(content, 300));
 console.log(`รันซ้ำ seed เดิม 300 ชีวิต: ${a === b ? 'ผลเดิมทุกหลัก ผ่าน' : 'ผลต่าง ตก'}`);
 if (a !== b) fails++;
+
+// การ์ดที่เช็กชนชั้น (B111): ต้องออกตามฐานะปีที่ออก ไม่ใช่ฐานะตอนเกิด — รั่ว = ออกตอนฐานะปีนั้นไม่อยู่ใน when.class
+// ตัวควบคุม: นับครั้งที่ฐานะตอนเกิดไม่อยู่ในเงื่อนไข ต้องมากกว่า 0 ไม่งั้นชุดนี้ไม่มีใครเลื่อนฐานะ ด่านรั่ว 0 ไม่ได้พิสูจน์อะไร
+const gated = new Map(content.events.filter((e) => e.when?.class).map((e) => [e.id, e.when.class]));
+let classFired = 0, classLeak = 0, classMoved = 0;
+const CLASS_LIVES = Math.min(n, 2000);
+for (let i = 0; i < CLASS_LIVES; i++) {
+  playLife(mixSeed(seed, i), content, randomBot, (card, st) => {
+    const allow = card.kind === 'event' && gated.get(card.id);
+    if (!allow) return;
+    classFired++;
+    if (!allow.includes(CLASSES[standingOf(st)])) classLeak++;
+    if (!allow.includes(st.cls)) classMoved++;
+  });
+}
+const classOk = classLeak === 0 && classMoved > 0;
+console.log(`การ์ดเช็กชนชั้น ${CLASS_LIVES} ชีวิต: ออก ${classFired} ครั้ง · ฐานะปีนั้นไม่ตรง ${classLeak} · ฐานะตอนเกิดไม่ตรง (ตัวควบคุม) ${classMoved} → ${classOk ? 'ผ่าน' : 'ตก'}`);
+if (!classOk) fails++;
 
 console.log(fails ? `\nไม่ผ่าน ${fails} ด่าน` : '\nผ่านทั้งหมด');
 if (fails) process.exitCode = 1;
