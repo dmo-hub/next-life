@@ -2063,9 +2063,10 @@ const INCOME_MULT = [0.1, 5];
 const CHRONIC_MAX = 3;
 const CHRONIC_STEP = { health: 0.35, happiness: 1, knowledge: 1, relations: 1, network: 1 };
 const CHRONIC_FADE = 5;
-// ตัวคูณตามค่าสถานะเป็นขั้นบันได: คนเขียนเนื้อหารู้ว่าค่าเท่าไรถึงนับว่า "สูง/ต่ำ" ไม่ต้องคิดเลขยกกำลัง
-const STAT_HIGH = 70;
-const STAT_LOW = 30;
+// ค่าสถานะเอียงน้ำหนักต่อเนื่องทุกแต้ม (B112 · เจ้าของเคาะ) — v^((ค่า−50)/20) ตัดที่ ±2 ⇒ 70 = v และ 30 = 1/v เท่าแบบขั้นเดิม (เดิมคูณเฉพาะ ≥70 / ≤30)
+// สุดทาง (≥90 / ≤10) = v² · โอกาสสำเร็จของตัวเลือกตัดที่ 5–95% (แบบต่างโลก B107b)
+const STAT_CURVE = { mid: 50, span: 20, cap: 2, okMin: 0.05, okMax: 0.95 };
+const statMul = (v, x) => v ** Math.max(-STAT_CURVE.cap, Math.min(STAT_CURVE.cap, (x - STAT_CURVE.mid) / STAT_CURVE.span));
 const clamp = (v) => Math.max(0, Math.min(100, v));
 // สุขต่ำมากทำอะไรก็ไม่เข้าหัว (B40): ความรู้ที่งอกเองรายปี + โอกาสสำเร็จของการ์ดเรียน/งาน คูณตามขั้น · เกณฑ์ = ต่ำกว่าค่าแรก
 const MOOD = [[15, 0.5], [30, 0.7]];
@@ -2073,9 +2074,19 @@ const moodMul = (st) => MOOD.find(([below]) => st.happiness < below)?.[1] ?? 1;
 const MOOD_CATS = ['work_money', 'study'];
 // การ์ดที่แกนสร้าง (หางาน · ด่านเรียนต่อ) ไม่มีหมวด — นับเป็นเรียน/งานด้วย id
 const moodCard = (ev) => !!ev && (MOOD_CATS.includes(ev.category) || ev.id === 'first_job' || ev.id?.startsWith('school_gate_'));
+// น้ำหนักทางผลหลังเอียงตาม multipliers และอารมณ์ · การ์ดที่มีทั้งทางสำเร็จและไม่สำเร็จ ตัดโอกาสสำเร็จรวมไว้ okMin–okMax (B112) โดยปรับสองกลุ่มตามสัดส่วน
+// (ไม่ดึงเลขสุ่มเพิ่ม · ป้าย % กับผลจริงใช้ตัวเดียวกัน)
 const outcomeWeights = (st, ev, c) => {
   const m = moodCard(ev) ? moodMul(st) : 1;
-  return c.outcomes.map((o) => o.weight * poolMultiplier(st, o.multipliers) * (o.ok ? m : 1));
+  const w = c.outcomes.map((o) => o.weight * poolMultiplier(st, o.multipliers) * (o.ok ? m : 1));
+  const ok = w.reduce((a, x, i) => a + (c.outcomes[i].ok ? x : 0), 0);
+  const all = w.reduce((a, x) => a + x, 0);
+  if (ok <= 0 || ok >= all) return w;
+  const p = ok / all;
+  const q = Math.max(STAT_CURVE.okMin, Math.min(STAT_CURVE.okMax, p));
+  if (q === p) return w;
+  const kOk = q / p, kNo = (1 - q) / (1 - p);
+  return w.map((x, i) => x * (c.outcomes[i].ok ? kOk : kNo));
 };
 
 function weighted(rng, items, weights) {
@@ -3058,7 +3069,7 @@ function poolMultiplier(st, m) {
   if (!m) return 1;
   // เพศมีผลต่อโอกาสการ์ด (B109 · เจ้าของเคาะ) — เพศกำเนิด ชาย/หญิง · when.sex มีอยู่แล้ว
   let x = (m.class ? (m.class[classNow(st)] ?? 1) : 1) * (m.sex?.[st.sex] ?? 1);
-  for (const [k, v] of Object.entries(m.stats ?? {})) x *= st[k] >= STAT_HIGH ? v : st[k] <= STAT_LOW ? 1 / v : 1;
+  for (const [k, v] of Object.entries(m.stats ?? {})) x *= statMul(v, st[k]);
   if (m.karma) x *= m.karma ** Math.sign(netLedger(st.ledger));
   // ขอพร: เอียงตามบัญชีแบบต่อเนื่อง บุญน้อยเอียงน้อย บาปหนักกลับทิศ
   if (m.wish) x *= m.wish ** ledgerLevel(st.ledger);
@@ -6831,7 +6842,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.87';
+const APP_VERSION = 'v0.2.88';
 const APP_BUILD = '2026-10-28';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
