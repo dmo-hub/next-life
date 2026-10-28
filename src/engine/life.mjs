@@ -746,6 +746,8 @@ function retireSpend(st, year) {
 export const totalDebt = (st) => st.debts.reduce((s, d) => s + d.balance, 0);
 // ทรัพย์สุทธิ = เงิน − หนี้รายก้อน (เงินติดลบนับเป็นหนี้อยู่แล้ว)
 export const netWorth = (st) => st.money - totalDebt(st);
+// ค่าโลกจริงตอนข้ามไปต่างโลก (B100) — ปรโลกส่งตอนเกิดใหม่ข้ามโลก ทริปกลางชีวิตส่งตอนกดรับ (B136)
+export const realAt = (st) => ({ stats: Object.fromEntries(STAT_KEYS.map((k) => [k, st[k]])), money: netWorth(st), unit: nationalIncome(st.content.era, st.seed, st.birthYear + st.age) * 12, age: st.age });
 
 // ฐานะระหว่างชีวิต (B95): รายได้เทียบเท่าต่อเดือนเทียบรายได้ครัวเรือนของประเทศปีนั้น ตัดด้วยเส้นแบ่ง 10 ระดับชุดเดียวกับฐานะตอนเกิด
 // รายได้เทียบเท่า = รายได้จากงาน × STANDING.household (คนเดียวเทียบรายได้ทั้งบ้าน) + ทรัพย์สุทธิ × STANDING.yield ต่อปี (ติดลบได้)
@@ -1274,6 +1276,8 @@ export function choose(st, idx, loan) {
         lore: isekaiWorldLore([...(st.lineage ?? []), { trips: st.trips }]),
         legends: isekaiWorldLegends([...(st.lineage ?? []), { trips: st.trips }]),
         trip: { ...trip, age: st.age, wit: st.knowledge / TRIP.wit },
+        // ค่าจริงของชีวิตนี้ตอนข้าม (B136) — ผลในต่างโลกสะท้อนกลับชุดนี้ แล้ว tripBack เขียนลง st
+        real: realAt(st),
       });
       return;
     }
@@ -1414,11 +1418,20 @@ function pickRite(st, ev) {
   return want.find(ok) ?? 'temple';
 }
 // ทริปจบ (การ์ดจบออกไปแล้ว): ตายในต่างโลก = ชีวิตไทยจบแบบหายตัว · กลับบ้าน = เวลาไทยเดินตามที่ทอยไว้แล้วเล่าการกลับ
+// ค่าจริงที่ต่างโลกสะท้อนกลับ เขียนลงชีวิตไทย (B136 · เจ้าของเคาะ): เงินมาทางนี้ทางเดียว (tripCarry ไม่มีเงิน)
+// ตายในต่างโลก = นับแค่เงิน (เข้ากองมรดก) · ค่าสถานะที่สะท้อนไปไม่มีผล เพราะชีวิตนี้จบแล้ว · ทริปในเซฟก่อน B136 ไม่มี real
+export function tripSettle(st, isk) {
+  if (!isk.real) return;
+  st.money += isk.real.money - isk.trip.money0;
+  if (isk.home) for (const k of STAT_KEYS) st[k] = clamp(isk.real.stats[k]);
+}
+
 // ปีที่หายไปเดินด้วย stepYear ปกติ (เงิน คนในบ้าน ด่านเรียน) แต่ไม่ทอยตายและไม่จับกอง — ตัวไม่อยู่ เรื่องของปีนั้นจึงมาเป็นข่าวหลังกลับ
 function tripBack(st) {
   const isk = st.trip;
   st.trip = null;
   (st.trips ??= []).push(tripLineage(isk));
+  tripSettle(st, isk);
   if (!isk.home) {
     st.tripLost = true;
     st.dead = true;
@@ -1426,7 +1439,6 @@ function tripBack(st) {
   }
   const away = isk.age - isk.trip.from;
   const c = tripCarry(isk);
-  st.money += c.gold * st.price;
   st.network = clamp(st.network + c.network);
   st.knowledge = clamp(st.knowledge + c.knowledge);
   for (let i = 0; i < isk.trip.thai; i++) stepYear(st);

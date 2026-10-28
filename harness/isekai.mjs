@@ -2,7 +2,7 @@
 // ด่าน: seed เดิมผลเดิม (รวดเดียว + เซฟ/โหลดกลางทาง) · จบได้ทุกชีวิตภายในเพดานการ์ด · ตอนจบ/บทบาท/สกิล/เหตุการณ์มีบอทถึง
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
-import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_TIME, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_TIME, ISEKAI_LINK, LINK, tripCarry, tripSettle, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 
@@ -386,6 +386,43 @@ check('ไปกลับกลางชีวิต: กลับบ้าน�
 check('ทริป seed เดิมผลเดิม + เล่นซ้ำจากลำดับปุ่ม', tripReplayBad);
 check('การ์ดทริปไม่เผยบุญบาป', tripLeak, `${tripCards.toLocaleString('en-US')} การ์ด`);
 check('โลกจำจากทริปอ่านกลับได้', tripLoreBad);
+
+// ค่าจริงสะท้อนกลับ (B136): ปีที่ทุ่มเทสะท้อน LINK.tick ของอัตราผลการ์ด (ค่าที่ไม่ชนเพดาน) · ทริปกลับบ้านเขียนค่าจริงลงชีวิตไทย + เงินทางเดียว
+// ทริปตายนับแค่เงิน · ชาติที่ไม่มี real ไม่แตะอะไร
+const REAL0 = { stats: { health: 50, happiness: 50, knowledge: 50, relations: 50, network: 50 }, money: 0, unit: 1000, age: 30 };
+let linkTickBad = 0, linkTicks = 0;
+for (let i = 0; i < lives; i++) {
+  const isk = startIsekai({ ...setup(i), real: REAL0 });
+  for (let guard = 0; guard < CARD_CAP; guard++) {
+    const st0 = { ...(isk.st ?? {}) }, r0 = isk.st && JSON.parse(JSON.stringify(isk.real));
+    const card = nextIsekaiCard(isk);
+    if (card.step === 'end') break;
+    // ตาที่ย้อนเวลาเมื่อตายตั้ง HP หลังปีเดินจบ ไม่ใช่ผลของการทุ่มเท ⇒ ข้าม
+    if (card.step === 'tick' && r0 && !card.sys?.includes('ย้อนเวลา')) {
+      linkTicks++;
+      // HP กับพลังลงสุขภาพทั้งคู่ ตามลำดับคีย์ของ isk.st · ชนเพดาน 0–100 ทีละขั้น
+      const c01 = (v) => Math.max(0, Math.min(100, v));
+      const want = JSON.parse(JSON.stringify(r0));
+      for (const k of Object.keys(isk.st)) {
+        const d = (isk.st[k] - st0[k]) * LINK.tick;
+        if (k === 'hp') want.stats.health = c01(want.stats.health + d);
+        else if (k === 'gold') want.money += (d * want.unit) / LINK.gold;
+        else if (ISEKAI_LINK[k]) want.stats[ISEKAI_LINK[k]] = c01(want.stats[ISEKAI_LINK[k]] + d * LINK.div);
+      }
+      if (Math.abs(isk.real.money - want.money) > 1e-6 || Object.keys(want.stats).some((w) => Math.abs(isk.real.stats[w] - want.stats[w]) > 1e-9)) linkTickBad++;
+    }
+    if (card.choices.length) chooseIsekai(isk, BOTS.สุ่ม(card, makeRng(mixSeed(seed, i * 977 + guard))));
+  }
+}
+const settle = (home) => {
+  const st = { money: 1000, health: 40, happiness: 40, knowledge: 40, relations: 40, network: 40 };
+  tripSettle(st, { home, trip: { money0: 500 }, real: { money: 800, stats: { health: 90, happiness: 10, knowledge: 120, relations: 55, network: 60 } } });
+  return st;
+};
+const home = settle(true), lost = settle(false), none = { money: 1000, health: 40 };
+tripSettle(none, { home: true, trip: {}, real: null });
+const settleBad = (home.money !== 1300 || home.health !== 90 || home.knowledge !== 100 ? 1 : 0) + (lost.money !== 1300 || lost.health !== 40 ? 1 : 0) + (none.money !== 1000 ? 1 : 0) + ('gold' in tripCarry({ st: { fame: 10 }, know: { a: 1 } }) ? 1 : 0);
+check('ค่าจริงสะท้อนกลับ: ปีที่ทุ่มเท 1/4 · ทริปกลับเขียนค่าจริง เงินทางเดียว · ทริปตายนับแค่เงิน', linkTickBad + settleBad + (linkTicks ? 0 : 1), `${linkTicks.toLocaleString('en-US')} ตา`);
 // ทริปหาย (ตายในต่างโลก) ราว 1 ใน 90 ทริป — ลูปข้างบนอาจไม่เจอสักชีวิต ⇒ ไล่ seed ต่อจนเจอ 5 ชีวิต แล้วตรวจว่าไม่มีงานศพ มีใบตามหาใบเดียว (B137)
 let lostSeen = 0, lostBad = 0;
 const tripBot = Object.assign((c, r, h) => isekaiBot(c, r, h), { isekai: true, trip: (card, rng) => {
