@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
@@ -1230,6 +1230,19 @@ function lockText(card, i) {
   return parts.join(' · ');
 }
 
+// กู้มาจ่าย (B111 เจ้าของเคาะ): ปุ่มละแหล่งใต้ตัวเลือกที่ขาดแค่เงิน บอกดอก + ยอดจ่ายต่อปี + ระยะ
+// นอกระบบไม่มีระยะ — จ่ายแต่ดอก ต้นค้าง ต้องบอกตรง ๆ ไม่งั้นอ่านเหมือนผ่อนหมดได้
+const pct = (r) => `${+(r * 100).toFixed(1)}%`;
+function loanButtons(card, i) {
+  return (card.loans?.[i] ?? []).map((o) => {
+    // ระยะเป็นก้อนแยก — ป้ายผลไม่ตัดกลางก้อน ก้อนยาวรวดเดียวล้นปุ่มจอมือถือ
+    const pay = o.years ? `ผ่อนปีละ ${baht(o.yearly)} · นาน ${o.years} ปี` : `จ่ายดอกปีละ ${baht(o.yearly)} · ต้นค้าง`;
+    const b = button(`กู้${o.name}มาจ่าย`, `ดอก ${pct(o.rate)} · ${pay}`, () => play(loanPick(i, o.kind)));
+    b.classList.add('loan');
+    return b;
+  });
+}
+
 // ลูกศรบนป้ายผลโปรแกรมอ่านจออ่านเป็น "upwards arrow" — ซ่อนลูกศรแล้วอ่านเป็นคำแทน ตาเห็นเหมือนเดิม
 const ARROW_WORD = { '↑': 'เพิ่ม', '↓': 'ลด' };
 function fxPart(text) {
@@ -1492,7 +1505,7 @@ function render(card) {
         const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);
         const b = keyed(button(c, fx, () => play(lifePick(i)), card.hints?.[i]), i);
         if (why) b.disabled = true;
-        choices.append(b);
+        choices.append(b, ...loanButtons(card, i));
       });
       // การ์ดเล่าเรื่อง (choices: []) ไม่มีปุ่มให้เลือก — ต้องมีทางไปใบถัดไป
       if (!card.choices.length) choices.append(enter(button(BTN.next, null, next)));
@@ -2117,6 +2130,10 @@ const snapShow = snapXor;
 const T = { next: '.', afterlife: '>', afterNext: ',', rebirth: '+' };
 const lifePick = (i) => i.toString(36);
 const afterPick = (i) => String.fromCharCode(65 + i);
+// กู้มาจ่าย = token 3 ตัว "~<แหล่ง><ตัวเลือก>" · log เก่าไม่มี "~" จึงตัดทีละตัวอักษรได้เหมือนเดิม
+const loanPick = (i, kind) => `~${LOAN_KINDS.indexOf(kind)}${i.toString(36)}`;
+const LOAN_TOK = /^~([0-9])([0-9a-z])$/;
+const tokens = (log) => log.match(/~..|[^]/g) ?? [];
 let save = null;
 
 // อายุของการ์ดชีวิตใบก่อน/ใบนี้ — จำใน apply ไม่ใช่ตอนวาด เพราะเล่นซ้ำจากเซฟไม่ได้วาดทุกใบ
@@ -2358,6 +2375,13 @@ function step(tok) {
     chooseAfter(af, tok.charCodeAt(0) - 65);
     return nextAfterCard(af);
   }
+  const loan = LOAN_TOK.exec(tok);
+  if (loan) {
+    const kind = LOAN_KINDS[+loan[1]];
+    if (!kind) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
+    choose(st, parseInt(loan[2], 36), kind);
+    return nextCard(st);
+  }
   if (!/^[0-9a-z]$/.test(tok)) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
   choose(st, parseInt(tok, 36));
   return nextCard(st);
@@ -2485,7 +2509,7 @@ function resume(s) {
   try {
     let card = begin(s.seed);
     if (s.rr) save.rr = 1;
-    for (const tok of s.log) card = apply(tok);
+    for (const tok of tokens(s.log)) card = apply(tok);
     save.log = s.log;
     return fingerprint(card) === s.fp ? card : null;
   } catch {

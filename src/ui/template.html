@@ -113,6 +113,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .choice { all:unset; box-sizing:border-box; min-height:52px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; cursor:pointer; font-size:15px; }
 .choice .fx { font-size:12px; text-align:right; flex-shrink:0; max-width:50%; }
 .choice .fx span { white-space:nowrap; }
+/* ปุ่มกู้มาจ่าย (B111) ห้อยใต้ตัวเลือกที่ขาดเงิน — ย่อและเยื้องให้เห็นว่าเป็นทางของปุ่มบน ไม่ใช่ตัวเลือกใหม่ */
+.choice.loan { min-height:40px; margin:-4px 0 0 24px; padding:6px 12px; font-size:13.5px; }
 /* text-indent สืบทอดจากย่อหน้าแขวนของจอกว้าง — ต้องคืนเป็น 0 ไม่งั้นบรรทัดรองมุดไปใต้เลขปุ่มลัด */
 .choice .hint { display:block; text-indent:0; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
 /* เลขปุ่มลัดเฉพาะจอกว้าง — มือถือไม่มีแป้นเลข เลขจะกินที่ป้ายตัวเลือกเปล่า ๆ */
