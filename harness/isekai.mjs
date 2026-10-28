@@ -2,7 +2,7 @@
 // ด่าน: seed เดิมผลเดิม (รวดเดียว + เซฟ/โหลดกลางทาง) · จบได้ทุกชีวิตภายในเพดานการ์ด · ตอนจบ/บทบาท/สกิล/เหตุการณ์มีบอทถึง
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
-import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_TIME, ISEKAI_LINK, LINK, tripCarry, tripSettle, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_TIME, ISEKAI_LINK, LINK, tripCarry, tripSettle, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, TRIP_QUEST, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 
@@ -103,6 +103,8 @@ let potionBad = 0, potionOver = 0;
 const potionFrom = [], potionAdd = {};
 // เวลาเดินเอง (B68b): ใบตาไม่มีตัวเลือก แต่บอกสิ่งที่ทุ่มเทได้ · การ์ดบทบาทมีคนธรรมดาเสมอ · สิ้นอายุเฉพาะหลังวัยชรา
 let tickBad = 0, roleBad = 0, oldBad = 0;
+// ทางกลับบ้าน (B154): ชาติที่เกิดในต่างโลกไม่เห็นเควส/อีเวนต์ทริป
+let tripEvBad = 0;
 const lens = [], clicks = [], humanAges = [];
 const commonerName = roleInfo('commoner').name;
 Object.values(BOTS).forEach((bot, b) => {
@@ -128,7 +130,9 @@ Object.values(BOTS).forEach((bot, b) => {
       if (card.step === 'event') {
         seen.event.add(card.id);
         seen.choice.add(`${card.id}#${card.pick}`);
+        if (EVENT[card.id].trip) tripEvBad++;
       }
+      for (const name of card.step === 'focus' ? card.choices : card.step === 'tick' ? card.focusChoices : []) if (name === TRIP_QUEST.focus.name) tripEvBad++;
       if (card.step === 'tick' && (card.choices.length || card.focusChoices.length < 2 || !(card.focus >= 0))) tickBad++;
       // ความรู้โลกเดิม (B68h): เรื่องอันตรายเฉพาะวัยผู้ใหญ่ขึ้นไป · โลกจำเฉพาะตอนชื่อเสียงถึง · ทางลัดที่เปิดได้
       if (card.step === 'event' && EVENT[card.id].adult && !ADULT_NAMES.includes(card.status.stage)) knowAdultBad++;
@@ -205,6 +209,41 @@ check('ยาต่ออายุ: อายุที่ต่อไม่เ�
 check('ซื้อร้านอย่างเดียวไม่ชนะขาด', !otherAvg || shopAvg > otherAvg * 1.5 ? 1 : 0, `ต่อเฉลี่ย ร้าน ${shopAvg.toFixed(1)} · ทางอื่น ${otherAvg.toFixed(1)} · ปน ${avg(potionAdd.mix).toFixed(1)} ปี`);
 // ทางคนร้ายหายากกว่าวีรบุรุษ — ต้องเจอทั้งสองแบบ ไม่งั้นด่านผ่านทั้งที่ไม่ได้ตรวจ
 check(`ดังถึง ${ISEKAI_FAME.legend} = โลกจำชื่อ · คนร้ายตามชื่อเสียงจากทางบาป`, legendEndBad + (legendGot - legendDark ? 0 : 1) + (legendDark ? 0 : 1), `${legendGot} ชาติ · คนร้าย ${legendDark}`);
+
+// ทางกลับบ้าน (B154): ทริปไม่กลับเองตามเวลา · การ์ดทางกลับมาเมื่อตามหาครบปีที่ทอย (นับใหม่เมื่อปฏิเสธ) · กลับบ้านได้ทางเดียวคือเลือกตัวเลือก home
+// ทริปที่ไม่ได้กลับจบด้วยตาย/สิ้นอายุเท่านั้น · การ์ดทริปเข้า seen ให้ด่านมีบอทถึงข้างล่างนับด้วย
+let questEarly = 0, homeBad = 0, questGot = 0, eventHome = 0, tripRuns = 0;
+Object.values(BOTS).forEach((bot, b) => {
+  for (let i = 0; i < n >> 2; i++) {
+    const trip = { ...tripRoll(mixSeed(seed, 0xb154 + i), 'door'), age: 18 + (i % 25), wit: 0 };
+    const a = play({ ...setup(i), trip }, bot, makeRng(mixSeed(seed ^ 0xb154, b * n + i)));
+    if (!a.ended) { stuck++; continue; }
+    tripRuns++;
+    let sought = 0, homePick = false;
+    for (const card of a.cards) {
+      if (card.step === 'tick' && card.focusChoices[card.focus] === TRIP_QUEST.focus.name) sought += card.years;
+      if (card.step !== 'event') continue;
+      seen.event.add(card.id);
+      seen.choice.add(`${card.id}#${card.pick}`);
+      const c = EVENT[card.id].choices[card.pick];
+      if (card.id === TRIP_QUEST.event) {
+        questGot++;
+        if (sought < trip.years) questEarly++;
+        if (!c.home) sought = 0;
+      }
+      if (c.home) {
+        homePick = true;
+        if (card.id !== TRIP_QUEST.event) eventHome++;
+        // กลับก่อนครบปีไทยที่ทอย = อายุร่างกายน้อยกว่าอายุไทย
+        if (card.age - trip.age < trip.thai) questEarly++;
+      }
+    }
+    const end = a.cards.at(-1);
+    if (!!end.home !== homePick || !!end.home !== !!a.isk.home || (!end.home && !a.isk.dead && !a.isk.natural)) homeBad++;
+  }
+});
+check('ทางกลับบ้าน: เควสครบปีที่ทอย · กลับเฉพาะเมื่อเลือก · ไม่กลับเองตามเวลา', questEarly + homeBad + (questGot && eventHome ? 0 : 1), `${tripRuns} ทริป · การ์ดทางกลับ ${questGot} · กลับด้วยอีเวนต์ ${eventHome}`);
+check('ชาติที่เกิดในต่างโลกไม่เห็นเควส/อีเวนต์ทริป', tripEvBad);
 
 // ทางแยกที่ต้องมีบอทถึง: ตอนจบทุกแบบของทุกบทบาท (+ ตายกลางทาง) · ทุกบทบาท · ทุกสกิล · ทุกเหตุการณ์ · ทุกตัวเลือก
 const missing = (want, got) => want.filter((x) => !got.has(x));
@@ -367,8 +406,8 @@ for (let i = 0; i < lives * 10; i++) {
   }
   const st = a.r.state;
   for (const x of t) {
-    // หลังวัยชราตาละ 5 ปี ปีกลับจึงเลยได้ไม่เกิน 4
-    if (x.years < 0 || x.years > TRIP.years[1] + 4 || (x.home && x.years < TRIP.years[0])) tripFail++;
+    // ทริปกลับเมื่อผู้เล่นเลือกบนการ์ดทางกลับ (B154) ไม่มีปีกลับตายตัวให้เทียบ
+    if (x.years < 0) tripFail++;
     if (x.home) tripHome++;
   }
   const lost = t.at(-1).home ? 0 : 1;
