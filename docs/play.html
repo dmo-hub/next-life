@@ -120,6 +120,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .choice .fx span { white-space:nowrap; }
 /* ปุ่มกู้มาจ่าย (B111) ห้อยใต้ตัวเลือกที่ขาดเงิน — ย่อและเยื้องให้เห็นว่าเป็นทางของปุ่มบน ไม่ใช่ตัวเลือกใหม่ */
 .choice.loan { min-height:40px; margin:-4px 0 0 24px; padding:6px 12px; font-size:13.5px; }
+/* ชื่อตัวเลือกบนปุ่มกู้ยาวได้ทั้งประโยค — บรรทัดเดียวตัดท้ายด้วย … ไม่งั้นปุ่มกู้สูงกว่าตัวเลือกเอง · min-width:0 ให้ก้อนข้อความหดในแถว flex ได้ */
+.choice.loan > span:first-child { min-width:0; }
+.choice.loan .of { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .choice .hint { display:block; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
@@ -8556,13 +8559,15 @@ function lockText(card, i) {
 
 // กู้มาจ่าย (B111 เจ้าของเคาะ): ปุ่มละแหล่งใต้ตัวเลือกที่ขาดแค่เงิน บอกดอก + ยอดจ่ายต่อปี + ระยะ
 // นอกระบบไม่มีระยะ — จ่ายแต่ดอก ต้นค้าง ต้องบอกตรง ๆ ไม่งั้นอ่านเหมือนผ่อนหมดได้
-// ป้ายบอกเลขข้อ: สองข้อขาดเงินพร้อมกันได้ ปุ่มกู้แหล่งเดียวกันหน้าตาเหมือนกันจนแยกไม่ออกว่าจ่ายข้อไหน
+// ป้ายบอกชื่อตัวเลือกที่จ่าย: สองข้อขาดเงินพร้อมกันได้ ปุ่มกู้แหล่งเดียวกันหน้าตาเหมือนกันจนแยกไม่ออกว่าจ่ายข้อไหน
+// ตัดท้ายด้วย CSS (.of) ไม่ใช่นับตัวอักษร — ความกว้างที่เหลือขึ้นกับจอและป้ายผล และตัดกลางสระไทยไม่ได้
 const pct = (r) => `${+(r * 100).toFixed(1)}%`;
 function loanButtons(card, i) {
   return (card.loans?.[i] ?? []).map((o) => {
     // ระยะเป็นก้อนแยก — ป้ายผลไม่ตัดกลางก้อน ก้อนยาวรวดเดียวล้นปุ่มจอมือถือ
     const pay = o.years ? `ผ่อนปีละ ${baht(o.yearly)} · นาน ${o.years} ปี` : `จ่ายดอกปีละ ${baht(o.yearly)} · ต้นค้าง`;
-    const b = button(`กู้${o.name}มาจ่ายข้อ ${i + 1}`,`ดอก ${pct(o.rate)} · ${pay}`, () => play(loanPick(i, o.kind)));
+    const b = button(`กู้${o.name}มาจ่าย: `, `ดอก ${pct(o.rate)} · ${pay}`, () => play(loanPick(i, o.kind)));
+    b.firstChild.append(el('span', 'of', card.choices[i]));
     b.classList.add('loan');
     return b;
   });

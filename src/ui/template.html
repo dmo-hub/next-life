@@ -120,6 +120,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .choice .fx span { white-space:nowrap; }
 /* ปุ่มกู้มาจ่าย (B111) ห้อยใต้ตัวเลือกที่ขาดเงิน — ย่อและเยื้องให้เห็นว่าเป็นทางของปุ่มบน ไม่ใช่ตัวเลือกใหม่ */
 .choice.loan { min-height:40px; margin:-4px 0 0 24px; padding:6px 12px; font-size:13.5px; }
+/* ชื่อตัวเลือกบนปุ่มกู้ยาวได้ทั้งประโยค — บรรทัดเดียวตัดท้ายด้วย … ไม่งั้นปุ่มกู้สูงกว่าตัวเลือกเอง · min-width:0 ให้ก้อนข้อความหดในแถว flex ได้ */
+.choice.loan > span:first-child { min-width:0; }
+.choice.loan .of { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .choice .hint { display:block; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
