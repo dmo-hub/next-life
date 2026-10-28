@@ -1,6 +1,6 @@
 // ส่วนต่างโลกของหน้ารวมการ์ดและหน้าเฉลย (B88b): สร้างจากโมดูลต่างโลกในเอนจินทุกครั้งที่ build — การ์ดต่างโลกใบใหม่ขึ้นหน้าเว็บเอง
 // หน้ารวมการ์ดได้แค่สิ่งที่จอแสดง (ชื่อโลก/สกิลพร้อมคำอธิบาย · ข้อความเหตุการณ์ · ตัวเลือก) · หน้าเฉลยได้ความยาก ผลสำเร็จ/พลาด ค่าที่ขยับ ธง และตอนจบ
-import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, GODDESS, GODDESS_VOWS, PATHS, meritName } from '../engine/index.mjs';
+import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, GODDESS, GODDESS_VOWS, PATHS, meritName } from '../engine/index.mjs';
 import { esc, text } from './catalog.mjs';
 
 export const ISEKAI_SECTION = 'ต่างโลก';
@@ -59,20 +59,25 @@ const byId = new Map(ISEKAI_EVENTS.map((e) => [e.id, e]));
 const ref = (id) => `<a href="#isk-${esc(id)}">${esc(byId.get(id).title)}</a>`;
 const flag = (f) => `<span class="fl" title="${esc(f)}">ธง ${esc(f)}</span>`;
 
+// know = ความรู้หมวดของเรื่องนี้ (ค่าซ่อน · หน้าเฉลยบอกได้)
 function fxLine(fx, goalName) {
-  const out = Object.entries(fx ?? {}).filter(([, v]) => v).map(([k, v]) => `${k === 'goal' ? goalName : ISEKAI_FX[k] ?? k} ${sgn(v)}`);
+  const out = Object.entries(fx ?? {}).filter(([, v]) => v).map(([k, v]) => `${k === 'goal' ? goalName : k === 'know' ? 'ความรู้หมวดนี้' : ISEKAI_FX[k] ?? k} ${sgn(v)}`);
   return out.map(esc);
 }
 
+// เงื่อนไขของเรื่องความรู้โลกเดิม (B68h) — หน้ารวมการ์ดไม่บอก เพราะจอไม่บอก
+const knowTags = (e) => [e.know && `ความรู้${ISEKAI_KNOW[e.know.cat].name}${e.know.min ? ` ถึง ${e.know.min}` : ''}`, e.adult && 'วัยผู้ใหญ่ขึ้นไป', e.loreOf && `ไม่มาในโลกที่จำ${ISEKAI_LORE[e.loreOf]}แล้ว`].filter(Boolean);
+
 function resultLine(kind, o, goalName) {
   const ex = [...fxLine(o.fx, goalName)];
+  if (o.lore) ex.push(esc(`โลกจำ${ISEKAI_LORE[o.lore]}ถ้าชื่อเสียงถึง ${ISEKAI_KNOW_T.loreFame}`));
   for (const f of [o.flag, o.flag2]) if (f) ex.push(f === 'won' ? 'ชนะฉากสุดท้าย' : `ติด${flag(f)}`);
   if (o.skill) ex.push('ได้สกิลสุ่ม 1 อย่างที่ยังไม่มี');
   return `<li><p><b class="rk">${kind}</b> ${text(o.text)}</p>${ex.length ? `<p class="fx">${ex.join(' · ')}</p>` : ''}</li>`;
 }
 
 function rollLine(c, src) {
-  const out = [`ทอย${ISEKAI_STAT[c.stat]} ความยาก ${c.dc}`];
+  const out = [c.know ? `ทอยความรู้${ISEKAI_KNOW[c.know].name} (+ความรู้ทั่วไปครึ่งหนึ่ง) ความยาก ${c.dc}` : `ทอย${ISEKAI_STAT[c.stat]} ความยาก ${c.dc}`];
   const skills = Object.values(ISEKAI_SKILLS).filter((s) => s.tag && s.tag === c.tag);
   if (skills.length) out.push(`สกิล${skills.map((s) => `${esc(s.name)} +${s.add ?? 20}%`).join(' หรือ ')}`);
   for (const b of [c.bonus, c.bonus2]) if (b) out.push(`+${b.add}% ถ้ามี${flag(b.flag)}${src.has(b.flag) ? ` (ได้จาก ${[...src.get(b.flag)].map(ref).join(', ')})` : ''}`);
@@ -85,13 +90,14 @@ function spoilEvent(e, src, meritTags) {
   const choices = e.choices
     .map((c, i) => {
       const lock = c.need ? `<p class="lock">ต้องมีทอง ${c.need.gold} ถึงกดได้</p>` : '';
-      const res = c.stat ? resultLine('สำเร็จ', c.win, goalName) + resultLine('พลาด', c.lose, goalName) : resultLine('ผล', c, goalName);
+      const rolled = c.stat || c.know;
+      const res = rolled ? resultLine('สำเร็จ', c.win, goalName) + resultLine('พลาด', c.lose, goalName) : resultLine('ผล', c, goalName);
       const m = meritTags(ISEKAI_MERIT[e.id]?.[i]);
       const merit = m.length ? `<p class="fx">${m.join(' · ')}</p>` : '<p class="nm">ไม่มีบุญบาป ไม่ว่าผลออกทางไหน</p>';
-      return `<li><p class="ch">${text(c.t)}</p>${lock}${merit}${c.stat ? `<p class="mul">${rollLine(c, src).join(' · ')}</p>` : '<p class="mul">ไม่ต้องทอย ได้ผลนี้ทุกครั้ง</p>'}<ol class="out">${res}</ol></li>`;
+      return `<li><p class="ch">${text(c.t)}</p>${lock}${merit}${rolled ? `<p class="mul">${rollLine(c, src).join(' · ')}</p>` : '<p class="mul">ไม่ต้องทอย ได้ผลนี้ทุกครั้ง</p>'}<ol class="out">${res}</ol></li>`;
     })
     .join('');
-  return [`<article class="c x" id="isk-${esc(e.id)}">`, `<h4>${esc(e.title)}</h4>`, tagLine(tags(e)), `<p>${text(e.text)}</p>`, `<ol class="chs">${choices}</ol>`, '</article>'].join('');
+  return [`<article class="c x" id="isk-${esc(e.id)}">`, `<h4>${esc(e.title)}</h4>`, tagLine([...tags(e), ...knowTags(e)]), `<p>${text(e.text)}</p>`, `<ol class="chs">${choices}</ol>`, '</article>'].join('');
 }
 
 // ตอนจบตามกติกา isekaiEnding ในเอนจิน · เกณฑ์ 50 และข้อยกเว้นของกลืนกินเขียนตามโค้ดนั้น

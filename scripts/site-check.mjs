@@ -97,7 +97,7 @@ check('หน้าเฉลยครบทุกการ์ด ตัวเล
 const iskWant = {
   การ์ด: isekaiCardCount(),
   ตัวเลือก: ISEKAI_EVENTS.reduce((s, e) => s + e.choices.length, 0),
-  ผล: ISEKAI_EVENTS.reduce((s, e) => s + e.choices.reduce((n, c) => n + (c.stat ? 2 : 1), 0), 0),
+  ผล: ISEKAI_EVENTS.reduce((s, e) => s + e.choices.reduce((n, c) => n + (c.stat || c.know ? 2 : 1), 0), 0),
   ตอนจบ: Object.values(ISEKAI_WORLDS).reduce((s, w) => s + new Set(['best', 'good', 'bad', w.special[1]]).size, 0),
   โลก: Object.keys(ISEKAI_WORLDS).length,
   สกิล: Object.keys(ISEKAI_SKILLS).length,
@@ -116,7 +116,8 @@ const catIsk = (cardsIsk.match(/<article class="c x"/g) ?? []).length;
 const catFull = ISEKAI_EVENTS.filter((e) => cardsIsk.includes(`<h4>${escHtml(e.title)}</h4>`) && e.choices.every((c) => cardsIsk.includes(`<li>${escHtml(c.t)}</li>`))).length;
 check('หน้ารวมการ์ดมีส่วนต่างโลกครบ', catIsk !== isekaiCardCount() || catFull !== ISEKAI_EVENTS.length, ` การ์ด ${catIsk}/${isekaiCardCount()} · เหตุการณ์ที่ชื่อและตัวเลือกครบ ${catFull}/${ISEKAI_EVENTS.length}`);
 const hidden = [
-  ...ISEKAI_EVENTS.flatMap((e) => e.choices.flatMap((c) => (c.stat ? [c.win.text, c.lose.text] : [c.text]))),
+  // ตัวเลือกความรู้โลกเดิม (B68h · c.know) ทอยเหมือนตัวเลือกค่าสถานะ
+  ...ISEKAI_EVENTS.flatMap((e) => e.choices.flatMap((c) => (c.stat || c.know ? [c.win.text, c.lose.text] : [c.text]))),
   ...Object.values(ISEKAI_WORLDS).flatMap((w) => Object.values(w.end).map(([title]) => title)),
 ];
 const iskLeak = hidden.filter((t) => cards.includes(escHtml(t)));
