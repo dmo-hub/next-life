@@ -1,7 +1,10 @@
 // ส่วนต่างโลกของหน้ารวมการ์ดและหน้าเฉลย (B88b): สร้างจากโมดูลต่างโลกในเอนจินทุกครั้งที่ build — การ์ดต่างโลกใบใหม่ขึ้นหน้าเว็บเอง
 // หน้ารวมการ์ดได้แค่สิ่งที่จอแสดง (ชื่อโลก/สกิลพร้อมคำอธิบาย · ข้อความเหตุการณ์ · ตัวเลือก) · หน้าเฉลยได้ความยาก ผลสำเร็จ/พลาด ค่าที่ขยับ ธง และตอนจบ
-import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_ROLES, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, GODDESS, GODDESS_VOWS, PATHS, meritName, roleInfo } from '../engine/index.mjs';
-import { esc, text } from './catalog.mjs';
+import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_ROLES, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, GODDESS, GODDESS_VOWS, PATHS, meritName, roleInfo } from '../engine/index.mjs';
+import { esc, text as rawText } from './catalog.mjs';
+
+// เหตุการณ์ตำนาน (B68i) เรียกชื่อคนต่างโลกรุ่นก่อนตอนเล่น — หน้าเว็บแสดงเป็นช่องชื่อแบบเดียวกับ {ชื่อชาติก่อน}
+const text = (s) => rawText(s.replaceAll('{legend}', '{ชื่อคนในตำนาน}'));
 
 export const ISEKAI_SECTION = 'ต่างโลก';
 const sgn = (n) => (n > 0 ? `+${n}` : String(n).replace('-', '−'));
@@ -70,7 +73,7 @@ function fxLine(fx, goalName) {
 }
 
 // เงื่อนไขของเรื่องความรู้โลกเดิม (B68h) — หน้ารวมการ์ดไม่บอก เพราะจอไม่บอก
-const knowTags = (e) => [e.know && `ความรู้${ISEKAI_KNOW[e.know.cat].name}${e.know.min ? ` ถึง ${e.know.min}` : ''}`, e.adult && 'วัยผู้ใหญ่ขึ้นไป', e.loreOf && `ไม่มาในโลกที่จำ${ISEKAI_LORE[e.loreOf]}แล้ว`].filter(Boolean);
+const knowTags = (e) => [e.know && `ความรู้${ISEKAI_KNOW[e.know.cat].name}${e.know.min ? ` ถึง ${e.know.min}` : ''}`, e.adult && 'วัยผู้ใหญ่ขึ้นไป', e.loreOf && `ไม่มาในโลกที่จำ${ISEKAI_LORE[e.loreOf]}แล้ว`, e.legend && `มาเฉพาะโลกที่จำคนต่างโลกรุ่นก่อนเป็น${e.legend === 'dark' ? 'คนร้าย' : 'วีรบุรุษ'}`].filter(Boolean);
 
 function resultLine(kind, o, goalName) {
   const ex = [...fxLine(o.fx, goalName)];
@@ -85,6 +88,7 @@ function rollLine(c, src) {
   const skills = Object.values(ISEKAI_SKILLS).filter((s) => s.tag && s.tag === c.tag);
   if (skills.length) out.push(`สกิล${skills.map((s) => `${esc(s.name)} +${s.add ?? 20}%`).join(' หรือ ')}`);
   for (const b of [c.bonus, c.bonus2]) if (b) out.push(`+${b.add}% ถ้ามี${flag(b.flag)}${src.has(b.flag) ? ` (ได้จาก ${[...src.get(b.flag)].map(ref).join(', ')})` : ''}`);
+  if (c.stat === 'cha') out.push(esc(`+1% ต่อชื่อเสียงทุก ${ISEKAI_FAME.chaPer} (สูงสุด +${ISEKAI_FAME.chaCap}%) · −${ISEKAI_FAME.dark}% ในโลกที่จำคนร้ายมากกว่าวีรบุรุษ`));
   return out;
 }
 
