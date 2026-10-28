@@ -122,7 +122,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [3, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
+    when: {age: [6, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ขนของขึ้นรถกระบะ"
     text: "พ่อได้งานใหม่ต่างจังหวัด ค่าแรงดีกว่าเดิมเกือบเท่าตัว พ่อแม่ถามคุณว่าอยากไปไหม ถ้าไปต้องทิ้งเพื่อนแถวบ้าน และยายที่เลี้ยงมาตั้งแต่เกิด"
     choices:
@@ -147,7 +147,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [4, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
+    when: {age: [6, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "เสียงจานแตกกลางดึก"
     text: "พ่อแม่ทะเลาะเรื่องเงินทุกคืน คุณนอนกอดหมอนฟังอยู่หลังประตู เช้ามาทั้งคู่ยิ้มให้เหมือนไม่มีอะไรเกิดขึ้น"
     choices:

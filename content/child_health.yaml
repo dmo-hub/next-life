@@ -7,7 +7,7 @@ events:
     years: [2500, 2650]
     weight: 3
     repeat: {gap: 3, max: 2}
-    when: {age: [3, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
+    when: {age: [6, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ไข้สูงสามวันไม่ลด"
     text: "อายุ {อายุ} ขวบ ตัวร้อนจี๋ ปวดหัว มีจุดแดงขึ้นแขน ยุงลายในโอ่งหลังบ้านบินว่อน แม่เอามือแตะหน้าผากคุณแล้วหน้าเสีย รพ.รัฐคิวยาวถึงเช้า เอกชนก็แพงจนพ่อเงียบ"
     choices:
@@ -45,7 +45,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [3, 10], family: [{role: parent, sex: หญิง, alive: true}]}
+    when: {age: [6, 10], family: [{role: parent, sex: หญิง, alive: true}]}
     title: "พลัดตกคลองหลังบ้าน"
     text: "อายุ {อายุ} ขวบ วิ่งไล่จับปลาแล้วลื่นตกคลอง ลุงข้างบ้านกระโดดลงไปคว้าขึ้นมาทัน ตัวเปียกโชก ไอสำลักน้ำ แม่วิ่งมากอดคุณตัวสั่น เรียก '{ชื่อ} {ชื่อ}' ไม่หยุด"
     choices:
@@ -150,7 +150,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 3
-    when: {age: [3, 12]}
+    when: {age: [6, 12]}
     title: "ฟันผุจนแก้มบวม"
     text: "อายุ {อายุ} ขวบ ติดน้ำหวานกับลูกอมจนฟันดำเป็นแถบ คืนนี้ปวดฟันร้องไห้ทั้งคืน แก้มบวมข้างเดียวเหมือนอมไข่ไว้"
     choices:
@@ -187,7 +187,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    when: {age: [2, 11], family: [{role: parent, sex: หญิง, alive: true}]}
+    when: {age: [6, 11], family: [{role: parent, sex: หญิง, alive: true}]}
     title: "หอบทุกหน้าหนาว"
     text: "อายุ {อายุ} ขวบ ไอหอบหวีดทุกครั้งที่ฝุ่นควันลง หมอบอกแม่ว่าคุณเป็นหอบหืดกับภูมิแพ้ ต้องอยู่กับมันไปอีกนาน"
     choices:
