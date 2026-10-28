@@ -8,7 +8,7 @@ import { siteFacts, injectFacts } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
 import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
 import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_ROLES, roleInfo, ISEKAI_SKILLS } from '../src/engine/index.mjs';
-import { isekaiCardCount, ISEKAI_SECTION } from '../src/site/otherworld.mjs';
+import { isekaiCardCount, ISEKAI_SECTION, text as isekaiText } from '../src/site/otherworld.mjs';
 import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR } from '../src/site/spec.mjs';
 import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
@@ -115,7 +115,7 @@ const iskGot = {
 const iskOff = Object.keys(iskWant).filter((k) => iskWant[k] !== iskGot[k] || !iskWant[k]);
 check('หน้าเฉลยส่วนต่างโลกครบ', iskOff.length, ` ${Object.keys(iskWant).map((k) => `${k} ${iskGot[k]}/${iskWant[k]}`).join(' · ')}`);
 const catIsk = (cardsIsk.match(/<article class="c x"/g) ?? []).length;
-const catFull = ISEKAI_EVENTS.filter((e) => cardsIsk.includes(`<h4>${escHtml(e.title)}</h4>`) && e.choices.every((c) => cardsIsk.includes(`<li>${escHtml(c.t)}</li>`))).length;
+const catFull = ISEKAI_EVENTS.filter((e) => cardsIsk.includes(`<h4>${escHtml(e.title)}</h4>`) && e.choices.every((c) => cardsIsk.includes(`<li>${isekaiText(c.t)}</li>`))).length;
 check('หน้ารวมการ์ดมีส่วนต่างโลกครบ', catIsk !== isekaiCardCount() || catFull !== ISEKAI_EVENTS.length, ` การ์ด ${catIsk}/${isekaiCardCount()} · เหตุการณ์ที่ชื่อและตัวเลือกครบ ${catFull}/${ISEKAI_EVENTS.length}`);
 const hidden = [
   // ตัวเลือกความรู้โลกเดิม (B68h · c.know) ทอยเหมือนตัวเลือกค่าสถานะ

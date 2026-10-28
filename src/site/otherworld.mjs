@@ -4,7 +4,8 @@ import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKIL
 import { esc, text as rawText } from './catalog.mjs';
 
 // เหตุการณ์ตำนาน (B68i) เรียกชื่อคนต่างโลกรุ่นก่อนตอนเล่น — หน้าเว็บแสดงเป็นช่องชื่อแบบเดียวกับ {ชื่อชาติก่อน}
-const text = (s) => rawText(s.replaceAll('{legend}', '{ชื่อคนในตำนาน}'));
+// site-check เทียบหน้ารวมการ์ดด้วยตัวนี้ตัวเดียวกัน ข้อความที่มีช่องชื่อจึงตรงกับที่หน้าแสดง
+export const text = (s) => rawText(s.replaceAll('{legend}', '{ชื่อคนในตำนาน}'));
 
 export const ISEKAI_SECTION = 'ต่างโลก';
 const sgn = (n) => (n > 0 ? `+${n}` : String(n).replace('-', '−'));
