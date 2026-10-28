@@ -250,7 +250,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .a.mem { background:#FFFFFF; border:12px solid #1F1F1F; outline:1px solid #8A8A8A; outline-offset:-6px; color:#1F1F1F; }
 .mem .top { background:transparent; color:#1F1F1F; justify-content:center; padding-top:18px; }
 .mem .top b { font-family:Srisakdi,serif; font-size:22px; font-weight:700; }
-.por { align-self:center; width:84px; height:96px; border:1px solid #1F1F1F; padding:4px; shape-rendering:crispEdges; }
+.por { align-self:center; width:96px; height:96px; border:1px solid #1F1F1F; padding:4px; }
 .mem .body > h3, .mem .body > .dates { text-align:center; }
 .mem .body h3 { font-family:Srisakdi,serif; font-size:30px; font-weight:700; color:#1F1F1F; }
 .mem .body .dates { margin-top:-6px; }
@@ -8651,12 +8651,6 @@ document.addEventListener('keydown', (e) => {
 // สีมืดทองเป็นของปรโลกที่เดียว (renderAfter) · ต่างโลกมีธีมของตัวเอง · มรณบัตร = หนังสืองานศพบนฐานทาง A
 const styleOf = (card) => (card.kind === 'death' ? 'a mem' : 'a');
 
-// ภาพพิกเซลเล็กบนการ์ด — [x, y, กว้าง, สูง, สี] ต่อสี่เหลี่ยม · ภาพประกอบล้วน ซ่อนจากโปรแกรมอ่านจอ
-function pixels(cls, w, h, rects) {
-  const svg = svgEl('svg', { class: cls, viewBox: `0 0 ${w} ${h}`, 'aria-hidden': 'true' });
-  for (const [x, y, rw, rh, fill] of rects) svg.append(svgEl('rect', { x, y, width: rw, height: rh, fill }));
-  return svg;
-}
 // ภาพจาก art.mjs (B56) วาดเป็น SVG — ชุดรูปทรงเดียวกับที่ภาพแชร์วาดลง canvas
 function artSvg(cls, w, h, parts) {
   const svg = svgEl('svg', { class: cls, viewBox: `0 0 ${w} ${h}`, 'aria-hidden': 'true' });
@@ -8690,7 +8684,8 @@ const avatarParts = (age) => avatarArt(Math.max(0, STAGES.findLastIndex((s) => a
 const avatar = (age) => artSvg('av', AVATAR_SIZE, AVATAR_SIZE, avatarParts(age));
 // ชราไม่ได้ "เติบโต" แล้ว แต่คงรูปประโยคเดียวกันให้ป้ายทุกช่วงอ่านเป็นชุด
 const growLabel = (stage) => `เติบโตเป็น${stage === 'หนุ่มสาว' ? (st.sex === 'หญิง' ? 'สาว' : 'หนุ่ม') : stage === 'ชรา' ? 'ผู้สูงวัย' : stage === 'วัยรุ่น' ? 'วัยรุ่น' : `วัย${stage}`}`;
-const portrait = () => pixels('por', 20, 24, [[0, 0, 20, 24, '#E8E8E8'], [7, 2, 6, 6, '#B8B8B8'], [7, 1, 6, 2, '#1F1F1F'], [5, 8, 10, 8, '#5A5A5A'], [6, 16, 3, 6, '#1F1F1F'], [11, 16, 3, 6, '#1F1F1F']]);
+// รูปบนป้ายคนหาย/หนังสืองานศพ = ตัวละครเองตอนอายุนั้น ชุดเดียวกับภาพแชร์ — หุ่นเทาตายตัวเดิมไม่บอกว่าเป็นใคร
+const portrait = (age) => artSvg('por', AVATAR_SIZE, AVATAR_SIZE, avatarParts(age));
 
 const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
 // ป้ายคนหาย (B139) — ถ้อยคำของคนที่บ้านที่ยังรอ: ไม่อาลัย ไม่บอกเหตุ (B110) · will[0] ไม่มีพินัยกรรม · will[1] มี
@@ -8802,7 +8797,7 @@ function render(card) {
     top.append(el('b', null, gone ? LOST.head : 'ด้วยรักและอาลัย'));
     box.append(top);
     // หนังสืองานศพบอกอายุ ไม่บอกปี พ.ศ. — ปีเกมไม่ขึ้นจอ (B14 ข้อ 12)
-    body.append(portrait(), el('h3', null, st.name), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
+    body.append(portrait(card.age), el('h3', null, st.name), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
     const why = causeOf(card.cause, card.age);
     if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
     // คนหายไม่รู้อายุตาย จึงเทียบรุ่นไม่ได้ (B142)
