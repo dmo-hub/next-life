@@ -1,12 +1,13 @@
 // ส่วนต่างโลกของหน้ารวมการ์ดและหน้าเฉลย (B88b): สร้างจากโมดูลต่างโลกในเอนจินทุกครั้งที่ build — การ์ดต่างโลกใบใหม่ขึ้นหน้าเว็บเอง
 // หน้ารวมการ์ดได้แค่สิ่งที่จอแสดง (ชื่อโลก/สกิลพร้อมคำอธิบาย · ข้อความเหตุการณ์ · ตัวเลือก) · หน้าเฉลยได้ความยาก ผลสำเร็จ/พลาด ค่าที่ขยับ ธง และตอนจบ
-import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, GODDESS, GODDESS_VOWS, PATHS, meritName } from '../engine/index.mjs';
+import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, GODDESS, GODDESS_VOWS, PATHS, meritName, roleInfo } from '../engine/index.mjs';
 import { esc, text } from './catalog.mjs';
 
 export const ISEKAI_SECTION = 'ต่างโลก';
 const CHAPTERS = 4;
 const sgn = (n) => (n > 0 ? `+${n}` : String(n).replace('-', '−'));
-const worldName = (id) => ISEKAI_WORLDS[id].name;
+// เหตุการณ์เฉพาะบทบาทใช้ id บทบาทใน worlds — roleInfo ตอบได้ทั้งโลกเดิมและบทบาทที่ไม่มีเนื้อเรื่องของโลก
+const worldName = (id) => roleInfo(id).name;
 const chLabel = (ch) => `บทที่ ${ch.length > 1 ? `${ch[0]}–${ch[ch.length - 1]}` : ch[0]}`;
 const where = (e) => (e.worlds ? e.worlds.map(worldName).join(' · ') : 'ทุกโลก');
 // ฉากเปิดและฉากสุดท้ายของแต่ละโลกอยู่ต้นและท้ายเสมอ (isekaiQueue) — จัดไว้หัวกลุ่มบทของมันให้อ่านตามลำดับเล่น
@@ -86,7 +87,7 @@ function rollLine(c, src) {
 
 // ป้ายบุญบาปผูกเจตนาของตัวเลือก ไม่ผูกผลทอย จึงอยู่ระดับตัวเลือกบรรทัดเดียว · ตัวเลือกไม่มีป้าย = ไม่ลงบัญชี
 function spoilEvent(e, src, meritTags) {
-  const goalName = e.worlds?.length === 1 ? `ความคืบหน้า${ISEKAI_WORLDS[e.worlds[0]].goal}` : 'ความคืบหน้าเป้าหมายของโลก';
+  const goalName = e.worlds?.length === 1 ? `ความคืบหน้า${roleInfo(e.worlds[0]).goal}` : 'ความคืบหน้าเป้าหมายของโลก';
   const choices = e.choices
     .map((c, i) => {
       const lock = c.need ? `<p class="lock">ต้องมีทอง ${c.need.gold} ถึงกดได้</p>` : '';
