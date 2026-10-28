@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
@@ -288,6 +288,23 @@ function list(items, cls = 'items') {
   const ul = el('ul', cls);
   for (const it of items) ul.append(el('li', null, it));
   return ul;
+}
+
+// ผังตระกูลที่มีชาติต่างโลกแยกสองกลุ่ม โลกเดิม | ต่างโลก (B68h) — ไม่มีชาติต่างโลกหน้าตาเดิม
+// ของที่แต่ละโลกจำนับจากทั้งเซฟ ไม่ใช่แค่แถวที่ย่อโชว์ · บทบาทที่ไม่มีโลกของตัวเองใช้ชื่อบทบาทจากแถวผังแทน
+function lineageList(all, brief = all.length) {
+  const shown = all.slice(-brief);
+  const more = all.length > shown.length ? [`… ก่อนหน้านี้อีก ${all.length - shown.length} รุ่น`] : [];
+  const lore = Object.entries(isekaiWorldLore(all));
+  const away = shown.filter((l) => l.isekai);
+  if (!away.length && !lore.length) return list([...more, ...lineageText(shown)], 'picks');
+  const box = el('div', 'lineage');
+  const home = shown.filter((l) => !l.isekai);
+  if (home.length || more.length) box.append(el('div', 'lh', 'ตระกูลโลกเดิม'), list([...more, ...lineageText(home)], 'picks'));
+  box.append(el('div', 'lh', 'ตระกูลต่างโลก'));
+  if (away.length) box.append(list(lineageText(away), 'picks'));
+  for (const [w, ids] of lore) box.append(el('p', 'llore', `โลก (${ISEKAI_WORLDS[w]?.name ?? all.find((l) => l.lore?.world === w)?.world ?? w}) ยังจำ: ${ids.map((id) => ISEKAI_LORE[id]).join(' · ')}`));
+  return box;
 }
 
 // สรุปช่วงวัยที่ผ่านมา: แถบตอนนี้ + ขีดตำแหน่งต้นช่วง — บอกว่าเปลี่ยนไปมากน้อยโดยไม่มีตัวเลข
@@ -1440,7 +1457,7 @@ function render(card) {
         const prev = st.lineage.at(-1);
         const note = prev.path === 'child' && notePick(prev.gen);
         if (note) box.append(noteQuote(`บันทึกของบรรพบุรุษ · ${prev.name ? `${prev.name} ` : ''}เมื่ออายุ ${note.a}`, note.t));
-        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), list(card.lineage, 'picks'));
+        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageList(st.lineage, LINEAGE_BRIEF));
         body.append(box);
       }
       choices.append(enter(button(BTN.next, null, next)));
@@ -1704,7 +1721,7 @@ function familyPanel() {
 function familyTree() {
   if (!st.lineage.length) return null;
   const d = el('details', 'tree');
-  d.append(el('summary', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), list(lineageText(st.lineage), 'picks'));
+  d.append(el('summary', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageList(st.lineage));
   return d;
 }
 
@@ -1832,7 +1849,7 @@ function renderAfter(card) {
   if (card.reckoning) body.append(reckoningBox(card.reckoning, af.st.deeds));
   if (card.lineage) {
     body.append(el('div', 'kicker', 'ผังตระกูล'));
-    body.append(list(card.lineage, 'picks'));
+    body.append(af.heir ? lineageList(af.heir.lineage) : list(card.lineage, 'picks'));
     // การ์ดส่งต่อ (B95): ผังตระกูลรวมชีวิตที่เพิ่งจบแล้ว + จุดฐานะบ้านที่รุ่นถัดไปจะเกิด
     const chart = af.heir && standingChart(standingGens(af.heir.lineage), CLASSES.indexOf(af.heir.cls));
     if (chart) body.append(chart);
@@ -1914,6 +1931,7 @@ function renderIsekai(card) {
     v.append(el('span', 'h', 'คำสัญญากับเทพธิดา'), el('blockquote', null, card.vow.text), el('b', null, card.vow.kept ? 'รักษาไว้ได้' : 'ผิดคำสัญญา'));
     body.append(v);
   }
+  if (card.lore?.length) body.append(el('p', 'isys', `โลกนี้จะจำ${card.lore.length > 1 ? `${card.lore.slice(0, -1).join(' ')} และ${card.lore.at(-1)}` : card.lore[0]}ไว้หลังคุณจากไป`));
   // ต่างโลกไม่มีฉายาของตัวเอง — เบาะแสชี้ฉายาของโลกเดิมที่ชาติหน้ายังไปเก็บได้ (B108 ใช้สองโลก)
   if (card.step === 'end' && !card.trip) clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
   if (card.highlights?.length) body.append(el('p', 'isys', 'ฉากที่จำได้ไม่ลืม'), list(card.highlights, 'picks'));

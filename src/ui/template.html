@@ -124,6 +124,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
 .recap .picks { overflow-wrap:anywhere; }
+.lineage .lh { font-size:12px; font-weight:600; margin:6px 0 2px; }
+.lineage .lh:first-child { margin-top:0; }
+.lineage .llore { font-size:12px; margin:4px 0 0 20px; overflow-wrap:anywhere; }
 /* แผงพับบนมรณบัตร: summary คงเป็น list-item ให้ลูกศรพับ/เปิดยังขึ้น (flex ทำลูกศรหาย)
    · margin ติดลบกิน padding 12px ของกรอบแผง — พับแล้วกรอบสูง 44px เท่าพื้นที่แตะ ไม่ซ้อน padding สองชั้น */
 .fold > summary { cursor:pointer; padding:12px 0; margin:-12px 0; font-size:13px; font-weight:600; line-height:20px; }
