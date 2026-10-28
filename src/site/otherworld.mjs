@@ -1,6 +1,6 @@
 // ส่วนต่างโลกของหน้ารวมการ์ดและหน้าเฉลย (B88b): สร้างจากโมดูลต่างโลกในเอนจินทุกครั้งที่ build — การ์ดต่างโลกใบใหม่ขึ้นหน้าเว็บเอง
 // หน้ารวมการ์ดได้แค่สิ่งที่จอแสดง (ชื่อโลก/สกิลพร้อมคำอธิบาย · ข้อความเหตุการณ์ · ตัวเลือก) · หน้าเฉลยได้ความยาก ผลสำเร็จ/พลาด ค่าที่ขยับ ธง และตอนจบ
-import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_ROLES, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, GODDESS, GODDESS_VOWS, PATHS, meritName, roleInfo } from '../engine/index.mjs';
+import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_ROLES, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, GODDESS, GODDESS_VOWS, PATHS, meritName, roleInfo } from '../engine/index.mjs';
 import { esc, text as rawText } from './catalog.mjs';
 
 // เหตุการณ์ตำนาน (B68i) เรียกชื่อคนต่างโลกรุ่นก่อนตอนเล่น — หน้าเว็บแสดงเป็นช่องชื่อแบบเดียวกับ {ชื่อชาติก่อน}
@@ -74,13 +74,14 @@ function fxLine(fx, goalName) {
 }
 
 // เงื่อนไขของเรื่องความรู้โลกเดิม (B68h) — หน้ารวมการ์ดไม่บอก เพราะจอไม่บอก
-const knowTags = (e) => [e.know && `ความรู้${ISEKAI_KNOW[e.know.cat].name}${e.know.min ? ` ถึง ${e.know.min}` : ''}`, e.adult && 'วัยผู้ใหญ่ขึ้นไป', e.loreOf && `ไม่มาในโลกที่จำ${ISEKAI_LORE[e.loreOf]}แล้ว`, e.legend && `มาเฉพาะโลกที่จำคนต่างโลกรุ่นก่อนเป็น${e.legend === 'dark' ? 'คนร้าย' : 'วีรบุรุษ'}`].filter(Boolean);
+const knowTags = (e) => [e.know && `ความรู้${ISEKAI_KNOW[e.know.cat].name}${e.know.min ? ` ถึง ${e.know.min}` : ''}`, e.adult && 'วัยผู้ใหญ่ขึ้นไป', e.loreOf && `ไม่มาในโลกที่จำ${ISEKAI_LORE[e.loreOf]}แล้ว`, e.legend && `มาเฉพาะโลกที่จำคนต่างโลกรุ่นก่อนเป็น${e.legend === 'dark' ? 'คนร้าย' : 'วีรบุรุษ'}`, e.bless && 'มาเฉพาะคนที่กรรมเป็นบวกหรือเทพธิดาอารมณ์ดี'].filter(Boolean);
 
 function resultLine(kind, o, goalName) {
   const ex = [...fxLine(o.fx, goalName)];
   if (o.lore) ex.push(esc(`โลกจำ${ISEKAI_LORE[o.lore]}ถ้าชื่อเสียงถึง ${ISEKAI_KNOW_T.loreFame}`));
   for (const f of [o.flag, o.flag2]) if (f) ex.push(f === 'won' ? 'ชนะฉากสุดท้าย' : `ติด${flag(f)}`);
   if (o.skill) ex.push('ได้สกิลสุ่ม 1 อย่างที่ยังไม่มี');
+  if (o.potion) ex.push(esc(`ดื่มยาต่ออายุทันที อายุขัย +${ISEKAI_POTION.years} ปี (รวมไม่เกิน ${ISEKAI_POTION.cap} ปีต่อชาติ) · ขวดที่ ${ISEKAI_POTION.free + 1} ขึ้นไปลงบาป${meritName('against_nature')}`));
   return `<li><p><b class="rk">${kind}</b> ${text(o.text)}</p>${ex.length ? `<p class="fx">${ex.join(' · ')}</p>` : ''}</li>`;
 }
 
