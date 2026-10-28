@@ -1,7 +1,7 @@
 // หน้าคู่มือสั้น (B121): ป้ายปุ่ม ค่าสถานะ และช่วงชีวิตอ่านจากค่ากลางที่เกมใช้ — ป้ายในเกมเปลี่ยน คู่มือเปลี่ยนตามตอน build
 // ไม่บอกตัวเลข สูตร หรือบุญบาป (กติกาเดียวกับคำอธิบายค่าสถานะในเกม)
 import { STAGES, AFTERLIFE_STAGE } from '../engine/index.mjs';
-import { BTN, STAT_HELP } from '../ui/labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE } from '../ui/labels.mjs';
 import { esc } from './catalog.mjs';
 
 // ความหมายของปุ่มเดินเรื่อง — คีย์ต้องตรง BTN ทุกตัว (site-check นับ)
@@ -21,9 +21,10 @@ const btn = (k) => `<b class="btn">${esc(BTN[k])}</b>`;
 export function guideHtml() {
   const stages = STAGES.map((s, i) => `<li>${esc(s.name)} <small>${s.from}${STAGES[i + 1] ? `–${STAGES[i + 1].from - 1}` : '+'} ปี</small></li>`).join('');
   const rows = Object.keys(BTN).map((k) => `<tr><td>${btn(k)}</td><td>${esc(BTN_HELP[k] ?? '')}</td></tr>`).join('');
+  const real = HELP.map((h) => `<li><a href="tel:${esc(h.tel)}">${esc(h.label)} · ${esc(h.call)}</a> — ${esc(h.org)} · <a href="${esc(h.web)}" rel="noopener">เว็บทางการ</a></li>`).join('');
   const help = STAT_HELP.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
   return `
-<nav class="toc" aria-label="สารบัญ"><a href="#goal">เล่นยังไง</a><a href="#card">การ์ดกับตัวเลือก</a><a href="#stages">ช่วงชีวิต</a><a href="#buttons">ปุ่ม</a><a href="#stats">ค่าสถานะ</a><a href="#keys">แป้นพิมพ์</a><a href="#save">เซฟและเวอร์ชัน</a></nav>
+<nav class="toc" aria-label="สารบัญ"><a href="#goal">เล่นยังไง</a><a href="#card">การ์ดกับตัวเลือก</a><a href="#stages">ช่วงชีวิต</a><a href="#buttons">ปุ่ม</a><a href="#stats">ค่าสถานะ</a><a href="#keys">แป้นพิมพ์</a><a href="#save">เซฟและเวอร์ชัน</a><a href="#help">ช่วยจริง</a></nav>
 <section id="goal"><h2>เล่นยังไง</h2>
 <p>เกิดแบบสุ่มเป็นคนไทยหนึ่งคน อ่านการ์ดทีละใบแล้วเลือกทาง ชีวิตเดินไปตามปีจนตาย ไม่มีชนะหรือแพ้ ตายแล้วไปปรโลก รู้ผลบุญบาปที่นั่น แล้วไปเกิดต่อเป็นลูกหลานของตัวเองหรือเกิดใหม่ตามกรรม เล่นต่อได้หลายรุ่น</p></section>
 <section id="card"><h2>การ์ดกับตัวเลือก</h2><ul>
@@ -44,5 +45,6 @@ export function guideHtml() {
 <li>ล้างข้อมูลเบราว์เซอร์หรือเปิดโหมดส่วนตัว เซฟจะหาย · ${btn('newFamily')} ลบทั้งตระกูล</li>
 <li>เกมอัปเดตเนื้อเรื่องแล้วชีวิตเก่ายังเล่นต่อได้ในหน้าเวอร์ชันเดิม เกมจะพาไปเอง</li>
 <li>เลขเวอร์ชันมุมบนของเกมกดได้ พาไปแพตช์โน้ตของเวอร์ชันนั้น</li>
-</ul></section>`;
+</ul></section>
+<section id="help"><h2>ช่วยจริง</h2><p>เรื่องในเกมบางเรื่องหนัก ถ้าใกล้ตัวคุณ ในชีวิตจริงมีคนรับฟังและช่วยได้ฟรี</p><ul>${real}</ul><p><small>${esc(HELP_NOTE)}</small></p></section>`;
 }

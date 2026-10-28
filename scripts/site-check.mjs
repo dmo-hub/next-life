@@ -50,7 +50,7 @@ for (const p of all) {
   const html = read(`${p}.html`);
   const base = new URL(`${p}.html`, docs);
   for (const [, ref] of html.matchAll(/(?:href|src)="([^"#]+)(?:#[^"]*)?"/g)) {
-    if (/^(https?:|mailto:|data:|javascript:)/.test(ref)) continue;
+    if (/^(https?:|mailto:|tel:|data:|javascript:)/.test(ref)) continue;
     if (!existsSync(new URL(ref, base))) dead.push(`${p}.html → ${ref}`);
   }
   for (const [, id] of html.matchAll(/href="#([^"]+)"/g)) if (!html.includes(`id="${id}"`)) dead.push(`${p}.html → #${id}`);

@@ -1,6 +1,6 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
-import { BTN, STAT_HELP } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE } from './labels.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.3.11';
@@ -1412,6 +1412,7 @@ function render(card) {
     // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
     const chart = card.life && lifeChart(card.life, card.age, card.cause);
     if (chart) body.append(chart);
+    body.append(helpBox());
     choices.append(enter(button(BTN.toAfter, null, () => openBook(card))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
     if (st.gen === 1) choices.append(inviteButton());
   } else {
@@ -1642,6 +1643,31 @@ function entryOffer(card, body, choices) {
     choices.querySelector('button').focus();
   };
   offer();
+}
+
+// ช่วยจริง (B145): สายด่วนสุขภาพจิตขึ้นทุกหน้าจบ — ขึ้นเฉพาะชีวิตที่ตายแบบหนึ่ง = ผู้เล่นอ่านสาเหตุที่ซ่อนไว้ออกจากปุ่ม (B110)
+// ที่เหลือขึ้นตามเรื่องที่ชีวิตนี้เจอ · ไม่ลงภาพแชร์ · ลิงก์ออกนอกเกมเปิดแท็บใหม่ เกมที่ค้างอยู่ไม่หาย
+const HELP_BY = { mind: () => true, drink: () => !!st.flags?.heavy_drinker, bankrupt: () => !!st.flags?.bankrupt || st.bankruptcies > 0 };
+const HELP_MAX = 3;
+function helpBox() {
+  const box = el('div', 'recap help');
+  box.append(el('div', 'h', 'ถ้าเรื่องในเกมใกล้ตัวคุณ'), el('p', 'sub', 'เรื่องในเกมจบแล้ว แต่ในชีวิตจริงมีคนรับฟังและช่วยได้ฟรี'));
+  for (const h of HELP.filter((x) => HELP_BY[x.id]?.()).slice(0, HELP_MAX)) box.append(helpRow(h));
+  const all = el('a', null, 'ดูทั้งหมด');
+  Object.assign(all, { href: 'guide.html#help', target: '_blank', rel: 'noopener' });
+  box.append(all, el('p', 'note', HELP_NOTE));
+  return box;
+}
+function helpRow(h) {
+  const row = el('div', 'help-row');
+  const call = el('a', 'help-call', `${h.label} · ${h.call}`);
+  call.href = `tel:${h.tel}`;
+  const web = el('a', null, 'เว็บทางการ');
+  Object.assign(web, { href: h.web, target: '_blank', rel: 'noopener' });
+  const org = el('small', null, `${h.org} · `);
+  org.append(web);
+  row.append(call, org);
+  return row;
 }
 
 // แผงครอบครัว (B36c): คนรอบตัวตอนนี้ แยกจากผังตระกูลที่เล่ารุ่นก่อน · อ่านอย่างเดียว ไม่มี token ในเซฟ

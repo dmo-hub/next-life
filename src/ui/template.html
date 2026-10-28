@@ -124,6 +124,12 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
 .recap .picks { overflow-wrap:anywhere; }
+/* ช่วยจริง (B145): เบอร์เป็นลิงก์ tel: แตะแล้วโทรได้บนมือถือ · ลิงก์สูง 44px เท่าปุ่มอื่น */
+.help .help-row { display:flex; flex-direction:column; gap:2px; }
+.help .help-call, .help > a { display:inline-flex; align-items:center; min-height:44px; overflow-wrap:anywhere; }
+.help .help-call { font-weight:600; }
+.help small, .help .note { font-size:12.5px; overflow-wrap:anywhere; }
+.help a { color:inherit; } .help small a { white-space:nowrap; }
 .lineage .lh { font-size:12px; font-weight:600; margin:6px 0 2px; }
 .lineage .lh:first-child { margin-top:0; }
 .lineage .llore { font-size:12px; margin:4px 0 0 20px; overflow-wrap:anywhere; }
