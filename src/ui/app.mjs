@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
@@ -1407,6 +1407,20 @@ function outliveLine(age) {
   return `${st.sex}ไทยที่เกิดปีเดียวกัน ${shown} อยู่ได้นานกว่าคุณ`;
 }
 
+// โอกาสเกิดแบบนี้ (B141) — คูณตามลำดับที่ newLife สุ่มจริง: ภาค×จังหวัดตามประชากร แล้วฐานะตามรายได้ของภาคนั้นในปีเกิด
+// อ่านตารางอย่างเดียว ไม่แตะ rng · เซฟเก่าที่ไม่มีจังหวัดไม่แสดง
+const oneIn = (n) => (n < 100 ? `${Math.round(n)}` : n < 1e6 ? Number(n.toPrecision(2)).toLocaleString('en-US') : `${Number((n / 1e6).toPrecision(2))} ล้าน`);
+function birthOddsLine() {
+  const birth = st.content.era.birth;
+  const region = birth.regions.find((r) => r.name === st.region);
+  const prov = region?.provinces.find((p) => p.name === st.province);
+  const cls = CLASSES.indexOf(st.cls);
+  if (!prov || cls < 0) return null;
+  const total = birth.regions.reduce((s, r) => s + r.w, 0);
+  const p = (prov.w / total) * classOdds(birth, regionRatio(birth, region.ses, st.birthYear))[cls].p;
+  return p > 0 ? `เด็กไทยที่เกิดปีเดียวกัน ราว 1 ใน ${oneIn(1 / p)} คน เกิดแบบคุณ (${provinceLabel(st)} · ฐานะ${st.cls})` : null;
+}
+
 function render(card) {
   // ไปกลับกลางชีวิต (B68m): ทริปยังเป็นชีวิตนี้ ปุ่มจึงเดินผ่านปุ่มชีวิต — จอเต็มของทริปเป็นงานเลน C
   if (card.kind === 'isekai') return renderIsekai(card);
@@ -1498,6 +1512,8 @@ function render(card) {
       body.append(el('span', 'stamp', 'แรกเกิด'));
       body.append(el('h3', 'lead', card.text));
       body.append(el('p', 'horo', horoscope(st)));
+      const odds = birthOddsLine();
+      if (odds) body.append(el('p', 'sub', odds));
       // บรรทัดแรกเป็นเรื่องของบ้าน · ที่เหลือเป็นบรรยากาศยุค ตัวรอง
       card.story.forEach((p, i) => body.append(el('p', i ? 'sub' : null, p)));
       if (card.inherit.length) {
