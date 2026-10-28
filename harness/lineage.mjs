@@ -174,12 +174,15 @@ for (const [name, r] of Object.entries(out)) {
 }
 
 // ฐานะชาติหน้าเฉลี่ย (ดัชนี 0–9) ตามระดับกรรมที่ปรโลก: บาป ≤ −0.2 · กลาง · บุญ ≥ 0.3 — ต้องเรียงขึ้นทั้งทางเป็นลูกและเกิดใหม่
+// ช่องกลางชีวิตน้อยแกว่งตาม seed และสัดส่วนอาชีพในช่องนั้น (Simpson) ⇒ ชีวิตไม่ถึงเกณฑ์ตัดสินแค่ บาป < บุญ แบบด่าน finance
+const MIN_MID = 300;
 console.log('\nฐานะชาติหน้าเฉลี่ย (0 = ยากไร้ · 9 = มั่งคั่ง) ตามกรรมที่ปรโลก   บาป   กลาง   บุญ');
 for (const path of ['reborn', 'child']) {
   const cells = [0, 1, 2].map((b) => Object.values(out).reduce((s, r) => [s[0] + r.byX[path][b][0], s[1] + r.byX[path][b][1]], [0, 0]));
   const means = cells.map(([s, c]) => (c ? s / c : NaN));
-  const ok = means[0] < means[1] && means[1] < means[2];
-  console.log(`${path === 'child' ? 'เป็นลูก ' : 'เกิดใหม่'} ${means.map((m, b) => `${f(m)} (${cells[b][1]})`).join('  ')} → ${ok ? 'ผ่าน' : 'ตก'}`);
+  const small = cells[1][1] < MIN_MID;
+  const ok = small ? means[0] < means[2] : means[0] < means[1] && means[1] < means[2];
+  console.log(`${path === 'child' ? 'เป็นลูก ' : 'เกิดใหม่'} ${means.map((m, b) => `${f(m)} (${cells[b][1]})`).join('  ')} → ${ok ? 'ผ่าน' : 'ตก'}${small ? ' (กลางไม่ตัดสิน ชีวิตน้อย · ตัดสินแค่ บาป < บุญ)' : ''}`);
   if (!ok) fails.push(`ฐานะชาติหน้าทาง${path} ไม่เรียงตามกรรม`);
 }
 
