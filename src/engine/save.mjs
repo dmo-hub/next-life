@@ -62,7 +62,8 @@ export function restore(text, content) {
 // card = การ์ดที่ค้างบนจอตอนเซฟ · คืน true = การ์ดนั้นใช้ไม่ได้แล้ว (การ์ดเนื้อหาหาย/จำนวนตัวเลือกเปลี่ยน) ผู้เรียกจั่วใบถัดไปใหม่
 export function repairLife(st, card) {
   const ev = st.pending && !st.pending.alloc ? st.pending : null;
-  const stale = !!card?.choices?.length && (!st.pending || (ev && ev.choices.length !== card.choices.length));
+  // การ์ดทริปต่างโลก (B68m) ไม่ผ่าน st.pending — สถานะทั้งชาติอยู่ใน st.trip ที่ภาพถ่ายเก็บไว้แล้ว จั่วใหม่ = นับใบซ้ำ + ดึงเลขสุ่มเกิน
+  const stale = !st.trip && !!card?.choices?.length && (!st.pending || (ev && ev.choices.length !== card.choices.length));
   if (stale) st.pending = null;
   const q = st.queue ?? [];
   st.queue = q.filter((c) => !('ev' in c) || c.ev);

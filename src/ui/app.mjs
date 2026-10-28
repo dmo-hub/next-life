@@ -2281,7 +2281,8 @@ function snapRead() {
     notesLoad(save.seed);
     let card = root.card;
     if (!af && repairLife(st, card)) card = track(nextCard(st));
-    else if (af && card.choices?.length && !af.pending) card = nextAfterCard(af);
+    // ชาติต่างโลกในปรโลกไม่ใช้ af.pending — การ์ดที่ค้างยังใช้ได้ จั่วใหม่ = นับใบซ้ำ + ดึงเลขสุ่มเกิน
+    else if (af && !af.isekai && card.choices?.length && !af.pending) card = nextAfterCard(af);
     return card;
   } catch {
     return null;
