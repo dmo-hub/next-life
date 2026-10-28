@@ -304,6 +304,14 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .ix-t { font-size:19px; line-height:1.5; color:#E8ECFF; }
 .ix-n { font-size:13px; color:#C9B0FF; }
 .ix-ask { margin:0 0 4px; font-size:14px; font-weight:600; }
+.ispeed { margin:8px 20px 0; display:flex; align-items:center; gap:6px; font-size:12px; }
+.ispeed button { min-width:44px; min-height:32px; padding:2px 8px; border:1px solid #2A3478; border-radius:6px; background:#0E1024; color:#A6AEDB; font:inherit; cursor:pointer; }
+.ispeed button[aria-pressed="true"] { border-color:#6FE3FF; color:#6FE3FF; background:#1E2350; }
+.ispeed button:focus-visible { outline:2px solid #6FE3FF; outline-offset:1px; }
+.itimer { flex:1; height:4px; border-radius:999px; background:#05060F; overflow:hidden; }
+.itimer i { display:block; height:100%; width:0; background:#6FE3FF; }
+@keyframes itick { from { width:0; } to { width:100%; } }
+@media (prefers-reduced-motion: reduce) { .itimer i { animation:none !important; } }
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
 .a .choice:disabled, .b .choice:disabled, .i .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
 /* พาแนลการ์ด (B131): จอตั้งไม่มีพาแนล — ตัวห่อหายไปจากเลย์เอาต์ ลูกเรียงในการ์ดแบบเดิม */

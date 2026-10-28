@@ -1904,7 +1904,63 @@ function isekaiStatusBox(s) {
   }
   return box;
 }
+// ตัวจับเวลา (B68b): ใบตาเดินเองแทนการกด "ต่อ" — ยิง afterNext ตัวเดียวกับปุ่ม เซฟจึงเล่นซ้ำได้เหมือนกดเอง
+// ความเร็วจำแยก key ไม่อยู่ในเซฟ เพราะไม่เปลี่ยนผลของชีวิต · ×1 = ตาละ 2 วินาที (เจ้าของเคาะ)
+const SPEED_KEY = 'next-life-isekai-speed-v1';
+const SPEEDS = [1, 2, 4, 0];
+const TICK_MS = 2000;
+let speed = speedRead();
+let tickTimer = null;
+function speedRead() {
+  try {
+    const v = Number(localStorage.getItem(SPEED_KEY) ?? 1);
+    return SPEEDS.includes(v) ? v : 1;
+  } catch {
+    return 1;
+  }
+}
+function speedWrite(v) {
+  speed = v;
+  try {
+    localStorage.setItem(SPEED_KEY, String(v));
+  } catch {
+    // ไม่มีที่เก็บ ก็จำแค่ในหน้านี้
+  }
+}
+// พักไว้ระหว่างแผงเปลี่ยนสิ่งที่ทุ่มเทเปิดอยู่หรือแท็บถูกซ่อน — ไม่ให้ใบเปลี่ยนใต้มือผู้เล่น · ใบหลุดจากจอแล้ว (ไปหน้าอื่น) ไม่กด
+function armTick(box, panel, bar) {
+  clearTimeout(tickTimer);
+  bar.style.animation = 'none';
+  if (!speed) return;
+  const ms = TICK_MS / speed;
+  void bar.offsetWidth;
+  bar.style.animation = `itick ${ms}ms linear forwards`;
+  tickTimer = setTimeout(() => {
+    if (!box.isConnected) return;
+    if (panel.open || document.hidden) return armTick(box, panel, bar);
+    play(T.afterNext);
+  }, ms);
+}
+function speedRow(onChange) {
+  const row = el('div', 'ispeed');
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-label', 'ความเร็วเวลา');
+  for (const v of SPEEDS) {
+    const b = el('button', null, v ? `×${v}` : 'หยุด');
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(v === speed));
+    b.addEventListener('click', () => {
+      speedWrite(v);
+      for (const x of row.children) x.setAttribute('aria-pressed', String(x === b));
+      onChange();
+    });
+    row.append(b);
+  }
+  return row;
+}
+
 function renderIsekai(card) {
+  clearTimeout(tickTimer);
   root.replaceChildren();
   const box = el('article', 'card i');
   const top = el('div', 'top');
@@ -1947,9 +2003,10 @@ function renderIsekai(card) {
     d.append(el('summary', null, `จดหมายเหตุทั้งชีวิต ${card.chronicle.length} บรรทัด`), list(card.chronicle.map(line), 'picks'));
     body.append(d);
   }
-  // ใบตา (B68b): เปลี่ยนสิ่งที่ทุ่มเทได้โดยไม่ต้องรอช่วงวัยใหม่ — ปุ่มเดินผ่าน afterPick เซฟจึงเล่นซ้ำได้ · ตัวจับเวลาเดินเองเป็นงานเลน C
+  // ใบตา (B68b): เปลี่ยนสิ่งที่ทุ่มเทได้โดยไม่ต้องรอช่วงวัยใหม่ — ปุ่มเดินผ่าน afterPick เซฟจึงเล่นซ้ำได้
+  let panel = null;
   if (card.step === 'tick') {
-    const d = el('details', 'tree');
+    const d = (panel = el('details', 'tree'));
     d.append(el('summary', null, 'เปลี่ยนสิ่งที่ทุ่มเท'));
     const row = el('div', 'choices');
     card.focusChoices.forEach((c, i) => {
@@ -1971,6 +2028,19 @@ function renderIsekai(card) {
   } else choices.append(enter(button(BTN.next, null, () => play(card.trip ? T.next : T.afterNext))));
   box.append(top);
   if (s) box.append(isekaiStatusBox(s));
+  // ใบผลลัพธ์/ใบเลือกหยุดรอเสมอ (เจ้าของเคาะ) — แถบความเร็วยังโชว์ให้ตั้งไว้ก่อนเดินต่อ
+  if (s && card.step !== 'end') {
+    const bar = el('i');
+    const walk = panel && !card.choices.length;
+    const row = speedRow(() => walk && armTick(box, panel, bar));
+    if (walk) {
+      const t = el('div', 'itimer');
+      t.append(bar);
+      row.append(t);
+    }
+    box.append(row);
+    if (walk) armTick(box, panel, bar);
+  }
   box.append(body, choices);
   root.append(panels(box));
 }
