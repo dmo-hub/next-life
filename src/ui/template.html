@@ -68,6 +68,17 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .bar { position:relative; height:6px; }
 .bar i { position:absolute; left:0; top:0; display:block; height:6px; }
 .bar b { position:absolute; top:-3px; width:2px; height:12px; margin-left:-1px; }
+/* ชื่อยาวขึ้นสองบรรทัดบนจอแคบ — แถบชิดล่างทุกช่องจึงยังอยู่แนวเดียวกัน */
+.stats .val { display:flex; align-items:center; gap:4px; margin-top:auto; }
+.stats .val .bar { flex:1; min-width:0; }
+.stats .num { font-weight:700; font-variant-numeric:tabular-nums; }
+.stats .warn { padding:0 4px; border-radius:3px; background:var(--red); color:#fff; font-size:10px; font-weight:700; line-height:1.5; white-space:nowrap; }
+.stats .warn-l { display:none; }
+@media (min-width:701px) { .stats .warn-s { display:none; } .stats .warn-l { display:inline; } }
+.stats .low > span, .stats .low .num { color:var(--red); }
+.stats .low .bar i { background:var(--red); }
+/* ตัวเลขในสรุปช่วงวัย: ต้นช่วง → ตอนนี้ คู่กับลูกศรทิศ */
+.delta .num { font-weight:700; font-variant-numeric:tabular-nums; }
 .meta { padding:0 20px 8px; font-size:12px; }
 .meta span { white-space:nowrap; }
 .tree, .family { padding:0 20px 8px; font-size:12px; }
@@ -225,6 +236,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .b .top small, .b .stats, .b .meta, .b .sub, .b .note { color:var(--sand); }
 .b .stat-help, .b .stat-help dd { color:var(--sand); } .b .stat-help dt { color:var(--cream); }
 .b .bar { background:#3A2C1F; } .b .bar i { background:var(--gold); } .b .bar b { background:var(--cream); }
+.b .stats .low > span, .b .stats .low .num { color:#E39A8A; } .b .stats .low .bar i { background:#E39A8A; }
 .b .kicker { color:var(--gold); letter-spacing:0.08em; }
 .b .body h3 { font-family:Srisakdi,serif; font-weight:700; color:var(--gold2); font-size:28px; }
 .b .body h3.lead { font-family:Sarabun,sans-serif; font-weight:400; font-size:19px; color:var(--cream); }

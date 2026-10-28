@@ -30,17 +30,31 @@ function el(tag, cls, text) {
 const SVG = 'http://www.w3.org/2000/svg';
 const baht = (v) => `${Math.round(v).toLocaleString('en-US')} บาท`;
 
-// แถบค่าสถานะไม่มีตัวเลข (ใบ 06) — ผู้เล่นอ่านจากความยาวแถบเท่านั้น
+// สุขภาพถึง 0 = ตายตอนขึ้นปี ผู้เล่นต้องเห็นก่อนถึงจุดนั้น · ค่าอื่นต่ำไม่ทำให้ตายจึงไม่เตือน
+const HEALTH_WARN = 20;
+// แถบค่าสถานะ: ชื่อเต็มบรรทัดบน แถบ + ตัวเลข 0–100 บรรทัดล่าง — ชื่อยาวขึ้นสองบรรทัดได้บนจอแคบโดยไม่ถูกตัด
+// (ทับคำตัดสินใบ 06 "แถบไม่มีตัวเลข")
 function stats(s) {
   const box = el('div', 'stats');
   for (const k of STAT_KEYS) {
-    const col = el('div');
+    const v = Math.round(s[k]);
+    const low = k === 'health' && v <= HEALTH_WARN;
+    const col = el('div', low ? 'low' : null);
     col.append(el('span', null, STAT_LABELS[k]));
+    const row = el('div', 'val');
     const track = el('div', 'bar');
     const fill = el('i');
-    fill.style.width = `${Math.round(s[k])}%`;
+    fill.style.width = `${v}%`;
     track.append(fill);
-    col.append(track);
+    row.append(track, el('b', 'num', String(v)));
+    // ป้ายสั้นบนจอแคบ ป้ายเต็มบนจอกว้าง สลับด้วย CSS · โปรแกรมอ่านจออ่านป้ายเต็มเสมอ
+    if (low) {
+      const w = el('span', 'warn');
+      w.append(el('span', 'warn-s', '!'), el('span', 'warn-l', 'ใกล้ตาย'));
+      w.setAttribute('aria-label', 'ใกล้ตาย');
+      row.append(w);
+    }
+    col.append(row);
     box.append(col);
   }
   return box;
@@ -121,7 +135,7 @@ function sparkline(series, fromAge, toAge, bands = false) {
 }
 
 // กราฟทั้งชีวิตบนบันทึกการตาย (B38a): ค่าสถานะ 5 เส้นสเกลเดียวกัน + เงินแยกใต้ แกนอายุเดียวกัน
-// เส้นแยกด้วยสีและลายเส้น (ไม่พึ่งสีอย่างเดียว) · ค่าสถานะไม่มีตัวเลขบนจอ (บอกแค่ทิศ) แกนตั้งจึงเป็นคำ
+// เส้นแยกด้วยสีและลายเส้น (ไม่พึ่งสีอย่างเดียว) · แกนตั้งเป็นตัวเลข 0–100 สเกลเดียวกับแถบค่าสถานะ
 const LINE_DASH = ['', '7 3', '2 3', '9 3 2 3', '4 2'];
 function legendItem(i, label) {
   const key = svgEl('svg', { class: 'key', viewBox: '0 0 24 8', 'aria-hidden': 'true' });
@@ -160,17 +174,20 @@ function lifeChart(life, deathAge, cause) {
   const y = (v) => T + ((100 - v) / 100) * (H - T - B);
   const svg = svgEl('svg', { class: 'spark life', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `ค่าสถานะตลอดชีวิต อายุ 0 ถึง ${deathAge}` });
   stageBands(svg, x, 0, deathAge, T, H - B, true);
-  for (const [v, t] of [[100, 'สูง'], [50, ''], [0, 'ต่ำ']]) {
+  for (const [v, t] of [[100, '100'], [50, '50'], [0, '0']]) {
     svg.append(svgEl('line', { class: 'grid', x1: L, x2: W - R, y1: y(v), y2: y(v) }));
     if (t) svg.append(svgEl('text', { class: 'ty', x: L - 4, y: y(v) + 3.5 }, t));
   }
   const ages = deathAge >= 10 ? [0, Math.round(deathAge / 2), deathAge] : [0, deathAge];
   for (const a of ages) svg.append(svgEl('text', { class: 'tx', x: x(a), y: H - 6, 'text-anchor': a === 0 ? 'start' : a === deathAge ? 'end' : 'middle' }, `อายุ ${a}`));
+  // คำอธิบายเส้นบอกค่าปลายเส้น (ตอนจากไป) — ตัวเลขเดียวกับแถบบนการ์ดใบสุดท้าย
   const legend = el('ul', 'legend');
+  legend.append(el('li', null, 'ตอนจากไป'));
+  const end = life.stats.at(-1);
   STAT_KEYS.forEach((k, i) => {
     const pts = life.stats.map((p) => `${x(p.age).toFixed(1)},${y(p[k]).toFixed(1)}`).join(' ');
     svg.append(svgEl('polyline', { class: `ln ln${i}`, points: pts, 'stroke-dasharray': LINE_DASH[i] }));
-    legend.append(legendItem(i, STAT_LABELS[k]));
+    legend.append(legendItem(i, `${STAT_LABELS[k]} ${Math.round(end[k])}`));
   });
   // จุดเรื่องเด่น + จุดตาย (B38)
   const cap = el('p', 'mk-cap', 'แตะจุดบนกราฟเพื่อดูเรื่องในปีนั้น');
@@ -316,7 +333,7 @@ function lineageList(all, brief = all.length) {
   return box;
 }
 
-// สรุปช่วงวัยที่ผ่านมา: แถบตอนนี้ + ขีดตำแหน่งต้นช่วง — บอกว่าเปลี่ยนไปมากน้อยโดยไม่มีตัวเลข
+// สรุปช่วงวัยที่ผ่านมา: แถบตอนนี้ + ขีดตำแหน่งต้นช่วง + ตัวเลขต้นช่วง → ตอนนี้ คู่ลูกศรทิศ
 function recap(r) {
   const box = el('div', 'recap');
   box.append(el('div', 'h', `ช่วง${r.stage} · อายุ ${r.fromAge}–${r.toAge}`));
@@ -324,7 +341,9 @@ function recap(r) {
   for (const s of r.stats) {
     const row = el('div');
     const dir = s.to - s.from;
-    row.append(el('span', null, `${s.label} ${Math.abs(dir) < 1 ? '·' : dir > 0 ? '↑' : '↓'}`));
+    const head = el('span', null, `${s.label} ${Math.abs(dir) < 1 ? '·' : dir > 0 ? '↑' : '↓'} `);
+    head.append(el('span', 'num', `${Math.round(s.from)} → ${Math.round(s.to)}`));
+    row.append(head);
     const track = el('div', 'bar');
     const now = el('i');
     now.style.width = `${Math.round(s.to)}%`;
