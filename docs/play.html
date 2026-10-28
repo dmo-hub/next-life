@@ -189,7 +189,6 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 /* สมุดชีวิต (B48) — หน้าก่อน/ข้ามกว้างเท่ากันใต้ปุ่มพลิกหน้า · ตัวเลือกที่กดเป็นตัวหนังสือเอียงแยกจากเนื้อเรื่อง */
 .lifebook .row { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
 .lifebook .row .choice { justify-content:center; }
-.lifebook .body .pick { font-family:Pridi,serif; font-size:15px; padding-left:10px; border-left:2px solid currentColor; }
 .lifebook .body .dates { margin-top:-6px; font-size:14px; }
 .stamp { align-self:flex-start; font-family:Pridi,serif; font-weight:600; padding:4px 10px; transform:rotate(-3deg); font-size:16px; }
 
@@ -7421,7 +7420,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.3.07';
+const APP_VERSION = 'v0.3.08';
 const APP_BUILD = '2026-10-28';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
@@ -9609,76 +9608,31 @@ function askFor(r, age, was) {
   return q ? { g: st.gen, a: age, q } : null;
 }
 
-// สมุดชีวิต (B48): จดการ์ดตอนผ่าน track — เล่นซ้ำจากเซฟก็ผ่านครบทุกใบ แกนเกมจึงไม่ต้องเก็บประวัติเพิ่ม
-// ตัวเลือกที่กดยังไม่รู้ตอนการ์ดออก จำตำแหน่งใน st.log ไว้อ่านตอนเปิดสมุด
-// น้ำหนัก: ผลที่ตามมา > บ้านเมือง > งาน/ครอบครัว > ที่เหลือ · ลาง เงินเก็บ เปลี่ยนช่วงวัย ไม่ขึ้นหน้า (มีสรุปของตัวเองแล้ว)
-const BOOK_W = { result: 5, era: 4, near: 3, other: 1 };
-const BOOK_NEAR = /^(career|work|biz|pet|herd|school|retirement|milestone|child|old)_/;
-const BOOK_STORIES = 8;
-const BOOK_PER_STAGE = 2;
-const BOOK_NOTES = 2;
-let bookCards = [];
+// สมุดชีวิต (B48): จดตอนการ์ดผ่าน track — เล่นซ้ำจากเซฟก็ผ่านครบทุกใบ แกนเกมจึงไม่ต้องเก็บประวัติเพิ่ม
 // เหตุการณ์บ้านเมืองที่ชีวิตนี้เห็น (B51) — จดตอนการ์ดผ่าน track เหมือนสมุดชีวิต เล่นซ้ำจากเซฟก็ได้ครบ
 let eraSeen = [];
 // ภาพในสมุดภาพบ้านเมืองที่ชีวิตนี้ปลด (B130): "e:<เหตุการณ์>" ภาพหลัก · "s:<เหตุการณ์>:<ช่อง>" ภาพตามวัย/ตามมา
 // ลงสมุดตอนการ์ดตาย (picsAdd) — ชีวิตที่ยังไม่จบยังไม่นับ แบบเดียวกับสมุดฉายา
 let picSeen = [];
 let bookIntro = null;
-// ลำดับการ์ดที่ผ่านมา — ใช้ดูว่าการ์ดผลตามหลังการ์ดเลือกทันทีหรือไม่
-let bookSeq = 0;
 function bookNote(card) {
   if (card.kind === 'intro') bookIntro = card;
-  const last = bookCards.at(-1);
-  // ผลของตัวเลือกเล่าต่อในหน้าเดียวกับการ์ดที่เลือก ผู้อ่านเห็นเหตุกับผลคู่กัน
-  if (card.kind === 'result' && last?.card.kind === 'event' && last.card.age === card.age && !last.result && last.next === bookSeq) {
-    last.result = card.text;
-    last.w = BOOK_W.result;
-  } else {
-    const w = card.kind === 'result' ? BOOK_W.result
-      : card.kind === 'era' || card.national || card.news ? BOOK_W.era
-      : card.kind === 'event' && !card.funeral ? (BOOK_NEAR.test(card.id) ? BOOK_W.near : BOOK_W.other)
-      : 0;
-    if (w) bookCards.push({ card, w, at: st.log.length, next: bookSeq + 1 });
-  }
   const era = card.kind === 'era' ? card.id : card.news && ERA_OF.get(card.id);
   if (era) eraSeen.push({ id: era, a: card.age });
   // ภาพหลักนับทุกการ์ดของเหตุการณ์ ไม่ใช่แค่ใบที่มีข่าวนำ — ผู้เล่นเห็นภาพยุคบนการ์ดใบนั้นแล้ว
   const pe = card.kind === 'era' ? card.id : ERA_OF.get(card.id);
   const ps = card.kind === 'event' && PIC_OF.get(card.id);
   for (const k of [pe && ERA_PICS[pe] && `e:${pe}`, ps && `s:${ps}`]) if (k && !picSeen.includes(k)) picSeen.push(k);
-  bookSeq++;
 }
 const bookReset = () => {
-  bookCards = [];
   eraSeen = [];
   picSeen = [];
   bookIntro = null;
-  bookSeq = 0;
 };
 
-// คัดหน้าจากน้ำหนัก เสมอกันใช้เลขจาก seed — เปิดซ้ำได้หน้าเดิม ไม่กินเลขสุ่มของเกม
-// รอบแรกช่วงวัยละไม่เกิน BOOK_PER_STAGE หน้า สมุดจึงเล่าทั้งชีวิต ไม่กองอยู่ช่วงที่การ์ดถี่
-function bookPicks(n) {
-  const key = `${save.seed}:${st.gen}`;
-  const ranked = bookCards.map((p, i) => ({ ...p, i, r: fnv(`${key}:${i}`) })).sort((a, b) => b.w - a.w || a.r - b.r);
-  const per = {};
-  const pick = [];
-  for (const p of ranked) {
-    if (pick.length >= n) break;
-    if ((per[p.card.stage] ?? 0) >= BOOK_PER_STAGE) continue;
-    per[p.card.stage] = (per[p.card.stage] ?? 0) + 1;
-    pick.push(p);
-  }
-  for (const p of ranked) if (pick.length < n && !pick.includes(p)) pick.push(p);
-  return pick.sort((a, b) => a.i - b.i);
-}
-
+// ปก → ฐานะตระกูล → หน้าสุดท้าย · ไม่มีหน้าเล่าเรื่องรายปี
 function bookPages(death) {
-  const said = notes.n.filter((x) => x.g === st.gen && x.t).sort((x, y) => x.a - y.a);
-  const keep = said.length <= BOOK_NOTES ? said : [...said].sort((x, y) => fnv(`${notes.seed}:${x.a}`) - fnv(`${notes.seed}:${y.a}`)).slice(0, BOOK_NOTES).sort((x, y) => x.a - y.a);
-  // บันทึกถามตอนต้นช่วงใหม่ จึงวางหลังเรื่องที่อายุเท่ากัน
-  const mid = [...bookPicks(BOOK_STORIES - keep.length).map((p) => ({ age: p.card.age, o: 0, draw: (b) => storyPage(b, p) })), ...keep.map((x) => ({ age: x.a, o: 1, draw: (b) => notePage(b, x) }))].sort((a, b) => a.age - b.age || a.o - b.o);
-  return [{ draw: (b) => coverPage(b, death) }, ...mid, { draw: standPage }, { draw: (b) => endPage(b, death) }];
+  return [{ draw: (b) => coverPage(b, death) }, { draw: standPage }, { draw: (b) => endPage(b, death) }];
 }
 
 // หน้าฐานะตระกูล (B95) ก่อนหน้าสุดท้าย — รุ่นก่อนทั้งหมด + ชีวิตนี้ถึงวันตาย
@@ -9691,25 +9645,6 @@ function standPage(body) {
 function coverPage(body, death) {
   body.append(el('span', 'kicker', 'สมุดชีวิต'), el('h3', null, st.name), el('p', 'dates', `${genLabel()}อายุ 0–${death.age} ปี · ${provinceLabel(st)}`));
   if (bookIntro) body.append(el('p', 'sub', bookIntro.text));
-}
-function storyPage(body, p) {
-  const c = p.card;
-  const kicker = c.kind === 'result' ? KICKER.result : c.kind === 'era' || c.national ? KICKER.era : `ช่วง${c.stage}`;
-  body.append(el('span', 'kicker', `อายุ ${c.age} · ${c.news ? `${kicker} · ${c.news.text}` : kicker}`));
-  if (c.kind === 'event') {
-    if (c.title) body.append(el('h3', null, c.title));
-    body.append(el(c.title ? 'p' : 'h3', c.title ? null : 'lead', c.text));
-    // จับคู่ด้วย id กับอายุ — การ์ดเล่าเรื่องไม่มีตัวเลือก ตำแหน่งเดิมใน log จึงอาจเป็นของใบถัดไป
-    const pick = st.log[p.at];
-    if (pick && pick.id === c.id && pick.age === c.age) body.append(el('p', 'pick', `เลือก “${pick.text}”`));
-    if (p.result) body.append(el('p', 'sub', p.result));
-  } else {
-    body.append(el('h3', c.kind === 'era' ? null : 'lead', c.text));
-    if (c.story) body.append(el('p', null, c.story));
-  }
-}
-function notePage(body, x) {
-  body.append(el('span', 'kicker', `อายุ ${x.a} · บันทึกถึงตัวเอง`), el('p', 'sub', x.q), noteQuote(`บันทึกเมื่ออายุ ${x.a}`, x.t));
 }
 function endPage(body, death) {
   body.append(el('span', 'kicker', `อายุ ${death.age}`), el('h3', 'lead', `${st.name} จากไปด้วยวัย ${death.age} ปี`));
@@ -9791,7 +9726,7 @@ function fingerprint(card) {
 // storage พังได้ (โหมดส่วนตัว · เต็ม · ปิด) — เกมยังเล่นได้ แค่ไม่จำ · ป้ายหัวเว็บบอกผู้เล่นว่าจำอยู่หรือไม่ (B77)
 // v = เวอร์ชันที่เขียน — ไว้ดูตอนไล่เซฟที่เล่นซ้ำไม่ตรง
 // สถานะหน้าจอที่การ์ดถัดไปอ่านต่อ (อายุใบก่อน · บันทึกชีวิต · สมุดชีวิต) — เดิมได้จากการเล่นซ้ำ ตอนนี้เก็บไปกับภาพถ่าย
-const uiState = () => ({ save, prevAge, curAge, lifeMark, noteAsk, bookCards, eraSeen, picSeen, bookIntro, bookSeq });
+const uiState = () => ({ save, prevAge, curAge, lifeMark, noteAsk, eraSeen, picSeen, bookIntro });
 function saveWrite(card) {
   try {
     localStorage.setItem(SNAP_KEY, snapHide(JSON.stringify({ v: APP_VERSION, snap: snapshot({ st, af, card, ui: uiState() }, CONTENT) })));
@@ -9832,7 +9767,7 @@ function snapRead() {
     if (!raw) return null;
     const root = restore(JSON.parse(snapShow(raw)).snap, CONTENT);
     ({ st, af } = root);
-    ({ save, prevAge, curAge, lifeMark, noteAsk, bookCards, eraSeen, bookIntro, bookSeq } = root.ui);
+    ({ save, prevAge, curAge, lifeMark, noteAsk, eraSeen, bookIntro } = root.ui);
     // ภาพถ่ายก่อนมีสมุดภาพ (B130) ไม่มีช่องนี้ — ภาพของการ์ดก่อนอัปเดตจึงไม่ถูกนับ
     picSeen = root.ui.picSeen ?? [];
     notesLoad(save.seed);
