@@ -124,6 +124,12 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
 .recap .picks { overflow-wrap:anywhere; }
+/* ช่วยจริง (B145): เบอร์เป็นลิงก์ tel: แตะแล้วโทรได้บนมือถือ · ลิงก์สูง 44px เท่าปุ่มอื่น */
+.help .help-row { display:flex; flex-direction:column; gap:2px; }
+.help .help-call, .help > a { display:inline-flex; align-items:center; min-height:44px; overflow-wrap:anywhere; }
+.help .help-call { font-weight:600; }
+.help small, .help .note { font-size:12.5px; overflow-wrap:anywhere; }
+.help a { color:inherit; } .help small a { white-space:nowrap; }
 .lineage .lh { font-size:12px; font-weight:600; margin:6px 0 2px; }
 .lineage .lh:first-child { margin-top:0; }
 .lineage .llore { font-size:12px; margin:4px 0 0 20px; overflow-wrap:anywhere; }
@@ -7381,6 +7387,16 @@ const BTN = {
   copy: 'คัดลอกสรุป',
 };
 
+// ช่วยจริง (B145): ลงเฉพาะหน่วยที่อ่านเบอร์จากเว็บของหน่วยงานเองแล้ว · หน้าจบเกมขึ้นตามเรื่องที่ชีวิตนั้นเจอ คู่มือรวมทุกหน่วย
+// tel ใส่ , = รอแล้วกดต่อ (เบอร์ที่ต้องกดเลขเมนู)
+const HELP = [
+  { id: 'mind', label: 'อยากมีคนคุยด้วย', call: 'โทร 1323', tel: '1323', org: 'สายด่วนสุขภาพจิต กรมสุขภาพจิต · ฟรี 24 ชม.', web: 'https://www.dmh.go.th/' },
+  { id: 'drink', label: 'อยากเลิกเหล้า', call: 'โทร 1413', tel: '1413', org: 'ศูนย์ปรึกษาเพื่อการเลิกสุราและการเสพติด', web: 'https://www.1413.in.th/' },
+  { id: 'scam', label: 'โดนหลอกออนไลน์', call: 'โทร 1441', tel: '1441', org: 'กองบัญชาการตำรวจสืบสวนสอบสวนอาชญากรรมทางเทคโนโลยี · 24 ชม.', web: 'https://www.ccib.go.th/' },
+  { id: 'bankrupt', label: 'เรื่องล้มละลาย/บังคับคดี', call: '1111 กด 79', tel: '1111,79', org: 'กรมบังคับคดี', web: 'https://www.led.go.th/th' },
+];
+const HELP_NOTE = 'เกมนี้ไม่รับเงินจากลิงก์เหล่านี้ และไม่รับบริจาค · ข้อมูลตรวจเมื่อ ตุลาคม 2569';
+
 // คำอธิบายค่าสถานะ: บอกแค่ทิศว่าค่านั้นไปมีผลกับอะไร — ห้ามตัวเลข เกณฑ์ สูตร และไม่พูดถึงบุญบาป
 // ทุกบรรทัดต้องตรงกับที่แกนเกมอ่านจริง (แก้แกนแล้วทิศเปลี่ยน ต้องแก้ที่นี่ด้วย)
 const STAT_HELP = [
@@ -7397,7 +7413,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.3.11';
+const APP_VERSION = 'v0.3.12';
 const APP_BUILD = '2026-10-28';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
@@ -8806,6 +8822,7 @@ function render(card) {
     // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
     const chart = card.life && lifeChart(card.life, card.age, card.cause);
     if (chart) body.append(chart);
+    body.append(helpBox());
     choices.append(enter(button(BTN.toAfter, null, () => openBook(card))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
     if (st.gen === 1) choices.append(inviteButton());
   } else {
@@ -9036,6 +9053,31 @@ function entryOffer(card, body, choices) {
     choices.querySelector('button').focus();
   };
   offer();
+}
+
+// ช่วยจริง (B145): สายด่วนสุขภาพจิตขึ้นทุกหน้าจบ — ขึ้นเฉพาะชีวิตที่ตายแบบหนึ่ง = ผู้เล่นอ่านสาเหตุที่ซ่อนไว้ออกจากปุ่ม (B110)
+// ที่เหลือขึ้นตามเรื่องที่ชีวิตนี้เจอ · ไม่ลงภาพแชร์ · ลิงก์ออกนอกเกมเปิดแท็บใหม่ เกมที่ค้างอยู่ไม่หาย
+const HELP_BY = { mind: () => true, drink: () => !!st.flags?.heavy_drinker, bankrupt: () => !!st.flags?.bankrupt || st.bankruptcies > 0 };
+const HELP_MAX = 3;
+function helpBox() {
+  const box = el('div', 'recap help');
+  box.append(el('div', 'h', 'ถ้าเรื่องในเกมใกล้ตัวคุณ'), el('p', 'sub', 'เรื่องในเกมจบแล้ว แต่ในชีวิตจริงมีคนรับฟังและช่วยได้ฟรี'));
+  for (const h of HELP.filter((x) => HELP_BY[x.id]?.()).slice(0, HELP_MAX)) box.append(helpRow(h));
+  const all = el('a', null, 'ดูทั้งหมด');
+  Object.assign(all, { href: 'guide.html#help', target: '_blank', rel: 'noopener' });
+  box.append(all, el('p', 'note', HELP_NOTE));
+  return box;
+}
+function helpRow(h) {
+  const row = el('div', 'help-row');
+  const call = el('a', 'help-call', `${h.label} · ${h.call}`);
+  call.href = `tel:${h.tel}`;
+  const web = el('a', null, 'เว็บทางการ');
+  Object.assign(web, { href: h.web, target: '_blank', rel: 'noopener' });
+  const org = el('small', null, `${h.org} · `);
+  org.append(web);
+  row.append(call, org);
+  return row;
 }
 
 // แผงครอบครัว (B36c): คนรอบตัวตอนนี้ แยกจากผังตระกูลที่เล่ารุ่นก่อน · อ่านอย่างเดียว ไม่มี token ในเซฟ
