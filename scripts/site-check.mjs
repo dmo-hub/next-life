@@ -7,7 +7,7 @@ import { loadContent } from '../src/node/load.mjs';
 import { siteFacts, injectFacts } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
 import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
-import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_WORLDS, ISEKAI_SKILLS } from '../src/engine/index.mjs';
+import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_ROLES, roleInfo, ISEKAI_SKILLS } from '../src/engine/index.mjs';
 import { isekaiCardCount, ISEKAI_SECTION } from '../src/site/otherworld.mjs';
 import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR } from '../src/site/spec.mjs';
 import { BTN } from '../src/ui/labels.mjs';
@@ -94,12 +94,14 @@ const got = {
 const off = Object.keys(want).filter((k) => want[k] !== got[k] || !want[k]);
 check('หน้าเฉลยครบทุกการ์ด ตัวเลือก ผลสุ่ม ป้ายบุญบาป', off.length, ` ${Object.keys(want).map((k) => `${k} ${got[k]}/${want[k]}`).join(' · ')}`);
 // 6) ส่วนต่างโลก: นับเทียบโมดูลในเอนจินตรง ๆ · หน้ารวมการ์ดห้ามมีข้อความผลสำเร็จ/พลาด ชื่อตอนจบ หรือความยาก
+const ISEKAI_ROLE_INFO = Object.keys(ISEKAI_ROLES).map(roleInfo);
 const iskWant = {
   การ์ด: isekaiCardCount(),
   ตัวเลือก: ISEKAI_EVENTS.reduce((s, e) => s + e.choices.length, 0),
   ผล: ISEKAI_EVENTS.reduce((s, e) => s + e.choices.reduce((n, c) => n + (c.stat || c.know ? 2 : 1), 0), 0),
-  ตอนจบ: Object.values(ISEKAI_WORLDS).reduce((s, w) => s + new Set(['best', 'good', 'bad', w.special[1]]).size, 0),
-  โลก: Object.keys(ISEKAI_WORLDS).length,
+  // บทบาทที่ไม่มีเนื้อเรื่องของโลกมีแค่ 3 ตอนจบ ไม่มีตอนจบพิเศษ
+  ตอนจบ: ISEKAI_ROLE_INFO.reduce((s, w) => s + new Set(['best', 'good', 'bad', w.special?.[1] ?? 'best']).size, 0),
+  บทบาท: ISEKAI_ROLE_INFO.length,
   สกิล: Object.keys(ISEKAI_SKILLS).length,
 };
 const iskGot = {
@@ -107,7 +109,7 @@ const iskGot = {
   ตัวเลือก: (spoilIsk.match(/<p class="ch">/g) ?? []).length,
   ผล: (spoilIsk.match(/<b class="rk">/g) ?? []).length,
   ตอนจบ: (spoilIsk.match(/<li class="end">/g) ?? []).length,
-  โลก: Object.values(ISEKAI_WORLDS).filter((w) => spoilIsk.includes(`<b>${escHtml(w.name)}</b>`)).length,
+  บทบาท: ISEKAI_ROLE_INFO.filter((w) => spoilIsk.includes(`<b>${escHtml(w.name)}</b>`)).length,
   สกิล: Object.values(ISEKAI_SKILLS).filter((x) => spoilIsk.includes(`<b>${escHtml(x.name)}</b>`)).length,
 };
 const iskOff = Object.keys(iskWant).filter((k) => iskWant[k] !== iskGot[k] || !iskWant[k]);
@@ -118,7 +120,7 @@ check('หน้ารวมการ์ดมีส่วนต่างโล�
 const hidden = [
   // ตัวเลือกความรู้โลกเดิม (B68h · c.know) ทอยเหมือนตัวเลือกค่าสถานะ
   ...ISEKAI_EVENTS.flatMap((e) => e.choices.flatMap((c) => (c.stat || c.know ? [c.win.text, c.lose.text] : [c.text]))),
-  ...Object.values(ISEKAI_WORLDS).flatMap((w) => Object.values(w.end).map(([title]) => title)),
+  ...ISEKAI_ROLE_INFO.flatMap((w) => Object.values(w.end).map(([title]) => title)),
 ];
 const iskLeak = hidden.filter((t) => cards.includes(escHtml(t)));
 if (/ความยาก|class="rk"/.test(cardsIsk)) iskLeak.push('ความยาก/ผล');

@@ -1,28 +1,31 @@
 // ส่วนต่างโลกของหน้ารวมการ์ดและหน้าเฉลย (B88b): สร้างจากโมดูลต่างโลกในเอนจินทุกครั้งที่ build — การ์ดต่างโลกใบใหม่ขึ้นหน้าเว็บเอง
 // หน้ารวมการ์ดได้แค่สิ่งที่จอแสดง (ชื่อโลก/สกิลพร้อมคำอธิบาย · ข้อความเหตุการณ์ · ตัวเลือก) · หน้าเฉลยได้ความยาก ผลสำเร็จ/พลาด ค่าที่ขยับ ธง และตอนจบ
-import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, GODDESS, GODDESS_VOWS, PATHS, meritName, roleInfo } from '../engine/index.mjs';
+import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_ROLES, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, GODDESS, GODDESS_VOWS, PATHS, meritName, roleInfo } from '../engine/index.mjs';
 import { esc, text } from './catalog.mjs';
 
 export const ISEKAI_SECTION = 'ต่างโลก';
-const CHAPTERS = 4;
 const sgn = (n) => (n > 0 ? `+${n}` : String(n).replace('-', '−'));
 // เหตุการณ์เฉพาะบทบาทใช้ id บทบาทใน worlds — roleInfo ตอบได้ทั้งโลกเดิมและบทบาทที่ไม่มีเนื้อเรื่องของโลก
 const worldName = (id) => roleInfo(id).name;
-const chLabel = (ch) => `บทที่ ${ch.length > 1 ? `${ch[0]}–${ch[ch.length - 1]}` : ch[0]}`;
+// ชั้นเหตุการณ์ (ch) เป็นของภายใน — ผู้อ่านเห็นเป็นช่วงวัยที่สุ่มใบนั้นได้ (เจ้าของเคาะ) · ฉากสุดท้ายมาตามอายุของบทบาท ไม่ผูกช่วงวัย
+const stageSpan = (ch) => {
+  const s = ISEKAI_STAGES.filter((g) => g.ch.some((c) => ch.includes(c)));
+  return s.length ? (s.length > 1 ? `${s[0].name}–${s.at(-1).name}` : s[0].name) : 'ตามอายุของบทบาท';
+};
 const where = (e) => (e.worlds ? e.worlds.map(worldName).join(' · ') : 'ทุกโลก');
-// ฉากเปิดและฉากสุดท้ายของแต่ละโลกอยู่ต้นและท้ายเสมอ (isekaiQueue) — จัดไว้หัวกลุ่มบทของมันให้อ่านตามลำดับเล่น
+// ฉากเปิดและฉากสุดท้ายของแต่ละโลกอยู่ต้นและท้ายเสมอ — จัดไว้หัวกลุ่มให้อ่านตามลำดับเล่น
 const groups = () =>
-  Array.from({ length: CHAPTERS }, (_, i) => i + 1).map((c) => ({
-    ch: c,
+  [...new Set(ISEKAI_EVENTS.map((e) => e.ch[0]))].sort((a, b) => a - b).map((c) => ({
+    label: stageSpan([c]),
     events: ISEKAI_EVENTS.filter((e) => e.ch[0] === c).sort((a, b) => Number(!!b.finale) - Number(!!a.finale) || Number(isIntro(b)) - Number(isIntro(a))),
   }));
 const isIntro = (e) => Object.values(ISEKAI_WORLDS).some((w) => w.intro === e.id);
-const tags = (e) => [where(e), chLabel(e.ch), isIntro(e) ? 'ฉากเปิด' : null, e.finale ? 'ฉากสุดท้าย' : null].filter(Boolean);
+const tags = (e) => [where(e), e.finale ? null : stageSpan(e.ch), isIntro(e) ? 'ฉากเปิด' : null, e.finale ? 'ฉากสุดท้าย' : null].filter(Boolean);
 const tagLine = (xs) => `<p class="tags">${xs.map((t) => `<span>${esc(t)}</span>`).join('')}</p>`;
 export const isekaiCardCount = () => ISEKAI_EVENTS.length + 2;
 
 // catalog.mjs กับไฟล์นี้ import กันไปมา — ห้ามเรียก esc/text ตอนโหลดโมดูล ต้องเรียกตอนสร้างหน้า
-const lead = () => `<p class="lead">เลือก "${esc(PATHS.find((p) => p.id === 'isekai').text)}" ที่ปรโลก แล้วใช้ชีวิตหนึ่งชาติในโลกแฟนตาซี ${CHAPTERS} บท ก่อนกลับไปให้ปรโลกตัดสิน · การ์ดสีม่วงคือการ์ดต่างโลก</p>`;
+const lead = () => `<p class="lead">เลือก "${esc(PATHS.find((p) => p.id === 'isekai').text)}" ที่ปรโลก แล้วใช้ชีวิตหนึ่งชาติในโลกแฟนตาซีที่เวลาเดินเอง ก่อนกลับไปให้ปรโลกตัดสิน · การ์ดสีม่วงคือการ์ดต่างโลก</p>`;
 
 function section(n, body) {
   return `<details id="s${n}"><summary>${ISEKAI_SECTION} <small>${isekaiCardCount()} ใบ</small></summary>${lead()}${body}</details>`;
@@ -33,7 +36,7 @@ export const isekaiNav = (n) => `<a href="#s${n}">${ISEKAI_SECTION} <small>${ise
 function pickCard(title, body, items) {
   return `<article class="c x"><h4>${esc(title)}</h4>${tagLine(['ก่อนเริ่มชาติ'])}<p>${esc(body)}</p><ul>${items.join('')}</ul></article>`;
 }
-const worldPick = (desc) => pickCard('ห้องสีขาว', `เทพธิดาเสนอโลกให้เลือก ${ISEKAI.worlds} จาก ${Object.keys(ISEKAI_WORLDS).length} โลก`, Object.entries(ISEKAI_WORLDS).map(([id, w]) => `<li><b>${esc(w.name)}</b> — ${esc(w.pitch)}${desc(id, w)}</li>`));
+const worldPick = (desc) => pickCard('ห้องสีขาว', `เทพธิดายื่นบทบาทให้เลือก ${ISEKAI.worlds} จาก ${Object.keys(ISEKAI_ROLES).length} บทบาท`, Object.keys(ISEKAI_ROLES).map((id) => [id, roleInfo(id)]).map(([id, r]) => `<li><b>${esc(r.name)}</b> — ${esc(r.pitch)}${desc(id, r)}</li>`));
 const skillPick = (desc) => pickCard('ของขวัญจากเทพธิดา', `เลือกสกิลโกง 1 อย่างจาก ${ISEKAI.skills} อย่างที่สุ่มมา`, Object.entries(ISEKAI_SKILLS).map(([id, s]) => `<li><b>${esc(s.name)}</b> — ${esc(s.desc)}${desc(id, s)}</li>`));
 
 function plainEvent(e) {
@@ -43,7 +46,7 @@ function plainEvent(e) {
 export function isekaiCatalogHtml(n) {
   const body = [
     `<h3>ก่อนเริ่มชาติ</h3><div class="grid">${worldPick(() => '')}${skillPick(() => '')}</div>`,
-    ...groups().map((g) => `<h3>บทที่ ${g.ch} <small>${g.events.length} ใบ</small></h3><div class="grid">${g.events.map(plainEvent).join('')}</div>`),
+    ...groups().map((g) => `<h3>${esc(g.label)} <small>${g.events.length} ใบ</small></h3><div class="grid">${g.events.map(plainEvent).join('')}</div>`),
   ].join('');
   return section(n, body);
 }
@@ -115,9 +118,37 @@ function endings(id, w) {
   return `<ul class="ends">${order.map((k) => `<li class="end"><b>${esc(w.end[k][0])}</b> — ${rule[k]}<br><small>${esc(w.end[k][1])}</small></li>`).join('')}</ul>`;
 }
 
+// โอกาสที่บทบาทอยู่ในชุดที่ยื่น ตอนกรรมเป็นกลาง — ไล่ทุกลำดับการจับแบบไม่คืน (11×10×9 ทาง) ตามกติกาใน isekaiRoleOffers
+// รวมการแทนใบสุดท้ายด้วยชาวบ้านมีอาชีพเมื่อชุดไม่มี จึงตรงกับเกมไม่ใช่แค่สัดส่วนน้ำหนัก
+let offerOdds = null;
+function roleOdds() {
+  if (offerOdds) return offerOdds;
+  const ids = Object.keys(ISEKAI_ROLES);
+  const hit = Object.fromEntries(ids.map((id) => [id, 0]));
+  const walk = (left, got, p) => {
+    if (got.length === ISEKAI.worlds || !left.length) {
+      const out = got.includes('commoner') ? got : [...got.slice(0, -1), 'commoner'];
+      for (const id of out) hit[id] += p;
+      return;
+    }
+    const sum = left.reduce((s, id) => s + ISEKAI_ROLES[id].p, 0);
+    for (const id of left) walk(left.filter((x) => x !== id), [...got, id], (p * ISEKAI_ROLES[id].p) / sum);
+  };
+  walk(ids, [], 1);
+  return (offerOdds = hit);
+}
+const LEAN = { 1: 'บุญมากเจอบ่อยขึ้น', '-1': 'บาปมากเจอบ่อยขึ้น' };
+// บทบาทที่ไม่มีฉากสุดท้ายตัดสินตอนสิ้นอายุจากเป้าหมายกับชื่อเสียง (isekaiEnding)
+function roleEndings(w) {
+  const rule = { best: `${esc(w.goal)} ≥ 80 หรือ ${esc(w.goal)} ≥ 60 กับชื่อเสียง ≥ 30`, good: `${esc(w.goal)} ≥ 40 หรือชื่อเสียง ≥ 30`, bad: 'ไม่ถึงทั้งสองเกณฑ์' };
+  return `<ul class="ends">${['best', 'good', 'bad'].map((k) => `<li class="end"><b>${esc(w.end[k][0])}</b> — ${rule[k]}<br><small>${esc(w.end[k][1])}</small></li>`).join('')}</ul>`;
+}
 function worldSpoil(id, w) {
-  const start = Object.entries(ISEKAI_STAT).map(([k, n]) => `${n} ${w.start[k]}`).concat(`ทอง ${w.start.gold}`).join(' · ');
-  return `<p class="fx">ค่าเริ่ม: ${esc(start)} · เป้าหมาย: ${esc(w.goal)}</p><p class="ex">ชื่อที่ได้: ${w.names.map((s) => text(s.replace('{p}', '{ชื่อชาติก่อน}'))).join(' / ')}</p>${endings(id, w)}`;
+  const r = ISEKAI_ROLES[id];
+  const pct = Math.round(roleOdds()[id] * 100);
+  const facts = [id === 'commoner' ? 'อยู่ในชุดที่ยื่นเสมอ' : `โอกาสถูกยื่น ${pct}% (กรรมกลาง)`, LEAN[r.lean], r.pace > 1 ? `อายุเดิน ×${r.pace}` : null, `เริ่มอายุ ${r.startAge}`, r.finaleAge ? `ฉากสุดท้ายอายุ ${r.finaleAge}` : null, r.like ? `ยืมเหตุการณ์ของ${roleInfo(r.like).name}` : null].filter(Boolean);
+  const start = Object.entries(ISEKAI_STAT).map(([k, n]) => `${n} ${w.stat[k]}`).concat(`ทอง ${w.stat.gold}`).join(' · ');
+  return `<p class="fx">${esc(facts.join(' · '))}</p><p class="fx">ค่าเริ่ม: ${esc(start)} · เป้าหมาย: ${esc(w.goal)} · ทุ่มเทของบทบาท: ${esc(w.focus.name)}</p><p class="ex">ชื่อที่ได้: ${w.names.map((s) => text(s.replace('{p}', '{ชื่อชาติก่อน}'))).join(' / ')}</p>${w.special ? endings(r.world, w) : roleEndings(w)}`;
 }
 
 // การ์ดที่ให้สกิลสุ่มไม่สุ่มโชคเทพธิดา (chooseIsekai) — สกิลอื่นได้ระหว่างทางด้วย
@@ -151,7 +182,7 @@ export function isekaiSpoilersHtml(n, meritTags) {
   const body = [
     rules(meritTags),
     `<h3>ก่อนเริ่มชาติ</h3><div class="grid">${worldPick(worldSpoil)}${skillPick(skillSpoil)}</div>`,
-    ...groups().map((g) => `<h3>บทที่ ${g.ch} <small>${g.events.length} ใบ</small></h3><div class="grid">${g.events.map((e) => spoilEvent(e, src, meritTags)).join('')}</div>`),
+    ...groups().map((g) => `<h3>${esc(g.label)} <small>${g.events.length} ใบ</small></h3><div class="grid">${g.events.map((e) => spoilEvent(e, src, meritTags)).join('')}</div>`),
     `<p class="ex">ตอนจบแบบตาย: <b>${esc(ISEKAI_DEATH[0])}</b> — ${esc(ISEKAI_DEATH[1])}</p>`,
   ].join('');
   return section(n, body);
