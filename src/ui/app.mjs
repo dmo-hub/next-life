@@ -1927,7 +1927,7 @@ function speedWrite(v) {
     // ไม่มีที่เก็บ ก็จำแค่ในหน้านี้
   }
 }
-// พักไว้ระหว่างแผงเปลี่ยนสิ่งที่ทุ่มเทเปิดอยู่หรือแท็บถูกซ่อน — ไม่ให้ใบเปลี่ยนใต้มือผู้เล่น · ใบหลุดจากจอแล้ว (ไปหน้าอื่น) ไม่กด
+// พักไว้ระหว่างแท็บถูกซ่อน หรือผู้เล่นชี้/โฟกัสแผงทุ่มเทอยู่ — ไม่ให้ใบเปลี่ยนใต้มือ · ใบหลุดจากจอแล้ว (ไปหน้าอื่น) ไม่กด
 // tok = token ของปุ่ม "ต่อ" ใบนั้น — ใบตาทริปกลางชีวิตเดินด้วย token ชีวิต ไม่ใช่ token ระหว่างชาติ
 function armTick(box, panel, bar, tok) {
   clearTimeout(tickTimer);
@@ -1938,7 +1938,7 @@ function armTick(box, panel, bar, tok) {
   bar.style.animation = `itick ${ms}ms linear forwards`;
   tickTimer = setTimeout(() => {
     if (!box.isConnected) return;
-    if (panel.open || document.hidden) return armTick(box, panel, bar, tok);
+    if (panel.matches(':hover, :focus-within') || document.hidden) return armTick(box, panel, bar, tok);
     play(tok);
   }, ms);
 }
@@ -2004,19 +2004,24 @@ function renderIsekai(card) {
     d.append(el('summary', null, `จดหมายเหตุทั้งชีวิต ${card.chronicle.length} บรรทัด`), list(card.chronicle.map(line), 'picks'));
     body.append(d);
   }
-  // ใบตา (B68b): เปลี่ยนสิ่งที่ทุ่มเทได้โดยไม่ต้องรอช่วงวัยใหม่ — ปุ่มเดินผ่าน afterPick เซฟจึงเล่นซ้ำได้
+  // แผงทุ่มเทบนใบตา (B68b): กริดเปิดตลอดแบบต้นแบบ — เวลาเดินอยู่แล้วกดเปลี่ยนได้ทันทีโดยไม่ต้องกางแผง (เจ้าของเคาะ)
+  // ปุ่มเดินผ่าน pick เซฟจึงเล่นซ้ำได้ · focusFx = ผลต่อปีของแต่ละทาง ไม่มีก็โชว์ชื่ออย่างเดียว
   let panel = null;
   if (card.step === 'tick') {
-    const d = (panel = el('details', 'tree'));
-    d.append(el('summary', null, 'เปลี่ยนสิ่งที่ทุ่มเท'));
-    const row = el('div', 'choices');
+    panel = el('div', 'ifocus');
+    panel.setAttribute('role', 'group');
+    panel.setAttribute('aria-label', 'สิ่งที่ทุ่มเท');
     card.focusChoices.forEach((c, i) => {
-      const b = button(c, i === card.focus ? 'ทำอยู่' : null, () => play(pick(i)));
-      if (i === card.focus) b.disabled = true;
-      row.append(b);
+      const on = i === card.focus;
+      const b = el('button', on ? 'on' : null);
+      b.type = 'button';
+      b.append(el('b', null, c), el('small', null, [card.focusFx?.[i], on && 'ทำอยู่'].filter(Boolean).join(' · ')));
+      b.setAttribute('aria-pressed', String(on));
+      if (on) b.disabled = true;
+      else b.addEventListener('click', () => play(pick(i)));
+      panel.append(b);
     });
-    d.append(row);
-    body.append(d);
+    body.append(el('p', 'kicker', 'ทุ่มเทกับ'), panel);
   }
   if (card.choices.length) {
     card.choices.forEach((c, i) => {

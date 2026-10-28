@@ -312,6 +312,20 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .itimer i { display:block; height:100%; width:0; background:#6FE3FF; }
 @keyframes itick { from { width:0; } to { width:100%; } }
 @media (prefers-reduced-motion: reduce) { .itimer i { animation:none !important; } }
+/* ทั้งหน้าเข้าธีมต่างโลกตามการ์ดที่ขึ้นจอ — ผูกกับการ์ดด้วย :has จึงไม่ต้องตามล้างธงทุกจุดที่วาดจอไทย */
+body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; }
+body:has(#app > .card.i) .logo { background:#0E1024; border-bottom-color:#3B4BA8; }
+body:has(#app > .card.i) .logo b { font-family:Pridi,serif; font-weight:600; font-size:clamp(22px, 6vw, 30px); color:#6FE3FF; }
+body:has(#app > .card.i) .logo small, body:has(#app > .card.i) .logo .ver, body:has(#app > .card.i) .logo .saved { color:#A6AEDB; }
+body:has(#app > .card.i) .logo .ver { border-color:#3B4BA8; }
+body:has(#app > .card.i) .foot a { color:#D3D8F5; }
+.ifocus { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px; }
+.ifocus button { display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-height:44px; padding:6px 10px; border:1px solid #2A3478; border-radius:6px; background:#0E1024; color:#E8ECFF; font:inherit; font-size:14px; text-align:left; cursor:pointer; }
+.ifocus button small { font-size:11px; color:#6FE3FF; }
+.ifocus button:hover, .ifocus button:focus-visible { border-color:#6FE3FF; background:#1E2350; outline:none; }
+/* ทางที่ทำอยู่: กดไม่ได้แต่ต้องเด่น ไม่ใช่จางแบบตัวเลือกล็อก */
+.ifocus button.on { border-color:#F2C94C; background:#1E2350; cursor:default; }
+.ifocus button.on small { color:#F2C94C; }
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
 .a .choice:disabled, .b .choice:disabled, .i .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
 /* พาแนลการ์ด (B131): จอตั้งไม่มีพาแนล — ตัวห่อหายไปจากเลย์เอาต์ ลูกเรียงในการ์ดแบบเดิม */
