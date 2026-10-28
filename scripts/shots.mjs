@@ -1,4 +1,5 @@
-// ภาพหน้าจอจริงบนหน้าเว็บ (B65) + ด่านล้นจอทุกหน้า — เปิด play.html / isekai.html แล้วกดจนถึงฉาก ถ่ายเฉพาะการ์ดเป็น webp ลง docs/img/
+// ภาพหน้าจอจริงบนหน้าเว็บ (B65) + ด่านล้นจอทุกหน้า — เปิด play.html แล้วกดจนถึงฉาก ถ่ายเฉพาะการ์ดเป็น webp ลง docs/img/
+// ภาพ otherworld-role/event ถ่ายจากเกมสั้นที่ลบไปแล้ว ไม่ได้ถ่ายใหม่ที่นี่ — ยังไม่มีทางกดใน play.html ที่ไปถึงต่างโลกแบบตายตัว
 // เวลาและ Math.random ในหน้าถูกตรึง ⇒ seed ชีวิตกับทางที่กดเหมือนเดิมทุกรอบ ภาพจึงเปลี่ยนเฉพาะเมื่อเกมเปลี่ยน
 // ต้องมี playwright-core + Chromium ในเครื่อง (ไม่อยู่ใน dependencies ของเกม):
 //   npm i -g playwright-core && npx playwright install chromium   หรือ ตั้ง PW_CORE=<โฟลเดอร์ playwright-core> PW_EXE=<chrome.exe>
@@ -100,21 +101,10 @@ if (!checkOnly) {
   await shot(page, 'article.card', 'thai-afterlife');
   if (errors.length) { console.log(`play.html console error ${errors.length}: ${errors.slice(0, 3).join(' | ')} → ตก`); fail++; }
   await page.close();
-
-  // ต่างโลก (เกมสั้น): เลือกบทบาท → การ์ดเหตุการณ์
-  const iso = await open('isekai.html', 390);
-  const roles = 'เกิดเป็นสไลม์|สโลว์ไลฟ์ชายป่า';
-  if (!(await playUntil(iso.page, roles, { max: 60 }))) throw new Error('isekai: ไม่เจอการ์ดเลือกบทบาท');
-  await shot(iso.page, 'main', 'otherworld-role');
-  const event = () => !/เกิดเป็นสไลม์|สโลว์ไลฟ์ชายป่า|ใช้ให้คุ้ม/.test(document.body.innerText) && document.querySelectorAll('main button:not([disabled])').length >= 2;
-  if (!(await playUntil(iso.page, event, { max: 60 }))) throw new Error('isekai: ไม่เจอการ์ดเหตุการณ์');
-  await shot(iso.page, 'main', 'otherworld-event');
-  if (iso.errors.length) { console.log(`isekai.html console error ${iso.errors.length} → ตก`); fail++; }
-  await iso.page.close();
 }
 
 // ทุกหน้าเว็บ 390/1280: ล้นแนวนอน 0 · console error 0
-for (const p of ['index', 'about', 'overview', 'otherworld', 'catalog', 'cards', 'whatsnew', 'spec', 'guide']) {
+for (const p of ['index', 'about', 'gdd', 'otherworld', 'catalog', 'cards', 'whatsnew', 'guide']) {
   for (const w of [390, 1280]) {
     const { page, errors } = await open(`${p}.html`, w);
     await page.waitForLoadState('load');

@@ -1,4 +1,4 @@
-// หน้าสเปกและรีเสิร์ช (B115): แปลง docs/spec/*.md เป็นหน้าเดียวตอน build — ไม่พาผู้อ่านออกไป GitHub
+// ภาคผนวกสเปกและรีเสิร์ชของ GDD (B115 เดิมเป็นหน้า spec.html): แปลง docs/spec/*.md ตอน build ฉีดลง docs/gdd.html — ไม่พาผู้อ่านออกไป GitHub
 // ไม่มี dependency markdown: รองรับเฉพาะไวยากรณ์ที่ไฟล์ใน docs/spec ใช้จริง (หัวข้อ · รายการซ้อน · ตาราง · โค้ดบล็อก · ตัวหนา · โค้ด · ลิงก์)
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { esc } from './catalog.mjs';
@@ -175,10 +175,24 @@ export function specHtml(content, dir = SPEC_DIR) {
       return `<li><a href="#${d.id}">${esc(d.title)}</a>${sub ? `<div class="sub">${sub}</div>` : ''}</li>`;
     });
     const exLi = ex.map((x) => `<li><a href="spec/${esc(x.f)}">${esc(x.title)}</a> <small>ตารางเต็ม หน้าแยก</small></li>`);
-    return `<section><h2>${esc(name)}</h2><ol>${[...li, ...exLi].join('')}</ol></section>`;
+    return `<div><h3>${esc(name)}</h3><ol>${[...li, ...exLi].join('')}</ol></div>`;
   }).join('');
+  // เอกสารรวมกันยาวหลายเท่าของตัว GDD — พับรายเอกสาร ลิงก์จากสารบัญเปิดให้เอง (SPEC_OPEN)
   const body = docs
-    .map((d) => `<article class="doc" id="${d.id}"><h2>${esc(d.title)}</h2><p class="src">ไฟล์ต้นฉบับ docs/spec/${esc(d.file)} · <a href="#toc">กลับสารบัญ</a></p>\n${d.html}\n</article>`)
+    .map((d) => `<details class="doc" id="${d.id}"><summary>${esc(d.title)}</summary><p class="src">ไฟล์ต้นฉบับ docs/spec/${esc(d.file)} · <a href="#spec-toc">กลับสารบัญภาคผนวก</a></p>\n${d.html}\n</details>`)
     .join('\n');
-  return `<nav class="toc" id="toc" aria-label="สารบัญ">${toc}</nav>\n${body}`;
+  return `<nav class="spec-toc" id="spec-toc" aria-label="สารบัญภาคผนวก">${toc}</nav>\n${body}\n${SPEC_OPEN}`;
+}
+
+// ลิงก์ไปหัวข้อที่อยู่ในเอกสารที่พับไว้ ต้องกางเอกสารนั้นก่อน ไม่งั้นเลื่อนไปหาที่ซ่อนอยู่
+const SPEC_OPEN = `<script>(() => { const open = () => { const t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); const d = t && t.closest('details'); if (d && !d.open) { d.open = true; t.scrollIntoView(); } }; addEventListener('hashchange', open); open(); })();</script>`;
+
+export const SPEC_START = '<!--SPEC:START-->';
+export const SPEC_END = '<!--SPEC:END-->';
+// แทนที่ทุกอย่างระหว่าง marker — ส่วนนอก marker เป็นของเขียนมือ build ห้ามแตะ
+export function injectSpec(html, dir = SPEC_DIR) {
+  const a = html.indexOf(SPEC_START);
+  const b = html.indexOf(SPEC_END);
+  if (a < 0 || b < a) throw new Error(`docs/gdd.html: ไม่พบ ${SPEC_START} … ${SPEC_END}`);
+  return `${html.slice(0, a + SPEC_START.length)}\n${specHtml(null, dir)}\n${html.slice(b)}`;
 }
