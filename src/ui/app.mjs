@@ -2210,7 +2210,7 @@ function fingerprint(card) {
 // storage พังได้ (โหมดส่วนตัว · เต็ม · ปิด) — เกมยังเล่นได้ แค่ไม่จำ · ป้ายหัวเว็บบอกผู้เล่นว่าจำอยู่หรือไม่ (B77)
 // v = เวอร์ชันที่เขียน — ไว้ดูตอนไล่เซฟที่เล่นซ้ำไม่ตรง
 // สถานะหน้าจอที่การ์ดถัดไปอ่านต่อ (อายุใบก่อน · บันทึกชีวิต · สมุดชีวิต) — เดิมได้จากการเล่นซ้ำ ตอนนี้เก็บไปกับภาพถ่าย
-const uiState = () => ({ save, prevAge, curAge, lifeMark, noteAsk, bookCards, eraSeen, bookIntro, bookSeq });
+const uiState = () => ({ save, prevAge, curAge, lifeMark, noteAsk, bookCards, eraSeen, picSeen, bookIntro, bookSeq });
 function saveWrite(card) {
   try {
     localStorage.setItem(SNAP_KEY, snapHide(JSON.stringify({ v: APP_VERSION, snap: snapshot({ st, af, card, ui: uiState() }, CONTENT) })));
@@ -2252,6 +2252,8 @@ function snapRead() {
     const root = restore(JSON.parse(snapShow(raw)).snap, CONTENT);
     ({ st, af } = root);
     ({ save, prevAge, curAge, lifeMark, noteAsk, bookCards, eraSeen, bookIntro, bookSeq } = root.ui);
+    // ภาพถ่ายก่อนมีสมุดภาพ (B130) ไม่มีช่องนี้ — ภาพของการ์ดก่อนอัปเดตจึงไม่ถูกนับ
+    picSeen = root.ui.picSeen ?? [];
     notesLoad(save.seed);
     let card = root.card;
     if (!af && repairLife(st, card)) card = track(nextCard(st));
