@@ -881,9 +881,6 @@ function shareFacts(card) {
     job: `${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`,
     pattern: { name: pattern.name, hint: pattern.hint ?? '' },
     title: titles[0] ? { name: titles[0].name, tier: titles[0].tier } : null,
-    // กราฟบนภาพใช้แค่ค่าสถานะรายปี (ค่าที่จอเห็นอยู่แล้ว) ไล่ช่องเอง ไม่ส่งก้อน card.life ทั้งก้อน
-    stats: (card.life?.stats ?? []).map((p) => Object.fromEntries([['age', p.age], ...STAT_KEYS.map((k) => [k, p[k]])])),
-    marks: lifeMarks(card.age).map((m) => m.age),
     note: ((n) => n && { age: n.a, text: n.t })(notePick(st.gen)),
     avatar: avatarParts(card.age),
   };
@@ -940,10 +937,8 @@ function copyButton(text) {
 
 // URL คงที่ ไม่ใช้ location.href — เปิดจากไฟล์ในเครื่องแล้ว path ในเครื่องจะติดไปกับภาพ
 const SHARE_URL = 'dmo-hub.github.io/next-life';
-// 9:16 (สตอรี่) — 4:5 เดิมไม่มีที่ให้กราฟ
+// 9:16 (สตอรี่)
 const SHARE_W = 1080, SHARE_H = 1920;
-// สีเส้นชุดเดียวกับ .b .ln0–4 ใน template — canvas อ่าน class ไม่ได้
-const SHARE_LINES = ['#E07A5F', '#D9B45A', '#8FB3E0', '#7FC4B8', '#EFE3C2'];
 const SHARE_FONTS = ['700 110px Srisakdi', '400 40px Sarabun', '600 30px Sarabun'];
 const FONT_WAIT_MS = 3000;
 
@@ -1035,7 +1030,7 @@ async function shareBlob(facts) {
   // ชื่อยาวแตกสองบรรทัดตรงช่องว่าง — ให้ย่อบรรทัดเดียวจะเล็กจนอ่านยากบนภาพแนวตั้ง
   for (const part of GAME_NAME.split(' ')) text(part, '700 84px Srisakdi, serif', c('gold'), 96, 0, 1);
   text('NEXT LIFE', '600 28px Sarabun, sans-serif', c('sand'), 44, 0, 1);
-  // รูปวัยสุดท้ายนั่งกลางเส้นคั่นแรก (B56) — ไม่กินที่เพิ่ม ข้อความข้างล่างจึงไม่ไหลเข้าหากราฟ
+  // รูปวัยสุดท้ายนั่งกลางเส้นคั่นแรก (B56) — ไม่กินที่เพิ่ม
   rule(44);
   ctx.fillStyle = c('lacquer');
   ctx.fillRect(cx - 54, y - 44 - 6, 108, 12);
@@ -1054,9 +1049,7 @@ async function shareBlob(facts) {
     text(facts.title.name, '700 68px Srisakdi, serif', c('gold2'), 84, 0, 1);
     text(facts.title.tier, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 1);
   }
-  if (facts.note) shareNote(ctx, c, facts.note, cx, maxW, y, SHARE_H - SHARE_CHART_TOP);
-  // กราฟอยู่ล่างสุด ยึดจากขอบล่าง — ข้อความข้างบนยาวแค่ไหนก็ไม่ทับกัน (ข้อความถูกจำกัดบรรทัดไว้แล้ว)
-  if (facts.stats.length >= 2) shareChart(ctx, c, facts, 120, SHARE_H - SHARE_CHART_TOP, SHARE_W - 240, 240);
+  if (facts.note) shareNote(ctx, c, facts.note, cx, maxW, y, SHARE_H - NOTE_BOTTOM);
   ctx.font = '400 30px Sarabun, sans-serif';
   ctx.fillStyle = c('sand');
   ctx.fillText(SHARE_URL, cx, SHARE_H - 72);
@@ -1064,14 +1057,13 @@ async function shareBlob(facts) {
   return new Promise((ok, fail) => cv.toBlob((b) => (b ? ok(b) : fail(new Error('canvas toBlob ว่าง'))), 'image/png'));
 }
 
-const SHARE_CHART_TOP = 440;
-// หัวกราฟวาดเหนือกรอบกราฟ 56px — บันทึกต้องจบก่อนหัวนั้นพอให้เว้นช่อง
-const NOTE_CLEAR = 100;
-// บันทึกชีวิตบนภาพ (B39): ข้อความผู้เล่นยาวไม่แน่นอน แต่ที่ว่างเหนือกราฟขึ้นกับข้อความข้างบน
-// จึงนับบรรทัดที่ลงได้จริง เกินตัดท้ายด้วย … · ลงไม่ได้สักบรรทัดก็ไม่วาด (ภาพไม่ทับกราฟ)
-function shareNote(ctx, c, note, cx, maxW, y, chartY) {
+// บันทึกต้องจบเหนือบรรทัด URL ท้ายภาพ
+const NOTE_BOTTOM = 140;
+// บันทึกชีวิตบนภาพ (B39): ข้อความผู้เล่นยาวไม่แน่นอน แต่ที่ว่างขึ้นกับข้อความข้างบน
+// จึงนับบรรทัดที่ลงได้จริง เกินตัดท้ายด้วย … · ลงไม่ได้สักบรรทัดก็ไม่วาด
+function shareNote(ctx, c, note, cx, maxW, y, bottom) {
   const LABEL = 44, LINE = 50;
-  const max = Math.min(3, Math.floor((chartY - NOTE_CLEAR - (y + 36 + LABEL)) / LINE));
+  const max = Math.min(3, Math.floor((bottom - (y + 36 + LABEL)) / LINE));
   if (max < 1) return;
   ctx.font = '400 34px Sarabun, sans-serif';
   let lines = wrapThai(ctx, `“${note.text}”`, maxW);
@@ -1088,84 +1080,6 @@ function shareNote(ctx, c, note, cx, maxW, y, chartY) {
   ctx.font = '400 34px Sarabun, sans-serif';
   ctx.fillStyle = c('cream');
   for (const l of lines) ctx.fillText(l, cx, (y += LINE));
-}
-
-// กราฟทั้งชีวิตบนภาพ (B38) — แบบเดียวกับ lifeChart บนจอ: แถบช่วงวัย · 5 เส้นสี+ลายเส้น · จุดเรื่องเด่น · จุดตาย · ไม่มีตัวเลขค่าสถานะ
-function shareChart(ctx, c, facts, x0, y0, w, h) {
-  const end = Math.max(facts.age, 1);
-  const x = (a) => x0 + (a / end) * w;
-  const y = (v) => y0 + ((100 - v) / 100) * h;
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.font = '600 28px Sarabun, sans-serif';
-  ctx.fillStyle = c('gold');
-  ctx.fillText(`ทั้งชีวิต · อายุ 0–${facts.age}`, x0 + w / 2, y0 - 56);
-  ctx.font = '400 22px Sarabun, sans-serif';
-  STAGES.forEach((s, i) => {
-    const a = s.from, b = Math.min(STAGES[i + 1]?.from ?? Infinity, facts.age);
-    if (b <= a) return;
-    if (i % 2 === 0) {
-      ctx.fillStyle = 'rgba(90, 70, 48, 0.35)';
-      ctx.fillRect(x(a), y0, x(b) - x(a), h);
-    }
-    if (x(b) - x(a) >= 90) {
-      ctx.fillStyle = c('sand');
-      ctx.fillText(s.name, (x(a) + x(b)) / 2, y0 - 12);
-    }
-  });
-  ctx.strokeStyle = c('bronze2');
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 6]);
-  for (const v of [0, 50, 100]) {
-    ctx.beginPath();
-    ctx.moveTo(x0, y(v));
-    ctx.lineTo(x0 + w, y(v));
-    ctx.stroke();
-  }
-  ctx.lineWidth = 4;
-  ctx.lineJoin = 'round';
-  STAT_KEYS.forEach((k, i) => {
-    ctx.strokeStyle = SHARE_LINES[i];
-    ctx.setLineDash(LINE_DASH[i] ? LINE_DASH[i].split(' ').map((n) => Number(n) * 2.5) : []);
-    ctx.beginPath();
-    facts.stats.forEach((p, j) => (j ? ctx.lineTo(x(p.age), y(p[k])) : ctx.moveTo(x(p.age), y(p[k]))));
-    ctx.stroke();
-  });
-  ctx.setLineDash([]);
-  ctx.fillStyle = c('gold2');
-  for (const a of facts.marks) {
-    ctx.beginPath();
-    ctx.arc(x(a), y0 + h - 12, 8, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.fillStyle = '#E07A5F';
-  ctx.beginPath();
-  ctx.arc(x(facts.age), y0 + h - 12, 11, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = c('sand');
-  for (const [a, al] of [[0, 'left'], [facts.age, 'right']]) {
-    ctx.textAlign = al;
-    ctx.fillText(`อายุ ${a}`, x(a), y0 + h + 34);
-  }
-  // คำอธิบายเส้นแถวเดียว จัดกลาง — ความกว้างวัดจริง ฟอนต์สำรองกว้างต่างกัน
-  ctx.font = '400 24px Sarabun, sans-serif';
-  const items = STAT_KEYS.map((k, i) => ({ i, label: STAT_LABELS[k], w: 44 + ctx.measureText(STAT_LABELS[k]).width + 28 }));
-  let lx = x0 + w / 2 - items.reduce((s, it) => s + it.w, 0) / 2;
-  const ly = y0 + h + 76;
-  ctx.textAlign = 'left';
-  ctx.lineWidth = 4;
-  for (const it of items) {
-    ctx.strokeStyle = SHARE_LINES[it.i];
-    ctx.setLineDash(LINE_DASH[it.i] ? LINE_DASH[it.i].split(' ').map((n) => Number(n) * 1.5) : []);
-    ctx.beginPath();
-    ctx.moveTo(lx, ly - 8);
-    ctx.lineTo(lx + 36, ly - 8);
-    ctx.stroke();
-    ctx.fillStyle = c('cream');
-    ctx.fillText(it.label, lx + 44, ly);
-    lx += it.w;
-  }
-  ctx.restore();
 }
 
 function downloadBlob(blob, name) {
