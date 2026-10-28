@@ -171,21 +171,6 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .memo { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px; font-size:13px; }
 .memo li { display:flex; align-items:center; justify-content:space-between; gap:8px; overflow-wrap:anywhere; }
 .memo li .more { flex:none; }
-/* บันทึกชีวิต (B39) — ช่องพิมพ์ 16px กัน iOS ซูมหน้าตอนแตะ · ปุ่มบันทึก/ข้ามกว้างเท่ากัน */
-.note-sheet { display:flex; flex-direction:column; gap:8px; padding:12px; }
-.note-sheet .h { font-size:13px; font-weight:600; }
-.note-sheet .q { font-size:15px; overflow-wrap:anywhere; }
-.note-sheet input { font:inherit; font-size:16px; width:100%; min-width:0; min-height:44px; padding:8px 12px; border-radius:0; }
-.note-sheet .row { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
-.note-sheet .choice { justify-content:center; }
-.life-note { margin:0; padding:8px 12px; display:flex; flex-direction:column; gap:2px; overflow-wrap:anywhere; }
-.life-note small { font-size:12px; }
-.life-note p { font-family:Pridi,serif; }
-.a .note-sheet { border:1px solid var(--rule); background:#FBF7EE; }
-.a .note-sheet .h { color:var(--red); } .a .note-sheet .q { color:var(--ink2); }
-.a .note-sheet input { border:1px solid var(--ink2); background:#FFFDF7; color:var(--ink); }
-.a .note-sheet input:focus-visible { outline:2px solid var(--ink); outline-offset:1px; }
-.a .life-note { border-left:3px solid var(--red); background:#FBF7EE; } .a .life-note small { color:var(--muted); }
 /* สมุดชีวิต (B48) — หน้าก่อน/ข้ามกว้างเท่ากันใต้ปุ่มพลิกหน้า · ตัวเลือกที่กดเป็นตัวหนังสือเอียงแยกจากเนื้อเรื่อง */
 .lifebook .row { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
 .lifebook .row .choice { justify-content:center; }
