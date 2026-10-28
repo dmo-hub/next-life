@@ -326,6 +326,16 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
 /* ทางที่ทำอยู่: กดไม่ได้แต่ต้องเด่น ไม่ใช่จางแบบตัวเลือกล็อก */
 .ifocus button.on { border-color:#F2C94C; background:#1E2350; cursor:default; }
 .ifocus button.on small { color:#F2C94C; }
+/* จดหมายเหตุบนการ์ดจบ — ป้ายอายุทอง เส้นซ้ายบอกชนิดบรรทัดแบบต้นแบบ · ช่วงวัยพับได้ ชีวิตยาวราวร้อยบรรทัดจึงไม่ดันปุ่มลงไปไกล */
+.ichron .istage { margin-top:6px; }
+.ichron .istage > summary { cursor:pointer; font-size:13px; color:#6FE3FF; }
+.ilog { list-style:none; margin:6px 0 0; padding:0; display:flex; flex-direction:column; gap:4px; font-size:13px; color:#D3D8F5; }
+.ilog li { border-left:2px solid #2A3478; padding-left:8px; overflow-wrap:anywhere; }
+.ilog li.event { border-left-color:#B48CFF; }
+.ilog li.lore { border-left-color:#F2C94C; color:#F2C94C; }
+.ilog b { margin-right:6px; color:#F2C94C; font-weight:600; }
+.ilog small { display:inline-block; margin-left:6px; padding:0 6px; border:1px solid currentColor; border-radius:999px; font-size:11px; }
+.ilog small.up { color:#5EE6A0; } .ilog small.down { color:#FF8A8A; }
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
 .a .choice:disabled, .b .choice:disabled, .i .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
 /* พาแนลการ์ด (B131): จอตั้งไม่มีพาแนล — ตัวห่อหายไปจากเลย์เอาต์ ลูกเรียงในการ์ดแบบเดิม */

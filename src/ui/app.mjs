@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
@@ -1886,6 +1886,49 @@ function isekaiMeter(label, v, cls) {
   m.append(row, bar);
   return m;
 }
+// จดหมายเหตุบนการ์ดจบ (B68b ชิ้น 3): แบ่งตามช่วงวัย เก่าอยู่บน ช่วงสุดท้ายเปิดค้าง (เจ้าของเคาะ)
+// บรรทัดรับได้ทั้งสตริง "อายุ N · …" ของ engine เดิม และ { age, stage, kind, text, deltas } ที่ขอเลน D ไว้ — มี deltas ถึงขึ้น chip
+const CHRON_AGE = /^อายุ (\d+)(?:–(\d+))? · (.*)$/;
+function chronEntry(x) {
+  if (typeof x !== 'string') return x;
+  const m = CHRON_AGE.exec(x);
+  // บรรทัดเหตุการณ์มีหัวเรื่องคั่น · ส่วนบรรทัดทุ่มเทเป็นประโยคเดียว · ไม่มีอายุ = บรรทัดระบบตอนเข้าโลก
+  if (!m) return { age: null, kind: 'lore', text: x };
+  return { age: Number(m[1]), kind: m[3].includes(' · ') ? 'event' : 'tick', text: m[3], to: m[2] ? Number(m[2]) : null };
+}
+function chronicleBox(lines, s) {
+  const role = Object.keys(ISEKAI_ROLES).find((id) => roleInfo(id).name === s?.world);
+  const pace = ISEKAI_ROLES[role]?.pace ?? 1;
+  const stageOf = (e) => (e.stage && ISEKAI_STAGES.find((g) => g.id === e.stage)) || ISEKAI_STAGES.findLast((g) => (e.age ?? 0) >= g.from * pace);
+  const label = { hp: 'HP', gold: 'ทอง', fame: 'ชื่อเสียง', goal: s?.goalName, ...ISEKAI_STAT };
+  const groups = [];
+  for (const e of lines.map(chronEntry)) {
+    const g = stageOf(e);
+    if (groups.at(-1)?.g !== g) groups.push({ g, rows: [] });
+    groups.at(-1).rows.push(e);
+  }
+  const d = el('details', 'tree ichron');
+  d.append(el('summary', null, `จดหมายเหตุทั้งชีวิต ${lines.length} บรรทัด`));
+  groups.forEach(({ g, rows }, i) => {
+    const aged = rows.filter((e) => e.age !== null);
+    const from = aged[0]?.age;
+    const to = aged.length ? Math.max(...aged.map((e) => e.to ?? e.age)) : null;
+    const sec = el('details', 'istage');
+    sec.open = i === groups.length - 1;
+    sec.append(el('summary', null, `${g.name}${from === undefined ? '' : ` · อายุ ${from === to ? from : `${from}–${to}`}`} · ${rows.length} บรรทัด`));
+    const ol = el('ol', 'ilog');
+    for (const e of rows) {
+      const li = el('li', e.kind);
+      if (e.age !== null) li.append(el('b', null, e.to ? `${e.age}–${e.to}` : String(e.age)));
+      li.append(el('span', null, e.text));
+      for (const [k, v] of Object.entries(e.deltas ?? {})) if (label[k]) li.append(el('small', v > 0 ? 'up' : 'down', `${label[k]} ${v > 0 ? '+' : ''}${v}`));
+      ol.append(li);
+    }
+    sec.append(ol);
+    d.append(sec);
+  });
+  return d;
+}
 function isekaiStatusBox(s) {
   const box = el('div', 'iwin');
   box.append(isekaiMeter('HP', s.hp, 'hp'), isekaiMeter(s.goalName, s.goal, 'goal'));
@@ -1997,13 +2040,7 @@ function renderIsekai(card) {
     d.append(el('summary', null, `เส้นทางที่เลือก ${card.log.length} เหตุการณ์`), list(card.log, 'picks'));
     body.append(d);
   }
-  if (card.chronicle?.length) {
-    const d = el('details', 'tree');
-    // จอขั้นต่ำ: บรรทัด object เรียงเป็นข้อความเดิม (chip ±ค่า แบ่งช่วงวัย = จอเลน C) · เซฟเก่าเป็นสตริงอยู่แล้ว
-    const line = (c) => (typeof c === 'string' ? c : c.kind === 'lore' ? c.text : `อายุ ${c.until ? `${c.age}–${c.until}` : c.age} · ${c.text}`);
-    d.append(el('summary', null, `จดหมายเหตุทั้งชีวิต ${card.chronicle.length} บรรทัด`), list(card.chronicle.map(line), 'picks'));
-    body.append(d);
-  }
+  if (card.chronicle?.length) body.append(chronicleBox(card.chronicle, s));
   // แผงทุ่มเทบนใบตา (B68b): กริดเปิดตลอดแบบต้นแบบ — เวลาเดินอยู่แล้วกดเปลี่ยนได้ทันทีโดยไม่ต้องกางแผง (เจ้าของเคาะ)
   // ปุ่มเดินผ่าน pick เซฟจึงเล่นซ้ำได้ · focusFx = ผลต่อปีของแต่ละทาง ไม่มีก็โชว์ชื่ออย่างเดียว
   let panel = null;
