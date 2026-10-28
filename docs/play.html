@@ -2825,6 +2825,8 @@ function retireSpend(st, year) {
 const totalDebt = (st) => st.debts.reduce((s, d) => s + d.balance, 0);
 // ทรัพย์สุทธิ = เงิน − หนี้รายก้อน (เงินติดลบนับเป็นหนี้อยู่แล้ว)
 const netWorth = (st) => st.money - totalDebt(st);
+// ค่าโลกจริงตอนข้ามไปต่างโลก (B100) — ปรโลกส่งตอนเกิดใหม่ข้ามโลก ทริปกลางชีวิตส่งตอนกดรับ (B136)
+const realAt = (st) => ({ stats: Object.fromEntries(STAT_KEYS.map((k) => [k, st[k]])), money: netWorth(st), unit: nationalIncome(st.content.era, st.seed, st.birthYear + st.age) * 12, age: st.age });
 
 // ฐานะระหว่างชีวิต (B95): รายได้เทียบเท่าต่อเดือนเทียบรายได้ครัวเรือนของประเทศปีนั้น ตัดด้วยเส้นแบ่ง 10 ระดับชุดเดียวกับฐานะตอนเกิด
 // รายได้เทียบเท่า = รายได้จากงาน × STANDING.household (คนเดียวเทียบรายได้ทั้งบ้าน) + ทรัพย์สุทธิ × STANDING.yield ต่อปี (ติดลบได้)
@@ -3353,6 +3355,8 @@ function choose(st, idx, loan) {
         lore: isekaiWorldLore([...(st.lineage ?? []), { trips: st.trips }]),
         legends: isekaiWorldLegends([...(st.lineage ?? []), { trips: st.trips }]),
         trip: { ...trip, age: st.age, wit: st.knowledge / TRIP.wit },
+        // ค่าจริงของชีวิตนี้ตอนข้าม (B136) — ผลในต่างโลกสะท้อนกลับชุดนี้ แล้ว tripBack เขียนลง st
+        real: realAt(st),
       });
       return;
     }
@@ -3493,11 +3497,20 @@ function pickRite(st, ev) {
   return want.find(ok) ?? 'temple';
 }
 // ทริปจบ (การ์ดจบออกไปแล้ว): ตายในต่างโลก = ชีวิตไทยจบแบบหายตัว · กลับบ้าน = เวลาไทยเดินตามที่ทอยไว้แล้วเล่าการกลับ
+// ค่าจริงที่ต่างโลกสะท้อนกลับ เขียนลงชีวิตไทย (B136 · เจ้าของเคาะ): เงินมาทางนี้ทางเดียว (tripCarry ไม่มีเงิน)
+// ตายในต่างโลก = นับแค่เงิน (เข้ากองมรดก) · ค่าสถานะที่สะท้อนไปไม่มีผล เพราะชีวิตนี้จบแล้ว · ทริปในเซฟก่อน B136 ไม่มี real
+function tripSettle(st, isk) {
+  if (!isk.real) return;
+  st.money += isk.real.money - isk.trip.money0;
+  if (isk.home) for (const k of STAT_KEYS) st[k] = clamp(isk.real.stats[k]);
+}
+
 // ปีที่หายไปเดินด้วย stepYear ปกติ (เงิน คนในบ้าน ด่านเรียน) แต่ไม่ทอยตายและไม่จับกอง — ตัวไม่อยู่ เรื่องของปีนั้นจึงมาเป็นข่าวหลังกลับ
 function tripBack(st) {
   const isk = st.trip;
   st.trip = null;
   (st.trips ??= []).push(tripLineage(isk));
+  tripSettle(st, isk);
   if (!isk.home) {
     st.tripLost = true;
     st.dead = true;
@@ -3505,7 +3518,6 @@ function tripBack(st) {
   }
   const away = isk.age - isk.trip.from;
   const c = tripCarry(isk);
-  st.money += c.gold * st.price;
   st.network = clamp(st.network + c.network);
   st.knowledge = clamp(st.knowledge + c.knowledge);
   for (let i = 0; i < isk.trip.thai; i++) stepYear(st);
@@ -3782,7 +3794,8 @@ const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'เ�
 // น้ำหนัก = อายุบนโลกเดิมตอนข้าม ÷ age ไม่เกิน 1 · HP หักเฉพาะสุขภาพต่ำกว่า 50 ไม่เกิน hpCut (สุขภาพตอนข้าม = ตอนตาย ซึ่งต่ำแทบทุกคน · ผูก 1:1 ตายต่างโลก 45% · เจ้าของเคาะ) ขากลับ HP สะท้อนสุขภาพ 1:1 · ทอง: เงินสุทธิเท่ารายได้ครัวเรือนประเทศ 1 ปี = gold ทอง ไม่เกิน goldCap เท่าทองตั้งต้น
 // หลังข้าม ผลการ์ดต่างโลกสะท้อนกลับค่าจริงชุดที่พกมา (ต่างโลก 1 = จริง div) · ชนเพดานฝั่งไหน ส่วนเกินไม่สะท้อน
 const ISEKAI_LINK = { str: 'health', mag: 'knowledge', cha: 'relations', luk: 'happiness', fame: 'network' };
-const LINK = { div: 10, part: 5, age: 40, gold: 100, goldCap: 3, hpCut: 30 };
+// tick = ปีที่ทุ่มเท (B136 · เจ้าของเคาะ) สะท้อนกลับแค่ส่วนนี้ของอัตราผลการ์ด — ชาติละ ~80 ตา ไม่งั้นค่าจริงชนเพดานก่อนกลางชาติ
+const LINK = { div: 10, part: 5, age: 40, gold: 100, goldCap: 3, hpCut: 30, tick: 0.25 };
 // worlds = จำนวนการ์ดบทบาทที่เทพธิดายื่น (ชื่อเดิมจากตอนที่ยังเลือกโลก) · roleLean = กรรมเอียงโอกาสบทบาทได้แค่ไหน
 const ISEKAI = { stay: 4, chance: 0.2, skills: 3, worlds: 3, karmaStat: 3, karmaDc: 4, karmaSkill: 0.3, memory: 3, roleLean: 0.6 };
 // เวลาเดิน (B68b · เจ้าของเคาะ ตาละ 1 ปี วัยชราตาละ 5 ปี): ตัวเลขปีคูณ pace ของบทบาท (เอลฟ์แก่ช้า)
@@ -5147,8 +5160,8 @@ const ENTRY_EVENTS = {
 // ไปกลับกลางชีวิต (B68m): ร่างเดิมข้ามไปทั้งตัว ไม่เกิดใหม่ · stream แยกตอนกดรับ ⇒ ชีวิตที่ปฏิเสธเดินเท่าเดิม
 // years = ปีที่อยู่ต่างโลก · thai = น้ำหนักจำนวนปีไทยที่ผ่านไป (ช่องที่ i = i ปี · 0 = ไม่กี่เดือน) · back = โอกาสได้กลับของการ์ดหายตัว
 // roles = บทบาทที่เนื้อเรื่องเป็นคนถูกส่งข้ามไป · finale = ฉากสุดท้ายห่างจากวันมาถึงเท่ากับระยะเดิมของบทบาท
-// wit/gold/fame/know = ตัวหารแปลงค่าข้ามโลก (ความรู้ไทย→wit · ทอง→เงินต่อดัชนีราคา · ชื่อเสียง→เครือข่าย · ความรู้โลกเดิม→ความรู้)
-const TRIP = { salt: 0x7219b3, years: [3, 12], thai: [6, 3, 2, 1], back: 0.5, roles: ['hero', 'slowlife'], wit: 10, gold: 20, fame: 5, know: 15, cap: 10 };
+// wit/fame/know = ตัวหารแปลงค่าข้ามโลก (ความรู้ไทย→wit · ชื่อเสียง→เครือข่าย · ความรู้โลกเดิม→ความรู้) · ทองกลับมาเป็นเงินผ่านค่าจริง (LINK)
+const TRIP = { salt: 0x7219b3, years: [3, 12], thai: [6, 3, 2, 1], back: 0.5, roles: ['hero', 'slowlife'], wit: 10, fame: 5, know: 15, cap: 10 };
 
 // ไปต่างโลกได้ 2 แบบ (เจ้าของเคาะ): ตาย กับหายตัว — ป้ายอายุตอนจบทุกจุดแยกตามแบบ · ไปกลับแล้วตายในต่างโลก = หายตัว
 const lifeEndWord = (gone) => (gone ? 'หายตัวไปตอนอายุ' : 'ตายอายุ');
@@ -5181,11 +5194,10 @@ function tripRoll(seed, id, n = 0) {
 
 // ทางเข้ามีหลายแบบ (ประตู วงเวท เกม ความฝัน) — ทางกลับจึงไม่เล่าว่าเป็นอะไร
 const TRIP_HOME = 'แล้ววันหนึ่งทางกลับบ้านก็เปิดขึ้นตรงหน้า';
-// ของที่พกกลับบ้าน — ค่าดิบต่อหน่วยของชีวิตไทย (ผู้เรียกคูณดัชนีราคาเอง) · ความรู้โลกเดิมรวมทุกหมวด
+// ของที่พกกลับบ้านนอกค่าจริงที่สะท้อนกลับ — ความรู้โลกเดิมรวมทุกหมวด · เงินไม่อยู่ที่นี่ (B136 · เจ้าของเคาะ) มาจากค่าจริงทางเดียว ไม่นับซ้ำ
 function tripCarry(isk) {
   const know = Object.values(isk.know).reduce((s, v) => s + v, 0);
   return {
-    gold: Math.max(0, isk.st.gold) * TRIP.gold,
     network: Math.min(TRIP.cap, Math.max(0, isk.st.fame) / TRIP.fame),
     knowledge: Math.min(TRIP.cap, know / TRIP.know),
   };
@@ -5243,7 +5255,8 @@ function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, bless
     step: 'world', last: null, rbdUsed: false, dead: false, natural: false, ending: null, log: [], chron: [], cards: 0,
   };
   if (trip) {
-    isk.trip = { ...trip, from: trip.age, until: trip.age + trip.years };
+    // money0 = เงินจริงตอนข้าม ให้ขากลับคิดส่วนต่างที่เกิดในต่างโลกได้ (B136)
+    isk.trip = { ...trip, from: trip.age, until: trip.age + trip.years, ...(isk.real && { money0: isk.real.money }) };
     isekaiStart(isk, trip.role);
     isk.age = trip.age;
     isk.inner.wit += trip.wit ?? 0;
@@ -5339,8 +5352,9 @@ function linkStart(isk, gold0) {
 }
 
 // ส่วนต่างที่เกิดจริงฝั่งต่างโลก (หลังชนเพดานแล้ว) สะท้อนกลับค่าจริง · ค่าจริงชนเพดานก็ตัดส่วนเกิน
-function linkBack(isk, k, d) {
+function linkBack(isk, k, raw, w = 1) {
   const s = isk.real.stats;
+  const d = raw * w;
   if (k === 'hp') s.health = isekaiClamp(s.health + d, 0, 100);
   else if (k === 'gold') isk.real.money += (d * isk.real.unit) / LINK.gold;
   else if (ISEKAI_LINK[k]) s[ISEKAI_LINK[k]] = isekaiClamp(s[ISEKAI_LINK[k]] + d * LINK.div, 0, 100);
@@ -5437,6 +5451,7 @@ function isekaiYear(isk) {
   const T = ISEKAI_TIME;
   const p = isekaiPace(isk), oldAt = isekaiOldAge(isk);
   const units = isk.age >= oldAt ? T.oldStep : T.step;
+  const before = isk.real && { ...isk.st };
   if (isk.age < oldAt) isk.st.hp = isekaiClamp(isk.st.hp + T.regen * units, 0, 100);
   else {
     let d = 0;
@@ -5448,6 +5463,8 @@ function isekaiYear(isk) {
   isk.inner.joy = isekaiClamp(isk.inner.joy + (50 - isk.inner.joy) * Math.min(1, 0.1 * units), 0, 100);
   isk.age += units * p;
   if (isk.age >= oldAt + T.cap * p) isk.st.hp = 0;
+  // ปีที่ทุ่มเท (รวม HP ฟื้น/เสื่อม) สะท้อนกลับค่าจริงทางเดียวกับผลการ์ด แต่เบากว่า (B136) — ส่วนต่างหลังชนเพดานแล้วเท่านั้น
+  if (before) for (const k of Object.keys(isk.st)) if (isk.st[k] !== before[k]) linkBack(isk, k, isk.st[k] - before[k], LINK.tick);
   if (isk.trip && isk.age >= isk.trip.until && isk.st.hp > 0) isk.home = true;
   return units * p;
 }
@@ -6003,7 +6020,6 @@ function closeIsekai(af) {
 }
 
 // ส่งดวงวิญญาณไปต่างโลก: กรรมที่ติดตัวไปคิดแบบเดียวกับการเกิดใหม่ (หักฝั่งที่ชี้ปลายทาง แล้วสุ่มสัดส่วน) — ไปต่างโลกไม่ใช่ทางลบบาป
-const realAt = (st) => ({ stats: Object.fromEntries(STAT_KEYS.map((k) => [k, st[k]])), money: netWorth(st), unit: nationalIncome(st.content.era, st.seed, st.birthYear + st.age) * 12, age: st.age });
 function sendToIsekai(af) {
   const r = CARRY.min + af.rng.next() * (CARRY.max - CARRY.min);
   const prev = af.from;
@@ -7219,7 +7235,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.96';
+const APP_VERSION = 'v0.2.97';
 const APP_BUILD = '2026-10-28';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
