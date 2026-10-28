@@ -40,6 +40,8 @@ export const MERIT_CATS = [
   { id: 'kill_for_gain', th: 'ฆ่าเพื่อแต้ม', kind: 'sin' },
   { id: 'cheat_exploit', th: 'ใช้สกิลโกงเอาเปรียบ', kind: 'sin' },
   { id: 'keep_goddess_vow', th: 'รักษาสัญญาเทพธิดา', kind: 'merit' },
+  // ความรู้อันตรายจากโลกเดิม (B68h) — ดินปืน ยาพิษ อาวุธ
+  { id: 'forbidden_knowledge', th: 'ความรู้อันตราย', kind: 'sin' },
   { id: 'neutral', th: 'กลาง', kind: 'neutral' },
 ];
 const CAT_BY_NAME = new Map(MERIT_CATS.flatMap((c) => [[c.id, c], [c.th, c]]));

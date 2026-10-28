@@ -2,7 +2,7 @@
 // ด่าน: seed เดิมผลเดิม (รวดเดียว + เซฟ/โหลดกลางทาง) · จบได้ทุกชีวิตภายในเพดานการ์ด · ตอนจบ/บทบาท/สกิล/เหตุการณ์มีบอทถึง
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
-import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, isekaiLineage, isekaiWorldLore, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 
@@ -20,7 +20,8 @@ const CARD_CAP = 240;
 
 // กติกาเดียวกับ harness/merit.mjs: key ของบัญชีห้ามออกไปกับการ์ด · เพิ่มฝั่งข้อความ = คำบุญ/บาปติดตัวเลข
 // สุข/รู้ของต่างโลก (joy · wit · inner) เป็นค่าซ่อน (เจ้าของเคาะ) — ห้ามออกไปกับการ์ดเหมือนบัญชี
-const LEAK = /ledger|merit|sin|karma|byCat|broken|omenTone|omenAge|^joy$|^wit$|^inner$/i;
+// ความรู้โลกเดิม (B68h · know · knowLast) เป็นค่าซ่อนเหมือนกัน
+const LEAK = /ledger|merit|sin|karma|byCat|broken|omenTone|omenAge|^joy$|^wit$|^inner$|^know$|^knowLast$/i;
 const LEAK_TEXT = /(บุญ|บาป)\s*[+\-−]?\s*\d/;
 function* keys(v) {
   if (Array.isArray(v)) for (const x of v) yield* keys(x);
@@ -81,8 +82,12 @@ const check = (label, bad, detail = '') => {
   if (bad) fail.push(label);
 };
 
-const seen = { end: new Set(), role: new Set(), skill: new Set(), event: new Set(), choice: new Set() };
+const seen = { end: new Set(), role: new Set(), skill: new Set(), event: new Set(), choice: new Set(), shortcut: new Set() };
 let mismatch = 0, resumeBad = 0, stuck = 0, leaks = 0, rangeBad = 0, cardsSeen = 0;
+const EVENT = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
+const ADULT_NAMES = ISEKAI_STAGES.filter((s) => ['adult', 'middle', 'old'].includes(s.id)).map((s) => s.name);
+const SHORTCUT = Object.fromEntries(Object.entries(ISEKAI_KNOW).map(([k, v]) => [v.focus.name, k]));
+let knowAdultBad = 0, loreSys = 0, loreBad = 0, loreGot = 0;
 // เวลาเดินเอง (B68b): ใบตาไม่มีตัวเลือก แต่บอกสิ่งที่ทุ่มเทได้ · การ์ดบทบาทมีคนธรรมดาเสมอ · สิ้นอายุเฉพาะหลังวัยชรา
 let tickBad = 0, roleBad = 0, oldBad = 0;
 const lens = [], clicks = [], humanAges = [];
@@ -112,7 +117,15 @@ Object.values(BOTS).forEach((bot, b) => {
         seen.choice.add(`${card.id}#${card.pick}`);
       }
       if (card.step === 'tick' && (card.choices.length || card.focusChoices.length < 2 || !(card.focus >= 0))) tickBad++;
+      // ความรู้โลกเดิม (B68h): เรื่องอันตรายเฉพาะวัยผู้ใหญ่ขึ้นไป · โลกจำเฉพาะตอนชื่อเสียงถึง · ทางลัดที่เปิดได้
+      if (card.step === 'event' && EVENT[card.id].adult && !ADULT_NAMES.includes(card.status.stage)) knowAdultBad++;
+      if (card.step === 'result' && card.sys?.startsWith('โลกนี้จะจำ')) {
+        loreSys++;
+        if (card.status.fame < ISEKAI_KNOW_T.loreFame) loreBad++;
+      }
+      for (const name of card.step === 'focus' ? card.choices : card.step === 'tick' ? card.focusChoices : []) if (SHORTCUT[name]) seen.shortcut.add(SHORTCUT[name]);
     }
+    loreGot += a.isk.lore.length;
     if (!a.cards[0].choices.includes(commonerName)) roleBad++;
     const { isk } = a;
     const pace = ISEKAI_ROLES[isk.role].pace ?? 1;
@@ -139,6 +152,9 @@ check('สิ้นอายุเฉพาะหลังวัยชรา', o
 // กดน้อยกว่าชาติไทยชัดเจน (เจ้าของเคาะ) · อายุขัยแบบมนุษย์ ไม่สั้นจนวัยชราหาย ไม่ยาวจนวัยชราน่าเบื่อ
 check('กดต่อชาติ p50 ไม่เกิน 40', p50(clicks) > 40 ? 1 : 0, `p50 ${p50(clicks)}`);
 check('สิ้นอายุ (มนุษย์) p50 อยู่ในช่วง 65–95', p50(humanAges) < 65 || p50(humanAges) > 95 ? 1 : 0, `p50 ${p50(humanAges)}`);
+check('ความรู้อันตรายเฉพาะวัยผู้ใหญ่ขึ้นไป', knowAdultBad);
+// ทุกครั้งที่บอกว่าโลกจะจำ ต้องลงรายการจริง และชื่อเสียงถึงเกณฑ์ (สำเร็จ + คนยอมรับ)
+check('โลกจำเฉพาะที่ชื่อเสียงถึง', loreBad + (loreSys !== loreGot ? 1 : 0), `${loreGot} รายการ`);
 
 // ทางแยกที่ต้องมีบอทถึง: ตอนจบทุกแบบของทุกบทบาท (+ ตายกลางทาง) · ทุกบทบาท · ทุกสกิล · ทุกเหตุการณ์ · ทุกตัวเลือก
 const missing = (want, got) => want.filter((x) => !got.has(x));
@@ -149,6 +165,7 @@ const reach = {
   สกิล: missing(Object.keys(ISEKAI_SKILLS), seen.skill),
   เหตุการณ์: missing(ISEKAI_EVENTS.map((e) => e.id), seen.event),
   ตัวเลือก: missing(ISEKAI_EVENTS.flatMap((e) => e.choices.map((_, j) => `${e.id}#${j}`)), seen.choice),
+  ทางลัดความรู้: missing(Object.keys(ISEKAI_KNOW), seen.shortcut),
 };
 for (const [k, m] of Object.entries(reach)) check(`${k}มีบอทถึง`, m.length, m.length ? m.slice(0, 8).join(' ') : '');
 
@@ -156,15 +173,20 @@ for (const [k, m] of Object.entries(reach)) check(`${k}มีบอทถึง`
 // ต้องได้ชาติต่างโลกติดกัน = stay + 1 พอดี · ปรโลกตัดสินทุกชาติ · ผังตระกูลต่อแถวต่างโลกครบ · ขากลับเกิดเป็นคน
 const content = loadContent();
 const PATH_ISEKAI = 2, PATH_REBORN = 1;
-let stayBad = 0, backBad = 0;
+let stayBad = 0, backBad = 0, loreCarryBad = 0;
 const stayPick = (card, rng, af) => (af.pending?.path ? (card.locked?.[PATH_ISEKAI] ? PATH_REBORN : PATH_ISEKAI) : BOTS.สุ่ม(card, rng));
 const backPick = (card, rng, af) => (af.pending?.path ? (af.from ? PATH_REBORN : PATH_ISEKAI) : BOTS.สุ่ม(card, rng));
 for (let i = 0; i < lives; i++) {
   for (const [pick, want] of [[stayPick, ISEKAI.stay + 1], [backPick, 1]]) {
     const { state } = playLife(mixSeed(seed, 9000 + i), content, BOTS.สุ่ม);
     const af = startAfterlife(state);
-    let verdicts = 0, locked = 0;
+    let verdicts = 0, locked = 0, lastIsk = null;
     for (let guard = 0; guard < 1200; guard++) {
+      // ชาติต่างโลกที่เพิ่งเริ่มต้องรู้ของที่โลกจำจากทุกชาติก่อนหน้า (ผังตระกูล + ชาติต่างโลกที่จบในช่วงนี้)
+      if (af.isekai && af.isekai !== lastIsk) {
+        lastIsk = af.isekai;
+        if (JSON.stringify(af.isekai.loreAll) !== JSON.stringify(isekaiWorldLore([...(state.lineage ?? []), ...af.isekaiLives]))) loreCarryBad++;
+      }
       const card = nextAfterCard(af);
       if (card.kind === 'verdict') verdicts++;
       if (card.kind === 'path' && af.from && card.locked?.[PATH_ISEKAI]) locked++;
@@ -181,6 +203,21 @@ for (let i = 0; i < lives; i++) {
 }
 check(`อยู่ต่อติดเพดาน ${ISEKAI.stay + 1} ชาติ แล้วปรโลกตัดสินทุกชาติ`, stayBad, `${lives} ชีวิต × 2 แบบ`);
 check('กลับโลกเดิมลงผังตระกูลครบ', backBad);
+check('ชาติต่างโลกถัดไปได้ของที่โลกจำจากผังตระกูล', loreCarryBad);
+
+// โลกจำ (B68h): ทุกโลกจำครบทุกอย่างแล้ว ⇒ เรื่องคิดค้นของที่มีอยู่แล้วไม่มาอีก · ใบทุ่มเทแรกบอกว่าโลกยังจำอะไร
+// แถวผังตระกูลพกรายการไปกลับได้ · ชาติที่ไม่มีของให้จำ แถวผังรูปเดิม
+const ALL_LORE = Object.fromEntries([...new Set(Object.keys(ISEKAI_ROLES).map((r) => roleInfo(r).world ?? r))].map((w) => [w, Object.keys(ISEKAI_LORE)]));
+let loreSkipBad = 0, loreLineBad = 0;
+for (let i = 0; i < lives * 5; i++) {
+  const a = play({ ...setup(i), lore: ALL_LORE }, BOTS.สุ่ม, makeRng(mixSeed(seed ^ 0x10e, i)));
+  if (a.cards.some((c) => c.step === 'event' && EVENT[c.id].loreOf)) loreSkipBad++;
+  if (!a.cards.find((c) => c.step === 'focus')?.text.includes('ที่นี่ยังมี')) loreLineBad++;
+}
+const row = (lore) => isekaiLineage({ name: 'ก', role: 'commoner', world: 'commoner', ending: { title: 'จบ' }, lore }, 2);
+const trip = isekaiWorldLore([row(['soap']), row([]), row(['soap', 'ledger'])]);
+const tripBad = (JSON.stringify(trip) !== JSON.stringify({ commoner: ['soap', 'ledger'] }) ? 1 : 0) + ('lore' in row([]) ? 1 : 0);
+check('โลกที่จำแล้วไม่ต้องคิดค้นซ้ำ + บอกในใบทุ่มเทแรก', loreSkipBad + loreLineBad + tripBad, `${lives * 5} ชาติ`);
 
 // ทางเข้าจากเหตุการณ์ในชีวิต (B68d): บอทสายต่างโลกกดรับการ์ดชวนใบแรก
 // อยู่ถึงอายุนัดแรก = เจอการ์ดชวน · กดรับแล้วมีงานศพ · ปรโลกไม่มีการ์ดทางเกิด · เข้าต่างโลกแบบ fated · บอทสุ่มไม่เคยกดรับ
@@ -214,6 +251,7 @@ check('บอทที่ไม่ประกาศ isekai ไม่เคย�
 const ctl = [
   ['รั่วจาก key', leakOf({ text: 'ก', status: { karma: 0.3 } }) > 0],
   ['รั่วจากข้อความ', leakOf({ text: 'ได้บุญ +5' }) > 0],
+  ['รั่วความรู้ซ่อน', leakOf({ text: 'ก', know: { food: 10 } }) > 0],
   ['ข้อความทำบุญปกติไม่นับรั่ว', leakOf({ text: 'คนที่บ้านทำบุญให้คุณทุกวันพระ' }) === 0],
   ['HP ทะลุเพดาน', rangeOf({ hp: 101, goal: 0, gold: 0, fame: 0, str: 1, mag: 1, cha: 1, luk: 1 }) > 0],
   ['ทองติดลบ', rangeOf({ hp: 50, goal: 0, gold: -1, fame: 0, str: 1, mag: 1, cha: 1, luk: 1 }) > 0],
