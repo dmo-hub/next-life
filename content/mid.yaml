@@ -22,7 +22,7 @@ events:
         clears_flags: [in_debt]
         outcomes:
           - {weight: 1, ok: true, text: "หมุนทันจริง ๆ งานใหญ่เข้าพอดี ปิดหนี้ได้หมดแบบไม่มีใครเชื่อ", effects: {happiness: 3, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}], multipliers: {karma: 1.4}}
-          - {weight: 3, text: "ดอกร้อยละยี่สิบต่อเดือน คนแปลกหน้ามายืนหน้าบ้านทุกเย็น", effects: {health: -2, happiness: -2, chronic: {happiness: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ดอกร้อยละยี่สิบต่อเดือน คนแปลกหน้ามายืนหน้าบ้านทุกเย็น", effects: {health: -2, happiness: -2, chronic: {happiness: -1}, debt: {kind: informal, amount: {unit: income_x, amount: 0.8}}, money: {unit: income_x, amount: -0.8}}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: debt_clinic
         text: "เข้าคลินิกแก้หนี้ ผ่อนยาว"
@@ -71,8 +71,7 @@ events:
         merit: [{cat: neutral}]
       - id: borrow_pay
         text: "กู้มาจ่ายให้จบ ๆ ไป"
-        effects: {happiness: 1}
-        sets_flags: [in_debt]
+        effects: {happiness: 1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1.5}}, money: {unit: income_x, amount: -1.5}}
         clears_flags: [guarantor]
         merit: [{cat: neutral}]
       - id: swear_off
@@ -105,8 +104,7 @@ events:
         merit: [{cat: neutral}]
       - id: borrow_uni
         text: "กู้ธนาคารมาจ่ายค่าเทอม"
-        effects: {relations: 2, happiness: 1}
-        sets_flags: [in_debt]
+        effects: {relations: 2, happiness: 1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1.5}}, money: {unit: income_x, amount: -1.5}}
         merit: [{cat: neutral}]
       - id: kid_choose
         text: "ให้ลูกเลือกเองว่าจะไปทางไหน"
@@ -205,7 +203,7 @@ events:
         text: "ทุ่มหมดหน้าตัก"
         outcomes:
           - {weight: 1, ok: true, text: "กิจการติดตลาดภายในปีเดียว ยอดสั่งเข้าจนผลิตไม่ทัน ชีวิตเปลี่ยนทั้งบ้าน", effects: {happiness: 3, income_mult: 1.6}, sets_flags: [own_business], merit: [{cat: neutral}]}
-          - {weight: 2, text: "รุ่นน้องหายไปพร้อมบัญชีบริษัท เหลือแต่ป้ายร้านกับหนี้ร่วม", effects: {happiness: -3, health: -1, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], next: mid_risky_chase_01, merit: [{cat: neutral}]}
+          - {weight: 2, text: "รุ่นน้องหายไปพร้อมบัญชีบริษัท เหลือแต่ป้ายร้านกับหนี้ร่วม", effects: {happiness: -3, health: -1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}}, next: mid_risky_chase_01, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: half_in
         text: "ลงแค่ครึ่ง เก็บอีกครึ่ง"
@@ -242,7 +240,7 @@ events:
         text: "เช่าโกดัง จ้างคนแพ็กเพิ่ม"
         outcomes:
           - {weight: 2, ok: true, text: "ยอดขายโตต่อเนื่อง กลายเป็นเถ้าแก่ที่มีลูกน้องสิบคน", effects: {income_mult: 1.5, happiness: 2, health: -1}, sets_flags: [own_business], next: mid_online_empire_01, merit: [{cat: neutral}]}
-          - {weight: 1, text: "กระแสหมดในสามเดือน โกดังว่างแต่สัญญาเช่ายังเหลือสองปี", effects: {happiness: -2, money: {unit: income_x, amount: -1.5}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 1, text: "กระแสหมดในสามเดือน โกดังว่างแต่สัญญาเช่ายังเหลือสองปี", effects: {happiness: -2, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1.5}}, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: stay_small
         text: "ทำเท่าที่ไหว ไม่ขยาย"

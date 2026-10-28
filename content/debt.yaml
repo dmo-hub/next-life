@@ -147,8 +147,7 @@ events:
           - {weight: 2, text: "ขายได้แค่ครึ่งเดียว ส่วนต่างพร้อมดอกตามมาเก็บที่คุณ", effects: {money: {unit: income_x, amount: -1.5}, happiness: -1}, merit: [{cat: neutral}]}
       - id: ignore_calls
         text: "เงียบ ไม่รับสายไฟแนนซ์"
-        effects: {happiness: -1, relations: -1}
-        sets_flags: [in_debt]
+        effects: {happiness: -1, relations: -1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}}
         merit: [{cat: neutral}]
 
   - id: debt_house_buy_01
@@ -446,7 +445,7 @@ events:
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, text: "ร้านติดตลาดตั้งแต่เดือนแรก ลูกค้าประจำเรียกชื่อคุณได้ทั้งซอย", effects: {money: {unit: income_x, amount: 2}, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
-          - {weight: 2, text: "ร้านเจ๊งในปีเดียว ไม่มีทั้งบ้านทั้งร้าน เหลือแต่หนี้ค่าเช่าที่", effects: {money: {unit: income_x, amount: -2}, happiness: -2}, sets_flags: [own_business, in_debt], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ร้านเจ๊งในปีเดียว ไม่มีทั้งบ้านทั้งร้าน เหลือแต่หนี้ค่าเช่าที่", effects: {debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}, happiness: -2}, sets_flags: [own_business], merit: [{cat: neutral}]}
       - id: rent_out
         text: "ปล่อยเช่า แล้วไปอยู่ห้องเล็ก"
         effects: {happiness: -1}

@@ -17,7 +17,7 @@ events:
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, text: "ร้านติดตลาด ลูกค้าแน่นทุกเย็น ได้เป็นนายตัวเองสักที", effects: {happiness: 2, income_mult: 1.3, money: {unit: income_x, amount: 1}}, sets_flags: [own_business], merit: [{cat: neutral}], multipliers: {stats: {relations: 1.5, network: 1.3}}}
-          - {weight: 3, text: "ร้านเงียบเหงา เงินชดเชยหมดภายในปีเดียว ต้องกู้มาจ่ายค่าเช่า", effects: {happiness: -2, job: service, money: {unit: income_x, amount: -1.5}}, sets_flags: [own_business, in_debt], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ร้านเงียบเหงา เงินชดเชยหมดภายในปีเดียว ต้องกู้มาจ่ายค่าเช่า", effects: {happiness: -2, job: service, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1.5}}, money: {unit: income_x, amount: -1.5}}, sets_flags: [own_business], merit: [{cat: neutral}]}
       - id: beg_to_stay
         text: "ขอทำต่อ ยอมลดเงินเดือน"
         effects: {income_mult: 0.8, happiness: -1, health: -1}
@@ -114,7 +114,7 @@ events:
         merit: [{cat: help_others, level: 1}]
         outcomes:
           - {weight: 2, ok: true, text: "เพื่อนผ่อนครบจริง ซึ้งใจจนขอให้เป็นพ่อแม่ทูนหัวของลูก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.4}}
-          - {weight: 3, text: "สามเดือนต่อมาเพื่อนหายเงียบ จดหมายทวงหนี้ส่งมาที่บ้านคุณแทน", effects: {happiness: -2, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}], next: work_guarantor_chase_01}
+          - {weight: 3, text: "สามเดือนต่อมาเพื่อนหายเงียบ จดหมายทวงหนี้ส่งมาที่บ้านคุณแทน", effects: {happiness: -2, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}], next: work_guarantor_chase_01}
       - id: refuse_flat
         text: "ปฏิเสธตรง ๆ ไม่ค้ำใคร"
         effects: {relations: -2, happiness: 1}
@@ -145,8 +145,8 @@ events:
       - id: house_loan_insured
         text: "กู้ซื้อบ้านเดี่ยว พ่วงประกัน"
         requires: {money: {unit: income_x, amount: 8}, reason: "ยังไม่มีเงินดาวน์"}
-        effects: {happiness: 2, health: -1, money: {unit: income_x, amount: -1.5}}
-        sets_flags: [has_kids, in_debt, has_insurance, home_owner]
+        effects: {happiness: 2, health: -1, money: {unit: income_x, amount: -1.5}, debt: {kind: mortgage, amount: {unit: income_x, amount: 25}}, invest: {asset: land, share: 0.6}}
+        sets_flags: [has_kids, has_insurance, home_owner]
         merit: [{cat: neutral}]
       - id: condo_near_work
         text: "ซื้อคอนโดใกล้ที่ทำงาน"
@@ -186,7 +186,7 @@ events:
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, text: "สาขาใหม่ขายดีทุกแห่ง มีคนมาขอซื้อแฟรนไชส์", effects: {happiness: 2, health: -1, income_mult: 2}, merit: [{cat: neutral}], next: work_franchise_01}
-          - {weight: 2, text: "ขยายเร็วจนคุมคุณภาพไม่อยู่ ลูกค้าหาย หนี้ยังอยู่ครบ", effects: {happiness: -2, income_mult: 0.7, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ขยายเร็วจนคุมคุณภาพไม่อยู่ ลูกค้าหาย หนี้ยังอยู่ครบ", effects: {happiness: -2, income_mult: 0.7, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
       - id: sell_recipe
         text: "ขายกิจการให้นายทุน แล้วพักยาว"
         effects: {happiness: 1, health: 1, money: {unit: income_x, amount: 3}}
@@ -219,7 +219,7 @@ events:
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, text: "ฝ่าช่วงวิกฤตไปได้ ร้านรอดและแข็งแรงกว่าเดิม", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ดอกทบดอก คนทวงหนี้มายืนหน้าบ้านทุกเย็น", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -2}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ดอกทบดอก คนทวงหนี้มายืนหน้าบ้านทุกเย็น", effects: {happiness: -2, health: -1, debt: {kind: informal, amount: {unit: income_x, amount: 0.8}}, money: {unit: income_x, amount: -0.8}}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
       - id: close_be_employee
         text: "ปิดร้าน กลับไปเป็นลูกจ้าง"
         effects: {happiness: -1, health: 1, job: labor}

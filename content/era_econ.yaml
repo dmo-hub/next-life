@@ -75,7 +75,7 @@ events:
         requires: {money: {unit: income_x, amount: 0.5}, reason: "ไม่มีเงินสำรองพอไปตั้งตัวต่างแดน"}
         outcomes:
           - {weight: 2, ok: true, multipliers: {occupation: {labor: 1.5, craft: 1.5}}, text: "ได้งานก่อสร้างในทะเลทราย ส่งเงินกลับบ้านทุกเดือน แต่หลังพังตั้งแต่ปีแรก", effects: {health: -2, income_mult: 1.5}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "นายหน้าหอบเงินค่าหัวหายไป ต้องกู้มาจ่ายคืนญาติ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 1, text: "นายหน้าหอบเงินค่าหัวหายไป ต้องกู้มาจ่ายคืนญาติ", effects: {happiness: -2, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1}}, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "รวมกลุ่มเพื่อนเปิดอู่ทอผ้า"
         outcomes:
@@ -213,7 +213,7 @@ events:
       - text: "รับเงินชดเชย เปิดร้านกาแฟ"
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {relations: 2}, occupation: {service: 1.5}}, text: "ร้านเล็กหน้าออฟฟิศเก่ากลายเป็นที่นั่งประจำของอดีตเพื่อนร่วมงาน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], next: era_econ_gfc_cafe_01, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ร้านกาแฟเปิดใหม่อีกสามร้านในซอยเดียวกัน คุณเจ๊งเป็นร้านแรก", effects: {happiness: -2, money: {unit: income_x, amount: -1.5}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านกาแฟเปิดใหม่อีกสามร้านในซอยเดียวกัน คุณเจ๊งเป็นร้านแรก", effects: {happiness: -2, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1.5}}, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "กัดฟันอยู่ต่อ ทำงานแทนสามคน"
         effects: {health: -1, knowledge: 1, income_mult: 1.1}
@@ -341,7 +341,7 @@ events:
         effects: {money: {unit: income_x, amount: -1}}
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "โรงสีเล็กสีข้าวให้ทั้งตำบล คุณกลายเป็นเถ้าแก่โรงสีที่ใครก็เรียกหา", effects: {happiness: 2, relations: 1, income_mult: 1.25}, sets_flags: [own_business], merit: [{cat: help_others, level: 1}]}
-          - {weight: 1, text: "เครื่องสีมือสองพังเดือนแรก เพื่อนบ้านถอนตัวหมด เหลือหนี้ค่าเครื่องคนเดียว", effects: {happiness: -2, relations: -1, money: {unit: income_x, amount: -1}}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 1, text: "เครื่องสีมือสองพังเดือนแรก เพื่อนบ้านถอนตัวหมด เหลือหนี้ค่าเครื่องคนเดียว", effects: {happiness: -2, relations: -1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1}}, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: help_others, level: 1}]
 
   - id: era_econ_gfc_cafe_01

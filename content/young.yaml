@@ -91,7 +91,7 @@ events:
         sets_flags: [married]
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ช่วยกันผ่อนจนปิดหนี้ได้ งานใหญ่สมหน้าทั้งสองบ้าน", effects: {happiness: 2, relations: 2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ดอกบานทุกเดือน ทะเลาะกันเรื่องเงินตั้งแต่ยังไม่ครบปี", effects: {happiness: 1, relations: -1}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ดอกบานทุกเดือน ทะเลาะกันเรื่องเงินตั้งแต่ยังไม่ครบปี", effects: {happiness: 1, relations: -1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1}}, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: wait
         text: "ขอเวลาคิดก่อนนะ"
@@ -163,8 +163,8 @@ events:
     choices:
       - id: new_car
         text: "ออกรถป้ายแดง ผ่อนยาว"
-        effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -1}}
-        sets_flags: [in_debt]
+        effects: {happiness: 2, relations: 1, debt: {kind: car, amount: {unit: income_x, amount: 4}}, money: {unit: income_x, amount: -4}}
+        sets_flags: [has_car]
         merit: [{cat: neutral}]
       - id: lend_friend
         text: "ให้เพื่อนยืม"
@@ -177,7 +177,7 @@ events:
         text: "กู้นอกระบบมาเปิดท้ายขายของ"
         outcomes:
           - {weight: 1, ok: true, text: "ขายดีจนปิดหนี้ได้ในครึ่งปี", effects: {money: {unit: income_x, amount: 2}, happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ดอกทบดอก คนทวงหนี้มายืนหน้าห้องทุกเช้า", effects: {money: {unit: income_x, amount: -2}, health: -1, happiness: -2}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ดอกทบดอก คนทวงหนี้มายืนหน้าห้องทุกเช้า", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 0.8}}, money: {unit: income_x, amount: -0.8}, health: -1, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: bike
         text: "ไม่ซื้อ ไม่ให้ยืม ปั่นจักรยานไป"
@@ -186,8 +186,8 @@ events:
         merit: [{cat: neutral}]
       - id: new_car_rite
         text: "ออกรถใหม่ ให้พระเจิมก่อนขับ"
-        effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -1.05}}
-        sets_flags: [in_debt]
+        effects: {happiness: 3, relations: 2, debt: {kind: car, amount: {unit: income_x, amount: 4}}, money: {unit: income_x, amount: -4.05}}
+        sets_flags: [has_car]
         merit: [{cat: neutral}]
 
   - id: young_shop_01
@@ -203,10 +203,9 @@ events:
     choices:
       - id: cafe
         text: "กู้มาเปิดร้านกาแฟตามฝัน"
-        sets_flags: [in_debt]
         outcomes:
           - {weight: 2, ok: true, text: "คนต่อคิวยาวถึงหน้าร้าน กลายเป็นร้านดังของย่าน", multipliers: {stats: {network: 1.4}}, effects: {happiness: 2, job: service, money: {unit: income_x, amount: 1}}, sets_flags: [own_business], next: young_shop_rush_01, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ขายได้วันละสิบแก้ว ค่าเช่ากินเงินเก็บหมด ต้องปิดร้านกลับไปทำงานเดิม", effects: {happiness: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ขายได้วันละสิบแก้ว ค่าเช่ากินเงินเก็บหมด ต้องปิดร้านกลับไปทำงานเดิม", effects: {happiness: -2, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: chicken_rice
         text: "เปิดร้านข้าวมันไก่สูตรแม่"
@@ -319,7 +318,7 @@ events:
         text: "จ่ายนายหน้า ไปทำงานโรงงาน"
         outcomes:
           - {weight: 3, ok: true, text: "ทำงานหนักสามปี ส่งเงินกลับมาสร้างบ้านให้พ่อแม่", effects: {money: {unit: income_x, amount: 3}, health: -1, relations: -1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ไปถึงแล้วไม่มีงานจริง นายหน้าปิดเบอร์หนี", effects: {money: {unit: income_x, amount: -2}, happiness: -3}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปถึงแล้วไม่มีงานจริง นายหน้าปิดเบอร์หนี", effects: {debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}, happiness: -3}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: legal_route
         text: "เรียนภาษา สอบไปแบบถูกกฎหมาย"
@@ -330,7 +329,7 @@ events:
         text: "กู้ค่าหัวไปเป็นแรงงานผิดกฎหมาย"
         outcomes:
           - {weight: 1, ok: true, text: "รอดการตรวจมาได้ เก็บเงินก้อนโตกลับบ้าน", effects: {money: {unit: income_x, amount: 3}, health: -1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ถูกจับส่งกลับกลางดึก หนี้ค่าหัวค้างเต็มบ่า", effects: {money: {unit: income_x, amount: -2}, happiness: -2}, sets_flags: [in_debt], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถูกจับส่งกลับกลางดึก หนี้ค่าหัวค้างเต็มบ่า", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 0.8}}, money: {unit: income_x, amount: -0.8}, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: stay
         text: "ไม่ไป อยู่ดูแลพ่อแม่ที่บ้าน"
