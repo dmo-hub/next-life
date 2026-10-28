@@ -124,6 +124,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
 .recap .picks { overflow-wrap:anywhere; }
+.lineage .lh { font-size:12px; font-weight:600; margin:6px 0 2px; }
+.lineage .lh:first-child { margin-top:0; }
+.lineage .llore { font-size:12px; margin:4px 0 0 20px; overflow-wrap:anywhere; }
 /* แผงพับบนมรณบัตร: summary คงเป็น list-item ให้ลูกศรพับ/เปิดยังขึ้น (flex ทำลูกศรหาย)
    · margin ติดลบกิน padding 12px ของกรอบแผง — พับแล้วกรอบสูง 44px เท่าพื้นที่แตะ ไม่ซ้อน padding สองชั้น */
 .fold > summary { cursor:pointer; padding:12px 0; margin:-12px 0; font-size:13px; font-weight:600; line-height:20px; }
@@ -301,6 +304,38 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .ix-t { font-size:19px; line-height:1.5; color:#E8ECFF; }
 .ix-n { font-size:13px; color:#C9B0FF; }
 .ix-ask { margin:0 0 4px; font-size:14px; font-weight:600; }
+.ispeed { margin:8px 20px 0; display:flex; align-items:center; gap:6px; font-size:12px; }
+.ispeed button { min-width:44px; min-height:32px; padding:2px 8px; border:1px solid #2A3478; border-radius:6px; background:#0E1024; color:#A6AEDB; font:inherit; cursor:pointer; }
+.ispeed button[aria-pressed="true"] { border-color:#6FE3FF; color:#6FE3FF; background:#1E2350; }
+.ispeed button:focus-visible { outline:2px solid #6FE3FF; outline-offset:1px; }
+.itimer { flex:1; height:4px; border-radius:999px; background:#05060F; overflow:hidden; }
+.itimer i { display:block; height:100%; width:0; background:#6FE3FF; }
+@keyframes itick { from { width:0; } to { width:100%; } }
+@media (prefers-reduced-motion: reduce) { .itimer i { animation:none !important; } }
+/* ทั้งหน้าเข้าธีมต่างโลกตามการ์ดที่ขึ้นจอ — ผูกกับการ์ดด้วย :has จึงไม่ต้องตามล้างธงทุกจุดที่วาดจอไทย */
+body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; }
+body:has(#app > .card.i) .logo { background:#0E1024; border-bottom-color:#3B4BA8; }
+body:has(#app > .card.i) .logo b { font-family:Pridi,serif; font-weight:600; font-size:clamp(22px, 6vw, 30px); color:#6FE3FF; }
+body:has(#app > .card.i) .logo small, body:has(#app > .card.i) .logo .ver, body:has(#app > .card.i) .logo .saved { color:#A6AEDB; }
+body:has(#app > .card.i) .logo .ver { border-color:#3B4BA8; }
+body:has(#app > .card.i) .foot a { color:#D3D8F5; }
+.ifocus { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px; }
+.ifocus button { display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-height:44px; padding:6px 10px; border:1px solid #2A3478; border-radius:6px; background:#0E1024; color:#E8ECFF; font:inherit; font-size:14px; text-align:left; cursor:pointer; }
+.ifocus button small { font-size:11px; color:#6FE3FF; }
+.ifocus button:hover, .ifocus button:focus-visible { border-color:#6FE3FF; background:#1E2350; outline:none; }
+/* ทางที่ทำอยู่: กดไม่ได้แต่ต้องเด่น ไม่ใช่จางแบบตัวเลือกล็อก */
+.ifocus button.on { border-color:#F2C94C; background:#1E2350; cursor:default; }
+.ifocus button.on small { color:#F2C94C; }
+/* จดหมายเหตุบนการ์ดจบ — ป้ายอายุทอง เส้นซ้ายบอกชนิดบรรทัดแบบต้นแบบ · ช่วงวัยพับได้ ชีวิตยาวราวร้อยบรรทัดจึงไม่ดันปุ่มลงไปไกล */
+.ichron .istage { margin-top:6px; }
+.ichron .istage > summary { cursor:pointer; font-size:13px; color:#6FE3FF; }
+.ilog { list-style:none; margin:6px 0 0; padding:0; display:flex; flex-direction:column; gap:4px; font-size:13px; color:#D3D8F5; }
+.ilog li { border-left:2px solid #2A3478; padding-left:8px; overflow-wrap:anywhere; }
+.ilog li.event { border-left-color:#B48CFF; }
+.ilog li.lore { border-left-color:#F2C94C; color:#F2C94C; }
+.ilog b { margin-right:6px; color:#F2C94C; font-weight:600; }
+.ilog small { display:inline-block; margin-left:6px; padding:0 6px; border:1px solid currentColor; border-radius:999px; font-size:11px; }
+.ilog small.up { color:#5EE6A0; } .ilog small.down { color:#FF8A8A; }
 /* ตัวเลือกที่ล็อก: ประกาศหลังกฎ hover ของทั้งสองทาง ความเจาะจงเท่ากันจึงชนะ — ชี้แล้วไม่กลับสีเหมือนกดได้ */
 .a .choice:disabled, .b .choice:disabled, .i .choice:disabled { opacity:0.45; cursor:not-allowed; background:transparent; color:inherit; border-style:dashed; }
 /* พาแนลการ์ด (B131): จอตั้งไม่มีพาแนล — ตัวห่อหายไปจากเลย์เอาต์ ลูกเรียงในการ์ดแบบเดิม */
@@ -1188,18 +1223,21 @@ const MERIT_WEIGHTS = {
   kill_for_gain: 1,
   cheat_exploit: 0.5,
   keep_goddess_vow: 0.5,
+  // ความรู้อันตรายจากโลกเดิม (B68h) — กลไกเกมตั้งเอง ไม่มีในคติ จึงเบากว่าระดับ 1 ของหมวดตามคติ
+  forbidden_knowledge: 0.5,
 };
-const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'vow_broken', 'kill_for_gain', 'cheat_exploit'];
+const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'vow_broken', 'kill_for_gain', 'cheat_exploit', 'forbidden_knowledge'];
 const FLAG_CATS = ['vow_broken'];
-const GAME_CATS = ['vow_broken', 'cheat_exploit', 'keep_goddess_vow'];
+const GAME_CATS = ['vow_broken', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge'];
 // หมวดที่ใช้เฉพาะต่างโลก — ไม่นับเป็นบาปตามคติพระมาลัยที่หน้าเว็บอ้าง
-const ISEKAI_CATS = ['kill_for_gain', 'cheat_exploit', 'keep_goddess_vow'];
+const ISEKAI_CATS = ['kill_for_gain', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge'];
 // ชื่อไทยที่เนื้อหาใช้แทน id ได้ (ใบ 12 เขียนหมวดเป็นไทย) — ต้องตรงกับ vocab ของด่าน build
 const TH = {
   โลภจนเบียดเบียน: 'greed_harm', รบกวนนักบวช: 'disturb_monk', ด่าตีพ่อแม่ผู้ใหญ่: 'abuse_elders', ตัดสินไม่เป็นธรรม: 'unjust_judgment',
   ผิดเมียผู้อื่น: 'adultery', เสน่ห์ยาแฝด: 'love_charm', กดขี่ผู้ใต้ปกครอง: 'oppress_subjects', ดื่มสุรา: 'intoxicants', บนแล้วไม่แก้: 'vow_broken',
   ทาน: 'dana', ศีล: 'sila', ภาวนา: 'bhavana', ดูแลพ่อแม่: 'care_parents', ช่วยคน: 'help_others', กลาง: 'neutral',
   ฆ่าเพื่อแต้ม: 'kill_for_gain', ใช้สกิลโกงเอาเปรียบ: 'cheat_exploit', รักษาสัญญาเทพธิดา: 'keep_goddess_vow',
+  ความรู้อันตราย: 'forbidden_knowledge',
 };
 const meritId = (cat) => TH[cat] ?? cat;
 const TH_BY_ID = Object.fromEntries(Object.entries(TH).map(([th, id]) => [id, th]));
@@ -2320,8 +2358,9 @@ function healthMultiplier(st) {
   return d < 0 ? 1 - d / 50 : Math.max(0.6, 1 - d / 150);
 }
 
+// อายุร่างกาย = อายุไทย + ปีที่อยู่ต่างโลก (B68m) — ปีปฏิทินยังตามอายุไทย · ชีวิตที่ไม่ข้ามโลกไม่มี st.away
 function deathChance(st) {
-  const base = lifeQx(st.content.era, st.seed, st.sex, st.birthYear + st.age, st.age);
+  const base = lifeQx(st.content.era, st.seed, st.sex, st.birthYear + st.age, st.age + (st.away ?? 0));
   if (base >= 1) return 1;
   return Math.min(1, base * healthMultiplier(st) * karmaMultiplier(st.ledger));
 }
@@ -2810,6 +2849,10 @@ const openChoices = (card) => card.choices.map((_, i) => i).filter((i) => !card.
 
 // เดินปีละครั้งจนมีการ์ดถึงกำหนดหรือตาย คืนการ์ดใบถัดไป
 function nextCard(st) {
+  if (st.trip) {
+    if (st.trip.step !== 'over') return { ...nextIsekaiCard(st.trip), trip: true, life: st.age };
+    return tripBack(st);
+  }
   if (st.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
   // คิวมาก่อนการตาย — การ์ดงานศพเข้าคิวตอนตายแล้วต้องออกก่อนมรณบัตร
   if (st.dead && !st.queue.length) return deathCard(st);
@@ -2999,6 +3042,7 @@ function noteDeed(st, text, record, age = st.age) {
 }
 
 function choose(st, idx) {
+  if (st.trip) return chooseIsekai(st.trip, idx);
   const ev = st.pending;
   if (ev?.alloc) {
     const opt = ev.alloc[idx];
@@ -3013,6 +3057,18 @@ function choose(st, idx) {
     if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
     // ปฏิเสธ = ไม่แตะอะไรเลย · กดรับ = จบชีวิตตรงนี้ งานศพตามปกติ แล้วปรโลกส่งข้ามโลก (ธง isekai_call)
+    // ทางที่ได้กลับ (B68m) = ไปต่างโลกทั้งตัวกลางชีวิต ไม่ตั้งธง · บัญชีบุญบาปส่งตัวเดียวกันเข้าไป
+    const n = st.trips?.length ?? 0;
+    const trip = idx === ENTRY.accept && tripRoll(st.seed, ev.entry, n);
+    if (trip) {
+      st.log.push({ id: `isekai_${ev.entry}`, age: st.age, choice: idx, text: ev.choices[idx].text });
+      st.trip = startIsekai({
+        seed: (st.seed ^ TRIP.salt ^ Math.imul(n + 1, 0x9e3779b1)) >>> 0, past: st.name, ledger: st.ledger,
+        lore: isekaiWorldLore([...(st.lineage ?? []), { trips: st.trips }]),
+        trip: { ...trip, age: st.age, wit: st.knowledge / TRIP.wit },
+      });
+      return;
+    }
     if (idx === ENTRY.accept) {
       st.flags.isekai_call = true;
       st.isekaiVia = ev.entry;
@@ -3147,6 +3203,32 @@ function pickRite(st, ev) {
   else if (st.relations >= FUNERAL.love.low) want = ['chant_3', 'one_day'];
   return want.find(ok) ?? 'temple';
 }
+// ทริปจบ (การ์ดจบออกไปแล้ว): ตายในต่างโลก = ชีวิตไทยจบแบบหายตัว · กลับบ้าน = เวลาไทยเดินตามที่ทอยไว้แล้วเล่าการกลับ
+// ปีที่หายไปเดินด้วย stepYear ปกติ (เงิน คนในบ้าน ด่านเรียน) แต่ไม่ทอยตายและไม่จับกอง — ตัวไม่อยู่ เรื่องของปีนั้นจึงมาเป็นข่าวหลังกลับ
+function tripBack(st) {
+  const isk = st.trip;
+  st.trip = null;
+  (st.trips ??= []).push(tripLineage(isk));
+  if (!isk.home) {
+    st.tripLost = true;
+    st.dead = true;
+    return queueFuneral(st) ? nextCard(st) : deathCard(st);
+  }
+  const away = isk.age - isk.trip.from;
+  const c = tripCarry(isk);
+  st.money += c.gold * st.price;
+  st.network = clamp(st.network + c.network);
+  st.knowledge = clamp(st.knowledge + c.knowledge);
+  for (let i = 0; i < isk.trip.thai; i++) stepYear(st);
+  // ใบตัดสินใจที่ถึงกำหนดทุกปี (เลื่อนขั้น ทบทวนเงิน ช่วงวัย) ซ้อนกันหลายใบ — เก็บใบล่าสุดของแต่ละเรื่อง ใบเก่าสร้างจากสถานะที่ไม่ใช่แล้ว
+  const key = (c) => (c.kind === 'eraEvent' ? `e:${c.ev.id}` : ['alloc', 'stage', 'omen'].includes(c.kind) ? c.kind : null);
+  st.due = st.due.filter((c, i) => !key(c) || !st.due.slice(i + 1).some((d) => key(d) === key(c))).map((c) => ({ ...c, age: st.age }));
+  st.away = (st.away ?? 0) + away - isk.trip.thai;
+  st.advance = false;
+  const when = isk.trip.thai ? `ผ่านไป ${isk.trip.thai} ปี` : 'ผ่านไปแค่ไม่กี่เดือน';
+  return emit(st, { kind: 'result', type: 'B', trip: true, age: st.age, stage: stageOf(st.age), text: `ลืมตาอีกทีก็ยืนอยู่หน้าบ้านหลังเดิม ในต่างโลกคุณอยู่มา ${away} ปี แต่ที่นี่${when} คนที่บ้านนึกว่าคุณหายตัวไป` });
+}
+
 function queueFuneral(st) {
   if (st.age < STAGES[1].from) return false;
   const evs = [FUNERAL.wishes, FUNERAL.rite].map((id) => st.content.events.find((e) => e.id === id)).filter(Boolean);
@@ -3191,6 +3273,11 @@ function statsOf(st) {
 // บอทได้ st เพื่ออ่านป้ายบุญบาปของตัวเลือกแทนการอ่านความหมายของข้อความแบบที่ผู้เล่นทำ — ห้ามอ่านบัญชีเอง
 // stream ของบอทแยกจาก rng ของแกนเกม เพื่อไม่ให้การเลือกไปเปลี่ยนลำดับสุ่มของโลก
 // st ส่งเข้ามาได้ = เล่นชีวิตรุ่นถัดไปที่ระหว่างชาติสร้างไว้
+const tripAny = (card, rng) => {
+  const open = card.choices.map((_, i) => i).filter((i) => !card.locked?.[i]);
+  return open[Math.floor(rng.next() * open.length)];
+};
+
 function playLife(seed, content, pickChoice, onCard, st = newLife(seed, content)) {
   const bot = makeRng(seed ^ 0x5bd1e995);
   for (;;) {
@@ -3198,6 +3285,11 @@ function playLife(seed, content, pickChoice, onCard, st = newLife(seed, content)
     onCard?.(card, st);
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
     // บอทที่ไม่ได้ประกาศ isekai ปฏิเสธการ์ดชวนโดยไม่ดึงเลขสุ่ม ⇒ ชีวิตเดินเท่าเดิม
+    // การ์ดในทริป (B68m) ไม่มีป้ายบุญบาปแบบชีวิตไทย — บอทที่ประกาศ trip เลือกเอง ที่เหลือสุ่มตัวที่ไม่ล็อก
+    if (card.trip && card.kind === 'isekai') {
+      if (card.choices.length) choose(st, pickChoice.trip ? pickChoice.trip(card, bot) : tripAny(card, bot));
+      continue;
+    }
     if (card.choices?.length) choose(st, card.entry && !pickChoice.isekai ? ENTRY.decline : pickChoice(card, bot, st));
   }
 }
@@ -3379,8 +3471,10 @@ function beliefChoice(st, ev, c) {
 // จำนวนครั้งที่เลือกทำกิจกรรมสายมูในชีวิตนี้ — แกน ④ ทางโลก ↔ ทางธรรม ของฉายา (ใบ 04) อ่าน
 const beliefActs = (st) => st.belief?.acts ?? 0;
 
-// ต่างโลก (B68): ทางที่ 3 ของการ์ดทางเกิด — เทพธิดาต่างโลกพาวิญญาณไปใช้ชีวิตสั้น ๆ ในโลกแฟนตาซี
-// เลือกโลก → เลือกสกิลโกง → 4 บท 9 เหตุการณ์ → ตอนจบ → กลับไปให้ปรโลกตัดสิน แล้วการ์ดทางเกิดให้เลือกกลับโลกเดิมหรืออยู่ต่างโลกต่อ
+// ต่างโลก (B68): ทางที่ 3 ของการ์ดทางเกิด — เทพธิดาต่างโลกพาวิญญาณไปใช้ชีวิตหนึ่งชาติในโลกแฟนตาซี
+// เลือกบทบาท 1 จากที่เทพธิดายื่น → เลือกสกิลโกง → เวลาเดินเองทีละปี ผู้เล่นเลือกสิ่งที่ทุ่มเทแล้วค้างไว้ข้ามปี (B68b)
+// เหตุการณ์ที่มีตัวเลือกหยุดเวลารอ → แก่แล้วร่างกายเสื่อมจนสิ้นอายุ → ตอนจบ → ปรโลกตัดสิน แล้วการ์ดทางเกิดให้เลือกกลับโลกเดิมหรืออยู่ต่างโลกต่อ
+// แนวเล่นต่างจากชาติไทย (การ์ดทีละใบ) โดยตั้งใจ — ชาติไทยกดทุกใบ ชาติต่างโลกกดเฉพาะตอนเปลี่ยนใจหรือมีเรื่องให้ตัดสิน
 // ใช้ stream สุ่มของตัวเองจาก seed ของชีวิต — ไม่กินเลขของ af.rng ฉากระหว่างชาติกับการส่งต่อจึงสุ่มได้เหมือนไม่มีต่างโลก
 // กรรมจากปรโลก (ระดับ −1..1) เป็นตัวตั้งของโลก: บุญมากได้สกิลให้เลือกมากขึ้นและค่าเริ่มดีขึ้น · บาปหนักได้น้อยลงและโลกโหดขึ้น · ไม่มีตัวเลขบัญชีบนการ์ด
 // บัญชีบุญบาปเป็นของดวงวิญญาณ (ส่วนที่ส่งต่อจากชาติก่อน) — ชาติต่างโลกบันทึกต่อลงบัญชีนั้น แล้วปรโลกตัดสินตอนจบชาติ
@@ -3395,7 +3489,12 @@ const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'เ�
 // หลังข้าม ผลการ์ดต่างโลกสะท้อนกลับค่าจริงชุดที่พกมา (ต่างโลก 1 = จริง div) · ชนเพดานฝั่งไหน ส่วนเกินไม่สะท้อน
 const ISEKAI_LINK = { str: 'health', mag: 'knowledge', cha: 'relations', luk: 'happiness', fame: 'network' };
 const LINK = { div: 10, part: 5, age: 40, gold: 100, goldCap: 3, hpCut: 30 };
-const ISEKAI = { stay: 2, chance: 0.2, skills: 3, worlds: 3, karmaStat: 3, karmaDc: 4, karmaSkill: 0.3, memory: 3, events: [1, 3, 3] };
+// worlds = จำนวนการ์ดบทบาทที่เทพธิดายื่น (ชื่อเดิมจากตอนที่ยังเลือกโลก) · roleLean = กรรมเอียงโอกาสบทบาทได้แค่ไหน
+const ISEKAI = { stay: 4, chance: 0.2, skills: 3, worlds: 3, karmaStat: 3, karmaDc: 4, karmaSkill: 0.3, memory: 3, roleLean: 0.6 };
+// เวลาเดิน (B68b · เจ้าของเคาะ ตาละ 1 ปี วัยชราตาละ 5 ปี): ตัวเลขปีคูณ pace ของบทบาท (เอลฟ์แก่ช้า)
+// eventP = โอกาสมีเรื่องให้ตัดสินต่อตา · quiet = อายุก่อนหน้านี้ไม่มีเรื่องสุ่ม (เด็กเล็ก) · regen/decay = HP ต่อปีก่อนและหลังวัยชรา
+// gainK = ค่ายิ่งสูงยิ่งฝึกขึ้นช้า (ค่าที่ 20 ขึ้นครึ่งหนึ่งของค่าที่ 0) · later = เรื่องต่อมาถึงกี่ปีหลังเรื่องแรก · cap = อายุเกินวัยชราเท่านี้ร่างหมดแรงแน่
+const ISEKAI_TIME = { step: 1, oldStep: 5, eventP: 0.3, quiet: 6, regen: 2, decay: 2, decayGrow: 0.4, gainK: 20, joy: 60, wit: 10, later: 3, cap: 45 };
 // เทพธิดาโผล่ถี่ตามกรรม (B68e · เจ้าของเคาะ): chance × (1 + ระดับกรรมสุทธิ) ไม่ต่ำกว่า chanceMin ⇒ บุญเต็ม 40% กลาง 20% บาปเต็ม 5%
 // ตายแบบต่างโลกได้โชคเพิ่ม fatedLuck · คำสัญญาที่ฝากไว้: รักษาได้ = บุญระดับ vowLevel · ผิด = ธงบนแล้วไม่แก้
 const GODDESS = { chanceMin: 0.05, fatedLuck: 10, vowLevel: 1 };
@@ -3485,6 +3584,167 @@ const ISEKAI_DEATH_BY = {
   monster: 'ร่างสไลม์แตกเป็นหยดเล็ก ๆ ก็อบลินตัวหนึ่งนั่งเฝ้าแอ่งนั้นอยู่ทั้งคืน เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
   villainess: 'เรื่องจบเร็วกว่าบทในเกมที่เคยเล่น หน้าสุดท้ายยังว่างอยู่ เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
   slowlife: 'บ้านเล็กชายป่าเงียบลง หมาป่าสีเงินนอนรออยู่หน้าประตูไม่ยอมไปไหน เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+  commoner: 'เสียงค้อนจากโรงตีเหล็กริมน้ำเงียบไปหลายวัน เพื่อนบ้านเอาดอกไม้มาวางไว้หน้าเตา เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+  merchant: 'เกวียนสินค้าจอดนิ่งอยู่ข้างทาง ม้าแก่ยังยืนรอคนบังคับ เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+  elf: 'ต้นไม้ในป่าลึกทิ้งใบพร้อมกันทั้งป่าในคืนเดียว เอลฟ์รุ่นพี่บอกว่าป่ากำลังไว้ทุกข์ เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+  dwarf: 'เมืองใต้ภูเขาตีระฆังหินสามครั้ง ค้อนของคุณถูกแขวนไว้บนกำแพงห้องโถง เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+  goblin: 'ก็อบลินทั้งรังนั่งล้อมกองไฟเงียบ ๆ ไม่มีใครแย่งกระดูกกันคืนนั้น เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+  demonchild: 'ปราสาทมืดลดธงครึ่งเสา จอมมารผู้เป็นพ่อนั่งเงียบอยู่บนบัลลังก์ทั้งคืน เทพธิดาถอนหายใจยาว แล้วหยิบแฟ้มของคุณขึ้นมาอีกรอบ',
+};
+
+// บทบาทตอนเกิด (B68b · เจ้าของเคาะ): สุ่มตามโอกาส p เอียงตามกรรม (lean +1 = บุญมากเจอบ่อยขึ้น · −1 = บาปมากเจอบ่อยขึ้น) แล้วเทพธิดายื่นให้เลือก
+// world = บทบาทนี้เล่นเนื้อเรื่องของโลกนั้น (ฉากเปิด ฉากสุดท้าย ตอนจบ) · like = บทบาทที่ไม่มีเนื้อเรื่องของตัวเอง ยืมเหตุการณ์กลางที่โลกนั้นเจอ
+// startAge/finaleAge = อายุก่อนคูณ pace · finaleAge = อายุที่ฉากสุดท้ายของเนื้อเรื่องมาถึง · focus = สิ่งที่ทุ่มเทเฉพาะบทบาท ดันค่าเป้าหมาย
+// commoner อยู่ในการ์ดที่ยื่นเสมอ (เจ้าของเคาะ: ต้องมีคนธรรมดามีอาชีพ 1 ใบ)
+const ISEKAI_ROLES = {
+  hero: { world: 'hero', p: 6, lean: 1, startAge: 17, finaleAge: 25, focus: { name: 'ตามหาทางไปปราสาทจอมมาร', gain: { goal: 1.5, str: 0.3 }, tag: 'fight' } },
+  noble: { world: 'noble', p: 14, lean: 1, startAge: 0, finaleAge: 18, focus: { name: 'เรียนงานปกครองที่ดิน', gain: { goal: 1.5, cha: 0.3 }, tag: 'talk' } },
+  monster: { world: 'monster', p: 8, lean: -1, startAge: 0, finaleAge: 15, focus: { name: 'ดูดซับแล้ววิวัฒน์', gain: { goal: 1.5, str: 0.3 }, tag: 'fight' } },
+  villainess: { world: 'villainess', p: 5, lean: 0, startAge: 8, finaleAge: 18, focus: { name: 'หักธงหายนะทีละธง', gain: { goal: 1.5, mag: 0.3 }, tag: 'appraise' } },
+  slowlife: { world: 'slowlife', p: 8, lean: 0, startAge: 20, finaleAge: 30, focus: { name: 'ดูแลร้านชายป่า', gain: { goal: 1.5, gold: 20 }, tag: 'cook' } },
+  commoner: {
+    p: 25, lean: 0, like: 'slowlife', startAge: 0,
+    name: 'ชาวบ้านมีอาชีพ', pitch: 'เกิดในบ้านช่างตีเหล็กริมแม่น้ำ ไม่มีใครอัญเชิญ ไม่มีคำทำนาย มีแค่เตาไฟกับค้อนของพ่อ',
+    goal: 'ชีวิตที่มั่นคง', stat: { str: 10, mag: 8, cha: 10, luk: 10, gold: 50 },
+    names: ['{p} ลูกช่างเหล็ก', 'ช่าง{p}', '{p} แห่งริมน้ำ'],
+    focus: { name: 'ช่วยงานโรงตีเหล็ก', gain: { goal: 1.5, gold: 15, str: 0.3 }, tag: 'trade' },
+    end: {
+      best: ['ช่างใหญ่แห่งริมน้ำ', 'ดาบจากโรงตีเหล็กของคุณผ่านมือผู้กล้ามาสามรุ่น ลูกศิษย์สิบกว่าคนไปเปิดโรงของตัวเองทั่วแคว้น'],
+      good: ['ช่างเหล็กที่ทั้งหมู่บ้านพึ่งได้', 'จอบ เคียว เกือกม้าของทุกบ้านผ่านมือคุณ ไม่ดัง แต่ไม่มีใครเดือดร้อนเพราะคุณ'],
+      bad: ['ชาวบ้านธรรมดาคนหนึ่ง', 'โรงตีเหล็กปิดตั้งแต่พ่อตาย คุณรับจ้างทั่วไปจนแก่ ชื่อคุณอยู่ในความจำของคนในหมู่บ้านได้ไม่นาน'],
+    },
+  },
+  merchant: {
+    p: 13, lean: 0, like: 'noble', startAge: 0,
+    name: 'ลูกพ่อค้าเร่', pitch: 'โตบนเกวียนสินค้าที่วิ่งระหว่างเมือง พ่อสอนนับเงินก่อนสอนอ่าน',
+    goal: 'กองคาราวาน', stat: { str: 8, mag: 9, cha: 12, luk: 11, gold: 300 },
+    names: ['{p} ลูกพ่อค้า', 'นายห้าง{p}', '{p} แห่งคาราวาน'],
+    focus: { name: 'ตามพ่อไปค้าขาย', gain: { goal: 1.5, gold: 30 }, tag: 'trade' },
+    end: {
+      best: ['เจ้าของคาราวานร้อยเกวียน', 'ธงของห้างคุณปักอยู่ทุกตลาดตั้งแต่ทะเลทรายถึงเมืองท่า พระราชายังต้องมากู้เงินคุณตอนสงคราม'],
+      good: ['พ่อค้าที่ทุกเมืองไว้ใจ', 'คาราวานสิบเกวียน ลูกค้าประจำทุกเมือง คนเชื่อตาชั่งของคุณมากกว่าตาชั่งหลวง'],
+      bad: ['พ่อค้าเร่ที่ขายไม่ออก', 'เกวียนเหลือคันเดียวกับม้าแก่หนึ่งตัว แต่ของในเกวียนยังพอแลกข้าวได้ทุกเมือง'],
+    },
+  },
+  elf: {
+    p: 9, lean: 1, like: 'hero', startAge: 0, pace: 3,
+    name: 'เอลฟ์ป่าลึก', pitch: 'เกิดเป็นเอลฟ์ในป่าที่ต้นไม้อายุเป็นพันปี เวลาของเอลฟ์เดินช้ากว่ามนุษย์สามเท่า',
+    goal: 'สายใยกับป่า', stat: { str: 8, mag: 13, cha: 11, luk: 9, gold: 20 },
+    names: ['เอลฟ์ชื่อ{p}', '{p}แห่งป่าลึก', 'ลีเรียน{p}'],
+    focus: { name: 'ฟังเสียงป่า', gain: { goal: 1.5, mag: 0.3 }, tag: 'magic' },
+    end: {
+      best: ['ผู้พิทักษ์ป่าพันปี', 'ป่าที่คุณดูแลขยายจนถึงเชิงเขา มนุษย์สามอาณาจักรเซ็นสัญญาว่าจะไม่ตัดไม้ในเขตนี้ตลอดไป'],
+      good: ['เอลฟ์ที่มนุษย์จำได้', 'คุณเห็นหมู่บ้านมนุษย์ข้างป่าเปลี่ยนไปสิบรุ่น ทุกรุ่นยังเล่าเรื่องเอลฟ์ที่มาช่วยตอนน้ำท่วม'],
+      bad: ['เอลฟ์ผู้เหงาในป่าใหญ่', 'ร้อยปีผ่านไปโดยแทบไม่ได้คุยกับใคร คุณรู้จักชื่อต้นไม้ทุกต้น แต่จำหน้าเพื่อนสมัยเด็กไม่ได้แล้ว'],
+    },
+  },
+  dwarf: {
+    p: 8, lean: 0, like: 'slowlife', startAge: 0,
+    name: 'คนแคระเหมืองหิน', pitch: 'เกิดใต้ภูเขาในเมืองคนแคระ ที่นี่วัดค่าคนจากของที่ตีขึ้นมาได้',
+    goal: 'ผลงานในตำนาน', stat: { str: 13, mag: 7, cha: 8, luk: 10, gold: 120 },
+    names: ['{p} ลูกเหมือง', 'คนแคระ{p}', '{p} เคราเหล็ก'],
+    focus: { name: 'ขุดเหมืองกับตีเหล็ก', gain: { goal: 1.5, str: 0.3, gold: 15 }, tag: 'fight' },
+    end: {
+      best: ['ช่างผู้ตีขวานราชา', 'ขวานที่คุณตีถูกวางไว้กลางห้องโถงใหญ่ คนแคระทุกรุ่นต่อจากนี้ต้องมาแตะมันก่อนเริ่มงานชิ้นแรก'],
+      good: ['หัวหน้าเหมืองชั้นลึก', 'เหมืองของคุณไม่เคยถล่มสักครั้ง ลูกน้องทุกคนกลับบ้านครบทุกเย็น'],
+      bad: ['คนแคระที่เคราไม่ยาว', 'ตีอะไรก็ไม่เคยถูกใจผู้อาวุโส คุณย้ายไปเปิดโรงซ่อมกระทะในเมืองมนุษย์ และขายดีกว่าที่คิด'],
+    },
+  },
+  goblin: {
+    p: 8, lean: -1, like: 'monster', startAge: 0,
+    name: 'ก็อบลินตัวเล็ก', pitch: 'เกิดเป็นก็อบลินตัวที่สามสิบสองของรัง ตัวเล็กที่สุดและหิวที่สุด',
+    goal: 'รังที่อยู่รอด', stat: { str: 9, mag: 8, cha: 7, luk: 12, gold: 0 },
+    names: ['ก็อบลินชื่อ{p}', '{p} ตัวจิ๋ว', 'โกบู{p}'],
+    // ออกหาอาหารเสี่ยงเจอนักล่า — HP ลดเร็วกว่าที่ฟื้น ก็อบลินที่ทุ่มให้รังจึงอายุสั้นตามเรื่อง
+    focus: { name: 'หาอาหารให้รัง', gain: { goal: 1.5, luk: 0.3, hp: -3 }, tag: 'sneak' },
+    end: {
+      best: ['หัวหน้าเผ่าก็อบลินที่มนุษย์ยอมคุยด้วย', 'รังของคุณเลิกปล้นแล้วหันมาปลูกเห็ดขาย มนุษย์หมู่บ้านข้าง ๆ มาซื้อทุกตลาดนัด'],
+      good: ['ก็อบลินแก่ที่สุดในรัง', 'ก็อบลินส่วนใหญ่อยู่ไม่ถึงสิบปี คุณอยู่จนหลานเหลนเต็มรัง และทุกตัวฟังคุณเวลาเล่าเรื่อง'],
+      bad: ['ก็อบลินธรรมดาตัวหนึ่ง', 'คุณหนีนักผจญภัยมาทั้งชีวิต รอดมาได้เพราะตัวเล็กพอจะมุดรูที่คนอื่นมุดไม่ได้'],
+    },
+  },
+  demonchild: {
+    p: 4, lean: -1, like: 'monster', startAge: 0,
+    name: 'ลูกจอมมาร', pitch: 'เกิดเป็นลูกคนเล็กของจอมมาร ทุกคนรอดูว่าจะโหดกว่าพ่อแค่ไหน แต่คุณยังจำได้ว่าชาติก่อนกลัวแมลงสาบ',
+    goal: 'บัลลังก์มืด', stat: { str: 11, mag: 13, cha: 9, luk: 7, gold: 400 },
+    names: ['องค์ชายมืด{p}', '{p} ผู้สืบสายจอมมาร', 'องค์ชาย{p}'],
+    focus: { name: 'เรียนวิชาสายจอมมาร', gain: { goal: 1.5, mag: 0.3 }, tag: 'magic' },
+    end: {
+      best: ['จอมมารผู้เปิดพรมแดน', 'คุณขึ้นบัลลังก์แล้วสั่งเปิดด่านค้าขายกับมนุษย์เป็นอย่างแรก ทหารปีศาจได้กลับบ้านหลังสงครามสามร้อยปี'],
+      good: ['องค์ชายที่ปีศาจรัก', 'บัลลังก์ตกเป็นของพี่ชาย แต่ปีศาจทั้งเมืองมาหาคุณเวลามีเรื่องเดือดร้อน ไม่มีใครไปหาพี่ชาย'],
+      bad: ['ลูกจอมมารที่ถูกลืม', 'พี่น้องแย่งบัลลังก์กันจนไม่มีใครสนใจคุณ คุณย้ายไปอยู่หอคอยชายแดนกับแมวดำหนึ่งตัว'],
+    },
+  },
+};
+// ชื่อ เป้าหมาย ตอนจบของบทบาท — บทบาทที่เล่นเนื้อเรื่องของโลกใช้ของโลกนั้น
+const roleInfo = (id) => {
+  const r = ISEKAI_ROLES[id];
+  return r.world ? { ...ISEKAI_WORLDS[r.world], ...r, stat: ISEKAI_WORLDS[r.world].start } : r;
+};
+
+// ช่วงวัยของชาติต่างโลก · ch = ชั้นเหตุการณ์ (ช่อง ch ของ ISEKAI_EVENTS) ที่สุ่มได้ในช่วงนี้ · rate = ความไวในการฝึก
+const ISEKAI_STAGES = [
+  { id: 'child', name: 'วัยเด็ก', from: 0, ch: [1], rate: 1.2 },
+  { id: 'teen', name: 'วัยรุ่น', from: 13, ch: [1, 2], rate: 1.1 },
+  { id: 'adult', name: 'วัยผู้ใหญ่', from: 20, ch: [2, 3], rate: 1 },
+  { id: 'middle', name: 'วัยกลางคน', from: 40, ch: [3], rate: 0.7 },
+  { id: 'old', name: 'วัยชรา', from: 60, ch: [3], rate: 0.4 },
+];
+
+// สิ่งที่ทุ่มเท (B68b): ค้างข้ามตาจนกว่าจะเปลี่ยน · gain = ค่าที่ได้ต่อปีก่อนคูณความไว · tag = สายเหตุการณ์ที่โผล่บ่อยขึ้น
+// joy/wit = ความสุข/ความรู้ ค่าภายในที่ไม่ขึ้นหน้าต่างสถานะ (เจ้าของเคาะ) · สุขดีฝึกไวและแก่ช้า · รู้มากฝึกเวทไว
+// lines = บรรทัดจดหมายเหตุของปีที่ทุ่มเทเรื่องนี้ (เลือกตามอายุ ไม่ดึงเลขสุ่ม)
+const ISEKAI_FOCUS = {
+  play: { name: 'วิ่งเล่นตามประสาเด็ก', stages: ['child'], gain: { hp: 2, joy: 5, luk: 0.5 }, tag: 'sneak',
+    lines: ['วิ่งไล่จับแมลงปอจนตะวันตกดิน', 'ปีนต้นไม้หลังบ้านจนแม่ตะโกนเรียก', 'แอบไปเล่นน้ำที่ลำธารกับเด็กข้างบ้าน'] },
+  sword: { name: 'ฝึกดาบ', gain: { str: 1, joy: -1 }, tag: 'fight',
+    lines: ['ฟันหุ่นฟางทุกเช้าจนมือพอง', 'ขอให้ทหารยามสอนท่าตั้งรับ', 'ซ้อมจนดาบไม้หักไปอีกเล่ม'] },
+  magic: { name: 'ฝึกเวท', gain: { mag: 1 }, tag: 'magic', wit: true,
+    lines: ['นั่งสมาธิรวบรวมมานาทุกคืน', 'จุดไฟด้วยนิ้วได้นานขึ้นอีกนิด', 'ท่องคาถาจนเพื่อนบ้านบ่นว่าหนวกหู'] },
+  people: { name: 'คบหาผู้คน', gain: { cha: 1, joy: 2 }, tag: 'talk',
+    lines: ['นั่งคุยกับคนแปลกหน้าในโรงเตี๊ยมจนดึก', 'ไปช่วยงานบวชงานแต่งทั่วหมู่บ้าน', 'มีเพื่อนใหม่มากินข้าวที่บ้านทุกอาทิตย์'] },
+  roam: { name: 'ออกเดินทางเสี่ยงโชค', stages: ['teen', 'adult', 'middle'], gain: { luk: 1, hp: -4, gold: 15, joy: 1 }, tag: 'sneak',
+    lines: ['เดินทางข้ามเขาไปเมืองที่ไม่เคยไป', 'หลงทางในป่าสามวัน แต่เจอทางลัดใหม่', 'นอนกลางดินกินกลางทรายตามคาราวาน'] },
+  // know = ความรู้โลกเดิมของหมวดที่แตะล่าสุด (ค่าเดียวกับ ISEKAI_KNOW_T.study · ประกาศทีหลังจึงอ้างตรงไม่ได้)
+  study: { name: 'อ่านตำรา', gain: { wit: 2, mag: 0.3, know: 1.5 }, tag: 'appraise',
+    lines: ['ยืมตำราจากหอสมุดจนบรรณารักษ์จำหน้าได้', 'จดสิ่งที่จำได้จากโลกเดิมลงสมุดเล่มหนา', 'อ่านแผนที่เก่าจนจำชื่อเมืองได้ทั้งทวีป'] },
+  work: { name: 'ทำงานหาเงิน', stages: ['teen', 'adult', 'middle', 'old'], gain: { gold: 40, joy: -2 }, tag: 'trade',
+    lines: ['รับจ้างแบกของที่ท่าเรือทั้งปี', 'ทำงานที่โรงเตี๊ยมจนรู้จักลูกค้าทุกคน', 'เก็บเงินได้อีกถุงหนึ่ง'] },
+  rest: { name: 'พักผ่อนอยู่บ้าน', gain: { hp: 6, joy: 6 },
+    lines: ['นอนตื่นสาย จิบชาร้อนดูฝนตก', 'ปลูกผักหน้าบ้านกับเลี้ยงไก่สามตัว', 'ปีนี้ไม่ได้ทำอะไรนอกจากพักให้หายเหนื่อย'] },
+};
+
+// ความรู้จากโลกเดิม (B68h · เจ้าของเคาะ): 9 หมวด เริ่มศูนย์ทุกหมวด เป็นค่าซ่อนแบบ joy/wit · โตจากเหตุการณ์ของหมวด + ทางลัดทุ่มเท + อ่านตำรา
+// focus = ทางลัดทุ่มเทที่เปิดเมื่อความรู้หมวดนั้นถึง shortcut · know ใน gain = ความรู้ของหมวดนี้เอง · stages = ช่วงวัยที่ทางลัดเปิด
+const ISEKAI_KNOW = {
+  food: { name: 'อาหาร', focus: { name: 'เปิดร้านอาหารแบบบ้านเกิด', gain: { gold: 30, fame: 0.5, know: 1, joy: 1 },
+    lines: ['ร้านเล็กหน้าบ้านขายหมดก่อนเที่ยงทุกวัน', 'ลองตำน้ำพริกด้วยพริกของโลกนี้จนได้สูตรใหม่', 'ลูกค้าประจำเริ่มสั่ง "แบบเดิม" โดยไม่ต้องดูเมนู'] } },
+  farm: { name: 'เกษตร', focus: { name: 'ทำแปลงทดลองแบบบ้านเกิด', gain: { gold: 20, fame: 0.4, know: 1, hp: 1 },
+    lines: ['ไถกลบตอซังแทนการเผา ดินร่วนขึ้นทุกปี', 'ชาวนาข้างแปลงแอบมาจดว่าคุณปลูกอะไรสลับกับอะไร', 'ขุดคูน้ำเล็ก ๆ รอบแปลง ปีนี้น้ำไม่ท่วม'] } },
+  medic: { name: 'แพทย์และสุขอนามัย', focus: { name: 'รักษาคนแบบบ้านเกิด', gain: { gold: 15, fame: 0.6, know: 1, cha: 0.3 },
+    lines: ['ต้มผ้าพันแผลทุกเช้าจนคนในตรอกทำตาม', 'ประคบร้อนให้ยายข้างบ้านจนเธอเดินได้ไกลขึ้น', 'สอนเด็ก ๆ ล้างมือก่อนกินข้าว แลกกับขนมคนละชิ้น'] } },
+  trade: { name: 'การค้า', focus: { name: 'ค้าขายแบบบ้านเกิด', gain: { gold: 45, know: 1, joy: -1 },
+    lines: ['จดบัญชีรับจ่ายทุกคืนจนรู้ว่าของชิ้นไหนกำไรจริง', 'ลดราคาของค้างร้านแบบเซลส์ปลายปี ของหมดเกลี้ยง', 'ทำบัตรสะสมแต้มจากแผ่นไม้ ลูกค้ากลับมาซื้อซ้ำ'] } },
+  craft: { name: 'ช่าง', focus: { name: 'ประดิษฐ์ของแบบบ้านเกิด', gain: { gold: 20, str: 0.3, know: 1 },
+    lines: ['ทำรอกชักน้ำให้บ่อกลางหมู่บ้าน', 'ลองหล่อตะปูให้ขนาดเท่ากันทุกตัว', 'นั่งแกะเฟืองไม้จนนิ้วเป็นแผลทั้งสิบนิ้ว'] } },
+  print: { name: 'การพิมพ์และการศึกษา', focus: { name: 'สอนหนังสือแบบบ้านเกิด', gain: { fame: 0.5, know: 1, wit: 1, joy: 1 },
+    lines: ['สอนเด็กสามคนอ่านป้ายร้านค้าได้', 'พิมพ์ตารางสูตรคูณแจกตามบ้าน', 'เขียนแบบเรียน ก ไก่ ฉบับโลกนี้ ใช้ตัวอักษรของที่นี่'] } },
+  war: { name: 'การทหาร', stages: ['adult', 'middle', 'old'], focus: { name: 'ฝึกทหารแบบบ้านเกิด', gain: { str: 0.5, fame: 0.4, know: 1, joy: -1 },
+    lines: ['สอนทหารยามเดินแถวกับวิ่งรอบค่ายตอนเช้า', 'จัดเสบียงเป็นห่อละมื้อแบบข้าวกล่อง', 'ซ้อมขนคนเจ็บด้วยเปลไม้ไผ่'] } },
+  law: { name: 'การเมืองและกฎหมาย', focus: { name: 'ช่วยงานราชการแบบบ้านเกิด', gain: { gold: 20, cha: 0.3, know: 1 },
+    lines: ['ทำแบบฟอร์มคำร้องให้ชาวบ้านกรอก ไม่ต้องต่อแถวรอพูด', 'จดบันทึกการประชุมหมู่บ้านทุกครั้ง', 'ช่วยนับคะแนนเลือกผู้ใหญ่บ้าน เปิดหีบต่อหน้าทุกคน'] } },
+  fun: { name: 'บันเทิง', focus: { name: 'ทำเรื่องสนุกแบบบ้านเกิด', gain: { gold: 15, cha: 0.4, know: 1, joy: 4 },
+    lines: ['สอนเด็ก ๆ เล่นเป่ายิ้งฉุบกับซ่อนหา', 'แต่งเพลงลูกทุ่งใส่คำของโลกนี้ คนฮัมตามทั้งตลาด', 'เปิดวงหมากฮอสหน้าบ้านทุกเย็น'] } },
+};
+// shortcut = ความรู้ที่ทางลัดทุ่มเทเปิด · wit = ส่วนของความรู้ทั่วไปที่ช่วยทุกหมวด
+// w0/w = น้ำหนักในกองของเรื่องระลึก (ขั้น 0 · มี 9 เรื่อง เบาไว้ไม่ให้กลบเรื่องประจำโลก) / เรื่องขั้นลึก (มาเฉพาะคนที่รู้แล้ว จึงหนักได้)
+// focusW = ทุ่มเททางลัดหมวดไหน เหตุการณ์หมวดนั้นโผล่บ่อยขึ้นกี่เท่า · loreFame = ชื่อเสียงตอนสำเร็จที่โลกจะจำ (สำเร็จ + คนยอมรับ)
+// gainK = ยิ่งรู้มากยิ่งโตช้า แบบ ISEKAI_TIME.gainK · study = อ่านตำราเติมความรู้หมวดที่แตะล่าสุดเท่านี้ต่อปี
+const ISEKAI_KNOW_T = { shortcut: 20, wit: 0.5, w0: 0.15, w: 0.8, focusW: 3, loreFame: 20, gainK: 30, study: 1.5 };
+// ของที่โลกจำได้ — ชื่อสั้นสำหรับบรรทัดจดหมายเหตุของชาติถัดไปในโลกเดียวกัน
+const ISEKAI_LORE = {
+  fishsauce: 'น้ำปลา', rotation: 'นาสลับ', soap: 'สบู่กับการต้มน้ำ', ledger: 'บัญชีสองช่อง', waterwheel: 'กังหันน้ำ',
+  school: 'โรงเรียนในโรงนา', gunpowder: 'ปืนใหญ่', court: 'ศาลที่มีพยาน', boardgame: 'หมากฮอส',
 };
 
 // stat ว่าง = ไม่ทอยเต๋า · need = ต้องมีทองถึงกดได้ · bonus/bonus2 = ธงที่ทำให้ง่ายขึ้น · flag ของตัวเลือกไม่ทอย = ติดทันที
@@ -3869,6 +4129,145 @@ const ISEKAI_EVENTS = [
         lose: { fx: { hp: -40, gold: -300 }, text: 'บาเรียแตก ร้านไหม้ไปครึ่งหนึ่ง' } },
     ] },
 
+  // ─── ก็อบลินตัวเล็ก (บทบาทที่ไม่มีเนื้อเรื่องของโลก · worlds = id บทบาท) ───
+  { id: 'gb1', worlds: ['goblin'], ch: [1], title: 'ก็อบลินตัวที่สามสิบสอง',
+    text: 'มื้อเย็นของรังคือกระดูกกวางหนึ่งท่อน ก็อบลินสามสิบเอ็ดตัวกระโจนใส่พร้อมกัน คุณตัวเล็กที่สุด และยังจำได้ว่าชาติก่อนกินข้าวสามมื้อ',
+    choices: [
+      { t: 'แย่งกระดูกกับพี่ ๆ', stat: 'str', tag: 'fight', dc: 8,
+        win: { fx: { str: 3, hp: 5 }, text: 'คุณกัดนิ้วพี่ใหญ่จนเขาปล่อย ได้กระดูกมาท่อนเล็ก ๆ แต่เป็นของคุณคนเดียว' },
+        lose: { fx: { hp: -10, str: 1 }, text: 'โดนเหยียบหน้าไปสามรอบ คืนนั้นได้แค่เลียพื้น' } },
+      { t: 'ย่องไปดูในโพรงของหัวหน้ารัง', stat: 'luk', tag: 'sneak', dc: 8,
+        win: { fx: { luk: 3, hp: 8 }, text: 'หัวหน้ารังซ่อนเห็ดตากแห้งไว้ใต้หนังหมี คุณกินไปสองดอก ไม่มีใครรู้' },
+        lose: { fx: { hp: -8 }, text: 'หัวหน้ารังนอนไม่หลับพอดี คุณโดนจับหางเหวี่ยงออกมา' } },
+      { t: 'แบ่งเศษขนมปังที่เก็บไว้ให้ตัวที่เล็กรองลงมา', fx: { cha: 2, goal: 3 }, text: 'ก็อบลินตัวที่สามสิบเอ็ดมองหน้าคุณนาน แล้วเดินตามคุณไปทุกที่ตั้งแต่วันนั้น' },
+    ] },
+  { id: 'gb2', worlds: ['goblin'], ch: [1, 2], title: 'นับเลขเกินห้า',
+    text: 'ก็อบลินในรังนับได้แค่ห้า เกินจากนั้นเรียกว่า "เยอะ" ทั้งหมด ทุกครั้งที่แบ่งของจึงต้องตีกันก่อน',
+    choices: [
+      { t: 'สอนทุกตัวนับเลขด้วยนิ้วเท้า', stat: 'cha', tag: 'talk', dc: 9,
+        win: { fx: { goal: 8, cha: 2 }, flag: 'tally', text: 'ตอนนี้รังนับได้ถึงยี่สิบ แบ่งของตามจำนวนตัว ไม่มีใครตีกันตอนกินข้าวอีก' },
+        lose: { fx: { goal: 2 }, text: 'ทุกตัวนับได้ถึงเจ็ด แล้วเถียงกันว่าเจ็ดมากกว่าเยอะไหม' } },
+      { t: 'แอบใช้เลขที่รู้คนเดียวโกงส่วนแบ่ง', stat: 'luk', tag: 'sneak', dc: 8,
+        win: { fx: { luk: 2, hp: 10 }, text: 'คุณได้ส่วนแบ่งมากกว่าตัวอื่นทุกมื้อ ตัวโตขึ้นทันพี่ ๆ ในฤดูเดียว' },
+        lose: { fx: { hp: -10 }, text: 'พี่ใหญ่สังเกตว่ากองของคุณสูงกว่ากองอื่น คุณโดนแย่งคืนหมด' } },
+    ] },
+  { id: 'gb3', worlds: ['goblin'], ch: [2], title: 'นักผจญภัยมือใหม่หลงเข้ารัง',
+    text: 'เด็กสาวในชุดเกราะหนังตกลงมาในหลุมหน้ารัง ขาพลิก ดาบหักครึ่ง เธอหลับตาแน่น "อย่ากินฉันนะ"',
+    choices: [
+      { t: 'ซ่อนเธอไว้แล้วพาออกทางอุโมงค์ลับ', stat: 'luk', tag: 'sneak', dc: 11,
+        win: { fx: { goal: 5, fame: 5 }, flag: 'humanpal', next: 'gb3b', text: 'ก่อนจากกันเธอผูกผ้าเช็ดหน้าไว้ที่ข้อมือคุณ "ฉันชื่อมิร่า จะไม่ลืมก็อบลินตัวนี้"' },
+        lose: { fx: { hp: -15 }, text: 'ก็อบลินยามเห็นเข้า คุณโดนรุมจนสลบ เธอหนีไปได้เองระหว่างนั้น' } },
+      { t: 'ตะโกนเรียกทั้งรังมารุม', stat: 'str', tag: 'fight', dc: 9,
+        win: { fx: { str: 2, gold: 30, goal: 3 }, text: 'รังได้ชุดเกราะกับถุงเงินมาหนึ่งถุง หัวหน้ารังลูบหัวคุณเป็นครั้งแรก' },
+        lose: { fx: { hp: -15 }, text: 'ดาบหักครึ่งยังฟันได้ คุณได้แผลเป็นยาวพาดหน้า' } },
+      { t: 'ยึดดาบไว้แล้วไล่เธอไป', fx: { str: 1, gold: 10 }, text: 'เธอกระโผลกกระเผลกหนีเข้าป่า คุณได้ดาบหักครึ่งไว้ขู่ตัวอื่น' },
+    ] },
+  // ใบตามของ gb3 — follow = ไม่อยู่ในกองสุ่ม · มาเมื่อช่วยนักผจญภัยออกจากรังได้
+  { id: 'gb3b', worlds: ['goblin'], ch: [3], follow: true, title: 'ผ้าเช็ดหน้าผืนเดิม',
+    text: 'มิร่ากลับมาที่ปากหุบเขา ตอนนี้เป็นนักผจญภัยระดับเงินแล้ว เธอโบกผ้าเช็ดหน้าผืนเดิม "หมู่บ้านฉันอยากซื้อเห็ดในถ้ำพวกนาย ขายไหม"',
+    choices: [
+      { t: 'ตกลง เปิดตลาดเห็ดที่ปากหุบ', stat: 'cha', tag: 'trade', dc: 12, bonus: { flag: 'tally', add: 15 },
+        win: { fx: { goal: 15, gold: 150, fame: 8 }, text: 'ก็อบลินที่นับเลขเป็นทอนเงินถูกทุกเหรียญ คนจากหมู่บ้านเริ่มมาซื้อทุกตลาดนัด' },
+        lose: { fx: { goal: 3, gold: -20 }, text: 'ก็อบลินกินเห็ดที่จะขายไปครึ่งกระสอบระหว่างทาง ตลาดนัดแรกเลยมีของแค่สามกอง' } },
+      { t: 'ขอให้เธอบอกกิลด์ว่ารังนี้ไม่ทำร้ายใคร', fx: { goal: 8, hp: 10 }, text: 'ป้ายประกาศล่าก็อบลินในหุบนี้ถูกปลดลงจากกระดานกิลด์ รังนอนหลับเต็มอิ่มได้เป็นครั้งแรก' },
+    ] },
+  { id: 'gb4', worlds: ['goblin'], ch: [2, 3], title: 'หัวหน้ารังแก่แล้ว',
+    text: 'หัวหน้ารังฟันหลุดไปครึ่งปาก ก็อบลินตัวโตสามตัวเริ่มยืนห่างจากเขาแล้วซุบซิบกัน ใครตัวใหญ่สุดจะได้ครองรัง ตามธรรมเนียมที่ไม่มีใครเขียนไว้',
+    choices: [
+      { t: 'ท้าดวลแย่งตำแหน่ง', stat: 'str', tag: 'fight', dc: 14,
+        win: { fx: { goal: 15, fame: 5, str: 2 }, text: 'คุณตัวเล็กกว่าแต่ไม่ยอมล้ม ตัวโตทั้งสามยอมก้มหัวให้ก่อนพระอาทิตย์ขึ้น' },
+        lose: { fx: { hp: -25 }, text: 'ฟันคุณหักไปสองซี่ แต่ทั้งรังจำได้ว่าตัวเล็กตัวนี้กล้า' } },
+      { t: 'รวมเสียงก็อบลินตัวเล็กทั้งรัง', stat: 'cha', tag: 'talk', dc: 12, bonus: { flag: 'tally', add: 15 },
+        win: { fx: { goal: 15, cha: 2 }, text: 'ตัวเล็กมีมากกว่าตัวโตสิบเท่า นับกันทีละตัว คุณได้ครองรังโดยไม่มีใครเลือดออก' },
+        lose: { fx: { goal: 3, hp: -10 }, text: 'ตัวเล็กหนีหมดตอนตัวโตคำราม เหลือคุณยืนอยู่คนเดียว' } },
+      { t: 'พาพวกที่อยากไปออกไปตั้งรังใหม่', stat: 'luk', tag: 'sneak', dc: 11,
+        win: { fx: { goal: 10, luk: 3 }, text: 'ถ้ำใหม่หลังน้ำตกแห้งและกว้าง ก็อบลินสิบสองตัวที่ตามมาเรียกคุณว่าหัวหน้า' },
+        lose: { fx: { hp: -15 }, text: 'ถ้ำที่เจอมีหมีอยู่ก่อน ทุกตัววิ่งกลับรังเดิมทั้งน้ำตา' } },
+    ] },
+  { id: 'gb5', worlds: ['goblin'], ch: [3], title: 'นักล่าก็อบลินมาถึงหุบเขา',
+    text: 'ชายในเกราะเหล็กเต็มตัวเดินเข้าหุบเขาคนเดียว ข่าวลือว่าเขาล้างรังก็อบลินมาแล้วร้อยรัง และไม่เคยฟังใครพูด',
+    choices: [
+      { t: 'พาทั้งรังหนีทางอุโมงค์ลึก', stat: 'luk', tag: 'sneak', dc: 15,
+        win: { fx: { goal: 15, luk: 2 }, text: 'ก็อบลินทุกตัวรอดออกไปอีกฝั่งเขา เขาเจอแต่ถ้ำว่างกับกองกระดูกเก่า' },
+        lose: { fx: { goal: -5, hp: -25 }, text: 'อุโมงค์ถล่มกลางทาง ครึ่งรังติดอยู่ข้างหลัง คุณกลับไปขุดจนเล็บหลุด' } },
+      { t: 'ออกไปโบกผ้าขาวคุยกับเขา', stat: 'cha', tag: 'talk', dc: 18, bonus: { flag: 'humanpal', add: 25 },
+        win: { fx: { goal: 20, fame: 10 }, text: 'เขาเห็นผ้าเช็ดหน้าของนักผจญภัยที่ข้อมือคุณ แล้ววางดาบลงช้า ๆ "มิร่าเคยเล่าเรื่องเจ้า"' },
+        lose: { fx: { hp: -35 }, text: 'เขาไม่ฟังจริง ๆ คุณรอดมาได้เพราะตัวเล็กพอมุดซอกหิน' } },
+      { t: 'วางกับดักทั่วหุบเขา', stat: 'str', tag: 'fight', dc: 16,
+        win: { fx: { goal: 10, str: 3, fame: 5 }, text: 'เขาตกหลุมขวากแล้วถอยกลับไปพร้อมขาที่เจ็บ รังรอดไปอีกหลายปี' },
+        lose: { fx: { hp: -35 }, text: 'เขาข้ามกับดักทุกอันเหมือนเคยเห็นมาแล้วร้อยครั้ง' } },
+    ] },
+
+  // ─── ลูกจอมมาร ───
+  { id: 'dk1', worlds: ['demonchild'], ch: [1], title: 'พี่เลี้ยงแวมไพร์',
+    text: 'พี่เลี้ยงแวมไพร์ยื่นถ้วยเลือดอุ่น ๆ มาให้ "องค์ชายต้องดื่มทุกเช้าจะได้โตไว" คุณยังจำรสนมจืดตราหมีได้ดี',
+    choices: [
+      { t: 'ขอนมวัวแทน', stat: 'cha', tag: 'talk', dc: 8,
+        win: { fx: { cha: 3, hp: 10 }, text: 'เธอหน้าซีดกว่าเดิม แต่ก็ไปรีดนมวัวมาให้เอง ปราสาทมืดมีวัวหนึ่งตัวตั้งแต่วันนั้น' },
+        lose: { fx: { hp: -5 }, text: 'เธอบีบจมูกแล้วกรอกให้ คุณสำลักจนน้ำตาไหล' } },
+      { t: 'แอบเปิดตำราเวทมืดในห้องพ่อ', stat: 'mag', tag: 'magic', dc: 8,
+        win: { fx: { mag: 4 }, text: 'คุณจุดไฟดำบนปลายนิ้วได้ตอนสามขวบ พ่อดีใจจนจัดงานเลี้ยงเจ็ดวัน' },
+        lose: { fx: { hp: -10, mag: 1 }, text: 'ไฟดำย้อนกลับมาไหม้คิ้ว คุณไม่มีคิ้วไปทั้งปี' } },
+      { t: 'ร้องไห้ดังจนปราสาทสั่น', fx: { mag: 2, hp: 5 }, text: 'ค้างคาวทั้งปราสาทบินหนี พี่เลี้ยงยอมเอาถ้วยออกไปแล้วกล่อมจนคุณหลับ' },
+    ] },
+  { id: 'dk2', worlds: ['demonchild'], ch: [1, 2], title: 'บทเรียนแรกของสายจอมมาร',
+    text: 'พ่อพาคุณลงคุกใต้ปราสาท อัศวินมนุษย์คนหนึ่งถูกล่ามอยู่ "ลูกจอมมารต้องตัดสินเชลยคนแรกด้วยตัวเอง ข้าจะดู"',
+    choices: [
+      { t: 'ร่ายเวทลงโทษตามธรรมเนียม', stat: 'mag', tag: 'magic', dc: 10,
+        win: { fx: { goal: 10, mag: 2, fame: 5 }, text: 'พ่อพยักหน้าช้า ๆ ทหารปีศาจกระซิบกันว่าองค์ชายคนเล็กไม่ธรรมดา' },
+        lose: { fx: { goal: 3, hp: -10 }, text: 'เวทไม่ออก พ่อถอนหายใจแล้วเดินขึ้นบันไดไปก่อน' } },
+      { t: 'สั่งให้เขาไปทำงานในสวนปราสาท', fx: { goal: 3, cha: 1 }, text: 'พ่อเลิกคิ้ว แต่ไม่ว่าอะไร อีกสิบปีต่อมาสวนของปราสาทมืดมีดอกกุหลาบเป็นครั้งแรก' },
+      { t: 'กลางดึกแอบไขกุญแจปล่อยเขาไป', stat: 'luk', tag: 'sneak', dc: 11,
+        win: { fx: { cha: 2, luk: 2 }, flag: 'mercy', text: 'เขาหันกลับมามองคุณที่ประตูหลังปราสาท "ข้าจะเล่าให้พระราชาฟังว่าลูกจอมมารไม่เหมือนที่เราคิด"' },
+        lose: { fx: { hp: -20, goal: -5 }, text: 'ยามจับได้คาประตู พ่อขังคุณไว้ในหอคอยหนึ่งเดือน' } },
+    ] },
+  { id: 'dk3', worlds: ['demonchild'], ch: [2], title: 'ถ้วยไวน์ของพี่ชาย',
+    text: 'งานเลี้ยงวันเกิดคุณ พี่ชายคนโตยกถ้วยไวน์มาให้ด้วยตัวเอง ยิ้มกว้างผิดปกติ ไวน์ในถ้วยมีฟองเล็ก ๆ ที่ไม่ควรมี',
+    choices: [
+      { t: 'ส่องถ้วยด้วยเวทประเมิน', stat: 'mag', tag: 'appraise', dc: 13,
+        win: { fx: { goal: 8, mag: 2 }, flag: 'proof', text: 'พิษงูดำสามหยด คุณเก็บถ้วยไว้ในห้องลับ ไม่พูดอะไรสักคำ' },
+        lose: { fx: { hp: -25 }, text: 'มองไม่ออก ดื่มไปครึ่งถ้วยก่อนจะรู้ตัว นอนซมไปทั้งฤดู' } },
+      { t: 'ดื่มให้หมด แล้วยิ้มตอบ', stat: 'str', tag: 'fight', dc: 13,
+        win: { fx: { str: 3, fame: 5, hp: -10 }, text: 'พิษไม่พอจะล้มลูกจอมมาร พี่ชายหน้าซีดทั้งคืน ทั้งราชสำนักเห็น' },
+        lose: { fx: { hp: -30 }, text: 'คุณล้มกลางงานเลี้ยง หมอหลวงเฝ้าอยู่สามวันกว่าจะฟื้น' } },
+      { t: 'แอบสลับถ้วยกับพี่ชาย', stat: 'luk', tag: 'sneak', dc: 13,
+        win: { fx: { goal: 10, luk: 2 }, text: 'พี่ชายดื่มรวดเดียวหมด แล้วต้องนอนติดเตียงไปทั้งปี ไม่มีใครพิสูจน์ได้ว่าใครทำ' },
+        lose: { fx: { hp: -20 }, text: 'มือคุณช้าไป พี่ชายเห็น ถ้วยหล่นแตก กลิ่นพิษลอยทั่วห้องโถง' } },
+    ] },
+  { id: 'dk4', worlds: ['demonchild'], ch: [2, 3], title: 'ทูตมนุษย์ที่ชายแดน',
+    text: 'พ่อส่งคุณไปพบทูตมนุษย์ที่ป้อมชายแดน "ไปทำให้มันกลัว" ทูตเป็นหญิงแก่ถือแค่ม้วนกระดาษ ไม่มีทหารตามมาสักคน',
+    choices: [
+      { t: 'เสนอเปิดด่านค้าขาย', stat: 'cha', tag: 'talk', dc: 15, bonus: { flag: 'mercy', add: 20 },
+        win: { fx: { goal: 15, fame: 8 }, flag: 'border', next: 'dk4b', text: 'เธอคลี่ม้วนกระดาษออก ข้างในเป็นร่างสัญญาค้าขายที่เตรียมมาแล้ว "ข้ารอคนที่จะพูดประโยคนี้มาสามสิบปี"' },
+        lose: { fx: { goal: 3 }, text: 'เธอไม่เชื่อว่าลูกจอมมารพูดจริง กลับไปโดยไม่เซ็นอะไร' } },
+      { t: 'ข่มด้วยเวทให้เห็นพลัง', stat: 'mag', tag: 'magic', dc: 13,
+        win: { fx: { goal: 10, mag: 2, fame: 5 }, text: 'ฟ้าเหนือป้อมมืดลงครึ่งวัน เธอกลับไปรายงานว่าลูกจอมมารน่ากลัวกว่าพ่อ' },
+        lose: { fx: { hp: -10 }, text: 'เวทพลาดไปเผาหลังคาป้อมตัวเอง ทูตยืนดูเฉย ๆ' } },
+      { t: 'รับถุงทองแล้วปล่อยกองคาราวานมนุษย์ผ่าน', fx: { gold: 300 }, text: 'ถุงทองหนักมือ แต่ทหารปีศาจที่เฝ้าด่านไม่ได้ส่วนแบ่ง และเริ่มมองคุณแปลก ๆ' },
+    ] },
+  // ใบตามของ dk4 — มาเมื่อทูตเซ็นสัญญาเปิดด่าน
+  { id: 'dk4b', worlds: ['demonchild'], ch: [3], follow: true, title: 'ตลาดแรกบนพรมแดน',
+    text: 'ตลาดนัดแรกระหว่างมนุษย์กับปีศาจเปิดที่ลานหน้าด่าน ยังไม่ทันเที่ยง ออร์กกับพ่อค้าผ้าก็เถียงกันเรื่องตาชั่งจนเริ่มชักมีด',
+    choices: [
+      { t: 'ลงไปยืนกลางตลาดตัดสินเอง', stat: 'cha', tag: 'talk', dc: 14,
+        win: { fx: { goal: 15, fame: 10 }, text: 'คุณให้ทั้งสองฝ่ายชั่งของบนตาชั่งเดียวกันต่อหน้าทุกคน ตลาดเปิดต่อจนค่ำ และเปิดทุกเดือนนับจากนั้น' },
+        lose: { fx: { goal: 3, hp: -15 }, text: 'ทั้งสองฝ่ายหันมาโทษคุณแทน ตลาดปิดไปสามเดือน' } },
+      { t: 'กางเวทแบ่งเขตห้ามชักอาวุธ', stat: 'mag', tag: 'magic', dc: 14,
+        win: { fx: { goal: 12, mag: 2 }, text: 'ใครชักมีดในเขตเวท มีดกลายเป็นดอกไม้ ออร์กถือช่อดอกไม้ยืนงงอยู่นาน' },
+        lose: { fx: { goal: 3, hp: -10 }, text: 'เวทกินมานาเกินตัว คุณหมดแรงกลางตลาด ต้องให้พ่อค้ามนุษย์หามกลับ' } },
+    ] },
+  { id: 'dk5', worlds: ['demonchild'], ch: [3], title: 'บัลลังก์ว่าง',
+    text: 'จอมมารประกาศสละบัลลังก์ สภาปีศาจทั้งเจ็ดเผ่าจะเลือกผู้สืบทอดจากลูกทั้งสี่ พี่ชายคนโตมองคุณข้ามโต๊ะประชุมไม่วางตา',
+    choices: [
+      { t: 'วางหลักฐานถ้วยพิษต่อหน้าสภา', stat: 'cha', tag: 'talk', dc: 18, bonus: { flag: 'proof', add: 25 }, bonus2: { flag: 'border', add: 10 },
+        win: { fx: { goal: 20, fame: 10 }, text: 'สภาเงียบทั้งห้อง พี่ชายถูกตัดสิทธิ์ เสียงข้างมากยกให้คุณ' },
+        lose: { fx: { goal: 5, fame: -10 }, text: 'สภาไม่เชื่อ หาว่าคุณใส่ร้ายพี่เพื่อแย่งบัลลังก์' } },
+      { t: 'ท้าประลองเวทกับพี่ทั้งสาม', stat: 'mag', tag: 'magic', dc: 20,
+        win: { fx: { goal: 20, fame: 15, mag: 2 }, text: 'ไฟดำของคุณกลืนเวทของพี่ทั้งสามในคราวเดียว สภาลุกขึ้นยืนทั้งห้อง' },
+        lose: { fx: { hp: -40 }, text: 'พี่ทั้งสามรุมคุณพร้อมกัน ไม่มีใครในสภาห้าม' } },
+      { t: 'ถอนตัว ขอไปอยู่หอคอยชายแดน', fx: { hp: 15, luk: 3, goal: 5 }, text: 'คุณได้หอคอยหนึ่งหลังกับแมวดำหนึ่งตัว พี่ ๆ แย่งกันต่อโดยไม่มีใครสนใจคุณ' },
+    ] },
+
   // ─── ทุกโลก (worlds ว่าง = ทุกโลก) ───
   { id: 'g_guild', worlds: ['hero', 'noble', 'slowlife'], ch: [1, 2], title: 'ลงทะเบียนกิลด์นักผจญภัย',
     text: 'พนักงานสาวหูแมวยื่นแผ่นวัดพลังมาให้ "วางมือได้เลยค่ะ ปกติจะขึ้นแรงค์ F"',
@@ -3908,7 +4307,8 @@ const ISEKAI_EVENTS = [
         lose: { fx: { hp: -15 }, text: 'ทหารคนนั้นรับส่วยจากตลาด คุณโดนอันธพาลรุมตอนกลางคืน' } },
       { t: 'เดินผ่านไป', fx: { luk: -3 }, text: 'สายตาเด็กคนนั้นตามคุณไปจนถึงปลายตลาด' },
     ] },
-  { id: 'g_dragon', worlds: null, ch: [2, 3], title: 'มังกรแก่ในถ้ำทอง',
+  // minFame = ต้องมีชื่อเสียงถึงก่อนเรื่องนี้จะมาหา (B68b · เรื่องระหว่างชีวิตผูกชื่อเสียง ไม่ผูกบุญบาป)
+  { id: 'g_dragon', worlds: null, ch: [2, 3], minFame: 15, title: 'มังกรแก่ในถ้ำทอง',
     text: 'มังกรสีมรกตนอนขดบนกองทอง ลืมตาข้างเดียว "สิ่งมีชีวิตจากต่างโลก กลิ่นของเจ้าแปลกดี"',
     choices: [
       { t: 'นั่งคุยกับมัน', stat: 'cha', tag: 'talk', dc: 16,
@@ -3995,6 +4395,232 @@ const ISEKAI_EVENTS = [
         win: { fx: { fame: 10, cha: 2 }, text: 'ทุกคนรอด เด็ก ๆ เรียกคุณว่าพี่ใหญ่' },
         lose: { fx: { hp: -15 }, text: 'ถ้ำมีหมีอยู่ก่อนแล้ว' } },
     ] },
+  // ─── ความรู้จากโลกเดิม (B68h) ───
+  // know = { หมวด, ความรู้ขั้นต่ำที่เรื่องนี้จะมาหา } · ตัวเลือกที่มี know ทอยด้วยความรู้หมวดนั้น · fx.know = ความรู้หมวดของเรื่องที่ขึ้นลง
+  // ล้มเหลวยังได้ความรู้เล็กน้อย (ลองใหม่ได้ในเรื่องถัดไปของหมวด) · lore = ของที่โลกนี้จะจำถ้าชื่อเสียงถึง · loreOf = โลกจำแล้ว เรื่องนี้ไม่มาอีก
+  // adult = ความรู้อันตราย เปิดเฉพาะวัยผู้ใหญ่ขึ้นไป · เล่าเป็นผล ไม่มีวิธีทำ
+  { id: 'k_food1', ch: [1, 2, 3], know: { cat: 'food', min: 0 }, title: 'ซุปจืดของโรงเตี๊ยม',
+    text: 'ซุปที่โรงเตี๊ยมจืดจนต้องเติมเกลือเอง คุณนึกถึงน้ำซุปกระดูกหมูที่แม่เคี่ยวทั้งคืน แต่จำไม่ได้ว่าแม่ใส่อะไรบ้าง',
+    choices: [
+      { t: 'นั่งนึกว่าแม่ใส่อะไรลงหม้อ', know: 'food', tag: 'cook', dc: 8,
+        win: { fx: { know: 15, cha: 1 }, text: 'รากผักชี กระเทียม พริกไทยเม็ด ค่อย ๆ กลับมาทีละอย่าง คุณจดใส่ผ้าเช็ดหน้าไว้ก่อนจะลืม' },
+        lose: { fx: { know: 5 }, text: 'นึกออกแค่กลิ่นหอม ๆ ที่เหลือว่างเปล่า อย่างน้อยก็รู้ว่าต้องเริ่มจากกระดูก' } },
+      { t: 'เติมเกลือแล้วกินให้หมด', fx: { hp: 5 }, text: 'อิ่มท้องดี วันนี้ไม่ต้องคิดอะไรมาก' },
+    ] },
+  { id: 'k_food2', ch: [2, 3], know: { cat: 'food', min: 10 }, title: 'แผงลอยหน้าประตูเมือง',
+    text: 'หน้าประตูเมืองมีแต่แผงขายขนมปังแข็ง คนเดินทางหิวกันทั้งวัน คุณมีเงินพอเช่าแผงได้หนึ่งเดือน',
+    choices: [
+      { t: 'ขายข้าวผัดกะเพราเท่าที่จำได้', know: 'food', tag: 'cook', dc: 18,
+        win: { fx: { gold: 200, fame: 6, know: 10 }, next: 'k_food3', text: 'ใบไม้ที่นี่ไม่ใช่กะเพรา แต่หอมคล้ายกัน คิวยาวถึงสะพาน คนขายขนมปังข้าง ๆ มองตาขวาง' },
+        lose: { fx: { gold: -80, know: 6 }, text: 'พริกที่นี่เผ็ดกว่าที่บ้านสิบเท่า ลูกค้าคนแรกวิ่งหาน้ำ ทั้งเดือนขายไม่ออก แต่ตอนนี้รู้แล้วว่าต้องลดพริก' } },
+      { t: 'ต้มซุปแจกคนเดินทางที่ไม่มีเงิน', fx: { gold: -50, cha: 2, fame: 3 }, text: 'ได้คำขอบคุณมาเต็มกระเป๋า เงินหายไปนิดหน่อย' },
+      { t: 'ขายขนมปังแข็งเหมือนคนอื่น', fx: { gold: 60 }, text: 'ขายได้พอค่าแผง ไม่มีใครจำหน้าคุณได้' },
+    ] },
+  { id: 'k_food3', ch: [2, 3], know: { cat: 'food', min: 25 }, loreOf: 'fishsauce', title: 'สมาคมพ่อค้าขอซื้อสูตร',
+    text: 'สมาคมพ่อค้าอาหารวางถุงทองตรงหน้า ขอซื้อสูตรน้ำปลากับวิธีผัดของคุณ แลกกับห้ามคนอื่นทำขาย',
+    choices: [
+      { t: 'สอนให้ทุกคนในเมืองทำเป็น', know: 'food', tag: 'cook', dc: 26,
+        win: { fx: { fame: 15, cha: 3, know: 5 }, lore: 'fishsauce', text: 'สามปีต่อมา ทุกบ้านมีโอ่งหมักน้ำปลาไว้หลังบ้าน เด็ก ๆ เรียกมันว่าน้ำของคนต่างโลก' },
+        lose: { fx: { fame: 3, know: 5 }, text: 'หลายบ้านหมักแล้วเน่า เลิกกันไปทีละบ้าน เหลือยายข้างบ้านคนเดียวที่ยังทำต่อ' } },
+      { t: 'ขายสูตรให้สมาคม', fx: { gold: 800 }, text: 'ได้ทองเยอะจนต้องจ้างคนแบก สมาคมขึ้นราคาน้ำปลาสามเท่า คนจนไม่มีปัญญาซื้อ' },
+      { t: 'ไม่ขายไม่สอน ทำขายเองคนเดียว', fx: { gold: 300, fame: -3 }, text: 'ร้านคุณขายดี ร้านรอบข้างปิดไปสองร้าน' },
+    ] },
+  { id: 'k_farm1', ch: [1, 2, 3], know: { cat: 'farm', min: 0 }, title: 'นาที่ข้าวไม่ขึ้น',
+    text: 'ชาวนาแถวนี้ปลูกพืชเดิมที่เดิมทุกปี ดินจืดลงเรื่อย ๆ ปีนี้ข้าวสาลีออกรวงไม่ถึงครึ่ง คุณจำได้ลาง ๆ ว่าครูวิทย์เคยพูดเรื่องนี้',
+    choices: [
+      { t: 'นึกถึงบทเรียนเรื่องปลูกพืชหมุนเวียน', know: 'farm', dc: 8,
+        win: { fx: { know: 15 }, text: 'ถั่วกับข้าวผลัดกันปลูก ถั่วคืนปุ๋ยให้ดิน คุณจำได้กระทั่งหน้าครูตอนพูด' },
+        lose: { fx: { know: 5 }, text: 'จำได้แค่ว่าต้องสลับอะไรสักอย่าง แต่สลับอะไรกับอะไรนึกไม่ออก' } },
+      { t: 'ช่วยชาวนาเกี่ยวข้าวเท่าที่มี', fx: { str: 1, hp: -5, cha: 1 }, text: 'ปวดหลังไปสามวัน ได้ขนมปังมาหนึ่งก้อน' },
+    ] },
+  { id: 'k_farm2', ch: [2, 3], know: { cat: 'farm', min: 10 }, title: 'แปลงทดลองหัวไร่',
+    text: 'ผู้ใหญ่บ้านยอมให้ยืมที่ดินหัวไร่หนึ่งแปลง "ถ้าไม่ได้ผล ปีหน้าเอาคืน"',
+    choices: [
+      { t: 'ปลูกถั่วสลับข้าว ทำปุ๋ยหมักจากเศษผัก', know: 'farm', dc: 18,
+        win: { fx: { gold: 150, fame: 6, know: 10 }, next: 'k_farm3', text: 'ปีที่สองแปลงคุณเขียวกว่าแปลงอื่นจนมองเห็นจากเนิน ชาวนามายืนดูกันทุกเช้า' },
+        lose: { fx: { gold: -30, know: 6 }, text: 'กองปุ๋ยหมักแฉะจนเน่า หนูมาทำรังทั้งกอง คราวหน้าต้องกลับกองบ่อยกว่านี้' } },
+      { t: 'ปลูกพริกกับตะไคร้ไว้กินเอง', fx: { hp: 8, gold: 30 }, text: 'ได้กินต้มยำครั้งแรกในโลกนี้ เกือบร้องไห้' },
+    ] },
+  { id: 'k_farm3', ch: [2, 3], know: { cat: 'farm', min: 25 }, loreOf: 'rotation', title: 'ปีแล้ง',
+    text: 'ฝนไม่ตกมาสองเดือน แปลงเดียวในหมู่บ้านที่ยังเขียวคือแปลงของคุณ เจ้าที่ดินส่งคนมาถามว่าทำอย่างไร',
+    choices: [
+      { t: 'สอนทุกครอบครัวในหมู่บ้าน', know: 'farm', dc: 26,
+        win: { fx: { fame: 15, cha: 3, know: 5 }, lore: 'rotation', text: 'ปีถัดมาไม่มีใครอดตาย หมู่บ้านเรียกวิธีนี้ว่านาสลับ แล้วสอนลูกหลานต่อ' },
+        lose: { fx: { fame: 3, know: 5 }, text: 'ครึ่งหมู่บ้านทำตาม อีกครึ่งบอกว่าคนต่างถิ่นไม่รู้จักดินที่นี่' } },
+      { t: 'บอกเฉพาะเจ้าที่ดิน แลกส่วนแบ่ง', fx: { gold: 500 }, text: 'เจ้าที่ดินขึ้นค่าเช่านาทุกแปลงที่ได้ผลดีขึ้น' },
+    ] },
+  { id: 'k_medic1', ch: [1, 2, 3], know: { cat: 'medic', min: 0 }, title: 'ท้องร่วงทั้งตรอก',
+    text: 'คนในตรอกท้องร่วงกันทั้งแถบ หมอประจำเมืองบอกว่าโดนคำสาป คุณเห็นเด็กตักน้ำจากบ่อเดียวกับที่ทิ้งของเสีย',
+    choices: [
+      { t: 'นึกถึงที่ครูสอนเรื่องเชื้อโรค', know: 'medic', tag: 'appraise', dc: 8,
+        win: { fx: { know: 15 }, text: 'ต้มน้ำก่อนดื่ม ล้างมือด้วยสบู่ แยกบ่อน้ำออกจากที่ทิ้งของเสีย ครูให้คัดเรื่องนี้สิบจบตอน ป.4' },
+        lose: { fx: { know: 5 }, text: 'คุณรู้ว่าน้ำมีปัญหา แต่อธิบายไม่ได้ว่าทำไม' } },
+      { t: 'ช่วยหมอแบกคนป่วย', fx: { hp: -10, cha: 2, fame: 2 }, text: 'คุณป่วยตามไปอีกสามวัน' },
+    ] },
+  { id: 'k_medic2', ch: [2, 3], know: { cat: 'medic', min: 10 }, title: 'สบู่ก้อนแรก',
+    text: 'คุณนึกออกว่าสบู่ทำจากไขมันกับน้ำขี้เถ้า แต่จำสัดส่วนไม่ได้ ร้านขายเทียนยอมให้ยืมหม้อ',
+    choices: [
+      { t: 'ลองต้มจนกว่าจะได้', know: 'medic', dc: 18,
+        win: { fx: { gold: 120, fame: 5, know: 10 }, next: 'k_medic3', text: 'ก้อนที่ห้าแข็งตัวพอดี ฟองนุ่ม กลิ่นไม่ค่อยหอม แต่คนป่วยในตรอกหายเร็วขึ้นจริง' },
+        lose: { fx: { hp: -8, know: 6 }, text: 'ก้อนแรกกัดมือจนแดง ก้อนที่สองเหลวเป็นซุป ยังไม่ได้ แต่ใกล้แล้ว' } },
+      { t: 'ทำลูกประคบสมุนไพรแทน', fx: { cha: 2, gold: 60 }, text: 'ประคบร้อนช่วยคนแก่หายปวดเมื่อยได้บ้าง ใครก็ชอบ' },
+    ] },
+  { id: 'k_medic3', ch: [2, 3], know: { cat: 'medic', min: 25 }, loreOf: 'soap', title: 'หมอประจำเมืองมาหา',
+    text: 'หมอที่เคยบอกว่าโรคระบาดเป็นคำสาปมายืนหน้าบ้าน ขอให้คุณสอนเรื่องล้างมือกับต้มน้ำให้ลูกศิษย์ของเขา',
+    choices: [
+      { t: 'สอนเต็มที่ ไม่คิดเงิน', know: 'medic', tag: 'talk', dc: 26,
+        win: { fx: { fame: 15, cha: 3, know: 5 }, lore: 'soap', text: 'ปีต่อมาคนท้องร่วงในเมืองลดลงครึ่งหนึ่ง โรงหมอตั้งอ่างล้างมือไว้หน้าประตู' },
+        lose: { fx: { fame: 3, know: 5 }, text: 'ลูกศิษย์ครึ่งหนึ่งเชื่อ อีกครึ่งหาว่าเป็นพิธีแปลก ๆ ของคนต่างโลก' } },
+      { t: 'ขายสบู่ให้โรงหมอในราคาสูง', fx: { gold: 600 }, text: 'ได้เงินมาก โรงหมอเล็ก ๆ ซื้อไม่ไหว' },
+    ] },
+  { id: 'k_trade1', ch: [1, 2, 3], know: { cat: 'trade', min: 0 }, title: 'บัญชีของพ่อค้าผ้า',
+    text: 'พ่อค้าผ้าที่คุณไปช่วยงานจดบัญชีเป็นขีดบนแผ่นไม้ ขาดทุนทุกปี แต่ไม่รู้ว่าเงินหายไปไหน',
+    choices: [
+      { t: 'นึกถึงวิชาบัญชีรายรับรายจ่ายสมัยเรียน', know: 'trade', tag: 'trade', dc: 8,
+        win: { fx: { know: 15 }, text: 'ช่องรับ ช่องจ่าย ยอดยกมา คุณตีตารางลงผ้าเก่า พ่อค้ามองเหมือนเห็นเวทมนตร์' },
+        lose: { fx: { know: 5 }, text: 'จำได้ว่ามีสองช่อง แต่ลืมว่ายอดยกมาต้องทำอย่างไร' } },
+      { t: 'ช่วยนับผ้าในโกดังแทน', fx: { gold: 40 }, text: 'ได้ค่าแรงวันละเหรียญทองแดง พ่อค้ายังขาดทุนเหมือนเดิม' },
+    ] },
+  { id: 'k_trade2', ch: [2, 3], know: { cat: 'trade', min: 10 }, title: 'หม้อเหล็กผ่อนได้',
+    text: 'ชาวบ้านอยากได้หม้อเหล็ก แต่ไม่มีเงินก้อน คุณนึกถึงป้าย "ผ่อน 0% 10 เดือน" หน้าห้างที่บ้าน',
+    choices: [
+      { t: 'เปิดร้านรับผ่อน คิดดอกต่ำ', know: 'trade', tag: 'trade', dc: 18,
+        win: { fx: { gold: 250, fame: 6, know: 10 }, next: 'k_trade3', text: 'ทุกบ้านมีหม้อเหล็ก เกือบทุกคนผ่อนตรงเวลา คนเรียกคุณว่าพ่อค้าใจดี' },
+        lose: { fx: { gold: -150, know: 6 }, text: 'ลูกค้าครึ่งหนึ่งย้ายเมืองหนีหนี้ คราวหน้าต้องรู้จักคนที่ให้ผ่อนก่อน' } },
+      { t: 'คิดดอกแพง ผิดนัดเมื่อไรยึดของ', fx: { gold: 400, fame: -5 }, text: 'ได้กำไรมาก ร้านเต็มไปด้วยหม้อที่ยึดคืนมา คนแอบเรียกคุณว่าแร้ง' },
+    ] },
+  { id: 'k_trade3', ch: [2, 3], know: { cat: 'trade', min: 25 }, loreOf: 'ledger', title: 'กิลด์พ่อค้าเชิญไปพูด',
+    text: 'กิลด์พ่อค้าได้ยินเรื่องบัญชีสองช่องของคุณ ขอให้ไปสอนในโถงประชุม พ่อค้าใหญ่บางคนไม่ชอบ เพราะบัญชีชัดแล้วโกงยาก',
+    choices: [
+      { t: 'สอนวิธีจดบัญชีให้ทุกคน', know: 'trade', tag: 'talk', dc: 26,
+        win: { fx: { fame: 15, cha: 3, know: 5 }, lore: 'ledger', text: 'กิลด์สั่งให้ทุกร้านจดบัญชีแบบใหม่ เด็กฝึกงานท่องกันทั้งตลาดว่า รับซ้าย จ่ายขวา' },
+        lose: { fx: { fame: 3, know: 5 }, text: 'พ่อค้าใหญ่ล้มที่ประชุม เรื่องเงียบไปอีกหลายปี' } },
+      { t: 'ช่วยพ่อค้าใหญ่ซ่อนกำไร', fx: { gold: 700 }, text: 'ได้ส่วนแบ่งก้อนโต ภาษีที่ควรเอาไปซ่อมสะพานหายไปเงียบ ๆ' },
+    ] },
+  { id: 'k_craft1', ch: [1, 2, 3], know: { cat: 'craft', min: 0 }, title: 'ลำธารหลังโรงสี',
+    text: 'คนในโรงสีเข็นโม่หินด้วยมือทั้งวัน หลังโรงสีมีลำธารไหลแรงทั้งปี คุณนึกถึงกังหันน้ำในหนังสือเรียน',
+    choices: [
+      { t: 'วาดกังหันที่จำได้ลงพื้นดิน', know: 'craft', dc: 8,
+        win: { fx: { know: 15 }, text: 'ใบพาย เพลา เฟือง คุณวาดได้เกือบครบ ช่างไม้ข้างโรงสีนั่งดูจนลืมกินข้าว' },
+        lose: { fx: { know: 5 }, text: 'วาดออกมาเป็นวงกลมมีขีด ๆ คนดูนึกว่าดวงอาทิตย์' } },
+      { t: 'ช่วยเข็นโม่', fx: { str: 2, hp: -5 }, text: 'แขนใหญ่ขึ้น โรงสีได้แป้งเพิ่มอีกนิด' },
+    ] },
+  { id: 'k_craft2', ch: [2, 3], know: { cat: 'craft', min: 10 }, loreOf: 'waterwheel', title: 'สร้างกังหันกับช่างไม้',
+    text: 'ช่างไม้ยอมลองสร้างตามรูปของคุณ ถ้าไม่สำเร็จ ค่าไม้ทั้งกองคุณจ่ายเอง',
+    choices: [
+      { t: 'คุมงานเองทุกขั้น', know: 'craft', dc: 18,
+        win: { fx: { gold: 200, fame: 8, know: 10 }, lore: 'waterwheel', text: 'กังหันหมุนครั้งแรก คนทั้งหมู่บ้านวิ่งมาดู โม่หินหมุนเองโดยไม่มีใครเข็น' },
+        lose: { fx: { gold: -120, know: 6 }, text: 'เพลาหักตอนน้ำหลาก ไม้ลอยไปครึ่งกอง คราวหน้าเพลาต้องหนากว่านี้' } },
+      { t: 'ให้ช่างไม้ทำตามที่เขาเข้าใจ', stat: 'luk', dc: 12,
+        win: { fx: { gold: 80 }, text: 'กังหันหน้าตาแปลกไปหน่อย แต่หมุนได้' },
+        lose: { fx: { gold: -40 }, text: 'มันหมุนกลับทาง' } },
+    ] },
+  { id: 'k_craft3', ch: [2, 3], know: { cat: 'craft', min: 20 }, adult: true, title: 'ขุนพลมาที่โรงสี',
+    text: 'ขุนพลของเจ้าเมืองเห็นเฟืองไม้ของคุณ อยากได้เครื่องยิงที่ยิงไกลกว่าของข้าศึกสองเท่า สงครามกับเมืองข้างเคียงใกล้เข้ามาแล้ว',
+    choices: [
+      { t: 'ออกแบบให้', fx: { gold: 600, fame: 8 }, text: 'เครื่องยิงชุดแรกเสร็จในสามเดือน เมืองข้างเคียงยอมแพ้เกือบไม่ต้องสู้ แต่กำแพงที่พังลงมาทับบ้านคนไปหลายหลัง' },
+      { t: 'ขอทำแค่กังหันน้ำ ไม่ทำอาวุธ', stat: 'cha', tag: 'talk', dc: 14,
+        win: { fx: { fame: 5 }, text: 'ขุนพลหัวเราะว่าหัวดื้อ แต่ก็ซื้อกังหันไปใช้ในค่ายทหาร' },
+        lose: { fx: { fame: -5, gold: -100 }, text: 'ขุนพลไม่พอใจ ยึดโรงสีไปครึ่งปี' } },
+    ] },
+  { id: 'k_print1', ch: [1, 2, 3], know: { cat: 'print', min: 0 }, title: 'หนังสือราคาเท่าบ้าน',
+    text: 'ตำราในหอสมุดเขียนด้วยมือ เล่มหนึ่งราคาเท่าบ้านหนึ่งหลัง ทั้งเมืองมีคนอ่านออกไม่ถึงสิบคน',
+    choices: [
+      { t: 'นึกถึงตอนไปเที่ยวโรงทำกระดาษสา', know: 'print', tag: 'appraise', dc: 8,
+        win: { fx: { know: 15 }, text: 'ต้มเปลือกไม้ ทุบ แช่น้ำ ช้อนขึ้นด้วยตะแกรง จำได้เพราะตอนนั้นได้ลองทำพัดกลับบ้าน' },
+        lose: { fx: { know: 5 }, text: 'จำได้แค่ว่าใช้เปลือกไม้ ที่เหลือในหัวมีแต่ร้านขายร่ม' } },
+      { t: 'ขอให้บรรณารักษ์สอนอ่าน', fx: { mag: 1, cha: 1 }, text: 'อ่านได้ช้า ๆ ทีละคำ บรรณารักษ์ดีใจที่มีคนมาถาม' },
+    ] },
+  { id: 'k_print2', ch: [2, 3], know: { cat: 'print', min: 10 }, title: 'ตัวอักษรไม้',
+    text: 'คุณทำกระดาษได้แล้ว แต่คัดทีละแผ่นช้าเกินไป แล้วก็นึกถึงตรายางที่ไปรษณีย์',
+    choices: [
+      { t: 'แกะตัวอักษรลงไม้ทีละตัว แล้วเรียงพิมพ์', know: 'print', dc: 18,
+        win: { fx: { gold: 150, fame: 6, know: 10 }, next: 'k_print3', text: 'วันเดียวพิมพ์ได้ร้อยแผ่น หมึกเลอะทั้งตัว แต่แผ่นแรกอ่านออกชัด' },
+        lose: { fx: { gold: -60, know: 6 }, text: 'ไม้บวมหมึก ตัวอักษรเบี้ยวจนอ่านไม่ออก รอบหน้าจะลองแผ่นทองแดง' } },
+      { t: 'หาพ่อค้ามาลงทุนก่อน', stat: 'cha', tag: 'talk', dc: 12,
+        win: { fx: { gold: 200 }, text: 'พ่อค้าผ้ายอมลงทุน แลกกับให้พิมพ์ใบโฆษณาร้านเขาก่อน' },
+        lose: { fx: { fame: -3 }, text: 'พ่อค้าหัวเราะใส่ "จะพิมพ์ไปให้ใครอ่าน"' } },
+    ] },
+  { id: 'k_print3', ch: [2, 3], know: { cat: 'print', min: 25 }, loreOf: 'school', title: 'โรงเรียนในโรงนา',
+    text: 'คุณพิมพ์หนังสือหัดอ่านได้เป็นกอง เด็กในหมู่บ้านมาขอดูภาพในเล่มทุกวัน แต่ไม่มีใครอ่านออก',
+    choices: [
+      { t: 'เปิดสอนอ่านฟรีในโรงนา', know: 'print', tag: 'talk', dc: 26,
+        win: { fx: { fame: 15, cha: 3, know: 5 }, lore: 'school', text: 'สิบปีต่อมา เด็กทุกคนในหมู่บ้านอ่านออก บางคนได้เป็นเสมียนในเมือง โรงนาหลังนั้นไม่มีวัวอีกเลย' },
+        lose: { fx: { fame: 3, know: 5 }, text: 'พ่อแม่ไม่ยอมให้ลูกมา เพราะต้องช่วยงานนา เหลือเด็กสองคนที่เรียนจนจบ' } },
+      { t: 'ขายหนังสือให้ขุนนางในราคาแพง', fx: { gold: 500 }, text: 'ห้องสมุดของขุนนางมีหนังสือของคุณเต็มชั้น ชาวบ้านยังอ่านไม่ออกเหมือนเดิม' },
+    ] },
+  { id: 'k_war1', ch: [2, 3], know: { cat: 'war', min: 0 }, adult: true, title: 'ทัพที่อดข้าว',
+    text: 'กองทัพของเจ้าเมืองเดินทัพผ่านหมู่บ้าน ทหารครึ่งหนึ่งป่วยเพราะเสบียงเน่ากลางทาง คุณนึกถึงตอนเกณฑ์ทหารที่บ้าน ทุกคนมีข้าวกล่องกับกระติกน้ำ',
+    choices: [
+      { t: 'นึกถึงวิธีถนอมอาหารกับจัดเสบียง', know: 'war', dc: 8,
+        win: { fx: { know: 15, fame: 3 }, text: 'ตากแห้ง หมักเกลือ แบ่งห่อละมื้อ แม่ทัพจดตามแทบไม่ทัน' },
+        lose: { fx: { know: 5 }, text: 'คุณพูดเรื่องอาหารกระป๋องกับตู้เย็น แม่ทัพมองหน้าอย่างสงสาร' } },
+      { t: 'ขายเสบียงให้ทัพในราคาสูง', fx: { gold: 250 }, text: 'ได้กำไร ทหารบางคนจำหน้าคุณได้ และไม่ได้จำในทางดี' },
+    ] },
+  { id: 'k_war2', ch: [2, 3], know: { cat: 'war', min: 10 }, adult: true, loreOf: 'gunpowder', title: 'ผงสีดำของนักเล่นแร่',
+    text: 'นักเล่นแร่แปรธาตุในเมืองเผาผงบางอย่างจนห้องทดลองไหม้ คุณรู้ว่าถ้าเขามาถูกทาง ผงนี้จะเปลี่ยนสงครามของโลกนี้ไปตลอด',
+    choices: [
+      { t: 'ชี้ทางให้เขา', know: 'war', tag: 'appraise', dc: 18,
+        win: { fx: { gold: 500, fame: 12, know: 10 }, lore: 'gunpowder', text: 'ปีต่อมาปืนใหญ่กระบอกแรกของโลกนี้ทลายกำแพงเมืองข้าศึก ผู้คนจำชื่อคุณได้ แต่ไม่ได้เรียกด้วยความรัก' },
+        lose: { fx: { hp: -25, know: 6 }, text: 'ห้องทดลองระเบิดอีกรอบ คุณรอดมาได้ คิ้วหายไปข้างหนึ่ง' } },
+      { t: 'บอกเขาว่ามันอันตรายเกินไป', stat: 'cha', tag: 'talk', dc: 14,
+        win: { fx: { fame: 4 }, text: 'เขาเลิกทดลอง หันไปทำดอกไม้ไฟงานเทศกาลแทน เด็ก ๆ ชอบมาก' },
+        lose: { fx: { luk: -1 }, text: 'เขาไม่ฟัง ยังเผาต่อทุกคืน' } },
+      { t: 'ทำเป็นไม่รู้', fx: { luk: 1 }, text: 'คุณเดินผ่านไป เสียงระเบิดเล็ก ๆ ยังดังจากห้องนั้นทุกคืน' },
+    ] },
+  { id: 'k_war3', ch: [2, 3], know: { cat: 'war', min: 10 }, adult: true, title: 'คนแปลกหน้าในโรงเตี๊ยม',
+    text: 'ชายในเสื้อคลุมรู้ว่าคุณมาจากต่างโลกและรู้เรื่องแปลก ๆ เขาวางถุงทองหนักบนโต๊ะ ขอยาที่กินแล้วหลับไม่ตื่น ไม่บอกว่าจะเอาไปให้ใคร',
+    choices: [
+      { t: 'รับงาน', fx: { gold: 1000 }, text: 'เดือนต่อมามีข่าวขุนนางคนหนึ่งตายกลางงานเลี้ยง คุณรู้ดีว่ายานั้นมาจากไหน' },
+      { t: 'ปฏิเสธแล้วไปแจ้งยาม', stat: 'cha', tag: 'talk', dc: 14,
+        win: { fx: { fame: 8 }, text: 'ยามจับเขาได้พร้อมจดหมายจ้างวาน มีคนรอดตายไปหนึ่งคนโดยไม่รู้ว่าเพราะใคร' },
+        lose: { fx: { hp: -20 }, text: 'ยามไม่เชื่อ คืนนั้นมีคนลอบทำร้ายคุณในตรอก' } },
+      { t: 'ปฏิเสธเงียบ ๆ', fx: { luk: 1 }, text: 'เขายักไหล่แล้วเดินออกไป คืนนั้นคุณนอนไม่หลับ' },
+    ] },
+  { id: 'k_law1', ch: [2, 3], know: { cat: 'law', min: 0 }, title: 'ศาลกลางลาน',
+    text: 'เจ้าเมืองตัดสินคดีขโมยแพะด้วยการให้จำเลยจุ่มมือลงน้ำเดือด ถ้ามือพองแปลว่าผิด คุณนึกถึงละครศาลที่แม่ชอบดู',
+    choices: [
+      { t: 'นึกถึงหลักที่ว่าทุกคนบริสุทธิ์จนกว่าจะพิสูจน์ได้ว่าผิด', know: 'law', tag: 'appraise', dc: 8,
+        win: { fx: { know: 15 }, text: 'พยาน หลักฐาน สิทธิ์แก้ต่าง คุณเรียงลำดับในหัวได้ครบ' },
+        lose: { fx: { know: 5 }, text: 'จำได้แค่คำว่า "ศาลขอสั่ง" ซึ่งไม่ช่วยอะไรเลย' } },
+      { t: 'ขอไปตามหาแพะตัวที่หาย', stat: 'luk', tag: 'sneak', dc: 12,
+        win: { fx: { fame: 5 }, text: 'แพะเดินกลับมาเองกลางการพิจารณาคดี ทั้งลานหัวเราะ จำเลยรอดไป' },
+        lose: { fx: { fame: -3 }, text: 'คุณโดนไล่ออกจากลานข้อหาก่อกวน' } },
+    ] },
+  { id: 'k_law2', ch: [2, 3], know: { cat: 'law', min: 10 }, loreOf: 'court', title: 'เจ้าเมืองขอคำปรึกษา',
+    text: 'เจ้าเมืองเบื่อที่คนบ่นว่าศาลไม่ยุติธรรม แต่ก็ไม่อยากเสียอำนาจตัดสินเอง เขาได้ยินว่าคุณพูดเรื่องพยานกับหลักฐาน',
+    choices: [
+      { t: 'เสนอให้ตั้งคนกลางฟังความทั้งสองฝ่าย', know: 'law', tag: 'talk', dc: 20,
+        win: { fx: { fame: 15, cha: 3, know: 10 }, lore: 'court', text: 'ศาลแรกที่มีพยานกับคนแก้ต่างเปิดในเมืองนี้ คดีขโมยแพะครั้งต่อมาใช้พยานสามคนแทนหม้อน้ำเดือด' },
+        lose: { fx: { fame: -5, know: 6 }, text: 'เจ้าเมืองหาว่าคุณจะยึดอำนาจ สั่งให้ออกจากเมืองไปสามเดือน' } },
+      { t: 'ช่วยเขียนกฎให้เขาตัดสินได้ทุกเรื่อง', fx: { gold: 500, fame: -3 }, text: 'เจ้าเมืองพอใจ ให้รางวัลก้อนโต คดีต่อมาเขาตัดสินตามอารมณ์เหมือนเดิม แต่ตอนนี้ถูกกฎหมาย' },
+    ] },
+  { id: 'k_fun1', ch: [1, 2, 3], know: { cat: 'fun', min: 0 }, title: 'ฝนตกทั้งเดือน',
+    text: 'ฝนตกติดกันสามอาทิตย์ เด็กในหมู่บ้านไม่มีอะไรเล่น นั่งเบื่อกันใต้ชายคา คุณนึกถึงหมากฮอสที่เคยเล่นกับตาหน้าบ้าน',
+    choices: [
+      { t: 'ขีดกระดานหมากฮอสลงพื้น', know: 'fun', dc: 8,
+        win: { fx: { know: 15, cha: 2 }, text: 'ใช้ฝาขวดแทนตัวหมาก เด็ก ๆ เล่นกันจนฝนหยุดแล้วก็ยังไม่เลิก' },
+        lose: { fx: { know: 5 }, text: 'จำกติกาปนกับหมากรุก เด็กเถียงกันจนร้องไห้' } },
+      { t: 'เล่านิทานผีให้ฟัง', fx: { cha: 2 }, text: 'เด็กครึ่งหนึ่งไม่กล้ากลับบ้าน อีกครึ่งขอฟังอีก' },
+    ] },
+  { id: 'k_fun2', ch: [2, 3], know: { cat: 'fun', min: 10 }, title: 'งานฉลองเก็บเกี่ยว',
+    text: 'เมืองจัดงานฉลองเก็บเกี่ยว มีแต่ดนตรีพิณกับเต้นรำเป็นวง คุณนึกถึงเวทีมวยงานวัดกับซุ้มปาลูกโป่ง',
+    choices: [
+      { t: 'ตั้งซุ้มเกมแบบงานวัดบ้านเกิด', know: 'fun', tag: 'trade', dc: 18,
+        win: { fx: { gold: 200, fame: 8, know: 10 }, next: 'k_fun3', text: 'ซุ้มปาลูกโป่งกับสอยดาวมีคนต่อแถวยาว เจ้าเมืองยังมาลองปาเอง' },
+        lose: { fx: { gold: -60, know: 6 }, text: 'ลูกโป่งที่นี่ทำจากกระเพาะหมู ไม่มีใครอยากปา' } },
+      { t: 'ขึ้นเวทีเล่าตำนานมวยไทยแล้วต่อยโชว์', stat: 'str', tag: 'fight', dc: 14,
+        win: { fx: { fame: 8, str: 2 }, text: 'ท่าไหว้ครูทำให้คนดูเงียบ แล้วเข่าลอยทำให้ทั้งลานลุกขึ้นยืน มีเด็กมาขอเป็นลูกศิษย์สามคน' },
+        lose: { fx: { hp: -15 }, text: 'คู่ชกเป็นคนแคระที่แข็งกว่าที่คิดเยอะ' } },
+    ] },
+  { id: 'k_fun3', ch: [2, 3], know: { cat: 'fun', min: 25 }, loreOf: 'boardgame', title: 'พ่อค้าเกมกระดาน',
+    text: 'พ่อค้าเห็นเด็กทั้งเมืองเล่นหมากฮอส อยากให้คุณทำกระดานส่งขายทั่วทวีป',
+    choices: [
+      { t: 'ทำขายราคาถูก ให้ทุกบ้านมีได้', know: 'fun', tag: 'trade', dc: 26,
+        win: { fx: { fame: 15, gold: 200, know: 5 }, lore: 'boardgame', text: 'ทุกโรงเตี๊ยมมีกระดานหมากฮอสวางข้างเคาน์เตอร์ คนแก่นั่งเล่นกันจนร้านปิด' },
+        lose: { fx: { gold: -100, know: 5 }, text: 'กระดานล็อตแรกบิดเพราะไม้ยังไม่แห้ง พ่อค้ายกเลิกสัญญา' } },
+      { t: 'ตั้งบ่อนเดิมพันหมากฮอส', fx: { gold: 600, fame: -5 }, text: 'ได้เงินจากวงพนันทุกคืน มีคนเสียบ้านไปแล้วสองหลัง' },
+    ] },
 ];
 const isekaiById = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
 
@@ -4018,6 +4644,14 @@ const ISEKAI_MERIT = {
   v5: { 1: [M('dana', 2), M('help_others', 1)] },
   s1: { 0: [M('help_others', 2)], 1: [M('help_others', 1)] },
   s9: { 1: [M('neutral')], 2: [M('help_others', 1)] },
+  gb1: { 2: [M('help_others', 1), M('dana', 1)] },
+  gb2: { 0: [M('help_others', 1)], 1: [M('cheat_exploit', 1)] },
+  gb3: { 0: [M('help_others', 2)], 1: [M('kill_for_gain', 2)], 2: [M('greed_harm', 1)] },
+  gb5: { 0: [M('help_others', 2)], 2: [M('neutral')] },
+  dk2: { 0: [M('unjust_judgment', 2)], 2: [M('help_others', 2)] },
+  dk3: { 2: [M('greed_harm', 2)] },
+  dk4: { 0: [M('help_others', 1)], 2: [M('greed_harm', 1)] },
+  dk4b: { 0: [M('help_others', 1)] },
   g_goblin: { 0: [M('neutral')], 1: [M('neutral')] },
   g_slave: { 0: [M('help_others', 3), M('dana', 1)], 1: [M('help_others', 2)] },
   g_dragon: { 1: [M('greed_harm', 1)] },
@@ -4025,6 +4659,24 @@ const ISEKAI_MERIT = {
   g_dungeon: { 0: [M('kill_for_gain', 1)], 2: [M('sila', 1)] },
   g_fairy: { 0: [M('help_others', 1)], 1: [M('greed_harm', 2), M('kill_for_gain', 1)] },
   g_storm: { 1: [M('help_others', 2)] },
+  // ความรู้จากโลกเดิม (B68h): แบ่งให้คนใช้ = บุญ · ผูกขาด/เอาเปรียบคนที่ไม่รู้ = บาป · ความรู้อันตรายลงหมวดของตัวเองไม่ว่าผลทอย
+  k_food2: { 1: [M('help_others', 1), M('dana', 1)] },
+  k_food3: { 0: [M('help_others', 2)], 1: [M('greed_harm', 1)] },
+  k_farm1: { 1: [M('help_others', 1)] },
+  k_farm3: { 0: [M('help_others', 2)], 1: [M('greed_harm', 1)] },
+  k_medic1: { 1: [M('help_others', 1)] },
+  k_medic2: { 1: [M('help_others', 1)] },
+  k_medic3: { 0: [M('help_others', 2), M('dana', 1)], 1: [M('greed_harm', 1)] },
+  k_trade2: { 1: [M('greed_harm', 2)] },
+  k_trade3: { 0: [M('help_others', 1)], 1: [M('greed_harm', 2)] },
+  k_craft3: { 0: [M('forbidden_knowledge', 2)], 1: [M('neutral')] },
+  k_print3: { 0: [M('help_others', 2), M('dana', 1)] },
+  k_war1: { 0: [M('help_others', 1)], 1: [M('greed_harm', 1)] },
+  k_war2: { 0: [M('forbidden_knowledge', 3)], 1: [M('help_others', 1)] },
+  k_war3: { 0: [M('forbidden_knowledge', 3), M('greed_harm', 1)], 1: [M('help_others', 2)] },
+  k_law1: { 1: [M('help_others', 1)] },
+  k_law2: { 0: [M('help_others', 2)], 1: [M('unjust_judgment', 2)] },
+  k_fun3: { 1: [M('greed_harm', 2)] },
 };
 
 const isekaiClamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -4079,11 +4731,48 @@ const ENTRY_EVENTS = {
     text: 'รถบรรทุกคันหนึ่งพุ่งมาทางม้าลาย ในหัวแวบขึ้นมาว่า แบบนี้ในนิยายเขาได้ไปต่างโลกกันนี่นา',
     choices: ['ยืนนิ่ง ลองดูสักตั้ง', 'กระโดดหลบตามสัญชาตญาณ'],
   },
+  door: {
+    bands: [1, 2], trip: true,
+    text: 'ประตูห้องเก็บของที่ปิดตายมาหลายปีแง้มออกเอง ข้างในเป็นทุ่งหญ้ากับท้องฟ้าที่มีดวงจันทร์สองดวง ลมพัดกลิ่นดอกไม้แปลก ๆ ออกมา',
+    choices: ['ก้าวข้ามธรณีประตูไปดู', 'ปิดประตูแล้วล็อกกุญแจ'],
+  },
 };
 
-// ไปต่างโลกได้ 2 แบบ (เจ้าของเคาะ): ตาย กับหายตัว — ป้ายอายุตอนจบทุกจุดแยกตามแบบ
+// ไปกลับกลางชีวิต (B68m): ร่างเดิมข้ามไปทั้งตัว ไม่เกิดใหม่ · stream แยกตอนกดรับ ⇒ ชีวิตที่ปฏิเสธเดินเท่าเดิม
+// years = ปีที่อยู่ต่างโลก · thai = น้ำหนักจำนวนปีไทยที่ผ่านไป (ช่องที่ i = i ปี · 0 = ไม่กี่เดือน) · back = โอกาสได้กลับของการ์ดหายตัว
+// roles = บทบาทที่เนื้อเรื่องเป็นคนถูกส่งข้ามไป · finale = ฉากสุดท้ายห่างจากวันมาถึงเท่ากับระยะเดิมของบทบาท
+// wit/gold/fame/know = ตัวหารแปลงค่าข้ามโลก (ความรู้ไทย→wit · ทอง→เงินต่อดัชนีราคา · ชื่อเสียง→เครือข่าย · ความรู้โลกเดิม→ความรู้)
+const TRIP = { salt: 0x7219b3, years: [3, 12], thai: [6, 3, 2, 1], back: 0.5, roles: ['hero', 'slowlife'], wit: 10, gold: 20, fame: 5, know: 15, cap: 10 };
+
+// ไปต่างโลกได้ 2 แบบ (เจ้าของเคาะ): ตาย กับหายตัว — ป้ายอายุตอนจบทุกจุดแยกตามแบบ · ไปกลับแล้วตายในต่างโลก = หายตัว
 const lifeEndWord = (gone) => (gone ? 'หายตัวไปตอนอายุ' : 'ตายอายุ');
-const isGone = (st) => !!ENTRY_EVENTS[st?.isekaiVia]?.gone;
+const isGone = (st) => !!ENTRY_EVENTS[st?.isekaiVia]?.gone || !!st?.tripLost;
+
+// ทอยตอนกดรับ: ได้ไปกลับไหม · กี่ปีต่างโลก · กี่ปีไทย — ดึงเลขครบทุกครั้งแม้ไม่ได้กลับ ลำดับจึงไม่ขึ้นกับผล
+function tripRoll(seed, id, n = 0) {
+  const rng = makeRng(mixSeed(seed ^ TRIP.salt, n));
+  const back = rng.next() < TRIP.back;
+  const years = rng.int(TRIP.years[0], TRIP.years[1]);
+  let x = rng.next() * TRIP.thai.reduce((s, w) => s + w, 0);
+  const thai = Math.max(0, TRIP.thai.findIndex((w) => (x -= w) < 0));
+  const role = rng.pick(TRIP.roles);
+  const e = ENTRY_EVENTS[id];
+  return e.trip || (e.gone && back) ? { years, thai, role } : null;
+}
+
+// ทางเข้ามีหลายแบบ (ประตู วงเวท เกม ความฝัน) — ทางกลับจึงไม่เล่าว่าเป็นอะไร
+const TRIP_HOME = 'แล้ววันหนึ่งทางกลับบ้านก็เปิดขึ้นตรงหน้า';
+// ของที่พกกลับบ้าน — ค่าดิบต่อหน่วยของชีวิตไทย (ผู้เรียกคูณดัชนีราคาเอง) · ความรู้โลกเดิมรวมทุกหมวด
+function tripCarry(isk) {
+  const know = Object.values(isk.know).reduce((s, v) => s + v, 0);
+  return {
+    gold: Math.max(0, isk.st.gold) * TRIP.gold,
+    network: Math.min(TRIP.cap, Math.max(0, isk.st.fame) / TRIP.fame),
+    knowledge: Math.min(TRIP.cap, know / TRIP.know),
+  };
+}
+// แถวทริปในผังตระกูลของชาติไทย — lore รูปเดียวกับแถวชาติต่างโลก ให้ isekaiWorldLore อ่านได้ทางเดียว
+const tripLineage = (isk) => ({ world: roleInfo(isk.role).name, age: isk.trip.from, years: isk.age - isk.trip.from, ending: isk.ending.title, ...(isk.home && { home: true }), ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }) });
 
 function entryOffers(seed) {
   const rng = makeRng(seed ^ ENTRY.salt);
@@ -4106,9 +4795,9 @@ function entryCard(st, stage) {
   const e = ENTRY_EVENTS[o.id];
   st.pending = { entry: o.id, choices: e.choices.map((text) => ({ text })) };
   return {
-    kind: 'event', id: `isekai_${o.id}`, entry: o.id, gone: !!e.gone, type: 'B', national: false, funeral: false,
+    kind: 'event', id: `isekai_${o.id}`, entry: o.id, gone: !!e.gone, ...(e.trip && { trip: true }), type: 'B', national: false, funeral: false,
     age: st.age, stage, title: null, text: e.text, choices: [...e.choices],
-    fx: ['ชีวิตนี้จบตรงนี้ ไปต่างโลก', ''], locked: [null, null],
+    fx: [e.trip ? 'ไปต่างโลกช่วงหนึ่ง แล้วกลับมาชีวิตเดิม' : e.gone ? 'ไปต่างโลก อาจไม่ได้กลับมาอีก' : 'ชีวิตนี้จบตรงนี้ ไปต่างโลก', ''], locked: [null, null],
   };
 }
 
@@ -4116,18 +4805,43 @@ function entryCard(st, stage) {
 // ledger = บัญชีที่ดวงวิญญาณพกมา · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = บัญชีเปล่า
 // fated = ชีวิตนี้ถูกเรียกข้ามโลกจากการ์ดชวน (ธง isekai_call · ตายหรือหายตัว) — เทพธิดาโผล่แน่นอนแล้ว ได้โชคเพิ่ม
 // real = ค่าโลกจริงตอนข้าม { stats, money, unit (รายได้ครัวเรือนประเทศต่อปี), age } · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = ค่าตั้งต้นของโลกล้วน
-function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null }) {
+// lore = ของที่แต่ละโลกจำได้จากชาติก่อน ๆ ทั้งเซฟ ({ world: [id] } จาก isekaiWorldLore)
+// trip = ไปกลับกลางชีวิต (B68m · tripRoll + age/wit จากชีวิตไทย) — ข้ามห้องสีขาว บทบาทมาจากการทอย เริ่มที่อายุไทย ถึงปีกลับ = จบแบบกลับบ้าน
+function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, trip = null }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
   const vow = blessed ? GODDESS_VOWS[(seed >>> 0) % GODDESS_VOWS.length].id : null;
-  return {
+  const isk = {
     rng, karma, past, run, memory, blessed, fated, ledger, vow, vowKept: null, vowHit: false,
     real: real && { ...real, stats: { ...real.stats } },
-    worldOffers: isekaiShuffle(rng, Object.keys(ISEKAI_WORLDS)).slice(0, ISEKAI.worlds + (blessed ? 1 : 0)),
+    worldOffers: isekaiRoleOffers(rng, karma, ISEKAI.worlds + (blessed ? 1 : 0)),
     skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).slice(0, sk),
-    world: null, name: '', skills: [], st: null, flags: {}, queue: [], idx: 0,
-    step: 'world', last: null, rbdUsed: false, dead: false, ending: null, log: [], cards: 0,
+    role: null, world: null, name: '', skills: [], st: null, inner: null, flags: {},
+    know: null, knowLast: null, loreAll: lore, worldLore: [], lore: [],
+    age: 0, focus: null, focusOffers: [], stageShown: null, due: null, used: [], later: [], finaleDone: false,
+    step: 'world', last: null, rbdUsed: false, dead: false, natural: false, ending: null, log: [], chron: [], cards: 0,
   };
+  if (trip) {
+    isk.trip = { ...trip, from: trip.age, until: trip.age + trip.years };
+    isekaiStart(isk, trip.role);
+    isk.age = trip.age;
+    isk.inner.wit += trip.wit ?? 0;
+    isk.step = 'skill';
+  }
+  return isk;
+}
+
+// สุ่มบทบาทไม่ซ้ำตามน้ำหนัก · กรรมเอียงน้ำหนักแต่ไม่ตัดบทบาทไหนทิ้ง · ชุดที่ไม่มีคนธรรมดา = แทนใบสุดท้าย
+function isekaiRoleOffers(rng, karma, n) {
+  const pool = Object.entries(ISEKAI_ROLES).map(([id, r]) => ({ id, w: r.p * Math.max(0.2, 1 + r.lean * karma * ISEKAI.roleLean) }));
+  const out = [];
+  while (out.length < n && pool.length) {
+    let x = rng.next() * pool.reduce((s, r) => s + r.w, 0);
+    const i = pool.findIndex((r) => (x -= r.w) < 0);
+    out.push(pool.splice(i < 0 ? pool.length - 1 : i, 1)[0].id);
+  }
+  if (!out.includes('commoner')) out[out.length - 1] = 'commoner';
+  return out;
 }
 
 const isekaiHas = (isk, s) => isk.skills.includes(s);
@@ -4138,32 +4852,59 @@ const isekaiDc = (isk, c) => c.dc + (isk.karma < 0 ? Math.round(-isk.karma * ISE
 const isekaiAids = (isk, c) => isk.skills.filter((s) => ISEKAI_SKILLS[s].tag && ISEKAI_SKILLS[s].tag === c.tag);
 
 // withSkills = false คือโอกาสถ้าไม่มีสกิล — ใช้เทียบว่าสกิลเพิ่มจริงเท่าไรหลังตัดเพดาน 5–95
+// ตัวเลือกความรู้ (c.know = หมวด) ทอยด้วยความรู้หมวดนั้น + ความรู้ทั่วไปส่วนหนึ่ง แทนค่าสถานะ
 function isekaiChance(isk, c, withSkills = true) {
-  if (!c.stat) return null;
-  let v = 50 + (isk.st[c.stat] - isekaiDc(isk, c)) * 4;
+  if (!c.stat && !c.know) return null;
+  const base = c.know ? isk.know[c.know] + isk.inner.wit * ISEKAI_KNOW_T.wit : isk.st[c.stat];
+  let v = 50 + (base - isekaiDc(isk, c)) * 4;
   if (withSkills) for (const s of isekaiAids(isk, c)) v += ISEKAI_SKILLS[s].add ?? 20;
   for (const b of [c.bonus, c.bonus2]) if (b && isk.flags[b.flag]) v += b.add;
   return isekaiClamp(Math.round(v), 5, 95);
 }
 
-function isekaiStart(isk, wid) {
-  const w = ISEKAI_WORLDS[wid];
-  isk.world = wid;
-  isk.name = isk.rng.pick(w.names).replace('{p}', isk.past);
+const isekaiPace = (isk) => ISEKAI_ROLES[isk.role].pace ?? 1;
+const isekaiOldAge = (isk) => ISEKAI_STAGES.at(-1).from * isekaiPace(isk);
+const isekaiStageOf = (isk) => ISEKAI_STAGES.findLast((s) => isk.age >= s.from * isekaiPace(isk));
+// ทางลัดความรู้ใช้ id 'k:<หมวด>' · kc = หมวดที่ทางลัดนี้เติมความรู้และดึงเหตุการณ์
+const isekaiFocusDef = (isk, id) => {
+  if (id === 'role') return roleInfo(isk.role).focus;
+  if (id?.startsWith('k:')) return { ...ISEKAI_KNOW[id.slice(2)].focus, kc: id.slice(2) };
+  return ISEKAI_FOCUS[id];
+};
+// ทางลัดที่ความรู้ถึงเกณฑ์แล้วในช่วงวัยนี้ — ต่อท้ายรายการ ลำดับเดิมไม่เลื่อน
+const isekaiKnowOffers = (isk, stage) => Object.keys(ISEKAI_KNOW).filter((k) => isk.know[k] >= ISEKAI_KNOW_T.shortcut && (!ISEKAI_KNOW[k].stages || ISEKAI_KNOW[k].stages.includes(stage.id))).map((k) => `k:${k}`);
+// สิ่งที่ทุ่มเทได้ในช่วงวัยนี้ — ของบทบาทอยู่ใบแรกเสมอ
+const isekaiFocusOffers = (isk, stage) => ['role', ...Object.keys(ISEKAI_FOCUS).filter((id) => !ISEKAI_FOCUS[id].stages || ISEKAI_FOCUS[id].stages.includes(stage.id)), ...isekaiKnowOffers(isk, stage)];
+// ป้ายบนปุ่มทุ่มเท: บอกว่าค่าไหนขึ้น ไม่บอกตัวเลข · สุข/รู้เป็นค่าซ่อน จึงไม่ขึ้นป้าย
+const isekaiFocusFx = (isk, id) => {
+  const f = isekaiFocusDef(isk, id);
+  const up = Object.entries(f.gain).filter(([k, v]) => v > 0 && k !== 'joy' && k !== 'wit' && k !== 'know').map(([k]) => (k === 'goal' ? roleInfo(isk.role).goal : ISEKAI_FX[k]));
+  return up.length ? `${up.join(' · ')} ขึ้น` : '';
+};
+
+function isekaiStart(isk, rid) {
+  const r = roleInfo(rid);
+  isk.role = rid;
+  isk.world = r.world ?? rid;
+  isk.name = isk.rng.pick(r.names).replace('{p}', isk.past);
   const shift = Math.round(isk.karma * ISEKAI.karmaStat);
-  isk.st = { hp: 100, gold: w.start.gold, fame: 0, goal: 0 };
-  for (const k of Object.keys(ISEKAI_STAT)) isk.st[k] = Math.max(1, w.start[k] + shift);
+  isk.st = { hp: 100, gold: r.stat.gold, fame: 0, goal: 0 };
+  for (const k of Object.keys(ISEKAI_STAT)) isk.st[k] = Math.max(1, r.stat[k] + shift);
   if (isk.memory) isk.st[isk.memory] += ISEKAI.memory;
   if (isk.fated) isk.st.luk += GODDESS.fatedLuck;
-  if (isk.real) linkStart(isk, w);
+  isk.inner = { joy: ISEKAI_TIME.joy, wit: ISEKAI_TIME.wit };
+  isk.know = Object.fromEntries(Object.keys(ISEKAI_KNOW).map((k) => [k, 0]));
+  isk.worldLore = isk.loreAll[isk.world] ?? [];
+  isk.age = (r.startAge ?? 0) * isekaiPace(isk);
+  if (isk.real) linkStart(isk, r.stat.gold);
 }
 
-function linkStart(isk, w) {
+function linkStart(isk, gold0) {
   const { stats, money, unit, age } = isk.real;
   const wt = Math.min(1, age / LINK.age);
   for (const [k, r] of Object.entries(ISEKAI_LINK)) isk.st[k] = Math.max(k === 'fame' ? 0 : 1, isk.st[k] + Math.round(isekaiClamp((wt * (stats[r] - 50)) / LINK.div, -LINK.part, LINK.part)));
   isk.st.hp = Math.round(100 - Math.min(LINK.hpCut, wt * Math.max(0, 50 - stats.health)));
-  isk.st.gold = isekaiClamp(Math.round(w.start.gold + (wt * money * LINK.gold) / unit), 0, w.start.gold * LINK.goldCap);
+  isk.st.gold = isekaiClamp(Math.round(gold0 + (wt * money * LINK.gold) / unit), 0, gold0 * LINK.goldCap);
 }
 
 // ส่วนต่างที่เกิดจริงฝั่งต่างโลก (หลังชนเพดานแล้ว) สะท้อนกลับค่าจริง · ค่าจริงชนเพดานก็ตัดส่วนเกิน
@@ -4172,6 +4913,20 @@ function linkBack(isk, k, d) {
   if (k === 'hp') s.health = isekaiClamp(s.health + d, 0, 100);
   else if (k === 'gold') isk.real.money += (d * isk.real.unit) / LINK.gold;
   else if (ISEKAI_LINK[k]) s[ISEKAI_LINK[k]] = isekaiClamp(s[ISEKAI_LINK[k]] + d * LINK.div, 0, 100);
+}
+
+// โลกจำ (B68h · เจ้าของเคาะ ทั้งเซฟ ต่อโลก): อ่านจากแถวผังตระกูลต่างโลก ซึ่งส่งต่อทุกชาติอยู่แล้ว ⇒ ไม่ต้องมีที่เก็บใหม่ในเซฟ
+function isekaiWorldLore(rows = []) {
+  const out = {};
+  for (const l of rows.flatMap((r) => [r, ...(r.trips ?? [])])) if (l.lore) out[l.lore.world] = [...new Set([...(out[l.lore.world] ?? []), ...l.lore.ids])];
+  return out;
+}
+
+// ความรู้หมวดเดียว: ยิ่งรู้มากยิ่งโตช้า (สูตรเดียวกับค่าสถานะ) · ลบได้เต็มค่า
+function isekaiLearn(isk, cat, v) {
+  if (!cat || !v) return;
+  const k = v > 0 ? ISEKAI_KNOW_T.gainK / (ISEKAI_KNOW_T.gainK + isk.know[cat]) : 1;
+  isk.know[cat] = isekaiClamp(isk.know[cat] + v * k, 0, 100);
 }
 
 // คำสัญญาเทพธิดา: ผิดทันทีที่กดตัวเลือกที่มีหมวดต้องห้าม · ข้อที่ต้องทำ ตัดสินตอนจบรอบ
@@ -4192,23 +4947,6 @@ function vowSettle(isk) {
   recordMerit(isk.ledger, [isk.vowKept ? { cat: 'keep_goddess_vow', level: GODDESS.vowLevel } : { cat: 'vow_broken' }], 'goddess');
 }
 
-function isekaiQueue(isk) {
-  const w = ISEKAI_WORLDS[isk.world];
-  const used = new Set([w.intro, w.finale]);
-  const fits = (e, c) => !e.finale && !e.follow && e.id !== w.intro && (!e.worlds || e.worlds.includes(isk.world)) && e.ch.includes(c);
-  const take = (c, n) => {
-    // เหตุการณ์ของโลกตัวเองมาก่อน เรื่องจะเดินตามแนวที่เลือก · ที่เหลือเติมจากกองทุกโลก
-    const pool = isekaiShuffle(isk.rng, ISEKAI_EVENTS.filter((e) => fits(e, c) && !used.has(e.id)));
-    pool.sort((a, b) => (a.worlds?.length === 1 ? 0 : 1) - (b.worlds?.length === 1 ? 0 : 1));
-    const out = pool.slice(0, n);
-    for (const e of out) used.add(e.id);
-    return isekaiShuffle(isk.rng, out).map((e) => ({ id: e.id, ch: c }));
-  };
-  const [c1, c2, c3] = ISEKAI.events;
-  isk.queue = [{ id: w.intro, ch: 1 }, ...take(1, c1), ...take(2, c2), ...take(3, c3), { id: w.finale, ch: 4 }];
-  isk.idx = 0;
-}
-
 function isekaiApply(isk, fx = {}) {
   const out = {};
   for (const [k, raw] of Object.entries(fx)) {
@@ -4224,24 +4962,106 @@ function isekaiApply(isk, fx = {}) {
   return out;
 }
 
+// ผลของการทุ่มเท units ปี (ปีแบบมนุษย์ — เอลฟ์ใช้เวลาจริงนานกว่า แต่โตเท่ากันต่อตา)
+// ค่ายิ่งสูงยิ่งขึ้นช้า ⇒ ทุ่มเรื่องเดียวทั้งชีวิตไม่ทะลุจนทุกด่านง่าย · สุขดีฝึกไว · รู้มากฝึกเวทไว
+// know = ความรู้ของหมวดทางลัด (kc) หรือหมวดที่แตะล่าสุดเมื่ออ่านตำรา
+function isekaiGrow(isk, gain, units, kc = null) {
+  const T = ISEKAI_TIME;
+  const joyRate = 0.6 + isk.inner.joy / 125;
+  const rate = isekaiStageOf(isk).rate;
+  for (const [k, per] of Object.entries(gain)) {
+    let v = per * units;
+    if (k === 'know') {
+      isekaiLearn(isk, kc ?? isk.knowLast, v * rate * joyRate);
+      continue;
+    }
+    if (ISEKAI_STAT[k] || k === 'wit') v *= (rate * joyRate * T.gainK) / (T.gainK + (k === 'wit' ? isk.inner.wit : isk.st[k]));
+    if (k === 'mag') v *= 1 + isk.inner.wit / 100;
+    if (k === 'goal') v *= joyRate;
+    if (ISEKAI_STAT[k] && isekaiHas(isk, 'exp')) v *= 2;
+    if (k === 'gold' && isekaiHas(isk, 'storage')) v *= 1.5;
+    if (k === 'joy' || k === 'wit') isk.inner[k] = isekaiClamp(isk.inner[k] + v, 0, 100);
+    else if (k === 'hp' || k === 'goal') isk.st[k] = isekaiClamp(isk.st[k] + v, 0, 100);
+    else isk.st[k] = Math.max(0, isk.st[k] + v);
+  }
+}
+
+// หนึ่งตา: HP ฟื้น (ก่อนชรา) หรือเสื่อมแรงขึ้นทุกปี (หลังชรา) → ทุ่มเท → ใจกลับเข้ากลาง → อายุเดิน
+// ฟื้นก่อนทุ่มเท ⇒ สิ่งที่ทุ่มเทที่กิน HP (เดินทางเสี่ยงโชค) ทำให้ตายได้จริง ไม่ถูกฟื้นกลบท้ายตา
+// เสื่อมคูณด้วยความสุข: สุขดีแก่ช้า · พ้นวัยชราเกิน cap ปี ร่างหมดแรงแน่ ชีวิตจึงจบเสมอ
+function isekaiYear(isk) {
+  const T = ISEKAI_TIME;
+  const p = isekaiPace(isk), oldAt = isekaiOldAge(isk);
+  const units = isk.age >= oldAt ? T.oldStep : T.step;
+  if (isk.age < oldAt) isk.st.hp = isekaiClamp(isk.st.hp + T.regen * units, 0, 100);
+  else {
+    let d = 0;
+    for (let i = 0; i < units; i++) d += T.decay + T.decayGrow * ((isk.age - oldAt) / p + i);
+    isk.st.hp = isekaiClamp(isk.st.hp - d * (1.3 - isk.inner.joy / 200), 0, 100);
+  }
+  const fd = isekaiFocusDef(isk, isk.focus);
+  isekaiGrow(isk, fd.gain, units, fd.kc);
+  isk.inner.joy = isekaiClamp(isk.inner.joy + (50 - isk.inner.joy) * Math.min(1, 0.1 * units), 0, 100);
+  isk.age += units * p;
+  if (isk.age >= oldAt + T.cap * p) isk.st.hp = 0;
+  if (isk.trip && isk.age >= isk.trip.until && isk.st.hp > 0) isk.home = true;
+  return units * p;
+}
+
+// เหตุการณ์ความรู้มาหาเมื่อรู้ถึงขั้นของเรื่อง · ความรู้อันตรายเฉพาะวัยผู้ใหญ่ขึ้นไป · ของที่โลกนี้จำแล้วไม่ต้องคิดค้นซ้ำ
+const ISEKAI_ADULT = ['adult', 'middle', 'old'];
+const isekaiKnowOpen = (isk, e, stage) => (!e.know || isk.know[e.know.cat] >= e.know.min) && (!e.adult || ISEKAI_ADULT.includes(stage.id)) && (!e.loreOf || !isk.worldLore.includes(e.loreOf));
+
+const isekaiFitsRole = (isk, e) => !e.worlds || e.worlds.includes(isk.world) || (e.worlds.length > 1 && e.worlds.includes(ISEKAI_ROLES[isk.role].like));
+
+// เรื่องที่ต้องตัดสินของตานี้: ฉากสุดท้ายถึงอายุ → เรื่องต่อที่นัดไว้ → สุ่มจากกองของช่วงวัย
+// ทุกตาดึงเลขทอย 1 ครั้งก่อนสุ่มกอง (ยกเว้นฉากบังคับ) · ทุ่มเทสายไหนเรื่องสายนั้นโผล่บ่อยขึ้น · เรื่องที่ต้องมีชื่อเสียงรอจนดังพอ
+function isekaiDue(isk) {
+  const T = ISEKAI_TIME;
+  const w = roleInfo(isk.role);
+  const take = (id) => (isk.used.push(id), id);
+  const finaleAt = isk.trip ? isk.trip.from + w.finaleAge - w.startAge : w.finaleAge * isekaiPace(isk);
+  if (w.finale && !isk.finaleDone && isk.age >= finaleAt) return take(w.finale);
+  const li = isk.later.findIndex((l) => l.age <= isk.age);
+  if (li >= 0) return take(isk.later.splice(li, 1)[0].id);
+  const roll = isk.rng.next();
+  if (isk.age < T.quiet * isekaiPace(isk) || roll >= T.eventP) return null;
+  const stage = isekaiStageOf(isk);
+  const ch = stage.ch;
+  const { tag, kc } = isekaiFocusDef(isk, isk.focus);
+  const pool = ISEKAI_EVENTS.filter((e) => !e.finale && !e.follow && e.id !== w.intro && isekaiFitsRole(isk, e) && e.ch.some((c) => ch.includes(c)) && !isk.used.includes(e.id) && isk.st.fame >= (e.minFame ?? 0) && isekaiKnowOpen(isk, e, stage));
+  if (!pool.length) return null;
+  const K = ISEKAI_KNOW_T;
+  const wt = pool.map((e) => (e.worlds?.length === 1 ? 2 : 1) * (tag && e.choices.some((c) => c.tag === tag) ? 3 : 1) * (e.know ? (e.know.min ? K.w : K.w0) * (kc === e.know.cat ? K.focusW : 1) : 1));
+  let x = isk.rng.next() * wt.reduce((s, v) => s + v, 0);
+  return take(pool[Math.max(0, wt.findIndex((v) => (x -= v) < 0))].id);
+}
+
 function isekaiStatus(isk) {
   if (!isk.st) return null;
-  const w = ISEKAI_WORLDS[isk.world];
-  return { name: isk.name, world: w.name, goalName: w.goal, ...isk.st, skills: isk.skills.map((s) => ISEKAI_SKILLS[s].name), chapter: isk.queue[isk.idx]?.ch ?? 4 };
+  const r = roleInfo(isk.role);
+  // ค่าภายในเก็บทศนิยม (ฝึกทีละนิด) — หน้าต่างสถานะเห็นจำนวนเต็ม · HP ปัดขึ้น ยังไม่ตายไม่เห็น 0
+  const st = Object.fromEntries(Object.entries(isk.st).map(([k, v]) => [k, k === 'hp' ? Math.ceil(v) : Math.round(v)]));
+  return { name: isk.name, world: r.name, goalName: r.goal, ...st, skills: isk.skills.map((s) => ISEKAI_SKILLS[s].name), age: isk.age, stage: isekaiStageOf(isk).name, focus: isk.focus ? isekaiFocusDef(isk, isk.focus).name : null };
 }
 
 const ISEKAI_HIGHLIGHTS = 3;
 // เรียงตามเวลาที่เกิด ไม่ใช่ตามน้ำหนัก — อ่านเป็นเรื่องเล่า
 const isekaiHighlights = (isk) => (isk.marks ?? []).map((m, i) => ({ ...m, i })).sort((a, b) => b.weight - a.weight || a.i - b.i).slice(0, ISEKAI_HIGHLIGHTS).sort((a, b) => a.i - b.i).map((m) => m.text);
 
+// บทบาทที่มีเนื้อเรื่องตัดสินจากฉากสุดท้าย · บทบาทอื่นตัดสินจากเป้าหมายกับชื่อเสียงตลอดชีวิต
+// บทบาทที่เหตุการณ์น้อย (ก็อบลิน ลูกจอมมาร) ดังยาก จึงถึงตอนจบดีสุดได้ด้วยเป้าหมายล้วนเมื่อทุ่มเทกับบทบาทนานพอ
 function isekaiEnding(isk) {
   if (isk.dead) return { id: 'death', title: ISEKAI_DEATH[0], text: ISEKAI_DEATH_BY[isk.world] ?? ISEKAI_DEATH[1] };
-  const w = ISEKAI_WORLDS[isk.world];
-  const won = !!isk.flags.won;
-  let tier = won && isk.st.goal >= 50 ? 'best' : won || isk.st.goal >= 50 ? 'good' : 'bad';
-  // ตอนจบพิเศษต้องชนะฉากสุดท้ายด้วยทางที่ธงปูไว้ · กลืนกินของสไลม์ไม่ดูเกณฑ์ goal เพราะเป็นการเลือกจบ
-  const [flag, key] = w.special;
-  if (won && isk.flags[flag] && (tier === 'best' || flag === 'devour')) tier = key;
+  const w = roleInfo(isk.role);
+  let tier;
+  if (w.special) {
+    const won = !!isk.flags.won;
+    tier = won && isk.st.goal >= 50 ? 'best' : won || isk.st.goal >= 50 ? 'good' : 'bad';
+    // ตอนจบพิเศษต้องชนะฉากสุดท้ายด้วยทางที่ธงปูไว้ · กลืนกินของสไลม์ไม่ดูเกณฑ์ goal เพราะเป็นการเลือกจบ
+    const [flag, key] = w.special;
+    if (won && isk.flags[flag] && (tier === 'best' || flag === 'devour')) tier = key;
+  } else tier = isk.st.goal >= 80 || (isk.st.goal >= 60 && isk.st.fame >= 30) ? 'best' : isk.st.goal >= 40 || isk.st.fame >= 30 ? 'good' : 'bad';
   const [title, text] = w.end[tier];
   return { id: tier, title, text };
 }
@@ -4251,14 +5071,15 @@ const isekaiCard = (isk, card) => {
   return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, ...card };
 };
 
-// การ์ดถัดไป · การ์ดที่มีตัวเลือกรอ chooseIsekai · ใบที่ไม่มีตัวเลือก (ผลลัพธ์) เรียกการ์ดถัดไปได้เลย
+// การ์ดถัดไป · ใบที่มีตัวเลือกรอ chooseIsekai · ใบตา (tick) ไม่มีตัวเลือก เรียกซ้ำ = เวลาเดินอีกตา
+// ใบตาบอกสิ่งที่ทุ่มเทได้ (focusChoices) — chooseIsekai บนใบตา = เปลี่ยนสิ่งที่ทุ่มเท โดยเวลาไม่หยุด
 function nextIsekaiCard(isk) {
   if (isk.step === 'world') {
     return isekaiCard(isk, {
       step: 'world', title: 'ห้องสีขาว',
-      text: `เทพธิดาผมสีเงินก้มหัวให้ "${isk.past ? `${isk.past} ` : ''}มาทางนี้ก่อน" แล้วกางแผนที่โลกตรงหน้า${isk.blessed ? ' วันนี้เธออารมณ์ดีเป็นพิเศษ เลยเปิดให้เลือกเพิ่มอีกโลก' : ''}${isk.vow ? ` ก่อนส่งไปเธอกระซิบว่า "${GODDESS_VOWS.find((v) => v.id === isk.vow).text}"` : ''}${isk.fated ? ' เธอบอกว่าคนที่ข้ามมาแบบในนิยายต่างโลกเป๊ะ ๆ ได้โชคแถมทุกคน' : ''}`,
-      choices: isk.worldOffers.map((w) => ISEKAI_WORLDS[w].name),
-      desc: isk.worldOffers.map((w) => ISEKAI_WORLDS[w].pitch),
+      text: `เทพธิดาผมสีเงินก้มหัวให้ "${isk.past ? `${isk.past} ` : ''}มาทางนี้ก่อน" แล้ววางแฟ้มชีวิตใหม่ไว้ตรงหน้า ${isk.worldOffers.length} แฟ้ม${isk.blessed ? ' วันนี้เธออารมณ์ดีเป็นพิเศษ เลยหยิบมาเพิ่มให้อีกแฟ้ม' : ''}${isk.vow ? ` ก่อนส่งไปเธอกระซิบว่า "${GODDESS_VOWS.find((v) => v.id === isk.vow).text}"` : ''}${isk.fated ? ' เธอบอกว่าคนที่ข้ามมาแบบในนิยายต่างโลกเป๊ะ ๆ ได้โชคแถมทุกคน' : ''}`,
+      choices: isk.worldOffers.map((r) => roleInfo(r).name),
+      desc: isk.worldOffers.map((r) => roleInfo(r).pitch),
       fx: isk.worldOffers.map(() => ''),
       ...(isk.memory && { note: `ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา · ${ISEKAI_STAT[isk.memory]} +${ISEKAI.memory}` }),
     });
@@ -4274,10 +5095,13 @@ function nextIsekaiCard(isk) {
   }
   if (isk.step === 'result') {
     const r = isk.last;
-    isk.step = isk.dead || isk.idx >= isk.queue.length - 1 ? 'end' : 'event';
-    if (isk.step === 'event') isk.idx++;
-    return isekaiCard(isk, { step: 'result', title: r.title, text: r.text, ok: r.ok, stat: r.stat, deltas: r.deltas, sys: r.sys, choices: [] });
+    isk.step = 'tick';
+    return isekaiCard(isk, { step: 'result', title: r.title, text: r.text, age: isk.age, ok: r.ok, stat: r.stat, deltas: r.deltas, sys: r.sys, choices: [] });
   }
+  if (isk.step === 'over') throw new Error('ชาติต่างโลกจบแล้ว — ปรโลกรับช่วงต่อ');
+  if (isk.step === 'tick' && isk.due) isk.step = 'event';
+  if (isk.step === 'event') return isekaiEventCard(isk, isekaiById[isk.due]);
+  if (isk.step === 'tick' && (isk.dead || isk.natural || isk.home)) isk.step = 'end';
   // ตอนจบเป็นใบสุดท้ายของชาติต่างโลก ไม่มีตัวเลือก — กลับหรืออยู่ต่อเลือกที่การ์ดทางเกิดหลังปรโลกตัดสิน
   if (isk.step === 'end') {
     isk.ending = isekaiEnding(isk);
@@ -4285,20 +5109,86 @@ function nextIsekaiCard(isk) {
     vowSettle(isk);
     return isekaiCard(isk, {
       // การ์ดปรโลกใบถัดไปเล่าเรื่องดวงวิญญาณถูกดึงกลับเอง ใบนี้จึงปิดแค่ชีวิตในโลกนี้ · ตอนจบแบบตายเล่าการตายไว้แล้ว
-      step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : `${isk.ending.text} ชีวิตในโลกนี้ดำเนินต่อไปจนถึงวันสุดท้าย`, ending: isk.ending.id,
+      step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : isk.home ? `${isk.ending.text} ${TRIP_HOME}` : `${isk.ending.text} แล้วจากไปอย่างสงบตอนอายุ ${isk.age}`, ending: isk.ending.id, age: isk.age,
+      ...(isk.home && { home: true }),
       choices: [],
       log: isk.log.slice(),
+      // บรรทัดละ { age, until?, stage, kind: tick|event|lore, text, deltas } · เซฟเก่าอาจยังมีบรรทัดสตริงปน
+      chronicle: isk.chron.slice(),
       // ผลคำสัญญาขึ้นเป็นแผงบนจอ (เลน C) ไม่ต่อท้าย text
       ...(isk.vow && { vow: { text: GODDESS_VOWS.find((v) => v.id === isk.vow).text, kept: isk.vowKept } }),
       highlights: isekaiHighlights(isk),
       // ใส่ช่องเฉพาะชาติที่สกิลเคยช่วยไว้ — การ์ดจบของชาติอื่นรูปเดิม
       ...(isk.saves && { saves: isk.saves }),
+      // ของที่โลกนี้จะจำต่อจากชาตินี้ (B68h) — ช่องเฉพาะชาติที่มี จอเลน C วาดได้
+      ...(isk.lore.length && { lore: isk.lore.map((id) => ISEKAI_LORE[id]) }),
     });
   }
-  if (isk.step === 'over') throw new Error('ชาติต่างโลกจบแล้ว — ปรโลกรับช่วงต่อ');
-  const ev = isekaiById[isk.queue[isk.idx].id];
+  const stage = isekaiStageOf(isk);
+  // ขึ้นช่วงวัยใหม่ = หยุดถามสิ่งที่ทุ่มเทครั้งเดียว (ทางเลือกเปลี่ยนตามวัย) · ระหว่างช่วงเปลี่ยนได้จากใบตา
+  if (isk.step === 'focus' || isk.stageShown !== stage.id) {
+    isk.step = 'focus';
+    isk.focusOffers = isekaiFocusOffers(isk, stage);
+    if (!isk.focusOffers.includes(isk.focus)) isk.focus = null;
+    // ใบทุ่มเทใบแรกของชาติบอกว่าโลกนี้ยังจำอะไรจากคนต่างโลกรุ่นก่อน
+    const remembered = !isk.stageShown && isk.worldLore.length ? ` ${isekaiLoreLine(isk)}` : '';
+    return isekaiCard(isk, {
+      step: 'focus', title: stage.name, age: isk.age,
+      text: `${isk.focus ? `เข้า${stage.name}แล้ว ช่วงนี้จะทุ่มเทกับอะไร หรือจะทำแบบเดิมต่อ` : `เข้า${stage.name}แล้ว ช่วงนี้จะทุ่มเทกับอะไร`}${remembered}`,
+      choices: isk.focusOffers.map((id) => isekaiFocusDef(isk, id).name),
+      fx: isk.focusOffers.map((id) => isekaiFocusFx(isk, id)),
+      current: isk.focusOffers.indexOf(isk.focus),
+    });
+  }
+  const before = { ...isk.st };
+  const from = isk.age;
+  const years = isekaiYear(isk);
+  let revived = false;
+  if (isk.st.hp <= 0) {
+    // แก่จนสิ้นอายุไม่ใช่ความตายที่ย้อนเวลาได้
+    if (from >= isekaiOldAge(isk)) isk.natural = true;
+    else if (isekaiHas(isk, 'rbd') && !isk.rbdUsed) {
+      isk.rbdUsed = true;
+      isk.st.hp = 40;
+      revived = true;
+    } else isk.dead = true;
+  }
+  if (!isk.dead && !isk.natural && !isk.home) isk.due = isekaiDue(isk);
+  // ความรู้ถึงเกณฑ์กลางช่วงวัย: ทางลัดต่อท้ายรายการทันที ไม่ต้องรอช่วงวัยถัดไป (ลำดับเดิมไม่เลื่อน เซฟที่เล่นซ้ำจึงตรง)
+  const opened = isekaiKnowOffers(isk, stage).filter((id) => !isk.focusOffers.includes(id));
+  isk.focusOffers.push(...opened);
+  const f = isekaiFocusDef(isk, isk.focus);
+  const text = f.lines ? f.lines[Math.floor(from / isekaiPace(isk)) % f.lines.length] : `ทุ่มเทกับ${f.name}ไปอีกปี`;
+  const deltas = {};
+  for (const k of Object.keys(isk.st)) {
+    const d = Math.round(isk.st[k]) - Math.round(before[k]);
+    if (d) deltas[k] = d;
+  }
+  const title = years > 1 ? `อายุ ${from}–${isk.age - 1}` : `อายุ ${from}`;
+  isk.chron.push({ age: from, ...(years > 1 && { until: isk.age - 1 }), stage: stage.id, kind: 'tick', text, deltas });
   return isekaiCard(isk, {
-    step: 'event', id: ev.id, title: ev.title, text: ev.text, finale: !!ev.finale, index: isk.idx + 1, total: isk.queue.length,
+    step: 'tick', title, text, age: from, years, stage: stage.name, deltas,
+    ...(revived && { sys: 'เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว' }),
+    ...(!revived && opened.length && { sys: `ความรู้จากโลกเดิมมากพอแล้ว ทุ่มเทได้อีกทาง · ${opened.map((id) => isekaiFocusDef(isk, id).name).join(' · ')}` }),
+    focus: isk.focusOffers.indexOf(isk.focus),
+    focusChoices: isk.focusOffers.map((id) => isekaiFocusDef(isk, id).name),
+    focusFx: isk.focusOffers.map((id) => isekaiFocusFx(isk, id)),
+    choices: [],
+  });
+}
+
+const isekaiLoreLine = (isk) => {
+  const names = isk.worldLore.map((id) => ISEKAI_LORE[id]);
+  const list = names.length > 1 ? `${names.slice(0, -1).join(' ')} และ${names.at(-1)}` : names[0];
+  return `ที่นี่ยังมี${list}ที่คนจากต่างโลกรุ่นก่อนทิ้งไว้`;
+};
+
+// ความรู้เป็นค่าซ่อน ป้ายจึงบอกแค่ว่าทอยด้วยความรู้ ไม่บอกหมวดหรือค่า
+const isekaiCheckName = (c) => (c.know ? 'ความรู้โลกเดิม' : ISEKAI_STAT[c.stat]);
+
+function isekaiEventCard(isk, ev) {
+  return isekaiCard(isk, {
+    step: 'event', id: ev.id, title: ev.title, text: ev.text, finale: !!ev.finale, age: isk.age,
     choices: ev.choices.map((c) => c.t),
     fx: ev.choices.map((c) => {
       if (c.need && isk.st.gold < c.need.gold) return '';
@@ -4306,7 +5196,7 @@ function nextIsekaiCard(isk) {
       if (p === null) return c.need ? `ใช้ทอง ${c.need.gold}` : '';
       const aid = p - isekaiChance(isk, c, false);
       const names = isekaiAids(isk, c).map((s) => ISEKAI_SKILLS[s].name).join(' + ');
-      return `${ISEKAI_STAT[c.stat]} ${p}%${aid > 0 ? ` · ${names} +${aid}%` : ''}`;
+      return `${isekaiCheckName(c)} ${p}%${aid > 0 ? ` · ${names} +${aid}%` : ''}`;
     }),
     locked: ev.choices.map((c) => (c.need && isk.st.gold < c.need.gold ? `ต้องมีทอง ${c.need.gold} · ขาดอีก ${Math.ceil(c.need.gold - isk.st.gold)}` : null)),
   });
@@ -4314,9 +5204,9 @@ function nextIsekaiCard(isk) {
 
 function chooseIsekai(isk, idx) {
   if (isk.step === 'world') {
-    const w = isk.worldOffers[idx];
-    if (!w) throw new Error('ตัวเลือกไม่ถูกต้อง');
-    isekaiStart(isk, w);
+    const r = isk.worldOffers[idx];
+    if (!r) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    isekaiStart(isk, r);
     isk.step = 'skill';
     return;
   }
@@ -4325,17 +5215,29 @@ function chooseIsekai(isk, idx) {
     if (!s) throw new Error('ตัวเลือกไม่ถูกต้อง');
     isk.skills.push(s);
     if (s === 'luck') isk.st.luk += 15;
-    isekaiQueue(isk);
-    isk.step = 'event';
+    if (isk.worldLore.length) isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'lore', text: isekaiLoreLine(isk), deltas: {} });
+    // ฉากเปิดของเนื้อเรื่องมาก่อนตาแรก
+    const intro = roleInfo(isk.role).intro;
+    if (intro) isk.due = (isk.used.push(intro), intro);
+    isk.step = 'tick';
+    return;
+  }
+  if (isk.step === 'focus' || isk.step === 'tick') {
+    const f = isk.focusOffers[idx];
+    if (!f) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    isk.focus = f;
+    if (isk.step === 'focus') isk.stageShown = isekaiStageOf(isk).id;
+    isk.step = 'tick';
     return;
   }
   if (isk.step !== 'event') throw new Error('การ์ดนี้ไม่มีตัวเลือก');
-  const ev = isekaiById[isk.queue[isk.idx].id];
+  const ev = isekaiById[isk.due];
   const c = ev.choices[idx];
   if (!c) throw new Error('ตัวเลือกไม่ถูกต้อง');
   if (c.need && isk.st.gold < c.need.gold) throw new Error('ตัวเลือกนี้ล็อกอยู่');
   let ok = true, out = c, aid = null;
-  if (c.stat) {
+  const rolled = !!(c.stat || c.know);
+  if (rolled) {
     // ทอยครั้งเดียวเท่าเดิม — สำเร็จแต่ทอยเกินโอกาสแบบไม่มีสกิล = สกิลช่วยไว้ (ไม่ดึงเลขสุ่มเพิ่ม ผลเกมจึงเท่าเดิม)
     const roll = isk.rng.next() * 100;
     ok = roll < isekaiChance(isk, c);
@@ -4345,14 +5247,29 @@ function chooseIsekai(isk, idx) {
       isk.saves = (isk.saves ?? 0) + 1;
     }
   }
-  const deltas = isekaiApply(isk, out.fx);
+  // ความรู้ไม่ขึ้นในผลที่ผู้เล่นเห็น (ค่าซ่อน) · เรื่องของหมวดไหนก็จำว่าแตะหมวดนั้นล่าสุด ให้อ่านตำราเติมต่อ
+  const { know: learned, ...fx } = out.fx ?? {};
+  const deltas = isekaiApply(isk, fx);
+  if (ev.know) {
+    isk.knowLast = ev.know.cat;
+    isekaiLearn(isk, ev.know.cat, learned);
+  }
+  let sys = null;
+  // โลกจำเฉพาะที่สำเร็จและคนยอมรับ (ชื่อเสียงถึง) — ไม่ถึงก็ยังได้ผลของเรื่องนี้ แค่โลกลืมเมื่อจากไป
+  if (out.lore && !isk.lore.includes(out.lore)) {
+    if (isk.st.fame >= ISEKAI_KNOW_T.loreFame) {
+      isk.lore.push(out.lore);
+      sys = `โลกนี้จะจำ${ISEKAI_LORE[out.lore]}ไว้หลังคุณจากไป`;
+    } else sys = `คนยังรู้จักคุณน้อยเกินไป ${ISEKAI_LORE[out.lore]}อาจไม่อยู่ถึงรุ่นหลาน`;
+  }
   for (const f of [out.flag, out.flag2]) if (f) isk.flags[f] = true;
   // ลงบัญชีที่ดวงวิญญาณพกมา (ไม่ดึงเลขสุ่ม ⇒ ลำดับเหตุการณ์เท่าเดิม) · ธงคำบนที่ผิดติดเป็นธงของรอบต่างโลก
   for (const f of recordMerit(isk.ledger, ISEKAI_MERIT[ev.id]?.[idx], ev.id)) isk.flags[f] = true;
   vowTrack(isk, ISEKAI_MERIT[ev.id]?.[idx]);
-  // เรื่องต่อแทรกก่อนฉากสุดท้าย ไม่ดึงเลขสุ่ม
-  if (out.next && !isk.queue.some((q) => q.id === out.next)) isk.queue.splice(isk.queue.length - 1, 0, { id: out.next, ch: 3 });
-  let sys = null;
+  // เรื่องต่อมาถึงอีกไม่กี่ปีให้หลัง ไม่ดึงเลขสุ่ม
+  // เรื่องต่อที่คิดค้นของที่โลกนี้จำอยู่แล้วไม่ต้องนัด (B68h) — นัดข้ามตัวกรองกอง จึงกันที่นี่
+  if (out.next && !isk.used.includes(out.next) && !isk.later.some((l) => l.id === out.next) && !isk.worldLore.includes(isekaiById[out.next].loreOf)) isk.later.push({ id: out.next, age: isk.age + ISEKAI_TIME.later * isekaiPace(isk) });
+  if (ev.finale) isk.finaleDone = true;
   if (out.skill) {
     const rest = Object.keys(ISEKAI_SKILLS).filter((k) => !isekaiHas(isk, k) && k !== 'luck');
     if (rest.length) {
@@ -4372,16 +5289,19 @@ function chooseIsekai(isk, idx) {
   // ฉากเด่นบนการ์ดจบ: ผลที่ขยับค่ามากสุด · ทองหารห้าสิบให้ชั่งกับค่าอื่นได้ · สกิลช่วยไว้/ตายนับเพิ่ม
   const weight = Object.entries(deltas).reduce((s, [k, v]) => s + Math.abs(k === 'gold' ? v / 50 : v), 0) + (aid ? 10 : 0) + (isk.dead ? 50 : 0);
   (isk.marks ??= []).push({ text: `${ev.title} · ${out.text}`, weight });
-  isk.log.push(`${ev.title} · ${c.t}${c.stat ? (ok ? (aid ? ` (สำเร็จ · ${aid}ช่วยไว้)` : ' (สำเร็จ)') : ' (พลาด)') : ''}`);
-  isk.last = { title: ev.title, text: out.text, ok: c.stat ? ok : null, stat: c.stat ? ISEKAI_STAT[c.stat] : null, deltas, sys };
+  isk.log.push(`อายุ ${isk.age} · ${ev.title} · ${c.t}${rolled ? (ok ? (aid ? ` (สำเร็จ · ${aid}ช่วยไว้)` : ' (สำเร็จ)') : ' (พลาด)') : ''}`);
+  isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'event', text: `${ev.title} · ${out.text}`, deltas: { ...deltas } });
+  isk.last = { title: ev.title, text: out.text, ok: rolled ? ok : null, stat: rolled ? isekaiCheckName(c) : null, deltas, sys };
+  isk.due = null;
   isk.step = 'result';
 }
 
 // ค่าที่ติดตัวไปชาติต่างโลกถัดไป = ค่าสถานะที่สูงสุดของรอบนี้
 const isekaiMemory = (isk) => Object.keys(ISEKAI_STAT).reduce((a, b) => (isk.st[b] > isk.st[a] ? b : a));
 
-// แถวในผังตระกูล — ไม่มีจังหวัด/ฐานะ/อายุแบบชาติไทย ผู้อ่าน lineage ต้องดู isekai ก่อน
-const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world: ISEKAI_WORLDS[isk.world].name, ending: isk.ending.title, path: 'isekai', realm: 'ต่างโลก', broke: false });
+// แถวในผังตระกูล — ไม่มีจังหวัด/ฐานะแบบชาติไทย ผู้อ่าน lineage ต้องดู isekai ก่อน · world = ชื่อบทบาท
+// lore = ของที่โลกนี้จำจากชาตินี้ (isekaiWorldLore อ่านกลับ) · ใส่เฉพาะชาติที่มี แถวของชาติอื่นรูปเดิม
+const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world: roleInfo(isk.role).name, ending: isk.ending.title, path: 'isekai', realm: 'ต่างโลก', broke: false, ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }) });
 
 // ช่วงระหว่างชาติ (ใบ 05 · 09) + ส่งต่อรุ่นถัดไป — ลำดับตามใบ 09:
 // บันทึกการตาย → ส่วนบุญ/อนุโมทนา → เทวทูต 5 → ปรโลกเปิดบัญชีชี้ปลายทาง → ทางเกิด → ภูมิปลายทาง หรือ ผีบรรพบุรุษ → ส่งต่อ 30–70% → รุ่นถัดไป
@@ -4590,7 +5510,7 @@ function carryCard(af) {
 }
 
 // ผังตระกูล (ใบ 05: เลิกเมื่อไรก็ดูได้) — หน้าจอวาดระหว่างชีวิตจาก st.lineage และบนการ์ดส่งต่อ
-const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่นที่ ${l.gen} · ${l.name} · ต่างโลก (${l.world}) · ${l.ending}` : `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ${l.province ? `${placeName(l.province)} · ` : ''}ฐานะ${l.cls} · ${lifeEndWord(l.gone)} ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${kinTier(l.tier).name}` : ''}`);
+const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่นที่ ${l.gen} · ${l.name} · ต่างโลก (${l.world}) · ${l.ending}` : `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ${l.province ? `${placeName(l.province)} · ` : ''}ฐานะ${l.cls} · ${lifeEndWord(l.gone)} ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${kinTier(l.tier).name}` : ''}${l.trips?.some((t) => t.home) ? ` · เคยไปต่างโลกแล้วกลับมา ${l.trips.filter((t) => t.home).length} ครั้ง` : ''}`);
 
 // ชาติต่างโลกจบ (การ์ดตอนจบออกไปแล้ว): ลงผังตระกูลเป็นรุ่นของตัวเอง แล้วเปิดปรโลกรอบใหม่ให้ชาตินั้น
 // ยมทูต/เทวทูตเป็นฉากของชีวิตไทย (เนื้อหาอ่านค่าชาติไทย) จึงเริ่มที่คำตัดสิน
@@ -4622,6 +5542,9 @@ function sendToIsekai(af) {
     memory: prev?.memory ?? null,
     // ค่าโลกจริงตอนข้าม (B100) — รอบต่างโลกติดกันใช้ค่าจริงที่สะท้อนมาจากรอบก่อน
     real: prev?.real ?? realAt(af.st),
+    // โลกจำของที่ชาติต่างโลกก่อน ๆ ทั้งเซฟสร้างไว้ (B68h) — รวมชาติที่เพิ่งจบในช่วงนี้ซึ่งยังไม่ลงผังของชาติไทย
+    // ทริปไปกลับของชาตินี้ (B68m) ยังไม่ลงผัง — ส่งเป็นแถวชั่วคราว
+    lore: isekaiWorldLore([...(af.st.lineage ?? []), { trips: af.st.trips }, ...af.isekaiLives]),
   });
 }
 
@@ -4798,7 +5721,7 @@ function makeHeir(af, r) {
   // broke = จากไปพร้อมหนี้ — ฉายาตระกูล (titles.mjs) นับรุ่นติดกัน · tier = กลับมาเกิดเป็นชั้นไหนของตัวเอง (ทางเป็นลูก)
   // ชีวิตต่างโลกต่อท้ายเป็นรุ่นของตัวเอง (B68) — แถวชาติไทยบันทึกทางว่าไปต่างโลกกับภูมิที่ปรโลกชี้ให้ชาติไทย แม้ขากลับจะเกิดใหม่ตามกรรมของชาติต่างโลก
   const thai = af.thaiVerdict ?? af.verdict;
-  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, ...(isGone(st) && { gone: true }), realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }], fame, ...(goals.length && { goals }), ...(st.officeTop >= 0 && { office: st.officeTop }), ...(ladderOf(st)?.pension && { service: true }) }, ...af.isekaiLives];
+  const lineage = [...(st.lineage ?? []), { gen, name: st.name, sex: st.sex, province: st.province, cls: st.cls, age: st.age, ...(isGone(st) && { gone: true }), realm: thai.realm.name, path: af.isekaiLives.length ? 'isekai' : af.path, ...(tier && { tier: tier.tier }), broke: (st.estate?.money ?? 0) < 0, standing: [...(st.standing ?? []), { age: st.age, cls: death }], fame, ...(goals.length && { goals }), ...(st.officeTop >= 0 && { office: st.officeTop }), ...(ladderOf(st)?.pension && { service: true }), ...(st.trips?.length && { trips: st.trips }) }, ...af.isekaiLives];
   const carried = r * (tier?.carry ?? 1);
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
@@ -5394,7 +6317,8 @@ function restore(text, content) {
 // card = การ์ดที่ค้างบนจอตอนเซฟ · คืน true = การ์ดนั้นใช้ไม่ได้แล้ว (การ์ดเนื้อหาหาย/จำนวนตัวเลือกเปลี่ยน) ผู้เรียกจั่วใบถัดไปใหม่
 function repairLife(st, card) {
   const ev = st.pending && !st.pending.alloc ? st.pending : null;
-  const stale = !!card?.choices?.length && (!st.pending || (ev && ev.choices.length !== card.choices.length));
+  // การ์ดทริปต่างโลก (B68m) ไม่ผ่าน st.pending — สถานะทั้งชาติอยู่ใน st.trip ที่ภาพถ่ายเก็บไว้แล้ว จั่วใหม่ = นับใบซ้ำ + ดึงเลขสุ่มเกิน
+  const stale = !st.trip && !!card?.choices?.length && (!st.pending || (ev && ev.choices.length !== card.choices.length));
   if (stale) st.pending = null;
   const q = st.queue ?? [];
   st.queue = q.filter((c) => !('ev' in c) || c.ev);
@@ -5812,7 +6736,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.2.85';
+const APP_VERSION = 'v0.2.86';
 const APP_BUILD = '2026-10-28';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
@@ -6097,6 +7021,23 @@ function list(items, cls = 'items') {
   const ul = el('ul', cls);
   for (const it of items) ul.append(el('li', null, it));
   return ul;
+}
+
+// ผังตระกูลที่มีชาติต่างโลกแยกสองกลุ่ม โลกเดิม | ต่างโลก (B68h) — ไม่มีชาติต่างโลกหน้าตาเดิม
+// ของที่แต่ละโลกจำนับจากทั้งเซฟ ไม่ใช่แค่แถวที่ย่อโชว์ · บทบาทที่ไม่มีโลกของตัวเองใช้ชื่อบทบาทจากแถวผังแทน
+function lineageList(all, brief = all.length) {
+  const shown = all.slice(-brief);
+  const more = all.length > shown.length ? [`… ก่อนหน้านี้อีก ${all.length - shown.length} รุ่น`] : [];
+  const lore = Object.entries(isekaiWorldLore(all));
+  const away = shown.filter((l) => l.isekai);
+  if (!away.length && !lore.length) return list([...more, ...lineageText(shown)], 'picks');
+  const box = el('div', 'lineage');
+  const home = shown.filter((l) => !l.isekai);
+  if (home.length || more.length) box.append(el('div', 'lh', 'ตระกูลโลกเดิม'), list([...more, ...lineageText(home)], 'picks'));
+  box.append(el('div', 'lh', 'ตระกูลต่างโลก'));
+  if (away.length) box.append(list(lineageText(away), 'picks'));
+  for (const [w, ids] of lore) box.append(el('p', 'llore', `โลก (${ISEKAI_WORLDS[w]?.name ?? all.find((l) => l.lore?.world === w)?.world ?? w}) ยังจำ: ${ids.map((id) => ISEKAI_LORE[id]).join(' · ')}`));
+  return box;
 }
 
 // สรุปช่วงวัยที่ผ่านมา: แถบตอนนี้ + ขีดตำแหน่งต้นช่วง — บอกว่าเปลี่ยนไปมากน้อยโดยไม่มีตัวเลข
@@ -7160,6 +8101,8 @@ const portrait = () => pixels('por', 20, 24, [[0, 0, 20, 24, '#E8E8E8'], [7, 2, 
 const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา' };
 
 function render(card) {
+  // ไปกลับกลางชีวิต (B68m): ทริปยังเป็นชีวิตนี้ ปุ่มจึงเดินผ่านปุ่มชีวิต — จอเต็มของทริปเป็นงานเลน C
+  if (card.kind === 'isekai') return renderIsekai(card);
   root.replaceChildren();
   const s = statsOf(st);
   // ปีเกมใช้ภายในเท่านั้น หน้าจอบอกแค่อายุ (B14 ข้อ 12)
@@ -7247,7 +8190,7 @@ function render(card) {
         const prev = st.lineage.at(-1);
         const note = prev.path === 'child' && notePick(prev.gen);
         if (note) box.append(noteQuote(`บันทึกของบรรพบุรุษ · ${prev.name ? `${prev.name} ` : ''}เมื่ออายุ ${note.a}`, note.t));
-        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), list(card.lineage, 'picks'));
+        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageList(st.lineage, LINEAGE_BRIEF));
         body.append(box);
       }
       choices.append(enter(button(BTN.next, null, next)));
@@ -7511,7 +8454,7 @@ function familyPanel() {
 function familyTree() {
   if (!st.lineage.length) return null;
   const d = el('details', 'tree');
-  d.append(el('summary', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), list(lineageText(st.lineage), 'picks'));
+  d.append(el('summary', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageList(st.lineage));
   return d;
 }
 
@@ -7639,7 +8582,7 @@ function renderAfter(card) {
   if (card.reckoning) body.append(reckoningBox(card.reckoning, af.st.deeds));
   if (card.lineage) {
     body.append(el('div', 'kicker', 'ผังตระกูล'));
-    body.append(list(card.lineage, 'picks'));
+    body.append(af.heir ? lineageList(af.heir.lineage) : list(card.lineage, 'picks'));
     // การ์ดส่งต่อ (B95): ผังตระกูลรวมชีวิตที่เพิ่งจบแล้ว + จุดฐานะบ้านที่รุ่นถัดไปจะเกิด
     const chart = af.heir && standingChart(standingGens(af.heir.lineage), CLASSES.indexOf(af.heir.cls));
     if (chart) body.append(chart);
@@ -7664,7 +8607,7 @@ function renderAfter(card) {
 }
 
 // ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
-const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกโลก', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก' };
+const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ช่วงวัยใหม่ · เลือกสิ่งที่ทุ่มเท', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก' };
 function isekaiMeter(label, v, cls) {
   const m = el('div', 'imeter');
   const row = el('div', 'irow');
@@ -7676,6 +8619,57 @@ function isekaiMeter(label, v, cls) {
   m.append(row, bar);
   return m;
 }
+// จดหมายเหตุบนการ์ดจบ (B68b ชิ้น 3): แบ่งตามช่วงวัย เก่าอยู่บน ช่วงสุดท้ายเปิดค้าง (เจ้าของเคาะ)
+// บรรทัดรับได้ทั้งสตริง "อายุ N · …" ของเซฟเก่า และ { age, until?, stage, kind, text, deltas } ของ engine — มี deltas ถึงขึ้น chip
+// ตาหลายปีของ engine บอกปลายช่วงเป็น until · จอใช้ชื่อ to ชุดเดียวกับที่แยกจากสตริง
+const CHRON_AGE = /^อายุ (\d+)(?:–(\d+))? · (.*)$/;
+function chronEntry(x) {
+  if (typeof x !== 'string') return { ...x, to: x.until ?? null };
+  const m = CHRON_AGE.exec(x);
+  // บรรทัดเหตุการณ์มีหัวเรื่องคั่น · ส่วนบรรทัดทุ่มเทเป็นประโยคเดียว · ไม่มีอายุ = บรรทัดระบบตอนเข้าโลก
+  if (!m) return { age: null, kind: 'lore', text: x };
+  return { age: Number(m[1]), kind: m[3].includes(' · ') ? 'event' : 'tick', text: m[3], to: m[2] ? Number(m[2]) : null };
+}
+function chronicleBox(lines, s) {
+  const role = Object.keys(ISEKAI_ROLES).find((id) => roleInfo(id).name === s?.world);
+  const pace = ISEKAI_ROLES[role]?.pace ?? 1;
+  const stageOf = (e) => (e.stage && ISEKAI_STAGES.find((g) => g.id === e.stage)) || ISEKAI_STAGES.findLast((g) => (e.age ?? 0) >= g.from * pace);
+  const label = { hp: 'HP', gold: 'ทอง', fame: 'ชื่อเสียง', goal: s?.goalName, ...ISEKAI_STAT };
+  const groups = [];
+  for (const e of lines.map(chronEntry)) {
+    const g = stageOf(e);
+    if (groups.at(-1)?.g !== g) groups.push({ g, rows: [] });
+    // ปีทุ่มเทที่ข้อความเดียวกันต่อกันรวมเป็นบรรทัดเดียว (เจ้าของเคาะ ~20 บรรทัด/ชีวิต) · เหตุการณ์คงแยก · ไม่ข้ามหัวช่วงวัยเพราะรวมในกลุ่มเดียวกันเท่านั้น
+    const prev = groups.at(-1).rows.at(-1);
+    if (e.kind === 'tick' && prev?.kind === 'tick' && prev.text === e.text && (prev.to ?? prev.age) + 1 === e.age) {
+      const deltas = { ...prev.deltas };
+      for (const [k, v] of Object.entries(e.deltas ?? {})) deltas[k] = (deltas[k] ?? 0) + v;
+      groups.at(-1).rows[groups.at(-1).rows.length - 1] = { ...prev, to: e.to ?? e.age, deltas };
+    } else groups.at(-1).rows.push(e);
+  }
+  const d = el('details', 'tree ichron');
+  d.append(el('summary', null, `จดหมายเหตุทั้งชีวิต ${groups.reduce((n, x) => n + x.rows.length, 0)} บรรทัด`));
+  groups.forEach(({ g, rows }, i) => {
+    const aged = rows.filter((e) => e.age !== null);
+    const from = aged[0]?.age;
+    const to = aged.length ? Math.max(...aged.map((e) => e.to ?? e.age)) : null;
+    const sec = el('details', 'istage');
+    sec.open = i === groups.length - 1;
+    sec.append(el('summary', null, `${g.name}${from === undefined ? '' : ` · อายุ ${from === to ? from : `${from}–${to}`}`} · ${rows.length} บรรทัด`));
+    const ol = el('ol', 'ilog');
+    for (const e of rows) {
+      const li = el('li', e.kind);
+      // บรรทัดเข้าโลกมีอายุไว้จัดช่วงวัย แต่เป็นเรื่องของโลก ไม่ใช่ปีของตัวละคร — ไม่ขึ้นเลขอายุ
+      if (e.age !== null && e.kind !== 'lore') li.append(el('b', null, e.to ? `${e.age}–${e.to}` : String(e.age)));
+      li.append(el('span', null, e.text));
+      for (const [k, v] of Object.entries(e.deltas ?? {})) if (label[k] && v) li.append(el('small', v > 0 ? 'up' : 'down', `${label[k]} ${v > 0 ? '+' : ''}${v}`));
+      ol.append(li);
+    }
+    sec.append(ol);
+    d.append(sec);
+  });
+  return d;
+}
 function isekaiStatusBox(s) {
   const box = el('div', 'iwin');
   box.append(isekaiMeter('HP', s.hp, 'hp'), isekaiMeter(s.goalName, s.goal, 'goal'));
@@ -7686,6 +8680,7 @@ function isekaiStatusBox(s) {
     grid.append(d);
   }
   box.append(grid, el('div', null, `ทอง ${s.gold.toLocaleString('en-US')} · ชื่อเสียง ${s.fame} · ${s.world}`));
+  box.append(el('div', null, `อายุ ${s.age} · ${s.stage}${s.focus ? ` · ทุ่มเทกับ${s.focus}` : ''}`));
   if (s.skills.length) {
     const chips = el('div', 'ichips');
     for (const name of s.skills) chips.append(el('span', 'ichip', name));
@@ -7693,15 +8688,74 @@ function isekaiStatusBox(s) {
   }
   return box;
 }
+// ตัวจับเวลา (B68b): ใบตาเดินเองแทนการกด "ต่อ" — ยิง afterNext ตัวเดียวกับปุ่ม เซฟจึงเล่นซ้ำได้เหมือนกดเอง
+// ความเร็วจำแยก key ไม่อยู่ในเซฟ เพราะไม่เปลี่ยนผลของชีวิต · ×1 = ตาละ 2 วินาที (เจ้าของเคาะ)
+const SPEED_KEY = 'next-life-isekai-speed-v1';
+const SPEEDS = [1, 2, 4, 0];
+const TICK_MS = 2000;
+let speed = speedRead();
+let tickTimer = null;
+function speedRead() {
+  try {
+    const v = Number(localStorage.getItem(SPEED_KEY) ?? 1);
+    return SPEEDS.includes(v) ? v : 1;
+  } catch {
+    return 1;
+  }
+}
+function speedWrite(v) {
+  speed = v;
+  try {
+    localStorage.setItem(SPEED_KEY, String(v));
+  } catch {
+    // ไม่มีที่เก็บ ก็จำแค่ในหน้านี้
+  }
+}
+// พักไว้ระหว่างแท็บถูกซ่อน หรือผู้เล่นชี้/โฟกัสแผงทุ่มเทอยู่ — ไม่ให้ใบเปลี่ยนใต้มือ · ใบหลุดจากจอแล้ว (ไปหน้าอื่น) ไม่กด
+// tok = token ของปุ่ม "ต่อ" ใบนั้น — ใบตาทริปกลางชีวิตเดินด้วย token ชีวิต ไม่ใช่ token ระหว่างชาติ
+function armTick(box, panel, bar, tok) {
+  clearTimeout(tickTimer);
+  bar.style.animation = 'none';
+  if (!speed) return;
+  const ms = TICK_MS / speed;
+  void bar.offsetWidth;
+  bar.style.animation = `itick ${ms}ms linear forwards`;
+  tickTimer = setTimeout(() => {
+    if (!box.isConnected) return;
+    if (panel.matches(':hover, :focus-within') || document.hidden) return armTick(box, panel, bar, tok);
+    play(tok);
+  }, ms);
+}
+function speedRow(onChange) {
+  const row = el('div', 'ispeed');
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-label', 'ความเร็วเวลา');
+  for (const v of SPEEDS) {
+    const b = el('button', null, v ? `×${v}` : 'หยุด');
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(v === speed));
+    b.addEventListener('click', () => {
+      speedWrite(v);
+      for (const x of row.children) x.setAttribute('aria-pressed', String(x === b));
+      onChange();
+    });
+    row.append(b);
+  }
+  return row;
+}
+
 function renderIsekai(card) {
+  clearTimeout(tickTimer);
   root.replaceChildren();
   const box = el('article', 'card i');
   const top = el('div', 'top');
   const s = card.status;
-  top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ชาติต่างโลกที่ ${card.run + 1} · ${s.name}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
+  const pick = card.trip ? lifePick : afterPick;
+  const where = card.trip ? `ข้ามมาตอนอายุ ${card.life}` : `ชาติต่างโลกที่ ${card.run + 1}`;
+  top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ${where} · ${s.name}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
-  body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} ${card.index}/${card.total}` : ISEKAI_KICKER[card.step]));
+  body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} · อายุ ${card.age}` : ISEKAI_KICKER[card.step]));
   body.append(el('h3', null, card.title), el('p', null, card.text));
   if (card.step === 'result' && card.ok !== null) body.append(el('p', card.ok ? 'iok' : 'ibad', `${card.ok ? 'สำเร็จ' : 'พลาด'} · ${card.stat}`));
   const deltas = Object.entries(card.deltas ?? {});
@@ -7718,25 +8772,61 @@ function renderIsekai(card) {
     v.append(el('span', 'h', 'คำสัญญากับเทพธิดา'), el('blockquote', null, card.vow.text), el('b', null, card.vow.kept ? 'รักษาไว้ได้' : 'ผิดคำสัญญา'));
     body.append(v);
   }
+  if (card.lore?.length) body.append(el('p', 'isys', `โลกนี้จะจำ${card.lore.length > 1 ? `${card.lore.slice(0, -1).join(' ')} และ${card.lore.at(-1)}` : card.lore[0]}ไว้หลังคุณจากไป`));
   // ต่างโลกไม่มีฉายาของตัวเอง — เบาะแสชี้ฉายาของโลกเดิมที่ชาติหน้ายังไปเก็บได้ (B108 ใช้สองโลก)
-  if (card.step === 'end') clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
+  if (card.step === 'end' && !card.trip) clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
   if (card.highlights?.length) body.append(el('p', 'isys', 'ฉากที่จำได้ไม่ลืม'), list(card.highlights, 'picks'));
   if (card.log?.length) {
     const d = el('details', 'tree');
     d.append(el('summary', null, `เส้นทางที่เลือก ${card.log.length} เหตุการณ์`), list(card.log, 'picks'));
     body.append(d);
   }
+  if (card.chronicle?.length) body.append(chronicleBox(card.chronicle, s));
+  // แผงทุ่มเทบนใบตา (B68b): กริดเปิดตลอดแบบต้นแบบ — เวลาเดินอยู่แล้วกดเปลี่ยนได้ทันทีโดยไม่ต้องกางแผง (เจ้าของเคาะ)
+  // ปุ่มเดินผ่าน pick เซฟจึงเล่นซ้ำได้ · focusFx = ผลต่อปีของแต่ละทาง ไม่มีก็โชว์ชื่ออย่างเดียว
+  let panel = null;
+  if (card.step === 'tick') {
+    panel = el('div', 'ifocus');
+    panel.setAttribute('role', 'group');
+    panel.setAttribute('aria-label', 'สิ่งที่ทุ่มเท');
+    card.focusChoices.forEach((c, i) => {
+      const on = i === card.focus;
+      const b = el('button', on ? 'on' : null);
+      b.type = 'button';
+      b.append(el('b', null, c), el('small', null, [card.focusFx?.[i], on && 'ทำอยู่'].filter(Boolean).join(' · ')));
+      b.setAttribute('aria-pressed', String(on));
+      if (on) b.disabled = true;
+      else b.addEventListener('click', () => play(pick(i)));
+      panel.append(b);
+    });
+    body.append(el('p', 'kicker', 'ทุ่มเทกับ'), panel);
+  }
   if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
-      const b = keyed(button(c, why ?? card.fx?.[i], () => play(afterPick(i))), i);
+      const b = keyed(button(c, why ?? (card.step === 'focus' && i === card.current ? [card.fx?.[i], 'ทำอยู่'].filter(Boolean).join(' · ') : card.fx?.[i]), () => play(pick(i))), i);
       if (card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
       if (why) b.disabled = true;
       choices.append(b);
     });
-  } else choices.append(enter(button(BTN.next, null, () => play(T.afterNext))));
+  }
+  const nextTok = card.trip ? T.next : T.afterNext;
+  if (!card.choices.length) choices.append(enter(button(BTN.next, null, () => play(nextTok))));
   box.append(top);
   if (s) box.append(isekaiStatusBox(s));
+  // ใบผลลัพธ์/ใบเลือกหยุดรอเสมอ (เจ้าของเคาะ) — แถบความเร็วยังโชว์ให้ตั้งไว้ก่อนเดินต่อ
+  if (s && card.step !== 'end') {
+    const bar = el('i');
+    const walk = panel && !card.choices.length;
+    const row = speedRow(() => walk && armTick(box, panel, bar, nextTok));
+    if (walk) {
+      const t = el('div', 'itimer');
+      t.append(bar);
+      row.append(t);
+    }
+    box.append(row);
+    if (walk) armTick(box, panel, bar, nextTok);
+  }
   box.append(body, choices);
   root.append(panels(box));
 }
@@ -7765,7 +8855,8 @@ let save = null;
 // อายุของการ์ดชีวิตใบก่อน/ใบนี้ — จำใน apply ไม่ใช่ตอนวาด เพราะเล่นซ้ำจากเซฟไม่ได้วาดทุกใบ
 let curAge = null;
 function track(card) {
-  if (af) return card;
+  // อายุบนการ์ดทริปเป็นอายุร่างกายในต่างโลก ไม่ใช่อายุชีวิตไทย
+  if (af || card.kind === 'isekai') return card;
   prevAge = curAge;
   curAge = card.age;
   bookNote(card);
@@ -8066,7 +9157,8 @@ function snapRead() {
     notesLoad(save.seed);
     let card = root.card;
     if (!af && repairLife(st, card)) card = track(nextCard(st));
-    else if (af && card.choices?.length && !af.pending) card = nextAfterCard(af);
+    // ชาติต่างโลกในปรโลกไม่ใช้ af.pending — การ์ดที่ค้างยังใช้ได้ จั่วใหม่ = นับใบซ้ำ + ดึงเลขสุ่มเกิน
+    else if (af && !af.isekai && card.choices?.length && !af.pending) card = nextAfterCard(af);
     return card;
   } catch {
     return null;
