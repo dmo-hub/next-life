@@ -144,7 +144,15 @@ function markDot(svg, cap, cx, cy, r, text, cls) {
 function lifeMarks(deathAge) {
   return STAGES.flatMap((s, i) => (s.from > deathAge ? [] : stageSummary(st, s.name, s.from, Math.min((STAGES[i + 1]?.from ?? Infinity) - 1, deathAge)).highlights));
 }
-function lifeChart(life, deathAge) {
+// สาเหตุการตาย (B110 · เจ้าของเคาะ): ป้ายสั้นภาษาคน [คำเชื่อม, คำนาม] — คำนามขึ้นจุดตายบนกราฟ ประโยคเต็มขึ้นมรณบัตร
+// self_harm ไม่อยู่ในตารางโดยตั้งใจ: ห้ามขึ้นจอจนกว่าแกนจะมีข้อความระวัง + สายด่วน 1323 · other ที่ยังไม่ชราไม่บอกอะไร · หายไปต่างโลกไม่ใช่การตาย
+const CAUSE_TEXT = {
+  infection: ['ด้วย', 'โรคติดเชื้อ'], pneumonia: ['ด้วย', 'ปอดอักเสบ'], heart: ['ด้วย', 'โรคหัวใจ'], stroke: ['ด้วย', 'โรคหลอดเลือดสมอง'],
+  cancer: ['ด้วย', 'โรคมะเร็ง'], diabetes_kidney: ['ด้วย', 'โรคเบาหวานและไต'], liver: ['ด้วย', 'โรคตับ'], chronic_resp: ['ด้วย', 'โรคปอดเรื้อรัง'],
+  road: ['จาก', 'อุบัติเหตุบนท้องถนน'], accident: ['จาก', 'อุบัติเหตุ'], assault: ['เพราะ', 'ถูกทำร้าย'], newborn: ['ด้วย', 'ภาวะแทรกซ้อนแรกเกิด'],
+};
+const causeOf = (cause, age) => (isGone(st) ? null : cause === 'other' ? (age >= STAGES.at(-1).from ? ['ด้วย', 'วัยชรา'] : null) : CAUSE_TEXT[cause] ?? null);
+function lifeChart(life, deathAge, cause) {
   if (life.stats.length < 2) return null;
   const box = el('div', 'lifechart');
   const W = 320, H = 158, L = 46, R = 8, T = 18, B = 20;
@@ -169,7 +177,8 @@ function lifeChart(life, deathAge) {
   cap.setAttribute('aria-live', 'polite');
   const mark = (a, text, cls) => markDot(svg, cap, x(a), H - B - 5, 4, text, cls);
   for (const m of lifeMarks(deathAge)) mark(m.age, `อายุ ${m.age} · ${m.text}`, 'ev');
-  mark(deathAge, `${lifeEndWord(isGone(st))} ${deathAge}`, 'death');
+  const why = causeOf(cause, deathAge);
+  mark(deathAge, `${lifeEndWord(isGone(st))} ${deathAge}${why ? ` · ${why[1]}` : ''}`, 'death');
   box.append(svg, legend, cap);
   const money = sparkline(life.money, 0, deathAge, true);
   if (money) box.append(el('div', 'h', 'เงินติดตัว'), money);
@@ -1398,6 +1407,8 @@ function render(card) {
     box.append(top);
     // หนังสืองานศพบอกอายุ ไม่บอกปี พ.ศ. — ปีเกมไม่ขึ้นจอ (B14 ข้อ 12)
     body.append(portrait(), el('h3', null, st.name), el('p', 'dates', `${genLabel()}สิริอายุ ${card.age} ปี`));
+    const why = causeOf(card.cause, card.age);
+    if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
     body.append(el('p', null, `${st.sex} · ${provinceLabel(st)} · ฐานะ${st.cls} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
     const net = card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
     body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
@@ -1415,7 +1426,7 @@ function render(card) {
     const tree = familyTree();
     if (tree) body.append(tree);
     // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
-    const chart = card.life && lifeChart(card.life, card.age);
+    const chart = card.life && lifeChart(card.life, card.age, card.cause);
     if (chart) body.append(chart);
     choices.append(enter(button(BTN.toAfter, null, () => openBook(card))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
   } else {
@@ -1490,6 +1501,8 @@ function render(card) {
     } else if (card.kind === 'era' || card.kind === 'omen' || card.kind === 'result') {
       body.append(el('h3', null, card.text));
       if (card.story) body.append(el('p', null, card.story));
+      // ตรวจเจอโรค (B110): บอกเวลาที่เหลือให้เตรียมใจ (เจ้าของเคาะ) · left = ปีก่อนถึงนัด 0 = ปีนี้
+      if (card.illness) body.append(el('p', 'sub', card.illness.left ? `หมอว่าเหลือเวลาราว ${card.illness.left} ปี` : 'หมอว่านี่อาจเป็นปีสุดท้าย'));
       choices.append(enter(button(BTN.next, null, next)));
     } else if (card.entry) {
       entryOffer(card, body, choices);
