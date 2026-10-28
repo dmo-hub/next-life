@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP } from './labels.mjs';
 
@@ -1421,6 +1421,62 @@ function birthOddsLine() {
   return p > 0 ? `เด็กไทยที่เกิดปีเดียวกัน ราว 1 ใน ${oneIn(1 / p)} คน เกิดแบบคุณ (${provinceLabel(st)} · ฐานะ${st.cls})` : null;
 }
 
+// ป้ายที่มาตัวเลข (B140): 📎 อ่านจากข้อมูลจริง · 🎲 ค่าประมาณของเกม (ปีที่ใช้ไม่มีข้อมูลจริง เกมยืมค่าปีที่ใกล้สุด)
+// บอกช่วงปีของชุดข้อมูล ไม่บอกปีของแถวที่ใช้ — ปีแถวคือปีเกิดของชีวิตที่อยู่ในช่วงข้อมูลจริง ปีเกมจะหลุดขึ้นจอ (B14 ข้อ 12)
+// มือถือไม่มี hover จึงเป็นปุ่มแตะเปิด/ปิด ไม่ใช่ title
+const yearsOf = (s) => (s.from === s.to ? `${s.from}` : `${s.from}–${s.to}`);
+const srcText = (what, s) => `${what} (${s.by.join(' · ')} ${yearsOf(s)})`;
+const inData = (s, ys) => ys.every((y) => y >= s.from && y <= s.to);
+const MORT_WHAT = 'อายุคาดเฉลี่ยและอัตราตายทารก';
+const NO_MORT = 'บางปีที่ใช้ยังไม่มีข้อมูลการตาย เกมใช้ค่าปีที่ใกล้ที่สุดแทน';
+function srcTag([real, text]) {
+  const tag = el('span', 'src');
+  const b = el('button', null, real ? '📎' : '🎲');
+  b.type = 'button';
+  b.setAttribute('aria-label', real ? 'ข้อมูลจริง แตะดูที่มา' : 'ค่าประมาณของเกม แตะดูเหตุผล');
+  b.setAttribute('aria-expanded', 'false');
+  const d = el('span', 'src-d', real ? text : `ค่าประมาณของเกม — ${text}`);
+  d.hidden = true;
+  b.onclick = () => {
+    d.hidden = !d.hidden;
+    b.setAttribute('aria-expanded', String(!d.hidden));
+  };
+  tag.append(b, d);
+  return tag;
+}
+const sourced = (node, src) => (node.append(' ', srcTag(src)), node);
+
+// ปีเกมทุกปีอ่านค่าของปีต้นแบบ (lifeQx · inflationRate) จึงตรวจที่ปีต้นแบบ ไม่ใช่ปีเกม
+function outliveSrc(age) {
+  const era = st.content.era;
+  const ys = [];
+  for (let a = 0; a <= age && a < MAX_AGE; a++) ys.push(protoYear(era, st.seed, st.birthYear + a));
+  return inData(era.src.mort, ys) ? [true, `คำนวณจาก${srcText(MORT_WHAT, era.src.mort)}`] : [false, NO_MORT];
+}
+
+// แยกทารก/เด็กโตตามเกณฑ์เดียวกับที่ engine เขียน card.note (ทารกอ่านอัตราตายทารกตรง · เด็กโตคำนวณ qx จากตารางชีพ)
+function childNoteSrc(age) {
+  const era = st.content.era;
+  const infant = age < 5;
+  const y = protoYear(era, st.seed, infant ? st.birthYear : st.birthYear + age);
+  if (!inData(era.src.mort, [y])) return [false, NO_MORT];
+  return [true, infant ? srcText('อัตราตายทารก', era.src.mort) : `คำนวณจาก${srcText(MORT_WHAT, era.src.mort)}`];
+}
+
+// ภาค×จังหวัดอ่านประชากรปีเดียว · ฐานะอ่านรายได้รายภาคของปีเกิดจริง (ไม่ผ่านปีต้นแบบ) — นอกช่วงตารางรายได้ = ค่ายืม
+function birthOddsSrc() {
+  const src = st.content.era.src;
+  if (!inData(src.income, [st.birthYear])) return [false, `ปีเกิดนี้อยู่นอกช่วงข้อมูลรายได้รายภาค (${yearsOf(src.income)}) เกมใช้ค่าปีที่ใกล้ที่สุดแทน`];
+  return [true, `คำนวณจาก${srcText('ประชากรรายจังหวัด', src.pop)} · ${srcText('รายได้ครัวเรือนรายภาค', src.income)} · ${srcText('ส่วนแบ่งรายได้', src.share)}`];
+}
+
+// บรรทัด "ของแพงขึ้น" ของการ์ดทบทวนเงินเก็บมาจาก engine เป็นข้อความ — จับที่คำนำ · ทุกปีอยู่ในช่วงปีต้นแบบ era.future
+const PRICE_ITEM = 'ของแพงขึ้น ';
+function priceSrc() {
+  const era = st.content.era;
+  return inData(era.src.cpi, [era.future.from, era.future.to]) ? [true, `คำนวณจาก${srcText('เงินเฟ้อรายปี', era.src.cpi)}`] : [false, 'บางปีที่ใช้ยังไม่มีข้อมูลเงินเฟ้อ เกมใช้ค่าประมาณแทน'];
+}
+
 function render(card) {
   // ไปกลับกลางชีวิต (B68m): ทริปยังเป็นชีวิตนี้ ปุ่มจึงเดินผ่านปุ่มชีวิต — จอเต็มของทริปเป็นงานเลน C
   if (card.kind === 'isekai') return renderIsekai(card);
@@ -1445,14 +1501,14 @@ function render(card) {
     const why = causeOf(card.cause, card.age);
     if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
     // คนหายไม่รู้อายุตาย จึงเทียบรุ่นไม่ได้ (B142)
-    if (!gone) body.append(el('p', 'sub', outliveLine(card.age)));
+    if (!gone) body.append(sourced(el('p', 'sub', outliveLine(card.age)), outliveSrc(card.age)));
     body.append(el('p', null, `${st.sex} · ${provinceLabel(st)} · ฐานะ${classNow(st)} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
     const net = gone ? (card.summary.money < 0 ? LOST.debt : LOST.money) : card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
     body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
     if (card.summary.debt) body.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
     if (card.summary.bankruptcies) body.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
     // บันทึกเด็กเป็นสถิติการตายของยุค — ไม่ใช่เรื่องของคนหาย
-    if (card.note && !gone) body.append(el('p', 'sub', card.note));
+    if (card.note && !gone) body.append(sourced(el('p', 'sub', card.note), childNoteSrc(card.age)));
     if (card.funeral) body.append(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
     if (card.will !== undefined) body.append(el('p', 'sub', gone ? LOST.will[card.will ? 1 : 0] : card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
     if (gone) body.append(el('p', 'call', LOST.call));
@@ -1513,7 +1569,7 @@ function render(card) {
       body.append(el('h3', 'lead', card.text));
       body.append(el('p', 'horo', horoscope(st)));
       const odds = birthOddsLine();
-      if (odds) body.append(el('p', 'sub', odds));
+      if (odds) body.append(sourced(el('p', 'sub', odds), birthOddsSrc()));
       // บรรทัดแรกเป็นเรื่องของบ้าน · ที่เหลือเป็นบรรยากาศยุค ตัวรอง
       card.story.forEach((p, i) => body.append(el('p', i ? 'sub' : null, p)));
       if (card.inherit.length) {
@@ -1551,7 +1607,12 @@ function render(card) {
     } else {
       if (card.title) body.append(el('h3', null, card.title));
       body.append(el(card.title ? 'p' : 'h3', card.title ? null : 'lead', card.text));
-      if (card.items?.length) body.append(list(card.items));
+      if (card.items?.length) {
+        const ul = list(card.items);
+        const price = card.kind === 'alloc' && [...ul.children].find((li) => li.textContent.startsWith(PRICE_ITEM));
+        if (price) sourced(price, priceSrc());
+        body.append(ul);
+      }
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
       const free = freeChoices(card);
       card.choices.forEach((c, i) => {

@@ -87,6 +87,11 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .body p.news { margin:0; padding-left:10px; border-left:2px solid currentColor; font-size:14px; opacity:0.8; }
 .items, .picks { margin:0; padding-left:20px; font-size:14px; }
 .body .sub { font-size:14px; }
+/* ป้ายที่มาตัวเลข (B140): ขอบลบให้เป้าแตะ 32px ไม่ดันความสูงบรรทัด · คำอธิบายสีตามบรรทัดที่ติด ธีมมืดจึงไม่ต้องแยกกฎ */
+.src button { all:unset; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; min-width:32px; min-height:32px; margin:-8px -4px; border-radius:6px; font-size:13px; line-height:1; vertical-align:middle; }
+.src button:focus-visible { outline:2px solid currentColor; outline-offset:-2px; }
+.src-d { display:block; margin-top:4px; font-size:12px; }
+.src-d[hidden] { display:none; }
 .body .note { font-size:12px; }
 .body .horo { font-family:Pridi,serif; font-size:14px; margin-top:-4px; }
 .spark { display:block; width:100%; height:auto; }

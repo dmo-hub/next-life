@@ -23,6 +23,21 @@ function classList(xs, what, n) {
 }
 const r = (v, d) => Number(v.toFixed(d));
 
+// ที่มาของชุดข้อมูลให้ UI ทำป้าย 📎/🎲 (B140) — นับเฉพาะแถวที่มี source และไม่ใช่ assumption
+// ชื่อแหล่งอ่านจาก host ของ URL · host ที่ยังไม่มีชื่อให้หยุด build ไม่งั้นป้ายขึ้นแหล่งว่างเงียบ
+const SOURCE_HOSTS = { 'api.worldbank.org': 'World Bank', 'www.nso.go.th': 'สสช.', 'openjicareport.jica.go.jp': 'JICA' };
+function sourceOf(rows, y) {
+  const real = rows.filter((x) => x.source && !x.assumption);
+  if (!real.length) throw new Error('ชุดข้อมูลไม่มีแถวที่มี source');
+  const by = [...new Set(real.map((x) => {
+    const host = new URL(x.source).host;
+    if (!SOURCE_HOSTS[host]) throw new Error(`ยังไม่ได้ตั้งชื่อแหล่ง ${host} ใน SOURCE_HOSTS`);
+    return SOURCE_HOSTS[host];
+  }))];
+  const ys = y === undefined ? real.map((x) => x.y) : [y];
+  return { by, from: Math.min(...ys), to: Math.max(...ys) };
+}
+
 // แปลงเป็นรูปที่แกนเกมอ่าน: at_age → age (เหตุการณ์หลักไมล์) · label → text · cost → เงินจ่ายออก
 // ฟิลด์ที่แกนยังไม่อ่านคงไว้ครบ ใบถัดไปใช้ต่อได้โดยไม่ต้องแก้ loader
 function normalize(e) {
@@ -334,6 +349,18 @@ export function loadEra() {
     causes,
     events,
     birth: loadBirth(),
+    src: loadSources(infl, m),
+  };
+}
+
+function loadSources(infl, m) {
+  const b = json('data/birthplace.json');
+  return {
+    cpi: sourceOf(infl.rows),
+    mort: sourceOf(SEXES.flatMap((s) => [...m.e0[s], ...m.imr[s]])),
+    pop: sourceOf([b.population], b.population.y),
+    income: sourceOf(b.household_income.rows),
+    share: sourceOf([...b.income_share.q, b.income_share.top10], b.income_share.y),
   };
 }
 
