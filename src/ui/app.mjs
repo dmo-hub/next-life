@@ -1432,7 +1432,7 @@ function render(card) {
     if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
     // คนหายไม่รู้อายุตาย จึงเทียบรุ่นไม่ได้ (B142)
     if (!gone) body.append(el('p', 'sub', outliveLine(card.age)));
-    body.append(el('p', null, `${st.sex} ·${provinceLabel(st)} · ฐานะ${classNow(st)} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
+    body.append(el('p', null, `${st.sex} · ${provinceLabel(st)} · ฐานะ${classNow(st)} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
     const net = gone ? (card.summary.money < 0 ? LOST.debt : LOST.money) : card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
     body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
     if (card.summary.debt) body.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
