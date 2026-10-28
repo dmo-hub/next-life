@@ -3,7 +3,7 @@ import {
   STAT_KEYS, EFFECT_KEYS, CLASSES, SEXES, STAGE_AGES, STAGE_NAMES, CATEGORIES, PLACEHOLDERS,
   ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE, EDU, SCHOOL_VALUES,
 } from './vocab.mjs';
-import { INCOME_MULT } from '../../engine/life.mjs';
+import { INCOME_MULT, MONEY_KEYS } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
 import { PET_KINDS, HERD_KINDS } from '../../engine/family.mjs';
@@ -21,11 +21,12 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder'],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', ...MONEY_KEYS],
   bound: ['min', 'max'],
+  ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
   family: ['role', 'age', 'alive', 'count', 'health', 'relations'],
-  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish', 'rank'],
+  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish', 'rank', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
   requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'reason'],
@@ -46,13 +47,17 @@ function* shaped(e) {
       for (const [k, b] of Object.entries(w.stats)) if (isObj(b)) yield ['bound', b, `.when.stats.${k}`];
     }
     if (isObj(w.flags)) yield ['whenFlags', w.flags, '.when.flags'];
+    for (const k of MONEY_KEYS) if (isObj(w[k])) yield ['bound', w[k], `.when.${k}`];
     for (const [i, f] of list(w.family).entries()) {
       if (!isObj(f)) continue;
       yield ['family', f, `.when.family[${i}]`];
       for (const k of ['health', 'relations']) if (isObj(f[k])) yield ['bound', f[k], `.when.family[${i}].${k}`];
     }
   }
-  if (isObj(e.multipliers)) yield ['multipliers', e.multipliers, '.multipliers'];
+  if (isObj(e.multipliers)) {
+    yield ['multipliers', e.multipliers, '.multipliers'];
+    for (const k of MONEY_KEYS) if (isObj(e.multipliers[k])) yield ['ratioMul', e.multipliers[k], `.multipliers.${k}`];
+  }
   if (isObj(e.belief)) {
     const b = e.belief;
     yield ['belief', b, '.belief'];
@@ -83,7 +88,10 @@ function* shaped(e) {
   for (const { node, path } of effectSites(e)) {
     if (path.includes('outcomes')) {
       yield ['outcome', node, path];
-      if (isObj(node.multipliers)) yield ['multipliers', node.multipliers, `${path}.multipliers`];
+      if (isObj(node.multipliers)) {
+        yield ['multipliers', node.multipliers, `${path}.multipliers`];
+        for (const k of MONEY_KEYS) if (isObj(node.multipliers[k])) yield ['ratioMul', node.multipliers[k], `${path}.multipliers.${k}`];
+      }
     }
     if (isObj(node.effects)) {
       yield ['effects', node.effects, `${path}.effects`];
@@ -105,6 +113,9 @@ function* shaped(e) {
 const bound = (b) => isObj(b) && ['min', 'max'].every((k) => b[k] === undefined || (typeof b[k] === 'number' && b[k] >= 0 && b[k] <= 100)) && !(b.min > b.max);
 const nonEmptySubset = (v, of) => Array.isArray(v) && v.length > 0 && v.every((x) => of.includes(x));
 const positive = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
+// อัตราส่วนเงิน (money_x · income_x · debt_x) ไม่มีเพดาน 100 แบบค่าสถานะ — ต้องมีอย่างน้อยหนึ่งขอบ ไม่งั้นเงื่อนไขไม่กั้นอะไร
+const ratio = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+const ratioBound = (b) => isObj(b) && (b.min !== undefined || b.max !== undefined) && ['min', 'max'].every((k) => b[k] === undefined || ratio(b[k])) && !(b.min > b.max);
 
 function checkMultipliers(m, at, r) {
   if (m === undefined) return;
@@ -115,6 +126,7 @@ function checkMultipliers(m, at, r) {
   }
   for (const k of ['karma', 'family_fame', 'wish']) if (m[k] !== undefined && !positive(m[k])) r(`${at}.${k}`, 'ต้องเป็นเลขบวก');
   if (m.flags !== undefined && (!isObj(m.flags) || Object.entries(m.flags).some(([f, v]) => !FLAG_RE.test(f) || !positive(v)))) r(`${at}.flags`, 'ต้องเป็น {ชื่อธง: เลขบวก}');
+  for (const k of MONEY_KEYS) if (m[k] !== undefined && !(ratioBound(m[k]) && positive(m[k].v))) r(`${at}.${k}`, 'ต้องเป็น {min, max, v} อัตราส่วน ≥ 0 อย่างน้อยหนึ่งขอบ v เป็นเลขบวก');
 }
 
 export const rules = [
@@ -252,6 +264,7 @@ export const rules = [
         if (!isObj(w.stats)) r('.when.stats', 'stats ต้องเป็น object');
         else for (const [k, b] of Object.entries(w.stats)) if (!bound(b)) r(`.when.stats.${k}`, 'ต้องเป็น {min, max} 0–100 min ≤ max');
       }
+      for (const k of MONEY_KEYS) if (w[k] !== undefined && !ratioBound(w[k])) r(`.when.${k}`, 'ต้องเป็น {min, max} อัตราส่วน ≥ 0 อย่างน้อยหนึ่งขอบ min ≤ max');
       if (w.flags !== undefined) {
         if (!isObj(w.flags) || ['has', 'not'].some((k) => w.flags[k] !== undefined && !Array.isArray(w.flags[k]))) r('.when.flags', 'flags ต้องเป็น {has: [...], not: [...]}');
       }

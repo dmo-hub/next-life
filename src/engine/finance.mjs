@@ -34,6 +34,9 @@ export const DEBTS = [
   { id: 'car', name: 'ผ่อนรถ' },
   { id: 'informal', name: 'หนี้นอกระบบ' },
   { id: 'credit_card', name: 'บัตรเครดิต', system: 'credit_card' },
+  // แหล่งกู้มาจ่าย (B111) — ปีเริ่มของกองทุนอยู่ใน data/debt.json (from) ไม่ใช่ system: คำว่ากองทุนหมู่บ้านในการ์ดเก่าไม่ได้อ้างการกู้
+  { id: 'bank_loan', name: 'สินเชื่อธนาคาร' },
+  { id: 'coop', name: 'กองทุนหมู่บ้าน/สหกรณ์' },
 ];
 const DEBT_BY_ID = new Map(DEBTS.map((d) => [d.id, d]));
 export const debtName = (id) => DEBT_BY_ID.get(id)?.name ?? id;
@@ -61,6 +64,7 @@ export const PRIZE_TABLES = { 'finance.lottery': LOTTERY_PRIZES };
 export function debtOpen(era, id, year) {
   const d = DEBT_BY_ID.get(id);
   if (!d) throw new Error(`หนี้ไม่รู้จัก: ${id}`);
+  if (era.finance.debt.kinds[id]?.from > year) return false;
   return !d.system || systemOpen(era, d.system, year);
 }
 
@@ -70,6 +74,7 @@ export function newDebt(era, seed, kind, amount, year) {
   const base = () => lendingRate(era, seed, year) + k.premium;
   let rate = k.rate;
   if (kind === 'car') rate = k.cap && year >= k.cap.from ? Math.min(base(), k.cap.v) : base();
+  else if (kind === 'bank_loan') rate = base();
   return { kind, balance: amount, rate, float: kind === 'mortgage', premium: k.premium ?? 0, years: k.years ?? null, grace: k.grace ?? 0, simple: !!k.simple };
 }
 
@@ -88,6 +93,8 @@ export function payDebt(era, seed, d, year) {
   d.years--;
   return pay;
 }
+// ยอดจ่ายปีแรกของก้อนที่เพิ่งกู้ ไม่แตะก้อนหนี้ — ปุ่มกู้บอกก่อนกด (ก้อนดอกคงที่ไม่มีปลอดหนี้เท่านั้น)
+export const firstPay = (d) => (d.simple ? d.balance * d.rate : d.rate ? (d.balance * d.rate) / (1 - (1 + d.rate) ** -d.years) : d.balance / d.years);
 export const debtDone = (d) => !d.simple && (d.years <= 0 || d.balance <= 0.5);
 
 // ร้องเรียนหนี้นอกระบบ: ดอกลดเหลืออัตราตามกฎหมาย แต่ยังจ่ายแต่ดอกเหมือนเดิม — เงินต้นค้างจนมีการ์ดให้ปิดหนี้

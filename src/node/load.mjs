@@ -203,6 +203,8 @@ export function loadDebt() {
       ...(k.simple && { simple: true }),
       ...(k.complaint_rate !== undefined && { complaint_rate: num(k.complaint_rate, `${id}.complaint_rate`) }),
       ...(k.cap && { cap: { from: num(k.cap.from, `${id}.cap.from`), v: num(k.cap.v, `${id}.cap.v`) } }),
+      ...(k.limit !== undefined && { limit: num(k.limit, `${id}.limit`) }),
+      ...(k.from !== undefined && { from: num(k.from, `${id}.from`) }),
     };
     if (kinds[id].rate === undefined && kinds[id].premium === undefined) throw new Error(`data/debt.json ${id} ต้องมี rate หรือ premium`);
     if (!kinds[id].simple && !(kinds[id].years >= 1)) throw new Error(`data/debt.json ${id} ผ่อนแบบมีงวดต้องมี years ≥ 1`);

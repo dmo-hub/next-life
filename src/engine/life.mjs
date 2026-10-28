@@ -2,7 +2,7 @@ import { makeRng } from './rng.mjs';
 import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, petCall, lossCall, petArrivals, petArriveText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear } from './era.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
-import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt } from './finance.mjs';
+import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt, firstPay } from './finance.mjs';
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './career.mjs';
 import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
@@ -588,6 +588,7 @@ function stepYear(st) {
 
   checkBankrupt(st, year, stage);
   debtLoad(st, year, paid);
+  informalFlag(st);
   const tone = omenTone(st.ledger);
   if (!tone) st.omenTone = null;
   else if (tone !== st.omenTone && (st.omenAge === null || st.age - st.omenAge >= OMEN.gap)) {
@@ -695,6 +696,18 @@ function debtIncome(st, year) {
   return st.retireBase === null ? null : st.retireBase * st.price;
 }
 
+// เงินก้อน/รายได้/หนี้ที่การ์ดเช็ก (B111 ข้อเคาะ 2–4) เป็นอัตราส่วน ไม่ใช่บาท — เกณฑ์เดียวใช้ได้ทุกยุคทุกฐานะ
+// money_x = เงินสดเทียบรายได้ปี · income_x = รายได้ต่อเดือนเทียบค่าแรงขั้นต่ำทั้งเดือน · debt_x = หนี้สุทธิเทียบรายได้ปี
+// ไม่มีรายได้ (เรียน/ว่างงาน) เทียบค่าแรงขั้นต่ำทั้งปีแทน — ไม่งั้นเด็กมีเงินแสนกับเด็กไม่มีเงินได้ค่าเดียวกัน
+export const MONEY_KEYS = ['money_x', 'income_x', 'debt_x'];
+export function moneyRatios(st, year = st.birthYear + st.age) {
+  const f = st.content.era.finance;
+  const minMonth = minWage(st.content.era, st.seed, year) * f.daysPerMonth;
+  const base = debtIncome(st, year) || minMonth * 12;
+  const monthly = isWorking(st) ? monthlyIncome(st, year) : st.retireBase !== null ? (st.retireBase * st.price) / 12 : 0;
+  return { money_x: Math.max(0, st.money) / base, income_x: monthly / minMonth, debt_x: Math.max(0, -netWorth(st)) / base };
+}
+
 // หนี้เกินกำลัง (B111 · เจ้าของเคาะ) — ธง in_debt คิดใหม่ทุกปีจากยอดจริง ไม่ค้างจากการ์ดเก่า (บั๊ก: "หนี้ล้นตัว" ออกตอนมีเงิน 3.8 ล้าน)
 // ติด: ผ่อนต่อปี > pay ของรายได้ปี หรือหนี้สุทธิ > net เท่ารายได้ปี · ล้าง: ต่ำกว่า payOff และ netOff · ช่วงกลางคงค่าเดิม กันธงกระพริบ
 // ยังไม่มีฐานรายได้ (เรียน/ไม่เคยทำงาน) = ล้างเมื่อไม่มีหนี้เหลือ ไม่งั้นคงตามเดิม
@@ -738,12 +751,64 @@ function borrow(st, { kind, amount }, s = 1) {
   const baht = moneyValue(st, amount) * s;
   st.money += baht;
   st.debts.push(newDebt(era, st.seed, kind, baht, year));
+  informalFlag(st);
 }
 
 // ปิดหนี้ทุกก้อนของชนิดนั้นด้วยเงินที่มี · เงินไม่พอ = เงินติดลบ ทบดอกเงินกู้ปกติแทน (ย้ายหนี้ออกจากดอกโหด)
 function settle(st, kind) {
   for (const d of st.debts) if (d.kind === kind) st.money -= d.balance;
   st.debts = st.debts.filter((d) => d.kind !== kind);
+  informalFlag(st);
+}
+
+// ธง informal_debt ติดตลอดที่หนี้นอกระบบค้าง (B111 เจ้าของเคาะ) — การ์ดทวงหนี้ของเนื้อหาอ่านธงนี้ engine ไม่ลงโทษเอง
+function informalFlag(st) {
+  const on = st.debts.some((d) => d.kind === 'informal');
+  if (on && !st.flags.informal_debt) {
+    st.flags.informal_debt = true;
+    st.flagAge.informal_debt ??= st.age;
+  } else if (!on) delete st.flags.informal_debt;
+}
+
+// กู้มาจ่าย (B111 เจ้าของเคาะ): ตัวเลือกที่ล็อกเพราะเงินอย่างเดียวกู้ส่วนที่ขาดได้ · ปุ่มละแหล่งที่เข้าเกณฑ์ บอกดอก+ยอดจ่ายปีแรก
+// ธนาคารต้องทำงานอยู่ · กองทุน/สหกรณ์ต้องมีรายได้ (ทำงานหรือบำนาญ) · นอกระบบให้ทุกคน · วงเงินนับหนี้ชนิดเดียวกันที่ค้างรวมก้อนใหม่
+// อายุต่ำกว่าบรรลุนิติภาวะกู้เองไม่ได้ · ตายแล้ว (การ์ดงานศพ) ไม่กู้ — หนี้หักจากกองมรดกอยู่แล้ว
+export const LOAN_AGE = 20;
+export const LOAN_KINDS = ['bank_loan', 'coop', 'informal'];
+export function loanOptions(st, gap) {
+  if (st.dead || st.age < LOAN_AGE || !(gap > 0)) return [];
+  const year = st.birthYear + st.age;
+  const era = st.content.era;
+  const kinds = era.finance.debt.kinds;
+  const income = debtIncome(st, year);
+  const owed = (kind) => st.debts.reduce((s, d) => s + (d.kind === kind ? d.balance : 0), 0);
+  const fits = (kind) => income > 0 && owed(kind) + gap <= kinds[kind].limit * income;
+  const ok = { bank_loan: isWorking(st) && fits('bank_loan'), coop: debtOpen(era, 'coop', year) && fits('coop'), informal: true };
+  return LOAN_KINDS.filter((k) => ok[k]).map((kind) => {
+    const d = newDebt(era, st.seed, kind, gap, year);
+    return { kind, name: debtName(kind), rate: d.rate, years: d.simple ? null : d.years, yearly: firstPay(d) };
+  });
+}
+
+// ยอดที่ขาดของตัวเลือก — ปัดขึ้นเป็นบาทเต็ม กู้แล้วต้องกดได้แน่ ไม่ติดเศษทศนิยม
+function choiceGap(st, c) {
+  const q = c.requires;
+  if (!q?.money || lockReason(st, c) === null) return null;
+  if (st.pending?.id === FUNERAL.rite && st.funeralPick && c.id !== st.funeralPick) return null;
+  if (q.age && (st.age < (q.age.min ?? 0) || st.age > (q.age.max ?? Infinity))) return null;
+  const gap = moneyValue(st, q.money) - (st.dead ? deadPurse(st) : st.money);
+  return gap > 0 ? gap : null;
+}
+
+function borrowFor(st, c, kind) {
+  const gap = choiceGap(st, c);
+  const need = gap === null ? 0 : Math.ceil(gap);
+  if (!need || lockReason(st, c, need) !== null) throw new Error('ตัวเลือกนี้กู้มาจ่ายไม่ได้');
+  if (!loanOptions(st, need).some((o) => o.kind === kind)) throw new Error(`กู้จาก${debtName(kind)}ไม่ได้`);
+  const year = st.birthYear + st.age;
+  st.money += need;
+  st.debts.push(newDebt(st.content.era, st.seed, kind, need, year));
+  informalFlag(st);
 }
 
 // การ์ดจัดสรรเงิน (ใบ 11) เล่าผลจริงของช่วงที่ผ่านมาก่อนให้เลือก — ไม่บอกปีถัดไป · ตัวเลือกสร้างตอนออกการ์ด
@@ -803,16 +868,16 @@ function eventCard(st, ev, news = null) {
 
 // ตัวเลือกที่ล็อกเพราะเงินบอกยอดที่ขาด (B107) — ใส่ช่องเฉพาะการ์ดที่มีตัวนั้น การ์ดอื่นรูปเดิมทุกช่อง
 // ล็อกด้วยเหตุที่ชนะเงินก่อน (อายุ · แบบงานศพที่ตกลงไว้) ไม่บอกยอด — เติมเงินก็ยังกดไม่ได้
+// loans = แหล่งกู้ต่อตัวเลือก (B111) เฉพาะตัวที่ขาดแค่เงิน — ขาดอย่างอื่นด้วย กู้แล้วก็ยังกดไม่ได้ จึงไม่เสนอ
 function moneyShort(ev, st) {
-  const moneyGap = ev.choices.map((c) => {
-    const q = c.requires;
-    if (!q?.money || lockReason(st, c) === null) return null;
-    if (st.pending?.id === FUNERAL.rite && st.funeralPick && c.id !== st.funeralPick) return null;
-    if (q.age && (st.age < (q.age.min ?? 0) || st.age > (q.age.max ?? Infinity))) return null;
-    const gap = moneyValue(st, q.money) - (st.dead ? deadPurse(st) : st.money);
-    return gap > 0 ? gap : null;
+  const moneyGap = ev.choices.map((c) => choiceGap(st, c));
+  if (!moneyGap.some((v) => v !== null)) return {};
+  const loans = moneyGap.map((gap, i) => {
+    if (gap === null || lockReason(st, ev.choices[i], Math.ceil(gap)) !== null) return null;
+    const opts = loanOptions(st, Math.ceil(gap));
+    return opts.length ? opts : null;
   });
-  return moneyGap.some((v) => v !== null) ? { moneyGap } : {};
+  return { moneyGap, ...(loans.some((l) => l) && { loans }) };
 }
 
 // บรรทัดรองบอกข้อแลกใต้ตัวเลือก (B52) — ใส่ช่องเฉพาะการ์ดที่มี hint การ์ดเดิมจึงมีรูปเท่าเดิมทุกช่อง
@@ -841,7 +906,8 @@ function jobHint(st, c) {
 }
 
 // ตัวเลือกที่ต้องมีเงิน/ค่าสถานะ/ธงถึงจะเลือกได้ (B14 A6) · ข้อความเหตุผลจากเนื้อหาทับข้อความตั้งต้น
-function lockReason(st, c) {
+// extra = เงินที่จะกู้มาเติม — ถามว่ากู้แล้วกดได้ไหม โดยไม่แตะ state
+function lockReason(st, c, extra = 0) {
   if (st.pending?.id === FUNERAL.rite && st.funeralPick && c.id !== st.funeralPick) return 'ไม่ใช่แบบที่ตกลงกัน';
   const q = c.requires;
   if (!q) return null;
@@ -850,7 +916,7 @@ function lockReason(st, c) {
   if (q.age && st.age > (q.age.max ?? Infinity)) return `อายุเกิน ${q.age.max} ปี`;
   const why = [];
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
-  const purse = st.dead ? deadPurse(st) : st.money;
+  const purse = (st.dead ? deadPurse(st) : st.money) + extra;
   if (q.money && purse < moneyValue(st, q.money)) why.push('เงินไม่พอ');
   for (const [k, b] of Object.entries(q.stats ?? {})) {
     if (b.min !== undefined && st[k] < b.min) why.push(`${STAT_LABELS[k]}ไม่ถึง`);
@@ -1006,6 +1072,11 @@ export function poolMultiplier(st, m) {
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
   if (m.rank) x *= m.rank ** rankLevel(st);
+  // ตัวคูณเงิน {min, max, v}: อัตราส่วนอยู่ในช่วง = คูณ v · คำนวณเฉพาะการ์ดที่ใช้ เพราะกองสุ่มเรียกทุกใบทุกปี
+  if (MONEY_KEYS.some((k) => m[k])) {
+    const r = moneyRatios(st);
+    for (const k of MONEY_KEYS) if (m[k] && inBound(r[k], m[k])) x *= m[k].v;
+  }
   return x;
 }
 
@@ -1028,6 +1099,10 @@ export function whenOk(st, when) {
   if (when.occupation && !(st.workFrom !== null && when.occupation.includes(st.occupation))) return false;
   if (when.school && !when.school.includes(schoolOf(st))) return false;
   if (when.ladder && !when.ladder.includes(st.ladder?.id ?? 'none')) return false;
+  if (MONEY_KEYS.some((k) => when[k])) {
+    const r = moneyRatios(st);
+    if (MONEY_KEYS.some((k) => when[k] && !inBound(r[k], when[k]))) return false;
+  }
   return !when.flags || flagsOk(st, when.flags);
 }
 
@@ -1060,7 +1135,8 @@ export function noteDeed(st, text, record, age = st.age) {
   }
 }
 
-export function choose(st, idx) {
+// loan = ชนิดหนี้จาก card.loans[idx] (กู้มาจ่าย) · ไม่ส่ง = เลือกแบบเดิม บอทและเซฟเก่าเดินเหมือนเดิมทุกก้าว
+export function choose(st, idx, loan) {
   if (st.trip) return chooseIsekai(st.trip, idx);
   const ev = st.pending;
   if (ev?.alloc) {
@@ -1098,6 +1174,7 @@ export function choose(st, idx) {
     return;
   }
   if (!ev || !ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
+  if (loan !== undefined) borrowFor(st, ev.choices[idx], loan);
   if (lockReason(st, ev.choices[idx])) throw new Error('ตัวเลือกนี้ล็อกอยู่');
   st.pending = null;
   // เติมข้อความก่อนผลลง — {เงิน} ต้องเป็นยอดตอนที่ผู้เล่นเห็นตัวเลือก
@@ -1113,7 +1190,7 @@ export function choose(st, idx) {
   const ss = pool ? poolStatScale(stageOf(st.age)) : 1;
   applyEffects(st, c.effects, s, ss);
   applyChoice(st, ev, c, text);
-  st.log.push({ id: ev.id, age: st.age, choice: idx, text });
+  st.log.push({ id: ev.id, age: st.age, choice: idx, text, ...(loan !== undefined && { loan }) });
   // ผลสุ่ม: จับทางด้วย rng ของโลก (เป็นผลของการเลือก) แล้วเล่าเป็นการ์ดผลลัพธ์ใบถัดไป
   // น้ำหนักแต่ละทางเอียงตาม multipliers ของทางนั้น — บัญชีอ่านหลังป้ายบุญบาปของตัวเลือกนี้ลงแล้ว (กรรมตามทันทันที)
   // การ์ดที่ตัวเลือกนี้ก่อ (ผล → เรื่องต่อ → หางาน) เข้าหัวคิวตามลำดับ ก่อนการ์ดอื่นของปีที่รออยู่
@@ -1309,6 +1386,11 @@ export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, c
       if (card.choices.length) choose(st, pickChoice.trip ? pickChoice.trip(card, bot) : tripAny(card, bot));
       continue;
     }
-    if (card.choices?.length) choose(st, card.entry && !pickChoice.isekai ? ENTRY.decline : pickChoice(card, bot, st));
+    // บอทคืนเลขตัวเลือก หรือ {i, loan} เมื่อกู้มาจ่าย (B111)
+    if (card.choices?.length) {
+      const p = card.entry && !pickChoice.isekai ? ENTRY.decline : pickChoice(card, bot, st);
+      if (typeof p === 'object') choose(st, p.i, p.loan);
+      else choose(st, p);
+    }
   }
 }

@@ -154,5 +154,49 @@ const classOk = classLeak === 0 && classMoved > 0;
 console.log(`การ์ดเช็กชนชั้น ${CLASS_LIVES} ชีวิต: ออก ${classFired} ครั้ง · ฐานะปีนั้นไม่ตรง ${classLeak} · ฐานะตอนเกิดไม่ตรง (ตัวควบคุม) ${classMoved} → ${classOk ? 'ผ่าน' : 'ตก'}`);
 if (!classOk) fails++;
 
+// กู้มาจ่าย (B111): บอทเดิมไม่กู้ ผลข้างบนจึงเท่าก่อนมีระบบ · บอทกู้นับตัวเลือกที่ขาดเงินเป็นตัวเลือกด้วย แล้วกู้จากแหล่งที่สุ่มได้
+// ด่าน: กู้แล้วต้องกดได้ทุกครั้ง (choose ไม่ throw) · ธง informal_debt ตรงกับหนี้นอกระบบที่ค้างทุกการ์ด · ต้องมีการกู้จริงทั้ง 3 แหล่ง ไม่งั้นด่านไม่ได้วัดอะไร
+// ตายพร้อมหนี้/ล้มละลายของคนกู้พิมพ์เทียบบอทเดิม ไม่ใช่ด่าน — กรอบของเจ้าของวัดกับบอทเดิม
+const loanBot = (card, rng) => {
+  const open = openChoices(card);
+  const loanable = (card.loans ?? []).map((l, i) => (l ? i : -1)).filter((i) => i >= 0);
+  const pick = rng.int(0, open.length + loanable.length - 1);
+  if (pick < open.length) return open[pick];
+  const i = loanable[pick - open.length];
+  return { i, loan: card.loans[i][rng.int(0, card.loans[i].length - 1)].kind };
+};
+const LOAN_LIVES = Math.min(n, 5000);
+const bySource = {};
+let loanLives = 0, loanErr = 0, flagLeak = 0, loanNeg = 0, loanBk = 0;
+for (let i = 0; i < LOAN_LIVES; i++) {
+  let took = false;
+  const bot = (card, rng) => {
+    const p = loanBot(card, rng);
+    if (typeof p === 'object') {
+      took = true;
+      bySource[p.loan] = (bySource[p.loan] ?? 0) + 1;
+    }
+    return p;
+  };
+  try {
+    const { state } = playLife(mixSeed(seed ^ 0x10a7, i), content, bot, (card, st) => {
+      if (!!st.flags.informal_debt !== st.debts.some((d) => d.kind === 'informal')) flagLeak++;
+    });
+    if (took) {
+      loanLives++;
+      if (state.estate.moneyAtBirth < 0) loanNeg++;
+      if (state.bankruptcies > 0) loanBk++;
+    }
+  } catch (e) {
+    loanErr++;
+    if (loanErr === 1) console.log(`กู้มาจ่ายพัง: ${e.message}`);
+  }
+}
+const SOURCES = ['bank_loan', 'coop', 'informal'];
+const loanOk = loanErr === 0 && flagLeak === 0 && SOURCES.every((k) => bySource[k] > 0);
+console.log(`\nบอทกู้ ${LOAN_LIVES} ชีวิต: กู้อย่างน้อยครั้งหนึ่ง ${loanLives} ชีวิต · ` + SOURCES.map((k) => `${k} ${bySource[k] ?? 0}`).join(' · ') + ` · พัง ${loanErr} · ธงนอกระบบไม่ตรง ${flagLeak} → ${loanOk ? 'ผ่าน' : 'ตก'}`);
+console.log(`คนที่กู้: ตายพร้อมหนี้ ${f(loanLives ? (loanNeg / loanLives) * 100 : NaN)}% · ล้มละลาย ${f(loanLives ? (loanBk / loanLives) * 100 : NaN)}% (บอทเดิม ${f(negP)}% · ${f(bkP)}%)`);
+if (!loanOk) fails++;
+
 console.log(fails ? `\nไม่ผ่าน ${fails} ด่าน` : '\nผ่านทั้งหมด');
 if (fails) process.exitCode = 1;
