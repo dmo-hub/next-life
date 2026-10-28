@@ -314,7 +314,7 @@ const trip = isekaiWorldLore([row(['soap']), row([]), row(['soap', 'ledger'])]);
 const tripBad = (JSON.stringify(trip) !== JSON.stringify({ commoner: ['soap', 'ledger'] }) ? 1 : 0) + ('lore' in row([]) ? 1 : 0);
 check('โลกที่จำแล้วไม่ต้องคิดค้นซ้ำ + บอกในใบทุ่มเทแรก', loreSkipBad + loreLineBad + tripBad, `${lives * 5} ชาติ`);
 
-// ตำนาน (B68i): แถวผังพกตำนานไปกลับได้ · ใบทุ่มเทแรกเล่าชื่อคนในตำนาน · เสน่ห์ได้โบนัสตามชื่อเสียง (มีเพดาน) โลกที่จำคนร้ายมากกว่าทำให้ยากขึ้น
+// ตำนาน (B68i): แถวผังพกตำนานไปกลับได้ · ใบทุ่มเทแรกเล่าชื่อคนในตำนาน · บารมีได้โบนัสตามชื่อเสียง (มีเพดาน) โลกที่จำคนร้ายมากกว่าทำให้ยากขึ้น
 const legendRow = (legend) => isekaiLineage({ name: 'ก', role: 'commoner', world: 'commoner', ending: { title: 'จบ' }, lore: [], legend }, 2);
 const backL = isekaiWorldLegends([legendRow({ world: 'commoner', name: 'ก', ending: 'จบ', dark: false }), legendRow(null), { trips: [{ legend: { world: 'commoner', name: 'ข', ending: 'หาย', dark: true } }] }]);
 let legendUnitBad = (JSON.stringify(backL) !== JSON.stringify({ commoner: [{ name: 'ก', ending: 'จบ', dark: false }, { name: 'ข', ending: 'หาย', dark: true }] }) ? 1 : 0) + ('legend' in legendRow(null) ? 1 : 0);
@@ -329,7 +329,7 @@ for (const [fame, ls, want] of [[0, [], 50], [F.chaPer * 2, [], 52], [1000, [], 
   if (isekaiChance(fake(fame, ls), C) !== want) legendUnitBad++;
 }
 if (isekaiChance(fake(1000, []), { stat: 'str', dc: 10 }) !== 50) legendUnitBad++;
-check('ตำนานในแถวผัง + บรรทัดใบทุ่มเทแรก + โบนัสเสน่ห์ตามชื่อเสียง', legendUnitBad, `${lives} ชาติ`);
+check('ตำนานในแถวผัง + บรรทัดใบทุ่มเทแรก + โบนัสบารมีตามชื่อเสียง', legendUnitBad, `${lives} ชาติ`);
 
 // ทางเข้าจากเหตุการณ์ในชีวิต (B68d): บอทสายต่างโลกกดรับการ์ดชวนใบแรก
 // อยู่ถึงอายุนัดแรก = เจอการ์ดชวน · กดรับแบบตายมีงานศพ · แบบหายตัวไม่มีงานศพ มีใบตามหาใบเดียว (B137)
