@@ -2,7 +2,7 @@ import { makeRng } from './rng.mjs';
 import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp } from './death.mjs';
-import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName } from './birth.mjs';
+import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt, firstPay } from './finance.mjs';
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './career.mjs';
@@ -173,6 +173,8 @@ export function newLife(seed, content, heir = null) {
     // heir ของ harness ไม่มี lineage — ไม่มีรุ่นก่อนให้เลี่ยงชื่อ
     // ทางในตระกูลเกิดเป็นลูก/หลานจริงที่มีชื่ออยู่แล้ว (B36a) — คงชื่อเดิมของเขา
     name: heir?.name ?? pickName(seed, sex, birthYear, era.names, (heir?.lineage ?? []).map((l) => l.name)),
+    // ชื่อจริงของตัวเอกเท่านั้น (ญาติ/ผังตระกูลใช้ชื่อเล่น) · ทายาทได้ชื่อจริงใหม่จาก seed ของชีวิตตัวเอง
+    realName: pickRealName(seed, sex, birthYear, era.names),
     region: region.name,
     province,
     ses: region.ses,

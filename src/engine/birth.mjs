@@ -80,3 +80,6 @@ export function pickName(seed, sex, birthYear, names, taken = []) {
   const free = pool.filter((n) => !taken.includes(n));
   return makeRng(seed ^ 0x510e527f).pick(free.length ? free : pool);
 }
+
+// ชื่อจริง (names-fun): ฉากจริงจังเรียกด้วยชื่อนี้ ชื่อเล่นขำจึงไม่ไปอยู่บนหนังสืองานศพ · stream แยกจากชื่อเล่น — ชื่อเล่นเดิมของทุก seed ไม่เปลี่ยนเพราะชื่อจริง
+export const pickRealName = (seed, sex, birthYear, names) => makeRng(seed ^ 0x2c4e1a77).pick(nameEra(names, birthYear).จริง[sex]);

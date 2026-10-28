@@ -2,6 +2,7 @@
 // เดินทั้งก้อนครั้งเดียว: เนื้อหาเกมไม่เก็บ (ผูกกลับตอนโหลด) · การ์ดเนื้อหาเก็บแค่ id · ตัวสุ่มเก็บสถานะภายใน
 // object ที่ถูกอ้างหลายที่ (af.st = st · kinLoss ชี้คนใน kin · thaiVerdict) เก็บครั้งเดียวแล้วอ้างด้วยเลข — ต่อกลับเป็นตัวเดียวกัน
 import { makeRng } from './rng.mjs';
+import { pickRealName } from './birth.mjs';
 
 export const SNAP_V = 1;
 const isRng = (v) => typeof v.next === 'function' && typeof v.int === 'function';
@@ -67,6 +68,8 @@ export function repairLife(st, card) {
   if (stale) st.pending = null;
   const q = st.queue ?? [];
   st.queue = q.filter((c) => !('ev' in c) || c.ev);
+  // เซฟก่อนมีชื่อจริง (names-fun) — สุ่มจาก seed เดิม โหลดกี่ครั้งก็ได้ชื่อเดียวกัน
+  st.realName ??= pickRealName(st.seed, st.sex, st.birthYear, st.content.era.names);
   const occ = st.content.era.finance.occupations;
   if (st.occupation && !occ.some((o) => o.id === st.occupation)) st.occupation = occ[0].id;
   const ladders = st.content.era.careers?.ladders;

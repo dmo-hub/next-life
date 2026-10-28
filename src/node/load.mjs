@@ -241,17 +241,17 @@ export function checkNames(names, from, to) {
   for (const e of names.eras ?? []) {
     if (e.from !== next) out.push(`ยุค ${e.from}–${e.to} ต้องเริ่มปี ${next} (ห้ามมีรู/ซ้อน)`);
     next = e.to + 1;
-    for (const sex of SEXES) {
-      const xs = e[sex];
+    // ชื่อจริง (names-fun) ขึ้นแทนชื่อเล่นในฉากจริงจัง — กติกาเดียวกับชื่อเล่น
+    for (const [kind, sex, xs] of SEXES.flatMap((sex) => [['ชื่อ', sex, e[sex]], ['ชื่อจริง', sex, e.จริง?.[sex]]])) {
       if (!Array.isArray(xs) || !xs.length) {
-        out.push(`ยุค ${e.from} ไม่มีชื่อ${sex}`);
+        out.push(`ยุค ${e.from} ไม่มี${kind}${sex}`);
         continue;
       }
-      if (new Set(xs).size !== xs.length) out.push(`ยุค ${e.from} ชื่อ${sex}ซ้ำในรายการ`);
+      if (new Set(xs).size !== xs.length) out.push(`ยุค ${e.from} ${kind}${sex}ซ้ำในรายการ`);
       for (const n of xs) {
-        if (typeof n !== 'string' || !n.trim() || /[{}\s]/.test(n)) out.push(`ยุค ${e.from} ชื่อ${sex} "${n}" ต้องเป็นคำเดียว`);
-        else if (n.length > PLACEHOLDERS.ชื่อ.length) out.push(`ยุค ${e.from} ชื่อ "${n}" ยาวเกิน ${PLACEHOLDERS.ชื่อ.length}`);
-        if (avoid.has(n)) out.push(`ยุค ${e.from} ชื่อ "${n}" อยู่ในรายการ avoid`);
+        if (typeof n !== 'string' || !n.trim() || /[{}\s]/.test(n)) out.push(`ยุค ${e.from} ${kind}${sex} "${n}" ต้องเป็นคำเดียว`);
+        else if (n.length > PLACEHOLDERS.ชื่อ.length) out.push(`ยุค ${e.from} ${kind} "${n}" ยาวเกิน ${PLACEHOLDERS.ชื่อ.length}`);
+        if (avoid.has(n)) out.push(`ยุค ${e.from} ${kind} "${n}" อยู่ในรายการ avoid`);
       }
     }
   }
@@ -332,7 +332,7 @@ export function loadEra() {
 
   return {
     births: { from: births.cbr.rows[0].y, w },
-    names: { eras: names.eras.map(({ from, to, ชาย, หญิง }) => ({ from, to, ชาย, หญิง })) },
+    names: { eras: names.eras.map(({ from, to, ชาย, หญิง, จริง }) => ({ from, to, ชาย, หญิง, จริง: { ชาย: จริง.ชาย, หญิง: จริง.หญิง } })) },
     cpi,
     future,
     finance: { ...finance.era, debt: loadDebt() },
