@@ -8,7 +8,7 @@ import { guideHtml } from './guide.mjs';
 import { injectDemo } from './demo.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · isekai.html (ตัวเกมเลน D) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
-export const FACT_PAGES = ['index', 'about', 'overview', 'otherworld'];
+export const FACT_PAGES = ['index', 'about', 'overview', 'otherworld', 'gdd'];
 // หน้าที่ build สร้างทั้งหน้าจากแม่แบบ src/site/<ชื่อ>.html — หน้าเฉลย (B88) แยกจากหน้ารวมการ์ดเพราะหน้ารวมการ์ดห้ามเผยผล/บุญบาป
 export const GEN_PAGES = [
   ['catalog', '<!--__CATALOG__-->', catalogHtml],
