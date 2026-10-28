@@ -925,6 +925,12 @@ async function copyText(s) {
     return ok;
   }
 }
+function inviteButton() {
+  const b = button('ชวนเพื่อนเกิดชีวิตเดียวกัน', null, async () => {
+    b.firstChild.textContent = (await copyText(inviteUrl())) ? 'คัดลอกลิงก์แล้ว' : 'คัดลอกไม่ได้';
+  });
+  return b;
+}
 function copyButton(text) {
   const b = button(BTN.copy, null, async () => {
     b.firstChild.textContent = (await copyText(text())) ? 'คัดลอกแล้ว' : 'คัดลอกไม่ได้';
@@ -1515,6 +1521,8 @@ function render(card) {
     const note = notePick(st.gen);
     if (note) body.append(noteQuote(`บันทึกเมื่ออายุ ${note.a}`, note.t));
     if (card.pets) body.append(el('p', 'sub', card.pets));
+    const from = st.gen === 1 && save.from;
+    if (from) body.append(el('p', 'sub', from.day ? `ชาติประจำวัน ${from.day} · ทุกคนที่เล่นวันนั้นเกิดแบบเดียวกันนี้ ทางที่เลือกต่างกันได้` : 'ชีวิตจากลิงก์เพื่อน · เกิดแบบเดียวกับเพื่อนทุกอย่าง ทางที่เลือกต่างกันได้'));
     body.append(titlesBox(card));
     if (card.memo === 'full') body.append(memoFull(card));
     body.append(eraBox());
@@ -1524,6 +1532,7 @@ function render(card) {
     const chart = card.life && lifeChart(card.life, card.age, card.cause);
     if (chart) body.append(chart);
     choices.append(enter(button(BTN.toAfter, null, () => openBook(card))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
+    if (st.gen === 1) choices.append(inviteButton());
   } else {
     const head = el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : `อายุ ${card.age} · ช่วง${card.stage}`);
     // การ์ดผลเป็นผลของใบก่อนอยู่แล้ว ป้ายซ้ำไม่บอกอะไรเพิ่ม · งานศพเกิดหลังตายจึงไม่ใช่ "ปีเดียวกัน" ของชีวิต
@@ -2603,10 +2612,47 @@ function begin(seed) {
 // seed จากเวลาเฉพาะฝั่งหน้าเว็บ แกนเกมเองไม่แตะนาฬิกา
 const freshSeed = () => (Date.now() ^ (performance.now() * 1000)) >>> 0;
 
-function start() {
-  const card = begin(freshSeed());
+// ลิงก์ชวนเพื่อน (B144): ไม่มี server จึงฝัง seed ต้นตระกูลใน URL · engine รับ uint32 ค่าผิดรูป = ไม่สนลิงก์ เกิดสุ่มตามปกติ
+const SEED_PARAM = 'seed';
+function linkSeed() {
+  try {
+    const v = new URLSearchParams(location.search).get(SEED_PARAM);
+    return v && /^\d{1,10}$/.test(v) && +v <= 0xffffffff ? +v : null;
+  } catch {
+    return null;
+  }
+}
+// อ่านแล้วลบออกจากแถบที่อยู่ — ไม่งั้นรีโหลดกลางชีวิตจะถามซ้ำ หรือเริ่มชีวิตจากลิงก์ทับชีวิตที่เล่นไปแล้ว
+function dropLinkSeed() {
+  try {
+    const u = new URL(location.href);
+    if (!u.searchParams.has(SEED_PARAM)) return;
+    u.searchParams.delete(SEED_PARAM);
+    history.replaceState(history.state, '', u);
+  } catch {
+    // แก้แถบที่อยู่ไม่ได้ ก็แค่ถามซ้ำตอนรีโหลด
+  }
+}
+// ชาติแรกเท่านั้นที่ seed กำหนดชีวิตทั้งหมด รุ่นถัดไปขึ้นกับทางที่เลือก ลิงก์จึงชวนได้แค่ชีวิตแรกของตระกูล
+const inviteUrl = () => `https://${SHARE_URL}/play.html?${SEED_PARAM}=${save.seed}`;
+// ชาติประจำวัน: seed จากวันที่ตามเวลาไทย ไม่ใช่เวลาของเครื่อง — ทั้งประเทศได้ชีวิตเดียวกันในวันนั้น
+function thaiDay() {
+  const d = new Date(Date.now() + 7 * 3600e3);
+  const dd = (n) => String(n).padStart(2, '0');
+  return { seed: fnv(`day:${d.toISOString().slice(0, 10)}`), label: `${dd(d.getUTCDate())}/${dd(d.getUTCMonth() + 1)}` };
+}
+
+// from อยู่ในเซฟ หน้าจบจึงบอกได้ว่าเกิดจากลิงก์/ชาติประจำวัน แม้รีโหลดกลางชีวิต · ไม่ใช่ token ใน log ผลเกมจึงเท่าเดิม
+function start(seed = freshSeed(), from = null) {
+  const card = begin(seed);
+  if (from) save.from = from;
   saveWrite(card);
   render(card);
+}
+const startLink = (seed) => start(seed, { link: 1 });
+function startDay() {
+  const d = thaiDay();
+  start(d.seed, { day: d.label });
 }
 
 // ขอเกิดใหม่ (B55): เฉพาะชีวิตแรกของตระกูล ก่อนกดอะไร และได้ครั้งเดียว — รุ่นถัดไปเกิดตามกรรม ต้องรับ
@@ -2647,9 +2693,15 @@ function homeCard(title, lines) {
 }
 
 // ล้างเซฟ = ลบทั้งตระกูล จึงถามซ้ำก่อน · สมุดทุกเล่มในชั้นสมุดแยก key ไม่โดนล้าง
-function confirmNew(back) {
-  const choices = homeCard('เริ่มตระกูลใหม่', ['ลบชีวิตที่ค้างไว้ทั้งตระกูล?', 'ผังตระกูลและสิ่งที่สืบทอดจะหายทั้งหมด กู้คืนไม่ได้ · สมุดในชั้นสมุดยังอยู่ครบ']);
-  choices.append(button('ลบแล้วเริ่มตระกูลใหม่', null, start), button('ยกเลิก', null, back));
+function confirmNew(back, go = () => start(), title = 'เริ่มตระกูลใหม่', yes = 'ลบแล้วเริ่มตระกูลใหม่') {
+  const choices = homeCard(title, ['ลบชีวิตที่ค้างไว้ทั้งตระกูล?', 'ผังตระกูลและสิ่งที่สืบทอดจะหายทั้งหมด กู้คืนไม่ได้ · สมุดในชั้นสมุดยังอยู่ครบ']);
+  choices.append(button(yes, null, go), button('ยกเลิก', null, back));
+}
+
+// เปิดลิงก์เพื่อนตอนมีตระกูลค้าง: ถามก่อนทับ · Enter = เล่นต่อของเดิม กดพลาดจะได้ไม่เสียตระกูล
+function linkAsk(card, seed) {
+  const choices = homeCard('ลิงก์จากเพื่อน', ['เพื่อนชวนเกิดชีวิตเดียวกัน', `มีชีวิตที่เล่นค้างไว้ (${genLabel()}${st.name}) · เกิดตามลิงก์ = ลบตระกูลนี้ทั้งหมด สมุดในชั้นสมุดยังอยู่ครบ`]);
+  choices.append(enter(button(BTN.resume, null, () => home(card))), button('ลบแล้วเกิดตามลิงก์', null, () => startLink(seed)));
 }
 
 function home(card) {
@@ -2660,15 +2712,22 @@ function home(card) {
 
 // เซฟจากเวอร์ชันที่เนื้อหาต่างกัน (B122): เซฟคือ seed + ลำดับปุ่ม เล่นซ้ำบนเนื้อหาใหม่ไม่ได้ชีวิตเดิม จึงเริ่มชีวิตใหม่
 // สมุดทุกเล่มในชั้นสมุดและบันทึกชีวิตแยก key ไว้ ไม่โดนล้าง
-function staleSave() {
+function staleSave(seed) {
   const choices = homeCard('เกมอัปเดตแล้ว', ['ชีวิตที่ค้างไว้เล่นต่อไม่ได้', 'เนื้อเรื่องเปลี่ยนตั้งแต่เล่นครั้งก่อน เริ่มชีวิตใหม่ในเวอร์ชันนี้ได้เลย · สมุดในชั้นสมุดยังอยู่ครบ']);
-  choices.append(enter(button('เริ่มชีวิตใหม่', null, start)), button(BTN.shelf, null, () => openShelf()));
+  choices.append(enter(button(seed === null ? 'เริ่มชีวิตใหม่' : 'เกิดตามลิงก์เพื่อน', null, () => (seed === null ? start() : startLink(seed)))), button(BTN.shelf, null, () => openShelf()));
 }
 
 // ลิงก์ท้ายหน้าเปิดชั้นสมุดได้ทุกหน้า (หน้า "เล่นต่อ" ขึ้นเฉพาะตอนมีเซฟ) · เปิดซ้อนตัวเองไม่ได้ ไม่งั้นปุ่มกลับพากลับมาที่ชั้นสมุด
 document.getElementById('shelfLink')?.addEventListener('click', (e) => {
   e.preventDefault();
   if (!root.querySelector('.shelf-view')) openShelf();
+});
+// ชีวิตแรกที่ยังไม่ได้กดอะไรไม่มีอะไรให้เสีย เปลี่ยนได้เลย · นอกนั้นถามก่อนลบตระกูล · ยกเลิกคืนจอเดิมทั้งชุด
+document.getElementById('dayLink')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (st.gen === 1 && !af && save.log === '') return startDay();
+  const prev = [...root.childNodes];
+  confirmNew(() => root.replaceChildren(...prev), startDay, 'ชาติประจำวัน', 'ลบแล้วเกิดชาติประจำวัน');
 });
 shelfDot();
 // เพดานความสูงการ์ด (B116) หักหัวเว็บ — ชื่อเกมตัดสองบรรทัดบนจอแคบ หัวจึงสูงไม่ตายตัว วัดจริงแทนเดาค่าเดียว · 20 = ระยะบนของ #app
@@ -2679,16 +2738,19 @@ document.fonts?.ready.then(chromeH);
 
 // ภาพถ่าย v2 ก่อน · ไม่มีจึงลองเซฟ v1 (เล่นซ้ำตรงการ์ดเดิม = เขียนทับเป็น v2 ทันที) · v1 ไม่ตรง/เซฟเสีย = หน้าเกมอัปเดต
 function boot() {
+  const seed = linkSeed();
+  dropLinkSeed();
   let card = snapRead();
   if (!card) {
     const s = saveRead();
-    if (!s && !snapExists()) return start();
+    if (!s && !snapExists()) return seed === null ? start() : startLink(seed);
     card = s && resume(s);
-    if (!card) return staleSave();
+    if (!card) return staleSave(seed);
     saveWrite(card);
   }
   savedMark(true);
-  home(card);
+  if (seed === null) home(card);
+  else linkAsk(card, seed);
 }
 
 boot();
