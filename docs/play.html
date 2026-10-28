@@ -7404,7 +7404,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.3.09';
+const APP_VERSION = 'v0.3.10';
 const APP_BUILD = '2026-10-28';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
@@ -8339,6 +8339,8 @@ function copyButton(text) {
 const SHARE_URL = 'dmo-hub.github.io/next-life';
 // 9:16 (สตอรี่)
 const SHARE_W = 1080, SHARE_H = 1920;
+// ช่วงที่ก้อนข้อความจัดกลาง: ใต้กรอบบน ถึงเหนือบรรทัด URL ท้ายภาพ
+const SHARE_TOP = 80, SHARE_BOTTOM = SHARE_H - 140;
 const SHARE_FONTS = ['700 110px Srisakdi', '400 40px Sarabun', '600 30px Sarabun'];
 const FONT_WAIT_MS = 3000;
 
@@ -8398,6 +8400,8 @@ async function shareBlob(facts) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
   let y = 0;
+  // วางสองรอบ: รอบแรกไม่วาด แค่วัดความสูงทั้งก้อน แล้ววาดจริงให้ก้อนอยู่กลางแนวตั้ง — ชีวิตที่ไม่มีฉายาจะได้ไม่เหลือที่ว่างกองอยู่ล่างภาพ
+  let draw = false;
   // ข้อความยาวกว่ากรอบ (ชื่อ/ฉายายาว · คำเดียวยาวเกินบรรทัด) ย่อฟอนต์ลงทีละขั้นจนได้ไม่เกิน maxLines และไม่มีบรรทัดล้น
   // ถึงขั้นต่ำแล้วยังไม่พอก็วาดที่ขั้นต่ำ — ดีกว่าตัดข้อความทิ้ง
   const text = (s, font, color, lineH, gap = 0, maxLines = 2) => {
@@ -8411,12 +8415,13 @@ async function shareBlob(facts) {
     ctx.fillStyle = color;
     for (const line of lines) {
       y += lineH * k;
-      ctx.fillText(line, cx, y);
+      if (draw) ctx.fillText(line, cx, y);
     }
     y += gap;
   };
   const rule = (gap) => {
     y += gap;
+    if (!draw) return void (y += gap);
     ctx.strokeStyle = c('bronze');
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -8426,29 +8431,36 @@ async function shareBlob(facts) {
     y += gap;
   };
 
-  y = 130;
-  // ชื่อยาวแตกสองบรรทัดตรงช่องว่าง — ให้ย่อบรรทัดเดียวจะเล็กจนอ่านยากบนภาพแนวตั้ง
-  for (const part of GAME_NAME.split(' ')) text(part, '700 84px Srisakdi, serif', c('gold'), 96, 0, 1);
-  text('NEXT LIFE', '600 28px Sarabun, sans-serif', c('sand'), 44, 0, 1);
-  // รูปวัยสุดท้ายนั่งกลางเส้นคั่นแรก (B56) — ไม่กินที่เพิ่ม
-  rule(44);
-  ctx.fillStyle = c('lacquer');
-  ctx.fillRect(cx - 54, y - 44 - 6, 108, 12);
-  artDraw(ctx, facts.avatar, cx - 42, y - 44 - 42, 84);
-  text(facts.name, '700 72px Srisakdi, serif', c('cream'), 84, 4, 1);
-  text(`${lifeEndWord(isGone(st))} ${facts.age}`, '700 96px Srisakdi, serif', c('gold2'), 110, 16, 1);
-  text(facts.who, '400 40px Sarabun, sans-serif', c('cream'), 58);
-  text(facts.job, '400 36px Sarabun, sans-serif', c('sand'), 52);
-  rule(44);
-  text('ชีวิตแบบ', '600 30px Sarabun, sans-serif', c('gold'), 44, 0, 1);
-  text(facts.pattern.name, '700 76px Srisakdi, serif', c('gold2'), 92, 0, 1);
-  if (facts.pattern.hint) text(facts.pattern.hint, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 3);
-  if (facts.title) {
-    y += 36;
-    text('ฉายาหายากที่สุด', '600 30px Sarabun, sans-serif', c('gold'), 44, 0, 1);
-    text(facts.title.name, '700 68px Srisakdi, serif', c('gold2'), 84, 0, 1);
-    text(facts.title.tier, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 1);
-  }
+  const layout = () => {
+    // ชื่อยาวแตกสองบรรทัดตรงช่องว่าง — ให้ย่อบรรทัดเดียวจะเล็กจนอ่านยากบนภาพแนวตั้ง
+    for (const part of GAME_NAME.split(' ')) text(part, '700 84px Srisakdi, serif', c('gold'), 96, 0, 1);
+    text('NEXT LIFE', '600 28px Sarabun, sans-serif', c('sand'), 44, 0, 1);
+    // รูปวัยสุดท้ายนั่งกลางเส้นคั่นแรก (B56) — ไม่กินที่เพิ่ม
+    rule(44);
+    if (draw) {
+      ctx.fillStyle = c('lacquer');
+      ctx.fillRect(cx - 54, y - 44 - 6, 108, 12);
+      artDraw(ctx, facts.avatar, cx - 42, y - 44 - 42, 84);
+    }
+    text(facts.name, '700 72px Srisakdi, serif', c('cream'), 84, 4, 1);
+    text(`${lifeEndWord(isGone(st))} ${facts.age}`, '700 96px Srisakdi, serif', c('gold2'), 110, 16, 1);
+    text(facts.who, '400 40px Sarabun, sans-serif', c('cream'), 58);
+    text(facts.job, '400 36px Sarabun, sans-serif', c('sand'), 52);
+    rule(44);
+    text('ชีวิตแบบ', '600 30px Sarabun, sans-serif', c('gold'), 44, 0, 1);
+    text(facts.pattern.name, '700 76px Srisakdi, serif', c('gold2'), 92, 0, 1);
+    if (facts.pattern.hint) text(facts.pattern.hint, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 3);
+    if (facts.title) {
+      y += 36;
+      text('ฉายาหายากที่สุด', '600 30px Sarabun, sans-serif', c('gold'), 44, 0, 1);
+      text(facts.title.name, '700 68px Srisakdi, serif', c('gold2'), 84, 0, 1);
+      text(facts.title.tier, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 1);
+    }
+  };
+  layout();
+  y = SHARE_TOP + Math.max(0, (SHARE_BOTTOM - SHARE_TOP - y) / 2);
+  draw = true;
+  layout();
   ctx.font = '400 30px Sarabun, sans-serif';
   ctx.fillStyle = c('sand');
   ctx.fillText(SHARE_URL, cx, SHARE_H - 72);
