@@ -6,7 +6,7 @@
 // กรรมจากปรโลก (ระดับ −1..1) เป็นตัวตั้งของโลก: บุญมากได้สกิลให้เลือกมากขึ้นและค่าเริ่มดีขึ้น · บาปหนักได้น้อยลงและโลกโหดขึ้น · ไม่มีตัวเลขบัญชีบนการ์ด
 // บัญชีบุญบาปเป็นของดวงวิญญาณ (ส่วนที่ส่งต่อจากชาติก่อน) — ชาติต่างโลกบันทึกต่อลงบัญชีนั้น แล้วปรโลกตัดสินตอนจบชาติ
 import { makeRng, mixSeed } from './rng.mjs';
-import { newLedger, recordMerit, ledgerLevel } from './merit.mjs';
+import { newLedger, recordMerit, ledgerLevel, meritId, SIN_CATS } from './merit.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค' };
 export const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'เสน่ห์', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
@@ -274,6 +274,11 @@ export const ISEKAI_LORE = {
   fishsauce: 'น้ำปลา', rotation: 'นาสลับ', soap: 'สบู่กับการต้มน้ำ', ledger: 'บัญชีสองช่อง', waterwheel: 'กังหันน้ำ',
   school: 'โรงเรียนในโรงนา', gunpowder: 'ปืนใหญ่', court: 'ศาลที่มีพยาน', boardgame: 'หมากฮอส',
 };
+// ตำนานข้ามชาติ (B68i · เจ้าของเคาะ): ชาติที่จบด้วยชื่อเสียงถึง legend = โลกนั้นจำชื่อไว้ทั้งเซฟ
+// คนร้าย = ชื่อเสียงที่ได้จากตัวเลือกที่ลงบาปเกินครึ่งของชื่อเสียงตอนจบ — นับจากสิ่งที่ผู้เล่นทำ ไม่อ่านยอดบัญชีซ่อน
+// chaPer/chaCap = ตัวเลือกทอยเสน่ห์ได้ +1% ต่อชื่อเสียงทุก chaPer สูงสุด chaCap · dark = ยากขึ้นเท่านี้ในโลกที่จำคนร้ายมากกว่าวีรบุรุษ
+// lines = บรรทัดตำนานบนใบทุ่มเทแรก เล่าแค่รุ่นล่าสุดเท่านี้ (เซฟยาวมีหลายสิบชาติ)
+export const ISEKAI_FAME = { legend: 20, chaPer: 5, chaCap: 10, dark: 10, lines: 2 };
 
 // stat ว่าง = ไม่ทอยเต๋า · need = ต้องมีทองถึงกดได้ · bonus/bonus2 = ธงที่ทำให้ง่ายขึ้น · flag ของตัวเลือกไม่ทอย = ติดทันที
 export const ISEKAI_EVENTS = [
@@ -923,6 +928,64 @@ export const ISEKAI_EVENTS = [
         win: { fx: { fame: 10, cha: 2 }, text: 'ทุกคนรอด เด็ก ๆ เรียกคุณว่าพี่ใหญ่' },
         lose: { fx: { hp: -15 }, text: 'ถ้ำมีหมีอยู่ก่อนแล้ว' } },
     ] },
+  // ─── ตำนานชาติก่อน (B68i) ───
+  // legend = มาเฉพาะในโลกที่จำคนต่างโลกรุ่นก่อนแบบนั้น (hero/dark) · {legend} = ชื่อของคนล่าสุดในตำนานแบบนั้น
+  { id: 'lg_statue', worlds: null, ch: [1, 2, 3], legend: 'hero', title: 'รูปปั้นกลางจัตุรัส',
+    text: 'กลางจัตุรัสมีรูปปั้น{legend} ตะไคร่ขึ้นครึ่งตัว ยายที่นั่งขายผักข้างฐานเล่าว่าคนคนนี้ก็มาจากต่างโลกเหมือนกัน',
+    choices: [
+      { t: 'ช่วยยายขัดรูปปั้นให้สะอาด', fx: { luk: 2, fame: 2 }, text: 'ยายเล่าเรื่องของ{legend}ให้ฟังจนตลาดวาย ครึ่งหนึ่งน่าจะแต่งเพิ่มเอง' },
+      { t: 'บอกยายว่าตัวเองมาจากที่เดียวกัน', stat: 'cha', tag: 'talk', dc: 14,
+        win: { fx: { fame: 8, cha: 2 }, text: 'ยายไม่เชื่อ จนคุณร้องเพลงที่สลักใต้ฐานได้ทั้งที่ยังไม่ได้ก้มอ่าน ข่าวลือไปถึงอีกฝั่งเมืองก่อนค่ำ' },
+        lose: { fx: { fame: -3 }, text: 'ยายหัวเราะ "เดือนนี้คนที่สามแล้ว"' } },
+      { t: 'ยืนดูเงียบ ๆ แล้วเดินต่อ', fx: { luk: 1 }, text: 'ใบหน้าหินนั้นดูคุ้นตาแปลก ๆ' },
+    ] },
+  { id: 'lg_heir', worlds: null, ch: [2, 3], legend: 'hero', title: 'หลานของคนที่เคยได้รับความช่วยเหลือ',
+    text: 'ชายแก่คนหนึ่งจับมือคุณแน่น "ปู่ข้ารอดตายเพราะ{legend} ได้ยินว่าเจ้ามาจากที่เดียวกัน ให้ข้าตอบแทนบ้าง"',
+    choices: [
+      { t: 'รับน้ำใจไว้', fx: { gold: 150 }, text: 'ถุงเงินหนักกว่าที่คิด เขาบอกว่าปู่สั่งไว้ก่อนตาย' },
+      { t: 'ไม่รับเงิน ขอช่วยงานในบ้านเขาแทน', fx: { cha: 2, fame: 3 }, text: 'ทั้งบ้านเลี้ยงข้าวคุณทุกเย็นไปอีกเดือน' },
+      { t: 'ขอให้พาไปหาคนที่เคยเดินทางกับ{legend}', stat: 'cha', tag: 'talk', dc: 15,
+        win: { fx: { mag: 2, fame: 5, goal: 5 }, text: 'แม่มดแก่ในหอคอยจำได้ทุกคำที่เพื่อนเก่าพูด สอนวิชาที่เคยสอนให้คนนั้นต่อให้คุณ' },
+        lose: { fx: { luk: -2 }, text: 'คนสุดท้ายที่รู้จักตายไปเมื่อหน้าหนาวที่แล้ว' } },
+    ] },
+  { id: 'lg_fake', worlds: null, ch: [2, 3], legend: 'hero', title: 'คนที่อ้างว่ากลับชาติมาเกิด',
+    text: 'ชายในชุดคลุมยืนบนลังไม้กลางตลาด ประกาศว่าตัวเองคือ{legend}กลับชาติมาเกิด แล้วเปิดรับเงินบริจาค ชาวบ้านต่อแถวยาว',
+    choices: [
+      { t: 'ถามเรื่องที่มีแต่คนต่างโลกตอบได้ ต่อหน้าทุกคน', stat: 'cha', tag: 'talk', dc: 16,
+        win: { fx: { fame: 10 }, text: 'เขาตอบไม่ได้สักข้อ ชาวบ้านทวงเงินคืนแล้วหันมามองคุณแทน' },
+        lose: { fx: { fame: -5 }, text: 'เขาเลี่ยงคำถามได้เนียน แล้วชี้ว่าคุณเป็นสายของปีศาจ' } },
+      { t: 'ร่วมมือกับเขา แบ่งเงินกันครึ่งต่อครึ่ง', fx: { gold: 300, fame: 6 }, text: 'คนต่างโลกสองคนยืนยันกันเอง ใครจะไม่เชื่อ แถวยาวขึ้นอีกเท่าตัว' },
+      { t: 'ปล่อยเขาไป', fx: { luk: 1 }, text: 'อย่างน้อยชาวบ้านก็ยังจำชื่อนั้นได้' },
+    ] },
+  { id: 'lg_fear', worlds: null, ch: [1, 2, 3], legend: 'dark', title: 'ชื่อที่ใช้ขู่เด็ก',
+    text: 'แม่คนหนึ่งดุลูกเสียงดัง "ไม่นอนเดี๋ยว{legend}มาเอาตัวไป" แล้วหันมาเห็นคุณ คนในตรอกรู้กันว่าคุณมาจากต่างโลกเหมือนคนในนิทานนั้น',
+    choices: [
+      { t: 'ไม่บอกใครว่ามาจากที่ไหน', fx: { luk: 1 }, text: 'คุณเปลี่ยนสำเนียงอยู่หลายเดือน จนคนเลิกถาม' },
+      { t: 'ช่วยงานทุกบ้านในตรอกจนคนลืมเรื่องเก่า', stat: 'cha', tag: 'talk', dc: 16,
+        win: { fx: { fame: 6, cha: 2 }, text: 'สองปีต่อมาเด็กในตรอกเลิกกลัว เรียกคุณว่าคนต่างโลกคนดี' },
+        lose: { fx: { fame: -4 }, text: 'ทำดีเท่าไรก็มีคนพูดว่าตอนแรก{legend}ก็ใจดีแบบนี้' } },
+      { t: 'ใช้ชื่อนั้นขู่เอาของ', fx: { gold: 200, fame: 5 }, text: 'ไม่มีร้านไหนกล้าเก็บเงินคุณ ชื่อของคุณเริ่มถูกเล่าต่อท้ายนิทานเรื่องเดิม' },
+    ] },
+  { id: 'lg_hunter', worlds: null, ch: [2, 3], legend: 'dark', title: 'นักล่าคนต่างโลก',
+    text: 'นักล่าสวมเกราะเก่ามาขวางทาง "{legend}ฆ่าครอบครัวข้า ข้าสาบานว่าจะล่าคนจากโลกนั้นทุกคน"',
+    choices: [
+      { t: 'สู้', stat: 'str', tag: 'fight', dc: 16,
+        win: { fx: { str: 2, fame: 6 }, text: 'ดาบของเขาหัก คุณไม่ซ้ำ เขานั่งร้องไห้กลางถนนจนคุณเดินลับตา' },
+        lose: { fx: { hp: -25 }, text: 'คุณหนีรอดมาพร้อมแผลยาวที่หลัง' } },
+      { t: 'เล่าว่าคุณไม่ใช่คนคนนั้น และมาเพื่ออะไร', stat: 'cha', tag: 'talk', dc: 15,
+        win: { fx: { cha: 2, goal: 5 }, text: 'เขาลดดาบลงช้า ๆ ก่อนจากไปบอกว่าจะคอยดูคุณ' },
+        lose: { fx: { hp: -15, fame: -5 }, text: 'เขาไม่ฟังสักคำ คนทั้งถนนเห็นคุณวิ่งหนี' } },
+      { t: 'ทิ้งของแล้วหนีเข้าป่า', fx: { gold: -100, luk: -2 }, text: 'รอดตัว แต่กระเป๋าทั้งใบอยู่กับเขา' },
+    ] },
+  { id: 'lg_ruin', worlds: null, ch: [2, 3], legend: 'dark', title: 'คฤหาสน์ไหม้บนเนิน',
+    text: 'คฤหาสน์ของ{legend}ไหม้ดำอยู่บนเนิน ยังมีคนแอบมาจุดเทียน พวกเขาคุกเข่าให้คุณ "ท่านกลับมาแล้ว"',
+    choices: [
+      { t: 'รับเป็นหัวหน้าของพวกเขา', fx: { mag: 4, fame: 8 }, text: 'ลูกศิษย์ของคนรุ่นก่อนสอนเวทที่ถูกห้ามให้ทั้งคืน ชาวบ้านเริ่มพูดถึงคุณด้วยเสียงเบา ๆ' },
+      { t: 'ไล่พวกเขาออกไปแล้วเผาเทียนทิ้ง', fx: { fame: 4, hp: -5 }, text: 'มีคนหนึ่งปาหินใส่ แต่คนที่เหลือเดินลงเนินไปเงียบ ๆ' },
+      { t: 'ค้นห้องหนังสือที่ยังไม่ไหม้', stat: 'mag', tag: 'magic', dc: 15,
+        win: { fx: { mag: 3, goal: 5 }, text: 'สมุดบันทึกเล่มสุดท้ายเขียนด้วยภาษาไทย อ่านแล้วนอนไม่หลับไปหลายคืน' },
+        lose: { fx: { hp: -10 }, text: 'พื้นห้องผุพังลงไปทั้งแผ่น' } },
+    ] },
   // ─── ความรู้จากโลกเดิม (B68h) ───
   // know = { หมวด, ความรู้ขั้นต่ำที่เรื่องนี้จะมาหา } · ตัวเลือกที่มี know ทอยด้วยความรู้หมวดนั้น · fx.know = ความรู้หมวดของเรื่องที่ขึ้นลง
   // ล้มเหลวยังได้ความรู้เล็กน้อย (ลองใหม่ได้ในเรื่องถัดไปของหมวด) · lore = ของที่โลกนี้จะจำถ้าชื่อเสียงถึง · loreOf = โลกจำแล้ว เรื่องนี้ไม่มาอีก
@@ -1187,6 +1250,12 @@ export const ISEKAI_MERIT = {
   g_dungeon: { 0: [M('kill_for_gain', 1)], 2: [M('sila', 1)] },
   g_fairy: { 0: [M('help_others', 1)], 1: [M('greed_harm', 2), M('kill_for_gain', 1)] },
   g_storm: { 1: [M('help_others', 2)] },
+  // ตำนานชาติก่อน (B68i): ตัวเลือกที่ได้ชื่อเสียงจากทางบาป = ทางที่ทำให้ชาตินี้ถูกจำเป็นคนร้าย
+  lg_heir: { 1: [M('help_others', 1)] },
+  lg_fake: { 0: [M('help_others', 1)], 1: [M('cheat_exploit', 2)] },
+  lg_fear: { 1: [M('help_others', 1)], 2: [M('greed_harm', 2)] },
+  lg_hunter: { 0: [M('neutral')] },
+  lg_ruin: { 0: [M('forbidden_knowledge', 1)], 1: [M('neutral')] },
   // ความรู้จากโลกเดิม (B68h): แบ่งให้คนใช้ = บุญ · ผูกขาด/เอาเปรียบคนที่ไม่รู้ = บาป · ความรู้อันตรายลงหมวดของตัวเองไม่ว่าผลทอย
   k_food2: { 1: [M('help_others', 1), M('dana', 1)] },
   k_food3: { 0: [M('help_others', 2)], 1: [M('greed_harm', 1)] },
@@ -1313,7 +1382,7 @@ export function tripCarry(isk) {
   };
 }
 // แถวทริปในผังตระกูลของชาติไทย — lore รูปเดียวกับแถวชาติต่างโลก ให้ isekaiWorldLore อ่านได้ทางเดียว
-export const tripLineage = (isk) => ({ world: roleInfo(isk.role).name, age: isk.trip.from, years: isk.age - isk.trip.from, ending: isk.ending.title, ...(isk.home && { home: true }), ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }) });
+export const tripLineage = (isk) => ({ world: roleInfo(isk.role).name, age: isk.trip.from, years: isk.age - isk.trip.from, ending: isk.ending.title, ...(isk.home && { home: true }), ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }), ...(isk.legend && { legend: { ...isk.legend } }) });
 
 export function entryOffers(seed) {
   const rng = makeRng(seed ^ ENTRY.salt);
@@ -1348,7 +1417,8 @@ export function entryCard(st, stage) {
 // real = ค่าโลกจริงตอนข้าม { stats, money, unit (รายได้ครัวเรือนประเทศต่อปี), age } · ไม่ส่ง (harness ที่เรียกโมดูลตรง) = ค่าตั้งต้นของโลกล้วน
 // lore = ของที่แต่ละโลกจำได้จากชาติก่อน ๆ ทั้งเซฟ ({ world: [id] } จาก isekaiWorldLore)
 // trip = ไปกลับกลางชีวิต (B68m · tripRoll + age/wit จากชีวิตไทย) — ข้ามห้องสีขาว บทบาทมาจากการทอย เริ่มที่อายุไทย ถึงปีกลับ = จบแบบกลับบ้าน
-export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, trip = null }) {
+// legends = คนต่างโลกรุ่นก่อนที่แต่ละโลกจำชื่อได้ ({ world: [{ name, ending, dark }] } จาก isekaiWorldLegends)
+export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
   const vow = blessed ? GODDESS_VOWS[(seed >>> 0) % GODDESS_VOWS.length].id : null;
@@ -1359,6 +1429,7 @@ export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null
     skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).slice(0, sk),
     role: null, world: null, name: '', skills: [], st: null, inner: null, flags: {},
     know: null, knowLast: null, loreAll: lore, worldLore: [], lore: [],
+    legendAll: legends, worldLegends: [], legend: null, fameDark: 0,
     age: 0, focus: null, focusOffers: [], stageShown: null, due: null, used: [], later: [], finaleDone: false,
     step: 'world', last: null, rbdUsed: false, dead: false, natural: false, ending: null, log: [], chron: [], cards: 0,
   };
@@ -1400,8 +1471,16 @@ export function isekaiChance(isk, c, withSkills = true) {
   let v = 50 + (base - isekaiDc(isk, c)) * 4;
   if (withSkills) for (const s of isekaiAids(isk, c)) v += ISEKAI_SKILLS[s].add ?? 20;
   for (const b of [c.bonus, c.bonus2]) if (b && isk.flags[b.flag]) v += b.add;
+  if (c.stat === 'cha') v += isekaiFameCha(isk);
   return isekaiClamp(Math.round(v), 5, 95);
 }
+
+// คนรู้จักมากคุยง่ายขึ้น (มีเพดาน) · โลกที่จำคนต่างโลกเป็นคนร้ายมากกว่าวีรบุรุษ ระแวงคนต่างโลกทุกคน
+const isekaiFameCha = (isk) => {
+  const F = ISEKAI_FAME;
+  const ls = isekaiLegends(isk);
+  return Math.min(F.chaCap, Math.floor(Math.max(0, isk.st.fame) / F.chaPer)) - (ls.filter((l) => l.dark).length * 2 > ls.length ? F.dark : 0);
+};
 
 const isekaiPace = (isk) => ISEKAI_ROLES[isk.role].pace ?? 1;
 const isekaiOldAge = (isk) => ISEKAI_STAGES.at(-1).from * isekaiPace(isk);
@@ -1436,7 +1515,8 @@ function isekaiStart(isk, rid) {
   isk.inner = { joy: ISEKAI_TIME.joy, wit: ISEKAI_TIME.wit };
   isk.know = Object.fromEntries(Object.keys(ISEKAI_KNOW).map((k) => [k, 0]));
   isk.worldLore = isk.loreAll[isk.world] ?? [];
-  isk.age = (r.startAge ?? 0) * isekaiPace(isk);
+  isk.worldLegends = isk.legendAll[isk.world] ?? [];
+  isk.age =(r.startAge ?? 0) * isekaiPace(isk);
   if (isk.real) linkStart(isk, r.stat.gold);
 }
 
@@ -1462,6 +1542,19 @@ export function isekaiWorldLore(rows = []) {
   for (const l of rows.flatMap((r) => [r, ...(r.trips ?? [])])) if (l.lore) out[l.lore.world] = [...new Set([...(out[l.lore.world] ?? []), ...l.lore.ids])];
   return out;
 }
+
+// ตำนานข้ามชาติ (B68i): อ่านจากแถวผังตระกูลแบบเดียวกับโลกจำ · เรียงตามลำดับแถว คนท้ายสุดคือรุ่นล่าสุด
+export function isekaiWorldLegends(rows = []) {
+  const out = {};
+  for (const l of rows.flatMap((r) => [r, ...(r.trips ?? [])])) if (l.legend) (out[l.legend.world] ??= []).push({ name: l.legend.name, ending: l.legend.ending, dark: l.legend.dark });
+  return out;
+}
+
+// เซฟแบบภาพถ่ายก่อน B68i ไม่มีช่องตำนาน
+const isekaiLegends = (isk) => isk.worldLegends ?? [];
+const isekaiLegendKind = (l) => (l.dark ? 'dark' : 'hero');
+// เหตุการณ์ตำนานเรียกชื่อคนล่าสุดในตำนานแบบเดียวกับเรื่อง
+const isekaiLegendFill = (isk, ev, s) => (ev.legend ? s.replaceAll('{legend}', isekaiLegends(isk).findLast((l) => isekaiLegendKind(l) === ev.legend)?.name ?? '') : s);
 
 // ความรู้หมวดเดียว: ยิ่งรู้มากยิ่งโตช้า (สูตรเดียวกับค่าสถานะ) · ลบได้เต็มค่า
 function isekaiLearn(isk, cat, v) {
@@ -1551,7 +1644,7 @@ function isekaiYear(isk) {
 
 // เหตุการณ์ความรู้มาหาเมื่อรู้ถึงขั้นของเรื่อง · ความรู้อันตรายเฉพาะวัยผู้ใหญ่ขึ้นไป · ของที่โลกนี้จำแล้วไม่ต้องคิดค้นซ้ำ
 const ISEKAI_ADULT = ['adult', 'middle', 'old'];
-const isekaiKnowOpen = (isk, e, stage) => (!e.know || isk.know[e.know.cat] >= e.know.min) && (!e.adult || ISEKAI_ADULT.includes(stage.id)) && (!e.loreOf || !isk.worldLore.includes(e.loreOf));
+const isekaiKnowOpen = (isk, e, stage) => (!e.know || isk.know[e.know.cat] >= e.know.min) && (!e.adult || ISEKAI_ADULT.includes(stage.id)) && (!e.loreOf || !isk.worldLore.includes(e.loreOf)) && (!e.legend || isekaiLegends(isk).some((l) => isekaiLegendKind(l) === e.legend));
 
 const isekaiFitsRole = (isk, e) => !e.worlds || e.worlds.includes(isk.world) || (e.worlds.length > 1 && e.worlds.includes(ISEKAI_ROLES[isk.role].like));
 
@@ -1648,6 +1741,8 @@ export function nextIsekaiCard(isk) {
     isk.ending = isekaiEnding(isk);
     isk.step = 'over';
     vowSettle(isk);
+    // ดังถึงเกณฑ์ = โลกนี้จำชื่อไว้ (B68i) · ชื่อเสียงที่ได้จากทางบาปเกินครึ่ง = ถูกจำเป็นคนร้าย
+    if (isk.st.fame >= ISEKAI_FAME.legend) isk.legend = { world: isk.world, name: isk.name, ending: isk.ending.title, dark: (isk.fameDark ?? 0) * 2 > isk.st.fame };
     return isekaiCard(isk, {
       // การ์ดปรโลกใบถัดไปเล่าเรื่องดวงวิญญาณถูกดึงกลับเอง ใบนี้จึงปิดแค่ชีวิตในโลกนี้ · ตอนจบแบบตายเล่าการตายไว้แล้ว
       step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : isk.home ? `${isk.ending.text} ${TRIP_HOME}` : `${isk.ending.text} แล้วจากไปอย่างสงบตอนอายุ ${isk.age}`, ending: isk.ending.id, age: isk.age,
@@ -1663,6 +1758,8 @@ export function nextIsekaiCard(isk) {
       ...(isk.saves && { saves: isk.saves }),
       // ของที่โลกนี้จะจำต่อจากชาตินี้ (B68h) — ช่องเฉพาะชาติที่มี จอเลน C วาดได้
       ...(isk.lore.length && { lore: isk.lore.map((id) => ISEKAI_LORE[id]) }),
+      // ชาตินี้จะอยู่ในตำนานของโลกนี้ (B68i) — ช่องเฉพาะชาติที่ดังถึงเกณฑ์
+      ...(isk.legend && { legend: { name: isk.legend.name, dark: isk.legend.dark } }),
     });
   }
   const stage = isekaiStageOf(isk);
@@ -1672,7 +1769,8 @@ export function nextIsekaiCard(isk) {
     isk.focusOffers = isekaiFocusOffers(isk, stage);
     if (!isk.focusOffers.includes(isk.focus)) isk.focus = null;
     // ใบทุ่มเทใบแรกของชาติบอกว่าโลกนี้ยังจำอะไรจากคนต่างโลกรุ่นก่อน
-    const remembered = !isk.stageShown && isk.worldLore.length ? ` ${isekaiLoreLine(isk)}` : '';
+    const past = isekaiLoreLine(isk);
+    const remembered = !isk.stageShown && past ? ` ${past}` : '';
     return isekaiCard(isk, {
       step: 'focus', title: stage.name, age: isk.age,
       text: `${isk.focus ? `เข้า${stage.name}แล้ว ช่วงนี้จะทุ่มเทกับอะไร หรือจะทำแบบเดิมต่อ` : `เข้า${stage.name}แล้ว ช่วงนี้จะทุ่มเทกับอะไร`}${remembered}`,
@@ -1718,10 +1816,14 @@ export function nextIsekaiCard(isk) {
   });
 }
 
+// ของที่โลกจำ + คนในตำนาน (B68i) ต่อกันเป็นบรรทัดเดียว · ไม่มีทั้งคู่ = ว่าง
 const isekaiLoreLine = (isk) => {
   const names = isk.worldLore.map((id) => ISEKAI_LORE[id]);
   const list = names.length > 1 ? `${names.slice(0, -1).join(' ')} และ${names.at(-1)}` : names[0];
-  return `ที่นี่ยังมี${list}ที่คนจากต่างโลกรุ่นก่อนทิ้งไว้`;
+  const legends = isekaiLegends(isk).slice(-ISEKAI_FAME.lines).map((l) => (l.dark
+    ? `คนที่นี่ยังเอ่ยชื่อ${l.name}เสียงเบา ๆ คนต่างโลกรุ่นก่อนที่จบแบบ "${l.ending}"`
+    : `คนที่นี่ยังเล่าเรื่อง${l.name} คนต่างโลกรุ่นก่อนที่จบแบบ "${l.ending}"`));
+  return [names.length && `ที่นี่ยังมี${list}ที่คนจากต่างโลกรุ่นก่อนทิ้งไว้`, ...legends].filter(Boolean).join(' · ');
 };
 
 // ความรู้เป็นค่าซ่อน ป้ายจึงบอกแค่ว่าทอยด้วยความรู้ ไม่บอกหมวดหรือค่า
@@ -1729,8 +1831,8 @@ const isekaiCheckName = (c) => (c.know ? 'ความรู้โลกเด�
 
 function isekaiEventCard(isk, ev) {
   return isekaiCard(isk, {
-    step: 'event', id: ev.id, title: ev.title, text: ev.text, finale: !!ev.finale, age: isk.age,
-    choices: ev.choices.map((c) => c.t),
+    step: 'event', id: ev.id, title: isekaiLegendFill(isk, ev, ev.title), text: isekaiLegendFill(isk, ev, ev.text), finale: !!ev.finale, age: isk.age,
+    choices: ev.choices.map((c) => isekaiLegendFill(isk, ev, c.t)),
     fx: ev.choices.map((c) => {
       if (c.need && isk.st.gold < c.need.gold) return '';
       const p = isekaiChance(isk, c);
@@ -1756,7 +1858,8 @@ export function chooseIsekai(isk, idx) {
     if (!s) throw new Error('ตัวเลือกไม่ถูกต้อง');
     isk.skills.push(s);
     if (s === 'luck') isk.st.luk += 15;
-    if (isk.worldLore.length) isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'lore', text: isekaiLoreLine(isk), deltas: {} });
+    const past = isekaiLoreLine(isk);
+    if (past) isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'lore', text: past, deltas: {} });
     // ฉากเปิดของเนื้อเรื่องมาก่อนตาแรก
     const intro = roleInfo(isk.role).intro;
     if (intro) isk.due = (isk.used.push(intro), intro);
@@ -1791,6 +1894,11 @@ export function chooseIsekai(isk, idx) {
   // ความรู้ไม่ขึ้นในผลที่ผู้เล่นเห็น (ค่าซ่อน) · เรื่องของหมวดไหนก็จำว่าแตะหมวดนั้นล่าสุด ให้อ่านตำราเติมต่อ
   const { know: learned, ...fx } = out.fx ?? {};
   const deltas = isekaiApply(isk, fx);
+  const tags = ISEKAI_MERIT[ev.id]?.[idx];
+  // ชื่อเสียงจากตัวเลือกที่ลงบาป นับแยกไว้ตัดสินว่าโลกจำเป็นคนร้ายไหม (B68i)
+  if (deltas.fame > 0 && tags?.some((t) => SIN_CATS.includes(meritId(t.cat)))) isk.fameDark = (isk.fameDark ?? 0) + deltas.fame;
+  const said = isekaiLegendFill(isk, ev, out.text);
+  const title = isekaiLegendFill(isk, ev, ev.title);
   if (ev.know) {
     isk.knowLast = ev.know.cat;
     isekaiLearn(isk, ev.know.cat, learned);
@@ -1805,8 +1913,8 @@ export function chooseIsekai(isk, idx) {
   }
   for (const f of [out.flag, out.flag2]) if (f) isk.flags[f] = true;
   // ลงบัญชีที่ดวงวิญญาณพกมา (ไม่ดึงเลขสุ่ม ⇒ ลำดับเหตุการณ์เท่าเดิม) · ธงคำบนที่ผิดติดเป็นธงของรอบต่างโลก
-  for (const f of recordMerit(isk.ledger, ISEKAI_MERIT[ev.id]?.[idx], ev.id)) isk.flags[f] = true;
-  vowTrack(isk, ISEKAI_MERIT[ev.id]?.[idx]);
+  for (const f of recordMerit(isk.ledger, tags, ev.id)) isk.flags[f] = true;
+  vowTrack(isk, tags);
   // เรื่องต่อมาถึงอีกไม่กี่ปีให้หลัง ไม่ดึงเลขสุ่ม
   // เรื่องต่อที่คิดค้นของที่โลกนี้จำอยู่แล้วไม่ต้องนัด (B68h) — นัดข้ามตัวกรองกอง จึงกันที่นี่
   if (out.next && !isk.used.includes(out.next) && !isk.later.some((l) => l.id === out.next) && !isk.worldLore.includes(isekaiById[out.next].loreOf)) isk.later.push({ id: out.next, age: isk.age + ISEKAI_TIME.later * isekaiPace(isk) });
@@ -1829,10 +1937,10 @@ export function chooseIsekai(isk, idx) {
   }
   // ฉากเด่นบนการ์ดจบ: ผลที่ขยับค่ามากสุด · ทองหารห้าสิบให้ชั่งกับค่าอื่นได้ · สกิลช่วยไว้/ตายนับเพิ่ม
   const weight = Object.entries(deltas).reduce((s, [k, v]) => s + Math.abs(k === 'gold' ? v / 50 : v), 0) + (aid ? 10 : 0) + (isk.dead ? 50 : 0);
-  (isk.marks ??= []).push({ text: `${ev.title} · ${out.text}`, weight });
-  isk.log.push(`อายุ ${isk.age} · ${ev.title} · ${c.t}${rolled ? (ok ? (aid ? ` (สำเร็จ · ${aid}ช่วยไว้)` : ' (สำเร็จ)') : ' (พลาด)') : ''}`);
-  isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'event', text: `${ev.title} · ${out.text}`, deltas: { ...deltas } });
-  isk.last = { title: ev.title, text: out.text, ok: rolled ? ok : null, stat: rolled ? isekaiCheckName(c) : null, deltas, sys };
+  (isk.marks ??= []).push({ text: `${title} · ${said}`, weight });
+  isk.log.push(`อายุ ${isk.age} · ${title} · ${isekaiLegendFill(isk, ev, c.t)}${rolled ? (ok ? (aid ? ` (สำเร็จ · ${aid}ช่วยไว้)` : ' (สำเร็จ)') : ' (พลาด)') : ''}`);
+  isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'event', text: `${title} · ${said}`, deltas: { ...deltas } });
+  isk.last = { title, text: said, ok: rolled ? ok : null, stat: rolled ? isekaiCheckName(c) : null, deltas, sys };
   isk.due = null;
   isk.step = 'result';
 }
@@ -1841,5 +1949,5 @@ export function chooseIsekai(isk, idx) {
 export const isekaiMemory = (isk) => Object.keys(ISEKAI_STAT).reduce((a, b) => (isk.st[b] > isk.st[a] ? b : a));
 
 // แถวในผังตระกูล — ไม่มีจังหวัด/ฐานะแบบชาติไทย ผู้อ่าน lineage ต้องดู isekai ก่อน · world = ชื่อบทบาท
-// lore = ของที่โลกนี้จำจากชาตินี้ (isekaiWorldLore อ่านกลับ) · ใส่เฉพาะชาติที่มี แถวของชาติอื่นรูปเดิม
-export const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world: roleInfo(isk.role).name, ending: isk.ending.title, path: 'isekai', realm: 'ต่างโลก', broke: false, ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }) });
+// lore = ของที่โลกนี้จำจากชาตินี้ (isekaiWorldLore อ่านกลับ) · legend = ชาตินี้ดังพอให้โลกจำชื่อ (isekaiWorldLegends อ่านกลับ) · ใส่เฉพาะชาติที่มี แถวของชาติอื่นรูปเดิม
+export const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world: roleInfo(isk.role).name, ending: isk.ending.title, path: 'isekai', realm: 'ต่างโลก', broke: false, ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }), ...(isk.legend && { legend: { ...isk.legend } }) });

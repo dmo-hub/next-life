@@ -10,7 +10,7 @@ import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, prom
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
-import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore } from './isekai.mjs';
+import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends } from './isekai.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -1272,6 +1272,7 @@ export function choose(st, idx, loan) {
       st.trip = startIsekai({
         seed: (st.seed ^ TRIP.salt ^ Math.imul(n + 1, 0x9e3779b1)) >>> 0, past: st.name, ledger: st.ledger,
         lore: isekaiWorldLore([...(st.lineage ?? []), { trips: st.trips }]),
+        legends: isekaiWorldLegends([...(st.lineage ?? []), { trips: st.trips }]),
         trip: { ...trip, age: st.age, wit: st.knowledge / TRIP.wit },
       });
       return;

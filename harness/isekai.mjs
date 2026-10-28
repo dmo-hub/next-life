@@ -2,7 +2,7 @@
 // ด่าน: seed เดิมผลเดิม (รวดเดียว + เซฟ/โหลดกลางทาง) · จบได้ทุกชีวิตภายในเพดานการ์ด · ตอนจบ/บทบาท/สกิล/เหตุการณ์มีบอทถึง
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
-import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, isekaiLineage, isekaiWorldLore, ENTRY_EVENTS, TRIP, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 
@@ -47,7 +47,14 @@ const rangeOf = (s) => {
 };
 
 // ตั้งต้นของชาติที่ i — กระจายกรรม −1..1 · รอบติดกัน · ความทรงจำ · เทพธิดาอารมณ์ดี ให้ครอบทุกทางเข้าของ startIsekai
+// ตำนานชาติก่อน (B68i): บางชาติเกิดในโลกที่จำวีรบุรุษ บางชาติจำคนร้ายมากกว่า ให้เหตุการณ์ตำนานมีบอทถึง
 const MEM = Object.keys(ISEKAI_STAT);
+const WORLDS = [...new Set(Object.keys(ISEKAI_ROLES).map((r) => roleInfo(r).world ?? r))];
+const HERO = { name: 'ท่านสมปอง', ending: 'ผู้กล้าผู้กอบกู้โลก', dark: false };
+const DARK = { name: 'จอมเวทวิเชียร', ending: 'ตายอีกครั้งในต่างโลก', dark: true };
+const legendsOf = (ls) => Object.fromEntries(WORLDS.map((w) => [w, ls]));
+const LEG_HERO = legendsOf([HERO]);
+const LEG_DARK = legendsOf([HERO, DARK, DARK]);
 const setup = (i) => ({
   seed: mixSeed(seed, i),
   karma: ((i % 21) - 10) / 10,
@@ -55,6 +62,8 @@ const setup = (i) => ({
   run: i % (ISEKAI.stay + 1),
   memory: i % 4 === 0 ? null : MEM[i % MEM.length],
   blessed: i % 5 === 0,
+  ...(i % 7 === 3 && { legends: LEG_HERO }),
+  ...(i % 7 === 5 && { legends: LEG_DARK }),
 });
 
 // เล่นหนึ่งชาติ: picks ที่ส่งมา = เล่นซ้ำตามนั้น (โหลดเซฟ) · หมด picks แล้วให้บอทเลือกต่อ
@@ -88,6 +97,8 @@ const EVENT = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
 const ADULT_NAMES = ISEKAI_STAGES.filter((s) => ['adult', 'middle', 'old'].includes(s.id)).map((s) => s.name);
 const SHORTCUT = Object.fromEntries(Object.entries(ISEKAI_KNOW).map(([k, v]) => [v.focus.name, k]));
 let knowAdultBad = 0, loreSys = 0, loreBad = 0, loreGot = 0;
+// ตำนาน (B68i): เหตุการณ์ตำนานมาเฉพาะโลกที่จำแบบนั้น เรียกชื่อถูก ไม่เหลือ {legend} · การ์ดจบมีช่องตำนานตรงเกณฑ์
+let legendEvBad = 0, legendTextBad = 0, legendEndBad = 0, legendGot = 0, legendDark = 0;
 // เวลาเดินเอง (B68b): ใบตาไม่มีตัวเลือก แต่บอกสิ่งที่ทุ่มเทได้ · การ์ดบทบาทมีคนธรรมดาเสมอ · สิ้นอายุเฉพาะหลังวัยชรา
 let tickBad = 0, roleBad = 0, oldBad = 0;
 const lens = [], clicks = [], humanAges = [];
@@ -124,7 +135,22 @@ Object.values(BOTS).forEach((bot, b) => {
         if (card.status.fame < ISEKAI_KNOW_T.loreFame) loreBad++;
       }
       for (const name of card.step === 'focus' ? card.choices : card.step === 'tick' ? card.focusChoices : []) if (SHORTCUT[name]) seen.shortcut.add(SHORTCUT[name]);
+      if (card.step === 'event' && EVENT[card.id].legend) {
+        const ls = cfg.legends?.[a.isk.world] ?? [];
+        const want = ls.findLast((l) => (l.dark ? 'dark' : 'hero') === EVENT[card.id].legend);
+        if (!want) legendEvBad++;
+        else if (EVENT[card.id].text.includes('{legend}') && !card.text.includes(want.name)) legendTextBad++;
+      }
+      if ([...strings(card)].some((s) => s.includes('{legend}'))) legendTextBad++;
     }
+    const end = a.cards.at(-1);
+    const famous = a.isk.st.fame >= ISEKAI_FAME.legend;
+    if (famous !== !!end.legend || (end.legend && end.legend.dark !== a.isk.fameDark * 2 > a.isk.st.fame)) legendEndBad++;
+    if (end.legend) {
+      legendGot++;
+      if (end.legend.dark) legendDark++;
+    }
+    if (a.isk.log.some((s) => s.includes('{legend}')) || a.isk.chron.some((l) => l.text.includes('{legend}'))) legendTextBad++;
     loreGot += a.isk.lore.length;
     if (!a.cards[0].choices.includes(commonerName)) roleBad++;
     const { isk } = a;
@@ -155,6 +181,9 @@ check('สิ้นอายุ (มนุษย์) p50 อยู่ในช�
 check('ความรู้อันตรายเฉพาะวัยผู้ใหญ่ขึ้นไป', knowAdultBad);
 // ทุกครั้งที่บอกว่าโลกจะจำ ต้องลงรายการจริง และชื่อเสียงถึงเกณฑ์ (สำเร็จ + คนยอมรับ)
 check('โลกจำเฉพาะที่ชื่อเสียงถึง', loreBad + (loreSys !== loreGot ? 1 : 0), `${loreGot} รายการ`);
+check('เหตุการณ์ตำนานมาเฉพาะโลกที่จำแบบนั้น + เรียกชื่อคนในตำนาน', legendEvBad + legendTextBad);
+// ทางคนร้ายหายากกว่าวีรบุรุษ — ต้องเจอทั้งสองแบบ ไม่งั้นด่านผ่านทั้งที่ไม่ได้ตรวจ
+check(`ดังถึง ${ISEKAI_FAME.legend} = โลกจำชื่อ · คนร้ายตามชื่อเสียงจากทางบาป`, legendEndBad + (legendGot - legendDark ? 0 : 1) + (legendDark ? 0 : 1), `${legendGot} ชาติ · คนร้าย ${legendDark}`);
 
 // ทางแยกที่ต้องมีบอทถึง: ตอนจบทุกแบบของทุกบทบาท (+ ตายกลางทาง) · ทุกบทบาท · ทุกสกิล · ทุกเหตุการณ์ · ทุกตัวเลือก
 const missing = (want, got) => want.filter((x) => !got.has(x));
@@ -173,7 +202,7 @@ for (const [k, m] of Object.entries(reach)) check(`${k}มีบอทถึง`
 // ต้องได้ชาติต่างโลกติดกัน = stay + 1 พอดี · ปรโลกตัดสินทุกชาติ · ผังตระกูลต่อแถวต่างโลกครบ · ขากลับเกิดเป็นคน
 const content = loadContent();
 const PATH_ISEKAI = 2, PATH_REBORN = 1;
-let stayBad = 0, backBad = 0, loreCarryBad = 0, stayMax = 0;
+let stayBad = 0, backBad = 0, loreCarryBad = 0, legendCarryBad = 0, legendRows = 0, stayMax = 0;
 // เพดานการ์ดของลูปอยู่ต่อ: ทุกชาติติดกันจบในเพดานของชาติเดียว + การ์ดปรโลกรอบละไม่ถึงร้อย — ชนเพดาน = บอทวนไม่จบ
 const STAY_GUARD = (ISEKAI.stay + 1) * (CARD_CAP + 100);
 const stayPick = (card, rng, af) => (af.pending?.path ? (card.locked?.[PATH_ISEKAI] ? PATH_REBORN : PATH_ISEKAI) : BOTS.สุ่ม(card, rng));
@@ -188,6 +217,8 @@ for (let i = 0; i < lives; i++) {
       if (af.isekai && af.isekai !== lastIsk) {
         lastIsk = af.isekai;
         if (JSON.stringify(af.isekai.loreAll) !== JSON.stringify(isekaiWorldLore([...(state.lineage ?? []), ...af.isekaiLives]))) loreCarryBad++;
+        if (JSON.stringify(af.isekai.legendAll) !== JSON.stringify(isekaiWorldLegends([...(state.lineage ?? []), ...af.isekaiLives]))) legendCarryBad++;
+        legendRows += af.isekaiLives.filter((r) => r.legend).length;
       }
       const card = nextAfterCard(af);
       if (card.kind === 'verdict') verdicts++;
@@ -207,6 +238,7 @@ for (let i = 0; i < lives; i++) {
 check(`อยู่ต่อติดเพดาน ${ISEKAI.stay + 1} ชาติ แล้วปรโลกตัดสินทุกชาติ`, stayBad, `${lives} ชีวิต × 2 แบบ · การ์ดมากสุด ${stayMax}/${STAY_GUARD}`);
 check('กลับโลกเดิมลงผังตระกูลครบ', backBad);
 check('ชาติต่างโลกถัดไปได้ของที่โลกจำจากผังตระกูล', loreCarryBad);
+check('ชาติต่างโลกถัดไปได้ตำนานชาติก่อนจากผังตระกูล', legendCarryBad + (legendRows ? 0 : 1), `แถวตำนานที่ส่งต่อ ${legendRows}`);
 
 // โลกจำ (B68h): ทุกโลกจำครบทุกอย่างแล้ว ⇒ เรื่องคิดค้นของที่มีอยู่แล้วไม่มาอีก · ใบทุ่มเทแรกบอกว่าโลกยังจำอะไร
 // แถวผังตระกูลพกรายการไปกลับได้ · ชาติที่ไม่มีของให้จำ แถวผังรูปเดิม
@@ -221,6 +253,23 @@ const row = (lore) => isekaiLineage({ name: 'ก', role: 'commoner', world: 'com
 const trip = isekaiWorldLore([row(['soap']), row([]), row(['soap', 'ledger'])]);
 const tripBad = (JSON.stringify(trip) !== JSON.stringify({ commoner: ['soap', 'ledger'] }) ? 1 : 0) + ('lore' in row([]) ? 1 : 0);
 check('โลกที่จำแล้วไม่ต้องคิดค้นซ้ำ + บอกในใบทุ่มเทแรก', loreSkipBad + loreLineBad + tripBad, `${lives * 5} ชาติ`);
+
+// ตำนาน (B68i): แถวผังพกตำนานไปกลับได้ · ใบทุ่มเทแรกเล่าชื่อคนในตำนาน · เสน่ห์ได้โบนัสตามชื่อเสียง (มีเพดาน) โลกที่จำคนร้ายมากกว่าทำให้ยากขึ้น
+const legendRow = (legend) => isekaiLineage({ name: 'ก', role: 'commoner', world: 'commoner', ending: { title: 'จบ' }, lore: [], legend }, 2);
+const backL = isekaiWorldLegends([legendRow({ world: 'commoner', name: 'ก', ending: 'จบ', dark: false }), legendRow(null), { trips: [{ legend: { world: 'commoner', name: 'ข', ending: 'หาย', dark: true } }] }]);
+let legendUnitBad = (JSON.stringify(backL) !== JSON.stringify({ commoner: [{ name: 'ก', ending: 'จบ', dark: false }, { name: 'ข', ending: 'หาย', dark: true }] }) ? 1 : 0) + ('legend' in legendRow(null) ? 1 : 0);
+for (let i = 0; i < lives; i++) {
+  const a = play({ ...setup(i), legends: LEG_HERO }, BOTS.สุ่ม, makeRng(mixSeed(seed ^ 0x1e9, i)));
+  if (!a.cards.find((c) => c.step === 'focus')?.text.includes(HERO.name)) legendUnitBad++;
+}
+const fake = (fame, worldLegends) => ({ st: { cha: 10, str: 10, fame }, inner: { wit: 0 }, skills: [], flags: {}, karma: 0, worldLegends });
+const C = { stat: 'cha', dc: 10 };
+const F = ISEKAI_FAME;
+for (const [fame, ls, want] of [[0, [], 50], [F.chaPer * 2, [], 52], [1000, [], 50 + F.chaCap], [1000, [HERO, DARK, DARK], 50 + F.chaCap - F.dark], [1000, [HERO, DARK], 50 + F.chaCap]]) {
+  if (isekaiChance(fake(fame, ls), C) !== want) legendUnitBad++;
+}
+if (isekaiChance(fake(1000, []), { stat: 'str', dc: 10 }) !== 50) legendUnitBad++;
+check('ตำนานในแถวผัง + บรรทัดใบทุ่มเทแรก + โบนัสเสน่ห์ตามชื่อเสียง', legendUnitBad, `${lives} ชาติ`);
 
 // ทางเข้าจากเหตุการณ์ในชีวิต (B68d): บอทสายต่างโลกกดรับการ์ดชวนใบแรก
 // อยู่ถึงอายุนัดแรก = เจอการ์ดชวน · กดรับแบบตายมีงานศพ · แบบหายตัวไม่มีงานศพ มีใบตามหาใบเดียว (B137)
