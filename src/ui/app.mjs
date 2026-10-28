@@ -1905,10 +1905,16 @@ function chronicleBox(lines, s) {
   for (const e of lines.map(chronEntry)) {
     const g = stageOf(e);
     if (groups.at(-1)?.g !== g) groups.push({ g, rows: [] });
-    groups.at(-1).rows.push(e);
+    // ปีทุ่มเทที่ข้อความเดียวกันต่อกันรวมเป็นบรรทัดเดียว (เจ้าของเคาะ ~20 บรรทัด/ชีวิต) · เหตุการณ์คงแยก · ไม่ข้ามหัวช่วงวัยเพราะรวมในกลุ่มเดียวกันเท่านั้น
+    const prev = groups.at(-1).rows.at(-1);
+    if (e.kind === 'tick' && prev?.kind === 'tick' && prev.text === e.text && (prev.to ?? prev.age) + 1 === e.age) {
+      const deltas = { ...prev.deltas };
+      for (const [k, v] of Object.entries(e.deltas ?? {})) deltas[k] = (deltas[k] ?? 0) + v;
+      groups.at(-1).rows[groups.at(-1).rows.length - 1] = { ...prev, to: e.to ?? e.age, deltas };
+    } else groups.at(-1).rows.push(e);
   }
   const d = el('details', 'tree ichron');
-  d.append(el('summary', null, `จดหมายเหตุทั้งชีวิต ${lines.length} บรรทัด`));
+  d.append(el('summary', null, `จดหมายเหตุทั้งชีวิต ${groups.reduce((n, x) => n + x.rows.length, 0)} บรรทัด`));
   groups.forEach(({ g, rows }, i) => {
     const aged = rows.filter((e) => e.age !== null);
     const from = aged[0]?.age;
@@ -1921,7 +1927,7 @@ function chronicleBox(lines, s) {
       const li = el('li', e.kind);
       if (e.age !== null) li.append(el('b', null, e.to ? `${e.age}–${e.to}` : String(e.age)));
       li.append(el('span', null, e.text));
-      for (const [k, v] of Object.entries(e.deltas ?? {})) if (label[k]) li.append(el('small', v > 0 ? 'up' : 'down', `${label[k]} ${v > 0 ? '+' : ''}${v}`));
+      for (const [k, v] of Object.entries(e.deltas ?? {})) if (label[k] && v) li.append(el('small', v > 0 ? 'up' : 'down', `${label[k]} ${v > 0 ? '+' : ''}${v}`));
       ol.append(li);
     }
     sec.append(ol);
