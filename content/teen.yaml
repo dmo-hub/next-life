@@ -52,7 +52,7 @@ events:
         text: "โดดเรียนไปซ้อมทั้งเดือน"
         outcomes:
           - {ok: true, weight: 1, text: "ทีมคว้าแชมป์ แมวมองทีมอีสปอร์ตมาขอเบอร์ถึงที่", next: teen_esports_scout_01, effects: {happiness: 3, money: {unit: income_x, amount: 1}, income_mult: 1.2}, merit: [{cat: neutral}]}
-          - {weight: 3, text: "ตกรอบแรก แถมครูโทรหาที่บ้านเรื่องขาดเรียน", effects: {knowledge: -2, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ตกรอบแรก แถมครูโทรหาที่บ้านเรื่องขาดเรียน", effects: {knowledge: -2, relations: -1}, merit: [{cat: neutral}], next: teen_gaming_grounded_01}
         merit: [{cat: neutral}]
       - id: weekend_only
         text: "เล่นแค่เสาร์อาทิตย์"
@@ -100,7 +100,7 @@ events:
         text: "แอบบอกครูฝ่ายปกครอง"
         outcomes:
           - {ok: true, weight: 1, text: "ครูจับได้คาหนังคาเขา ไม่มีใครรู้ว่าใครบอก", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
-          - {weight: 1, text: "ความแตกว่าใครฟ้อง ทั้งสายชั้นเลิกคุยด้วย", effects: {relations: -2, happiness: -1}, sets_flags: [bullied], merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ความแตกว่าใครฟ้อง ทั้งสายชั้นเลิกคุยด้วย", effects: {relations: -2, happiness: -1}, sets_flags: [bullied], merit: [{cat: help_others, level: 1}], next: teen_snitch_gate_01}
         merit: [{cat: help_others, level: 1}]
 
   - id: teen_first_love_01
@@ -148,7 +148,7 @@ events:
         text: "เข้าแก๊ง ซิ่งทุกคืน"
         outcomes:
           - {ok: true, weight: 2, text: "มีพวกพ้องเต็มซอย ไม่มีใครกล้าแตะ", effects: {happiness: 2, relations: 1, health: -1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ด่านตำรวจรวบทั้งแก๊ง ผู้ปกครองต้องมาประกันตัว", effects: {relations: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ด่านตำรวจรวบทั้งแก๊ง ผู้ปกครองต้องมาประกันตัว", effects: {relations: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}], next: teen_gang_bust_01}
         merit: [{cat: neutral}]
       - id: extort_juniors
         text: "ร่วมไถเงินรุ่นน้อง"
@@ -262,7 +262,7 @@ events:
         text: "ลากขาไปตามหาเพื่อนก่อน"
         outcomes:
           - {ok: true, weight: 1, text: "เจอเพื่อนสลบในคูน้ำ คุณช่วยชีวิตเขาไว้ได้ทัน", multipliers: {karma: 1.4}, effects: {relations: 3, health: -1}, merit: [{cat: help_others, level: 2}]}
-          - {weight: 1, text: "เพื่อนหนีกลับบ้านไปแล้ว ทิ้งให้นอนเจ็บคนเดียว", effects: {relations: -2, health: -1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เพื่อนหนีกลับบ้านไปแล้ว ทิ้งให้นอนเจ็บคนเดียว", effects: {relations: -2, health: -1}, merit: [{cat: help_others, level: 1}], next: teen_moto_friend_01}
         merit: [{cat: help_others, level: 1}]
       - id: call_parents
         text: "โทรให้พ่อแม่มารับ"
@@ -362,4 +362,120 @@ events:
       - id: keep_box
         text: "เก็บไว้ใต้เตียงต่อ"
         effects: {happiness: -1}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ teen_gang_01 (ถูกรวบทั้งแก๊ง) — ออกทาง next เท่านั้น
+  - id: teen_gang_bust_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "ออกจากโรงพักตีสอง"
+    text: "ออกจากโรงพักตอนตีสอง ผู้ใหญ่ที่มาประกันตัวเดินนำกลับบ้านเงียบทั้งทาง สายวันต่อมาหัวโจกฝากเพื่อนมาบอกว่าคืนนี้รวมตัวที่เดิม"
+    choices:
+      - id: stay_temple
+        text: "ไปอยู่วัดช่วงปิดเทอม"
+        effects: {happiness: -1, health: 1, relations: 1}
+        merit: [{cat: bhavana, level: 1}]
+      - id: change_school
+        text: "ขอย้ายไปโรงเรียนไกลซอย"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ที่ใหม่ไม่มีใครรู้จัก เพื่อนกลุ่มใหม่ชวนเตะบอลตอนเย็นแทนซิ่ง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ที่ใหม่ก็มีแก๊งของมัน แถมเราเป็นเด็กใหม่ให้รังแก", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: back_to_gang
+        text: "กลับไปหาแก๊งตามนัด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ซิ่งต่อเหมือนไม่เคยเกิดอะไร พวกพ้องยกให้เป็นคนใจถึง", effects: {happiness: 1, relations: -1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถล้มกลางถนน แผลถลอกยาวทั้งแขน", effects: {health: -2}, merit: [{cat: neutral}]}
+      - id: tell_all
+        text: "เล่าทุกอย่างให้ที่บ้านฟัง"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ teen_moto_crash_01 (เพื่อนหนีทิ้ง) — ออกทาง next เท่านั้น
+  - id: teen_moto_friend_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "หน้าห้องเรียน"
+    text: "เปิดเทอมวันแรก ขายังใส่เฝือกอ่อน เพื่อนที่ขับคืนนั้นยืนอยู่หน้าห้อง เห็นเราแล้วหลบตา ทำท่าจะเดินหนีอีกรอบ"
+    choices:
+      - id: talk_it_out
+        text: "เรียกมาคุยให้รู้เรื่อง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.4}}, text: "เพื่อนยอมรับว่ากลัวจนสติแตก ขอโทษแล้วช่วยถือกระเป๋าให้ทุกวันจนถอดเฝือก", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุยกันไม่กี่คำก็มีเรื่อง ครูต้องเดินมาแยก", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: cut_off
+        text: "เลิกคบ ไม่พูดด้วยอีก"
+        effects: {relations: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: ask_bill
+        text: "ให้เขาช่วยออกค่ารักษา"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนแบ่งเงินเก็บมาช่วยจ่ายครึ่งหนึ่ง", effects: {money: {unit: income_x, amount: 0.3}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เพื่อนบอกว่าไม่มีให้ แล้วหายไปจากกลุ่มเลย", effects: {relations: -1}, merit: [{cat: neutral}]}
+      - id: let_go
+        text: "ทำเหมือนไม่มีอะไรเกิดขึ้น"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: bhavana, level: 1}]
+  # เรื่องต่อ teen_first_smoke_01 (ฟ้องครู ความแตก) — ออกทาง next เท่านั้น
+  - id: teen_snitch_gate_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "หน้าประตูโรงเรียน"
+    text: "สามอาทิตย์แล้วที่กินข้าวกลางวันคนเดียว เย็นนี้รุ่นพี่กลุ่มเดิมยืนดักรออยู่หน้าประตูโรงเรียน ไม่มีใครในสายชั้นยอมเดินกลับด้วย"
+    choices:
+      - id: tell_teacher
+        text: "กลับไปบอกครูคนเดิม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ครูเดินมาส่งถึงปากซอย แล้วเรียกรุ่นพี่ไปคุยยาว ไม่มีใครมาดักอีก", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูบอกให้ไปเคลียร์กันเอง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: back_gate
+        text: "อ้อมไปออกประตูหลัง"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: face_them
+        text: "เดินเข้าไปคุยตรง ๆ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "รุ่นพี่แปลกใจที่ไม่หนี คุยจบกันที่ต่างคนต่างไม่ยุ่ง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โดนผลักล้มกลางทาง สายกระเป๋าขาด", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: join_club
+        text: "เข้าชมรมหาเพื่อนกลุ่มใหม่"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ teen_gaming_01 (ตกรอบแรก ครูโทรหาที่บ้าน) — ออกทาง next เท่านั้น
+  - id: teen_gaming_grounded_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "ห้ามเข้าร้านเกม"
+    text: "หลังครูวางสาย ที่บ้านตัดค่าขนมลงครึ่งหนึ่ง สั่งห้ามเข้าร้านเกมจนกว่าเกรดเทอมนี้จะกลับมา เพื่อนในทีมยังแวะมาชวนไปซ้อมหน้าบ้านทุกเย็น"
+    choices:
+      - id: study_hard
+        text: "อ่านหนังสือเอาเกรดคืน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.4}}, text: "เกรดกลับมาได้ในเทอมเดียว ที่บ้านคืนค่าขนมให้ครบ", effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อ่านทั้งเทอมแต่เกรดขยับนิดเดียว", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: sneak_out
+        text: "แอบหนีไปร้านเกมตอนเย็น"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ไม่มีใครรู้ ได้ซ้อมกับทีมต่อ", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เจ้าของร้านเกมโทรบอกที่บ้าน โดนหนักกว่าเดิม", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+      - id: negotiate
+        text: "ต่อรองขอเล่นแค่วันหยุด"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: quit_team
+        text: "บอกทีมว่าขอพักก่อน"
+        effects: {relations: -1, knowledge: 1}
         merit: [{cat: neutral}]

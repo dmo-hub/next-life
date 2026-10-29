@@ -281,7 +281,7 @@ events:
         text: "ลาออก ทำคอนเทนต์เต็มตัว"
         outcomes:
           - {weight: 2, ok: true, text: "ยอดฟอลพุ่งไม่หยุด กลายเป็นอินฟลูฯ ตัวจริง", effects: {happiness: 2, income_mult: 1.8}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "กระแสหมดในสามเดือน กลับไปสมัครงานก็ไม่มีใครเรียก", effects: {happiness: -2, income_mult: 0.7}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กระแสหมดในสามเดือน กลับไปสมัครงานก็ไม่มีใครเรียก", effects: {happiness: -2, income_mult: 0.7}, merit: [{cat: neutral}], next: young_influencer_fade_01}
         merit: [{cat: neutral}]
       - id: side_job
         text: "รับรีวิวเป็นงานเสริม"
@@ -440,3 +440,32 @@ events:
         text: "เถียงกันต่อ ไม่มีใครยอม"
         effects: {relations: -2, happiness: -1}
         merit: [{cat: neutral}]
+  # เรื่องต่อ young_influencer_01 (ลาออกทำคอนเทนต์ กระแสหมด) — ออกทาง next เท่านั้น
+  - id: young_influencer_fade_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "ยอดวิวไม่ถึงร้อย"
+    text: "เงินเก็บเหลือพอจ่ายค่าห้องอีกสองเดือน คลิปล่าสุดยอดวิวไม่ถึงร้อย ใบสมัครงานที่ส่งไปสิบกว่าที่ยังไม่มีใครตอบ"
+    choices:
+      - id: day_labor
+        text: "รับงานรายวันไปก่อน"
+        effects: {money: {unit: income_x, amount: 0.3}, happiness: -1, health: -1}
+        merit: [{cat: neutral}]
+      - id: go_home
+        text: "กลับบ้านต่างจังหวัดตั้งหลัก"
+        effects: {money: {unit: income_x, amount: 0.5}, happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: try_again
+        text: "ลองทำคลิปแนวใหม่อีกรอบ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.4}}, text: "คลิปสอนงานช่างที่ทำได้จริงติดกระแส มีคนจ้างไปสอนตามที่ต่าง ๆ", effects: {income_mult: 1.3, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทำต่ออีกสามเดือนก็เงียบ เงินเก็บหมดเกลี้ยง", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
+      - id: learn_skill
+        text: "ลงคอร์สเรียนทักษะใหม่"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.4}}, text: "เรียนตัดต่อจนได้งานประจำที่เอเจนซี่", effects: {income_mult: 1.2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรียนจบแต่ตลาดงานยังเงียบ", effects: {money: {unit: income_x, amount: -0.3}, knowledge: 1}, merit: [{cat: neutral}]}

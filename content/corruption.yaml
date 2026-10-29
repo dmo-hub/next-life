@@ -24,7 +24,7 @@ events:
         merit: [{cat: greed_harm, level: 3}, {cat: unjust_judgment, level: 2}]
         outcomes:
           - {weight: 1, ok: true, text: "ผู้รับเหมาจ่ายไม่อั้น ได้เงินก้อนโตกว่าที่คิด แต่ต่อจากนี้เขามีหลักฐานกุมไว้ในมือ", effects: {money: {unit: income_x, amount: 3}}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "หักมุม เขาคือเจ้าหน้าที่ล่อซื้อ กุญแจมือคล้องข้อมือกลางออฟฟิศ ข่าวลงทั้งจังหวัด", effects: {job: labor, money: {unit: income_x, amount: -2}, happiness: -3, relations: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+          - {weight: 2, text: "หักมุม เขาคือเจ้าหน้าที่ล่อซื้อ กุญแจมือคล้องข้อมือกลางออฟฟิศ ข่าวลงทั้งจังหวัด", effects: {job: labor, money: {unit: income_x, amount: -2}, happiness: -3, relations: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}], next: fraud_sting_bail_01}
       - id: refuse
         text: "ดันซองคืน ไม่เซ็น"
         merit: [{cat: sila, level: 1}]
@@ -98,7 +98,7 @@ events:
         merit: [{cat: help_others, level: 1}]
         outcomes:
           - {weight: 1, ok: true, text: "เสียงที่อัดไว้ล้มทั้งขบวนการ ผู้ประกอบการรายเล็กรวมตัวมาขอบคุณ ได้ลูกค้าใหม่เพียบ", effects: {network: 2, relations: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ถูกขึ้นบัญชีดำเงียบ ๆ ไม่มีงานรัฐมาถึงมืออีกหลายปี", effects: {income_mult: 0.8, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ถูกขึ้นบัญชีดำเงียบ ๆ ไม่มีงานรัฐมาถึงมืออีกหลายปี", effects: {income_mult: 0.8, happiness: -1}, merit: [{cat: neutral}], next: fraud_blacklist_01}
       - id: walk_away
         text: "ถอยไปหางานเอกชนแทน"
         effects: {happiness: 1, network: -1}
@@ -138,7 +138,7 @@ events:
         merit: [{cat: help_others, level: 1}]
         outcomes:
           - {weight: 1, ok: true, text: "ลูกค้าแห่ย้ายมาซื้อแผงเรา ยอดขายพุ่งทั้งเดือน", effects: {network: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "เพื่อนบ้านโกรธจัด ปล่อยข่าวว่าเราขายของเน่า ทั้งตลาดมองค้อน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เพื่อนบ้านโกรธจัด ปล่อยข่าวว่าเราขายของเน่า ทั้งตลาดมองค้อน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}], next: fraud_scale_gossip_01}
 
   - id: fraud_materials_01
     type: A
@@ -374,3 +374,93 @@ events:
         outcomes:
           - {weight: 1, text: "สบายใจขึ้นนิดหนึ่ง แต่เงินที่ขาดจากบัญชีของคนอื่นก็ยังขาดอยู่เท่าเดิม", effects: {happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "หลานเห็นใบอนุโมทนาแล้วถามต่อว่า เจ้าของเงินจริงได้อะไรบ้าง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+  # เรื่องต่อ fraud_sign_bribe_01 (ขอสองเท่า โดนล่อซื้อ) — ออกทาง next เท่านั้น
+  - id: fraud_sting_bail_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "เอกสารสองแผ่น"
+    text: "ข้อมือยังมีรอยกุญแจมือ ทนายที่จ้างมาวางเอกสารสองแผ่นบนโต๊ะ แผ่นหนึ่งคือคำรับสารภาพ อีกแผ่นคือรายชื่อคนที่เคยสั่งให้เซ็นผ่าน"
+    choices:
+      - id: confess
+        text: "รับสารภาพ ขอลดโทษ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ศาลให้รอลงอาญา ได้กลับบ้านพร้อมประวัติติดตัว เริ่มนับหนึ่งใหม่กับงานที่ไม่ต้องเซ็นอะไรอีก", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โทษไม่รอ ต้องเข้าไปนอนในเรือนจำอยู่หลายเดือน", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+      - id: name_boss
+        text: "ซัดทอดหัวหน้าที่สั่งการ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "คดีขยายไปถึงหัวหน้า ทนายต่อรองให้เป็นพยานจนโทษเบาลง", effects: {happiness: 1, network: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หัวหน้ามีเส้นสาย เรื่องพลิกกลับมาหนักที่ตัวเองคนเดียว", effects: {money: {unit: income_x, amount: -1}, happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+      - id: fight_case
+        text: "จ้างทนายสู้คดีจนสุด"
+        effects: {money: {unit: income_x, amount: -1.5}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: go_hometown
+        text: "กลับบ้านเกิด เปิดร้านเล็ก ๆ"
+        effects: {network: -2, happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ fraud_contract_01 (อัดเสียงแจ้งความ ถูกขึ้นบัญชีดำ) — ออกทาง next เท่านั้น
+  - id: fraud_blacklist_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "บัญชีดำ"
+    text: "สองปีแล้วที่ยื่นประมูลงานรัฐกี่ครั้งก็ตกรอบเอกสาร เช้านี้นักข่าวสายสืบสวนโทรมา บอกว่าได้ยินเรื่องเสียงที่อัดไว้ ขอนัดคุย"
+    choices:
+      - id: give_interview
+        text: "ให้สัมภาษณ์เต็ม ๆ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.4}}, text: "ข่าวขึ้นหน้าหนึ่ง หน่วยงานต้องเปิดประมูลใหม่ทั้งหมด ชื่อเราถูกพูดถึงในทางดี", effects: {network: 2, income_mult: 1.1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ข่าวอยู่ได้วันเดียวก็เงียบ ผู้รับเหมาเจ้าใหญ่เลิกส่งงานช่วงต่อมาให้", effects: {income_mult: 0.9, happiness: -1}, merit: [{cat: neutral}]}
+      - id: go_private
+        text: "หันไปจับงานเอกชนเต็มตัว"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "เอกชนจ่ายช้ากว่า แต่ไม่ต้องจ่ายใต้โต๊ะ งานค่อย ๆ เต็มมือ", effects: {income_mult: 1.1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เอกชนกดราคาหนัก ต้องลดคนงานไปครึ่งทีม", effects: {relations: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+      - id: stay_quiet
+        text: "ปฏิเสธนักข่าว อยู่เงียบ ๆ"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: pay_back_in
+        text: "ยอมจ่ายใต้โต๊ะครั้งนี้"
+        sets_flags: [took_bribe]
+        effects: {income_mult: 1.2, happiness: -1}
+        merit: [{cat: greed_harm, level: 1}]
+  # เรื่องต่อ fraud_scale_01 (เตือนลูกค้า โดนปล่อยข่าวของเน่า) — ออกทาง next เท่านั้น
+  - id: fraud_scale_gossip_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ข่าวลือในตลาด"
+    text: "ยอดขายหายไปครึ่งหนึ่งในเดือนเดียว คนขายแผงอื่นยังกระซิบกันว่าของแผงเราไม่สด ส่วนแผงข้าง ๆ ก็ยังถ่วงตาชั่งเหมือนเดิม"
+    choices:
+      - id: public_scale
+        text: "ตั้งตาชั่งกลางให้ชั่งเทียบ"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "คนซื้อเริ่มหิ้วของมาชั่งเทียบ ข่าวของเน่าเงียบไปเอง แผงข้าง ๆ ต้องเลิกถ่วง", effects: {relations: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่ค่อยมีใครสนใจตาชั่งกลาง ยอดขายยังซึมต่อ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: move_stall
+        text: "ย้ายไปเช่าแผงตลาดอื่น"
+        effects: {money: {unit: income_x, amount: -0.5}, network: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: free_taste
+        text: "แจกของชิมทุกเช้า"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "คนชิมแล้วรู้ว่าของสด กลับมาซื้อประจำ แถมพาคนอื่นมาด้วย", effects: {network: 1, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "แจกหมดทุกเช้า แต่คนชิมแล้วก็เดินไปซื้อแผงอื่น", effects: {money: {unit: income_x, amount: -0.3}, happiness: -1}, merit: [{cat: neutral}]}
+      - id: confront
+        text: "ไปเคลียร์กับแผงข้าง ๆ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "คุยกันตรง ๆ จนเขายอมหยุดปล่อยข่าว ต่างคนต่างขาย", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เถียงกันเสียงดังกลางตลาด เจ้าของตลาดสั่งพักแผงทั้งสองเจ้าไปหนึ่งอาทิตย์", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}

@@ -169,7 +169,7 @@ events:
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, text: "วงแตก ซอยเงียบลง เพื่อนบ้านหลายคนเลิกเสียเงินกับโพยไปเอง", effects: {happiness: 1, relations: 1}, merit: [{cat: help_others, level: 1}]}
-          - {weight: 2, text: "ตำรวจมาตามนัด แต่เจ๊รู้ก่อนเก็บของหมด แล้วทั้งซอยก็รู้ว่าใครเป็นคนโทร", effects: {relations: -3, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตำรวจมาตามนัด แต่เจ๊รู้ก่อนเก็บของหมด แล้วทั้งซอยก็รู้ว่าใครเป็นคนโทร", effects: {relations: -3, happiness: -1}, merit: [{cat: neutral}], next: lot_snitch_soi_01}
       - id: refuse
         text: "ปฏิเสธ ช่วยยกของให้แทน"
         effects: {relations: 1}
@@ -206,3 +206,32 @@ events:
         effects: {happiness: 1, money: {unit: income_x, amount: 0.2}}
         clears_flags: [lottery_habit]
         merit: [{cat: neutral}]
+  # เรื่องต่อ lot_underground_mid_01 (แจ้งตำรวจ ทั้งซอยรู้ว่าใครโทร) — ออกทาง next เท่านั้น
+  - id: lot_snitch_soi_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "เบาะที่โดนกรีด"
+    text: "สองอาทิตย์ต่อมา ร้านเจ๊กลับมารับโพยเหมือนเดิม คนในซอยเดินผ่านหน้าบ้านเราแล้วเงียบเสียงลงทุกครั้ง เช้านี้เบาะมอเตอร์ไซค์โดนกรีดเป็นทางยาว"
+    choices:
+      - id: face_jae
+        text: "ไปคุยกับเจ๊ตรง ๆ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.4}}, text: "เจ๊ถอนหายใจ บอกว่าไม่โกรธแค่เสียใจ แล้วบอกคนในซอยให้เลิกยุ่งกับเรา", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เจ๊ทำเป็นไม่รู้จัก แล้วเล่าเรื่องเราให้ทุกคนที่มาซื้อของฟัง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: move_house
+        text: "ย้ายบ้านไปอยู่ซอยอื่น"
+        effects: {money: {unit: income_x, amount: -0.5}, happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: live_with_it
+        text: "เย็บเบาะเอง ทำใจอยู่ต่อ"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: report_again
+        text: "แจ้งตำรวจซ้ำพร้อมหลักฐาน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "คราวนี้จับได้คาร้าน วงหวยในซอยปิดถาวร", effects: {relations: -1, happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เรื่องเงียบเหมือนเดิม ยางรถโดนเจาะเพิ่มอีกสองเส้น", effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
