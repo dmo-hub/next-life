@@ -103,6 +103,7 @@ function mults(m, L) {
   if (!m) return [];
   const out = [];
   for (const [f, v] of Object.entries(m.flags ?? {})) out.push(`×${v} ถ้า${L.flag(f)}`);
+  for (const [f, v] of Object.entries(m.parent_flags ?? {})) out.push(`×${v} ถ้ารุ่นก่อน${L.flag(f)}`);
   for (const [k, v] of Object.entries(m.stats ?? {})) out.push(`×${v} เมื่อ${STAT_LABELS[k]}สูง (÷${v} เมื่อต่ำ)`);
   for (const [o, v] of Object.entries(m.occupation ?? {})) out.push(`×${v} ถ้าทำงาน${esc(L.occ(o))}`);
   for (const [c, v] of Object.entries(m.class ?? {})) out.push(`×${v} ถ้าฐานะ${esc(c)}`);
@@ -119,10 +120,10 @@ function mults(m, L) {
 const MONEY_TH = { money_x: 'เงินสดเทียบรายได้ปี', income_x: 'รายได้ต่อเดือนเทียบค่าแรงขั้นต่ำ', debt_x: 'หนี้สุทธิเทียบรายได้ปี' };
 const moneyBound = (k, b) => [b.min !== undefined ? `${MONEY_TH[k]} ≥ ${b.min} เท่า` : '', b.max !== undefined ? `${MONEY_TH[k]} ≤ ${b.max} เท่า` : ''].filter(Boolean).join(' และ ');
 
-function flagCond(f, L) {
+function flagCond(f, L, who = '') {
   const out = [];
-  for (const x of f?.has ?? []) out.push(`มี ${L.flag(x)}`);
-  for (const x of f?.not ?? []) out.push(`ไม่มี ${L.flag(x)}`);
+  for (const x of f?.has ?? []) out.push(`${who}มี ${L.flag(x)}`);
+  for (const x of f?.not ?? []) out.push(`${who}ไม่มี ${L.flag(x)}`);
   return out;
 }
 
@@ -160,6 +161,8 @@ function conditions(e, L) {
   for (const f of w.family ?? []) out.push(famCond(f));
   if (w.loss) out.push(`เพิ่งเสีย${any(w.loss.roles.map((r) => FAMILY_ROLE_NAMES[r] ?? r))}${w.loss.within ? ` ภายใน ${w.loss.within} ปี` : 'ปีนี้'}`);
   out.push(...flagCond(w.flags, L));
+  // ธงของพ่อแม่รุ่นก่อน ไม่ใช่ของตัวละคร — การ์ดจึงออกเฉพาะชีวิตที่เกิดเป็นลูกของรุ่นก่อน
+  out.push(...flagCond(w.parent_flags, L, 'เกิดเป็นลูกของรุ่นก่อนที่'));
   if (e.realm) out.push(`ไป${any(e.realm.map((r) => REALMS.find((x) => x.id === r)?.name ?? r))}`);
   if (e.repeat) out.push(`ออกซ้ำได้ ${e.repeat.max} ครั้ง เว้น ${e.repeat.gap} ปี`);
   if (e.weight !== undefined) out.push(`น้ำหนักในกองสุ่ม ${e.weight}`);
