@@ -188,6 +188,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
+    multipliers: {parent_flags: {smoker: 2}}
     when: {age: [6, 11], family: [{role: parent, sex: หญิง, alive: true}]}
     title: "หอบทุกหน้าหนาว"
     text: "อายุ {อายุ} ขวบ ไอหอบหวีดทุกครั้งที่ฝุ่นควันลง หมอบอกแม่ว่าคุณเป็นหอบหืดกับภูมิแพ้ ต้องอยู่กับมันไปอีกนาน"

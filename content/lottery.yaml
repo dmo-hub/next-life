@@ -6,6 +6,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 2
+    multipliers: {parent_flags: {lottery_habit: 1.5}}
     # เรื่องเปิดด้วยเงินเดือนก้อนแรก — อาชีพครบทุกตัว = มีงานของตัวเองแล้ว (ยังไม่ทำงานไม่ออก)
     when: {occupation: [farmer, labor, factory, craft, service, clerk, technician, professional, manager]}
     title: "แผงล็อตเตอรี่หน้าโต๊ะ"

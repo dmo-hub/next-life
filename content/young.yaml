@@ -238,7 +238,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 3
-    multipliers: {flags: {bullied: 0.5, heavy_drinker: 2}}
+    multipliers: {flags: {bullied: 0.5, heavy_drinker: 2, no_drink_vow: 0.5}}
     repeat: {gap: 3, max: 2}
     when: {age: [19, 26]}
     title: "ปาร์ตี้คืนวันศุกร์"

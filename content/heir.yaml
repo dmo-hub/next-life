@@ -1,0 +1,286 @@
+# การ์ดทายาท — ออกเฉพาะทางเป็นลูกที่รุ่นก่อนถือธงในทะเบียน heir: (when.parent_flags) · ไม่มีคำ พ่อ/แม่ เพราะเพศผู้ถือธงรู้ตอนเล่นเท่านั้น
+# ธงกิจการ/บ้าน/โกงติดหลังทายาทเกิด ⇒ การ์ดวัยรุ่นขึ้นไป (heir: from_age)
+events:
+  # smoker
+  - id: kid_smoke_house_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [6, 12], parent_flags: {has: [smoker]}}
+    title: "ควันในบ้าน"
+    text: "กลิ่นบุหรี่ติดผ้าม่าน ติดหมอน ติดเสื้อนักเรียน เพื่อนที่โรงเรียนเริ่มถามว่าบ้านเผาอะไร ไอแห้ง ๆ ตอนกลางคืนก็ไม่ยอมหายสักที"
+    choices:
+      - id: hide_lighter
+        text: "แอบซ่อนไฟแช็กทุกอัน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "หาไฟแช็กไม่เจอทั้งเช้า ผู้ใหญ่ในบ้านหงุดหงิดใส่ทั้งวัน แล้วเย็นนั้นก็ซื้อมาใหม่สองอัน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ผู้ใหญ่ในบ้านเห็นไฟแช็กกองอยู่ใต้เตียง นั่งนิ่งไปนาน แล้วเริ่มออกไปสูบนอกบ้านแทน", effects: {health: 1, relations: 1}, merit: [{cat: neutral}]}
+      - id: ask_quit
+        text: "ขอให้เลิกตรง ๆ"
+        merit: [{cat: care_parents, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "คำขอสั้น ๆ ของเด็กคนหนึ่งได้ผลกว่าคำหมอ ซองสุดท้ายถูกขยำทิ้งลงถังต่อหน้า", effects: {health: 1, relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้คำตอบว่า \"เดี๋ยวค่อยเลิก\" เหมือนทุกครั้ง แต่ก็เห็นเขาสูบน้อยลงหน่อยตอนอยู่ใกล้", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - id: used_to_it
+        text: "ชินแล้ว ไม่พูดอะไร"
+        effects: {health: -1}
+        merit: [{cat: neutral}]
+      - id: sleep_window
+        text: "ย้ายไปนอนห้องที่เปิดหน้าต่างได้"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  # heavy_drinker
+  - id: kid_fetch_from_circle_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [8, 12], parent_flags: {has: [heavy_drinker]}}
+    title: "ไปตามที่วงเหล้า"
+    text: "สามทุ่มแล้วข้าวเย็นยังวางอยู่บนโต๊ะ ที่บ้านส่ง{ชื่อ}ไปตามผู้ใหญ่ที่วงเหล้าท้ายซอย เสียงหัวเราะดังมาถึงปากซอย"
+    choices:
+      - id: walk_in
+        text: "เดินเข้าไปจูงมือกลับบ้าน"
+        merit: [{cat: care_parents, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คนในวงแซวว่ามีคนมารับแล้ว ผู้ใหญ่ในบ้านลุกตามมาแต่โดยดี เดินโซเซกลับบ้านจับมือไม่ยอมปล่อย", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โดนตวาดกลางวงให้กลับไปก่อน เดินกลับคนเดียวในซอยมืด ร้องไห้ไม่ให้ใครเห็น", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+      - id: wait_outside
+        text: "ยืนรอหน้าวงจนเลิก"
+        effects: {happiness: -1, health: -1}
+        merit: [{cat: neutral}]
+      - id: go_back_lie
+        text: "กลับไปบอกว่าหาไม่เจอ"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: neighbor_help
+        text: "ไปเคาะบ้านป้าข้าง ๆ ขอให้ช่วย"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าเดินไปพูดสองประโยค วงแตกทันที หลังจากนั้นป้าแวะมาถามไถ่ทุกเย็น", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าบอกว่าเรื่องในบ้านคนอื่นไม่อยากยุ่ง ปิดประตูใส่เบา ๆ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+
+  # heavy_drinker — ทางสาบานตั้ง no_drink_vow ให้ young_party_01 ออกครึ่งเดียว
+  - id: teen_no_drink_vow_01
+    type: A
+    category: health
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [14, 18], parent_flags: {has: [heavy_drinker]}}
+    title: "สาบานไม่แตะเหล้า"
+    text: "งานเลี้ยงรุ่นจบ ม.ต้น เพื่อนส่งแก้วเบียร์มาให้ กลิ่นมันเหมือนกลิ่นในบ้านทุกคืนที่ผ่านมา มือที่รับแก้วชะงักค้าง"
+    choices:
+      - id: vow
+        text: "วางแก้ว สาบานว่าจะไม่ดื่ม"
+        effects: {health: 1, relations: -1}
+        sets_flags: [no_drink_vow]
+        merit: [{cat: sila, level: 1}]
+      - id: one_sip
+        text: "จิบนิดเดียวให้เพื่อนพอใจ"
+        merit: [{cat: intoxicants, level: 1}]
+        outcomes:
+          - {weight: 2, text: "จิบเดียวกลายเป็นแก้ว แก้วกลายเป็นขวด ตื่นมาในห้องเพื่อนจำอะไรไม่ได้", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "จิบเดียวแล้ววางจริง ๆ รู้ตัวว่าคุมได้ และรู้ว่าจะไม่เป็นแบบที่บ้าน", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - id: talk_friend
+        text: "เล่าเรื่องที่บ้านให้เพื่อนฟัง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เพื่อนฟังจนจบแล้วรับแก้วไปดื่มแทน ตั้งแต่นั้นมีคนคอยกันแก้วให้ทุกงาน", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนเอาไปเล่าต่อในกลุ่ม วันรุ่งขึ้นทั้งห้องรู้เรื่องในบ้าน", effects: {relations: -1, happiness: -2}, merit: [{cat: neutral}]}
+      - id: leave_party
+        text: "ขอตัวกลับก่อนเงียบ ๆ"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+
+  # lottery_habit
+  - id: kid_lottery_errand_01
+    type: A
+    category: work_money
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [8, 12], parent_flags: {has: [lottery_habit]}}
+    title: "เลขจากความฝัน"
+    text: "ตื่นเช้ามาผู้ใหญ่ในบ้านถามว่าเมื่อคืนฝันเห็นอะไร แล้วยื่นเงินให้วิ่งไปซื้อหวยที่แผงหน้าปากซอยก่อนไปโรงเรียน"
+    choices:
+      - id: make_up_dream
+        text: "แต่งความฝันให้ฟังเป็นเลข"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 9, text: "เลขที่แต่งขึ้นไม่ถูกสักตัว ผู้ใหญ่ในบ้านถอนหายใจ งวดหน้าก็ถามอีก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ท้ายสองตัวตรงกับเลขที่แต่ง ทั้งบ้านเรียก{ชื่อ}ว่าตัวนำโชค ได้ขนมกองโตแต่ก็โดนถามความฝันทุกงวด", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+      - id: run_errand
+        text: "วิ่งไปซื้อตามสั่ง"
+        effects: {knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: say_waste
+        text: "บอกว่าเสียเงินเปล่า"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "โดนดุว่าเด็กไม่รู้อะไร เงินค่าขนมงวดนั้นหายไปครึ่ง", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ผู้ใหญ่ในบ้านนิ่งไป แล้วงวดนั้นเอาเงินค่าหวยไปซื้อสมุดให้แทน", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+      - id: keep_change
+        text: "แอบเก็บเงินทอนไว้เอง"
+        effects: {happiness: 1}
+        merit: [{cat: greed_harm, level: 1}]
+
+  # own_business
+  - id: teen_family_shop_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [15, 18], parent_flags: {has: [own_business]}}
+    title: "หน้าร้านของที่บ้าน"
+    text: "ร้านที่ที่บ้านเปิดมาหลายปีเริ่มอยู่ตัว ผู้ใหญ่ในบ้านถามตอนปิดร้านว่าจบ ม.ปลาย แล้วจะช่วยดูร้านเลยไหม ใบสมัครเรียนต่อวางอยู่บนโต๊ะ"
+    choices:
+      - id: take_over
+        text: "รับช่วงร้าน เรียนรู้จากหน้าร้าน"
+        merit: [{cat: care_parents, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 2}}, text: "ลูกค้าประจำจำหน้าได้ภายในเดือนเดียว รู้จักคนทั้งตลาด", effects: {network: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านเงียบลงตามย่าน ต้องนั่งเฝ้าร้านทั้งวันขณะเพื่อนไปเรียนต่อกันหมด", effects: {happiness: -1, knowledge: -1}, merit: [{cat: neutral}]}
+      - id: study_first
+        text: "ขอเรียนต่อก่อน"
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: both
+        text: "เรียนภาคค่ำ กลางวันดูร้าน"
+        effects: {knowledge: 1, health: -1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: care_parents, level: 1}]
+      - id: online_shop
+        text: "ชวนเปิดหน้าร้านออนไลน์"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 2}}, text: "ออเดอร์จากต่างจังหวัดเข้ามาไม่หยุด ผู้ใหญ่ในบ้านยอมรับว่าคิดไม่ถึง", effects: {knowledge: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ถ่ายรูปสินค้าทั้งคืน ขายได้สามชิ้นในเดือนแรก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+
+  # home_owner
+  - id: teen_home_paid_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [13, 18], parent_flags: {has: [home_owner]}}
+    title: "บ้านที่ผ่อนหมดแล้ว"
+    text: "ผู้ใหญ่ในบ้านเอาโฉนดออกมาวางบนโต๊ะกินข้าว บอกว่าผ่อนงวดสุดท้ายเสร็จเมื่อเช้า แล้วถามเล่น ๆ ว่าห้องหลังบ้านที่ว่างอยู่ อยากได้เป็นห้องของตัวเองไหม"
+    choices:
+      - id: own_room
+        text: "ขอห้องไว้อ่านหนังสือ"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: rent_out
+        text: "เสนอให้ปล่อยห้องเช่า"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้คนเช่าเป็นนักศึกษาเงียบ ๆ ค่าเช่าเดือนแรกที่บ้านแบ่งมาให้เป็นค่าขนม", effects: {money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนเช่าค้างค่าเช่าสามเดือนแล้วหายไป ผู้ใหญ่ในบ้านไม่พูดเรื่องนี้อีก", effects: {relations: -1}, merit: [{cat: neutral}]}
+      - id: give_elder
+        text: "ยกห้องให้ญาติที่ป่วยมาพัก"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: not_care
+        text: "บอกว่าห้องไหนก็ได้"
+        merit: [{cat: neutral}]
+
+  # caught_fraud
+  - id: teen_parent_news_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [13, 18], parent_flags: {has: [caught_fraud]}}
+    title: "ข่าวเก่าในกลุ่มแชต"
+    text: "เพื่อนส่งลิงก์ข่าวเก่าเข้ากลุ่มห้อง รูปในข่าวเบลอแค่ครึ่งหน้า แต่ทุกคนจำได้ว่าเป็นคนในบ้านของ{ชื่อ} ข้อความในกลุ่มเงียบไปทั้งห้อง"
+    choices:
+      - id: own_it
+        text: "ตอบในกลุ่มว่าใช่ ที่บ้านผิดจริง"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ความตรงไปตรงมาทำให้กลุ่มเลิกแซว เพื่อนสองสามคนทักมาส่วนตัวว่าที่บ้านเขาก็มีเรื่อง", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยอมรับแล้วก็ยังโดนเรียกฉายาตามข่าวไปจนจบเทอม", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: leave_group
+        text: "ออกจากกลุ่ม ไม่ไปโรงเรียนสามวัน"
+        effects: {happiness: -1, knowledge: -1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: fight_sender
+        text: "ไปหาเรื่องคนส่งลิงก์"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ต่อยกันหลังโรงอาหาร โดนเรียกผู้ปกครอง ข่าวเก่ากลายเป็นเรื่องใหม่ทั้งโรงเรียน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนส่งยอมลบลิงก์ แต่ทั้งห้องเริ่มเว้นระยะห่าง", effects: {relations: -1}, merit: [{cat: neutral}]}
+      - id: tell_teacher
+        text: "เล่าให้ครูประจำชั้นฟัง"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  # loan_shark — รุ่นก่อนติดราวอายุ 33 ทายาทยังเด็กอยู่ จึงเล่าตอน 9–12 ได้
+  - id: kid_collector_door_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [9, 12], parent_flags: {has: [loan_shark]}}
+    title: "คนทวงหนี้หน้าบ้าน"
+    text: "ผู้ชายสองคนขี่มอเตอร์ไซค์มาจอดหน้าบ้าน ถามหาผู้ใหญ่ในบ้านด้วยเสียงดังทั้งซอย {ชื่อ}อยู่บ้านคนเดียว เสียงเคาะประตูหนักขึ้นเรื่อย ๆ"
+    choices:
+      - id: stay_quiet
+        text: "ปิดไฟ นั่งเงียบหลังตู้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "เขาพ่นสีแดงไว้ที่ประตูแล้วขี่ออกไป คืนนั้นนอนไม่หลับทั้งคืน", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาเคาะอยู่ครึ่งชั่วโมงแล้วไป ทิ้งกระดาษเบอร์โทรไว้ใต้ประตู", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: open_say_out
+        text: "เปิดประตูบอกว่าไม่อยู่"
+        effects: {happiness: -2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: call_neighbor
+        text: "แอบโทรหาบ้านข้าง ๆ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงข้างบ้านเดินออกมายืนดู สองคนนั้นขี่รถออกไปทันที ลุงชวนไปนั่งกินข้าวบ้านลุงจนผู้ใหญ่กลับ", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีใครรับสาย ต้องนั่งฟังเสียงเคาะจนเขาเบื่อไปเอง", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: run_out_back
+        text: "หนีออกประตูหลังไปบ้านเพื่อน"
+        effects: {happiness: -1, health: -1}
+        merit: [{cat: neutral}]
+
+  # guarantor
+  - id: teen_court_letter_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [13, 18], parent_flags: {has: [guarantor]}}
+    title: "จดหมายจากศาล"
+    text: "ซองสีน้ำตาลจากศาลวางบนโต๊ะกินข้าว ข้างในเป็นหมายเรื่องหนี้ที่คนในบ้านเคยไปค้ำให้เพื่อนเมื่อหลายปีก่อน คนที่กู้หายไปนานแล้ว เหลือแต่ชื่อผู้ค้ำ"
+    choices:
+      - id: read_help
+        text: "นั่งอ่านเอกสารช่วยกัน"
+        merit: [{cat: care_parents, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 2}}, text: "เจอว่าหนี้บางส่วนขาดอายุความ พาไปคลินิกแก้หนี้ ยอดที่ต้องจ่ายลดลงเกือบครึ่ง", effects: {knowledge: 1, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "อ่านจนดึกก็ไม่เข้าใจศัพท์กฎหมาย เห็นแต่ตัวเลขที่ต้องจ่าย", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+      - id: work_to_help
+        text: "หางานพิเศษช่วยผ่อน"
+        effects: {knowledge: -1, health: -1, relations: 1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: angry
+        text: "โกรธที่ไปค้ำให้คนอื่น"
+        effects: {relations: -2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: never_sign
+        text: "จดไว้ ชีวิตนี้ไม่ค้ำให้ใคร"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]

@@ -148,6 +148,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
+    multipliers: {parent_flags: {heavy_drinker: 2, guarantor: 1.5}}
     when: {age: [6, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "เสียงจานแตกกลางดึก"
     text: "พ่อแม่ทะเลาะเรื่องเงินทุกคืน คุณนอนกอดหมอนฟังอยู่หลังประตู เช้ามาทั้งคู่ยิ้มให้เหมือนไม่มีอะไรเกิดขึ้น"

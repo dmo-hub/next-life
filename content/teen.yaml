@@ -74,7 +74,7 @@ events:
     stage: วัยรุ่น
     years: [2500, 2650]
     weight: 2
-    multipliers: {sex: {หญิง: 0.07}}
+    multipliers: {sex: {หญิง: 0.07}, parent_flags: {smoker: 1.5}}
     when: {school: [lower, upper, voc]}
     title: "บุหรี่มวนแรก"
     text: "หลังเลิกเรียน รุ่นพี่ยื่นบุหรี่มวนหนึ่งมาให้ ทั้งวงเงียบกริบ จ้องรอดูว่าจะกล้าสูบไหม"
@@ -140,7 +140,7 @@ events:
     stage: วัยรุ่น
     years: [2500, 2650]
     weight: 2
-    multipliers: {flags: {bullied: 2}}
+    multipliers: {flags: {bullied: 2}, parent_flags: {caught_fraud: 1.5}}
     title: "แก๊งซิ่งประจำซอย"
     text: "แก๊งซิ่งประจำซอยชวนเข้ากลุ่ม หัวโจกตบไหล่ '{ชื่อ} อยู่กับพวกพี่แล้วทั้งซอยจะเกรงใจ'"
     choices:
@@ -210,6 +210,7 @@ events:
     years: [2500, 2650]
     when: {age: [15, 18]}
     weight: 2
+    multipliers: {parent_flags: {own_business: 0.5, loan_shark: 2}}
     title: "หาเงินเองครั้งแรก"
     text: "ที่บ้านเงินเริ่มตึง ร้านหมูกระทะข้างตลาดรับเด็กล้างจาน ส่วนเพื่อนชวนไปแบกของที่ท่าเรือ ได้เงินมากกว่าเท่าตัว"
     choices:
