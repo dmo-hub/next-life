@@ -28,7 +28,7 @@ events:
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 960, text: "ห้าคนนั่งลุ้นหน้าทีวี ไม่ถูกสักใบ หัวเราะกันแล้วสัญญาว่างวดหน้าเอาใหม่", effects: {relations: 1, money: {unit: fixed_baht, amount: -400, ref_year: 2560}}, merit: [{cat: neutral}]}
-          - {weight: 36, ok: true, text: "ถูกเลขท้ายสามตัวหนึ่งใบ หารห้าแล้วได้คนละนิดแต่ดีใจทั้งแผนก", effects: {happiness: 1, relations: 1, money: {unit: fixed_baht, amount: 400, ref_year: 2560}}, merit: [{cat: neutral}]}
+          - {weight: 36, text: "ถูกเลขท้ายสามตัวหนึ่งใบ! ใบนั้นอยู่ในกระเป๋า{ชื่อ}คนเดียว เพื่อนในกลุ่มแชตยังไม่มีใครเปิดตรวจ", next: lot_pool_small_01, merit: [{cat: neutral}]}
           - {weight: 4, text: "ใบหนึ่งในเลขชุดที่ลงขันกันถูกรางวัลที่หนึ่ง! สลากทั้งชุดอยู่ในกระเป๋า{ชื่อ}คนเดียว แล้วโทรศัพท์ก็เริ่มดังไม่หยุด", next: lot_pool_split_01, merit: [{cat: neutral}]}
       - id: save_instead
         text: "ไม่ซื้อ เอาเงินไปฝากดีกว่า"
@@ -69,6 +69,35 @@ events:
         text: "เพิ่มส่วนให้เพื่อนที่แม่ป่วย"
         effects: {relations: 3, happiness: 1, money: {unit: fixed_baht, amount: 900000, ref_year: 2560}}
         merit: [{cat: dana, level: 2}, {cat: help_others, level: 1}]
+
+  - id: lot_pool_small_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "สี่พันบาทในกระเป๋าเรา"
+    text: "สลากใบที่ถูกเลขท้ายสามตัวได้มาสี่พันบาท ยังไม่มีใครในกลุ่มรู้ เพื่อนคนหนึ่งเพิ่งบ่นในแชตว่าเดือนนี้ค่าเช่าห้องไม่พอ ส่วน{ชื่อ}ก็มีบิลค้างจ่ายรออยู่"
+    choices:
+      - id: tell_and_split
+        text: "บอกทุกคน หารห้าเท่ากัน"
+        effects: {relations: 2, happiness: 1, money: {unit: fixed_baht, amount: 800, ref_year: 2560}}
+        merit: [{cat: sila, level: 1}]
+      - id: keep_quiet
+        text: "เงียบไว้ บอกว่าไม่ถูกสักใบ"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 3, text: "ไม่มีใครเปิดตรวจย้อน เงินสี่พันหายไปกับบิลค้างจ่ายในวันเดียว แต่ทุกครั้งที่เพื่อนชวนลงขันงวดใหม่ ใจก็กระตุกทุกที", effects: {happiness: -1, money: {unit: fixed_baht, amount: 4000, ref_year: 2560}}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 2, text: "เพื่อนอีกคนจดเลขชุดไว้ในมือถือ ตรวจเจอเองแล้วส่งรูปเข้ากลุ่ม ไม่มีใครพูดอะไร แต่งวดหน้าไม่มีใครชวนอีก", effects: {relations: -3, network: -1, happiness: -2, money: {unit: fixed_baht, amount: 4000, ref_year: 2560}}, merit: [{cat: greed_harm, level: 1}]}
+      - id: give_to_tenant
+        text: "ยกส่วนตัวเองให้เพื่อนที่ลำบาก"
+        effects: {relations: 3, happiness: 1}
+        merit: [{cat: dana, level: 1}, {cat: help_others, level: 1}]
+      - id: roll_over
+        text: "ชวนเอาทั้งก้อนลงงวดหน้าต่อ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 9, text: "ทุกคนตกลง งวดหน้าไม่ถูกสักใบ สี่พันหายวับ หัวเราะกันแห้ง ๆ ในกลุ่มแชต", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "งวดหน้าถูกท้ายสามตัวซ้ำอีกใบ ทั้งกลุ่มเรียก{ชื่อ}ว่ามือขลัง ได้คนละพันกว่าบาทพร้อมเรื่องเล่าไปอีกนาน", effects: {relations: 2, happiness: 2, money: {unit: fixed_baht, amount: 1600, ref_year: 2560}}, merit: [{cat: neutral}]}
 
   - id: lot_habit_drain_01
     type: A
