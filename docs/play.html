@@ -135,6 +135,13 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .choice.loan > span:first-child { min-width:0; }
 .choice.loan .of { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .choice .hint { display:block; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
+/* ป้ายทางที่มีผลตามมา: ไอคอนต่อท้ายข้อความตัวเลือก + บรรทัดอธิบายใต้ชุดปุ่ม */
+.choice .follow { display:inline-flex; gap:2px; vertical-align:-2px; margin-left:6px; }
+.follow svg, .follow-key svg { width:14px; height:14px; flex:none; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+.follow-key { display:flex; flex-wrap:wrap; align-items:center; gap:2px 12px; margin:-2px 0 0; font-size:12px; }
+.follow-key > span { display:inline-flex; align-items:center; gap:4px; }
+.a .choice .follow, .a .follow-key svg { color:var(--red); } .a .follow-key { color:var(--muted); }
+.a .choice:hover .follow, .a .choice:focus-visible .follow { color:#F3B9AE; }
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
 .recap .picks { overflow-wrap:anywhere; }
@@ -3170,6 +3177,7 @@ function eventCard(st, ev, news = null) {
     text: fill(ev.text, st),
     choices: ev.choices.map((c) => fill(c.text, st)),
     ...choiceHints(ev, st),
+    ...choiceFollows(ev),
     fx: ev.choices.map((c) => choiceFx(st, ev, c)),
     // เหตุผลที่ตัวเลือกกดไม่ได้ (null = กดได้) — หน้าจอแสดงเทาพร้อมเหตุผล
     locked: ev.choices.map((c) => lockReason(st, c)),
@@ -3189,6 +3197,19 @@ function moneyShort(ev, st) {
     return opts.length ? opts : null;
   });
   return { moneyGap, ...(loans.some((l) => l) && { loans }) };
+}
+
+// ป้ายเห็นล่วงหน้า: ตัวเลือกที่ตัวเองหรือผลสุ่มทางใดทางหนึ่งมีเรื่องต่อ (next · ปีเดียวกัน) หรือผลย้อน (schedules · ปีหลัง)
+// ผู้เล่นรู้ว่าการเลือกนี้มีเรื่องตามมา แต่ไม่รู้ผลหรือโอกาส · เงื่อนไขของการ์ดปลายทางไม่ดู ป้ายจึงไม่เผยสถานะที่ซ่อนอยู่
+// ใส่ช่องเฉพาะการ์ดที่มีอย่างน้อยหนึ่งตัวเลือก การ์ดอื่นรูปเดิมทุกช่อง
+function choiceFollows(ev) {
+  const follows = ev.choices.map((c) => {
+    const ways = [c, ...(c.outcomes ?? [])];
+    const next = ways.some((w) => w.next);
+    const later = ways.some((w) => w.schedules?.length);
+    return next && later ? 'both' : next ? 'next' : later ? 'later' : null;
+  });
+  return follows.some((f) => f) ? { follows } : {};
 }
 
 // บรรทัดรองบอกข้อแลกใต้ตัวเลือก (B52) — ใส่ช่องเฉพาะการ์ดที่มี hint การ์ดเดิมจึงมีรูปเท่าเดิมทุกช่อง
@@ -7454,7 +7475,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.5.00';
+const APP_VERSION = 'v0.5.01';
 const APP_BUILD = '2026-10-29';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
@@ -8668,9 +8689,48 @@ function freeChoices(card) {
   return pays.map((p) => !p);
 }
 
-function button(label, fx, onclick, hint = null) {
+// ป้ายทางที่มีผลตามมา (card.follows): ไอคอนท้ายข้อความตัวเลือก + คำอธิบายบรรทัดเดียวใต้ชุดปุ่ม
+// บอกแค่ว่ามีเรื่องตามมา ไม่บอกดีหรือร้าย · both = 2 ไอคอน
+const FOLLOW_ICON = {
+  next: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4l2.8-2.8M7.2 4.6l1.3-1.3a2.6 2.6 0 0 1 3.7 3.7l-1.3 1.3M8.8 11.4l-1.3 1.3a2.6 2.6 0 0 1-3.7-3.7l1.3-1.3"/></svg>',
+  later: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2h8M4 14h8M5 2c0 4 6 4 6 6s-6 2-6 6M11 2c0 4-6 4-6 6s6 2 6 6"/></svg>',
+};
+const FOLLOW_WORD = { next: 'มีเรื่องต่อ', later: 'มีผลภายหลัง' };
+const followKinds = (f) => (!f ? [] : f === 'both' ? ['next', 'later'] : [f]);
+const followIcon = (k) => {
+  const s = el('span');
+  s.insertAdjacentHTML('beforeend', FOLLOW_ICON[k]);
+  return s;
+};
+
+function followMark(f) {
+  const kinds = followKinds(f);
+  if (!kinds.length) return null;
+  const words = kinds.map((k) => FOLLOW_WORD[k]).join(' · ');
+  const m = el('span', 'follow');
+  m.title = words;
+  // ไอคอนซ่อนจากโปรแกรมอ่านจอ — ต้องได้คำแทน
+  m.append(...kinds.map(followIcon), el('span', 'sr', words));
+  return m;
+}
+
+function followKey() {
+  const p = el('p', 'follow-key');
+  // ป้ายบนปุ่มมีคำสำหรับโปรแกรมอ่านจออยู่แล้ว — บรรทัดนี้ซ้ำ
+  p.setAttribute('aria-hidden', 'true');
+  for (const k of ['next', 'later']) {
+    const s = followIcon(k);
+    s.append(`= ${FOLLOW_WORD[k]}`);
+    p.append(s);
+  }
+  return p;
+}
+
+function button(label, fx, onclick, hint = null, follow = null) {
   const b = el('button', 'choice');
   const main = el('span', null, label);
+  const mark = followMark(follow);
+  if (mark) main.append(mark);
   // อยู่ในก้อนเดียวกับข้อความตัวเลือก ป้ายผลด้านขวาจึงยังชิดขวาเหมือนการ์ดที่ไม่มีบรรทัดรอง
   if (hint) main.append(el('small', 'hint', hint));
   b.append(main);
@@ -8973,12 +9033,13 @@ function render(card) {
         const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
         const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);
-        const b = button(c, fx, () => play(lifePick(i)), card.hints?.[i]);
+        const b = button(c, fx, () => play(lifePick(i)), card.hints?.[i], card.follows?.[i]);
         if (why) b.disabled = true;
         choices.append(b, ...loanButtons(card, i));
       });
       // การ์ดเล่าเรื่อง (choices: []) ไม่มีปุ่มให้เลือก — ต้องมีทางไปใบถัดไป
       if (!card.choices.length) choices.append(enter(button(BTN.next, null, next)));
+      if (card.follows?.some(Boolean)) choices.append(followKey());
       const tip = whisperFor(card, free);
       if (tip) body.append(tip);
       if (card.choices.length > 1) choices.append(foldLater(box, body, choices, card));
