@@ -21,7 +21,7 @@ events:
         text: "ไม่อ่าน ฝนตามดวงเอา"
         outcomes:
           - {ok: true, weight: 1, text: "ติดคณะดังแบบงง ๆ ทั้งโรงเรียนแตกตื่น", multipliers: {karma: 1.5}, effects: {knowledge: 1, happiness: 3}, sets_flags: [good_student], merit: [{cat: neutral}]}
-          - {weight: 3, text: "ฝนผิดแถวตั้งแต่ข้อแรก รู้ตัวตอนหมดเวลา", effects: {happiness: -2}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ฝนผิดแถวตั้งแต่ข้อแรก รู้ตัวตอนหมดเวลา", effects: {happiness: -2}, merit: [{cat: neutral}], next: teen_exam_after_01}
         merit: [{cat: neutral}]
       - id: vocational
         text: "ไม่สอบ ไปเรียนสายอาชีพ"
@@ -122,7 +122,7 @@ events:
       - id: keep_friend
         text: "ปฏิเสธเพื่อรักษาเพื่อน"
         outcomes:
-          - {weight: 1, text: "เพื่อนเงียบหายไปทั้งเทอม", effects: {relations: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนเงียบหายไปทั้งเทอม", effects: {relations: -2}, merit: [{cat: neutral}], next: teen_friend_silent_01}
           - {ok: true, weight: 1, text: "เพื่อนขอบคุณที่จริงใจ กลายเป็นเพื่อนกันตลอดชีวิต", multipliers: {stats: {relations: 2}}, effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: secret_date
@@ -478,4 +478,60 @@ events:
       - id: quit_team
         text: "บอกทีมว่าขอพักก่อน"
         effects: {relations: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ teen_first_love_01 (ปฏิเสธเพื่อรักษาเพื่อน แต่เพื่อนเงียบ) — ออกทาง next เท่านั้น
+  - id: teen_friend_silent_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "โต๊ะข้างกันที่เงียบ"
+    text: "นั่งโต๊ะติดกันมาทั้งเทอมแต่ไม่มีใครพูดสักคำ จดหมายฉบับนั้นยังอยู่ในกระเป๋า วันนี้ครูจับคู่ทำรายงานกลุ่ม ชื่อเราสองคนอยู่บรรทัดเดียวกัน"
+    choices:
+      - id: speak_first
+        text: "เป็นฝ่ายทักก่อน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.4}}, text: "เพื่อนหัวเราะทั้งน้ำตา บอกว่ารอคำนี้มาทั้งเทอม", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนตอบแค่เรื่องงาน แล้วหันไปคุยกับคนอื่น", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: just_work
+        text: "ทำรายงานไปเงียบ ๆ"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: ask_swap
+        text: "ขอครูเปลี่ยนคู่"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+      - id: middle_friend
+        text: "ฝากเพื่อนอีกคนช่วยพูดให้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "คนกลางนัดกินข้าวสามคน พูดกันจนเข้าใจ", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนกลางเล่าเรื่องจดหมายไปทั่วห้อง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+  # เรื่องต่อ teen_entrance_exam_01 (ฝนผิดแถว) — ออกทาง next เท่านั้น
+  - id: teen_exam_after_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "ประกาศผลไม่มีชื่อ"
+    text: "ประกาศผลออกเช้านี้ เลื่อนหาชื่อตัวเองสามรอบก็ไม่เจอ เพื่อนในห้องเริ่มโพสต์รูปชุดนักศึกษา รอบสองเปิดรับอีกเดือนเดียว"
+    choices:
+      - id: second_round
+        text: "อ่านหนักสอบรอบสอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.4}}, text: "รอบนี้ฝนทีละข้ออย่างใจเย็น ติดคณะที่เลือกเป็นอันดับสอง", effects: {knowledge: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อ่านไม่ทัน คะแนนขาดไปนิดเดียว", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: gap_year
+        text: "พักปีหนึ่ง ทำงานแล้วสอบใหม่"
+        effects: {money: {unit: income_x, amount: 0.3}, knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: go_vocational
+        text: "เปลี่ยนไปเรียนสายอาชีพ"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: blame_luck
+        text: "โทษดวง ไม่สอบอีกแล้ว"
+        effects: {happiness: -1, knowledge: -1}
         merit: [{cat: neutral}]

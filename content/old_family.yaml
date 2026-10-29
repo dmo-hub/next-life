@@ -169,7 +169,7 @@ events:
       - id: decline
         text: "ไม่ไปหรอก อยู่บ้านสบายกว่า"
         outcomes:
-          - {weight: 1, text: "เพื่อนส่งรูปมาอวดทั้งกลุ่ม นั่งเหงาอยู่บ้านคนเดียว", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนส่งรูปมาอวดทั้งกลุ่ม นั่งเหงาอยู่บ้านคนเดียว", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}], next: old_trip_photos_01}
           - {weight: 1, text: "ได้พักจริง ๆ นอนกลางวันยาวไม่มีใครกวน", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -422,4 +422,31 @@ events:
       - id: write_letter
         text: "เขียนจดหมายเล่าให้ทุกบ้าน"
         effects: {relations: 1, happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ old_friend_trip_01 (ไม่ไปเที่ยว นั่งเหงา) — ออกทาง next เท่านั้น
+  - id: old_trip_photos_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    title: "รูปในกลุ่มแชต"
+    text: "รูปทริปเด้งเข้ากลุ่มทั้งคืน ทุกคนยิ้มฟันหลอหน้าน้ำตก มีรูปหนึ่งเว้นที่ว่างไว้ข้างกลุ่ม เพื่อนพิมพ์มาว่า 'ที่ตรงนี้เก็บไว้ให้ {ชื่อ} รอบหน้า'"
+    choices:
+      - id: book_next
+        text: "จองทริปรอบหน้าเลย"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.4}}, text: "รอบหน้าได้ยืนตรงที่ว่างนั้นจริง ๆ ถ่ายรูปกลับมาแขวนไว้กลางบ้าน", effects: {happiness: 2, relations: 2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถึงวันจริงเข่าไม่ดี ต้องยกเลิกกลางทาง", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+      - id: elder_class
+        text: "ไปลงคลาสผู้สูงอายุแถวบ้าน"
+        effects: {relations: 1, health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: leave_group
+        text: "ออกจากกลุ่มแชต ไม่อยากเห็น"
+        effects: {relations: -2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: call_friend
+        text: "โทรหาเพื่อนที่ชวน คุยยาว"
+        effects: {relations: 2}
         merit: [{cat: neutral}]

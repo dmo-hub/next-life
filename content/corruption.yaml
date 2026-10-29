@@ -229,7 +229,7 @@ events:
         merit: [{cat: greed_harm, level: 3}]
         outcomes:
           - {weight: 2, text: "ได้เงินก้อนตั้งตัวใหม่ แต่กลับบ้านเกิดไม่ได้อีกแล้ว คนที่บ้านโทรมาร้องไห้ทุกเดือน", effects: {money: {unit: income_x, amount: 3}, relations: -3, happiness: -1}, schedules: [{event: echo_fraud_home_news_01, after_years: [10, 18]}], merit: [{cat: neutral}]}
-          - {weight: 1, text: "ตำรวจตามเจอที่ห้องเช่าในอาทิตย์เดียว ต้องขายทุกอย่างใช้คืนพร้อมค่าทนาย", effects: {money: {unit: income_x, amount: -2}, relations: -3, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตำรวจตามเจอที่ห้องเช่าในอาทิตย์เดียว ต้องขายทุกอย่างใช้คืนพร้อมค่าทนาย", effects: {money: {unit: income_x, amount: -2}, relations: -3, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}], next: fraud_village_court_01}
       - id: open_books
         text: "ปิดประกาศบัญชีให้ทุกคนดู"
         effects: {relations: 2, network: 1}
@@ -464,3 +464,34 @@ events:
         outcomes:
           - {weight: 1, ok: true, text: "คุยกันตรง ๆ จนเขายอมหยุดปล่อยข่าว ต่างคนต่างขาย", effects: {relations: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "เถียงกันเสียงดังกลางตลาด เจ้าของตลาดสั่งพักแผงทั้งสองเจ้าไปหนึ่งอาทิตย์", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
+  # เรื่องต่อ fraud_village_fund_01 (หนีเข้าเมือง ตำรวจตามเจอ) — ออกทาง next เท่านั้น
+  - id: fraud_village_court_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2545, 2650]
+    title: "วันขึ้นศาล"
+    text: "ห้องพิจารณาคดีเล็กกว่าที่คิด แถวหลังมีชาวบ้านจากหมู่บ้านนั่งมาเต็มสองแถว บางคนเคยฝากเงินไว้กับเราด้วยมือตัวเอง ทนายขอเวลาคุยห้านาทีก่อนศาลขึ้นบัลลังก์"
+    choices:
+      - id: plead_guilty
+        text: "รับสารภาพทุกข้อ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ศาลลดโทษกึ่งหนึ่งเพราะรับสารภาพ ชาวบ้านบางคนพยักหน้าเบา ๆ ตอนเดินออกจากห้อง", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รับสารภาพแล้วโทษยังหนัก ต้องเข้าเรือนจำหลายปี", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+      - id: fight_case
+        text: "สู้คดี อ้างว่ายืมมาจะคืน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "หลักฐานไม่พอ ศาลยกฟ้อง แต่ทั้งหมู่บ้านไม่มีใครเชื่อ", effects: {relations: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "สมุดบัญชีพูดแทนทุกอย่าง โทษหนักกว่าคนที่รับสารภาพ", effects: {happiness: -3, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: kin_mediate
+        text: "ให้ญาติผู้ใหญ่ไปเจรจาชาวบ้าน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "ชาวบ้านยอมถอนแจ้งความแลกกับผ่อนคืนครบทุกบาท", effects: {money: {unit: income_x, amount: -1}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ญาติกลับมาหน้าเสีย บอกว่าไม่มีใครยอมคุยด้วย", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: repay_all
+        text: "ผ่อนคืนกองทุนจนครบ"
+        effects: {money: {unit: income_x, amount: -1.5}, relations: 1, happiness: 1}
+        merit: [{cat: sila, level: 1}]

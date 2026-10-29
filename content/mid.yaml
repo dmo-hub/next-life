@@ -136,7 +136,7 @@ events:
         text: "เรียกญาติประชุมแบ่งเวร"
         outcomes:
           - {weight: 2, ok: true, text: "แบ่งเวรได้ลงตัว ญาติที่ไม่คุยกันสิบปีกลับมานั่งกินข้าวด้วยกัน", effects: {relations: 3, happiness: 1}, merit: [{cat: care_parents, level: 2}], multipliers: {stats: {relations: 2}}}
-          - {weight: 2, text: "ประชุมจบที่ทะเลาะเรื่องมรดก สุดท้ายงานทั้งหมดตกที่เราคนเดียว", effects: {relations: -2, health: -1}, merit: [{cat: care_parents, level: 1}]}
+          - {weight: 2, text: "ประชุมจบที่ทะเลาะเรื่องมรดก สุดท้ายงานทั้งหมดตกที่เราคนเดียว", effects: {relations: -2, health: -1}, merit: [{cat: care_parents, level: 1}], next: mid_care_alone_01}
         merit: [{cat: care_parents, level: 1}]
       - id: move_in
         text: "รับมาอยู่บ้านแบบครอบครัวใหญ่"
@@ -470,3 +470,33 @@ events:
         text: "ปล่อยวาง ทำงานหาใหม่"
         effects: {happiness: -1}
         merit: [{cat: neutral}]
+  # เรื่องต่อ mid_parent_care_01 (ประชุมแบ่งเวรล่ม งานตกที่เราคนเดียว) — ออกทาง next เท่านั้น
+  - id: mid_care_alone_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    when: {family: [{role: parent, alive: true}]}
+    title: "เวรที่ไม่มีใครมา"
+    text: "สามเดือนแล้วที่ป้อนข้าว เช็ดตัว พาไปหาหมอคนเดียว ญาติที่ทะเลาะเรื่องมรดกวันนั้นไม่โทรมาสักสาย คืนนี้นั่งหลับคาเก้าอี้ข้างเตียงเป็นคืนที่สี่"
+    choices:
+      - id: hire_help
+        text: "จ้างคนช่วยดูแลกลางวัน"
+        effects: {health: 1, money: {unit: income_x, amount: -0.8}}
+        merit: [{cat: neutral}]
+      - id: lawyer_meeting
+        text: "นัดประชุมใหม่ มีทนายนั่งกลาง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.4}}, text: "แบ่งมรดกกันชัดบนกระดาษ ญาติยอมรับเวรเสาร์อาทิตย์", effects: {relations: 1, health: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทนายกลางก็ช่วยไม่ได้ ญาติเดินออกจากห้องตั้งแต่ชั่วโมงแรก", effects: {relations: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+      - id: carry_on
+        text: "แบกต่อไปคนเดียว"
+        effects: {health: -1, happiness: -1, relations: 1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: post_story
+        text: "เล่าเรื่องลงกลุ่มญาติตรง ๆ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ญาติคนหนึ่งอ่านแล้วนั่งรถมาช่วยตั้งแต่เช้าวันรุ่งขึ้น", effects: {relations: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ญาติโกรธที่ประจานกัน กลุ่มเงียบกริบ", effects: {relations: -2}, merit: [{cat: neutral}]}

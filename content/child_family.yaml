@@ -188,7 +188,7 @@ events:
       - text: "ตามพ่อแม่ไปที่ทำงานทุกวัน"
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "จำงานพ่อแม่ได้หมด ลูกค้าชมว่าฉลาด", effects: {knowledge: 2, relations: 1}, sets_flags: [good_student], merit: [{cat: neutral}]}
-          - {weight: 2, text: "เบื่อจนวิ่งหายในตลาดครึ่งวัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เบื่อจนวิ่งหายในตลาดครึ่งวัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}], next: kid_lost_market_01}
         merit: [{cat: neutral}]
       - text: "ขอไปค่ายฟุตบอลภาคฤดูร้อน"
         effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.2}}
@@ -249,3 +249,32 @@ events:
         effects: {relations: 2, happiness: 1}
         sets_flags: [sporty]
         merit: [{cat: help_others, level: 1}]
+  # เรื่องต่อ kid_grandma_01 (วิ่งหายในตลาด) — ออกทาง next เท่านั้น
+  - id: kid_lost_market_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    title: "หลงในตลาด"
+    text: "เดินตามแมวเข้าซอยเล็กในตลาด หันกลับมาอีกทีไม่รู้จักร้านไหนเลย เสียงประกาศตามหาเด็กดังมาจากลำโพงไกล ๆ แต่ฟังไม่ออกว่าเรียกชื่อใคร"
+    choices:
+      - id: ask_vendor
+        text: "เข้าไปถามคนขายผลไม้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "คนขายจูงมือเดินไปส่งถึงหน้าแผง ยื่นมะม่วงให้ลูกหนึ่งก่อนกลับ", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนขายยุ่งจนไม่ได้ยิน ต้องยืนรอจนตลาดใกล้วาย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: police_box
+        text: "เดินไปป้อมยามหน้าตลาด"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: find_way
+        text: "หาทางกลับเองตามกลิ่นร้านขนม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "จำกลิ่นขนมหน้าแผงได้ เดินกลับมาเองก่อนใครจะหาเจอ", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ยิ่งเดินยิ่งไกล จนผู้ใหญ่ทั้งตลาดต้องช่วยกันตามหา", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+      - id: sit_and_cry
+        text: "นั่งร้องไห้ตรงนั้น"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
