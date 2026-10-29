@@ -442,13 +442,11 @@ function courtScene() {
   return wrap;
 }
 
-// ตายก่อนมีตัวเลือกหลังอายุ 18 พอ = ไม่มีแบบชีวิต (titles.mjs) — บอกเหตุแทนช่องว่าง
-const NO_PATTERN = { name: 'ยังบอกไม่ได้', hint: 'ชีวิตนี้สั้นเกินกว่าจะเห็นว่าเดินทางไหน' };
 // แบบชีวิต/ฉายาคิดครั้งเดียวต่อการ์ดตาย แล้วลงสมุดฉายา — กดย้อน/วาดซ้ำไม่นับซ้ำ
 function lifeTitles(card) {
   if (!card.lifeTitles) {
     const t = titlesOf(st);
-    card.lifeTitles = { ...t, pattern: t.pattern ?? NO_PATTERN };
+    card.lifeTitles = { ...t };
     bookAdd(t);
     card.lifeTitles.clue = titleClue(`${st.seed}:${st.gen}`, t);
     picsAdd();
@@ -913,7 +911,7 @@ function summaryText(age, realm = null) {
     `${GAME_NAME} · ${st.name}`,
     `เกิดปี ${st.birthYear} · ${provinceLabel(st)}`,
     `${lifeEndWord(isGone(st))} ${age}`,
-    `ชีวิตแบบ${(t.pattern ?? NO_PATTERN).name}`,
+    `ชีวิตแบบ${t.pattern.name}`,
     t.titles[0] ? `ฉายา ${t.titles[0].name} (${t.titles[0].tier})` : 'ยังไม่ได้ฉายา',
     realm && `ไปภูมิ${realm}`,
     `https://${SHARE_URL}`,
