@@ -1,5 +1,5 @@
 // harness ของแบบชีวิต + ฉายา (B10 · ใบ 04): บอทหลายบุคลิกเล่นต่อกันหลายรุ่น แล้วนับว่าแต่ละตัวออกกี่ %
-// ด่าน (1) ใบ 07: แบบชีวิต 17 แบบ + ฉายาทุกตัว (รวมฉายาตระกูล) ≥ MIN_RATE ของชีวิตทั้งหมดรวมทุกบุคลิก
+// ด่าน (1) ใบ 07: แบบชีวิตทุกแบบ (ผู้ใหญ่ 17 + ชีวิตสั้น) + ฉายาทุกตัว (รวมฉายาตระกูล) ≥ MIN_RATE ของชีวิตทั้งหมดรวมทุกบุคลิก
 // · ผลของ titlesOf ไม่มีค่าบัญชีบุญบาป (ขึ้นบนการ์ดตายก่อนปรโลกเฉลย) · พิมพ์ค่ากลาง/ช่วงแกนของบอทสุ่มให้ตั้ง AXES
 import { playLife, playAfterlife, nextLife, mixSeed } from '../src/engine/index.mjs';
 import { titlesOf, axisRaw, ALL_PATTERNS, TITLES, FAMILY_TITLES, AXES, PATTERN_MIN_PICKS } from '../src/engine/titles.mjs';

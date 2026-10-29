@@ -4,7 +4,7 @@
 // (การกระทำนั้นผู้เล่นเห็นในข้อความอยู่แล้ว) ไม่รวมยอด ไม่หักกลบ ไม่บอกฝั่งที่หนักกว่า
 import { allocOptions } from './finance.mjs';
 import { meritId, SIN_CATS } from './merit.mjs';
-import { CLASSES, LEVELS, RETIRE_AGE, riskLabel, netWorth, totalDebt, standingOf } from './life.mjs';
+import { CLASSES, LEVELS, RETIRE_AGE, riskLabel, netWorth, totalDebt, standingOf, stageOf } from './life.mjs';
 import { expectedDeathAge, eraEventsAt, protoYear } from './era.mjs';
 import { nationalIncome } from './birth.mjs';
 import { ladderOf } from './rank.mjs';
@@ -217,12 +217,40 @@ export const PATTERNS = [
   { id: 'WARD', name: 'ว่าวจุฬากลางสนามหลวง', hint: 'ทะยานสูงไกลบ้าน กล้าเสี่ยง และยังมีสายผูกใจไว้' },
 ];
 export const HALF = { id: 'HALF', name: 'น้ำครึ่งแก้ว', hint: 'ไม่สุดทางไหนเลย ทุกทางพอดี ๆ' };
-export const ALL_PATTERNS = [...PATTERNS, HALF];
+// ชีวิตสั้น: ตายหรือหายตัวก่อนมีตัวเลือกหลังอายุ 18 พอให้เห็นแบบชีวิตผู้ใหญ่ — ผู้เล่นยังควรได้ชื่อชีวิตจริงแทน "ยังบอกไม่ได้"
+// อ่านตัวเลือกตั้งแต่เกิดด้วย 2 แกนที่ไม่แตะป้ายบุญบาป เทียบค่ากลางวัยเด็ก/วัยรุ่นของบอทสุ่ม (STAGE_AXES)
+// ① ใกล้คนในบ้าน(H) ↔ ออกไปหาเรื่องเรียน/เพื่อน(O) · ② มั่นคง(S) ↔ เสี่ยง(R) · ไม่ทันมีตัวเลือกเลยได้แบบของตัวเอง
+// หายตัวก่อนมีตัวเลือกหลัง 18 พอ ไม่เกิดในบอททุกสาย จึงไม่มีแบบแยก (ของสะสมที่ไม่มีใครได้)
+// ชื่อเป็นภาพไทยแบบเดียวกับแบบผู้ใหญ่ · เล่าทาง ไม่สงสารหรือตัดสิน
+export const SHORT_PATTERNS = [
+  { id: 'K0', name: 'เทียนเล่มเล็ก', hint: 'จุดได้ไม่นาน แต่คนข้างตัวยังจำแสงนั้นได้' },
+  { id: 'KHS', name: 'ดอกมะลิริมรั้ว', hint: 'อยู่ใกล้คนในบ้าน เรียบง่าย หอมอ่อน ๆ' },
+  { id: 'KHR', name: 'ลูกนกหัดบิน', hint: 'กล้าลองทั้งที่ยังอยู่ใกล้รัง' },
+  { id: 'KOS', name: 'สมุดปกแข็ง', hint: 'ตั้งใจเรียน เดินตามที่วางไว้ทีละหน้า' },
+  { id: 'KOR', name: 'ลูกโป่งงานวัด', hint: 'ลอยไปหาเรื่องสนุกก่อนใคร ไม่กลัวลม' },
+];
+export const ALL_PATTERNS = [...PATTERNS, HALF, ...SHORT_PATTERNS];
 const POLES = [['F', 'W'], ['H', 'A'], ['S', 'R'], ['L', 'D']];
 
-// ชีวิตแบบไหน · null = ตัวเลือกหลังอายุ 18 ไม่พอให้เห็นแบบชีวิต
+function shortPattern(st) {
+  const find = (id) => SHORT_PATTERNS.find((p) => p.id === id);
+  const picks = picksAfter(st, 0).filter((p) => p.age < PATTERN_FROM);
+  const a = { work: 0, away: 0, risk: 0, dhamma: 0 };
+  let n = 0;
+  for (const p of picks) {
+    if (!pickBase(a, p)) continue;
+    pickFlags(a, p.c);
+    n++;
+  }
+  if (!n) return find('K0');
+  const ref = STAGE_AXES[KID_STAGES.includes(stageOf(st.age)) ? stageOf(st.age) : KID_STAGES.at(-1)];
+  const z = (k) => (a[k] / Math.sqrt(n) - ref[k][0]) / Math.max(SCALE_MIN, ref[k][1]);
+  return find(`K${z('work') > 0 ? 'O' : 'H'}${z('risk') > 0 ? 'R' : 'S'}`);
+}
+
+// ชีวิตแบบไหน · ตัวเลือกหลังอายุ 18 ไม่พอ = แบบชีวิตสั้น
 export function patternOf(st, raw = axisRaw(st)) {
-  if (raw.picks < PATTERN_MIN_PICKS) return null;
+  if (raw.picks < PATTERN_MIN_PICKS) return shortPattern(st);
   const z = axisZ(raw);
   if (z.filter((v) => Math.abs(v) < NEAR).length >= HALF_AXES) return HALF;
   const id = z.map((v, i) => POLES[i][v > 0 ? 1 : 0]).join('');
