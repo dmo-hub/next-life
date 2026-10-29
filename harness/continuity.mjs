@@ -4,8 +4,6 @@
 // ด่าน: ผลย้อนออกตรงปีที่นัด · ออกเมื่อ when ของมันผ่านเท่านั้น — เว้นการ์ดสายมู (category belief) ที่ระบบความเชื่อปล่อยเอง
 // และล้างธงที่ when อ่านไปพร้อมกับการ์ด (ตรวจที่ npm run belief) · --min-next / --min-echo = เป้าสัดส่วนชีวิต (ไม่ใส่ = รายงานอย่างเดียว)
 // รายชื่อปลายทางที่ไม่เคยออกให้เลน A ดูว่าเนื้อหาใหม่ถึงผู้เล่นจริง · ตารางแยกหมวดให้แต่ละเลนวัดก้อนของตัวเอง
-import { readdirSync, readFileSync } from 'node:fs';
-import { parse } from 'yaml';
 import { playLife, mixSeed, whenOk } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
@@ -29,15 +27,13 @@ const fail = [];
 const drawn = [...NEXT, ...ECHO].filter((id) => byId[id] && (byId[id].weight || byId[id].age !== undefined));
 if (drawn.length) fail.push(`ปลายทางที่อยู่ในกองสุ่ม/หลักไมล์ด้วย นับแยกไม่ได้: ${drawn.join(' ')}`);
 
-// หมวดของสาย — loadContent ไม่เก็บไฟล์ต้นทาง จึงอ่าน yaml ซ้ำเพื่อจับ id กับไฟล์ (หนี้/ทุจริตเป็นไฟล์ ไม่ใช่ category)
-// ดูทั้งสายของปลายทาง (ต้นทางทุกชั้น + ปลายทางถัดไปทุกชั้น) ไม่ใช่ใบต้นทางใบเดียว: สายหนี้หลายสายเริ่มจากการ์ดทั่วไป
-// ใน young/mid แล้วค่อยต่อเข้า debt.yaml · ใบหนึ่งแตะได้หลายหมวด จึงไล่ตามลำดับ CATS หมวดแรกที่ตรงชนะ
+// หมวดของสาย — จับจากเนื้อของการ์ด ไม่ใช่ชื่อไฟล์: สายหนี้/โกงหลายสายอยู่ในไฟล์ช่วงวัย (young · mid · old) ไม่ใช่ debt/corruption.yaml
+// ดูทั้งสายของปลายทาง (ต้นทางทุกชั้น + ปลายทางถัดไปทุกชั้น) ไม่ใช่ใบต้นทางใบเดียว · ใบหนึ่งแตะได้หลายหมวด จึงไล่ตามลำดับ CATS หมวดแรกที่ตรงชนะ
 const TARGET = new Set([...NEXT, ...ECHO]);
-const contentDir = new URL('../content/', import.meta.url);
-const fileOf = {};
-for (const f of readdirSync(contentDir).filter((x) => x.endsWith('.yaml'))) {
-  for (const e of parse(readFileSync(new URL(f, contentDir), 'utf8')).events ?? []) fileOf[e.id] = f;
-}
+const DEBT_FLAGS = ['in_debt', 'loan_shark', 'guarantor'];
+const FRAUD_FLAGS = ['embezzler', 'took_bribe', 'caught_fraud'];
+const parts = (e) => (e?.choices ?? []).flatMap((c) => [c, ...(c.outcomes ?? [])]);
+const anyPart = (id, test) => parts(byId[id]).some(test);
 const up = new Map(), down = new Map();
 const link = (from, to) => {
   for (const [m, a, b] of [[up, to, from], [down, from, to]]) (m.get(a) ?? m.set(a, new Set()).get(a)).add(b);
@@ -55,11 +51,13 @@ const walk = (id, m) => {
   return seen;
 };
 const CATS = [
-  ['หนี้', (id) => fileOf[id] === 'debt.yaml'],
-  ['ทุจริต', (id) => fileOf[id] === 'corruption.yaml'],
+  // สายมูปล่อย/ล้างธงเอง (ระบบความเชื่อ) — แยกก่อน ไม่ให้ไปปนหมวดเรื่องที่บนบานถึง
+  ['มู', (id) => id.startsWith('bel_') || byId[id]?.category === 'belief'],
+  ['ทุจริต', (id) => anyPart(id, (w) => (w.merit ?? []).some((m) => m.cat === 'greed_harm' && (m.level ?? 1) >= 2) || (w.sets_flags ?? []).some((f) => FRAUD_FLAGS.includes(f)))],
+  ['หนี้', (id) => anyPart(id, (w) => w.effects?.debt || (w.sets_flags ?? []).some((f) => DEBT_FLAGS.includes(f)))],
   ['สุขภาพ', (id) => byId[id]?.category === 'health'],
   ['ครอบครัว', (id) => byId[id]?.category === 'family'],
-  ['อื่น', () => true],
+  ['งาน/เงิน', () => true],
 ];
 const catOf = new Map();
 const cat = Object.fromEntries(CATS.map(([k]) => [k, { roots: new Set(), targets: 0, withNext: 0, nextCards: 0, longEcho: 0 }]));
