@@ -21,7 +21,7 @@ events:
         text: "นอนพักก่อน เดี๋ยวก็หาย"
         outcomes:
           - {weight: 1, ok: true, text: "ตื่นมาหายเป็นปลิดทิ้ง หมอบอกว่าเป็นแค่เส้นเลือดตีบชั่วคราว รอบหน้าไม่รอดแน่", effects: {health: 1, knowledge: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ตื่นมาอีกทีพูดไม่ได้ทั้งประโยค ต้องมีคนป้อนข้าว", effects: {health: -2, happiness: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตื่นมาอีกทีพูดไม่ได้ทั้งประโยค ต้องมีคนป้อนข้าว", effects: {health: -2, happiness: -2, chronic: {health: -1}}, merit: [{cat: neutral}], next: oldh_stroke_care_01}
         merit: [{cat: neutral}]
       - id: aspirin_wait
         text: "กินแอสไพรินแล้วนั่งรอหลานกลับ"
@@ -51,7 +51,7 @@ events:
         text: "ยอมไปตรวจสมองให้รู้เรื่อง"
         outcomes:
           - {weight: 1, ok: true, text: "หักมุม! แค่ขาดวิตามินบีสิบสอง กินยาเดือนเดียวความจำกลับมาแจ๋ว", multipliers: {karma: 1.4}, effects: {health: 2, happiness: 2}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "อัลไซเมอร์ระยะแรก หมอให้ยาชะลอ ได้เวลาเตรียมใจกันทั้งบ้าน", effects: {health: -1, relations: 1, chronic: {knowledge: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "อัลไซเมอร์ระยะแรก หมอให้ยาชะลอ ได้เวลาเตรียมใจกันทั้งบ้าน", effects: {health: -1, relations: 1, chronic: {knowledge: -1}}, merit: [{cat: neutral}], next: oldh_dementia_plan_01}
         merit: [{cat: neutral}]
       - id: deny_it
         text: "โวยว่าทุกคนใส่ร้าย ไม่ได้ลืม"
@@ -199,7 +199,7 @@ events:
         text: "ช่างมัน ยังขับรถไปตลาดเองได้"
         outcomes:
           - {weight: 1, ok: true, text: "รอดทุกเที่ยวแบบไม่มีใครเข้าใจ", effects: {happiness: 1, health: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ถอยชนเสาไฟหน้าบ้าน หลานยึดกุญแจรถทันที", effects: {health: -1, relations: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ถอยชนเสาไฟหน้าบ้าน หลานยึดกุญแจรถทันที", effects: {health: -1, relations: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}], next: oldh_car_keys_01}
         merit: [{cat: neutral}]
 
   - id: oldh_copd_01
@@ -390,4 +390,89 @@ events:
       - id: run_quiet
         text: "ไม่รับอะไร วิ่งเงียบ ๆ ต่อไป"
         effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ oldh_stroke_01 (นอนรอ พูดไม่ได้) — ออกทาง next เท่านั้น
+  - id: oldh_stroke_care_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    title: "ใครจะป้อนข้าว"
+    text: "ออกจากโรงพยาบาลพร้อมรถเข็นกับกระดาษนัดกายภาพทุกอาทิตย์ คนในบ้านนั่งล้อมวงคุยกันเสียงเบา ว่าใครจะอยู่ดูแลตอนกลางวัน"
+    choices:
+      - id: home_rotation
+        text: "ให้คนในบ้านผลัดกันดูแล"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ทุกคนจัดเวรกันลงตัว ได้นั่งกินข้าวพร้อมหน้าบ่อยกว่าตอนยังแข็งแรง", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เวรล่มทุกอาทิตย์ ได้ยินเสียงทะเลาะกันหน้าห้องบ่อย ๆ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: hire_carer
+        text: "จ้างคนดูแลประจำ"
+        effects: {health: 1, money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+      - id: care_home
+        text: "ขอไปอยู่สถานดูแลผู้สูงอายุ"
+        effects: {health: 1, relations: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: physio_hard
+        text: "ฝึกกายภาพเองทุกวันไม่ยอมแพ้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.5}}, text: "หกเดือนต่อมาพูดได้เป็นประโยค ตักข้าวกินเองได้อีกครั้ง", effects: {health: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ฝึกหนักจนล้มในห้องน้ำ ต้องเริ่มนับหนึ่งใหม่", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+  # เรื่องต่อ oldh_cataract_01 (ขับรถทั้งตาฝ้า ถูกยึดกุญแจ) — ออกทาง next เท่านั้น
+  - id: oldh_car_keys_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    title: "กุญแจในลิ้นชัก"
+    text: "กุญแจรถถูกเก็บใส่ลิ้นชักที่ล็อกไว้ ตลาดเช้าที่เคยขับไปเองทุกวันกลายเป็นที่ที่ต้องรอคนว่างพาไป"
+    choices:
+      - id: sneak_drive
+        text: "แอบเอากุญแจสำรองขับเอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ไปกลับตลาดได้โดยไม่มีใครรู้ เกือบเฉี่ยวรถเข็นผลไม้หน้าวัด", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เลี้ยวชนรั้วบ้านข้าง ๆ คราวนี้รถถูกขายทิ้งทั้งคัน", effects: {health: -1, relations: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+      - id: take_bus
+        text: "ยอมนั่งรถสองแถวไปตลาด"
+        effects: {happiness: -1, relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: eye_surgery
+        text: "ไปผ่าต้อให้จบเรื่อง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, multipliers: {stats: {health: 1.3}}, text: "ผ่าเสร็จมองเห็นชัดจนอ่านป้ายได้ไกลสุดถนน กุญแจถูกคืนพร้อมคำเตือน", effects: {health: 1, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตาอักเสบหลังผ่า ต้องนั่งอยู่บ้านอีกเดือน", effects: {health: -1}, merit: [{cat: neutral}]}
+      - id: order_delivery
+        text: "สั่งของส่งถึงบ้านแทน"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ oldh_dementia_01 (อัลไซเมอร์ระยะแรก) — ออกทาง next เท่านั้น
+  - id: oldh_dementia_plan_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    title: "ก่อนจะลืม"
+    text: "หมอบอกว่าช่วงนี้ยังจำได้เกือบทุกอย่าง แต่จะไม่เป็นแบบนี้ตลอดไป สมุดบัญชี โฉนด กับรหัสต่าง ๆ ยังอยู่ในหัวคนเดียว"
+    choices:
+      - id: write_will
+        text: "เขียนพินัยกรรมให้ชัด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ทนายมาอ่านให้ฟังทีละข้อ เซ็นเสร็จแล้วโล่งเหมือนวางของหนัก", effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขียนเสร็จแล้วมีคนไม่พอใจส่วนแบ่ง งานกินข้าวเดือนนั้นเงียบกริบ", effects: {relations: -1}, merit: [{cat: neutral}]}
+      - id: hand_accounts
+        text: "มอบบัญชีให้คนที่ไว้ใจ"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: memory_box
+        text: "อัดเสียงเล่าเรื่องเก่าเก็บไว้"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: keep_all
+        text: "เก็บทุกอย่างไว้เองต่อ"
+        effects: {happiness: 1, relations: -1}
         merit: [{cat: neutral}]

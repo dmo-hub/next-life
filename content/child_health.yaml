@@ -209,7 +209,7 @@ events:
         text: "ยอมกินยาหม้อสูตรยาย"
         outcomes:
           - {weight: 1, ok: true, text: "อาการเบาลงจริง ไม่มีใครรู้ว่าเพราะยาหรือเพราะหน้าหนาวหมด", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ไม่ดีขึ้นเลย หอบติดตัวเป็นโรคประจำตัวไปอีกนาน", effects: {health: -1, chronic: {health: -1}}, sets_flags: [weak_lungs], schedules: [{event: child_lungs_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไม่ดีขึ้นเลย หอบติดตัวเป็นโรคประจำตัวไปอีกนาน", effects: {health: -1, chronic: {health: -1}}, sets_flags: [weak_lungs], schedules: [{event: child_lungs_01, after_years: [1, 1]}], merit: [{cat: neutral}], next: child_asthma_school_01}
         merit: [{cat: neutral}]
       - id: wait_outgrow
         text: "แอบทิ้งยาพ่น บอกว่าไม่เป็นไร"
@@ -315,3 +315,32 @@ events:
         text: "แจกที่เหลือให้น้องอนุบาล"
         effects: {happiness: 1, relations: 2}
         merit: [{cat: dana, level: 1}]
+  # เรื่องต่อ child_asthma_01 (ยาหม้อไม่ได้ผล) — ออกทาง next เท่านั้น
+  - id: child_asthma_school_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    title: "ห้องพยาบาลโรงเรียน"
+    text: "หอบหนักกลางคาบพละ ครูพยาบาลจับนั่งพ่นยาในห้องพยาบาล แล้วเขียนจดหมายใส่ซองฝากกลับบ้าน บอกว่าต้องพาไปหาหมอเด็กจริงจัง"
+    choices:
+      - id: give_letter
+        text: "เอาจดหมายให้ผู้ใหญ่ในบ้าน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.4}}, text: "ได้ไปหาหมอเด็ก ได้ยาพ่นตัวใหม่กับตารางกินยา หอบน้อยลงจนวิ่งเล่นได้", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ใหญ่ในบ้านเถียงกันว่ายาหม้อหรือยาหมอดีกว่า สุดท้ายไม่มีใครพาไป", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: hide_letter
+        text: "ซ่อนจดหมาย กลัวโดนดุ"
+        effects: {health: -1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: skip_pe
+        text: "ขอครูงดวิชาพละ"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: practice_breath
+        text: "ฝึกหายใจตามที่ครูสอน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝึกทุกเช้าจนหายใจได้ยาวขึ้น ครูให้ไปสอนเพื่อนที่เป็นแบบเดียวกัน", effects: {health: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝึกได้สามวันก็ลืม หอบอีกตอนหน้าหนาว", effects: {health: -1}, merit: [{cat: neutral}]}

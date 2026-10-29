@@ -24,7 +24,7 @@ events:
         text: "ลองสมุนไพรที่ญาติส่งในไลน์"
         outcomes:
           - {weight: 1, ok: true, text: "ค่าน้ำตาลลดจริง หมอยังงงจนขอชื่อสมุนไพร", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}], multipliers: {karma: 1.4}, next: midh_herb_fame_01}
-          - {weight: 3, text: "ไตเริ่มรวน สุดท้ายต้องกลับไปหาหมอพร้อมค่ารักษาก้อนโต", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ไตเริ่มรวน สุดท้ายต้องกลับไปหาหมอพร้อมค่ารักษาก้อนโต", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}], next: midh_kidney_herb_01}
         merit: [{cat: neutral}]
       - id: weight_camp
         text: "เข้าคอร์สคุมน้ำหนักราคาแพง"
@@ -89,13 +89,13 @@ events:
         text: "บินไปรักษาทางเลือกต่างประเทศ"
         outcomes:
           - {weight: 1, text: "หมอที่นั่นอ่านผลแล้วส่งตัวกลับไปผ่าตัดตามแผนเดิม ได้เที่ยวเป็นของแถม", effects: {happiness: 1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
-          - {weight: 3, text: "กลับมาพร้อมใบเสร็จยาวเหยียดและมะเร็งระยะสอง", effects: {health: -3, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "กลับมาพร้อมใบเสร็จยาวเหยียดและมะเร็งระยะสอง", effects: {health: -3, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], next: midh_cancer_late_01}
         merit: [{cat: neutral}]
       - id: secret_trip
         text: "ไม่บอกใคร แล้วออกเที่ยวรอบโลก"
         outcomes:
           - {weight: 1, ok: true, text: "กลับมาตรวจซ้ำ ผลแรกสลับชื่อกับคนไข้อีกคน เที่ยวฟรีเลยรอบนี้", effects: {health: 1, happiness: 3, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ทริปนี้ดีที่สุดในชีวิต แต่ก้อนก็โตไปพร้อมกัน", effects: {health: -2, happiness: 2, relations: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทริปนี้ดีที่สุดในชีวิต แต่ก้อนก็โตไปพร้อมกัน", effects: {health: -2, happiness: 2, relations: -1, chronic: {health: -1}}, merit: [{cat: neutral}], next: midh_cancer_late_01}
         merit: [{cat: neutral}]
       - id: surgery_reset
         text: "ผ่าตัด แล้วเลิกทุกนิสัยเสีย"
@@ -124,8 +124,8 @@ events:
       - id: bus_home
         text: "นั่งพักแล้วนั่งรถเมล์กลับบ้าน"
         outcomes:
-          - {weight: 2, text: "อาการหายไปเอง แต่หัวใจจำครั้งนี้ไว้", effects: {chronic: {health: -1}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ตีสามคืนนั้นหัวใจวาย คนข้างบ้านหามขึ้นรถไปส่ง รพ.", effects: {health: -3, relations: 1, chronic: {health: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "อาการหายไปเอง แต่หัวใจจำครั้งนี้ไว้", effects: {chronic: {health: -1}}, merit: [{cat: neutral}], next: midh_heart_checkup_01}
+          - {weight: 1, text: "ตีสามคืนนั้นหัวใจวาย คนข้างบ้านหามขึ้นรถไปส่ง รพ.", effects: {health: -3, relations: 1, chronic: {health: -1}}, merit: [{cat: neutral}], next: midh_heart_after_01}
         merit: [{cat: neutral}]
       - id: massage_shop
         text: "แวะร้านนวดกดจุดปากซอย"
@@ -172,7 +172,7 @@ events:
         text: "ทนปวด ไปปิดงานใหญ่ให้จบ"
         outcomes:
           - {weight: 1, ok: true, text: "ปิดงานได้ทันกำหนด คนจ้างเห็นความอึดเลยขึ้นค่าตัวให้", effects: {health: -1, income_mult: 1.2}, merit: [{cat: neutral}], multipliers: {stats: {health: 1.5}}}
-          - {weight: 2, text: "เป็นลมกลางที่ทำงาน งานไม่จบ นิ่วก็ยังอยู่", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เป็นลมกลางที่ทำงาน งานไม่จบ นิ่วก็ยังอยู่", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}], next: midh_faint_work_01}
         merit: [{cat: neutral}]
       - id: share_room
         text: "รอคิวส่องกล้องฟรีที่ รพ.รัฐ"
@@ -311,4 +311,120 @@ events:
       - id: keep_secret
         text: "เก็บสูตรไว้กินคนเดียว"
         effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ midh_heart_01 (นั่งรถเมล์กลับ อาการหายเอง) — ออกทาง next เท่านั้น
+  - id: midh_heart_checkup_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "คลื่นหัวใจไม่เรียบ"
+    text: "ตรวจสุขภาพประจำปีของบริษัทปีนี้ เส้นคลื่นหัวใจบนกระดาษมีหยักแปลก ๆ อยู่สองช่วง พยาบาลวงปากกาแดงไว้ แล้วเขียนว่า ควรพบแพทย์โรคหัวใจ"
+    choices:
+      - id: see_cardio
+        text: "ไปหาหมอหัวใจตามนัด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.4}}, text: "หมอเจอเส้นเลือดตีบก่อนมันจะตัน ได้ยามากินทุกเช้า กับใบสั่งให้เดินวันละครึ่งชั่วโมง", effects: {health: 1, money: {unit: income_x, amount: -0.3}, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คิวหมอหัวใจยาวสามเดือน ระหว่างรอเหนื่อยง่ายขึ้นทุกอาทิตย์", effects: {health: -1}, merit: [{cat: neutral}]}
+      - id: ignore_paper
+        text: "พับกระดาษเก็บใส่ลิ้นชัก"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: cut_fried
+        text: "เลิกของทอด เดินเช้าเอง"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: search_online
+        text: "หาข้อมูลเองในเน็ต"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.4}}, text: "อ่านเจอบทความหมอหัวใจที่เขียนตรงอาการ เลยยอมไปตรวจจริงจัง", effects: {knowledge: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "อ่านกระทู้ทั้งคืนจนเครียด นอนไม่หลับไปหลายวัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+  # เรื่องต่อ midh_kidney_stone_01 (ทนปวดจนเป็นลมที่ทำงาน) — ออกทาง next เท่านั้น
+  - id: midh_faint_work_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ห้องหัวหน้า"
+    text: "กลับมาทำงานวันแรกหลังเป็นลม หัวหน้าเรียกเข้าห้อง ปิดประตู แล้ววางแฟ้มงานที่ค้างไว้บนโต๊ะ ถามว่าจะเอายังไงกับสุขภาพตัวเอง"
+    choices:
+      - id: sick_leave
+        text: "ขอลาป่วยไปรักษาให้จบ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "หัวหน้าเซ็นให้ลาสองอาทิตย์ ส่องกล้องเอานิ่วออก กลับมาทำงานตัวเบาเหมือนคนใหม่", effects: {health: 2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลาได้ แต่งานชิ้นใหญ่ถูกโอนให้คนอื่นถาวร", effects: {health: 1, happiness: -1, income_mult: 0.95}, merit: [{cat: neutral}]}
+      - id: promise_fine
+        text: "ยืนยันว่าไหว ทำต่อได้"
+        effects: {health: -1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hand_over
+        text: "ขอแบ่งงานให้ทีมช่วย"
+        effects: {health: 1, relations: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: quit_job
+        text: "ลาออกไปพักใหญ่"
+        effects: {health: 2, happiness: 1, money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ midh_diabetes_01 (สมุนไพรไลน์ ไตรวน) — ออกทาง next เท่านั้น
+  - id: midh_kidney_herb_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ค่าไตบนกระดาษ"
+    text: "หมอวางผลเลือดเทียบกับปีก่อน ค่าไตขึ้นเกือบเท่าตัว ขวดสมุนไพรในกระเป๋ายังเหลืออีกครึ่ง หมอถามว่ายังกินอยู่ไหม"
+    choices:
+      - id: strict_diet
+        text: "เลิกสมุนไพร คุมอาหารตามหมอ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.4}}, text: "หกเดือนต่อมาค่าไตนิ่ง หมอบอกว่ายังทันก่อนต้องฟอก", effects: {health: 1, happiness: -1, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุมได้ครึ่งปีแล้วหลุด ค่าไตไต่ขึ้นช้า ๆ", effects: {health: -1}, merit: [{cat: neutral}]}
+      - id: dialysis
+        text: "เตรียมใจฟอกไต"
+        effects: {health: 1, happiness: -2, money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+      - id: keep_herb
+        text: "กินสมุนไพรต่อ หมอไม่รู้จริง"
+        effects: {health: -2, chronic: {health: -1}}
+        merit: [{cat: neutral}]
+      - id: warn_group
+        text: "โพสต์เตือนในกลุ่มไลน์ญาติ"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ญาติอีกสองคนเลิกกินตาม แล้วโทรมาขอบคุณ", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "คนส่งสมุนไพรโกรธ หาว่าทำให้ขายของไม่ได้", effects: {relations: -1}, merit: [{cat: neutral}]}
+  # เรื่องต่อ midh_cancer_early_01 (รักษาทางเลือก · เที่ยวรอบโลก ก้อนโต) — ออกทาง next เท่านั้น
+  - id: midh_cancer_late_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ระยะสอง"
+    text: "ฟิล์มใหม่วางคู่ฟิล์มเก่า ก้อนโตขึ้นจนเห็นด้วยตาเปล่า หมอพูดคำว่าระยะสองช้า ๆ แล้วเลื่อนกล่องทิชชูมาไว้ใกล้มือ"
+    choices:
+      - id: chemo
+        text: "เข้าคีโมเต็มคอร์ส"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.5}}, text: "ผมร่วงหมดหัว อาเจียนทุกรอบ แต่ผลตรวจหลังคอร์สสุดท้ายไม่เจอก้อนแล้ว", effects: {health: 1, happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร่างกายทนยาไม่ไหว ต้องหยุดกลางคอร์ส", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+      - id: tell_family
+        text: "บอกคนในบ้านทุกอย่าง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.4}}, text: "ทุกคนช่วยกันจัดเวรพาไปหาหมอ ไม่มีใครต้องไปคนเดียวสักรอบ", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทุกคนโกรธที่ปิดไว้นาน บ้านเงียบไปหลายวัน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: sell_house
+        text: "ขายบ้านมารักษาที่ดีที่สุด"
+        requires: {flags: {has: [home_owner]}, reason: "ไม่มีบ้านของตัวเองให้ขาย"}
+        effects: {health: 2, money: {unit: income_x, amount: 3}, happiness: -1}
+        clears_flags: [home_owner]
+        merit: [{cat: neutral}]
+      - id: public_rights
+        text: "ใช้สิทธิ์ รพ.รัฐรักษาต่อ"
+        effects: {health: 1, happiness: -1}
         merit: [{cat: neutral}]
