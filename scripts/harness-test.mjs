@@ -151,7 +151,8 @@ const f2 = (v) => v.toFixed(2);
 {
   const base = loadContent();
   const src = base.events.find((e) => e.stage === 'วัยรุ่น' && e.type === 'A' && !e.when);
-  const content = { ...base, events: [...base.events, { ...src, id: 'pf_probe', multipliers: undefined, weight: 1000, when: { parent_flags: { has: ['smoker'] } } }] };
+  // ตัดการ์ดทายาทจริงออก — ให้ pf_probe เป็นผู้อ่านธงพ่อแม่ใบเดียว ผลไม่ขยับตามเนื้อหา
+  const content = { ...base, events: [...base.events.filter((e) => !e.when?.parent_flags), { ...src, id: 'pf_probe', multipliers: undefined, weight: 1000, when: { parent_flags: { has: ['smoker'] } } }] };
   const pick = (card) => (card.locked ? card.locked.findIndex((x) => !x) : 0);
   const run = (parentFlags) => {
     const seen = [];

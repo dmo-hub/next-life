@@ -219,8 +219,10 @@ const heirControls = {
   'from_age ติดลบ': { ...flagReg, heir: { ...flagReg.heir, smoker: { tier: 1, tell: 'x', from_age: -1 } } },
 };
 for (const [name, r] of Object.entries(heirControls)) if (!heirCheck(r, realDocs).problems.length) fails.push(`ทะเบียน heir: ตัวควบคุม "${name}" ไม่ตก`);
-// ไม่มีผู้อ่าน = รายงานก่อน — การ์ดทายาทของเนื้อหายังไม่เข้า (เปิดเป็นด่านพร้อมการ์ดชุดนั้น)
-rows.push(['ทะเบียน heir:', `${Object.keys(flagReg.heir ?? {}).length} ธง · ตัวควบคุม ${Object.keys(heirControls).length} แบบ · ยังไม่มีการ์ดอ่าน ${heir.unread.length}${heir.unread.length ? `: ${heir.unread.join(' ')}` : ''}`]);
+// ธงในทะเบียนที่ไม่มีการ์ดอ่าน = แกนส่งไปเปล่า ๆ ผู้เล่นไม่เคยเห็นผล
+for (const f of heir.unread) fails.push(`ทะเบียน heir: "${f}" ไม่มีการ์ดอ่าน (when.parent_flags / multipliers.parent_flags)`);
+if (!heirCheck(flagReg, []).unread.length) fails.push('ทะเบียน heir: ตัวควบคุม "ไม่มีการ์ด" ไม่ตก');
+rows.push(['ทะเบียน heir:', `${Object.keys(flagReg.heir ?? {}).length} ธง · ตัวควบคุม ${Object.keys(heirControls).length + 1} แบบ · ไม่มีการ์ดอ่าน ${heir.unread.length}`]);
 
 try {
   const real = loadEvents();
