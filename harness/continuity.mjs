@@ -1,0 +1,87 @@
+// เรื่องต่อ + ผลย้อน (เฟส 1): ผู้เล่นเจอผลของการเลือกตามมาจริงไหม — บอททุกสายเล่นเนื้อหาจริง
+// เรื่องต่อ = การ์ดปลายทาง next ของผลสุ่ม (ออกปีเดียวกัน) · ผลย้อน = การ์ดที่ schedules นัดไว้ปีหลัง
+// ปลายทางทั้งสองแบบไม่อยู่ในกองสุ่ม/หลักไมล์ (ด่านตรวจข้างล่าง) การ์ดที่เห็นจึงนับเป็นผลของการเลือกได้ตรง ๆ
+// ด่าน: ผลย้อนออกตรงปีที่นัด · ออกเมื่อ when ของมันผ่านเท่านั้น — เว้นการ์ดสายมู (category belief) ที่ระบบความเชื่อปล่อยเอง
+// และล้างธงที่ when อ่านไปพร้อมกับการ์ด (ตรวจที่ npm run belief) · --min-next / --min-echo = เป้าสัดส่วนชีวิต (ไม่ใส่ = รายงานอย่างเดียว)
+// รายชื่อปลายทางที่ไม่เคยออกให้เลน A ดูว่าเนื้อหาใหม่ถึงผู้เล่นจริง
+import { playLife, mixSeed, whenOk } from '../src/engine/index.mjs';
+import { loadContent } from '../src/node/load.mjs';
+import { BOTS } from './bots.mjs';
+
+const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? Number(process.argv[i + 1]) : d; };
+const n = arg('--n', 4000), seed = arg('--seed', 1);
+const minNext = arg('--min-next', null), minEcho = arg('--min-echo', null);
+// ชีวิตยาว = อยู่ถึงอายุนี้ — ผลย้อนนัดหลายปี ชีวิตสั้นไม่มีเวลาให้ทวง
+const LONG_AGE = 50;
+const content = loadContent();
+const byId = Object.fromEntries(content.events.map((e) => [e.id, e]));
+const NEXT = new Set(), ECHO = new Set();
+for (const e of content.events) for (const c of e.choices ?? []) {
+  for (const s of c.schedules ?? []) ECHO.add(s.event);
+  for (const o of c.outcomes ?? []) {
+    if (o.next) NEXT.add(o.next);
+    for (const s of o.schedules ?? []) ECHO.add(s.event);
+  }
+}
+const fail = [];
+const drawn = [...NEXT, ...ECHO].filter((id) => byId[id] && (byId[id].weight || byId[id].age !== undefined));
+if (drawn.length) fail.push(`ปลายทางที่อยู่ในกองสุ่ม/หลักไมล์ด้วย นับแยกไม่ได้: ${drawn.join(' ')}`);
+
+const seenTarget = new Map();
+const rows = [];
+let offDate = 0, offWhen = 0;
+for (const [name, bot] of Object.entries(BOTS)) {
+  const r = { name, lives: 0, withNext: 0, nextCards: 0, long: 0, longEcho: 0, booked: 0, echoCards: 0 };
+  for (let i = 0; i < n / Object.keys(BOTS).length; i++) {
+    let next = 0, echo = 0, age = 0;
+    // ช่วงอายุที่นัดไว้ต่อปลายทาง จดจากตัวเลือกที่บอทกด (ทุกผลสุ่มของตัวเลือกนั้น) — นัดปีเดียวกันถูกใช้ก่อนการ์ดใบถัดไปออก อ่าน st.scheduled ไม่ทัน
+    const booked = [];
+    let at = 0;
+    const pick = (card, rng, x) => {
+      const idx = bot(card, rng, x);
+      const c = card.kind === 'event' && byId[card.id]?.choices?.[idx];
+      for (const w of c ? [c, ...(c.outcomes ?? [])] : []) for (const sc of w.schedules ?? []) booked.push([sc.event, at + sc.after_years[0], at + sc.after_years[1]]);
+      return idx;
+    };
+    playLife(mixSeed(seed, i), content, pick, (card, st) => {
+      age = at = st.age;
+      if (card.kind !== 'event' || !card.id) return;
+      if (NEXT.has(card.id)) next++;
+      if (ECHO.has(card.id)) {
+        echo++;
+        if (byId[card.id].category !== 'belief' && !booked.some(([id, lo, hi]) => id === card.id && st.age >= lo && st.age <= hi)) offDate++;
+        if (byId[card.id].category !== 'belief' && !whenOk(st, byId[card.id].when)) offWhen++;
+      }
+      if (NEXT.has(card.id) || ECHO.has(card.id)) seenTarget.set(card.id, (seenTarget.get(card.id) ?? 0) + 1);
+    });
+    r.lives++;
+    r.nextCards += next;
+    if (next) r.withNext++;
+    r.booked += booked.length;
+    r.echoCards += echo;
+    if (age >= LONG_AGE) {
+      r.long++;
+      if (echo) r.longEcho++;
+    }
+  }
+  rows.push(r);
+}
+
+const pct = (a, b) => (b ? `${((100 * a) / b).toFixed(2)}%` : '—');
+console.log(`ปลายทางในเนื้อหา: เรื่องต่อ ${NEXT.size} ใบ · ผลย้อน ${ECHO.size} ใบ · ${n.toLocaleString('en-US')} ชีวิต · seed ${seed}`);
+console.log('บอท          ชีวิตที่เจอเรื่องต่อ   เรื่องต่อ/ชีวิต   ชีวิตยาว (≥50) ที่เจอผลย้อน   นัด → ออก');
+const all = { lives: 0, withNext: 0, long: 0, longEcho: 0 };
+for (const r of rows) {
+  for (const k of Object.keys(all)) all[k] += r[k];
+  console.log(`${r.name.padEnd(12)} ${pct(r.withNext, r.lives).padStart(10)}            ${(r.nextCards / r.lives).toFixed(2).padStart(5)}          ${pct(r.longEcho, r.long).padStart(8)} (${r.long})            ${r.booked} → ${r.echoCards}`);
+}
+console.log(`รวม         ${pct(all.withNext, all.lives).padStart(10)}                             ${pct(all.longEcho, all.long).padStart(8)} (${all.long})`);
+const never = [...NEXT, ...ECHO].filter((id) => !seenTarget.has(id));
+console.log(never.length ? `ปลายทางที่ไม่เคยออก ${never.length} ใบ: ${never.join(' ')}` : 'ปลายทางออกครบทุกใบ');
+
+if (offDate) fail.push(`ผลย้อนออกไม่ตรงปีที่นัด ${offDate} ครั้ง`);
+if (offWhen) fail.push(`ผลย้อนออกทั้งที่ when ไม่ผ่าน ${offWhen} ครั้ง`);
+if (minNext !== null && (100 * all.withNext) / all.lives < minNext) fail.push(`ชีวิตที่เจอเรื่องต่อต่ำกว่าเป้า ${minNext}%`);
+if (minEcho !== null && (100 * all.longEcho) / Math.max(1, all.long) < minEcho) fail.push(`ชีวิตยาวที่เจอผลย้อนต่ำกว่าเป้า ${minEcho}%`);
+console.log(fail.length ? `\nตก: ${fail.join(' · ')}` : `\nผลย้อนออกตรงนัดและตาม when${minNext === null && minEcho === null ? ' (ไม่มีเป้าสัดส่วน — รายงานอย่างเดียว)' : ' · ถึงเป้าสัดส่วน'} → ผ่าน`);
+process.exit(fail.length ? 1 : 0);
