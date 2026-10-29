@@ -171,13 +171,13 @@ events:
         sets_flags: [lent_friend]
         outcomes:
           - {weight: 1, ok: true, text: "เพื่อนคืนครบพร้อมกระเช้าผลไม้ ซึ้งจนพูดไม่ออก", multipliers: {stats: {relations: 2}}, effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
-          - {weight: 2, text: "เพื่อนบล็อกไลน์ ย้ายบ้านหายเงียบ", effects: {money: {unit: income_x, amount: -1}, happiness: -2, relations: -1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 2, text: "เพื่อนบล็อกไลน์ ย้ายบ้านหายเงียบ", effects: {money: {unit: income_x, amount: -1}, happiness: -2, relations: -1}, merit: [{cat: help_others, level: 1}], next: debt_friend_gone_01}
         merit: [{cat: help_others, level: 1}]
       - id: loan_shark
         text: "กู้นอกระบบมาเปิดท้ายขายของ"
         outcomes:
           - {weight: 1, ok: true, text: "ขายดีจนปิดหนี้ได้ในครึ่งปี", effects: {money: {unit: income_x, amount: 2}, happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ดอกทบดอก คนทวงหนี้มายืนหน้าห้องทุกเช้า", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 0.8}}, money: {unit: income_x, amount: -0.8}, health: -1, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ดอกทบดอก คนทวงหนี้มายืนหน้าห้องทุกเช้า", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 0.8}}, money: {unit: income_x, amount: -0.8}, health: -1, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}], next: debt_shark_young_door_01}
         merit: [{cat: neutral}]
       - id: bike
         text: "ไม่ซื้อ ไม่ให้ยืม ปั่นจักรยานไป"
@@ -329,7 +329,7 @@ events:
         text: "กู้ค่าหัวไปเป็นแรงงานผิดกฎหมาย"
         outcomes:
           - {weight: 1, ok: true, text: "รอดการตรวจมาได้ เก็บเงินก้อนโตกลับบ้าน", effects: {money: {unit: income_x, amount: 3}, health: -1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ถูกจับส่งกลับกลางดึก หนี้ค่าหัวค้างเต็มบ่า", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 0.8}}, money: {unit: income_x, amount: -0.8}, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถูกจับส่งกลับกลางดึก หนี้ค่าหัวค้างเต็มบ่า", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 0.8}}, money: {unit: income_x, amount: -0.8}, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}], next: debt_shark_young_door_01}
         merit: [{cat: neutral}]
       - id: stay
         text: "ไม่ไป อยู่ดูแลพ่อแม่ที่บ้าน"

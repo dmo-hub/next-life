@@ -273,7 +273,7 @@ events:
       - id: put_in
         text: "ลงเงินเก็บเกือบทั้งหมด"
         outcomes:
-          - {weight: 3, text: "เดือนแรกได้ปันผลจริง เดือนที่สองแอปหายจากโทรศัพท์ทุกเครื่อง", effects: {happiness: -3, money: {unit: income_x, amount: -2}}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
+          - {weight: 3, text: "เดือนแรกได้ปันผลจริง เดือนที่สองแอปหายจากโทรศัพท์ทุกเครื่อง", effects: {happiness: -3, money: {unit: income_x, amount: -2}}, sets_flags: [ponzi_victim], merit: [{cat: neutral}], next: mid_scam_recovery_01}
           - {weight: 1, text: "ถอนทันก่อนวงแตกสองวัน ได้กำไรมาแบบงง ๆ แต่เพื่อนอีกหลายคนไม่ทัน", effects: {happiness: 1, money: {unit: income_x, amount: 1}, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: test_small
@@ -406,4 +406,66 @@ events:
         outcomes:
           - {weight: 1, ok: true, text: "โพสต์ไวรัล คนเสียหายอีกเป็นสิบโผล่มารวมตัว ฟ้องร่วมกันได้", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "โดนฟ้องหมิ่นประมาทกลับ ต้องจ้างทนายเพิ่มอีกก้อน", effects: {money: {unit: income_x, amount: -1}, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # เรื่องต่อโดนแชร์ลูกโซ่ (mid_scam_01) — ออกทาง next เท่านั้น · คอขวด = mid_scam_victims_01
+  - id: mid_scam_recovery_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ทนายตามเงินคืน"
+    text: "ไม่กี่วันหลังแอปหาย มีบัญชีชื่อสำนักงานกฎหมายทักมา บอกว่าตามเงินคืนได้เต็มจำนวน ขอแค่ค่าดำเนินการล่วงหน้าก้อนเล็ก ๆ"
+    choices:
+      - id: pay_fee
+        text: "โอนค่าดำเนินการ ขอแค่ได้คืน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, text: "ค่าดำเนินการหาย ทนายก็หาย โดนซ้ำรอบสองในเดือนเดียว", effects: {money: {unit: income_x, amount: -0.5}, happiness: -2}, next: mid_scam_victims_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อีกฝ่ายขอเพิ่มอีกรอบ ฉุกคิดได้ทันเลยหยุดโอน", effects: {money: {unit: income_x, amount: -0.3}, knowledge: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+      - id: police_online
+        text: "แจ้งความออนไลน์กับตำรวจ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ได้เลขคดี ตำรวจอายัดบัญชีม้าทัน ได้เงินคืนมาบางส่วน", effects: {money: {unit: income_x, amount: 0.5}, happiness: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้แค่เลขคดีกลับมา เงินไม่ขยับ", effects: {happiness: -1}, next: mid_scam_victims_01, merit: [{cat: neutral}]}
+      - id: join_group
+        text: "เข้ากลุ่มผู้เสียหายรวมพลัง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ในกลุ่มมีคนโดนแบบเดียวกันเป็นพัน นัดกันไปยื่นเรื่องพร้อมกัน", effects: {relations: 1}, next: mid_scam_victims_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อ่านเรื่องในกลุ่มทั้งคืน เห็นคนโดนหนักกว่าตัวเองเยอะ ใจเบาลงนิดหนึ่ง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - id: keep_quiet
+        text: "เก็บเงียบ ไม่บอกใคร"
+        effects: {happiness: -2, health: -1}
+        merit: [{cat: neutral}]
+
+  - id: mid_scam_victims_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "กลุ่มผู้เสียหาย"
+    text: "กลุ่มผู้เสียหายนัดรวมตัวยื่นเรื่องพร้อมกัน บางคนเสียบ้าน บางคนเสียเงินเก็บทั้งชีวิต ทุกคนมองหาคนที่จะช่วยประสานงาน"
+    choices:
+      - id: coordinate
+        text: "รับเป็นคนประสานงานกลุ่ม"
+        effects: {network: 1}
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "คดีเดินหน้า ศาลสั่งยึดทรัพย์หัวขบวน ทุกคนได้คืนคนละเล็กละน้อย", effects: {money: {unit: income_x, amount: 0.5}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ประชุมทุกคืนจนหมดแรง คดียืดยาวไม่รู้จบ", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+      - id: tell_home
+        text: "เล่าให้คนในบ้านช่วยคิด"
+        effects: {relations: 1, happiness: 1}
+        sets_flags: [scam_aware]
+        merit: [{cat: neutral}]
+      - id: warn_others
+        text: "เขียนเตือนคนอื่นไม่ให้โดน"
+        effects: {relations: 1, knowledge: 1}
+        sets_flags: [scam_aware]
+        merit: [{cat: help_others, level: 1}]
+      - id: move_on
+        text: "ปล่อยวาง ทำงานหาใหม่"
+        effects: {happiness: -1}
         merit: [{cat: neutral}]
