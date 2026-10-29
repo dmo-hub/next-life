@@ -492,13 +492,15 @@ export function levelValue(level) {
 
 // เพดานค่าใช้จ่าย income_x: เรื่องเดียวกัน (ค่าหาเสียง · งานบวช · ค่ารักษา) คนรายได้สูงจ่ายแพงกว่าได้แต่ไม่เกิน
 // SPEND_CAP เท่าของคนรายได้ขั้นต่ำ — ไม่งั้นรายได้ร้อยเท่าค่าแรงขั้นต่ำทำให้ค่าหาเสียงผู้ใหญ่บ้านเป็นสิบล้าน · ฝั่งรายรับยังโตตามรายได้
-// ฐานต่ำสุด = เงินเก็บของคนรายได้ขั้นต่ำ — เงินเก็บต่อปีติดลบได้ (รายจ่ายเกินรายได้) แล้วค่าใช้จ่ายจะกลายเป็นได้เงิน
+// เงินเก็บต่อปีติดลบ/ศูนย์ (รายจ่ายเกินรายได้) ใช้ฐานของคนรายได้ขั้นต่ำแทน — ไม่งั้นค่าใช้จ่ายกลายเป็นได้เงิน
+// เงินเก็บบวกแม้ต่ำกว่านั้นใช้ค่าจริง: ยกขึ้นทุกคนที่ต่ำกว่าฐานทำให้คนจนจ่ายแพงขึ้นทั้งกระดาน
 export const SPEND_CAP = 10;
 function spendBase(st) {
   const year = st.birthYear + st.age;
   const era = st.content.era;
   const floor = minWage(era, st.seed, year) * era.finance.daysPerMonth * 12 * era.birth.saveRate;
-  return Math.max(floor, Math.min(yearlySaving(st, year), SPEND_CAP * floor));
+  const saving = yearlySaving(st, year);
+  return saving > 0 ? Math.min(saving, SPEND_CAP * floor) : floor;
 }
 
 // เงินในผลตัวเลือก: ตัวเลขเปล่า = บาทของปีนั้น · {unit: income_x} = จำนวนเท่าของเงินเก็บต่อปีตอนนี้
