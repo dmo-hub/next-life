@@ -720,21 +720,22 @@ function stepYear(st) {
     }
   }
   // สายยศ (B40): ปีในขั้นนับตามความสุข ถึงคิวแล้วการ์ดเลื่อนขั้น · ผู้ใหญ่บ้าน/กำนันพ้นตำแหน่งตอนเกษียณ · ครบวาระ/ถูกชวนลงสมัคร = การ์ดเลือกตั้ง
-  // การ์ดเลื่อนขั้น/งบ/เลือกตั้งกินโควตากองสุ่มแบบเรื่องต่อ — คนมีตำแหน่งเจอทุกวาระ ชีวิตจึงยาวขึ้นเฉพาะสายนี้ (หางด่าน 4)
-  const rankDue = (ev) => {
+  // การ์ดงบ/เลือกตั้งกินโควตากองสุ่มแบบเรื่องต่อ — คนมีตำแหน่งการเมืองเจอทุกวาระ ชีวิตจึงยาวขึ้นเฉพาะสายนี้ (หางด่าน 4)
+  // การ์ดเลื่อนขั้นไม่หัก: ออกกับคนทำงานแทบทุกคน หักแล้วชีวิตสั้นลงทั้งกระดาน ไม่ใช่แค่หาง
+  const officeDueCard = (ev) => {
     st.due.push({ kind: 'eraEvent', ev, age: st.age });
     takeYearQuota(st);
   };
   if (isWorking(st)) {
     ageRank(st, moodMul(st));
-    if (promoDue(st)) rankDue(promoCard(st));
+    if (promoDue(st)) st.due.push({ kind: 'eraEvent', ev: promoCard(st), age: st.age });
   }
   if (st.office && !officeFull(st) && st.age >= RETIRE_AGE) {
     st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeStep(st).name}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง` });
     st.office = null;
   }
-  if (budgetDue(st)) rankDue(budgetCard(st));
-  if (officeDue(st)) rankDue(officeCard(st));
+  if (budgetDue(st)) officeDueCard(budgetCard(st));
+  if (officeDue(st)) officeDueCard(officeCard(st));
   if (recruitDue(st)) st.due.push({ kind: 'eraEvent', ev: recruitCard(st), age: st.age });
   if (isWorking(st) && earlyDue(st)) st.due.push({ kind: 'eraEvent', ev: earlyCard(st), age: st.age });
   if (isAllocAge(st.age)) st.due.push(allocCard(st, year, stage));
@@ -1186,7 +1187,7 @@ function poolTurn(st) {
   st.poolLeft = poolRounds(stageOf(st.age));
 }
 
-// โควตาการ์ด: การ์ดเรื่องต่อ (next) ผลย้อน (schedules) และการ์ดสายยศ/ตำแหน่ง แทนที่การ์ดกองสุ่มหนึ่งใบ — ติดค้างไว้ แล้วทิ้งการ์ดกองสุ่มใบถัดไปที่จั่วได้
+// โควตาการ์ด: การ์ดเรื่องต่อ (next) ผลย้อน (schedules) และการ์ดงบ/เลือกตั้งของตำแหน่งการเมือง แทนที่การ์ดกองสุ่มหนึ่งใบ — ติดค้างไว้ แล้วทิ้งการ์ดกองสุ่มใบถัดไปที่จั่วได้
 // หักเป็นใบ ไม่ใช่รอบจั่ว เพราะรอบหนึ่งออกการ์ดแค่ตามโอกาส POOL_CHANCE · ปีที่จั่วไม่ได้อีกแล้วค้างไปหักปีถัดไป
 // เนื้อหาเพิ่มสายเรื่องต่อได้โดยชีวิตไม่ยาวขึ้น · ชีวิตที่ไม่เจอเรื่องต่อจั่วและดึงเลขสุ่มเท่าเดิมทุกรอบ
 export function takeYearQuota(st) {
