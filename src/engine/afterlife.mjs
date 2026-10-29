@@ -346,6 +346,10 @@ const illOf = (cause, age, from) => (CHRONIC.includes(cause) ? { ill: { cause, a
 const deathOf = (st) => (isGone(st) ? { gone: true } : { cause: st.cause ?? 'other', ...illOf(st.cause, st.age, st.terminal?.cause === st.cause ? (st.terminal.toldAge ?? st.age - 1) : st.age) });
 const kinDeathOf = (m) => (m.cause ? { cause: m.cause, ...illOf(m.cause, m.diedAge, m.ill?.cause === m.cause ? (m.ill.toldAt ?? m.diedAge - 1) : m.diedAge) } : {});
 
+// ธงที่ทายาททางสายเลือดได้รู้จากรุ่นก่อน — allow-list ตามหมวด heir: ของทะเบียน (ธงอื่นเป็นเรื่องส่วนตัวของรุ่นก่อน) · เพดานชั้นต่อธง
+// ไม่ดึงเลขสุ่ม: ไม่มีการ์ดอ่าน parent_flags = เล่นเท่าเดิมทุกไบต์ · เก็บแยกจาก st.flags ของทายาท (ธงตัวตนของเขาเอง)
+const heirFlags = (st, tier) => Object.fromEntries(Object.entries(st.content.heir ?? {}).filter(([f, h]) => st.flags[f] && tier <= h.tier).map(([f]) => [f, tier]));
+
 function makeHeir(af, r) {
   const st = af.st;
   const era = st.content.era;
@@ -353,7 +357,7 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
-  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, province = null;
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, province = null, parentFlags = {};
   const death = deathStanding(st);
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
@@ -370,6 +374,7 @@ function makeHeir(af, r) {
     const link = me?.role === 'grandchild' ? st.kin.find((m) => m.id === me.of) ?? null : tier.tier > 1 ? pickOne(kids) : null;
     const spouse = (st.kin ?? []).filter((m) => m.role === 'spouse').at(-1) ?? null;
     if (me) ({ sex, name } = me);
+    parentFlags = heirFlags(st, tier.tier);
     const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
@@ -448,6 +453,7 @@ function makeHeir(af, r) {
     carried,
     kept: ledger.merit + ledger.sin,
     tier: tier?.tier ?? null,
+    parentFlags,
     // ส่วนที่บ้านส่งต่อ แยกจาก bonus (ซึ่งรวมผลกรรม) ให้การ์ดเปิดชีวิตเล่าทิศได้โดยไม่เผยบัญชี
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,

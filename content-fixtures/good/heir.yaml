@@ -1,0 +1,31 @@
+# ธงพ่อแม่ (heir:) ครบ 3 แบบ: when.parent_flags.has ตั้งแต่ from_age · not บนการ์ดเด็ก · ตัวคูณบนใบและบนผลสุ่ม
+events:
+  - id: teen_home_shop_01
+    type: A
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {parent_flags: {has: [own_business]}}
+    text: "ผู้ใหญ่ในบ้านชวนให้ช่วยดูร้านช่วงปิดเทอม"
+    choices:
+      - text: "ช่วยเต็มที่"
+        outcomes:
+          - {weight: 1, multipliers: {parent_flags: {lottery_habit: 0.5}}, text: "ลูกค้าประจำจำหน้าได้ ทักทายทุกวัน", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "งานหนักกว่าที่คิด แต่ได้ค่าขนมเพิ่ม", merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - {text: "ช่วยบ้างเป็นบางวัน", merit: [{cat: neutral}]}
+      - {text: "ขอไปเที่ยวกับเพื่อนแทน", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {text: "ขออ่านหนังสือแทน", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+  - id: kid_quiet_home_01
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {parent_flags: {not: [heavy_drinker]}}
+    multipliers: {parent_flags: {smoker: 0.5}}
+    text: "เย็นวันหยุด บ้านเงียบสงบ ทุกคนนั่งกินข้าวพร้อมหน้า"
+    choices:
+      - {text: "เล่าเรื่องที่โรงเรียน", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - {text: "รีบกินแล้วไปเล่น", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {text: "ช่วยล้างจาน", merit: [{cat: neutral}]}
+      - {text: "นั่งดูทีวี", merit: [{cat: neutral}]}

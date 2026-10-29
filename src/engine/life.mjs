@@ -228,6 +228,8 @@ export function newLife(seed, content, heir = null) {
     omenTone: null,
     omenAge: null,
     flags: {},
+    // ธงของรุ่นก่อนที่ทายาทได้รู้ {ธง: ชั้น} — แยกจาก flags เพราะ flags คือสิ่งที่ตัวเองเคยทำ (ฉายา/ความเสี่ยงตายอ่านอยู่)
+    parentFlags: heir?.parentFlags ?? {},
     scheduled: [],
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
@@ -994,6 +996,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     ...(news && { news }),
     // ผลย้อน: อายุตอนเลือกตัวเลือกที่นัดการ์ดนี้ไว้
     ...(echoFrom !== undefined && { echoFrom }),
+    ...parentFrom(st, ev),
     funeral: ev.id === FUNERAL.wishes || ev.id === FUNERAL.rite,
     age: st.age,
     stage: stageOf(st.age),
@@ -1261,6 +1264,7 @@ export function poolMultiplier(st, m) {
   if (m.wish) x *= m.wish ** ledgerLevel(st.ledger);
   if (m.family_fame) x *= m.family_fame ** (st.fame ?? 0);
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
+  for (const [f, v] of Object.entries(m.parent_flags ?? {})) if (st.parentFlags?.[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
   if (m.rank) x *= m.rank ** rankLevel(st);
   // ตัวคูณเงิน {min, max, v}: อัตราส่วนอยู่ในช่วง = คูณ v · คำนวณเฉพาะการ์ดที่ใช้ เพราะกองสุ่มเรียกทุกใบทุกปี
@@ -1279,6 +1283,13 @@ export const illnessOk = (st, w) => !!st.terminal?.told && (!w.causes || w.cause
 export const heredityOk = (st, w) => (st.heredity ?? []).some((k) => !w.causes || w.causes.includes(k));
 const inBound = (v, b) => !b || ((b.min === undefined || v >= b.min) && (b.max === undefined || v <= b.max));
 const flagsOk = (st, f) => (f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]);
+// เซฟก่อนมีช่องนี้ไม่มี parentFlags — อ่านแบบ ?. ให้เท่ากับไม่มีธงพ่อแม่
+const parentFlagsOk = (st, f) => (f.has ?? []).every((k) => st.parentFlags?.[k]) && !(f.not ?? []).some((k) => st.parentFlags?.[k]);
+// ป้ายบนการ์ด: ธงพ่อแม่ที่ทำให้ใบนี้ออก (when.parent_flags.has เท่านั้น — ตัวคูณแค่เอียงโอกาส ไม่ได้เล่า)
+const parentFrom = (st, ev) => {
+  const x = (ev.when?.parent_flags?.has ?? []).filter((f) => st.parentFlags?.[f]).map((f) => ({ flag: f, tier: st.parentFlags[f] }));
+  return x.length ? { parentFrom: x } : {};
+};
 // ครอบครัวมีแค่พ่อแม่ (ด่าน family-system กั้นบทบาทอื่นไว้) · เงื่อนไขผ่านเมื่อพ่อหรือแม่คนใดคนหนึ่งตรง
 // เงื่อนไขเกิดแบบประกาศทุกฟิลด์ (ใบ 07)
 export function whenOk(st, when) {
@@ -1301,6 +1312,7 @@ export function whenOk(st, when) {
     const r = moneyRatios(st);
     if (MONEY_KEYS.some((k) => when[k] && !inBound(r[k], when[k]))) return false;
   }
+  if (when.parent_flags && !parentFlagsOk(st, when.parent_flags)) return false;
   return !when.flags || flagsOk(st, when.flags);
 }
 

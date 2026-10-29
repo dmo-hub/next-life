@@ -1,0 +1,19 @@
+# อ้างธงพ่อแม่ที่ไม่อยู่หมวด heir: — ธงในทะเบียน flags: แต่แกนไม่ส่ง (married) · ตัวคูณธงสะกดผิด (smokr) · ตัวคูณบนผลสุ่ม — ธงใน heir: (smoker) ยังผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {parent_flags: {has: [married, smoker]}}
+    multipliers: {parent_flags: {smokr: 2, heavy_drinker: 1.5}}
+    text: "ข้อความการ์ด"
+    choices:
+      - text: "ทางที่หนึ่ง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, multipliers: {parent_flags: {has_car: 2}}, text: "ผลทางหนึ่ง", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผลทางสอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}

@@ -385,4 +385,7 @@ export function loadCareers(fin) {
   return { ladders, office: { steps: c.office.steps.map(step) }, pension: { div: c.pension.div, cap: c.pension.cap }, severance: c.severance.rows };
 }
 
-export const loadContent = () => ({ events: loadEvents(), era: loadEra() });
+// หมวด heir: ของทะเบียนธง = ชุดธงที่แกนส่งถึงทายาท — แกนต้องรู้ตอนเล่น ไม่ใช่แค่ lint
+const loadHeir = () => parse(read('content/rules/flags.yaml')).heir ?? {};
+
+export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir() });

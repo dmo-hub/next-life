@@ -57,6 +57,11 @@ const near = (a, b) => Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.a
 const out = {};
 let streamBad = 0, streamChecks = 0, childDeaths = 0, childBad = 0, occBad = 0, provBad = 0, provSame = 0, rebirths = 0;
 let leaks = 0, reveals = 0, afterlives = 0, statBad = 0, carryBad = 0, debtLeak = 0, lenBad = 0, isekaiLives = 0, isekaiBad = 0;
+// ธงข้ามรุ่น (heir:): ก ทางอื่นไม่ได้ · ข ได้เฉพาะธงในทะเบียน ชั้นไม่เกินเพดาน รุ่นก่อนถือจริง · ค ไม่ปนกับ flags ของทายาท
+const HEIR = content.heir ?? {};
+const parentReaders = (e) => [e.when?.parent_flags, e.multipliers?.parent_flags, ...(e.choices ?? []).flatMap((c) => (c.outcomes ?? []).map((o) => o.multipliers?.parent_flags))].some(Boolean);
+const heirReaders = content.events.filter(parentReaders);
+let heirA = 0, heirB = 0, heirC = 0, heirTwin = 0, heirGot = 0;
 const lens = [];
 // ทางในตระกูลแยกชั้น (B18): จำนวน · ผลรวมสัดส่วนส่งต่อ · มรดก (เท่ารายได้ปี) · |ส่วนต่างความสัมพันธ์+คอนเน็คชั่นจากบ้าน|
 const tiers = KIN_TIERS.map(() => ({ n: 0, carry: 0, legacy: 0, kin: 0 }));
@@ -89,6 +94,7 @@ for (const [name, pick] of Object.entries(BOTS)) {
       let verdict = null;
       let snap = null;
       let verdicts = 0;
+      const prevFlags = { ...st.flags };
       const af = playAfterlife(st, pick, (card, a) => {
         const { [REVEAL]: reveal, ...rest } = card;
         for (const k of keys(rest)) if (LEAK.test(k)) leaks++;
@@ -146,6 +152,13 @@ for (const [name, pick] of Object.entries(BOTS)) {
         const a = playLife(h.seed, content, pick, null, plain), b = playLife(h.seed, content, pick, null, twin);
         if (a.age !== b.age || a.cards !== b.cards || Math.round(a.state.money) !== Math.round(b.state.money)) streamBad++;
         streamChecks++;
+        // ธงพ่อแม่ครบทั้งทะเบียนต้องไม่ขยับอะไรนอกการ์ดที่อ่านมัน (ความเสี่ยงตาย ฉายา ตำแหน่ง อ่าน flags ไม่ใช่ parentFlags)
+        // มีการ์ดอ่านแล้วชีวิตต่างได้โดยชอบ ⇒ ส่วนนี้วัดได้เฉพาะตอนเนื้อหายังไม่มีผู้อ่าน
+        if (!heirReaders.length) {
+          const full = newLife(h.seed, content, { birthYear: plain.birthYear, sex: plain.sex, region: { name: plain.region, ses: plain.ses }, cls: plain.cls, bonus: {}, parentFlags: Object.fromEntries(Object.keys(HEIR).map((k) => [k, 1])) });
+          const c = playLife(h.seed, content, pick, null, full);
+          if (a.age !== c.age || a.cards !== c.cards || Math.round(a.state.money) !== Math.round(c.state.money)) heirTwin++;
+        }
       }
       const lastJob = st.occupation, lastProv = st.province;
       wantGen = st.gen + 1 + af.isekaiLives.length;
@@ -154,6 +167,14 @@ for (const [name, pick] of Object.entries(BOTS)) {
       // ปรโลกตัดสินทุกชาติ: ชาติไทย 1 ครั้ง + ชาติต่างโลกละ 1 ครั้ง (B68 วงเดียว)
       if (verdicts !== 1 + af.isekaiLives.length) isekaiBad++;
       st = nextLife(af);
+      const pf = Object.entries(st.parentFlags ?? {});
+      if (af.path !== 'child') { if (pf.length) heirA++; }
+      else {
+        for (const [k, t] of pf) if (!HEIR[k] || t !== h.tier || t > HEIR[k].tier || !prevFlags[k]) heirB++;
+        for (const [k, x] of Object.entries(HEIR)) if (prevFlags[k] && h.tier <= x.tier && !st.parentFlags[k]) heirB++;
+      }
+      if (af.path === 'child' && pf.length) heirGot++;
+      if (Object.keys(st.flags).length) heirC++;
       if (af.path === 'child' && st.familyOcc !== lastJob) occBad++;
       if (af.path === 'child' && st.province !== lastProv) provBad++;
       // เกิดใหม่ต้องสุ่มจังหวัดใหม่จริง — ถ้าทางเกิดใหม่ติดจังหวัดเดิมเกือบทุกครั้ง แปลว่าค่าบ้านรั่วมาทางที่ไม่ใช่ลูก
@@ -221,6 +242,36 @@ check('ส่งต่อบุญบาป ลูก ≥ หลาน ≥ เ�
 check('มรดก ลูก ≥ หลาน ≥ เหลน', desc('legacy') ? 0 : 1);
 check('ความสัมพันธ์/คอนเน็คชั่นจากบ้าน ลูก ≥ หลาน ≥ เหลน', desc('kin') ? 0 : 1);
 check('ต่างโลกเกิดได้จริง ลงผังตระกูลรุ่นละชาติ และปรโลกตัดสินทุกชาติ', isekaiBad + (isekaiLives ? 0 : 1), ` ${isekaiLives} ชีวิต`);
+
+// ง ทางเป็นลูกในบอทสุ่มมีน้อย — บังคับทาง child (ถ้าไม่ถูกล็อก) ตระกูลละ 2 รุ่น แล้วดูป้าย parentFrom ในรุ่นสอง
+const forceChild = (card, rng, h) => (h.pending?.path && !card.locked?.[0] ? 0 : BOTS.สุ่ม(card, rng));
+const byId = new Map(content.events.map((e) => [e.id, e]));
+const heirFired = new Map(heirReaders.filter((e) => e.when?.parent_flags?.has).map((e) => [e.id, 0]));
+let forced = 0, withFlag = 0, dCards = 0, heirD = 0;
+for (let i = 0; i < Math.min(n, 500); i++) {
+  const first = playLife(mixSeed(seed, 7700 + i), content, forceChild);
+  const af = playAfterlife(first.state, forceChild);
+  if (af.path !== 'child') continue;
+  const st = nextLife(af);
+  forced++;
+  if (Object.keys(st.parentFlags).length) withFlag++;
+  playLife(st.seed, content, forceChild, (card, s) => {
+    if (heirFired.has(card.id)) heirFired.set(card.id, heirFired.get(card.id) + 1);
+    if (!card.parentFrom) return;
+    dCards++;
+    const has = byId.get(card.id)?.when?.parent_flags?.has ?? [];
+    for (const x of card.parentFrom) if (!has.includes(x.flag) || s.parentFlags[x.flag] !== x.tier) heirD++;
+  }, st);
+}
+console.log('');
+check('ทางเกิดใหม่/ต่างโลกไม่ได้ธงพ่อแม่', heirA);
+check('ทางเป็นลูกได้ธงในทะเบียน heir: ครบ ชั้นไม่เกินเพดาน และรุ่นก่อนถือจริง', heirB, ` · ได้ธง ${heirGot} ชีวิต`);
+check('ทายาทเกิดมามีธงตัวเองว่าง (ธงพ่อแม่อยู่ช่องแยก)', heirC);
+check(`ธงพ่อแม่ครบทะเบียนไม่ขยับชีวิตเมื่อไม่มีการ์ดอ่าน (${heirReaders.length ? 'มีผู้อ่านแล้ว ข้าม' : `${streamChecks} คู่`})`, heirTwin);
+check(`ป้าย parentFrom ตรงเงื่อนไขการ์ด (${dCards} ใบ)`, heirD);
+// รายงานจนการ์ดทายาทของเนื้อหาเข้า — แล้วเปลี่ยนเป็นด่าน: การ์ดอ่านธงพ่อแม่ทุกใบออกจริงในรุ่นสอง
+const deadHeir = [...heirFired].filter(([, c]) => !c).map(([id]) => id);
+console.log(`ทางลูกบังคับ: ถือธงพ่อแม่ ${withFlag}/${forced} ชีวิต · การ์ดอ่านธงพ่อแม่ ${heirReaders.length} ใบ · ไม่เคยออก ${deadHeir.length}${deadHeir.length ? `: ${deadHeir.join(' ')}` : ''}`);
 if (!sceneIds.length) fails.push('ไม่มีฉากระหว่างชาติในเนื้อหา');
 if (fails.length) {
   for (const x of fails) console.log(`  ✗ ${x}`);

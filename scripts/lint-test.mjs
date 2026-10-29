@@ -3,7 +3,8 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { RULES, DOC_SHAPE, lintContext, lintDocs, formatProblem } from '../src/node/lint/index.mjs';
-import { strings } from '../src/node/lint/util.mjs';
+import { strings, isObj } from '../src/node/lint/util.mjs';
+import { parentRefs } from '../src/node/lint/flags.mjs';
 import { loadEvents, loadEra, loadContent, checkNames } from '../src/node/load.mjs';
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
 import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT } from '../src/engine/career.mjs';
@@ -192,6 +193,34 @@ rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${c
 for (const f of stale) if (!ctx.flags.prefixes.has(f)) fails.push(`ทะเบียนธง: "${f}" ไม่มีเนื้อหาใน content/ ใช้`);
 // แกนนัดการ์ดชดใช้ทุนด้วย id — ไม่มีใน content = dueAt ข้ามเงียบ ทุนกลับเป็นของฟรี
 if (!realDocs.some(({ doc }) => (doc.events ?? []).some((e) => e.id === BOND_EVENT))) fails.push(`การ์ดชดใช้ทุน "${BOND_EVENT}" ไม่มีใน content/`);
+
+// ทะเบียน heir: (ธงที่แกนส่งถึงทายาท) — ตรวจทั้งชุด ไม่ใส่ใน RULES เพราะ fixture รันทีละไฟล์ จะตกด้วยกติกานี้ทุกไฟล์
+// tier เพดาน 2 (หลาน) — เหลนไม่ได้รับธง
+function heirCheck(reg, docs) {
+  const problems = [];
+  const flagSet = new Set(Object.keys(reg.flags ?? {}));
+  for (const [f, h] of Object.entries(reg.heir ?? {})) {
+    if (!flagSet.has(f)) problems.push(`ทะเบียน heir: "${f}" ไม่อยู่ใน flags: — ชีวิตก่อนไม่มีทางติดธงนี้`);
+    if (!isObj(h) || ![1, 2].includes(h.tier)) problems.push(`ทะเบียน heir: "${f}" tier ต้องเป็น 1 (ลูก) หรือ 2 (หลาน)`);
+    if (!isObj(h) || typeof h.tell !== 'string' || !h.tell.trim() || h.tell.length > MAX_LEN.hint) problems.push(`ทะเบียน heir: "${f}" tell ต้องเป็นข้อความไม่ว่าง ≤ ${MAX_LEN.hint} ตัวอักษร (หน้าจอใช้คำนี้)`);
+    if (isObj(h) && h.from_age !== undefined && !(Number.isInteger(h.from_age) && h.from_age >= 0 && h.from_age <= 60)) problems.push(`ทะเบียน heir: "${f}" from_age ต้องเป็นจำนวนเต็ม 0–60`);
+  }
+  const read = new Set();
+  for (const { doc } of docs) for (const e of doc.events ?? []) for (const { f } of parentRefs(isObj(e) ? e : {})) read.add(f);
+  return { problems, unread: Object.keys(reg.heir ?? {}).filter((f) => !read.has(f)) };
+}
+const flagReg = parse(readFileSync(new URL('content/rules/flags.yaml', root), 'utf8'));
+const heir = heirCheck(flagReg, realDocs);
+for (const p of heir.problems) fails.push(p);
+const heirControls = {
+  'ธงนอก flags:': { ...flagReg, heir: { ...flagReg.heir, no_such: { tier: 1, tell: 'x' } } },
+  'tier 3': { ...flagReg, heir: { ...flagReg.heir, smoker: { tier: 3, tell: 'x' } } },
+  'tell ว่าง': { ...flagReg, heir: { ...flagReg.heir, smoker: { tier: 1, tell: ' ' } } },
+  'from_age ติดลบ': { ...flagReg, heir: { ...flagReg.heir, smoker: { tier: 1, tell: 'x', from_age: -1 } } },
+};
+for (const [name, r] of Object.entries(heirControls)) if (!heirCheck(r, realDocs).problems.length) fails.push(`ทะเบียน heir: ตัวควบคุม "${name}" ไม่ตก`);
+// ไม่มีผู้อ่าน = รายงานก่อน — การ์ดทายาทของเนื้อหายังไม่เข้า (เปิดเป็นด่านพร้อมการ์ดชุดนั้น)
+rows.push(['ทะเบียน heir:', `${Object.keys(flagReg.heir ?? {}).length} ธง · ตัวควบคุม ${Object.keys(heirControls).length} แบบ · ยังไม่มีการ์ดอ่าน ${heir.unread.length}${heir.unread.length ? `: ${heir.unread.join(' ')}` : ''}`]);
 
 try {
   const real = loadEvents();

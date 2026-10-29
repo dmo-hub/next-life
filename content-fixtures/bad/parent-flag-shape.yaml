@@ -1,0 +1,75 @@
+# รูป parent_flags ผิด: ธงเดียวกันทั้ง has และ not · has ไม่ใช่รายการ · ไม่มีทั้ง has และ not · ธงมีพารามิเตอร์ · ตัวคูณ 0 · ใช้ในฉากระหว่างชาติ
+events:
+  - id: bad_case_both
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {parent_flags: {has: [smoker], not: [smoker]}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_notlist
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {parent_flags: {has: smoker}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_empty
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {parent_flags: {}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_param
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {parent_flags: {has: ["vow_open:x"]}}
+    multipliers: {parent_flags: {smoker: 0}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_after_open_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    text: "ญาติทำบุญไปให้"
+    choices:
+      - {text: อนุโมทนา, merit: [{cat: dana, level: 1}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: bad_after_heir_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    when: {parent_flags: {has: [smoker]}}
+    text: "ญาติทำบุญไปให้"
+    choices:
+      - {text: อนุโมทนา, merit: [{cat: dana, level: 1}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

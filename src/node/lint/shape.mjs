@@ -24,12 +24,12 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'parent_flags', ...MONEY_KEYS],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
   family: ['role', 'sex', 'age', 'alive', 'count', 'health', 'relations'],
-  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'occupation', 'wish', 'rank', ...MONEY_KEYS],
+  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
   requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'reason'],
@@ -50,6 +50,7 @@ function* shaped(e) {
       for (const [k, b] of Object.entries(w.stats)) if (isObj(b)) yield ['bound', b, `.when.stats.${k}`];
     }
     if (isObj(w.flags)) yield ['whenFlags', w.flags, '.when.flags'];
+    if (isObj(w.parent_flags)) yield ['whenFlags', w.parent_flags, '.when.parent_flags'];
     for (const k of MONEY_KEYS) if (isObj(w[k])) yield ['bound', w[k], `.when.${k}`];
     for (const [i, f] of list(w.family).entries()) {
       if (!isObj(f)) continue;

@@ -1,0 +1,52 @@
+# การ์ดเล่าธงพ่อแม่ที่ทะเบียนตั้ง from_age ก่อนอายุนั้น: stage เด็กไม่มี when.age (เริ่ม 0) · when.age ขอบล่างต่ำกว่า from_age
+# ยังผ่าน: from_age ถึงแล้ว (วัยรุ่น) · ธงไม่มี from_age บนการ์ดเด็ก · ตัวคูณบนการ์ดเด็ก (แค่เอียงโอกาส ไม่เล่า)
+events:
+  - id: bad_case_kid
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {parent_flags: {has: [own_business]}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_low_age
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [10, 12], parent_flags: {has: [smoker, caught_fraud]}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: ok_case_teen
+    type: A
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {parent_flags: {has: [caught_fraud]}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: ok_case_kid_mult
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [6, 12], parent_flags: {has: [smoker]}}
+    multipliers: {parent_flags: {home_owner: 0.5}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}

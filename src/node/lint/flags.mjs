@@ -1,5 +1,5 @@
 // กติกาธง + นัดเหตุการณ์ต่อเนื่อง + เรื่องต่อหลังผล: ธงที่เงื่อนไขขอใช้ต้องมีคนตั้ง · นัด/เรื่องต่อต้องชี้เหตุการณ์ที่มีจริง
-import { FLAG_RE, meritCat } from './vocab.mjs';
+import { FLAG_RE, meritCat, STAGE_AGES, AFTERLIFE_STAGE } from './vocab.mjs';
 import { EXAM_PASS, BOND_FLAG } from '../../engine/career.mjs';
 import { DEBT_FLAGS } from '../../engine/life.mjs';
 import { isObj, isRange, list, effectSites, choicesOf } from './util.mjs';
@@ -19,6 +19,19 @@ function flagRefs(e) {
   if (isObj(e.multipliers) && isObj(e.multipliers.flags)) for (const f of Object.keys(e.multipliers.flags)) out.push({ f, path: `.multipliers.flags.${f}`, need: true });
   return out;
 }
+
+// ผู้อ่านธงพ่อแม่ทุกจุด: when.parent_flags.has/not ของใบ · multipliers.parent_flags ของใบและของผลสุ่ม
+const parentMults = (e) => [[e.multipliers, '.multipliers'], ...effectSites(e).filter((x) => x.path.includes('outcomes')).map((x) => [x.node.multipliers, `${x.path}.multipliers`])];
+export function parentRefs(e) {
+  const out = [];
+  const w = isObj(e.when) && isObj(e.when.parent_flags) ? e.when.parent_flags : {};
+  for (const k of ['has', 'not']) list(w[k]).forEach((f, i) => out.push({ f, k, path: `.when.parent_flags.${k}[${i}]` }));
+  for (const [m, at] of parentMults(e)) if (isObj(m) && isObj(m.parent_flags)) for (const f of Object.keys(m.parent_flags)) out.push({ f, k: 'mult', path: `${at}.parent_flags.${f}` });
+  return out;
+}
+// ธงพ่อแม่ไม่มีพารามิเตอร์ — ทะเบียน heir: มีแต่ชื่อเต็ม
+const parentFlagName = (f) => typeof f === 'string' && FLAG_RE.test(f) && !f.includes(':');
+const positive = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
 
 // ทะเบียนตรวจเฉพาะจุดที่ตั้ง/ล้างธง: ธงที่ถูกอ้างแต่ไม่มีใครตั้งเป็นเรื่องของ flag-unset · ชื่อผิดรูปเป็นเรื่องของ flag-format
 const atSetSite = (f, set) => set !== undefined && typeof f === 'string' && FLAG_RE.test(f);
@@ -114,6 +127,43 @@ export const rules = [
         color.set(id, 2);
       };
       for (const id of nexts.keys()) if (!color.has(id)) walk(id);
+    },
+  },
+  {
+    id: 'parent-flag-registry',
+    desc: 'ธงที่ when.parent_flags / multipliers.parent_flags อ้าง ต้องอยู่ในหมวด heir: ของ content/rules/flags.yaml — ธงนอกหมวดแกนไม่ส่งถึงทายาท การ์ดจะไม่มีวันออก/ตัวคูณไม่เคยทำงาน',
+    event(e, ctx, r) {
+      // ชื่อผิดรูปเป็นเรื่องของ parent-flag-shape — fixture แต่ละไฟล์จึงตกกติกาเดียว
+      for (const { f, path } of parentRefs(e)) if (parentFlagName(f) && !ctx.flags.heir.has(f)) r(path, `ธง "${f}" ไม่อยู่ในหมวด heir: (แกนไม่ส่งธงนี้ถึงทายาท)`);
+    },
+  },
+  {
+    id: 'parent-flag-shape',
+    desc: 'when.parent_flags = {has: [...], not: [...]} ชื่อธงถูกรูป ไม่ซ้ำระหว่าง has กับ not · multipliers.parent_flags = {ชื่อธง: เลขบวก} · ใช้ไม่ได้ในฉากระหว่างชาติ (ฉากนั้นอ่านชีวิตที่เพิ่งจบ ไม่ใช่ทายาท)',
+    event(e, ctx, r) {
+      const refs = parentRefs(e);
+      if (isObj(e.when) && e.when.parent_flags !== undefined) {
+        const w = e.when.parent_flags;
+        if (!isObj(w) || ['has', 'not'].some((k) => w[k] !== undefined && !Array.isArray(w[k])) || (w.has === undefined && w.not === undefined)) r('.when.parent_flags', 'parent_flags ต้องเป็น {has: [...], not: [...]} อย่างน้อยหนึ่งอย่าง');
+        else for (const f of list(w.has)) if (list(w.not).includes(f)) r('.when.parent_flags', `ธง "${f}" อยู่ทั้ง has และ not — การ์ดไม่มีวันออก`);
+      }
+      for (const { f, path } of refs) if (!parentFlagName(f)) r(path, `ธง "${f}" ผิดรูป (ธงพ่อแม่ไม่มีพารามิเตอร์)`);
+      for (const [m, at] of parentMults(e)) if (isObj(m) && m.parent_flags !== undefined && (!isObj(m.parent_flags) || Object.values(m.parent_flags).some((v) => !positive(v)))) r(`${at}.parent_flags`, 'ต้องเป็น {ชื่อธง: เลขบวก}');
+      if (e.stage === AFTERLIFE_STAGE && refs.length) r('.when.parent_flags', 'ฉากระหว่างชาติใช้ parent_flags ไม่ได้');
+    },
+  },
+  {
+    id: 'parent-flag-age',
+    desc: 'การ์ดที่ when.parent_flags.has ธงที่ทะเบียนตั้ง from_age ต้องออกได้ตั้งแต่อายุนั้นขึ้นไปเท่านั้น (ขอบล่าง when.age หรือต้นช่วง stage) — ธงที่รุ่นก่อนมักติดหลังลูกโตแล้ว การ์ดเด็กจะเล่าเรื่องที่ยังไม่เกิด',
+    event(e, ctx, r) {
+      // ตัวคูณ/not ไม่ได้เล่าว่าพ่อแม่ทำอะไร — ดูแค่ has
+      const has = isObj(e.when) && isObj(e.when.parent_flags) ? list(e.when.parent_flags.has) : [];
+      const low = isObj(e.when) && isRange(e.when.age, 0, 120) ? e.when.age[0] : STAGE_AGES[e.stage]?.[0];
+      if (low === undefined) return;
+      has.forEach((f, i) => {
+        const min = ctx.flags.heirFrom.get(f) ?? 0;
+        if (low < min) r(`.when.parent_flags.has[${i}]`, `ธง "${f}" เล่าได้ตั้งแต่อายุ ${min} (heir: from_age) แต่การ์ดออกได้ตั้งแต่ ${low} — ตั้ง when.age [${min}, …] หรือย้ายไป stage ที่เริ่มอายุ ${min}+`);
+      });
     },
   },
 ];
