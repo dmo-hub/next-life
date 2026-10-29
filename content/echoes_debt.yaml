@@ -1,0 +1,219 @@
+# ผลย้อน หมวดหนี้ (เฟส 1 ข้อ 3): ตัวเลือกเดิมใน debt.yaml นัดการ์ดเหล่านี้ 3–25 ปีให้หลังด้วย schedules
+# ไม่มี weight — ออกทางนัดเท่านั้น · when ของแต่ละใบกันเรื่องขัดกับชีวิตตอนนั้น
+# ข้อความเรียกตัวเลือกเดิมตรง ๆ เพราะคนเขียนรู้ว่ามาจากไหน
+events:
+  # ← debt_student_loan_01 "กู้มา แบ่งไปซื้อมือถือใหม่"
+  - id: echo_debt_payroll_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2539, 2650]
+    systems: [student_loan]
+    lore_ref: lore-finance-series.html#6
+    when: {occupation: [clerk, professional, manager, factory, technician, service]}
+    title: "บรรทัดใหม่ในสลิป"
+    text: "สลิปเงินเดือนเดือนนี้มีบรรทัดใหม่ หักชำระกยศ. ผ่านนายจ้าง ฝ่ายบุคคลส่งรายชื่อเข้ากลุ่มแผนกผิดห้อง ทั้งแผนกรู้กันก่อนเที่ยงว่าใครยังค้างหนี้สมัยเรียน ทั้งที่มือถือเครื่องนั้นพังไปนานแล้ว"
+    choices:
+      - id: pay_off
+        text: "ปิดยอดที่เหลือให้จบ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ใช้เงินเก็บปิดยอดได้ในเดือนเดียว บรรทัดนั้นหายไปจากสลิปเดือนถัดมา", effects: {money: {unit: income_x, amount: -1}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปิดได้แต่เงินเก็บหมดเกลี้ยง ปลายปีต้องยืมเพื่อนจ่ายค่าห้อง", effects: {money: {unit: income_x, amount: -1.5}, relations: -1}, merit: [{cat: neutral}]}
+      - id: laugh_it_off
+        text: "หัวเราะกลบ เล่าเรื่องมือถือ"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: complain_hr
+        text: "ร้องเรียนเรื่องข้อมูลหลุด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝ่ายบุคคลส่งอีเมลขอโทษทั้งบริษัท แล้วเปลี่ยนวิธีส่งเอกสาร", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรื่องเงียบ แถมโดนมองว่าเรื่องมาก", effects: {network: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: help_junior
+        text: "สอนน้องใหม่วางแผนใช้เงินกู้"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  # ← debt_student_loan_01 "ทำงานพิเศษส่งตัวเอง"
+  - id: echo_debt_old_boss_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ร้านเดิมสมัยเรียน"
+    text: "เจ้าของร้านที่เคยรับไปทำพาร์ตไทม์สมัยเรียนโทรมา บอกว่าจำเด็กที่ทำงานดึกแล้วยังมาตรงเวลาได้ ตอนนี้จะเปิดสาขาสอง อยากได้คนที่ไว้ใจได้มาลงขันด้วย"
+    choices:
+      - id: join_share
+        text: "ลงขันด้วย"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.4}}, text: "สาขาสองคืนทุนในสองปี ได้ปันผลทุกสิ้นปี", effects: {money: {unit: income_x, amount: -1}, income_mult: 1.3, happiness: 1}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทำเลใหม่คนเดินน้อย สาขาสองปิดในปีเดียว เงินที่ลงขันหายเกือบหมด", effects: {money: {unit: income_x, amount: -1.5}, happiness: -1}, merit: [{cat: neutral}]}
+      - id: refer_friend
+        text: "แนะนำเพื่อนที่เหมาะกว่าให้"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: just_visit
+        text: "ปฏิเสธ แต่แวะไปกินข้าวด้วย"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: quit_and_run
+        text: "ลาออกจากงานประจำมาคุมร้านเต็มตัว"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "คุมร้านเองจนยอดขึ้นสองเท่า เจ้าของเดิมยกส่วนแบ่งก้อนใหญ่ให้", effects: {income_mult: 1.5, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 2, text: "งานร้านหนักกว่าที่คิด รายได้น้อยกว่างานเดิม", effects: {income_mult: 0.85, health: -1}, merit: [{cat: neutral}]}
+
+  # ← debt_guarantor_ask_01 "ปฏิเสธแบบนุ่ม ๆ"
+  - id: echo_debt_unsigned_friend_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "รถคันที่ไม่ได้ค้ำ"
+    text: "เพื่อนคนที่เคยยื่นสัญญาให้ค้ำแล้วเราปฏิเสธ ขับรถคันใหม่มาจอดหน้าบ้าน สิบกว่าปีที่เงียบหายไป วันนี้เขามีกิจการของตัวเอง ยื่นซองการ์ดงานเปิดสาขาใหม่ให้กับมือ"
+    choices:
+      - id: go_open
+        text: "ไปร่วมงานเปิดสาขา"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.4}}, text: "เขาจับมือแน่นต่อหน้าแขก บอกว่าวันที่ไม่มีใครค้ำให้คือวันที่ต้องลุกขึ้นเอง", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปถึงแล้วเขาแนะนำเราว่าเป็นคนที่ไม่ยอมช่วยตอนลำบาก แขกหัวเราะกันทั้งโต๊ะ", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+      - id: ask_why
+        text: "ถามตรง ๆ ว่ายังโกรธอยู่ไหม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาหัวเราะ บอกว่าโกรธอยู่ปีเดียว แล้วชวนไปกินข้าวกันเหมือนสมัยเรียน", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขายิ้มไม่ตอบ แล้วขับรถออกไป", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: send_flowers
+        text: "ส่งพวงดอกไม้ไปแสดงความยินดี"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: skip_it
+        text: "ไม่ไป เรื่องมันนานแล้ว"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+
+  # ← debt_car_buy_01 "ออกรถให้พ่อแม่ใช้ที่บ้าน"
+  - id: echo_debt_old_car_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    when: {family: [{role: parent, alive: true}]}
+    title: "รถใต้ถุนบ้าน"
+    text: "รถคันที่ออกให้ที่บ้านใช้เมื่อหลายปีก่อนยังจอดอยู่ใต้ถุน ผ่อนหมดไปนานแล้ว แต่ระยะหลังไม่มีใครขับออกไปไหน ฝุ่นจับเต็มกระจก คนในบ้านถามว่าจะขายหรือเก็บไว้"
+    choices:
+      - id: sell_car
+        text: "ขาย เอาเงินเข้ากองกลาง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ขายได้ราคาดีกว่าที่คิด เงินก้อนนั้นพอซ่อมหลังคาบ้านทั้งหลัง", effects: {money: {unit: income_x, amount: 1}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ใหญ่ในบ้านไม่ยอม บอกว่ารถคันนี้มีความทรงจำ งอนไปหลายวัน", effects: {relations: -1, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+      - id: keep_car
+        text: "เก็บไว้ พาที่บ้านไปหาหมอ"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: care_parents, level: 1}]
+      - id: trip_out
+        text: "ซ่อมแล้วพาที่บ้านเที่ยวทะเล"
+        effects: {relations: 2, happiness: 2, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: care_parents, level: 1}]
+      - id: give_relative
+        text: "ยกให้ญาติที่ต้องใช้รถทำมาหากิน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: dana, level: 1}]
+
+  # ← debt_cash_short_01 "ลงวงไพ่ หวังพลิกคืนเดียว"
+  - id: echo_debt_card_table_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "คนจากวงไพ่คืนนั้น"
+    text: "หลายปีหลังคืนที่ลงวงไพ่หวังพลิกเงินด่วน คนที่เคยนั่งตรงข้ามโผล่มาหน้าบ้าน ยิ้มกว้าง บอกว่าคืนนี้มีวงใหญ่ ขาดอีกที่เดียว เห็นหน้าแล้วนึกถึงทันที"
+    choices:
+      - id: refuse_door
+        text: "บอกว่าเลิกเล่นแล้ว ปิดประตู"
+        effects: {happiness: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: one_more
+        text: "ไปอีกครั้งเดียว"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ไพ่ขึ้นทั้งคืน กลับบ้านพร้อมเงินก้อนกับเบอร์วงต่อไปในมือ", effects: {money: {unit: income_x, amount: 1}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "หมดตัวอีกรอบ คราวนี้เจ้ามือให้ติดไว้ก่อน ดอกนับตั้งแต่พรุ่งนี้", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 0.8}}, money: {unit: income_x, amount: -0.8}, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+      - id: ask_about_old
+        text: "ถามข่าวคนในวงเดิม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเล่าว่าเจ้ามือคืนนั้นติดคุกไปแล้ว คนในวงหลายคนเสียบ้าน ฟังจบแล้วเย็นวาบไปทั้งตัว", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุยกันเพลินจนเขาขอยืมเงินค่ารถกลับ แล้วก็ไม่เคยคืน", effects: {money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+      - id: talk_him_out
+        text: "ชวนเขาเลิกเล่นด้วยกัน"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เขานั่งเงียบไปนาน แล้วขอเบอร์ไว้โทรคุยตอนอยากเล่น", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เขาหัวเราะ บอกว่าคนเคยแพ้หมดตัวจะมาสอนใคร", effects: {happiness: -1}, merit: [{cat: neutral}]}
+
+  # ← debt_refinance_01 "แต่งสลิปเงินเดือนกู้เพิ่ม" (ผ่านฉลุย)
+  - id: echo_debt_slip_audit_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ธนาคารขอเอกสารย้อนหลัง"
+    text: "ธนาคารส่งจดหมายลงทะเบียนมา ขอให้นำสลิปเงินเดือนตัวจริงย้อนหลังที่ใช้ยื่นกู้เพิ่มเมื่อหลายปีก่อนมาตรวจสอบ ภายในสิบห้าวัน ตัวเลขในสลิปชุดนั้นไม่ตรงกับเงินเดือนจริงสักใบ"
+    choices:
+      - id: confess_bank
+        text: "เข้าไปสารภาพ ขอปรับโครงสร้างหนี้"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ธนาคารยอมปรับงวดให้แลกกับดอกที่สูงขึ้น ไม่ดำเนินคดี", effects: {money: {unit: income_x, amount: -1}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ธนาคารเรียกคืนส่วนที่กู้เกินทั้งก้อนภายในปี", effects: {money: {unit: income_x, amount: -2.5}, happiness: -2}, merit: [{cat: neutral}]}
+      - id: ignore_letter
+        text: "เงียบไว้ ไม่ไปตามนัด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "จดหมายฉบับต่อมาไม่มาอีก เรื่องเงียบไปเฉย ๆ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หมายศาลมาถึงที่ทำงาน ข้อหาใช้เอกสารเท็จ ทั้งแผนกรู้เรื่อง", effects: {money: {unit: income_x, amount: -2}, happiness: -2, network: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: pay_down
+        text: "ขายของมีค่าโปะหนี้ส่วนเกินก่อน"
+        effects: {money: {unit: income_x, amount: -2}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: get_lawyer
+        text: "ปรึกษาทนายก่อนไปธนาคาร"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ทนายพาไปเจรจาจนจบที่ผ่อนคืนส่วนเกิน ไม่มีคดี", effects: {money: {unit: income_x, amount: -1.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ค่าทนายแพง แล้วธนาคารก็ยังเรียกคืนเต็มจำนวน", effects: {money: {unit: income_x, amount: -2}, happiness: -1}, merit: [{cat: neutral}]}
+
+  # ← debt_friend_reunion_01 "ยกหนี้ให้ จบกันแค่นี้"
+  - id: echo_debt_forgiven_back_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "หนี้ที่ยกให้"
+    text: "ปีที่งานหายและเงินเก็บร่อยหรอ เพื่อนคนที่เคยยกหนี้ให้ในงานเลี้ยงรุ่นโทรมา บอกว่าได้ข่าวแล้ว ตอนนี้ธุรกิจเขาตั้งตัวได้ อยากตอบแทนเรื่องวันนั้นบ้าง"
+    choices:
+      - id: accept_job
+        text: "รับงานที่เขาเสนอ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.4}}, text: "ได้งานประจำในบริษัทเขา เงินเดือนดีกว่างานเก่า", effects: {income_mult: 1.2, happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทำงานกับเพื่อนแล้วอึดอัด เถียงกันเรื่องงานจนต้องลาออกเอง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: accept_loan
+        text: "ขอยืมเงินก้อนตั้งหลัก"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เขาโอนให้ทันที บอกว่าไม่ต้องรีบคืน ถือว่าวนกลับมาที่เดิม", effects: {money: {unit: income_x, amount: 1}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้เงิน แต่กลายเป็นเรื่องเล่าในกลุ่มรุ่นว่าใครช่วยใคร", effects: {money: {unit: income_x, amount: 1}, happiness: -1}, merit: [{cat: neutral}]}
+      - id: decline_proud
+        text: "ขอบคุณ แต่ขอลุกเอง"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: ask_for_others
+        text: "ขอให้ช่วยเพื่อนที่แย่กว่า"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: help_others, level: 1}]
