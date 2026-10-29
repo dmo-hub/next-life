@@ -90,7 +90,7 @@ function buyTicket(st, ev) {
   const b = ev.belief;
   const table = PRIZE_TABLES[b.prize_table];
   if (!table) throw new Error(`ไม่รู้จักตารางรางวัล: ${b.prize_table}`);
-  const stake = moneyValue(st, b.stake);
+  const stake = moneyValue(st, b.stake, true);
   st.money -= stake;
   stateOf(st).tickets++;
   const p = drawPrize(table, smallPrizeMult(st.ledger, b.odds_modifier), st.rng.next());

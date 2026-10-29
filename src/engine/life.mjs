@@ -490,11 +490,22 @@ export function levelValue(level) {
   return Math.sign(level) * v;
 }
 
+// เพดานค่าใช้จ่าย income_x: เรื่องเดียวกัน (ค่าหาเสียง · งานบวช · ค่ารักษา) คนรายได้สูงจ่ายแพงกว่าได้แต่ไม่เกิน
+// SPEND_CAP เท่าของคนรายได้ขั้นต่ำ — ไม่งั้นรายได้ร้อยเท่าค่าแรงขั้นต่ำทำให้ค่าหาเสียงผู้ใหญ่บ้านเป็นสิบล้าน · ฝั่งรายรับยังโตตามรายได้
+export const SPEND_CAP = 10;
+function spendBase(st) {
+  const year = st.birthYear + st.age;
+  const era = st.content.era;
+  const floor = minWage(era, st.seed, year) * era.finance.daysPerMonth * 12 * era.birth.saveRate;
+  return Math.min(yearlySaving(st, year), SPEND_CAP * floor);
+}
+
 // เงินในผลตัวเลือก: ตัวเลขเปล่า = บาทของปีนั้น · {unit: income_x} = จำนวนเท่าของเงินเก็บต่อปีตอนนี้
 // · {unit: fixed_baht, ref_year} = บาทของปีอ้างอิง ปรับตามเงินเฟ้อจริงมาเป็นบาทของปีนี้
-export function moneyValue(st, m) {
+// spend = ผู้เรียกถามยอดที่ต้องมี/ต้องจ่าย (requires.money · ราคาใบหวย) ทั้งที่ amount เป็นบวก
+export function moneyValue(st, m, spend = false) {
   if (typeof m === 'number') return m;
-  if (m.unit === 'income_x') return m.amount * yearlySaving(st);
+  if (m.unit === 'income_x') return m.amount * (spend || m.amount < 0 ? spendBase(st) : yearlySaving(st));
   if (m.unit === 'fixed_baht') {
     const year = st.birthYear + st.age;
     const ref = m.ref_year ?? year;
@@ -895,7 +906,7 @@ function choiceGap(st, c) {
   if (!q?.money || lockReason(st, c) === null) return null;
   if (st.pending?.id === FUNERAL.rite && st.funeralPick && c.id !== st.funeralPick) return null;
   if (q.age && (st.age < (q.age.min ?? 0) || st.age > (q.age.max ?? Infinity))) return null;
-  const gap = moneyValue(st, q.money) - (st.dead ? deadPurse(st) : st.money);
+  const gap = moneyValue(st, q.money, true) - (st.dead ? deadPurse(st) : st.money);
   return gap > 0 ? gap : null;
 }
 
@@ -1049,7 +1060,7 @@ function lockReason(st, c, extra = 0) {
   const why = [];
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
   const purse = (st.dead ? deadPurse(st) : st.money) + extra;
-  if (q.money && purse < moneyValue(st, q.money)) why.push('เงินไม่พอ');
+  if (q.money && purse < moneyValue(st, q.money, true)) why.push('เงินไม่พอ');
   for (const [k, b] of Object.entries(q.stats ?? {})) {
     if (b.min !== undefined && st[k] < b.min) why.push(`${STAT_LABELS[k]}ไม่ถึง`);
     if (b.max !== undefined && st[k] > b.max) why.push(`${STAT_LABELS[k]}มากเกินไป`);
@@ -1465,7 +1476,7 @@ function pickRite(st, ev) {
   const purse = deadPurse(st);
   const ok = (id) => {
     const c = ev.choices.find((x) => x.id === id);
-    return !!c && (!c.requires?.money || purse >= moneyValue(st, c.requires.money));
+    return !!c && (!c.requires?.money || purse >= moneyValue(st, c.requires.money, true));
   };
   let want = ['one_day'];
   if (st.relations >= FUNERAL.love.high) want = [...(st.rng.next() < 0.5 ? ['grand', 'chant_7'] : ['chant_7', 'grand']), 'chant_3', 'one_day'];
