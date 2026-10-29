@@ -1,6 +1,6 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, FOLLOW_WORD } from './labels.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.5.16';
@@ -1217,11 +1217,6 @@ function freeChoices(card) {
 
 // ป้ายทางที่มีผลตามมา (card.follows): ไอคอนท้ายข้อความตัวเลือก + คำอธิบายบรรทัดเดียวใต้ชุดปุ่ม
 // บอกแค่ว่ามีเรื่องตามมา ไม่บอกดีหรือร้าย · both = 2 ไอคอน
-const FOLLOW_ICON = {
-  next: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4l2.8-2.8M7.2 4.6l1.3-1.3a2.6 2.6 0 0 1 3.7 3.7l-1.3 1.3M8.8 11.4l-1.3 1.3a2.6 2.6 0 0 1-3.7-3.7l1.3-1.3"/></svg>',
-  later: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2h8M4 14h8M5 2c0 4 6 4 6 6s-6 2-6 6M11 2c0 4-6 4-6 6s6 2 6 6"/></svg>',
-};
-const FOLLOW_WORD = { next: 'มีเรื่องต่อ', later: 'มีผลภายหลัง' };
 const followKinds = (f) => (!f ? [] : f === 'both' ? ['next', 'later'] : [f]);
 const followIcon = (k) => {
   const s = el('span');
