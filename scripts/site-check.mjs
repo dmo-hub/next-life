@@ -13,6 +13,7 @@ import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR, SPEC_START, SPEC_E
 import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
 import { injectDemo, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
+import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -177,6 +178,72 @@ const broken = [
 ];
 check('เดโมการ์ดหน้าแรกกดได้ครบทุกทาง ไม่แตะเซฟ', res.length < 3 || res.some((r) => !r) || !real || touches || !same || !steps.length || live(steps[0]).length < 3, ` ทาง ${res.length} · ข้อความผลจริง ${real}${touches ? ' · แตะ storage/network' : ''}${same ? '' : ' · build ใหม่แล้วหน้าเปลี่ยน (ยังไม่ได้ build?)'}`);
 check('เดโมการ์ดหน้าแรกมีเรื่องต่อ และกดไปได้ถึงทุกขั้น', !gos.length || broken.length, ` ขั้น ${steps.length} · ทางที่มีเรื่องต่อ ${gos.length}${broken.length ? ` · ${broken.slice(0, 3).join(' · ')}` : ''}`);
+
+// 11) หน้าเฉลยไม่ตัดเงื่อนไขทิ้งเงียบ: ถอด key ใน when / multipliers / requires ที่ content ใช้จริงออกทีละตัว ⇒ การ์ดบนหน้าเฉลยต้องเปลี่ยน
+// วัดจากผลวาดแทนรายการชื่อ key — รายการเขียนมือจะไม่ตามตัวสร้าง · key ที่ตั้งใจไม่เฉลยใส่ SPOILER_SKIP พร้อมเหตุผล
+const SPOILER_SKIP = new Set([]);
+const fNames = flagNames();
+const sNames = systemNames();
+const drawn = (e) => {
+  try {
+    const html = spoilersHtml({ ...content, events: [e] }, fNames, sNames);
+    return html.slice(html.indexOf('<article'), html.indexOf('</article>'));
+  } catch (err) {
+    return `throw ${err.message}`;
+  }
+};
+const without = (obj, path) => {
+  const out = structuredClone(obj);
+  const parent = path.slice(0, -1).reduce((o, k) => o[k], out);
+  if (Array.isArray(parent)) parent.splice(path.at(-1), 1);
+  else delete parent[path.at(-1)];
+  return out;
+};
+// เส้นทางที่ถอดได้: key ชั้นแรกของ when / multipliers / requires + key ย่อยของ flags · family[] · loss · stats ที่ตัวสร้างต้องแยกวาด
+const probes = (e) => {
+  const out = [];
+  const walk = (node, at, label, deep) => {
+    for (const [k, v] of Object.entries(node ?? {})) {
+      out.push([[...at, k], `${label}.${k}`]);
+      if (!deep.includes(k) || !v || typeof v !== 'object') continue;
+      if (Array.isArray(v)) v.forEach((x, i) => Object.keys(x).forEach((kk) => out.push([[...at, k, i, kk], `${label}.${k}[].${kk}`])));
+      else if (k === 'stats') Object.entries(v).forEach(([s, b]) => typeof b === 'object' && Object.keys(b).forEach((kk) => out.push([[...at, k, s, kk], `${label}.${k}.*.${kk}`])));
+      else Object.keys(v).forEach((kk) => out.push([[...at, k, kk], `${label}.${k}.${kk}`]));
+    }
+  };
+  walk(e.when, ['when'], 'when', ['flags', 'family', 'loss', 'stats']);
+  walk(e.multipliers, ['multipliers'], 'multipliers(การ์ด)', []);
+  e.choices.forEach((c, i) => {
+    walk(c.requires, ['choices', i, 'requires'], 'requires', ['flags', 'family', 'stats']);
+    walk(c.multipliers, ['choices', i, 'multipliers'], 'multipliers(ตัวเลือก)', []);
+    (c.outcomes ?? []).forEach((o, j) => walk(o.multipliers, ['choices', i, 'outcomes', j, 'multipliers'], 'multipliers(ผล)', []));
+  });
+  return out;
+};
+const silent = (events) => {
+  const miss = new Map();
+  for (const e of events) {
+    const base = drawn(e);
+    for (const [path, label] of probes(e)) {
+      if (SPOILER_SKIP.has(label) || drawn(without(e, path)) !== base) continue;
+      if (!miss.has(label)) miss.set(label, new Set());
+      miss.get(label).add(e.id);
+    }
+  }
+  return miss;
+};
+const missing = silent(content.events);
+// ตัวควบคุม: key ปลอมทุกชั้นต้องถูกจับ — กันด่านที่ผ่านเพราะไม่ได้ถอดอะไรเลย
+const fake = structuredClone(content.events.find((e) => e.choices.some((c) => c.outcomes?.length)));
+const fc = fake.choices.find((c) => c.outcomes?.length);
+fake.when = { ...fake.when, zz_fake: 1 };
+fake.multipliers = { ...fake.multipliers, zz_fake: 2 };
+fc.requires = { ...fc.requires, zz_fake: 1 };
+fc.outcomes[0].multipliers = { ...fc.outcomes[0].multipliers, zz_fake: 2 };
+const fakeMiss = silent([fake]);
+const fakeCaught = ['when.zz_fake', 'multipliers(การ์ด).zz_fake', 'requires.zz_fake', 'multipliers(ผล).zz_fake'].every((k) => fakeMiss.has(k));
+const missLines = [...missing].map(([k, ids]) => `${k} ${ids.size} ใบ เช่น ${[...ids].slice(0, 3).join(',')}`);
+check('หน้าเฉลยวาดทุกเงื่อนไขและตัวคูณที่การ์ดใช้', missing.size || !fakeCaught, ` key ไม่ขึ้นหน้า ${missing.size}${missLines.length ? `: ${missLines.join(' | ')}` : ''} · ตัวควบคุม${fakeCaught ? 'จับได้' : 'จับไม่ได้'}`);
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 process.exit(fail ? 1 : 0);
