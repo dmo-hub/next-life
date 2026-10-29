@@ -1513,6 +1513,13 @@ function render(card) {
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
     body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));
     if (card.news?.story) body.append(el('p', 'news', card.news.story));
+    // ผลย้อน: บอกที่มาก่อนอ่านเรื่อง · อายุ 0 เป็นค่าจริง ห้ามเช็ก truthy
+    if (card.kind === 'event' && card.echoFrom !== undefined) {
+      const ef = followIcon('later');
+      ef.className = 'ef';
+      ef.append(`มาจากที่คุณเลือกตอนอายุ ${card.echoFrom}`);
+      body.append(ef);
+    }
 
     if (card.kind === 'intro') {
       body.append(el('span', 'stamp', 'แรกเกิด'));
