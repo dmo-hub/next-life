@@ -6,7 +6,7 @@ events:
     scene: transfer
     years: [2400, 2700]
     when: {age: [0, 12]}
-    text: "พ่อแม่ทำบุญไปให้"
+    text: "ญาติทำบุญไปให้"
     choices:
       - {text: อนุโมทนา, merit: [{cat: dana, level: 1}]}
       - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}

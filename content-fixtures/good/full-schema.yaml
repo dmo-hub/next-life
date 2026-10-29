@@ -48,7 +48,7 @@ events:
     category: family
     stage: ทำงาน
     years: [2518, 2650]
-    text: "พ่อแม่เล่าให้ญาติฟังว่าลูกคนนี้ช่วยบ้านมาตลอด"
+    text: "ญาติพูดกันว่าคนนี้ช่วยบ้านมาตลอด"
     when: {flags: {has: [married]}}
     choices: []
   - id: work_job_01
