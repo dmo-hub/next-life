@@ -142,6 +142,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .follow-key > span { display:inline-flex; align-items:center; gap:4px; }
 .a .choice .follow, .a .follow-key svg { color:var(--red); } .a .follow-key { color:var(--muted); }
 .a .choice:hover .follow, .a .choice:focus-visible .follow { color:#F3B9AE; }
+.ef { display:flex; align-items:center; gap:5px; margin:2px 0 4px; font-size:13px; font-weight:600; color:var(--red); }
+.ef svg { width:14px; height:14px; flex:none; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+.i .ef { color:#FFB4C8; }
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
 .recap .h { font-size:13px; font-weight:600; }
 .recap .picks { overflow-wrap:anywhere; }
@@ -7502,6 +7505,13 @@ function avatarArt(stage, sex, tier) {
 // ค่ากลางของป้ายบนจอ (B121) — เกมกับหน้าคู่มือ (src/site/guide.mjs) อ่านที่เดียวกัน แก้ป้ายที่นี่แล้วคู่มือตามเอง
 // build.mjs ต่อไฟล์นี้ก่อน app.mjs ในสคริปต์เดียว · ห้ามอ้าง document/window เพราะ Node import ตอนสร้างหน้าเว็บ
 
+// ป้ายทางที่มีผลตามมาบนปุ่มตัวเลือก — คู่มือวาดไอคอนชุดเดียวกับในเกม
+const FOLLOW_ICON = {
+  next: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4l2.8-2.8M7.2 4.6l1.3-1.3a2.6 2.6 0 0 1 3.7 3.7l-1.3 1.3M8.8 11.4l-1.3 1.3a2.6 2.6 0 0 1-3.7-3.7l1.3-1.3"/></svg>',
+  later: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2h8M4 14h8M5 2c0 4 6 4 6 6s-6 2-6 6M11 2c0 4-6 4-6 6s6 2 6 6"/></svg>',
+};
+const FOLLOW_WORD = { next: 'มีเรื่องต่อ', later: 'มีผลภายหลัง' };
+
 // ป้ายปุ่มเดินเรื่องที่คู่มืออธิบาย — ปุ่มที่ผูกกับสถานการณ์เฉพาะ (ลบสมุด · ยกเลิก) ยังเขียนตรงในหน้าจอ
 const BTN = {
   next: 'ต่อไป',
@@ -7540,7 +7550,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.5.16';
+const APP_VERSION = 'v0.5.17';
 const APP_BUILD = '2026-10-29';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
@@ -8754,11 +8764,6 @@ function freeChoices(card) {
 
 // ป้ายทางที่มีผลตามมา (card.follows): ไอคอนท้ายข้อความตัวเลือก + คำอธิบายบรรทัดเดียวใต้ชุดปุ่ม
 // บอกแค่ว่ามีเรื่องตามมา ไม่บอกดีหรือร้าย · both = 2 ไอคอน
-const FOLLOW_ICON = {
-  next: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4l2.8-2.8M7.2 4.6l1.3-1.3a2.6 2.6 0 0 1 3.7 3.7l-1.3 1.3M8.8 11.4l-1.3 1.3a2.6 2.6 0 0 1-3.7-3.7l1.3-1.3"/></svg>',
-  later: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2h8M4 14h8M5 2c0 4 6 4 6 6s-6 2-6 6M11 2c0 4-6 4-6 6s6 2 6 6"/></svg>',
-};
-const FOLLOW_WORD = { next: 'มีเรื่องต่อ', later: 'มีผลภายหลัง' };
 const followKinds = (f) => (!f ? [] : f === 'both' ? ['next', 'later'] : [f]);
 const followIcon = (k) => {
   const s = el('span');
@@ -9050,6 +9055,13 @@ function render(card) {
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
     body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));
     if (card.news?.story) body.append(el('p', 'news', card.news.story));
+    // ผลย้อน: บอกที่มาก่อนอ่านเรื่อง · อายุ 0 เป็นค่าจริง ห้ามเช็ก truthy
+    if (card.kind === 'event' && card.echoFrom !== undefined) {
+      const ef = followIcon('later');
+      ef.className = 'ef';
+      ef.append(`มาจากที่คุณเลือกตอนอายุ ${card.echoFrom}`);
+      body.append(ef);
+    }
 
     if (card.kind === 'intro') {
       body.append(el('span', 'stamp', 'แรกเกิด'));
