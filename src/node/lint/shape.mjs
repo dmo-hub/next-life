@@ -528,7 +528,7 @@ export const rules = [
   },
   {
     id: 'family-system',
-    desc: 'when.family ใช้ role กับ age/alive/count — สุขภาพ/ความสัมพันธ์ของสมาชิกยังไม่มีระบบ ใส่ไปแล้วการ์ดไม่เคยออก · when.loss = {roles?: [spouse|child|grandchild|pet|herd], within?: 0–10}',
+    desc: 'when.family ใช้ role กับ sex/alive/age/count — health/relations ของสมาชิก familyOk ไม่อ่าน (ความผูกพันรายคนมีใน kin[].bond แต่ when.family ยังไม่อ่าน) ใส่ไปแล้วการ์ดไม่เคยออก · when.loss = {roles?: [spouse|child|grandchild|pet|herd], within?: 0–10}',
     event(e, ctx, r) {
       const fam = isObj(e.when) ? e.when.family : undefined;
       list(fam).forEach((f, i) => {
