@@ -960,7 +960,7 @@ function goneSearchCard(st) {
 export const ERA_NEWS = { merge: true };
 
 // news = ข่าวบ้านเมืองที่รวมมาเป็นบรรทัดนำ (B58) — การ์ดยังเป็นของเหตุการณ์ ตัวเลือก/เซฟเดินเหมือนเดิม
-function eventCard(st, ev, news = null) {
+function eventCard(st, ev, news = null, echoFrom = undefined) {
   pickFocus(st);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
@@ -974,6 +974,8 @@ function eventCard(st, ev, news = null) {
     // การ์ดเนื้อหาที่ผูกเหตุการณ์บ้านเมือง — หน้าจอติดป้ายบ้านเมืองแทนช่วงวัย
     national: !!ev.era,
     ...(news && { news }),
+    // ผลย้อน: อายุตอนเลือกตัวเลือกที่นัดการ์ดนี้ไว้
+    ...(echoFrom !== undefined && { echoFrom }),
     funeral: ev.id === FUNERAL.wishes || ev.id === FUNERAL.rite,
     age: st.age,
     stage: stageOf(st.age),
@@ -1157,11 +1159,15 @@ export function nextCard(st) {
       st.fired[ev.id] = { n: (st.fired[ev.id]?.n ?? 0) + 1, age: st.age };
       beliefFired(st, ev);
     }
+    // ผลย้อนพกอายุตอนเลือกไปให้หน้าจอบอกที่มา — อ่านก่อนกรองนัดที่ใช้แล้วทิ้ง · นัดจากเซฟเก่าไม่มี from = ไม่มีป้าย
+    // นัดปีเดียวกัน (after_years [0, 0]) ไม่ส่ง — ป้ายจะบอกอายุเดียวกับการ์ดเอง
+    const from = ev ? st.scheduled.find((x) => x.event === ev.id && x.age === st.age)?.from : undefined;
+    const echoFrom = from < st.age ? from : undefined;
     if (st.scheduled.length) st.scheduled = st.scheduled.filter((x) => x.age >= st.age && !st.done[x.event]);
     if (ev) {
       // อายุนี้อาจมีเหตุการณ์อื่นรออยู่ (หลักไมล์ชนกับนัด) — ค้นอายุเดิมอีกรอบก่อนเดินปี
       st.advance = false;
-      return eventCard(st, ev);
+      return eventCard(st, ev, null, echoFrom);
     }
   }
 }
@@ -1289,7 +1295,7 @@ function applyChoice(st, ev, c, text) {
   }
   for (const f of c.clears_flags ?? []) delete st.flags[f];
   applyFamily(st, c, ev.category === 'family' && c.effects?.relations > 0 ? c.effects.relations : 0);
-  for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]) });
+  for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]), from: st.age });
 }
 
 // รายการบุญบาปตามอายุ (B26) — วัดจากบัญชีที่ขยับจริง ไม่ใช่ป้ายบนตัวเลือก: คำบนที่ผิดซ้ำไม่ทบ จึงไม่ควรขึ้นซ้ำ
