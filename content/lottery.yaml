@@ -56,6 +56,7 @@ events:
         merit: [{cat: sila, level: 2}]
       - id: claim_lost
         text: "บอกว่าสลากหายไปแล้ว"
+        hint: "ราคา: บาปหนักมาก"
         merit: [{cat: greed_harm, level: 3}]
         outcomes:
           - {weight: 1, text: "ไม่มีใครพิสูจน์ได้ เงินทั้งก้อนเป็นของคนเดียว แต่ตั้งแต่วันนั้นไม่มีเพื่อนเก่าคนไหนรับสายอีก", effects: {relations: -3, network: -2, happiness: -1, money: {unit: fixed_baht, amount: 6000000, ref_year: 2560}}, merit: [{cat: greed_harm, level: 3}]}
@@ -184,6 +185,7 @@ events:
     choices:
       - id: run_slips
         text: "รับเดินโพยแทนเจ๊"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 3, ok: true, text: "เดินเก็บโพยทั้งซอยได้ค่าคอมทุกงวด รู้จักคนทั้งตำบล", effects: {network: 2, money: {unit: income_x, amount: 0.6}}, merit: [{cat: greed_harm, level: 1}]}

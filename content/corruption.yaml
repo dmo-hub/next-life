@@ -13,6 +13,7 @@ events:
     choices:
       - id: take_and_sign
         text: "รับซอง เซ็นให้เงียบ ๆ"
+        hint: "ราคา: บาปหนัก"
         sets_flags: [took_bribe]
         merit: [{cat: greed_harm, level: 2}, {cat: unjust_judgment, level: 1}]
         outcomes:
@@ -20,6 +21,7 @@ events:
           - {weight: 1, text: "สามเดือนต่อมาอาคารร้าวทั้งแถบ ชื่อคนเซ็นอยู่บนเอกสารชัดเจน ถูกไล่ออกพร้อมคดีติดตัว", effects: {job: labor, money: {unit: income_x, amount: -1.5}, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: ask_double
         text: "ขอเพิ่มเป็นสองเท่า"
+        hint: "ราคา: บาปหนักมาก"
         sets_flags: [took_bribe]
         merit: [{cat: greed_harm, level: 3}, {cat: unjust_judgment, level: 2}]
         outcomes:
@@ -82,6 +84,7 @@ events:
     choices:
       - id: pay_under
         text: "จ่ายใต้โต๊ะ เอางานให้ได้"
+        hint: "ราคา: บาปหนัก"
         sets_flags: [took_bribe]
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
@@ -117,12 +120,14 @@ events:
     choices:
       - id: rig_scale
         text: "ลองถ่วงตาชั่งดูบ้าง"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 3, ok: true, text: "กำไรงอกขึ้นทุกวันโดยไม่มีใครทัก เงินเก็บเริ่มเป็นก้อน", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ลูกค้าหิ้วตาชั่งมาเทียบกลางตลาด ต่อหน้าคนทั้งซอย ของขาดไปเกือบขีด", effects: {happiness: -2, relations: -2}, sets_flags: [caught_fraud], next: fraud_scale_rumor_01, merit: [{cat: neutral}]}
       - id: mix_cheap
         text: "ผสมของเกรดต่ำลงไปด้วย"
+        hint: "ราคา: บาปหนัก"
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
           - {weight: 2, ok: true, text: "ต้นทุนลดฮวบ กำไรเกือบเท่าตัว ลูกค้ายังไม่รู้ตัว", effects: {money: {unit: income_x, amount: 2}}, merit: [{cat: neutral}]}
@@ -153,6 +158,7 @@ events:
     choices:
       - id: sign_overdraw
         text: "เซ็นให้ รับส่วนแบ่ง"
+        hint: "ราคา: บาปเบา"
         sets_flags: [embezzler]
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
@@ -160,6 +166,7 @@ events:
           - {weight: 1, text: "ฝ่ายตรวจนับสต็อกกะทันหัน ของขาดเป็นคันรถ ชื่อเราอยู่ทุกใบเบิก ถูกไล่ออกวันนั้นเลย", effects: {job: labor, money: {unit: income_x, amount: -1.5}, happiness: -2, relations: -1}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: swap_grade
         text: "แอบใช้ของเกรดต่ำแทนสเปก"
+        hint: "ราคา: บาปหนัก"
         sets_flags: [embezzler]
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
@@ -192,6 +199,7 @@ events:
         merit: [{cat: sila, level: 1}]
       - id: blame_scale
         text: "อ้างว่าตาชั่งเสียเอง"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 1, ok: true, text: "คนส่วนใหญ่ยอมเชื่อ เรื่องค่อย ๆ เงียบไป", effects: {happiness: 1}, merit: [{cat: neutral}]}
@@ -219,12 +227,14 @@ events:
     choices:
       - id: borrow_quiet
         text: "ยืมไปหมุนก่อน เดี๋ยวคืน"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 2, ok: true, text: "หมุนทันพอดี คืนครบก่อนวันประชุม ยังมีกำไรติดมือ ไม่มีใครรู้", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "หมุนไม่ทัน วันประชุมใหญ่มีคนขอดูสมุดบัญชี ตัวเลขห่างกันเป็นแสน", effects: {relations: -2, happiness: -2}, sets_flags: [embezzler, caught_fraud], next: fraud_village_meeting_01, merit: [{cat: neutral}]}
       - id: take_and_run
         text: "เอาเงินก้อนหนีเข้าเมือง"
+        hint: "ราคา: บาปหนักมาก"
         sets_flags: [embezzler]
         merit: [{cat: greed_harm, level: 3}]
         outcomes:
@@ -255,6 +265,7 @@ events:
         merit: [{cat: sila, level: 1}]
       - id: blame_other
         text: "ชี้ว่ากรรมการอีกคนเอาไป"
+        hint: "ราคา: บาปหนัก"
         merit: [{cat: unjust_judgment, level: 2}]
         outcomes:
           - {weight: 1, text: "ชาวบ้านหันไปเล่นงานคนนั้นแทน เขาถูกไล่ออกจากกรรมการทั้งที่ไม่ได้ทำ", effects: {relations: -1}, merit: [{cat: neutral}]}
@@ -265,6 +276,7 @@ events:
         merit: [{cat: sila, level: 1}]
       - id: flee
         text: "เก็บของหนีออกจากหมู่บ้าน"
+        hint: "ราคา: บาปหนัก"
         effects: {relations: -3, happiness: -2, network: -1}
         merit: [{cat: greed_harm, level: 2}]
 
@@ -281,12 +293,14 @@ events:
     choices:
       - id: squeeze
         text: "ตัดโอที เก็บโบนัสไว้"
+        hint: "ราคา: บาปหนัก"
         merit: [{cat: oppress_subjects, level: 2}]
         outcomes:
           - {weight: 2, ok: true, text: "โบนัสเข้าบัญชีตามสัญญา ลูกน้องเดินผ่านไม่ทักสักคำ", effects: {money: {unit: income_x, amount: 2}, relations: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ลูกน้องรวมตัวร้องเรียน เจ้าของโยนความผิดมาให้คนเดียว ถูกไล่ออกไม่มีเงินชดเชย", effects: {job: labor, relations: -2, happiness: -2}, merit: [{cat: neutral}]}
       - id: ghost_staff
         text: "ใส่ชื่อลูกน้องผีเบิกเงินเดือน"
+        hint: "ราคา: บาปหนักมาก"
         sets_flags: [embezzler]
         merit: [{cat: greed_harm, level: 3}, {cat: oppress_subjects, level: 1}]
         outcomes:
@@ -328,6 +342,7 @@ events:
           - {weight: 2, text: "แพ้คดี ถูกไล่ออกจากงาน ข่าวลงชื่อเต็มให้ญาติทั้งตระกูลอ่าน", effects: {job: labor, money: {unit: income_x, amount: -1.5}, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: frame_other
         text: "ซัดทอดว่าคนอื่นสั่งให้ทำ"
+        hint: "ราคา: บาปหนัก"
         merit: [{cat: unjust_judgment, level: 2}]
         outcomes:
           - {weight: 2, text: "รอดตัว คนที่ถูกซัดทอดติดคุกแทน ลูกเขาเรียนห้องเดียวกับหลานเรา", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
@@ -363,6 +378,7 @@ events:
         merit: [{cat: dana, level: 1}, {cat: sila, level: 1}]
       - id: lie_grandkid
         text: "โกหกว่าเป็นสมุดของคนอื่น"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 2, text: "หลานพยักหน้ารับ แต่สายตาไม่เหมือนเดิมอีกแล้ว", effects: {relations: -1}, merit: [{cat: neutral}]}
@@ -430,6 +446,7 @@ events:
         merit: [{cat: neutral}]
       - id: pay_back_in
         text: "ยอมจ่ายใต้โต๊ะครั้งนี้"
+        hint: "ราคา: บาปเบา"
         sets_flags: [took_bribe]
         effects: {income_mult: 1.2, happiness: -1}
         merit: [{cat: greed_harm, level: 1}]

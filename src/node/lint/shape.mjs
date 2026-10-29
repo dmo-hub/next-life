@@ -8,6 +8,7 @@ import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
 import { PET_KINDS, HERD_KINDS, PET_CAUSES } from '../../engine/family.mjs';
 import { CHRONIC, ILL_YEARS, HEREDITARY, CARE_CAUSES } from '../../engine/death.mjs';
+import { SIN_CATS } from '../../engine/merit.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 // คนที่ when.kin_illness เลือกได้ = พ่อแม่ + คนในบ้านที่แกนออกการ์ดแจ้งป่วย (เพื่อนรุ่นไม่แจ้ง)
 const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
@@ -133,6 +134,10 @@ function checkMultipliers(m, at, r) {
   for (const k of MONEY_KEYS) if (m[k] !== undefined && !(ratioBound(m[k]) && positive(m[k].v))) r(`${at}.${k}`, 'ต้องเป็น {min, max, v} อัตราส่วน ≥ 0 อย่างน้อยหนึ่งขอบ v เป็นเลขบวก');
 }
 
+// ป้ายราคาทางลัดดำ (B156): ผู้เล่นเห็นระดับบาปเป็นคำ ไม่เห็นตัวเลข · ระดับ 3 ขึ้นไปรวมเป็นหนักมาก
+const SIN_PRICE = { 1: 'บาปเบา', 2: 'บาปหนัก', 3: 'บาปหนักมาก' };
+const SIN_PRICE_RE = /ราคา: (บาปหนักมาก|บาปหนัก|บาปเบา)/;
+
 export const rules = [
   {
     id: 'unknown-key',
@@ -173,13 +178,21 @@ export const rules = [
   },
   {
     id: 'choice-hint',
-    desc: 'hint (บรรทัดรองใต้ตัวเลือก) เป็นข้อความไม่ว่าง บอกข้อแลกเป็นทิศ/ความเสี่ยง — ห้ามตัวเลข ห้ามคำบุญ/บาป/กุศล (ผู้เล่นต้องไม่เห็นค่าหรือบัญชีบุญบาปจากปุ่ม)',
+    desc: 'hint (บรรทัดรองใต้ตัวเลือก) เป็นข้อความไม่ว่าง บอกข้อแลกเป็นทิศ/ความเสี่ยง — ห้ามตัวเลข ห้ามคำบุญ/บาป/กุศล (ผู้เล่นต้องไม่เห็นค่าหรือบัญชีบุญบาปจากปุ่ม) · ยกเว้นป้ายราคาทางลัดดำ "ราคา: บาปเบา|บาปหนัก|บาปหนักมาก" ที่ต้องตรงระดับบาปของตัวเลือกนั้น (B156)',
     event(e, ctx, r) {
       for (const { c, path } of choicesOf(e)) {
         if (c.hint === undefined) continue;
         if (typeof c.hint !== 'string' || !c.hint.trim()) { r(`${path}.hint`, 'hint ต้องเป็นข้อความไม่ว่าง'); continue; }
         if (/[0-9๐-๙]/.test(c.hint)) r(`${path}.hint`, 'hint ห้ามมีตัวเลข — บอกเป็นทิศ เช่น "อาจเสียเงินก้อนใหญ่"');
-        if (/บุญ|บาป|กุศล/.test(c.hint)) r(`${path}.hint`, 'hint ห้ามบอกบุญบาป');
+        const price = c.hint.match(SIN_PRICE_RE);
+        if (/บุญ|บาป|กุศล/.test(c.hint.replace(SIN_PRICE_RE, ''))) r(`${path}.hint`, 'hint ห้ามบอกบุญบาป');
+        if (price) {
+          // ป้ายคิดจากบาปที่ติดตัวเลือกเท่านั้น — บาปใน outcome เป็นความเสี่ยง ไม่ใช่ราคาที่จ่ายแน่
+          const lv = Math.max(0, ...list(c.merit).filter((m) => SIN_CATS.includes(m?.cat)).map((m) => m.level ?? 1));
+          const want = SIN_PRICE[Math.min(lv, 3)];
+          if (!want) r(`${path}.hint`, 'ป้ายราคาบาปใส่ได้เฉพาะตัวเลือกที่มีบาปใน merit ของตัวเลือก');
+          else if (price[1] !== want) r(`${path}.hint`, `ป้ายราคาต้องเป็น "${want}" ตามระดับบาป ${lv}`);
+        }
       }
     },
   },

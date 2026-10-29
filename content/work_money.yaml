@@ -198,6 +198,7 @@ events:
         merit: [{cat: dana, level: 1}]
       - id: cut_corners
         text: "ขึ้นราคา แอบลดคุณภาพของ"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 1, ok: true, text: "กำไรพุ่ง ไม่มีใครสังเกต อย่างน้อยก็ตอนนี้", effects: {money: {unit: income_x, amount: 2}}, merit: [{cat: neutral}]}
@@ -259,6 +260,7 @@ events:
         merit: [{cat: neutral}]
       - id: fake_review
         text: "รับรีวิวของที่ไม่เคยลองใช้"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 2, ok: true, text: "เงินเข้าง่ายจนแทบไม่เชื่อ", effects: {money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}

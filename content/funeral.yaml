@@ -69,6 +69,7 @@ events:
         merit: [{cat: neutral}]
       - id: grand
         text: "งานใหญ่ เชิญแขกทั้งอำเภอ"
+        hint: "ราคา: บาปเบา"
         requires: {money: {unit: fixed_baht, amount: 1500000, ref_year: 2566}, reason: "เงินที่ทิ้งไว้ไม่พอ"}
         effects: {money: {unit: fixed_baht, amount: -1500000, ref_year: 2566}}
         # ฟุ่มเฟือยเกินเหตุ = บาปเล็กน้อย (เจ้าของเคาะ) · บุญจากแขกมีเพดานเท่าบาปนี้ งานใหญ่จึงไม่ได้บุญสุทธิ

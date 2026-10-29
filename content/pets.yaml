@@ -295,6 +295,7 @@ events:
         merit: [{cat: neutral}]
       - id: abandon
         text: "ปล่อยไว้ที่วัด"
+        hint: "ราคา: บาปเบา"
         effects: {happiness: -1}
         family: [{leave: pet}]
         merit: [{cat: greed_harm, level: 1}]
@@ -426,6 +427,7 @@ events:
         merit: [{cat: neutral}]
       - id: sell_sick
         text: "ขายตัวป่วยให้พ่อค้าเงียบ ๆ"
+        hint: "ราคา: บาปเบา"
         effects: {money: {unit: income_x, amount: 0.4}}
         family: [{leave: herd}]
         merit: [{cat: greed_harm, level: 1}]

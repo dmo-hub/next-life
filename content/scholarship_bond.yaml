@@ -34,7 +34,7 @@ events:
         merit: [{cat: neutral}]
       - id: skip_out
         text: "เบี้ยวทุน ไม่ไปรายงานตัว"
-        hint: "อาจถูกฟ้องจนผู้ค้ำเดือดร้อน"
+        hint: "อาจถูกฟ้องจนผู้ค้ำเดือดร้อน · ราคา: บาปเบา"
         clears_flags: [scholar_bond]
         outcomes:
           - {weight: 1, ok: true, text: "เรื่องเงียบไปหลายปี ไม่มีใครตามทวง", effects: {happiness: 1}, merit: [{cat: neutral}]}

@@ -59,6 +59,7 @@ events:
         merit: [{cat: neutral}]
       - id: spread_rumor
         text: "ปล่อยข่าวว่าร้านเขาขายของเน่า"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 1, text: "ข่าวลือได้ผลอยู่เดือนเดียว ลูกค้ากลับมาบ้าง", effects: {income_mult: 1.1}, merit: [{cat: neutral}]}
@@ -341,6 +342,7 @@ events:
           - {weight: 1, text: "เงินก้อนใหม่เพิ่งโอนไปเช้าวันจันทร์ บ่ายวันนั้นตำรวจบุกสำนักงานวง ข้อหาฉ้อโกงประชาชน เงินทั้งหมดถูกอายัด", effects: {happiness: -3, health: -1}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
       - id: recruit_friends
         text: "ชวนญาติพี่น้องเข้าวง"
+        hint: "ราคา: บาปหนัก"
         effects: {money: {unit: income_x, amount: 0.5}, network: 1}
         merit: [{cat: greed_harm, level: 2}]
         outcomes:

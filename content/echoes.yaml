@@ -110,6 +110,7 @@ events:
         merit: [{cat: neutral}]
       - id: threaten
         text: "ขู่ว่าจะแฉเรื่องเก่าของเขา"
+        hint: "ราคา: บาปเบา"
         effects: {relations: -2, network: -1}
         merit: [{cat: greed_harm, level: 1}]
 
@@ -166,5 +167,6 @@ events:
         merit: [{cat: neutral}]
       - id: cover_again
         text: "รับปากช่วยปิดเรื่องให้เขาอีก"
+        hint: "ราคา: บาปเบา"
         effects: {money: {unit: income_x, amount: 1}, happiness: -2}
         merit: [{cat: greed_harm, level: 1}]

@@ -152,6 +152,7 @@ events:
         merit: [{cat: neutral}]
       - id: extort_juniors
         text: "ร่วมไถเงินรุ่นน้อง"
+        hint: "ราคา: บาปเบา"
         sets_flags: [extorted_juniors]
         effects: {money: {unit: income_x, amount: 0.3}, relations: -2, happiness: 1}
         merit: [{cat: greed_harm, level: 1}]

@@ -221,6 +221,7 @@ events:
           - {weight: 1, text: "เขาหนีไปกลางดึก ทิ้งไว้แต่ผนังพังกับค่าไฟค้างสามเดือน", effects: {money: {unit: income_x, amount: -1}, happiness: -1}, merit: [{cat: neutral}]}
       - id: cut_utilities
         text: "ตัดน้ำตัดไฟ บีบให้ออก"
+        hint: "ราคา: บาปเบา"
         effects: {happiness: 1, relations: -2}
         merit: [{cat: greed_harm, level: 1}]
 
@@ -411,6 +412,7 @@ events:
           - {weight: 2, text: "เงินก้อนหมดไปกับรถคันใหม่ในเดือนเดียว เหลือแต่งวดบ้านที่ยาวกว่าเดิม", effects: {money: {unit: income_x, amount: -3}, happiness: 1}, sets_flags: [has_car], merit: [{cat: neutral}]}
       - id: fake_slip
         text: "แต่งสลิปเงินเดือนกู้เพิ่ม"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 2, text: "ผ่านฉลุย ได้เงินก้อนโตกว่าที่ควรได้ แต่งวดใหม่ก็โตตาม", effects: {debt: {kind: mortgage, amount: {unit: income_x, amount: 5}}, happiness: 1}, schedules: [{event: echo_debt_slip_audit_01, after_years: [3, 8]}], merit: [{cat: neutral}]}

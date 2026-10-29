@@ -1,0 +1,13 @@
+# ป้ายราคาทางลัดดำ (B156): hint บอกระดับบาปเป็นคำได้เมื่อตรงบาปที่ติดตัวเลือก · ต่อท้ายข้อแลกเดิมได้ · ระดับเกิน 3 นับเป็นหนักมาก
+events:
+  - id: good_sin_price_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ผู้รับเหมายื่นซองมาให้"
+    choices:
+      - {text: "รับซอง", hint: "ราคา: บาปเบา", merit: [{cat: greed_harm, level: 1}]}
+      - {text: "รับซองแล้วขอเพิ่ม", hint: "ได้เงินก้อน · ราคา: บาปหนัก", merit: [{cat: greed_harm, level: 2}]}
+      - {text: "รับแล้วโยนความผิดให้ลูกน้อง", hint: "ราคา: บาปหนักมาก", merit: [{cat: greed_harm, level: 1}, {cat: unjust_judgment, level: 3}]}
+      - {text: "ไม่รับ", merit: [{cat: sila, level: 1}]}

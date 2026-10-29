@@ -26,6 +26,7 @@ events:
           - {weight: 2, text: "เจ้านายยิ้มรับ แต่เช้าวันรุ่งขึ้นโต๊ะของคุณถูกย้ายไปริมห้องเก็บของ", effects: {happiness: -2}, next: career_poach_cornered_01, merit: [{cat: neutral}]}
       - id: steal_clients
         text: "ย้ายไปพร้อมขนรายชื่อลูกค้า"
+        hint: "ราคา: บาปหนัก"
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
           - {weight: 2, ok: true, text: "ลูกค้าตามมาครึ่งพอร์ต ที่ใหม่ยกให้เป็นดาวเด่นของทีม", effects: {income_mult: 1.5, relations: -1}, merit: [{cat: greed_harm, level: 1}]}
@@ -126,6 +127,7 @@ events:
         merit: [{cat: neutral}]
       - id: pull_strings
         text: "ใช้เส้นสายขอยกเลิกคำสั่ง"
+        hint: "ราคา: บาปเบา"
         requires: {stats: {network: {min: 50}}, reason: "ยังไม่มีคนรู้จักพอจะช่วยได้"}
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
@@ -164,6 +166,7 @@ events:
         merit: [{cat: help_others, level: 1}]
       - id: push_hard
         text: "รับเลย แล้วบีบลูกน้องทำยอด"
+        hint: "ราคา: บาปหนัก"
         requires: {edu: อุดมศึกษา, reason: "ตำแหน่งนี้ต้องจบปริญญาตรี"}
         merit: [{cat: oppress_subjects, level: 2}]
         outcomes:
@@ -183,7 +186,7 @@ events:
         outcomes:
           - {weight: 3, ok: true, multipliers: {stats: {relations: 1.4}}, text: "รุ่นพี่หัวโจกยอมเล่าเรื่องที่อัดอั้น ทีมกลับมาเหนียวแน่นกว่าเดิม", effects: {relations: 2, happiness: 2, network: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "คุยไม่รู้เรื่อง ลูกน้องเอาไปเล่าลือจนทั้งบริษัทรู้", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
-      - {text: "ไล่หัวโจกออกให้เข็ด", effects: {relations: -2, happiness: 1}, merit: [{cat: unjust_judgment, level: 2}]}
+      - {text: "ไล่หัวโจกออกให้เข็ด", hint: "ราคา: บาปหนัก", effects: {relations: -2, happiness: 1}, merit: [{cat: unjust_judgment, level: 2}]}
       - {text: "ขอลงจากตำแหน่งเอง", effects: {income_mult: 0.85, health: 1, happiness: 1}, merit: [{cat: neutral}]}
       - {text: "ทำงานหนักให้ดูเป็นตัวอย่าง", effects: {health: -2, relations: 1}, merit: [{cat: neutral}]}
 
@@ -278,6 +281,7 @@ events:
           - {weight: 1, text: "ช่างประจำปัดว่ายุ่ง เข้าห้องสอบไปทั้งที่ไม่เคยจับเครื่องจริง สอบตก", effects: {happiness: -2}, merit: [{cat: neutral}]}
       - id: pay_examiner
         text: "ใส่ซองให้กรรมการคุมสอบ"
+        hint: "ราคา: บาปเบา"
         cost: {unit: income_x, amount: 0.5}
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
@@ -333,6 +337,7 @@ events:
     choices:
       - id: take_seat
         text: "รับตำแหน่งที่ญาติฝาก"
+        hint: "ราคา: บาปหนัก"
         requires: {edu: อาชีวะ, reason: "ตำแหน่งนี้ต้องมีวุฒิอาชีวะขึ้นไป"}
         sets_flags: [took_bribe]
         merit: [{cat: greed_harm, level: 2}]
@@ -341,6 +346,7 @@ events:
           - {weight: 1, text: "คนที่ถูกเบียดร้องเรียนจนมีการสอบสวน ถูกไล่ออกพร้อมข่าวฉาว", effects: {job: labor, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: pay_bribe
         text: "จ่ายใต้โต๊ะซื้อเก้าอี้ผู้จัดการ"
+        hint: "ราคา: บาปหนักมาก"
         requires: {edu: อุดมศึกษา, reason: "เก้าอี้นี้ต้องจบปริญญาตรี"}
         effects: {money: {unit: income_x, amount: -2}}
         sets_flags: [took_bribe]

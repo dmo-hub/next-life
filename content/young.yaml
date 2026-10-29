@@ -289,6 +289,7 @@ events:
         merit: [{cat: neutral}]
       - id: fake_review
         text: "รับรีวิวของที่ไม่เคยใช้จริง"
+        hint: "ราคา: บาปเบา"
         outcomes:
           - {weight: 2, text: "เงินเข้าง่ายกว่าที่คิด ไม่มีใครจับได้", effects: {money: {unit: income_x, amount: 2}}, merit: [{cat: greed_harm, level: 1}]}
           - {weight: 1, text: "โดนแฉว่ารีวิวปลอม ทัวร์ลงทั้งเพจ", effects: {relations: -2, happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: greed_harm, level: 1}]}
@@ -373,6 +374,7 @@ events:
         merit: [{cat: help_others, level: 1}]
       - id: blackmail
         text: "เอาแฟ้มไปขู่หัวหน้าแลกเงิน"
+        hint: "ราคา: บาปหนัก"
         outcomes:
           - {weight: 1, text: "หัวหน้ายอมจ่ายเงียบ ๆ ทุกเดือน", effects: {money: {unit: income_x, amount: 2}, happiness: -1}, merit: [{cat: greed_harm, level: 2}]}
           - {weight: 2, text: "หัวหน้าอัดเสียงไว้ทั้งหมด ถูกไล่ออกพร้อมประวัติด่างทั้งวงการ", effects: {income_mult: 0.6, happiness: -2, network: -2}, sets_flags: [caught_fraud], merit: [{cat: greed_harm, level: 2}]}
