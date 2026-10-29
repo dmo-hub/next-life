@@ -41,7 +41,10 @@ function labels(content, flags, systems) {
     return `<span class="fl" title="${esc(f)}">${esc(name ?? f)}</span>`;
   };
   const sys = (id) => `${esc(systems[id] ?? id)}${from[id] ? ` (พ.ศ. ${from[id]})` : ''}`;
-  return { occ: (id) => occ[id] ?? id, era: (id) => era[id] ?? id, sys, flag };
+  // none = ไม่ได้อยู่สายเลื่อนขั้นใด (แกนเทียบ st.ladder?.id ?? 'none')
+  const ladders = content.era.careers?.ladders ?? {};
+  const ladder = (id) => (id === 'none' ? 'ไม่อยู่สายเลื่อนขั้น' : ((n) => (n.startsWith('สาย') ? n : `สาย${n}`))(ladders[id]?.name ?? id));
+  return { occ: (id) => occ[id] ?? id, era: (id) => era[id] ?? id, sys, flag, ladder };
 }
 
 // เงินในผล: ตัวเลขเปล่า = บาทของปีนั้น · income_x = เท่าของเงินเก็บต่อปี · fixed_baht = บาทของปีอ้างอิง ปรับตามเงินเฟ้อ (moneyValue ในแกน)
@@ -103,10 +106,18 @@ function mults(m, L) {
   for (const [k, v] of Object.entries(m.stats ?? {})) out.push(`×${v} เมื่อ${STAT_LABELS[k]}สูง (÷${v} เมื่อต่ำ)`);
   for (const [o, v] of Object.entries(m.occupation ?? {})) out.push(`×${v} ถ้าทำงาน${esc(L.occ(o))}`);
   for (const [c, v] of Object.entries(m.class ?? {})) out.push(`×${v} ถ้าฐานะ${esc(c)}`);
+  for (const [s, v] of Object.entries(m.sex ?? {})) out.push(`×${v} ถ้าเพศ${esc(s)}`);
   if (m.karma) out.push(`×${m.karma} เมื่อบุญมากกว่าบาป (÷${m.karma} เมื่อบาปมากกว่า)`);
   if (m.wish) out.push(`ยกกำลังตามระดับบัญชีบุญบาป (ฐาน ${m.wish})`);
+  if (m.rank) out.push(`×${m.rank} ต่อขั้นตำแหน่งที่ไต่ขึ้น (ทบกัน)`);
+  if (m.family_fame) out.push(`×${m.family_fame} ต่อระดับชื่อเสียงตระกูล (ทบกัน)`);
+  for (const k of Object.keys(MONEY_TH)) if (m[k]) out.push(`×${m[k].v} เมื่อ${moneyBound(k, m[k])}`);
   return out;
 }
+
+// อัตราส่วนเงินที่การ์ดเช็ก (moneyRatios ในแกน) — เกณฑ์เป็นเท่า ไม่ใช่บาท
+const MONEY_TH = { money_x: 'เงินสดเทียบรายได้ปี', income_x: 'รายได้ต่อเดือนเทียบค่าแรงขั้นต่ำ', debt_x: 'หนี้สุทธิเทียบรายได้ปี' };
+const moneyBound = (k, b) => [b.min !== undefined ? `${MONEY_TH[k]} ≥ ${b.min} เท่า` : '', b.max !== undefined ? `${MONEY_TH[k]} ≤ ${b.max} เท่า` : ''].filter(Boolean).join(' และ ');
 
 function flagCond(f, L) {
   const out = [];
@@ -115,8 +126,10 @@ function flagCond(f, L) {
   return out;
 }
 
+const PARENT_BY_SEX = { ชาย: 'พ่อ', หญิง: 'แม่' };
 function famCond(f) {
-  const who = FAMILY_ROLE_NAMES[f.role] ?? f.role;
+  const role = f.role === 'parent' && PARENT_BY_SEX[f.sex] ? PARENT_BY_SEX[f.sex] : `${FAMILY_ROLE_NAMES[f.role] ?? f.role}${f.sex ? `เพศ${esc(f.sex)}` : ''}`;
+  const who = `${role}${f.age ? ` อายุ ${range(f.age, ' ปี')}` : ''}`;
   const alive = f.alive === undefined ? '' : f.alive ? 'ที่ยังอยู่' : 'ที่จากไปแล้ว';
   if (f.count) return f.count[1] === 0 ? `ไม่มี${who}${alive}` : `มี${who}${alive} ${range(f.count, ' คน')}`;
   return `มี${who}${alive}`;
@@ -140,6 +153,8 @@ function conditions(e, L) {
   if (w.sex) out.push(`เพศ${any(w.sex.map(esc))}`);
   if (w.class) out.push(`ฐานะ${any(w.class.map(esc))}`);
   if (w.occupation) out.push(`ทำงาน${any(w.occupation.map((o) => esc(L.occ(o))))}`);
+  if (w.ladder) out.push(any(w.ladder.map((l) => esc(L.ladder(l)))));
+  for (const k of Object.keys(MONEY_TH)) if (w[k]) out.push(moneyBound(k, w[k]));
   if (w.school) out.push(`เรียน${any(w.school.map((s) => esc(TRACKS[s]?.name ?? (s === 'none' ? 'ไม่ได้เรียน' : s))))}`);
   for (const [k, b] of Object.entries(w.stats ?? {})) out.push(bound(k, b));
   for (const f of w.family ?? []) out.push(famCond(f));
@@ -217,11 +232,13 @@ function card(e, L, byId) {
     })
     .join('');
   const cond = conditions(e, L);
+  const odds = mults(e.multipliers, L);
   return [
     `<article class="c a" id="${esc(e.id)}">`,
     `<h4>${text(e.title ?? 'ไม่มีชื่อการ์ด')}</h4>`,
     tags.length ? `<p class="tags">${tags.map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : '',
     cond.length ? `<p class="when">ออกเมื่อ: ${cond.join(' · ')}</p>` : '',
+    odds.length ? `<p class="when">โอกาสออก: ${odds.join(' · ')}</p>` : '',
     `<p>${text(e.text)}</p>`,
     choices ? `<ol class="chs">${choices}</ol>` : '<p class="none">การ์ดเล่าเรื่อง ไม่มีตัวเลือก</p>',
     '</article>',
