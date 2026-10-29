@@ -84,14 +84,15 @@ async function shot(page, selector, name) {
 
 if (!checkOnly) {
   mkdirSync(new URL('img/', docs), { recursive: true });
-  // ชาติไทย: การ์ดเกิด → การ์ดเลือก (≥3 ทาง) → การ์ดตาย → ปรโลก
+  // ชาติไทย: การ์ดเกิด → การ์ดเลือก (≥3 ทาง มีป้ายเรื่องต่อ/ผลภายหลังบนปุ่ม) → การ์ดตาย → ปรโลก
   const { page, errors } = await open('play.html', 390);
   await page.waitForSelector('article.card');
   await shot(page, 'article.card', 'thai-birth');
+  // ภาพหน้าแรกต้องโชว์ป้าย .follow — การ์ดที่ไม่มีป้ายข้ามไป
   const choice = () => {
     const c = document.querySelector('article.card');
     const n = c ? c.querySelectorAll('.choices button:not([disabled])').length : 0;
-    return n >= 4 && !/เปิดชีวิต|ลืมตาดูโลก/.test(c.innerText);
+    return n >= 4 && !!c.querySelector('.choices button:not([disabled]) .follow') && !/เปิดชีวิต|ลืมตาดูโลก/.test(c.innerText);
   };
   if (!(await playUntil(page, choice))) throw new Error('ไม่เจอการ์ดเลือก');
   await shot(page, 'article.card', 'thai-choice');
