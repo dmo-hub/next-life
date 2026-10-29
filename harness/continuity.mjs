@@ -3,7 +3,9 @@
 // ปลายทางทั้งสองแบบไม่อยู่ในกองสุ่ม/หลักไมล์ (ด่านตรวจข้างล่าง) การ์ดที่เห็นจึงนับเป็นผลของการเลือกได้ตรง ๆ
 // ด่าน: ผลย้อนออกตรงปีที่นัด · ออกเมื่อ when ของมันผ่านเท่านั้น — เว้นการ์ดสายมู (category belief) ที่ระบบความเชื่อปล่อยเอง
 // และล้างธงที่ when อ่านไปพร้อมกับการ์ด (ตรวจที่ npm run belief) · --min-next / --min-echo = เป้าสัดส่วนชีวิต (ไม่ใส่ = รายงานอย่างเดียว)
-// รายชื่อปลายทางที่ไม่เคยออกให้เลน A ดูว่าเนื้อหาใหม่ถึงผู้เล่นจริง
+// รายชื่อปลายทางที่ไม่เคยออกให้เลน A ดูว่าเนื้อหาใหม่ถึงผู้เล่นจริง · ตารางแยกหมวดให้แต่ละเลนวัดก้อนของตัวเอง
+import { readdirSync, readFileSync } from 'node:fs';
+import { parse } from 'yaml';
 import { playLife, mixSeed, whenOk } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
@@ -27,6 +29,49 @@ const fail = [];
 const drawn = [...NEXT, ...ECHO].filter((id) => byId[id] && (byId[id].weight || byId[id].age !== undefined));
 if (drawn.length) fail.push(`ปลายทางที่อยู่ในกองสุ่ม/หลักไมล์ด้วย นับแยกไม่ได้: ${drawn.join(' ')}`);
 
+// หมวดของสาย — loadContent ไม่เก็บไฟล์ต้นทาง จึงอ่าน yaml ซ้ำเพื่อจับ id กับไฟล์ (หนี้/ทุจริตเป็นไฟล์ ไม่ใช่ category)
+// ดูทั้งสายของปลายทาง (ต้นทางทุกชั้น + ปลายทางถัดไปทุกชั้น) ไม่ใช่ใบต้นทางใบเดียว: สายหนี้หลายสายเริ่มจากการ์ดทั่วไป
+// ใน young/mid แล้วค่อยต่อเข้า debt.yaml · ใบหนึ่งแตะได้หลายหมวด จึงไล่ตามลำดับ CATS หมวดแรกที่ตรงชนะ
+const TARGET = new Set([...NEXT, ...ECHO]);
+const contentDir = new URL('../content/', import.meta.url);
+const fileOf = {};
+for (const f of readdirSync(contentDir).filter((x) => x.endsWith('.yaml'))) {
+  for (const e of parse(readFileSync(new URL(f, contentDir), 'utf8')).events ?? []) fileOf[e.id] = f;
+}
+const up = new Map(), down = new Map();
+const link = (from, to) => {
+  for (const [m, a, b] of [[up, to, from], [down, from, to]]) (m.get(a) ?? m.set(a, new Set()).get(a)).add(b);
+};
+for (const e of content.events) for (const c of e.choices ?? []) {
+  for (const s of c.schedules ?? []) link(e.id, s.event);
+  for (const o of c.outcomes ?? []) {
+    if (o.next) link(e.id, o.next);
+    for (const s of o.schedules ?? []) link(e.id, s.event);
+  }
+}
+const walk = (id, m) => {
+  const seen = new Set([id]);
+  for (const x of seen) for (const y of m.get(x) ?? []) seen.add(y);
+  return seen;
+};
+const CATS = [
+  ['หนี้', (id) => fileOf[id] === 'debt.yaml'],
+  ['ทุจริต', (id) => fileOf[id] === 'corruption.yaml'],
+  ['สุขภาพ', (id) => byId[id]?.category === 'health'],
+  ['ครอบครัว', (id) => byId[id]?.category === 'family'],
+  ['อื่น', () => true],
+];
+const catOf = new Map();
+const cat = Object.fromEntries(CATS.map(([k]) => [k, { roots: new Set(), targets: 0, withNext: 0, nextCards: 0, longEcho: 0 }]));
+for (const id of TARGET) {
+  const line = new Set([...walk(id, up), ...walk(id, down)]);
+  const k = CATS.find(([, hit]) => [...line].some(hit))[0];
+  catOf.set(id, k);
+  cat[k].targets++;
+  // สาย = การ์ดต้นทางรากที่ไม่ใช่ปลายทางของใครเอง
+  for (const x of walk(id, up)) if (!TARGET.has(x)) cat[k].roots.add(x);
+}
+
 const seenTarget = new Map();
 const rows = [];
 let offDate = 0, offWhen = 0;
@@ -34,6 +79,7 @@ for (const [name, bot] of Object.entries(BOTS)) {
   const r = { name, lives: 0, withNext: 0, nextCards: 0, long: 0, longEcho: 0, booked: 0, echoCards: 0 };
   for (let i = 0; i < n / Object.keys(BOTS).length; i++) {
     let next = 0, echo = 0, age = 0;
+    const catNext = {}, catEcho = new Set();
     // ช่วงอายุที่นัดไว้ต่อปลายทาง จดจากตัวเลือกที่บอทกด (ทุกผลสุ่มของตัวเลือกนั้น) — นัดปีเดียวกันถูกใช้ก่อนการ์ดใบถัดไปออก อ่าน st.scheduled ไม่ทัน
     const booked = [];
     let at = 0;
@@ -46,9 +92,13 @@ for (const [name, bot] of Object.entries(BOTS)) {
     playLife(mixSeed(seed, i), content, pick, (card, st) => {
       age = at = st.age;
       if (card.kind !== 'event' || !card.id) return;
-      if (NEXT.has(card.id)) next++;
+      if (NEXT.has(card.id)) {
+        next++;
+        catNext[catOf.get(card.id)] = (catNext[catOf.get(card.id)] ?? 0) + 1;
+      }
       if (ECHO.has(card.id)) {
         echo++;
+        catEcho.add(catOf.get(card.id));
         if (byId[card.id].category !== 'belief' && !booked.some(([id, lo, hi]) => id === card.id && st.age >= lo && st.age <= hi)) offDate++;
         if (byId[card.id].category !== 'belief' && !whenOk(st, byId[card.id].when)) offWhen++;
       }
@@ -59,9 +109,14 @@ for (const [name, bot] of Object.entries(BOTS)) {
     if (next) r.withNext++;
     r.booked += booked.length;
     r.echoCards += echo;
+    for (const [k, v] of Object.entries(catNext)) {
+      cat[k].withNext++;
+      cat[k].nextCards += v;
+    }
     if (age >= LONG_AGE) {
       r.long++;
       if (echo) r.longEcho++;
+      for (const k of catEcho) cat[k].longEcho++;
     }
   }
   rows.push(r);
@@ -76,6 +131,13 @@ for (const r of rows) {
   console.log(`${r.name.padEnd(12)} ${pct(r.withNext, r.lives).padStart(10)}            ${(r.nextCards / r.lives).toFixed(2).padStart(5)}          ${pct(r.longEcho, r.long).padStart(8)} (${r.long})            ${r.booked} → ${r.echoCards}`);
 }
 console.log(`รวม         ${pct(all.withNext, all.lives).padStart(10)}                             ${pct(all.longEcho, all.long).padStart(8)} (${all.long})`);
+console.log(`\nแยกหมวดสาย (${CATS.map(([k]) => k).join(' > ')} · หมวดแรกที่สายแตะชนะ)`);
+console.log('หมวด       สาย   ปลายทางออก   ชีวิตที่เจอเรื่องต่อ   เรื่องต่อ/ชีวิต   ชีวิตยาวที่เจอผลย้อน');
+for (const [k] of CATS) {
+  const c = cat[k];
+  const shown = [...catOf].filter(([id, x]) => x === k && seenTarget.has(id)).length;
+  console.log(`${k.padEnd(9)} ${String(c.roots.size).padStart(4)}   ${`${shown}/${c.targets}`.padStart(10)}   ${pct(c.withNext, all.lives).padStart(14)}   ${(c.nextCards / all.lives).toFixed(2).padStart(14)}   ${pct(c.longEcho, all.long).padStart(18)}`);
+}
 const never = [...NEXT, ...ECHO].filter((id) => !seenTarget.has(id));
 console.log(never.length ? `ปลายทางที่ไม่เคยออก ${never.length} ใบ: ${never.join(' ')}` : 'ปลายทางออกครบทุกใบ');
 
