@@ -71,6 +71,11 @@ for (const id of TARGET) {
 }
 
 const seenTarget = new Map();
+// ยอดคาดต่อปลายทาง = ผลรวมสัดส่วน weight ของผลที่ชี้ไปตอนบอทกดตัวเลือกนั้น (ไม่คิดตัวคูณ/when/ปี จึงเป็นเพดานบน)
+// ปลายทางที่คาดต่ำกว่า RARE_EXPECT ออก 0 ครั้งได้เพราะ rng ล้วน — แยกจาก "ไม่เคยออก" ไม่ให้เป็นสัญญาณหลอก
+const RARE_EXPECT = 3;
+const expect = new Map();
+const addExpect = (id, v) => expect.set(id, (expect.get(id) ?? 0) + v);
 const rows = [];
 let offDate = 0, offWhen = 0;
 for (const [name, bot] of Object.entries(BOTS)) {
@@ -85,6 +90,15 @@ for (const [name, bot] of Object.entries(BOTS)) {
       const idx = bot(card, rng, x);
       const c = card.kind === 'event' && byId[card.id]?.choices?.[idx];
       for (const w of c ? [c, ...(c.outcomes ?? [])] : []) for (const sc of w.schedules ?? []) booked.push([sc.event, at + sc.after_years[0], at + sc.after_years[1]]);
+      if (c) {
+        for (const sc of c.schedules ?? []) addExpect(sc.event, 1);
+        const total = (c.outcomes ?? []).reduce((a, o) => a + (o.weight ?? 1), 0);
+        for (const o of c.outcomes ?? []) {
+          const share = (o.weight ?? 1) / total;
+          if (o.next) addExpect(o.next, share);
+          for (const sc of o.schedules ?? []) addExpect(sc.event, share);
+        }
+      }
       return idx;
     };
     playLife(mixSeed(seed, i), content, pick, (card, st) => {
@@ -136,8 +150,11 @@ for (const [k] of CATS) {
   const shown = [...catOf].filter(([id, x]) => x === k && seenTarget.has(id)).length;
   console.log(`${k.padEnd(9)} ${String(c.roots.size).padStart(4)}   ${`${shown}/${c.targets}`.padStart(10)}   ${pct(c.withNext, all.lives).padStart(14)}   ${(c.nextCards / all.lives).toFixed(2).padStart(14)}   ${pct(c.longEcho, all.long).padStart(18)}`);
 }
-const never = [...NEXT, ...ECHO].filter((id) => !seenTarget.has(id));
-console.log(never.length ? `ปลายทางที่ไม่เคยออก ${never.length} ใบ: ${never.join(' ')}` : 'ปลายทางออกครบทุกใบ');
+const unseen = [...NEXT, ...ECHO].filter((id) => !seenTarget.has(id));
+const rare = unseen.filter((id) => (expect.get(id) ?? 0) < RARE_EXPECT);
+const never = unseen.filter((id) => !rare.includes(id));
+console.log(never.length ? `ปลายทางที่ไม่เคยออก ${never.length} ใบ: ${never.map((id) => `${id} (คาด ${(expect.get(id) ?? 0).toFixed(1)})`).join(' ')}` : 'ปลายทางออกครบทุกใบที่คาดว่าควรออก');
+if (rare.length) console.log(`  หายาก ไม่ออกรอบนี้ (คาด <${RARE_EXPECT} ครั้ง · rng ล้วน): ${rare.map((id) => `${id} (คาด ${(expect.get(id) ?? 0).toFixed(2)})`).join(' ')}`);
 
 if (offDate) fail.push(`ผลย้อนออกไม่ตรงปีที่นัด ${offDate} ครั้ง`);
 if (offWhen) fail.push(`ผลย้อนออกทั้งที่ when ไม่ผ่าน ${offWhen} ครั้ง`);
