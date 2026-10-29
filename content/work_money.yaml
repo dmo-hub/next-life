@@ -90,7 +90,7 @@ events:
         requires: {stats: {happiness: {min: 50}}, reason: "อารมณ์ไม่ดีพอจะเล่นกับมัน"}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "คลิปแกล้งแก๊งคอลเซ็นเตอร์ดังทั้งประเทศ คนทักมาขอบคุณไม่หยุด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "คลิปแกล้งแก๊งคอลเซ็นเตอร์ดังทั้งประเทศ คนทักมาขอบคุณไม่หยุด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "มันเอาเบอร์ไปขาย โดนโทรก่อกวนทั้งเดือน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
       - id: warn_neighbors
         text: "เตือนพ่อแม่กับคนทั้งซอย"
@@ -128,7 +128,7 @@ events:
         effects: {knowledge: 1}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "เจอว่าเพื่อนติดหนี้อีกห้าเจ้า รอดตัวไปหวุดหวิด", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "เจอว่าเพื่อนติดหนี้อีกห้าเจ้า รอดตัวไปหวุดหวิด", effects: {happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เพื่อนน้อยใจว่าไม่ไว้ใจกัน เลิกคบไปเลย", effects: {relations: -2}, merit: [{cat: neutral}]}
 
   - id: work_house_01
@@ -167,7 +167,7 @@ events:
         sets_flags: [has_kids, home_owner]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ได้บ้านสภาพดีในราคาครึ่งเดียว เพื่อนบ้านยังอิจฉา", effects: {happiness: 2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ได้บ้านสภาพดีในราคาครึ่งเดียว เพื่อนบ้านยังอิจฉา", effects: {happiness: 2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เจ้าของเดิมไม่ยอมย้ายออก ฟ้องร้องกันยืดเยื้อหลายปี", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
 
   - id: work_biz_boom_01
@@ -185,7 +185,7 @@ events:
         text: "กู้มาเปิดเพิ่มอีกสามสาขา"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "สาขาใหม่ขายดีทุกแห่ง มีคนมาขอซื้อแฟรนไชส์", effects: {happiness: 2, health: -1, income_mult: 2}, merit: [{cat: neutral}], next: work_franchise_01}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "สาขาใหม่ขายดีทุกแห่ง มีคนมาขอซื้อแฟรนไชส์", effects: {happiness: 2, health: -1, income_mult: 2}, merit: [{cat: neutral}], next: work_franchise_01}
           - {weight: 2, text: "ขยายเร็วจนคุมคุณภาพไม่อยู่ ลูกค้าหาย หนี้ยังอยู่ครบ", effects: {happiness: -2, income_mult: 0.7, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
       - id: sell_recipe
         text: "ขายกิจการให้นายทุน แล้วพักยาว"
@@ -229,7 +229,7 @@ events:
         text: "ย้ายไปขายออนไลน์อย่างเดียว"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ปิดหน้าร้าน รับงานผ่านแอปแทน ออเดอร์เด้งไม่หยุด", effects: {happiness: 1, income_mult: 1.3}, sets_flags: [online_seller], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ปิดหน้าร้าน รับงานผ่านแอปแทน ออเดอร์เด้งไม่หยุด", effects: {happiness: 1, income_mult: 1.3}, sets_flags: [online_seller], merit: [{cat: neutral}]}
           - {weight: 1, text: "ค่าคอมแอปกินกำไรหมด ขายมากยิ่งเหนื่อยฟรี", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
       - id: sell_lease
         text: "เซ้งกิจการให้คนอื่น"
@@ -313,7 +313,7 @@ events:
         text: "ขับรถตามไปหาถึงร้าน"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "เจอเพื่อนยืนสับไก่อยู่หน้าร้าน เขาทรุดลงร้องไห้ขอโทษ แล้วทยอยโอนคืนได้ก้อนหนึ่ง ที่เหลือยังต้องผ่อนเอง", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.5}}, text: "เจอเพื่อนยืนสับไก่อยู่หน้าร้าน เขาทรุดลงร้องไห้ขอโทษ แล้วทยอยโอนคืนได้ก้อนหนึ่ง ที่เหลือยังต้องผ่อนเอง", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ร้านปิดไปแล้ว เหลือแต่ป้ายเซ้งกับค่าน้ำมันที่เสียฟรี", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
       - id: sue_friend
         text: "จ้างทนายฟ้องไล่เบี้ยกลับ"

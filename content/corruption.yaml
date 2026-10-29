@@ -30,13 +30,13 @@ events:
         merit: [{cat: sila, level: 1}]
         schedules: [{event: echo_fraud_clean_hands_01, after_years: [10, 20]}]
         outcomes:
-          - {weight: 2, ok: true, text: "ผู้บริหารรู้เรื่องทีหลัง เรียกไปชมต่อหน้าที่ประชุม ชื่อเสียงเรื่องมือสะอาดเริ่มเป็นที่รู้กัน", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "ผู้บริหารรู้เรื่องทีหลัง เรียกไปชมต่อหน้าที่ประชุม ชื่อเสียงเรื่องมือสะอาดเริ่มเป็นที่รู้กัน", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ผู้รับเหมาไปหาคนอื่นเซ็นแทน แล้วเส้นสายเขาก็ทำให้ถูกย้ายไปสาขาที่ห่างไกล", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
       - id: report
         text: "เก็บซองเป็นหลักฐาน แจ้งผู้ตรวจ"
         merit: [{cat: help_others, level: 1}, {cat: sila, level: 1}]
         outcomes:
-          - {weight: 1, ok: true, text: "ผู้ตรวจจับผู้รับเหมาได้คาหนังคาเขา ได้เลื่อนขั้นเป็นคนคุมงานตรวจรับทั้งหมด", effects: {income_mult: 1.2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "ผู้ตรวจจับผู้รับเหมาได้คาหนังคาเขา ได้เลื่อนขั้นเป็นคนคุมงานตรวจรับทั้งหมด", effects: {income_mult: 1.2, network: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "เรื่องเงียบหาย ไม่กี่วันต่อมามีจดหมายไม่ลงชื่อมาถึงบ้าน เขียนว่ารู้นะว่าหลานเรียนที่ไหน", effects: {happiness: -1}, next: fraud_whistle_01, merit: [{cat: neutral}]}
 
   - id: fraud_whistle_01
@@ -52,7 +52,7 @@ events:
         merit: [{cat: sila, level: 1}, {cat: help_others, level: 1}]
         schedules: [{event: echo_fraud_witness_01, after_years: [8, 15]}]
         outcomes:
-          - {weight: 2, ok: true, text: "คดีขยายไปถึงคนใหญ่กว่าที่คิด ได้เงินรางวัลนำจับ เพื่อนร่วมงานที่เคยเงียบแอบมาขอบคุณ", effects: {money: {unit: income_x, amount: 1}, relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "คดีขยายไปถึงคนใหญ่กว่าที่คิด ได้เงินรางวัลนำจับ เพื่อนร่วมงานที่เคยเงียบแอบมาขอบคุณ", effects: {money: {unit: income_x, amount: 1}, relations: 1, network: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "คดีชนะ แต่ถูกย้ายไปนั่งห้องเก็บเอกสารชั้นใต้ดิน ไม่มีใครกล้าคุยด้วย", effects: {happiness: -2, network: -1}, merit: [{cat: neutral}]}
       - id: withdraw
         text: "ถอนเรื่อง ขอให้จบ ๆ"
@@ -66,7 +66,7 @@ events:
         text: "เอาหลักฐานไปให้นักข่าว"
         merit: [{cat: help_others, level: 1}]
         outcomes:
-          - {weight: 1, ok: true, text: "ข่าวดังทั้งประเทศ กลายเป็นคนกล้าที่คนพูดถึง มีที่ทำงานใหม่ทักมาเสนองาน", effects: {network: 3, happiness: 2, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "ข่าวดังทั้งประเทศ กลายเป็นคนกล้าที่คนพูดถึง มีที่ทำงานใหม่ทักมาเสนองาน", effects: {network: 3, happiness: 2, income_mult: 1.2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ข่าวออกแค่วันเดียวแล้วเงียบ แต่ถูกฟ้องหมิ่นประมาทตามมาเป็นปี", effects: {money: {unit: income_x, amount: -1}, happiness: -2}, merit: [{cat: neutral}]}
 
   - id: fraud_contract_01
@@ -97,7 +97,7 @@ events:
         text: "แอบอัดเสียงไว้ แล้วแจ้งความ"
         merit: [{cat: help_others, level: 1}]
         outcomes:
-          - {weight: 1, ok: true, text: "เสียงที่อัดไว้ล้มทั้งขบวนการ ผู้ประกอบการรายเล็กรวมตัวมาขอบคุณ ได้ลูกค้าใหม่เพียบ", effects: {network: 2, relations: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "เสียงที่อัดไว้ล้มทั้งขบวนการ ผู้ประกอบการรายเล็กรวมตัวมาขอบคุณ ได้ลูกค้าใหม่เพียบ", effects: {network: 2, relations: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ถูกขึ้นบัญชีดำเงียบ ๆ ไม่มีงานรัฐมาถึงมืออีกหลายปี", effects: {income_mult: 0.8, happiness: -1}, merit: [{cat: neutral}], next: fraud_blacklist_01}
       - id: walk_away
         text: "ถอยไปหางานเอกชนแทน"
@@ -131,13 +131,13 @@ events:
         text: "ชั่งตรง แถมให้อีกนิด"
         merit: [{cat: sila, level: 1}, {cat: dana, level: 1}]
         outcomes:
-          - {weight: 2, ok: true, text: "ลูกค้าบอกปากต่อปากว่าร้านนี้ไม่โกง คิวยาวขึ้นทุกเช้า", effects: {income_mult: 1.2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ลูกค้าบอกปากต่อปากว่าร้านนี้ไม่โกง คิวยาวขึ้นทุกเช้า", effects: {income_mult: 1.2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "กำไรบางเฉียบ แต่หลับสบาย", effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
       - id: warn_customers
         text: "เตือนลูกค้าเรื่องตาชั่งแผงข้าง"
         merit: [{cat: help_others, level: 1}]
         outcomes:
-          - {weight: 1, ok: true, text: "ลูกค้าแห่ย้ายมาซื้อแผงเรา ยอดขายพุ่งทั้งเดือน", effects: {network: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ลูกค้าแห่ย้ายมาซื้อแผงเรา ยอดขายพุ่งทั้งเดือน", effects: {network: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "เพื่อนบ้านโกรธจัด ปล่อยข่าวว่าเราขายของเน่า ทั้งตลาดมองค้อน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}], next: fraud_scale_gossip_01}
 
   - id: fraud_materials_01
@@ -175,7 +175,7 @@ events:
         text: "เอาใบเบิกไปให้เจ้าของดู"
         merit: [{cat: help_others, level: 1}]
         outcomes:
-          - {weight: 1, ok: true, text: "เจ้าของตรวจย้อนหลังเจอเงินรั่วมาเป็นปี ให้รางวัลก้อนหนึ่งแล้วไว้ใจให้คุมงานแทนหัวหน้าเก่า", effects: {money: {unit: income_x, amount: 1}, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "เจ้าของตรวจย้อนหลังเจอเงินรั่วมาเป็นปี ให้รางวัลก้อนหนึ่งแล้วไว้ใจให้คุมงานแทนหัวหน้าเก่า", effects: {money: {unit: income_x, amount: 1}, network: 2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "หักมุม เจ้าของเป็นญาติหัวหน้า เรื่องเงียบหาย แล้วเราโดนจับผิดทุกวันจนต้องทนกัดฟัน", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
 
   - id: fraud_scale_rumor_01
@@ -301,7 +301,7 @@ events:
         text: "ค้านเจ้าของ ปกป้องลูกน้อง"
         merit: [{cat: help_others, level: 1}]
         outcomes:
-          - {weight: 1, ok: true, text: "เจ้าของยอมถอย ลูกน้องรักจนยอมทำงานเกินเวลาให้ฟรีตอนบริษัทลำบาก ยอดแผนกพุ่งเกินเป้า", effects: {relations: 2, network: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "เจ้าของยอมถอย ลูกน้องรักจนยอมทำงานเกินเวลาให้ฟรีตอนบริษัทลำบาก ยอดแผนกพุ่งเกินเป้า", effects: {relations: 2, network: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ถูกลดตำแหน่งไปคุมโกดัง แต่ลูกน้องเก่ายังแวะมาเลี้ยงข้าวทุกเดือน", effects: {income_mult: 0.7, relations: 1, happiness: -1}, merit: [{cat: neutral}]}
 
   - id: fraud_audit_back_01

@@ -53,7 +53,7 @@ events:
       - text: "ลาออกมาเปิดกิจการเอง"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ลูกค้าเก่าที่ชอบงานคุณตามมาจ้างเอง กิจการเล็กแต่ไปได้", effects: {income_mult: 1.25, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.5}}, text: "ลูกค้าเก่าที่ชอบงานคุณตามมาจ้างเอง กิจการเล็กแต่ไปได้", effects: {income_mult: 1.25, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 3, text: "ไม่มีใครตามมาเลย เงินเก็บหมดไปกับค่าเช่าออฟฟิศ", effects: {money: {unit: income_x, amount: -2}, income_mult: 0.8}, sets_flags: [own_business], merit: [{cat: neutral}]}
 
   - id: career_dream_01
@@ -77,7 +77,7 @@ events:
         text: "ทำงานเดิมควบทำขนมขายตอนเย็น"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 3, ok: true, text: "รายได้เสริมงอกเงย ลูกค้าประจำเริ่มสั่งล่วงหน้า", effects: {income_mult: 1.15, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, multipliers: {stats: {health: 1.3}}, text: "รายได้เสริมงอกเงย ลูกค้าประจำเริ่มสั่งล่วงหน้า", effects: {income_mult: 1.15, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "อดนอนจนหลับในที่ทำงาน หัวหน้าเรียกตักเตือน", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
       - {id: save_five_years, text: "เก็บเงินอีกห้าปีค่อยว่ากัน", effects: {happiness: -1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
       - {id: give_recipe, text: "ยกสูตรให้น้องที่บ้านไปทำแทน", effects: {relations: 2, happiness: 1}, merit: [{cat: dana, level: 1}]}
@@ -245,7 +245,7 @@ events:
         text: "ลงเรียนช่างภาคค่ำ"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 3, ok: true, text: "เรียนหลังเลิกงานสองปี ได้เพื่อนช่างเต็มรุ่น ขึ้นเงินเดือนตามฝีมือ", effects: {knowledge: 2, network: 2, income_mult: 1.15}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, multipliers: {stats: {health: 1.5}}, text: "เรียนหลังเลิกงานสองปี ได้เพื่อนช่างเต็มรุ่น ขึ้นเงินเดือนตามฝีมือ", effects: {knowledge: 2, network: 2, income_mult: 1.15}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เหนื่อยสะสมจนเป็นโรคกระเพาะ ต้องพักเรียนกลางคัน", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
       - id: apply_technician
         text: "สอบเลื่อนเป็นช่างเทคนิค"
@@ -305,7 +305,7 @@ events:
         text: "รับจ้างไซต์ก่อสร้าง"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 3, ok: true, text: "งานหนักแต่ได้เงินสด ส่งกลับบ้านได้ทุกเดือน", effects: {job: labor, money: {unit: income_x, amount: 0.5}}, merit: [{cat: care_parents, level: 1}]}
+          - {weight: 3, ok: true, multipliers: {stats: {health: 1.3}}, text: "งานหนักแต่ได้เงินสด ส่งกลับบ้านได้ทุกเดือน", effects: {job: labor, money: {unit: income_x, amount: 0.5}}, merit: [{cat: care_parents, level: 1}]}
           - {weight: 1, text: "นั่งร้านพังใส่ ขาหักต้องกลับบ้านมือเปล่า", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
       - id: street_stall
         text: "ตั้งแผงส้มตำหน้าตลาด"

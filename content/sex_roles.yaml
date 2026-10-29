@@ -128,19 +128,19 @@ events:
       - id: ask_raise
         text: "ถือซองไปขอขึ้นเงินเดือนตรง ๆ"
         outcomes:
-          - {weight: 1, ok: true, text: "หัวหน้าอึกอักแล้วยอมปรับให้ เพื่อนผู้หญิงทั้งแผนกมากระซิบถามว่าพูดยังไง", effects: {happiness: 1, network: 1, income_mult: 1.15}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "หัวหน้าอึกอักแล้วยอมปรับให้ เพื่อนผู้หญิงทั้งแผนกมากระซิบถามว่าพูดยังไง", effects: {happiness: 1, network: 1, income_mult: 1.15}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ได้คำตอบว่า 'บริษัทมีโครงสร้างอยู่แล้ว' แล้วโดนย้ายไปนั่งใกล้ห้องเก็บของ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: band_together
         text: "ชวนผู้หญิงทั้งแผนกร้องเรียน"
         outcomes:
-          - {weight: 1, ok: true, text: "ฝ่ายบุคคลเรียกประชุม ปีถัดมาบริษัทเปลี่ยนตารางเงินเดือนทั้งแผนก", effects: {relations: 2, network: 1, income_mult: 1.1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ฝ่ายบุคคลเรียกประชุม ปีถัดมาบริษัทเปลี่ยนตารางเงินเดือนทั้งแผนก", effects: {relations: 2, network: 1, income_mult: 1.1}, merit: [{cat: help_others, level: 1}]}
           - {weight: 1, text: "เรื่องเงียบหาย มีแค่ชื่อคุณที่หัวหน้าจำได้", effects: {relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
       - id: switch_job
         text: "แอบสมัครงานที่จ่ายตามตำแหน่ง"
         outcomes:
-          - {weight: 1, ok: true, text: "ได้งานใหม่ เงินเดือนเท่าเพื่อนผู้ชายในซองนั้นพอดี", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ได้งานใหม่ เงินเดือนเท่าเพื่อนผู้ชายในซองนั้นพอดี", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "สัมภาษณ์ไปห้าที่ ทุกที่ถามว่าวางแผนจะมีลูกเมื่อไหร่", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: let_it_go

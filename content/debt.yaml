@@ -68,7 +68,7 @@ events:
         sets_flags: [has_car]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "เครื่องฟิตเกินราคา ขับมาหลายปีไม่เคยเข้าอู่ เพื่อนขอยืมไปเที่ยวจนชิน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "เครื่องฟิตเกินราคา ขับมาหลายปีไม่เคยเข้าอู่ เพื่อนขอยืมไปเที่ยวจนชิน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ไมล์ถูกกรอ เครื่องดับกลางทางด่วน ค่าซ่อมเกือบเท่าราคารถ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
       - id: keep_bike
         text: "ขี่มอเตอร์ไซค์คันเดิมต่อ"
@@ -119,7 +119,7 @@ events:
         text: "ชวนเพื่อนเปิดร้านด้วยกันแทน"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "ร้านเล็กของสองคนขายดีจนต้องจ้างคนเพิ่ม เพื่อนซื้อรถได้เองโดยไม่ต้องมีใครค้ำ", effects: {happiness: 2, money: {unit: income_x, amount: 1.5}}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ร้านเล็กของสองคนขายดีจนต้องจ้างคนเพิ่ม เพื่อนซื้อรถได้เองโดยไม่ต้องมีใครค้ำ", effects: {happiness: 2, money: {unit: income_x, amount: 1.5}}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 2, text: "ทะเลาะเรื่องเงินทอนทุกคืน ร้านปิดในปีเดียว เพื่อนก็หายไปด้วย", effects: {relations: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], next: debt_friend_gone_01}
 
   - id: debt_guarantor_default_01
@@ -140,7 +140,7 @@ events:
         clears_flags: [guarantor]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "เจอเพื่อนเปิดแผงอยู่ต่างจังหวัด เขาก้มกราบขอโทษแล้วรับผ่อนต่อเอง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "เจอเพื่อนเปิดแผงอยู่ต่างจังหวัด เขาก้มกราบขอโทษแล้วรับผ่อนต่อเอง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ไปถึงบ้านเพื่อน เจอแต่แม่เขานอนป่วยติดเตียง กลับมามือเปล่าพร้อมค่าน้ำมัน", effects: {happiness: -2}, sets_flags: [guarantor], merit: [{cat: neutral}]}
       - id: let_seize
         text: "ให้ไฟแนนซ์ยึดรถไปขาย"
@@ -179,7 +179,7 @@ events:
         sets_flags: [home_owner]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ราคาถูกกว่าตลาดเกือบครึ่ง ปีต่อมามีข่าวรถไฟฟ้าจะมาลงหน้าซอย", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ราคาถูกกว่าตลาดเกือบครึ่ง ปีต่อมามีข่าวรถไฟฟ้าจะมาลงหน้าซอย", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "วันรับกุญแจ ไขประตูเข้าไปเจอครอบครัวแปลกหน้ากำลังนั่งกินข้าวอยู่ในบ้าน", next: debt_house_squatter_01, merit: [{cat: neutral}]}
       - id: keep_renting
         text: "เช่าต่อ เก็บเงินไว้ก่อน"
@@ -207,7 +207,7 @@ events:
         effects: {money: {unit: income_x, amount: -1}}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ศาลสั่งให้ออกภายในเดือน ได้ย้ายเข้าบ้านพร้อมสัญญาฉบับปลอมเป็นที่ระลึก", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "ศาลสั่งให้ออกภายในเดือน ได้ย้ายเข้าบ้านพร้อมสัญญาฉบับปลอมเป็นที่ระลึก", effects: {happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "คดียืดไปสองปี ค่าทนายบานจนแทบเท่าเงินดาวน์", effects: {money: {unit: income_x, amount: -1}, health: -1, happiness: -2}, merit: [{cat: neutral}]}
       - id: pay_moving
         text: "ออกค่าย้ายให้เขาไปเอง"
@@ -217,7 +217,7 @@ events:
         text: "ให้อยู่ต่อ เก็บค่าเช่าแทน"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ค่าเช่าพอผ่อนบ้านได้ทั้งงวด เหมือนมีคนผ่อนบ้านให้ฟรี ๆ", effects: {money: {unit: income_x, amount: 1}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ค่าเช่าพอผ่อนบ้านได้ทั้งงวด เหมือนมีคนผ่อนบ้านให้ฟรี ๆ", effects: {money: {unit: income_x, amount: 1}, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เขาหนีไปกลางดึก ทิ้งไว้แต่ผนังพังกับค่าไฟค้างสามเดือน", effects: {money: {unit: income_x, amount: -1}, happiness: -1}, merit: [{cat: neutral}]}
       - id: cut_utilities
         text: "ตัดน้ำตัดไฟ บีบให้ออก"
@@ -249,13 +249,13 @@ events:
         text: "ขอยืมญาติ"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ญาติให้ยืมแบบไม่คิดดอก แถมห่อกับข้าวใส่ถุงให้กลับบ้าน", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ญาติให้ยืมแบบไม่คิดดอก แถมห่อกับข้าวใส่ถุงให้กลับบ้าน", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ยืมได้ แต่เรื่องไปถึงหูทั้งตระกูลภายในวันเดียว", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
       - id: overtime
         text: "รับงานเสริมทุกคืนจนครบ"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ลูกค้าประจำติดใจ จ้างต่อเป็นงานประจำ", effects: {income_mult: 1.1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.5}}, text: "ลูกค้าประจำติดใจ จ้างต่อเป็นงานประจำ", effects: {income_mult: 1.1, network: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ล้มฟุบกลางงาน ค่าหมอรอบนี้แพงกว่าเงินที่หามาได้", effects: {health: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
       - id: gamble_night
         text: "ลงวงไพ่ หวังพลิกคืนเดียว"
@@ -286,7 +286,7 @@ events:
         effects: {complain: true}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ตำรวจเรียกไกล่เกลี่ย ดอกลดเหลือตามกฎหมาย คนทวงพูดจาสุภาพขึ้นทันตา เหลือแต่เงินต้นที่ต้องหามาคืน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "ตำรวจเรียกไกล่เกลี่ย ดอกลดเหลือตามกฎหมาย คนทวงพูดจาสุภาพขึ้นทันตา เหลือแต่เงินต้นที่ต้องหามาคืน", effects: {happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "คืนต่อมามีขวดลอยมากระแทกหลังคาบ้าน เสียงหัวเราะดังลั่นปากซอย", effects: {happiness: -2, relations: -1}, next: debt_shark_threat_01, merit: [{cat: neutral}]}
       - id: pay_interest
         text: "จ่ายดอกไปก่อน ต้นค่อยว่ากัน"
@@ -365,7 +365,7 @@ events:
         effects: {complain: true}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ตำรวจสั่งลดดอกตามกฎหมาย คนทวงเสียงเบาลง เหลือแต่เงินต้นที่ต้องหามาคืน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "ตำรวจสั่งลดดอกตามกฎหมาย คนทวงเสียงเบาลง เหลือแต่เงินต้นที่ต้องหามาคืน", effects: {happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ดอกลดจริง แต่กระจกหน้าบ้านแตกกลางดึกคืนนั้น", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
       - id: remortgage
         text: "เอาบ้านเข้าธนาคารมาโปะ"
@@ -379,7 +379,7 @@ events:
         clears_flags: [loan_shark]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ญาติเงียบไปนาน แล้วโอนเงินปิดหนี้ให้ทั้งก้อน ขอแค่อย่าปิดบังกันอีก", effects: {settle: informal, relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 2}}, text: "ญาติเงียบไปนาน แล้วโอนเงินปิดหนี้ให้ทั้งก้อน ขอแค่อย่าปิดบังกันอีก", effects: {settle: informal, relations: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ญาติโกรธจนไม่รับสายไปครึ่งปี หนี้ก็ยังอยู่ที่เดิม", effects: {relations: -2, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
       - id: pay_interest
         text: "จ่ายดอกไปก่อน"
@@ -400,7 +400,7 @@ events:
         text: "ย้ายไปธนาคารใหม่ ดอกต่ำกว่า"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "งวดลดลงทุกเดือน เงินที่เหลือพอพาคนในบ้านไปเที่ยวทะเลปีละครั้ง", effects: {money: {unit: income_x, amount: 1}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "งวดลดลงทุกเดือน เงินที่เหลือพอพาคนในบ้านไปเที่ยวทะเลปีละครั้ง", effects: {money: {unit: income_x, amount: 1}, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ดอกต่ำแค่สามปีแรก ปีที่สี่พุ่งแรงกว่าธนาคารเดิม ค่าปรับย้ายก็เสียไปแล้ว", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
       - id: cash_out
         text: "รีไฟแนนซ์แล้วกู้เพิ่มอีกก้อน"
@@ -449,7 +449,7 @@ events:
         clears_flags: [home_owner]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "ร้านติดตลาดตั้งแต่เดือนแรก ลูกค้าประจำเรียกชื่อคุณได้ทั้งซอย", effects: {money: {unit: income_x, amount: 2}, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "ร้านติดตลาดตั้งแต่เดือนแรก ลูกค้าประจำเรียกชื่อคุณได้ทั้งซอย", effects: {money: {unit: income_x, amount: 2}, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 2, text: "ร้านเจ๊งในปีเดียว ไม่มีทั้งบ้านทั้งร้าน เหลือแต่หนี้ค่าเช่าที่", effects: {debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}, happiness: -2}, sets_flags: [own_business], merit: [{cat: neutral}]}
       - id: rent_out
         text: "ปล่อยเช่า แล้วไปอยู่ห้องเล็ก"
@@ -484,7 +484,7 @@ events:
         effects: {complain: true}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ตำรวจสั่งลดดอกตามกฎหมาย คนทวงเสียงอ่อนลงทันที เหลือแต่เงินต้นที่ค่อย ๆ คืน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "ตำรวจสั่งลดดอกตามกฎหมาย คนทวงเสียงอ่อนลงทันที เหลือแต่เงินต้นที่ค่อย ๆ คืน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ดอกลดจริง แต่กระถางต้นไม้หน้าบ้านถูกเตะแตกทั้งแถวในคืนเดียว", effects: {happiness: -2}, merit: [{cat: neutral}]}
       - id: kids_help
         text: "สารภาพกับญาติ ขอให้ช่วย"
@@ -492,7 +492,7 @@ events:
         clears_flags: [loan_shark]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ญาติรวมเงินกันปิดหนี้ให้ทั้งก้อน แล้วพาไปอยู่ด้วยกันที่บ้านหลาน", effects: {settle: informal, relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 2}}, text: "ญาติรวมเงินกันปิดหนี้ให้ทั้งก้อน แล้วพาไปอยู่ด้วยกันที่บ้านหลาน", effects: {settle: informal, relations: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ญาติเองก็ผ่อนบ้านอยู่ ช่วยได้แค่ค่ากับข้าว หนี้ก้อนเดิมยังอยู่ที่เดิม", effects: {relations: 1, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
       - id: sell_gold
         text: "ขายทองที่เก็บมาทั้งชีวิตใช้หนี้"

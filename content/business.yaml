@@ -86,7 +86,7 @@ events:
         effects: {money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "ขายดีจนเจ้าของตลาดให้ล็อกหัวมุม รายได้เสริมงอกทุกคืน", effects: {happiness: 1, income_mult: 1.2}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "ขายดีจนเจ้าของตลาดให้ล็อกหัวมุม รายได้เสริมงอกทุกคืน", effects: {happiness: 1, income_mult: 1.2}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
           - {weight: 1, text: "ล็อกอยู่ท้ายตลาด ลมพัดกลิ่นห้องน้ำมาทั้งคืน ขายได้ไม่คุ้มค่าเช่า", effects: {happiness: -1}, merit: [{cat: neutral}]}
       - id: sell_recipe
         text: "ขายสูตรให้ร้านดังในเมือง"
@@ -127,7 +127,7 @@ events:
         effects: {money: {unit: income_x, amount: -2}}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "พ่อครัวทำร้านดังทั้งจังหวัด {ชื่อ} ได้นั่งนับเงินอย่างเดียว", effects: {happiness: 1, job: service, money: {unit: income_x, amount: 1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "พ่อครัวทำร้านดังทั้งจังหวัด {ชื่อ} ได้นั่งนับเงินอย่างเดียว", effects: {happiness: 1, job: service, money: {unit: income_x, amount: 1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 1, text: "พ่อครัวดังได้สามเดือนก็พาสูตรกับลูกน้องไปเปิดร้านตรงข้าม", effects: {happiness: -2, relations: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
       - id: cook_for_temple
         text: "ทำกับข้าวเลี้ยงงานวัดแทน"
@@ -211,7 +211,7 @@ events:
         text: "รวมสวนเพื่อนบ้านต่อรองราคา"
         merit: [{cat: help_others, level: 1}]
         outcomes:
-          - {weight: 1, ok: true, text: "สวนทั้งตำบลรวมกันได้ราคาดีขึ้นทุกบ้าน {ชื่อ} ถูกยกเป็นหัวหน้ากลุ่ม", effects: {relations: 2, network: 2, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "สวนทั้งตำบลรวมกันได้ราคาดีขึ้นทุกบ้าน {ชื่อ} ถูกยกเป็นหัวหน้ากลุ่ม", effects: {relations: 2, network: 2, income_mult: 1.3}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ประชุมกันสามรอบก็ยังตกลงกันไม่ได้ ผลไม้สุกคาต้นไปครึ่งหนึ่ง", effects: {relations: -1, income_mult: 1.05}, merit: [{cat: neutral}]}
       - id: sell_whole_orchard
         text: "ขายสวนทั้งแปลงให้เขาไปเลย"
@@ -242,7 +242,7 @@ events:
         effects: {money: {unit: income_x, amount: -0.7}}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "สูตรของตัวเองอร่อยกว่าเจ้าดัง ลูกค้าบอกต่อจนเปิดสาขาสอง", effects: {happiness: 2, job: service}, sets_flags: [own_business], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "สูตรของตัวเองอร่อยกว่าเจ้าดัง ลูกค้าบอกต่อจนเปิดสาขาสอง", effects: {happiness: 2, job: service}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 2, text: "ทำไปทำมาหน้าตาเหมือนยี่ห้อดังเกินไป โดนหนังสือเตือนให้ปลดป้าย", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
       - id: ask_owners
         text: "ไปถามคนที่ซื้อไปก่อน"
@@ -275,7 +275,7 @@ events:
         text: "รับ แต่ทำสัญญาให้ชัด"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "เพื่อนอ่านสัญญาแล้วยิ้ม ทำงานหนักจนกิจการโตขึ้นจริง", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "เพื่อนอ่านสัญญาแล้วยิ้ม ทำงานหนักจนกิจการโตขึ้นจริง", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เพื่อนงอนว่าไม่ไว้ใจกัน เลิกคบไปทั้งที่ยังไม่ได้เริ่ม", effects: {relations: -2}, merit: [{cat: neutral}]}
       - id: refuse_partner
         text: "ขอทำคนเดียวเหมือนเดิม"
@@ -321,7 +321,7 @@ events:
         sets_flags: [scam_aware]
         merit: [{cat: help_others, level: 1}]
         outcomes:
-          - {weight: 1, ok: true, text: "เพื่อนบ้านถอนตัวทัน อีกปีวงล่ม เขามากราบขอบคุณถึงหน้าบ้าน", effects: {relations: 3, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "เพื่อนบ้านถอนตัวทัน อีกปีวงล่ม เขามากราบขอบคุณถึงหน้าบ้าน", effects: {relations: 3, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เพื่อนบ้านหาว่าอิจฉา เลิกพูดด้วยไปเป็นปี", effects: {happiness: -1}, merit: [{cat: neutral}]}
 
   - id: biz_ponzi_pay_01

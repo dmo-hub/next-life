@@ -97,7 +97,7 @@ events:
       - id: apologize
         text: "ขอโทษเรื่องเก่าตรง ๆ"
         outcomes:
-          - {weight: 2, ok: true, text: "เขานิ่งไปนาน แล้วเซ็นให้ 'ผมไม่ได้ทำเพื่อพี่ ผมทำเพราะงาน'", effects: {money: {unit: income_x, amount: 0.3}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "เขานิ่งไปนาน แล้วเซ็นให้ 'ผมไม่ได้ทำเพื่อพี่ ผมทำเพราะงาน'", effects: {money: {unit: income_x, amount: 0.3}, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เขาฟังจบแล้วยื่นแฟ้มคืน บอกว่าเอกสารไม่ครบ", effects: {happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: sila, level: 1}]
       - id: pretend
@@ -157,7 +157,7 @@ events:
       - id: take_with_terms
         text: "รับ แต่ขอชื่อตัวเองในผลงาน"
         outcomes:
-          - {weight: 1, ok: true, text: "เขาหัวเราะแล้วยอม ชื่อคุณขึ้นสไลด์เป็นครั้งแรก", effects: {money: {unit: income_x, amount: 0.6}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "เขาหัวเราะแล้วยอม ชื่อคุณขึ้นสไลด์เป็นครั้งแรก", effects: {money: {unit: income_x, amount: 0.6}, happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เขาถอนข้อเสนอเงียบ ๆ ภายในวันเดียว", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse

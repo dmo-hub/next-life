@@ -131,7 +131,7 @@ events:
       - id: troll_back
         text: "แกล้งคุยยื้อจนมิจท้อ"
         outcomes:
-          - {weight: 2, ok: true, text: "คุยยาวชั่วโมงครึ่ง มิจฉาชีพบ่นเหนื่อยแล้ววางเอง คลิปที่หลานอัดไว้ดังทั้งเน็ต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "คุยยาวชั่วโมงครึ่ง มิจฉาชีพบ่นเหนื่อยแล้ววางเอง คลิปที่หลานอัดไว้ดังทั้งเน็ต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "หลงเผลอบอกเลขบัตรไปครึ่งหนึ่ง ต้องวิ่งเปลี่ยนเอกสารทั้งสัปดาห์", effects: {happiness: -1, health: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: warn_village
@@ -313,7 +313,7 @@ events:
       - id: hire_neighbors
         text: "จ้างป้าข้างบ้านมาช่วยตำ"
         outcomes:
-          - {weight: 2, ok: true, text: "ทั้งซอยมีงานทำ เสียงครกดังทั้งวัน กลายเป็นวิสาหกิจเล็ก ๆ ของหมู่บ้าน", effects: {relations: 2, happiness: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ทั้งซอยมีงานทำ เสียงครกดังทั้งวัน กลายเป็นวิสาหกิจเล็ก ๆ ของหมู่บ้าน", effects: {relations: 2, happiness: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: help_others, level: 2}]}
           - {weight: 1, text: "ป้าข้างบ้านแอบจดสูตรไปเปิดไลฟ์แข่ง ราคาถูกกว่าครึ่ง", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: help_others, level: 1}]
       - id: sell_recipe
@@ -329,7 +329,7 @@ events:
       - id: go_on_show
         text: "ไปออกรายการให้ดังทั้งประเทศ"
         outcomes:
-          - {weight: 1, ok: true, text: "พูดตรงจนคนดูขำทั้งประเทศ ออเดอร์เข้าวันเดียวเท่าทั้งปี", effects: {happiness: 3, network: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "พูดตรงจนคนดูขำทั้งประเทศ ออเดอร์เข้าวันเดียวเท่าทั้งปี", effects: {happiness: 3, network: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ตื่นกล้องพูดผิดพูดถูก คลิปโดนตัดไปล้อทั้งเน็ต อายจนไม่กล้าออกจากบ้าน", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: quit_live

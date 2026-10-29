@@ -60,7 +60,7 @@ events:
         text: "ตามล่าตัวเพื่อนให้เจอ"
         clears_flags: [guarantor]
         outcomes:
-          - {weight: 2, ok: true, text: "เจอเพื่อนขายก๋วยเตี๋ยวอยู่อีกจังหวัด ร้องไห้กอดกันแล้วผ่อนคืนทีละน้อย", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.5}}, text: "เจอเพื่อนขายก๋วยเตี๋ยวอยู่อีกจังหวัด ร้องไห้กอดกันแล้วผ่อนคืนทีละน้อย", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "เจอแล้ว แต่เขามีหนี้มากกว่าเราอีก กลับบ้านมือเปล่าพร้อมค่าน้ำมัน", effects: {happiness: -2, health: -1}, sets_flags: [guarantor], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: fight_court
@@ -286,7 +286,7 @@ events:
       - id: check_first
         text: "ค้นข้อมูลก่อนตัดสินใจ"
         outcomes:
-          - {weight: 2, ok: true, text: "เจอข่าวว่าเป็นแชร์ลูกโซ่ที่มีคนเสียหายเป็นร้อย เลยรวบหลักฐานไปแจ้งความ", effects: {knowledge: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 2}}, text: "เจอข่าวว่าเป็นแชร์ลูกโซ่ที่มีคนเสียหายเป็นร้อย เลยรวบหลักฐานไปแจ้งความ", effects: {knowledge: 2, health: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ข้อมูลดูน่าเชื่อจนเกือบโอนไปแล้ว มือสั่นนอนไม่หลับทั้งคืน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: warn_others
@@ -385,7 +385,7 @@ events:
       - id: police
         text: "รวบหลักฐานไปแจ้งความ"
         outcomes:
-          - {weight: 2, ok: true, text: "ตำรวจตามเจอ ศาลสั่งคืนเงินบางส่วน ได้กลับมาพอหายใจคล่อง", effects: {money: {unit: income_x, amount: 1}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ตำรวจตามเจอ ศาลสั่งคืนเงินบางส่วน ได้กลับมาพอหายใจคล่อง", effects: {money: {unit: income_x, amount: 1}, happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "คดีเดินช้าเป็นปี ค่าเดินทางขึ้นศาลกินเงินที่เหลือไปอีก", effects: {money: {unit: income_x, amount: -0.5}, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: confront
@@ -405,7 +405,7 @@ events:
       - id: expose_post
         text: "แฉลงโซเชียลให้ทั้งประเทศรู้"
         outcomes:
-          - {weight: 1, ok: true, text: "โพสต์ไวรัล คนเสียหายอีกเป็นสิบโผล่มารวมตัว ฟ้องร่วมกันได้", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "โพสต์ไวรัล คนเสียหายอีกเป็นสิบโผล่มารวมตัว ฟ้องร่วมกันได้", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "โดนฟ้องหมิ่นประมาทกลับ ต้องจ้างทนายเพิ่มอีกก้อน", effects: {money: {unit: income_x, amount: -1}, happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 

@@ -38,7 +38,7 @@ events:
         text: "ขอแผงมาช่วยขายเอาค่าคอม"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 3, ok: true, text: "ปากหวานขายหมดแผงในบ่ายเดียว แม่ค้าชวนมาเป็นลูกมือทุกต้นเดือน", effects: {network: 1, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, multipliers: {stats: {network: 1.5}}, text: "ปากหวานขายหมดแผงในบ่ายเดียว แม่ค้าชวนมาเป็นลูกมือทุกต้นเดือน", effects: {network: 1, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ขายไม่ออกสักใบ ต้องเหมาที่เหลือเองตามที่ตกลง แล้วก็ไม่ถูกสักใบ", effects: {happiness: -1, money: {unit: fixed_baht, amount: -1600, ref_year: 2560}}, merit: [{cat: neutral}]}
 
   - id: lot_pool_split_01
@@ -63,7 +63,7 @@ events:
         text: "แบ่งตามเงินที่แต่ละคนลง"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "ทุกคนยอมรับ แม้คนที่ลงน้อยจะบ่นนิดหน่อย แต่ก็ยังนั่งกินข้าวโต๊ะเดียวกัน", effects: {relations: 1, happiness: 2, money: {unit: fixed_baht, amount: 1200000, ref_year: 2560}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ทุกคนยอมรับ แม้คนที่ลงน้อยจะบ่นนิดหน่อย แต่ก็ยังนั่งกินข้าวโต๊ะเดียวกัน", effects: {relations: 1, happiness: 2, money: {unit: fixed_baht, amount: 1200000, ref_year: 2560}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เถียงกันว่าใครลงเท่าไรจนลงไม้ลงมือ แบ่งเงินได้แต่แผนกแตกเป็นสองก๊ก", effects: {relations: -2, happiness: -1, money: {unit: fixed_baht, amount: 1200000, ref_year: 2560}}, merit: [{cat: neutral}]}
       - id: give_neediest
         text: "เพิ่มส่วนให้เพื่อนที่แม่ป่วย"

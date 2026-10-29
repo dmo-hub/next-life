@@ -199,7 +199,7 @@ events:
         text: "ชวนครูมาเต้นคลิปต่อ"
         requires: {stats: {relations: {min: 60}}, reason: "ยังไม่กล้าพอจะชวนครู"}
         outcomes:
-          - {ok: true, weight: 1, text: "คลิปครูเต้นดังกว่าเดิมสิบเท่า ทั้งโรงเรียนรักครูขึ้น", effects: {relations: 2, happiness: 2}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "คลิปครูเต้นดังกว่าเดิมสิบเท่า ทั้งโรงเรียนรักครูขึ้น", effects: {relations: 2, happiness: 2}, sets_flags: [likes_clips], merit: [{cat: neutral}]}
           - {weight: 1, text: "ครูโดนผู้บริหารเรียกพบ ไม่มองหน้ากันอีกเลย", effects: {relations: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -291,14 +291,14 @@ events:
         text: "ขอทุนนักกีฬาอีสปอร์ตแทน"
         requires: {stats: {knowledge: {min: 50}}, reason: "เกรดไม่ถึงเกณฑ์ทุนนักกีฬา"}
         outcomes:
-          - {ok: true, weight: 1, text: "ได้โควตาทุนนักกีฬาเต็มจำนวนไว้ใช้ตอนเข้ามหาวิทยาลัย เรียนไปแข่งไป ไม่ต้องจ่ายค่าเทอมสักบาท", effects: {happiness: 2, knowledge: 1}, sets_flags: [scholarship], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ได้โควตาทุนนักกีฬาเต็มจำนวนไว้ใช้ตอนเข้ามหาวิทยาลัย เรียนไปแข่งไป ไม่ต้องจ่ายค่าเทอมสักบาท", effects: {happiness: 2, knowledge: 1}, sets_flags: [scholarship], merit: [{cat: neutral}]}
           - {weight: 1, text: "โควตาทุนเต็มแล้ว ได้เสื้อทีมกลับบ้านมาตัวเดียว", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: ask_parents_scout
         text: "พาแมวมองไปคุยกับพ่อแม่"
         requires: {family: [{role: parent, alive: true}]}
         outcomes:
-          - {ok: true, weight: 1, text: "พ่อแม่ยอมให้ลองหนึ่งปี ขอแค่เกรดห้ามตก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "พ่อแม่ยอมให้ลองหนึ่งปี ขอแค่เกรดห้ามตก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ที่บ้านไล่แมวมองออกจากบ้าน แล้วยกคอมไปขายทิ้งต่อหน้า", effects: {relations: -1, happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse_scout
