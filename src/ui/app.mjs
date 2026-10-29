@@ -1217,9 +1217,48 @@ function freeChoices(card) {
   return pays.map((p) => !p);
 }
 
-function button(label, fx, onclick, hint = null) {
+// ป้ายทางที่มีผลตามมา (card.follows): ไอคอนท้ายข้อความตัวเลือก + คำอธิบายบรรทัดเดียวใต้ชุดปุ่ม
+// บอกแค่ว่ามีเรื่องตามมา ไม่บอกดีหรือร้าย · both = 2 ไอคอน
+const FOLLOW_ICON = {
+  next: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4l2.8-2.8M7.2 4.6l1.3-1.3a2.6 2.6 0 0 1 3.7 3.7l-1.3 1.3M8.8 11.4l-1.3 1.3a2.6 2.6 0 0 1-3.7-3.7l1.3-1.3"/></svg>',
+  later: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2h8M4 14h8M5 2c0 4 6 4 6 6s-6 2-6 6M11 2c0 4-6 4-6 6s6 2 6 6"/></svg>',
+};
+const FOLLOW_WORD = { next: 'มีเรื่องต่อ', later: 'มีผลภายหลัง' };
+const followKinds = (f) => (!f ? [] : f === 'both' ? ['next', 'later'] : [f]);
+const followIcon = (k) => {
+  const s = el('span');
+  s.insertAdjacentHTML('beforeend', FOLLOW_ICON[k]);
+  return s;
+};
+
+function followMark(f) {
+  const kinds = followKinds(f);
+  if (!kinds.length) return null;
+  const words = kinds.map((k) => FOLLOW_WORD[k]).join(' · ');
+  const m = el('span', 'follow');
+  m.title = words;
+  // ไอคอนซ่อนจากโปรแกรมอ่านจอ — ต้องได้คำแทน
+  m.append(...kinds.map(followIcon), el('span', 'sr', words));
+  return m;
+}
+
+function followKey() {
+  const p = el('p', 'follow-key');
+  // ป้ายบนปุ่มมีคำสำหรับโปรแกรมอ่านจออยู่แล้ว — บรรทัดนี้ซ้ำ
+  p.setAttribute('aria-hidden', 'true');
+  for (const k of ['next', 'later']) {
+    const s = followIcon(k);
+    s.append(`= ${FOLLOW_WORD[k]}`);
+    p.append(s);
+  }
+  return p;
+}
+
+function button(label, fx, onclick, hint = null, follow = null) {
   const b = el('button', 'choice');
   const main = el('span', null, label);
+  const mark = followMark(follow);
+  if (mark) main.append(mark);
   // อยู่ในก้อนเดียวกับข้อความตัวเลือก ป้ายผลด้านขวาจึงยังชิดขวาเหมือนการ์ดที่ไม่มีบรรทัดรอง
   if (hint) main.append(el('small', 'hint', hint));
   b.append(main);
@@ -1522,12 +1561,13 @@ function render(card) {
         const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
         const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);
-        const b = button(c, fx, () => play(lifePick(i)), card.hints?.[i]);
+        const b = button(c, fx, () => play(lifePick(i)), card.hints?.[i], card.follows?.[i]);
         if (why) b.disabled = true;
         choices.append(b, ...loanButtons(card, i));
       });
       // การ์ดเล่าเรื่อง (choices: []) ไม่มีปุ่มให้เลือก — ต้องมีทางไปใบถัดไป
       if (!card.choices.length) choices.append(enter(button(BTN.next, null, next)));
+      if (card.follows?.some(Boolean)) choices.append(followKey());
       const tip = whisperFor(card, free);
       if (tip) body.append(tip);
       if (card.choices.length > 1) choices.append(foldLater(box, body, choices, card));
