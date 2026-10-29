@@ -1116,10 +1116,7 @@ export function nextCard(st) {
     const year = st.birthYear + st.age;
     let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
     // กองสุ่มจับได้ปีละ poolRounds รอบ หลังหลักไมล์/นัดของปีนั้นหมดแล้ว · การ์ดที่จับได้อาจนัดตอนต่อปีเดียวกัน — ค้นนัดก่อนรอบถัดไป
-    if (st.poolAge !== st.age) {
-      st.poolAge = st.age;
-      st.poolLeft = poolRounds(stageOf(st.age));
-    }
+    poolTurn(st);
     while (!ev && st.poolLeft > 0) {
       st.poolLeft--;
       ev = drawPool(st, year);
@@ -1136,6 +1133,21 @@ export function nextCard(st) {
       return eventCard(st, ev);
     }
   }
+}
+
+// รอบจั่วกองสุ่มของปีตั้งครั้งแรกที่อายุนั้นต้องใช้ — ไม่ดึงเลขสุ่ม จึงตั้งก่อนถึงคิวจั่วได้
+function poolTurn(st) {
+  if (st.poolAge === st.age) return;
+  st.poolAge = st.age;
+  st.poolLeft = poolRounds(stageOf(st.age));
+}
+
+// โควตาการ์ดของปี: การ์ดเรื่องต่อ (next) นับเป็นการ์ดของปีนั้น แทนที่รอบจั่วกองสุ่มหนึ่งรอบ
+// เนื้อหาเพิ่มสายเรื่องต่อได้โดยชีวิตไม่ยาวขึ้น · ชีวิตที่ไม่เจอเรื่องต่อจั่วเท่าเดิมทุกรอบ
+// รอบหมดแล้วเรื่องต่อยังออก (ตัดกลางสายไม่ได้) แต่ไม่ยืมรอบของปีถัดไป
+export function takeYearQuota(st) {
+  poolTurn(st);
+  if (st.poolLeft > 0) st.poolLeft--;
 }
 
 // กองสุ่ม (B14): เหตุการณ์ไม่มี at_age แต่มี weight · ใบเดิมไม่ซ้ำในชีวิต เว้นแต่ตั้ง repeat · ไม่มีใบที่เกิดได้ = ไม่ดึงเลขสุ่ม
@@ -1347,6 +1359,7 @@ export function choose(st, idx, loan) {
       st.done[follow.id] = true;
       st.fired[follow.id] = { n: (st.fired[follow.id]?.n ?? 0) + 1, age: st.age };
       beliefFired(st, follow);
+      takeYearQuota(st);
       after.push({ kind: 'eraEvent', ev: follow, age: st.age });
     }
   }
