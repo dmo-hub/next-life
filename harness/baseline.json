@@ -1,32 +1,20 @@
 {
   "n": 20000,
   "seed": 1,
-  "deadEvents": [
-    "era_econ_oil1_kid_01",
-    "era_econ_oil1_adult_01"
-  ],
-  "deadChoices": [
-    "after_realm_hell_01#0",
-    "after_realm_hell_01#2",
-    "after_realm_hell_02#0",
-    "after_realm_hell_02#1",
-    "after_ancestor_far_01#1",
-    "lot_pool_split_01#split_equal",
-    "lot_pool_split_01#split_by_stake",
-    "lot_jackpot_kin_01#quit_open_shop",
-    "lot_jackpot_kin_01#friend_invest"
-  ],
+  "deadEvents": [],
+  "deadChoices": [],
   "deadFlags": [],
   "statBad": 0,
-  "gate4Share": 0.9896,
-  "gate3bWorst": 1.55,
+  "gate4Share": 0.9317,
+  "gate3bWorst": 1.653,
+  "gate3bWorstSe": 0.688,
   "ageMean": {
-    "สุ่ม": 69.982,
-    "สายบุญ": 73.474,
-    "สายบาป": 59.067,
-    "สายเงิน": 60.627,
-    "สายครอบครัว": 71.26,
-    "สายสุขภาพ": 77.328
+    "สุ่ม": 72.09,
+    "สายบุญ": 76.543,
+    "สายบาป": 57.546,
+    "สายเงิน": 60.572,
+    "สายครอบครัว": 71.154,
+    "สายสุขภาพ": 81.742
   },
-  "at": "2026-10-23"
+  "at": "2026-10-29"
 }
