@@ -525,11 +525,19 @@ function hurts(st, fx) {
 const AID_WHO = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน' };
 
 // s = ตัวหรี่ผลของการ์ดกองสุ่มเมื่อจับหลายรอบต่อปี (pace.mjs) · ยอดกู้หรี่ด้วยเพราะการ์ดกู้คู่กับเงินจ่ายออก · ลงทุน/งาน/เรื้อรังเป็นโครงสร้าง ไม่หรี่
+// ก่อนเริ่มทำงาน ค่าใช้จ่าย (ผลการ์ด · ค่าเลี้ยงสัตว์ · งวดหนี้) คิดจากรายได้บ้าน เกินกระเป๋าเด็กได้ — ส่วนเกินบ้านจ่าย เด็กไม่ติดหนี้
+function homePays(st) {
+  if (st.workFrom === null && st.money < 0) st.money = 0;
+}
+
 // hurt = ตัวคูณส่วนที่ติดลบของค่าและเงิน (ญาติช่วยประคองตอนเจอผลร้าย) · ส่วนที่เป็นบวกไม่แตะ
 function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
   const cut = (v) => (v < 0 ? v * hurt : v);
   for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + cut(levelValue(fx[k]) * ss));
-  if (fx.money) st.money += cut(moneyValue(st, fx.money) * s);
+  if (fx.money) {
+    st.money += cut(moneyValue(st, fx.money) * s);
+    homePays(st);
+  }
   // เงินชดเชยคิดจากงานเดิม — ต้องลงก่อนผลเปลี่ยนงานในก้อนเดียวกัน
   if (fx.severance && isWorking(st)) st.money += (severanceDays(st) * monthlyIncome(st)) / 30;
   if (fx.retire && isWorking(st)) {
@@ -689,6 +697,7 @@ function stepYear(st) {
     paid += p;
   }
   st.debts = st.debts.filter((d) => !debtDone(d));
+  homePays(st);
   const stage = stageOf(st.age);
   if (st.legacy && st.age >= st.legacy.age) receiveLegacy(st, year, stage);
   st.trail.push({ year, money: Math.round(st.money) });
