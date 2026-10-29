@@ -145,6 +145,7 @@ events:
       - id: send_money
         text: "ส่งเงินอย่างเดียว ไม่มีเวลา"
         effects: {money: {unit: income_x, amount: -0.5}, relations: -2, health: 1}
+        schedules: [{event: echo_fam_money_only_01, after_years: [15, 25]}]
         merit: [{cat: neutral}]
       - id: move_in_rite
         text: "รับพ่อแม่มาอยู่ ทำบุญบ้านก่อน"

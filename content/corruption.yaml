@@ -28,6 +28,7 @@ events:
       - id: refuse
         text: "ดันซองคืน ไม่เซ็น"
         merit: [{cat: sila, level: 1}]
+        schedules: [{event: echo_fraud_clean_hands_01, after_years: [10, 20]}]
         outcomes:
           - {weight: 2, ok: true, text: "ผู้บริหารรู้เรื่องทีหลัง เรียกไปชมต่อหน้าที่ประชุม ชื่อเสียงเรื่องมือสะอาดเริ่มเป็นที่รู้กัน", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ผู้รับเหมาไปหาคนอื่นเซ็นแทน แล้วเส้นสายเขาก็ทำให้ถูกย้ายไปสาขาที่ห่างไกล", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
@@ -49,6 +50,7 @@ events:
       - id: testify
         text: "ยืนยันให้การจนสุดทาง"
         merit: [{cat: sila, level: 1}, {cat: help_others, level: 1}]
+        schedules: [{event: echo_fraud_witness_01, after_years: [8, 15]}]
         outcomes:
           - {weight: 2, ok: true, text: "คดีขยายไปถึงคนใหญ่กว่าที่คิด ได้เงินรางวัลนำจับ เพื่อนร่วมงานที่เคยเงียบแอบมาขอบคุณ", effects: {money: {unit: income_x, amount: 1}, relations: 1, network: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "คดีชนะ แต่ถูกย้ายไปนั่งห้องเก็บเอกสารชั้นใต้ดิน ไม่มีใครกล้าคุยด้วย", effects: {happiness: -2, network: -1}, merit: [{cat: neutral}]}
@@ -226,7 +228,7 @@ events:
         sets_flags: [embezzler]
         merit: [{cat: greed_harm, level: 3}]
         outcomes:
-          - {weight: 2, text: "ได้เงินก้อนตั้งตัวใหม่ แต่กลับบ้านเกิดไม่ได้อีกแล้ว คนที่บ้านโทรมาร้องไห้ทุกเดือน", effects: {money: {unit: income_x, amount: 3}, relations: -3, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้เงินก้อนตั้งตัวใหม่ แต่กลับบ้านเกิดไม่ได้อีกแล้ว คนที่บ้านโทรมาร้องไห้ทุกเดือน", effects: {money: {unit: income_x, amount: 3}, relations: -3, happiness: -1}, schedules: [{event: echo_fraud_home_news_01, after_years: [10, 18]}], merit: [{cat: neutral}]}
           - {weight: 1, text: "ตำรวจตามเจอที่ห้องเช่าในอาทิตย์เดียว ต้องขายทุกอย่างใช้คืนพร้อมค่าทนาย", effects: {money: {unit: income_x, amount: -2}, relations: -3, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: open_books
         text: "ปิดประกาศบัญชีให้ทุกคนดู"
@@ -294,6 +296,7 @@ events:
         text: "ลดเงินเดือนตัวเองแทนโอที"
         effects: {income_mult: 0.8, relations: 2}
         merit: [{cat: help_others, level: 2}]
+        schedules: [{event: echo_fraud_old_team_01, after_years: [8, 15]}]
       - id: stand_up
         text: "ค้านเจ้าของ ปกป้องลูกน้อง"
         merit: [{cat: help_others, level: 1}]

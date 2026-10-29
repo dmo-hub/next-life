@@ -97,7 +97,7 @@ events:
         text: "ขอเวลาคิดก่อนนะ"
         outcomes:
           - {weight: 1, ok: true, text: "เขายิ้มแล้วบอกว่ารอได้ ความรักแน่นกว่าเดิม", multipliers: {stats: {relations: 2}}, effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "เขาเก็บแหวนแล้วเดินออกจากร้านไปเลย", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เขาเก็บแหวนแล้วเดินออกจากร้านไปเลย", effects: {happiness: -2, relations: -1}, schedules: [{event: echo_fam_ring_back_01, after_years: [10, 20]}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse
         text: "ปฏิเสธ ขอไปตามฝันก่อน"

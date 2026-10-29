@@ -1,0 +1,240 @@
+# ผลย้อน หมวดครอบครัว + ทุจริต (เฟส 1 ข้อ 3): ตัวเลือกเดิมนัดการ์ดเหล่านี้ 8–30 ปีให้หลังด้วย schedules
+# ไม่มี weight — ออกทางนัดเท่านั้น · when ของแต่ละใบกันเรื่องขัดกับชีวิตตอนนั้น (คนที่เกี่ยวข้องไม่อยู่แล้ว = ไม่ออก)
+# ข้อความเรียกตัวเลือกเดิมตรง ๆ เพราะคนเขียนรู้ว่ามาจากไหน · หมวดหนี้/สุขภาพเป็นของเลน A
+events:
+  # ← kid_parents_fight_01 "ทำเป็นไม่ได้ยิน เก็บไว้คนเดียว"
+  - id: echo_fam_behind_door_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {family: [{role: spouse, alive: true}, {role: child, alive: true}]}
+    title: "หลังประตูบานเดิม"
+    text: "ตอนเด็กคุณเคยนอนกอดหมอนฟังพ่อแม่ทะเลาะอยู่หลังประตู แล้วเก็บไว้คนเดียวไม่บอกใคร คืนนี้เสียงดังมาจากห้องของคุณกับคู่ชีวิตเอง พอเปิดประตูออกมา ลูกยืนกอดหมอนอยู่ตรงนั้น"
+    choices:
+      - id: tell_kid
+        text: "นั่งลงเล่าให้ลูกฟังตรง ๆ"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ลูกฟังจบแล้วถามว่าพ่อแม่ยังรักกันไหม คืนนั้นทั้งบ้านนอนห้องเดียวกัน", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกพยักหน้าเหมือนเข้าใจ แต่ตั้งแต่คืนนั้นเริ่มล็อกประตูห้องตัวเอง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pretend_fine
+        text: "ยิ้มบอกว่าไม่มีอะไร ไปนอนเถอะ"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: counseling
+        text: "ชวนคู่ชีวิตไปหาที่ปรึกษาครอบครัว"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ไปได้หกครั้ง เสียงดังในบ้านเบาลงจนลูกกล้าชวนเพื่อนมาค้าง", effects: {relations: 2, happiness: 2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปครั้งเดียวแล้วทะเลาะกันต่อในรถขากลับ", effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: take_kid_out
+        text: "พาลูกไปค้างบ้านตายายสักพัก"
+        effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+
+  # ← kid_move_01 "ร้องไห้ขอไม่ย้าย อยู่กับยายต่อ"
+  - id: echo_fam_grandma_deed_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "ชื่อหลังโฉนด"
+    text: "ยายจากไปหลายปีแล้ว ป้าโทรมาบอกว่าตอนรื้อตู้เจอโฉนดสวนหลังบ้าน ยายเขียนชื่อคุณไว้ด้านหลังด้วยลายมือสั่น ๆ 'ให้หลานที่ร้องไห้ไม่ยอมย้ายไปจากยาย'"
+    choices:
+      - id: keep_garden
+        text: "รับไว้ กลับไปปลูกผักวันหยุด"
+        effects: {happiness: 2, relations: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: share_cousins
+        text: "แบ่งให้ญาติที่ยังอยู่ที่นั่น"
+        effects: {relations: 3, happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: sell_it
+        text: "ขาย เอาเงินมาตั้งตัว"
+        outcomes:
+          - {weight: 2, ok: true, text: "ได้เงินก้อนพอดาวน์บ้านหลังแรก ป้าบอกว่ายายคงอยากให้เป็นแบบนี้", effects: {money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ญาติฝั่งโน้นหาว่าทิ้งของยาย งานรวมญาติปีนี้ไม่มีใครเรียกชื่อ", effects: {money: {unit: income_x, amount: 1.5}, relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: merit_for_her
+        text: "ทำบุญให้ยาย ฝากป้าดูแลต่อ"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: dana, level: 1}]
+
+  # ← young_wedding_01 "ขอเวลาคิดก่อนนะ" ผลที่เขาเดินออกจากร้าน
+  - id: echo_fam_ring_back_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ร้านหมูกระทะร้านเดิม"
+    text: "ร้านหมูกระทะร้านเดิมยังเปิดอยู่ โต๊ะข้าง ๆ คือคนที่เคยคุกเข่ายื่นแหวนให้คุณ วันที่คุณขอเวลาคิด แล้วเขาเก็บแหวนเดินออกไป เขาจำคุณได้ก่อนและยกแก้วให้"
+    choices:
+      - id: say_sorry
+        text: "เดินไปขอโทษเรื่องวันนั้น"
+        outcomes:
+          - {weight: 2, ok: true, text: "เขาหัวเราะ บอกว่าวันนั้นก็เร็วไปจริง ๆ คุยกันจนร้านปิด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาฟังแล้วบอกว่าไม่ต้องขอโทษ แต่ไม่ได้ชวนให้นั่งด้วย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: raise_glass
+        text: "ยกแก้วตอบ แล้วกินต่อเงียบ ๆ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: swap_number
+        text: "ขอเบอร์ไว้ ชวนไปกินข้าววันหลัง"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "กลายเป็นเพื่อนที่โทรหากันได้ทุกเรื่อง ไม่มีใครพูดถึงแหวนวงนั้นอีก", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนที่มากับเขาหันมามองหน้าคุณนานเกินไป คืนนั้นจบแค่ทักทาย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: leave_early
+        text: "รีบเช็กบิลกลับบ้าน"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ← mid_parent_care_01 "ส่งเงินอย่างเดียว ไม่มีเวลา"
+  - id: echo_fam_money_only_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    when: {family: [{role: child, alive: true}]}
+    title: "เงินโอนทุกต้นเดือน"
+    text: "ตอนพ่อแม่ล้มป่วย คุณส่งเงินกลับบ้านอย่างเดียวเพราะไม่มีเวลา วันนี้เป็นคุณเองที่ล้มในห้องน้ำ ลูกโทรมาบอกว่างานยุ่งมาก จะโอนเงินค่าคนดูแลให้ทุกต้นเดือน"
+    choices:
+      - id: ask_visit
+        text: "บอกลูกว่าอยากเห็นหน้ามากกว่า"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ลูกเงียบไปนาน แล้วขับรถมาถึงตอนตีหนึ่ง นอนเฝ้าข้างเตียงทั้งคืน", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกบอกว่าเข้าใจ แต่สุดท้ายก็มาได้แค่วันหยุดยาว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: accept_money
+        text: "รับเงิน ไม่อยากเป็นภาระ"
+        effects: {money: {unit: income_x, amount: 0.3}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: own_story
+        text: "เล่าว่าตัวเองก็เคยส่งแต่เงิน"
+        outcomes:
+          - {weight: 2, ok: true, text: "ลูกฟังจบแล้วขอลางานหนึ่งอาทิตย์ มาทำกับข้าวที่คุณชอบให้กินทุกมื้อ", effects: {relations: 2, happiness: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกบอกว่าคุณก็ทำแบบนี้ เขาเลยไม่เคยรู้ว่าต้องทำแบบอื่น", effects: {relations: -1, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: neighbor_help
+        text: "ฝากเพื่อนบ้านช่วยดูแทน"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  # ← fraud_village_fund_01 "เอาเงินก้อนหนีเข้าเมือง" ผลที่ได้เงินแต่กลับบ้านไม่ได้
+  - id: echo_fraud_home_news_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2545, 2650]
+    when: {flags: {not: [caught_fraud]}}
+    title: "ข่าวจากบ้านเกิด"
+    text: "หลายปีหลังจากหอบเงินกองทุนหมู่บ้านหนีเข้าเมือง ญาติส่งข่าวมาว่าผู้ใหญ่บ้านคนเก่าเสียแล้ว ในงานศพมีคนพูดถึงเงินกองทุนก้อนนั้นอีกครั้ง และชื่อของคุณยังอยู่ในทุกประโยค"
+    choices:
+      - id: return_pay
+        text: "กลับไปงานศพ คืนเงินต่อหน้าทุกคน"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ชาวบ้านนิ่งไปทั้งศาลา แล้วลุงคนหนึ่งลุกมารับซองแทนกองทุน ขากลับมีคนเดินมาส่งถึงรถ", effects: {money: {unit: income_x, amount: -2}, relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "รับเงินคืนแต่ไม่มีใครยอมสบตา ลูกหลานผู้ใหญ่บ้านขอให้กลับก่อนสวดจบ", effects: {money: {unit: income_x, amount: -2}, relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: dana, level: 1}]
+      - id: send_anon
+        text: "ฝากเงินคืนแบบไม่ลงชื่อ"
+        effects: {money: {unit: income_x, amount: -1.5}, happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: stay_away
+        text: "ไม่ไป ปิดเครื่องไปหลายวัน"
+        effects: {happiness: -2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: send_wreath
+        text: "ส่งพวงหรีดไปแทนตัว"
+        outcomes:
+          - {weight: 1, text: "พวงหรีดถูกยกไปวางหลังศาลา ไม่มีใครอ่านชื่อ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มีคนถ่ายรูปพวงหรีดลงกลุ่มหมู่บ้าน พร้อมถามว่าเงินซื้อมาจากไหน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ← fraud_sign_bribe_01 "ดันซองคืน ไม่เซ็น"
+  - id: echo_fraud_clean_hands_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ตึกที่ไม่ได้เซ็น"
+    text: "ข่าวเช้าวันนี้ ตึกที่ผู้รับเหมาคนนั้นสร้างร้าวจนต้องอพยพคนทั้งตึก นักข่าวไล่ถามว่าใครเป็นคนตรวจรับ หลายปีก่อนเขาเคยวางซองหนาเตอะไว้บนโต๊ะคุณ และคุณดันซองคืนโดยไม่เซ็น"
+    choices:
+      - id: give_statement
+        text: "ไปให้ข้อมูลกับคณะกรรมการสอบสวน"
+        outcomes:
+          - {weight: 2, ok: true, text: "คณะกรรมการเชิญเป็นที่ปรึกษาตรวจรับงานทั้งจังหวัด คนในวงการรู้ชื่อคุณดีขึ้นอีกมาก", effects: {network: 2, income_mult: 1.1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ให้การเสร็จแล้วมีรถไม่ติดป้ายจอดหน้าบ้านอยู่หลายคืน", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: tell_kids
+        text: "เล่าเรื่องซองให้ที่บ้านฟัง"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: help_tenants
+        text: "ไปช่วยคนที่ต้องอพยพหาที่พัก"
+        effects: {relations: 1, network: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: help_others, level: 1}]
+      - id: stay_quiet
+        text: "ดูข่าวเงียบ ๆ ไม่อยากยุ่ง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  # ← fraud_whistle_01 "ยืนยันให้การจนสุดทาง"
+  - id: echo_fraud_witness_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "คนที่ออกจากคุก"
+    text: "หัวหน้าคนที่คุณยืนยันให้การจนติดคุก พ้นโทษแล้ว เขามายืนรอหน้าที่ทำงานตอนเย็น ตัวผอมลงครึ่งหนึ่ง ในมือถือถุงผลไม้"
+    choices:
+      - id: talk
+        text: "เดินไปคุยด้วย"
+        outcomes:
+          - {weight: 2, ok: true, text: "เขาบอกว่าในคุกมีเวลาคิดเยอะ ขอบคุณที่ทำให้เขาได้หยุด แล้วยื่นถุงผลไม้ให้", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาไม่ได้มาขอบคุณ เขามาถามว่าคุ้มไหมที่ครอบครัวเขาแตก", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: help_job
+        text: "ช่วยฝากงานให้เริ่มใหม่"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาทำงานซื่อจนเจ้าของร้านไว้ใจให้ถือกุญแจ", effects: {relations: 1, network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่กี่เดือนเขาก็หายไปพร้อมเงินในลิ้นชัก เจ้าของร้านโทรมาต่อว่าคุณ", effects: {network: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: back_door
+        text: "ออกประตูหลัง หลบหน้า"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: call_guard
+        text: "เรียก รปภ. ให้เชิญออกไป"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+
+  # ← fraud_wage_squeeze_01 "ลดเงินเดือนตัวเองแทนโอที"
+  - id: echo_fraud_old_team_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ลูกน้องคนเก่า"
+    text: "ปีที่บริษัทเก่าบีบให้ตัดโอทีลูกน้อง คุณยอมลดเงินเดือนตัวเองแทน วันนี้ลูกน้องคนหนึ่งจากแผนกนั้นเปิดบริษัทของตัวเองแล้ว เขาโทรมาบอกว่าตำแหน่งที่ปรึกษายังว่าง และชื่อแรกที่เขานึกถึงคือคุณ"
+    choices:
+      - id: join
+        text: "รับงาน ไปช่วยเขาสร้างทีม"
+        outcomes:
+          - {weight: 2, ok: true, text: "บริษัทโตเร็ว ลูกน้องรุ่นใหม่เรียกคุณว่าครู", effects: {income_mult: 1.2, network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บริษัทไปไม่รอดภายในสองปี แต่เขายังจ่ายเงินคุณครบทุกบาท", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: part_time
+        text: "ช่วยแค่วันเสาร์ ไม่เอาเงิน"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: send_others
+        text: "แนะนำเพื่อนเก่าคนอื่นไปแทน"
+        effects: {network: 2}
+        merit: [{cat: neutral}]
+      - id: decline
+        text: "ขอบคุณ แต่อยากพักแล้ว"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]

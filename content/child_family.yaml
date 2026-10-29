@@ -134,6 +134,7 @@ events:
         merit: [{cat: neutral}]
       - text: "ร้องไห้ขอไม่ย้าย อยู่กับยายต่อ"
         effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.3}}
+        schedules: [{event: echo_fam_grandma_deed_01, after_years: [15, 25]}]
         merit: [{cat: neutral}]
       - text: "อ้อนให้ยายย้ายไปด้วยกัน"
         outcomes:
@@ -162,6 +163,7 @@ events:
       - text: "ทำเป็นไม่ได้ยิน เก็บไว้คนเดียว"
         effects: {happiness: -2, health: -1, relations: -1}
         sets_flags: [broken_home]
+        schedules: [{event: echo_fam_behind_door_01, after_years: [22, 30]}]
         merit: [{cat: neutral}]
       - text: "ขอไปนอนบ้านตายายสักพัก"
         effects: {relations: 1, happiness: 1, health: 1}
