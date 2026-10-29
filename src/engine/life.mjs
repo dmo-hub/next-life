@@ -1029,8 +1029,10 @@ function moneyShort(ev, st) {
 export function choiceFollows(ev) {
   const follows = ev.choices.map((c) => {
     const ways = [c, ...(c.outcomes ?? [])];
-    const next = ways.some((w) => w.next);
-    const later = ways.some((w) => w.schedules?.length);
+    // นัดที่ช้าสุด 0 ปี ออกปีเดียวกัน ผู้เล่นเห็นเป็นเรื่องต่อ ไม่ใช่ผลภายหลัง
+    const sameYear = (s) => s.after_years[1] === 0;
+    const next = ways.some((w) => w.next || w.schedules?.some(sameYear));
+    const later = ways.some((w) => w.schedules?.some((s) => !sameYear(s)));
     return next && later ? 'both' : next ? 'next' : later ? 'later' : null;
   });
   return follows.some((f) => f) ? { follows } : {};
