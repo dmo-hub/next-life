@@ -970,6 +970,7 @@ function eventCard(st, ev, news = null) {
     text: fill(ev.text, st),
     choices: ev.choices.map((c) => fill(c.text, st)),
     ...choiceHints(ev, st),
+    ...choiceFollows(ev),
     fx: ev.choices.map((c) => choiceFx(st, ev, c)),
     // เหตุผลที่ตัวเลือกกดไม่ได้ (null = กดได้) — หน้าจอแสดงเทาพร้อมเหตุผล
     locked: ev.choices.map((c) => lockReason(st, c)),
@@ -989,6 +990,19 @@ function moneyShort(ev, st) {
     return opts.length ? opts : null;
   });
   return { moneyGap, ...(loans.some((l) => l) && { loans }) };
+}
+
+// ป้ายเห็นล่วงหน้า: ตัวเลือกที่ตัวเองหรือผลสุ่มทางใดทางหนึ่งมีเรื่องต่อ (next · ปีเดียวกัน) หรือผลย้อน (schedules · ปีหลัง)
+// ผู้เล่นรู้ว่าการเลือกนี้มีเรื่องตามมา แต่ไม่รู้ผลหรือโอกาส · เงื่อนไขของการ์ดปลายทางไม่ดู ป้ายจึงไม่เผยสถานะที่ซ่อนอยู่
+// ใส่ช่องเฉพาะการ์ดที่มีอย่างน้อยหนึ่งตัวเลือก การ์ดอื่นรูปเดิมทุกช่อง
+export function choiceFollows(ev) {
+  const follows = ev.choices.map((c) => {
+    const ways = [c, ...(c.outcomes ?? [])];
+    const next = ways.some((w) => w.next);
+    const later = ways.some((w) => w.schedules?.length);
+    return next && later ? 'both' : next ? 'next' : later ? 'later' : null;
+  });
+  return follows.some((f) => f) ? { follows } : {};
 }
 
 // บรรทัดรองบอกข้อแลกใต้ตัวเลือก (B52) — ใส่ช่องเฉพาะการ์ดที่มี hint การ์ดเดิมจึงมีรูปเท่าเดิมทุกช่อง
