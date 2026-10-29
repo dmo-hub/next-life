@@ -1,0 +1,43 @@
+# เอ่ยถึงแม่ในเนื้อการ์ด · ลูกในตัวเลือกวัยทำงาน — ไม่มีเงื่อนไขให้ยังอยู่ · การ์ดที่กั้นด้วยแม่ทั้งใบ / ล็อกตัวเลือกด้วยลูก / แม่ค้า ยังผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "แม่โทรมาถามว่าปีใหม่จะกลับบ้านไหม"
+    choices:
+      - {text: "กลับ", merit: [{cat: neutral}]}
+      - {text: "ไม่กลับ", merit: [{cat: neutral}]}
+      - {text: "ส่งเงินไปแทน", merit: [{cat: neutral}]}
+      - {text: "ยังไม่ตอบ", merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "พาลูกไปหาหมอ", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: ok_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {family: [{role: parent, sex: หญิง, alive: true}]}
+    text: "แม่โทรมาถามว่าปีใหม่จะกลับบ้านไหม"
+    choices:
+      - {text: "กลับ", merit: [{cat: neutral}]}
+      - {text: "ไม่กลับ", merit: [{cat: neutral}]}
+      - {text: "ส่งเงินไปแทน", merit: [{cat: neutral}]}
+      - {text: "ยังไม่ตอบ", merit: [{cat: neutral}]}
+  - id: ok_case_02
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "แม่ค้าหน้าปากซอยเรียกลูกค้า"
+    choices:
+      - {text: "พาลูกไปหาหมอ", requires: {family: [{role: child, alive: true}]}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
