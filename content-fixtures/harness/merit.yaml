@@ -33,7 +33,7 @@ events:
     stage: วัยรุ่น
     at_age: 18
     years: [2500, 2650]
-    text: "พรุ่งนี้สอบเข้ามหาวิทยาลัย แม่พาไปไหว้ศาลประจำเมือง"
+    text: "พรุ่งนี้สอบเข้ามหาวิทยาลัย ผู้ใหญ่ในบ้านพาไปไหว้ศาลประจำเมือง"
     lore_ref: lore-finance-belief.md#B
     belief:
       kind: vow
@@ -84,7 +84,7 @@ events:
     stage: ทำงาน
     at_age: 35
     years: [2500, 2650]
-    text: "พ่อป่วยหนัก ต้องมีคนเฝ้าที่โรงพยาบาลหลายสัปดาห์"
+    text: "ผู้ใหญ่ในบ้านป่วยหนัก ต้องมีคนเฝ้าที่โรงพยาบาลหลายสัปดาห์"
     choices:
       - {label: ลางานไปเฝ้าพ่อเอง, cost: {unit: income_x, amount: 0.1}, merit: [{cat: care_parents, level: 2}]}
       - {label: ส่งเงินไปช่วยค่ารักษา, cost: {unit: income_x, amount: 0.05}, merit: [{cat: care_parents, level: 1}]}
