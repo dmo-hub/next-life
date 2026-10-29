@@ -2450,6 +2450,7 @@ function newLife(seed, content, heir = null) {
     lastEraAge: null,
     // อายุล่าสุดที่จับกองสุ่มแล้ว — กันจับซ้ำเมื่อการ์ดอายุเดียวกันทำให้ลูปค้นซ้ำ
     poolAge: null,
+    poolOwed: 0,
     incomeMult: 1,
     chronic: {},
     // อายุที่ระดับเรื้อรังของค่านั้นเปลี่ยนล่าสุด — นับรอบจางจากจุดนี้
@@ -3316,13 +3317,15 @@ function nextCard(st) {
     const year = st.birthYear + st.age;
     let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
     // กองสุ่มจับได้ปีละ poolRounds รอบ หลังหลักไมล์/นัดของปีนั้นหมดแล้ว · การ์ดที่จับได้อาจนัดตอนต่อปีเดียวกัน — ค้นนัดก่อนรอบถัดไป
-    if (st.poolAge !== st.age) {
-      st.poolAge = st.age;
-      st.poolLeft = poolRounds(stageOf(st.age));
-    }
+    poolTurn(st);
     while (!ev && st.poolLeft > 0) {
       st.poolLeft--;
       ev = drawPool(st, year);
+      // ใบที่ทิ้งแทนเรื่องต่อไม่นับว่าออก — ยังจั่วได้อีกในปีหลัง
+      if (ev && st.poolOwed) {
+        st.poolOwed--;
+        ev = null;
+      }
     }
     if (ev) {
       st.done[ev.id] = true;
@@ -3336,6 +3339,20 @@ function nextCard(st) {
       return eventCard(st, ev);
     }
   }
+}
+
+// รอบจั่วกองสุ่มของปีตั้งครั้งแรกที่อายุนั้นต้องใช้ — ไม่ดึงเลขสุ่ม จึงตั้งก่อนถึงคิวจั่วได้
+function poolTurn(st) {
+  if (st.poolAge === st.age) return;
+  st.poolAge = st.age;
+  st.poolLeft = poolRounds(stageOf(st.age));
+}
+
+// โควตาการ์ด: การ์ดเรื่องต่อ (next) แทนที่การ์ดกองสุ่มหนึ่งใบ — ติดค้างไว้ แล้วทิ้งการ์ดกองสุ่มใบถัดไปที่จั่วได้
+// หักเป็นใบ ไม่ใช่รอบจั่ว เพราะรอบหนึ่งออกการ์ดแค่ตามโอกาส POOL_CHANCE · ปีที่จั่วไม่ได้อีกแล้วค้างไปหักปีถัดไป
+// เนื้อหาเพิ่มสายเรื่องต่อได้โดยชีวิตไม่ยาวขึ้น · ชีวิตที่ไม่เจอเรื่องต่อจั่วและดึงเลขสุ่มเท่าเดิมทุกรอบ
+function takeYearQuota(st) {
+  st.poolOwed = (st.poolOwed ?? 0) + 1;
 }
 
 // กองสุ่ม (B14): เหตุการณ์ไม่มี at_age แต่มี weight · ใบเดิมไม่ซ้ำในชีวิต เว้นแต่ตั้ง repeat · ไม่มีใบที่เกิดได้ = ไม่ดึงเลขสุ่ม
@@ -3547,6 +3564,7 @@ function choose(st, idx, loan) {
       st.done[follow.id] = true;
       st.fired[follow.id] = { n: (st.fired[follow.id]?.n ?? 0) + 1, age: st.age };
       beliefFired(st, follow);
+      takeYearQuota(st);
       after.push({ kind: 'eraEvent', ev: follow, age: st.age });
     }
   }
@@ -7436,7 +7454,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.4.02';
+const APP_VERSION = 'v0.5.00';
 const APP_BUILD = '2026-10-29';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
