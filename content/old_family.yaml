@@ -114,7 +114,7 @@ events:
       - id: transfer
         text: "รีบโอนตามที่บอก"
         outcomes:
-          - {weight: 3, text: "เงินหายทั้งก้อน เบอร์นั้นปิดเครื่องทันที", effects: {happiness: -3, health: -1, money: {unit: income_x, amount: -3}, chronic: {happiness: -1}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "เงินหายทั้งก้อน เบอร์นั้นปิดเครื่องทันที", effects: {happiness: -3, health: -1, money: {unit: income_x, amount: -3}, chronic: {happiness: -1}}, merit: [{cat: neutral}], next: old_scam_after_01}
           - {weight: 1, text: "ธนาคารโทรมาระงับทัน เพราะยอดโอนแปลก รอดหวุดหวิด", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}], sets_flags: [scam_aware], multipliers: {karma: 1.4}}
         merit: [{cat: neutral}]
       - id: hang_up
@@ -366,3 +366,33 @@ events:
         text: "ปล่อยวาง อดีตก็คืออดีต"
         effects: {happiness: 1, health: 1}
         merit: [{cat: bhavana, level: 1}]
+  # เรื่องต่อ old_phone_scam_01 (โอนไปทั้งก้อน) — ออกทาง next เท่านั้น
+  - id: old_scam_after_01
+    type: A
+    category: work_money
+    stage: ชรา
+    years: [2550, 2650]
+    title: "หลังวางสาย"
+    text: "สมุดบัญชีเหลือเลขศูนย์ต่อท้ายไม่กี่ตัว มือยังสั่นตอนกดดูยอดซ้ำเป็นรอบที่สิบ คนในบ้านยังไม่มีใครรู้เรื่อง"
+    choices:
+      - id: freeze_bank
+        text: "รีบไปธนาคารขออายัด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.4}}, text: "ธนาคารอายัดบัญชีปลายทางทัน ได้เงินคืนมาเกือบครึ่ง", effects: {money: {unit: income_x, amount: 1.5}, happiness: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 2, text: "เงินถูกโอนต่อออกไปหมดตั้งแต่ชั่วโมงแรก ได้แค่ใบรับเรื่องกลับบ้าน", effects: {happiness: -1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+      - id: tell_home
+        text: "บอกคนในบ้านตามตรง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.4}}, text: "ไม่มีใครดุสักคำ ช่วยกันเปลี่ยนรหัสบัญชีใหม่ แล้วนั่งกินข้าวเย็นด้วยกันทั้งบ้าน", effects: {relations: 1, happiness: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "โดนบ่นว่าแก่แล้วยังหลงเชื่อ สมุดบัญชีถูกยึดไปเก็บแทน", effects: {relations: -1, happiness: -1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+      - id: keep_quiet
+        text: "เก็บเงียบไว้คนเดียว"
+        effects: {happiness: -1, health: -1}
+        merit: [{cat: neutral}]
+      - id: warn_others
+        text: "อัดคลิปเล่าเตือนคนอื่น"
+        effects: {relations: 1, happiness: 1}
+        sets_flags: [scam_aware]
+        merit: [{cat: help_others, level: 1}]

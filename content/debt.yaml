@@ -188,7 +188,7 @@ events:
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, text: "สามปีต่อมาถนนสี่เลนตัดผ่านหน้าที่ดิน นายหน้าโทรมาขอซื้อทุกอาทิตย์", effects: {happiness: 2, money: {unit: income_x, amount: 2}}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ไปดูของจริงถึงรู้ว่าเป็นที่ดินตาบอด ไม่มีทางเข้า ขายต่อใครก็ไม่เอา", effects: {happiness: -2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไปดูของจริงถึงรู้ว่าเป็นที่ดินตาบอด ไม่มีทางเข้า ขายต่อใครก็ไม่เอา", effects: {happiness: -2}, merit: [{cat: neutral}], next: debt_landlocked_01}
 
   - id: debt_house_squatter_01
     type: A
@@ -696,3 +696,33 @@ events:
         text: "ลุกออกจากงานเงียบ ๆ"
         effects: {happiness: -1}
         merit: [{cat: neutral}]
+  # เรื่องต่อ debt_house_buy_01 (ที่ดินตาบอด) — ออกทาง next เท่านั้น
+  - id: debt_landlocked_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ทางเข้าที่ไม่มี"
+    text: "ที่ดินแปลงใหม่ล้อมด้วยสวนยางของคนอื่นสามด้าน อีกด้านเป็นคลอง เจ้าของแปลงหน้ายืนเท้าเอวดูอยู่ ถามว่าจะเดินผ่านที่เขาไปทุกครั้งหรือ"
+    choices:
+      - id: buy_path
+        text: "ขอซื้อทางผ่านแปลงข้าง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.4}}, text: "นั่งกินข้าวกับเจ้าของแปลงหน้าสามรอบ เขายอมขายทางกว้างพอรถผ่านในราคาพอรับได้", effects: {money: {unit: income_x, amount: -0.5}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เขาเรียกราคาทางผ่านแพงเกือบเท่าที่ดินทั้งแปลง คุยกันไม่จบ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: wait_road
+        text: "ปล่อยไว้ รอถนนตัดผ่าน"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: sell_loss
+        text: "ขายขาดทุนให้แปลงข้าง"
+        effects: {money: {unit: income_x, amount: 1}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: sue_seller
+        text: "ฟ้องนายหน้าที่ปิดบัง"
+        effects: {complain: true}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.4}}, text: "ศาลสั่งให้นายหน้าคืนเงินส่วนหนึ่ง เพราะโฆษณาว่าติดทางสาธารณะ", effects: {money: {unit: income_x, amount: 1.5}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "คดียืดเยื้อสองปี ค่าทนายกินเงินมากกว่าที่ได้คืน", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}

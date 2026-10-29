@@ -24,7 +24,7 @@ events:
         merit: [{cat: help_others, level: 1}]
         outcomes:
           - {weight: 1, ok: true, text: "ลูกค้าเชื่อแล้วจ่ายตรง ทั้งซอยรักร้านนี้ ยอดขายโตทุกเดือน", effects: {job: service, relations: 1}, sets_flags: [own_business], merit: [{cat: neutral}], multipliers: {stats: {relations: 1.5}}}
-          - {weight: 2, text: "สมุดเชื่อหนาขึ้นทุกวัน แต่เงินสดหายไปหมด สุดท้ายต้องปิดร้าน", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "สมุดเชื่อหนาขึ้นทุกวัน แต่เงินสดหายไปหมด สุดท้ายต้องปิดร้าน", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], next: biz_credit_book_01}
       - id: rent_to_friend
         text: "บอกเพื่อนมาเช่าแทน"
         effects: {relations: 1, network: 1}
@@ -429,3 +429,32 @@ events:
         effects: {relations: 2, network: 1}
         sets_flags: [scam_aware]
         merit: [{cat: help_others, level: 2}]
+  # เรื่องต่อ biz_grocery_01 (สมุดเชื่อ) — ออกทาง next เท่านั้น
+  - id: biz_credit_book_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "สมุดเชื่อเล่มหนา"
+    text: "ร้านปิดไปแล้ว เหลือสมุดเชื่อเล่มหนาบนโต๊ะ ชื่อคนในซอยเกือบทุกบ้านอยู่ในนั้น ยอดรวมพอจ่ายค่าเช่าที่ค้างได้ทั้งหมด"
+    choices:
+      - id: collect_door
+        text: "เดินทวงทีละบ้าน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.4}}, text: "ส่วนใหญ่ยอมจ่ายคืนทีละนิด ได้เงินพอปิดค่าเช่าที่ค้าง", effects: {money: {unit: income_x, amount: 1}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "บ้านไหนเห็นก็ปิดประตู ได้คืนไม่ถึงหนึ่งในสิบ แถมโดนนินทาทั้งซอย", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: forgive_all
+        text: "ฉีกสมุดทิ้ง ยกให้ทั้งซอย"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: sell_book
+        text: "ขายสมุดให้คนรับทวงหนี้"
+        effects: {money: {unit: income_x, amount: 0.5}, relations: -2}
+        merit: [{cat: neutral}]
+      - id: post_names
+        text: "ติดรายชื่อคนค้างหน้าร้าน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "อายกันทั้งซอย หลายบ้านแอบเอาเงินมาใส่ซองคืนตอนกลางคืน", effects: {money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "มีคนฉีกประกาศทิ้งตั้งแต่เช้า แล้วขู่จะแจ้งความหมิ่นประมาท", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}

@@ -91,7 +91,7 @@ events:
         sets_flags: [married]
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ช่วยกันผ่อนจนปิดหนี้ได้ งานใหญ่สมหน้าทั้งสองบ้าน", effects: {happiness: 2, relations: 2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ดอกบานทุกเดือน ทะเลาะกันเรื่องเงินตั้งแต่ยังไม่ครบปี", effects: {happiness: 1, relations: -1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1}}, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ดอกบานทุกเดือน ทะเลาะกันเรื่องเงินตั้งแต่ยังไม่ครบปี", effects: {happiness: 1, relations: -1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1}}, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], next: young_dowry_debt_01}
         merit: [{cat: neutral}]
       - id: wait
         text: "ขอเวลาคิดก่อนนะ"
@@ -410,4 +410,33 @@ events:
         outcomes:
           - {weight: 2, ok: true, text: "ลูกค้าประจำลงชื่อกันเต็มหน้า เจ้าของตึกยอมขึ้นแค่นิดเดียว", multipliers: {stats: {relations: 1.5}}, effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เจ้าของตึกไม่สน ขึ้นเต็มเท่าตัวตามเดิม", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ young_wedding_01 (กู้จ่ายสินสอด) — ออกทาง next เท่านั้น
+  - id: young_dowry_debt_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "งวดสินสอด"
+    text: "สิ้นเดือนทีไรใบแจ้งหนี้ค่าสินสอดมาถึงก่อนเงินเดือน คืนนี้เถียงกันเรื่องเงินจนข้าวเย็นชืดคาโต๊ะ เพื่อนบ้านห้องข้างเคาะผนังขอให้เบาเสียง"
+    choices:
+      - id: talk_inlaws
+        text: "ไปคุยกับบ้านฝั่งโน้นตรง ๆ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.4}}, text: "บ้านฝั่งโน้นคืนสินสอดมาครึ่งหนึ่งเป็นทุนตั้งตัว บอกว่าแค่อยากได้หน้าในงานเท่านั้น", effects: {money: {unit: income_x, amount: 0.5}, relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "บ้านฝั่งโน้นหน้าตึง หาว่ามาทวงของที่ให้ไปแล้ว งานรวมญาติปีนี้ไม่มีใครชวน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: split_wallet
+        text: "แยกกระเป๋าเงินคนละใบ"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: side_job
+        text: "รับงานเสริมช่วยกันโปะ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "ขายของออนไลน์ช่วงค่ำด้วยกันครึ่งปี ปิดงวดสินสอดได้ก่อนกำหนด ทะเลาะกันน้อยลงเยอะ", effects: {money: {unit: income_x, amount: 0.5}, relations: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เหนื่อยจนไม่มีแรงคุยกัน หนี้ลดแต่บ้านเงียบเหมือนคนแปลกหน้า", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+      - id: keep_fighting
+        text: "เถียงกันต่อ ไม่มีใครยอม"
+        effects: {relations: -2, happiness: -1}
         merit: [{cat: neutral}]

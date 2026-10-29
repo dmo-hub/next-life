@@ -228,7 +228,7 @@ events:
         requires: {money: {unit: income_x, amount: 0.5}, reason: "ไม่มีทุนซื้อของมาขาย"}
         outcomes:
           - {ok: true, weight: 1, text: "ขายดีจนต้องจ้างเพื่อนช่วยแพ็กของ", multipliers: {stats: {knowledge: 2}}, effects: {money: {unit: income_x, amount: 2}, income_mult: 1.2}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ของค้างสต็อกเต็มห้องนอน", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ของค้างสต็อกเต็มห้องนอน", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}], next: teen_case_stock_01}
         merit: [{cat: neutral}]
       - id: chase_scholarship
         text: "ไม่ทำ ตั้งใจเรียนชิงทุน"
@@ -333,4 +333,33 @@ events:
         outcomes:
           - {weight: 1, text: "ดราม่าทำยอดฟอลพุ่ง แบรนด์ใหม่ทักมาจ้างต่อทันที", effects: {money: {unit: income_x, amount: 0.5}, happiness: 1, relations: -1}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ทัวร์ลงหนักกว่าเดิม คนแคปไปประจานถึงหน้าโรงเรียน", effects: {relations: -2, happiness: -2}, sets_flags: [bullied], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+  # เรื่องต่อ teen_part_time_01 (เคสค้างสต็อก) — ออกทาง next เท่านั้น
+  - id: teen_case_stock_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "เคสรุ่นเก่า"
+    text: "มือถือรุ่นใหม่ออกมาแล้ว เคสสามร้อยชิ้นใต้เตียงกลายเป็นรุ่นเก่าในคืนเดียว ที่บ้านเริ่มบ่นว่าห้องเดินไม่ได้"
+    choices:
+      - id: flea_market
+        text: "ไปเปิดท้ายขายล้างสต็อก"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.4}}, text: "ตะโกนขายสามเสาร์ติดกัน ได้ทุนคืนเกือบหมด แถมจำวิธีต่อราคาได้ติดตัว", effects: {money: {unit: income_x, amount: 0.4}, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขายได้ไม่ถึงสิบชิ้น ตากแดดจนหน้าไหม้", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: give_class
+        text: "แจกเพื่อนทั้งห้อง"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: sell_lot
+        text: "ขายยกล็อตให้ร้านมือถือ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.4}}, text: "เจ้าของร้านรับไปหมดในราคาทุน แล้วชวนมาช่วยร้านวันหยุด", effects: {money: {unit: income_x, amount: 0.5}, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ร้านกดราคาเหลือชิ้นละไม่กี่บาท ได้เงินไม่พอค่ารถไปส่ง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: keep_box
+        text: "เก็บไว้ใต้เตียงต่อ"
+        effects: {happiness: -1}
         merit: [{cat: neutral}]
