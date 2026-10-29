@@ -2927,6 +2927,12 @@ function stepYear(st) {
     }
   }
   // สายยศ (B40): ปีในขั้นนับตามความสุข ถึงคิวแล้วการ์ดเลื่อนขั้น · ผู้ใหญ่บ้าน/กำนันพ้นตำแหน่งตอนเกษียณ · ครบวาระ/ถูกชวนลงสมัคร = การ์ดเลือกตั้ง
+  // การ์ดงบ/ครบวาระของคนมีตำแหน่งการเมืองกินโควตากองสุ่มแบบเรื่องต่อ — เจอทุกวาระ ชีวิตจึงยาวขึ้นเฉพาะสายนี้ (หางด่าน 4)
+  // ไม่หัก: การ์ดเลื่อนขั้น (ออกกับคนทำงานแทบทุกคน) · ใบชวนลงสมัครครั้งแรก (ออกกับทุกคนที่คอนเน็คชั่นถึง แม้ไม่ลง) — หักแล้วชีวิตสั้นลงทั้งกระดาน ไม่ใช่แค่หาง
+  const officeDueCard = (ev) => {
+    st.due.push({ kind: 'eraEvent', ev, age: st.age });
+    if (st.office) takeYearQuota(st);
+  };
   if (isWorking(st)) {
     ageRank(st, moodMul(st));
     if (promoDue(st)) st.due.push({ kind: 'eraEvent', ev: promoCard(st), age: st.age });
@@ -2935,8 +2941,8 @@ function stepYear(st) {
     st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeStep(st).name}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง` });
     st.office = null;
   }
-  if (budgetDue(st)) st.due.push({ kind: 'eraEvent', ev: budgetCard(st), age: st.age });
-  if (officeDue(st)) st.due.push({ kind: 'eraEvent', ev: officeCard(st), age: st.age });
+  if (budgetDue(st)) officeDueCard(budgetCard(st));
+  if (officeDue(st)) officeDueCard(officeCard(st));
   if (recruitDue(st)) st.due.push({ kind: 'eraEvent', ev: recruitCard(st), age: st.age });
   if (isWorking(st) && earlyDue(st)) st.due.push({ kind: 'eraEvent', ev: earlyCard(st), age: st.age });
   if (isAllocAge(st.age)) st.due.push(allocCard(st, year, stage));
@@ -3388,7 +3394,7 @@ function poolTurn(st) {
   st.poolLeft = poolRounds(stageOf(st.age));
 }
 
-// โควตาการ์ด: การ์ดเรื่องต่อ (next) และผลย้อน (schedules) แทนที่การ์ดกองสุ่มหนึ่งใบ — ติดค้างไว้ แล้วทิ้งการ์ดกองสุ่มใบถัดไปที่จั่วได้
+// โควตาการ์ด: การ์ดเรื่องต่อ (next) ผลย้อน (schedules) และการ์ดงบ/เลือกตั้งของตำแหน่งการเมือง แทนที่การ์ดกองสุ่มหนึ่งใบ — ติดค้างไว้ แล้วทิ้งการ์ดกองสุ่มใบถัดไปที่จั่วได้
 // หักเป็นใบ ไม่ใช่รอบจั่ว เพราะรอบหนึ่งออกการ์ดแค่ตามโอกาส POOL_CHANCE · ปีที่จั่วไม่ได้อีกแล้วค้างไปหักปีถัดไป
 // เนื้อหาเพิ่มสายเรื่องต่อได้โดยชีวิตไม่ยาวขึ้น · ชีวิตที่ไม่เจอเรื่องต่อจั่วและดึงเลขสุ่มเท่าเดิมทุกรอบ
 function takeYearQuota(st) {
@@ -7522,7 +7528,7 @@ const STAT_HELP = [
 
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.5.08';
+const APP_VERSION = 'v0.5.09';
 const APP_BUILD = '2026-10-29';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
