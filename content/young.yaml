@@ -1,5 +1,5 @@
 # กองสุ่มช่วงหนุ่มสาว (19–30) · ตั้งธง married has_kids in_debt own_business heavy_drinker smoker
-# ใช้ธงวัยต้น: good_student (ทุน/ไปนอก) · likes_clips (อินฟลูฯ) · bullied (หัวหน้าเอาเปรียบ/ปาร์ตี้) · sporty (ไปนอก)
+# ใช้ธงวัยต้น: good_student (ทุน/ไปนอก) · likes_clips (อินฟลูฯ) · bullied (หัวหน้าเอาเปรียบ/ปาร์ตี้) · sporty (ไปนอก) · school_record (ทุนยากขึ้น)
 events:
   - id: young_scholarship_01
     type: A
@@ -7,7 +7,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 1
-    multipliers: {flags: {good_student: 4}}
+    multipliers: {flags: {good_student: 4, school_record: 0.5}}
     when: {age: [19, 24]}
     title: "จดหมายทุนเรียนต่อ"
     text: "อายุ {อายุ} จดหมายแจ้งว่าได้ทุนเรียนต่อ แต่ต้องกลับมาใช้ทุนอีกหลายปี วันเดียวกันรุ่นพี่ก็ชวนไปทำงานบริษัทที่เงินเดือนสูงกว่าเกือบเท่าตัว"

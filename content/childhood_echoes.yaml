@@ -1,0 +1,179 @@
+# ผลย้อนจากวัยเด็กตอนโต (ประตู 1 ไอเดีย 1 + 2 · ที่มา study-games 65-1 · 65-2)
+# ต้นทางอยู่ช่วง 10–12 ปี เพราะตัวเลือกเด็กเล็กกว่านั้นเป็นของพ่อแม่ (SPEC-continuity) · ปลายทางไม่มี weight = ออกผ่านนัดเท่านั้น
+events:
+  # ---- 65-2 เพื่อนวัยเด็กกลับมา 20 ปีให้หลัง ----
+  - id: kid_friend_lunch_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [10, 12]}
+    title: "กล่องข้าวว่างของเพื่อน"
+    text: "เพื่อนโต๊ะข้าง ๆ นั่งดื่มน้ำเปล่าตอนพักเที่ยงมาเกือบอาทิตย์ บอกทุกคนว่าไม่หิว แต่ท้องร้องดังจนคนหันมามอง วันนี้มีเด็กกลุ่มหลังห้องเริ่มหัวเราะใส่"
+    choices:
+      - id: share_lunch
+        text: "แบ่งข้าวกินด้วยกันทุกวัน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: dana, level: 1}]
+        schedules: [{event: echo_old_friend_help_01, after_years: [20, 22]}]
+      - id: tell_teacher
+        text: "แอบไปบอกครูประจำชั้น"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+        schedules: [{event: echo_old_friend_help_01, after_years: [20, 22]}]
+      - id: look_away
+        text: "ทำเป็นไม่เห็น"
+        merit: [{cat: neutral}]
+        schedules: [{event: echo_old_friend_cold_01, after_years: [20, 22]}]
+      - id: laugh_along
+        text: "หัวเราะตามกลุ่มหลังห้อง"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+        schedules: [{event: echo_old_friend_cold_01, after_years: [20, 22]}]
+
+  - id: echo_old_friend_help_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ข้อความจากเพื่อนเก่า"
+    text: "ข้อความจากชื่อที่ไม่เห็นมายี่สิบปีเด้งขึ้นมา 'จำได้ไหม ที่แบ่งข้าวให้ตอน ป.6 ตอนนี้เปิดบริษัทเล็ก ๆ ของตัวเองแล้ว อยากเจอสักครั้ง' ร้านกาแฟที่นัดอยู่ใกล้ที่ทำงานพอดี"
+    choices:
+      - id: job_offer
+        text: "ไปเจอ คุยเรื่องงาน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เขาชวนไปช่วยงานฝ่ายที่ขาดคน เงินเดือนดีกว่าเดิม และบอกว่าไว้ใจคนที่เคยไม่ทิ้งเขา", effects: {network: 2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุยกันสนุกจนลืมเวลา งานที่เขามีไม่ตรงกับที่ทำ แต่ได้เพื่อนกลับมาหนึ่งคน", effects: {relations: 2}, merit: [{cat: neutral}]}
+      - id: invest_together
+        text: "ขอร่วมลงทุนด้วย"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "บริษัทเขาโตเร็วกว่าที่คิด ส่วนแบ่งปลายปีมากกว่าเงินเดือนสองเดือน", effects: {money: {unit: income_x, amount: 1}, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกค้ารายใหญ่ของเขาเลิกจ้างกลางปี เงินที่ลงไปหายไปครึ่งหนึ่ง แต่เขาขอโทษทุกเดือน", effects: {money: {unit: income_x, amount: -0.5}, relations: 1}, merit: [{cat: neutral}]}
+      - id: just_catch_up
+        text: "เจอกันแค่คุยเรื่องเก่า"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: too_busy
+        text: "ตอบว่าช่วงนี้งานยุ่ง"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: echo_old_friend_cold_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ชื่อในงานเลี้ยงรุ่น"
+    text: "งานเลี้ยงรุ่นประถมปีนี้ มีคนพูดถึงเพื่อนที่เคยนั่งดื่มน้ำเปล่าตอนพักเที่ยง ตอนนี้เป็นเจ้าของบริษัทใหญ่ เขามางานด้วย ยกมือทักทุกโต๊ะ ยกเว้นโต๊ะนี้"
+    choices:
+      - id: go_apologize
+        text: "เดินไปขอโทษเรื่องตอนนั้น"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาฟังเงียบ ๆ แล้วพยักหน้า บอกว่าจำได้ทุกคน แต่ขอบคุณที่ยังจำได้เหมือนกัน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เขายิ้มสุภาพ บอกว่าไม่เป็นไร แล้วหันไปคุยกับคนอื่นต่อ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: ask_business
+        text: "เข้าไปขอนามบัตรเรื่องงาน"
+        effects: {happiness: -1, network: -1}
+        merit: [{cat: neutral}]
+      - id: leave_early
+        text: "กลับบ้านก่อนงานเลิก"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: help_today
+        text: "ช่วยน้องรุ่นที่ไม่มีใครคุยด้วย"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  # ---- 65-1 ความผิดวัยเด็กโดนจับได้ → สอบราชการ/เรียนต่อยาก ----
+  - id: kid_exam_copy_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [10, 12], school: [primary, lower]}
+    title: "ข้อสอบที่หล่นอยู่"
+    text: "หลังเลิกเรียน มีปึกข้อสอบปลายภาควางทิ้งไว้บนโต๊ะครูที่ไม่มีใครอยู่ เพื่อนสองคนกำลังถ่ายรูปเก็บไว้ แล้วหันมาชวนให้ถ่ายด้วย พรุ่งนี้สอบวิชาที่อ่อนที่สุด"
+    choices:
+      - id: take_photo
+        text: "ถ่ายรูปเก็บไว้ด้วย"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 2, text: "คะแนนสอบออกมาสูงเกินจนตัวเองยังตกใจ ไม่มีใครถามอะไร", effects: {knowledge: -1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูเห็นรูปในโทรศัพท์ของเพื่อน ฝ่ายปกครองเรียกทั้งสามคนเข้าห้อง ชื่อถูกจดลงสมุดประวัติ", effects: {happiness: -2, relations: -1}, sets_flags: [school_record], schedules: [{event: echo_school_record_exam_01, after_years: [10, 13]}], merit: [{cat: neutral}]}
+      - id: walk_away
+        text: "เดินออกมา ไปอ่านหนังสือเอง"
+        effects: {knowledge: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: tell_teacher
+        text: "ไปบอกครูว่าข้อสอบหลุด"
+        effects: {relations: -1, knowledge: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: keep_watch
+        text: "ยืนดูต้นทางให้เพื่อน"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 2, text: "ไม่มีใครเดินมา เพื่อนให้ขนมเป็นค่าตอบแทน", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ภารโรงเดินผ่านมาเห็น ชื่อถูกจดลงสมุดประวัติพร้อมเพื่อน", effects: {happiness: -1}, sets_flags: [school_record], schedules: [{event: echo_school_record_exam_01, after_years: [10, 13]}], merit: [{cat: neutral}]}
+
+  - id: teen_record_turn_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [16, 18], flags: {has: [school_record]}}
+    title: "สมุดประวัติเล่มเดิม"
+    text: "ครูฝ่ายปกครองคนใหม่เรียกเข้าห้อง เปิดสมุดประวัติเล่มเดิมให้ดูชื่อตัวเองตั้งแต่ประถม บอกว่าถ้ายื่นเรียนต่อหรือสอบงานรัฐ ที่นี่ต้องส่งเล่มนี้ไปด้วย เว้นแต่จะมีอะไรมาเขียนต่อท้าย"
+    choices:
+      - id: volunteer
+        text: "อาสาสอนน้องทุกเย็น"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+        clears_flags: [school_record]
+      - id: apologize_letter
+        text: "เขียนจดหมายขอโทษครูเก่า"
+        effects: {happiness: 1}
+        merit: [{cat: sila, level: 1}]
+        clears_flags: [school_record]
+      - id: deny_it
+        text: "บอกว่าตอนนั้นยังเด็ก"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: not_care
+        text: "ไม่สนใจ ไม่เรียนต่ออยู่แล้ว"
+        merit: [{cat: neutral}]
+
+  - id: echo_school_record_exam_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {flags: {has: [school_record]}}
+    title: "ตรวจประวัติก่อนสอบ"
+    text: "ใบสมัครสอบงานรัฐถูกส่งกลับมาพร้อมคำถามหนึ่งบรรทัด ให้ชี้แจงเรื่องที่บันทึกไว้ในสมุดประวัติตอนประถม เจ้าหน้าที่บอกว่าไม่ได้ตัดสิทธิ์ แต่ต้องรอกรรมการพิจารณาอีกรอบ"
+    choices:
+      - id: explain_honest
+        text: "ชี้แจงตามจริงทุกอย่าง"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "กรรมการอ่านแล้วให้ผ่าน บอกว่าคนยอมรับผิดตรง ๆ หาไม่ง่าย", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เรื่องค้างพิจารณาจนพ้นรอบสอบ ต้องรอปีหน้า", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+      - id: ask_connection
+        text: "หาคนรู้จักช่วยเร่งเรื่อง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "เรื่องผ่านเร็วจริง แต่คนที่ช่วยโทรมาทวงบุญคุณอีกหลายครั้ง", effects: {network: 1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนรู้จักบอกว่าช่วยไม่ได้ เรื่องนี้ต้องผ่านกรรมการ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: apply_private
+        text: "ไม่รอ ไปสมัครงานเอกชนแทน"
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - id: give_up
+        text: "ถอนใบสมัคร"
+        effects: {happiness: -2}
+        merit: [{cat: neutral}]
