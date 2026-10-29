@@ -55,7 +55,7 @@ events:
       - id: ignore_it
         text: "ช่างมัน เดี๋ยวก็หาย"
         outcomes:
-          - {weight: 3, text: "หายจริง... ส่วนความดันแค่เงียบไว้ก่อน", effects: {chronic: {health: -1}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "หายจริง... ส่วนความดันแค่เงียบไว้ก่อน", effects: {chronic: {health: -1}}, schedules: [{event: echo_health_silent_pressure_01, after_years: [6, 12]}], merit: [{cat: neutral}]}
           - {weight: 1, text: "ล้มหน้าห้องน้ำตอนตีห้า ตื่นมาอีกทีอยู่ห้องฉุกเฉิน", effects: {health: -3, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: quit_stress_job

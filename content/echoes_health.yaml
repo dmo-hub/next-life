@@ -1,0 +1,218 @@
+# ผลย้อน หมวดสุขภาพ (เฟส 1 ข้อ 3): ตัวเลือก/ผลเดิมนัดการ์ดเหล่านี้ 6–35 ปีให้หลังด้วย schedules
+# ไม่มี weight — ออกทางนัดเท่านั้น · ข้อความเรียกตัวเลือกเดิมตรง ๆ เพราะคนเขียนรู้ว่ามาจากไหน
+events:
+  # ← teen_moto_crash_01 "ไปหาหมอนวดพื้นบ้าน" (กระดูกติดผิดรูป)
+  - id: echo_health_crooked_leg_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ขาข้างที่ติดเบี้ยว"
+    text: "ขาข้างที่หมอนวดพื้นบ้านจัดกระดูกให้ตอนรถไถลกลับจากงานวัดเริ่มปวดทุกเช้า หมอกระดูกดูฟิล์มแล้วบอกว่ากระดูกติดเบี้ยวมาตั้งแต่วันนั้น ข้อเข่าเลยสึกเร็วกว่าคนวัยเดียวกัน"
+    choices:
+      - id: realign
+        text: "ผ่าตัดหักจัดกระดูกใหม่"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.4}}, text: "พักฟื้นครึ่งปี แล้วเดินได้ตรงเป็นครั้งแรกในรอบหลายสิบปี", effects: {health: 2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แผลติดเชื้อ ต้องผ่าซ้ำอีกรอบ", effects: {health: -1, money: {unit: income_x, amount: -1.5}, happiness: -1}, merit: [{cat: neutral}]}
+      - id: live_with_it
+        text: "อยู่แบบนี้ต่อ กินยาแก้ปวด"
+        effects: {health: -1, happiness: -1, chronic: {health: -1}}
+        merit: [{cat: neutral}]
+      - id: physio
+        text: "ทำกายภาพ เสริมกล้ามเนื้อ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "กล้ามขาแน่นขึ้นจนรับน้ำหนักแทนข้อเข่าได้ ปวดน้อยลงเกินครึ่ง", effects: {health: 1, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทำได้เดือนเดียวก็เลิก ปวดเท่าเดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: back_to_healer
+        text: "กลับไปหาหมอนวดคนเดิม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "นวดแล้วสบายไปสามวัน แล้วปวดกลับมาเหมือนเดิม", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ดัดแรงจนเข่าบวมเป่ง เดินไม่ได้ไปอาทิตย์หนึ่ง", effects: {health: -2}, merit: [{cat: neutral}]}
+
+  # ← midh_pressure_01 "ช่างมัน เดี๋ยวก็หาย" (ความดันเงียบไว้)
+  - id: echo_health_silent_pressure_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    title: "ความดันที่เงียบไว้"
+    text: "หลายปีก่อนเคยปวดท้ายทอยจนเภสัชกรขอวัดความดันซ้ำ แล้วเราบอกตัวเองว่าเดี๋ยวก็หาย วันนี้ตื่นมาแขนซ้ายชา ปากเบี้ยวนิด ๆ ในกระจก ห้านาทีต่อมาก็กลับเป็นปกติ"
+    choices:
+      - id: rush_er
+        text: "ไปห้องฉุกเฉินเดี๋ยวนี้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.4}}, text: "หมอบอกว่าเป็นสัญญาณเตือนก่อนเส้นเลือดสมองตีบ มาทันพอดี ได้ยาความดันกับยาละลายลิ่มเลือดกลับบ้าน", effects: {health: 1, chronic: {health: 1}, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปถึงแล้วต้องนอนดูอาการหลายวัน ค่าห้องไม่ใช่น้อย", effects: {health: -1, money: {unit: income_x, amount: -0.8}}, merit: [{cat: neutral}]}
+      - id: wait_again
+        text: "หายแล้ว ไม่เป็นไรหรอก"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "อาการไม่กลับมาอีก แต่ความดันก็ยังไม่มีใครวัด", effects: {chronic: {health: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "สองอาทิตย์ต่อมาล้มกลางตลาด ซีกซ้ายอ่อนแรงไปหลายเดือน", effects: {health: -3, happiness: -2}, merit: [{cat: neutral}]}
+      - id: buy_monitor
+        text: "ซื้อเครื่องวัดความดันมาวัดเอง"
+        effects: {health: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: call_someone
+        text: "โทรเรียกคนใกล้ตัวมาเป็นเพื่อน"
+        effects: {relations: 1, health: 1}
+        merit: [{cat: neutral}]
+
+  # ← workh_smoker_cough_01 "เปลี่ยนไปสูบไฟฟ้ากลิ่นผลไม้"
+  - id: echo_health_vape_lungs_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "เงาบนฟิล์มปอด"
+    text: "หลายปีที่เปลี่ยนจากบุหรี่มวนมาสูบไฟฟ้ากลิ่นผลไม้ เพราะคิดว่าเบากว่า วันนี้ตรวจสุขภาพประจำปี หมอเปิดฟิล์มปอดแล้วชี้เงาขาวเป็นหย่อมทั้งสองข้าง"
+    choices:
+      - id: quit_now
+        text: "ทิ้งทั้งหมด เลิกวันนี้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.4}}, text: "ครบปีไม่แตะอีกเลย ฟิล์มรอบใหม่เงาจางลงจนหมอยิ้ม", effects: {health: 2, chronic: {health: 1}, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เลิกได้สามเดือน แล้วกลับไปสูบตอนงานเครียด", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+      - id: more_tests
+        text: "ส่องกล้องตรวจให้ละเอียด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เป็นแค่ปอดอักเสบเรื้อรัง รักษาได้ถ้าเลิกสูบ", effects: {health: 1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจอก้อนเล็กที่ต้องตามดูทุกสามเดือนไปอีกนาน", effects: {health: -1, happiness: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+      - id: keep_vaping
+        text: "ลดกลิ่น ลดความถี่ สูบต่อ"
+        effects: {health: -2, chronic: {health: -1}}
+        merit: [{cat: neutral}]
+      - id: tell_young
+        text: "เล่าให้น้อง ๆ ในงานฟังตรง ๆ"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  # ← workh_fatty_liver_01 "ช่างมัน คืนนี้ชาบูเหมือนเดิม"
+  - id: echo_health_liver_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ตับที่เคยขาวโพลน"
+    text: "ผลตรวจรอบนี้หมอไม่ได้พูดว่าไขมันพอกตับแล้ว แต่พูดคำว่าพังผืด ตัวเลขค่าตับในกระดาษสูงเกือบสามเท่า หมอถามว่าตั้งแต่ตรวจเจอครั้งนั้นแก้อะไรไปบ้าง"
+    choices:
+      - id: diet_strict
+        text: "คุมอาหารจริงจัง เดินทุกวัน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.4}}, text: "น้ำหนักลงสิบโล ค่าตับกลับมาใกล้ปกติ หมอบอกว่าพังผืดยังไม่ไปไกล", effects: {health: 2, chronic: {health: 1}, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุมได้ครึ่งปีแล้วกลับไปกินแบบเดิม ค่าตับไต่ขึ้นอีก", effects: {health: -1}, merit: [{cat: neutral}]}
+      - id: stop_drink
+        text: "เลิกเหล้าเบียร์ขาด"
+        effects: {health: 2, happiness: -1, relations: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: same_as_ever
+        text: "กินยาตามหมอ ใช้ชีวิตเหมือนเดิม"
+        effects: {health: -1, chronic: {health: -1}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: herbal_again
+        text: "หาสมุนไพรบำรุงตับมากินเสริม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ไม่ดีขึ้นแต่ก็ไม่แย่ลง เสียเงินไปเปล่า ๆ", effects: {money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตับอักเสบซ้ำจากสมุนไพร นอนโรงพยาบาลสองอาทิตย์", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+
+  # ← child_drown_01 "ขอแม่ไปเรียนว่ายน้ำให้เป็น"
+  - id: echo_health_swim_save_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "เสียงตะโกนริมน้ำ"
+    text: "เที่ยวน้ำตกกับเพื่อนช่วงสงกรานต์ เสียงตะโกนดังมาจากแอ่งลึก เด็กผู้ชายคนหนึ่งจมลงไปแล้วโผล่ขึ้นมาไม่ถึงหัว ท่าว่ายน้ำที่หัดตั้งแต่เด็กหลังตกคลองวันนั้นยังอยู่ในตัว"
+    choices:
+      - id: dive_in
+        text: "กระโดดลงไปช่วยเลย"
+        merit: [{cat: help_others, level: 2}]
+        outcomes:
+          - {weight: 3, ok: true, multipliers: {stats: {health: 1.4}}, text: "ลากเด็กขึ้นฝั่งได้ทัน ไอน้ำออกมาแล้วร้องไห้ลั่น ครอบครัวเขาไหว้ไม่หยุด", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช่วยขึ้นมาได้ แต่โดนเด็กกดจนสำลักน้ำเอง ต้องนอนโรงพยาบาลหนึ่งคืน", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+      - id: throw_float
+        text: "โยนห่วงยางแล้วตะโกนให้เกาะ"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เด็กเกาะห่วงได้ ดึงเข้าฝั่งอย่างปลอดภัย", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ห่วงลอยไปไม่ถึง ต้องให้คนอื่นกระโดดลงไปแทน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: call_guard
+        text: "วิ่งไปเรียกเจ้าหน้าที่"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: teach_after
+        text: "อาสาสอนว่ายน้ำเด็กแถวนั้น"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "สอนทุกเสาร์อาทิตย์จนเด็กในหมู่บ้านว่ายเป็นครึ่งค่อนหมู่บ้าน", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สอนได้ไม่กี่ครั้งงานก็เข้า ต้องเลิกกลางคัน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+
+  # ← workh_office_syndrome_01 "แปะพลาสเตอร์ แล้วทำงานต่อ"
+  - id: echo_health_spine_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "หมอนรองกระดูกคอ"
+    text: "หลายปีที่แปะพลาสเตอร์แล้วนั่งหน้าจอต่อ เช้านี้ชาจากคอลงไปถึงปลายนิ้วทั้งแขน กำแก้วกาแฟไม่อยู่ หมอดูผลสแกนแล้วบอกว่าหมอนรองกระดูกคอปลิ้นไปกดเส้นประสาท"
+    choices:
+      - id: surgery
+        text: "ผ่าตัดตามที่หมอแนะนำ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.4}}, text: "ตื่นจากยาสลบแล้วนิ้วกลับมามีแรง ชาหายไปเกือบหมด", effects: {health: 2, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผ่าแล้วยังชาอยู่ครึ่งหนึ่ง ต้องทำกายภาพอีกนาน", effects: {health: -1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+      - id: physio_rest
+        text: "ลางานทำกายภาพเต็มคอร์ส"
+        effects: {health: 1, chronic: {health: 1}, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: push_again
+        text: "กินยาแก้ปวด แล้วทำงานต่อ"
+        effects: {health: -2, chronic: {health: -1}}
+        merit: [{cat: neutral}]
+      - id: change_work
+        text: "เปลี่ยนไปทำงานที่ไม่ต้องนั่งจอ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "งานใหม่เงินน้อยกว่า แต่คอหายชา นอนหลับเต็มอิ่มทุกคืน", effects: {health: 2, income_mult: 0.9, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หางานใหม่ไม่ได้ ต้องกลับไปนั่งหน้าจอเหมือนเดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+
+  # ← workh_burnout_01 "ไปพบจิตแพทย์"
+  - id: echo_health_listener_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "น้ำตากลางห้องประชุม"
+    text: "น้องใหม่ในทีมนั่งร้องไห้เงียบ ๆ กลางห้องประชุมเช้าวันจันทร์ ภาพเดียวกับตัวเองเมื่อหลายปีก่อน ก่อนจะยอมไปพบจิตแพทย์ ทุกคนในห้องทำเป็นมองไม่เห็น"
+    choices:
+      - id: talk_after
+        text: "ชวนน้องไปคุยหลังประชุม"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.4}}, text: "เล่าเรื่องตัวเองให้ฟังทั้งหมด น้องยอมไปพบหมอ อีกครึ่งปีกลับมายิ้มได้", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้องปิดตัว บอกว่าไม่เป็นไร แล้วลาออกเดือนต่อมา", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: tell_boss
+        text: "ขอหัวหน้าลดงานให้น้อง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวหน้าฟัง แล้วแบ่งงานใหม่ทั้งทีม", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หัวหน้าบอกว่าทุกคนก็เหนื่อย ใครไม่ไหวก็ออกไป", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+      - id: stay_out
+        text: "ไม่ยุ่ง เรื่องส่วนตัวของน้อง"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: start_group
+        text: "ตั้งวงคุยเรื่องเครียดในทีม"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "เพื่อนร่วมงานหลายคนกล้าพูด บริษัทเริ่มจ้างนักจิตวิทยามาประจำ", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "มีคนมาแค่สองคน แล้ววงก็เงียบหายไปเอง", effects: {happiness: -1}, merit: [{cat: neutral}]}

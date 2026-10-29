@@ -51,6 +51,7 @@ events:
     choices:
       - id: swim_lessons
         text: "ขอแม่ไปเรียนว่ายน้ำให้เป็น"
+        schedules: [{event: echo_health_swim_save_01, after_years: [12, 20]}]
         effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.2}}
         sets_flags: [sporty]
         merit: [{cat: neutral}]

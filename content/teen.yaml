@@ -256,7 +256,7 @@ events:
         text: "ไปหาหมอนวดพื้นบ้าน"
         outcomes:
           - {ok: true, weight: 1, multipliers: {stats: {health: 1.3}}, text: "นวดไม่กี่ครั้งก็เดินฉิว ประหยัดไปเยอะ", effects: {happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "กระดูกติดผิดรูป เดินกะเผลกไปอีกนาน", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กระดูกติดผิดรูป เดินกะเผลกไปอีกนาน", effects: {health: -2, happiness: -1}, schedules: [{event: echo_health_crooked_leg_01, after_years: [25, 35]}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: find_friend
         text: "ลากขาไปตามหาเพื่อนก่อน"

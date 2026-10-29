@@ -12,6 +12,7 @@ events:
     choices:
       - id: push_on
         text: "แปะพลาสเตอร์ แล้วทำงานต่อ"
+        schedules: [{event: echo_health_spine_01, after_years: [10, 15]}]
         effects: {health: -1, chronic: {health: -1}, money: {unit: income_x, amount: 0.3}}
         merit: [{cat: neutral}]
       - id: stretch_hourly
@@ -95,6 +96,7 @@ events:
         merit: [{cat: neutral}]
       - id: see_psychiatrist
         text: "ไปพบจิตแพทย์"
+        schedules: [{event: echo_health_listener_01, after_years: [8, 15]}]
         effects: {happiness: 1, health: 1, chronic: {happiness: 1}, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
       - id: meditation_retreat
@@ -158,6 +160,7 @@ events:
     choices:
       - id: ignore_it
         text: "ช่างมัน คืนนี้ชาบูเหมือนเดิม"
+        schedules: [{event: echo_health_liver_01, after_years: [8, 15]}]
         effects: {happiness: 1, chronic: {health: -1}}
         merit: [{cat: neutral}]
       - id: run_every_morning
@@ -219,6 +222,7 @@ events:
         merit: [{cat: neutral}]
       - id: switch_vape
         text: "เปลี่ยนไปสูบไฟฟ้ากลิ่นผลไม้"
+        schedules: [{event: echo_health_vape_lungs_01, after_years: [8, 15]}]
         sets_flags: [smoker]
         outcomes:
           - {weight: 1, text: "ไอหายไปสองเดือน แล้วกลับมาไอหนักกว่าเดิม", effects: {health: -1}, merit: [{cat: neutral}]}
