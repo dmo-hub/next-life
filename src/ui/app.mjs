@@ -3,8 +3,8 @@ import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, 
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, FOLLOW_WORD } from './labels.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
-const APP_VERSION = 'v0.6.00';
-const APP_BUILD = '2026-10-29';
+const APP_VERSION = 'v0.6.01';
+const APP_BUILD = '2026-10-30';
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
 
