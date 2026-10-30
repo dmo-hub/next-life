@@ -3,10 +3,11 @@
 // "กดได้" = openChoices ตัดตัวเลือกล็อก · เด็กที่ตายก่อน 18 ไม่นับต่อชีวิต (ชีวิตสั้นการ์ดระบบกินสัดส่วน)
 // ด่าน: p10 ต่อชีวิตของทุกบอท ≥ MIN (เป้าเป็นของชีวิต ไม่ใช่ค่ากลาง — ชีวิตส่วนน้อยที่การ์ดเลือกบางต้องไม่หลุดเป้า) · ตัวควบคุม: ตัวหารรวมการ์ดผล (นิยามก่อนเคาะ) ต้องต่ำกว่าตัวจริงทุกบอท
 // ไม่มีการ์ดค้าง (stuckCard ใน gates.mjs) ทั้งโลกหลักและทริป — lint กันได้แค่ requires ของเนื้อหา ไม่ครอบการ์ดที่แกนสร้างกับล็อก/ซ่อนจากที่อื่น
+// การ์ดเนื้อหาเหลือปุ่มเดียวเพราะล็อก (oneOpen) · ช่องแทนค่าค้างบนจอ (unfilledIn) — สองข้อของ xian-16
 import { playLife, mixSeed, openChoices } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
-import { stuckCard } from './gates.mjs';
+import { stuckCard, oneOpen, ONE_OPEN_OK, unfilledIn } from './gates.mjs';
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? Number(process.argv[i + 1]) : d; };
 const n = arg('--n', 2000), seed = arg('--seed', 1);
@@ -22,8 +23,10 @@ const check = (label, bad, extra = '') => {
   if (bad) fail++;
 };
 console.log(`สัดส่วนการ์ดมีตัวเลือก · ${Object.keys(BOTS).length} บอท × ${n} ชีวิต · seed ${seed} · ตัวหาร = ทั้งหมด − การ์ดผล`);
-const low = [], ctlBad = [], stuck = new Map();
+const low = [], ctlBad = [], stuck = new Map(), single = new Map(), unfilled = new Map();
 const stuckAt = (k) => stuck.set(k, (stuck.get(k) ?? 0) + 1);
+const bump = (m, k) => m.set(k, (m.get(k) ?? 0) + 1);
+let singleHidden = 0, singleOk = 0;
 for (const [name, bot] of Object.entries(BOTS)) {
   const share = [], shareAll = [];
   for (let i = 0; i < n; i++) {
@@ -31,6 +34,11 @@ for (const [name, bot] of Object.entries(BOTS)) {
     const r = playLife(mixSeed(seed, i), content, bot, (card) => {
       const why = stuckCard(card, byId);
       if (why) stuckAt(`${card.id ?? card.kind} (${why})`);
+      const one = oneOpen(card, byId);
+      if (one === 'locked') bump(single, card.id);
+      else if (one === 'hidden') singleHidden++;
+      else if (ONE_OPEN_OK.has(card.id) && openChoices(card).length === 1) singleOk++;
+      for (const u of unfilledIn(card)) bump(unfilled, `${card.id ?? card.kind} ${u}`);
       if (card.isekai || card.trip) return;
       all++;
       if (card.kind === 'result') result++;
@@ -48,5 +56,9 @@ for (const [name, bot] of Object.entries(BOTS)) {
 check(`p10 ต่อชีวิตทุกบอท ≥ ${pct(DENSITY.min)}`, low.length, low.length ? ` · ${low.join(' · ')}` : '');
 check('  ตัวควบคุม: ตัวหารรวมการ์ดผลต่ำกว่าตัวจริงทุกบอท', ctlBad.length, ctlBad.length ? ` · ${ctlBad.join(' · ')}` : '');
 check('ไม่มีการ์ดค้าง (ไม่มีปุ่มที่เห็นและกดได้) ทั้งโลกหลักและทริป', [...stuck.values()].reduce((a, b) => a + b, 0), stuck.size ? ` · ${[...stuck].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => `${k} ${v}`).join(' · ')}` : '');
+const top = (m) => (m.size ? ` · ${[...m].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => `${k} ${v}`).join(' · ')}` : '');
+check(`การ์ดเนื้อหาไม่เหลือปุ่มกดได้ปุ่มเดียวเพราะล็อก (ยกเว้น ${[...ONE_OPEN_OK.keys()].join(' ')} ${singleOk} ครั้ง)`, [...single.values()].reduce((a, b) => a + b, 0), top(single));
+console.log(`  เหลือปุ่มเดียวเพราะตัวเลือกซ่อน (gate ของโฟกัส · ไม่ตัดสิน) ${singleHidden} ครั้ง`);
+check('ไม่มีช่องแทนค่าค้างบนจอ ทั้งโลกหลักและทริป', [...unfilled.values()].reduce((a, b) => a + b, 0), top(unfilled));
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 if (fail) process.exitCode = 1;

@@ -202,3 +202,29 @@ export function stuckCard(card, byId) {
   if (openChoices(card).some((i) => card.hidden?.[i] !== true)) return null;
   return card.hidden?.some((h) => h === true) ? 'ไม่มีปุ่มที่เห็นและกดได้' : 'กดไม่ได้สักปุ่ม';
 }
+
+// การ์ดเนื้อหาที่เหลือปุ่มกดได้ปุ่มเดียว (ไอเดีย xian-16) — ทางเลือกหายเพราะล็อก = ผู้เล่นไม่ได้เลือกจริง
+// ล็อกตามแบบของระบบ (แบบงานศพที่ตกลง · คำสั่งเสียที่สั่งแล้ว) ยกเว้นรายใบ · การ์ดที่แกนสร้างไม่นับ (ล็อกวุฒิ/ค่าเทอมตามแบบ)
+// เหลือปุ่มเดียวเพราะซ่อน (card.hidden ของตัวเลือก gate) เป็นแบบของโฟกัส — คืน 'hidden' ให้ผู้เรียกนับแยก ไม่ตก
+export const ONE_OPEN_OK = new Map([
+  ['funeral_rite_01', 'ล็อกตามแบบงานศพที่ตกลงไว้'],
+  ['funeral_wishes_01', 'ล็อกคำสั่งเสียที่สั่งไปแล้ว'],
+]);
+export function oneOpen(card, byId) {
+  if (card.kind !== 'event' || !byId[card.id] || !(card.choices?.length >= 2)) return null;
+  const open = openChoices(card);
+  const shown = open.filter((i) => card.hidden?.[i] !== true);
+  if (shown.length !== 1) return null;
+  if (open.length >= 2) return 'hidden';
+  return ONE_OPEN_OK.has(card.id) ? null : 'locked';
+}
+
+// ช่องแทนค่าค้างบนจอ (ไอเดีย xian-16): ข้อความอ้างคน/ชื่อที่ไม่มีในชีวิตนั้น แกนจึงเติมไม่ได้ — lint kin-unguarded กันได้แค่ที่เขียน when.family
+const UNFILLED = /\{[^{}\s]{1,30}\}/g;
+const strs = (v, out) => {
+  if (typeof v === 'string') out.push(v);
+  else if (Array.isArray(v)) for (const x of v) strs(x, out);
+  else if (v && typeof v === 'object') for (const x of Object.values(v)) strs(x, out);
+  return out;
+};
+export const unfilledIn = (card) => strs(card, []).flatMap((s) => s.match(UNFILLED) ?? []);
