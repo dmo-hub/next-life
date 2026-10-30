@@ -10,6 +10,8 @@ import { VERDICT_REF } from './afterlife.mjs';
 // band = แถบเกือบตายเป็นสัดส่วนของโอกาสตายจากอุบัติเหตุของปีนั้น (ค่าตั้งของเกม วัดเป้าใน harness/near-death)
 // minAge = ต่ำกว่านี้ไม่มีทริป (การ์ดเล่าเหตุแบบผู้ใหญ่) · salt = stream เลือกใบศาล แยกจากทุก stream ของโลก
 export const NEAR_DEATH = { band: 1, minAge: 15, causes: ['road', 'accident'], salt: 0x7f4a7c15 };
+// คำใบ้ยาวเกินจะเป็นหัวการ์ด ⇒ หัวสั้นคงที่ ข้อความลงเนื้อ
+const HINT_TITLE = 'ก่อนลืมตา';
 export const COURT_SCENES = ['near', 'visit', 'summons'];
 // ระดับคำใบ้จากบัญชีสุทธิ (ช่วงเดียวกับ verdictLevel −1..1) · ขอบตามภูมิที่ปรโลก: นรก ≤ −0.5 · เปรต/ดิรัจฉาน < 0 · เทวดา > 2/3
 export const NEAR_HINT_LEVELS = [
@@ -62,7 +64,7 @@ export function courtCard(st) {
       const lines = st.content.nearHints?.[hintLevel(st.ledger)];
       if (!lines?.length) continue;
       const text = lines[Math.floor(courtRng(st).next() * lines.length)];
-      return { ...courtBase(st, c.mode), id: 'court_hint', title: null, text, choices: [], fx: [], locked: [] };
+      return { ...courtBase(st, c.mode), id: 'court_hint', title: HINT_TITLE, text, choices: [], fx: [], locked: [] };
     }
     const ev = courtEvent(st, step);
     if (!ev) {
