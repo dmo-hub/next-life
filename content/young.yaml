@@ -102,6 +102,7 @@ events:
       - id: refuse
         text: "ปฏิเสธ ขอไปตามฝันก่อน"
         effects: {happiness: -1, knowledge: 1, relations: -1}
+        sets_flags: [ex_bitter]
         merit: [{cat: neutral}]
       - id: big_wedding_rite
         text: "ดูฤกษ์แต่งก่อน แล้วจัดใหญ่"

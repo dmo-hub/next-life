@@ -127,7 +127,9 @@ events:
         merit: [{cat: neutral}]
       - id: secret_date
         text: "แอบคบ ไม่ให้ที่บ้านรู้"
-        effects: {happiness: 2, relations: -1, knowledge: -1}
+        outcomes:
+          - {ok: true, weight: 2, text: "แอบเจอกันหลังเลิกเรียนทุกวัน ที่บ้านไม่เคยรู้", effects: {happiness: 2, relations: -1, knowledge: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ที่บ้านจับได้ สั่งให้เลิกต่อหน้า คุณเลือกที่บ้าน เขาด่าคุณกลางโรงเรียนแล้วไม่พูดด้วยอีกเลย", effects: {happiness: -2, relations: -1}, sets_flags: [ex_bitter], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: study_first
         text: "ขอเรียนให้จบก่อนนะ"

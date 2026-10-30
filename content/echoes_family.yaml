@@ -238,3 +238,80 @@ events:
         text: "ขอบคุณ แต่อยากพักแล้ว"
         effects: {happiness: 1}
         merit: [{cat: neutral}]
+
+  # แฟนเก่าที่เลิกไม่ดี (B166) ← young_wedding_01 "ปฏิเสธ" · teen_first_love_01 "แอบคบ" ผลที่บ้านจับได้
+  - id: fam_ex_return_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 6
+    when: {flags: {has: [ex_bitter, married]}, family: [{role: spouse, alive: true}]}
+    title: "กล่องจดหมายเก่า"
+    text: "คนที่คุณเลิกด้วยเมื่อหลายปีก่อนมายืนหน้าบ้าน ถือกล่องจดหมายที่คุณเคยเขียนให้ บอกว่าจะเอาไปให้คู่ชีวิตคุณอ่าน ถ้าวันนี้คุณไม่ออกมาคุยด้วย"
+    choices:
+      - id: talk_out
+        text: "ออกไปคุยกันหน้าบ้าน"
+        clears_flags: [ex_bitter]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "เขาระบายจนหมดแล้ววางกล่องไว้ให้ เดินจากไปไม่หันกลับมา", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เสียงดังจนข้างบ้านออกมาดู คู่ชีวิตรู้เรื่องทั้งหมดจากปากคนอื่น", effects: {relations: -3, happiness: -2}, merit: [{cat: neutral}]}
+      - id: call_spouse
+        text: "เรียกคู่ชีวิตออกมาฟังด้วยกัน"
+        clears_flags: [ex_bitter]
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คู่ชีวิตยืนข้างคุณ ฟังจนจบแล้วบอกให้เขากลับไป เรื่องจบที่หน้าประตู", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คู่ชีวิตเงียบไปทั้งเดือน ถามซ้ำแต่เรื่องที่คุณไม่เคยเล่า", effects: {relations: -3, happiness: -2}, merit: [{cat: neutral}]}
+      - id: pay_off
+        text: "ยื่นเงินให้ไปเงียบ ๆ"
+        clears_flags: [ex_bitter]
+        requires: {money: {unit: income_x, amount: 0.5}, reason: "ไม่มีเงินพอจะยื่น"}
+        effects: {money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เขารับเงินแล้วหายไป กล่องจดหมายไม่เคยมาถึงบ้านอีก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ปีต่อมาเขากลับมาพร้อมทนาย ฟ้องเรียกค่าเสียหายที่คุณทิ้งไปทั้งที่สัญญากันไว้ ใบเสร็จที่คุณยื่นให้กลายเป็นหลักฐาน", effects: {money: {unit: income_x, amount: -1}, relations: -2, happiness: -2}, merit: [{cat: neutral}]}
+      - id: shut_door
+        text: "ปิดประตู ทำเป็นไม่อยู่บ้าน"
+        effects: {happiness: -1}
+        schedules: [{event: echo_fam_ex_crash_01, after_years: [1, 4]}]
+        merit: [{cat: neutral}]
+
+  # ← fam_ex_return_01 "ปิดประตู ทำเป็นไม่อยู่บ้าน"
+  - id: echo_fam_ex_crash_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {flags: {has: [ex_bitter, married]}, family: [{role: spouse, alive: true}]}
+    title: "แขกที่ไม่ได้เชิญ"
+    text: "งานฉลองครบรอบแต่งงาน แขกเต็มร้าน คนที่คุณปิดประตูใส่เดินเข้ามากลางงานพร้อมกล่องจดหมายใบเดิม หยิบไมค์จากพิธีกรแล้วเริ่มอ่านฉบับแรก"
+    choices:
+      - id: grab_mic
+        text: "เดินไปแย่งไมค์"
+        clears_flags: [ex_bitter]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ไมค์หลุดมือเขา ญาติช่วยพาออกจากร้าน งานเดินต่อแบบเงียบกว่าเดิม", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ยื้อกันจนโต๊ะล้ม คลิปในงานไปถึงที่ทำงานคุณก่อนเช้า", effects: {relations: -3, network: -2, happiness: -3}, merit: [{cat: neutral}]}
+      - id: let_read
+        text: "ปล่อยให้อ่านจนจบ แล้วขอบคุณที่มา"
+        clears_flags: [ex_bitter]
+        merit: [{cat: bhavana, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "จดหมายเด็ก ๆ ทำแขกหัวเราะทั้งร้าน เขาวางไมค์แล้วเดินออกไปเอง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฉบับท้าย ๆ เขียนถึงวันที่คุณทิ้งเขาไป คู่ชีวิตลุกออกจากงานก่อนเค้กมา", effects: {relations: -3, happiness: -2}, merit: [{cat: neutral}]}
+      - id: call_police
+        text: "ให้พนักงานร้านเรียกตำรวจ"
+        clears_flags: [ex_bitter]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ตำรวจพาตัวออกไป ลงบันทึกประจำวันให้ เขาไม่มาอีก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาแจ้งความกลับว่าถูกทำร้ายตอนพาออก ต้องจ้างทนายสู้คดีอยู่ปีหนึ่ง", effects: {money: {unit: income_x, amount: -1}, happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+      - id: leave_party
+        text: "จูงมือคู่ชีวิตออกจากงานไปด้วยกัน"
+        effects: {relations: 1, happiness: -2, network: -1}
+        clears_flags: [ex_bitter]
+        merit: [{cat: neutral}]
