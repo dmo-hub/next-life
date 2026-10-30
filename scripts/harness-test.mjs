@@ -151,7 +151,7 @@ const f2 = (v) => v.toFixed(2);
 {
   const base = loadContent();
   const src = base.events.find((e) => e.stage === 'วัยรุ่น' && e.type === 'A' && !e.when);
-  // ตัดการ์ดทายาทจริงออก — ให้ pf_probe เป็นผู้อ่านธงพ่อแม่ใบเดียว ผลไม่ขยับตามเนื้อหา
+  // ตัดการ์ดจริงที่กั้นด้วย when.parent_flags ออก — pf_probe เป็นการ์ดเดียวที่ขึ้นป้าย (ใบที่มีแค่ตัวคูณไม่ขึ้นป้าย) ผลจึงไม่ขยับตามเนื้อหา
   const content = { ...base, events: [...base.events.filter((e) => !e.when?.parent_flags), { ...src, id: 'pf_probe', multipliers: undefined, weight: 1000, when: { parent_flags: { has: ['smoker'] } } }] };
   const pick = (card) => (card.locked ? card.locked.findIndex((x) => !x) : 0);
   const run = (parentFlags) => {

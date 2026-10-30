@@ -270,7 +270,7 @@ check('ทายาทเกิดมามีธงตัวเองว่า�
 check(`ธงพ่อแม่ครบทะเบียนไม่ขยับชีวิตเมื่อไม่มีการ์ดอ่าน (${heirReaders.length ? 'มีผู้อ่านแล้ว ข้าม' : `${streamChecks} คู่`})`, heirTwin);
 check(`ป้าย parentFrom ตรงเงื่อนไขการ์ด (${dCards} ใบ)`, heirD);
 const deadHeir = [...heirFired].filter(([, c]) => !c).map(([id]) => id);
-check(`การ์ดอ่านธงพ่อแม่ออกจริงในรุ่นสองทุกใบ (${heirFired.size} ใบ)`, deadHeir.length, deadHeir.length ? ` ไม่เคยออก: ${deadHeir.join(' ')}` : '');
+check(`การ์ดที่กั้นด้วยธงพ่อแม่ออกจริงในรุ่นสองทุกใบ (${heirFired.size} ใบ · ไม่นับใบที่มีแค่ตัวคูณ)`, deadHeir.length, deadHeir.length ? ` ไม่เคยออก: ${deadHeir.join(' ')}` : '');
 console.log(`ทางลูกบังคับ: ถือธงพ่อแม่ ${withFlag}/${forced} ชีวิต · การ์ดอ่านธงพ่อแม่ ${heirReaders.length} ใบ · ไม่เคยออก ${deadHeir.length}${deadHeir.length ? `: ${deadHeir.join(' ')}` : ''}`);
 if (!sceneIds.length) fails.push('ไม่มีฉากระหว่างชาติในเนื้อหา');
 if (fails.length) {
