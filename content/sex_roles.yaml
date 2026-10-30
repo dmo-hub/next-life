@@ -39,7 +39,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 3
-    when: {age: [20, 30], sex: [ชาย], flags: {not: [married]}, family: [{role: parent, sex: หญิง, alive: true}]}
+    when: {age: [20, 30], sex: [ชาย], flags: {not: [married]}, family: [{role: parent, sex: หญิง, alive: true}, {role: spouse, count: [0, 0]}]}
     title: "แม่อยากเกาะชายผ้าเหลือง"
     text: "แม่ไม่เคยพูดตรง ๆ แต่ทุกครั้งที่มีงานบวชลูกบ้านข้าง ๆ แม่จะกลับมานั่งเงียบนาน วันนี้ป้าข้างบ้านพูดแทนให้ 'ลูกผู้ชายบวชให้แม่สักพรรษา แม่จะได้ขึ้นสวรรค์'"
     choices:
@@ -66,7 +66,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 3
-    when: {age: [30, 55], sex: [หญิง], flags: {not: [married]}, family: [{role: parent, sex: ชาย, alive: true, age: [65, 120]}]}
+    when: {age: [30, 55], sex: [หญิง], flags: {not: [married]}, family: [{role: parent, sex: ชาย, alive: true, age: [65, 120]}, {role: spouse, count: [0, 0]}]}
     title: "ทุกคนหันมามองลูกสาวคนที่ยังโสด"
     text: "พ่อล้มในห้องน้ำ หมอบอกว่าต่อจากนี้ต้องมีคนอยู่ด้วยตลอด วงประชุมญาติเงียบไปพักหนึ่ง แล้วน้าก็พูดขึ้นมา 'ก็{ชื่อ}ไง ยังไม่มีครอบครัว ผู้หญิงดูแลพ่อแม่ได้ดีกว่าผู้ชายอยู่แล้ว'"
     choices:
