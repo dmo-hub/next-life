@@ -227,14 +227,17 @@ function closeIsekai(af) {
 }
 
 // ส่งดวงวิญญาณไปต่างโลก: กรรมที่ติดตัวไปคิดแบบเดียวกับการเกิดใหม่ (หักฝั่งที่ชี้ปลายทาง แล้วสุ่มสัดส่วน) — ไปต่างโลกไม่ใช่ทางลบบาป
+// ถูกเรียกแล้วหายตัวไปทั้งร่าง (B173) ไม่ได้ตายแล้วเกิดใหม่ จึงพกบัญชีไปทั้งก้อนแบบทริป · ยังดึงเลขสุ่มเท่าเดิมให้ทางอื่นเดินตรงกับก่อนแก้
 function sendToIsekai(af) {
   const r = CARRY.min + af.rng.next() * (CARRY.max - CARRY.min);
   const prev = af.from;
+  // ชาติต่างโลกที่จบแล้ว (prev) ตายจริงในโลกนั้น — ธงของชาติไทยยังติดอยู่ จึงต้องกันไว้ ไม่ให้รอบถัดไปพกทั้งก้อนด้วย
+  const whole = !prev && !!af.st.flags?.isekai_call && isGone(af.st);
   af.isekai = startIsekai({
     seed: af.st.seed,
     karma: af.verdict.x,
     past: af.st.name,
-    ledger: carryLedger(af.st.ledger, af.verdict.net, r),
+    ledger: whole ? af.st.ledger : carryLedger(af.st.ledger, af.verdict.net, r),
     blessed: !prev && af.blessed,
     fated: !prev && !!af.st.flags?.isekai_call,
     run: prev ? prev.run + 1 : 0,
