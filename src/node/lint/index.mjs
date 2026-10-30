@@ -11,9 +11,10 @@ import { rules as lore, loreHeadings } from './lore.mjs';
 import { rules as belief } from './belief.mjs';
 import { rules as afterlife } from './afterlife.mjs';
 import { rules as kin } from './kin.mjs';
+import { rules as focus, focusTags } from './focus.mjs';
 import { isObj } from './util.mjs';
 
-export const RULES = [...shape, ...merit, ...flags, ...systems, ...banned, ...lore, ...belief, ...afterlife, ...kin];
+export const RULES = [...shape, ...merit, ...flags, ...systems, ...banned, ...lore, ...belief, ...afterlife, ...kin, ...focus];
 const root = new URL('../../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
 
@@ -32,7 +33,8 @@ export function lintContext() {
   const heir = Object.entries(reg.heir ?? {});
   const flags = { flags: new Set(Object.keys(reg.flags)), prefixes: new Set(Object.keys(reg.prefixes)), heir: new Set(heir.map(([k]) => k)), heirFrom: new Map(heir.map(([k, v]) => [k, v?.from_age ?? 0])) };
   const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
-  return { regions, systems, eras, occupations, ladders, lore, flags, causes, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
+  const focusTagsAll = focusTags(parse(read('content/rules/focus.yaml')));
+  return { regions, systems, eras, occupations, ladders, lore, flags, causes, focusTags: focusTagsAll, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]

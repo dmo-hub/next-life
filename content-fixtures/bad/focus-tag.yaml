@@ -1,0 +1,13 @@
+# ผิดกติกาเดียว: การ์ดติดป้ายหมวดโฟกัสที่ไม่มีจริง (ไม่ใช่ category และไม่อยู่ใน tags ของ content/rules/focus.yaml)
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    focus: [moon_walk]
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

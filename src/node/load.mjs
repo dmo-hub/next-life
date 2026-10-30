@@ -10,6 +10,7 @@ import { checkMeritTable } from '../engine/merit.mjs';
 import { DEBTS } from '../engine/finance.mjs';
 import { PLACEHOLDERS, MAX_LEN } from './lint/vocab.mjs';
 import { NEAR_HINT_LEVELS } from '../engine/court.mjs';
+import { checkFocus } from './lint/focus.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -408,4 +409,12 @@ export function loadNearHints(p = 'content/rules/near-hints.yaml') {
   return doc;
 }
 
-export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints() });
+// โฟกัสชีวิตโลกหลัก (B163): ทะเบียนผิดรูป = หยุด build ไม่ปล่อยให้แกนอ่านค่าครึ่ง ๆ
+function loadFocus() {
+  const doc = parse(read('content/rules/focus.yaml'));
+  const bad = checkFocus(doc);
+  if (bad.length) throw new Error(`content/rules/focus.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return { year_scale: doc.year_scale, card_mul: doc.card_mul, focuses: doc.focuses };
+}
+
+export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus: loadFocus() });

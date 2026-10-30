@@ -1,0 +1,26 @@
+# โฟกัสชีวิต (สิ่งที่ทุ่มเท) โลกหลัก — กติกาอยู่ src/engine/focus.mjs (ตัวกลางทุกโลก) · ที่นี่คือเนื้อของโลกหลัก
+# ไม่ตั้งโฟกัส = "ใช้ชีวิตตามน้ำ" ไม่มีผลอะไรเลย (ไม่อยู่ในรายการนี้ แกนใส่ให้เอง)
+#
+# year_scale = ผลต่อปีเป็นกี่เท่าของผลการ์ดระดับเดียวกัน (fx ใช้ระดับ ±1..±3 แบบการ์ด · เงินใช้หน่วยแบบการ์ด)
+# card_mul   = การ์ดกองสุ่มที่หมวดตรงโฟกัส น้ำหนักคูณเท่านี้ (เจ้าของเคาะ ×2)
+# tags       = ป้ายหมวดเพิ่มนอก category ที่การ์ดติดได้ด้วย `focus: [ป้าย]` · category ของการ์ด (study · work_money · family · health · belief · society) ใช้เป็นป้ายได้เลยไม่ต้องลงที่นี่
+#
+# ต่อโฟกัส: name = ชื่อบนปุ่ม · group = หมวดโฟกัส (work · people · body · gate) · stages = ช่วงวัยที่เลือกได้
+# when = เงื่อนไขสถานะแบบ when ของการ์ด · fx = ผลต่อปี (ขึ้น/ลงบอกบนปุ่มเป็นคำจากเครื่องหมาย ไม่บอกตัวเลข) · cards = ป้ายหมวดการ์ดที่ถ่วง
+year_scale: 0.25
+card_mul: 2
+tags: {}
+focuses:
+  study_hard:
+    name: ตั้งใจเรียน
+    group: work
+    stages: [เด็ก, วัยรุ่น, หนุ่มสาว]
+    when: {school: [primary, lower, upper, voc, hvoc, uni, cadet, police_cadet]}
+    fx: {knowledge: 2, happiness: -1}
+    cards: [study]
+  health_care:
+    name: ดูแลสุขภาพ
+    group: body
+    stages: [วัยรุ่น, หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    fx: {health: 2, money: {unit: income_x, amount: -1}}
+    cards: [health]

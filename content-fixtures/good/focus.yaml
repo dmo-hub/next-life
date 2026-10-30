@@ -1,0 +1,15 @@
+# โฟกัสชีวิต (B163): การ์ดติดป้ายหมวดโฟกัสเพิ่มจาก category ได้ ด้วยป้ายที่มีจริง
+events:
+  - id: good_focus_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    category: work_money
+    weight: 1
+    focus: [health]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

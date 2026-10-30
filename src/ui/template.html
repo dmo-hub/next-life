@@ -94,6 +94,17 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .tab-bar button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
 .tab-panel { padding-top:6px; }
 .stat-help { padding:0 20px; font-size:12px; color:var(--muted); }
+/* ปุ่มโฟกัสชีวิต (B163): แถบเต็มใต้ค่าสถานะ · ชื่อโฟกัสกับทิศผลตัดบรรทัดได้ ป้าย "เปลี่ยน" ชิดขวาไม่ตกบรรทัด */
+.focus { padding:0 20px 8px; font-size:12px; }
+.focus button { all:unset; box-sizing:border-box; width:100%; min-height:44px; display:flex; flex-wrap:wrap; align-items:center; gap:2px 8px; padding:6px 10px; border:1px solid color-mix(in srgb, currentColor 35%, transparent); border-radius:6px; cursor:pointer; overflow-wrap:anywhere; }
+.focus button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.focus-btn b { font-size:14px; }
+.focus-k { font-weight:600; opacity:0.8; }
+.focus-fx { opacity:0.8; }
+.focus-go { margin-left:auto; text-decoration:underline; text-underline-offset:2px; white-space:nowrap; }
+.focus-pick { display:flex; flex-direction:column; gap:4px; margin-top:4px; }
+.focus-pick[hidden] { display:none; }
+.focus-pick .on { border-style:solid; border-color:currentColor; font-weight:600; }
 .stat-help summary { cursor:pointer; min-height:36px; display:flex; align-items:center; text-decoration:underline; text-underline-offset:2px; }
 .stat-help dl { margin:0 0 10px; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 12px; }
 .stat-help dt { font-weight:600; color:var(--ink2); white-space:nowrap; }
@@ -385,7 +396,7 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
   .p-side .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
   .top { padding:8px 16px; }
   .stats { padding:6px 12px; }
-  .meta, .tree, .tabs, .stat-help { padding-left:12px; padding-right:12px; }
+  .meta, .tree, .tabs, .stat-help, .focus { padding-left:12px; padding-right:12px; }
   /* พาแนลซ้ายแคบ: หัวการ์ดตัดบรรทัดเป็นแถว (ไม่งั้นอายุเหลือคำละบรรทัด) · ค่าสถานะ 2 ช่องต่อแถว (4 ค่า = 2×2) ป้าย "ความสัมพันธ์" ไม่ขาดกลางคำ */
   .p-left .top { flex-wrap:wrap; gap:4px 10px; }
   .p-left .top small { flex-basis:100%; text-align:left; }

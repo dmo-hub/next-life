@@ -11,6 +11,7 @@ import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './court.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
+import { FOCUS_FLOW, focusOffers, focusSet, focusYearEnd, focusCardMul } from './focus.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
@@ -704,6 +705,7 @@ function invest(st, { asset, share }) {
 // เดินหนึ่งปี: ทุกอย่างไหลเป็นรายปีในลูปนี้ที่เดียว การกระโดดหลายปีจึงได้ผลเท่ากับเดินทีละปีเสมอ
 function stepYear(st) {
   const prevStage = stageOf(st.age);
+  lifeFocusYear(st);
   // ปีสุดท้ายที่ทำงานต้องวัดก่อนขึ้นอายุ — ขึ้นแล้ว isWorking เป็นเท็จ
   // คนที่ยังนั่งตำแหน่งเต็มเวลาหลังเกษียณวัดใหม่ทุกปีจนเลิกทำงาน — ปีที่ปกติถึงเกษียณได้ค่าเดิม
   if (isWorking(st) && st.age + 1 >= RETIRE_AGE) {
@@ -1292,7 +1294,28 @@ function drawPool(st, year) {
   if (!pool.length || st.rng.next() >= POOL_CHANCE[stage]) return null;
   // การ์ดทาง B (สายมู/ลาง) มีเป้าจำนวนต่อชีวิต — จับหลายรอบแล้วหรี่น้ำหนักตามรอบ ไม่ให้ล้นเป้า
   const b = poolEffectScale(stage);
-  return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers) * (e.type === 'B' ? b : 1)));
+  return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers) * (e.type === 'B' ? b : 1) * lifeFocusMul(st, e)));
+}
+
+// โฟกัสชีวิตโลกหลัก (B163): เนื้ออยู่ content.focus · กติกากลางอยู่ focus.mjs · เนื้อหาชุดทดสอบที่ไม่มี focus = ตามน้ำเสมอ
+const lifeFocusOk = (st) => (w) => whenOk(st, w);
+export const lifeFocusDefs = (st) => st.content.focus?.focuses ?? {};
+// ตามน้ำอยู่หัวรายการเสมอ แล้วตามลำดับในเนื้อหา
+export const lifeFocusOffers = (st) => [FOCUS_FLOW, ...focusOffers(lifeFocusDefs(st), stageOf(st.age), lifeFocusOk(st))];
+export function setLifeFocus(st, id) {
+  if (!lifeFocusOffers(st).includes(id)) throw new Error(`โฟกัสนี้เลือกตอนนี้ไม่ได้: ${id}`);
+  focusSet(st, id, st.age);
+}
+// ปิดปีก่อนขึ้นอายุ: ผลของปีที่อายุ st.age ตามโฟกัสตอนนี้ · ไม่ดึงเลขสุ่ม
+function lifeFocusYear(st) {
+  if (!st.focus) return;
+  const c = st.content.focus;
+  const id = focusYearEnd(st, c.focuses, stageOf(st.age), lifeFocusOk(st), st.age);
+  if (id) applyEffects(st, c.focuses[id].fx, c.year_scale);
+}
+function lifeFocusMul(st, e) {
+  if (!st.focus) return 1;
+  return focusCardMul(lifeFocusDefs(st)[st.focus], [e.category, ...(e.focus ?? [])], st.content.focus.card_mul);
 }
 
 // ไล่ทั้งกองเหตุการณ์ทุกปีกินเวลา harness ราวหนึ่งในห้า — จัดกลุ่มครั้งเดียวต่อชุดเนื้อหา (ผูกกับตัวอาเรย์ แทนทั้งอาเรย์ = กลุ่มใหม่)

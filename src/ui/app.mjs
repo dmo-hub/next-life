@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, MONEY_ICON } from './labels.mjs';
 
@@ -58,6 +58,43 @@ function stats(s) {
     box.append(col);
   }
   return box;
+}
+
+// ปุ่มโฟกัสชีวิต (B163): แถบเต็มใต้ค่าสถานะ — การ์ดกว้างไม่เกิน 460 ทุกจอ ข้างค่าสถานะไม่มีที่พอ
+// ไม่ใช่ตัวเลือกของการ์ด (อยู่นอก .choices · ไม่มีเลขปุ่มลัด) · เปลี่ยนแล้วเซฟทันที ผลไปคิดตอนสิ้นปี
+const focusName = (id) => (id === FOCUS_FLOW ? FOCUS_FLOW_NAME : lifeFocusDefs(st)[id].name);
+const focusFx = (id) => (id === FOCUS_FLOW ? 'ไม่ทุ่มเรื่องไหนเป็นพิเศษ' : focusWords(lifeFocusDefs(st)[id], STAT_LABELS));
+function focusBar(card, open = false) {
+  const cur = st.focus ?? FOCUS_FLOW;
+  const wrap = el('div', 'focus');
+  const btn = el('button', 'focus-btn');
+  btn.type = 'button';
+  btn.setAttribute('aria-expanded', String(open));
+  const fx = focusFx(cur);
+  btn.append(el('span', 'focus-k', 'โฟกัส'), el('b', null, focusName(cur)), el('span', 'focus-fx', fx), el('span', 'focus-go', open ? 'ปิด' : 'เปลี่ยน'));
+  const pick = el('div', 'focus-pick');
+  pick.hidden = !open;
+  for (const id of lifeFocusOffers(st)) {
+    const b = el('button', id === cur ? 'on' : null);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(id === cur));
+    b.append(el('b', null, focusName(id)), el('span', 'focus-fx', focusFx(id)));
+    b.onclick = () => {
+      setLifeFocus(st, id);
+      saveWrite(card);
+      const next = focusBar(card);
+      wrap.replaceWith(next);
+      next.querySelector('.focus-btn').focus();
+    };
+    pick.append(b);
+  }
+  btn.onclick = () => {
+    const next = focusBar(card, pick.hidden);
+    wrap.replaceWith(next);
+    next.querySelector('.focus-btn').focus();
+  };
+  wrap.append(btn, pick);
+  return wrap;
 }
 
 function statHelp() {
@@ -1451,7 +1488,9 @@ function render(card) {
     // การ์ดผลเป็นผลของใบก่อนอยู่แล้ว ป้ายซ้ำไม่บอกอะไรเพิ่ม · งานศพเกิดหลังตายจึงไม่ใช่ "ปีเดียวกัน" ของชีวิต
     if (card.kind !== 'result' && !card.funeral && card.age === prevAge) head.append(el('span', 'same', 'ปีเดียวกัน'));
     top.append(avatar(card.age), head, el('small', null, `${genLabel()}${st.name} · ${provinceLabel(st)}`));
-    box.append(top, stats(s), statHelp());
+    box.append(top, stats(s));
+    if (!st.dead) box.append(focusBar(card));
+    box.append(statHelp());
     // ไม่มีรายได้ก็ต้องเห็นเงินติดตัวเสมอแม้ 0 · มีงานทำแล้วซ่อนเงินติดตัวเฉพาะตอนเป็น 0 พอดี ติดลบ (หนี้) ยังต้องเห็น
     // เงินกู้เป็นยอดค้างของสัญญา ไม่ใช่เงินติดตัวติดลบ จึงแยกช่อง ไม่หักรวมกัน
     const working = isWorking(st, card.age);
