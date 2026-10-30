@@ -152,6 +152,7 @@ events:
         merit: [{cat: dana, level: 2}]
       - id: quit_open_shop
         text: "เอาเงินรางวัลเปิดกิจการตัวเอง"
+        gate: business
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, text: "ร้านติดลมบน มีเงินทุนหนาไม่ต้องกู้ใคร ได้เป็นเถ้าแก่เต็มตัว", effects: {income_mult: 1.3, happiness: 2, network: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
@@ -186,6 +187,7 @@ events:
     choices:
       - id: run_slips
         text: "รับเดินโพยแทนเจ๊"
+        gate: shortcut_money
         hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:

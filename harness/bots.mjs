@@ -2,7 +2,7 @@
 // ทุกตัวเลือกจากตัวเลือกที่กดได้ (openChoices) · ตัดสินจากป้ายบนการ์ด (card.fx) ที่ผู้เล่นเห็นเท่านั้น
 // ข้อยกเว้นเดียว: สายบุญ/บาปอ่านป้ายบุญบาปของตัวเลือก (holder.pending) แทนการอ่านความหมายของข้อความแบบที่คนทำ — ไม่อ่านบัญชี
 // เสมอกันสุ่มจาก stream ของบอท · holder = st (การ์ดชีวิต) หรือ af (การ์ดระหว่างชาติ)
-import { openChoices, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, STAT_LABELS } from '../src/engine/index.mjs';
+import { openChoices, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, STAT_LABELS, STAT_KEYS, makeRng, mixSeed, stageOf, lifeFocusOffers, lifeFocusDefs, setLifeFocus, FOCUS_FLOW } from '../src/engine/index.mjs';
 
 export const random = (card, rng) => {
   const open = openChoices(card);
@@ -80,7 +80,36 @@ const stillness = (card) => (i) => {
 };
 export const passive = (card, rng, h) => (h.pending?.alloc || !card.fx ? random(card, rng) : best(card, rng, stillness(card)));
 
-export const BOTS = {
+
+// นโยบายโฟกัสของบอท (โฟกัสใบ 04): ราว 1/3 ใช้ชีวิตตามน้ำทั้งชีวิต · ที่เหลือเลือกโฟกัสที่ดันค่าเด่นของตัวเองขึ้น ทบทวนเมื่อขึ้นช่วงวัยใหม่หรือโฟกัสเดิมปิด
+// ไม่มีนโยบายนี้ บอทไม่เคยโฟกัส ⇒ ประตูเข้าสายปิดตลอด ด่านที่วัดสายการเมือง/ธุรกิจ/บวชจะเหลือแค่ชีวิตที่ถูกชวน
+// สุ่มจาก stream ของ seed ชีวิต (แยกจากบอทเลือกตัวเลือกและ rng ของโลก) — WeakMap ต่อชีวิต จึงไม่เขียนอะไรลง state
+export const FOCUS_FLOW_SHARE = 1 / 3;
+const FOCUS_SALT = 0x3c6ef372;
+const focusMemo = new WeakMap();
+export function botFocus(st) {
+  let m = focusMemo.get(st);
+  if (!m) {
+    const rng = makeRng(mixSeed(st.seed ^ FOCUS_SALT, st.gen ?? 1));
+    m = { rng, flow: rng.next() < FOCUS_FLOW_SHARE, stage: null };
+    focusMemo.set(st, m);
+  }
+  if (m.flow) return;
+  const offers = lifeFocusOffers(st).filter((id) => id !== FOCUS_FLOW);
+  const s = stageOf(st.age);
+  if (s === m.stage && (!st.focus || offers.includes(st.focus))) return;
+  m.stage = s;
+  if (!offers.length) return;
+  const defs = lifeFocusDefs(st);
+  const top = STAT_KEYS.reduce((a, k) => (st[k] > st[a] ? k : a));
+  const fit = offers.filter((id) => defs[id].fx?.[top] > 0);
+  const from = fit.length ? fit : offers;
+  setLifeFocus(st, from[Math.floor(m.rng.next() * from.length)]);
+}
+export const botFlows = (st) => !!focusMemo.get(st)?.flow;
+const withFocus = (bot) => Object.assign((...a) => bot(...a), bot, { focus: botFocus });
+
+const RAW_BOTS = {
   สุ่ม: random,
   สายบุญ: extreme(1),
   สายบาป: extreme(-1),
@@ -89,3 +118,4 @@ export const BOTS = {
   สายครอบครัว: labelBot({ relations: 3, happiness: 1 }),
   สายสุขภาพ: labelBot({ health: 3, happiness: 1 }),
 };
+export const BOTS = Object.fromEntries(Object.entries(RAW_BOTS).map(([k, b]) => [k, withFocus(b)]));

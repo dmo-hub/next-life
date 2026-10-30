@@ -301,6 +301,7 @@ export function newLife(seed, content, heir = null) {
   st.statTrail.push(statPoint(st));
   st.stageMark = markStage(st);
   lifeFocusBorn(st, heir?.focus);
+  if (heir?.gates?.length) st.gates = [...heir.gates];
   return st;
 }
 
@@ -803,7 +804,8 @@ function stepYear(st) {
     st.office = null;
   }
   if (budgetDue(st)) officeDueCard(budgetCard(st));
-  if (officeDue(st)) officeDueCard(officeCard(st));
+  // ทอยเลขสุ่มของการ์ดชวนก่อนเสมอ แล้วจึงดูประตู — ชีวิตที่ประตูปิดดึงเลขเท่าเดิม เส้นทางอื่นจึงไม่ขยับ
+  if (officeDue(st) && (st.office || lifeGateOpen(st, OFFICE_GATE))) officeDueCard(officeCard(st));
   if (recruitDue(st)) st.due.push({ kind: 'eraEvent', ev: recruitCard(st), age: st.age });
   if (isWorking(st) && earlyDue(st)) st.due.push({ kind: 'eraEvent', ev: earlyCard(st), age: st.age });
   if (isAllocAge(st.age)) st.due.push(allocCard(st, year, stage));
@@ -1037,6 +1039,9 @@ export const ERA_NEWS = { merge: true };
 // news = ข่าวบ้านเมืองที่รวมมาเป็นบรรทัดนำ (B58) — การ์ดยังเป็นของเหตุการณ์ ตัวเลือก/เซฟเดินเหมือนเดิม
 function eventCard(st, ev, news = null, echoFrom = undefined) {
   pickFocus(st);
+  // ตัวเลือกที่พาเข้าสาย (ป้าย gate) ซ่อนจนประตูเปิด — การ์ดยังออกด้วยตัวเลือกที่เหลือ · ใบที่ไม่มีป้ายได้ ev เดิมทั้งก้อน
+  const open = ev.choices.filter((c) => !c.gate || [c.gate].flat().some((id) => lifeGateOpen(st, id)));
+  if (open.length !== ev.choices.length) ev = { ...ev, choices: open };
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
@@ -1384,6 +1389,13 @@ function lifeFocusBorn(st, kid) {
   if (lifeFocusOffers(st).includes(kid)) focusSet(st, kid, -1);
   else st.focusHeir = kid;
 }
+// ประตูเข้าสาย (โฟกัสใบ 04 · เจ้าของเคาะ: ล็อกแค่ประตู): เปิดเมื่อโฟกัสนั้นสะสมครบ chain_years · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
+// · การ์ดชวน (ธง gate:<โฟกัส>) เปิดให้ได้โดยไม่ต้องโฟกัส เช่น นักธุรกิจถูกชวนลงการเมือง
+export const GATE_FLAG = 'gate:';
+export const lifeGateOpen = (st, id) => (st.focusYears?.[id] ?? 0) >= (st.content.focus?.chain_years ?? Infinity) || !!st.gates?.includes(id) || !!st.flags[GATE_FLAG + id];
+export const lifeGatesOpen = (st) => Object.entries(lifeFocusDefs(st)).filter(([id, d]) => d.group === 'gate' && lifeGateOpen(st, id)).map(([id]) => id);
+// การ์ดชวนลงสมัครตอนยังไม่มีตำแหน่ง = ประตูสายการเมือง
+export const OFFICE_GATE = 'politics_base';
 function lifeFocusMul(st, e) {
   if (!st.focus) return 1;
   return focusCardMul(lifeFocusDefs(st)[st.focus], [e.category, ...(e.focus ?? [])], st.content.focus.card_mul);
@@ -1827,6 +1839,8 @@ export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, c
     const card = nextCard(st);
     onCard?.(card, st);
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
+    // บอทที่มีนโยบายโฟกัส (ใบ 04) ตั้งโฟกัสหลังเห็นการ์ด — นโยบายสุ่มจาก stream ของตัวเอง ไม่แตะ rng ของโลก
+    if (pickChoice.focus && !st.dead && !st.trip && !st.court) pickChoice.focus(st);
     // บอทที่ไม่ได้ประกาศ isekai ปฏิเสธการ์ดชวนโดยไม่ดึงเลขสุ่ม ⇒ ชีวิตเดินเท่าเดิม
     // การ์ดในทริป (B68m) ไม่มีป้ายบุญบาปแบบชีวิตไทย — บอทที่ประกาศ trip เลือกเอง ที่เหลือสุ่มตัวที่ไม่ล็อก
     if (card.court) {

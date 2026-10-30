@@ -117,6 +117,7 @@ events:
           - {weight: 2, text: "เงินก้อนนั้นหายไปพร้อมเพื่อน โซเชียลของเขาปิดเงียบทุกช่องทาง", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}], next: debt_friend_gone_01}
       - id: joint_shop
         text: "ชวนเพื่อนเปิดร้านด้วยกันแทน"
+        gate: business
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "ร้านเล็กของสองคนขายดีจนต้องจ้างคนเพิ่ม เพื่อนซื้อรถได้เองโดยไม่ต้องมีใครค้ำ", effects: {happiness: 2, money: {unit: income_x, amount: 1.5}}, sets_flags: [own_business], merit: [{cat: neutral}]}
@@ -447,6 +448,7 @@ events:
           - {weight: 1, text: "สามเดือนหลังขาย ห้างใหญ่มาเปิดหน้าหมู่บ้าน ราคาบ้านแถวนั้นพุ่งอีกเท่าตัว", effects: {settle: informal, happiness: -2}, merit: [{cat: neutral}]}
       - id: sell_open_shop
         text: "ขายแล้วเอาเงินไปเปิดร้าน"
+        gate: business
         effects: {invest: {asset: deposit, share: 0.9}, settle: mortgage}
         clears_flags: [home_owner]
         merit: [{cat: neutral}]

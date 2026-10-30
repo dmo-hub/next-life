@@ -74,4 +74,20 @@ export const rules = [
       });
     },
   },
+  {
+    id: 'focus-gate',
+    desc: 'gate ของตัวเลือก = โฟกัสหมวด gate ที่มีจริง (ตัวเดียวหรือรายการ) · การ์ดต้องเหลือตัวเลือกที่ไม่ติดประตูอย่างน้อย 1 ให้ชีวิตที่ประตูปิด',
+    event(e, ctx, r) {
+      const cs = Array.isArray(e.choices) ? e.choices : [];
+      let gated = 0;
+      cs.forEach((c, i) => {
+        if (c?.gate === undefined) return;
+        gated++;
+        const ids = [c.gate].flat();
+        if (!ids.length || ids.some((id) => typeof id !== 'string')) return r(`.choices[${i}].gate`, 'gate ต้องเป็นชื่อโฟกัสหรือรายการชื่อ');
+        for (const id of ids) if (!ctx.gateFocuses.includes(id)) r(`.choices[${i}].gate`, `ไม่ใช่โฟกัสหมวด gate: ${id}`);
+      });
+      if (gated && gated === cs.length) r('.choices', 'ทุกตัวเลือกติดประตู — ชีวิตที่ประตูปิดจะได้การ์ดไม่มีตัวเลือก');
+    },
+  },
 ];

@@ -13,6 +13,7 @@ events:
     choices:
       - id: open_grocery
         text: "เซ้งเลย เปิดร้านชำ"
+        gate: business
         effects: {money: {unit: income_x, amount: -1}}
         merit: [{cat: neutral}]
         outcomes:
@@ -20,6 +21,7 @@ events:
           - {weight: 2, text: "ของหมดอายุค้างชั้นเป็นแถบ ทุนจมไปกับขนมที่ไม่มีใครซื้อ", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
       - id: credit_book
         text: "เปิดร้าน ให้คนในซอยเชื่อได้"
+        gate: business
         effects: {money: {unit: income_x, amount: -1}, relations: 1}
         merit: [{cat: help_others, level: 1}]
         outcomes:
@@ -118,6 +120,7 @@ events:
     choices:
       - id: open_restaurant
         text: "ทุ่มหมดตัว เปิดร้าน"
+        gate: business
         effects: {money: {unit: income_x, amount: -2}}
         merit: [{cat: neutral}]
         outcomes:
@@ -125,6 +128,7 @@ events:
           - {weight: 1, text: "หกเดือนแรกขายได้ดี แล้วมีโครงการขยายถนน ปิดหน้าร้านยาวสองปี", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
       - id: hire_chef
         text: "จ้างพ่อครัวฝีมือดีมาคุม"
+        gate: business
         effects: {money: {unit: income_x, amount: -2}}
         merit: [{cat: neutral}]
         outcomes:
@@ -140,6 +144,7 @@ events:
         merit: [{cat: neutral}]
       - id: open_restaurant_rite
         text: "เปิดร้านตามฤกษ์ นิมนต์พระ"
+        gate: business
         effects: {money: {unit: income_x, amount: -2.05}, happiness: 1, relations: 1}
         merit: [{cat: neutral}]
         outcomes:
@@ -232,6 +237,7 @@ events:
     choices:
       - id: buy_franchise
         text: "จ่ายค่าแฟรนไชส์เลย"
+        gate: business
         requires: {money: {unit: income_x, amount: 1.5}, reason: "เงินเก็บไม่พอค่าแฟรนไชส์"}
         effects: {money: {unit: income_x, amount: -1.5}}
         merit: [{cat: neutral}]
@@ -240,6 +246,7 @@ events:
           - {weight: 2, text: "สามเดือนต่อมาเบอร์บริษัทแม่ติดต่อไม่ได้ ป้ายสีชมพูกลายเป็นของที่ระลึก", effects: {happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
       - id: copy_own_brand
         text: "ทำยี่ห้อเองให้ถูกกว่า"
+        gate: business
         effects: {money: {unit: income_x, amount: -0.7}}
         merit: [{cat: neutral}]
         outcomes:
@@ -460,3 +467,31 @@ events:
         outcomes:
           - {weight: 1, ok: true, text: "อายกันทั้งซอย หลายบ้านแอบเอาเงินมาใส่ซองคืนตอนกลางคืน", effects: {money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "มีคนฉีกประกาศทิ้งตั้งแต่เช้า แล้วขู่จะแจ้งความหมิ่นประมาท", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+
+  # ประตูการเมืองของนักธุรกิจ (โฟกัสใบ 04 · เจ้าของเคาะ): เจ้าของกิจการถูกชวนลงการเมืองได้โดยไม่ต้องเคยโฟกัสการเมือง · ตอบรับ = ประตูเปิด การ์ดชวนลงสมัครจึงออกได้
+  - id: biz_politics_invite_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [46, 59], flags: {has: [own_business], not: [caught_fraud, "gate:politics_base"]}}
+    title: "โต๊ะจีนงานหอการค้า"
+    text: "งานเลี้ยงหอการค้าจังหวัด ประธานสภาท้องถิ่นยกแก้วมาชนถึงโต๊ะ บอกว่าคนทำมาค้าขายจนคนทั้งตลาดรู้จักแบบนี้ ถ้าลงสมัครสมาชิกสภาฯ รอบหน้า ชาวบ้านคงเลือก"
+    choices:
+      - id: say_yes
+        text: "รับปากว่าจะลองลงดูสักตั้ง"
+        sets_flags: ["gate:politics_base"]
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - id: back_room
+        text: "ขอเป็นคนสนับสนุนอยู่หลังบ้าน"
+        effects: {network: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: ask_home
+        text: "ขอกลับไปปรึกษาที่บ้านก่อน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: stay_trade
+        text: "ยิ้มรับ แต่ขอค้าขายอย่างเดียวพอ"
+        merit: [{cat: neutral}]

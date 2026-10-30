@@ -204,18 +204,21 @@ events:
     choices:
       - id: cafe
         text: "กู้มาเปิดร้านกาแฟตามฝัน"
+        gate: business
         outcomes:
           - {weight: 2, ok: true, text: "คนต่อคิวยาวถึงหน้าร้าน กลายเป็นร้านดังของย่าน", multipliers: {stats: {network: 1.4}}, effects: {happiness: 2, job: service, money: {unit: income_x, amount: 1}}, sets_flags: [own_business], next: young_shop_rush_01, merit: [{cat: neutral}]}
           - {weight: 2, text: "ขายได้วันละสิบแก้ว ค่าเช่ากินเงินเก็บหมด ต้องปิดร้านกลับไปทำงานเดิม", effects: {happiness: -2, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: chicken_rice
         text: "เปิดร้านข้าวมันไก่สูตรแม่"
+        gate: business
         outcomes:
           - {weight: 3, ok: true, multipliers: {stats: {health: 1.3}}, text: "อร่อยจนคนบอกกันปากต่อปาก", effects: {relations: 1, job: service, money: {unit: income_x, amount: 1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 1, text: "ขายดีแต่ยืนหน้าเตาจนหลังพัง ต้องเซ้งร้านกลับไปทำงานเดิม", effects: {health: -2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: partner
         text: "ชวนเพื่อนลงขันกันคนละครึ่ง"
+        gate: business
         outcomes:
           - {weight: 1, ok: true, text: "ช่วยกันจนรุ่ง เปิดสาขาสองในปีเดียว", multipliers: {stats: {relations: 2}}, effects: {relations: 1, job: service, money: {unit: income_x, amount: 1.5}}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 1, text: "เช้าวันหนึ่งเพื่อนหอบเงินในลิ้นชักหายไปทั้งหมด", effects: {relations: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
@@ -226,6 +229,7 @@ events:
         merit: [{cat: neutral}]
       - id: chicken_rice_rite
         text: "เปิดร้านข้าวมันไก่ตามฤกษ์"
+        gate: business
         cost: {unit: fixed_baht, amount: 2000, ref_year: 2566}
         effects: {happiness: 1, relations: 1}
         outcomes:

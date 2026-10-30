@@ -1,0 +1,12 @@
+# ผิดกติกาเดียว: ตัวเลือกติดประตูโฟกัสที่ไม่ใช่หมวด gate
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "เปิดร้านของตัวเอง", gate: work_hard, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

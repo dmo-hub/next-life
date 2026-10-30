@@ -179,6 +179,7 @@ events:
         merit: [{cat: neutral}]
       - id: quit_dream
         text: "ลาออกไปทำตามฝันที่เก็บไว้"
+        gate: business
         effects: {happiness: 2, income_mult: 0.8, knowledge: 1}
         sets_flags: [own_business]
         merit: [{cat: neutral}]
@@ -208,6 +209,7 @@ events:
     choices:
       - id: all_in
         text: "ทุ่มหมดหน้าตัก"
+        gate: business
         outcomes:
           - {weight: 1, ok: true, text: "กิจการติดตลาดภายในปีเดียว ยอดสั่งเข้าจนผลิตไม่ทัน ชีวิตเปลี่ยนทั้งบ้าน", effects: {happiness: 3, income_mult: 1.6}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 2, text: "รุ่นน้องหายไปพร้อมบัญชีบริษัท เหลือแต่ป้ายร้านกับหนี้ร่วม", effects: {happiness: -3, health: -1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}}, next: mid_risky_chase_01, merit: [{cat: neutral}]}
@@ -228,6 +230,7 @@ events:
         merit: [{cat: neutral}]
       - id: own_shop
         text: "ไม่ร่วมกับใคร เปิดร้านเอง"
+        gate: business
         effects: {income_mult: 1.15, health: -1, happiness: 1}
         sets_flags: [own_business]
         merit: [{cat: neutral}]

@@ -33,8 +33,10 @@ export function lintContext() {
   const heir = Object.entries(reg.heir ?? {});
   const flags = { flags: new Set(Object.keys(reg.flags)), prefixes: new Set(Object.keys(reg.prefixes)), heir: new Set(heir.map(([k]) => k)), heirFrom: new Map(heir.map(([k, v]) => [k, v?.from_age ?? 0])) };
   const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
-  const focusTagsAll = focusTags(parse(read('content/rules/focus.yaml')));
-  return { regions, systems, eras, occupations, ladders, lore, flags, causes, focusTags: focusTagsAll, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
+  const focusDoc = parse(read('content/rules/focus.yaml'));
+  const focusTagsAll = focusTags(focusDoc);
+  const gateFocuses = Object.entries(focusDoc.focuses ?? {}).filter(([, f]) => f?.group === 'gate').map(([id]) => id);
+  return { regions, systems, eras, occupations, ladders, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]

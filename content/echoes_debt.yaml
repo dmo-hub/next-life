@@ -46,6 +46,7 @@ events:
     choices:
       - id: join_share
         text: "ลงขันด้วย"
+        gate: business
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {network: 1.4}}, text: "สาขาสองคืนทุนในสองปี ได้ปันผลทุกสิ้นปี", effects: {money: {unit: income_x, amount: -1}, income_mult: 1.3, happiness: 1}, sets_flags: [own_business], merit: [{cat: neutral}]}
@@ -60,6 +61,7 @@ events:
         merit: [{cat: neutral}]
       - id: quit_and_run
         text: "ลาออกจากงานประจำมาคุมร้านเต็มตัว"
+        gate: business
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "คุมร้านเองจนยอดขึ้นสองเท่า เจ้าของเดิมยกส่วนแบ่งก้อนใหญ่ให้", effects: {income_mult: 1.5, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}

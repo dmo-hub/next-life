@@ -52,6 +52,7 @@ events:
       - {text: "ก้มหน้าทำงานต่อเงียบ ๆ", effects: {happiness: -1, income_mult: 0.9}, merit: [{cat: neutral}]}
       - {text: "ขอโทษเจ้านายตรง ๆ", effects: {relations: 2, happiness: -1}, merit: [{cat: sila, level: 1}]}
       - text: "ลาออกมาเปิดกิจการเอง"
+        gate: business
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {network: 1.5}}, text: "ลูกค้าเก่าที่ชอบงานคุณตามมาจ้างเอง กิจการเล็กแต่ไปได้", effects: {income_mult: 1.25, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
@@ -70,6 +71,7 @@ events:
     choices:
       - id: quit_for_dream
         text: "ลาออกเปิดร้านขนมพรุ่งนี้เลย"
+        gate: business
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {network: 1.4}}, text: "เพื่อนช่วยกันแชร์ ขนมสูตรตัวเองขายหมดทุกวัน ได้เป็นเจ้าของร้านสมใจ", effects: {job: service, happiness: 3}, sets_flags: [own_business], merit: [{cat: neutral}]}
@@ -214,6 +216,7 @@ events:
           - {weight: 2, text: "เรียนจบแต่ไม่มีใครกล้าจ้างช่างมือใหม่วัยนี้", effects: {job: labor, money: {unit: income_x, amount: -1}, happiness: -2}, merit: [{cat: neutral}]}
       - id: severance_shop
         text: "เอาเงินชดเชยเปิดร้านอาหาร"
+        gate: business
         effects: {severance: true}
         merit: [{cat: neutral}]
         outcomes:

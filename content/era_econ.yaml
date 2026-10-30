@@ -78,6 +78,7 @@ events:
           - {weight: 1, text: "นายหน้าหอบเงินค่าหัวหายไป ต้องกู้มาจ่ายคืนญาติ", effects: {happiness: -2, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1}}, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "รวมกลุ่มเพื่อนเปิดอู่ทอผ้า"
+        gate: business
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {relations: 2}, occupation: {craft: 1.5}}, text: "ผ้าทอมือได้ออเดอร์จากร้านในเมือง กลายเป็นเถ้าแก่ตัวเล็ก", effects: {relations: 1, income_mult: 1.3}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 1, text: "ทอเสร็จแต่ไม่มีคนซื้อ ผ้ากองเต็มบ้านจนใช้เป็นผ้าห่ม", effects: {happiness: -1, health: 1}, merit: [{cat: neutral}]}
@@ -132,6 +133,7 @@ events:
           - {weight: 1, text: "ทั้งตลาดก็ขายของมือสองเหมือนกัน กลับบ้านพร้อมของเต็มรถ", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ช้อนซื้อกิจการเจ๊งราคาถูก"
+        gate: business
         requires: {money: {unit: income_x, amount: 1}, reason: "ไม่มีเงินก้อนพอช้อนซื้อ"}
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}, occupation: {service: 1.5, manager: 1.5}}, text: "ฟื้นร้านที่เจ้าของทิ้งได้สำเร็จ สิบปีต่อมาคุณมีร้านสามสาขา", effects: {happiness: 2, income_mult: 1.6, money: {unit: income_x, amount: -1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
@@ -211,6 +213,7 @@ events:
     text: "ข่าวต่างประเทศเต็มไปด้วยคำว่าล้มละลาย บริษัทส่งออกแถวบ้านยกเลิกโบนัส ประกาศรับคนสมัครใจลาออกพร้อมเงินชดเชยก้อนโต คนในบ้านต้องคิดหนัก"
     choices:
       - text: "รับเงินชดเชย เปิดร้านกาแฟ"
+        gate: business
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {relations: 2}, occupation: {service: 1.5}}, text: "ร้านเล็กหน้าออฟฟิศเก่ากลายเป็นที่นั่งประจำของอดีตเพื่อนร่วมงาน", effects: {happiness: 2, income_mult: 1.3}, sets_flags: [own_business], next: era_econ_gfc_cafe_01, merit: [{cat: neutral}]}
           - {weight: 1, text: "ร้านกาแฟเปิดใหม่อีกสามร้านในซอยเดียวกัน คุณเจ๊งเป็นร้านแรก", effects: {happiness: -2, debt: {kind: bank_loan, amount: {unit: income_x, amount: 1.5}}, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
@@ -337,6 +340,7 @@ events:
         effects: {relations: -1, money: {unit: income_x, amount: 0.3}}
         merit: [{cat: neutral}]
       - text: "ชวนเพื่อนบ้านตั้งโรงสีชุมชน"
+        gate: business
         requires: {money: {unit: income_x, amount: 1}, reason: "ไม่มีเงินก้อนพอซื้อเครื่องสี"}
         effects: {money: {unit: income_x, amount: -1}}
         outcomes:
@@ -359,6 +363,7 @@ events:
           - {weight: 1, text: "สาขาชงกาแฟจืดเหมือนน้ำล้างแก้ว ลูกค้าเหมาว่าร้านคุณก็จืดด้วย", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ปฏิเสธบริษัท ทุ่มให้ร้านเต็มตัว"
+        gate: business
         effects: {happiness: 2, health: 1, income_mult: 1.2}
         sets_flags: [own_business]
         merit: [{cat: neutral}]

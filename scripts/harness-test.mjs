@@ -1,9 +1,9 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk } from '../src/engine/index.mjs';
+import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
-import { BOTS, readFx } from '../harness/bots.mjs';
+import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
 import { kinGaps, kinDeadRefs, familyLockShort } from '../harness/kin.mjs';
 
 const fails = [];
@@ -163,6 +163,60 @@ const f2 = (v) => v.toFixed(2);
   const none = run({}), smoker = run({ smoker: 1 }), other = run({ heavy_drinker: 1 });
   check('B159 ไม่มีธงพ่อแม่ = การ์ดอ่านธงไม่ออก · ไม่มีช่อง parentFrom', !none.probe.length && !none.keyed.length && !other.probe.length && !other.keyed.length);
   check('B159 ถือธงตรง = การ์ดออก ป้าย [{flag, tier}] เฉพาะใบนั้น', smoker.probe.length > 0 && smoker.keyed.length === smoker.probe.length && JSON.stringify(smoker.probe[0].parentFrom) === '[{"flag":"smoker","tier":1}]');
+}
+
+// ประตูเข้าสาย (โฟกัสใบ 04): ตัวเลือกติดป้าย gate ซ่อนจนประตูเปิด · ประตูเปิดจากโฟกัสครบ chain_years · ทายาท · ธงชวน
+// การ์ดชวนลงสมัครตอนยังไม่มีตำแหน่ง = ประตูการเมือง · บอทมีนโยบายโฟกัส ~1/3 ตามน้ำ
+{
+  const base = loadContent();
+  const byId = new Map(base.events.map((e) => [e.id, e]));
+  const gated = base.events.filter((e) => e.choices.some((c) => c.gate));
+  const probe = { id: 'gate_probe', type: 'A', category: 'work_money', stage: 'ทำงาน', years: [2400, 2700], weight: 100000, text: 'probe', choices: [
+    { id: 'open', text: 'เปิดกิจการ', gate: 'business', merit: [{ cat: 'neutral' }] }, ...[1, 2, 3].map((i) => ({ id: `n${i}`, text: `อื่น ${i}`, merit: [{ cat: 'neutral' }] })),
+  ] };
+  const content = { ...base, events: [...base.events, probe] };
+  const seen = (prep) => {
+    const st = newLife(11, content);
+    prep(st);
+    let n = null;
+    playLife(11, content, (card) => (card.id === 'gate_probe' ? card.choices.length - 1 : random(card, makeRng(1))), (c) => { if (c.id === 'gate_probe') n = c.choices.length; }, st);
+    return n;
+  };
+  check('ใบ 04 ประตูปิด = ตัวเลือกติดประตูไม่ขึ้น (การ์ดยังออก 3 ตัวเลือก)', seen(() => {}) === 3, `${seen(() => {})}`);
+  check('ใบ 04 โฟกัสสะสมครบ chain_years = ตัวเลือกขึ้น', seen((st) => (st.focusYears = { business: base.focus.chain_years })) === 4);
+  check('ใบ 04 โฟกัสสะสมไม่ครบ = ยังซ่อน', seen((st) => (st.focusYears = { business: base.focus.chain_years - 1 })) === 3);
+  check('ใบ 04 ทายาทรับประตูที่รุ่นก่อนเปิด = ขึ้นโดยไม่ต้องสะสมเอง', seen((st) => (st.gates = ['business'])) === 4);
+  check('ใบ 04 ธงชวน gate:<โฟกัส> = ขึ้น', seen((st) => (st.flags[GATE_FLAG + 'business'] = true)) === 4);
+
+  // ชีวิตจริงทั้งกอง: จำนวนตัวเลือกบนการ์ดที่ติดป้าย = ตามสถานะประตูตอนการ์ดออก · ชีวิตตามน้ำ/ประตูปิดไม่เคยเห็นตัวเลือกประตู
+  const N = 1200;
+  let wrong = 0, flowLives = 0, flowGatedCards = 0, flowGateChoices = 0, invites = 0, invitesClosed = 0, bizLives = 0, bizInvite = 0, polFocus = 0, polOffice = 0;
+  for (let i = 0; i < N; i++) {
+    const seed = mixSeed(404, i);
+    const bot = BOTS[Object.keys(BOTS)[i % 6]];
+    let st0 = null, invited = false;
+    const { state: st } = playLife(seed, base, bot, (c, s) => {
+      st0 = s;
+      const ev = c.kind === 'event' && byId.get(c.id);
+      if (ev && ev.choices.some((x) => x.gate)) {
+        const want = ev.choices.filter((x) => !x.gate || [x.gate].flat().some((id) => lifeGateOpen(s, id))).length;
+        if (c.choices.length !== want) wrong++;
+        if (botFlows(s)) { flowGatedCards++; flowGateChoices += c.choices.length - ev.choices.filter((x) => !x.gate).length; }
+      }
+      if (/^office_/.test(c.id ?? '') && !s.office) { invites++; if (!lifeGateOpen(s, OFFICE_GATE)) invitesClosed++; }
+      if (c.id === 'biz_politics_invite_01') invited = true;
+    });
+    if (botFlows(st)) flowLives++;
+    if (st.flags.own_business && !(st.focusYears?.politics_base)) { bizLives++; if (invited) bizInvite++; }
+    if ((st.focusYears?.politics_base ?? 0) >= base.focus.chain_years) { polFocus++; if ((st.officeTop ?? -1) >= 0) polOffice++; }
+  }
+  check('ใบ 04 ตัวเลือกบนการ์ดติดป้าย = ตามสถานะประตู (ทั้งกอง)', wrong === 0, `ไม่ตรง ${wrong}`);
+  check('ใบ 04 การ์ดชวนลงสมัครออกเฉพาะประตูการเมืองเปิด', invitesClosed === 0 && invites > 0, `ชวน ${invites} · ประตูปิดแต่ออก ${invitesClosed}`);
+  const share = flowLives / N;
+  check('ใบ 04 บอทตามน้ำราว 1/3', Math.abs(share - FOCUS_FLOW_SHARE) < 0.05, `${(share * 100).toFixed(1)}%`);
+  check('ใบ 04 ชีวิตตามน้ำยังเจอการ์ดทั่วไปที่มีประตู แต่ไม่เห็นตัวเลือกประตู', flowGatedCards > 0 && flowGateChoices === 0, `การ์ด ${flowGatedCards} · ตัวเลือกประตูที่เห็น ${flowGateChoices}`);
+  check('ใบ 04 นักธุรกิจที่ไม่โฟกัสการเมืองถูกชวนลงการเมือง > 0', bizInvite > 0, `${bizInvite}/${bizLives}`);
+  check('ใบ 04 บอทที่โฟกัสการเมืองครบ ได้ตำแหน่ง > 0', polOffice > 0, `${polOffice}/${polFocus}`);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
