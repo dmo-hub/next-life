@@ -1,5 +1,6 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
+import { shelfMemoArt, shelfTitleArt, shelfPicArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, MONEY_ICON } from './labels.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
@@ -640,6 +641,11 @@ function shelfSec(title, got, all, intro) {
 function titleShelf(body, fresh) {
   const b = bookRead();
   body.append(el('p', 'bk-intro', `สะสมจากทุกชีวิตที่เคยเล่น · เปิดแล้ว ${bookGot(b)}/${BOOK_ALL} · ตัวที่ยังไม่ได้เป็น ??? พร้อมคำใบ้`));
+  shelfTitleArt(body, [
+    { label: 'แบบชีวิต', groups: [{ key: 'p', items: ALL_PATTERNS, got: b.p }] },
+    { label: 'ฉายาประจำตัว', groups: TIERS.map((tier, i) => ({ key: 't', items: TITLES.filter((x) => x.tier === tier), got: b.t, gold2: i === 0 })) },
+    { label: 'ฉายาตระกูล', groups: [{ key: 'f', items: FAMILY_TITLES, got: b.f }] },
+  ], fresh, bookGot(b), BOOK_ALL);
   const rows = (group, items, got) => {
     const ul = el('ul', 'bk-list');
     for (const x of items) {
@@ -854,6 +860,7 @@ function memoShelf(body, choices, fresh, again) {
   const m = memoRead();
   memoSeenWrite(m.l.map((x) => x.k));
   body.append(el('p', 'bk-intro', `ชีวิตที่จบแล้ว ${m.l.length} ชีวิต`));
+  shelfMemoArt(body, m.l, fresh, CONTENT.era.birth.regions);
   const ul = el('ul', 'memo');
   // ลบทีละแถวได้ทันที (สรุปสั้น ไม่ใช่เซฟ ไม่ต้องถามซ้ำ)
   for (const x of [...m.l].reverse()) {
@@ -887,6 +894,11 @@ function memoShelf(body, choices, fresh, again) {
 function picShelf(body, fresh) {
   const p = picsRead();
   body.append(el('p', 'bk-intro', `ภาพเหตุการณ์ภัยพิบัติและเศรษฐกิจที่เคยผ่าน สะสมข้ามชีวิต · ได้แล้ว ${picsGot(p)}/${PIC_ALL} ภาพ`), shelfBar(picsGot(p), PIC_ALL));
+  shelfPicArt(body, PIC_EVENTS.map((e) => {
+    const slots = ERA_PICS[e.id];
+    const met = p.e.includes(e.id);
+    return { id: e.id, name: e.name, kind: e.kind, from: e.from, to: e.to, met, all: 1 + slots.length, n: (met ? 1 : 0) + slots.filter(([k]) => p.s.includes(`${e.id}:${k}`)).length, fresh: fresh.some((k) => k === `e:${e.id}` || k.startsWith(`s:${e.id}:`)) };
+  }), picsGot(p), PIC_ALL);
   for (const e of PIC_EVENTS) {
     const s = el('section', 'pic-ev');
     const met = p.e.includes(e.id);
