@@ -13,6 +13,8 @@ const list = (xs) => xs.join(', ');
 // ค่าใดค่าหนึ่งก็ผ่าน — คั่นด้วย "หรือ" ไม่ให้ปนกับ · ที่คั่นเงื่อนไขซึ่งต้องผ่านทุกข้อ
 const any = (xs) => xs.join(' หรือ ');
 const range = ([a, b], unit = '') => (a === b ? `${a}${unit}` : `${a}–${b}${unit}`);
+// วิธีดูแลพ่อแม่ (B167 when.filial) ตามคำที่ผู้เล่นเห็นบนตัวเลือก
+const FILIAL_TH = { self: 'ดูแลเอง', share: 'แบ่งเวรกับญาติ', hire: 'จ้างคนดูแล', home: 'ส่งบ้านพักคนชรา', away: 'ไม่ได้ดูแลเอง' };
 
 // ชื่อธงอ่านจากทะเบียนธงชุดเดียวกับด่าน lint · ธงมีพารามิเตอร์ (vow_open:xxx) ใช้คำอธิบายของชื่อหน้า
 export function flagNames(root = new URL('../../', import.meta.url)) {
@@ -160,6 +162,14 @@ function conditions(e, L) {
   for (const [k, b] of Object.entries(w.stats ?? {})) out.push(bound(k, b));
   for (const f of w.family ?? []) out.push(famCond(f));
   if (w.loss) out.push(w.loss.after ? `เสีย${any(w.loss.roles.map((r) => FAMILY_ROLE_NAMES[r] ?? r))}มาแล้ว ${w.loss.after}–${w.loss.within} ปี` : `เพิ่งเสีย${any(w.loss.roles.map((r) => FAMILY_ROLE_NAMES[r] ?? r))}${w.loss.within ? ` ภายใน ${w.loss.within} ปี` : 'ปีนี้'}`);
+  if (w.kin_illness) {
+    const k = w.kin_illness;
+    out.push(`${any((k.roles ?? ['parent', 'spouse', 'child', 'grandchild']).map((r) => FAMILY_ROLE_NAMES[r] ?? r))}รู้แล้วว่าป่วยโรคเรื้อรัง${k.causes ? ` (${any(k.causes.map(esc))})` : ''}${k.left ? ` เหลือ ${range(k.left, ' ปี')}` : ''}`);
+  }
+  if (w.filial) {
+    const n = w.filial.n ?? [1, 99];
+    out.push(`เคยดูแลพ่อแม่ ${n[1] >= 99 ? `${n[0]} ครั้งขึ้นไป` : range(n, ' ครั้ง')}${w.filial.way ? ` ครั้งล่าสุดแบบ${any(w.filial.way.map((x) => FILIAL_TH[x] ?? x))}` : ''}`);
+  }
   out.push(...flagCond(w.flags, L));
   // ธงของพ่อแม่รุ่นก่อน ไม่ใช่ของตัวละคร — การ์ดจึงออกเฉพาะชีวิตที่เกิดเป็นลูกของรุ่นก่อน
   out.push(...flagCond(w.parent_flags, L, 'เกิดเป็นลูกของรุ่นก่อนที่'));
