@@ -9,6 +9,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { parse } from 'yaml';
 import { loadContent } from '../src/node/load.mjs';
+import { effectSites } from '../src/node/lint/util.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 import { playLife, mixSeed } from '../src/engine/index.mjs';
 import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS } from './gates.mjs';
@@ -100,6 +101,13 @@ for (const [flag, bot] of Object.entries(SIDE_REACH)) {
   for (let i = 0; i < 200 && !sideFlags.has(flag); i++) if (playLife(mixSeed(seed, 9500 + i), content, bot).state.flags?.[flag]) sideFlags.add(flag);
   console.log(`ธงที่บอทหลักไม่ตั้งโดยกติกา · ${flag}: บอทสายต่างโลก${sideFlags.has(flag) ? 'ถึง' : 'ไม่ถึง'}`);
 }
+// การ์ดที่ when.parent_flags.has ออกได้เฉพาะทายาทของรุ่นที่ถือธง — ชีวิตที่นี่เป็นรุ่นเดียว parentFlags ว่างเสมอ ⇒ ถึงไม่ได้โดยโครงสร้าง
+// ด่านว่าใบพวกนี้ออกได้จริงอยู่ที่ npm run lineage · ธงที่มีแต่ใบพวกนี้ตั้งก็ถึงไม่ได้ด้วยเหตุเดียวกัน · ใบที่ผู้อ่านธงพ่อแม่แค่คูณโอกาสยังตัดสินที่นี่
+const HEIR_ONLY = new Set(content.events.filter((e) => e.when?.parent_flags?.has?.length).map((e) => e.id));
+const setters = new Map();
+for (const e of content.events) for (const { node } of effectSites(e)) for (const fl of node.sets_flags ?? []) setters.set(fl, [...(setters.get(fl) ?? []), e.id]);
+const HEIR_FLAGS = new Set([...setters].filter(([, ids]) => ids.every((id) => HEIR_ONLY.has(id))).map(([fl]) => fl));
+console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run lineage): การ์ดที่ต้องมีธงพ่อแม่ ${HEIR_ONLY.size} ใบ · ธงที่มีแต่การ์ดพวกนั้นตั้ง ${HEIR_FLAGS.size} ตัว${HEIR_FLAGS.size ? ` (${[...HEIR_FLAGS].join(' · ')})` : ''}`);
 // ฐานเทียบรอบก่อนคิดจาก seed ตายตัวเท่านั้น — รวม seed สุ่มแล้วตัวที่รอดเพราะ seed สุ่มจะกลายเป็น "ตายใหม่" ในรอบหน้า
 function deadOf(runs) {
   const fired = new Map(), picks = new Set(), flags = new Set();
@@ -113,10 +121,10 @@ function deadOf(runs) {
   const { dead, thin } = splitDeadChoices(content.events, fired, explored, picks);
   return {
     fired,
-    events: content.events.filter((e) => !fired.has(e.id)).map((e) => e.id),
+    events: content.events.filter((e) => !fired.has(e.id) && !HEIR_ONLY.has(e.id)).map((e) => e.id),
     choices: dead,
     thinChoices: thin,
-    flags: FLAGS.filter((x) => !flags.has(x) && !sideFlags.has(x)),
+    flags: FLAGS.filter((x) => !flags.has(x) && !sideFlags.has(x) && !HEIR_FLAGS.has(x)),
   };
 }
 const { fired, events: deadEvents, choices: deadChoices, thinChoices, flags: deadFlags } = deadOf(main);
