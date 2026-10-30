@@ -1,0 +1,14 @@
+# การ์ดทางแรกของสายยศ (B170) แบบถูกต้อง — ไม่มี weight ออกได้ทางเดียวคือปีที่เข้าสาย
+events:
+  - id: first_police_fixture_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    first_of: police
+    text: "สัปดาห์แรกที่โรงพัก มีซองวางไว้บนโต๊ะ"
+    choices:
+      - {text: "รับไว้", sets_flags: [took_bribe], merit: [{cat: neutral}]}
+      - {text: "คืนไป", merit: [{cat: neutral}]}
+      - {text: "ขอคิดดูก่อน", merit: [{cat: neutral}]}
+      - {text: "ไม่พูดอะไร", merit: [{cat: neutral}]}

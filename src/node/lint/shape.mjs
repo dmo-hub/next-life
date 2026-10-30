@@ -15,7 +15,7 @@ import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placehold
 const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near'],
+  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
@@ -449,6 +449,15 @@ export const rules = [
       const ages = Object.values(TRACKS).filter((t) => t.exam === p.before).map((t) => t.until);
       const span = STAGE_AGES[e.stage];
       if (span && !ages.some((a) => a >= span[0] && a <= span[1])) r('.stage', `ด่าน ${p.before} อยู่ที่อายุ ${ages.join('/')} ไม่อยู่ในช่วง ${e.stage}`);
+    },
+  },
+  {
+    id: 'first-of-shape',
+    desc: 'first_of = id สายใน data/careers.json (B170) · การ์ดทางแรกออกตอนเข้าสายเท่านั้น — ห้ามมี weight/at_age/era/repeat/prelude',
+    event(e, ctx, r) {
+      if (e.first_of === undefined) return;
+      if (!ctx.ladders.includes(e.first_of)) r('.first_of', `ต้องเป็น id สาย ${ctx.ladders.join('|')} ได้ ${JSON.stringify(e.first_of)}`);
+      if (['weight', 'at_age', 'era', 'repeat', 'prelude'].some((k) => e[k] !== undefined)) r('.first_of', 'การ์ดทางแรกห้ามมี weight/at_age/era/repeat/prelude — ออกได้ทางเดียวคือปีที่เข้าสาย');
     },
   },
   {

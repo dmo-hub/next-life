@@ -1,0 +1,27 @@
+# การ์ดทางแรกชี้สายที่ไม่มี + การ์ดทางแรกที่ยังอยู่ในกองสุ่ม (มี weight) — การ์ดทางแรกตำรวจไม่มี weight ใน good/first-of.yaml ผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    first_of: fireman
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "รับไว้", merit: [{cat: neutral}]}
+      - {text: "คืนไป", merit: [{cat: neutral}]}
+      - {text: "ขอคิดดูก่อน", merit: [{cat: neutral}]}
+      - {text: "ไม่พูดอะไร", merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    first_of: police
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "รับไว้", merit: [{cat: neutral}]}
+      - {text: "คืนไป", merit: [{cat: neutral}]}
+      - {text: "ขอคิดดูก่อน", merit: [{cat: neutral}]}
+      - {text: "ไม่พูดอะไร", merit: [{cat: neutral}]}

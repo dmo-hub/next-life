@@ -116,7 +116,7 @@ events:
     years: [2500, 2650]
     weight: 3
     when: {ladder: [police]}
-    multipliers: {rank: 1.3, flags: {in_debt: 1.5}}
+    multipliers: {rank: 1.3, flags: {in_debt: 1.5, badge_bent: 2, badge_clean: 0.5}}
     title: "ซองต้นเดือน"
     text: "ต้นเดือนร้านในเขตส่งซองมาที่โต๊ะ หัวหน้าบอกว่าเก็บรวมแล้วส่งขึ้นไปตามระบบ ส่วนหนึ่งเป็นของคนเก็บ"
     choices:

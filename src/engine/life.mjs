@@ -588,6 +588,13 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
     st.incomeMult = 1;
     st.jobSince = st.age;
     enterLadder(st, fx.ladder);
+    // ทางแรกของสาย (B170): การ์ด first_of ออกปีที่เข้าสาย ครั้งเดียวต่อชีวิต (เข้าสายซ้ำไม่ออกอีก) · แทนการ์ดกองสุ่มหนึ่งใบแบบผลย้อน ชีวิตจึงไม่ยาวขึ้น
+    const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id]);
+    if (first) {
+      st.done[first.id] = true;
+      st.due.push({ kind: 'eraEvent', ev: first, age: st.age });
+      takeYearQuota(st);
+    }
   }
   if (fx.promote !== undefined) promote(st, fx.promote);
   if (fx.office !== undefined) setOffice(st, fx.office);
