@@ -86,6 +86,7 @@ events:
         merit: [{cat: sila, level: 1}]
       - id: keep_quiet
         text: "เงียบไว้ บอกว่าไม่ถูกสักใบ"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 3, text: "ไม่มีใครเปิดตรวจย้อน เงินสี่พันหายไปกับบิลค้างจ่ายในวันเดียว แต่ทุกครั้งที่เพื่อนชวนลงขันงวดใหม่ ใจก็กระตุกทุกที", effects: {happiness: -1, money: {unit: fixed_baht, amount: 4000, ref_year: 2560}}, merit: [{cat: greed_harm, level: 1}]}

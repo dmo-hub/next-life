@@ -101,6 +101,7 @@ events:
     choices:
       - id: take_photo
         text: "ถ่ายรูปเก็บไว้ด้วย"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 2, text: "คะแนนสอบออกมาสูงเกินจนตัวเองยังตกใจ ไม่มีใครถามอะไร", effects: {knowledge: -1, happiness: 1}, merit: [{cat: neutral}]}
@@ -115,6 +116,7 @@ events:
         merit: [{cat: sila, level: 1}]
       - id: keep_watch
         text: "ยืนดูต้นทางให้เพื่อน"
+        hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
           - {weight: 2, text: "ไม่มีใครเดินมา เพื่อนให้ขนมเป็นค่าตอบแทน", effects: {relations: 1}, merit: [{cat: neutral}]}
