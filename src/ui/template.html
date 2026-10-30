@@ -297,8 +297,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .irow { display:flex; justify-content:space-between; }
 .ibar { height:8px; border-radius:999px; background:#05060F; overflow:hidden; }
 .ibar i { display:block; height:100%; }
-.ibar.hp i { background:#FF6B6B; } .ibar.goal i { background:#B48CFF; }
-.istats { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:6px; }
+.ibar.hp i { background:#FF6B6B; }
+.istats { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px; }
 .istats div { display:flex; flex-direction:column; align-items:center; border:1px solid #2A3478; border-radius:6px; padding:2px; }
 .istats b { font-size:16px; color:#E8ECFF; }
 .ichips { display:flex; flex-wrap:wrap; gap:6px; }
@@ -376,11 +376,11 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
   .top { padding:8px 16px; }
   .stats { padding:6px 12px; }
   .meta, .tree, .family, .stat-help { padding-left:12px; padding-right:12px; }
-  /* พาแนลซ้ายแคบ: หัวการ์ดตัดบรรทัดเป็นแถว (ไม่งั้นอายุเหลือคำละบรรทัด) · ค่าสถานะ 3 ช่องต่อแถว ป้าย "ความสุข" ไม่ขาดกลางคำ */
+  /* พาแนลซ้ายแคบ: หัวการ์ดตัดบรรทัดเป็นแถว (ไม่งั้นอายุเหลือคำละบรรทัด) · ค่าสถานะ 2 ช่องต่อแถว (4 ค่า = 2×2) ป้าย "ความสัมพันธ์" ไม่ขาดกลางคำ */
   .p-left .top { flex-wrap:wrap; gap:4px 10px; }
   .p-left .top small { flex-basis:100%; text-align:left; }
   .p-left .stats { flex-wrap:wrap; gap:6px 10px; }
-  .p-left .stats > div { flex:1 1 calc(33% - 10px); }
+  .p-left .stats > div { flex:1 1 calc(50% - 10px); }
   /* พาแนลกลาง: เรื่องกับปุ่มอยู่คอลัมน์เดียว — บีบภาพ ระยะ และตัวอักษรให้ปุ่มขึ้นในจอแรกให้มากที่สุด */
   .p-mid .body { padding:10px 16px 6px; gap:6px; }
   .p-mid .body h3 { font-size:20px; }
