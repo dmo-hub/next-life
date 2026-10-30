@@ -3,6 +3,7 @@
 // · ฐานะชาติหน้าขยับตามกรรมทั้งสองทาง (ใบ 05 แรงทุกทาง) · หนี้ไม่ตกถึงลูก · ทุกฉากในเนื้อหาออกได้จริง · ค่าแถบไม่หลุด
 import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier, COURT_SCENES, makeRng } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
+import { stuckCard } from './gates.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
@@ -60,6 +61,9 @@ let streamBad = 0, streamChecks = 0, childDeaths = 0, childBad = 0, occBad = 0, 
 let leaks = 0, reveals = 0, afterlives = 0, statBad = 0, carryBad = 0, debtLeak = 0, lenBad = 0, isekaiLives = 0, isekaiBad = 0;
 // ธงข้ามรุ่น (heir:): ก ทางอื่นไม่ได้ · ข ได้เฉพาะธงในทะเบียน ชั้นไม่เกินเพดาน รุ่นก่อนถือจริง · ค ไม่ปนกับ flags ของทายาท
 const HEIR = content.heir ?? {};
+// การ์ดค้างระหว่างชาติ (stuckCard ใน gates.mjs) — การ์ดฉาก/ศาลปรโลกแกนสร้างเอง lint ไม่เห็น · ชีวิตและทริปตรวจที่ density
+const eventById = Object.fromEntries(content.events.map((e) => [e.id, e]));
+const stuck = new Map();
 const parentReaders = (e) => [e.when?.parent_flags, e.multipliers?.parent_flags, ...(e.choices ?? []).flatMap((c) => (c.outcomes ?? []).map((o) => o.multipliers?.parent_flags))].some(Boolean);
 const heirReaders = content.events.filter(parentReaders);
 let heirA = 0, heirB = 0, heirC = 0, heirTwin = 0, heirGot = 0;
@@ -97,6 +101,8 @@ for (const [name, pick] of Object.entries(BOTS)) {
       let verdicts = 0;
       const prevFlags = { ...st.flags };
       const af = playAfterlife(st, pick, (card, a) => {
+        const why = stuckCard(card, eventById);
+        if (why) stuck.set(`${card.id ?? card.kind} (${why})`, (stuck.get(`${card.id ?? card.kind} (${why})`) ?? 0) + 1);
         const { [REVEAL]: reveal, ...rest } = card;
         for (const k of keys(rest)) if (LEAK.test(k)) leaks++;
         if (card.kind === 'verdict') {
@@ -267,6 +273,7 @@ for (let i = 1; i < tiers.length; i++) {
 check('มรดก ลูก ≥ หลาน ≥ เหลน (ตกเฉพาะกลับทิศที่พิสูจน์ได้)', legacyInv);
 check('ความสัมพันธ์/คอนเน็คชั่นจากบ้าน ลูก ≥ หลาน ≥ เหลน', desc('kin') ? 0 : 1);
 check('ต่างโลกเกิดได้จริง ลงผังตระกูลรุ่นละชาติ และปรโลกตัดสินทุกชาติ', isekaiBad + (isekaiLives ? 0 : 1), ` ${isekaiLives} ชีวิต`);
+check('ไม่มีการ์ดค้างระหว่างชาติ (ไม่มีปุ่มที่เห็นและกดได้)', [...stuck.values()].reduce((a, b) => a + b, 0), stuck.size ? ` · ${[...stuck].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => `${k} ${v}`).join(' · ')}` : '');
 
 // ง ทางเป็นลูกในบอทสุ่มมีน้อย — บังคับทาง child (ถ้าไม่ถูกล็อก) ตระกูลละ 2 รุ่น แล้วดูป้าย parentFrom ในรุ่นสอง
 const forceChild = (card, rng, h) => (h.pending?.path && !card.locked?.[0] ? 0 : BOTS.สุ่ม(card, rng));

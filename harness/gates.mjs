@@ -1,6 +1,6 @@
 // ด่าน 3a · 3b · 4 ของใบ 07 — npm run gate (บอทสุ่มชุดเดียว) กับ harness เต็ม (6 บุคลิก × 2 seed) ตัดสินด้วยโค้ดชุดเดียวกัน
 // แต่ละด่านคืนบรรทัดที่พิมพ์ + ตก/ผ่าน ผู้เรียกเป็นคนพิมพ์และตั้ง exit code
-import { expectedDeathAge, periodE0, qx, e0FromLx, infantMortality, MAX_AGE } from '../src/engine/index.mjs';
+import { expectedDeathAge, periodE0, qx, e0FromLx, infantMortality, MAX_AGE, openChoices } from '../src/engine/index.mjs';
 
 const f = (v) => v.toFixed(2);
 
@@ -191,4 +191,14 @@ export function compareBaseline(prev, now) {
   const tol = gate3bTol(prev, now);
   if (now.gate3bWorst > prev.gate3bWorst + tol) worse.push(`ด่าน 3b ห่างสุด ${prev.gate3bWorst} → ${now.gate3bWorst} ปี (ยอม +${f(tol)})`);
   return worse;
+}
+
+// การ์ดค้าง (ไอเดีย reigns-15): การ์ดที่มีตัวเลือกแต่ไม่มีปุ่มที่ทั้งมองเห็นและกดได้ = ผู้เล่นไปต่อไม่ได้ หรือผลของการ์ดหายเงียบ
+// นับตัวเลือกของเนื้อหาด้วย — แกนตัดตัวเลือกออกจาก card.choices ทั้งหมด (ป้าย gate) ก็ต้องจับได้ ไม่ผูกว่าแกนซ่อนแบบไหน
+// card.hidden[i] = true คือหน้าจอไม่แสดงตัวเลือกนั้น (คู่กับ card.locked) · คืนเหตุ หรือ null เมื่อไม่ค้าง
+export function stuckCard(card, byId) {
+  const had = card.kind === 'event' && byId[card.id]?.choices?.length;
+  if (!card.choices?.length) return had ? 'ตัวเลือกถูกตัดหมด' : null;
+  if (openChoices(card).some((i) => card.hidden?.[i] !== true)) return null;
+  return card.hidden?.some((h) => h === true) ? 'ไม่มีปุ่มที่เห็นและกดได้' : 'กดไม่ได้สักปุ่ม';
 }
