@@ -1,6 +1,6 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, FOLLOW_WORD } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON } from './labels.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.6.02';
@@ -1215,43 +1215,16 @@ function freeChoices(card) {
   return pays.map((p) => !p);
 }
 
-// ป้ายทางที่มีผลตามมา (card.follows): ไอคอนท้ายข้อความตัวเลือก + คำอธิบายบรรทัดเดียวใต้ชุดปุ่ม
-// บอกแค่ว่ามีเรื่องตามมา ไม่บอกดีหรือร้าย · both = 2 ไอคอน
-const followKinds = (f) => (!f ? [] : f === 'both' ? ['next', 'later'] : [f]);
+// ไอคอนบรรทัดผลย้อนบนการ์ด · ป้ายล่วงหน้าบนปุ่มตัวเลือกเจ้าของสั่งซ่อน — ผู้เล่นไม่รู้ล่วงหน้าว่าทางไหนมีเรื่องตามมา
 const followIcon = (k) => {
   const s = el('span');
   s.insertAdjacentHTML('beforeend', FOLLOW_ICON[k]);
   return s;
 };
 
-function followMark(f) {
-  const kinds = followKinds(f);
-  if (!kinds.length) return null;
-  const words = kinds.map((k) => FOLLOW_WORD[k]).join(' · ');
-  const m = el('span', 'follow');
-  m.title = words;
-  // ไอคอนซ่อนจากโปรแกรมอ่านจอ — ต้องได้คำแทน
-  m.append(...kinds.map(followIcon), el('span', 'sr', words));
-  return m;
-}
-
-function followKey() {
-  const p = el('p', 'follow-key');
-  // ป้ายบนปุ่มมีคำสำหรับโปรแกรมอ่านจออยู่แล้ว — บรรทัดนี้ซ้ำ
-  p.setAttribute('aria-hidden', 'true');
-  for (const k of ['next', 'later']) {
-    const s = followIcon(k);
-    s.append(`= ${FOLLOW_WORD[k]}`);
-    p.append(s);
-  }
-  return p;
-}
-
-function button(label, fx, onclick, hint = null, follow = null) {
+function button(label, fx, onclick, hint = null) {
   const b = el('button', 'choice');
   const main = el('span', null, label);
-  const mark = followMark(follow);
-  if (mark) main.append(mark);
   // อยู่ในก้อนเดียวกับข้อความตัวเลือก ป้ายผลด้านขวาจึงยังชิดขวาเหมือนการ์ดที่ไม่มีบรรทัดรอง
   if (hint) main.append(el('small', 'hint', hint));
   b.append(main);
@@ -1561,13 +1534,12 @@ function render(card) {
         const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
         const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);
-        const b = button(c, fx, () => play(lifePick(i)), card.hints?.[i], card.follows?.[i]);
+        const b = button(c, fx, () => play(lifePick(i)), card.hints?.[i]);
         if (why) b.disabled = true;
         choices.append(b, ...loanButtons(card, i));
       });
       // การ์ดเล่าเรื่อง (choices: []) ไม่มีปุ่มให้เลือก — ต้องมีทางไปใบถัดไป
       if (!card.choices.length) choices.append(enter(button(BTN.next, null, next)));
-      if (card.follows?.some(Boolean)) choices.append(followKey());
       const tip = whisperFor(card, free);
       if (tip) body.append(tip);
       if (card.choices.length > 1) choices.append(foldLater(box, body, choices, card));
