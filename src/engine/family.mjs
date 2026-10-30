@@ -410,6 +410,36 @@ export function petsAfter(st) {
   return `${pets.map(petLabel).join(' กับ')} ได้${who}รับไปเลี้ยงต่อ`;
 }
 
+// มรณบัตร: ใครมาส่ง (B164) — ผลย้อนของความสัมพันธ์ทั้งชีวิต เล่าเป็นคำ ไม่โชว์ค่าและไม่มีชื่อใคร (คนที่จากไปห้ามถูกเรียก)
+// คนที่ยังอยู่มาจากที่ไกลได้ (นับคนที่ย้ายออกด้วย) · bond ถึงเกณฑ์ = อยู่ช่วยงาน ต่ำกว่า = แวะมาครู่เดียว (พื้น bond แค่ "เฉย ๆ" ไม่ถึงขั้นไม่มา) · แขกที่เหลือแบ่งตามน้ำหนักเดียวกับสูตรแขก
+// ใช้ค่าเฉลี่ยวัยทำงาน ไม่ใช่ค่าตอนตาย — ค่าตกตามวัยชรา แต่คนที่เคยรู้จักกันยังมา · อ่าน state ล้วน ไม่ดึงเลขสุ่ม
+export const FUNERAL_WHO = { come: 40, adult: 18, roles: ['spouse', 'child', 'grandchild', 'peer'] };
+const WHO_WORD = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน', peer: 'เพื่อนรุ่นเดียวกัน' };
+const whoList = (by) => {
+  const parts = FUNERAL_WHO.roles.filter((r) => by[r]).map((r) => (r === 'spouse' ? WHO_WORD[r] : `${WHO_WORD[r]} ${by[r]} คน`));
+  return parts.length > 1 ? `${parts.slice(0, -1).join(' ')} และ${parts.at(-1)}` : parts[0];
+};
+export function funeralWho(st, guests) {
+  const came = {}, away = {};
+  let n = 0;
+  for (const m of st.kin ?? []) {
+    if (!FUNERAL_WHO.roles.includes(m.role) || !m.alive) continue;
+    const to = (m.bond ?? BOND_START[m.role]) >= FUNERAL_WHO.come ? came : away;
+    to[m.role] = (to[m.role] ?? 0) + 1;
+    if (to === came) n++;
+  }
+  const parts = [];
+  if (n) parts.push(`${whoList(came)}อยู่ช่วยงานจนเสร็จ`);
+  if (Object.keys(away).length) parts.push(`${whoList(away)}แวะมาแค่ครู่เดียว`);
+  const rest = n ? 'แขกที่เหลือส่วนใหญ่' : 'แขกส่วนใหญ่';
+  if (guests > n) {
+    const trail = (st.statTrail ?? []).filter((p) => p.age >= FUNERAL_WHO.adult);
+    const avg = (k) => (trail.length ? trail.reduce((t, p) => t + p[k], 0) / trail.length : st[k]);
+    parts.push(`${rest}${avg('network') * 3 > avg('relations') * 2 ? 'เป็นคนในวงการที่เคยร่วมงานกันมา' : 'เป็นเพื่อนบ้านและคนที่เคยช่วยเหลือกันมา'}`);
+  } else if (n) parts.push('ศาลามีแต่คนในบ้าน');
+  return parts.length ? { text: parts.join(' · '), came: n } : null;
+}
+
 // รายชื่อให้แผงครอบครัว (B36c) อ่านอย่างเดียว — ช่องที่ไล่ไว้เท่านั้น ไม่มีค่าบัญชีหรือค่าที่อนุมานกรรมได้
 export function familyOf(st) {
   const year = kinYearOf(st);

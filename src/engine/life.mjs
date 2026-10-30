@@ -1,5 +1,5 @@
 import { makeRng } from './rng.mjs';
-import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk } from './family.mjs';
+import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
@@ -1528,7 +1528,10 @@ function deathCard(st) {
   if (pets) card.pets = pets;
   if (st.funeral) {
     const { text, cost } = st.funeral;
-    card.funeral = { text, guests: funeralGuests(st), cost: Math.round(cost) };
+    const guests = funeralGuests(st);
+    const who = funeralWho(st, guests);
+    // ยอดที่โชว์ไม่ต่ำกว่าคนในบ้านที่มา (บริจาคร่างปัดได้ 0) — ชื่อเสียง/บุญแขกยังคิดจากยอดเดิม
+    card.funeral = { text, guests: Math.max(guests, who?.came ?? 0), cost: Math.round(cost), ...(who && { who: who.text }) };
   }
   // มีทรัพย์ให้แบ่ง + ลูกที่ยังอยู่ถึงเกณฑ์ = เรื่องพินัยกรรม (afterlife.mjs หักส่วนที่เสียไปกับการทะเลาะ) · ลูกคนเดียวไม่มีใครให้ทะเลาะด้วย
   if (card.summary.money > 0 && !card.short && disputes(st)) card.will = !!st.flags.wish_will;

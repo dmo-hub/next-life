@@ -1428,6 +1428,7 @@ function render(card) {
     // บันทึกเด็กเป็นสถิติการตายของยุค — ไม่ใช่เรื่องของคนหาย
     if (card.note && !gone) body.append(sourced(el('p', 'sub', card.note), childNoteSrc(card.age)));
     if (card.funeral) body.append(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
+    if (card.funeral?.who) body.append(el('p', 'sub', card.funeral.who));
     if (card.will !== undefined) body.append(el('p', 'sub', gone ? LOST.will[card.will ? 1 : 0] : card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
     if (gone) body.append(el('p', 'call', LOST.call));
     if (card.pets) body.append(el('p', 'sub', card.pets));
@@ -2181,6 +2182,7 @@ function endPage(body, death) {
   body.append(el('span', 'kicker', `อายุ ${death.age}`), el('h3', 'lead', `${realName()} จากไปด้วยวัย ${death.age} ปี`));
   if (death.note) body.append(el('p', 'sub', death.note));
   if (death.funeral) body.append(el('p', 'sub', `งานศพ: ${death.funeral.text}`));
+  if (death.funeral?.who) body.append(el('p', 'sub', death.funeral.who));
 }
 
 // พลิกเองทีละหน้า (คำตัดสินเจ้าของ) · เปิดหน้าไหนก็ไม่แตะ st และไม่ลงเซฟ — รีโหลดกลางสมุดกลับไปที่มรณบัตร

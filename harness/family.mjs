@@ -31,6 +31,10 @@ let died = 0, expected = 0, expectedShift = 0;
 let heirChecks = 0, heirBad = 0;
 let bondBad = 0, bondUp = 0, aided = 0;
 let lossCards = 0, lossEvents = 0, multiKid = 0, notLatest = 0;
+// B164 ใครมาส่งงานศพ: ตัดวลีคงที่ของบรรทัดออกแล้วต้องเหลือแค่ตัวเลข — เหลืออย่างอื่น = มีชื่อคนหรือคำหลุดเข้ามา
+let funerals = 0, whoLines = 0, whoCame = 0, whoAway = 0, whoLeak = 0, whoShort = 0;
+const WHO_FIXED = ['เป็นคนในวงการที่เคยร่วมงานกันมา', 'เป็นเพื่อนบ้านและคนที่เคยช่วยเหลือกันมา', 'แขกที่เหลือส่วนใหญ่', 'แขกส่วนใหญ่', 'ศาลามีแต่คนในบ้าน', 'อยู่ช่วยงานจนเสร็จ', 'แวะมาแค่ครู่เดียว', 'เพื่อนรุ่นเดียวกัน', 'คู่ชีวิต', 'ลูก', 'หลาน', 'และ', 'คน', '·'];
+const whoLeft = (text) => WHO_FIXED.reduce((t, w) => t.split(w).join(''), text).replace(/[\d\s]/g, '');
 const kidsAt50 = [];
 const roles = { spouse: 0, child: 0, grandchild: 0 };
 const fmt = (v) => v.toFixed(2);
@@ -41,6 +45,17 @@ for (const [bot, pick] of Object.entries(BOTS)) {
     const check = (card, st) => {
       cards++;
       if (card.kind === 'result' && card.text.includes('มาช่วยประคอง')) aided++;
+      if (card.kind === 'death' && card.funeral) {
+        funerals++;
+        const w = card.funeral.who;
+        const living = st.kin.filter((m) => ['spouse', 'child', 'grandchild', 'peer'].includes(m.role) && m.alive).length;
+        if (w) {
+          whoLines++;
+          if (w.includes('อยู่ช่วยงาน')) whoCame++;
+          if (w.includes('แวะมาแค่ครู่เดียว')) whoAway++;
+          if (whoLeft(w)) whoLeak++;
+        } else if (living || card.funeral.guests) whoShort++;
+      }
       for (const m of [...st.parents, ...st.kin]) if (m.alive && !(m.bond >= BOND_FLOOR && m.bond <= 100)) bondBad++;
       for (const m of st.kin) {
         if (was.get(m.id) === false && m.alive) revive++;
@@ -135,6 +150,9 @@ check('การ์ดดูแลพา bond เกินค่าเริ่�
 check('ญาติช่วยประคองเกิดได้', aided ? 0 : 1, ` ${aided} ครั้ง`);
 check('คนในบ้านจากไปเองทุกครั้งมีการ์ดแจ้ง', lossEvents && lossCards === lossEvents ? 0 : 1, ` ${lossCards}/${lossEvents}`);
 check('คนเป้าของการ์ดสุ่มได้ ไม่ใช่ลูกคนเล็กเสมอ', multiKid && notLatest ? 0 : 1, ` ${notLatest}/${multiKid} การ์ด`);
+check('งานศพบอกใครมาส่งทุกงานที่มีคน (B164)', whoShort, ` ${whoLines}/${funerals} งาน`);
+check('  บรรทัดใครมาส่งไม่มีชื่อคน', whoLeak);
+check('  ขึ้นได้ทั้งทางอยู่ช่วยงานและแวะครู่เดียว', whoCame && whoAway ? 0 : 1, ` อยู่ ${whoCame} · แวะ ${whoAway}`);
 
 // สัตว์เลี้ยง/เพื่อนรุ่น: ยังไม่มีเนื้อหาใช้ — ทดสอบกับชีวิตจริงที่เติมสมาชิกเอง
 {
