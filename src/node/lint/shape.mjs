@@ -119,6 +119,10 @@ function* shaped(e) {
 const bound = (b) => isObj(b) && ['min', 'max'].every((k) => b[k] === undefined || (typeof b[k] === 'number' && b[k] >= 0 && b[k] <= 100)) && !(b.min > b.max);
 const nonEmptySubset = (v, of) => Array.isArray(v) && v.length > 0 && v.every((x) => of.includes(x));
 const positive = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
+// คะแนนผลของ ok-direction: ผลรวมค่าสถานะ + ทิศเงิน (ขนาดเงินต่างหน่วยกัน income_x/fixed_baht เทียบตรงไม่ได้)
+const okScore = (o) => STAT_KEYS.reduce((s, k) => s + (typeof o.effects?.[k] === 'number' ? o.effects[k] : 0), 0) + Math.sign(o.effects?.money?.amount ?? 0);
+// การ์ดที่ป้าย ok หมายถึง "ทางซื่อ" ไม่ใช่ "ทางได้ผลดี" — รอเจ้าของตัดสินความหมายป้าย · lint-test พิมพ์รายการนี้ทุกรอบ
+export const OK_DIRECTION_SKIP = new Map([['gov_hire_nephew_01', 'ทาง ok = หลานไม่ติดเพราะไม่ฝาก (ซื่อ) แต่ค่าต่ำกว่าทางหลานติดเอง']]);
 // อัตราส่วนเงิน (money_x · income_x · debt_x) ไม่มีเพดาน 100 แบบค่าสถานะ — ต้องมีอย่างน้อยหนึ่งขอบ ไม่งั้นเงื่อนไขไม่กั้นอะไร
 const ratio = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0;
 const ratioBound = (b) => isObj(b) && (b.min !== undefined || b.max !== undefined) && ['min', 'max'].every((k) => b[k] === undefined || ratio(b[k])) && !(b.min > b.max);
@@ -513,6 +517,18 @@ export const rules = [
       }
       for (const { c, path } of choicesOf(e)) {
         if (Array.isArray(c.outcomes) && c.outcomes.length && c.outcomes.every((o) => isObj(o) && o.ok === true)) r(`${path}.outcomes`, 'ทุกทางเป็น ok — % สำเร็จจะเป็น 100 เสมอ ไม่ต้องเป็นผลสุ่ม');
+      }
+    },
+  },
+  {
+    id: 'ok-direction',
+    desc: 'ทาง ok (สำเร็จ) ต้องไม่แย่กว่าทางไม่ ok ของตัวเลือกเดียวกัน — ผลรวมค่าสถานะ + ทิศเงิน · ป้ายโอกาสสำเร็จบนปุ่มนับทาง ok จึงต้องเป็นทางที่ดีจริง',
+    event(e, ctx, r) {
+      if (OK_DIRECTION_SKIP.has(e.id)) return;
+      for (const { c, path } of choicesOf(e)) {
+        const os = Array.isArray(c.outcomes) ? c.outcomes.filter(isObj) : [];
+        const ok = os.filter((o) => o.ok === true).map(okScore), no = os.filter((o) => o.ok !== true).map(okScore);
+        if (ok.length && no.length && Math.max(...ok) < Math.min(...no)) r(`${path}.outcomes`, `ทาง ok ดีสุด (${Math.max(...ok)}) แย่กว่าทางไม่ ok แย่สุด (${Math.min(...no)}) — สลับป้าย ok หรือค่าผลกลับทิศ`);
       }
     },
   },

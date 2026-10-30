@@ -3,6 +3,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { RULES, DOC_SHAPE, lintContext, lintDocs, formatProblem } from '../src/node/lint/index.mjs';
+import { OK_DIRECTION_SKIP } from '../src/node/lint/shape.mjs';
 import { strings, isObj } from '../src/node/lint/util.mjs';
 import { parentRefs } from '../src/node/lint/flags.mjs';
 import { loadEvents, loadEra, loadContent, checkNames } from '../src/node/load.mjs';
@@ -228,6 +229,10 @@ rows.push(['ทะเบียน heir:', `${Object.keys(flagReg.heir ?? {}).len
 try {
   const real = loadEvents();
   rows.push(['content/', `ผ่าน ${real.length} เหตุการณ์`]);
+  // ยกเว้นที่ไม่มีการ์ดแล้ว = ค้างในโค้ดโดยไม่มีใครเห็น
+  const realIds = new Set(real.map((e) => e.id));
+  for (const id of OK_DIRECTION_SKIP.keys()) if (!realIds.has(id)) fails.push(`ok-direction ยกเว้น "${id}" ไม่มีการ์ดนี้ใน content/ แล้ว`);
+  rows.push(['ok-direction ยกเว้น', [...OK_DIRECTION_SKIP].map(([id, why]) => `${id} (${why})`).join(' · ') || '-']);
   // ด่าน afterlife-coverage ตรวจได้แค่ scene ที่มีเนื้อหา — ชุดจริงต้องมีครบทุก scene ไม่งั้นแกนเดินช่วงที่ 7 แล้วหาการ์ดไม่เจอ
   const open = SCENES.map((sc) => real.filter((e) => e.scene === sc && !e.when).length);
   rows.push(['ฉากระหว่างชาติ (ใบไม่มี when)', SCENES.map((sc, i) => `${sc} ${open[i]}`).join(' · ')]);

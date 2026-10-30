@@ -1,0 +1,16 @@
+# ผิดกติกาเดียว: ทาง ok (สำเร็จ) ได้ค่าแย่กว่าทางไม่ ok — ป้ายโอกาสสำเร็จบนปุ่มจะชี้ไปทางที่เสียกว่า
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "หัวหน้าชวนรับงานด่วนข้ามคืน"
+    choices:
+      - text: "รับงาน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "งานเสร็จทันแต่ร่างพัง", effects: {health: -3, happiness: -1}}
+          - {weight: 1, text: "งานไม่เสร็จ หัวหน้าเลิกฝากงาน", effects: {network: -1}}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
