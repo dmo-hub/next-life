@@ -1,6 +1,6 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
-import { shelfMemoArt, shelfTitleArt, shelfPicArt } from './shelfart.mjs';
+import { shelfMemoArt, shelfTitleArt, shelfPicArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, MONEY_ICON } from './labels.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
@@ -368,6 +368,17 @@ function lineageList(all, brief = all.length) {
   box.append(el('div', 'lh', 'ตระกูลต่างโลก'));
   if (away.length) box.append(list(lineageText(away), 'picks'));
   for (const [w, ids] of lore) box.append(el('p', 'llore', `โลก (${ISEKAI_WORLDS[w]?.name ?? all.find((l) => l.lore?.world === w)?.world ?? w}) ยังจำ: ${ids.map((id) => ISEKAI_LORE[id]).join(' · ')}`));
+  return box;
+}
+
+// ผังตระกูลเป็นภาพ (เจ้าของสั่ง) · ข้อความเดิมพับไว้ใต้ภาพ — ชื่อ จังหวัด ฉายา และ screen reader ยังอ่านได้
+function lineageView(all, now, brief = all.length, youWord) {
+  const box = el('div', 'lineage-view');
+  const shown = all.slice(-brief);
+  shelfLineageArt(box, shown, all.length - shown.length, now, CLASSES, youWord, all.findLast((l) => !l.isekai));
+  const d = el('details', 'lineage-text');
+  d.append(el('summary', null, 'อ่านเป็นข้อความ'), lineageList(all, brief));
+  box.append(d);
   return box;
 }
 
@@ -1555,7 +1566,7 @@ function render(card) {
       if (card.inherit.length) {
         const box = el('div', 'recap');
         box.append(el('div', 'h', 'สิ่งที่สืบทอดจากชาติก่อน'), list(card.inherit, 'picks'));
-        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageList(st.lineage, LINEAGE_BRIEF));
+        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageView(st.lineage, st.cls, LINEAGE_BRIEF));
         body.append(box);
       }
       choices.append(enter(button(BTN.next, null, next)));
@@ -1838,12 +1849,12 @@ function familyTab() {
 // ผังตระกูล (ใบ 05 เลิกเมื่อไรก็ดูได้) — มีเมื่อเป็นรุ่นที่ 2 ขึ้นไป · การ์ดตายยังเป็นแบบพับ (familyTree)
 function treeTab() {
   if (!st.lineage.length) return null;
-  return { id: 'tree', label: `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`, body: () => lineageList(st.lineage) };
+  return { id: 'tree', label: `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`, body: () => lineageView(st.lineage, st.cls) };
 }
 function familyTree() {
   if (!st.lineage.length) return null;
   const d = el('details', 'tree');
-  d.append(el('summary', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageList(st.lineage));
+  d.append(el('summary', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageView(st.lineage, st.cls));
   return d;
 }
 
@@ -1900,7 +1911,7 @@ function renderAfter(card) {
   if (card.reckoning) body.append(reckoningBox(card.reckoning, af.st.deeds));
   if (card.lineage) {
     body.append(el('div', 'kicker', 'ผังตระกูล'));
-    body.append(af.heir ? lineageList(af.heir.lineage) : list(card.lineage, 'picks'));
+    body.append(af.heir ? lineageView(af.heir.lineage, af.heir.cls, af.heir.lineage.length, 'รุ่นถัดไป') : list(card.lineage, 'picks'));
     // การ์ดส่งต่อ (B95): ผังตระกูลรวมชีวิตที่เพิ่งจบแล้ว + จุดฐานะบ้านที่รุ่นถัดไปจะเกิด
     const chart = af.heir && standingChart(standingGens(af.heir.lineage), CLASSES.indexOf(af.heir.cls));
     if (chart) body.append(chart);

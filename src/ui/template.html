@@ -185,6 +185,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 /* ชั้นสมุด (B130): แท็บเป็นปุ่มกด (aria-pressed) ไม่ใช่ tablist — เปลี่ยนแท็บ = วาดหน้าใหม่ทั้งหน้า */
 .bk-intro { margin:0; font-size:13px; color:var(--muted); }
 .shelf-art { display:block; width:100%; border:1px solid var(--ink2); border-radius:8px; }
+.lineage-view { display:grid; gap:6px; }
+.lineage-text summary { cursor:pointer; font-size:13px; color:var(--muted); min-height:44px; display:flex; align-items:center; }
 .bk-tabs { display:flex; flex-wrap:wrap; gap:6px; }
 .bk-tabs button { all:unset; cursor:pointer; min-height:44px; padding:0 12px; border:1px solid var(--ink2); border-radius:999px; font-size:13px; font-weight:600; display:inline-flex; align-items:center; }
 .bk-tabs button[aria-pressed="true"] { background:var(--ink); color:var(--paper); }

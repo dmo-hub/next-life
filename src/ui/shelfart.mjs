@@ -334,3 +334,75 @@ export function shelfPicArt(host, events, got, all) {
   k.cv.dataset.count = JSON.stringify({ got, all, met: events.filter((e) => e.met).length, events: events.length });
   return k.cv;
 }
+
+// ---- ผังตระกูล: วงต่อรุ่นเรียงซ้าย→ขวา จบที่ "คุณ" · ชาติต่างโลกลอยแถวบน ----
+// rows = แถว lineage ที่จะโชว์ (เรียงรุ่น) · more = รุ่นที่ย่อไว้ก่อนหน้า · now = ฐานะตอนนี้ของผู้เล่น · classes = ลำดับฐานะต่ำ→สูง
+// prev = ชาติไทยล่าสุดของทั้งผัง — แถวที่โชว์อาจเป็นต่างโลกล้วน แต่ทางที่มา/ทิศฐานะยังเทียบกับชาติไทย
+const SA_PATH = { child: 'กลับมาเป็นลูกหลาน', isekai: 'กลับจากต่างโลก' };
+const SA_REALM_COL = { นรก: '#b0412e', เปรต: '#8a5a8a', ดิรัจฉาน: '#6f7d3a', มนุษย์: '#c9b27a', เทวดา: '#f0d78c', ต่างโลก: '#7aa2c8' };
+const saMix = (a, b, t) => `rgb(${saRgb(a).map((v, i) => Math.round(v + (saRgb(b)[i] - v) * t)).join(',')})`;
+export function shelfLineageArt(host, rows, more, now, classes, youWord = 'คุณ', prev = rows.findLast((l) => !l.isekai)) {
+  const home = rows.filter((l) => !l.isekai), away = rows.filter((l) => l.isekai);
+  const k = saCanvas(host, 160, `ผังตระกูล ${rows.length + more} รุ่นก่อนถึง${youWord}${away.length ? ` มีชาติต่างโลก ${away.length} ชาติ` : ''}`);
+  if (!k) return null;
+  const { c, W, H } = k;
+  saBg(c, W, H);
+  const clsCol = (cls) => saMix('#5a4322', ART_INK.gold2, Math.max(0, classes.indexOf(cls)) / (classes.length - 1));
+  const left = more ? 44 : 24, slots = rows.length + 1;
+  const gap = Math.min(96, (W - left - 26) / Math.max(1, slots - 1));
+  const yHome = H * 0.5, yAway = H * 0.2, r = Math.min(13, gap * 0.32);
+  // หลายรุ่นบนจอแคบ: ตัดป้ายรองที่จะทับกัน (อายุ/ภูมิยังมีในข้อความใต้ภาพ) เหลือเลขรุ่น + จุดสีภูมิ
+  const dense = gap < 52, named = gap >= 60;
+  const pts = rows.map((l, i) => [left + i * gap, l.isekai ? yAway : yHome]);
+  const you = [left + rows.length * gap, yHome];
+  if (more) saText(c, `…${more}`, 8, yHome + 4, { size: 11, color: SA_MUTED, bold: true });
+  // เส้นต่อรุ่น: ทองทึบระหว่างชาติไทย · ประเส้นเมื่อแตะชาติต่างโลก
+  const seq = [...pts, you];
+  for (let i = 1; i < seq.length; i++) {
+    const dashed = rows[i - 1]?.isekai || rows[i]?.isekai;
+    c.setLineDash(dashed ? [4, 4] : []);
+    c.strokeStyle = dashed ? 'rgba(122,162,200,.7)' : 'rgba(217,180,90,.7)';
+    c.lineWidth = 2;
+    c.beginPath(); c.moveTo(...seq[i - 1]); c.lineTo(...seq[i]); c.stroke();
+  }
+  c.setLineDash([]);
+  rows.forEach((l, i) => {
+    const [x, y] = pts[i];
+    c.fillStyle = l.isekai ? '#2c3e52' : clsCol(l.cls);
+    c.strokeStyle = l.isekai ? '#7aa2c8' : ART_INK.lacquer;
+    c.lineWidth = 1.5;
+    c.setLineDash(l.gone ? [3, 2] : []);
+    c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); c.stroke();
+    c.setLineDash([]);
+    if (l.broke) { c.strokeStyle = '#d0533c'; c.lineWidth = 2; c.beginPath(); c.moveTo(x - r * 0.7, y + r * 0.7); c.lineTo(x + r * 0.7, y - r * 0.7); c.stroke(); }
+    saText(c, `${l.gen}`, x, y + 4, { size: 11, align: 'center', color: l.isekai ? '#cfe0f0' : ART_INK.lacquer, bold: true });
+    if (l.isekai) { if (named) saText(c, (l.world ?? '').slice(0, 8), x, y - r - 4, { size: 9, align: 'center', color: '#a9c4dc' }); }
+    else if (dense) {
+      saText(c, `${l.age}`, x, y + r + 12, { size: 9, align: 'center' });
+      c.fillStyle = SA_REALM_COL[l.realm] ?? SA_MUTED;
+      c.beginPath(); c.arc(x, y + r + 20, 3, 0, Math.PI * 2); c.fill();
+    } else {
+      saText(c, `${l.gone ? 'หาย' : 'อายุ'} ${l.age}`, x, y + r + 13, { size: 10, align: 'center' });
+      c.fillStyle = SA_REALM_COL[l.realm] ?? SA_MUTED;
+      c.beginPath(); c.arc(x - 12, y + r + 24, 3, 0, Math.PI * 2); c.fill();
+      saText(c, l.realm ?? '', x - 6, y + r + 27, { size: 9, color: SA_REALM_COL[l.realm] ?? SA_MUTED });
+    }
+  });
+  // ปลายแถว (คุณ · รุ่นถัดไป): ฐานะ + ทิศเทียบชาติไทยก่อนหน้า + ทางที่มา
+  c.fillStyle = clsCol(now);
+  c.strokeStyle = ART_INK.cream;
+  c.lineWidth = 2;
+  c.beginPath(); c.arc(you[0], you[1], r + 2, 0, Math.PI * 2); c.fill(); c.stroke();
+  // คำยาวกว่า "คุณ" ไม่พอในวง — ย้ายลงใต้วง
+  const inside = youWord.length <= 3;
+  saText(c, inside ? youWord : '★', you[0], you[1] + 4, { size: 10, align: 'center', color: ART_INK.lacquer, bold: true });
+  if (!inside) saText(c, youWord, Math.min(W - 6, you[0] + 20), you[1] + r + 15, { size: 10, align: 'right', color: ART_INK.cream, bold: true });
+  const d = prev ? classes.indexOf(now) - classes.indexOf(prev.cls) : 0;
+  if (d) saText(c, `ฐานะ ${d > 0 ? '↑' : '↓'}`, Math.min(W - 6, you[0] + 20), you[1] - r - 6, { size: 10, align: 'right', color: d > 0 ? ART_INK.gold2 : '#d0533c', bold: true });
+  if (prev) {
+    const via = rows.at(-1)?.isekai ? SA_PATH.isekai : SA_PATH[prev.path] ?? 'เกิดใหม่ตามกรรม';
+    saText(c, via, Math.min(W - 6, you[0] + r + 4), H - 8, { size: 10, align: 'right', color: ART_INK.gold });
+  }
+  k.cv.dataset.count = JSON.stringify({ home: home.length, away: away.length, more, slots });
+  return k.cv;
+}
