@@ -1,7 +1,7 @@
 // harness ระหว่างชาติ + หลายรุ่น (B06): บอท 3 บุคลิกเล่นตระกูลละหลายรุ่นผ่านฟังก์ชันชุดเดียวกับหน้าเว็บ
 // ด่าน: เล่นครบทุกรุ่น · ช่วงที่ 7 ยาว 6–10 การ์ด · ปรโลกเฉลยบัญชีทุกครั้งและที่เดียว · ส่งต่อ 30–70% ตรงสูตร
 // · ฐานะชาติหน้าขยับตามกรรมทั้งสองทาง (ใบ 05 แรงทุกทาง) · หนี้ไม่ตกถึงลูก · ทุกฉากในเนื้อหาออกได้จริง · ค่าแถบไม่หลุด
-import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier } from '../src/engine/index.mjs';
+import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier, COURT_SCENES } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 
 const args = process.argv.slice(2);
@@ -48,7 +48,8 @@ function* keys(v) {
   else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) { yield k; yield* keys(x); }
 }
 const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations', 'network'];
-const sceneIds = content.events.filter((e) => e.stage === AFTERLIFE_STAGE).map((e) => e.id);
+// ใบศาลเฉียดตาย (B153) ใช้ stage ระหว่างชาติแต่ออกกลางชีวิต ไม่ใช่ฉากปรโลก — ด่าน near นับใบพวกนี้แทน
+const sceneIds = content.events.filter((e) => e.stage === AFTERLIFE_STAGE && !COURT_SCENES.includes(e.scene)).map((e) => e.id);
 const fired = new Map(sceneIds.map((id) => [id, 0]));
 const fails = [];
 const f = (v, d = 2) => v.toFixed(d);
