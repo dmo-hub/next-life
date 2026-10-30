@@ -412,9 +412,10 @@ export function loadNearHints(p = 'content/rules/near-hints.yaml') {
 // โฟกัสชีวิตโลกหลัก (B163): ทะเบียนผิดรูป = หยุด build ไม่ปล่อยให้แกนอ่านค่าครึ่ง ๆ
 function loadFocus() {
   const doc = parse(read('content/rules/focus.yaml'));
-  const bad = checkFocus(doc);
+  const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
+  const bad = checkFocus(doc, { causes, flags: Object.keys(parse(read('content/rules/flags.yaml')).flags) });
   if (bad.length) throw new Error(`content/rules/focus.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
-  return { year_scale: doc.year_scale, card_mul: doc.card_mul, focuses: doc.focuses };
+  return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, focuses: doc.focuses };
 }
 
 export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus: loadFocus() });

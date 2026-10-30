@@ -1,4 +1,4 @@
-import { makeRng } from './rng.mjs';
+import { makeRng, mixSeed } from './rng.mjs';
 import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp } from './death.mjs';
@@ -11,7 +11,7 @@ import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './court.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
-import { FOCUS_FLOW, focusOffers, focusSet, focusYearEnd, focusCardMul } from './focus.mjs';
+import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
@@ -300,6 +300,7 @@ export function newLife(seed, content, heir = null) {
   st.trail.push({ year: birthYear, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
   st.stageMark = markStage(st);
+  lifeFocusBorn(st, heir?.focus);
   return st;
 }
 
@@ -473,6 +474,8 @@ function faceDeath(st, cause, opts = {}) {
   if (st.pact?.survive === true) {
     // สัญญาจ่ายบาปแล้วจึงได้ของจริง · สุขภาพกลับค่าธรรมชาติ ไม่งั้นหมดตัวแล้วตายซ้ำทันที
     st.pact.survive = 'used';
+    // เสี่ยงของโฟกัสที่ทอยตายไว้ต้องหายด้วย ไม่งั้นรอดปีนี้แล้วปีถัดไปตายด้วยเหตุเดิมทันที
+    st.focusDoom = undefined;
     st.health = Math.max(st.health, st.healthNatural, 1);
     return { fate: 'survive', card: { kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: PACT.surviveText } };
   }
@@ -1198,7 +1201,7 @@ export function nextCard(st) {
     if (st.advance) {
       // สุ่มตายของปีที่อายุ st.age ก่อนขึ้นปีใหม่ — ทารกจึงตายได้ตั้งแต่ขวบปีแรกตามอัตราตายทารกจริง และอายุบนการ์ดตายเป็นปีเต็ม
       // สุขภาพหมดตัว = ตายด้วยสาเหตุตามสัดส่วนของอายุนั้น ไม่มีช่วงป่วย
-      const cause = st.health <= 0 ? healthCause(st) : deathRoll(st);
+      const cause = st.focusDoom ?? (st.health <= 0 ? healthCause(st) : deathRoll(st));
       const d = cause && faceDeath(st, cause);
       if (d?.fate === 'survive') {
         st.queue.push(d.card);
@@ -1298,20 +1301,88 @@ function drawPool(st, year) {
 }
 
 // โฟกัสชีวิตโลกหลัก (B163): เนื้ออยู่ content.focus · กติกากลางอยู่ focus.mjs · เนื้อหาชุดทดสอบที่ไม่มี focus = ตามน้ำเสมอ
-const lifeFocusOk = (st) => (w) => whenOk(st, w);
+// need = สถานะที่ when ของการ์ดเขียนไม่ได้ (หรือ · ไม่มี · ช่วงไว้ทุกข์) — ทะเบียนอ้างชื่อ lint ตรวจชื่อกับรายการนี้
+const alive = (role, age) => (st) => familyOk(st, { role, alive: true, ...(age && { age }) });
+const hasSpouse = alive('spouse');
+const hasChild = alive('child');
+// ไว้ทุกข์ = คู่จากไปปีนี้หรือปีก่อน
+const mourning = (st) => (st.kinLoss ?? []).some((l) => l.role === 'spouse' && st.birthYear + st.age - l.year <= FOCUS_MOURN);
+const FOCUS_MOURN = 1;
+export const FOCUS_NEEDS = {
+  working: (st) => isWorking(st),
+  single: (st) => !hasSpouse(st) && !mourning(st),
+  partnered_or_kids: (st) => hasSpouse(st) || hasChild(st),
+  has_kids: hasChild,
+  kids_or_grandkids: (st) => hasChild(st) || alive('grandchild')(st),
+  old_parent: alive('parent', [60, 200]),
+  savings_or_credit: (st) => st.money > 0 || isWorking(st),
+};
+const lifeFocusOk = (st) => (w, def) => whenOk(st, w) && (def?.need ?? []).every((k) => FOCUS_NEEDS[k](st));
 export const lifeFocusDefs = (st) => st.content.focus?.focuses ?? {};
 // ตามน้ำอยู่หัวรายการเสมอ แล้วตามลำดับในเนื้อหา
-export const lifeFocusOffers = (st) => [FOCUS_FLOW, ...focusOffers(lifeFocusDefs(st), stageOf(st.age), lifeFocusOk(st))];
+export const lifeFocusOffers = (st) => [FOCUS_FLOW, ...focusOffers(lifeFocusDefs(st), stageOf(st.age), lifeFocusOk(st), st)];
 export function setLifeFocus(st, id) {
   if (!lifeFocusOffers(st).includes(id)) throw new Error(`โฟกัสนี้เลือกตอนนี้ไม่ได้: ${id}`);
   focusSet(st, id, st.age);
+  delete st.focusHeir;
 }
-// ปิดปีก่อนขึ้นอายุ: ผลของปีที่อายุ st.age ตามโฟกัสตอนนี้ · ไม่ดึงเลขสุ่ม
+// ปิดปีก่อนขึ้นอายุ: ผลของปีที่อายุ st.age ตามโฟกัสตอนนี้ · ตามน้ำไม่ดึงเลขสุ่มใด
 function lifeFocusYear(st) {
-  if (!st.focus) return;
   const c = st.content.focus;
-  const id = focusYearEnd(st, c.focuses, stageOf(st.age), lifeFocusOk(st), st.age);
-  if (id) applyEffects(st, c.focuses[id].fx, c.year_scale);
+  // โฟกัสที่รับจากพ่อแม่แต่ยังเปิดไม่ได้ (เช่นยังไม่เข้าเรียน) รอจนเปิด แล้วนับปีนั้นเต็ม · ผู้เล่นตั้งเองก่อน = ทิ้ง
+  if (!st.focus && st.focusHeir && focusOpen(c.focuses[st.focusHeir], stageOf(st.age), lifeFocusOk(st), st)) {
+    focusSet(st, st.focusHeir, st.age - 1);
+    delete st.focusHeir;
+  }
+  if (!st.focus) return;
+  const id = focusYearEnd(st, c.focuses, stageOf(st.age), lifeFocusOk(st), st.age, c.chain_years);
+  if (!id) return;
+  const def = c.focuses[id];
+  // ผลเงินเป็นเท่าของรายได้ จึงคิดเฉพาะปีที่มีรายได้ของตัวเอง · ค่าใช้จ่ายหรี่ด้วย spend_scale และหักได้ไม่เกินส่วนหนึ่งของเงินเก็บ (ไม่กู้มาทุ่ม)
+  // เจ้าของเคาะ "ผลเงินชนด่าน finance = finance ชนะ": หักเต็มกินเงินเก็บไว้ใช้ยามเกษียณ ชีวิตที่ทุ่มยาวล้มละลายเกินกรอบ
+  const { money, ...rest } = def.fx;
+  applyEffects(st, rest, c.year_scale);
+  if (money && isWorking(st)) {
+    const v = moneyValue(st, money) * c.year_scale;
+    st.money += v < 0 ? Math.max(v * c.spend_scale, -FOCUS_SPEND_CAP * Math.max(0, st.money)) : v;
+  }
+  if (def.career && isWorking(st)) {
+    if (st.ladder) st.ladder.prog = Math.max(0, st.ladder.prog + def.career.rank);
+    st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * (1 + def.career.raise)));
+  }
+  (def.risk ?? []).forEach((r, i) => lifeFocusRisk(st, id, r, i));
+}
+
+// เสี่ยงสุ่มของโฟกัส: ทอยจาก stream ของ (seed · อายุ · ข้อ) ไม่แตะ rng ของโลก ชีวิตจึงต่างจากตามน้ำแค่ผลที่เกิดจริง
+// เสี่ยงตาย (cause): ครั้งแรกเป็นการ์ดเตือน (ผลเจ็บตาม fx) · โดนซ้ำหลังเตือน = ตายต้นปีถัดไปด้วยสาเหตุนั้น — ไม่มีใครตายจากโฟกัสโดยไม่ได้เห็นสัญญาณก่อน
+const FOCUS_RISK_SALT = 0x6f0c5a17;
+const FOCUS_SPEND_CAP = 0.1;
+function lifeFocusRisk(st, id, r, i) {
+  if (makeRng(mixSeed(st.seed ^ FOCUS_RISK_SALT, st.age * 8 + i)).next() >= r.chance) return;
+  const key = `${id}:${i}`;
+  if (r.cause && st.focusWarn?.[key] !== undefined) {
+    st.focusDoom = r.cause;
+    return;
+  }
+  if (r.cause) (st.focusWarn ??= {})[key] = st.age;
+  applyEffects(st, r.fx ?? {});
+  for (const f of r.flags ?? []) {
+    st.flags[f] = true;
+    st.flagAge[f] ??= st.age;
+  }
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: r.cause ? r.warn : r.text, focusRisk: key });
+}
+
+// ทายาททางสายเลือด (โฟกัสใบ 03): เริ่มชาติด้วยตัวเด็กของหมวดโฟกัสหลักของพ่อแม่ (kid ในทะเบียน) · ไม่มีหมวด/ไม่มีตัวเด็ก = ตามน้ำ
+export function lifeFocusKid(st) {
+  const defs = lifeFocusDefs(st);
+  const main = focusMain(st, defs);
+  return (main && defs[main].kid) || null;
+}
+function lifeFocusBorn(st, kid) {
+  if (!kid || !lifeFocusDefs(st)[kid]) return;
+  if (lifeFocusOffers(st).includes(kid)) focusSet(st, kid, -1);
+  else st.focusHeir = kid;
 }
 function lifeFocusMul(st, e) {
   if (!st.focus) return 1;

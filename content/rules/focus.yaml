@@ -1,16 +1,33 @@
 # โฟกัสชีวิต (สิ่งที่ทุ่มเท) โลกหลัก — กติกาอยู่ src/engine/focus.mjs (ตัวกลางทุกโลก) · ที่นี่คือเนื้อของโลกหลัก
 # ไม่ตั้งโฟกัส = "ใช้ชีวิตตามน้ำ" ไม่มีผลอะไรเลย (ไม่อยู่ในรายการนี้ แกนใส่ให้เอง)
 #
-# year_scale = ผลต่อปีเป็นกี่เท่าของผลการ์ดระดับเดียวกัน (fx ใช้ระดับ ±1..±3 แบบการ์ด · เงินใช้หน่วยแบบการ์ด)
-# card_mul   = การ์ดกองสุ่มที่หมวดตรงโฟกัส น้ำหนักคูณเท่านี้ (เจ้าของเคาะ ×2)
-# tags       = ป้ายหมวดเพิ่มนอก category ที่การ์ดติดได้ด้วย `focus: [ป้าย]` · category ของการ์ด (study · work_money · family · health · belief · society) ใช้เป็นป้ายได้เลยไม่ต้องลงที่นี่
+# year_scale  = ผลต่อปีเป็นกี่เท่าของผลการ์ดระดับเดียวกัน (fx ใช้ระดับ ±1..±3 แบบการ์ด · เงินใช้หน่วยแบบการ์ด)
+# spend_scale = ค่าใช้จ่ายรายปีของโฟกัส (fx เงินติดลบ) หรี่ลงอีกเท่านี้ — ด่าน finance ชนะ (เจ้าของเคาะ) · ระดับในตารางยังบอกคำ "เงินลด/ลดมาก" ตามเดิม
+# card_mul    = การ์ดกองสุ่มที่หมวดตรงโฟกัส น้ำหนักคูณเท่านี้ (เจ้าของเคาะ ×2)
+# chain_years = ปีเต็มที่ต้นสายต้องสะสมก่อนปลายสายโผล่ (เจ้าของเคาะ ≥ 3 เท่าประตู)
+# tags        = ป้ายหมวดเพิ่มนอก category ที่การ์ดติดได้ด้วย `focus: [ป้าย]` · category ของการ์ด (study · work_money · family · health · belief · society) ใช้เป็นป้ายได้เลยไม่ต้องลงที่นี่
 #
 # ต่อโฟกัส: name = ชื่อบนปุ่ม · group = หมวดโฟกัส (work · people · body · gate) · stages = ช่วงวัยที่เลือกได้
-# when = เงื่อนไขสถานะแบบ when ของการ์ด · fx = ผลต่อปี (ขึ้น/ลงบอกบนปุ่มเป็นคำจากเครื่องหมาย ไม่บอกตัวเลข) · cards = ป้ายหมวดการ์ดที่ถ่วง
+# when = เงื่อนไขสถานะแบบ when ของการ์ด · need = สถานะที่ when เขียนไม่ได้ (ชื่อใน FOCUS_NEEDS ของแกน ต้องผ่านทุกตัว)
+# after = ปลายสาย: ซ่อนจนโฟกัสต้นสายตัวนี้สะสมครบ chain_years แล้วโผล่ตั้งแต่ช่วงวัยถัดไป
+# fx = ผลต่อปี (ขึ้น/ลงบอกบนปุ่มเป็นคำจากเครื่องหมาย ไม่บอกตัวเลข · เงินคิดเฉพาะปีที่มีรายได้ของตัวเอง) · cards = ป้ายหมวดการ์ดที่ถ่วง
+# career = ตอนมีงาน: rank = ปีในขั้นที่นับเพิ่มต่อปี (เลื่อนขั้นเร็ว/ช้า) · raise = รายได้โตเพิ่มต่อปี (สัดส่วน)
+# risk = เสี่ยงสุ่มรายปี: chance · fx · text (การ์ดผล) · flags · cause = ตายได้ (ครั้งแรกขึ้น warn เป็นการ์ดเตือน โดนซ้ำหลังเตือน = ตายด้วยสาเหตุนี้)
+# kid = ตัวเด็กที่ทายาทในตระกูลเริ่มชาติด้วย เมื่อโฟกัสนี้คือโฟกัสหลักของรุ่นก่อน (ไม่ใส่ = ทายาทตามน้ำ)
 year_scale: 0.25
+spend_scale: 0.25
 card_mul: 2
+chain_years: 3
 tags: {}
 focuses:
+  # ── เด็ก–วัยรุ่น ──
+  play_friends:
+    name: เล่นกับเพื่อน
+    group: people
+    stages: [เด็ก, วัยรุ่น]
+    fx: {relations: 1, happiness: 1, knowledge: -1}
+    cards: [society]
+    kid: play_friends
   study_hard:
     name: ตั้งใจเรียน
     group: work
@@ -18,9 +35,257 @@ focuses:
     when: {school: [primary, lower, upper, voc, hvoc, uni, cadet, police_cadet]}
     fx: {knowledge: 2, happiness: -1}
     cards: [study]
+    kid: study_hard
+  house_chores:
+    name: ช่วยงานบ้าน
+    group: people
+    stages: [เด็ก, วัยรุ่น]
+    fx: {relations: 1, happiness: -1}
+    cards: [family]
+    kid: house_chores
+  run_wild:
+    name: วิ่งเล่นซุกซน
+    group: body
+    stages: [เด็ก, วัยรุ่น]
+    fx: {health: 1, happiness: 1, knowledge: -1}
+    cards: [health]
+    risk:
+      - {chance: 0.06, fx: {health: -2, happiness: -1}, text: "ปีนต้นไม้แล้วกิ่งหัก ตกลงมาแขนหัก ต้องเข้าเฝือกอยู่หลายเดือน"}
+    kid: run_wild
+
+  # ── วัยรุ่น–หนุ่มสาว ──
+  follow_dream:
+    name: ตามความฝัน
+    group: work
+    stages: [วัยรุ่น, หนุ่มสาว]
+    fx: {happiness: 1, knowledge: 1, money: {unit: income_x, amount: -0.5}}
+    cards: [work_money]
+    kid: study_hard
+  party_friends:
+    name: คบเพื่อนเที่ยว
+    group: people
+    stages: [วัยรุ่น, หนุ่มสาว, ทำงาน]
+    fx: {relations: 1, network: 1, happiness: 1, knowledge: -1, money: {unit: income_x, amount: -0.5}}
+    cards: [society]
+    risk:
+      - {chance: 0.015, cause: road, fx: {health: -2}, warn: "เมาแล้วขี่รถกลับจากวงเหล้า ล้มคว่ำกลางถนน รอดมาได้ด้วยแผลเย็บเต็มขา เพื่อนในวงบอกว่าครั้งหน้าอาจไม่โชคดีแบบนี้"}
+    kid: play_friends
+
+  # ── วัยทำงาน: เงิน/งาน ──
+  work_hard:
+    name: ทุ่มงาน
+    group: work
+    stages: [หนุ่มสาว, ทำงาน, กลางคน]
+    need: [working]
+    fx: {money: {unit: income_x, amount: 1}, health: -1, relations: -1}
+    career: {rank: 0.5, raise: 0.02}
+    cards: [work_money]
+    kid: house_chores
+  side_income:
+    name: หารายได้เสริม
+    group: work
+    stages: [หนุ่มสาว, ทำงาน, กลางคน]
+    need: [working]
+    fx: {money: {unit: income_x, amount: 0.75}, health: -1, happiness: -1}
+    cards: [work_money]
+    kid: house_chores
+  save_money:
+    name: อดออม
+    group: work
+    stages: [หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    fx: {money: {unit: income_x, amount: 0.5}, happiness: -1}
+    cards: [work_money]
+    kid: house_chores
+
+  # ── คน/ครอบครัว ──
+  find_partner:
+    name: หาคู่
+    group: people
+    stages: [หนุ่มสาว, ทำงาน, กลางคน]
+    need: [single]
+    fx: {happiness: 1, money: {unit: income_x, amount: -0.25}}
+    cards: [family]
+    kid: play_friends
+  family_care:
+    name: ดูแลครอบครัว
+    group: people
+    stages: [หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    need: [partnered_or_kids]
+    fx: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.5}}
+    career: {rank: -0.25, raise: 0}
+    cards: [family]
+    kid: house_chores
+  parent_care:
+    name: ดูแลพ่อแม่
+    group: people
+    stages: [ทำงาน, กลางคน]
+    need: [old_parent]
+    fx: {relations: 1, money: {unit: income_x, amount: -0.5}, happiness: -1}
+    cards: [family]
+    kid: house_chores
+  teach_kids:
+    name: สอนลูกหลาน
+    group: people
+    stages: [ชรา]
+    need: [kids_or_grandkids]
+    fx: {relations: 1, happiness: 1, health: -1, money: {unit: income_x, amount: -0.25}}
+    cards: [family]
+
+  # ── กาย/ใจ ──
   health_care:
     name: ดูแลสุขภาพ
     group: body
     stages: [วัยรุ่น, หนุ่มสาว, ทำงาน, กลางคน, ชรา]
     fx: {health: 2, money: {unit: income_x, amount: -1}}
     cards: [health]
+    kid: run_wild
+  rest_travel:
+    name: พักผ่อนท่องเที่ยว
+    group: body
+    stages: [หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    fx: {happiness: 2, health: 1, money: {unit: income_x, amount: -0.5}}
+    cards: [health]
+    kid: run_wild
+  make_merit:
+    name: ทำทานปฏิบัติธรรม
+    group: body
+    stages: [วัยรุ่น, หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    fx: {happiness: 1, money: {unit: income_x, amount: -0.25}}
+    cards: [belief]
+    kid: house_chores
+
+  # ── สายประตู + เสี่ยง (ล็อกการ์ดประตูอยู่ใบ 04) ──
+  politics_base:
+    name: สร้างฐานการเมือง
+    group: gate
+    stages: [ทำงาน, กลางคน, ชรา]
+    when: {age: [25, 120]}
+    fx: {network: 2, money: {unit: income_x, amount: -0.5}, relations: -1}
+    cards: [society]
+    risk:
+      - {chance: 0.015, cause: assault, fx: {health: -1, happiness: -2}, warn: "ขัดผลประโยชน์ฝ่ายตรงข้ามในพื้นที่ มีคนขี่รถมายิงขู่หน้าบ้านกลางดึก ตำรวจบอกให้ระวังตัวไว้"}
+    kid: play_friends
+  ordain:
+    name: บวชบำเพ็ญ
+    group: gate
+    stages: [หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    fx: {happiness: 1, knowledge: 1, money: {unit: income_x, amount: -2}, relations: -1}
+    cards: [belief]
+    kid: house_chores
+  business:
+    name: ทำธุรกิจลงทุน
+    group: gate
+    stages: [หนุ่มสาว, ทำงาน, กลางคน]
+    need: [savings_or_credit]
+    fx: {money: {unit: income_x, amount: 1}, health: -1, happiness: -1}
+    cards: [work_money]
+    risk:
+      - {chance: 0.06, fx: {money: {unit: income_x, amount: -2}, happiness: -2}, text: "ลูกค้ารายใหญ่เบี้ยวหนี้ทั้งก้อน กิจการขาดทุนหนักจนต้องเอาเงินเก็บมาโปะ"}
+    kid: study_hard
+  occult:
+    name: ศึกษาสายมู
+    group: gate
+    stages: [วัยรุ่น, หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    fx: {happiness: 1, money: {unit: income_x, amount: -0.5}, knowledge: -1}
+    cards: [belief]
+    risk:
+      - {chance: 0.05, fx: {money: {unit: income_x, amount: -1}, happiness: -1}, text: "อาจารย์ที่ฝากตัวไว้หอบเงินค่าบูชาเครื่องรางของลูกศิษย์ทั้งสำนักหนีหายไป"}
+    kid: play_friends
+  shortcut_money:
+    name: หาเงินทางลัด
+    group: gate
+    stages: [หนุ่มสาว, ทำงาน, กลางคน]
+    fx: {money: {unit: income_x, amount: 2}, relations: -1}
+    cards: [work_money]
+    risk:
+      - {chance: 0.05, flags: [caught_fraud], fx: {money: {unit: income_x, amount: -2}, happiness: -3, relations: -2}, text: "ตำรวจบุกจับถึงบ้าน คดีติดตัว ประวัติด่างพร้อยไปทั้งชีวิต"}
+      - {chance: 0.015, cause: assault, fx: {health: -2}, warn: "เงินก้อนที่หมุนอยู่ไปเหยียบเท้าเจ้าถิ่น ถูกรุมทำร้ายในซอยเปลี่ยว รอดมาได้ แต่มีคนฝากบอกว่ารอบหน้าไม่ปล่อยแน่"}
+    kid: play_friends
+
+  # ── ปลายสาย: ซ่อนจนต้นสายสะสมครบ แล้วโผล่ตั้งแต่ช่วงวัยถัดไป ──
+  scholarship:
+    name: สอบชิงทุนเรียนต่อ
+    group: work
+    stages: [วัยรุ่น, หนุ่มสาว]
+    after: study_hard
+    when: {school: [lower, upper, voc, hvoc, uni, cadet, police_cadet]}
+    fx: {knowledge: 3, happiness: -1, relations: -1}
+    cards: [study]
+    kid: study_hard
+  gang_lead:
+    name: เป็นหัวโจกกลุ่ม
+    group: people
+    stages: [วัยรุ่น, หนุ่มสาว]
+    after: play_friends
+    fx: {network: 1, relations: 1, knowledge: -1}
+    cards: [society]
+    risk:
+      - {chance: 0.08, fx: {health: -1, happiness: -1}, text: "กลุ่มเรามีเรื่องกับกลุ่มต่างโรงเรียน ชกต่อยกันจนโดนเรียกผู้ปกครองทั้งสองฝั่ง"}
+    kid: play_friends
+  family_trade:
+    name: สืบทอดกิจการครอบครัว
+    group: work
+    stages: [หนุ่มสาว, ทำงาน, กลางคน]
+    after: house_chores
+    fx: {money: {unit: income_x, amount: 1}, relations: 1, happiness: -1}
+    cards: [work_money]
+    risk:
+      - {chance: 0.06, fx: {money: {unit: income_x, amount: -2}, happiness: -1}, text: "ร้านเก่าของบ้านขายไม่ออกหลายเดือนติด ต้องลดคนงานและกู้มาหมุน"}
+    kid: house_chores
+  sport:
+    name: เล่นกีฬาจริงจัง
+    group: body
+    stages: [วัยรุ่น, หนุ่มสาว]
+    after: run_wild
+    fx: {health: 3, network: 1, knowledge: -1}
+    cards: [health]
+    risk:
+      - {chance: 0.06, fx: {health: -3, happiness: -1}, text: "เอ็นไขว้หน้าเข่าขาดกลางสนาม ต้องผ่าตัดและพักยาวทั้งฤดูกาล"}
+    kid: run_wild
+  dream_job:
+    name: ทำงานสายฝัน
+    group: work
+    stages: [หนุ่มสาว, ทำงาน]
+    after: follow_dream
+    fx: {happiness: 3, money: {unit: income_x, amount: -0.5}}
+    cards: [work_money]
+    kid: study_hard
+  exec_climb:
+    name: ไต่ตำแหน่งบริหาร
+    group: work
+    stages: [ทำงาน, กลางคน]
+    after: work_hard
+    need: [working]
+    fx: {money: {unit: income_x, amount: 1}, network: 1, health: -2, relations: -1}
+    career: {rank: 1, raise: 0.03}
+    cards: [work_money]
+    risk:
+      - {chance: 0.02, cause: heart, fx: {health: -2}, warn: "หน้ามืดล้มกลางห้องประชุม หมอบอกว่าหัวใจเริ่มฟ้อง ถ้ายังทำงานหนักแบบนี้อีกจะไม่ได้กลับบ้าน"}
+    kid: house_chores
+  invest_long:
+    name: ลงทุนระยะยาว
+    group: work
+    stages: [ทำงาน, กลางคน, ชรา]
+    after: save_money
+    fx: {money: {unit: income_x, amount: 0.75}, happiness: -1}
+    cards: [work_money]
+    risk:
+      - {chance: 0.08, fx: {money: {unit: income_x, amount: -1}, happiness: -1}, text: "ตลาดตกแรงทั้งปี พอร์ตที่เก็บมาหลายปีหายไปเกือบครึ่ง"}
+    kid: house_chores
+  raise_kids:
+    name: ปั้นลูกให้ได้ดี
+    group: people
+    stages: [ทำงาน, กลางคน]
+    after: family_care
+    need: [has_kids]
+    fx: {relations: 2, money: {unit: income_x, amount: -0.5}, happiness: -1}
+    cards: [family]
+    kid: house_chores
+  temple_pillar:
+    name: เป็นกำลังหลักของวัดและชุมชน
+    group: body
+    stages: [กลางคน, ชรา]
+    after: make_merit
+    fx: {network: 1, happiness: 1, money: {unit: income_x, amount: -0.5}}
+    cards: [belief]
+    kid: house_chores
