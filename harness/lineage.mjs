@@ -1,7 +1,7 @@
 // harness ระหว่างชาติ + หลายรุ่น (B06): บอท 3 บุคลิกเล่นตระกูลละหลายรุ่นผ่านฟังก์ชันชุดเดียวกับหน้าเว็บ
 // ด่าน: เล่นครบทุกรุ่น · ช่วงที่ 7 ยาว 6–10 การ์ด · ปรโลกเฉลยบัญชีทุกครั้งและที่เดียว · ส่งต่อ 30–70% ตรงสูตร
 // · ฐานะชาติหน้าขยับตามกรรมทั้งสองทาง (ใบ 05 แรงทุกทาง) · หนี้ไม่ตกถึงลูก · ทุกฉากในเนื้อหาออกได้จริง · ค่าแถบไม่หลุด
-import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier, COURT_SCENES } from '../src/engine/index.mjs';
+import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier, COURT_SCENES, makeRng } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 
 const args = process.argv.slice(2);
@@ -65,7 +65,7 @@ const heirReaders = content.events.filter(parentReaders);
 let heirA = 0, heirB = 0, heirC = 0, heirTwin = 0, heirGot = 0;
 const lens = [];
 // ทางในตระกูลแยกชั้น (B18): จำนวน · ผลรวมสัดส่วนส่งต่อ · มรดก (เท่ารายได้ปี) · |ส่วนต่างความสัมพันธ์+คอนเน็คชั่นจากบ้าน|
-const tiers = KIN_TIERS.map(() => ({ n: 0, carry: 0, legacy: 0, kin: 0 }));
+const tiers = KIN_TIERS.map(() => ({ n: 0, carry: 0, legacy: 0, kin: 0, units: [] }));
 for (const [name, pick] of Object.entries(BOTS)) {
   const r = { realms: {}, paths: { child: 0, reborn: 0 }, byX: { child: [[0, 0], [0, 0], [0, 0]], reborn: [[0, 0], [0, 0], [0, 0]] }, ages: Array.from({ length: gens }, () => [0, 0]), legacy: [0, 0] };
   for (let i = 0; i < n; i++) {
@@ -128,6 +128,7 @@ for (const [name, pick] of Object.entries(BOTS)) {
         t.n++;
         t.carry += h.carried;
         t.legacy += h.legacy.units;
+        t.units.push(h.legacy.units);
         t.kin += Math.abs(h.kin.relations) + Math.abs(h.kin.network);
       }
       const want = carryLedger(snap, verdict.net, h.carried);
@@ -240,7 +241,30 @@ for (const [k, label] of [['n', 'จำนวน'], ['carry', 'ส่งต่�
 check('เกิดเป็นลูก/หลาน/เหลนได้จริงทุกชั้น', tm.filter((t) => !t.n).length, ` ${tm.map((t) => t.n).join(' / ')}`);
 const desc = (k) => tm.every((t, i) => !i || !(t[k] > tm[i - 1][k]));
 check('ส่งต่อบุญบาป ลูก ≥ หลาน ≥ เหลน', desc('carry') ? 0 : 1);
-check('มรดก ลูก ≥ หลาน ≥ เหลน', desc('legacy') ? 0 : 1);
+// มรดกหางยาว (ชีวิตก้อนใหญ่ไม่กี่ชีวิตลากค่าเฉลี่ยทั้งชั้น) — ค่าเฉลี่ยชั้นติดกันสลับกันได้จาก noise ล้วนที่ seed เดียว
+// ⇒ ตกเฉพาะกลับทิศที่พิสูจน์ได้แบบด่าน finance: bootstrap ค่าเฉลี่ยในชั้น หาช่วง 95% ของ (ชั้นใกล้ − ชั้นห่าง) · ขอบบน < 0 = ตก
+// RNG ของ bootstrap ผูกกับ --seed และไม่แตะ stream ของแกน ⇒ ผลซ้ำทุกหลัก ชีวิตไม่ขยับ
+const BOOT = 1000;
+const bootRng = makeRng(mixSeed(seed, 0xb007));
+const bootMeans = (xs) => {
+  const out = new Float64Array(BOOT);
+  for (let b = 0; b < BOOT; b++) {
+    let s = 0;
+    for (let i = 0; i < xs.length; i++) s += xs[Math.floor(bootRng.next() * xs.length)];
+    out[b] = s / xs.length;
+  }
+  return out;
+};
+const legacyBoots = tiers.map((t) => bootMeans(t.units));
+let legacyInv = 0;
+for (let i = 1; i < tiers.length; i++) {
+  const diffs = legacyBoots[i - 1].map((v, b) => v - legacyBoots[i][b]).sort();
+  const [lo, hi] = [diffs[Math.floor(BOOT * 0.025)], diffs[Math.ceil(BOOT * 0.975) - 1]];
+  const d = tm[i - 1].legacy - tm[i].legacy;
+  if (hi < 0) legacyInv++;
+  console.log(`  มรดก ${KIN_TIERS[i - 1].name}−${KIN_TIERS[i].name} ${f(d)} ช่วง 95% [${f(lo)}, ${f(hi)}] → ${hi < 0 ? 'กลับทิศ → ตก' : d >= 0 ? 'ผ่าน' : 'เสมอ (noise) → ผ่าน'}`);
+}
+check('มรดก ลูก ≥ หลาน ≥ เหลน (ตกเฉพาะกลับทิศที่พิสูจน์ได้)', legacyInv);
 check('ความสัมพันธ์/คอนเน็คชั่นจากบ้าน ลูก ≥ หลาน ≥ เหลน', desc('kin') ? 0 : 1);
 check('ต่างโลกเกิดได้จริง ลงผังตระกูลรุ่นละชาติ และปรโลกตัดสินทุกชาติ', isekaiBad + (isekaiLives ? 0 : 1), ` ${isekaiLives} ชีวิต`);
 
