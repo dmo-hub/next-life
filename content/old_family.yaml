@@ -450,3 +450,63 @@ events:
         text: "โทรหาเพื่อนที่ชวน คุยยาว"
         effects: {relations: 2}
         merit: [{cat: neutral}]
+  # B167: ตอนเราแก่ ลูกดูแลเราแบบที่เราเคยดูแลพ่อแม่ — {ลูกดูแลแบบเรา} ฉายวิธีครั้งล่าสุด · ต้องเคยเจอการ์ดดูแลพ่อแม่
+  - id: old_kids_care_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [65, 90], family: [{role: child, alive: true, age: [25, 70]}], filial: {n: [1, 99]}}
+    title: "ถึงคราวลูก"
+    text: "หมอบอกว่าต่อจากนี้ต้องมีคนอยู่ด้วยตลอด ลูก ๆ คุยกันในครัวเสียงเบา แล้ว{ชื่อลูก}ก็เดินมานั่งข้างเตียง {ลูกดูแลแบบเรา}"
+    choices:
+      - id: go_along
+        text: "ยอมตามที่ลูกจัด"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+        schedules: [{event: old_kids_care_02, after_years: [1, 2]}]
+      - id: stay_home
+        text: "ขออยู่บ้านตัวเองต่อ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ลูก ๆ ผลัดกันมานอนค้างคนละคืน บ้านที่เงียบมานานมีเสียงคนอีกครั้ง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกรับปาก แต่ไม่มีใครมาได้จริง คืนหนึ่งล้มในห้องน้ำ นอนรอจนเช้าคนเดียว", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+        schedules: [{event: old_kids_care_02, after_years: [1, 2]}]
+      - id: tell_why
+        text: "เล่าว่าตอนนั้นคิดอะไรอยู่"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: still_able
+        text: "บอกว่ายังดูแลตัวเองได้"
+        effects: {happiness: 1, health: -1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: old_kids_care_02
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    when: {family: [{role: child, alive: true}]}
+    title: "เสียงโทรศัพท์ตอนหนึ่งทุ่ม"
+    text: "ผ่านมาปีกว่า ทุกเย็น{ชื่อลูก}ยังโทรมาถามว่ากินข้าวหรือยัง คืนนี้คุณนึกถึงพ่อแม่ของตัวเองขึ้นมา ว่าตอนนั้นท่านนั่งรอโทรศัพท์แบบนี้หรือเปล่า"
+    choices:
+      - id: thank_kid
+        text: "บอกลูกว่าขอบใจ"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: merit_parents
+        text: "ไปทำบุญอุทิศถึงท่าน"
+        cost: {unit: fixed_baht, amount: 500, ref_year: 2566}
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: say_sorry
+        text: "ขอโทษลูกเรื่องเก่า ๆ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ปลายสายเงียบไปนาน แล้วลูกก็บอกว่าลืมไปหมดแล้ว", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกทำเสียงอึกอัก แล้วรีบวางสายไปทำธุระ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: just_listen
+        text: "ไม่พูดอะไร ฟังเสียงลูกไป"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]

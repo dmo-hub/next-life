@@ -1,10 +1,10 @@
 import { makeRng } from './rng.mjs';
-import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears } from './family.mjs';
+import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt, firstPay } from './finance.mjs';
-import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS } from './merit.mjs';
+import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS, meritId, MERIT_LEVELS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './career.mjs';
 import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
@@ -498,6 +498,8 @@ export const FILL = {
   ชื่อฝูง: (st) => (focusOf(st, 'herd') ? petCall(focusOf(st, 'herd')) : 'สัตว์ในคอก'),
   ครับ: (st) => (st.sex === 'หญิง' ? 'ค่ะ' : 'ครับ'),
   ผม: (st) => (st.sex === 'หญิง' ? 'ฉัน' : 'ผม'),
+  ลูกดูแลแบบเรา: (st) => filialMirrorText(st),
+  พ่อแม่ที่ป่วย: (st) => illParentWord(st),
 };
 export function fill(text, st) {
   return text.replace(/\{([^{}]*)\}/g, (m, k) => (FILL[k] ? String(FILL[k](st)) : m));
@@ -1026,7 +1028,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     age: st.age,
     stage: stageOf(st.age),
     title: ev.title ? fill(ev.title, st) : null,
-    text: fill(ev.text, st),
+    text: fill(ev.text, st) + pastSelfLine(st, ev),
     choices: ev.choices.map((c) => fill(c.text, st)),
     ...choiceHints(ev, st),
     fx: ev.choices.map((c) => choiceFx(st, ev, c)),
@@ -1034,6 +1036,14 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     locked: ev.choices.map((c) => lockReason(st, c)),
     ...moneyShort(ev, st),
   });
+}
+
+// ทายาทชั้นลูก (B167): การ์ดดูแลพ่อแม่ที่พ่อ/แม่เป็นผู้เล่นรุ่นก่อนบอกว่าเป็นเราเอง — การ์ดที่ระบุเพศพ่อแม่คนละเพศกับรุ่นก่อนไม่บอก (พูดถึงอีกคน)
+function pastSelfLine(st, ev) {
+  const p = st.parents.find((x) => x.ancestor && x.alive);
+  if (!p || !ev.choices.some((c) => c.filial)) return '';
+  if ((ev.when?.family ?? []).some((f) => f.role === 'parent' && f.sex && f.sex !== p.sex)) return '';
+  return ` · ${p.sex === 'หญิง' ? 'แม่' : 'พ่อ'}คนนี้คือคุณเองในชาติก่อน`;
 }
 
 // ตัวเลือกที่ล็อกเพราะเงินบอกยอดที่ขาด (B107) — ใส่ช่องเฉพาะการ์ดที่มีตัวนั้น การ์ดอื่นรูปเดิมทุกช่อง
@@ -1337,6 +1347,7 @@ export function whenOk(st, when) {
   if (when.loss && !lossOk(st, when.loss)) return false;
   if (when.illness && !illnessOk(st, when.illness)) return false;
   if (when.kin_illness && !kinIllOk(st, when.kin_illness)) return false;
+  if (when.filial && !filialOk(st, when.filial)) return false;
   if (when.heredity && !heredityOk(st, when.heredity)) return false;
   if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
   if (when.class && !when.class.includes(classNow(st))) return false;
@@ -1370,6 +1381,10 @@ function applyChoice(st, ev, c, text) {
   applyFamily(st, c, ev.category === 'family' && c.effects?.relations > 0 ? c.effects.relations : 0);
   for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]), from: st.age });
 }
+
+// แรงที่เราดูแลพ่อแม่ (B167): บุญดูแลพ่อแม่บวก บาปทำร้ายผู้ใหญ่ลบ ตามระดับของป้าย — ป้ายหมวดอื่นบนตัวเลือกเดียวกันไม่นับ
+const FILIAL_CATS = { care_parents: 1, abuse_elders: -1 };
+const filialScore = (tags = []) => tags.reduce((s, t) => s + (FILIAL_CATS[meritId(t.cat)] ?? 0) * (MERIT_LEVELS[t.level] ?? 0), 0);
 
 // รายการบุญบาปตามอายุ (B26) — วัดจากบัญชีที่ขยับจริง ไม่ใช่ป้ายบนตัวเลือก: คำบนที่ผิดซ้ำไม่ทบ จึงไม่ควรขึ้นซ้ำ
 // ผลสุ่มของตัวเลือกเดียวกันรวมเข้ารายการเดิม ผู้เล่นทำเรื่องเดียว · อยู่ใน st ไม่ออกไปกับการ์ด หน้าจออ่านตอนวาดการ์ดปรโลก
@@ -1452,6 +1467,7 @@ export function choose(st, idx, loan) {
   const ss = pool ? poolStatScale(stageOf(st.age)) : 1;
   applyEffects(st, c.effects, s, ss);
   applyChoice(st, ev, c, text);
+  if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
   st.log.push({ id: ev.id, age: st.age, choice: idx, text, ...(loan !== undefined && { loan }) });
   // ผลสุ่ม: จับทางด้วย rng ของโลก (เป็นผลของการเลือก) แล้วเล่าเป็นการ์ดผลลัพธ์ใบถัดไป
@@ -1464,6 +1480,7 @@ export function choose(st, idx, loan) {
     const helper = !o.ok && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
     applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1);
     applyChoice(st, ev, o, text);
+    if (c.filial) filialNote(st, c.filial, filialScore(o.merit), true);
     if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);

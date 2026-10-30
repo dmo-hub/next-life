@@ -72,20 +72,24 @@ events:
     choices:
       - id: move_home
         text: "ลาออกกลับบ้านไปดูแลเอง"
+        filial: self
         effects: {relations: 2, happiness: -1, money: {unit: income_x, amount: -1}}
         merit: [{cat: care_parents, level: 2}]
       - id: share_shifts
         text: "ให้พี่น้องแบ่งเวรเท่า ๆ กัน"
+        filial: share
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {relations: 1.3}}, text: "พี่ชายเงียบไปพักหนึ่งแล้วรับเวรวันเสาร์อาทิตย์ ตารางติดตู้เย็นใบแรกในบ้าน", effects: {relations: 1, happiness: 1}, merit: [{cat: care_parents, level: 1}]}
           - {weight: 1, text: "ทุกคนรับปาก แต่พอถึงเวรก็มีธุระ เวรที่ว่างกลับมาตกที่คุณอยู่ดี", effects: {relations: -1, happiness: -1}, merit: [{cat: care_parents, level: 1}]}
         merit: [{cat: care_parents, level: 1}]
       - id: hire_carer
         text: "จ้างคนดูแล กลับบ้านวันหยุด"
+        filial: hire
         effects: {happiness: 1, money: {unit: income_x, amount: -0.8}}
         merit: [{cat: care_parents, level: 1}]
       - id: bring_to_city
         text: "พาพ่อแม่มาอยู่ด้วยในเมือง"
+        filial: self
         effects: {relations: 1, happiness: -1, health: -1}
         merit: [{cat: care_parents, level: 1}]
 

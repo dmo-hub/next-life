@@ -7,7 +7,7 @@ import {
 import { INCOME_MULT, MONEY_KEYS, PACT } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
-import { PET_KINDS, HERD_KINDS, PET_CAUSES } from '../../engine/family.mjs';
+import { PET_KINDS, HERD_KINDS, PET_CAUSES, FILIAL_WAYS } from '../../engine/family.mjs';
 import { CHRONIC, ILL_YEARS, HEREDITARY, CARE_CAUSES } from '../../engine/death.mjs';
 import { SIN_CATS } from '../../engine/merit.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
@@ -16,7 +16,7 @@ const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain', 'severance'],
@@ -26,7 +26,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'parent_flags', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', ...MONEY_KEYS],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
@@ -609,6 +609,22 @@ export const rules = [
       if (ill.roles !== undefined && !(Array.isArray(ill.roles) && ill.roles.length && ill.roles.every((x) => KIN_ILL_ROLES.includes(x)))) r('.when.kin_illness.roles', `roles ต้องเป็นรายการจาก ${KIN_ILL_ROLES.join(' ')}`);
       if (ill.causes !== undefined && !(Array.isArray(ill.causes) && ill.causes.length && ill.causes.every((x) => CHRONIC.includes(x)))) r('.when.kin_illness.causes', `causes ต้องเป็นรายการจาก ${CHRONIC.join(' ')}`);
       if (ill.left !== undefined && !isRange(ill.left, 0, ILL_YEARS[1] - 1)) r('.when.kin_illness.left', `left ต้องเป็น [lo, hi] ใน 0–${ILL_YEARS[1] - 1}`);
+    },
+  },
+  {
+    id: 'filial',
+    desc: `filial บนตัวเลือก = ${FILIAL_WAYS.join('|')} ใช้ได้เฉพาะการ์ดหมวด family/health (การ์ดดูแลพ่อแม่) · when.filial = {way?: [..], n?: [lo, hi] ≥ 1} — เราเคยดูแลพ่อแม่แบบไหน กี่ครั้ง`,
+    event(e, ctx, r) {
+      for (const { c, path } of choicesOf(e)) {
+        if (!isObj(c) || c.filial === undefined) continue;
+        if (!FILIAL_WAYS.includes(c.filial)) r(`${path}.filial`, `filial ต้องเป็น ${FILIAL_WAYS.join(' ')}`);
+        if (!['family', 'health'].includes(e.category)) r(`${path}.filial`, 'filial ใช้ได้เฉพาะการ์ดหมวด family/health');
+      }
+      const w = isObj(e.when) ? e.when.filial : undefined;
+      if (w === undefined) return;
+      if (!isObj(w) || Object.keys(w).some((k) => k !== 'way' && k !== 'n')) return r('.when.filial', 'filial ต้องเป็น {way?, n?}');
+      if (w.way !== undefined && !(Array.isArray(w.way) && w.way.length && w.way.every((x) => FILIAL_WAYS.includes(x)))) r('.when.filial.way', `way ต้องเป็นรายการจาก ${FILIAL_WAYS.join(' ')}`);
+      if (w.n !== undefined && !isRange(w.n, 1, 99)) r('.when.filial.n', 'n ต้องเป็น [lo, hi] ใน 1–99');
     },
   },
   {

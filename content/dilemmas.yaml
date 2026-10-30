@@ -19,20 +19,24 @@ events:
     choices:
       - id: mother_first
         text: "จ่ายค่าผ่าตัดแม่ ลูกรอปีหน้า"
+        filial: self
         effects: {money: {unit: income_x, amount: -1.5}, relations: -1, happiness: -1}
         merit: [{cat: care_parents, level: 2}, {cat: oppress_subjects, level: 1}]
       - id: child_first
         text: "ส่งลูกเรียน แม่รอคิวรัฐ"
+        filial: away
         outcomes:
           - {weight: 1, text: "แม่ได้คิวผ่าตัดในอีกแปดเดือน ระหว่างรอต้องพาเข้าโรงพยาบาลกลางดึกสองครั้ง", effects: {money: {unit: income_x, amount: -1.5}, happiness: -2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "แม่ได้คิวเร็วกว่าที่คิด ผ่าตัดเสร็จทันก่อนลูกเปิดเทอม", effects: {money: {unit: income_x, amount: -1.5}, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: help_others, level: 2}, {cat: abuse_elders, level: 1}]
       - id: child_loan
         text: "จ่ายค่าแม่ ให้ลูกกู้ กยศ."
+        filial: self
         effects: {money: {unit: income_x, amount: -1.5}, happiness: -1}
         merit: [{cat: care_parents, level: 1}, {cat: help_others, level: 1}, {cat: oppress_subjects, level: 1}]
       - id: sell_land
         text: "ขายที่ดินที่แม่หวงไว้"
+        filial: self
         effects: {money: {unit: income_x, amount: 0.5}, relations: -2, happiness: -1}
         merit: [{cat: care_parents, level: 1}, {cat: help_others, level: 1}, {cat: abuse_elders, level: 1}]
 
@@ -104,18 +108,22 @@ events:
     choices:
       - id: care_home
         text: "ส่งพ่อเข้าบ้านพักคนชรา"
+        filial: home
         effects: {money: {unit: income_x, amount: -0.8}, happiness: -1, relations: 1}
         merit: [{cat: help_others, level: 1}, {cat: abuse_elders, level: 1}]
       - id: quit_self
         text: "ลาออกมาดูแลพ่อเอง"
+        filial: self
         effects: {money: {unit: income_x, amount: -1.5}, happiness: -1, health: -1, relations: 1}
         merit: [{cat: care_parents, level: 2}, {cat: oppress_subjects, level: 1}]
       - id: spouse_quits
         text: "ขอให้คู่ชีวิตออกจากงาน"
+        filial: share
         effects: {money: {unit: income_x, amount: -1}, relations: -2}
         merit: [{cat: care_parents, level: 1}, {cat: oppress_subjects, level: 2}]
       - id: cheap_carer
         text: "จ้างคนดูแลค่าแรงถูก ไม่มีวันหยุด"
+        filial: hire
         outcomes:
           - {weight: 2, text: "คนดูแลอยู่ได้ครึ่งปี พ่อเรียกชื่อเธอได้ทุกเช้า", effects: {money: {unit: income_x, amount: -0.5}, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "คนดูแลหนีกลับบ้านตอนตีสี่ ทิ้งพ่อไว้กับประตูที่ไม่ได้ล็อก", effects: {money: {unit: income_x, amount: -0.3}, happiness: -2}, merit: [{cat: neutral}]}

@@ -4,9 +4,9 @@
 // · ทางในตระกูลเกิดเป็นลูก/หลานจริงที่ยังอยู่ (ชื่อ/เพศ/ปีเกิดตรง)
 // B36a2: คนในบ้านจากไปเองมีการ์ดแจ้งครบ · คนเป้าของการ์ดสุ่ม · bond อยู่ใน floor–100 ทุกการ์ด (เนื้อหายังไม่มี op ลด bond) · การ์ดดูแลพา bond ขึ้นเกินค่าเริ่มได้จริง · ญาติช่วยเกิดได้จริง
 // · สัตว์เลี้ยงตายตรงอายุขัย · เพื่อนรุ่นเกิดปีเดียวกับเรา · สองบทบาทนี้ไม่ตั้งธง
-import { playLife, playAfterlife, nextLife, mixSeed, lifeQx, focusOf, memberAge, newLife, addMember, ageKin, BOND_START, BOND_FLOOR } from '../src/engine/index.mjs';
+import { playLife, playAfterlife, nextLife, mixSeed, lifeQx, focusOf, memberAge, newLife, addMember, ageKin, BOND_START, BOND_FLOOR, FILIAL, openChoices, meritId, MERIT_LEVELS } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
-import { BOTS } from './bots.mjs';
+import { BOTS, random } from './bots.mjs';
 import { kinGaps, kinDeadRefs, familyLockShort, FAMILY_OPEN_MIN } from './kin.mjs';
 
 const args = process.argv.slice(2);
@@ -188,6 +188,48 @@ check('  การ์ดรักใหม่ขึ้นได้ · แต่�
   check('สัตว์เลี้ยงตายตรงอายุขัย', !pet.alive && pet.diedAge === 3 && !!pet.name && pet.kind === 'หมา' && !herd.alive && herd.diedAge === 2 && herd.name === null ? 0 : 1);
   check('เพื่อนรุ่นเกิดปีเดียวกับเรา มีชื่อ', peer.born === st.birthYear && !!peer.name ? 0 : 1);
   check('สัตว์เลี้ยง/เพื่อนรุ่นไม่ตั้งธงครอบครัว', st.flags.married || st.flags.has_kids ? 1 : 0);
+}
+// B167: ลูกเลียนแรงที่เราดูแลพ่อแม่ — บอทกตัญญู (การ์ดดูแลพ่อแม่เลือกบุญดูแลพ่อแม่สูงสุด) vs บอทละทิ้ง (ทาง away/home ก่อน)
+// การ์ดอื่นสุ่มเหมือนกัน · seed ชุดเดียวกัน · step 0 = ตัวควบคุม (ส่วนต่างที่เหลือมาจากผลอื่นของตัวเลือก เช่น relations)
+// วัด bond ลูกเฉลี่ยที่การ์ดแรกตั้งแต่อายุ FILIAL.at (หลังแกนปรับ) · ญาติช่วยประคองหลังอายุนั้นต่อชีวิต
+{
+  const FILIAL_SCORE = { care_parents: 1, abuse_elders: -1 };
+  const careScore = (c) => (c.merit ?? []).reduce((t, m) => t + (FILIAL_SCORE[meritId(m.cat)] ?? 0) * (MERIT_LEVELS[m.level] ?? 0), 0);
+  const filialBot = (kind) => (card, rng, st) => {
+    const chs = st?.pending?.choices;
+    if (!chs?.some((c) => c.filial)) return random(card, rng);
+    const open = openChoices(card);
+    const score = (i) => (kind === 'good' ? careScore(chs[i]) : (['away', 'home'].includes(chs[i].filial) ? 10 : 0) - careScore(chs[i]));
+    return open.reduce((a, b) => (score(b) > score(a) ? b : a));
+  };
+  const lives = Math.min(n, 2000);
+  const run = (kind, step) => {
+    const keep = FILIAL.step;
+    FILIAL.step = step;
+    let sum = 0, cnt = 0, aid = 0;
+    for (let i = 0; i < lives; i++) {
+      let at = null;
+      let helped = 0;
+      const { state: st } = playLife(mixSeed(seed, i * 11 + 5), content, filialBot(kind), (card, st) => {
+        if (st.age < FILIAL.at) return;
+        if (at === null) at = st.filial?.n ? st.kin.filter((m) => m.role === 'child' && m.alive && !m.left).map((m) => m.bond) : [];
+        if (card.kind === 'result' && card.text.includes('มาช่วยประคอง')) helped++;
+      });
+      if (!at?.length) continue;
+      sum += at.reduce((a, b) => a + b, 0) / at.length;
+      cnt++;
+      aid += helped;
+    }
+    FILIAL.step = keep;
+    return { bond: sum / Math.max(1, cnt), cnt, aid: aid / Math.max(1, cnt) };
+  };
+  const g = run('good', FILIAL.step), a = run('away', FILIAL.step), g0 = run('good', 0), a0 = run('away', 0);
+  const dd = (g.bond - a.bond) - (g0.bond - a0.bond);
+  console.log(`ดูแลพ่อแม่ (B167) · ${lives} ชีวิต/บอท · ถึง ${FILIAL.at} มีลูก+เคยดูแล: กตัญญู ${g.cnt} · ละทิ้ง ${a.cnt}`);
+  console.log(`  bond ลูกตอน ${FILIAL.at}: กตัญญู ${fmt(g.bond)} · ละทิ้ง ${fmt(a.bond)} · ตัวควบคุม step 0: ${fmt(g0.bond)} / ${fmt(a0.bond)}`);
+  console.log(`  ญาติช่วยประคองหลัง ${FILIAL.at} ต่อชีวิต: กตัญญู ${fmt(g.aid)} · ละทิ้ง ${fmt(a.aid)} · step 0: ${fmt(g0.aid)} / ${fmt(a0.aid)}`);
+  check(`  ส่วนต่าง bond ลูก (กตัญญู − ละทิ้ง) เกินตัวควบคุม ≥ 2×step`, g.cnt && a.cnt && dd >= 2 * FILIAL.step ? 0 : 1, ` ${fmt(dd)}`);
+  check('  ญาติช่วยประคองตอนแก่: กตัญญูมากกว่าละทิ้ง และห่างกว่าตัวควบคุม', g.aid > a.aid && g.aid - a.aid > g0.aid - a0.aid ? 0 : 1);
 }
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 if (fail) process.exitCode = 1;

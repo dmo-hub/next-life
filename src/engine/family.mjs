@@ -28,6 +28,11 @@ const BOND_CARE_PER_REL = 2;
 export const KIN_AID = { from: 60, base: 50, span: 120, scale: 0.5, roles: ['spouse', 'child', 'grandchild'] };
 // แก่แล้วไม่เหลือคนในบ้านที่ยังอยู่ = เสียความสุข/สุขภาพต่อปี · ปิดไว้ (0) จนเนื้อหามีทางมีลูกมากพอ — ตอนนี้คนแก่ส่วนใหญ่ไม่มีลูก
 export const KIN_LONELY = { from: 65, happiness: 0, health: 0 };
+// เราดูแลพ่อแม่แบบไหน (B167) — ตัวเลือกการ์ดดูแลพ่อแม่ติด filial · จดเฉพาะชีวิตนี้ ไม่ส่งต่อรุ่น
+// way = วิธีครั้งล่าสุด (การ์ดชราให้ลูกทำแบบเดียวกัน) · score = บุญดูแลพ่อแม่ − บาปทำร้ายผู้ใหญ่ ตามระดับของตัวเลือก
+// ถึงอายุ at ลูกที่ยังอยู่ได้ bond ± step × score (ไม่เกิน cap) — ลูกที่เห็นเราดูแลพ่อแม่ผูกพันกับเรามากขึ้น · kinAid ทำงานต่อเอง
+export const FILIAL_WAYS = ['self', 'share', 'hire', 'home', 'away'];
+export const FILIAL = { at: 60, step: 3, cap: 5 };
 
 // สัตว์ (B44) — ค่าตั้งของเกม · อายุขัยตามชนิดโดยประมาณ · เงินต่อปีเป็นสัดส่วนของเงินเก็บรายปีของชีวิตนั้น
 // (บาทคงที่บีบส่วนต่างทรัพย์ของชั้นล่างที่ห่างกันน้อยจนลำดับพลิกในด่าน finance)
@@ -264,6 +269,7 @@ function petYear(st, saving) {
 // saving = เงินเก็บรายปีของชีวิตนี้ (ผู้เรียกคิดให้) ฐานของเงินสัตว์
 export function ageKin(st, year, saving = 0) {
   kinYearlyBond(st);
+  filialMirror(st);
   const lost = [];
   if (!st.kin.length) return lost;
   petYear(st, saving);
@@ -356,6 +362,40 @@ export function familyOk(st, f) {
     : (st.kin ?? []).filter((m) => m.role === f.role && !m.left).map((m) => ({ alive: m.alive, age: memberAge(st, m, year), sex: m.sex }));
   const n = pool.filter((m) => (f.alive === undefined || m.alive === f.alive) && (f.sex === undefined || m.sex === f.sex) && kinInRange(m.age, f.age)).length;
   return f.count ? kinInRange(n, f.count) : n > 0;
+}
+
+// จดการดูแลพ่อแม่จากตัวเลือก (ผู้เรียกคิด score จากป้ายบุญบาป) · ผลสุ่มของตัวเลือกเดียวกันเติมแค่ score ไม่นับครั้งซ้ำ
+export function filialNote(st, way, score, outcome = false) {
+  st.filial ??= { way, n: 0, score: 0 };
+  st.filial.way = way;
+  if (!outcome) st.filial.n += 1;
+  st.filial.score += score;
+}
+// ลูกเลียนแรงที่เราเคยดูแลพ่อแม่ — ครั้งเดียวตอนถึงอายุ at · ไม่ดึงเลขสุ่ม · ไม่ตั้ง kinCared (ไม่ใช่การดูแลปีนี้)
+function filialMirror(st) {
+  if (st.age !== FILIAL.at || !st.filial?.n) return;
+  const d = Math.round(FILIAL.step * Math.max(-FILIAL.cap, Math.min(FILIAL.cap, st.filial.score)));
+  if (!d) return;
+  for (const m of st.kin) if (m.role === 'child' && m.alive && !m.left) m.bond = bondClamp((m.bond ?? BOND_START.child) + d);
+}
+// เงื่อนไขการ์ดตอนเราแก่ (when.filial): เคยดูแลพ่อแม่ n ครั้ง · วิธีล่าสุดอยู่ใน way
+export function filialOk(st, w) {
+  const n = st.filial?.n ?? 0;
+  return kinInRange(n, w.n ?? [1, Infinity]) && (!w.way || (n > 0 && w.way.includes(st.filial.way)));
+}
+// ลูกเลียนวิธี: ประโยคที่ลูกบอกเรา ฉายวิธีที่เราเคยใช้กับพ่อแม่ ({ลูกดูแลแบบเรา}) · ไม่บอกตัวเลข
+const FILIAL_MIRROR = {
+  self: (p) => `"เดี๋ยวลูกลาออกมาอยู่กับ${p}เอง" — ประโยคเดียวกับที่คุณเคยพูดตอนพ่อแม่ของคุณล้ม`,
+  share: () => '"พี่น้องแบ่งเวรกันแล้ว คนละวัน" — ตารางแบบเดียวกับที่คุณเคยนั่งแบ่งกับญาติตอนพ่อแม่ของคุณป่วย',
+  hire: (p) => `"ลูกจ้างคนมาดูแล${p}ประจำ วันหยุดจะแวะมา" — แบบเดียวกับที่คุณเคยจ้างคนดูแลพ่อแม่ของคุณ`,
+  home: (p) => `"ลูกหาบ้านพักคนชราดี ๆ ไว้ให้${p}แล้ว" — แบบเดียวกับที่คุณเคยพาพ่อแม่ของคุณไปส่ง`,
+  away: () => '"งานลูกยุ่งมาก จะโอนเงินมาให้ทุกเดือน" — แบบเดียวกับที่คุณเคยทำกับพ่อแม่ของคุณ',
+};
+export const filialMirrorText = (st) => (FILIAL_MIRROR[st.filial?.way] ?? (() => '"เรื่องนี้ลูกจัดการเอง"'))(st.sex === 'หญิง' ? 'แม่' : 'พ่อ');
+// พ่อหรือแม่ที่รู้แล้วว่าป่วย ให้การ์ด when.kin_illness roles parent เรียก ({พ่อแม่ที่ป่วย}) · คนล่าสุดที่แจ้ง
+export function illParentWord(st) {
+  const p = st.parents.filter((x) => x.alive && x.ill?.toldAt !== undefined).at(-1);
+  return p ? (p.sex === 'หญิง' ? 'แม่' : 'พ่อ') : 'พ่อแม่';
 }
 
 // ผลร้ายของผลสุ่ม: คนในบ้านที่ผูกพันที่สุดอาจช่วยประคอง → คืนคนนั้น (ผู้เรียกลดความเสียหายตาม KIN_AID.scale) หรือ null

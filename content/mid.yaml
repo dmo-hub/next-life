@@ -125,30 +125,36 @@ events:
     choices:
       - id: quit_care
         text: "ลาออกมาดูแลเอง"
+        filial: self
         effects: {relations: 2, income_mult: 0.7, health: -1}
         merit: [{cat: care_parents, level: 3}]
       - id: nursing_home
         text: "จ้างศูนย์ดูแลผู้สูงอายุ"
+        filial: home
         requires: {money: {unit: income_x, amount: 1}, reason: "เงินไม่พอจ้างศูนย์ดูแล"}
         effects: {money: {unit: income_x, amount: -1}, health: 1, happiness: -1}
         merit: [{cat: care_parents, level: 1}]
       - id: share_siblings
         text: "เรียกญาติประชุมแบ่งเวร"
+        filial: share
         outcomes:
           - {weight: 2, ok: true, text: "แบ่งเวรได้ลงตัว ญาติที่ไม่คุยกันสิบปีกลับมานั่งกินข้าวด้วยกัน", effects: {relations: 3, happiness: 1}, merit: [{cat: care_parents, level: 2}], multipliers: {stats: {relations: 2}}}
           - {weight: 2, text: "ประชุมจบที่ทะเลาะเรื่องมรดก สุดท้ายงานทั้งหมดตกที่เราคนเดียว", effects: {relations: -2, health: -1}, merit: [{cat: care_parents, level: 1}], next: mid_care_alone_01}
         merit: [{cat: care_parents, level: 1}]
       - id: move_in
         text: "รับมาอยู่บ้านแบบครอบครัวใหญ่"
+        filial: self
         effects: {relations: 1, happiness: -1, health: 1}
         merit: [{cat: care_parents, level: 2}]
       - id: send_money
         text: "ส่งเงินอย่างเดียว ไม่มีเวลา"
+        filial: away
         effects: {money: {unit: income_x, amount: -0.5}, relations: -2, health: 1}
         schedules: [{event: echo_fam_money_only_01, after_years: [15, 25]}]
         merit: [{cat: neutral}]
       - id: move_in_rite
         text: "รับพ่อแม่มาอยู่ ทำบุญบ้านก่อน"
+        filial: self
         cost: {unit: fixed_baht, amount: 2000, ref_year: 2566}
         effects: {relations: 2, health: 1}
         merit: [{cat: care_parents, level: 2}]
@@ -483,21 +489,64 @@ events:
     choices:
       - id: hire_help
         text: "จ้างคนช่วยดูแลกลางวัน"
+        filial: hire
         effects: {health: 1, money: {unit: income_x, amount: -0.8}}
         merit: [{cat: neutral}]
       - id: lawyer_meeting
         text: "นัดประชุมใหม่ มีทนายนั่งกลาง"
+        filial: share
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {relations: 1.4}}, text: "แบ่งมรดกกันชัดบนกระดาษ ญาติยอมรับเวรเสาร์อาทิตย์", effects: {relations: 1, health: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ทนายกลางก็ช่วยไม่ได้ ญาติเดินออกจากห้องตั้งแต่ชั่วโมงแรก", effects: {relations: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
       - id: carry_on
         text: "แบกต่อไปคนเดียว"
+        filial: self
         effects: {health: -1, happiness: -1, relations: 1}
         merit: [{cat: care_parents, level: 1}]
       - id: post_story
         text: "เล่าเรื่องลงกลุ่มญาติตรง ๆ"
+        filial: share
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, text: "ญาติคนหนึ่งอ่านแล้วนั่งรถมาช่วยตั้งแต่เช้าวันรุ่งขึ้น", effects: {relations: 1, health: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ญาติโกรธที่ประจานกัน กลุ่มเงียบกริบ", effects: {relations: -2}, merit: [{cat: neutral}]}
+  # B167: การ์ดแรกที่ใช้ระบบญาติป่วย (when.kin_illness) — ออกหลังแกนแจ้งว่าพ่อ/แม่ป่วยโรคเรื้อรัง · ตัวเลือกติด filial
+  - id: mid_parent_ill_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 4
+    when: {kin_illness: {roles: [parent]}, family: [{role: parent, alive: true}]}
+    title: "ผลตรวจของ{พ่อแม่ที่ป่วย}"
+    text: "{พ่อแม่ที่ป่วย}โทรมาเล่าผลตรวจด้วยเสียงเรียบ ๆ เหมือนเล่าเรื่องฝนตก หมอบอกว่าต่อไปต้องมีคนพาไปโรงพยาบาลทุกเดือน และอาการจะไม่กลับไปเหมือนเดิม"
+    choices:
+      - id: move_back
+        text: "ย้ายกลับไปอยู่ด้วย"
+        filial: self
+        effects: {relations: 2, income_mult: 0.7, happiness: -1}
+        merit: [{cat: care_parents, level: 3}]
+      - id: share_trips
+        text: "ชวนพี่น้องแบ่งเวรพาไปหาหมอ"
+        filial: share
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ตารางเวรติดหน้าตู้เย็น ทุกคนมาตามนัด ไม่มีใครต้องลางานติดกันเกินสองวัน", effects: {relations: 2, happiness: 1}, merit: [{cat: care_parents, level: 1}]}
+          - {weight: 1, text: "เดือนที่สามพี่น้องเริ่มมีธุระ เวรที่ว่างตกมาที่คุณทุกครั้ง", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: care_parents, level: 1}]
+      - id: hire_nurse
+        text: "จ้างผู้ช่วยพยาบาลมาดูแลที่บ้าน"
+        filial: hire
+        requires: {money: {unit: income_x, amount: 1}, reason: "เงินไม่พอจ้างผู้ช่วยพยาบาล"}
+        effects: {money: {unit: income_x, amount: -1}, health: 1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: care_home
+        text: "หาบ้านพักคนชราใกล้โรงพยาบาล"
+        filial: home
+        effects: {money: {unit: income_x, amount: -0.8}, relations: -1}
+        merit: [{cat: help_others, level: 1}, {cat: abuse_elders, level: 1}]
+      - id: send_fees
+        text: "ส่งค่ารักษา ไม่มีเวลากลับ"
+        filial: away
+        effects: {money: {unit: income_x, amount: -0.5}, relations: -2}
+        merit: [{cat: neutral}]
