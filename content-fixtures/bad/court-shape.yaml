@@ -1,0 +1,13 @@
+# ผิดกติกาเดียว: ใบเยือนศาลแตะค่าสถานะ (ค่าเข้าสูตรชีวิต อายุตายจะเลื่อน)
+events:
+  - id: bad_case_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: visit
+    years: [2400, 2700]
+    text: "เจ้าหน้าที่บอกว่ายังไม่ถึงคิว"
+    choices:
+      - {text: ขอดูสมุด, effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

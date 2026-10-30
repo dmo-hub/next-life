@@ -8,6 +8,7 @@ import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, 
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './career.mjs';
 import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
+import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './court.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends } from './isekai.mjs';
@@ -428,7 +429,10 @@ function deathRoll(st) {
   const span = ILL_YEARS[1] - ILL_YEARS[0] + 1;
   const unscheduled = (span - Math.max(0, Math.min(span, age - ILL_YEARS[0] + 1))) / span;
   const now = hz.map((x, j) => (CHRONIC.includes(keys[j]) ? x * unscheduled : x));
-  if (u < now.reduce((s, x) => s + x, 0)) return pickCause(st.causeRng, keys, now);
+  const sum = now.reduce((s, x) => s + x, 0);
+  if (u < sum) return pickCause(st.causeRng, keys, now);
+  // เฉียดตาย (B153) ต้องไหลต่อไปนัดป่วยเหมือนรอดปกติ — ข้ามแล้ว causeRng ขาดหนึ่งครั้ง นัดโรคทั้งชีวิตเลื่อน
+  nearMiss(st, u - sum, keys, now);
   if (!st.terminal) scheduleIllness(st);
   return null;
 }
@@ -1102,6 +1106,17 @@ export const openChoices = (card) => card.choices.map((_, i) => i).filter((i) =>
 
 // เดินปีละครั้งจนมีการ์ดถึงกำหนดหรือตาย คืนการ์ดใบถัดไป
 export function nextCard(st) {
+  // ทริปศาล (B153) ช่องแยกจาก st.trip — st.trip ผูกก้อนต่างโลกทั้งก้อน
+  if (st.court) {
+    const card = courtCard(st);
+    if (card) return card;
+    const c = st.court;
+    st.court = null;
+    if (c.mode !== 'summons') return nextCard(st);
+    st.dead = true;
+    st.cause = c.cause;
+    return queueFuneral(st) ? nextCard(st) : deathCard(st);
+  }
   if (st.trip) {
     if (st.trip.step !== 'over') return { ...nextIsekaiCard(st.trip), trip: true, life: st.age };
     return tripBack(st);
@@ -1143,6 +1158,11 @@ export function nextCard(st) {
       // สุขภาพหมดตัว = ตายด้วยสาเหตุตามสัดส่วนของอายุนั้น ไม่มีช่วงป่วย
       const cause = st.health <= 0 ? healthCause(st) : deathRoll(st);
       if (cause) {
+        // โกงความตาย (B153): ไปศาลก่อน แล้วตายปีนี้ด้วยสาเหตุเดิม
+        if (st.flags.cheat_death) {
+          st.court = summonsCourt(cause);
+          return nextCard(st);
+        }
         st.dead = true;
         st.cause = cause;
         return queueFuneral(st) ? nextCard(st) : deathCard(st);
@@ -1150,6 +1170,11 @@ export function nextCard(st) {
       stepYear(st);
     }
     st.advance = true;
+    // เฉียดตายปีนี้: ออกทริปก่อน · advance ปิดไว้ให้รอบถัดไปไม่ทอยตายซ้ำ แล้วเดินต่อจุดนี้เหมือนไม่มีทริป
+    if (st.court) {
+      st.advance = false;
+      return nextCard(st);
+    }
     // การ์ดชวนไปต่างโลก (B68d) ออกต้นปี ใบถัดไปต้องไม่เดินเวลา
     const offer = entryCard(st, stageOf(st.age));
     if (offer) {
@@ -1347,6 +1372,7 @@ export function noteDeed(st, text, record, age = st.age) {
 
 // loan = ชนิดหนี้จาก card.loans[idx] (กู้มาจ่าย) · ไม่ส่ง = เลือกแบบเดิม บอทและเซฟเก่าเดินเหมือนเดิมทุกก้าว
 export function choose(st, idx, loan) {
+  if (st.court) return chooseCourt(st, idx);
   if (st.trip) return chooseIsekai(st.trip, idx);
   const ev = st.pending;
   if (ev?.alloc) {
@@ -1382,6 +1408,7 @@ export function choose(st, idx, loan) {
         trip: { ...trip, age: st.age, wit: st.knowledge / TRIP.wit },
         // ค่าจริงของชีวิตนี้ตอนข้าม (B136) — ผลในต่างโลกสะท้อนกลับชุดนี้ แล้ว tripBack เขียนลง st
         real: realAt(st),
+        hints: st.content.nearHints,
       });
       return;
     }
@@ -1608,12 +1635,17 @@ const tripAny = (card, rng) => {
 
 export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, content)) {
   const bot = makeRng(seed ^ 0x5bd1e995);
+  let courtBot = null;
   for (;;) {
     const card = nextCard(st);
     onCard?.(card, st);
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
     // บอทที่ไม่ได้ประกาศ isekai ปฏิเสธการ์ดชวนโดยไม่ดึงเลขสุ่ม ⇒ ชีวิตเดินเท่าเดิม
     // การ์ดในทริป (B68m) ไม่มีป้ายบุญบาปแบบชีวิตไทย — บอทที่ประกาศ trip เลือกเอง ที่เหลือสุ่มตัวที่ไม่ล็อก
+    if (card.court) {
+      if (card.choices.length) choose(st, courtPick(card, (courtBot ??= makeRng(seed ^ 0x1f83d9ab))));
+      continue;
+    }
     if (card.trip && card.kind === 'isekai') {
       if (card.choices.length) choose(st, pickChoice.trip ? pickChoice.trip(card, bot) : tripAny(card, bot));
       continue;

@@ -1,6 +1,8 @@
 // กติกาฉากช่วงที่ 7 (B06): ฉากระหว่างชาติอ่านโดย afterlife.mjs ไม่ใช่ลูปชีวิต — ฟิลด์ที่ลูปชีวิตใช้จึงไม่มีผลที่นี่
 import { AFTERLIFE_STAGE, STAT_KEYS } from './vocab.mjs';
 import { SCENES, REALM_SCENES, REALMS } from '../../engine/afterlife.mjs';
+import { COURT_SCENES, NEAR_DEATH } from '../../engine/court.mjs';
+import { meritId } from '../../engine/merit.mjs';
 import { isObj, list, choicesOf, effectSites } from './util.mjs';
 
 const REALM_IDS = REALMS.map((r) => r.id);
@@ -18,7 +20,7 @@ export const rules = [
         for (const k of ['scene', 'realm']) if (e[k] !== undefined) r(`.${k}`, `${k} ใช้ได้เฉพาะ stage ${AFTERLIFE_STAGE}`);
         return;
       }
-      if (!SCENES.includes(e.scene)) r('.scene', `scene ต้องเป็น ${SCENES.join('|')} ได้ ${JSON.stringify(e.scene)}`);
+      if (!SCENES.includes(e.scene) && !COURT_SCENES.includes(e.scene)) r('.scene', `scene ต้องเป็น ${[...SCENES, ...COURT_SCENES].join('|')} ได้ ${JSON.stringify(e.scene)}`);
       if (e.type !== 'B') r('.type', 'ฉากระหว่างชาติเป็นการ์ดลายรดน้ำ type B (ใบ 06)');
       if (e.realm !== undefined) {
         if (!REALM_SCENES.includes(e.scene)) r('.realm', `realm ใช้ได้เฉพาะ scene ${REALM_SCENES.join('|')} — ก่อนปรโลกยังไม่รู้ภูมิ`);
@@ -46,6 +48,25 @@ export const rules = [
           const ok = open.some((x) => realm === null || x.e.realm === undefined || list(x.e.realm).includes(realm));
           if (!ok) r(xs[0], '', `scene ${scene}${realm ? ` ภูมิ ${realm}` : ''} ไม่มีใบที่ไม่มี when`);
         }
+      }
+    },
+  },
+  {
+    id: 'court-shape',
+    desc: `ทริปศาลขณะยังมีชีวิต (scene ${COURT_SCENES.join('|')}): ไม่มี when/weight/realm · ตัวเลือกไม่มี effects (ค่าสถานะเข้าสูตรชีวิต อายุตายจะเลื่อน) · near/visit ป้ายบุญบาปเป็น neutral ล้วน · near: ${NEAR_DEATH.causes.join('|')} มีเฉพาะ scene near และไม่มีตัวเลือก`,
+    event(e, ctx, r) {
+      const court = e.stage === AFTERLIFE_STAGE && COURT_SCENES.includes(e.scene);
+      if (e.near !== undefined && !(court && e.scene === 'near')) r('.near', 'near ใช้ได้เฉพาะ scene near');
+      if (!court) return;
+      for (const k of ['when', 'weight', 'realm', 'multipliers']) if (e[k] !== undefined) r(`.${k}`, `ฉากศาลไม่มี ${k} — แกนเลือกใบเอง`);
+      if (e.scene === 'near') {
+        if (!NEAR_DEATH.causes.includes(e.near)) r('.near', `scene near ต้องมี near: ${NEAR_DEATH.causes.join('|')}`);
+        if (Array.isArray(e.choices) && e.choices.length) r('.choices', 'ใบเกือบตายเป็นการ์ดเล่าเรื่อง choices: []');
+      }
+      for (const { c, path } of choicesOf(e)) {
+        if (c.effects !== undefined) r(`${path}.effects`, 'ฉากศาลไม่มีผลต่อค่าสถานะ');
+        if (c.outcomes !== undefined) r(`${path}.outcomes`, 'ฉากศาลไม่มีผลสุ่ม');
+        if (e.scene !== 'summons' && list(c.merit).some((t) => !isObj(t) || meritId(t.cat) !== 'neutral')) r(`${path}.merit`, 'ฉากเยือนศาลลงบัญชีไม่ได้ — ป้ายต้องเป็น neutral ล้วน');
       }
     },
   },

@@ -8,7 +8,8 @@ import { lintDocs, formatProblem } from './lint/index.mjs';
 import { MERIT_CATS } from './lint/vocab.mjs';
 import { checkMeritTable } from '../engine/merit.mjs';
 import { DEBTS } from '../engine/finance.mjs';
-import { PLACEHOLDERS } from './lint/vocab.mjs';
+import { PLACEHOLDERS, MAX_LEN } from './lint/vocab.mjs';
+import { NEAR_HINT_LEVELS } from '../engine/court.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -388,4 +389,23 @@ export function loadCareers(fin) {
 // หมวด heir: ของทะเบียนธง = ชุดธงที่แกนส่งถึงทายาท — แกนต้องรู้ตอนเล่น ไม่ใช่แค่ lint
 const loadHeir = () => parse(read('content/rules/flags.yaml')).heir ?? {};
 
-export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir() });
+// คำใบ้ที่ศาลตอนเฉียดตาย (B153) ระดับละหลายข้อความ — ไม่ใช่การ์ด จึงตรวจตอนโหลดแทนด่านเนื้อหา
+// ห้ามเลขคู่คำบุญ/บาป (กติกาเดียวกับด่านการ์ดไม่เผยบัญชีของ harness)
+export function loadNearHints(p = 'content/rules/near-hints.yaml') {
+  const doc = parse(read(p));
+  const ids = NEAR_HINT_LEVELS.map((l) => l.id);
+  const bad = Object.keys(doc ?? {}).filter((k) => !ids.includes(k)).map((k) => `ระดับ ${k} ไม่มีในแกน (${ids.join(' ')})`);
+  for (const id of ids) {
+    const xs = doc?.[id];
+    if (!Array.isArray(xs) || xs.length < 2) bad.push(`ระดับ ${id} ต้องมีอย่างน้อย 2 ข้อความ`);
+    for (const s of Array.isArray(xs) ? xs : []) {
+      if (typeof s !== 'string' || !s.trim()) bad.push(`ระดับ ${id} มีข้อความว่าง`);
+      else if (s.length > MAX_LEN.text) bad.push(`ระดับ ${id} ยาว ${s.length} เกินเพดาน ${MAX_LEN.text}`);
+      else if (/(บุญ|บาป)\s*[+\-−]?\s*\d/.test(s)) bad.push(`ระดับ ${id} เผยตัวเลขบัญชี: ${s}`);
+    }
+  }
+  if (bad.length) throw new Error(`${p} ไม่ผ่านด่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return doc;
+}
+
+export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints() });

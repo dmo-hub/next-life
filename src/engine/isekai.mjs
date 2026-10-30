@@ -7,6 +7,7 @@
 // บัญชีบุญบาปเป็นของดวงวิญญาณ (ส่วนที่ส่งต่อจากชาติก่อน) — ชาติต่างโลกบันทึกต่อลงบัญชีนั้น แล้วปรโลกตัดสินตอนจบชาติ
 import { makeRng, mixSeed } from './rng.mjs';
 import { newLedger, recordMerit, ledgerLevel, meritId, SIN_CATS } from './merit.mjs';
+import { hintLevel } from './court.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค' };
 export const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
@@ -1486,7 +1487,7 @@ export function entryCard(st, stage) {
 // lore = ของที่แต่ละโลกจำได้จากชาติก่อน ๆ ทั้งเซฟ ({ world: [id] } จาก isekaiWorldLore)
 // trip = ไปกลับกลางชีวิต (B68m · tripRoll + age/wit จากชีวิตไทย) — ข้ามห้องสีขาว บทบาทมาจากการทอย เริ่มที่อายุไทย เลือกกลับบนการ์ดทางกลับ = จบแบบกลับบ้าน
 // legends = คนต่างโลกรุ่นก่อนที่แต่ละโลกจำชื่อได้ ({ world: [{ name, ending, dark }] } จาก isekaiWorldLegends)
-export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null }) {
+export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null, hints = null }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
   const vow = blessed ? GODDESS_VOWS[(seed >>> 0) % GODDESS_VOWS.length].id : null;
@@ -1500,6 +1501,8 @@ export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null
     legendAll: legends, worldLegends: [], legend: null, fameDark: 0, potions: [], lifeAdd: 0,
     age: 0, focus: null, focusOffers: [], stageShown: null, due: null, used: [], later: [], finaleDone: false,
     step: 'world', last: null, rbdUsed: false, dead: false, natural: false, ending: null, log: [], chron: [], cards: 0,
+    // ทริปศาล (B153): hints = คำใบ้จากเนื้อหา (ผู้เรียกส่ง content.nearHints) · court = ใบศาลที่รอออก visit|summons
+    hints, court: null,
   };
   if (trip) {
     // money0 = เงินจริงตอนข้าม ให้ขากลับคิดส่วนต่างที่เกิดในต่างโลกได้ (B136)
@@ -1729,7 +1732,12 @@ function isekaiDrink(isk, id) {
   if (n > P.free) recordMerit(isk.ledger, [M('against_nature', P.level)], id);
   const add = Math.min(P.years, P.cap - (isk.lifeAdd ?? 0));
   isk.lifeAdd = (isk.lifeAdd ?? 0) + add;
-  if (add <= 0) return 'ยาไหลลงคอเหมือนน้ำเปล่า ร่างกายนี้ยืดออกไปไม่ได้อีกแล้ว';
+  // ดื่มเกินเพดาน = โกงความตาย (B153): ถูกเรียกตัวแล้วจบชาตินี้ตรงนั้น เหมือนโลกปกติ
+  if (add <= 0) {
+    isk.court = 'summons';
+    isk.dead = true;
+    return 'ยาไหลลงคอเหมือนน้ำเปล่า ร่างกายนี้ยืดออกไปไม่ได้อีกแล้ว';
+  }
   return n > P.free ? 'อายุขัยยืดออกไปอีก แต่คืนนั้นคุณฝันว่ามองกระจกแล้วไม่เห็นหน้าตัวเอง' : 'อายุขัยยืดออกไปอีก ตัวเบาเหมือนอายุน้อยลงหลายปี';
 }
 
@@ -1799,6 +1807,19 @@ const isekaiCard = (isk, card) => {
   return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, ...card };
 };
 
+// ใบศาล (B153) ไม่นับการ์ดของชาติ ไม่ดึงเลขสุ่ม — ชาติหลังฟื้นเดินเหมือนไม่มีใบนี้ · คำใบ้เลือกตามอายุแทนการสุ่ม
+export const ISEKAI_COURT = {
+  visit: { title: 'ห้องโถงที่ไม่ใช่ของโลกนี้', text: 'วินาทีที่ร่างนี้หมดลม คุณยืนอยู่ในห้องโถงยาวที่คนนั่งรอเต็มไปหมด เจ้าหน้าที่เปิดสมุดแล้วส่ายหน้า บอกว่ายังไม่ถึงคิว แล้วเสียงนาฬิกาก็ดึงคุณกลับ' },
+  summons: { title: 'คนมารับข้ามโลก', text: 'ยาขวดสุดท้ายยังไม่ทันหายขม คนแต่งกายสีเข้มก็ยืนอยู่ปลายเตียง บอกเรียบ ๆ ว่าร่างนี้ยืดเกินที่ตกลงไว้ อยู่โลกไหนก็หนีบัญชีไม่ได้' },
+};
+function isekaiCourtCard(isk) {
+  const mode = isk.court;
+  isk.court = null;
+  const lines = mode === 'visit' ? isk.hints?.[hintLevel(isk.ledger)] : null;
+  const hint = lines?.length ? ` ${lines[isk.age % lines.length]}` : '';
+  return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, step: 'result', court: mode, title: ISEKAI_COURT[mode].title, text: ISEKAI_COURT[mode].text + hint, age: isk.age, ok: null, stat: null, deltas: {}, sys: null, choices: [] };
+}
+
 // การ์ดถัดไป · ใบที่มีตัวเลือกรอ chooseIsekai · ใบตา (tick) ไม่มีตัวเลือก เรียกซ้ำ = เวลาเดินอีกตา
 // ใบตาบอกสิ่งที่ทุ่มเทได้ (focusChoices) — chooseIsekai บนใบตา = เปลี่ยนสิ่งที่ทุ่มเท โดยเวลาไม่หยุด
 export function nextIsekaiCard(isk) {
@@ -1827,6 +1848,7 @@ export function nextIsekaiCard(isk) {
     return isekaiCard(isk, { step: 'result', title: r.title, text: r.text, age: isk.age, ok: r.ok, stat: r.stat, deltas: r.deltas, sys: r.sys, choices: [] });
   }
   if (isk.step === 'over') throw new Error('ชาติต่างโลกจบแล้ว — ปรโลกรับช่วงต่อ');
+  if (isk.step === 'tick' && isk.court) return isekaiCourtCard(isk);
   if (isk.step === 'tick' && isk.due) isk.step = 'event';
   if (isk.step === 'event') return isekaiEventCard(isk, isekaiById[isk.due]);
   if (isk.step === 'tick' && (isk.dead || isk.natural || isk.home)) isk.step = 'end';
@@ -1883,6 +1905,7 @@ export function nextIsekaiCard(isk) {
     else if (isekaiHas(isk, 'rbd') && !isk.rbdUsed) {
       isk.rbdUsed = true;
       isk.st.hp = 40;
+      isk.court = 'visit';
       revived = true;
     } else isk.dead = true;
   }
@@ -2030,7 +2053,8 @@ export function chooseIsekai(isk, idx) {
     if (isekaiHas(isk, 'rbd') && !isk.rbdUsed) {
       isk.rbdUsed = true;
       isk.st.hp = 40;
-      sys = 'เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว';
+      isk.court = 'visit';
+      sys ='เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว';
     } else isk.dead = true;
   }
   // ฉากเด่นบนการ์ดจบ: ผลที่ขยับค่ามากสุด · ทองหารห้าสิบให้ชั่งกับค่าอื่นได้ · สกิลช่วยไว้/ตายนับเพิ่ม

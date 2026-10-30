@@ -99,7 +99,7 @@ const SHORTCUT = Object.fromEntries(Object.entries(ISEKAI_KNOW).map(([k, v]) => 
 let knowAdultBad = 0, loreSys = 0, loreBad = 0, loreGot = 0;
 // ตำนาน (B68i): เหตุการณ์ตำนานมาเฉพาะโลกที่จำแบบนั้น เรียกชื่อถูก ไม่เหลือ {legend} · การ์ดจบมีช่องตำนานตรงเกณฑ์
 let legendEvBad = 0, legendTextBad = 0, legendEndBad = 0, legendGot = 0, legendDark = 0;
-let potionBad = 0, potionOver = 0;
+let potionBad = 0, potionOver = 0, courtBad = 0, courtOver = 0, courtVisit = 0;
 const potionFrom = [], potionAdd = {};
 // เวลาเดินเอง (B68b): ใบตาไม่มีตัวเลือก แต่บอกสิ่งที่ทุ่มเทได้ · การ์ดบทบาทมีคนธรรมดาเสมอ · สิ้นอายุเฉพาะหลังวัยชรา
 let tickBad = 0, roleBad = 0, oldBad = 0;
@@ -177,8 +177,18 @@ Object.values(BOTS).forEach((bot, b) => {
       (potionAdd[g] ??= []).push(isk.lifeAdd);
     }
     if (drunk > P.free) potionOver++;
+    // ศาล (B153): ดื่มเกินเพดาน = ถูกเรียกตัวแล้วจบชาติอายุนั้น · ย้อนเวลาเมื่อตายใช้แล้ว = ใบเยือนหนึ่งใบ · นอกนั้นไม่มีใบศาล
+    const summons = a.cards.filter((c) => c.court === 'summons');
+    const visits = a.cards.filter((c) => c.court === 'visit').length;
+    if (drunk * P.years > P.cap) {
+      courtOver++;
+      if (summons.length !== 1 || !isk.dead || summons[0].age !== end.age) courtBad++;
+    } else if (summons.length) courtBad++;
+    if (visits !== (isk.rbdUsed ? 1 : 0)) courtBad++;
+    courtVisit += visits;
   }
 });
+check('ศาล: ดื่มเกินเพดานถูกเรียกตัวแล้วตายอายุนั้นทุกชาติ · ย้อนเวลาเมื่อตาย = ใบเยือน 1 ใบ', courtBad + (courtOver && courtVisit ? 0 : 1), `ดื่มเกินเพดาน ${courtOver} ชาติ · ใบเยือน ${courtVisit}`);
 
 const total = n * Object.keys(BOTS).length;
 for (const xs of [lens, clicks, humanAges]) xs.sort((x, y) => x - y);
