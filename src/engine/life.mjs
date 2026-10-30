@@ -83,10 +83,19 @@ export const moodMul = (st) => MOOD.find(([below]) => st.happiness < below)?.[1]
 const MOOD_CATS = ['work_money', 'study'];
 // การ์ดที่แกนสร้าง (หางาน · ด่านเรียนต่อ) ไม่มีหมวด — นับเป็นเรียน/งานด้วย id
 const moodCard = (ev) => !!ev && (MOOD_CATS.includes(ev.category) || ev.id === 'first_job' || ev.id?.startsWith('school_gate_'));
+// สัญญากับมาร (B156): ยืมโชค = น้ำหนักทางสำเร็จคูณ luck จนถึงอายุที่สัญญาหมด (ยังโดนเพดาน okMax) · รอดตายได้ครั้งเดียวต่อชีวิต
+// ราคาคือบาป mara_pact บนตัวเลือก (lint pact-shape) · st.pact อยู่กับชีวิตนี้ ไม่ส่งต่อรุ่น
+export const PACT = { luck: 1.5, maxYears: 10, surviveText: 'ความตายเฉียดผ่านไปเหมือนมีใครเบี่ยงทางให้ ในหัวมีเสียงหัวเราะเบา ๆ ดังอยู่ครู่หนึ่ง' };
+const pactLuck = (st) => (st.age < (st.pact?.luck ?? 0) ? PACT.luck : 1);
+function signPact(st, p) {
+  st.pact ??= {};
+  if (p.luck) st.pact.luck = Math.max(st.pact.luck ?? 0, st.age + p.luck);
+  if (p.survive && !st.pact.survive) st.pact.survive = true;
+}
 // น้ำหนักทางผลหลังเอียงตาม multipliers และอารมณ์ · การ์ดที่มีทั้งทางสำเร็จและไม่สำเร็จ ตัดโอกาสสำเร็จรวมไว้ okMin–okMax (B112) โดยปรับสองกลุ่มตามสัดส่วน
 // (ไม่ดึงเลขสุ่มเพิ่ม · ป้าย % กับผลจริงใช้ตัวเดียวกัน)
 const outcomeWeights = (st, ev, c) => {
-  const m = moodCard(ev) ? moodMul(st) : 1;
+  const m = (moodCard(ev) ? moodMul(st) : 1) * pactLuck(st);
   const w = c.outcomes.map((o) => o.weight * poolMultiplier(st, o.multipliers) * (o.ok ? m : 1));
   const ok = w.reduce((a, x, i) => a + (c.outcomes[i].ok ? x : 0), 0);
   const all = w.reduce((a, x) => a + x, 0);
@@ -1157,6 +1166,15 @@ export function nextCard(st) {
       // สุ่มตายของปีที่อายุ st.age ก่อนขึ้นปีใหม่ — ทารกจึงตายได้ตั้งแต่ขวบปีแรกตามอัตราตายทารกจริง และอายุบนการ์ดตายเป็นปีเต็ม
       // สุขภาพหมดตัว = ตายด้วยสาเหตุตามสัดส่วนของอายุนั้น ไม่มีช่วงป่วย
       const cause = st.health <= 0 ? healthCause(st) : deathRoll(st);
+      if (cause && st.pact?.survive === true) {
+        // สัญญารอดตาย (B156) มาก่อนพิธีโกงความตาย — สัญญาจ่ายบาปแล้วจึงได้ของจริง · สุขภาพกลับค่าธรรมชาติ ไม่งั้นหมดตัวแล้วตายซ้ำปีถัดไป
+        st.pact.survive = 'used';
+        st.health = Math.max(st.health, st.healthNatural, 1);
+        st.queue.push({ kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: PACT.surviveText });
+        stepYear(st);
+        st.advance = false;
+        return nextCard(st);
+      }
       if (cause) {
         // โกงความตาย (B153): ไปศาลก่อน แล้วตายปีนี้ด้วยสาเหตุเดิม
         if (st.flags.cheat_death) {
@@ -1438,6 +1456,7 @@ export function choose(st, idx, loan) {
   const ss = pool ? poolStatScale(stageOf(st.age)) : 1;
   applyEffects(st, c.effects, s, ss);
   applyChoice(st, ev, c, text);
+  if (c.pact) signPact(st, c.pact);
   st.log.push({ id: ev.id, age: st.age, choice: idx, text, ...(loan !== undefined && { loan }) });
   // ผลสุ่ม: จับทางด้วย rng ของโลก (เป็นผลของการเลือก) แล้วเล่าเป็นการ์ดผลลัพธ์ใบถัดไป
   // น้ำหนักแต่ละทางเอียงตาม multipliers ของทางนั้น — บัญชีอ่านหลังป้ายบุญบาปของตัวเลือกนี้ลงแล้ว (กรรมตามทันทันที)

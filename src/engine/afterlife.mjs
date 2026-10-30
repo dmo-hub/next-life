@@ -304,18 +304,22 @@ export function chooseAfter(af, idx) {
 
 // ส่งต่อบัญชี: ฝั่งที่ชี้ปลายทางถูกหัก spend × |สุทธิที่ปรโลก| (ไม่ติดลบ) แล้วคูณ r ทั้งสองฝั่งและทุกหมวด
 // คำบนที่ผิด (broken) ไม่ส่งต่อ — ผูกกับชีวิตที่บน
+// หมวดใน FULL_CARRY ไม่คูณ r — บาปสัญญากับมาร (B156) ต้องตามทุกชาติจนชดใช้ จางได้ทางส่วน spend เท่านั้น
+export const FULL_CARRY = ['mara_pact'];
 export function carryLedger(ledger, net, r) {
   const keep = { merit: ledger.merit, sin: ledger.sin };
   const side = net >= 0 ? 'merit' : 'sin';
   keep[side] = Math.max(0, keep[side] - Math.abs(net) * CARRY.spend);
   const out = newLedger();
+  out.merit = keep.merit * r;
+  out.sin = keep.sin * r;
   for (const [id, v] of Object.entries(ledger.byCat)) {
     const s = SIN_CATS.includes(id) ? 'sin' : 'merit';
     const f = ledger[s] ? keep[s] / ledger[s] : 0;
-    if (v * f * r) out.byCat[id] = v * f * r;
+    const full = FULL_CARRY.includes(id);
+    if (v * f * (full ? 1 : r)) out.byCat[id] = v * f * (full ? 1 : r);
+    if (full) out[s] += v * f * (1 - r);
   }
-  out.merit = keep.merit * r;
-  out.sin = keep.sin * r;
   return out;
 }
 

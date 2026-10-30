@@ -2,8 +2,9 @@
 import {
   STAT_KEYS, EFFECT_KEYS, CLASSES, SEXES, STAGE_AGES, STAGE_NAMES, CATEGORIES, PLACEHOLDERS,
   ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE, EDU, SCHOOL_VALUES,
+  meritCat,
 } from './vocab.mjs';
-import { INCOME_MULT, MONEY_KEYS } from '../../engine/life.mjs';
+import { INCOME_MULT, MONEY_KEYS, PACT } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
 import { PET_KINDS, HERD_KINDS, PET_CAUSES } from '../../engine/family.mjs';
@@ -15,7 +16,7 @@ const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain', 'severance'],
@@ -194,6 +195,25 @@ export const rules = [
           else if (price[1] !== want) r(`${path}.hint`, `ป้ายราคาต้องเป็น "${want}" ตามระดับบาป ${lv}`);
         }
       }
+    },
+  },
+  {
+    id: 'pact-shape',
+    desc: `pact (สัญญากับมาร B156) มีแค่ luck = จำนวนปี 1–${PACT.maxYears} และ/หรือ survive: true · ตัวเลือกที่มี pact ต้องจ่าย mara_pact ระดับ 3 ใน merit ของตัวเลือก · survive ได้ไม่เกิน 1 ตัวเลือกต่อการ์ด`,
+    event(e, ctx, r) {
+      let survive = 0;
+      for (const { c, path } of choicesOf(e)) {
+        if (c.pact === undefined) continue;
+        const p = c.pact;
+        if (!isObj(p) || !Object.keys(p).length) { r(`${path}.pact`, 'pact ต้องเป็น object ที่มี luck หรือ survive'); continue; }
+        for (const k of Object.keys(p)) if (!['luck', 'survive'].includes(k)) r(`${path}.pact.${k}`, `pact ไม่รู้จัก "${k}" (มีแค่ luck · survive)`);
+        if (p.luck !== undefined && !(isInt(p.luck) && p.luck >= 1 && p.luck <= PACT.maxYears)) r(`${path}.pact.luck`, `luck ต้องเป็นจำนวนปี 1–${PACT.maxYears} ได้ ${p.luck}`);
+        if (p.survive !== undefined && p.survive !== true) r(`${path}.pact.survive`, 'survive ใส่ได้แค่ true');
+        if (p.survive === true) survive++;
+        // ราคาต้องจ่ายตอนเซ็น — บาปใน outcome เป็นแค่ความเสี่ยง ไม่นับ
+        if (!list(c.merit).some((m) => meritCat(m?.cat)?.id === 'mara_pact' && m.level === 3)) r(`${path}.merit`, 'ตัวเลือกที่มี pact ต้องมี {cat: mara_pact, level: 3}');
+      }
+      if (survive > 1) r('.choices', `survive อยู่ ${survive} ตัวเลือก ได้ไม่เกิน 1 ต่อการ์ด`);
     },
   },
   {

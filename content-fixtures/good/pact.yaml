@@ -1,0 +1,13 @@
+# สัญญากับมาร (B156): ยืมโชคเป็นปี · โชค+รอดตายในตัวเลือกเดียว · ยืมเงินเป็นเนื้อหาล้วนไม่ต้องมี pact · ราคา mara_pact ระดับ 3 ติดตัวเลือก (ชื่อไทยก็ได้)
+events:
+  - id: good_pact_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "คืนหนึ่งมีเสียงกระซิบเสนอข้อแลกเปลี่ยน"
+    choices:
+      - {text: "ขอโชค", hint: "ราคา: บาปหนักมาก", pact: {luck: 10}, merit: [{cat: mara_pact, level: 3}]}
+      - {text: "ขอทั้งโชคและชีวิต", pact: {luck: 1, survive: true}, merit: [{cat: สัญญากับมาร, level: 3}, {cat: greed_harm, level: 1}]}
+      - {text: "ขอเงิน", effects: {happiness: 1}, merit: [{cat: mara_pact, level: 3}]}
+      - {text: "ปิดหูไม่ฟัง", merit: [{cat: sila, level: 1}]}

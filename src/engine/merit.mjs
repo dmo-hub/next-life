@@ -28,19 +28,21 @@ export const MERIT_WEIGHTS = {
   forbidden_knowledge: 0.5,
   // ดื่มยาต่ออายุเกินที่ร่างกายรับ (B68k) — กลไกเกมตั้งเอง เบาเท่าหมวดเกมอื่น
   against_nature: 0.5,
+  // สัญญากับมาร (B156) — กลไกเกมตั้งเอง ความหนักมาจากระดับ 3 + ไม่จางข้ามชาติ (FULL_CARRY ใน afterlife) ไม่ใช่น้ำหนักหมวด
+  mara_pact: 0.5,
 };
-export const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'vow_broken', 'kill_for_gain', 'cheat_exploit', 'forbidden_knowledge', 'against_nature'];
+export const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'vow_broken', 'kill_for_gain', 'cheat_exploit', 'forbidden_knowledge', 'against_nature', 'mara_pact'];
 export const FLAG_CATS = ['vow_broken'];
-export const GAME_CATS = ['vow_broken', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge', 'against_nature'];
-// หมวดที่ใช้เฉพาะต่างโลก — ไม่นับเป็นบาปตามคติพระมาลัยที่หน้าเว็บอ้าง
-export const ISEKAI_CATS = ['kill_for_gain', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge', 'against_nature'];
+export const GAME_CATS = ['vow_broken', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge', 'against_nature', 'mara_pact'];
+// หมวดที่ไม่นับเป็นบาปตามคติพระมาลัยที่หน้าเว็บอ้าง (ส่วนใหญ่ใช้เฉพาะต่างโลก · mara_pact ใช้ได้ทั้งสองโลก)
+export const ISEKAI_CATS = ['kill_for_gain', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge', 'against_nature', 'mara_pact'];
 // ชื่อไทยที่เนื้อหาใช้แทน id ได้ (ใบ 12 เขียนหมวดเป็นไทย) — ต้องตรงกับ vocab ของด่าน build
 const TH = {
   โลภจนเบียดเบียน: 'greed_harm', รบกวนนักบวช: 'disturb_monk', ด่าตีพ่อแม่ผู้ใหญ่: 'abuse_elders', ตัดสินไม่เป็นธรรม: 'unjust_judgment',
   ผิดเมียผู้อื่น: 'adultery', เสน่ห์ยาแฝด: 'love_charm', กดขี่ผู้ใต้ปกครอง: 'oppress_subjects', ดื่มสุรา: 'intoxicants', บนแล้วไม่แก้: 'vow_broken',
   ทาน: 'dana', ศีล: 'sila', ภาวนา: 'bhavana', ดูแลพ่อแม่: 'care_parents', ช่วยคน: 'help_others', กลาง: 'neutral',
   ฆ่าเพื่อแต้ม: 'kill_for_gain', ใช้สกิลโกงเอาเปรียบ: 'cheat_exploit', รักษาสัญญาเทพธิดา: 'keep_goddess_vow',
-  ความรู้อันตราย: 'forbidden_knowledge', ฝืนธรรมชาติ: 'against_nature',
+  ความรู้อันตราย: 'forbidden_knowledge', ฝืนธรรมชาติ: 'against_nature', สัญญากับมาร: 'mara_pact',
 };
 export const meritId = (cat) => TH[cat] ?? cat;
 const TH_BY_ID = Object.fromEntries(Object.entries(TH).map(([th, id]) => [id, th]));

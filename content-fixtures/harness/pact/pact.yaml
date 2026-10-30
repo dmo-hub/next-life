@@ -1,0 +1,47 @@
+# เนื้อหาทดสอบของ B156 สัญญากับมาร — ให้ harness/pact.mjs พิสูจน์โชคยืม · รอดตายครั้งเดียว · บาปสัญญาไม่จางข้ามชาติ · อยู่นอก content/ จึงไม่เข้าเกม
+# ใบเสนอสัญญาอายุ 20 · ใบวัดโชคอายุ 25 (ในช่วงสัญญา 10 ปี) และ 35 (พ้นช่วง) · ใบวัดมีทางสำเร็จ/พลาดเท่ากัน ไม่แตะค่าสถานะ ให้ส่วนต่างมาจากโชคยืมอย่างเดียว
+events:
+  - id: tm_pact_offer
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    at_age: 20
+    years: [2400, 2700]
+    text: "คืนหนึ่งมีเสียงกระซิบข้างหูเสนอข้อแลกเปลี่ยน"
+    choices:
+      - {label: ขอโชคดีสิบปี, hint: "ราคา: บาปหนักมาก", pact: {luck: 10}, merit: [{cat: mara_pact, level: 3}]}
+      - {label: ขอรอดจากความตายครั้งหนึ่ง, hint: "ราคา: บาปหนักมาก", pact: {survive: true}, merit: [{cat: mara_pact, level: 3}]}
+      - {label: ขอเงินก้อนหนึ่ง, hint: "ราคา: บาปหนักมาก", merit: [{cat: mara_pact, level: 3}]}
+      - {label: ปิดหูไม่ฟัง, merit: [{cat: neutral}]}
+  - id: tm_pact_probe_in
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    at_age: 25
+    years: [2400, 2700]
+    text: "มีงานเสี่ยงดวงเข้ามาให้ลองทำ"
+    choices:
+      - label: ลองดู
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "งานออกมาดีเกินคาด"}
+          - {weight: 1, text: "งานไม่เป็นอย่างที่หวัง"}
+      - {label: ไม่ลอง, merit: [{cat: neutral}]}
+      - {label: ให้คนอื่นทำแทน, merit: [{cat: neutral}]}
+      - {label: รอดูก่อน, merit: [{cat: neutral}]}
+  - id: tm_pact_probe_out
+    type: A
+    category: society
+    stage: ทำงาน
+    at_age: 35
+    years: [2400, 2700]
+    text: "มีงานเสี่ยงดวงเข้ามาให้ลองทำอีกครั้ง"
+    choices:
+      - label: ลองดู
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "งานออกมาดีเกินคาด"}
+          - {weight: 1, text: "งานไม่เป็นอย่างที่หวัง"}
+      - {label: ไม่ลอง, merit: [{cat: neutral}]}
+      - {label: ให้คนอื่นทำแทน, merit: [{cat: neutral}]}
+      - {label: รอดูก่อน, merit: [{cat: neutral}]}

@@ -1,0 +1,57 @@
+# ผิดกติกาเดียว pact-shape แต่ละใบผิดคนละข้อ: คีย์นอกรายการ · luck เกินเพดาน · survive ไม่ใช่ true · ไม่จ่าย mara_pact ระดับ 3 · survive สองตัวเลือก
+events:
+  - id: bad_pact_key_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "เสียงหนึ่งเสนอเงินก้อนใหญ่ให้แลกกับชื่อ"
+    choices:
+      - {text: "รับเงิน", pact: {money: 1}, merit: [{cat: mara_pact, level: 3}]}
+      - {text: "ไม่รับ", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 3", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 4", merit: [{cat: neutral}]}
+  - id: bad_pact_luck_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "เสียงหนึ่งเสนอโชคให้ยาวนาน"
+    choices:
+      - {text: "รับโชค", pact: {luck: 30}, merit: [{cat: mara_pact, level: 3}]}
+      - {text: "ไม่รับ", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 3", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 4", merit: [{cat: neutral}]}
+  - id: bad_pact_survive_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "เสียงหนึ่งเสนอให้รอดจากความตาย"
+    choices:
+      - {text: "รับข้อเสนอ", pact: {survive: 2}, merit: [{cat: mara_pact, level: 3}]}
+      - {text: "ไม่รับ", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 3", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 4", merit: [{cat: neutral}]}
+  - id: bad_pact_price_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "เสียงหนึ่งเสนอโชคแลกของเล็กน้อย"
+    choices:
+      - {text: "รับโชค", pact: {luck: 5}, merit: [{cat: mara_pact, level: 2}]}
+      - {text: "ไม่รับ", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 3", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 4", merit: [{cat: neutral}]}
+  - id: bad_pact_twice_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "เสียงหนึ่งเสนอให้รอดจากความตายได้สองทาง"
+    choices:
+      - {text: "รับทางแรก", pact: {survive: true}, merit: [{cat: mara_pact, level: 3}]}
+      - {text: "รับทางที่สอง", pact: {survive: true}, merit: [{cat: mara_pact, level: 3}]}
+      - {text: "ไม่รับ", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 4", merit: [{cat: neutral}]}

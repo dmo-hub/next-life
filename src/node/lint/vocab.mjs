@@ -44,6 +44,8 @@ export const MERIT_CATS = [
   { id: 'forbidden_knowledge', th: 'ความรู้อันตราย', kind: 'sin' },
   // ดื่มยาต่ออายุเกินที่ร่างกายรับ (B68k)
   { id: 'against_nature', th: 'ฝืนธรรมชาติ', kind: 'sin' },
+  // ยืมโชค/รอดตายจากมาร (B156) — ตามไปทุกชาติจนชดใช้
+  { id: 'mara_pact', th: 'สัญญากับมาร', kind: 'sin' },
   { id: 'neutral', th: 'กลาง', kind: 'neutral' },
 ];
 const CAT_BY_NAME = new Map(MERIT_CATS.flatMap((c) => [[c.id, c], [c.th, c]]));
