@@ -1039,9 +1039,6 @@ export const ERA_NEWS = { merge: true };
 // news = ข่าวบ้านเมืองที่รวมมาเป็นบรรทัดนำ (B58) — การ์ดยังเป็นของเหตุการณ์ ตัวเลือก/เซฟเดินเหมือนเดิม
 function eventCard(st, ev, news = null, echoFrom = undefined) {
   pickFocus(st);
-  // ตัวเลือกที่พาเข้าสาย (ป้าย gate) ซ่อนจนประตูเปิด — การ์ดยังออกด้วยตัวเลือกที่เหลือ · ใบที่ไม่มีป้ายได้ ev เดิมทั้งก้อน
-  const open = ev.choices.filter((c) => !c.gate || [c.gate].flat().some((id) => lifeGateOpen(st, id)));
-  if (open.length !== ev.choices.length) ev = { ...ev, choices: open };
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
@@ -1067,6 +1064,9 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     fx: ev.choices.map((c) => choiceFx(st, ev, c)),
     // เหตุผลที่ตัวเลือกกดไม่ได้ (null = กดได้) — หน้าจอแสดงเทาพร้อมเหตุผล
     locked: ev.choices.map((c) => lockReason(st, c)),
+    // ตัวเลือกที่พาเข้าสาย (ป้าย gate) ซ่อนจนประตูเปิด — ล็อกไว้ด้วย (กดไม่ได้ · บอทข้าม) แต่ไม่ตัดออก
+    // เพราะ harness/เซฟ/ผลย้อนจับตัวเลือกด้วยเลขลำดับในเนื้อหา · ใบที่ไม่มีป้ายไม่มีช่องนี้
+    ...(ev.choices.some((c) => c.gate) && { hidden: ev.choices.map((c) => gateShut(st, c)) }),
     ...moneyShort(ev, st),
   });
 }
@@ -1129,6 +1129,7 @@ function familyWhy(fs) {
 // extra = เงินที่จะกู้มาเติม — ถามว่ากู้แล้วกดได้ไหม โดยไม่แตะ state
 function lockReason(st, c, extra = 0) {
   if (st.pending?.id === FUNERAL.rite && st.funeralPick && c.id !== st.funeralPick) return 'ไม่ใช่แบบที่ตกลงกัน';
+  if (gateShut(st, c)) return GATE_LOCK;
   const q = c.requires;
   if (!q) return null;
   // อายุตามกฎหมายบอกเหตุผลของตัวเอง — reason ของเนื้อหาเขียนไว้ให้เงื่อนไขอื่น (เช่น "สั่งไว้แล้ว")
@@ -1396,6 +1397,8 @@ export const lifeGateOpen = (st, id) => (st.focusYears?.[id] ?? 0) >= (st.conten
 export const lifeGatesOpen = (st) => Object.entries(lifeFocusDefs(st)).filter(([id, d]) => d.group === 'gate' && lifeGateOpen(st, id)).map(([id]) => id);
 // การ์ดชวนลงสมัครตอนยังไม่มีตำแหน่ง = ประตูสายการเมือง
 export const OFFICE_GATE = 'politics_base';
+const gateShut = (st, c) => !!c.gate && ![c.gate].flat().some((id) => lifeGateOpen(st, id));
+const GATE_LOCK = 'ยังไม่เคยทุ่มเทกับทางนี้';
 function lifeFocusMul(st, e) {
   if (!st.focus) return 1;
   return focusCardMul(lifeFocusDefs(st)[st.focus], [e.category, ...(e.focus ?? [])], st.content.focus.card_mul);

@@ -38,6 +38,8 @@ for (let i = 0; i < n; i++) {
     if (card.id) inc(r.picks, `${card.id}#${idx}`);
     return idx;
   };
+  // ตัวห่อนับตัวเลือกต้องพานโยบายโฟกัสของบอทไปด้วย — ไม่งั้นด่านนี้ไม่มีชีวิตไหนเปิดประตูเข้าสาย (โฟกัสใบ 04)
+  choose.focus = pick.focus;
   const onCard = (card, st) => {
     for (const k of STAT_KEYS) if (!(st[k] >= 0 && st[k] <= 100)) r.statBad++;
     if (!Number.isFinite(st.money)) r.statBad++;

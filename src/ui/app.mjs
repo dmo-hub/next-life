@@ -1597,6 +1597,8 @@ function render(card) {
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
       const free = freeChoices(card);
       card.choices.forEach((c, i) => {
+        // ตัวเลือกประตูเข้าสายที่ยังไม่เปิด (โฟกัสใบ 04) ไม่บอกว่ามีอยู่ — ต่างจากตัวที่ล็อกด้วยเงิน/ค่าสถานะ
+        if (card.hidden?.[i]) return;
         const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
         const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);

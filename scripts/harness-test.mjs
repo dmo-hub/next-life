@@ -165,7 +165,7 @@ const f2 = (v) => v.toFixed(2);
   check('B159 ถือธงตรง = การ์ดออก ป้าย [{flag, tier}] เฉพาะใบนั้น', smoker.probe.length > 0 && smoker.keyed.length === smoker.probe.length && JSON.stringify(smoker.probe[0].parentFrom) === '[{"flag":"smoker","tier":1}]');
 }
 
-// ประตูเข้าสาย (โฟกัสใบ 04): ตัวเลือกติดป้าย gate ซ่อนจนประตูเปิด · ประตูเปิดจากโฟกัสครบ chain_years · ทายาท · ธงชวน
+// ประตูเข้าสาย (โฟกัสใบ 04): ตัวเลือกติดป้าย gate ซ่อน (hidden + locked) จนประตูเปิด — ไม่ตัดออก เลขลำดับจึงตรงเนื้อหา · ประตูเปิดจากโฟกัสครบ chain_years · ทายาท · ธงชวน
 // การ์ดชวนลงสมัครตอนยังไม่มีตำแหน่ง = ประตูการเมือง · บอทมีนโยบายโฟกัส ~1/3 ตามน้ำ
 {
   const base = loadContent();
@@ -175,11 +175,12 @@ const f2 = (v) => v.toFixed(2);
     { id: 'open', text: 'เปิดกิจการ', gate: 'business', merit: [{ cat: 'neutral' }] }, ...[1, 2, 3].map((i) => ({ id: `n${i}`, text: `อื่น ${i}`, merit: [{ cat: 'neutral' }] })),
   ] };
   const content = { ...base, events: [...base.events, probe] };
+  const visible = (c) => c.choices.filter((_, i) => !c.hidden?.[i]).length;
   const seen = (prep) => {
     const st = newLife(11, content);
     prep(st);
     let n = null;
-    playLife(11, content, (card) => (card.id === 'gate_probe' ? card.choices.length - 1 : random(card, makeRng(1))), (c) => { if (c.id === 'gate_probe') n = c.choices.length; }, st);
+    playLife(11, content, (card) => (card.id === 'gate_probe' ? card.choices.length - 1 : random(card, makeRng(1))), (c) => { if (c.id === 'gate_probe') n = visible(c) + (c.hidden?.some((h, i) => h && !c.locked?.[i]) ? 100 : 0); }, st);
     return n;
   };
   check('ใบ 04 ประตูปิด = ตัวเลือกติดประตูไม่ขึ้น (การ์ดยังออก 3 ตัวเลือก)', seen(() => {}) === 3, `${seen(() => {})}`);
@@ -199,9 +200,10 @@ const f2 = (v) => v.toFixed(2);
       st0 = s;
       const ev = c.kind === 'event' && byId.get(c.id);
       if (ev && ev.choices.some((x) => x.gate)) {
-        const want = ev.choices.filter((x) => !x.gate || [x.gate].flat().some((id) => lifeGateOpen(s, id))).length;
-        if (c.choices.length !== want) wrong++;
-        if (botFlows(s)) { flowGatedCards++; flowGateChoices += c.choices.length - ev.choices.filter((x) => !x.gate).length; }
+        // ตัวเลือกครบตามเนื้อหา (ลำดับไม่เลื่อน) · ซ่อน = ล็อกด้วยเสมอ · ซ่อนตรงสถานะประตู
+        const shut = ev.choices.map((x) => !!x.gate && ![x.gate].flat().some((id) => lifeGateOpen(s, id)));
+        if (c.choices.length !== ev.choices.length || shut.some((h, k) => h !== !!c.hidden?.[k] || (h && !c.locked?.[k]))) wrong++;
+        if (botFlows(s)) { flowGatedCards++; flowGateChoices += ev.choices.filter((x, k) => x.gate && !c.hidden?.[k]).length; }
       }
       if (/^office_/.test(c.id ?? '') && !s.office) { invites++; if (!lifeGateOpen(s, OFFICE_GATE)) invitesClosed++; }
       if (c.id === 'biz_politics_invite_01') invited = true;
@@ -210,7 +212,7 @@ const f2 = (v) => v.toFixed(2);
     if (st.flags.own_business && !(st.focusYears?.politics_base)) { bizLives++; if (invited) bizInvite++; }
     if ((st.focusYears?.politics_base ?? 0) >= base.focus.chain_years) { polFocus++; if ((st.officeTop ?? -1) >= 0) polOffice++; }
   }
-  check('ใบ 04 ตัวเลือกบนการ์ดติดป้าย = ตามสถานะประตู (ทั้งกอง)', wrong === 0, `ไม่ตรง ${wrong}`);
+  check('ใบ 04 ตัวเลือกบนการ์ดติดป้าย: ครบตามเนื้อหา · ซ่อน+ล็อกตรงสถานะประตู (ทั้งกอง)', wrong === 0, `ไม่ตรง ${wrong}`);
   check('ใบ 04 การ์ดชวนลงสมัครออกเฉพาะประตูการเมืองเปิด', invitesClosed === 0 && invites > 0, `ชวน ${invites} · ประตูปิดแต่ออก ${invitesClosed}`);
   const share = flowLives / N;
   check('ใบ 04 บอทตามน้ำราว 1/3', Math.abs(share - FOCUS_FLOW_SHARE) < 0.05, `${(share * 100).toFixed(1)}%`);

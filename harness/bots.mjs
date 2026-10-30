@@ -87,7 +87,9 @@ export const passive = (card, rng, h) => (h.pending?.alloc || !card.fx ? random(
 export const FOCUS_FLOW_SHARE = 1 / 3;
 const FOCUS_SALT = 0x3c6ef372;
 const focusMemo = new WeakMap();
-export function botFocus(st) {
+// key = ค่าเด่นที่บอทตัวนั้นดัน (ไม่ส่ง = ค่าสถานะที่สูงสุดตอนนั้น) · บอทสายเงินดันเงิน — ไม่งั้นโฟกัสที่ผลมีแต่เงิน (ทำธุรกิจ · ทางลัด) ไม่มีบอทไหนเลือก
+// ประตูธุรกิจ/ทางลัดจึงไม่เคยเปิด ตัวเลือกหลังประตูกับการ์ดตามมาไม่มีใครถึงเลยในด่าน full
+export function botFocus(st, key) {
   let m = focusMemo.get(st);
   if (!m) {
     const rng = makeRng(mixSeed(st.seed ^ FOCUS_SALT, st.gen ?? 1));
@@ -101,13 +103,13 @@ export function botFocus(st) {
   m.stage = s;
   if (!offers.length) return;
   const defs = lifeFocusDefs(st);
-  const top = STAT_KEYS.reduce((a, k) => (st[k] > st[a] ? k : a));
+  const top = key ?? STAT_KEYS.reduce((a, k) => (st[k] > st[a] ? k : a));
   const fit = offers.filter((id) => defs[id].fx?.[top] > 0);
   const from = fit.length ? fit : offers;
   setLifeFocus(st, from[Math.floor(m.rng.next() * from.length)]);
 }
 export const botFlows = (st) => !!focusMemo.get(st)?.flow;
-const withFocus = (bot) => Object.assign((...a) => bot(...a), bot, { focus: botFocus });
+const withFocus = (bot, key) => Object.assign((...a) => bot(...a), bot, { focus: (st) => botFocus(st, key) });
 
 const RAW_BOTS = {
   สุ่ม: random,
@@ -118,4 +120,5 @@ const RAW_BOTS = {
   สายครอบครัว: labelBot({ relations: 3, happiness: 1 }),
   สายสุขภาพ: labelBot({ health: 3, happiness: 1 }),
 };
-export const BOTS = Object.fromEntries(Object.entries(RAW_BOTS).map(([k, b]) => [k, withFocus(b)]));
+const FOCUS_KEY = { สายเงิน: 'money' };
+export const BOTS = Object.fromEntries(Object.entries(RAW_BOTS).map(([k, b]) => [k, withFocus(b, FOCUS_KEY[k])]));
