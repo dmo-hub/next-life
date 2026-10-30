@@ -22,6 +22,7 @@
     "density": "node harness/density.mjs --n 2000 --seed 1",
     "repeat": "node harness/repeat.mjs --n 2000 --seed 1",
     "passive": "node harness/passive.mjs --n 2000 --seed 1",
+    "keep": "node harness/keep.mjs",
     "continuity": "node harness/continuity.mjs --n 4000 --seed 1 --min-next 80 --min-echo 28",
     "full": "node harness/full.mjs --n 20000 --seed 1",
     "full:release": "node harness/full.mjs --release --seed 1",
