@@ -176,3 +176,334 @@ events:
         text: "อัดเสียงไว้ เก็บเป็นหลักฐาน"
         merit: [{cat: neutral}]
         effects: {knowledge: 1, happiness: -1}
+
+  # ราชการ — ใบเบิกล่วงเวลาที่ไม่ได้ทำ
+  - id: first_gov_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    first_of: gov
+    title: "ใบเบิกล่วงเวลา"
+    text: "สิ้นเดือนแรกที่บรรจุ หัวหน้าฝ่ายส่งใบเบิกค่าล่วงเวลามาให้เซ็น ชื่อคุณอยู่ครบทุกเสาร์อาทิตย์ทั้งที่ไม่เคยมา ทุกคนในฝ่ายเซ็นกันหมดแล้ว"
+    choices:
+      - id: sign
+        text: "เซ็นตามทุกคน"
+        hint: "ราคา: บาปหนัก"
+        sets_flags: [took_bribe, desk_bent]
+        schedules: [{event: echo_gov_audit_01, after_years: [6, 14]}]
+        merit: [{cat: cheat_exploit, level: 2}]
+        outcomes:
+          - {weight: 3, ok: true, text: "เงินเดือนเดือนแรกหนากว่าที่คิด หัวหน้าบอกว่าเด็กใหม่คนนี้เข้าใจระบบ", effects: {network: 2, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดือนต่อมาหัวหน้าให้คุณเป็นคนทำใบเบิกแทนทั้งฝ่าย ลายมือคุณอยู่ทุกแผ่น", effects: {happiness: -2, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+      - id: strike_out
+        text: "ขีดชื่อตัวเองออก"
+        sets_flags: [desk_clean]
+        schedules: [{event: echo_gov_trusted_01, after_years: [6, 14]}]
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้อำนวยการเห็นใบเบิกที่มีรอยขีด เรียกไปถามแล้วจำชื่อคุณได้", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทั้งฝ่ายต้องทำใบใหม่ งานเอกสารที่ไม่มีใครอยากทำตกมาที่โต๊ะคุณทั้งปี", effects: {relations: -2, happiness: -2}, merit: [{cat: neutral}]}
+      - id: work_it
+        text: "เซ็น แล้วมาทำงานจริงทุกเสาร์"
+        hint: "ราคา: บาปเบา"
+        merit: [{cat: cheat_exploit, level: 1}]
+        effects: {knowledge: 1, health: -1, happiness: -1}
+      - id: ask_rule
+        text: "ถามว่าระเบียบเขียนไว้ยังไง"
+        merit: [{cat: neutral}]
+        effects: {knowledge: 1, network: -1}
+
+  # ← first_gov_01 "เซ็นตามทุกคน"
+  - id: echo_gov_audit_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {ladder: [gov]}
+    title: "ตรวจย้อนหลังสิบปี"
+    text: "ผู้ตรวจเงินแผ่นดินขอใบเบิกล่วงเวลาย้อนหลังสิบปีของกรม ใบแรกที่หยิบขึ้นมามีลายเซ็นคุณ วันเสาร์ที่คุณไปงานแต่งเพื่อนต่างจังหวัด"
+    choices:
+      - id: repay
+        text: "ยอมรับ คืนเงินทั้งหมด"
+        clears_flags: [desk_bent]
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คืนเงินพร้อมดอกเบี้ย ถูกตัดเงินเดือนแต่ยังรับราชการต่อ", effects: {money: {unit: income_x, amount: -1}, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถูกตั้งกรรมการสอบวินัยร้ายแรง ให้ออกจากราชการ", effects: {job: labor, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: blame_boss
+        text: "บอกว่าหัวหน้าสั่ง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ลายมือในใบเบิกเป็นของหัวหน้าเก่า คุณโดนแค่ภาคทัณฑ์", effects: {network: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าเก่าเกษียณไปแล้ว ความผิดตกที่คนที่ยังอยู่", effects: {income_mult: 0.85, happiness: -2}, merit: [{cat: neutral}]}
+      - id: fix_papers
+        text: "ทำบันทึกการทำงานย้อนหลัง"
+        hint: "ราคา: บาปหนัก"
+        merit: [{cat: cheat_exploit, level: 2}]
+        outcomes:
+          - {weight: 2, ok: true, text: "บันทึกย้อนหลังผ่านตาผู้ตรวจ เรื่องจบที่หนังสือเตือน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รูปงานแต่งวันนั้นอยู่ในโซเชียลของเพื่อน เอกสารปลอมกลายเป็นความผิดอีกกระทง", effects: {job: labor, happiness: -3, relations: -1}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: keep_quiet
+        text: "นิ่งไว้ รอให้เรื่องเงียบ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ตรวจได้คนผิดครบแล้วก่อนถึงชื่อคุณ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชื่อคุณอยู่ในรายงานฉบับสุดท้าย ถูกเรียกเงินคืนพร้อมเบี้ยปรับ", effects: {money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+
+  # ← first_gov_01 "ขีดชื่อตัวเองออก"
+  - id: echo_gov_trusted_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {ladder: [gov]}
+    title: "คนที่ขีดชื่อออก"
+    text: "ผู้อำนวยการคนใหม่ยังจำเรื่องใบเบิกที่มีรอยขีดเมื่อหลายปีก่อนได้ เรียกคุณไปคุมงบจัดซื้อทั้งกอง บอกว่าต้องการคนที่ไม่ยอมเซ็นอะไรง่าย ๆ"
+    choices:
+      - id: take_job
+        text: "รับงาน คุมเข้ม"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "งบปีนั้นเหลือคืนคลังเป็นครั้งแรก ชื่อคุณขึ้นบัญชีเลื่อนขั้นพิเศษ", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้รับเหมาเจ้าประจำร้องเรียนว่าคุณกลั่นแกล้ง ต้องชี้แจงอยู่ครึ่งปี", effects: {happiness: -2, network: -1}, merit: [{cat: neutral}]}
+      - id: decline
+        text: "ขอทำงานเดิมต่อ"
+        merit: [{cat: neutral}]
+        effects: {happiness: 1}
+      - id: share_load
+        text: "รับ แต่ขอกรรมการร่วมสามคน"
+        merit: [{cat: neutral}]
+        effects: {relations: 1, knowledge: 1}
+      - id: soft_hand
+        text: "รับ แล้วผ่อนให้เจ้าประจำ"
+        hint: "ราคา: บาปหนัก"
+        clears_flags: [desk_clean]
+        sets_flags: [took_bribe]
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ทุกอย่างราบรื่น ของขวัญปีใหม่จากผู้รับเหมาส่งมาถึงบ้าน", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้อำนวยการเห็นราคากลางที่ขยับ เรียกคืนงานแล้วไม่พูดกับคุณอีก", effects: {network: -2, happiness: -2}, merit: [{cat: neutral}]}
+
+  - id: gov_bent_turn_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 8
+    when: {ladder: [gov], flags: {has: [desk_bent]}}
+    title: "ใบเบิกปีนี้"
+    text: "ข้าราชการบรรจุใหม่ถือใบเบิกล่วงเวลามาถามคุณว่าต้องเซ็นจริงเหรอ ชื่อเขาอยู่ครบทุกเสาร์ทั้งที่เพิ่งมาได้สองสัปดาห์"
+    choices:
+      - id: say_sign
+        text: "บอกให้เซ็นไป"
+        hint: "ราคา: บาปหนัก"
+        merit: [{cat: cheat_exploit, level: 2}]
+        effects: {network: 1}
+      - id: say_strike
+        text: "บอกให้ขีดออก ขีดของตัวเองด้วย"
+        clears_flags: [desk_bent]
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝ่ายอื่นขีดตาม ใบเบิกเดือนนั้นเหลือแค่ชั่วโมงที่ทำจริง", effects: {income_mult: 0.9, happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าฝ่ายย้ายคุณไปห้องเก็บเอกสาร", effects: {income_mult: 0.9, network: -2}, merit: [{cat: neutral}]}
+      - id: shrug
+        text: "บอกว่าแล้วแต่เขา"
+        merit: [{cat: neutral}]
+        effects: {happiness: -1}
+      - id: tell_story
+        text: "เล่าเรื่องตัวเองให้ฟัง"
+        merit: [{cat: help_others, level: 1}]
+        effects: {relations: 1, happiness: 1}
+
+  - id: gov_clean_tempt_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 8
+    when: {ladder: [gov], flags: {has: [desk_clean]}}
+    title: "ทุนดูงานต่างประเทศ"
+    text: "หัวหน้ากองเสนอชื่อคุณไปดูงานต่างประเทศสองสัปดาห์ งบมาจากบริษัทที่กำลังยื่นประมูล รายการดูงานมีแต่ห้างกับทะเล"
+    choices:
+      - id: go
+        text: "ไปดูงาน"
+        hint: "ราคา: บาปเบา"
+        clears_flags: [desk_clean]
+        merit: [{cat: greed_harm, level: 1}]
+        effects: {happiness: 2, network: 1}
+      - id: refuse
+        text: "ขอสละสิทธิ์"
+        merit: [{cat: sila, level: 1}]
+        effects: {network: -1, happiness: 1}
+      - id: pay_own
+        text: "ไป แต่จ่ายค่าเดินทางเอง"
+        merit: [{cat: neutral}]
+        effects: {money: {unit: income_x, amount: -0.5}, knowledge: 1}
+      - id: report
+        text: "ทำหนังสือถามฝ่ายกฎหมาย"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝ่ายกฎหมายตีกลับ ทริปถูกยกเลิกทั้งคณะ", effects: {knowledge: 1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หนังสือเงียบหาย ชื่อคุณหายจากรายชื่อดูงานทุกรายการหลังจากนั้น", effects: {network: -2}, merit: [{cat: neutral}]}
+
+  # ทหาร — พลทหารรับใช้
+  - id: first_army_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    first_of: army
+    title: "พลทหารประจำตัว"
+    text: "ติดยศได้ไม่ถึงเดือน หน่วยส่งพลทหารมาให้หนึ่งคน บอกว่าไว้ล้างรถ ซักผ้า ไปรับส่งของที่บ้าน นายทุกคนก็มี"
+    choices:
+      - id: use_him
+        text: "ใช้งานตามธรรมเนียม"
+        hint: "ราคา: บาปหนัก"
+        sets_flags: [rank_bent]
+        schedules: [{event: echo_army_complaint_01, after_years: [6, 14]}]
+        merit: [{cat: oppress_subjects, level: 2}]
+        outcomes:
+          - {weight: 3, ok: true, text: "งานบ้านเสร็จทุกวัน รุ่นพี่ชวนไปตีกอล์ฟเพราะมีเวลาว่าง", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พลทหารหนีหน่วยกลางดึก ผู้บังคับกองพันเรียกไปถามว่าดูแลยังไง", effects: {network: -1, happiness: -2}, merit: [{cat: neutral}]}
+      - id: send_back
+        text: "ส่งกลับไปฝึกตามหน้าที่"
+        sets_flags: [rank_clean]
+        schedules: [{event: echo_army_visit_01, after_years: [6, 14]}]
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้บังคับกองพันชมในที่ประชุมว่ากำลังพลต้องอยู่ที่หน่วย", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "รุ่นพี่ว่าคุณทำให้คนอื่นดูไม่ดี ไม่มีใครชวนไปไหนทั้งปี", effects: {relations: -2, network: -1}, merit: [{cat: neutral}]}
+      - id: pay_him
+        text: "ให้ช่วยงาน แต่จ่ายค่าแรงเอง"
+        hint: "ราคา: บาปเบา"
+        merit: [{cat: oppress_subjects, level: 1}, {cat: dana, level: 1}]
+        effects: {money: {unit: income_x, amount: -0.2}, relations: 1}
+      - id: teach_him
+        text: "ให้มาช่วยงานในหน่วยแทน"
+        merit: [{cat: neutral}]
+        effects: {knowledge: 1, happiness: 1}
+
+  # ← first_army_01 "ใช้งานตามธรรมเนียม"
+  - id: echo_army_complaint_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {ladder: [army]}
+    title: "จดหมายร้องเรียนฉบับเก่า"
+    text: "อดีตพลทหารคนที่เคยล้างรถให้คุณยื่นเรื่องต่อกรรมาธิการ เล่าทุกงานที่ทำให้ที่บ้านนายตลอดสองปี ชื่อคุณอยู่บรรทัดแรก"
+    choices:
+      - id: apologize
+        text: "ไปขอโทษเขาต่อหน้า"
+        clears_flags: [rank_bent]
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เขารับคำขอโทษ ถอนเรื่องเหลือแค่บันทึกในแฟ้ม", effects: {happiness: 1, network: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาไม่ยอมเจอ เรื่องเดินต่อจนคุณพลาดการเลื่อนยศปีนั้น", effects: {income_mult: 0.9, happiness: -2}, merit: [{cat: neutral}]}
+      - id: say_custom
+        text: "ชี้แจงว่าใคร ๆ ก็ทำ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "กรรมาธิการได้คำตอบเดียวกันจากทุกหน่วย เรื่องเงียบไป", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คำชี้แจงของคุณถูกยกไปลงข่าวเป็นตัวอย่าง", effects: {relations: -2, network: -2}, merit: [{cat: neutral}]}
+      - id: lean_on
+        text: "ส่งคนไปคุยให้เขาถอนเรื่อง"
+        hint: "ราคา: บาปหนัก"
+        merit: [{cat: oppress_subjects, level: 2}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เรื่องถูกถอนในสัปดาห์เดียว ไม่มีใครพูดถึงอีก", effects: {network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาอัดเสียงคนที่ไปคุยไว้ เรื่องใหญ่กว่าเดิมจนถูกสั่งพักราชการ", effects: {income_mult: 0.85, happiness: -3}, merit: [{cat: neutral}]}
+      - id: let_it_run
+        text: "ปล่อยให้สอบไปตามขั้นตอน"
+        merit: [{cat: neutral}]
+        effects: {happiness: -2, knowledge: 1}
+
+  # ← first_army_01 "ส่งกลับไปฝึกตามหน้าที่"
+  - id: echo_army_visit_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {ladder: [army]}
+    title: "พลทหารคนนั้น"
+    text: "ชายที่เคยเป็นพลทหารประจำตัวคุณได้ไม่ถึงวัน เปิดอู่ซ่อมรถอยู่หน้าค่าย เห็นรถคุณจอดหน้าร้านก็วิ่งออกมาทักก่อน บอกว่าวันนั้นเขาได้กลับไปฝึกจนติดหน่วยรบพิเศษ"
+    choices:
+      - id: catch_up
+        text: "นั่งคุยจนค่ำ"
+        merit: [{cat: neutral}]
+        effects: {relations: 2, happiness: 2}
+      - id: pay_full
+        text: "ให้ซ่อมรถ จ่ายเต็มราคา"
+        merit: [{cat: dana, level: 1}]
+        effects: {money: {unit: income_x, amount: -0.1}, relations: 1}
+      - id: recommend
+        text: "แนะนำงานซ่อมรถของหน่วยให้"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "อู่ได้งานรถของหน่วยทั้งค่าย เขาไม่ยอมเก็บเงินค่าซ่อมรถคุณอีกเลย", effects: {network: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนในหน่วยลือว่าคุณรับส่วนแบ่งจากอู่ ต้องชี้แจงจนเรื่องจบ", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+      - id: nod
+        text: "พยักหน้าทัก แล้วขับต่อ"
+        merit: [{cat: neutral}]
+        effects: {happiness: -1}
+
+  - id: army_bent_turn_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 8
+    when: {ladder: [army], flags: {has: [rank_bent]}}
+    title: "นายทหารใหม่ในหน่วย"
+    text: "ร้อยตรีจบใหม่มาขอคำแนะนำ พลทหารที่หน่วยส่งให้เขาเพิ่งร้องไห้ว่าคิดถึงบ้าน เขาถามว่าควรให้ไปล้างรถที่บ้านแบบที่คุณเคยทำไหม"
+    choices:
+      - id: say_yes
+        text: "บอกว่าทุกคนก็ใช้"
+        hint: "ราคา: บาปหนัก"
+        merit: [{cat: oppress_subjects, level: 2}]
+        effects: {network: 1}
+      - id: say_no
+        text: "บอกให้ส่งกลับ ส่งของตัวเองด้วย"
+        clears_flags: [rank_bent]
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "นายทหารอีกสองคนในกองร้อยส่งตาม บ้านพักเงียบลง หน่วยฝึกครบกำลัง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รุ่นพี่ที่ยังใช้พลทหารอยู่มองคุณไม่ดี งานพิเศษไม่ถึงมือคุณอีก", effects: {network: -2, happiness: -1}, merit: [{cat: neutral}]}
+      - id: no_answer
+        text: "บอกว่าคิดเอาเอง"
+        merit: [{cat: neutral}]
+        effects: {happiness: -1}
+      - id: let_him_call
+        text: "ให้พลทหารยืมโทรศัพท์โทรกลับบ้าน"
+        merit: [{cat: help_others, level: 1}]
+        effects: {relations: 1, happiness: 1}
+
+  - id: army_clean_tempt_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 8
+    when: {ladder: [army], flags: {has: [rank_clean]}}
+    title: "บ้านพักหลังใหญ่"
+    text: "เลื่อนยศแล้วได้บ้านพักหลังใหญ่ สนามหญ้ากว้างจนตัดเองไม่ไหว หน่วยเสนอพลทหารให้สองคน บอกว่าแค่ตัดหญ้าสัปดาห์ละครั้ง"
+    choices:
+      - id: accept
+        text: "รับไว้ แค่ตัดหญ้า"
+        hint: "ราคา: บาปเบา"
+        clears_flags: [rank_clean]
+        merit: [{cat: oppress_subjects, level: 1}]
+        effects: {happiness: 1, network: 1}
+      - id: hire
+        text: "จ้างคนแถวค่ายตัดเอง"
+        merit: [{cat: neutral}]
+        effects: {money: {unit: income_x, amount: -0.2}, relations: 1}
+      - id: own_hands
+        text: "ตัดเองทุกเย็น"
+        merit: [{cat: neutral}]
+        effects: {health: 1, happiness: -1}
+      - id: give_garden
+        text: "ให้ชาวบ้านมาปลูกผักแทน"
+        merit: [{cat: help_others, level: 1}]
+        effects: {relations: 2}

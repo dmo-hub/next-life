@@ -45,7 +45,7 @@ events:
     years: [2500, 2650]
     weight: 3
     when: {ladder: [army], age: [33, 59]}
-    multipliers: {rank: 1.3}
+    multipliers: {rank: 1.3, flags: {rank_bent: 2, rank_clean: 0.5}}
     title: "พลทหารประจำบ้าน"
     text: "หน่วยส่งพลทหารเกณฑ์สองคนมาประจำบ้านพัก ภรรยานายคนก่อนใช้ให้ซักผ้า ล้างรถ ไปส่งลูกนายที่โรงเรียนจนเป็นเรื่องปกติ"
     choices:
@@ -243,7 +243,7 @@ events:
     years: [2500, 2650]
     weight: 3
     when: {ladder: [gov], age: [31, 59]}
-    multipliers: {rank: 1.2}
+    multipliers: {rank: 1.2, flags: {desk_bent: 2, desk_clean: 0.5}}
     title: "งบต้องหมดก่อนสิ้นเดือนกันยา"
     text: "เหลืออีกสามสัปดาห์จะสิ้นปีงบประมาณ งบของกองยังเหลือหลายแสน ถ้าใช้ไม่หมด ปีหน้าจะถูกตัดตามที่เหลือ"
     choices:
