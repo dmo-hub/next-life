@@ -225,6 +225,8 @@ export function newLife(seed, content, heir = null) {
     retireBase: null,
     // เส้นสุขภาพของชีวิตนี้ถ้าไม่มีเหตุการณ์ใดเลย — ตัวคูณการตายวัดจากส่วนต่างกับเส้นนี้
     healthNatural: s.health,
+    // อยู่ใต้เกณฑ์เตือนแล้ว (B160) — เกิดมาใต้เกณฑ์ไม่นับว่าตก
+    lowWarned: s.health <= WARN.human,
     // บัญชีบุญบาปซ่อน — ห้ามส่งออกไปกับการ์ดหรือ statsOf
     ledger: heir?.ledger ?? newLedger(),
     // ที่มาของบัญชีชาตินี้ตามอายุ (B26) — บัญชีที่พกมาจากชาติก่อนไม่มีรายการ
@@ -461,6 +463,23 @@ function scheduleIllness(st) {
   if (!(st.causeRng.next() < ch.reduce((s, x) => s + x, 0))) return;
   st.terminal = { cause: pickCause(st.causeRng, keys, ch), age, told: false };
 }
+
+// การ์ดเตือนชีวิตใกล้หมด (B160): ตกจากเหนือเกณฑ์ลงถึงเกณฑ์ = 1 ใบ · ขึ้นเหนือเกณฑ์แล้วตกใหม่ = เตือนใหม่
+// การ์ดระบบ ไม่หักโควตากองสุ่ม · ตัวเลือกมีแค่ "ช่างมัน" จนร้าน/โฟกัสโลกหลักเข้า · ต่างโลกส่งตัวเลือกของตัวเองได้
+export const WARN = {
+  human: 20,
+  isekai: 25,
+  ignore: 'ช่างมัน',
+  text: 'ร่างกายทรุดลงจนรู้สึกได้ทุกเช้า ถ้ายังใช้ชีวิตแบบนี้ต่อไป อีกไม่นานร่างกายคงไม่ไหว',
+};
+// เซฟก่อนมีช่องนี้ไม่มี lowWarned = ถือว่ายังไม่เคยเตือน
+export function crossedLow(holder, value, line) {
+  const low = value <= line;
+  const was = holder.lowWarned ?? false;
+  holder.lowWarned = low;
+  return low && !was;
+}
+export const warnCard = (age, stage, text, choices = [WARN.ignore]) => ({ kind: 'warn', age, stage, text, choices, fx: choices.map(() => ''), locked: choices.map(() => null) });
 
 function healthCause(st) {
   const era = st.content.era;
@@ -1165,6 +1184,7 @@ export function nextCard(st) {
       card.choices = options.map((o) => o.label);
       st.pending = { alloc: options };
     }
+    if (card.kind === 'warn') st.pending = { warn: true, choices: card.choices };
     return emit(st, card);
   }
   for (;;) {
@@ -1192,6 +1212,7 @@ export function nextCard(st) {
         return queueFuneral(st) ? nextCard(st) : deathCard(st);
       }
       stepYear(st);
+      if (crossedLow(st, st.health, WARN.human)) st.due.push(warnCard(st.age, stageOf(st.age), WARN.text));
     }
     st.advance = true;
     // เฉียดตายปีนี้: ออกทริปก่อน · advance ปิดไว้ให้รอบถัดไปไม่ทอยตายซ้ำ แล้วเดินต่อจุดนี้เหมือนไม่มีทริป
@@ -1421,6 +1442,12 @@ export function choose(st, idx, loan) {
     st.queue.push({ kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: c.reply });
     return;
   }
+  if (ev?.warn) {
+    if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    st.pending = null;
+    st.log.push({ id: 'warn', age: st.age, choice: idx, text: ev.choices[idx] });
+    return;
+  }
   if (ev?.entry) {
     if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
@@ -1498,6 +1525,21 @@ export function choose(st, idx, loan) {
   if (st.needJob) {
     st.needJob = false;
     after.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
+  }
+  // ชีวิตหมดจากผลการ์ด = ตายในการ์ดนั้น (B160) ไม่รอขอบปี · การ์ดผลยังเล่าก่อน · เรื่องต่อ หางาน และการ์ดที่รอในปีนั้นไม่ออกแล้ว
+  // การ์ดงานศพเลือกหลังตายแล้ว ⇒ ไม่ตัดสินซ้ำ
+  if (!st.dead && st.health <= 0) {
+    st.dead = true;
+    st.cause = healthCause(st);
+    st.queue = after.filter((x) => x.kind === 'result');
+    st.due = [];
+    queueFuneral(st);
+    return;
+  }
+  // เตือนต่อท้ายการ์ดผลของตัวเลือกนี้ ก่อนเรื่องต่อ — เรื่องต่อที่ทำชีวิตหมดล้างคิว การ์ดเตือนที่อยู่หลังจะไม่เคยออก
+  if (!st.dead && crossedLow(st, st.health, WARN.human)) {
+    const at = after.findIndex((x) => x.kind !== 'result');
+    after.splice(at < 0 ? after.length : at, 0, warnCard(st.age, stageOf(st.age), WARN.text));
   }
   st.queue.unshift(...after);
 }
@@ -1613,6 +1655,8 @@ function tripBack(st) {
   // ใบตัดสินใจที่ถึงกำหนดทุกปี (เลื่อนขั้น ทบทวนเงิน ช่วงวัย) ซ้อนกันหลายใบ — เก็บใบล่าสุดของแต่ละเรื่อง ใบเก่าสร้างจากสถานะที่ไม่ใช่แล้ว
   const key = (c) => (c.kind === 'eraEvent' ? `e:${c.ev.id}` : ['alloc', 'stage', 'omen'].includes(c.kind) ? c.kind : null);
   st.due = st.due.filter((c, i) => !key(c) || !st.due.slice(i + 1).some((d) => key(d) === key(c))).map((c) => ({ ...c, age: st.age }));
+  // ค่าจริงจากต่างโลก + ปีที่หายไปเขียนสุขภาพนอก choose/ขอบปี — ตัดสินเกณฑ์เตือนที่สภาพตอนกลับถึงบ้าน
+  if (crossedLow(st, st.health, WARN.human)) st.due.push(warnCard(st.age, stageOf(st.age), WARN.text));
   st.away = (st.away ?? 0) + away - isk.trip.thai;
   st.advance = false;
   const when = isk.trip.thai ? `ผ่านไป ${isk.trip.thai} ปี` : 'ผ่านไปแค่ไม่กี่เดือน';
@@ -1687,7 +1731,8 @@ export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, c
     }
     // บอทคืนเลขตัวเลือก หรือ {i, loan} เมื่อกู้มาจ่าย (B111)
     if (card.choices?.length) {
-      const p = card.entry && !pickChoice.isekai ? ENTRY.decline : pickChoice(card, bot, st);
+      // การ์ดเตือนมีตัวเลือกเดียว — ไม่ดึงเลขสุ่มของบอท ⇒ ทางเลือกหลังการ์ดเตือนเท่าเดิม
+      const p = card.entry && !pickChoice.isekai ? ENTRY.decline : card.kind === 'warn' ? 0 : pickChoice(card, bot, st);
       if (typeof p === 'object') choose(st, p.i, p.loan);
       else choose(st, p);
     }
