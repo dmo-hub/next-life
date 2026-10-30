@@ -12,6 +12,7 @@ import { CHRONIC } from './death.mjs';
 import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth } from './life.mjs';
 import { ISEKAI, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
+import { warnPick } from './warn.mjs';
 
 // ระดับกรรมที่ปรโลก (−1..1) = บัญชีสุทธิ ÷ ref · ref แยกจากตัวคูณกรรมระหว่างชีวิต (KARMA.ref) เพราะบัญชีทั้งชีวิตสะสมไกลกว่า
 // จุดอิ่มของตัวคูณการตายมาก — ใช้ ref เดียวกันแล้วเกือบทุกคนชนเพดาน ภูมิกับฐานะชาติหน้าจะไม่แยกคน
@@ -482,7 +483,7 @@ export function playAfterlife(st, pickChoice, onCard) {
   for (;;) {
     const card = nextAfterCard(af);
     onCard?.(card, af);
-    if (card.choices?.length) chooseAfter(af, pickChoice(card, af.botRng, af));
+    if (card.choices?.length) chooseAfter(af, warnPick(card) >= 0 ? warnPick(card) : pickChoice(card, af.botRng, af));
     if (card.done) return af;
   }
 }

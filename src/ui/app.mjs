@@ -1873,7 +1873,7 @@ function renderAfter(card) {
 }
 
 // ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
-const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ช่วงวัยใหม่ · เลือกสิ่งที่ทุ่มเท', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก' };
+const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ช่วงวัยใหม่ · เลือกสิ่งที่ทุ่มเท', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก', warn: 'ใกล้ตาย' };
 function isekaiMeter(label, v, cls) {
   const m = el('div', 'imeter');
   const row = el('div', 'irow');
@@ -2027,7 +2027,7 @@ function renderIsekai(card) {
   top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ${where} · ${s.name}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
-  body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} · อายุ ${card.age}` : ISEKAI_KICKER[card.step]));
+  body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} · อายุ ${card.age}` : card.warn ? `${ISEKAI_KICKER.warn} · เลือกสิ่งที่ทุ่มเท` : ISEKAI_KICKER[card.step]));
   body.append(el('h3', null, card.title), el('p', null, card.text));
   if (card.step === 'result' && card.ok !== null) body.append(el('p', card.ok ? 'iok' : 'ibad', card.ok ? 'สำเร็จ' : 'พลาด'));
   const deltas = Object.entries(card.deltas ?? {});
@@ -2077,7 +2077,9 @@ function renderIsekai(card) {
   if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
-      const b = button(c, why ?? (card.step === 'focus' && i === card.current ? [card.fx?.[i], 'ทำอยู่'].filter(Boolean).join(' · ') : card.fx?.[i]), () => play(pick(i)));
+      // ใบทุ่มเทจากการ์ดเตือน (B161) ติดป้าย "ฟื้นชีวิต" ที่ทางที่ engine ชี้
+      const tags = [card.fx?.[i], card.step === 'focus' && i === card.current && 'ทำอยู่', card.step === 'focus' && i === card.suggest && 'แนะนำ · ฟื้นชีวิต'].filter(Boolean).join(' · ');
+      const b = button(c, why ?? (card.step === 'focus' ? tags : card.fx?.[i]), () => play(pick(i)));
       if (card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
       if (why) b.disabled = true;
       choices.append(b);

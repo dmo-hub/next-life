@@ -8,6 +8,7 @@
 import { makeRng, mixSeed } from './rng.mjs';
 import { newLedger, recordMerit, ledgerLevel, meritId, SIN_CATS } from './merit.mjs';
 import { hintLevel } from './court.mjs';
+import { WARN, crossedLow, warnCard } from './warn.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค' };
 export const ISEKAI_FX = { hp: 'ชีวิต', str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
@@ -242,6 +243,15 @@ export const ISEKAI_FOCUS = {
     lines: ['รับจ้างแบกของที่ท่าเรือทั้งปี', 'ทำงานที่โรงเตี๊ยมจนรู้จักลูกค้าทุกคน', 'เก็บเงินได้อีกถุงหนึ่ง'] },
   rest: { name: 'พักผ่อนอยู่บ้าน', gain: { hp: 6, joy: 6 },
     lines: ['นอนตื่นสาย จิบชาร้อนดูฝนตก', 'ปลูกผักหน้าบ้านกับเลี้ยงไก่สามตัว', 'ปีนี้ไม่ได้ทำอะไรนอกจากพักให้หายเหนื่อย'] },
+};
+
+// การ์ดเตือน HP (B161): "เปลี่ยนโฟกัส" เปิดใบทุ่มเทกลางช่วงวัยที่ชี้ทางฟื้นชีวิต · ร้านเติมทีหลัง
+export const ISEKAI_WARN = {
+  title: 'ใกล้ตาย',
+  text: 'แผลเก่ายังไม่ทันหาย แผลใหม่ก็มาซ้ำ ลุกจากที่นอนแต่ละเช้ายากขึ้นทุกวัน ถ้ายังฝืนแบบนี้ต่อ ชาตินี้คงจบเร็วกว่าที่คิด',
+  focus: 'เปลี่ยนโฟกัส',
+  rest: 'rest',
+  ask: 'ร่างกายต้องการพัก ช่วงนี้จะทุ่มเทกับอะไร',
 };
 
 // ความรู้จากโลกเดิม (B68h · เจ้าของเคาะ): 9 หมวด เริ่มศูนย์ทุกหมวด เป็นค่าซ่อนแบบ joy/wit · โตจากเหตุการณ์ของหมวด + ทางลัดทุ่มเท + อ่านตำรา
@@ -1596,6 +1606,8 @@ function isekaiStart(isk, rid) {
   isk.worldLegends = isk.legendAll[isk.world] ?? [];
   isk.age =(r.startAge ?? 0) * isekaiPace(isk);
   if (isk.real) linkStart(isk, r.stat.gold);
+  // เริ่มชาติใต้เกณฑ์เตือนไม่นับว่าตก (เหมือนชีวิตไทยที่เกิดมาใต้เกณฑ์)
+  isk.lowWarned = isk.st.hp <= WARN.isekai;
 }
 
 function linkStart(isk, gold0) {
@@ -1852,6 +1864,12 @@ export function nextIsekaiCard(isk) {
   }
   if (isk.step === 'over') throw new Error('ชาติต่างโลกจบแล้ว — ปรโลกรับช่วงต่อ');
   if (isk.step === 'tick' && isk.court) return isekaiCourtCard(isk);
+  // เตือนต่อจากใบตา/ใบผลที่ทำ HP ตกเกณฑ์ ก่อนเหตุการณ์ที่ถึงคิว · ค้างที่ step นี้จนเลือก เซฟกลางการ์ดจึงกลับมาใบเดิม
+  if (isk.step === 'tick' && isk.warn) isk.step = 'warn';
+  if (isk.step === 'warn') {
+    const card = warnCard(isk.age, isekaiStageOf(isk).name, ISEKAI_WARN.text, [ISEKAI_WARN.focus, WARN.ignore]);
+    return isekaiCard(isk, { ...card, kind: 'isekai', step: 'warn', title: ISEKAI_WARN.title, fx: [`แนะนำ ${ISEKAI_FOCUS[ISEKAI_WARN.rest].name}`, ''] });
+  }
   if (isk.step === 'tick' && isk.due) isk.step = 'event';
   if (isk.step === 'event') return isekaiEventCard(isk, isekaiById[isk.due]);
   if (isk.step === 'tick' && (isk.dead || isk.natural || isk.home)) isk.step = 'end';
@@ -1890,12 +1908,14 @@ export function nextIsekaiCard(isk) {
     // ใบทุ่มเทใบแรกของชาติบอกว่าโลกนี้ยังจำอะไรจากคนต่างโลกรุ่นก่อน
     const past = isekaiLoreLine(isk);
     const remembered = !isk.stageShown && past ? ` ${past}` : '';
+    // มาจากการ์ดเตือน (B161) = กลางช่วงวัย ไม่ใช่เข้าช่วงใหม่ · suggest ชี้ทางฟื้นชีวิต
     return isekaiCard(isk, {
       step: 'focus', title: stage.name, age: isk.age,
-      text: `${isk.focus ? `เข้า${stage.name}แล้ว ช่วงนี้จะทุ่มเทกับอะไร หรือจะทำแบบเดิมต่อ` : `เข้า${stage.name}แล้ว ช่วงนี้จะทุ่มเทกับอะไร`}${remembered}`,
+      text: isk.focusWarn ? ISEKAI_WARN.ask : `${isk.focus ? `เข้า${stage.name}แล้ว ช่วงนี้จะทุ่มเทกับอะไร หรือจะทำแบบเดิมต่อ` : `เข้า${stage.name}แล้ว ช่วงนี้จะทุ่มเทกับอะไร`}${remembered}`,
       choices: isk.focusOffers.map((id) => isekaiFocusDef(isk, id).name),
       fx: isk.focusOffers.map((id) => isekaiFocusFx(isk, id)),
       current: isk.focusOffers.indexOf(isk.focus),
+      ...(isk.focusWarn && { warn: true, suggest: isk.focusOffers.indexOf(ISEKAI_WARN.rest) }),
     });
   }
   const before = { ...isk.st };
@@ -1912,6 +1932,7 @@ export function nextIsekaiCard(isk) {
       revived = true;
     } else isk.dead = true;
   }
+  isekaiWarnCheck(isk);
   if (!isk.dead && !isk.natural && !isk.home) isk.due = isekaiDue(isk);
   // ความรู้ถึงเกณฑ์กลางช่วงวัย: ทางลัดต่อท้ายรายการทันที ไม่ต้องรอช่วงวัยถัดไป (ลำดับเดิมไม่เลื่อน เซฟที่เล่นซ้ำจึงตรง)
   const opened = isekaiKnowOffers(isk, stage).filter((id) => !isk.focusOffers.includes(id));
@@ -1945,6 +1966,11 @@ const isekaiLoreLine = (isk) => {
     : `คนที่นี่ยังเล่าเรื่อง${l.name} คนต่างโลกรุ่นก่อนที่จบแบบ "${l.ending}"`));
   return [names.length && `ที่นี่ยังมี${list}ที่คนจากต่างโลกรุ่นก่อนทิ้งไว้`, ...legends].filter(Boolean).join(' · ');
 };
+
+// เช็กหลังทุกจุดที่ HP ขยับ (ใบตา · ผลเหตุการณ์ รวมยา/ฟื้นตัว/ย้อนเวลา) — ชาติที่จบในตานั้นไม่ต้องเตือน
+function isekaiWarnCheck(isk) {
+  if (crossedLow(isk, isk.st.hp, WARN.isekai) && !isk.dead && !isk.natural && !isk.home) isk.warn = true;
+}
 
 // ความรู้เป็นค่าซ่อน ป้ายจึงบอกแค่ว่าทอยด้วยความรู้ ไม่บอกหมวดหรือค่า
 const isekaiCheckName = (c) => (c.know ? 'ความรู้โลกเดิม' : ISEKAI_STAT[c.stat]);
@@ -1991,8 +2017,19 @@ export function chooseIsekai(isk, idx) {
     const f = isk.focusOffers[idx];
     if (!f) throw new Error('ตัวเลือกไม่ถูกต้อง');
     isk.focus = f;
-    if (isk.step === 'focus') isk.stageShown = isekaiStageOf(isk).id;
+    if (isk.step === 'focus') {
+      isk.stageShown = isekaiStageOf(isk).id;
+      isk.focusWarn = false;
+    }
     isk.step = 'tick';
+    return;
+  }
+  // การ์ดเตือนไม่ดึงเลขสุ่ม ไม่ลงเส้นทางที่เลือก (ไม่ใช่เหตุการณ์) · เปลี่ยนโฟกัส = ใบทุ่มเทใบถัดไป
+  if (isk.step === 'warn') {
+    if (idx !== 0 && idx !== 1) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    isk.warn = false;
+    isk.focusWarn = idx === 0;
+    isk.step = idx === 0 ? 'focus' : 'tick';
     return;
   }
   if (isk.step !== 'event') throw new Error('การ์ดนี้ไม่มีตัวเลือก');
@@ -2061,6 +2098,7 @@ export function chooseIsekai(isk, idx) {
       sys ='เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว';
     } else isk.dead = true;
   }
+  isekaiWarnCheck(isk);
   // ฉากเด่นบนการ์ดจบ: ผลที่ขยับค่ามากสุด · ทองหารห้าสิบให้ชั่งกับค่าอื่นได้ · สกิลช่วยไว้/ตายนับเพิ่ม
   const weight = Object.entries(deltas).reduce((s, [k, v]) => s + Math.abs(k === 'gold' ? v / 50 : v), 0) + (aid ? 10 : 0) + (isk.dead ? 50 : 0);
   (isk.marks ??= []).push({ text: `${title} · ${said}`, weight });

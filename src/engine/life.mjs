@@ -12,6 +12,7 @@ import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './cou
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends } from './isekai.mjs';
+import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -463,23 +464,6 @@ function scheduleIllness(st) {
   if (!(st.causeRng.next() < ch.reduce((s, x) => s + x, 0))) return;
   st.terminal = { cause: pickCause(st.causeRng, keys, ch), age, told: false };
 }
-
-// การ์ดเตือนชีวิตใกล้หมด (B160): ตกจากเหนือเกณฑ์ลงถึงเกณฑ์ = 1 ใบ · ขึ้นเหนือเกณฑ์แล้วตกใหม่ = เตือนใหม่
-// การ์ดระบบ ไม่หักโควตากองสุ่ม · ตัวเลือกมีแค่ "ช่างมัน" จนร้าน/โฟกัสโลกหลักเข้า · ต่างโลกส่งตัวเลือกของตัวเองได้
-export const WARN = {
-  human: 20,
-  isekai: 25,
-  ignore: 'ช่างมัน',
-  text: 'ร่างกายทรุดลงจนรู้สึกได้ทุกเช้า ถ้ายังใช้ชีวิตแบบนี้ต่อไป อีกไม่นานร่างกายคงไม่ไหว',
-};
-// เซฟก่อนมีช่องนี้ไม่มี lowWarned = ถือว่ายังไม่เคยเตือน
-export function crossedLow(holder, value, line) {
-  const low = value <= line;
-  const was = holder.lowWarned ?? false;
-  holder.lowWarned = low;
-  return low && !was;
-}
-export const warnCard = (age, stage, text, choices = [WARN.ignore]) => ({ kind: 'warn', age, stage, text, choices, fx: choices.map(() => ''), locked: choices.map(() => null) });
 
 // ด่านตายเดียวของโลกหลัก (ขอบปี + ชีวิตหมดกลางปี): สัญญารอดตาย (B156) มาก่อนพิธีโกงความตาย (B153) แล้วจึงตาย
 // คืน 'survive' พร้อมการ์ดเล่า (ผู้เรียกวางเอง) · 'court' = ตั้ง st.court แล้ว · 'dead' = ตั้ง st.dead/st.cause แล้ว ผู้เรียกจัดงานศพ
@@ -1740,13 +1724,12 @@ export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, c
       continue;
     }
     if (card.trip && card.kind === 'isekai') {
-      if (card.choices.length) choose(st, pickChoice.trip ? pickChoice.trip(card, bot) : tripAny(card, bot));
+      if (card.choices.length) choose(st, warnPick(card) >= 0 ? warnPick(card) : pickChoice.trip ? pickChoice.trip(card, bot) : tripAny(card, bot));
       continue;
     }
     // บอทคืนเลขตัวเลือก หรือ {i, loan} เมื่อกู้มาจ่าย (B111)
     if (card.choices?.length) {
-      // การ์ดเตือนมีตัวเลือกเดียว — ไม่ดึงเลขสุ่มของบอท ⇒ ทางเลือกหลังการ์ดเตือนเท่าเดิม
-      const p = card.entry && !pickChoice.isekai ? ENTRY.decline : card.kind === 'warn' ? 0 : pickChoice(card, bot, st);
+      const p = card.entry && !pickChoice.isekai ? ENTRY.decline : warnPick(card) >= 0 ? warnPick(card) : pickChoice(card, bot, st);
       if (typeof p === 'object') choose(st, p.i, p.loan);
       else choose(st, p);
     }

@@ -2,7 +2,7 @@
 // ด่าน: seed เดิมผลเดิม (รวดเดียว + เซฟ/โหลดกลางทาง) · จบได้ทุกชีวิตภายในเพดานการ์ด · ตอนจบ/บทบาท/สกิล/เหตุการณ์มีบอทถึง
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
-import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_TIME, ISEKAI_LINK, LINK, tripCarry, tripSettle, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, TRIP_QUEST, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed } from '../src/engine/index.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_TIME, ISEKAI_LINK, LINK, tripCarry, tripSettle, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, TRIP_QUEST, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed, WARN, ISEKAI_FOCUS } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 
@@ -105,6 +105,7 @@ const potionFrom = [], potionAdd = {};
 let tickBad = 0, roleBad = 0, oldBad = 0;
 // ทางกลับบ้าน (B154): ชาติที่เกิดในต่างโลกไม่เห็นเควส/อีเวนต์ทริป
 let tripEvBad = 0;
+let warnBad = 0, warnSeen = 0, warnFocus = 0, warnFocusBad = 0;
 const lens = [], clicks = [], humanAges = [];
 const commonerName = roleInfo('commoner').name;
 Object.values(BOTS).forEach((bot, b) => {
@@ -123,6 +124,32 @@ Object.values(BOTS).forEach((bot, b) => {
 
     lens.push(a.cards.length);
     clicks.push(a.picks.length);
+    // การ์ดเตือน (B161): HP บนจอ (ปัดขึ้น) ตกจากเหนือเกณฑ์ลงถึงเกณฑ์แต่ยังไม่หมด = ใบถัดไปต้องเป็นการ์ดเตือน · เตือนนอกจังหวะนี้ = เกิน
+    // เลือกเปลี่ยนโฟกัส = ใบทุ่มเทชี้ "พักผ่อน" · ทางที่กดต้องเป็นโฟกัสบนใบตาถัดไป
+    let hpPrev = null, wantWarn = false, focusPick = null;
+    a.cards.forEach((card, j) => {
+      if (card.step === 'warn') {
+        if (!wantWarn || card.choices.length !== 2 || card.choices[1] !== WARN.ignore) warnBad++;
+        warnSeen++;
+        if (card.pick === 0) warnFocus++;
+      } else if (wantWarn) warnBad++;
+      wantWarn = false;
+      const hp = card.status?.hp;
+      if (hp != null) {
+        if (hpPrev !== null && hpPrev > WARN.isekai && hp <= WARN.isekai && hp > 0 && card.step !== 'end') wantWarn = true;
+        hpPrev = hp;
+      }
+      if (card.step === 'focus' && card.warn) {
+        if (card.choices[card.suggest] !== ISEKAI_FOCUS.rest.name) warnFocusBad++;
+        focusPick = card.choices[card.pick];
+      } else if (card.step === 'focus') focusPick = null;
+      else if (card.step === 'tick' && focusPick !== null) {
+        if (card.focusChoices[card.focus] !== focusPick) warnFocusBad++;
+        focusPick = null;
+      }
+      // ตกเกณฑ์ที่ใบสุดท้ายก่อนจบ = ไม่มีใบถัดไปให้เตือน · เลือกโฟกัสแล้วตายในเหตุการณ์ก่อนถึงใบตาไม่นับ
+      if (j === a.cards.length - 1 && wantWarn) warnBad++;
+    });
     for (const card of a.cards) {
       cardsSeen++;
       leaks += leakOf(card);
@@ -202,6 +229,8 @@ check('ค่าบนหน้าต่างสถานะอยู่ใน�
 check('ใบตาเวลาเดินเอง ไม่มีตัวเลือก แต่เปลี่ยนสิ่งที่ทุ่มเทได้', tickBad);
 check('เทพธิดายื่นบทบาทคนธรรมดามีอาชีพทุกครั้ง', roleBad);
 check('สิ้นอายุเฉพาะหลังวัยชรา', oldBad);
+check(`การ์ดเตือนออก 1 ใบต่อการตก HP ถึง ${WARN.isekai}`, warnBad, `${warnSeen} ใบ`);
+check('เตือนแล้วเปลี่ยนโฟกัส: ชี้พักผ่อน · ใบตาถัดไปทุ่มเทตามที่กด', warnFocusBad + (warnFocus ? 0 : 1), `กดเปลี่ยน ${warnFocus} ครั้ง`);
 // กดน้อยกว่าชาติไทยชัดเจน (เจ้าของเคาะ) · อายุขัยแบบมนุษย์ ไม่สั้นจนวัยชราหาย ไม่ยาวจนวัยชราน่าเบื่อ
 check('กดต่อชาติ p50 ไม่เกิน 40', p50(clicks) > 40 ? 1 : 0, `p50 ${p50(clicks)}`);
 check('สิ้นอายุ (มนุษย์) p50 อยู่ในช่วง 65–95', p50(humanAges) < 65 || p50(humanAges) > 95 ? 1 : 0, `p50 ${p50(humanAges)}`);
