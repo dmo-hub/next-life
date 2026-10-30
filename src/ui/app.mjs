@@ -1468,12 +1468,7 @@ function render(card) {
     // จอแคบให้ตัดบรรทัดได้แค่ที่ตัวคั่น — เบราว์เซอร์ตัดคำไทยกลาง "ราย|ได้" ได้แม้เว้นวรรคแบบไม่ตัด จึงต้องห่อ span
     for (const t of purse) meta.append(' · ', el('span', null, t));
     box.append(meta);
-    const fam = familyPanel();
-    if (fam) box.append(fam);
-    const tree = familyTree();
-    if (tree) box.append(tree);
-    const stand = standingPanel();
-    if (stand) box.append(stand);
+    box.append(cardTabs());
     const kicker = card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind];
     // ภาพยุค (B56): การ์ดบ้านเมือง + การ์ดรับมือที่ผูกยุคไว้ (B58) ได้ภาพของยุคนั้น · ยุคที่ไม่มีภาพ = หน้าตาเดิม
     const eraPic = eraArt(card.kind === 'era' ? card.id : card.kind === 'event' ? ERA_OF.get(card.id) : null);
@@ -1723,9 +1718,39 @@ const kinWord = (m) => {
   if (m.role === 'herd') return `ฝูง${m.kind ?? 'สัตว์'}`;
   return 'เพื่อนรุ่น';
 };
-// พับ/กางค้างไว้ข้ามการ์ด — การ์ดวาดใหม่ทุกใบ ไม่งั้นผู้เล่นต้องกางซ้ำทุกครั้ง (ค่าหน้าจอ ไม่อยู่ในเซฟ)
-let familyOpen = false;
-function familyPanel() {
+// แผงครอบครัว · ผังตระกูล · กราฟฐานะตระกูลใต้หัวการ์ดเป็นแถบแท็บ เปิดได้ทีละแท็บ กดแท็บเดิมซ้ำ = ปิด
+// แท็บที่เปิดค้างข้ามการ์ด — การ์ดวาดใหม่ทุกใบ ไม่งั้นผู้เล่นต้องกดซ้ำทุกครั้ง (ค่าหน้าจอ ไม่อยู่ในเซฟ)
+let cardTab = null;
+function cardTabs() {
+  const tabs = [familyTab(), treeTab(), standTab()].filter(Boolean);
+  const wrap = el('div', 'tabs');
+  const bar = el('div', 'tab-bar');
+  bar.setAttribute('role', 'group');
+  bar.setAttribute('aria-label', 'ครอบครัวและตระกูล');
+  const panel = el('div', 'tab-panel');
+  panel.id = 'card-tab';
+  const btns = tabs.map((t) => {
+    const b = el('button', null, t.label);
+    b.type = 'button';
+    b.setAttribute('aria-controls', panel.id);
+    b.onclick = () => show((cardTab = cardTab === t.id ? null : t.id));
+    return b;
+  });
+  // แท็บที่จำไว้ไม่มีในการ์ดนี้ (ผังตระกูลตอนเริ่มตระกูลใหม่) = แสดงปิด แต่ไม่ล้างค่าที่จำ
+  const show = (id) => {
+    const t = tabs.find((x) => x.id === id);
+    btns.forEach((b, i) => b.setAttribute('aria-pressed', String(tabs[i] === t)));
+    panel.hidden = !t;
+    // วาดเนื้อตอนเปิดเท่านั้น — กราฟฐานะตระกูลแพง การ์ดส่วนใหญ่ผ่านไปโดยไม่มีใครเปิด
+    panel.replaceChildren(...(t ? [t.body()] : []));
+  };
+  bar.append(...btns);
+  wrap.append(bar, panel);
+  show(cardTab);
+  return wrap;
+}
+
+function familyTab() {
   const all = familyOf(st);
   if (!all.length) return null;
   const rank = (m) => FAMILY_ORDER.indexOf(m.role) * 2 + (m.alive ? 0 : 1);
@@ -1745,16 +1770,16 @@ function familyPanel() {
   const people = all.filter((m) => !ANIMAL_ROLES.includes(m.role));
   const alive = people.filter((m) => m.alive).length;
   const animals = all.filter((m) => ANIMAL_ROLES.includes(m.role) && m.alive && !m.left).length;
-  const d = el('details', 'family');
-  d.open = familyOpen;
-  d.addEventListener('toggle', () => (familyOpen = d.open));
   const ul = el('ul', 'picks');
   for (const r of rows) ul.append(el('li', r.gone ? 'gone' : null, r.text));
-  d.append(el('summary', null, `ครอบครัว · ยังอยู่ ${alive} ${alive === people.length ? 'คน' : `จาก ${people.length} คน`}${animals ? ` · สัตว์ ${animals}` : ''}`), ul);
-  return d;
+  return { id: 'family', label: `ครอบครัว · ยังอยู่ ${alive} ${alive === people.length ? 'คน' : `จาก ${people.length} คน`}${animals ? ` · สัตว์ ${animals}` : ''}`, body: () => ul };
 }
 
-// ผังตระกูลพับได้ (ใบ 05 เลิกเมื่อไรก็ดูได้) — มีเมื่อเป็นรุ่นที่ 2 ขึ้นไป
+// ผังตระกูล (ใบ 05 เลิกเมื่อไรก็ดูได้) — มีเมื่อเป็นรุ่นที่ 2 ขึ้นไป · การ์ดตายยังเป็นแบบพับ (familyTree)
+function treeTab() {
+  if (!st.lineage.length) return null;
+  return { id: 'tree', label: `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`, body: () => lineageList(st.lineage) };
+}
 function familyTree() {
   if (!st.lineage.length) return null;
   const d = el('details', 'tree');
@@ -1762,23 +1787,17 @@ function familyTree() {
   return d;
 }
 
-// กราฟฐานะตระกูลพับได้ระหว่างเล่น (B95) — วาดตอนกางเท่านั้น การ์ดส่วนใหญ่ผ่านไปโดยไม่มีใครกาง · พับ/กางค้างข้ามการ์ดแบบแผงครอบครัว
-let standOpen = false;
-function standingPanel() {
-  const d = el('details', 'tree stand-d');
-  const fill = () => {
-    if (!d.open || d.querySelector('.stand')) return;
-    const chart = standingChart(standingGens(st.lineage, standingNow(false)), null, false);
-    d.append(chart ?? el('p', 'sub', 'ยังมีจุดเดียว — กราฟขึ้นเมื่อถึงช่วงวัยถัดไป'));
+// กราฟฐานะตระกูลระหว่างเล่น (B95)
+function standTab() {
+  return {
+    id: 'stand',
+    label: st.lineage.length ? `กราฟฐานะตระกูล · ${st.lineage.length + 1} รุ่น` : 'กราฟฐานะตระกูล',
+    body: () => {
+      const d = el('div', 'stand-d');
+      d.append(standingChart(standingGens(st.lineage, standingNow(false)), null, false) ?? el('p', 'sub', 'ยังมีจุดเดียว — กราฟขึ้นเมื่อถึงช่วงวัยถัดไป'));
+      return d;
+    },
   };
-  d.open = standOpen;
-  d.addEventListener('toggle', () => {
-    standOpen = d.open;
-    fill();
-  });
-  d.append(el('summary', null, st.lineage.length ? `กราฟฐานะตระกูล · ${st.lineage.length + 1} รุ่น` : 'กราฟฐานะตระกูล'));
-  fill();
-  return d;
 }
 
 // คู่ใจที่ตายก่อนเรามารอเดินไปปรโลกด้วย (B44) — เฉพาะตัวที่ดูแลดี (ป้าย "สนิท" ขึ้นไปในแผงครอบครัว)

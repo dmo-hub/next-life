@@ -81,10 +81,15 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .delta .num { font-weight:700; font-variant-numeric:tabular-nums; }
 .meta { padding:0 20px 8px; font-size:12px; }
 .meta span { white-space:nowrap; }
-.tree, .family { padding:0 20px 8px; font-size:12px; }
-.tree summary, .family summary { cursor:pointer; }
-.tree .picks, .family .picks { font-size:12px; }
-.family li.gone { opacity:0.55; }
+.tree, .tabs { padding:0 20px 8px; font-size:12px; }
+.tree summary { cursor:pointer; }
+.tree .picks, .tabs .picks { font-size:12px; }
+.tabs li.gone { opacity:0.55; }
+.tab-bar { display:flex; flex-wrap:wrap; gap:6px; }
+.tab-bar button { all:unset; cursor:pointer; min-height:32px; padding:0 10px; border:1px solid currentColor; border-radius:999px; font-size:12px; display:inline-flex; align-items:center; }
+.tab-bar button[aria-pressed="true"] { background:var(--ink); border-color:var(--ink); color:var(--paper); font-weight:600; }
+.tab-bar button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.tab-panel { padding-top:6px; }
 .stat-help { padding:0 20px; font-size:12px; color:var(--muted); }
 .stat-help summary { cursor:pointer; min-height:36px; display:flex; align-items:center; text-decoration:underline; text-underline-offset:2px; }
 .stat-help dl { margin:0 0 10px; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 12px; }
@@ -250,7 +255,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .b .choice { border:1px solid var(--bronze2); background:var(--lacquer2); color:var(--cream); }
 .b .choice:hover, .b .choice:focus-visible { border-color:var(--gold); background:#2E2218; outline:none; }
 .b .choice .fx { color:var(--gold); }
-.b .picks, .b .tree summary, .b .family summary { color:#E3D6B3; }
+.b .picks, .b .tree summary, .b .tab-bar button { color:#E3D6B3; }
+.b .tab-bar button[aria-pressed="true"] { background:var(--gold); border-color:var(--gold); color:var(--lacquer); }
 .b .recap { border:1px solid var(--bronze); background:var(--lacquer2); }
 .b .recap .h { color:var(--gold); }
 .scene { height:96px; background:var(--lacquer2); border-bottom:1px solid var(--bronze); }
@@ -377,7 +383,7 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
   .p-side .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
   .top { padding:8px 16px; }
   .stats { padding:6px 12px; }
-  .meta, .tree, .family, .stat-help { padding-left:12px; padding-right:12px; }
+  .meta, .tree, .tabs, .stat-help { padding-left:12px; padding-right:12px; }
   /* พาแนลซ้ายแคบ: หัวการ์ดตัดบรรทัดเป็นแถว (ไม่งั้นอายุเหลือคำละบรรทัด) · ค่าสถานะ 2 ช่องต่อแถว (4 ค่า = 2×2) ป้าย "ความสัมพันธ์" ไม่ขาดกลางคำ */
   .p-left .top { flex-wrap:wrap; gap:4px 10px; }
   .p-left .top small { flex-basis:100%; text-align:left; }
