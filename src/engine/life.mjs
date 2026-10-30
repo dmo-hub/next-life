@@ -481,6 +481,25 @@ export function crossedLow(holder, value, line) {
 }
 export const warnCard = (age, stage, text, choices = [WARN.ignore]) => ({ kind: 'warn', age, stage, text, choices, fx: choices.map(() => ''), locked: choices.map(() => null) });
 
+// ด่านตายเดียวของโลกหลัก (ขอบปี + ชีวิตหมดกลางปี): สัญญารอดตาย (B156) มาก่อนพิธีโกงความตาย (B153) แล้วจึงตาย
+// คืน 'survive' พร้อมการ์ดเล่า (ผู้เรียกวางเอง) · 'court' = ตั้ง st.court แล้ว · 'dead' = ตั้ง st.dead/st.cause แล้ว ผู้เรียกจัดงานศพ
+function faceDeath(st, cause, opts = {}) {
+  if (st.pact?.survive === true) {
+    // สัญญาจ่ายบาปแล้วจึงได้ของจริง · สุขภาพกลับค่าธรรมชาติ ไม่งั้นหมดตัวแล้วตายซ้ำทันที
+    st.pact.survive = 'used';
+    st.health = Math.max(st.health, st.healthNatural, 1);
+    return { fate: 'survive', card: { kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: PACT.surviveText } };
+  }
+  if (st.flags.cheat_death) {
+    // ไปศาลก่อน แล้วตายปีนี้ด้วยสาเหตุเดิม · afterQueue = การ์ดผลที่รอในคิวเล่าก่อนเข้าศาล
+    st.court = { ...summonsCourt(cause), ...(opts.afterQueue ? { afterQueue: true } : {}) };
+    return { fate: 'court' };
+  }
+  st.dead = true;
+  st.cause = cause;
+  return { fate: 'dead' };
+}
+
 function healthCause(st) {
   const era = st.content.era;
   const py = protoYear(era, st.seed, st.birthYear + st.age);
@@ -1141,7 +1160,7 @@ export const openChoices = (card) => card.choices.map((_, i) => i).filter((i) =>
 // เดินปีละครั้งจนมีการ์ดถึงกำหนดหรือตาย คืนการ์ดใบถัดไป
 export function nextCard(st) {
   // ทริปศาล (B153) ช่องแยกจาก st.trip — st.trip ผูกก้อนต่างโลกทั้งก้อน
-  if (st.court) {
+  if (st.court && !(st.court.afterQueue && st.queue.length)) {
     const card = courtCard(st);
     if (card) return card;
     const c = st.court;
@@ -1192,25 +1211,15 @@ export function nextCard(st) {
       // สุ่มตายของปีที่อายุ st.age ก่อนขึ้นปีใหม่ — ทารกจึงตายได้ตั้งแต่ขวบปีแรกตามอัตราตายทารกจริง และอายุบนการ์ดตายเป็นปีเต็ม
       // สุขภาพหมดตัว = ตายด้วยสาเหตุตามสัดส่วนของอายุนั้น ไม่มีช่วงป่วย
       const cause = st.health <= 0 ? healthCause(st) : deathRoll(st);
-      if (cause && st.pact?.survive === true) {
-        // สัญญารอดตาย (B156) มาก่อนพิธีโกงความตาย — สัญญาจ่ายบาปแล้วจึงได้ของจริง · สุขภาพกลับค่าธรรมชาติ ไม่งั้นหมดตัวแล้วตายซ้ำปีถัดไป
-        st.pact.survive = 'used';
-        st.health = Math.max(st.health, st.healthNatural, 1);
-        st.queue.push({ kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: PACT.surviveText });
+      const d = cause && faceDeath(st, cause);
+      if (d?.fate === 'survive') {
+        st.queue.push(d.card);
         stepYear(st);
         st.advance = false;
         return nextCard(st);
       }
-      if (cause) {
-        // โกงความตาย (B153): ไปศาลก่อน แล้วตายปีนี้ด้วยสาเหตุเดิม
-        if (st.flags.cheat_death) {
-          st.court = summonsCourt(cause);
-          return nextCard(st);
-        }
-        st.dead = true;
-        st.cause = cause;
-        return queueFuneral(st) ? nextCard(st) : deathCard(st);
-      }
+      if (d?.fate === 'court') return nextCard(st);
+      if (d?.fate === 'dead') return queueFuneral(st) ? nextCard(st) : deathCard(st);
       stepYear(st);
       if (crossedLow(st, st.health, WARN.human)) st.due.push(warnCard(st.age, stageOf(st.age), WARN.text));
     }
@@ -1528,12 +1537,17 @@ export function choose(st, idx, loan) {
   }
   // ชีวิตหมดจากผลการ์ด = ตายในการ์ดนั้น (B160) ไม่รอขอบปี · การ์ดผลยังเล่าก่อน · เรื่องต่อ หางาน และการ์ดที่รอในปีนั้นไม่ออกแล้ว
   // การ์ดงานศพเลือกหลังตายแล้ว ⇒ ไม่ตัดสินซ้ำ
-  if (!st.dead && st.health <= 0) {
-    st.dead = true;
-    st.cause = healthCause(st);
+  if (!st.dead && !st.court && st.health <= 0) {
+    const d = faceDeath(st, healthCause(st), { afterQueue: true });
     st.queue = after.filter((x) => x.kind === 'result');
     st.due = [];
-    queueFuneral(st);
+    if (d.fate === 'dead') queueFuneral(st);
+    if (d.fate === 'survive') {
+      // รอดแบบเดียวกับขอบปี: ปีนั้นจบที่ความตายเฉียดผ่าน แล้วขึ้นปีโดยไม่ทอยตายอายุเดิมซ้ำ
+      st.queue.push(d.card);
+      stepYear(st);
+      st.advance = false;
+    }
     return;
   }
   // เตือนต่อท้ายการ์ดผลของตัวเลือกนี้ ก่อนเรื่องต่อ — เรื่องต่อที่ทำชีวิตหมดล้างคิว การ์ดเตือนที่อยู่หลังจะไม่เคยออก
