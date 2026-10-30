@@ -898,11 +898,12 @@ function checkBankrupt(st, year, stage) {
 }
 
 // กู้ก้อนใหม่: เงินกู้เข้ากระเป๋าทั้งก้อน แล้วผ่อนคืนทุกปีใน stepYear · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
+// ยอดกู้ income_x ใช้ฐานเดียวกับค่าใช้จ่าย (spendBase) — การ์ดกู้คู่กับเงินจ่ายออกเท่ากัน ฐานต่างกันทำให้คนรายได้สูงได้หนี้หลายเท่าของที่จ่าย
 function borrow(st, { kind, amount }, s = 1) {
   const year = st.birthYear + st.age;
   const era = st.content.era;
   if (!debtOpen(era, kind, year)) throw new Error(`${debtName(kind)} ยังไม่มีในปี ${year}`);
-  const baht = moneyValue(st, amount) * s;
+  const baht = moneyValue(st, amount, true) * s;
   st.money += baht;
   st.debts.push(newDebt(era, st.seed, kind, baht, year));
   informalFlag(st);
