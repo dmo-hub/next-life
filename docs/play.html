@@ -81,6 +81,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .delta .num { font-weight:700; font-variant-numeric:tabular-nums; }
 .meta { padding:0 20px 8px; font-size:12px; }
 .meta span { white-space:nowrap; }
+.meta:has(+ .meta.money) { padding-bottom:2px; }
+.meta.money, .a .meta.money { padding-top:0; }
+.meta.money svg { width:14px; height:14px; margin-right:4px; vertical-align:-2px; fill:none; stroke:currentColor; stroke-width:1.6; }
 .tree, .tabs { padding:0 20px 8px; font-size:12px; }
 .tree summary { cursor:pointer; }
 .tree .picks, .tabs .picks { font-size:12px; }
@@ -7716,6 +7719,8 @@ const FOLLOW_ICON = {
   later: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2h8M4 14h8M5 2c0 4 6 4 6 6s-6 2-6 6M11 2c0 4-6 4-6 6s6 2 6 6"/></svg>',
 };
 const FOLLOW_WORD = { later: 'มีผลภายหลัง' };
+// ไอคอนนำบรรทัดเงินใต้หัวการ์ด — ทุกช่องมีคำบอกอยู่แล้ว (เงินติดตัว · รายได้ · เงินกู้) ไอคอนจึงซ่อนจากโปรแกรมอ่านจอ
+const MONEY_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="13" height="8" rx="1.5"/><circle cx="8" cy="8" r="2"/></svg>';
 
 // ป้ายปุ่มเดินเรื่องที่คู่มืออธิบาย — ปุ่มที่ผูกกับสถานการณ์เฉพาะ (ลบสมุด · ยกเลิก) ยังเขียนตรงในหน้าจอ
 const BTN = {
@@ -9215,15 +9220,22 @@ function render(card) {
       working && `รายได้ ${baht(monthlyIncome(st, year))}/เดือน`,
       debt > 0 && `เงินกู้ ${baht(debt)}`,
     ].filter(Boolean);
-    // ช่วงเรียน ป้ายเรียนแทนช่อง "กำลังเรียน…" ที่บอกเรื่องเดียวกัน — ต่อท้ายแยกแล้วแถบตกบรรทัดบนจอแคบ
+    // ช่วงเรียน ป้ายเรียนแทนช่อง "กำลังเรียน…" ที่บอกเรื่องเดียวกัน · เป้าหมายอื่นต่อท้ายบรรทัดฐานะ ไม่ปนบรรทัดเงิน
     const goal = nextGoal(st);
     const school = goal && schoolOf(st) !== 'none';
-    if (goal && !school) purse.push(goal);
     // ฐานะ ณ ปีนี้ (ตัวเดียวกับที่การ์ดเช็กชนชั้น) ไม่ใช่ชนชั้นตอนเกิด — ฐานะตอนเกิดยังดูได้ที่กราฟฐานะตระกูล
-    const meta = el('div', 'meta', `ฐานะ${classNow(st)} · ${school ? goal : jobText(st, card.age)}`);
     // จอแคบให้ตัดบรรทัดได้แค่ที่ตัวคั่น — เบราว์เซอร์ตัดคำไทยกลาง "ราย|ได้" ได้แม้เว้นวรรคแบบไม่ตัด จึงต้องห่อ span
-    for (const t of purse) meta.append(' · ', el('span', null, t));
+    const meta = el('div', 'meta');
+    const line = (row, parts) => parts.forEach((t, i) => row.append(...(i ? [' · '] : []), el('span', null, t)));
+    line(meta, [`ฐานะ${classNow(st)}`, school ? goal : jobText(st, card.age), goal && !school && goal].filter(Boolean));
     box.append(meta);
+    // เรื่องเงินแยกบรรทัดของตัวเอง ไอคอนนำหน้าให้กวาดตาเจอ
+    if (purse.length) {
+      const money = el('div', 'meta money');
+      money.insertAdjacentHTML('beforeend', MONEY_ICON);
+      line(money, purse);
+      box.append(money);
+    }
     box.append(cardTabs());
     const kicker = card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind];
     // ภาพยุค (B56): การ์ดบ้านเมือง + การ์ดรับมือที่ผูกยุคไว้ (B58) ได้ภาพของยุคนั้น · ยุคที่ไม่มีภาพ = หน้าตาเดิม

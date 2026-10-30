@@ -6,6 +6,8 @@ export const FOLLOW_ICON = {
   later: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2h8M4 14h8M5 2c0 4 6 4 6 6s-6 2-6 6M11 2c0 4-6 4-6 6s6 2 6 6"/></svg>',
 };
 export const FOLLOW_WORD = { later: 'มีผลภายหลัง' };
+// ไอคอนนำบรรทัดเงินใต้หัวการ์ด — ทุกช่องมีคำบอกอยู่แล้ว (เงินติดตัว · รายได้ · เงินกู้) ไอคอนจึงซ่อนจากโปรแกรมอ่านจอ
+export const MONEY_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="13" height="8" rx="1.5"/><circle cx="8" cy="8" r="2"/></svg>';
 
 // ป้ายปุ่มเดินเรื่องที่คู่มืออธิบาย — ปุ่มที่ผูกกับสถานการณ์เฉพาะ (ลบสมุด · ยกเลิก) ยังเขียนตรงในหน้าจอ
 export const BTN = {
