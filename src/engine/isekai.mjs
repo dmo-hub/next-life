@@ -1476,7 +1476,8 @@ export function entryCard(st, stage) {
   return {
     kind: 'event', id: `isekai_${o.id}`, entry: o.id, gone: !!e.gone, ...(e.trip && { trip: true }), type: 'B', national: false, funeral: false,
     age: st.age, stage, title: null, text: e.text, choices: [...e.choices],
-    fx: [e.trip ? 'ไปต่างโลกช่วงหนึ่ง แล้วกลับมาชีวิตเดิม' : e.gone ? 'ไปต่างโลก อาจไม่ได้กลับมาอีก' : 'ชีวิตนี้จบตรงนี้ ไปต่างโลก', ''], locked: [null, null],
+    // ปุ่มไม่บอกว่าตาย หายตัว หรือได้กลับ — ผู้เล่นรู้จากเรื่องหลังกดรับ
+    fx: ['', ''], locked: [null, null],
   };
 }
 

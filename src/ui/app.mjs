@@ -1664,18 +1664,18 @@ const genLabel = () => (st.gen > 1 ? `รุ่นที่ ${st.gen} · ` : '')
 const realName = () => st.realName ?? st.name;
 const fullName = () => (st.realName && st.realName !== st.name ? `${st.realName} (${st.name})` : st.name);
 
-// การ์ดชวนไปต่างโลก (B68d): กรอบสีต่างโลกโผล่กลางการ์ดชีวิต · กดรับ = ชีวิตนี้จบ จึงถามซ้ำก่อนส่งให้เอนจิน
+// การ์ดชวนไปต่างโลก (B68d): กรอบสีต่างโลกโผล่กลางการ์ดชีวิต · กดรับแล้วย้อนไม่ได้ จึงถามซ้ำก่อนส่งให้เอนจิน
 // การถามซ้ำอยู่ที่จอล้วน ไม่ลงเซฟ — เซฟเก็บเฉพาะปุ่มที่ไปถึงเอนจิน · ปฏิเสธกดทีเดียวพอ
+// จอไม่บอกว่ารับแล้วตาย หายตัว หรือได้กลับ — คำถามยืนยันจึงใช้ประโยคเดียวทุกใบ ผู้เล่นรู้จากเรื่องหลังกดรับ
 function entryOffer(card, body, choices) {
   const gate = el('div', 'ix');
   // ข้อความในกรอบเป็น div ไม่ใช่ h3/p — กฎสีของแนวการ์ดไทยจับ .body h3/.body p แล้วจะทับสีต่างโลก
   gate.append(el('span', 'ix-k', 'เสียงเรียกจากต่างโลก'), el('div', 'ix-t', card.text));
-  gate.append(el('div', 'ix-n', card.gone ? 'ถ้ารับ คุณจะหายตัวไปจากโลกนี้' : 'ถ้ารับ ชีวิตในโลกนี้จะจบลงตรงนี้'));
   body.append(gate);
   const offer = () => choices.replaceChildren(...card.choices.map((c, i) => button(c, card.fx?.[i], () => (i === ENTRY.accept ? ask() : play(lifePick(i))))));
   const ask = () => {
     choices.replaceChildren(
-      el('p', 'ix-ask', card.gone ? 'แน่ใจนะ หายตัวไปแล้วกลับมาเล่นชีวิตนี้ต่อไม่ได้' : 'แน่ใจนะ ชีวิตนี้จบแล้วกลับมาเล่นต่อไม่ได้'),
+      el('p', 'ix-ask', 'แน่ใจนะ ก้าวไปแล้วย้อนกลับมาเลือกใหม่ไม่ได้'),
       button('ยืนยัน ไปต่างโลก', null, () => play(lifePick(ENTRY.accept))),
       button('ยังก่อน', null, () => {
         offer();
