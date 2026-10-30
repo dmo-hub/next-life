@@ -1,7 +1,7 @@
 // ตัวเลขบนหน้าเว็บ (B65) — คิดจากข้อมูล/โค้ดชุดเดียวกับเกมทุกครั้งที่ build หน้าเว็บจึงไม่ค้างเลขเก่าเมื่อระบบเปลี่ยน
 // หน้า docs อ้างด้วย <span data-fact="ชื่อ">…</span> · ห้ามมีค่าบัญชีบุญบาปรายชีวิต มีแต่กติกาที่ผู้เล่นอ่านได้อยู่แล้ว
 import { readFileSync } from 'node:fs';
-import { ALL_PATTERNS, TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, ISEKAI_CATS, LEGACY, PATTERN_FROM, ENTRY, ENTRY_EVENTS, GODDESS, GODDESS_VOWS } from '../engine/index.mjs';
+import { ALL_PATTERNS, TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, ISEKAI_CATS, LEGACY, PATTERN_FROM, ENTRY, ENTRY_EVENTS, GODDESS, GODDESS_VOWS, COURT_SCENES } from '../engine/index.mjs';
 import { isekaiCardCount } from './otherworld.mjs';
 
 const th = (n) => n.toLocaleString('en-US');
@@ -9,7 +9,8 @@ const th = (n) => n.toLocaleString('en-US');
 export function siteFacts(content, appSrc = readFileSync(new URL('../ui/app.mjs', import.meta.url), 'utf8')) {
   const pick = (re) => appSrc.match(re)?.[1] ?? '';
   const era = content.era;
-  const life = content.events.filter((e) => e.stage !== 'ระหว่างชาติ');
+  // ใบศาลเฉียดตาย (B153) ใช้ stage ระหว่างชาติแต่ออกกลางชีวิต — นับเป็นการ์ดช่วงมีชีวิต ไม่ใช่ฉากปรโลก
+  const life = content.events.filter((e) => e.stage !== 'ระหว่างชาติ' || COURT_SCENES.includes(e.scene));
   const regions = era.birth.regions;
   const lottery = content.events.filter((e) => e.belief?.kind === 'lottery_numen').map((e) => e.belief);
   return {
