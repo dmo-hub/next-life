@@ -11,7 +11,7 @@ import { parse } from 'yaml';
 import { loadContent } from '../src/node/load.mjs';
 import { effectSites } from '../src/node/lint/util.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
-import { playLife, mixSeed } from '../src/engine/index.mjs';
+import { playLife, mixSeed, COURT_SCENES } from '../src/engine/index.mjs';
 import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS } from './gates.mjs';
 
 const args = process.argv.slice(2);
@@ -108,6 +108,11 @@ const setters = new Map();
 for (const e of content.events) for (const { node } of effectSites(e)) for (const fl of node.sets_flags ?? []) setters.set(fl, [...(setters.get(fl) ?? []), e.id]);
 const HEIR_FLAGS = new Set([...setters].filter(([, ids]) => ids.every((id) => HEIR_ONLY.has(id))).map(([fl]) => fl));
 console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run lineage): การ์ดที่ต้องมีธงพ่อแม่ ${HEIR_ONLY.size} ใบ · ธงที่มีแต่การ์ดพวกนั้นตั้ง ${HEIR_FLAGS.size} ตัว${HEIR_FLAGS.size ? ` (${[...HEIR_FLAGS].join(' · ')})` : ''}`);
+// ใบศาล (B153) แกนแทรกเองตอนเฉียดตาย/ถูกเรียกตัว และบอทศาลเลือกแทน — ไม่จั่วจากกองและไม่ผ่านบอทหลัก ⇒ ด่าน 2 ตัดสินไม่ได้
+// ด่านว่าออกครบลำดับและถูกเรียกตัวทุกชีวิตที่ถือธงอยู่ที่ npm run near · ธง cheat_death ข้ามเฉพาะตอนยังไม่มีการ์ดตั้ง (near ตั้งเอง) — มีการ์ดตั้งเมื่อไรกลับมาตัดสินที่นี่
+const COURT_ONLY = new Set(content.events.filter((e) => COURT_SCENES.includes(e.scene)).map((e) => e.id));
+const COURT_FLAGS = new Set(['cheat_death'].filter((fl) => !setters.has(fl)));
+console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run near): ใบศาล ${COURT_ONLY.size} ใบ · ธงที่ยังไม่มีการ์ดตั้ง ${COURT_FLAGS.size} ตัว${COURT_FLAGS.size ? ` (${[...COURT_FLAGS].join(' · ')})` : ''}`);
 // ฐานเทียบรอบก่อนคิดจาก seed ตายตัวเท่านั้น — รวม seed สุ่มแล้วตัวที่รอดเพราะ seed สุ่มจะกลายเป็น "ตายใหม่" ในรอบหน้า
 function deadOf(runs) {
   const fired = new Map(), picks = new Set(), flags = new Set();
@@ -118,13 +123,13 @@ function deadOf(runs) {
   }
   const explored = new Map();
   for (const r of runs) if (r.bot === 'สุ่ม') for (const [k, v] of r.fired) explored.set(k, (explored.get(k) ?? 0) + v);
-  const { dead, thin } = splitDeadChoices(content.events, fired, explored, picks);
+  const { dead, thin } = splitDeadChoices(content.events.filter((e) => !COURT_ONLY.has(e.id)), fired, explored, picks);
   return {
     fired,
-    events: content.events.filter((e) => !fired.has(e.id) && !HEIR_ONLY.has(e.id)).map((e) => e.id),
+    events: content.events.filter((e) => !fired.has(e.id) && !HEIR_ONLY.has(e.id) && !COURT_ONLY.has(e.id)).map((e) => e.id),
     choices: dead,
     thinChoices: thin,
-    flags: FLAGS.filter((x) => !flags.has(x) && !sideFlags.has(x) && !HEIR_FLAGS.has(x)),
+    flags: FLAGS.filter((x) => !flags.has(x) && !sideFlags.has(x) && !HEIR_FLAGS.has(x) && !COURT_FLAGS.has(x)),
   };
 }
 const { fired, events: deadEvents, choices: deadChoices, thinChoices, flags: deadFlags } = deadOf(main);
