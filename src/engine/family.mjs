@@ -328,12 +328,21 @@ export function kinIllOk(st, w) {
 }
 
 // เงื่อนไขการ์ดสูญเสีย (when.loss): มีคนในบ้านบทบาทที่ระบุ (ไม่ใส่ = ทุกบทบาท) จากไปเองภายใน within ปีที่ผ่านมา (ไม่ใส่ = ปีนี้)
+// after = ต้องผ่านมาอย่างน้อยกี่ปี (B165 ช่วงไว้ทุกข์ — การ์ดรักใหม่ไม่ขึ้นก่อนพ้นช่วง)
 export function lossOk(st, w) {
   const year = kinYearOf(st);
-  return (st.kinLoss ?? []).some((l) => (!w.roles || w.roles.includes(l.role)) && year - l.year <= (w.within ?? 0));
+  return (st.kinLoss ?? []).some((l) => (!w.roles || w.roles.includes(l.role)) && year - l.year >= (w.after ?? 0) && year - l.year <= (w.within ?? 0));
 }
 // ชื่อคนที่จากไปล่าสุด ให้การ์ดสูญเสียเรียก ({ชื่อผู้จากไป})
 export const lastLoss = (st) => (st.kinLoss ?? []).at(-1) ?? null;
+// คู่ที่จากไปล่าสุด ({ชื่อคู่เก่า}) — คนที่จากไปล่าสุดอาจเป็นสัตว์หรือลูก การ์ดรักใหม่จึงเรียกคู่ตรง ๆ
+export const lastSpouseLoss = (st) => (st.kinLoss ?? []).findLast((l) => l.role === 'spouse') ?? null;
+// ปีที่อยู่ด้วยกัน ({ปีคู่เก่า}): อายุตอนแต่ง = flagAge.married (ไม่ถูกลบตอนธงหลุด) · ไม่รู้อายุตอนแต่ง = ไม่บอกเลขปี
+export function spouseYears(st) {
+  const l = lastSpouseLoss(st);
+  const wed = st.flagAge?.married;
+  return l && wed !== undefined ? Math.max(1, l.year - st.birthYear - wed) : null;
+}
 // ชื่อที่การ์ดสูญเสียเรียก — สัตว์เรียกแบบ petCall
 export const lossCall = (l) => (ANIMAL.includes(l.role) ? petCall(l) : l.name);
 

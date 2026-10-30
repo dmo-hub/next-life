@@ -1,0 +1,203 @@
+# รักครั้งใหม่หลังคู่ตาย (B165): พ้นช่วงไว้ทุกข์ 3 ปีถึงขึ้น (when.loss after) ภายใน 10 ปี · ไม่มีคู่ที่ยังอยู่
+# ใบละช่วงวัยเพราะกองสุ่มแยกตาม stage · ตอบรับแล้วต่อการ์ดแต่งรอบสองใบเดียวกันทุกวัย
+# แกนจดการสูญเสียเฉพาะคู่ที่จากไปเองตามตารางชีพ — คู่ที่เนื้อหาเล่าว่าตาย (family die) ไม่มีใบนี้
+# แต่งรอบสองใช้ธง married อย่างเดียว = แกนเพิ่มคู่ใหม่ให้ (ตอนไม่มีคู่ที่ยังอยู่) เหมือน young_wedding_01
+events:
+  - id: remarry_love_work_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {loss: {roles: [spouse], after: 3, within: 10}, flags: {not: [married]}}
+    title: "คนที่รอได้"
+    text: "ผ่านมาหลายปีหลัง“{ชื่อคู่เก่า}”จากไป เพื่อนร่วมงานคนหนึ่งชวนกินข้าวเย็นทุกวันศุกร์ ไม่เคยถามถึงรูปงานแต่งที่ยังตั้งบนโต๊ะทำงาน คืนนี้เขาบอกตรง ๆ ว่าอยากดูแลคุณ ถ้าคุณพร้อม"
+    choices:
+      - id: ready
+        text: "บอกเขาว่าพร้อมแล้ว"
+        outcomes:
+          - {weight: 3, ok: true, text: "เขาขอไปกราบรูป“{ชื่อคู่เก่า}”ก่อน แล้วค่อยคุยเรื่องงานแต่ง", effects: {happiness: 2, relations: 1}, next: remarry_wedding_work_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ญาติฝั่ง“{ชื่อคู่เก่า}”รู้ข่าวแล้วเงียบใส่ ทั้งสองตกลงคบกันไปก่อน ยังไม่แต่ง", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: slow
+        text: "ขอคบกันไปก่อน ยังไม่แต่ง"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: memory
+        text: "ขออยู่กับความทรงจำต่อไป"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: merit_first
+        text: "ทำบุญอุทิศให้คู่เก่าก่อนตัดสินใจ"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: dana, level: 1}]
+      - id: ask_kids
+        text: "ถามลูกก่อนว่าคิดยังไง"
+        requires: {family: [{role: child, alive: true}], reason: "ไม่มีลูกให้ถาม"}
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกบอกว่าอยากเห็นคุณยิ้มแบบเดิมอีกสักครั้ง", effects: {happiness: 1, relations: 2}, next: remarry_wedding_work_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกเดินหนีเข้าห้องเงียบ ๆ ยังไม่พร้อมให้ใครมาแทน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: remarry_love_mid_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 2
+    when: {loss: {roles: [spouse], after: 3, within: 10}, flags: {not: [married]}}
+    title: "เจอกันในงานรวมรุ่น"
+    text: "งานเลี้ยงรุ่นปีนี้คุณนั่งข้างเพื่อนสมัยเรียนที่เสียคู่ไปเหมือนกัน คุยกันถึงตีหนึ่งเรื่อง“{ชื่อคู่เก่า}”ที่อยู่ด้วยกันมา {ปีคู่เก่า} อีกฝ่ายฟังจนจบแล้วถามว่าแก่ไปด้วยกันอีกสักคนดีไหม"
+    choices:
+      - id: ready
+        text: "ตอบตกลง ไม่อยากเหงาอีกแล้ว"
+        outcomes:
+          - {weight: 3, ok: true, text: "อีกฝ่ายจับมือแน่น บอกว่าจะไม่ขอให้ลืม“{ชื่อคู่เก่า}”", effects: {happiness: 2, relations: 1}, next: remarry_wedding_mid_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ญาติทั้งสองฝ่ายพูดเรื่องมรดกก่อนเรื่องอื่น ทั้งคู่เลยคบกันไปเงียบ ๆ ไม่แต่ง", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: slow
+        text: "ขอเป็นเพื่อนคุยกันไปก่อน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: memory
+        text: "บอกว่าใจยังอยู่กับคนเดิม"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: merit_first
+        text: "ชวนกันไปทำบุญให้คู่เก่าทั้งสองคน"
+        effects: {happiness: 1, relations: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: dana, level: 1}]
+      - id: ask_kids
+        text: "กลับไปถามลูกก่อน"
+        requires: {family: [{role: child, alive: true}], reason: "ไม่มีลูกให้ถาม"}
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกโตพอจะเข้าใจ บอกว่าดีใจที่มีคนอยู่ข้างคุณ", effects: {happiness: 1, relations: 2}, next: remarry_wedding_mid_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกกลัวเรื่องบ้านกับที่ดิน คุยกันทีไรเสียงดังทุกที", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: remarry_love_old_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [60, 85], loss: {roles: [spouse], after: 3, within: 10}, flags: {not: [married]}}
+    title: "คู่รำวงที่วัด"
+    text: "ชมรมผู้สูงอายุที่วัดมีรำวงทุกเย็นวันพระ คนเดิมมาขอเป็นคู่รำคุณทุกครั้ง วันนี้เขาถือปิ่นโตมาฝาก บอกว่ารู้ว่ายังคิดถึง“{ชื่อคู่เก่า}” แต่อยากมีคนกินข้าวด้วยกันตอนเย็น"
+    choices:
+      - id: ready
+        text: "รับปิ่นโต แล้วตอบว่าตกลง"
+        outcomes:
+          - {weight: 3, ok: true, text: "คนทั้งชมรมแซวกันยกใหญ่ เจ้าอาวาสบอกว่าจะหาฤกษ์ให้", effects: {happiness: 2, relations: 1}, next: remarry_wedding_old_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลานบ่นว่าแก่แล้วจะแต่งทำไม สองคนเลยไปมาหาสู่กันโดยไม่แต่ง", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: slow
+        text: "เป็นเพื่อนกินข้าวเย็นกันก็พอ"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: memory
+        text: "ขอบคุณ แต่ขออยู่คนเดียว"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: merit_first
+        text: "ชวนกันถวายสังฆทานให้คู่เก่า"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: dana, level: 1}]
+      - id: ask_kids
+        text: "ปรึกษาลูกก่อน"
+        requires: {family: [{role: child, alive: true}], reason: "ไม่มีลูกให้ถาม"}
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกบอกว่าตอนนี้ถึงเวลาคิดถึงตัวเองบ้างแล้ว", effects: {happiness: 1, relations: 2}, next: remarry_wedding_old_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกกลัวคนแปลกหน้ามาหวังสมบัติ ไม่ยอมคุยด้วยหลายเดือน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ← เรื่องต่อของการ์ดรักใหม่ วัยละใบ (เรื่องต่อต้องอยู่ช่วงเดียวกับแม่ · ไม่มี weight · ออกทาง next เท่านั้น)
+  - id: remarry_wedding_work_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {loss: {roles: [spouse], after: 3, within: 10}, flags: {not: [married]}}
+    title: "แต่งรอบสอง"
+    text: "งานรอบนี้ไม่มีซุ้มดอกไม้ ไม่มีขบวนขันหมาก แหวนวงเก่าที่ใส่มา {ปีคู่เก่า}กับ“{ชื่อคู่เก่า}”ยังอยู่ในกล่องข้างหัวนอน คนใหม่บอกว่าแล้วแต่คุณจะเก็บไว้แบบไหน"
+    choices:
+      - id: keep_ring
+        text: "เก็บแหวนวงเก่าไว้ที่หิ้งพระ"
+        effects: {happiness: 1, relations: 1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: return_ring
+        text: "ส่งแหวนคืนญาติฝั่งคู่เก่า"
+        effects: {relations: 2}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: merit_wed
+        text: "ทำบุญอุทิศให้คู่เก่าก่อนแต่ง"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
+        sets_flags: [married]
+        merit: [{cat: dana, level: 1}]
+      - id: quiet
+        text: "จดทะเบียนเงียบ ๆ ไม่บอกใคร"
+        effects: {happiness: 1, relations: -1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+
+  - id: remarry_wedding_mid_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    when: {loss: {roles: [spouse], after: 3, within: 10}, flags: {not: [married]}}
+    title: "แต่งรอบสอง"
+    text: "งานรอบนี้มีแค่ญาติสนิทสองบ้านกับพระเก้ารูป แหวนวงเก่าที่ใส่มา {ปีคู่เก่า}กับ“{ชื่อคู่เก่า}”ยังอยู่ในกล่องข้างหัวนอน คนใหม่บอกว่าแล้วแต่คุณจะเก็บไว้แบบไหน"
+    choices:
+      - id: keep_ring
+        text: "เก็บแหวนวงเก่าไว้ที่หิ้งพระ"
+        effects: {happiness: 1, relations: 1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: return_ring
+        text: "ส่งแหวนคืนญาติฝั่งคู่เก่า"
+        effects: {relations: 2}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: merit_wed
+        text: "ทำบุญอุทิศให้คู่เก่าก่อนแต่ง"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
+        sets_flags: [married]
+        merit: [{cat: dana, level: 1}]
+      - id: quiet
+        text: "จดทะเบียนเงียบ ๆ ไม่บอกใคร"
+        effects: {happiness: 1, relations: -1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+
+  - id: remarry_wedding_old_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    when: {loss: {roles: [spouse], after: 3, within: 10}, flags: {not: [married]}}
+    title: "แต่งรอบสอง"
+    text: "งานรอบนี้จัดที่ศาลาวัด คนในชมรมช่วยกันทำกับข้าว แหวนวงเก่าที่ใส่มา {ปีคู่เก่า}กับ“{ชื่อคู่เก่า}”ยังอยู่ในกล่องข้างหัวนอน คนใหม่บอกว่าแล้วแต่คุณจะเก็บไว้แบบไหน"
+    choices:
+      - id: keep_ring
+        text: "เก็บแหวนวงเก่าไว้ที่หิ้งพระ"
+        effects: {happiness: 1, relations: 1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: return_ring
+        text: "ส่งแหวนคืนญาติฝั่งคู่เก่า"
+        effects: {relations: 2}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: merit_wed
+        text: "ทำบุญอุทิศให้คู่เก่าก่อนแต่ง"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
+        sets_flags: [married]
+        merit: [{cat: dana, level: 1}]
+      - id: quiet
+        text: "จดทะเบียนเงียบ ๆ ไม่บอกใคร"
+        effects: {happiness: 1, relations: -1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]

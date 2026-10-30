@@ -35,6 +35,9 @@ let lossCards = 0, lossEvents = 0, multiKid = 0, notLatest = 0;
 let funerals = 0, whoLines = 0, whoCame = 0, whoAway = 0, whoLeak = 0, whoShort = 0;
 const WHO_FIXED = ['เป็นคนในวงการที่เคยร่วมงานกันมา', 'เป็นเพื่อนบ้านและคนที่เคยช่วยเหลือกันมา', 'แขกที่เหลือส่วนใหญ่', 'แขกส่วนใหญ่', 'ศาลามีแต่คนในบ้าน', 'อยู่ช่วยงานจนเสร็จ', 'แวะมาแค่ครู่เดียว', 'เพื่อนรุ่นเดียวกัน', 'คู่ชีวิต', 'ลูก', 'หลาน', 'และ', 'คน', '·'];
 const whoLeft = (text) => WHO_FIXED.reduce((t, w) => t.split(w).join(''), text).replace(/[\d\s]/g, '');
+// B165 รักครั้งใหม่หลังคู่ตาย: ไม่ขึ้นในช่วงไว้ทุกข์ 3 ปี · ขึ้นได้จริง · แต่งรอบสองได้คู่ใหม่ที่ยังอยู่
+const MOURN = 3;
+let loveCards = 0, loveEarly = 0, rewed = 0, rewedBad = 0;
 const kidsAt50 = [];
 const roles = { spouse: 0, child: 0, grandchild: 0 };
 const fmt = (v) => v.toFixed(2);
@@ -62,6 +65,14 @@ for (const [bot, pick] of Object.entries(BOTS)) {
         was.set(m.id, m.alive);
       }
       if (card.loss) lossCards++;
+      if (card.kind === 'eraEvent' || card.kind === 'event') {
+        const id = card.ev?.id ?? card.id;
+        if (id?.startsWith('remarry_love_')) {
+          loveCards++;
+          const l = st.kinLoss.findLast((x) => x.role === 'spouse');
+          if (!l || st.birthYear + st.age - l.year < MOURN) loveEarly++;
+        }
+      }
       // คนเป้าสุ่มตอนการ์ดเลือกขึ้น — การ์ดผลใบถัดมายังเรียกคนเดิมได้แม้ผลทำให้เขาจากไป จึงตรวจเฉพาะการ์ดเลือก
       // การ์ดชวนไปต่างโลก (B68d) ไม่ผ่านการเลือกคนเป้าและข้อความไม่เรียกชื่อใคร — คนเป้าที่ค้างจากการ์ดก่อนหน้าจึงไม่ใช่คนที่การ์ดนี้เรียก
       // ใบศาลเฉียดตาย (B153) ก็เช่นกัน — แกนแทรกกลางชีวิตโดยไม่เลือกคนเป้า
@@ -85,6 +96,13 @@ for (const [bot, pick] of Object.entries(BOTS)) {
     };
     const { state: st } = playLife(mixSeed(seed, i * 7 + 1), content, pick, check);
     for (const m of [...st.parents, ...st.kin]) if (m.bond > BOND_START[m.role ?? 'parent']) bondUp++;
+    const wedAt = st.log.find((x) => x.id.startsWith('remarry_wedding_'));
+    if (wedAt) {
+      rewed++;
+      // คู่ใหม่ = คู่ที่เพิ่มหลังคู่เก่าจากไป · ต้องไม่ใช่คนเดิมที่ฟื้น
+      const spouses = st.kin.filter((m) => m.role === 'spouse');
+      if (spouses.length < 2 || spouses.at(-1).born === undefined) rewedBad++;
+    }
     lossEvents += st.kinLoss.length;
     for (const m of st.kin) {
       roles[m.role]++;
@@ -153,6 +171,8 @@ check('คนเป้าของการ์ดสุ่มได้ ไม่
 check('งานศพบอกใครมาส่งทุกงานที่มีคน (B164)', whoShort, ` ${whoLines}/${funerals} งาน`);
 check('  บรรทัดใครมาส่งไม่มีชื่อคน', whoLeak);
 check('  ขึ้นได้ทั้งทางอยู่ช่วยงานและแวะครู่เดียว', whoCame && whoAway ? 0 : 1, ` อยู่ ${whoCame} · แวะ ${whoAway}`);
+check(`การ์ดรักใหม่ไม่ขึ้นใน ${MOURN} ปีหลังคู่ตาย (B165)`, loveEarly, ` ${loveCards} ใบ`);
+check('  การ์ดรักใหม่ขึ้นได้ · แต่งรอบสองได้คู่ใหม่', loveCards && rewed ? rewedBad : 1, ` แต่ง ${rewed} ชีวิต`);
 
 // สัตว์เลี้ยง/เพื่อนรุ่น: ยังไม่มีเนื้อหาใช้ — ทดสอบกับชีวิตจริงที่เติมสมาชิกเอง
 {

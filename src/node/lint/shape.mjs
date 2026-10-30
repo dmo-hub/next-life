@@ -573,9 +573,10 @@ export const rules = [
       const loss = isObj(e.when) ? e.when.loss : undefined;
       if (loss === undefined) return;
       const LOSS_ROLES = ['spouse', 'child', 'grandchild', 'pet', 'herd'];
-      if (!isObj(loss) || Object.keys(loss).some((k) => k !== 'roles' && k !== 'within')) return r('.when.loss', 'loss ต้องเป็น {roles?, within?}');
+      if (!isObj(loss) || Object.keys(loss).some((k) => !['roles', 'within', 'after'].includes(k))) return r('.when.loss', 'loss ต้องเป็น {roles?, within?, after?}');
       if (loss.roles !== undefined && !(Array.isArray(loss.roles) && loss.roles.length && loss.roles.every((x) => LOSS_ROLES.includes(x)))) r('.when.loss.roles', `roles ต้องเป็นรายการจาก ${LOSS_ROLES.join(' ')}`);
       if (loss.within !== undefined && !(isInt(loss.within) && loss.within >= 0 && loss.within <= 10)) r('.when.loss.within', 'within ต้องเป็นจำนวนปี 0–10');
+      if (loss.after !== undefined && !(isInt(loss.after) && loss.after >= 0 && loss.after <= (loss.within ?? 0))) r('.when.loss.after', 'after ต้องเป็นจำนวนปี 0–within');
     },
   },
   {
