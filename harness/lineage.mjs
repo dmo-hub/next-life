@@ -270,7 +270,21 @@ check('ทายาทเกิดมามีธงตัวเองว่า�
 check(`ธงพ่อแม่ครบทะเบียนไม่ขยับชีวิตเมื่อไม่มีการ์ดอ่าน (${heirReaders.length ? 'มีผู้อ่านแล้ว ข้าม' : `${streamChecks} คู่`})`, heirTwin);
 check(`ป้าย parentFrom ตรงเงื่อนไขการ์ด (${dCards} ใบ)`, heirD);
 const deadHeir = [...heirFired].filter(([, c]) => !c).map(([id]) => id);
-check(`การ์ดที่กั้นด้วยธงพ่อแม่ออกจริงในรุ่นสองทุกใบ (${heirFired.size} ใบ · ไม่นับใบที่มีแค่ตัวคูณ)`, deadHeir.length, deadHeir.length ? ` ไม่เคยออก: ${deadHeir.join(' ')}` : '');
+// ธงหายากถึงทายาทแค่ไม่กี่ชีวิตใน 500 ตระกูล (loan_shark ปิดหนี้ก่อนตาย) — ใบที่ไม่ออกเองลองซ้ำด้วยทายาทที่ถือธงครบ แยกดวงออกจากการ์ดที่ออกไม่ได้จริง
+const HEIR_RETRY = 200;
+const deadForced = deadHeir.filter((id) => {
+  const ev = byId.get(id);
+  const parentFlags = Object.fromEntries(ev.when.parent_flags.has.map((f) => [f, 1]));
+  for (let i = 0; i < HEIR_RETRY; i++) {
+    const s = mixSeed(seed, 9900 + i);
+    const p = newLife(s, content);
+    let hit = false;
+    playLife(s, content, forceChild, (card) => { if (card.id === id) hit = true; }, newLife(s, content, { birthYear: p.birthYear, sex: p.sex, region: { name: p.region, ses: p.ses }, cls: p.cls, bonus: {}, parentFlags }));
+    if (hit) return false;
+  }
+  return true;
+});
+check(`การ์ดที่กั้นด้วยธงพ่อแม่ออกได้จริงทุกใบ (${heirFired.size} ใบ · ไม่นับใบที่มีแค่ตัวคูณ · ไม่ออกเอง ${deadHeir.length} ใบลองถือธงซ้ำ ${HEIR_RETRY} ชีวิต)`, deadForced.length, deadForced.length ? ` ไม่เคยออก: ${deadForced.join(' ')}` : '');
 console.log(`ทางลูกบังคับ: ถือธงพ่อแม่ ${withFlag}/${forced} ชีวิต · การ์ดอ่านธงพ่อแม่ ${heirReaders.length} ใบ · ไม่เคยออก ${deadHeir.length}${deadHeir.length ? `: ${deadHeir.join(' ')}` : ''}`);
 if (!sceneIds.length) fails.push('ไม่มีฉากระหว่างชาติในเนื้อหา');
 if (fails.length) {
