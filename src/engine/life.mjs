@@ -1028,7 +1028,6 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     text: fill(ev.text, st),
     choices: ev.choices.map((c) => fill(c.text, st)),
     ...choiceHints(ev, st),
-    ...choiceFollows(ev),
     fx: ev.choices.map((c) => choiceFx(st, ev, c)),
     // เหตุผลที่ตัวเลือกกดไม่ได้ (null = กดได้) — หน้าจอแสดงเทาพร้อมเหตุผล
     locked: ev.choices.map((c) => lockReason(st, c)),
@@ -1048,21 +1047,6 @@ function moneyShort(ev, st) {
     return opts.length ? opts : null;
   });
   return { moneyGap, ...(loans.some((l) => l) && { loans }) };
-}
-
-// ตัวเลือกที่ตัวเองหรือผลสุ่มทางใดทางหนึ่งมีเรื่องต่อ (next · ปีเดียวกัน) หรือผลย้อน (schedules · ปีหลัง)
-// หน้าจอไม่แสดงเป็นป้ายบนปุ่มแล้ว (เจ้าของสั่งซ่อน ผู้เล่นไม่รู้ล่วงหน้า) · ช่องนี้คงไว้ตามคำสั่งเดียวกัน แม้ตอนนี้ไม่มีผู้อ่าน · เงื่อนไขของการ์ดปลายทางไม่ดู
-// ใส่ช่องเฉพาะการ์ดที่มีอย่างน้อยหนึ่งตัวเลือก การ์ดอื่นรูปเดิมทุกช่อง
-export function choiceFollows(ev) {
-  const follows = ev.choices.map((c) => {
-    const ways = [c, ...(c.outcomes ?? [])];
-    // นัดที่ช้าสุด 0 ปี ออกปีเดียวกัน ผู้เล่นเห็นเป็นเรื่องต่อ ไม่ใช่ผลภายหลัง
-    const sameYear = (s) => s.after_years[1] === 0;
-    const next = ways.some((w) => w.next || w.schedules?.some(sameYear));
-    const later = ways.some((w) => w.schedules?.some((s) => !sameYear(s)));
-    return next && later ? 'both' : next ? 'next' : later ? 'later' : null;
-  });
-  return follows.some((f) => f) ? { follows } : {};
 }
 
 // บรรทัดรองบอกข้อแลกใต้ตัวเลือก (B52) — ใส่ช่องเฉพาะการ์ดที่มี hint การ์ดเดิมจึงมีรูปเท่าเดิมทุกช่อง
