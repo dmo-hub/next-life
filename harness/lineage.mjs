@@ -70,6 +70,8 @@ let heirA = 0, heirB = 0, heirC = 0, heirTwin = 0, heirGot = 0;
 const lens = [];
 // ทางในตระกูลแยกชั้น (B18): จำนวน · ผลรวมสัดส่วนส่งต่อ · มรดก (เท่ารายได้ปี) · |ส่วนต่างความสัมพันธ์+คอนเน็คชั่นจากบ้าน|
 const tiers = KIN_TIERS.map(() => ({ n: 0, carry: 0, legacy: 0, kin: 0, units: [] }));
+const causeGen = Array.from({ length: gens }, () => new Map());
+const CAUSE_MIN = 30;
 for (const [name, pick] of Object.entries(BOTS)) {
   const r = { realms: {}, paths: { child: 0, reborn: 0 }, byX: { child: [[0, 0], [0, 0], [0, 0]], reborn: [[0, 0], [0, 0], [0, 0]] }, ages: Array.from({ length: gens }, () => [0, 0]), legacy: [0, 0] };
   for (let i = 0; i < n; i++) {
@@ -94,6 +96,7 @@ for (const [name, pick] of Object.entries(BOTS)) {
       }
       if (st.gen !== wantGen) fails.push(`ตระกูล ${i} รุ่นที่ ${g + 1} ได้ gen ${st.gen} (ควรเป็น ${wantGen})`);
       r.ages[g][0] += life.age;
+      causeGen[g].set(st.cause ?? 'other', (causeGen[g].get(st.cause ?? 'other') ?? 0) + 1);
       r.ages[g][1]++;
       // สำเนาบัญชีตอนการ์ดส่งต่อ (หลังฉากระหว่างชาติปรับบัญชีครบแล้ว) = บัญชีที่ makeHeir ใช้
       let verdict = null;
@@ -301,6 +304,11 @@ console.log('');
 check('ทางเกิดใหม่/ต่างโลกไม่ได้ธงพ่อแม่', heirA);
 check('ทางเป็นลูกได้ธงในทะเบียน heir: ครบ ชั้นไม่เกินเพดาน และรุ่นก่อนถือจริง', heirB, ` · ได้ธง ${heirGot} ชีวิต`);
 check('ทายาทเกิดมามีธงตัวเองว่าง (ธงพ่อแม่อยู่ช่องแยก)', heirC);
+// ทายาทตายได้ทุกสาเหตุแบบรุ่นแรก (ไอเดีย thelands-5 — เขา: ธงตายค้าง ทายาทอมตะ) · สาเหตุที่รุ่นแรกน้อยกว่าเกณฑ์หายไปในรุ่นหลังได้จาก rng ล้วน ไม่ตัดสิน
+const counted = [...causeGen[0]].filter(([, v]) => v >= CAUSE_MIN).map(([c]) => c);
+const lostCause = counted.flatMap((c) => causeGen.slice(1).flatMap((m, g) => (m.get(c) ? [] : [`${c} รุ่น ${g + 2}`])));
+console.log(`  สาเหตุตายต่อรุ่น (นับ ${counted.length} สาเหตุที่รุ่นแรก ≥${CAUSE_MIN}): ${counted.map((c) => `${c} ${causeGen.map((m) => m.get(c) ?? 0).join('/')}`).join(' · ')}`);
+check('ทายาทรุ่นหลังตายได้ทุกสาเหตุที่รุ่นแรกตาย', lostCause.length, lostCause.length ? ` · หาย: ${lostCause.join(' · ')}` : '');
 check(`ธงพ่อแม่ครบทะเบียนไม่ขยับชีวิตเมื่อไม่มีการ์ดอ่าน (${heirReaders.length ? 'มีผู้อ่านแล้ว ข้าม' : `${streamChecks} คู่`})`, heirTwin);
 check(`ป้าย parentFrom ตรงเงื่อนไขการ์ด (${dCards} ใบ)`, heirD);
 const deadHeir = [...heirFired].filter(([, c]) => !c).map(([id]) => id);
