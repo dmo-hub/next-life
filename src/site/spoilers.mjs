@@ -159,7 +159,7 @@ function conditions(e, L) {
   if (w.school) out.push(`เรียน${any(w.school.map((s) => esc(TRACKS[s]?.name ?? (s === 'none' ? 'ไม่ได้เรียน' : s))))}`);
   for (const [k, b] of Object.entries(w.stats ?? {})) out.push(bound(k, b));
   for (const f of w.family ?? []) out.push(famCond(f));
-  if (w.loss) out.push(`เพิ่งเสีย${any(w.loss.roles.map((r) => FAMILY_ROLE_NAMES[r] ?? r))}${w.loss.within ? ` ภายใน ${w.loss.within} ปี` : 'ปีนี้'}`);
+  if (w.loss) out.push(w.loss.after ? `เสีย${any(w.loss.roles.map((r) => FAMILY_ROLE_NAMES[r] ?? r))}มาแล้ว ${w.loss.after}–${w.loss.within} ปี` : `เพิ่งเสีย${any(w.loss.roles.map((r) => FAMILY_ROLE_NAMES[r] ?? r))}${w.loss.within ? ` ภายใน ${w.loss.within} ปี` : 'ปีนี้'}`);
   out.push(...flagCond(w.flags, L));
   // ธงของพ่อแม่รุ่นก่อน ไม่ใช่ของตัวละคร — การ์ดจึงออกเฉพาะชีวิตที่เกิดเป็นลูกของรุ่นก่อน
   out.push(...flagCond(w.parent_flags, L, 'เกิดเป็นลูกของรุ่นก่อนที่'));
