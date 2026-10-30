@@ -1305,7 +1305,7 @@ const growLabel = (stage) => `เติบโตเป็น${stage === 'หน�
 // รูปบนป้ายคนหาย/หนังสืองานศพ = ตัวละครเองตอนอายุนั้น ชุดเดียวกับภาพแชร์ — หุ่นเทาตายตัวเดิมไม่บอกว่าเป็นใคร
 const portrait = (age) => artSvg('por', AVATAR_SIZE, AVATAR_SIZE, avatarParts(age));
 
-const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา', warn: 'ใกล้ตาย' };
+const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา', warn: 'ใกล้ตาย', memory: 'ความทรงจำ' };
 // ป้ายคนหาย (B139) — ถ้อยคำของคนที่บ้านที่ยังรอ: ไม่อาลัย ไม่บอกเหตุ (B110) · will[0] ไม่มีพินัยกรรม · will[1] มี
 const LOST = {
   head: 'ประกาศตามหาคนหาย',
@@ -1429,6 +1429,7 @@ function render(card) {
     if (card.note && !gone) body.append(sourced(el('p', 'sub', card.note), childNoteSrc(card.age)));
     if (card.funeral) body.append(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
     if (card.funeral?.who) body.append(el('p', 'sub', card.funeral.who));
+    if (card.lastImage) body.append(el('p', 'sub', `ภาพสุดท้ายที่นึกถึง: ${card.lastImage}`));
     if (card.will !== undefined) body.append(el('p', 'sub', gone ? LOST.will[card.will ? 1 : 0] : card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
     if (gone) body.append(el('p', 'call', LOST.call));
     if (card.pets) body.append(el('p', 'sub', card.pets));

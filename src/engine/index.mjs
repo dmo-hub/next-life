@@ -6,6 +6,7 @@ export * from './merit.mjs';
 export * from './career.mjs';
 export * from './rank.mjs';
 export * from './warn.mjs';
+export * from './memory.mjs';
 export * from './life.mjs';
 export * from './goal.mjs';
 export * from './isekai.mjs';

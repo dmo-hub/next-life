@@ -6,7 +6,9 @@
 // ชิ้น 2: พ่อแม่/ญาติที่จากไปมีสาเหตุทุกคน สัดส่วนใกล้ค่าคาดจากอายุ/ปีของเขาเอง · ญาติที่ตายตามนัดโรคเรื้อรังมีการ์ดแจ้งก่อน
 // · พ่อ/แม่ตายด้วยโรคถ่ายทอดได้ ⇒ ชีวิตนั้นจดประวัติครอบครัว และตายด้วยโรคนั้นบ่อยกว่าคนไม่มีประวัติ
 // ชิ้น 3: ทำร้ายตัวเองพาสายด่วน 1323 · สัตว์คู่ใจมีสาเหตุ · การ์ดสั่งตายพร้อมสาเหตุได้สาเหตุนั้นโดยไม่ดึงเลขสุ่ม
-import { playLife, newLife, applyFamily, mixSeed, protoYear, causeShares, CHRONIC, DEATH_RISK, HEREDITARY, MAX_AGE, PET_CAUSES } from '../src/engine/index.mjs';
+// B168: ตายสงบ (วัยชรา/โรคเรื้อรังที่นัดไว้ อายุ ≥60) ได้การ์ดย้อนความทรงจำ 1 ใบพอดีก่อนคำสั่งเสีย · ทางอื่น 0 · ไม่มีช่อง {} ดิบ
+// · ตัวควบคุม นัดตายอุบัติเหตุอายุ 70 = 0 ใบ (นัดโรคเรื้อรังอายุ 70 ต้องได้)
+import { playLife, newLife, applyFamily, mixSeed, protoYear, causeShares, CHRONIC, DEATH_RISK, HEREDITARY, MAX_AGE, PET_CAUSES, memoryStories, isGone, stageOf, MEMORY } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { random } from './bots.mjs';
 
@@ -46,6 +48,8 @@ const hered = { yes: [0, 0], no: [0, 0] };
 let careCards = 0, careNoHelp = 0, careStray = 0, petLoss = 0, petNoCause = 0;
 let noCause = 0, cardMismatch = 0, chronicDeaths = 0, chronicUntold = 0, illCards = 0, illWrong = 0;
 const life30 = { none: [0, 0], smoker: [0, 0] };
+// B168: เข้าเกณฑ์ (มีเรื่องพอ) · ได้ · ไม่เข้าแต่ได้ · ได้เกินใบ · ใบถัดไปไม่ใช่คำสั่งเสีย · ช่อง {} ดิบ · เข้าเกณฑ์แต่ไม่ได้ ที่สุขภาพยังเหลือ (ตายกลางปีจากผลการ์ดสุขภาพเป็น 0 = ไม่เข้าตามสเปก)
+const mem = { fit: 0, got: 0, stray: 0, multi: 0, order: 0, raw: 0, miss: 0, missMid: 0 };
 const smokeShare = { none: [0, 0], smoker: [0, 0] };
 const fmt = (v, d = 2) => v.toFixed(d);
 
@@ -53,7 +57,14 @@ for (let i = 0; i < n; i++) {
   let told = null;
   let healthDeath = false;
   let parentsAt = null;
+  let memN = 0, memPrev = false;
   const r = playLife(mixSeed(seed, i), content, random, (card, st) => {
+    if (memPrev && card.id !== 'funeral_wishes_01') mem.order++;
+    memPrev = card.kind === 'memory';
+    if (memPrev) {
+      memN++;
+      if (/[{}]/.test(JSON.stringify([card.text, card.items, card.choices]))) mem.raw++;
+    }
     // อายุพ่อแม่ตอนเราเกิด → ปีที่เขาตาย · คนที่ตายก่อนเราเกิด/ชะตารู้แล้ว (ผู้เล่นรุ่นก่อน) ไม่นับ
     parentsAt ??= st.parents.map((p) => (p.alive ? p.age : null));
     if (card.kinIllness) kinIllCards++;
@@ -77,6 +88,14 @@ for (let i = 0; i < n; i++) {
   });
   const st = r.state;
   const age = r.age;
+  // เกณฑ์ตามสเปกเขียนแยกจาก memoryEligible — ใช้ตัวเดียวกัน ด่านจะผ่านเองเสมอ
+  const calm = st.age >= MEMORY.from && !isGone(st) && (st.cause === 'other' || (CHRONIC.includes(st.cause) && st.terminal?.cause === st.cause));
+  const fit = calm && memoryStories(st, stageOf).length >= MEMORY.min;
+  if (fit) mem.fit++;
+  if (memN) mem.got++;
+  if (memN && !fit) mem.stray++;
+  if (memN > 1) mem.multi++;
+  if (fit && !memN) st.health > 0 ? mem.miss++ : mem.missMid++;
   const kinDead = [
     ...st.parents.map((p, j) => (!p.alive && parentsAt?.[j] !== null && !p.gone && p.diesAt === undefined ? { m: p, year: st.birthYear + p.diedAge - parentsAt[j], age: p.diedAge, tells: true } : null)).filter(Boolean),
     ...(st.kin ?? []).filter((m) => !m.alive && !['pet', 'herd'].includes(m.role)).map((m) => ({ m, year: m.born + m.diedAge + 1, age: m.diedAge, tells: ['spouse', 'child', 'grandchild'].includes(m.role) && !m.left })),
@@ -214,6 +233,32 @@ check('สัตว์คู่ใจที่จากไปมีสาเห�
   const other = st.parents.find((p) => p.alive);
   const d2 = other ? draw(() => applyFamily(st, { family: [{ die: 'parent' }] })) : false;
   check('  ตัวควบคุม ไม่ใส่สาเหตุ ⇒ สุ่มจาก kinCauseRng', other && d2 && keys.includes(other.cause) ? 0 : 1, ` (${other?.cause} · ดึงเลข ${d2})`);
+}
+check('ตายสงบอายุ ≥60 ได้การ์ดย้อนความทรงจำ', mem.got ? mem.miss : 1, ` ${mem.got}/${mem.fit} ชีวิต · ขาดเพราะตายกลางปีสุขภาพหมด ${mem.missMid}`);
+check('ทางอื่นไม่มีการ์ดย้อน · ไม่เกิน 1 ใบ · ใบถัดไปเป็นคำสั่งเสีย', mem.stray + mem.multi + mem.order, ` (หลุด ${mem.stray} · เกิน ${mem.multi} · ลำดับ ${mem.order})`);
+check('การ์ดย้อนไม่มีช่อง {} ดิบ', mem.raw, ` (${mem.raw})`);
+// นัดตายตอนขึ้นปีอายุ 70 ผ่าน st.terminal (ทางเดียวกับโรคที่หมอบอก) · อุบัติเหตุต้องไม่ได้ · โรคเรื้อรังต้องได้ — ผลไม่ได้แปลว่าเงื่อนไขอ่านสาเหตุจริง
+{
+  const forced = (cause) => {
+    let lives = 0, cards = 0;
+    for (let i = 0; i < 40 && lives < 10; i++) {
+      let set = false, c = 0;
+      const st = playLife(mixSeed(seed + 99, i), content, random, (card, s) => {
+        if (card.kind === 'memory') c++;
+        if (!set && s.age === 69 && !s.dead && !s.trip && !s.court) {
+          s.terminal = { cause, age: 70, told: true };
+          set = true;
+        }
+      }).state;
+      if (!set || st.age !== 70 || st.cause !== cause || memoryStories(st, stageOf).length < MEMORY.min) continue;
+      lives++;
+      cards += c;
+    }
+    return { lives, cards };
+  };
+  const road = forced('road'), cancer = forced('cancer');
+  check('  ตัวควบคุม นัดตายอุบัติเหตุอายุ 70 = 0 ใบ', road.lives ? road.cards : 1, ` ${road.cards} ใบ/${road.lives} ชีวิต`);
+  check('  ตัวควบคุม นัดตายโรคเรื้อรังอายุ 70 = 1 ใบทุกชีวิต', cancer.lives && cancer.cards === cancer.lives ? 0 : 1, ` ${cancer.cards} ใบ/${cancer.lives} ชีวิต`);
 }
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 if (fail) process.exitCode = 1;

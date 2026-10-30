@@ -160,6 +160,8 @@ function petCause(st, m) {
 export function parentDied(st, p, year) {
   p.alive = false;
   p.diedAge ??= p.diesAt ?? p.age;
+  // อายุของเราตอนพ่อ/แม่จากไป — การ์ดย้อนความทรงจำ (B168) เล่า · diedAge เป็นอายุของพ่อแม่
+  p.diedAtYou ??= st.age;
   if (p.gone) return;
   p.cause ??= kinCause(st.content.era, st.seed, st.kinCauseRng, p.sex, year, p.diedAge);
   inherit(st, p.cause);

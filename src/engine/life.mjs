@@ -13,6 +13,7 @@ import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
+import { memoryCard, memoryEligible } from './memory.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -1188,6 +1189,7 @@ export function nextCard(st) {
       st.pending = { alloc: options };
     }
     if (card.kind === 'warn') st.pending = { warn: true, choices: card.choices };
+    if (card.kind === 'memory') st.pending = { memory: true, choices: card.choices };
     return emit(st, card);
   }
   for (;;) {
@@ -1203,7 +1205,13 @@ export function nextCard(st) {
         return nextCard(st);
       }
       if (d?.fate === 'court') return nextCard(st);
-      if (d?.fate === 'dead') return queueFuneral(st) ? nextCard(st) : deathCard(st);
+      if (d?.fate === 'dead') {
+        // ตายสงบตอนขึ้นปี (B168) ย้อนชีวิตก่อนคำสั่งเสีย — ทางศาล/กลางปี/ต่างโลกไม่ผ่านจุดนี้
+        const mem = memoryEligible(st, isGone) && memoryCard(st, stageOf);
+        if (!queueFuneral(st)) return deathCard(st);
+        if (mem) st.queue.unshift(mem);
+        return nextCard(st);
+      }
       stepYear(st);
       if (crossedLow(st, st.health, WARN.human)) st.due.push(warnCard(st.age, stageOf(st.age), WARN.text));
     }
@@ -1441,6 +1449,13 @@ export function choose(st, idx, loan) {
     st.log.push({ id: 'warn', age: st.age, choice: idx, text: ev.choices[idx] });
     return;
   }
+  // ภาพสุดท้าย (B168) ขึ้นแค่มรณบัตร — ไม่ลง log ชีวิตจบแล้ว ไม่มีอะไรอ่านต่อ
+  if (ev?.memory) {
+    if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    st.pending = null;
+    st.lastImage = ev.choices[idx];
+    return;
+  }
   if (ev?.entry) {
     if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
@@ -1566,6 +1581,7 @@ function deathCard(st) {
   card.life = lifeSeries(st);
   card.job = jobText(st);
   card.gen = st.gen;
+  if (st.lastImage) card.lastImage = st.lastImage;
   // ใบ 07: ตายตอนเด็กได้บันทึกสั้นบอกสถิติยุคนั้น (ทารกใช้อัตราตายทารก · เด็กโตใช้โอกาสตายรายปีของอายุนั้น) แล้วเข้าช่วงที่ 7 ตามปกติ
   if (st.age < 5) {
     const imr = infantMortality(era, st.sex, protoYear(era, st.seed, st.birthYear));
@@ -1729,7 +1745,8 @@ export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, c
     }
     // บอทคืนเลขตัวเลือก หรือ {i, loan} เมื่อกู้มาจ่าย (B111)
     if (card.choices?.length) {
-      const p = card.entry && !pickChoice.isekai ? ENTRY.decline : warnPick(card) >= 0 ? warnPick(card) : pickChoice(card, bot, st);
+      // การ์ดย้อนความทรงจำไม่ดึงเลขบอท — งานศพหลังจากนี้เลือกเหมือนไม่มีการ์ดนี้
+      const p = card.entry && !pickChoice.isekai ? ENTRY.decline : card.kind === 'memory' ? 0 : warnPick(card) >= 0 ? warnPick(card) : pickChoice(card, bot, st);
       if (typeof p === 'object') choose(st, p.i, p.loan);
       else choose(st, p);
     }
