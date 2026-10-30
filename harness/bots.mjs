@@ -71,6 +71,15 @@ const labelBot = (w) => (card, rng, h) => (h.pending?.alloc ? random(card, rng) 
 // บอทใน BOTS ไม่ประกาศ ⇒ ปฏิเสธทุกใบโดยไม่ดึงเลขสุ่ม ชีวิตจึงเดินเท่าเดิม
 export const isekaiBot = Object.assign((card, rng, h) => (card.entry ? 0 : random(card, rng, h)), { isekai: true });
 
+// บอทเฉย (ไอเดีย 65-15): กดปุ่มที่ป้ายผลขยับน้อยสุด ไม่แตะทางเสี่ยง/ลงทุน/กู้ — ใช้วัดว่าการไม่ทำอะไรไม่ได้ชีวิตดีกว่าคนที่เลือกจริง
+// ไม่อยู่ใน BOTS: ด่านที่วนบุคลิกทั้งชุดจะได้ตัวเลขเดิม · harness/passive.mjs เรียกตรง
+const PASSIVE_ACT = /เสี่ยง|ลงทุน|กู้|สำเร็จ/;
+const stillness = (card) => (i) => {
+  const { stat, tags } = readFx(card.fx?.[i]);
+  return -(Object.values(stat).reduce((s, v) => s + Math.abs(v), 0) + 2 * tags.filter((t) => PASSIVE_ACT.test(t)).length);
+};
+export const passive = (card, rng, h) => (h.pending?.alloc || !card.fx ? random(card, rng) : best(card, rng, stillness(card)));
+
 export const BOTS = {
   สุ่ม: random,
   สายบุญ: extreme(1),
