@@ -1,6 +1,6 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, SHOWN_LABEL, ISEKAI_SHOWN, ISEKAI_HP } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP } from './labels.mjs';
 
 // เลขเวอร์ชันเดโม — เขียนทับโดย `npm run bump` (patch +1 · `npm run bump -- minor` = minor +1 patch 00) ห้ามแก้รูปแบบบรรทัด
 const APP_VERSION = 'v0.6.03';
@@ -32,7 +32,6 @@ const baht = (v) => `${Math.round(v).toLocaleString('en-US')} บาท`;
 
 // ชีวิต (สุขภาพ) ถึง 0 = ตาย ผู้เล่นต้องเห็นก่อนถึงจุดนั้น · ค่าอื่นต่ำไม่ทำให้ตายจึงไม่เตือน
 const HEALTH_WARN = 20;
-const statLabel = (k) => SHOWN_LABEL[k] ?? STAT_LABELS[k];
 // แถบค่าสถานะ: ชื่อเต็มบรรทัดบน แถบ + ตัวเลข 0–100 บรรทัดล่าง — ชื่อยาวขึ้นสองบรรทัดได้บนจอแคบโดยไม่ถูกตัด
 // (ทับคำตัดสินใบ 06 "แถบไม่มีตัวเลข")
 function stats(s) {
@@ -41,7 +40,7 @@ function stats(s) {
     const v = Math.round(s[k]);
     const low = k === 'health' && v <= HEALTH_WARN;
     const col = el('div', low ? 'low' : null);
-    col.append(el('span', null, statLabel(k)));
+    col.append(el('span', null, STAT_LABELS[k]));
     const row = el('div', 'val');
     const track = el('div', 'bar');
     const fill = el('i');
@@ -188,7 +187,7 @@ function lifeChart(life, deathAge, cause) {
   SHOWN_STATS.forEach((k, i) => {
     const pts = life.stats.map((p) => `${x(p.age).toFixed(1)},${y(p[k]).toFixed(1)}`).join(' ');
     svg.append(svgEl('polyline', { class: `ln ln${i}`, points: pts, 'stroke-dasharray': LINE_DASH[i] }));
-    legend.append(legendItem(i, `${statLabel(k)} ${Math.round(end[k])}`));
+    legend.append(legendItem(i, `${STAT_LABELS[k]} ${Math.round(end[k])}`));
   });
   // จุดเรื่องเด่น + จุดตาย (B38)
   const cap = el('p', 'mk-cap', 'แตะจุดบนกราฟเพื่อดูเรื่องในปีนั้น');
@@ -342,7 +341,7 @@ function recap(r) {
   for (const s of r.stats.filter((x) => SHOWN_STATS.includes(x.key))) {
     const row = el('div');
     const dir = s.to - s.from;
-    const head = el('span', null, `${statLabel(s.key)} ${Math.abs(dir) < 1 ? '·' : dir > 0 ? '↑' : '↓'} `);
+    const head = el('span', null, `${s.label} ${Math.abs(dir) < 1 ? '·' : dir > 0 ? '↑' : '↓'} `);
     head.append(el('span', 'num', `${Math.round(s.from)} → ${Math.round(s.to)}`));
     row.append(head);
     const track = el('div', 'bar');
@@ -2003,7 +2002,7 @@ function renderIsekai(card) {
   const choices = el('div', 'choices');
   body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} · อายุ ${card.age}` : ISEKAI_KICKER[card.step]));
   body.append(el('h3', null, card.title), el('p', null, card.text));
-  if (card.step === 'result' && card.ok !== null) body.append(el('p', card.ok ? 'iok' : 'ibad', `${card.ok ? 'สำเร็จ' : 'พลาด'} · ${card.stat}`));
+  if (card.step === 'result' && card.ok !== null) body.append(el('p', card.ok ? 'iok' : 'ibad', card.ok ? 'สำเร็จ' : 'พลาด'));
   const deltas = Object.entries(card.deltas ?? {});
   if (deltas.length) {
     const label = isekaiLabels();

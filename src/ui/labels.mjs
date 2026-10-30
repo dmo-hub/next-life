@@ -30,9 +30,7 @@ export const HELP = [
 export const HELP_NOTE = 'เกมนี้ไม่รับเงินจากลิงก์เหล่านี้ และไม่รับบริจาค · ข้อมูลตรวจเมื่อ ตุลาคม 2569';
 
 // ค่าบนจอ 4 ตัวทุกโลก (B162) — "ชีวิต" ช่องแรกเสมอเพราะเป็นค่าที่หมดแล้วตาย · ค่าที่ไม่อยู่ในรายการยังอยู่ในแกนเกมและมีผลเท่าเดิม แค่ไม่ขึ้นจอ
-// ป้ายเปลี่ยนที่จอเท่านั้น id ในแกนเกมคงเดิม (health · hp) เซฟเก่าจึงเปิดได้
 export const SHOWN_STATS = ['health', 'happiness', 'knowledge', 'relations'];
-export const SHOWN_LABEL = { health: 'ชีวิต' };
 export const ISEKAI_SHOWN = ['str', 'mag', 'luk'];
 export const ISEKAI_HP = 'ชีวิต';
 

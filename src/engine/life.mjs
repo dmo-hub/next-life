@@ -36,7 +36,9 @@ export function startStats(cls) {
 export const LEVELS = { 1: 5, 2: 12, 3: 20 };
 // network ไม่แตะการตาย (อ่านแค่ health) — เปิดทางงาน/ผลสมัครงานเท่านั้น
 export const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations', 'network'];
-export const STAT_LABELS = { health: 'สุขภาพ', happiness: 'ความสุข', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'คอนเน็คชั่น', money: 'เงิน' };
+// ป้ายที่ผู้เล่นเห็น (ปุ่ม · เหตุล็อก · ฉากเกิด · หน้าเฉลย) — health ขึ้นว่า "ชีวิต" เพราะหมดแล้วตาย · network เป็นค่าซ่อน ป้ายจึงเป็นคำคนพูด ไม่ใช่ชื่อค่า
+// บอทใน harness อ่านป้ายย้อนกลับจากตารางนี้ เปลี่ยนคำแล้วบอทตามเอง
+export const STAT_LABELS = { health: 'ชีวิต', happiness: 'ความสุข', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'เส้นสาย', money: 'เงิน' };
 
 // ช่วงชีวิต (ใบ 03) · ระหว่างชาติไม่ใช่ช่วงอายุ แต่จองชื่อไว้ให้ใบที่ทำหลังตาย
 export const STAGES = [
@@ -1100,7 +1102,7 @@ function lockReason(st, c, extra = 0) {
   const purse = (st.dead ? deadPurse(st) : st.money) + extra;
   if (q.money && purse < moneyValue(st, q.money, true)) why.push('เงินไม่พอ');
   for (const [k, b] of Object.entries(q.stats ?? {})) {
-    if (b.min !== undefined && st[k] < b.min) why.push(`${STAT_LABELS[k]}ไม่ถึง`);
+    if (b.min !== undefined && st[k] < b.min) why.push(k === 'network' ? 'ยังไม่มีเส้นสายพอ' : `${STAT_LABELS[k]}ไม่ถึง`);
     if (b.max !== undefined && st[k] > b.max) why.push(`${STAT_LABELS[k]}มากเกินไป`);
   }
   if (q.flags && !flagsOk(st, q.flags)) why.push('ยังไม่เข้าเงื่อนไข');

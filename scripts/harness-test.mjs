@@ -91,9 +91,9 @@ const f2 = (v) => v.toFixed(2);
 
 // บอทอ่านป้ายที่ผู้เล่นเห็น
 {
-  const fx = readFx('สุขภาพ ↑ · เงิน ↓ · ความสัมพันธ์ ↑ ระยะยาว · ลงทุน');
+  const fx = readFx('ชีวิต ↑ · เงิน ↓ · ความสัมพันธ์ ↑ ระยะยาว · ลงทุน');
   check('readFx แตกป้ายถูก', fx.stat.health === 1 && fx.stat.money === -1 && fx.stat.relations === 2 && fx.tags.join() === 'ลงทุน', JSON.stringify(fx));
-  const card = { choices: ['ก', 'ข', 'ค'], fx: ['เงิน ↑', 'สุขภาพ ↑', 'ความสัมพันธ์ ↑'], locked: [null, null, null] };
+  const card = { choices: ['ก', 'ข', 'ค'], fx: ['เงิน ↑', 'ชีวิต ↑', 'ความสัมพันธ์ ↑'], locked: [null, null, null] };
   const h = { pending: { choices: [{}, {}, {}] } };
   check('สายเงินเลือกเงิน', BOTS['สายเงิน'](card, makeRng(1), h) === 0);
   check('สายสุขภาพเลือกสุขภาพ', BOTS['สายสุขภาพ'](card, makeRng(1), h) === 1);

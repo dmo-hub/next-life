@@ -10,7 +10,7 @@ import { newLedger, recordMerit, ledgerLevel, meritId, SIN_CATS } from './merit.
 import { hintLevel } from './court.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค' };
-export const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
+export const ISEKAI_FX = { hp: 'ชีวิต', str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
 // ค่าตั้งของเกม: stay = อยู่ต่างโลกต่อติดกันได้กี่รอบ (กันบอทวนไม่จบ) · chance = โอกาสเทพธิดาโผล่เองตอนถึงทางเกิด
 // karma* = ผลของระดับกรรมต่อโลก · skills = จำนวนสกิลให้เลือกปกติ · memory = ค่าที่ติดตัวไปชาติต่างโลกถัดไป
 // ค่าสถานะสองโลกผูกกัน (B100 · เจ้าของเคาะ 1ก 2ก 3ก) — ต่างโลก = ฐานของโลก + น้ำหนัก × (ค่าจริง − 50) ÷ div ส่วนจริงไม่เกิน ±part
@@ -43,10 +43,10 @@ export const ISEKAI_SKILLS = {
   tongue: { name: 'ลิ้นทองเทวี', desc: 'พูดได้ทุกภาษา คนฟังแล้วเคลิ้ม · ตัวเลือกเจรจา +20%', tag: 'talk' },
   cook: { name: 'ฝีมือครัวจากโลกเดิม', desc: 'รสมือแม่ค้าตลาดนัด · ตัวเลือกทำอาหาร +25%', tag: 'cook', add: 25 },
   stealth: { name: 'ซ่อนตัวระดับเทพ', desc: 'ไม่มีใครสังเกตเห็น · ตัวเลือกแอบ/หนี +20%', tag: 'sneak' },
-  regen: { name: 'ฟื้นฟูอัตโนมัติ', desc: 'HP ฟื้น +6 ทุกเหตุการณ์' },
+  regen: { name: 'ฟื้นฟูอัตโนมัติ', desc: 'ชีวิตฟื้น +6 ทุกเหตุการณ์' },
   exp: { name: 'ประสบการณ์ ×2', desc: 'ค่าสถานะที่ได้เพิ่มเป็นสองเท่า' },
   luck: { name: 'โชคเทพธิดา', desc: 'โชค +15 ตั้งแต่เกิด' },
-  rbd: { name: 'ย้อนเวลาเมื่อตาย', desc: 'ตายครั้งแรกเวลาจะย้อนกลับ ฟื้นด้วย HP 40' },
+  rbd: { name: 'ย้อนเวลาเมื่อตาย', desc: 'ตายครั้งแรกเวลาจะย้อนกลับ ฟื้นด้วยชีวิต 40' },
 };
 
 export const ISEKAI_WORLDS = {
@@ -1570,11 +1570,12 @@ const isekaiKnowOffers = (isk, stage) => Object.keys(ISEKAI_KNOW).filter((k) => 
 // สิ่งที่ทุ่มเทได้ในช่วงวัยนี้ — ของบทบาทอยู่ใบแรกเสมอ
 // ตามหาทางกลับต่อท้ายของกลาง เฉพาะทริป ⇒ ชาติที่เกิดในต่างโลกได้รายการเท่าเดิม
 const isekaiFocusOffers = (isk, stage) => ['role', ...Object.keys(ISEKAI_FOCUS).filter((id) => !ISEKAI_FOCUS[id].stages || ISEKAI_FOCUS[id].stages.includes(stage.id)), ...(isk.trip ? [TRIP_QUEST.id] : []), ...isekaiKnowOffers(isk, stage)];
-// ป้ายบนปุ่มทุ่มเท: บอกว่าค่าไหนขึ้น ไม่บอกตัวเลข · สุข/รู้เป็นค่าซ่อน จึงไม่ขึ้นป้าย
+// ป้ายบนปุ่มทุ่มเท: บอกว่าค่าไหนขึ้น ไม่บอกตัวเลข · สุข/รู้/บารมี/เป้าหมายโลกเป็นค่าซ่อน จึงไม่ขึ้นป้าย
+const ISEKAI_FOCUS_HIDDEN = new Set(['joy', 'wit', 'know', 'cha', 'goal']);
 const isekaiFocusFx = (isk, id) => {
   if (id === TRIP_QUEST.id) return 'ใกล้ทางกลับบ้านขึ้น';
   const f = isekaiFocusDef(isk, id);
-  const up = Object.entries(f.gain).filter(([k, v]) => v > 0 && k !== 'joy' && k !== 'wit' && k !== 'know').map(([k]) => (k === 'goal' ? roleInfo(isk.role).goal : ISEKAI_FX[k]));
+  const up = Object.entries(f.gain).filter(([k, v]) => v > 0 && !ISEKAI_FOCUS_HIDDEN.has(k)).map(([k]) => ISEKAI_FX[k]);
   return up.length ? `${up.join(' · ')} ขึ้น` : '';
 };
 
@@ -1830,7 +1831,8 @@ export function nextIsekaiCard(isk) {
       choices: isk.worldOffers.map((r) => roleInfo(r).name),
       desc: isk.worldOffers.map((r) => roleInfo(r).pitch),
       fx: isk.worldOffers.map(() => ''),
-      ...(isk.memory && { note: `ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา · ${ISEKAI_STAT[isk.memory]} +${ISEKAI.memory}` }),
+      // บารมีไม่ขึ้นจอ — ความทรงจำที่ติดมาเป็นบารมีจึงเล่าไม่บอกค่า
+      ...(isk.memory && { note: isk.memory === 'cha' ? 'ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา' : `ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา · ${ISEKAI_STAT[isk.memory]} +${ISEKAI.memory}` }),
     });
   }
   if (isk.step === 'skill') {
@@ -1956,7 +1958,8 @@ function isekaiEventCard(isk, ev) {
       if (p === null) return c.need ? `ใช้ทอง ${c.need.gold}` : '';
       const aid = p - isekaiChance(isk, c, false);
       const names = isekaiAids(isk, c).map((s) => ISEKAI_SKILLS[s].name).join(' + ');
-      return `${isekaiCheckName(c)} ${p}%${aid > 0 ? ` · ${names} +${aid}%` : ''}`;
+      // บอกแค่โอกาส ไม่บอกชื่อค่าที่ทอย — บารมีกับความรู้เป็นค่าซ่อน ถ้าบอกเฉพาะค่าที่เห็นก็เดาค่าซ่อนออกจากปุ่มที่ไม่มีชื่อ
+      return `${p}%${aid > 0 ? ` · ${names} +${aid}%` : ''}`;
     }),
     locked: ev.choices.map((c) => (c.need && isk.st.gold < c.need.gold ? `ต้องมีทอง ${c.need.gold} · ขาดอีก ${Math.ceil(c.need.gold - isk.st.gold)}` : null)),
   });

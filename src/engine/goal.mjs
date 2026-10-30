@@ -6,7 +6,7 @@ import { PROMO, OFFICE, officeFull, stepName, ladderOf } from './rank.mjs';
 import { isWorking, moodMul, schoolOf } from './life.mjs';
 
 // ข้อความสั้นแบบ "ขาด…" — ป้ายต้องไม่ทำให้แถบหัวการ์ดตกบรรทัดเพิ่ม (เจ้าของเคาะ B89 A6)
-const SHORT_TH = { knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'คอนเน็คชั่น', health: 'ความแข็งแรง' };
+const SHORT_TH = { knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'เส้นสาย', health: 'ความแข็งแรง' };
 function shortText(st, need) {
   const keys = Object.keys(need).filter((k) => st[k] < need[k]);
   if (!keys.length) return null;

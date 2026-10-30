@@ -1456,7 +1456,7 @@ const EXAMS = [...new Set(Object.values(TRACKS).map((t) => t.exam).filter(Boolea
 // ธงที่แกนตั้งเมื่อสอบเข้ามหาวิทยาลัยติด (ทุกทางที่มีการสอบ) — การ์ดแก้บนตอนสอบเข้าอ่านธงนี้ ไม่ติด/ไม่ได้สอบ = ไม่ทวง
 const EXAM_PASS = 'exam_pass:uni';
 // สอบเข้าโรงเรียนนายร้อยต้องผ่านทั้งข้อเขียนและร่างกาย · สอบ ก.พ. ต้องจบปริญญา (B40)
-const CADET_NEED = { stats: { knowledge: { min: 45 }, health: { min: 50 } }, reason: 'ความรู้หรือสุขภาพยังไม่ถึงเกณฑ์สอบ' };
+const CADET_NEED = { stats: { knowledge: { min: 45 }, health: { min: 50 } }, reason: 'ความรู้หรือชีวิตยังไม่ถึงเกณฑ์สอบ' };
 const SCHOOL_FROM = 6;
 // ทุนสอบชิงมีภาระใช้ทุน (B118): ธงค้างจนการ์ดชดใช้ทุนเคลียร์ · การ์ดอยู่ใน content/scholarship_bond.yaml
 const BOND_FLAG = 'scholar_bond';
@@ -1834,7 +1834,7 @@ function promoText(st, mood) {
   return short ? `ต้องเก่งขึ้นอีกหน่อยถึงจะมีลุ้นเลื่อนขั้น` : `อีกราว ${n} ปีมีลุ้นเลื่อนขั้น`;
 }
 
-const STAT_TH = { health: 'สุขภาพ', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'คอนเน็คชั่น' };
+const STAT_TH = { health: 'ชีวิต', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'เส้นสาย' };
 const needText = (need) => `${Object.keys(need).map((k) => STAT_TH[k]).join('/')}ยังไม่ถึง`;
 
 // การ์ดเลื่อนขั้น: รอตามคิว (ไม่ล็อก การ์ดจึงไม่ค้าง) · ทำผลงาน (ค่าถึงเกณฑ์) · วิ่งเต้น (บาป) · ขอพร
@@ -2338,7 +2338,9 @@ function startStats(cls) {
 const LEVELS = { 1: 5, 2: 12, 3: 20 };
 // network ไม่แตะการตาย (อ่านแค่ health) — เปิดทางงาน/ผลสมัครงานเท่านั้น
 const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations', 'network'];
-const STAT_LABELS = { health: 'สุขภาพ', happiness: 'ความสุข', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'คอนเน็คชั่น', money: 'เงิน' };
+// ป้ายที่ผู้เล่นเห็น (ปุ่ม · เหตุล็อก · ฉากเกิด · หน้าเฉลย) — health ขึ้นว่า "ชีวิต" เพราะหมดแล้วตาย · network เป็นค่าซ่อน ป้ายจึงเป็นคำคนพูด ไม่ใช่ชื่อค่า
+// บอทใน harness อ่านป้ายย้อนกลับจากตารางนี้ เปลี่ยนคำแล้วบอทตามเอง
+const STAT_LABELS = { health: 'ชีวิต', happiness: 'ความสุข', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'เส้นสาย', money: 'เงิน' };
 
 // ช่วงชีวิต (ใบ 03) · ระหว่างชาติไม่ใช่ช่วงอายุ แต่จองชื่อไว้ให้ใบที่ทำหลังตาย
 const STAGES = [
@@ -3402,7 +3404,7 @@ function lockReason(st, c, extra = 0) {
   const purse = (st.dead ? deadPurse(st) : st.money) + extra;
   if (q.money && purse < moneyValue(st, q.money, true)) why.push('เงินไม่พอ');
   for (const [k, b] of Object.entries(q.stats ?? {})) {
-    if (b.min !== undefined && st[k] < b.min) why.push(`${STAT_LABELS[k]}ไม่ถึง`);
+    if (b.min !== undefined && st[k] < b.min) why.push(k === 'network' ? 'ยังไม่มีเส้นสายพอ' : `${STAT_LABELS[k]}ไม่ถึง`);
     if (b.max !== undefined && st[k] > b.max) why.push(`${STAT_LABELS[k]}มากเกินไป`);
   }
   if (q.flags && !flagsOk(st, q.flags)) why.push('ยังไม่เข้าเงื่อนไข');
@@ -3987,7 +3989,7 @@ function playLife(seed, content, pickChoice, onCard, st = newLife(seed, content)
 
 
 // ข้อความสั้นแบบ "ขาด…" — ป้ายต้องไม่ทำให้แถบหัวการ์ดตกบรรทัดเพิ่ม (เจ้าของเคาะ B89 A6)
-const SHORT_TH = { knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'คอนเน็คชั่น', health: 'ความแข็งแรง' };
+const SHORT_TH = { knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'เส้นสาย', health: 'ความแข็งแรง' };
 function shortText(st, need) {
   const keys = Object.keys(need).filter((k) => st[k] < need[k]);
   if (!keys.length) return null;
@@ -4168,7 +4170,7 @@ const beliefActs = (st) => st.belief?.acts ?? 0;
 
 
 const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค' };
-const ISEKAI_FX = { hp: 'HP', str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
+const ISEKAI_FX = { hp: 'ชีวิต', str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
 // ค่าตั้งของเกม: stay = อยู่ต่างโลกต่อติดกันได้กี่รอบ (กันบอทวนไม่จบ) · chance = โอกาสเทพธิดาโผล่เองตอนถึงทางเกิด
 // karma* = ผลของระดับกรรมต่อโลก · skills = จำนวนสกิลให้เลือกปกติ · memory = ค่าที่ติดตัวไปชาติต่างโลกถัดไป
 // ค่าสถานะสองโลกผูกกัน (B100 · เจ้าของเคาะ 1ก 2ก 3ก) — ต่างโลก = ฐานของโลก + น้ำหนัก × (ค่าจริง − 50) ÷ div ส่วนจริงไม่เกิน ±part
@@ -4201,10 +4203,10 @@ const ISEKAI_SKILLS = {
   tongue: { name: 'ลิ้นทองเทวี', desc: 'พูดได้ทุกภาษา คนฟังแล้วเคลิ้ม · ตัวเลือกเจรจา +20%', tag: 'talk' },
   cook: { name: 'ฝีมือครัวจากโลกเดิม', desc: 'รสมือแม่ค้าตลาดนัด · ตัวเลือกทำอาหาร +25%', tag: 'cook', add: 25 },
   stealth: { name: 'ซ่อนตัวระดับเทพ', desc: 'ไม่มีใครสังเกตเห็น · ตัวเลือกแอบ/หนี +20%', tag: 'sneak' },
-  regen: { name: 'ฟื้นฟูอัตโนมัติ', desc: 'HP ฟื้น +6 ทุกเหตุการณ์' },
+  regen: { name: 'ฟื้นฟูอัตโนมัติ', desc: 'ชีวิตฟื้น +6 ทุกเหตุการณ์' },
   exp: { name: 'ประสบการณ์ ×2', desc: 'ค่าสถานะที่ได้เพิ่มเป็นสองเท่า' },
   luck: { name: 'โชคเทพธิดา', desc: 'โชค +15 ตั้งแต่เกิด' },
-  rbd: { name: 'ย้อนเวลาเมื่อตาย', desc: 'ตายครั้งแรกเวลาจะย้อนกลับ ฟื้นด้วย HP 40' },
+  rbd: { name: 'ย้อนเวลาเมื่อตาย', desc: 'ตายครั้งแรกเวลาจะย้อนกลับ ฟื้นด้วยชีวิต 40' },
 };
 
 const ISEKAI_WORLDS = {
@@ -5728,11 +5730,12 @@ const isekaiKnowOffers = (isk, stage) => Object.keys(ISEKAI_KNOW).filter((k) => 
 // สิ่งที่ทุ่มเทได้ในช่วงวัยนี้ — ของบทบาทอยู่ใบแรกเสมอ
 // ตามหาทางกลับต่อท้ายของกลาง เฉพาะทริป ⇒ ชาติที่เกิดในต่างโลกได้รายการเท่าเดิม
 const isekaiFocusOffers = (isk, stage) => ['role', ...Object.keys(ISEKAI_FOCUS).filter((id) => !ISEKAI_FOCUS[id].stages || ISEKAI_FOCUS[id].stages.includes(stage.id)), ...(isk.trip ? [TRIP_QUEST.id] : []), ...isekaiKnowOffers(isk, stage)];
-// ป้ายบนปุ่มทุ่มเท: บอกว่าค่าไหนขึ้น ไม่บอกตัวเลข · สุข/รู้เป็นค่าซ่อน จึงไม่ขึ้นป้าย
+// ป้ายบนปุ่มทุ่มเท: บอกว่าค่าไหนขึ้น ไม่บอกตัวเลข · สุข/รู้/บารมี/เป้าหมายโลกเป็นค่าซ่อน จึงไม่ขึ้นป้าย
+const ISEKAI_FOCUS_HIDDEN = new Set(['joy', 'wit', 'know', 'cha', 'goal']);
 const isekaiFocusFx = (isk, id) => {
   if (id === TRIP_QUEST.id) return 'ใกล้ทางกลับบ้านขึ้น';
   const f = isekaiFocusDef(isk, id);
-  const up = Object.entries(f.gain).filter(([k, v]) => v > 0 && k !== 'joy' && k !== 'wit' && k !== 'know').map(([k]) => (k === 'goal' ? roleInfo(isk.role).goal : ISEKAI_FX[k]));
+  const up = Object.entries(f.gain).filter(([k, v]) => v > 0 && !ISEKAI_FOCUS_HIDDEN.has(k)).map(([k]) => ISEKAI_FX[k]);
   return up.length ? `${up.join(' · ')} ขึ้น` : '';
 };
 
@@ -5988,7 +5991,8 @@ function nextIsekaiCard(isk) {
       choices: isk.worldOffers.map((r) => roleInfo(r).name),
       desc: isk.worldOffers.map((r) => roleInfo(r).pitch),
       fx: isk.worldOffers.map(() => ''),
-      ...(isk.memory && { note: `ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา · ${ISEKAI_STAT[isk.memory]} +${ISEKAI.memory}` }),
+      // บารมีไม่ขึ้นจอ — ความทรงจำที่ติดมาเป็นบารมีจึงเล่าไม่บอกค่า
+      ...(isk.memory && { note: isk.memory === 'cha' ? 'ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา' : `ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา · ${ISEKAI_STAT[isk.memory]} +${ISEKAI.memory}` }),
     });
   }
   if (isk.step === 'skill') {
@@ -6114,7 +6118,8 @@ function isekaiEventCard(isk, ev) {
       if (p === null) return c.need ? `ใช้ทอง ${c.need.gold}` : '';
       const aid = p - isekaiChance(isk, c, false);
       const names = isekaiAids(isk, c).map((s) => ISEKAI_SKILLS[s].name).join(' + ');
-      return `${isekaiCheckName(c)} ${p}%${aid > 0 ? ` · ${names} +${aid}%` : ''}`;
+      // บอกแค่โอกาส ไม่บอกชื่อค่าที่ทอย — บารมีกับความรู้เป็นค่าซ่อน ถ้าบอกเฉพาะค่าที่เห็นก็เดาค่าซ่อนออกจากปุ่มที่ไม่มีชื่อ
+      return `${p}%${aid > 0 ? ` · ${names} +${aid}%` : ''}`;
     }),
     locked: ev.choices.map((c) => (c.need && isk.st.gold < c.need.gold ? `ต้องมีทอง ${c.need.gold} · ขาดอีก ${Math.ceil(c.need.gold - isk.st.gold)}` : null)),
   });
@@ -7727,9 +7732,7 @@ const HELP = [
 const HELP_NOTE = 'เกมนี้ไม่รับเงินจากลิงก์เหล่านี้ และไม่รับบริจาค · ข้อมูลตรวจเมื่อ ตุลาคม 2569';
 
 // ค่าบนจอ 4 ตัวทุกโลก (B162) — "ชีวิต" ช่องแรกเสมอเพราะเป็นค่าที่หมดแล้วตาย · ค่าที่ไม่อยู่ในรายการยังอยู่ในแกนเกมและมีผลเท่าเดิม แค่ไม่ขึ้นจอ
-// ป้ายเปลี่ยนที่จอเท่านั้น id ในแกนเกมคงเดิม (health · hp) เซฟเก่าจึงเปิดได้
 const SHOWN_STATS = ['health', 'happiness', 'knowledge', 'relations'];
-const SHOWN_LABEL = { health: 'ชีวิต' };
 const ISEKAI_SHOWN = ['str', 'mag', 'luk'];
 const ISEKAI_HP = 'ชีวิต';
 
@@ -7777,7 +7780,6 @@ const baht = (v) => `${Math.round(v).toLocaleString('en-US')} บาท`;
 
 // ชีวิต (สุขภาพ) ถึง 0 = ตาย ผู้เล่นต้องเห็นก่อนถึงจุดนั้น · ค่าอื่นต่ำไม่ทำให้ตายจึงไม่เตือน
 const HEALTH_WARN = 20;
-const statLabel = (k) => SHOWN_LABEL[k] ?? STAT_LABELS[k];
 // แถบค่าสถานะ: ชื่อเต็มบรรทัดบน แถบ + ตัวเลข 0–100 บรรทัดล่าง — ชื่อยาวขึ้นสองบรรทัดได้บนจอแคบโดยไม่ถูกตัด
 // (ทับคำตัดสินใบ 06 "แถบไม่มีตัวเลข")
 function stats(s) {
@@ -7786,7 +7788,7 @@ function stats(s) {
     const v = Math.round(s[k]);
     const low = k === 'health' && v <= HEALTH_WARN;
     const col = el('div', low ? 'low' : null);
-    col.append(el('span', null, statLabel(k)));
+    col.append(el('span', null, STAT_LABELS[k]));
     const row = el('div', 'val');
     const track = el('div', 'bar');
     const fill = el('i');
@@ -7933,7 +7935,7 @@ function lifeChart(life, deathAge, cause) {
   SHOWN_STATS.forEach((k, i) => {
     const pts = life.stats.map((p) => `${x(p.age).toFixed(1)},${y(p[k]).toFixed(1)}`).join(' ');
     svg.append(svgEl('polyline', { class: `ln ln${i}`, points: pts, 'stroke-dasharray': LINE_DASH[i] }));
-    legend.append(legendItem(i, `${statLabel(k)} ${Math.round(end[k])}`));
+    legend.append(legendItem(i, `${STAT_LABELS[k]} ${Math.round(end[k])}`));
   });
   // จุดเรื่องเด่น + จุดตาย (B38)
   const cap = el('p', 'mk-cap', 'แตะจุดบนกราฟเพื่อดูเรื่องในปีนั้น');
@@ -8087,7 +8089,7 @@ function recap(r) {
   for (const s of r.stats.filter((x) => SHOWN_STATS.includes(x.key))) {
     const row = el('div');
     const dir = s.to - s.from;
-    const head = el('span', null, `${statLabel(s.key)} ${Math.abs(dir) < 1 ? '·' : dir > 0 ? '↑' : '↓'} `);
+    const head = el('span', null, `${s.label} ${Math.abs(dir) < 1 ? '·' : dir > 0 ? '↑' : '↓'} `);
     head.append(el('span', 'num', `${Math.round(s.from)} → ${Math.round(s.to)}`));
     row.append(head);
     const track = el('div', 'bar');
@@ -9748,7 +9750,7 @@ function renderIsekai(card) {
   const choices = el('div', 'choices');
   body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} · อายุ ${card.age}` : ISEKAI_KICKER[card.step]));
   body.append(el('h3', null, card.title), el('p', null, card.text));
-  if (card.step === 'result' && card.ok !== null) body.append(el('p', card.ok ? 'iok' : 'ibad', `${card.ok ? 'สำเร็จ' : 'พลาด'} · ${card.stat}`));
+  if (card.step === 'result' && card.ok !== null) body.append(el('p', card.ok ? 'iok' : 'ibad', card.ok ? 'สำเร็จ' : 'พลาด'));
   const deltas = Object.entries(card.deltas ?? {});
   if (deltas.length) {
     const label = isekaiLabels();

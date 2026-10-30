@@ -140,7 +140,7 @@ export function promoText(st, mood) {
   return short ? `ต้องเก่งขึ้นอีกหน่อยถึงจะมีลุ้นเลื่อนขั้น` : `อีกราว ${n} ปีมีลุ้นเลื่อนขั้น`;
 }
 
-const STAT_TH = { health: 'สุขภาพ', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'คอนเน็คชั่น' };
+const STAT_TH = { health: 'ชีวิต', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'เส้นสาย' };
 const needText = (need) => `${Object.keys(need).map((k) => STAT_TH[k]).join('/')}ยังไม่ถึง`;
 
 // การ์ดเลื่อนขั้น: รอตามคิว (ไม่ล็อก การ์ดจึงไม่ค้าง) · ทำผลงาน (ค่าถึงเกณฑ์) · วิ่งเต้น (บาป) · ขอพร
