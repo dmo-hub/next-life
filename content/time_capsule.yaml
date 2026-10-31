@@ -1,0 +1,165 @@
+# แคปซูลเวลา (gameslash-3) — วันจบประถมฝังของหนึ่งอย่าง อีก 15–30 ปีกลับมาเปิด
+# ชนิดของที่ฝังเลือกใบเปิด (นัดแยกใบ) · ย้ายออกจากที่ที่โตมา (moved_away) ทำให้หาไม่เจอบ่อยขึ้น
+# ใบเปิดไม่มี when — นัดมาจากตัวเลือกเท่านั้น ใส่เงื่อนไขแล้วไม่ผ่านปีนั้น นัดหายเงียบ
+events:
+  - id: capsule_bury_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [10, 12], school: [primary]}
+    title: "กล่องใต้ต้นไม้"
+    text: "วันสุดท้ายของชั้นประถม ครูประจำชั้นให้ทุกคนเอาของหนึ่งอย่างใส่กล่องสังกะสี แล้วฝังไว้ใต้ต้นไม้หลังอาคารเรียน ครูบอกว่าอีกหลายปีค่อยกลับมาขุดดูว่าตัวเองโตมาเป็นคนแบบไหน"
+    choices:
+      - id: letter
+        text: "เขียนจดหมายถึงตัวเองตอนโต"
+        effects: {knowledge: 1}
+        sets_flags: [capsule_letter]
+        schedules: [{event: echo_capsule_letter_01, after_years: [15, 30]}]
+        merit: [{cat: neutral}]
+      - id: photo
+        text: "ใส่รูปถ่ายกับเพื่อนทั้งห้อง"
+        effects: {relations: 1}
+        sets_flags: [capsule_photo]
+        schedules: [{event: echo_capsule_photo_01, after_years: [15, 30]}]
+        merit: [{cat: neutral}]
+      - id: toy
+        text: "ยอมใส่ของเล่นชิ้นโปรด"
+        effects: {happiness: -1}
+        sets_flags: [capsule_toy]
+        schedules: [{event: echo_capsule_toy_01, after_years: [15, 30]}]
+        merit: [{cat: neutral}]
+      - id: coin
+        text: "ใส่เหรียญที่หยอดกระปุกมา"
+        sets_flags: [capsule_coin]
+        schedules: [{event: echo_capsule_coin_01, after_years: [15, 30]}]
+        merit: [{cat: neutral}]
+      - id: nothing
+        text: "ไม่ใส่อะไร ยืนดูเพื่อนฝัง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  # ← capsule_bury_01 "เขียนจดหมายถึงตัวเองตอนโต"
+  - id: echo_capsule_letter_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "จดหมายลายมือเด็ก"
+    text: "เพื่อนประถมคนหนึ่งตามหาคุณจนเจอ บอกว่าถึงเวลาขุดกล่องที่ฝังไว้วันจบประถมแล้ว ในนั้นมีจดหมายที่คุณเขียนถึงตัวเองตอนโต จำไม่ได้แล้วว่าเขียนอะไรลงไป"
+    choices:
+      - id: dig_self
+        text: "กลับไปขุดเอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ลายมือตัวโย้เย้ถามว่าตอนนี้มีความสุขไหม คุณยืนอ่านอยู่นานกว่าที่คิด", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ตรงที่เคยเป็นต้นไม้กลายเป็นลานจอดรถ ไม่มีใครรู้ว่ากล่องไปอยู่ไหน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: with_friends
+        text: "นัดเพื่อนรุ่นเดียวกันมาเปิด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "เพื่อนอ่านจดหมายของแต่ละคนดัง ๆ คำสัญญาตอนสิบขวบไม่มีใครทำได้สักข้อ หัวเราะกันจนน้ำตาไหล", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ขุดกันทั้งบ่ายไม่เจออะไร เลยนั่งกินข้าวคุยเรื่องเก่าแทน", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - id: ask_teacher
+        text: "ฝากครูเก่าเปิดแทน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ครูส่งจดหมายฉบับนั้นมาทางไปรษณีย์ เขียนต่อท้ายว่าครูยังจำเด็กที่เขียนมันได้", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ครูตอบกลับว่าโรงเรียนสร้างอาคารใหม่ทับที่ตรงนั้นไปแล้ว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: leave_it
+        text: "ปล่อยไว้ตรงนั้น"
+        merit: [{cat: neutral}]
+
+  # ← capsule_bury_01 "ใส่รูปถ่ายกับเพื่อนทั้งห้อง"
+  - id: echo_capsule_photo_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "รูปหมู่ชั้นประถม"
+    text: "เพื่อนประถมคนหนึ่งตามหาคุณจนเจอ บอกว่าถึงเวลาขุดกล่องที่ฝังไว้วันจบประถมแล้ว ในนั้นมีรูปหมู่ที่ทุกคนยืนเรียงกันหน้าห้อง บางคนในรูปไม่ได้ข่าวมานานแล้ว"
+    choices:
+      - id: dig_self
+        text: "กลับไปขุดเอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "รูปซีดจนเกือบขาว แต่ยังเห็นหน้าตัวเองยิ้มแหงนดูกล้อง จำได้ว่าวันนั้นร้อนมาก", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ตรงที่เคยเป็นต้นไม้กลายเป็นลานจอดรถ ไม่มีใครรู้ว่ากล่องไปอยู่ไหน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: with_friends
+        text: "นัดเพื่อนรุ่นเดียวกันมาเปิด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ทุกคนไล่ชี้หน้าในรูปว่าตอนนี้ใครอยู่ไหน ได้เบอร์เพื่อนที่หายไปกลับมาหลายคน", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ขุดกันทั้งบ่ายไม่เจออะไร เลยนั่งกินข้าวคุยเรื่องเก่าแทน", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - id: ask_teacher
+        text: "ฝากครูเก่าเปิดแทน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ครูส่งรูปใบนั้นมาทางไปรษณีย์ เขียนชื่อทุกคนไว้ด้านหลังครบไม่ขาดสักคน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ครูตอบกลับว่าโรงเรียนสร้างอาคารใหม่ทับที่ตรงนั้นไปแล้ว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: leave_it
+        text: "ปล่อยไว้ตรงนั้น"
+        merit: [{cat: neutral}]
+
+  # ← capsule_bury_01 "ยอมใส่ของเล่นชิ้นโปรด"
+  - id: echo_capsule_toy_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "ของเล่นชิ้นโปรด"
+    text: "เพื่อนประถมคนหนึ่งตามหาคุณจนเจอ บอกว่าถึงเวลาขุดกล่องที่ฝังไว้วันจบประถมแล้ว ของเล่นชิ้นที่คุณร้องไห้ตอนยอมใส่ลงไปน่าจะยังอยู่ในนั้น"
+    choices:
+      - id: dig_self
+        text: "กลับไปขุดเอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "สีลอกไปเกือบหมด แต่พอจับขึ้นมาก็จำน้ำหนักในมือได้ทันที เก็บใส่กระเป๋ากลับบ้าน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ตรงที่เคยเป็นต้นไม้กลายเป็นลานจอดรถ ไม่มีใครรู้ว่ากล่องไปอยู่ไหน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: with_friends
+        text: "นัดเพื่อนรุ่นเดียวกันมาเปิด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ของเล่นวางเรียงกันเต็มโต๊ะ ทุกคนแย่งกันเล่าว่าชิ้นไหนเคยเป็นของใคร", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ขุดกันทั้งบ่ายไม่เจออะไร เลยนั่งกินข้าวคุยเรื่องเก่าแทน", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - id: ask_teacher
+        text: "ฝากครูเก่าเปิดแทน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ครูส่งพัสดุกล่องเล็กมาถึงบ้าน ข้างในเป็นของเล่นชิ้นนั้นห่อกระดาษหนังสือพิมพ์ไว้อย่างดี", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ครูตอบกลับว่าโรงเรียนสร้างอาคารใหม่ทับที่ตรงนั้นไปแล้ว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: leave_it
+        text: "ปล่อยไว้ตรงนั้น"
+        merit: [{cat: neutral}]
+
+  # ← capsule_bury_01 "ใส่เหรียญที่หยอดกระปุกมา"
+  - id: echo_capsule_coin_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "เหรียญในกล่องสังกะสี"
+    text: "เพื่อนประถมคนหนึ่งตามหาคุณจนเจอ บอกว่าถึงเวลาขุดกล่องที่ฝังไว้วันจบประถมแล้ว เหรียญที่คุณหยอดกระปุกมาทั้งเทอมยังอยู่ในนั้น ค่าเงินคงไม่เหมือนเดิมแล้ว"
+    choices:
+      - id: dig_self
+        text: "กลับไปขุดเอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "เหรียญรุ่นเก่าที่เลิกผลิตไปแล้ว ร้านรับซื้อของเก่าให้ราคามากกว่าที่คิด", effects: {happiness: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ตรงที่เคยเป็นต้นไม้กลายเป็นลานจอดรถ ไม่มีใครรู้ว่ากล่องไปอยู่ไหน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: with_friends
+        text: "นัดเพื่อนรุ่นเดียวกันมาเปิด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "เอาเหรียญของทุกคนรวมกันไปเลี้ยงข้าว ได้กับข้าวมาแค่สองจาน แต่นั่งคุยกันจนร้านปิด", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ขุดกันทั้งบ่ายไม่เจออะไร เลยนั่งกินข้าวคุยเรื่องเก่าแทน", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - id: ask_teacher
+        text: "ฝากครูเก่าเปิดแทน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "ครูบอกว่าจะเอาเหรียญไปหยอดตู้บริจาคของโรงเรียนให้ในนามคุณ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {flags: {moved_away: 3}}, text: "ครูตอบกลับว่าโรงเรียนสร้างอาคารใหม่ทับที่ตรงนั้นไปแล้ว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: leave_it
+        text: "ปล่อยไว้ตรงนั้น"
+        merit: [{cat: neutral}]
