@@ -1,5 +1,5 @@
 {
- "version": "v0.6.18",
+ "version": "v0.6.19",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -144,6 +144,8 @@
   "echo_army_visit_01",
   "echo_debt_card_table_01",
   "echo_debt_forgiven_back_01",
+  "echo_debt_invest_due_01",
+  "echo_debt_invest_lesson_01",
   "echo_debt_old_boss_01",
   "echo_debt_old_car_01",
   "echo_debt_payroll_01",
@@ -409,6 +411,9 @@
   "debt_friend_gone_01",
   "debt_friend_reunion_01",
   "debt_landlocked_01",
+  "debt_invest_offer_01",
+  "echo_debt_invest_due_01",
+  "echo_debt_invest_lesson_01",
   "dilemma_mother_or_tuition_01",
   "dilemma_father_diagnosis_01",
   "dilemma_team_cut_01",
