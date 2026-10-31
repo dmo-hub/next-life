@@ -7,8 +7,8 @@ import { loadContent } from '../src/node/load.mjs';
 import { siteFacts, injectFacts } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
 import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
-import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_ROLES, roleInfo, ISEKAI_SKILLS } from '../src/engine/index.mjs';
-import { isekaiCardCount, ISEKAI_SECTION, text as isekaiText } from '../src/site/otherworld.mjs';
+import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_ROLES, roleInfo, ISEKAI_SKILLS, ISEKAI_CAREERS, CONT_REGIONS, CONT_RACES, CONT_END, contBirth, makeRng } from '../src/engine/index.mjs';
+import { isekaiCardCount, ISEKAI_SECTION, contEndTitles, text as isekaiText } from '../src/site/otherworld.mjs';
 import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR, SPEC_START, SPEC_END } from '../src/site/spec.mjs';
 import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
@@ -101,7 +101,8 @@ const iskWant = {
   ตัวเลือก: ISEKAI_EVENTS.reduce((s, e) => s + e.choices.length, 0),
   ผล: ISEKAI_EVENTS.reduce((s, e) => s + e.choices.reduce((n, c) => n + (c.stat || c.know ? 2 : 1), 0), 0),
   // บทบาทที่ไม่มีเนื้อเรื่องของโลกมีแค่ 3 ตอนจบ ไม่มีตอนจบพิเศษ
-  ตอนจบ: ISEKAI_ROLE_INFO.reduce((s, w) => s + new Set(['best', 'good', 'bad', w.special?.[1] ?? 'best']).size, 0),
+  // + ตอนจบชาติทวีป (06d)
+  ตอนจบ: ISEKAI_ROLE_INFO.reduce((s, w) => s + new Set(['best', 'good', 'bad', w.special?.[1] ?? 'best']).size, 0) + Object.keys(CONT_END).length,
   บทบาท: ISEKAI_ROLE_INFO.length,
   สกิล: Object.keys(ISEKAI_SKILLS).length,
 };
@@ -122,11 +123,40 @@ const hidden = [
   // ตัวเลือกความรู้โลกเดิม (B68h · c.know) ทอยเหมือนตัวเลือกค่าสถานะ
   ...ISEKAI_EVENTS.flatMap((e) => e.choices.flatMap((c) => (c.stat || c.know ? [c.win.text, c.lose.text] : [c.text]))),
   ...ISEKAI_ROLE_INFO.flatMap((w) => Object.values(w.end).map(([title]) => title)),
+  ...contEndTitles(),
 ];
 const iskLeak = hidden.filter((t) => cards.includes(escHtml(t)));
 if (/ความยาก|class="rk"/.test(cardsIsk)) iskLeak.push('ความยาก/ผล');
 check('หน้ารวมการ์ดส่วนต่างโลกไม่เฉลยผลหรือตอนจบ', iskLeak.length || !cardsIsk, iskLeak.length ? ` · เจอ ${iskLeak.slice(0, 3).join(' | ')}` : ` (ตรวจ ${hidden.length} ข้อความ)`);
 check('หน้ารวมการ์ดลิงก์ไปหน้าเฉลย และหน้าเฉลยมีป้ายเตือนสปอยล์', !cards.includes('href="spoilers.html"') || !spoil.includes('class="warn"'));
+
+// 6b) ชาติใหม่เกิดในทวีป (06d): ส่วนหลักของหน้าเฉลยมีครบทุกแคว้น เผ่า อาชีพ · หน้าที่ผู้เล่นใหม่อ่านไม่พูดถึงการเลือกบทบาท (กลุ่มพับชาติเก่ายกเว้น)
+// · โอกาสต่อแฟ้มบนหน้าเท่าที่ contBirth สุ่มจริง ±1 จุด
+const noOld = (html) => html.replace(/<details class="old"[\s\S]*?<\/details>/, '');
+const contMiss = (html) => {
+  const has = (name) => html.includes(`<b>${escHtml(name)}</b>`);
+  return [...Object.values(CONT_REGIONS), ...Object.values(CONT_RACES), ...Object.values(ISEKAI_CAREERS)].filter((x) => !has(x.name)).map((x) => x.name);
+};
+const ROLE_TALK = /เทพธิดายื่นบทบาท|เลือกบทบาท|บทบาทตอนเกิด/;
+const newPages = { 'catalog ต่างโลก': noOld(cardsIsk), 'spoilers ต่างโลก': noOld(spoilIsk), otherworld: read('otherworld.html'), index: read('index.html'), about: read('about.html') };
+const roleLeft = Object.entries(newPages).filter(([, h]) => ROLE_TALK.test(h)).map(([p]) => p);
+const spoilNew = noOld(spoilIsk);
+const contGone = contMiss(spoilNew);
+const regGone = Object.values(CONT_REGIONS).filter((g) => !noOld(cardsIsk).includes(`<b>${escHtml(g.name)}</b>`)).map((g) => g.name);
+// ตัวควบคุม: ใส่คำเลือกบทบาทกลับในส่วนใหม่ · ตัดแคว้นแรกออกจากหน้าเฉลย ⇒ ทั้งคู่ต้องถูกจับ
+const firstReg = Object.values(CONT_REGIONS)[0].name;
+const ctl = ROLE_TALK.test(`${spoilNew}<p>เทพธิดายื่นบทบาทให้เลือก</p>`) && contMiss(spoilNew.replaceAll(`<b>${escHtml(firstReg)}</b>`, '')).includes(firstReg);
+check('ส่วนต่างโลกพูดถึงทวีปแทนบทบาท: ครบทุกแคว้น เผ่า อาชีพ · ไม่มีคำเลือกบทบาทนอกกลุ่มชาติเก่า', contGone.length || regGone.length || roleLeft.length || !ctl, ` แคว้น ${Object.keys(CONT_REGIONS).length} · เผ่า ${Object.keys(CONT_RACES).length} · อาชีพ ${Object.keys(ISEKAI_CAREERS).length}${contGone.length ? ` · หน้าเฉลยขาด ${contGone.join(' ')}` : ''}${regGone.length ? ` · หน้ารวมการ์ดขาด ${regGone.join(' ')}` : ''}${roleLeft.length ? ` · ยังพูดถึงบทบาท: ${roleLeft.join(' ')}` : ''} · ตัวควบคุม${ctl ? 'จับได้' : 'จับไม่ได้'}`);
+const N_BIRTH = 10000;
+const brng = makeRng(0xb127);
+const born = {};
+for (let i = 0; i < N_BIRTH; i++) {
+  const b = contBirth(brng);
+  born[b.region] = (born[b.region] ?? 0) + 1;
+}
+const odds = Object.fromEntries([...spoilNew.matchAll(/data-reg="([^"]+)">(\d+)</g)].map((m) => [m[1], Number(m[2])]));
+const oddOff = Object.keys(CONT_REGIONS).filter((id) => odds[id] === undefined || Math.abs(odds[id] - (100 * (born[id] ?? 0)) / N_BIRTH) > 1);
+check('โอกาสต่อแฟ้มบนหน้าเฉลยตรงที่เกมสุ่ม ±1 จุด', oddOff.length, ` ${Object.keys(odds).length}/${Object.keys(CONT_REGIONS).length} แคว้น · สุ่ม ${N_BIRTH} ครั้ง${oddOff.length ? ` · เพี้ยน ${oddOff.map((id) => `${id} หน้า ${odds[id]}% เกม ${((100 * (born[id] ?? 0)) / N_BIRTH).toFixed(1)}%`).join(' | ')}` : ''}`);
 
 // 7) ภาคผนวกสเปกใน GDD (B115): ทุกไฟล์ .md ใน docs/spec มีหัวข้อบนหน้า · URL อ้างอิงทุกตัวในต้นฉบับกดได้ · หน้าเว็บไม่พาไปหน้า tree/blob บน GitHub อีก
 const gdd = read('gdd.html');

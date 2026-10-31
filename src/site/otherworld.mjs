@@ -1,6 +1,7 @@
 // ส่วนต่างโลกของหน้ารวมการ์ดและหน้าเฉลย (B88b): สร้างจากโมดูลต่างโลกในเอนจินทุกครั้งที่ build — การ์ดต่างโลกใบใหม่ขึ้นหน้าเว็บเอง
 // หน้ารวมการ์ดได้แค่สิ่งที่จอแสดง (ชื่อโลก/สกิลพร้อมคำอธิบาย · ข้อความเหตุการณ์ · ตัวเลือก) · หน้าเฉลยได้ความยาก ผลสำเร็จ/พลาด ค่าที่ขยับ ธง และตอนจบ
-import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_ROLES, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, GODDESS, GODDESS_VOWS, PATHS, meritName, roleInfo } from '../engine/index.mjs';
+// ชาติใหม่เกิดในทวีป (06d): ส่วนหลักพูดถึงแฟ้มเกิด/เผ่า/แคว้น · บทบาท 4 โลกกับการ์ดเฉพาะโลกย้ายไปกลุ่มพับ "ชาติเก่า" (ยังเล่นถึงจากเซฟ)
+import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_ROLES, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_FOCUS, ISEKAI_CAREERS, ISEKAI_CAREER_T, GODDESS, GODDESS_VOWS, PATHS, CONT_LIFE, CONT_END, CONT_REGIONS, CONT_RACES, CONT_TIER, CONT_DISPUTES, contRaceStart, meritName, roleInfo } from '../engine/index.mjs';
 import { esc, text as rawText } from './catalog.mjs';
 
 // เหตุการณ์ตำนาน (B68i) เรียกชื่อคนต่างโลกรุ่นก่อนตอนเล่น — หน้าเว็บแสดงเป็นช่องชื่อแบบเดียวกับ {ชื่อชาติก่อน}
@@ -16,17 +17,29 @@ const stageSpan = (ch) => {
   const s = ISEKAI_STAGES.filter((g) => g.ch.some((c) => ch.includes(c)));
   return s.length ? (s.length > 1 ? `${s[0].name}–${s.at(-1).name}` : s[0].name) : 'ตามอายุของบทบาท';
 };
-const where = (e) => (e.worlds ? e.worlds.map(worldName).join(' · ') : 'ทุกโลก');
+// การ์ดที่ไม่มี worlds มาได้ทั้งชาติทวีปและชาติเก่า (isekaiFitsRole) — ไม่ต้องติดป้ายโลก
+const where = (e) => (e.worlds ? e.worlds.map(worldName).join(' · ') : null);
 // ฉากเปิดและฉากสุดท้ายของแต่ละโลกอยู่ต้นและท้ายเสมอ — จัดไว้หัวกลุ่มให้อ่านตามลำดับเล่น
-const groups = () =>
-  [...new Set(ISEKAI_EVENTS.map((e) => e.ch[0]))].sort((a, b) => a - b).map((c) => ({
+const groups = (old) => {
+  const evs = ISEKAI_EVENTS.filter((e) => !!e.worlds === old);
+  return [...new Set(evs.map((e) => e.ch[0]))].sort((a, b) => a - b).map((c) => ({
     label: stageSpan([c]),
-    events: ISEKAI_EVENTS.filter((e) => e.ch[0] === c).sort((a, b) => Number(!!b.finale) - Number(!!a.finale) || Number(isIntro(b)) - Number(isIntro(a))),
+    events: evs.filter((e) => e.ch[0] === c).sort((a, b) => Number(!!b.finale) - Number(!!a.finale) || Number(isIntro(b)) - Number(isIntro(a))),
   }));
+};
 const isIntro = (e) => Object.values(ISEKAI_WORLDS).some((w) => w.intro === e.id);
 const tags = (e) => [where(e), e.finale ? null : stageSpan(e.ch), isIntro(e) ? 'ฉากเปิด' : null, e.finale ? 'ฉากสุดท้าย' : null].filter(Boolean);
 const tagLine = (xs) => `<p class="tags">${xs.map((t) => `<span>${esc(t)}</span>`).join('')}</p>`;
-export const isekaiCardCount = () => ISEKAI_EVENTS.length + 2;
+// ใบเลือกก่อนเริ่มชาติ 3 ใบ: แฟ้มเกิด · สกิล · บทบาท (ชาติเก่า)
+export const isekaiCardCount = () => ISEKAI_EVENTS.length + 3;
+export const ISEKAI_OLD = 'ชาติเก่า (เซฟก่อนมีทวีป)';
+const groupHtml = (gs, draw) => gs.map((g) => `<h3>${esc(g.label)} <small>${g.events.length} ใบ</small></h3><div class="grid">${g.events.map(draw).join('')}</div>`).join('');
+// กลุ่มพับท้ายส่วนต่างโลก — site-check ตัดส่วนนี้ออกก่อนตรวจว่าหน้าไม่พูดถึงบทบาทแล้ว
+const oldHtml = (pick, draw) => {
+  const gs = groups(true);
+  const n = gs.reduce((s, g) => s + g.events.length, 0) + 1;
+  return `<details class="old" id="isk-old"><summary>${esc(ISEKAI_OLD)} <small>${n} ใบ</small></summary><p class="lead">ชาติต่างโลกที่เริ่มก่อนมีทวีปเลือกบทบาทจาก 4 โลก เซฟเดิมยังเล่นต่อได้จนจบชาติ ชาติใหม่ไม่เจอการ์ดกลุ่มนี้</p><h3>ก่อนเริ่มชาติ</h3><div class="grid">${pick}</div>${groupHtml(gs, draw)}</details>`;
+};
 
 // catalog.mjs กับไฟล์นี้ import กันไปมา — ห้ามเรียก esc/text ตอนโหลดโมดูล ต้องเรียกตอนสร้างหน้า
 const lead = () => `<p class="lead">เลือก "${esc(PATHS.find((p) => p.id === 'isekai').text)}" ที่ปรโลก แล้วใช้ชีวิตหนึ่งชาติในโลกแฟนตาซีที่เวลาเดินเอง ก่อนกลับไปให้ปรโลกตัดสิน · การ์ดสีม่วงคือการ์ดต่างโลก</p>`;
@@ -40,7 +53,12 @@ export const isekaiNav = (n) => `<a href="#s${n}">${ISEKAI_SECTION} <small>${ise
 function pickCard(title, body, items) {
   return `<article class="c x"><h4>${esc(title)}</h4>${tagLine(['ก่อนเริ่มชาติ'])}<p>${esc(body)}</p><ul>${items.join('')}</ul></article>`;
 }
-const worldPick = (desc) => pickCard('ห้องสีขาว', `เทพธิดายื่นบทบาทให้เลือก ${ISEKAI.worlds} จาก ${Object.keys(ISEKAI_ROLES).length} บทบาท`, Object.keys(ISEKAI_ROLES).map((id) => [id, roleInfo(id)]).map(([id, r]) => `<li><b>${esc(r.name)}</b> — ${esc(r.pitch)}${desc(id, r)}</li>`));
+const raceNames = (ids) => ids.map((r) => CONT_RACES[r].name).join(' · ');
+const ruler = (g) => (g.ruler ? `ผู้ปกครอง: ${g.ruler}` : 'ไม่มีผู้ปกครอง');
+// แฟ้มเกิดบนจอบอกเผ่า · แคว้น · แนวของแคว้น — หน้ารวมการ์ดบอกเท่านั้นพร้อมเผ่าที่เกิดได้ · น้ำหนักโอกาสเกิดอยู่หน้าเฉลย
+const birthPick = (desc) =>
+  pickCard('ห้องสีขาว', `เทพธิดายื่นแฟ้มเกิด ${CONT_LIFE.offers} ใบให้เลือก แต่ละใบบอกเผ่ากับแคว้นที่จะไปเกิดในทวีป${CONT_LIFE.name} (${Object.keys(CONT_REGIONS).length} แคว้น · ${Object.keys(CONT_RACES).length} เผ่า)`, Object.entries(CONT_REGIONS).map(([id, g]) => `<li><b>${esc(g.name)}</b> — ${esc(g.about)} · ${esc(ruler(g))} · เผ่าที่เกิดได้: ${esc(raceNames(g.races))}${desc(id, g)}</li>`));
+const rolePick = (desc) => pickCard('ห้องสีขาว (ชาติเก่า)', `เทพธิดายื่นบทบาทให้เลือก ${ISEKAI.worlds} จาก ${Object.keys(ISEKAI_ROLES).length} บทบาท`, Object.keys(ISEKAI_ROLES).map((id) => [id, roleInfo(id)]).map(([id, r]) => `<li><b>${esc(r.name)}</b> — ${esc(r.pitch)}${desc(id, r)}</li>`));
 const skillPick = (desc) => pickCard('ของขวัญจากเทพธิดา', `เลือกสกิลโกง 1 อย่างจาก ${ISEKAI.skills} อย่างที่สุ่มมา`, Object.entries(ISEKAI_SKILLS).map(([id, s]) => `<li><b>${esc(s.name)}</b> — ${esc(s.desc)}${desc(id, s)}</li>`));
 
 function plainEvent(e) {
@@ -48,10 +66,7 @@ function plainEvent(e) {
 }
 
 export function isekaiCatalogHtml(n) {
-  const body = [
-    `<h3>ก่อนเริ่มชาติ</h3><div class="grid">${worldPick(() => '')}${skillPick(() => '')}</div>`,
-    ...groups().map((g) => `<h3>${esc(g.label)} <small>${g.events.length} ใบ</small></h3><div class="grid">${g.events.map(plainEvent).join('')}</div>`),
-  ].join('');
+  const body = [`<h3>ก่อนเริ่มชาติ</h3><div class="grid">${birthPick(() => '')}${skillPick(() => '')}</div>`, groupHtml(groups(false), plainEvent), oldHtml(rolePick(() => ''), plainEvent)].join('');
   return section(n, body);
 }
 
@@ -158,6 +173,34 @@ function worldSpoil(id, w) {
   return `<p class="fx">${esc(facts.join(' · '))}</p><p class="fx">ค่าเริ่ม: ${esc(start)} · เป้าหมาย: ${esc(w.goal)} · ทุ่มเทของบทบาท: ${esc(w.focus.name)}</p><p class="ex">ชื่อที่ได้: ${w.names.map((s) => text(s.replace('{p}', '{ชื่อชาติก่อน}'))).join(' / ')}</p>${w.special ? endings(r.world, w) : roleEndings(w)}`;
 }
 
+// โอกาสต่อแฟ้ม = น้ำหนักระดับ ÷ น้ำหนักรวม ตามกติกา contBirth (แฟ้มที่ซ้ำคู่เผ่า+แคว้นถูกสุ่มใหม่ จึงเพี้ยนจากนี้ไม่ถึงจุด)
+// เผ่าแบ่งเท่าในแคว้น ⇒ โอกาสเผ่า = ผลรวมของแคว้นที่เผ่านั้นเกิดได้ ÷ จำนวนเผ่าในแคว้น
+const TIER_NAME = { very: 'บ่อยมาก', often: 'บ่อย', mid: 'ปานกลาง', few: 'น้อย', rare: 'หายาก' };
+const tierSum = () => Object.values(CONT_REGIONS).reduce((s, g) => s + CONT_TIER[g.tier], 0);
+const regionOdds = (id) => CONT_TIER[CONT_REGIONS[id].tier] / tierSum();
+const raceOdds = (r) => Object.keys(CONT_REGIONS).filter((id) => CONT_REGIONS[id].races.includes(r)).reduce((s, id) => s + regionOdds(id) / CONT_REGIONS[id].races.length, 0);
+const birthSpoil = (id, g) => `<p class="fx">โอกาสต่อแฟ้ม <span class="od" data-reg="${esc(id)}">${Math.round(regionOdds(id) * 100)}</span>% (${esc(TIER_NAME[g.tier])})${g.danger ? ' · แคว้นอันตราย ดันเจียนลับลงบ่อยกว่า' : ''}</p>`;
+
+const FILL = (s) => s.replaceAll('{job}', '{อาชีพ}').replaceAll('{land}', '{แคว้น}');
+export const contEndTitles = () => Object.values(CONT_END).map(([t]) => FILL(t));
+const STAT4 = ['str', 'mag', 'cha', 'luk'];
+function contSpoil() {
+  const gold = roleInfo(CONT_LIFE.like).stat.gold;
+  const oldAt = ISEKAI_STAGES.at(-1).from;
+  const races = Object.entries(CONT_RACES).map(([r, x]) => {
+    const st = contRaceStart(r);
+    const lands = Object.values(CONT_REGIONS).filter((g) => g.races.includes(r)).map((g) => g.name);
+    const facts = [`ค่าเริ่ม ${STAT4.map((k) => `${ISEKAI_STAT[k]} ${st[k]}`).join(' · ')} · ทอง ${gold}`, `อายุเดิน ×${x.pace} (วัยชราเริ่มอายุ ${Math.floor(oldAt * x.pace)})`, `โอกาสต่อแฟ้ม ${Math.round(raceOdds(r) * 100)}%`, `เกิดได้ใน ${lands.join(' · ')}`];
+    return `<li><b>${esc(x.name)}</b> — ${esc(facts.join(' · '))}</li>`;
+  });
+  const src = (f) => (f.startsWith('k:') ? `${ISEKAI_KNOW[f.slice(2)].focus.name} (ทางลัดความรู้${ISEKAI_KNOW[f.slice(2)].name})` : ISEKAI_FOCUS[f].name);
+  const jobs = Object.values(ISEKAI_CAREERS).map((c) => `<li><b>${esc(c.name)}</b> — ทุ่มเท ${esc(c.from.map(src).join(' หรือ '))} รวมครบ ${ISEKAI_CAREER_T.years} ปี · ต่อปี ${fxLine(c.gain).join(' · ')}</li>`);
+  const fame = CONT_LIFE.fame;
+  const rule = { best: `ชื่อเสียง ≥ ${fame} และมีอาชีพ`, good: `ชื่อเสียง ≥ ${fame} หรือมีอาชีพ อย่างใดอย่างหนึ่ง (ไม่มีอาชีพ {อาชีพ} = คนดัง)`, bad: 'ไม่ถึงทั้งสองข้อ' };
+  const ends = Object.entries(CONT_END).map(([k, [t, s]]) => `<li class="end"><b>${esc(FILL(t))}</b> — ${esc(rule[k])}<br><small>${esc(FILL(s))}</small></li>`);
+  return `<h3>เผ่า <small>${races.length} เผ่า</small></h3><ul class="rules">${races.join('')}</ul><h3>อาชีพ <small>${jobs.length} อาชีพ</small></h3><ul class="rules">${jobs.join('')}</ul><h3>ตอนจบชาติทวีป</h3><p class="ex">{อาชีพ} = อาชีพแรกที่ได้ · {แคว้น} = แคว้นที่เกิด</p><ul class="ends">${ends.join('')}</ul>`;
+}
+
 // การ์ดที่ให้สกิลสุ่มไม่สุ่มโชคเทพธิดา (chooseIsekai) — สกิลอื่นได้ระหว่างทางด้วย
 const skillSpoil = (id) => (id === 'luck' ? '<p class="ex">ได้ตอนเลือกที่ห้องสีขาวเท่านั้น</p>' : '<p class="ex">ได้ระหว่างทางด้วย ถ้าการ์ดให้สกิลสุ่ม</p>');
 
@@ -171,13 +214,16 @@ function rules(meritTags) {
   const broke = meritTags([{ cat: 'vow_broken' }]).join('');
   const t = ISEKAI_TIME;
   return `<ul class="rules">${[
-    `ทางเกิดที่ 3 เปิดทุกชาติ · เทพธิดาอารมณ์ดีมายืนรอข้างทาง โอกาสตามกรรมจากปรโลก: บุญเต็ม ${at(1)} · กลาง ${at(0)} · บาปเต็ม ${at(-1)} (ไม่ต่ำกว่า ${pct(GODDESS.chanceMin)}) = ได้เลือกโลกเพิ่ม 1 และสกิลเพิ่ม 1 (เฉพาะรอบแรกที่ไป) และฝากคำสัญญา 1 ข้อ`,
+    `ชาติใหม่เกิดในทวีป${esc(CONT_LIFE.name)}: เทพธิดายื่นแฟ้มเกิด ${CONT_LIFE.offers} ใบ (เผ่า + แคว้น ไม่ซ้ำคู่กัน) สุ่มตามระดับโอกาสเกิดของแคว้น กรรมไม่ทำให้แฟ้มเอียง · ไม่มีเป้าหมาย ฉากเปิด หรือฉากสุดท้าย · คนที่ข้ามมาทั้งตัวเป็น${esc(CONT_RACES[CONT_LIFE.tripRace].name)} ลงแคว้นสุ่มที่${esc(CONT_RACES[CONT_LIFE.tripRace].name)}เกิดได้`,
+    `เผ่าแก่ไม่เท่ากัน: อายุเริ่มช่วงวัย วัยชรา และปีที่นับเป็นอาชีพ คูณด้วยตัวคูณอายุของเผ่า · ทุ่มเทสายต้นทางของอาชีพรวมครบ ${ISEKAI_CAREER_T.years} ปี ได้อาชีพนั้นติดตัวทั้งชาติ ได้หลายอาชีพพร้อมกันได้`,
+    `ทุกชาติทวีปสุ่มขั้วอำนาจ (มหาอำนาจ 1 · ขาลง 1–2 · มาแรง 1–2 จากแคว้นที่มีผู้ปกครอง) · ข้อพิพาทใหญ่ 1 จาก ${Object.keys(CONT_DISPUTES).length} เรื่อง · ดันเจียนลับ 3–4 จุด — ยังไม่มีการ์ดที่ใช้ จึงยังไม่มีผลกับชาตินั้น`,
+    `ทางเกิดที่ 3 เปิดทุกชาติ · เทพธิดาอารมณ์ดีมายืนรอข้างทาง โอกาสตามกรรมจากปรโลก: บุญเต็ม ${at(1)} · กลาง ${at(0)} · บาปเต็ม ${at(-1)} (ไม่ต่ำกว่า ${pct(GODDESS.chanceMin)}) = ได้แฟ้มเกิดเพิ่ม 1 และสกิลเพิ่ม 1 (เฉพาะรอบแรกที่ไป) และฝากคำสัญญา 1 ข้อ`,
     `ชีวิตที่รับการ์ดชวนข้ามโลกระหว่างมีชีวิต (ตายหรือหายตัว) เจอเทพธิดาแน่นอน และได้โชคเพิ่ม ${GODDESS.fatedLuck}`,
     `คำสัญญา (ชีวิตละข้อเดียว เทพธิดาเลือกให้):${GODDESS_VOWS.map(vowRule).join(' · ')} — รักษาได้ ${keep} · ผิด ${broke} (เฉลยที่ปรโลก)`,
     `อยู่ต่างโลกต่อติดกันได้ ${k.stay} รอบ แล้วต้องกลับโลกเดิมตามกรรม`,
     `กรรมจากปรโลก (−1 ถึง 1): ค่าเริ่มทุกตัวขยับ กรรม × ${k.karmaStat} (ปัดเศษ) · กรรม ≥ ${k.karmaSkill} ได้สกิลให้เลือกเพิ่ม 1 · ≤ −${k.karmaSkill} ลดลง 1 · บาปทำให้ทุกด่านยากขึ้นสูงสุด ${k.karmaDc}`,
     'โอกาสสำเร็จ = 50 + (ค่าที่ทอย − ความยาก) × 4 + สกิลตรงสาย + ธงที่ปูไว้ แล้วตัดให้อยู่ระหว่าง 5% ถึง 95%',
-    `เวลาเดินเองตาละ ${t.step} ปี (วัยชราตาละ ${t.oldStep} ปี) · ทุกตามีโอกาส ${Math.round(t.eventP * 100)}% ที่จะมีเหตุการณ์ให้ตัดสิน เรื่องสายเดียวกับที่ทุ่มเทอยู่โผล่บ่อยกว่า 3 เท่า · ฉากเปิดมาก่อนตาแรก ฉากสุดท้ายมาเมื่อถึงอายุของบทบาท`,
+    `เวลาเดินเองตาละ ${t.step} ปี (วัยชราตาละ ${t.oldStep} ปี) · ทุกตามีโอกาส ${Math.round(t.eventP * 100)}% ที่จะมีเหตุการณ์ให้ตัดสิน เรื่องสายเดียวกับที่ทุ่มเทอยู่โผล่บ่อยกว่า 3 เท่า · ชาติเก่า: ฉากเปิดมาก่อนตาแรก ฉากสุดท้ายมาเมื่อถึงอายุของบทบาท`,
     `วัยชราเริ่มอายุ ${ISEKAI_STAGES.at(-1).from} · หลังจากนั้นร่างกายเสื่อมทุกปีแรงขึ้นเรื่อย ๆ จนสิ้นอายุ ความสุขดีทำให้แก่ช้า`,
     `ชีวิต (HP) หมด = ${esc(ISEKAI_DEATH[0])} (เว้นมีสกิล${esc(ISEKAI_SKILLS.rbd.name)} ฟื้นได้ครั้งเดียว) · ค่าสถานะที่สูงสุดตอนจบติดตัวไปชาติต่างโลกถัดไป +${k.memory}`,
   ].map((s) => `<li>${s}</li>`).join('')}</ul>`;
@@ -188,9 +234,11 @@ export function isekaiSpoilersHtml(n, meritTags) {
   const src = flagSources();
   const body = [
     rules(meritTags),
-    `<h3>ก่อนเริ่มชาติ</h3><div class="grid">${worldPick(worldSpoil)}${skillPick(skillSpoil)}</div>`,
-    ...groups().map((g) => `<h3>${esc(g.label)} <small>${g.events.length} ใบ</small></h3><div class="grid">${g.events.map((e) => spoilEvent(e, src, meritTags)).join('')}</div>`),
+    `<h3>ก่อนเริ่มชาติ</h3><div class="grid">${birthPick(birthSpoil)}${skillPick(skillSpoil)}</div>`,
+    contSpoil(),
+    groupHtml(groups(false), (e) => spoilEvent(e, src, meritTags)),
     `<p class="ex">ตอนจบแบบตาย: <b>${esc(ISEKAI_DEATH[0])}</b> — ${esc(ISEKAI_DEATH[1])}</p>`,
+    oldHtml(rolePick(worldSpoil), (e) => spoilEvent(e, src, meritTags)),
   ].join('');
   return section(n, body);
 }

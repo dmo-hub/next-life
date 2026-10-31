@@ -1,5 +1,5 @@
 // ภาพหน้าจอจริงบนหน้าเว็บ (B65) + ด่านล้นจอทุกหน้า — เปิด play.html แล้วกดจนถึงฉาก ถ่ายเฉพาะการ์ดเป็น webp ลง docs/img/
-// ภาพ otherworld-role/event ถ่ายจากเกมสั้นที่ลบไปแล้ว ไม่ได้ถ่ายใหม่ที่นี่ — ยังไม่มีทางกดใน play.html ที่ไปถึงต่างโลกแบบตายตัว
+// ภาพ otherworld-event ถ่ายจากเกมสั้นที่ลบไปแล้ว · otherworld-birth ถ่ายจาก play.html (seed 7 · กดทางเทพธิดาต่างโลกที่ปรโลก) ด้วย CDP นอกสคริปต์นี้ — ยังไม่ได้ย้ายเข้ามา
 // เวลาและ Math.random ในหน้าถูกตรึง ⇒ seed ชีวิตกับทางที่กดเหมือนเดิมทุกรอบ ภาพจึงเปลี่ยนเฉพาะเมื่อเกมเปลี่ยน
 // ต้องมี playwright-core + Chromium ในเครื่อง (ไม่อยู่ใน dependencies ของเกม):
 //   npm i -g playwright-core && npx playwright install chromium   หรือ ตั้ง PW_CORE=<โฟลเดอร์ playwright-core> PW_EXE=<chrome.exe>

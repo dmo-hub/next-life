@@ -1,7 +1,7 @@
 // ตัวเลขบนหน้าเว็บ (B65) — คิดจากข้อมูล/โค้ดชุดเดียวกับเกมทุกครั้งที่ build หน้าเว็บจึงไม่ค้างเลขเก่าเมื่อระบบเปลี่ยน
 // หน้า docs อ้างด้วย <span data-fact="ชื่อ">…</span> · ห้ามมีค่าบัญชีบุญบาปรายชีวิต มีแต่กติกาที่ผู้เล่นอ่านได้อยู่แล้ว
 import { readFileSync } from 'node:fs';
-import { ALL_PATTERNS, TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, ISEKAI_CATS, LEGACY, PATTERN_FROM, ENTRY, ENTRY_EVENTS, GODDESS, GODDESS_VOWS, COURT_SCENES } from '../engine/index.mjs';
+import { ALL_PATTERNS, TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, ISEKAI_CATS, LEGACY, PATTERN_FROM, ENTRY, ENTRY_EVENTS, GODDESS, GODDESS_VOWS, COURT_SCENES, CONT_LIFE, CONT_REGIONS, CONT_RACES, ISEKAI_CAREERS, ISEKAI_CAREER_T } from '../engine/index.mjs';
 import { isekaiCardCount } from './otherworld.mjs';
 
 const th = (n) => n.toLocaleString('en-US');
@@ -61,6 +61,12 @@ export function siteFacts(content, appSrc = readFileSync(new URL('../ui/app.mjs'
     entryGone: String(Object.values(ENTRY_EVENTS).filter((e) => e.gone).length),
     vowCount: String(GODDESS_VOWS.length),
     fatedLuck: String(GODDESS.fatedLuck),
+    contOffers: String(CONT_LIFE.offers),
+    contRegions: String(Object.keys(CONT_REGIONS).length),
+    contRaces: String(Object.keys(CONT_RACES).length),
+    contCareers: String(Object.keys(ISEKAI_CAREERS).length),
+    contCareerYears: String(ISEKAI_CAREER_T.years),
+    contFame: String(CONT_LIFE.fame),
   };
 }
 
