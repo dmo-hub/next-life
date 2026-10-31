@@ -113,6 +113,21 @@ console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ np
 const COURT_ONLY = new Set(content.events.filter((e) => COURT_SCENES.includes(e.scene)).map((e) => e.id));
 const COURT_FLAGS = new Set(['cheat_death'].filter((fl) => !setters.has(fl)));
 console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run near): ใบศาล ${COURT_ONLY.size} ใบ · ธงที่ยังไม่มีการ์ดตั้ง ${COURT_FLAGS.size} ตัว${COURT_FLAGS.size ? ` (${[...COURT_FLAGS].join(' · ')})` : ''}`);
+// ของสายธุรกิจที่ถึงได้เฉพาะชีวิตที่ถือโฟกัสธุรกิจครบ 3 ปี (โฟกัสใบ 04 · เจ้าของเคาะ ข) — บอทหลักถือโฟกัสธุรกิจน้อยเกินจะถึงใน full
+// พิสูจน์ว่าถึงได้จริงใน biz-reach: บังคับโฟกัสธุรกิจ 1,000 ชีวิต 18/18 ตัว > 0 · ไม่โฟกัส 0 ทุกตัว · id ที่ไม่มีในเนื้อหาแล้ว = ตก (กันรายการเน่า)
+// FULL_FOCUS_DROP=<id> ถอดออกจากรายการชั่วคราว (ตัวควบคุม: ถอดแล้วด่าน 2 ต้องตก)
+const FOCUS_ONLY_WHY = 'ต้องโฟกัสธุรกิจครบ 3 ปี · พิสูจน์ใน biz-reach: บังคับโฟกัส 18/18 > 0';
+const FOCUS_ONLY_EVENTS = ['biz_grocery_rival_01', 'biz_credit_book_01', 'era_econ_gfc_cafe_01', 'mid_risky_chase_01', 'career_dream_crossroad_01', 'young_shop_rush_01'];
+const FOCUS_ONLY_CHOICES = ['biz_grocery_01#open_grocery', 'biz_grocery_01#credit_book', 'debt_guarantor_ask_01#joint_shop', 'era_econ_gfc_adult_01#0', 'era_econ_oil2_farm_01#3', 'mid_crisis_01#quit_dream', 'mid_risky_bet_01#all_in', 'career_dream_01#quit_for_dream', 'young_shop_01#cafe', 'young_shop_01#chicken_rice', 'young_shop_01#partner', 'young_shop_01#chicken_rice_rite'];
+const focusDrop = process.env.FULL_FOCUS_DROP;
+const FOCUS_ONLY = new Set([...FOCUS_ONLY_EVENTS, ...FOCUS_ONLY_CHOICES].filter((id) => id !== focusDrop));
+const choiceIds = new Set(content.events.flatMap((e) => (e.choices ?? []).map((c, i) => `${e.id}#${c.id ?? i}`)));
+const focusRotten = [...FOCUS_ONLY_EVENTS.filter((id) => !content.events.some((e) => e.id === id)), ...FOCUS_ONLY_CHOICES.filter((id) => !choiceIds.has(id))];
+console.log(`ข้ามที่ด่าน 2 (${FOCUS_ONLY_WHY}): เหตุการณ์ ${FOCUS_ONLY_EVENTS.length} · ตัวเลือก ${FOCUS_ONLY_CHOICES.length}${focusDrop ? ` · ตัวควบคุมถอด ${focusDrop}` : ''} — ${[...FOCUS_ONLY_EVENTS, ...FOCUS_ONLY_CHOICES].join(' · ')}`);
+if (focusRotten.length) {
+  console.log(`  ✗ รายการยกเว้นอ้าง id ที่ไม่มีในเนื้อหาแล้ว: ${focusRotten.join(' · ')}`);
+  fails.push('ด่าน 2 รายการยกเว้นโฟกัส');
+}
 // ฐานเทียบรอบก่อนคิดจาก seed ตายตัวเท่านั้น — รวม seed สุ่มแล้วตัวที่รอดเพราะ seed สุ่มจะกลายเป็น "ตายใหม่" ในรอบหน้า
 function deadOf(runs) {
   const fired = new Map(), picks = new Set(), flags = new Set();
@@ -126,8 +141,8 @@ function deadOf(runs) {
   const { dead, thin } = splitDeadChoices(content.events.filter((e) => !COURT_ONLY.has(e.id)), fired, explored, picks);
   return {
     fired,
-    events: content.events.filter((e) => !fired.has(e.id) && !HEIR_ONLY.has(e.id) && !COURT_ONLY.has(e.id)).map((e) => e.id),
-    choices: dead,
+    events: content.events.filter((e) => !fired.has(e.id) && !HEIR_ONLY.has(e.id) && !COURT_ONLY.has(e.id) && !FOCUS_ONLY.has(e.id)).map((e) => e.id),
+    choices: dead.filter((id) => !FOCUS_ONLY.has(id)),
     thinChoices: thin,
     flags: FLAGS.filter((x) => !flags.has(x) && !sideFlags.has(x) && !HEIR_FLAGS.has(x) && !COURT_FLAGS.has(x)),
   };
