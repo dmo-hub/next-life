@@ -2978,9 +2978,11 @@ function fixedFx(ev, c) {
     if (hidden.includes(k)) { out.push('?'); break; }
     const sign = k === 'money' && typeof fx[k] === 'object' ? Math.sign(fx[k].amount) : Math.sign(fx[k]);
     // ช่องว่างไม่ตัดบรรทัด: ลูกศรต้องติดชื่อค่า ไม่หล่นไปบรรทัดใหม่
-    out.push(`${STAT_LABELS[k]}\u00a0${sign > 0 ? '↑' : '↓'}`);
+    out.push(`${k === 'money' && fx[k].grey ? 'เงินเทา' : STAT_LABELS[k]}\u00a0${sign > 0 ? '↑' : '↓'}`);
   }
   if (fx.invest) out.push('ลงทุน');
+  if (fx.grey_seize) out.push('เงินเทาถูกยึด');
+  if (fx.grey_launder) out.push('ฟอกเงินเทา');
   if (fx.debt) out.push(`กู้${debtName(fx.debt.kind)}`);
   if (fx.settle) out.push(`ปิด${debtName(fx.settle)}`);
   if (fx.complain) out.push('ร้องเรียนดอกโหด');
@@ -3162,10 +3164,13 @@ function homePays(st) {
 function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
   const cut = (v) => (v < 0 ? v * hurt : v);
   for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + cut(levelValue(fx[k]) * ss));
-  if (fx.money) {
+  if (fx.money?.grey) greyAdd(st, moneyValue(st, fx.money) * s);
+  else if (fx.money) {
     st.money += cut(moneyValue(st, fx.money) * s);
     homePays(st);
   }
+  if (fx.grey_seize) greySeize(st, fx.grey_seize);
+  if (fx.grey_launder) greyLaunder(st, fx.grey_launder);
   // เงินชดเชยคิดจากงานเดิม — ต้องลงก่อนผลเปลี่ยนงานในก้อนเดียวกัน
   if (fx.severance && isWorking(st)) st.money += (severanceDays(st) * monthlyIncome(st)) / 30;
   if (fx.retire && isWorking(st)) {
@@ -3704,11 +3709,33 @@ function familyWhy(fs) {
   return sexes.size > 1 || sexes.has(undefined) ? 'พ่อแม่ไม่อยู่แล้ว' : sexes.has('หญิง') ? 'แม่ไม่อยู่แล้ว' : 'พ่อไม่อยู่แล้ว';
 }
 
+// เงินเทา (ใบ 36 · เจ้าของเคาะ 2026-10-31): ถุง st.grey แยกจาก money — ฐานะ/มรดก/ชื่อเสียงอ่าน money จึงไม่นับ · ใช้ได้เมื่อฟอกเข้า money
+// ยึดครึ่งถุงตอนถูกจับครั้งแรก · ฟอกเสียค่าฟอก 30% ปีละครั้ง · ตายแล้วหายไปกับตัว (ไม่เข้า estate)
+// ช่องเกิดเมื่อได้เงินเทาครั้งแรก — ชีวิตที่ไม่เคยแตะมี state เท่าเดิมทุกไบต์ (lifehash) และเซฟเก่าโหลดได้โดยไม่ต้องแปลง
+const GREY = { seize: 0.5, fee: 0.3 };
+function greyAdd(st, baht) {
+  st.grey = (st.grey ?? 0) + Math.max(0, baht);
+}
+function greySeize(st, share) {
+  if (st.grey) st.grey *= 1 - share;
+}
+function greyLaunder(st, share) {
+  const moved = (st.grey ?? 0) * share;
+  st.grey = (st.grey ?? 0) - moved;
+  st.money += moved * (1 - GREY.fee);
+  st.greyLaunderAge = st.age;
+}
+const greyLaunderLock = (st) => ((st.grey ?? 0) <= 0 ? 'ไม่มีเงินที่ต้องฟอก' : st.greyLaunderAge === st.age ? 'ฟอกไปแล้วปีนี้' : null);
+
 // ตัวเลือกที่ต้องมีเงิน/ค่าสถานะ/ธงถึงจะเลือกได้ (B14 A6) · ข้อความเหตุผลจากเนื้อหาทับข้อความตั้งต้น
 // extra = เงินที่จะกู้มาเติม — ถามว่ากู้แล้วกดได้ไหม โดยไม่แตะ state
 function lockReason(st, c, extra = 0) {
   if (st.pending?.id === FUNERAL.rite && st.funeralPick && c.id !== st.funeralPick) return 'ไม่ใช่แบบที่ตกลงกัน';
   if (gateShut(st, c)) return GATE_LOCK;
+  if (c.effects?.grey_launder) {
+    const g = greyLaunderLock(st);
+    if (g) return g;
+  }
   const q = c.requires;
   if (!q) return null;
   // อายุตามกฎหมายบอกเหตุผลของตัวเอง — reason ของเนื้อหาเขียนไว้ให้เงื่อนไขอื่น (เช่น "สั่งไว้แล้ว")
@@ -4076,6 +4103,8 @@ function whenOk(st, when) {
 // ธงจากเนื้อหา (ตัวเลือก · ผลลัพธ์ · การ์ดที่แกนสร้าง · เสี่ยงของโฟกัส) ติดผ่านจุดนี้จุดเดียว — ผลที่ต้องเกิดตอนธงติดจึงดักได้ที่เดียว
 // ธงจากบัญชีบุญบาป (recordMerit) ไม่ผ่านที่นี่: ไม่จดอายุที่ได้มาตั้งแต่เดิม
 function raiseFlag(st, f) {
+  // ถูกจับครั้งแรกเท่านั้นที่ยึด — ต้องเช็กก่อนตั้งธง · ผลลัพธ์ใส่เงินก่อนติดธง เงินก้อนที่ได้พร้อมถูกจับจึงถูกยึดด้วย
+  if (f === 'caught_fraud' && !st.flags[f]) greySeize(st, GREY.seize);
   st.flags[f] = true;
   st.flagAge[f] ??= st.age;
 }

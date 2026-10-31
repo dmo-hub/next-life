@@ -1,0 +1,17 @@
+# เงินเทาครบรูป: เงินได้ติด grey · ยึดเป็นสัดส่วน · ฟอกอยู่บนตัวเลือก
+events:
+  - id: good_grey_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2530, 2650]
+    text: "ซองสีน้ำตาลวางอยู่บนโต๊ะ"
+    choices:
+      - text: "รับไว้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ไม่มีใครถาม", effects: {money: {unit: income_x, amount: 1, grey: true}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มีคนเห็น", effects: {grey_seize: 0.5}, merit: [{cat: neutral}]}
+      - {text: "ฝากญาติฟอก", effects: {grey_launder: 0.5}, merit: [{cat: neutral}]}
+      - {text: "รับแล้วซื้อทองเก็บ", effects: {money: {unit: income_x, amount: 0.5, grey: true}}, merit: [{cat: neutral}]}
+      - {text: "คืนซอง", merit: [{cat: neutral}]}

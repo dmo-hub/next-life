@@ -19,11 +19,11 @@ const KEYS = {
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain', 'severance'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   debt: ['kind', 'amount'],
-  money: ['unit', 'amount', 'ref_year'],
+  money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
   when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', ...MONEY_KEYS],
@@ -385,6 +385,24 @@ export const rules = [
         const fx = isObj(node.effects) ? node.effects : {};
         if (fx.settle !== undefined && !DEBTS.some((d) => d.id === fx.settle)) r(`${path}.effects.settle`, `ปิดหนี้ต้องเป็นชนิดหนี้ (${DEBTS.map((d) => d.id).join(' ')}) ได้ ${JSON.stringify(fx.settle)}`);
         if (fx.complain !== undefined && fx.complain !== true) r(`${path}.effects.complain`, 'complain ต้องเป็น true เท่านั้น');
+      }
+    },
+  },
+  {
+    id: 'grey-shape',
+    desc: 'เงินเทา effects.money.grey = true กับเงินได้ (amount > 0) เท่านั้น · grey_seize / grey_launder = สัดส่วน 0 < x ≤ 1 · grey_launder อยู่บนตัวเลือก (ล็อกปีละครั้ง) ไม่อยู่ในผลสุ่ม',
+    event(e, ctx, r) {
+      for (const { node, path } of effectSites(e)) {
+        const fx = isObj(node.effects) ? node.effects : {};
+        const m = fx.money;
+        if (isObj(m) && m.grey !== undefined && !(m.grey === true && typeof m.amount === 'number' && m.amount > 0)) r(`${path}.effects.money.grey`, `grey ต้องเป็น true กับเงินได้ (amount > 0) ได้ ${JSON.stringify(m)}`);
+        for (const k of ['grey_seize', 'grey_launder']) {
+          if (fx[k] !== undefined && !(typeof fx[k] === 'number' && fx[k] > 0 && fx[k] <= 1)) r(`${path}.effects.${k}`, `ต้องเป็นสัดส่วน 0 < x ≤ 1 ได้ ${JSON.stringify(fx[k])}`);
+        }
+        if (fx.grey_launder !== undefined && /outcomes/.test(path)) r(`${path}.effects.grey_launder`, 'ฟอกต้องอยู่บนตัวเลือก ไม่ใช่ผลสุ่ม (ล็อกปีละครั้งอ่านจากตัวเลือก)');
+      }
+      for (const [kind, node, path] of shaped(e)) {
+        if (kind === 'money' && isObj(node) && node.grey !== undefined && !/\.effects\.money$/.test(path)) r(path, 'grey ใช้ได้เฉพาะ effects.money');
       }
     },
   },

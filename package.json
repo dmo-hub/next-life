@@ -19,6 +19,7 @@
     "causes": "node harness/causes.mjs --n 20000 --seed 1",
     "near": "node harness/near-death.mjs --n 20000 --seed 1",
     "pact": "node harness/pact.mjs --n 2000 --seed 1",
+    "grey": "node harness/grey.mjs --n 500 --seed 1",
     "density": "node harness/density.mjs --n 2000 --seed 1",
     "repeat": "node harness/repeat.mjs --n 2000 --seed 1",
     "passive": "node harness/passive.mjs --n 2000 --seed 1",
