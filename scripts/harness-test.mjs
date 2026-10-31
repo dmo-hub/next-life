@@ -271,6 +271,18 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 05a ตัวควบคุม: เกณฑ์ ∞ = 0 อาชีพ', inf.length === 0, inf.join(' · '));
 }
 
+// ใบ 06a: ด่านทวีปจับตัวสุ่ม/แผนที่ที่พังได้ (ตัวควบคุม) — ป้อนของพังเข้า contChecks ตรง ๆ ไม่แก้ข้อมูลจริง
+{
+  const { contChecks } = await import('../harness/continent.mjs');
+  const C = await import('../src/engine/continent.mjs');
+  const failed = (o, label) => contChecks({ n: 300, ...o }).some((r) => !r.ok && r.label.startsWith(label));
+  const real = contChecks({ n: 3000 }).filter((r) => !r.ok);
+  check('ใบ 06a ข้อมูลจริงผ่านทุกด่าน (n3000 · n300 ข้อพิพาท ±2 จุดแกว่งเกิน)', real.length === 0, real.map((r) => r.label).join(' · '));
+  check('ใบ 06a ตัวควบคุม: เส้นทางหายหนึ่งทิศ → ด่านสมมาตรตก', failed({ near: (id) => (id === 'coralis' ? [] : C.contNeighbors(id)) }, 'แผนที่สมมาตร'));
+  check('ใบ 06a ตัวควบคุม: ไม่มีมหาอำนาจ → ด่านขั้วอำนาจตก', failed({ nation: (s) => { const x = C.contNation(s); return { ...x, powers: { ...x.powers, major: undefined } }; } }, 'ขั้วอำนาจ'));
+  check('ใบ 06a ตัวควบคุม: เผ่านอกรายการแคว้น → ด่านเกิดตก', failed({ birth: (rng) => ({ ...C.contBirth(rng), race: 'dragonkin' }) }, 'เกิดได้ทุกแคว้น'));
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {
