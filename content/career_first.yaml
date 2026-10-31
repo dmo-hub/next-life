@@ -191,7 +191,7 @@ events:
         text: "เซ็นตามทุกคน"
         hint: "ราคา: บาปหนัก"
         sets_flags: [took_bribe, desk_bent]
-        schedules: [{event: echo_gov_audit_01, after_years: [6, 14]}]
+        schedules: [{event: echo_gov_audit_01, after_years: [4, 10]}]
         merit: [{cat: cheat_exploit, level: 2}]
         outcomes:
           - {weight: 3, ok: true, text: "เงินเดือนเดือนแรกหนากว่าที่คิด หัวหน้าบอกว่าเด็กใหม่คนนี้เข้าใจระบบ", effects: {network: 2, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
@@ -199,7 +199,7 @@ events:
       - id: strike_out
         text: "ขีดชื่อตัวเองออก"
         sets_flags: [desk_clean]
-        schedules: [{event: echo_gov_trusted_01, after_years: [6, 14]}]
+        schedules: [{event: echo_gov_trusted_01, after_years: [4, 10]}]
         merit: [{cat: sila, level: 1}]
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้อำนวยการเห็นใบเบิกที่มีรอยขีด เรียกไปถามแล้วจำชื่อคุณได้", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}

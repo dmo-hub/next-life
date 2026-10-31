@@ -227,6 +227,16 @@ events:
         text: "ปล่อยไป ทำงานประจำต่อ"
         effects: {happiness: -1, health: 1, money: {unit: income_x, amount: 0.5}}
         merit: [{cat: neutral}]
+      - id: side_stall
+        text: "เช่าแผงหน้าห้องขายของหลังเลิกงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ขายของหน้าห้องได้ค่ากับข้าวทุกเย็น", effects: {happiness: 1, health: -1, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของห้องเปิดร้านเองเดือนถัดมา แผงหน้าห้องต้องเก็บ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tip_friend
+        text: "บอกต่อให้เพื่อนที่อยากเปิดร้าน"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: neutral}]
       - id: chicken_rice_rite
         text: "เปิดร้านข้าวมันไก่ตามฤกษ์"
         gate: business
