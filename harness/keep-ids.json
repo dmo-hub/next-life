@@ -1,5 +1,5 @@
 {
- "version": "v0.6.12",
+ "version": "v0.6.13",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -323,6 +323,7 @@
   "biz_ponzi_crash_01",
   "biz_ponzi_again_01",
   "biz_credit_book_01",
+  "biz_politics_invite_01",
   "first_police_01",
   "echo_police_ledger_01",
   "echo_police_clean_01",
