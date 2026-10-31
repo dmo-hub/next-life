@@ -45,7 +45,7 @@ events:
     choices:
       - id: full_lent
         text: "ลางานบวชหนึ่งพรรษา"
-        gate: [ordain, occult]
+        gate: ordain
         effects: {happiness: 1, relations: 2, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: sila, level: 2}, {cat: care_parents, level: 1}]
       - id: short

@@ -32,6 +32,13 @@ events:
       - id: go_home
         text: "แยกกลับบ้านก่อน"
         merit: [{cat: neutral}]
+      - id: apprentice_palm
+        text: "ขอฝากตัวเรียนดูลายมือกับหมอดู"
+        gate: occult
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "หมอดูให้นั่งโต๊ะแทนตอนลุกไปพัก ลูกค้าบางคนเดินกลับมาหาคุณเอง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรียนได้สามเดือน หมอดูเรียกค่าครูก้อนโตแล้วยังไม่ยอมสอนเคล็ดจริง", effects: {money: {unit: income_x, amount: -0.3}, happiness: -1}, merit: [{cat: neutral}]}
   - id: bel_fortune_market_rite
     type: B
     category: belief
@@ -88,6 +95,13 @@ events:
       - id: wait_car
         text: "ไปนั่งรอในรถ"
         merit: [{cat: neutral}]
+      - id: open_table
+        text: "ตั้งโต๊ะดูไพ่เองวันหยุด"
+        gate: occult
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ลูกค้าวันหยุดต่อคิวยาวขึ้นทุกเดือน บางคนพาเพื่อนมาด้วย", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทายว่าลูกค้าจะได้เลื่อนขั้น เดือนถัดมาเขาถูกเลิกจ้าง กลับมาต่อว่าถึงหน้าโต๊ะ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
   - id: bel_fortune_cards_rite
     type: B
     category: belief
@@ -207,6 +221,14 @@ events:
       - id: lunch
         text: "ขอตัวไปกินข้าวก่อน"
         merit: [{cat: neutral}]
+      - id: rent_stall
+        text: "เช่าแผงส่องพระของตัวเอง"
+        gate: occult
+        effects: {money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "แผงเล็กท้ายศูนย์มีขาประจำ ส่องพระให้ลูกค้าจนรู้จักกันทั้งซอย", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รับพระเก๊มาเข้าแผงทั้งชุด กว่าจะรู้ก็ปล่อยไปหลายองค์ ต้องตามขอโทษลูกค้า", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
 
   - id: bel_amulet_yantra
     type: B
@@ -237,6 +259,11 @@ events:
         merit: [{cat: neutral}]
       - id: decline
         text: "ไม่ไป ยังไม่พร้อม"
+        merit: [{cat: neutral}]
+      - id: stay_samnak
+        text: "ขออยู่ช่วยงานสำนักเป็นศิษย์"
+        gate: occult
+        effects: {happiness: 1, relations: -1}
         merit: [{cat: neutral}]
 
   # ทำบุญเสริมดวง — คู่เจตนา ต้นทุนเท่ากัน ป้ายเหมือนกัน · ทำหวังผลบุญน้อยกว่า 1 ระดับ และมีการ์ดตามมาถ้าเงินไม่ดีขึ้น
