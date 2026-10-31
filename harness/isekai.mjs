@@ -238,13 +238,17 @@ check('ความรู้อันตรายเฉพาะวัยผู�
 // ทุกครั้งที่บอกว่าโลกจะจำ ต้องลงรายการจริง และชื่อเสียงถึงเกณฑ์ (สำเร็จ + คนยอมรับ)
 check('โลกจำเฉพาะที่ชื่อเสียงถึง', loreBad + (loreSys !== loreGot ? 1 : 0), `${loreGot} รายการ`);
 check('เหตุการณ์ตำนานมาเฉพาะโลกที่จำแบบนั้น + เรียกชื่อคนในตำนาน', legendEvBad + legendTextBad);
-// ยาต่ออายุ (B68k): ทุกบอทได้ยาครบทุกทาง · ต้องมีชาติที่ดื่มเกิน free ให้ด่านบาปได้ตรวจจริง
-// ซื้อร้านอย่างเดียวไม่ได้อายุเกินทางอื่นมาก (เฉลี่ยไม่เกิน 1.5 เท่า)
+// ยาต่ออายุ (B68k): ทุกทางมีบอทถึง ≥ 1 ตัว และบอทสุ่มถึงครบ — ทางยาไม่ตาย · บอทบุคลิกเลี่ยงบางทางตามนิสัยได้ (เจ้าของเคาะ 2026-10-31)
+// ต้องมีชาติที่ดื่มเกิน free ให้ด่านบาปได้ตรวจจริง · ซื้อร้านอย่างเดียวไม่ได้อายุเกินทางอื่นมาก (เฉลี่ยไม่เกิน 1.5 เท่า)
 const POTION_SRC = ISEKAI_EVENTS.filter((e) => e.choices.some((c) => c.potion || c.win?.potion)).map((e) => e.id);
-const potionMiss = Object.keys(BOTS).flatMap((name, b) => POTION_SRC.filter((id) => !potionFrom[b]?.has(id)).map((id) => `${name}:${id}`));
+const RANDOM_BOT = Object.keys(BOTS).indexOf('สุ่ม');
+const potionMiss = [
+  ...POTION_SRC.filter((id) => !potionFrom.some((s) => s?.has(id))).map((id) => `ไม่มีบอทไหน:${id}`),
+  ...POTION_SRC.filter((id) => !potionFrom[RANDOM_BOT]?.has(id)).map((id) => `สุ่ม:${id}`),
+];
 const avg = (xs = []) => (xs.length ? xs.reduce((s, v) => s + v, 0) / xs.length : 0);
 const shopAvg = avg(potionAdd.shop), otherAvg = avg(potionAdd.other);
-check('ยาต่ออายุ: อายุที่ต่อไม่เกินเพดาน · บาปเฉพาะขวดที่เกิน · ทุกบอทได้ทุกทาง', potionBad + potionMiss.length + (potionOver ? 0 : 1), `${POTION_SRC.length} ทาง · ดื่มเกิน ${ISEKAI_POTION.free} ขวด ${potionOver} ชาติ${potionMiss.length ? ` · ขาด ${potionMiss.slice(0, 6).join(' ')}` : ''}`);
+check('ยาต่ออายุ: อายุที่ต่อไม่เกินเพดาน · บาปเฉพาะขวดที่เกิน · ทุกทางมีบอทถึงและบอทสุ่มถึงครบ', potionBad + potionMiss.length + (potionOver ? 0 : 1), `${POTION_SRC.length} ทาง · ดื่มเกิน ${ISEKAI_POTION.free} ขวด ${potionOver} ชาติ${potionMiss.length ? ` · ขาด ${potionMiss.slice(0, 6).join(' ')}` : ''}`);
 check('ซื้อร้านอย่างเดียวไม่ชนะขาด', !otherAvg || shopAvg > otherAvg * 1.5 ? 1 : 0, `ต่อเฉลี่ย ร้าน ${shopAvg.toFixed(1)} · ทางอื่น ${otherAvg.toFixed(1)} · ปน ${avg(potionAdd.mix).toFixed(1)} ปี`);
 // ทางคนร้ายหายากกว่าวีรบุรุษ — ต้องเจอทั้งสองแบบ ไม่งั้นด่านผ่านทั้งที่ไม่ได้ตรวจ
 check(`ดังถึง ${ISEKAI_FAME.legend} = โลกจำชื่อ · คนร้ายตามชื่อเสียงจากทางบาป`, legendEndBad + (legendGot - legendDark ? 0 : 1) + (legendDark ? 0 : 1), `${legendGot} ชาติ · คนร้าย ${legendDark}`);

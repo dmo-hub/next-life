@@ -2,9 +2,10 @@
 // มันกดเหมือนสุ่มเงียบ ๆ ด่านเหล่านั้นยังผ่านแต่ไม่ได้วัดอะไร
 // วัด: เดินด้วยบอทสุ่ม · ทุกการ์ดที่บอทของ harness ตัดสินและกดได้ ≥ 2 ทาง ถามบอทบุคลิกกับบอทสุ่มด้วย rng ชุดเดียวกัน
 // คะแนนเสมอทุกทาง = กดเหมือนสุ่ม · โลกหลักตัดการ์ดที่ playLife เลือกเอง (ทริป · ศาล · ความทรงจำ · การ์ดชวน)
-// ต่างโลกส่ง h = {} แบบ harness/isekai.mjs — รายงาน ไม่ตัดสิน จนกว่าเจ้าของเคาะทางอ่านป้ายต่างโลก
+// ต่างโลกส่ง h = {} แบบ harness/isekai.mjs · ตัดสินเกณฑ์เดียวกับโลกหลัก (เจ้าของเคาะทาง 1 ให้บอทอ่านป้ายต่างโลก 2026-10-31)
 // เกณฑ์รายบอทต่อโลก ไม่ใช่ค่าเฉลี่ย: บอทบุญ/บาปพึ่งป้ายบุญบาป บอทครอบครัว/สุขภาพพึ่งป้ายผล ค่าเฉลี่ยกลบตัวที่หลุด
-// ตัวควบคุม: --h0 ส่ง h = {} (บุญ/บาปต้องตก) · --nofx ลบป้ายผล (ครอบครัว/สุขภาพ/เงินต้องตก)
+// ตัวควบคุม: --h0 ส่ง h = {} (บุญ/บาปโลกหลักต้องตก) · --nofx ลบป้ายผล (ครอบครัว/สุขภาพ/เงินต้องตกทั้งสองโลก)
+// --noid ลบ id ของการ์ดต่างโลก (บุญ/บาปต่างโลกอ่าน ISEKAI_MERIT ตาม id ไม่ใช่ h — ต้องตก)
 import { playLife, mixSeed, makeRng, openChoices } from '../src/engine/index.mjs';
 import { startIsekai, nextIsekaiCard, chooseIsekai } from '../src/engine/isekai.mjs';
 import { loadContent } from '../src/node/load.mjs';
@@ -12,7 +13,7 @@ import { BOTS } from './bots.mjs';
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? Number(process.argv[i + 1]) : d; };
 const n = arg('--n', 200), m = arg('--m', 50), seed = arg('--seed', 1);
-const H0 = process.argv.includes('--h0'), NOFX = process.argv.includes('--nofx');
+const H0 = process.argv.includes('--h0'), NOFX = process.argv.includes('--nofx'), NOID = process.argv.includes('--noid');
 const MIN = 0.1;
 const BOT_SALT = 0x7d1f;
 const content = loadContent();
@@ -21,7 +22,7 @@ const pickOf = (r) => (r && typeof r === 'object' ? r.i : r);
 
 let asked = 0;
 const ask = (card, h, diff) => {
-  const c = NOFX ? { ...card, fx: [] } : card;
+  const c = { ...card, ...(NOFX && { fx: [] }), ...(NOID && card.kind === 'isekai' && { id: undefined }) };
   const hh = H0 ? {} : h;
   const rs = mixSeed(seed ^ BOT_SALT, asked++);
   const base = pickOf(BOTS.สุ่ม(c, makeRng(rs), hh));
@@ -57,13 +58,13 @@ for (let i = 0; i < m; i++) {
 
 const share = (w, k) => (w.cards ? w.diff[k] / w.cards : 0);
 const pct = (x) => `${(100 * x).toFixed(1)}%`;
-console.log(`บอทบุคลิกกดต่างจากบอทสุ่ม · เกณฑ์ ≥ ${pct(MIN)} ต่อบอทต่อโลก · seed ${seed}${H0 ? ' · ตัวควบคุม h = {}' : ''}${NOFX ? ' · ตัวควบคุมลบป้ายผล' : ''}`);
+console.log(`บอทบุคลิกกดต่างจากบอทสุ่ม · เกณฑ์ ≥ ${pct(MIN)} ต่อบอทต่อโลก · seed ${seed}${H0 ? ' · ตัวควบคุม h = {}' : ''}${NOFX ? ' · ตัวควบคุมลบป้ายผล' : ''}${NOID ? ' · ตัวควบคุมลบ id การ์ดต่างโลก' : ''}`);
 console.log(`  โลกหลัก ${n} ชีวิต ${main.cards} การ์ด · ต่างโลก ${m} ชาติ ${isk.cards} การ์ด`);
 const low = people.filter((k) => share(main, k) < MIN);
 for (const k of people) {
-  console.log(`  ${k.padEnd(10)} โลกหลัก ${pct(share(main, k)).padStart(6)}${share(main, k) < MIN ? ' ตก' : ''} · ต่างโลก ${pct(share(isk, k)).padStart(6)}${share(isk, k) < MIN ? ' (ต่ำกว่าเกณฑ์)' : ''}`);
+  console.log(`  ${k.padEnd(10)} โลกหลัก ${pct(share(main, k)).padStart(6)}${share(main, k) < MIN ? ' ตก' : ''} · ต่างโลก ${pct(share(isk, k)).padStart(6)}${share(isk, k) < MIN ? ' ตก' : ''}`);
 }
 const iskLow = people.filter((k) => share(isk, k) < MIN);
 console.log(`โลกหลัก: ${low.length ? `ตก ${low.length} บอท (${low.join(' ')})` : 'ผ่านทุกบอท'}`);
-console.log(`ต่างโลก: รายงาน ไม่ตัดสิน — ต่ำกว่าเกณฑ์ ${iskLow.length}/${people.length} บอท (รอเคาะทางอ่านป้ายต่างโลก)`);
-process.exit(low.length ? 1 : 0);
+console.log(`ต่างโลก: ${iskLow.length ? `ตก ${iskLow.length} บอท (${iskLow.join(' ')})` : 'ผ่านทุกบอท'}`);
+process.exit(low.length || iskLow.length ? 1 : 0);

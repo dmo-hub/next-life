@@ -1,8 +1,8 @@
 // บอท 6 บุคลิก (ใบ 07): สุ่มล้วน · สายบุญ · สายบาป · สายเงิน/เสี่ยง · สายครอบครัว · สายสุขภาพ
 // ทุกตัวเลือกจากตัวเลือกที่กดได้ (openChoices) · ตัดสินจากป้ายบนการ์ด (card.fx) ที่ผู้เล่นเห็นเท่านั้น
-// ข้อยกเว้นเดียว: สายบุญ/บาปอ่านป้ายบุญบาปของตัวเลือก (holder.pending) แทนการอ่านความหมายของข้อความแบบที่คนทำ — ไม่อ่านบัญชี
+// ข้อยกเว้นเดียว: สายบุญ/บาปอ่านป้ายบุญบาปของตัวเลือก (holder.pending · ต่างโลกอ่าน ISEKAI_MERIT ของการ์ด) แทนการอ่านความหมายของข้อความแบบที่คนทำ — ไม่อ่านบัญชี
 // เสมอกันสุ่มจาก stream ของบอท · holder = st (การ์ดชีวิต) หรือ af (การ์ดระหว่างชาติ)
-import { openChoices, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, STAT_LABELS, STAT_KEYS, makeRng, mixSeed, stageOf, lifeFocusOffers, lifeFocusDefs, setLifeFocus, FOCUS_FLOW } from '../src/engine/index.mjs';
+import { openChoices, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, STAT_LABELS, STAT_KEYS, makeRng, mixSeed, stageOf, lifeFocusOffers, lifeFocusDefs, setLifeFocus, FOCUS_FLOW, ISEKAI_FX, ISEKAI_LINK, ISEKAI_MERIT } from '../src/engine/index.mjs';
 
 export const random = (card, rng) => {
   const open = openChoices(card);
@@ -26,6 +26,10 @@ const meritScore = (c) =>
     return s + (SIN_CATS.includes(id) ? -v : v);
   }, 0);
 const extreme = (sign) => (card, rng, h) => {
+  if (card.kind === 'isekai') {
+    const m = ISEKAI_MERIT[card.id];
+    return m ? best(card, rng, (i) => sign * meritScore({ merit: m[i] ?? [] })) : random(card, rng);
+  }
   // การ์ดจัดสรรเงิน/เลือกทางเกิดไม่มีป้ายบุญบาป
   if (!h.pending?.choices) return random(card, rng);
   return best(card, rng, (i) => sign * meritScore(h.pending.choices[i]));
@@ -44,9 +48,26 @@ export function readFx(fx) {
   return out;
 }
 
+// ป้ายต่างโลก (เจ้าของเคาะทาง 1 · 2026-10-31): ใบทุ่มเทเขียน "<ชื่อค่าต่างโลก> · … ขึ้น/ลด" — แปลงเป็นค่าโลกหลักตาม ISEKAI_LINK
+// ที่แกนใช้สะท้อนผลกลับอยู่แล้ว (ชีวิต→สุขภาพ · ทอง→เงิน) ให้น้ำหนักบุคลิกชุดเดิมใช้ได้ · ใบเหตุการณ์บอกแค่โอกาส "70%" → ป้ายเสี่ยงชุดเดิม
+const ISK_NAME = Object.fromEntries(Object.entries(ISEKAI_FX).map(([k, v]) => [v, k]));
+const ISK_KEY = { ...ISEKAI_LINK, hp: 'health', gold: 'money' };
+export function readIsekaiFx(fx) {
+  const out = { stat: {}, tags: [] };
+  const text = fx ?? '';
+  const m = text.match(/^(.+) (ขึ้น|ลด)$/);
+  if (m) for (const n of m[1].split(' · ')) {
+    const key = ISK_KEY[ISK_NAME[n]];
+    if (key) out.stat[key] = (out.stat[key] ?? 0) + (m[2] === 'ขึ้น' ? 1 : -1);
+  }
+  const pc = text.match(/^([0-9]+)%/);
+  if (pc) out.tags.push(Number(pc[1]) < 50 ? 'เสี่ยงสูง' : Number(pc[1]) < 80 ? 'เสี่ยงกลาง' : 'สำเร็จ ?');
+  return out;
+}
+
 // คะแนนจากน้ำหนักต่อค่าสถานะ + ป้ายคำ (ลงทุน · กู้ · เสี่ยง · สำเร็จ ?) · ป้าย "?" ล้วน = ไม่รู้ผล ได้ 0
 const byLabel = (w, tag = () => 0) => (card) => (i) => {
-  const { stat, tags } = readFx(card.fx?.[i]);
+  const { stat, tags } = card.kind === 'isekai' ? readIsekaiFx(card.fx?.[i]) : readFx(card.fx?.[i]);
   let s = 0;
   for (const [k, v] of Object.entries(stat)) s += (w[k] ?? 0) * v;
   for (const t of tags) s += tag(t);
