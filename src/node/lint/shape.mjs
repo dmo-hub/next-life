@@ -121,8 +121,8 @@ const nonEmptySubset = (v, of) => Array.isArray(v) && v.length > 0 && v.every((x
 const positive = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
 // คะแนนผลของ ok-direction: ผลรวมค่าสถานะ + ทิศเงิน (ขนาดเงินต่างหน่วยกัน income_x/fixed_baht เทียบตรงไม่ได้)
 const okScore = (o) => STAT_KEYS.reduce((s, k) => s + (typeof o.effects?.[k] === 'number' ? o.effects[k] : 0), 0) + Math.sign(o.effects?.money?.amount ?? 0);
-// การ์ดที่ป้าย ok หมายถึง "ทางซื่อ" ไม่ใช่ "ทางได้ผลดี" — รอเจ้าของตัดสินความหมายป้าย · lint-test พิมพ์รายการนี้ทุกรอบ
-export const OK_DIRECTION_SKIP = new Map([['gov_hire_nephew_01', 'ทาง ok = หลานไม่ติดเพราะไม่ฝาก (ซื่อ) แต่ค่าต่ำกว่าทางหลานติดเอง']]);
+// ป้าย ok = ผลดีต่อผู้เล่น (แกนใช้คิดโอกาส) · การ์ดที่ตั้งใจให้ทาง ok ค่าต่ำกว่าใส่ที่นี่พร้อมเหตุผล · lint-test พิมพ์รายการนี้ทุกรอบ
+export const OK_DIRECTION_SKIP = new Map();
 // อัตราส่วนเงิน (money_x · income_x · debt_x) ไม่มีเพดาน 100 แบบค่าสถานะ — ต้องมีอย่างน้อยหนึ่งขอบ ไม่งั้นเงื่อนไขไม่กั้นอะไร
 const ratio = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0;
 const ratioBound = (b) => isObj(b) && (b.min !== undefined || b.max !== undefined) && ['min', 'max'].every((k) => b[k] === undefined || ratio(b[k])) && !(b.min > b.max);

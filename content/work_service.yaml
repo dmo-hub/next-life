@@ -289,8 +289,8 @@ events:
         text: "ให้คะแนนตามที่ตอบจริง"
         merit: [{cat: sila, level: 1}]
         outcomes:
-          - {weight: 2, ok: true, text: "หลานได้คะแนนตามจริง ไม่ติด ผู้ใหญ่ไม่โทรมาอีกเลย", effects: {network: -1, happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "หลานสัมภาษณ์ดีจริงจนติดเองโดยไม่ต้องช่วย ผู้ใหญ่คิดว่าเราช่วย", effects: {network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หลานได้คะแนนตามจริง ไม่ติด ผู้ใหญ่ไม่โทรมาอีกเลย", effects: {network: -1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "หลานสัมภาษณ์ดีจริงจนติดเองโดยไม่ต้องช่วย ผู้ใหญ่คิดว่าเราช่วย", effects: {network: 1}, merit: [{cat: neutral}]}
       - id: step_down
         text: "ขอถอนตัว อ้างว่ารู้จักผู้สมัคร"
         effects: {network: -1}
