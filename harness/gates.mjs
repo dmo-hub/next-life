@@ -206,7 +206,7 @@ export function stuckCard(card, byId) {
 // การ์ดเนื้อหาที่เหลือปุ่มกดได้ปุ่มเดียว (ไอเดีย xian-16) — ทางเลือกหายเพราะล็อก = ผู้เล่นไม่ได้เลือกจริง
 // ล็อกตามแบบของระบบ (แบบงานศพที่ตกลง · คำสั่งเสียที่สั่งแล้ว) ยกเว้นรายใบ · การ์ดที่แกนสร้างไม่นับ (ล็อกวุฒิ/ค่าเทอมตามแบบ)
 // เหลือปุ่มเดียวเพราะซ่อน (card.hidden ของตัวเลือก gate) เป็นแบบของโฟกัส — คืน 'hidden' ให้ผู้เรียกนับแยก ไม่ตก
-// ตัวเลือก gate ที่ปิดเป็นทั้งล็อกและซ่อน (openChoices ตัดออก) — ตกเฉพาะเมื่อมีตัวเลือกที่ผู้เล่นเห็นแต่ล็อกอยู่
+// ตัวเลือก gate ที่ปิดเป็นทั้งล็อกและซ่อน (openChoices ตัดออก) — ถ้านับตัวที่ซ่อนกลับเข้าไปแล้วกดได้ ≥ 2 ปุ่มเดียวเกิดจาก gate
 export const ONE_OPEN_OK = new Map([
   ['funeral_rite_01', 'ล็อกตามแบบงานศพที่ตกลงไว้'],
   ['funeral_wishes_01', 'ล็อกคำสั่งเสียที่สั่งไปแล้ว'],
@@ -216,8 +216,8 @@ export function oneOpen(card, byId) {
   const open = openChoices(card);
   const shown = open.filter((i) => card.hidden?.[i] !== true);
   if (shown.length !== 1) return null;
-  const shutShown = card.choices.some((_, i) => !open.includes(i) && card.hidden?.[i] !== true);
-  if (open.length >= 2 || !shutShown) return 'hidden';
+  const gateShut = card.choices.filter((_, i) => !open.includes(i) && card.hidden?.[i] === true).length;
+  if (open.length + gateShut >= 2) return 'hidden';
   return ONE_OPEN_OK.has(card.id) ? null : 'locked';
 }
 
