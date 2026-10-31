@@ -142,6 +142,11 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .mk-cap { margin:0; font-size:12px; min-height:1.5em; overflow-wrap:anywhere; }
 .a .spark .mk.ev circle { fill:var(--paper); stroke:var(--ink2); } .a .spark .mk.death circle { fill:var(--red); stroke:var(--ink); }
 .a .mk-cap { color:var(--muted); }
+.spark.echo path { fill:none; stroke-width:1.5; } .spark.echo path.hit { stroke:transparent; stroke-width:12; }
+.spark .mk.arc:focus-visible path:not(.hit), .spark .mk.arc:hover path:not(.hit) { stroke-width:3; }
+.echo-list { margin:0; padding-left:20px; font-size:12px; display:flex; flex-direction:column; gap:2px; overflow-wrap:anywhere; }
+.a .spark.echo path:not(.hit) { stroke:var(--ink2); } .a .spark .mk.arc circle { fill:var(--ink2); stroke:none; } .a .echo-list { color:var(--ink2); }
+.b .spark.echo path:not(.hit) { stroke:var(--gold2); } .b .spark .mk.arc circle { fill:var(--gold2); stroke:none; } .b .echo-list { color:var(--sand); }
 .choices { padding:8px 20px 20px; display:flex; flex-direction:column; gap:10px; margin-top:auto; }
 .choice { all:unset; box-sizing:border-box; min-height:52px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; cursor:pointer; font-size:15px; }
 .choice .fx { font-size:12px; text-align:right; flex-shrink:0; max-width:50%; }

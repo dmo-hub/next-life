@@ -70,6 +70,23 @@ for (const id of TARGET) {
   for (const x of walk(id, up)) if (!TARGET.has(x)) cat[k].roots.add(x);
 }
 
+// คู่เหตุและผลของหน้าจบ (gameslash-4): ผลย้อนที่ขึ้นป้าย "ผลจากอายุ X" ทุกใบมีคู่ตรงลำดับ · ข้อความเหตุ = ตัวเลือกที่กดจริงในปีนั้น
+// ชื่อผล = ชื่อบนการ์ดที่เห็น — หน้าจบเล่าเฉพาะของที่ผู้เล่นเห็นแล้ว ไม่เติมป้ายบุญบาป/หมวด
+const ECHO_SHOW = 5;
+const echoStat = { lives: 0, pairs: 0, bad: 0, first: null, over: 0 };
+function echoCheck(st, shown) {
+  const got = (st.echoes ?? []).filter((e) => !e.missed);
+  const ok = got.length === shown.length && got.every((e, j) => e.from === shown[j].from && e.age === shown[j].age && e.title === shown[j].title
+    && e.from < e.age && st.log.some((l) => l.age === e.from && l.text === e.pick));
+  if (!ok) {
+    echoStat.bad++;
+    echoStat.first ??= `seed ${st.seed} คู่ ${got.length} ป้าย ${shown.length}`;
+  }
+  if (got.length) echoStat.lives++;
+  if (got.length > ECHO_SHOW) echoStat.over++;
+  echoStat.pairs += got.length;
+}
+
 const seenTarget = new Map();
 // ยอดคาดต่อปลายทาง = ผลรวมสัดส่วน weight ของผลที่ชี้ไปตอนบอทกดตัวเลือกนั้น (ไม่คิดตัวคูณ/when/ปี จึงเป็นเพดานบน)
 // ปลายทางที่คาดต่ำกว่า RARE_EXPECT ออก 0 ครั้งได้เพราะ rng ล้วน — แยกจาก "ไม่เคยออก" ไม่ให้เป็นสัญญาณหลอก
@@ -101,9 +118,11 @@ for (const [name, bot] of Object.entries(BOTS)) {
       }
       return idx;
     };
-    playLife(mixSeed(seed, i), content, pick, (card, st) => {
+    const shown = [];
+    const { state } = playLife(mixSeed(seed, i), content, pick, (card, st) => {
       age = at = st.age;
       if (card.kind !== 'event' || !card.id) return;
+      if (card.echoFrom !== undefined) shown.push({ from: card.echoFrom, age: card.age, title: card.title });
       if (NEXT.has(card.id)) {
         next++;
         catNext[catOf.get(card.id)] = (catNext[catOf.get(card.id)] ?? 0) + 1;
@@ -116,6 +135,7 @@ for (const [name, bot] of Object.entries(BOTS)) {
       }
       if (NEXT.has(card.id) || ECHO.has(card.id)) seenTarget.set(card.id, (seenTarget.get(card.id) ?? 0) + 1);
     });
+    echoCheck(state, shown);
     r.lives++;
     r.nextCards += next;
     if (next) r.withNext++;
@@ -156,6 +176,9 @@ const never = unseen.filter((id) => !rare.includes(id));
 console.log(never.length ? `ปลายทางที่ไม่เคยออก ${never.length} ใบ: ${never.map((id) => `${id} (คาด ${(expect.get(id) ?? 0).toFixed(1)})`).join(' ')}` : 'ปลายทางออกครบทุกใบที่คาดว่าควรออก');
 if (rare.length) console.log(`  หายาก ไม่ออกรอบนี้ (คาด <${RARE_EXPECT} ครั้ง · rng ล้วน): ${rare.map((id) => `${id} (คาด ${(expect.get(id) ?? 0).toFixed(2)})`).join(' ')}`);
 
+console.log(`เหตุและผล (หน้าจบ): ชีวิตที่มีคู่ ${pct(echoStat.lives, all.lives)} · คู่/ชีวิต ${(echoStat.pairs / all.lives).toFixed(2)} · ชีวิตที่คู่เกิน ${ECHO_SHOW} (หน้าจบคัดคู่ห่างสุด) ${echoStat.over}`);
+if (echoStat.bad) fail.push(`คู่เหตุและผลไม่ตรงการ์ดผลย้อน/ตัวเลือกที่กด ${echoStat.bad} ชีวิต (ตัวแรก ${echoStat.first})`);
+if (!echoStat.pairs) fail.push('ไม่มีชีวิตไหนได้คู่เหตุและผล');
 if (offDate) fail.push(`ผลย้อนออกไม่ตรงปีที่นัด ${offDate} ครั้ง`);
 if (offWhen) fail.push(`ผลย้อนออกทั้งที่ when ไม่ผ่าน ${offWhen} ครั้ง`);
 if (minNext !== null && (100 * all.withNext) / all.lives < minNext) fail.push(`ชีวิตที่เจอเรื่องต่อต่ำกว่าเป้า ${minNext}%`);

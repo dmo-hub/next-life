@@ -1295,8 +1295,11 @@ export function nextCard(st) {
     }
     // ผลย้อนพกอายุตอนเลือกไปให้หน้าจอบอกที่มา — อ่านก่อนกรองนัดที่ใช้แล้วทิ้ง · นัดจากเซฟเก่าไม่มี from = ไม่มีป้าย
     // นัดปีเดียวกัน (after_years [0, 0]) ไม่ส่ง — ป้ายจะบอกอายุเดียวกับการ์ดเอง
-    const from = ev ? st.scheduled.find((x) => x.event === ev.id && x.age === st.age)?.from : undefined;
+    const due = ev ? st.scheduled.find((x) => x.event === ev.id && x.age === st.age) : undefined;
+    const from = due?.from;
     const echoFrom = from < st.age ? from : undefined;
+    // คู่เหตุและผลให้หน้าจบ (gameslash-4) — ข้อความตัวเลือกกับชื่อการ์ดที่ผู้เล่นเห็นมาแล้ว · นัดจากเซฟเก่าไม่มี pick = ไม่เก็บ
+    if (echoFrom !== undefined && due.pick) (st.echoes ??= []).push({ from, age: st.age, pick: due.pick, title: ev.title ? fill(ev.title, st) : null });
     if (st.scheduled.length) st.scheduled = st.scheduled.filter((x) => x.age >= st.age && !st.done[x.event]);
     if (ev) {
       // อายุนี้อาจมีเหตุการณ์อื่นรออยู่ (หลักไมล์ชนกับนัด) — ค้นอายุเดิมอีกรอบก่อนเดินปี
@@ -1540,7 +1543,7 @@ function applyChoice(st, ev, c, text) {
   for (const f of c.sets_flags ?? []) raiseFlag(st, f);
   for (const f of c.clears_flags ?? []) delete st.flags[f];
   applyFamily(st, c, ev.category === 'family' && c.effects?.relations > 0 ? c.effects.relations : 0);
-  for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]), from: st.age });
+  for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]), from: st.age, pick: text });
 }
 
 // แรงที่เราดูแลพ่อแม่ (B167): บุญดูแลพ่อแม่บวก บาปทำร้ายผู้ใหญ่ลบ ตามระดับของป้าย — ป้ายหมวดอื่นบนตัวเลือกเดียวกันไม่นับ

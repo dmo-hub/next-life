@@ -184,8 +184,11 @@ function legendItem(i, label) {
 }
 // หมุดบนกราฟ: ชี้/แตะ/โฟกัสแล้วบรรทัดใต้กราฟบอกเรื่อง — มือถือไม่มี hover <title> อย่างเดียวไม่พอ
 function markDot(svg, cap, cx, cy, r, text, cls) {
+  markShapes(svg, cap, text, cls, svgEl('circle', { cx, cy, r }));
+}
+function markShapes(svg, cap, text, cls, ...shapes) {
   const g = svgEl('g', { class: `mk ${cls}`, tabindex: 0, role: 'button', 'aria-label': text });
-  g.append(svgEl('title', {}, text), svgEl('circle', { cx, cy, r }));
+  g.append(svgEl('title', {}, text), ...shapes);
   const show = () => (cap.textContent = text);
   g.addEventListener('click', show);
   g.addEventListener('focus', show);
@@ -204,6 +207,26 @@ const CAUSE_TEXT = {
   road: ['จาก', 'อุบัติเหตุบนท้องถนน'], accident: ['จาก', 'อุบัติเหตุ'], assault: ['เพราะ', 'ถูกทำร้าย'], newborn: ['ด้วย', 'ภาวะแทรกซ้อนแรกเกิด'],
 };
 const causeOf = (cause, age) => (isGone(st) ? null : cause === 'other' ? (age >= STAGES.at(-1).from ? ['ด้วย', 'วัยชรา'] : null) : CAUSE_TEXT[cause] ?? null);
+// เหตุและผล (gameslash-4): นัดที่ยิงแล้ว คู่ที่ห่างที่สุดไม่เกิน ECHO_MAX · แถบแยกใต้กราฟ — เส้นโค้งทับเส้นค่าสถานะแล้วอ่านไม่ออก
+// เล่าแค่ตัวเลือกกับชื่อการ์ดที่ผู้เล่นเห็นมาแล้ว ไม่มีสี/คำบอกดีร้าย · missed = นัดที่สุ่มไม่ผ่าน ไม่มีผลให้โยง
+const ECHO_MAX = 5;
+function echoBand(x, W, deathAge, cap) {
+  const pairs = (st.echoes ?? []).filter((e) => !e.missed && e.age <= deathAge).map((e, i) => ({ ...e, i }));
+  if (!pairs.length) return null;
+  const top = pairs.sort((a, b) => b.age - b.from - (a.age - a.from) || a.i - b.i).slice(0, ECHO_MAX).sort((a, b) => a.from - b.from || a.age - b.age);
+  const H = 40, base = H - 6, far = Math.max(...top.map((e) => e.age - e.from));
+  const svg = svgEl('svg', { class: 'spark echo', viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `เหตุและผล ${top.length} เรื่อง` });
+  const list = el('ol', 'echo-list');
+  for (const e of top) {
+    const text = `อายุ ${e.from} · ${e.pick} → อายุ ${e.age}${e.title ? ` · ${e.title}` : ''}`;
+    const x1 = x(e.from), x2 = x(e.age), lift = 2 * (8 + 22 * ((e.age - e.from) / far));
+    const d = `M${x1.toFixed(1)},${base} Q${((x1 + x2) / 2).toFixed(1)},${(base - lift).toFixed(1)} ${x2.toFixed(1)},${base}`;
+    // เส้นหนาโปร่งใสรับนิ้ว — เส้นจริงบางเกินจะแตะโดนบนมือถือ
+    markShapes(svg, cap, text, 'arc', svgEl('path', { class: 'hit', d }), svgEl('path', { d }), svgEl('circle', { cx: x1, cy: base, r: 2.5 }), svgEl('circle', { cx: x2, cy: base, r: 2.5 }));
+    list.append(el('li', null, text));
+  }
+  return [svg, list];
+}
 function lifeChart(life, deathAge, cause) {
   if (life.stats.length < 2) return null;
   const box = el('div', 'lifechart');
@@ -235,6 +258,8 @@ function lifeChart(life, deathAge, cause) {
   const why = causeOf(cause, deathAge);
   mark(deathAge, `${lifeEndWord(isGone(st))} ${deathAge}${why ? ` · ${why[1]}` : ''}`, 'death');
   box.append(svg, legend, cap);
+  const echoes = echoBand(x, W, deathAge, cap);
+  if (echoes) box.append(el('div', 'h', 'เหตุและผล'), ...echoes);
   const money = sparkline(life.money, 0, deathAge, true);
   if (money) box.append(el('div', 'h', 'เงินติดตัว'), money);
   return fold(box, `ทั้งชีวิต · อายุ 0–${deathAge}`);
