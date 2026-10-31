@@ -1372,10 +1372,7 @@ function lifeFocusRisk(st, id, r, i) {
   }
   if (r.cause) (st.focusWarn ??= {})[key] = st.age;
   applyEffects(st, r.fx ?? {});
-  for (const f of r.flags ?? []) {
-    st.flags[f] = true;
-    st.flagAge[f] ??= st.age;
-  }
+  for (const f of r.flags ?? []) raiseFlag(st, f);
   st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: r.cause ? r.warn : r.text, focusRisk: key });
 }
 
@@ -1497,6 +1494,13 @@ export function whenOk(st, when) {
   return !when.flags || flagsOk(st, when.flags);
 }
 
+// ธงจากเนื้อหา (ตัวเลือก · ผลลัพธ์ · การ์ดที่แกนสร้าง · เสี่ยงของโฟกัส) ติดผ่านจุดนี้จุดเดียว — ผลที่ต้องเกิดตอนธงติดจึงดักได้ที่เดียว
+// ธงจากบัญชีบุญบาป (recordMerit) ไม่ผ่านที่นี่: ไม่จดอายุที่ได้มาตั้งแต่เดิม
+function raiseFlag(st, f) {
+  st.flags[f] = true;
+  st.flagAge[f] ??= st.age;
+}
+
 // ป้ายบุญบาปเข้าบัญชีซ่อน · ธง · นัดเหตุการณ์ต่อเนื่อง (ใบ 07) — นัดสุ่มปีจาก rng ของโลก เพราะเป็นผลของการเลือก
 function applyChoice(st, ev, c, text) {
   // คำบนเดียวกันมีหลายการ์ดนัด (ครั้งที่ 1 · ครั้งที่ 2) — ใช้ธงคำบนที่การ์ดปิดเป็นตัวระบุ ไม่ใช่ id การ์ด
@@ -1504,10 +1508,7 @@ function applyChoice(st, ev, c, text) {
   noteDeed(st, text, () => {
     for (const f of recordMerit(st.ledger, c.merit, vow)) st.flags[f] = true;
   });
-  for (const f of c.sets_flags ?? []) {
-    st.flags[f] = true;
-    st.flagAge[f] ??= st.age;
-  }
+  for (const f of c.sets_flags ?? []) raiseFlag(st, f);
   for (const f of c.clears_flags ?? []) delete st.flags[f];
   applyFamily(st, c, ev.category === 'family' && c.effects?.relations > 0 ? c.effects.relations : 0);
   for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]), from: st.age });
