@@ -2030,6 +2030,33 @@ function isekaiStatusBox(s) {
   }
   return box;
 }
+// แถบโฟกัสต่างโลก: หน้าตา/คลาสเดียวกับ focusBar โลกหลัก · กาง/พับในที่ ไม่สร้างกล่องใหม่ (armTick ถือกล่องนี้ไว้ดูว่าชี้/โฟกัสอยู่ไหม)
+function isekaiFocusBar(card, pick) {
+  const cur = card.focus;
+  const wrap = el('div', 'focus ifocusbar');
+  const btn = el('button', 'focus-btn');
+  btn.type = 'button';
+  btn.setAttribute('aria-expanded', 'false');
+  const go = el('span', 'focus-go', 'เปลี่ยน');
+  btn.append(el('span', 'focus-k', 'โฟกัส'), el('b', null, card.focusChoices[cur] ?? ''), el('span', 'focus-fx', card.focusFx?.[cur] ?? ''), go);
+  const list = el('div', 'focus-pick');
+  list.hidden = true;
+  card.focusChoices.forEach((c, i) => {
+    const b = el('button', i === cur ? 'on' : null);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(i === cur));
+    b.append(el('b', null, c), el('span', 'focus-fx', card.focusFx?.[i] ?? ''));
+    b.onclick = () => (i === cur ? btn.click() : play(pick(i)));
+    list.append(b);
+  });
+  btn.onclick = () => {
+    list.hidden = !list.hidden;
+    btn.setAttribute('aria-expanded', String(!list.hidden));
+    go.textContent = list.hidden ? 'เปลี่ยน' : 'ปิด';
+  };
+  wrap.append(btn, list);
+  return wrap;
+}
 // ตัวจับเวลา (B68b): ใบตาเดินเองแทนการกด "ต่อ" — ยิง afterNext ตัวเดียวกับปุ่ม เซฟจึงเล่นซ้ำได้เหมือนกดเอง
 // ความเร็วจำแยก key ไม่อยู่ในเซฟ เพราะไม่เปลี่ยนผลของชีวิต · ×1 = ตาละ 2 วินาที (เจ้าของเคาะ)
 const SPEED_KEY = 'next-life-isekai-speed-v1';
@@ -2064,7 +2091,8 @@ function armTick(box, panel, bar, tok) {
   bar.style.animation = `itick ${ms}ms linear forwards`;
   tickTimer = setTimeout(() => {
     if (!box.isConnected) return;
-    if (panel.matches(':hover, :focus-within') || document.hidden) return armTick(box, panel, bar, tok);
+    // แถบโฟกัสกางอยู่ = ผู้เล่นกำลังเลือก เวลารอแม้เมาส์ออกนอกแถบ
+    if (panel.matches(':hover, :focus-within') || panel.querySelector('[aria-expanded="true"]') || document.hidden) return armTick(box, panel, bar, tok);
     play(tok);
   }, ms);
 }
@@ -2125,25 +2153,10 @@ function renderIsekai(card) {
     body.append(d);
   }
   if (card.chronicle?.length) body.append(chronicleBox(card.chronicle, s));
-  // แผงทุ่มเทบนใบตา (B68b): กริดเปิดตลอดแบบต้นแบบ — เวลาเดินอยู่แล้วกดเปลี่ยนได้ทันทีโดยไม่ต้องกางแผง (เจ้าของเคาะ)
-  // ปุ่มเดินผ่าน pick เซฟจึงเล่นซ้ำได้ · focusFx = ผลต่อปีของแต่ละทาง ไม่มีก็โชว์ชื่ออย่างเดียว
+  // แถบโฟกัสบนใบตา (05a · ปุ่มเดียวกับโลกหลัก แทนกริดเปิดตลอดของ B68b): กด "เปลี่ยน" กางรายการ · กางอยู่/ชี้อยู่ = เวลาหยุดรอ (armTick)
+  // ปุ่มเลือกยังเดินผ่าน pick เซฟจึงเล่นซ้ำได้ (ต่างจากโลกหลักที่เปลี่ยนนอกลำดับปุ่ม) · focusFx = ผลต่อปีของแต่ละทาง
   let panel = null;
-  if (card.step === 'tick') {
-    panel = el('div', 'ifocus');
-    panel.setAttribute('role', 'group');
-    panel.setAttribute('aria-label', 'สิ่งที่ทุ่มเท');
-    card.focusChoices.forEach((c, i) => {
-      const on = i === card.focus;
-      const b = el('button', on ? 'on' : null);
-      b.type = 'button';
-      b.append(el('b', null, c), el('small', null, [card.focusFx?.[i], on && 'ทำอยู่'].filter(Boolean).join(' · ')));
-      b.setAttribute('aria-pressed', String(on));
-      if (on) b.disabled = true;
-      else b.addEventListener('click', () => play(pick(i)));
-      panel.append(b);
-    });
-    body.append(el('p', 'kicker', 'ทุ่มเทกับ'), panel);
-  }
+  if (card.step === 'tick') panel = isekaiFocusBar(card, pick);
   if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
@@ -2159,6 +2172,7 @@ function renderIsekai(card) {
   if (!card.choices.length) choices.append(enter(button(BTN.next, null, () => play(nextTok))));
   box.append(top);
   if (s) box.append(isekaiStatusBox(s));
+  if (panel) box.append(panel);
   // ใบผลลัพธ์/ใบเลือกหยุดรอเสมอ (เจ้าของเคาะ) — แถบความเร็วยังโชว์ให้ตั้งไว้ก่อนเดินต่อ
   if (s && card.step !== 'end') {
     const bar = el('i');
