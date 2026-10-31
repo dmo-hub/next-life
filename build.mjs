@@ -22,7 +22,16 @@ const code = files.map((f) => strip(read(f))).join('\n');
 const data = `const CONTENT = ${JSON.stringify(content).replace(/</g, '\\u003c')};\n`;
 const script = `(() => {\n${data}${code}\n})();`.replace(/<\/script/gi, '<\\/script');
 
-writeFileSync(new URL('./docs/play.html', import.meta.url), read('./src/ui/template.html').replace('/*__SCRIPT__*/', () => script));
+// ฟอนต์ฝังในไฟล์ให้เกมเปิดออฟไลน์ได้ และภาพแชร์ (canvas) ได้ Srisakdi จริงไม่ตกไปฟอนต์สำรอง
+// ไฟล์ใน src/ui/fonts ตัดเหลือไทยทั้งบล็อก + ASCII + เครื่องหมายที่เกมใช้ (ชื่อสุ่ม/ข้อความประกอบไม่ตายตัว จึงไม่ตัดตามตัวที่ปรากฏ)
+// Srisakdi มีแค่ 700: ทุกที่ที่ใช้เป็นตัวหนา (font-weight 700 หรือ <b>)
+const PLAY_FONTS = [['Pridi', 400, 'Pridi-Regular'], ['Pridi', 600, 'Pridi-SemiBold'], ['Sarabun', 400, 'Sarabun-Regular'], ['Sarabun', 600, 'Sarabun-SemiBold'], ['Srisakdi', 700, 'Srisakdi-Bold']];
+const fonts = PLAY_FONTS.map(([family, weight, file]) => {
+  const b64 = readFileSync(new URL(`./src/ui/fonts/${file}.woff2`, import.meta.url)).toString('base64');
+  return `@font-face { font-family:${family}; font-weight:${weight}; font-style:normal; font-display:swap; src:url(data:font/woff2;base64,${b64}) format('woff2'); }`;
+}).join('\n');
+
+writeFileSync(new URL('./docs/play.html', import.meta.url), read('./src/ui/template.html').replace('/*__FONTS__*/', () => fonts).replace('/*__SCRIPT__*/', () => script));
 console.log(`docs/play.html: ${content.events.length} เหตุการณ์ · ข้อมูลยุค ${JSON.stringify(content.era).length.toLocaleString('en-US')} ตัวอักษร`);
 const site = buildSite(content);
 console.log(`docs/ หน้าเว็บ: ${site.pages.join(' · ')} · ${site.facts.version}`);

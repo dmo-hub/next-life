@@ -192,6 +192,16 @@ const vers = [...notes.matchAll(/<h3>(v\d+\.\d+\.\d+)/g)].map((m) => [m[1], m.in
 const early = vers.filter(([v, at]) => notes.search(new RegExp(`${v.replace(/\./g, '\\.')}(?!\\d)`)) !== at).map(([v]) => v);
 check('เลขรุ่นในเกมเป็นลิงก์แพตช์โน้ต และหัวข้อแต่ละรุ่นเป็นจุดแรกที่เลขนั้นโผล่', !play.includes('whatsnew.html#:~:text=') || !play.includes('<a id="appVer"') || !vers.length || early.length, ` ${vers.length} รุ่น${early.length ? ` · โผล่ก่อนหัวข้อ: ${early.slice(0, 5).join(' ')}` : ''}`);
 
+// 9b) เกมเปิดออฟไลน์ได้: ฟอนต์ฝังครบทุกแบบที่หน้าใช้ ไม่ดึงจากเว็บอื่น · ตัวควบคุม: หน้าที่ยังมี <link> Google Fonts ต้องถูกจับ
+const PLAY_FACES = ['Pridi 400', 'Pridi 600', 'Sarabun 400', 'Sarabun 600', 'Srisakdi 700'];
+const fontGap = (html) => [
+  ...PLAY_FACES.filter((f) => { const [fam, w] = f.split(' '); return !new RegExp(`@font-face \\{ font-family:${fam}; font-weight:${w};[^}]*src:url\\(data:font/woff2;base64,[A-Za-z0-9+/]{1000}`).test(html); }),
+  ...(/fonts\.(googleapis|gstatic)\.com/.test(html) ? ['ดึง Google Fonts'] : []),
+];
+const fontMiss = fontGap(play);
+const fontCtl = fontGap(play.replace('<style>', '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun"><style>')).length > 0;
+check('เกมฝังฟอนต์ไทยครบ ไม่ดึงฟอนต์จากเว็บอื่น', fontMiss.length || !fontCtl, ` ${PLAY_FACES.length - fontMiss.filter((x) => PLAY_FACES.includes(x)).length}/${PLAY_FACES.length} แบบ${fontMiss.length ? ` · ขาด ${fontMiss.join(' ')}` : ''} · ตัวควบคุม${fontCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
 // 10) เดโมการ์ดหน้าแรก (B121): ทุกทางมีผลให้อ่าน มีข้อความผลจริงอย่างน้อยหนึ่งทาง ไม่แตะ storage/network · build ซ้ำได้หน้าเดิม
 const index = read('index.html');
 const demo = index.slice(index.indexOf(DEMO_START), index.indexOf(DEMO_END));
