@@ -1485,6 +1485,7 @@ function render(card) {
     body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
     if (card.summary.debt) body.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
     if (card.summary.bankruptcies) body.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
+    if (card.summary.grey) body.append(el('p', 'sub', `เงินเทาที่หายไปกับตัว ${baht(card.summary.grey)}`));
     // บันทึกเด็กเป็นสถิติการตายของยุค — ไม่ใช่เรื่องของคนหาย
     if (card.note && !gone) body.append(sourced(el('p', 'sub', card.note), childNoteSrc(card.age)));
     if (card.funeral) body.append(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
@@ -1522,6 +1523,8 @@ function render(card) {
       (!working || s.money !== 0) && `เงินติดตัว ${baht(s.money)}`,
       working && `รายได้ ${baht(monthlyIncome(st, year))}/เดือน`,
       debt > 0 && `เงินกู้ ${baht(debt)}`,
+      // เงินเทาแยกถุง ใช้จ่ายไม่ได้จนกว่าฟอก — แสดงเป็นตัวเลขให้เห็นว่าเสียไปเท่าไรตอนถูกยึด
+      st.grey > 0 && `เงินเทา ${baht(st.grey)}`,
     ].filter(Boolean);
     // ช่วงเรียน ป้ายเรียนแทนช่อง "กำลังเรียน…" ที่บอกเรื่องเดียวกัน · เป้าหมายอื่นต่อท้ายบรรทัดฐานะ ไม่ปนบรรทัดเงิน
     const goal = nextGoal(st);

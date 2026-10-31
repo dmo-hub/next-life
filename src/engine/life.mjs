@@ -1712,6 +1712,8 @@ function deathCard(st) {
       moneyAtBirth: Math.round(netWorth(st) / priceRatio(era, st.seed, st.birthYear, year)),
       debt: Math.round(totalDebt(st)),
       bankruptcies: st.bankruptcies,
+      // เงินเทาที่ยังไม่ฟอกหายไปกับตัว — ไม่เข้า estate จึงไม่เป็นมรดก/ฐานะรุ่นถัดไป · มีช่องเฉพาะชีวิตที่เหลือถุง
+      ...(st.grey > 0 && { grey: Math.round(st.grey) }),
     },
   };
   st.estate = { year, money: card.summary.money, moneyAtBirth: card.summary.moneyAtBirth, debt: card.summary.debt, bankruptcies: st.bankruptcies };
