@@ -1,0 +1,97 @@
+# กู้ไปลงทุนเป็นทางเข้าสายหนี้: ชวนกู้ → ผลย้อนงวดทวง → ผลย้อนบทเรียนเงิน
+# ผลย้อนไม่มี when ผูกอาชีพ/ตำแหน่ง — ชีวิตเปลี่ยนสายระหว่างนัดแล้วการ์ดยังออก
+# ทางนอกระบบตั้ง loan_shark ให้การ์ดทวงหนี้นอกระบบเดิมรับต่อ จึงไม่นัดใบทวงของสายนี้
+events:
+  - id: debt_invest_offer_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {age: [25, 45]}
+    weight: 2
+    title: "เงินกู้ดอกถูกช่วงโปรโมชัน"
+    text: "เพื่อนเก่าชวนลงขันร้านใหม่ที่กำลังไปได้ดี ขาดอีกก้อนเดียวก็เปิดสาขาสองได้ ธนาคารแถวบ้านเพิ่งติดป้ายสินเชื่อดอกต่ำช่วงโปรโมชัน เพื่อนบอกว่าปันผลปีแรกก็พอจ่ายดอกแล้ว"
+    choices:
+      - id: bank_invest
+        text: "กู้ธนาคารมาลงขันกับเพื่อน"
+        effects: {debt: {kind: bank_loan, amount: {unit: income_x, amount: 3}}, money: {unit: income_x, amount: -3}}
+        schedules: [{event: echo_debt_invest_due_01, after_years: [2, 4]}]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "สาขาสองเปิดได้จริง ปันผลงวดแรกเข้าบัญชีตรงวัน", effects: {money: {unit: income_x, amount: 0.5}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ร้านเปิดช้ากว่าที่บอกครึ่งปี ปันผลยังไม่มา แต่งวดธนาคารมาตรงทุกเดือน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: shark_invest
+        text: "เอาเงินด่วนนอกระบบ ได้ไวกว่า"
+        hint: "ดอกรายวัน"
+        effects: {debt: {kind: informal, amount: {unit: income_x, amount: 1.5}}, money: {unit: income_x, amount: -1.5}}
+        sets_flags: [loan_shark]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้เงินในวันเดียว ร้านเปิดทันฤกษ์ เพื่อนยกมือไหว้ขอบคุณ", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เงินก้อนหายไปกับค่าตกแต่งร้าน คนเก็บดอกมายืนรอหน้าบ้านตั้งแต่อาทิตย์แรก", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: save_first
+        text: "ไม่กู้ เก็บเงินเองอีกปีสองปี"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - id: ask_elder
+        text: "ถามคนที่เคยกู้มาลงทุนก่อน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+
+  # ← debt_invest_offer_01 "กู้ธนาคารมาลงขันกับเพื่อน"
+  - id: echo_debt_invest_due_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "งวดที่มาตรงทุกเดือน"
+    text: "ผ่านมาหลายปีหลังเซ็นสัญญากู้ไปลงขันร้านเพื่อน ปันผลมาบ้างไม่มาบ้าง แต่จดหมายธนาคารมาตรงวันทุกเดือน เดือนนี้ดอกรวมกับเงินต้นมากกว่าเงินเดือนครึ่งหนึ่ง"
+    choices:
+      - id: keep_paying
+        text: "ผ่อนต่อ ตัดค่าใช้จ่ายอื่นทิ้ง"
+        effects: {happiness: -1}
+        schedules: [{event: echo_debt_invest_lesson_01, after_years: [3, 6]}]
+        merit: [{cat: neutral}]
+      - id: side_job
+        text: "รับงานเสริมกลางคืนมาโปะ"
+        effects: {health: -1, money: {unit: income_x, amount: 0.5}}
+        schedules: [{event: echo_debt_invest_lesson_01, after_years: [3, 6]}]
+        merit: [{cat: neutral}]
+      - id: settle_now
+        text: "เอาเงินเก็บปิดก้อนนี้ทีเดียว"
+        requires: {money: {unit: income_x, amount: 3}, reason: "เงินเก็บไม่พอปิดหนี้ก้อนนี้"}
+        effects: {settle: bank_loan, happiness: 1}
+        schedules: [{event: echo_debt_invest_lesson_01, after_years: [3, 6]}]
+        merit: [{cat: neutral}]
+      - id: ask_friend_back
+        text: "ไปขอเงินลงขันคืนจากเพื่อน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนคืนเงินต้นให้ครึ่งหนึ่ง พอเอาไปโปะธนาคารได้หลายงวด", effects: {money: {unit: income_x, amount: 1.5}, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เพื่อนบอกว่าเงินจมอยู่ในร้าน ขอเวลาอีกปี ตั้งแต่นั้นก็ไม่ค่อยรับสาย", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+
+  # ← echo_debt_invest_due_01 "ผ่อนต่อ" · "รับงานเสริม" · "ปิดก้อนเดียว"
+  - id: echo_debt_invest_lesson_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "สมุดรายรับรายจ่าย"
+    text: "ตั้งแต่ปีที่ต้องผ่อนหนี้ก้อนลงขันร้านเพื่อน คุณเริ่มจดรายรับรายจ่ายทุกคืนจนเป็นนิสัย ปีนี้เปิดสมุดดูแล้วเงินเก็บมากกว่าปีไหน ๆ"
+    choices:
+      - id: teach_kin
+        text: "สอนลูกหลานจดบัญชีแบบเดียวกัน"
+        effects: {income_mult: 1.05, relations: 1}
+        merit: [{cat: neutral}]
+      - id: help_friend_plan
+        text: "ช่วยเพื่อนที่จะกู้วางแผนก่อน"
+        effects: {income_mult: 1.05, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: treat_self
+        text: "ให้รางวัลตัวเองสักครั้ง"
+        effects: {income_mult: 1.05, happiness: 2, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: keep_quiet_book
+        text: "เก็บสมุดไว้อ่านคนเดียว"
+        effects: {income_mult: 1.05, happiness: 1}
+        merit: [{cat: neutral}]
