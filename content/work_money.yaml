@@ -171,10 +171,11 @@ events:
           - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ได้บ้านสภาพดีในราคาครึ่งเดียว เพื่อนบ้านยังอิจฉา", effects: {happiness: 2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เจ้าของเดิมไม่ยอมย้ายออก ฟ้องร้องกันยืดเยื้อหลายปี", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
 
+  # ช่วงกลางคน: กิจการส่วนใหญ่เปิดตอนกลางคน (ตัวเลือกเปิดกิจการติดประตูโฟกัสธุรกิจ) — อยู่ช่วงทำงานแทบไม่มีใครมีกิจการทันเห็นใบนี้
   - id: work_biz_boom_01
     type: A
     category: work_money
-    stage: ทำงาน
+    stage: กลางคน
     years: [2500, 2650]
     weight: 2
     when: {flags: {has: [own_business]}}
@@ -334,10 +335,11 @@ events:
         effects: {happiness: 1, relations: 1, money: {unit: income_x, amount: -1}}
         merit: [{cat: dana, level: 1}]
 
+  # เรื่องต่อ work_biz_boom_01 — อยู่ช่วงกลางคนตามต้นทาง
   - id: work_franchise_01
     type: A
     category: work_money
-    stage: ทำงาน
+    stage: กลางคน
     years: [2500, 2650]
     title: "เช็คเปล่าจากนายทุน"
     text: "นายทุนรายใหญ่นัดคุยที่ล็อบบี้โรงแรมหรู เลื่อนเช็คเปล่ามาให้กรอกตัวเลขเอง แลกกับการซื้อแบรนด์ทั้งหมด ขณะที่ลูกน้องสาขาแรกโทรมาขอเป็นเจ้าของร่วมด้วยสักนิด"
