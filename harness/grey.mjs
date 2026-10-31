@@ -42,7 +42,13 @@ function variant(mode) {
   }
   return { content: { ...base, events }, touched };
 }
+// การ์ดยึด/ฟอกของเนื้อหา (grey_seize · grey_launder) ลดถุงได้เอง และฟอกย้ายเงินเทาเข้า money โดยตั้งใจ
+// ⇒ ข้อเทียบไม่รั่วใช้เนื้อหาที่ถอดการ์ดพวกนี้ออกทั้งสองชีวิต · ข้อถุงลดยอมให้ลดหลังการ์ดพวกนี้
+const greyFx = (fx) => fx && (fx.grey_seize !== undefined || fx.grey_launder !== undefined);
+const GREY_CARDS = new Set(base.events.filter((e) => (e.choices ?? []).some((c) => greyFx(c.effects) || (c.outcomes ?? []).some((o) => greyFx(o.effects)))).map((e) => e.id));
 const G = variant('grey'), C = variant('cut');
+const noGreyCards = (v) => ({ ...v.content, events: v.content.events.filter((e) => !GREY_CARDS.has(e.id)) });
+const GL = noGreyCards(G), CL = noGreyCards(C);
 const strip = (st) => JSON.stringify(st, (k, v) => (k === 'content' || GREY_KEYS.includes(k) ? undefined : v));
 
 let fail = 0;
@@ -55,17 +61,19 @@ let leak = 0, compared = 0, withGrey = 0, neg = 0, seizeBad = 0, seized = 0;
 for (const [name, bot] of Object.entries(BOTS)) {
   for (let i = 0; i < n; i++) {
     const s = mixSeed(seed, i);
-    let prevGrey = 0, prevCaught = false;
+    let prevGrey = 0, prevCaught = false, prevCard = null;
     const a = playLife(s, G.content, bot, (card, st) => {
       const g = st.grey ?? 0;
       if (g < 0) neg++;
-      // ลดได้ทางเดียวในชีวิตที่ไม่มีการ์ดยึด/ฟอก: ถูกจับครั้งแรก และลดเหลือ (1 − seize) ของถุงก่อนหน้าพอดี (เงินก้อนที่ได้พร้อมถูกจับถูกยึดด้วย)
+      // ลดได้ 2 ทาง: การ์ดยึด/ฟอกใบก่อนหน้า (onCard เห็นผลของใบก่อน) · ถูกจับครั้งแรก และลดเหลือ (1 − seize) ของถุงก่อนหน้าพอดี (เงินก้อนที่ได้พร้อมถูกจับถูกยึดด้วย)
       if (g < prevGrey - 1e-6) {
         seized++;
-        if (!(st.flags.caught_fraud && !prevCaught)) seizeBad++;
+        if (!(st.flags.caught_fraud && !prevCaught) && !GREY_CARDS.has(prevCard)) seizeBad++;
       }
+      prevCard = card.id;
       prevCaught = !!st.flags.caught_fraud;
-      if (POUR && g > 0) {
+      // ไม่เทตอนการ์ดยึด/ฟอกเปิดอยู่: ล็อกของตัวเลือกคิดไว้ตอนจั่ว เทกลางใบ = ตัวเลือกที่บอทเห็นว่ากดได้กลายเป็นล็อก
+      if (POUR && g > 0 && !GREY_CARDS.has(card.id)) {
         st.money += g;
         st.grey = 0;
       }
@@ -73,9 +81,12 @@ for (const [name, bot] of Object.entries(BOTS)) {
     });
     if (!LEAK_BOTS.includes(name)) continue;
     compared++;
-    const b = playLife(s, C.content, bot);
-    if ((a.state.grey ?? 0) > 0 || a.state.flags.took_bribe || a.state.flags.embezzler) withGrey++;
-    const same = strip(a.state) === strip(b.state) && standingOf(a.state) === standingOf(b.state) && legacyUnits(a.state) === legacyUnits(b.state) && famePoints(a.state, standingOf(a.state)) === famePoints(b.state, standingOf(b.state));
+    // ชีวิตเทียบฝั่งเงินเทาต้องโดนตัวควบคุมเทเข้า money เหมือนกัน ไม่งั้น --pour ไม่มีทางตก
+    const pour = (card, st) => { if (POUR && st.grey > 0) { st.money += st.grey; st.grey = 0; } };
+    const a2 = GREY_CARDS.size ? playLife(s, GL, bot, pour) : a;
+    const b = playLife(s, GREY_CARDS.size ? CL : C.content, bot);
+    if ((a2.state.grey ?? 0) > 0 || a2.state.flags.took_bribe || a2.state.flags.embezzler) withGrey++;
+    const same = strip(a2.state) === strip(b.state) && standingOf(a2.state) === standingOf(b.state) && legacyUnits(a2.state) === legacyUnits(b.state) && famePoints(a2.state, standingOf(a2.state)) === famePoints(b.state, standingOf(b.state));
     if (!same) leak++;
   }
 }
@@ -84,7 +95,7 @@ check('ถุงเงินเทาไม่ติดลบ', neg);
 check('ถุงลดเฉพาะการ์ดที่ถูกจับครั้งแรก', seizeBad, ` · ลด ${seized} ครั้ง`);
 if (!withGrey) check('ชีวิตมีเงินเทาจริง (ด่านไม่ได้ผ่านเพราะไม่มีใครหยิบ)', 1);
 
-// ยึด/ฟอก/ล็อก ตรงที่สถานะ (เนื้อหายังไม่มีการ์ดยึด/ฟอก)
+// ยึด/ฟอก/ล็อก ตรงที่สถานะ
 const st = { grey: 0, money: 0, age: 30, greyLaunderAge: null };
 const unit = [];
 greyAdd(st, 1000);

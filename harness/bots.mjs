@@ -41,7 +41,8 @@ export function readFx(fx) {
   const out = { stat: {}, tags: [] };
   for (const part of (fx ?? '').split(' · ').filter(Boolean)) {
     const m = part.match(/(\S+) (↑|↓)/);
-    const key = m && (NAME[m[1]] ?? (m[1] === 'รายได้' ? 'income' : null));
+    // ป้าย "เงินเทา ↑" (ใบ 36) แยก key จาก money — เงินเทาใช้จ่ายไม่ได้จนฟอก สายเงินจึงให้น้ำหนักต่ำกว่าเงินสะอาด
+    const key = m && (NAME[m[1]] ?? (m[1] === 'รายได้' ? 'income' : m[1] === 'เงินเทา' ? 'grey' : null));
     if (key) out.stat[key] = (out.stat[key] ?? 0) + (m[2] === '↑' ? 1 : -1) * (part.includes('ระยะยาว') ? 2 : 1);
     else out.tags.push(part);
   }
@@ -83,7 +84,7 @@ const allocScore = (card) => (i) => {
 };
 const money = (card, rng, h) => {
   if (h.pending?.alloc) return best(card, rng, allocScore(card));
-  return best(card, rng, byLabel({ money: 2, income: 3 }, (t) => RISK_TAG[t] ?? (t.startsWith('กู้') ? 1 : 0))(card));
+  return best(card, rng, byLabel({ money: 2, income: 3, grey: 1 }, (t) => RISK_TAG[t] ?? (t.startsWith('กู้') ? 1 : 0))(card));
 };
 
 const labelBot = (w) => (card, rng, h) => (h.pending?.alloc ? random(card, rng) : best(card, rng, byLabel(w)(card)));
