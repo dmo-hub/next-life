@@ -1,5 +1,5 @@
 {
- "version": "v0.6.23",
+ "version": "v0.6.24",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -479,6 +479,11 @@
   "era_econ_gfc_cafe_01",
   "funeral_wishes_01",
   "funeral_rite_01",
+  "grey_audit_01",
+  "grey_ex_partner_01",
+  "grey_land_01",
+  "grey_front_shop_01",
+  "grey_temple_01",
   "kid_smoke_house_01",
   "kid_fetch_from_circle_01",
   "teen_no_drink_vow_01",
