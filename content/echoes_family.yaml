@@ -97,15 +97,14 @@ events:
     category: family
     stage: ชรา
     years: [2500, 2650]
-    when: {family: [{role: child, alive: true}]}
     title: "เงินโอนทุกต้นเดือน"
-    text: "ตอนคนที่บ้านเกิดล้มป่วย คุณส่งเงินกลับไปอย่างเดียวเพราะไม่มีเวลา วันนี้เป็นคุณเองที่ล้มในห้องน้ำ ลูกโทรมาบอกว่างานยุ่งมาก จะโอนเงินค่าคนดูแลให้ทุกต้นเดือน"
+    text: "ตอนคนที่บ้านเกิดล้มป่วย คุณส่งเงินกลับไปอย่างเดียวเพราะไม่มีเวลา วันนี้เป็นคุณเองที่ล้มในห้องน้ำ ลูกหลานโทรมาบอกว่างานยุ่งมาก จะโอนเงินค่าคนดูแลให้ทุกต้นเดือน"
     choices:
       - id: ask_visit
-        text: "บอกลูกว่าอยากเห็นหน้ามากกว่า"
+        text: "บอกลูกหลานว่าอยากเห็นหน้ามากกว่า"
         outcomes:
-          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ลูกเงียบไปนาน แล้วขับรถมาถึงตอนตีหนึ่ง นอนเฝ้าข้างเตียงทั้งคืน", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ลูกบอกว่าเข้าใจ แต่สุดท้ายก็มาได้แค่วันหยุดยาว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ปลายสายเงียบไปนาน แล้วขับรถมาถึงตอนตีหนึ่ง นอนเฝ้าข้างเตียงทั้งคืน", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกหลานบอกว่าเข้าใจ แต่สุดท้ายก็มาได้แค่วันหยุดยาว", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: accept_money
         text: "รับเงิน ไม่อยากเป็นภาระ"
@@ -114,8 +113,8 @@ events:
       - id: own_story
         text: "เล่าว่าตัวเองก็เคยส่งแต่เงิน"
         outcomes:
-          - {weight: 2, ok: true, text: "ลูกฟังจบแล้วขอลางานหนึ่งอาทิตย์ มาทำกับข้าวที่คุณชอบให้กินทุกมื้อ", effects: {relations: 2, happiness: 1, health: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ลูกบอกว่าคุณก็ทำแบบนี้ เขาเลยไม่เคยรู้ว่าต้องทำแบบอื่น", effects: {relations: -1, happiness: -2}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ลูกหลานฟังจบแล้วขอลางานหนึ่งอาทิตย์ มาทำกับข้าวที่คุณชอบให้กินทุกมื้อ", effects: {relations: 2, happiness: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกหลานบอกว่าคุณก็ทำแบบนี้ เขาเลยไม่เคยรู้ว่าต้องทำแบบอื่น", effects: {relations: -1, happiness: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: neighbor_help
         text: "ฝากเพื่อนบ้านช่วยดูแทน"
@@ -128,7 +127,6 @@ events:
     category: society
     stage: ชรา
     years: [2545, 2650]
-    when: {flags: {not: [caught_fraud]}}
     title: "ข่าวจากบ้านเกิด"
     text: "หลายปีหลังจากหอบเงินกองทุนหมู่บ้านหนีเข้าเมือง ญาติส่งข่าวมาว่าผู้ใหญ่บ้านคนเก่าเสียแล้ว ในงานศพมีคนพูดถึงเงินกองทุนก้อนนั้นอีกครั้ง และชื่อของคุณยังอยู่ในทุกประโยค"
     choices:

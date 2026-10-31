@@ -101,7 +101,6 @@ events:
     category: family
     stage: กลางคน
     years: [2500, 2650]
-    when: {family: [{role: parent, alive: true}]}
     title: "รถใต้ถุนบ้าน"
     text: "รถคันที่ออกให้ที่บ้านใช้เมื่อหลายปีก่อนยังจอดอยู่ใต้ถุน ผ่อนหมดไปนานแล้ว แต่ระยะหลังไม่มีใครขับออกไปไหน ฝุ่นจับเต็มกระจก คนในบ้านถามว่าจะขายหรือเก็บไว้"
     choices:
@@ -113,12 +112,18 @@ events:
           - {weight: 1, text: "ผู้ใหญ่ในบ้านไม่ยอม บอกว่ารถคันนี้มีความทรงจำ งอนไปหลายวัน", effects: {relations: -1, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
       - id: keep_car
         text: "เก็บไว้ พาที่บ้านไปหาหมอ"
+        requires: {family: [{role: parent, alive: true}], reason: "พ่อแม่ไม่อยู่ให้พาไปแล้ว"}
         effects: {relations: 2, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: care_parents, level: 1}]
       - id: trip_out
         text: "ซ่อมแล้วพาที่บ้านเที่ยวทะเล"
+        requires: {family: [{role: parent, alive: true}], reason: "พ่อแม่ไม่อยู่ให้พาไปแล้ว"}
         effects: {relations: 2, happiness: 2, money: {unit: income_x, amount: -0.5}}
         merit: [{cat: care_parents, level: 1}]
+      - id: keep_for_home
+        text: "เก็บไว้ ใช้รับส่งคนในบ้าน"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
       - id: give_relative
         text: "ยกให้ญาติที่ต้องใช้รถทำมาหากิน"
         effects: {relations: 1, happiness: 1}
