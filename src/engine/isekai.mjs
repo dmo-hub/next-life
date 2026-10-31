@@ -259,14 +259,14 @@ export const ISEKAI_FOCUS = {
 
 // อาชีพตามโฟกัส (05a): โฟกัสต้นทางรวมกันสะสมปีเต็มครบ years ⇒ ได้อาชีพนั้นติดตัวทั้งชาติ · ได้หลายอาชีพพร้อมกันได้ (เจ้าของเคาะ)
 // ISEKAI_CAREER_T.years = chain_years ของโลกหลัก (content/rules/focus.yaml · เจ้าของเคาะใช้ค่าเดียวกัน — harness-test เทียบให้)
-// gain = ผลต่อปีของอาชีพ คิดแบบเดียวกับทุ่มเท · ว่าง = ยังเป็นป้าย (ตารางผลรอเจ้าของเคาะ)
+// gain = ผลต่อปีของอาชีพ คิดแบบเดียวกับทุ่มเท ซ้อนกับโฟกัสที่ถืออยู่ · เจ้าของเคาะชุด T1 = ราว ¼ ของโฟกัสต้นทาง
 export const ISEKAI_CAREER_T = { years: 3 };
 export const ISEKAI_CAREERS = {
-  swordsman: { name: 'นักดาบ', from: ['sword'], gain: {} },
-  mage: { name: 'จอมเวท', from: ['magic'], gain: {} },
-  merchant: { name: 'พ่อค้า', from: ['work', 'k:trade'], gain: {} },
-  adventurer: { name: 'นักผจญภัย', from: ['roam', 'explore'], gain: {} },
-  priest: { name: 'นักบวช', from: ['alms', 'k:medic'], gain: {} },
+  swordsman: { name: 'นักดาบ', from: ['sword'], gain: { str: 0.25 } },
+  mage: { name: 'จอมเวท', from: ['magic'], gain: { mag: 0.25 } },
+  merchant: { name: 'พ่อค้า', from: ['work', 'k:trade'], gain: { gold: 10 } },
+  adventurer: { name: 'นักผจญภัย', from: ['roam', 'explore'], gain: { luk: 0.25 } },
+  priest: { name: 'นักบวช', from: ['alms', 'k:medic'], gain: { fame: 0.1, hp: 1 } },
 };
 
 // การ์ดเตือน HP (B161): "เปลี่ยนโฟกัส" เปิดใบทุ่มเทกลางช่วงวัยที่ชี้ทางฟื้นชีวิต · ร้านเติมทีหลัง
