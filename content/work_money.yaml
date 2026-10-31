@@ -34,6 +34,12 @@ events:
         outcomes:
           - {weight: 1, ok: true, text: "คลิปไวรัล บริษัทคู่แข่งทักมาเสนองานที่เงินดีกว่าเดิม", effects: {happiness: 2, income_mult: 1.4}, merit: [{cat: neutral}]}
           - {weight: 2, text: "บริษัทเก่าส่งทนายมาฟ้องหมิ่นประมาท ต้องจ่ายค่าไกล่เกลี่ย", effects: {relations: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: use_savings
+        text: "ใช้เงินสำรองระหว่างหางานใหม่"
+        requires: {flags: {has: [kept_savings]}, reason: "ไม่มีเงินสำรองเก็บไว้"}
+        clears_flags: [kept_savings]
+        effects: {severance: true, knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
 
   - id: work_promotion_01
     type: A
