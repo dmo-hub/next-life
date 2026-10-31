@@ -140,12 +140,15 @@ const contMiss = (html) => {
 const ROLE_TALK = /เทพธิดายื่นบทบาท|เลือกบทบาท|บทบาทตอนเกิด/;
 const newPages = { 'catalog ต่างโลก': noOld(cardsIsk), 'spoilers ต่างโลก': noOld(spoilIsk), otherworld: read('otherworld.html'), index: read('index.html'), about: read('about.html'), gdd: read('gdd.html') };
 const roleLeft = Object.entries(newPages).filter(([, h]) => ROLE_TALK.test(h)).map(([p]) => p);
+// gdd เล่าตอนจบชาติทวีปด้วยเกณฑ์ชื่อเสียงจากโค้ด — ไม่งั้นเหลือแค่ระดับตอนจบของบทบาท 4 โลกเดิม
+const endTalk = (html) => html.includes('data-fact="contFame"');
+if (!endTalk(newPages.gdd)) roleLeft.push('gdd (ตอนจบชาติทวีป)');
 const spoilNew = noOld(spoilIsk);
 const contGone = contMiss(spoilNew);
 const regGone = Object.values(CONT_REGIONS).filter((g) => !noOld(cardsIsk).includes(`<b>${escHtml(g.name)}</b>`)).map((g) => g.name);
 // ตัวควบคุม: ใส่คำเลือกบทบาทกลับในส่วนใหม่ · ตัดแคว้นแรกออกจากหน้าเฉลย ⇒ ทั้งคู่ต้องถูกจับ
 const firstReg = Object.values(CONT_REGIONS)[0].name;
-const ctl = ROLE_TALK.test(`${spoilNew}<p>เทพธิดายื่นบทบาทให้เลือก</p>`) && contMiss(spoilNew.replaceAll(`<b>${escHtml(firstReg)}</b>`, '')).includes(firstReg);
+const ctl = ROLE_TALK.test(`${spoilNew}<p>เทพธิดายื่นบทบาทให้เลือก</p>`) && !endTalk(newPages.gdd.replaceAll('data-fact="contFame"', '')) && contMiss(spoilNew.replaceAll(`<b>${escHtml(firstReg)}</b>`, '')).includes(firstReg);
 check('ส่วนต่างโลกพูดถึงทวีปแทนบทบาท: ครบทุกแคว้น เผ่า อาชีพ · ไม่มีคำเลือกบทบาทนอกกลุ่มชาติเก่า', contGone.length || regGone.length || roleLeft.length || !ctl, ` แคว้น ${Object.keys(CONT_REGIONS).length} · เผ่า ${Object.keys(CONT_RACES).length} · อาชีพ ${Object.keys(ISEKAI_CAREERS).length}${contGone.length ? ` · หน้าเฉลยขาด ${contGone.join(' ')}` : ''}${regGone.length ? ` · หน้ารวมการ์ดขาด ${regGone.join(' ')}` : ''}${roleLeft.length ? ` · ยังพูดถึงบทบาท: ${roleLeft.join(' ')}` : ''} · ตัวควบคุม${ctl ? 'จับได้' : 'จับไม่ได้'}`);
 const N_BIRTH = 10000;
 const brng = makeRng(0xb127);
