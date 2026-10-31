@@ -1457,7 +1457,13 @@ function dueAt(st) {
   return [...new Set(at)].sort((a, b) => a - b).map((i) => events[i]);
 }
 
-const canRepeat = (st, e) => e.repeat && st.fired[e.id].n < e.repeat.max && st.age - st.fired[e.id].age >= e.repeat.gap;
+// กติกาจั่ว (xian-16 ค · doom-18): cooldown = ระยะห่างขั้นต่ำของใบที่ออกซ้ำได้ ทับ gap ที่สั้นกว่า · nextCap = เรื่องต่อที่เปิดสายใหม่ได้ต่อช่วงวัย
+// ไม่ให้ชีวิตเดียวถูกเรื่องต่อกินจนการ์ดสุ่มไม่มีที่ลง · ใบซ้ำที่เพดานดันขึ้นมาแทนจึงต้องมีคูลดาวน์คู่กัน
+// เพดานต่อช่วงวัย ไม่ใช่ต่อชีวิต — เพดานต่อชีวิตถูกช่วงต้นใช้หมด เรื่องต่อช่วงแก่/แต่งงานใหม่หายไปครึ่งถึงสี่ในห้า
+// 2 สายต่อช่วงวัย: ตัดเฉพาะช่วงที่แน่นเกิน (ไม่มีเพดาน บางช่วงมี 5–7 สาย) · การ์ดช่วงแก่/แต่งงานใหม่ยังออกเท่าเดิม
+// export ให้ harness ตั้งเป็น { cooldown: 0, nextCap: Infinity } = ปิดกติกา ได้ชีวิตเท่าก่อนมีกติกาทุกไบต์ (ตัวควบคุม)
+export const DRAW_RULES = { cooldown: 3, nextCap: 2 };
+const canRepeat = (st, e) => e.repeat && st.fired[e.id].n < e.repeat.max && st.age - st.fired[e.id].age >= Math.max(e.repeat.gap, DRAW_RULES.cooldown);
 
 // ตัวคูณโอกาส (ใบ 07) ใช้ทั้งโอกาสเกิดของเหตุการณ์และน้ำหนักผลสุ่มแต่ละทาง: ค่าสถานะขั้นบันได · กรรมตามทิศบัญชีสุทธิ · ธงที่ถืออยู่
 // ชื่อเสียงตระกูลยังไม่มีระบบ คูณ 1
@@ -1661,7 +1667,13 @@ export function choose(st, idx, loan) {
     if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
-    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow)) {
+    // นับสายเฉพาะตอนมีเพดาน — ปิดกติกาแล้ว state ต้องไม่มีช่องเพิ่ม ไม่งั้นตัวควบคุมเทียบฐานไม่ได้
+    const capped = DRAW_RULES.nextCap !== Infinity;
+    const start = capped && !st.inStory?.[ev.id];
+    const stage = stageOf(st.age);
+    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow) && !(start && (st.stories?.[stage] ?? 0) >= DRAW_RULES.nextCap)) {
+      if (start) (st.stories ??= {})[stage] = (st.stories[stage] ?? 0) + 1;
+      if (capped) (st.inStory ??= {})[follow.id] = true;
       st.done[follow.id] = true;
       st.fired[follow.id] = { n: (st.fired[follow.id]?.n ?? 0) + 1, age: st.age };
       beliefFired(st, follow);
