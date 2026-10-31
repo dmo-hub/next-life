@@ -3,6 +3,7 @@
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
 import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_TIME, ISEKAI_LINK, LINK, tripCarry, tripSettle, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, TRIP_QUEST, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed, WARN, ISEKAI_FOCUS } from '../src/engine/index.mjs';
+import { CONT_LIFE, CONT_REGIONS, CONT_RACES, CONT_END } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 
@@ -49,7 +50,7 @@ const rangeOf = (s) => {
 // ตั้งต้นของชาติที่ i — กระจายกรรม −1..1 · รอบติดกัน · ความทรงจำ · เทพธิดาอารมณ์ดี ให้ครอบทุกทางเข้าของ startIsekai
 // ตำนานชาติก่อน (B68i): บางชาติเกิดในโลกที่จำวีรบุรุษ บางชาติจำคนร้ายมากกว่า ให้เหตุการณ์ตำนานมีบอทถึง
 const MEM = Object.keys(ISEKAI_STAT);
-const WORLDS = [...new Set(Object.keys(ISEKAI_ROLES).map((r) => roleInfo(r).world ?? r))];
+const WORLDS = [...new Set(Object.keys(ISEKAI_ROLES).map((r) => roleInfo(r).world ?? r)), CONT_LIFE.world];
 const HERO = { name: 'ท่านสมปอง', ending: 'ผู้กล้าผู้กอบกู้โลก', dark: false };
 const DARK = { name: 'จอมเวทวิเชียร', ending: 'ตายอีกครั้งในต่างโลก', dark: true };
 const legendsOf = (ls) => Object.fromEntries(WORLDS.map((w) => [w, ls]));
@@ -62,6 +63,8 @@ const setup = (i) => ({
   run: i % (ISEKAI.stay + 1),
   memory: i % 4 === 0 ? null : MEM[i % MEM.length],
   blessed: i % 5 === 0,
+  // 06b: ชาติคู่เริ่มด้วยแฟ้มบทบาทเดิม (เส้นทดสอบ) ให้การ์ด 4 โลกยังมีบอทถึงจนกว่า 06c ลบ · ชาติคี่เกิดในทวีปแบบผู้เล่นใหม่
+  legacy: i % 2 === 0,
   ...(i % 7 === 3 && { legends: LEG_HERO }),
   ...(i % 7 === 5 && { legends: LEG_DARK }),
 });
@@ -103,6 +106,9 @@ let potionBad = 0, potionOver = 0, courtBad = 0, courtOver = 0, courtVisit = 0;
 const potionFrom = [], potionAdd = {};
 // เวลาเดินเอง (B68b): ใบตาไม่มีตัวเลือก แต่บอกสิ่งที่ทุ่มเทได้ · การ์ดบทบาทมีคนธรรมดาเสมอ · สิ้นอายุเฉพาะหลังวัยชรา
 let tickBad = 0, roleBad = 0, oldBad = 0;
+// ชาติทวีป (06b): ไม่มีบทบาท · มีแคว้น/เผ่า/ชาติ · แฟ้มเกิดครบจำนวน · ไม่มีใบทุ่มเทของบทบาท · อายุบนการ์ดเป็นเลขเต็ม
+let contBad = 0, contLives = 0, ageFrac = 0;
+const contSeen = { region: new Set(), race: new Set() };
 // ทางกลับบ้าน (B154): ชาติที่เกิดในต่างโลกไม่เห็นเควส/อีเวนต์ทริป
 let tripEvBad = 0;
 let warnBad = 0, warnSeen = 0, warnFocus = 0, warnFocusBad = 0;
@@ -185,13 +191,21 @@ Object.values(BOTS).forEach((bot, b) => {
     }
     if (a.isk.log.some((s) => s.includes('{legend}')) || a.isk.chron.some((l) => l.text.includes('{legend}'))) legendTextBad++;
     loreGot += a.isk.lore.length;
-    if (!a.cards[0].choices.includes(commonerName)) roleBad++;
     const { isk } = a;
-    const pace = ISEKAI_ROLES[isk.role].pace ?? 1;
+    if (cfg.legacy && !a.cards[0].choices.includes(commonerName)) roleBad++;
+    if (!cfg.legacy) {
+      contLives++;
+      const want = CONT_LIFE.offers + (cfg.blessed ? 1 : 0);
+      if (isk.role || !CONT_REGIONS[isk.region] || !CONT_RACES[isk.race] || !isk.nation || a.cards[0].choices.length !== want || a.cards.some((c) => c.step === 'focus' && c.choices.includes(roleInfo('commoner').focus.name))) contBad++;
+      contSeen.region.add(isk.region);
+      contSeen.race.add(isk.race);
+    }
+    for (const c of a.cards) if ((typeof c.age === 'number' && !Number.isInteger(c.age)) || (c.status && !Number.isInteger(c.status.age))) ageFrac++;
+    const pace = isk.race ? CONT_RACES[isk.race].pace : ISEKAI_ROLES[isk.role].pace ?? 1;
     if (isk.natural && isk.age < ISEKAI_STAGES.at(-1).from * pace) oldBad++;
     if (isk.natural && pace === 1) humanAges.push(isk.age);
-    seen.end.add(`${isk.role}:${isk.ending.id}`);
-    seen.role.add(isk.role);
+    seen.end.add(`${isk.role ?? CONT_LIFE.world}:${isk.ending.id}`);
+    if (isk.role) seen.role.add(isk.role);
     for (const s of isk.skills) seen.skill.add(s);
     // ยาต่ออายุ (B68k): อายุที่ต่อตรงกับจำนวนขวดแต่ไม่เกินเพดาน · บาปฝืนธรรมชาติเฉพาะขวดที่เกิน free · ตายจากความแก่ไม่เกินเพดานใหม่
     const P = ISEKAI_POTION;
@@ -227,7 +241,9 @@ check(`จบได้ทุกชีวิต ภายใน ${CARD_CAP} ก�
 check('การ์ดไม่เผยบุญบาป', leaks, `${cardsSeen.toLocaleString('en-US')} การ์ด`);
 check('ค่าบนหน้าต่างสถานะอยู่ในช่วง', rangeBad);
 check('ใบตาเวลาเดินเอง ไม่มีตัวเลือก แต่เปลี่ยนสิ่งที่ทุ่มเทได้', tickBad);
-check('เทพธิดายื่นบทบาทคนธรรมดามีอาชีพทุกครั้ง', roleBad);
+check('เทพธิดายื่นบทบาทคนธรรมดามีอาชีพทุกครั้ง (เส้นทดสอบบทบาทเดิม)', roleBad);
+check('ชาติทวีป: ไม่มีบทบาท · มีแคว้น/เผ่า/ชาติ · แฟ้มเกิดครบ · ไม่มีทุ่มเทของบทบาท', contBad, `${contLives} ชาติ`);
+check('อายุบนการ์ด/หน้าต่างสถานะเป็นเลขเต็ม (pace ไม่เต็มปัดตอนแสดง)', ageFrac);
 check('สิ้นอายุเฉพาะหลังวัยชรา', oldBad);
 check(`การ์ดเตือนออก 1 ใบต่อการตก HP ถึง ${WARN.isekai}`, warnBad, `${warnSeen} ใบ`);
 check('เตือนแล้วเปลี่ยนโฟกัส: ชี้พักผ่อน · ใบตาถัดไปทุ่มเทตามที่กด', warnFocusBad + (warnFocus ? 0 : 1), `กดเปลี่ยน ${warnFocus} ครั้ง`);
@@ -290,7 +306,7 @@ check('ชาติที่เกิดในต่างโลกไม่เ�
 
 // ทางแยกที่ต้องมีบอทถึง: ตอนจบทุกแบบของทุกบทบาท (+ ตายกลางทาง) · ทุกบทบาท · ทุกสกิล · ทุกเหตุการณ์ · ทุกตัวเลือก
 const missing = (want, got) => want.filter((x) => !got.has(x));
-const wantEnd = Object.keys(ISEKAI_ROLES).flatMap((r) => Object.keys(roleInfo(r).end).map((t) => `${r}:${t}`).concat(`${r}:death`));
+const wantEnd = Object.keys(ISEKAI_ROLES).flatMap((r) => Object.keys(roleInfo(r).end).map((t) => `${r}:${t}`).concat(`${r}:death`)).concat([...Object.keys(CONT_END), 'death'].map((t) => `${CONT_LIFE.world}:${t}`));
 const reach = {
   ตอนจบ: missing(wantEnd, seen.end),
   บทบาท: missing(Object.keys(ISEKAI_ROLES), seen.role),
@@ -298,6 +314,8 @@ const reach = {
   เหตุการณ์: missing(ISEKAI_EVENTS.map((e) => e.id), seen.event),
   ตัวเลือก: missing(ISEKAI_EVENTS.flatMap((e) => e.choices.map((_, j) => `${e.id}#${j}`)), seen.choice),
   ทางลัดความรู้: missing(Object.keys(ISEKAI_KNOW), seen.shortcut),
+  แคว้นเกิด: missing(Object.keys(CONT_REGIONS), contSeen.region),
+  เผ่าเกิด: missing(Object.keys(CONT_RACES), contSeen.race),
 };
 for (const [k, m] of Object.entries(reach)) check(`${k}มีบอทถึง`, m.length, m.length ? m.slice(0, 8).join(' ') : '');
 
@@ -345,7 +363,7 @@ check('ชาติต่างโลกถัดไปได้ตำนาน�
 
 // โลกจำ (B68h): ทุกโลกจำครบทุกอย่างแล้ว ⇒ เรื่องคิดค้นของที่มีอยู่แล้วไม่มาอีก · ใบทุ่มเทแรกบอกว่าโลกยังจำอะไร
 // แถวผังตระกูลพกรายการไปกลับได้ · ชาติที่ไม่มีของให้จำ แถวผังรูปเดิม
-const ALL_LORE = Object.fromEntries([...new Set(Object.keys(ISEKAI_ROLES).map((r) => roleInfo(r).world ?? r))].map((w) => [w, Object.keys(ISEKAI_LORE)]));
+const ALL_LORE = Object.fromEntries(WORLDS.map((w) => [w, Object.keys(ISEKAI_LORE)]));
 let loreSkipBad = 0, loreLineBad = 0;
 for (let i = 0; i < lives * 5; i++) {
   const a = play({ ...setup(i), lore: ALL_LORE }, BOTS.สุ่ม, makeRng(mixSeed(seed ^ 0x10e, i)));

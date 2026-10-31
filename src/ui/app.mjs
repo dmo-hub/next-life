@@ -2019,7 +2019,7 @@ function isekaiStatusBox(s) {
     d.append(el('span', null, ISEKAI_STAT[k]), el('b', null, String(s[k])));
     grid.append(d);
   }
-  box.append(grid, el('div', null, `ทอง ${s.gold.toLocaleString('en-US')} · ชื่อเสียง ${s.fame} · ${s.world}`));
+  box.append(grid, el('div', null, `ทอง ${s.gold.toLocaleString('en-US')} · ชื่อเสียง ${s.fame} · ${s.race ? `${s.race} · ` : ''}${s.world}`));
   box.append(el('div', null, `อายุ ${s.age} · ${s.stage}${s.focus ? ` · ทุ่มเทกับ${s.focus}` : ''}`));
   // อาชีพตามโฟกัส (05a) — เซฟก่อนมีอาชีพไม่มีช่องนี้
   if (s.careers?.length) box.append(el('div', null, `อาชีพ ${s.careers.join(' · ')}`));

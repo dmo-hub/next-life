@@ -10,6 +10,7 @@ import { newLedger, recordMerit, ledgerLevel, meritId, SIN_CATS } from './merit.
 import { hintLevel } from './court.mjs';
 import { WARN, crossedLow, warnCard } from './warn.mjs';
 import { FOCUS_FLOW, focusSet, focusYearEnd } from './focus.mjs';
+import { CONT_REGIONS, CONT_RACES, contBirth, contNation, contRaceStart } from './continent.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค' };
 export const ISEKAI_FX = { hp: 'ชีวิต', str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
@@ -207,6 +208,17 @@ export const ISEKAI_ROLES = {
       bad: ['ลูกจอมมารที่ถูกลืม', 'พี่น้องแย่งบัลลังก์กันจนไม่มีใครสนใจคุณ คุณย้ายไปอยู่หอคอยชายแดนกับแมวดำหนึ่งตัว'],
     },
   },
+};
+// ชาติใหม่เกิดในทวีปเอเธอร์การ์ด (06b): แคว้น + เผ่า แทนบทบาท · ไม่มีเป้าหมาย/ฉากเปิด/ฉากจบ · ชาติเก่าในเซฟ (มี role) เดินเส้นบทบาทจนจบ
+// ค่าที่ผู้รวมงานรับแทนเจ้าของตามค่าแนะนำ (รอเคาะเช้า) รวมที่นี่จุดเดียว:
+// world = ถังความทรงจำ/ตำนานของทั้งทวีป · name = คำนำชื่อบนผังตระกูล ("เอเธอร์การ์ด · <แคว้น>") · offers = แฟ้มเกิดที่เทพธิดายื่น (กรรมไม่เอียง)
+// tripRace = เผ่าของทริปจากโลกหลัก (ลงแคว้นสุ่ม) · like = บทบาทที่ยืมทองเริ่มกับชุดชื่อ · fame = ชื่อเสียงที่ตอนจบนับว่าดัง
+export const CONT_LIFE = { world: 'aethergard', name: 'เอเธอร์การ์ด', offers: 3, tripRace: 'human', like: 'commoner', fame: 30 };
+// ตอนจบชาติทวีป: ยังไม่มีเป้าหมาย (05b จบตามสายที่ไกลสุด) — ดังถึงเกณฑ์และมีอาชีพ / อย่างใดอย่างหนึ่ง / ไม่มีทั้งคู่ · {job} = อาชีพแรก · {land} = แคว้น
+export const CONT_END = {
+  best: ['{job}ผู้เลื่องชื่อแห่ง{land}', 'ชื่อของคุณถูกเล่าต่อในโรงเตี๊ยมทั่ว{land} คนรุ่นหลังยังเอ่ยถึงเวลาพูดถึงยุคนั้น'],
+  good: ['{job}แห่ง{land}', 'ไม่ได้ดังไปทั้งทวีป แต่คนใน{land}รู้ว่าถ้ามีเรื่องต้องพึ่งใคร ให้ไปหาคุณ'],
+  bad: ['ชาวบ้านธรรมดาแห่ง{land}', 'ใช้ชีวิตเงียบ ๆ ใน{land} ไม่มีใครรู้ว่าคุณข้ามมาจากโลกอื่น และคุณก็ไม่เคยเล่าให้ใครฟัง'],
 };
 // ชื่อ เป้าหมาย ตอนจบของบทบาท — บทบาทที่เล่นเนื้อเรื่องของโลกใช้ของโลกนั้น
 export const roleInfo = (id) => {
@@ -1485,7 +1497,7 @@ export function tripCarry(isk) {
   };
 }
 // แถวทริปในผังตระกูลของชาติไทย — lore รูปเดียวกับแถวชาติต่างโลก ให้ isekaiWorldLore อ่านได้ทางเดียว
-export const tripLineage = (isk) => ({ world: roleInfo(isk.role).name, age: isk.trip.from, years: isk.age - isk.trip.from, ending: isk.ending.title, ...(isk.home && { home: true }), ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }), ...(isk.legend && { legend: { ...isk.legend } }) });
+export const tripLineage = (isk) => ({ world: isekaiFrame(isk).name, age: isk.trip.from, years: isk.age - isk.trip.from, ending: isk.ending.title, ...(isk.home && { home: true }), ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }), ...(isk.legend && { legend: { ...isk.legend } }) });
 
 export function entryOffers(seed) {
   const rng = makeRng(seed ^ ENTRY.salt);
@@ -1522,14 +1534,15 @@ export function entryCard(st, stage) {
 // lore = ของที่แต่ละโลกจำได้จากชาติก่อน ๆ ทั้งเซฟ ({ world: [id] } จาก isekaiWorldLore)
 // trip = ไปกลับกลางชีวิต (B68m · tripRoll + age/wit จากชีวิตไทย) — ข้ามห้องสีขาว บทบาทมาจากการทอย เริ่มที่อายุไทย เลือกกลับบนการ์ดทางกลับ = จบแบบกลับบ้าน
 // legends = คนต่างโลกรุ่นก่อนที่แต่ละโลกจำชื่อได้ ({ world: [{ name, ending, dark }] } จาก isekaiWorldLegends)
-export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null, hints = null }) {
+// legacy = เริ่มด้วยแฟ้มบทบาท 4 โลกเดิม — เส้นทดสอบของ harness เท่านั้น (ผู้เล่นใหม่เข้าไม่ได้) จนกว่าการ์ด 4 โลกจะถูกลบ (06c)
+export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null, hints = null, legacy = false }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
   const vow = blessed ? GODDESS_VOWS[(seed >>> 0) % GODDESS_VOWS.length].id : null;
   const isk = {
     rng, karma, past, run, memory, blessed, fated, ledger, vow, vowKept: null, vowHit: false,
     real: real && { ...real, stats: { ...real.stats } },
-    worldOffers: isekaiRoleOffers(rng, karma, ISEKAI.worlds + (blessed ? 1 : 0)),
+    worldOffers: legacy ? isekaiRoleOffers(rng, karma, ISEKAI.worlds + (blessed ? 1 : 0)) : contOffers(rng, CONT_LIFE.offers + (blessed ? 1 : 0)),
     skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).slice(0, sk),
     role: null, world: null, name: '', skills: [], st: null, inner: null, flags: {},
     know: null, knowLast: null, loreAll: lore, worldLore: [], lore: [],
@@ -1539,15 +1552,29 @@ export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null
     // ทริปศาล (B153): hints = คำใบ้จากเนื้อหา (ผู้เรียกส่ง content.nearHints) · court = ใบศาลที่รอออก visit|summons
     hints, court: null,
   };
+  // ขั้วอำนาจ · ข้อพิพาท · ดันเจียนลับของชาตินี้ (stream ของทวีปเอง) — 06c เริ่มใช้
+  if (!legacy) isk.nation = contNation(mixSeed(seed, run));
   if (trip) {
     // money0 = เงินจริงตอนข้าม ให้ขากลับคิดส่วนต่างที่เกิดในต่างโลกได้ (B136)
     isk.trip = { ...trip, from: trip.age, ...(isk.real && { money0: isk.real.money }) };
-    isekaiStart(isk, trip.role);
+    // ทริปทอยบทบาทไว้ตั้งแต่ก่อนมีทวีป (ลำดับเลขสุ่มของ tripRoll คงเดิม) · ชาติทวีปลงแคว้นสุ่มด้วยเผ่าของทริป
+    if (legacy) isekaiStart(isk, trip.role);
+    else contStart(isk, contBirth(isk.rng, CONT_LIFE.tripRace));
     isk.age = trip.age;
     isk.inner.wit += trip.wit ?? 0;
     isk.step = 'skill';
   }
   return isk;
+}
+
+// แฟ้มเกิด: แคว้น + เผ่าไม่ซ้ำคู่กัน ตามน้ำหนักระดับโอกาสเกิด · กรรมไม่เอียง (ค่าแนะนำ 06b)
+function contOffers(rng, n) {
+  const out = [];
+  for (let i = 0; out.length < n && i < n * 20; i++) {
+    const b = contBirth(rng);
+    if (!out.some((o) => o.region === b.region && o.race === b.race)) out.push(b);
+  }
+  return out;
 }
 
 // สุ่มบทบาทไม่ซ้ำตามน้ำหนัก · กรรมเอียงน้ำหนักแต่ไม่ตัดบทบาทไหนทิ้ง · ชุดที่ไม่มีคนธรรมดา = แทนใบสุดท้าย
@@ -1589,13 +1616,21 @@ const isekaiFameCha = (isk) => {
   return Math.min(F.chaCap, Math.floor(Math.max(0, isk.st.fame) / F.chaPer)) - (ls.filter((l) => l.dark).length * 2 > ls.length ? F.dark : 0);
 };
 
-const isekaiPace = (isk) => ISEKAI_ROLES[isk.role].pace ?? 1;
+const isekaiPace = (isk) => (isk.race ? CONT_RACES[isk.race].pace : ISEKAI_ROLES[isk.role].pace ?? 1);
+// กรอบของชาติ: ชาติเก่า = บทบาท · ชาติทวีป = ชื่อแคว้น · ค่าเริ่มเผ่า · ทอง/ชื่อยืมบทบาท like
+const isekaiFrame = (isk) => {
+  if (isk.role) return roleInfo(isk.role);
+  const like = ISEKAI_ROLES[CONT_LIFE.like];
+  return { name: `${CONT_LIFE.name} · ${CONT_REGIONS[isk.region].name}`, names: like.names, stat: { ...contRaceStart(isk.race), gold: like.stat.gold }, startAge: 0 };
+};
+// อายุบนจอ: pace ไม่เต็ม (ชาวสัตว์ 0.9 · ออร์ค 0.8) ทำให้อายุในเกมเป็นทศนิยม — ปัดลงตอนแสดงเท่านั้น (เจ้าของเคาะรอบ 4) · pace เต็มได้ค่าเดิม
+const isekaiShownAge = (a) => Math.floor(a + 1e-9);
 // ยาต่ออายุ (B68k) เลื่อนจุดที่ร่างกายเริ่มเสื่อมกับเพดานอายุไปพร้อมกัน · ป้ายช่วงวัยไม่เลื่อน · เซฟก่อน B68k ไม่มี lifeAdd
 const isekaiOldAge = (isk) => (ISEKAI_STAGES.at(-1).from + (isk.lifeAdd ?? 0)) * isekaiPace(isk);
 const isekaiStageOf = (isk) => ISEKAI_STAGES.findLast((s) => isk.age >= s.from * isekaiPace(isk));
 // ทางลัดความรู้ใช้ id 'k:<หมวด>' · kc = หมวดที่ทางลัดนี้เติมความรู้และดึงเหตุการณ์
 const isekaiFocusDef = (isk, id) => {
-  if (id === 'role') return roleInfo(isk.role).focus;
+  if (id === 'role') return isekaiFrame(isk).focus;
   if (id?.startsWith('k:')) return { ...ISEKAI_KNOW[id.slice(2)].focus, kc: id.slice(2) };
   if (id === TRIP_QUEST.id) return TRIP_QUEST.focus;
   return ISEKAI_FOCUS[id];
@@ -1604,7 +1639,7 @@ const isekaiFocusDef = (isk, id) => {
 const isekaiKnowOffers = (isk, stage) => Object.keys(ISEKAI_KNOW).filter((k) => isk.know[k] >= ISEKAI_KNOW_T.shortcut && (!ISEKAI_KNOW[k].stages || ISEKAI_KNOW[k].stages.includes(stage.id))).map((k) => `k:${k}`);
 // สิ่งที่ทุ่มเทได้ในช่วงวัยนี้ — ของบทบาทอยู่ใบแรกเสมอ
 // ตามหาทางกลับต่อท้ายของกลาง เฉพาะทริป ⇒ ชาติที่เกิดในต่างโลกได้รายการเท่าเดิม
-const isekaiFocusOffers = (isk, stage) => ['role', ...Object.keys(ISEKAI_FOCUS).filter((id) => !ISEKAI_FOCUS[id].stages || ISEKAI_FOCUS[id].stages.includes(stage.id)), ...(isk.trip ? [TRIP_QUEST.id] : []), ...isekaiKnowOffers(isk, stage)];
+const isekaiFocusOffers = (isk, stage) => [...(isk.role ? ['role'] : []), ...Object.keys(ISEKAI_FOCUS).filter((id) => !ISEKAI_FOCUS[id].stages || ISEKAI_FOCUS[id].stages.includes(stage.id)), ...(isk.trip ? [TRIP_QUEST.id] : []), ...isekaiKnowOffers(isk, stage)];
 // ป้ายบนปุ่มทุ่มเท: บอกว่าค่าไหนขึ้น ไม่บอกตัวเลข · สุข/รู้/บารมี/เป้าหมายโลกเป็นค่าซ่อน จึงไม่ขึ้นป้าย
 const ISEKAI_FOCUS_HIDDEN = new Set(['joy', 'wit', 'know', 'cha', 'goal']);
 const isekaiFocusFx = (isk, id) => {
@@ -1618,6 +1653,18 @@ function isekaiStart(isk, rid) {
   const r = roleInfo(rid);
   isk.role = rid;
   isk.world = r.world ?? rid;
+  isekaiBegin(isk, r);
+}
+
+function contStart(isk, { region, race }) {
+  isk.region = region;
+  isk.race = race;
+  isk.world = CONT_LIFE.world;
+  isekaiBegin(isk, isekaiFrame(isk));
+}
+
+// ส่วนที่ชาติเก่า/ชาติทวีปเริ่มเหมือนกัน: ชื่อ · ค่าเริ่ม + กรรม · ความทรงจำโลก · อายุเริ่ม
+function isekaiBegin(isk, r) {
   isk.name = isk.rng.pick(r.names).replace('{p}', isk.past);
   const shift = Math.round(isk.karma * ISEKAI.karmaStat);
   isk.st = { hp: 100, gold: r.stat.gold, fame: 0, goal: 0 };
@@ -1804,13 +1851,14 @@ function isekaiDrink(isk, id) {
 const ISEKAI_ADULT = ['adult', 'middle', 'old'];
 const isekaiKnowOpen = (isk, e, stage) => (!e.know || isk.know[e.know.cat] >= e.know.min) && (!e.adult || ISEKAI_ADULT.includes(stage.id)) && (!e.loreOf || !isk.worldLore.includes(e.loreOf)) && (!e.legend || isekaiLegends(isk).some((l) => isekaiLegendKind(l) === e.legend)) && (!e.bless || isk.karma > 0 || isk.blessed);
 
-const isekaiFitsRole = (isk, e) => !e.worlds || e.worlds.includes(isk.world) || (e.worlds.length > 1 && e.worlds.includes(ISEKAI_ROLES[isk.role].like));
+// ชาติทวีปไม่มีโลกของเรื่อง ⇒ เห็นเฉพาะการ์ดทุกโลก (การ์ดแคว้น/ข้อพิพาทมากับ 06c)
+const isekaiFitsRole = (isk, e) => !e.worlds || (!!isk.role && (e.worlds.includes(isk.world) || (e.worlds.length > 1 && e.worlds.includes(ISEKAI_ROLES[isk.role].like))));
 
 // เรื่องที่ต้องตัดสินของตานี้: ฉากสุดท้ายถึงอายุ → เรื่องต่อที่นัดไว้ → สุ่มจากกองของช่วงวัย
 // ทุกตาดึงเลขทอย 1 ครั้งก่อนสุ่มกอง (ยกเว้นฉากบังคับ) · ทุ่มเทสายไหนเรื่องสายนั้นโผล่บ่อยขึ้น · เรื่องที่ต้องมีชื่อเสียงรอจนดังพอ
 function isekaiDue(isk) {
   const T = ISEKAI_TIME;
-  const w = roleInfo(isk.role);
+  const w = isekaiFrame(isk);
   const take = (id) => (isk.used.push(id), id);
   const finaleAt = isk.trip ? isk.trip.from + w.finaleAge - w.startAge : w.finaleAge * isekaiPace(isk);
   if (w.finale && !isk.finaleDone && isk.age >= finaleAt) return take(w.finale);
@@ -1834,10 +1882,10 @@ function isekaiDue(isk) {
 
 export function isekaiStatus(isk) {
   if (!isk.st) return null;
-  const r = roleInfo(isk.role);
+  const r = isekaiFrame(isk);
   // ค่าภายในเก็บทศนิยม (ฝึกทีละนิด) — หน้าต่างสถานะเห็นจำนวนเต็ม · HP ปัดขึ้น ยังไม่ตายไม่เห็น 0
   const st = Object.fromEntries(Object.entries(isk.st).map(([k, v]) => [k, k === 'hp' ? Math.ceil(v) : Math.round(v)]));
-  return { name: isk.name, world: r.name, goalName: r.goal, ...st, skills: isk.skills.map((s) => ISEKAI_SKILLS[s].name), age: isk.age, stage: isekaiStageOf(isk).name, focus: isk.focus ? isekaiFocusDef(isk, isk.focus).name : null, careers: (isk.careers ?? []).map((c) => ISEKAI_CAREERS[c].name) };
+  return { name: isk.name, world: r.name, goalName: r.goal, ...(isk.race && { race: CONT_RACES[isk.race].name }), ...st, skills: isk.skills.map((s) => ISEKAI_SKILLS[s].name), age: isekaiShownAge(isk.age), stage: isekaiStageOf(isk).name, focus: isk.focus ? isekaiFocusDef(isk, isk.focus).name : null, careers: (isk.careers ?? []).map((c) => ISEKAI_CAREERS[c].name) };
 }
 
 export const ISEKAI_HIGHLIGHTS = 3;
@@ -1848,6 +1896,13 @@ const isekaiHighlights = (isk) => (isk.marks ?? []).map((m, i) => ({ ...m, i }))
 // บทบาทที่เหตุการณ์น้อย (ก็อบลิน ลูกจอมมาร) ดังยาก จึงถึงตอนจบดีสุดได้ด้วยเป้าหมายล้วนเมื่อทุ่มเทกับบทบาทนานพอ
 function isekaiEnding(isk) {
   if (isk.dead) return { id: 'death', title: ISEKAI_DEATH[0], text: ISEKAI_DEATH_BY[isk.world] ?? ISEKAI_DEATH[1] };
+  if (!isk.role) {
+    const job = (isk.careers ?? []).map((c) => ISEKAI_CAREERS[c].name)[0];
+    const famed = isk.st.fame >= CONT_LIFE.fame;
+    const tier = famed && job ? 'best' : famed || job ? 'good' : 'bad';
+    const fill = (s) => s.replaceAll('{job}', job ?? 'คนดัง').replaceAll('{land}', CONT_REGIONS[isk.region].name);
+    return { id: tier, title: fill(CONT_END[tier][0]), text: fill(CONT_END[tier][1]) };
+  }
   const w = roleInfo(isk.role);
   let tier;
   if (w.special) {
@@ -1863,7 +1918,7 @@ function isekaiEnding(isk) {
 
 const isekaiCard = (isk, card) => {
   isk.cards++;
-  return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, ...card };
+  return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, ...card, ...(typeof card.age === 'number' && { age: isekaiShownAge(card.age) }) };
 };
 
 // ใบศาล (B153) ไม่นับการ์ดของชาติ ไม่ดึงเลขสุ่ม — ชาติหลังฟื้นเดินเหมือนไม่มีใบนี้ · คำใบ้เลือกตามอายุแทนการสุ่ม
@@ -1875,8 +1930,8 @@ function isekaiCourtCard(isk) {
   const mode = isk.court;
   isk.court = null;
   const lines = mode === 'visit' ? isk.hints?.[hintLevel(isk.ledger)] : null;
-  const hint = lines?.length ? ` ${lines[isk.age % lines.length]}` : '';
-  return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, step: 'result', court: mode, title: ISEKAI_COURT[mode].title, text: ISEKAI_COURT[mode].text + hint, age: isk.age, ok: null, stat: null, deltas: {}, sys: null, choices: [] };
+  const hint = lines?.length ? ` ${lines[isekaiShownAge(isk.age) % lines.length]}` : '';
+  return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, step: 'result', court: mode, title: ISEKAI_COURT[mode].title, text: ISEKAI_COURT[mode].text + hint, age: isekaiShownAge(isk.age), ok: null, stat: null, deltas: {}, sys: null, choices: [] };
 }
 
 // การ์ดถัดไป · ใบที่มีตัวเลือกรอ chooseIsekai · ใบตา (tick) ไม่มีตัวเลือก เรียกซ้ำ = เวลาเดินอีกตา
@@ -1886,8 +1941,9 @@ export function nextIsekaiCard(isk) {
     return isekaiCard(isk, {
       step: 'world', title: 'ห้องสีขาว',
       text: `เทพธิดาผมสีเงินก้มหัวให้ "${isk.past ? `${isk.past} ` : ''}มาทางนี้ก่อน" แล้ววางแฟ้มชีวิตใหม่ไว้ตรงหน้า ${isk.worldOffers.length} แฟ้ม${isk.blessed ? ' วันนี้เธออารมณ์ดีเป็นพิเศษ เลยหยิบมาเพิ่มให้อีกแฟ้ม' : ''}${isk.vow ? ` ก่อนส่งไปเธอกระซิบว่า "${GODDESS_VOWS.find((v) => v.id === isk.vow).text}"` : ''}${isk.fated ? ' เธอบอกว่าคนที่ข้ามมาแบบในนิยายต่างโลกเป๊ะ ๆ ได้โชคแถมทุกคน' : ''}`,
-      choices: isk.worldOffers.map((r) => roleInfo(r).name),
-      desc: isk.worldOffers.map((r) => roleInfo(r).pitch),
+      // แฟ้มบทบาท (ชาติเก่า/เส้นทดสอบ) เป็น id · แฟ้มเกิดในทวีปเป็น { region, race }
+      choices: isk.worldOffers.map((r) => (typeof r === 'string' ? roleInfo(r).name : `${CONT_RACES[r.race].name} · ${CONT_REGIONS[r.region].name}`)),
+      desc: isk.worldOffers.map((r) => (typeof r === 'string' ? roleInfo(r).pitch : CONT_REGIONS[r.region].about)),
       fx: isk.worldOffers.map(() => ''),
       // บารมีไม่ขึ้นจอ — ความทรงจำที่ติดมาเป็นบารมีจึงเล่าไม่บอกค่า
       ...(isk.memory && { note: isk.memory === 'cha' ? 'ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา' : `ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา · ${ISEKAI_STAT[isk.memory]} +${ISEKAI.memory}` }),
@@ -1927,7 +1983,7 @@ export function nextIsekaiCard(isk) {
     if (isk.st.fame >= ISEKAI_FAME.legend) isk.legend = { world: isk.world, name: isk.name, ending: isk.ending.title, dark: (isk.fameDark ?? 0) * 2 > isk.st.fame };
     return isekaiCard(isk, {
       // การ์ดปรโลกใบถัดไปเล่าเรื่องดวงวิญญาณถูกดึงกลับเอง ใบนี้จึงปิดแค่ชีวิตในโลกนี้ · ตอนจบแบบตายเล่าการตายไว้แล้ว
-      step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : isk.home ? `${isk.ending.text} ${TRIP_HOME}` : `${isk.ending.text} แล้วจากไปอย่างสงบตอนอายุ ${isk.age}`, ending: isk.ending.id, age: isk.age,
+      step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : isk.home ? `${isk.ending.text} ${TRIP_HOME}` : `${isk.ending.text} แล้วจากไปอย่างสงบตอนอายุ ${isekaiShownAge(isk.age)}`, ending: isk.ending.id, age: isk.age,
       ...(isk.home && { home: true }),
       choices: [],
       log: isk.log.slice(),
@@ -1990,8 +2046,9 @@ export function nextIsekaiCard(isk) {
     const d = Math.round(isk.st[k]) - Math.round(before[k]);
     if (d) deltas[k] = d;
   }
-  const title = years > 1 ? `อายุ ${from}–${isk.age - 1}` : `อายุ ${from}`;
-  isk.chron.push({ age: from, ...(years > 1 && { until: isk.age - 1 }), stage: stage.id, kind: 'tick', text, deltas });
+  const [a0, a1] = [isekaiShownAge(from), isekaiShownAge(isk.age - 1)];
+  const title = years > 1 ? `อายุ ${a0}–${a1}` : `อายุ ${a0}`;
+  isk.chron.push({ age: a0, ...(years > 1 && { until: a1 }), stage: stage.id, kind: 'tick', text, deltas });
   return isekaiCard(isk, {
     step: 'tick', title, text, age: from, years, stage: stage.name, deltas,
     ...(revived && { sys: 'เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว' }),
@@ -2042,7 +2099,8 @@ export function chooseIsekai(isk, idx) {
   if (isk.step === 'world') {
     const r = isk.worldOffers[idx];
     if (!r) throw new Error('ตัวเลือกไม่ถูกต้อง');
-    isekaiStart(isk, r);
+    if (typeof r === 'string') isekaiStart(isk, r);
+    else contStart(isk, r);
     isk.step = 'skill';
     return;
   }
@@ -2054,7 +2112,7 @@ export function chooseIsekai(isk, idx) {
     const past = isekaiLoreLine(isk);
     if (past) isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'lore', text: past, deltas: {} });
     // ฉากเปิดของเนื้อเรื่องมาก่อนตาแรก
-    const intro = roleInfo(isk.role).intro;
+    const intro = isekaiFrame(isk).intro;
     if (intro) isk.due = (isk.used.push(intro), intro);
     isk.step = 'tick';
     return;
@@ -2160,4 +2218,4 @@ export const isekaiMemory = (isk) => Object.keys(ISEKAI_STAT).reduce((a, b) => (
 
 // แถวในผังตระกูล — ไม่มีจังหวัด/ฐานะแบบชาติไทย ผู้อ่าน lineage ต้องดู isekai ก่อน · world = ชื่อบทบาท
 // lore = ของที่โลกนี้จำจากชาตินี้ (isekaiWorldLore อ่านกลับ) · legend = ชาตินี้ดังพอให้โลกจำชื่อ (isekaiWorldLegends อ่านกลับ) · ใส่เฉพาะชาติที่มี แถวของชาติอื่นรูปเดิม
-export const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world: roleInfo(isk.role).name, ending: isk.ending.title, path: 'isekai', realm: 'ต่างโลก', broke: false, ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }), ...(isk.legend && { legend: { ...isk.legend } }) });
+export const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world: isekaiFrame(isk).name, ending: isk.ending.title, path: 'isekai', realm: 'ต่างโลก', broke: false, ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }), ...(isk.legend && { legend: { ...isk.legend } }) });

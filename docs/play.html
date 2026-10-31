@@ -4652,6 +4652,141 @@ function beliefChoice(st, ev, c) {
 // จำนวนครั้งที่เลือกทำกิจกรรมสายมูในชีวิตนี้ — แกน ④ ทางโลก ↔ ทางธรรม ของฉายา (ใบ 04) อ่าน
 const beliefActs = (st) => st.belief?.acts ?? 0;
 
+// ทวีปเอเธอร์การ์ด (06a): ข้อมูลแคว้น/เผ่า/แผนที่ + ตัวสุ่มต่อชาติ — ยังไม่ต่อเข้าเกม (06b ต่อ)
+// บริสุทธิ์: รับ seed/rng คืนค่า ไม่แตะสถานะเกม · ตัวสุ่มต่อชาติใช้ stream ของตัวเอง (CONT_SALT) ไม่กินเลขสุ่มของชาติ
+// ชื่อระดับบนสุดขึ้นต้น CONT_/cont ทุกตัว — build.mjs รวมทุกโมดูลเป็นสโคปเดียว
+// ค่าที่ยังรอเจ้าของเคาะ (06a-ticket หัว "ให้เจ้าของเคาะ") ใช้ค่าแนะนำในใบ: ค่าเริ่มเผ่า · น้ำหนักโอกาสเกิด · เผ่าแบ่งเท่า · ขาลง/มาแรง 50/50 · ข้อพิพาทเท่ากัน
+
+const CONT_SALT = 0xc0a7;
+// ระดับโอกาสเกิด → น้ำหนักแคว้น (ร่าง)
+const CONT_TIER = { very: 8, often: 5, mid: 3, few: 2, rare: 1 };
+const CONT_RACES = {
+  human: { name: 'มนุษย์', start: { cha: 2 }, pace: 1 },
+  elf: { name: 'เอลฟ์', start: { mag: 2, str: -2 }, pace: 3 },
+  dwarf: { name: 'คนแคระ', start: { str: 2, cha: -2 }, pace: 2 },
+  beastkin: { name: 'ชาวสัตว์', start: { str: 2, luk: 2, mag: -2 }, pace: 0.9 },
+  halfling: { name: 'ฮาล์ฟลิง', start: { luk: 2, str: -2 }, pace: 1.3 },
+  orc: { name: 'ออร์ค', start: { str: 4, mag: -2, cha: -2 }, pace: 0.8 },
+  demon: { name: 'ปีศาจ', start: { mag: 2, str: 2, cha: -2, luk: -2 }, pace: 2.5 },
+  dragonkin: { name: 'เชื้อมังกร', start: { str: 2, mag: 2, luk: -2 }, pace: 3 },
+};
+const ALL_RACES = Object.keys(CONT_RACES);
+// about = แนวของแคว้น (บนแฟ้มเกิด) · ruler null = ไม่มีผู้ปกครอง (ไม่เข้าสุ่มขั้วอำนาจ) · danger = ดันเจียนลับออกถี่กว่า (รอบ 22: ไม่มีผู้ปกครองทั้ง 4 + ปากเหว · คาร์กัล · โอรัน)
+const CONT_REGIONS = {
+  helvard: { about: 'อาณาจักรมนุษย์ใหญ่ ขุนนางถือที่ดิน', name: 'เฮลวาร์ด', ruler: 'กษัตริย์', races: ['human', 'beastkin'], tier: 'very' },
+  verdani: { about: 'ลุ่มน้ำ ทุ่งนา ยุ้งฉางของทวีป', name: 'เวอร์ดานี', ruler: 'ดยุก', races: ['human', 'beastkin'], tier: 'often' },
+  marishaven: { about: 'เมืองท่าเสรี', name: 'มาริสฮาเวน', ruler: 'สภาพ่อค้า', races: ['human', 'halfling'], tier: 'often' },
+  lioselle: { about: 'ป่าเอลฟ์', name: 'เลียวเซล', ruler: 'สภาอาวุโส', races: ['elf'], tier: 'mid' },
+  gromdal: { about: 'นครใต้ภู เหมือง', name: 'กรอมดาล', ruler: 'สภากิลด์', races: ['dwarf'], tier: 'mid' },
+  karghal: { about: 'แดนพ่ายสงครามจอมมาร', name: 'ทุ่งเถ้าคาร์กัล', ruler: 'สภาเผ่า', races: ['demon', 'orc'], tier: 'mid', danger: true },
+  nameless_wood: { about: 'ป่ามอนสเตอร์', name: 'พนาไร้ชื่อ', ruler: null, races: ['orc', 'beastkin'], tier: 'mid', danger: true },
+  northvale: { about: 'หิมะ 8 เดือน', name: 'นอร์ธเวล', ruler: 'หัวหน้าเผ่า', races: ['human'], tier: 'few' },
+  windcliff: { about: 'มังกรเฒ่าบนยอด', name: 'ผาวายุ', ruler: 'ผู้เฒ่า', races: ['dragonkin'], tier: 'rare' },
+  cloud_isles: { about: 'เกาะลอย ส่งของ', name: 'หมู่เกาะเมฆา', ruler: null, races: ['halfling'], tier: 'rare', danger: true },
+  red_sands: { about: 'ชุมทางคาราวาน', name: 'ผืนทรายชาด', ruler: 'สภาคลัง', races: ['human', 'orc'], tier: 'mid' },
+  lexaria: { about: 'นครสัญญา ทนาย', name: 'เล็กซาเรีย', ruler: 'สภารับรอง', races: ['human', 'dwarf'], tier: 'few' },
+  aurelia: { about: 'นครศาสนจักร', name: 'ออเรเลีย', ruler: 'ประมุข', races: ['human'], tier: 'few' },
+  zeron: { about: 'หอเวทมหาวิทยาลัย', name: 'ซีรอน', ruler: 'อธิการ', races: ['elf', 'human'], tier: 'few' },
+  weir_marsh: { about: 'สาธารณรัฐสภาฝาย', name: 'บึงพันฝาย', ruler: 'ผู้แทน', races: ['halfling'], tier: 'mid' },
+  abyss_mouth: { about: 'เขตเสรีนักผจญภัย', name: 'ปากเหวพันชั้น', ruler: 'ผู้แทนเขต', races: ALL_RACES, tier: 'few', danger: true },
+  coralis: { about: 'เกาะโจรสลัด', name: 'โคราลิส', ruler: 'กัปตัน', races: ['human', 'beastkin'], tier: 'few' },
+  poison_range: { about: 'ป่าอันตราย ของหายาก', name: 'เทือกพิษ', ruler: null, races: ['demon'], tier: 'rare', danger: true },
+  oran: { about: 'เมืองหลวงเก่าล่มสลาย', name: 'โอรัน', ruler: 'ผู้สำเร็จราชการ', races: ['human'], tier: 'few', danger: true },
+  singing_steppe: { about: 'เผ่าเร่ร่อน ม้า', name: 'ทุ่งหญ้าเสียง', ruler: null, races: ['beastkin', 'orc'], tier: 'mid', danger: true },
+};
+// แผนที่ติดกัน (รอบ 21) เก็บเป็นคู่ครั้งเดียว สร้างสองทิศตอนโหลด ⇒ สมมาตรเสมอ
+const CONT_ROADS = [
+  ['northvale', 'windcliff'], ['northvale', 'gromdal'], ['northvale', 'singing_steppe'],
+  ['windcliff', 'gromdal'], ['windcliff', 'cloud_isles'],
+  ['gromdal', 'helvard'], ['gromdal', 'abyss_mouth'],
+  ['helvard', 'oran'], ['helvard', 'aurelia'], ['helvard', 'lexaria'], ['helvard', 'red_sands'],
+  ['oran', 'abyss_mouth'], ['oran', 'karghal'],
+  ['abyss_mouth', 'poison_range'],
+  ['aurelia', 'zeron'], ['aurelia', 'verdani'],
+  ['zeron', 'lexaria'], ['zeron', 'lioselle'],
+  ['lexaria', 'marishaven'], ['lexaria', 'singing_steppe'],
+  ['lioselle', 'nameless_wood'], ['lioselle', 'singing_steppe'],
+  ['nameless_wood', 'weir_marsh'],
+  ['poison_range', 'karghal'],
+  ['karghal', 'red_sands'],
+  ['red_sands', 'verdani'],
+  ['verdani', 'weir_marsh'], ['verdani', 'marishaven'],
+  ['weir_marsh', 'marishaven'],
+  ['marishaven', 'coralis'], ['marishaven', 'cloud_isles'],
+];
+// เครือข่ายทางลับ 6 เส้น (รอบ 22) — คู่ที่ไม่ติดกันตรง
+const CONT_SECRET = [
+  ['poison_range', 'nameless_wood'], ['abyss_mouth', 'zeron'], ['oran', 'verdani'],
+  ['northvale', 'lioselle'], ['karghal', 'weir_marsh'], ['windcliff', 'red_sands'],
+];
+const CONT_DISPUTES = {
+  throne_war: { name: 'สงครามชิงบัลลังก์', w: 1 },
+  trade_route: { name: 'แย่งเส้นทางการค้า', w: 1 },
+  witch_hunt: { name: 'ศาสนจักรล่าแม่มด', w: 1 },
+  plague: { name: 'โรคระบาด', w: 1 },
+  dungeon_surge: { name: 'ดันเจี้ยนทะลัก', w: 1 },
+  demon_lord: { name: 'จอมมารฟื้น', w: 1 },
+  peasant_revolt: { name: 'กบฏชาวนา', w: 1 },
+  frost_exodus: { name: 'เผ่าอพยพหนีหนาว', w: 1 },
+};
+// ขาลง/มาแรง: 2 แคว้นด้วยโอกาส two · ดันเจียน 3 หรือ 4 จุด (four) · แคว้นอันตรายน้ำหนัก ×danger
+const CONT_T = { two: 0.5, four: 0.5, danger: 3, base: 10 };
+
+const contLinks = (pairs) => {
+  const out = Object.fromEntries(Object.keys(CONT_REGIONS).map((id) => [id, []]));
+  for (const [a, b] of pairs) {
+    out[a].push(b);
+    out[b].push(a);
+  }
+  return out;
+};
+const CONT_NEAR = contLinks(CONT_ROADS);
+const CONT_HIDDEN = contLinks(CONT_SECRET);
+const contNeighbors = (id) => CONT_NEAR[id] ?? [];
+const contSecret = (id) => CONT_HIDDEN[id] ?? [];
+
+// สุ่มตามน้ำหนัก ดึงเลขสุ่ม 1 ตัว
+const contWeighted = (rng, ids, w) => {
+  let x = rng.next() * ids.reduce((s, id) => s + w(id), 0);
+  return ids.find((id) => (x -= w(id)) < 0) ?? ids.at(-1);
+};
+// หยิบ n ตัวไม่ซ้ำตามน้ำหนัก
+const contDraw = (rng, ids, n, w = () => 1) => {
+  const left = ids.slice(), out = [];
+  while (out.length < n && left.length) {
+    const id = contWeighted(rng, left, w);
+    out.push(id);
+    left.splice(left.indexOf(id), 1);
+  }
+  return out;
+};
+
+// ต่อชาติ: ขั้วอำนาจจากแคว้นที่มีผู้ปกครอง (ไม่ซ้ำกัน) · ข้อพิพาท 1 ข้อ · ดันเจียนลับ 3–4 จุด แคว้นละไม่เกิน 1
+function contNation(seed) {
+  const rng = makeRng(mixSeed(seed ^ CONT_SALT, 0));
+  const ruled = Object.keys(CONT_REGIONS).filter((id) => CONT_REGIONS[id].ruler);
+  const nf = rng.next() < CONT_T.two ? 2 : 1;
+  const nr = rng.next() < CONT_T.two ? 2 : 1;
+  const [major, ...rest] = contDraw(rng, ruled, 1 + nf + nr);
+  const ds = Object.keys(CONT_DISPUTES);
+  const dispute = contWeighted(rng, ds, (id) => CONT_DISPUTES[id].w);
+  const nd = rng.next() < CONT_T.four ? 4 : 3;
+  const dungeons = contDraw(rng, Object.keys(CONT_REGIONS), nd, (id) => (CONT_REGIONS[id].danger ? CONT_T.danger : 1));
+  return { powers: { major, falling: rest.slice(0, nf), rising: rest.slice(nf) }, dispute, dungeons };
+}
+
+// เกิด: แคว้นตามน้ำหนักระดับโอกาส (เฉพาะแคว้นที่เผ่านั้นเกิดได้ ถ้าระบุเผ่า) · เผ่าแบ่งเท่าในแคว้น
+function contBirth(rng, race = null) {
+  const ids = Object.keys(CONT_REGIONS).filter((id) => !race || CONT_REGIONS[id].races.includes(race));
+  const region = contWeighted(rng, ids, (id) => CONT_TIER[CONT_REGIONS[id].tier]);
+  return { region, race: race ?? rng.pick(CONT_REGIONS[region].races) };
+}
+
+// ค่าเริ่มเผ่า = ฐาน (base · ต่อค่า) + ส่วนเผ่า · ค่าไม่ต่ำกว่า 1
+const contRaceStart = (race, base = CONT_T.base) =>
+  Object.fromEntries(['str', 'mag', 'cha', 'luk'].map((k) => [k, Math.max(1, base + (CONT_RACES[race].start[k] ?? 0))]));
+const contLifeMul = (race) => CONT_RACES[race].pace;
+
 // ต่างโลก (B68): ทางที่ 3 ของการ์ดทางเกิด — เทพธิดาต่างโลกพาวิญญาณไปใช้ชีวิตหนึ่งชาติในโลกแฟนตาซี
 // เลือกบทบาท 1 จากที่เทพธิดายื่น → เลือกสกิลโกง → เวลาเดินเองทีละปี ผู้เล่นเลือกสิ่งที่ทุ่มเทแล้วค้างไว้ข้ามปี (B68b)
 // เหตุการณ์ที่มีตัวเลือกหยุดเวลารอ → แก่แล้วร่างกายเสื่อมจนสิ้นอายุ → ตอนจบ → ปรโลกตัดสิน แล้วการ์ดทางเกิดให้เลือกกลับโลกเดิมหรืออยู่ต่างโลกต่อ
@@ -4659,6 +4794,7 @@ const beliefActs = (st) => st.belief?.acts ?? 0;
 // ใช้ stream สุ่มของตัวเองจาก seed ของชีวิต — ไม่กินเลขของ af.rng ฉากระหว่างชาติกับการส่งต่อจึงสุ่มได้เหมือนไม่มีต่างโลก
 // กรรมจากปรโลก (ระดับ −1..1) เป็นตัวตั้งของโลก: บุญมากได้สกิลให้เลือกมากขึ้นและค่าเริ่มดีขึ้น · บาปหนักได้น้อยลงและโลกโหดขึ้น · ไม่มีตัวเลขบัญชีบนการ์ด
 // บัญชีบุญบาปเป็นของดวงวิญญาณ (ส่วนที่ส่งต่อจากชาติก่อน) — ชาติต่างโลกบันทึกต่อลงบัญชีนั้น แล้วปรโลกตัดสินตอนจบชาติ
+
 
 
 
@@ -4860,6 +4996,17 @@ const ISEKAI_ROLES = {
       bad: ['ลูกจอมมารที่ถูกลืม', 'พี่น้องแย่งบัลลังก์กันจนไม่มีใครสนใจคุณ คุณย้ายไปอยู่หอคอยชายแดนกับแมวดำหนึ่งตัว'],
     },
   },
+};
+// ชาติใหม่เกิดในทวีปเอเธอร์การ์ด (06b): แคว้น + เผ่า แทนบทบาท · ไม่มีเป้าหมาย/ฉากเปิด/ฉากจบ · ชาติเก่าในเซฟ (มี role) เดินเส้นบทบาทจนจบ
+// ค่าที่ผู้รวมงานรับแทนเจ้าของตามค่าแนะนำ (รอเคาะเช้า) รวมที่นี่จุดเดียว:
+// world = ถังความทรงจำ/ตำนานของทั้งทวีป · name = คำนำชื่อบนผังตระกูล ("เอเธอร์การ์ด · <แคว้น>") · offers = แฟ้มเกิดที่เทพธิดายื่น (กรรมไม่เอียง)
+// tripRace = เผ่าของทริปจากโลกหลัก (ลงแคว้นสุ่ม) · like = บทบาทที่ยืมทองเริ่มกับชุดชื่อ · fame = ชื่อเสียงที่ตอนจบนับว่าดัง
+const CONT_LIFE = { world: 'aethergard', name: 'เอเธอร์การ์ด', offers: 3, tripRace: 'human', like: 'commoner', fame: 30 };
+// ตอนจบชาติทวีป: ยังไม่มีเป้าหมาย (05b จบตามสายที่ไกลสุด) — ดังถึงเกณฑ์และมีอาชีพ / อย่างใดอย่างหนึ่ง / ไม่มีทั้งคู่ · {job} = อาชีพแรก · {land} = แคว้น
+const CONT_END = {
+  best: ['{job}ผู้เลื่องชื่อแห่ง{land}', 'ชื่อของคุณถูกเล่าต่อในโรงเตี๊ยมทั่ว{land} คนรุ่นหลังยังเอ่ยถึงเวลาพูดถึงยุคนั้น'],
+  good: ['{job}แห่ง{land}', 'ไม่ได้ดังไปทั้งทวีป แต่คนใน{land}รู้ว่าถ้ามีเรื่องต้องพึ่งใคร ให้ไปหาคุณ'],
+  bad: ['ชาวบ้านธรรมดาแห่ง{land}', 'ใช้ชีวิตเงียบ ๆ ใน{land} ไม่มีใครรู้ว่าคุณข้ามมาจากโลกอื่น และคุณก็ไม่เคยเล่าให้ใครฟัง'],
 };
 // ชื่อ เป้าหมาย ตอนจบของบทบาท — บทบาทที่เล่นเนื้อเรื่องของโลกใช้ของโลกนั้น
 const roleInfo = (id) => {
@@ -6138,7 +6285,7 @@ function tripCarry(isk) {
   };
 }
 // แถวทริปในผังตระกูลของชาติไทย — lore รูปเดียวกับแถวชาติต่างโลก ให้ isekaiWorldLore อ่านได้ทางเดียว
-const tripLineage = (isk) => ({ world: roleInfo(isk.role).name, age: isk.trip.from, years: isk.age - isk.trip.from, ending: isk.ending.title, ...(isk.home && { home: true }), ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }), ...(isk.legend && { legend: { ...isk.legend } }) });
+const tripLineage = (isk) => ({ world: isekaiFrame(isk).name, age: isk.trip.from, years: isk.age - isk.trip.from, ending: isk.ending.title, ...(isk.home && { home: true }), ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }), ...(isk.legend && { legend: { ...isk.legend } }) });
 
 function entryOffers(seed) {
   const rng = makeRng(seed ^ ENTRY.salt);
@@ -6175,14 +6322,15 @@ function entryCard(st, stage) {
 // lore = ของที่แต่ละโลกจำได้จากชาติก่อน ๆ ทั้งเซฟ ({ world: [id] } จาก isekaiWorldLore)
 // trip = ไปกลับกลางชีวิต (B68m · tripRoll + age/wit จากชีวิตไทย) — ข้ามห้องสีขาว บทบาทมาจากการทอย เริ่มที่อายุไทย เลือกกลับบนการ์ดทางกลับ = จบแบบกลับบ้าน
 // legends = คนต่างโลกรุ่นก่อนที่แต่ละโลกจำชื่อได้ ({ world: [{ name, ending, dark }] } จาก isekaiWorldLegends)
-function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null, hints = null }) {
+// legacy = เริ่มด้วยแฟ้มบทบาท 4 โลกเดิม — เส้นทดสอบของ harness เท่านั้น (ผู้เล่นใหม่เข้าไม่ได้) จนกว่าการ์ด 4 โลกจะถูกลบ (06c)
+function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null, hints = null, legacy = false }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
   const vow = blessed ? GODDESS_VOWS[(seed >>> 0) % GODDESS_VOWS.length].id : null;
   const isk = {
     rng, karma, past, run, memory, blessed, fated, ledger, vow, vowKept: null, vowHit: false,
     real: real && { ...real, stats: { ...real.stats } },
-    worldOffers: isekaiRoleOffers(rng, karma, ISEKAI.worlds + (blessed ? 1 : 0)),
+    worldOffers: legacy ? isekaiRoleOffers(rng, karma, ISEKAI.worlds + (blessed ? 1 : 0)) : contOffers(rng, CONT_LIFE.offers + (blessed ? 1 : 0)),
     skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).slice(0, sk),
     role: null, world: null, name: '', skills: [], st: null, inner: null, flags: {},
     know: null, knowLast: null, loreAll: lore, worldLore: [], lore: [],
@@ -6192,15 +6340,29 @@ function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, bless
     // ทริปศาล (B153): hints = คำใบ้จากเนื้อหา (ผู้เรียกส่ง content.nearHints) · court = ใบศาลที่รอออก visit|summons
     hints, court: null,
   };
+  // ขั้วอำนาจ · ข้อพิพาท · ดันเจียนลับของชาตินี้ (stream ของทวีปเอง) — 06c เริ่มใช้
+  if (!legacy) isk.nation = contNation(mixSeed(seed, run));
   if (trip) {
     // money0 = เงินจริงตอนข้าม ให้ขากลับคิดส่วนต่างที่เกิดในต่างโลกได้ (B136)
     isk.trip = { ...trip, from: trip.age, ...(isk.real && { money0: isk.real.money }) };
-    isekaiStart(isk, trip.role);
+    // ทริปทอยบทบาทไว้ตั้งแต่ก่อนมีทวีป (ลำดับเลขสุ่มของ tripRoll คงเดิม) · ชาติทวีปลงแคว้นสุ่มด้วยเผ่าของทริป
+    if (legacy) isekaiStart(isk, trip.role);
+    else contStart(isk, contBirth(isk.rng, CONT_LIFE.tripRace));
     isk.age = trip.age;
     isk.inner.wit += trip.wit ?? 0;
     isk.step = 'skill';
   }
   return isk;
+}
+
+// แฟ้มเกิด: แคว้น + เผ่าไม่ซ้ำคู่กัน ตามน้ำหนักระดับโอกาสเกิด · กรรมไม่เอียง (ค่าแนะนำ 06b)
+function contOffers(rng, n) {
+  const out = [];
+  for (let i = 0; out.length < n && i < n * 20; i++) {
+    const b = contBirth(rng);
+    if (!out.some((o) => o.region === b.region && o.race === b.race)) out.push(b);
+  }
+  return out;
 }
 
 // สุ่มบทบาทไม่ซ้ำตามน้ำหนัก · กรรมเอียงน้ำหนักแต่ไม่ตัดบทบาทไหนทิ้ง · ชุดที่ไม่มีคนธรรมดา = แทนใบสุดท้าย
@@ -6242,13 +6404,21 @@ const isekaiFameCha = (isk) => {
   return Math.min(F.chaCap, Math.floor(Math.max(0, isk.st.fame) / F.chaPer)) - (ls.filter((l) => l.dark).length * 2 > ls.length ? F.dark : 0);
 };
 
-const isekaiPace = (isk) => ISEKAI_ROLES[isk.role].pace ?? 1;
+const isekaiPace = (isk) => (isk.race ? CONT_RACES[isk.race].pace : ISEKAI_ROLES[isk.role].pace ?? 1);
+// กรอบของชาติ: ชาติเก่า = บทบาท · ชาติทวีป = ชื่อแคว้น · ค่าเริ่มเผ่า · ทอง/ชื่อยืมบทบาท like
+const isekaiFrame = (isk) => {
+  if (isk.role) return roleInfo(isk.role);
+  const like = ISEKAI_ROLES[CONT_LIFE.like];
+  return { name: `${CONT_LIFE.name} · ${CONT_REGIONS[isk.region].name}`, names: like.names, stat: { ...contRaceStart(isk.race), gold: like.stat.gold }, startAge: 0 };
+};
+// อายุบนจอ: pace ไม่เต็ม (ชาวสัตว์ 0.9 · ออร์ค 0.8) ทำให้อายุในเกมเป็นทศนิยม — ปัดลงตอนแสดงเท่านั้น (เจ้าของเคาะรอบ 4) · pace เต็มได้ค่าเดิม
+const isekaiShownAge = (a) => Math.floor(a + 1e-9);
 // ยาต่ออายุ (B68k) เลื่อนจุดที่ร่างกายเริ่มเสื่อมกับเพดานอายุไปพร้อมกัน · ป้ายช่วงวัยไม่เลื่อน · เซฟก่อน B68k ไม่มี lifeAdd
 const isekaiOldAge = (isk) => (ISEKAI_STAGES.at(-1).from + (isk.lifeAdd ?? 0)) * isekaiPace(isk);
 const isekaiStageOf = (isk) => ISEKAI_STAGES.findLast((s) => isk.age >= s.from * isekaiPace(isk));
 // ทางลัดความรู้ใช้ id 'k:<หมวด>' · kc = หมวดที่ทางลัดนี้เติมความรู้และดึงเหตุการณ์
 const isekaiFocusDef = (isk, id) => {
-  if (id === 'role') return roleInfo(isk.role).focus;
+  if (id === 'role') return isekaiFrame(isk).focus;
   if (id?.startsWith('k:')) return { ...ISEKAI_KNOW[id.slice(2)].focus, kc: id.slice(2) };
   if (id === TRIP_QUEST.id) return TRIP_QUEST.focus;
   return ISEKAI_FOCUS[id];
@@ -6257,7 +6427,7 @@ const isekaiFocusDef = (isk, id) => {
 const isekaiKnowOffers = (isk, stage) => Object.keys(ISEKAI_KNOW).filter((k) => isk.know[k] >= ISEKAI_KNOW_T.shortcut && (!ISEKAI_KNOW[k].stages || ISEKAI_KNOW[k].stages.includes(stage.id))).map((k) => `k:${k}`);
 // สิ่งที่ทุ่มเทได้ในช่วงวัยนี้ — ของบทบาทอยู่ใบแรกเสมอ
 // ตามหาทางกลับต่อท้ายของกลาง เฉพาะทริป ⇒ ชาติที่เกิดในต่างโลกได้รายการเท่าเดิม
-const isekaiFocusOffers = (isk, stage) => ['role', ...Object.keys(ISEKAI_FOCUS).filter((id) => !ISEKAI_FOCUS[id].stages || ISEKAI_FOCUS[id].stages.includes(stage.id)), ...(isk.trip ? [TRIP_QUEST.id] : []), ...isekaiKnowOffers(isk, stage)];
+const isekaiFocusOffers = (isk, stage) => [...(isk.role ? ['role'] : []), ...Object.keys(ISEKAI_FOCUS).filter((id) => !ISEKAI_FOCUS[id].stages || ISEKAI_FOCUS[id].stages.includes(stage.id)), ...(isk.trip ? [TRIP_QUEST.id] : []), ...isekaiKnowOffers(isk, stage)];
 // ป้ายบนปุ่มทุ่มเท: บอกว่าค่าไหนขึ้น ไม่บอกตัวเลข · สุข/รู้/บารมี/เป้าหมายโลกเป็นค่าซ่อน จึงไม่ขึ้นป้าย
 const ISEKAI_FOCUS_HIDDEN = new Set(['joy', 'wit', 'know', 'cha', 'goal']);
 const isekaiFocusFx = (isk, id) => {
@@ -6271,6 +6441,18 @@ function isekaiStart(isk, rid) {
   const r = roleInfo(rid);
   isk.role = rid;
   isk.world = r.world ?? rid;
+  isekaiBegin(isk, r);
+}
+
+function contStart(isk, { region, race }) {
+  isk.region = region;
+  isk.race = race;
+  isk.world = CONT_LIFE.world;
+  isekaiBegin(isk, isekaiFrame(isk));
+}
+
+// ส่วนที่ชาติเก่า/ชาติทวีปเริ่มเหมือนกัน: ชื่อ · ค่าเริ่ม + กรรม · ความทรงจำโลก · อายุเริ่ม
+function isekaiBegin(isk, r) {
   isk.name = isk.rng.pick(r.names).replace('{p}', isk.past);
   const shift = Math.round(isk.karma * ISEKAI.karmaStat);
   isk.st = { hp: 100, gold: r.stat.gold, fame: 0, goal: 0 };
@@ -6457,13 +6639,14 @@ function isekaiDrink(isk, id) {
 const ISEKAI_ADULT = ['adult', 'middle', 'old'];
 const isekaiKnowOpen = (isk, e, stage) => (!e.know || isk.know[e.know.cat] >= e.know.min) && (!e.adult || ISEKAI_ADULT.includes(stage.id)) && (!e.loreOf || !isk.worldLore.includes(e.loreOf)) && (!e.legend || isekaiLegends(isk).some((l) => isekaiLegendKind(l) === e.legend)) && (!e.bless || isk.karma > 0 || isk.blessed);
 
-const isekaiFitsRole = (isk, e) => !e.worlds || e.worlds.includes(isk.world) || (e.worlds.length > 1 && e.worlds.includes(ISEKAI_ROLES[isk.role].like));
+// ชาติทวีปไม่มีโลกของเรื่อง ⇒ เห็นเฉพาะการ์ดทุกโลก (การ์ดแคว้น/ข้อพิพาทมากับ 06c)
+const isekaiFitsRole = (isk, e) => !e.worlds || (!!isk.role && (e.worlds.includes(isk.world) || (e.worlds.length > 1 && e.worlds.includes(ISEKAI_ROLES[isk.role].like))));
 
 // เรื่องที่ต้องตัดสินของตานี้: ฉากสุดท้ายถึงอายุ → เรื่องต่อที่นัดไว้ → สุ่มจากกองของช่วงวัย
 // ทุกตาดึงเลขทอย 1 ครั้งก่อนสุ่มกอง (ยกเว้นฉากบังคับ) · ทุ่มเทสายไหนเรื่องสายนั้นโผล่บ่อยขึ้น · เรื่องที่ต้องมีชื่อเสียงรอจนดังพอ
 function isekaiDue(isk) {
   const T = ISEKAI_TIME;
-  const w = roleInfo(isk.role);
+  const w = isekaiFrame(isk);
   const take = (id) => (isk.used.push(id), id);
   const finaleAt = isk.trip ? isk.trip.from + w.finaleAge - w.startAge : w.finaleAge * isekaiPace(isk);
   if (w.finale && !isk.finaleDone && isk.age >= finaleAt) return take(w.finale);
@@ -6487,10 +6670,10 @@ function isekaiDue(isk) {
 
 function isekaiStatus(isk) {
   if (!isk.st) return null;
-  const r = roleInfo(isk.role);
+  const r = isekaiFrame(isk);
   // ค่าภายในเก็บทศนิยม (ฝึกทีละนิด) — หน้าต่างสถานะเห็นจำนวนเต็ม · HP ปัดขึ้น ยังไม่ตายไม่เห็น 0
   const st = Object.fromEntries(Object.entries(isk.st).map(([k, v]) => [k, k === 'hp' ? Math.ceil(v) : Math.round(v)]));
-  return { name: isk.name, world: r.name, goalName: r.goal, ...st, skills: isk.skills.map((s) => ISEKAI_SKILLS[s].name), age: isk.age, stage: isekaiStageOf(isk).name, focus: isk.focus ? isekaiFocusDef(isk, isk.focus).name : null, careers: (isk.careers ?? []).map((c) => ISEKAI_CAREERS[c].name) };
+  return { name: isk.name, world: r.name, goalName: r.goal, ...(isk.race && { race: CONT_RACES[isk.race].name }), ...st, skills: isk.skills.map((s) => ISEKAI_SKILLS[s].name), age: isekaiShownAge(isk.age), stage: isekaiStageOf(isk).name, focus: isk.focus ? isekaiFocusDef(isk, isk.focus).name : null, careers: (isk.careers ?? []).map((c) => ISEKAI_CAREERS[c].name) };
 }
 
 const ISEKAI_HIGHLIGHTS = 3;
@@ -6501,6 +6684,13 @@ const isekaiHighlights = (isk) => (isk.marks ?? []).map((m, i) => ({ ...m, i }))
 // บทบาทที่เหตุการณ์น้อย (ก็อบลิน ลูกจอมมาร) ดังยาก จึงถึงตอนจบดีสุดได้ด้วยเป้าหมายล้วนเมื่อทุ่มเทกับบทบาทนานพอ
 function isekaiEnding(isk) {
   if (isk.dead) return { id: 'death', title: ISEKAI_DEATH[0], text: ISEKAI_DEATH_BY[isk.world] ?? ISEKAI_DEATH[1] };
+  if (!isk.role) {
+    const job = (isk.careers ?? []).map((c) => ISEKAI_CAREERS[c].name)[0];
+    const famed = isk.st.fame >= CONT_LIFE.fame;
+    const tier = famed && job ? 'best' : famed || job ? 'good' : 'bad';
+    const fill = (s) => s.replaceAll('{job}', job ?? 'คนดัง').replaceAll('{land}', CONT_REGIONS[isk.region].name);
+    return { id: tier, title: fill(CONT_END[tier][0]), text: fill(CONT_END[tier][1]) };
+  }
   const w = roleInfo(isk.role);
   let tier;
   if (w.special) {
@@ -6516,7 +6706,7 @@ function isekaiEnding(isk) {
 
 const isekaiCard = (isk, card) => {
   isk.cards++;
-  return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, ...card };
+  return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, ...card, ...(typeof card.age === 'number' && { age: isekaiShownAge(card.age) }) };
 };
 
 // ใบศาล (B153) ไม่นับการ์ดของชาติ ไม่ดึงเลขสุ่ม — ชาติหลังฟื้นเดินเหมือนไม่มีใบนี้ · คำใบ้เลือกตามอายุแทนการสุ่ม
@@ -6528,8 +6718,8 @@ function isekaiCourtCard(isk) {
   const mode = isk.court;
   isk.court = null;
   const lines = mode === 'visit' ? isk.hints?.[hintLevel(isk.ledger)] : null;
-  const hint = lines?.length ? ` ${lines[isk.age % lines.length]}` : '';
-  return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, step: 'result', court: mode, title: ISEKAI_COURT[mode].title, text: ISEKAI_COURT[mode].text + hint, age: isk.age, ok: null, stat: null, deltas: {}, sys: null, choices: [] };
+  const hint = lines?.length ? ` ${lines[isekaiShownAge(isk.age) % lines.length]}` : '';
+  return { kind: 'isekai', status: isekaiStatus(isk), run: isk.run, step: 'result', court: mode, title: ISEKAI_COURT[mode].title, text: ISEKAI_COURT[mode].text + hint, age: isekaiShownAge(isk.age), ok: null, stat: null, deltas: {}, sys: null, choices: [] };
 }
 
 // การ์ดถัดไป · ใบที่มีตัวเลือกรอ chooseIsekai · ใบตา (tick) ไม่มีตัวเลือก เรียกซ้ำ = เวลาเดินอีกตา
@@ -6539,8 +6729,9 @@ function nextIsekaiCard(isk) {
     return isekaiCard(isk, {
       step: 'world', title: 'ห้องสีขาว',
       text: `เทพธิดาผมสีเงินก้มหัวให้ "${isk.past ? `${isk.past} ` : ''}มาทางนี้ก่อน" แล้ววางแฟ้มชีวิตใหม่ไว้ตรงหน้า ${isk.worldOffers.length} แฟ้ม${isk.blessed ? ' วันนี้เธออารมณ์ดีเป็นพิเศษ เลยหยิบมาเพิ่มให้อีกแฟ้ม' : ''}${isk.vow ? ` ก่อนส่งไปเธอกระซิบว่า "${GODDESS_VOWS.find((v) => v.id === isk.vow).text}"` : ''}${isk.fated ? ' เธอบอกว่าคนที่ข้ามมาแบบในนิยายต่างโลกเป๊ะ ๆ ได้โชคแถมทุกคน' : ''}`,
-      choices: isk.worldOffers.map((r) => roleInfo(r).name),
-      desc: isk.worldOffers.map((r) => roleInfo(r).pitch),
+      // แฟ้มบทบาท (ชาติเก่า/เส้นทดสอบ) เป็น id · แฟ้มเกิดในทวีปเป็น { region, race }
+      choices: isk.worldOffers.map((r) => (typeof r === 'string' ? roleInfo(r).name : `${CONT_RACES[r.race].name} · ${CONT_REGIONS[r.region].name}`)),
+      desc: isk.worldOffers.map((r) => (typeof r === 'string' ? roleInfo(r).pitch : CONT_REGIONS[r.region].about)),
       fx: isk.worldOffers.map(() => ''),
       // บารมีไม่ขึ้นจอ — ความทรงจำที่ติดมาเป็นบารมีจึงเล่าไม่บอกค่า
       ...(isk.memory && { note: isk.memory === 'cha' ? 'ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา' : `ความทรงจำจากชาติต่างโลกครั้งก่อนยังติดตัวมา · ${ISEKAI_STAT[isk.memory]} +${ISEKAI.memory}` }),
@@ -6580,7 +6771,7 @@ function nextIsekaiCard(isk) {
     if (isk.st.fame >= ISEKAI_FAME.legend) isk.legend = { world: isk.world, name: isk.name, ending: isk.ending.title, dark: (isk.fameDark ?? 0) * 2 > isk.st.fame };
     return isekaiCard(isk, {
       // การ์ดปรโลกใบถัดไปเล่าเรื่องดวงวิญญาณถูกดึงกลับเอง ใบนี้จึงปิดแค่ชีวิตในโลกนี้ · ตอนจบแบบตายเล่าการตายไว้แล้ว
-      step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : isk.home ? `${isk.ending.text} ${TRIP_HOME}` : `${isk.ending.text} แล้วจากไปอย่างสงบตอนอายุ ${isk.age}`, ending: isk.ending.id, age: isk.age,
+      step: 'end', title: isk.ending.title, text: isk.dead ? isk.ending.text : isk.home ? `${isk.ending.text} ${TRIP_HOME}` : `${isk.ending.text} แล้วจากไปอย่างสงบตอนอายุ ${isekaiShownAge(isk.age)}`, ending: isk.ending.id, age: isk.age,
       ...(isk.home && { home: true }),
       choices: [],
       log: isk.log.slice(),
@@ -6643,8 +6834,9 @@ function nextIsekaiCard(isk) {
     const d = Math.round(isk.st[k]) - Math.round(before[k]);
     if (d) deltas[k] = d;
   }
-  const title = years > 1 ? `อายุ ${from}–${isk.age - 1}` : `อายุ ${from}`;
-  isk.chron.push({ age: from, ...(years > 1 && { until: isk.age - 1 }), stage: stage.id, kind: 'tick', text, deltas });
+  const [a0, a1] = [isekaiShownAge(from), isekaiShownAge(isk.age - 1)];
+  const title = years > 1 ? `อายุ ${a0}–${a1}` : `อายุ ${a0}`;
+  isk.chron.push({ age: a0, ...(years > 1 && { until: a1 }), stage: stage.id, kind: 'tick', text, deltas });
   return isekaiCard(isk, {
     step: 'tick', title, text, age: from, years, stage: stage.name, deltas,
     ...(revived && { sys: 'เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว' }),
@@ -6695,7 +6887,8 @@ function chooseIsekai(isk, idx) {
   if (isk.step === 'world') {
     const r = isk.worldOffers[idx];
     if (!r) throw new Error('ตัวเลือกไม่ถูกต้อง');
-    isekaiStart(isk, r);
+    if (typeof r === 'string') isekaiStart(isk, r);
+    else contStart(isk, r);
     isk.step = 'skill';
     return;
   }
@@ -6707,7 +6900,7 @@ function chooseIsekai(isk, idx) {
     const past = isekaiLoreLine(isk);
     if (past) isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'lore', text: past, deltas: {} });
     // ฉากเปิดของเนื้อเรื่องมาก่อนตาแรก
-    const intro = roleInfo(isk.role).intro;
+    const intro = isekaiFrame(isk).intro;
     if (intro) isk.due = (isk.used.push(intro), intro);
     isk.step = 'tick';
     return;
@@ -6813,142 +7006,7 @@ const isekaiMemory = (isk) => Object.keys(ISEKAI_STAT).reduce((a, b) => (isk.st[
 
 // แถวในผังตระกูล — ไม่มีจังหวัด/ฐานะแบบชาติไทย ผู้อ่าน lineage ต้องดู isekai ก่อน · world = ชื่อบทบาท
 // lore = ของที่โลกนี้จำจากชาตินี้ (isekaiWorldLore อ่านกลับ) · legend = ชาตินี้ดังพอให้โลกจำชื่อ (isekaiWorldLegends อ่านกลับ) · ใส่เฉพาะชาติที่มี แถวของชาติอื่นรูปเดิม
-const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world: roleInfo(isk.role).name, ending: isk.ending.title, path: 'isekai', realm: 'ต่างโลก', broke: false, ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }), ...(isk.legend && { legend: { ...isk.legend } }) });
-
-// ทวีปเอเธอร์การ์ด (06a): ข้อมูลแคว้น/เผ่า/แผนที่ + ตัวสุ่มต่อชาติ — ยังไม่ต่อเข้าเกม (06b ต่อ)
-// บริสุทธิ์: รับ seed/rng คืนค่า ไม่แตะสถานะเกม · ตัวสุ่มต่อชาติใช้ stream ของตัวเอง (CONT_SALT) ไม่กินเลขสุ่มของชาติ
-// ชื่อระดับบนสุดขึ้นต้น CONT_/cont ทุกตัว — build.mjs รวมทุกโมดูลเป็นสโคปเดียว
-// ค่าที่ยังรอเจ้าของเคาะ (06a-ticket หัว "ให้เจ้าของเคาะ") ใช้ค่าแนะนำในใบ: ค่าเริ่มเผ่า · น้ำหนักโอกาสเกิด · เผ่าแบ่งเท่า · ขาลง/มาแรง 50/50 · ข้อพิพาทเท่ากัน
-
-const CONT_SALT = 0xc0a7;
-// ระดับโอกาสเกิด → น้ำหนักแคว้น (ร่าง)
-const CONT_TIER = { very: 8, often: 5, mid: 3, few: 2, rare: 1 };
-const CONT_RACES = {
-  human: { name: 'มนุษย์', start: { cha: 2 }, pace: 1 },
-  elf: { name: 'เอลฟ์', start: { mag: 2, str: -2 }, pace: 3 },
-  dwarf: { name: 'คนแคระ', start: { str: 2, cha: -2 }, pace: 2 },
-  beastkin: { name: 'ชาวสัตว์', start: { str: 2, luk: 2, mag: -2 }, pace: 0.9 },
-  halfling: { name: 'ฮาล์ฟลิง', start: { luk: 2, str: -2 }, pace: 1.3 },
-  orc: { name: 'ออร์ค', start: { str: 4, mag: -2, cha: -2 }, pace: 0.8 },
-  demon: { name: 'ปีศาจ', start: { mag: 2, str: 2, cha: -2, luk: -2 }, pace: 2.5 },
-  dragonkin: { name: 'เชื้อมังกร', start: { str: 2, mag: 2, luk: -2 }, pace: 3 },
-};
-const ALL_RACES = Object.keys(CONT_RACES);
-// ruler null = ไม่มีผู้ปกครอง (ไม่เข้าสุ่มขั้วอำนาจ) · danger = ดันเจียนลับออกถี่กว่า (รอบ 22: ไม่มีผู้ปกครองทั้ง 4 + ปากเหว · คาร์กัล · โอรัน)
-const CONT_REGIONS = {
-  helvard: { name: 'เฮลวาร์ด', ruler: 'กษัตริย์', races: ['human', 'beastkin'], tier: 'very' },
-  verdani: { name: 'เวอร์ดานี', ruler: 'ดยุก', races: ['human', 'beastkin'], tier: 'often' },
-  marishaven: { name: 'มาริสฮาเวน', ruler: 'สภาพ่อค้า', races: ['human', 'halfling'], tier: 'often' },
-  lioselle: { name: 'เลียวเซล', ruler: 'สภาอาวุโส', races: ['elf'], tier: 'mid' },
-  gromdal: { name: 'กรอมดาล', ruler: 'สภากิลด์', races: ['dwarf'], tier: 'mid' },
-  karghal: { name: 'ทุ่งเถ้าคาร์กัล', ruler: 'สภาเผ่า', races: ['demon', 'orc'], tier: 'mid', danger: true },
-  nameless_wood: { name: 'พนาไร้ชื่อ', ruler: null, races: ['orc', 'beastkin'], tier: 'mid', danger: true },
-  northvale: { name: 'นอร์ธเวล', ruler: 'หัวหน้าเผ่า', races: ['human'], tier: 'few' },
-  windcliff: { name: 'ผาวายุ', ruler: 'ผู้เฒ่า', races: ['dragonkin'], tier: 'rare' },
-  cloud_isles: { name: 'หมู่เกาะเมฆา', ruler: null, races: ['halfling'], tier: 'rare', danger: true },
-  red_sands: { name: 'ผืนทรายชาด', ruler: 'สภาคลัง', races: ['human', 'orc'], tier: 'mid' },
-  lexaria: { name: 'เล็กซาเรีย', ruler: 'สภารับรอง', races: ['human', 'dwarf'], tier: 'few' },
-  aurelia: { name: 'ออเรเลีย', ruler: 'ประมุข', races: ['human'], tier: 'few' },
-  zeron: { name: 'ซีรอน', ruler: 'อธิการ', races: ['elf', 'human'], tier: 'few' },
-  weir_marsh: { name: 'บึงพันฝาย', ruler: 'ผู้แทน', races: ['halfling'], tier: 'mid' },
-  abyss_mouth: { name: 'ปากเหวพันชั้น', ruler: 'ผู้แทนเขต', races: ALL_RACES, tier: 'few', danger: true },
-  coralis: { name: 'โคราลิส', ruler: 'กัปตัน', races: ['human', 'beastkin'], tier: 'few' },
-  poison_range: { name: 'เทือกพิษ', ruler: null, races: ['demon'], tier: 'rare', danger: true },
-  oran: { name: 'โอรัน', ruler: 'ผู้สำเร็จราชการ', races: ['human'], tier: 'few', danger: true },
-  singing_steppe: { name: 'ทุ่งหญ้าเสียง', ruler: null, races: ['beastkin', 'orc'], tier: 'mid', danger: true },
-};
-// แผนที่ติดกัน (รอบ 21) เก็บเป็นคู่ครั้งเดียว สร้างสองทิศตอนโหลด ⇒ สมมาตรเสมอ
-const CONT_ROADS = [
-  ['northvale', 'windcliff'], ['northvale', 'gromdal'], ['northvale', 'singing_steppe'],
-  ['windcliff', 'gromdal'], ['windcliff', 'cloud_isles'],
-  ['gromdal', 'helvard'], ['gromdal', 'abyss_mouth'],
-  ['helvard', 'oran'], ['helvard', 'aurelia'], ['helvard', 'lexaria'], ['helvard', 'red_sands'],
-  ['oran', 'abyss_mouth'], ['oran', 'karghal'],
-  ['abyss_mouth', 'poison_range'],
-  ['aurelia', 'zeron'], ['aurelia', 'verdani'],
-  ['zeron', 'lexaria'], ['zeron', 'lioselle'],
-  ['lexaria', 'marishaven'], ['lexaria', 'singing_steppe'],
-  ['lioselle', 'nameless_wood'], ['lioselle', 'singing_steppe'],
-  ['nameless_wood', 'weir_marsh'],
-  ['poison_range', 'karghal'],
-  ['karghal', 'red_sands'],
-  ['red_sands', 'verdani'],
-  ['verdani', 'weir_marsh'], ['verdani', 'marishaven'],
-  ['weir_marsh', 'marishaven'],
-  ['marishaven', 'coralis'], ['marishaven', 'cloud_isles'],
-];
-// เครือข่ายทางลับ 6 เส้น (รอบ 22) — คู่ที่ไม่ติดกันตรง
-const CONT_SECRET = [
-  ['poison_range', 'nameless_wood'], ['abyss_mouth', 'zeron'], ['oran', 'verdani'],
-  ['northvale', 'lioselle'], ['karghal', 'weir_marsh'], ['windcliff', 'red_sands'],
-];
-const CONT_DISPUTES = {
-  throne_war: { name: 'สงครามชิงบัลลังก์', w: 1 },
-  trade_route: { name: 'แย่งเส้นทางการค้า', w: 1 },
-  witch_hunt: { name: 'ศาสนจักรล่าแม่มด', w: 1 },
-  plague: { name: 'โรคระบาด', w: 1 },
-  dungeon_surge: { name: 'ดันเจี้ยนทะลัก', w: 1 },
-  demon_lord: { name: 'จอมมารฟื้น', w: 1 },
-  peasant_revolt: { name: 'กบฏชาวนา', w: 1 },
-  frost_exodus: { name: 'เผ่าอพยพหนีหนาว', w: 1 },
-};
-// ขาลง/มาแรง: 2 แคว้นด้วยโอกาส two · ดันเจียน 3 หรือ 4 จุด (four) · แคว้นอันตรายน้ำหนัก ×danger
-const CONT_T = { two: 0.5, four: 0.5, danger: 3, base: 10 };
-
-const contLinks = (pairs) => {
-  const out = Object.fromEntries(Object.keys(CONT_REGIONS).map((id) => [id, []]));
-  for (const [a, b] of pairs) {
-    out[a].push(b);
-    out[b].push(a);
-  }
-  return out;
-};
-const CONT_NEAR = contLinks(CONT_ROADS);
-const CONT_HIDDEN = contLinks(CONT_SECRET);
-const contNeighbors = (id) => CONT_NEAR[id] ?? [];
-const contSecret = (id) => CONT_HIDDEN[id] ?? [];
-
-// สุ่มตามน้ำหนัก ดึงเลขสุ่ม 1 ตัว
-const contWeighted = (rng, ids, w) => {
-  let x = rng.next() * ids.reduce((s, id) => s + w(id), 0);
-  return ids.find((id) => (x -= w(id)) < 0) ?? ids.at(-1);
-};
-// หยิบ n ตัวไม่ซ้ำตามน้ำหนัก
-const contDraw = (rng, ids, n, w = () => 1) => {
-  const left = ids.slice(), out = [];
-  while (out.length < n && left.length) {
-    const id = contWeighted(rng, left, w);
-    out.push(id);
-    left.splice(left.indexOf(id), 1);
-  }
-  return out;
-};
-
-// ต่อชาติ: ขั้วอำนาจจากแคว้นที่มีผู้ปกครอง (ไม่ซ้ำกัน) · ข้อพิพาท 1 ข้อ · ดันเจียนลับ 3–4 จุด แคว้นละไม่เกิน 1
-function contNation(seed) {
-  const rng = makeRng(mixSeed(seed ^ CONT_SALT, 0));
-  const ruled = Object.keys(CONT_REGIONS).filter((id) => CONT_REGIONS[id].ruler);
-  const nf = rng.next() < CONT_T.two ? 2 : 1;
-  const nr = rng.next() < CONT_T.two ? 2 : 1;
-  const [major, ...rest] = contDraw(rng, ruled, 1 + nf + nr);
-  const ds = Object.keys(CONT_DISPUTES);
-  const dispute = contWeighted(rng, ds, (id) => CONT_DISPUTES[id].w);
-  const nd = rng.next() < CONT_T.four ? 4 : 3;
-  const dungeons = contDraw(rng, Object.keys(CONT_REGIONS), nd, (id) => (CONT_REGIONS[id].danger ? CONT_T.danger : 1));
-  return { powers: { major, falling: rest.slice(0, nf), rising: rest.slice(nf) }, dispute, dungeons };
-}
-
-// เกิด: แคว้นตามน้ำหนักระดับโอกาส (เฉพาะแคว้นที่เผ่านั้นเกิดได้ ถ้าระบุเผ่า) · เผ่าแบ่งเท่าในแคว้น
-function contBirth(rng, race = null) {
-  const ids = Object.keys(CONT_REGIONS).filter((id) => !race || CONT_REGIONS[id].races.includes(race));
-  const region = contWeighted(rng, ids, (id) => CONT_TIER[CONT_REGIONS[id].tier]);
-  return { region, race: race ?? rng.pick(CONT_REGIONS[region].races) };
-}
-
-// ค่าเริ่มเผ่า = ฐาน (base · ต่อค่า) + ส่วนเผ่า · ค่าไม่ต่ำกว่า 1
-const contRaceStart = (race, base = CONT_T.base) =>
-  Object.fromEntries(['str', 'mag', 'cha', 'luk'].map((k) => [k, Math.max(1, base + (CONT_RACES[race].start[k] ?? 0))]));
-const contLifeMul = (race) => CONT_RACES[race].pace;
+const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world: isekaiFrame(isk).name, ending: isk.ending.title, path: 'isekai', realm: 'ต่างโลก', broke: false, ...(isk.lore.length && { lore: { world: isk.world, ids: isk.lore.slice() } }), ...(isk.legend && { legend: { ...isk.legend } }) });
 
 // ช่วงระหว่างชาติ (ใบ 05 · 09) + ส่งต่อรุ่นถัดไป — ลำดับตามใบ 09:
 // บันทึกการตาย → ส่วนบุญ/อนุโมทนา → เทวทูต 5 → ปรโลกเปิดบัญชีชี้ปลายทาง → ทางเกิด → ภูมิปลายทาง หรือ ผีบรรพบุรุษ → ส่งต่อ 30–70% → รุ่นถัดไป
@@ -10898,7 +10956,7 @@ function isekaiStatusBox(s) {
     d.append(el('span', null, ISEKAI_STAT[k]), el('b', null, String(s[k])));
     grid.append(d);
   }
-  box.append(grid, el('div', null, `ทอง ${s.gold.toLocaleString('en-US')} · ชื่อเสียง ${s.fame} · ${s.world}`));
+  box.append(grid, el('div', null, `ทอง ${s.gold.toLocaleString('en-US')} · ชื่อเสียง ${s.fame} · ${s.race ? `${s.race} · ` : ''}${s.world}`));
   box.append(el('div', null, `อายุ ${s.age} · ${s.stage}${s.focus ? ` · ทุ่มเทกับ${s.focus}` : ''}`));
   // อาชีพตามโฟกัส (05a) — เซฟก่อนมีอาชีพไม่มีช่องนี้
   if (s.careers?.length) box.append(el('div', null, `อาชีพ ${s.careers.join(' · ')}`));
