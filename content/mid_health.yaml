@@ -296,7 +296,7 @@ events:
         text: "บรรจุขวดขาย โฆษณาว่าหายขาด"
         hint: "ราคา: บาปเบา"
         outcomes:
-          - {weight: 1, text: "ขายดีจนรวยไปพักใหญ่ จนลูกค้าคนหนึ่งเลิกกินยาหมอแล้วหามเข้า รพ.", effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: 2}}, merit: [{cat: greed_harm, level: 2}]}
+          - {weight: 1, text: "ขายดีจนรวยไปพักใหญ่ จนลูกค้าคนหนึ่งเลิกกินยาหมอแล้วหามเข้า รพ.", effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: 2, grey: true}}, merit: [{cat: greed_harm, level: 2}], sets_flags: [dirty_money]}
           - {weight: 2, text: "โดนร้องเรียนโฆษณาเกินจริง ของถูกยึดทั้งโกดัง ต้องคืนเงินลูกค้าทุกขวด", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: greed_harm, level: 1}]}
         merit: [{cat: greed_harm, level: 1}]
       - id: give_recipe

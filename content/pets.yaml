@@ -428,7 +428,8 @@ events:
       - id: sell_sick
         text: "ขายตัวป่วยให้พ่อค้าเงียบ ๆ"
         hint: "ราคา: บาปเบา"
-        effects: {money: {unit: income_x, amount: 0.4}}
+        effects: {money: {unit: income_x, amount: 0.4, grey: true}}
+        sets_flags: [dirty_money]
         family: [{leave: herd}]
         merit: [{cat: greed_harm, level: 1}]
 

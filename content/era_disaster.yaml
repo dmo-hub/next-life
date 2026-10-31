@@ -86,7 +86,8 @@ events:
       - id: price_gouge
         text: "กักน้ำดื่มไว้ขายราคาสามเท่า"
         hint: "ราคา: บาปเบา"
-        effects: {happiness: 1, relations: -2, money: {unit: income_x, amount: 1.5}}
+        effects: {happiness: 1, relations: -2, money: {unit: income_x, amount: 1.5, grey: true}}
+        sets_flags: [dirty_money]
         merit: [{cat: greed_harm, level: 1}]
       - id: stay_home
         text: "ปิดทีวี ไปวิ่งให้หายเครียด"
@@ -180,7 +181,7 @@ events:
         text: "ตุนหน้ากากไว้ขาย"
         hint: "ราคา: บาปเบา"
         outcomes:
-          - {weight: 1, text: "ขายหมดเกลี้ยงในสามวัน กำไรเท่าเงินเดือนครึ่งปี", effects: {happiness: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 1, text: "ขายหมดเกลี้ยงในสามวัน กำไรเท่าเงินเดือนครึ่งปี", effects: {happiness: 1, money: {unit: income_x, amount: 1.5, grey: true}}, merit: [{cat: greed_harm, level: 1}], sets_flags: [dirty_money]}
           - {weight: 2, text: "ข่าวซาเร็วกว่าคิด หน้ากากค้างเต็มห้องไปอีกหลายปี", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: greed_harm, level: 1}]}
         merit: [{cat: greed_harm, level: 1}]
       - id: study_in_slump
@@ -345,7 +346,8 @@ events:
       - id: wall_own_house
         text: "กั้นทรายบ้านตัวเองสูงท่วมหัว"
         hint: "ราคา: บาปเบา"
-        effects: {happiness: 1, relations: -3, money: {unit: income_x, amount: 0.5}}
+        effects: {happiness: 1, relations: -3, money: {unit: income_x, amount: 0.5, grey: true}}
+        sets_flags: [dirty_money]
         merit: [{cat: greed_harm, level: 1}]
       - id: wade_to_work
         text: "ลุยน้ำไปทำงานไปเรียนทุกวัน"

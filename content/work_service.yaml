@@ -90,7 +90,7 @@ events:
         sets_flags: [took_bribe]
         merit: [{cat: greed_harm, level: 3}]
         outcomes:
-          - {weight: 3, ok: true, text: "ส่วนแบ่งเข้าบัญชีญาติเป็นงวด ๆ เครื่องที่ซื้อมาใช้ได้ไม่ถึงครึ่งของที่โฆษณา", effects: {money: {unit: income_x, amount: 3}, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "ส่วนแบ่งเข้าบัญชีญาติเป็นงวด ๆ เครื่องที่ซื้อมาใช้ได้ไม่ถึงครึ่งของที่โฆษณา", effects: {money: {unit: income_x, amount: 3, grey: true}, happiness: -1}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "นักข่าวเทียบราคากับตลาดแล้วลงข่าวเต็มหน้า กรรมการทุกคนถูกตั้งสอบ ออกจากราชการพร้อมคดี", effects: {job: labor, money: {unit: income_x, amount: -2}, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: open_spec
         text: "เขียนสเปกกลาง ให้หลายเจ้าแข่งกัน"
@@ -138,7 +138,7 @@ events:
         sets_flags: [took_bribe]
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
-          - {weight: 1, ok: true, text: "สองเดือนแรกไม่มีใครถาม เงินก้อนพอผ่อนรถได้สบาย", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "สองเดือนแรกไม่มีใครถาม เงินก้อนพอผ่อนรถได้สบาย", effects: {money: {unit: income_x, amount: 1, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 2, text: "หัวหน้ารู้ตั้งแต่เดือนแรก ถูกย้ายไปอยู่โรงพักที่ไกลที่สุดของจังหวัด", effects: {happiness: -2, network: -1}, merit: [{cat: neutral}]}
       - id: report_up
         text: "ร้องเรียนผู้ตรวจ"
@@ -164,7 +164,7 @@ events:
         sets_flags: [took_bribe]
         merit: [{cat: unjust_judgment, level: 3}]
         outcomes:
-          - {weight: 2, ok: true, text: "คดีจบเร็ว ผู้ใหญ่ฝากขอบคุณมาพร้อมของก้อนหนึ่ง คนงานคนนั้นติดคุกแทน", effects: {money: {unit: income_x, amount: 2}, network: 1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "คดีจบเร็ว ผู้ใหญ่ฝากขอบคุณมาพร้อมของก้อนหนึ่ง คนงานคนนั้นติดคุกแทน", effects: {money: {unit: income_x, amount: 2, grey: true}, network: 1, happiness: -1}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "คนรอรถเมล์ที่ป้ายเห็นหน้าคนขับชัด ไปให้ปากคำกับนักข่าว ถูกไล่ออกพร้อมคดีทำสำนวนเท็จ", effects: {job: labor, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: by_the_book
         text: "ทำสำนวนตามหลักฐาน"

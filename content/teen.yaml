@@ -155,8 +155,8 @@ events:
       - id: extort_juniors
         text: "ร่วมไถเงินรุ่นน้อง"
         hint: "ราคา: บาปเบา"
-        sets_flags: [extorted_juniors]
-        effects: {money: {unit: income_x, amount: 0.3}, relations: -2, happiness: 1}
+        sets_flags: [dirty_money, extorted_juniors]
+        effects: {money: {unit: income_x, amount: 0.3, grey: true}, relations: -2, happiness: 1}
         merit: [{cat: greed_harm, level: 1}]
       - id: boxing_camp
         text: "หนีไปเข้าค่ายมวยแทน"

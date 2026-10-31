@@ -168,5 +168,6 @@ events:
       - id: cover_again
         text: "รับปากช่วยปิดเรื่องให้เขาอีก"
         hint: "ราคา: บาปเบา"
-        effects: {money: {unit: income_x, amount: 1}, happiness: -2}
+        effects: {money: {unit: income_x, amount: 1, grey: true}, happiness: -2}
+        sets_flags: [dirty_money]
         merit: [{cat: greed_harm, level: 1}]

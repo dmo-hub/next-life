@@ -203,7 +203,7 @@ events:
         hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
-          - {weight: 1, ok: true, text: "กำไรพุ่ง ไม่มีใครสังเกต อย่างน้อยก็ตอนนี้", effects: {money: {unit: income_x, amount: 2}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "กำไรพุ่ง ไม่มีใครสังเกต อย่างน้อยก็ตอนนี้", effects: {money: {unit: income_x, amount: 2, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 2, text: "นักรีวิวคนเดิมกลับมาแฉ ร้านร้างภายในเดือนเดียว", effects: {happiness: -2, relations: -1, income_mult: 0.7}, merit: [{cat: neutral}]}
 
   - id: work_biz_bust_01
@@ -265,7 +265,7 @@ events:
         hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
-          - {weight: 2, ok: true, text: "เงินเข้าง่ายจนแทบไม่เชื่อ", effects: {money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "เงินเข้าง่ายจนแทบไม่เชื่อ", effects: {money: {unit: income_x, amount: 1.5, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "ผู้ติดตามใช้แล้วแพ้หนัก แฉกันทั้งเน็ต ชื่อเสียงพังในคืนเดียว", effects: {relations: -2, happiness: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
       - id: fundraise_hospital
         text: "ใช้ยอดวิวระดมทุนให้ รพ.บ้านเกิด"

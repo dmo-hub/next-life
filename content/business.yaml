@@ -350,7 +350,8 @@ events:
       - id: recruit_friends
         text: "ชวนญาติพี่น้องเข้าวง"
         hint: "ราคา: บาปหนัก"
-        effects: {money: {unit: income_x, amount: 0.5}, network: 1}
+        effects: {money: {unit: income_x, amount: 0.5, grey: true}, network: 1}
+        sets_flags: [dirty_money]
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
           - {weight: 2, text: "ญาติเข้ามาเจ็ดคน ค่าแนะนำไหลเข้าทุกสัปดาห์ ทุกคนเรียก{ชื่อ}ว่าเสี่ย", effects: {happiness: 1}, next: biz_ponzi_crash_01, merit: [{cat: neutral}]}

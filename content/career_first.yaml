@@ -18,8 +18,8 @@ events:
         schedules: [{event: echo_police_ledger_01, after_years: [6, 14]}]
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
-          - {weight: 3, ok: true, text: "จ่าตบไหล่ เย็นนั้นทั้งเวรพาไปกินข้าว งานด่วนเรื่องไหนก็มีคนช่วย", effects: {network: 2, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ซองเดือนต่อมาหนากว่าเดิม จ่าบอกว่ามีงานให้ช่วยดูแลบ่อนในเขตด้วย", effects: {happiness: -2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "จ่าตบไหล่ เย็นนั้นทั้งเวรพาไปกินข้าว งานด่วนเรื่องไหนก็มีคนช่วย", effects: {network: 2, money: {unit: income_x, amount: 0.3, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
+          - {weight: 1, text: "ซองเดือนต่อมาหนากว่าเดิม จ่าบอกว่ามีงานให้ช่วยดูแลบ่อนในเขตด้วย", effects: {happiness: -2, money: {unit: income_x, amount: 0.5, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
       - id: return_it
         text: "คืนซองต่อหน้าทุกคน"
         sets_flags: [badge_clean]
@@ -109,7 +109,7 @@ events:
         sets_flags: [took_bribe]
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
-          - {weight: 2, ok: true, text: "ได้ซองหนากว่าที่เคยคืนไปหลายเท่า เจ้าของร้านย้ายร้านไปเดือนต่อมา", effects: {money: {unit: income_x, amount: 1}, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ได้ซองหนากว่าที่เคยคืนไปหลายเท่า เจ้าของร้านย้ายร้านไปเดือนต่อมา", effects: {money: {unit: income_x, amount: 1, grey: true}, happiness: -1}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "เจ้าของร้านอัดเสียงไว้ทั้งหมด ถูกสั่งพักราชการ", effects: {income_mult: 0.85, relations: -2}, merit: [{cat: neutral}]}
 
   # ใบแก้ตัวของคนรับซองแรก — ล้าง badge_bent ได้ (took_bribe คงเป็นประวัติ)
@@ -159,9 +159,9 @@ events:
         text: "รับข้อเสนอ"
         hint: "ราคา: บาปหนัก"
         clears_flags: [badge_clean]
-        sets_flags: [took_bribe, badge_bent]
+        sets_flags: [dirty_money, took_bribe, badge_bent]
         merit: [{cat: greed_harm, level: 2}]
-        effects: {knowledge: 1, money: {unit: income_x, amount: 0.5}}
+        effects: {knowledge: 1, money: {unit: income_x, amount: 0.5, grey: true}}
       - id: refuse
         text: "ปฏิเสธ จ่ายกาแฟเอง"
         merit: [{cat: sila, level: 1}]
@@ -194,8 +194,8 @@ events:
         schedules: [{event: echo_gov_audit_01, after_years: [4, 10]}]
         merit: [{cat: cheat_exploit, level: 2}]
         outcomes:
-          - {weight: 3, ok: true, text: "เงินเดือนเดือนแรกหนากว่าที่คิด หัวหน้าบอกว่าเด็กใหม่คนนี้เข้าใจระบบ", effects: {network: 2, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "เดือนต่อมาหัวหน้าให้คุณเป็นคนทำใบเบิกแทนทั้งฝ่าย ลายมือคุณอยู่ทุกแผ่น", effects: {happiness: -2, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "เงินเดือนเดือนแรกหนากว่าที่คิด หัวหน้าบอกว่าเด็กใหม่คนนี้เข้าใจระบบ", effects: {network: 2, money: {unit: income_x, amount: 0.3, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
+          - {weight: 1, text: "เดือนต่อมาหัวหน้าให้คุณเป็นคนทำใบเบิกแทนทั้งฝ่าย ลายมือคุณอยู่ทุกแผ่น", effects: {happiness: -2, money: {unit: income_x, amount: 0.3, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
       - id: strike_out
         text: "ขีดชื่อตัวเองออก"
         sets_flags: [desk_clean]
@@ -282,7 +282,7 @@ events:
         sets_flags: [took_bribe]
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
-          - {weight: 2, ok: true, text: "ทุกอย่างราบรื่น ของขวัญปีใหม่จากผู้รับเหมาส่งมาถึงบ้าน", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ทุกอย่างราบรื่น ของขวัญปีใหม่จากผู้รับเหมาส่งมาถึงบ้าน", effects: {money: {unit: income_x, amount: 1, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "ผู้อำนวยการเห็นราคากลางที่ขยับ เรียกคืนงานแล้วไม่พูดกับคุณอีก", effects: {network: -2, happiness: -2}, merit: [{cat: neutral}]}
 
   - id: gov_bent_turn_01

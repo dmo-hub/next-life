@@ -59,8 +59,8 @@ events:
         hint: "ราคา: บาปหนักมาก"
         merit: [{cat: greed_harm, level: 3}]
         outcomes:
-          - {weight: 1, text: "ไม่มีใครพิสูจน์ได้ เงินทั้งก้อนเป็นของคนเดียว แต่ตั้งแต่วันนั้นไม่มีเพื่อนเก่าคนไหนรับสายอีก", effects: {relations: -3, network: -2, happiness: -1, money: {unit: fixed_baht, amount: 6000000, ref_year: 2560}}, merit: [{cat: greed_harm, level: 3}]}
-          - {weight: 2, text: "เพื่อนเอาสลิปโอนเงินไปแจ้งความ ศาลสั่งคืนส่วนของทุกคนพร้อมค่าทนาย ชื่อเสียงพังทั้งแผนก", effects: {relations: -3, network: -3, happiness: -2, money: {unit: fixed_baht, amount: 600000, ref_year: 2560}}, merit: [{cat: greed_harm, level: 3}]}
+          - {weight: 1, text: "ไม่มีใครพิสูจน์ได้ เงินทั้งก้อนเป็นของคนเดียว แต่ตั้งแต่วันนั้นไม่มีเพื่อนเก่าคนไหนรับสายอีก", effects: {relations: -3, network: -2, happiness: -1, money: {unit: fixed_baht, amount: 6000000, ref_year: 2560, grey: true}}, merit: [{cat: greed_harm, level: 3}], sets_flags: [dirty_money]}
+          - {weight: 2, text: "เพื่อนเอาสลิปโอนเงินไปแจ้งความ ศาลสั่งคืนส่วนของทุกคนพร้อมค่าทนาย ชื่อเสียงพังทั้งแผนก", effects: {relations: -3, network: -3, happiness: -2, money: {unit: fixed_baht, amount: 600000, ref_year: 2560, grey: true}}, merit: [{cat: greed_harm, level: 3}], sets_flags: [dirty_money]}
       - id: split_by_stake
         text: "แบ่งตามเงินที่แต่ละคนลง"
         merit: [{cat: neutral}]
@@ -89,8 +89,8 @@ events:
         hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
-          - {weight: 3, text: "ไม่มีใครเปิดตรวจย้อน เงินสี่พันหายไปกับบิลค้างจ่ายในวันเดียว แต่ทุกครั้งที่เพื่อนชวนลงขันงวดใหม่ ใจก็กระตุกทุกที", effects: {happiness: -1, money: {unit: fixed_baht, amount: 4000, ref_year: 2560}}, merit: [{cat: greed_harm, level: 1}]}
-          - {weight: 2, text: "เพื่อนอีกคนจดเลขชุดไว้ในมือถือ ตรวจเจอเองแล้วส่งรูปเข้ากลุ่ม ไม่มีใครพูดอะไร แต่งวดหน้าไม่มีใครชวนอีก", effects: {relations: -3, network: -1, happiness: -2, money: {unit: fixed_baht, amount: 4000, ref_year: 2560}}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 3, text: "ไม่มีใครเปิดตรวจย้อน เงินสี่พันหายไปกับบิลค้างจ่ายในวันเดียว แต่ทุกครั้งที่เพื่อนชวนลงขันงวดใหม่ ใจก็กระตุกทุกที", effects: {happiness: -1, money: {unit: fixed_baht, amount: 4000, ref_year: 2560, grey: true}}, merit: [{cat: greed_harm, level: 1}], sets_flags: [dirty_money]}
+          - {weight: 2, text: "เพื่อนอีกคนจดเลขชุดไว้ในมือถือ ตรวจเจอเองแล้วส่งรูปเข้ากลุ่ม ไม่มีใครพูดอะไร แต่งวดหน้าไม่มีใครชวนอีก", effects: {relations: -3, network: -1, happiness: -2, money: {unit: fixed_baht, amount: 4000, ref_year: 2560, grey: true}}, merit: [{cat: greed_harm, level: 1}], sets_flags: [dirty_money]}
       - id: give_to_tenant
         text: "ยกส่วนตัวเองให้เพื่อนที่ลำบาก"
         effects: {relations: 3, happiness: 1}
@@ -191,7 +191,7 @@ events:
         hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
-          - {weight: 3, ok: true, text: "เดินเก็บโพยทั้งซอยได้ค่าคอมทุกงวด รู้จักคนทั้งตำบล", effects: {network: 2, money: {unit: income_x, amount: 0.6}}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 3, ok: true, text: "เดินเก็บโพยทั้งซอยได้ค่าคอมทุกงวด รู้จักคนทั้งตำบล", effects: {network: 2, money: {unit: income_x, amount: 0.6, grey: true}}, merit: [{cat: greed_harm, level: 1}], sets_flags: [dirty_money]}
           - {weight: 1, text: "ตำรวจตั้งด่านกลางซอย สมุดโพยอยู่ในกระเป๋าเรา โดนคุมตัวทั้งที่เจ๊นั่งดูทีวีอยู่บ้าน", effects: {happiness: -3, network: -2, money: {unit: income_x, amount: -1.5}}, merit: [{cat: greed_harm, level: 1}]}
       - id: bet_big
         text: "ขอแทงเลขเด็ดเองก้อนใหญ่"

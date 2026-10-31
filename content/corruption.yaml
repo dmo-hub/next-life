@@ -17,7 +17,7 @@ events:
         sets_flags: [took_bribe]
         merit: [{cat: greed_harm, level: 2}, {cat: unjust_judgment, level: 1}]
         outcomes:
-          - {weight: 3, ok: true, text: "เงินก้อนเข้ากระเป๋า งานผ่านไปไม่มีใครถาม ตอนกลางคืนนอนไม่ค่อยหลับ", effects: {money: {unit: income_x, amount: 2}, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "เงินก้อนเข้ากระเป๋า งานผ่านไปไม่มีใครถาม ตอนกลางคืนนอนไม่ค่อยหลับ", effects: {money: {unit: income_x, amount: 2, grey: true}, happiness: -1}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "สามเดือนต่อมาอาคารร้าวทั้งแถบ ชื่อคนเซ็นอยู่บนเอกสารชัดเจน ถูกไล่ออกพร้อมคดีติดตัว", effects: {job: labor, money: {unit: income_x, amount: -1.5}, happiness: -3, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: ask_double
         text: "ขอเพิ่มเป็นสองเท่า"
@@ -25,7 +25,7 @@ events:
         sets_flags: [took_bribe]
         merit: [{cat: greed_harm, level: 3}, {cat: unjust_judgment, level: 2}]
         outcomes:
-          - {weight: 1, ok: true, text: "ผู้รับเหมาจ่ายไม่อั้น ได้เงินก้อนโตกว่าที่คิด แต่ต่อจากนี้เขามีหลักฐานกุมไว้ในมือ", effects: {money: {unit: income_x, amount: 3}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ผู้รับเหมาจ่ายไม่อั้น ได้เงินก้อนโตกว่าที่คิด แต่ต่อจากนี้เขามีหลักฐานกุมไว้ในมือ", effects: {money: {unit: income_x, amount: 3, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 2, text: "หักมุม เขาคือเจ้าหน้าที่ล่อซื้อ กุญแจมือคล้องข้อมือกลางออฟฟิศ ข่าวลงทั้งจังหวัด", effects: {job: labor, money: {unit: income_x, amount: -2}, happiness: -3, relations: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}], next: fraud_sting_bail_01}
       - id: refuse
         text: "ดันซองคืน ไม่เซ็น"
@@ -88,7 +88,7 @@ events:
         sets_flags: [took_bribe]
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
-          - {weight: 3, ok: true, text: "ได้สัญญามาครอง งานไหลเข้าต่อเนื่อง แต่ทุกงานต่อจากนี้ก็ต้องจ่ายแบบเดิม", effects: {income_mult: 1.3, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "ได้สัญญามาครอง งานไหลเข้าต่อเนื่อง แต่ทุกงานต่อจากนี้ก็ต้องจ่ายแบบเดิม", effects: {income_mult: 1.3, money: {unit: income_x, amount: 1, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "คนรับซองโดนจับก่อน แล้วซัดทอดรายชื่อคนจ่ายทั้งหมด ชื่อเราอยู่บรรทัดแรก", effects: {money: {unit: income_x, amount: -2}, happiness: -2, relations: -1}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: honest_bid
         text: "ยื่นราคาจริง ไม่จ่ายสักบาท"
@@ -123,14 +123,14 @@ events:
         hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
-          - {weight: 3, ok: true, text: "กำไรงอกขึ้นทุกวันโดยไม่มีใครทัก เงินเก็บเริ่มเป็นก้อน", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "กำไรงอกขึ้นทุกวันโดยไม่มีใครทัก เงินเก็บเริ่มเป็นก้อน", effects: {money: {unit: income_x, amount: 1, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "ลูกค้าหิ้วตาชั่งมาเทียบกลางตลาด ต่อหน้าคนทั้งซอย ของขาดไปเกือบขีด", effects: {happiness: -2, relations: -2}, sets_flags: [caught_fraud], next: fraud_scale_rumor_01, merit: [{cat: neutral}]}
       - id: mix_cheap
         text: "ผสมของเกรดต่ำลงไปด้วย"
         hint: "ราคา: บาปหนัก"
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
-          - {weight: 2, ok: true, text: "ต้นทุนลดฮวบ กำไรเกือบเท่าตัว ลูกค้ายังไม่รู้ตัว", effects: {money: {unit: income_x, amount: 2}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ต้นทุนลดฮวบ กำไรเกือบเท่าตัว ลูกค้ายังไม่รู้ตัว", effects: {money: {unit: income_x, amount: 2, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "ลูกค้ากินแล้วป่วยกันทั้งบ้าน ถูกฟ้องจนหมดตัว ต้องเลิกกิจการไปรับจ้างรายวัน", effects: {job: labor, money: {unit: income_x, amount: -3}, happiness: -2, relations: -2}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: honest_extra
         text: "ชั่งตรง แถมให้อีกนิด"
@@ -162,7 +162,7 @@ events:
         sets_flags: [embezzler]
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
-          - {weight: 3, ok: true, text: "ส่วนแบ่งเข้ามือทุกสิ้นเดือน เงินเก็บโตเร็วกว่าเงินเดือนเสียอีก", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, text: "ส่วนแบ่งเข้ามือทุกสิ้นเดือน เงินเก็บโตเร็วกว่าเงินเดือนเสียอีก", effects: {money: {unit: income_x, amount: 1, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "ฝ่ายตรวจนับสต็อกกะทันหัน ของขาดเป็นคันรถ ชื่อเราอยู่ทุกใบเบิก ถูกไล่ออกวันนั้นเลย", effects: {job: labor, money: {unit: income_x, amount: -1.5}, happiness: -2, relations: -1}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: swap_grade
         text: "แอบใช้ของเกรดต่ำแทนสเปก"
@@ -170,7 +170,7 @@ events:
         sets_flags: [embezzler]
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
-          - {weight: 2, ok: true, text: "ส่วนต่างราคาเข้ากระเป๋าเต็ม ๆ ของที่ส่งออกไปหน้าตาเหมือนเดิมทุกชิ้น", effects: {money: {unit: income_x, amount: 2}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ส่วนต่างราคาเข้ากระเป๋าเต็ม ๆ ของที่ส่งออกไปหน้าตาเหมือนเดิมทุกชิ้น", effects: {money: {unit: income_x, amount: 2, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "ของล็อตนั้นพังคามือลูกค้า ถูกเรียกคืนทั้งล็อต สืบมาถึงเรา ไล่ออกพร้อมโดนเรียกค่าเสียหาย", effects: {job: labor, money: {unit: income_x, amount: -2.5}, happiness: -2, relations: -1}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: refuse_sign
         text: "ไม่เซ็น เบิกตามจริง"
@@ -230,7 +230,7 @@ events:
         hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
-          - {weight: 2, ok: true, text: "หมุนทันพอดี คืนครบก่อนวันประชุม ยังมีกำไรติดมือ ไม่มีใครรู้", effects: {money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "หมุนทันพอดี คืนครบก่อนวันประชุม ยังมีกำไรติดมือ ไม่มีใครรู้", effects: {money: {unit: income_x, amount: 1, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 2, text: "หมุนไม่ทัน วันประชุมใหญ่มีคนขอดูสมุดบัญชี ตัวเลขห่างกันเป็นแสน", effects: {relations: -2, happiness: -2}, sets_flags: [embezzler, caught_fraud], next: fraud_village_meeting_01, merit: [{cat: neutral}]}
       - id: take_and_run
         text: "เอาเงินก้อนหนีเข้าเมือง"
@@ -238,7 +238,7 @@ events:
         sets_flags: [embezzler]
         merit: [{cat: greed_harm, level: 3}]
         outcomes:
-          - {weight: 2, text: "ได้เงินก้อนตั้งตัวใหม่ แต่กลับบ้านเกิดไม่ได้อีกแล้ว คนที่บ้านโทรมาร้องไห้ทุกเดือน", effects: {money: {unit: income_x, amount: 3}, relations: -3, happiness: -1}, schedules: [{event: echo_fraud_home_news_01, after_years: [10, 18]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้เงินก้อนตั้งตัวใหม่ แต่กลับบ้านเกิดไม่ได้อีกแล้ว คนที่บ้านโทรมาร้องไห้ทุกเดือน", effects: {money: {unit: income_x, amount: 3, grey: true}, relations: -3, happiness: -1}, schedules: [{event: echo_fraud_home_news_01, after_years: [10, 18]}], merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "ตำรวจตามเจอที่ห้องเช่าในอาทิตย์เดียว ต้องขายทุกอย่างใช้คืนพร้อมค่าทนาย", effects: {money: {unit: income_x, amount: -2}, relations: -3, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}], next: fraud_village_court_01}
       - id: open_books
         text: "ปิดประกาศบัญชีให้ทุกคนดู"
@@ -296,7 +296,7 @@ events:
         hint: "ราคา: บาปหนัก"
         merit: [{cat: oppress_subjects, level: 2}]
         outcomes:
-          - {weight: 2, ok: true, text: "โบนัสเข้าบัญชีตามสัญญา ลูกน้องเดินผ่านไม่ทักสักคำ", effects: {money: {unit: income_x, amount: 2}, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "โบนัสเข้าบัญชีตามสัญญา ลูกน้องเดินผ่านไม่ทักสักคำ", effects: {money: {unit: income_x, amount: 2, grey: true}, relations: -1}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "ลูกน้องรวมตัวร้องเรียน เจ้าของโยนความผิดมาให้คนเดียว ถูกไล่ออกไม่มีเงินชดเชย", effects: {job: labor, relations: -2, happiness: -2}, merit: [{cat: neutral}]}
       - id: ghost_staff
         text: "ใส่ชื่อลูกน้องผีเบิกเงินเดือน"
@@ -304,7 +304,7 @@ events:
         sets_flags: [embezzler]
         merit: [{cat: greed_harm, level: 3}, {cat: oppress_subjects, level: 1}]
         outcomes:
-          - {weight: 2, ok: true, text: "เงินเดือนของคนที่ไม่มีตัวตนเข้ากระเป๋าทุกเดือน ไม่มีใครเช็กรายชื่อ", effects: {money: {unit: income_x, amount: 2.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "เงินเดือนของคนที่ไม่มีตัวตนเข้ากระเป๋าทุกเดือน ไม่มีใครเช็กรายชื่อ", effects: {money: {unit: income_x, amount: 2.5, grey: true}}, merit: [{cat: neutral}], sets_flags: [dirty_money]}
           - {weight: 1, text: "ฝ่ายบัญชีคนใหม่โทรหาพนักงานทุกคนเพื่อยืนยันตัว ชื่อผีโผล่ครบ ถูกไล่ออกและแจ้งความ", effects: {job: labor, money: {unit: income_x, amount: -2}, relations: -2, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: share_cut
         text: "ลดเงินเดือนตัวเองแทนโอที"

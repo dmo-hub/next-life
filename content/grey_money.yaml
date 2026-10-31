@@ -1,0 +1,155 @@
+# เงินเทา (ใบ 36): การ์ดที่ตามเงินจากทางมืดมา — ถูกตรวจแล้วยึดบางส่วน · หาทางฟอกเข้าบัญชี
+# ผูกธง dirty_money (ติดคู่กับก้อนเงินเทาทุกก้อน) เพราะ when อ่านถุงเงินเทาไม่ได้ · ฟอกล็อกเองเมื่อถุงว่างหรือฟอกแล้วปีนี้
+# ทุกใบจึงมีทางอื่นที่กดได้เสมออย่างน้อย 3 ทาง · ยึดในการ์ดไม่เกินที่แกนยึดตอนถูกจับจริง (ถูกจับแรงกว่าถูกตรวจ)
+events:
+  - id: grey_audit_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [28, 59], flags: {has: [dirty_money]}}
+    title: "ตรวจบัญชีทรัพย์สิน"
+    text: "สรรพากรส่งหนังสือขอตรวจบัญชีย้อนหลัง ยอดเงินฝากหลายก้อนไม่ตรงกับรายได้ที่แจ้งไว้ทุกปี"
+    choices:
+      - id: tell_truth
+        text: "ชี้แจงตามจริงทุกบัญชี"
+        merit: [{cat: sila, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ตรวจรับคำชี้แจง ให้เสียภาษีย้อนหลังแล้วเรื่องจบ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เงินที่บอกที่มาไม่ได้ถูกอายัดไว้ส่วนหนึ่ง", effects: {grey_seize: 0.3, happiness: -1}, merit: [{cat: neutral}]}
+      - id: claim_inherit
+        text: "อ้างว่าเป็นมรดกตกทอด"
+        hint: "ราคา: บาปเบา"
+        merit: [{cat: cheat_exploit, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ตรวจพยักหน้า ไม่ขุดต่อ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีพินัยกรรมสักแผ่น เงินก้อนนั้นถูกอายัดครึ่งหนึ่ง", effects: {grey_seize: 0.5, happiness: -2}, merit: [{cat: neutral}]}
+      - id: hire_accountant
+        text: "จ้างนักบัญชีจัดเอกสารให้"
+        merit: [{cat: neutral}]
+        effects: {network: -1, happiness: -1}
+      - id: ignore_letter
+        text: "วางจดหมายไว้ก่อน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เรื่องเงียบหายไปเอง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หมายเรียกฉบับที่สองมาถึงบ้าน คนในบ้านเปิดอ่านก่อน", effects: {relations: -1, happiness: -2}, merit: [{cat: neutral}]}
+
+  - id: grey_ex_partner_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 3
+    when: {flags: {has: [dirty_money]}}
+    title: "เพื่อนเก่าปากโป้ง"
+    text: "เพื่อนที่รู้เรื่องเงินก้อนนั้นเมาแล้วเล่าในวงเหล้า คนในวงคนหนึ่งทำงานอยู่ ป.ป.ช."
+    choices:
+      - id: talk_down
+        text: "ไปคุยให้เพื่อนเงียบ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนสาบานว่าจำอะไรไม่ได้สักคำ", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนในวงจดชื่อคุณไว้แล้ว เงินบางส่วนถูกอายัดระหว่างสอบ", effects: {grey_seize: 0.3, happiness: -1}, merit: [{cat: neutral}]}
+      - id: let_it
+        text: "ทำเป็นไม่รู้เรื่อง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คนฟังคิดว่าเป็นเรื่องคนเมาเล่า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หนังสือเชิญไปให้ถ้อยคำมาถึง เงินบางส่วนถูกอายัด", effects: {grey_seize: 0.3, happiness: -2}, merit: [{cat: neutral}]}
+      - id: cut_ties
+        text: "ตัดขาดกับเพื่อนคนนั้น"
+        merit: [{cat: neutral}]
+        effects: {relations: -2, happiness: -1}
+      - id: tell_family
+        text: "เล่าให้คนที่บ้านฟังตามจริง"
+        merit: [{cat: sila, level: 1}]
+        effects: {relations: 1, happiness: -1}
+
+  - id: grey_land_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [28, 59], flags: {has: [dirty_money]}}
+    title: "ที่ดินในชื่อญาติ"
+    text: "นายหน้าเสนอที่ดินแปลงหนึ่ง บอกว่าโอนเข้าชื่อญาติได้ ไม่มีใครถามว่าเงินมาจากไหน"
+    choices:
+      - id: buy_relative
+        text: "ซื้อไว้ในชื่อน้อง"
+        hint: "ราคา: บาปเบา"
+        merit: [{cat: cheat_exploit, level: 1}]
+        effects: {grey_launder: 0.5}
+        outcomes:
+          - {weight: 2, ok: true, text: "โฉนดอยู่ในลิ้นชักของน้อง ทุกคนรู้ว่าเป็นของใคร", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลายปีต่อมาน้องเริ่มเรียกที่แปลงนั้นว่าของตัวเอง", effects: {relations: -2}, merit: [{cat: neutral}]}
+      - id: decline
+        text: "ไม่เอา เก็บเงินไว้อย่างเดิม"
+        merit: [{cat: neutral}]
+        effects: {happiness: -1}
+      - id: ask_lawyer
+        text: "ถามทนายก่อนตัดสินใจ"
+        merit: [{cat: neutral}]
+        effects: {knowledge: 1, network: -1}
+      - id: ask_home
+        text: "ปรึกษาคนที่บ้าน"
+        merit: [{cat: neutral}]
+        effects: {relations: 1}
+
+  - id: grey_front_shop_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [28, 59], flags: {has: [dirty_money]}}
+    title: "ร้านบังหน้า"
+    text: "เพื่อนแนะให้เปิดร้านเล็ก ๆ สักร้าน ขายได้จริงเท่าไรก็ได้ ใบเสร็จออกเท่าที่อยากให้เงินสะอาด"
+    choices:
+      - id: open_front
+        text: "เปิดร้านบังหน้าตามที่เพื่อนว่า"
+        hint: "ราคา: บาปเบา"
+        merit: [{cat: cheat_exploit, level: 1}]
+        effects: {grey_launder: 0.3, happiness: -1}
+      - id: refuse
+        text: "ไม่เอา กลัวเรื่องยาว"
+        merit: [{cat: neutral}]
+        effects: {health: 1}
+      - id: forget_it
+        text: "ลืมเงินก้อนนั้นไปก่อน"
+        merit: [{cat: neutral}]
+        effects: {happiness: 1, network: -1}
+      - id: ask_home
+        text: "ถามคนที่บ้านก่อน"
+        merit: [{cat: neutral}]
+        effects: {relations: 1}
+
+  - id: grey_temple_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 3
+    when: {flags: {has: [dirty_money]}}
+    title: "ทำบุญก้อนใหญ่"
+    text: "วัดใกล้บ้านกำลังสร้างโบสถ์ ใครถวายก้อนใหญ่ได้ชื่อจารึกบนป้าย ไม่มีใครถามว่าเงินมาจากไหน"
+    choices:
+      - id: big_donation
+        text: "ถวายก้อนใหญ่ในนามตัวเอง"
+        hint: "ราคา: บาปเบา"
+        merit: [{cat: cheat_exploit, level: 1}]
+        effects: {grey_launder: 0.2, network: 1}
+      - id: small_donation
+        text: "ทำบุญตามกำลังเงินเดือน"
+        merit: [{cat: dana, level: 1}]
+        effects: {happiness: 1}
+      - id: help_build
+        text: "ไปช่วยแรงสร้างโบสถ์"
+        merit: [{cat: help_others, level: 1}]
+        effects: {health: -1, relations: 1}
+      - id: stay_home
+        text: "ไม่ไปงานนี้"
+        merit: [{cat: neutral}]
+        effects: {happiness: -1}
