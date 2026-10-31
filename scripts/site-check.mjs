@@ -138,7 +138,7 @@ const contMiss = (html) => {
   return [...Object.values(CONT_REGIONS), ...Object.values(CONT_RACES), ...Object.values(ISEKAI_CAREERS)].filter((x) => !has(x.name)).map((x) => x.name);
 };
 const ROLE_TALK = /เทพธิดายื่นบทบาท|เลือกบทบาท|บทบาทตอนเกิด/;
-const newPages = { 'catalog ต่างโลก': noOld(cardsIsk), 'spoilers ต่างโลก': noOld(spoilIsk), otherworld: read('otherworld.html'), index: read('index.html'), about: read('about.html') };
+const newPages = { 'catalog ต่างโลก': noOld(cardsIsk), 'spoilers ต่างโลก': noOld(spoilIsk), otherworld: read('otherworld.html'), index: read('index.html'), about: read('about.html'), gdd: read('gdd.html') };
 const roleLeft = Object.entries(newPages).filter(([, h]) => ROLE_TALK.test(h)).map(([p]) => p);
 const spoilNew = noOld(spoilIsk);
 const contGone = contMiss(spoilNew);
