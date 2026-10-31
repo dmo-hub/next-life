@@ -23,6 +23,7 @@
     "repeat": "node harness/repeat.mjs --n 2000 --seed 1",
     "passive": "node harness/passive.mjs --n 2000 --seed 1",
     "botdiff": "node harness/botdiff.mjs --n 200 --seed 1",
+    "lifehash": "node harness/lifehash.mjs",
     "keep": "node harness/keep.mjs",
     "continuity": "node harness/continuity.mjs --n 4000 --seed 1 --min-next 80 --min-echo 28",
     "full": "node harness/full.mjs --n 20000 --seed 1",
