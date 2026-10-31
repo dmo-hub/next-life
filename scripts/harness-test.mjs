@@ -221,6 +221,56 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 04 บอทที่โฟกัสการเมืองครบ ได้ตำแหน่ง > 0', polOffice > 0, `${polOffice}/${polFocus}`);
 }
 
+// ใบ 05a: อาชีพต่างโลกนับปีเต็มด้วยกติกากลาง — สคริปต์บังคับโฟกัสทีละตา ไม่ใช้บอท
+{
+  const I = await import('../src/engine/isekai.mjs');
+  const base = loadContent();
+  // plan = [[โฟกัส, ตา], ...] นับตาตั้งแต่ตาที่เปลี่ยนเข้า (ตานั้นไม่นับปีเต็ม) · โฟกัสยังไม่เปิดในวัยนี้ = พักผ่อนรอ ไม่นับตา
+  // เหตุการณ์กดตัวเลือกแรก · การ์ดเตือนกดฝืนต่อ ⇒ โฟกัสไม่ถูกเปลี่ยนนอกแผน
+  const planned = (seed, plan) => {
+    const isk = I.startIsekai({ seed });
+    let seg = 0, left = plan[0][1];
+    const want = () => plan[seg][0];
+    const hold = (c) => I.chooseIsekai(isk, isk.focusOffers.includes(want()) ? isk.focusOffers.indexOf(want()) : isk.focusOffers.indexOf('rest'));
+    for (let g = 0; g < 3000 && seg < plan.length; g++) {
+      const c = I.nextIsekaiCard(isk);
+      if (c.step === 'end') return null;
+      if (c.step === 'world' || c.step === 'skill' || c.step === 'event') I.chooseIsekai(isk, 0);
+      else if (c.step === 'warn') I.chooseIsekai(isk, 1);
+      else if (c.step === 'focus') hold(c);
+      else if (c.step === 'tick') {
+        if (c.years !== 1) return null;
+        if (isk.focus === want() && --left === 0 && ++seg < plan.length) left = plan[seg][1];
+        if (seg < plan.length && isk.focus !== want()) hold(c);
+      }
+    }
+    return isk;
+  };
+  // ชาติแรกที่รอดครบแผน (สคริปต์ไม่หนีความตาย) — หาไม่เจอใน 50 seed = โยนให้ด่านพัง (ข้อ "ไม่ได้อาชีพ" จะผ่านลอย ๆ ไม่ได้)
+  const run = (plan) => {
+    for (let s = 1; s <= 50; s++) {
+      const isk = planned(s, plan);
+      if (isk) return isk.careers ?? [];
+    }
+    throw new Error(`ใบ 05a ไม่มีชาติรอดครบแผน ${JSON.stringify(plan)}`);
+  };
+  const has = (plan, c) => run(plan).includes(c);
+  check('ใบ 05a ปีอาชีพต่างโลก = chain_years โลกหลัก', I.ISEKAI_CAREER_T.years === base.focus.chain_years, `${I.ISEKAI_CAREER_T.years} · ${base.focus.chain_years}`);
+  check('ใบ 05a ปีที่เปลี่ยน + 2 ปีเต็ม = ยังไม่ได้อาชีพ', !has([['sword', 3]], 'swordsman'), run([['sword', 3]]).join(' · '));
+  check('ใบ 05a ปีที่เปลี่ยน + 3 ปีเต็ม = นักดาบ', has([['sword', 4]], 'swordsman'));
+  check('ใบ 05a สะสมไม่ติดกันครบ 3 = นักดาบ', has([['sword', 3], ['rest', 2], ['sword', 2]], 'swordsman'));
+  check('ใบ 05a สลับไปกลับแต่ปีเต็มไม่ครบ = ยังไม่ได้', !has([['sword', 2], ['rest', 2], ['sword', 2]], 'swordsman'));
+  const five = [['magic', 'mage'], ['work', 'merchant'], ['explore', 'adventurer'], ['alms', 'priest']];
+  check('ใบ 05a อาชีพอื่นครบ 3 ปีเต็มได้ทุกตัว', five.every(([f, c]) => has([[f, 4]], c)), five.filter(([f, c]) => !has([[f, 4]], c)).map(([, c]) => c).join(' · ') || 'ครบ');
+  check('ใบ 05a ต้นทางรวมกัน (ทำงาน 2 + เดินทาง 2 ไม่ใช่สายเดียวกัน) ไม่ได้', !has([['work', 3], ['roam', 3]], 'merchant') && !has([['work', 3], ['roam', 3]], 'adventurer'));
+  // ตัวควบคุมฝั่งตก: เกณฑ์ปี ∞ ⇒ ไม่มีใครได้อาชีพ (ด่านข้างบนจับได้)
+  const keep = I.ISEKAI_CAREER_T.years;
+  I.ISEKAI_CAREER_T.years = Infinity;
+  const inf = run([['sword', 20]]);
+  I.ISEKAI_CAREER_T.years = keep;
+  check('ใบ 05a ตัวควบคุม: เกณฑ์ ∞ = 0 อาชีพ', inf.length === 0, inf.join(' · '));
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {

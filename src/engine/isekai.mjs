@@ -9,6 +9,7 @@ import { makeRng, mixSeed } from './rng.mjs';
 import { newLedger, recordMerit, ledgerLevel, meritId, SIN_CATS } from './merit.mjs';
 import { hintLevel } from './court.mjs';
 import { WARN, crossedLow, warnCard } from './warn.mjs';
+import { FOCUS_FLOW, focusSet, focusYearEnd } from './focus.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค' };
 export const ISEKAI_FX = { hp: 'ชีวิต', str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
@@ -243,6 +244,29 @@ export const ISEKAI_FOCUS = {
     lines: ['รับจ้างแบกของที่ท่าเรือทั้งปี', 'ทำงานที่โรงเตี๊ยมจนรู้จักลูกค้าทุกคน', 'เก็บเงินได้อีกถุงหนึ่ง'] },
   rest: { name: 'พักผ่อนอยู่บ้าน', gain: { hp: 6, joy: 6 },
     lines: ['นอนตื่นสาย จิบชาร้อนดูฝนตก', 'ปลูกผักหน้าบ้านกับเลี้ยงไก่สามตัว', 'ปีนี้ไม่ได้ทำอะไรนอกจากพักให้หายเหนื่อย'] },
+  // 5 ตัวใหม่ (05a · เจ้าของเคาะชุดแนะนำ) ต่อท้าย ⇒ ลำดับตัวเดิมบนใบทุ่มเทไม่เลื่อน · merit = บุญต่อปีเต็มที่ทุ่มเท
+  fame: { name: 'สร้างชื่อเสียง', gain: { cha: 1, fame: 0.5 }, tag: 'talk',
+    lines: ['รับงานที่คนอื่นไม่กล้ารับจนชื่อไปถึงเมืองข้าง ๆ', 'เล่าเรื่องตัวเองในโรงเตี๊ยมจนนักกวีเอาไปแต่งเพลง', 'ไปทุกงานเลี้ยงที่ขุนนางเชิญ'] },
+  mate: { name: 'หาคู่', stages: ['teen', 'adult', 'middle'], gain: { cha: 0.5, joy: 3 }, tag: 'talk',
+    lines: ['แต่งตัวไปงานเทศกาลทุกงาน', 'เขียนจดหมายถึงคนที่แอบชอบแต่ไม่กล้าส่ง', 'ไปนั่งร้านเดิมทุกเย็นเผื่อเจอคนเดิม'] },
+  kin: { name: 'ดูแลครอบครัว', stages: ['adult', 'middle', 'old'], gain: { hp: 3, joy: 4 },
+    lines: ['ซ่อมหลังคาบ้านก่อนหน้าฝน', 'สอนเด็ก ๆ ในบ้านอ่านหนังสือทุกค่ำ', 'ทำอาหารมื้อใหญ่ให้ทั้งบ้านทุกวันหยุด'] },
+  alms: { name: 'ทำทาน', gain: { gold: -20, fame: 0.3 }, merit: { cat: 'dana', level: 1 },
+    lines: ['แบ่งขนมปังให้เด็กข้างถนนทุกเช้า', 'บริจาคทองให้วิหารซ่อมหลังคา', 'ตั้งหม้อซุปแจกคนเดินทางหน้าบ้าน'] },
+  explore: { name: 'สำรวจดินแดน', stages: ['teen', 'adult', 'middle'], gain: { luk: 1, hp: -3 }, tag: 'sneak',
+    lines: ['เดินตามแม่น้ำขึ้นไปจนสุดต้นน้ำ', 'วาดแผนที่หุบเขาที่ยังไม่มีใครวาด', 'ข้ามช่องเขาที่คนแถวนี้บอกว่าไม่มีทางผ่าน'] },
+};
+
+// อาชีพตามโฟกัส (05a): โฟกัสต้นทางรวมกันสะสมปีเต็มครบ years ⇒ ได้อาชีพนั้นติดตัวทั้งชาติ · ได้หลายอาชีพพร้อมกันได้ (เจ้าของเคาะ)
+// ISEKAI_CAREER_T.years = chain_years ของโลกหลัก (content/rules/focus.yaml · เจ้าของเคาะใช้ค่าเดียวกัน — harness-test เทียบให้)
+// gain = ผลต่อปีของอาชีพ คิดแบบเดียวกับทุ่มเท · ว่าง = ยังเป็นป้าย (ตารางผลรอเจ้าของเคาะ)
+export const ISEKAI_CAREER_T = { years: 3 };
+export const ISEKAI_CAREERS = {
+  swordsman: { name: 'นักดาบ', from: ['sword'], gain: {} },
+  mage: { name: 'จอมเวท', from: ['magic'], gain: {} },
+  merchant: { name: 'พ่อค้า', from: ['work', 'k:trade'], gain: {} },
+  adventurer: { name: 'นักผจญภัย', from: ['roam', 'explore'], gain: {} },
+  priest: { name: 'นักบวช', from: ['alms', 'k:medic'], gain: {} },
 };
 
 // การ์ดเตือน HP (B161): "เปลี่ยนโฟกัส" เปิดใบทุ่มเทกลางช่วงวัยที่ชี้ทางฟื้นชีวิต · ร้านเติมทีหลัง
@@ -1711,6 +1735,25 @@ function isekaiGrow(isk, gain, units, kc = null) {
   }
 }
 
+// ปีเต็มของโฟกัส (05a): กติกากลางเดียวกับโลกหลัก — ปีที่เปลี่ยนไม่นับ · สะสมไม่ต้องติดกัน · ตาวัยชราเดินทีละหลายปี นับทุกปีของตา
+// ช่วงวัย/ทางลัดคุมที่ใบทุ่มเทแล้ว ที่นี่นับปีอย่างเดียว · คืนอาชีพที่ได้ใหม่ในตานี้ (ผลเริ่มตาถัดไป · คิดใน isekaiYear)
+function isekaiFocusCount(isk, from, units) {
+  const p = isekaiPace(isk);
+  // เซฟก่อน 05a ไม่มีอายุที่เปลี่ยน — เริ่มนับจากตานี้
+  isk.focusAt ??= from;
+  const def = isekaiFocusDef(isk, isk.focus);
+  const had = isk.careers ?? [];
+  for (let i = 0; i < units; i++) {
+    const n = isk.focusYears?.[isk.focus] ?? 0;
+    focusYearEnd(isk, { [isk.focus]: {} }, null, () => true, from + i * p);
+    if (def.merit && (isk.focusYears?.[isk.focus] ?? 0) > n) recordMerit(isk.ledger, [def.merit], isk.focus);
+  }
+  const ys = isk.focusYears ?? {};
+  const hired = Object.keys(ISEKAI_CAREERS).filter((c) => !had.includes(c) && ISEKAI_CAREERS[c].from.reduce((s, id) => s + (ys[id] ?? 0), 0) >= ISEKAI_CAREER_T.years);
+  if (hired.length) isk.careers = [...had, ...hired];
+  return hired;
+}
+
 // หนึ่งตา: HP ฟื้น (ก่อนชรา) หรือเสื่อมแรงขึ้นทุกปี (หลังชรา) → ทุ่มเท → ใจกลับเข้ากลาง → อายุเดิน
 // ฟื้นก่อนทุ่มเท ⇒ สิ่งที่ทุ่มเทที่กิน HP (เดินทางเสี่ยงโชค) ทำให้ตายได้จริง ไม่ถูกฟื้นกลบท้ายตา
 // เสื่อมคูณด้วยความสุข: สุขดีแก่ช้า · พ้นวัยชราเกิน cap ปี ร่างหมดแรงแน่ ชีวิตจึงจบเสมอ
@@ -1727,6 +1770,8 @@ function isekaiYear(isk) {
   }
   const fd = isekaiFocusDef(isk, isk.focus);
   isekaiGrow(isk, fd.gain, units, fd.kc);
+  // ผลอาชีพ (05a) คิดพร้อมทุ่มเท ก่อนเพดานอายุ — คิดหลังเพดานแล้ว HP บวกชุบร่างที่หมดแรงให้อยู่ไม่จบ
+  for (const c of isk.careers ?? []) isekaiGrow(isk, ISEKAI_CAREERS[c].gain, units);
   isk.inner.joy = isekaiClamp(isk.inner.joy + (50 - isk.inner.joy) * Math.min(1, 0.1 * units), 0, 100);
   isk.age += units * p;
   if (isk.age >= oldAt + T.cap * p) isk.st.hp = 0;
@@ -1792,7 +1837,7 @@ export function isekaiStatus(isk) {
   const r = roleInfo(isk.role);
   // ค่าภายในเก็บทศนิยม (ฝึกทีละนิด) — หน้าต่างสถานะเห็นจำนวนเต็ม · HP ปัดขึ้น ยังไม่ตายไม่เห็น 0
   const st = Object.fromEntries(Object.entries(isk.st).map(([k, v]) => [k, k === 'hp' ? Math.ceil(v) : Math.round(v)]));
-  return { name: isk.name, world: r.name, goalName: r.goal, ...st, skills: isk.skills.map((s) => ISEKAI_SKILLS[s].name), age: isk.age, stage: isekaiStageOf(isk).name, focus: isk.focus ? isekaiFocusDef(isk, isk.focus).name : null };
+  return { name: isk.name, world: r.name, goalName: r.goal, ...st, skills: isk.skills.map((s) => ISEKAI_SKILLS[s].name), age: isk.age, stage: isekaiStageOf(isk).name, focus: isk.focus ? isekaiFocusDef(isk, isk.focus).name : null, careers: (isk.careers ?? []).map((c) => ISEKAI_CAREERS[c].name) };
 }
 
 export const ISEKAI_HIGHLIGHTS = 3;
@@ -1904,7 +1949,7 @@ export function nextIsekaiCard(isk) {
   if (isk.step === 'focus' || isk.stageShown !== stage.id) {
     isk.step = 'focus';
     isk.focusOffers = isekaiFocusOffers(isk, stage);
-    if (!isk.focusOffers.includes(isk.focus)) isk.focus = null;
+    if (!isk.focusOffers.includes(isk.focus)) focusSet(isk, FOCUS_FLOW, isk.age);
     // ใบทุ่มเทใบแรกของชาติบอกว่าโลกนี้ยังจำอะไรจากคนต่างโลกรุ่นก่อน
     const past = isekaiLoreLine(isk);
     const remembered = !isk.stageShown && past ? ` ${past}` : '';
@@ -1921,6 +1966,7 @@ export function nextIsekaiCard(isk) {
   const before = { ...isk.st };
   const from = isk.age;
   const years = isekaiYear(isk);
+  const hired = isekaiFocusCount(isk, from, years / isekaiPace(isk));
   let revived = false;
   if (isk.st.hp <= 0) {
     // แก่จนสิ้นอายุไม่ใช่ความตายที่ย้อนเวลาได้
@@ -1949,7 +1995,7 @@ export function nextIsekaiCard(isk) {
   return isekaiCard(isk, {
     step: 'tick', title, text, age: from, years, stage: stage.name, deltas,
     ...(revived && { sys: 'เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว' }),
-    ...(!revived && opened.length && { sys: `ความรู้จากโลกเดิมมากพอแล้ว ทุ่มเทได้อีกทาง · ${opened.map((id) => isekaiFocusDef(isk, id).name).join(' · ')}` }),
+    ...(!revived && (opened.length || hired.length) && { sys: [hired.length && `ได้เป็น${hired.map((c) => ISEKAI_CAREERS[c].name).join(' · ')}แล้ว`, opened.length && `ความรู้จากโลกเดิมมากพอแล้ว ทุ่มเทได้อีกทาง · ${opened.map((id) => isekaiFocusDef(isk, id).name).join(' · ')}`].filter(Boolean).join(' · ') }),
     focus: isk.focusOffers.indexOf(isk.focus),
     focusChoices: isk.focusOffers.map((id) => isekaiFocusDef(isk, id).name),
     focusFx: isk.focusOffers.map((id) => isekaiFocusFx(isk, id)),
@@ -2016,7 +2062,7 @@ export function chooseIsekai(isk, idx) {
   if (isk.step === 'focus' || isk.step === 'tick') {
     const f = isk.focusOffers[idx];
     if (!f) throw new Error('ตัวเลือกไม่ถูกต้อง');
-    isk.focus = f;
+    focusSet(isk, f, isk.age);
     if (isk.step === 'focus') {
       isk.stageShown = isekaiStageOf(isk).id;
       isk.focusWarn = false;

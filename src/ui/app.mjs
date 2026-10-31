@@ -2021,6 +2021,8 @@ function isekaiStatusBox(s) {
   }
   box.append(grid, el('div', null, `ทอง ${s.gold.toLocaleString('en-US')} · ชื่อเสียง ${s.fame} · ${s.world}`));
   box.append(el('div', null, `อายุ ${s.age} · ${s.stage}${s.focus ? ` · ทุ่มเทกับ${s.focus}` : ''}`));
+  // อาชีพตามโฟกัส (05a) — เซฟก่อนมีอาชีพไม่มีช่องนี้
+  if (s.careers?.length) box.append(el('div', null, `อาชีพ ${s.careers.join(' · ')}`));
   if (s.skills.length) {
     const chips = el('div', 'ichips');
     for (const name of s.skills) chips.append(el('span', 'ichip', name));
