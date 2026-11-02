@@ -2,9 +2,9 @@
 // · หน้ารวมการ์ดไม่มีผล/บุญบาป/น้ำหนัก · ทุกการ์ดใน content อยู่บนหน้ารวมการ์ด
 // · ส่วนต่างโลก (B88b) ทั้งสองหน้าครบทุกการ์ด · หน้ารวมการ์ดไม่มีผลสำเร็จ/พลาด ความยาก หรือตอนจบ
 // · หน้าเฉลย (B88) ครบทุกการ์ด/ตัวเลือก/ผลสุ่ม และเฉลยจริง — กฎ "ไม่หลุดบุญบาป" ของหน้ารวมการ์ดไม่ใช้กับหน้านี้
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
-import { siteFacts, injectFacts } from '../src/site/facts.mjs';
+import { siteFacts, injectFacts, readVersion, versionLines } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
 import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
 import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_ROLES, roleInfo, ISEKAI_SKILLS, ISEKAI_CAREERS, CONT_REGIONS, CONT_RACES, CONT_END, contBirth, makeRng } from '../src/engine/index.mjs';
@@ -191,6 +191,19 @@ const notes = read('whatsnew.html');
 const vers = [...notes.matchAll(/<h3>(v\d+\.\d+\.\d+)/g)].map((m) => [m[1], m.index + 4]);
 const early = vers.filter(([v, at]) => notes.search(new RegExp(`${v.replace(/\./g, '\\.')}(?!\\d)`)) !== at).map(([v]) => v);
 check('เลขรุ่นในเกมเป็นลิงก์แพตช์โน้ต และหัวข้อแต่ละรุ่นเป็นจุดแรกที่เลขนั้นโผล่', !play.includes('whatsnew.html#:~:text=') || !play.includes('<a id="appVer"') || !vers.length || early.length, ` ${vers.length} รุ่น${early.length ? ` · โผล่ก่อนหัวข้อ: ${early.slice(0, 5).join(' ')}` : ''}`);
+
+// 9a) เลขเวอร์ชันมีที่เดียว (src/version.json): ซอร์สอื่นใต้ src/ ไม่ถือเลข ไม่งั้น bump ต้องแก้หลายไฟล์และชนกันตอน merge · เกมที่ build แล้วใช้เลขจากไฟล์นั้น
+// ตัวควบคุม: ใส่บรรทัดเลขกลับใน app.mjs · เกมที่ build จากเลขอื่น ⇒ ต้องถูกจับทั้งคู่
+const ver = readVersion();
+const verRe = new RegExp(`APP_(?:VERSION|BUILD)\\s*=\\s*['"\`]|${ver.version.replace(/\./g, '\\.')}(?!\\d)`);
+const srcRoot = new URL('../src/', import.meta.url);
+const srcFiles = readdirSync(srcRoot, { recursive: true }).map((f) => f.replace(/\\/g, '/')).filter((f) => /\.(mjs|html)$/.test(f));
+const verHeld = (files) => files.filter(([, text]) => verRe.test(text)).map(([f]) => f);
+const srcTexts = srcFiles.map((f) => [f, readFileSync(new URL(f, srcRoot), 'utf8')]);
+const held = verHeld(srcTexts);
+const playVer = (html, v) => html.includes(versionLines(v));
+const verCtl = verHeld([['ui/app.mjs', `${appSrc}\nconst APP_VERSION = '${ver.version}';`]]).length > 0 && !playVer(play, { ...ver, version: 'v0.0.00' });
+check('เลขเวอร์ชันอยู่ที่ src/version.json ที่เดียว และเกมใช้เลขนั้น', held.length || !playVer(play, ver) || !verCtl, ` ${ver.version} · ${ver.build} · ซอร์ส ${srcTexts.length} ไฟล์${held.length ? ` · ถือเลขเอง: ${held.join(' ')}` : ''}${playVer(play, ver) ? '' : ' · play.html ไม่ได้ build จากเลขนี้'} · ตัวควบคุม${verCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 9b) เกมเปิดออฟไลน์ได้: ฟอนต์ฝังครบทุกแบบที่หน้าใช้ ไม่ดึงจากเว็บอื่น · ตัวควบคุม: หน้าที่ยังมี <link> Google Fonts ต้องถูกจับ
 const PLAY_FACES = ['Pridi 400', 'Pridi 600', 'Sarabun 400', 'Sarabun 600', 'Srisakdi 700'];

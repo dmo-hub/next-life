@@ -6,16 +6,20 @@ import { isekaiCardCount } from './otherworld.mjs';
 
 const th = (n) => n.toLocaleString('en-US');
 
-export function siteFacts(content, appSrc = readFileSync(new URL('../ui/app.mjs', import.meta.url), 'utf8')) {
-  const pick = (re) => appSrc.match(re)?.[1] ?? '';
+// เลขเวอร์ชันอยู่ไฟล์นี้ไฟล์เดียว: bump แก้แค่ไฟล์นี้ · build ฉีดเข้าเกม (versionLines) และหน้าเว็บ (data-fact) ⇒ ไม่มีซอร์สอื่นถือเลขให้ชนกันตอน merge
+export const VERSION_FILE = new URL('../version.json', import.meta.url);
+export const readVersion = () => JSON.parse(readFileSync(VERSION_FILE, 'utf8'));
+export const versionLines = ({ version, build }) => `const APP_VERSION = ${JSON.stringify(version)};\nconst APP_BUILD = ${JSON.stringify(build)};\n`;
+
+export function siteFacts(content, ver = readVersion()) {
   const era = content.era;
   // ใบศาลเฉียดตาย (B153) ใช้ stage ระหว่างชาติแต่ออกกลางชีวิต — นับเป็นการ์ดช่วงมีชีวิต ไม่ใช่ฉากปรโลก
   const life = content.events.filter((e) => e.stage !== 'ระหว่างชาติ' || COURT_SCENES.includes(e.scene));
   const regions = era.birth.regions;
   const lottery = content.events.filter((e) => e.belief?.kind === 'lottery_numen').map((e) => e.belief);
   return {
-    version: pick(/APP_VERSION = '([^']+)'/),
-    build: pick(/APP_BUILD = '([^']+)'/),
+    version: ver.version,
+    build: ver.build,
     yearFrom: String(era.births.from),
     futureFrom: String(era.future.recent),
     yearTo: String(era.births.from + era.births.w.length - 1),
