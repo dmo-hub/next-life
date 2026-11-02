@@ -140,14 +140,98 @@ function focusBar(card, open = false) {
   return wrap;
 }
 
-function statHelp() {
-  const d = el('details', 'stat-help');
-  d.append(el('summary', null, 'ค่าสถานะเหล่านี้หมายถึงอะไร?'));
-  const dl = el('dl');
-  for (const [k, v] of STAT_HELP) dl.append(el('dt', null, k), el('dd', null, v));
-  d.append(dl);
-  return d;
+// แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทย · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
+// ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ · ปุ่มที่แผงยังไม่ลง (ใบ 05–08) เป็นปุ่มจางให้เห็นโครงเมนูครบ
+const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบครัว'], ['money', 'เงิน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
+function lifeMenu(card, box) {
+  // การ์ดใหม่วาดทับทั้ง root แผงเดิมหายไปด้วยแล้ว
+  sheetClose = null;
+  const nav = el('nav', 'mnav');
+  nav.setAttribute('aria-label', 'เมนู');
+  const sheets = { me: () => mePanel(card) };
+  for (const [id, label] of LIFE_MENU) {
+    const b = el('button', null);
+    b.type = 'button';
+    b.dataset.menu = id;
+    b.append(el('span', null, label));
+    if (sheets[id]) {
+      b.setAttribute('aria-expanded', 'false');
+      b.onclick = () => (root.querySelector('.sheet') ? closeSheet() : openSheet(label, sheets[id](), box, b));
+    } else {
+      b.disabled = true;
+      b.append(el('small', null, 'เร็ว ๆ นี้'));
+    }
+    nav.append(b);
+  }
+  return nav;
 }
+// การ์ดใต้แผงเป็น inert: แตะหรือปุ่มลัดตัวเลขไม่ไปเลือกตัวเลือกที่ถูกบังอยู่ · Esc หรือกดปุ่มเมนูเดิมซ้ำ = ปิด
+let sheetClose = null;
+function openSheet(title, content, box, from) {
+  const sheet = el('section', 'sheet');
+  sheet.setAttribute('role', 'dialog');
+  sheet.setAttribute('aria-modal', 'true');
+  sheet.setAttribute('aria-label', title);
+  const head = el('div', 'sheet-h');
+  const shut = el('button', 'sheet-x', 'กลับไปการ์ด');
+  shut.type = 'button';
+  head.append(el('h2', null, title), shut);
+  sheet.append(head, content);
+  sheetClose = () => {
+    sheet.remove();
+    box.inert = false;
+    from.setAttribute('aria-expanded', 'false');
+    sheetClose = null;
+    from.focus();
+  };
+  shut.onclick = closeSheet;
+  box.inert = true;
+  from.setAttribute('aria-expanded', 'true');
+  root.append(sheet);
+  shut.focus();
+}
+const closeSheet = () => sheetClose?.();
+
+// แผงตัวฉัน: ค่าเต็มคู่คำอธิบาย · โฟกัส · ฐานะและงาน (ย้ายมาจากใต้แถบสถานะของการ์ด) · ไม่มีลูกศรปีนี้ — ลูกศรอยู่บนแถบสถานะที่เดียว
+// การ์ดตายเปิดได้เหมือนกัน เห็นค่าตอนจากไป แต่ไม่มีโฟกัส (ชีวิตจบแล้ว)
+function mePanel(card) {
+  const s = statsOf(st);
+  const help = new Map(STAT_HELP);
+  const wrap = el('div', 'me');
+  const ul = el('ul', 'me-m');
+  for (const k of SHOWN_STATS) {
+    const v = Math.round(s[k]);
+    const li = el('li', k === 'health' && v <= HEALTH_WARN && !st.dead ? 'low' : null);
+    const head = el('span', 'mh');
+    head.append(el('span', 'mk', STAT_LABELS[k]), el('b', 'num', String(v)));
+    const track = el('span', 'br');
+    const fill = el('i');
+    fill.style.width = `${v}%`;
+    track.append(fill);
+    li.append(head, track);
+    if (help.has(STAT_LABELS[k])) li.append(el('p', null, help.get(STAT_LABELS[k])));
+    ul.append(li);
+  }
+  const shown = new Set(SHOWN_STATS.map((k) => STAT_LABELS[k]));
+  const dl = el('dl');
+  for (const [k, v] of STAT_HELP) if (!shown.has(k)) dl.append(el('dt', null, k), el('dd', null, v));
+  wrap.append(el('h3', null, 'ค่าสถานะ'), ul, dl);
+  if (!st.dead && card.kind !== 'death') wrap.append(el('h3', null, 'โฟกัส'), focusBar(card));
+  const meta = el('p', 'meta');
+  metaLine(meta, standParts(card));
+  wrap.append(el('h3', null, 'ฐานะและงาน'), meta);
+  return wrap;
+}
+// ช่วงเรียน ป้ายเรียนแทนช่อง "กำลังเรียน…" ที่บอกเรื่องเดียวกัน · เป้าหมายอื่นต่อท้ายบรรทัดฐานะ
+// ฐานะ ณ ปีนี้ (ตัวเดียวกับที่การ์ดเช็กชนชั้น) ไม่ใช่ชนชั้นตอนเกิด — ฐานะตอนเกิดยังดูได้ที่กราฟฐานะตระกูล
+function standParts(card) {
+  if (card.kind === 'death') return [`ฐานะ${classNow(st)}`, card.job, st.edu && `วุฒิ${st.edu}`].filter(Boolean);
+  const goal = nextGoal(st);
+  const school = goal && schoolOf(st) !== 'none';
+  return [`ฐานะ${classNow(st)}`, school ? goal : jobText(st, card.age), goal && !school && goal].filter(Boolean);
+}
+// จอแคบให้ตัดบรรทัดได้แค่ที่ตัวคั่น — เบราว์เซอร์ตัดคำไทยกลาง "ราย|ได้" ได้แม้เว้นวรรคแบบไม่ตัด จึงต้องห่อ span
+const metaLine = (row, parts) => parts.forEach((t, i) => row.append(...(i ? [' · '] : []), el('span', null, t)));
 
 // ป้ายแกนเงินสั้นพอวางข้างกราฟ: 15k · 1.2 ล้าน
 function shortBaht(v) {
@@ -1388,6 +1472,10 @@ document.addEventListener('keydown', (e) => {
   const t = e.target;
   if (t.closest?.('input, textarea, select, [contenteditable]')) return;
   let b;
+  if (e.key === 'Escape' && sheetClose) {
+    e.preventDefault();
+    return closeSheet();
+  }
   const book = root.querySelector('.lifebook');
   if (book && (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
     // Space บนปุ่มที่โฟกัสอยู่ให้ปุ่มนั้นทำงานเอง ไม่งั้นกดทีเดียวพลิกสองครั้ง
@@ -1400,8 +1488,8 @@ document.addEventListener('keydown', (e) => {
   } else if (/^[1-9]$/.test(e.key)) {
     b = root.querySelector(`.choices [data-key="${e.key}"]`);
   }
-  // การ์ดที่พับไว้ (B117) ปุ่มยังอยู่ใน DOM แค่ซ่อน — ปุ่มลัดต้องไม่กดปุ่มที่มองไม่เห็น
-  if (!b || b.disabled || b.closest('[hidden]')) return;
+  // การ์ดที่พับไว้ (B117) ปุ่มยังอยู่ใน DOM แค่ซ่อน — ปุ่มลัดต้องไม่กดปุ่มที่มองไม่เห็น · การ์ดใต้แผงเมนู (inert) ก็เช่นกัน
+  if (!b || b.disabled || b.closest('[hidden], [inert]')) return;
   e.preventDefault();
   b.click();
 });
@@ -1764,8 +1852,6 @@ function render(card) {
     if (st.gen === 1) choices.append(inviteButton());
   } else {
     box.append(statusBar(card, s));
-    if (!st.dead) box.append(focusBar(card));
-    box.append(statHelp());
     // ไม่มีรายได้ก็ต้องเห็นเงินติดตัวเสมอแม้ 0 · มีงานทำแล้วซ่อนเงินติดตัวเฉพาะตอนเป็น 0 พอดี ติดลบ (หนี้) ยังต้องเห็น
     // เงินกู้เป็นยอดค้างของสัญญา ไม่ใช่เงินติดตัวติดลบ จึงแยกช่อง ไม่หักรวมกัน
     const working = isWorking(st, card.age);
@@ -1777,20 +1863,11 @@ function render(card) {
       // เงินเทาแยกถุง ใช้จ่ายไม่ได้จนกว่าฟอก — แสดงเป็นตัวเลขให้เห็นว่าเสียไปเท่าไรตอนถูกยึด
       st.grey > 0 && `เงินเทา ${baht(st.grey)}`,
     ].filter(Boolean);
-    // ช่วงเรียน ป้ายเรียนแทนช่อง "กำลังเรียน…" ที่บอกเรื่องเดียวกัน · เป้าหมายอื่นต่อท้ายบรรทัดฐานะ ไม่ปนบรรทัดเงิน
-    const goal = nextGoal(st);
-    const school = goal && schoolOf(st) !== 'none';
-    // ฐานะ ณ ปีนี้ (ตัวเดียวกับที่การ์ดเช็กชนชั้น) ไม่ใช่ชนชั้นตอนเกิด — ฐานะตอนเกิดยังดูได้ที่กราฟฐานะตระกูล
-    // จอแคบให้ตัดบรรทัดได้แค่ที่ตัวคั่น — เบราว์เซอร์ตัดคำไทยกลาง "ราย|ได้" ได้แม้เว้นวรรคแบบไม่ตัด จึงต้องห่อ span
-    const meta = el('div', 'meta');
-    const line = (row, parts) => parts.forEach((t, i) => row.append(...(i ? [' · '] : []), el('span', null, t)));
-    line(meta, [`ฐานะ${classNow(st)}`, school ? goal : jobText(st, card.age), goal && !school && goal].filter(Boolean));
-    box.append(meta);
-    // เรื่องเงินแยกบรรทัดของตัวเอง ไอคอนนำหน้าให้กวาดตาเจอ
+    // ฐานะ/งานย้ายไปแผงตัวฉัน (ui-redo ใบ 04) · เรื่องเงินยังเป็นบรรทัดของตัวเอง ไอคอนนำหน้าให้กวาดตาเจอ
     if (purse.length) {
       const money = el('div', 'meta money');
       money.insertAdjacentHTML('beforeend', MONEY_ICON);
-      line(money, purse);
+      metaLine(money, purse);
       box.append(money);
     }
     box.append(cardTabs());
@@ -1869,7 +1946,7 @@ function render(card) {
     }
   }
   box.append(body, choices);
-  root.append(panels(box));
+  root.append(panels(box), lifeMenu(card, box));
   fxCard(box, card);
 }
 
