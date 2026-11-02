@@ -317,6 +317,39 @@ const f2 = (v) => v.toFixed(2);
   const never = moved([[M.focus, keepM + 6]]);
   M.years = keepM;
   check('ใบ 06c-1 ตัวควบคุม: เกณฑ์ ∞ = 0 ใบทางแยก', never.seen.length === 0, `${never.seen.length} ใบ`);
+
+  // ใบ 06c-2 กองทวีป: ด่าน contDeckWrong (harness/continent.mjs · ตัวเดียวกับ harness/isekai) ต้องจับตัวกรองแกนที่เปิดทิ้ง
+  // เล่นกดตัวเลือกแรกที่ไม่ล็อกทุกใบ (ทางแยก = ย้าย ⇒ แคว้นเปลี่ยนกลางชาติ) · ตัดสินด้วยแคว้นตอนที่การ์ดออก
+  const { contDeckWrong } = await import('../harness/continent.mjs');
+  const deckRun = (legacy = false, n = 400) => {
+    let wrong = 0, seen = 0;
+    for (let s = 1; s <= n; s++) {
+      const isk = I.startIsekai({ seed: s, legacy });
+      for (let g = 0; g < 400; g++) {
+        const c = I.nextIsekaiCard(isk);
+        if (c.step === 'end') break;
+        const ev = c.step === 'event' && I.ISEKAI_EVENTS.find((e) => e.id === c.id);
+        if (ev && (ev.regions || ev.dispute || ev.power)) {
+          seen++;
+          if (contDeckWrong(isk, ev, isk.region)) wrong++;
+        }
+        if (c.choices.length) I.chooseIsekai(isk, c.step === 'warn' ? 1 : Math.max(0, (c.locked ?? []).findIndex((x) => !x)));
+      }
+    }
+    return { wrong, seen };
+  };
+  const deckReal = deckRun();
+  check('ใบ 06c-2 กองทวีปมาถูกแคว้น/ชาติ', deckReal.seen > 0 && deckReal.wrong === 0, `เห็น ${deckReal.seen} · ผิดที่ ${deckReal.wrong}`);
+  const deckOld = deckRun(true);
+  check('ใบ 06c-2 ชาติเก่า (มีบทบาท) ไม่เห็นกองทวีป', deckOld.seen === 0, `${deckOld.seen} ใบ`);
+  // ตัวควบคุมฝั่งตก: เปิดตัวกรองทีละกอง ⇒ การ์ดกองนั้นออกผิดที่ ด่านข้างบนต้องเห็น
+  for (const k of Object.keys(I.CONT_DECK)) {
+    const keepFit = I.CONT_DECK[k].fit;
+    I.CONT_DECK[k].fit = () => true;
+    const open = deckRun();
+    I.CONT_DECK[k].fit = keepFit;
+    check(`ใบ 06c-2 ตัวควบคุม: เปิดตัวกรอง ${k} ⇒ ผิดที่ > 0`, open.wrong > 0, `ผิดที่ ${open.wrong}`);
+  }
 }
 
 // ใบ 06a: ด่านทวีปจับตัวสุ่ม/แผนที่ที่พังได้ (ตัวควบคุม) — ป้อนของพังเข้า contChecks ตรง ๆ ไม่แก้ข้อมูลจริง

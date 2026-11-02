@@ -6,7 +6,9 @@ import { esc, text as rawText } from './catalog.mjs';
 
 // เหตุการณ์ตำนาน (B68i) เรียกชื่อคนต่างโลกรุ่นก่อนตอนเล่น — หน้าเว็บแสดงเป็นช่องชื่อแบบเดียวกับ {ชื่อชาติก่อน}
 // site-check เทียบหน้ารวมการ์ดด้วยตัวนี้ตัวเดียวกัน ข้อความที่มีช่องชื่อจึงตรงกับที่หน้าแสดง
-export const text = (s) => rawText(s.replaceAll('{legend}', '{ชื่อคนในตำนาน}'));
+// ตัวแทนของกองทวีป (06c-2) เป็นชื่อแคว้น/ข้อพิพาทที่สุ่มต่อชาติ — หน้าเว็บบอกว่าช่องนี้คืออะไร
+const CONT_PH = { land: 'แคว้นที่อยู่', major: 'มหาอำนาจ', falling: 'แคว้นขาลง', rising: 'แคว้นมาแรง', dispute: 'ข้อพิพาทของยุค' };
+export const text = (s) => rawText(Object.entries(CONT_PH).reduce((t, [k, v]) => t.replaceAll(`{${k}}`, `{${v}}`), s.replaceAll('{legend}', '{ชื่อคนในตำนาน}')));
 
 export const ISEKAI_SECTION = 'ต่างโลก';
 const sgn = (n) => (n > 0 ? `+${n}` : String(n).replace('-', '−'));
@@ -17,8 +19,9 @@ const stageSpan = (ch) => {
   const s = ISEKAI_STAGES.filter((g) => g.ch.some((c) => ch.includes(c)));
   return s.length ? (s.length > 1 ? `${s[0].name}–${s.at(-1).name}` : s[0].name) : 'ตามอายุของบทบาท';
 };
-// การ์ดที่ไม่มี worlds มาได้ทั้งชาติทวีปและชาติเก่า (isekaiFitsRole) — ไม่ต้องติดป้ายโลก
-const where = (e) => (e.worlds ? e.worlds.map(worldName).join(' · ') : null);
+// การ์ดที่ไม่มี worlds มาได้ทั้งชาติทวีปและชาติเก่า (isekaiFits) — ไม่ต้องติดป้ายโลก · กองทวีปติดป้ายแคว้น/ข้อพิพาท/ขั้วที่เปิดกอง
+const POWER_TAG = { major: 'อยู่หรือติดมหาอำนาจ', falling: 'อยู่หรือติดแคว้นขาลง', rising: 'อยู่หรือติดแคว้นมาแรง' };
+const where = (e) => (e.worlds ? e.worlds.map(worldName).join(' · ') : e.regions ? e.regions.map((r) => CONT_REGIONS[r].name).join(' · ') : e.dispute ? `ยุค${CONT_DISPUTES[e.dispute].name}` : e.power ? POWER_TAG[e.power] : null);
 // ฉากเปิดและฉากสุดท้ายของแต่ละโลกอยู่ต้นและท้ายเสมอ — จัดไว้หัวกลุ่มให้อ่านตามลำดับเล่น
 const groups = (old) => {
   const evs = ISEKAI_EVENTS.filter((e) => !!e.worlds === old);

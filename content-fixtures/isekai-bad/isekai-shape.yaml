@@ -1,0 +1,16 @@
+# ตัวควบคุม: ช่องนอกรายการ (worlds) + ch ไม่ใช่ชั้นของช่วงวัย
+cards:
+  - id: bad_x
+    regions: [helvard]
+    ch: [9]
+    title: ชื่อ
+    text: ข้อความ
+    worlds: [hero]
+    choices:
+      - t: ก
+        text: ผลก
+      - t: ข
+        stat: luk
+        dc: 10
+        win: { text: ชนะ }
+        lose: { text: แพ้ }

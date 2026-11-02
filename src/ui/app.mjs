@@ -1,4 +1,4 @@
-import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME } from '../engine/index.mjs';
+import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfPicArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, MONEY_ICON } from './labels.mjs';
@@ -710,6 +710,8 @@ function titleShelf(body, fresh) {
 // ไม่จำกัดจำนวน (คำตัดสินเจ้าของ) จึงเก็บแค่สรุปสั้น · ที่เก็บเต็มต้องบอกผู้เล่นให้ลบเอง ห้ามลบเงียบ
 const MEMO_KEY = 'next-life-memorial-v1';
 const ERA_EVENTS = CONTENT.era.events;
+// การ์ดทวีป (06c-2) มากับเนื้อหา ไม่อยู่ในแกน — ต่อเข้ากองก่อนเริ่ม/โหลดเซฟชาติต่างโลก
+useIsekaiCards(CONTENT.isekai);
 // การ์ดรับมือที่รวมข่าวบ้านเมือง (B58) ไม่มีการ์ดบ้านเมืองแยก — หาเหตุการณ์จากการ์ดเนื้อหาที่ผูกไว้
 const ERA_OF = new Map(CONTENT.events.filter((c) => c.era).map((c) => [c.id, c.era]));
 const eraName = (id) => ERA_EVENTS.find((e) => e.id === id)?.name ?? id;

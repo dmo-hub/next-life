@@ -10,7 +10,7 @@ import { newLedger, recordMerit, ledgerLevel, meritId, SIN_CATS } from './merit.
 import { hintLevel } from './court.mjs';
 import { WARN, crossedLow, warnCard } from './warn.mjs';
 import { FOCUS_FLOW, focusSet, focusYearEnd } from './focus.mjs';
-import { CONT_REGIONS, CONT_RACES, contBirth, contNation, contNeighbors, contRaceStart } from './continent.mjs';
+import { CONT_REGIONS, CONT_RACES, CONT_DISPUTES, contBirth, contNation, contNeighbors, contRaceStart } from './continent.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค' };
 export const ISEKAI_FX = { hp: 'ชีวิต', str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
@@ -1330,6 +1330,21 @@ export const ISEKAI_EVENTS = [
     ] },
 ];
 const isekaiById = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
+// การ์ดทวีปจาก content/isekai/*.yaml (06c-2) ต่อท้ายกองใน JS — ตัวโหลดฝั่ง node กับหน้าเกม (CONTENT.isekai) เรียกก่อนเล่น
+// ต่อท้าย ⇒ ลำดับกองเดิมไม่เลื่อน ชาติเก่าสุ่มได้เท่าเดิม · harness โหลดเนื้อหาหลายรอบ ⇒ id ที่รับจาก yaml แล้วข้าม · ชนการ์ดใน JS = หยุด
+// ป้ายบุญบาปอยู่บนตัวเลือกใน yaml (merit) ย้ายเข้า ISEKAI_MERIT ที่แกนกับบอทอ่านตาม id
+export const ISEKAI_YAML = new Set();
+export function useIsekaiCards(cards = []) {
+  for (const e of cards) {
+    if (ISEKAI_YAML.has(e.id)) continue;
+    if (isekaiById[e.id]) throw new Error(`การ์ดต่างโลก ${e.id} ใน yaml ซ้ำกับการ์ดใน isekai.mjs`);
+    ISEKAI_YAML.add(e.id);
+    ISEKAI_EVENTS.push(e);
+    isekaiById[e.id] = e;
+    const tags = Object.fromEntries(e.choices.flatMap((c, i) => (c.merit ? [[i, c.merit]] : [])));
+    if (Object.keys(tags).length) ISEKAI_MERIT[e.id] = tags;
+  }
+}
 
 // ป้ายบุญบาปต่างโลก (B68c) ตามเจตนาของตัวเลือก ไม่ตามผลทอย · id เหตุการณ์ → ลำดับตัวเลือก → [หมวด, ระดับ]
 // ฆ่าเพื่อปกป้องคน = กลาง · ชื่อเสียง (fame) เป็นอีกแกน ไม่ลงบัญชีนี้
@@ -1721,6 +1736,15 @@ const isekaiLegends = (isk) => isk.worldLegends ?? [];
 const isekaiLegendKind = (l) => (l.dark ? 'dark' : 'hero');
 // เหตุการณ์ตำนานเรียกชื่อคนล่าสุดในตำนานแบบเดียวกับเรื่อง
 const isekaiLegendFill = (isk, ev, s) => (ev.legend ? s.replaceAll('{legend}', isekaiLegends(isk).findLast((l) => isekaiLegendKind(l) === ev.legend)?.name ?? '') : s);
+// ตัวแทนของกองทวีป (06c-2) — มีแค่ชาติทวีป (ตัวกรองกองกันชาติเก่าไว้แล้ว) · ขั้วที่มี 2 แคว้นเรียกแคว้นที่อยู่หรือติดผู้เล่นก่อน
+export const CONT_FILL = ['land', 'major', 'falling', 'rising', 'dispute'];
+const contFill = (isk, s) => {
+  const p = isk.nation.powers;
+  const power = (kind) => CONT_REGIONS[contPowerAt(isk, kind) ?? (kind === 'major' ? p.major : p[kind][0])].name;
+  const val = { land: () => CONT_REGIONS[isk.region].name, major: () => power('major'), falling: () => power('falling'), rising: () => power('rising'), dispute: () => CONT_DISPUTES[isk.nation.dispute].name };
+  return CONT_FILL.reduce((t, k) => (t.includes(`{${k}}`) ? t.replaceAll(`{${k}}`, val[k]()) : t), s);
+};
+const isekaiFill = (isk, ev, s) => (contDeckOf(ev) ? contFill(isk, isekaiLegendFill(isk, ev, s)) : isekaiLegendFill(isk, ev, s));
 
 // ความรู้หมวดเดียว: ยิ่งรู้มากยิ่งโตช้า (สูตรเดียวกับค่าสถานะ) · ลบได้เต็มค่า
 function isekaiLearn(isk, cat, v) {
@@ -1855,8 +1879,30 @@ function isekaiDrink(isk, id) {
 const ISEKAI_ADULT = ['adult', 'middle', 'old'];
 const isekaiKnowOpen = (isk, e, stage) => (!e.know || isk.know[e.know.cat] >= e.know.min) && (!e.adult || ISEKAI_ADULT.includes(stage.id)) && (!e.loreOf || !isk.worldLore.includes(e.loreOf)) && (!e.legend || isekaiLegends(isk).some((l) => isekaiLegendKind(l) === e.legend)) && (!e.bless || isk.karma > 0 || isk.blessed);
 
-// ชาติทวีปไม่มีโลกของเรื่อง ⇒ เห็นเฉพาะการ์ดทุกโลก (การ์ดแคว้น/ข้อพิพาทมากับ 06c)
-const isekaiFitsRole = (isk, e) => !e.worlds || (!!isk.role && (e.worlds.includes(isk.world) || (e.worlds.length > 1 && e.worlds.includes(ISEKAI_ROLES[isk.role].like))));
+// ขั้วอำนาจที่ผู้เล่นอยู่หรืออยู่ติด (ขาลง/มาแรงมีได้ 2 แคว้น) — ไม่มี = null
+const contPowerAt = (isk, kind) => {
+  const p = isk.nation.powers;
+  return (kind === 'major' ? [p.major] : p[kind]).find((id) => id === isk.region || contNeighbors(isk.region).includes(id)) ?? null;
+};
+// กองการ์ดทวีป (06c-2): การ์ดจาก content/isekai ผูกได้ช่องเดียว · w = น้ำหนักสุ่ม (เทียบ ×2 ของการ์ดผูกโลกเดียว) · fit = เปิดกองให้ชาตินี้ไหม
+// เป็นค่าคงที่ export ให้ตัวควบคุมของ harness-test เปิดตัวกรองทิ้งได้
+export const CONT_DECK = {
+  regions: { w: 2, fit: (isk, e) => e.regions.includes(isk.region) },
+  dispute: { w: 2, fit: (isk, e) => e.dispute === isk.nation.dispute },
+  power: { w: 1, fit: (isk, e) => !!contPowerAt(isk, e.power) },
+};
+const contDeckOf = (e) => Object.keys(CONT_DECK).find((k) => e[k] !== undefined);
+
+// ชาติเก่า (มีบทบาท) เห็นการ์ดโลกของบทบาท · ชาติทวีปไม่มีโลกของเรื่อง ⇒ เห็นการ์ดทุกโลก + กองทวีปที่เข้ากับแคว้น/ชาติ
+const isekaiFits = (isk, e) => {
+  const deck = contDeckOf(e);
+  if (deck) return !isk.role && !!isk.nation && CONT_DECK[deck].fit(isk, e);
+  return !e.worlds || (!!isk.role && (e.worlds.includes(isk.world) || (e.worlds.length > 1 && e.worlds.includes(ISEKAI_ROLES[isk.role].like))));
+};
+const isekaiDeckW = (e) => {
+  const deck = contDeckOf(e);
+  return deck ? CONT_DECK[deck].w : e.worlds?.length === 1 ? 2 : 1;
+};
 
 // เรื่องที่ต้องตัดสินของตานี้: ฉากสุดท้ายถึงอายุ → เรื่องต่อที่นัดไว้ → สุ่มจากกองของช่วงวัย
 // ทุกตาดึงเลขทอย 1 ครั้งก่อนสุ่มกอง (ยกเว้นฉากบังคับ) · ทุ่มเทสายไหนเรื่องสายนั้นโผล่บ่อยขึ้น · เรื่องที่ต้องมีชื่อเสียงรอจนดังพอ
@@ -1884,10 +1930,10 @@ function isekaiDue(isk) {
   const ch = stage.ch;
   const { tag, kc } = isekaiFocusDef(isk, isk.focus);
   // อีเวนต์พากลับเปิดเมื่ออยู่ต่างโลกครบปีไทยที่ทอยไว้ ⇒ อายุร่างกายไม่น้อยกว่าอายุไทยหลังกลับ (st.away ไม่ติดลบ)
-  const pool = ISEKAI_EVENTS.filter((e) => !e.finale && !e.follow && e.id !== w.intro && (!e.trip || (isk.trip && e.trip === 'event' && isk.age - isk.trip.from >= isk.trip.thai)) && isekaiFitsRole(isk, e) && e.ch.some((c) => ch.includes(c)) && !isk.used.includes(e.id) && isk.st.fame >= (e.minFame ?? 0) && isekaiKnowOpen(isk, e, stage));
+  const pool = ISEKAI_EVENTS.filter((e) => !e.finale && !e.follow && e.id !== w.intro && (!e.trip || (isk.trip && e.trip === 'event' && isk.age - isk.trip.from >= isk.trip.thai)) && isekaiFits(isk, e) && e.ch.some((c) => ch.includes(c)) && !isk.used.includes(e.id) && isk.st.fame >= (e.minFame ?? 0) && isekaiKnowOpen(isk, e, stage));
   if (!pool.length) return null;
   const K = ISEKAI_KNOW_T;
-  const wt = pool.map((e) => (e.worlds?.length === 1 ? 2 : 1) * (tag && e.choices.some((c) => c.tag === tag) ? 3 : 1) * (e.know ? (e.know.min ? K.w : K.w0) * (kc === e.know.cat ? K.focusW : 1) : 1));
+  const wt = pool.map((e) => isekaiDeckW(e) * (tag && e.choices.some((c) => c.tag === tag) ? 3 : 1) * (e.know ? (e.know.min ? K.w : K.w0) * (kc === e.know.cat ? K.focusW : 1) : 1));
   let x = isk.rng.next() * wt.reduce((s, v) => s + v, 0);
   return take(pool[Math.max(0, wt.findIndex((v) => (x -= v) < 0))].id);
 }
@@ -2106,8 +2152,8 @@ const isekaiCheckName = (c) => (c.know ? 'ความรู้โลกเด�
 
 function isekaiEventCard(isk, ev) {
   return isekaiCard(isk, {
-    step: 'event', id: ev.id, title: isekaiLegendFill(isk, ev, ev.title), text: isekaiLegendFill(isk, ev, ev.text), finale: !!ev.finale, age: isk.age,
-    choices: ev.choices.map((c) => isekaiLegendFill(isk, ev, c.t)),
+    step: 'event', id: ev.id, title: isekaiFill(isk, ev, ev.title), text: isekaiFill(isk, ev, ev.text), finale: !!ev.finale, age: isk.age,
+    choices: ev.choices.map((c) => isekaiFill(isk, ev, c.t)),
     fx: ev.choices.map((c) => {
       if (c.need && isk.st.gold < c.need.gold) return '';
       const p = isekaiChance(isk, c);
@@ -2202,8 +2248,8 @@ export function chooseIsekai(isk, idx) {
   const tags = ISEKAI_MERIT[ev.id]?.[idx];
   // ชื่อเสียงจากตัวเลือกที่ลงบาป นับแยกไว้ตัดสินว่าโลกจำเป็นคนร้ายไหม (B68i)
   if (deltas.fame > 0 && tags?.some((t) => SIN_CATS.includes(meritId(t.cat)))) isk.fameDark = (isk.fameDark ?? 0) + deltas.fame;
-  const said = isekaiLegendFill(isk, ev, out.text);
-  const title = isekaiLegendFill(isk, ev, ev.title);
+  const said = isekaiFill(isk, ev, out.text);
+  const title = isekaiFill(isk, ev, ev.title);
   if (ev.know) {
     isk.knowLast = ev.know.cat;
     isekaiLearn(isk, ev.know.cat, learned);
@@ -2249,7 +2295,7 @@ export function chooseIsekai(isk, idx) {
   // ฉากเด่นบนการ์ดจบ: ผลที่ขยับค่ามากสุด · ทองหารห้าสิบให้ชั่งกับค่าอื่นได้ · สกิลช่วยไว้/ตายนับเพิ่ม
   const weight = Object.entries(deltas).reduce((s, [k, v]) => s + Math.abs(k === 'gold' ? v / 50 : v), 0) + (aid ? 10 : 0) + (isk.dead ? 50 : 0);
   (isk.marks ??= []).push({ text: `${title} · ${said}`, weight });
-  isk.log.push(`อายุ ${isk.age} · ${title} · ${isekaiLegendFill(isk, ev, c.t)}${rolled ? (ok ? (aid ? ` (สำเร็จ · ${aid}ช่วยไว้)` : ' (สำเร็จ)') : ' (พลาด)') : ''}`);
+  isk.log.push(`อายุ ${isk.age} · ${title} · ${isekaiFill(isk, ev, c.t)}${rolled ? (ok ? (aid ? ` (สำเร็จ · ${aid}ช่วยไว้)` : ' (สำเร็จ)') : ' (พลาด)') : ''}`);
   isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'event', text: `${title} · ${said}`, deltas: { ...deltas } });
   isk.last = { title, text: said, ok: rolled ? ok : null, stat: rolled ? isekaiCheckName(c) : null, deltas, sys };
   isk.due = null;
