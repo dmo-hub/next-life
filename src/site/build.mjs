@@ -5,6 +5,7 @@ import { catalogHtml } from './catalog.mjs';
 import { spoilersHtml } from './spoilers.mjs';
 import { injectSpec } from './spec.mjs';
 import { guideHtml } from './guide.mjs';
+import { focusHtml } from './focus.mjs';
 import { injectDemo } from './demo.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
@@ -15,6 +16,8 @@ export const GEN_PAGES = [
   ['spoilers', '<!--__SPOILERS__-->', spoilersHtml],
   // คู่มือสั้น (B121) ป้ายปุ่มดึงจาก src/ui/labels.mjs ที่เกมใช้
   ['guide', '<!--__GUIDE__-->', guideHtml],
+  // โฟกัสชีวิต: รายการ/เงื่อนไข/ป้ายดึงจาก content.focus กับโมดูลต่างโลก ระดับคู่มือ ไม่เผยขนาดผลหรือโอกาส
+  ['focus', '<!--__FOCUS__-->', focusHtml],
 ];
 
 export function buildSite(content, root = new URL('../../', import.meta.url), facts = siteFacts(content)) {
