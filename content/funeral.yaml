@@ -40,15 +40,15 @@ events:
         requires: {flags: {not: [wish_no_wreath]}, reason: "สั่งไว้แล้ว"}
         sets_flags: [wish_no_wreath]
         merit: [{cat: dana, level: 1}]
+      - id: enough
+        text: "พอแค่นี้ ไม่มีอะไรค้างใจแล้ว"
+        merit: [{cat: neutral}]
       # จดหมายคำฝาก (afterfall-3): แกนล็อก "ไม่มีใครให้ฝาก" เมื่อตอนตายไม่มีลูกหลาน/เพื่อน/คู่ชีวิตเหลืออยู่ (letter: true · letterTo ใน family.mjs)
       - id: letter
         text: "เขียนจดหมายคำฝากทิ้งไว้"
         letter: true
         requires: {flags: {not: [wish_letter]}, reason: "เขียนไว้แล้ว"}
         sets_flags: [wish_letter]
-        merit: [{cat: neutral}]
-      - id: enough
-        text: "พอแค่นี้ ไม่มีอะไรค้างใจแล้ว"
         merit: [{cat: neutral}]
 
   - id: funeral_rite_01

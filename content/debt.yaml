@@ -462,15 +462,15 @@ events:
         outcomes:
           - {weight: 2, ok: true, text: "ค่าเช่าครอบคลุมงวดผ่อนทั้งหมด บ้านผ่อนตัวเองจนเกือบหมด", effects: {money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ผู้เช่าเลี้ยงหมาสิบตัวในบ้าน คืนบ้านมาพร้อมพื้นพังทั้งหลัง", effects: {money: {unit: income_x, amount: -1}, happiness: -2}, merit: [{cat: neutral}]}
+      - id: keep_house
+        text: "ไม่ขาย บ้านนี้คือชีวิต"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
       # จดหมายคำฝากของรุ่นก่อน (afterfall-3): ไม่ขาย แล้วได้ผลเท่าทางสำเร็จของ "ปล่อยเช่า"
       - id: heed_letter
         text: "ไม่ขาย ตามที่รับปาก ปล่อยเช่าแทน"
         requires: {flags: {has: [heed_home]}, reason: "ไม่ได้รับปากใครไว้"}
         effects: {money: {unit: income_x, amount: 1.5}}
-        merit: [{cat: neutral}]
-      - id: keep_house
-        text: "ไม่ขาย บ้านนี้คือชีวิต"
-        effects: {happiness: 1, relations: 1}
         merit: [{cat: neutral}]
 
   - id: debt_shark_collect_old_01
