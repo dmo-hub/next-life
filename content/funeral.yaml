@@ -40,6 +40,13 @@ events:
         requires: {flags: {not: [wish_no_wreath]}, reason: "สั่งไว้แล้ว"}
         sets_flags: [wish_no_wreath]
         merit: [{cat: dana, level: 1}]
+      # จดหมายคำฝาก (afterfall-3): แกนล็อก "ไม่มีใครให้ฝาก" เมื่อตอนตายไม่มีลูกหลาน/เพื่อน/คู่ชีวิตเหลืออยู่ (letter: true · letterTo ใน family.mjs)
+      - id: letter
+        text: "เขียนจดหมายคำฝากทิ้งไว้"
+        letter: true
+        requires: {flags: {not: [wish_letter]}, reason: "เขียนไว้แล้ว"}
+        sets_flags: [wish_letter]
+        merit: [{cat: neutral}]
       - id: enough
         text: "พอแค่นี้ ไม่มีอะไรค้างใจแล้ว"
         merit: [{cat: neutral}]
@@ -79,4 +86,133 @@ events:
         merit: [{cat: dana, level: 3}]
       - id: temple
         text: "ให้วัดหรือมูลนิธิช่วยจัดให้"
+        merit: [{cat: neutral}]
+
+  # ---------- จดหมายคำฝาก (afterfall-3) · ไม่อยู่ในกองสุ่ม ----------
+  # ใบเลือกคำฝาก: แกนต่อท้ายตัวเลือก letter ของคำสั่งเสีย · ธง wish_letter_* ส่งถึงทายาทผ่านทะเบียน heir:
+  - id: funeral_letter_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    title: "จดหมายคำฝาก"
+    text: "มือสั่นจนต้องเขียนช้า ๆ ซองนี้จะฝากไว้กับ{ผู้รับซอง} ให้ส่งต่อถึงคนรุ่นหลังเมื่อถึงเวลา กระดาษมีที่พอสำหรับเรื่องเดียว"
+    choices:
+      - id: study
+        text: "เรียนให้สูงเท่าที่ไหว"
+        sets_flags: [wish_letter_study]
+        merit: [{cat: neutral}]
+      - id: kin
+        text: "ดูแลกันเอง อย่าแตกกันเรื่องมรดก"
+        sets_flags: [wish_letter_kin]
+        merit: [{cat: neutral}]
+      - id: home
+        text: "บ้านเกิดอย่าขายทิ้ง"
+        sets_flags: [wish_letter_home]
+        merit: [{cat: neutral}]
+      - id: save
+        text: "เก็บเงินไว้ก้อนหนึ่งเสมอ"
+        sets_flags: [wish_letter_save]
+        merit: [{cat: neutral}]
+
+  # ใบที่ทายาทอ่าน (id ขึ้นต้น heir_letter_): แกนดันเข้าคิวตามหลังการ์ดมรดก ปีที่ผู้ฝากตาย ไม่ก่อนอายุ 13 · ใบละชนิดคำฝาก
+  - id: heir_letter_study_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [13, 120], parent_flags: {has: [wish_letter_study]}}
+    title: "ซองจากรุ่นก่อน"
+    text: "{ผู้ยื่นซอง}ยื่นซองเก่าให้ ข้างในเป็นลายมือของ{ผู้ฝาก}ที่จากไป{เหตุผู้ฝาก} เขียนไว้สั้น ๆ ว่า \"เรียนให้สูงเท่าที่ไหว ความรู้ไม่มีใครยึดไปได้\""
+    choices:
+      - id: keep
+        text: "เก็บไว้ จะทำตามที่ฝาก"
+        sets_flags: [heed_study]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: fold
+        text: "อ่านแล้วพับเก็บใส่ลิ้นชัก"
+        merit: [{cat: neutral}]
+      - id: later
+        text: "ยังไม่พร้อมจะอ่าน"
+        merit: [{cat: neutral}]
+      - id: share
+        text: "อ่านให้คนในบ้านฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: heir_letter_kin_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [13, 120], parent_flags: {has: [wish_letter_kin]}}
+    title: "ซองจากรุ่นก่อน"
+    text: "{ผู้ยื่นซอง}ยื่นซองเก่าให้ ข้างในเป็นลายมือของ{ผู้ฝาก}ที่จากไป{เหตุผู้ฝาก} เขียนไว้สั้น ๆ ว่า \"ดูแลกันเอง อย่าให้เงินทองมาทำให้พี่น้องไม่มองหน้ากัน\""
+    choices:
+      - id: keep
+        text: "เก็บไว้ จะทำตามที่ฝาก"
+        sets_flags: [heed_kin]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: fold
+        text: "อ่านแล้วพับเก็บใส่ลิ้นชัก"
+        merit: [{cat: neutral}]
+      - id: later
+        text: "ยังไม่พร้อมจะอ่าน"
+        merit: [{cat: neutral}]
+      - id: share
+        text: "อ่านให้คนในบ้านฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: heir_letter_home_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [13, 120], parent_flags: {has: [wish_letter_home]}}
+    title: "ซองจากรุ่นก่อน"
+    text: "{ผู้ยื่นซอง}ยื่นซองเก่าให้ ข้างในเป็นลายมือของ{ผู้ฝาก}ที่จากไป{เหตุผู้ฝาก} เขียนไว้สั้น ๆ ว่า \"บ้านหลังนี้อย่าขายทิ้ง ถึงจะไปไกลแค่ไหน ให้มีที่กลับ\""
+    choices:
+      - id: keep
+        text: "เก็บไว้ จะทำตามที่ฝาก"
+        sets_flags: [heed_home]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: fold
+        text: "อ่านแล้วพับเก็บใส่ลิ้นชัก"
+        merit: [{cat: neutral}]
+      - id: later
+        text: "ยังไม่พร้อมจะอ่าน"
+        merit: [{cat: neutral}]
+      - id: share
+        text: "อ่านให้คนในบ้านฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: heir_letter_save_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [13, 120], parent_flags: {has: [wish_letter_save]}}
+    title: "ซองจากรุ่นก่อน"
+    text: "{ผู้ยื่นซอง}ยื่นซองเก่าให้ ข้างในเป็นลายมือของ{ผู้ฝาก}ที่จากไป{เหตุผู้ฝาก} เขียนไว้สั้น ๆ ว่า \"เก็บเงินไว้ก้อนหนึ่งเสมอ วันที่ลำบากจะได้ไม่ต้องก้มหัวให้ใคร\""
+    choices:
+      - id: keep
+        text: "เก็บไว้ จะทำตามที่ฝาก"
+        # รับปากเรื่องเงินเก็บ = มีเงินสำรองแบบ gs-5 ⇒ ตัวเลือก "ใช้เงินสำรอง" ในการ์ดเดิมเปิดเอง
+        sets_flags: [heed_save, kept_savings]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: fold
+        text: "อ่านแล้วพับเก็บใส่ลิ้นชัก"
+        merit: [{cat: neutral}]
+      - id: later
+        text: "ยังไม่พร้อมจะอ่าน"
+        merit: [{cat: neutral}]
+      - id: share
+        text: "อ่านให้คนในบ้านฟัง"
+        effects: {relations: 1}
         merit: [{cat: neutral}]

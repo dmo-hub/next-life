@@ -26,6 +26,12 @@ events:
         text: "สละทุนให้เพื่อนที่ยากจนกว่า"
         effects: {relations: 2, happiness: 1}
         merit: [{cat: help_others, level: 2}]
+      # จดหมายคำฝากของรุ่นก่อน (afterfall-3): ผลเท่าทางสำเร็จของ "รับทุน" ไม่มีทางพลาด
+      - id: heed_letter
+        text: "รับทุน ทำตามที่รับปากในจดหมาย"
+        requires: {flags: {has: [heed_study]}, reason: "ไม่ได้รับปากใครไว้"}
+        effects: {knowledge: 3, income_mult: 1.4}
+        merit: [{cat: neutral}]
       - id: study_and_work
         text: "เรียนภาคค่ำ กลางวันทำงาน"
         effects: {knowledge: 2, money: {unit: income_x, amount: 0.5}, happiness: -1}
