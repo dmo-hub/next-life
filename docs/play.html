@@ -353,6 +353,21 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .itimer i { display:block; height:100%; width:0; background:#6FE3FF; }
 @keyframes itick { from { width:0; } to { width:100%; } }
 @media (prefers-reduced-motion: reduce) { .itimer i { animation:none !important; } }
+/* เอฟเฟกต์ B-fx (ตัวเล่นใน app.mjs) — พลิก: ลูกตรงของการ์ดซ่อนด้านหลัง หลังการ์ดเป็นแผ่นรักลายทองหันกลับด้าน · translateZ กันกระพริบเพราะอยู่ระนาบเดียวกับพื้นการ์ด */
+.fx-flip { position:relative; transform-style:preserve-3d; }
+.fx-flip > * { backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+.fx-flip > .fx-back { position:absolute; inset:0; display:grid; place-items:center; border-radius:inherit; background:var(--lacquer2); transform:rotateY(180deg) translateZ(1px); }
+.fx-back svg { width:min(200px, 60%); height:auto; }
+.fx-ov { position:fixed; inset:0; z-index:50; pointer-events:none; }
+.fx-ov.fx-out { opacity:0; transition:opacity .25s; }
+.fx-veil { position:absolute; inset:0; background:var(--lacquer); opacity:0; }
+.fx-lamp { position:absolute; left:50%; top:38%; margin:-60px 0 0 -60px; overflow:visible; }
+.fx-cap { position:absolute; left:16px; right:16px; top:calc(38% + 76px); text-align:center; font-family:Pridi,serif; font-size:18px; color:var(--cream); opacity:0; }
+.fx-cap small { display:block; font-family:Sarabun,sans-serif; font-size:13px; color:var(--sand); }
+.fx-title { position:absolute; inset:0; display:grid; place-items:center; }
+.fx-title svg { overflow:visible; max-width:92vw; height:auto; }
+.fx-title .fx-name { font-family:Pridi,serif; font-weight:600; }
+.fx-ov canvas { position:absolute; inset:0; width:100%; height:100%; }
 /* ทั้งหน้าเข้าธีมต่างโลกตามการ์ดที่ขึ้นจอ — ผูกกับการ์ดด้วย :has จึงไม่ต้องตามล้างธงทุกจุดที่วาดจอไทย */
 body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; }
 body:has(#app > .card.i) .logo { background:#0E1024; border-bottom-color:#3B4BA8; }
@@ -10523,6 +10538,180 @@ function priceSrc() {
   return inData(era.src.cpi, [era.future.from, era.future.to]) ? [true, `คำนวณจาก${srcText('เงินเฟ้อรายปี', era.src.cpi)}`] : [false, 'บางปีที่ใช้ยังไม่มีข้อมูลเงินเฟ้อ เกมใช้ค่าประมาณแทน'];
 }
 
+// เอฟเฟกต์ 3 จังหวะ (B-fx · เจ้าของเลือกแบบ A ทั้งสาม): พลิกการ์ดใหม่ทุกใบ · ตะเกียงดับตอนตาย · แถบผ้าคลี่เมื่อได้ฉายาหายาก/ตำนาน
+// frame(parts, t) ขึ้นกับ t 0..1 อย่างเดียว ⇒ ข้าม = frame(1) · สีชุด ART_INK ไม่รับค่าบุญบาป — ตายแบบเดียวทุกกรรม ห้ามเผยกรรมผ่านเอฟเฟกต์
+const fxClamp = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
+const fxSpan = (t, a, b) => fxClamp((t - a) / (b - a));
+const fxOut = (x) => 1 - (1 - x) ** 3;
+const fxIn = (x) => x * x * x;
+const fxBack = (x) => 1 + 2.2 * (x - 1) ** 3 + 1.2 * (x - 1) ** 2;
+const fxSvg = (w, h, inner, cls = '') => `<svg class="${cls}" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">${inner}</svg>`;
+// สุ่มแบบมี seed ตายตัว — ผงทองเหมือนกันทุกชีวิตทุกครั้ง
+const fxRng = (s) => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+const FX_INK = ART_INK;
+// หลังการ์ด: กรอบทองคู่ + กนกม้วนมุม + ข้าวหลามตัดกลาง (ภาษาเดียวกับ ERA_FRAME ใน art.mjs)
+const FX_CARD_BACK = fxSvg(200, 250, `<rect x="6" y="6" width="188" height="238" rx="6" fill="none" stroke="${FX_INK.gold}" stroke-width="1.6"/><rect x="11" y="11" width="178" height="228" rx="4" fill="none" stroke="${FX_INK.bronze2}" stroke-width="0.8"/><path d="M16 36q0-20 20-20q-10 5-10 13q0 7 7 7q5 0 5-5M184 36q0-20-20-20q10 5 10 13q0 7-7 7q-5 0-5-5M16 214q0 20 20 20q-10-5-10-13q0-7 7-7q5 0 5 5M184 214q0 20-20 20q10-5 10-13q0-7-7-7q-5 0-5 5" fill="none" stroke="${FX_INK.gold}" stroke-width="1.2"/><path d="M100 85l30 40l-30 40l-30-40z" fill="none" stroke="${FX_INK.gold}" stroke-width="1.4"/><path d="M100 103l16 22l-16 22l-16-22z" fill="${FX_INK.gold2}"/>`);
+// ฉากซ้อนเต็มจอของตาย/ฉายา — จบเองค่อยจางออก · ถูกข้ามหายทันที
+const fxOv = () => document.body.appendChild(el('div', 'fx-ov'));
+function fxOvEnd(ov, natural) {
+  if (!natural) return ov.remove();
+  ov.classList.add('fx-out');
+  setTimeout(() => ov.remove(), 260);
+}
+
+const FX = {
+  // พลิก 3D ทั้งใบ: ครึ่งแรกเห็นหลังการ์ด ครึ่งหลังเห็นหน้า
+  flipA: { dur: 280, block: 280,
+    build: (card) => {
+      const back = el('div', 'fx-back');
+      back.innerHTML = FX_CARD_BACK;
+      card.classList.add('fx-flip');
+      card.append(back);
+      return { card, back };
+    },
+    frame: (p, t) => { p.card.style.transform = `perspective(1400px) rotateY(${180 * (1 - fxOut(t))}deg)`; },
+    end: (p) => { p.card.classList.remove('fx-flip'); p.card.style.transform = ''; p.back.remove(); } },
+  // ตะเกียงดับ: เปลวสั่นแล้วหด · ควันเส้นเดียวลอยขึ้นจาง · จอหรี่เป็นรัก · คำบรรยายค่อยขึ้น
+  deathA: { dur: 1600, block: 300,
+    build: (ov, o) => {
+      ov.innerHTML = `<div class="fx-veil"></div>${fxSvg(120, 120, `<path class="fx-smoke" d="M60 44c-6-8 6-14 0-22s6-14 0-20" fill="none" stroke="${FX_INK.cream}" stroke-width="1.4" stroke-linecap="round" pathLength="100" stroke-dasharray="100"/><g class="fx-flame" style="transform-origin:60px 58px"><path d="M60 34c7 9 9 15 6 20q-2 4-6 4t-6-4c-3-5-1-11 6-20z" fill="${FX_INK.gold2}"/><path d="M60 44c3 4 4 7 2 10q-1 2-2 2t-2-2c-2-3-1-6 2-10z" fill="${FX_INK.cream}"/></g><path d="M36 64h48q-4 18-24 18t-24-18z" fill="${FX_INK.bronze2}" stroke="${FX_INK.gold}" stroke-width="1.4"/><path d="M58 64v-6h4v6" fill="${FX_INK.lacquer2}"/><path d="M44 90h32" stroke="${FX_INK.gold}" stroke-width="1.4"/>`, 'fx-lamp')}<div class="fx-cap"></div>`;
+      const cap = ov.querySelector('.fx-cap');
+      cap.append(o.head, el('small', null, o.sub));
+      return { ov, flame: ov.querySelector('.fx-flame'), smoke: ov.querySelector('.fx-smoke'), veil: ov.firstChild, cap };
+    },
+    frame: (p, t) => {
+      const f = fxSpan(t, 0, 0.38);
+      const flick = 1 + 0.08 * Math.sin(t * 60) * (1 - f);
+      p.flame.style.transform = `scale(${(1 - fxIn(f)) * flick},${(1 - f) * flick})`;
+      p.flame.style.opacity = 1 - fxSpan(t, 0.3, 0.38);
+      const s = fxSpan(t, 0.32, 0.9);
+      p.smoke.style.strokeDashoffset = 100 * (1 - fxOut(s));
+      p.smoke.style.opacity = s > 0 ? 0.7 * (1 - fxSpan(t, 0.7, 1)) : 0;
+      p.veil.style.opacity = 0.82 * fxOut(fxSpan(t, 0.15, 0.85));
+      p.cap.style.opacity = fxOut(fxSpan(t, 0.55, 1));
+      p.cap.style.transform = `translateY(${6 * (1 - fxSpan(t, 0.55, 1))}px)`;
+    },
+    end: (p, natural) => fxOvEnd(p.ov, natural) },
+  // แถบผ้าคลี่ + แสงวิ่ง · ตำนาน = กรอบคู่ + รัศมีหมุนช้า + ผงทองพุ่งรอบแถบ
+  titleA: {
+    build: (ov, o) => {
+      const leg = o.tier === 'legend';
+      const id = `fx${++fxUid}`;
+      const rays = leg ? `<g class="fx-rays" style="transform-origin:150px 60px">${Array.from({ length: 16 }, (_, i) => `<path d="M150 60L${150 + 140 * Math.cos(i * Math.PI / 8 - 0.06)} ${60 + 140 * Math.sin(i * Math.PI / 8 - 0.06)}L${150 + 140 * Math.cos(i * Math.PI / 8 + 0.06)} ${60 + 140 * Math.sin(i * Math.PI / 8 + 0.06)}z" fill="${FX_INK.gold2}"/>`).join('')}</g>` : '';
+      ov.innerHTML = `<div class="fx-veil"></div><div class="fx-title">${fxSvg(300, 120, `<defs><linearGradient id="${id}s" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><clipPath id="${id}c"><path d="M40 38h220v44h-220z"/></clipPath></defs>${rays}<g class="fx-ribbon" style="transform-origin:150px 60px"><path d="M40 46h-26l10 14l-10 14h26z" fill="${FX_INK.bronze2}"/><path d="M260 46h26l-10 14l10 14h-26z" fill="${FX_INK.bronze2}"/><path d="M40 38h220v44h-220z" fill="${FX_INK.lacquer2}" stroke="${FX_INK.gold}" stroke-width="${leg ? 2 : 1.4}"/>${leg ? `<path d="M45 43h210v34h-210z" fill="none" stroke="${FX_INK.gold2}" stroke-width="0.8"/>` : ''}<text class="fx-name" x="150" y="${leg ? 67 : 66}" text-anchor="middle" font-size="${leg ? 19 : 17}" fill="${leg ? FX_INK.gold2 : FX_INK.cream}"></text><rect class="fx-shine" x="-60" y="38" width="60" height="44" fill="url(#${id}s)" clip-path="url(#${id}c)"/></g><text class="fx-sub" x="150" y="108" text-anchor="middle" font-size="11" fill="${FX_INK.gold}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`)}</div>${leg ? '<canvas></canvas>' : ''}`;
+      const q = (s) => ov.querySelector(s);
+      const name = q('.fx-name');
+      name.textContent = o.name;
+      // ชื่อฉายายาวเกินแถบ ⇒ บีบให้พอดีแถบ ไม่ล้นออกนอกผ้า
+      if (name.getComputedTextLength() > 210) {
+        name.setAttribute('textLength', 210);
+        name.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+      }
+      return { ov, leg, veil: ov.firstChild, ribbon: q('.fx-ribbon'), name, shine: q('.fx-shine'), rays: q('.fx-rays'), sub: q('.fx-sub'), dust: leg && fxDust(ov, 9) };
+    },
+    dur: (o) => (o.tier === 'legend' ? 1400 : 900), block: 300,
+    frame: (p, t) => {
+      const u = p.leg ? fxSpan(t, 0, 0.3) : fxSpan(t, 0, 0.4);
+      p.veil.style.opacity = 0.6 * fxOut(fxSpan(t, 0, 0.2));
+      p.ribbon.style.transform = `scaleX(${fxBack(u)})`;
+      p.ribbon.style.opacity = fxSpan(t, 0, 0.08);
+      p.name.style.opacity = fxSpan(t, 0.25, 0.5);
+      p.sub.style.opacity = fxSpan(t, 0.45, 0.7);
+      p.shine.setAttribute('x', -60 + 380 * fxSpan(t, 0.45, 0.85));
+      if (p.leg) {
+        p.rays.style.opacity = 0.35 * fxOut(fxSpan(t, 0.2, 0.6));
+        p.rays.style.transform = `rotate(${24 * t}deg) scale(${0.6 + 0.4 * fxOut(fxSpan(t, 0.2, 0.7))})`;
+        p.dust(fxSpan(t, 0.25, 1));
+      }
+    },
+    end: (p, natural) => fxOvEnd(p.ov, natural) },
+};
+
+// ผงทองพุ่งออกจากกลางแล้วตกช้า (แนวคิด poof) — คืนฟังก์ชันวาดตาม k
+function fxDust(ov, seed) {
+  const cv = ov.querySelector('canvas'), r = ov.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = r.width * dpr;
+  cv.height = r.height * dpr;
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const rnd = fxRng(seed), cx = r.width / 2, cy = r.height / 2, ps = [];
+  for (let i = 0; i < 46; i++) {
+    const a = rnd() * Math.PI * 2, v = 50 + 90 * rnd();
+    ps.push({ vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.6, s: 1 + 2 * rnd(), c: rnd() < 0.5 ? FX_INK.gold2 : FX_INK.gold });
+  }
+  return (k) => {
+    ctx.clearRect(0, 0, r.width, r.height);
+    if (k <= 0 || k >= 1) return;
+    ctx.globalAlpha = 1 - k;
+    for (const q of ps) {
+      ctx.fillStyle = q.c;
+      ctx.fillRect(cx + q.vx * fxOut(k), cy + q.vy * fxOut(k) + 30 * k * k, q.s, q.s);
+    }
+    ctx.globalAlpha = 1;
+  };
+}
+
+// reduced-motion: พลิกเหลือ fade 150ms · ฉากตาย/ฉายาไม่เล่นเลย (การ์ดบอกเรื่องเดียวกันอยู่แล้ว)
+const FX_RM = 150;
+const fxReduced = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+let fxCur = null;
+let fxSeen = null;
+let fxUid = 0;
+// บล็อกคลิกได้ไม่เกิน block ms · หลังจากนั้นคลิกแรกข้ามไปภาพจบแล้วปุ่มทำงานต่อทันที · then = จังหวะถัดไป เล่นต่อเมื่อจบเองเท่านั้น
+function fxPlay(stage, name, o = {}, then = null) {
+  const fx = FX[name];
+  const parts = fx.build(stage, o);
+  const rm = fxReduced();
+  const total = rm ? FX_RM : typeof fx.dur === 'function' ? fx.dur(o) : fx.dur;
+  const t0 = performance.now();
+  let raf = 0;
+  const fin = (natural) => {
+    cancelAnimationFrame(raf);
+    if (fxCur === me) fxCur = null;
+    fx.frame(parts, 1);
+    stage.style.opacity = '';
+    fx.end(parts, natural);
+    if (natural) then?.();
+  };
+  const me = { until: t0 + Math.min(fx.block, total), skip: () => fin(false) };
+  const tick = (now) => {
+    const t = fxClamp((now - t0) / total);
+    if (rm) stage.style.opacity = t;
+    else fx.frame(parts, t);
+    if (t < 1) raf = requestAnimationFrame(tick);
+    else fin(true);
+  };
+  if (rm) {
+    fx.frame(parts, 1);
+    stage.style.opacity = 0;
+  } else fx.frame(parts, 0);
+  raf = requestAnimationFrame(tick);
+  fxCur = me;
+}
+const FX_TIER = { ตำนาน: 'legend', หายาก: 'rare' };
+// เรียกท้ายทุกตัววาดการ์ด: การ์ดใหม่ = พลิก · การ์ดตาย = ตะเกียงดับ แล้วต่อแถบผ้าคลี่ถ้าฉายาเด่นเป็นหายาก/ตำนาน
+// วาดซ้ำการ์ดเดิม (สลับแท็บ) ไม่เล่นซ้ำ
+function fxCard(box, card) {
+  fxCur?.skip();
+  if (fxSeen === card) return;
+  fxSeen = card;
+  if (card.kind !== 'death') return fxPlay(box, 'flipA');
+  if (fxReduced()) return;
+  const top = lifeTitles(card).titles[0];
+  const tier = top && FX_TIER[top.tier];
+  const gone = isGone(st);
+  fxPlay(fxOv(), 'deathA', { head: gone ? 'หายไปจากบ้าน' : 'จากไปอย่างสงบ', sub: `${genLabel()}${lifeEndWord(gone)} ${card.age}` }, tier && (() => fxPlay(fxOv(), 'titleA', { tier, name: top.name })));
+}
+const fxGate = (e) => {
+  if (!fxCur) return;
+  if (performance.now() < fxCur.until) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  } else fxCur.skip();
+};
+window.addEventListener('click', fxGate, true);
+window.addEventListener('keydown', (e) => [' ', 'Enter', 'ArrowRight', 'ArrowLeft'].includes(e.key) && fxGate(e), true);
+
 function render(card) {
   // ไปกลับกลางชีวิต (B68m): ทริปยังเป็นชีวิตนี้ ปุ่มจึงเดินผ่านปุ่มชีวิต — จอเต็มของทริปเป็นงานเลน C
   if (card.kind === 'isekai') return renderIsekai(card);
@@ -10686,6 +10875,7 @@ function render(card) {
   }
   box.append(body, choices);
   root.append(panels(box));
+  fxCard(box, card);
 }
 
 // กล่องกระซิบ (B117): สอนระบบที่เพิ่งโผล่ครั้งแรกตามวัย ในเสียงยาย · บอกแค่ทิศ ไม่บอกตัวเลข/สูตร/บัญชีบุญบาป (กติกาเดียวกับ B31)
@@ -11006,6 +11196,7 @@ function renderAfter(card) {
   if (court) box.append(courtScene());
   box.append(body, choices);
   root.append(panels(box));
+  fxCard(box, card);
 }
 
 // ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
@@ -11256,6 +11447,7 @@ function renderIsekai(card) {
   }
   box.append(body, choices);
   root.append(panels(box));
+  fxCard(box, card);
 }
 
 // เซฟรุ่นเก่า (v1) = seed ต้นตระกูล + ลำดับปุ่มที่กด แล้วเล่นซ้ำตอนโหลด — เนื้อหาเปลี่ยนแล้วเล่นซ้ำได้คนละชีวิต
@@ -11362,6 +11554,7 @@ function openBook(death) {
     choices.append(row);
     box.append(top, body, choices);
     root.append(panels(box));
+    fxCard(box, pages[i]);
   };
   show(0);
 }
