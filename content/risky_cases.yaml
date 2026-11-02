@@ -1,0 +1,277 @@
+# เคสเสี่ยง (gameslash-1) — ทางลัดสุ่มโดน/ไม่โดนตั้งแต่ตอนกด แล้วเปิดผลทีหลัง 1–5 ปี
+# ผลทันทีของสองทางเหมือนกันทุกตัวอักษร ⇒ ผู้เล่นไม่รู้ว่าทางไหนล็อกไว้ · ทางไม่โดนมีใบปิดเคสบอกว่ารอดเพราะจังหวะ
+# ใบโดน/ใบปิดเคสไม่มี when — นัดมาจากทางผลเท่านั้น ใส่เงื่อนไขแล้วไม่ผ่านปีนั้น นัดหายเงียบ
+events:
+  # วัยรุ่น — เฉลยข้อสอบ
+  - id: teen_risky_answers_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [15, 18], school: [lower, upper, voc]}
+    title: "เฉลยจากรุ่นพี่"
+    text: "คืนก่อนสอบปลายภาค รุ่นพี่ในกลุ่มขายเฉลยวิชาที่คุณตกแน่ถ้าไม่มีมัน ราคาเท่าค่าขนมสองอาทิตย์ เพื่อนครึ่งห้องซื้อไปแล้ว"
+    choices:
+      - id: buy
+        text: "ซื้อเฉลยจากรุ่นพี่"
+        hint: "ราคา: บาปเบา"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 1, text: "คะแนนวิชานั้นผ่านฉลุย ไม่มีใครถามอะไรสักคำ", effects: {happiness: 1, knowledge: -1}, schedules: [{event: risky_answers_caught_01, after_years: [1, 5]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "คะแนนวิชานั้นผ่านฉลุย ไม่มีใครถามอะไรสักคำ", effects: {happiness: 1, knowledge: -1}, schedules: [{event: risky_answers_quiet_01, after_years: [1, 5]}], merit: [{cat: neutral}]}
+      - id: cram
+        text: "อ่านเองทั้งคืน"
+        effects: {knowledge: 1, health: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: ask_friend
+        text: "ขอติวจากเพื่อนที่เก่ง"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: take_resit
+        text: "ยอมตก ไปสอบซ่อม"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ← teen_risky_answers_01 "ซื้อเฉลยจากรุ่นพี่" (ทางโดน)
+  - id: risky_answers_caught_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "รายชื่อคนซื้อเฉลย"
+    text: "รุ่นพี่ที่ขายเฉลยปีนั้นถูกจับได้ แล้วส่งสมุดจดชื่อคนซื้อให้โรงเรียนทั้งเล่ม ชื่อคุณอยู่ในนั้น โรงเรียนเรียกกลับไปชี้แจงและจะยกเลิกผลสอบวิชานั้นย้อนหลัง"
+    choices:
+      - id: admit
+        text: "ยอมรับ ขอสอบใหม่"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: pay_quiet
+        text: "จ่ายเงินให้เรื่องเงียบ"
+        hint: "ราคา: บาปเบา"
+        merit: [{cat: greed_harm, level: 1}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เรื่องจบที่ห้องครู ไม่มีใครพูดถึงอีก แต่เงินเก็บหายไปก้อนหนึ่ง", effects: {money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูไม่รับเงิน รายงานผู้อำนวยการเพิ่มอีกเรื่อง", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+      - id: ask_parents
+        text: "ขอให้พ่อแม่ไปคุยกับครู"
+        requires: {family: [{role: parent, alive: true}], reason: "ไม่มีพ่อแม่ไปคุยแทน"}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "ครูยอมลดเหลือภาคทัณฑ์ ขากลับไม่มีใครในรถพูดสักคำ", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ใหญ่ที่บ้านถูกต่อว่ากลับมา ผลสอบยังถูกยกเลิกเหมือนเดิม", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+      - id: deny
+        text: "บอกว่าไม่เคยซื้อ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "หลักฐานมีแค่คำซัดทอด เรื่องจบที่หนังสือตักเตือน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ในสมุดมีลายเซ็นรับของคุณ ครูยกเลิกผลสอบแล้วเพิ่มโทษฐานโกหก", effects: {happiness: -2, knowledge: -1}, merit: [{cat: neutral}]}
+
+  # ← teen_risky_answers_01 "ซื้อเฉลยจากรุ่นพี่" (ทางไม่โดน)
+  - id: risky_answers_quiet_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "เฉลยชุดนั้น"
+    text: "รุ่นพี่ที่ขายเฉลยถูกจับได้ คนซื้อจากเขาหลายคนถูกเรียกเข้าห้องปกครอง แต่สมุดจดชื่อหน้าที่มีชื่อคุณหายไปก่อน เรื่องเงียบไปแล้ว คุณรู้ดีว่าที่รอดมาไม่ใช่เพราะเก่ง แค่จังหวะดี"
+    choices:
+      - id: relief
+        text: "โล่งใจ ไม่คิดถึงอีก"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: never_again
+        text: "บอกตัวเองว่าครั้งเดียวพอ"
+        effects: {knowledge: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: tell_close
+        text: "เล่าให้เพื่อนสนิทฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: keep_secret
+        text: "เก็บเป็นความลับคนเดียว"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  # หนุ่มสาว — ใบผ่านงานปลอม
+  - id: young_risky_cert_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [21, 28], occupation: [factory, clerk, service, technician, professional, manager]}
+    title: "ใบผ่านงาน"
+    text: "บริษัทที่ใฝ่ฝันเปิดรับคนมีประสบการณ์สองปี คุณมีแค่หกเดือน ร้านถ่ายเอกสารหน้าตลาดรับทำใบผ่านงาน หัวกระดาษบริษัทจริง ลายเซ็นครบ ใช้เวลาครึ่งวัน"
+    choices:
+      - id: buy_cert
+        text: "ซื้อใบผ่านงานปลอม"
+        hint: "ราคา: บาปหนัก"
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 1, text: "ได้งานตำแหน่งที่อยากได้ เงินเดือนสูงกว่าที่เคยได้มาก", effects: {income_mult: 1.1, happiness: 1}, schedules: [{event: risky_cert_caught_01, after_years: [1, 5]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้งานตำแหน่งที่อยากได้ เงินเดือนสูงกว่าที่เคยได้มาก", effects: {income_mult: 1.1, happiness: 1}, schedules: [{event: risky_cert_quiet_01, after_years: [1, 5]}], merit: [{cat: neutral}]}
+      - id: apply_true
+        text: "สมัครตามจริง หกเดือน"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: lower_post
+        text: "สมัครตำแหน่งที่ต่ำกว่า"
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - id: stay_year
+        text: "ทำงานเดิมต่ออีกปี"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+
+  # ← young_risky_cert_01 "ซื้อใบผ่านงานปลอม" (ทางโดน)
+  - id: risky_cert_caught_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "ตรวจประวัติย้อนหลัง"
+    text: "ฝ่ายบุคคลตรวจประวัติพนักงานย้อนหลังทั้งบริษัท โทรไปบริษัทในใบผ่านงานของคุณ ปลายสายบอกว่าไม่เคยมีพนักงานชื่อนี้"
+    choices:
+      - id: resign
+        text: "ยอมรับ ลาออกเอง"
+        effects: {income_mult: 0.9, happiness: -2}
+        merit: [{cat: sila, level: 1}]
+      - id: pay_damage
+        text: "จ่ายค่าเสียหายขอทำงานต่อ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "บริษัทหักเงินก้อนใหญ่แล้วให้ทำงานต่อแบบภาคทัณฑ์", effects: {money: {unit: income_x, amount: -1}, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บริษัทรับเงินแล้วยังเลิกจ้าง ชื่อคุณอยู่ในรายชื่อที่ฝ่ายบุคคลส่งต่อกัน", effects: {money: {unit: income_x, amount: -1}, income_mult: 0.85, happiness: -2}, merit: [{cat: neutral}]}
+      - id: ask_parents
+        text: "ขอพ่อแม่ไปรับรองให้"
+        requires: {family: [{role: parent, alive: true}], reason: "ไม่มีพ่อแม่ไปรับรองให้"}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้านายเห็นแก่ผู้ใหญ่ ให้ทำงานต่อแบบภาคทัณฑ์", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ผู้ใหญ่ที่บ้านต้องนั่งฟังเรื่องนี้จนจบ แล้วคุณก็ถูกเลิกจ้างอยู่ดี", effects: {relations: -2, income_mult: 0.85}, merit: [{cat: neutral}]}
+      - id: deny
+        text: "ยืนยันว่าบริษัทเก่าจำผิด"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "บริษัทเก่าเปลี่ยนเจ้าของไปแล้ว ไม่มีใครยืนยันอะไรได้ เรื่องค้างไว้แค่นั้น", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เจ้าของบริษัทเก่ายืนยันเป็นหนังสือ ถูกไล่ออกและถูกแจ้งความเอกสารปลอม", effects: {income_mult: 0.8, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+
+  # ← young_risky_cert_01 "ซื้อใบผ่านงานปลอม" (ทางไม่โดน)
+  - id: risky_cert_quiet_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "ร้านถ่ายเอกสารหน้าตลาด"
+    text: "ร้านถ่ายเอกสารที่ทำใบผ่านงานให้ถูกตำรวจบุก พนักงานในร้านถูกเรียกสอบหลายคน แต่สมุดลูกค้าของร้านปีนั้นไฟไหม้ไปก่อน เรื่องเงียบไปแล้ว คุณรู้ดีว่าที่รอดมาไม่ใช่เพราะเก่ง แค่จังหวะดี"
+    choices:
+      - id: relief
+        text: "โล่งใจ ไม่คิดถึงอีก"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: never_again
+        text: "ทำงานให้คุ้มกับที่ได้มา"
+        effects: {knowledge: 1, health: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: tell_close
+        text: "เล่าให้คนสนิทฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: keep_secret
+        text: "เก็บเป็นความลับคนเดียว"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ทำงาน — ฝากชื่อขึ้นตำแหน่ง
+  - id: work_risky_string_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager]}
+    title: "เก้าอี้หัวหน้าแผนก"
+    text: "ตำแหน่งหัวหน้าแผนกว่างลง คุณกับเพื่อนร่วมงานอีกคนมีสิทธิ์เท่ากัน แต่เขาทำงานนานกว่าและเก่งกว่า เพื่อนเก่าของคุณเป็นกรรมการบริษัท บอกว่ายกหูโทรศัพท์ครั้งเดียวเรื่องก็จบ"
+    choices:
+      - id: call_board
+        text: "ฝากชื่อกับเพื่อนที่เป็นกรรมการ"
+        hint: "ราคา: บาปหนัก"
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 1, text: "ได้ตำแหน่งหัวหน้า เพื่อนร่วมงานคนนั้นยิ้มแสดงความยินดีแบบไม่สบตา", effects: {income_mult: 1.15, network: 1}, schedules: [{event: risky_string_caught_01, after_years: [1, 5]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้ตำแหน่งหัวหน้า เพื่อนร่วมงานคนนั้นยิ้มแสดงความยินดีแบบไม่สบตา", effects: {income_mult: 1.15, network: 1}, schedules: [{event: risky_string_quiet_01, after_years: [1, 5]}], merit: [{cat: neutral}]}
+      - id: compete
+        text: "แข่งกันตามผลงาน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ผลงานไตรมาสนั้นชนะขาด ได้ตำแหน่งแบบไม่มีใครค้าน", effects: {income_mult: 1.1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เพื่อนร่วมงานได้ตำแหน่งไป คุณทำงานเดิมต่อ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: step_back
+        text: "ถอยให้คนที่เก่งกว่า"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: move_dept
+        text: "ขอย้ายไปแผนกอื่น"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+
+  # ← work_risky_string_01 "ฝากชื่อกับเพื่อนที่เป็นกรรมการ" (ทางโดน)
+  - id: risky_string_caught_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ข้อความถึงฝ่ายบุคคล"
+    text: "เพื่อนร่วมงานที่ถูกเบียดยื่นเรื่องร้องเรียน แนบข้อความที่กรรมการคนนั้นสั่งฝ่ายบุคคลให้เลือกคุณ ฝ่ายกฎหมายเรียกคุณไปชี้แจง"
+    choices:
+      - id: step_down
+        text: "ยอมรับ ขอลงจากตำแหน่ง"
+        effects: {income_mult: 0.9, happiness: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: pay_off
+        text: "จ่ายเงินให้เขาถอนเรื่อง"
+        hint: "ราคา: บาปหนัก"
+        merit: [{cat: greed_harm, level: 2}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เขารับเงินแล้วถอนเรื่อง ลาออกไปอยู่บริษัทคู่แข่ง", effects: {money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาไม่รับเงิน อัดเสียงไว้เป็นหลักฐานอีกกระทง คุณถูกไล่ออก", effects: {income_mult: 0.8, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+      - id: ask_family
+        text: "ขอพ่อแม่ช่วยหาทนาย"
+        requires: {family: [{role: parent, alive: true}], reason: "ไม่มีพ่อแม่ช่วยหาทนาย"}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ทนายที่ที่บ้านหามาเจรจาจนเรื่องจบที่ย้ายแผนก", effects: {money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทนายช่วยได้แค่ไม่ให้เป็นคดี ตำแหน่งยังหลุด", effects: {money: {unit: income_x, amount: -0.5}, income_mult: 0.9}, merit: [{cat: neutral}]}
+      - id: deny
+        text: "บอกว่าไม่รู้เรื่อง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "กรรมการคนนั้นรับไว้คนเดียว แต่ทั้งชั้นรู้ว่าคุณขึ้นมายังไง", effects: {network: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ข้อความมีชื่อคุณชัด ถูกปลดจากตำแหน่งแล้วไล่ออก", effects: {income_mult: 0.8, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
+
+  # ← work_risky_string_01 "ฝากชื่อกับเพื่อนที่เป็นกรรมการ" (ทางไม่โดน)
+  - id: risky_string_quiet_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "กรรมการคนนั้น"
+    text: "กรรมการที่ฝากชื่อให้คุณเกษียณไปแล้ว เพื่อนร่วมงานคนนั้นลาออกไปเงียบ ๆ ไม่มีใครในบริษัทถามว่าคุณได้ตำแหน่งมายังไง เรื่องเงียบไปแล้ว คุณรู้ดีว่าที่รอดมาไม่ใช่เพราะเก่ง แค่จังหวะดี"
+    choices:
+      - id: relief
+        text: "โล่งใจ ไม่คิดถึงอีก"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: earn_it
+        text: "ทำงานให้คุ้มกับเก้าอี้"
+        effects: {knowledge: 1, health: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: call_friend
+        text: "โทรหาเพื่อนที่ลาออกไป"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: keep_secret
+        text: "เก็บเป็นความลับคนเดียว"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
