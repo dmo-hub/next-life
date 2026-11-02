@@ -1608,6 +1608,7 @@ export function choose(st, idx, loan) {
     const n = st.trips?.length ?? 0;
     const trip = idx === ENTRY.accept && tripRoll(st.seed, ev.entry, n);
     if (trip) {
+      if (overlapLeftIsekai(st)) overlapStep(st);
       st.log.push({ id: `isekai_${ev.entry}`, age: st.age, choice: idx, text: ev.choices[idx].text });
       st.trip = startIsekai({
         seed: (st.seed ^ TRIP.salt ^ Math.imul(n + 1, 0x9e3779b1)) >>> 0, past: st.name, ledger: st.ledger,
@@ -1802,6 +1803,9 @@ export const overlapOf = (st) => st?.overlap ?? 0;
 export function overlapStep(st) {
   st.overlap = overlapOf(st) + 1;
 }
+// ตระกูลเคยออกจากต่างโลกมาแล้ว = มีชาติต่างโลกลงผัง (กลับมาเกิดแล้ว) หรือทริปที่กลับถึงบ้าน · ทริปหลงตายในต่างโลก ไม่นับว่าออก
+// เข้าต่างโลกอีกเมื่อจริง = กลับเข้าโลกที่เคยออกไป +1 (เกิด · ถูกเรียก · ทริป)
+export const overlapLeftIsekai = (st) => [...(st.lineage ?? []), { trips: st.trips }].some((l) => l.isekai || l.trips?.some((t) => t.home));
 
 // ปีที่หายไปเดินด้วย stepYear ปกติ (เงิน คนในบ้าน ด่านเรียน) แต่ไม่ทอยตายและไม่จับกอง — ตัวไม่อยู่ เรื่องของปีนั้นจึงมาเป็นข่าวหลังกลับ
 function tripBack(st) {

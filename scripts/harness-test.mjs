@@ -380,17 +380,24 @@ const f2 = (v) => v.toFixed(2);
   const stay = walk(state, P('reborn'));
   const away = walk(playLife(mixSeed(1, 802), content, BOTS.สุ่ม).state, P('isekai'));
   const back = E.nextLife(away);
+  const backV = back.overlap;
   const again = walk(playLife(back.seed, content, BOTS.สุ่ม, null, back).state, P('isekai'));
-  check('ค่าซ้อนทับ: เกิดกลับหลังชาติต่างโลก +1 ส่งต่อทายาท · เกิดในโลกปกติต่อกันไม่มีช่อง', !('overlap' in stay.heir) && !('overlap' in E.nextLife(stay)) && away.heir.overlap === 1 && back.overlap === 1 && again.heir.overlap === 2, `${E.overlapOf(stay.heir)} · ${away.heir.overlap} · ${again.heir.overlap}`);
+  // รอบสอง: เข้าต่างโลกซ้ำหลังเคยออก +1 แล้วเกิดกลับอีก +1 ⇒ 1 + 2
+  check('ค่าซ้อนทับ: เกิดกลับหลังชาติต่างโลก +1 ส่งต่อทายาท · เข้าต่างโลกซ้ำ +1 · เกิดในโลกปกติต่อกันไม่มีช่อง', !('overlap' in stay.heir) && !('overlap' in E.nextLife(stay)) && away.heir.overlap === 1 && backV === 1 && again.heir.overlap === 3, `${E.overlapOf(stay.heir)} · ${away.heir.overlap} · ${again.heir.overlap}`);
   const tripBot = Object.assign((card, rng, h) => (card.entry ? E.ENTRY.accept : BOTS.สุ่ม(card, rng, h)), { isekai: true, trip: (card, rng) => card.choices.map((_, k) => k).filter((k) => !card.locked?.[k])[0] });
-  let home = null, lost = null;
-  for (let i = 0; i < 300 && !(home && lost); i++) {
+  // ค่าที่ควรได้ = ทริปกลับบ้าน + ทริปที่เริ่มหลังเคยกลับบ้านแล้ว (เข้าต่างโลกซ้ำ) · ทริปหลงไม่ได้กลับ
+  const want = (trips) => trips.reduce((a, t) => ({ v: a.v + (a.left ? 1 : 0) + (t.home ? 1 : 0), left: a.left || !!t.home }), { v: 0, left: false }).v;
+  let tHome = null, tLost = null, tAgain = null;
+  for (let i = 0; i < 300 && !(tHome && tLost && tAgain); i++) {
     const r = playLife(mixSeed(1, 9000 + i), content, tripBot).state;
-    const h = (r.trips ?? []).filter((t) => t.home).length;
-    if (h && !home) home = [h, E.overlapOf(r)];
-    if (r.tripLost && !lost) lost = [(r.trips ?? []).filter((t) => t.home).length, E.overlapOf(r)];
+    const t = r.trips ?? [];
+    const got = [want(t), E.overlapOf(r)];
+    if (t.some((x) => x.home) && !tHome) tHome = got;
+    if (r.tripLost && !tLost) tLost = got;
+    if (t.findIndex((x) => x.home) >= 0 && t.findIndex((x) => x.home) < t.length - 1 && !tAgain) tAgain = got;
   }
-  check('ค่าซ้อนทับ: ทริปกลับบ้าน +1 ต่อทริป · ทริปหลงไม่นับ', !!home && home[0] === home[1] && !!lost && lost[0] === lost[1], `กลับ ${home ?? 'ไม่เจอ'} · หลง ${lost ?? 'ไม่เจอ'}`);
+  const same = (x) => !!x && x[0] === x[1];
+  check('ค่าซ้อนทับ: ทริปกลับบ้าน +1 · ทริปหลงไม่นับ · ทริปหลังเคยกลับ (เข้าซ้ำ) +1', same(tHome) && same(tLost) && same(tAgain), `กลับ ${tHome ?? 'ไม่เจอ'} · หลง ${tLost ?? 'ไม่เจอ'} · เข้าซ้ำ ${tAgain ?? 'ไม่เจอ'}`);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

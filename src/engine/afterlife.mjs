@@ -9,7 +9,7 @@ import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
 import { goalsMet } from './titles.mjs';
 import { heirPets } from './family.mjs';
 import { CHRONIC } from './death.mjs';
-import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf } from './life.mjs';
+import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai } from './life.mjs';
 import { ISEKAI, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 import { warnPick } from './warn.mjs';
@@ -232,6 +232,8 @@ function closeIsekai(af) {
 function sendToIsekai(af) {
   const r = CARRY.min + af.rng.next() * (CARRY.max - CARRY.min);
   const prev = af.from;
+  // เข้าต่างโลกครั้งแรกของรอบปรโลกนี้ (เกิด/ถูกเรียก) ขณะตระกูลเคยออกจากต่างโลกมาแล้ว = กลับเข้าโลกเดิม · รอบต่อเนื่อง (prev) ยังไม่ได้ออก
+  if (!prev && overlapLeftIsekai(af.st)) overlapStep(af.st);
   // ชาติต่างโลกที่จบแล้ว (prev) ตายจริงในโลกนั้น — ธงของชาติไทยยังติดอยู่ จึงต้องกันไว้ ไม่ให้รอบถัดไปพกทั้งก้อนด้วย
   const whole = !prev && !!af.st.flags?.isekai_call && isGone(af.st);
   af.isekai = startIsekai({
