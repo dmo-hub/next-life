@@ -29,6 +29,12 @@ events:
         text: "ขอไปเรียนประจำในเมือง"
         effects: {knowledge: 2, relations: -2}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "พาพ่อแม่ไปที่หลบภัยที่จดไว้"
+        requires: {flags: {has: ["braced:typhoon_gay"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:typhoon_gay"]
+        effects: {health: 1, relations: 2}
+        merit: [{cat: neutral}]
 
   - id: era_dis_typhoon_small_01
     type: A
@@ -93,6 +99,12 @@ events:
         text: "ปิดทีวี ไปวิ่งให้หายเครียด"
         effects: {health: 1, relations: -1}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ของที่มัดไว้รอด เอาไปแจกชายฝั่ง"
+        requires: {flags: {has: ["braced:typhoon_gay"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:typhoon_gay"]
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
 
   # ---------- SARS ----------
   - id: era_dis_sars_kid_01
@@ -128,6 +140,12 @@ events:
         outcomes:
           - {weight: 3, ok: true, multipliers: {stats: {health: 1.5}}, text: "เรียนทันเพื่อน ไม่มีอะไรเกิดขึ้น", effects: {knowledge: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ไข้ขึ้นกลางห้อง ถูกจับแยก เพื่อนตั้งฉายาไปทั้งปี", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ใส่หน้ากากที่ตุนไว้ แล้วไปหาหมอ"
+        requires: {flags: {has: ["braced:sars"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:sars"]
+        effects: {health: 1, relations: 1}
         merit: [{cat: neutral}]
 
   - id: era_dis_sars_small_01
@@ -197,6 +215,12 @@ events:
         text: "อาสาช่วยคัดกรองที่สนามบิน"
         effects: {health: -1, relations: 2, knowledge: 1}
         merit: [{cat: help_others, level: 2}]
+      - id: use_braced
+        text: "แจกหน้ากากที่ตุนไว้ให้เพื่อนบ้าน"
+        requires: {flags: {has: ["braced:sars"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:sars"]
+        effects: {relations: 2, health: 1}
+        merit: [{cat: help_others, level: 1}]
 
   # ---------- สึนามิ ----------
   - id: era_dis_tsunami_kid_01
@@ -230,6 +254,12 @@ events:
       - id: move_inland
         text: "ฝันร้าย ขอพ่อแม่ย้ายไปไกลทะเล"
         effects: {health: 1, happiness: -1, income_mult: 0.8}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ดึงมือพ่อแม่วิ่งขึ้นที่สูงทันที"
+        requires: {flags: {has: ["braced:tsunami"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:tsunami"]
+        effects: {health: 1, relations: 2}
         merit: [{cat: neutral}]
 
   - id: era_dis_tsunami_adult_01
@@ -267,6 +297,12 @@ events:
         text: "ปิดข่าว ไม่อยากรับรู้อีก"
         effects: {health: 1, happiness: 1, relations: -1}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "รอสายญาติ เขาจำทางหนีที่เล่าไว้"
+        requires: {flags: {has: ["braced:tsunami"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:tsunami"]
+        effects: {happiness: 2, relations: 2}
+        merit: [{cat: neutral}]
 
   # ---------- น้ำท่วมใหญ่ ----------
   - id: era_dis_flood_kid_01
@@ -298,6 +334,12 @@ events:
         outcomes:
           - {weight: 2, ok: true, text: "เรือขายดีเป็นเทน้ำเทท่า คุณทาสีจนมือเลอะทั้งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "น้ำลดเร็วกว่าที่คิด เรือค้างเต็มหน้าบ้าน กลายเป็นกระถางต้นไม้", effects: {money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ของเล่นกับหนังสือยกขึ้นไว้แล้ว"
+        requires: {flags: {has: ["braced:great_flood"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:great_flood"]
+        effects: {happiness: 1, knowledge: 1}
         merit: [{cat: neutral}]
 
   - id: era_dis_flood_small_01
@@ -359,6 +401,12 @@ events:
         text: "ย้ายกลับไปอยู่บ้านเกิดทำสวน"
         effects: {health: 1, happiness: 1, chronic: {health: 1}, income_mult: 0.8}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ของในบ้านยกขึ้นที่สูงไว้แล้ว"
+        requires: {flags: {has: ["braced:great_flood"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:great_flood"]
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
 
   # ---------- โควิด-19 ----------
   - id: era_dis_covid_kid_01
@@ -392,6 +440,12 @@ events:
         outcomes:
           - {weight: 2, text: "หลุดเรียนบ่อยจนเกรดร่วง ตามเพื่อนไม่ทันไปอีกหลายปี", effects: {knowledge: -2}, merit: [{cat: neutral}]}
           - {weight: 1, ok: true, multipliers: {stats: {relations: 2}}, text: "ครูเห็นความพยายาม ขี่มอเตอร์ไซค์เอาชีทมาส่งถึงบ้านทุกอาทิตย์", effects: {knowledge: 1, relations: 2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "เข้าเรียนผ่านจอได้ตั้งแต่วันแรก"
+        requires: {flags: {has: ["braced:covid19"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:covid19"]
+        effects: {knowledge: 2}
         merit: [{cat: neutral}]
 
   - id: era_dis_covid_small_01
@@ -468,6 +522,12 @@ events:
         requires: {flags: {has: [kept_savings]}, reason: "ไม่มีเงินสำรองเก็บไว้"}
         clears_flags: [kept_savings]
         effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "อยู่บ้านกับของที่ตุนไว้ครบเดือน"
+        requires: {flags: {has: ["braced:covid19"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:covid19"]
+        effects: {health: 1, happiness: 1}
         merit: [{cat: neutral}]
 
   # ---------- เรื่องต่อ (ออกทาง next เท่านั้น) ----------

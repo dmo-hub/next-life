@@ -1,0 +1,221 @@
+# ลางภัยยุค (afterfall-1): ใบ herald_of ออกปีก่อนภัยที่จะได้ใบรับมือครั้งแรก ไม่อยู่ในกองสุ่ม
+# ห้ามเอ่ยชื่อภัยหรือปี — เป็นเสียงคนรอบตัว/ข่าวไกล ๆ ที่ผู้เล่นต้องตีความเอง
+# คนอ่านมีตั้งแต่อายุ 6 ⇒ ตัวเลือกพูดในนามทั้งบ้าน · ตัวเลือกเตรียมตั้ง braced:<ภัย> ให้ใบรับมือปีหน้าปลดตัวเลือกที่ใช้ของที่เตรียม
+events:
+  - id: era_herald_typhoon_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    herald_of: typhoon_gay
+    title: "ทะเลนิ่งผิดฤดู"
+    text: "ชาวประมงแถวบ้านว่าปีนี้ทะเลแปลก ลมร้อนนิ่งผิดฤดู ปลาหนีเข้าฝั่งเร็ว คนแก่ที่ออกเรือมาทั้งชีวิตเริ่มเอาเชือกมัดหลังคาบ้านตัวเอง"
+    choices:
+      - id: tie_roof
+        text: "ช่วยที่บ้านมัดหลังคา เก็บของ"
+        effects: {health: -1}
+        sets_flags: ["braced:typhoon_gay"]
+        merit: [{cat: neutral}]
+      - id: note_shelter
+        text: "จดทางไปที่หลบภัยติดข้างฝา"
+        sets_flags: ["braced:typhoon_gay"]
+        merit: [{cat: neutral}]
+      - id: old_storm_tales
+        text: "ชวนคนแก่เล่าเรื่องพายุเก่า"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: wind_every_year
+        text: "ลมแรงทุกปี ไม่เห็นแปลก"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: era_herald_sars_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    herald_of: sars
+    title: "ข่าวไอจากเมืองไกล"
+    text: "ข่าวต่างประเทศเล่าถึงคนไอไม่หยุดในเมืองไกล ๆ หมอที่อนามัยเริ่มขอให้ล้างมือก่อนเข้าห้องตรวจ ร้านขายยาหน้าปากซอยสั่งหน้ากากมาเพิ่มอีกลัง"
+    choices:
+      - id: stock_masks
+        text: "ซื้อหน้ากากติดบ้านไว้สักกล่อง"
+        effects: {money: {unit: income_x, amount: -0.1}}
+        sets_flags: ["braced:sars"]
+        merit: [{cat: neutral}]
+      - id: wash_habit
+        text: "หัดล้างมือให้เป็นนิสัยทั้งบ้าน"
+        effects: {health: 1}
+        sets_flags: ["braced:sars"]
+        merit: [{cat: neutral}]
+      - id: tell_elders
+        text: "เล่าข่าวให้คนแก่ในบ้านฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: far_news
+        text: "ข่าวไกลตัว ไม่เกี่ยวกับเรา"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: era_herald_tsunami_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    herald_of: tsunami
+    title: "ครูวิทย์พูดเรื่องทะเล"
+    text: "ครูวิทยาศาสตร์ออกรายการวิทยุ เล่าว่าแผ่นดินใต้ทะเลขยับบ่อยขึ้น ใครไปทะเลให้จำไว้ว่าน้ำลดไกลผิดปกติคือสัญญาณให้วิ่งขึ้นที่สูง คนในซอยหัวเราะว่าครูดูหนังมากไป"
+    choices:
+      - id: learn_high_ground
+        text: "จำทางขึ้นที่สูงตอนไปทะเล"
+        sets_flags: ["braced:tsunami"]
+        merit: [{cat: neutral}]
+      - id: tell_family
+        text: "เล่าให้คนในบ้านฟังจนจำได้"
+        effects: {relations: 1}
+        sets_flags: ["braced:tsunami"]
+        merit: [{cat: neutral}]
+      - id: read_quakes
+        text: "หาหนังสือแผ่นดินไหวมาอ่าน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: laugh_along
+        text: "หัวเราะตามคนในซอย"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: era_herald_flood_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    herald_of: great_flood
+    title: "น้ำในคลองสูงผิดตา"
+    text: "ฝนปีนี้มาเร็วกว่าทุกปี คนแก่ในซอยยืนมองระดับน้ำในคลองแล้วส่ายหัว ผู้ใหญ่บ้านประกาศเสียงตามสายให้ช่วยกันลอกท่อ เขื่อนข้างบนว่ากันว่าเก็บน้ำไว้เต็มแล้ว"
+    choices:
+      - id: raise_things
+        text: "ช่วยที่บ้านยกของขึ้นที่สูง"
+        effects: {health: -1}
+        sets_flags: ["braced:great_flood"]
+        merit: [{cat: neutral}]
+      - id: boat_and_water
+        text: "เตรียมเรือกับน้ำดื่มไว้ก่อน"
+        effects: {money: {unit: income_x, amount: -0.1}}
+        sets_flags: ["braced:great_flood"]
+        merit: [{cat: neutral}]
+      - id: clear_drains
+        text: "ไปช่วยผู้ใหญ่บ้านลอกท่อ"
+        effects: {health: -1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: floods_every_year
+        text: "น้ำมาทุกปี ไม่เห็นต้องห่วง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: era_herald_covid_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    herald_of: covid19
+    title: "แขกยกเลิกห้องเงียบ ๆ"
+    text: "ข่าวโรคใหม่จากต่างแดนเริ่มขึ้นจอทุกคืน ญาติที่ทำงานโรงแรมว่าแขกยกเลิกห้องกันเงียบ ๆ ร้านขายยาเริ่มติดป้ายขายหน้ากากคนละไม่เกินสองกล่อง"
+    choices:
+      - id: stock_month
+        text: "ตุนข้าวสารกับยาไว้สักเดือน"
+        effects: {money: {unit: income_x, amount: -0.2}}
+        sets_flags: ["braced:covid19"]
+        merit: [{cat: neutral}]
+      - id: learn_online
+        text: "หัดสั่งของกับเรียนผ่านจอ"
+        effects: {knowledge: 1}
+        sets_flags: ["braced:covid19"]
+        merit: [{cat: neutral}]
+      - id: call_relatives
+        text: "โทรเตือนญาติต่างจังหวัด"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: news_every_year
+        text: "ข่าวแบบนี้มีทุกปี"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: era_herald_oil2_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    herald_of: oil_crisis_2
+    title: "ราคาหน้าปั๊มขยับ"
+    text: "ราคาน้ำมันหน้าปั๊มขยับขึ้นทุกอาทิตย์ คนขับรถเมล์บ่นว่าเถ้าแก่จะขึ้นค่ารถ ผู้ใหญ่ในซอยเริ่มคุยกันว่าโรงงานแถวนี้อาจลดกะ"
+    choices:
+      - id: save_small
+        text: "บอกที่บ้านกันเงินไว้ก้อนหนึ่ง"
+        sets_flags: ["braced:oil_crisis_2"]
+        merit: [{cat: neutral}]
+      - id: grow_veggies
+        text: "หัดปลูกผักหลังบ้านไว้กินเอง"
+        effects: {health: 1}
+        sets_flags: ["braced:oil_crisis_2"]
+        merit: [{cat: neutral}]
+      - id: buy_before_up
+        text: "ซื้อของที่อยากได้ก่อนแพง"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: not_our_business
+        text: "เรื่องผู้ใหญ่ ไม่ต้องคิดมาก"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: era_herald_tyk_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    herald_of: tom_yum_kung
+    title: "ตึกสร้างค้างทีละหลัง"
+    text: "ไฟแนนซ์เปิดใหม่แจกดอกเบี้ยสูงกันทั้งเมือง ตึกสร้างค้างเริ่มโผล่ทีละหลัง ลุงที่ทำงานธนาคารกระซิบว่าคนต่างชาติถอนเงินออกกันเงียบ ๆ"
+    choices:
+      - id: move_to_big_bank
+        text: "บอกที่บ้านย้ายเงินไปธนาคารใหญ่"
+        sets_flags: ["braced:tom_yum_kung"]
+        merit: [{cat: neutral}]
+      - id: no_new_debt
+        text: "บอกที่บ้านอย่าเพิ่งกู้ก้อนใหม่"
+        sets_flags: ["braced:tom_yum_kung"]
+        merit: [{cat: neutral}]
+      - id: chase_high_rate
+        text: "ดอกสูงแบบนี้ ฝากเพิ่มดีกว่า"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: uncle_exaggerates
+        text: "ลุงพูดเกินจริงไปเอง"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: era_herald_gfc_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    herald_of: global_financial_crisis
+    title: "ออเดอร์เลื่อนส่ง"
+    text: "ข่าวบ้านในต่างประเทศราคาตกติดกันหลายเดือน ออเดอร์โรงงานส่งออกแถวบ้านเริ่มเลื่อนส่ง หัวหน้างานประกาศงดโอทีทั้งแผนกโดยไม่บอกเหตุผล"
+    choices:
+      - id: emergency_fund
+        text: "บอกที่บ้านกันเงินสำรองไว้"
+        sets_flags: ["braced:global_financial_crisis"]
+        merit: [{cat: neutral}]
+      - id: learn_new_skill
+        text: "หัดวิชาใหม่ไว้เผื่อวันหลัง"
+        effects: {knowledge: 1}
+        sets_flags: ["braced:global_financial_crisis"]
+        merit: [{cat: neutral}]
+      - id: buy_as_planned
+        text: "ซื้อของตามแผนเดิม"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: far_away_trouble
+        text: "เรื่องไกลตัว เดี๋ยวก็ผ่านไป"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]

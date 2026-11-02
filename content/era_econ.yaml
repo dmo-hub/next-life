@@ -28,6 +28,12 @@ events:
       - text: "ปลูกผักหลังบ้านไว้กินเอง"
         effects: {health: 1, knowledge: 1, happiness: -1}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "กินผักที่ปลูกไว้ตั้งแต่ปีก่อน"
+        requires: {flags: {has: ["braced:oil_crisis_2"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:oil_crisis_2"]
+        effects: {health: 1, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
 
   - id: era_econ_oil2_small_01
     type: A
@@ -95,6 +101,12 @@ events:
         clears_flags: [kept_savings]
         effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "กินผักหลังบ้าน ไม่ต้องซื้อของแพง"
+        requires: {flags: {has: ["braced:oil_crisis_2"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:oil_crisis_2"]
+        effects: {health: 1, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
 
   # ── ต้มยำกุ้ง ──
   - id: era_econ_tyk_kid_01
@@ -121,6 +133,12 @@ events:
       - text: "ไปอยู่กับย่า ช่วยย่าทำสวน"
         effects: {health: 1, relations: 2, knowledge: -1}
         merit: [{cat: care_parents, level: 1}]
+      - id: use_braced
+        text: "ไม่มีหนี้ก้อนใหม่ ไม่ต้องย้าย"
+        requires: {flags: {has: ["braced:tom_yum_kung"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:tom_yum_kung"]
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
 
   - id: era_econ_tyk_adult_01
     type: A
@@ -156,6 +174,12 @@ events:
         clears_flags: [kept_savings]
         effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "เงินอยู่ธนาคารใหญ่ ไม่หายไปด้วย"
+        requires: {flags: {has: ["braced:tom_yum_kung"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:tom_yum_kung"]
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
 
   # ── วิกฤตการเงินโลก ──
   - id: era_econ_gfc_kid_01
@@ -182,6 +206,12 @@ events:
       - text: "ตามแม่ไปช่วยงานวัดทุกเสาร์"
         effects: {relations: 1, happiness: 1, knowledge: 1}
         merit: [{cat: help_others, level: 1}]
+      - id: use_braced
+        text: "เงินที่บ้านกันไว้พอรอแม่หางาน"
+        requires: {flags: {has: ["braced:global_financial_crisis"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:global_financial_crisis"]
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
 
   - id: era_econ_gfc_small_01
     type: A
@@ -247,6 +277,12 @@ events:
           - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "ของเก่าในบ้านขายหมดเกลี้ยง เลยรับของคนอื่นมาขายต่อจนเป็นร้านออนไลน์", effects: {happiness: 1, money: {unit: income_x, amount: 0.4}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
           - {weight: 1, text: "โดนลูกค้าโกงโอนเงินปลอม ของหายไปสามกล่อง", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ใช้เงินที่กันไว้รองานที่ดีกว่า"
+        requires: {flags: {has: ["braced:global_financial_crisis"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:global_financial_crisis"]
+        effects: {happiness: 1, income_mult: 1.1}
+        merit: [{cat: neutral}]
 
   # ── ชรา 60+ (ทั้งสามเหตุการณ์) ──
   - id: era_econ_oil2_old_01
@@ -275,6 +311,12 @@ events:
           - {weight: 1, ok: true, text: "วงแชร์เปียได้ตามนัด ได้ดอกมาจ่ายค่าไฟไปทั้งปี", effects: {happiness: 1, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
           - {weight: 2, text: "ท้าวแชร์หอบเงินหนีกลางดึก เงินเก็บหายไปก้อนใหญ่", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ใช้เงินที่กันไว้จ่ายค่าไฟ"
+        requires: {flags: {has: ["braced:oil_crisis_2"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:oil_crisis_2"]
+        effects: {happiness: 1, health: 1}
+        merit: [{cat: neutral}]
 
   - id: era_econ_tyk_old_01
     type: A
@@ -300,6 +342,12 @@ events:
       - text: "ใส่บาตรเท่าเดิมทุกเช้า ไม่ลด"
         effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
         merit: [{cat: dana, level: 1}]
+      - id: use_braced
+        text: "เงินฝากย้ายไว้ธนาคารใหญ่แล้ว"
+        requires: {flags: {has: ["braced:tom_yum_kung"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:tom_yum_kung"]
+        effects: {happiness: 2, health: 1}
+        merit: [{cat: neutral}]
 
   - id: era_econ_gfc_old_01
     type: A
@@ -326,6 +374,12 @@ events:
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ดอกได้ตามสัญญา ค่ายาไม่ต้องควักเงินต้น", effects: {happiness: 1, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ที่ให้ดอกสูงกลายเป็นแชร์ลูกโซ่ ปิดตัวเงียบไปพร้อมเงินต้น", effects: {happiness: -2, money: {unit: income_x, amount: -1}}, sets_flags: [ponzi_victim], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ใช้เงินที่กันไว้ ไม่แตะเงินต้น"
+        requires: {flags: {has: ["braced:global_financial_crisis"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:global_financial_crisis"]
+        effects: {happiness: 1}
         merit: [{cat: neutral}]
 
   # ── เรื่องต่อ (ออกทาง next เท่านั้น · ไม่มี era/weight) ──
