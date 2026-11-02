@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ศึกษาหนึ่งในอสงไขย</title>
+<style>
+  /* Tailwind-inspired — slate/sky/indigo + multi-color pills */
+  :root[data-theme="light"] {
+    --bg: #ffffff;
+    --bg-elev: #f8fafc;
+    --bg-elev-2: #f1f5f9;
+    --bg-hover: #e2e8f0;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-dim: #475569;
+    --text-faint: #94a3b8;
+    --accent: #0ea5e9;
+    --accent-soft: #e0f2fe;
+    --accent-border: #7dd3fc;
+    --indigo: #6366f1;
+    --indigo-soft: #e0e7ff;
+    --green: #10b981;
+    --green-soft: #d1fae5;
+    --green-border: #6ee7b7;
+    --amber: #f59e0b;
+    --amber-soft: #fef3c7;
+    --amber-border: #fcd34d;
+    --red: #f43f5e;
+    --red-soft: #ffe4e6;
+    --red-border: #fda4af;
+    --violet: #8b5cf6;
+    --violet-soft: #ede9fe;
+  }
+  :root[data-theme="dark"] {
+    --bg: #020617;
+    --bg-elev: #0f172a;
+    --bg-elev-2: #1e293b;
+    --bg-hover: #334155;
+    --border: #1e293b;
+    --border-strong: #334155;
+    --text: #f1f5f9;
+    --text-dim: #94a3b8;
+    --text-faint: #64748b;
+    --accent: #38bdf8;
+    --accent-soft: rgba(56,189,248,0.12);
+    --accent-border: rgba(56,189,248,0.35);
+    --indigo: #818cf8;
+    --indigo-soft: rgba(129,140,248,0.12);
+    --green: #34d399;
+    --green-soft: rgba(52,211,153,0.12);
+    --green-border: rgba(52,211,153,0.35);
+    --amber: #fbbf24;
+    --amber-soft: rgba(251,191,36,0.12);
+    --amber-border: rgba(251,191,36,0.35);
+    --red: #fb7185;
+    --red-soft: rgba(251,113,133,0.12);
+    --red-border: rgba(251,113,133,0.35);
+    --violet: #a78bfa;
+    --violet-soft: rgba(167,139,250,0.12);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-size: 14px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 48px 24px 96px; }
+
+  /* Header */
+  .header {
+    margin-bottom: 36px; padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 24px; flex-wrap: wrap;
+  }
+  h1 {
+    font-size: 30px; font-weight: 700; letter-spacing: -0.025em;
+    margin: 0 0 8px; color: var(--text);
+  }
+  .intro { color: var(--text-dim); font-size: 15px; line-height: 1.6; margin: 0; }
+  .theme-toggle {
+    background: var(--bg-elev); color: var(--text-dim);
+    border: 1px solid var(--border-strong); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; cursor: pointer;
+    font-family: inherit; font-weight: 500; transition: all 0.15s;
+  }
+  .theme-toggle:hover { background: var(--bg-hover); color: var(--text); }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 6px 8px;
+    color: var(--text-dim); font-size: 13px; margin-top: 12px;
+  }
+  .meta .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; background: var(--bg-elev);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px; color: var(--text-dim);
+  }
+  .meta .chip b { color: var(--text); font-weight: 600; }
+
+  /* Section */
+  section { margin-bottom: 44px; scroll-margin-top: 24px; }
+  h2 {
+    font-size: 22px; font-weight: 700; letter-spacing: -0.018em;
+    color: var(--text); margin: 0 0 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  h2 .section-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--accent-soft); color: var(--accent);
+    font-size: 13px; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  h3 { font-size: 15px; font-weight: 600; color: var(--text); margin: 20px 0 8px; }
+  p { color: var(--text); font-size: 13.5px; line-height: 1.65; margin: 4px 0 12px; }
+  p.meta { color: var(--text-dim); font-size: 13px; }
+
+  /* Tables */
+  .table-wrap {
+    border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; margin: 12px 0 16px;
+    background: var(--bg-elev);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    text-align: left; font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-dim);
+    padding: 10px 14px;
+    background: var(--bg-elev-2);
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td {
+    padding: 10px 14px; vertical-align: top;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--bg-hover); }
+
+  /* Code */
+  code {
+    font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+    font-size: 12.5px;
+    background: var(--bg-elev-2);
+    color: var(--indigo);
+    padding: 1px 7px; border-radius: 5px;
+    border: 1px solid var(--border);
+    font-weight: 500;
+  }
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 16px 18px; overflow-x: auto;
+    font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+    font-size: 12.5px; line-height: 1.7;
+    margin: 12px 0 16px;
+    border: 1px solid #1e293b;
+  }
+  pre code { background: transparent; border: none; color: inherit; padding: 0; }
+
+  /* Pills */
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 9px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid;
+  }
+  .pill.sky     { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-border); }
+  .pill.emerald { background: var(--green-soft); color: var(--green); border-color: var(--green-border); }
+  .pill.amber   { background: var(--amber-soft); color: var(--amber); border-color: var(--amber-border); }
+  .pill.rose    { background: var(--red-soft); color: var(--red); border-color: var(--red-border); }
+  .pill.violet  { background: var(--violet-soft); color: var(--violet); border-color: transparent; }
+  .pill.slate   { background: var(--bg-elev-2); color: var(--text-dim); border-color: var(--border-strong); }
+
+  /* Callouts */
+  .summary-card, .finding, .danger {
+    margin: 12px 0; padding: 14px 16px;
+    border-radius: 10px; border: 1px solid;
+    font-size: 13.5px; line-height: 1.65;
+  }
+  .summary-card { background: var(--accent-soft); border-color: var(--accent-border); }
+  .summary-card b { color: var(--accent); font-weight: 700; }
+  .finding { background: var(--amber-soft); border-color: var(--amber-border); }
+  .finding b { color: var(--amber); font-weight: 700; }
+  .danger { background: var(--red-soft); border-color: var(--red-border); }
+  .danger b { color: var(--red); font-weight: 700; }
+
+  /* Stat tiles */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px; margin: 12px 0 16px;
+  }
+  .stat {
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .stat .label {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-faint); margin-bottom: 4px;
+  }
+  .stat .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px; font-weight: 700;
+    color: var(--text); line-height: 1.2;
+  }
+  .stat .delta { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+  ul, ol { margin: 4px 0 12px; padding-left: 24px; }
+  li { margin: 4px 0; color: var(--text); font-size: 13.5px; }
+
+  @media (max-width: 780px) {
+    .container { padding: 24px 16px 64px; }
+    h1 { font-size: 24px; }
+    .header { flex-direction: column; }
+  }
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<!--nav--><style>
+.nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
+.nl-nav{font:15px/1.4 Sarabun,"Noto Sans Thai",system-ui,sans-serif;text-align:left}
+.nl-nav a{text-decoration:none;color:inherit}
+.nl-in{max-width:1040px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
+.nl-top{background:#1F2430;color:#F4EFE3}
+.nl-top>.nl-in{min-height:52px;flex-wrap:wrap;column-gap:12px}
+.nl-brand{font-weight:700;margin-right:auto;padding:12px 0}
+.nl-main{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.nl-main a{padding:13px 8px 11px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-main a[aria-current]{border-bottom-color:#D6A64A;font-weight:600}
+.nl-swap{border:1px solid #6B7080;padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
+.nl-swap:hover,.nl-main a:hover{opacity:1;color:#fff}
+.nl-dev .nl-top{background:#2F3833}
+.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:#8A6A2E;color:#F4EFE3;vertical-align:2px}
+.nl-tabs{background:#F3EEE2;color:#1F2430;border-bottom:1px solid #D8D0C0}
+.nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
+.nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-tabs a[aria-current]{border-bottom-color:#A23B2C;font-weight:600}
+.nl-tabs.nl-sub{background:#EBE4D5;font-size:14px}
+@media (max-width:640px){
+.nl-top>.nl-in{padding:0}
+.nl-brand{padding:12px 16px}
+.nl-swap{margin-right:16px}
+.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid #343A48}
+}
+</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../../dev/index.html">สารบัญ</a><a href="../../gdd.html">GDD</a><a href="../../dev/plan.html">สเปก/แผน</a><a href="../../dev/maps/continent.html">แผนที่</a><a href="../../dev/study/games.html" aria-current="page">งานศึกษา</a><a href="../../dev/archive/index.html">คลังเก่า</a></div></div><div class="nl-tabs nl-sub" role="navigation" aria-label="หน้าในหมวดงานศึกษา"><div class="nl-in"><a href="../../dev/study/games.html">ศึกษาเกมอื่น</a><a href="../../dev/study/asamkhyeya.html" aria-current="page">ศึกษาหนึ่งในอสงไขย</a></div></div></div><!--/nav-->
+<div class="container">
+
+  <div class="header">
+    <div>
+      <h1>ศึกษาเกม "หนึ่งในอสงไขย"</h1>
+      <p class="intro">เล่นจริงด้วย Playwright 8 ชีวิต และอ่านกลไกจากไฟล์เกม เพื่อออกแบบชาติต่างโลกแบบเวลาเดินเอง (B68b) ไม่ได้คัดลอกโค้ดหรือข้อความของเกม</p>
+      <div class="meta">
+        <span class="chip"><b>ใบงาน</b> B69 · เลน E</span>
+        <span class="chip"><b>วันที่</b> 2026-10-26</span>
+        <span class="chip"><b>ไฟล์เกม</b> 735,844 ไบต์</span>
+      </div>
+    </div>
+    <button class="theme-toggle" onclick="
+      const r = document.documentElement;
+      r.dataset.theme = r.dataset.theme === 'dark' ? 'light' : 'dark';
+      this.textContent = r.dataset.theme === 'dark' ? '☾ Dark' : '☀ Light';
+    ">☀ Light</button>
+  </div>
+
+  <section>
+    <div class="stats">
+      <div class="stat"><div class="label">อีเวนต์ในเกม</div><div class="value">409</div></div>
+      <div class="stat"><div class="label">ชีวิตที่เล่นจริง</div><div class="value" style="color:var(--green)">8</div></div>
+      <div class="stat"><div class="label">ชีวิตเต็ม (ความเร็วปกติ)</div><div class="value" style="color:var(--amber)">~25 นาที</div></div>
+      <div class="stat"><div class="label">ใบตัวเลือกต่อชีวิต</div><div class="value">50–56</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="section-num">01</span>เกมเล่นยังไง</h2>
+    <div class="summary-card">ชีวิตอมนุษย์ในป่าหิมพานต์ อายุราว 500 ปีทิพย์ เดินทีละ 5 ปี ตาละ 15 วินาที ผู้เล่นเลือกว่าช่วงนี้จะทุ่มเทกับอะไร แล้วปล่อยเวลาเดิน ใบที่มีตัวเลือกจะหยุดเวลารอ บุญบาปซ่อนทั้งชีวิตแล้วเปิดตอนตาย</div>
+    <ul>
+      <li>เลือกโฟกัสครั้งเดียว เวลาเดินต่อเองทุกตาจนมีใบตัวเลือก (ทดสอบ 6 ตาติด) <span class="pill emerald">เล่น</span></li>
+      <li>แต่ละตาวัดได้ 14.6–15.0 วินาทีที่ ×1 เร่งได้ ×2 ×4 หยุดและข้ามได้ <span class="pill emerald">เล่น</span></li>
+      <li>จุดบังคับ: เลือกครู (อายุ 45) แอบเข้าเมืองมนุษย์ (75) เลือกฝ่ายในศึก (170–225) คู่แข่งโผล่ทุก 50–100 ปี <span class="pill sky">อ่านโค้ด</span></li>
+      <li>ตายเพราะร่างกายเสื่อมทุกตาหลังวัยชรา ไม่ได้ทอยตายที่อายุขัย <span class="pill sky">อ่านโค้ด</span></li>
+      <li>ภพหลังตายคิดจากบุญลบบาป (ตบะ 220 ขึ้นไปไปพรหมโลก) แต่ชาติหน้าเริ่มบุญบาปศูนย์เสมอ <span class="pill sky">อ่านโค้ด</span></li>
+    </ul>
+    <p><small>ภาพหน้าจอเกมต้นทางเก็บไว้นอกเว็บ (เป็นภาพเกมของผู้อื่น)</small></p>
+  </section>
+
+  <section>
+    <h2><span class="section-num">02</span>8 ชีวิตที่เล่น</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>บุคลิก</th><th>เผ่า</th><th>อายุตาย</th><th>สาเหตุ</th><th>บุญ / บาป</th><th>ภพ</th><th>ตา</th><th>ใบตัวเลือก</th></tr></thead>
+      <tbody>
+        <tr><td>นักบวช</td><td>ครุฑ</td><td class="mono">554</td><td>สิ้นอายุขัย</td><td class="mono">379 / 6</td><td><span class="pill emerald">ดุสิต</span></td><td class="mono">111</td><td class="mono">53</td></tr>
+        <tr><td>นักรบ</td><td>วานร</td><td class="mono">474</td><td>สิ้นอายุขัย</td><td class="mono">35 / 176</td><td><span class="pill rose">อเวจี</span></td><td class="mono">95</td><td class="mono">56</td></tr>
+        <tr><td>พ่อค้า</td><td>คนธรรพ์</td><td class="mono">278</td><td>ช้างเหยียบตอนแข่งกับคู่แข่ง</td><td class="mono">23 / 13</td><td><span class="pill amber">วนกลับหิมพานต์</span></td><td class="mono">56</td><td class="mono">31</td></tr>
+        <tr><td>ครอบครัว</td><td>วานร</td><td class="mono">501</td><td>สิ้นอายุขัย</td><td class="mono">105 / 4</td><td><span class="pill emerald">ดาวดึงส์</span></td><td class="mono">101</td><td class="mono">51</td></tr>
+        <tr><td>ทายาทรุ่น 2</td><td>วานร</td><td class="mono">584</td><td>สิ้นอายุขัย</td><td class="mono">57 / 3</td><td><span class="pill emerald">จาตุมหาราชิกา</span></td><td class="mono">44</td><td class="mono">26</td></tr>
+        <tr><td>ทายาทรุ่น 3</td><td>วานร</td><td class="mono">499</td><td>ไข้ห่าจากดูแลผู้ป่วย</td><td class="mono">28 / 2</td><td><span class="pill emerald">มนุษย์ผู้มีบุญ</span></td><td class="mono">29</td><td class="mono">16</td></tr>
+        <tr><td>สุ่ม</td><td>รุกขเทวดา</td><td class="mono">479</td><td>สิ้นอายุขัย</td><td class="mono">119 / 18</td><td><span class="pill emerald">ดาวดึงส์</span></td><td class="mono">96</td><td class="mono">50</td></tr>
+        <tr><td>ทายาทรุ่น 2</td><td>รุกขเทวดา</td><td class="mono">408</td><td>สิ้นอายุขัย</td><td class="mono">28 / 2</td><td><span class="pill emerald">มนุษย์ผู้มีบุญ</span></td><td class="mono">13</td><td class="mono">7</td></tr>
+      </tbody>
+    </table></div>
+    <div class="finding"><b>จากที่เล่น:</b> นักบวชซื้อพร 4 อย่างด้วยตบะ ตบะเหลือ 173 ไม่ถึงเกณฑ์พรหมโลก 220 ทั้งที่บุญสุทธิ 373 ได้แค่ดุสิต เกมไม่บอกเกณฑ์นี้ ส่วนทายาทเริ่มเล่นที่อายุ 340–365 ซึ่งเป็นวัยชราแล้ว ชาติจึงสั้น 13–44 ตา</div>
+  </section>
+
+  <section>
+    <h2><span class="section-num">03</span>5 ข้อที่กระทบชาติต่างโลก (B68b)</h2>
+    <ol>
+      <li>โฟกัสค้างข้ามตาได้ ทำให้ต่างจากการ์ดทีละใบของชาติไทยชัดที่สุด และกดราว 60 ครั้งต่อชีวิต</li>
+      <li>ตายเพราะเสื่อมทุกตาหลังวัยชรา ใช้แทนตารางชีพที่ต่างโลกยังไม่มีได้ แต่ช่วงชรา 30–50 ตาเป็นช่วงที่น่าเบื่อที่สุด</li>
+      <li>ทายาทเริ่มที่อายุจริงจึงเริ่มวัยชรา ถ้าใช้ทายาทแบบ Rogue Legacy ควรให้เริ่มเป็นเด็ก</li>
+      <li>บุญบาปเปลี่ยนอีเวนต์ระหว่างชีวิต (นักรบโดนวีรบุรุษมาปราบ 5 ครั้ง) ผู้เล่นเดาบัญชีได้ ควรย้ายไปผูกกับชื่อเสียง</li>
+      <li>สุขกับรู้ขับระบบหลายตัว แต่ไม่อยู่ในชุดค่า HP พลัง เวท เสน่ห์ โชค ต้องมีอะไรมารับสองบทบาทนี้</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2><span class="section-num">04</span>เรื่องที่รอเจ้าของเคาะ</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>คำถาม</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">1</td><td>สุขกับรู้: ตัดทิ้ง ซ่อนเป็นค่าภายใน หรือเพิ่มเข้าชุดค่า</td></tr>
+        <tr><td class="mono">2</td><td>โฟกัสค้างข้ามตาได้ หรือบังคับเลือกทุกตา</td></tr>
+        <tr><td class="mono">3</td><td>สร้างเมืองและดินแดน (5 ระดับ ภาษี อีเวนต์ปกครอง) เอาไหม</td></tr>
+        <tr><td class="mono">4</td><td>ทายาทต่างโลกเริ่มเป็นเด็ก หรือเริ่มที่อายุจริง</td></tr>
+        <tr><td class="mono">5</td><td>ย่นตาวัยชรา (เช่นตาละ 10 ปี) ไหม</td></tr>
+        <tr><td class="mono">6</td><td>ย้ายผลของบุญบาประหว่างชีวิตไปผูกกับชื่อเสียงไหม</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2><span class="section-num">05</span>ไฟล์ละเอียด</h2>
+    <ul>
+      <li><code>play-log.md</code> เล่นจริง ลำดับหน้าจอ จังหวะเกม</li>
+      <li><code>mechanics.md</code> ค่าสถานะ สูตร โฟกัส อาชีพ เผ่า บุญบาปทุกจุด ปรโลก ทายาท ร้าน</li>
+      <li><code>events.md</code> อีเวนต์ 409 ใบ</li>
+      <li><code>adapt.md</code> กลไกไหนใช้ตรง ปรับ หรือไม่เอา</li>
+    </ul>
+    <ul>
+      <li><code>market-shop.md</code> ร้านพร ของวิเศษ ตลาดมนุษย์ สัตว์คู่ใจ ทายาทแบบศิษย์ (งานต่อ B70)</li>
+      <li><code>angles.md</code> เล่นมุมอื่น 5 แบบ: คนบาป สายสัมพันธ์ ผู้ปกครอง นักผจญภัย ไม่ทำอะไร</li>
+      <li><code>training.md</code> ฝึกฝน ครู พรสวรรค์ แข่งขัน/สอบ (งานต่อ B74)</li>
+      <li><code>rival-friend-party.md</code> สหาย คู่แข่งตลอดชีวิต กระบวนท่า ปาร์ตี้ (งานต่อ B75)</li>
+      <li><code>relationship-rewards.md</code> ผลตอบแทนจากความสัมพันธ์ (งานต่อ B71)</li>
+      <li><code>secret-events.md</code> อีเวนต์ลับ คิวผลล่าช้า สายลับ (งานต่อ B73)</li>
+      <li><code>dark-paths.md</code> สายมืด ไสยดำ อาชญากรรม การเมืองสกปรก (งานต่อ B82)</li>
+      <li><code>dungeon-monsters.md</code> ดันเจี้ยน มอนสเตอร์ จุดอ่อน สูตรต่อสู้ (งานต่อ B80 B81)</li>
+      <li><code>mystical.md</code> สิ่งลี้ลับ คำสาป ผี เทพยั่ว (งานต่อ B85)</li>
+      <li><code>inventory.md</code> ของติดตัว กระเป๋า ตำหนิของ (งานต่อ B78)</li>
+      <li><code>high-risk-path.md</code> ทางเสี่ยงสูง ตบะ พรหมโลก (งานต่อ B84)</li>
+      <li><code>easter-eggs.md</code> อีสเตอร์เอกก์และแบบมุก (งานต่อ B73 B87)</li>
+      <li><code>career-ladder.md</code> สายยศและการเลื่อนขั้น (งานต่อ B40)</li>
+      <li><code>city-kingdom.md</code> เมือง การปกครอง และทางสู่อาณาจักร (งานต่อ B79 B68l)</li>
+      <li><code>succession.md</code> การสืบทอดและลูกศิษย์ (งานต่อ B76)</li>
+    </ul>
+    <div class="finding"><b>ตรวจเพิ่มแล้ว:</b> ช่อง "?" ในตารางอีเวนต์ 6 แถวเทียบโค้ดครบ · กดบันทึกการ์ด PNG จริงได้ภาพ 1080×1810 · เล่นเพิ่ม 60 ชีวิตจนครบ 10 เผ่า · เล่นทายาทแบบศิษย์ 2 ช่วง ศิษย์เริ่มอายุ 114–153 ชาติยาวได้ 114 ตา · ปุ่มทายาทที่จอ 390 ไม่ถูกบังเมื่ออยู่ในจอ (ที่สคริปต์เจอตอนแรกยังไม่รู้สาเหตุ)</div>
+  </section>
+
+</div>
+<script>if(matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.dataset.theme='dark';document.querySelector('.theme-toggle').textContent='☾ Dark'}</script>
+</body>
+</html>

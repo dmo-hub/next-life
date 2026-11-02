@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>หลักไมล์ 8 สาย — โลกหลัก</title>
+<style>
+  :root { --ink: #3b2a1a; --paper: #efe3c2; }
+  body { margin: 0; background: #1b1610; color: #f1e7cf; font-family: "Sarabun", "Leelawadee UI", system-ui, sans-serif; }
+  .wrap { display: flex; gap: 14px; padding: 14px; flex-wrap: wrap; align-items: flex-start; }
+  .mapbox { flex: 1 1 820px; max-width: 1200px; }
+  canvas { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: 0 4px 24px #000a; cursor: pointer; }
+  aside { flex: 0 0 300px; font-size: 14px; }
+  .card { background: var(--paper); color: var(--ink); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 2px 10px #0006; }
+  .card h2 { font-size: 16px; margin: 0 0 6px; }
+  .muted { color: #6b5638; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  td { padding: 3px 4px; border-top: 1px solid #d6c59c; vertical-align: top; }
+  ol, ul { margin: 4px 0 0; padding-left: 18px; }
+  button { font: inherit; padding: 4px 10px; cursor: pointer; }
+</style>
+</head>
+<body>
+<!--nav--><style>
+.nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
+.nl-nav{font:15px/1.4 Sarabun,"Noto Sans Thai",system-ui,sans-serif;text-align:left}
+.nl-nav a{text-decoration:none;color:inherit}
+.nl-in{max-width:1040px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
+.nl-top{background:#1F2430;color:#F4EFE3}
+.nl-top>.nl-in{min-height:52px;flex-wrap:wrap;column-gap:12px}
+.nl-brand{font-weight:700;margin-right:auto;padding:12px 0}
+.nl-main{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.nl-main a{padding:13px 8px 11px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-main a[aria-current]{border-bottom-color:#D6A64A;font-weight:600}
+.nl-swap{border:1px solid #6B7080;padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
+.nl-swap:hover,.nl-main a:hover{opacity:1;color:#fff}
+.nl-dev .nl-top{background:#2F3833}
+.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:#8A6A2E;color:#F4EFE3;vertical-align:2px}
+.nl-tabs{background:#F3EEE2;color:#1F2430;border-bottom:1px solid #D8D0C0}
+.nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
+.nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-tabs a[aria-current]{border-bottom-color:#A23B2C;font-weight:600}
+.nl-tabs.nl-sub{background:#EBE4D5;font-size:14px}
+@media (max-width:640px){
+.nl-top>.nl-in{padding:0}
+.nl-brand{padding:12px 16px}
+.nl-swap{margin-right:16px}
+.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid #343A48}
+}
+</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../../dev/index.html">สารบัญ</a><a href="../../gdd.html">GDD</a><a href="../../dev/plan.html">สเปก/แผน</a><a href="../../dev/maps/continent.html" aria-current="page">แผนที่</a><a href="../../dev/study/games.html">งานศึกษา</a><a href="../../dev/archive/index.html">คลังเก่า</a></div></div><div class="nl-tabs nl-sub" role="navigation" aria-label="หน้าในหมวดแผนที่"><div class="nl-in"><a href="../../dev/maps/continent.html">ทวีป</a><a href="../../dev/maps/afterlife.html">ปรโลก</a><a href="../../dev/maps/dungeon.html">ดันเจียน</a><a href="../../dev/maps/lineage.html">ตระกูล</a><a href="../../dev/maps/milestones.html" aria-current="page">หลักไมล์</a><a href="../../dev/maps/politics.html">การเมือง</a></div></div></div><!--/nav-->
+<div class="wrap">
+  <div class="mapbox"><canvas id="map" width="1200" height="800"></canvas></div>
+  <aside>
+    <div class="card">
+      <h2>ตอนจบ (ร่าง · สูงสุด 3 สาย)</h2>
+      <ol id="ending"></ol>
+      <div class="muted" style="margin-top:6px;font-size:12px">ชื่อตอนจบตามหลักไมล์สูงสุด เรียงสายที่ไปไกลสุดก่อน · ถึงปลายสาย = ชื่อพิเศษของสาย</div>
+    </div>
+    <div class="card">
+      <h2>ถึงแล้วต่อสาย</h2>
+      <table id="sum"></table>
+      <div style="margin-top:8px"><button id="reset">ล้างทั้งหมด</button></div>
+    </div>
+    <div class="card">
+      <h2>กติกา (รอบ 20)</h2>
+      <ul>
+        <li>คลิกหลักไมล์ = ถึงขั้นนั้น · คลิกขั้นที่ถึงล่าสุดซ้ำ = ถอยหนึ่งขั้น</li>
+        <li>ไม่มีป้ายบนการ์ด — ดูหลักไมล์จากหน้ารวมอย่างเดียว</li>
+        <li>ถึงปลายสาย → ชื่อเสียงตระกูล +1</li>
+        <li>หลักไมล์ = แต้มในร้านบุญหลังตาย</li>
+      </ul>
+      <div class="muted" style="margin-top:6px;font-size:12px">ยังไม่ได้ตัดสิน: ชื่อตอนจบพิเศษต่อสาย · สเกลแต้มร้านบุญต่อหลักไมล์</div>
+    </div>
+  </aside>
+</div>
+<script src="core.js"></script>
+<script>
+const { fbm, rnd, vignette, cartouche, label, badge, load, save, canvasPoint } = MapCore;
+// ---- ข้อมูลตาม tickets/37-main-world-milestones.md หัว "Answer รอบ 20" ข้อ 1 · ร่างเปลี่ยน = แก้ที่นี่ + node maps/check-data.mjs ----
+const LINES = [
+  { name: 'เรียน', steps: ['จบประถม', 'ม.ปลาย/อาชีวะ', 'ปริญญาตรี', 'สูงกว่าตรี'] },
+  { name: 'ราชการ/ยศ', steps: ['เข้ารับราชการ', 'ขั้นกลาง', 'ขั้นสูง', 'ยอดสาย'] },
+  { name: 'การเมือง', steps: ['ผู้นำท้องถิ่น', 'นายก อบต.', 'ส.ส.', 'หัวหน้าพรรค', 'นายกฯ'] },
+  { name: 'ธุรกิจ', steps: ['ค้าขาย', 'เปิดกิจการ', 'มีลูกจ้าง/ลงทุน', 'เศรษฐี'] },
+  { name: 'ธรรม/มู', steps: ['ทำบุญสม่ำเสมอ', 'บวช/เข้าสำนัก', 'คนนับถือ', 'ผู้มีบารมี'] },
+  { name: 'ครอบครัว', steps: ['แต่งงาน', 'มีลูก', 'มีหลาน', 'สี่รุ่นพร้อมหน้า'] },
+  { name: 'มั่งคั่ง', steps: ['มีบ้าน', 'ฐานะขยับ 2 ขั้น', 'มั่งคั่ง'] },
+  { name: 'ทางลัด', steps: ['เงินก้อนแรก', 'รวยทางลัด', 'รอดจนตายไม่โดนจับ'] },
+];
+const KEY = 'nextlife-milestones';
+const COL = ['#2f6f8f', '#6a5a2e', '#8a3b12', '#a5791c', '#6b3f86', '#a04a5a', '#3f7a3a', '#555'];
+
+const cv = document.getElementById('map');
+const ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height;
+const top0 = 110, rowH = (H - top0 - 30) / LINES.length, x0 = 190, x1 = W - 120;
+// ถึงแล้ว = เลขขั้น (0 = ยังไม่ถึงขั้นไหน) · ของที่เก็บผิดรูปถือว่ายังไม่ถึง
+let got = load(KEY, {});
+if (typeof got !== 'object' || !got) got = {};
+const reached = (i) => Math.max(0, Math.min(LINES[i].steps.length, got[LINES[i].name] | 0));
+const at = (i, k) => {
+  const n = LINES[i].steps.length;
+  const x = x0 + ((x1 - x0) * k) / (n - 1);
+  const y = top0 + rowH * (i + 0.5) + Math.sin(x / 90 + i) * 6;
+  return [x, y];
+};
+
+function paper() {
+  const img = ctx.createImageData(W, H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const s = 0.86 + 0.18 * fbm(x / 90, y / 90);
+    const o = (y * W + x) * 4;
+    img.data[o] = 236 * s; img.data[o + 1] = 222 * s; img.data[o + 2] = 186 * s; img.data[o + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+function draw() {
+  paper();
+  cartouche(ctx, 'หลักไมล์ 8 สาย — โลกหลัก', 'ต่อจากใบ 37 รอบ 20 · คลิกหลักไมล์ที่ชีวิตนี้ถึง', { x: 20, y: 18, w: 420 });
+  LINES.forEach((L, i) => {
+    const n = L.steps.length, r = reached(i);
+    // ถนนของสาย: ช่วงที่ถึงแล้วสีของสาย · ที่เหลือเส้นประจาง
+    for (let k = 0; k < n - 1; k++) {
+      const [ax, ay] = at(i, k), [bx, by] = at(i, k + 1);
+      ctx.save();
+      ctx.strokeStyle = k + 1 < r ? COL[i] : 'rgba(80,60,35,.35)';
+      ctx.lineWidth = k + 1 < r ? 6 : 3;
+      ctx.setLineDash(k + 1 < r ? [] : [8, 6]);
+      ctx.beginPath(); ctx.moveTo(ax, ay);
+      ctx.quadraticCurveTo((ax + bx) / 2, (ay + by) / 2 - 12 + 24 * rnd(i, k), bx, by);
+      ctx.stroke();
+      ctx.restore();
+    }
+    label(ctx, L.name, 92, at(i, 0)[1] + 5, { size: 17 });
+    L.steps.forEach((s, k) => {
+      const [x, y] = at(i, k);
+      badge(ctx, x, y, k < r ? '✓' : String(k + 1), k < r ? COL[i] : '#a8977a', 12);
+      label(ctx, s, x, y + 30, { size: 12, color: k < r ? '#2e1e10' : '#6b5638' });
+    });
+    // ปลายสาย: ธงเมื่อถึงขั้นสุดท้าย
+    const [ex, ey] = at(i, n - 1);
+    ctx.save();
+    ctx.fillStyle = r === n ? '#c8961e' : 'rgba(80,60,35,.3)';
+    ctx.fillRect(ex + 22, ey - 22, 3, 26);
+    ctx.beginPath(); ctx.moveTo(ex + 25, ey - 22); ctx.lineTo(ex + 45, ey - 16); ctx.lineTo(ex + 25, ey - 10); ctx.fill();
+    ctx.restore();
+    if (r === n) label(ctx, 'ถึงปลายสาย', ex + 70, ey - 2, { size: 11, italic: true, color: '#8a3b12' });
+  });
+  vignette(ctx, W, H);
+  side();
+}
+function side() {
+  const rows = LINES.map((L, i) => ({ L, r: reached(i), n: L.steps.length }));
+  document.getElementById('sum').innerHTML = rows.map(({ L, r, n }) => `<tr><td>${L.name}</td><td>${r}/${n}${r ? ` · ${L.steps[r - 1]}` : ''}</td></tr>`).join('');
+  // ไกลสุด = สัดส่วนที่ถึง ก่อนจำนวนขั้น (สายสั้นถึงปลายนับไกลกว่าสายยาวที่ถึงครึ่งทาง) · เสมอเรียงตามลำดับสาย
+  const far = rows.filter((x) => x.r).sort((a, b) => b.r / b.n - a.r / a.n || b.r - a.r).slice(0, 3);
+  document.getElementById('ending').innerHTML = far.length
+    ? far.map(({ L, r, n }) => `<li>${L.steps[r - 1]}${r === n ? ` <b>· ปลายสาย${L.name}</b> <span class="muted">(ชื่อพิเศษยังไม่ตั้ง)</span>` : ''}</li>`).join('')
+    : '<li class="muted">ยังไม่ถึงหลักไมล์ไหน</li>';
+}
+cv.addEventListener('click', (e) => {
+  const [px, py] = canvasPoint(cv, e);
+  LINES.forEach((L, i) => L.steps.forEach((_, k) => {
+    const [x, y] = at(i, k);
+    if (Math.hypot(px - x, py - y) > 18) return;
+    const r = reached(i);
+    got[L.name] = r === k + 1 ? k : k + 1;
+    save(KEY, got);
+  }));
+  draw();
+});
+document.getElementById('reset').onclick = () => { got = {}; save(KEY, got); draw(); };
+document.fonts?.ready.then(draw);
+draw();
+</script>
+</body>
+</html>

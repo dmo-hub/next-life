@@ -2,7 +2,8 @@
 // · หน้ารวมการ์ดไม่มีผล/บุญบาป/น้ำหนัก · ทุกการ์ดใน content อยู่บนหน้ารวมการ์ด
 // · ส่วนต่างโลก (B88b) ทั้งสองหน้าครบทุกการ์ด · หน้ารวมการ์ดไม่มีผลสำเร็จ/พลาด ความยาก หรือตอนจบ
 // · หน้าเฉลย (B88) ครบทุกการ์ด/ตัวเลือก/ผลสุ่ม และเฉลยจริง — กฎ "ไม่หลุดบุญบาป" ของหน้ารวมการ์ดไม่ใช้กับหน้านี้
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { NAV_PAGES, NAV_SKIP, NAV_START, NAV_END, navHtml } from '../src/site/nav.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { siteFacts, injectFacts } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
@@ -47,7 +48,7 @@ const moved = ['cards', 'titles'].every((k) => probe.includes(`data-fact="${k}">
 check('ตัวควบคุม: ข้อมูลเปลี่ยนแล้วเลขบนหน้าเปลี่ยนตาม', !moved, ` (การ์ด ${facts.cards} → ${f2.cards} · ฉายา ${facts.titles} → ${f2.titles})`);
 
 // 3) ลิงก์ภายในเว็บไม่ตาย (ไฟล์ · รูป · ที่มาจากหน้าใน docs/ และ docs/spec/ ที่หน้าเว็บลิงก์ถึง)
-const all = [...pages, 'cards', 'whatsnew', 'archive/cards-v1', 'archive/overview-v1'];
+const all = [...new Set([...pages, 'whatsnew', ...NAV_PAGES.map((p) => p.replace(/\.html$/, ''))])];
 const dead = [];
 for (const p of all) {
   const html = read(`${p}.html`);
@@ -310,6 +311,16 @@ const focusCtl = focusGap(focusPage.replaceAll(`<b>${escHtml(f0.name)}</b>`, '')
 const fGap = focusGap(focusPage);
 const fLeak = focusLeak(focusPage);
 check('หน้าโฟกัสครบทุกโฟกัสพร้อมป้ายเดียวกับเกม ไม่เผยผลเสี่ยงหรือตัวเลข และมีลิงก์จากเมนู', fGap.length || fLeak.length || needOff.length || noMenu.length || !gddFocus || !focusCtl, ` โลกนี้ ${Object.keys(fdefs).length} · ต่างโลก ${Object.keys(ISEKAI_FOCUS).length}+${Object.keys(ISEKAI_KNOW).length} · อาชีพ ${Object.keys(ISEKAI_CAREERS).length}${fGap.length ? ` · ขาด ${fGap.join(' ')}` : ''}${fLeak.length ? ` · เผย ${fLeak.slice(0, 2).join(' | ')}` : ''}${needOff.length ? ` · need ไม่ตรง ${needOff.join(' ')}` : ''}${noMenu.length ? ` · ไม่มีลิงก์ ${noMenu.join(' ')}` : ''}${gddFocus ? '' : ' · gdd #5 ไม่ชี้มา'} · ตัวควบคุม${focusCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 13) ผังเมนู: ทุกหน้าในผังมีเมนูตรงกับ nav.mjs (แก้มือในหน้าแล้วไม่ build = ตก) · ทุกหน้า .html ใต้ docs/ อยู่ในผัง ไม่มีหน้ากำพร้าที่ไม่มีทางกดไปถึง
+const htmlUnder = (dir, pre = '') => readdirSync(new URL(dir, docs), { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? htmlUnder(`${dir}${d.name}/`, `${pre}${d.name}/`) : d.name.endsWith('.html') ? [`${pre}${d.name}`] : []));
+const navOff = (page, html = read(page)) => html.slice(html.indexOf(NAV_START), html.indexOf(NAV_END) + NAV_END.length) !== navHtml(page);
+const navBad = NAV_PAGES.filter((p) => navOff(p));
+const orphan = (files) => files.filter((f) => !NAV_PAGES.includes(f) && !NAV_SKIP.includes(f));
+const docsHtml = htmlUnder('./');
+// ตัวควบคุม: เมนูหน้าแรกโดนแก้มือ · มีหน้าใหม่ที่ไม่ได้เติมในผัง ⇒ ต้องถูกจับทั้งคู่
+const navCtl = navOff('index.html', read('index.html').replace('>หน้าแรก<', '>หน้าหลัก<')) && orphan([...docsHtml, 'dev/new-page.html']).includes('dev/new-page.html');
+check('ทุกหน้าในผังมีเมนูจาก nav.mjs และไม่มีหน้ากำพร้า', navBad.length || orphan(docsHtml).length || !navCtl, ` ผัง ${NAV_PAGES.length} หน้า · .html ใต้ docs ${docsHtml.length}${navBad.length ? ` · เมนูไม่ตรง ${navBad.join(' ')}` : ''}${orphan(docsHtml).length ? ` · ตกผัง ${orphan(docsHtml).join(' ')}` : ''} · ตัวควบคุม${navCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 process.exit(fail ? 1 : 0);

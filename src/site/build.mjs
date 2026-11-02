@@ -7,6 +7,7 @@ import { injectSpec } from './spec.mjs';
 import { guideHtml } from './guide.mjs';
 import { focusHtml } from './focus.mjs';
 import { injectDemo } from './demo.mjs';
+import { NAV_PAGES, injectNav } from './nav.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'gdd'];
@@ -36,6 +37,13 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     const page = injectFacts(readFileSync(at(`src/site/${name}.html`), 'utf8'), facts, `src/site/${name}.html`).replace(slot, () => html(content));
     writeFileSync(at(`docs/${name}.html`), page);
     out.push(name);
+  }
+  // เมนูฉีดรอบสุดท้ายให้ทุกหน้าในผัง รวมหน้าที่เพิ่งสร้างจากแม่แบบ — แม่แบบจึงถือแค่ marker ว่าง
+  for (const page of NAV_PAGES) {
+    const file = at(`docs/${page}`);
+    const html = readFileSync(file, 'utf8');
+    const next = injectNav(html, page);
+    if (next !== html) writeFileSync(file, next);
   }
   return { facts, pages: out };
 }
