@@ -288,5 +288,19 @@ const fakeCaught = ['when.zz_fake', 'multipliers(การ์ด).zz_fake', 'req
 const missLines = [...missing].map(([k, ids]) => `${k} ${ids.size} ใบ เช่น ${[...ids].slice(0, 3).join(',')}`);
 check('หน้าเฉลยวาดทุกเงื่อนไขและตัวคูณที่การ์ดใช้', missing.size || !fakeCaught, ` key ไม่ขึ้นหน้า ${missing.size}${missLines.length ? `: ${missLines.join(' | ')}` : ''} · ตัวควบคุม${fakeCaught ? 'จับได้' : 'จับไม่ได้'}`);
 
+// merge=build เก็บไฟล์ฝั่งตัวเองตอน merge — ใส่กับหน้าเขียนมือ = เนื้อที่อีก branch เขียนหายเงียบ · หน้าสร้างใหม่ที่ไม่ได้ใส่ = ชนทุก merge
+const attrs = readFileSync(new URL('../.gitattributes', import.meta.url), 'utf8').split(/\r?\n/).map((l) => l.trim().split(/\s+/));
+const mergeBuild = (lines) => new Set(lines.filter(([p, ...w]) => !p.startsWith('#') && w.includes('merge=build')).map(([p]) => p));
+const wantBuild = ['play', ...GEN_PAGES.map(([name]) => name)].map((n) => `docs/${n}.html`);
+const sameSet = (got) => got.size === wantBuild.length && wantBuild.every((p) => got.has(p));
+const gotBuild = mergeBuild(attrs);
+const handBuild = FACT_PAGES.filter((n) => gotBuild.has(`docs/${n}.html`));
+// ตัวควบคุม: เติมหน้าเขียนมือเข้ารายการแล้วต้องตก
+const ctlCaught = !sameSet(mergeBuild([...attrs, [`docs/${FACT_PAGES[0]}.html`, 'merge=build']]));
+const lfAttr = attrs.some(([p, ...w]) => p === 'docs/*.html' && w.includes('eol=lf'));
+const crPages = wantBuild.filter((p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8').includes('\r'));
+check('.gitattributes merge=build ครบหน้าที่ build สร้าง ไม่มีหน้าเขียนมือ · docs eol=lf · ไฟล์ build ไม่มี CR', !sameSet(gotBuild) || handBuild.length || !ctlCaught || !lfAttr || crPages.length,
+  ` merge=build ${gotBuild.size}/${wantBuild.length}${handBuild.length ? ` หน้ามือ ${handBuild.join(',')}` : ''} · eol=lf ${lfAttr ? 'มี' : 'ไม่มี'}${crPages.length ? ` · มี CR ${crPages.join(',')}` : ''} · ตัวควบคุม${ctlCaught ? 'จับได้' : 'จับไม่ได้'}`);
+
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 process.exit(fail ? 1 : 0);

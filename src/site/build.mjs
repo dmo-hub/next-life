@@ -17,21 +17,26 @@ export const GEN_PAGES = [
   ['guide', '<!--__GUIDE__-->', guideHtml],
 ];
 
+// ไฟล์ที่ build เขียนเป็น LF ล้วนเสมอ: แม่แบบ/โมดูลที่ checkout บน Windows เป็น CRLF จะทำให้ผลออกมาปนสองแบบ
+// git จึงเห็นว่าแก้ทั้งที่เนื้อเท่าเดิม แล้ว checkout/stash ไม่ยอม (คู่กับ eol=lf ใน .gitattributes)
+export const toLf = (text) => text.replace(/\r\n/g, '\n');
+
 export function buildSite(content, root = new URL('../../', import.meta.url), facts = siteFacts(content)) {
   const at = (p) => new URL(p, root);
   const out = [];
   for (const name of FACT_PAGES) {
     const file = at(`docs/${name}.html`);
-    const html = readFileSync(file, 'utf8');
+    const raw = readFileSync(file, 'utf8');
+    const html = toLf(raw);
     // หน้าแรกมีเดโมการ์ดจากแกนเกม (B121) · GDD มีภาคผนวกสเปกจาก docs/spec — สร้างใหม่ทุก build
     const faced = injectFacts(html, facts, `docs/${name}.html`);
-    const next = name === 'index' ? injectDemo(faced, content) : name === 'gdd' ? injectSpec(faced) : faced;
-    if (next !== html) writeFileSync(file, next);
+    const next = toLf(name === 'index' ? injectDemo(faced, content) : name === 'gdd' ? injectSpec(faced) : faced);
+    if (next !== raw) writeFileSync(file, next);
     out.push(name);
   }
   for (const [name, slot, html] of GEN_PAGES) {
     const page = injectFacts(readFileSync(at(`src/site/${name}.html`), 'utf8'), facts, `src/site/${name}.html`).replace(slot, () => html(content));
-    writeFileSync(at(`docs/${name}.html`), page);
+    writeFileSync(at(`docs/${name}.html`), toLf(page));
     out.push(name);
   }
   return { facts, pages: out };
