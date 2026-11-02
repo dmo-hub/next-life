@@ -100,15 +100,18 @@ heir:
 # ข้อห้ามตระกูล (dynasty-3) — เรื่องเงินที่เจ็บจริงในชาติหนึ่ง บ้านถือต่อกันหลายรุ่น เก็บที่ st.taboos {ชนิด: ระยะ} แยกจาก parentFlags (ระยะเกินเพดาน tier)
 # cause = เคยติดธงตัวไหนก็ได้ในชาตินี้ (ล้างแล้วยังนับ — loan_shark ล้างตอนปิดหนี้)
 # mark = แกนตั้งธงนี้เองตอนการ์ดใน cards ออก — ค้ำแล้วโดนตามหนี้จริง ต่างจาก guarantor ที่ติดตั้งแต่เซ็น
+# breaks.flags = ตัวเลือกที่ตั้งธงนี้นับว่าผิดข้อห้าม · ชนิดที่ไม่มีธงให้จับ เนื้อหาติดป้าย breaks: [ชนิด] บนตัวเลือกเอง
 # tell = คำบ้านที่รู้ต้นเหตุ · faded = คำบ้านที่จำไม่ได้แล้วว่าทำไม
 taboo:
   guarantor:
     cause: {flags: [burned_guarantor]}
     mark: {flag: burned_guarantor, cards: [debt_guarantor_default_01, mid_guarantor_01, work_guarantor_chase_01]}
+    breaks: {flags: [guarantor]}
     tell: "บ้านนี้ไม่ค้ำประกันให้ใคร"
     faded: "บ้านนี้ถือกันมาว่าไม่ค้ำประกันให้ใคร ไม่มีใครจำได้แล้วว่าทำไม"
   loan_shark:
     cause: {flags: [loan_shark]}
+    breaks: {flags: [loan_shark]}
     tell: "บ้านนี้ไม่กู้เงินนอกระบบ"
     faded: "บ้านนี้ถือกันมาว่าไม่กู้เงินนอกระบบ ไม่มีใครจำได้แล้วว่าทำไม"
   overreach:

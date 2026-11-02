@@ -1,4 +1,4 @@
-# ล็อกทุกตัวเลือก · ล็อกด้วยธงไม่มี reason · requires ว่าง · family ที่บทบาทไม่มีในบ้าน — การ์ดที่ล็อกบางตัวด้วยเงิน/ค่าสถานะยังผ่าน
+# ล็อกทุกตัวเลือก · ล็อกด้วยธงไม่มี reason · requires ว่าง · family ที่บทบาทไม่มีในบ้าน · ฝืนใจไม่มี stats.min/reason — การ์ดที่ล็อกบางตัวด้วยเงิน/ค่าสถานะ (รวมฝืนใจที่ครบ) ยังผ่าน
 events:
   - id: bad_case_01
     type: A
@@ -11,6 +11,7 @@ events:
       - {text: "ทางที่สาม", requires: {flags: {has: [married]}}, sets_flags: [married], merit: [{cat: neutral}]}
       - {text: "ทางที่สี่", requires: {reason: "ไม่มีเงื่อนไข"}, merit: [{cat: neutral}]}
       - {text: "ทางที่ห้า", requires: {family: [{role: cousin}]}, merit: [{cat: neutral}]}
+      - {text: "ทางที่หก", requires: {money: {unit: income_x, amount: 1}, reluctant: true}, merit: [{cat: neutral}]}
   - id: ok_case_01
     type: A
     stage: ทำงาน
@@ -18,6 +19,7 @@ events:
     text: "ข้อความการ์ด"
     choices:
       - {text: "ทางที่หนึ่ง", requires: {stats: {health: {min: 40}}}, merit: [{cat: neutral}]}
+      - {text: "ทางที่ห้า", requires: {stats: {relations: {min: 60}}, reluctant: true, reason: "ยังไม่กล้าพอ"}, merit: [{cat: neutral}]}
       - {text: "ทางที่สอง", requires: {money: {unit: income_x, amount: 2}, reason: "เงินเก็บไม่ถึงสองปี"}, merit: [{cat: neutral}]}
       - {text: "ทางที่สาม", merit: [{cat: neutral}]}
       - {text: "ทางที่สี่", merit: [{cat: neutral}]}

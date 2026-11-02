@@ -1,0 +1,13 @@
+# ป้ายผิดข้อห้ามอ้างชนิดที่ไม่อยู่หมวด taboo: (no_debt) · breaks ว่าง — ชนิดในทะเบียน (overreach) ยังผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", breaks: [no_debt, overreach], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", breaks: [], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", breaks: [overreach], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}

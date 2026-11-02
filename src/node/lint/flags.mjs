@@ -153,6 +153,17 @@ export const rules = [
     },
   },
   {
+    id: 'taboo-breaks',
+    desc: 'choices[].breaks = รายชื่อชนิดข้อห้ามในหมวด taboo: ของ content/rules/flags.yaml — ตัวเลือกนี้นับว่าผิดข้อห้ามตระกูล (ชนิดที่ไม่มีธงให้แกนจับ)',
+    event(e, ctx, r) {
+      for (const [i, c] of list(e.choices).entries()) {
+        if (!isObj(c) || c.breaks === undefined) continue;
+        if (!Array.isArray(c.breaks) || !c.breaks.length) r(`.choices[${i}].breaks`, 'breaks ต้องเป็นรายการชนิดข้อห้าม');
+        else for (const k of c.breaks) if (!ctx.flags.taboo.has(k)) r(`.choices[${i}].breaks`, `ข้อห้าม "${k}" ไม่อยู่ในหมวด taboo: (${[...ctx.flags.taboo].join(' ')})`);
+      }
+    },
+  },
+  {
     id: 'parent-flag-age',
     desc: 'การ์ดที่ when.parent_flags.has ธงที่ทะเบียนตั้ง from_age ต้องออกได้ตั้งแต่อายุนั้นขึ้นไปเท่านั้น (ขอบล่าง when.age หรือต้นช่วง stage) — ธงที่รุ่นก่อนมักติดหลังลูกโตแล้ว การ์ดเด็กจะเล่าเรื่องที่ยังไม่เกิด',
     event(e, ctx, r) {

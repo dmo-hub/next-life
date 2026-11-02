@@ -189,7 +189,8 @@ const used = new Set();
 for (const { doc } of realDocs) for (const { s: f } of flagNames(doc)) used.add(f.split(':')[0]);
 // ธงที่แกนตั้งเอง (ป้ายหมวด 9 · ศาลสั่งล้มละลาย) มีในทะเบียนเพื่อให้เนื้อหาอ่านได้ ไม่ต้องรอเนื้อหาใช้
 // cheat_death: แกนอ่านตอนผลสุ่มตาย (ถูกเรียกตัว B153) — มีผู้อ่านแล้วแม้ยังไม่มีการ์ดตั้ง
-const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death'];
+// ธง mark ของทะเบียน taboo: แกนตั้งตอนการ์ดตามหนี้ออก และแกนอ่านเป็นต้นเหตุข้อห้ามตระกูล
+const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death', ...Object.values(nameContent.taboo).flatMap((t) => (t.mark ? [t.mark.flag] : []))];
 const stale = [...ctx.flags.flags, ...ctx.flags.prefixes].filter((f) => !used.has(f) && !ENGINE_FLAGS.includes(f));
 rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${ctx.flags.prefixes.size} ชื่อหน้า · ค้าง ${stale.length}`]);
 // ธงมีพารามิเตอร์ยังไม่มีเนื้อหาจริงใช้ (มีแค่ใน fixture สายมู) จึงไม่นับว่าค้าง

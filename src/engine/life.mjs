@@ -1075,6 +1075,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     // เพราะ harness/เซฟ/ผลย้อนจับตัวเลือกด้วยเลขลำดับในเนื้อหา · ใบที่ไม่มีป้ายไม่มีช่องนี้
     ...(ev.choices.some((c) => c.gate) && { hidden: ev.choices.map((c) => gateShut(st, c)) }),
     ...moneyShort(ev, st),
+    ...reluctantField(st, ev),
   });
 }
 
@@ -1168,15 +1169,63 @@ function lockReason(st, c, extra = 0) {
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
   const purse = (st.dead ? deadPurse(st) : st.money) + extra;
   if (q.money && purse < moneyValue(st, q.money, true)) why.push('เงินไม่พอ');
+  let soft = 0;
   for (const [k, b] of Object.entries(q.stats ?? {})) {
-    if (b.min !== undefined && st[k] < b.min) why.push(k === 'network' ? 'ยังไม่มีเส้นสายพอ' : `${STAT_LABELS[k]}ไม่ถึง`);
+    if (b.min !== undefined && st[k] < b.min) {
+      why.push(k === 'network' ? 'ยังไม่มีเส้นสายพอ' : `${STAT_LABELS[k]}ไม่ถึง`);
+      if (b.min - st[k] <= RELUCT.gap) soft++;
+    }
     if (b.max !== undefined && st[k] > b.max) why.push(`${STAT_LABELS[k]}มากเกินไป`);
   }
   if (q.flags && !flagsOk(st, q.flags)) why.push('ยังไม่เข้าเงื่อนไข');
   if (q.edu && eduRank(st.edu) < eduRank(q.edu)) why.push('วุฒิไม่ถึง');
   if (q.family && !q.family.every((f) => familyOk(st, f))) why.push(familyWhy(q.family));
   if (!why.length) return null;
+  // ฝืนใจ: ขาดแค่ค่าสถานะไม่เกินเพดานทุกตัว = กดได้ · ขาดเงิน/ธง/วุฒิ/ครอบครัว หรือขาดเกินเพดาน ยังล็อกด้วยเหตุผลเดิม
+  if (q.reluctant && soft === why.length) return null;
   return q.reason ?? why.join(' · ');
+}
+
+// ตัวเลือกฝืนใจ (dynasty-4) + ผิดข้อห้ามตระกูล (dynasty-3) ใช้ช่องเดียวกัน card.reluctant — ป้ายเป็นคำ ไม่บอกเลขที่ขาด (แนว goal.mjs)
+// gap = ค่าสถานะที่ขาดได้ไม่เกินเท่านี้ · cost = ระดับความสุขที่เสียตอนฝืน · taboo = ระดับความสุขที่เสียตอนผิดข้อห้ามที่บ้านยังรู้ต้นเหตุ
+export const RELUCT = { gap: 10, cost: -2, taboo: -1 };
+
+// ตัวเลือกที่ requires.reluctant ซึ่งค่าสถานะยังไม่ถึงแต่กดได้ (ไม่ล็อก) — ถึงเกณฑ์แล้วเป็นตัวเลือกปกติ
+function reluctantWhy(st, c) {
+  const q = c.requires;
+  if (!q?.reluctant) return null;
+  const short = Object.entries(q.stats ?? {}).filter(([k, b]) => b.min !== undefined && st[k] < b.min);
+  if (!short.length || lockReason(st, c)) return null;
+  return q.reason ?? short.map(([k]) => (k === 'network' ? 'ยังไม่มีเส้นสายพอ' : `${STAT_LABELS[k]}ไม่ถึง`)).join(' · ');
+}
+
+// ข้อห้ามที่ตัวเลือกนี้ผิด [[ชนิด, ระยะ]] — นับเฉพาะที่ผู้เล่นเลือกเอง (ธงบนตัวเลือก หรือป้าย breaks) ผลสุ่มที่ตั้งธงไม่นับ
+function tabooHits(st, c) {
+  const reg = st.content.taboo ?? {};
+  return Object.entries(st.taboos ?? {}).filter(([k]) => reg[k] && (c.breaks?.includes(k) || (reg[k].breaks?.flags ?? []).some((f) => c.sets_flags?.includes(f))));
+}
+
+function reluctantLabel(st, c) {
+  const r = reluctantWhy(st, c);
+  const reg = st.content.taboo ?? {};
+  const parts = [...(r ? [`${r} · ฝืนใจ`] : []), ...tabooHits(st, c).map(([k, d]) => (d <= TABOO.know ? `ผิดคำที่บ้านถือ · ${reg[k].tell}` : reg[k].faded))];
+  return parts.length ? parts.join(' · ') : null;
+}
+
+// ช่องเฉพาะการ์ดที่มีตัวฝืนใจ (แบบ moneyGap) — การ์ดอื่นรูปเดิมทุกช่อง
+function reluctantField(st, ev) {
+  const reluctant = ev.choices.map((c) => reluctantLabel(st, c));
+  return reluctant.some((x) => x) ? { reluctant } : {};
+}
+
+// คิดจาก state ตอนกด ไม่ใช่จากการ์ดที่วาด — เซฟ/ผู้เรียกที่ไม่ผ่านหน้าจอได้ผลเท่ากัน · ผิดข้อห้ามแล้วข้อนั้นไม่ส่งต่อรุ่นถัดไป (ทุกระยะ)
+function payReluctance(st, c) {
+  let fx = reluctantWhy(st, c) ? levelValue(RELUCT.cost) : 0;
+  for (const [k, d] of tabooHits(st, c)) {
+    (st.tabooBroken ??= {})[k] = true;
+    if (d <= TABOO.know) fx += levelValue(RELUCT.taboo);
+  }
+  if (fx) st.happiness = clamp(st.happiness + fx);
 }
 
 // ดัชนีตัวเลือกที่กดได้ — บอทเลือกจากชุดนี้เท่านั้น · ไม่มีตัวล็อก = ทุกตัว (ลำดับสุ่มของบอทจึงเหมือนก่อนมีการล็อก)
@@ -1645,6 +1694,7 @@ export function choose(st, idx, loan) {
   const text = fill(ev.choices[idx].text, st);
   const c = ev.choices[idx];
   markTaboo(st, ev);
+  payReluctance(st, c);
   if (ev.id === FUNERAL.rite) {
     st.funeral = { id: c.id, text, cost: c.effects?.money ? -moneyValue(st, c.effects.money) : 0 };
     // คนมาส่งทำบุญอุทิศให้ — ลงบัญชีก่อนถึงปรโลก
