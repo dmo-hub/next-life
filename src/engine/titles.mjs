@@ -42,6 +42,8 @@ export function picksAfter(st, from = PATTERN_FROM) {
       continue;
     }
     const ev = idx.get(l.id);
+    // ใบลางภัยยุคเป็นเสียงเตือนที่ทุกคนได้ยิน (ออกตั้งแต่อายุ 6) ไม่ใช่ทางชีวิต — นับแล้วแกนเสี่ยง/บ้านเกิดของเด็กเอียงจนแบบชีวิตสั้นหาย
+    if (ev?.herald_of) continue;
     const c = ev?.choices[l.choice];
     if (c) out.push({ age: l.age, ev, c, text: l.text });
   }

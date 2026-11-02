@@ -834,7 +834,8 @@ function stepYear(st) {
 
 // ลางภัยยุค (afterfall-1): ปีหน้ามีภัยที่จะได้ใบรับมือครั้งแรก = ใบ herald_of ออกปีนี้ให้เตรียมตัว
 // ปีภัยคำนวณจาก seed ได้ล่วงหน้า (protoYear) จึงไม่ดึงเลขสุ่ม · ERA_GAP ตัดปีไหนก็รู้ก่อนเหมือนกัน — ลางเกือบไม่หลอก นอกจากตายก่อน
-// แทนการ์ดกองสุ่มหนึ่งใบแบบ first_of ชีวิตจึงไม่ยาวขึ้น · เด็กเล็กไม่ได้ลาง (เตรียมอะไรเองไม่ได้)
+// ผู้ใหญ่: แทนการ์ดกองสุ่มหนึ่งใบแบบ first_of ชีวิตจึงไม่ยาวขึ้น · เด็กเล็กไม่ได้ลาง (เตรียมอะไรเองไม่ได้)
+// ก่อน HERALD_QUOTA_FROM ไม่กินโควตา — ใบกองสุ่มวัยเด็กมีน้อย เบียดออกแล้วแบบชีวิตสั้น (titles) หายไปครึ่ง · ชีวิตเด็กยาวขึ้นใบละลาง
 function heraldNextYear(st, year) {
   // ของที่เตรียมไว้ใช้ได้แค่ปีภัย — ไม่กดใช้ในใบรับมือก็หมดอายุ ธงไม่ค้างไปปลดอะไรตอนแก่
   for (const f of Object.keys(st.flags)) {
@@ -855,10 +856,11 @@ function heraldNextYear(st, year) {
     if (!h) continue;
     st.done[h.id] = true;
     st.due.push({ kind: 'eraEvent', ev: h, age: st.age });
-    takeYearQuota(st);
+    if (st.age >= HERALD_QUOTA_FROM) takeYearQuota(st);
   }
 }
 const HERALD_MIN_AGE = 6;
+const HERALD_QUOTA_FROM = 18;
 const HERALD_FLAG = 'braced:';
 
 // การ์ดนำของด่านสอบ (B63): ไม่อยู่ในกองสุ่ม ออกในคิวก่อนด่านปีเดียวกัน — "พรุ่งนี้สอบ" จึงตามด้วยด่านจริงเสมอ
