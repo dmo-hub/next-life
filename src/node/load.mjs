@@ -421,6 +421,7 @@ export function loadResultReacts(p = 'content/rules/result-reacts.yaml') {
   if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
   return doc;
 }
+const loadTaboo = () => parse(read('content/rules/flags.yaml')).taboo ?? {};
 
 // คำใบ้ที่ศาลตอนเฉียดตาย (B153) ระดับละหลายข้อความ — ไม่ใช่การ์ด จึงตรวจตอนโหลดแทนด่านเนื้อหา
 // ห้ามเลขคู่คำบุญ/บาป (กติกาเดียวกับด่านการ์ดไม่เผยบัญชีของ harness)
@@ -595,5 +596,5 @@ export function loadContent() {
   const cadet = loadCadet();
   checkCadetEraCards(cadet, events);
   checkCadetHeirText(cadet);
-  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), nature: loadNature(), tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(), away: loadAway(), arcs: loadArcs(events), cadet, spending: loadSpending() };
+  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), taboo: loadTaboo(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), nature: loadNature(), tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(), away: loadAway(), arcs: loadArcs(events), cadet, spending: loadSpending() };
 }

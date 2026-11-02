@@ -356,6 +356,8 @@ export function newLife(seed, content, heir = null) {
     ...(heir?.skills?.length && { skills: heir.skills }),
     // ค่าที่ได้จากช่องพกที่ไม่ใช้ (ใบ 201) — การ์ดเกิดบอกเป็นคำ · เซฟเก่าไม่มี = ไม่มีบรรทัด
     ...(heir?.spare && { spare: heir.spare }),
+    // ข้อห้ามตระกูล {ชนิด: ระยะรุ่น} (dynasty-3) — แยกจาก parentFlags เพราะถือได้ไกลกว่าเพดาน tier · เซฟเก่าไม่มีช่องนี้ อ่านแบบ ?.
+    taboos: heir?.taboos ?? {},
     scheduled: [],
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
@@ -2324,6 +2326,14 @@ function raiseFlag(st, f) {
   st.flagAge[f] ??= st.age;
 }
 
+// ข้อห้ามตระกูล (dynasty-3): ระยะ 1–2 รุ่นบ้านยังรู้ต้นเหตุ · ถึง forget หายจากบ้าน
+export const TABOO = { know: 2, forget: 5 };
+
+// ต้นเหตุข้อห้ามที่ไม่มีธงจากเนื้อหา (ค้ำแล้วโดนตามหนี้) — แกนตั้งธงตอนตอบการ์ดในรายชื่อของทะเบียน
+function markTaboo(st, ev) {
+  for (const t of Object.values(st.content.taboo ?? {})) if (t.mark?.cards.includes(ev.id)) raiseFlag(st, t.mark.flag);
+}
+
 // ป้ายบุญบาปเข้าบัญชีซ่อน · ธง · นัดเหตุการณ์ต่อเนื่อง (ใบ 07) — นัดสุ่มปีจาก rng ของโลก เพราะเป็นผลของการเลือก
 function applyChoice(st, ev, c, text) {
   // คำบนเดียวกันมีหลายการ์ดนัด (ครั้งที่ 1 · ครั้งที่ 2) — ใช้ธงคำบนที่การ์ดปิดเป็นตัวระบุ ไม่ใช่ id การ์ด
@@ -2451,6 +2461,7 @@ export function choose(st, idx, loan) {
   // เติมข้อความก่อนผลลง — {เงิน} ต้องเป็นยอดตอนที่ผู้เล่นเห็นตัวเลือก
   const text = fill(ev.choices[idx].text, st);
   const c = ev.choices[idx];
+  markTaboo(st, ev);
   if (ev.id === FUNERAL.rite) {
     st.funeral = { id: c.id, text, cost: c.effects?.money ? -moneyValue(st, c.effects.money) : 0 };
     // คนมาส่งทำบุญอุทิศให้ — ลงบัญชีก่อนถึงปรโลก
