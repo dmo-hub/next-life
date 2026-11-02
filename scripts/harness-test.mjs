@@ -227,15 +227,19 @@ const f2 = (v) => v.toFixed(2);
   const base = loadContent();
   // plan = [[โฟกัส, ตา], ...] นับตาตั้งแต่ตาที่เปลี่ยนเข้า (ตานั้นไม่นับปีเต็ม) · โฟกัสยังไม่เปิดในวัยนี้ = พักผ่อนรอ ไม่นับตา
   // เหตุการณ์กดตัวเลือกแรก · การ์ดเตือนกดฝืนต่อ ⇒ โฟกัสไม่ถูกเปลี่ยนนอกแผน
-  const planned = (seed, plan) => {
-    const isk = I.startIsekai({ seed });
+  // ใบทางแยก (06c-1): opt.seen เก็บใบที่ผ่าน · opt.go = เลือกแคว้นแรก (ไม่ส่ง = อยู่ที่เดิม) · opt.legacy = ชาติเก่ามีบทบาท
+  const planned = (seed, plan, opt = {}) => {
+    const isk = I.startIsekai({ seed, legacy: !!opt.legacy });
     let seg = 0, left = plan[0][1];
     const want = () => plan[seg][0];
     const hold = (c) => I.chooseIsekai(isk, isk.focusOffers.includes(want()) ? isk.focusOffers.indexOf(want()) : isk.focusOffers.indexOf('rest'));
     for (let g = 0; g < 3000 && seg < plan.length; g++) {
       const c = I.nextIsekaiCard(isk);
       if (c.step === 'end') return null;
-      if (c.step === 'world' || c.step === 'skill' || c.step === 'event') I.chooseIsekai(isk, 0);
+      if (c.step === 'move') {
+        opt.seen?.push(c);
+        I.chooseIsekai(isk, opt.go ? 0 : c.choices.length - 1);
+      } else if (c.step === 'world' || c.step === 'skill' || c.step === 'event') I.chooseIsekai(isk, 0);
       else if (c.step === 'warn') I.chooseIsekai(isk, 1);
       else if (c.step === 'focus') hold(c);
       else if (c.step === 'tick') {
@@ -269,6 +273,50 @@ const f2 = (v) => v.toFixed(2);
   const inf = run([['sword', 20]]);
   I.ISEKAI_CAREER_T.years = keep;
   check('ใบ 05a ตัวควบคุม: เกณฑ์ ∞ = 0 อาชีพ', inf.length === 0, inf.join(' · '));
+
+  const C = await import('../src/engine/continent.mjs');
+  // ใบ 06c-1 ย้ายแคว้น: ใบทางแยกมาหลังตาที่สำรวจครบปีเต็ม ⇒ ดูการ์ดต่อจนถึงใบตาถัดไป · แผนนับตาที่เปลี่ยนเข้าด้วย (ปีเต็ม = ตา − 1)
+  const moved = (plan, opt = {}) => {
+    for (let s = 1; s <= 50; s++) {
+      const seen = [];
+      const isk = planned(s, plan, { ...opt, seen });
+      if (!isk) continue;
+      for (let g = 0; g < 10; g++) {
+        const c = I.nextIsekaiCard(isk);
+        if (c.step === 'tick' || c.step === 'end') break;
+        if (c.step === 'move') {
+          seen.push(c);
+          I.chooseIsekai(isk, opt.go ? 0 : c.choices.length - 1);
+        } else I.chooseIsekai(isk, c.step === 'warn' ? 1 : 0);
+      }
+      return { isk, seen };
+    }
+    throw new Error(`ใบ 06c-1 ไม่มีชาติรอดครบแผน ${JSON.stringify(plan)}`);
+  };
+  const M = I.CONT_MOVE;
+  const one = moved([[M.focus, M.years]]);
+  check(`ใบ 06c-1 สำรวจ ${M.years - 1} ปีเต็ม = ยังไม่มีทางแยก`, one.seen.length === 0, `${one.seen.length} ใบ`);
+  const two = moved([[M.focus, M.years + 1]]);
+  const card = two.seen[0];
+  check(`ใบ 06c-1 สำรวจ ${M.years} ปีเต็ม = ใบทางแยก 1 ใบ · แคว้นติดกัน ≤ ${M.offers} + อยู่ที่เดิม`, two.seen.length === 1 && card.choices.length >= 2 && card.choices.length <= M.offers + 1 && !two.isk.moves, `${two.seen.length} ใบ · ${card?.choices.join(' / ')}`);
+  const born = two.isk.region;
+  const go = moved([[M.focus, M.years + 1]], { go: true });
+  const m = go.isk.moves?.[0];
+  check('ใบ 06c-1 เลือกแคว้น = ย้ายไปแคว้นติดกัน · หน้าต่างสถานะเห็นแคว้นใหม่', !!m && m.from === born && C.contNeighbors(born).includes(m.to) && go.isk.region === m.to && I.isekaiStatus(go.isk).world.endsWith(C.CONT_REGIONS[m.to].name), JSON.stringify(m ?? null));
+  // ไม่ย้าย = นับใหม่: สำรวจต่ออีก years − 1 ปีเต็มยังไม่มาซ้ำ · ครบ years ปีเต็มมาอีกใบ
+  const stayShort = moved([[M.focus, M.years + 1], [M.focus, M.years - 1]]);
+  const stayFull = moved([[M.focus, M.years + 1], [M.focus, M.years]]);
+  check('ใบ 06c-1 อยู่ที่เดิม = ตัวนับเริ่มใหม่ (ไม่ยื่นซ้ำทุกปี)', stayShort.seen.length === 1 && stayFull.seen.length === 2, `${stayShort.seen.length} · ${stayFull.seen.length} ใบ`);
+  const rest = moved([['rest', M.years + 6]]);
+  check('ใบ 06c-1 ไม่สำรวจ = ไม่มีใบทางแยก', rest.seen.length === 0, `${rest.seen.length} ใบ`);
+  const old = moved([[M.focus, M.years + 6]], { legacy: true });
+  check('ใบ 06c-1 ชาติเก่า (มีบทบาท) ไม่มีใบทางแยก', !!old.isk.role && old.seen.length === 0, `${old.seen.length} ใบ`);
+  // ตัวควบคุมฝั่งตก: เกณฑ์ปี ∞ ⇒ ไม่มีใบทางแยก (ด่าน 2 ปีเต็มข้างบนจับได้)
+  const keepM = M.years;
+  M.years = Infinity;
+  const never = moved([[M.focus, keepM + 6]]);
+  M.years = keepM;
+  check('ใบ 06c-1 ตัวควบคุม: เกณฑ์ ∞ = 0 ใบทางแยก', never.seen.length === 0, `${never.seen.length} ใบ`);
 }
 
 // ใบ 06a: ด่านทวีปจับตัวสุ่ม/แผนที่ที่พังได้ (ตัวควบคุม) — ป้อนของพังเข้า contChecks ตรง ๆ ไม่แก้ข้อมูลจริง

@@ -1966,7 +1966,7 @@ function renderAfter(card) {
 }
 
 // ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
-const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ช่วงวัยใหม่ · เลือกสิ่งที่ทุ่มเท', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก', warn: 'ใกล้ตาย' };
+const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ช่วงวัยใหม่ · เลือกสิ่งที่ทุ่มเท', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก', warn: 'ใกล้ตาย', move: 'ทางแยก · เลือกแคว้น' };
 function isekaiMeter(label, v, cls) {
   const m = el('div', 'imeter');
   const row = el('div', 'irow');

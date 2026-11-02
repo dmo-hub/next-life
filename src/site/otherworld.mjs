@@ -1,7 +1,7 @@
 // ส่วนต่างโลกของหน้ารวมการ์ดและหน้าเฉลย (B88b): สร้างจากโมดูลต่างโลกในเอนจินทุกครั้งที่ build — การ์ดต่างโลกใบใหม่ขึ้นหน้าเว็บเอง
 // หน้ารวมการ์ดได้แค่สิ่งที่จอแสดง (ชื่อโลก/สกิลพร้อมคำอธิบาย · ข้อความเหตุการณ์ · ตัวเลือก) · หน้าเฉลยได้ความยาก ผลสำเร็จ/พลาด ค่าที่ขยับ ธง และตอนจบ
 // ชาติใหม่เกิดในทวีป (06d): ส่วนหลักพูดถึงแฟ้มเกิด/เผ่า/แคว้น · บทบาท 4 โลกกับการ์ดเฉพาะโลกย้ายไปกลุ่มพับ "ชาติเก่า" (ยังเล่นถึงจากเซฟ)
-import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_ROLES, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_FOCUS, ISEKAI_CAREERS, ISEKAI_CAREER_T, GODDESS, GODDESS_VOWS, PATHS, CONT_LIFE, CONT_END, CONT_REGIONS, CONT_RACES, CONT_TIER, CONT_DISPUTES, contRaceStart, meritName, roleInfo } from '../engine/index.mjs';
+import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_ROLES, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_FOCUS, ISEKAI_CAREERS, ISEKAI_CAREER_T, GODDESS, GODDESS_VOWS, PATHS, CONT_LIFE, CONT_END, CONT_REGIONS, CONT_RACES, CONT_TIER, CONT_DISPUTES, CONT_MOVE, contRaceStart, meritName, roleInfo } from '../engine/index.mjs';
 import { esc, text as rawText } from './catalog.mjs';
 
 // เหตุการณ์ตำนาน (B68i) เรียกชื่อคนต่างโลกรุ่นก่อนตอนเล่น — หน้าเว็บแสดงเป็นช่องชื่อแบบเดียวกับ {ชื่อชาติก่อน}
@@ -216,6 +216,7 @@ function rules(meritTags) {
   return `<ul class="rules">${[
     `ชาติใหม่เกิดในทวีป${esc(CONT_LIFE.name)}: เทพธิดายื่นแฟ้มเกิด ${CONT_LIFE.offers} ใบ (เผ่า + แคว้น ไม่ซ้ำคู่กัน) สุ่มตามระดับโอกาสเกิดของแคว้น กรรมไม่ทำให้แฟ้มเอียง · ไม่มีเป้าหมาย ฉากเปิด หรือฉากสุดท้าย · คนที่ข้ามมาทั้งตัวเป็น${esc(CONT_RACES[CONT_LIFE.tripRace].name)} ลงแคว้นสุ่มที่${esc(CONT_RACES[CONT_LIFE.tripRace].name)}เกิดได้`,
     `เผ่าแก่ไม่เท่ากัน: อายุเริ่มช่วงวัย วัยชรา และปีที่นับเป็นอาชีพ คูณด้วยตัวคูณอายุของเผ่า · ทุ่มเทสายต้นทางของอาชีพรวมครบ ${ISEKAI_CAREER_T.years} ปี ได้อาชีพนั้นติดตัวทั้งชาติ ได้หลายอาชีพพร้อมกันได้`,
+    `ย้ายแคว้น: ทุ่มเทกับ${esc(ISEKAI_FOCUS[CONT_MOVE.focus].name)}ครบ ${CONT_MOVE.years} ปีเต็มนับจากเกิดหรือทางแยกครั้งก่อน = ใบทางแยกยื่นแคว้นที่มีถนนติดกันสุ่มไม่เกิน ${CONT_MOVE.offers} แคว้น + อยู่ที่เดิม · ย้ายแล้วตอนจบเล่าเป็นคนของแคว้นใหม่ · ไม่ย้ายก็นับปีใหม่ · ชาติเก่าที่มีบทบาทไม่มีทางแยก`,
     `ทุกชาติทวีปสุ่มขั้วอำนาจ (มหาอำนาจ 1 · ขาลง 1–2 · มาแรง 1–2 จากแคว้นที่มีผู้ปกครอง) · ข้อพิพาทใหญ่ 1 จาก ${Object.keys(CONT_DISPUTES).length} เรื่อง · ดันเจียนลับ 3–4 จุด — ยังไม่มีการ์ดที่ใช้ จึงยังไม่มีผลกับชาตินั้น`,
     `ทางเกิดที่ 3 เปิดทุกชาติ · เทพธิดาอารมณ์ดีมายืนรอข้างทาง โอกาสตามกรรมจากปรโลก: บุญเต็ม ${at(1)} · กลาง ${at(0)} · บาปเต็ม ${at(-1)} (ไม่ต่ำกว่า ${pct(GODDESS.chanceMin)}) = ได้แฟ้มเกิดเพิ่ม 1 และสกิลเพิ่ม 1 (เฉพาะรอบแรกที่ไป) และฝากคำสัญญา 1 ข้อ`,
     `ชีวิตที่รับการ์ดชวนข้ามโลกระหว่างมีชีวิต (ตายหรือหายตัว) เจอเทพธิดาแน่นอน และได้โชคเพิ่ม ${GODDESS.fatedLuck}`,
