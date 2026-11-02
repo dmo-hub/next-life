@@ -829,7 +829,37 @@ function stepYear(st) {
       }
     }
   }
+  heraldNextYear(st, year);
 }
+
+// ลางภัยยุค (afterfall-1): ปีหน้ามีภัยที่จะได้ใบรับมือครั้งแรก = ใบ herald_of ออกปีนี้ให้เตรียมตัว
+// ปีภัยคำนวณจาก seed ได้ล่วงหน้า (protoYear) จึงไม่ดึงเลขสุ่ม · ERA_GAP ตัดปีไหนก็รู้ก่อนเหมือนกัน — ลางเกือบไม่หลอก นอกจากตายก่อน
+// แทนการ์ดกองสุ่มหนึ่งใบแบบ first_of ชีวิตจึงไม่ยาวขึ้น · เด็กเล็กไม่ได้ลาง (เตรียมอะไรเองไม่ได้)
+function heraldNextYear(st, year) {
+  // ของที่เตรียมไว้ใช้ได้แค่ปีภัย — ไม่กดใช้ในใบรับมือก็หมดอายุ ธงไม่ค้างไปปลดอะไรตอนแก่
+  for (const f of Object.keys(st.flags)) {
+    if (f.startsWith(HERALD_FLAG) && st.age - st.flagAge[f] > 1) {
+      delete st.flags[f];
+      delete st.flagAge[f];
+    }
+  }
+  if (st.age < HERALD_MIN_AGE) return;
+  if (st.lastEraAge !== null && st.age + 1 - st.lastEraAge < ERA_GAP) return;
+  for (const e of eraEventsAt(st.content.era, st.seed, year + 1)) {
+    const answers = st.content.events.filter((c) => c.era === e.id);
+    if (answers.some((c) => st.done[c.id])) continue;
+    // ช่วงอายุปีหน้าไม่มีใบรับมือ (วิกฤตเศรษฐกิจวัยรุ่นนอกโรงเรียน) = ลางไม่มีใบให้ใช้ของที่เตรียม · เงื่อนไขอื่นของปีหน้ายังเดาไม่ได้
+    const age = st.age + 1;
+    if (!answers.some((c) => (c.when?.age ? age >= c.when.age[0] && age <= c.when.age[1] : c.stage === stageOf(age)))) continue;
+    const h = st.content.events.find((c) => c.herald_of === e.id && !st.done[c.id] && inYears(c, year) && whenOk(st, c.when));
+    if (!h) continue;
+    st.done[h.id] = true;
+    st.due.push({ kind: 'eraEvent', ev: h, age: st.age });
+    takeYearQuota(st);
+  }
+}
+const HERALD_MIN_AGE = 6;
+const HERALD_FLAG = 'braced:';
 
 // การ์ดนำของด่านสอบ (B63): ไม่อยู่ในกองสุ่ม ออกในคิวก่อนด่านปีเดียวกัน — "พรุ่งนี้สอบ" จึงตามด้วยด่านจริงเสมอ
 // ทอย chance หลังผ่านเงื่อนไขแล้วเท่านั้น ชีวิตที่ไม่เข้าเงื่อนไขจึงไม่กิน rng ของโลก

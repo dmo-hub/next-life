@@ -15,7 +15,7 @@ import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placehold
 const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'focus'],
+  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'focus'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
@@ -480,6 +480,15 @@ export const rules = [
       if (e.first_of === undefined) return;
       if (!ctx.ladders.includes(e.first_of)) r('.first_of', `ต้องเป็น id สาย ${ctx.ladders.join('|')} ได้ ${JSON.stringify(e.first_of)}`);
       if (['weight', 'at_age', 'era', 'repeat', 'prelude'].some((k) => e[k] !== undefined)) r('.first_of', 'การ์ดทางแรกห้ามมี weight/at_age/era/repeat/prelude — ออกได้ทางเดียวคือปีที่เข้าสาย');
+    },
+  },
+  {
+    id: 'herald-of-shape',
+    desc: 'herald_of = id เหตุการณ์บ้านเมือง (afterfall-1) · ใบลางออกปีก่อนภัยที่จะได้ใบรับมือครั้งแรกเท่านั้น — ห้ามมี weight/at_age/era/repeat/prelude/first_of',
+    event(e, ctx, r) {
+      if (e.herald_of === undefined) return;
+      if (typeof e.herald_of !== 'string' || !ctx.eras.has(e.herald_of)) r('.herald_of', `ไม่มีเหตุการณ์บ้านเมือง "${e.herald_of}" (${[...ctx.eras].join(' ')})`);
+      if (['weight', 'at_age', 'era', 'repeat', 'prelude', 'first_of'].some((k) => e[k] !== undefined)) r('.herald_of', 'ใบลางห้ามมี weight/at_age/era/repeat/prelude/first_of — ออกได้ทางเดียวคือปีก่อนภัย');
     },
   },
   {
