@@ -141,7 +141,7 @@ function focusBar(card, open = false) {
 }
 
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทย · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
-// ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ · ปุ่มที่แผงยังไม่ลง (ใบ 05–08) เป็นปุ่มจางให้เห็นโครงเมนูครบ
+// ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ · ปุ่มที่แผงยังไม่ลง (ใบ 06–08) เป็นปุ่มจางให้เห็นโครงเมนูครบ
 const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบครัว'], ['money', 'เงิน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
 function lifeMenu(card, box) {
   // การ์ดใหม่วาดทับทั้ง root แผงเดิมหายไปด้วยแล้ว
@@ -149,6 +149,8 @@ function lifeMenu(card, box) {
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
   const sheets = { me: () => mePanel(card) };
+  // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
+  const views = { shelf: () => openShelf() };
   for (const [id, label] of LIFE_MENU) {
     const b = el('button', null);
     b.type = 'button';
@@ -157,6 +159,12 @@ function lifeMenu(card, box) {
     if (sheets[id]) {
       b.setAttribute('aria-expanded', 'false');
       b.onclick = () => (root.querySelector('.sheet') ? closeSheet() : openSheet(label, sheets[id](), box, b));
+    } else if (views[id]) {
+      b.onclick = () => {
+        // ปิดแผงก่อน ไม่งั้นการ์ดที่เก็บไว้คืนตอนกลับยัง inert อยู่
+        closeSheet();
+        views[id]();
+      };
     } else {
       b.disabled = true;
       b.append(el('small', null, 'เร็ว ๆ นี้'));
@@ -948,15 +956,16 @@ function picsSeen() {
   picsWrite(p);
 }
 
-// จุดแดงที่ลิงก์ชั้นสมุด (B116 → B130): ชีวิตใหม่ในสมุดอนุสรณ์ · ฉายาใหม่ · ภาพใหม่ ที่ยังไม่เปิดดู
+// จุดแดงที่ทางเข้าชั้นสมุด (B116 → B130): ชีวิตใหม่ในสมุดอนุสรณ์ · ฉายาใหม่ · ภาพใหม่ ที่ยังไม่เปิดดู
+// ลิงก์ท้ายหน้าซ่อนในฉากที่มีเมนู แต่ยังเป็นทางเข้าของต่างโลก/ปรโลก ⇒ ติดจุดทั้งสองที่
 const shelfFresh = () => ({ m: memoUnseen(), t: bookRead().n, p: picsRead().n });
 function shelfDot() {
-  const a = document.getElementById('shelfLink');
-  if (!a) return;
   const f = shelfFresh();
   const n = f.m.length + f.t.length + f.p.length;
-  a.querySelector('.new-dot')?.remove();
-  if (n) a.append(newDot(`มีของใหม่ในชั้นสมุด ${n}`));
+  for (const a of document.querySelectorAll('#shelfLink, .mnav [data-menu="shelf"]')) {
+    a.querySelector('.new-dot')?.remove();
+    if (n) a.append(newDot(`มีของใหม่ในชั้นสมุด ${n}`));
+  }
 }
 // ปุ่มเปิดชั้นสมุดจากการ์ดตาย — กลับมาแล้วคืนการ์ดเดิมทั้งก้อน
 function shelfButton(label, tab, onBack) {
@@ -970,7 +979,6 @@ function eraBox() {
   // ภาพที่ชีวิตนี้เพิ่งได้ อ่านจากที่เก็บ (แบบจุดฉายา) รีโหลดที่มรณบัตรจึงยังบอกได้
   const fresh = picsRead().n.filter((k) => picSeen.includes(k)).length;
   if (fresh) box.append(el('p', 'note', `ได้ภาพใหม่ในสมุดภาพบ้านเมือง ${fresh} ภาพ`));
-  box.append(shelfButton(`เปิดชั้นสมุด · ภาพบ้านเมือง ${picsGot(picsRead())}/${PIC_ALL}`, 'p'));
   return fold(box, `เหตุการณ์ในแผ่นดินที่ได้เห็น (${eraSeen.length})`, fresh ? `ได้ภาพใหม่ ${fresh}` : null);
 }
 function memoFull(card) {
@@ -987,11 +995,13 @@ function memoFull(card) {
 // fresh = ของใหม่ตอนเปิดชั้นครั้งแรก — เปิดแท็บแล้วล้างจุดในที่เก็บ แต่ป้าย "ใหม่" ยังอยู่จนออกจากชั้น สลับแท็บไปมาก็ยังหาเจอ
 const SHELF_TABS = [['m', 'อนุสรณ์'], ['t', 'ฉายา'], ['p', 'ภาพบ้านเมือง']];
 function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh()) {
-  // เปิดจากท้ายหน้า/หน้าเล่นต่อ: ไปแท็บที่มีของใหม่ก่อน
+  // เปิดจากเมนู/ท้ายหน้า/หน้าเล่นต่อ: ไปแท็บที่มีของใหม่ก่อน
   tab ??= SHELF_TABS.find(([k]) => fresh[k].length)?.[0] ?? 'm';
   const again = (t = tab) => openShelf(t, prev, onBack, fresh);
   const back = () => {
     root.replaceChildren(...prev);
+    // จุดบนปุ่มเมนูที่คืนมายังเป็นของตอนก่อนเปิด
+    shelfDot();
     onBack?.();
   };
   const m = memoRead();
@@ -1946,7 +1956,8 @@ function render(card) {
     }
   }
   box.append(body, choices);
-  root.append(panels(box), lifeMenu(card, box));
+  root.append(panels(box, false), lifeMenu(card, box));
+  shelfDot();
   fxCard(box, card);
 }
 
@@ -2037,15 +2048,18 @@ function foldLater(box, body, choices, card) {
 // จอแนวนอนเตี้ย (B131 แบบ C2): ห่อลูกการ์ดเป็นพาแนลซ้าย (หัว ค่าสถานะ แผง) · กลาง (เรื่องต่อด้วยปุ่ม) · ขวา (สมุด · ฉายา)
 // จอตั้งตัวห่อเป็น display:contents และพาแนลขวาซ่อน ⇒ หน้าตาเดิม · ห่อทุกขนาดจอ หมุนจอกลางเกมจึงไม่ต้องวาดการ์ดใหม่
 // กริดวางหลายลูกต่อกันในคอลัมน์เดียวโดยแถวไม่สูงตามคอลัมน์ข้าง ๆ ไม่ได้ จึงต้องมีตัวห่อ
-function panels(box) {
+// side = false: ฉากที่มีเมนูล่าง เข้าสมุดจากเมนูแล้ว พาแนลขวาจะซ้ำ จึงเหลือสองคอลัมน์
+function panels(box, side = true) {
   const left = el('div', 'p-left');
   const mid = el('div', 'p-mid');
   for (const k of [...box.children]) (k.classList.contains('body') || k.classList.contains('choices') ? mid : left).append(k);
   box.classList.add('pn');
-  box.append(left, mid, sidePanel());
+  box.append(left, mid);
+  if (side) box.append(sidePanel());
+  else box.classList.add('pn2');
   return box;
 }
-// พาแนลขวา: ทางเข้าชั้นสมุด + ความคืบหน้าสมุดฉายา · กระเป๋ายังไม่มีระบบ จึงยังไม่มีช่อง (เพิ่มเมื่อมีของ)
+// พาแนลขวา (ฉากที่ยังไม่มีเมนูล่าง): ทางเข้าชั้นสมุด + ความคืบหน้าสมุดฉายา · กระเป๋ายังไม่มีระบบ จึงยังไม่มีช่อง (เพิ่มเมื่อมีของ)
 // ปุ่มเป็นลิงก์ ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด เปิดชั้นสมุดแล้วกลับมาการ์ดเดิม
 function sidePanel() {
   const side = el('aside', 'p-side');
@@ -2865,7 +2879,7 @@ function staleSave(seed) {
   choices.append(enter(button(seed === null ? 'เริ่มชีวิตใหม่' : 'เกิดตามลิงก์เพื่อน', null, () => (seed === null ? start() : startLink(seed)))), button(BTN.shelf, null, () => openShelf()));
 }
 
-// ลิงก์ท้ายหน้าเปิดชั้นสมุดได้ทุกหน้า (หน้า "เล่นต่อ" ขึ้นเฉพาะตอนมีเซฟ) · เปิดซ้อนตัวเองไม่ได้ ไม่งั้นปุ่มกลับพากลับมาที่ชั้นสมุด
+// ลิงก์ท้ายหน้าเปิดชั้นสมุดได้ทุกหน้าที่ยังไม่มีเมนูล่าง (หน้า "เล่นต่อ" ขึ้นเฉพาะตอนมีเซฟ) · เปิดซ้อนตัวเองไม่ได้ ไม่งั้นปุ่มกลับพากลับมาที่ชั้นสมุด
 document.getElementById('shelfLink')?.addEventListener('click', (e) => {
   e.preventDefault();
   if (!root.querySelector('.shelf-view')) openShelf();

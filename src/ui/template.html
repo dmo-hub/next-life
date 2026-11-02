@@ -132,6 +132,10 @@ body:has(.mnav) { padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)
 .mnav button:focus-visible { outline:2px solid currentColor; outline-offset:-4px; }
 .mnav button:disabled { color:var(--muted); opacity:0.55; cursor:default; }
 .mnav small { font-size:10px; font-weight:400; line-height:1.2; }
+/* จุดของใหม่ (ใบ 05) มุมขวาบนของคำ ไม่ดันป้ายปุ่มให้เบี้ยว · ฉากที่มีเมนูเข้าสมุดจากปุ่มสมุดทางเดียว ลิงก์ท้ายหน้าจึงซ่อน */
+.mnav button { position:relative; }
+.mnav .new-dot { position:absolute; top:10px; left:calc(50% + 16px); margin:0; }
+body:has(.mnav) .foot-shelf { display:none; }
 /* แผงจากเมนู: ทับการ์ดเหนือแถบเมนู เลื่อนในตัวเอง · การ์ดข้างใต้ inert จางลงให้รู้ว่ายังรออยู่ */
 .sheet { position:fixed; left:0; right:0; bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)); z-index:8; max-width:calc(var(--cw) + 2 * var(--pad-x)); max-height:calc(100svh - var(--nav-h) - env(safe-area-inset-bottom) - 24px); margin:0 auto; overflow:auto; overscroll-behavior:contain; padding:0 20px 16px; background:var(--paper); border-radius:var(--rk) var(--rk) 0 0; box-shadow:0 -8px 32px rgb(0 0 0 / .18); }
 .card[inert] { opacity:0.5; }
@@ -451,6 +455,7 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
   #app { padding-top:8px; }
   .card:not(.pn) { max-width:var(--cw); margin:0 auto; }
   .card.pn { display:grid; grid-template-columns:minmax(0, 0.9fr) minmax(0, 1.35fr) minmax(0, 0.75fr); align-items:start; min-height:0; }
+  .card.pn2 { grid-template-columns:minmax(0, 0.9fr) minmax(0, 1.35fr); }
   .p-left, .p-mid { display:flex; flex-direction:column; min-width:0; }
   .p-left { grid-column:1; }
   .p-mid { grid-column:2; border-left:1px dashed color-mix(in srgb, currentColor 30%, transparent); }
@@ -484,7 +489,7 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
 <body>
 <header class="logo"><b>เกิดใหม่ทั้งที <span>ชาตินี้ขอชิงมาเกิด</span></b><small>NEXT LIFE</small><a id="appVer" class="ver" title="เวอร์ชันเดโม · แพตช์โน้ตของเวอร์ชันนี้"></a><span id="saved" class="saved" aria-live="polite"></span></header>
 <main id="app"></main>
-<footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <a href="#" id="shelfLink">ชั้นสมุด</a> · <a href="#" id="dayLink">ชาติประจำวัน</a> · <a href="about.html">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
+<footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <span class="foot-shelf"><a href="#" id="shelfLink">ชั้นสมุด</a> · </span><a href="#" id="dayLink">ชาติประจำวัน</a> · <a href="about.html">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
 <script>
 /*__SCRIPT__*/
 </script>
