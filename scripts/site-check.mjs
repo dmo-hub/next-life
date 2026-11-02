@@ -12,7 +12,7 @@ import { isekaiCardCount, ISEKAI_SECTION, contEndTitles, text as isekaiText } fr
 import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR, SPEC_START, SPEC_END } from '../src/site/spec.mjs';
 import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
-import { injectDemo, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
+import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
 import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
@@ -215,13 +215,12 @@ const fontMiss = fontGap(play);
 const fontCtl = fontGap(play.replace('<style>', '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun"><style>')).length > 0;
 check('เกมฝังฟอนต์ไทยครบ ไม่ดึงฟอนต์จากเว็บอื่น', fontMiss.length || !fontCtl, ` ${PLAY_FACES.length - fontMiss.filter((x) => PLAY_FACES.includes(x)).length}/${PLAY_FACES.length} แบบ${fontMiss.length ? ` · ขาด ${fontMiss.join(' ')}` : ''} · ตัวควบคุม${fontCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
-// 10) เดโมการ์ดหน้าแรก (B121): ทุกทางมีผลให้อ่าน มีข้อความผลจริงอย่างน้อยหนึ่งทาง ไม่แตะ storage/network · build ซ้ำได้หน้าเดิม
-const index = read('index.html');
-const demo = index.slice(index.indexOf(DEMO_START), index.indexOf(DEMO_END));
+// 10) เดโมการ์ดบนหน้ารวมการ์ด (B121): ทุกทางมีผลให้อ่าน มีข้อความผลจริงอย่างน้อยหนึ่งทาง ไม่แตะ storage/network · build ซ้ำได้หน้าเดิม
+const demo = cards.slice(cards.indexOf(DEMO_START), cards.indexOf(DEMO_END));
 const res = [...demo.matchAll(/data-res="([^"]*)"/g)].map((m) => m[1]);
 const real = res.filter((r) => !r.startsWith('ผลลงที่ค่าสถานะ')).length;
 const touches = /localStorage|sessionStorage|indexedDB|fetch\(|XMLHttpRequest/.test(demo);
-const same = injectDemo(index, content) === index;
+const same = cards.includes(demoHtml(content));
 // B133 สายเรื่องต่อ: ทุกขั้นมีทางที่กดได้และทุกทางมีผล · ปลายทางของทุกปุ่มมีขั้นนั้นจริง · ทุกขั้นที่ซ่อนมีปุ่มพาไปถึง · มีเรื่องต่ออย่างน้อยหนึ่งทาง
 const steps = [...demo.matchAll(/<div class="tstep" data-step="(\d+)"[^>]*>([\s\S]*?)<p class="tres"/g)].map((m) => ({ id: m[1], btns: [...m[2].matchAll(/<button [^>]*>/g)].map((b) => b[0]) }));
 const live = (s) => s.btns.filter((b) => !b.includes('data-lock'));
@@ -232,8 +231,8 @@ const broken = [
   ...gos.filter((g) => !stepIds.has(g)).map((g) => `ชี้ขั้น ${g} ที่ไม่มี`),
   ...steps.slice(1).filter((s) => !gos.includes(s.id)).map((s) => `ขั้น ${s.id} ไปไม่ถึง`),
 ];
-check('เดโมการ์ดหน้าแรกกดได้ครบทุกทาง ไม่แตะเซฟ', res.length < 3 || res.some((r) => !r) || !real || touches || !same || !steps.length || live(steps[0]).length < 3, ` ทาง ${res.length} · ข้อความผลจริง ${real}${touches ? ' · แตะ storage/network' : ''}${same ? '' : ' · build ใหม่แล้วหน้าเปลี่ยน (ยังไม่ได้ build?)'}`);
-check('เดโมการ์ดหน้าแรกมีเรื่องต่อ และกดไปได้ถึงทุกขั้น', !gos.length || broken.length, ` ขั้น ${steps.length} · ทางที่มีเรื่องต่อ ${gos.length}${broken.length ? ` · ${broken.slice(0, 3).join(' · ')}` : ''}`);
+check('เดโมการ์ดหน้ารวมการ์ดกดได้ครบทุกทาง ไม่แตะเซฟ', res.length < 3 || res.some((r) => !r) || !real || touches || !same || !steps.length || live(steps[0]).length < 3, ` ทาง ${res.length} · ข้อความผลจริง ${real}${touches ? ' · แตะ storage/network' : ''}${same ? '' : ' · build ใหม่แล้วหน้าเปลี่ยน (ยังไม่ได้ build?)'}`);
+check('เดโมการ์ดหน้ารวมการ์ดมีเรื่องต่อ และกดไปได้ถึงทุกขั้น', !gos.length || broken.length, ` ขั้น ${steps.length} · ทางที่มีเรื่องต่อ ${gos.length}${broken.length ? ` · ${broken.slice(0, 3).join(' · ')}` : ''}`);
 
 // 11) หน้าเฉลยไม่ตัดเงื่อนไขทิ้งเงียบ: ถอด key ใน when / multipliers / requires ที่ content ใช้จริงออกทีละตัว ⇒ การ์ดบนหน้าเฉลยต้องเปลี่ยน
 // วัดจากผลวาดแทนรายการชื่อ key — รายการเขียนมือจะไม่ตามตัวสร้าง · key ที่ตั้งใจไม่เฉลยใส่ SPOILER_SKIP พร้อมเหตุผล
