@@ -1846,33 +1846,41 @@ function render(card) {
     if (gone) body.append(el('p', 'call', LOST.call));
     const rb = ribbons(card);
     if (rb) body.append(rb);
-    // ใบมรณะย่อ (ui-redo ใบ 10): ด้านบนพอดีจอแรกแล้วตามด้วยปุ่มไปต่อทันที — บรรทัดรองกับกล่องอื่นต่อใต้ปุ่มจนใบ 11 ย้ายเข้าแท็บ
+    // ใบมรณะย่อ (ui-redo ใบ 10): ด้านบนพอดีจอแรกแล้วตามด้วยปุ่มไปต่อทันที — รายละเอียดอยู่ในแท็บใต้ปุ่ม (ใบ 11)
     // ชิ้นใต้ปุ่มมีคลาส body ⇒ จอแนวนอนเตี้ย panels() ยังวางไว้คอลัมน์กลางต่อจากปุ่ม
     const rest = el('div', 'body d-rest');
     after.push(rest);
+    const sum = [];
     // คนหายไม่รู้อายุตาย จึงเทียบรุ่นไม่ได้ (B142)
-    if (!gone) rest.append(sourced(el('p', 'sub', outliveLine(card.age)), outliveSrc(card.age)));
-    if (card.summary.debt) rest.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
-    if (card.summary.bankruptcies) rest.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
-    if (card.summary.grey) rest.append(el('p', 'sub', `เงินเทาที่หายไปกับตัว ${baht(card.summary.grey)}`));
+    if (!gone) sum.push(sourced(el('p', 'sub', outliveLine(card.age)), outliveSrc(card.age)));
+    if (card.summary.debt) sum.push(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
+    if (card.summary.bankruptcies) sum.push(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
+    if (card.summary.grey) sum.push(el('p', 'sub', `เงินเทาที่หายไปกับตัว ${baht(card.summary.grey)}`));
     // บันทึกเด็กเป็นสถิติการตายของยุค — ไม่ใช่เรื่องของคนหาย
-    if (card.note && !gone) rest.append(sourced(el('p', 'sub', card.note), childNoteSrc(card.age)));
-    if (card.funeral) rest.append(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
-    if (card.funeral?.who) rest.append(el('p', 'sub', card.funeral.who));
-    if (card.lastImage) rest.append(el('p', 'sub', `ภาพสุดท้ายที่นึกถึง: ${card.lastImage}`));
-    if (card.will !== undefined) rest.append(el('p', 'sub', gone ? LOST.will[card.will ? 1 : 0] : card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
-    if (card.pets) rest.append(el('p', 'sub', card.pets));
+    if (card.note && !gone) sum.push(sourced(el('p', 'sub', card.note), childNoteSrc(card.age)));
+    if (card.will !== undefined) sum.push(el('p', 'sub', gone ? LOST.will[card.will ? 1 : 0] : card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
     const from = st.gen === 1 && save.from;
-    if (from) rest.append(el('p', 'sub', from.day ? `ชาติประจำวัน ${from.day} · ทุกคนที่เล่นวันนั้นเกิดแบบเดียวกันนี้ ทางที่เลือกต่างกันได้` : 'ชีวิตจากลิงก์เพื่อน · เกิดแบบเดียวกับเพื่อนทุกอย่าง ทางที่เลือกต่างกันได้'));
-    rest.append(titlesBox(card));
-    if (card.memo === 'full') rest.append(memoFull(card));
-    rest.append(eraBox());
-    const tree = familyTree();
-    if (tree) rest.append(tree);
+    if (from) sum.push(el('p', 'sub', from.day ? `ชาติประจำวัน ${from.day} · ทุกคนที่เล่นวันนั้นเกิดแบบเดียวกันนี้ ทางที่เลือกต่างกันได้` : 'ชีวิตจากลิงก์เพื่อน · เกิดแบบเดียวกับเพื่อนทุกอย่าง ทางที่เลือกต่างกันได้'));
+    // สมุดเต็มต้องให้ผู้เล่นลงมือเอง จึงอยู่แท็บที่เปิดอยู่แล้ว ไม่ซ่อนไว้แท็บอนุสรณ์
+    if (card.memo === 'full') sum.push(memoFull(card));
+    sum.push(helpBox());
     // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
     const chart = card.life && lifeChart(card.life, card.age, card.cause);
-    if (chart) rest.append(chart);
-    rest.append(helpBox());
+    const kin = familyOf(st);
+    const fam = el('div', 'fam');
+    fam.append(...kinParts(kin.filter((m) => !ANIMAL_ROLES.includes(m.role))), ...kinParts(kin.filter((m) => ANIMAL_ROLES.includes(m.role)), true));
+    if (card.pets) fam.append(el('p', 'sub', card.pets));
+    if (!fam.childElementCount) fam.append(el('p', 'sub', 'ไม่มีใครในบ้านตอนจากไป'));
+    const clan = el('div', 'fam');
+    clan.append(...clanParts());
+    const memo = [];
+    if (card.funeral) memo.push(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
+    if (card.funeral?.who) memo.push(el('p', 'sub', card.funeral.who));
+    if (card.lastImage) memo.push(el('p', 'sub', `ภาพสุดท้ายที่นึกถึง: ${card.lastImage}`));
+    // คนหายไม่มีศพ (B137) — แท็บนี้จึงอาจไม่มีงานศพ แต่ชีวิตนี้ยังลงสมุดอนุสรณ์
+    if (!card.funeral) memo.push(el('p', 'sub', gone ? 'ยังไม่มีงานศพ คนที่บ้านยังรอข่าวอยู่' : 'ไม่มีบันทึกงานศพ'));
+    if (card.memo !== 'full') memo.push(shelfButton('เปิดสมุดอนุสรณ์', 'm'));
+    rest.append(deathTabs(card, [sum, [chart, eraBox()].filter(Boolean), [fam], [clan], [titlesBox(card)], memo]));
     // ปุ่มหลักมีปุ่มเดียว · บันทึกภาพ/แชร์/คัดลอก/ชวนเพื่อนเป็นปุ่มรองท้ายการ์ด (ใบ 12 รวมเป็นเมนูแชร์)
     choices.append(enter(button(BTN.toAfter, null, () => openBook(card))));
     const share = el('div', 'd-share');
@@ -2143,25 +2151,84 @@ const kinWord = (m) => {
 // วาดตอนกดเปิดเท่านั้น — กราฟฐานะตระกูลแพง การ์ดส่วนใหญ่ผ่านไปโดยไม่มีใครเปิด
 function familyPanel() {
   const all = familyOf(st);
-  const people = all.filter((m) => !ANIMAL_ROLES.includes(m.role));
-  const animals = all.filter((m) => ANIMAL_ROLES.includes(m.role));
   // แผงอยู่นอกการ์ด สีกราฟฐานะตระกูลผูกกับชุดสีการ์ด (.a) — ไม่ใส่ กราฟเป็นก้อนดำ
   const wrap = el('div', 'fam a');
-  // หัวนับเฉพาะคน — สัตว์นับแยกที่หัวของมันเอง ไม่งั้น "ยังอยู่ 3 คน" รวมหมากับฝูงไก่
-  if (people.length) {
-    const alive = people.filter((m) => m.alive).length;
-    wrap.append(el('h3', null, `คนในบ้าน · ยังอยู่ ${alive} ${alive === people.length ? 'คน' : `จาก ${people.length} คน`}`), kinList(people));
+  wrap.append(...kinParts(all.filter((m) => !ANIMAL_ROLES.includes(m.role))), ...clanParts(), ...kinParts(all.filter((m) => ANIMAL_ROLES.includes(m.role)), true));
+  return wrap;
+}
+// ชิ้นของแผงครอบครัวที่การ์ดตายแยกไปลงแท็บ ครอบครัว · ตระกูล (ui-redo ใบ 11)
+// หัวนับเฉพาะคน — สัตว์นับแยกที่หัวของมันเอง ไม่งั้น "ยังอยู่ 3 คน" รวมหมากับฝูงไก่
+function kinParts(members, animals = false) {
+  if (!members.length) return [];
+  if (animals) {
+    const here = members.filter((m) => m.alive && !m.left).length;
+    return [el('h3', null, here ? `สัตว์เลี้ยง · ยังอยู่ ${here}` : 'สัตว์เลี้ยง'), kinList(members)];
   }
-  // ผังตระกูลมีเมื่อเป็นรุ่นที่ 2 ขึ้นไป · การ์ดตายยังมีแบบพับบนการ์ดด้วย (familyTree)
-  if (st.lineage.length) wrap.append(el('h3', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageView(st.lineage, st.cls));
-  wrap.append(
+  const alive = members.filter((m) => m.alive).length;
+  return [el('h3', null, `คนในบ้าน · ยังอยู่ ${alive} ${alive === members.length ? 'คน' : `จาก ${members.length} คน`}`), kinList(members)];
+}
+// ผังตระกูลมีเมื่อเป็นรุ่นที่ 2 ขึ้นไป
+function clanParts() {
+  const out = [];
+  if (st.lineage.length) out.push(el('h3', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageView(st.lineage, st.cls));
+  out.push(
     el('h3', null, st.lineage.length ? `กราฟฐานะตระกูล · ${st.lineage.length + 1} รุ่น` : 'กราฟฐานะตระกูล'),
     standingChart(standingGens(st.lineage, standingNow(!!st.dead)), null, false) ?? el('p', 'sub', 'ยังมีจุดเดียว — กราฟขึ้นเมื่อถึงช่วงวัยถัดไป'),
   );
-  if (animals.length) {
-    const here = animals.filter((m) => m.alive && !m.left).length;
-    wrap.append(el('h3', null, here ? `สัตว์เลี้ยง · ยังอยู่ ${here}` : 'สัตว์เลี้ยง'), kinList(animals));
-  }
+  return out;
+}
+
+// แท็บรายละเอียดการ์ดตาย (ui-redo ใบ 11 · ชุดแท็บที่เจ้าของเลือกในใบ 02) — วาดทุกแผงครั้งเดียว สลับด้วย hidden
+// แท็บที่เปิดค้างจำต่อการ์ด: กลับจากชั้นสมุด/วาดซ้ำยังอยู่แท็บเดิม · ชีวิตถัดไปเริ่มที่สรุป
+const DEATH_TABS = ['สรุป', 'ชีวิตนี้', 'ครอบครัว', 'ตระกูล', 'ฉายา', 'อนุสรณ์'];
+const deathTabOf = new WeakMap();
+function deathTabs(card, parts) {
+  const wrap = el('div', 'd-tabs');
+  const bar = el('div', 'd-tab-bar');
+  bar.setAttribute('role', 'tablist');
+  bar.setAttribute('aria-label', 'รายละเอียดชีวิตนี้');
+  const tabs = DEATH_TABS.map((label, i) => {
+    const b = el('button', null, label);
+    b.type = 'button';
+    b.id = `d-tab-${i}`;
+    b.setAttribute('role', 'tab');
+    b.setAttribute('aria-controls', `d-pane-${i}`);
+    b.onclick = () => pick(i);
+    const pane = el('div', 'd-pane');
+    pane.id = `d-pane-${i}`;
+    pane.setAttribute('role', 'tabpanel');
+    pane.setAttribute('aria-labelledby', b.id);
+    pane.append(...parts[i]);
+    return { b, pane };
+  });
+  const pick = (i, focus) => {
+    deathTabOf.set(card, i);
+    tabs.forEach(({ b, pane }, j) => {
+      b.setAttribute('aria-selected', String(i === j));
+      b.tabIndex = i === j ? 0 : -1;
+      pane.hidden = i !== j;
+    });
+    // กล่องพับ (กราฟ · ยุค · ฉายา) มีแท็บของตัวเองแล้ว เปิดแท็บครั้งแรกคลี่ให้เลย — คลี่ตอนเปิดจริง จุดใหม่จึงหายเมื่อผู้เล่นได้เห็น
+    // ครั้งเดียวต่อแผง ผู้เล่นพับเองแล้วสลับกลับมาไม่คลี่ซ้ำ
+    const p = tabs[i].pane;
+    if (!p.dataset.opened) {
+      p.dataset.opened = '1';
+      for (const d of p.querySelectorAll(':scope > * > details.fold')) d.open = true;
+    }
+    if (focus) tabs[i].b.focus();
+  };
+  // ลูกศรตามแบบ tablist — โฟกัสอยู่ในแถบ คีย์ลัดทั้งหน้าไม่ได้ใช้ลูกศรบนการ์ดตาย
+  bar.onkeydown = (e) => {
+    const at = tabs.findIndex(({ b }) => b === e.target);
+    const n = tabs.length;
+    const to = { ArrowRight: at + 1, ArrowLeft: at - 1 + n, Home: 0, End: n - 1 }[e.key];
+    if (at < 0 || to === undefined) return;
+    e.preventDefault();
+    pick(to % n, true);
+  };
+  bar.append(...tabs.map((t) => t.b));
+  wrap.append(bar, ...tabs.map((t) => t.pane));
+  pick(deathTabOf.get(card) ?? 0);
   return wrap;
 }
 // แผงเงิน (ui-redo ใบ 07): ย้ายบรรทัดเงินใต้แถบสถานะมาเป็นช่องละแถว · ค่าชุดเดียวกับที่การ์ดเคยบอก ไม่เปิดตัวเลขที่เกมซ่อน
@@ -2222,13 +2289,6 @@ function kinList(members) {
       row([who, m.age != null && `อายุ ${m.age}`, m.left ? 'แยกทางแล้ว' : m.bondLevel].filter(Boolean).join(' · '), false);
     });
   return ul;
-}
-
-function familyTree() {
-  if (!st.lineage.length) return null;
-  const d = el('details', 'tree');
-  d.append(el('summary', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageView(st.lineage, st.cls));
-  return d;
 }
 
 // คู่ใจที่ตายก่อนเรามารอเดินไปปรโลกด้วย (B44) — เฉพาะตัวที่ดูแลดี (ป้าย "สนิท" ขึ้นไปในแผงครอบครัว)

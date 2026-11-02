@@ -240,8 +240,8 @@ body:has(.mnav) .foot { display:none; }
 .delta { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px 14px; font-size:12px; }
 .delta > div { display:flex; flex-direction:column; gap:4px; }
 .titles .pattern { font-family:var(--ft); font-weight:600; font-size:20px; }
-.titles .more, .eras .more, .memo .more, .warn .more { all:unset; align-self:flex-start; min-height:44px; cursor:pointer; font-size:14px; font-weight:600; text-decoration:underline; }
-.titles .more:focus-visible, .eras .more:focus-visible, .memo .more:focus-visible, .warn .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.titles .more, .eras .more, .memo .more, .warn .more, .d-pane > .more { all:unset; align-self:flex-start; min-height:44px; cursor:pointer; font-size:14px; font-weight:600; text-decoration:underline; }
+.titles .more:focus-visible, .eras .more:focus-visible, .memo .more:focus-visible, .warn .more:focus-visible, .d-pane > .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
 /* ชั้นสมุด (B130): แท็บเป็นปุ่มกด (aria-pressed) ไม่ใช่ tablist — เปลี่ยนแท็บ = วาดหน้าใหม่ทั้งหน้า */
 .bk-intro { margin:0; font-size:13px; color:var(--muted); }
 .shelf-art { display:block; width:100%; border:1px solid var(--ink2); border-radius:8px; }
@@ -360,6 +360,15 @@ body:has(.mnav) .foot { display:none; }
 .d-rb li { padding:3px 16px; background:var(--red); color:#FFFFFF; font-size:14px; font-weight:600; line-height:1.5; overflow-wrap:anywhere; clip-path:polygon(0 0, 100% 0, calc(100% - 8px) 50%, 100% 100%, 0 100%, 8px 50%); }
 .d-rb .more-n { padding:3px 0; background:none; color:inherit; font-weight:400; clip-path:none; }
 .d-rest { padding-top:12px; }
+/* แท็บรายละเอียด (ui-redo ใบ 11): ปุ่มแคปซูลตัดบรรทัดได้ จอแคบไม่ล้นแนวนอน · หัวในแผงคืนเป็นหัวเล็ก ไม่รับตัวเขียนชื่อผู้ตาย */
+.d-tab-bar { display:flex; flex-wrap:wrap; gap:6px; }
+.d-tab-bar button { all:unset; box-sizing:border-box; cursor:pointer; min-height:36px; padding:0 12px; border:1px solid #1F1F1F; border-radius:999px; font-size:14px; display:inline-flex; align-items:center; }
+.d-tab-bar button[aria-selected="true"] { background:#1F1F1F; color:#FFFFFF; font-weight:600; }
+.d-tab-bar button:focus-visible { outline:2px solid var(--red); outline-offset:2px; }
+.d-pane { display:flex; flex-direction:column; gap:10px; padding-top:12px; }
+.d-pane[hidden] { display:none; }
+.mem .d-pane h3 { margin:8px 0 0; font-family:var(--ft); font-size:14px; font-weight:600; color:var(--muted); text-align:left; }
+.d-pane .fam { display:flex; flex-direction:column; gap:8px; }
 .d-share { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; padding-top:12px; border-top:1px dashed #8A8A8A; }
 .d-share .choice { flex:1 1 auto; min-height:44px; padding:6px 12px; justify-content:center; font-size:14px; background:transparent; border-style:dashed; }
 /* ป้ายตามหาคนหาย (B139): กระดาษประกาศติดเสา หัวแดงตัวหนา — ต่างจากหนังสืองานศพขาวดำ ให้รู้ว่ายังไม่มีใครถือว่าจากไป */
