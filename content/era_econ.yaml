@@ -28,12 +28,6 @@ events:
       - text: "ปลูกผักหลังบ้านไว้กินเอง"
         effects: {health: 1, knowledge: 1, happiness: -1}
         merit: [{cat: neutral}]
-      - id: use_braced
-        text: "กินผักที่ปลูกไว้ตั้งแต่ปีก่อน"
-        requires: {flags: {has: ["braced:oil_crisis_2"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
-        clears_flags: ["braced:oil_crisis_2"]
-        effects: {health: 1, money: {unit: income_x, amount: 0.2}}
-        merit: [{cat: neutral}]
 
   - id: era_econ_oil2_small_01
     type: A
@@ -133,12 +127,6 @@ events:
       - text: "ไปอยู่กับย่า ช่วยย่าทำสวน"
         effects: {health: 1, relations: 2, knowledge: -1}
         merit: [{cat: care_parents, level: 1}]
-      - id: use_braced
-        text: "ไม่มีหนี้ก้อนใหม่ ไม่ต้องย้าย"
-        requires: {flags: {has: ["braced:tom_yum_kung"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
-        clears_flags: ["braced:tom_yum_kung"]
-        effects: {happiness: 1, relations: 1}
-        merit: [{cat: neutral}]
 
   - id: era_econ_tyk_adult_01
     type: A
@@ -206,12 +194,6 @@ events:
       - text: "ตามแม่ไปช่วยงานวัดทุกเสาร์"
         effects: {relations: 1, happiness: 1, knowledge: 1}
         merit: [{cat: help_others, level: 1}]
-      - id: use_braced
-        text: "เงินที่บ้านกันไว้พอรอแม่หางาน"
-        requires: {flags: {has: ["braced:global_financial_crisis"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
-        clears_flags: ["braced:global_financial_crisis"]
-        effects: {happiness: 1, relations: 1}
-        merit: [{cat: neutral}]
 
   - id: era_econ_gfc_small_01
     type: A
