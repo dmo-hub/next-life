@@ -6,8 +6,6 @@ export const FOLLOW_ICON = {
   later: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2h8M4 14h8M5 2c0 4 6 4 6 6s-6 2-6 6M11 2c0 4-6 4-6 6s6 2 6 6"/></svg>',
 };
 export const FOLLOW_WORD = { later: 'มีผลภายหลัง' };
-// ไอคอนนำบรรทัดเงินใต้หัวการ์ด — ทุกช่องมีคำบอกอยู่แล้ว (เงินติดตัว · รายได้ · เงินกู้) ไอคอนจึงซ่อนจากโปรแกรมอ่านจอ
-export const MONEY_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="13" height="8" rx="1.5"/><circle cx="8" cy="8" r="2"/></svg>';
 // หัวใจข้างอายุบนแถบสถานะตอนชีวิตใกล้หมด — ตัวห่อมี aria-label "ใกล้ตาย" ไอคอนจึงซ่อนจากโปรแกรมอ่านจอ
 export const HEART_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14S1.5 9.8 1.5 5.6A3.4 3.4 0 0 1 8 4a3.4 3.4 0 0 1 6.5 1.6C14.5 9.8 8 14 8 14z"/></svg>';
 

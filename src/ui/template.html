@@ -100,9 +100,6 @@ body:has(.sb.dying)::after { content:''; position:fixed; inset:0; z-index:9; poi
 .delta .num { font-weight:700; font-variant-numeric:tabular-nums; }
 .meta { padding:0 20px 8px; font-size:12px; }
 .meta span { white-space:nowrap; }
-.meta.money, .a .meta.money { padding-top:0; }
-.a .sb + .meta.money { padding-top:10px; }
-.meta.money svg { width:14px; height:14px; margin-right:4px; vertical-align:-2px; fill:none; stroke:currentColor; stroke-width:1.6; }
 .tree { padding:0 20px 8px; font-size:12px; }
 .tree summary { cursor:pointer; }
 .tree .picks { font-size:12px; }
@@ -153,6 +150,12 @@ body:has(.mnav) .foot-shelf { display:none; }
 .me dd { margin:0; color:var(--ink2); }
 .me .focus { padding:0; }
 .me .meta { margin:0; padding:0; font-size:14px; }
+/* แผงเงิน (ใบ 07): ป้ายซ้าย ตัวเลขชิดขวาหลักตรงกัน กวาดตาเทียบได้ · ตัวเลขยาวตัดบรรทัดได้ ไม่ดันจอล้น */
+.mo dl { margin:12px 0 0; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:10px 16px; font-size:15px; }
+.mo dt { color:var(--ink2); white-space:nowrap; }
+.mo dd { margin:0; text-align:right; font-weight:700; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.mo dd.neg { color:var(--dg); }
+.mo p { margin:16px 0 0; font-size:13px; color:var(--ink2); }
 .body { padding:18px 20px 8px; display:flex; flex-direction:column; gap:8px; }
 .body h3 { margin:0; font-size:24px; line-height:1.35; }
 .body h3.lead { font-size:19px; font-weight:400; }

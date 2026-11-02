@@ -1,7 +1,7 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfPicArt, shelfLineageArt } from './shelfart.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, MONEY_ICON, HEART_ICON } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
@@ -148,7 +148,7 @@ function lifeMenu(card, box) {
   sheetClose = null;
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
-  const sheets = { me: () => mePanel(card), family: familyPanel };
+  const sheets = { me: () => mePanel(card), family: familyPanel, money: () => moneyPanel(card) };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
   const views = { shelf: () => openShelf() };
   for (const [id, label] of LIFE_MENU) {
@@ -1813,8 +1813,6 @@ function render(card) {
   if (card.kind === 'isekai') return renderIsekai(card);
   root.replaceChildren();
   const s = statsOf(st);
-  // ปีเกมใช้ภายในเท่านั้น หน้าจอบอกแค่อายุ (B14 ข้อ 12)
-  const year = st.birthYear + card.age;
   const box = el('article', `card ${styleOf(card)}`);
   const top = el('div', 'top');
   const body = el('div', 'body');
@@ -1861,25 +1859,8 @@ function render(card) {
     choices.append(enter(button(BTN.toAfter, null, () => openBook(card))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
     if (st.gen === 1) choices.append(inviteButton());
   } else {
+    // ฐานะ/งานอยู่แผงตัวฉัน (ui-redo ใบ 04) · เงินอยู่แผงเงิน (ใบ 07) — ใต้แถบสถานะเหลือแค่เนื้อการ์ด
     box.append(statusBar(card, s));
-    // ไม่มีรายได้ก็ต้องเห็นเงินติดตัวเสมอแม้ 0 · มีงานทำแล้วซ่อนเงินติดตัวเฉพาะตอนเป็น 0 พอดี ติดลบ (หนี้) ยังต้องเห็น
-    // เงินกู้เป็นยอดค้างของสัญญา ไม่ใช่เงินติดตัวติดลบ จึงแยกช่อง ไม่หักรวมกัน
-    const working = isWorking(st, card.age);
-    const debt = Math.round(totalDebt(st));
-    const purse = [
-      (!working || s.money !== 0) && `เงินติดตัว ${baht(s.money)}`,
-      working && `รายได้ ${baht(monthlyIncome(st, year))}/เดือน`,
-      debt > 0 && `เงินกู้ ${baht(debt)}`,
-      // เงินเทาแยกถุง ใช้จ่ายไม่ได้จนกว่าฟอก — แสดงเป็นตัวเลขให้เห็นว่าเสียไปเท่าไรตอนถูกยึด
-      st.grey > 0 && `เงินเทา ${baht(st.grey)}`,
-    ].filter(Boolean);
-    // ฐานะ/งานย้ายไปแผงตัวฉัน (ui-redo ใบ 04) · เรื่องเงินยังเป็นบรรทัดของตัวเอง ไอคอนนำหน้าให้กวาดตาเจอ
-    if (purse.length) {
-      const money = el('div', 'meta money');
-      money.insertAdjacentHTML('beforeend', MONEY_ICON);
-      metaLine(money, purse);
-      box.append(money);
-    }
     const kicker = card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind];
     // ภาพยุค (B56): การ์ดบ้านเมือง + การ์ดรับมือที่ผูกยุคไว้ (B58) ได้ภาพของยุคนั้น · ยุคที่ไม่มีภาพ = หน้าตาเดิม
     const eraPic = eraArt(card.kind === 'era' ? card.id : card.kind === 'event' ? ERA_OF.get(card.id) : null);
@@ -1969,7 +1950,7 @@ const WHISPERS = [
   ['chance', (c) => c.fx?.some((f) => /สำเร็จ|เสี่ยง/.test(f ?? '')), 'ทางที่บอกโอกาสสำเร็จหรือความเสี่ยงไว้ ผลยังไม่แน่นอน ค่าสถานะตอนนี้ช่วยเอียงผลได้บ้าง'],
   ['free', (c, free) => free?.some(Boolean), 'ป้าย "ฟรี" คือทางที่ไม่ต้องควักเงินเลย ไม่ว่าผลจะออกมาทางไหน'],
   ['school', (c) => c.id?.startsWith('school_gate_'), 'เรียนจบชั้นหนึ่งแล้วจะเรียนต่อหรือออกมาทำงานก็ได้ ความรู้ช่วยสอบเข้าที่ดี ส่วนเงินที่บ้านตัดสินว่าที่ไหนส่งไหว'],
-  ['job', (c) => c.id === 'first_job', 'งานแรกขึ้นกับวุฒิที่มี คนรู้จักเยอะยิ่งเจองานค่าแรงดี รายได้ต่อเดือนจะขึ้นใต้แถบค่าสถานะ'],
+  ['job', (c) => c.id === 'first_job', 'งานแรกขึ้นกับวุฒิที่มี คนรู้จักเยอะยิ่งเจองานค่าแรงดี รายได้ต่อเดือนดูได้ที่ปุ่ม เงิน ในเมนูท้ายจอ'],
   ['alloc', (c) => c.kind === 'alloc', 'ทุกช่วงได้ทบทวนเงินเก็บ ตัวเลขที่เห็นเป็นผลของช่วงที่ผ่านมา ไม่ได้บอกช่วงหน้า และของแพงขึ้นทุกปี เงินที่เก็บเฉย ๆ จึงซื้อของได้น้อยลง'],
   ['debt', (c) => c.fx?.some((f) => /กู้/.test(f ?? '')), 'กู้มาแล้วต้องผ่อนทุกปี หนี้ที่ท่วมรายได้อยู่นาน ๆ พาไปถึงล้มละลายได้'],
 ];
@@ -2160,6 +2141,28 @@ function familyPanel() {
     const here = animals.filter((m) => m.alive && !m.left).length;
     wrap.append(el('h3', null, here ? `สัตว์เลี้ยง · ยังอยู่ ${here}` : 'สัตว์เลี้ยง'), kinList(animals));
   }
+  return wrap;
+}
+// แผงเงิน (ui-redo ใบ 07): ย้ายบรรทัดเงินใต้แถบสถานะมาเป็นช่องละแถว · ค่าชุดเดียวกับที่การ์ดเคยบอก ไม่เปิดตัวเลขที่เกมซ่อน
+// ปุ่มกู้ยังอยู่บนการ์ดเพราะเป็นทางเลือกของการ์ดนั้น ไม่ใช่ข้อมูล
+function moneyPanel(card) {
+  const s = statsOf(st);
+  // คนตายไม่มีรายได้ต่อ — การ์ดตายเห็นแค่ที่ทิ้งไว้
+  const working = !st.dead && isWorking(st, card.age);
+  // เงินกู้เป็นยอดค้างของสัญญา ไม่ใช่เงินติดตัวติดลบ จึงแยกช่อง ไม่หักรวมกัน
+  const debt = Math.round(totalDebt(st));
+  const rows = [
+    ['เงินติดตัว', baht(s.money), s.money < 0],
+    // ปีเกมใช้ภายในเท่านั้น หน้าจอบอกแค่อายุ (B14 ข้อ 12)
+    !st.dead && ['รายได้', working ? `${baht(monthlyIncome(st, st.birthYear + card.age))}/เดือน` : 'ยังไม่มีงานทำ'],
+    ['เงินกู้', debt > 0 ? baht(debt) : 'ไม่มี'],
+    // เงินเทาแยกถุง ใช้จ่ายไม่ได้จนกว่าฟอก · ไม่เคยมีก็ไม่บอกว่ามีถุงนี้
+    st.grey > 0 && ['เงินเทา', baht(st.grey)],
+  ].filter(Boolean);
+  const wrap = el('div', 'mo');
+  const dl = el('dl');
+  for (const [k, v, neg] of rows) dl.append(el('dt', null, k), el('dd', neg ? 'num neg' : 'num', v));
+  wrap.append(dl, el('p', null, new Map(STAT_HELP).get('เงิน · หนี้')));
   return wrap;
 }
 function kinList(members) {
