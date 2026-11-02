@@ -3,7 +3,7 @@
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
 import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_TIME, ISEKAI_LINK, LINK, tripCarry, tripSettle, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, TRIP_QUEST, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed, WARN, ISEKAI_FOCUS } from '../src/engine/index.mjs';
-import { CONT_LIFE, CONT_REGIONS, CONT_RACES, CONT_END } from '../src/engine/index.mjs';
+import { CONT_LIFE, CONT_REGIONS, CONT_RACES, CONT_END, CONT_MOVE, contNeighbors } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 
@@ -108,7 +108,10 @@ const potionFrom = [], potionAdd = {};
 let tickBad = 0, roleBad = 0, oldBad = 0;
 // ชาติทวีป (06b): ไม่มีบทบาท · มีแคว้น/เผ่า/ชาติ · แฟ้มเกิดครบจำนวน · ไม่มีใบทุ่มเทของบทบาท · อายุบนการ์ดเป็นเลขเต็ม
 let contBad = 0, contLives = 0, ageFrac = 0;
-const contSeen = { region: new Set(), race: new Set() };
+const contSeen = { region: new Set(), race: new Set(), movedIn: new Set() };
+// ย้ายแคว้น (06c-1): ทางเดินตามถนน · ชาติเก่าไม่มีใบทางแยก
+let moveBad = 0, moveCards = 0;
+const moveCount = [];
 // ทางกลับบ้าน (B154): ชาติที่เกิดในต่างโลกไม่เห็นเควส/อีเวนต์ทริป
 let tripEvBad = 0;
 let warnBad = 0, warnSeen = 0, warnFocus = 0, warnFocusBad = 0;
@@ -197,9 +200,21 @@ Object.values(BOTS).forEach((bot, b) => {
       contLives++;
       const want = CONT_LIFE.offers + (cfg.blessed ? 1 : 0);
       if (isk.role || !CONT_REGIONS[isk.region] || !CONT_RACES[isk.race] || !isk.nation || a.cards[0].choices.length !== want || a.cards.some((c) => c.step === 'focus' && c.choices.includes(roleInfo('commoner').focus.name))) contBad++;
-      contSeen.region.add(isk.region);
+      // แคว้นเกิด = ต้นทางของการย้ายครั้งแรก (06c-1 · isk.region คือแคว้นสุดท้าย)
+      const moves = isk.moves ?? [];
+      contSeen.region.add(moves[0]?.from ?? isk.region);
+      // ย้ายได้เฉพาะถนนบนแผนที่ · ต่อจากแคว้นที่อยู่ล่าสุด · จบที่แคว้นปลายทางของครั้งท้าย · ใบทางแยกเท่าจำนวนครั้งที่ยื่น ตัวเลือก ≤ offers + อยู่ที่เดิม
+      moves.forEach((m, k) => {
+        contSeen.movedIn.add(m.to);
+        if (!contNeighbors(m.from).includes(m.to) || (k && moves[k - 1].to !== m.from)) moveBad++;
+      });
+      if (moves.length && moves.at(-1).to !== isk.region) moveBad++;
+      const mc = a.cards.filter((c) => c.step === 'move');
+      if (mc.length < moves.length || mc.some((c) => c.choices.length < 2 || c.choices.length > CONT_MOVE.offers + 1)) moveBad++;
+      moveCards += mc.length;
+      moveCount.push(moves.length);
       contSeen.race.add(isk.race);
-    }
+    } else if (a.cards.some((c) => c.step === 'move') || isk.moves) moveBad++;
     for (const c of a.cards) if ((typeof c.age === 'number' && !Number.isInteger(c.age)) || (c.status && !Number.isInteger(c.status.age))) ageFrac++;
     const pace = isk.race ? CONT_RACES[isk.race].pace : ISEKAI_ROLES[isk.role].pace ?? 1;
     if (isk.natural && isk.age < ISEKAI_STAGES.at(-1).from * pace) oldBad++;
@@ -243,6 +258,8 @@ check('ค่าบนหน้าต่างสถานะอยู่ใน�
 check('ใบตาเวลาเดินเอง ไม่มีตัวเลือก แต่เปลี่ยนสิ่งที่ทุ่มเทได้', tickBad);
 check('เทพธิดายื่นบทบาทคนธรรมดามีอาชีพทุกครั้ง (เส้นทดสอบบทบาทเดิม)', roleBad);
 check('ชาติทวีป: ไม่มีบทบาท · มีแคว้น/เผ่า/ชาติ · แฟ้มเกิดครบ · ไม่มีทุ่มเทของบทบาท', contBad, `${contLives} ชาติ`);
+moveCount.sort((x, y) => x - y);
+check('ย้ายแคว้นตามถนนเท่านั้น · ชาติเก่าไม่มีใบทางแยก', moveBad, `ใบทางแยก ${moveCards} · ชาติที่ย้าย ${moveCount.filter((x) => x).length}/${moveCount.length} · ย้ายต่อชาติ p50/p90/max ${p50(moveCount)}/${moveCount[Math.floor(moveCount.length * 0.9)] ?? 0}/${moveCount.at(-1) ?? 0}`);
 check('อายุบนการ์ด/หน้าต่างสถานะเป็นเลขเต็ม (pace ไม่เต็มปัดตอนแสดง)', ageFrac);
 check('สิ้นอายุเฉพาะหลังวัยชรา', oldBad);
 check(`การ์ดเตือนออก 1 ใบต่อการตก HP ถึง ${WARN.isekai}`, warnBad, `${warnSeen} ใบ`);
@@ -315,6 +332,7 @@ const reach = {
   ตัวเลือก: missing(ISEKAI_EVENTS.flatMap((e) => e.choices.map((_, j) => `${e.id}#${j}`)), seen.choice),
   ทางลัดความรู้: missing(Object.keys(ISEKAI_KNOW), seen.shortcut),
   แคว้นเกิด: missing(Object.keys(CONT_REGIONS), contSeen.region),
+  แคว้นที่ย้ายเข้า: missing(Object.keys(CONT_REGIONS), contSeen.movedIn),
   เผ่าเกิด: missing(Object.keys(CONT_RACES), contSeen.race),
 };
 for (const [k, m] of Object.entries(reach)) check(`${k}มีบอทถึง`, m.length, m.length ? m.slice(0, 8).join(' ') : '');

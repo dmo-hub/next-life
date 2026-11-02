@@ -10,7 +10,7 @@ import { newLedger, recordMerit, ledgerLevel, meritId, SIN_CATS } from './merit.
 import { hintLevel } from './court.mjs';
 import { WARN, crossedLow, warnCard } from './warn.mjs';
 import { FOCUS_FLOW, focusSet, focusYearEnd } from './focus.mjs';
-import { CONT_REGIONS, CONT_RACES, contBirth, contNation, contRaceStart } from './continent.mjs';
+import { CONT_REGIONS, CONT_RACES, contBirth, contNation, contNeighbors, contRaceStart } from './continent.mjs';
 
 export const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค' };
 export const ISEKAI_FX = { hp: 'ชีวิต', str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
@@ -214,6 +214,10 @@ export const ISEKAI_ROLES = {
 // world = ถังความทรงจำ/ตำนานของทั้งทวีป · name = คำนำชื่อบนผังตระกูล ("เอเธอร์การ์ด · <แคว้น>") · offers = แฟ้มเกิดที่เทพธิดายื่น (กรรมไม่เอียง)
 // tripRace = เผ่าของทริปจากโลกหลัก (ลงแคว้นสุ่ม) · like = บทบาทที่ยืมทองเริ่มกับชุดชื่อ · fame = ชื่อเสียงที่ตอนจบนับว่าดัง
 export const CONT_LIFE = { world: 'aethergard', name: 'เอเธอร์การ์ด', offers: 3, tripRace: 'human', like: 'commoner', fame: 30 };
+// ย้ายแคว้น (06c-1 · เจ้าของเคาะ): สำรวจดินแดนครบ years ปีเต็มนับจากเกิด/ทางแยกครั้งก่อน ⇒ ใบทางแยกยื่นแคว้นติดกันสุ่ม ≤ offers + อยู่ที่เดิม
+// ปีเต็มยืม focusYears.explore (กติกาเดียวกับอาชีพ) แต่นับจากหลักที่จดไว้ตอนทางแยก — focusYears สะสมทั้งชาติ ใช้ตรง ๆ ใบจะมาทุกปีหลังครบครั้งแรก
+// ไม่ย้ายก็นับใหม่ ⇒ ใบไม่ตามจี้ทุกปี · ชาติเก่า (มีบทบาท) ไม่มีแคว้นจึงไม่มีใบนี้
+export const CONT_MOVE = { focus: 'explore', years: 2, offers: 3, event: 'cont_move' };
 // ตอนจบชาติทวีป: ยังไม่มีเป้าหมาย (05b จบตามสายที่ไกลสุด) — ดังถึงเกณฑ์และมีอาชีพ / อย่างใดอย่างหนึ่ง / ไม่มีทั้งคู่ · {job} = อาชีพแรก · {land} = แคว้น
 export const CONT_END = {
   best: ['{job}ผู้เลื่องชื่อแห่ง{land}', 'ชื่อของคุณถูกเล่าต่อในโรงเตี๊ยมทั่ว{land} คนรุ่นหลังยังเอ่ยถึงเวลาพูดถึงยุคนั้น'],
@@ -1864,6 +1868,14 @@ function isekaiDue(isk) {
   if (w.finale && !isk.finaleDone && isk.age >= finaleAt) return take(w.finale);
   // การ์ดทางกลับไม่ลง used — เลือกอยู่ต่อแล้วตามหาใหม่ครบอีกรอบ ก็มาอีกได้
   if (isk.trip && (isk.seek ?? 0) >= isk.trip.years) return TRIP_QUEST.event;
+  // ทางแยกมาก่อนเรื่องที่นัดไว้ (เรื่องนัดรอตาหน้าได้) · แคว้นปลายทางสุ่มตอนนี้ ⇒ เล่นเซฟซ้ำได้ใบเดิม
+  if (!isk.role && (isk.focusYears?.[CONT_MOVE.focus] ?? 0) - (isk.roamFrom ?? 0) >= CONT_MOVE.years) {
+    const near = contNeighbors(isk.region);
+    if (near.length) {
+      isk.moveOffers = isekaiShuffle(isk.rng, near).slice(0, CONT_MOVE.offers);
+      return CONT_MOVE.event;
+    }
+  }
   const li = isk.later.findIndex((l) => l.age <= isk.age);
   if (li >= 0) return take(isk.later.splice(li, 1)[0].id);
   const roll = isk.rng.next();
@@ -1970,6 +1982,20 @@ export function nextIsekaiCard(isk) {
   if (isk.step === 'warn') {
     const card = warnCard(isk.age, isekaiStageOf(isk).name, ISEKAI_WARN.text, [ISEKAI_WARN.focus, WARN.ignore]);
     return isekaiCard(isk, { ...card, kind: 'isekai', step: 'warn', title: ISEKAI_WARN.title, fx: [`แนะนำ ${ISEKAI_FOCUS[ISEKAI_WARN.rest].name}`, ''] });
+  }
+  if (isk.step === 'tick' && isk.due === CONT_MOVE.event) {
+    isk.due = null;
+    isk.step = 'move';
+  }
+  if (isk.step === 'move') {
+    const here = CONT_REGIONS[isk.region].name;
+    return isekaiCard(isk, {
+      step: 'move', title: 'ทางแยก', age: isk.age,
+      text: `เดินสำรวจมาหลายปี จนรู้ทางออกจาก${here}ทุกเส้น ป้ายไม้ตรงทางแยกชี้ไปหลายแคว้น จะเก็บของย้ายไปตั้งหลักที่ใหม่ หรือกลับไปอยู่ที่เดิม`,
+      choices: [...isk.moveOffers.map((r) => CONT_REGIONS[r].name), `อยู่${here}ต่อ`],
+      desc: [...isk.moveOffers.map((r) => CONT_REGIONS[r].about), ''],
+      fx: [...isk.moveOffers.map(() => ''), ''],
+    });
   }
   if (isk.step === 'tick' && isk.due) isk.step = 'event';
   if (isk.step === 'event') return isekaiEventCard(isk, isekaiById[isk.due]);
@@ -2134,6 +2160,23 @@ export function chooseIsekai(isk, idx) {
     isk.warn = false;
     isk.focusWarn = idx === 0;
     isk.step = idx === 0 ? 'focus' : 'tick';
+    return;
+  }
+  // ทางแยกไม่ดึงเลขสุ่ม ไม่ใช่เหตุการณ์ (ไม่ลง used · มาอีกได้) · ย้ายหรือไม่ ตัวนับก็เริ่มใหม่
+  if (isk.step === 'move') {
+    const to = isk.moveOffers[idx];
+    if (!to && idx !== isk.moveOffers.length) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    isk.roamFrom = isk.focusYears?.[CONT_MOVE.focus] ?? 0;
+    isk.moveOffers = null;
+    if (to) {
+      const from = isk.region;
+      isk.region = to;
+      (isk.moves ??= []).push({ age: isk.age, from, to });
+      const text = `ทางแยก · ย้ายจาก${CONT_REGIONS[from].name}ไปตั้งหลักที่${CONT_REGIONS[to].name}`;
+      isk.log.push(`อายุ ${isk.age} · ${text}`);
+      isk.chron.push({ age: isk.age, stage: isekaiStageOf(isk).id, kind: 'event', text, deltas: {} });
+    }
+    isk.step = 'tick';
     return;
   }
   if (isk.step !== 'event') throw new Error('การ์ดนี้ไม่มีตัวเลือก');
