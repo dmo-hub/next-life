@@ -421,7 +421,21 @@ export function loadResultReacts(p = 'content/rules/result-reacts.yaml') {
   if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
   return doc;
 }
-const loadTaboo = () => parse(read('content/rules/flags.yaml')).taboo ?? {};
+// หมวด taboo: (dynasty-3) — ธงต้นเหตุ/ธงที่ผิดต้องอยู่ทะเบียน · การ์ดที่แกนตั้งธง mark ต้องมีจริง · ผิดรูป = ข้อห้ามไม่มีวันเกิดแบบเงียบ จึงหยุดตอนโหลด
+function loadTaboo(events) {
+  const reg = parse(read('content/rules/flags.yaml'));
+  const flags = new Set(Object.keys(reg.flags)), ids = new Set(events.map((e) => e.id));
+  const bad = [];
+  for (const [k, t] of Object.entries(reg.taboo ?? {})) {
+    if (!Array.isArray(t?.cause?.flags) || !t.cause.flags.length) bad.push(`${k}: cause.flags ต้องเป็นรายการธง`);
+    for (const f of [...(t?.cause?.flags ?? []), ...(t?.breaks?.flags ?? []), ...(t?.mark ? [t.mark.flag] : [])]) if (!flags.has(f)) bad.push(`${k}: ธง ${f} ไม่อยู่ในทะเบียน flags:`);
+    for (const id of t?.mark?.cards ?? []) if (!ids.has(id)) bad.push(`${k}: mark อ้างการ์ด ${id} ที่ไม่มี`);
+    if (t?.mark && !t.cause?.flags?.includes(t.mark.flag)) bad.push(`${k}: ธง mark ต้องอยู่ใน cause.flags`);
+    for (const w of ['tell', 'faded']) if (!(typeof t?.[w] === 'string' && t[w].trim())) bad.push(`${k}: ต้องมี ${w}`);
+  }
+  if (bad.length) throw new Error(`content/rules/flags.yaml หมวด taboo: ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return reg.taboo ?? {};
+}
 
 // คำใบ้ที่ศาลตอนเฉียดตาย (B153) ระดับละหลายข้อความ — ไม่ใช่การ์ด จึงตรวจตอนโหลดแทนด่านเนื้อหา
 // ห้ามเลขคู่คำบุญ/บาป (กติกาเดียวกับด่านการ์ดไม่เผยบัญชีของ harness)
@@ -596,5 +610,5 @@ export function loadContent() {
   const cadet = loadCadet();
   checkCadetEraCards(cadet, events);
   checkCadetHeirText(cadet);
-  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), taboo: loadTaboo(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), nature: loadNature(), tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(), away: loadAway(), arcs: loadArcs(events), cadet, spending: loadSpending() };
+  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), taboo: loadTaboo(events), nearHints: loadNearHints(), resultReacts: loadResultReacts(), nature: loadNature(), tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(), away: loadAway(), arcs: loadArcs(events), cadet, spending: loadSpending() };
 }

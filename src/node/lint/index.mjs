@@ -36,7 +36,7 @@ export function lintContext() {
   const ladders = Object.keys(JSON.parse(read('data/careers.json')).ladders);
   const reg = parse(read('content/rules/flags.yaml'));
   const heir = Object.entries(reg.heir ?? {});
-  const flags = { flags: new Set(Object.keys(reg.flags)), prefixes: new Set(Object.keys(reg.prefixes)), heir: new Set(heir.map(([k]) => k)), heirFrom: new Map(heir.map(([k, v]) => [k, v?.from_age ?? 0])), home: new Set(Object.keys(reg.home ?? {})) };
+  const flags = { flags: new Set(Object.keys(reg.flags)), prefixes: new Set(Object.keys(reg.prefixes)), taboo: new Set(Object.keys(reg.taboo ?? {})), heir: new Set(heir.map(([k]) => k)), heirFrom: new Map(heir.map(([k, v]) => [k, v?.from_age ?? 0])), home: new Set(Object.keys(reg.home ?? {})) };
   const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
   const natureDoc = parse(read('content/rules/nature.yaml'));
   const items = Object.keys(parse(read('content/rules/items.yaml')).items ?? {});

@@ -403,9 +403,10 @@ const CADET_FLAG_KEYS = ['setFlags', 'clearFlags', 'setFlagsPoor', 'flagsHas', '
 })(load('content/rules/', 'cadet.yaml').doc);
 // ธงที่แกนตั้งเอง (ป้ายหมวด 9 · ศาลสั่งล้มละลาย) มีในทะเบียนเพื่อให้เนื้อหาอ่านได้ ไม่ต้องรอเนื้อหาใช้
 // cheat_death: แกนอ่านตอนผลสุ่มตาย (ถูกเรียกตัว B153) — มีผู้อ่านแล้วแม้ยังไม่มีการ์ดตั้ง
+// ธง mark ของทะเบียน taboo: แกนตั้งตอนการ์ดตามหนี้ออก และแกนอ่านเป็นต้นเหตุข้อห้ามตระกูล
 // army_family / police_family (B5): แกนตั้งตอนเข้าสายยศ army/police (rank.mjs markService)
 // tree_teacher (ใบ 08): ด่านจบประถมของแกนตั้ง · treePace ในแกนอ่าน
-const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death', 'army_family', 'police_family', 'tree_teacher'];
+const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death', 'army_family', 'police_family', 'tree_teacher', ...Object.values(nameContent.taboo).flatMap((t) => (t.mark ? [t.mark.flag] : []))];
 const stale = [...ctx.flags.flags, ...ctx.flags.prefixes].filter((f) => !used.has(f) && !ENGINE_FLAGS.includes(f));
 rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${ctx.flags.prefixes.size} ชื่อหน้า · ค้าง ${stale.length}`]);
 // ธงมีพารามิเตอร์ยังไม่มีเนื้อหาจริงใช้ (มีแค่ใน fixture สายลี้ลับ) จึงไม่นับว่าค้าง
