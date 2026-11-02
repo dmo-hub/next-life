@@ -349,6 +349,21 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 Sarabun
 .itimer i { display:block; height:100%; width:0; background:#6FE3FF; }
 @keyframes itick { from { width:0; } to { width:100%; } }
 @media (prefers-reduced-motion: reduce) { .itimer i { animation:none !important; } }
+/* เอฟเฟกต์ B-fx (ตัวเล่นใน app.mjs) — พลิก: ลูกตรงของการ์ดซ่อนด้านหลัง หลังการ์ดเป็นแผ่นรักลายทองหันกลับด้าน · translateZ กันกระพริบเพราะอยู่ระนาบเดียวกับพื้นการ์ด */
+.fx-flip { position:relative; transform-style:preserve-3d; }
+.fx-flip > * { backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+.fx-flip > .fx-back { position:absolute; inset:0; display:grid; place-items:center; border-radius:inherit; background:var(--lacquer2); transform:rotateY(180deg) translateZ(1px); }
+.fx-back svg { width:min(200px, 60%); height:auto; }
+.fx-ov { position:fixed; inset:0; z-index:50; pointer-events:none; }
+.fx-ov.fx-out { opacity:0; transition:opacity .25s; }
+.fx-veil { position:absolute; inset:0; background:var(--lacquer); opacity:0; }
+.fx-lamp { position:absolute; left:50%; top:38%; margin:-60px 0 0 -60px; overflow:visible; }
+.fx-cap { position:absolute; left:16px; right:16px; top:calc(38% + 76px); text-align:center; font-family:Pridi,serif; font-size:18px; color:var(--cream); opacity:0; }
+.fx-cap small { display:block; font-family:Sarabun,sans-serif; font-size:13px; color:var(--sand); }
+.fx-title { position:absolute; inset:0; display:grid; place-items:center; }
+.fx-title svg { overflow:visible; max-width:92vw; height:auto; }
+.fx-title .fx-name { font-family:Pridi,serif; font-weight:600; }
+.fx-ov canvas { position:absolute; inset:0; width:100%; height:100%; }
 /* ทั้งหน้าเข้าธีมต่างโลกตามการ์ดที่ขึ้นจอ — ผูกกับการ์ดด้วย :has จึงไม่ต้องตามล้างธงทุกจุดที่วาดจอไทย */
 body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; }
 body:has(#app > .card.i) .logo { background:#0E1024; border-bottom-color:#3B4BA8; }
