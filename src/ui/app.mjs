@@ -141,14 +141,14 @@ function focusBar(card, open = false) {
 }
 
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทย · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
-// ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ · ปุ่มที่แผงยังไม่ลง (ใบ 07–08) เป็นปุ่มจางให้เห็นโครงเมนูครบ
+// ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ
 const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบครัว'], ['money', 'เงิน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
 function lifeMenu(card, box) {
   // การ์ดใหม่วาดทับทั้ง root แผงเดิมหายไปด้วยแล้ว
   sheetClose = null;
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
-  const sheets = { me: () => mePanel(card), family: familyPanel, money: () => moneyPanel(card) };
+  const sheets = { me: () => mePanel(card), family: familyPanel, money: () => moneyPanel(card), more: morePanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
   const views = { shelf: () => openShelf() };
   for (const [id, label] of LIFE_MENU) {
@@ -159,15 +159,12 @@ function lifeMenu(card, box) {
     if (sheets[id]) {
       b.setAttribute('aria-expanded', 'false');
       b.onclick = () => (root.querySelector('.sheet') ? closeSheet() : openSheet(label, sheets[id](), box, b));
-    } else if (views[id]) {
+    } else {
       b.onclick = () => {
         // ปิดแผงก่อน ไม่งั้นการ์ดที่เก็บไว้คืนตอนกลับยัง inert อยู่
         closeSheet();
         views[id]();
       };
-    } else {
-      b.disabled = true;
-      b.append(el('small', null, 'เร็ว ๆ นี้'));
     }
     nav.append(b);
   }
@@ -2165,6 +2162,26 @@ function moneyPanel(card) {
   wrap.append(dl, el('p', null, new Map(STAT_HELP).get('เงิน · หนี้')));
   return wrap;
 }
+// แผงเพิ่มเติม: ลิงก์ท้ายหน้าเดิมทั้งชุด — ฉากที่มีเมนูซ่อนท้ายหน้า ที่นี่จึงเป็นทางเข้าเดียว · ไม่มีหน้าตั้งค่า (ui-redo ข้อ 10)
+function morePanel() {
+  const ul = el('ul', 'mr');
+  const day = el('button', null, 'ชาติประจำวัน');
+  day.type = 'button';
+  // ปิดแผงก่อน หน้าถามยืนยันจะได้เก็บการ์ดที่ไม่ inert ไว้คืนตอนยกเลิก
+  day.onclick = () => {
+    closeSheet();
+    dayNew();
+  };
+  const link = (text, href) => Object.assign(el('a', null, text), { href });
+  for (const x of [day, link('คู่มือ', 'guide.html'), link('กลไกในเกม', 'about.html'), link('หน้าแรก', 'index.html')]) {
+    const li = el('li');
+    li.append(x);
+    ul.append(li);
+  }
+  const wrap = el('div', 'mr-w');
+  wrap.append(ul, el('p', null, 'เกม ไม่ใช่คำแนะนำการลงทุน'));
+  return wrap;
+}
 function kinList(members) {
   const rank = (m) => FAMILY_ORDER.indexOf(m.role) * 2 + (m.alive ? 0 : 1);
   const ul = el('ul', 'picks');
@@ -2855,11 +2872,14 @@ document.getElementById('shelfLink')?.addEventListener('click', (e) => {
   if (!root.querySelector('.shelf-view')) openShelf();
 });
 // ชีวิตแรกที่ยังไม่ได้กดอะไรไม่มีอะไรให้เสีย เปลี่ยนได้เลย · นอกนั้นถามก่อนลบตระกูล · ยกเลิกคืนจอเดิมทั้งชุด
-document.getElementById('dayLink')?.addEventListener('click', (e) => {
-  e.preventDefault();
+function dayNew() {
   if (st.gen === 1 && !af && save.log === '') return startDay();
   const prev = [...root.childNodes];
   confirmNew(() => root.replaceChildren(...prev), startDay, 'ชาติประจำวัน', 'ลบแล้วเกิดชาติประจำวัน');
+}
+document.getElementById('dayLink')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  dayNew();
 });
 shelfDot();
 // เพดานความสูงการ์ด (B116) หักหัวเว็บ — ชื่อเกมตัดสองบรรทัดบนจอแคบ หัวจึงสูงไม่ตายตัว วัดจริงแทนเดาค่าเดียว · 20 = ระยะบนของ #app

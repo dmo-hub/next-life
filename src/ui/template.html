@@ -114,19 +114,17 @@ body:has(.sb.dying)::after { content:''; position:fixed; inset:0; z-index:9; poi
 .focus-pick { display:flex; flex-direction:column; gap:4px; margin-top:4px; }
 .focus-pick[hidden] { display:none; }
 .focus-pick .on { border-style:solid; border-color:currentColor; font-weight:600; }
-/* แถบเมนูล่าง (ui-redo ใบ 04): ติดขอบล่างจอ กว้างเท่าการ์ด · หน้าเว้นท้ายเท่าความสูงแถบ ท้ายการ์ดกับลิงก์ท้ายหน้าจึงไม่ถูกบัง */
+/* แถบเมนูล่าง (ui-redo ใบ 04): ติดขอบล่างจอ กว้างเท่าการ์ด · หน้าเว้นท้ายเท่าความสูงแถบ ท้ายการ์ดจึงไม่ถูกบัง */
 :root { --nav-h:60px; }
 body:has(.mnav) { padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)); }
 .mnav { position:fixed; left:0; right:0; bottom:0; z-index:8; display:flex; max-width:calc(var(--cw) + 2 * var(--pad-x)); margin:0 auto; padding:0 max(8px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px, env(safe-area-inset-left)); background:var(--paper); border-top:1px solid var(--rule2); box-shadow:0 -4px 16px rgb(0 0 0 / .06); }
 .mnav button { all:unset; box-sizing:border-box; flex:1 1 0; min-width:0; min-height:var(--nav-h); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:4px 2px; font-size:13px; font-weight:600; color:var(--ink); text-align:center; cursor:pointer; }
 .mnav button[aria-expanded="true"] { color:var(--fl); box-shadow:inset 0 3px 0 var(--fl); }
 .mnav button:focus-visible { outline:2px solid currentColor; outline-offset:-4px; }
-.mnav button:disabled { color:var(--muted); opacity:0.55; cursor:default; }
-.mnav small { font-size:10px; font-weight:400; line-height:1.2; }
-/* จุดของใหม่ (ใบ 05) มุมขวาบนของคำ ไม่ดันป้ายปุ่มให้เบี้ยว · ฉากที่มีเมนูเข้าสมุดจากปุ่มสมุดทางเดียว ลิงก์ท้ายหน้าจึงซ่อน */
+/* จุดของใหม่ (ใบ 05) มุมขวาบนของคำ ไม่ดันป้ายปุ่มให้เบี้ยว · ฉากที่มีเมนู ลิงก์ท้ายหน้าทั้งชุดย้ายเข้าปุ่มสมุดกับแผงเพิ่มเติม (ใบ 08) ท้ายหน้าจึงซ่อน */
 .mnav button { position:relative; }
 .mnav .new-dot { position:absolute; top:10px; left:calc(50% + 16px); margin:0; }
-body:has(.mnav) .foot-shelf { display:none; }
+body:has(.mnav) .foot { display:none; }
 /* แผงจากเมนู: ทับการ์ดเหนือแถบเมนู เลื่อนในตัวเอง · การ์ดข้างใต้ inert จางลงให้รู้ว่ายังรออยู่ */
 .sheet { position:fixed; left:0; right:0; bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)); z-index:8; max-width:calc(var(--cw) + 2 * var(--pad-x)); max-height:calc(100svh - var(--nav-h) - env(safe-area-inset-bottom) - 24px); margin:0 auto; overflow:auto; overscroll-behavior:contain; padding:0 20px 16px; background:var(--paper); border-radius:var(--rk) var(--rk) 0 0; box-shadow:0 -8px 32px rgb(0 0 0 / .18); }
 .card[inert] { opacity:0.5; }
@@ -155,6 +153,12 @@ body:has(.mnav) .foot-shelf { display:none; }
 .mo dt { color:var(--ink2); white-space:nowrap; }
 .mo dd { margin:0; text-align:right; font-weight:700; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .mo dd.neg { color:var(--dg); }
+/* แผงเพิ่มเติม (ใบ 08): แถวละลิงก์เต็มกว้าง แตะง่ายบนมือถือ · ปุ่มชาติประจำวันหน้าตาเดียวกับลิงก์ */
+.mr { list-style:none; margin:8px 0 0; padding:0; }
+.mr li + li { border-top:1px solid var(--rule2); }
+.mr a, .mr button { all:unset; box-sizing:border-box; display:block; width:100%; min-height:48px; line-height:48px; font-size:15px; font-weight:600; color:var(--ink); cursor:pointer; }
+.mr a:focus-visible, .mr button:focus-visible { outline:2px solid currentColor; outline-offset:-2px; }
+.mr-w > p { margin:12px 0 0; font-size:12px; color:var(--muted); }
 .mo p { margin:16px 0 0; font-size:13px; color:var(--ink2); }
 .body { padding:18px 20px 8px; display:flex; flex-direction:column; gap:8px; }
 .body h3 { margin:0; font-size:24px; line-height:1.35; }
