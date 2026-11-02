@@ -378,7 +378,12 @@ function filialMirror(st) {
   if (st.age !== FILIAL.at || !st.filial?.n) return;
   const d = Math.round(FILIAL.step * Math.max(-FILIAL.cap, Math.min(FILIAL.cap, st.filial.score)));
   if (!d) return;
-  for (const m of st.kin) if (m.role === 'child' && m.alive && !m.left) m.bond = bondClamp((m.bond ?? BOND_START.child) + d);
+  for (const m of st.kin) {
+    if (m.role !== 'child' || !m.alive || m.left) continue;
+    const b = m.bond ?? BOND_START.child;
+    // ลดไม่ทะลุ floor แบบเดียวกับปีที่ไม่ได้ดูแล — bondClamp ตัดที่ 0 ทำลูกหลุดช่วงที่ด่าน family บังคับ
+    m.bond = d > 0 ? bondClamp(b + d) : b > BOND_FLOOR ? Math.max(BOND_FLOOR, b + d) : b;
+  }
 }
 // เงื่อนไขการ์ดตอนเราแก่ (when.filial): เคยดูแลพ่อแม่ n ครั้ง · วิธีล่าสุดอยู่ใน way
 export function filialOk(st, w) {
