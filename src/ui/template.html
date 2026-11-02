@@ -351,6 +351,17 @@ body:has(.mnav) .foot { display:none; }
 .mem .body h3 { font-family:Srisakdi,serif; font-size:30px; font-weight:700; color:#1F1F1F; }
 .mem .body .dates { margin-top:-6px; }
 .mem .choice { border-color:#1F1F1F; }
+/* ใบมรณะย่อ (ui-redo ใบ 10): ปุ่มไปต่อเป็นปุ่มหลักสีเน้นปุ่มเดียวต่อจากสรุป · ปุ่มแชร์เป็นปุ่มรองเส้นประท้ายการ์ด
+   ฉายาเด่นเป็นริบบิ้นปลายบาก (ค่าเคาะใบ 02) — ตัดด้วย clip-path ข้อความยาวจึงตัดบรรทัดในริบบิ้นได้ */
+.mem .choices { margin-top:0; }
+.mem .choices > .choice { background:var(--red); border-color:var(--red); color:#FFFFFF; justify-content:center; font-weight:600; }
+.mem .choices > .choice:hover, .mem .choices > .choice:focus-visible { background:#8F2A1B; border-color:#8F2A1B; color:#FFFFFF; outline:2px solid #1F1F1F; outline-offset:2px; }
+.d-rb { margin:2px 0 0; padding:0; list-style:none; display:flex; flex-wrap:wrap; justify-content:center; gap:6px 8px; }
+.d-rb li { padding:3px 16px; background:var(--red); color:#FFFFFF; font-size:14px; font-weight:600; line-height:1.5; overflow-wrap:anywhere; clip-path:polygon(0 0, 100% 0, calc(100% - 8px) 50%, 100% 100%, 0 100%, 8px 50%); }
+.d-rb .more-n { padding:3px 0; background:none; color:inherit; font-weight:400; clip-path:none; }
+.d-rest { padding-top:12px; }
+.d-share { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; padding-top:12px; border-top:1px dashed #8A8A8A; }
+.d-share .choice { flex:1 1 auto; min-height:44px; padding:6px 12px; justify-content:center; font-size:14px; background:transparent; border-style:dashed; }
 /* ป้ายตามหาคนหาย (B139): กระดาษประกาศติดเสา หัวแดงตัวหนา — ต่างจากหนังสืองานศพขาวดำ ให้รู้ว่ายังไม่มีใครถือว่าจากไป */
 .a.mem.lost { background:#FFF8E1; border:3px dashed #B3261E; outline:none; }
 .lost .top { padding-top:20px; }

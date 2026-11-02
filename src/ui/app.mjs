@@ -663,6 +663,18 @@ function lifeTitles(card) {
 }
 const TITLES_SHOWN = 3;
 
+// ป้ายริบบิ้นบนใบมรณะย่อ (ui-redo ใบ 10 · ค่าเคาะใบ 02 "ริบบิ้น"): ฉายาเด่นของชีวิตนี้เท่าที่แผงฉายาโชว์ ที่เหลือบอกเป็นจำนวน
+// ไม่มีฉายา = ไม่มีแถว (แผงฉายาด้านล่างบอก "ยังไม่ได้ฉายา" อยู่แล้ว)
+function ribbons(card) {
+  const { titles } = lifeTitles(card);
+  if (!titles.length) return null;
+  const ul = el('ul', 'd-rb');
+  ul.setAttribute('aria-label', 'ฉายาที่ได้ชีวิตนี้');
+  for (const t of titles.slice(0, TITLES_SHOWN)) ul.append(el('li', null, t.name));
+  if (titles.length > TITLES_SHOWN) ul.append(el('li', 'more-n', `อีก ${titles.length - TITLES_SHOWN} ฉายา`));
+  return ul;
+}
+
 // บันทึกการตาย (ใบ 04): แบบชีวิต 1 + ฉายาเด่น 3 + ปุ่มดูทั้งหมด · ฉายาตระกูลแยกหัวข้อ
 // แผงนี้มีแต่ของชีวิตนี้ (B130) — ของสะสมทุกชีวิตอยู่ในชั้นสมุด หัวข้อจึงย้ำ "ชีวิตนี้" ไม่ให้ปนกับสมุด
 function titlesBox(card) {
@@ -1814,6 +1826,8 @@ function render(card) {
   const top = el('div', 'top');
   const body = el('div', 'body');
   const choices = el('div', 'choices');
+  // ชิ้นที่ต่อท้ายปุ่ม (การ์ดตาย) — การ์ดอื่นปุ่มอยู่ท้ายสุดเสมอ
+  const after = [];
   const next = () => play(T.next);
 
   if (card.kind === 'death') {
@@ -1826,35 +1840,45 @@ function render(card) {
     body.append(portrait(card.age), el('h3', null, fullName()), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
     const why = causeOf(card.cause, card.age);
     if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
-    // คนหายไม่รู้อายุตาย จึงเทียบรุ่นไม่ได้ (B142)
-    if (!gone) body.append(sourced(el('p', 'sub', outliveLine(card.age)), outliveSrc(card.age)));
     body.append(el('p', null, `${st.sex} · ${provinceLabel(st)} · ฐานะ${classNow(st)} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
     const net = gone ? (card.summary.money < 0 ? LOST.debt : LOST.money) : card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
     body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
-    if (card.summary.debt) body.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
-    if (card.summary.bankruptcies) body.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
-    if (card.summary.grey) body.append(el('p', 'sub', `เงินเทาที่หายไปกับตัว ${baht(card.summary.grey)}`));
-    // บันทึกเด็กเป็นสถิติการตายของยุค — ไม่ใช่เรื่องของคนหาย
-    if (card.note && !gone) body.append(sourced(el('p', 'sub', card.note), childNoteSrc(card.age)));
-    if (card.funeral) body.append(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
-    if (card.funeral?.who) body.append(el('p', 'sub', card.funeral.who));
-    if (card.lastImage) body.append(el('p', 'sub', `ภาพสุดท้ายที่นึกถึง: ${card.lastImage}`));
-    if (card.will !== undefined) body.append(el('p', 'sub', gone ? LOST.will[card.will ? 1 : 0] : card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
     if (gone) body.append(el('p', 'call', LOST.call));
-    if (card.pets) body.append(el('p', 'sub', card.pets));
+    const rb = ribbons(card);
+    if (rb) body.append(rb);
+    // ใบมรณะย่อ (ui-redo ใบ 10): ด้านบนพอดีจอแรกแล้วตามด้วยปุ่มไปต่อทันที — บรรทัดรองกับกล่องอื่นต่อใต้ปุ่มจนใบ 11 ย้ายเข้าแท็บ
+    // ชิ้นใต้ปุ่มมีคลาส body ⇒ จอแนวนอนเตี้ย panels() ยังวางไว้คอลัมน์กลางต่อจากปุ่ม
+    const rest = el('div', 'body d-rest');
+    after.push(rest);
+    // คนหายไม่รู้อายุตาย จึงเทียบรุ่นไม่ได้ (B142)
+    if (!gone) rest.append(sourced(el('p', 'sub', outliveLine(card.age)), outliveSrc(card.age)));
+    if (card.summary.debt) rest.append(el('p', 'sub', `หนี้ผ่อนค้าง ${baht(card.summary.debt)}`));
+    if (card.summary.bankruptcies) rest.append(el('p', 'sub', `เคยล้มละลาย ${card.summary.bankruptcies} ครั้ง`));
+    if (card.summary.grey) rest.append(el('p', 'sub', `เงินเทาที่หายไปกับตัว ${baht(card.summary.grey)}`));
+    // บันทึกเด็กเป็นสถิติการตายของยุค — ไม่ใช่เรื่องของคนหาย
+    if (card.note && !gone) rest.append(sourced(el('p', 'sub', card.note), childNoteSrc(card.age)));
+    if (card.funeral) rest.append(el('p', 'sub', `งานศพ: ${card.funeral.text} · แขกมาส่งราว ${card.funeral.guests.toLocaleString('en-US')} คน${card.funeral.cost ? ` · ค่าใช้จ่าย ${baht(card.funeral.cost)}` : ''}`));
+    if (card.funeral?.who) rest.append(el('p', 'sub', card.funeral.who));
+    if (card.lastImage) rest.append(el('p', 'sub', `ภาพสุดท้ายที่นึกถึง: ${card.lastImage}`));
+    if (card.will !== undefined) rest.append(el('p', 'sub', gone ? LOST.will[card.will ? 1 : 0] : card.will ? 'มีพินัยกรรม ทายาทแบ่งทรัพย์ตามที่สั่งไว้' : 'ไม่มีพินัยกรรม ทายาทแบ่งทรัพย์กันเองจนผิดใจกัน'));
+    if (card.pets) rest.append(el('p', 'sub', card.pets));
     const from = st.gen === 1 && save.from;
-    if (from) body.append(el('p', 'sub', from.day ? `ชาติประจำวัน ${from.day} · ทุกคนที่เล่นวันนั้นเกิดแบบเดียวกันนี้ ทางที่เลือกต่างกันได้` : 'ชีวิตจากลิงก์เพื่อน · เกิดแบบเดียวกับเพื่อนทุกอย่าง ทางที่เลือกต่างกันได้'));
-    body.append(titlesBox(card));
-    if (card.memo === 'full') body.append(memoFull(card));
-    body.append(eraBox());
+    if (from) rest.append(el('p', 'sub', from.day ? `ชาติประจำวัน ${from.day} · ทุกคนที่เล่นวันนั้นเกิดแบบเดียวกันนี้ ทางที่เลือกต่างกันได้` : 'ชีวิตจากลิงก์เพื่อน · เกิดแบบเดียวกับเพื่อนทุกอย่าง ทางที่เลือกต่างกันได้'));
+    rest.append(titlesBox(card));
+    if (card.memo === 'full') rest.append(memoFull(card));
+    rest.append(eraBox());
     const tree = familyTree();
-    if (tree) body.append(tree);
+    if (tree) rest.append(tree);
     // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
     const chart = card.life && lifeChart(card.life, card.age, card.cause);
-    if (chart) body.append(chart);
-    body.append(helpBox());
-    choices.append(enter(button(BTN.toAfter, null, () => openBook(card))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
-    if (st.gen === 1) choices.append(inviteButton());
+    if (chart) rest.append(chart);
+    rest.append(helpBox());
+    // ปุ่มหลักมีปุ่มเดียว · บันทึกภาพ/แชร์/คัดลอก/ชวนเพื่อนเป็นปุ่มรองท้ายการ์ด (ใบ 12 รวมเป็นเมนูแชร์)
+    choices.append(enter(button(BTN.toAfter, null, () => openBook(card))));
+    const share = el('div', 'd-share');
+    share.append(...shareButtons(card), copyButton(() => summaryText(card.age)));
+    if (st.gen === 1) share.append(inviteButton());
+    rest.append(share);
   } else {
     // ฐานะ/งานอยู่แผงตัวฉัน (ui-redo ใบ 04) · เงินอยู่แผงเงิน (ใบ 07) — ใต้แถบสถานะเหลือแค่เนื้อการ์ด
     box.append(statusBar(card, s));
@@ -1932,7 +1956,7 @@ function render(card) {
       if (card.choices.length > 1) choices.append(foldLater(box, body, choices, card));
     }
   }
-  box.append(body, choices);
+  box.append(body, choices, ...after);
   root.append(panels(box, false), lifeMenu(card, box));
   shelfDot();
   fxCard(box, card);
