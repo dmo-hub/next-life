@@ -1,0 +1,14 @@
+# ใบลางภัยยุค (afterfall-1) แบบถูกต้อง — ไม่มี weight ออกได้ทางเดียวคือปีก่อนภัย
+events:
+  - id: herald_flood_fixture_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    herald_of: great_flood
+    text: "ผู้ใหญ่บ้านว่าปีหน้าน้ำเหนือมาเยอะ"
+    choices:
+      - {text: "ยกของขึ้นที่สูง", sets_flags: ["braced:great_flood"], merit: [{cat: neutral}]}
+      - {text: "รอดูก่อน", merit: [{cat: neutral}]}
+      - {text: "ถามคนแก่ในซอย", merit: [{cat: neutral}]}
+      - {text: "ไม่สนใจ", merit: [{cat: neutral}]}
