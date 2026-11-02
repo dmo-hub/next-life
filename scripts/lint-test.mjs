@@ -14,6 +14,7 @@ import { MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '.
 import { SCENES } from '../src/engine/afterlife.mjs';
 import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenText } from '../src/engine/merit.mjs';
 import { ISEKAI_EVENTS, ISEKAI_MERIT } from '../src/engine/isekai.mjs';
+import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 
 const root = new URL('../', import.meta.url);
 const dir = (d) => readdirSync(new URL(d, root)).filter((n) => n.endsWith('.yaml')).sort();
@@ -239,6 +240,21 @@ try {
   SCENES.forEach((sc, i) => !open[i] && fails.push(`content/: ไม่มีฉาก ${sc} ที่ออกได้ทุกคน`));
 } catch (err) {
   fails.push(err.message);
+}
+
+// การ์ดทวีป (06c-2) มีด่านแยก (รูปการ์ดต่างโลก) — กติกาเดียวกับข้างบน: isekai-bad/<กติกา>.yaml ตกด้วยกติกานั้นอย่างเดียว · ทุกกติกามีไฟล์ bad · ของจริงผ่าน
+{
+  const badDir = 'content-fixtures/isekai-bad/';
+  const files = dir(badDir);
+  for (const f of files) {
+    const want = f.replace(/\.yaml$/, '');
+    const got = [...new Set(lintIsekai([load(badDir, f)]).map((p) => p.rule))];
+    if (got.length !== 1 || got[0] !== want) fails.push(`isekai-bad/${f}: ต้องตกด้วย ${want} อย่างเดียว ได้ [${got.join(', ')}]`);
+  }
+  for (const { id } of ISEKAI_RULES) if (!files.includes(`${id}.yaml`)) fails.push(`กติกา ${id} ไม่มีไฟล์ isekai-bad ทดสอบ`);
+  const real = lintIsekai(dir('content/isekai/').map((f) => load('content/isekai/', f)));
+  for (const p of real) fails.push(`content/isekai: ${formatIsekaiProblem(p)}`);
+  rows.push(['content/isekai/', `${real.length ? `ตก ${real.length} ข้อ` : 'ผ่าน'} · กติกา ${ISEKAI_RULES.length} · ไฟล์ bad ${files.length}`]);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

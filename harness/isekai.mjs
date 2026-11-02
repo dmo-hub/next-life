@@ -6,6 +6,7 @@ import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI
 import { CONT_LIFE, CONT_REGIONS, CONT_RACES, CONT_END, CONT_MOVE, contNeighbors } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
+import { contDeckWrong } from './continent.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
@@ -96,6 +97,8 @@ const check = (label, bad, detail = '') => {
 
 const seen = { end: new Set(), role: new Set(), skill: new Set(), event: new Set(), choice: new Set(), shortcut: new Set() };
 let mismatch = 0, resumeBad = 0, stuck = 0, leaks = 0, rangeBad = 0, cardsSeen = 0;
+// โหลดเนื้อหาก่อนอ่านกอง: การ์ดทวีปจาก content/isekai ต่อเข้า ISEKAI_EVENTS ตอนโหลด (06c-2)
+const content = loadContent();
 const EVENT = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
 const ADULT_NAMES = ISEKAI_STAGES.filter((s) => ['adult', 'middle', 'old'].includes(s.id)).map((s) => s.name);
 const SHORTCUT = Object.fromEntries(Object.entries(ISEKAI_KNOW).map(([k, v]) => [v.focus.name, k]));
@@ -114,6 +117,11 @@ let moveBad = 0, moveCards = 0;
 const moveCount = [];
 // ทางกลับบ้าน (B154): ชาติที่เกิดในต่างโลกไม่เห็นเควส/อีเวนต์ทริป
 let tripEvBad = 0;
+// กองทวีป (06c-2): การ์ดแคว้น/ข้อพิพาท/ขั้วมาเฉพาะชาติที่เข้าเงื่อนไข ณ แคว้นที่อยู่ตอนนั้น · ไม่เหลือตัวแทนดิบ · นับเหตุการณ์ต่อชาติทวีป
+let deckBad = 0, deckRaw = 0;
+const deckSeen = { regions: 0, dispute: 0, power: 0 }, contEvents = [];
+const REGION_BY_NAME = Object.fromEntries(Object.entries(CONT_REGIONS).map(([id, r]) => [`${CONT_LIFE.name} · ${r.name}`, id]));
+const DECK_RAW = /\{(land|major|falling|rising|dispute)\}/;
 let warnBad = 0, warnSeen = 0, warnFocus = 0, warnFocusBad = 0;
 const lens = [], clicks = [], humanAges = [];
 const commonerName = roleInfo('commoner').name;
@@ -167,7 +175,11 @@ Object.values(BOTS).forEach((bot, b) => {
         seen.event.add(card.id);
         seen.choice.add(`${card.id}#${card.pick}`);
         if (EVENT[card.id].trip) tripEvBad++;
+        const ev = EVENT[card.id];
+        if (contDeckWrong(a.isk, ev, REGION_BY_NAME[card.status?.world])) deckBad++;
+        for (const k of Object.keys(deckSeen)) if (ev[k] !== undefined) deckSeen[k]++;
       }
+      if ([...strings(card)].some((s) => DECK_RAW.test(s))) deckRaw++;
       for (const name of card.step === 'focus' ? card.choices : card.step === 'tick' ? card.focusChoices : []) if (name === TRIP_QUEST.focus.name) tripEvBad++;
       if (card.step === 'tick' && (card.choices.length || card.focusChoices.length < 2 || !(card.focus >= 0))) tickBad++;
       // ความรู้โลกเดิม (B68h): เรื่องอันตรายเฉพาะวัยผู้ใหญ่ขึ้นไป · โลกจำเฉพาะตอนชื่อเสียงถึง · ทางลัดที่เปิดได้
@@ -214,6 +226,7 @@ Object.values(BOTS).forEach((bot, b) => {
       moveCards += mc.length;
       moveCount.push(moves.length);
       contSeen.race.add(isk.race);
+      contEvents.push(a.cards.filter((c) => c.step === 'event').length);
     } else if (a.cards.some((c) => c.step === 'move') || isk.moves) moveBad++;
     for (const c of a.cards) if ((typeof c.age === 'number' && !Number.isInteger(c.age)) || (c.status && !Number.isInteger(c.status.age))) ageFrac++;
     const pace = isk.race ? CONT_RACES[isk.race].pace : ISEKAI_ROLES[isk.role].pace ?? 1;
@@ -320,6 +333,10 @@ Object.values(BOTS).forEach((bot, b) => {
 });
 check('ทางกลับบ้าน: เควสครบปีที่ทอย · กลับเฉพาะเมื่อเลือก · ไม่กลับเองตามเวลา', questEarly + homeBad + (questGot && eventHome ? 0 : 1), `${tripRuns} ทริป · การ์ดทางกลับ ${questGot} · กลับด้วยอีเวนต์ ${eventHome}`);
 check('ชาติที่เกิดในต่างโลกไม่เห็นเควส/อีเวนต์ทริป', tripEvBad);
+// เหตุการณ์ต่อชาติทวีปเป็นตัวเลขรายงาน (06b ได้ p50 20) ไม่ใช่เกณฑ์ · ต้องเห็นครบทั้ง 3 กอง ไม่งั้นด่านผ่านทั้งที่ไม่ได้ตรวจ
+contEvents.sort((x, y) => x - y);
+const q = (f) => contEvents[Math.floor((contEvents.length - 1) * f)];
+check('กองทวีป: การ์ดแคว้น/ข้อพิพาท/ขั้วมาเฉพาะชาติและแคว้นที่เข้าเงื่อนไข · ไม่เหลือตัวแทนดิบ', deckBad + deckRaw + (deckSeen.regions && deckSeen.dispute && deckSeen.power ? 0 : 1), `เห็น แคว้น ${deckSeen.regions} · ข้อพิพาท ${deckSeen.dispute} · ขั้ว ${deckSeen.power} ใบ · ผิดที่ ${deckBad} · ตัวแทนดิบ ${deckRaw} · เหตุการณ์ต่อชาติทวีป p10/p50/p90 ${q(0.1)}/${q(0.5)}/${q(0.9)}`);
 
 // ทางแยกที่ต้องมีบอทถึง: ตอนจบทุกแบบของทุกบทบาท (+ ตายกลางทาง) · ทุกบทบาท · ทุกสกิล · ทุกเหตุการณ์ · ทุกตัวเลือก
 const missing = (want, got) => want.filter((x) => !got.has(x));
@@ -339,7 +356,6 @@ for (const [k, m] of Object.entries(reach)) check(`${k}มีบอทถึง`
 
 // ทางเลือกหลังจบผ่านปรโลกจริง: บอทอยู่ต่างโลกต่อทุกครั้งที่เปิด แล้วกลับโลกเดิมเมื่อทางนั้นล็อก
 // ต้องได้ชาติต่างโลกติดกัน = stay + 1 พอดี · ปรโลกตัดสินทุกชาติ · ผังตระกูลต่อแถวต่างโลกครบ · ขากลับเกิดเป็นคน
-const content = loadContent();
 const PATH_ISEKAI = 2, PATH_REBORN = 1;
 let stayBad = 0, backBad = 0, loreCarryBad = 0, legendCarryBad = 0, legendRows = 0, stayMax = 0;
 // เพดานการ์ดของลูปอยู่ต่อ: ทุกชาติติดกันจบในเพดานของชาติเดียว + การ์ดปรโลกรอบละไม่ถึงร้อย — ชนเพดาน = บอทวนไม่จบ

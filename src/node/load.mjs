@@ -11,6 +11,8 @@ import { DEBTS } from '../engine/finance.mjs';
 import { PLACEHOLDERS, MAX_LEN } from './lint/vocab.mjs';
 import { NEAR_HINT_LEVELS } from '../engine/court.mjs';
 import { checkFocus } from './lint/focus.mjs';
+import { lintIsekai, formatIsekaiProblem } from './lint/isekai.mjs';
+import { useIsekaiCards } from '../engine/isekai.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -418,4 +420,15 @@ function loadFocus() {
   return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, focuses: doc.focuses };
 }
 
-export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus: loadFocus() });
+// การ์ดทวีป (06c-2): รูปการ์ดต่างโลก ไม่ใช่ events ของโลกหลัก จึงอยู่โฟลเดอร์แยก (loadEvents ไม่อ่านโฟลเดอร์ย่อย) ด่านแยก
+// โหลดแล้วต่อเข้ากองของแกนทันที ⇒ harness/site ที่เรียก loadContent ได้กองเดียวกับหน้าเกม (หน้าเกมต่อจาก CONTENT.isekai)
+export function loadIsekaiCards(dir = 'content/isekai/') {
+  const docs = readdirSync(new URL(dir, root)).filter((n) => n.endsWith('.yaml')).sort().map((f) => ({ file: `${dir}${f}`, doc: parse(read(`${dir}${f}`)) }));
+  const problems = lintIsekai(docs);
+  if (problems.length) throw new Error(`การ์ดทวีปไม่ผ่านด่าน ${problems.length} ข้อ\n${problems.map(formatIsekaiProblem).join('\n')}`);
+  const cards = docs.flatMap(({ doc }) => doc.cards);
+  useIsekaiCards(cards);
+  return cards;
+}
+
+export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus: loadFocus(), isekai: loadIsekaiCards() });

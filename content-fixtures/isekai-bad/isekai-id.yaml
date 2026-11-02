@@ -1,0 +1,15 @@
+# ตัวควบคุม: id ชนการ์ดใน isekai.mjs
+cards:
+  - id: h0
+    regions: [helvard]
+    ch: [2]
+    title: ชื่อ
+    text: ข้อความ
+    choices:
+      - t: ก
+        text: ผลก
+      - t: ข
+        stat: luk
+        dc: 10
+        win: { text: ชนะ }
+        lose: { text: แพ้ }

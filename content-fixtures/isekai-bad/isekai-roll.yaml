@@ -1,0 +1,15 @@
+# ตัวควบคุม: ทอยไม่มี lose · tag ไม่ใช่แท็กโฟกัส
+cards:
+  - id: bad_x
+    regions: [helvard]
+    ch: [2]
+    title: ชื่อ
+    text: ข้อความ
+    choices:
+      - t: ก
+        text: ผลก
+      - t: ข
+        stat: luk
+        dc: 10
+        tag: dance
+        win: { text: ชนะ }
