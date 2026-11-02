@@ -206,9 +206,9 @@ const verCtl = verHeld([['ui/app.mjs', `${appSrc}\nconst APP_VERSION = '${ver.ve
 check('เลขเวอร์ชันอยู่ที่ src/version.json ที่เดียว และเกมใช้เลขนั้น', held.length || !playVer(play, ver) || !verCtl, ` ${ver.version} · ${ver.build} · ซอร์ส ${srcTexts.length} ไฟล์${held.length ? ` · ถือเลขเอง: ${held.join(' ')}` : ''}${playVer(play, ver) ? '' : ' · play.html ไม่ได้ build จากเลขนี้'} · ตัวควบคุม${verCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 9b) เกมเปิดออฟไลน์ได้: ฟอนต์ฝังครบทุกแบบที่หน้าใช้ ไม่ดึงจากเว็บอื่น · ตัวควบคุม: หน้าที่ยังมี <link> Google Fonts ต้องถูกจับ
-const PLAY_FACES = ['Pridi 400', 'Pridi 600', 'Sarabun 400', 'Sarabun 600', 'Srisakdi 700'];
+const PLAY_FACES = ['Noto Sans Thai 400', 'Noto Sans Thai 600', 'Sarabun 400', 'Sarabun 600', 'Srisakdi 700'];
 const fontGap = (html) => [
-  ...PLAY_FACES.filter((f) => { const [fam, w] = f.split(' '); return !new RegExp(`@font-face \\{ font-family:${fam}; font-weight:${w};[^}]*src:url\\(data:font/woff2;base64,[A-Za-z0-9+/]{1000}`).test(html); }),
+  ...PLAY_FACES.filter((f) => { const [, fam, w] = /^(.+) (\d+)$/.exec(f); return !new RegExp(`@font-face \\{ font-family:"${fam}"; font-weight:${w};[^}]*src:url\\(data:font/woff2;base64,[A-Za-z0-9+/]{1000}`).test(html); }),
   ...(/fonts\.(googleapis|gstatic)\.com/.test(html) ? ['ดึง Google Fonts'] : []),
 ];
 const fontMiss = fontGap(play);

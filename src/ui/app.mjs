@@ -1,7 +1,7 @@
 import { newLife, nextCard, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfPicArt, shelfLineageArt } from './shelfart.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, MONEY_ICON } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, MONEY_ICON, HEART_ICON } from './labels.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
@@ -31,32 +31,76 @@ const baht = (v) => `${Math.round(v).toLocaleString('en-US')} บาท`;
 
 // ชีวิต (สุขภาพ) ถึง 0 = ตาย ผู้เล่นต้องเห็นก่อนถึงจุดนั้น · ค่าอื่นต่ำไม่ทำให้ตายจึงไม่เตือน
 const HEALTH_WARN = 20;
-// แถบค่าสถานะ: ชื่อเต็มบรรทัดบน แถบ + ตัวเลข 0–100 บรรทัดล่าง — ชื่อยาวขึ้นสองบรรทัดได้บนจอแคบโดยไม่ถูกตัด
-// (ทับคำตัดสินใบ 06 "แถบไม่มีตัวเลข")
-function stats(s) {
-  const box = el('div', 'stats');
+
+// ลูกศรปีนี้บนแถบค่า: เทียบกับค่าตอนการ์ดใบแรกของปี · ใบแรกของปีใหม่ยังเทียบกับต้นปีก่อน ผลสิ้นปีจึงไม่หายก่อนผู้เล่นเห็น
+// อยู่ในหน่วยความจำของหน้า ไม่ลงเซฟ ⇒ ผลเกมไม่ขยับ · ชีวิตใหม่หรือโหลดเซฟ การ์ดแรกไม่มีลูกศร
+let yearMark = null;
+// ค่าที่เหตุการณ์ซ่อนไว้ (hidden ของเหตุการณ์/ตัวเลือก = ป้ายผล ?) ห้ามเผยผ่านลูกศรในปีที่เลือกทางนั้น — key = อายุ
+const veiled = new Map();
+function yearDelta(age, s) {
+  if (yearMark?.st !== st) {
+    yearMark = { st, age, base: s };
+    veiled.clear();
+    return null;
+  }
+  const from = yearMark;
+  if (age !== from.age) yearMark = { st, age, base: s };
+  const hide = new Set([...(veiled.get(from.age) ?? []), ...(veiled.get(age) ?? [])]);
+  return Object.fromEntries(SHOWN_STATS.filter((k) => !hide.has(k)).map((k) => [k, Math.round(s[k]) - Math.round(from.base[k])]));
+}
+// อ่านเหตุการณ์ดิบจาก st.pending แบบเดียวกับป้าย "ฟรี" · ไม่มีเหตุการณ์ดิบแต่ป้ายผลขึ้น ? = ซ่อนทั้งแถบ ดีกว่าเผยค่าที่ซ่อน
+function veil(card, i) {
+  const ev = card.kind === 'event' && card.id && st.pending?.id === card.id ? st.pending : null;
+  const keys = ev ? [...(ev.hidden ?? []), ...(ev.choices?.[i]?.hidden ?? [])] : card.fx?.[i]?.split(' · ').includes('?') ? SHOWN_STATS : [];
+  if (keys.length) veiled.set(card.age, [...(veiled.get(card.age) ?? []), ...keys]);
+}
+
+// แถบสถานะสองแถว (ui-redo ใบ 03): แถวบน อวตาร · ชื่อ+ที่ · อายุ · แถวล่าง ค่า 4 ตัว ชื่อ ตัวเลข ลูกศรปีนี้ แล้วแถบเส้น
+// ใกล้ตาย = หัวใจข้างอายุ + ขอบจอแดง (CSS จับ .sb.dying) · โปรแกรมอ่านจออ่าน "ใกล้ตาย" จากหัวใจ ไม่พึ่งสี
+function statusBar(card, s) {
+  const bar = el('header', 'sb');
+  const r1 = el('div', 'sb-r1');
+  const who = el('span', 'sb-who');
+  who.append(el('b', null, `${genLabel()}${st.name}`), el('small', null, `${provinceLabel(st)} · ช่วง${card.stage}`));
+  const age = el('span', 'sb-age');
+  age.append(el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : String(card.age)));
+  if (!card.funeral) age.append(el('small', null, ' ปี'));
+  // การ์ดผลเป็นผลของใบก่อนอยู่แล้ว ป้ายซ้ำไม่บอกอะไรเพิ่ม · งานศพเกิดหลังตายจึงไม่ใช่ "ปีเดียวกัน" ของชีวิต
+  if (card.kind !== 'result' && !card.funeral && card.age === prevAge) age.append(el('span', 'same', 'ปีเดียวกัน'));
+  const hp = Math.round(s.health);
+  if (!st.dead && hp <= HEALTH_WARN) {
+    bar.classList.add('dying');
+    const heart = el('span', 'sb-heart');
+    heart.insertAdjacentHTML('beforeend', HEART_ICON);
+    heart.setAttribute('role', 'img');
+    heart.setAttribute('aria-label', 'ใกล้ตาย');
+    age.append(heart);
+  }
+  r1.append(avatar(card.age), who, age);
+  const delta = st.dead ? null : yearDelta(card.age, s);
+  const ul = el('ul', 'sb-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
-    const low = k === 'health' && v <= HEALTH_WARN;
-    const col = el('div', low ? 'low' : null);
-    col.append(el('span', null, STAT_LABELS[k]));
-    const row = el('div', 'val');
-    const track = el('div', 'bar');
+    const li = el('li', k === 'health' && v <= HEALTH_WARN ? 'low' : null);
+    const head = el('span', 'mh');
+    head.append(el('span', 'mk', STAT_LABELS[k]), el('b', 'num', String(v)));
+    const d = delta?.[k];
+    if (d) {
+      const em = el('em', d < 0 ? 'dn' : null);
+      const sign = el('span', null, d > 0 ? '▲' : '▼');
+      sign.setAttribute('aria-hidden', 'true');
+      em.append(sign, el('span', 'sr', d > 0 ? 'ปีนี้เพิ่ม ' : 'ปีนี้ลด '), String(Math.abs(d)));
+      head.append(em);
+    }
+    const track = el('span', 'br');
     const fill = el('i');
     fill.style.width = `${v}%`;
     track.append(fill);
-    row.append(track, el('b', 'num', String(v)));
-    // ป้ายสั้นบนจอแคบ ป้ายเต็มบนจอกว้าง สลับด้วย CSS · โปรแกรมอ่านจออ่านป้ายเต็มเสมอ
-    if (low) {
-      const w = el('span', 'warn');
-      w.append(el('span', 'warn-s', '!'), el('span', 'warn-l', 'ใกล้ตาย'));
-      w.setAttribute('aria-label', 'ใกล้ตาย');
-      row.append(w);
-    }
-    col.append(row);
-    box.append(col);
+    li.append(head, track);
+    ul.append(li);
   }
-  return box;
+  bar.append(r1, ul);
+  return bar;
 }
 
 // ปุ่มโฟกัสชีวิต (B163): แถบเต็มใต้ค่าสถานะ — การ์ดกว้างไม่เกิน 460 ทุกจอ ข้างค่าสถานะไม่มีที่พอ
@@ -1262,7 +1306,7 @@ function loanButtons(card, i) {
   return (card.loans?.[i] ?? []).map((o) => {
     // ระยะเป็นก้อนแยก — ป้ายผลไม่ตัดกลางก้อน ก้อนยาวรวดเดียวล้นปุ่มจอมือถือ
     const pay = o.years ? `ผ่อนปีละ ${baht(o.yearly)} · นาน ${o.years} ปี` : `จ่ายดอกปีละ ${baht(o.yearly)} · ต้นค้าง`;
-    const b = button(`กู้${o.name}มาจ่าย: `, `ดอก ${pct(o.rate)} · ${pay}`, () => play(loanPick(i, o.kind)));
+    const b = button(`กู้${o.name}มาจ่าย: `, `ดอก ${pct(o.rate)} · ${pay}`, () => (veil(card, i), play(loanPick(i, o.kind))));
     b.firstChild.append(el('span', 'of', card.choices[i]));
     b.classList.add('loan');
     return b;
@@ -1328,6 +1372,16 @@ const enter = (b) => {
   b.dataset.enter = '';
   return b;
 };
+// ปุ่มลัดตัวเลข: เลขบนปุ่มคือคีย์ที่กด · นับเฉพาะตัวเลือกที่เห็น (ประตูที่ยังไม่เปิดไม่กินเลข) · ปุ่มกู้ไม่มีเลข เป็นทางของปุ่มบน
+// คีย์มีแค่ 1–9 — การ์ดที่ตัวเลือกเกิน 9 ปุ่มที่เหลือไม่ขึ้นเลข ไม่งั้นเลข 10 บอกคีย์ที่กดไม่ได้
+const numbered = (b, n) => {
+  if (n > 9) return b;
+  b.dataset.key = String(n);
+  const k = el('kbd', null, String(n));
+  k.setAttribute('aria-hidden', 'true');
+  b.prepend(k);
+  return b;
+};
 document.addEventListener('keydown', (e) => {
   // กดค้าง = repeat — ไม่นับ ไม่งั้นเลือกรัวข้ามการ์ด
   if (e.repeat || e.altKey || e.ctrlKey || e.metaKey || e.isComposing) return;
@@ -1343,6 +1397,8 @@ document.addEventListener('keydown', (e) => {
     // โฟกัสอยู่ที่ปุ่ม/หัวข้อพับ ให้ Enter ทำงานของตัวนั้น (แชร์ภาพ · สมุดฉายา · ผังตระกูล)
     if (t.closest?.('button, summary, a')) return;
     b = root.querySelector('.choices [data-enter]');
+  } else if (/^[1-9]$/.test(e.key)) {
+    b = root.querySelector(`.choices [data-key="${e.key}"]`);
   }
   // การ์ดที่พับไว้ (B117) ปุ่มยังอยู่ใน DOM แค่ซ่อน — ปุ่มลัดต้องไม่กดปุ่มที่มองไม่เห็น
   if (!b || b.disabled || b.closest('[hidden]')) return;
@@ -1707,11 +1763,7 @@ function render(card) {
     choices.append(enter(button(BTN.toAfter, null, () => openBook(card))), ...shareButtons(card), copyButton(() => summaryText(card.age)));
     if (st.gen === 1) choices.append(inviteButton());
   } else {
-    const head = el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : `อายุ ${card.age} · ช่วง${card.stage}`);
-    // การ์ดผลเป็นผลของใบก่อนอยู่แล้ว ป้ายซ้ำไม่บอกอะไรเพิ่ม · งานศพเกิดหลังตายจึงไม่ใช่ "ปีเดียวกัน" ของชีวิต
-    if (card.kind !== 'result' && !card.funeral && card.age === prevAge) head.append(el('span', 'same', 'ปีเดียวกัน'));
-    top.append(avatar(card.age), head, el('small', null, `${genLabel()}${st.name} · ${provinceLabel(st)}`));
-    box.append(top, stats(s));
+    box.append(statusBar(card, s));
     if (!st.dead) box.append(focusBar(card));
     box.append(statHelp());
     // ไม่มีรายได้ก็ต้องเห็นเงินติดตัวเสมอแม้ 0 · มีงานทำแล้วซ่อนเงินติดตัวเฉพาะตอนเป็น 0 พอดี ติดลบ (หนี้) ยังต้องเห็น
@@ -1798,13 +1850,14 @@ function render(card) {
       }
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
       const free = freeChoices(card);
+      let n = 0;
       card.choices.forEach((c, i) => {
         // ตัวเลือกประตูเข้าสายที่ยังไม่เปิด (โฟกัสใบ 04) ไม่บอกว่ามีอยู่ — ต่างจากตัวที่ล็อกด้วยเงิน/ค่าสถานะ
         if (card.hidden?.[i]) return;
         const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
         const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);
-        const b = button(c, fx, () => play(lifePick(i)), card.hints?.[i]);
+        const b = numbered(button(c, fx, () => (veil(card, i), play(lifePick(i))), card.hints?.[i]), ++n);
         if (why) b.disabled = true;
         choices.append(b, ...loanButtons(card, i));
       });
@@ -1940,7 +1993,7 @@ function entryOffer(card, body, choices) {
   // ข้อความในกรอบเป็น div ไม่ใช่ h3/p — กฎสีของแนวการ์ดไทยจับ .body h3/.body p แล้วจะทับสีต่างโลก
   gate.append(el('span', 'ix-k', 'เสียงเรียกจากต่างโลก'), el('div', 'ix-t', card.text));
   body.append(gate);
-  const offer = () => choices.replaceChildren(...card.choices.map((c, i) => button(c, card.fx?.[i], () => (i === ENTRY.accept ? ask() : play(lifePick(i))))));
+  const offer = () => choices.replaceChildren(...card.choices.map((c, i) => numbered(button(c, card.fx?.[i], () => (i === ENTRY.accept ? ask() : play(lifePick(i)))), i + 1)));
   const ask = () => {
     choices.replaceChildren(
       el('p', 'ix-ask', 'แน่ใจนะ ก้าวไปแล้วย้อนกลับมาเลือกใหม่ไม่ได้'),
