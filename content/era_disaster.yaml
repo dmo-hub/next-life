@@ -463,6 +463,12 @@ events:
         text: "อาสาไปช่วยศูนย์ฉีดวัคซีน"
         effects: {relations: 2, knowledge: 1}
         merit: [{cat: help_others, level: 2}]
+      - id: use_savings
+        text: "ใช้เงินสำรองประคองช่วงปิดเมือง"
+        requires: {flags: {has: [kept_savings]}, reason: "ไม่มีเงินสำรองเก็บไว้"}
+        clears_flags: [kept_savings]
+        effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
 
   # ---------- เรื่องต่อ (ออกทาง next เท่านั้น) ----------
   - id: era_dis_tsunami_land_offer_01

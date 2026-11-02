@@ -21,7 +21,7 @@ events:
         text: "นอนพักก่อน เดี๋ยวก็หาย"
         outcomes:
           - {weight: 1, ok: true, text: "ตื่นมาหายเป็นปลิดทิ้ง หมอบอกว่าเป็นแค่เส้นเลือดตีบชั่วคราว รอบหน้าไม่รอดแน่", effects: {health: 1, knowledge: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ตื่นมาอีกทีพูดไม่ได้ทั้งประโยค ต้องมีคนป้อนข้าว", effects: {health: -2, happiness: -2, chronic: {health: -1}}, merit: [{cat: neutral}], next: oldh_stroke_care_01}
+          - {weight: 2, multipliers: {flags: {health_checked: 0.5}}, text: "ตื่นมาอีกทีพูดไม่ได้ทั้งประโยค ต้องมีคนป้อนข้าว", effects: {health: -2, happiness: -2, chronic: {health: -1}}, merit: [{cat: neutral}], next: oldh_stroke_care_01}
         merit: [{cat: neutral}]
       - id: aspirin_wait
         text: "กินแอสไพรินแล้วนั่งรอหลานกลับ"
@@ -137,6 +137,13 @@ events:
         text: "ไม่รักษา เอาเงินไปเที่ยวทั่วไทย"
         effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -1}}
         merit: [{cat: neutral}]
+      - id: claim_chemo
+        text: "เคลมประกัน สู้เต็มคอร์ส"
+        requires: {flags: {has: [has_insurance]}, reason: "ไม่มีประกันสุขภาพ"}
+        outcomes:
+          - {weight: 2, ok: true, text: "ผมร่วงหมดหัว ประกันจ่ายไปเกินครึ่ง ผลสแกนรอบสุดท้ายไม่เจอก้อนแล้ว", multipliers: {stats: {health: 2}}, effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร่างกายรับยาไม่ไหว ก้อนหดแต่คนก็หดตาม", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
 
   - id: oldh_kidney_01
     type: A
@@ -167,6 +174,11 @@ events:
       - id: refuse
         text: "ไม่ฟอก ไม่ผ่า ขอกินของอร่อย"
         effects: {happiness: 2, health: -3, chronic: {health: -1}}
+        merit: [{cat: neutral}]
+      - id: claim_hemo
+        text: "เคลมประกันฟอกเลือด"
+        requires: {flags: {has: [has_insurance]}, reason: "ไม่มีประกันสุขภาพ"}
+        effects: {health: 1, happiness: -2, money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
 
   - id: oldh_cataract_01

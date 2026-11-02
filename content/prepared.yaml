@@ -1,0 +1,29 @@
+# เตรียมไว้ก่อน (gameslash-5) — ไปตรวจสุขภาพประจำปีตั้ง health_checked · การ์ดโรคที่ปล่อยอาการไว้อ่านธงนี้ ทางร้ายเบาลงครึ่งหนึ่ง
+# ตรวจมีราคา (ลางาน + จ่ายเพิ่ม) ไม่งั้นทุกคนเลือกทางนี้
+events:
+  - id: work_checkup_offer_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager, factory, service]}
+    title: "คูปองตรวจสุขภาพ"
+    text: "บริษัทแจกคูปองตรวจสุขภาพประจำปี ต้องลางานครึ่งวันไปเจาะเลือดตั้งแต่เช้า ถ้าอยากตรวจหัวใจกับน้ำตาลละเอียดต้องจ่ายเพิ่มเอง คนในแผนกครึ่งหนึ่งไม่ไป"
+    choices:
+      - id: go_check
+        text: "ไปตรวจละเอียด จ่ายเพิ่มเอง"
+        effects: {happiness: -1, money: {unit: income_x, amount: -0.1}}
+        sets_flags: [health_checked]
+        merit: [{cat: neutral}]
+      - id: skip_work
+        text: "ไม่ไป งานล้นมือ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: give_coupon
+        text: "ยกคูปองให้เพื่อนร่วมงาน"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: next_year
+        text: "เก็บไว้ ค่อยไปปีหน้า"
+        merit: [{cat: neutral}]

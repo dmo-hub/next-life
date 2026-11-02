@@ -141,7 +141,6 @@ events:
       - id: say_no
         text: "บอกว่าบ้านเราไม่พร้อม"
         effects: {relations: -1}
-        family: [{bond: child, d: -3}]
         merit: [{cat: neutral}]
       - id: fish_first
         text: "ให้เลี้ยงปลาก่อน ดูความรับผิดชอบ"

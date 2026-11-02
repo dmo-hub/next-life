@@ -90,6 +90,11 @@ events:
           - {weight: 2, ok: true, multipliers: {occupation: {farmer: 2, labor: 1.5}}, text: "ข้าวปีนั้นราคาดีเกินคาด พ่อแม่ยิ้มบอกว่านาผืนนี้รอคุณมานานแล้ว", effects: {happiness: 1, money: {unit: income_x, amount: 0.4}}, next: era_econ_oil2_farm_01, merit: [{cat: neutral}]}
           - {weight: 1, text: "ฝนทิ้งช่วงทั้งปี ต้นข้าวเหลืองตายคานา ต้องกลับเข้าเมืองไปหางานใหม่", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: care_parents, level: 1}]
+      - text: "ใช้เงินสำรองรอโรงงานเปิดกะ"
+        requires: {flags: {has: [kept_savings]}, reason: "ไม่มีเงินสำรองเก็บไว้"}
+        clears_flags: [kept_savings]
+        effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
 
   # ── ต้มยำกุ้ง ──
   - id: era_econ_tyk_kid_01
@@ -146,6 +151,11 @@ events:
       - text: "เปิดครัวแจกข้าวคนตกงานในซอย"
         effects: {relations: 3, health: 1, money: {unit: income_x, amount: -0.5}}
         merit: [{cat: dana, level: 2}]
+      - text: "ใช้เงินสำรองประคองจนตั้งตัวได้"
+        requires: {flags: {has: [kept_savings]}, reason: "ไม่มีเงินสำรองเก็บไว้"}
+        clears_flags: [kept_savings]
+        effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
 
   # ── วิกฤตการเงินโลก ──
   - id: era_econ_gfc_kid_01
