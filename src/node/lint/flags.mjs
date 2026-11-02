@@ -85,6 +85,19 @@ export const rules = [
     },
   },
   {
+    id: 'schedule-chance',
+    desc: 'schedules[].chance (gameslash-2 ผลย้อนมีโอกาส) เป็นตัวเลข 0 < chance ≤ 1 · ไม่ใส่หรือ 1 = ยิงเสมอ',
+    all(events, ctx, r) {
+      for (const x of events) {
+        for (const { node, path } of effectSites(x.e)) {
+          list(node.schedules).forEach((s, i) => {
+            if (isObj(s) && s.chance !== undefined && !(typeof s.chance === 'number' && s.chance > 0 && s.chance <= 1)) r(x, `${path}.schedules[${i}]`, `chance ต้องเป็นตัวเลข 0 < chance ≤ 1 (ได้ ${JSON.stringify(s.chance)})`);
+          });
+        }
+      }
+    },
+  },
+  {
     id: 'next-target',
     desc: 'ผลสุ่มที่มี next ต้องมี text (การ์ดผลมาก่อน) และชี้เหตุการณ์อื่นที่มีจริง ช่วงวัยเดียวกัน ที่ไม่มี at_age/weight/era (ออกได้ทางเรื่องต่อเท่านั้น)',
     all(events, ctx, r) {

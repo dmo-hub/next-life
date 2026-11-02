@@ -1543,7 +1543,16 @@ function applyChoice(st, ev, c, text) {
   for (const f of c.sets_flags ?? []) raiseFlag(st, f);
   for (const f of c.clears_flags ?? []) delete st.flags[f];
   applyFamily(st, c, ev.category === 'family' && c.effects?.relations > 0 ? c.effects.relations : 0);
-  for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]), from: st.age, pick: text });
+  for (const s of c.schedules ?? []) {
+    const age = st.age + st.rng.int(s.after_years[0], s.after_years[1]);
+    // ผลย้อนมีโอกาส (gameslash-2): ไม่ใส่ chance หรือ chance 1 = ไม่สุ่มเพิ่ม เลขสุ่มของชีวิตเดิมไม่ขยับ
+    // ไม่ผ่าน = ไม่นัด แต่จดใน echoes ช่องเดียวกับคู่เหตุและผล (missed) — หน้าจบ/สมุดเล่าได้ว่ารอดผลย้อนมา
+    const chance = s.chance;
+    if (chance < 1 && st.rng.next() >= chance) {
+      const target = st.content.events.find((e) => e.id === s.event);
+      (st.echoes ??= []).push({ from: st.age, age, pick: text, title: target?.title ? fill(target.title, st) : null, missed: true });
+    } else st.scheduled.push({ event: s.event, age, from: st.age, pick: text });
+  }
 }
 
 // แรงที่เราดูแลพ่อแม่ (B167): บุญดูแลพ่อแม่บวก บาปทำร้ายผู้ใหญ่ลบ ตามระดับของป้าย — ป้ายหมวดอื่นบนตัวเลือกเดียวกันไม่นับ
