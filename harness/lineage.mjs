@@ -1,7 +1,7 @@
 // harness ระหว่างชาติ + หลายรุ่น (B06): บอท 3 บุคลิกเล่นตระกูลละหลายรุ่นผ่านฟังก์ชันชุดเดียวกับหน้าเว็บ
 // ด่าน: เล่นครบทุกรุ่น · ช่วงที่ 7 ยาว 6–10 การ์ด · ปรโลกเฉลยบัญชีทุกครั้งและที่เดียว · ส่งต่อ 30–70% ตรงสูตร
 // · ฐานะชาติหน้าขยับตามกรรมทั้งสองทาง (ใบ 05 แรงทุกทาง) · หนี้ไม่ตกถึงลูก · ทุกฉากในเนื้อหาออกได้จริง · ค่าแถบไม่หลุด
-import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier, COURT_SCENES, makeRng } from '../src/engine/index.mjs';
+import { newLife, playLife, playAfterlife, nextLife, openChoices, TABOO, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier, COURT_SCENES, makeRng } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { stuckCard, unfilledIn } from './gates.mjs';
 
@@ -67,6 +67,10 @@ const stuck = new Map(), unfilled = new Map();
 const parentReaders = (e) => [e.when?.parent_flags, e.multipliers?.parent_flags, ...(e.choices ?? []).flatMap((c) => (c.outcomes ?? []).map((o) => o.multipliers?.parent_flags))].some(Boolean);
 const heirReaders = content.events.filter(parentReaders);
 let heirA = 0, heirB = 0, heirC = 0, heirTwin = 0, heirGot = 0;
+// ข้อห้ามตระกูล (dynasty-3): ทางอื่นได้ว่าง · ทางเป็นลูก ระยะ = ระยะเดิม + tier หรือ tier ถ้าชาติก่อนเกิดต้นเหตุ (เอาค่าน้อย) · ถึง forget หาย
+// คิดค่าคาดเองจากทะเบียน ไม่เรียก helper ของแกน — ตัววัดต้องไม่ใช้สูตรเดียวกับสิ่งที่วัด
+const TABOOS = content.taboo ?? {};
+let tabooBad = 0, tabooGot = 0, tabooFar = 0;
 const lens = [];
 // ทางในตระกูลแยกชั้น (B18): จำนวน · ผลรวมสัดส่วนส่งต่อ · มรดก (เท่ารายได้ปี) · |ส่วนต่างความสัมพันธ์+คอนเน็คชั่นจากบ้าน|
 const tiers = KIN_TIERS.map(() => ({ n: 0, carry: 0, legacy: 0, kin: 0, units: [] }));
@@ -178,8 +182,17 @@ for (const [name, pick] of Object.entries(BOTS)) {
       if (af.isekaiLives.length && h.lineage.length !== (st.lineage?.length ?? 0) + 1 + af.isekaiLives.length) isekaiBad++;
       // ปรโลกตัดสินทุกชาติ: ชาติไทย 1 ครั้ง + ชาติต่างโลกละ 1 ครั้ง (B68 วงเดียว)
       if (verdicts !== 1 + af.isekaiLives.length) isekaiBad++;
+      const prev = st;
       st = nextLife(af);
       const pf = Object.entries(st.parentFlags ?? {});
+      const wantTaboo = {};
+      if (af.path === 'child') {
+        for (const [k, d] of Object.entries(prev.taboos ?? {})) if (!prev.tabooBroken?.[k] && d + h.tier < TABOO.forget) wantTaboo[k] = d + h.tier;
+        for (const [k, t] of Object.entries(TABOOS)) if (h.tier < TABOO.forget && t.cause.flags.some((f) => prev.flags[f] || f in (prev.flagAge ?? {}))) wantTaboo[k] = Math.min(wantTaboo[k] ?? h.tier, h.tier);
+      }
+      if (JSON.stringify(Object.entries(st.taboos ?? {}).sort()) !== JSON.stringify(Object.entries(wantTaboo).sort())) tabooBad++;
+      if (Object.keys(st.taboos ?? {}).length) tabooGot++;
+      if (Object.values(st.taboos ?? {}).some((d) => d > TABOO.know)) tabooFar++;
       if (af.path !== 'child') { if (pf.length) heirA++; }
       else {
         for (const [k, t] of pf) if (!HEIR[k] || t !== h.tier || t > HEIR[k].tier || !prevFlags[k]) heirB++;
@@ -304,6 +317,7 @@ console.log('');
 check('ทางเกิดใหม่/ต่างโลกไม่ได้ธงพ่อแม่', heirA);
 check('ทางเป็นลูกได้ธงในทะเบียน heir: ครบ ชั้นไม่เกินเพดาน และรุ่นก่อนถือจริง', heirB, ` · ได้ธง ${heirGot} ชีวิต`);
 check('ทายาทเกิดมามีธงตัวเองว่าง (ธงพ่อแม่อยู่ช่องแยก)', heirC);
+check('ข้อห้ามตระกูล: ทางอื่นไม่ได้ · ทางเป็นลูกระยะตรงผลรวม tier และต้นเหตุจริง', tabooBad, ` · ได้ข้อห้าม ${tabooGot} ชีวิต · ระยะเกิน ${TABOO.know} ${tabooFar}`);
 // ทายาทตายได้ทุกสาเหตุแบบรุ่นแรก (ไอเดีย thelands-5 — เขา: ธงตายค้าง ทายาทอมตะ) · สาเหตุที่รุ่นแรกน้อยกว่าเกณฑ์หายไปในรุ่นหลังได้จาก rng ล้วน ไม่ตัดสิน
 const counted = [...causeGen[0]].filter(([, v]) => v >= CAUSE_MIN).map(([c]) => c);
 const lostCause = counted.flatMap((c) => causeGen.slice(1).flatMap((m, g) => (m.get(c) ? [] : [`${c} รุ่น ${g + 2}`])));

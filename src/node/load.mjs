@@ -391,6 +391,7 @@ export function loadCareers(fin) {
 
 // หมวด heir: ของทะเบียนธง = ชุดธงที่แกนส่งถึงทายาท — แกนต้องรู้ตอนเล่น ไม่ใช่แค่ lint
 const loadHeir = () => parse(read('content/rules/flags.yaml')).heir ?? {};
+const loadTaboo = () => parse(read('content/rules/flags.yaml')).taboo ?? {};
 
 // คำใบ้ที่ศาลตอนเฉียดตาย (B153) ระดับละหลายข้อความ — ไม่ใช่การ์ด จึงตรวจตอนโหลดแทนด่านเนื้อหา
 // ห้ามเลขคู่คำบุญ/บาป (กติกาเดียวกับด่านการ์ดไม่เผยบัญชีของ harness)
@@ -431,4 +432,4 @@ export function loadIsekaiCards(dir = 'content/isekai/') {
   return cards;
 }
 
-export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus: loadFocus(), isekai: loadIsekaiCards() });
+export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), taboo: loadTaboo(), nearHints: loadNearHints(), focus: loadFocus(), isekai: loadIsekaiCards() });
