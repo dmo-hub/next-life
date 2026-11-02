@@ -141,14 +141,14 @@ function focusBar(card, open = false) {
 }
 
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทย · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
-// ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ · ปุ่มที่แผงยังไม่ลง (ใบ 06–08) เป็นปุ่มจางให้เห็นโครงเมนูครบ
+// ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ · ปุ่มที่แผงยังไม่ลง (ใบ 07–08) เป็นปุ่มจางให้เห็นโครงเมนูครบ
 const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบครัว'], ['money', 'เงิน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
 function lifeMenu(card, box) {
   // การ์ดใหม่วาดทับทั้ง root แผงเดิมหายไปด้วยแล้ว
   sheetClose = null;
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
-  const sheets = { me: () => mePanel(card) };
+  const sheets = { me: () => mePanel(card), family: familyPanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
   const views = { shelf: () => openShelf() };
   for (const [id, label] of LIFE_MENU) {
@@ -1880,7 +1880,6 @@ function render(card) {
       metaLine(money, purse);
       box.append(money);
     }
-    box.append(cardTabs());
     const kicker = card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind];
     // ภาพยุค (B56): การ์ดบ้านเมือง + การ์ดรับมือที่ผูกยุคไว้ (B58) ได้ภาพของยุคนั้น · ยุคที่ไม่มีภาพ = หน้าตาเดิม
     const eraPic = eraArt(card.kind === 'era' ? card.id : card.kind === 'event' ? ERA_OF.get(card.id) : null);
@@ -2138,86 +2137,54 @@ const kinWord = (m) => {
   if (m.role === 'herd') return `ฝูง${m.kind ?? 'สัตว์'}`;
   return 'เพื่อนรุ่น';
 };
-// แผงครอบครัว · ผังตระกูล · กราฟฐานะตระกูลใต้หัวการ์ดเป็นแถบแท็บ เปิดได้ทีละแท็บ กดแท็บเดิมซ้ำ = ปิด
-// แท็บที่เปิดค้างข้ามการ์ด — การ์ดวาดใหม่ทุกใบ ไม่งั้นผู้เล่นต้องกดซ้ำทุกครั้ง (ค่าหน้าจอ ไม่อยู่ในเซฟ)
-let cardTab = null;
-function cardTabs() {
-  const tabs = [familyTab(), treeTab(), standTab()].filter(Boolean);
-  const wrap = el('div', 'tabs');
-  const bar = el('div', 'tab-bar');
-  bar.setAttribute('role', 'group');
-  bar.setAttribute('aria-label', 'ครอบครัวและตระกูล');
-  const panel = el('div', 'tab-panel');
-  panel.id = 'card-tab';
-  const btns = tabs.map((t) => {
-    const b = el('button', null, t.label);
-    b.type = 'button';
-    b.setAttribute('aria-controls', panel.id);
-    b.onclick = () => show((cardTab = cardTab === t.id ? null : t.id));
-    return b;
-  });
-  // แท็บที่จำไว้ไม่มีในการ์ดนี้ (ผังตระกูลตอนเริ่มตระกูลใหม่) = แสดงปิด แต่ไม่ล้างค่าที่จำ
-  const show = (id) => {
-    const t = tabs.find((x) => x.id === id);
-    btns.forEach((b, i) => b.setAttribute('aria-pressed', String(tabs[i] === t)));
-    panel.hidden = !t;
-    // วาดเนื้อตอนเปิดเท่านั้น — กราฟฐานะตระกูลแพง การ์ดส่วนใหญ่ผ่านไปโดยไม่มีใครเปิด
-    panel.replaceChildren(...(t ? [t.body()] : []));
-  };
-  bar.append(...btns);
-  wrap.append(bar, panel);
-  show(cardTab);
+// แผงครอบครัว (ui-redo ใบ 06): คนในบ้าน · ผังตระกูล · กราฟฐานะตระกูล ย้ายจากแถบแท็บใต้หัวการ์ด · สัตว์อยู่ท้ายแผง แถวละตัว
+// วาดตอนกดเปิดเท่านั้น — กราฟฐานะตระกูลแพง การ์ดส่วนใหญ่ผ่านไปโดยไม่มีใครเปิด
+function familyPanel() {
+  const all = familyOf(st);
+  const people = all.filter((m) => !ANIMAL_ROLES.includes(m.role));
+  const animals = all.filter((m) => ANIMAL_ROLES.includes(m.role));
+  // แผงอยู่นอกการ์ด สีกราฟฐานะตระกูลผูกกับชุดสีการ์ด (.a) — ไม่ใส่ กราฟเป็นก้อนดำ
+  const wrap = el('div', 'fam a');
+  // หัวนับเฉพาะคน — สัตว์นับแยกที่หัวของมันเอง ไม่งั้น "ยังอยู่ 3 คน" รวมหมากับฝูงไก่
+  if (people.length) {
+    const alive = people.filter((m) => m.alive).length;
+    wrap.append(el('h3', null, `คนในบ้าน · ยังอยู่ ${alive} ${alive === people.length ? 'คน' : `จาก ${people.length} คน`}`), kinList(people));
+  }
+  // ผังตระกูลมีเมื่อเป็นรุ่นที่ 2 ขึ้นไป · การ์ดตายยังมีแบบพับบนการ์ดด้วย (familyTree)
+  if (st.lineage.length) wrap.append(el('h3', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageView(st.lineage, st.cls));
+  wrap.append(
+    el('h3', null, st.lineage.length ? `กราฟฐานะตระกูล · ${st.lineage.length + 1} รุ่น` : 'กราฟฐานะตระกูล'),
+    standingChart(standingGens(st.lineage, standingNow(!!st.dead)), null, false) ?? el('p', 'sub', 'ยังมีจุดเดียว — กราฟขึ้นเมื่อถึงช่วงวัยถัดไป'),
+  );
+  if (animals.length) {
+    const here = animals.filter((m) => m.alive && !m.left).length;
+    wrap.append(el('h3', null, here ? `สัตว์เลี้ยง · ยังอยู่ ${here}` : 'สัตว์เลี้ยง'), kinList(animals));
+  }
   return wrap;
 }
-
-function familyTab() {
-  const all = familyOf(st);
-  if (!all.length) return null;
+function kinList(members) {
   const rank = (m) => FAMILY_ORDER.indexOf(m.role) * 2 + (m.alive ? 0 : 1);
-  const rows = all
+  const ul = el('ul', 'picks');
+  members
     .map((m, i) => ({ m, i }))
     .sort((a, b) => rank(a.m) - rank(b.m) || (a.m.order ?? 0) - (b.m.order ?? 0) || a.i - b.i)
-    .map(({ m }) => {
+    .forEach(({ m }) => {
       const who = m.name ? `${kinWord(m)} · ${m.name}` : kinWord(m);
+      const row = (text, gone) => ul.append(el('li', gone ? 'gone' : null, text));
       // ฝูงเป็นทรัพย์สิน นับเป็นหน่วยเดียว — ไม่มีอายุรายตัวหรือความผูกพันให้บอก
-      if (m.role === 'herd') return { text: m.alive && !m.left ? `${who} · เลี้ยงไว้` : `${who} · หมดไปแล้ว`, gone: !m.alive || !!m.left };
-      if (!m.alive) return { text: `${who} · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}`, gone: true };
-      if (m.role === 'pet' && m.left) return { text: `${who} · ไม่ได้อยู่กับเราแล้ว`, gone: true };
-      const parts = [who, m.age != null && `อายุ ${m.age}`, m.left ? 'แยกทางแล้ว' : m.bondLevel].filter(Boolean);
-      return { text: parts.join(' · '), gone: false };
+      if (m.role === 'herd') return row(m.alive && !m.left ? `${who} · เลี้ยงไว้` : `${who} · หมดไปแล้ว`, !m.alive || !!m.left);
+      if (!m.alive) return row(`${who} · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}`, true);
+      if (m.role === 'pet' && m.left) return row(`${who} · ไม่ได้อยู่กับเราแล้ว`, true);
+      row([who, m.age != null && `อายุ ${m.age}`, m.left ? 'แยกทางแล้ว' : m.bondLevel].filter(Boolean).join(' · '), false);
     });
-  // หัวแผงนับเฉพาะคน — สัตว์บอกแยก ไม่งั้น "ยังอยู่ 3 คน" รวมหมากับฝูงไก่
-  const people = all.filter((m) => !ANIMAL_ROLES.includes(m.role));
-  const alive = people.filter((m) => m.alive).length;
-  const animals = all.filter((m) => ANIMAL_ROLES.includes(m.role) && m.alive && !m.left).length;
-  const ul = el('ul', 'picks');
-  for (const r of rows) ul.append(el('li', r.gone ? 'gone' : null, r.text));
-  return { id: 'family', label: `ครอบครัว · ยังอยู่ ${alive} ${alive === people.length ? 'คน' : `จาก ${people.length} คน`}${animals ? ` · สัตว์ ${animals}` : ''}`, body: () => ul };
+  return ul;
 }
 
-// ผังตระกูล (ใบ 05 เลิกเมื่อไรก็ดูได้) — มีเมื่อเป็นรุ่นที่ 2 ขึ้นไป · การ์ดตายยังเป็นแบบพับ (familyTree)
-function treeTab() {
-  if (!st.lineage.length) return null;
-  return { id: 'tree', label: `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`, body: () => lineageView(st.lineage, st.cls) };
-}
 function familyTree() {
   if (!st.lineage.length) return null;
   const d = el('details', 'tree');
   d.append(el('summary', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageView(st.lineage, st.cls));
   return d;
-}
-
-// กราฟฐานะตระกูลระหว่างเล่น (B95)
-function standTab() {
-  return {
-    id: 'stand',
-    label: st.lineage.length ? `กราฟฐานะตระกูล · ${st.lineage.length + 1} รุ่น` : 'กราฟฐานะตระกูล',
-    body: () => {
-      const d = el('div', 'stand-d');
-      d.append(standingChart(standingGens(st.lineage, standingNow(false)), null, false) ?? el('p', 'sub', 'ยังมีจุดเดียว — กราฟขึ้นเมื่อถึงช่วงวัยถัดไป'));
-      return d;
-    },
-  };
 }
 
 // คู่ใจที่ตายก่อนเรามารอเดินไปปรโลกด้วย (B44) — เฉพาะตัวที่ดูแลดี (ป้าย "สนิท" ขึ้นไปในแผงครอบครัว)
