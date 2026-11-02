@@ -238,6 +238,8 @@ export function newLife(seed, content, heir = null) {
     gen: heir?.gen ?? 1,
     // ชื่อเสียงตระกูล 0–3 (B95b) ส่งต่อจากรุ่นก่อน · การ์ดเอียงตาม multipliers.family_fame
     fame: heir?.fame ?? 0,
+    // ค่าซ้อนทับของตระกูล (overlapOf) — ใส่ช่องเฉพาะเมื่อ > 0 ⇒ ตระกูลที่ไม่เคยข้ามโลกได้สถานะเท่าเดิมทุกไบต์ · เซฟเก่าไม่มีช่อง = 0
+    ...(heir?.overlap && { overlap: heir.overlap }),
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // อายุที่ธงแต่ละตัวติดครั้งแรก — ระหว่างชาติอ่านอายุตอนมีลูก
@@ -1794,6 +1796,13 @@ export function tripSettle(st, isk) {
   if (isk.home) for (const k of STAT_KEYS) st[k] = clamp(isk.real.stats[k]);
 }
 
+// ค่าซ้อนทับ (โลกซ้อนทับ): ตัวนับเดียวของตระกูล ขึ้นทีละ 1 ทุกครั้งที่กลับเข้าโลกที่เคยออกไป ไม่มีทางลด · ไปกับทายาทเหมือนบัญชีบุญบาป
+// ไม่ดึงเลขสุ่ม — ชีวิตที่ไม่ข้ามโลกเดินเท่าเดิม · เริ่มตระกูลใหม่ (newLife ไม่มี heir) = 0
+export const overlapOf = (st) => st?.overlap ?? 0;
+export function overlapStep(st) {
+  st.overlap = overlapOf(st) + 1;
+}
+
 // ปีที่หายไปเดินด้วย stepYear ปกติ (เงิน คนในบ้าน ด่านเรียน) แต่ไม่ทอยตายและไม่จับกอง — ตัวไม่อยู่ เรื่องของปีนั้นจึงมาเป็นข่าวหลังกลับ
 function tripBack(st) {
   const isk = st.trip;
@@ -1805,6 +1814,8 @@ function tripBack(st) {
     st.dead = true;
     return nextCard(st);
   }
+  // กลับถึงบ้าน = กลับเข้าโลกที่เคยออกไป · ทริปหลงไม่ได้กลับ จึงไม่นับ
+  overlapStep(st);
   const away = isk.age - isk.trip.from;
   const c = tripCarry(isk);
   st.network = clamp(st.network + c.network);

@@ -364,6 +364,35 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 06a ตัวควบคุม: เผ่านอกรายการแคว้น → ด่านเกิดตก', failed({ birth: (rng) => ({ ...C.contBirth(rng), race: 'dragonkin' }) }, 'เกิดได้ทุกแคว้น'));
 }
 
+// ค่าซ้อนทับ (โลกซ้อนทับ ใบ 08): เกิดกลับหลังชาติต่างโลก +1 · ทริปกลับบ้าน +1 · ไม่ข้ามโลก/เริ่มตระกูลใหม่ = 0 และไม่มีช่องในสถานะ
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const fresh = newLife(mixSeed(1, 801), content);
+  const o = {};
+  E.overlapStep(o);
+  E.overlapStep(o);
+  check('ค่าซ้อนทับ: ตระกูลใหม่ = 0 ไม่มีช่อง · ขึ้นทีละ 1', E.overlapOf(fresh) === 0 && !('overlap' in fresh) && E.overlapOf(null) === 0 && o.overlap === 2);
+  const P = (id) => E.PATHS.findIndex((p) => p.id === id);
+  // ทางเกิด: ชาติไทยเลือก want · กลับจากต่างโลกเลือกเกิดใหม่โลกเดิม · การ์ดอื่นกดตัวเปิดตัวแรก
+  const walk = (st, want) => E.playAfterlife(st, (card, rng, af) => (card.kind === 'path' ? (af.from ? P('reborn') : want) : Math.max(0, (card.locked ?? []).findIndex((x) => !x))));
+  const { state } = playLife(mixSeed(1, 802), content, BOTS.สุ่ม);
+  const stay = walk(state, P('reborn'));
+  const away = walk(playLife(mixSeed(1, 802), content, BOTS.สุ่ม).state, P('isekai'));
+  const back = E.nextLife(away);
+  const again = walk(playLife(back.seed, content, BOTS.สุ่ม, null, back).state, P('isekai'));
+  check('ค่าซ้อนทับ: เกิดกลับหลังชาติต่างโลก +1 ส่งต่อทายาท · เกิดในโลกปกติต่อกันไม่มีช่อง', !('overlap' in stay.heir) && !('overlap' in E.nextLife(stay)) && away.heir.overlap === 1 && back.overlap === 1 && again.heir.overlap === 2, `${E.overlapOf(stay.heir)} · ${away.heir.overlap} · ${again.heir.overlap}`);
+  const tripBot = Object.assign((card, rng, h) => (card.entry ? E.ENTRY.accept : BOTS.สุ่ม(card, rng, h)), { isekai: true, trip: (card, rng) => card.choices.map((_, k) => k).filter((k) => !card.locked?.[k])[0] });
+  let home = null, lost = null;
+  for (let i = 0; i < 300 && !(home && lost); i++) {
+    const r = playLife(mixSeed(1, 9000 + i), content, tripBot).state;
+    const h = (r.trips ?? []).filter((t) => t.home).length;
+    if (h && !home) home = [h, E.overlapOf(r)];
+    if (r.tripLost && !lost) lost = [(r.trips ?? []).filter((t) => t.home).length, E.overlapOf(r)];
+  }
+  check('ค่าซ้อนทับ: ทริปกลับบ้าน +1 ต่อทริป · ทริปหลงไม่นับ', !!home && home[0] === home[1] && !!lost && lost[0] === lost[1], `กลับ ${home ?? 'ไม่เจอ'} · หลง ${lost ?? 'ไม่เจอ'}`);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {
