@@ -428,7 +428,15 @@ const f2 = (v) => v.toFixed(2);
   st.flags.hunter = true;
   st.age = 30;
   const empty = E.itemsOf(st);
-  check('ไอเทม: ชีวิตที่ไม่เคยได้ของไม่มี state items · itemsOf ได้ 3 ช่องว่าง เป้ 0/6', !('items' in st) && Object.values(empty.wear).every((x) => x === null) && Object.keys(empty.wear).join() === 'charm,weapon,outfit' && empty.bag.length === 0 && empty.cap === 6);
+  check('ไอเทม: ชีวิตที่ไม่เคยได้ของไม่มี state items · itemsOf ได้ 3 ช่องว่าง เป้ 0/3', !('items' in st) && Object.values(empty.wear).every((x) => x === null) && Object.keys(empty.wear).join() === 'charm,weapon,outfit' && empty.bag.length === 0 && empty.cap === 3);
+  const keepStage = E.OVERLAP_STAGE_MIN[3];
+  E.OVERLAP_STAGE_MIN[3] = 3;
+  const hidden = E.itemsVisible(st);
+  st.overlap = 3;
+  const byStage = E.itemsVisible(st);
+  st.overlap = 0;
+  E.OVERLAP_STAGE_MIN[3] = keepStage;
+  check('ไอเทม: ช่องไอเทมซ่อนเมื่อขั้นซ้อนทับ < 3 และไม่มีของ · ขั้น 3 โชว์ (ยืมเกณฑ์ขั้น 3 ชั่วคราว)', !hidden && byStage, `${hidden} → ${byStage}`);
   const texts = [];
   for (let i = 0; i < 5; i++) {
     st.health = 100;
@@ -438,6 +446,7 @@ const f2 = (v) => v.toFixed(2);
     texts.push(st.queue.find((x) => x.kind === 'result')?.text ?? '');
   }
   const it = st.items;
+  check('ไอเทม: ได้ของชิ้นแรกแล้วช่องไอเทมโชว์ แม้ขั้นซ้อนทับ < 3', E.overlapStageOf(st) < 3 && E.itemsVisible(st));
   check('ไอเทม: บอส 4 รอบ → ตะกรุด/มีด/เสื้อกั๊กลงช่อง เขี้ยวเข้าเป้ (ช่องเครื่องรางเต็ม)', it.wear.charm === 'dg_takrut' && it.wear.weapon === 'dg_knife' && it.wear.outfit === 'dg_vest' && it.bag.join() === 'dg_fang', JSON.stringify(it));
   check('ไอเทม: การ์ดผลต่อท้ายชื่อของ+ช่อง · รอบที่ 5 ครบแล้วไม่ได้เพิ่ม', texts[0].includes('ได้ตะกรุดผลึกม่วง ใส่ช่องเครื่องราง') && texts[3].includes('ได้เขี้ยวบอสเลี่ยมทอง เก็บเข้าเป้') && !texts[4].includes(' · ได้'), texts.map((t) => t.slice(-30)).join(' | '));
   st.items.cap = 2;

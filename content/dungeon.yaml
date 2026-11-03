@@ -198,6 +198,6 @@ events:
         effects: {network: 1, relations: 1}
         merit: [{cat: help_others, level: 1}]
       - id: bag_keep
-        text: "เอาของในเป้ไปขายเอง"
+        text: "เก็บของในเป้ไว้เอง"
         effects: {money: {unit: income_x, amount: 0.8}, loot: [dg_crossbow, dg_armband]}
         merit: [{cat: greed_harm, level: 1}]

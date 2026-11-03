@@ -646,6 +646,8 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
 
 // ไอเทมติดตัว (B78): state สร้างตอนได้ชิ้นแรก — ชีวิตที่ไม่เคยได้ของและเซฟก่อนมีระบบจึงไม่มีช่องนี้ ผู้อ่านใช้ itemsOf ได้ช่องว่าง
 export const itemsOf = (st) => st.items ?? { wear: Object.fromEntries(Object.keys(st.content.items.slots).map((k) => [k, null])), bag: [], cap: st.content.items.cap };
+// จอโชว์ช่องไอเทมเมื่อโลกซ้อนทับถึงขั้น 3 หรือมีของแล้ว — ก่อนนั้นช่องว่างเปล่าบอกใบ้ระบบที่ผู้เล่นยังไปไม่ถึง
+export const itemsVisible = (st) => overlapStageOf(st) >= 3 || (st.items ? Object.values(st.items.wear).some(Boolean) || st.items.bag.length > 0 : false);
 
 // ไม่ดึงเลขสุ่ม: ได้ชิ้นแรกในลิสต์ที่ยังไม่มี ครบแล้วไม่ได้เพิ่ม · ลงช่องชนิดตรงถ้าว่าง ไม่งั้นเข้าเป้ · เป้เต็มขายทันที (ไม่มีปุ่มทิ้ง/ให้)
 // คืนข้อความที่ผู้เล่นเห็น หรือ null เมื่อไม่ได้อะไร
