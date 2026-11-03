@@ -16,6 +16,10 @@ const CUT = { herald: (e) => !!e.herald_of };
 // ตก = ทั้งสองเงื่อนไข: z กันสัญญาณสุ่มของตัวหายาก · ส่วนต่างสัมพัทธ์กันผลจิ๋วของตัวใหญ่ที่ z สูงเพราะ n เยอะ
 const Z_FAIL = 3;
 const REL_FAIL = 0.25;
+// ตัวที่เจ้าของยอมรับว่าลางขยับจริงตามดีไซน์ — ยังพิมพ์ตัวเลขทุกรอบ (~ แทน ✗) แต่ไม่นับตก · ค่าห่างจากตัวเลขที่ยอมรับมากเมื่อไหร่ค่อยยกกลับไปให้เจ้าของดู
+const ACCEPTED = {
+  't:grandparent': 'ลางภัยยุค 18+ (af1) ลดผู้เลี้ยงหลานแทนพ่อแม่ ~1/4 — ยอมรับที่ n2000 seed 1: มีลาง 2.98% ตัดลาง 4.04% z −7.73',
+};
 
 const cutOf = (content, k) => ({ ...content, events: content.events.filter((e) => !CUT[k](e)) });
 
@@ -124,7 +128,8 @@ if (!isMainThread) {
     return out;
   };
   const pct = (p) => `${(p * 100).toFixed(2)}%`;
-  const table = (label, bots, judge) => {
+  const accepted = [];
+  const table =(label, bots, judge) => {
     const A = sum(bots, 'full');
     const C = sum(bots, 'ctl');
     let fail = 0;
@@ -139,10 +144,12 @@ if (!isMainThread) {
       const z = se ? (pa - pc) / se : 0;
       // เทียบกับชุดตัดลาง (ไม่มีลาง = ฐาน) · ฐาน 0 แต่ชุดเต็มมี = เปลี่ยนเต็ม
       const rel = pc ? Math.abs(pa - pc) / pc : pa ? Infinity : 0;
-      const bad = Math.abs(z) >= Z_FAIL && rel >= REL_FAIL;
+      const over = Math.abs(z) >= Z_FAIL && rel >= REL_FAIL;
+      const bad = over && !ACCEPTED[id];
       if (bad && judge) fail++;
+      if (over && !bad && judge) accepted.push(id);
       const relTxt = rel === Infinity ? '∞' : `${(rel * 100).toFixed(0)}%`;
-      console.log(`${bad ? '✗' : ' '} ${name.padEnd(28)} ${String(a).padStart(6)} ${pct(pa).padStart(7)} ${String(c).padStart(6)} ${pct(pc).padStart(7)} ${((pa - pc) * 100).toFixed(2).padStart(7)} ${z.toFixed(2).padStart(6)} ${relTxt.padStart(5)}`);
+      console.log(`${bad ? '✗' : over ? '~' : ' '} ${name.padEnd(28)} ${String(a).padStart(6)} ${pct(pa).padStart(7)} ${String(c).padStart(6)} ${pct(pc).padStart(7)} ${((pa - pc) * 100).toFixed(2).padStart(7)} ${z.toFixed(2).padStart(6)} ${relTxt.padStart(5)}`);
     };
     console.log(`\n${label} · ชีวิตละชุด ${A.lives}`);
     console.log(`  ${''.padEnd(28)} ${'มีลาง'.padStart(14)} ${'ตัดลาง'.padStart(14)} ${'ต่าง'.padStart(7)} ${'z'.padStart(6)} ${'สัมพัทธ์'.padStart(5)}`);
@@ -157,6 +164,7 @@ if (!isMainThread) {
   const fail = table('ทุกบอทรวม (ตัดสิน)', Object.keys(BOTS), true);
   // เพดานแบบชีวิตกระจุกวัดบนบอทสุ่ม — พิมพ์ให้เห็นแยก แต่ไม่ตัดสิน: ชีวิตชุดเดียวน้อยกว่ารวม 6 เท่า ตัวหายากแกว่งเกิน z ง่าย
   table('บอทสุ่มอย่างเดียว (ดูอย่างเดียว ไม่ตัดสิน)', ['สุ่ม'], false);
+  for (const id of accepted) console.log(`~ ${id} เกินขอบแต่ยอมรับแล้ว: ${ACCEPTED[id]}`);
   console.log(fail ? `\nด่านตัวควบคุมลางตก ${fail} ตัว (|z| ≥ ${Z_FAIL} และต่างสัมพัทธ์ ≥ ${REL_FAIL * 100}%)` : `\nด่านตัวควบคุมลางผ่าน: แบบชีวิต ${ALL_PATTERNS.length} + ฉายา ${TITLES.length} + ตระกูล ${FAMILY_TITLES.length} ตัว ไม่มีตัวไหนขยับเกินขอบ`);
   if (fail) process.exitCode = 1;
 }
