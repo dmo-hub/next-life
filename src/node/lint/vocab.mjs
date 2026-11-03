@@ -46,6 +46,8 @@ export const MERIT_CATS = [
   { id: 'against_nature', th: 'ฝืนธรรมชาติ', kind: 'sin' },
   // ยืมโชค/รอดตายจากมาร (B156) — ตามไปทุกชาติจนชดใช้
   { id: 'mara_pact', th: 'สัญญากับมาร', kind: 'sin' },
+  // ทรยศคนที่ไว้ใจในต่างโลก — แยกจาก "บนแล้วไม่แก้" (สัญญาเทพธิดา) · มีระดับ 1–3
+  { id: 'betrayal', th: 'ทรยศ', kind: 'sin' },
   { id: 'neutral', th: 'กลาง', kind: 'neutral' },
 ];
 const CAT_BY_NAME = new Map(MERIT_CATS.flatMap((c) => [[c.id, c], [c.th, c]]));

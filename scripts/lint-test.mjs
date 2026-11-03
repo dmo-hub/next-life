@@ -255,6 +255,12 @@ try {
   const real = lintIsekai(dir('content/isekai/').map((f) => load('content/isekai/', f)));
   for (const p of real) fails.push(`content/isekai: ${formatIsekaiProblem(p)}`);
   rows.push(['content/isekai/', `${real.length ? `ตก ${real.length} ข้อ` : 'ผ่าน'} · กติกา ${ISEKAI_RULES.length} · ไฟล์ bad ${files.length}`]);
+  // หมวดทรยศ (isekai ใบ 09): ไฟล์ตัวควบคุม isekai-merit เปลี่ยนเฉพาะหมวด — betrayal ต้องผ่าน หมวดที่ไม่มียังต้องตก
+  const bm = load(badDir, 'isekai-merit.yaml');
+  const withCat = (cat) => lintIsekai([{ ...bm, doc: { ...bm.doc, cards: bm.doc.cards.map((c) => ({ ...c, choices: c.choices.map((x) => (x.merit ? { ...x, merit: [{ cat, level: 2 }] } : x)) })) } }]).map((p) => p.rule);
+  const bt = { betrayal: withCat('betrayal'), nope: withCat('nope') };
+  if (bt.betrayal.length || bt.nope.join() !== 'isekai-merit') fails.push(`isekai-merit หมวดทรยศ: betrayal [${bt.betrayal}] · nope [${bt.nope}]`);
+  rows.push(['isekai-merit หมวดทรยศ', 'betrayal ผ่าน · หมวดที่ไม่มีตก']);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

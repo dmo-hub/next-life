@@ -364,6 +364,25 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 06a ตัวควบคุม: เผ่านอกรายการแคว้น → ด่านเกิดตก', failed({ birth: (rng) => ({ ...C.contBirth(rng), race: 'dragonkin' }) }, 'เกิดได้ทุกแคว้น'));
 }
 
+// หมวดบาปทรยศ (isekai ใบ 09): ยังไม่มีตัวเลือกจริงติดป้าย (ใบหลายคู่ใช้) ⇒ ฉีดการ์ดโพรบ — ป้ายลงบัญชีหมวดทรยศ · หน้าเฉลยขึ้นชื่อหมวด
+// อยู่ท้ายไฟล์เพราะ useIsekaiCards ต่อการ์ดเข้ากองกลางถาวร ข้ออื่นจะเห็นการ์ดโพรบ
+{
+  const I = await import('../src/engine/isekai.mjs');
+  const M = await import('../src/engine/merit.mjs');
+  const { spoilersHtml } = await import('../src/site/spoilers.mjs');
+  const content = loadContent();
+  const shown = (html) => html.includes('บาป ทรยศ ระดับ 2');
+  const before = shown(spoilersHtml(content));
+  const probe = { id: 'zz_betrayal_probe', regions: ['helvard'], ch: [2], title: 'โพรบ', text: 'โพรบ', choices: [{ t: 'หักหลังคนที่ไว้ใจ', text: 'ผลก', merit: [{ cat: 'betrayal', level: 2 }] }, { t: 'ข', text: 'ผลข' }] };
+  I.useIsekaiCards([probe]);
+  const led = M.newLedger();
+  M.recordMerit(led, I.ISEKAI_MERIT[probe.id]?.[0], probe.id);
+  const want = M.MERIT_WEIGHTS.betrayal * M.MERIT_LEVELS[2];
+  check('ใบ 09 หมวดทรยศ: เป็นบาปหมวดเกม (เบากว่าบาปตามคติระดับ 1) · ไม่นับในบาปตามคติ', M.SIN_CATS.includes('betrayal') && M.GAME_CATS.includes('betrayal') && M.ISEKAI_CATS.includes('betrayal') && M.meritName('betrayal') === 'ทรยศ' && M.meritId('ทรยศ') === 'betrayal' && M.SIN_CATS.filter((c) => !M.FLAG_CATS.includes(c) && !M.ISEKAI_CATS.includes(c)).length === 8);
+  check('ใบ 09 หมวดทรยศ: ตัวเลือกติดป้ายลงบัญชีหมวดนี้ (ฉีดการ์ด)', led.byCat.betrayal === want && led.sin === want, JSON.stringify(led.byCat));
+  check('ใบ 09 หมวดทรยศ: หน้าเฉลยขึ้น "บาป ทรยศ ระดับ 2" หลังฉีดการ์ด ก่อนฉีดไม่มี', !before && shown(spoilersHtml(content)), `${before}`);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {
