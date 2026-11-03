@@ -26,7 +26,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', 'ancestor', ...MONEY_KEYS],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
@@ -305,6 +305,7 @@ export const rules = [
       if (w.sex !== undefined && !nonEmptySubset(w.sex, SEXES)) r('.when.sex', `sex ต้องเป็นรายการจาก ${SEXES.join(' ')}`);
       const top = OVERLAP_STAGE_MIN.length - 1;
       if (w.overlap_stage !== undefined && !isRange(w.overlap_stage, 0, top)) r('.when.overlap_stage', `overlap_stage ต้องเป็น [จาก, ถึง] ขั้น 0–${top} จำนวนเต็ม`);
+      if (w.ancestor !== undefined && w.ancestor !== true) r('.when.ancestor', 'ancestor ต้องเป็น true (มีแถวชาติไทยในผังตระกูล)');
       if (w.stats !== undefined) {
         if (!isObj(w.stats)) r('.when.stats', 'stats ต้องเป็น object');
         else for (const [k, b] of Object.entries(w.stats)) if (!bound(b)) r(`.when.stats.${k}`, 'ต้องเป็น {min, max} 0–100 min ≤ max');

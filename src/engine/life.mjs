@@ -533,6 +533,10 @@ export const FILL = {
   ผม: (st) => (st.sex === 'หญิง' ? 'ฉัน' : 'ผม'),
   ลูกดูแลแบบเรา: (st) => filialMirrorText(st),
   พ่อแม่ที่ป่วย: (st) => illParentWord(st),
+  ชื่อบรรพบุรุษ: (st) => ancestorOf(st)?.name ?? 'คนรุ่นก่อน',
+  บรรพบุรุษ: (st) => ancestorWho(ancestorOf(st)),
+  จังหวัดบรรพบุรุษ: (st) => (ancestorOf(st)?.province ? placeName(ancestorOf(st).province) : 'ที่ไหนสักแห่ง'),
+  อายุตายบรรพบุรุษ: (st) => ancestorOf(st)?.age ?? 'ไม่รู้',
 };
 export function fill(text, st) {
   return text.replace(/\{([^{}]*)\}/g, (m, k) => (FILL[k] ? String(FILL[k](st)) : m));
@@ -1516,6 +1520,7 @@ export function whenOk(st, when) {
   if (when.region && !when.region.includes(st.region)) return false;
   if (when.sex && !when.sex.includes(st.sex)) return false;
   if (when.overlap_stage && !inRange(overlapStageOf(st), when.overlap_stage)) return false;
+  if (when.ancestor && !ancestorOf(st)) return false;
   for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;
   // อาชีพนับเมื่อมีงานของตัวเองแล้ว — อาชีพครอบครัวก่อนทำงานไม่ทำให้การ์ดที่ทำงานออก
   if (when.occupation && !(st.workFrom !== null && when.occupation.includes(st.occupation))) return false;
@@ -1814,6 +1819,10 @@ export const overlapStageOf = (st) => OVERLAP_STAGE_MIN.findLastIndex((min) => o
 // ตระกูลเคยออกจากต่างโลกมาแล้ว = มีชาติต่างโลกลงผัง (กลับมาเกิดแล้ว) หรือทริปที่กลับถึงบ้าน · ทริปหลงตายในต่างโลก ไม่นับว่าออก
 // เข้าต่างโลกอีกเมื่อจริง = กลับเข้าโลกที่เคยออกไป +1 (เกิด · ถูกเรียก · ทริป)
 export const overlapLeftIsekai = (st) => [...(st.lineage ?? []), { trips: st.trips }].some((l) => l.isekai || l.trips?.some((t) => t.home));
+// ผีบรรพบุรุษ (when.ancestor): แถวชาติไทยล่าสุดในผังตระกูล = ชาติก่อนของตัวเราเอง ไม่ใช่วิญญาณอื่น ⇒ การ์ดเล่า/เตือนได้ ทวงบุญบาปไม่ได้
+// เลือกแถวตายตัว ไม่ดึงเลขสุ่ม · ชาติต่างโลกไม่มีจังหวัด/อายุแบบผังไทยจึงข้าม · ข้ามโลกด้วยทริปตั้งแต่ชาติแรก = ยังไม่มีแถว ไม่มีผีให้ขึ้น
+export const ancestorOf = (st) => (st.lineage ?? []).findLast((l) => !l.isekai && l.name);
+const ancestorWho = (l) => (!l ? 'เงาคนคนหนึ่ง' : l.sex === 'หญิง' ? (l.age >= 60 ? 'หญิงชรา' : 'ผู้หญิง') : l.age >= 60 ? 'ชายชรา' : 'ผู้ชาย');
 
 // ตารางนัดการ์ดซ้อนทับต่อชีวิต: ลอกแบบตารางนัดการ์ดชวนต่างโลก — สุ่มจาก stream แยกของ seed ไม่ดึง st.rng
 // ขั้น 0 ไม่มีตารางและไม่เพิ่มช่องใด ⇒ ตระกูลค่า 0 เดินเท่าเดิมทุกหลัก · การ์ดซ้อนทับไม่อยู่ในกองสุ่ม ออกทางนัดนี้ทางเดียว

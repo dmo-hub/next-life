@@ -414,6 +414,24 @@ const f2 = (v) => v.toFixed(2);
   check('ขั้นค่าซ้อนทับ: ขั้น 2–4 ยังไปไม่ถึงจนใบ 16 ใส่เกณฑ์ (ค่าสูงแค่ไหนก็ขั้น 1)', E.OVERLAP_STAGE_MIN.length === 5 && E.OVERLAP_STAGE_MIN[1] === 1 && E.overlapStageOf(st) === 1, String(E.overlapStageOf(st)));
 }
 
+// ผีบรรพบุรุษ (ใบ 18): แถวชาติไทยล่าสุดในผัง ข้ามชาติต่างโลก/แถวไม่มีชื่อ · ไม่มีแถวไทย = เงื่อนไขไม่ผ่าน · ช่องแทนค่าอ่านจากแถวนั้น
+{
+  const E = await import('../src/engine/index.mjs');
+  const st = newLife(mixSeed(1, 1801), loadContent());
+  const want = { ancestor: true };
+  const seen = [];
+  const got = (lineage) => {
+    st.lineage = lineage;
+    return [E.whenOk(st, want), E.ancestorOf(st)?.name ?? '-'];
+  };
+  seen.push(got([]), got([{ isekai: true, name: 'ไรนา', world: 'x' }]), got([{ name: 'ก้อย', sex: 'หญิง', province: 'น่าน', age: 71 }, { name: 'ต้น', sex: 'ชาย', province: 'กรุงเทพมหานคร', age: 40 }, { name: null, sex: 'ชาย', age: 9 }, { isekai: true, name: 'ไรนา', world: 'x' }]));
+  check('ผีบรรพบุรุษ: ผังว่าง/มีแต่ต่างโลก = ไม่ออก · เลือกแถวไทยล่าสุดที่มีชื่อ', seen.map((r) => r.join(':')).join() === 'false:-,false:-,true:ต้น', seen.map((r) => r.join(':')).join());
+  const text = E.fill('{บรรพบุรุษ}|{ชื่อบรรพบุรุษ}|{จังหวัดบรรพบุรุษ}|{อายุตายบรรพบุรุษ}', st);
+  st.lineage = [{ name: 'ก้อย', sex: 'หญิง', province: 'น่าน', age: 71 }];
+  const old = E.fill('{บรรพบุรุษ}|{จังหวัดบรรพบุรุษ}', st);
+  check('ผีบรรพบุรุษ: ช่องแทนค่า = เพศ/ชื่อ/จังหวัด/อายุตายของแถว', text === 'ผู้ชาย|ต้น|กรุงเทพมหานคร|40' && old === 'หญิงชรา|จ.น่าน', `${text} · ${old}`);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {

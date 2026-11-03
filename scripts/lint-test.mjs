@@ -89,6 +89,21 @@ for (const [name, extra, pass] of overlapCases) {
   const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.path.endsWith('.overlap_stage'));
   if (!ok) fails.push(`overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกที่ช่อง overlap_stage'} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
 }
+// ผีบรรพบุรุษ (ใบ 18): การ์ด when.ancestor ทวงบาป/ขอส่วนบุญไม่ได้ — ตกต้องตกที่ป้าย merit / ช่อง ancestor · ตัวควบคุม: ป้ายเดียวกันบนการ์ดไม่มี ancestor ผ่าน
+const ancestorCard = (when, merit) => ({ ...overlapCard({ when }), choices: [1, 2, 3, 4].map((n) => ({ text: `ทางเลือก ${n}`, merit: n === 1 ? merit : [{ cat: 'neutral' }] })) });
+const ancestorCases = [
+  ['neutral ล้วน', { overlap_stage: [2, 2], ancestor: true }, [{ cat: 'neutral' }], true, ''],
+  ['ขอส่วนบุญ (ทาน)', { overlap_stage: [2, 2], ancestor: true }, [{ cat: 'dana', level: 1 }], false, '.merit[0]'],
+  ['ทวงบาป (ศีล)', { overlap_stage: [2, 2], ancestor: true }, [{ cat: 'sila', level: 2 }], false, '.merit[0]'],
+  ['ancestor ไม่ใช่ true', { overlap_stage: [2, 2], ancestor: 'yes' }, [{ cat: 'neutral' }], false, '.ancestor'],
+  ['ตัวควบคุม: ทานบนการ์ดไม่มี ancestor', { overlap_stage: [2, 2] }, [{ cat: 'dana', level: 1 }], true, ''],
+];
+for (const [name, when, merit, pass, at] of ancestorCases) {
+  const ps = lintDocs([{ file: `ancestor-case:${name}`, doc: { events: [ancestorCard(when, merit)] } }], ctx);
+  const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.path.endsWith(at));
+  if (!ok) fails.push(`ผีบรรพบุรุษ "${name}": ต้อง${pass ? 'ผ่าน' : `ตกที่ ${at}`} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
+}
+rows.push(['ผีบรรพบุรุษ ป้ายบุญบาป', `${ancestorCases.length} เคส`]);
 rows.push(['overlap_stage ตก/ผ่าน', `${overlapCases.length} เคส`]);
 // ป้ายบุญบาปต่างโลก (B68c) อยู่นอก yaml ไม่ผ่านด่านเนื้อหา — ตรวจ id/ลำดับตัวเลือก/หมวด/ระดับ ที่นี่แทน
 const iskById = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
