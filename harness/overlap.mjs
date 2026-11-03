@@ -12,7 +12,10 @@
 //   (5) เริ่มตระกูลใหม่ (newLife ไม่มี heir) = 0 แม้ตระกูลก่อนหน้าค่าสูง
 //   (6) การ์ดข่าวลือขั้น 1 (ใบ 09): ฝั่งข้ามโลกออก > 0 · ตัวควบคุมไม่ข้ามโลกออก 0 — นับจากบันทึกการ์ดที่ออกของแต่ละชีวิต
 //   (7) ขั้นที่ชาติต่างโลกเห็น (ใบ 15): ทุกชาติ (ทริป · เกิด · ถูกเรียก) เห็นขั้นเท่าขั้นของตระกูลตอนข้าม · การ์ดต่างโลกขั้น ≥ 1 ออก > 0 และไม่ออกในชาติขั้น 0
-import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, overlapStageOf, PATHS, ENTRY } from '../src/engine/index.mjs';
+//   (8) คนตายที่ตระกูลจำ (ใบ 13): ทายาทค่า > 0 = รายชื่อเดิม + คนตายของชาตินี้ที่ด่านนับเอง (พ่อแม่ที่ไม่ใช่ผู้เล่นรุ่นก่อน · คนใน kin ยกเว้นฝูงสัตว์)
+//       ทายาทค่า 0 ไม่มีช่อง · ฟิลด์ครบชุด ไม่มีปีตาย/ภูมิ · รายชื่อติดถึงชีวิตถัดไป · ฝั่งข้ามโลกมีรายชื่อ > 0 · ตัวควบคุมไม่มีเลย
+//       พิมพ์จำนวนเฉลี่ยต่อรุ่น + ขนาดเซฟรุ่นสุดท้าย (วัดเพดาน localStorage ที่ --gens สูง)
+import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, overlapStageOf, snapshot, PATHS, ENTRY } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
 
@@ -47,6 +50,12 @@ const watchIsekai = (r) => {
     }
   };
 };
+
+const DEAD_KEYS = 'bond,cause,gen,name,role';
+const deadHere = (s) => s.parents.filter((p) => !p.alive && !p.ancestor).length + (s.kin ?? []).filter((m) => !m.alive && m.role !== 'herd').length;
+const deadOf = (s) => s?.deadKin?.length ?? 0;
+const P_CHILD = PATHS.findIndex((p) => p.id === 'child');
+const kidPath = (bot) => (card, rng, h) => (card.kind === 'path' && !card.locked?.[P_CHILD] && P_CHILD < card.choices.length ? P_CHILD : bot(card, rng, h));
 
 const P_ISEKAI = PATHS.findIndex((p) => p.id === 'isekai');
 const P_REBORN = PATHS.findIndex((p) => p.id === 'reborn');
@@ -83,13 +92,14 @@ const fail = (msg) => fails.push(msg);
 let resetChecked = 0;
 for (const [name, base] of Object.entries(BOTS)) {
   for (const [mode, bot] of [['ข้าม', crosser(base)], ['ไม่ข้าม', stayer(base)]]) {
-    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, rumor: 0, bad: 0, drop: 0, families: 0, top: 0, iskLives: 0, iskStage: {}, iskBad: 0, iskCard: 0, iskCardBad: 0 };
+    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, rumor: 0, bad: 0, drop: 0, families: 0, top: 0, iskLives: 0, iskStage: {}, iskBad: 0, iskCard: 0, iskCardBad: 0, deadByGen: Array.from({ length: gens }, () => []), deadBad: 0, deadMax: 0, kidAncestor: 0, saveBytes: [], deadBytes: [] };
     rows.push(r);
     const watch = watchIsekai(r);
     for (let i = 0; i < n; i++) {
       let st = null;
       let prev = 0;
       let left = false;
+      let last = null;
       for (let g = 0; g < gens; g++) {
         const start = overlapOf(st);
         const { state } = playLife(mixSeed(seed, i * 7919 + g), content, bot, (card, s) => watch(card, s.trip, s), st ?? undefined);
@@ -108,7 +118,15 @@ for (const [name, base] of Object.entries(BOTS)) {
         if (v < prev) r.drop++;
         prev = v;
         r.byGen[g].push(v);
-        if (g === gens - 1) break;
+        r.deadByGen[g].push(deadOf(state));
+        if (g === gens - 1) {
+          last = state;
+          if (v > 0) {
+            r.saveBytes.push(snapshot(state, content).length);
+            r.deadBytes.push(JSON.stringify(state.deadKin ?? []).length);
+          }
+          break;
+        }
         const af = playAfterlife(state, bot, (card, a) => watch(card, a.isekai, a.st));
         const back = af.isekaiLives.length ? 1 : 0;
         const reBorn = back && left ? 1 : 0;
@@ -117,8 +135,14 @@ for (const [name, base] of Object.entries(BOTS)) {
         r.reBorn += reBorn;
         if (af.isekaiLives.length > 1) r.chain++;
         if (overlapOf(af.heir) - v !== back + reBorn) r.bad++;
+        const want = overlapOf(af.heir) ? deadOf(state) + deadHere(state) : 0;
+        const list = af.heir.deadKin ?? [];
+        if (list.length !== want || (!want && 'deadKin' in af.heir)) r.deadBad++;
+        if (list.some((d) => Object.keys(d).sort().join() !== DEAD_KEYS)) r.deadBad++;
+        r.deadMax = Math.max(r.deadMax, list.length);
         st = nextLife(af);
         if (overlapOf(st) !== overlapOf(af.heir)) r.bad++;
+        if (deadOf(st) !== list.length) r.deadBad++;
       }
       if (prev > 0) {
         r.families++;
@@ -127,6 +151,17 @@ for (const [name, base] of Object.entries(BOTS)) {
         const fresh = newLife(mixSeed(seed ^ 0x0e1a9, i), content);
         resetChecked++;
         if (overlapOf(fresh) !== 0 || 'overlap' in fresh) fail(`${name}: เริ่มตระกูลใหม่ได้ค่า ${overlapOf(fresh)}`);
+        // ฝั่งข้ามไม่เคยเลือกทางเป็นลูก ⇒ ต่ออีกไม่เกิน 3 รุ่นทางเป็นลูก ให้มีพ่อ/แม่ที่เป็นผู้เล่นรุ่นก่อนตายอยู่ในชาติที่ค่า > 0 (ต้องไม่ถูกจำ)
+        if (mode === 'ข้าม') {
+          let s = last;
+          for (let k = 0; k < 3; k++) {
+            const af = playAfterlife(s, kidPath(base));
+            if (s.parents.some((p) => p.ancestor && !p.alive)) r.kidAncestor++;
+            if ((af.heir.deadKin?.length ?? 0) !== deadOf(s) + deadHere(s)) r.deadBad++;
+            if (af.path !== 'child') break;
+            ({ state: s } = playLife(mixSeed(seed, i * 7919 + gens + k), content, base, undefined, nextLife(af)));
+          }
+        }
       }
     }
     if (r.bad) fail(`${name} ${mode}: บัญชีเหยียบซ้ำไม่ตรง ${r.bad} จุด`);
@@ -136,6 +171,8 @@ for (const [name, base] of Object.entries(BOTS)) {
     if (r.iskBad) fail(`${name} ${mode}: ชาติต่างโลกเห็นขั้นไม่ตรงขั้นตระกูลตอนข้าม ${r.iskBad} ชาติ`);
     if (r.iskCardBad) fail(`${name} ${mode}: การ์ด ${ISK_CARD}* ออกในชาติต่างโลกขั้น 0 ${r.iskCardBad} ครั้ง`);
     if (mode === 'ไม่ข้าม' && r.iskCard) fail(`${name} ไม่ข้าม: การ์ด ${ISK_CARD}* ออก ${r.iskCard} ครั้ง`);
+    if (r.deadBad) fail(`${name} ${mode}: รายชื่อคนตายไม่ตรง ${r.deadBad} จุด`);
+    if (mode === 'ไม่ข้าม' && r.deadMax) fail(`${name} ไม่ข้าม: มีรายชื่อคนตาย ${r.deadMax} คน`);
   }
 }
 
@@ -152,6 +189,8 @@ const iskStage = {};
 for (const r of cross) for (const [k, v] of Object.entries(r.iskStage)) iskStage[k] = (iskStage[k] ?? 0) + v;
 if (!iskStage[1]) fail('ไม่มีชาติต่างโลกที่เห็นขั้น ≥ 1 — ตัววัดขั้นฝั่งต่างโลกไม่ได้วัดอะไร');
 if (!sum('iskCard')) fail(`ฝั่งข้ามโลกไม่มีการ์ด ${ISK_CARD}* ออกเลย`);
+if (!cross.some((r) => r.deadMax)) fail('ฝั่งข้ามโลกไม่มีตระกูลไหนจำคนตายได้ — ตัววัดรายชื่อไม่ได้วัดอะไร');
+if (!sum('kidAncestor')) fail('ไม่มีชาติค่า > 0 ที่พ่อ/แม่ผู้เล่นรุ่นก่อนตาย — ตัววัด "ไม่จำชาติก่อนของตัวเอง" ไม่ได้วัดอะไร');
 
 const mean = (vs) => (vs.length ? vs.reduce((s, v) => s + v, 0) / vs.length : 0);
 const pct = (c, t) => `${t ? ((c / t) * 100).toFixed(1) : '0.0'}%`;
@@ -175,6 +214,18 @@ console.log(`เริ่มตระกูลใหม่ตรวจ ${resetCh
 console.log(`การ์ดข่าวลือ (${RUMOR}*): ข้าม ${sum('rumor')} ครั้ง · ไม่ข้าม ${rows.filter((r) => r.mode === 'ไม่ข้าม').reduce((s, r) => s + r.rumor, 0)} ครั้ง`);
 console.log(`ขั้นที่ชาติต่างโลกเห็น (ฝั่งข้ามโลก ${sum('iskLives')} ชาติ): ${Object.keys(iskStage).sort().map((k) => `ขั้น ${k} = ${iskStage[k]}`).join(' · ')} · ไม่ตรงขั้นตระกูลตอนข้าม ${rows.reduce((s, r) => s + r.iskBad, 0)}`);
 console.log(`การ์ดต่างโลก (${ISK_CARD}*): ข้าม ${sum('iskCard')} ครั้ง · ออกในชาติขั้น 0 ${rows.reduce((s, r) => s + r.iskCardBad, 0)} · ไม่ข้าม ${rows.filter((r) => r.mode === 'ไม่ข้าม').reduce((s, r) => s + r.iskCard, 0)}`);
+const deadGen = Array.from({ length: gens }, (_, g) => {
+  const cs = cross.flatMap((r) => r.deadByGen[g]);
+  const vs = cross.flatMap((r) => r.byGen[g]);
+  const on = cs.filter((_, k) => vs[k] > 0);
+  const off = cs.filter((_, k) => vs[k] === 0);
+  return `รุ่น ${g + 1} ค่า>0 ${mean(on).toFixed(1)} คน (${on.length} ตระกูล) · ค่า 0 ${mean(off).toFixed(1)}`;
+});
+console.log(`คนตายที่ตระกูลจำ (ฝั่งข้ามโลก เฉลี่ยตอนจบชีวิต · ตัวควบคุมสูงสุด ${Math.max(...rows.filter((r) => r.mode === 'ไม่ข้าม').map((r) => r.deadMax))} · ต่อทางเป็นลูกที่พ่อ/แม่รุ่นก่อนตาย ${sum('kidAncestor')} ชาติ ไม่ถูกจำ):${deadGen.join(' | ')}`);
+const saves = cross.flatMap((r) => r.saveBytes);
+const deads = cross.flatMap((r) => r.deadBytes);
+const kb = (b) => `${(b / 1024).toFixed(1)} KB`;
+if (saves.length) console.log(`ขนาดเซฟรุ่น ${gens} (ตระกูลค่า > 0 ${saves.length} ตระกูล): เฉลี่ย ${kb(mean(saves))} · สูงสุด ${kb(Math.max(...saves))} · ส่วนรายชื่อคนตาย เฉลี่ย ${kb(mean(deads))} สูงสุด ${kb(Math.max(...deads))} · รายชื่อยาวสุด ${Math.max(...cross.map((r) => r.deadMax))} คน`);
 if (fails.length) {
   for (const f of fails) console.log(`✗ ${f}`);
   console.log(`ด่านค่าซ้อนทับตก ${fails.length} ข้อ`);
