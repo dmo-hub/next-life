@@ -10,7 +10,7 @@ import { goalsMet, titlesOf } from './titles.mjs';
 import { heirPets } from './family.mjs';
 import { CHRONIC } from './death.mjs';
 import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen } from './life.mjs';
-import { ISEKAI, ISEKAI_SKILLS, carryPick, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
+import { ISEKAI, ISEKAI_SKILLS, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 import { warnPick } from './warn.mjs';
 
@@ -243,6 +243,8 @@ function closeIsekai(af) {
   af.isekaiLives.push(isekaiLineage(isk, (af.st.gen ?? 1) + 1 + af.isekaiLives.length));
   // บัญชีเดียวของดวงวิญญาณ (B26 · B68a-2): ชาติต่างโลกที่จบแล้วเขียนกลับลง af.st.ledger ปรโลกรอบใหม่และบันทึกการกระทำ (noteDeed) จึงอ่านที่เดียวกัน
   af.st.ledger = isk.ledger;
+  // ขั้นที่อัปในชาตินี้ติดไปชาติต่างโลกถัดไป (sendToIsekai อ่าน af.st.skills)
+  if (af.st.skills) af.st.skills = skillsBack(af.st.skills, isk);
   af.from = { name: isk.name, run: isk.run, memory: isekaiMemory(isk), real: isk.real };
   af.isekai = null;
   af.path = null;
@@ -500,10 +502,10 @@ function makeHeir(af, r) {
   };
 }
 
-// รุ่นถัดไป: ชีวิตใหม่จาก heir ที่การ์ดส่งต่อสร้างไว้ · carry = id สกิลที่ผู้เล่นเลือกพกจากคลัง (06s · bookCarryOffers)
-export function nextLife(af, carry = []) {
+// รุ่นถัดไป: ชีวิตใหม่จาก heir ที่การ์ดส่งต่อสร้างไว้ · carry = id สกิลที่ผู้เล่นเลือกพกจากคลัง (06s · bookCarryOffers) · book = คลังของผู้เล่น ให้การ์ดอัปเกรดรู้ขั้นคลัง
+export function nextLife(af, carry = [], book = {}) {
   if (!af.heir) throw new Error('ยังไม่ถึงการ์ดส่งต่อ');
-  return newLife(af.heir.seed, af.st.content, { ...af.heir, skills: carryPick(carry) });
+  return newLife(af.heir.seed, af.st.content, { ...af.heir, skills: carryPick(carry, book) });
 }
 
 // harness/หน้าเว็บเดินช่วงที่ 7 ด้วยฟังก์ชันชุดเดียวกัน · บอทได้ af (มี pending.choices ให้อ่านป้ายบุญบาปแบบเดียวกับการ์ดชีวิต)

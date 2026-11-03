@@ -12,7 +12,7 @@ import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './cou
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
-import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends } from './isekai.mjs';
+import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
 
@@ -1262,6 +1262,11 @@ export function nextCard(st) {
     }
     if (card.kind === 'warn') st.pending = { warn: true, choices: card.choices };
     if (card.kind === 'memory') st.pending = { memory: true, choices: card.choices };
+    // ปุ่มสร้างตอนการ์ดออก ไม่ใช่ตอนเข้าคิว — ขั้นที่เห็นต้องเป็นขั้นปัจจุบัน
+    if (card.kind === 'upgrade') {
+      Object.assign(card, { title: SKILL_UP.title, text: SKILL_UP.text, ...upgradeOffer(st.skills) });
+      st.pending = { upgrade: true, choices: card.choices };
+    }
     return emit(st, card);
   }
   for (;;) {
@@ -1632,6 +1637,16 @@ export function choose(st, idx, loan) {
     st.lastImage = ev.choices[idx];
     return;
   }
+  // ปุ่มสุดท้าย = ผ่าน · ไม่ดึงเลขสุ่ม
+  if (ev?.upgrade) {
+    const s = st.skills[idx];
+    if (!s && idx !== st.skills.length) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    if (s && s.lv >= SKILL.top) throw new Error('ตัวเลือกนี้ล็อกอยู่');
+    st.pending = null;
+    if (s) st.skills = st.skills.map((x) => (x === s ? { ...x, lv: skillUp(x.lv, x.cap) } : x));
+    st.log.push({ id: 'upgrade', age: st.age, choice: idx, text: ev.choices[idx] });
+    return;
+  }
   if (ev?.entry) {
     if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
@@ -1687,8 +1702,9 @@ export function choose(st, idx, loan) {
   // การ์ดที่ตัวเลือกนี้ก่อ (ผล → เรื่องต่อ → หางาน) เข้าหัวคิวตามลำดับ ก่อนการ์ดอื่นของปีที่รออยู่
   // สายมูก่อการ์ดของตัวเองได้ (ผลหวยสายมู) — มาก่อนผลสุ่มของตัวเลือก
   const after = beliefChoice(st, ev, c);
+  let o = null;
   if (c.outcomes?.length) {
-    const o = weighted(st.rng, c.outcomes, outcomeWeights(st, ev, c));
+    o = weighted(st.rng, c.outcomes, outcomeWeights(st, ev, c));
     const helper = !o.ok && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
     applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1);
     applyChoice(st, ev, o, text);
@@ -1725,6 +1741,11 @@ export function choose(st, idx, loan) {
       st.advance = false;
     }
     return;
+  }
+  // ผลที่ให้อัปเกรด (06s) → การ์ดอัปเกรดต่อจากการ์ดผล ก่อนเรื่องต่อ · ไม่ได้พกสกิลมา = ไม่มีการ์ด
+  if (st.skills?.length && (c.upgrade || o?.upgrade)) {
+    const at = after.findIndex((x) => x.kind !== 'result');
+    after.splice(at < 0 ? after.length : at, 0, { kind: 'upgrade', age: st.age, stage: stageOf(st.age) });
   }
   // เตือนต่อท้ายการ์ดผลของตัวเลือกนี้ ก่อนเรื่องต่อ — เรื่องต่อที่ทำชีวิตหมดล้างคิว การ์ดเตือนที่อยู่หลังจะไม่เคยออก
   if (!st.dead && crossedLow(st, st.health, WARN.human)) {
@@ -1835,6 +1856,8 @@ function tripBack(st) {
   st.trip = null;
   (st.trips ??= []).push(tripLineage(isk));
   tripSettle(st, isk);
+  // ตายในทริปก็เขียนกลับ — ชาติต่างโลกหลังปรโลกพกชุดนี้ต่อ
+  if (st.skills) st.skills = skillsBack(st.skills, isk);
   if (!isk.home) {
     st.tripLost = true;
     st.dead = true;

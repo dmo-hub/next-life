@@ -66,13 +66,25 @@ export function bookAdd(book, id, lv = 1) {
   return { book: { ...book, [id]: to }, up: to > was };
 }
 export const bookCarryOffers = (book) => Object.keys(ISEKAI_SKILLS).filter((id) => book?.[id] > 0).map((id) => ({ id, name: ISEKAI_SKILLS[id].name, desc: ISEKAI_SKILLS[id].desc, lv: book[id] }));
-// ชุดที่พกไปชาติใหม่ · ทุกตัวเริ่มขั้น 1 แม้คลังจำขั้นสูงกว่า (isd-1)
-export function carryPick(ids = []) {
+// ชุดที่พกไปชาติใหม่ · ทุกตัวเริ่มขั้น 1 แม้คลังจำขั้นสูงกว่า (isd-1) · cap = ขั้นในคลังที่การ์ดอัปเกรดเร่งไปถึงได้ เก็บเฉพาะ > 1
+export function carryPick(ids = [], book = {}) {
   if (ids.length > SKILL.carry) throw new Error(`พกได้ไม่เกิน ${SKILL.carry} อย่าง`);
   if (new Set(ids).size !== ids.length) throw new Error('พกสกิลซ้ำ');
   for (const id of ids) if (!ISEKAI_SKILLS[id]) throw new Error(`ไม่รู้จักสกิล ${id}`);
-  return ids.map((id) => ({ id, lv: 1 }));
+  return ids.map((id) => ({ id, lv: 1, ...(book?.[id] > 1 && { cap: Math.min(SKILL.top, book[id]) }) }));
 }
+// อัปเกรดหนึ่งครั้ง: ยังต่ำกว่าขั้นในคลัง = ขึ้นทีละ 2 แต่ไม่เกินขั้นคลัง (Q2 ก) · ถึงแล้วขึ้นทีละ 1
+export const skillUp = (lv, cap = 1) => Math.min(SKILL.top, lv < cap ? Math.min(cap, lv + 2) : lv + 1);
+export const SKILL_UP = { title: 'ฝีมือที่คมขึ้น', text: 'เรื่องที่ผ่านมาทำให้ของที่ติดตัวมาคมขึ้นอีกขั้น จะฝึกอย่างไหน', pass: 'ยังไม่ฝึกตอนนี้', top: 'ขั้นสูงสุดแล้ว' };
+// ปุ่มการ์ดอัปเกรด = สกิลที่ถือเรียงตามลำดับที่ได้ + ปุ่มผ่านท้ายสุด · ขั้นสูงสุดแล้ว = ล็อก ⇒ ปุ่มผ่านกดได้เสมอ การ์ดไม่ค้าง
+export const upgradeOffer = (held) => ({
+  choices: [...held.map((s) => `${ISEKAI_SKILLS[s.id].name} · ขั้น ${s.lv}${s.lv < SKILL.top ? ` → ${skillUp(s.lv, s.cap)}` : ''}`), SKILL_UP.pass],
+  desc: [...held.map((s) => ISEKAI_SKILLS[s.id].desc), ''],
+  fx: [...held.map(() => ''), ''],
+  locked: [...held.map((s) => (s.lv >= SKILL.top ? SKILL_UP.top : null)), null],
+});
+// ขั้นที่อัปในชาติต่างโลกกลับลงชุดที่พกของชีวิตไทย — ชาติต่างโลกถัดไป/ช่วงที่เหลือของชีวิตไทยใช้ขั้นนั้นต่อ · ของขวัญประจำชาติไม่ติดกลับ
+export const skillsBack = (skills, isk) => skills.map((s) => ({ ...s, lv: skillLv(isk, s.id) }));
 
 export const ISEKAI_WORLDS = {
   hero: {
@@ -1590,6 +1602,7 @@ export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null
     role: null, world: null, name: '', skills: carry.map((c) => c.id), st: null, inner: null, flags: {},
     // isk.lv เก็บเฉพาะสกิลที่เกินขั้น 1 — ชาติที่ไม่มีการอัปเกรด state เท่าก่อนมีขั้น (lifehash)
     ...(carry.some((c) => c.lv > 1) && { lv: Object.fromEntries(carry.filter((c) => c.lv > 1).map((c) => [c.id, c.lv])) }),
+    ...(carry.some((c) => c.cap > 1) && { cap: Object.fromEntries(carry.filter((c) => c.cap > 1).map((c) => [c.id, c.cap])) }),
     know: null, knowLast: null, loreAll: lore, worldLore: [], lore: [],
     legendAll: legends, worldLegends: [], legend: null, fameDark: 0, potions: [], lifeAdd: 0,
     age: 0, focus: null, focusOffers: [], stageShown: null, due: null, used: [], later: [], finaleDone: false,
@@ -2046,8 +2059,12 @@ export function nextIsekaiCard(isk) {
   }
   if (isk.step === 'result') {
     const r = isk.last;
-    isk.step = 'tick';
+    isk.step = isk.up ? 'upgrade' : 'tick';
     return isekaiCard(isk, { step: 'result', title: r.title, text: r.text, age: isk.age, ok: r.ok, stat: r.stat, deltas: r.deltas, sys: r.sys, choices: [] });
+  }
+  // ค้างที่ step นี้จนเลือก (เซฟกลางการ์ดกลับมาใบเดิม) · ไม่ดึงเลขสุ่ม
+  if (isk.step === 'upgrade') {
+    return isekaiCard(isk, { step: 'upgrade', title: SKILL_UP.title, text: SKILL_UP.text, age: isk.age, ...upgradeOffer(isk.skills.map((id) => ({ id, lv: skillLv(isk, id), cap: isk.cap?.[id] }))) });
   }
   if (isk.step === 'over') throw new Error('ชาติต่างโลกจบแล้ว — ปรโลกรับช่วงต่อ');
   if (isk.step === 'tick' && isk.court) return isekaiCourtCard(isk);
@@ -2255,6 +2272,16 @@ export function chooseIsekai(isk, idx) {
     isk.step = 'tick';
     return;
   }
+  // ปุ่มสุดท้าย = ผ่าน · isk.up ลบทิ้งไม่ตั้ง false ให้ state หลังการ์ดเท่ากับชาติที่ไม่เคยได้การ์ดนี้
+  if (isk.step === 'upgrade') {
+    const id = isk.skills[idx];
+    if (!id && idx !== isk.skills.length) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    if (id && skillLv(isk, id) >= SKILL.top) throw new Error('ตัวเลือกนี้ล็อกอยู่');
+    if (id) (isk.lv ??= {})[id] = skillUp(skillLv(isk, id), isk.cap?.[id]);
+    delete isk.up;
+    isk.step = 'tick';
+    return;
+  }
   if (isk.step !== 'event') throw new Error('การ์ดนี้ไม่มีตัวเลือก');
   const ev = isekaiById[isk.due];
   const c = ev.choices[idx];
@@ -2322,6 +2349,8 @@ export function chooseIsekai(isk, idx) {
     } else isk.dead = true;
   }
   isekaiWarnCheck(isk);
+  // ผลที่ให้อัปเกรด (06s) → การ์ดอัปเกรดต่อจากใบผล · ตายในผลนี้ไม่มีให้ฝึกต่อ
+  if (out.upgrade && !isk.dead && isk.skills.length) isk.up = true;
   // ฉากเด่นบนการ์ดจบ: ผลที่ขยับค่ามากสุด · ทองหารห้าสิบให้ชั่งกับค่าอื่นได้ · สกิลช่วยไว้/ตายนับเพิ่ม
   const weight = Object.entries(deltas).reduce((s, [k, v]) => s + Math.abs(k === 'gold' ? v / 50 : v), 0) + (aid ? 10 : 0) + (isk.dead ? 50 : 0);
   (isk.marks ??= []).push({ text: `${title} · ${said}`, weight });
