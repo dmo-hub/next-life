@@ -157,6 +157,8 @@ rows.push(['การ์ดจัดสรร 2500–2700', `${seenLabels.size} 
 // ≥4 ตัวเลือก · มีทางไม่ล็อก · ยาว · คำต้องห้าม · ผล job/school ชี้ของที่มีจริง
 const career = { ...loadContent(), events: [] };
 const occIds = career.era.finance.occupations.map((o) => o.id);
+// อาชีพตามขั้นยศได้จากการเข้าสายเท่านั้น — การ์ดหางานเสนอเป็นงานตรง ๆ = คนนอกสายได้ยศโดยไม่มีสาย
+const rankOccs = career.era.finance.occupations.filter((o) => !o.birth).map((o) => o.id);
 const careerTexts = new Set();
 let careerCards = 0;
 function checkCareer(ev, where) {
@@ -170,12 +172,20 @@ function checkCareer(ev, where) {
       if (node.text) careerTexts.add(node.text);
       const fx = node.effects ?? {};
       if (fx.job !== undefined && !occIds.includes(fx.job)) fails.push(`${where}: อาชีพ ${fx.job} ไม่มีจริง`);
+      if (rankOccs.includes(fx.job)) fails.push(`${where}: เสนออาชีพตามขั้นยศ ${fx.job} เป็นงาน`);
       if (fx.school !== undefined && !SCHOOL_VALUES.includes(fx.school)) fails.push(`${where}: ช่วงเรียน ${fx.school} ไม่มีจริง`);
     }
   }
 }
 for (const cls of CLASSES) for (const network of [0, 50, 100]) for (const [i, edu] of [null, ...EDU].entries()) {
   checkCareer(jobCard(Object.assign(newLife(i + 1, career), { cls, network, edu, age: 22 })), `การ์ดหางาน ${cls} คอนเน็คชั่น ${network} วุฒิ ${edu}`);
+}
+// บ้านสายยศ (ทายาทของคนที่ตายในขั้นยศ): สืบต่องานบ้าน = เข้าสายของพ่อแม่ ไม่ใช่รับอาชีพยศไปตรง ๆ
+for (const occ of rankOccs) for (const lad of Object.keys(career.era.careers.ladders).filter((id) => career.era.careers.ladders[id].steps.some((s) => s.occ === occ))) {
+  const where = `การ์ดหางาน บ้าน ${occ} สาย ${lad}`;
+  const ev = jobCard(Object.assign(newLife(1, career), { cls: CLASSES[3], network: 50, edu: 'อุดมศึกษา', age: 22, familyOcc: occ, familyLadder: lad }));
+  checkCareer(ev, where);
+  if (!ev.choices.some((c) => c.effects?.ladder === lad)) fails.push(`${where}: ไม่มีทางสืบต่อเข้าสาย ${lad}`);
 }
 for (const [t, track] of Object.entries(TRACKS)) {
   if (track.gate) checkCareer(schoolGate(Object.assign(newLife(1, career), { school: t, age: track.until })), `ด่านเรียนต่อ ${t}`);
