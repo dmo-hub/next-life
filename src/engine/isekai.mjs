@@ -2098,6 +2098,8 @@ export function nextIsekaiCard(isk) {
       ...(isk.lore.length && { lore: isk.lore.map((id) => ISEKAI_LORE[id]) }),
       // ชาตินี้จะอยู่ในตำนานของโลกนี้ (B68i) — ช่องเฉพาะชาติที่ดังถึงเกณฑ์
       ...(isk.legend && { legend: { name: isk.legend.name, dark: isk.legend.dark } }),
+      // สกิลที่ถือตอนจบให้ผู้เล่นเลือกลงคลัง 1 อย่าง (06s) — UI เรียก bookAdd เอง การ์ดไม่เปลี่ยนสถานะเกม
+      ...(isk.skills.length && { earn: isk.skills.map((id) => ({ id, name: ISEKAI_SKILLS[id].name, lv: skillLv(isk, id) })) }),
     });
   }
   const stage = isekaiStageOf(isk);

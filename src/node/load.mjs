@@ -12,7 +12,8 @@ import { PLACEHOLDERS, MAX_LEN } from './lint/vocab.mjs';
 import { NEAR_HINT_LEVELS } from '../engine/court.mjs';
 import { checkFocus } from './lint/focus.mjs';
 import { lintIsekai, formatIsekaiProblem } from './lint/isekai.mjs';
-import { useIsekaiCards } from '../engine/isekai.mjs';
+import { useIsekaiCards, ISEKAI_SKILLS } from '../engine/isekai.mjs';
+import { TITLES, ALL_PATTERNS, FAMILY_GOALS } from '../engine/titles.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -420,6 +421,35 @@ function loadFocus() {
   return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, focuses: doc.focuses };
 }
 
+// สกิลตอนจบชีวิตไทย (06s): id แหล่งหรือ id สกิลพิมพ์ผิด = สกิลไม่เคยออกเงียบ ๆ จึงหยุด build
+// lifeGoal ยังไม่มีระบบให้เทียบ id — ตรวจแค่สกิล
+export function loadSkillMap(p = 'content/rules/skill-map.yaml', focus = loadFocus()) {
+  const doc = parse(read(p)) ?? {};
+  const known = {
+    job: json('data/finance.json').occupations.list.map((o) => o.id),
+    title: TITLES.map((t) => t.id),
+    pattern: ALL_PATTERNS.map((x) => x.id),
+    cause: Object.keys(json('data/death-causes.json').groups),
+    goal: FAMILY_GOALS.map((g) => g.id),
+    focus: Object.keys(focus.focuses),
+    lifeGoal: null,
+  };
+  const bad = Object.keys(doc).filter((k) => !(k in known)).map((k) => `คีย์ ${k} ไม่มีในแกน (${Object.keys(known).join(' ')})`);
+  const map = {};
+  for (const [key, ids] of Object.entries(known)) {
+    const m = doc[key] ?? {};
+    if (typeof m !== 'object' || Array.isArray(m)) { bad.push(`${key} ต้องเป็น { id: [สกิล] }`); continue; }
+    for (const [id, skills] of Object.entries(m)) {
+      if (ids && !ids.includes(id)) bad.push(`${key}.${id} ไม่มีในแหล่งของคีย์นี้`);
+      if (!Array.isArray(skills) || !skills.length) bad.push(`${key}.${id} ต้องเป็นรายการสกิลอย่างน้อย 1`);
+      else for (const s of skills) if (!ISEKAI_SKILLS[s]) bad.push(`${key}.${id} ชี้สกิล ${s} ที่ไม่มี`);
+    }
+    map[key] = m;
+  }
+  if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return map;
+}
+
 // การ์ดทวีป (06c-2): รูปการ์ดต่างโลก ไม่ใช่ events ของโลกหลัก จึงอยู่โฟลเดอร์แยก (loadEvents ไม่อ่านโฟลเดอร์ย่อย) ด่านแยก
 // โหลดแล้วต่อเข้ากองของแกนทันที ⇒ harness/site ที่เรียก loadContent ได้กองเดียวกับหน้าเกม (หน้าเกมต่อจาก CONTENT.isekai)
 export function loadIsekaiCards(dir = 'content/isekai/') {
@@ -431,4 +461,7 @@ export function loadIsekaiCards(dir = 'content/isekai/') {
   return cards;
 }
 
-export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus: loadFocus(), isekai: loadIsekaiCards() });
+export function loadContent() {
+  const focus = loadFocus();
+  return { events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), skillMap: loadSkillMap(undefined, focus) };
+}
