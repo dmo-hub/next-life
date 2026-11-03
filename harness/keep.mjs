@@ -11,6 +11,7 @@ import { snapshot, restore, repairLife, SNAP_V } from '../src/engine/save.mjs';
 import { ERA_PICS } from '../src/ui/art.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { effectSites } from '../src/node/lint/util.mjs';
+import { readVersion } from '../src/site/facts.mjs';
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i < 0 ? d : process.argv[i + 1]; };
 const SAVE = process.argv.includes('--save');
@@ -24,7 +25,7 @@ const PLAY_MAX = 400;
 
 const content = loadContent();
 const app = readFileSync(new URL('../src/ui/app.mjs', import.meta.url), 'utf8');
-const version = app.match(/const APP_VERSION = '([^']+)'/)?.[1] ?? '?';
+const { version } = readVersion();
 
 // การ์ดที่ของอื่นอ้างถึง: ผลย้อน/การ์ดต่อจากตัวเลือก + การ์ดที่ปลดภาพในสมุดภาพ (ช่อง era ของการ์ด · PIC_FOLLOW ของหน้าเว็บ)
 function referencedEvents() {

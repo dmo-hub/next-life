@@ -2,9 +2,9 @@
 // · หน้ารวมการ์ดไม่มีผล/บุญบาป/น้ำหนัก · ทุกการ์ดใน content อยู่บนหน้ารวมการ์ด
 // · ส่วนต่างโลก (B88b) ทั้งสองหน้าครบทุกการ์ด · หน้ารวมการ์ดไม่มีผลสำเร็จ/พลาด ความยาก หรือตอนจบ
 // · หน้าเฉลย (B88) ครบทุกการ์ด/ตัวเลือก/ผลสุ่ม และเฉลยจริง — กฎ "ไม่หลุดบุญบาป" ของหน้ารวมการ์ดไม่ใช้กับหน้านี้
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
-import { siteFacts, injectFacts } from '../src/site/facts.mjs';
+import { siteFacts, injectFacts, readVersion, versionLines } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
 import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
 import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_ROLES, roleInfo, ISEKAI_SKILLS, ISEKAI_CAREERS, CONT_REGIONS, CONT_RACES, CONT_END, contBirth, makeRng } from '../src/engine/index.mjs';
@@ -12,7 +12,7 @@ import { isekaiCardCount, ISEKAI_SECTION, contEndTitles, text as isekaiText } fr
 import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR, SPEC_START, SPEC_END } from '../src/site/spec.mjs';
 import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
-import { injectDemo, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
+import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
 import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
@@ -192,23 +192,35 @@ const vers = [...notes.matchAll(/<h3>(v\d+\.\d+\.\d+)/g)].map((m) => [m[1], m.in
 const early = vers.filter(([v, at]) => notes.search(new RegExp(`${v.replace(/\./g, '\\.')}(?!\\d)`)) !== at).map(([v]) => v);
 check('เลขรุ่นในเกมเป็นลิงก์แพตช์โน้ต และหัวข้อแต่ละรุ่นเป็นจุดแรกที่เลขนั้นโผล่', !play.includes('whatsnew.html#:~:text=') || !play.includes('<a id="appVer"') || !vers.length || early.length, ` ${vers.length} รุ่น${early.length ? ` · โผล่ก่อนหัวข้อ: ${early.slice(0, 5).join(' ')}` : ''}`);
 
+// 9a) เลขเวอร์ชันมีที่เดียว (src/version.json): ซอร์สอื่นใต้ src/ ไม่ถือเลข ไม่งั้น bump ต้องแก้หลายไฟล์และชนกันตอน merge · เกมที่ build แล้วใช้เลขจากไฟล์นั้น
+// ตัวควบคุม: ใส่บรรทัดเลขกลับใน app.mjs · เกมที่ build จากเลขอื่น ⇒ ต้องถูกจับทั้งคู่
+const ver = readVersion();
+const verRe = new RegExp(`APP_(?:VERSION|BUILD)\\s*=\\s*['"\`]|${ver.version.replace(/\./g, '\\.')}(?!\\d)`);
+const srcRoot = new URL('../src/', import.meta.url);
+const srcFiles = readdirSync(srcRoot, { recursive: true }).map((f) => f.replace(/\\/g, '/')).filter((f) => /\.(mjs|html)$/.test(f));
+const verHeld = (files) => files.filter(([, text]) => verRe.test(text)).map(([f]) => f);
+const srcTexts = srcFiles.map((f) => [f, readFileSync(new URL(f, srcRoot), 'utf8')]);
+const held = verHeld(srcTexts);
+const playVer = (html, v) => html.includes(versionLines(v));
+const verCtl = verHeld([['ui/app.mjs', `${appSrc}\nconst APP_VERSION = '${ver.version}';`]]).length > 0 && !playVer(play, { ...ver, version: 'v0.0.00' });
+check('เลขเวอร์ชันอยู่ที่ src/version.json ที่เดียว และเกมใช้เลขนั้น', held.length || !playVer(play, ver) || !verCtl, ` ${ver.version} · ${ver.build} · ซอร์ส ${srcTexts.length} ไฟล์${held.length ? ` · ถือเลขเอง: ${held.join(' ')}` : ''}${playVer(play, ver) ? '' : ' · play.html ไม่ได้ build จากเลขนี้'} · ตัวควบคุม${verCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
 // 9b) เกมเปิดออฟไลน์ได้: ฟอนต์ฝังครบทุกแบบที่หน้าใช้ ไม่ดึงจากเว็บอื่น · ตัวควบคุม: หน้าที่ยังมี <link> Google Fonts ต้องถูกจับ
-const PLAY_FACES = ['Pridi 400', 'Pridi 600', 'Sarabun 400', 'Sarabun 600', 'Srisakdi 700'];
+const PLAY_FACES = ['Noto Sans Thai 400', 'Noto Sans Thai 600', 'Sarabun 400', 'Sarabun 600', 'Srisakdi 700'];
 const fontGap = (html) => [
-  ...PLAY_FACES.filter((f) => { const [fam, w] = f.split(' '); return !new RegExp(`@font-face \\{ font-family:${fam}; font-weight:${w};[^}]*src:url\\(data:font/woff2;base64,[A-Za-z0-9+/]{1000}`).test(html); }),
+  ...PLAY_FACES.filter((f) => { const [, fam, w] = /^(.+) (\d+)$/.exec(f); return !new RegExp(`@font-face \\{ font-family:"${fam}"; font-weight:${w};[^}]*src:url\\(data:font/woff2;base64,[A-Za-z0-9+/]{1000}`).test(html); }),
   ...(/fonts\.(googleapis|gstatic)\.com/.test(html) ? ['ดึง Google Fonts'] : []),
 ];
 const fontMiss = fontGap(play);
 const fontCtl = fontGap(play.replace('<style>', '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun"><style>')).length > 0;
 check('เกมฝังฟอนต์ไทยครบ ไม่ดึงฟอนต์จากเว็บอื่น', fontMiss.length || !fontCtl, ` ${PLAY_FACES.length - fontMiss.filter((x) => PLAY_FACES.includes(x)).length}/${PLAY_FACES.length} แบบ${fontMiss.length ? ` · ขาด ${fontMiss.join(' ')}` : ''} · ตัวควบคุม${fontCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
-// 10) เดโมการ์ดหน้าแรก (B121): ทุกทางมีผลให้อ่าน มีข้อความผลจริงอย่างน้อยหนึ่งทาง ไม่แตะ storage/network · build ซ้ำได้หน้าเดิม
-const index = read('index.html');
-const demo = index.slice(index.indexOf(DEMO_START), index.indexOf(DEMO_END));
+// 10) เดโมการ์ดบนหน้ารวมการ์ด (B121): ทุกทางมีผลให้อ่าน มีข้อความผลจริงอย่างน้อยหนึ่งทาง ไม่แตะ storage/network · build ซ้ำได้หน้าเดิม
+const demo = cards.slice(cards.indexOf(DEMO_START), cards.indexOf(DEMO_END));
 const res = [...demo.matchAll(/data-res="([^"]*)"/g)].map((m) => m[1]);
 const real = res.filter((r) => !r.startsWith('ผลลงที่ค่าสถานะ')).length;
 const touches = /localStorage|sessionStorage|indexedDB|fetch\(|XMLHttpRequest/.test(demo);
-const same = injectDemo(index, content) === index;
+const same = cards.includes(demoHtml(content));
 // B133 สายเรื่องต่อ: ทุกขั้นมีทางที่กดได้และทุกทางมีผล · ปลายทางของทุกปุ่มมีขั้นนั้นจริง · ทุกขั้นที่ซ่อนมีปุ่มพาไปถึง · มีเรื่องต่ออย่างน้อยหนึ่งทาง
 const steps = [...demo.matchAll(/<div class="tstep" data-step="(\d+)"[^>]*>([\s\S]*?)<p class="tres"/g)].map((m) => ({ id: m[1], btns: [...m[2].matchAll(/<button [^>]*>/g)].map((b) => b[0]) }));
 const live = (s) => s.btns.filter((b) => !b.includes('data-lock'));
@@ -219,8 +231,8 @@ const broken = [
   ...gos.filter((g) => !stepIds.has(g)).map((g) => `ชี้ขั้น ${g} ที่ไม่มี`),
   ...steps.slice(1).filter((s) => !gos.includes(s.id)).map((s) => `ขั้น ${s.id} ไปไม่ถึง`),
 ];
-check('เดโมการ์ดหน้าแรกกดได้ครบทุกทาง ไม่แตะเซฟ', res.length < 3 || res.some((r) => !r) || !real || touches || !same || !steps.length || live(steps[0]).length < 3, ` ทาง ${res.length} · ข้อความผลจริง ${real}${touches ? ' · แตะ storage/network' : ''}${same ? '' : ' · build ใหม่แล้วหน้าเปลี่ยน (ยังไม่ได้ build?)'}`);
-check('เดโมการ์ดหน้าแรกมีเรื่องต่อ และกดไปได้ถึงทุกขั้น', !gos.length || broken.length, ` ขั้น ${steps.length} · ทางที่มีเรื่องต่อ ${gos.length}${broken.length ? ` · ${broken.slice(0, 3).join(' · ')}` : ''}`);
+check('เดโมการ์ดหน้ารวมการ์ดกดได้ครบทุกทาง ไม่แตะเซฟ', res.length < 3 || res.some((r) => !r) || !real || touches || !same || !steps.length || live(steps[0]).length < 3, ` ทาง ${res.length} · ข้อความผลจริง ${real}${touches ? ' · แตะ storage/network' : ''}${same ? '' : ' · build ใหม่แล้วหน้าเปลี่ยน (ยังไม่ได้ build?)'}`);
+check('เดโมการ์ดหน้ารวมการ์ดมีเรื่องต่อ และกดไปได้ถึงทุกขั้น', !gos.length || broken.length, ` ขั้น ${steps.length} · ทางที่มีเรื่องต่อ ${gos.length}${broken.length ? ` · ${broken.slice(0, 3).join(' · ')}` : ''}`);
 
 // 11) หน้าเฉลยไม่ตัดเงื่อนไขทิ้งเงียบ: ถอด key ใน when / multipliers / requires ที่ content ใช้จริงออกทีละตัว ⇒ การ์ดบนหน้าเฉลยต้องเปลี่ยน
 // วัดจากผลวาดแทนรายการชื่อ key — รายการเขียนมือจะไม่ตามตัวสร้าง · key ที่ตั้งใจไม่เฉลยใส่ SPOILER_SKIP พร้อมเหตุผล

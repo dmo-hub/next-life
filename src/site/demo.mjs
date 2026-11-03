@@ -1,5 +1,5 @@
-// เดโมการ์ดใบเดียวบนหน้าแรก (B121): การ์ดจริงจากแกนเกมตอน build — ป้ายผลและข้อความผลมาจากการเล่นจริง ไม่เขียนมือ
-// หน้าแรกไม่โหลดตัวเกม ไม่แตะ localStorage ⇒ เซฟของคนที่กำลังเล่นอยู่ไม่โดนทับ
+// เดโมการ์ดใบเดียวบนหน้ารวมการ์ด (B121): การ์ดจริงจากแกนเกมตอน build — ป้ายผลและข้อความผลมาจากการเล่นจริง ไม่เขียนมือ
+// หน้าเว็บไม่โหลดตัวเกม ไม่แตะ localStorage ⇒ เซฟของคนที่กำลังเล่นอยู่ไม่โดนทับ
 // ผลที่มีเรื่องต่อ (B133) เล่นต่อเป็นสายเหมือนในเกม — ต้นไม้ของสายคำนวณตอน build ทั้งหมด หน้าแค่เปิด/ปิดขั้น
 import { playLife } from '../engine/index.mjs';
 import { esc } from './catalog.mjs';
@@ -9,7 +9,7 @@ import { esc } from './catalog.mjs';
 export const DEMO = { seed: 4, id: 'biz_grocery_01' };
 export const DEMO_START = '<!--demo-->';
 export const DEMO_END = '<!--/demo-->';
-// สายยาวกว่านี้หน้าแรกยืดเกินไป — ขั้นที่ลึกกว่าจบที่การ์ดผลแล้วชวนไปเล่นทั้งชีวิต
+// สายยาวกว่านี้หน้ายืดเกินไป — ขั้นที่ลึกกว่าจบที่การ์ดผลแล้วชวนไปเล่นทั้งชีวิต
 export const DEMO_DEPTH = 3;
 const STOP = {};
 // บอทเลือกทางที่ไม่ล็อกแบบสุ่มจาก rng ของแกน — seed เดิมได้ทางเดิมทุก build
@@ -106,7 +106,7 @@ function findCard(content) {
     plain ??= h;
   }
   if (plain) return plain;
-  throw new Error('เดโมหน้าแรก: ไม่พบการ์ดที่เข้าเกณฑ์');
+  throw new Error('เดโมการ์ด: ไม่พบการ์ดที่เข้าเกณฑ์');
 }
 
 export function demoCard(content) {
@@ -166,12 +166,3 @@ export function demoHtml(content) {
   ].join('\n');
 }
 
-// แทนก้อนเดโมเดิมในหน้าแรกด้วยก้อนใหม่ — ตัวคั่นต้องมีคู่เดียว ไม่งั้นหยุด build ดีกว่าเขียนหน้าเพี้ยน
-export function injectDemo(html, content, where = 'docs/index.html') {
-  const a = html.indexOf(DEMO_START);
-  const b = html.indexOf(DEMO_END);
-  if (a < 0 || b < a || html.indexOf(DEMO_START, a + 1) >= 0) throw new Error(`${where}: ต้องมี ${DEMO_START} … ${DEMO_END} คู่เดียว`);
-  // ตามตัวขึ้นบรรทัดของไฟล์ ไม่งั้น build บน Windows ทิ้ง diff แค่ CRLF ไว้ทุกรอบ
-  const block = html.includes('\r\n') ? demoHtml(content).replace(/\n/g, '\r\n') : demoHtml(content);
-  return html.slice(0, a) + block + html.slice(b + DEMO_END.length);
-}
