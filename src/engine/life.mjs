@@ -304,6 +304,7 @@ export function newLife(seed, content, heir = null) {
   st.stageMark = markStage(st);
   lifeFocusBorn(st, heir?.focus);
   if (heir?.gates?.length) st.gates = [...heir.gates];
+  overlapPlan(st);
   return st;
 }
 
@@ -1814,6 +1815,25 @@ export const overlapStageOf = (st) => OVERLAP_STAGE_MIN.findLastIndex((min) => o
 // เข้าต่างโลกอีกเมื่อจริง = กลับเข้าโลกที่เคยออกไป +1 (เกิด · ถูกเรียก · ทริป)
 export const overlapLeftIsekai = (st) => [...(st.lineage ?? []), { trips: st.trips }].some((l) => l.isekai || l.trips?.some((t) => t.home));
 
+// ตารางนัดการ์ดซ้อนทับต่อชีวิต: ลอกแบบตารางนัดการ์ดชวนต่างโลก — สุ่มจาก stream แยกของ seed ไม่ดึง st.rng
+// ขั้น 0 ไม่มีตารางและไม่เพิ่มช่องใด ⇒ ตระกูลค่า 0 เดินเท่าเดิมทุกหลัก · การ์ดซ้อนทับไม่อยู่ในกองสุ่ม ออกทางนัดนี้ทางเดียว
+// นัดลง st.scheduled จึงกินโควตาปีแบบผลย้อน (ชีวิตไม่ยาวขึ้น) · ขั้น 1 อย่างน้อย 1 ใบ ให้คนที่ข้ามโลกครั้งแรกเห็นผลแน่นอน
+// ขั้นขึ้นกลางชีวิตได้ทางเดียวคือทริปกลับบ้าน ⇒ ทิ้งนัดที่ยังไม่ออกแล้วสุ่มใหม่ด้วย stream ของรอบนั้น หลังเดินปีที่หายไปแล้ว
+export const OVERLAP_PLAN = { salt: 0x3c6ef372, prefix: 'overlap_', ages: [15, 60], quota: [[0, 0], [1, 1], [1, 2], [2, 4], [2, 4]] };
+// stage ส่งเองได้เฉพาะด่าน — ขั้น 2–4 ยังไม่มีเลขเกณฑ์ให้ตระกูลจริงไปถึง
+export function overlapPlan(st, run = 0, stage = overlapStageOf(st)) {
+  if (!stage) return;
+  st.scheduled = st.scheduled.filter((x) => !x.overlap);
+  const rng = makeRng(mixSeed(st.seed ^ OVERLAP_PLAN.salt, run));
+  const [lo, hi] = OVERLAP_PLAN.quota[stage];
+  const from = Math.max(st.age + 1, OVERLAP_PLAN.ages[0]);
+  const pool = st.content.events.filter((e) => e.id.startsWith(OVERLAP_PLAN.prefix) && !st.done[e.id] && inRange(stage, e.when?.overlap_stage));
+  for (let left = rng.int(lo, hi); left > 0 && pool.length && from <= OVERLAP_PLAN.ages[1]; left--) {
+    const [ev] = pool.splice(rng.int(0, pool.length - 1), 1);
+    st.scheduled.push({ event: ev.id, age: rng.int(from, OVERLAP_PLAN.ages[1]), overlap: true });
+  }
+}
+
 // ปีที่หายไปเดินด้วย stepYear ปกติ (เงิน คนในบ้าน ด่านเรียน) แต่ไม่ทอยตายและไม่จับกอง — ตัวไม่อยู่ เรื่องของปีนั้นจึงมาเป็นข่าวหลังกลับ
 function tripBack(st) {
   const isk = st.trip;
@@ -1832,6 +1852,7 @@ function tripBack(st) {
   st.network = clamp(st.network + c.network);
   st.knowledge = clamp(st.knowledge + c.knowledge);
   for (let i = 0; i < isk.trip.thai; i++) stepYear(st);
+  overlapPlan(st, st.trips.length);
   // ใบตัดสินใจที่ถึงกำหนดทุกปี (เลื่อนขั้น ทบทวนเงิน ช่วงวัย) ซ้อนกันหลายใบ — เก็บใบล่าสุดของแต่ละเรื่อง ใบเก่าสร้างจากสถานะที่ไม่ใช่แล้ว
   const key = (c) => (c.kind === 'eraEvent' ? `e:${c.ev.id}` : ['alloc', 'stage', 'omen'].includes(c.kind) ? c.kind : null);
   st.due = st.due.filter((c, i) => !key(c) || !st.due.slice(i + 1).some((d) => key(d) === key(c))).map((c) => ({ ...c, age: st.age }));
