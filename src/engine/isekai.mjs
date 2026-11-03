@@ -1347,34 +1347,34 @@ export function useIsekaiCards(cards = []) {
 }
 
 // ป้ายบุญบาปต่างโลก (B68c) ตามเจตนาของตัวเลือก ไม่ตามผลทอย · id เหตุการณ์ → ลำดับตัวเลือก → [หมวด, ระดับ]
-// ฆ่าเพื่อปกป้องคน = กลาง · ชื่อเสียง (fame) เป็นอีกแกน ไม่ลงบัญชีนี้
+// ปกป้องคน (ฆ่าหรือไม่ฆ่า) = ช่วยคน 1 · ล่า/ค้นเพื่อตัวเองไม่มีใครต้องปกป้อง = กลาง · ชื่อเสียง (fame) เป็นอีกแกน ไม่ลงบัญชีนี้
 const M = (cat, level) => ({ cat, level });
 export const ISEKAI_MERIT = {
   h2: { 0: [M('help_others', 2)], 1: [M('help_others', 1)], 2: [M('greed_harm', 1)] },
-  h3: { 0: [M('neutral')], 1: [M('help_others', 2)], 2: [M('neutral')] },
+  h3: { 0: [M('help_others', 1)], 1: [M('help_others', 2)], 2: [M('help_others', 1)] },
   h4: { 1: [M('kill_for_gain', 3)] },
   h5: { 2: [M('greed_harm', 2)] },
-  h9: { 0: [M('neutral')] },
+  h9: { 0: [M('help_others', 1)] },
   n2: { 1: [M('cheat_exploit', 1)] },
   n3: { 0: [M('help_others', 2)], 1: [M('help_others', 1)] },
   n9: { 0: [M('help_others', 2)], 2: [M('help_others', 1)] },
-  m1: { 0: [M('help_others', 2)], 1: [M('neutral')] },
+  m1: { 0: [M('help_others', 2)], 1: [M('help_others', 1)] },
   m2: { 0: [M('neutral')], 2: [M('greed_harm', 1)] },
   m9: { 0: [M('help_others', 3)], 1: [M('kill_for_gain', 3)], 2: [M('help_others', 2)] },
   v0: { 1: [M('sila', 1)] },
   v2: { 0: [M('help_others', 1)], 1: [M('help_others', 1)] },
   v5: { 1: [M('dana', 2), M('help_others', 1)] },
   s1: { 0: [M('help_others', 2)], 1: [M('help_others', 1)] },
-  s9: { 1: [M('neutral')], 2: [M('help_others', 1)] },
+  s9: { 1: [M('help_others', 1)], 2: [M('help_others', 1)] },
   gb1: { 2: [M('help_others', 1), M('dana', 1)] },
   gb2: { 0: [M('help_others', 1)], 1: [M('cheat_exploit', 1)] },
   gb3: { 0: [M('help_others', 2)], 1: [M('kill_for_gain', 2)], 2: [M('greed_harm', 1)] },
-  gb5: { 0: [M('help_others', 2)], 2: [M('neutral')] },
+  gb5: { 0: [M('help_others', 2)], 2: [M('help_others', 1)] },
   dk2: { 0: [M('unjust_judgment', 2)], 2: [M('help_others', 2)] },
   dk3: { 2: [M('greed_harm', 2)] },
   dk4: { 0: [M('help_others', 1)], 2: [M('greed_harm', 1)] },
   dk4b: { 0: [M('help_others', 1)] },
-  g_goblin: { 0: [M('neutral')], 1: [M('neutral')] },
+  g_goblin: { 0: [M('help_others', 1)], 1: [M('help_others', 1)] },
   g_slave: { 0: [M('help_others', 3), M('dana', 1)], 1: [M('help_others', 2)] },
   g_dragon: { 1: [M('greed_harm', 1)] },
   g_goddess: { 1: [M('care_parents', 1)] },
