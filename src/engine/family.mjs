@@ -460,6 +460,17 @@ export function heirPets(st, birthYear, tier) {
   return pets.length ? pets : undefined;
 }
 
+// คนตายที่ตระกูลโลกซ้อนจำได้ (ผีญาติดึงไปใช้) — เฉพาะคนที่ตายก่อนเรา · พ่อ/แม่ที่เป็นผู้เล่นรุ่นก่อนคือชาติก่อนของเราเอง ไม่ใช่วิญญาณอื่น · ฝูงสัตว์ไม่มีตัวตนรายตัว
+// เก็บเลขรุ่นแทนปีตาย: ผีสุ่มเอียงหารุ่นใกล้ ไม่ได้กรองว่าไปเกิดแล้วหรือยัง
+export function deadKinOf(st) {
+  const gen = st.gen ?? 1;
+  const one = (m, role) => ({ name: m.name ?? null, role, bond: m.bond ?? BOND_START[role], cause: m.cause ?? null, gen });
+  return [
+    ...st.parents.filter((p) => !p.alive && !p.ancestor).map((p) => one(p, 'parent')),
+    ...(st.kin ?? []).filter((m) => !m.alive && m.role !== 'herd').map((m) => one(m, m.role)),
+  ];
+}
+
 // มรณบัตร: ใครรับเลี้ยงสัตว์ต่อ — คู่ชีวิต > ลูก > หลาน ที่ยังอยู่ ไม่มีใคร = เพื่อนบ้าน
 export function petsAfter(st) {
   const pets = (st.kin ?? []).filter((m) => ANIMAL.includes(m.role) && m.alive && !m.left);
