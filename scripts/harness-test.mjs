@@ -414,6 +414,48 @@ const f2 = (v) => v.toFixed(2);
   check('ขั้นค่าซ้อนทับ: ขั้น 2–4 ยังไปไม่ถึงจนใบ 16 ใส่เกณฑ์ (ค่าสูงแค่ไหนก็ขั้น 1)', E.OVERLAP_STAGE_MIN.length === 5 && E.OVERLAP_STAGE_MIN[1] === 1 && E.overlapStageOf(st) === 1, String(E.overlapStageOf(st)));
 }
 
+// ไอเทมติดตัว (B78): ห้องบอสให้ชิ้นแรกที่ยังไม่มี · ช่องชนิดตรงว่างก่อน แล้วเป้ · เป้เต็มขาย · ครบแล้วไม่ได้เพิ่ม · ชีวิต/เซฟที่ไม่เคยได้ของไม่มีช่อง
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const byId = (id) => content.events.find((e) => e.id === id);
+  // ตัดทางไม่ ok ออก ⇒ ผลแน่นอนโดยไม่แตะ rng ของเทส
+  const sure = (ev) => ({ ...ev, choices: ev.choices.map((c) => ({ ...c, ...(c.outcomes && { outcomes: c.outcomes.filter((o) => o.ok) }) })) });
+  const boss = sure(byId('dungeon_hunt_boss_01'));
+  const out = byId('dungeon_pull_out_01');
+  const keep = out.choices.findIndex((c) => c.id === 'bag_keep');
+  const st = newLife(mixSeed(1, 2323), content);
+  st.flags.hunter = true;
+  st.age = 30;
+  const empty = E.itemsOf(st);
+  check('ไอเทม: ชีวิตที่ไม่เคยได้ของไม่มี state items · itemsOf ได้ 3 ช่องว่าง เป้ 0/6', !('items' in st) && Object.values(empty.wear).every((x) => x === null) && Object.keys(empty.wear).join() === 'charm,weapon,outfit' && empty.bag.length === 0 && empty.cap === 6);
+  const texts = [];
+  for (let i = 0; i < 5; i++) {
+    st.health = 100;
+    st.queue = [];
+    st.pending = boss;
+    E.choose(st, 0);
+    texts.push(st.queue.find((x) => x.kind === 'result')?.text ?? '');
+  }
+  const it = st.items;
+  check('ไอเทม: บอส 4 รอบ → ตะกรุด/มีด/เสื้อกั๊กลงช่อง เขี้ยวเข้าเป้ (ช่องเครื่องรางเต็ม)', it.wear.charm === 'dg_takrut' && it.wear.weapon === 'dg_knife' && it.wear.outfit === 'dg_vest' && it.bag.join() === 'dg_fang', JSON.stringify(it));
+  check('ไอเทม: การ์ดผลต่อท้ายชื่อของ+ช่อง · รอบที่ 5 ครบแล้วไม่ได้เพิ่ม', texts[0].includes('ได้ตะกรุดผลึกม่วง ใส่ช่องเครื่องราง') && texts[3].includes('ได้เขี้ยวบอสเลี่ยมทอง เก็บเข้าเป้') && !texts[4].includes(' · ได้'), texts.map((t) => t.slice(-30)).join(' | '));
+  st.items.cap = 2;
+  const money = st.money;
+  const run = () => {
+    st.queue = [];
+    st.pending = out;
+    E.choose(st, keep);
+    return st.queue[0];
+  };
+  const a = run();
+  const b = run();
+  const sold = st.money - money - 2 * E.moneyValue(st, out.choices[keep].effects.money);
+  check('ไอเทม: เป้ที่ทางออก → หน้าไม้เข้าเป้ (ช่องอาวุธเต็ม) · ปลอกแขนเจอเป้เต็มขายได้เงิน · เล่าเป็นการ์ดผลใบแรก', st.items.bag.join() === 'dg_fang,dg_crossbow' && a?.kind === 'result' && a.text.includes('เก็บเข้าเป้') && !!b?.text.includes('เป้เต็ม') && near(sold, E.moneyValue(st, content.items.list.dg_armband.sell), 1e-6), `${st.items.bag.join()} · ขายได้ ${sold.toFixed(0)}`);
+  const old = E.restore(E.snapshot({ st: newLife(mixSeed(1, 2324), content) }, content), content).st;
+  check('ไอเทม: เซฟก่อนมีระบบโหลดได้ ช่องว่าง', !!old && !('items' in old) && Object.values(E.itemsOf(old).wear).every((x) => x === null));
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {

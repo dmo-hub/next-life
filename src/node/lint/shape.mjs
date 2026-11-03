@@ -21,7 +21,7 @@ const KEYS = {
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   debt: ['kind', 'amount'],
@@ -587,6 +587,22 @@ export const rules = [
         if (!DUNGEON_CAUSES.includes(d)) r(`${path}.effects.die`, `ต้องเป็น ${DUNGEON_CAUSES.join('|')} ได้ ${JSON.stringify(d)}`);
         else if (node === choice) r(`${path}.effects.die`, 'ใช้ได้แค่ในผลสุ่ม (outcomes) — การ์ดผลต้องเล่าเหตุก่อนมรณบัตร');
         else if (!list(choice.requires?.flags?.has).includes('hunter')) r(`${path}.effects.die`, 'ตัวเลือกต้อง requires.flags.has มี hunter — คนถูกดึงเข้าดันเจียนรอดเสมอ');
+      }
+    },
+  },
+  {
+    id: 'loot-shape',
+    desc: 'effects.loot = รายการ id ไม่ซ้ำใน content/rules/items.yaml (ได้ชิ้นแรกที่ยังไม่มี) — บนตัวเลือกที่ไม่มี outcomes หรือบนผลสุ่มที่มี text (ข้อความของที่ได้ต่อท้ายการ์ดผล)',
+    event(e, ctx, r) {
+      for (const { node, path, choice } of effectSites(e)) {
+        const l = isObj(node.effects) ? node.effects.loot : undefined;
+        if (l === undefined) continue;
+        const p = `${path}.effects.loot`;
+        if (!Array.isArray(l) || !l.length) { r(p, 'ต้องเป็นรายการ id ไม่ว่าง'); continue; }
+        for (const id of l) if (!ctx.items.includes(id)) r(p, `ไม่มีของ ${JSON.stringify(id)} ในทะเบียน content/rules/items.yaml`);
+        if (new Set(l).size !== l.length) r(p, 'id ซ้ำในรายการ');
+        if (node === choice && choice.outcomes?.length) r(p, 'ตัวเลือกที่มี outcomes ใส่ loot ที่ผลสุ่มแทน');
+        if (node !== choice && !node.text) r(p, 'ผลสุ่มที่ให้ของต้องมี text — ข้อความของที่ได้ต่อท้ายการ์ดผล');
       }
     },
   },

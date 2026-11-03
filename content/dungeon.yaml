@@ -121,7 +121,7 @@ events:
         requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่าที่ถือบัตรกิลด์"}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 6, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "ทีมล้มบอสได้ กิลด์ตีราคาผลึกที่ขนออกมาได้ก้อนใหญ่ ชื่อคุณขึ้นกระดานกิลด์", effects: {money: {unit: income_x, amount: 2}, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 6, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "ทีมล้มบอสได้ กิลด์ตีราคาผลึกที่ขนออกมาได้ก้อนใหญ่ ชื่อคุณขึ้นกระดานกิลด์", effects: {money: {unit: income_x, amount: 2}, network: 2, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
           - {weight: 3, text: "ล้มบอสได้แต่คุณโดนหางฟาดจนซี่โครงร้าว ส่วนแบ่งผลึกแทบไม่พอค่าหมอ", effects: {health: -2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
           - {weight: 1.5, text: "บอสสะบัดหางกวาดทั้งแนว ทีมลากร่างคุณออกจากเกตได้ แต่คุณไม่ได้ลืมตาขึ้นมาอีก", effects: {die: assault}, merit: [{cat: neutral}]}
       - id: weak_spot
@@ -129,7 +129,7 @@ events:
         requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่าที่ถือบัตรกิลด์"}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 6, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณเห็นเกล็ดที่แตกอยู่ใต้คอ ตีครั้งเดียวบอสก็ทรุด ทีมแบ่งผลึกกันอย่างงาม", effects: {money: {unit: income_x, amount: 1.5}, network: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 6, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณเห็นเกล็ดที่แตกอยู่ใต้คอ ตีครั้งเดียวบอสก็ทรุด ทีมแบ่งผลึกกันอย่างงาม", effects: {money: {unit: income_x, amount: 1.5}, network: 1, knowledge: 1, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
           - {weight: 3, text: "จังหวะพลาดไปนิดเดียว เพดานถล่มลงมาทับขาคุณ ทีมต้องหามออก", effects: {health: -2}, merit: [{cat: neutral}]}
           - {weight: 1.5, text: "เสาหินที่บอสชนพังลงมาทั้งต้น ทีมขุดหาคุณจนเกตปิด", effects: {die: accident}, merit: [{cat: neutral}]}
       - id: decoy
@@ -137,7 +137,7 @@ events:
         requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่าที่ถือบัตรกิลด์"}
         merit: [{cat: help_others, level: 2}]
         outcomes:
-          - {weight: 5, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณวิ่งวนจนบอสหลงทาง ทีมออกครบทุกคน กิลด์ให้เบี้ยกล้าหาญพิเศษ", effects: {money: {unit: income_x, amount: 0.8}, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 5, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณวิ่งวนจนบอสหลงทาง ทีมออกครบทุกคน กิลด์ให้เบี้ยกล้าหาญพิเศษ", effects: {money: {unit: income_x, amount: 0.8}, network: 2, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
           - {weight: 3, text: "ทีมออกไปได้ คุณหนีตามมาทีหลังพร้อมรอยกรงเล็บยาวตลอดหลัง", effects: {health: -2, network: 1}, merit: [{cat: neutral}]}
           - {weight: 1.5, text: "ทีมออกไปได้ครบทุกคน แต่คนที่ล่อบอสไว้ไม่ได้ตามออกมา", effects: {die: assault}, merit: [{cat: neutral}]}
       - id: back_off
@@ -199,5 +199,5 @@ events:
         merit: [{cat: help_others, level: 1}]
       - id: bag_keep
         text: "เอาของในเป้ไปขายเอง"
-        effects: {money: {unit: income_x, amount: 0.8}}
+        effects: {money: {unit: income_x, amount: 0.8}, loot: [dg_crossbow, dg_armband]}
         merit: [{cat: greed_harm, level: 1}]

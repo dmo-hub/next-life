@@ -644,6 +644,32 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
   }
 }
 
+// ไอเทมติดตัว (B78): state สร้างตอนได้ชิ้นแรก — ชีวิตที่ไม่เคยได้ของและเซฟก่อนมีระบบจึงไม่มีช่องนี้ ผู้อ่านใช้ itemsOf ได้ช่องว่าง
+export const itemsOf = (st) => st.items ?? { wear: Object.fromEntries(Object.keys(st.content.items.slots).map((k) => [k, null])), bag: [], cap: st.content.items.cap };
+
+// ไม่ดึงเลขสุ่ม: ได้ชิ้นแรกในลิสต์ที่ยังไม่มี ครบแล้วไม่ได้เพิ่ม · ลงช่องชนิดตรงถ้าว่าง ไม่งั้นเข้าเป้ · เป้เต็มขายทันที (ไม่มีปุ่มทิ้ง/ให้)
+// คืนข้อความที่ผู้เล่นเห็น หรือ null เมื่อไม่ได้อะไร
+function gainLoot(st, ids) {
+  const reg = st.content.items;
+  const it = itemsOf(st);
+  const id = ids.find((x) => !Object.values(it.wear).includes(x) && !it.bag.includes(x));
+  if (!id) return null;
+  st.items = it;
+  const item = reg.list[id];
+  let where;
+  if (!it.wear[item.slot]) {
+    it.wear[item.slot] = id;
+    where = ` ใส่ช่อง${reg.slots[item.slot]}`;
+  } else if (it.bag.length < it.cap) {
+    it.bag.push(id);
+    where = ' เก็บเข้าเป้';
+  } else {
+    st.money += moneyValue(st, item.sell);
+    where = ' แต่เป้เต็ม เลยขายต่อได้เงินแทน';
+  }
+  return `${item.text} · ได้${item.name}${where}`;
+}
+
 // เรื้อรังไหลทุกปี แล้วจางลงระดับละ 1 ทุก CHRONIC_FADE ปีนับจากครั้งล่าสุดที่ระดับเปลี่ยน
 // ไม่แตะเส้นสุขภาพธรรมชาติ — ป่วยเรื้อรังจึงเพิ่มโอกาสตายจริง
 function flowChronic(st) {
@@ -1652,6 +1678,7 @@ export function choose(st, idx, loan) {
   // ใบในรอบเดียวกัน (ev.run) ที่สุขภาพหมดอยู่ก่อนกด = โรคที่ถึงคิวกลางรอบ ไม่ใช่ผลของใบนี้ — จำไว้ก่อนผลของตัวเลือกลง
   const ill = ev.run !== undefined && st.health <= 0;
   applyEffects(st, c.effects, s, ss);
+  const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
@@ -1661,6 +1688,8 @@ export function choose(st, idx, loan) {
   // การ์ดที่ตัวเลือกนี้ก่อ (ผล → เรื่องต่อ → หางาน) เข้าหัวคิวตามลำดับ ก่อนการ์ดอื่นของปีที่รออยู่
   // สายมูก่อการ์ดของตัวเองได้ (ผลหวยสายมู) — มาก่อนผลสุ่มของตัวเลือก
   const after = beliefChoice(st, ev, c);
+  // ตัวเลือกตรงไม่มีการ์ดผล — ของที่ได้เล่าเป็นการ์ดผลใบเดียว (lint ห้าม loot บนตัวเลือกที่มี outcomes)
+  if (gotC) after.unshift({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: gotC });
   let doom, wound;
   if (c.outcomes?.length) {
     const o = weighted(st.rng, c.outcomes, outcomeWeights(st, ev, c));
@@ -1670,9 +1699,10 @@ export function choose(st, idx, loan) {
     // ตายในการ์ด ญาติประคองไม่ได้ — ป้าย "หนักแค่ครึ่งเดียว" จะขัดกับมรณบัตรใบถัดไป
     const helper = !o.ok && !doom && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
     applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1);
+    const gotO = o.effects?.loot && gainLoot(st, o.effects.loot);
     applyChoice(st, ev, o, text);
     if (c.filial) filialNote(st, c.filial, filialScore(o.merit), true);
-    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') });
+    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') + (gotO ? ` · ${gotO}` : '') });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
     if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow)) {
