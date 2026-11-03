@@ -148,19 +148,20 @@ function focusBar(card, open = false) {
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทยและต่างโลก · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
 // ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ
 const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบครัว'], ['money', 'เงิน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
-// ต่างโลกไม่มีครอบครัวกับเงินบาทให้ดู — ทอง ชื่อเสียง อาชีพ สกิลอยู่ในแผงตัวฉันของร่างนี้ (ui-redo ใบ 13)
-const ISEKAI_MENU = [['me', 'ตัวฉัน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
+// ต่างโลกไม่มีครอบครัวกับเงินบาทให้ดู — ทอง ชื่อเสียง อาชีพอยู่ในแผงตัวฉันของร่างนี้ (ui-redo ใบ 13)
+// สกิลแยกปุ่มเพราะสมุดสกิล (06s-3) จะมาต่อที่แผงนี้ · ความเร็วย้ายจากการ์ดมาที่เมนู (ใบ 14)
+const ISEKAI_MENU = [['me', 'ตัวฉัน'], ['skill', 'สกิล'], ['speed', 'ความเร็ว'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
 function lifeMenu(card, box) {
   // การ์ดใหม่วาดทับทั้ง root แผงเดิมหายไปด้วยแล้ว
   sheetClose = null;
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
   const isk = card.kind === 'isekai';
-  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), family: familyPanel, money: () => moneyPanel(card), more: morePanel };
+  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), skill: () => isekaiSkillPanel(card.status), speed: speedPanel, family: familyPanel, money: () => moneyPanel(card), more: morePanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
   const views = { shelf: () => openShelf() };
-  // ต่างโลกช่วงยังไม่มีร่าง (ไม่มีหน้าต่างสถานะ) ไม่มีอะไรให้แผงตัวฉันโชว์
-  const items = isk ? ISEKAI_MENU.filter(([id]) => id !== 'me' || card.status) : LIFE_MENU;
+  // ต่างโลกช่วงยังไม่มีร่าง (ไม่มีหน้าต่างสถานะ) ไม่มีอะไรให้แผงตัวฉันกับสกิลโชว์
+  const items = isk ? ISEKAI_MENU.filter(([id]) => (id !== 'me' && id !== 'skill') || card.status) : LIFE_MENU;
   for (const [id, label] of items) {
     const b = el('button', null);
     b.type = 'button';
@@ -2445,7 +2446,7 @@ function isekaiBar(card, s, where) {
   bar.append(r1, ul);
   return bar;
 }
-// แผงตัวฉันต่างโลก: ของที่เคยอัดในหน้าต่างสถานะบนการ์ด — ค่าเต็ม · ทอง ชื่อเสียง เผ่า · อาชีพ · สกิล
+// แผงตัวฉันต่างโลก: ของที่เคยอัดในหน้าต่างสถานะบนการ์ด — ค่าเต็ม · ทอง ชื่อเสียง เผ่า · อาชีพ (สกิลอยู่แผงของมันเอง)
 function isekaiMePanel(s) {
   const wrap = el('div', 'me');
   const ul = el('ul', 'me-m');
@@ -2461,11 +2462,23 @@ function isekaiMePanel(s) {
     metaLine(job, s.careers);
     wrap.append(el('h3', null, 'อาชีพ'), job);
   }
-  if (s.skills.length) {
-    const chips = el('div', 'ichips');
-    for (const name of s.skills) chips.append(el('span', 'ichip', name));
-    wrap.append(el('h3', null, 'สกิล'), chips);
+  return wrap;
+}
+function isekaiSkillPanel(s) {
+  const wrap = el('div', 'me');
+  if (!s.skills.length) {
+    wrap.append(el('p', 'meta', 'ร่างนี้ยังไม่มีสกิล'));
+    return wrap;
   }
+  const chips = el('div', 'ichips');
+  for (const name of s.skills) chips.append(el('span', 'ichip', name));
+  wrap.append(chips);
+  return wrap;
+}
+// เปลี่ยนความเร็วระหว่างแผงเปิด: armTick วนรอแผงปิดด้วยความเร็วใหม่อยู่แล้ว แต่จาก "หยุด" ไม่มีรอบไหนวนอยู่ จึงต้องตั้งใหม่เอง
+function speedPanel() {
+  const wrap = el('div', 'me');
+  wrap.append(speedRow(() => tickAgain?.()), el('p', 'meta', 'ใบผลลัพธ์และใบที่ต้องเลือก หยุดรอเสมอ'));
   return wrap;
 }
 // แถบโฟกัสต่างโลก: หน้าตา/คลาสเดียวกับ focusBar โลกหลัก · กาง/พับในที่ ไม่สร้างกล่องใหม่ (armTick ถือกล่องนี้ไว้ดูว่าชี้/โฟกัสอยู่ไหม)
@@ -2502,6 +2515,8 @@ const SPEEDS = [1, 2, 4, 0];
 const TICK_MS = 2000;
 let speed = speedRead();
 let tickTimer = null;
+// ตั้งเวลาใบตาที่ค้างอยู่ใหม่ — null เมื่อใบปัจจุบันไม่เดินเอง
+let tickAgain = null;
 function speedRead() {
   try {
     const v = Number(localStorage.getItem(SPEED_KEY) ?? 1);
@@ -2554,6 +2569,7 @@ function speedRow(onChange) {
 
 function renderIsekai(card) {
   clearTimeout(tickTimer);
+  tickAgain = null;
   root.replaceChildren();
   const box = el('article', 'card i');
   const s = card.status;
@@ -2614,18 +2630,14 @@ function renderIsekai(card) {
   if (!card.choices.length) choices.append(enter(button(BTN.next, null, () => play(nextTok))));
   box.append(head);
   if (panel) box.append(panel);
-  // ใบผลลัพธ์/ใบเลือกหยุดรอเสมอ (เจ้าของเคาะ) — แถบความเร็วยังโชว์ให้ตั้งไว้ก่อนเดินต่อ
-  if (s && card.step !== 'end') {
+  // ใบผลลัพธ์/ใบเลือกหยุดรอเสมอ (เจ้าของเคาะ) — การ์ดเหลือแค่เส้นเวลาของใบที่เดินเอง ปุ่มความเร็วอยู่ในเมนู (ใบ 14)
+  if (s && panel && !card.choices.length) {
     const bar = el('i');
-    const walk = panel && !card.choices.length;
-    const row = speedRow(() => walk && armTick(box, panel, bar, nextTok));
-    if (walk) {
-      const t = el('div', 'itimer');
-      t.append(bar);
-      row.append(t);
-    }
-    box.append(row);
-    if (walk) armTick(box, panel, bar, nextTok);
+    const t = el('div', 'itimer');
+    t.append(bar);
+    box.append(t);
+    tickAgain = () => armTick(box, panel, bar, nextTok);
+    tickAgain();
   }
   box.append(body, choices);
   root.append(panels(box, false), lifeMenu(card, box));
