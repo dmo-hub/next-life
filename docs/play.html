@@ -373,7 +373,14 @@ body:has(.mnav) .foot { display:none; }
 .d-pane[hidden] { display:none; }
 .mem .d-pane h3 { margin:8px 0 0; font-family:var(--ft); font-size:14px; font-weight:600; color:var(--muted); text-align:left; }
 .d-pane .fam { display:flex; flex-direction:column; gap:8px; }
-.d-share { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; padding-top:12px; border-top:1px dashed #8A8A8A; }
+/* เมนูแชร์ (ใบ 12): พับเป็นปุ่มรองเส้นประปุ่มเดียว เปิดแล้วคำสั่งเรียงต่อในที่เดิม ไม่ลอยทับการ์ด จอแคบจึงไม่ล้น */
+.d-share { margin-top:4px; padding-top:12px; border-top:1px dashed #8A8A8A; }
+.d-share > summary { list-style:none; cursor:pointer; min-height:44px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; gap:6px; padding:6px 12px; border:1px dashed #1F1F1F; font-size:14px; }
+.d-share > summary::-webkit-details-marker { display:none; }
+.d-share > summary::after { content:'\25BE'; }
+.d-share[open] > summary::after { content:'\25B4'; }
+.d-share > summary:focus-visible { outline:2px solid var(--red); outline-offset:2px; }
+.d-share-in { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
 .d-share .choice { flex:1 1 auto; min-height:44px; padding:6px 12px; justify-content:center; font-size:14px; background:transparent; border-style:dashed; }
 /* ป้ายตามหาคนหาย (B139): กระดาษประกาศติดเสา หัวแดงตัวหนา — ต่างจากหนังสืองานศพขาวดำ ให้รู้ว่ายังไม่มีใครถือว่าจากไป */
 .a.mem.lost { background:#FFF8E1; border:3px dashed #B3261E; outline:none; }
@@ -381,7 +388,7 @@ body:has(.mnav) .foot { display:none; }
 .lost .top b { font-family:var(--ft); font-size:24px; font-weight:800; color:#B3261E; letter-spacing:0.02em; }
 .lost .por { border:2px solid #1F1F1F; }
 .lost .call { margin:0; padding:8px 10px; border:2px solid #B3261E; color:#B3261E; font-weight:700; text-align:center; }
-.lost .choice { border-color:#B3261E; }
+.lost .choice, .lost .d-share > summary { border-color:#B3261E; }
 
 /* ทาง C ต่างโลก (B68) — หน้าต่างสถานะแบบเกม: พื้นฟ้ากลางคืน กรอบฟ้าเรือง · ต่างจากสองแนวไทยให้รู้ว่าออกจากวงเวียนเดิมแล้ว */
 .i { background:#161A3A; color:#E8ECFF; border:1px solid #3B4BA8; }
@@ -9157,6 +9164,7 @@ const BTN = {
   resume: 'เล่นต่อ',
   shelf: 'ชั้นสมุด',
   copy: 'คัดลอกสรุป',
+  share: 'แชร์ชีวิตนี้',
 };
 
 // ช่วยจริง (B145): ลงเฉพาะหน่วยที่อ่านเบอร์จากเว็บของหน่วยงานเองแล้ว · หน้าจบเกมขึ้นตามเรื่องที่ชีวิตนั้นเจอ คู่มือรวมทุกหน่วย
@@ -11067,11 +11075,13 @@ function render(card) {
     if (!card.funeral) memo.push(el('p', 'sub', gone ? 'ยังไม่มีงานศพ คนที่บ้านยังรอข่าวอยู่' : 'ไม่มีบันทึกงานศพ'));
     if (card.memo !== 'full') memo.push(shelfButton('เปิดสมุดอนุสรณ์', 'm'));
     rest.append(deathTabs(card, [sum, [chart, eraBox()].filter(Boolean), [fam], [clan], [titlesBox(card)], memo]));
-    // ปุ่มหลักมีปุ่มเดียว · บันทึกภาพ/แชร์/คัดลอก/ชวนเพื่อนเป็นปุ่มรองท้ายการ์ด (ใบ 12 รวมเป็นเมนูแชร์)
+    // ปุ่มหลักมีปุ่มเดียว · บันทึกภาพ/แชร์/คัดลอก/ชวนเพื่อนพับรวมในเมนูแชร์ท้ายการ์ด ไม่แย่งที่ปุ่มไปต่อ
     choices.append(enter(button(BTN.toAfter, null, () => openBook(card))));
-    const share = el('div', 'd-share');
-    share.append(...shareButtons(card), copyButton(() => summaryText(card.age)));
-    if (st.gen === 1) share.append(inviteButton());
+    const share = el('details', 'd-share');
+    const menu = el('div', 'd-share-in');
+    menu.append(...shareButtons(card), copyButton(() => summaryText(card.age)));
+    if (st.gen === 1) menu.append(inviteButton());
+    share.append(el('summary', null, BTN.share), menu);
     rest.append(share);
   } else {
     // ฐานะ/งานอยู่แผงตัวฉัน (ui-redo ใบ 04) · เงินอยู่แผงเงิน (ใบ 07) — ใต้แถบสถานะเหลือแค่เนื้อการ์ด

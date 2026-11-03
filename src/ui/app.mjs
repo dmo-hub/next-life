@@ -1881,11 +1881,13 @@ function render(card) {
     if (!card.funeral) memo.push(el('p', 'sub', gone ? 'ยังไม่มีงานศพ คนที่บ้านยังรอข่าวอยู่' : 'ไม่มีบันทึกงานศพ'));
     if (card.memo !== 'full') memo.push(shelfButton('เปิดสมุดอนุสรณ์', 'm'));
     rest.append(deathTabs(card, [sum, [chart, eraBox()].filter(Boolean), [fam], [clan], [titlesBox(card)], memo]));
-    // ปุ่มหลักมีปุ่มเดียว · บันทึกภาพ/แชร์/คัดลอก/ชวนเพื่อนเป็นปุ่มรองท้ายการ์ด (ใบ 12 รวมเป็นเมนูแชร์)
+    // ปุ่มหลักมีปุ่มเดียว · บันทึกภาพ/แชร์/คัดลอก/ชวนเพื่อนพับรวมในเมนูแชร์ท้ายการ์ด ไม่แย่งที่ปุ่มไปต่อ
     choices.append(enter(button(BTN.toAfter, null, () => openBook(card))));
-    const share = el('div', 'd-share');
-    share.append(...shareButtons(card), copyButton(() => summaryText(card.age)));
-    if (st.gen === 1) share.append(inviteButton());
+    const share = el('details', 'd-share');
+    const menu = el('div', 'd-share-in');
+    menu.append(...shareButtons(card), copyButton(() => summaryText(card.age)));
+    if (st.gen === 1) menu.append(inviteButton());
+    share.append(el('summary', null, BTN.share), menu);
     rest.append(share);
   } else {
     // ฐานะ/งานอยู่แผงตัวฉัน (ui-redo ใบ 04) · เงินอยู่แผงเงิน (ใบ 07) — ใต้แถบสถานะเหลือแค่เนื้อการ์ด
