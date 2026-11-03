@@ -43,7 +43,7 @@ events:
         text: "สมัครเข้ากิลด์นักล่า"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, multipliers: {stats: {health: 1.5}}, text: "ผ่านการทดสอบร่างกาย ได้บัตรนักล่าฝึกหัดพร้อมเครื่องแบบชุดแรก", effects: {ladder: hunter, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.5}}, text: "ผ่านการทดสอบร่างกาย ได้บัตรนักล่าฝึกหัดพร้อมเครื่องแบบชุดแรก", effects: {ladder: hunter, happiness: 1}, sets_flags: [hunter], merit: [{cat: neutral}]}
           - {weight: 1, text: "วิ่งไม่ครบรอบสนาม ครูฝึกให้กลับไปซ้อมแล้วค่อยมาใหม่ปีหน้า", effects: {happiness: -1}, merit: [{cat: neutral}]}
       - id: volunteer
         text: "เป็นอาสากู้ภัยหน้าเกตแทน"

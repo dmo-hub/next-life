@@ -13,13 +13,15 @@ import { SIN_CATS } from '../../engine/merit.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 // คนที่ when.kin_illness เลือกได้ = พ่อแม่ + คนในบ้านที่แกนออกการ์ดแจ้งป่วย (เพื่อนรุ่นไม่แจ้ง)
 const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
+// ตายในดันเจียนไม่มีกลุ่มสาเหตุของตัวเอง — ลงกลุ่มบาดเจ็บเดิมให้ด่าน causes และสถิติตายตามอายุยังเทียบ WHO ได้
+const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'focus'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   debt: ['kind', 'amount'],
@@ -571,6 +573,20 @@ export const rules = [
       for (const [m, at] of mults) {
         const v = isObj(m) ? m.rank : undefined;
         if (v !== undefined && !positive(v)) r(`${at}.rank`, 'ต้องเป็นเลขบวก');
+      }
+    },
+  },
+  {
+    // คนถูกดึงเข้าดันเจียนครั้งแรกรอดเสมอ ⇒ ทางตายต้องอยู่หลังตัวเลือกที่ล็อกให้นักล่าเท่านั้น
+    id: 'dungeon-die',
+    desc: `effects.die = ${DUNGEON_CAUSES.join('|')} (ตายในดันเจียน · กลุ่มสาเหตุเดิมใน data/death-causes.json) — ใช้ได้เฉพาะผลสุ่มของตัวเลือกที่ requires.flags.has มี hunter`,
+    event(e, ctx, r) {
+      for (const { node, path, choice } of effectSites(e)) {
+        const d = isObj(node.effects) ? node.effects.die : undefined;
+        if (d === undefined) continue;
+        if (!DUNGEON_CAUSES.includes(d)) r(`${path}.effects.die`, `ต้องเป็น ${DUNGEON_CAUSES.join('|')} ได้ ${JSON.stringify(d)}`);
+        else if (node === choice) r(`${path}.effects.die`, 'ใช้ได้แค่ในผลสุ่ม (outcomes) — การ์ดผลต้องเล่าเหตุก่อนมรณบัตร');
+        else if (!list(choice.requires?.flags?.has).includes('hunter')) r(`${path}.effects.die`, 'ตัวเลือกต้อง requires.flags.has มี hunter — คนถูกดึงเข้าดันเจียนรอดเสมอ');
       }
     },
   },

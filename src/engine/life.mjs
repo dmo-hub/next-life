@@ -1659,9 +1659,14 @@ export function choose(st, idx, loan) {
   // การ์ดที่ตัวเลือกนี้ก่อ (ผล → เรื่องต่อ → หางาน) เข้าหัวคิวตามลำดับ ก่อนการ์ดอื่นของปีที่รออยู่
   // สายมูก่อการ์ดของตัวเองได้ (ผลหวยสายมู) — มาก่อนผลสุ่มของตัวเลือก
   const after = beliefChoice(st, ev, c);
+  let doom, wound;
   if (c.outcomes?.length) {
     const o = weighted(st.rng, c.outcomes, outcomeWeights(st, ev, c));
-    const helper = !o.ok && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
+    doom = o.effects?.die;
+    // ตัวเลือกที่มีทางตาย (ห้องบอส): ชีวิตหมดจากบาดแผลทางอื่นของตัวเลือกเดียวกันก็ตายในดันเจียน ไม่ใช่ด้วยโรค
+    wound = c.outcomes.find((x) => x.effects?.die)?.effects.die;
+    // ตายในการ์ด ญาติประคองไม่ได้ — ป้าย "หนักแค่ครึ่งเดียว" จะขัดกับมรณบัตรใบถัดไป
+    const helper = !o.ok && !doom && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
     applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1);
     applyChoice(st, ev, o, text);
     if (c.filial) filialNote(st, c.filial, filialScore(o.merit), true);
@@ -1685,8 +1690,9 @@ export function choose(st, idx, loan) {
   }
   // ชีวิตหมดจากผลการ์ด = ตายในการ์ดนั้น (B160) ไม่รอขอบปี · การ์ดผลยังเล่าก่อน · เรื่องต่อ หางาน และการ์ดที่รอในปีนั้นไม่ออกแล้ว
   // การ์ดงานศพเลือกหลังตายแล้ว ⇒ ไม่ตัดสินซ้ำ
-  if (!st.dead && !st.court && st.health <= 0) {
-    const d = faceDeath(st, healthCause(st), { afterQueue: true });
+  // ผลที่สั่งตาย (ดันเจียนของนักล่า) เดินทางเดียวกัน แต่สาเหตุมาจากการ์ด ไม่ใช่โรคตามสุขภาพ
+  if (!st.dead && !st.court && (doom || st.health <= 0)) {
+    const d = faceDeath(st, doom ?? wound ?? healthCause(st), { afterQueue: true });
     st.queue = after.filter((x) => x.kind === 'result');
     st.due = [];
     if (d.fate === 'dead') queueFuneral(st);

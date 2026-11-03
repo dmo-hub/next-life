@@ -13,6 +13,7 @@
 //   (6) การ์ดข่าวลือขั้น 1 (ใบ 09): ฝั่งข้ามโลกออก > 0 · ตัวควบคุมไม่ข้ามโลกออก 0 — นับจากบันทึกการ์ดที่ออกของแต่ละชีวิต
 //   (7) ขั้นที่ชาติต่างโลกเห็น (ใบ 15): ทุกชาติ (ทริป · เกิด · ถูกเรียก) เห็นขั้นเท่าขั้นของตระกูลตอนข้าม · การ์ดต่างโลกขั้น ≥ 1 ออก > 0 และไม่ออกในชาติขั้น 0
 //   (10) สายนักล่า (ใบ 19): ขั้น 3 เข้าสายผ่านการ์ดรับสมัคร ชื่องานเป็นขั้นนักล่า เลื่อนขั้นได้ · ขั้น 0–1 เข้าสาย 0 · ปฏิเสธการ์ดแล้วทำงานบริการไม่ถูกจับเข้าสาย
+//   (11) ดันเจียนไทย (ใบ 21): ขั้น 3 รอบละ 2–3 ใบ · คนถูกดึงตายในดันเจียน 0 · นักล่าตายด้วย accident/assault · ค่าซ้อนไม่ขยับ · ขั้น 0–1 ไม่เจอ
 import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, overlapStageOf, overlapPlan, PATHS, ENTRY } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
@@ -386,4 +387,112 @@ if (fails.length) {
     console.log(`ด่านสายนักล่าตก ${hunterFails.length} ข้อ`);
     process.exitCode = 1;
   } else console.log('ด่านสายนักล่าผ่าน');
+}
+
+// (11) ดันเจียนไทย (ใบ 21): ขั้น 3 เจอดันเจียน 2–3 ใบต่อรอบ · คนถูกดึง (ไม่ใช่นักล่า) ตายในดันเจียน 0 · นักล่าตายได้จริงด้วยกลุ่มสาเหตุเดิม · ค่าซ้อนไม่ขยับจากดันเจียน
+// id ใบและสาเหตุเขียนจากสเปก (decisions 52 53 79) ไม่อ่านจาก content · บล็อกแยกท้ายไฟล์แบบ (10) · ยืมเกณฑ์ขั้น 2–3 เฉพาะช่วงนัดและเล่นชีวิตนั้น
+{
+  const { OVERLAP_STAGE_MIN } = await import('../src/engine/index.mjs');
+  const RECRUIT = 'overlap_hunter_recruit_01';
+  const ENTRIES = ['overlap_dungeon_01', 'overlap_dungeon_02', 'overlap_dungeon_03', 'overlap_dungeon_04'];
+  const INNER = ['dungeon_hunt_mid_01', 'dungeon_hunt_boss_01', 'dungeon_pull_mid_01', 'dungeon_pull_out_01'];
+  const CAUSES = ['accident', 'assault'];
+  const isDungeon = (id) => ENTRIES.includes(id) || INNER.includes(id);
+  const dunFails = [];
+  // นักล่า: สมัครเสมอ แล้วเลือกนำทีมทุกครั้งที่เปิด (ตัวเลือกแรกของใบเข้า) · ใบกลาง/บอสเลือกตามบุคลิก = นักล่ากลาง
+  const hunterBot = (bot) => Object.assign((card, rng, h) => ((card.id === RECRUIT || ENTRIES.includes(card.id)) && open(card, 0) ? 0 : bot(card, rng, h)), bot);
+  // คนทั่วไป: ไม่สมัครนักล่าเลย (ตัวเลือกสุดท้ายของใบรับสมัคร) ⇒ ทางเดียวที่เข้าดันเจียนคือถูกดึง
+  const civBot = (bot) => Object.assign((card, rng, h) => (card.id === RECRUIT ? card.choices.length - 1 : bot(card, rng, h)), bot);
+  const tally = () => ({ lives: 0, withRun: 0, runs: 0, avoided: 0, badLen: 0, lens: [0, 0, 0, 0], deaths: 0, direct: 0, illDuring: 0, badCause: 0, ovMoved: 0, ages: [] });
+  const hun = tally();
+  const civ = tally();
+  const low = { lives: 0, cards: 0 };
+  const watch = (t, life) => (card, s) => {
+    // ผลสั่งตายตั้ง dead ก่อนการ์ดผลของมันขึ้นจอ ⇒ เห็น dead ครั้งแรกบนการ์ดผลขณะรอบยังเปิด = ตายในดันเจียน
+    // ตายขอบปีหลังรอบจบ ใบแรกที่เห็นคืองานศพ/มรณบัตร ไม่ใช่การ์ดผล — ไม่นับ
+    // สุขภาพหมดอยู่ก่อนเปิดใบ (โรคที่นัดตายไว้) = ตายระหว่างรอบแต่ไม่ใช่ดันเจียนฆ่า — แยกนับ ไม่เข้าเกณฑ์ "ถูกดึงตาย 0"
+    if (s.dead && !life.deadSeen) {
+      life.deadSeen = true;
+      if (life.run && card.kind === 'result' && life.hp <= 0) t.illDuring++;
+      else if (life.run && card.kind === 'result') {
+        t.deaths++;
+        // สุขภาพยังเหลือตอนตาย = ทางตายของการ์ดสั่ง (die) · หมดแล้ว = บาดแผลทางอื่นของตัวเลือกเดียวกัน
+        if (s.health > 0) t.direct++;
+        if (!CAUSES.includes(s.cause)) t.badCause++;
+      }
+    }
+    if (card.kind === 'result') return;
+    if (life.run && !INNER.includes(card.id)) close(t, life, s);
+    if (ENTRIES.includes(card.id)) life.run = { len: 1, ov: overlapOf(s) };
+    else if (life.run && INNER.includes(card.id)) life.run.len++;
+    life.hp = s.health;
+  };
+  const close = (t, life, s) => {
+    if (overlapOf(s) !== life.run.ov) t.ovMoved++;
+    // จบที่ใบเข้า = กดส่งต่อ/หลบ ไม่ได้เข้าดันเจียน — ไม่นับเป็นรอบ
+    if (life.run.len === 1) t.avoided++;
+    else {
+      t.runs++;
+      t.lens[Math.min(life.run.len, 3)]++;
+      if (life.run.len > 3) t.badLen++;
+      life.runs++;
+    }
+    life.run = null;
+  };
+  const playStage3 = (k, bot, t, hunter) => {
+    const life = { run: null, deadSeen: false, runs: 0 };
+    const keep = [OVERLAP_STAGE_MIN[2], OVERLAP_STAGE_MIN[3]];
+    OVERLAP_STAGE_MIN[2] = 2;
+    OVERLAP_STAGE_MIN[3] = 3;
+    try {
+      const s = newLife(mixSeed(seed ^ 0x4e21, k), content);
+      s.overlap = 3;
+      // การ์ดรับสมัครออกแค่บางชีวิต (กินช่องโควตาเดียวกัน) ⇒ วัดอัตราตายต่อรอบด้วยบัตรนักล่าตั้งแต่เกิด
+      if (hunter) s.flags.hunter = true;
+      overlapPlan(s, 0);
+      const { state } = playLife(mixSeed(seed ^ 0x4e21, k), content, bot, watch(t, life), s);
+      if (life.run) close(t, life, state);
+      t.lives++;
+      if (life.runs) t.withRun++;
+      t.ages.push(state.age);
+    } finally {
+      [OVERLAP_STAGE_MIN[2], OVERLAP_STAGE_MIN[3]] = keep;
+    }
+  };
+  let k = 0;
+  for (const [name, base] of Object.entries(BOTS)) {
+    // ขั้นจริง 0–1: ตระกูลข้ามโลกหลายรุ่น ใบดันเจียนต้องไม่โผล่สักใบ
+    for (let i = 0; i < n; i++) {
+      let st;
+      for (let g = 0; g < gens; g++) {
+        const { state } = playLife(mixSeed(seed ^ 0x4e22, i * 7919 + g), content, crosser(base), (card) => isDungeon(card.id) && low.cards++, st ?? undefined);
+        low.lives++;
+        st = nextLife(playAfterlife(state, crosser(base)));
+      }
+    }
+    for (let i = 0; i < n; i++) {
+      playStage3(k, hunterBot(stayer(base)), hun, true);
+      playStage3(k++, civBot(stayer(base)), civ, false);
+    }
+  }
+  const p50 = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)] ?? '-';
+  if (low.cards) dunFails.push(`ชีวิตขั้น 0–1 เจอใบดันเจียน ${low.cards} ใบ`);
+  if (!civ.runs || !hun.runs) dunFails.push(`ขั้น 3 ไม่มีรอบดันเจียน (คนทั่วไป ${civ.runs} · นักล่า ${hun.runs})`);
+  if (civ.deaths) dunFails.push(`คนถูกดึงตายในดันเจียน ${civ.deaths} ครั้ง — ต้อง 0`);
+  // ตัววัดคนตายต้องจับได้จริง: นักล่าที่เข้าห้องบอสหลายร้อยรอบต้องมีคนตาย ไม่งั้น 0 ข้างบนไม่ได้แปลว่าปลอดภัย
+  if (!hun.deaths) dunFails.push('นักล่าไม่ตายในดันเจียนเลย — ตัววัดคนตายไม่ได้วัดอะไร');
+  if (!hun.direct) dunFails.push(`นักล่าตาย ${hun.deaths} ครั้งแต่ไม่มีจากทางตายของการ์ด (die) เลย — ผลสั่งตายไม่ทำงาน`);
+  if (hun.badCause || civ.badCause) dunFails.push(`ตายในดันเจียนด้วยสาเหตุนอก ${CAUSES.join('/')} ${hun.badCause + civ.badCause} ครั้ง`);
+  if (hun.badLen || civ.badLen) dunFails.push(`รอบดันเจียนยาวเกิน 3 ใบ: นักล่า ${hun.badLen} · คนทั่วไป ${civ.badLen}`);
+  if (!hun.lens[2] || !hun.lens[3]) dunFails.push(`รอบนักล่าไม่ครบทั้งแบบ 2 ใบ (${hun.lens[2]}) และ 3 ใบ (${hun.lens[3]})`);
+  if (hun.ovMoved || civ.ovMoved) dunFails.push(`ค่าซ้อนขยับระหว่างรอบดันเจียน ${hun.ovMoved + civ.ovMoved} รอบ`);
+  const line = (label, t) => `  ${label} ${t.lives} ชีวิต: มีดันเจียน ${pct(t.withRun, t.lives)} · ${t.runs} รอบ (${(t.runs / (t.lives || 1)).toFixed(2)}/ชีวิต) ยาว 2 ใบ ${t.lens[2]} · 3 ใบ ${t.lens[3]} · หลบ/ส่งต่อ ${t.avoided} · ตายในดันเจียน ${t.deaths} (${pct(t.deaths, t.runs)}/รอบ · ทางตายตรง ${t.direct}) · โรคถึงคิวระหว่างรอบ ${t.illDuring} · ค่าซ้อนขยับ ${t.ovMoved} · อายุตาย p50 ${p50(t.ages)}`;
+  console.log(`\nดันเจียนไทย (ใบ 21): ขั้น 0–1 ${low.lives} ชีวิต ใบดันเจียน ${low.cards}`);
+  console.log(line('นักล่า (ยืมขั้น 3 · บัตรตั้งแต่เกิด)', hun));
+  console.log(line('คนทั่วไป (ยืมขั้น 3)', civ));
+  if (dunFails.length) {
+    for (const f of dunFails) console.log(`✗ ${f}`);
+    console.log(`ด่านดันเจียนตก ${dunFails.length} ข้อ`);
+    process.exitCode = 1;
+  } else console.log('ด่านดันเจียนผ่าน');
 }
