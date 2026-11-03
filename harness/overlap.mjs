@@ -11,7 +11,8 @@
 //   (4) ค่าไม่ลดระหว่างรุ่นในทุกบอท
 //   (5) เริ่มตระกูลใหม่ (newLife ไม่มี heir) = 0 แม้ตระกูลก่อนหน้าค่าสูง
 //   (6) การ์ดข่าวลือขั้น 1 (ใบ 09): ฝั่งข้ามโลกออก > 0 · ตัวควบคุมไม่ข้ามโลกออก 0 — นับจากบันทึกการ์ดที่ออกของแต่ละชีวิต
-import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, PATHS, ENTRY } from '../src/engine/index.mjs';
+//   (7) ขั้นที่ชาติต่างโลกเห็น (ใบ 15): ทุกชาติ (ทริป · เกิด · ถูกเรียก) เห็นขั้นเท่าขั้นของตระกูลตอนข้าม · การ์ดต่างโลกขั้น ≥ 1 ออก > 0 และไม่ออกในชาติขั้น 0
+import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, overlapStageOf, PATHS, ENTRY } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
 
@@ -26,6 +27,26 @@ const seed = opt('seed', 1);
 const content = loadContent();
 const RUMOR = 'overlap_rumor_';
 const rumorsOf = (state) => Object.entries(state.fired ?? {}).reduce((s, [id, f]) => s + (id.startsWith(RUMOR) ? f.n : 0), 0);
+const ISK_CARD = 'cp_overlap_';
+// ค่าตระกูลไม่ขยับระหว่างที่ชาติต่างโลกยังเล่นอยู่ (ทริปเหยียบตอนกลับ · ปรโลกเหยียบก่อนส่ง) ⇒ ขั้นของตระกูล ณ การ์ดแรกของชาติ = ขั้นตอนข้าม
+// ค่าตระกูลเองตรวจแยกแล้วที่ด่าน (1) จึงเทียบกับ overlapStageOf ของตระกูลได้ตรง ๆ
+const watchIsekai = (r) => {
+  const seen = new WeakSet();
+  return (card, isk, family) => {
+    if (!isk) return;
+    const got = isk.overlapStage ?? 0;
+    if (!seen.has(isk)) {
+      seen.add(isk);
+      r.iskLives++;
+      r.iskStage[got] = (r.iskStage[got] ?? 0) + 1;
+      if (got !== overlapStageOf(family)) r.iskBad++;
+    }
+    if (card.id?.startsWith(ISK_CARD)) {
+      r.iskCard++;
+      if (got < 1) r.iskCardBad++;
+    }
+  };
+};
 
 const P_ISEKAI = PATHS.findIndex((p) => p.id === 'isekai');
 const P_REBORN = PATHS.findIndex((p) => p.id === 'reborn');
@@ -62,15 +83,16 @@ const fail = (msg) => fails.push(msg);
 let resetChecked = 0;
 for (const [name, base] of Object.entries(BOTS)) {
   for (const [mode, bot] of [['ข้าม', crosser(base)], ['ไม่ข้าม', stayer(base)]]) {
-    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, rumor: 0, bad: 0, drop: 0, families: 0, top: 0 };
+    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, rumor: 0, bad: 0, drop: 0, families: 0, top: 0, iskLives: 0, iskStage: {}, iskBad: 0, iskCard: 0, iskCardBad: 0 };
     rows.push(r);
+    const watch = watchIsekai(r);
     for (let i = 0; i < n; i++) {
       let st = null;
       let prev = 0;
       let left = false;
       for (let g = 0; g < gens; g++) {
         const start = overlapOf(st);
-        const { state } = playLife(mixSeed(seed, i * 7919 + g), content, bot, null, st ?? undefined);
+        const { state } = playLife(mixSeed(seed, i * 7919 + g), content, bot, (card, s) => watch(card, s.trip, s), st ?? undefined);
         const home = (state.trips ?? []).filter((t) => t.home).length;
         let reTrip = 0;
         for (const t of state.trips ?? []) {
@@ -87,7 +109,7 @@ for (const [name, base] of Object.entries(BOTS)) {
         prev = v;
         r.byGen[g].push(v);
         if (g === gens - 1) break;
-        const af = playAfterlife(state, bot);
+        const af = playAfterlife(state, bot, (card, a) => watch(card, a.isekai, a.st));
         const back = af.isekaiLives.length ? 1 : 0;
         const reBorn = back && left ? 1 : 0;
         if (back) left = true;
@@ -111,6 +133,9 @@ for (const [name, base] of Object.entries(BOTS)) {
     if (r.drop) fail(`${name} ${mode}: ค่าลดระหว่างรุ่น ${r.drop} ตระกูล`);
     if (mode === 'ไม่ข้าม' && r.byGen.some((vs) => vs.some((v) => v !== 0))) fail(`${name} ไม่ข้าม: ค่าไม่เป็น 0`);
     if (mode === 'ไม่ข้าม' && r.rumor) fail(`${name} ไม่ข้าม: การ์ดข่าวลือออก ${r.rumor} ครั้ง`);
+    if (r.iskBad) fail(`${name} ${mode}: ชาติต่างโลกเห็นขั้นไม่ตรงขั้นตระกูลตอนข้าม ${r.iskBad} ชาติ`);
+    if (r.iskCardBad) fail(`${name} ${mode}: การ์ด ${ISK_CARD}* ออกในชาติต่างโลกขั้น 0 ${r.iskCardBad} ครั้ง`);
+    if (mode === 'ไม่ข้าม' && r.iskCard) fail(`${name} ไม่ข้าม: การ์ด ${ISK_CARD}* ออก ${r.iskCard} ครั้ง`);
   }
 }
 
@@ -123,6 +148,10 @@ if (!sum('reTrip')) fail('ไม่มีตัวอย่างเข้าต
 if (!sum('reBorn')) fail('ไม่มีตัวอย่างเข้าต่างโลกซ้ำทางเกิด/ถูกเรียก');
 if (!resetChecked) fail('ไม่ได้ตรวจเริ่มตระกูลใหม่สักครั้ง');
 if (!sum('rumor')) fail('ฝั่งข้ามโลกไม่มีการ์ดข่าวลือออกเลย');
+const iskStage = {};
+for (const r of cross) for (const [k, v] of Object.entries(r.iskStage)) iskStage[k] = (iskStage[k] ?? 0) + v;
+if (!iskStage[1]) fail('ไม่มีชาติต่างโลกที่เห็นขั้น ≥ 1 — ตัววัดขั้นฝั่งต่างโลกไม่ได้วัดอะไร');
+if (!sum('iskCard')) fail(`ฝั่งข้ามโลกไม่มีการ์ด ${ISK_CARD}* ออกเลย`);
 
 const mean = (vs) => (vs.length ? vs.reduce((s, v) => s + v, 0) / vs.length : 0);
 const pct = (c, t) => `${t ? ((c / t) * 100).toFixed(1) : '0.0'}%`;
@@ -144,10 +173,12 @@ console.log(`\nค่าตอนจบรุ่น ${gens} (ฝั่งข้�
 console.log(`\nตัวควบคุมไม่ข้ามโลก: ${rows.filter((r) => r.mode === 'ไม่ข้าม').every((r) => r.byGen.every((vs) => vs.every((v) => v === 0))) ? '0 ทุกรุ่นทุกบอท ผ่าน' : 'มีค่า > 0 ตก'}`);
 console.log(`เริ่มตระกูลใหม่ตรวจ ${resetChecked} ครั้ง`);
 console.log(`การ์ดข่าวลือ (${RUMOR}*): ข้าม ${sum('rumor')} ครั้ง · ไม่ข้าม ${rows.filter((r) => r.mode === 'ไม่ข้าม').reduce((s, r) => s + r.rumor, 0)} ครั้ง`);
+console.log(`ขั้นที่ชาติต่างโลกเห็น (ฝั่งข้ามโลก ${sum('iskLives')} ชาติ): ${Object.keys(iskStage).sort().map((k) => `ขั้น ${k} = ${iskStage[k]}`).join(' · ')} · ไม่ตรงขั้นตระกูลตอนข้าม ${rows.reduce((s, r) => s + r.iskBad, 0)}`);
+console.log(`การ์ดต่างโลก (${ISK_CARD}*): ข้าม ${sum('iskCard')} ครั้ง · ออกในชาติขั้น 0 ${rows.reduce((s, r) => s + r.iskCardBad, 0)} · ไม่ข้าม ${rows.filter((r) => r.mode === 'ไม่ข้าม').reduce((s, r) => s + r.iskCard, 0)}`);
 if (fails.length) {
   for (const f of fails) console.log(`✗ ${f}`);
   console.log(`ด่านค่าซ้อนทับตก ${fails.length} ข้อ`);
   process.exitCode = 1;
 } else {
-  console.log(`ด่านค่าซ้อนทับผ่าน: บัญชีเหยียบซ้ำตรงทุกชีวิต · เกิดกลับ ${sum('born')} · ทริปกลับบ้าน ${sum('trip')} · เข้าซ้ำ ทริป ${sum('reTrip')} เกิด ${sum('reBorn')} · ทริปหลงไม่นับ ${sum('lost')} · ข่าวลือออก ${sum('rumor')} · ค่าไม่ลด · ตัวควบคุม = 0`);
+  console.log(`ด่านค่าซ้อนทับผ่าน: บัญชีเหยียบซ้ำตรงทุกชีวิต · เกิดกลับ ${sum('born')} · ทริปกลับบ้าน ${sum('trip')} · เข้าซ้ำ ทริป ${sum('reTrip')} เกิด ${sum('reBorn')} · ทริปหลงไม่นับ ${sum('lost')} · ข่าวลือออก ${sum('rumor')} · ชาติต่างโลกเห็นขั้นตรง ${sum('iskLives')} ชาติ · การ์ดต่างโลกขั้น ≥ 1 ออก ${sum('iskCard')} · ค่าไม่ลด · ตัวควบคุม = 0`);
 }
