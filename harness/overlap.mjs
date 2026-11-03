@@ -10,6 +10,7 @@
 //   (3) ตัวควบคุมไม่ข้ามโลก = 0 ทุกรุ่น
 //   (4) ค่าไม่ลดระหว่างรุ่นในทุกบอท
 //   (5) เริ่มตระกูลใหม่ (newLife ไม่มี heir) = 0 แม้ตระกูลก่อนหน้าค่าสูง
+//   (6) การ์ดข่าวลือขั้น 1 (ใบ 09): ฝั่งข้ามโลกออก > 0 · ตัวควบคุมไม่ข้ามโลกออก 0 — นับจากบันทึกการ์ดที่ออกของแต่ละชีวิต
 import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, PATHS, ENTRY } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
@@ -23,6 +24,8 @@ const n = opt('n', 200);
 const gens = opt('gens', 4);
 const seed = opt('seed', 1);
 const content = loadContent();
+const RUMOR = 'overlap_rumor_';
+const rumorsOf = (state) => Object.entries(state.fired ?? {}).reduce((s, [id, f]) => s + (id.startsWith(RUMOR) ? f.n : 0), 0);
 
 const P_ISEKAI = PATHS.findIndex((p) => p.id === 'isekai');
 const P_REBORN = PATHS.findIndex((p) => p.id === 'reborn');
@@ -59,7 +62,7 @@ const fail = (msg) => fails.push(msg);
 let resetChecked = 0;
 for (const [name, base] of Object.entries(BOTS)) {
   for (const [mode, bot] of [['ข้าม', crosser(base)], ['ไม่ข้าม', stayer(base)]]) {
-    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, bad: 0, drop: 0, families: 0, top: 0 };
+    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, rumor: 0, bad: 0, drop: 0, families: 0, top: 0 };
     rows.push(r);
     for (let i = 0; i < n; i++) {
       let st = null;
@@ -75,6 +78,7 @@ for (const [name, base] of Object.entries(BOTS)) {
           if (t.home) left = true;
         }
         r.trip += home;
+        r.rumor += rumorsOf(state);
         r.reTrip += reTrip;
         if (state.tripLost) r.lost++;
         if (overlapOf(state) - start !== home + reTrip) r.bad++;
@@ -106,6 +110,7 @@ for (const [name, base] of Object.entries(BOTS)) {
     if (r.bad) fail(`${name} ${mode}: บัญชีเหยียบซ้ำไม่ตรง ${r.bad} จุด`);
     if (r.drop) fail(`${name} ${mode}: ค่าลดระหว่างรุ่น ${r.drop} ตระกูล`);
     if (mode === 'ไม่ข้าม' && r.byGen.some((vs) => vs.some((v) => v !== 0))) fail(`${name} ไม่ข้าม: ค่าไม่เป็น 0`);
+    if (mode === 'ไม่ข้าม' && r.rumor) fail(`${name} ไม่ข้าม: การ์ดข่าวลือออก ${r.rumor} ครั้ง`);
   }
 }
 
@@ -117,15 +122,16 @@ if (!sum('trip')) fail('ไม่มีตัวอย่างทริปก�
 if (!sum('reTrip')) fail('ไม่มีตัวอย่างเข้าต่างโลกซ้ำทางทริป');
 if (!sum('reBorn')) fail('ไม่มีตัวอย่างเข้าต่างโลกซ้ำทางเกิด/ถูกเรียก');
 if (!resetChecked) fail('ไม่ได้ตรวจเริ่มตระกูลใหม่สักครั้ง');
+if (!sum('rumor')) fail('ฝั่งข้ามโลกไม่มีการ์ดข่าวลือออกเลย');
 
 const mean = (vs) => (vs.length ? vs.reduce((s, v) => s + v, 0) / vs.length : 0);
 const pct = (c, t) => `${t ? ((c / t) * 100).toFixed(1) : '0.0'}%`;
 console.log(`ด่านค่าซ้อนทับ · ${Object.keys(BOTS).join(' · ')} × ${n} ตระกูล × ${gens} รุ่น × (ข้าม + ไม่ข้าม) · seed ${seed} · ${((Date.now() - started) / 1000).toFixed(0)} วิ\n`);
 const genHead = Array.from({ length: gens }, (_, g) => `รุ่น ${g + 1}`.padStart(13)).join('');
-console.log(`${'บอท'.padEnd(14)}${'แบบ'.padEnd(9)}${genHead}  เกิดกลับ  ทริปกลับ  เข้าซ้ำทริป  เข้าซ้ำเกิด  ทริปหลง  ต่างโลกติดกัน  ตระกูล>0  สูงสุด`);
+console.log(`${'บอท'.padEnd(14)}${'แบบ'.padEnd(9)}${genHead}  เกิดกลับ  ทริปกลับ  เข้าซ้ำทริป  เข้าซ้ำเกิด  ทริปหลง  ต่างโลกติดกัน  ข่าวลือ  ตระกูล>0  สูงสุด`);
 for (const r of rows) {
   const cells = r.byGen.map((vs) => `${mean(vs).toFixed(2)}/${pct(vs.filter((v) => v > 0).length, vs.length)}`.padStart(13)).join('');
-  console.log(`${r.name.padEnd(14)}${r.mode.padEnd(9)}${cells}  ${String(r.born).padStart(8)}  ${String(r.trip).padStart(8)}  ${String(r.reTrip).padStart(10)}  ${String(r.reBorn).padStart(9)}  ${String(r.lost).padStart(7)}  ${String(r.chain).padStart(13)}  ${pct(r.families, n).padStart(8)}  ${String(r.top).padStart(6)}`);
+  console.log(`${r.name.padEnd(14)}${r.mode.padEnd(9)}${cells}  ${String(r.born).padStart(8)}  ${String(r.trip).padStart(8)}  ${String(r.reTrip).padStart(10)}  ${String(r.reBorn).padStart(9)}  ${String(r.lost).padStart(7)}  ${String(r.chain).padStart(13)}  ${String(r.rumor).padStart(6)}  ${pct(r.families, n).padStart(8)}  ${String(r.top).padStart(6)}`);
 }
 console.log('  (ช่องรุ่น = ค่าเฉลี่ยตอนจบชีวิต / สัดส่วนตระกูลที่ค่า > 0)');
 
@@ -137,10 +143,11 @@ console.log(`\nค่าตอนจบรุ่น ${gens} (ฝั่งข้�
 
 console.log(`\nตัวควบคุมไม่ข้ามโลก: ${rows.filter((r) => r.mode === 'ไม่ข้าม').every((r) => r.byGen.every((vs) => vs.every((v) => v === 0))) ? '0 ทุกรุ่นทุกบอท ผ่าน' : 'มีค่า > 0 ตก'}`);
 console.log(`เริ่มตระกูลใหม่ตรวจ ${resetChecked} ครั้ง`);
+console.log(`การ์ดข่าวลือ (${RUMOR}*): ข้าม ${sum('rumor')} ครั้ง · ไม่ข้าม ${rows.filter((r) => r.mode === 'ไม่ข้าม').reduce((s, r) => s + r.rumor, 0)} ครั้ง`);
 if (fails.length) {
   for (const f of fails) console.log(`✗ ${f}`);
   console.log(`ด่านค่าซ้อนทับตก ${fails.length} ข้อ`);
   process.exitCode = 1;
 } else {
-  console.log(`ด่านค่าซ้อนทับผ่าน: บัญชีเหยียบซ้ำตรงทุกชีวิต · เกิดกลับ ${sum('born')} · ทริปกลับบ้าน ${sum('trip')} · เข้าซ้ำ ทริป ${sum('reTrip')} เกิด ${sum('reBorn')} · ทริปหลงไม่นับ ${sum('lost')} · ค่าไม่ลด · ตัวควบคุม = 0`);
+  console.log(`ด่านค่าซ้อนทับผ่าน: บัญชีเหยียบซ้ำตรงทุกชีวิต · เกิดกลับ ${sum('born')} · ทริปกลับบ้าน ${sum('trip')} · เข้าซ้ำ ทริป ${sum('reTrip')} เกิด ${sum('reBorn')} · ทริปหลงไม่นับ ${sum('lost')} · ข่าวลือออก ${sum('rumor')} · ค่าไม่ลด · ตัวควบคุม = 0`);
 }
