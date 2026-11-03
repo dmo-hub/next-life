@@ -10,6 +10,7 @@
 //   (3) ตัวควบคุมไม่ข้ามโลก = 0 ทุกรุ่น
 //   (4) ค่าไม่ลดระหว่างรุ่นในทุกบอท
 //   (5) เริ่มตระกูลใหม่ (newLife ไม่มี heir) = 0 แม้ตระกูลก่อนหน้าค่าสูง
+//   (9) ผีบรรพบุรุษขั้น 2 (ใบ 18): ขั้น 0–1 ออก 0 · ขั้น 2 ข้อความตรงแถวชาติไทยล่าสุดในผัง · ต้องออก > 0
 //   (6) การ์ดข่าวลือขั้น 1 (ใบ 09): ฝั่งข้ามโลกออก > 0 · ตัวควบคุมไม่ข้ามโลกออก 0 — นับจากบันทึกการ์ดที่ออกของแต่ละชีวิต
 //   (7) ขั้นที่ชาติต่างโลกเห็น (ใบ 15): ทุกชาติ (ทริป · เกิด · ถูกเรียก) เห็นขั้นเท่าขั้นของตระกูลตอนข้าม · การ์ดต่างโลกขั้น ≥ 1 ออก > 0 และไม่ออกในชาติขั้น 0
 //   (10) สายนักล่า (ใบ 19): ขั้น 3 เข้าสายผ่านการ์ดรับสมัคร ชื่องานเป็นขั้นนักล่า เลื่อนขั้นได้ · ขั้น 0–1 เข้าสาย 0 · ปฏิเสธการ์ดแล้วทำงานบริการไม่ถูกจับเข้าสาย
@@ -346,6 +347,53 @@ for (let stage = 0; stage < PLAN_QUOTA.length; stage++) {
   synth.push(`ขั้น ${stage} [${PLAN_QUOTA[stage].join('–')}]: ${[...seen.keys()].sort().map((k) => `${k} ใบ ${seen.get(k)}`).join(' · ')}`);
 }
 
+// (9) ผีบรรพบุรุษขั้น 2 (ใบ 18): ชีวิตขั้น 0–1 ไม่ออกเลย · ขั้น 2 คำเรียก/ชื่อ/จังหวัด/อายุตายบนการ์ด = แถวชาติไทยล่าสุดในผังที่ด่านหาเอง (ไม่เรียก ancestorOf)
+// ขั้น 2 ตระกูลจริงยังไปไม่ถึง (เกณฑ์รอใบ 16) ⇒ ยืมเกณฑ์ขั้น 2 = ค่า 2 เฉพาะตอนสร้างทายาทและเล่นชีวิตนั้น แล้วคืนค่าเดิม
+const { OVERLAP_STAGE_MIN, placeName } = await import('../src/engine/index.mjs');
+const ANCESTOR = 'overlap_ancestor_';
+const ancWho = (l) => (l.sex === 'หญิง' ? (l.age >= 60 ? 'หญิงชรา' : 'ผู้หญิง') : l.age >= 60 ? 'ชายชรา' : 'ผู้ชาย');
+const anc = { low: 0, lowLives: 0, lives: 0, seen: 0, bad: 0, noRow: 0, show: '' };
+for (const [name, base] of Object.entries(BOTS)) {
+  const cross = crosser(base);
+  for (let i = 0; i < n; i++) {
+    let st;
+    let af;
+    for (let g = 0; g < gens; g++) {
+      anc.lowLives++;
+      const { state } = playLife(mixSeed(seed ^ 0x9a05, i * 7919 + g), content, cross, (card) => {
+        if (card.id?.startsWith(ANCESTOR)) anc.low++;
+      }, st ?? undefined);
+      af = playAfterlife(state, cross);
+      st = nextLife(af);
+    }
+    if (overlapOf(af.heir) < 2) continue;
+    const row = af.heir.lineage.findLast((l) => !l.isekai && l.name);
+    if (!row) anc.noRow++;
+    const keep = OVERLAP_STAGE_MIN[2];
+    OVERLAP_STAGE_MIN[2] = 2;
+    try {
+      const heir = nextLife(af);
+      if (overlapStageOf(heir) !== 2) {
+        fail(`${name}: ยืมเกณฑ์แล้วทายาทค่า ${overlapOf(heir)} ไม่ได้ขั้น 2`);
+        continue;
+      }
+      anc.lives++;
+      playLife(mixSeed(seed ^ 0x9a05, i * 7919 + gens), content, stayer(base), (card) => {
+        if (!card.id?.startsWith(ANCESTOR)) return;
+        anc.seen++;
+        const ok = row && [`มี${ancWho(row)}ยืน`, `ชื่อ${row.name} `, `อยู่${placeName(row.province)} `, `อายุ ${row.age} `].every((s) => card.text.includes(s));
+        if (!ok) anc.bad++;
+        else if (!anc.show) anc.show = `${ancWho(row)} ${row.name} ${placeName(row.province)} อายุ ${row.age}`;
+      }, heir);
+    } finally {
+      OVERLAP_STAGE_MIN[2] = keep;
+    }
+  }
+}
+if (anc.low) fail(`การ์ด ${ANCESTOR}* ออกในชีวิตขั้น 0–1 ${anc.low} ครั้ง`);
+if (anc.bad) fail(`การ์ด ${ANCESTOR}* ข้อความไม่ตรงแถวในผัง/ออกทั้งที่ไม่มีแถวไทย ${anc.bad} ใบ`);
+if (!anc.seen) fail(`ไม่มีการ์ด ${ANCESTOR}* ออกในชีวิตขั้น 2 เลย — ตัววัดชื่อจากผังไม่ได้วัดอะไร`);
+
 const mean = (vs) => (vs.length ? vs.reduce((s, v) => s + v, 0) / vs.length : 0);
 const pct = (c, t) => `${t ? ((c / t) * 100).toFixed(1) : '0.0'}%`;
 console.log(`ด่านค่าซ้อนทับ · ${Object.keys(BOTS).join(' · ')} × ${n} ตระกูล × ${gens} รุ่น × (ข้าม + ไม่ข้าม) · seed ${seed} · ${((Date.now() - started) / 1000).toFixed(0)} วิ\n`);
@@ -388,6 +436,7 @@ const saves = cross.flatMap((r) => r.saveBytes);
 const deads = cross.flatMap((r) => r.deadBytes);
 const kb = (b) => `${(b / 1024).toFixed(1)} KB`;
 if (saves.length) console.log(`ขนาดเซฟรุ่น ${gens} (ตระกูลค่า > 0 ${saves.length} ตระกูล): เฉลี่ย ${kb(mean(saves))} · สูงสุด ${kb(Math.max(...saves))} · ส่วนรายชื่อคนตาย เฉลี่ย ${kb(mean(deads))} สูงสุด ${kb(Math.max(...deads))} · รายชื่อยาวสุด ${Math.max(...cross.map((r) => r.deadMax))} คน`);
+console.log(`\nผีบรรพบุรุษ (${ANCESTOR}*): ชีวิตขั้น 0–1 ${anc.lowLives} ชีวิต ออก ${anc.low} · ทายาทขั้น 2 (ยืมเกณฑ์) ${anc.lives} ชีวิต ออก ${anc.seen} ใบ ไม่ตรงผัง ${anc.bad} · ไม่มีแถวไทย ${anc.noRow} · ตัวอย่าง ${anc.show || '-'}`);
 if (fails.length) {
   for (const f of fails) console.log(`✗ ${f}`);
   console.log(`ด่านค่าซ้อนทับตก ${fails.length} ข้อ`);
