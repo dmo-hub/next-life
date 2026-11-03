@@ -240,6 +240,8 @@ export function newLife(seed, content, heir = null) {
     fame: heir?.fame ?? 0,
     // ค่าซ้อนทับของตระกูล (overlapOf) — ใส่ช่องเฉพาะเมื่อ > 0 ⇒ ตระกูลที่ไม่เคยข้ามโลกได้สถานะเท่าเดิมทุกไบต์ · เซฟเก่าไม่มีช่อง = 0
     ...(heir?.overlap && { overlap: heir.overlap }),
+    // คนตายที่ตระกูลจำได้ (deadKinOf) — มีเฉพาะตระกูลค่าซ้อน > 0 · เซฟเก่าไม่มีช่อง = ยังไม่มีผีญาติ
+    ...(heir?.deadKin && { deadKin: heir.deadKin }),
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // อายุที่ธงแต่ละตัวติดครั้งแรก — ระหว่างชาติอ่านอายุตอนมีลูก
