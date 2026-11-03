@@ -10,7 +10,7 @@ import { goalsMet } from './titles.mjs';
 import { heirPets } from './family.mjs';
 import { CHRONIC } from './death.mjs';
 import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen } from './life.mjs';
-import { ISEKAI, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
+import { ISEKAI, carryPick, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 import { warnPick } from './warn.mjs';
 
@@ -246,6 +246,8 @@ function sendToIsekai(af) {
     // ค่าโลกจริงตอนข้าม (B100) — รอบต่างโลกติดกันใช้ค่าจริงที่สะท้อนมาจากรอบก่อน
     real: prev?.real ?? realAt(af.st),
     hints: af.st.content.nearHints,
+    // ชุดที่พกตอนเกิดชีวิตไทยนี้ ใช้ต่อทุกชาติต่างโลกที่ตามมาจนเกิดใหม่ (06s)
+    carry: af.st.skills ?? [],
     // โลกจำของที่ชาติต่างโลกก่อน ๆ ทั้งเซฟสร้างไว้ (B68h) — รวมชาติที่เพิ่งจบในช่วงนี้ซึ่งยังไม่ลงผังของชาติไทย
     // ทริปไปกลับของชาตินี้ (B68m) ยังไม่ลงผัง — ส่งเป็นแถวชั่วคราว
     lore: isekaiWorldLore([...(af.st.lineage ?? []), { trips: af.st.trips }, ...af.isekaiLives]),
@@ -475,10 +477,10 @@ function makeHeir(af, r) {
   };
 }
 
-// รุ่นถัดไป: ชีวิตใหม่จาก heir ที่การ์ดส่งต่อสร้างไว้
-export function nextLife(af) {
+// รุ่นถัดไป: ชีวิตใหม่จาก heir ที่การ์ดส่งต่อสร้างไว้ · carry = id สกิลที่ผู้เล่นเลือกพกจากคลัง (06s · bookCarryOffers)
+export function nextLife(af, carry = []) {
   if (!af.heir) throw new Error('ยังไม่ถึงการ์ดส่งต่อ');
-  return newLife(af.heir.seed, af.st.content, af.heir);
+  return newLife(af.heir.seed, af.st.content, { ...af.heir, skills: carryPick(carry) });
 }
 
 // harness/หน้าเว็บเดินช่วงที่ 7 ด้วยฟังก์ชันชุดเดียวกัน · บอทได้ af (มี pending.choices ให้อ่านป้ายบุญบาปแบบเดียวกับการ์ดชีวิต)

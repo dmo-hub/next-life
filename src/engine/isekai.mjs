@@ -52,6 +52,28 @@ export const ISEKAI_SKILLS = {
   rbd: { name: 'ย้อนเวลาเมื่อตาย', desc: 'ตายครั้งแรกเวลาจะย้อนกลับ ฟื้นด้วยชีวิต 40' },
 };
 
+// สกิลข้ามชาติ (06s): carry = พกไปชาติใหม่ได้กี่อย่าง · top = ขั้นสูงสุด · step = โอกาสที่เพิ่มต่อขั้นที่เกินขั้น 1
+// ขั้น 1 ได้ค่าเดิมของสกิล ⇒ ชาติที่ไม่มีการอัปเกรดเดินเท่าก่อนมีขั้น
+export const SKILL = { carry: 3, top: 3, step: 10 };
+const skillLv = (isk, s) => isk.lv?.[s] ?? 1;
+const skillAdd = (isk, s) => (ISEKAI_SKILLS[s].add ?? 20) + SKILL.step * (skillLv(isk, s) - 1);
+// คลังสกิลอยู่ในเครื่องผู้เล่นแบบสมุดฉายา (UI เก็บ ไม่อยู่ในเซฟ) — แกนแค่คำนวณ · จำขั้นสูงสุดที่เคยถึง ไม่ลด
+// ลงซ้ำ = +1 ขั้น · ลงด้วยขั้นที่อัปถึงในชาติ (lv) สูงกว่า = ได้ขั้นนั้น
+export function bookAdd(book, id, lv = 1) {
+  if (!ISEKAI_SKILLS[id]) throw new Error(`ไม่รู้จักสกิล ${id}`);
+  const was = book?.[id] ?? 0;
+  const to = Math.min(SKILL.top, Math.max(was ? was + 1 : 1, lv));
+  return { book: { ...book, [id]: to }, up: to > was };
+}
+export const bookCarryOffers = (book) => Object.keys(ISEKAI_SKILLS).filter((id) => book?.[id] > 0).map((id) => ({ id, name: ISEKAI_SKILLS[id].name, desc: ISEKAI_SKILLS[id].desc, lv: book[id] }));
+// ชุดที่พกไปชาติใหม่ · ทุกตัวเริ่มขั้น 1 แม้คลังจำขั้นสูงกว่า (isd-1)
+export function carryPick(ids = []) {
+  if (ids.length > SKILL.carry) throw new Error(`พกได้ไม่เกิน ${SKILL.carry} อย่าง`);
+  if (new Set(ids).size !== ids.length) throw new Error('พกสกิลซ้ำ');
+  for (const id of ids) if (!ISEKAI_SKILLS[id]) throw new Error(`ไม่รู้จักสกิล ${id}`);
+  return ids.map((id) => ({ id, lv: 1 }));
+}
+
 export const ISEKAI_WORLDS = {
   hero: {
     name: 'ผู้กล้าที่ถูกอัญเชิญ', pitch: 'ถูกเรียกมาพร้อมคนแปลกหน้าอีกสามคนจากโลกเดิม พระราชาขอให้ปราบจอมมาร',
@@ -1554,7 +1576,8 @@ export function entryCard(st, stage) {
 // trip = ไปกลับกลางชีวิต (B68m · tripRoll + age/wit จากชีวิตไทย) — ข้ามห้องสีขาว บทบาทมาจากการทอย เริ่มที่อายุไทย เลือกกลับบนการ์ดทางกลับ = จบแบบกลับบ้าน
 // legends = คนต่างโลกรุ่นก่อนที่แต่ละโลกจำชื่อได้ ({ world: [{ name, ending, dark }] } จาก isekaiWorldLegends)
 // legacy = เริ่มด้วยแฟ้มบทบาท 4 โลกเดิม — เส้นทดสอบของ harness เท่านั้น (ผู้เล่นใหม่เข้าไม่ได้) จนกว่าการ์ด 4 โลกจะถูกลบ (06c)
-export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null, hints = null, legacy = false }) {
+// carry = สกิลที่พกมาจากชีวิตไทยของดวงวิญญาณนี้ [{ id, lv }] (06s) — ของขวัญของชาติสุ่มจากที่เหลือ
+export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null, hints = null, legacy = false, carry = [] }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
   const vow = blessed ? GODDESS_VOWS[(seed >>> 0) % GODDESS_VOWS.length].id : null;
@@ -1562,8 +1585,11 @@ export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null
     rng, karma, past, run, memory, blessed, fated, ledger, vow, vowKept: null, vowHit: false,
     real: real && { ...real, stats: { ...real.stats } },
     worldOffers: legacy ? isekaiRoleOffers(rng, karma, ISEKAI.worlds + (blessed ? 1 : 0)) : contOffers(rng, CONT_LIFE.offers + (blessed ? 1 : 0)),
-    skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).slice(0, sk),
-    role: null, world: null, name: '', skills: [], st: null, inner: null, flags: {},
+    // สับทั้งรายการก่อนกรองของที่พกมา — เลขสุ่มที่ใช้เท่ากันไม่ว่าพกอะไร
+    skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).filter((s) => !carry.some((c) => c.id === s)).slice(0, sk),
+    role: null, world: null, name: '', skills: carry.map((c) => c.id), st: null, inner: null, flags: {},
+    // isk.lv เก็บเฉพาะสกิลที่เกินขั้น 1 — ชาติที่ไม่มีการอัปเกรด state เท่าก่อนมีขั้น (lifehash)
+    ...(carry.some((c) => c.lv > 1) && { lv: Object.fromEntries(carry.filter((c) => c.lv > 1).map((c) => [c.id, c.lv])) }),
     know: null, knowLast: null, loreAll: lore, worldLore: [], lore: [],
     legendAll: legends, worldLegends: [], legend: null, fameDark: 0, potions: [], lifeAdd: 0,
     age: 0, focus: null, focusOffers: [], stageShown: null, due: null, used: [], later: [], finaleDone: false,
@@ -1622,7 +1648,7 @@ export function isekaiChance(isk, c, withSkills = true) {
   if (!c.stat && !c.know) return null;
   const base = c.know ? isk.know[c.know] + isk.inner.wit * ISEKAI_KNOW_T.wit : isk.st[c.stat];
   let v = 50 + (base - isekaiDc(isk, c)) * 4;
-  if (withSkills) for (const s of isekaiAids(isk, c)) v += ISEKAI_SKILLS[s].add ?? 20;
+  if (withSkills) for (const s of isekaiAids(isk, c)) v += skillAdd(isk, s);
   for (const b of [c.bonus, c.bonus2]) if (b && isk.flags[b.flag]) v += b.add;
   if (c.stat === 'cha') v += isekaiFameCha(isk);
   return isekaiClamp(Math.round(v), 5, 95);
@@ -1690,6 +1716,8 @@ function isekaiBegin(isk, r) {
   for (const k of Object.keys(ISEKAI_STAT)) isk.st[k] = Math.max(1, r.stat[k] + shift);
   if (isk.memory) isk.st[isk.memory] += ISEKAI.memory;
   if (isk.fated) isk.st.luk += GODDESS.fatedLuck;
+  // โชคเทพธิดาที่พกมาได้ผลตั้งแต่เกิดแบบเดียวกับเลือกเป็นของขวัญ (ของขวัญกรองตัวที่พกออกแล้ว ไม่บวกซ้ำ)
+  if (isekaiHas(isk, 'luck')) isk.st.luk += 15;
   isk.inner = { joy: ISEKAI_TIME.joy, wit: ISEKAI_TIME.wit };
   isk.know = Object.fromEntries(Object.keys(ISEKAI_KNOW).map((k) => [k, 0]));
   isk.worldLore = isk.loreAll[isk.world] ?? [];

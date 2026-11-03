@@ -247,6 +247,8 @@ export function newLife(seed, content, heir = null) {
     flags: {},
     // ธงของรุ่นก่อนที่ทายาทได้รู้ {ธง: ชั้น} — แยกจาก flags เพราะ flags คือสิ่งที่ตัวเองเคยทำ (ฉายา/ความเสี่ยงตายอ่านอยู่)
     parentFlags: heir?.parentFlags ?? {},
+    // สกิลที่พกมาจากคลัง [{ id, lv }] (06s) ใช้ทั้งชีวิตนี้และชาติต่างโลกที่ตามมา · ไม่พก = ไม่มีช่อง (state เท่าก่อนมีสกิลข้ามชาติ)
+    ...(heir?.skills?.length && { skills: heir.skills }),
     scheduled: [],
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
@@ -1647,6 +1649,7 @@ export function choose(st, idx, loan) {
         // ค่าจริงของชีวิตนี้ตอนข้าม (B136) — ผลในต่างโลกสะท้อนกลับชุดนี้ แล้ว tripBack เขียนลง st
         real: realAt(st),
         hints: st.content.nearHints,
+        carry: st.skills ?? [],
       });
       return;
     }
