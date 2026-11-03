@@ -400,6 +400,20 @@ const f2 = (v) => v.toFixed(2);
   check('ค่าซ้อนทับ: ทริปกลับบ้าน +1 · ทริปหลงไม่นับ · ทริปหลังเคยกลับ (เข้าซ้ำ) +1', same(tHome) && same(tLost) && same(tAgain), `กลับ ${tHome ?? 'ไม่เจอ'} · หลง ${tLost ?? 'ไม่เจอ'} · เข้าซ้ำ ${tAgain ?? 'ไม่เจอ'}`);
 }
 
+// ขั้นค่าซ้อนทับ (ใบ 09): การ์ดอ่านขั้น ไม่อ่านค่าดิบ · ขั้น 1 = ค่า 1 · ขึ้นขั้นกลางชีวิตแล้วเงื่อนไขเห็นทันที · ตัวคูณยกกำลังตามขั้น
+{
+  const E = await import('../src/engine/index.mjs');
+  const st = newLife(mixSeed(1, 803), loadContent());
+  const rumor = { overlap_stage: [1, 2] };
+  const before = [E.overlapStageOf(st), E.whenOk(st, rumor), E.poolMultiplier(st, { overlap_stage: 3 })];
+  E.overlapStep(st);
+  const after = [E.overlapStageOf(st), E.whenOk(st, rumor), E.poolMultiplier(st, { overlap_stage: 3 }), E.poolMultiplier(st, { overlap_stage: 0 })];
+  check('ขั้นค่าซ้อนทับ: ค่า 0 = ขั้น 0 การ์ดขั้น 1 ไม่ออก ตัวคูณ ×1', before.join() === '0,false,1', before.join());
+  check('ขั้นค่าซ้อนทับ: ขึ้นค่ากลางชีวิต → ขั้น 1 การ์ดออกได้ทันที ตัวคูณ ×3 · ตัวคูณ 0 ปิดการ์ด', after.join() === '1,true,3,0', after.join());
+  st.overlap = 1e6;
+  check('ขั้นค่าซ้อนทับ: ขั้น 2–4 ยังไปไม่ถึงจนใบ 16 ใส่เกณฑ์ (ค่าสูงแค่ไหนก็ขั้น 1)', E.OVERLAP_STAGE_MIN.length === 5 && E.OVERLAP_STAGE_MIN[1] === 1 && E.overlapStageOf(st) === 1, String(E.overlapStageOf(st)));
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {

@@ -68,6 +68,28 @@ const controls = {
 };
 for (const [name, args] of Object.entries(controls)) if (!checkMeritTable(...args).length) fails.push(`merit-table ตัวควบคุม "${name}" ไม่ตก`);
 rows.push(['merit-table ตัวควบคุม', `${Object.keys(controls).length} แบบ`]);
+// ขั้นค่าซ้อนทับ (โลกซ้อนทับ ใบ 09): ทุกเคสเป็นการ์ดเดียวกัน ต่างแค่ช่องนี้ — ตกต้องตกที่ช่อง overlap_stage เท่านั้น ผ่านต้องไม่มีปัญหาเลย
+const overlapCard = (extra) => ({ id: 'overlap_case_01', type: 'A', stage: 'ทำงาน', years: [2500, 2650], weight: 1, text: 'ข้อความการ์ด', ...extra, choices: [1, 2, 3, 4].map((n) => ({ text: `ทางเลือก ${n}`, merit: [{ cat: 'neutral' }] })) });
+const overlapCases = [
+  ['when [1, 2]', { when: { overlap_stage: [1, 2] } }, true],
+  ['when [0, 4]', { when: { overlap_stage: [0, 4] } }, true],
+  ['ตัวคูณ 2', { multipliers: { overlap_stage: 2 } }, true],
+  ['ตัวคูณ 0', { multipliers: { overlap_stage: 0 } }, true],
+  ['when ขั้น 5', { when: { overlap_stage: [1, 5] } }, false],
+  ['when ติดลบ', { when: { overlap_stage: [-1, 2] } }, false],
+  ['when ไม่ใช่จำนวนเต็ม', { when: { overlap_stage: [1.5, 2] } }, false],
+  ['when ข้อความ', { when: { overlap_stage: ['1', 2] } }, false],
+  ['when ตัวเลขเดียว', { when: { overlap_stage: 1 } }, false],
+  ['when min > max', { when: { overlap_stage: [3, 1] } }, false],
+  ['ตัวคูณติดลบ', { multipliers: { overlap_stage: -1 } }, false],
+  ['ตัวคูณข้อความ', { multipliers: { overlap_stage: '2' } }, false],
+];
+for (const [name, extra, pass] of overlapCases) {
+  const ps = lintDocs([{ file: `overlap-case:${name}`, doc: { events: [overlapCard(extra)] } }], ctx);
+  const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.path.endsWith('.overlap_stage'));
+  if (!ok) fails.push(`overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกที่ช่อง overlap_stage'} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
+}
+rows.push(['overlap_stage ตก/ผ่าน', `${overlapCases.length} เคส`]);
 // ป้ายบุญบาปต่างโลก (B68c) อยู่นอก yaml ไม่ผ่านด่านเนื้อหา — ตรวจ id/ลำดับตัวเลือก/หมวด/ระดับ ที่นี่แทน
 const iskById = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
 let iskTags = 0;

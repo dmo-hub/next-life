@@ -114,6 +114,7 @@ function mults(m, L) {
   if (m.wish) out.push(`ยกกำลังตามระดับบัญชีบุญบาป (ฐาน ${m.wish})`);
   if (m.rank) out.push(`×${m.rank} ต่อขั้นตำแหน่งที่ไต่ขึ้น (ทบกัน)`);
   if (m.family_fame) out.push(`×${m.family_fame} ต่อระดับชื่อเสียงตระกูล (ทบกัน)`);
+  if (m.overlap_stage !== undefined) out.push(`×${m.overlap_stage} ต่อขั้นค่าซ้อนทับ (ทบกัน)`);
   for (const k of Object.keys(MONEY_TH)) if (m[k]) out.push(`×${m[k].v} เมื่อ${moneyBound(k, m[k])}`);
   return out;
 }
@@ -154,6 +155,7 @@ function conditions(e, L) {
   for (const s of e.systems ?? []) out.push(`หลังมี${L.sys(s)}`);
   if (w.region) out.push(`ภาค${any(w.region.map(esc))}`);
   if (w.sex) out.push(`เพศ${any(w.sex.map(esc))}`);
+  if (w.overlap_stage) out.push(`ค่าซ้อนทับขั้น ${range(w.overlap_stage)}`);
   if (w.class) out.push(`ฐานะ${any(w.class.map(esc))}`);
   if (w.occupation) out.push(`ทำงาน${any(w.occupation.map((o) => esc(L.occ(o))))}`);
   if (w.ladder) out.push(any(w.ladder.map((l) => esc(L.ladder(l)))));
