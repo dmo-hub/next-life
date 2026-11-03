@@ -814,14 +814,18 @@ function stepYear(st) {
   if (recruitDue(st)) st.due.push({ kind: 'eraEvent', ev: recruitCard(st), age: st.age });
   if (isWorking(st) && earlyDue(st)) st.due.push({ kind: 'eraEvent', ev: earlyCard(st), age: st.age });
   if (isAllocAge(st.age)) st.due.push(allocCard(st, year, stage));
-  // ทุกภาคเจอได้ เกิดซ้ำได้ (B14 ข้อ 13) · เว้นอย่างน้อย ERA_GAP ปีไม่ให้ถี่จนกลบเรื่องชีวิต — ปีที่เว้น เงินยังเสียตามปีต้นแบบ
-  const eras = eraEventsAt(st.content.era, st.seed, year);
+  // ทุกภาคเจอได้ · เว้นอย่างน้อย ERA_GAP ปีไม่ให้ถี่จนกลบเรื่องชีวิต — ปีที่เว้น เงินยังเสียตามปีต้นแบบ
+  // ปีต้นแบบวนได้ แต่เหตุจริงครั้งเดียวในประวัติศาสตร์ (B99a): กลุ่มเหตุเดิมออกครั้งเดียวต่อชีวิต ทั้งการ์ดเล่าและใบรับมือ · ปีที่ข้าม เงินยังเสียตามปีต้นแบบ
+  let eras = eraEventsAt(st.content.era, st.seed, year);
+  if (eras.length) {
+    const seen = erasSeen(st, st.age - 1);
+    eras = eras.filter((e) => !seen.has(e.id));
+  }
   if (eras.length && (st.lastEraAge === null || st.age - st.lastEraAge >= ERA_GAP)) {
     st.lastEraAge = st.age;
     for (const e of eras) {
       // เล่าเหตุการณ์บ้านเมืองก่อนเสมอ · มีการ์ดเนื้อหาผูกไว้ = ตามด้วยการ์ดให้เลือกรับมือ
       st.due.push({ kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: e.name, story: eraStory(st, e) });
-      // ใบรับมือเดิมไม่ออกซ้ำในชีวิตเดียว — เหตุการณ์เกิดซ้ำได้ แต่ข้อความ/ผลเดิมทุกตัวอักษรอ่านเหมือนบั๊ก · ครั้งหลังเล่าแค่การ์ดบ้านเมือง
       const ev = st.content.events.find((c) => c.era === e.id && !st.done[c.id] && whenOk(st, c.when) && (c.when?.age || c.stage === stage));
       if (ev) {
         st.done[ev.id] = true;
@@ -830,6 +834,20 @@ function stepYear(st) {
     }
   }
   heraldNextYear(st, year);
+}
+
+// กลุ่มเหตุบ้านเมืองที่ออกแล้วถึงอายุ upTo — ไล่ย้อนจาก seed + ปีเกิดด้วยกติกาเดียวกับ stepYear แทนการเก็บคีย์ใหม่ใน st
+// lifehash hash state ทั้งก้อน: เก็บคีย์ = ทุกชีวิตที่เจอเหตุบ้านเมืองขยับ · ไล่ย้อน = ขยับเฉพาะชีวิตที่เคยเจอซ้ำ
+function erasSeen(st, upTo) {
+  const seen = new Set();
+  let last = null;
+  for (let a = 1; a <= upTo; a++) {
+    const es = eraEventsAt(st.content.era, st.seed, st.birthYear + a).filter((e) => !seen.has(e.id));
+    if (!es.length || (last !== null && a - last < ERA_GAP)) continue;
+    last = a;
+    for (const e of es) seen.add(e.id);
+  }
+  return seen;
 }
 
 // ลางภัยยุค (afterfall-1): ปีหน้ามีภัยที่จะได้ใบรับมือครั้งแรก = ใบ herald_of ออกปีนี้ให้เตรียมตัว
@@ -846,7 +864,11 @@ function heraldNextYear(st, year) {
   }
   if (st.age < HERALD_MIN_AGE) return;
   if (st.lastEraAge !== null && st.age + 1 - st.lastEraAge < ERA_GAP) return;
-  for (const e of eraEventsAt(st.content.era, st.seed, year + 1)) {
+  const next = eraEventsAt(st.content.era, st.seed, year + 1);
+  // กลุ่มเหตุที่เจอแล้วจะไม่ออกอีก ลางของมันจึงหลอก
+  const seen = next.length ? erasSeen(st, st.age) : null;
+  for (const e of next) {
+    if (seen.has(e.id)) continue;
     const answers = st.content.events.filter((c) => c.era === e.id);
     if (answers.some((c) => st.done[c.id])) continue;
     // ช่วงอายุปีหน้าไม่มีใบรับมือ (วิกฤตเศรษฐกิจวัยรุ่นนอกโรงเรียน) = ลางไม่มีใบให้ใช้ของที่เตรียม · เงื่อนไขอื่นของปีหน้ายังเดาไม่ได้

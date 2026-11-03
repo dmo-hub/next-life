@@ -46,7 +46,10 @@ const check = (label, bad, extra = '') => {
 console.log(`การ์ดซ้ำ + ผลย้อนถึงจริง · ${Object.keys(BOTS).length} บอท × ${n} ชีวิต · seed ${seed}`);
 const extras = [], dupIdsLife = [], dupIds = new Map(), skipped = Object.fromEntries(SKIP.map((p) => [p, 0]));
 let engineOnly = 0;
-const E = { n: 0, hit: 0, dead: 0, done: 0, stuck: 0 };
+// เหตุบ้านเมืองครั้งเดียวต่อกลุ่มเหตุ (B99a): การ์ดเล่า (kind era) กับใบรับมือ (ป้าย era:) นับแยกกลุ่มต่อชีวิต
+const eraMax = [];
+let eraOver = 0;
+const E ={ n: 0, hit: 0, dead: 0, done: 0, stuck: 0 };
 const stuckIds = new Map();
 for (const [name, bot] of Object.entries(BOTS)) {
   for (let i = 0; i < n; i++) {
@@ -54,7 +57,10 @@ for (const [name, bot] of Object.entries(BOTS)) {
     const st0 = newLife(mixSeed(seed, i), content);
     st0.scheduled = new Rec();
     const fired = new Map();
+    const eraN = new Map();
     const life = playLife(st0.seed, content, bot, (card, st) => {
+      const g = card.kind === 'era' ? `เล่า:${card.id}` : card.kind === 'event' && byId[card.id]?.era ? `รับมือ:${byId[card.id].era}` : null;
+      if (g) eraN.set(g, (eraN.get(g) ?? 0) + 1);
       if (card.kind !== 'event' || !card.id) return;
       (fired.get(card.id) ?? fired.set(card.id, []).get(card.id)).push(st.age);
       // เหตุที่ค้าง: ปีนัดมีการ์ดอื่นออก ⇒ ตรวจ when ของปลายทาง ณ ตอนนั้น · ไม่มีการ์ดในปีนัด = ตรวจที่การ์ดแรกของปีถัดไป
@@ -72,6 +78,9 @@ for (const [name, bot] of Object.entries(BOTS)) {
       dupIds.set(id, (dupIds.get(id) ?? 0) + 1);
     }
     extras.push(extra);
+    const em = Math.max(0, ...eraN.values());
+    eraMax.push(em);
+    if (em > 1) eraOver++;
     dupIdsLife.push(ids);
     const end = life.state.age;
     for (const b of booked) {
@@ -99,7 +108,9 @@ for (const [id, o] of [...stuckIds].sort((a, b) => b[1].n - a[1].n).slice(0, 15)
   const { n: k, ...why } = o;
   console.log(`    ${id} ${k} · ${Object.entries(why).map(([r, v]) => `${r} ${v}`).join(' · ')} · when ${JSON.stringify(byId[id]?.when ?? null)}`);
 }
+console.log(`\nเหตุบ้านเมืองต่อกลุ่มต่อชีวิต: สูงสุด ${Math.max(...eraMax)} · ชีวิตที่เจอกลุ่มเดิมเกิน 1 ใบ ${eraOver} (${pct(eraOver, lives)})`);
 console.log('');
+check('เหตุบ้านเมืองกลุ่มเดียวกันไม่เกิน 1 ใบต่อชีวิต', eraOver, ` · ${eraOver} ชีวิต`);
 check(`ใบเนื้อหาที่ออกเกินมาต่อชีวิต p95 ≤ ${REPEAT.maxExtra}`, q(extras, 0.95) > REPEAT.maxExtra ? 1 : 0, ` · ${q(extras, 0.95)}`);
 check(`ผลย้อนนอกสายมูถึงตรงนัด ≥ ${REPEAT.minHit * 100}%`, E.hit < REPEAT.minHit * E.n ? 1 : 0, ` · ${pct(E.hit, E.n)}`);
 check(`ผลย้อนนอกสายมูค้าง ≤ ${REPEAT.maxStuck * 100}%`, E.stuck > REPEAT.maxStuck * E.n ? 1 : 0, ` · ${pct(E.stuck, E.n)}`);
