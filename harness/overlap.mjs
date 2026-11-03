@@ -14,6 +14,7 @@
 //   (7) ขั้นที่ชาติต่างโลกเห็น (ใบ 15): ทุกชาติ (ทริป · เกิด · ถูกเรียก) เห็นขั้นเท่าขั้นของตระกูลตอนข้าม · การ์ดต่างโลกขั้น ≥ 1 ออก > 0 และไม่ออกในชาติขั้น 0
 //   (10) สายนักล่า (ใบ 19): ขั้น 3 เข้าสายผ่านการ์ดรับสมัคร ชื่องานเป็นขั้นนักล่า เลื่อนขั้นได้ · ขั้น 0–1 เข้าสาย 0 · ปฏิเสธการ์ดแล้วทำงานบริการไม่ถูกจับเข้าสาย
 //   (11) ดันเจียนไทย (ใบ 21): ขั้น 3 รอบละ 2–3 ใบ · คนถูกดึงตายในดันเจียน 0 · นักล่าตายด้วย accident/assault · ค่าซ้อนไม่ขยับ · ขั้น 0–1 ไม่เจอ
+//        โรคที่ถึงคิวกลางรอบตายท้ายรอบ 0 ตัดกลางทาง (ชุดบังคับสุขภาพ 0 ก่อนใบเข้า) · ห้องบอสทางไม่ตายลงโรค ไม่ใช่บาดแผล
 import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, overlapStageOf, overlapPlan, PATHS, ENTRY } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
@@ -398,22 +399,30 @@ if (fails.length) {
   const INNER = ['dungeon_hunt_mid_01', 'dungeon_hunt_boss_01', 'dungeon_pull_mid_01', 'dungeon_pull_out_01'];
   const CAUSES = ['accident', 'assault'];
   const isDungeon = (id) => ENTRIES.includes(id) || INNER.includes(id);
+  // ตัวเลือกที่พาไปใบถัดไปของรอบ (สเปกใบ 21 ข้อ 3) — โรคที่ถึงคิวต้องไม่ตัดรอบตรงนี้ · ทางอื่นของใบเหล่านี้คือจบรอบ
+  const CONTINUE = { ...Object.fromEntries(ENTRIES.map((id) => [id, ['hunt', 'pulled']])), dungeon_hunt_mid_01: ['push_on', 'leave_behind'], dungeon_pull_mid_01: ['hide', 'help_stranger'] };
+  const BOSS = 'dungeon_hunt_boss_01';
+  const midRun = (s) => {
+    const l = s.log.findLast((x) => isDungeon(x.id));
+    const cid = l && content.events.find((e) => e.id === l.id)?.choices[l.choice]?.id;
+    return Boolean(l && CONTINUE[l.id]?.includes(cid));
+  };
   const dunFails = [];
   // นักล่า: สมัครเสมอ แล้วเลือกนำทีมทุกครั้งที่เปิด (ตัวเลือกแรกของใบเข้า) · ใบกลาง/บอสเลือกตามบุคลิก = นักล่ากลาง
   const hunterBot = (bot) => Object.assign((card, rng, h) => ((card.id === RECRUIT || ENTRIES.includes(card.id)) && open(card, 0) ? 0 : bot(card, rng, h)), bot);
   // คนทั่วไป: ไม่สมัครนักล่าเลย (ตัวเลือกสุดท้ายของใบรับสมัคร) ⇒ ทางเดียวที่เข้าดันเจียนคือถูกดึง
   const civBot = (bot) => Object.assign((card, rng, h) => (card.id === RECRUIT ? card.choices.length - 1 : bot(card, rng, h)), bot);
-  const tally = () => ({ lives: 0, withRun: 0, runs: 0, avoided: 0, badLen: 0, lens: [0, 0, 0, 0], deaths: 0, direct: 0, illDuring: 0, badCause: 0, ovMoved: 0, ages: [] });
+  const tally = () => ({ lives: 0, withRun: 0, runs: 0, avoided: 0, badLen: 0, lens: [0, 0, 0, 0], deaths: 0, direct: 0, illDuring: 0, illEnd: 0, badCause: 0, ovMoved: 0, ages: [] });
   const hun = tally();
   const civ = tally();
   const low = { lives: 0, cards: 0 };
   const watch = (t, life) => (card, s) => {
     // ผลสั่งตายตั้ง dead ก่อนการ์ดผลของมันขึ้นจอ ⇒ เห็น dead ครั้งแรกบนการ์ดผลขณะรอบยังเปิด = ตายในดันเจียน
     // ตายขอบปีหลังรอบจบ ใบแรกที่เห็นคืองานศพ/มรณบัตร ไม่ใช่การ์ดผล — ไม่นับ
-    // สุขภาพหมดอยู่ก่อนเปิดใบ (โรคที่นัดตายไว้) = ตายระหว่างรอบแต่ไม่ใช่ดันเจียนฆ่า — แยกนับ ไม่เข้าเกณฑ์ "ถูกดึงตาย 0"
+    // สุขภาพหมดอยู่ก่อนเปิดใบ (โรคที่นัดตายไว้) = ไม่ใช่ดันเจียนฆ่า — แยกนับ ไม่เข้าเกณฑ์ "ถูกดึงตาย 0" · ตายบนตัวเลือกที่ยังมีใบต่อ = ตัดรอบกลางทาง (ต้อง 0)
     if (s.dead && !life.deadSeen) {
       life.deadSeen = true;
-      if (life.run && card.kind === 'result' && life.hp <= 0) t.illDuring++;
+      if (life.run && card.kind === 'result' && life.hp <= 0) t[midRun(s) ? 'illDuring' : 'illEnd']++;
       else if (life.run && card.kind === 'result') {
         t.deaths++;
         // สุขภาพยังเหลือตอนตาย = ทางตายของการ์ดสั่ง (die) · หมดแล้ว = บาดแผลทางอื่นของตัวเลือกเดียวกัน
@@ -439,27 +448,58 @@ if (fails.length) {
     }
     life.run = null;
   };
-  const playStage3 = (k, bot, t, hunter) => {
-    const life = { run: null, deadSeen: false, runs: 0 };
+  const stage3 = (k, salt, bot, hunter, onCard) => {
     const keep = [OVERLAP_STAGE_MIN[2], OVERLAP_STAGE_MIN[3]];
     OVERLAP_STAGE_MIN[2] = 2;
     OVERLAP_STAGE_MIN[3] = 3;
     try {
-      const s = newLife(mixSeed(seed ^ 0x4e21, k), content);
+      const s = newLife(mixSeed(seed ^ salt, k), content);
       s.overlap = 3;
       // การ์ดรับสมัครออกแค่บางชีวิต (กินช่องโควตาเดียวกัน) ⇒ วัดอัตราตายต่อรอบด้วยบัตรนักล่าตั้งแต่เกิด
       if (hunter) s.flags.hunter = true;
       overlapPlan(s, 0);
-      const { state } = playLife(mixSeed(seed ^ 0x4e21, k), content, bot, watch(t, life), s);
-      if (life.run) close(t, life, state);
-      t.lives++;
-      if (life.runs) t.withRun++;
-      t.ages.push(state.age);
+      return playLife(mixSeed(seed ^ salt, k), content, bot, onCard, s).state;
     } finally {
       [OVERLAP_STAGE_MIN[2], OVERLAP_STAGE_MIN[3]] = keep;
     }
   };
+  const playStage3 = (k, bot, t, hunter) => {
+    const life = { run: null, deadSeen: false, runs: 0 };
+    const state = stage3(k, 0x4e21, bot, hunter, watch(t, life));
+    if (life.run) close(t, life, state);
+    t.lives++;
+    if (life.runs) t.withRun++;
+    t.ages.push(state.age);
+  };
+  // ชุดบังคับ: ฐานธรรมชาติมีโรคถึงคิวกลางรอบแค่หลักหน่วย ⇒ ตั้งสุขภาพ 0 ตอนใบเข้าใบแรกขึ้นจอ (ก่อนกด) ให้ได้เคสพอวัด · อยู่ในด่านเท่านั้น
+  // ห้องบอส ตัวเลือกที่มีทางตายแต่ผลออกทางไม่ตาย: แกนทอยสาเหตุจากตารางโรคตามอายุ (บาดเจ็บออกได้ตามสัดส่วนจริง) ⇒ ใช้บาดแผลของตัวเลือกแทน = บาดเจ็บทุกครั้ง
+  // ทางถอยไม่มีทางตายให้ยืมบาดแผลอยู่แล้ว — นับรวมจะผ่านแม้แกนยังใช้บาดแผล
+  const SICK = { hunter: 3, civ: 1 };
+  const sick = { forced: 0, mid: 0, end: 0, preBossInjury: 0, boss: 0, bossIll: 0 };
+  const bossChoices = content.events.find((e) => e.id === BOSS).choices;
+  const dieTexts = (c) => (c?.outcomes ?? []).filter((o) => o.effects?.die).map((o) => o.text);
+  const sickWatch = (life) => (card, s) => {
+    if (card.kind !== 'result' && !life.forced && ENTRIES.includes(card.id)) {
+      s.health = 0;
+      life.forced = true;
+      sick.forced++;
+    } else if (card.kind === 'event' && life.forced && !s.dead && !isDungeon(card.id)) life.out = true;
+    if (!s.dead || life.deadSeen || !life.forced) return;
+    life.deadSeen = true;
+    // รอดความตายท้ายรอบแล้วไปตายทีหลัง ไม่ใช่เรื่องของรอบนี้ · ตัวเลือกจบรอบที่ไม่มีผลสุ่ม ใบแรกหลังตายคืองานศพ ไม่ใช่การ์ดผล
+    if (life.out) return;
+    if (midRun(s)) return void sick.mid++;
+    sick.end++;
+    const l = s.log.findLast((x) => isDungeon(x.id));
+    const die = l.id === BOSS ? dieTexts(bossChoices[l.choice]) : [];
+    if (l.id !== BOSS) sick.preBossInjury += CAUSES.includes(s.cause) ? 1 : 0;
+    else if (die.length && !(card.kind === 'result' && die.some((x) => card.text.includes(x)))) {
+      sick.boss++;
+      if (!CAUSES.includes(s.cause)) sick.bossIll++;
+    }
+  };
   let k = 0;
+  let ks = 0;
   for (const [name, base] of Object.entries(BOTS)) {
     // ขั้นจริง 0–1: ตระกูลข้ามโลกหลายรุ่น ใบดันเจียนต้องไม่โผล่สักใบ
     for (let i = 0; i < n; i++) {
@@ -474,6 +514,12 @@ if (fails.length) {
       playStage3(k, hunterBot(stayer(base)), hun, true);
       playStage3(k++, civBot(stayer(base)), civ, false);
     }
+    for (let i = 0; i < SICK.hunter + SICK.civ; i++) {
+      const hunter = i < SICK.hunter;
+      // นักล่าชุดนี้บุกตรง (ตัวเลือกแรกของใบกลาง/บอส = ไปต่อ · บุกเต็มกำลัง) ให้ถึงห้องบอสบนตัวเลือกที่มีทางตายทุกคน
+      const bot = hunter ? Object.assign((card, rng, h) => (INNER.includes(card.id) && open(card, 0) ? 0 : hunterBot(stayer(base))(card, rng, h)), base) : civBot(stayer(base));
+      stage3(ks++, 0x4e23, bot, hunter, sickWatch({ forced: false, deadSeen: false, out: false }));
+    }
   }
   const p50 = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)] ?? '-';
   if (low.cards) dunFails.push(`ชีวิตขั้น 0–1 เจอใบดันเจียน ${low.cards} ใบ`);
@@ -486,10 +532,15 @@ if (fails.length) {
   if (hun.badLen || civ.badLen) dunFails.push(`รอบดันเจียนยาวเกิน 3 ใบ: นักล่า ${hun.badLen} · คนทั่วไป ${civ.badLen}`);
   if (!hun.lens[2] || !hun.lens[3]) dunFails.push(`รอบนักล่าไม่ครบทั้งแบบ 2 ใบ (${hun.lens[2]}) และ 3 ใบ (${hun.lens[3]})`);
   if (hun.ovMoved || civ.ovMoved) dunFails.push(`ค่าซ้อนขยับระหว่างรอบดันเจียน ${hun.ovMoved + civ.ovMoved} รอบ`);
-  const line = (label, t) => `  ${label} ${t.lives} ชีวิต: มีดันเจียน ${pct(t.withRun, t.lives)} · ${t.runs} รอบ (${(t.runs / (t.lives || 1)).toFixed(2)}/ชีวิต) ยาว 2 ใบ ${t.lens[2]} · 3 ใบ ${t.lens[3]} · หลบ/ส่งต่อ ${t.avoided} · ตายในดันเจียน ${t.deaths} (${pct(t.deaths, t.runs)}/รอบ · ทางตายตรง ${t.direct}) · โรคถึงคิวระหว่างรอบ ${t.illDuring} · ค่าซ้อนขยับ ${t.ovMoved} · อายุตาย p50 ${p50(t.ages)}`;
+  if (hun.illDuring || civ.illDuring || sick.mid) dunFails.push(`โรคถึงคิวตัดรอบกลางทาง: นักล่า ${hun.illDuring} · คนทั่วไป ${civ.illDuring} · ชุดบังคับ ${sick.mid} — ต้องเดินจนจบรอบก่อน`);
+  if (!sick.end) dunFails.push(`ชุดบังคับ ${sick.forced} ชีวิตไม่มีใครตายท้ายรอบ — ตัววัดไม่ได้วัดอะไร`);
+  if (!sick.boss) dunFails.push('ชุดบังคับไม่มีคนป่วยถึงห้องบอสทางไม่ตาย — วัดสาเหตุใบสุดท้ายไม่ได้');
+  else if (!sick.bossIll) dunFails.push(`คนป่วยที่ห้องบอส ${sick.boss} คนตายด้วยบาดเจ็บทุกคน — ใบสุดท้ายต้องลงโรค ไม่ใช่บาดแผลของตัวเลือก`);
+  const line = (label, t) => `  ${label} ${t.lives} ชีวิต: มีดันเจียน ${pct(t.withRun, t.lives)} · ${t.runs} รอบ (${(t.runs / (t.lives || 1)).toFixed(2)}/ชีวิต) ยาว 2 ใบ ${t.lens[2]} · 3 ใบ ${t.lens[3]} · หลบ/ส่งต่อ ${t.avoided} · ตายในดันเจียน ${t.deaths} (${pct(t.deaths, t.runs)}/รอบ · ทางตายตรง ${t.direct}) · โรคถึงคิวกลางรอบ ${t.illDuring} · ท้ายรอบ ${t.illEnd} · ค่าซ้อนขยับ ${t.ovMoved} · อายุตาย p50 ${p50(t.ages)}`;
   console.log(`\nดันเจียนไทย (ใบ 21): ขั้น 0–1 ${low.lives} ชีวิต ใบดันเจียน ${low.cards}`);
   console.log(line('นักล่า (ยืมขั้น 3 · บัตรตั้งแต่เกิด)', hun));
   console.log(line('คนทั่วไป (ยืมขั้น 3)', civ));
+  console.log(`  ชุดบังคับสุขภาพ 0 ก่อนใบเข้า ${sick.forced} ชีวิต: ตายกลางรอบ ${sick.mid} · ท้ายรอบ ${sick.end} (ก่อนบอสลงบาดเจ็บตามตาราง ${sick.preBossInjury}) · ห้องบอสทางไม่ตาย ${sick.boss} ลงโรค ${sick.bossIll}`);
   if (dunFails.length) {
     for (const f of dunFails) console.log(`✗ ${f}`);
     console.log(`ด่านดันเจียนตก ${dunFails.length} ข้อ`);

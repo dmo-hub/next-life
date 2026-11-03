@@ -1649,6 +1649,8 @@ export function choose(st, idx, loan) {
   const pool = ev.weight && ev.age === undefined && !ev.era;
   const s = pool ? poolEffectScale(stageOf(st.age)) : 1;
   const ss = pool ? poolStatScale(stageOf(st.age)) : 1;
+  // ใบในรอบเดียวกัน (ev.run) ที่สุขภาพหมดอยู่ก่อนกด = โรคที่ถึงคิวกลางรอบ ไม่ใช่ผลของใบนี้ — จำไว้ก่อนผลของตัวเลือกลง
+  const ill = ev.run !== undefined && st.health <= 0;
   applyEffects(st, c.effects, s, ss);
   applyChoice(st, ev, c, text);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
@@ -1691,8 +1693,10 @@ export function choose(st, idx, loan) {
   // ชีวิตหมดจากผลการ์ด = ตายในการ์ดนั้น (B160) ไม่รอขอบปี · การ์ดผลยังเล่าก่อน · เรื่องต่อ หางาน และการ์ดที่รอในปีนั้นไม่ออกแล้ว
   // การ์ดงานศพเลือกหลังตายแล้ว ⇒ ไม่ตัดสินซ้ำ
   // ผลที่สั่งตาย (ดันเจียนของนักล่า) เดินทางเดียวกัน แต่สาเหตุมาจากการ์ด ไม่ใช่โรคตามสุขภาพ
-  if (!st.dead && !st.court && (doom || st.health <= 0)) {
-    const d = faceDeath(st, doom ?? wound ?? healthCause(st), { afterQueue: true });
+  // โรคที่ถึงคิวกลางรอบรอให้รอบจบก่อน (ตัดกลางรอบ = ผู้เล่นไม่รู้ว่าออกจากเกตหรือไม่) แล้วตายด้วยโรคที่ใบสุดท้าย — บาดแผลของห้องบอสไม่ใช่เหตุ
+  const runOn = ill && !doom && after.some((x) => x.kind === 'eraEvent' && x.ev.run === ev.run);
+  if (!st.dead && !st.court && !runOn && (doom || st.health <= 0)) {
+    const d = faceDeath(st, doom ?? (ill ? undefined : wound) ?? healthCause(st), { afterQueue: true });
     st.queue = after.filter((x) => x.kind === 'result');
     st.due = [];
     if (d.fate === 'dead') queueFuneral(st);
