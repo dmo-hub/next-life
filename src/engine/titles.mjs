@@ -4,7 +4,7 @@
 // (การกระทำนั้นผู้เล่นเห็นในข้อความอยู่แล้ว) ไม่รวมยอด ไม่หักกลบ ไม่บอกฝั่งที่หนักกว่า
 import { allocOptions } from './finance.mjs';
 import { meritId, SIN_CATS } from './merit.mjs';
-import { CLASSES, LEVELS, RETIRE_AGE, riskLabel, netWorth, totalDebt, standingOf, stageOf } from './life.mjs';
+import { CLASSES, LEVELS, RETIRE_AGE, riskLabel, netWorth, totalDebt, standingOf, stageOf, erasShown } from './life.mjs';
 import { expectedDeathAge, eraEventsAt, protoYear } from './era.mjs';
 import { nationalIncome } from './birth.mjs';
 import { ladderOf } from './rank.mjs';
@@ -279,11 +279,13 @@ export function lifeFacts(st) {
     else if (p.ev.choices.some((c) => tags(c).some((t) => SIN_CATS.includes(t.id)))) declined++;
   }
   // เหตุการณ์บ้านเมืองที่ทันตอนเป็นผู้ใหญ่ · ปีอนาคตวนปีต้นแบบ เหตุการณ์ชื่อเดียวกันจึงนับแยกตามปีที่เกิด
-  const crises = new Set(), disasters = new Set();
+  const crises = new Set();
   for (let a = 20; a <= st.age; a++) {
     const y = st.birthYear + a;
-    for (const e of eraEventsAt(era, st.seed, y)) (e.kind === 'economy' ? crises : disasters).add(`${e.id}@${y - (protoYear(era, st.seed, y) - e.from)}`);
+    for (const e of eraEventsAt(era, st.seed, y)) if (e.kind === 'economy') crises.add(`${e.id}@${y - (protoYear(era, st.seed, y) - e.from)}`);
   }
+  // ภัยนับเฉพาะกลุ่มที่ขึ้นการ์ดให้เห็น — ปีที่กลุ่มเหตุถูกซ่อน (ออกแล้ว/เว้นช่วง) ผู้เล่นไม่รู้ว่ารอดอะไรมา
+  const disasters = new Set(erasShown(st, st.age).filter(({ e, age }) => age >= 20 && e.kind !== 'economy').map(({ e }) => e.id));
   const worth = netWorth(st);
   return {
     st,
@@ -330,7 +332,7 @@ export const TITLES = [
   { id: 'folk_sage', tier: 'หายาก', name: 'ปราชญ์ชาวบ้าน', hint: 'รู้มากโดยไม่ต้องมีปริญญา', test: (f) => f.st.knowledge >= 95 && (!f.st.edu || f.st.edu === 'ประถม') },
   { id: 'outlived', tier: 'หายาก', name: 'อายุยืนเกินคาด', hint: 'อยู่นานกว่าคนรุ่นเดียวกันมาก', test: (f) => f.age >= f.expected + 25 },
   { id: 'clean_hands', tier: 'หายาก', name: 'มือสะอาดในที่สกปรก', hint: 'เจอทางลัดหลายครั้งแต่ไม่เคยเลือก', test: (f) => f.declined >= 10 && f.sinPicks === 0 },
-  { id: 'survivor', tier: 'ทั่วไป', name: 'รอดมาได้ทุกภัย', hint: 'ผ่านภัยพิบัติใหญ่มาหลายครั้ง', test: (f) => f.disasters >= 6 },
+  { id: 'survivor', tier: 'ทั่วไป', name: 'รอดมาได้ทุกภัย', hint: 'ผ่านภัยพิบัติใหญ่มาหลายครั้ง', test: (f) => f.disasters >= 3 },
   { id: 'lucky_number', tier: 'ทั่วไป', name: 'ผู้รอเลขเด็ด', hint: 'ซื้อหวยจนเป็นนิสัย', test: (f) => has(f, 'lottery_habit') },
   { id: 'grandparent', tier: 'หายาก', name: 'ผู้เลี้ยงหลานแทนพ่อแม่', hint: 'รับหลานมาเลี้ยงเอง', test: (f) => has(f, 'raised_grandkids') },
   { id: 'centenarian', tier: 'ตำนาน', name: 'ร้อยปีไม่สาย', hint: 'อยู่ถึงร้อยปี', test: (f) => f.age >= 100 },

@@ -839,15 +839,23 @@ function stepYear(st) {
 // กลุ่มเหตุบ้านเมืองที่ออกแล้วถึงอายุ upTo — ไล่ย้อนจาก seed + ปีเกิดด้วยกติกาเดียวกับ stepYear แทนการเก็บคีย์ใหม่ใน st
 // lifehash hash state ทั้งก้อน: เก็บคีย์ = ทุกชีวิตที่เจอเหตุบ้านเมืองขยับ · ไล่ย้อน = ขยับเฉพาะชีวิตที่เคยเจอซ้ำ
 function erasSeen(st, upTo) {
-  const seen = new Set();
+  return new Set(erasShown(st, upTo).map(({ e }) => e.id));
+}
+
+// เหตุบ้านเมืองที่ขึ้นการ์ดเล่าจริงถึงอายุ upTo พร้อมอายุที่ออก — ฉายาที่นับภัยต้องนับเฉพาะที่ผู้เล่นเห็น ไม่ใช่ทุกปีต้นแบบที่วนมา
+export function erasShown(st, upTo) {
+  const shown = [], seen = new Set();
   let last = null;
   for (let a = 1; a <= upTo; a++) {
     const es = eraEventsAt(st.content.era, st.seed, st.birthYear + a).filter((e) => !seen.has(e.id));
     if (!es.length || (last !== null && a - last < ERA_GAP)) continue;
     last = a;
-    for (const e of es) seen.add(e.id);
+    for (const e of es) {
+      seen.add(e.id);
+      shown.push({ e, age: a });
+    }
   }
-  return seen;
+  return shown;
 }
 
 // ลางภัยยุค (afterfall-1): ปีหน้ามีภัยที่จะได้ใบรับมือครั้งแรก = ใบ herald_of ออกปีนี้ให้เตรียมตัว
