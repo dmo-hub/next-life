@@ -15,7 +15,10 @@
 //   (8) คนตายที่ตระกูลจำ (ใบ 13): ทายาทค่า > 0 = รายชื่อเดิม + คนตายของชาตินี้ที่ด่านนับเอง (พ่อแม่ที่ไม่ใช่ผู้เล่นรุ่นก่อน · คนใน kin ยกเว้นฝูงสัตว์)
 //       ทายาทค่า 0 ไม่มีช่อง · ฟิลด์ครบชุด ไม่มีปีตาย/ภูมิ · รายชื่อติดถึงชีวิตถัดไป · ฝั่งข้ามโลกมีรายชื่อ > 0 · ตัวควบคุมไม่มีเลย
 //       พิมพ์จำนวนเฉลี่ยต่อรุ่น + ขนาดเซฟรุ่นสุดท้าย (วัดเพดาน localStorage ที่ --gens สูง)
+//   (9) ผีทั่วไป (ใบ 25): ฝั่งข้ามโลกออก > 0 · ไม่ออกในชีวิตขั้น 0 · ตัวควบคุมออก 0 · ตัวเลือกทานดันบัญชีทานขึ้นอย่างน้อยระดับ 1 ก่อนการ์ดถัดไป
+//       ต้องมีคนเลือกทานจริง > 0 ครั้ง ไม่งั้นตัววัดบัญชีไม่ได้วัดอะไร
 import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, overlapStageOf, snapshot, PATHS, ENTRY } from '../src/engine/index.mjs';
+import { MERIT_LEVELS, meritId } from '../src/engine/merit.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
 
@@ -48,6 +51,27 @@ const watchIsekai = (r) => {
       r.iskCard++;
       if (got < 1) r.iskCardBad++;
     }
+  };
+};
+
+const GHOST = 'overlap_ghost_';
+const danaPicks = new Map(content.events.filter((e) => e.id.startsWith(GHOST)).map((e) => [e.id, new Set(e.choices.flatMap((c, k) => (c.merit.some((m) => meritId(m.cat) === 'dana') ? [k] : [])))]));
+// บัญชีทานอ่านก่อนการ์ดผีแล้วเทียบตอนการ์ดถัดไป (ตัวเลือกลงบัญชีระหว่างสองจังหวะนี้) — ตัวเลือกอื่นไม่ตรวจ เพราะทานจากที่อื่นขึ้นช่วงเดียวกันได้
+const watchGhost = (r) => {
+  let wait = null;
+  return (card, st) => {
+    if (wait) {
+      const pick = st.log.slice(wait.at).find((e) => e.id === wait.id);
+      if (pick && danaPicks.get(wait.id).has(pick.choice)) {
+        r.ghostDana++;
+        if ((st.ledger.byCat.dana ?? 0) - wait.dana < MERIT_LEVELS[1]) r.ghostDanaBad++;
+      }
+      wait = null;
+    }
+    if (!card.id?.startsWith(GHOST)) return;
+    r.ghost++;
+    if (overlapStageOf(st) < 1) r.ghostBad++;
+    wait = { id: card.id, at: st.log.length, dana: st.ledger.byCat.dana ?? 0 };
   };
 };
 
@@ -92,9 +116,10 @@ const fail = (msg) => fails.push(msg);
 let resetChecked = 0;
 for (const [name, base] of Object.entries(BOTS)) {
   for (const [mode, bot] of [['ข้าม', crosser(base)], ['ไม่ข้าม', stayer(base)]]) {
-    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, rumor: 0, bad: 0, drop: 0, families: 0, top: 0, iskLives: 0, iskStage: {}, iskBad: 0, iskCard: 0, iskCardBad: 0, deadByGen: Array.from({ length: gens }, () => []), deadBad: 0, deadMax: 0, kidAncestor: 0, saveBytes: [], deadBytes: [] };
+    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, rumor: 0, bad: 0, drop: 0, families: 0, top: 0, iskLives: 0, iskStage: {}, iskBad: 0, iskCard: 0, iskCardBad: 0, deadByGen: Array.from({ length: gens }, () => []), deadBad: 0, deadMax: 0, kidAncestor: 0, saveBytes: [], deadBytes: [], ghost: 0, ghostBad: 0, ghostDana: 0, ghostDanaBad: 0 };
     rows.push(r);
     const watch = watchIsekai(r);
+    const ghost = watchGhost(r);
     for (let i = 0; i < n; i++) {
       let st = null;
       let prev = 0;
@@ -102,7 +127,7 @@ for (const [name, base] of Object.entries(BOTS)) {
       let last = null;
       for (let g = 0; g < gens; g++) {
         const start = overlapOf(st);
-        const { state } = playLife(mixSeed(seed, i * 7919 + g), content, bot, (card, s) => watch(card, s.trip, s), st ?? undefined);
+        const { state } = playLife(mixSeed(seed, i * 7919 + g), content, bot, (card, s) => (watch(card, s.trip, s), ghost(card, s)), st ?? undefined);
         const home = (state.trips ?? []).filter((t) => t.home).length;
         let reTrip = 0;
         for (const t of state.trips ?? []) {
@@ -173,6 +198,9 @@ for (const [name, base] of Object.entries(BOTS)) {
     if (mode === 'ไม่ข้าม' && r.iskCard) fail(`${name} ไม่ข้าม: การ์ด ${ISK_CARD}* ออก ${r.iskCard} ครั้ง`);
     if (r.deadBad) fail(`${name} ${mode}: รายชื่อคนตายไม่ตรง ${r.deadBad} จุด`);
     if (mode === 'ไม่ข้าม' && r.deadMax) fail(`${name} ไม่ข้าม: มีรายชื่อคนตาย ${r.deadMax} คน`);
+    if (r.ghostBad) fail(`${name} ${mode}: การ์ด ${GHOST}* ออกในชีวิตขั้น 0 ${r.ghostBad} ครั้ง`);
+    if (mode === 'ไม่ข้าม' && r.ghost) fail(`${name} ไม่ข้าม: การ์ด ${GHOST}* ออก ${r.ghost} ครั้ง`);
+    if (r.ghostDanaBad) fail(`${name} ${mode}: เลือกทำบุญให้ผีแล้วบัญชีทานไม่ขึ้นระดับ 1 ${r.ghostDanaBad} ครั้ง`);
   }
 }
 
@@ -190,6 +218,8 @@ for (const r of cross) for (const [k, v] of Object.entries(r.iskStage)) iskStage
 if (!iskStage[1]) fail('ไม่มีชาติต่างโลกที่เห็นขั้น ≥ 1 — ตัววัดขั้นฝั่งต่างโลกไม่ได้วัดอะไร');
 if (!sum('iskCard')) fail(`ฝั่งข้ามโลกไม่มีการ์ด ${ISK_CARD}* ออกเลย`);
 if (!cross.some((r) => r.deadMax)) fail('ฝั่งข้ามโลกไม่มีตระกูลไหนจำคนตายได้ — ตัววัดรายชื่อไม่ได้วัดอะไร');
+if (!sum('ghost')) fail(`ฝั่งข้ามโลกไม่มีการ์ด ${GHOST}* ออกเลย`);
+if (!sum('ghostDana')) fail('ไม่มีใครเลือกทำบุญให้ผีทั่วไป — ตัววัดบัญชีทานไม่ได้วัดอะไร');
 if (!sum('kidAncestor')) fail('ไม่มีชาติค่า > 0 ที่พ่อ/แม่ผู้เล่นรุ่นก่อนตาย — ตัววัด "ไม่จำชาติก่อนของตัวเอง" ไม่ได้วัดอะไร');
 
 const mean = (vs) => (vs.length ? vs.reduce((s, v) => s + v, 0) / vs.length : 0);
@@ -222,6 +252,7 @@ const deadGen = Array.from({ length: gens }, (_, g) => {
   return `รุ่น ${g + 1} ค่า>0 ${mean(on).toFixed(1)} คน (${on.length} ตระกูล) · ค่า 0 ${mean(off).toFixed(1)}`;
 });
 console.log(`คนตายที่ตระกูลจำ (ฝั่งข้ามโลก เฉลี่ยตอนจบชีวิต · ตัวควบคุมสูงสุด ${Math.max(...rows.filter((r) => r.mode === 'ไม่ข้าม').map((r) => r.deadMax))} · ต่อทางเป็นลูกที่พ่อ/แม่รุ่นก่อนตาย ${sum('kidAncestor')} ชาติ ไม่ถูกจำ):${deadGen.join(' | ')}`);
+console.log(`ผีทั่วไป (${GHOST}*): ข้าม ${sum('ghost')} ครั้ง · ออกในชีวิตขั้น 0 ${rows.reduce((s, r) => s + r.ghostBad, 0)} · ไม่ข้าม ${rows.filter((r) => r.mode === 'ไม่ข้าม').reduce((s, r) => s + r.ghost, 0)} · เลือกทำบุญ ${sum('ghostDana')} ครั้ง ทานไม่ขึ้น ${rows.reduce((s, r) => s + r.ghostDanaBad, 0)}`);
 const saves = cross.flatMap((r) => r.saveBytes);
 const deads = cross.flatMap((r) => r.deadBytes);
 const kb = (b) => `${(b / 1024).toFixed(1)} KB`;
@@ -231,5 +262,5 @@ if (fails.length) {
   console.log(`ด่านค่าซ้อนทับตก ${fails.length} ข้อ`);
   process.exitCode = 1;
 } else {
-  console.log(`ด่านค่าซ้อนทับผ่าน: บัญชีเหยียบซ้ำตรงทุกชีวิต · เกิดกลับ ${sum('born')} · ทริปกลับบ้าน ${sum('trip')} · เข้าซ้ำ ทริป ${sum('reTrip')} เกิด ${sum('reBorn')} · ทริปหลงไม่นับ ${sum('lost')} · ข่าวลือออก ${sum('rumor')} · ชาติต่างโลกเห็นขั้นตรง ${sum('iskLives')} ชาติ · การ์ดต่างโลกขั้น ≥ 1 ออก ${sum('iskCard')} · ค่าไม่ลด · ตัวควบคุม = 0`);
+  console.log(`ด่านค่าซ้อนทับผ่าน: บัญชีเหยียบซ้ำตรงทุกชีวิต · เกิดกลับ ${sum('born')} · ทริปกลับบ้าน ${sum('trip')} · เข้าซ้ำ ทริป ${sum('reTrip')} เกิด ${sum('reBorn')} · ทริปหลงไม่นับ ${sum('lost')} · ข่าวลือออก ${sum('rumor')} · ชาติต่างโลกเห็นขั้นตรง ${sum('iskLives')} ชาติ · การ์ดต่างโลกขั้น ≥ 1 ออก ${sum('iskCard')} · ผีทั่วไปออก ${sum('ghost')} ทำบุญ ${sum('ghostDana')} · ค่าไม่ลด · ตัวควบคุม = 0`);
 }
