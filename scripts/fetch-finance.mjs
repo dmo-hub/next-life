@@ -143,9 +143,19 @@ const OCC = [
   { id: 'technician', name: 'ช่างเทคนิค', isco: 3, edu: 'อาชีวะ' },
   { id: 'professional', name: 'วิชาชีพ', isco: 2, edu: 'อุดมศึกษา' },
   { id: 'manager', name: 'ผู้บริหาร', isco: 1, edu: 'อุดมศึกษา' },
+  // อาชีพตามขั้นยศราชการ/ทหาร/ตำรวจ — ไม่สุ่มตอนเกิด (birth: false) · ได้เฉพาะคนในสาย ให้การ์ดบริษัทที่กรองอาชีพไม่หลุดถึงนายพล
+  // ILOSTAT ไม่มีแถว ISCO 0 ของไทย ⇒ ค่าจ้างเท่าหมวดที่ขั้นยศเคยผูก (same)
+  { id: 'officer', name: 'เจ้าหน้าที่รัฐ', isco: 0, edu: 'อุดมศึกษา', birth: false, same: 'professional' },
+  { id: 'senior_officer', name: 'ผู้บริหารภาครัฐ', isco: 0, edu: 'อุดมศึกษา', birth: false, same: 'manager' },
 ];
 // รหัสหมวดเก็บเป็นป้าย ไม่ใช่ตัวเลข — check-data จะถือว่าเป็นค่าที่ต้องมีที่มา
-const occupations = OCC.map((o) => ({ ...o, isco: `ISCO-08 หมวด ${o.isco}`, wage: { v: iscoWage(o.isco), source: ILO_URL } }));
+const occupations = OCC.map(({ same, ...o }) => ({
+  ...o,
+  isco: `ISCO-08 หมวด ${o.isco}`,
+  wage: same
+    ? { v: iscoWage(OCC.find((x) => x.id === same).isco), assumption: true, note: `ILOSTAT ไม่มีค่าจ้าง ISCO 0 (กองทัพ) ของไทย — ใช้ค่าจ้างหมวดเดียวกับ ${same}` }
+    : { v: iscoWage(o.isco), source: ILO_URL },
+}));
 
 const finance = {
   title: 'ชุดข้อมูลการเงินรายปี (B08) — ผลตอบแทนสินทรัพย์ · ดอกเบี้ย · ค่าจ้าง',
