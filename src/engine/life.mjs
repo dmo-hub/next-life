@@ -7,7 +7,7 @@ import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, ass
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS, meritId, MERIT_LEVELS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './career.mjs';
 import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
-import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
+import { beliefOk, beliefFired, beliefChoice, moneyTight } from './belief.mjs';
 import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './court.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
@@ -1575,8 +1575,24 @@ export function whenOk(st, when) {
     if (MONEY_KEYS.some((k) => when[k] && !inBound(r[k], when[k]))) return false;
   }
   if (when.parent_flags && !parentFlagsOk(st, when.parent_flags)) return false;
+  if (when.dark_gate && !darkGateOk(st)) return false;
   return !when.flags || flagsOk(st, when.flags);
 }
+
+// ประตูทางมืด (B99a): ข้อเสนอผิดกฎหมายถึงคนที่ทั้งเงินตึงและเคยเลือกทางบาปเองชาตินี้ถึงเกณฑ์ — คนจนที่มือสะอาดไม่ถูกชวน
+// นับจากตัวเลือกที่กดจริงใน st.log ไม่อ่านบัญชีบุญบาปซ่อน · log เริ่มใหม่ทุกชาติ บาปชาติก่อนจึงไม่นับ
+export const DARK_GATE = { picks: 2 };
+export function sinPicks(st) {
+  const ix = lifeEventIndex(st.content.events);
+  let n = 0;
+  for (const l of st.log) {
+    const i = ix.pos.get(l.id);
+    const c = i === undefined ? null : st.content.events[i].choices?.[l.choice];
+    if (c?.merit?.some((t) => SIN_CATS.includes(meritId(t.cat)))) n++;
+  }
+  return n;
+}
+export const darkGateOk = (st) => moneyTight(st) && sinPicks(st) >= DARK_GATE.picks;
 
 // ธงจากเนื้อหา (ตัวเลือก · ผลลัพธ์ · การ์ดที่แกนสร้าง · เสี่ยงของโฟกัส) ติดผ่านจุดนี้จุดเดียว — ผลที่ต้องเกิดตอนธงติดจึงดักได้ที่เดียว
 // ธงจากบัญชีบุญบาป (recordMerit) ไม่ผ่านที่นี่: ไม่จดอายุที่ได้มาตั้งแต่เดิม

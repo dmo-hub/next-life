@@ -1,7 +1,7 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE } from '../src/engine/index.mjs';
-import { loadContent } from '../src/node/load.mjs';
+import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE } from '../src/engine/index.mjs';
+import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
 import { kinGaps, kinDeadRefs, familyLockShort } from '../harness/kin.mjs';
@@ -362,6 +362,36 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 06a ตัวควบคุม: เส้นทางหายหนึ่งทิศ → ด่านสมมาตรตก', failed({ near: (id) => (id === 'coralis' ? [] : C.contNeighbors(id)) }, 'แผนที่สมมาตร'));
   check('ใบ 06a ตัวควบคุม: ไม่มีมหาอำนาจ → ด่านขั้วอำนาจตก', failed({ nation: (s) => { const x = C.contNation(s); return { ...x, powers: { ...x.powers, major: undefined } }; } }, 'ขั้วอำนาจ'));
   check('ใบ 06a ตัวควบคุม: เผ่านอกรายการแคว้น → ด่านเกิดตก', failed({ birth: (rng) => ({ ...C.contBirth(rng), race: 'dragonkin' }) }, 'เกิดได้ทุกแคว้น'));
+}
+
+// ใบ B99a ประตูทางมืด: ใบ fixture dark_gate ในกองจริง · สายบาปที่จนต้องถูกชวน · ทุกครั้งที่ออกต้องเงินตึง + เลือกบาปเองถึงเกณฑ์
+// ตัวควบคุม: ถอด dark_gate จากใบเดียวกัน ⇒ ต้องออกกับคนที่ประตูปิดด้วย ไม่งั้นข้อ "ทุกครั้งประตูเปิด" ผ่านเพราะใบไม่ออกเลย
+{
+  const base = loadContent();
+  const dark = loadEvents('content-fixtures/good/').filter((e) => e.when?.dark_gate);
+  const run = (events, botName, n) => {
+    const content = { ...base, events: [...base.events, ...events] };
+    const ids = new Set(events.map((e) => e.id));
+    let lives = 0, shown = 0, closed = 0;
+    for (let i = 0; i < n; i++) {
+      let hit = false;
+      playLife(mixSeed(0xb99a, i), content, BOTS[botName], (card, st) => {
+        if (card.kind !== 'event' || !ids.has(card.id)) return;
+        shown++;
+        hit = true;
+        if (!(moneyTight(st) && sinPicks(st) >= DARK_GATE.picks)) closed++;
+      });
+      if (hit) lives++;
+    }
+    return { lives, shown, closed };
+  };
+  const sin = run(dark, 'สายบาป', 150);
+  const merit = run(dark, 'สายบุญ', 150);
+  const open = run(dark.map((e) => ({ ...e, when: { ...e.when, dark_gate: undefined } })), 'สายบุญ', 150);
+  check('ใบ B99a สายบาปจนถูกชวนทำผิด', sin.lives > 0, `${sin.lives}/150 ชีวิต`);
+  check('ใบ B99a ทุกครั้งที่ใบออก ประตูเปิด', sin.closed + merit.closed === 0, `ออก ${sin.shown + merit.shown} · ประตูปิด ${sin.closed + merit.closed}`);
+  check('ใบ B99a สายบุญถูกชวนน้อยกว่าสายบาปมาก', merit.lives * 5 <= sin.lives, `${merit.lives} vs ${sin.lives}`);
+  check('ใบ B99a ตัวควบคุม: ถอดประตู ⇒ ออกกับคนที่ประตูปิด', open.closed > 0, `ประตูปิด ${open.closed}`);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
