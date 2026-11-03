@@ -172,18 +172,22 @@ export function loadFinance() {
   const set = series([f.set_close.base, ...f.set_close.rows]);
   const div = series(f.set_dividend.rows);
   if (div.from !== set.from + 1 || div.v.length !== set.v.length - 1) throw new Error('ปีปันผลไม่ตรงกับปีดัชนีหุ้น');
-  const occupations = f.occupations.list.map(({ id, name, edu, wage }) => ({ id, name, edu, wage: wage.v }));
+  const occupations = f.occupations.list.map(({ id, name, edu, wage, birth }) => ({ id, name, edu, wage: wage.v, birth: birth !== false }));
+  // อาชีพตามขั้นยศ (birth: false) อยู่ท้ายรายการ น้ำหนักเกิด 0 — คิดน้ำหนักจากอาชีพที่เกิดได้เท่านั้น
+  // ไม่งั้นอันดับค่าจ้างกับ top ขยับ ชีวิตที่ไม่เคยเข้าสายยศจะสุ่มอาชีพตอนเกิดได้ไม่เท่าเดิม
+  const born = occupations.filter((o) => o.birth);
+  if (occupations.slice(0, born.length).some((o) => !o.birth)) throw new Error('อาชีพ birth: false ต้องอยู่ท้าย occupations.list');
   // อาชีพเรียงตามค่าจ้าง ฐานะสูงเล็งอาชีพค่าจ้างสูง · พื้น floor ให้ทุกอาชีพเกิดได้ทุกฐานะ
   const { spread, floor } = rules.occupation_by_class;
-  const byWage = occupations.map((o, i) => i).sort((a, b) => occupations[a].wage - occupations[b].wage);
+  const byWage = born.map((o, i) => i).sort((a, b) => born[a].wage - born[b].wage);
   const rank = byWage.reduce((m, oi, r) => ((m[oi] = r), m), []);
-  const top = occupations.length - 1;
+  const top = born.length - 1;
   const occByClass = {};
   CLASSES.forEach((cls, d) => {
     const aim = (d * top) / (CLASSES.length - 1);
-    const w = occupations.map((o, i) => Math.exp(-((rank[i] - aim) ** 2) / (2 * spread ** 2)) + floor);
+    const w = born.map((o, i) => Math.exp(-((rank[i] - aim) ** 2) / (2 * spread ** 2)) + floor);
     const sum = w.reduce((s, x) => s + x, 0);
-    occByClass[cls] = w.map((x) => x / sum);
+    occByClass[cls] = [...w.map((x) => x / sum), ...Array(occupations.length - born.length).fill(0)];
   });
   const era = {
     deposit: series(f.deposit.rows),

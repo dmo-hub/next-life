@@ -212,6 +212,8 @@ export function newLife(seed, content, heir = null) {
     occupation: occupation.id,
     occupationName: occupation.name,
     familyOcc: occupation.id,
+    // บ้านสายยศ (afterlife ส่งมาเมื่ออาชีพสุดท้ายของพ่อแม่เป็นขั้นยศ) · ไม่มีคีย์ = สืบต่อด้วยอาชีพบ้านตามปกติ
+    ...(heir?.familyLadder && { familyLadder: heir.familyLadder }),
     workFrom: null,
     // สายยศ/ตำแหน่ง (B40 · rank.mjs): ขั้นในสายอาชีพ · ตำแหน่งการเมือง · บำนาญต่อปีเป็นบาทค่าเงินปีเกิด
     ladder: null,

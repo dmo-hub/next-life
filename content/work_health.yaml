@@ -5,8 +5,8 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 3
-    when: {occupation: [clerk, professional, manager, technician]}
-    multipliers: {flags: {sporty: 0.5}, occupation: {clerk: 1.5, professional: 1.2}}
+    when: {occupation: [clerk, professional, manager, technician, officer, senior_officer]}
+    multipliers: {flags: {sporty: 0.5}, occupation: {clerk: 1.5, professional: 1.2, officer: 1.2, senior_officer: 1.2}}
     title: "คอแข็งเป็นหิน"
     text: "อายุ {อายุ} นั่งหน้าจอวันละสิบสองชั่วโมง เช้านี้หันคอไปทางซ้ายไม่ได้ นิ้วชาไปถึงข้อศอก เพื่อนโต๊ะข้าง ๆ บอกว่าเป็นกันทั้งออฟฟิศ"
     choices:

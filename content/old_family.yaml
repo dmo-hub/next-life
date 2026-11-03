@@ -145,7 +145,7 @@ events:
     stage: ชรา
     years: [2500, 2650]
     weight: 2
-    multipliers: {flags: {married: 0.8}, occupation: {professional: 1.3, manager: 1.3}}
+    multipliers: {flags: {married: 0.8}, occupation: {professional: 1.3, manager: 1.3, officer: 1.3, senior_officer: 1.3}}
     title: "เพื่อนเก่าชวนเที่ยว"
     text: "เพื่อนสมัยเรียนที่ไม่เจอกันสามสิบปีทักมา '{ชื่อ} แก่แล้วไปเที่ยวกันสักทริปมั้ย ก่อนเดินไม่ไหว'"
     choices:
