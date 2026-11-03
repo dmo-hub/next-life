@@ -158,6 +158,13 @@ events:
         cost: {unit: fixed_baht, amount: 2000, ref_year: 2566}
         effects: {relations: 2, health: 1}
         merit: [{cat: care_parents, level: 2}]
+      # จดหมายคำฝากของรุ่นก่อน (afterfall-3): ผลเท่าทางสำเร็จของ "เรียกญาติประชุมแบ่งเวร"
+      - id: heed_letter
+        text: "ทำตามจดหมาย เรียกพี่น้องมาช่วย"
+        filial: share
+        requires: {flags: {has: [heed_kin]}, reason: "ไม่ได้รับปากใครไว้"}
+        effects: {relations: 3, happiness: 1}
+        merit: [{cat: care_parents, level: 2}]
 
   - id: mid_crisis_01
     type: A

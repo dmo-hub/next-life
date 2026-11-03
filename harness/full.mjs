@@ -9,10 +9,9 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { parse } from 'yaml';
 import { loadContent } from '../src/node/load.mjs';
-import { effectSites } from '../src/node/lint/util.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 import { playLife, mixSeed, COURT_SCENES } from '../src/engine/index.mjs';
-import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS } from './gates.mjs';
+import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS, heirChain } from './gates.mjs';
 
 const args = process.argv.slice(2);
 const has = (name) => args.includes(`--${name}`);
@@ -103,11 +102,12 @@ for (const [flag, bot] of Object.entries(SIDE_REACH)) {
 }
 // การ์ดที่ when.parent_flags.has ออกได้เฉพาะทายาทของรุ่นที่ถือธง — ชีวิตที่นี่เป็นรุ่นเดียว parentFlags ว่างเสมอ ⇒ ถึงไม่ได้โดยโครงสร้าง
 // ด่านว่าใบพวกนี้ออกได้จริงอยู่ที่ npm run lineage · ธงที่มีแต่ใบพวกนี้ตั้งก็ถึงไม่ได้ด้วยเหตุเดียวกัน · ใบที่ผู้อ่านธงพ่อแม่แค่คูณโอกาสยังตัดสินที่นี่
-const HEIR_ONLY = new Set(content.events.filter((e) => e.when?.parent_flags?.has?.length).map((e) => e.id));
-const setters = new Map();
-for (const e of content.events) for (const { node } of effectSites(e)) for (const fl of node.sets_flags ?? []) setters.set(fl, [...(setters.get(fl) ?? []), e.id]);
-const HEIR_FLAGS = new Set([...setters].filter(([, ids]) => ids.every((id) => HEIR_ONLY.has(id))).map(([fl]) => fl));
-console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run lineage): การ์ดที่ต้องมีธงพ่อแม่ ${HEIR_ONLY.size} ใบ · ธงที่มีแต่การ์ดพวกนั้นตั้ง ${HEIR_FLAGS.size} ตัว${HEIR_FLAGS.size ? ` (${[...HEIR_FLAGS].join(' · ')})` : ''}`);
+// ผู้อ่านธงพวกนั้น (when.flags.has · requires.flags.has) ถึงไม่ได้ต่อเป็นโซ่ (heirChain ใน gates.mjs) — af3-heed ตกด่าน 2 ครั้งแรกเพราะข้ามแค่ชั้นแรก
+// FULL_HEIR_CHAIN=off ข้ามแค่ชั้นแรกแบบเดิม (ตัวควบคุม: ผู้อ่านธงทายาทต้องกลับมาตก)
+const chainOff = process.env.FULL_HEIR_CHAIN === 'off';
+const { parent: HEIR_PARENT, events: HEIR_ONLY, choices: HEIR_CHOICES, flags: HEIR_FLAGS, setters } = heirChain(content.events, { chain: !chainOff });
+const heirChained = [...HEIR_ONLY].filter((id) => !HEIR_PARENT.has(id));
+console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run lineage): การ์ดที่ต้องมีธงพ่อแม่ ${HEIR_PARENT.size} ใบ · ธงที่มีแต่ของทายาทตั้ง ${HEIR_FLAGS.size} ตัว${HEIR_FLAGS.size ? ` (${[...HEIR_FLAGS].join(' · ')})` : ''} · ผู้อ่านธงพวกนั้นตามโซ่ การ์ด ${heirChained.length}${heirChained.length ? ` (${heirChained.join(' · ')})` : ''} · ตัวเลือก ${HEIR_CHOICES.size}${HEIR_CHOICES.size ? ` (${[...HEIR_CHOICES].join(' · ')})` : ''}${chainOff ? ' · ตัวควบคุมปิดโซ่' : ''}`);
 // ใบศาล (B153) แกนแทรกเองตอนเฉียดตาย/ถูกเรียกตัว และบอทศาลเลือกแทน — ไม่จั่วจากกองและไม่ผ่านบอทหลัก ⇒ ด่าน 2 ตัดสินไม่ได้
 // ด่านว่าออกครบลำดับและถูกเรียกตัวทุกชีวิตที่ถือธงอยู่ที่ npm run near · ธง cheat_death ข้ามเฉพาะตอนยังไม่มีการ์ดตั้ง (near ตั้งเอง) — มีการ์ดตั้งเมื่อไรกลับมาตัดสินที่นี่
 const COURT_ONLY = new Set(content.events.filter((e) => COURT_SCENES.includes(e.scene)).map((e) => e.id));
@@ -149,7 +149,7 @@ function deadOf(runs) {
   return {
     fired,
     events: content.events.filter((e) => !fired.has(e.id) && !HEIR_ONLY.has(e.id) && !COURT_ONLY.has(e.id) && !FOCUS_ONLY.has(e.id)).map((e) => e.id),
-    choices: dead.filter((id) => !FOCUS_ONLY.has(id)),
+    choices: dead.filter((id) => !FOCUS_ONLY.has(id) && !HEIR_CHOICES.has(id)),
     thinChoices: thin,
     flags: FLAGS.filter((x) => !flags.has(x) && !sideFlags.has(x) && !HEIR_FLAGS.has(x) && !COURT_FLAGS.has(x)),
   };

@@ -35,6 +35,28 @@ export function splitDeadChoices(events, fired, explored, picks, min = MIN_EXPEC
   return { dead, thin };
 }
 
+// ของที่ถึงได้เฉพาะชีวิตทายาท: การ์ด when.parent_flags.has → ธงที่ตั้งได้แค่จากของพวกนี้ → การ์ด/ตัวเลือกที่ has ต้องมีธงพวกนั้น
+// (has ต้องครบทุกตัว ขาดตัวเดียวก็ถึงไม่ได้) → ธงที่ตั้งได้แค่จากผู้อ่านพวกนั้น … วนจนนิ่ง
+// ชีวิตรุ่นเดียว (full) parentFlags ว่างเสมอ ⇒ ถึงไม่ได้โดยโครงสร้าง ด่านว่าถึงได้จริงอยู่ที่ lineage · chain: false = ไม่ตามผู้อ่านธง (ตัวควบคุม)
+export function heirChain(events, { chain = true } = {}) {
+  const parent = new Set(events.filter((e) => e.when?.parent_flags?.has?.length).map((e) => e.id));
+  const evs = new Set(parent), choices = new Set(), setters = new Map();
+  for (const e of events) (e.choices ?? []).forEach((c, i) => {
+    const key = `${e.id}#${c.id ?? i}`;
+    for (const node of [c, ...[].concat(c.outcomes ?? [])]) for (const fl of node?.sets_flags ?? []) setters.set(fl, [...(setters.get(fl) ?? []), { ev: e.id, key }]);
+  });
+  const needs = (flags, has) => (has ?? []).some((fl) => flags.has(fl));
+  for (;;) {
+    const flags = new Set([...setters].filter(([, xs]) => xs.every((x) => evs.has(x.ev) || choices.has(x.key))).map(([fl]) => fl));
+    const before = evs.size + choices.size;
+    if (chain) for (const e of events) {
+      if (needs(flags, e.when?.flags?.has)) evs.add(e.id);
+      (e.choices ?? []).forEach((c, i) => needs(flags, c.requires?.flags?.has) && choices.add(`${e.id}#${c.id ?? i}`));
+    }
+    if (evs.size + choices.size === before) return { parent, events: evs, choices, flags, setters };
+  }
+}
+
 function cardGate(cardsOver60, name, min, max, paused, pausedText) {
   const xs = [...cardsOver60].sort((a, b) => a - b);
   const inRange = xs.filter((c) => c >= min && c <= max).length;

@@ -1,5 +1,5 @@
 import { makeRng, mixSeed } from './rng.mjs';
-import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord } from './family.mjs';
+import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
@@ -240,6 +240,8 @@ export function newLife(seed, content, heir = null) {
     fame: heir?.fame ?? 0,
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
+    // จดหมายคำฝากของรุ่นก่อน (afterfall-3) {age, from, cause, by} — ออกหลังมรดกถึงมือเท่านั้น
+    letter: heir?.letter ?? null,
     // อายุที่ธงแต่ละตัวติดครั้งแรก — ระหว่างชาติอ่านอายุตอนมีลูก
     flagAge: {},
     omenTone: null,
@@ -530,7 +532,22 @@ export const FILL = {
   ผม: (st) => (st.sex === 'หญิง' ? 'ฉัน' : 'ผม'),
   ลูกดูแลแบบเรา: (st) => filialMirrorText(st),
   พ่อแม่ที่ป่วย: (st) => illParentWord(st),
+  // จดหมายคำฝาก (afterfall-3): ฝั่งผู้ฝากอ่านคนรอบตัวตอนตาย · ฝั่งทายาทอ่าน st.letter ที่ระหว่างชาติสร้างไว้
+  ผู้รับซอง: (st) => (letterTo(st) ? letterToText(letterTo(st)) : 'คนข้างหลัง'),
+  ผู้ฝาก: (st) => st.letter?.from ?? 'ผู้ใหญ่รุ่นก่อน',
+  // ไม่บอกเหตุ (self_harm · other ก่อนชรา) ก็ยังต้องได้คำ — "ที่จากไปแล้ว" ไม่เผยเหตุ และช่องไม่ว่าง
+  เหตุผู้ฝาก: (st) => st.letter?.cause?.join('') ?? 'แล้ว',
+  ผู้ยื่นซอง: (st) => st.letter?.by ?? 'คนในบ้าน',
 };
+
+// สาเหตุการตาย (B110 · เจ้าของเคาะ): ป้ายสั้นภาษาคน [คำเชื่อม, คำนาม] — หน้าจอและจดหมายคำฝากใช้ตารางเดียวกัน
+// self_harm ไม่อยู่ในตารางโดยตั้งใจ: ห้ามขึ้นจอจนกว่าแกนจะมีข้อความระวัง + สายด่วน 1323 · other ที่ยังไม่ชราไม่บอกอะไร
+const CAUSE_TEXT = {
+  infection: ['ด้วย', 'โรคติดเชื้อ'], pneumonia: ['ด้วย', 'ปอดอักเสบ'], heart: ['ด้วย', 'โรคหัวใจ'], stroke: ['ด้วย', 'โรคหลอดเลือดสมอง'],
+  cancer: ['ด้วย', 'โรคมะเร็ง'], diabetes_kidney: ['ด้วย', 'โรคเบาหวานและไต'], liver: ['ด้วย', 'โรคตับ'], chronic_resp: ['ด้วย', 'โรคปอดเรื้อรัง'],
+  road: ['จาก', 'อุบัติเหตุบนท้องถนน'], accident: ['จาก', 'อุบัติเหตุ'], assault: ['เพราะ', 'ถูกทำร้าย'], newborn: ['ด้วย', 'ภาวะแทรกซ้อนแรกเกิด'],
+};
+export const causeWords = (cause, age) => (cause === 'other' ? (age >= STAGES.at(-1).from ? ['ด้วย', 'วัยชรา'] : null) : CAUSE_TEXT[cause] ?? null);
 export function fill(text, st) {
   return text.replace(/\{([^{}]*)\}/g, (m, k) => (FILL[k] ? String(FILL[k](st)) : m));
 }
@@ -702,6 +719,17 @@ function receiveLegacy(st, year, stage) {
   st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text });
 }
 
+// จดหมายคำฝาก (afterfall-3): ตามหลังการ์ดมรดก ⇒ ไม่มีทางออกขณะผู้ฝากยังอยู่ · ไม่กินโควตาปี ไม่ดึงเลขสุ่ม
+// ใบที่ออกเลือกจาก parent_flags (ชนิดคำฝาก) · ธงไม่ถึงชั้นนี้ = ไม่มีใบ
+function receiveLetter(st) {
+  st.letter = { ...st.letter, read: true };
+  const ev = st.content.events.find((e) => e.id.startsWith(LETTER.read) && whenOk(st, e.when));
+  if (!ev) return;
+  st.done[ev.id] = true;
+  st.fired[ev.id] = { n: 1, age: st.age };
+  st.due.push({ kind: 'eraEvent', ev, age: st.age });
+}
+
 // ย้ายสัดส่วน share ของเงินทั้งหมดเข้าสินทรัพย์เดียว · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
 function invest(st, { asset, share }) {
   if (!assetOpen(st.content.era, asset, st.birthYear + st.age)) throw new Error(`${assetName(asset)} ยังไม่มีในปี ${st.birthYear + st.age}`);
@@ -762,6 +790,7 @@ function stepYear(st) {
   homePays(st);
   const stage = stageOf(st.age);
   if (st.legacy && st.age >= st.legacy.age) receiveLegacy(st, year, stage);
+  if (st.letter && !st.letter.read && !st.legacy && st.age >= st.letter.age) receiveLetter(st);
   st.trail.push({ year, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
 
@@ -1189,6 +1218,7 @@ function lockReason(st, c, extra = 0) {
     const g = greyLaunderLock(st);
     if (g) return g;
   }
+  if (c.letter && !letterTo(st)) return LETTER.nobody;
   const q = c.requires;
   if (!q) return null;
   // อายุตามกฎหมายบอกเหตุผลของตัวเอง — reason ของเนื้อหาเขียนไว้ให้เงื่อนไขอื่น (เช่น "สั่งไว้แล้ว")
@@ -1701,6 +1731,13 @@ export function choose(st, idx, loan) {
       after.push({ kind: 'eraEvent', ev: follow, age: st.age });
     }
   }
+  // จดหมายคำฝาก: เลือกคำฝากใบย่อยก่อน แล้วคำสั่งเสียกลับมาตามปกติ
+  const pick = c.letter && st.content.events.find((e) => e.id === LETTER.pick);
+  if (pick) {
+    st.done[pick.id] = true;
+    st.fired[pick.id] = { n: 1, age: st.age };
+    after.push({ kind: 'eraEvent', ev: pick, age: st.age });
+  }
   // คำสั่งเสียเลือกได้หลายข้อ: สั่งเรื่องหนึ่งแล้วการ์ดกลับมาให้สั่งต่อ ข้อที่สั่งแล้วล็อกด้วยธงของมันเอง
   if (ev.id === FUNERAL.wishes && (c.sets_flags ?? []).some((f) => f.startsWith('wish_'))) after.push({ kind: 'eraEvent', ev, age: st.age });
   // เลิกเรียนแล้วหางานทันที
@@ -1778,6 +1815,7 @@ function deathCard(st) {
   }
   // มีทรัพย์ให้แบ่ง + ลูกที่ยังอยู่ถึงเกณฑ์ = เรื่องพินัยกรรม (afterlife.mjs หักส่วนที่เสียไปกับการทะเลาะ) · ลูกคนเดียวไม่มีใครให้ทะเลาะด้วย
   if (card.summary.money > 0 && !card.short && disputes(st)) card.will = !!st.flags.wish_will;
+  if (st.flags.wish_letter && letterTo(st)) card.letter = `ฝากจดหมายไว้กับ${letterToText(letterTo(st))}`;
   return card;
 }
 
@@ -1794,6 +1832,8 @@ export const FUNERAL = {
   // ลูกที่ยังอยู่ตั้งแต่เท่านี้ถึงมีการแบ่งมรดกกันเอง (เจ้าของเคาะ A9)
   disputeKids: 2,
 };
+// จดหมายคำฝาก (afterfall-3): ใบเลือกคำฝากตามหลังคำสั่งเสีย · ใบที่ทายาทอ่านขึ้นต้นด้วย read (ใบละชนิดคำฝาก)
+export const LETTER = { pick: 'funeral_letter_01', read: 'heir_letter_', nobody: 'ไม่มีใครให้ฝาก' };
 const guestBase = (st) => 20 + st.relations * 2 + st.network * 3;
 // แขกมาส่งตามความสัมพันธ์/คอนเน็คชั่น คูณขนาดงาน — ปัดสิบ ไม่ใช่ยอดนับจริง · ไม่มีงานศพ = 0
 export const funeralGuests = (st) => (st.funeral ? Math.round(((FUNERAL.guests[st.funeral.id] ?? 1) * guestBase(st)) / 10) * 10 : 0);
