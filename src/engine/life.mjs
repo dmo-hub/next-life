@@ -238,6 +238,8 @@ export function newLife(seed, content, heir = null) {
     gen: heir?.gen ?? 1,
     // ชื่อเสียงตระกูล 0–3 (B95b) ส่งต่อจากรุ่นก่อน · การ์ดเอียงตาม multipliers.family_fame
     fame: heir?.fame ?? 0,
+    // ค่าซ้อนทับของตระกูล (overlapOf) — ใส่ช่องเฉพาะเมื่อ > 0 ⇒ ตระกูลที่ไม่เคยข้ามโลกได้สถานะเท่าเดิมทุกไบต์ · เซฟเก่าไม่มีช่อง = 0
+    ...(heir?.overlap && { overlap: heir.overlap }),
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // จดหมายคำฝากของรุ่นก่อน (afterfall-3) {age, from, cause, by} — ออกหลังมรดกถึงมือเท่านั้น
@@ -304,6 +306,7 @@ export function newLife(seed, content, heir = null) {
   st.stageMark = markStage(st);
   lifeFocusBorn(st, heir?.focus);
   if (heir?.gates?.length) st.gates = [...heir.gates];
+  overlapPlan(st);
   return st;
 }
 
@@ -656,6 +659,34 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
     else delete st.chronic[k];
     st.chronicAge[k] = st.age;
   }
+}
+
+// ไอเทมติดตัว (B78): state สร้างตอนได้ชิ้นแรก — ชีวิตที่ไม่เคยได้ของและเซฟก่อนมีระบบจึงไม่มีช่องนี้ ผู้อ่านใช้ itemsOf ได้ช่องว่าง
+export const itemsOf = (st) => st.items ?? { wear: Object.fromEntries(Object.keys(st.content.items.slots).map((k) => [k, null])), bag: [], cap: st.content.items.cap };
+// จอโชว์ช่องไอเทมเมื่อโลกซ้อนทับถึงขั้น 3 หรือมีของแล้ว — ก่อนนั้นช่องว่างเปล่าบอกใบ้ระบบที่ผู้เล่นยังไปไม่ถึง
+export const itemsVisible = (st) => overlapStageOf(st) >= 3 || (st.items ? Object.values(st.items.wear).some(Boolean) || st.items.bag.length > 0 : false);
+
+// ไม่ดึงเลขสุ่ม: ได้ชิ้นแรกในลิสต์ที่ยังไม่มี ครบแล้วไม่ได้เพิ่ม · ลงช่องชนิดตรงถ้าว่าง ไม่งั้นเข้าเป้ · เป้เต็มขายทันที (ไม่มีปุ่มทิ้ง/ให้)
+// คืนข้อความที่ผู้เล่นเห็น หรือ null เมื่อไม่ได้อะไร
+function gainLoot(st, ids) {
+  const reg = st.content.items;
+  const it = itemsOf(st);
+  const id = ids.find((x) => !Object.values(it.wear).includes(x) && !it.bag.includes(x));
+  if (!id) return null;
+  st.items = it;
+  const item = reg.list[id];
+  let where;
+  if (!it.wear[item.slot]) {
+    it.wear[item.slot] = id;
+    where = ` ใส่ช่อง${reg.slots[item.slot]}`;
+  } else if (it.bag.length < it.cap) {
+    it.bag.push(id);
+    where = ' เก็บเข้าเป้';
+  } else {
+    st.money += moneyValue(st, item.sell);
+    where = ' แต่เป้เต็ม เลยขายต่อได้เงินแทน';
+  }
+  return `${item.text} · ได้${item.name}${where}`;
 }
 
 // เรื้อรังไหลทุกปี แล้วจางลงระดับละ 1 ทุก CHRONIC_FADE ปีนับจากครั้งล่าสุดที่ระดับเปลี่ยน
@@ -1532,6 +1563,7 @@ export function poolMultiplier(st, m) {
   // ขอพร: เอียงตามบัญชีแบบต่อเนื่อง บุญน้อยเอียงน้อย บาปหนักกลับทิศ
   if (m.wish) x *= m.wish ** ledgerLevel(st.ledger);
   if (m.family_fame) x *= m.family_fame ** (st.fame ?? 0);
+  if (m.overlap_stage !== undefined) x *= m.overlap_stage ** overlapStageOf(st);
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
   for (const [f, v] of Object.entries(m.parent_flags ?? {})) if (st.parentFlags?.[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
@@ -1573,6 +1605,7 @@ export function whenOk(st, when) {
   if (when.class && !when.class.includes(classNow(st))) return false;
   if (when.region && !when.region.includes(st.region)) return false;
   if (when.sex && !when.sex.includes(st.sex)) return false;
+  if (when.overlap_stage && !inRange(overlapStageOf(st), when.overlap_stage)) return false;
   for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;
   // อาชีพนับเมื่อมีงานของตัวเองแล้ว — อาชีพครอบครัวก่อนทำงานไม่ทำให้การ์ดที่ทำงานออก
   if (when.occupation && !(st.workFrom !== null && when.occupation.includes(st.occupation))) return false;
@@ -1668,6 +1701,7 @@ export function choose(st, idx, loan) {
     const n = st.trips?.length ?? 0;
     const trip = idx === ENTRY.accept && tripRoll(st.seed, ev.entry, n);
     if (trip) {
+      if (overlapLeftIsekai(st)) overlapStep(st);
       st.log.push({ id: `isekai_${ev.entry}`, age: st.age, choice: idx, text: ev.choices[idx].text });
       st.trip = startIsekai({
         seed: (st.seed ^ TRIP.salt ^ Math.imul(n + 1, 0x9e3779b1)) >>> 0, past: st.name, ledger: st.ledger,
@@ -1677,6 +1711,7 @@ export function choose(st, idx, loan) {
         // ค่าจริงของชีวิตนี้ตอนข้าม (B136) — ผลในต่างโลกสะท้อนกลับชุดนี้ แล้ว tripBack เขียนลง st
         real: realAt(st),
         hints: st.content.nearHints,
+        overlapStage: overlapStageOf(st),
       });
       return;
     }
@@ -1704,7 +1739,10 @@ export function choose(st, idx, loan) {
   const pool = ev.weight && ev.age === undefined && !ev.era;
   const s = pool ? poolEffectScale(stageOf(st.age)) : 1;
   const ss = pool ? poolStatScale(stageOf(st.age)) : 1;
+  // ใบในรอบเดียวกัน (ev.run) ที่สุขภาพหมดอยู่ก่อนกด = โรคที่ถึงคิวกลางรอบ ไม่ใช่ผลของใบนี้ — จำไว้ก่อนผลของตัวเลือกลง
+  const ill = ev.run !== undefined && st.health <= 0;
   applyEffects(st, c.effects, s, ss);
+  const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
@@ -1714,13 +1752,21 @@ export function choose(st, idx, loan) {
   // การ์ดที่ตัวเลือกนี้ก่อ (ผล → เรื่องต่อ → หางาน) เข้าหัวคิวตามลำดับ ก่อนการ์ดอื่นของปีที่รออยู่
   // สายมูก่อการ์ดของตัวเองได้ (ผลหวยสายมู) — มาก่อนผลสุ่มของตัวเลือก
   const after = beliefChoice(st, ev, c);
+  // ตัวเลือกตรงไม่มีการ์ดผล — ของที่ได้เล่าเป็นการ์ดผลใบเดียว (lint ห้าม loot บนตัวเลือกที่มี outcomes)
+  if (gotC) after.unshift({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: gotC });
+  let doom, wound;
   if (c.outcomes?.length) {
     const o = weighted(st.rng, c.outcomes, outcomeWeights(st, ev, c));
-    const helper = !o.ok && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
+    doom = o.effects?.die;
+    // ตัวเลือกที่มีทางตาย (ห้องบอส): ชีวิตหมดจากบาดแผลทางอื่นของตัวเลือกเดียวกันก็ตายในดันเจียน ไม่ใช่ด้วยโรค
+    wound = c.outcomes.find((x) => x.effects?.die)?.effects.die;
+    // ตายในการ์ด ญาติประคองไม่ได้ — ป้าย "หนักแค่ครึ่งเดียว" จะขัดกับมรณบัตรใบถัดไป
+    const helper = !o.ok && !doom && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
     applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1);
+    const gotO = o.effects?.loot && gainLoot(st, o.effects.loot);
     applyChoice(st, ev, o, text);
     if (c.filial) filialNote(st, c.filial, filialScore(o.merit), true);
-    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') });
+    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') + (gotO ? ` · ${gotO}` : '') });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
     if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow)) {
@@ -1747,8 +1793,11 @@ export function choose(st, idx, loan) {
   }
   // ชีวิตหมดจากผลการ์ด = ตายในการ์ดนั้น (B160) ไม่รอขอบปี · การ์ดผลยังเล่าก่อน · เรื่องต่อ หางาน และการ์ดที่รอในปีนั้นไม่ออกแล้ว
   // การ์ดงานศพเลือกหลังตายแล้ว ⇒ ไม่ตัดสินซ้ำ
-  if (!st.dead && !st.court && st.health <= 0) {
-    const d = faceDeath(st, healthCause(st), { afterQueue: true });
+  // ผลที่สั่งตาย (ดันเจียนของนักล่า) เดินทางเดียวกัน แต่สาเหตุมาจากการ์ด ไม่ใช่โรคตามสุขภาพ
+  // โรคที่ถึงคิวกลางรอบรอให้รอบจบก่อน (ตัดกลางรอบ = ผู้เล่นไม่รู้ว่าออกจากเกตหรือไม่) แล้วตายด้วยโรคที่ใบสุดท้าย — บาดแผลของห้องบอสไม่ใช่เหตุ
+  const runOn = ill && !doom && after.some((x) => x.kind === 'eraEvent' && x.ev.run === ev.run);
+  if (!st.dead && !st.court && !runOn && (doom || st.health <= 0)) {
+    const d = faceDeath(st, doom ?? (ill ? undefined : wound) ?? healthCause(st), { afterQueue: true });
     st.queue = after.filter((x) => x.kind === 'result');
     st.due = [];
     if (d.fate === 'dead') queueFuneral(st);
@@ -1866,6 +1915,39 @@ export function tripSettle(st, isk) {
   if (isk.home) for (const k of STAT_KEYS) st[k] = clamp(isk.real.stats[k]);
 }
 
+// ค่าซ้อนทับ (โลกซ้อนทับ): ตัวนับเดียวของตระกูล ขึ้นทีละ 1 ทุกครั้งที่กลับเข้าโลกที่เคยออกไป ไม่มีทางลด · ไปกับทายาทเหมือนบัญชีบุญบาป
+// ไม่ดึงเลขสุ่ม — ชีวิตที่ไม่ข้ามโลกเดินเท่าเดิม · เริ่มตระกูลใหม่ (newLife ไม่มี heir) = 0
+export const overlapOf = (st) => st?.overlap ?? 0;
+export function overlapStep(st) {
+  st.overlap = overlapOf(st) + 1;
+}
+// ขั้นของค่าซ้อนทับ 0–4: การ์ดอ่านแค่ขั้น ไม่อ่านค่าดิบ · ขั้น 1 = ค่า 1 ล็อก · ขั้น 2–4 ไปไม่ถึงจนใบ 16 วัดบอทอัตราจริงแล้วใส่เลข
+export const OVERLAP_STAGE_MIN = [0, 1, Infinity, Infinity, Infinity];
+// อ่านค่าสดทุกครั้ง — ขึ้นขั้นกลางชีวิต (ทริปกลับบ้าน) การ์ดขั้นใหม่ออกได้ปีถัดไปเลย
+export const overlapStageOf = (st) => OVERLAP_STAGE_MIN.findLastIndex((min) => overlapOf(st) >= min);
+// ตระกูลเคยออกจากต่างโลกมาแล้ว = มีชาติต่างโลกลงผัง (กลับมาเกิดแล้ว) หรือทริปที่กลับถึงบ้าน · ทริปหลงตายในต่างโลก ไม่นับว่าออก
+// เข้าต่างโลกอีกเมื่อจริง = กลับเข้าโลกที่เคยออกไป +1 (เกิด · ถูกเรียก · ทริป)
+export const overlapLeftIsekai = (st) => [...(st.lineage ?? []), { trips: st.trips }].some((l) => l.isekai || l.trips?.some((t) => t.home));
+
+// ตารางนัดการ์ดซ้อนทับต่อชีวิต: ลอกแบบตารางนัดการ์ดชวนต่างโลก — สุ่มจาก stream แยกของ seed ไม่ดึง st.rng
+// ขั้น 0 ไม่มีตารางและไม่เพิ่มช่องใด ⇒ ตระกูลค่า 0 เดินเท่าเดิมทุกหลัก · การ์ดซ้อนทับไม่อยู่ในกองสุ่ม ออกทางนัดนี้ทางเดียว
+// นัดลง st.scheduled จึงกินโควตาปีแบบผลย้อน (ชีวิตไม่ยาวขึ้น) · ขั้น 1 อย่างน้อย 1 ใบ ให้คนที่ข้ามโลกครั้งแรกเห็นผลแน่นอน
+// ขั้นขึ้นกลางชีวิตได้ทางเดียวคือทริปกลับบ้าน ⇒ ทิ้งนัดที่ยังไม่ออกแล้วสุ่มใหม่ด้วย stream ของรอบนั้น หลังเดินปีที่หายไปแล้ว
+export const OVERLAP_PLAN = { salt: 0x3c6ef372, prefix: 'overlap_', ages: [15, 60], quota: [[0, 0], [1, 1], [1, 2], [2, 4], [2, 4]] };
+// stage ส่งเองได้เฉพาะด่าน — ขั้น 2–4 ยังไม่มีเลขเกณฑ์ให้ตระกูลจริงไปถึง
+export function overlapPlan(st, run = 0, stage = overlapStageOf(st)) {
+  if (!stage) return;
+  st.scheduled = st.scheduled.filter((x) => !x.overlap);
+  const rng = makeRng(mixSeed(st.seed ^ OVERLAP_PLAN.salt, run));
+  const [lo, hi] = OVERLAP_PLAN.quota[stage];
+  const from = Math.max(st.age + 1, OVERLAP_PLAN.ages[0]);
+  const pool = st.content.events.filter((e) => e.id.startsWith(OVERLAP_PLAN.prefix) && !st.done[e.id] && inRange(stage, e.when?.overlap_stage));
+  for (let left = rng.int(lo, hi); left > 0 && pool.length && from <= OVERLAP_PLAN.ages[1]; left--) {
+    const [ev] = pool.splice(rng.int(0, pool.length - 1), 1);
+    st.scheduled.push({ event: ev.id, age: rng.int(from, OVERLAP_PLAN.ages[1]), overlap: true });
+  }
+}
+
 // ปีที่หายไปเดินด้วย stepYear ปกติ (เงิน คนในบ้าน ด่านเรียน) แต่ไม่ทอยตายและไม่จับกอง — ตัวไม่อยู่ เรื่องของปีนั้นจึงมาเป็นข่าวหลังกลับ
 function tripBack(st) {
   const isk = st.trip;
@@ -1877,11 +1959,14 @@ function tripBack(st) {
     st.dead = true;
     return nextCard(st);
   }
+  // กลับถึงบ้าน = กลับเข้าโลกที่เคยออกไป · ทริปหลงไม่ได้กลับ จึงไม่นับ
+  overlapStep(st);
   const away = isk.age - isk.trip.from;
   const c = tripCarry(isk);
   st.network = clamp(st.network + c.network);
   st.knowledge = clamp(st.knowledge + c.knowledge);
   for (let i = 0; i < isk.trip.thai; i++) stepYear(st);
+  overlapPlan(st, st.trips.length);
   // ใบตัดสินใจที่ถึงกำหนดทุกปี (เลื่อนขั้น ทบทวนเงิน ช่วงวัย) ซ้อนกันหลายใบ — เก็บใบล่าสุดของแต่ละเรื่อง ใบเก่าสร้างจากสถานะที่ไม่ใช่แล้ว
   const key = (c) => (c.kind === 'eraEvent' ? `e:${c.ev.id}` : ['alloc', 'stage', 'omen'].includes(c.kind) ? c.kind : null);
   st.due = st.due.filter((c, i) => !key(c) || !st.due.slice(i + 1).some((d) => key(d) === key(c))).map((c) => ({ ...c, age: st.age }));

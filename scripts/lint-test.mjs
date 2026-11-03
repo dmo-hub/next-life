@@ -68,6 +68,28 @@ const controls = {
 };
 for (const [name, args] of Object.entries(controls)) if (!checkMeritTable(...args).length) fails.push(`merit-table ตัวควบคุม "${name}" ไม่ตก`);
 rows.push(['merit-table ตัวควบคุม', `${Object.keys(controls).length} แบบ`]);
+// ขั้นค่าซ้อนทับ (โลกซ้อนทับ ใบ 09): ทุกเคสเป็นการ์ดเดียวกัน ต่างแค่ช่องนี้ — ตกต้องตกที่ช่อง overlap_stage เท่านั้น ผ่านต้องไม่มีปัญหาเลย
+const overlapCard = (extra) => ({ id: 'overlap_case_01', type: 'A', stage: 'ทำงาน', years: [2500, 2650], weight: 1, text: 'ข้อความการ์ด', ...extra, choices: [1, 2, 3, 4].map((n) => ({ text: `ทางเลือก ${n}`, merit: [{ cat: 'neutral' }] })) });
+const overlapCases = [
+  ['when [1, 2]', { when: { overlap_stage: [1, 2] } }, true],
+  ['when [0, 4]', { when: { overlap_stage: [0, 4] } }, true],
+  ['ตัวคูณ 2', { multipliers: { overlap_stage: 2 } }, true],
+  ['ตัวคูณ 0', { multipliers: { overlap_stage: 0 } }, true],
+  ['when ขั้น 5', { when: { overlap_stage: [1, 5] } }, false],
+  ['when ติดลบ', { when: { overlap_stage: [-1, 2] } }, false],
+  ['when ไม่ใช่จำนวนเต็ม', { when: { overlap_stage: [1.5, 2] } }, false],
+  ['when ข้อความ', { when: { overlap_stage: ['1', 2] } }, false],
+  ['when ตัวเลขเดียว', { when: { overlap_stage: 1 } }, false],
+  ['when min > max', { when: { overlap_stage: [3, 1] } }, false],
+  ['ตัวคูณติดลบ', { multipliers: { overlap_stage: -1 } }, false],
+  ['ตัวคูณข้อความ', { multipliers: { overlap_stage: '2' } }, false],
+];
+for (const [name, extra, pass] of overlapCases) {
+  const ps = lintDocs([{ file: `overlap-case:${name}`, doc: { events: [overlapCard(extra)] } }], ctx);
+  const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.path.endsWith('.overlap_stage'));
+  if (!ok) fails.push(`overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกที่ช่อง overlap_stage'} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
+}
+rows.push(['overlap_stage ตก/ผ่าน', `${overlapCases.length} เคส`]);
 // ป้ายบุญบาปต่างโลก (B68c) อยู่นอก yaml ไม่ผ่านด่านเนื้อหา — ตรวจ id/ลำดับตัวเลือก/หมวด/ระดับ ที่นี่แทน
 const iskById = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
 let iskTags = 0;
@@ -255,6 +277,25 @@ try {
   const real = lintIsekai(dir('content/isekai/').map((f) => load('content/isekai/', f)));
   for (const p of real) fails.push(`content/isekai: ${formatIsekaiProblem(p)}`);
   rows.push(['content/isekai/', `${real.length ? `ตก ${real.length} ข้อ` : 'ผ่าน'} · กติกา ${ISEKAI_RULES.length} · ไฟล์ bad ${files.length}`]);
+  // ขั้นค่าซ้อนทับฝั่งต่างโลก (ใบ 15): การ์ดเดียวกันต่างแค่ช่องนี้ — ตกต้องตกด้วย isekai-overlap อย่างเดียว ผ่านต้องไม่มีปัญหาเลย
+  const iskOverlapCard = (stage) => ({ id: 'overlap_case_isk', power: 'major', ch: [2], ...(stage !== undefined && { overlap_stage: stage }), title: 'ชื่อ', text: 'ข้อความ', choices: [{ t: 'ก', text: 'ผลก' }, { t: 'ข', text: 'ผลข' }] });
+  const iskOverlapCases = [
+    ['ไม่มีช่อง', undefined, true],
+    ['[1, 4]', [1, 4], true],
+    ['[0, 0]', [0, 0], true],
+    ['ขั้น 5', [1, 5], false],
+    ['ติดลบ', [-1, 2], false],
+    ['ไม่ใช่จำนวนเต็ม', [1.5, 2], false],
+    ['ข้อความ', ['1', 2], false],
+    ['ตัวเลขเดียว', 1, false],
+    ['จาก > ถึง', [3, 1], false],
+  ];
+  for (const [name, stage, pass] of iskOverlapCases) {
+    const ps = lintIsekai([{ file: `isekai-overlap-case:${name}`, doc: { cards: [iskOverlapCard(stage)] } }]);
+    const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.rule === 'isekai-overlap');
+    if (!ok) fails.push(`isekai overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกด้วย isekai-overlap'} ได้ [${ps.map(formatIsekaiProblem).join(' | ') || 'ผ่าน'}]`);
+  }
+  rows.push(['isekai overlap_stage ตก/ผ่าน', `${iskOverlapCases.length} เคส`]);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

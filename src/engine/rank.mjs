@@ -34,6 +34,12 @@ export const PROMO = {
     { years: 5, need: { knowledge: 35 }, odds: 2 },
     { years: 7, need: { relations: 50 }, odds: 1 },
   ],
+  // นักล่า (โลกซ้อนทับขั้น 3): ขั้นล่างวัดร่างกาย ขั้นบนวัดเส้นสาย
+  hunter: [
+    { years: 3, need: { health: 50 }, odds: 3 },
+    { years: 4, need: { health: 55, knowledge: 50 }, odds: 2 },
+    { years: 5, need: { network: 60 }, odds: 1 },
+  ],
 };
 // ตำรวจไต่ช้ากว่าทหาร — คนเข้าสายตำรวจมากกว่า (เปิดรับกลางทาง) ยอดสองสายจึงหายากใกล้กัน
 PROMO.police = [

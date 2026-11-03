@@ -8,7 +8,8 @@ import { lintDocs, formatProblem } from './lint/index.mjs';
 import { MERIT_CATS } from './lint/vocab.mjs';
 import { checkMeritTable } from '../engine/merit.mjs';
 import { DEBTS } from '../engine/finance.mjs';
-import { PLACEHOLDERS, MAX_LEN } from './lint/vocab.mjs';
+import { PLACEHOLDERS, MAX_LEN, ID_RE } from './lint/vocab.mjs';
+import { isObj, isMoney } from './lint/util.mjs';
 import { NEAR_HINT_LEVELS } from '../engine/court.mjs';
 import { checkFocus } from './lint/focus.mjs';
 import { lintIsekai, formatIsekaiProblem } from './lint/isekai.mjs';
@@ -431,4 +432,22 @@ export function loadIsekaiCards(dir = 'content/isekai/') {
   return cards;
 }
 
-export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus: loadFocus(), isekai: loadIsekaiCards() });
+// ทะเบียนไอเทม (B78): แกนวางของลงช่องตามชนิด — ชนิดสะกดผิด/ไม่มีราคาขาย = ของหายเงียบตอนช่องเต็ม จึงหยุดที่ตอนโหลด
+export function loadItems(p = 'content/rules/items.yaml') {
+  const doc = parse(read(p));
+  const slots = isObj(doc?.slots) ? doc.slots : {};
+  const bad = [];
+  if (!Object.keys(slots).length) bad.push('slots ต้องมีอย่างน้อย 1 ช่อง');
+  if (!Number.isInteger(doc?.cap) || doc.cap < 1) bad.push(`cap ต้องเป็นเลขเต็ม ≥ 1 ได้ ${doc?.cap}`);
+  for (const [id, it] of Object.entries(doc?.items ?? {})) {
+    if (!ID_RE.test(id)) bad.push(`${id}: id ต้องเป็น a-z0-9_`);
+    if (!Object.hasOwn(slots, it?.slot)) bad.push(`${id}: slot ต้องเป็น ${Object.keys(slots).join('|')} ได้ ${it?.slot}`);
+    if (typeof it?.name !== 'string' || !it.name.trim() || it.name.length > MAX_LEN.title) bad.push(`${id}: name ต้องเป็นข้อความไม่ว่าง ≤ ${MAX_LEN.title}`);
+    if (typeof it?.text !== 'string' || !it.text.trim() || it.text.length > MAX_LEN.text) bad.push(`${id}: text ต้องเป็นข้อความไม่ว่าง ≤ ${MAX_LEN.text}`);
+    if (!isMoney(it?.sell)) bad.push(`${id}: sell ต้องเป็นเงิน {unit, amount}`);
+  }
+  if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return { slots, cap: doc.cap, list: doc.items ?? {} };
+}
+
+export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus: loadFocus(), isekai: loadIsekaiCards(), items: loadItems() });

@@ -364,6 +364,107 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 06a ตัวควบคุม: เผ่านอกรายการแคว้น → ด่านเกิดตก', failed({ birth: (rng) => ({ ...C.contBirth(rng), race: 'dragonkin' }) }, 'เกิดได้ทุกแคว้น'));
 }
 
+// ค่าซ้อนทับ (โลกซ้อนทับ ใบ 08): เกิดกลับหลังชาติต่างโลก +1 · ทริปกลับบ้าน +1 · ไม่ข้ามโลก/เริ่มตระกูลใหม่ = 0 และไม่มีช่องในสถานะ
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const fresh = newLife(mixSeed(1, 801), content);
+  const o = {};
+  E.overlapStep(o);
+  E.overlapStep(o);
+  check('ค่าซ้อนทับ: ตระกูลใหม่ = 0 ไม่มีช่อง · ขึ้นทีละ 1', E.overlapOf(fresh) === 0 && !('overlap' in fresh) && E.overlapOf(null) === 0 && o.overlap === 2);
+  const P = (id) => E.PATHS.findIndex((p) => p.id === id);
+  // ทางเกิด: ชาติไทยเลือก want · กลับจากต่างโลกเลือกเกิดใหม่โลกเดิม · การ์ดอื่นกดตัวเปิดตัวแรก
+  const walk = (st, want) => E.playAfterlife(st, (card, rng, af) => (card.kind === 'path' ? (af.from ? P('reborn') : want) : Math.max(0, (card.locked ?? []).findIndex((x) => !x))));
+  const { state } = playLife(mixSeed(1, 802), content, BOTS.สุ่ม);
+  const stay = walk(state, P('reborn'));
+  const away = walk(playLife(mixSeed(1, 802), content, BOTS.สุ่ม).state, P('isekai'));
+  const back = E.nextLife(away);
+  const backV = back.overlap;
+  const again = walk(playLife(back.seed, content, BOTS.สุ่ม, null, back).state, P('isekai'));
+  // รอบสอง: เข้าต่างโลกซ้ำหลังเคยออก +1 แล้วเกิดกลับอีก +1 ⇒ 1 + 2
+  check('ค่าซ้อนทับ: เกิดกลับหลังชาติต่างโลก +1 ส่งต่อทายาท · เข้าต่างโลกซ้ำ +1 · เกิดในโลกปกติต่อกันไม่มีช่อง', !('overlap' in stay.heir) && !('overlap' in E.nextLife(stay)) && away.heir.overlap === 1 && backV === 1 && again.heir.overlap === 3, `${E.overlapOf(stay.heir)} · ${away.heir.overlap} · ${again.heir.overlap}`);
+  const tripBot = Object.assign((card, rng, h) => (card.entry ? E.ENTRY.accept : BOTS.สุ่ม(card, rng, h)), { isekai: true, trip: (card, rng) => card.choices.map((_, k) => k).filter((k) => !card.locked?.[k])[0] });
+  // ค่าที่ควรได้ = ทริปกลับบ้าน + ทริปที่เริ่มหลังเคยกลับบ้านแล้ว (เข้าต่างโลกซ้ำ) · ทริปหลงไม่ได้กลับ
+  const want = (trips) => trips.reduce((a, t) => ({ v: a.v + (a.left ? 1 : 0) + (t.home ? 1 : 0), left: a.left || !!t.home }), { v: 0, left: false }).v;
+  let tHome = null, tLost = null, tAgain = null;
+  for (let i = 0; i < 300 && !(tHome && tLost && tAgain); i++) {
+    const r = playLife(mixSeed(1, 9000 + i), content, tripBot).state;
+    const t = r.trips ?? [];
+    const got = [want(t), E.overlapOf(r)];
+    if (t.some((x) => x.home) && !tHome) tHome = got;
+    if (r.tripLost && !tLost) tLost = got;
+    if (t.findIndex((x) => x.home) >= 0 && t.findIndex((x) => x.home) < t.length - 1 && !tAgain) tAgain = got;
+  }
+  const same = (x) => !!x && x[0] === x[1];
+  check('ค่าซ้อนทับ: ทริปกลับบ้าน +1 · ทริปหลงไม่นับ · ทริปหลังเคยกลับ (เข้าซ้ำ) +1', same(tHome) && same(tLost) && same(tAgain), `กลับ ${tHome ?? 'ไม่เจอ'} · หลง ${tLost ?? 'ไม่เจอ'} · เข้าซ้ำ ${tAgain ?? 'ไม่เจอ'}`);
+}
+
+// ขั้นค่าซ้อนทับ (ใบ 09): การ์ดอ่านขั้น ไม่อ่านค่าดิบ · ขั้น 1 = ค่า 1 · ขึ้นขั้นกลางชีวิตแล้วเงื่อนไขเห็นทันที · ตัวคูณยกกำลังตามขั้น
+{
+  const E = await import('../src/engine/index.mjs');
+  const st = newLife(mixSeed(1, 803), loadContent());
+  const rumor = { overlap_stage: [1, 2] };
+  const before = [E.overlapStageOf(st), E.whenOk(st, rumor), E.poolMultiplier(st, { overlap_stage: 3 })];
+  E.overlapStep(st);
+  const after = [E.overlapStageOf(st), E.whenOk(st, rumor), E.poolMultiplier(st, { overlap_stage: 3 }), E.poolMultiplier(st, { overlap_stage: 0 })];
+  check('ขั้นค่าซ้อนทับ: ค่า 0 = ขั้น 0 การ์ดขั้น 1 ไม่ออก ตัวคูณ ×1', before.join() === '0,false,1', before.join());
+  check('ขั้นค่าซ้อนทับ: ขึ้นค่ากลางชีวิต → ขั้น 1 การ์ดออกได้ทันที ตัวคูณ ×3 · ตัวคูณ 0 ปิดการ์ด', after.join() === '1,true,3,0', after.join());
+  st.overlap = 1e6;
+  check('ขั้นค่าซ้อนทับ: ขั้น 2–4 ยังไปไม่ถึงจนใบ 16 ใส่เกณฑ์ (ค่าสูงแค่ไหนก็ขั้น 1)', E.OVERLAP_STAGE_MIN.length === 5 && E.OVERLAP_STAGE_MIN[1] === 1 && E.overlapStageOf(st) === 1, String(E.overlapStageOf(st)));
+}
+
+// ไอเทมติดตัว (B78): ห้องบอสให้ชิ้นแรกที่ยังไม่มี · ช่องชนิดตรงว่างก่อน แล้วเป้ · เป้เต็มขาย · ครบแล้วไม่ได้เพิ่ม · ชีวิต/เซฟที่ไม่เคยได้ของไม่มีช่อง
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const byId = (id) => content.events.find((e) => e.id === id);
+  // ตัดทางไม่ ok ออก ⇒ ผลแน่นอนโดยไม่แตะ rng ของเทส
+  const sure = (ev) => ({ ...ev, choices: ev.choices.map((c) => ({ ...c, ...(c.outcomes && { outcomes: c.outcomes.filter((o) => o.ok) }) })) });
+  const boss = sure(byId('dungeon_hunt_boss_01'));
+  const out = byId('dungeon_pull_out_01');
+  const keep = out.choices.findIndex((c) => c.id === 'bag_keep');
+  const st = newLife(mixSeed(1, 2323), content);
+  st.flags.hunter = true;
+  st.age = 30;
+  const empty = E.itemsOf(st);
+  check('ไอเทม: ชีวิตที่ไม่เคยได้ของไม่มี state items · itemsOf ได้ 3 ช่องว่าง เป้ 0/3', !('items' in st) && Object.values(empty.wear).every((x) => x === null) && Object.keys(empty.wear).join() === 'charm,weapon,outfit' && empty.bag.length === 0 && empty.cap === 3);
+  const keepStage = E.OVERLAP_STAGE_MIN[3];
+  E.OVERLAP_STAGE_MIN[3] = 3;
+  const hidden = E.itemsVisible(st);
+  st.overlap = 3;
+  const byStage = E.itemsVisible(st);
+  st.overlap = 0;
+  E.OVERLAP_STAGE_MIN[3] = keepStage;
+  check('ไอเทม: ช่องไอเทมซ่อนเมื่อขั้นซ้อนทับ < 3 และไม่มีของ · ขั้น 3 โชว์ (ยืมเกณฑ์ขั้น 3 ชั่วคราว)', !hidden && byStage, `${hidden} → ${byStage}`);
+  const texts = [];
+  for (let i = 0; i < 5; i++) {
+    st.health = 100;
+    st.queue = [];
+    st.pending = boss;
+    E.choose(st, 0);
+    texts.push(st.queue.find((x) => x.kind === 'result')?.text ?? '');
+  }
+  const it = st.items;
+  check('ไอเทม: ได้ของชิ้นแรกแล้วช่องไอเทมโชว์ แม้ขั้นซ้อนทับ < 3', E.overlapStageOf(st) < 3 && E.itemsVisible(st));
+  check('ไอเทม: บอส 4 รอบ → ตะกรุด/มีด/เสื้อกั๊กลงช่อง เขี้ยวเข้าเป้ (ช่องเครื่องรางเต็ม)', it.wear.charm === 'dg_takrut' && it.wear.weapon === 'dg_knife' && it.wear.outfit === 'dg_vest' && it.bag.join() === 'dg_fang', JSON.stringify(it));
+  check('ไอเทม: การ์ดผลต่อท้ายชื่อของ+ช่อง · รอบที่ 5 ครบแล้วไม่ได้เพิ่ม', texts[0].includes('ได้ตะกรุดผลึกม่วง ใส่ช่องเครื่องราง') && texts[3].includes('ได้เขี้ยวบอสเลี่ยมทอง เก็บเข้าเป้') && !texts[4].includes(' · ได้'), texts.map((t) => t.slice(-30)).join(' | '));
+  st.items.cap = 2;
+  const money = st.money;
+  const run = () => {
+    st.queue = [];
+    st.pending = out;
+    E.choose(st, keep);
+    return st.queue[0];
+  };
+  const a = run();
+  const b = run();
+  const sold = st.money - money - 2 * E.moneyValue(st, out.choices[keep].effects.money);
+  check('ไอเทม: เป้ที่ทางออก → หน้าไม้เข้าเป้ (ช่องอาวุธเต็ม) · ปลอกแขนเจอเป้เต็มขายได้เงิน · เล่าเป็นการ์ดผลใบแรก', st.items.bag.join() === 'dg_fang,dg_crossbow' && a?.kind === 'result' && a.text.includes('เก็บเข้าเป้') && !!b?.text.includes('เป้เต็ม') && near(sold, E.moneyValue(st, content.items.list.dg_armband.sell), 1e-6), `${st.items.bag.join()} · ขายได้ ${sold.toFixed(0)}`);
+  const old = E.restore(E.snapshot({ st: newLife(mixSeed(1, 2324), content) }, content), content).st;
+  check('ไอเทม: เซฟก่อนมีระบบโหลดได้ ช่องว่าง', !!old && !('items' in old) && Object.values(E.itemsOf(old).wear).every((x) => x === null));
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {

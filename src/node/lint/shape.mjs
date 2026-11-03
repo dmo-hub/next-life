@@ -4,7 +4,7 @@ import {
   ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE, EDU, SCHOOL_VALUES,
   meritCat,
 } from './vocab.mjs';
-import { INCOME_MULT, MONEY_KEYS, PACT } from '../../engine/life.mjs';
+import { INCOME_MULT, MONEY_KEYS, PACT, OVERLAP_STAGE_MIN } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
 import { PET_KINDS, HERD_KINDS, PET_CAUSES, FILIAL_WAYS } from '../../engine/family.mjs';
@@ -13,25 +13,27 @@ import { SIN_CATS } from '../../engine/merit.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 // คนที่ when.kin_illness เลือกได้ = พ่อแม่ + คนในบ้านที่แกนออกการ์ดแจ้งป่วย (เพื่อนรุ่นไม่แจ้ง)
 const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
+// ตายในดันเจียนไม่มีกลุ่มสาเหตุของตัวเอง — ลงกลุ่มบาดเจ็บเดิมให้ด่าน causes และสถิติตายตามอายุยังเทียบ WHO ได้
+const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'focus'],
+  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'focus', 'run'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   debt: ['kind', 'amount'],
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', ...MONEY_KEYS],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
   family: ['role', 'sex', 'age', 'alive', 'count', 'health', 'relations'],
-  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', ...MONEY_KEYS],
+  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
   requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'reason'],
@@ -135,6 +137,8 @@ function checkMultipliers(m, at, r) {
     if (!isObj(m[k]) || Object.entries(m[k]).some(([kk, v]) => !of.includes(kk) || !positive(v))) r(`${at}.${k}`, `ต้องเป็น {${of.join('|')}: เลขบวก}`);
   }
   for (const k of ['karma', 'family_fame', 'wish']) if (m[k] !== undefined && !positive(m[k])) r(`${at}.${k}`, 'ต้องเป็นเลขบวก');
+  // 0 ได้: ขั้น 0 คูณ 1 (x ** 0) ขั้น 1 ขึ้นไปปิดการ์ด — การ์ดชีวิตปกติที่หายเมื่อโลกเริ่มซ้อน
+  if (m.overlap_stage !== undefined && !ratio(m.overlap_stage)) r(`${at}.overlap_stage`, 'ต้องเป็นตัวเลข ≥ 0 (คูณยกกำลังตามขั้นค่าซ้อนทับ)');
   if (m.flags !== undefined && (!isObj(m.flags) || Object.entries(m.flags).some(([f, v]) => !FLAG_RE.test(f) || !positive(v)))) r(`${at}.flags`, 'ต้องเป็น {ชื่อธง: เลขบวก}');
   for (const k of MONEY_KEYS) if (m[k] !== undefined && !(ratioBound(m[k]) && positive(m[k].v))) r(`${at}.${k}`, 'ต้องเป็น {min, max, v} อัตราส่วน ≥ 0 อย่างน้อยหนึ่งขอบ v เป็นเลขบวก');
 }
@@ -301,6 +305,8 @@ export const rules = [
       if (w.class !== undefined && !nonEmptySubset(w.class, CLASSES)) r('.when.class', `class ต้องเป็นรายการจาก ${CLASSES.join(' ')}`);
       if (w.region !== undefined && !nonEmptySubset(w.region, ctx.regions)) r('.when.region', `region ต้องเป็นรายการจาก ${ctx.regions.join(' · ')}`);
       if (w.sex !== undefined && !nonEmptySubset(w.sex, SEXES)) r('.when.sex', `sex ต้องเป็นรายการจาก ${SEXES.join(' ')}`);
+      const top = OVERLAP_STAGE_MIN.length - 1;
+      if (w.overlap_stage !== undefined && !isRange(w.overlap_stage, 0, top)) r('.when.overlap_stage', `overlap_stage ต้องเป็น [จาก, ถึง] ขั้น 0–${top} จำนวนเต็ม`);
       if (w.stats !== undefined) {
         if (!isObj(w.stats)) r('.when.stats', 'stats ต้องเป็น object');
         else for (const [k, b] of Object.entries(w.stats)) if (!bound(b)) r(`.when.stats.${k}`, 'ต้องเป็น {min, max} 0–100 min ≤ max');
@@ -561,7 +567,7 @@ export const rules = [
   },
   {
     id: 'rank-shape',
-    desc: 'สายยศ (B40): effects.severance = true (จ่ายเงินชดเชยเลิกจ้างตามอายุงาน) · when.ladder = รายการ id สายใน data/careers.json หรือ none · multipliers.rank = เลขบวก (คูณยกกำลังตามขั้นยศ+ตำแหน่ง)',
+    desc: 'สายยศ (B40): effects.severance = true (จ่ายเงินชดเชยเลิกจ้างตามอายุงาน) · effects.ladder = id สายใน data/careers.json (เข้าสายที่ขั้นแรก) · when.ladder = รายการ id สายใน data/careers.json หรือ none · multipliers.rank = เลขบวก (คูณยกกำลังตามขั้นยศ+ตำแหน่ง)',
     event(e, ctx, r) {
       const ids = [...ctx.ladders, 'none'];
       const wl = isObj(e.when) ? e.when.ladder : undefined;
@@ -571,10 +577,41 @@ export const rules = [
         if (path.includes('outcomes')) mults.push([node.multipliers, `${path}.multipliers`]);
         const fx = isObj(node.effects) ? node.effects : {};
         if (fx.severance !== undefined && fx.severance !== true) r(`${path}.effects.severance`, 'ใช้ได้แค่ true');
+        if (fx.ladder !== undefined && !ctx.ladders.includes(fx.ladder)) r(`${path}.effects.ladder`, `ต้องเป็น id สาย ${ctx.ladders.join('|')} ได้ ${JSON.stringify(fx.ladder)}`);
       }
       for (const [m, at] of mults) {
         const v = isObj(m) ? m.rank : undefined;
         if (v !== undefined && !positive(v)) r(`${at}.rank`, 'ต้องเป็นเลขบวก');
+      }
+    },
+  },
+  {
+    // คนถูกดึงเข้าดันเจียนครั้งแรกรอดเสมอ ⇒ ทางตายต้องอยู่หลังตัวเลือกที่ล็อกให้นักล่าเท่านั้น
+    id: 'dungeon-die',
+    desc: `effects.die = ${DUNGEON_CAUSES.join('|')} (ตายในดันเจียน · กลุ่มสาเหตุเดิมใน data/death-causes.json) — ใช้ได้เฉพาะผลสุ่มของตัวเลือกที่ requires.flags.has มี hunter`,
+    event(e, ctx, r) {
+      for (const { node, path, choice } of effectSites(e)) {
+        const d = isObj(node.effects) ? node.effects.die : undefined;
+        if (d === undefined) continue;
+        if (!DUNGEON_CAUSES.includes(d)) r(`${path}.effects.die`, `ต้องเป็น ${DUNGEON_CAUSES.join('|')} ได้ ${JSON.stringify(d)}`);
+        else if (node === choice) r(`${path}.effects.die`, 'ใช้ได้แค่ในผลสุ่ม (outcomes) — การ์ดผลต้องเล่าเหตุก่อนมรณบัตร');
+        else if (!list(choice.requires?.flags?.has).includes('hunter')) r(`${path}.effects.die`, 'ตัวเลือกต้อง requires.flags.has มี hunter — คนถูกดึงเข้าดันเจียนรอดเสมอ');
+      }
+    },
+  },
+  {
+    id: 'loot-shape',
+    desc: 'effects.loot = รายการ id ไม่ซ้ำใน content/rules/items.yaml (ได้ชิ้นแรกที่ยังไม่มี) — บนตัวเลือกที่ไม่มี outcomes หรือบนผลสุ่มที่มี text (ข้อความของที่ได้ต่อท้ายการ์ดผล)',
+    event(e, ctx, r) {
+      for (const { node, path, choice } of effectSites(e)) {
+        const l = isObj(node.effects) ? node.effects.loot : undefined;
+        if (l === undefined) continue;
+        const p = `${path}.effects.loot`;
+        if (!Array.isArray(l) || !l.length) { r(p, 'ต้องเป็นรายการ id ไม่ว่าง'); continue; }
+        for (const id of l) if (!ctx.items.includes(id)) r(p, `ไม่มีของ ${JSON.stringify(id)} ในทะเบียน content/rules/items.yaml`);
+        if (new Set(l).size !== l.length) r(p, 'id ซ้ำในรายการ');
+        if (node === choice && choice.outcomes?.length) r(p, 'ตัวเลือกที่มี outcomes ใส่ loot ที่ผลสุ่มแทน');
+        if (node !== choice && !node.text) r(p, 'ผลสุ่มที่ให้ของต้องมี text — ข้อความของที่ได้ต่อท้ายการ์ดผล');
       }
     },
   },
