@@ -646,6 +646,12 @@ try {
     }
   }
   rows.push(['ui-imports (src/ui ← import)', `${n} ชื่อ`]);
+  // หมวดทรยศ (isekai ใบ 09): ไฟล์ตัวควบคุม isekai-merit เปลี่ยนเฉพาะหมวด — betrayal ต้องผ่าน หมวดที่ไม่มียังต้องตก
+  const bm = load(badDir, 'isekai-merit.yaml');
+  const withCat = (cat) => lintIsekai([{ ...bm, doc: { ...bm.doc, cards: bm.doc.cards.map((c) => ({ ...c, choices: c.choices.map((x) => (x.merit ? { ...x, merit: [{ cat, level: 2 }] } : x)) })) } }]).map((p) => p.rule);
+  const bt = { betrayal: withCat('betrayal'), nope: withCat('nope') };
+  if (bt.betrayal.length || bt.nope.join() !== 'isekai-merit') fails.push(`isekai-merit หมวดทรยศ: betrayal [${bt.betrayal}] · nope [${bt.nope}]`);
+  rows.push(['isekai-merit หมวดทรยศ', 'betrayal ผ่าน · หมวดที่ไม่มีตก']);
 }
 
 // ---- B64 ป้ายเรื่องหนัก (heavy: turning/sad) + ตัวเลือกปั่น (silly: true): ตัวควบคุมทีละแบบ · คำเตือนนับการ์ดไม่มีตัวเลือกปั่น (ไม่ตก) ----
