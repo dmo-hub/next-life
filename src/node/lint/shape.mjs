@@ -19,7 +19,7 @@ const KEYS = {
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   debt: ['kind', 'amount'],
@@ -556,7 +556,7 @@ export const rules = [
   },
   {
     id: 'rank-shape',
-    desc: 'สายยศ (B40): effects.severance = true (จ่ายเงินชดเชยเลิกจ้างตามอายุงาน) · when.ladder = รายการ id สายใน data/careers.json หรือ none · multipliers.rank = เลขบวก (คูณยกกำลังตามขั้นยศ+ตำแหน่ง)',
+    desc: 'สายยศ (B40): effects.severance = true (จ่ายเงินชดเชยเลิกจ้างตามอายุงาน) · effects.ladder = id สายใน data/careers.json (เข้าสายที่ขั้นแรก) · when.ladder = รายการ id สายใน data/careers.json หรือ none · multipliers.rank = เลขบวก (คูณยกกำลังตามขั้นยศ+ตำแหน่ง)',
     event(e, ctx, r) {
       const ids = [...ctx.ladders, 'none'];
       const wl = isObj(e.when) ? e.when.ladder : undefined;
@@ -566,6 +566,7 @@ export const rules = [
         if (path.includes('outcomes')) mults.push([node.multipliers, `${path}.multipliers`]);
         const fx = isObj(node.effects) ? node.effects : {};
         if (fx.severance !== undefined && fx.severance !== true) r(`${path}.effects.severance`, 'ใช้ได้แค่ true');
+        if (fx.ladder !== undefined && !ctx.ladders.includes(fx.ladder)) r(`${path}.effects.ladder`, `ต้องเป็น id สาย ${ctx.ladders.join('|')} ได้ ${JSON.stringify(fx.ladder)}`);
       }
       for (const [m, at] of mults) {
         const v = isObj(m) ? m.rank : undefined;

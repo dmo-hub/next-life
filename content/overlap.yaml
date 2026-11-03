@@ -27,3 +27,33 @@ events:
         text: "หัวเราะทิ้ง คิดว่าฝันไป"
         effects: {happiness: 1}
         merit: [{cat: neutral}]
+
+  # ขั้น 3 เกตเปิดทั้งสังคม: ประกาศรับสมัครนักล่า ทางเดียวที่เข้าสาย hunter (สายนี้ไม่มี occs คนทำงานบริการจึงไม่ถูกจับเข้าเอง)
+  # กั้น ladder ไว้ที่คนนอกสายบำนาญ — ข้าราชการ/ทหาร/ตำรวจได้การ์ดดันเจียนตามอาชีพแทน ไม่ลาออกมาสมัคร
+  - id: overlap_hunter_recruit_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {overlap_stage: [3, 4], age: [18, 45], ladder: [none, private, trade]}
+    title: "ประกาศรับสมัครนักล่า"
+    text: "ป้ายประกาศติดทั่วเมืองตั้งแต่เกตเปิดกลางถนนเมื่อต้นปี กิลด์นักล่ารับสมัครคนร่างกายแข็งแรง ฝึกให้สามเดือน เงินเดือนประจำบวกเบี้ยเสี่ยงภัย ใต้ป้ายมีชื่อนักล่าที่ไม่ได้กลับออกมาเขียนต่อกันยาวเหยียด"
+    choices:
+      - id: apply
+        text: "สมัครเข้ากิลด์นักล่า"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.5}}, text: "ผ่านการทดสอบร่างกาย ได้บัตรนักล่าฝึกหัดพร้อมเครื่องแบบชุดแรก", effects: {ladder: hunter, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วิ่งไม่ครบรอบสนาม ครูฝึกให้กลับไปซ้อมแล้วค่อยมาใหม่ปีหน้า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: volunteer
+        text: "เป็นอาสากู้ภัยหน้าเกตแทน"
+        merit: [{cat: help_others, level: 1}]
+        effects: {health: -1, relations: 1}
+      - id: move_away
+        text: "ย้ายบ้านให้ไกลจากเกต"
+        merit: [{cat: neutral}]
+        effects: {money: {unit: income_x, amount: -0.3}, happiness: 1}
+      - id: stay_put
+        text: "ทำงานเดิมต่อ ปล่อยให้คนอื่นล่า"
+        merit: [{cat: neutral}]
+        effects: {}

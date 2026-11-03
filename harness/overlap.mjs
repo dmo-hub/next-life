@@ -12,6 +12,7 @@
 //   (5) เริ่มตระกูลใหม่ (newLife ไม่มี heir) = 0 แม้ตระกูลก่อนหน้าค่าสูง
 //   (6) การ์ดข่าวลือขั้น 1 (ใบ 09): ฝั่งข้ามโลกออก > 0 · ตัวควบคุมไม่ข้ามโลกออก 0 — นับจากบันทึกการ์ดที่ออกของแต่ละชีวิต
 //   (7) ขั้นที่ชาติต่างโลกเห็น (ใบ 15): ทุกชาติ (ทริป · เกิด · ถูกเรียก) เห็นขั้นเท่าขั้นของตระกูลตอนข้าม · การ์ดต่างโลกขั้น ≥ 1 ออก > 0 และไม่ออกในชาติขั้น 0
+//   (10) สายนักล่า (ใบ 19): ขั้น 3 เข้าสายผ่านการ์ดรับสมัคร ชื่องานเป็นขั้นนักล่า เลื่อนขั้นได้ · ขั้น 0–1 เข้าสาย 0 · ปฏิเสธการ์ดแล้วทำงานบริการไม่ถูกจับเข้าสาย
 import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, overlapStageOf, overlapPlan, PATHS, ENTRY } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
@@ -292,4 +293,97 @@ if (fails.length) {
   process.exitCode = 1;
 } else {
   console.log(`ด่านค่าซ้อนทับผ่าน: บัญชีเหยียบซ้ำตรงทุกชีวิต · เกิดกลับ ${sum('born')} · ทริปกลับบ้าน ${sum('trip')} · เข้าซ้ำ ทริป ${sum('reTrip')} เกิด ${sum('reBorn')} · ทริปหลงไม่นับ ${sum('lost')} · ข่าวลือออก ${sum('rumor')} · ชาติต่างโลกเห็นขั้นตรง ${sum('iskLives')} ชาติ · การ์ดต่างโลกขั้น ≥ 1 ออก ${sum('iskCard')} · ค่าไม่ลด · ตัวควบคุม = 0`);
+}
+
+// (10) สายนักล่า (ใบ 19): ขั้น 3 เข้าสายผ่านการ์ดรับสมัคร ชื่องานเป็นขั้นนักล่า เลื่อนขั้นได้ · ขั้น 0–1 เข้าสาย 0 · คนทำงานบริการไม่ถูกจับเข้าสายเอง
+// ชื่อขั้นเขียนจากสเปกที่ผู้รวมงานเคาะ ไม่อ่าน careers.json · บล็อกแยกท้ายไฟล์ ไม่แตะผลรวม fails ข้างบน (ใบพี่น้องแก้ช่วงนั้น)
+// ขั้น 3 ตระกูลจริงยังไปไม่ถึง ⇒ ยืมเกณฑ์ขั้น 2–3 = ค่า 2–3 เฉพาะช่วงนัดและเล่นชีวิตนั้น แล้วคืนค่าเดิม
+{
+  const { OVERLAP_STAGE_MIN, rankName, officeFull } = await import('../src/engine/index.mjs');
+  const RECRUIT = 'overlap_hunter_recruit_01';
+  const FIRST = 'first_hunter_01';
+  const NAMES = ['นักล่าฝึกหัด', 'นักล่าเกต', 'หัวหน้าทีมล่า', 'ผู้บัญชาการกิลด์นักล่า'];
+  const hunterFails = [];
+  // บอทที่สมัครเสมอเมื่อเจอการ์ดรับสมัคร (ตัวเลือกแรก) · ตัวควบคุมไม่สมัครเลย — การ์ดอื่นเลือกตามบุคลิก
+  const applier = (bot) => Object.assign((card, rng, h) => (card.id === RECRUIT && open(card, 0) ? 0 : bot(card, rng, h)), bot);
+  const decliner = (bot) => Object.assign((card, rng, h) => (card.id === RECRUIT ? card.choices.length - 1 : bot(card, rng, h)), bot);
+  const hunt = { low: 0, lowLives: 0, lowRecruit: 0, lowService: 0, lives: 0, recruit: 0, entered: 0, first: 0, promoted: 0, top: 0, badName: 0, show: '', ctlLives: 0, ctlService: 0, ctlHunter: 0 };
+  const watch = (life, ctl) => (card, s) => {
+    if (card.id === RECRUIT) life.recruit = true;
+    if (card.id === FIRST) life.first++;
+    if (s.occupation === 'service') life.service = true;
+    if (s.ladder?.id !== 'hunter') return;
+    life.hunter = true;
+    life.rank = Math.max(life.rank, s.ladder.rank);
+    // ตำแหน่งการเมืองเต็มเวลาแทนชื่องานทุกสาย (rankName) — ไม่ใช่ชื่อขั้นที่ใบนี้วัด
+    if (officeFull(s)) return;
+    const shown = rankName(s);
+    if (!NAMES.some((nm) => shown.startsWith(nm))) hunt.badName++;
+    else if (!ctl && s.ladder.rank > 0 && !hunt.show) hunt.show = shown;
+  };
+  const playStage3 = (k, bot, ctl) => {
+    const life = { recruit: false, first: 0, service: false, hunter: false, rank: 0 };
+    const keep = [OVERLAP_STAGE_MIN[2], OVERLAP_STAGE_MIN[3]];
+    OVERLAP_STAGE_MIN[2] = 2;
+    OVERLAP_STAGE_MIN[3] = 3;
+    try {
+      const s = newLife(mixSeed(seed ^ 0x4e19, k), content);
+      s.overlap = 3;
+      if (overlapStageOf(s) !== 3) {
+        hunterFails.push(`ยืมเกณฑ์แล้วค่า 3 ไม่ได้ขั้น 3`);
+        return life;
+      }
+      overlapPlan(s, 0);
+      playLife(mixSeed(seed ^ 0x4e19, k), content, bot, watch(life, ctl), s);
+    } finally {
+      [OVERLAP_STAGE_MIN[2], OVERLAP_STAGE_MIN[3]] = keep;
+    }
+    return life;
+  };
+  let k = 0;
+  for (const [name, base] of Object.entries(BOTS)) {
+    // ขั้นจริง 0–1: ตระกูลข้ามโลกหลายรุ่น การ์ดรับสมัครกับสายนักล่าต้องไม่โผล่
+    for (let i = 0; i < n; i++) {
+      let st;
+      for (let g = 0; g < gens; g++) {
+        const life = { recruit: false, first: 0, service: false, hunter: false, rank: 0 };
+        const { state } = playLife(mixSeed(seed ^ 0x4e1a, i * 7919 + g), content, applier(crosser(base)), watch(life, true), st ?? undefined);
+        hunt.lowLives++;
+        if (life.recruit) hunt.lowRecruit++;
+        if (life.hunter || life.first) hunt.low++;
+        if (life.service && overlapOf(state) === 0) hunt.lowService++;
+        st = nextLife(playAfterlife(state, crosser(base)));
+      }
+    }
+    for (let i = 0; i < n; i++) {
+      const life = playStage3(k++, applier(stayer(base)), false);
+      hunt.lives++;
+      if (life.recruit) hunt.recruit++;
+      if (life.hunter) hunt.entered++;
+      hunt.first += life.first;
+      if (life.rank > 0) hunt.promoted++;
+      hunt.top = Math.max(hunt.top, life.rank);
+      if (life.hunter !== (life.first === 1)) hunterFails.push(`${name}: เข้าสาย ${life.hunter} แต่การ์ดทางแรกออก ${life.first} ใบ`);
+      // ตัวควบคุม: ชีวิตเดียวกันที่ปฏิเสธการ์ดรับสมัคร — ทำงานบริการแล้วต้องไม่ถูกจับเข้าสาย
+      const ctl = playStage3(k - 1, decliner(stayer(base)), true);
+      hunt.ctlLives++;
+      if (ctl.service) hunt.ctlService++;
+      if (ctl.hunter || ctl.first) hunt.ctlHunter++;
+    }
+  }
+  if (hunt.low || hunt.lowRecruit) hunterFails.push(`ชีวิตขั้น 0–1 เข้าสายนักล่า ${hunt.low} · เจอการ์ดรับสมัคร ${hunt.lowRecruit}`);
+  if (!hunt.lowService) hunterFails.push('ไม่มีชีวิตค่า 0 ที่ทำงานบริการ — ตัววัด "ไม่ถูกจับเข้าสาย" ไม่ได้วัดอะไร');
+  if (!hunt.entered) hunterFails.push('ชีวิตขั้น 3 ไม่มีใครเข้าสายนักล่า');
+  if (!hunt.promoted) hunterFails.push('ชีวิตขั้น 3 ในสายนักล่าไม่มีใครเลื่อนขั้น');
+  if (hunt.badName) hunterFails.push(`ชื่องานบนจอของคนในสายนักล่าไม่ใช่ขั้นนักล่า ${hunt.badName} ครั้ง`);
+  if (hunt.ctlHunter) hunterFails.push(`ตัวควบคุมปฏิเสธการ์ดรับสมัครแต่เข้าสายนักล่า ${hunt.ctlHunter} ชีวิต`);
+  if (!hunt.ctlService) hunterFails.push('ตัวควบคุมขั้น 3 ไม่มีชีวิตทำงานบริการ — ตัววัดไม่ได้วัดอะไร');
+  console.log(`\nสายนักล่า (ใบ 19): ขั้น 0–1 ${hunt.lowLives} ชีวิต เข้าสาย ${hunt.low} การ์ดรับสมัคร ${hunt.lowRecruit} · ค่า 0 ทำงานบริการ ${hunt.lowService} ชีวิต`);
+  console.log(`  ขั้น 3 (ยืมเกณฑ์) ${hunt.lives} ชีวิต: เจอการ์ดรับสมัคร ${pct(hunt.recruit, hunt.lives)} · เข้าสาย ${hunt.entered} · ทางแรก ${hunt.first} ใบ · เลื่อนขั้น ${hunt.promoted} · ขั้นสูงสุด ${hunt.top} · ชื่อผิด ${hunt.badName} · ตัวอย่าง ${hunt.show || '-'}`);
+  console.log(`  ตัวควบคุมปฏิเสธ ${hunt.ctlLives} ชีวิต: ทำงานบริการ ${hunt.ctlService} · เข้าสาย ${hunt.ctlHunter}`);
+  if (hunterFails.length) {
+    for (const f of hunterFails) console.log(`✗ ${f}`);
+    console.log(`ด่านสายนักล่าตก ${hunterFails.length} ข้อ`);
+    process.exitCode = 1;
+  } else console.log('ด่านสายนักล่าผ่าน');
 }
