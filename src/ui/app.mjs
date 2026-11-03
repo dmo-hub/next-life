@@ -81,26 +81,31 @@ function statusBar(card, s) {
   const ul = el('ul', 'sb-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
-    const li = el('li', k === 'health' && v <= HEALTH_WARN ? 'low' : null);
-    const head = el('span', 'mh');
-    head.append(el('span', 'mk', STAT_LABELS[k]), el('b', 'num', String(v)));
+    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN);
     const d = delta?.[k];
     if (d) {
       const em = el('em', d < 0 ? 'dn' : null);
       const sign = el('span', null, d > 0 ? '▲' : '▼');
       sign.setAttribute('aria-hidden', 'true');
       em.append(sign, el('span', 'sr', d > 0 ? 'ปีนี้เพิ่ม ' : 'ปีนี้ลด '), String(Math.abs(d)));
-      head.append(em);
+      li.firstChild.append(em);
     }
-    const track = el('span', 'br');
-    const fill = el('i');
-    fill.style.width = `${v}%`;
-    track.append(fill);
-    li.append(head, track);
     ul.append(li);
   }
   bar.append(r1, ul);
   return bar;
+}
+// ช่องค่าหนึ่งช่อง: ป้าย ตัวเลข แถบเส้น — แถบสถานะกับแผงตัวฉันของทั้งสองโลกใช้ตัวเดียวกัน หน้าตาจึงไม่แยกกันเพี้ยน
+function meterLi(label, v, low) {
+  const li = el('li', low ? 'low' : null);
+  const head = el('span', 'mh');
+  head.append(el('span', 'mk', label), el('b', 'num', String(v)));
+  const track = el('span', 'br');
+  const fill = el('i');
+  fill.style.width = `${v}%`;
+  track.append(fill);
+  li.append(head, track);
+  return li;
 }
 
 // ปุ่มโฟกัสชีวิต (B163): แถบเต็มใต้ค่าสถานะ — การ์ดกว้างไม่เกิน 460 ทุกจอ ข้างค่าสถานะไม่มีที่พอ
@@ -140,18 +145,23 @@ function focusBar(card, open = false) {
   return wrap;
 }
 
-// แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทย · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
+// แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทยและต่างโลก · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
 // ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ
 const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบครัว'], ['money', 'เงิน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
+// ต่างโลกไม่มีครอบครัวกับเงินบาทให้ดู — ทอง ชื่อเสียง อาชีพ สกิลอยู่ในแผงตัวฉันของร่างนี้ (ui-redo ใบ 13)
+const ISEKAI_MENU = [['me', 'ตัวฉัน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
 function lifeMenu(card, box) {
   // การ์ดใหม่วาดทับทั้ง root แผงเดิมหายไปด้วยแล้ว
   sheetClose = null;
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
-  const sheets = { me: () => mePanel(card), family: familyPanel, money: () => moneyPanel(card), more: morePanel };
+  const isk = card.kind === 'isekai';
+  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), family: familyPanel, money: () => moneyPanel(card), more: morePanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
   const views = { shelf: () => openShelf() };
-  for (const [id, label] of LIFE_MENU) {
+  // ต่างโลกช่วงยังไม่มีร่าง (ไม่มีหน้าต่างสถานะ) ไม่มีอะไรให้แผงตัวฉันโชว์
+  const items = isk ? ISEKAI_MENU.filter(([id]) => id !== 'me' || card.status) : LIFE_MENU;
+  for (const [id, label] of items) {
     const b = el('button', null);
     b.type = 'button';
     b.dataset.menu = id;
@@ -206,14 +216,7 @@ function mePanel(card) {
   const ul = el('ul', 'me-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
-    const li = el('li', k === 'health' && v <= HEALTH_WARN && !st.dead ? 'low' : null);
-    const head = el('span', 'mh');
-    head.append(el('span', 'mk', STAT_LABELS[k]), el('b', 'num', String(v)));
-    const track = el('span', 'br');
-    const fill = el('i');
-    fill.style.width = `${v}%`;
-    track.append(fill);
-    li.append(head, track);
+    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN && !st.dead);
     if (help.has(STAT_LABELS[k])) li.append(el('p', null, help.get(STAT_LABELS[k])));
     ul.append(li);
   }
@@ -2360,17 +2363,6 @@ function renderAfter(card) {
 
 // ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
 const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ช่วงวัยใหม่ · เลือกสิ่งที่ทุ่มเท', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก', warn: 'ใกล้ตาย', move: 'ทางแยก · เลือกแคว้น' };
-function isekaiMeter(label, v, cls) {
-  const m = el('div', 'imeter');
-  const row = el('div', 'irow');
-  row.append(el('span', null, label), el('span', null, `${v}/100`));
-  const bar = el('div', `ibar ${cls}`);
-  const fill = el('i');
-  fill.style.width = `${v}%`;
-  bar.append(fill);
-  m.append(row, bar);
-  return m;
-}
 // จดหมายเหตุบนการ์ดจบ (B68b ชิ้น 3): แบ่งตามช่วงวัย เก่าอยู่บน ช่วงสุดท้ายเปิดค้าง (เจ้าของเคาะ)
 // บรรทัดรับได้ทั้งสตริง "อายุ N · …" ของเซฟเก่า และ { age, until?, stage, kind, text, deltas } ของ engine — มี deltas ถึงขึ้น chip
 // ตาหลายปีของ engine บอกปลายช่วงเป็น until · จอใช้ชื่อ to ชุดเดียวกับที่แยกจากสตริง
@@ -2428,25 +2420,53 @@ function isekaiLabels() {
   for (const k of ISEKAI_SHOWN) out[k] = ISEKAI_STAT[k];
   return out;
 }
-function isekaiStatusBox(s) {
-  const box = el('div', 'iwin');
-  box.append(isekaiMeter(ISEKAI_HP, s.hp, 'hp'));
-  const grid = el('div', 'istats');
-  for (const k of ISEKAI_SHOWN) {
-    const d = el('div');
-    d.append(el('span', null, ISEKAI_STAT[k]), el('b', null, String(s[k])));
-    grid.append(d);
+// แถบสถานะต่างโลก (ui-redo ใบ 13): โครง statusBar ค่าคนละชุด · ชีวิตต่างโลกถึง 0 ก็ตาย จึงเตือนที่เกณฑ์เดียวกับโลกนี้
+// รูปตัวละครโลกนี้ไม่ใช่ร่างนี้ — วงกลมอักษรแรกของชื่อแทน · ไม่มีลูกศรปีนี้ เพราะการ์ดผลบอกตัวเลขที่ขยับอยู่แล้ว
+function isekaiBar(card, s, where) {
+  const bar = el('header', 'sb');
+  const r1 = el('div', 'sb-r1');
+  const ini = el('span', 'av ini', [...s.name][0]);
+  ini.setAttribute('aria-hidden', 'true');
+  const who = el('span', 'sb-who');
+  who.append(el('b', null, s.name), el('small', null, `${genLabel()}${st.name} · ${where}`));
+  const age = el('span', 'sb-age');
+  age.append(el('b', null, String(s.age)), el('small', null, ' ปี'));
+  if (card.step !== 'end' && s.hp <= HEALTH_WARN) {
+    bar.classList.add('dying');
+    const heart = el('span', 'sb-heart');
+    heart.insertAdjacentHTML('beforeend', HEART_ICON);
+    heart.setAttribute('role', 'img');
+    heart.setAttribute('aria-label', 'ใกล้ตาย');
+    age.append(heart);
   }
-  box.append(grid, el('div', null, `ทอง ${s.gold.toLocaleString('en-US')} · ชื่อเสียง ${s.fame} · ${s.race ? `${s.race} · ` : ''}${s.world}`));
-  box.append(el('div', null, `อายุ ${s.age} · ${s.stage}${s.focus ? ` · ทุ่มเทกับ${s.focus}` : ''}`));
+  r1.append(ini, who, age);
+  const ul = el('ul', 'sb-m');
+  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
+  bar.append(r1, ul);
+  return bar;
+}
+// แผงตัวฉันต่างโลก: ของที่เคยอัดในหน้าต่างสถานะบนการ์ด — ค่าเต็ม · ทอง ชื่อเสียง เผ่า · อาชีพ · สกิล
+function isekaiMePanel(s) {
+  const wrap = el('div', 'me');
+  const ul = el('ul', 'me-m');
+  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
+  const dl = el('dl');
+  dl.append(el('dt', null, 'ทอง'), el('dd', null, s.gold.toLocaleString('en-US')), el('dt', null, 'ชื่อเสียง'), el('dd', null, String(s.fame)));
+  const who = el('p', 'meta');
+  metaLine(who, [s.race, s.world, `อายุ ${s.age}`, s.stage, s.focus && `ทุ่มเทกับ${s.focus}`].filter(Boolean));
+  wrap.append(el('h3', null, 'ค่าสถานะ'), ul, dl, el('h3', null, 'ตัวตน'), who);
   // อาชีพตามโฟกัส (05a) — เซฟก่อนมีอาชีพไม่มีช่องนี้
-  if (s.careers?.length) box.append(el('div', null, `อาชีพ ${s.careers.join(' · ')}`));
+  if (s.careers?.length) {
+    const job = el('p', 'meta');
+    metaLine(job, s.careers);
+    wrap.append(el('h3', null, 'อาชีพ'), job);
+  }
   if (s.skills.length) {
     const chips = el('div', 'ichips');
     for (const name of s.skills) chips.append(el('span', 'ichip', name));
-    box.append(chips);
+    wrap.append(el('h3', null, 'สกิล'), chips);
   }
-  return box;
+  return wrap;
 }
 // แถบโฟกัสต่างโลก: หน้าตา/คลาสเดียวกับ focusBar โลกหลัก · กาง/พับในที่ ไม่สร้างกล่องใหม่ (armTick ถือกล่องนี้ไว้ดูว่าชี้/โฟกัสอยู่ไหม)
 function isekaiFocusBar(card, pick) {
@@ -2509,8 +2529,8 @@ function armTick(box, panel, bar, tok) {
   bar.style.animation = `itick ${ms}ms linear forwards`;
   tickTimer = setTimeout(() => {
     if (!box.isConnected) return;
-    // แถบโฟกัสกางอยู่ = ผู้เล่นกำลังเลือก เวลารอแม้เมาส์ออกนอกแถบ
-    if (panel.matches(':hover, :focus-within') || panel.querySelector('[aria-expanded="true"]') || document.hidden) return armTick(box, panel, bar, tok);
+    // แถบโฟกัสกางอยู่ = ผู้เล่นกำลังเลือก เวลารอแม้เมาส์ออกนอกแถบ · แผงจากเมนูเปิดอยู่ = การ์ดถูกบัง ใบไม่เปลี่ยนใต้แผง
+    if (panel.matches(':hover, :focus-within') || panel.querySelector('[aria-expanded="true"]') || sheetClose || document.hidden) return armTick(box, panel, bar, tok);
     play(tok);
   }, ms);
 }
@@ -2536,11 +2556,15 @@ function renderIsekai(card) {
   clearTimeout(tickTimer);
   root.replaceChildren();
   const box = el('article', 'card i');
-  const top = el('div', 'top');
   const s = card.status;
   const pick = card.trip ? lifePick : afterPick;
   const where = card.trip ? `ข้ามมาตอนอายุ ${card.life}` : `ชาติต่างโลกที่ ${card.run + 1}`;
-  top.append(el('b', null, 'ต่างโลก'), el('small', null, s ? `${genLabel()}${st.name} · ${where} · ${s.name}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
+  // ยังไม่มีร่างต่างโลก (ไม่มีค่าให้แถบ) — หัวการ์ดบรรทัดเดียวแบบเดิม
+  let head = s && isekaiBar(card, s, where);
+  if (!head) {
+    head = el('div', 'top');
+    head.append(el('b', null, 'ต่างโลก'), el('small', null, `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
+  }
   const body = el('div', 'body');
   const choices = el('div', 'choices');
   body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} · อายุ ${card.age}` : card.warn ? `${ISEKAI_KICKER.warn} · เลือกสิ่งที่ทุ่มเท` : ISEKAI_KICKER[card.step]));
@@ -2588,8 +2612,7 @@ function renderIsekai(card) {
   }
   const nextTok = card.trip ? T.next : T.afterNext;
   if (!card.choices.length) choices.append(enter(button(BTN.next, null, () => play(nextTok))));
-  box.append(top);
-  if (s) box.append(isekaiStatusBox(s));
+  box.append(head);
   if (panel) box.append(panel);
   // ใบผลลัพธ์/ใบเลือกหยุดรอเสมอ (เจ้าของเคาะ) — แถบความเร็วยังโชว์ให้ตั้งไว้ก่อนเดินต่อ
   if (s && card.step !== 'end') {
@@ -2605,7 +2628,8 @@ function renderIsekai(card) {
     if (walk) armTick(box, panel, bar, nextTok);
   }
   box.append(body, choices);
-  root.append(panels(box));
+  root.append(panels(box, false), lifeMenu(card, box));
+  shelfDot();
   fxCard(box, card);
 }
 

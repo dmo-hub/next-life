@@ -400,14 +400,9 @@ body:has(.mnav) .foot { display:none; }
 .i .idesc { display:block; text-indent:0; margin-top:2px; font-size:12px; color:#A6AEDB; }
 .i .iok { color:#5EE6A0; font-weight:600; } .i .ibad { color:#FF8A8A; font-weight:600; }
 .i .isys { font-size:13px; color:#F2C94C; border:1px dashed #F2C94C; border-radius:6px; padding:6px 10px; }
-.iwin { margin:12px 20px 0; padding:10px 12px; border:1px solid #2A3478; border-radius:8px; background:#0E1024; display:flex; flex-direction:column; gap:8px; font-size:12px; color:#A6AEDB; }
-.irow { display:flex; justify-content:space-between; }
-.ibar { height:8px; border-radius:999px; background:#05060F; overflow:hidden; }
-.ibar i { display:block; height:100%; }
-.ibar.hp i { background:#FF6B6B; }
-.istats { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px; }
-.istats div { display:flex; flex-direction:column; align-items:center; border:1px solid #2A3478; border-radius:6px; padding:2px; }
-.istats b { font-size:16px; color:#E8ECFF; }
+/* แถบสถานะต่างโลก (ui-redo ใบ 13): โครง .sb ของโลกนี้ พื้นแถบเข้มกว่าการ์ดแบบต้นแบบ · อักษรแรกของชื่อแทนรูปตัวละคร */
+.i .sb { background:#12152E; }
+.sb .ini { display:grid; place-items:center; background:#232A5E; color:#6FE3FF; font-weight:700; }
 .ichips { display:flex; flex-wrap:wrap; gap:6px; }
 .ichip { padding:1px 8px; border:1px solid #F2C94C; border-radius:999px; color:#F2C94C; }
 /* คำสัญญากับเทพธิดาบนการ์ดจบต่างโลก (B68e) — กรอบทองแบบข้อความระบบ · รักษาได้เขียว ผิดแดง (มีคำกำกับ ไม่พึ่งสีอย่างเดียว) */
@@ -444,7 +439,8 @@ body:has(.mnav) .foot { display:none; }
 .fx-title .fx-name { font-family:Pridi,serif; font-weight:600; }
 .fx-ov canvas { position:absolute; inset:0; width:100%; height:100%; }
 /* ทั้งหน้าเข้าธีมต่างโลกตามการ์ดที่ขึ้นจอ — ผูกกับการ์ดด้วย :has จึงไม่ต้องตามล้างธงทุกจุดที่วาดจอไทย */
-body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; }
+/* ui-redo ใบ 13: ชุดกรมท่าเรืองของต้นแบบลงตัวแปรหน้า — แถบสถานะ เมนูล่าง/ราวซ้าย และแผงจากเมนูเปลี่ยนสีตามโดยไม่มีกฎแยก */
+body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; --ink:#E8ECFF; --ink2:#D3D8F5; --paper:#161A3A; --paper2:#232A5E; --rule2:#3B4BA8; --fl:#6FE3FF; --track:#262C5A; }
 body:has(#app > .card.i) .logo { background:#0E1024; border-bottom-color:#3B4BA8; }
 body:has(#app > .card.i) .logo b { font-family:var(--ft); font-weight:600; font-size:clamp(22px, 6vw, 30px); color:#6FE3FF; }
 body:has(#app > .card.i) .logo small, body:has(#app > .card.i) .logo .ver, body:has(#app > .card.i) .logo .saved { color:#A6AEDB; }
