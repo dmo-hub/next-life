@@ -27,3 +27,31 @@ events:
         text: "หัวเราะทิ้ง คิดว่าฝันไป"
         effects: {happiness: 1}
         merit: [{cat: neutral}]
+
+  # ขั้น 2 (ผีคนจริงชาติก่อน ยังเป็นความลับ): ผีคือแถวชาติไทยล่าสุดในผังตระกูล = ชาติก่อนของตัวเราเอง
+  # เล่าเรื่อง/เตือนเท่านั้น ป้าย neutral ล้วน (lint merit-ancestor) · ทวง/ขอส่วนบุญเป็นของผีญาติตาย ไม่ใช่ใบนี้
+  - id: overlap_ancestor_01
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {overlap_stage: [2, 2], ancestor: true}
+    title: "คนในผังตระกูล"
+    text: "คืนหนึ่งมี{บรรพบุรุษ}ยืนนิ่งอยู่ปลายเตียง บอกว่าชื่อ{ชื่อบรรพบุรุษ} เคยอยู่{จังหวัดบรรพบุรุษ} จากไปตอนอายุ {อายุตายบรรพบุรุษ} ไม่ได้มาขออะไร มาเตือนแค่ว่าม่านระหว่างโลกขาดแล้ว อย่าข้ามไปมาบ่อยนัก แปลกที่เสียงนั้นคุ้นหูเหมือนเสียงตัวเอง"
+    choices:
+      - id: ask_name
+        text: "ถามชื่อซ้ำให้แน่ใจ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: heed
+        text: "รับคำเตือนไว้ในใจ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: look_away
+        text: "หลับตา ทำเป็นไม่เห็น"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: tell_home
+        text: "เล่าให้คนในบ้านฟัง"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
