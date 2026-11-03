@@ -257,6 +257,8 @@ export function newLife(seed, content, heir = null) {
     // ความจำข้ามชาติ (past.mjs) + อาชีพที่ติดพรสวรรค์มา — ชีวิตแรกไม่มีช่อง
     ...(heir?.past && { past: heir.past }),
     ...(pastTalent(heir?.past) && { talent: pastTalent(heir.past) }),
+    // คนตายที่ตระกูลจำได้ (deadKinOf) — มีเฉพาะตระกูลค่าซ้อน > 0 · เซฟเก่าไม่มีช่อง = ยังไม่มีผีญาติ
+    ...(heir?.deadKin && { deadKin: heir.deadKin }),
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // จดหมายคำฝากของรุ่นก่อน (afterfall-3) {age, from, cause, by} — ออกหลังมรดกถึงมือเท่านั้น

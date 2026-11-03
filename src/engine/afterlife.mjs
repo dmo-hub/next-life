@@ -7,7 +7,7 @@ import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
 import { goalsMet, titlesOf } from './titles.mjs';
-import { heirPets, letterTo } from './family.mjs';
+import { heirPets, letterTo, deadKinOf } from './family.mjs';
 import { CHRONIC } from './death.mjs';
 import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf } from './life.mjs';
 import { ISEKAI, ISEKAI_SKILLS, SKILL, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
@@ -615,6 +615,8 @@ function makeHeir(af, r) {
   const ledger = carryLedger(af.st.ledger, net, carried);
   // ทายาทเกิดในโลกปกติเสมอ — รอบนี้มีชาติต่างโลกคั่น = กลับเข้าโลกที่เคยออกไป +1 (ชาติต่างโลกติดกันหลายรอบก็กลับครั้งเดียว) · ปรโลกคั่นชาติไม่นับ
   const overlap = overlapOf(st) + (af.isekaiLives.length ? 1 : 0);
+  // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
+  const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1 + af.isekaiLives.length,
@@ -648,6 +650,7 @@ function makeHeir(af, r) {
     ...(overlap && { overlap }),
     // ความจำข้ามชาติไปกับทุกทางเกิด · ภูมิ = ภูมิที่ปรโลกชี้ให้ชาติไทย (แบบแถวผังตระกูล)
     past: pastOf(st, thai.realm.id, isGone(st)),
+    ...(deadKin.length && { deadKin }),
   };
 }
 
