@@ -30,7 +30,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years', 'chance'],
-  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'identity', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'home_flags', 'overlap_stage', 'kin_ghost', 'dark_gate', 'past_life', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'identity', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'home_flags', 'overlap_stage', 'kin_ghost', 'ancestor', 'dark_gate', 'past_life', ...MONEY_KEYS],
   pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
@@ -352,6 +352,7 @@ export const rules = [
       const top = OVERLAP_STAGE_MIN.length - 1;
       if (w.kin_ghost !== undefined && !nonEmptySubset(w.kin_ghost, ['haunt', 'warn'])) r('.when.kin_ghost', 'kin_ghost ต้องเป็นรายการจาก haunt warn (สีหน้าผีญาติ)');
       if (w.overlap_stage !== undefined && !isRange(w.overlap_stage, 0, top)) r('.when.overlap_stage', `overlap_stage ต้องเป็น [จาก, ถึง] ขั้น 0–${top} จำนวนเต็ม`);
+      if (w.ancestor !== undefined && w.ancestor !== true) r('.when.ancestor', 'ancestor ต้องเป็น true (มีแถวชาติไทยในผังตระกูล)');
       if (w.stats !== undefined) {
         if (!isObj(w.stats)) r('.when.stats', 'stats ต้องเป็น object');
         else for (const [k, b] of Object.entries(w.stats)) if (!bound(b)) r(`.when.stats.${k}`, 'ต้องเป็น {min, max} 0–100 min ≤ max');

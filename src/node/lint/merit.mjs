@@ -43,4 +43,12 @@ export const rules = [
       }
     },
   },
+  {
+    id: 'merit-ancestor',
+    desc: 'การ์ดผีบรรพบุรุษ (when.ancestor) ป้ายเป็น neutral ล้วน — แถวผังคือชาติก่อนของตัวเราเอง ทวงบาป/ขอส่วนบุญไม่ได้',
+    event(e, ctx, r) {
+      if (!isObj(e.when) || e.when.ancestor === undefined) return;
+      for (const { m, path } of meritItems(e)) if (meritCat(m.cat)?.kind !== 'neutral') r(path, 'ผีบรรพบุรุษคือชาติก่อนของตัวเรา — ป้ายต้องเป็น neutral ล้วน');
+    },
+  },
 ];
