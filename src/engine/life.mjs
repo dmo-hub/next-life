@@ -1620,6 +1620,7 @@ export function choose(st, idx, loan) {
         // ค่าจริงของชีวิตนี้ตอนข้าม (B136) — ผลในต่างโลกสะท้อนกลับชุดนี้ แล้ว tripBack เขียนลง st
         real: realAt(st),
         hints: st.content.nearHints,
+        overlapStage: overlapStageOf(st),
       });
       return;
     }

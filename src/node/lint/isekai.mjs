@@ -3,8 +3,9 @@
 import { ISEKAI_EVENTS, ISEKAI_YAML, ISEKAI_STAT, ISEKAI_FX, ISEKAI_FOCUS, ISEKAI_STAGES, CONT_DECK, CONT_FILL } from '../../engine/isekai.mjs';
 import { CONT_REGIONS, CONT_DISPUTES } from '../../engine/continent.mjs';
 import { MERIT_LEVELS } from '../../engine/merit.mjs';
+import { OVERLAP_STAGE_MIN } from '../../engine/life.mjs';
 import { MERIT_CATS } from './vocab.mjs';
-import { isObj, isInt } from './util.mjs';
+import { isObj, isInt, isRange } from './util.mjs';
 
 export const ISEKAI_RULES = [
   { id: 'isekai-shape', desc: 'ไฟล์เป็น {cards: [...]} · ช่องของการ์ด/ตัวเลือก/ผลอยู่ในรายการ · ch เป็นชั้นของช่วงวัย · ตัวเลือก 2–3 ข้อ' },
@@ -14,9 +15,10 @@ export const ISEKAI_RULES = [
   { id: 'isekai-fill', desc: 'ตัวแทนในข้อความมีแค่ {land} {major} {falling} {rising} {dispute}' },
   { id: 'isekai-merit', desc: 'merit = รายการ {cat, level} หมวดที่มีจริง · หมวดกลาง/ธงไม่มี level · หมวดอื่น level 1–3' },
   { id: 'isekai-next', desc: 'next ชี้การ์ด follow ใน yaml · การ์ด follow ต้องมีใครชี้มา (ไม่งั้นไม่มีทางถึง)' },
+  { id: 'isekai-overlap', desc: `overlap_stage = [จาก, ถึง] ขั้นค่าซ้อนทับ 0–${OVERLAP_STAGE_MIN.length - 1} จำนวนเต็ม (รูปเดียวกับ when.overlap_stage ฝั่งไทย)` },
 ];
 
-const CARD_KEYS = ['id', 'ch', 'title', 'text', 'choices', 'minFame', 'adult', 'follow', ...Object.keys(CONT_DECK)];
+const CARD_KEYS = ['id', 'ch', 'title', 'text', 'choices', 'minFame', 'adult', 'follow', 'overlap_stage', ...Object.keys(CONT_DECK)];
 const CHOICE_KEYS = ['t', 'fx', 'text', 'stat', 'dc', 'tag', 'win', 'lose', 'flag', 'next', 'need', 'merit'];
 const OUT_KEYS = ['fx', 'text', 'flag', 'next'];
 const POWERS = ['major', 'falling', 'rising'];
@@ -50,6 +52,7 @@ export function lintIsekai(docs) {
       if (!str(e.title) || !str(e.text)) bad(id, 'isekai-shape', 'ต้องมี title และ text');
       if (!Array.isArray(e.ch) || !e.ch.length || !e.ch.every((c) => CH.has(c))) bad(id, 'isekai-shape', `ch ต้องเป็นรายการชั้นของช่วงวัย (${[...CH].join(' ')})`);
       if (e.minFame !== undefined && !(isInt(e.minFame) && e.minFame > 0)) bad(id, 'isekai-shape', 'minFame ต้องเป็นจำนวนเต็มบวก');
+      if (e.overlap_stage !== undefined && !isRange(e.overlap_stage, 0, OVERLAP_STAGE_MIN.length - 1)) bad(id, 'isekai-overlap', `overlap_stage ต้องเป็น [จาก, ถึง] ขั้น 0–${OVERLAP_STAGE_MIN.length - 1} จำนวนเต็ม ได้ ${JSON.stringify(e.overlap_stage)}`);
       for (const k of ['adult', 'follow']) if (e[k] !== undefined && e[k] !== true) bad(id, 'isekai-shape', `${k} ใส่ได้แค่ true`);
       if (!Array.isArray(e.choices) || e.choices.length < 2 || e.choices.length > 3) bad(id, 'isekai-shape', 'ตัวเลือก 2–3 ข้อ');
 

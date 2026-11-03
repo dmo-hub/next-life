@@ -9,7 +9,7 @@ import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
 import { goalsMet } from './titles.mjs';
 import { heirPets } from './family.mjs';
 import { CHRONIC } from './death.mjs';
-import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai } from './life.mjs';
+import { newLife, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf } from './life.mjs';
 import { ISEKAI, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 import { warnPick } from './warn.mjs';
@@ -253,6 +253,7 @@ function sendToIsekai(af) {
     lore: isekaiWorldLore([...(af.st.lineage ?? []), { trips: af.st.trips }, ...af.isekaiLives]),
     // คนต่างโลกรุ่นก่อนที่ดังพอให้โลกจำชื่อ (B68i) — อ่านแถวชุดเดียวกับโลกจำ
     legends: isekaiWorldLegends([...(af.st.lineage ?? []), { trips: af.st.trips }, ...af.isekaiLives]),
+    overlapStage: overlapStageOf(af.st),
   });
 }
 

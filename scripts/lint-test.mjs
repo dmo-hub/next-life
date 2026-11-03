@@ -277,6 +277,25 @@ try {
   const real = lintIsekai(dir('content/isekai/').map((f) => load('content/isekai/', f)));
   for (const p of real) fails.push(`content/isekai: ${formatIsekaiProblem(p)}`);
   rows.push(['content/isekai/', `${real.length ? `ตก ${real.length} ข้อ` : 'ผ่าน'} · กติกา ${ISEKAI_RULES.length} · ไฟล์ bad ${files.length}`]);
+  // ขั้นค่าซ้อนทับฝั่งต่างโลก (ใบ 15): การ์ดเดียวกันต่างแค่ช่องนี้ — ตกต้องตกด้วย isekai-overlap อย่างเดียว ผ่านต้องไม่มีปัญหาเลย
+  const iskOverlapCard = (stage) => ({ id: 'overlap_case_isk', power: 'major', ch: [2], ...(stage !== undefined && { overlap_stage: stage }), title: 'ชื่อ', text: 'ข้อความ', choices: [{ t: 'ก', text: 'ผลก' }, { t: 'ข', text: 'ผลข' }] });
+  const iskOverlapCases = [
+    ['ไม่มีช่อง', undefined, true],
+    ['[1, 4]', [1, 4], true],
+    ['[0, 0]', [0, 0], true],
+    ['ขั้น 5', [1, 5], false],
+    ['ติดลบ', [-1, 2], false],
+    ['ไม่ใช่จำนวนเต็ม', [1.5, 2], false],
+    ['ข้อความ', ['1', 2], false],
+    ['ตัวเลขเดียว', 1, false],
+    ['จาก > ถึง', [3, 1], false],
+  ];
+  for (const [name, stage, pass] of iskOverlapCases) {
+    const ps = lintIsekai([{ file: `isekai-overlap-case:${name}`, doc: { cards: [iskOverlapCard(stage)] } }]);
+    const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.rule === 'isekai-overlap');
+    if (!ok) fails.push(`isekai overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกด้วย isekai-overlap'} ได้ [${ps.map(formatIsekaiProblem).join(' | ') || 'ผ่าน'}]`);
+  }
+  rows.push(['isekai overlap_stage ตก/ผ่าน', `${iskOverlapCases.length} เคส`]);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
