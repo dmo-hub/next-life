@@ -164,7 +164,8 @@ export function pickOccupation(era, seed, cls) {
     r -= w[i];
     if (r < 0) return f.occupations[i];
   }
-  return f.occupations.at(-1);
+  // ปัดเศษทศนิยมเหลือ r ≥ 0 — ตกที่อาชีพเกิดได้ตัวท้าย ไม่ใช่อาชีพตามขั้นยศ
+  return f.occupations.findLast((o) => o.birth);
 }
 
 // พอร์ตปรับสัดส่วนคืนทุกต้นปี · สินทรัพย์ที่ปีนี้ซื้อไม่ได้ย้ายไปเงินฝาก

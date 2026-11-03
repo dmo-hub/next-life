@@ -366,7 +366,7 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
-  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, province = null, parentFlags = {};
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, parentFlags = {};
   const death = deathStanding(st);
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
@@ -374,6 +374,8 @@ function makeHeir(af, r) {
   if (af.path === 'child') {
     // บ้านของรุ่นถัดไปคือบ้านของคนในชาติก่อน — อาชีพของครอบครัวจึงเป็นงานสุดท้ายของเขา ไม่สุ่มใหม่
     occupation = st.occupation;
+    // อาชีพตามขั้นยศมีความหมายแค่ในสาย — บ้านส่งต่อสายของพ่อแม่ให้การ์ดหางานพากลับเข้าสาย
+    if (st.content.era.finance.occupations.find((o) => o.id === occupation)?.birth === false) familyLadder = st.ladder?.id ?? null;
     tier = weighted(rng, KIN_TIERS, KIN_TIERS.map((t) => t.w));
     // ลูก/หลานที่ยังอยู่จริง (B36a): เกิดเป็นคนหนึ่งในนั้น · ไม่มีลูกเหลือแต่มีหลาน = ชั้นลูกเลื่อนเป็นหลาน · สุ่มเลือกคนจาก kinRng ของชีวิตก่อน
     const kids = livingKin(st, 'child'), grand = livingKin(st, 'grandchild');
@@ -457,6 +459,7 @@ function makeHeir(af, r) {
     parents,
     legacy,
     occupation,
+    ...(familyLadder && { familyLadder }),
     bonus,
     ledger,
     carried,

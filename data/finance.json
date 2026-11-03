@@ -2566,6 +2566,30 @@
      "v": 31890.08,
      "source": "https://sdmx.ilo.org/rest/data/ILO,DF_EAR_EMTA_SEX_OCU_CUR_NB,1.0/THA.A.......?format=csv&startPeriod=1950"
     }
+   },
+   {
+    "id": "officer",
+    "name": "เจ้าหน้าที่รัฐ",
+    "isco": "ISCO-08 หมวด 0",
+    "edu": "อุดมศึกษา",
+    "birth": false,
+    "wage": {
+     "v": 28936.34,
+     "assumption": true,
+     "note": "ILOSTAT ไม่มีค่าจ้าง ISCO 0 (กองทัพ) ของไทย — ใช้ค่าจ้างหมวดเดียวกับ professional"
+    }
+   },
+   {
+    "id": "senior_officer",
+    "name": "ผู้บริหารภาครัฐ",
+    "isco": "ISCO-08 หมวด 0",
+    "edu": "อุดมศึกษา",
+    "birth": false,
+    "wage": {
+     "v": 31890.08,
+     "assumption": true,
+     "note": "ILOSTAT ไม่มีค่าจ้าง ISCO 0 (กองทัพ) ของไทย — ใช้ค่าจ้างหมวดเดียวกับ manager"
+    }
    }
   ]
  },
