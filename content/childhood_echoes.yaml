@@ -13,6 +13,7 @@ events:
     text: "เพื่อนโต๊ะข้าง ๆ นั่งดื่มน้ำเปล่าตอนพักเที่ยงมาเกือบอาทิตย์ บอกทุกคนว่าไม่หิว แต่ท้องร้องดังจนคนหันมามอง วันนี้มีเด็กกลุ่มหลังห้องเริ่มหัวเราะใส่"
     choices:
       - id: share_lunch
+        nature: social
         text: "แบ่งข้าวกินด้วยกันทุกวัน"
         effects: {relations: 1, happiness: 1}
         merit: [{cat: dana, level: 1}]
@@ -107,10 +108,12 @@ events:
           - {weight: 2, text: "คะแนนสอบออกมาสูงเกินจนตัวเองยังตกใจ ไม่มีใครถามอะไร", effects: {knowledge: -1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ครูเห็นรูปในโทรศัพท์ของเพื่อน ฝ่ายปกครองเรียกทั้งสามคนเข้าห้อง ชื่อถูกจดลงสมุดประวัติ", effects: {happiness: -2, relations: -1}, sets_flags: [school_record], schedules: [{event: echo_school_record_exam_01, after_years: [10, 13]}], merit: [{cat: neutral}]}
       - id: walk_away
+        nature: learn
         text: "เดินออกมา ไปอ่านหนังสือเอง"
         effects: {knowledge: 1}
         merit: [{cat: sila, level: 1}]
       - id: tell_teacher
+        nature: bold
         text: "ไปบอกครูว่าข้อสอบหลุด"
         effects: {relations: -1, knowledge: 1}
         merit: [{cat: sila, level: 1}]

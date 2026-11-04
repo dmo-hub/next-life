@@ -13,12 +13,14 @@ events:
     text: "วันสุดท้ายของชั้นประถม ครูประจำชั้นให้ทุกคนเอาของหนึ่งอย่างใส่กล่องสังกะสี แล้วฝังไว้ใต้ต้นไม้หลังอาคารเรียน ครูบอกว่าอีกหลายปีค่อยกลับมาขุดดูว่าตัวเองโตมาเป็นคนแบบไหน"
     choices:
       - id: letter
+        nature: learn
         text: "เขียนจดหมายถึงตัวเองตอนโต"
         effects: {knowledge: 1}
         sets_flags: [capsule_letter]
         schedules: [{event: echo_capsule_letter_01, after_years: [15, 30]}]
         merit: [{cat: neutral}]
       - id: photo
+        nature: social
         text: "ใส่รูปถ่ายกับเพื่อนทั้งห้อง"
         effects: {relations: 1}
         sets_flags: [capsule_photo]
