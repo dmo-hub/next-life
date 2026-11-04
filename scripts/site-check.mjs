@@ -17,6 +17,7 @@ import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml } from '../src/site/nav.mjs';
+import { uiPage, designMoved, tweakPages, cssVars, UI_PAGE, UI_MOVED_FROM } from '../src/site/ui.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
@@ -204,7 +205,7 @@ const readOr = (p) => (existsSync(new URL(p, docs)) ? read(p) : null);
 const designGap = (out, readPage, readOld = readOr) => [
   ...designFiles().filter((f) => !readPage(designPage(f))?.includes(`<details class="doc" id="${docId(f)}"`)).map((f) => `ไม่มี ${f}`),
   ...out.filter(([f, pg]) => lf(readPage(f)) !== lf(designHtml(designTpl, pg, f))).map(([f]) => `ค้าง ${f}`),
-  ...out.filter(([f, pg]) => lf(readOld(f)) !== movedHtml(f, DESIGN_AT + f, pg.title)).map(([f]) => `ไม่มีหน้าส่งต่อ ${f}`),
+  ...out.filter(([f, pg]) => lf(readOld(f)) !== designMoved(f, pg.title)).map(([f]) => `ไม่มีหน้าส่งต่อ ${f}`),
   // หน้าเรื่องที่ถูกรวม/ลบแล้วยังค้าง ทั้งที่ใหม่และที่เดิม
   ...readdirSync(new URL(DESIGN_AT, docs)).filter((n) => /^design-.+\.html$/.test(n) && !out.some(([f]) => f === n)).map((n) => `เกิน ${DESIGN_AT}${n}`),
   ...readdirSync(docs).filter((n) => /^design-.+\.html$/.test(n) && !out.some(([f]) => f === n)).map((n) => `เกิน ${n}`),
@@ -245,6 +246,38 @@ const devTabMiss = (html) => {
 const devMiss = devFiles.map((f) => [f, read(f)]).filter(([, h]) => h.includes('class="nl-tabs"')).map(([f, h]) => [f, devTabMiss(h)]).filter(([, m]) => m.length).map(([f, m]) => `${f} ขาด ${m.join(' ')}`);
 const devCtl = devTabMiss(read('dev/index.html').replace(/<a href="[^"]*dev\/design\.html"[^>]*>คำตัดสินเกม<\/a>/, '')).length === 1;
 const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.html" aria-current="true"') && devNavHtml('dev/design.html').includes('href="../dev/design.html" aria-current="page"');
+// 7e) หน้าดีไซน์ UI (ui-redo 44): ตรงของที่ build ตอนนี้ · design.html เดิมส่งต่อมาที่นี่ · สีทุกตัวแปรในเกมขึ้นหน้า · ลิงก์ tweak ครบทุกหน้า tweak และปลายทางมีจริง
+// · ชิ้นส่วนตัวอย่างอยู่ใน iframe sandbox ว่าง (ไม่มีสคริปต์ ไม่มี same-origin ⇒ แตะ localStorage ไม่ได้) และ srcdoc ไม่มี <script
+// ตัวควบคุม: แก้สีในเกม 1 ค่า ⇒ หน้าที่ build ต้องเปลี่ยนและมีค่าใหม่ · ถอดลิงก์ tweak 1 ลิงก์ ⇒ ต้องนับขาด · เติม allow-scripts ⇒ ต้องถูกจับ
+const uiTpl = readFileSync(new URL('../src/ui/template.html', import.meta.url), 'utf8');
+const uiBuilt = (tpl) => designHtml(designTpl, uiPage(content, docs, tpl), UI_PAGE.slice(DESIGN_AT.length));
+const uiNow = uiBuilt(uiTpl);
+const uiHtml = readOr(UI_PAGE) ?? '';
+const uiColors = cssVars(uiTpl.match(/<style>([\s\S]*?)<\/style>/)[1]).flatMap((g) => g.vars).filter(([, v]) => /^(#|rgba?\(|hsla?\()/i.test(v));
+const uiTweaks = tweakPages(docs);
+const uiTweakGap = (html) => {
+  const box = html.match(/<ul id="ui-tweaks">([\s\S]*?)<\/ul>/)?.[1] ?? '';
+  const hrefs = [...box.matchAll(/href="([^"]+)"/g)].map((m) => `dev/${m[1]}`);
+  return [...uiTweaks.filter(([f]) => !hrefs.includes(f)).map(([f]) => `ขาดลิงก์ ${f}`), ...hrefs.filter((h) => !existsSync(new URL(h, docs))).map((h) => `ลิงก์ตาย ${h}`)];
+};
+const uiFrameBad = (html) => {
+  const frames = [...html.matchAll(/<iframe[^>]*>/g)].map((m) => m[0]);
+  return !frames.length || frames.some((f) => !/ sandbox=""/.test(f) || /&lt;script|<script/i.test(f));
+};
+const uiMiss = [
+  ...(lf(uiHtml) !== lf(uiNow) ? [`ค้าง ${UI_PAGE}`] : []),
+  ...(lf(readOr(UI_MOVED_FROM)) !== designMoved(UI_MOVED_FROM, '') ? [`${UI_MOVED_FROM} ไม่ส่งต่อมา ${UI_PAGE}`] : []),
+  ...uiColors.filter(([, v]) => !uiHtml.includes(`background:${v}`)).map(([k]) => `ไม่มีสี ${k}`),
+  ...uiTweakGap(uiHtml),
+  ...(uiFrameBad(uiHtml) ? ['iframe ไม่ปิดสคริปต์'] : []),
+];
+const [uiK, uiV] = uiColors[0] ?? ['', ''];
+const uiRecolor = uiBuilt(uiTpl.replace(`${uiK}:${uiV}`, `${uiK}:#010203`));
+const uiCtl =
+  uiRecolor !== uiNow && uiRecolor.includes('background:#010203') &&
+  (uiTweaks.length === 0 || uiTweakGap(uiHtml.replace(/(<ul id="ui-tweaks">)<li>[\s\S]*?<\/li>/, '$1')).length === 1) &&
+  uiFrameBad(uiHtml.replace(' sandbox=""', ' sandbox="allow-scripts"'));
+check('หน้าดีไซน์ UI ตรงของที่ build สีจากเกมครบ ลิงก์ tweak ครบ ตัวอย่างไม่รันสคริปต์', uiMiss.length || !uiCtl, ` สี ${uiColors.length} · tweak ${uiTweaks.length}${uiMiss.length ? ` · ${uiMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${uiCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('หน้าห้องผู้พัฒนามีแท็บครบชุดเดียวกัน', devMiss.length || !devCtl || !devCur, ` ${devFiles.length} หน้า${devMiss.length ? ` · ${devMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${devCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('ทุกหน้ามีแถบบนชุดเดียวและชี้หน้าปัจจุบัน', navMiss.length || !navCtl || !curOk, ` ${navFiles.length} หน้า${navMiss.length ? ` · ${navMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${navCtl ? 'จับได้' : 'จับไม่ได้'}`);
 

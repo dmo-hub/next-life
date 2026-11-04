@@ -1,4 +1,4 @@
-import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, bookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS } from '../engine/index.mjs';
+import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
@@ -212,45 +212,91 @@ function lifeMenu(card, box) {
     b.append(el('span', null, label));
     if (sheets[id]) {
       b.setAttribute('aria-expanded', 'false');
-      b.onclick = () => (root.querySelector('.sheet') ? closeSheet() : openSheet(label, sheets[id](), box, b));
+      b.onclick = () => {
+        const cur = root.querySelector('.sheet');
+        // แผงค้าง: ปุ่มอื่นสลับแผง · ปุ่มเดิมซ้ำ = ซ่อนแผงจนกดเมนูใหม่ · ลิ้นชัก: กดปุ่มใดก็ปิด
+        if (cur && (!cur.classList.contains('pin') || cur.dataset.menu === id)) {
+          if (cur.classList.contains('pin')) pinId = null;
+          return closeSheet();
+        }
+        if (pinned()) pinId = id;
+        openSheet(label, sheets[id](), box, b, id);
+      };
     } else {
       b.onclick = () => {
-        // ปิดแผงก่อน ไม่งั้นการ์ดที่เก็บไว้คืนตอนกลับยัง inert อยู่
-        closeSheet();
+        // ปิดลิ้นชักก่อน ไม่งั้นการ์ดที่เก็บไว้คืนตอนกลับยัง inert อยู่ · แผงค้างไม่ inert เก็บไปพร้อมการ์ด กลับมาแผงเดิมยังอยู่
+        unblockSheet();
         views[id]();
       };
     }
     nav.append(b);
   }
+  // แผงเปิดค้างตามที่เลือกไว้ทุกการ์ด — การ์ดใหม่วาด root ใหม่ทั้งก้อน · รอ render ต่อเมนูเข้า root ก่อนค่อยเปิด
+  // ต่างโลกไม่มีครอบครัว/เงิน ชีวิตไทยไม่มีสกิล/ความเร็ว ⇒ แผงที่เลือกไว้ไม่มีในเมนูนี้ เปิดตัวฉันแทน
+  pinMenu = () => {
+    if (!box.isConnected) return;
+    const it = items.find(([id]) => id === pinId && sheets[id]) ?? items.find(([id]) => id === 'me');
+    const b = it && nav.querySelector(`[data-menu="${it[0]}"]`);
+    if (b) openSheet(it[1], sheets[it[0]](), box, b, it[0]);
+  };
+  queueMicrotask(pinAgain);
   return nav;
 }
-// การ์ดใต้แผงเป็น inert: แตะหรือปุ่มลัดตัวเลขไม่ไปเลือกตัวเลือกที่ถูกบังอยู่ · Esc หรือกดปุ่มเมนูเดิมซ้ำ = ปิด
-// from ว่าง = แผงที่เกมเปิดเอง (แจ้งอัปเดต) — ปิดแล้วโฟกัสกลับปุ่มแรกของจอใต้แผง
+// แผงค้าง (ui-redo ใบ 67): จอคอมกว้างพอให้การ์ดช่องกลางไม่แคบกว่า 560 (ราว 220 + แผง 420 + ขอบการ์ด 64) แผงเปิดข้างการ์ดตั้งแต่เข้าเกม
+// ไม่บัง ไม่ inert ไม่ดักโฟกัส การ์ดเล่นต่อได้ · จอแคบกว่านั้นเป็นลิ้นชักทับการ์ดแบบเดิม · จอเตี้ยใช้ราวแคบของมือถือแนวนอน ไม่ค้าง
+const PIN_MQ = window.matchMedia?.('(min-width: 1264px) and (min-height: 541px)');
+const pinned = () => !!PIN_MQ?.matches;
+let pinId = 'me';
+let pinMenu = null;
+const pinAgain = () => {
+  if (pinned() && pinId && !root.querySelector('.sheet')) pinMenu?.();
+};
+// ข้ามเส้นกว้าง/แคบ: ลิ้นชักที่เปิดอยู่กลายเป็นแผงค้าง · แผงค้างหายเมื่อจอแคบลง (ลิ้นชักไม่เปิดเอง)
+PIN_MQ?.addEventListener?.('change', () => {
+  closeSheet(true);
+  pinAgain();
+});
+const unblockSheet = () => {
+  if (!root.querySelector('.sheet.pin')) closeSheet();
+};
+// ลิ้นชัก: การ์ดใต้แผงเป็น inert — แตะหรือปุ่มลัดตัวเลขไม่ไปเลือกตัวเลือกที่ถูกบังอยู่ · Esc หรือกดปุ่มเมนูเดิมซ้ำ = ปิด
+// from ว่าง = แผงที่เกมเปิดเอง (แจ้งอัปเดต) — ปิดแล้วโฟกัสกลับปุ่มแรกของจอใต้แผง · keep = ปิดเพื่อเปิดแผงอื่นต่อ ไม่ย้ายโฟกัส
 let sheetClose = null;
-function openSheet(title, content, box, from) {
-  const sheet = el('section', 'sheet');
-  sheet.setAttribute('role', 'dialog');
-  sheet.setAttribute('aria-modal', 'true');
+function openSheet(title, content, box, from, id) {
+  closeSheet(true);
+  const pin = pinned();
+  const sheet = el('section', pin ? 'sheet pin' : 'sheet');
+  if (!pin) {
+    sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-modal', 'true');
+  }
   sheet.setAttribute('aria-label', title);
+  if (id) sheet.dataset.menu = id;
   const head = el('div', 'sheet-h');
   const shut = el('button', 'sheet-x', 'กลับไปการ์ด');
   shut.type = 'button';
   head.append(el('h2', null, title), shut);
   sheet.append(head, content);
-  sheetClose = () => {
+  sheetClose = (keep) => {
     sheet.remove();
     box.inert = false;
     from?.setAttribute('aria-expanded', 'false');
     sheetClose = null;
-    (from ?? box.querySelector('button, a'))?.focus();
+    if (!keep) (from ?? box.querySelector('button, a'))?.focus();
   };
-  shut.onclick = closeSheet;
-  box.inert = true;
+  // แผงค้างของเมนู: ซ่อนจนกดเมนูใหม่ · แผงที่เกมเปิดเอง (แจ้งอัปเดต) ปิดแล้วแผงที่เลือกไว้กลับมา
+  shut.onclick = () => {
+    if (pin && id) pinId = null;
+    closeSheet();
+    pinAgain();
+  };
   from?.setAttribute('aria-expanded', 'true');
   root.append(sheet);
+  if (pin) return;
+  box.inert = true;
   shut.focus();
 }
-const closeSheet = () => sheetClose?.();
+const closeSheet = (keep) => sheetClose?.(keep);
 
 // แผงตัวฉัน: ค่าเต็มคู่คำอธิบาย · โฟกัส · ฐานะและงาน (ย้ายมาจากใต้แถบสถานะของการ์ด) · ไม่มีลูกศรปีนี้ — ลูกศรอยู่บนแถบสถานะที่เดียว
 // การ์ดตายเปิดได้เหมือนกัน เห็นค่าตอนจากไป แต่ไม่มีโฟกัส (ชีวิตจบแล้ว)
@@ -1054,7 +1100,7 @@ function picsSeen() {
 }
 
 // สมุดสกิล (06s): สกิลที่ดวงวิญญาณเคยได้ สะสมข้ามชีวิตแบบสมุดฉายา · ไม่อยู่ในเซฟ (ล้างตระกูลแล้วยังอยู่)
-// s = { id: ขั้นสูงสุดที่เคยถึง } คำนวณด้วย bookAdd ของแกน · e = การ์ดที่ลงสมุดไปแล้ว — รีโหลดกลับมาที่การ์ดเดิม ลงซ้ำ = ขั้นขึ้นฟรี
+// s = { id: ขั้นสูงสุดที่เคยถึง } คำนวณด้วย skillBookAdd ของแกน · e = การ์ดที่ลงสมุดไปแล้ว — รีโหลดกลับมาที่การ์ดเดิม ลงซ้ำ = ขั้นขึ้นฟรี
 // n = สกิลที่เพิ่งลงแต่ยังไม่เปิดดู (จุดแดงแบบสมุดฉายา)
 const SKILLS_KEY = 'next-life-skills-v1';
 const SKILL_IDS = Object.keys(ISEKAI_SKILLS);
@@ -1080,7 +1126,7 @@ function skillsEarn(key, id, lv) {
   const k = skillsRead();
   if (k.e.includes(key)) return null;
   const was = k.s[id] ?? 0;
-  k.s = bookAdd(k.s, id, lv).book;
+  k.s = skillBookAdd(k.s, id, lv).book;
   k.e = [...k.e, key].slice(-SKILLS_EARN_MAX);
   if (!k.n.includes(id)) k.n.push(id);
   skillsWrite(k);
@@ -1668,7 +1714,7 @@ document.addEventListener('keydown', (e) => {
   const t = e.target;
   if (t.closest?.('input, textarea, select, [contenteditable]')) return;
   let b;
-  if (e.key === 'Escape' && sheetClose) {
+  if (e.key === 'Escape' && sheetClose && !root.querySelector('.sheet.pin')) {
     e.preventDefault();
     return closeSheet();
   }
@@ -2497,9 +2543,9 @@ function morePanel() {
   const ul = el('ul', 'mr');
   const day = el('button', null, 'ชาติประจำวัน');
   day.type = 'button';
-  // ปิดแผงก่อน หน้าถามยืนยันจะได้เก็บการ์ดที่ไม่ inert ไว้คืนตอนยกเลิก
+  // ปิดลิ้นชักก่อน หน้าถามยืนยันจะได้เก็บการ์ดที่ไม่ inert ไว้คืนตอนยกเลิก · แผงค้างไม่ inert เก็บไปด้วยได้
   day.onclick = () => {
-    closeSheet();
+    unblockSheet();
     dayNew();
   };
   const link = (text, href) => Object.assign(el('a', null, text), { href });
@@ -2632,7 +2678,7 @@ function earnBox(earn, key) {
   const book = skillsRead().s;
   for (const x of earn) {
     const was = book[x.id] ?? 0;
-    const to = bookAdd(book, x.id, x.lv).book[x.id];
+    const to = skillBookAdd(book, x.id, x.lv).book[x.id];
     const tag = !was ? `ใหม่ · ขั้น ${to}` : to > was ? `ขั้น ${was} → ${to}` : 'ขั้นสูงสุดแล้ว';
     const b = button(x.name, tag, () => {
       const r = skillsEarn(key, x.id, x.lv);
@@ -2711,7 +2757,8 @@ function renderAfter(card) {
   root.replaceChildren();
   const box = el('article', 'card b af');
   const top = el('div', 'top');
-  top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, card.loop ? `${genLabel()}${st.name} · ภูมิ${af.verdict.realm.name} · ปีที่ ${card.loop.year}/${card.loop.years}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
+  // หัวแถบเป็นชื่อเกมเหมือนหน้าเปิด (ui-redo 66 · เจ้าของ) · ฉากที่อยู่บอกด้วยป้ายบนการ์ดแทน
+  top.append(el('b', null, GAME_NAME), el('small', null, card.loop ? `${genLabel()}${st.name} · ภูมิ${af.verdict.realm.name} · ปีที่ ${card.loop.year}/${card.loop.years}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
   const next = () => play(T.afterNext);
@@ -2953,8 +3000,8 @@ function armTick(box, panel, bar, tok) {
   bar.style.animation = `itick ${ms}ms linear forwards`;
   tickTimer = setTimeout(() => {
     if (!box.isConnected) return;
-    // แถบโฟกัสกางอยู่ = ผู้เล่นกำลังเลือก เวลารอแม้เมาส์ออกนอกแถบ · แผงจากเมนูเปิดอยู่ = การ์ดถูกบัง ใบไม่เปลี่ยนใต้แผง
-    if (panel.matches(':hover, :focus-within') || panel.querySelector('[aria-expanded="true"]') || sheetClose || document.hidden) return armTick(box, panel, bar, tok);
+    // แถบโฟกัสกางอยู่ = ผู้เล่นกำลังเลือก เวลารอแม้เมาส์ออกนอกแถบ · ลิ้นชักเปิดอยู่ = การ์ดถูกบัง ใบไม่เปลี่ยนใต้แผง (แผงค้างไม่บัง เวลาเดินต่อ)
+    if (panel.matches(':hover, :focus-within') || panel.querySelector('[aria-expanded="true"]') || root.querySelector('.sheet:not(.pin)') || document.hidden) return armTick(box, panel, bar, tok);
     play(tok);
   }, ms);
 }
@@ -3451,6 +3498,13 @@ const chromeH = () => document.documentElement.style.setProperty('--chrome', `${
 chromeH();
 addEventListener('resize', chromeH);
 document.fonts?.ready.then(chromeH);
+// ราว/แผงบนคอมเริ่มใต้หัวเว็บ (ui-redo ใบ 67): ขอบล่างหัวจริงขณะเลื่อน — เลื่อนพ้นหัวแล้วชิดบน · หัวสูงเปลี่ยนตามธีมต่างโลกกับฟอนต์ที่โหลดทีหลัง
+const logoEl = document.querySelector('.logo');
+const headEdge = () => logoEl && document.documentElement.style.setProperty('--hd', `${Math.max(0, Math.round(logoEl.getBoundingClientRect().bottom))}px`);
+headEdge();
+addEventListener('scroll', headEdge, { passive: true });
+addEventListener('resize', headEdge);
+if (logoEl && window.ResizeObserver) new ResizeObserver(headEdge).observe(logoEl);
 
 // ภาพถ่าย v2 ก่อน · ไม่มีจึงลองเซฟ v1 (เล่นซ้ำตรงการ์ดเดิม = เขียนทับเป็น v2 ทันที) · v1 ไม่ตรง/เซฟเสีย = หน้าเกมอัปเดต
 function boot() {

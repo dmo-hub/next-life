@@ -74,10 +74,10 @@
 .nl-swap{margin-right:16px}
 .nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid #343A48}
 }
-</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html" aria-current="true">คำตัดสินเกม</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/ui-redo/tweak.html">ต้นแบบ UI</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div>
+</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html" aria-current="true">คำตัดสินเกม</a><a href="../dev/ui.html">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/ui-redo/tweak.html">ต้นแบบ UI</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div>
 <header><div class="w">
   <h1>ชีวิตไทยลึกขึ้น — ใบค้างของโลกปกติจัดตามเฟส v2</h1>
-  <p>เรื่อง thai-life-deep · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.53</span></p>
+  <p>เรื่อง thai-life-deep · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.56</span></p>
 </div></header>
 <main><div class="w">
 <p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
@@ -325,6 +325,49 @@
 <h4 id="d-thai-life-deep-decisions-h67">2026-11-04 18:16 · เพิ่มเลือด popup หลังผู้ค้าน (design-challenger opus @7123806 · Refuted 331 · Weakened 330 332 333 334)</h4>
 <h3 id="d-thai-life-deep-decisions-h68">คำตอบที่ตัดสิน</h3>
 <ol><li>ด่าน 3b (แทน 331): บอทที่ด่าน 3b ใช้ไม่แตะทางสุขภาพ (ตัดโฟกัส health_care/rest_travel · ของสุขภาพในตลาด · ปุ่มหาหมอ) ⇒ คนทั่วไปตรงสถิติ · บอทสายสุขภาพแยกวัดว่ายืดได้ · ข้อเท็จจริง: บอทสุ่ม 2/3 เลือกโฟกัสดันค่าเด่น (harness/bots.mjs:106) · gate กับ full ใช้บอทสุ่มคนละแบบ (harness/run.mjs:4 · full.mjs:188)</li><li>คงไม่จำกัด (ยืนยัน 330 หลังผู้ค้านเตือนว่าคนดูแลตัวถึง 120 ได้ประจำ) · ไม่เลือก: ยิ่งแก่เติมได้น้อยลง · เพดานยืด</li><li>เกินเส้น (ต่อ 332 + 324): ส่วนเกินเส้นธรรมชาติจางช้าเอง ต้องดูแลต่อเนื่องถึงคงไว้ · ต่ำกว่าเส้น (แผล) ฟื้นขึ้นตาม 324</li><li>ไอเทมฟื้น (ต่อ 333ง): ไม่ตกทอด ตายแล้วหาย (ยกเว้นจากกติกาส่งของ B78/B76) · items.yaml ต้องเพิ่มช่องผล (ตอนนี้ไม่มี)</li><li>ตลาด (แทน 333ค): ปรับผล 2 ชิ้นเดิมในร่าง (ตรวจสุขภาพประจำปี · ฟิตเนส/กีฬา shop-list-draft:41-42) ให้บวกหลอด · ไม่เพิ่มชิ้นใหม่ · แก้ใบ 52</li><li>การ์ดเตือน (ต่อ 333ก): ปุ่ม &quot;ไปหาหมอ&quot; (เงิน) ปุ่มเดียวคู่ &quot;ช่างมัน&quot; · ตัดพักงาน (ซ้ำกับเปลี่ยนโฟกัส) · บอทสายสุขภาพกดหาหมอ ที่เหลือกดช่างมันไม่ดึงเลขสุ่มตาม B161 · ลดแรงข้ามเส้น 20 ลง 0 ทีเดียวไม่เห็นการ์ดเตือน = ยอมรับ (ข้อ 326)</li><li>การ์ดสุขภาพชุดใหม่ (ต่อ 333ข): ทำพร้อมรอบกติกาตาย ตั้งฐาน lifehash ครั้งเดียวกับใบ 190 · ด่าน 4 ต้องผ่าน · เฉพาะโลกไทย (ต่างโลกคงร้านทอง + ยาต่ออายุ B68k)</li><li>ยา/ค่ารักษา (ต่อ 334): ทับ B72:6 · ใบ 54 75 เขียนจาก &quot;ลดโอกาสตาย&quot; เป็น &quot;บวกหลอด&quot; · ใบ 60 จาก &quot;จ่ายแล้วได้ปีคืน&quot; เป็น &quot;หลอดลดช้าลง&quot; (ตามข้อ 325)</li><li>ไม่ได้ถาม (ผู้ค้านเสนอ · planner ใส่เป็นเกณฑ์ใบ 198): ด่าน finance ใช้บอทไม่มีโฟกัส (harness/finance.mjs:14) มองไม่เห็นคนรวยอายุยืน ⇒ เลนรายงานผลบอทสายสุขภาพในด่าน finance ด้วย</li></ol>
+<h4 id="d-thai-life-deep-decisions-h69">2026-11-04 18:46 · B67 ใบ 163: JSON เจ้าของจากหน้า b67-tweak (คำต่อคำ · next-life-planner)</h4>
+<pre data-lang="json"><code>{
+ &quot;page&quot;: &quot;b67-tweak&quot;,
+ &quot;ticket&quot;: 162,
+ &quot;base&quot;: &quot;a&quot;,
+ &quot;changed&quot;: [
+  &quot;pos&quot;,
+  &quot;count&quot;,
+  &quot;bar&quot;,
+  &quot;realm&quot;,
+  &quot;perLife&quot;,
+  &quot;head&quot;,
+  &quot;choiceLayout&quot;
+ ],
+ &quot;soul&quot;: {
+  &quot;label&quot;: &quot;สถิติวิญญาณ&quot;,
+  &quot;pos&quot;: &quot;2&quot;,
+  &quot;count&quot;: &quot;none&quot;,
+  &quot;bar&quot;: &quot;grid3&quot;,
+  &quot;layout&quot;: &quot;list&quot;,
+  &quot;realm&quot;: &quot;names&quot;,
+  &quot;job&quot;: &quot;all&quot;,
+  &quot;perLife&quot;: &quot;on&quot;,
+  &quot;dot&quot;: &quot;new&quot;
+ },
+ &quot;end&quot;: {
+  &quot;theme&quot;: &quot;b&quot;,
+  &quot;head&quot;: &quot;สิ้นสุดวัฏสงสาร?&quot;,
+  &quot;title&quot;: &quot;ผู้บำเพ็ญบารมี&quot;,
+  &quot;showLives&quot;: &quot;on&quot;,
+  &quot;hints&quot;: &quot;on&quot;,
+  &quot;choiceLayout&quot;: &quot;pair&quot;,
+  &quot;order&quot;: &quot;nirvana&quot;,
+  &quot;confirm&quot;: &quot;ask&quot;,
+  &quot;glyph&quot;: &quot;lotus&quot;
+ },
+ &quot;note&quot;: &quot;เอาคำว่า ระหว่างชาติ ที่มุมขวาบนออก&quot;
+}</code></pre>
+<p>คำเจ้าของในแชทพร้อม JSON (ภาพแถบแท็บ grid3: อนุสรณ์ 27 · สถิติวิญญาณ · ฉายา 12/80 · สกิล 3 · ภาพบ้านเมือง 5/40 · เคยจากไป 4): &quot;ตัวเลือกวงรีด้านบน อยากเปลี่ยนเป็นดีไซน์อื่น&quot;</p>
+<ol><li>ใบ 164 แท็บสถิติวิญญาณ: ค่าตาม <code>soul</code> ข้างบน (ถัดอนุสรณ์ · ไม่มีตัวเลข · แถบ grid3 · รายการ · ภูมิเป็นชื่อ · อาชีพทุกชาติ · รายชาติเปิด · จุดของใหม่) · รูปปุ่มแท็บไม่ยึด pill ของหน้า tweak — รอ ui-redo ใบ 64 (ui-redo decisions 94)</li><li>ใบ 170 จอนิพพาน/โพธิสัตว์: ค่าตาม <code>end</code> ข้างบน (ธีม b · หัว &quot;สิ้นสุดวัฏสงสาร?&quot; · ฉายา &quot;ผู้บำเพ็ญบารมี&quot; · บอกจำนวนชาติ · คำใบ้ใต้ปุ่ม · ปุ่มคู่ · นิพพานก่อน · ถามยืนยัน · ดอกบัว) · ชื่อ &quot;บารมีข้ามชาติ&quot; (ข้อ 272) คงเป็นชื่อระบบ ฉายาบนจอใช้ &quot;ผู้บำเพ็ญบารมี&quot;</li><li>note &quot;เอาคำว่า ระหว่างชาติ ที่มุมขวาบนออก&quot;: เจ้าของเลือก (popup 18:4x) <strong>ทุกการ์ดระหว่างชาติ</strong> ไม่ใช่แค่จอนิพพาน · ในเกมคำนี้คือหัวแถบบน <code>&lt;b&gt;</code> ของ renderAfter (@3046478 app.mjs:2705) · ไม่เลือก: เฉพาะจอนิพพาน · → ui-redo decisions 95 ใบ ui-redo 66 · ชื่อ stage &quot;ระหว่างชาติ&quot; ในเนื้อหา/about/catalog ไม่แตะ</li></ol>
+<h4 id="d-thai-life-deep-decisions-h70">2026-11-04 19:44 · ใบ 133 เทศกาลทำ &quot;ลูกนกหัดบิน&quot; ตกด่าน titles (คิว integrator · popup เจ้าของ 1 รอบ)</h4>
+<p>ที่มา: เลน A 133 ด่าน titles ลูกนกหัดบิน ฐาน 37 → 30 · เส้น 36 · integrator เสนอ 3 ทาง</p>
+<ol><li>เจ้าของเลือก &quot;เทศกาลไม่นับแบบชีวิต&quot;: การ์ดเทศกาลใบ 133 ติดธง ambient ไม่นับเข้าแกนแบบชีวิต แบบเดียวกับการ์ดลางภัย · การ์ด 8 ใบ อายุ/น้ำหนักคงเดิม · ไม่เลือก: จำกัดอายุ 9–12/ลดน้ำหนัก · ถอยการ์ดเด็ก 4 ใบ · เกณฑ์: titles ลูกนกหัดบินกลับ ≥ 36 · ด่านอื่นของใบ 133 ตามเดิม</li></ol>
 </details>
 <script>(() => { const open = () => { const t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); const d = t && t.closest('details'); if (d && !d.open) { d.open = true; t.scrollIntoView(); } }; addEventListener('hashchange', open); open(); })();</script>
 </div></main>
