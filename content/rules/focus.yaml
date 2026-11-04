@@ -19,17 +19,19 @@
 # นิสัยจากวัยเด็ก (B41): แต้มจากปีทุ่มเทที่ติด nature +1/ปี และตัวเลือกการ์ดที่ติด `nature:` +1/ครั้ง จนถึงอายุ nature_age แล้วล็อกตัวแต้มสูงสุด
 # nature_age  = อายุที่ล็อกนิสัย (ปีของอายุนี้ยังนับ) · heir_nature = แต้มต่อปีของทุ่มเทที่ทายาทได้จากพ่อแม่เองก่อนผู้เล่นเปลี่ยน (เจ้าของเคาะครึ่ง)
 # ไม่มีแต้มเลย = ไม่มีนิสัยเด่น
+# ต่อนิสัย: stat = ค่าที่ผลบวกจากตัวเลือกการ์ดคูณ nature_mul (money นับเฉพาะการ์ดหมวดใน cards) · jobs = อาชีพตรงสาย การ์ดขึ้นเงินเดือน (income_mult) ส่วนที่ขึ้นคูณ nature_mul
 year_scale: 0.25
 spend_scale: 0.25
 card_mul: 2
 chain_years: 3
 nature_age: 12
 heir_nature: 0.5
+nature_mul: 1.1
 natures:
-  social: {name: เข้ากับคนง่าย}
-  learn: {name: ใฝ่รู้}
-  duty: {name: ขยันรับผิดชอบ}
-  bold: {name: ใจกล้า}
+  social: {name: เข้ากับคนง่าย, stat: relations, jobs: [service, manager]}
+  learn: {name: ใฝ่รู้, stat: knowledge, jobs: [professional, clerk, technician]}
+  duty: {name: ขยันรับผิดชอบ, stat: money, cards: [work_money], jobs: [farmer, craft, labor, factory]}
+  bold: {name: ใจกล้า, stat: health}
 tags: {}
 focuses:
   # ── เด็ก–วัยรุ่น ──

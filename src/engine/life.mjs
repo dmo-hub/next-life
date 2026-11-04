@@ -602,12 +602,15 @@ function homePays(st) {
 }
 
 // hurt = ตัวคูณส่วนที่ติดลบของค่าและเงิน (ญาติช่วยประคองตอนเจอผลร้าย) · ส่วนที่เป็นบวกไม่แตะ
-function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
+// nat = ตัวคูณนิสัย (natureBoost) ส่วนที่เป็นบวกของค่าตรงนิสัยเท่านั้น · คืน true เมื่อตัวคูณมีผล (ป้าย "เพราะคุณเป็นคน…")
+function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
+  let hit = false;
   const cut = (v) => (v < 0 ? v * hurt : v);
-  for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + cut(levelValue(fx[k]) * ss));
+  const up = (k, v) => (nat?.stat === k && v > 0 ? ((hit = true), v * nat.mul) : v);
+  for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + cut(up(k, levelValue(fx[k]) * ss)));
   if (fx.money?.grey) greyAdd(st, moneyValue(st, fx.money) * s);
   else if (fx.money) {
-    st.money += cut(moneyValue(st, fx.money) * s);
+    st.money += cut(up('money', moneyValue(st, fx.money) * s));
     homePays(st);
   }
   if (fx.grey_seize) greySeize(st, fx.grey_seize);
@@ -622,7 +625,10 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
   if (fx.debt) borrow(st, fx.debt, s);
   if (fx.settle) settle(st, fx.settle);
   if (fx.complain) for (const d of st.debts) complainDebt(st.content.era, d);
-  if (fx.income_mult) st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * fx.income_mult ** s));
+  if (fx.income_mult) {
+    const m = nat?.job && fx.income_mult > 1 ? ((hit = true), 1 + (fx.income_mult - 1) * nat.mul) : fx.income_mult;
+    st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * m ** s));
+  }
   if (fx.school) {
     st.school = fx.school === 'none' ? null : fx.school;
     if (!st.school && st.workFrom === null) st.needJob = true;
@@ -659,6 +665,7 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
     else delete st.chronic[k];
     st.chronicAge[k] = st.age;
   }
+  return hit;
 }
 
 // ไอเทมติดตัว (B78): state สร้างตอนได้ชิ้นแรก — ชีวิตที่ไม่เคยได้ของและเซฟก่อนมีระบบจึงไม่มีช่องนี้ ผู้อ่านใช้ itemsOf ได้ช่องว่าง
@@ -1275,7 +1282,15 @@ function lockReason(st, c, extra = 0) {
 export const openChoices = (card) => card.choices.map((_, i) => i).filter((i) => !card.locked?.[i]);
 
 // เดินปีละครั้งจนมีการ์ดถึงกำหนดหรือตาย คืนการ์ดใบถัดไป
+// ป้าย "เพราะคุณเป็นคน…" ติดการ์ดใบถัดไปหลังตัวเลือกที่ตัวคูณนิสัยมีผล — ไม่เพิ่มการ์ด ชีวิตจึงยาวเท่าเดิม (เจ้าของเคาะ)
 export function nextCard(st) {
+  const card = drawCard(st);
+  if (!st.because) return card;
+  const text = st.because;
+  delete st.because;
+  return { ...card, because: text };
+}
+function drawCard(st) {
   // ทริปศาล (B153) ช่องแยกจาก st.trip — st.trip ผูกก้อนต่างโลกทั้งก้อน
   if (st.court && !(st.court.afterQueue && st.queue.length)) {
     const card = courtCard(st);
@@ -1541,6 +1556,15 @@ function natureLock(st) {
   if (id) st.nature = id;
   st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: id ? `คุณโตมาเป็นคน${c.natures[id].name}` : NATURE_NONE, nature: id });
 }
+// ตัวคูณนิสัยของการ์ดใบนี้: ค่าตรงนิสัย (เงินนับเฉพาะการ์ดหมวดใน cards) + การ์ดขึ้นเงินเดือนเมื่ออาชีพตรงสาย · ไม่มีนิสัย = null คูณ 1 ทุกค่า
+function natureBoost(st, ev) {
+  const n = st.nature && st.content.focus?.natures?.[st.nature];
+  if (!n) return null;
+  const stat = n.stat && (n.stat !== 'money' || !n.cards || n.cards.includes(ev.category)) ? n.stat : null;
+  const job = !!n.jobs?.includes(st.occupation) && isWorking(st);
+  if (!stat && !job) return null;
+  return { stat, job, mul: st.content.focus.nature_mul, text: `เพราะคุณเป็นคน${n.name} ผลดีเมื่อกี้เลยมากขึ้นอีกนิด` };
+}
 // ประตูเข้าสาย (โฟกัสใบ 04 · เจ้าของเคาะ: ล็อกแค่ประตู): เปิดเมื่อโฟกัสนั้นสะสมครบ chain_years · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
 // · การ์ดชวน (ธง gate:<โฟกัส>) เปิดให้ได้โดยไม่ต้องโฟกัส เช่น นักธุรกิจถูกชวนลงการเมือง
 export const GATE_FLAG = 'gate:';
@@ -1772,7 +1796,8 @@ export function choose(st, idx, loan) {
   const ss = pool ? poolStatScale(stageOf(st.age)) : 1;
   // ใบในรอบเดียวกัน (ev.run) ที่สุขภาพหมดอยู่ก่อนกด = โรคที่ถึงคิวกลางรอบ ไม่ใช่ผลของใบนี้ — จำไว้ก่อนผลของตัวเลือกลง
   const ill = ev.run !== undefined && st.health <= 0;
-  applyEffects(st, c.effects, s, ss);
+  const nat = natureBoost(st, ev);
+  let because = applyEffects(st, c.effects, s, ss, 1, nat);
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
   naturePoint(st, c.nature, 1);
@@ -1794,7 +1819,7 @@ export function choose(st, idx, loan) {
     wound = c.outcomes.find((x) => x.effects?.die)?.effects.die;
     // ตายในการ์ด ญาติประคองไม่ได้ — ป้าย "หนักแค่ครึ่งเดียว" จะขัดกับมรณบัตรใบถัดไป
     const helper = !o.ok && !doom && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
-    applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1);
+    because = applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1, nat) || because;
     const gotO = o.effects?.loot && gainLoot(st, o.effects.loot);
     applyChoice(st, ev, o, text);
     if (c.filial) filialNote(st, c.filial, filialScore(o.merit), true);
@@ -1809,6 +1834,7 @@ export function choose(st, idx, loan) {
       after.push({ kind: 'eraEvent', ev: follow, age: st.age });
     }
   }
+  if (because) st.because = nat.text;
   // จดหมายคำฝาก: เลือกคำฝากใบย่อยก่อน แล้วคำสั่งเสียกลับมาตามปกติ
   const pick = c.letter && st.content.events.find((e) => e.id === LETTER.pick);
   if (pick) {

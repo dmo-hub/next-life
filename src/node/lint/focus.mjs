@@ -1,7 +1,7 @@
 // โฟกัสชีวิต (B163): ทะเบียน content/rules/focus.yaml ต้องถูกรูปก่อนแกนอ่าน · การ์ดที่ติดป้ายหมวดโฟกัสต้องอ้างป้ายที่มีจริง
 import { CATEGORIES, EFFECT_KEYS, STAGE_AGES, SCHOOL_VALUES } from './vocab.mjs';
 import { isObj, isInt, list } from './util.mjs';
-import { FOCUS_NEEDS } from '../../engine/life.mjs';
+import { FOCUS_NEEDS, STAT_KEYS } from '../../engine/life.mjs';
 
 export const FOCUS_GROUPS = ['work', 'people', 'body', 'gate'];
 // คำบนปุ่มห้ามบอกตัวเลขและห้ามพูดถึงบัญชีบุญบาป (ผลบุญบาปแตะได้ แต่เป็นความลับ)
@@ -29,7 +29,16 @@ export function checkFocus(doc, ctx = {}) {
   // นิสัยจากวัยเด็ก (B41): มาเป็นชุด — มีทะเบียนนิสัย ต้องมีอายุล็อกและแต้มทายาท
   if (doc.natures !== undefined) {
     if (!isObj(doc.natures) || !Object.keys(doc.natures).length) out.push('natures ต้องมีอย่างน้อย 1 ตัว');
-    for (const [id, n] of Object.entries(isObj(doc.natures) ? doc.natures : {})) if (!(isObj(n) && typeof n.name === 'string' && n.name && !FOCUS_BANNED.test(n.name))) out.push(`natures.${id}.name ต้องเป็นข้อความ ไม่มีตัวเลข/คำบุญบาป`);
+    for (const [id, n] of Object.entries(isObj(doc.natures) ? doc.natures : {})) {
+      if (!(isObj(n) && typeof n.name === 'string' && n.name && !FOCUS_BANNED.test(n.name))) {
+        out.push(`natures.${id}.name ต้องเป็นข้อความ ไม่มีตัวเลข/คำบุญบาป`);
+        continue;
+      }
+      if (n.stat !== undefined && ![...STAT_KEYS, 'money'].includes(n.stat)) out.push(`natures.${id}.stat ไม่ใช่ค่าที่คูณได้: ${n.stat}`);
+      for (const t of list(n.cards)) if (!CATEGORIES.includes(t)) out.push(`natures.${id}.cards ไม่ใช่หมวดการ์ด: ${t}`);
+      for (const j of list(n.jobs)) if (ctx.jobs && !ctx.jobs.includes(j)) out.push(`natures.${id}.jobs ไม่รู้จักอาชีพ ${j}`);
+    }
+    if (!(typeof doc.nature_mul === 'number' && doc.nature_mul >= 1)) out.push('nature_mul ต้องเป็นเลข ≥ 1');
     if (!(isInt(doc.nature_age) && doc.nature_age > 0 && doc.nature_age < STAGE_AGES['วัยรุ่น'][0])) out.push('nature_age ต้องเป็นอายุช่วงเด็ก');
     if (!(typeof doc.heir_nature === 'number' && doc.heir_nature >= 0 && doc.heir_nature <= 1)) out.push('heir_nature ต้องอยู่ระหว่าง 0–1');
   }
