@@ -495,6 +495,78 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ B99a ตัวควบคุม: ถอดประตู ⇒ ออกกับคนที่ประตูปิด', open.closed > 0, `ประตูปิด ${open.closed}`);
 }
 
+// วงปรโลก (ใบ 107): ทางเป็นลูก/เกิดใหม่เข้าวง เล่นครบปีหรือชีวิตทิพย์หมด แล้วการ์ดส่งต่อ · ถูกเรียกตัวข้ามวง
+// · เซฟกลางวงโหลดแล้วเดินต่อได้ผลเดิม · เซฟเก่า (steps ไม่มี loop) เล่นแบบเดิม · วงไม่แตะทายาท
+{
+  const E = await import('../src/engine/index.mjs');
+  const { snapshot, restore } = await import('../src/engine/save.mjs');
+  const content = loadContent();
+  const P = (id) => E.PATHS.findIndex((p) => p.id === id);
+  const first = (card) => Math.max(0, (card.locked ?? []).findIndex((x) => !x));
+  const life = (k, tweak) => {
+    const { state } = playLife(mixSeed(1, 1070 + k), content, BOTS.สุ่ม);
+    tweak?.(state);
+    return state;
+  };
+  // เดินระหว่างชาติด้วยมือ: old = ตัดขั้นวงแบบเซฟก่อนมีวง · stop = หยุดแล้วคืน af ค้างพร้อมการ์ดบนจอ
+  const drive = (af, { stop, card: shown } = {}) => {
+    const loop = [];
+    let card = shown ?? E.nextAfterCard(af);
+    for (;;) {
+      if (card.loop) loop.push(card);
+      if (stop?.(card, af)) return { af, card, loop };
+      if (card.choices?.length) E.chooseAfter(af, card.kind === 'path' ? P('reborn') : first(card));
+      if (card.done) return { af, card, loop };
+      card = E.nextAfterCard(af);
+    }
+  };
+  const begin = (st, old) => {
+    const af = E.startAfterlife(st);
+    if (old) af.steps = af.steps.filter((s) => s !== 'loop');
+    return af;
+  };
+  const skip = (k, v) => (k === 'content' ? undefined : v);
+  const heirOf = (af) => JSON.stringify(af.heir, skip);
+
+  const a = drive(begin(life(0)));
+  const l = a.af.loop;
+  const years = a.loop.filter((c) => c.kind === 'scene');
+  const start = years[0]?.loop;
+  const want = E.LOOP.start[l?.realm] ?? {};
+  check('วงปรโลก: ทางเกิดใหม่เข้าวง ปีละการ์ด · ปีทิพย์ = 3 + |สุทธิ|÷2 · จบแล้วการ์ดส่งต่อ', !!l && l.years === E.loopYears(a.af.verdict.net) && years.length === l.year && a.loop.at(-1).kind === 'loopEnd' && a.card.kind === 'carry', l ? `${l.realm} ${l.year}/${l.years} ปี · จบ ${l.end}` : 'ไม่เข้าวง');
+  check('วงปรโลก: ค่าเริ่มตามภูมิ · ปัญญาธรรม/ผูกพัน = ครึ่งความรู้/ความสัมพันธ์ตอนตาย', !!start && start.health === want.health && start.happiness === want.happiness && start.knowledge === Math.round(a.af.st.knowledge * E.LOOP.inherit) && start.relations === Math.round(a.af.st.relations * E.LOOP.inherit), start ? `${start.health}/${start.happiness}/${start.knowledge}/${start.relations}` : '');
+
+  // บาปหนัก = นรก 30 ปี ชีวิตทิพย์เริ่ม 30 ลดปีละ 2 ⇒ หมดก่อนครบ · ตัวควบคุม: ไม่ลดเอง + เริ่มเต็ม ⇒ อยู่ครบ (การ์ดบางใบหักชีวิตทิพย์เองด้วย)
+  const heavy = (st) => { st.ledger.sin += 200; };
+  const h = drive(begin(life(1, heavy))).af.loop;
+  check('วงปรโลก: ชีวิตทิพย์หมดก่อนครบปี = ไปเกิดเร็วขึ้น', h?.realm === 'hell' && h.end === 'spent' && h.year < h.years, h ? `${h.realm} ${h.year}/${h.years}` : 'ไม่เข้าวง');
+  const [drain, hp] = [E.LOOP.drain, E.LOOP.start.hell.health];
+  Object.assign(E.LOOP, { drain: 0 });
+  E.LOOP.start.hell.health = 100;
+  const hc = drive(begin(life(1, heavy))).af.loop;
+  Object.assign(E.LOOP, { drain });
+  E.LOOP.start.hell.health = hp;
+  check('วงปรโลก ตัวควบคุม: ไม่ลดเอง + เริ่มเต็ม ⇒ ด่านเห็นคนอยู่ครบ', hc?.end === 'served', hc ? `${hc.year}/${hc.years}` : '');
+
+  const called = drive(begin(life(2, (st) => { st.flags.isekai_call = true; }))).af;
+  check('วงปรโลก: ถูกเรียกตัว (isekai_call) ไม่เข้าวง', called.loop === null && called.isekaiLives.length > 0 && called.steps.indexOf('loop') < 0, `ทาง ${called.path}`);
+
+  // วงไม่ดึงเลขสุ่มของปรโลก/ไม่แตะบัญชี ⇒ ทายาทเท่าการเล่นแบบไม่มีวงทุกไบต์
+  const old = drive(begin(life(0), true));
+  check('วงปรโลก: ทายาทเท่าการเล่นแบบไม่มีวง · เซฟเก่า (steps เดิม) ไม่เข้าวง', heirOf(old.af) === heirOf(a.af) && old.af.loop === null && old.loop.length === 0);
+
+  // เซฟกลางวงปีที่ 3 → ภาพถ่าย → โหลด → เล่นต่อ ได้ทายาท/ปีเท่าเล่นรวด · เซฟเก่ากลางฉาก 6 ขั้นโหลดแล้วไม่เข้าวง
+  const mid = drive(begin(life(0)), { stop: (c) => c.loop?.year === 3 && c.kind === 'scene' });
+  const back = (x) => restore(snapshot({ st: x.af.st, af: x.af, card: x.card, ui: {} }, content), content);
+  const r = back(mid);
+  const done = drive(r.af, { card: r.card });
+  check('วงปรโลก: เซฟกลางวง (ปีที่ 3) โหลดแล้วเล่นต่อได้ผลเดิม', mid.card.loop?.year === 3 && done.af.loop.year === l?.year && heirOf(done.af) === heirOf(a.af), `ปี ${done.af.loop?.year}/${l?.year}`);
+  const oldMid = drive(begin(life(0), true), { stop: (c) => c.kind === 'path' });
+  const ro = back(oldMid);
+  const oldDone = drive(ro.af, { card: ro.card });
+  check('วงปรโลก: เซฟเก่ากลางฉากระหว่างชาติโหลดแล้วเล่นแบบเดิมจนเกิด', oldDone.af.loop === null && oldDone.loop.length === 0 && heirOf(oldDone.af) === heirOf(a.af));
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {
