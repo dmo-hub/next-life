@@ -17,7 +17,7 @@ import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml } from '../src/site/nav.mjs';
-import { uiPage, designMoved, tweakPages, cssVars, UI_PAGE, UI_MOVED_FROM } from '../src/site/ui.mjs';
+import { uiPage, designMoved, tweakPages, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
@@ -269,7 +269,8 @@ const uiTweakGap = (html) => {
   return [...uiTweaks.filter(([f]) => !hrefs.includes(f)).map(([f]) => `ขาดลิงก์ ${f}`), ...hrefs.filter((h) => !existsSync(new URL(h, docs))).map((h) => `ลิงก์ตาย ${h}`)];
 };
 const uiFrameBad = (html) => {
-  const frames = [...html.matchAll(/<iframe[^>]*>/g)].map((m) => m[0]);
+  // กรอบต้นแบบปรับสดตั้งใจรันสคริปต์ — มีด่านของตัวเอง (7e2)
+  const frames = [...html.matchAll(/<iframe[^>]*>/g)].map((m) => m[0]).filter((f) => !f.includes(`title="${UI_LIVE_TITLE}"`));
   return !frames.length || frames.some((f) => !/ sandbox=""/.test(f) || /&lt;script|<script/i.test(f));
 };
 const uiMiss = [
@@ -286,6 +287,34 @@ const uiCtl =
   (uiTweaks.length === 0 || uiTweakGap(uiHtml.replace(/(<ul id="ui-tweaks">)<li>[\s\S]*?<\/li>/, '$1')).length === 1) &&
   uiFrameBad(uiHtml.replace(' sandbox=""', ' sandbox="allow-scripts"'));
 check('หน้าดีไซน์ UI ตรงของที่ build สีจากเกมครบ ลิงก์ tweak ครบ ตัวอย่างไม่รันสคริปต์', uiMiss.length || !uiCtl, ` สี ${uiColors.length} · tweak ${uiTweaks.length}${uiMiss.length ? ` · ${uiMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${uiCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7e2) ต้นแบบปรับสด (ui-redo 76): หัวในหน้าดีไซน์ UI มีกรอบที่รันสคริปต์ได้และไม่มี sandbox (sandbox ไม่มี allow-same-origin ⇒ localStorage throw ค่าที่เจ้าของปรับไว้หาย)
+// · สคริปต์ยังจำค่าใต้คีย์เดิมและคัดลอกลง clipboard · tweak.html เดิมเป็นหน้าส่งต่อมาหัวนี้ · ไม่มีลิงก์/แท็บชี้ tweak.html เดิมเหลือ
+// ตัวควบคุม: ถอดหัวออก ⇒ ต้องตก · ใส่ sandbox="allow-scripts" ⇒ ต้องตก
+const liveBad = (html) => {
+  const h = html.indexOf(`<h2 id="${UI_LIVE_ID}">`);
+  const open = `<iframe title="${UI_LIVE_TITLE}"`;
+  const a = h < 0 ? -1 : html.indexOf(open, h);
+  const s = a < 0 ? -1 : html.indexOf(' srcdoc="', a);
+  if (s < 0) return ['ไม่มีหัวต้นแบบปรับสด'];
+  const doc = html.slice(s + 9, html.indexOf('"', s + 9)).replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+  return [
+    ...(html.slice(a, s).includes('sandbox') ? ['กรอบต้นแบบมี sandbox'] : []),
+    ...(doc.includes("const KEY = 'uiredo02-tweak'") ? [] : ['คีย์ localStorage เปลี่ยน']),
+    ...(doc.includes('navigator.clipboard.writeText') ? [] : ['ไม่มีคัดลอก']),
+  ];
+};
+const liveLinks = [...devFiles, ...readdirSync(docs).filter((n) => n.endsWith('.html'))].filter((f) => !read(f).includes(MOVED_MARK) && read(f).includes('ui-redo/tweak.html"'));
+const liveMiss = [
+  ...liveBad(uiHtml),
+  ...(lf(readOr(UI_LIVE_FROM)) !== liveMoved() ? [`${UI_LIVE_FROM} ไม่ส่งต่อมา ${UI_PAGE}#${UI_LIVE_ID}`] : []),
+  ...liveLinks.map((f) => `${f} ยังลิงก์ tweak.html`),
+  ...(DEV_TABS.some(([h]) => h === UI_LIVE_FROM) ? ['แท็บ dev ยังมี tweak.html'] : []),
+];
+const liveCtl =
+  liveBad(uiHtml.replace(`<h2 id="${UI_LIVE_ID}">`, '<h2>')).length > 0 &&
+  liveBad(uiHtml.replace(`<iframe title="${UI_LIVE_TITLE}"`, `<iframe title="${UI_LIVE_TITLE}" sandbox="allow-scripts"`)).includes('กรอบต้นแบบมี sandbox');
+check('ต้นแบบปรับสดอยู่ในหน้าดีไซน์ UI รันสคริปต์ จำค่าคีย์เดิม คัดลอกได้ ที่เดิมส่งต่อ', liveMiss.length || !liveCtl, `${liveMiss.length ? ` ${liveMiss.slice(0, 4).join(' | ')} ·` : ''} ตัวควบคุม${liveCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('หน้าห้องผู้พัฒนามีแท็บครบชุดเดียวกัน', devMiss.length || !devCtl || !devCur, ` ${devFiles.length} หน้า${devMiss.length ? ` · ${devMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${devCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('ทุกหน้ามีแถบบนชุดเดียวและชี้หน้าปัจจุบัน', navMiss.length || !navCtl || !curOk, ` ${navFiles.length} หน้า${navMiss.length ? ` · ${navMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${navCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
