@@ -31,6 +31,8 @@ repos: next-life · ตั้งเมื่อ 2026-11-03 (ใบ 01–16 ม�
 - [design.html → ดีไซน์ UI](../ui-redo-decisions.md) (2026-11-04 16:25–16:40 · grill + ผู้ค้าน opus @ec9b3ac · ข้อ 42–57): หน้า UI = dev/ui.html · คำตัดสินเกม → dev/design*.html · เมนูการออกแบบเข้าห้อง dev · URL เดิม = หน้าส่งต่อจาก build · ใบ [43](tickets/43-design-move-to-dev.md) → [44](tickets/44-ui-page-skeleton.md) → [45](tickets/45-shots-capture-game-screens.md) · แก้ 32 (←44) 35 (= หน้า UI) 36 (+7 หน้า) 42 (←43)
 - (2026-11-04 · คิว integrator) เกจฐานะ + เงินสด + อาชีพบนหัวการ์ด → [../ui-redo-decisions.md](../ui-redo-decisions.md) 58–64 (ผู้ค้าน @6ad9e6c Weakened 58–60) · ใบ 46 tweak (none) → 47 hitl · 48 แกนย่อเงินไทย/เกษียณ/สเกลทอง (none) → 49 ลงจริง (←47 48)
 
+- (2026-11-04 18:28–18:32 · คิว integrator 18:3x) ภาพแรกเกิดพื้นหลังจาง + ภาพหมวดการ์ดผล → [../ui-redo-decisions.md](../ui-redo-decisions.md) 79–93 (ผู้ค้าน opus @efc61dc Weakened 79 80 82–85) · ใบ [58 tweak](tickets/58-card-art-tweak.md) → [59 hitl](tickets/59-card-art-hitl.md) → [61 แรกเกิด](tickets/61-birth-bg-apply.md) · [60 engine ป้ายหมวด](tickets/60-result-card-category-tag.md) + 59 → [62 การ์ดผล](tickets/62-result-card-art-apply.md)
+
 ## Not yet specified
 
 - ใบ 15 ปรโลกบนโครงใหม่ — รอเกมในปรโลก (three-worlds) ชัดก่อน
