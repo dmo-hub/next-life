@@ -1,0 +1,31 @@
+# ประตูทางมืด (B99a): ข้อเสนอผิดกฎหมายติด when.dark_gate ได้เมื่อมีทางบาปให้เลือก · ทางบาปอยู่ในผลสุ่มก็นับ
+events:
+  - id: good_dark_gate_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {dark_gate: true}
+    text: "คนรู้จักชวนไปขนของข้ามแดนรอบเดียวได้เงินเท่าค่าแรงสามเดือน"
+    choices:
+      - {text: "รับงาน", hint: "ราคา: บาปเบา", merit: [{cat: greed_harm, level: 1}]}
+      - {text: "รับงานแล้วชวนเพื่อนอีกคน", hint: "ราคา: บาปหนัก", merit: [{cat: greed_harm, level: 2}]}
+      - {text: "ขอคิดดูก่อน", merit: [{cat: neutral}]}
+      - {text: "ไม่รับ", merit: [{cat: sila, level: 1}]}
+  - id: good_dark_gate_02
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {dark_gate: true, age: [25, 50]}
+    text: "เจ้าหนี้เสนอลบหนี้ถ้าคุณยอมเฝ้าโกดังกลางคืนโดยไม่ถามว่าข้างในมีอะไร"
+    choices:
+      - text: "ยอมเฝ้า"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, text: "ผ่านไปเงียบ ๆ หนี้หายไปครึ่งหนึ่ง", merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 1, text: "ตำรวจมาค้นโกดัง คุณวิ่งหนีทันแบบหวุดหวิด", merit: [{cat: greed_harm, level: 1}]}
+      - {text: "ต่อรองขอผ่อนแทน", merit: [{cat: neutral}]}
+      - {text: "แจ้งตำรวจ", merit: [{cat: sila, level: 1}]}
+      - {text: "ย้ายหนี", merit: [{cat: neutral}]}

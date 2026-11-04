@@ -28,7 +28,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', 'dark_gate', ...MONEY_KEYS],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
@@ -715,6 +715,17 @@ export const rules = [
       if (h === undefined) return;
       if (!isObj(h) || Object.keys(h).some((k) => k !== 'causes')) return r('.when.heredity', 'heredity ต้องเป็น {causes?}');
       if (h.causes !== undefined && !(Array.isArray(h.causes) && h.causes.length && h.causes.every((x) => HEREDITARY.includes(x)))) r('.when.heredity.causes', `causes ต้องเป็นรายการจาก ${HEREDITARY.join(' ')}`);
+    },
+  },
+  {
+    id: 'dark-gate',
+    desc: 'when.dark_gate = true — ข้อเสนอผิดกฎหมาย (B99a) ออกเฉพาะคนเงินตึงที่เลือกทางบาปเองถึงเกณฑ์ · การ์ดต้องมีทางบาปให้เลือก ไม่งั้นประตูไม่มีอะไรให้เปิด',
+    event(e, ctx, r) {
+      const g = isObj(e.when) ? e.when.dark_gate : undefined;
+      if (g === undefined) return;
+      if (g !== true) return r('.when.dark_gate', 'dark_gate ต้องเป็น true');
+      const sin = (m) => list(m).some((t) => SIN_CATS.includes(t?.cat));
+      if (!choicesOf(e).some(({ c }) => sin(c.merit) || list(c.outcomes).some((o) => isObj(o) && sin(o.merit)))) r('.when.dark_gate', 'การ์ด dark_gate ต้องมีตัวเลือกที่ลงป้ายบาป');
     },
   },
 ];

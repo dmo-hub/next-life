@@ -7,7 +7,7 @@ import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, ass
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS, meritId, MERIT_LEVELS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './career.mjs';
 import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
-import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
+import { beliefOk, beliefFired, beliefChoice, moneyTight } from './belief.mjs';
 import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './court.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
@@ -874,14 +874,18 @@ function stepYear(st) {
   if (recruitDue(st)) st.due.push({ kind: 'eraEvent', ev: recruitCard(st), age: st.age });
   if (isWorking(st) && earlyDue(st)) st.due.push({ kind: 'eraEvent', ev: earlyCard(st), age: st.age });
   if (isAllocAge(st.age)) st.due.push(allocCard(st, year, stage));
-  // ทุกภาคเจอได้ เกิดซ้ำได้ (B14 ข้อ 13) · เว้นอย่างน้อย ERA_GAP ปีไม่ให้ถี่จนกลบเรื่องชีวิต — ปีที่เว้น เงินยังเสียตามปีต้นแบบ
-  const eras = eraEventsAt(st.content.era, st.seed, year);
+  // ทุกภาคเจอได้ · เว้นอย่างน้อย ERA_GAP ปีไม่ให้ถี่จนกลบเรื่องชีวิต — ปีที่เว้น เงินยังเสียตามปีต้นแบบ
+  // ปีต้นแบบวนได้ แต่เหตุจริงครั้งเดียวในประวัติศาสตร์ (B99a): กลุ่มเหตุเดิมออกครั้งเดียวต่อชีวิต ทั้งการ์ดเล่าและใบรับมือ · ปีที่ข้าม เงินยังเสียตามปีต้นแบบ
+  let eras = eraEventsAt(st.content.era, st.seed, year);
+  if (eras.length) {
+    const seen = erasSeen(st, st.age - 1);
+    eras = eras.filter((e) => !seen.has(e.id));
+  }
   if (eras.length && (st.lastEraAge === null || st.age - st.lastEraAge >= ERA_GAP)) {
     st.lastEraAge = st.age;
     for (const e of eras) {
       // เล่าเหตุการณ์บ้านเมืองก่อนเสมอ · มีการ์ดเนื้อหาผูกไว้ = ตามด้วยการ์ดให้เลือกรับมือ
       st.due.push({ kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: e.name, story: eraStory(st, e) });
-      // ใบรับมือเดิมไม่ออกซ้ำในชีวิตเดียว — เหตุการณ์เกิดซ้ำได้ แต่ข้อความ/ผลเดิมทุกตัวอักษรอ่านเหมือนบั๊ก · ครั้งหลังเล่าแค่การ์ดบ้านเมือง
       const ev = st.content.events.find((c) => c.era === e.id && !st.done[c.id] && whenOk(st, c.when) && (c.when?.age || c.stage === stage));
       if (ev) {
         st.done[ev.id] = true;
@@ -890,6 +894,28 @@ function stepYear(st) {
     }
   }
   heraldNextYear(st, year);
+}
+
+// กลุ่มเหตุบ้านเมืองที่ออกแล้วถึงอายุ upTo — ไล่ย้อนจาก seed + ปีเกิดด้วยกติกาเดียวกับ stepYear แทนการเก็บคีย์ใหม่ใน st
+// lifehash hash state ทั้งก้อน: เก็บคีย์ = ทุกชีวิตที่เจอเหตุบ้านเมืองขยับ · ไล่ย้อน = ขยับเฉพาะชีวิตที่เคยเจอซ้ำ
+function erasSeen(st, upTo) {
+  return new Set(erasShown(st, upTo).map(({ e }) => e.id));
+}
+
+// เหตุบ้านเมืองที่ขึ้นการ์ดเล่าจริงถึงอายุ upTo พร้อมอายุที่ออก — ฉายาที่นับภัยต้องนับเฉพาะที่ผู้เล่นเห็น ไม่ใช่ทุกปีต้นแบบที่วนมา
+export function erasShown(st, upTo) {
+  const shown = [], seen = new Set();
+  let last = null;
+  for (let a = 1; a <= upTo; a++) {
+    const es = eraEventsAt(st.content.era, st.seed, st.birthYear + a).filter((e) => !seen.has(e.id));
+    if (!es.length || (last !== null && a - last < ERA_GAP)) continue;
+    last = a;
+    for (const e of es) {
+      seen.add(e.id);
+      shown.push({ e, age: a });
+    }
+  }
+  return shown;
 }
 
 // ลางภัยยุค (afterfall-1): ปีหน้ามีภัยที่จะได้ใบรับมือครั้งแรก = ใบ herald_of ออกปีนี้ให้เตรียมตัว
@@ -909,7 +935,11 @@ function heraldNextYear(st, year) {
   // เพดานต่อชีวิต: ภัยทุกชนิดได้ลาง = แฟนตาซีเกินเป้า 5–8 ใบ/ชีวิตทุกบอท · นับจาก st.done ไม่เพิ่มคีย์ใน st (lifehash hash ทั้งก้อน)
   let left = HERALD_PER_LIFE - st.content.events.filter((c) => c.herald_of && st.done[c.id]).length;
   if (left <= 0) return;
-  for (const e of eraEventsAt(st.content.era, st.seed, year + 1)) {
+  const next = eraEventsAt(st.content.era, st.seed, year + 1);
+  // กลุ่มเหตุที่เจอแล้วจะไม่ออกอีก ลางของมันจึงหลอก
+  const seen = next.length ? erasSeen(st, st.age) : null;
+  for (const e of next) {
+    if (seen.has(e.id)) continue;
     const answers = st.content.events.filter((c) => c.era === e.id);
     if (answers.some((c) => st.done[c.id])) continue;
     // ช่วงอายุปีหน้าไม่มีใบรับมือ (วิกฤตเศรษฐกิจวัยรุ่นนอกโรงเรียน) = ลางไม่มีใบให้ใช้ของที่เตรียม · เงื่อนไขอื่นของปีหน้ายังเดาไม่ได้
@@ -1621,8 +1651,24 @@ export function whenOk(st, when) {
     if (MONEY_KEYS.some((k) => when[k] && !inBound(r[k], when[k]))) return false;
   }
   if (when.parent_flags && !parentFlagsOk(st, when.parent_flags)) return false;
+  if (when.dark_gate && !darkGateOk(st)) return false;
   return !when.flags || flagsOk(st, when.flags);
 }
+
+// ประตูทางมืด (B99a): ข้อเสนอผิดกฎหมายถึงคนที่ทั้งเงินตึงและเคยเลือกทางบาปเองชาตินี้ถึงเกณฑ์ — คนจนที่มือสะอาดไม่ถูกชวน
+// นับจากตัวเลือกที่กดจริงใน st.log ไม่อ่านบัญชีบุญบาปซ่อน · log เริ่มใหม่ทุกชาติ บาปชาติก่อนจึงไม่นับ
+export const DARK_GATE = { picks: 2 };
+export function sinPicks(st) {
+  const ix = lifeEventIndex(st.content.events);
+  let n = 0;
+  for (const l of st.log) {
+    const i = ix.pos.get(l.id);
+    const c = i === undefined ? null : st.content.events[i].choices?.[l.choice];
+    if (c?.merit?.some((t) => SIN_CATS.includes(meritId(t.cat)))) n++;
+  }
+  return n;
+}
+export const darkGateOk = (st) => moneyTight(st) && sinPicks(st) >= DARK_GATE.picks;
 
 // ธงจากเนื้อหา (ตัวเลือก · ผลลัพธ์ · การ์ดที่แกนสร้าง · เสี่ยงของโฟกัส) ติดผ่านจุดนี้จุดเดียว — ผลที่ต้องเกิดตอนธงติดจึงดักได้ที่เดียว
 // ธงจากบัญชีบุญบาป (recordMerit) ไม่ผ่านที่นี่: ไม่จดอายุที่ได้มาตั้งแต่เดิม
