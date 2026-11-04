@@ -55,13 +55,56 @@ function veil(card, i) {
   if (keys.length) veiled.set(card.age, [...(veiled.get(card.age) ?? []), ...keys]);
 }
 
+// ป้ายเตือนพัก (ui-redo 24 · เจ้าของเคาะ): นับเวลาเฉพาะตอนแท็บเห็นอยู่ ครบ REST.at → บรรทัดจังหวัดบนแถบสถานะกลายเป็นป้ายพัก REST.show แล้วคืนบรรทัดเดิมและเริ่มนับใหม่
+// ไม่มีแผ่น ไม่หยุดเกม · ซ่อนแท็บนานถึง REST.reset = ถือว่าพักแล้ว เริ่มนับใหม่ · ปรโลกไม่มีแถบสถานะจึงไม่มีป้าย
+// ทางทดสอบ: play.html?rest=<วินาที> ย่นทั้งชุดเป็นวินาทีเท่านั้น (ป้ายขึ้นที่วินาทีนั้น · ขึ้นค้างเท่ากัน · ซ่อนครึ่งหนึ่งนับเป็นพัก)
+// เวลาอยู่ในหน่วยความจำ ไม่เก็บลงเซฟ ⇒ ผลเกม/บอทไม่ขยับ · รีโหลดเริ่มนับใหม่
+const REST_TEST = Number(new URLSearchParams(location.search).get('rest')) || 0;
+const REST = REST_TEST > 0 ? { at: REST_TEST * 1000, show: REST_TEST * 1000, reset: REST_TEST * 500, tick: 250 } : { at: 2 * 3600e3, show: 10 * 60e3, reset: 5 * 60e3, tick: 30e3 };
+const REST_TEXT = 'เล่นมา 2 ชม. แล้ว พักสายตาหน่อย';
+let restMs = 0;
+let restLast = document.hidden ? null : performance.now();
+let restHidden = null;
+const restOn = () => restMs >= REST.at;
+// แถบที่วาดอยู่แล้วสลับข้อความเองโดยไม่วาดการ์ดใหม่ — data-where เก็บบรรทัดเดิมไว้คืน
+function restPaint() {
+  for (const small of document.querySelectorAll('.sb-who small[data-where]')) {
+    small.textContent = restOn() ? REST_TEXT : small.dataset.where;
+    small.classList.toggle('rest', restOn());
+  }
+}
+function restStep() {
+  const now = performance.now();
+  if (restLast !== null) restMs += now - restLast;
+  restLast = document.hidden ? null : now;
+  if (restMs >= REST.at + REST.show) restMs = 0;
+  restPaint();
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    restStep();
+    restHidden = performance.now();
+  } else {
+    if (restHidden !== null && performance.now() - restHidden >= REST.reset) restMs = 0;
+    restHidden = null;
+    restLast = performance.now();
+    restPaint();
+  }
+});
+setInterval(restStep, REST.tick);
+const whereLine = (text) => {
+  const small = el('small', restOn() ? 'rest' : null, restOn() ? REST_TEXT : text);
+  small.dataset.where = text;
+  return small;
+};
+
 // แถบสถานะสองแถว (ui-redo ใบ 03): แถวบน อวตาร · ชื่อ+ที่ · อายุ · แถวล่าง ค่า 4 ตัว ชื่อ ตัวเลข ลูกศรปีนี้ แล้วแถบเส้น
 // ใกล้ตาย = หัวใจข้างอายุ + ขอบจอแดง (CSS จับ .sb.dying) · โปรแกรมอ่านจออ่าน "ใกล้ตาย" จากหัวใจ ไม่พึ่งสี
 function statusBar(card, s) {
   const bar = el('header', 'sb');
   const r1 = el('div', 'sb-r1');
   const who = el('span', 'sb-who');
-  who.append(el('b', null, `${genLabel()}${st.name}`), el('small', null, `${provinceLabel(st)} · ช่วง${card.stage}`));
+  who.append(el('b', null, `${genLabel()}${st.name}`), whereLine(`${provinceLabel(st)} · ช่วง${card.stage}`));
   const age = el('span', 'sb-age');
   age.append(el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : String(card.age)));
   if (!card.funeral) age.append(el('small', null, ' ปี'));
@@ -2515,7 +2558,7 @@ function isekaiBar(card, s, where) {
   const ini = el('span', 'av ini', [...s.name][0]);
   ini.setAttribute('aria-hidden', 'true');
   const who = el('span', 'sb-who');
-  who.append(el('b', null, s.name), el('small', null, `${genLabel()}${st.name} · ${where}`));
+  who.append(el('b', null, s.name), whereLine(`${genLabel()}${st.name} · ${where}`));
   const age = el('span', 'sb-age');
   age.append(el('b', null, String(s.age)), el('small', null, ' ปี'));
   if (card.step !== 'end' && s.hp <= HEALTH_WARN) {
