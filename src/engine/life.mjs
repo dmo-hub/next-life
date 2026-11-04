@@ -381,14 +381,18 @@ function outcomeFx(st, c, ev) {
 // โอกาสได้ทางสำเร็จ ปัดเป็นขั้น PCT_STEP ไม่โชว์ 0/100 · ผลของตัวเลือกลงก่อนสุ่มทาง (choose)
 // จึงคิดบนค่าหลังผลตัวเลือกในสำเนา ไม่แตะ state จริง
 export const PCT_STEP = 5;
-export function successPct(st, c, ev = null) {
+// ค่าดิบไม่ปัด — harness ที่วัดผลเอียงเล็ก ๆ (ผลเบาสกิล k) เห็นต่างกันต่ำกว่าขั้นป้าย
+export function successP(st, c, ev = null) {
   const fx = c.effects ?? {};
   const p = { ...st, flags: { ...st.flags } };
   for (const k of STAT_KEYS) if (fx[k]) p[k] = clamp(p[k] + levelValue(fx[k]));
   for (const f of c.sets_flags ?? []) p.flags[f] = true;
   for (const f of c.clears_flags ?? []) delete p.flags[f];
   const w = outcomeWeights(p, ev, c);
-  const r = w.reduce((s, x, i) => s + (c.outcomes[i].ok ? x : 0), 0) / w.reduce((s, x) => s + x, 0);
+  return w.reduce((s, x, i) => s + (c.outcomes[i].ok ? x : 0), 0) / w.reduce((s, x) => s + x, 0);
+}
+export function successPct(st, c, ev = null) {
+  const r = successP(st, c, ev);
   return Math.max(PCT_STEP, Math.min(100 - PCT_STEP, Math.round((r * 100) / PCT_STEP) * PCT_STEP));
 }
 

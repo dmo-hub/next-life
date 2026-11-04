@@ -3,9 +3,11 @@
 // ✗ เมื่อทางใด < MIN หรือทางรางวัล (ลงคลัง/อัปขั้น) > MAX · ตัวควบคุม (เปิดเสมอ): ปิดทีละทางแล้วทางนั้นต้องตก ไม่งั้นตัวนับไม่ได้วัดของจริง
 // เนื้อจริงยังไม่มีแหล่งลงคลังไทยและจุดอัปเกรด ⇒ ใช้ content-fixtures/harness/skills/ ใส่ในหน่วยความจำ ไม่เข้าเกม
 // ผลเบาไทยนับ "โอกาส" (การ์ดหมวดที่ตรงกับสกิลที่พก) ไม่ขึ้นกับ k — k = 0 ทำให้ไม่มีผลต่อเกม แต่ทางต้องเปิดอยู่ · --k ตั้งค่าเพื่อวัดเท่านั้น
+// บรรทัด [วัด] ไม่ตัดสินผ่าน/ตก — ไว้เทียบค่า k และโหมดโตเร็ว (--catch a = ทีละ 2 ถึงขั้นคลัง · none = ไม่มีโตเร็ว · c18 = ได้ขั้นคลังเมื่ออายุ 18)
+// k มีผลเฉพาะชีวิตที่พกสกิล ⇒ ด่านชีวิตเดี่ยว (lifehash/stats) วัดผล k ไม่ได้ · --ctl 0 ข้ามตัวควบคุมตอนวัดหลายค่า
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
-import { playLife, playAfterlife, nextLife, newLife, mixSeed, makeRng, bookAdd, bookCarryOffers, thaiSkillMul, THAI_SKILL, SKILL, ISEKAI_SKILLS, ISEKAI_EVENTS } from '../src/engine/index.mjs';
+import { playLife, playAfterlife, nextLife, newLife, mixSeed, makeRng, bookAdd, bookCarryOffers, thaiSkillMul, successP, THAI_SKILL, SKILL, ISEKAI_SKILLS, ISEKAI_EVENTS } from '../src/engine/index.mjs';
 import { loadContent, loadSkillMap } from '../src/node/load.mjs';
 import { random } from './bots.mjs';
 
@@ -18,6 +20,9 @@ const n = opt('n', 200);
 const seed = opt('seed', 1);
 const GENS = opt('gens', 4);
 THAI_SKILL.k = opt('k', THAI_SKILL.k);
+const CTL = opt('ctl', 1);
+const CATCH = args.includes('--catch') ? args[args.indexOf('--catch') + 1] : 'a';
+if (!['a', 'none', 'c18'].includes(CATCH)) throw new Error(`--catch รับ a · none · c18 (ได้ ${CATCH})`);
 
 export const SKILLS_GATE = { min: 0.02, max: 0.9 };
 const FIX = 'content-fixtures/harness/skills/';
@@ -44,9 +49,12 @@ function run(off, lives) {
   const content = setup(off);
   const EV = Object.fromEntries(content.events.map((e) => [e.id, e]));
   const s = { gens: 0, later: 0, isekaiEarn: 0, thaiEarn: 0, upgrade: 0, carry: 0, light: 0, bookUp: 0, firstCarry: 0, overCarry: 0, bookDown: 0, inBook: {}, carried: {} };
+  const m = { age: [0, 0], ageCarry: [0, 0], cards: [0, 0], cardsCarry: [0, 0], ok: {}, cap: { n: 0, reached: 0, lv: 0 } };
+  const c18 = new WeakSet();
   for (let i = 0; i < lives; i++) {
     const rng = makeRng(mixSeed(seed ^ BOT_SALT, i));
     let book = {};
+    let capOf = {};
     let st = newLife(mixSeed(seed, i), content);
     for (let g = 0; g < GENS; g++) {
       const got = { isekaiEarn: false, thaiEarn: false, upgrade: false, light: false };
@@ -64,11 +72,25 @@ function run(off, lives) {
         if (card.earn?.length) earn(card, card.kind === 'verdict' ? 'thaiEarn' : 'isekaiEarn');
         const ev = !card.trip && x?.pending?.id && EV[x.pending.id];
         if (ev && thaiSkillMul(x.skills, ev.category, 1) > 1 && ev.choices?.some((c) => c.outcomes?.some((o) => o.ok))) got.light = true;
+        // โหมด c18 จำลองในตัววัด: ชีวิตไทยถึง 18 แล้วสกิลที่พกขึ้นเป็นขั้นคลังทีเดียว (ทริปต่างโลกหลังจากนั้นได้ขั้นนี้ติดไป)
+        if (CATCH === 'c18' && x?.content && x.skills?.length && x.age >= 18 && !c18.has(x)) {
+          c18.add(x);
+          x.skills = x.skills.map((k) => ({ ...k, lv: Math.max(k.lv, capOf[k.id] ?? 1) }));
+        }
       };
       // การ์ดอัปเกรด: ปุ่มผ่านอยู่ท้ายสุด ⇒ กดเลขที่น้อยกว่าจำนวนปุ่มลบหนึ่ง = ได้ฝึกจริง
       const pick = (card, r, h) => {
         const p = random(card, r, h);
         if ((card.kind === 'upgrade' || card.step === 'upgrade') && p < card.choices.length - 1) got.upgrade = true;
+        // อัตราทาง ok = ค่าคาดหมายจากน้ำหนักจริงตอนกด (ก่อน choose) · เฉพาะตัวเลือกที่มีทั้งทาง ok และไม่ ok
+        const ev = h?.content && !card.trip && h.pending;
+        const c = ev?.choices?.[typeof p === 'object' ? p.i : p];
+        if (c?.outcomes?.some((o) => o.ok) && !c.outcomes.every((o) => o.ok)) {
+          const cat = ev.category ?? '-';
+          const row = (m.ok[cat] ??= { hit: [0, 0], miss: [0, 0] })[thaiSkillMul(h.skills, ev.category, 1) > 1 ? 'hit' : 'miss'];
+          row[0] += successP(h, c, ev);
+          row[1]++;
+        }
         return p;
       };
       pick.isekai = true;
@@ -77,7 +99,14 @@ function run(off, lives) {
         s.later++;
         if (st.skills?.length) s.carry++;
       }
-      const { state } = playLife(st.seed, content, pick, see, st);
+      const life = playLife(st.seed, content, pick, see, st);
+      const { state } = life;
+      const held = g > 0 && state.skills?.length;
+      for (const [k, v] of [['age', life.age], ['cards', life.cards]]) {
+        m[k][0] += v; m[k][1]++;
+        if (held) { m[`${k}Carry`][0] += v; m[`${k}Carry`][1]++; }
+      }
+      for (const k of state.skills ?? []) if ((capOf[k.id] ?? 1) > 1) { m.cap.n++; m.cap.lv += k.lv; if (k.lv >= capOf[k.id]) m.cap.reached++; }
       // ปรโลก (รวมชาติต่างโลกที่เข้าจากปรโลก) นับเป็นรุ่นเดียวกับชีวิตไทยที่เพิ่งจบ · รุ่นสุดท้ายไม่เดินปรโลก
       const af = g < GENS - 1 ? playAfterlife(state, pick, see) : null;
       s.gens++;
@@ -88,9 +117,11 @@ function run(off, lives) {
       if (off !== 'carry') while (offers.length && ids.length < SKILL.carry) ids.push(offers.splice(rng.int(0, offers.length - 1), 1)[0]);
       if (ids.length > SKILL.carry) s.overCarry++;
       for (const id of ids) s.carried[id] = (s.carried[id] ?? 0) + 1;
-      st = nextLife(af, ids, book);
+      capOf = Object.fromEntries(ids.map((id) => [id, book[id]]));
+      st = nextLife(af, ids, CATCH === 'none' ? {} : book);
     }
   }
+  if (!off) s.m = m;
   return s;
 }
 
@@ -117,10 +148,16 @@ const ids = Object.keys(ISEKAI_SKILLS);
 console.log(`ต่อสกิล (ครั้งที่ลงคลัง/ขั้นขึ้น · ครั้งที่ถูกพก): ${ids.map((id) => `${id} ${s.inBook[id] ?? 0}/${s.carried[id] ?? 0}`).join(' · ')}`);
 const never = ids.filter((id) => !s.inBook[id]);
 console.log(`สกิลที่ไม่เคยลงคลัง: ${never.length ? never.join(' ') : '-'}`);
+const avg = ([sum, cnt]) => (cnt ? sum / cnt : 0).toFixed(2);
+console.log(`[วัด] ชีวิตไทย อายุตายเฉลี่ย ${avg(s.m.age)} (รุ่นที่พกสกิล ${avg(s.m.ageCarry)} · ${s.m.ageCarry[1]} รุ่น) · การ์ด/ชีวิต ${avg(s.m.cards)} (รุ่นที่พก ${avg(s.m.cardsCarry)})`);
+const okp = ([sum, cnt]) => (cnt ? `${((100 * sum) / cnt).toFixed(2)}% n${cnt}` : '-');
+console.log(`[วัด] ทาง ok ต่อหมวด (ตรงสกิลที่พก | ไม่ตรง): ${Object.entries(s.m.ok).sort().map(([cat, r]) => `${cat} ${okp(r.hit)} | ${okp(r.miss)}`).join(' · ')}`);
+const cp = s.m.cap;
+console.log(`[วัด] โตเร็ว --catch ${CATCH}: สกิลพกที่คลัง >1 ${cp.n} ตัว-รุ่น · ถึงขั้นคลังตอนตาย ${cp.n ? pct(cp.reached / cp.n) : '-'} · ขั้นเฉลี่ยตอนตาย ${cp.n ? (cp.lv / cp.n).toFixed(2) : '-'}`);
 
 // ตัวควบคุม: ปิดทีละทาง ต้องตกที่ทางนั้น
 const ctlN = Math.max(30, Math.round(n / 4));
-for (const k of Object.keys(PATHS)) {
+for (const k of CTL ? Object.keys(PATHS) : []) {
   const c = run(k, ctlN);
   check(`ตัวควบคุม ปิด${PATHS[k]} → ทางนั้นตก`, fails(c).includes(k), `${pct(share(c, k))} (n ${ctlN})`);
 }
