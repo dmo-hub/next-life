@@ -331,6 +331,17 @@ body:has(.mnav) .foot { display:none; }
 .choice .fx span { white-space:nowrap; }
 /* ปุ่มล็อกใช้ช่องป้ายผลวางเหตุผลเป็นประโยค — ก้อนเดียวไม่มี " · " ห้ามตัดแล้วยาวเกินครึ่งปุ่มจนล้นจอมือถือ (B174) */
 .choice:disabled .fx span { white-space:normal; }
+/* ป้ายผลไอคอน (ui-redo 54): ชิปพื้นจางสีตามทิศทั้งชิ้น · ลูกศรติดท้ายทุกชิ้น จอขาวดำ/ตาบอดสีจึงแยกขึ้นลงได้จากรูป
+   สีขึ้น/ลงแยกตามพื้นการ์ด — ชาติไทยพื้นสว่างใช้สีเข้ม · ต่างโลก/ระหว่างชาติ และปุ่มชาติไทยตอนชี้ (พื้นกลับเป็นสีเข้ม) ใช้สีสว่าง */
+.choice { --fx-up:#2F6B66; --fx-dn:#B73824; }
+.i .choice, .b .choice, .a .choice:hover, .a .choice:focus-visible { --fx-up:#7FE0A8; --fx-dn:#FF8A7A; }
+.choice .fx .fxp { display:inline-flex; align-items:center; }
+.choice .fx .fxp > [aria-hidden] { display:inline-flex; align-items:center; gap:2px; }
+.choice .fx .fxp svg { width:1.15em; height:1.15em; flex:none; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+.choice .fx .fxp b { font-weight:600; }
+.choice .fx .up, .choice .fx .dn { padding:0 5px; border-radius:999px; }
+.choice .fx .up { color:var(--fx-up); background:color-mix(in srgb, var(--fx-up) 16%, transparent); }
+.choice .fx .dn { color:var(--fx-dn); background:color-mix(in srgb, var(--fx-dn) 16%, transparent); }
 /* ปุ่มกู้มาจ่าย (B111) ห้อยใต้ตัวเลือกที่ขาดเงิน — ย่อและเยื้องให้เห็นว่าเป็นทางของปุ่มบน ไม่ใช่ตัวเลือกใหม่ */
 .choice.loan { min-height:40px; margin:-4px 0 0 24px; padding:6px 12px; font-size:13.5px; }
 /* ชื่อตัวเลือกบนปุ่มกู้ยาวได้ทั้งประโยค — บรรทัดเดียวตัดท้ายด้วย … ไม่งั้นปุ่มกู้สูงกว่าตัวเลือกเอง · min-width:0 ให้ก้อนข้อความหดในแถว flex ได้ */
