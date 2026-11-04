@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife } from '../src/engine/index.mjs';
+import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
@@ -612,6 +612,60 @@ const f2 = (v) => v.toFixed(2);
   const ro = back(oldMid);
   const oldDone = drive(ro.af, { card: ro.card });
   check('วงปรโลก: เซฟเก่ากลางฉากระหว่างชาติโหลดแล้วเล่นแบบเดิมจนเกิด', oldDone.af.loop === null && oldDone.loop.length === 0 && heirOf(oldDone.af) === heirOf(a.af));
+}
+
+// ใบ 159 ความจำข้ามชาติ + พรสวรรค์ติดชาติ: ทุกชีวิตที่ 2 มีความจำครบช่อง · ชีวิตแรกไม่มีช่อง · เงื่อนไขการ์ดอ่านได้
+// · พรสวรรค์วัดบนทายาทคนเดียวกันต่างแค่ความจำ (ตัวควบคุม: ไม่มีชาติก่อน · งานอื่น · ทำไม่นานพอ ต้องได้ 1 เท่าเดิม) · เซฟเก่าไม่มีช่องโหลดได้
+{
+  const content = loadContent();
+  const bot = BOTS.สายบุญ;
+  const KEYS = ['lives', 'province', 'job', 'jobYears', 'cause', 'realm', 'realms', 'jobs', 'treasures', 'wish', 'barami'];
+  let first = 0, second = 0, full = 0, talent = 0, heir;
+  const N = 60;
+  for (let i = 0; i < N; i++) {
+    const { state } = playLife(mixSeed(159, i), content, bot);
+    if ('past' in state || 'talent' in state) first++;
+    const af = playAfterlife(state, bot);
+    heir ??= af.heir;
+    const st2 = nextLife(af);
+    if (st2.past) second++;
+    if (st2.past && KEYS.every((k) => k in st2.past) && st2.past.province === state.province && st2.past.lives === 1) full++;
+    if (st2.talent) talent++;
+  }
+  check('ใบ 159 ชีวิตแรกไม่มีความจำ/พรสวรรค์', first === 0, `${first}/${N}`);
+  check('ใบ 159 ชีวิตที่ 2 มีความจำครบทุกช่อง', second === N && full === N, `มี ${second} · ครบ ${full}/${N}`);
+  check('ใบ 159 พรสวรรค์เกิดในชีวิตที่ 2 บางส่วน', talent > 0, `${talent}/${N}`);
+  const mk = (past) => newLife(heir.seed, content, { ...heir, past });
+  const take = (st, job) => {
+    st.age = 22;
+    st.school = null;
+    st.pending = { id: 'past_job_test', type: 'A', stage: 'ทำงาน', category: 'work', text: 'งาน', choices: [{ text: 'รับงาน', effects: { job } }] };
+    choose(st, 0);
+    return monthlyIncome(st);
+  };
+  const craft = { ...heir.past, job: 'craft', jobYears: PAST_TALENT.years };
+  const base = take(mk(undefined), 'craft');
+  const gift = take(mk(craft), 'craft');
+  check('ใบ 159 ชาติก่อนเป็นช่างนาน ได้งานช่างรายได้เริ่ม ×1.1', near(gift / base, PAST_TALENT.mul, 1e-9), f2(gift / base));
+  check('ใบ 159 ตัวควบคุม: งานอื่น ไม่มีพรสวรรค์', near(take(mk(craft), 'clerk') / take(mk(undefined), 'clerk'), 1), '');
+  check('ใบ 159 ตัวควบคุม: ทำไม่นานพอ ไม่มีพรสวรรค์', near(take(mk({ ...craft, jobYears: PAST_TALENT.years - 1 }), 'craft') / base, 1), '');
+  const s2 = mk(craft), s1 = newLife(mixSeed(159, 0), content);
+  s2.province = craft.province;
+  const ok = (st, w) => whenOk(st, { past_life: w });
+  check('ใบ 159 เงื่อนไข past_life อ่านชาติก่อน', ok(s2, { any: true }) && ok(s2, { job: ['craft'], province: 'same', talent: true }) && !ok(s2, { job: ['farmer'] }) && !ok(s2, { any: false }));
+  check('ใบ 159 เงื่อนไข past_life ชีวิตแรก', ok(s1, { any: false }) && !ok(s1, { any: true }) && !ok(s1, { realm: ['human'] }));
+  // เซฟเก่า: ภาพถ่ายชีวิตที่ 2 ที่ถอดช่องความจำออก → โหลดแล้วได้ความจำจากผังตระกูล ไม่มีอาชีพ ไม่มีพรสวรรค์ · ชีวิตแรกยังไม่มีช่อง
+  const old = (st) => {
+    const raw = JSON.parse(snapshot(st, content));
+    delete raw.root.past;
+    delete raw.root.talent;
+    const back = restore(JSON.stringify(raw), content);
+    repairLife(back, null);
+    return back;
+  };
+  const o2 = old(mk(craft)), o1 = old(s1);
+  check('ใบ 159 เซฟเก่าชีวิตที่ 2 โหลดได้ มีความจำจากผังตระกูล', o2.past?.lives === heir.lineage.filter((l) => !l.isekai).length && o2.past.job === null && !o2.talent && KEYS.every((k) => k in o2.past), JSON.stringify(o2.past));
+  check('ใบ 159 เซฟเก่าชีวิตแรกไม่มีช่องความจำ', !('past' in o1));
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

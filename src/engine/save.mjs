@@ -3,6 +3,8 @@
 // object ที่ถูกอ้างหลายที่ (af.st = st · kinLoss ชี้คนใน kin · thaiVerdict) เก็บครั้งเดียวแล้วอ้างด้วยเลข — ต่อกลับเป็นตัวเดียวกัน
 import { makeRng } from './rng.mjs';
 import { pickRealName } from './birth.mjs';
+import { REALMS } from './afterlife.mjs';
+import { pastFromLineage } from './past.mjs';
 
 export const SNAP_V = 1;
 const isRng = (v) => typeof v.next === 'function' && typeof v.int === 'function';
@@ -81,5 +83,10 @@ export function repairLife(st, card) {
   // เซฟก่อนญาติมีสาเหตุ (B110 ชิ้น 2) — ญาติที่จากไปแล้วไม่มีสาเหตุย้อนหลัง · คนที่ยังอยู่เริ่มนับจากนี้
   st.kinCauseRng ??= makeRng(st.seed ^ 0xc1059ed8);
   st.heredity ??= [];
+  // เซฟก่อนมีความจำข้ามชาติ (ใบ 159) — รุ่นที่มีผังตระกูลได้ความจำจากแถวท้าย ไม่มีอาชีพ จึงไม่มีพรสวรรค์ · ชีวิตแรกไม่มีช่องเหมือนเดิม
+  if (!('past' in st)) {
+    const past = pastFromLineage(st.lineage, (name) => REALMS.find((r) => r.name === name)?.id ?? null);
+    if (past) st.past = past;
+  }
   return stale;
 }
