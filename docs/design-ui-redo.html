@@ -15,8 +15,6 @@
   h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
   header p { margin: 0; color: #E3DDD0; }
   header a { color: #F4EFE3; }
-  nav.site { margin-top: 10px; font-size: 14px; }
-  nav.site a { display: inline-block; padding: 6px 4px; min-height: 32px; }
   main { padding: 24px 16px 64px; }
   h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
   ul, ol { padding-left: 22px; margin: 0 0 8px; }
@@ -39,23 +37,37 @@
   details.doc h3 { font-size: 18px; }
   details.doc h4 { font-family: Pridi, serif; font-size: 16px; margin: 14px 0 4px; }
   details.doc h5 { font-size: 15px; margin: 12px 0 4px; }
+  .lead { font-size: 14px; color: #4A4F5C; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; color: #A23B2C; }
   .src { font-size: 13px; color: #4A4F5C; }
   pre { background: #1F2430; color: #F4EFE3; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
   pre code { background: none; padding: 0; }
   .tw { overflow-x: auto; margin: 0 0 12px; }
   .tw th, .tw td { overflow-wrap: normal; }
+  /*NAV-CSS:START*/
+  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
+  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: #F0D78C; }
+  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+/*NAV-CSS:END*/
 </style>
 </head>
 <body>
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">เกิดใหม่ทั้งที</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a class="dark" href="otherworld.html">ต่างโลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="gdd.html">เอกสารออกแบบเกม (GDD)</a><a href="design.html" aria-current="true">การออกแบบ</a></div><a class="play" href="play.html">เล่นเกม</a></nav><!--NAV:END-->
 <header><div class="w">
   <h1>หน้าจอใหม่ทั้งเกม (ui-redo)</h1>
   <p>เรื่อง ui-redo · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.31</span></p>
-  <nav class="site"><a href="index.html">หน้าแรก</a> · <a href="play.html">เล่นเกม</a> · <a href="design.html">สารบัญการออกแบบ</a> · <a href="gdd.html">เอกสารออกแบบเกม (GDD)</a> · <a href="whatsnew.html">แพตช์โน้ต</a></nav>
 </div></header>
 <main><div class="w">
+<p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
 <nav class="spec-toc" id="design-toc" aria-label="สารบัญหน้านี้"><div><h3>ในหน้านี้</h3><ol><li><a href="#d-ui-redo-MAP">MAP: หน้าจอใหม่ทั้งเกม (ui-redo)</a><div class="sub"><a href="#d-ui-redo-MAP-h1">Destination</a><a href="#d-ui-redo-MAP-h2">Notes</a><a href="#d-ui-redo-MAP-h3">Decisions so far</a><a href="#d-ui-redo-MAP-h4">Not yet specified</a><a href="#d-ui-redo-MAP-h5">Out of scope</a></div></li><li><a href="#d-ui-redo-decisions">รื้อหน้าเล่นเกม play.html — คำตอบที่ตัดสิน</a></li></ol></div></nav>
 <details class="doc" id="d-ui-redo-MAP" open><summary>MAP: หน้าจอใหม่ทั้งเกม (ui-redo)</summary><p class="src">ไฟล์ต้นฉบับ design/ui-redo/MAP.md · <a href="#design-toc">กลับสารบัญ</a></p>
-<p>repos: next-life · ตั้งเมื่อ 2026-11-03 (ใบ 01–16 มีมาก่อน · สเปก SPEC.md · คำตัดสิน <code>../ui-redo-decisions.md</code>)</p>
+<p>repos: next-life · ตั้งเมื่อ 2026-11-03 (ใบ 01–16 มีมาก่อน · สเปก SPEC.md · คำตัดสิน <a href="#d-ui-redo-decisions"><code>../ui-redo-decisions.md</code></a>)</p>
 <h3 id="d-ui-redo-MAP-h1">Destination</h3>
 <p>หน้าจอเกมทุกโลกและเว็บเอกสารอยู่บนโครงใหม่ (แถบสถานะ · เมนูล่าง · แผง · การ์ดตาย) ตาม SPEC.md เข้า main ครบ ไม่มี branch UI ค้าง</p>
 <h3 id="d-ui-redo-MAP-h2">Notes</h3>

@@ -15,8 +15,6 @@
   h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
   header p { margin: 0; color: #E3DDD0; }
   header a { color: #F4EFE3; }
-  nav.site { margin-top: 10px; font-size: 14px; }
-  nav.site a { display: inline-block; padding: 6px 4px; min-height: 32px; }
   main { padding: 24px 16px 64px; }
   h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
   ul, ol { padding-left: 22px; margin: 0 0 8px; }
@@ -39,20 +37,24 @@
   details.doc h3 { font-size: 18px; }
   details.doc h4 { font-family: Pridi, serif; font-size: 16px; margin: 14px 0 4px; }
   details.doc h5 { font-size: 15px; margin: 12px 0 4px; }
+  .lead { font-size: 14px; color: #4A4F5C; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; color: #A23B2C; }
   .src { font-size: 13px; color: #4A4F5C; }
   pre { background: #1F2430; color: #F4EFE3; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
   pre code { background: none; padding: 0; }
   .tw { overflow-x: auto; margin: 0 0 12px; }
   .tw th, .tw td { overflow-wrap: normal; }
+  /*NAV-CSS:START*//*NAV-CSS:END*/
 </style>
 </head>
 <body>
+<!--NAV:START--><!--NAV:END-->
 <header><div class="w">
   <h1><!--__TITLE__--></h1>
   <p><!--__LEAD__--> · เวอร์ชัน <span data-fact="version">v0.0.0</span></p>
-  <nav class="site"><a href="index.html">หน้าแรก</a> · <a href="play.html">เล่นเกม</a> · <a href="design.html">สารบัญการออกแบบ</a> · <a href="gdd.html">เอกสารออกแบบเกม (GDD)</a> · <a href="whatsnew.html">แพตช์โน้ต</a></nav>
 </div></header>
 <main><div class="w">
+<p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
 <!--__DESIGN__-->
 </div></main>
 </body>

@@ -41,7 +41,9 @@ function makeInline(file, known, link) {
     if (/^https?:\/\//.test(ref)) return ref;
     const u = new URL(ref, base);
     if (u.protocol !== 'spec:') return null;
-    const p = u.pathname.replace(/^\//, '');
+    const raw = u.pathname.replace(/^\//, '');
+    // ชื่อไฟล์ที่ย้ายแล้ว (ต้นฉบับยังอ้างชื่อเดิม) — ผู้เรียกให้ตารางแปลงมาเอง
+    const p = known.has(raw) ? raw : (link.alias?.[raw] ?? raw);
     if (known.has(p)) return link.doc(p);
     if (p && !p.endsWith('.md')) return link.asset(p);
     return null;

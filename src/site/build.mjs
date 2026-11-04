@@ -1,5 +1,5 @@
 // หน้าเว็บนอกตัวเกม (B65): ฉีดตัวเลขลงหน้าที่เขียนมือ + สร้างหน้ารวมการ์ดและหน้าเฉลยจากแม่แบบ · เรียกจาก build.mjs ทุกครั้ง
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs';
 import { siteFacts, injectFacts } from './facts.mjs';
 import { catalogHtml } from './catalog.mjs';
 import { spoilersHtml } from './spoilers.mjs';
@@ -7,9 +7,12 @@ import { injectSpec } from './spec.mjs';
 import { guideHtml } from './guide.mjs';
 import { demoHtml } from './demo.mjs';
 import { designPages, designHtml } from './design.mjs';
+import { injectNav } from './nav.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'gdd'];
+// หน้าเขียนมือที่ไม่มีตัวเลขจาก data แต่ต้องมีแถบบนชุดเดียวกัน — ไฟล์อยู่ใต้ docs/
+export const NAV_PAGES = ['whatsnew.html', 'cards.html', 'spec/lore-finance-series.html'];
 // หน้าที่ build สร้างทั้งหน้าจากแม่แบบ src/site/<ชื่อ>.html — หน้าเฉลย (B88) แยกจากหน้ารวมการ์ดเพราะหน้ารวมการ์ดห้ามเผยผล/บุญบาป
 export const GEN_PAGES = [
   // เดโมการ์ดเล่นได้ (B121) อยู่หน้ารวมการ์ด ไม่ใช่หน้าแรก
@@ -27,20 +30,29 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     const html = readFileSync(file, 'utf8');
     // GDD มีภาคผนวกสเปกจาก docs/spec — สร้างใหม่ทุก build
     const faced = injectFacts(html, facts, `docs/${name}.html`);
-    const next = name === 'gdd' ? injectSpec(faced) : faced;
+    const next = injectNav(name === 'gdd' ? injectSpec(faced) : faced, `${name}.html`);
     if (next !== html) writeFileSync(file, next);
     out.push(name);
   }
   for (const [name, slot, html] of GEN_PAGES) {
     const page = injectFacts(readFileSync(at(`src/site/${name}.html`), 'utf8'), facts, `src/site/${name}.html`).replace(slot, () => html(content));
-    writeFileSync(at(`docs/${name}.html`), page);
+    writeFileSync(at(`docs/${name}.html`), injectNav(page, `${name}.html`));
     out.push(name);
   }
   // หน้าการออกแบบหลายหน้าจากแม่แบบเดียว — จำนวนหน้าตามโฟลเดอร์ใน design/
   const designTpl = injectFacts(readFileSync(at('src/site/design.html'), 'utf8'), facts, 'src/site/design.html');
-  for (const [file, page] of designPages(new URL('design/', root))) {
-    writeFileSync(at(`docs/${file}`), designHtml(designTpl, page));
+  const designOut = designPages(new URL('design/', root));
+  for (const [file, page] of designOut) {
+    writeFileSync(at(`docs/${file}`), designHtml(designTpl, page, file));
     out.push(file.replace(/\.html$/, ''));
+  }
+  // เรื่องที่ถูกรวม/ลบออกจาก design/ ทิ้งหน้าเก่าไว้ = ลิงก์ค้างที่ไม่ตรงต้นฉบับ
+  const made = new Set(designOut.map(([f]) => f));
+  for (const f of readdirSync(at('docs/')).filter((n) => /^design-.+\.html$/.test(n) && !made.has(n))) unlinkSync(at(`docs/${f}`));
+  for (const file of NAV_PAGES) {
+    const html = readFileSync(at(`docs/${file}`), 'utf8');
+    const next = injectNav(html, file);
+    if (next !== html) writeFileSync(at(`docs/${file}`), next);
   }
   return { facts, pages: out };
 }

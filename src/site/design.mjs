@@ -3,6 +3,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { esc } from './catalog.mjs';
 import { renderDoc, docId, SPEC_OPEN } from './spec.mjs';
+import { injectNav } from './nav.mjs';
 
 export const DESIGN_DIR = new URL('../../design/', import.meta.url);
 export const LORE = 'lore';
@@ -17,8 +18,19 @@ export function designFiles(dir = DESIGN_DIR) {
     .sort((a, b) => a.localeCompare(b));
 }
 
-// ไฟล์ชั้นบนสุด → design.html · lore/ → design-lore.html · <เรื่อง>/ → design-<เรื่อง>.html
-export const designPage = (f) => (f.includes('/') ? `design-${f.split('/')[0]}.html` : 'design.html');
+// เรื่องที่เนื้อน้อยจนหน้าแยกแทบว่าง — ขึ้นท้ายหน้าเรื่องแม่ (MAP ของ three-worlds รวมสองเรื่องนี้ไว้แล้ว)
+export const DESIGN_MERGE = { isekai: 'three-worlds', 'life-goal': 'three-worlds' };
+// ต้นฉบับบางไฟล์ยังอ้างชื่อไฟล์ก่อนย้ายเข้าโฟลเดอร์ (path นับจากราก design/) → ชื่อปัจจุบัน
+export const DESIGN_RENAMED = {
+  'lore-afterlife.md': 'lore/afterlife.md',
+  'lore-era-data.md': 'lore/era-data.md',
+  'lore-finance-belief.md': 'lore/finance-belief.md',
+  'ui-redo-decisions.md': 'ui-redo/decisions.md',
+};
+const dirOf = (f) => (f.includes('/') ? f.split('/')[0] : '');
+
+// ไฟล์ชั้นบนสุด → design.html · lore/ → design-lore.html · <เรื่อง>/ → design-<เรื่อง>.html (เรื่องใน DESIGN_MERGE ไปหน้าเรื่องแม่)
+export const designPage = (f) => (f.includes('/') ? `design-${DESIGN_MERGE[dirOf(f)] ?? dirOf(f)}.html` : 'design.html');
 
 export function designDocs(dir = DESIGN_DIR) {
   const files = designFiles(dir);
@@ -26,7 +38,7 @@ export function designDocs(dir = DESIGN_DIR) {
   return files.map((f) => {
     const page = designPage(f);
     // ลิงก์ไปไฟล์นอก design/ (โค้ด · ใบงานนอก repo) ไม่มีหน้าให้ไป ⇒ เป็นข้อความ
-    const link = { doc: (p) => (designPage(p) === page ? '' : designPage(p)) + `#${docId(p)}`, asset: () => null };
+    const link = { doc: (p) => (designPage(p) === page ? '' : designPage(p)) + `#${docId(p)}`, asset: () => null, alias: DESIGN_RENAMED };
     return { ...renderDoc(f, readFileSync(new URL(f, dir), 'utf8'), known, link), page };
   });
 }
@@ -42,15 +54,22 @@ export function designPages(dir = DESIGN_DIR) {
   const byPage = new Map();
   for (const d of docs) byPage.set(d.page, [...(byPage.get(d.page) ?? []), d]);
   const topics = [...byPage.keys()].filter((p) => p !== 'design.html' && p !== `design-${LORE}.html`).sort();
-  const lead = (p) => [...byPage.get(p)].sort((a, b) => RANK(a.file) - RANK(b.file))[0];
-  const pageTitle = (p) => (p === `design-${LORE}.html` ? LORE_TITLE : titleOf(lead(p)));
+  const topicOf = (p) => p.slice(7, -5);
+  // เรื่องแม่ขึ้นก่อน เรื่องที่รวมเข้ามาต่อท้ายเรียงชื่อ · ในเรื่องเดียวกัน MAP → decisions → ที่เหลือ
+  const sorted = (p) =>
+    [...byPage.get(p)].sort(
+      (a, b) => (dirOf(a.file) !== topicOf(p)) - (dirOf(b.file) !== topicOf(p)) || dirOf(a.file).localeCompare(dirOf(b.file)) || RANK(a.file) - RANK(b.file) || a.file.localeCompare(b.file),
+    );
+  const merged = (p) => [...new Set(byPage.get(p).map((d) => dirOf(d.file)))].filter((x) => x !== topicOf(p)).sort();
+  const fileLabel = (p, d) => (dirOf(d.file) === topicOf(p) ? '' : `${dirOf(d.file)}/`) + d.file.split('/').at(-1).replace(/\.md$/, '');
+  const pageTitle = (p) => (p === `design-${LORE}.html` ? LORE_TITLE : titleOf(sorted(p)[0]));
   const card = (p, note) => `<li><a href="${p}">${esc(pageTitle(p))}</a> <small>${note}</small></li>`;
 
   const out = [];
   const top = byPage.get('design.html') ?? [];
   const index = [
     `<nav class="spec-toc" id="design-toc" aria-label="สารบัญการออกแบบ">`,
-    `<div><h3>เรื่องที่ออกแบบ</h3><ol>${topics.map((p) => card(p, [...byPage.get(p)].sort((a, b) => RANK(a.file) - RANK(b.file)).map((d) => d.file.split('/')[1].replace(/\.md$/, '')).join(' · '))).join('')}</ol></div>`,
+    `<div><h3>เรื่องที่ออกแบบ</h3><ol>${topics.map((p) => card(p, sorted(p).map((d) => esc(fileLabel(p, d))).join(' · '))).join('')}</ol></div>`,
     byPage.has(`design-${LORE}.html`) ? `<div><h3>ข้อมูลอ้างอิง</h3><ol>${card(`design-${LORE}.html`, `${byPage.get(`design-${LORE}.html`).length} ไฟล์`)}</ol></div>` : '',
     `<div><h3>ในหน้านี้</h3><ol>${top.map((d) => `<li><a href="#${d.id}">${esc(d.title)}</a></li>`).join('')}</ol></div>`,
     `</nav>`,
@@ -58,8 +77,9 @@ export function designPages(dir = DESIGN_DIR) {
   out.push(['design.html', { title: 'การออกแบบ', lead: 'คำตัดสินของเจ้าของเกมแยกตามเรื่อง ตามสำเนาใน design/ ของ repo · อ่านอย่างเดียว', body: `${index}\n${top.map((d) => docBlock(d, true)).join('\n')}` }]);
 
   for (const p of [...topics, `design-${LORE}.html`].filter((x) => byPage.has(x))) {
-    const ds = byPage.get(p).sort((a, b) => RANK(a.file) - RANK(b.file) || a.file.localeCompare(b.file));
+    const ds = sorted(p);
     const lore = p === `design-${LORE}.html`;
+    const also = merged(p);
     const toc = `<nav class="spec-toc" id="design-toc" aria-label="สารบัญหน้านี้"><div><h3>ในหน้านี้</h3><ol>${ds
       .map((d) => {
         const sub = lore ? '' : subToc(d);
@@ -67,14 +87,16 @@ export function designPages(dir = DESIGN_DIR) {
       })
       .join('')}</ol></div></nav>`;
     // lore ยาวรวมกันหลายเท่าของหน้าเรื่อง — พับรายไฟล์ ลิงก์จากสารบัญกางให้เอง · หน้าเรื่องมี 1–2 ไฟล์ กางไว้เลย
-    out.push([p, { title: pageTitle(p), lead: lore ? 'ข้อมูลที่ใช้ตอนเขียนเนื้อหาและตัวเลข แหล่งที่มาอยู่ในแต่ละไฟล์' : `เรื่อง ${p.slice(7, -5)} · แผนที่ใบงานและคำตัดสิน`, body: `${toc}\n${ds.map((d) => docBlock(d, !lore)).join('\n')}\n${SPEC_OPEN}` }]);
+    out.push([p, { title: pageTitle(p), lead: lore ? 'ข้อมูลที่ใช้ตอนเขียนเนื้อหาและตัวเลข แหล่งที่มาอยู่ในแต่ละไฟล์' : `เรื่อง ${topicOf(p)}${also.length ? ` (รวม ${also.join(' · ')})` : ''} · แผนที่ใบงานและคำตัดสิน`, body: `${toc}\n${ds.map((d) => docBlock(d, !lore)).join('\n')}\n${SPEC_OPEN}` }]);
   }
   return out;
 }
 
-export function designHtml(tpl, page) {
-  return tpl
+// file = ชื่อหน้า (design-lore.html) — แถบบนรู้ว่าหน้าไหนเป็นหน้าปัจจุบัน
+export function designHtml(tpl, page, file) {
+  const html = tpl
     .replace(/<!--__TITLE__-->/g, () => esc(page.title))
     .replace('<!--__LEAD__-->', () => esc(page.lead))
     .replace('<!--__DESIGN__-->', () => page.body);
+  return injectNav(html, file);
 }

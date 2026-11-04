@@ -60,13 +60,25 @@
   dl { margin: 0; } dt { font-weight: 600; margin-top: 8px; } dd { margin: 0 0 4px; }
   kbd { font-family: ui-monospace, Consolas, monospace; font-size: 13px; border: 1px solid #8E8574; border-bottom-width: 2px; padding: 0 5px; background: #FBF8F1; }
   footer { font-size: 13px; color: #4A4F5C; margin-top: 32px; }
+  /*NAV-CSS:START*/
+  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
+  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: #F0D78C; }
+  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+/*NAV-CSS:END*/
 </style>
 </head>
 <body>
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">เกิดใหม่ทั้งที</a><div class="links"><a href="guide.html" aria-current="page">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a class="dark" href="otherworld.html">ต่างโลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="gdd.html">เอกสารออกแบบเกม (GDD)</a><a href="design.html">การออกแบบ</a></div><a class="play" href="play.html">เล่นเกม</a></nav><!--NAV:END-->
 <header><div class="w">
   <h1>วิธีเล่น</h1>
   <p>คู่มือสั้นสำหรับเริ่มเล่น ป้ายปุ่มและคำอธิบายค่าสถานะบนหน้านี้ดึงจากชุดเดียวกับในเกม จึงตรงกับที่เห็นบนจอเสมอ</p>
-  <p>เวอร์ชัน <span data-fact="version">v0.6.31</span> · <a href="index.html">หน้าแรก</a> · <a href="gdd.html">เอกสารออกแบบเกม</a> · <a href="play.html">เล่นเกม</a></p>
+  <p>เวอร์ชัน <span data-fact="version">v0.6.31</span></p>
 </div></header>
 <main><div class="w">
 

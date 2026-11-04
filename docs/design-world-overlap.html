@@ -15,8 +15,6 @@
   h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
   header p { margin: 0; color: #E3DDD0; }
   header a { color: #F4EFE3; }
-  nav.site { margin-top: 10px; font-size: 14px; }
-  nav.site a { display: inline-block; padding: 6px 4px; min-height: 32px; }
   main { padding: 24px 16px 64px; }
   h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
   ul, ol { padding-left: 22px; margin: 0 0 8px; }
@@ -39,27 +37,41 @@
   details.doc h3 { font-size: 18px; }
   details.doc h4 { font-family: Pridi, serif; font-size: 16px; margin: 14px 0 4px; }
   details.doc h5 { font-size: 15px; margin: 12px 0 4px; }
+  .lead { font-size: 14px; color: #4A4F5C; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; color: #A23B2C; }
   .src { font-size: 13px; color: #4A4F5C; }
   pre { background: #1F2430; color: #F4EFE3; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
   pre code { background: none; padding: 0; }
   .tw { overflow-x: auto; margin: 0 0 12px; }
   .tw th, .tw td { overflow-wrap: normal; }
+  /*NAV-CSS:START*/
+  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
+  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: #F0D78C; }
+  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+/*NAV-CSS:END*/
 </style>
 </head>
 <body>
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">เกิดใหม่ทั้งที</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a class="dark" href="otherworld.html">ต่างโลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="gdd.html">เอกสารออกแบบเกม (GDD)</a><a href="design.html" aria-current="true">การออกแบบ</a></div><a class="play" href="play.html">เล่นเกม</a></nav><!--NAV:END-->
 <header><div class="w">
   <h1>โลกซ้อนทับ — ข้ามโลกซ้ำบ่อย กำแพงโลกบาง ของแต่ละโลกรั่วเข้าหากัน จนถึงจบโลก</h1>
   <p>เรื่อง world-overlap · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.31</span></p>
-  <nav class="site"><a href="index.html">หน้าแรก</a> · <a href="play.html">เล่นเกม</a> · <a href="design.html">สารบัญการออกแบบ</a> · <a href="gdd.html">เอกสารออกแบบเกม (GDD)</a> · <a href="whatsnew.html">แพตช์โน้ต</a></nav>
 </div></header>
 <main><div class="w">
+<p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
 <nav class="spec-toc" id="design-toc" aria-label="สารบัญหน้านี้"><div><h3>ในหน้านี้</h3><ol><li><a href="#d-world-overlap-MAP">MAP: โลกซ้อนทับ — ข้ามโลกซ้ำบ่อย กำแพงโลกบาง ของแต่ละโลกรั่วเข้าหากัน จนถึงจบโลก</a><div class="sub"><a href="#d-world-overlap-MAP-h1">Destination</a><a href="#d-world-overlap-MAP-h2">Notes</a><a href="#d-world-overlap-MAP-h3">Decisions so far</a><a href="#d-world-overlap-MAP-h4">Not yet specified</a><a href="#d-world-overlap-MAP-h5">Out of scope</a></div></li><li><a href="#d-world-overlap-decisions">คำตัดสิน — โลกซ้อนทับ</a><div class="sub"><a href="#d-world-overlap-decisions-h2">คำตอบที่ตัดสิน</a><a href="#d-world-overlap-decisions-h12">คำตอบที่ตัดสิน</a><a href="#d-world-overlap-decisions-h14">คำตอบที่ตัดสิน</a></div></li></ol></div></nav>
 <details class="doc" id="d-world-overlap-MAP" open><summary>MAP: โลกซ้อนทับ — ข้ามโลกซ้ำบ่อย กำแพงโลกบาง ของแต่ละโลกรั่วเข้าหากัน จนถึงจบโลก</summary><p class="src">ไฟล์ต้นฉบับ design/world-overlap/MAP.md · <a href="#design-toc">กลับสารบัญ</a></p>
 <p>repos: next-life · ตั้งเมื่อ 2026-11-02</p>
 <h3 id="d-world-overlap-MAP-h1">Destination</h3>
 <p>สเปกที่ตัดสินครบว่าค่าซ้อนทับขึ้นยังไง แต่ละขั้นปลดอะไรในทั้ง 4 ทิศ ดันเจียนระบบใหม่ในโลกปกติเล่นยังไง และจบโลกแล้วรอบใหม่เป็นยังไง — ละเอียดพอให้ผู้รวมงานแตกใบ B ลงเลนได้โดยไม่ต้องถามเจ้าของเพิ่ม</p>
 <h3 id="d-world-overlap-MAP-h2">Notes</h3>
-<ul><li>plan only — ลงมือผ่านใบ <code>../build/B*.md</code> ตาม <code>../build/LANES.md</code> เมื่อแผนจบ</li><li>ต่อยอด <a href="design-three-worlds.html#d-three-worlds-MAP"><code>../three-worlds/MAP.md</code></a> (3 โลก · บุญบาปบัญชีเดียว · ทางข้ามโลก) และ <a href="design-isekai.html#d-isekai-MAP"><code>../isekai/MAP.md</code></a> — คำตัดสินเดิมยังใช้ เว้นข้อที่แผนนี้เคาะทับ (เขียน &quot;ทับ three-worlds/…&quot; ในคำตอบใบ)</li><li>ศัพท์: <strong>ค่าซ้อนทับ</strong> = ตัวเลขเดียวต่อเซฟ ขึ้นอย่างเดียว · <strong>เหยียบซ้ำ</strong> = กลับเข้าโลกที่เคยออกไป (ไทย→ต่างโลก→ไทย = +1 · เกิดไทยต่อกันไม่นับ · ปรโลกคั่นชาติเป็นทางผ่านไม่นับ) · <strong>ขั้น</strong> = ช่วงของค่าซ้อนทับที่ปลดเนื้อหา · <strong>จบโลก</strong> = เหตุการณ์ที่ขั้นสุด แล้วเริ่มรอบใหม่</li><li>ของที่มีแล้วเกี่ยวข้อง (ยังไม่ได้อ่านโค้ด — ใบ &quot;โค้ดที่โลกซ้อนทับต้องเกาะ&quot; ตอบ): หอคอยร้อยชั้น 06t · ดันเจียนลับ 06e (ต่างโลก) · ลาง/แฟนตาซีแทรกเป้า 5–8 ใบต่อชีวิต (omc-1) · เจ้าหน้าที่ปรโลก 4 ตำแหน่ง (three-worlds ใบ 02) · ผังตระกูล/คนตายในเซฟ</li><li>skill: <code>grilling</code> + <code>domain-modeling</code> (ใบ grilling · popup ไทย) · research brief ตรง</li><li>คำตัดสินเจ้าของคำต่อคำ: <a href="#d-world-overlap-decisions"><code>decisions.md</code></a></li></ul>
+<ul><li>plan only — ลงมือผ่านใบ <code>../build/B*.md</code> ตาม <code>../build/LANES.md</code> เมื่อแผนจบ</li><li>ต่อยอด <a href="design-three-worlds.html#d-three-worlds-MAP"><code>../three-worlds/MAP.md</code></a> (3 โลก · บุญบาปบัญชีเดียว · ทางข้ามโลก) และ <a href="design-three-worlds.html#d-isekai-MAP"><code>../isekai/MAP.md</code></a> — คำตัดสินเดิมยังใช้ เว้นข้อที่แผนนี้เคาะทับ (เขียน &quot;ทับ three-worlds/…&quot; ในคำตอบใบ)</li><li>ศัพท์: <strong>ค่าซ้อนทับ</strong> = ตัวเลขเดียวต่อเซฟ ขึ้นอย่างเดียว · <strong>เหยียบซ้ำ</strong> = กลับเข้าโลกที่เคยออกไป (ไทย→ต่างโลก→ไทย = +1 · เกิดไทยต่อกันไม่นับ · ปรโลกคั่นชาติเป็นทางผ่านไม่นับ) · <strong>ขั้น</strong> = ช่วงของค่าซ้อนทับที่ปลดเนื้อหา · <strong>จบโลก</strong> = เหตุการณ์ที่ขั้นสุด แล้วเริ่มรอบใหม่</li><li>ของที่มีแล้วเกี่ยวข้อง (ยังไม่ได้อ่านโค้ด — ใบ &quot;โค้ดที่โลกซ้อนทับต้องเกาะ&quot; ตอบ): หอคอยร้อยชั้น 06t · ดันเจียนลับ 06e (ต่างโลก) · ลาง/แฟนตาซีแทรกเป้า 5–8 ใบต่อชีวิต (omc-1) · เจ้าหน้าที่ปรโลก 4 ตำแหน่ง (three-worlds ใบ 02) · ผังตระกูล/คนตายในเซฟ</li><li>skill: <code>grilling</code> + <code>domain-modeling</code> (ใบ grilling · popup ไทย) · research brief ตรง</li><li>คำตัดสินเจ้าของคำต่อคำ: <a href="#d-world-overlap-decisions"><code>decisions.md</code></a></li></ul>
 <h3 id="d-world-overlap-MAP-h3">Decisions so far</h3>
 <ul><li>(ตั้งแผนที่ · popup 2026-11-02) ค่าซ้อนทับเดียวต่อเซฟ นับการข้ามโลกทั้งเซฟ เริ่มเพิ่มทีละนิดตั้งแต่เหยียบซ้ำครั้งแรก · <strong>ขึ้นอย่างเดียว</strong> ไม่มีทางลด</li><li>(ตั้งแผนที่) โทนโลกปกติเป็นขั้น: เบา (เห็นแค่ตัวเรา · ข่าวลือ) → ถึงเกณฑ์เปิดเผยทั้งสังคม</li><li>(ตั้งแผนที่) รั่วครบ 4 ทิศ: ต่างโลก→ไทย (เกต หอคอย ดันเจียน มอนสเตอร์) · หลังตาย→ไทย/ต่างโลก (ผี วิญญาณ) · ต่างโลก→หลังตาย (มอนสเตอร์บุกนรก) · ไทย→ต่างโลก (คนหลงมิติ ของใช้ อาคาร ความรู้/ความเชื่อ)</li><li>(ตั้งแผนที่) บทผู้เล่นในโลกปกติ = เหตุการณ์แทรก + อาชีพใหม่ + เกมย่อยดันเจียน <strong>ระบบใหม่ในโลกปกติ</strong> (ไม่ยืมระบบต่างโลก)</li><li>(ตั้งแผนที่) ผีที่โผล่ = ทั้งคนจริงจากชาติก่อนและผีทั่วไป</li><li>(ตั้งแผนที่) ขั้นสุด = เหตุการณ์จบโลก → เริ่มรอบใหม่ เก็บกรรม+สมุด</li><li>ขั้นของค่าซ้อนทับ · ดันเจียน · ผีคนจริง · บุกนรก · ไทย→ต่างโลก · จบโลก: ปิดแล้ว — คำตัดสิน decisions 28–90 · ใบลงมือรอบ 3 = 09–36 (frontier: 08 กำลังทำ → 09 · 15 · 16 · 13 · 11 · 10 หลัง 08)</li><li>โค้ดที่โลกซ้อนทับต้องเกาะ: ไม่มีตัวนับเหยียบซ้ำ (อนุมานจาก lineage/trips ได้) · ไม่มีช่องระดับเซฟนอก st · สมุดอยู่ localStorage แยกอยู่รอดอยู่แล้ว · คนตายข้ามชาติส่งแค่พ่อแม่ทาง child ไม่มีเหตุการณ์ร่วม · whenOk ไม่มีเงื่อนไขค่าระดับเซฟ · ปรโลก 4 ตำแหน่ง/หอคอย = สเปก · ดันเจียนมีแค่รายชื่อสุ่มต่อชาติ</li><li>(2026-11-03 · grill ระบบไอเทม · ผู้ค้านแล้ว) decisions 91–96: ช่องไอเทมไทย 4 ช่อง · ของใช้ครั้งเดียวเป็นตัวเลือกบนการ์ด · พกข้ามชาติ/โลก 1 ชิ้นทุกทิศ · ลูกหลานได้ของที่พก + 1 ชิ้น · เลือกของพกในการ์ดส่งต่อใบเดิม · ของฝังรอดได้โลกละ 1 ชิ้น → ใบ 23 · ใบ 24</li><li>(2026-11-03 · คำถามเลน A ใบ 21) decisions 97–100: ดันเจียนไทย 1 รอบ = ใบเข้า→กลาง (ถอยได้)→ห้องบอส · ใบเข้า 4 ชุดในโควตาซ้อน · ทางสำเร็จ health 2.0 / knowledge 1.2 · ตาย <code>die: accident|assault</code> นักล่ากลาง ~4%/รอบ</li><li>(2026-11-03 · หมอก) decisions 101–102: แผงไอเทมไทยแสดงตั้งแต่ขั้น 3 · ค่าซ้อนทับบนจอ = คำใบ้ ม่านบาง/ม่านขาด/ม่านพัง (ข้อ 35) บนผังตระกูล + แผงตัวฉัน (ข้อ 103) ตัวเลขซ่อน · เซฟเก่าเริ่มค่าซ้อน 0 (ข้อ 20) · สายนักล่า = ใบ 19 · ร่างทรง = ใบ 20 · หน่วยรัฐ = ตำรวจ/ทหารเดิมได้การ์ดดันเจียน (ข้อ 63) · ผลต่อเป้าแฟนตาซี 5–8 = แยกโควตา + ด่านตระกูลค่าสูง (ข้อ 25)</li></ul>
 <h3 id="d-world-overlap-MAP-h4">Not yet specified</h3>
