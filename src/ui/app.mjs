@@ -1,4 +1,4 @@
-import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS } from '../engine/index.mjs';
+import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
@@ -139,10 +139,11 @@ function statusBar(card, s) {
   return bar;
 }
 // ช่องค่าหนึ่งช่อง: ป้าย ตัวเลข แถบเส้น — แถบสถานะกับแผงตัวฉันของทั้งสองโลกใช้ตัวเดียวกัน หน้าตาจึงไม่แยกกันเพี้ยน
-function meterLi(label, v, low) {
+// shown = ตัวเลขบนป้ายเมื่อไม่ใช่ค่าเดียวกับความยาวแถบ (เกจทองต่างโลก: แถบเป็น % ของสเกล ป้ายเป็นทองจริง)
+function meterLi(label, v, low, shown = String(v)) {
   const li = el('li', low ? 'low' : null);
   const head = el('span', 'mh');
-  head.append(el('span', 'mk', label), el('b', 'num', String(v)));
+  head.append(el('span', 'mk', label), el('b', 'num', shown));
   const track = el('span', 'br');
   const fill = el('i');
   fill.style.width = `${v}%`;
@@ -2923,11 +2924,24 @@ function isekaiBar(card, s, where) {
   bar.append(r1, ul);
   return bar;
 }
+// เกจทองต่างโลก: หลอดเต็ม = ทองตั้งต้นของร่าง + ISEKAI_GOLD_SPAN · ทองที่หาได้ทั้งชาติแทบไม่ขึ้นกับทองตั้งต้น
+// จึงบวกช่วงคงที่แทนการคูณ (ร่างเริ่ม 0 คูณแล้วเต็มตั้งแต่ทองก้อนแรก)
+// ทองตั้งต้นอ่านจากตารางร่าง ไม่ใช่ทองหลังพกเงินโลกเดิมมา (ค่านั้นไม่ได้เก็บ) — ชาติที่พกมาหลอดเริ่มสูงกว่าได้
+const ISEKAI_GOLD_SPAN = 3000;
+const isekaiGoldStart = (k) => (k.role ? roleInfo(k.role) : ISEKAI_ROLES[CONT_LIFE.like]).stat.gold;
+// 0–1 · null = ยังไม่มีร่าง (ปีแรกก่อนได้บทบาท/เผ่า) ไม่แสดงเกจ
+function isekaiGoldFill(k, gold) {
+  if (!k?.role && !k?.race) return null;
+  return Math.min(1, Math.max(0, gold / (isekaiGoldStart(k) + ISEKAI_GOLD_SPAN)));
+}
 // แผงตัวฉันต่างโลก: ของที่เคยอัดในหน้าต่างสถานะบนการ์ด — ค่าเต็ม · ทอง ชื่อเสียง เผ่า · อาชีพ (สกิลอยู่แผงของมันเอง)
 function isekaiMePanel(s) {
   const wrap = el('div', 'me');
   const ul = el('ul', 'me-m');
   ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
+  // ชาติต่างโลกหลังตายอยู่ใน af.isekai · ทริประหว่างชาติไทยอยู่ใน st.trip
+  const gold = isekaiGoldFill(af?.isekai ?? st?.trip, s.gold);
+  if (gold !== null) ul.append(meterLi('ทอง', Math.round(gold * 1000) / 10, false, s.gold.toLocaleString('en-US')));
   const dl = el('dl');
   dl.append(el('dt', null, 'ทอง'), el('dd', null, s.gold.toLocaleString('en-US')), el('dt', null, 'ชื่อเสียง'), el('dd', null, String(s.fame)));
   const who = el('p', 'meta');
