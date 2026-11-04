@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ปรับเอฟเฟกต์ได้ฉายา: หายาก vs ตำนาน (tweak) · next-life</title>
+<style>
+:root {
+  --page:#DCD6CB; --ink:#1F2430; --ink2:#3A3F4B; --paper:#F4EFE3; --paper2:#E9E1CF; --rule:#B9AE97;
+  --lacquer:#17110D; --lacquer2:#221912; --gold:#D9B45A; --gold2:#F0D78C; --cream:#EFE3C2; --bronze2:#8A6D3B;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--page); color:var(--ink); font:15px/1.55 Sarabun,"Noto Sans Thai",system-ui,sans-serif; }
+.bar { position:sticky; top:0; z-index:5; background:var(--ink); color:var(--paper); padding:10px 14px; display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; }
+.bar h1 { margin:0; font-size:16px; flex:1 1 100%; }
+/* จอแคบ แถบควบคุมสูงหลายแถว ติดบนจะบังภาพ */
+@media (max-width:700px) { .bar { position:static; } }
+.bar label { display:inline-flex; gap:6px; align-items:center; font-size:13px; min-height:32px; cursor:pointer; }
+.bar button, .tools button { font:inherit; font-size:13px; min-height:32px; padding:0 12px; border-radius:999px; border:1px solid var(--gold); background:transparent; color:var(--gold2); cursor:pointer; }
+.bar button.on { background:var(--gold); color:var(--ink); }
+.bar input[type=range] { width:160px; }
+.bar output { font-variant-numeric:tabular-nums; min-width:3.2em; }
+main { padding:14px; margin:0 auto; max-width:1280px; }
+main.w390 { max-width:390px; padding:10px 8px; }
+.intro { font-size:14px; margin:0 0 10px; }
+.layout { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:14px; align-items:start; }
+main.w390 .layout { grid-template-columns:1fr; }
+.panel { border:1px solid var(--rule); border-radius:10px; background:var(--paper2); padding:10px; margin-bottom:14px; }
+.panel.ref { opacity:.8; }
+.panel .h { display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; }
+.panel .h b { font-size:15px; }
+.panel .h label { font-size:13px; display:inline-flex; gap:6px; align-items:center; min-height:32px; cursor:pointer; }
+.panel .note { font-size:13px; margin:2px 0 8px; opacity:.85; }
+.pair { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+main.w390 .pair { grid-template-columns:1fr; }
+.cell small { display:block; font-size:12px; font-weight:700; margin-bottom:4px; }
+/* ฉากจำลอง: การ์ดตายในเกมอยู่ข้างหลัง ม่านลงทับแล้วเอฟเฟกต์ขึ้นกลางจอ */
+.stage { position:relative; height:210px; border-radius:8px; overflow:hidden; background:var(--paper); }
+.stage .fake { position:absolute; inset:18px 22px; border:1px solid var(--rule); border-radius:10px; background:#FBF8F0; }
+.stage .fake i { display:block; height:8px; margin:16px 18px 0; background:#E4DCCB; border-radius:4px; }
+.stage .fake i:nth-child(2) { width:60%; }
+.stage .veil { position:absolute; inset:0; background:var(--lacquer); opacity:0; }
+.stage svg { position:absolute; left:50%; top:50%; width:300px; height:170px; margin:-85px 0 0 -150px; overflow:visible; }
+body.gray .stage svg { filter:grayscale(1); }
+.side { position:sticky; top:118px; }
+main.w390 .side { position:static; }
+.side .panel label { display:grid; grid-template-columns:1fr auto; gap:4px 8px; align-items:center; font-size:13px; margin:6px 0; }
+.side .panel label input[type=range] { grid-column:1 / -1; width:100%; }
+.side .panel select { font:inherit; font-size:13px; max-width:100%; }
+.side h2 { font-size:15px; margin:0 0 4px; }
+.tools { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.tools button { color:var(--ink); border-color:var(--ink2); }
+textarea { width:100%; height:120px; font:12px/1.4 ui-monospace,Consolas,monospace; margin-top:8px; }
+.fx-name { font-weight:600; }
+</style>
+</head>
+<body>
+<!--nav--><style>
+.nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
+.nl-nav{font:15px/1.4 Sarabun,"Noto Sans Thai",system-ui,sans-serif;text-align:left}
+.nl-nav a{text-decoration:none;color:inherit}
+.nl-in{max-width:1040px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
+.nl-top{background:#1F2430;color:#F4EFE3}
+.nl-top>.nl-in{min-height:52px;flex-wrap:wrap;column-gap:12px}
+.nl-brand{font-weight:700;margin-right:auto;padding:12px 0}
+.nl-swap{border:1px solid #6B7080;padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
+.nl-swap:hover{opacity:1;color:#fff}
+.nl-dev .nl-top{background:#2F3833}
+.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:#8A6A2E;color:#F4EFE3;vertical-align:2px}
+.nl-tabs{background:#F3EEE2;color:#1F2430;border-bottom:1px solid #D8D0C0}
+.nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
+.nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-tabs a[aria-current]{border-bottom-color:#A23B2C;font-weight:600}
+@media (max-width:640px){
+.nl-top>.nl-in{padding:0}
+.nl-brand{padding:12px 16px}
+.nl-swap{margin-right:16px}
+}
+</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../../dev/index.html">สารบัญ</a><a href="../../dev/spec.html">ภาคผนวกสเปก</a><a href="../../dev/plan.html">สเปก/แผน</a><a href="../../dev/maps/continent.html">แผนที่</a><a href="../../dev/ui-redo/tweak.html" aria-current="page">ต้นแบบ UI</a><a href="../../dev/archive/index.html">คลังเก่า</a></div></div></div><!--/nav-->
+<div class="bar">
+  <h1>เอฟเฟกต์ได้ฉายา · หายาก vs ตำนาน ต้องแยกออกจากภาพนิ่ง · ยังไม่ลงเกม</h1>
+  <button id="play" type="button">▶ เล่น</button>
+  <button id="last" type="button">เฟรมสุดท้าย</button>
+  <label>หยุดที่ <input id="t" type="range" min="0" max="100" value="100"> <output id="tOut">100%</output></label>
+  <label><input id="gray" type="checkbox"> ขาวดำ (เช็กว่ารูปทรงต่างกันโดยไม่พึ่งสี)</label>
+  <button id="w1280" type="button" class="on">1280</button>
+  <button id="w390" type="button">390</button>
+</div>
+<main id="main">
+<p class="intro">แต่ละแบบวางคู่ หายาก | ตำนาน ด้วยฉายาจริงจากเกม · ลากแถบ "หยุดที่" เพื่อดูทีละจังหวะ (0–100% ของเวลาแต่ละระดับ) · กด "เฟรมสุดท้าย" เพื่อดูภาพนิ่งที่ค้างจอ · ติ๊ก "เลือกแบบนี้" แล้วปรับค่าทางขวา และคัดลอก JSON ส่งกลับ</p>
+<div class="layout">
+  <div id="designs"></div>
+  <div class="side">
+    <div class="panel">
+      <h2>ปรับค่า</h2>
+      <label>ฉายาหายาก <select id="rareName"></select></label>
+      <label>ฉายาตำนาน <select id="legName"></select></label>
+      <label>สีหายาก <input id="rareCol" type="color"></label>
+      <label>สีตำนาน <input id="legCol" type="color"></label>
+      <label>ตัวหนังสือบนพื้นทองของตำนาน <input id="legInk" type="color"></label>
+      <label>เส้นกรอบ <output data-for="frameW"></output><input id="frameW" type="range" min="0.6" max="3.2" step="0.1"></label>
+      <label>รัศมี/แสงรอบตำนาน <output data-for="glow"></output><input id="glow" type="range" min="0" max="80" step="1"></label>
+      <label>ตัวอักษร <select id="font"><option>Pridi</option><option>Noto Sans Thai</option><option>Sarabun</option><option>Srisakdi</option></select></label>
+      <label>ขนาดตัวอักษร <output data-for="fs"></output><input id="fs" type="range" min="13" max="24" step="1"></label>
+      <label>เวลาหายาก (ms) <output data-for="durRare"></output><input id="durRare" type="range" min="400" max="2000" step="50"></label>
+      <label>เวลาตำนาน (ms) <output data-for="durLeg"></output><input id="durLeg" type="range" min="600" max="3000" step="50"></label>
+      <div class="tools"><button id="copy" type="button">คัดลอก JSON</button><button id="reset" type="button">ค่าเริ่ม</button></div>
+      <textarea id="json" readonly aria-label="ค่าที่ตั้งไว้ (JSON)"></textarea>
+    </div>
+  </div>
+</div>
+</main>
+<script>
+// หน้าเขียนมือ ไม่ผ่าน build: ชื่อฉายาลอกจาก src/engine/titles.mjs (tier หายาก/ตำนาน) · สีชุดเดียวกับ ART_INK ของเกม
+const RARE = ['บัณฑิตคนแรกของบ้าน', 'แผลในใจที่ผ่านมาได้', 'ผู้เคยก้าวพลาด', 'ผู้แบกหนี้แทนคนอื่น', 'ผู้เดินทางคนเดียว', 'เศรษฐีเงียบ', 'ปราชญ์ชาวบ้าน', 'อายุยืนเกินคาด', 'มือสะอาดในที่สกปรก', 'ผู้เลี้ยงหลานแทนพ่อแม่', 'ผู้ไม่เคยเลือกทางมืด'];
+const LEGEND = ['ล้มแล้วลุก', 'ร้อยปีไม่สาย', 'จากศูนย์สู่เศรษฐี', 'จากไปอย่างสงบ'];
+const INK = { lacquer: '#17110D', lacquer2: '#221912', gold: '#D9B45A', gold2: '#F0D78C', cream: '#EFE3C2', bronze2: '#8A6D3B' };
+// หายาก = เงิน · ตำนาน = ทอง: โลหะคนละชนิด แยกได้ทั้งสีและความสว่าง
+const DEF = { design: 'plaque', rareName: 'ผู้เลี้ยงหลานแทนพ่อแม่', legName: 'จากศูนย์สู่เศรษฐี', rareCol: '#C9CDD3', legCol: '#D9B45A', legInk: '#17110D', frameW: 1.6, glow: 46, font: 'Pridi', fs: 17, durRare: 900, durLeg: 1400 };
+const KEY = 'next-life-title-fx-tweak-v1';
+let P = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') };
+
+const clamp = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
+const span = (t, a, b) => clamp((t - a) / (b - a));
+const out = (x) => 1 - (1 - x) ** 3;
+const back = (x) => 1 + 2.2 * (x - 1) ** 3 + 1.2 * (x - 1) ** 2;
+const NAME_W = 200;
+const sub = (leg, col) => `<text class="fx-sub" x="150" y="160" text-anchor="middle" font-size="11" fill="${col}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`;
+const nameText = (y, fill, extra = '') => `<text class="fx-name" x="150" y="${y}" text-anchor="middle" font-size="${P.fs}" fill="${fill}" style="font-family:'${P.font}',serif"${extra}></text>`;
+const shineDefs = (id, clip) => `<defs><linearGradient id="${id}s" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${INK.gold2}"/><stop offset=".55" stop-color="${P.legCol}"/><stop offset="1" stop-color="${INK.bronze2}"/></linearGradient><clipPath id="${id}c"><path d="${clip}"/></clipPath></defs>`;
+const rays = (n, r, cy = 80) => `<g class="rays" style="transform-origin:150px ${cy}px">${Array.from({ length: n }, (_, i) => { const a = (i * 2 * Math.PI) / n; return `<path d="M150 ${cy}L${150 + r * Math.cos(a - 0.07)} ${cy + r * Math.sin(a - 0.07)}L${150 + r * Math.cos(a + 0.07)} ${cy + r * Math.sin(a + 0.07)}z" fill="${INK.gold2}"/>`; }).join('')}</g>`;
+const curl = (x, y, sx, sy, col, w) => `<path d="M${x} ${y}q0 ${-20 * sy} ${20 * sx} ${-20 * sy}q${-10 * sx} ${5 * sy} ${-10 * sx} ${13 * sy}q0 ${7 * sy} ${7 * sx} ${7 * sy}q${5 * sx} 0 ${5 * sx} ${-5 * sy}" fill="none" stroke="${col}" stroke-width="${w}"/>`;
+let uid = 0;
+
+const DESIGNS = [
+  { id: 'plaque', title: 'แบบ 1 · ป้ายจารึก / หน้าบัน',
+    note: 'หายาก = ป้ายสี่เหลี่ยมขอบเงินบนพื้นรัก · ตำนาน = ป้ายทองมีหน้าบันจั่วโบสถ์ครอบด้านบน + ฐานบัว + รัศมีหลังป้าย · ต่างกันที่ รูปทรง (มีหลังคา/ไม่มี) · สีพื้น (รัก/ทอง) · รัศมี',
+    svg: (leg, id) => leg
+      ? `${shineDefs(id, 'M36 62h228v44h-228z')}${rays(18, 60 + P.glow)}<g class="gable"><path d="M58 62L150 22L242 62z" fill="url(#${id}g)" stroke="${INK.gold2}" stroke-width="${P.frameW}"/><path d="M84 58L150 30L216 58" fill="none" stroke="${P.legInk}" stroke-width="0.9"/><path d="M58 62q-16 0-20-14q7 5 13 2M242 62q16 0 20-14q-7 5-13 2M150 22v-10" fill="none" stroke="${P.legCol}" stroke-width="${P.frameW}"/><path d="M150 4l4 6l-4 6l-4-6z" fill="${INK.gold2}"/></g><g class="body" style="transform-origin:150px 84px"><path d="M36 62h228v44h-228z" fill="url(#${id}g)" stroke="${INK.gold2}" stroke-width="${P.frameW}"/><path d="M41 67h218v34h-218z" fill="none" stroke="${P.legInk}" stroke-width="0.8"/>${nameText(90, P.legInk)}<rect class="shine" x="-60" y="62" width="60" height="44" fill="url(#${id}s)" clip-path="url(#${id}c)"/></g><path class="base" d="M30 106h240l-10 8h-220z" fill="${INK.bronze2}" stroke="${P.legCol}" stroke-width="0.8"/>${sub(true, INK.gold2)}`
+      : `${shineDefs(id, 'M36 62h228v44h-228z')}<g class="body" style="transform-origin:150px 84px"><rect x="36" y="62" width="228" height="44" rx="6" fill="${INK.lacquer2}" stroke="${P.rareCol}" stroke-width="${P.frameW}"/><path d="M24 84l7-7l7 7l-7 7zM262 84l7-7l7 7l-7 7z" fill="${P.rareCol}"/>${nameText(90, INK.cream)}<rect class="shine" x="-60" y="62" width="60" height="44" fill="url(#${id}s)" clip-path="url(#${id}c)"/></g>${sub(false, P.rareCol)}`,
+    frame: (q, t, leg) => {
+      const u = span(t, 0, leg ? 0.3 : 0.4);
+      q('.body').style.transform = `scale(${0.8 + 0.2 * back(u)})`;
+      q('.body').style.opacity = span(t, 0, 0.1);
+      q('.fx-name').style.opacity = span(t, 0.2, 0.45);
+      q('.fx-sub').style.opacity = span(t, 0.5, 0.75);
+      q('.shine').setAttribute('x', -60 + 380 * span(t, 0.5, 0.9));
+      if (!leg) return;
+      const g = span(t, 0.3, 0.55);
+      q('.gable').style.transform = `translateY(${-26 * (1 - out(g))}px)`;
+      q('.gable').style.opacity = g;
+      q('.base').style.opacity = span(t, 0.25, 0.45);
+      q('.rays').style.opacity = 0.32 * out(span(t, 0.4, 0.8));
+      q('.rays').style.transform = `rotate(${20 * t}deg) scale(${0.7 + 0.3 * out(span(t, 0.4, 0.85))})`;
+    } },
+  { id: 'medal', title: 'แบบ 2 · ตราเหรียญ / ดอกบัวบาน',
+    note: 'หายาก = เหรียญกลมขอบเงิน ดาวดวงเดียว ชื่อใต้เหรียญขีดเส้นเดียว · ตำนาน = เหรียญทองล้อมกลีบบัว 12 กลีบ ดาว 3 ดวง วงจุดทองรอบนอก ชื่อสีทองขีดสองเส้น · ต่างกันที่ รูปทรง (กลม/บัวบาน) · สี · จำนวนดาว',
+    svg: (leg, id) => {
+      const star = (x, y, r, f) => `<path d="M${x} ${y - r}L${x + r * 0.3} ${y - r * 0.3}L${x + r} ${y}L${x + r * 0.3} ${y + r * 0.3}L${x} ${y + r}L${x - r * 0.3} ${y + r * 0.3}L${x - r} ${y}L${x - r * 0.3} ${y - r * 0.3}z" fill="${f}"/>`;
+      if (!leg) return `${shineDefs(id, 'M150 18a30 30 0 1 0 0.01 0z')}<g class="medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="30" fill="${INK.lacquer2}" stroke="${P.rareCol}" stroke-width="${P.frameW}"/>${star(150, 48, 13, P.rareCol)}</g>${nameText(110, INK.cream)}<path class="line" d="M70 120h160" stroke="${P.rareCol}" stroke-width="${P.frameW}" pathLength="100" stroke-dasharray="100"/>${sub(false, P.rareCol)}`;
+      const petals = Array.from({ length: 12 }, (_, i) => `<path class="petal" d="M150 48q-9 -22 0 -42q9 20 0 42z" transform="rotate(${i * 30} 150 48)" fill="url(#${id}g)" stroke="${INK.gold2}" stroke-width="0.6"/>`).join('');
+      const R = 30 + P.glow * 0.5;
+      const dots = Array.from({ length: 16 }, (_, i) => `<circle class="dot" cx="${150 + R * Math.cos(i * Math.PI / 8)}" cy="${48 + R * Math.sin(i * Math.PI / 8)}" r="1.8" fill="${INK.gold2}"/>`).join('');
+      return `${shineDefs(id, 'M150 22a26 26 0 1 0 0.01 0z')}<g class="dots">${dots}</g><g class="petals">${petals}</g><g class="medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="26" fill="url(#${id}g)" stroke="${INK.gold2}" stroke-width="${P.frameW}"/><circle cx="150" cy="48" r="21" fill="none" stroke="${P.legInk}" stroke-width="0.8"/>${star(150, 42, 9, P.legInk)}${star(139, 56, 5, P.legInk)}${star(161, 56, 5, P.legInk)}</g>${nameText(110, INK.gold2)}<path class="line" d="M70 119h160M90 124h120" stroke="${P.legCol}" stroke-width="${P.frameW}" pathLength="100" stroke-dasharray="100"/>${sub(true, INK.gold2)}`;
+    },
+    frame: (q, t, leg, qa) => {
+      const m = span(t, 0, 0.3);
+      q('.medal').style.transform = `scale(${1.7 - 0.7 * out(m)})`;
+      q('.medal').style.opacity = span(t, 0, 0.12);
+      q('.fx-name').style.opacity = span(t, 0.3, 0.55);
+      q('.line').style.strokeDashoffset = 100 * (1 - out(span(t, 0.4, 0.7)));
+      q('.fx-sub').style.opacity = span(t, 0.55, 0.8);
+      if (!leg) return;
+      qa('.petal').forEach((p, i) => { p.style.opacity = span(t, 0.25 + i * 0.025, 0.35 + i * 0.025); });
+      qa('.dot').forEach((d, i) => { d.style.opacity = span(t, 0.6 + i * 0.012, 0.66 + i * 0.012); });
+    } },
+  { id: 'frame', title: 'แบบ 3 · กรอบมุมกนก',
+    note: 'หายาก = มุมฉากเงินแค่ 4 มุม ตรงกลางโปร่ง · ตำนาน = กรอบทองเต็มรอบสองเส้น + กนกม้วนทั้ง 4 มุม + ข้าวหลามตัดบน/ล่าง + แสงฟุ้งรอบกรอบ · ต่างกันที่ กรอบ (มุม/เต็มรอบ) · ลวดลาย · สี · แสง',
+    svg: (leg, id) => {
+      if (!leg) {
+        const w = P.frameW;
+        return `<rect class="band" x="36" y="58" width="228" height="48" fill="${INK.lacquer2}" opacity=".85"/><path class="corners" d="M36 74v-16h18M246 58h18v16M264 90v16h-18M54 106h-18v-16" fill="none" stroke="${P.rareCol}" stroke-width="${w + 0.4}" pathLength="100" stroke-dasharray="100"/>${nameText(88, INK.cream)}${sub(false, P.rareCol)}`;
+      }
+      const w = P.frameW;
+      return `<rect class="glow" x="36" y="58" width="228" height="48" fill="none" stroke="${INK.gold2}" stroke-width="${2 + P.glow * 0.3}" opacity=".22" style="filter:blur(${2 + P.glow * 0.08}px)"/><rect class="band" x="36" y="58" width="228" height="48" fill="${INK.lacquer2}"/><path class="outline" d="M36 58h228v48h-228z M41 63h218v38h-218z" fill="none" stroke="${P.legCol}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/><g class="curls">${curl(28, 56, 1, 1, P.legCol, w)}${curl(272, 56, -1, 1, P.legCol, w)}${curl(28, 108, 1, -1, P.legCol, w)}${curl(272, 108, -1, -1, P.legCol, w)}</g><path class="crest" d="M150 44l10 14l-10 6l-10-6zM150 120l10-14l-10-6l-10 6z" fill="${INK.gold2}" stroke="${P.legCol}" stroke-width="0.8"/>${nameText(88, INK.gold2)}${sub(true, INK.gold2)}`;
+    },
+    frame: (q, t, leg) => {
+      q('.band').style.opacity = 0.85 * span(t, 0, 0.15);
+      q('.fx-name').style.opacity = span(t, 0.25, 0.5);
+      q('.fx-sub').style.opacity = span(t, 0.5, 0.75);
+      if (!leg) { q('.corners').style.strokeDashoffset = 100 * (1 - out(span(t, 0, 0.45))); return; }
+      q('.band').style.opacity = span(t, 0, 0.15);
+      q('.outline').style.strokeDashoffset = 100 * (1 - out(span(t, 0, 0.45)));
+      q('.curls').style.opacity = span(t, 0.35, 0.6);
+      q('.crest').style.opacity = span(t, 0.5, 0.7);
+      q('.glow').style.opacity = 0.22 * out(span(t, 0.55, 0.9));
+    } },
+  { id: 'A', ref: true, title: 'อ้างอิง · แบบ A ที่ลงเกมแล้ว (แถบผ้าคลี่) — เจ้าของบอกไม่ผ่าน',
+    note: 'ลอกจาก titleA ใน src/ui/app.mjs ค่าตายตัว ไม่รับค่าที่ปรับทางขวา · ภาพนิ่งหายากกับตำนานต่างกันแค่เส้นกรอบในกับสีตัวหนังสือ',
+    svg: (leg, id) => `${shineDefs(id, 'M40 58h220v44h-220z')}${leg ? `<g class="rays" style="transform-origin:150px 80px">${Array.from({ length: 16 }, (_, i) => `<path d="M150 80L${150 + 140 * Math.cos(i * Math.PI / 8 - 0.06)} ${80 + 140 * Math.sin(i * Math.PI / 8 - 0.06)}L${150 + 140 * Math.cos(i * Math.PI / 8 + 0.06)} ${80 + 140 * Math.sin(i * Math.PI / 8 + 0.06)}z" fill="${INK.gold2}"/>`).join('')}</g>` : ''}<g class="body" style="transform-origin:150px 80px"><path d="M40 66h-26l10 14l-10 14h26z" fill="${INK.bronze2}"/><path d="M260 66h26l-10 14l10 14h-26z" fill="${INK.bronze2}"/><path d="M40 58h220v44h-220z" fill="${INK.lacquer2}" stroke="${INK.gold}" stroke-width="${leg ? 2 : 1.4}"/>${leg ? `<path d="M45 63h210v34h-210z" fill="none" stroke="${INK.gold2}" stroke-width="0.8"/>` : ''}<text class="fx-name" x="150" y="${leg ? 87 : 86}" text-anchor="middle" font-size="${leg ? 19 : 17}" fill="${leg ? INK.gold2 : INK.cream}" style="font-family:Pridi,serif"></text><rect class="shine" x="-60" y="58" width="60" height="44" fill="url(#${id}s)" clip-path="url(#${id}c)"/></g><text class="fx-sub" x="150" y="128" text-anchor="middle" font-size="11" fill="${INK.gold}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`,
+    frame: (q, t, leg) => {
+      const u = leg ? span(t, 0, 0.3) : span(t, 0, 0.4);
+      q('.body').style.transform = `scaleX(${back(u)})`;
+      q('.body').style.opacity = span(t, 0, 0.08);
+      q('.fx-name').style.opacity = span(t, 0.25, 0.5);
+      q('.fx-sub').style.opacity = span(t, 0.45, 0.7);
+      q('.shine').setAttribute('x', -60 + 380 * span(t, 0.45, 0.85));
+      if (leg) {
+        q('.rays').style.opacity = 0.35 * out(span(t, 0.2, 0.6));
+        q('.rays').style.transform = `rotate(${24 * t}deg) scale(${0.6 + 0.4 * out(span(t, 0.2, 0.7))})`;
+      }
+    } },
+];
+
+const $ = (s) => document.querySelector(s);
+const stages = [];
+function build() {
+  const box = $('#designs');
+  box.innerHTML = '';
+  stages.length = 0;
+  for (const d of DESIGNS) {
+    const panel = document.createElement('section');
+    panel.className = `panel${d.ref ? ' ref' : ''}`;
+    panel.innerHTML = `<div class="h"><b>${d.title}</b>${d.ref ? '' : `<label><input type="radio" name="pick" value="${d.id}"${P.design === d.id ? ' checked' : ''}> เลือกแบบนี้</label>`}</div><p class="note">${d.note}</p><div class="pair"></div>`;
+    // ต่อเข้าหน้าก่อน วัดความยาวชื่อได้เฉพาะ SVG ที่อยู่ใน DOM
+    box.append(panel);
+    for (const leg of [false, true]) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.innerHTML = `<small>${leg ? 'ตำนาน' : 'หายาก'}</small><div class="stage" data-design="${d.id}" data-tier="${leg ? 'legend' : 'rare'}"><div class="fake"><i></i><i></i><i></i></div><div class="veil"></div></div>`;
+      const stage = cell.querySelector('.stage');
+      stage.insertAdjacentHTML('beforeend', `<svg viewBox="0 0 300 170" aria-hidden="true">${d.svg(leg, `t${++uid}`)}</svg>`);
+      panel.querySelector('.pair').append(cell);
+      const q = (s) => stage.querySelector(s);
+      const name = q('.fx-name');
+      name.textContent = leg ? P.legName : P.rareName;
+      // ชื่อยาวเกินกรอบ ⇒ บีบให้พอดี เหมือนในเกม
+      if (name.getComputedTextLength() > NAME_W) { name.setAttribute('textLength', NAME_W); name.setAttribute('lengthAdjust', 'spacingAndGlyphs'); }
+      stages.push({ d, leg, q, qa: (s) => stage.querySelectorAll(s), veil: q('.veil') });
+    }
+  }
+  box.querySelectorAll('input[name=pick]').forEach((r) => r.addEventListener('change', () => { P.design = r.value; save(); }));
+  draw(+$('#t').value / 100);
+}
+function drawOne(s, t) {
+  s.veil.style.opacity = 0.6 * out(span(t, 0, 0.2));
+  s.d.frame(s.q, t, s.leg, s.qa);
+}
+function draw(t) { for (const s of stages) drawOne(s, t); }
+
+let raf = 0;
+function play() {
+  cancelAnimationFrame(raf);
+  const t0 = performance.now();
+  const step = (now) => {
+    const ms = now - t0;
+    let done = true;
+    for (const s of stages) {
+      const dur = s.d.ref ? (s.leg ? 1400 : 900) : s.leg ? P.durLeg : P.durRare;
+      const t = clamp(ms / dur);
+      if (t < 1) done = false;
+      drawOne(s, t);
+    }
+    if (!done) raf = requestAnimationFrame(step);
+    else setT(100);
+  };
+  raf = requestAnimationFrame(step);
+}
+function setT(v) { $('#t').value = v; $('#tOut').textContent = `${v}%`; }
+
+function save() {
+  localStorage.setItem(KEY, JSON.stringify(P));
+  $('#json').value = JSON.stringify(P);
+}
+function syncInputs() {
+  for (const k of Object.keys(DEF)) {
+    const i = document.getElementById(k);
+    if (i) i.value = P[k];
+    const o = document.querySelector(`output[data-for="${k}"]`);
+    if (o) o.textContent = P[k];
+  }
+}
+$('#rareName').innerHTML = RARE.map((n) => `<option>${n}</option>`).join('');
+$('#legName').innerHTML = LEGEND.map((n) => `<option>${n}</option>`).join('');
+for (const k of Object.keys(DEF)) {
+  const i = document.getElementById(k);
+  if (!i) continue;
+  i.addEventListener('input', () => {
+    P[k] = i.type === 'range' ? Number(i.value) : i.value;
+    const o = document.querySelector(`output[data-for="${k}"]`);
+    if (o) o.textContent = P[k];
+    save();
+    build();
+  });
+}
+$('#t').addEventListener('input', () => { cancelAnimationFrame(raf); setT($('#t').value); draw(+$('#t').value / 100); });
+$('#play').addEventListener('click', () => { setT(0); play(); });
+$('#last').addEventListener('click', () => { cancelAnimationFrame(raf); setT(100); draw(1); });
+$('#gray').addEventListener('change', () => document.body.classList.toggle('gray', $('#gray').checked));
+for (const w of ['390', '1280']) {
+  $(`#w${w}`).addEventListener('click', () => {
+    $('#main').classList.toggle('w390', w === '390');
+    $('#w390').classList.toggle('on', w === '390');
+    $('#w1280').classList.toggle('on', w === '1280');
+  });
+}
+$('#copy').addEventListener('click', async () => {
+  const txt = JSON.stringify(P);
+  $('#json').value = txt;
+  try { await navigator.clipboard.writeText(txt); $('#copy').textContent = 'คัดลอกแล้ว'; } catch { $('#json').select(); $('#copy').textContent = 'กด Ctrl+C'; }
+  setTimeout(() => { $('#copy').textContent = 'คัดลอก JSON'; }, 1500);
+});
+$('#reset').addEventListener('click', () => { P = { ...DEF }; syncInputs(); save(); build(); });
+syncInputs();
+save();
+build();
+</script>
+</body>
+</html>
