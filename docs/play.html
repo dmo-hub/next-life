@@ -70,6 +70,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .grow .av { width:56px; height:56px; }
 /* แผ่นภาพยุค: รักดำ+ทองทุกธีม (สีอยู่ในตัวภาพ) — ธีมสว่างจึงเป็นแผ่นเข้มบนพื้นขาวเหมือนกรอบภาพ */
 .era-art { display:block; width:100%; height:auto; aspect-ratio:5 / 2; }
+/* ภาพฉากบนการ์ดแรกเกิด/การ์ดตาย: เล็กพอให้ปุ่มไปต่ออยู่จอแรก */
+.era-art.scene-sm { width:min(100%, 150px); margin:0 auto 6px; }
 .same { margin-left:8px; padding:1px 6px; border:1px solid currentColor; border-radius:var(--rc); font:400 11px/1.4 var(--ft); white-space:nowrap; opacity:0.85; vertical-align:2px; }
 .bar { position:relative; height:6px; }
 .bar i { position:absolute; left:0; top:0; display:block; height:6px; }
@@ -8841,6 +8843,38 @@ function eraPicArt(id, slot) {
   return pic ? [...ERA_FRAME, ...pic[3]] : null;
 }
 
+// ภาพฉากสำคัญของชีวิต (ui-redo 31): เกิด · แต่ง · มีลูก · เกษียณ · ตาย — กรอบ สี และขนาดเดียวกับภาพยุค · ฉากละ 1–3 ภาพ
+// [ป้ายบรรยายภาพ, รูปทรง] · ผู้เรียกเลือกฉากจากการ์ด (app.mjs SCENE_OF) — ไฟล์นี้ไม่รู้จัก id การ์ด
+const artCradle = (x, y) => [artLine(`M${x} ${y}q22 16 44 0`, { w: 1.6 }), artFill(artCirc(x + 22, y + 4, 4), ART_INK.cream), artLine(`M${x + 14} ${y + 6}q8 6 16 0`, { stroke: ART_INK.bronze2, w: 1 })];
+const artCrib = (x, y, w = 50) => [
+  artLine(`M${x} ${y}h${w}M${x} ${y + 18}h${w}M${x} ${y - 4}v28M${x + w} ${y - 4}v28`, { w: 1.4 }),
+  artLine(Array.from({ length: Math.floor(w / 8) - 1 }, (_, i) => `M${x + 8 * (i + 1)} ${y}v18`).join(''), { w: 0.8 }),
+  artFill(artCirc(x + w / 2, y + 8, 4), ART_INK.cream),
+];
+const artStar = (x, y) => artLine(`M${x} ${y - 3}v6M${x - 3} ${y}h6`, { stroke: ART_INK.cream, w: 1 });
+const artGift = (x, y) => [artBox(x, y, 14, 12), artLine(`M${x + 3} ${y}q4-5 4 0q0-5 4 0`, { w: 1 })];
+const artRing = (x, y) => [artLine(artCirc(x, y, 6), { w: 1.6 }), artFill(`M${x - 3} ${y - 6}l3-5l3 5z`, ART_INK.cream)];
+const artCandle = (x) => [artLine(`M${x} 66V40h6v26`, { w: 1.2 }), artFlame(x + 3, 30)];
+const artLotus = (x, y) => [artFill(`M${x} ${y}q-6-10 0-18q6 8 0 18z`), artFill(`M${x} ${y}q-12-4-14-12q10 0 14 12z`, ART_INK.bronze2), artFill(`M${x} ${y}q12-4 14-12q-10 0-14 12z`, ART_INK.bronze2)];
+const ART_SCENES = {
+  birth_poor: ['บ้านใต้ถุนสูง เปลผ้าแขวนรอบเด็กแรกเกิด', [ART_GROUND, artStilt(28), artLine('M100 18h60M108 18v20M152 18v20', { w: 1.2 }), ...artCradle(108, 38), artLine('M162 66V20', { stroke: ART_INK.bronze2, w: 2 }), artStar(76, 18), artStar(180, 30)]],
+  birth_mid: ['บ้านในเมือง เตียงเด็กข้างหน้าต่าง', [ART_GROUND, artHouse(28, 66, 1.6), ...artCrib(104, 40), artLine('M129 14v10M119 24h20M121 24v6M137 24v6', { stroke: ART_INK.cream, w: 1 }), artStar(172, 22)]],
+  birth_rich: ['เตียงเด็กมีมุ้งครอบ กล่องของขวัญรอบห้อง', [ART_GROUND, artLine('M96 22q34-16 68 0v40M96 22v40', { stroke: ART_INK.cream, w: 1 }), ...artCrib(104, 38), ...artGift(40, 54), ...artGift(58, 54), ...artGift(49, 42), artLine('M176 66V36M170 40q6-10 12 0', { w: 1.2 }), artFlame(176, 26)]],
+  wed_ask: ['ขอแต่งงานข้างเตาหมูกระทะ', [ART_GROUND, artLine('M60 54h80M68 54v12M132 54v12', { w: 1.2 }), artLine('M84 54q16-16 32 0M80 54h40', { w: 1.6 }), artLine('M92 40q2-6 0-10M100 38q2-6 0-10M108 40q2-6 0-10', { stroke: ART_INK.cream, w: 1 }), ...artPerson(44, 66, 1.4), ...artPerson(156, 66, 1.4), ...artRing(100, 20)]],
+  wed_rite: ['รดน้ำสังข์ มงคลแฝดคล้องคู่บ่าวสาว', [ART_GROUND, ...artPerson(80, 66, 1.6), ...artPerson(120, 66, 1.6), artLine('M70 30q10-10 20 0M110 30q10-10 20 0M90 26q10-6 20 0', { stroke: ART_INK.cream, w: 1.2 }), artLine('M150 30q10-6 18 0l-4 6h-10z', { w: 1.2 }), artLine('M150 36q-4 6-8 8', { stroke: ART_INK.cream, w: 1, }), ...artLotus(40, 64), ...artLotus(166, 64)]],
+  baby_news: ['ที่ตรวจขึ้นสองขีด', [artLine('M64 46h72v12h-72zM82 46v12M90 46v12', { w: 1.6 }), artLine('M110 49h14v6h-14z', { stroke: ART_INK.bronze2, w: 1 }), artFill('M100 30c-4-6-12-2-8 4l8 8l8-8c4-6-4-10-8-4z'), artStar(62, 26), artStar(140, 24)]],
+  baby_home: ['บ้านหลังแรก รถเข็นเด็กหน้าบ้าน', [ART_GROUND, artHouse(36, 66, 1.8), artLine('M128 50h30q0 10-10 10h-14zM128 50q-2-10 8-14', { w: 1.4 }), artWheel(134, 63, 3), artWheel(152, 63, 3), artLine('M158 50l8-8', { w: 1.4 }), artStar(110, 20)]],
+  retire_home: ['เปลญวนใต้ต้นไม้ แดดเย็นวันเกษียณ', [ART_GROUND, ...artPalm(40, 66), artLine('M48 40q40 22 80 0', { w: 1.6 }), artLine('M128 40l8-14M128 40v26', { stroke: ART_INK.bronze2, w: 2 }), artLine(artCirc(160, 30, 9), { stroke: ART_INK.cream, w: 1.2 }), artLine('M146 46h28M150 52h20', { stroke: ART_INK.cream, w: 1 })]],
+  retire_early: ['ถือกล่องของออกจากที่ทำงาน', [ART_GROUND, artLine('M120 66V18h48v48M128 26h8v8h-8zM144 26h8v8h-8zM128 42h8v8h-8zM144 42h8v8h-8zM138 66v-10h12v10', { w: 1.2 }), ...artPerson(70, 66, 1.6), artBox(76, 42, 16, 10), artLine('M30 30q10-8 20 0', { stroke: ART_INK.cream, w: 1 })]],
+  death: ['เทียนคู่ ธูป และดอกบัว', [ART_GROUND, ...artCandle(64), ...artCandle(130), artLine('M100 66V52M96 52h8', { w: 1.2 }), artLine('M97 52l-3-22M100 52v-24M103 52l3-22', { stroke: ART_INK.bronze2, w: 1 }), artFill(artCirc(94, 30, 1.2), ART_INK.cream), artFill(artCirc(100, 28, 1.2), ART_INK.cream), artFill(artCirc(106, 30, 1.2), ART_INK.cream), ...artLotus(40, 64), ...artLotus(160, 64)]],
+  gone: ['ทางที่ไม่มีใครเห็นปลาย โคมแขวนรอ', [artLine('M30 66l60-40M170 66l-60-40', { stroke: ART_INK.bronze2, w: 1 }), artLine('M88 28h24', { stroke: ART_INK.bronze2, w: 0.8 }), artLine('M150 66V22h14', { w: 1.4 }), artLine('M160 22v6M154 28h12v12h-12z', { w: 1.2 }), artFlame(160, 30), artLine('M92 60l2-4M100 52l2-4M106 44l2-4', { stroke: ART_INK.cream, w: 1 })]],
+};
+const ART_SCENE_IDS = Object.keys(ART_SCENES);
+function sceneArt(id) {
+  const s = ART_SCENES[id];
+  return s ? { label: s[0], parts: [...ERA_FRAME, ...s[1]] } : null;
+}
+
 // ฐานะ 10 ระดับของ standingOf → จน/กลาง/รวย ตามชื่อระดับ (ยากไร้–ค่อนข้างจน · ชนชั้นกลางล่าง–กลางบน · มีอันจะกิน–มั่งคั่ง)
 const artTier = (level) => (level <= 3 ? 0 : level <= 6 ? 1 : 2);
 
@@ -10273,6 +10307,18 @@ const ERA_EVENTS = CONTENT.era.events;
 useIsekaiCards(CONTENT.isekai);
 // การ์ดรับมือที่รวมข่าวบ้านเมือง (B58) ไม่มีการ์ดบ้านเมืองแยก — หาเหตุการณ์จากการ์ดเนื้อหาที่ผูกไว้
 const ERA_OF = new Map(CONTENT.events.filter((c) => c.era).map((c) => [c.id, c.era]));
+// ภาพฉากสำคัญ (ui-redo 31): การ์ดจริงที่ผูกภาพ — แต่งงาน = การ์ดที่ตั้งธง married · มีลูก = การ์ดที่ตั้งธง has_kids · เกษียณ = การ์ดอายุ 60 + โครงการเกษียณก่อนกำหนด
+// แรกเกิดเลือกตามฐานะบ้าน (ชุดเดียวกับรูปตัวละคร) · การ์ดตาย/หายตัวผูกในหน้าการ์ดตาย · การ์ดอื่นไม่มีภาพ หน้าตาเดิม
+const SCENE_OF = new Map([['young_wedding_01', 'wed_ask'], ['remarry_wedding_work_01', 'wed_rite'], ['remarry_wedding_mid_01', 'wed_rite'], ['remarry_wedding_old_01', 'wed_rite'], ['young_baby_01', 'baby_news'], ['work_house_01', 'baby_home'], ['retirement', 'retire_home'], ['early_retire', 'retire_early']]);
+const BIRTH_SCENE = ['birth_poor', 'birth_mid', 'birth_rich'];
+// ภาพเล็ก (sm) บนการ์ดแรกเกิด/การ์ดตาย: ปุ่มไปต่อยังอยู่จอแรก 390 · data-scene ให้ด่านจอหาเจอ
+function sceneSvg(id, sm) {
+  const s = sceneArt(id);
+  if (!s) return null;
+  const svg = artSvg(`era-art scene-art${sm ? ' scene-sm' : ''}`, ERA_ART_W, ERA_ART_H, s.parts);
+  svg.dataset.scene = id;
+  return svg;
+}
 const eraName = (id) => ERA_EVENTS.find((e) => e.id === id)?.name ?? id;
 function memoRead() {
   try {
@@ -11262,6 +11308,8 @@ function render(card) {
     top.append(el('b', null, gone ? LOST.head : 'ด้วยรักและอาลัย'));
     box.append(top);
     // หนังสืองานศพบอกอายุ ไม่บอกปี พ.ศ. — ปีเกมไม่ขึ้นจอ (B14 ข้อ 12)
+    const scene = sceneSvg(gone ? 'gone' : 'death', true);
+    if (scene) body.append(scene);
     body.append(portrait(card.age), el('h3', null, fullName()), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
     const why = causeOf(card.cause, card.age);
     if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
@@ -11322,6 +11370,10 @@ function render(card) {
     // ภาพยุค (B56): การ์ดบ้านเมือง + การ์ดรับมือที่ผูกยุคไว้ (B58) ได้ภาพของยุคนั้น · ยุคที่ไม่มีภาพ = หน้าตาเดิม
     const eraPic = eraArt(card.kind === 'era' ? card.id : card.kind === 'event' ? ERA_OF.get(card.id) : null);
     if (eraPic) body.append(artSvg('era-art', ERA_ART_W, ERA_ART_H, eraPic));
+    else {
+      const scene = card.kind === 'intro' ? sceneSvg(BIRTH_SCENE[artTier(standingOf(st))], true) : SCENE_OF.has(card.id) && sceneSvg(SCENE_OF.get(card.id), false);
+      if (scene) body.append(scene);
+    }
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
     body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));
     if (card.news?.story) body.append(el('p', 'news', card.news.story));

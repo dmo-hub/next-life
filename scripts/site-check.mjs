@@ -18,6 +18,7 @@ import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS } from '../src/site/nav.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
+import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -305,6 +306,18 @@ const cutLog = releaseLog(wnEmptied);
 const notesCtl = !!topV && cutLog[0]?.v !== topV && !notesIn(play, cutLog);
 if (topV !== ver.version) console.log(`  ⚠ ${ver.version} ไม่มีข้อในแพตช์โน้ต — แผ่นแจ้งอัปเดตใช้ ${topV ?? '(ไม่มีรุ่นไหนมีโน้ต)'} (เตือน ไม่ตก)`);
 check('แจ้งอัปเดตในเกม: เกมฝังรุ่นที่มีโน้ตชุดเดียวกับแพตช์โน้ต ข้อความล้วนไม่เกินเพดาน', !notesLog.length || !notesIn(play, notesLog) || notesDirty.length || !notesCtl, ` ${notesLog.length} รุ่น · ล่าสุด ${topV} ${notesLog[0]?.items.length ?? 0} ข้อ${notesIn(play, notesLog) ? '' : ' · play.html ไม่ได้ build จากแพตช์โน้ตนี้'}${notesDirty.length ? ` · ข้อความไม่สะอาด ${notesDirty.length}: ${notesDirty[0].slice(0, 60)}` : ''} · ตัวควบคุม${notesCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 9a2) ภาพฉากสำคัญ (ui-redo 31): ทุกชิ้นของทุกฉากเป็น path จริง (ลืม ... กับตัวช่วยที่คืนหลายชิ้น = ชิ้นนั้นหายจากภาพเงียบ ๆ) · การ์ดที่ผูกใน SCENE_OF มีอยู่จริง · ฉากที่ผูกมีภาพ
+// ตัวควบคุม: id การ์ดปลอม 1 ตัว · ชิ้นภาพซ้อน array 1 ชิ้น ⇒ ต้องถูกจับ
+const sceneMap = [...(appSrc.match(/const SCENE_OF = new Map\(\[([\s\S]*?)\]\);/)?.[1] ?? '').matchAll(/\['([\w-]+)', '([\w-]+)'\]/g)].map((m) => [m[1], m[2]]);
+const sceneUsed = [...sceneMap.map(([, v]) => v), ...(appSrc.match(/const BIRTH_SCENE = \[([^\]]*)\]/)?.[1] ?? '').match(/[\w-]+/g) ?? [], ...[...appSrc.matchAll(/sceneSvg\(gone \? '([\w-]+)' : '([\w-]+)'/g)].flatMap((m) => [m[1], m[2]])];
+const ENGINE_CARDS = ['early_retire'];
+const sceneBadParts = (ids, get) => ids.filter((id) => !get(id) || get(id).parts.some((x) => !x || typeof x.d !== 'string'));
+const sceneNoCard = (pairs, evs) => pairs.filter(([id]) => !evs.has(id) && !ENGINE_CARDS.includes(id)).map(([id]) => id);
+const evIds = new Set(content.events.map((e) => e.id));
+const sceneMiss = [...sceneBadParts([...new Set(sceneUsed)], sceneArt).map((id) => `ภาพ ${id} พัง/ไม่มี`), ...sceneNoCard(sceneMap, evIds).map((id) => `ไม่มีการ์ด ${id}`)];
+const sceneCtl = sceneNoCard([...sceneMap, ['no_such_card', 'death']], evIds).includes('no_such_card') && sceneBadParts(['death'], () => ({ parts: [...sceneArt('death').parts, [sceneArt('death').parts[0]]] })).length === 1;
+check('ภาพฉากสำคัญ: ทุกชิ้นวาดได้ · การ์ดที่ผูกมีจริง', sceneMiss.length || sceneMap.length < 5 || !sceneCtl, ` ${ART_SCENE_IDS.length} ภาพ · ผูก ${sceneMap.length} การ์ด + แรกเกิด + การ์ดตาย${sceneMiss.length ? ` · ${sceneMiss.join(' | ')}` : ''} · ตัวควบคุม${sceneCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 9b) เกมเปิดออฟไลน์ได้: ฟอนต์ฝังครบทุกแบบที่หน้าใช้ ไม่ดึงจากเว็บอื่น · ตัวควบคุม: หน้าที่ยังมี <link> Google Fonts ต้องถูกจับ
 const PLAY_FACES = ['Noto Sans Thai 400', 'Noto Sans Thai 600', 'Sarabun 400', 'Sarabun 600', 'Srisakdi 700'];
