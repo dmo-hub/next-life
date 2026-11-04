@@ -34,7 +34,8 @@ function saCanvas(host, H, label) {
   host.append(cv);
   const c = cv.getContext?.('2d');
   if (!c) return null;
-  const W = Math.max(280, Math.round(cv.getBoundingClientRect().width || host.clientWidth || 340));
+  // offsetWidth ไม่โดน transform — ระหว่างการ์ดพลิก rect หดเหลือเสี้ยวเดียว
+  const W = Math.max(280, Math.round(cv.offsetWidth || host.clientWidth || 340));
   const dpr = window.devicePixelRatio || 1;
   cv.width = W * dpr;
   cv.height = H * dpr;
