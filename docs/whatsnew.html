@@ -39,7 +39,7 @@
 </style>
 </head>
 <body>
-<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">NEXT LIFE</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html" aria-current="page">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="worlds.html">ชาตินี้ · ปรโลก · ต่างโลก</a><a class="dark" href="otherworld.html">ต่างโลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="design.html">การออกแบบ</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">NEXT LIFE</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html" aria-current="page">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="worlds.html">โลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
 <header><div class="w">
   <h1>แพตช์โน้ต</h1>
   <p>การเปลี่ยนแปลงแต่ละเวอร์ชัน กติกาที่เปลี่ยน และระบบที่กำลังทำ</p>
@@ -50,7 +50,7 @@
   <p class="lead">ระบบที่ตัดสินแล้วแต่ยังไม่เข้าเกม ลำดับและรายละเอียดอาจเปลี่ยนได้</p>
   <h3 id="soon-หน้าจอและเว็บ">หน้าจอและเว็บ</h3>
   <ul>
-    <li><span class="tag soon">กำลังทำ</span><b>บันทึกชีวิต</b> ขีดฆ่าชื่อคนที่ตาย · ประวัติคู่ชีวิต · จอปรโลกโฉมใหม่</li>
+    <li><span class="tag soon">กำลังทำ</span><b>บันทึกชีวิต</b> ประวัติคู่ชีวิต · จอปรโลกโฉมใหม่</li>
   </ul>
 
   <h3 id="soon-เรียน-งาน-และการเมือง">เรียน งาน และการเมือง</h3>
@@ -136,6 +136,38 @@
 
   <h2>แพตช์โน้ต</h2>
   <p class="lead">การเปลี่ยนแปลงทีละเวอร์ชัน ใหม่สุดอยู่บน · ป้าย <span class="tag rule">กติกา</span> คือกติกาเกมที่เปลี่ยน</p>
+
+  <h3>v0.6.52 <small>4 พ.ย. 2569</small></h3>
+  <ul>
+    <li>ห้องผู้พัฒนามีหน้าต้นแบบ <b>ใบชวนไปต่างโลก</b> แบบใหม่ให้เจ้าของเลือก: หน้าตาเหมือนการ์ดเหตุการณ์ปกติ มีใบปูเรื่องก่อนถึงใบชวน 1–3 ใบ</li>
+  </ul>
+
+  <h3>v0.6.51 <small>4 พ.ย. 2569</small></h3>
+  <ul>
+    <li>ผังตระกูลบนการ์ดแรกเกิดแสดงครบทุกรุ่นตั้งแต่รุ่นแรก ไม่ย่อรุ่นต้น ๆ เป็น "…3" แล้ว</li>
+  </ul>
+
+  <h3>v0.6.50 <small>4 พ.ย. 2569</small></h3>
+  <ul>
+    <li>ห้องผู้พัฒนามีหน้าต้นแบบใหม่ 2 หน้าให้เจ้าของเลือกแบบ: เอฟเฟกต์ได้ฉายาหายากกับตำนาน (3 แบบ) และแท็บสถิติวิญญาณกับจอนิพพาน/โพธิสัตว์</li>
+  </ul>
+
+  <h3>v0.6.49 <small>4 พ.ย. 2569</small></h3>
+  <ul>
+    <li>แถบเมนูเว็บรวม "ชาตินี้ · ปรโลก · ต่างโลก" กับ "ต่างโลก" เป็นหัวเดียวชื่อ <b>โลก</b></li>
+    <li>ชั้นสมุด แท็บภาพบ้านเมือง: หัวแท็บเป็นแถบภาพย่อของภาพที่เก็บได้ บอกจำนวนและปี ภาพใหม่มีจุดเรือง</li>
+    <li>แผงครอบครัว: คนและสัตว์ที่จากไปแล้วขีดฆ่าชื่อ แถวไม่จางแล้ว</li>
+  </ul>
+
+  <h3>v0.6.48 <small>4 พ.ย. 2569</small></h3>
+  <ul>
+    <li>การ์ดใบใหม่ไม่พลิกแล้ว แต่มี <b>เส้นทองวิ่งรอบกรอบ</b> แล้วเนื้อการ์ดค่อยขึ้น · เครื่องที่ตั้งลดการเคลื่อนไหวเห็นแค่จางเข้า</li>
+  </ul>
+
+  <h3>v0.6.47 <small>4 พ.ย. 2569</small></h3>
+  <ul>
+    <li>หน้าคำตัดสินการออกแบบเกมย้ายเข้า <b>ห้องผู้พัฒนา</b> (แท็บ "คำตัดสินเกม") · แถบเมนูของผู้เล่นไม่มี "การออกแบบ" แล้ว · ลิงก์เดิมยังเปิดได้ พาไปหน้าใหม่ให้เอง</li>
+  </ul>
 
   <h3>v0.6.46 <small>4 พ.ย. 2569</small></h3>
   <ul>

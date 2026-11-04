@@ -256,6 +256,21 @@ body:has(.mnav) .foot { display:none; }
 /* ชั้นสมุด (B130): แท็บเป็นปุ่มกด (aria-pressed) ไม่ใช่ tablist — เปลี่ยนแท็บ = วาดหน้าใหม่ทั้งหน้า */
 .bk-intro { margin:0; font-size:13px; color:var(--muted); }
 .shelf-art { display:block; width:100%; border:1px solid var(--ink2); border-radius:8px; }
+/* แถบภาพย่อภาพบ้านเมือง (ui-redo ใบ 41): ช่องตัดแถวตามความกว้าง ความสูงตามเนื้อ · พื้นรักเหมือนภาพหัวแท็บอื่น */
+.pic-strip { border:1px solid var(--ink2); border-radius:8px; background:linear-gradient(var(--lacquer2), var(--lacquer)); padding:10px 8px 8px; color:var(--cream); }
+.pic-strip > .h { font-size:13px; font-weight:700; color:var(--gold2); margin:0 0 8px; }
+.pic-row { display:grid; grid-template-columns:repeat(auto-fill, minmax(64px, 1fr)); gap:6px; }
+.pic-th { display:flex; flex-direction:column; align-items:center; gap:2px; min-width:0; }
+.pic-th .pic { width:100%; aspect-ratio:5 / 4; display:grid; place-items:center; border:1.5px solid var(--gold); border-radius:3px; overflow:hidden; background:var(--lacquer2); }
+.pic-th .pic svg { width:100%; height:100%; display:block; }
+.pic-th.lock .pic { border:1px solid var(--bronze); background:#2a1f15; }
+.pic-th.lock .pic b { font-size:12px; color:var(--bronze2); }
+.pic-th.fresh .pic { box-shadow:0 0 0 2px var(--cream), 0 0 10px var(--gold2); }
+.pic-th .n { font-size:10px; color:var(--cream); }
+.pic-th.lock .n { color:#8a7a5a; }
+.pic-th .dot { display:block; width:6px; height:6px; border-radius:50%; background:var(--gold); }
+.pic-th.lock .dot { background:var(--bronze2); }
+.pic-th .yr { font-size:10px; color:var(--sand); }
 .lineage-view { display:grid; gap:6px; }
 .lineage-text summary { cursor:pointer; font-size:13px; color:var(--muted); min-height:44px; display:flex; align-items:center; }
 .bk-tabs { display:flex; flex-wrap:wrap; gap:6px; }
@@ -440,11 +455,9 @@ body:has(.mnav) .foot { display:none; }
 .itimer i { display:block; height:100%; width:0; background:#6FE3FF; }
 @keyframes itick { from { width:0; } to { width:100%; } }
 @media (prefers-reduced-motion: reduce) { .itimer i { animation:none !important; } }
-/* เอฟเฟกต์ B-fx (ตัวเล่นใน app.mjs) — พลิก: ลูกตรงของการ์ดซ่อนด้านหลัง หลังการ์ดเป็นแผ่นรักลายทองหันกลับด้าน · translateZ กันกระพริบเพราะอยู่ระนาบเดียวกับพื้นการ์ด */
-.fx-flip { position:relative; transform-style:preserve-3d; }
-.fx-flip > * { backface-visibility:hidden; -webkit-backface-visibility:hidden; }
-.fx-flip > .fx-back { position:absolute; inset:0; display:grid; place-items:center; border-radius:inherit; background:var(--lacquer2); transform:rotateY(180deg) translateZ(1px); }
-.fx-back svg { width:min(200px, 60%); height:auto; }
+/* เอฟเฟกต์ B-fx (ตัวเล่นใน app.mjs) — การ์ดใหม่: เส้นทองวาดทับขอบการ์ด ไม่รับคลิก · overflow:visible ให้เส้นครึ่งนอกขอบไม่ถูกตัด */
+.fx-trace-on { position:relative; }
+.fx-trace { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; z-index:2; }
 .fx-ov { position:fixed; inset:0; z-index:50; pointer-events:none; }
 .fx-ov.fx-out { opacity:0; transition:opacity .25s; }
 .fx-veil { position:absolute; inset:0; background:var(--lacquer); opacity:0; }

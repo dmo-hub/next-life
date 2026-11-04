@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>คำตัดสินเกม · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<meta name="description" content="คำตัดสินเกม — คำตัดสินการออกแบบของเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด ตามสำเนาใน repo">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi:wght@400;600&family=Sarabun:wght@400;600&display=swap">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
+  header { background: #1F2430; color: #F4EFE3; padding: 32px 16px 28px; }
+  .w { max-width: 900px; margin: 0 auto; }
+  h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
+  header p { margin: 0; color: #E3DDD0; }
+  header a { color: #F4EFE3; }
+  main { padding: 24px 16px 64px; }
+  h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
+  ul, ol { padding-left: 22px; margin: 0 0 8px; }
+  li { margin: 0 0 6px; }
+  p { margin: 0 0 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #E9E2D2; font-weight: 600; }
+  code { font-size: 13px; background: #E9E2D2; padding: 0 4px; }
+  a { color: #A23B2C; }
+  .spec-toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 0 0 16px; font-size: 14px; }
+  .spec-toc > div { border: 1px solid #C9BFA9; background: #FBF8F1; padding: 10px 14px; }
+  .spec-toc h3 { margin: 0 0 4px; }
+  .spec-toc li > a { line-height: 1.5; padding: 4px 0; }
+  .spec-toc li small { display: block; }
+  .spec-toc .sub a { display: block; color: #4A4F5C; padding: 4px 0; }
+  .spec-toc small { color: #4A4F5C; }
+  details.doc { border: 1px solid #C9BFA9; background: #FBF8F1; padding: 8px 14px; margin: 0 0 8px; overflow-wrap: anywhere; }
+  details.doc > summary { font-family: Pridi, serif; font-size: 17px; cursor: pointer; padding: 6px 0; min-height: 32px; }
+  details.doc h3 { font-size: 18px; }
+  details.doc h4 { font-family: Pridi, serif; font-size: 16px; margin: 14px 0 4px; }
+  details.doc h5 { font-size: 15px; margin: 12px 0 4px; }
+  .lead { font-size: 14px; color: #4A4F5C; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; color: #A23B2C; }
+  .src { font-size: 13px; color: #4A4F5C; }
+  pre { background: #1F2430; color: #F4EFE3; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
+  pre code { background: none; padding: 0; }
+  .tw { overflow-x: auto; margin: 0 0 12px; }
+  .tw th, .tw td { overflow-wrap: normal; }
+</style>
+</head>
+<body>
+<!--nav--><style>
+.nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
+.nl-nav{font:15px/1.4 Sarabun,"Noto Sans Thai",system-ui,sans-serif;text-align:left}
+.nl-nav a{text-decoration:none;color:inherit}
+.nl-in{max-width:1040px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
+.nl-top{background:#1F2430;color:#F4EFE3}
+.nl-top>.nl-in{min-height:52px;flex-wrap:wrap;column-gap:12px}
+.nl-brand{font-weight:700;margin-right:auto;padding:12px 0}
+.nl-main{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.nl-main a{padding:13px 8px 11px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-main a[aria-current]{border-bottom-color:#D6A64A;font-weight:600}
+.nl-swap{border:1px solid #6B7080;padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
+.nl-swap:hover,.nl-main a:hover{opacity:1;color:#fff}
+.nl-dev .nl-top{background:#2F3833}
+.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:#8A6A2E;color:#F4EFE3;vertical-align:2px}
+.nl-tabs{background:#F3EEE2;color:#1F2430;border-bottom:1px solid #D8D0C0}
+.nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
+.nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-tabs a[aria-current]{border-bottom-color:#A23B2C;font-weight:600}
+.nl-tabs.nl-sub{background:#EBE4D5;font-size:14px}
+@media (max-width:640px){
+.nl-top>.nl-in{padding:0}
+.nl-brand{padding:12px 16px}
+.nl-swap{margin-right:16px}
+.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid #343A48}
+}
+</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html" aria-current="page">คำตัดสินเกม</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/ui-redo/tweak.html">ต้นแบบ UI</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div>
+<header><div class="w">
+  <h1>คำตัดสินเกม</h1>
+  <p>คำตัดสินของเจ้าของเกมแยกตามเรื่อง ตามสำเนาใน design/ ของ repo · อ่านอย่างเดียว · เวอร์ชัน <span data-fact="version">v0.6.52</span></p>
+</div></header>
+<main><div class="w">
+<p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
+<nav class="spec-toc" id="design-toc" aria-label="สารบัญคำตัดสินเกม"><div><h3>เรื่องที่ออกแบบ</h3><ol><li><a href="design-adopt-study.html">สเปกนำผลศึกษาเกม (B158) เข้า next-life พร้อมแจกเลน</a> <small>MAP · decisions</small></li><li><a href="design-thai-life-deep.html">ชีวิตไทยลึกขึ้น — ใบค้างของโลกปกติจัดตามเฟส v2</a> <small>MAP · decisions</small></li><li><a href="design-three-worlds.html">เกม next-life 3 โลก — ปกติ · หลังความตาย · ต่างโลก เชื่อมด้วยบุญบาป</a> <small>MAP · decisions · isekai/MAP · isekai/decisions · life-goal/decisions</small></li><li><a href="design-ui-redo.html">หน้าจอใหม่ทั้งเกม (ui-redo)</a> <small>MAP · decisions</small></li><li><a href="design-world-overlap.html">โลกซ้อนทับ — ข้ามโลกซ้ำบ่อย กำแพงโลกบาง ของแต่ละโลกรั่วเข้าหากัน จนถึงจบโลก</a> <small>MAP · decisions</small></li></ol></div><div><h3>ข้อมูลอ้างอิง</h3><ol><li><a href="design-lore.html">ข้อมูลอ้างอิง (lore)</a> <small>13 ไฟล์</small></li></ol></div><div><h3>ในหน้านี้</h3><ol><li><a href="#d-MAP">MAP: สเปก + ต้นแบบเล่นได้ของเกมจำลองชีวิตคนไทยหลายรุ่น มีแฟนตาซีคติไทย</a></li><li><a href="#d-README">design/ — สำเนาอ่านอย่างเดียว</a></li></ol></div></nav>
+<details class="doc" id="d-MAP" open><summary>MAP: สเปก + ต้นแบบเล่นได้ของเกมจำลองชีวิตคนไทยหลายรุ่น มีแฟนตาซีคติไทย</summary><p class="src">ไฟล์ต้นฉบับ design/MAP.md · <a href="#design-toc">กลับสารบัญ</a></p>
+<p>repos: <code>next-life</code> (เว็บเกม · remote <code>dmo-hub/next-life</code> · Pages จาก <code>docs/</code> — ตอนเช็กล่าสุด 22 ต.ค. ยัง 404 รอ user เปิด) · ตั้งเมื่อ 2026-10-22<br>สถานะ: <strong>ใบงานปิดครบ 14/14 (ระยะสเปก จบ 22 ต.ค.)</strong> · ขั้นต่อไป = ทำต้นแบบเกม (แกนเกมแยกโมดูล + ชุด 0 ตามใบ 07) · รายละเอียดงานค้างอยู่ <code>WORK.md</code></p>
+<h3 id="d-MAP-h1">Destination</h3>
+<p>สเปกเกมที่ตัดสินใจครบ + ต้นแบบ HTML ไฟล์เดียวที่เล่นได้ครบวงจร: เกิดในไทย → ใช้ชีวิต 15–20 นาที → ตาย → ช่วงระหว่างชาติ (ยมโลก/บุญบาป) → เล่นต่อเป็นลูกหลาน และคนอื่นหยิบไปสร้างต่อได้โดยไม่ต้องตัดสินใจเพิ่ม</p>
+<h3 id="d-MAP-h2">Notes</h3>
+<p>การตัดสินใจระดับจุดหมาย (grilling 2026-10-22 — ตัดสินแล้ว ไม่ต้องเปิดใบงานซ้ำ):</p>
+<ul><li>ฉาก: ประเทศไทยประเทศเดียว · ใช้สถิติจริงเฉพาะจุดเกิด (จังหวัด · ฐานะ) และอายุคาดเฉลี่ย ส่วนเหตุการณ์ประมาณเอาได้ · <strong>ขยายแล้ว (กลับคำตัดสินเดิมบางส่วน)</strong>: สถิติจริงรายปียังใช้กับเงินเฟ้อ · ผลตอบแทนสินทรัพย์ · ค่าจ้าง · โรค/e0 ตามยุค (ใบ 10 13 14 03) · แต่ <strong>ฐานะชาติหน้าไม่ใช้สถิติ — ผลกรรมกำหนดแรงทุกทาง (ใบ 05)</strong> และ <strong>การตายไม่ตรงสถิติจริงล้วน ๆ — คูณตัวคูณกรรม (ใบ 09)</strong> · เจ้าของตัดสินเองหลังเห็นข้อขัด ห้ามแก้คืน</li><li>ขยาย 2026-10-22 (ระหว่างทำใบ &quot;โครงชีวิต&quot;): <strong>สุ่มปีเกิด 2500–2569 ถ่วงตามจำนวนเกิดจริง</strong> · เงินเฟ้อจริง · ปีเลยปัจจุบันสุ่มจากสถิติย้อนหลัง + ไซไฟเบา ๆ · เหตุการณ์จริงเฉพาะเศรษฐกิจ/ภัยพิบัติ ไม่แตะการเมือง</li><li>จังหวะ: กดต่อเอง เล่นละเอียด 15–20 นาทีต่อชีวิต (ต้องมีเหตุการณ์ราว 80–150 เหตุการณ์)</li><li>ค่าสถานะ: สุขภาพ · ความสุข · ความรู้ · ความสัมพันธ์ + เงิน/หนี้ · ผลของตัวเลือกบอกแค่ทิศทาง (↑/↓) ไม่บอกตัวเลข</li><li>เพิ่ม 2026-10-22 (user ขอหลังตั้ง map — กลับคำตัดสินเดิมที่ไม่เอาบุญบาป): ระบบ <strong>บุญบาป</strong> · <strong>การเงินการลงทุน</strong> · <strong>ความเชื่อ (สายมู)</strong> เป็นระบบหลัก รายละเอียดอยู่ในใบงานของแต่ละระบบ · ในเกมห้ามมีข้อความที่อ่านเหมือนคำแนะนำการลงทุนจริง</li><li>แก่นเกม: เล่าเรื่องเป็นหลัก + ฉายาเสริม 2 ชั้น (ลวดลายจากแกนคู่แบบ 1in8b + ฉายาตามเงื่อนไขแบบ 65 ล้าน)</li><li>หลังตาย: เล่นต่อเป็นลูก หลายรุ่นเต็มระบบ (ต้นแบบต้องครอบด้วย)</li><li>แฟนตาซี: คติไทย (ผี · เทวดา · พญายม · นาค · เจ้าที่ · กรรม) อยู่ทั้งช่วงระหว่างชาติและแทรกเบา ๆ ในชีวิต · มีผลกับกลไกจริง · <strong>ตัดสินกลับคำเดิม (&quot;จำกัด ห้ามทำให้สถิติจริงเสียความหมาย&quot; ใช้ไม่ได้แล้ว)</strong>: กรรมตามทันกระทบทุกอย่างรวมสุขภาพ/การตาย (ใบ 09) และกำหนดฐานะชาติหน้าแรงทุกทาง (ใบ 05) · แต่สายมู/พิธีกรรมในชีวิตจำกัดที่ความสบายใจ/ค่าทางสังคม ยกเว้นหวยสายมู (ใบ 12)</li><li>เทคนิค: HTML ไฟล์เดียว ไม่มี backend · เซฟใน localStorage · สไตล์การ์ดตัวหนังสือ + ภาพพิกเซลเล็ก</li><li>เนื้อหา: AI ร่าง แล้วเจ้าของคัดและแก้</li><li>บทเรียนจากการแกะ 2 เกม (ใช้เป็นหลักฐาน): เงื่อนไขฉายาที่เรียงลำดับทำให้ฉายาบางตัวไม่มีทางได้ (&quot;ชีวิตที่หนักหนา&quot; ใน 65 ล้าน 0/80,000 ชีวิต) · การบอกผลเป็นตัวเลขทำให้สคริปต์เล่นแทนได้ง่าย · ควรมี harness จำลองชีวิตแบบตั้ง seed ได้ไว้ใช้ปรับสมดุลตั้งแต่วันแรก (ทั้ง 2 เกมมี และเราใช้วัดผลตัวเลือกได้)</li><li>skill ที่ใช้: <code>grilling</code> + <code>domain-modeling</code> สำหรับใบ grilling · <code>research</code> brief ตรงสำหรับใบ research</li></ul>
+<h3 id="d-MAP-h3">Decisions so far</h3>
+<ul><li><strong>รับค่าที่ AI ตั้งใน B14 (เจ้าของตัดสิน 2026-10-23)</strong>: <code>POOL_CHANCE</code> เด็ก .30 · วัยรุ่น .50 · หนุ่มสาว .45 · ทำงาน/กลางคน .35 · ชรา .30 · ป้ายเสี่ยง <code>RISK</code> แต้มผลห่าง ≤2 ต่ำ · ≤5 กลาง · เกินนั้นสูง · อายุแม่ตอนคลอด 18–40 พ่อ = แม่ +0–8 — รายละเอียด <code>build/B14-plan.md</code></li></ul>
+<ul><li><strong>การตายเดินตามแนวชีวิต (เจ้าของตัดสิน 2026-10-22 หลัง B02)</strong>: ทุกปีของชีวิตใช้ตารางชีพของปีปฏิทินนั้น (อายุ a ใช้ตารางปี เกิด+a) ไม่ใช่ตารางปีเกิดตลอดชีวิต · เป้าด่าน 3 (ใบ 07) = อายุตายที่ข้อมูลคาดตามแนวนี้ ไม่ใช่ e0 ของปีเกิด (เช่น ชายเกิด 2500 ≈ 58 ปี ไม่ใช่ 49) · รูปเส้นการตายตามอายุ: ก่อน 2543 ตาราง HLD 1960 แยกเพศ · 2543–2566 ตาราง WHO รายปี (ตาม lore หัวข้อ 6 · เจ้าของสั่งให้ดึง HLD ก่อนใช้ทางแทน)</li><li><strong>เคาะ B03/B08 (2026-10-22)</strong>: id หมวดบุญบาปเป็นอังกฤษ AI ร่างเจ้าของตรวจ · เพดานความยาววัดจาก <code>cards.html</code> แล้วเสนอ · ระบบที่ปีเริ่มยังไม่ยืนยันปิดตัวเลือกจนได้แหล่ง · ผลตอบแทนอนาคตสุ่ม &quot;ปีต้นแบบเดียวกันทุกสินทรัพย์&quot; · ช่องว่างข้อมูลการเงินใช้ค่าตั้งต้น assumption ไม่ปิดตัวเลือก · ค่าแรงขั้นต่ำแปลงเดือนละ 26 วัน · รายละเอียดใน <code>build/B03-plan.md</code> · <code>build/B08-plan.md</code></li><li><strong>เคาะ 2026-10-23</strong>: การ์ดที่ให้เลือกมี ≥4 ตัวเลือก ไม่มีเพดาน (ด่าน build · การ์ดเล่าเรื่อง 0 ข้อยกเว้น · ใบ 07) · รางวัลเลขท้ายสลากมีทุกปีตั้งแต่ต้นเกม [สมมติฐานก่อน 2533] + รางวัลเล็กก่อน 2550 = ตัวคูณราคาใบ (B08-plan ข้อ 4–5) · B05: เนื้อหาทดสอบบุญบาปอยู่เฉพาะ harness · ตัวคูณกรรมบาปสุด ×2.0 บุญสุด ×0.75 (ค่าเริ่ม harness ปรับ)</li></ul>
+<ul><li>แหล่งสถิติไทยสำหรับจุดเกิดและอายุคาดเฉลี่ย: สุ่มจังหวัดจากประชากร data.go.th (CC-BY) · ฐานะใช้ quintile ระดับประเทศถ่วงรายได้รายภาค · อายุคาด WPP ชาย 72.3 หญิง 81.0 · ไม่มีข้อมูลการเรียนต่อแยกตามฐานะ ต้องประมาณเอง</li><li>คติไทยเรื่องหลังความตายและวัฏสงสาร: ไตรภูมิมีบัญชีบุญบาปจริง (ชั่งฝ่ายที่หนักกว่า) · โทษนรกมีกำหนดเวลา · เหตุตกนรก 8 ข้อจากพระมาลัยใช้เป็นตารางกรรมได้ · ปฏิทินทำบุญรายภาค · ห้ามให้พระ/พระพุทธรูปเป็นตัวตลก · แผ่นเต็มอยู่ที่ <a href="design-lore.html#d-lore-afterlife"><code>lore-afterlife.md</code></a></li><li>หน้าตาการ์ดและภาพพิกเซล: ผสม 2 แนวสลับตามประเภทเหตุการณ์ — ชีวิตจริงใช้ &quot;ทะเบียนราษฎร์&quot; (กระดาษ/Pridi) · ความเชื่อ/แฟนตาซี/ระหว่างชาติใช้ &quot;ลายรดน้ำ&quot; (รักดำ-ทอง/Srisakdi) · เหตุการณ์ต้องมีฟิลด์ประเภท · ต้นแบบ <code>proto/cards-v1.html</code></li><li>ผลตอบแทนและความเสี่ยงของทางเลือกการเงินแบบไทย: เงินฝาก/เงินเฟ้อรายปีมีครบ · หุ้นมีแค่ปีวิกฤต (−55.18% · −47.56%) ยังไม่มีค่าเฉลี่ย TRI ระยะยาว · หนี้นอกระบบ 20%/24 วัน · แชร์ลูกโซ่ · หวย 1 ใน 1,000,000 · ตารางเต็ม <a href="design-lore.html#d-lore-finance-belief"><code>lore-finance-belief.md</code></a></li><li>โครงชีวิต ค่าสถานะ และกลไกเวลา: 6 ช่วงวัย + ช่วงระหว่างชาติ · ~100 การ์ด/ชีวิต · ตายจากตารางชีพรายปี × สุขภาพ หรือสุขภาพ 0 · ค่าไหลตามธรรมชาติ · จุดเกิดให้ผลใหญ่ตามจริง · เกิดปี 2500–2569 + เงินเฟ้อจริง · โรคละเอียดตามสถิติไทย</li><li>ระบบฉายา 2 ชั้น: ลวดลาย 4 แกน 16 แบบ (ครอบครัว/งาน · บ้านเกิด/ไปไกล · มั่นคง/เสี่ยง · ทางโลก/ทางธรรม) + ฉายาเงื่อนไข ~25 ตัว 3 ระดับ ได้หลายตัวพร้อมกัน (ทุกตัว ≥0.1% ใน harness) + ฉายาตระกูล 5–8 ตัว · ฉายาด้านลบใช้คำเห็นใจ · มีสมุดฉายา</li><li>ข้อมูลไทยตามยุค 2500–2569: เกิด = CBR × ประชากร (เบบี้บูม 2506–2526) · เงินเฟ้อ World Bank ครบ 2503–2568 (2500–2502 ประมาณเอง) · e0 ชาย 49.0 → 72.3 · โรคติดเชื้อนำยุคแรก → NCD · ไทม์ไลน์วิกฤต · <a href="design-lore.html#d-lore-era-data"><code>lore-era-data.md</code></a></li><li>ระบบหลายรุ่นและช่วงระหว่างชาติ: เลือกเป็นลูกหรือเกิดใหม่ตามกรรม · บุญบาปส่งต่อข้ามชาติ · <strong>ผลกรรมกำหนดฐานะ/ค่าเริ่มต้นชาติหน้าแรงทุกทาง</strong> (เจ้าของยกเลิกข้อห้ามจากแผ่นคติเอง) · มรดกแบ่งตามลูก หนี้ไม่เกินมรดก + ชื่อเสียงตระกูล · ไม่มีจบ ไม่มีนิพพาน</li><li>ระบบบุญบาป: บัญชีซ่อน เฉลยที่ศาลพญายม + ลางดี/ร้าย · บาป 8 หมวดพระมาลัย + บุญ ทาน/ศีล/ภาวนา · <strong>กรรมตามทันแรง กระทบทุกอย่างรวมการตาย</strong> (การตาย = ตารางชีพ × สุขภาพ × กรรม) · ส่งต่อข้ามชาติสุ่ม 30–70% · ช่วงที่ 7 มีเหตุการณ์ปรับบัญชี 4 แบบ (ส่วนบุญ+อนุโมทนา · เทวทูต 5 · เลือกในภูมิปลายทาง · ผีบรรพบุรุษ) ก่อนชี้ปลายทางและสุ่มส่งต่อ · <strong>หมวดบาปที่ 9 <code>vow_broken</code> เพิ่มจากใบ 12 (ธง ไม่มีระดับ นอกคัมภีร์)</strong></li><li>ระบบการเงินและการลงทุน: จัดสรรเงินทุก ~5 ปี + ข้อเสนอเฉพาะกิจ · ผลตอบแทนปีอดีตใช้ค่าจริง อนาคตสุ่ม · ธุรกิจตามยุค · หนี้ 4 แบบ + ล้มละลาย · ค่าจ้างจริงตามอาชีพ×การศึกษา×ภาค×ยุค · มีทางทุจริต (บาปหนัก) · บอกผลตอบแทนจริงหลังเกิด + ป้ายไม่ใช่คำแนะนำการลงทุน</li><li>ชุดข้อมูลการเงินรายปีและค่าจ้างตามยุค: หุ้นเปิด เม.ย. 2518 (ก่อนนั้นเลือกไม่ได้) · ราคาบ้าน BIS ย้อนถึง 2534 · ทองโลกรายปี · ค่าแรงขั้นต่ำรายปี · ค่าจ้างตามวุฒิมีแค่ 2561–62 ต้องประมาณ · ปีเริ่มของระบบ · <code>lore-finance-series.html</code></li><li>รูปแบบข้อมูลเหตุการณ์ + ขั้นตอน AI ร่าง + harness จำลอง: YAML ตามช่วงวัย → build เป็น JSON · เงื่อนไขประกาศล้วน (รวมสมาชิกครอบครัว) · ผลเป็นระดับ ±1–3 + ตารางกลาง · เงิน 2 หน่วย (เท่าของรายได้ / ราคาคงที่ปรับเงินเฟ้อ) · ป้ายบุญบาป หมวด+ระดับ · ด่านอัตโนมัติก่อนเจ้าของตรวจผ่านหน้า HTML · harness ใช้แกนเกมเดียวกันใน Node บอท 6 บุคลิก 20,000 ชีวิต · 4 ด่าน (ฉายา ≥0.1% · ไม่มีเหตุการณ์ตาย · อายุ ±3 ปีจาก e0 · 80–150 การ์ด) บังคับครบก่อนปล่อย</li><li>เรื่องราวชีวิตคนไทยและเรื่องเล่าพื้นบ้านที่เหมาะเป็นเนื้อเกม: มีวัตถุดิบตามช่วงวัย + ความเชื่อพื้นบ้านพร้อมแหล่ง · สายมูกว่า 80% (ผลสำรวจออนไลน์) · ข่าวลือผีปอบ/ผีกะต้องเล่าให้เห็นผลเสียของการกล่าวหา</li><li>ระบบความเชื่อ (สายมู): 6 กิจกรรม (ดูดวง · ฤกษ์ · หวยสายมู · บนบาน/แก้บน · เครื่องราง/สักยันต์ · ทำบุญเสริมดวง) ให้ผลแค่ความสบายใจ/ค่าทางสังคม/เงินจ่ายออก <strong>ยกเว้นหวยสายมู</strong> (เหตุการณ์ครั้งคราว ≤5 ใบ/ชีวิต ตอนเงินตึง · <strong>รางวัลเล็ก (เลขหน้า3/ท้าย3/ท้าย2 =1.4%) ×4 ที่บุญเต็ม ขึ้นอย่างเดียว</strong> บาปมาก=ฐานจริง · รางวัลที่ 1 และรางวัลใหญ่ไม่ขยับ · ตรวจโครงสร้างรางวัลกับ glo.or.th แล้ว 14,168 ต่อล้าน = 1.4168% ตรงใบ 11 · เกมตั้งเอง นอกคัมภีร์ · บัญชีซ่อนรั่วข้ามหลายชีวิต เจ้าของรับแล้ว) · <strong>หมวดบาปที่ 9 <code>vow_broken</code> (บนบานไม่แก้) ธงเบา นอกคัมภีร์ — แก้ใบ 09 แล้ว</strong> · ทำบุญหวังรวยบุญน้อยกว่าทำด้วยใจ 1 ระดับ ตัดสินจากป้ายที่กด ผู้เล่นไม่เห็นผลต่าง · บนบานมีตัวเลือก &quot;แก้ตามกำลัง&quot; กันความจนกลายเป็นบาป · schema ต่อยอดใบ 07 + ด่านเพิ่ม 7 ข้อ</li></ul>
+<h3 id="d-MAP-h4">Not yet specified</h3>
+<ul><li>แฟนตาซีแทรกในชีวิต: <strong>ตัดสินแล้วส่วนกลไก</strong> — ลางดี/ลางร้ายจากบัญชี (ใบ 09) · เหตุการณ์สายมู 6 ชนิด ผลจำกัดที่ความสบายใจ/ค่าทางสังคม (ใบ 12) · <strong>ความถี่ตัดสินแล้ว 2026-10-22: เป้าตั้งต้น 5–8 ใบต่อชีวิต</strong> (จาก ~100 การ์ด · รวมทุกเหตุการณ์แฟนตาซี/สายมูในช่วงมีชีวิต ไม่นับช่วงระหว่างชาติ) · <strong>นับลางด้วย (เจ้าของเคาะ 2026-11-02 · omc-1 ทาง A): ลางบัญชี + ลางภัยยุค (type A) นับในเป้า 5–8</strong> · <code>full</code> พิมพ์แยก B/ลางบัญชี/ลางภัยยุค (B = ตัวนับแบบเดิม) · harness ปรับได้ · ข้อต้องวัด: หวยสายมู (เพดาน 5) นับรวมในโควตานี้ — ถ้าค่าเฉลี่ยกินเกินครึ่งโควตา ยกกลับมาให้เจ้าของเคาะ</li><li>การแชร์การ์ดตอนตาย: เนื้อหาการ์ดตัดสินแล้วในใบ 04 (ลวดลาย + ฉายาหายากสุด 1 ตัว) · <strong>ช่องทางตัดสินแล้ว 2026-10-22: ภาพ PNG วาดด้วย canvas ในเบราว์เซอร์ + ปุ่มแชร์ของมือถือ (Web Share API) · เครื่องที่แชร์ไม่ได้ = ดาวน์โหลดภาพ</strong> (ไม่มี backend) · ที่ยังค้าง: เลย์เอาต์ภาพ · ข้อความประกอบ (ทำตอนทำต้นแบบ)</li><li>ชื่อลวดลาย 17 แบบ (16 + &quot;ครึ่ง ๆ&quot; ตามใบ 04) + ฉายา ~25 ตัว (AI ร่าง 3 ตัวเลือก เจ้าของเลือก — ทำตอนทำต้นแบบ)</li><li>ชื่อเกมและแบรนด์: <strong>ตัดสินแล้ว = ชาติหน้า · Next Life</strong> (เลือก 2026-10-22 จาก 50 ชื่อ) · <strong>โลโก้ตัดสินแล้ว 2026-10-22: ตัวอักษรล้วน &quot;ชาติหน้า&quot; ฟอนต์ Srisakdi สีทองบนรักดำ ตามทาง B ลายรดน้ำของใบ 06</strong> · ไม่มีสัญลักษณ์ภาพ</li><li>การ deploy: ตัดสินแล้ว 2026-10-22 = GitHub Pages ใน org dmo-hub แบบ dmo (repo <code>dmo-hub/next-life</code> เสิร์ฟจาก <code>docs/</code>) · เผยแพร่ต้นแบบการ์ด + สเปก/ภาพรวม map + รีเสิร์ช · <strong>ขึ้นแล้ว 22 ต.ค.</strong> <a href="https://dmo-hub.github.io/next-life/" rel="noopener">https://dmo-hub.github.io/next-life/</a> (รวม play.html ต้นแบบ B01) · สำเนา spec ใน repo ซิงก์ล่าสุด 22 ต.ค. รอบ 5 (ขั้นตอนใน <code>WORK.md</code>)</li><li>ตัวเลขความสมดุล: อายุเฉลี่ย · การกระจายฐานะ · อัตราการได้ฉายาแต่ละตัว (เกณฑ์ตัดสินแล้วในใบ 07 · ค่าจริงรอ harness ตอนทำต้นแบบ)</li></ul>
+<h3 id="d-MAP-h5">Out of scope</h3>
+<ul><li>backend · อนุสรณ์ · ระบบแชร์ชีวิตแบบ 1in8b (ตัดสินแล้วว่าไม่มี backend)</li><li>หลายประเทศ (ตัดสินแล้วว่าไทยประเทศเดียว)</li><li>เวลาเดินจริง 30–90 นาทีแบบ 1in8b</li><li>การหารายได้จากเกม</li></ul>
+</details>
+<details class="doc" id="d-README" open><summary>design/ — สำเนาอ่านอย่างเดียว</summary><p class="src">ไฟล์ต้นฉบับ design/README.md · <a href="#design-toc">กลับสารบัญ</a></p>
+<p>คัดลอกเมื่อ 2026-11-04 (ต้นฉบับรุ่น 53a17da05) · <strong>อย่าแก้ไฟล์ในโฟลเดอร์นี้</strong> — ต้นฉบับอยู่นอก repo และจะถูกคัดลอกทับทุกครั้งที่ปล่อยเวอร์ชัน<br>อยากเปลี่ยนคำตัดสินหรือเสนอของใหม่ → เปิด issue หรือเขียนใน PR ให้เจ้าของเกมเคาะ</p>
+<div class="tw"><table><thead><tr><th>โฟลเดอร์</th><th>คืออะไร</th></tr></thead><tbody><tr><td><a href="#d-MAP"><code>MAP.md</code></a></td><td>แผนที่รวมทุกเรื่อง</td></tr><tr><td><code>&lt;เรื่อง&gt;/decisions.md</code></td><td>ข้อที่เจ้าของเกมเคาะแล้ว — ห้ามทำขัด</td></tr><tr><td><code>&lt;เรื่อง&gt;/MAP.md</code></td><td>ใบงานในเรื่องนั้น ใบไหนรอใบไหน</td></tr><tr><td><code>lore/</code></td><td>ข้อมูลอ้างอิงตอนเขียนเนื้อหาและตัวเลข (แหล่งที่มาอยู่ในแต่ละไฟล์)</td></tr></tbody></table></div>
+<p>เลขใบงาน/ข้อตัดสินในไฟล์อ้างถึงใบที่อยู่นอก repo — ใบที่จ่ายให้ผู้ร่วมทำจะเปิดเป็น GitHub Issue พร้อมเนื้อครบ</p>
+</details>
+</div></main>
+</body>
+</html>

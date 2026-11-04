@@ -1,6 +1,6 @@
 import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, bookAdd, bookCarryOffers } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt } from './art.mjs';
-import { shelfMemoArt, shelfTitleArt, shelfPicArt, shelfLineageArt } from './shelfart.mjs';
+import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
@@ -1209,15 +1209,39 @@ function memoShelf(body, choices, fresh, again) {
     }), enter(button('ยกเลิก', null, () => again('m'))));
   }));
 }
+// หัวแท็บภาพบ้านเมือง (ui-redo ใบ 41 · แบบ ข ต้นแบบ B176): ภาพย่อต่อเหตุการณ์เรียงตามปี ใช้ภาพเหตุการณ์ตัวเดียวกับรายการข้างล่าง
+// เป็น DOM ไม่ใช่ canvas — ช่องตัดแถวเองตามความกว้าง ความสูงตามเนื้อ จอแคบไม่เหลือที่ว่างค้าง · events = ชุดเดียวกับที่ส่งให้ภาพหัวแท็บเดิม
+function picStrip(events, got, all) {
+  const box = el('div', 'pic-strip');
+  box.setAttribute('role', 'img');
+  box.setAttribute('aria-label', `ภาพย่อเหตุการณ์บ้านเมืองเรียงตามปี ได้ภาพแล้ว ${got} จาก ${all}`);
+  box.dataset.count = JSON.stringify({ got, all, met: events.filter((e) => e.met).length, events: events.length });
+  box.append(el('div', 'h', `ภาพบ้านเมืองที่ได้ ${got}/${all}`));
+  const row = el('div', 'pic-row');
+  for (const ev of [...events].sort((a, b) => a.from - b.from)) {
+    const th = el('div', `pic-th${ev.met ? '' : ' lock'}${ev.fresh ? ' fresh' : ''}`);
+    const pic = el('div', 'pic');
+    if (ev.met) {
+      const svg = artSvg('era-art', ERA_ART_W, ERA_ART_H, eraArt(ev.id));
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+      pic.append(svg);
+    } else pic.append(el('b', null, '???'));
+    th.append(pic, el('span', 'n', `${ev.n}/${ev.all}`), el('i', 'dot'), el('span', 'yr', `${ev.from}`));
+    row.append(th);
+  }
+  box.append(row);
+  return box;
+}
+
 // แท็บภาพบ้านเมือง: เหตุการณ์ละแผ่น ภาพหลักเต็มแถว ภาพตามวัย/ตามมาเป็นช่องเล็ก · ยังไม่เจอ = ??? + ทางปลด
 function picShelf(body, fresh) {
   const p = picsRead();
   body.append(el('p', 'bk-intro', `ภาพเหตุการณ์ภัยพิบัติและเศรษฐกิจที่เคยผ่าน สะสมข้ามชีวิต · ได้แล้ว ${picsGot(p)}/${PIC_ALL} ภาพ`), shelfBar(picsGot(p), PIC_ALL));
-  shelfPicArt(body, PIC_EVENTS.map((e) => {
+  body.append(picStrip(PIC_EVENTS.map((e) => {
     const slots = ERA_PICS[e.id];
     const met = p.e.includes(e.id);
     return { id: e.id, name: e.name, kind: e.kind, from: e.from, to: e.to, met, all: 1 + slots.length, n: (met ? 1 : 0) + slots.filter(([k]) => p.s.includes(`${e.id}:${k}`)).length, fresh: fresh.some((k) => k === `e:${e.id}` || k.startsWith(`s:${e.id}:`)) };
-  }), picsGot(p), PIC_ALL);
+  }), picsGot(p), PIC_ALL));
   for (const e of PIC_EVENTS) {
     const s = el('section', 'pic-ev');
     const met = p.e.includes(e.id);
@@ -1807,8 +1831,6 @@ const fxSvg = (w, h, inner, cls = '') => `<svg class="${cls}" viewBox="0 0 ${w} 
 // สุ่มแบบมี seed ตายตัว — ผงทองเหมือนกันทุกชีวิตทุกครั้ง
 const fxRng = (s) => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 const FX_INK = ART_INK;
-// หลังการ์ด: กรอบทองคู่ + กนกม้วนมุม + ข้าวหลามตัดกลาง (ภาษาเดียวกับ ERA_FRAME ใน art.mjs)
-const FX_CARD_BACK = fxSvg(200, 250, `<rect x="6" y="6" width="188" height="238" rx="6" fill="none" stroke="${FX_INK.gold}" stroke-width="1.6"/><rect x="11" y="11" width="178" height="228" rx="4" fill="none" stroke="${FX_INK.bronze2}" stroke-width="0.8"/><path d="M16 36q0-20 20-20q-10 5-10 13q0 7 7 7q5 0 5-5M184 36q0-20-20-20q10 5 10 13q0 7-7 7q-5 0-5-5M16 214q0 20 20 20q-10-5-10-13q0-7 7-7q5 0 5 5M184 214q0 20-20 20q10-5 10-13q0-7-7-7q-5 0-5 5" fill="none" stroke="${FX_INK.gold}" stroke-width="1.2"/><path d="M100 85l30 40l-30 40l-30-40z" fill="none" stroke="${FX_INK.gold}" stroke-width="1.4"/><path d="M100 103l16 22l-16 22l-16-22z" fill="${FX_INK.gold2}"/>`);
 // ฉากซ้อนเต็มจอของตาย/ฉายา — จบเองค่อยจางออก · ถูกข้ามหายทันที
 const fxOv = () => document.body.appendChild(el('div', 'fx-ov'));
 function fxOvEnd(ov, natural) {
@@ -1818,17 +1840,35 @@ function fxOvEnd(ov, natural) {
 }
 
 const FX = {
-  // พลิก 3D ทั้งใบ: ครึ่งแรกเห็นหลังการ์ด ครึ่งหลังเห็นหน้า
-  flipA: { dur: 280, block: 280,
+  // เส้นทองวิ่งรอบกรอบการ์ด แล้วเนื้อการ์ดค่อยขึ้น (ui-redo ใบ 37 · แบบ B ของต้นแบบ fx-proto) · ขนาดเส้นวัดจากการ์ดจริงตอนเริ่ม
+  // reduced-motion ไม่วาดเส้น — fxPlay จางทั้งใบให้เอง
+  flipB: { dur: 520, block: 280,
     build: (card) => {
-      const back = el('div', 'fx-back');
-      back.innerHTML = FX_CARD_BACK;
-      card.classList.add('fx-flip');
-      card.append(back);
-      return { card, back };
+      const kids = [...card.children];
+      if (fxReduced()) return { kids, line: null, svg: null };
+      const r = card.getBoundingClientRect();
+      const rx = parseFloat(getComputedStyle(card).borderTopLeftRadius) || 0;
+      card.classList.add('fx-trace-on');
+      card.insertAdjacentHTML('beforeend', fxSvg(r.width, r.height, `<rect x="1" y="1" width="${Math.max(0, r.width - 2)}" height="${Math.max(0, r.height - 2)}" rx="${rx}" fill="none" stroke="${FX_INK.gold}" stroke-width="2" pathLength="100" stroke-dasharray="100"/>`, 'fx-trace'));
+      const svg = card.lastElementChild;
+      return { card, kids, svg, line: svg.querySelector('rect') };
     },
-    frame: (p, t) => { p.card.style.transform = `perspective(1400px) rotateY(${180 * (1 - fxOut(t))}deg)`; },
-    end: (p) => { p.card.classList.remove('fx-flip'); p.card.style.transform = ''; p.back.remove(); } },
+    frame: (p, t) => {
+      if (p.line) {
+        p.line.style.strokeDashoffset = 100 * (1 - fxOut(fxSpan(t, 0, 0.55)));
+        p.line.style.opacity = 1 - 0.6 * fxSpan(t, 0.75, 1);
+      }
+      const c = fxOut(fxSpan(t, 0.35, 1));
+      for (const k of p.kids) {
+        k.style.opacity = c === 1 ? '' : c;
+        k.style.transform = c === 1 ? '' : `translateY(${8 * (1 - c)}px)`;
+      }
+    },
+    end: (p) => {
+      for (const k of p.kids) k.style.opacity = k.style.transform = '';
+      p.svg?.remove();
+      p.card?.classList.remove('fx-trace-on');
+    } },
   // ตะเกียงดับ: เปลวสั่นแล้วหด · ควันเส้นเดียวลอยขึ้นจาง · จอหรี่เป็นรัก · คำบรรยายค่อยขึ้น
   deathA: { dur: 1600, block: 300,
     build: (ov, o) => {
@@ -1964,7 +2004,7 @@ function fxCard(box, card) {
   fxSeen = card;
   // นับเฉพาะทางที่กดได้ — การ์ดที่ล็อกจนเหลือทางเดียวกดพลาดไม่ได้ผลต่างอะไร
   const open = (card.choices ?? []).filter((_, i) => !card.locked?.[i]).length;
-  if (card.kind !== 'death') return fxPlay(box, 'flipA', open >= 2 ? { hold: FX_CHOICE_HOLD } : {});
+  if (card.kind !== 'death') return fxPlay(box, 'flipB', open >= 2 ? { hold: FX_CHOICE_HOLD } : {});
   if (fxReduced()) return;
   const top = lifeTitles(card).titles[0];
   const tier = top && FX_TIER[top.tier];
@@ -2094,7 +2134,8 @@ function render(card) {
       if (card.inherit.length) {
         const box = el('div', 'recap');
         box.append(el('div', 'h', card.age > 0 ? 'สิ่งที่สืบทอดจากรุ่นก่อน' : 'สิ่งที่สืบทอดจากชาติก่อน'), list(card.inherit, 'picks'));
-        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageView(st.lineage, st.cls, LINEAGE_BRIEF));
+        // เจ้าของสั่งไม่ย่อรุ่นต้นทางซ้าย — ผังบนการ์ดแรกเกิดโชว์ครบทุกรุ่น (ภาพบีบป้ายเองเมื่อรุ่นถี่)
+        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageView(st.lineage, st.cls));
         body.append(box);
       }
       choices.append(enter(button(BTN.next, null, next)));
@@ -2549,8 +2590,14 @@ function kinList(members) {
       const row = (text, gone) => ul.append(el('li', gone ? 'gone' : null, text));
       // ฝูงเป็นทรัพย์สิน นับเป็นหน่วยเดียว — ไม่มีอายุรายตัวหรือความผูกพันให้บอก
       if (m.role === 'herd') return row(m.alive && !m.left ? `${who} · เลี้ยงไว้` : `${who} · หมดไปแล้ว`, !m.alive || !!m.left);
-      if (!m.alive) return row(`${who} · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}`, true);
+      // ยกให้คนอื่น/หายไป ≠ ตาย — จางไม่ขีด (ตัวที่ยกให้แล้วตายภายหลังก็ยังเป็นตัวที่ยกให้)
       if (m.role === 'pet' && m.left) return row(`${who} · ไม่ได้อยู่กับเราแล้ว`, true);
+      // ตาย (ui-redo ใบ 28): ขีดเฉพาะชื่อ แถวไม่จาง อายุที่จากไปอ่านง่าย
+      if (!m.alive) {
+        const li = el('li', 'dead');
+        li.append(el('s', null, who), ` · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}`);
+        return ul.append(li);
+      }
       row([who, m.age != null && `อายุ ${m.age}`, m.left ? 'แยกทางแล้ว' : m.bondLevel].filter(Boolean).join(' · '), false);
     });
   return ul;

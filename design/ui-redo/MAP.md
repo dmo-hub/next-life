@@ -29,6 +29,7 @@ repos: next-life · ตั้งเมื่อ 2026-11-03 (ใบ 01–16 ม�
 - [รวมหน้า "โลก"](tickets/42-worlds-merge-page.md) (2026-11-04 16:2x เจ้าของผ่านผู้รวมงาน · ข้อ 41): โครงหน้าอยู่ใน tweak ใบ 32 · ลงจริงใบ 42 ←33
 - [UI 3 ข้อจากเจ้าของ](../ui-redo-decisions.md) (2026-11-04 16:0x ผ่านผู้รวมงาน · ข้อ 38–40): [37 พลิกการ์ด B เส้นทอง](tickets/37-flip-gold-trace.md) (ทับ B-fx A) · 38 tweak ฉายาหายาก/ตำนาน → 39 เจ้าของเลือก → 40 ลงเกม · [41 ภาพบ้านเมือง ข แถบภาพย่อ](tickets/41-town-tab-thumb-strip.md) (ทับ B176 ก)
 - [design.html → ดีไซน์ UI](../ui-redo-decisions.md) (2026-11-04 16:25–16:40 · grill + ผู้ค้าน opus @ec9b3ac · ข้อ 42–57): หน้า UI = dev/ui.html · คำตัดสินเกม → dev/design*.html · เมนูการออกแบบเข้าห้อง dev · URL เดิม = หน้าส่งต่อจาก build · ใบ [43](tickets/43-design-move-to-dev.md) → [44](tickets/44-ui-page-skeleton.md) → [45](tickets/45-shots-capture-game-screens.md) · แก้ 32 (←44) 35 (= หน้า UI) 36 (+7 หน้า) 42 (←43)
+- (2026-11-04 · คิว integrator) เกจฐานะ + เงินสด + อาชีพบนหัวการ์ด → [../ui-redo-decisions.md](../ui-redo-decisions.md) 58–64 (ผู้ค้าน @6ad9e6c Weakened 58–60) · ใบ 46 tweak (none) → 47 hitl · 48 แกนย่อเงินไทย/เกษียณ/สเกลทอง (none) → 49 ลงจริง (←47 48)
 
 ## Not yet specified
 
