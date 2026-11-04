@@ -297,7 +297,7 @@ challenge pass (planner ทำเอง · 🌙 ห้าม subagent ⇒ design
 
 ### 2026-11-04 19:12 · SEO หน้าแรก next-life (คำเจ้าของในแชท next-life-planner "งานด่วน ทำ seo หน้าแรก" · popup 1 รอบ = next-life ออกใบ · ไม่ใช้กฎ tweak · ไม่เปลี่ยนเลย์เอาต์)
 ที่มา (วัดเอง @d502cd3 + curl สด 19:1x): docs/index.html มี lang="th" · title · meta description · h1 เดียว · **ไม่มี** canonical · og:* · twitter:* · JSON-LD · favicon · ภาพแชร์ · https://dmo-hub.github.io/robots.txt 404 (โดเมนราก org ไม่ใช่ของ repo) · /next-life/sitemap.xml 404 · play.html ไม่มี description · archive/cards-v1 + archive/overview-v1 ไม่มี noindex (design-* + spoilers มีแล้ว)
-100. หน้าแรก: canonical `https://dmo-hub.github.io/next-life/` · og:type website · og:title/og:description = title/description เดิม · og:locale th_TH · og:url · og:image 1200×630 PNG ใหม่ (ภาพจากศิลป์เกมเดิม + ชื่อเกม ทั้งไทย/อังกฤษ · เก็บใต้ docs/) · twitter:card summary_large_image · favicon (svg + png 32/180) · JSON-LD `VideoGame` (name ไทย + alternateName "Next Life" · inLanguage th · gamePlatform "Web browser" · applicationCategory Game · url · image · offers ฟรี) + `WebSite` · description เดิมคงคำ "ไม่ใช่คำแนะนำการลงทุน"
+100. หน้าแรก: canonical `https://dmo-hub.github.io/next-life/` · og:type website · og:title/og:description = title/description เดิม · og:locale th_TH · og:url · og:image 1200×630 PNG ใหม่ (ภาพจากศิลป์เกมเดิม + ชื่อเกม ทั้งไทย/อังกฤษ · เก็บใต้ docs/) · twitter:card summary_large_image · favicon (svg + png 32/180) · JSON-LD `VideoGame` (name ไทย + alternateName "Next Life" · inLanguage th · gamePlatform "Web browser" · applicationCategory Game · url · image · offers ฟรี) + `WebSite` · description เดิมคงคำ "ไม่ใช่คำแนะนำการลงทุน" · 🔁 21:30 ลงจริง v0.6.60 abdf9a5 (omen): applicationCategory = GameApplication แทน "Game" (ค่ามาตรฐาน schema.org) · ไม่มี aggregateRating (ไม่มีรีวิวจริง) · planner รับ
 101. ทั้งเว็บขั้นต่ำ (planner เคาะ ให้หน้าแรกไม่โดดเดี่ยว): docs/sitemap.xml รายการหน้าสาธารณะที่ไม่ noindex (index guide play worlds otherworld about catalog cards whatsnew · ไม่รวม dev/ design-* spoilers archive/ spec/) · archive/*.html ใส่ noindex · play.html เติม description + canonical · ไม่ทำ robots.txt (ทำที่รากโดเมนไม่ได้) ⇒ เจ้าของส่ง sitemap ผ่าน Google Search Console เอง (งานนอก repo)
 102. ด่าน: site-check เพิ่มเกณฑ์ หน้าแรกต้องมี canonical + og:image ที่ไฟล์มีจริง + JSON-LD parse ได้ · sitemap ทุก URL ไฟล์มีจริงและไม่ noindex · หน้า noindex ไม่อยู่ใน sitemap · เอกสาร/หน้าเว็บล้วน ลัดคิว (กฎข้อ 78) · เจ้าของสั่งด่วน
 
@@ -313,3 +313,50 @@ challenge pass (planner ทำเอง · 🌙 ห้าม subagent ⇒ design
 ### 2026-11-04 19:44 · ด่าน import ui↔engine (คิว integrator · planner เคาะ ไม่ต้องถามเจ้าของ)
 ที่มา: integrator — v0.6.55 (d54400d) hotfix "bookAdd is not defined" หลัง merge 8b2fb24 เปลี่ยนชื่อเป็น skillBookAdd · ต้นแบบตรวจ 10 บรรทัด main เดิม MISSING bookAdd · ใหม่ 0
 109. ใบ 73 ด่าน lint:test ตรวจชื่อ import src/ui ← engine มีจริง · ไม่ใช่ UI แต่กันเกมพังทั้งเกม ⇒ ลัดคิวแบบใบ UI (ขยายกฎข้อ 78 เฉพาะใบด่านกันพังทั้งเกม)
+
+### 2026-11-04 21:32 · เจ้าของวาง JSON ป้ายผลไอคอน (ใบ 53 · หน้า fx-icons-tweak ใบ 52 · แชท next-life-planner)
+JSON คำต่อคำ:
+```json
+{
+ "page": "fx-icons-tweak (ui-redo 52)",
+ "preset": "ข ไอคอนเส้น + ชิป",
+ "changed": [
+  "sep",
+  "pct"
+ ],
+ "dir": "arrow",
+ "color": "all",
+ "chip": "on",
+ "word": "icon",
+ "size": "100",
+ "sep": "dot",
+ "free": "chip",
+ "pct": "word",
+ "hide": "icon",
+ "upA": "#2F6B66",
+ "dnA": "#B73824",
+ "upI": "#7FE0A8",
+ "dnI": "#FF8A7A",
+ "icons": {
+  "ชีวิต": "heart",
+  "ความสุข": "smile",
+  "ความรู้": "book",
+  "ความสัมพันธ์": "people",
+  "เงิน": "coin",
+  "รายได้": "case",
+  "เส้นสาย": "link",
+  "พลัง": "bolt",
+  "เวท": "spark",
+  "โชค": "clover",
+  "ทอง": "coin",
+  "ชื่อเสียง": "star",
+  "free": "tag",
+  "pct": "target",
+  "hide": "ask"
+ },
+ "note": "เอาฟรีออก ไม่ต้องแสดงหรือใบ้"
+}
+```
+110. ใบ 54 ลงตาม JSON ข้างบน: preset ข ไอคอนเส้น+ชิป · ลูกศรขึ้นลง · สีทั้งชิป · ขนาด 100 · คั่นด้วยจุด · %สำเร็จเป็นคำ (`pct: word`) · ป้าย ? ใช้ไอคอน ask · สีชาติไทย upA/dnA · ต่างโลก upI/dnI · ไอคอนต่อค่าตาม `icons`
+111. note เจ้าของทับ `free: chip` และข้อ 72 ส่วน "ฟรี": **ไม่มีป้ายฟรีเลย** ไม่แสดงบนปุ่ม ไม่ใบ้ · planner ตีความ "ไม่ใบ้" ว่าไม่ต้องมีใน aria-label ด้วย (ใบ 54 เดิมยกตัวอย่าง "ไม่เสียเงิน" ⇒ ตัดออก) · ไอคอน `free: tag` ไม่ใช้ · คู่มือ (guide.mjs/guide.html/คำอธิบายป้าย) ไม่ต้องอธิบายป้ายฟรี
+112. ข้อ 73 74 คงเดิม: ค่าที่ B169 ซ่อนห้ามได้ไอคอนเฉพาะตัว · aria-label ข้อความเต็มของค่าที่แสดง · ขาวดำแยกขึ้นลงจากลูกศร

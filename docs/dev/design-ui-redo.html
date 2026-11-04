@@ -102,7 +102,7 @@ try{sessionStorage.setItem(K,H)}catch(e){}g.remove();d.classList.add('nl-open');
 </style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html" aria-current="true">คำตัดสินเกม</a><a href="../dev/ui.html">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/ui-redo/tweak.html">ต้นแบบ UI</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div>
 <header><div class="w">
   <h1>หน้าจอใหม่ทั้งเกม (ui-redo)</h1>
-  <p>เรื่อง ui-redo · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.60</span></p>
+  <p>เรื่อง ui-redo · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.61</span></p>
 </div></header>
 <main><div class="w">
 <p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
@@ -218,13 +218,55 @@ try{sessionStorage.setItem(K,H)}catch(e){}g.remove();d.classList.add('nl-open');
 <ol><li>เจ้าของเลือก (popup 19:0x): <strong>ราวเมนูเริ่มใต้แถบหัว</strong> + <strong>แผงขวาเปิดค้าง</strong> — ทับแถว 23 ส่วน &quot;แผงบนคอม ลิ้นชักเมื่อกด&quot; · ไม่เลือก: ปุ่มเมนูที่เลือกเด่น (มีอยู่แล้วเมื่อแผงเปิด aria-expanded · template.html:553)</li><li>planner เคาะแทน (ด่วน · ปลายทางเจ้าของให้ภาพชัด ⇒ ไม่ทำหน้า tweak แบบ B68d ข้อ 300): (ก) ราว <code>.mnav</code> และแผง <code>.sheet</code> บนคอมเริ่มใต้แถบหัว (top = ความสูงแถบหัวจริง ไม่ฮาร์ดโค้ด · เลื่อนหน้าแล้วแถบหัวพ้นจอ ราว/แผงขึ้นชิดบน) (ข) แผงเปิดค้าง = เปิดแผง &quot;ตัวฉัน&quot; ตั้งแต่เข้าเกม · กดเมนูอื่นสลับแผง · ไม่มีฉากมืดทับการ์ด การ์ดกดได้ตลอด · การ์ดเลื่อนไปอยู่ช่องกลางระหว่างราวกับแผง ไม่ถูกแผงบัง (ภาพ 2 แผงบังขวาการ์ด = สภาพลิ้นชักเดิม ไม่ใช่ปลายทาง) (ค) จอกว้างไม่พอ (การ์ดกว้าง &lt; 560px เมื่อมีราว+แผง) คงลิ้นชักเดิม · มือถือไม่แตะ (ง) ปุ่ม &quot;กลับไปการ์ด&quot; ในแผงค้าง = ซ่อนแผงจนกดเมนูใหม่</li><li>คิว: UI ล้วน ลัดคิว (กฎข้อ 78) · เจ้าของสั่งด่วน</li></ol>
 <h4 id="d-ui-redo-decisions-h34">2026-11-04 19:12 · SEO หน้าแรก next-life (คำเจ้าของในแชท next-life-planner &quot;งานด่วน ทำ seo หน้าแรก&quot; · popup 1 รอบ = next-life ออกใบ · ไม่ใช้กฎ tweak · ไม่เปลี่ยนเลย์เอาต์)</h4>
 <p>ที่มา (วัดเอง @d502cd3 + curl สด 19:1x): docs/index.html มี lang=&quot;th&quot; · title · meta description · h1 เดียว · <strong>ไม่มี</strong> canonical · og:* · twitter:* · JSON-LD · favicon · ภาพแชร์ · <a href="https://dmo-hub.github.io/robots.txt" rel="noopener">https://dmo-hub.github.io/robots.txt</a> 404 (โดเมนราก org ไม่ใช่ของ repo) · /next-life/sitemap.xml 404 · play.html ไม่มี description · archive/cards-v1 + archive/overview-v1 ไม่มี noindex (design-* + spoilers มีแล้ว)</p>
-<ol><li>หน้าแรก: canonical <code>https://dmo-hub.github.io/next-life/</code> · og:type website · og:title/og:description = title/description เดิม · og:locale th_TH · og:url · og:image 1200×630 PNG ใหม่ (ภาพจากศิลป์เกมเดิม + ชื่อเกม ทั้งไทย/อังกฤษ · เก็บใต้ docs/) · twitter:card summary_large_image · favicon (svg + png 32/180) · JSON-LD <code>VideoGame</code> (name ไทย + alternateName &quot;Next Life&quot; · inLanguage th · gamePlatform &quot;Web browser&quot; · applicationCategory Game · url · image · offers ฟรี) + <code>WebSite</code> · description เดิมคงคำ &quot;ไม่ใช่คำแนะนำการลงทุน&quot;</li><li>ทั้งเว็บขั้นต่ำ (planner เคาะ ให้หน้าแรกไม่โดดเดี่ยว): docs/sitemap.xml รายการหน้าสาธารณะที่ไม่ noindex (index guide play worlds otherworld about catalog cards whatsnew · ไม่รวม dev/ design-* spoilers archive/ spec/) · archive/*.html ใส่ noindex · play.html เติม description + canonical · ไม่ทำ robots.txt (ทำที่รากโดเมนไม่ได้) ⇒ เจ้าของส่ง sitemap ผ่าน Google Search Console เอง (งานนอก repo)</li><li>ด่าน: site-check เพิ่มเกณฑ์ หน้าแรกต้องมี canonical + og:image ที่ไฟล์มีจริง + JSON-LD parse ได้ · sitemap ทุก URL ไฟล์มีจริงและไม่ noindex · หน้า noindex ไม่อยู่ใน sitemap · เอกสาร/หน้าเว็บล้วน ลัดคิว (กฎข้อ 78) · เจ้าของสั่งด่วน</li></ol>
+<ol><li>หน้าแรก: canonical <code>https://dmo-hub.github.io/next-life/</code> · og:type website · og:title/og:description = title/description เดิม · og:locale th_TH · og:url · og:image 1200×630 PNG ใหม่ (ภาพจากศิลป์เกมเดิม + ชื่อเกม ทั้งไทย/อังกฤษ · เก็บใต้ docs/) · twitter:card summary_large_image · favicon (svg + png 32/180) · JSON-LD <code>VideoGame</code> (name ไทย + alternateName &quot;Next Life&quot; · inLanguage th · gamePlatform &quot;Web browser&quot; · applicationCategory Game · url · image · offers ฟรี) + <code>WebSite</code> · description เดิมคงคำ &quot;ไม่ใช่คำแนะนำการลงทุน&quot; · 🔁 21:30 ลงจริง v0.6.60 abdf9a5 (omen): applicationCategory = GameApplication แทน &quot;Game&quot; (ค่ามาตรฐาน schema.org) · ไม่มี aggregateRating (ไม่มีรีวิวจริง) · planner รับ</li><li>ทั้งเว็บขั้นต่ำ (planner เคาะ ให้หน้าแรกไม่โดดเดี่ยว): docs/sitemap.xml รายการหน้าสาธารณะที่ไม่ noindex (index guide play worlds otherworld about catalog cards whatsnew · ไม่รวม dev/ design-* spoilers archive/ spec/) · archive/*.html ใส่ noindex · play.html เติม description + canonical · ไม่ทำ robots.txt (ทำที่รากโดเมนไม่ได้) ⇒ เจ้าของส่ง sitemap ผ่าน Google Search Console เอง (งานนอก repo)</li><li>ด่าน: site-check เพิ่มเกณฑ์ หน้าแรกต้องมี canonical + og:image ที่ไฟล์มีจริง + JSON-LD parse ได้ · sitemap ทุก URL ไฟล์มีจริงและไม่ noindex · หน้า noindex ไม่อยู่ใน sitemap · เอกสาร/หน้าเว็บล้วน ลัดคิว (กฎข้อ 78) · เจ้าของสั่งด่วน</li></ol>
 <h4 id="d-ui-redo-decisions-h35">2026-11-04 19:14 · หน้าแรกย้ายส่วน · ซ่อนต่างโลก · ถอดหน่วงคลิก · หน้าติดรหัส (คำเจ้าของในแชท next-life-planner 4 คำสั่งต่อกัน · popup 2 รอบ · ไม่ใช้กฎ tweak)</h4>
 <p>ที่มา (@d502cd3): (1) ภาพหน้าแรกส่วนใต้หัว + &quot;ย้ายส่วนี้ไปหน้าอื่น&quot; · docs/index.html:92-96 section.road &quot;กำลังทำ&quot; (ROADMAP ชี้ whatsnew.html#soon-*) · :98-108 details.sys &quot;ระบบหลัก&quot; (2) &quot;ซ่อนส่วนที่เป็นข้อความ &quot;ต่างโลก&quot; ให้คนเล่นได้เซอร์ไพร์&quot; · นับคำ ต่างโลก: index 8 · guide 7 · play 185 · worlds 18 · otherworld 45 · about 19 · catalog 15 · cards 17 · whatsnew 84 (3) &quot;เอาระบบหน่วงเวลาตอนกดเลือกตัวเลืือกออก&quot; · app.mjs:1958 FX_CHOICE_HOLD 700 (ใบ 26 ed93750 · ข้อ 6 แถว 63/93) + FX.flipB block 280 (:1845) · fxCard :2007 (4) &quot;วิธีเล่นแพตช์โน้ตกลไกในเกมโลกการ์ดทั้งหมดห้องผู้พัฒนา หน้าเหล่านี้ ถ้าจเขข้า ต้องส่รหัส&quot; · เมนูร่วม src/site/nav.mjs</p>
 <ol><li>ย้ายส่วน: เจ้าของเลือก &quot;กำลังทำ&quot; → whatsnew.html · &quot;ระบบหลัก&quot; → about.html · หน้าแรกเหลือหัว + ปุ่มเริ่มเล่น + การ์ดโลก + footer · ตัวสร้าง ROADMAP/data-fact ตามไปที่หน้าใหม่ ไม่ทิ้งเลขค้าง</li><li>ซ่อนต่างโลก: เจ้าของเลือก &quot;หน้าสาธารณะทั้งเว็บ&quot; · ในเกมไม่แตะ · planner เคาะ: หน้าที่ไม่ติดรหัส (index · play head/meta · หน้าส่งต่อ) ไม่มีคำ ต่างโลก/isekai/เทพธิดาต่างโลก · การ์ด &quot;ต่างโลก&quot; หน้าแรกออก เหลือ ชาตินี้ · ปรโลก + ปุ่ม worlds เป็น &quot;ชาตินี้ · ปรโลก&quot; · description/og/JSON-LD ใบ 68 ตัดวลี &quot;มีต่างโลกเป็นโลกที่สอง&quot; · หน้าติดรหัส (ข้อ 106) คงเนื้อเดิม · otherworld.html เข้ากลุ่มติดรหัส + noindex</li><li>ถอดหน่วงคลิก: ทับข้อ 6 (แถว 63 · 93) · ลบ FX_CHOICE_HOLD + FX.flipB block → 0 ⇒ คลิกแรกข้ามภาพพลิกแล้วปุ่มทำงานทันที · ภาพพลิกยังเล่นเมื่อไม่กด · deathA/title block คงเดิม (ไม่ใช่ตอนกดเลือก) · harness smoke 400 คลิกต้องผ่าน · UI ล้วน</li><li>หน้าติดรหัส: เจ้าของเลือก &quot;กล่องถามรหัสหน้าฉาก&quot; (JS บังหน้า · เนื้อยังอยู่ใน HTML · view-source อ่านได้ — เจ้าของรับรู้ ไม่ใช่กันจริง) · หน้า: guide whatsnew about worlds catalog dev/<strong> + otherworld (ข้อ 104) · cards spoilers archive spec ติดด้วย (planner เคาะ: หน้าลูกของกลุ่มเดียวกัน) · เมนู: เจ้าของเลือก &quot;คงเมนู กดแล้วถามรหัส&quot; · รหัส: เก็บแค่ SHA-256 ใน JS </strong>ห้ามเขียนรหัสจริงลง repo/แชท/ใบ** · เจ้าของตั้งเองผ่านสคริปต์ที่เลนทำ · ผ่านแล้วจำ sessionStorage · หน้าติดรหัสใส่ noindex · play + index ไม่ติด</li><li>ผลต่อใบ 68 SEO (ทับข้อ 101 ส่วนรายการ): sitemap เหลือ index + play · หน้าติดรหัสทุกหน้า noindex ไม่อยู่ใน sitemap</li><li>คิว: ทุกใบ UI/เว็บล้วน ลัดคิว · 68 69 70 72 แตะ docs/ + nav.mjs ชุดเดียวกัน ⇒ ผู้รวมงานจ่ายเลนเดียวเรียง 72 → 69 → 70 → 68 · 71 แยกเลนได้ (src/ui/app.mjs)</li></ol>
 <h4 id="d-ui-redo-decisions-h36">2026-11-04 19:44 · ด่าน import ui↔engine (คิว integrator · planner เคาะ ไม่ต้องถามเจ้าของ)</h4>
 <p>ที่มา: integrator — v0.6.55 (d54400d) hotfix &quot;bookAdd is not defined&quot; หลัง merge 8b2fb24 เปลี่ยนชื่อเป็น skillBookAdd · ต้นแบบตรวจ 10 บรรทัด main เดิม MISSING bookAdd · ใหม่ 0</p>
 <ol><li>ใบ 73 ด่าน lint:test ตรวจชื่อ import src/ui ← engine มีจริง · ไม่ใช่ UI แต่กันเกมพังทั้งเกม ⇒ ลัดคิวแบบใบ UI (ขยายกฎข้อ 78 เฉพาะใบด่านกันพังทั้งเกม)</li></ol>
+<h4 id="d-ui-redo-decisions-h37">2026-11-04 21:32 · เจ้าของวาง JSON ป้ายผลไอคอน (ใบ 53 · หน้า fx-icons-tweak ใบ 52 · แชท next-life-planner)</h4>
+<p>JSON คำต่อคำ:</p>
+<pre data-lang="json"><code>{
+ &quot;page&quot;: &quot;fx-icons-tweak (ui-redo 52)&quot;,
+ &quot;preset&quot;: &quot;ข ไอคอนเส้น + ชิป&quot;,
+ &quot;changed&quot;: [
+  &quot;sep&quot;,
+  &quot;pct&quot;
+ ],
+ &quot;dir&quot;: &quot;arrow&quot;,
+ &quot;color&quot;: &quot;all&quot;,
+ &quot;chip&quot;: &quot;on&quot;,
+ &quot;word&quot;: &quot;icon&quot;,
+ &quot;size&quot;: &quot;100&quot;,
+ &quot;sep&quot;: &quot;dot&quot;,
+ &quot;free&quot;: &quot;chip&quot;,
+ &quot;pct&quot;: &quot;word&quot;,
+ &quot;hide&quot;: &quot;icon&quot;,
+ &quot;upA&quot;: &quot;#2F6B66&quot;,
+ &quot;dnA&quot;: &quot;#B73824&quot;,
+ &quot;upI&quot;: &quot;#7FE0A8&quot;,
+ &quot;dnI&quot;: &quot;#FF8A7A&quot;,
+ &quot;icons&quot;: {
+  &quot;ชีวิต&quot;: &quot;heart&quot;,
+  &quot;ความสุข&quot;: &quot;smile&quot;,
+  &quot;ความรู้&quot;: &quot;book&quot;,
+  &quot;ความสัมพันธ์&quot;: &quot;people&quot;,
+  &quot;เงิน&quot;: &quot;coin&quot;,
+  &quot;รายได้&quot;: &quot;case&quot;,
+  &quot;เส้นสาย&quot;: &quot;link&quot;,
+  &quot;พลัง&quot;: &quot;bolt&quot;,
+  &quot;เวท&quot;: &quot;spark&quot;,
+  &quot;โชค&quot;: &quot;clover&quot;,
+  &quot;ทอง&quot;: &quot;coin&quot;,
+  &quot;ชื่อเสียง&quot;: &quot;star&quot;,
+  &quot;free&quot;: &quot;tag&quot;,
+  &quot;pct&quot;: &quot;target&quot;,
+  &quot;hide&quot;: &quot;ask&quot;
+ },
+ &quot;note&quot;: &quot;เอาฟรีออก ไม่ต้องแสดงหรือใบ้&quot;
+}</code></pre>
+<ol><li>ใบ 54 ลงตาม JSON ข้างบน: preset ข ไอคอนเส้น+ชิป · ลูกศรขึ้นลง · สีทั้งชิป · ขนาด 100 · คั่นด้วยจุด · %สำเร็จเป็นคำ (<code>pct: word</code>) · ป้าย ? ใช้ไอคอน ask · สีชาติไทย upA/dnA · ต่างโลก upI/dnI · ไอคอนต่อค่าตาม <code>icons</code></li><li>note เจ้าของทับ <code>free: chip</code> และข้อ 72 ส่วน &quot;ฟรี&quot;: <strong>ไม่มีป้ายฟรีเลย</strong> ไม่แสดงบนปุ่ม ไม่ใบ้ · planner ตีความ &quot;ไม่ใบ้&quot; ว่าไม่ต้องมีใน aria-label ด้วย (ใบ 54 เดิมยกตัวอย่าง &quot;ไม่เสียเงิน&quot; ⇒ ตัดออก) · ไอคอน <code>free: tag</code> ไม่ใช้ · คู่มือ (guide.mjs/guide.html/คำอธิบายป้าย) ไม่ต้องอธิบายป้ายฟรี</li><li>ข้อ 73 74 คงเดิม: ค่าที่ B169 ซ่อนห้ามได้ไอคอนเฉพาะตัว · aria-label ข้อความเต็มของค่าที่แสดง · ขาวดำแยกขึ้นลงจากลูกศร</li></ol>
 </details>
 <script>(() => { const open = () => { const t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); const d = t && t.closest('details'); if (d && !d.open) { d.open = true; t.scrollIntoView(); } }; addEventListener('hashchange', open); open(); })();</script>
 </div></main>
