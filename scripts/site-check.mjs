@@ -14,6 +14,7 @@ import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
 import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
 import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
+import { designFiles, designPage, designPages, designHtml } from '../src/site/design.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -26,7 +27,8 @@ const check = (name, bad, extra = '') => {
 };
 
 // 1) ตัวเลขบนหน้า = ค่าที่คิดจากข้อมูลตอนนี้ (หน้าที่ยังไม่ได้ build ใหม่หลังแก้ข้อมูล = ตก)
-const pages = [...FACT_PAGES, ...GEN_PAGES.map(([name]) => name)];
+const designOut = designPages();
+const pages = [...FACT_PAGES, ...GEN_PAGES.map(([name]) => name), ...designOut.map(([f]) => f.replace(/\.html$/, ''))];
 let seen = 0;
 const wrong = [];
 for (const p of pages) {
@@ -175,6 +177,18 @@ const caught = firstUrl && urlsIn(new Set([...specHref].filter((h) => h !== firs
 check('ภาคผนวกสเปกใน GDD ครบทุกไฟล์และลิงก์อ้างอิงกดได้', noDoc.length || noHtml.length || unlinked.length || !caught, ` ไฟล์ ${specFiles().length - noDoc.length}/${specFiles().length} · URL ไม่เป็นลิงก์ ${unlinked.length}${unlinked.length ? `: ${unlinked.slice(0, 3).join(' | ')}` : ''}${noHtml.length ? ` · ไม่มีลิงก์ ${noHtml.join(' ')}` : ''} · ตัวควบคุม${caught ? 'จับได้' : 'จับไม่ได้'}`);
 const gh = all.flatMap((p) => [...read(`${p}.html`).matchAll(/https?:\/\/github\.com\/[^"\s]*\/(?:tree|blob)\/[^"\s]*/g)].map((m) => `${p}.html → ${m[0]}`));
 check('หน้าเว็บไม่ลิงก์ไปหน้า tree/blob บน GitHub', gh.length, ` ${all.length} หน้า${gh.length ? ` · เจอ ${gh.slice(0, 3).join(' | ')}` : ''}`);
+
+// 7b) หน้าการออกแบบ: ทุกไฟล์ใน design/ มีหัวข้อบนหน้าของเรื่องนั้น · หน้าใน docs/ ตรงกับที่ build จาก design/ ตอนนี้ (sync สำเนาใหม่แล้วลืม build = ตก)
+// ตัวควบคุม: ถอดเอกสารแรกออกจากหน้าสารบัญ ⇒ ต้องถูกจับว่าไม่ครบ และไม่ตรงของที่ build
+const designTpl = injectFacts(readFileSync(new URL('../src/site/design.html', import.meta.url), 'utf8'), facts);
+const designGap = (out, readPage) => [
+  ...designFiles().filter((f) => !readPage(designPage(f))?.includes(`<details class="doc" id="${docId(f)}"`)).map((f) => `ไม่มี ${f}`),
+  ...out.filter(([f, pg]) => readPage(f) !== designHtml(designTpl, pg)).map(([f]) => `ค้าง ${f}`),
+];
+const designMiss = designGap(designOut, (f) => (existsSync(new URL(f, docs)) ? read(f) : null));
+const cutFirst = designOut.map(([f, pg], i) => [f, i ? pg : { ...pg, body: pg.body.replace(/<details class="doc"[\s\S]*?<\/details>/, '') }]);
+const designCtl = designGap(designOut, (f) => designHtml(designTpl, cutFirst.find(([x]) => x === f)[1])).length >= 2;
+check('หน้าการออกแบบครบทุกไฟล์ใน design/ และตรงของที่ build', designMiss.length || !designCtl, ` ไฟล์ ${designFiles().length} · ${designOut.length} หน้า${designMiss.length ? ` · ${designMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${designCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 8) คู่มือ (B121): ป้ายปุ่มทุกตัวในค่ากลางขึ้นคู่มือพร้อมคำอธิบาย · หน้าจอเกมไม่เขียนป้ายเหล่านั้นตรงซ้ำ (ไม่งั้นแก้ค่ากลางแล้วเกมไม่ตาม)
 const guide = read('guide.html');

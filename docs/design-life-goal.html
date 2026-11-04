@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>เป้าชีวิตส่วนตัว · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<meta name="description" content="เป้าชีวิตส่วนตัว — คำตัดสินการออกแบบของเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด ตามสำเนาใน repo">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi:wght@400;600&family=Sarabun:wght@400;600&display=swap">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
+  header { background: #1F2430; color: #F4EFE3; padding: 32px 16px 28px; }
+  .w { max-width: 900px; margin: 0 auto; }
+  h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
+  header p { margin: 0; color: #E3DDD0; }
+  header a { color: #F4EFE3; }
+  nav.site { margin-top: 10px; font-size: 14px; }
+  nav.site a { display: inline-block; padding: 6px 4px; min-height: 32px; }
+  main { padding: 24px 16px 64px; }
+  h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
+  ul, ol { padding-left: 22px; margin: 0 0 8px; }
+  li { margin: 0 0 6px; }
+  p { margin: 0 0 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #E9E2D2; font-weight: 600; }
+  code { font-size: 13px; background: #E9E2D2; padding: 0 4px; }
+  a { color: #A23B2C; }
+  .spec-toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 0 0 16px; font-size: 14px; }
+  .spec-toc > div { border: 1px solid #C9BFA9; background: #FBF8F1; padding: 10px 14px; }
+  .spec-toc h3 { margin: 0 0 4px; }
+  .spec-toc li > a { line-height: 1.5; padding: 4px 0; }
+  .spec-toc li small { display: block; }
+  .spec-toc .sub a { display: block; color: #4A4F5C; padding: 4px 0; }
+  .spec-toc small { color: #4A4F5C; }
+  details.doc { border: 1px solid #C9BFA9; background: #FBF8F1; padding: 8px 14px; margin: 0 0 8px; overflow-wrap: anywhere; }
+  details.doc > summary { font-family: Pridi, serif; font-size: 17px; cursor: pointer; padding: 6px 0; min-height: 32px; }
+  details.doc h3 { font-size: 18px; }
+  details.doc h4 { font-family: Pridi, serif; font-size: 16px; margin: 14px 0 4px; }
+  details.doc h5 { font-size: 15px; margin: 12px 0 4px; }
+  .src { font-size: 13px; color: #4A4F5C; }
+  pre { background: #1F2430; color: #F4EFE3; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
+  pre code { background: none; padding: 0; }
+  .tw { overflow-x: auto; margin: 0 0 12px; }
+  .tw th, .tw td { overflow-wrap: normal; }
+</style>
+</head>
+<body>
+<header><div class="w">
+  <h1>เป้าชีวิตส่วนตัว</h1>
+  <p>เรื่อง life-goal · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.31</span></p>
+  <nav class="site"><a href="index.html">หน้าแรก</a> · <a href="play.html">เล่นเกม</a> · <a href="design.html">สารบัญการออกแบบ</a> · <a href="gdd.html">เอกสารออกแบบเกม (GDD)</a> · <a href="whatsnew.html">แพตช์โน้ต</a></nav>
+</div></header>
+<main><div class="w">
+<nav class="spec-toc" id="design-toc" aria-label="สารบัญหน้านี้"><div><h3>ในหน้านี้</h3><ol><li><a href="#d-life-goal-decisions">เป้าชีวิตส่วนตัว — decisions</a><div class="sub"><a href="#d-life-goal-decisions-h2">คำตอบที่ตัดสิน</a><a href="#d-life-goal-decisions-h4">คำตอบที่ตัดสิน</a><a href="#d-life-goal-decisions-h6">คำตอบที่ตัดสิน</a></div></li></ol></div></nav>
+<details class="doc" id="d-life-goal-decisions" open><summary>เป้าชีวิตส่วนตัว — decisions</summary><p class="src">ไฟล์ต้นฉบับ design/life-goal/decisions.md · <a href="#design-toc">กลับสารบัญ</a></p>
+<p>ที่มา: 06s-1 คีย์ skillMap &quot;เป้าชีวิต&quot; (เลน B ชี้ว่าไม่มีระบบ · goal.mjs B89 เป็นแค่ป้ายบอกทิศ ไม่เก็บ state) → เจ้าของเลือกสร้างระบบใหม่ แยกใบจาก 06s-1 (เลน B ใส่ lifeGoal: {} stub)</p>
+<h4 id="d-life-goal-decisions-h1">2026-11-03 (grill รอบ 1)</h4>
+<h3 id="d-life-goal-decisions-h2">คำตอบที่ตัดสิน</h3>
+<ol><li>เป้ามาจากไหน: ผู้เล่นเลือก 1 จาก 3 ตอนวัยรุ่น</li><li>ชุดเป้า: เป้าตามช่วงวัย หลายเป้าต่อชีวิต</li><li>ทำสำเร็จได้: ด้านบน + ความสุขตอนสำเร็จ (ด้านบน = สกิลตาม skillMap.lifeGoal + บรรทัดการ์ดตาย + สมุด)</li><li>ป้ายหัวการ์ด: แสดงเมื่อไม่มีสายให้บอก</li></ol>
+<p>คำถามค้าง (รอบ 2): ข้อ 1 &quot;เลือกตอนวัยรุ่น&quot; กับข้อ 2 &quot;ตามช่วงวัยหลายเป้า&quot; — เลือกทุกช่วงวัยหรือครั้งเดียว · กี่เป้าต่อช่วง · ความสุขเท่าไร (ด่านสมดุล) · การ์ดเลือกเป้าเพิ่มใบ ⇒ lifehash ชีวิตไทยขยับ · ยังไม่ผ่านผู้ค้าน</p>
+<h4 id="d-life-goal-decisions-h3">2026-11-03 (grill รอบ 2 · popup ผู้รวมงาน)</h4>
+<h3 id="d-life-goal-decisions-h4">คำตอบที่ตัดสิน</h3>
+<ol><li>เลือกกี่ครั้ง: เลือกทุกช่วงวัย — การ์ดเลือกเป้าโผล่ต้นช่วง วัยรุ่น · หนุ่มสาว · ทำงาน · กลางคน ช่วงละ 1 เป้าจาก 3 (ข้อ 1 &quot;วัยรุ่น&quot; = ช่วงแรก · ข้อ 2 ใช้ได้ตรง)</li><li>ความสุขตอนสำเร็จ: +5 ต่อเป้า</li></ol>
+<p>รายละเอียด: 5 = การ์ดเพิ่มได้ถึง 4 ใบต่อชีวิต ⇒ lifehash ชีวิตไทยขยับ · โควตาการ์ดต่อปีต้องวัด · 6 = เท่าการ์ดดีระดับกลาง ด่านสมดุลความสุขเดิมต้องวัดหลังลงโค้ด · ยังไม่ผ่านผู้ค้าน</p>
+<h4 id="d-life-goal-decisions-h5">2026-11-03 (popup หลังผู้ค้านดีไซน์ · design-challenger @09b258b · Refuted 6 · Weakened 1–5 · next-life-planner)</h4>
+<h3 id="d-life-goal-decisions-h6">คำตอบที่ตัดสิน</h3>
+<ol><li>ข้อ 1 ซ้อนระบบทุ่มเท (โฟกัส B163 focusMet): เป้า = ปลายสายทุ่มเท — ใช้ระบบทุ่มเทเดิม เพิ่มป้าย + รางวัล ไม่มีการ์ดเลือกเป้า (ทับข้อ 1 · 5 เรื่องการ์ดต้นช่วง ⇒ การ์ดไม่เพิ่ม · ไม่ต้องคิดโควตา)</li><li>ข้อ 2 หมดช่วงแล้วยังไม่สำเร็จ: ค้างข้ามช่วงได้ (ทำสำเร็จช้าก็ได้รางวัล)</li><li>ข้อ 3 รางวัล: ส่งความสุข + บรรทัดการ์ดตายก่อน · สกิล (skillMap.lifeGoal) + สมุด ต่อทีหลังเมื่อ 06s-1 เข้า main</li><li>ข้อ 4 ที่แสดง: แถบทุ่มเทใต้ค่าสถานะ (ทับ &quot;ป้ายหัวการ์ดเมื่อไม่มีสาย&quot;)</li><li>ข้อ 6 ความสุขตอนสำเร็จ: ระดับ 2 (+12) — ต้องวัดด่านสมดุลความสุข</li></ol>
+<p>หมายเหตุผู้ค้าน (ข้อเท็จจริง @09b258b):</p>
+<ul><li>LEVELS = {1:5, 2:12, 3:20} life.mjs:39 · ความสุขกลับค่าพื้นฐาน ครึ่งชีวิต 3 ปี life.mjs:63-66</li><li>ป้ายหัวการ์ด nextGoal ลำดับ เรียน &gt; การเมือง &gt; ยศ goal.mjs:48-53 · <code>lifeGoal</code> ใน main = 0 (มีแค่ lane-b 06s-1 @08d39da afterlife.mjs:151)</li><li>ชื่อชน FAMILY_GOALS (ฉายา) titles.mjs:357-368 — ยังไม่ได้ถามเรื่องตั้งชื่อใหม่ (ไม่ได้เลือกตัวเลือก &quot;ความฝัน&quot;)</li><li>บอทเลือกทุ่มเทด้วยเลขสุ่มชุดแยก harness/bots.mjs:111-131 ⇒ lifehash ขยับจากผลความสุขเท่านั้น</li></ul>
+</details>
+<script>(() => { const open = () => { const t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); const d = t && t.closest('details'); if (d && !d.open) { d.open = true; t.scrollIntoView(); } }; addEventListener('hashchange', open); open(); })();</script>
+</div></main>
+</body>
+</html>

@@ -6,6 +6,7 @@ import { spoilersHtml } from './spoilers.mjs';
 import { injectSpec } from './spec.mjs';
 import { guideHtml } from './guide.mjs';
 import { demoHtml } from './demo.mjs';
+import { designPages, designHtml } from './design.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'gdd'];
@@ -34,6 +35,12 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     const page = injectFacts(readFileSync(at(`src/site/${name}.html`), 'utf8'), facts, `src/site/${name}.html`).replace(slot, () => html(content));
     writeFileSync(at(`docs/${name}.html`), page);
     out.push(name);
+  }
+  // หน้าการออกแบบหลายหน้าจากแม่แบบเดียว — จำนวนหน้าตามโฟลเดอร์ใน design/
+  const designTpl = injectFacts(readFileSync(at('src/site/design.html'), 'utf8'), facts, 'src/site/design.html');
+  for (const [file, page] of designPages(new URL('design/', root))) {
+    writeFileSync(at(`docs/${file}`), designHtml(designTpl, page));
+    out.push(file.replace(/\.html$/, ''));
   }
   return { facts, pages: out };
 }
