@@ -1,4 +1,5 @@
 # โฟกัสชีวิต (B163): การ์ดติดป้ายหมวดโฟกัสเพิ่มจาก category ได้ ด้วยป้ายที่มีจริง · ตัวเลือกติดประตูเข้าสาย (ใบ 04) ด้วยโฟกัสหมวด gate
+# นิสัยจากวัยเด็ก (B41): ป้าย nature บนการ์ดเด็กที่ออกช่วงนับแต้ม · ตัวเลือกวัยโตล็อกด้วยนิสัย
 events:
   - id: good_focus_01
     type: A
@@ -12,5 +13,16 @@ events:
       - {text: "ตกลง", merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 2, gate: business, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 5, gate: [ordain, occult], merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, requires: {nature: bold}, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: good_focus_kid_01
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    when: {age: [5, 10]}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ตกลง", nature: learn, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, nature: social, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

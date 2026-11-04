@@ -249,6 +249,24 @@ for (const f of heir.unread) fails.push(`ทะเบียน heir: "${f}" ไ�
 if (!heirCheck(flagReg, []).unread.length) fails.push('ทะเบียน heir: ตัวควบคุม "ไม่มีการ์ด" ไม่ตก');
 rows.push(['ทะเบียน heir:', `${Object.keys(flagReg.heir ?? {}).length} ธง · ตัวควบคุม ${Object.keys(heirControls).length + 1} แบบ · ไม่มีการ์ดอ่าน ${heir.unread.length}`]);
 
+// ป้ายนิสัย (B41): ไฟล์ bad จับได้แค่ทางเดียว — ไล่ทุกทางที่กติกาต้องตก จากการ์ดฐานที่ผ่าน แก้ทีละจุด
+const natureProblems = (e, c = ctx) => lintDocs([{ file: 'nature-control', doc: { events: [e] } }], c).filter((p) => p.rule === 'nature-tag');
+const natureBase = { id: 'nature_ctl_01', type: 'A', stage: 'เด็ก', years: [2500, 2650], when: { age: [6, 12] }, text: 'ข้อความการ์ด', choices: ['ตกลง', 'ทางเลือกอื่น 2', 'ทางเลือกอื่น 3', 'ทางเลือกอื่น 4'].map((text) => ({ text, merit: [{ cat: 'neutral' }] })) };
+const natureCard = (patch, choice) => Object.fromEntries(Object.entries({ ...natureBase, ...patch, choices: [{ ...natureBase.choices[0], ...choice }, ...natureBase.choices.slice(1)] }).filter(([, v]) => v !== undefined));
+const natureId = Object.keys(ctx.natures)[0];
+const natureOk = natureProblems(natureCard({}, { nature: natureId }));
+for (const p of natureOk) fails.push(`nature-tag: การ์ดฐานต้องผ่าน ${formatProblem(p)}`);
+const natureControls = {
+  'ป้ายนิสัยที่ไม่มี': [natureCard({}, { nature: 'no_such' })],
+  'requires.nature ที่ไม่มี': [natureCard({ stage: 'ทำงาน', when: undefined }, { requires: { nature: 'no_such' } })],
+  'ป้ายบนการ์ดอายุ 0–5': [natureCard({ when: { age: [0, 5] } }, { nature: natureId })],
+  'ป้ายบนการ์ด at_age 3': [natureCard({ when: undefined, at_age: 3 }, { nature: natureId })],
+  'ป้ายบนการ์ดวัยโต': [natureCard({ stage: 'ทำงาน', when: undefined }, { nature: natureId })],
+  'ไม่มีทะเบียนนิสัย': [natureCard({}, { nature: natureId }), { ...ctx, natures: {} }],
+};
+for (const [name, args] of Object.entries(natureControls)) if (!natureProblems(...args).length) fails.push(`nature-tag: ตัวควบคุม "${name}" ไม่ตก`);
+rows.push(['ป้ายนิสัย nature-tag', `การ์ดฐาน ${natureOk.length ? 'ตก' : 'ผ่าน'} · ตัวควบคุม ${Object.keys(natureControls).length} แบบ`]);
+
 try {
   const real = loadEvents();
   rows.push(['content/', `ผ่าน ${real.length} เหตุการณ์`]);
