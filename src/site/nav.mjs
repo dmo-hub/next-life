@@ -41,7 +41,7 @@ export function navHtml(file) {
   const cur = (href) => (href === file ? ' aria-current="page"' : href === 'design.html' && /^design-.+\.html$/.test(file) ? ' aria-current="true"' : '');
   const a = (href, text, cls) => `<a${cls ? ` class="${cls}"` : ''} href="${up}${href}"${cur(href)}>${text}</a>`;
   const links = NAV_MENU.map(([h, t, c]) => a(h, t, c)).join('');
-  return `<nav class="top" aria-label="หน้าอื่น">${a('index.html', 'เกิดใหม่ทั้งที', 'brand')}<div class="links">${links}</div>${a('play.html', 'เล่นเกม', 'play')}</nav>${NAV_SCRIPT}`;
+  return `<nav class="top" aria-label="หน้าอื่น">${a('index.html', 'NEXT LIFE', 'brand')}<div class="links">${links}</div>${a('play.html', 'เล่นเกม', 'play')}</nav>${NAV_SCRIPT}`;
 }
 
 const swap = (html, start, end, body, where) => {
