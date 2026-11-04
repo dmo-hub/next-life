@@ -1742,8 +1742,6 @@ const fxSvg = (w, h, inner, cls = '') => `<svg class="${cls}" viewBox="0 0 ${w} 
 // สุ่มแบบมี seed ตายตัว — ผงทองเหมือนกันทุกชีวิตทุกครั้ง
 const fxRng = (s) => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 const FX_INK = ART_INK;
-// หลังการ์ด: กรอบทองคู่ + กนกม้วนมุม + ข้าวหลามตัดกลาง (ภาษาเดียวกับ ERA_FRAME ใน art.mjs)
-const FX_CARD_BACK = fxSvg(200, 250, `<rect x="6" y="6" width="188" height="238" rx="6" fill="none" stroke="${FX_INK.gold}" stroke-width="1.6"/><rect x="11" y="11" width="178" height="228" rx="4" fill="none" stroke="${FX_INK.bronze2}" stroke-width="0.8"/><path d="M16 36q0-20 20-20q-10 5-10 13q0 7 7 7q5 0 5-5M184 36q0-20-20-20q10 5 10 13q0 7-7 7q-5 0-5-5M16 214q0 20 20 20q-10-5-10-13q0-7 7-7q5 0 5 5M184 214q0 20-20 20q10-5 10-13q0-7-7-7q-5 0-5 5" fill="none" stroke="${FX_INK.gold}" stroke-width="1.2"/><path d="M100 85l30 40l-30 40l-30-40z" fill="none" stroke="${FX_INK.gold}" stroke-width="1.4"/><path d="M100 103l16 22l-16 22l-16-22z" fill="${FX_INK.gold2}"/>`);
 // ฉากซ้อนเต็มจอของตาย/ฉายา — จบเองค่อยจางออก · ถูกข้ามหายทันที
 const fxOv = () => document.body.appendChild(el('div', 'fx-ov'));
 function fxOvEnd(ov, natural) {
@@ -1753,17 +1751,35 @@ function fxOvEnd(ov, natural) {
 }
 
 const FX = {
-  // พลิก 3D ทั้งใบ: ครึ่งแรกเห็นหลังการ์ด ครึ่งหลังเห็นหน้า
-  flipA: { dur: 280, block: 280,
+  // เส้นทองวิ่งรอบกรอบการ์ด แล้วเนื้อการ์ดค่อยขึ้น (ui-redo ใบ 37 · แบบ B ของต้นแบบ fx-proto) · ขนาดเส้นวัดจากการ์ดจริงตอนเริ่ม
+  // reduced-motion ไม่วาดเส้น — fxPlay จางทั้งใบให้เอง
+  flipB: { dur: 520, block: 280,
     build: (card) => {
-      const back = el('div', 'fx-back');
-      back.innerHTML = FX_CARD_BACK;
-      card.classList.add('fx-flip');
-      card.append(back);
-      return { card, back };
+      const kids = [...card.children];
+      if (fxReduced()) return { kids, line: null, svg: null };
+      const r = card.getBoundingClientRect();
+      const rx = parseFloat(getComputedStyle(card).borderTopLeftRadius) || 0;
+      card.classList.add('fx-trace-on');
+      card.insertAdjacentHTML('beforeend', fxSvg(r.width, r.height, `<rect x="1" y="1" width="${Math.max(0, r.width - 2)}" height="${Math.max(0, r.height - 2)}" rx="${rx}" fill="none" stroke="${FX_INK.gold}" stroke-width="2" pathLength="100" stroke-dasharray="100"/>`, 'fx-trace'));
+      const svg = card.lastElementChild;
+      return { card, kids, svg, line: svg.querySelector('rect') };
     },
-    frame: (p, t) => { p.card.style.transform = `perspective(1400px) rotateY(${180 * (1 - fxOut(t))}deg)`; },
-    end: (p) => { p.card.classList.remove('fx-flip'); p.card.style.transform = ''; p.back.remove(); } },
+    frame: (p, t) => {
+      if (p.line) {
+        p.line.style.strokeDashoffset = 100 * (1 - fxOut(fxSpan(t, 0, 0.55)));
+        p.line.style.opacity = 1 - 0.6 * fxSpan(t, 0.75, 1);
+      }
+      const c = fxOut(fxSpan(t, 0.35, 1));
+      for (const k of p.kids) {
+        k.style.opacity = c === 1 ? '' : c;
+        k.style.transform = c === 1 ? '' : `translateY(${8 * (1 - c)}px)`;
+      }
+    },
+    end: (p) => {
+      for (const k of p.kids) k.style.opacity = k.style.transform = '';
+      p.svg?.remove();
+      p.card?.classList.remove('fx-trace-on');
+    } },
   // ตะเกียงดับ: เปลวสั่นแล้วหด · ควันเส้นเดียวลอยขึ้นจาง · จอหรี่เป็นรัก · คำบรรยายค่อยขึ้น
   deathA: { dur: 1600, block: 300,
     build: (ov, o) => {
@@ -1897,7 +1913,7 @@ function fxCard(box, card) {
   fxSeen = card;
   // นับเฉพาะทางที่กดได้ — การ์ดที่ล็อกจนเหลือทางเดียวกดพลาดไม่ได้ผลต่างอะไร
   const open = (card.choices ?? []).filter((_, i) => !card.locked?.[i]).length;
-  if (card.kind !== 'death') return fxPlay(box, 'flipA', open >= 2 ? { hold: FX_CHOICE_HOLD } : {});
+  if (card.kind !== 'death') return fxPlay(box, 'flipB', open >= 2 ? { hold: FX_CHOICE_HOLD } : {});
   if (fxReduced()) return;
   const top = lifeTitles(card).titles[0];
   const tier = top && FX_TIER[top.tier];
