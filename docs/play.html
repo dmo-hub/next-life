@@ -2788,6 +2788,81 @@ function memoryCard(st, stageOf) {
   return { kind: 'memory', age: st.age, stage: stageOf(st.age), text: MEMORY.text, items: memoryPeople(st), choices, fx: choices.map(() => ''), locked: choices.map(() => null) };
 }
 
+// ความจำข้ามชาติ (B67a · ใบ 159): ของชาติก่อนที่ชาตินี้จำได้ ส่งต่อทุกทางเกิดผ่านทายาท (makeHeir) ช่องเดียว
+// ไม่ใช่บัญชีบุญบาป — ไม่มีแต้ม ไม่มีชื่อหมวด · การ์ดอ่านผ่าน when.past_life เท่านั้น
+// ชีวิตแรกไม่มีช่อง st.past (ไม่ใช่ null) ⇒ ชีวิตที่ไม่มีชาติก่อนได้สถานะเท่าก่อนมีระบบทุกไบต์
+// ไม่ import life.mjs (life.mjs import ไฟล์นี้)
+
+// พรสวรรค์ติดชาติ (ข้อ 3): ชาติก่อนทำอาชีพหลักนานถึง years ปี → ชาตินี้ได้งานเดียวกันแล้วตัวคูณรายได้เริ่มที่ mul แทน 1
+const PAST_TALENT = { years: 10, mul: 1.1 };
+// วิธีตายของชีวิตที่หายไปต่างโลก — ไม่มีศพ ไม่มีสาเหตุในกลุ่มสาเหตุตาย
+const PAST_GONE = 'gone';
+const PAST_PROVINCE = ['same', 'other'];
+
+// อาชีพที่ทำนานที่สุดของชีวิตนี้ · ปีเท่ากันเอาอาชีพที่เริ่มนับก่อน · ไม่เคยทำงาน = null
+function pastMainJob(st) {
+  let job = null, years = 0;
+  for (const [k, n] of Object.entries(st.workYears ?? {})) if (n > years) [job, years] = [k, n];
+  return { job, years };
+}
+
+const addOnce = (list, v) => (v && !list.includes(v) ? [...list, v] : list);
+
+// ความจำที่ชีวิตที่เพิ่งจบฝากให้ชาติถัดไป · realm = id ภูมิที่ปรโลกชี้ให้ชาตินี้ · gone = หายไปต่างโลก
+// รายการสะสม (ภูมิ/อาชีพที่เคยเป็น) ต่อจากความจำเดิม · treasures/wish/barami = ช่องของกิมมิคข้อ 6 7 10 ส่งต่อค่าเดิมจนกว่าใบนั้นจะเติม
+function pastOf(st, realm, gone) {
+  const prev = st.past;
+  const { job, years } = pastMainJob(st);
+  return {
+    lives: (prev?.lives ?? 0) + 1,
+    province: st.province ?? null,
+    job,
+    jobYears: years,
+    cause: gone ? PAST_GONE : st.cause ?? 'other',
+    realm,
+    realms: addOnce(prev?.realms ?? [], realm),
+    jobs: addOnce(prev?.jobs ?? [], job),
+    treasures: [...(prev?.treasures ?? [])],
+    wish: null,
+    barami: prev?.barami ?? 0,
+  };
+}
+
+// อาชีพที่ชาตินี้มีพรสวรรค์ติดมา · null = ไม่มี (ชีวิตแรก/ชาติก่อนทำงานไม่นานพอ)
+const pastTalent = (past) => (past?.job && past.jobYears >= PAST_TALENT.years ? past.job : null);
+
+// ตัวคูณรายได้ตอนเริ่มงาน: งานตรงพรสวรรค์ได้ mul · งานอื่น 1 เท่าเดิม
+const talentStart = (st) => (st.talent && st.talent === st.occupation ? PAST_TALENT.mul : 1);
+
+// when.past_life: any = มี/ไม่มีชาติก่อน · province = เกิดจังหวัดเดียวกับชาติก่อนไหม · job/cause = อาชีพหลัก/วิธีตายชาติก่อน
+// realm = เคยไปภูมินั้นสักชาติ · talent = มีพรสวรรค์ติดชาติ · เงื่อนไขอื่นนอกจาก any:false ต้องมีชาติก่อน
+function pastLifeOk(st, w) {
+  const p = st.past;
+  if (w.any !== undefined && w.any !== !!p) return false;
+  if (!p) return w.any === false && Object.keys(w).length === 1;
+  if (w.province !== undefined && (w.province === 'same') !== (p.province === st.province)) return false;
+  if (w.job && !w.job.includes(p.job)) return false;
+  if (w.cause && !w.cause.includes(p.cause)) return false;
+  if (w.realm && !w.realm.some((r) => p.realms.includes(r))) return false;
+  if (w.talent !== undefined && w.talent !== !!st.talent) return false;
+  return true;
+}
+
+// เซฟก่อนมีความจำข้ามชาติ: ชีวิตรุ่นที่ 2 ขึ้นไปสร้างจากแถวท้ายของผังตระกูล (ที่เกิด · วิธีตาย · ภูมิ) · อาชีพไม่เคยบันทึก = null
+// realmId แปลงชื่อภูมิในผังเป็น id (ผู้เรียกส่งมา — ไฟล์นี้ไม่ import ปรโลก)
+function pastFromLineage(lineage, realmId) {
+  const rows = (lineage ?? []).filter((l) => !l.isekai);
+  const last = rows.at(-1);
+  if (!last) return undefined;
+  const realms = [];
+  for (const l of rows) {
+    const r = realmId(l.realm);
+    if (r && !realms.includes(r)) realms.push(r);
+  }
+  return { lives: rows.length, province: last.province ?? null, job: null, jobYears: 0, cause: last.gone ? PAST_GONE : last.cause ?? 'other', realm: realmId(last.realm), realms, jobs: [], treasures: [], wish: null, barami: 0 };
+}
+
+
 
 
 
@@ -3030,6 +3105,9 @@ function newLife(seed, content, heir = null) {
     fame: heir?.fame ?? 0,
     // ค่าซ้อนทับของตระกูล (overlapOf) — ใส่ช่องเฉพาะเมื่อ > 0 ⇒ ตระกูลที่ไม่เคยข้ามโลกได้สถานะเท่าเดิมทุกไบต์ · เซฟเก่าไม่มีช่อง = 0
     ...(heir?.overlap && { overlap: heir.overlap }),
+    // ความจำข้ามชาติ (past.mjs) + อาชีพที่ติดพรสวรรค์มา — ชีวิตแรกไม่มีช่อง
+    ...(heir?.past && { past: heir.past }),
+    ...(pastTalent(heir?.past) && { talent: pastTalent(heir.past) }),
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // จดหมายคำฝากของรุ่นก่อน (afterfall-3) {age, from, cause, by} — ออกหลังมรดกถึงมือเท่านั้น
@@ -3440,16 +3518,17 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
     st.occupation = o.id;
     st.occupationName = o.name;
     if (st.workFrom === null) st.workFrom = st.age;
-    // ตัวคูณรายได้ผูกกับงานเดิม เปลี่ยนงานแล้วเริ่มนับใหม่
-    st.incomeMult = 1;
+    // ตัวคูณรายได้ผูกกับงานเดิม เปลี่ยนงานแล้วเริ่มนับใหม่ · งานตรงพรสวรรค์ติดชาติเริ่มสูงกว่านิดหนึ่ง
+    st.incomeMult = talentStart(st);
     st.jobSince = st.age;
     enterByJob(st, o.id);
   }
   if (fx.ladder) {
     if (st.workFrom === null) st.workFrom = st.age;
-    st.incomeMult = 1;
     st.jobSince = st.age;
     enterLadder(st, fx.ladder);
+    // วัดพรสวรรค์หลังเข้าสาย — อาชีพเปลี่ยนตามขั้นแรกของสาย
+    st.incomeMult = talentStart(st);
     // ทางแรกของสาย (B170): การ์ด first_of ออกปีที่เข้าสาย ครั้งเดียวต่อชีวิต (เข้าสายซ้ำไม่ออกอีก) · แทนการ์ดกองสุ่มหนึ่งใบแบบผลย้อน ชีวิตจึงไม่ยาวขึ้น
     const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id]);
     if (first) {
@@ -3652,6 +3731,11 @@ function stepYear(st) {
     // บำนาญข้าราชการ (B40): ค่าจ้างสุดท้าย × ปีรับราชการ ÷ div ไม่เกิน cap เท่าของค่าจ้างสุดท้าย
     const pen = st.content.era.careers.pension;
     st.pension = ladderOf(st)?.pension ? Math.min(pen.cap, (st.age + 1 - st.ladder.from) / pen.div) * jobWage(st, st.birthYear + st.age) * 12 / st.price : 0;
+  }
+  // ปีทำงานต่ออาชีพ — อาชีพหลักที่ชาติถัดไปจำได้ (past.mjs) · ช่องเกิดปีแรกที่ทำงาน
+  if (isWorking(st)) {
+    const w = (st.workYears ??= {});
+    w[st.occupation] = (w[st.occupation] ?? 0) + 1;
   }
 
   st.age += 1;
@@ -4568,6 +4652,7 @@ function whenOk(st, when) {
   }
   if (when.parent_flags && !parentFlagsOk(st, when.parent_flags)) return false;
   if (when.dark_gate && !darkGateOk(st)) return false;
+  if (when.past_life && !pastLifeOk(st, when.past_life)) return false;
   return !when.flags || flagsOk(st, when.flags);
 }
 
@@ -7765,6 +7850,7 @@ const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world:
 
 
 
+
 // ระดับกรรมที่ปรโลก (−1..1) = บัญชีสุทธิ ÷ ref · ref แยกจากตัวคูณกรรมระหว่างชีวิต (KARMA.ref) เพราะบัญชีทั้งชีวิตสะสมไกลกว่า
 // จุดอิ่มของตัวคูณการตายมาก — ใช้ ref เดียวกันแล้วเกือบทุกคนชนเพดาน ภูมิกับฐานะชาติหน้าจะไม่แยกคน
 const VERDICT_REF = 30;
@@ -8396,6 +8482,8 @@ function makeHeir(af, r) {
     ...(blood && { start: { age: st.birthYear + st.age - blood.born, kinId: blood.id } }),
     fame,
     ...(overlap && { overlap }),
+    // ความจำข้ามชาติไปกับทุกทางเกิด · ภูมิ = ภูมิที่ปรโลกชี้ให้ชาติไทย (แบบแถวผังตระกูล)
+    past: pastOf(st, thai.realm.id, isGone(st)),
   };
 }
 
@@ -8950,6 +9038,8 @@ function titlesOf(st) {
 // object ที่ถูกอ้างหลายที่ (af.st = st · kinLoss ชี้คนใน kin · thaiVerdict) เก็บครั้งเดียวแล้วอ้างด้วยเลข — ต่อกลับเป็นตัวเดียวกัน
 
 
+
+
 const SNAP_V = 1;
 const isRng = (v) => typeof v.next === 'function' && typeof v.int === 'function';
 
@@ -9027,6 +9117,11 @@ function repairLife(st, card) {
   // เซฟก่อนญาติมีสาเหตุ (B110 ชิ้น 2) — ญาติที่จากไปแล้วไม่มีสาเหตุย้อนหลัง · คนที่ยังอยู่เริ่มนับจากนี้
   st.kinCauseRng ??= makeRng(st.seed ^ 0xc1059ed8);
   st.heredity ??= [];
+  // เซฟก่อนมีความจำข้ามชาติ (ใบ 159) — รุ่นที่มีผังตระกูลได้ความจำจากแถวท้าย ไม่มีอาชีพ จึงไม่มีพรสวรรค์ · ชีวิตแรกไม่มีช่องเหมือนเดิม
+  if (!('past' in st)) {
+    const past = pastFromLineage(st.lineage, (name) => REALMS.find((r) => r.name === name)?.id ?? null);
+    if (past) st.past = past;
+  }
   return stale;
 }
 

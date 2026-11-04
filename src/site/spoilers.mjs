@@ -23,6 +23,24 @@ export function flagNames(root = new URL('../../', import.meta.url)) {
   return { ...doc.flags, ...Object.fromEntries(Object.entries(doc.prefixes ?? {}).map(([k, v]) => [`${k}:`, v])) };
 }
 
+// ชื่อกลุ่มสาเหตุตายของ when.past_life.cause — อ่านไฟล์ข้อมูลเดียวกับที่ lint ตรวจ id
+const CAUSE_TH = Object.fromEntries(Object.entries(JSON.parse(readFileSync(new URL('../../data/death-causes.json', import.meta.url), 'utf8')).groups).map(([k, g]) => [k, g.label]));
+const PAST_CAUSE_TH = { ...CAUSE_TH, gone: 'หายไปต่างโลก' };
+
+// ความจำชาติก่อน (ใบ 159) เป็นคำที่ผู้อ่านเฉลยเข้าใจ — any:false ใช้คู่ช่องอื่นไม่ได้ (lint)
+function pastCond(p, L) {
+  if (!p) return [];
+  if (p.any === false) return ['ชีวิตแรก (ไม่มีชาติก่อน)'];
+  const out = [];
+  if (p.any) out.push('มีชาติก่อน');
+  if (p.province) out.push(p.province === 'same' ? 'เกิดจังหวัดเดียวกับชาติก่อน' : 'เกิดคนละจังหวัดกับชาติก่อน');
+  if (p.job) out.push(`ชาติก่อนทำงาน${any(p.job.map((o) => esc(L.occ(o))))}นานที่สุด`);
+  if (p.cause) out.push(`ชาติก่อนจบด้วย${any(p.cause.map((c) => esc(PAST_CAUSE_TH[c] ?? c)))}`);
+  if (p.realm) out.push(`เคยไป${any(p.realm.map((r) => REALMS.find((x) => x.id === r)?.name ?? r))}สักชาติ`);
+  if (p.talent !== undefined) out.push(p.talent ? 'มีพรสวรรค์ติดชาติ' : 'ไม่มีพรสวรรค์ติดชาติ');
+  return out;
+}
+
 // ชื่อระบบอยู่ในไฟล์ข้อมูลแต่ loader ไม่ส่งต่อให้แกน (แกนใช้แค่ปีเริ่ม) — อ่านไฟล์เดียวกันตรง ๆ
 export function systemNames(root = new URL('../../', import.meta.url)) {
   return Object.fromEntries(JSON.parse(readFileSync(new URL('data/system-starts.json', root), 'utf8')).systems.map((s) => [s.id, s.name]));
@@ -178,6 +196,7 @@ function conditions(e, L) {
   out.push(...flagCond(w.flags, L));
   // ธงของพ่อแม่รุ่นก่อน ไม่ใช่ของตัวละคร — การ์ดจึงออกเฉพาะชีวิตที่เกิดเป็นลูกของรุ่นก่อน
   out.push(...flagCond(w.parent_flags, L, 'เกิดเป็นลูกของรุ่นก่อนที่'));
+  out.push(...pastCond(w.past_life, L));
   if (e.realm) out.push(`ไป${any(e.realm.map((r) => REALMS.find((x) => x.id === r)?.name ?? r))}`);
   if (e.repeat) out.push(`ออกซ้ำได้ ${e.repeat.max} ครั้ง เว้น ${e.repeat.gap} ปี`);
   if (e.weight !== undefined) out.push(`น้ำหนักในกองสุ่ม ${e.weight}`);
