@@ -551,6 +551,21 @@ const f2 = (v) => v.toFixed(2);
   const called = drive(begin(life(2, (st) => { st.flags.isekai_call = true; }))).af;
   check('วงปรโลก: ถูกเรียกตัว (isekai_call) ไม่เข้าวง', called.loop === null && called.isekaiLives.length > 0 && called.steps.indexOf('loop') < 0, `ทาง ${called.path}`);
 
+  // ปุ่มผู้สืบสายเลือด (B76 · ทายาทอายุจริง) ข้ามวงเหมือนถูกเรียกตัว — หาชีวิตที่มีรายชื่อ แล้วกดปุ่มนั้นด้วย id คนแรก
+  let blood = null;
+  for (let k = 10; k < 400 && !blood; k++) {
+    const st = life(k);
+    if (!E.heirCandidates(st).length) continue;
+    const af = E.startAfterlife(st);
+    for (let card = E.nextAfterCard(af); !card.done; card = E.nextAfterCard(af)) {
+      if (card.kind === 'path') E.chooseAfter(af, P('blood'), card.heirs[0].id);
+      else if (card.choices?.length) E.chooseAfter(af, first(card));
+      if (card.loop) af.sawLoop = true;
+    }
+    blood = af;
+  }
+  check('วงปรโลก: ปุ่มผู้สืบสายเลือด (ทายาทอายุจริง) ไม่เข้าวง', blood?.path === 'blood' && blood.loop === null && !blood.sawLoop, blood ? `ทาง ${blood.path}` : 'หาชีวิตที่มีรายชื่อไม่เจอ');
+
   // วงไม่ดึงเลขสุ่มของปรโลก/ไม่แตะบัญชี ⇒ ทายาทเท่าการเล่นแบบไม่มีวงทุกไบต์
   const old = drive(begin(life(0), true));
   check('วงปรโลก: ทายาทเท่าการเล่นแบบไม่มีวง · เซฟเก่า (steps เดิม) ไม่เข้าวง', heirOf(old.af) === heirOf(a.af) && old.af.loop === null && old.loop.length === 0);
