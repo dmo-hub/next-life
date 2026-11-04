@@ -136,13 +136,21 @@ for (const sex of SEXES) {
 rows.push(['ช่องแทนค่าแกนเติมครบ', `${Object.keys(PLACEHOLDERS).length} ช่อง × ${SEXES.length} เพศ`]);
 
 // ชื่อเล่น (B27): ผ่านด่านของ loader แล้ว ยังต้องไม่โดนคำต้องห้ามของเนื้อหา · ด่านต้องจับชื่อที่หลุดรายการ avoid/ยุคมีรู
+// ชื่อจริงขึ้นจอได้เหมือนชื่อเล่น (pickRealName) และผู้เล่นพิมพ์ชื่อเองไม่ได้ — รายการนี้คือที่เดียวที่กันชื่อนักการเมือง/สถาบันได้
 const namesRaw = JSON.parse(readFileSync(new URL('data/names.json', root), 'utf8'));
 const nameFrom = namesRaw.eras[0].from, nameTo = namesRaw.eras.at(-1).to;
-let nameCount = 0;
-for (const e of namesRaw.eras) for (const sex of SEXES) for (const n of e[sex]) {
-  nameCount++;
-  for (const b of ctx.banned) if (b.re.test(n)) fails.push(`ชื่อ ${e.from} ${sex}: โดนคำต้องห้าม ${b.id} "${n}"`);
-}
+const bannedNames = (names) => names.eras.flatMap((e) => SEXES.flatMap((sex) => [[sex, e[sex]], [`จริง${sex}`, e.จริง[sex]]].flatMap(([kind, xs]) =>
+  xs.flatMap((n) => ctx.banned.filter((b) => b.re.test(n)).map((b) => ({ id: b.id, msg: `ชื่อ ${e.from} ${kind}: โดนคำต้องห้าม ${b.id} "${n}"` }))))));
+const nameCount = namesRaw.eras.reduce((t, e) => t + SEXES.reduce((u, sex) => u + e[sex].length + e.จริง[sex].length, 0), 0);
+for (const { msg } of bannedNames(namesRaw)) fails.push(msg);
+// ตัวควบคุมคำต้องห้าม: ชื่อเล่นและชื่อจริงต้องจับได้ทั้งการเมืองจริงและสถาบัน
+const withReal = (sex, n) => ({ ...namesRaw, eras: [{ ...namesRaw.eras[0], จริง: { ...namesRaw.eras[0].จริง, [sex]: [...namesRaw.eras[0].จริง[sex], n] } }, ...namesRaw.eras.slice(1)] });
+const bannedControls = [
+  ['ชื่อเล่นชนนักการเมือง', 'real_politics', { ...namesRaw, eras: [{ ...namesRaw.eras[0], ชาย: [...namesRaw.eras[0].ชาย, 'ทักษิณ'] }, ...namesRaw.eras.slice(1)] }],
+  ['ชื่อจริงชนนักการเมือง', 'real_politics', withReal('หญิง', 'ยิ่งลักษณ์')],
+  ['ชื่อจริงชนสถาบัน', 'monarchy', withReal('ชาย', 'เจ้าฟ้าชาย')],
+];
+for (const [name, id, n] of bannedControls) if (!bannedNames(n).some((x) => x.id === id)) fails.push(`names ตัวควบคุม "${name}" ไม่ตก ${id}`);
 for (const p of checkNames(namesRaw, nameFrom, nameTo)) fails.push(`names: ${p}`);
 const withFirst = (k, xs) => ({ ...namesRaw, eras: [{ ...namesRaw.eras[0], [k]: xs }, ...namesRaw.eras.slice(1)] });
 const nameControls = {
@@ -163,7 +171,7 @@ for (let s = 1; s <= 200; s++) {
   if (newLife(s, nameContent, { ...nameHeir, lineage: [{ gen: 1, name: free }] }).name === free) nameClash++;
 }
 if (nameClash) fails.push(`รุ่นถัดไปได้ชื่อซ้ำรุ่นก่อน ${nameClash} ครั้งใน 200 seed`);
-rows.push(['ชื่อเล่น', `${nameCount} ชื่อ · ${namesRaw.eras.length} ยุค ${nameFrom}–${nameTo} · ตัวควบคุม ${Object.keys(nameControls).length} แบบ`]);
+rows.push(['ชื่อเล่น+ชื่อจริง', `${nameCount} ชื่อ · ${namesRaw.eras.length} ยุค ${nameFrom}–${nameTo} · ตัวควบคุม ${Object.keys(nameControls).length + bannedControls.length} แบบ`]);
 
 // การ์ดจัดสรรเงินสร้างในแกน ไม่ผ่านด่านเนื้อหา — ตรวจทุกปีของเกม: ≥4 ตัวเลือก · ยาว · คำต้องห้าม · หุ้นไม่โผล่ก่อน 2518
 const era = loadEra();
