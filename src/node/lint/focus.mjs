@@ -26,6 +26,13 @@ export function checkFocus(doc, ctx = {}) {
   if (!isObj(doc)) return ['ทะเบียนโฟกัสต้องเป็น object'];
   for (const k of ['year_scale', 'spend_scale', 'card_mul', 'chain_years']) if (!(typeof doc[k] === 'number' && doc[k] > 0)) out.push(`${k} ต้องเป็นเลขบวก`);
   const tags = new Set(focusTags(doc));
+  // นิสัยจากวัยเด็ก (B41): มาเป็นชุด — มีทะเบียนนิสัย ต้องมีอายุล็อกและแต้มทายาท
+  if (doc.natures !== undefined) {
+    if (!isObj(doc.natures) || !Object.keys(doc.natures).length) out.push('natures ต้องมีอย่างน้อย 1 ตัว');
+    for (const [id, n] of Object.entries(isObj(doc.natures) ? doc.natures : {})) if (!(isObj(n) && typeof n.name === 'string' && n.name && !FOCUS_BANNED.test(n.name))) out.push(`natures.${id}.name ต้องเป็นข้อความ ไม่มีตัวเลข/คำบุญบาป`);
+    if (!(isInt(doc.nature_age) && doc.nature_age > 0 && doc.nature_age < STAGE_AGES['วัยรุ่น'][0])) out.push('nature_age ต้องเป็นอายุช่วงเด็ก');
+    if (!(typeof doc.heir_nature === 'number' && doc.heir_nature >= 0 && doc.heir_nature <= 1)) out.push('heir_nature ต้องอยู่ระหว่าง 0–1');
+  }
   if (!isObj(doc.focuses) || !Object.keys(doc.focuses).length) out.push('focuses ต้องมีอย่างน้อย 1 ตัว');
   for (const [id, f] of Object.entries(doc.focuses ?? {})) {
     const at = `focuses.${id}`;
@@ -42,6 +49,9 @@ export function checkFocus(doc, ctx = {}) {
     if (f.after === id) out.push(`${at}.after อ้างตัวเอง`);
     // ตัวเด็กต้องเลือกได้ตั้งแต่เด็ก ไม่งั้นทายาทรอจนโต
     if (f.kid && doc.focuses[f.kid] && !(doc.focuses[f.kid].stages ?? ['เด็ก']).includes('เด็ก')) out.push(`${at}.kid ต้องเป็นโฟกัสที่เปิดช่วงเด็ก: ${f.kid}`);
+    if (f.nature !== undefined && !doc.natures?.[f.nature]) out.push(`${at}.nature อ้างนิสัยที่ไม่มี: ${f.nature}`);
+    // แต้มนิสัยนับแค่ช่วงเด็ก — โฟกัสที่เปิดหลังเด็กติด nature ไปก็ไม่ได้แต้ม
+    if (f.nature !== undefined && !(f.stages ?? ['เด็ก']).includes('เด็ก')) out.push(`${at}.nature ต้องเป็นโฟกัสที่เปิดช่วงเด็ก`);
     checkFx(f.fx, `${at}.fx`, out);
     if (f.career !== undefined && !(isObj(f.career) && typeof f.career.rank === 'number' && typeof f.career.raise === 'number' && f.career.raise > -1)) out.push(`${at}.career ต้องเป็น {rank: เลข, raise: เลข}`);
     if (f.risk !== undefined && !(Array.isArray(f.risk) && f.risk.length)) out.push(`${at}.risk ต้องเป็นรายการ`);

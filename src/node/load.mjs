@@ -418,7 +418,7 @@ function loadFocus() {
   const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
   const bad = checkFocus(doc, { causes, flags: Object.keys(parse(read('content/rules/flags.yaml')).flags) });
   if (bad.length) throw new Error(`content/rules/focus.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
-  return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, focuses: doc.focuses };
+  return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, focuses: doc.focuses, ...(doc.natures && { natures: doc.natures, nature_age: doc.nature_age, heir_nature: doc.heir_nature }) };
 }
 
 // การ์ดทวีป (06c-2): รูปการ์ดต่างโลก ไม่ใช่ events ของโลกหลัก จึงอยู่โฟลเดอร์แยก (loadEvents ไม่อ่านโฟลเดอร์ย่อย) ด่านแยก

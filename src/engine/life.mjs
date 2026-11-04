@@ -774,6 +774,7 @@ function invest(st, { asset, share }) {
 function stepYear(st) {
   const prevStage = stageOf(st.age);
   lifeFocusYear(st);
+  natureLock(st);
   // ปีสุดท้ายที่ทำงานต้องวัดก่อนขึ้นอายุ — ขึ้นแล้ว isWorking เป็นเท็จ
   // คนที่ยังนั่งตำแหน่งเต็มเวลาหลังเกษียณวัดใหม่ทุกปีจนเลิกทำงาน — ปีที่ปกติถึงเกษียณได้ค่าเดิม
   if (isWorking(st) && st.age + 1 >= RETIRE_AGE) {
@@ -1452,6 +1453,8 @@ export const lifeFocusDefs = (st) => st.content.focus?.focuses ?? {};
 export const lifeFocusOffers = (st) => [FOCUS_FLOW, ...focusOffers(lifeFocusDefs(st), stageOf(st.age), lifeFocusOk(st), st)];
 export function setLifeFocus(st, id) {
   if (!lifeFocusOffers(st).includes(id)) throw new Error(`โฟกัสนี้เลือกตอนนี้ไม่ได้: ${id}`);
+  // ผู้เล่นเปลี่ยนเองแล้ว ปีทุ่มเทหลังจากนี้นับแต้มนิสัยเต็ม · กดตัวเดิมที่รับจากพ่อแม่ไม่ใช่การเปลี่ยน
+  if ((st.focus ?? FOCUS_FLOW) !== id) delete st.focusBorn;
   focusSet(st, id, st.age);
   delete st.focusHeir;
 }
@@ -1464,9 +1467,11 @@ function lifeFocusYear(st) {
     delete st.focusHeir;
   }
   if (!st.focus) return;
+  const full = st.focusAt < st.age;
   const id = focusYearEnd(st, c.focuses, stageOf(st.age), lifeFocusOk(st), st.age, c.chain_years);
   if (!id) return;
   const def = c.focuses[id];
+  if (full) naturePoint(st, def.nature, st.focusBorn ? c.heir_nature : 1);
   // ผลเงินเป็นเท่าของรายได้ จึงคิดเฉพาะปีที่มีรายได้ของตัวเอง · ค่าใช้จ่ายหรี่ด้วย spend_scale และหักได้ไม่เกินส่วนหนึ่งของเงินเก็บ (ไม่กู้มาทุ่ม)
   // เจ้าของเคาะ "ผลเงินชนด่าน finance = finance ชนะ": หักเต็มกินเงินเก็บไว้ใช้ยามเกษียณ ชีวิตที่ทุ่มยาวล้มละลายเกินกรอบ
   const { money, ...rest } = def.fx;
@@ -1509,6 +1514,32 @@ function lifeFocusBorn(st, kid) {
   if (!kid || !lifeFocusDefs(st)[kid]) return;
   if (lifeFocusOffers(st).includes(kid)) focusSet(st, kid, -1);
   else st.focusHeir = kid;
+  st.focusBorn = true;
+}
+
+// นิสัยจากวัยเด็ก (B41): แต้มสะสมถึงอายุ nature_age แล้วล็อกตัวเดียวถาวร · เนื้อหาที่ไม่มีทะเบียนนิสัย = ไม่มีระบบนี้ ชีวิตเดินเหมือนเดิมทุกหลัก
+// ทายาทเริ่มชาติด้วยทุ่มเทตัวเด็กของพ่อแม่ — นับปีเต็มเท่าลูกที่เลือกเอง ทายาทแทบทุกคนจะได้นิสัยพ่อแม่ จึงนับแค่ heir_nature จนผู้เล่นเปลี่ยนเอง
+// ตัวที่ได้แต้มล่าสุดย้ายไปท้าย naturePts เสมอ แต้มเสมอกันจึงเลือกตัวท้าย (ตัวที่ได้แต้มล่าสุด)
+const NATURE_NONE = 'ยังไม่รู้ว่าตัวเองเป็นคนแบบไหน';
+function naturePoint(st, id, n) {
+  const c = st.content.focus;
+  if (!id || !n || !c?.natures?.[id] || st.age > c.nature_age) return;
+  const pts = (st.naturePts ??= {});
+  const v = (pts[id] ?? 0) + n;
+  delete pts[id];
+  pts[id] = v;
+}
+// ปิดปีอายุ nature_age: การ์ดบอกนิสัยออกก่อนการ์ดเข้าช่วงวัยถัดไป · ไม่มีแต้ม (ตามน้ำ ไม่กดป้าย) = ไม่มีนิสัยเด่น
+function natureLock(st) {
+  const c = st.content.focus;
+  if (!c?.natures || st.age !== c.nature_age) return;
+  const pts = st.naturePts ?? {};
+  let id = null;
+  for (const [k, v] of Object.entries(pts)) if (v > 0 && (!id || v >= pts[id])) id = k;
+  delete st.naturePts;
+  delete st.focusBorn;
+  if (id) st.nature = id;
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: id ? `คุณโตมาเป็นคน${c.natures[id].name}` : NATURE_NONE, nature: id });
 }
 // ประตูเข้าสาย (โฟกัสใบ 04 · เจ้าของเคาะ: ล็อกแค่ประตู): เปิดเมื่อโฟกัสนั้นสะสมครบ chain_years · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
 // · การ์ดชวน (ธง gate:<โฟกัส>) เปิดให้ได้โดยไม่ต้องโฟกัส เช่น นักธุรกิจถูกชวนลงการเมือง
@@ -1744,6 +1775,7 @@ export function choose(st, idx, loan) {
   applyEffects(st, c.effects, s, ss);
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
+  naturePoint(st, c.nature, 1);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
   st.log.push({ id: ev.id, age: st.age, choice: idx, text, ...(loan !== undefined && { loan }) });

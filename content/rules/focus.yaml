@@ -14,10 +14,22 @@
 # career = ตอนมีงาน: rank = ปีในขั้นที่นับเพิ่มต่อปี (เลื่อนขั้นเร็ว/ช้า) · raise = รายได้โตเพิ่มต่อปี (สัดส่วน)
 # risk = เสี่ยงสุ่มรายปี: chance · fx · text (การ์ดผล) · flags · cause = ตายได้ (ครั้งแรกขึ้น warn เป็นการ์ดเตือน โดนซ้ำหลังเตือน = ตายด้วยสาเหตุนี้)
 # kid = ตัวเด็กที่ทายาทในตระกูลเริ่มชาติด้วย เมื่อโฟกัสนี้คือโฟกัสหลักของรุ่นก่อน (ไม่ใส่ = ทายาทตามน้ำ)
+# nature = นิสัยที่ปีทุ่มเทช่วงเด็กสะสมแต้มให้ (ชื่อใน natures)
+#
+# นิสัยจากวัยเด็ก (B41): แต้มจากปีทุ่มเทที่ติด nature +1/ปี และตัวเลือกการ์ดที่ติด `nature:` +1/ครั้ง จนถึงอายุ nature_age แล้วล็อกตัวแต้มสูงสุด
+# nature_age  = อายุที่ล็อกนิสัย (ปีของอายุนี้ยังนับ) · heir_nature = แต้มต่อปีของทุ่มเทที่ทายาทได้จากพ่อแม่เองก่อนผู้เล่นเปลี่ยน (เจ้าของเคาะครึ่ง)
+# ไม่มีแต้มเลย = ไม่มีนิสัยเด่น
 year_scale: 0.25
 spend_scale: 0.25
 card_mul: 2
 chain_years: 3
+nature_age: 12
+heir_nature: 0.5
+natures:
+  social: {name: เข้ากับคนง่าย}
+  learn: {name: ใฝ่รู้}
+  duty: {name: ขยันรับผิดชอบ}
+  bold: {name: ใจกล้า}
 tags: {}
 focuses:
   # ── เด็ก–วัยรุ่น ──
@@ -28,6 +40,7 @@ focuses:
     fx: {relations: 1, happiness: 1, knowledge: -1}
     cards: [society]
     kid: play_friends
+    nature: social
   study_hard:
     name: ตั้งใจเรียน
     group: work
@@ -36,6 +49,7 @@ focuses:
     fx: {knowledge: 2, happiness: -1}
     cards: [study]
     kid: study_hard
+    nature: learn
   house_chores:
     name: ช่วยงานบ้าน
     group: people
@@ -43,6 +57,7 @@ focuses:
     fx: {relations: 1, happiness: -1}
     cards: [family]
     kid: house_chores
+    nature: duty
   run_wild:
     name: วิ่งเล่นซุกซน
     group: body
@@ -52,6 +67,7 @@ focuses:
     risk:
       - {chance: 0.06, fx: {health: -2, happiness: -1}, text: "ปีนต้นไม้แล้วกิ่งหัก ตกลงมาแขนหัก ต้องเข้าเฝือกอยู่หลายเดือน"}
     kid: run_wild
+    nature: bold
 
   # ── วัยรุ่น–หนุ่มสาว ──
   follow_dream:
