@@ -42,7 +42,8 @@
     "fetch:data": "node scripts/fetch-data.mjs",
     "site:check": "node scripts/site-check.mjs",
     "site:password": "node scripts/set-password.mjs",
-    "shots": "node scripts/shots.mjs"
+    "shots": "node scripts/shots.mjs",
+    "og": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "yaml": "2.8.1"

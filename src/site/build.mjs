@@ -1,5 +1,5 @@
 // หน้าเว็บนอกตัวเกม (B65): ฉีดตัวเลขลงหน้าที่เขียนมือ + สร้างหน้ารวมการ์ดและหน้าเฉลยจากแม่แบบ · เรียกจาก build.mjs ทุกครั้ง
-import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, unlinkSync, existsSync } from 'node:fs';
 import { siteFacts, injectFacts } from './facts.mjs';
 import { catalogHtml } from './catalog.mjs';
 import { spoilersHtml } from './spoilers.mjs';
@@ -12,6 +12,8 @@ import { uiPage, designMoved, UI_PAGE } from './ui.mjs';
 import { soonCats, soonIds, injectRoadmap } from './roadmap.mjs';
 import { GAME_CSS_PAGES, gameCss, injectGameCss } from './game-css.mjs';
 import { gatedFiles, injectGate, readGateHash } from './gate.mjs';
+import { injectSeo, sitemapXml, faviconSvg, SITEMAP, FAVICON_SVG } from './seo.mjs';
+import { ART_INK } from '../ui/art.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
@@ -33,7 +35,8 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     const file = at(`docs/${name}.html`);
     const html = readFileSync(file, 'utf8');
     const filled = injectFacts(html, facts, `docs/${name}.html`);
-    const next = injectNav(filled, `${name}.html`);
+    // SEO หน้าแรก (ui-redo 68) อ่าน title/description หลังฉีดเลขแล้ว
+    const next = injectNav(name === 'index' ? injectSeo(filled, 'docs/index.html') : filled, `${name}.html`);
     if (next !== html) writeFileSync(file, next);
     out.push(name);
   }
@@ -82,5 +85,6 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     const next = injectGate(html, hash, file);
     if (next !== html) writeFileSync(at(`docs/${file}`), next);
   }
+  for (const [file, body] of [[SITEMAP, sitemapXml()], [FAVICON_SVG, faviconSvg(ART_INK)]]) if (!existsSync(at(`docs/${file}`)) || readFileSync(at(`docs/${file}`), 'utf8') !== body) writeFileSync(at(`docs/${file}`), body);
   return { facts, pages: out };
 }

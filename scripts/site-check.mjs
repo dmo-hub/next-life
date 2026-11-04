@@ -22,6 +22,7 @@ import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, PUBLIC_HIDE } from '../src/site/gate.mjs';
+import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -551,6 +552,57 @@ check('หน้าเฉลยวาดทุกเงื่อนไขแล�
   // ตัวเกมยังพาไปต่างโลกได้ — คำต้องยังอยู่ใน body ของ play.html (ไม่ได้ตัดตัวเกม)
   const gameKeeps = PUBLIC_HIDE.test(read('play.html').slice(headOf(read('play.html')).length));
   check('หน้าไม่ติดรหัส (หน้าแรก · head ของ play · หน้าส่งต่อ) ไม่มีคำต่างโลก ตัวเกมคงเดิม', miss.length || ctlBad.length || !moved.length || !gameKeeps, ` ${pages(read).length} หน้า (ส่งต่อ ${moved.length})${miss.length ? ` · เจอ ${miss.join(' | ')}` : ''}${gameKeeps ? '' : ' · ตัวเกมไม่มีคำ (ตัดเกิน)'} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
+}
+
+// SEO หน้าแรก + sitemap (ui-redo 68 · ข้อ 102): canonical · og:image ไฟล์จริง 1200×630 < 300KB · JSON-LD parse ได้ มี VideoGame + WebSite ไม่มีคำซ่อน
+// · บล็อกตรงของที่ build จาก title/description ปัจจุบัน · head ของ play มี description + canonical · sitemap ทุก URL มีไฟล์จริง ไม่ติดรหัส ไม่ noindex
+// ตัวควบคุม: ถอด canonical · JSON-LD พัง · ภาพผิดขนาด · ใส่หน้าติดรหัสใน sitemap ⇒ ต้องถูกจับทุกแบบ
+{
+  const pngSize = (buf) => (buf?.length > 24 && buf.toString('latin1', 12, 16) === 'IHDR' ? [buf.readUInt32BE(16), buf.readUInt32BE(20)] : null);
+  const fileOf = (url) => (url.startsWith(SITE) ? decodeURIComponent(url.slice(SITE.length)) || 'index.html' : null);
+  const bin = (f) => (existsSync(new URL(f, docs)) ? readFileSync(new URL(f, docs)) : null);
+  const seoGap = ({ index, play, sitemap, png }) => {
+    const out = [];
+    const a = index.indexOf(SEO_START);
+    const b = index.indexOf(SEO_END);
+    const blk = a < 0 || b < a ? '' : index.slice(a + SEO_START.length, b);
+    if (!blk) return ['หน้าแรกไม่มีบล็อก SEO'];
+    if (blk.trim() !== seoBlock(pageMeta(index, 'docs/index.html'))) out.push('บล็อก SEO ไม่ตรง title/description ปัจจุบัน (build ใหม่)');
+    if (!blk.includes(`<link rel="canonical" href="${SITE}">`)) out.push('ไม่มี canonical');
+    const img = blk.match(/<meta property="og:image" content="([^"]+)">/)?.[1];
+    const dim = pngSize(png);
+    if (img !== SITE + OG_IMAGE || !png) out.push(`og:image ไม่มีไฟล์ ${img}`);
+    else if (dim?.[0] !== OG_W || dim?.[1] !== OG_H || png.length >= 300 * 1024) out.push(`og:image ${dim?.join('×')} ${Math.round(png.length / 1024)}KB`);
+    let ld = null;
+    try { ld = JSON.parse(blk.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] ?? ''); } catch {}
+    const types = Array.isArray(ld) ? ld.map((x) => x['@type']) : [];
+    if (!types.includes('VideoGame') || !types.includes('WebSite')) out.push(`JSON-LD ${ld ? `ได้ ${types.join(',')}` : 'parse ไม่ได้'}`);
+    if (PUBLIC_HIDE.test(blk)) out.push('บล็อก SEO มีคำซ่อน');
+    for (const f of [FAVICON_SVG, FAVICON_PNG, TOUCH_ICON]) if (!existsSync(new URL(f, docs))) out.push(`ไม่มี ${f}`);
+    const head = play.slice(0, play.search(/<\/head>/i));
+    if (!/<meta name="description" content="[^"]+">/.test(head) || !head.includes(`<link rel="canonical" href="${SITE}play.html">`)) out.push('head ของ play ไม่มี description/canonical');
+    const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    if (sitemap !== sitemapXml()) out.push('sitemap ไม่ตรงของที่ build');
+    for (const u of locs) {
+      const f = fileOf(u);
+      const html = f && existsSync(new URL(f, docs)) ? (f === 'index.html' ? index : read(f)) : null;
+      if (!html) out.push(`sitemap ลิงก์ตาย ${u}`);
+      else if (gateBlockOf(html) || /<meta name="robots" content="[^"]*noindex/.test(html)) out.push(`sitemap มีหน้า noindex ${u}`);
+    }
+    return out;
+  };
+  const now = { index: read('index.html'), play: read('play.html'), sitemap: read(SITEMAP), png: bin(OG_IMAGE) };
+  const miss = seoGap(now);
+  const fakePng = Buffer.from(now.png ?? Buffer.alloc(32));
+  fakePng.writeUInt32BE(OG_W - 1, 16);
+  const ctl = {
+    'ถอด canonical': { ...now, index: now.index.replace(/<link rel="canonical"[^>]*>\n/, '') },
+    'JSON-LD พัง': { ...now, index: now.index.replace('<script type="application/ld+json">[', '<script type="application/ld+json">[,') },
+    'ภาพผิดขนาด': { ...now, png: fakePng },
+    'sitemap มีหน้าติดรหัส': { ...now, sitemap: now.sitemap.replace('</urlset>', `  <url><loc>${SITE}about.html</loc></url>\n</urlset>`) },
+  };
+  const ctlBad = Object.entries(ctl).filter(([, v]) => !seoGap(v).length).map(([k]) => k);
+  check('SEO หน้าแรก (canonical · og:image จริง · JSON-LD) · play มี description/canonical · sitemap ทุก URL ไฟล์จริงไม่ noindex', miss.length || ctlBad.length, ` sitemap ${[...now.sitemap.matchAll(/<loc>/g)].length} URL${miss.length ? ` · ${miss.join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
 }
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
