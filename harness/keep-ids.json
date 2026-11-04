@@ -1,5 +1,5 @@
 {
- "version": "v0.6.67",
+ "version": "v0.6.68",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -517,6 +517,14 @@
   "era_herald_oil2_01",
   "era_herald_tyk_01",
   "era_herald_gfc_01",
+  "fest_songkran_kid_01",
+  "fest_songkran_adult_01",
+  "fest_lent_kid_01",
+  "fest_lent_adult_01",
+  "fest_loykrathong_kid_01",
+  "fest_loykrathong_adult_01",
+  "fest_newyear_kid_01",
+  "fest_newyear_adult_01",
   "funeral_wishes_01",
   "funeral_rite_01",
   "funeral_letter_01",
