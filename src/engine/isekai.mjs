@@ -47,7 +47,7 @@ export const ISEKAI_SKILLS = {
   cook: { name: 'ฝีมือครัวจากโลกเดิม', desc: 'รสมือแม่ค้าตลาดนัด · ตัวเลือกทำอาหาร +25%', tag: 'cook', add: 25, thai: { cats: ['family'] } },
   stealth: { name: 'ซ่อนตัวระดับเทพ', desc: 'ไม่มีใครสังเกตเห็น · ตัวเลือกแอบ/หนี +20%', tag: 'sneak' },
   regen: { name: 'ฟื้นฟูอัตโนมัติ', desc: 'ชีวิตฟื้น +6 ทุกเหตุการณ์', thai: { cats: ['health'] } },
-  exp: { name: 'ประสบการณ์ ×2', desc: 'ค่าสถานะที่ได้เพิ่มเป็นสองเท่า', thai: { cats: ['study'] } },
+  exp: { name: 'ประสบการณ์ ×2', desc: 'ค่าสถานะที่ได้เพิ่มเป็นสองเท่า', thai: { cats: ['study', 'work_money'] } },
   luck: { name: 'โชคเทพธิดา', desc: 'โชค +15 ตั้งแต่เกิด' },
   rbd: { name: 'ย้อนเวลาเมื่อตาย', desc: 'ตายครั้งแรกเวลาจะย้อนกลับ ฟื้นด้วยชีวิต 40' },
 };
@@ -56,8 +56,8 @@ export const ISEKAI_SKILLS = {
 // ขั้น 1 ได้ค่าเดิมของสกิล ⇒ ชาติที่ไม่มีการอัปเกรดเดินเท่าก่อนมีขั้น
 export const SKILL = { carry: 3, top: 3, step: 10 };
 // ผลเบาชาติไทย: ชาติไทยไม่มีแท็กตัวเลือกให้สกิลจับ ⇒ เอียงทั้งหมวดการ์ดแทน — ทาง ok ของการ์ดหมวดที่ตรงคูณ 1 + k × ผลรวมขั้นของสกิลที่ตรง
-// (ยังโดนเพดาน okMax · ไม่ดึงเลขสุ่ม) · k = 0 ⇒ ชีวิตเท่าก่อนมีผลเบา จนกว่าจะวัดแล้วเคาะค่า
-export const THAI_SKILL = { k: 0 };
+// (ยังโดนเพดาน okMax · ไม่ดึงเลขสุ่ม) · k = 0.1 ≈ +2–3 จุดต่อหมวดที่ขั้น 1 — เบาพอไม่ทำให้ชีวิตยาวขึ้น (วัดด้วย harness/skills.mjs)
+export const THAI_SKILL = { k: 0.1 };
 export function thaiSkillMul(skills, cat, k = THAI_SKILL.k) {
   if (!k || !cat || !skills?.length) return 1;
   let lv = 0;
