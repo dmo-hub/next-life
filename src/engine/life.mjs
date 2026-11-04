@@ -863,9 +863,10 @@ function stepYear(st) {
   flowChronic(st);
   ageParents(st, year);
   // คนในบ้านจากไปเองปีนี้ = การ์ดแจ้งทุกครั้ง ก่อนเหตุการณ์ของปี
-  for (const l of ageKin(st, year, yearlySaving(st))) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l, ...(careHelp(l.cause) && { help: careHelp(l.cause) }) });
-  for (const n of kinIllNews(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), ...n });
-  for (const m of petArrivals(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: petArriveText(m) });
+  // digest = ชนิดข่าวญาติ/สัตว์ (ui-redo ใบ 27) ให้จอรวมหลายใบติดกันเป็นใบเดียว · ป้ายคงที่ไม่ดึงเลขสุ่ม · ข่าวตัวเรา/เงิน/ตำแหน่งไม่ติด จึงคงใบเดี่ยว
+  for (const l of ageKin(st, year, yearlySaving(st))) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l, ...(careHelp(l.cause) && { help: careHelp(l.cause) }), digest: 'kin_loss' });
+  for (const n of kinIllNews(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), ...n, digest: 'kin_ill' });
+  for (const m of petArrivals(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: petArriveText(m), digest: 'pet' });
   if (st.terminal && !st.terminal.told) {
     st.terminal.told = true;
     st.terminal.toldAge = st.age;

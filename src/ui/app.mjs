@@ -2014,6 +2014,10 @@ function render(card) {
       grow.append(avatar(card.age), el('span', null, growLabel(card.stage)));
       body.append(grow, recap(card.recap));
       choices.append(enter(button(BTN.next, null, next)));
+    } else if (digestRest(card).length) {
+      const rest = digestRest(card);
+      body.append(el('h3', null, 'เรื่องใหญ่ของปีนี้'), list([card, ...rest].map((x) => x.text)));
+      choices.append(enter(button(BTN.next, null, () => play(T.next, rest.length + 1))));
     } else if (card.kind === 'era' || card.kind === 'omen' || card.kind === 'result') {
       body.append(el('h3', null, card.text));
       if (card.story) body.append(el('p', null, card.story));
@@ -3050,11 +3054,26 @@ function saveClear() {
 
 const show = (card) => (af ? renderAfter(card) : render(card));
 
-function play(tok) {
-  const card = apply(tok);
-  save.log += tok;
+function play(tok, times = 1) {
+  let card;
+  for (let i = 0; i < times; i++) {
+    card = apply(tok);
+    save.log += tok;
+  }
   saveWrite(card);
   show(card);
+}
+
+// ข่าวญาติ/สัตว์ที่ต่อคิวติดกันในปีเดียวกัน (ui-redo ใบ 27) — จอรวมเป็นใบเดียว กดครั้งเดียวเดิน T.next ครบทุกใบ
+// อ่านคิวอย่างเดียว ผลเกม/เซฟเท่ากดทีละใบ · โหลดเซฟกลางชุดก็ได้ใบรวมของที่เหลือเพราะอ่านคิวตอนวาด
+function digestRest(card) {
+  if (af || card.kind !== 'result' || !card.digest) return [];
+  const rest = [];
+  for (const x of st.queue) {
+    if (x.kind !== 'result' || !x.digest) break;
+    rest.push(x);
+  }
+  return rest;
 }
 
 function begin(seed) {
