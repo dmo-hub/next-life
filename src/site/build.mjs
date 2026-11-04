@@ -10,7 +10,7 @@ import { designPages, designHtml } from './design.mjs';
 import { injectNav } from './nav.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
-export const FACT_PAGES = ['index', 'about', 'otherworld', 'gdd'];
+export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds', 'gdd'];
 // หน้าเขียนมือที่ไม่มีตัวเลขจาก data แต่ต้องมีแถบบนชุดเดียวกัน — ไฟล์อยู่ใต้ docs/
 export const NAV_PAGES = ['whatsnew.html', 'cards.html', 'spec/lore-finance-series.html'];
 // หน้าที่ build สร้างทั้งหน้าจากแม่แบบ src/site/<ชื่อ>.html — หน้าเฉลย (B88) แยกจากหน้ารวมการ์ดเพราะหน้ารวมการ์ดห้ามเผยผล/บุญบาป

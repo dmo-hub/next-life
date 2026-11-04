@@ -214,6 +214,27 @@ const navCtl =
 const curOk = navHtml('design-lore.html').includes('href="design.html" aria-current="true"') && navHtml('spec/lore-finance-series.html').includes('href="../play.html"');
 check('ทุกหน้ามีแถบบนชุดเดียวและชี้หน้าปัจจุบัน', navMiss.length || !navCtl || !curOk, ` ${navFiles.length} หน้า${navMiss.length ? ` · ${navMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${navCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
+// 7d) หน้าโลกที่เล่นได้ (three-worlds 08): บอกแค่ทางที่ผู้เล่นเห็นบนจอเสมอ — ทางลับที่เป็นเหตุสุ่ม (ทริปศาลทั้งตัว court.mjs) ห้ามมีแม้แต่คำ
+// · ทางเกิดครบทุกทางจาก PATHS · แผนภาพ 3 กล่องไม่มีป้ายบนลูกศร (svg มีแค่ <text> ชื่อฉาก) · ลิงก์ไปหน้าต่างโลก
+// ตัวควบคุม: เติมคำทางลับ 1 คำ · ป้ายบนลูกศร 1 ป้าย ⇒ ต้องถูกจับ
+const SECRET_TALK = /เฉียดตาย|เกือบตาย|เรียกตัว|ศาลยม|ผู้ลงทัณฑ์|โกงความตาย/;
+const WORLD_NAMES = ['ชาตินี้', 'ปรโลก', 'ต่างโลก'];
+const worldsBad = (html) => {
+  const why = [];
+  if (SECRET_TALK.test(html)) why.push(`คำทางลับ "${html.match(SECRET_TALK)[0]}"`);
+  const svg = html.match(/<svg[\s\S]*?<\/svg>/)?.[0] ?? '';
+  const labels = [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]);
+  if (labels.length !== 3 || !WORLD_NAMES.every((n) => labels.includes(n))) why.push(`แผนภาพ: ${labels.join(' ') || 'ไม่มี'}`);
+  const pathsMiss = Object.keys(facts).filter((k) => /^path[A-Z]/.test(k) && !html.includes(`data-fact="${k}"`));
+  if (pathsMiss.length) why.push(`ทางเกิดขาด ${pathsMiss.join(' ')}`);
+  if (!html.includes('href="otherworld.html')) why.push('ไม่ลิงก์หน้าต่างโลก');
+  return why;
+};
+const worldsHtml = read('worlds.html');
+const worldsMiss = worldsBad(worldsHtml);
+const worldsCtl = worldsBad(worldsHtml.replace('</main>', '<p>เฉียดตาย</p></main>')).length === 1 && worldsBad(worldsHtml.replace('</svg>', '<text>ตาย</text></svg>')).length === 1;
+check('หน้าโลกที่เล่นได้: ไม่มีคำทางลับ · แผนภาพ 3 กล่องไม่มีป้ายลูกศร · ทางเกิดครบ · ลิงก์ต่างโลก', worldsMiss.length || !worldsCtl, `${worldsMiss.length ? ` · ${worldsMiss.join(' | ')}` : ''} · ตัวควบคุม${worldsCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
 // 8) คู่มือ (B121): ป้ายปุ่มทุกตัวในค่ากลางขึ้นคู่มือพร้อมคำอธิบาย · หน้าจอเกมไม่เขียนป้ายเหล่านั้นตรงซ้ำ (ไม่งั้นแก้ค่ากลางแล้วเกมไม่ตาม)
 const guide = read('guide.html');
 const appSrc = readFileSync(new URL('../src/ui/app.mjs', import.meta.url), 'utf8');
