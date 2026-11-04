@@ -286,6 +286,11 @@ events:
         text: "ไม่ไป ตื่นเช้าไปวิ่งสวนแทน"
         effects: {health: 2, relations: -1, happiness: -1}
         merit: [{cat: neutral}]
+      - id: work_the_room
+        text: "เดินทักทุกโต๊ะ ได้เบอร์คนทำงานมา"
+        requires: {nature: social}
+        effects: {network: 2, relations: 1}
+        merit: [{cat: neutral}]
 
   - id: young_influencer_01
     type: A

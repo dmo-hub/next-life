@@ -1970,6 +1970,8 @@ function render(card) {
   } else {
     // ฐานะ/งานอยู่แผงตัวฉัน (ui-redo ใบ 04) · เงินอยู่แผงเงิน (ใบ 07) — ใต้แถบสถานะเหลือแค่เนื้อการ์ด
     box.append(statusBar(card, s));
+    // ตัวคูณนิสัย (B41) มีผลกับตัวเลือกก่อนหน้า — บอกบนใบถัดไปแทนการ์ดผลเพิ่ม
+    if (card.because) body.append(el('p', 'note', card.because));
     const kicker = card.kind === 'event' ? (card.funeral ? 'งานศพ' : card.national ? KICKER.era : `ช่วง${card.stage}`) : KICKER[card.kind];
     // ภาพยุค (B56): การ์ดบ้านเมือง + การ์ดรับมือที่ผูกยุคไว้ (B58) ได้ภาพของยุคนั้น · ยุคที่ไม่มีภาพ = หน้าตาเดิม
     const eraPic = eraArt(card.kind === 'era' ? card.id : card.kind === 'event' ? ERA_OF.get(card.id) : null);

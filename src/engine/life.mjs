@@ -607,12 +607,15 @@ function homePays(st) {
 }
 
 // hurt = ตัวคูณส่วนที่ติดลบของค่าและเงิน (ญาติช่วยประคองตอนเจอผลร้าย) · ส่วนที่เป็นบวกไม่แตะ
-function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
+// nat = ตัวคูณนิสัย (natureBoost) ส่วนที่เป็นบวกของค่าตรงนิสัยเท่านั้น · คืน true เมื่อตัวคูณมีผล (ป้าย "เพราะคุณเป็นคน…")
+function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
+  let hit = false;
   const cut = (v) => (v < 0 ? v * hurt : v);
-  for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + cut(levelValue(fx[k]) * ss));
+  const up = (k, v) => (nat?.stat === k && v > 0 ? ((hit = true), v * nat.mul) : v);
+  for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + cut(up(k, levelValue(fx[k]) * ss)));
   if (fx.money?.grey) greyAdd(st, moneyValue(st, fx.money) * s);
   else if (fx.money) {
-    st.money += cut(moneyValue(st, fx.money) * s);
+    st.money += cut(up('money', moneyValue(st, fx.money) * s));
     homePays(st);
   }
   if (fx.grey_seize) greySeize(st, fx.grey_seize);
@@ -627,7 +630,10 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
   if (fx.debt) borrow(st, fx.debt, s);
   if (fx.settle) settle(st, fx.settle);
   if (fx.complain) for (const d of st.debts) complainDebt(st.content.era, d);
-  if (fx.income_mult) st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * fx.income_mult ** s));
+  if (fx.income_mult) {
+    const m = nat?.job && fx.income_mult > 1 ? ((hit = true), 1 + (fx.income_mult - 1) * nat.mul) : fx.income_mult;
+    st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * m ** s));
+  }
   if (fx.school) {
     st.school = fx.school === 'none' ? null : fx.school;
     if (!st.school && st.workFrom === null) st.needJob = true;
@@ -664,6 +670,7 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
     else delete st.chronic[k];
     st.chronicAge[k] = st.age;
   }
+  return hit;
 }
 
 // ไอเทมติดตัว (B78): state สร้างตอนได้ชิ้นแรก — ชีวิตที่ไม่เคยได้ของและเซฟก่อนมีระบบจึงไม่มีช่องนี้ ผู้อ่านใช้ itemsOf ได้ช่องว่าง
@@ -841,6 +848,7 @@ const HEIR_UNI_KNOW = 55;
 function stepYear(st) {
   const prevStage = stageOf(st.age);
   lifeFocusYear(st);
+  natureLock(st);
   // ปีสุดท้ายที่ทำงานต้องวัดก่อนขึ้นอายุ — ขึ้นแล้ว isWorking เป็นเท็จ
   // คนที่ยังนั่งตำแหน่งเต็มเวลาหลังเกษียณวัดใหม่ทุกปีจนเลิกทำงาน — ปีที่ปกติถึงเกษียณได้ค่าเดิม
   if (isWorking(st) && st.age + 1 >= RETIRE_AGE) {
@@ -1347,6 +1355,8 @@ function lockReason(st, c, extra = 0) {
   // อายุตามกฎหมายบอกเหตุผลของตัวเอง — reason ของเนื้อหาเขียนไว้ให้เงื่อนไขอื่น (เช่น "สั่งไว้แล้ว")
   if (q.age && st.age < (q.age.min ?? 0)) return `อายุยังไม่ถึง ${q.age.min} ปี`;
   if (q.age && st.age > (q.age.max ?? Infinity)) return `อายุเกิน ${q.age.max} ปี`;
+  // ตัวเลือกวัยโตของนิสัย (B41) — บอกนิสัยที่ขาดเป็นคำ ผู้เล่นจึงรู้ว่าวัยเด็กแบบไหนเปิดทางนี้
+  if (q.nature && st.nature !== q.nature) return `ต้องเป็นคน${st.content.focus?.natures?.[q.nature]?.name ?? ''}`;
   const why = [];
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
   const purse = (st.dead ? deadPurse(st) : st.money) + extra;
@@ -1367,7 +1377,15 @@ function lockReason(st, c, extra = 0) {
 export const openChoices = (card) => card.choices.map((_, i) => i).filter((i) => !card.locked?.[i] && !card.manual?.[i]);
 
 // เดินปีละครั้งจนมีการ์ดถึงกำหนดหรือตาย คืนการ์ดใบถัดไป
+// ป้าย "เพราะคุณเป็นคน…" ติดการ์ดใบถัดไปหลังตัวเลือกที่ตัวคูณนิสัยมีผล — ไม่เพิ่มการ์ด ชีวิตจึงยาวเท่าเดิม (เจ้าของเคาะ)
 export function nextCard(st) {
+  const card = drawCard(st);
+  if (!st.because) return card;
+  const text = st.because;
+  delete st.because;
+  return { ...card, because: text };
+}
+function drawCard(st) {
   // ทริปศาล (B153) ช่องแยกจาก st.trip — st.trip ผูกก้อนต่างโลกทั้งก้อน
   if (st.court && !(st.court.afterQueue && st.queue.length)) {
     const card = courtCard(st);
@@ -1545,6 +1563,8 @@ export const lifeFocusDefs = (st) => st.content.focus?.focuses ?? {};
 export const lifeFocusOffers = (st) => [FOCUS_FLOW, ...focusOffers(lifeFocusDefs(st), stageOf(st.age), lifeFocusOk(st), st)];
 export function setLifeFocus(st, id) {
   if (!lifeFocusOffers(st).includes(id)) throw new Error(`โฟกัสนี้เลือกตอนนี้ไม่ได้: ${id}`);
+  // ผู้เล่นเปลี่ยนเองแล้ว ปีทุ่มเทหลังจากนี้นับแต้มนิสัยเต็ม · กดตัวเดิมที่รับจากพ่อแม่ไม่ใช่การเปลี่ยน
+  if ((st.focus ?? FOCUS_FLOW) !== id) delete st.focusBorn;
   focusSet(st, id, st.age);
   delete st.focusHeir;
 }
@@ -1557,9 +1577,11 @@ function lifeFocusYear(st) {
     delete st.focusHeir;
   }
   if (!st.focus) return;
+  const full = st.focusAt < st.age;
   const id = focusYearEnd(st, c.focuses, stageOf(st.age), lifeFocusOk(st), st.age, c.chain_years);
   if (!id) return;
   const def = c.focuses[id];
+  if (full) naturePoint(st, def.nature, st.focusBorn ? c.heir_nature : 1);
   // ผลเงินเป็นเท่าของรายได้ จึงคิดเฉพาะปีที่มีรายได้ของตัวเอง · ค่าใช้จ่ายหรี่ด้วย spend_scale และหักได้ไม่เกินส่วนหนึ่งของเงินเก็บ (ไม่กู้มาทุ่ม)
   // เจ้าของเคาะ "ผลเงินชนด่าน finance = finance ชนะ": หักเต็มกินเงินเก็บไว้ใช้ยามเกษียณ ชีวิตที่ทุ่มยาวล้มละลายเกินกรอบ
   const { money, ...rest } = def.fx;
@@ -1602,6 +1624,41 @@ function lifeFocusBorn(st, kid) {
   if (!kid || !lifeFocusDefs(st)[kid]) return;
   if (lifeFocusOffers(st).includes(kid)) focusSet(st, kid, -1);
   else st.focusHeir = kid;
+  st.focusBorn = true;
+}
+
+// นิสัยจากวัยเด็ก (B41): แต้มสะสมถึงอายุ nature_age แล้วล็อกตัวเดียวถาวร · เนื้อหาที่ไม่มีทะเบียนนิสัย = ไม่มีระบบนี้ ชีวิตเดินเหมือนเดิมทุกหลัก
+// ทายาทเริ่มชาติด้วยทุ่มเทตัวเด็กของพ่อแม่ — นับปีเต็มเท่าลูกที่เลือกเอง ทายาทแทบทุกคนจะได้นิสัยพ่อแม่ จึงนับแค่ heir_nature จนผู้เล่นเปลี่ยนเอง
+// ตัวที่ได้แต้มล่าสุดย้ายไปท้าย naturePts เสมอ แต้มเสมอกันจึงเลือกตัวท้าย (ตัวที่ได้แต้มล่าสุด)
+const NATURE_NONE = 'ยังไม่รู้ว่าตัวเองเป็นคนแบบไหน';
+function naturePoint(st, id, n) {
+  const c = st.content.focus;
+  if (!id || !n || !c?.natures?.[id] || st.age > c.nature_age) return;
+  const pts = (st.naturePts ??= {});
+  const v = (pts[id] ?? 0) + n;
+  delete pts[id];
+  pts[id] = v;
+}
+// ปิดปีอายุ nature_age: การ์ดบอกนิสัยออกก่อนการ์ดเข้าช่วงวัยถัดไป · ไม่มีแต้ม (ตามน้ำ ไม่กดป้าย) = ไม่มีนิสัยเด่น
+function natureLock(st) {
+  const c = st.content.focus;
+  if (!c?.natures || st.age !== c.nature_age) return;
+  const pts = st.naturePts ?? {};
+  let id = null;
+  for (const [k, v] of Object.entries(pts)) if (v > 0 && (!id || v >= pts[id])) id = k;
+  delete st.naturePts;
+  delete st.focusBorn;
+  if (id) st.nature = id;
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: id ? `คุณโตมาเป็นคน${c.natures[id].name}` : NATURE_NONE, nature: id });
+}
+// ตัวคูณนิสัยของการ์ดใบนี้: ค่าตรงนิสัย (เงินนับเฉพาะการ์ดหมวดใน cards) + การ์ดขึ้นเงินเดือนเมื่ออาชีพตรงสาย · ไม่มีนิสัย = null คูณ 1 ทุกค่า
+function natureBoost(st, ev) {
+  const n = st.nature && st.content.focus?.natures?.[st.nature];
+  if (!n) return null;
+  const stat = n.stat && (n.stat !== 'money' || !n.cards || n.cards.includes(ev.category)) ? n.stat : null;
+  const job = !!n.jobs?.includes(st.occupation) && isWorking(st);
+  if (!stat && !job) return null;
+  return { stat, job, mul: st.content.focus.nature_mul, text: `เพราะคุณเป็นคน${n.name} ผลดีเมื่อกี้เลยมากขึ้นอีกนิด` };
 }
 // ประตูเข้าสาย (โฟกัสใบ 04 · เจ้าของเคาะ: ล็อกแค่ประตู): เปิดเมื่อโฟกัสนั้นสะสมครบ chain_years · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
 // · การ์ดชวน (ธง gate:<โฟกัส>) เปิดให้ได้โดยไม่ต้องโฟกัส เช่น นักธุรกิจถูกชวนลงการเมือง
@@ -1850,9 +1907,11 @@ export function choose(st, idx, loan) {
   const ss = pool ? poolStatScale(stageOf(st.age)) : 1;
   // ใบในรอบเดียวกัน (ev.run) ที่สุขภาพหมดอยู่ก่อนกด = โรคที่ถึงคิวกลางรอบ ไม่ใช่ผลของใบนี้ — จำไว้ก่อนผลของตัวเลือกลง
   const ill = ev.run !== undefined && st.health <= 0;
-  applyEffects(st, c.effects, s, ss);
+  const nat = natureBoost(st, ev);
+  let because = applyEffects(st, c.effects, s, ss, 1, nat);
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
+  naturePoint(st, c.nature, 1);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
   st.log.push({ id: ev.id, age: st.age, choice: idx, text, ...(loan !== undefined && { loan }) });
@@ -1871,7 +1930,7 @@ export function choose(st, idx, loan) {
     wound = c.outcomes.find((x) => x.effects?.die)?.effects.die;
     // ตายในการ์ด ญาติประคองไม่ได้ — ป้าย "หนักแค่ครึ่งเดียว" จะขัดกับมรณบัตรใบถัดไป
     const helper = !o.ok && !doom && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
-    applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1);
+    because = applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1, nat) || because;
     const gotO = o.effects?.loot && gainLoot(st, o.effects.loot);
     applyChoice(st, ev, o, text);
     if (c.filial) filialNote(st, c.filial, filialScore(o.merit), true);
@@ -1886,6 +1945,7 @@ export function choose(st, idx, loan) {
       after.push({ kind: 'eraEvent', ev: follow, age: st.age });
     }
   }
+  if (because) st.because = nat.text;
   // จดหมายคำฝาก: เลือกคำฝากใบย่อยก่อน แล้วคำสั่งเสียกลับมาตามปกติ
   const pick = c.letter && st.content.events.find((e) => e.id === LETTER.pick);
   if (pick) {

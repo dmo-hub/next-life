@@ -18,7 +18,7 @@ const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'focus', 'run'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
@@ -36,7 +36,7 @@ const KEYS = {
   multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
-  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'reason'],
+  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'reason'],
   belief: ['kind', 'tradition', 'outside_canon', 'vow', 'trigger', 'cap_per_life', 'prize_table', 'stake', 'odds_modifier'],
   vow: ['deadline_years', 'due_event', 'redeem_full_cost', 'redeem_light_cost', 'defer_once'],
   trigger: ['money_state'],
@@ -499,14 +499,14 @@ export const rules = [
   },
   {
     id: 'choice-lock',
-    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, sex?, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
+    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, sex?, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), nature?: id นิสัย (เหตุผลแกนเขียนเอง), reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
     event(e, ctx, r) {
       const cs = choicesOf(e);
       for (const { c, path } of cs) {
         const q = c.requires;
         if (q === undefined) continue;
         const at = `${path}.requires`;
-        if (!isObj(q) || !['money', 'stats', 'flags', 'edu', 'family', 'age'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags edu family หรือ age อย่างน้อยหนึ่งอย่าง'); continue; }
+        if (!isObj(q) || !['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags edu family age หรือ nature อย่างน้อยหนึ่งอย่าง'); continue; }
         // อายุตามกฎหมาย (เช่น พินัยกรรม 15 ปีขึ้นไป) — แกนเขียนเหตุผล "อายุยังไม่ถึง N ปี" เอง
         if (q.age !== undefined && !(isObj(q.age) && (q.age.min !== undefined || q.age.max !== undefined) && [q.age.min, q.age.max].every((v) => v === undefined || (Number.isInteger(v) && v >= 0 && v <= 120)))) r(`${at}.age`, 'ต้องเป็น {min, max} จำนวนเต็ม 0–120');
         // ตัวเลือกที่พูดถึงคนในบ้านล็อกได้เมื่อไม่มีคนนั้น (เงื่อนไขชุดเดียวกับ when.family)

@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE } from '../src/engine/index.mjs';
+import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
@@ -350,6 +350,38 @@ const f2 = (v) => v.toFixed(2);
     I.CONT_DECK[k].fit = keepFit;
     check(`ใบ 06c-2 ตัวควบคุม: เปิดตัวกรอง ${k} ⇒ ผิดที่ > 0`, open.wrong > 0, `ผิดที่ ${open.wrong}`);
   }
+}
+
+// B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50% (ใบ: สืบทอดโอกาสเล็กน้อย ไม่ใช่ได้แน่) · นับเฉพาะทายาทที่พ่อแม่มีนิสัยและถึงอายุล็อก
+// ตัวควบคุม heir_nature 0 (เจ้าของเคาะ): seed เดียวกัน ชีวิตแรกเดินเหมือนกันทุกหลัก และแต้มไม่มีผลก่อนล็อก
+// ⇒ ทายาทรุ่นแรกต่างกันแค่แต้มทุ่มเทที่ได้จากพ่อแม่ — ทายาทที่ได้นิสัยเดียวกันต้องลดลง ไม่งั้นสายแต้มทายาทไม่ต่อ
+{
+  const content = loadContent();
+  const heirs = (n) => {
+    let same = 0, all = 0;
+    for (const bot of Object.values(BOTS)) {
+      for (let i = 0; i < n; i++) {
+        const seed = mixSeed(1, i * 7919);
+        const { state: parent } = playLife(seed, content, bot);
+        if (!parent.nature) continue;
+        let seen;
+        playLife(mixSeed(1, i * 7919 + 1), content, bot, (card) => {
+          if (card.kind === 'result' && 'nature' in card) seen = card.nature ?? null;
+        }, nextLife(playAfterlife(parent, bot)));
+        if (seen === undefined) continue;
+        all++;
+        if (seen === parent.nature) same++;
+      }
+    }
+    return { same, all, pct: all ? (same / all) * 100 : 0 };
+  };
+  const real = heirs(40);
+  check('B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50%', real.all >= 50 && real.pct <= 50, `${real.same}/${real.all} = ${f2(real.pct)}%`);
+  const keep = content.focus.heir_nature;
+  content.focus.heir_nature = 0;
+  const zero = heirs(40);
+  content.focus.heir_nature = keep;
+  check('B41 ตัวควบคุม: heir_nature 0 ⇒ ทายาทนิสัยเดียวกันลดลง', zero.all === real.all && zero.same < real.same, `${zero.same}/${zero.all} = ${f2(zero.pct)}% · จริง ${real.same}`);
 }
 
 // ใบ 06a: ด่านทวีปจับตัวสุ่ม/แผนที่ที่พังได้ (ตัวควบคุม) — ป้อนของพังเข้า contChecks ตรง ๆ ไม่แก้ข้อมูลจริง

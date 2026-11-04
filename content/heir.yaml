@@ -19,6 +19,7 @@ events:
           - {weight: 2, text: "หาไฟแช็กไม่เจอทั้งเช้า ผู้ใหญ่ในบ้านหงุดหงิดใส่ทั้งวัน แล้วเย็นนั้นก็ซื้อมาใหม่สองอัน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
           - {weight: 1, ok: true, text: "ผู้ใหญ่ในบ้านเห็นไฟแช็กกองอยู่ใต้เตียง นั่งนิ่งไปนาน แล้วเริ่มออกไปสูบนอกบ้านแทน", effects: {health: 1, relations: 1}, merit: [{cat: neutral}]}
       - id: ask_quit
+        nature: bold
         text: "ขอให้เลิกตรง ๆ"
         merit: [{cat: care_parents, level: 1}]
         outcomes:
@@ -45,6 +46,7 @@ events:
     text: "สามทุ่มแล้วข้าวเย็นยังวางอยู่บนโต๊ะ ที่บ้านส่ง{ชื่อ}ไปตามผู้ใหญ่ที่วงเหล้าท้ายซอย เสียงหัวเราะดังมาถึงปากซอย"
     choices:
       - id: walk_in
+        nature: bold
         text: "เดินเข้าไปจูงมือกลับบ้าน"
         merit: [{cat: care_parents, level: 1}]
         outcomes:

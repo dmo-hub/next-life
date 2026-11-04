@@ -47,7 +47,9 @@ function labels(content, flags, systems) {
   // none = ไม่ได้อยู่สายเลื่อนขั้นใด (แกนเทียบ st.ladder?.id ?? 'none')
   const ladders = content.era.careers?.ladders ?? {};
   const ladder = (id) => (id === 'none' ? 'ไม่อยู่สายเลื่อนขั้น' : ((n) => (n.startsWith('สาย') ? n : `สาย${n}`))(ladders[id]?.name ?? id));
-  return { occ: (id) => occ[id] ?? id, era: (id) => era[id] ?? id, sys, flag, ladder };
+  // นิสัยจากวัยเด็ก (B41) อยู่ในกติกาทุ่มเท content.focus.natures
+  const nature = (id) => content.focus?.natures?.[id]?.name ?? id;
+  return { occ: (id) => occ[id] ?? id, era: (id) => era[id] ?? id, sys, flag, ladder, nature };
 }
 
 // เงินในผล: ตัวเลขเปล่า = บาทของปีนั้น · income_x = เท่าของเงินเก็บต่อปี · fixed_baht = บาทของปีอ้างอิง ปรับตามเงินเฟ้อ (moneyValue ในแกน)
@@ -190,6 +192,7 @@ function locks(q, L) {
   if (q.age) out.push(`อายุ${q.age.min !== undefined ? ` ≥ ${q.age.min}` : ''}${q.age.max !== undefined ? ` ≤ ${q.age.max}` : ''}`);
   if (q.edu) out.push(`จบ${esc(Array.isArray(q.edu) ? q.edu.join(' หรือ ') : q.edu)}`);
   for (const f of q.family ?? []) out.push(famCond(f));
+  if (q.nature) out.push(`เป็นคน${esc(L.nature(q.nature))}`);
   out.push(...flagCond(q.flags, L));
   return [`เลือกได้เมื่อ ${out.join(' · ')}${q.reason ? ` · ไม่ผ่านจอบอก "${esc(q.reason)}"` : ''}`];
 }
@@ -204,6 +207,8 @@ function cardRef(id, byId) {
 function extras(node, L, byId) {
   const out = [...flagsLine(node, L)];
   for (const f of node.family ?? []) out.push(family(f, L));
+  // ป้าย nature: บนตัวเลือกวัยเด็กสะสมแต้มนิสัย (B41) — หน้าเฉลยบอกว่าตัวเลือกไหนปั้นนิสัยอะไร
+  if (node.nature) out.push(`แต้มนิสัย${esc(L.nature(node.nature))} +1`);
   for (const s of node.schedules ?? []) out.push(`นัดการ์ด ${cardRef(s.event, byId)} อีก ${range(s.after_years, ' ปี')}`);
   if (node.next) out.push(`ต่อด้วยการ์ด ${cardRef(node.next, byId)}`);
   if (node.redeem) out.push(`แก้บน: ${REDEEM_TH[node.redeem] ?? esc(node.redeem)}`);

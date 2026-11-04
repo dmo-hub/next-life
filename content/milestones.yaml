@@ -9,12 +9,15 @@ events:
     text: "อายุ {อายุ} ปี ถึงเวลาเข้าโรงเรียนแล้ว ที่บ้านใน{ภาค}"
     choices:
       - text: "ตั้งใจเรียนเต็มที่"
+        nature: learn
         effects: { knowledge: 2, happiness: -1 }
         merit: [{ cat: neutral }]
       - text: "เรียนไปเล่นไป"
+        nature: social
         effects: { knowledge: 1, happiness: 1 }
         merit: [{ cat: neutral }]
       - text: "เรียนไปด้วย ช่วยงานที่บ้านไปด้วย"
+        nature: duty
         effects: { knowledge: 1, relations: 1 }
         merit: [{ cat: neutral }]
       - text: "ร้องไห้ไม่อยากไปโรงเรียน"
