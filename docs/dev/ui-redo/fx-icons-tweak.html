@@ -376,6 +376,10 @@ body:has(.mnav) .foot { display:none; }
 .a .choice { border:1px solid var(--ink); background:#FFFDF7; }
 .a .choice:hover, .a .choice:focus-visible { background:var(--ink); color:var(--paper); outline:none; }
 .a .choice .fx { color:var(--green); } .a .choice:hover .fx, .a .choice:focus-visible .fx { color:#CFE3E0; }
+/* คำอธิบายสกิลใต้ชื่อปุ่ม (06s: จอเลือกพก · การ์ดฝึกสกิล · เลือกลงสมุด) · ปุ่มเลือกพกที่กดไว้มีแถบซ้าย */
+.a .choice .idesc, .b .choice .idesc { display:block; margin-top:2px; font-size:12px; }
+.a .choice .idesc { color:var(--muted); } .a .choice:hover .idesc, .a .choice:focus-visible .idesc { color:#CFE3E0; }
+.a .choice[aria-pressed="true"] { box-shadow:inset 5px 0 0 var(--green); }
 .a .stamp { border:2px solid var(--red); color:var(--red); }
 .a .recap { border:1px solid var(--rule); border-radius:var(--r); background:#FBF7EE; }
 
@@ -392,7 +396,9 @@ body:has(.mnav) .foot { display:none; }
 .b .choice { border:1px solid var(--bronze2); background:var(--lacquer2); color:var(--cream); }
 .b .choice:hover, .b .choice:focus-visible { border-color:var(--gold); background:#2E2218; outline:none; }
 .b .choice .fx { color:var(--gold); }
-.b .picks, .b .tree summary { color:#E3D6B3; }
+.b .choice .idesc { color:var(--cream); opacity:0.8; }
+.b .picks, .b .tree summary, .b .tab-bar button { color:#E3D6B3; }
+.b .tab-bar button[aria-pressed="true"] { background:var(--gold); border-color:var(--gold); color:var(--lacquer); }
 .b .recap { border:1px solid var(--bronze); background:var(--lacquer2); }
 .b .recap .h { color:var(--gold); }
 .scene { height:96px; background:var(--lacquer2); border-bottom:1px solid var(--bronze); }
@@ -624,7 +630,7 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
 .nl-swap{margin-right:16px}
 .nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid #343A48}
 }
-</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../../dev/index.html">สารบัญ</a><a href="../../dev/spec.html">ภาคผนวกสเปก</a><a href="../../dev/plan.html">สเปก/แผน</a><a href="../../dev/design.html">คำตัดสินเกม</a><a href="../../dev/maps/continent.html">แผนที่</a><a href="../../dev/ui-redo/tweak.html" aria-current="true">ต้นแบบ UI</a><a href="../../dev/archive/index.html">คลังเก่า</a></div></div></div><!--/nav-->
+</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../../dev/index.html">สารบัญ</a><a href="../../dev/spec.html">ภาคผนวกสเปก</a><a href="../../dev/plan.html">สเปก/แผน</a><a href="../../dev/design.html">คำตัดสินเกม</a><a href="../../dev/ui.html">การออกแบบ</a><a href="../../dev/maps/continent.html">แผนที่</a><a href="../../dev/ui-redo/tweak.html" aria-current="true">ต้นแบบ UI</a><a href="../../dev/archive/index.html">คลังเก่า</a></div></div></div><!--/nav-->
 <div class="lay">
 <aside class="ctl" id="ctl" aria-label="แผงปรับค่า">
   <h1>ปรับป้ายผลบนปุ่ม</h1>
