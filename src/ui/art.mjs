@@ -18,7 +18,7 @@ const artFill = (d, fill = ART_INK.gold2) => ({ d, fill });
 
 // กรอบแผ่นภาพยุค: ขอบทองคู่ + ลายกนกม้วนที่มุม (ลายไทยทองบนพื้นเข้ม)
 export const ERA_ART_W = 200, ERA_ART_H = 80;
-const ERA_FRAME = [
+export const ERA_FRAME = [
   { d: `M0 0h${ERA_ART_W}v${ERA_ART_H}h-${ERA_ART_W}z`, fill: ART_INK.lacquer2 },
   artLine(`M4 4h${ERA_ART_W - 8}v${ERA_ART_H - 8}h-${ERA_ART_W - 8}z`, { w: 1.2 }),
   artLine(`M7 7h${ERA_ART_W - 14}v${ERA_ART_H - 14}h-${ERA_ART_W - 14}z`, { stroke: ART_INK.bronze2, w: 0.6 }),
