@@ -450,4 +450,16 @@ export function loadItems(p = 'content/rules/items.yaml') {
   return { slots, cap: doc.cap, list: doc.items ?? {} };
 }
 
-export const loadContent = () => ({ events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus: loadFocus(), isekai: loadIsekaiCards(), items: loadItems() });
+// ทะเบียนสายเรื่องรายคน (krung-1): ทุกคีย์ arc บนการ์ดต้องมีชื่อ — หน้าจบใช้บอกสถานะสาย · harness ส่งทะเบียนของ fixture เองได้
+export function loadArcs(events, p = 'content/rules/arcs.yaml') {
+  const arcs = parse(read(p))?.arcs ?? {};
+  const bad = Object.entries(arcs).filter(([, a]) => typeof a?.name !== 'string' || !a.name.trim()).map(([k]) => `สาย ${k} ไม่มี name`);
+  for (const e of events) if (e.arc && !arcs[e.arc]) bad.push(`การ์ด ${e.id} อ้างสาย ${e.arc} ที่ไม่มีในทะเบียน`);
+  if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return arcs;
+}
+
+export const loadContent = () => {
+  const events = loadEvents();
+  return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus: loadFocus(), isekai: loadIsekaiCards(), items: loadItems(), arcs: loadArcs(events) };
+};

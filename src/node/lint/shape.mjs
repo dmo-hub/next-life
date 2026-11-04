@@ -17,9 +17,9 @@ const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'focus', 'run'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter'],
-  outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
+  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'focus', 'run', 'arc'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'arc_end'],
+  outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'arc_end'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
   chronic: STAT_KEYS,
@@ -495,6 +495,23 @@ export const rules = [
       if (e.herald_of === undefined) return;
       if (typeof e.herald_of !== 'string' || !ctx.eras.has(e.herald_of)) r('.herald_of', `ไม่มีเหตุการณ์บ้านเมือง "${e.herald_of}" (${[...ctx.eras].join(' ')})`);
       if (['weight', 'at_age', 'era', 'repeat', 'prelude', 'first_of'].some((k) => e[k] !== undefined)) r('.herald_of', 'ใบลางห้ามมี weight/at_age/era/repeat/prelude/first_of — ออกได้ทางเดียวคือปีก่อนภัย');
+    },
+  },
+  {
+    id: 'arc-shape',
+    desc: 'arc = คีย์สายเรื่องรายคน (a-z0-9_ · ชื่ออยู่ทะเบียน content/rules/arcs.yaml) · ออกได้จากกองสุ่ม นัด หรือเรื่องต่อเท่านั้น — ห้ามมี at_age/era/first_of/herald_of/prelude (ทางเข้าที่ตัวคุมสายเลื่อนไม่ได้) · arc_end: true ใช้ได้เฉพาะการ์ดที่มี arc',
+    event(e, ctx, r) {
+      if (e.arc !== undefined) {
+        if (typeof e.arc !== 'string' || !ID_RE.test(e.arc)) r('.arc', `ต้องเป็นคีย์ a-z0-9_ ได้ ${JSON.stringify(e.arc)}`);
+        if (['at_age', 'era', 'first_of', 'herald_of', 'prelude'].some((k) => e[k] !== undefined)) r('.arc', 'การ์ดสายเรื่องห้ามมี at_age/era/first_of/herald_of/prelude — ออกได้จากกองสุ่ม นัด หรือเรื่องต่อ');
+      }
+      for (const { c, path } of choicesOf(e)) {
+        for (const [w, p] of [[c, path], ...list(c.outcomes).map((o, i) => [o, `${path}.outcomes[${i}]`])]) {
+          if (w?.arc_end === undefined) continue;
+          if (w.arc_end !== true) r(`${p}.arc_end`, `ต้องเป็น true ได้ ${JSON.stringify(w.arc_end)}`);
+          else if (e.arc === undefined) r(`${p}.arc_end`, 'arc_end ใช้ได้เฉพาะการ์ดที่มี arc');
+        }
+      }
     },
   },
   {
