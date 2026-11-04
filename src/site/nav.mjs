@@ -9,8 +9,8 @@ export const NAV_MENU = [
   ['guide.html', 'วิธีเล่น'],
   ['whatsnew.html', 'แพตช์โน้ต'],
   ['about.html', 'กลไกในเกม'],
-  ['worlds.html', 'ชาตินี้ · ปรโลก · ต่างโลก'],
-  ['otherworld.html', 'ต่างโลก', 'dark'],
+  // เจ้าของรวมสองหน้าเป็นหัวเดียว "โลก" · หน้าต่างโลกยังอยู่ (ลิงก์จากหน้าโลก) และนับเป็นหัวนี้ตอนเปิดอยู่
+  ['worlds.html', 'โลก', null, ['otherworld.html']],
   ['catalog.html', 'การ์ดทั้งหมด'],
   ['dev/index.html', 'ห้องผู้พัฒนา'],
 ];
@@ -36,9 +36,9 @@ const NAV_SCRIPT = `<script>(()=>{const l=document.querySelector('nav.top .links
 // file = path ใต้ docs/ เช่น about.html · spec/lore-finance-series.html
 export function navHtml(file) {
   const up = '../'.repeat(file.split('/').length - 1);
-  const cur = (href) => (href === file ? ' aria-current="page"' : '');
-  const a = (href, text, cls) => `<a${cls ? ` class="${cls}"` : ''} href="${up}${href}"${cur(href)}>${text}</a>`;
-  const links = NAV_MENU.map(([h, t, c]) => a(h, t, c)).join('');
+  const cur = (href, also = []) => (href === file || also.includes(file) ? ' aria-current="page"' : '');
+  const a = (href, text, cls, also) => `<a${cls ? ` class="${cls}"` : ''} href="${up}${href}"${cur(href, also)}>${text}</a>`;
+  const links = NAV_MENU.map(([h, t, c, also]) => a(h, t, c, also)).join('');
   return `<nav class="top" aria-label="หน้าอื่น">${a('index.html', 'NEXT LIFE', 'brand')}<div class="links">${links}</div>${a('play.html', 'เล่นเกม', 'play')}</nav>${NAV_SCRIPT}`;
 }
 
