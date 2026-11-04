@@ -51,22 +51,30 @@ const ENGINE_LABEL = {
   early_retire: 'การ์ดเกษียณก่อนกำหนด',
 };
 const ENGINE_REASON = { promote: 'เลื่อนขั้นในสาย', cadet: 'จบโรงเรียนนายร้อย ติดยศเข้าสาย', other: 'เปลี่ยนตามวัยหรือกติกาของเกม ไม่ผ่านตัวเลือก' };
-function engineCard(id) {
+// การ์ดเลื่อนขั้น/ลงสมัครมีใบละขั้น — ใส่ชื่อขั้นปลายทาง ไม่งั้นขึ้น "การ์ดเลื่อนขั้น" ซ้ำกันหลายแถวในกล่องเดียว
+function engineCard(id, careers) {
   if (ENGINE_LABEL[id]) return ENGINE_LABEL[id];
   if (id.startsWith('school_gate_')) return 'การ์ดเรียนจบ เลือกทางต่อ';
-  if (id.startsWith('promo_')) return 'การ์ดเลื่อนขั้น';
-  if (id.startsWith('office_budget_')) return 'การ์ดงบประจำตำแหน่ง';
-  if (id.startsWith('office_')) return 'การ์ดชวนลงสมัคร';
+  const promo = id.match(/^promo_(.+)_(\d+)$/);
+  if (promo) {
+    const next = careers.ladders[promo[1]]?.steps?.[Number(promo[2]) + 1];
+    const to = next?.name ?? next?.suffix;
+    return `การ์ดเลื่อนขั้น${to ? `เป็น${to}` : ''}`;
+  }
+  const budget = id.match(/^office_budget_(\d+)$/);
+  if (budget) return `การ์ดงบประจำตำแหน่ง${careers.office?.steps?.[Number(budget[1])]?.name ?? ''}`;
+  const office = id.match(/^office_(\d+)$/);
+  if (office) return `การ์ดชวนลงสมัคร${careers.office?.steps?.[Number(office[1])]?.name ?? ''}`;
   return id;
 }
 
-function cardName(id, byId) {
-  const e = byId.get(id);
-  if (!e) return esc(engineCard(id));
+function cardName(id, ctx) {
+  const e = ctx.byId.get(id);
+  if (!e) return esc(engineCard(id, ctx.careers));
   const name = e.title ?? `${[...e.text].slice(0, 24).join('')}…`;
   return `<a href="#${esc(id)}">${text(name)}</a>`;
 }
-const viaHtml = (v, byId) => (v.engine ? esc(ENGINE_REASON[v.engine] ?? v.engine) : `${cardName(v.id, byId)}${v.text ? ` — ${text(v.text)}` : ''}`);
+const viaHtml = (v, ctx) => (v.engine ? esc(ENGINE_REASON[v.engine] ?? v.engine) : `${cardName(v.id, ctx)}${v.text ? ` — ${text(v.text)}` : ''}`);
 const pct = (k, lives) => (lives ? (k / lives) * 100 : 0);
 const simPct = (p) => `<b class="sim" title="ชีวิตที่เจอ ÷ ชีวิตที่เคยทำงานนี้">${p.toFixed(1)}%</b>`;
 
@@ -76,12 +84,12 @@ function unitName(key, L) {
   return `${L.occ(occ)} (${L.ladder(lad)})`;
 }
 
-function exitHtml(x, byId, L) {
+function exitHtml(x, ctx, L) {
   if (x.kind === 'death') return 'ตายระหว่างทำงาน';
   if (x.kind === 'retire') return 'เกษียณเมื่ออายุครบ';
   if (x.kind === 'early_retire') return 'เกษียณก่อนกำหนด';
-  if (x.kind === 'move') return `ย้ายไป${esc(unitName(x.to, L))} · ผ่าน ${viaHtml(x, byId)}`;
-  return `ออกจากงาน · ผ่าน ${viaHtml(x, byId)}`;
+  if (x.kind === 'move') return `ย้ายไป${esc(unitName(x.to, L))} · ผ่าน ${viaHtml(x, ctx)}`;
+  return `ออกจากงาน · ผ่าน ${viaHtml(x, ctx)}`;
 }
 
 function pctList(rows, lives, draw) {
@@ -92,14 +100,14 @@ function pctList(rows, lives, draw) {
 }
 
 // ใบที่ข้อมูลบอกว่าผูกกับงานนี้แต่ไม่มีในไฟล์ผล — ขึ้นชื่อโดยไม่มีเลข
-const noSim = (ids, byId) => (ids.length ? `<p class="rare">ยังไม่มีผลจำลอง: ${ids.map((id) => cardName(id, byId)).join(' · ')}</p>` : '');
+const noSim = (ids, ctx) => (ids.length ? `<p class="rare">ยังไม่มีผลจำลอง: ${ids.map((id) => cardName(id, ctx)).join(' · ')}</p>` : '');
 
-function unitHtml(key, title, sub, staticIn, staticCards, sim, byId, L) {
+function unitHtml(key, title, sub, staticIn, staticCards, sim, ctx, L) {
   const u = sim?.units?.[key];
   const simCards = new Set(sim?.cards ?? []);
   const head = `<h4>${esc(title)}${sub ? ` <small>${esc(sub)}</small>` : ''}</h4>`;
   if (!u || !u.lives) {
-    return `<div class="job">${head}<p class="rare">ยังไม่มีผลจำลอง${sim ? ' — ไม่มีชีวิตจำลองไหนเคยทำงานนี้' : ''}</p>${noSim([...new Set([...staticIn, ...staticCards])].sort(), byId)}</div>`;
+    return `<div class="job">${head}<p class="rare">ยังไม่มีผลจำลอง${sim ? ' — ไม่มีชีวิตจำลองไหนเคยทำงานนี้' : ''}</p>${noSim([...new Set([...staticIn, ...staticCards])].sort(), ctx)}</div>`;
   }
   const seenIn = new Set(u.entries.map((r) => r.id).filter(Boolean));
   const seenCards = new Set(u.cards.map((r) => r.id));
@@ -107,13 +115,13 @@ function unitHtml(key, title, sub, staticIn, staticCards, sim, byId, L) {
     `<div class="job">${head}`,
     `<p class="lives">เคยทำงานนี้ ${u.lives.toLocaleString('en-US')} จาก ${sim.lives.toLocaleString('en-US')} ชีวิตจำลอง</p>`,
     `<p class="sub">ทางเข้า</p>`,
-    pctList(u.entries, u.lives, (r) => viaHtml(r, byId)),
-    noSim(staticIn.filter((id) => !seenIn.has(id) && !simCards.has(id)), byId),
+    pctList(u.entries, u.lives, (r) => viaHtml(r, ctx)),
+    noSim(staticIn.filter((id) => !seenIn.has(id) && !simCards.has(id)), ctx),
     `<p class="sub">การ์ดที่เจอระหว่างทำงานนี้</p>`,
-    pctList(u.cards, u.lives, (r) => cardName(r.id, byId)) || '<p class="rare">ไม่มีการ์ดเฉพาะงานนี้</p>',
-    noSim(staticCards.filter((id) => !seenCards.has(id) && !simCards.has(id)), byId),
+    pctList(u.cards, u.lives, (r) => cardName(r.id, ctx)) || '<p class="rare">ไม่มีการ์ดเฉพาะงานนี้</p>',
+    noSim(staticCards.filter((id) => !seenCards.has(id) && !simCards.has(id)), ctx),
     `<p class="sub">ทางออก</p>`,
-    pctList(u.exits, u.lives, (r) => exitHtml(r, byId, L)) || '<p class="rare">ไม่มีชีวิตจำลองที่ออกจากงานนี้</p>',
+    pctList(u.exits, u.lives, (r) => exitHtml(r, ctx, L)) || '<p class="rare">ไม่มีชีวิตจำลองที่ออกจากงานนี้</p>',
     '</div>',
   ].join('');
 }
@@ -122,7 +130,7 @@ function unitHtml(key, title, sub, staticIn, staticCards, sim, byId, L) {
 export function careerHtml(content, L, sim = careerSim()) {
   const careers = content.era.careers;
   if (!careers?.ladders) return '';
-  const byId = new Map(content.events.map((e) => [e.id, e]));
+  const ctx = { byId: new Map(content.events.map((e) => [e.id, e])), careers };
   const occOfLadder = (lad) => (careers.ladders[lad].occs ? null : careers.ladders[lad].steps[0].occ);
   // ทางเข้าตามข้อมูล: ผล effects.job (อาชีพของสายเอกชน/สายอาชีพ) · effects.ladder (เข้าสายที่ขั้นแรก)
   const entersTo = (e, lad, occ) =>
@@ -136,15 +144,15 @@ export function careerHtml(content, L, sim = careerSim()) {
         const steps = stepNames(ladder, occ);
         const staticIn = content.events.filter((e) => entersTo(e, lad, occ)).map((e) => e.id);
         const staticCards = content.events.filter((e) => during(e, lad, occ)).map((e) => e.id);
-        return unitHtml(unitKey(lad, occ), L.occ(occ), steps.length ? `ขั้น ${steps.join(' · ')}` : '', staticIn, staticCards, sim, byId, L2);
+        return unitHtml(unitKey(lad, occ), L.occ(occ), steps.length ? `ขั้น ${steps.join(' · ')}` : '', staticIn, staticCards, sim, ctx, L2);
       })
       .join('');
     return `<h3>${esc(L.ladder(lad))} <small>${occs.length} อาชีพ</small></h3><div class="jobs">${body}</div>`;
   });
   const office = careers.office;
-  if (office) sections.push(`<h3>${esc(office.name)} <small>ทำควบงานเดิมได้ถึงระดับท้องถิ่น</small></h3><div class="jobs">${unitHtml(OFFICE_UNIT, office.name, `ขั้น ${office.steps.map((s) => s.name).join(' · ')}`, [], [], sim, byId, L2)}</div>`);
+  if (office) sections.push(`<h3>${esc(office.name)} <small>ทำควบงานเดิมได้ถึงระดับท้องถิ่น</small></h3><div class="jobs">${unitHtml(OFFICE_UNIT, office.name, `ขั้น ${office.steps.map((s) => s.name).join(' · ')}`, [], [], sim, ctx, L2)}</div>`);
   const lead = sim
-    ? `ผลจำลอง ${sim.lives.toLocaleString('en-US')} ชีวิต (บอท ${sim.bots.length} แบบ แบบละ ${sim.perBot.toLocaleString('en-US')} ชีวิต · เกมรุ่น ${esc(sim.sha)}) · <b class="sim">%</b> สีนี้ = ชีวิตที่เจอ ÷ ชีวิตที่เคยทำงานนั้น เจอกี่ครั้งก็นับครั้งเดียว ไม่ใช่โอกาสของผลสุ่มบนการ์ด`
+    ? `ผลจำลอง ${sim.lives.toLocaleString('en-US')} ชีวิต (บอท ${sim.bots.length} แบบ แบบละ ${sim.perBot.toLocaleString('en-US')} ชีวิต · เกมรุ่น ${esc(sim.sha)}) · เลขในกรอบฟ้า = ชีวิตที่เจอ ÷ ชีวิตที่เคยทำงานนั้น เจอกี่ครั้งก็นับครั้งเดียว ไม่ใช่โอกาสของผลสุ่มบนการ์ด`
     : 'ยังไม่มีไฟล์ผลจำลอง — รายการด้านล่างมาจากข้อมูลการ์ดอย่างเดียว ไม่มีเลข';
   return `<details id="career"><summary>เส้นทางงาน <small>${Object.keys(careers.ladders).length + (office ? 1 : 0)} สาย · ผลจำลอง</small></summary><p class="lead">${lead}</p>${sections.join('')}</details>`;
 }
