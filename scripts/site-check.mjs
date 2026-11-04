@@ -23,6 +23,7 @@ import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, PUBLIC_HIDE } from '../src/site/gate.mjs';
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
+import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsTweak } from '../src/site/docs-tweak.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -293,6 +294,23 @@ const liveCss = gameCss(readFileSync(new URL('../src/ui/template.html', import.m
 const cssMiss = GAME_CSS_PAGES.filter((f) => gameCssBlock(read(f)) !== liveCss);
 const cssCtl = gameCssBlock(read(GAME_CSS_PAGES[0])) !== `${liveCss} `;
 check('หน้า tweak ใช้ CSS เกมชุดปัจจุบัน', cssMiss.length || !cssCtl, ` ${GAME_CSS_PAGES.length} หน้า${cssMiss.length ? ` · เก่า ${cssMiss.join(' ')}` : ''} · ตัวควบคุม${cssCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7c4) หน้า tweak เว็บเอกสาร (ui-redo 32): รายการในหน้า = ขอบเขตที่คิดจาก docs/ ตอนนี้ + :root หน้าเล่นตอนนี้ · ไม่มีหน้านอกขอบเขต (ตัวเกม คลังเก่า หน้า tweak หน้าส่งต่อ) · ทุกหน้ามีไฟล์จริง
+// ตัวควบคุม: ถอดหน้า 1 หน้าจากบล็อก ⇒ ต้องไม่ตรง · ขอบเขตที่คิดได้ต้องมีครบชุดหลักที่ใบงานระบุ
+const dtHtml = readOr(DOCS_TWEAK_PAGE) ?? '';
+const dtNow = docsTweakData(docs, uiTpl);
+const dtBlock = docsTweakBlock(dtHtml);
+const dtFiles = dtNow.pages.map((p) => p.f);
+const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'cards.html', 'spoilers.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', 'dev/maps/politics.html', 'dev/archive/index.html'];
+const dtOut = (f) => f === 'play.html' || f.startsWith('archive/') || f.startsWith('dev/ui-redo/') || /tweak/.test(f) || read(f).includes(MOVED_MARK);
+const dtMiss = [
+  ...(JSON.stringify(dtBlock) !== JSON.stringify(dtNow) ? [`ค้าง ${DOCS_TWEAK_PAGE} (build ใหม่)`] : []),
+  ...dtMust.filter((f) => !dtFiles.includes(f)).map((f) => `ขาด ${f}`),
+  ...dtFiles.filter((f) => !existsSync(new URL(f, docs)) || dtOut(f)).map((f) => `เกิน ${f}`),
+  ...(dtNow.pages.filter((p) => p.k === 'map').length !== dtFiles.filter((f) => f.startsWith('dev/maps/')).length ? ['dev/maps ไม่ได้ชนิดแผนที่'] : []),
+];
+const dtCtl = dtBlock && JSON.stringify({ ...dtBlock, pages: dtBlock.pages.slice(1) }) !== JSON.stringify(dtNow) && !injectDocsTweak(dtHtml, dtNow, 'ctl').includes(`${DOCS_TWEAK_START}null`);
+check('หน้า tweak เว็บเอกสารมีทุกหน้าในขอบเขต', dtMiss.length || !dtCtl, ` ${dtFiles.length} หน้า${dtMiss.length ? ` · ${dtMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${dtCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) แผนงาน (ui-redo 23 · ย้ายไป whatsnew ui-redo 69): แถวหมวดใต้หัวกำลังทำ = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
 // · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)

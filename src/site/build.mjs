@@ -14,6 +14,7 @@ import { GAME_CSS_PAGES, gameCss, injectGameCss } from './game-css.mjs';
 import { gatedFiles, injectGate, readGateHash } from './gate.mjs';
 import { injectSeo, sitemapXml, faviconSvg, SITEMAP, FAVICON_SVG } from './seo.mjs';
 import { ART_INK } from '../ui/art.mjs';
+import { DOCS_TWEAK_PAGE, docsTweakData, injectDocsTweak } from './docs-tweak.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
@@ -78,6 +79,11 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     const next = injectNav(file === 'whatsnew.html' ? injectRoadmap(soonIds(html), soonCats(html), 'docs/whatsnew.html') : html, file);
     if (next !== html) writeFileSync(at(`docs/${file}`), next);
   }
+  // หน้า tweak เว็บเอกสาร (ui-redo 32): รายการหน้าคิดหลังทุกหน้าข้างบนเขียนเสร็จ ⇒ หน้าที่เพิ่ง build ใหม่อยู่ในรายการด้วย
+  const dt = readFileSync(at(`docs/${DOCS_TWEAK_PAGE}`), 'utf8');
+  const dtNext = injectDocsTweak(dt, docsTweakData(at('docs/'), readFileSync(at('src/ui/template.html'), 'utf8')), `docs/${DOCS_TWEAK_PAGE}`);
+  if (dtNext !== dt) writeFileSync(at(`docs/${DOCS_TWEAK_PAGE}`), dtNext);
+  out.push(DOCS_TWEAK_PAGE.replace(/\.html$/, ''));
   // กล่องรหัส (ui-redo 72) ฉีดท้ายสุด — หน้าที่ build สร้างใหม่ข้างบนต้องได้บล็อกด้วย · play.html (build.mjs เขียน) ไม่ติดรหัสอยู่แล้ว
   const hash = readGateHash();
   for (const file of gatedFiles(at('docs/'))) {
