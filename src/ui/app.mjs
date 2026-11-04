@@ -585,10 +585,27 @@ function lineageList(all, brief = all.length) {
 function lineageView(all, now, brief = all.length, youWord) {
   const box = el('div', 'lineage-view');
   const shown = all.slice(-brief);
-  shelfLineageArt(box, shown, all.length - shown.length, now, CLASSES, youWord, all.findLast((l) => !l.isekai));
+  const draw = () => shelfLineageArt(box, shown, all.length - shown.length, now, CLASSES, youWord, all.findLast((l) => !l.isekai));
+  let cv = draw();
   const d = el('details', 'lineage-text');
   d.append(el('summary', null, 'อ่านเป็นข้อความ'), lineageList(all, brief));
   box.append(d);
+  // การ์ดสร้างก่อนติดหน้า (และจอหมุน/ย่อได้ภายหลัง) ภาพที่วาดไว้ถูก CSS ยืดจนวงกลมเป็นวงรี — วาดใหม่ทุกครั้งที่ความกว้างจริงเปลี่ยน
+  if (cv && typeof ResizeObserver === 'function') {
+    const ro = new ResizeObserver(() => {
+      if (!cv.isConnected) return ro.disconnect();
+      // ภาพกว้างขั้นต่ำ 280 (saCanvas) — เทียบกับความกว้างที่วาดได้จริง ไม่งั้นจอแคบวาดซ้ำไม่จบ
+      const want = Math.max(280, cv.offsetWidth);
+      if (Math.abs(want - cv.width / (window.devicePixelRatio || 1)) < 2) return;
+      ro.unobserve(cv);
+      cv.remove();
+      cv = draw();
+      if (!cv) return ro.disconnect();
+      box.prepend(cv);
+      ro.observe(cv);
+    });
+    ro.observe(cv);
+  }
   return box;
 }
 
