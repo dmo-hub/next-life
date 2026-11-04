@@ -1,5 +1,5 @@
 // ภาพรวมบนหัวแท็บชั้นสมุด (B176): วาด canvas จากของที่ผู้เล่นสะสม ไม่ใช่ภาพวาดมือ · เปิดแท็บ = วาดใหม่
-// แกนวาด (noise · แบ่งเขตจากจุดตั้ง · ไอคอน · ป้าย) ยกแบบย่อจากหน้าแผนที่ต้นแบบของเจ้าของ (maps/core.js) — ที่นั่นเป็น
+// แกนวาด (noise · แบ่งเขตจากจุดตั้ง) ยกแบบย่อจากหน้าแผนที่ต้นแบบของเจ้าของ (maps/core.js) — ที่นั่นเป็น
 // classic script ใช้ผ่าน window จึง import ไม่ได้ · build ต่อทุกไฟล์เป็น scope เดียว ชื่อระดับบนสุดจึงขึ้นต้น sa กันชน
 import { ART_INK } from './art.mjs';
 
@@ -71,42 +71,6 @@ function saNote(c, x, y, w, s) {
   c.fillRect(x - w / 2, y - 18, w, 28);
   saText(c, s, x, y + 1, { size: 13, align: 'center', color: ART_INK.gold2, bold: true });
 }
-// ป้ายชื่อมีขอบกระดาษ (แบบหมุดบนแผนที่ต้นแบบ)
-function saLabel(c, s, x, y, size = 10) {
-  c.save();
-  c.font = SA_FONT(size, true);
-  c.textAlign = 'center';
-  c.lineWidth = 4;
-  c.strokeStyle = 'rgba(245,236,210,.95)';
-  c.lineJoin = 'round';
-  c.strokeText(s, x, y);
-  c.fillStyle = '#2e1e10';
-  c.fillText(s, x, y);
-  c.restore();
-}
-// ไอคอนวงกลม 2 แบบที่ใช้: เมือง (เศรษฐกิจ) · ซากตึก (ภัยพิบัติ)
-function saIcon(c, kind, x, y) {
-  c.save();
-  c.translate(x, y);
-  c.fillStyle = ART_INK.cream;
-  c.strokeStyle = '#3b2a1a';
-  c.lineWidth = 1.5;
-  c.beginPath();
-  c.arc(0, 0, 11, 0, Math.PI * 2);
-  c.fill();
-  c.stroke();
-  c.fillStyle = '#c8961e';
-  if (kind === 'economy') {
-    c.fillRect(-6, -2, 12, 7);
-    for (const dx of [-6, -1, 4]) c.fillRect(dx, -6, 2.5, 4);
-  } else {
-    c.fillRect(-6, 0, 3, 5);
-    c.fillRect(-1, -4, 3, 9);
-    c.fillRect(4, 2, 3, 3);
-  }
-  c.restore();
-}
-
 // ---- อนุสรณ์: แผนที่ภาค ----
 // รูปประเทศหยาบในกรอบ 64×100 · วาดใหญ่นอกจอครั้งเดียวต่อหน้า (noise ของเส้นแดนตั้งไว้ที่หลักร้อย px) แล้วย่อลง
 const SA_THAI = [[10, 6], [20, 0], [32, 3], [38, 10], [46, 13], [56, 12], [63, 20], [64, 30], [58, 37], [50, 40], [50, 47], [46, 52], [40, 48], [36, 46], [34, 50], [35, 58], [37, 68], [40, 78], [44, 88], [46, 96], [42, 98], [36, 92], [32, 82], [30, 72], [30, 62], [30, 54], [28, 46], [24, 40], [18, 30], [14, 22], [8, 14]];
@@ -286,53 +250,6 @@ export function shelfTitleArt(host, shelves, fresh, got, all) {
     counts.push(lit);
   });
   k.cv.dataset.count = JSON.stringify({ got, all, shelves: counts });
-  return k.cv;
-}
-
-// ---- ภาพบ้านเมือง: แม่น้ำเวลา ----
-// events = [{id, name, kind, from, to, n ภาพที่ได้, all ภาพทั้งหมด, met ได้ภาพหลักแล้ว, fresh}]
-export function shelfPicArt(host, events, got, all) {
-  const k = saCanvas(host, 200, `แม่น้ำเวลาเหตุการณ์บ้านเมือง ได้ภาพแล้ว ${got} จาก ${all}`);
-  if (!k) return null;
-  const { c, W, H } = k;
-  saBg(c, W, H, '#2a2014', '#1a130d');
-  saText(c, `ภาพบ้านเมืองที่ได้ ${got}/${all}`, 8, 20, { size: 13, color: ART_INK.gold2, bold: true });
-  const y0 = Math.floor((Math.min(...events.map((e) => e.from)) - 2) / 10) * 10;
-  const y1 = Math.ceil((Math.max(...events.map((e) => e.to)) + 4) / 10) * 10;
-  const X = (y) => 20 + ((y - y0) / (y1 - y0)) * (W - 40);
-  const RY = (x) => H * 0.56 + Math.sin(x / 55) * 14 + (saFbm(x / 80, 3) - 0.5) * 18;
-  c.strokeStyle = '#3d5560';
-  c.lineWidth = 9;
-  c.lineCap = 'round';
-  c.beginPath();
-  for (let x = 10; x <= W - 10; x += 4) { if (x === 10) c.moveTo(x, RY(x)); else c.lineTo(x, RY(x)); }
-  c.stroke();
-  c.strokeStyle = 'rgba(150,200,210,.35)';
-  c.lineWidth = 2;
-  c.stroke();
-  for (let y = y0; y <= y1; y += 10) saText(c, `${y}`, X(y), H - 6, { size: 10, align: 'center', color: SA_MUTED });
-  // จอแคบซ่อนชื่อเหตุการณ์ (เหลือไอคอน + ช่องภาพ) ไม่งั้นป้ายทับกัน
-  const named = W > 500;
-  events.forEach((ev, i) => {
-    const x = X(ev.from), up = i % 2 === 0, y = RY(x) + (up ? -34 : 34);
-    c.strokeStyle = 'rgba(138,109,59,.7)';
-    c.lineWidth = 1;
-    c.beginPath(); c.moveTo(x, RY(x)); c.lineTo(x, y); c.stroke();
-    if (ev.fresh) saGlow(c, x, y, 9);
-    if (ev.met) saIcon(c, ev.kind, x, y);
-    else {
-      c.fillStyle = '#3a2c1c';
-      c.strokeStyle = ART_INK.bronze2;
-      c.beginPath(); c.arc(x, y, 11, 0, Math.PI * 2); c.fill(); c.stroke();
-      saText(c, '?', x, y + 4, { size: 12, align: 'center', color: ART_INK.bronze2, bold: true });
-    }
-    for (let s = 0; s < ev.all; s++) {
-      c.fillStyle = s < ev.n ? ART_INK.gold2 : '#4a3a26';
-      c.fillRect(x - ev.all * 3 + s * 6, y + (up ? -20 : 15), 4, 4);
-    }
-    if (ev.met && named) saLabel(c, ev.name.length > 14 ? `${ev.name.slice(0, 13)}…` : ev.name, x, y + (up ? -26 : 32));
-  });
-  k.cv.dataset.count = JSON.stringify({ got, all, met: events.filter((e) => e.met).length, events: events.length });
   return k.cv;
 }
 
