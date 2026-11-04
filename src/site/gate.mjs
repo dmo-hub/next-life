@@ -11,6 +11,8 @@ export const GATE_KEY = 'next-life-gate';
 export const GATE_CONFIG = new URL('./gate.json', import.meta.url);
 // หน้าที่ไม่ติดรหัส: หน้าแรก + ตัวเกม (ข้อ 106) · หน้าส่งต่อพาไปหน้าที่ติดรหัสอยู่แล้ว จึงไม่ต้องบังซ้ำ
 export const GATE_OPEN = ['index.html', 'play.html'];
+// หน้าไม่ติดรหัส (รวมหน้าส่งต่อ) ไม่บอกว่ามีโลกที่สาม ให้ผู้เล่นเจอเองในเกม (ui-redo 70) · ตัวเกมใน play.html ไม่นับ
+export const PUBLIC_HIDE = /ต่างโลก|isekai/i;
 
 export const readGateHash = (file = GATE_CONFIG) => {
   const { sha256 } = JSON.parse(readFileSync(file, 'utf8'));
