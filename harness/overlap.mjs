@@ -547,3 +547,48 @@ if (fails.length) {
     process.exitCode = 1;
   } else console.log('ด่านดันเจียนผ่าน');
 }
+
+// (12) โซ่ซ้อนทับทุกใบ: full ข้ามโซ่นี้ที่ด่าน 2 (reachChain ใน gates.mjs ตัวเดียวกัน) ⇒ ทุกใบต้องออก ทุกตัวเลือกในโซ่ต้องกดได้จริงที่นี่
+// ใบใหม่ที่กั้นด้วยขั้นซ้อนทับเข้าด่านนี้เอง ไม่มีลิสต์มือ · ขั้น 2–4 ยังเป็น ∞ ⇒ ยืมเกณฑ์ขั้น = ค่า แบบ (10)(11) เฉพาะช่วงเล่น
+// ชีวิตละขั้นวน 1–4 · บอทกดตัวเลือกในโซ่ที่ยังไม่เคยกดก่อน · ครึ่งหนึ่งไล่ตั้งของโซ่ (สมัครนักล่า) อีกครึ่งเลี่ยง (ทางคนทั่วไปถูกดึง)
+{
+  const { OVERLAP_STAGE_MIN } = await import('../src/engine/index.mjs');
+  const { reachChain, CHAIN_ROOTS } = await import('./gates.mjs');
+  const chain = reachChain(content.events, CHAIN_ROOTS.overlap);
+  const want = new Set([...chain.events, ...chain.choices]);
+  const hit = new Set();
+  const setsOwn = (c) => [c, ...[].concat(c.outcomes ?? [])].some((x) => (x?.sets_flags ?? []).some((f) => chain.flags.has(f)));
+  const chase = (greedy) => (card, rng, h) => {
+    const ev = h.pending;
+    if (ev?.id !== card.id || ev.choices?.length !== card.choices.length) return BOTS.สุ่ม(card, rng, h);
+    const key = (k) => `${ev.id}#${ev.choices[k].id ?? k}`;
+    const ks = card.choices.map((_, k) => k).filter((k) => open(card, k));
+    const fresh = ks.filter((k) => chain.choices.has(key(k)) && !hit.has(key(k)));
+    const side = ks.filter((k) => setsOwn(ev.choices[k]) === greedy);
+    const j = fresh.length ? fresh[rng.int(0, fresh.length - 1)] : side.length && (greedy || chain.events.has(ev.id)) ? side[rng.int(0, side.length - 1)] : BOTS.สุ่ม(card, rng, h);
+    if (chain.choices.has(key(j))) hit.add(key(j));
+    return j;
+  };
+  const LIMIT = 400;
+  let lives = 0;
+  const keep = OVERLAP_STAGE_MIN.slice();
+  try {
+    for (let k = 2; k < OVERLAP_STAGE_MIN.length; k++) OVERLAP_STAGE_MIN[k] = k;
+    for (let i = 0; i < LIMIT && [...want].some((x) => !hit.has(x)); i++) {
+      const s = newLife(mixSeed(seed ^ 0x0c12, i), content);
+      s.overlap = 1 + (i % 4);
+      overlapPlan(s, 0);
+      lives++;
+      playLife(mixSeed(seed ^ 0x0c12, i), content, chase(((i >> 2) & 1) === 0), (card) => { if (want.has(card.id)) hit.add(card.id); }, s);
+    }
+  } finally {
+    keep.forEach((v, k) => { OVERLAP_STAGE_MIN[k] = v; });
+  }
+  const miss = [...want].filter((x) => !hit.has(x));
+  console.log(`\nโซ่ซ้อนทับ (reachChain · ตัวที่ full ข้าม): ราก ${chain.roots.size} ใบ · ทั้งโซ่ ${chain.events.size} ใบ ${chain.choices.size} ตัวเลือก · ธง ${[...chain.flags].join(' ') || '-'} · ยืมขั้น 1–4 ${lives} ชีวิต · ไม่เคยถึง ${miss.length}${miss.length ? `: ${miss.join(' ')}` : ''}`);
+  if (!chain.roots.size) console.log('  (ยังไม่มีใบที่กั้นด้วยขั้นซ้อนทับ)');
+  if (miss.length) {
+    console.log(`✗ โซ่ซ้อนทับมีของที่ไม่เคยถึง ${miss.length} ตัว`);
+    process.exitCode = 1;
+  } else console.log('ด่านโซ่ซ้อนทับผ่าน');
+}

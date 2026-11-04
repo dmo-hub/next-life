@@ -11,7 +11,7 @@ import { parse } from 'yaml';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 import { playLife, mixSeed, COURT_SCENES } from '../src/engine/index.mjs';
-import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS, heirChain } from './gates.mjs';
+import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS, heirChain, reachChain, CHAIN_ROOTS } from './gates.mjs';
 
 const args = process.argv.slice(2);
 const has = (name) => args.includes(`--${name}`);
@@ -104,10 +104,20 @@ for (const [flag, bot] of Object.entries(SIDE_REACH)) {
 // ด่านว่าใบพวกนี้ออกได้จริงอยู่ที่ npm run lineage · ธงที่มีแต่ใบพวกนี้ตั้งก็ถึงไม่ได้ด้วยเหตุเดียวกัน · ใบที่ผู้อ่านธงพ่อแม่แค่คูณโอกาสยังตัดสินที่นี่
 // ผู้อ่านธงพวกนั้น (when.flags.has · requires.flags.has) ถึงไม่ได้ต่อเป็นโซ่ (heirChain ใน gates.mjs) — af3-heed ตกด่าน 2 ครั้งแรกเพราะข้ามแค่ชั้นแรก
 // FULL_HEIR_CHAIN=off ข้ามแค่ชั้นแรกแบบเดิม (ตัวควบคุม: ผู้อ่านธงทายาทต้องกลับมาตก)
+// ใบที่ when.overlap_stage ขั้นต่ำ ≥ 1 (โลกซ้อนทับ) ก็ถึงไม่ได้แบบเดียวกัน: ค่าซ้อนทับขึ้นแค่ตอนกลับเข้าต่างโลกที่เคยออก ต้องหลายรุ่น · บอทหลักไม่รับชวน
+// โซ่ตาม reachChain (ธง · next · first_of) ด่านว่าถึงได้จริงอยู่ที่ npm run overlap · FULL_OVERLAP_CHAIN=off ไม่ข้ามโซ่นี้เลย (ตัวควบคุม: ทั้งโซ่ต้องกลับมาตก)
 const chainOff = process.env.FULL_HEIR_CHAIN === 'off';
-const { parent: HEIR_PARENT, events: HEIR_ONLY, choices: HEIR_CHOICES, flags: HEIR_FLAGS, setters } = heirChain(content.events, { chain: !chainOff });
-const heirChained = [...HEIR_ONLY].filter((id) => !HEIR_PARENT.has(id));
-console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run lineage): การ์ดที่ต้องมีธงพ่อแม่ ${HEIR_PARENT.size} ใบ · ธงที่มีแต่ของทายาทตั้ง ${HEIR_FLAGS.size} ตัว${HEIR_FLAGS.size ? ` (${[...HEIR_FLAGS].join(' · ')})` : ''} · ผู้อ่านธงพวกนั้นตามโซ่ การ์ด ${heirChained.length}${heirChained.length ? ` (${heirChained.join(' · ')})` : ''} · ตัวเลือก ${HEIR_CHOICES.size}${HEIR_CHOICES.size ? ` (${[...HEIR_CHOICES].join(' · ')})` : ''}${chainOff ? ' · ตัวควบคุมปิดโซ่' : ''}`);
+const overlapOff = process.env.FULL_OVERLAP_CHAIN === 'off';
+const { parent: HEIR_PARENT, events: HEIR_EVENTS, choices: HEIR_CHOICE_SET, flags: HEIR_FLAG_SET, setters } = heirChain(content.events, { chain: !chainOff });
+const OV = overlapOff ? { roots: new Set(), events: new Set(), choices: new Set(), flags: new Set() } : reachChain(content.events, CHAIN_ROOTS.overlap);
+const heirChained = [...HEIR_EVENTS].filter((id) => !HEIR_PARENT.has(id));
+const ovChained = [...OV.events].filter((id) => !OV.roots.has(id));
+const ids = (xs) => (xs.length ? ` (${xs.join(' · ')})` : '');
+console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run lineage): การ์ดที่ต้องมีธงพ่อแม่ ${HEIR_PARENT.size} ใบ · ธงที่มีแต่ของทายาทตั้ง ${HEIR_FLAG_SET.size} ตัว${ids([...HEIR_FLAG_SET])} · ผู้อ่านธงพวกนั้นตามโซ่ การ์ด ${heirChained.length}${ids(heirChained)} · ตัวเลือก ${HEIR_CHOICE_SET.size}${ids([...HEIR_CHOICE_SET])}${chainOff ? ' · ตัวควบคุมปิดโซ่' : ''}`);
+console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run overlap): การ์ดขั้นซ้อนทับ ≥ 1 ${OV.roots.size} ใบ${ids([...OV.roots])} · ตามโซ่ การ์ด ${ovChained.length}${ids(ovChained)} · ตัวเลือก ${OV.choices.size}${ids([...OV.choices])} · ธง ${OV.flags.size}${ids([...OV.flags])}${overlapOff ? ' · ตัวควบคุมไม่ข้ามโซ่นี้' : ''}`);
+const HEIR_ONLY = new Set([...HEIR_EVENTS, ...OV.events]);
+const HEIR_CHOICES = new Set([...HEIR_CHOICE_SET, ...OV.choices]);
+const HEIR_FLAGS = new Set([...HEIR_FLAG_SET, ...OV.flags]);
 // ใบศาล (B153) แกนแทรกเองตอนเฉียดตาย/ถูกเรียกตัว และบอทศาลเลือกแทน — ไม่จั่วจากกองและไม่ผ่านบอทหลัก ⇒ ด่าน 2 ตัดสินไม่ได้
 // ด่านว่าออกครบลำดับและถูกเรียกตัวทุกชีวิตที่ถือธงอยู่ที่ npm run near · ธง cheat_death ข้ามเฉพาะตอนยังไม่มีการ์ดตั้ง (near ตั้งเอง) — มีการ์ดตั้งเมื่อไรกลับมาตัดสินที่นี่
 const COURT_ONLY = new Set(content.events.filter((e) => COURT_SCENES.includes(e.scene)).map((e) => e.id));
