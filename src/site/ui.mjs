@@ -7,7 +7,7 @@ import { esc } from './catalog.mjs';
 import { demoCard } from './demo.mjs';
 import { STAT_LABELS } from '../engine/life.mjs';
 import { SHOWN_STATS, BTN } from '../ui/labels.mjs';
-import { movedHtml, MOVED_MARK } from './nav.mjs';
+import { movedHtml } from './nav.mjs';
 import { DESIGN_AT } from './design.mjs';
 import { PUBLIC_HIDE } from './gate.mjs';
 
@@ -73,14 +73,24 @@ export function menuLabels(name, src = readFileSync(APP, 'utf8')) {
   return [...m[1].matchAll(/\['[^']*', '([^']*)'\]/g)].map((x) => x[1]);
 }
 
-// หน้าเอกสารทุกหน้าที่ชื่อไฟล์มี tweak ใต้ docs/dev/ (ยกเว้นคลังเก่า) → [path ใต้ docs/, ชื่อหน้า]
+// หน้า tweak ทุกหน้าเป็นหัวในหน้านี้ (ui-redo 79) — ตัวหน้าอยู่ใต้ dev/tweak/ ลึกเท่าที่เดิม (ลิงก์ ../../ ในหน้ายังถูก) และฝังด้วย iframe
+// ที่เดิมใต้ dev/ui-redo/ เป็นหน้าส่งต่อมาหัว → [path ใต้ docs/, ชื่อหน้า, id หัว, ที่เดิม]
+export const UI_TWEAK_AT = 'dev/tweak/';
+export const UI_TWEAK_FROM = 'dev/ui-redo/';
 export function tweakPages(docs) {
-  return readdirSync(new URL('dev/', docs), { recursive: true })
-    .map((f) => `dev/${f.replace(/\\/g, '/')}`)
-    .filter((f) => /tweak[^/]*\.html$/.test(f) && !f.startsWith('dev/archive/') && !readFileSync(new URL(f, docs), 'utf8').includes(MOVED_MARK))
+  return readdirSync(new URL(UI_TWEAK_AT, docs))
+    .filter((n) => n.endsWith('.html'))
     .sort()
-    .map((f) => [f, readFileSync(new URL(f, docs), 'utf8').match(/<title>([^<]*)<\/title>/)?.[1]?.split(' · ')[0] ?? f]);
+    .map((n) => [`${UI_TWEAK_AT}${n}`, readFileSync(new URL(UI_TWEAK_AT + n, docs), 'utf8').match(/<title>([^<]*)<\/title>/)?.[1]?.split(' · ')[0] ?? n, `ui-t-${n.replace(/(-tweak)?\.html$/, '')}`, UI_TWEAK_FROM + n]);
 }
+
+// ป้ายสถานะของหัว = ป้ายในแถวของหัวนั้นบนสารบัญห้องผู้พัฒนา (แก้ป้ายที่เดียว) · id → HTML ของป้าย
+export function tweakStatus(docs) {
+  const html = readFileSync(new URL('dev/index.html', docs), 'utf8');
+  return Object.fromEntries([...html.matchAll(/<a href="ui\.html#([a-z0-9-]+)">[^<]*<\/a>((?:<span class="st [a-z]+">[^<]*<\/span>)*)/g)].map((m) => [m[1], m[2]]));
+}
+const PUBLIC_TITLE = (t) => (PUBLIC_HIDE.test(t) ? 'หน้า tweak' : t);
+export const tweakMoved = ([, title, id, from]) => movedHtml(from, `${UI_PAGE}#${id}`, PUBLIC_TITLE(title));
 
 const meter = (k, v, d) =>
   `<li${v <= 20 ? ' class="low"' : ''}><span class="mh"><span class="mk">${esc(STAT_LABELS[k])}</span><b class="num">${v}</b>${d ? `<em${d < 0 ? ' class="dn"' : ''}><span aria-hidden="true">${d > 0 ? '▲' : '▼'}</span>${Math.abs(d)}</em>` : ''}</span><span class="br"><i style="width:${v}%"></i></span></li>`;
@@ -128,6 +138,7 @@ export function uiPage(content, docs, tpl = readFileSync(TEMPLATE, 'utf8')) {
   const others = groups.flatMap((g) => g.vars.filter(([, v]) => !isColor(v)).map(([k, v]) => [g.sel, k, v]));
   const sw = ([k, v]) => `<li><span class="sw" style="background:${esc(v)}"></span><code>${esc(k)}</code> <small>${esc(v)}</small></li>`;
   const tweaks = tweakPages(docs);
+  const status = tweakStatus(docs);
   const parts = specimens(content, src);
   const shot = ([id, name]) =>
     `<div><h3>${esc(name)}</h3>${UI_SHOT_W.map((w) => {
@@ -135,14 +146,16 @@ export function uiPage(content, docs, tpl = readFileSync(TEMPLATE, 'utf8')) {
       return existsSync(new URL(f, docs)) ? `<p><img src="shots/${id}-${w}.png" alt="จอ${esc(name)} กว้าง ${w}" loading="lazy" style="max-width:100%;height:auto"></p>` : `<p class="wait">${w} px — ยังไม่มีภาพ (<code>${f}</code>)</p>`;
     }).join('')}</div>`;
   const body = [
-    '<style>.sws{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 12px}.sws li{display:flex;align-items:center;gap:8px;margin:0;min-width:0}.sws small{overflow-wrap:anywhere}.sw{flex:none;width:28px;height:28px;border:1px solid #1F2430}.ui-spec{margin:0 0 16px}.ui-spec figcaption{font-size:14px;font-weight:600;margin:0 0 4px}.fspec{margin:0 0 12px;overflow-wrap:anywhere}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.wait{color:#5A5F6B;font-size:14px}.ui-live{width:min(1400px,calc(100vw - 32px));margin:0 0 16px calc(50% - min(700px,calc(50vw - 16px)))}.ui-live iframe{display:block;width:100%;height:min(900px,calc(100vh - 24px));min-height:560px;border:1px solid #C9BFA9;background:#E6E0D3}</style>',
+    '<style>.sws{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 12px}.sws li{display:flex;align-items:center;gap:8px;margin:0;min-width:0}.sws small{overflow-wrap:anywhere}.sw{flex:none;width:28px;height:28px;border:1px solid #1F2430}.ui-spec{margin:0 0 16px}.ui-spec figcaption{font-size:14px;font-weight:600;margin:0 0 4px}.fspec{margin:0 0 12px;overflow-wrap:anywhere}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.wait{color:#5A5F6B;font-size:14px}.st{display:inline-block;font-size:12px;font-weight:600;padding:0 6px;border:1px solid currentColor;margin-left:6px;white-space:nowrap;line-height:1.5}.st.done{color:#2F6B3A}.st.pick{color:#7A5A12}.st.wait{color:#A23B2C}.ui-live{width:min(1400px,calc(100vw - 32px));margin:0 0 16px calc(50% - min(700px,calc(50vw - 16px)))}.ui-live iframe{display:block;width:100%;height:min(900px,calc(100vh - 24px));min-height:560px;border:1px solid #C9BFA9;background:#E6E0D3}</style>',
     '<h2 id="ui-decisions">คำตัดสิน UI</h2>',
     `<p>หน้าเล่นใช้การ์ดใบเดียวกลางจอ แถบสถานะสองแถวบนการ์ด แถบเมนูล่าง · ธีมการ์ดสามแบบ: กระดาษ (ชีวิตนี้) · ลายรดน้ำ (ระหว่างชาติ) · ต่างโลก · งานปรับหน้าตาทุกชิ้นมีหน้า tweak ให้เจ้าของเลือกก่อนลงจริง · คำตัดสินเต็ม: <a href="design-ui-redo.html">คำตัดสินเกม เรื่อง ui-redo</a></p>`,
-    `<h3>หน้า tweak (${tweaks.length})</h3>`,
-    `<ul id="ui-tweaks">${tweaks.map(([f, t]) => `<li><a href="${f.replace(/^dev\//, '')}">${esc(t)}</a> <small>${esc(f)}</small></li>`).join('')}</ul>`,
+    `<h3>หน้า tweak (${tweaks.length + 1})</h3>`,
+    `<ul id="ui-tweaks"><li><a href="#${UI_LIVE_ID}">${UI_LIVE_TITLE}</a>${status[UI_LIVE_ID] ?? ''}</li>${tweaks.map(([, t, id]) => `<li><a href="#${id}">${esc(t)}</a>${status[id] ?? ''}</li>`).join('')}</ul>`,
     `<h2 id="${UI_LIVE_ID}">${UI_LIVE_TITLE}</h2>`,
-    '<p>จอต้นแบบหน้าเล่นกดได้ (ui-redo 02) — ปรับเลย์เอาต์/ชิ้นย่อยแล้วกด "คัดลอกค่า" ส่งผู้รวมงาน · ค่าที่ปรับจำไว้ในเครื่อง (ชุดเดียวกับหน้า tweak เดิม) · ยังรอลงเกม</p>',
+    `<p>จอต้นแบบหน้าเล่นกดได้ (ui-redo 02) — ปรับเลย์เอาต์/ชิ้นย่อยแล้วกด "คัดลอกค่า" ส่งผู้รวมงาน · ค่าที่ปรับจำไว้ในเครื่อง (ชุดเดียวกับหน้า tweak เดิม)${status[UI_LIVE_ID] ?? ''}</p>`,
     liveFrame(),
+    // กรอบ src ไม่มี sandbox ด้วยเหตุเดียวกับต้นแบบปรับสด (คีย์ localStorage เดิมของแต่ละหน้า · คัดลอก) · แต่ละหน้าอยู่กรอบของตัวเอง ⇒ global JS · header.sb · :root ของแต่ละหน้าไม่ชนกัน
+    ...tweaks.map(([f, t, id]) => `<h2 id="${id}">${esc(t)}</h2><p><small>${esc(f)}</small>${status[id] ?? ''}</p><div class="ui-live"><iframe title="${esc(t)}" allow="clipboard-write" loading="lazy" src="${f.slice(4)}"></iframe></div>`),
     '<h2 id="ui-colors">สี</h2>',
     '<p>อ่านจากตัวแปร CSS ของหน้าเล่น (<code>src/ui/template.html</code>) ตอน build</p>',
     ...colors.map(([sel, vars]) => `<h3><code>${esc(sel)}</code></h3><ul class="sws">${vars.map(sw).join('')}</ul>`),

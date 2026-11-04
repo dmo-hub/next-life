@@ -17,7 +17,7 @@ import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml } from '../src/site/nav.mjs';
-import { uiPage, designMoved, tweakPages, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
+import { uiPage, designMoved, tweakPages, tweakMoved, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
@@ -263,14 +263,23 @@ const uiNow = uiBuilt(uiTpl);
 const uiHtml = readOr(UI_PAGE) ?? '';
 const uiColors = cssVars(uiTpl.match(/<style>([\s\S]*?)<\/style>/)[1]).flatMap((g) => g.vars).filter(([, v]) => /^(#|rgba?\(|hsla?\()/i.test(v));
 const uiTweaks = tweakPages(docs);
+// หน้า tweak เป็นหัวในหน้านี้ (ui-redo 79): ทุกหน้าใต้ dev/tweak/ มีลิงก์ในสารบัญ · หัว · กรอบที่ชี้ไฟล์และไม่มี sandbox (คีย์ localStorage เดิม) · ที่เดิมเป็นหน้าส่งต่อมาหัว
 const uiTweakGap = (html) => {
   const box = html.match(/<ul id="ui-tweaks">([\s\S]*?)<\/ul>/)?.[1] ?? '';
-  const hrefs = [...box.matchAll(/href="([^"]+)"/g)].map((m) => `dev/${m[1]}`);
-  return [...uiTweaks.filter(([f]) => !hrefs.includes(f)).map(([f]) => `ขาดลิงก์ ${f}`), ...hrefs.filter((h) => !existsSync(new URL(h, docs))).map((h) => `ลิงก์ตาย ${h}`)];
+  const frame = (f) => html.match(new RegExp(`<iframe[^>]* src="${f.slice(4)}"[^>]*>`))?.[0];
+  return uiTweaks.flatMap((t) => {
+    const [f, , id, from] = t;
+    return [
+      ...(box.includes(`href="#${id}"`) ? [] : [`ขาดลิงก์ ${id}`]),
+      ...(html.includes(`<h2 id="${id}">`) ? [] : [`ขาดหัว ${id}`]),
+      ...(!frame(f) ? [`ขาดกรอบ ${f}`] : /sandbox/.test(frame(f)) ? [`กรอบมี sandbox ${f}`] : []),
+      ...(lf(readOr(from)) !== tweakMoved(t) ? [`${from} ไม่ส่งต่อมา #${id}`] : []),
+    ];
+  });
 };
 const uiFrameBad = (html) => {
-  // กรอบต้นแบบปรับสดตั้งใจรันสคริปต์ — มีด่านของตัวเอง (7e2)
-  const frames = [...html.matchAll(/<iframe[^>]*>/g)].map((m) => m[0]).filter((f) => !f.includes(`title="${UI_LIVE_TITLE}"`));
+  // กรอบต้นแบบปรับสด (7e2) และกรอบหน้า tweak (src=) ตั้งใจรันสคริปต์ — ด่านนี้ดูแค่ชิ้นส่วนตัวอย่าง
+  const frames = [...html.matchAll(/<iframe[^>]*>/g)].map((m) => m[0]).filter((f) => !f.includes(`title="${UI_LIVE_TITLE}"`) && !f.includes(' src="'));
   return !frames.length || frames.some((f) => !/ sandbox=""/.test(f) || /&lt;script|<script/i.test(f));
 };
 const uiMiss = [
@@ -284,7 +293,7 @@ const [uiK, uiV] = uiColors[0] ?? ['', ''];
 const uiRecolor = uiBuilt(uiTpl.replace(`${uiK}:${uiV}`, `${uiK}:#010203`));
 const uiCtl =
   uiRecolor !== uiNow && uiRecolor.includes('background:#010203') &&
-  (uiTweaks.length === 0 || uiTweakGap(uiHtml.replace(/(<ul id="ui-tweaks">)<li>[\s\S]*?<\/li>/, '$1')).length === 1) &&
+  (uiTweaks.length === 0 || uiTweakGap(uiHtml.replace(`<h2 id="${uiTweaks[0][2]}">`, '<h2>')).length === 1) &&
   uiFrameBad(uiHtml.replace(' sandbox=""', ' sandbox="allow-scripts"'));
 check('หน้าดีไซน์ UI ตรงของที่ build สีจากเกมครบ ลิงก์ tweak ครบ ตัวอย่างไม่รันสคริปต์', uiMiss.length || !uiCtl, ` สี ${uiColors.length} · tweak ${uiTweaks.length}${uiMiss.length ? ` · ${uiMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${uiCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
@@ -304,11 +313,11 @@ const liveBad = (html) => {
     ...(doc.includes('navigator.clipboard.writeText') ? [] : ['ไม่มีคัดลอก']),
   ];
 };
-const liveLinks = [...devFiles, ...readdirSync(docs).filter((n) => n.endsWith('.html'))].filter((f) => !read(f).includes(MOVED_MARK) && read(f).includes('ui-redo/tweak.html"'));
+const liveLinks = [...devFiles, ...readdirSync(docs).filter((n) => n.endsWith('.html'))].filter((f) => !read(f).includes(MOVED_MARK) && [UI_LIVE_FROM, ...uiTweaks.map((t) => t[3])].some((o) => read(f).includes(`${o.slice(4)}"`)));
 const liveMiss = [
   ...liveBad(uiHtml),
   ...(lf(readOr(UI_LIVE_FROM)) !== liveMoved() ? [`${UI_LIVE_FROM} ไม่ส่งต่อมา ${UI_PAGE}#${UI_LIVE_ID}`] : []),
-  ...liveLinks.map((f) => `${f} ยังลิงก์ tweak.html`),
+  ...liveLinks.map((f) => `${f} ยังลิงก์หน้า tweak ที่เดิม`),
   ...(DEV_TABS.some(([h]) => h === UI_LIVE_FROM) ? ['แท็บ dev ยังมี tweak.html'] : []),
 ];
 const liveCtl =

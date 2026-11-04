@@ -8,7 +8,7 @@ import { guideHtml } from './guide.mjs';
 import { demoHtml } from './demo.mjs';
 import { designPages, designHtml, DESIGN_AT } from './design.mjs';
 import { injectNav } from './nav.mjs';
-import { uiPage, designMoved, liveMoved, UI_PAGE, UI_LIVE_FROM } from './ui.mjs';
+import { uiPage, designMoved, liveMoved, tweakPages, tweakMoved, UI_PAGE, UI_LIVE_FROM } from './ui.mjs';
 import { soonCats, soonIds, injectRoadmap } from './roadmap.mjs';
 import { GAME_CSS_PAGES, gameCss, injectGameCss } from './game-css.mjs';
 import { gatedFiles, injectGate, readGateHash } from './gate.mjs';
@@ -65,6 +65,7 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   writeFileSync(at(`docs/${UI_PAGE}`), designHtml(designTpl, uiPage(content, at('docs/')), UI_PAGE.slice(DESIGN_AT.length)));
   out.push(UI_PAGE.replace(/\.html$/, ''));
   writeFileSync(at(`docs/${UI_LIVE_FROM}`), liveMoved());
+  for (const t of tweakPages(at('docs/'))) writeFileSync(at(`docs/${t[3]}`), tweakMoved(t));
   // เรื่องที่ถูกรวม/ลบออกจาก design/ ทิ้งหน้าเก่าไว้ = ลิงก์ค้างที่ไม่ตรงต้นฉบับ · ที่เดิมที่เป็นหน้าเนื้อ (ไม่ใช่หน้าส่งต่อ) ก็ลบ
   const made = new Set(designOut.map(([f]) => f));
   for (const dir of ['docs/', `docs/${DESIGN_AT}`]) for (const f of readdirSync(at(dir)).filter((n) => /^design-.+\.html$/.test(n) && !made.has(n))) unlinkSync(at(`${dir}${f}`));
