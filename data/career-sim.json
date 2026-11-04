@@ -1,7 +1,7 @@
 {
  "assumption": true,
  "note": "ผลจำลองจากบอทของเกม ไม่ใช่สถิติจริง — % = ชีวิตที่เจอ ÷ ชีวิตที่เคยทำงานนั้น · สร้างด้วย node harness/career-sim.mjs",
- "sha": "4c085bc",
+ "sha": "9180898",
  "seed": 1,
  "perBot": 1000,
  "bots": [
