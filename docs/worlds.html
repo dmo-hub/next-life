@@ -1,6 +1,31 @@
 <!doctype html>
 <html lang="th">
 <head>
+<!--GATE:START--><meta name="robots" content="noindex"><style>html:not(.nl-open) body>*:not(#nl-gate){display:none!important}
+html:not(.nl-open):not(.nl-js) body::before{content:"\E15 \E49 \E2D \E07 \E40 \E1B \E34 \E14  JavaScript \E08 \E36 \E07 \E08 \E30 \E40 \E1B \E34 \E14 \E2B \E19 \E49 \E32 \E19 \E35 \E49 \E44 \E14 \E49 ";display:block;padding:48px 24px;font:16px/1.6 Sarabun,"Noto Sans Thai",sans-serif;text-align:center}
+#nl-gate{box-sizing:border-box;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#17110D;color:#F4EFE3;font:16px/1.6 Sarabun,"Noto Sans Thai",sans-serif}
+#nl-gate *{box-sizing:border-box}
+#nl-gate form{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}
+#nl-gate h1{margin:0;font-size:22px;color:#F0D78C}
+#nl-gate p{margin:0}
+#nl-gate input{min-height:44px;padding:8px 12px;font:inherit;color:#17110D;background:#F4EFE3;border:1px solid #5A4630;border-radius:6px}
+#nl-gate button{min-height:44px;padding:0 16px;font:inherit;font-weight:700;color:#17110D;background:#F0D78C;border:0;border-radius:6px;cursor:pointer}
+#nl-gate input:focus-visible,#nl-gate button:focus-visible,#nl-gate a:focus-visible{outline:3px solid #F0D78C;outline-offset:2px}
+#nl-gate .err{min-height:1.6em;color:#F2A38F}
+#nl-gate nav{display:flex;flex-wrap:wrap;gap:4px 16px}
+#nl-gate a{color:#E3DDD0;display:inline-block;line-height:44px}</style><script>(()=>{const K="next-life-gate",H=null,d=document.documentElement;
+try{if(sessionStorage.getItem(K)===String(H)){d.classList.add('nl-open');return}}catch(e){}
+d.classList.add('nl-js');
+addEventListener('DOMContentLoaded',()=>{const g=document.createElement('div');g.id='nl-gate';
+g.innerHTML='<form role="dialog" aria-modal="true" aria-labelledby="nl-gate-h"><h1 id="nl-gate-h">หน้านี้ต้องใส่รหัส</h1><p>หน้าเอกสารของเกมเปิดเฉพาะคนที่มีรหัส · ตัวเกมเล่นได้เลยไม่ต้องใส่</p><label for="nl-gate-pw">รหัส</label><input id="nl-gate-pw" type="password" autocomplete="current-password" required><button type="submit">เข้า</button><p class="err" role="alert"></p><nav aria-label="หน้าที่ไม่ต้องใส่รหัส"><a href="index.html">หน้าแรก</a><a href="play.html">เล่นเกม</a></nav></form>';
+document.body.prepend(g);const f=g.querySelector('form'),i=g.querySelector('input'),e=g.querySelector('.err');i.focus();
+if(!H){e.textContent='ยังไม่ได้ตั้งรหัส หน้านี้จึงยังเปิดไม่ได้';i.disabled=true;g.querySelector('button').disabled=true;return}
+f.addEventListener('submit',async(ev)=>{ev.preventDefault();e.textContent='';
+if(!(window.crypto&&crypto.subtle)){e.textContent='เบราว์เซอร์นี้ตรวจรหัสไม่ได้ (ต้องเปิดผ่าน https)';return}
+const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(i.value));
+const x=[...new Uint8Array(b)].map((n)=>n.toString(16).padStart(2,'0')).join('');
+if(x!==H){e.textContent='รหัสไม่ถูก ลองใหม่อีกครั้ง';i.select();i.focus();return}
+try{sessionStorage.setItem(K,H)}catch(e){}g.remove();d.classList.add('nl-open');d.classList.remove('nl-js')})})})()</script><!--GATE:END-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ชาตินี้ · ปรโลก · ต่างโลก · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>

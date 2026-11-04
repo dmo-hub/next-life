@@ -11,6 +11,7 @@ import { injectNav } from './nav.mjs';
 import { uiPage, designMoved, UI_PAGE } from './ui.mjs';
 import { soonCats, soonIds, injectRoadmap } from './roadmap.mjs';
 import { GAME_CSS_PAGES, gameCss, injectGameCss } from './game-css.mjs';
+import { gatedFiles, injectGate, readGateHash } from './gate.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
@@ -73,6 +74,13 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   for (const file of NAV_PAGES) {
     const html = readFileSync(at(`docs/${file}`), 'utf8');
     const next = injectNav(file === 'whatsnew.html' ? soonIds(html) : html, file);
+    if (next !== html) writeFileSync(at(`docs/${file}`), next);
+  }
+  // กล่องรหัส (ui-redo 72) ฉีดท้ายสุด — หน้าที่ build สร้างใหม่ข้างบนต้องได้บล็อกด้วย · play.html (build.mjs เขียน) ไม่ติดรหัสอยู่แล้ว
+  const hash = readGateHash();
+  for (const file of gatedFiles(at('docs/'))) {
+    const html = readFileSync(at(`docs/${file}`), 'utf8');
+    const next = injectGate(html, hash, file);
     if (next !== html) writeFileSync(at(`docs/${file}`), next);
   }
   return { facts, pages: out };

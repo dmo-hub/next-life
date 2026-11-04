@@ -21,6 +21,7 @@ import { uiPage, designMoved, tweakPages, cssVars, UI_PAGE, UI_MOVED_FROM } from
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
+import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN } from '../src/site/gate.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -200,11 +201,14 @@ check('หน้าเว็บไม่ลิงก์ไปหน้า tree/b
 // ตัวควบคุม: ถอดเอกสารแรกออกจากหน้าสารบัญ ⇒ ต้องถูกจับว่าไม่ครบ และไม่ตรงของที่ build
 const designTpl = injectFacts(readFileSync(new URL('../src/site/design.html', import.meta.url), 'utf8'), facts);
 const lf = (s) => s?.replace(/\r\n/g, '\n');
+// หน้าที่ build เขียนได้กล่องรหัสต่อท้ายเสมอ (ui-redo 72) ⇒ ของคาดหวังต้องผ่าน injectGate ชุดเดียวกัน
+const gateHash = readGateHash();
+const gated = (html, file) => injectGate(html, gateHash, file);
 // หน้าอยู่ใต้ DESIGN_AT · ที่เดิมใต้ docs/ ต้องเป็นหน้าส่งต่อไปหน้าใหม่ (ui-redo 43) — หน้าส่งต่อไม่นับเป็น "เกิน"
 const readOr = (p) => (existsSync(new URL(p, docs)) ? read(p) : null);
 const designGap = (out, readPage, readOld = readOr) => [
   ...designFiles().filter((f) => !readPage(designPage(f))?.includes(`<details class="doc" id="${docId(f)}"`)).map((f) => `ไม่มี ${f}`),
-  ...out.filter(([f, pg]) => lf(readPage(f)) !== lf(designHtml(designTpl, pg, f))).map(([f]) => `ค้าง ${f}`),
+  ...out.filter(([f, pg]) => lf(readPage(f)) !== lf(gated(designHtml(designTpl, pg, f), DESIGN_AT + f))).map(([f]) => `ค้าง ${f}`),
   ...out.filter(([f, pg]) => lf(readOld(f)) !== designMoved(f, pg.title)).map(([f]) => `ไม่มีหน้าส่งต่อ ${f}`),
   // หน้าเรื่องที่ถูกรวม/ลบแล้วยังค้าง ทั้งที่ใหม่และที่เดิม
   ...readdirSync(new URL(DESIGN_AT, docs)).filter((n) => /^design-.+\.html$/.test(n) && !out.some(([f]) => f === n)).map((n) => `เกิน ${DESIGN_AT}${n}`),
@@ -212,7 +216,7 @@ const designGap = (out, readPage, readOld = readOr) => [
 ];
 const designMiss = designGap(designOut, (f) => readOr(DESIGN_AT + f));
 const cutFirst = designOut.map(([f, pg], i) => [f, i ? pg : { ...pg, body: pg.body.replace(/<details class="doc"[\s\S]*?<\/details>/, '') }]);
-const designCtl = designGap(designOut, (f) => designHtml(designTpl, cutFirst.find(([x]) => x === f)[1], f)).length >= 2;
+const designCtl = designGap(designOut, (f) => gated(designHtml(designTpl, cutFirst.find(([x]) => x === f)[1], f), DESIGN_AT + f)).length >= 2;
 // ตัวควบคุมหน้าส่งต่อ: ลบหน้าส่งต่อ 1 ไฟล์ ⇒ ต้องถูกจับ
 const movedCtl = designGap(designOut, (f) => readOr(DESIGN_AT + f), (f) => (f === designOut[0][0] ? null : readOr(f))).some((x) => x.startsWith('ไม่มีหน้าส่งต่อ'));
 check('หน้าคำตัดสินเกมใต้ dev/ ครบทุกไฟล์ใน design/ ตรงของที่ build และที่เดิมเป็นหน้าส่งต่อ', designMiss.length || !designCtl || !movedCtl, ` ไฟล์ ${designFiles().length} · ${designOut.length} หน้า${designMiss.length ? ` · ${designMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${designCtl && movedCtl ? 'จับได้' : 'จับไม่ได้'}`);
@@ -250,7 +254,7 @@ const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.
 // · ชิ้นส่วนตัวอย่างอยู่ใน iframe sandbox ว่าง (ไม่มีสคริปต์ ไม่มี same-origin ⇒ แตะ localStorage ไม่ได้) และ srcdoc ไม่มี <script
 // ตัวควบคุม: แก้สีในเกม 1 ค่า ⇒ หน้าที่ build ต้องเปลี่ยนและมีค่าใหม่ · ถอดลิงก์ tweak 1 ลิงก์ ⇒ ต้องนับขาด · เติม allow-scripts ⇒ ต้องถูกจับ
 const uiTpl = readFileSync(new URL('../src/ui/template.html', import.meta.url), 'utf8');
-const uiBuilt = (tpl) => designHtml(designTpl, uiPage(content, docs, tpl), UI_PAGE.slice(DESIGN_AT.length));
+const uiBuilt = (tpl) => gated(designHtml(designTpl, uiPage(content, docs, tpl), UI_PAGE.slice(DESIGN_AT.length)), UI_PAGE);
 const uiNow = uiBuilt(uiTpl);
 const uiHtml = readOr(UI_PAGE) ?? '';
 const uiColors = cssVars(uiTpl.match(/<style>([\s\S]*?)<\/style>/)[1]).flatMap((g) => g.vars).filter(([, v]) => /^(#|rgba?\(|hsla?\()/i.test(v));
@@ -473,6 +477,40 @@ const fakeMiss = silent([fake]);
 const fakeCaught = ['when.zz_fake', 'multipliers(การ์ด).zz_fake', 'requires.zz_fake', 'multipliers(ผล).zz_fake'].every((k) => fakeMiss.has(k));
 const missLines = [...missing].map(([k, ids]) => `${k} ${ids.size} ใบ เช่น ${[...ids].slice(0, 3).join(',')}`);
 check('หน้าเฉลยวาดทุกเงื่อนไขและตัวคูณที่การ์ดใช้', missing.size || !fakeCaught, ` key ไม่ขึ้นหน้า ${missing.size}${missLines.length ? `: ${missLines.join(' | ')}` : ''} · ตัวควบคุม${fakeCaught ? 'จับได้' : 'จับไม่ได้'}`);
+
+// กล่องรหัส (ui-redo 72): ทุกหน้า docs/ ที่ไม่ใช่หน้าแรก/ตัวเกม/หน้าส่งต่อ มีบล็อกชุดเดียวใน <head> ตรง hash ปัจจุบัน + noindex · หน้าแรก/ตัวเกมไม่มี
+// ตัวควบคุม: ถอดบล็อก · hash อื่น · ย้ายไปท้าย body · ใส่บล็อกให้หน้าแรก ⇒ ต้องถูกจับทุกแบบ
+{
+  const BLOCK = /<!--GATE:START-->[\s\S]*?<!--GATE:END-->/;
+  const gateGap = (files, readPage) => [
+    ...files.flatMap((f) => {
+      const html = readPage(f);
+      const blk = gateBlockOf(html);
+      if (!blk) return [`ไม่มีกล่องรหัส ${f}`];
+      const head = html.search(/<\/head>/i);
+      return [
+        ...(blk.count !== 1 ? [`กล่องรหัสซ้ำ ${f}`] : []),
+        ...(blk.body !== gateBlock(gateHash, f) ? [`กล่องรหัสไม่ตรง hash ปัจจุบัน ${f}`] : []),
+        ...(head < 0 || html.search(BLOCK) > head ? [`กล่องรหัสไม่อยู่ใน <head> ${f}`] : []),
+        ...(!blk.body.includes('<meta name="robots" content="noindex">') ? [`ไม่มี noindex ${f}`] : []),
+      ];
+    }),
+    ...GATE_OPEN.filter((f) => gateBlockOf(readPage(f))).map((f) => `หน้าไม่ติดรหัสมีกล่อง ${f}`),
+  ];
+  const files = gatedFiles(docs);
+  const miss = gateGap(files, read);
+  const [g0, g1] = files;
+  const other = gateHash === 'f'.repeat(64) ? 'e'.repeat(64) : 'f'.repeat(64);
+  const only = (want, fn) => (f) => (f === want ? fn(read(f), f) : read(f));
+  const ctl = {
+    ถอดบล็อก: only(g0, (h) => h.replace(BLOCK, '')),
+    'hash อื่น': only(g0, (h, f) => injectGate(h, other, f)),
+    'ท้าย body': only(g1, (h) => { const b = h.match(BLOCK)[0]; return h.replace(BLOCK, '').replace(/<\/body>/i, `${b}</body>`); }),
+    หน้าแรกติด: only('index.html', (h, f) => injectGate(h, gateHash, f)),
+  };
+  const ctlBad = Object.entries(ctl).filter(([, rp]) => !gateGap(files, rp).length).map(([k]) => k);
+  check('หน้าเว็บติดรหัสครบ (กล่องใน head · hash ปัจจุบัน · noindex) หน้าแรก/ตัวเกมไม่ติด', miss.length || ctlBad.length || files.length < 20, ` ${files.length} หน้า · hash ${gateHash ? 'ตั้งแล้ว' : 'ยังไม่ตั้ง (กล่องบอกว่ายังเปิดไม่ได้)'}${miss.length ? ` · ${miss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
+}
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 process.exit(fail ? 1 : 0);
