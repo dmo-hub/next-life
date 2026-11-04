@@ -1,5 +1,5 @@
 {
- "version": "v0.6.52",
+ "version": "v0.6.53",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -742,6 +742,7 @@
   "next-life-pics-v1",
   "next-life-save-v1",
   "next-life-save-v2",
+  "next-life-skills-v1",
   "next-life-whisper-v1"
  ]
 }
