@@ -1,11 +1,13 @@
-// หน้าการออกแบบ: แปลง design/*.md (สำเนาคำตัดสินของเจ้าของเกม) เป็นหน้าเว็บ · ใช้ตัวแปลงเดียวกับภาคผนวก GDD
-// แยกหน้าตามเรื่อง — รวมทุกไฟล์หน้าเดียวยาวเกินอ่านบนมือถือ · สารบัญ = design.html
+// หน้าคำตัดสินเกม: แปลง design/*.md (สำเนาคำตัดสินของเจ้าของเกม) เป็นหน้าเว็บ · ใช้ตัวแปลงเดียวกับภาคผนวก GDD
+// แยกหน้าตามเรื่อง — รวมทุกไฟล์หน้าเดียวยาวเกินอ่านบนมือถือ · สารบัญ = design.html · ทุกหน้าอยู่ใต้ DESIGN_AT ในห้องผู้พัฒนา
+// ชื่อไฟล์ (designPage) ไม่มีโฟลเดอร์ ลิงก์ข้ามหน้าในชุดจึงเป็นชื่อเปล่า · URL เดิมใต้ docs/ เป็นหน้าส่งต่อ (build)
 import { readFileSync, readdirSync } from 'node:fs';
 import { esc } from './catalog.mjs';
 import { renderDoc, docId, SPEC_OPEN } from './spec.mjs';
-import { injectNav } from './nav.mjs';
+import { devNavHtml } from './nav.mjs';
 
 export const DESIGN_DIR = new URL('../../design/', import.meta.url);
+export const DESIGN_AT = 'dev/';
 export const LORE = 'lore';
 const LORE_TITLE = 'ข้อมูลอ้างอิง (lore)';
 // ในหน้าเรื่อง แผนที่ใบงานขึ้นก่อนคำตัดสิน · ไฟล์อื่นต่อท้ายเรียงชื่อ
@@ -68,13 +70,13 @@ export function designPages(dir = DESIGN_DIR) {
   const out = [];
   const top = byPage.get('design.html') ?? [];
   const index = [
-    `<nav class="spec-toc" id="design-toc" aria-label="สารบัญการออกแบบ">`,
+    `<nav class="spec-toc" id="design-toc" aria-label="สารบัญคำตัดสินเกม">`,
     `<div><h3>เรื่องที่ออกแบบ</h3><ol>${topics.map((p) => card(p, sorted(p).map((d) => esc(fileLabel(p, d))).join(' · '))).join('')}</ol></div>`,
     byPage.has(`design-${LORE}.html`) ? `<div><h3>ข้อมูลอ้างอิง</h3><ol>${card(`design-${LORE}.html`, `${byPage.get(`design-${LORE}.html`).length} ไฟล์`)}</ol></div>` : '',
     `<div><h3>ในหน้านี้</h3><ol>${top.map((d) => `<li><a href="#${d.id}">${esc(d.title)}</a></li>`).join('')}</ol></div>`,
     `</nav>`,
   ].join('');
-  out.push(['design.html', { title: 'การออกแบบ', lead: 'คำตัดสินของเจ้าของเกมแยกตามเรื่อง ตามสำเนาใน design/ ของ repo · อ่านอย่างเดียว', body: `${index}\n${top.map((d) => docBlock(d, true)).join('\n')}` }]);
+  out.push(['design.html', { title: 'คำตัดสินเกม', lead: 'คำตัดสินของเจ้าของเกมแยกตามเรื่อง ตามสำเนาใน design/ ของ repo · อ่านอย่างเดียว', body: `${index}\n${top.map((d) => docBlock(d, true)).join('\n')}` }]);
 
   for (const p of [...topics, `design-${LORE}.html`].filter((x) => byPage.has(x))) {
     const ds = sorted(p);
@@ -92,11 +94,11 @@ export function designPages(dir = DESIGN_DIR) {
   return out;
 }
 
-// file = ชื่อหน้า (design-lore.html) — แถบบนรู้ว่าหน้าไหนเป็นหน้าปัจจุบัน
+// file = ชื่อหน้า (design-lore.html) — แถบห้องผู้พัฒนารู้ว่าหน้าไหนเป็นหน้าปัจจุบัน
 export function designHtml(tpl, page, file) {
-  const html = tpl
+  return tpl
     .replace(/<!--__TITLE__-->/g, () => esc(page.title))
     .replace('<!--__LEAD__-->', () => esc(page.lead))
+    .replace('<!--__DEVNAV__-->', () => devNavHtml(DESIGN_AT + file))
     .replace('<!--__DESIGN__-->', () => page.body);
-  return injectNav(html, file);
 }

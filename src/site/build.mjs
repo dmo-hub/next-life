@@ -6,8 +6,8 @@ import { spoilersHtml } from './spoilers.mjs';
 import { injectSpec, SPEC_PAGE } from './spec.mjs';
 import { guideHtml } from './guide.mjs';
 import { demoHtml } from './demo.mjs';
-import { designPages, designHtml } from './design.mjs';
-import { injectNav } from './nav.mjs';
+import { designPages, designHtml, DESIGN_AT } from './design.mjs';
+import { injectNav, movedHtml } from './nav.mjs';
 import { soonCats, soonIds, injectRoadmap } from './roadmap.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
@@ -47,16 +47,17 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     writeFileSync(at(`docs/${name}.html`), injectNav(page, `${name}.html`));
     out.push(name);
   }
-  // หน้าการออกแบบหลายหน้าจากแม่แบบเดียว — จำนวนหน้าตามโฟลเดอร์ใน design/
+  // หน้าคำตัดสินเกมหลายหน้าจากแม่แบบเดียว — จำนวนหน้าตามโฟลเดอร์ใน design/ · ที่อยู่เดิมใต้ docs/ เขียนเป็นหน้าส่งต่อทุกรอบ (ลิงก์ภายนอกยังเปิดได้)
   const designTpl = injectFacts(readFileSync(at('src/site/design.html'), 'utf8'), facts, 'src/site/design.html');
   const designOut = designPages(new URL('design/', root));
   for (const [file, page] of designOut) {
-    writeFileSync(at(`docs/${file}`), designHtml(designTpl, page, file));
-    out.push(file.replace(/\.html$/, ''));
+    writeFileSync(at(`docs/${DESIGN_AT}${file}`), designHtml(designTpl, page, file));
+    writeFileSync(at(`docs/${file}`), movedHtml(file, DESIGN_AT + file, page.title));
+    out.push(DESIGN_AT + file.replace(/\.html$/, ''));
   }
-  // เรื่องที่ถูกรวม/ลบออกจาก design/ ทิ้งหน้าเก่าไว้ = ลิงก์ค้างที่ไม่ตรงต้นฉบับ
+  // เรื่องที่ถูกรวม/ลบออกจาก design/ ทิ้งหน้าเก่าไว้ = ลิงก์ค้างที่ไม่ตรงต้นฉบับ · ที่เดิมที่เป็นหน้าเนื้อ (ไม่ใช่หน้าส่งต่อ) ก็ลบ
   const made = new Set(designOut.map(([f]) => f));
-  for (const f of readdirSync(at('docs/')).filter((n) => /^design-.+\.html$/.test(n) && !made.has(n))) unlinkSync(at(`docs/${f}`));
+  for (const dir of ['docs/', `docs/${DESIGN_AT}`]) for (const f of readdirSync(at(dir)).filter((n) => /^design-.+\.html$/.test(n) && !made.has(n))) unlinkSync(at(`${dir}${f}`));
   for (const file of NAV_PAGES) {
     const html = readFileSync(at(`docs/${file}`), 'utf8');
     const next = injectNav(file === 'whatsnew.html' ? soonIds(html) : html, file);
