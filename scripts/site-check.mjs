@@ -582,7 +582,7 @@ check('หน้าเฉลยวาดทุกเงื่อนไขแล�
     const head = play.slice(0, play.search(/<\/head>/i));
     if (!/<meta name="description" content="[^"]+">/.test(head) || !head.includes(`<link rel="canonical" href="${SITE}play.html">`)) out.push('head ของ play ไม่มี description/canonical');
     const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-    if (sitemap !== sitemapXml()) out.push('sitemap ไม่ตรงของที่ build');
+    if (lf(sitemap) !== sitemapXml()) out.push('sitemap ไม่ตรงของที่ build');
     for (const u of locs) {
       const f = fileOf(u);
       const html = f && existsSync(new URL(f, docs)) ? (f === 'index.html' ? index : read(f)) : null;

@@ -85,6 +85,6 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     const next = injectGate(html, hash, file);
     if (next !== html) writeFileSync(at(`docs/${file}`), next);
   }
-  for (const [file, body] of [[SITEMAP, sitemapXml()], [FAVICON_SVG, faviconSvg(ART_INK)]]) if (!existsSync(at(`docs/${file}`)) || readFileSync(at(`docs/${file}`), 'utf8') !== body) writeFileSync(at(`docs/${file}`), body);
+  for (const [file, body] of [[SITEMAP, sitemapXml()], [FAVICON_SVG, faviconSvg(ART_INK)]]) if (!existsSync(at(`docs/${file}`)) || readFileSync(at(`docs/${file}`), 'utf8').replace(/\r\n/g, '\n') !== body) writeFileSync(at(`docs/${file}`), body);
   return { facts, pages: out };
 }
