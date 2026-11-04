@@ -2702,7 +2702,8 @@ function renderAfter(card) {
   root.replaceChildren();
   const box = el('article', 'card b af');
   const top = el('div', 'top');
-  top.append(el('b', null, 'ระหว่างชาติ'), el('small', null, `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
+  // หัวแถบเป็นชื่อเกมเหมือนหน้าเปิด (ui-redo 66 · เจ้าของ) · ฉากที่อยู่บอกด้วยป้ายบนการ์ดแทน
+  top.append(el('b', null, GAME_NAME), el('small', null, `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
   const next = () => play(T.afterNext);
