@@ -4,7 +4,7 @@
 // · หน้าเฉลย (B88) ครบทุกการ์ด/ตัวเลือก/ผลสุ่ม และเฉลยจริง — กฎ "ไม่หลุดบุญบาป" ของหน้ารวมการ์ดไม่ใช้กับหน้านี้
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
-import { siteFacts, injectFacts, readVersion, versionLines } from '../src/site/facts.mjs';
+import { siteFacts, injectFacts, readVersion, versionLines, releaseLog, notesLines, NOTE_CUT } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
 import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
 import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_ROLES, roleInfo, ISEKAI_SKILLS, ISEKAI_CAREERS, CONT_REGIONS, CONT_RACES, CONT_END, contBirth, makeRng } from '../src/engine/index.mjs';
@@ -275,6 +275,20 @@ const held = verHeld(srcTexts);
 const playVer = (html, v) => html.includes(versionLines(v));
 const verCtl = verHeld([['ui/app.mjs', `${appSrc}\nconst APP_VERSION = '${ver.version}';`]]).length > 0 && !playVer(play, { ...ver, version: 'v0.0.00' });
 check('เลขเวอร์ชันอยู่ที่ src/version.json ที่เดียว และเกมใช้เลขนั้น', held.length || !playVer(play, ver) || !verCtl, ` ${ver.version} · ${ver.build} · ซอร์ส ${srcTexts.length} ไฟล์${held.length ? ` · ถือเลขเอง: ${held.join(' ')}` : ''}${playVer(play, ver) ? '' : ' · play.html ไม่ได้ build จากเลขนี้'} · ตัวควบคุม${verCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 9c) แจ้งอัปเดตในเกม (ui-redo 22): เกมที่ build แล้วฝังรุ่นที่มีโน้ตชุดเดียวกับแพตช์โน้ต · ข้อความไม่มีแท็ก/entity หลุด และไม่ยาวเกินเพดานตัด
+// รุ่นปัจจุบันไม่มีโน้ต (bump ของเลน) = เตือน ไม่ตก — แผ่นใช้รุ่นล่าสุดที่มีโน้ต
+// ตัวควบคุม: ล้างข้อของรุ่นบนสุดใน whatsnew ⇒ รุ่นนั้นต้องหลุดจากชุด และชุดที่ได้ต้องไม่ตรงที่ฝัง
+const wnNow = read('whatsnew.html');
+const notesLog = releaseLog(wnNow);
+const notesIn = (html, log) => html.includes(notesLines(log));
+const notesDirty = notesLog.flatMap((r) => r.items).filter((t) => /[<>]|&[#\w]+;/.test(t) || t.length > NOTE_CUT);
+const topV = notesLog[0]?.v;
+const wnEmptied = topV ? wnNow.replace(new RegExp(`(<h3>${topV.replace(/\./g, '\\.')} <small>[^<]*</small></h3>\\s*<ul>)[\\s\\S]*?(</ul>)`), '$1$2') : wnNow;
+const cutLog = releaseLog(wnEmptied);
+const notesCtl = !!topV && cutLog[0]?.v !== topV && !notesIn(play, cutLog);
+if (topV !== ver.version) console.log(`  ⚠ ${ver.version} ไม่มีข้อในแพตช์โน้ต — แผ่นแจ้งอัปเดตใช้ ${topV ?? '(ไม่มีรุ่นไหนมีโน้ต)'} (เตือน ไม่ตก)`);
+check('แจ้งอัปเดตในเกม: เกมฝังรุ่นที่มีโน้ตชุดเดียวกับแพตช์โน้ต ข้อความล้วนไม่เกินเพดาน', !notesLog.length || !notesIn(play, notesLog) || notesDirty.length || !notesCtl, ` ${notesLog.length} รุ่น · ล่าสุด ${topV} ${notesLog[0]?.items.length ?? 0} ข้อ${notesIn(play, notesLog) ? '' : ' · play.html ไม่ได้ build จากแพตช์โน้ตนี้'}${notesDirty.length ? ` · ข้อความไม่สะอาด ${notesDirty.length}: ${notesDirty[0].slice(0, 60)}` : ''} · ตัวควบคุม${notesCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 9b) เกมเปิดออฟไลน์ได้: ฟอนต์ฝังครบทุกแบบที่หน้าใช้ ไม่ดึงจากเว็บอื่น · ตัวควบคุม: หน้าที่ยังมี <link> Google Fonts ต้องถูกจับ
 const PLAY_FACES = ['Noto Sans Thai 400', 'Noto Sans Thai 600', 'Sarabun 400', 'Sarabun 600', 'Srisakdi 700'];

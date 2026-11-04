@@ -11,6 +11,31 @@ export const VERSION_FILE = new URL('../version.json', import.meta.url);
 export const readVersion = () => JSON.parse(readFileSync(VERSION_FILE, 'utf8'));
 export const versionLines = ({ version, build }) => `const APP_VERSION = ${JSON.stringify(version)};\nconst APP_BUILD = ${JSON.stringify(build)};\n`;
 
+// แจ้งอัปเดตในเกม (ui-redo 22): รุ่นที่มีโน้ตในแพตช์โน้ตของ whatsnew (ที่ npm run rel เขียน) ใหม่สุดก่อน — ข้อความชุดเดียวกับหน้าเว็บ ไม่มีที่สองให้ลืมแก้
+// bump ของเลนไม่เขียนโน้ต ⇒ รุ่นที่ไม่มีข้อถูกข้าม เกมจำ "รุ่นล่าสุดที่มีโน้ต" แทนเลขรุ่นจริง · เก็บ NOTE_KEEP รุ่น พอรวมรุ่นที่ยังไม่เห็นได้โดยไม่ฝังประวัติทั้งหมด
+// ข้อความถอดแท็กเหลือข้อความล้วน (ป้ายกติกาเป็นคำนำหน้า) แล้วตัดที่ NOTE_CUT ตัวอักษรตรงช่องว่าง ≈ 2 บรรทัดบนแผ่นที่จอ 390 (วัดใน site:check ไม่ได้ — วัดด้วยเบราว์เซอร์)
+const ENT = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ' };
+export const NOTE_KEEP = 20;
+export const NOTE_CUT = 90;
+const plain = (li) => li.replace(/<span class="tag rule">([^<]*)<\/span>/g, '$1: ').replace(/<[^>]+>/g, '').replace(/&[#\w]+;/g, (e) => ENT[e] ?? e).replace(/\s+/g, ' ').trim();
+export function noteCut(t) {
+  if (t.length <= NOTE_CUT) return t;
+  const head = t.slice(0, NOTE_CUT - 1);
+  const sp = head.lastIndexOf(' ');
+  return `${(sp > NOTE_CUT * 0.6 ? head.slice(0, sp) : head).replace(/[\s·:]+$/, '')}…`;
+}
+export function releaseLog(html, keep = NOTE_KEEP) {
+  const part = html.slice(Math.max(0, html.indexOf('<h2>แพตช์โน้ต</h2>')));
+  const out = [];
+  for (const m of part.matchAll(/<h3>(v[\d.]+) <small>[^<]*<\/small><\/h3>\s*<ul>([\s\S]*?)<\/ul>/g)) {
+    const items = [...m[2].matchAll(/<li>([\s\S]*?)<\/li>/g)].map(([, li]) => noteCut(plain(li))).filter(Boolean);
+    if (items.length) out.push({ v: m[1], items });
+    if (out.length >= keep) break;
+  }
+  return out;
+}
+export const notesLines = (log) => `const RELEASE_NOTES = ${JSON.stringify(log)};\n`;
+
 export function siteFacts(content, ver = readVersion()) {
   const era = content.era;
   // ใบศาลเฉียดตาย (B153) ใช้ stage ระหว่างชาติแต่ออกกลางชีวิต — นับเป็นการ์ดช่วงมีชีวิต ไม่ใช่ฉากปรโลก

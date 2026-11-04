@@ -182,6 +182,7 @@ function lifeMenu(card, box) {
   return nav;
 }
 // การ์ดใต้แผงเป็น inert: แตะหรือปุ่มลัดตัวเลขไม่ไปเลือกตัวเลือกที่ถูกบังอยู่ · Esc หรือกดปุ่มเมนูเดิมซ้ำ = ปิด
+// from ว่าง = แผงที่เกมเปิดเอง (แจ้งอัปเดต) — ปิดแล้วโฟกัสกลับปุ่มแรกของจอใต้แผง
 let sheetClose = null;
 function openSheet(title, content, box, from) {
   const sheet = el('section', 'sheet');
@@ -196,13 +197,13 @@ function openSheet(title, content, box, from) {
   sheetClose = () => {
     sheet.remove();
     box.inert = false;
-    from.setAttribute('aria-expanded', 'false');
+    from?.setAttribute('aria-expanded', 'false');
     sheetClose = null;
-    from.focus();
+    (from ?? box.querySelector('button, a'))?.focus();
   };
   shut.onclick = closeSheet;
   box.inert = true;
-  from.setAttribute('aria-expanded', 'true');
+  from?.setAttribute('aria-expanded', 'true');
   root.append(sheet);
   shut.focus();
 }
@@ -2288,7 +2289,19 @@ function morePanel() {
     dayNew();
   };
   const link = (text, href) => Object.assign(el('a', null, text), { href });
-  for (const x of [day, link('คู่มือ', 'guide.html'), link('กลไกในเกม', 'about.html'), link('หน้าแรก', 'index.html')]) {
+  // อัปเดตล่าสุด: เปลี่ยนเนื้อแผงเดิมเป็นรายการรุ่นนี้ ปุ่มกลับไปการ์ดยังใช้ปิดได้เหมือนเดิม
+  const news = el('button', null, NOTES_TITLE);
+  news.type = 'button';
+  news.onclick = () => {
+    const sheet = wrap.closest('.sheet');
+    sheet?.setAttribute('aria-label', NOTES_TITLE);
+    const h = sheet?.querySelector('.sheet-h h2');
+    if (h) h.textContent = NOTES_TITLE;
+    wrap.replaceWith(notesPanel());
+    notesMark();
+    sheet?.querySelector('.sheet-x')?.focus();
+  };
+  for (const x of [day, news, link('คู่มือ', 'guide.html'), link('กลไกในเกม', 'about.html'), link('หน้าแรก', 'index.html')]) {
     const li = el('li');
     li.append(x);
     ul.append(li);
@@ -2296,6 +2309,61 @@ function morePanel() {
   const wrap = el('div', 'mr-w');
   wrap.append(ul, el('p', null, 'เกม ไม่ใช่คำแนะนำการลงทุน'));
   return wrap;
+}
+
+// แจ้งอัปเดตในเกม (ui-redo 22 · เจ้าของเคาะ): มีรุ่นที่มีโน้ตซึ่งเบราว์เซอร์นี้ยังไม่เห็น (รวมคนเปิดครั้งแรก) → แผ่นทับจอแรกก่อนกดอะไร วันละไม่เกินครั้ง
+// RELEASE_NOTES = รุ่นที่มีโน้ตใหม่สุดก่อน (build ดึงจากแพตช์โน้ต) · แผ่นรวมข้อของทุกรุ่นที่ยังไม่เห็น ไม่เกิน NOTES_MAX ข้อ · เปิดครั้งแรกเห็นแค่รุ่นล่าสุด
+// key เก็บ { v: รุ่นล่าสุดที่มีโน้ตตอนปิดแผ่น, day: วันที่แผ่นขึ้นเองครั้งล่าสุด } · localStorage ใช้ไม่ได้ = ขึ้นทุกครั้งที่เปิดแต่ปิดได้ เกมเล่นต่อตามเดิม
+// จอแรกของเซฟกลางชีวิตคือหน้า "เล่นต่อ" ไม่ใช่การ์ดที่ค้าง ⇒ แผ่นไม่แทรกกลางการ์ด · หน้า "เกมอัปเดตแล้ว" ของเซฟเก่ามีเรื่องให้อ่านอยู่แล้ว ไม่ซ้อน
+const NOTES_KEY = 'next-life-notes-seen-v1';
+const NOTES_TITLE = 'อัปเดตล่าสุด';
+const NOTES_MAX = 5;
+let notesSkip = false;
+const notesDay = () => new Date().toLocaleDateString('en-CA');
+function notesRead() {
+  try {
+    const s = JSON.parse(localStorage.getItem(NOTES_KEY) ?? 'null');
+    return s && typeof s === 'object' ? s : {};
+  } catch {
+    return {};
+  }
+}
+function notesWrite(patch) {
+  try {
+    localStorage.setItem(NOTES_KEY, JSON.stringify({ ...notesRead(), ...patch }));
+  } catch {}
+}
+const notesMark = () => notesWrite({ v: RELEASE_NOTES[0]?.v });
+// รุ่นที่ยังไม่เห็น: ใหม่กว่ารุ่นที่จำไว้ · ไม่เคยจำ = รุ่นล่าสุดรุ่นเดียว · รุ่นที่จำหลุดจากชุดที่ฝัง = ทั้งชุด (ถูกตัดที่ NOTES_MAX อยู่แล้ว)
+function notesUnseen() {
+  const { v } = notesRead();
+  if (!v) return RELEASE_NOTES.slice(0, 1);
+  const i = RELEASE_NOTES.findIndex((r) => r.v === v);
+  return i < 0 ? RELEASE_NOTES : RELEASE_NOTES.slice(0, i);
+}
+function notesPanel(log = RELEASE_NOTES.slice(0, 1)) {
+  const wrap = el('div', 'nt');
+  const vs = log.map((r) => r.v);
+  wrap.append(el('p', 'nt-v', vs.length > 1 ? `เวอร์ชัน ${vs.at(-1)} ถึง ${vs[0]}` : `เวอร์ชัน ${vs[0] ?? APP_VERSION}`));
+  const items = log.flatMap((r) => r.items);
+  const ul = el('ul', 'nt-l');
+  for (const t of items.slice(0, NOTES_MAX)) ul.append(el('li', null, t));
+  const all = Object.assign(el('a', null, items.length > NOTES_MAX ? `ดูทั้งหมด ${items.length} ข้อในแพตช์โน้ต` : 'อ่านแพตช์โน้ตทุกเวอร์ชัน'), { href: vs[0] ? `whatsnew.html#:~:text=${vs[0]}` : 'whatsnew.html' });
+  wrap.append(ul, all);
+  return wrap;
+}
+function notesBoot() {
+  if (notesSkip || notesRead().day === notesDay()) return;
+  const log = notesUnseen();
+  const box = root.firstElementChild;
+  if (!log.length || !box) return;
+  notesWrite({ day: notesDay() });
+  openSheet(NOTES_TITLE, notesPanel(log), box, null);
+  const shut = sheetClose;
+  sheetClose = () => {
+    notesMark();
+    shut();
+  };
 }
 function kinList(members) {
   const rank = (m) => FAMILY_ORDER.indexOf(m.role) * 2 + (m.alive ? 0 : 1);
@@ -3002,6 +3070,7 @@ function home(card) {
 // เซฟจากเวอร์ชันที่เนื้อหาต่างกัน (B122): เซฟคือ seed + ลำดับปุ่ม เล่นซ้ำบนเนื้อหาใหม่ไม่ได้ชีวิตเดิม จึงเริ่มชีวิตใหม่
 // สมุดทุกเล่มในชั้นสมุดและบันทึกชีวิตแยก key ไว้ ไม่โดนล้าง
 function staleSave(seed) {
+  notesSkip = true;
   const choices = homeCard('เกมอัปเดตแล้ว', ['ชีวิตที่ค้างไว้เล่นต่อไม่ได้', 'เนื้อเรื่องเปลี่ยนตั้งแต่เล่นครั้งก่อน เริ่มชีวิตใหม่ในเวอร์ชันนี้ได้เลย · สมุดในชั้นสมุดยังอยู่ครบ']);
   choices.append(enter(button(seed === null ? 'เริ่มชีวิตใหม่' : 'เกิดตามลิงก์เพื่อน', null, () => (seed === null ? start() : startLink(seed)))), button(BTN.shelf, null, () => openShelf()));
 }
@@ -3046,3 +3115,4 @@ function boot() {
 }
 
 boot();
+notesBoot();
