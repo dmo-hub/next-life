@@ -9,6 +9,7 @@ import { demoHtml } from './demo.mjs';
 import { designPages, designHtml, DESIGN_AT } from './design.mjs';
 import { injectNav, movedHtml } from './nav.mjs';
 import { soonCats, soonIds, injectRoadmap } from './roadmap.mjs';
+import { GAME_CSS_PAGES, gameCss, injectGameCss } from './game-css.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
@@ -58,6 +59,13 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   // เรื่องที่ถูกรวม/ลบออกจาก design/ ทิ้งหน้าเก่าไว้ = ลิงก์ค้างที่ไม่ตรงต้นฉบับ · ที่เดิมที่เป็นหน้าเนื้อ (ไม่ใช่หน้าส่งต่อ) ก็ลบ
   const made = new Set(designOut.map(([f]) => f));
   for (const dir of ['docs/', `docs/${DESIGN_AT}`]) for (const f of readdirSync(at(dir)).filter((n) => /^design-.+\.html$/.test(n) && !made.has(n))) unlinkSync(at(`${dir}${f}`));
+  const css = gameCss(readFileSync(at('src/ui/template.html'), 'utf8'));
+  for (const file of GAME_CSS_PAGES) {
+    const html = readFileSync(at(`docs/${file}`), 'utf8');
+    const next = injectGameCss(html, css, `docs/${file}`);
+    if (next !== html) writeFileSync(at(`docs/${file}`), next);
+    out.push(file.replace(/\.html$/, ''));
+  }
   for (const file of NAV_PAGES) {
     const html = readFileSync(at(`docs/${file}`), 'utf8');
     const next = injectNav(file === 'whatsnew.html' ? soonIds(html) : html, file);
