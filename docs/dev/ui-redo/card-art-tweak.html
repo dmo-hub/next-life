@@ -477,22 +477,33 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .deed b { color:var(--gold2); font-size:12px; }
 .deed.bad b { color:#E39A8A; }
 /* มรณบัตร — หนังสืองานศพ (B83b D3 ทาง B): ขาวดำ กรอบหนา รูปกลางใบ · กราฟกับสรุปข้างในคงสีทาง A */
-.a.mem { background:#FFFFFF; border:12px solid #1F1F1F; outline:1px solid #8A8A8A; outline-offset:-6px; color:#1F1F1F; }
+.a.mem { position:relative; isolation:isolate; background:#FFFFFF; border:12px solid #1F1F1F; outline:1px solid #8A8A8A; outline-offset:-6px; color:#1F1F1F; }
+/* ภาพฉากเป็นพื้นหลังจาง (ui-redo 57 · ค่าแรกเกิดใบ 61: ชิดบนกลาง กว้างเต็ม จาง 0.1) — z-index ติดลบใต้เนื้อ แต่ isolation ของการ์ดกันไม่ให้ลงไปใต้พื้นขาว
+   ทุกเส้นเป็นหมึกดำ (เจ้าของตั้งสีทองเป็น #000000) */
+.d-bg { position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none; color:#000000; }
+.d-bg svg { position:absolute; left:50%; top:0; width:100%; height:auto; transform:translateX(-50%); opacity:0.1; }
+.d-bg [fill]:not([fill="none"]) { fill:currentColor; }
+.d-bg [stroke] { stroke:currentColor; }
 .mem .top { background:transparent; color:#1F1F1F; justify-content:center; padding-top:18px; }
 .mem .top b { font-family:Srisakdi,serif; font-size:22px; font-weight:700; }
 .por { align-self:center; width:96px; height:96px; border:1px solid #1F1F1F; padding:4px; }
-.mem .body > h3, .mem .body > .dates { text-align:center; }
+.d-head { display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; }
+.d-head .por { width:80px; height:80px; }
 .mem .body h3 { font-family:Srisakdi,serif; font-size:30px; font-weight:700; color:#1F1F1F; }
 .mem .body .dates { margin-top:-6px; }
 .mem .choice { border-color:#1F1F1F; }
-/* ใบมรณะย่อ (ui-redo ใบ 10): ปุ่มไปต่อเป็นปุ่มหลักสีเน้นปุ่มเดียวต่อจากสรุป · ปุ่มแชร์เป็นปุ่มรองเส้นประท้ายการ์ด
-   ฉายาเด่นเป็นริบบิ้นปลายบาก (ค่าเคาะใบ 02) — ตัดด้วย clip-path ข้อความยาวจึงตัดบรรทัดในริบบิ้นได้ */
+.d-tl { margin:0; text-align:center; font-size:14px; overflow-wrap:anywhere; }
+.d-tl .k { margin-right:4px; font-weight:600; color:var(--muted); }
+.d-tl .more-n { color:var(--muted); }
+.d-facts { max-width:440px; width:100%; margin:0 auto; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:4px 12px; font-size:14px; }
+.d-facts dt { color:var(--muted); font-weight:600; white-space:nowrap; }
+.d-facts dd { margin:0; overflow-wrap:anywhere; }
+.d-facts .neg { color:var(--dg); font-weight:600; }
+/* ใบมรณะย่อ (ui-redo ใบ 10): ปุ่มไปต่อเป็นปุ่มหลักปุ่มเดียวต่อจากข้อมูล · ปุ่มแชร์เป็นปุ่มรองเส้นประท้ายการ์ด
+   สีเน้นเป็นดำ (ui-redo 57 · เจ้าของตั้ง accent #000000) — กด/โฟกัสยกเป็นเทาเข้มให้ยังเห็นว่ามีการตอบสนอง */
 .mem .choices { margin-top:0; }
-.mem .choices > .choice { background:var(--red); border-color:var(--red); color:#FFFFFF; justify-content:center; font-weight:600; }
-.mem .choices > .choice:hover, .mem .choices > .choice:focus-visible { background:#8F2A1B; border-color:#8F2A1B; color:#FFFFFF; outline:2px solid #1F1F1F; outline-offset:2px; }
-.d-rb { margin:2px 0 0; padding:0; list-style:none; display:flex; flex-wrap:wrap; justify-content:center; gap:6px 8px; }
-.d-rb li { padding:3px 16px; background:var(--red); color:#FFFFFF; font-size:14px; font-weight:600; line-height:1.5; overflow-wrap:anywhere; clip-path:polygon(0 0, 100% 0, calc(100% - 8px) 50%, 100% 100%, 0 100%, 8px 50%); }
-.d-rb .more-n { padding:3px 0; background:none; color:inherit; font-weight:400; clip-path:none; }
+.mem .choices > .choice { background:#000000; border-color:#000000; color:#FFFFFF; justify-content:center; font-weight:600; }
+.mem .choices > .choice:hover, .mem .choices > .choice:focus-visible { background:#3A3A3A; border-color:#3A3A3A; color:#FFFFFF; outline:2px solid #000000; outline-offset:2px; }
 .d-rest { padding-top:12px; }
 /* แท็บรายละเอียด (ui-redo ใบ 11): ปุ่มแคปซูลตัดบรรทัดได้ จอแคบไม่ล้นแนวนอน · หัวในแผงคืนเป็นหัวเล็ก ไม่รับตัวเขียนชื่อผู้ตาย */
 .d-tab-bar { display:flex; flex-wrap:wrap; gap:6px; }
