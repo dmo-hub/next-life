@@ -23,6 +23,7 @@
     "causes": "node harness/causes.mjs --n 20000 --seed 1",
     "near": "node harness/near-death.mjs --n 20000 --seed 1",
     "pact": "node harness/pact.mjs --n 2000 --seed 1",
+    "skills": "node harness/skills.mjs --n 200 --seed 1",
     "grey": "node harness/grey.mjs --n 500 --seed 1",
     "density": "node harness/density.mjs --n 2000 --seed 1",
     "repeat": "node harness/repeat.mjs --n 2000 --seed 1",
@@ -41,7 +42,9 @@
     "harness:test": "node scripts/harness-test.mjs",
     "fetch:data": "node scripts/fetch-data.mjs",
     "site:check": "node scripts/site-check.mjs",
-    "shots": "node scripts/shots.mjs"
+    "site:password": "node scripts/set-password.mjs",
+    "shots": "node scripts/shots.mjs",
+    "og": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "yaml": "2.8.1"

@@ -1,9 +1,12 @@
-// ภาคผนวกสเปกและรีเสิร์ชของ GDD (B115 เดิมเป็นหน้า spec.html): แปลง docs/spec/*.md ตอน build ฉีดลง docs/gdd.html — ไม่พาผู้อ่านออกไป GitHub
+// ภาคผนวกสเปกและรีเสิร์ช (B115 · เดิมอยู่ท้ายหน้า GDD): แปลง docs/spec/*.md ตอน build ฉีดลง docs/dev/spec.html — ไม่พาผู้อ่านออกไป GitHub
 // ไม่มี dependency markdown: รองรับเฉพาะไวยากรณ์ที่ไฟล์ใน docs/spec ใช้จริง (หัวข้อ · รายการซ้อน · ตาราง · โค้ดบล็อก · ตัวหนา · โค้ด · ลิงก์)
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { esc } from './catalog.mjs';
 
 export const SPEC_DIR = new URL('../../docs/spec/', import.meta.url);
+// หน้าที่รับภาคผนวก (path จากราก repo) — อยู่ใต้ docs/dev/ ลิงก์ไปไฟล์ใน docs/spec จึงขึ้นไปหนึ่งชั้น
+export const SPEC_PAGE = 'docs/dev/spec.html';
+const SPEC_UP = '../spec/';
 // ลำดับบนหน้า: แผนที่โปรเจกต์ → แผ่นรีเสิร์ช → ใบงาน 01–14 · ไฟล์ .md ใหม่ใน docs/spec ขึ้นหน้าเองท้ายกลุ่มของมัน
 const GROUPS = [
   ['ภาพรวม', (f) => f === 'MAP.md'],
@@ -32,7 +35,7 @@ export function trimUrl(u) {
 export const bareUrls = (md) => [...md.replace(/<!--[\s\S]*?-->/g, '').matchAll(URL_RE)].map((m) => trimUrl(m[0]));
 
 // ปลายทางลิงก์ของภาคผนวก GDD: เอกสารทุกไฟล์อยู่หน้าเดียวกัน · ไฟล์อื่นใน docs/spec เปิดตรงได้เพราะอยู่ใต้ docs/
-const SPEC_LINK = { doc: (p) => `#${docId(p)}`, asset: (p) => (existsSync(new URL(p, SPEC_DIR)) ? `spec/${p}` : null) };
+const SPEC_LINK = { doc: (p) => `#${docId(p)}`, asset: (p) => (existsSync(new URL(p, SPEC_DIR)) ? `${SPEC_UP}${p}` : null) };
 
 function makeInline(file, known, link) {
   const base = new URL(file, 'spec:/');
@@ -179,7 +182,7 @@ export function specHtml(content, dir = SPEC_DIR) {
       const sub = d.file.startsWith('tickets/') ? '' : d.heads.filter((x) => x.level === 2).map((x) => `<a href="#${x.id}">${esc(x.text)}</a>`).join('');
       return `<li><a href="#${d.id}">${esc(d.title)}</a>${sub ? `<div class="sub">${sub}</div>` : ''}</li>`;
     });
-    const exLi = ex.map((x) => `<li><a href="spec/${esc(x.f)}">${esc(x.title)}</a> <small>ตารางเต็ม หน้าแยก</small></li>`);
+    const exLi = ex.map((x) => `<li><a href="${SPEC_UP}${esc(x.f)}">${esc(x.title)}</a> <small>ตารางเต็ม หน้าแยก</small></li>`);
     return `<div><h3>${esc(name)}</h3><ol>${[...li, ...exLi].join('')}</ol></div>`;
   }).join('');
   // เอกสารรวมกันยาวหลายเท่าของตัว GDD — พับรายเอกสาร ลิงก์จากสารบัญเปิดให้เอง (SPEC_OPEN)
@@ -198,6 +201,6 @@ export const SPEC_END = '<!--SPEC:END-->';
 export function injectSpec(html, dir = SPEC_DIR) {
   const a = html.indexOf(SPEC_START);
   const b = html.indexOf(SPEC_END);
-  if (a < 0 || b < a) throw new Error(`docs/gdd.html: ไม่พบ ${SPEC_START} … ${SPEC_END}`);
+  if (a < 0 || b < a) throw new Error(`${SPEC_PAGE}: ไม่พบ ${SPEC_START} … ${SPEC_END}`);
   return `${html.slice(0, a + SPEC_START.length)}\n${specHtml(null, dir)}\n${html.slice(b)}`;
 }

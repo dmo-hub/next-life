@@ -9,6 +9,49 @@ export const FOLLOW_WORD = { later: 'มีผลภายหลัง' };
 // หัวใจข้างอายุบนแถบสถานะตอนชีวิตใกล้หมด — ตัวห่อมี aria-label "ใกล้ตาย" ไอคอนจึงซ่อนจากโปรแกรมอ่านจอ
 export const HEART_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14S1.5 9.8 1.5 5.6A3.4 3.4 0 0 1 8 4a3.4 3.4 0 0 1 6.5 1.6C14.5 9.8 8 14 8 14z"/></svg>';
 
+// ป้ายผลบนปุ่มตัวเลือก (ui-redo 54 ตาม JSON ที่เจ้าของเลือก): ไอคอนเส้นต่อค่า + ลูกศร + ชิปสีตามทิศ · คู่มือวาดด้วยฟังก์ชันเดียวกัน
+// ป้ายอ่านจากข้อความที่แกนส่งมา ไม่ใช่จากผลดิบ — ค่าที่แกนซ่อนเป็น ? อยู่แล้วจึงไม่มีทางได้ไอคอนเฉพาะตัว · ค่าที่ไม่มีไอคอน (บารมี เงินเทา ชาติหน้า …) คงเป็นคำ
+const FX_ICON_PATH = {
+  heart: 'M8 13.5S2 10 2 5.8A3 3 0 0 1 8 4.5a3 3 0 0 1 6 1.3C14 10 8 13.5 8 13.5z',
+  smile: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM5.5 9.5q2.5 2.5 5 0M6 6.5h0M10 6.5h0',
+  book: 'M2 3.5h4.5Q8 3.5 8 5v8.5q0-1.5-1.5-1.5H2zM14 3.5H9.5Q8 3.5 8 5v8.5q0-1.5 1.5-1.5H14z',
+  people: 'M5.5 7.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM1.5 13.5q0-4 4-4t4 4M11 7a1.8 1.8 0 1 0 0-3.6M11.5 9.5q3 .5 3 4',
+  coin: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM8 4.5v7M10 6.2Q9.5 5.5 8 5.5T6 6.7Q6 8 8 8t2 1.3T8 10.5 6 9.8',
+  case: 'M2 5.5h12v8H2zM5.5 5.5V3.5h5v2M2 9h12',
+  link: 'M6.5 9.5l3-3M7 4.5l1.2-1.2a2.6 2.6 0 0 1 3.7 3.7L10.7 8.2M9 11.5l-1.2 1.2a2.6 2.6 0 0 1-3.7-3.7L5.3 7.8',
+  bolt: 'M9 1.5L3.5 9H8l-1 5.5L12.5 7H8z',
+  spark: 'M8 1.5v4M8 10.5v4M1.5 8h4M10.5 8h4M3.5 3.5l2 2M10.5 10.5l2 2M12.5 3.5l-2 2M5.5 10.5l-2 2',
+  clover: 'M8 8C5 8 3 6 4.5 4.2S8 4 8 8zm0 0c0-3 2-5 3.8-3.5S12 8 8 8zm0 0c3 0 5 2 3.5 3.8S8 12 8 8zm0 0c0 3-2 5-3.8 3.5S4 8 8 8zm0 0l2.5 6',
+  star: 'M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z',
+  ask: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM6.2 6.2Q6.4 4.6 8 4.6t1.8 1.5Q9.8 7.2 8 7.8v1.4M8 11.2h0',
+};
+const FX_ICON_OF = { ชีวิต: 'heart', ความสุข: 'smile', ความรู้: 'book', ความสัมพันธ์: 'people', เงิน: 'coin', รายได้: 'case', เส้นสาย: 'link', พลัง: 'bolt', เวท: 'spark', โชค: 'clover', ทอง: 'coin', ชื่อเสียง: 'star' };
+const fxIcon = (name) => `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="${FX_ICON_PATH[name]}"/></svg>`;
+const fxEscHtml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const FX_ARROW_SAID = { '↑': 'เพิ่ม', '↓': 'ลด' };
+// ชิ้นที่ตาเห็นต่างจากคำที่ควรอ่าน: ซ่อนชิ้นที่เห็นจากโปรแกรมอ่านจอ แล้วอ่านคำเต็มแทน
+const fxSr = (cls, vis, said) => `<span class="${cls}"><span aria-hidden="true">${vis}</span><span class="sr">${fxEscHtml(said)}</span></span>`;
+function fxPiece(text) {
+  const stat = text.match(/^(.+?)[\s ]([↑↓])(?:[\s ](ระยะยาว))?$/);
+  if (stat) {
+    const [, name, arrow, long] = stat;
+    const face = FX_ICON_OF[name] ? fxIcon(FX_ICON_OF[name]) : fxEscHtml(name);
+    return fxSr(`fxp ${arrow === '↑' ? 'up' : 'dn'}`, `${face}<b>${arrow}</b>${long ? `<small>${long}</small>` : ''}`, `${name}${FX_ARROW_SAID[arrow]}${long ? ` ${long}` : ''}`);
+  }
+  // ป้าย ? ไอคอนกลางตัวเดียวทุกค่า — ไอคอนต่อค่าจะบอกว่าค่าไหนถูกซ่อน
+  if (text === '?') return fxSr('fxp', fxIcon('ask'), 'ไม่รู้ผล');
+  const pct = text.match(/^สำเร็จ ~(\d+)%$/);
+  if (pct) return fxSr('fxp', fxEscHtml(text), `สำเร็จราว ${pct[1]}%`);
+  if (text === 'สำเร็จ ?') return fxSr('fxp', fxEscHtml(text), 'สำเร็จ ไม่รู้โอกาส');
+  if (/^\d+%$/.test(text)) return fxSr('fxp', fxEscHtml(text), `โอกาส ${text}`);
+  // ลูกศรที่หลงอยู่กลางคำอื่นยังอ่านเป็นคำ — โปรแกรมอ่านจออ่าน ↑ ว่า "upwards arrow"
+  return `<span>${text.split(/([↑↓])/).map((b) => (FX_ARROW_SAID[b] ? `<span aria-hidden="true">${b}</span><span class="sr">${FX_ARROW_SAID[b]}</span>` : fxEscHtml(b))).join('')}</span>`;
+}
+// ป้ายแต่ละค่าเป็นก้อนเดียว ตัดบรรทัดได้แค่ระหว่างก้อน — ไม่งั้นคำไทยหักกลางคำ
+export const fxHtml = (fx) => fx.split(' · ').map(fxPiece).join(' · ');
+// ตารางไอคอนในคู่มือ: เฉพาะค่าที่มีไอคอนจริง ตามลำดับที่ส่งมา
+export const fxIconRow = (names) => names.filter((n) => FX_ICON_OF[n]).map((n) => `<span class="fxk">${fxIcon(FX_ICON_OF[n])}${fxEscHtml(n)}</span>`).join(' ');
+
 // ป้ายปุ่มเดินเรื่องที่คู่มืออธิบาย — ปุ่มที่ผูกกับสถานการณ์เฉพาะ (ลบสมุด · ยกเลิก) ยังเขียนตรงในหน้าจอ
 export const BTN = {
   next: 'ต่อไป',
@@ -30,6 +73,10 @@ export const HELP = [
   { id: 'scam', label: 'โดนหลอกออนไลน์', call: 'โทร 1441', tel: '1441', org: 'กองบัญชาการตำรวจสืบสวนสอบสวนอาชญากรรมทางเทคโนโลยี · 24 ชม.', web: 'https://www.ccib.go.th/' },
   { id: 'bankrupt', label: 'เรื่องล้มละลาย/บังคับคดี', call: '1111 กด 79', tel: '1111,79', org: 'กรมบังคับคดี', web: 'https://www.led.go.th/th' },
 ];
+// คำเตือนเนื้อหา (ui-redo 25): หน้าแรกเว็บ (data-fact warnWords) กับการ์ดแรกเกิด/หน้าเล่นต่อในเกมอ่านชุดนี้ชุดเดียว
+// เติมคำเฉพาะเรื่องที่มีการ์ดจริงในเกมแล้ว (การนอกใจรอการ์ดนอกใจเข้าเกม)
+export const WARN_WORDS = ['ความตาย', 'หนี้', 'การสูญเสีย', 'ความรุนแรง'];
+export const warnWords = (w = WARN_WORDS) => `${w.slice(0, -1).join(' ')} และ${w.at(-1)}`;
 export const HELP_NOTE = 'เกมนี้ไม่รับเงินจากลิงก์เหล่านี้ และไม่รับบริจาค · ข้อมูลตรวจเมื่อ ตุลาคม 2569';
 
 // ค่าบนจอ 4 ตัวทุกโลก (B162) — "ชีวิต" ช่องแรกเสมอเพราะเป็นค่าที่หมดแล้วตาย · ค่าที่ไม่อยู่ในรายการยังอยู่ในแกนเกมและมีผลเท่าเดิม แค่ไม่ขึ้นจอ

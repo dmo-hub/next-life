@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด · Next Life</title>
+<meta name="description" content="เล่นเกมจำลองชีวิตคนไทยหลายรุ่นบนเบราว์เซอร์ เกิดแบบสุ่มตามสถิติจริงของไทย ใช้ชีวิตทีละการ์ด ตายแล้วไปปรโลก เกิดเป็นลูกหลานหรือเกิดใหม่ตามกรรม เกม ไม่ใช่คำแนะนำการลงทุน">
+<link rel="canonical" href="https://dmo-hub.github.io/next-life/play.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <style>
 /*__FONTS__*/
 /* สีมาจากต้นแบบการ์ด (ใบ 06) — ทาง A ทะเบียนราษฎร์ · ทาง B ลายรดน้ำ · ไม่สลับตามโหมดมืดเพราะสีเป็นตัวบอกแนวการ์ด */
@@ -66,6 +70,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .grow .av { width:56px; height:56px; }
 /* แผ่นภาพยุค: รักดำ+ทองทุกธีม (สีอยู่ในตัวภาพ) — ธีมสว่างจึงเป็นแผ่นเข้มบนพื้นขาวเหมือนกรอบภาพ */
 .era-art { display:block; width:100%; height:auto; aspect-ratio:5 / 2; }
+/* ภาพฉากบนการ์ดแรกเกิด/การ์ดตาย: เล็กพอให้ปุ่มไปต่ออยู่จอแรก */
+.era-art.scene-sm { width:min(100%, 150px); margin:0 auto 6px; }
 .same { margin-left:8px; padding:1px 6px; border:1px solid currentColor; border-radius:var(--rc); font:400 11px/1.4 var(--ft); white-space:nowrap; opacity:0.85; vertical-align:2px; }
 .bar { position:relative; height:6px; }
 .bar i { position:absolute; left:0; top:0; display:block; height:6px; }
@@ -78,6 +84,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .sb-who { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.3; }
 .sb-who b { font-weight:600; overflow-wrap:anywhere; }
 .sb-who small { font-size:12px; color:var(--muted); overflow-wrap:anywhere; }
+/* ป้ายพักแทนบรรทัดจังหวัด: บรรทัดเดียวเสมอ แถวไม่สูงขึ้น */
+.sb-who small.rest { color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .sb-age { display:flex; align-items:center; gap:4px; white-space:nowrap; }
 .sb-age > b { font-size:20px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
 .sb-age small { font-size:12px; }
@@ -159,6 +167,10 @@ body:has(.mnav) .foot { display:none; }
 .mr a, .mr button { all:unset; box-sizing:border-box; display:block; width:100%; min-height:48px; line-height:48px; font-size:15px; font-weight:600; color:var(--ink); cursor:pointer; }
 .mr a:focus-visible, .mr button:focus-visible { outline:2px solid currentColor; outline-offset:-2px; }
 .mr-w > p { margin:12px 0 0; font-size:12px; color:var(--muted); }
+.nt-v { margin:4px 0 0; font-size:13px; color:var(--muted); }
+.nt-l { margin:8px 0 12px; padding-left:20px; }
+.nt-l li { margin:0 0 8px; overflow-wrap:anywhere; }
+.nt > a { display:inline-block; min-height:44px; line-height:44px; font-weight:600; color:var(--ink); }
 .mo p { margin:16px 0 0; font-size:13px; color:var(--ink2); }
 .body { padding:18px 20px 8px; display:flex; flex-direction:column; gap:8px; }
 .body h3 { margin:0; font-size:24px; line-height:1.35; }
@@ -201,6 +213,10 @@ body:has(.mnav) .foot { display:none; }
 .a .spark.echo path:not(.hit) { stroke:var(--ink2); } .a .spark .mk.arc circle { fill:var(--ink2); stroke:none; } .a .echo-list { color:var(--ink2); }
 .b .spark.echo path:not(.hit) { stroke:var(--gold2); } .b .spark .mk.arc circle { fill:var(--gold2); stroke:none; } .b .echo-list { color:var(--sand); }
 .choices { padding:8px 20px 20px; display:flex; flex-direction:column; gap:10px; margin-top:auto; }
+/* การ์ดเปิดชีวิต (ui-redo ใบ 74): ปุ่มติดเหนือเมนูล่างเมื่อเนื้อยาวเกินจอ · sticky ยังกินที่ในการ์ด เลื่อนสุดแล้วบรรทัดท้ายจึงอยู่เหนือปุ่ม ไม่จมใต้ปุ่ม
+   · พื้นทึบสีกระดาษ เนื้อที่เลื่อนผ่านไม่ทะลุหลังปุ่ม · เงาบนบอกว่ายังมีเนื้อต่อข้างใต้ */
+.choices.pin { position:sticky; bottom:0; z-index:2; background:var(--paper); border-radius:0 0 var(--rk) var(--rk); box-shadow:0 -10px 12px -10px rgb(0 0 0 / .18); }
+body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)); }
 .choice { all:unset; box-sizing:border-box; min-height:52px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; border-radius:var(--r); cursor:pointer; font-size:15px; }
 /* เลขปุ่มลัดนำหน้าตัวเลือก (ui-redo ใบ 02) — ข้อความตัวเลือกกินที่ที่เหลือ ป้ายผลยังชิดขวา */
 .choice > kbd { display:inline-grid; place-items:center; width:26px; height:26px; flex:none; font:600 13px/1 var(--ft); border:1px solid var(--rule2); border-radius:var(--rc); color:var(--muted); }
@@ -210,6 +226,17 @@ body:has(.mnav) .foot { display:none; }
 .choice .fx span { white-space:nowrap; }
 /* ปุ่มล็อกใช้ช่องป้ายผลวางเหตุผลเป็นประโยค — ก้อนเดียวไม่มี " · " ห้ามตัดแล้วยาวเกินครึ่งปุ่มจนล้นจอมือถือ (B174) */
 .choice:disabled .fx span { white-space:normal; }
+/* ป้ายผลไอคอน (ui-redo 54): ชิปพื้นจางสีตามทิศทั้งชิ้น · ลูกศรติดท้ายทุกชิ้น จอขาวดำ/ตาบอดสีจึงแยกขึ้นลงได้จากรูป
+   สีขึ้น/ลงแยกตามพื้นการ์ด — ชาติไทยพื้นสว่างใช้สีเข้ม · ต่างโลก/ระหว่างชาติ และปุ่มชาติไทยตอนชี้ (พื้นกลับเป็นสีเข้ม) ใช้สีสว่าง */
+.choice { --fx-up:#2F6B66; --fx-dn:#B73824; }
+.i .choice, .b .choice, .a .choice:hover, .a .choice:focus-visible { --fx-up:#7FE0A8; --fx-dn:#FF8A7A; }
+.choice .fx .fxp { display:inline-flex; align-items:center; }
+.choice .fx .fxp > [aria-hidden] { display:inline-flex; align-items:center; gap:2px; }
+.choice .fx .fxp svg { width:1.15em; height:1.15em; flex:none; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+.choice .fx .fxp b { font-weight:600; }
+.choice .fx .up, .choice .fx .dn { padding:0 5px; border-radius:999px; }
+.choice .fx .up { color:var(--fx-up); background:color-mix(in srgb, var(--fx-up) 16%, transparent); }
+.choice .fx .dn { color:var(--fx-dn); background:color-mix(in srgb, var(--fx-dn) 16%, transparent); }
 /* ปุ่มกู้มาจ่าย (B111) ห้อยใต้ตัวเลือกที่ขาดเงิน — ย่อและเยื้องให้เห็นว่าเป็นทางของปุ่มบน ไม่ใช่ตัวเลือกใหม่ */
 .choice.loan { min-height:40px; margin:-4px 0 0 24px; padding:6px 12px; font-size:13.5px; }
 /* ชื่อตัวเลือกบนปุ่มกู้ยาวได้ทั้งประโยค — บรรทัดเดียวตัดท้ายด้วย … ไม่งั้นปุ่มกู้สูงกว่าตัวเลือกเอง · min-width:0 ให้ก้อนข้อความหดในแถว flex ได้ */
@@ -227,6 +254,9 @@ body:has(.mnav) .foot { display:none; }
 .help .help-row { display:flex; flex-direction:column; gap:2px; }
 .help .help-call, .help > a { display:inline-flex; align-items:center; min-height:44px; overflow-wrap:anywhere; }
 .help .help-call { font-weight:600; }
+/* คำเตือนเนื้อหา (ui-redo 25) — การ์ดแรกเกิดตระกูลใหม่ + หน้าเล่นต่อ · สีตามการ์ดที่วางอยู่ */
+.warn-line { margin:8px 0 0; font-size:13px; line-height:1.5; opacity:.85; }
+.warn-line a { color:inherit; font-weight:600; text-decoration:underline; }
 .help small, .help .note { font-size:12.5px; overflow-wrap:anywhere; }
 .help a { color:inherit; } .help small a { white-space:nowrap; }
 .lineage .lh { font-size:12px; font-weight:600; margin:6px 0 2px; }
@@ -245,6 +275,21 @@ body:has(.mnav) .foot { display:none; }
 /* ชั้นสมุด (B130): แท็บเป็นปุ่มกด (aria-pressed) ไม่ใช่ tablist — เปลี่ยนแท็บ = วาดหน้าใหม่ทั้งหน้า */
 .bk-intro { margin:0; font-size:13px; color:var(--muted); }
 .shelf-art { display:block; width:100%; border:1px solid var(--ink2); border-radius:8px; }
+/* แถบภาพย่อภาพบ้านเมือง (ui-redo ใบ 41): ช่องตัดแถวตามความกว้าง ความสูงตามเนื้อ · พื้นรักเหมือนภาพหัวแท็บอื่น */
+.pic-strip { border:1px solid var(--ink2); border-radius:8px; background:linear-gradient(var(--lacquer2), var(--lacquer)); padding:10px 8px 8px; color:var(--cream); }
+.pic-strip > .h { font-size:13px; font-weight:700; color:var(--gold2); margin:0 0 8px; }
+.pic-row { display:grid; grid-template-columns:repeat(auto-fill, minmax(64px, 1fr)); gap:6px; }
+.pic-th { display:flex; flex-direction:column; align-items:center; gap:2px; min-width:0; }
+.pic-th .pic { width:100%; aspect-ratio:5 / 4; display:grid; place-items:center; border:1.5px solid var(--gold); border-radius:3px; overflow:hidden; background:var(--lacquer2); }
+.pic-th .pic svg { width:100%; height:100%; display:block; }
+.pic-th.lock .pic { border:1px solid var(--bronze); background:#2a1f15; }
+.pic-th.lock .pic b { font-size:12px; color:var(--bronze2); }
+.pic-th.fresh .pic { box-shadow:0 0 0 2px var(--cream), 0 0 10px var(--gold2); }
+.pic-th .n { font-size:10px; color:var(--cream); }
+.pic-th.lock .n { color:#8a7a5a; }
+.pic-th .dot { display:block; width:6px; height:6px; border-radius:50%; background:var(--gold); }
+.pic-th.lock .dot { background:var(--bronze2); }
+.pic-th .yr { font-size:10px; color:var(--sand); }
 .lineage-view { display:grid; gap:6px; }
 .lineage-text summary { cursor:pointer; font-size:13px; color:var(--muted); min-height:44px; display:flex; align-items:center; }
 .bk-tabs { display:flex; flex-wrap:wrap; gap:6px; }
@@ -312,6 +357,10 @@ body:has(.mnav) .foot { display:none; }
 .a .choice { border:1px solid var(--ink); background:#FFFDF7; }
 .a .choice:hover, .a .choice:focus-visible { background:var(--ink); color:var(--paper); outline:none; }
 .a .choice .fx { color:var(--green); } .a .choice:hover .fx, .a .choice:focus-visible .fx { color:#CFE3E0; }
+/* คำอธิบายสกิลใต้ชื่อปุ่ม (06s: จอเลือกพก · การ์ดฝึกสกิล · เลือกลงสมุด) · ปุ่มเลือกพกที่กดไว้มีแถบซ้าย */
+.a .choice .idesc, .b .choice .idesc { display:block; margin-top:2px; font-size:12px; }
+.a .choice .idesc { color:var(--muted); } .a .choice:hover .idesc, .a .choice:focus-visible .idesc { color:#CFE3E0; }
+.a .choice[aria-pressed="true"] { box-shadow:inset 5px 0 0 var(--green); }
 .a .stamp { border:2px solid var(--red); color:var(--red); }
 .a .recap { border:1px solid var(--rule); border-radius:var(--r); background:#FBF7EE; }
 
@@ -328,7 +377,9 @@ body:has(.mnav) .foot { display:none; }
 .b .choice { border:1px solid var(--bronze2); background:var(--lacquer2); color:var(--cream); }
 .b .choice:hover, .b .choice:focus-visible { border-color:var(--gold); background:#2E2218; outline:none; }
 .b .choice .fx { color:var(--gold); }
-.b .picks, .b .tree summary { color:#E3D6B3; }
+.b .choice .idesc { color:var(--cream); opacity:0.8; }
+.b .picks, .b .tree summary, .b .tab-bar button { color:#E3D6B3; }
+.b .tab-bar button[aria-pressed="true"] { background:var(--gold); border-color:var(--gold); color:var(--lacquer); }
 .b .recap { border:1px solid var(--bronze); background:var(--lacquer2); }
 .b .recap .h { color:var(--gold); }
 .scene { height:96px; background:var(--lacquer2); border-bottom:1px solid var(--bronze); }
@@ -423,11 +474,9 @@ body:has(.mnav) .foot { display:none; }
 .itimer i { display:block; height:100%; width:0; background:#6FE3FF; }
 @keyframes itick { from { width:0; } to { width:100%; } }
 @media (prefers-reduced-motion: reduce) { .itimer i { animation:none !important; } }
-/* เอฟเฟกต์ B-fx (ตัวเล่นใน app.mjs) — พลิก: ลูกตรงของการ์ดซ่อนด้านหลัง หลังการ์ดเป็นแผ่นรักลายทองหันกลับด้าน · translateZ กันกระพริบเพราะอยู่ระนาบเดียวกับพื้นการ์ด */
-.fx-flip { position:relative; transform-style:preserve-3d; }
-.fx-flip > * { backface-visibility:hidden; -webkit-backface-visibility:hidden; }
-.fx-flip > .fx-back { position:absolute; inset:0; display:grid; place-items:center; border-radius:inherit; background:var(--lacquer2); transform:rotateY(180deg) translateZ(1px); }
-.fx-back svg { width:min(200px, 60%); height:auto; }
+/* เอฟเฟกต์ B-fx (ตัวเล่นใน app.mjs) — การ์ดใหม่: เส้นทองวาดทับขอบการ์ด ไม่รับคลิก · overflow:visible ให้เส้นครึ่งนอกขอบไม่ถูกตัด */
+.fx-trace-on { position:relative; }
+.fx-trace { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; z-index:2; }
 .fx-ov { position:fixed; inset:0; z-index:50; pointer-events:none; }
 .fx-ov.fx-out { opacity:0; transition:opacity .25s; }
 .fx-veil { position:absolute; inset:0; background:var(--lacquer); opacity:0; }
@@ -512,22 +561,33 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
   .scene { height:64px; }
   .choice .fx span { white-space:normal; }
 }
-/* เลย์เอาต์คอม (ui-redo ใบ 09 · เจ้าของเคาะราวซ้าย + ลิ้นชัก): จอกว้างแถบเมนูล่างกลายเป็นราวซ้ายค้าง · แผงเปิดเป็นลิ้นชักขวาเต็มความสูง ไม่มีแผงเปิดค้าง
+/* เลย์เอาต์คอม (ui-redo ใบ 09 · เจ้าของเคาะราวซ้าย + ลิ้นชัก): จอกว้างแถบเมนูล่างกลายเป็นราวซ้ายค้าง · แผงเปิดเป็นลิ้นชักขวาเต็มความสูง (จอกว้างมากเป็นแผงค้าง ใบ 67 ด้านล่าง)
    · มือถือแนวนอนเตี้ยใช้ราวแคบด้วย — แถบล่าง 60px กินหนึ่งในหกของจอสูง 360 · ราวกว้างเพิ่มตามรอยบากฝั่งซ้าย ป้ายปุ่มจึงไม่ถูกบีบ */
 @media (min-width: 1024px), (orientation: landscape) and (max-height: 540px) {
-  :root { --rail-w:calc(220px + env(safe-area-inset-left)); }
+  :root { --rail-w:calc(220px + env(safe-area-inset-left)); --sheet-w:420px; }
   body:has(.mnav) { padding-bottom:0; padding-left:var(--rail-w); }
   .mnav { top:0; right:auto; width:var(--rail-w); max-width:none; flex-direction:column; gap:4px; margin:0; padding:max(16px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left)); border-top:0; border-right:1px solid var(--rule2); box-shadow:4px 0 16px rgb(0 0 0 / .06); }
   .mnav button { flex:none; flex-direction:row; justify-content:flex-start; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
   .mnav button:hover { background:var(--paper2); }
   .mnav button[aria-expanded="true"] { background:var(--paper2); box-shadow:inset 3px 0 0 var(--fl); }
   .mnav .new-dot { position:static; margin-left:6px; }
-  .sheet { top:0; bottom:0; left:auto; width:min(420px, 100vw - var(--rail-w)); max-width:none; max-height:none; margin:0; padding-right:max(20px, env(safe-area-inset-right)); border-left:1px solid var(--rule2); border-radius:0; box-shadow:-10px 0 30px rgb(0 0 0 / .2); }
+  body:has(.mnav) .choices.pin { bottom:env(safe-area-inset-bottom); }
+  .sheet { top:0; bottom:0; left:auto; width:min(var(--sheet-w), 100vw - var(--rail-w)); max-width:none; max-height:none; margin:0; padding-right:max(20px, env(safe-area-inset-right)); border-left:1px solid var(--rule2); border-radius:0; box-shadow:-10px 0 30px rgb(0 0 0 / .2); }
 }
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --rail-w:calc(96px + env(safe-area-inset-left)); }
   .mnav { gap:2px; padding:max(8px, env(safe-area-inset-top)) 6px max(8px, env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left)); }
   .mnav button { justify-content:center; min-height:44px; padding:0 4px; font-size:13px; }
+}
+/* ราว/แผงเริ่มใต้หัวเว็บ (ui-redo ใบ 67 · เจ้าของเลือกจากภาพ): หัวเว็บกว้างเต็มจอทับช่องราว · --hd = ขอบล่างหัวที่วัดขณะเลื่อน เลื่อนพ้นแล้วชิดบน
+   · มือถือแนวนอนเตี้ยคงราวเต็มสูงแบบเดิม (หัวบางอยู่แล้ว) */
+@media (min-width: 1024px) {
+  body:has(.mnav) .logo { margin-left:calc(-1 * var(--rail-w)); }
+  .mnav, .sheet { top:var(--hd, 0px); }
+  /* แผงค้าง (เกณฑ์ความกว้างอยู่ที่ PIN_MQ ใน app.mjs): การ์ดเลื่อนไปช่องกลางระหว่างราวกับแผง ไม่ถูกบัง · ไม่มีเงาลิ้นชัก ไม่เลื่อนเข้า */
+  body:has(.sheet.pin) { padding-right:var(--sheet-w); }
+  body:has(.sheet.pin) .logo { margin-right:calc(-1 * var(--sheet-w)); }
+  .sheet.pin { box-shadow:none; animation:none; }
 }
 @media (prefers-reduced-motion: no-preference) and (min-width: 1024px), (prefers-reduced-motion: no-preference) and (orientation: landscape) and (max-height: 540px) {
   .sheet { animation:drw .2s ease-out; }

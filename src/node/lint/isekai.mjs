@@ -11,7 +11,7 @@ export const ISEKAI_RULES = [
   { id: 'isekai-shape', desc: 'ไฟล์เป็น {cards: [...]} · ช่องของการ์ด/ตัวเลือก/ผลอยู่ในรายการ · ch เป็นชั้นของช่วงวัย · ตัวเลือก 2–3 ข้อ' },
   { id: 'isekai-id', desc: 'id ตัวพิมพ์เล็ก/ตัวเลข/_ · ไม่ซ้ำกันและไม่ชนการ์ดใน isekai.mjs' },
   { id: 'isekai-deck', desc: 'ผูกกองได้ช่องเดียว: regions (แคว้นที่มีจริง) · dispute (ข้อพิพาทที่มีจริง) · power (major/falling/rising)' },
-  { id: 'isekai-roll', desc: 'ตัวเลือกทอย = stat + dc + win + lose · ไม่ทอย = text · tag เป็นแท็กของโฟกัส · ผลแตะได้แค่ค่าต่างโลก' },
+  { id: 'isekai-roll', desc: 'ตัวเลือกทอย = stat + dc + win + lose · ไม่ทอย = text · tag เป็นแท็กของโฟกัส · ผลแตะได้แค่ค่าต่างโลก · upgrade = true อยู่ที่ผล (ทอยแล้วอยู่ใน win/lose)' },
   { id: 'isekai-fill', desc: 'ตัวแทนในข้อความมีแค่ {land} {major} {falling} {rising} {dispute}' },
   { id: 'isekai-merit', desc: 'merit = รายการ {cat, level} หมวดที่มีจริง · หมวดกลาง/ธงไม่มี level · หมวดอื่น level 1–3' },
   { id: 'isekai-next', desc: 'next ชี้การ์ด follow ใน yaml · การ์ด follow ต้องมีใครชี้มา (ไม่งั้นไม่มีทางถึง)' },
@@ -19,8 +19,8 @@ export const ISEKAI_RULES = [
 ];
 
 const CARD_KEYS = ['id', 'ch', 'title', 'text', 'choices', 'minFame', 'adult', 'follow', 'overlap_stage', ...Object.keys(CONT_DECK)];
-const CHOICE_KEYS = ['t', 'fx', 'text', 'stat', 'dc', 'tag', 'win', 'lose', 'flag', 'next', 'need', 'merit'];
-const OUT_KEYS = ['fx', 'text', 'flag', 'next'];
+const CHOICE_KEYS = ['t', 'fx', 'text', 'stat', 'dc', 'tag', 'win', 'lose', 'flag', 'next', 'need', 'merit', 'upgrade'];
+const OUT_KEYS = ['fx', 'text', 'flag', 'next', 'upgrade'];
 const POWERS = ['major', 'falling', 'rising'];
 const CH = new Set(ISEKAI_STAGES.flatMap((s) => s.ch));
 const TAGS = new Set(Object.values(ISEKAI_FOCUS).map((f) => f.tag).filter(Boolean));
@@ -74,7 +74,7 @@ export function lintIsekai(docs) {
           if (!ISEKAI_STAT[c.stat]) bad(id, 'isekai-roll', `${at} stat ต้องเป็น ${Object.keys(ISEKAI_STAT).join('/')}`);
           if (!(isInt(c.dc) && c.dc > 0 && c.dc <= 40)) bad(id, 'isekai-roll', `${at} dc ต้องเป็นจำนวนเต็ม 1–40`);
           if (!isObj(c.win) || !isObj(c.lose)) bad(id, 'isekai-roll', `${at} ทอยต้องมีทั้ง win และ lose`);
-          if (c.text !== undefined || c.fx !== undefined || c.flag !== undefined) bad(id, 'isekai-roll', `${at} ทอยแล้วผลอยู่ใน win/lose ไม่ใช่ที่ตัวเลือก`);
+          if (c.text !== undefined || c.fx !== undefined || c.flag !== undefined || c.upgrade !== undefined) bad(id, 'isekai-roll', `${at} ทอยแล้วผลอยู่ใน win/lose ไม่ใช่ที่ตัวเลือก`);
           for (const k of ['win', 'lose']) if (isObj(c[k])) outs.push([`${at}.${k}`, c[k]]);
         } else outs.push([at, c]);
         if (c.tag !== undefined && !TAGS.has(c.tag)) bad(id, 'isekai-roll', `${at} tag ${c.tag} ไม่ใช่แท็กโฟกัส (${[...TAGS].join(' ')})`);
@@ -85,6 +85,7 @@ export function lintIsekai(docs) {
           texts.push(o.text);
           if (o.fx !== undefined && (!isObj(o.fx) || Object.entries(o.fx).some(([k, v]) => !ISEKAI_FX[k] || typeof v !== 'number' || !Number.isFinite(v)))) bad(id, 'isekai-roll', `${p} fx แตะได้แค่ ${Object.keys(ISEKAI_FX).join(' ')} เป็นตัวเลข`);
           if (o.flag !== undefined && !(typeof o.flag === 'string' && FLAG.test(o.flag))) bad(id, 'isekai-shape', `${p} flag ต้องเป็นตัวพิมพ์เล็ก/_`);
+          if (o.upgrade !== undefined && o.upgrade !== true) bad(id, 'isekai-roll', `${p} upgrade ใช้ได้แค่ true`);
           if (o.next !== undefined) cards.at(-1).next = [...(cards.at(-1).next ?? []), [p, o.next]];
         }
         if (c.merit !== undefined) {

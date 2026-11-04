@@ -1,0 +1,13 @@
+# ผิดกติกาเดียว: ตัวเลือกการ์ดเด็กติดป้ายนิสัยที่ไม่มีในทะเบียน
+events:
+  - id: bad_case_01
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    when: {age: [6, 12]}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "อ่านหนังสือทั้งวัน", nature: shy, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

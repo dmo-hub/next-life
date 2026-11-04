@@ -23,6 +23,24 @@ export function flagNames(root = new URL('../../', import.meta.url)) {
   return { ...doc.flags, ...Object.fromEntries(Object.entries(doc.prefixes ?? {}).map(([k, v]) => [`${k}:`, v])) };
 }
 
+// ชื่อกลุ่มสาเหตุตายของ when.past_life.cause — อ่านไฟล์ข้อมูลเดียวกับที่ lint ตรวจ id
+const CAUSE_TH = Object.fromEntries(Object.entries(JSON.parse(readFileSync(new URL('../../data/death-causes.json', import.meta.url), 'utf8')).groups).map(([k, g]) => [k, g.label]));
+const PAST_CAUSE_TH = { ...CAUSE_TH, gone: 'หายไปต่างโลก' };
+
+// ความจำชาติก่อน (ใบ 159) เป็นคำที่ผู้อ่านเฉลยเข้าใจ — any:false ใช้คู่ช่องอื่นไม่ได้ (lint)
+function pastCond(p, L) {
+  if (!p) return [];
+  if (p.any === false) return ['ชีวิตแรก (ไม่มีชาติก่อน)'];
+  const out = [];
+  if (p.any) out.push('มีชาติก่อน');
+  if (p.province) out.push(p.province === 'same' ? 'เกิดจังหวัดเดียวกับชาติก่อน' : 'เกิดคนละจังหวัดกับชาติก่อน');
+  if (p.job) out.push(`ชาติก่อนทำงาน${any(p.job.map((o) => esc(L.occ(o))))}นานที่สุด`);
+  if (p.cause) out.push(`ชาติก่อนจบด้วย${any(p.cause.map((c) => esc(PAST_CAUSE_TH[c] ?? c)))}`);
+  if (p.realm) out.push(`เคยไป${any(p.realm.map((r) => REALMS.find((x) => x.id === r)?.name ?? r))}สักชาติ`);
+  if (p.talent !== undefined) out.push(p.talent ? 'มีพรสวรรค์ติดชาติ' : 'ไม่มีพรสวรรค์ติดชาติ');
+  return out;
+}
+
 // ชื่อระบบอยู่ในไฟล์ข้อมูลแต่ loader ไม่ส่งต่อให้แกน (แกนใช้แค่ปีเริ่ม) — อ่านไฟล์เดียวกันตรง ๆ
 export function systemNames(root = new URL('../../', import.meta.url)) {
   return Object.fromEntries(JSON.parse(readFileSync(new URL('data/system-starts.json', root), 'utf8')).systems.map((s) => [s.id, s.name]));
@@ -47,7 +65,9 @@ function labels(content, flags, systems) {
   // none = ไม่ได้อยู่สายเลื่อนขั้นใด (แกนเทียบ st.ladder?.id ?? 'none')
   const ladders = content.era.careers?.ladders ?? {};
   const ladder = (id) => (id === 'none' ? 'ไม่อยู่สายเลื่อนขั้น' : ((n) => (n.startsWith('สาย') ? n : `สาย${n}`))(ladders[id]?.name ?? id));
-  return { occ: (id) => occ[id] ?? id, era: (id) => era[id] ?? id, sys, flag, ladder };
+  // นิสัยจากวัยเด็ก (B41) อยู่ในกติกาทุ่มเท content.focus.natures
+  const nature = (id) => content.focus?.natures?.[id]?.name ?? id;
+  return { occ: (id) => occ[id] ?? id, era: (id) => era[id] ?? id, sys, flag, ladder, nature };
 }
 
 // เงินในผล: ตัวเลขเปล่า = บาทของปีนั้น · income_x = เท่าของเงินเก็บต่อปี · fixed_baht = บาทของปีอ้างอิง ปรับตามเงินเฟ้อ (moneyValue ในแกน)
@@ -176,6 +196,7 @@ function conditions(e, L) {
   out.push(...flagCond(w.flags, L));
   // ธงของพ่อแม่รุ่นก่อน ไม่ใช่ของตัวละคร — การ์ดจึงออกเฉพาะชีวิตที่เกิดเป็นลูกของรุ่นก่อน
   out.push(...flagCond(w.parent_flags, L, 'เกิดเป็นลูกของรุ่นก่อนที่'));
+  out.push(...pastCond(w.past_life, L));
   if (e.realm) out.push(`ไป${any(e.realm.map((r) => REALMS.find((x) => x.id === r)?.name ?? r))}`);
   if (e.repeat) out.push(`ออกซ้ำได้ ${e.repeat.max} ครั้ง เว้น ${e.repeat.gap} ปี`);
   if (e.weight !== undefined) out.push(`น้ำหนักในกองสุ่ม ${e.weight}`);
@@ -190,6 +211,7 @@ function locks(q, L) {
   if (q.age) out.push(`อายุ${q.age.min !== undefined ? ` ≥ ${q.age.min}` : ''}${q.age.max !== undefined ? ` ≤ ${q.age.max}` : ''}`);
   if (q.edu) out.push(`จบ${esc(Array.isArray(q.edu) ? q.edu.join(' หรือ ') : q.edu)}`);
   for (const f of q.family ?? []) out.push(famCond(f));
+  if (q.nature) out.push(`เป็นคน${esc(L.nature(q.nature))}`);
   out.push(...flagCond(q.flags, L));
   return [`เลือกได้เมื่อ ${out.join(' · ')}${q.reason ? ` · ไม่ผ่านจอบอก "${esc(q.reason)}"` : ''}`];
 }
@@ -204,6 +226,8 @@ function cardRef(id, byId) {
 function extras(node, L, byId) {
   const out = [...flagsLine(node, L)];
   for (const f of node.family ?? []) out.push(family(f, L));
+  // ป้าย nature: บนตัวเลือกวัยเด็กสะสมแต้มนิสัย (B41) — หน้าเฉลยบอกว่าตัวเลือกไหนปั้นนิสัยอะไร
+  if (node.nature) out.push(`แต้มนิสัย${esc(L.nature(node.nature))} +1`);
   for (const s of node.schedules ?? []) out.push(`นัดการ์ด ${cardRef(s.event, byId)} อีก ${range(s.after_years, ' ปี')}`);
   if (node.next) out.push(`ต่อด้วยการ์ด ${cardRef(node.next, byId)}`);
   if (node.redeem) out.push(`แก้บน: ${REDEEM_TH[node.redeem] ?? esc(node.redeem)}`);

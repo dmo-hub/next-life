@@ -9,11 +9,9 @@ export const NAV_MENU = [
   ['guide.html', 'วิธีเล่น'],
   ['whatsnew.html', 'แพตช์โน้ต'],
   ['about.html', 'กลไกในเกม'],
-  ['worlds.html', 'ชาตินี้ · ปรโลก · ต่างโลก'],
-  ['otherworld.html', 'ต่างโลก', 'dark'],
+  // เจ้าของรวมสองหน้าเป็นหัวเดียว "โลก" · หน้าต่างโลกยังอยู่ (ลิงก์จากหน้าโลก) และนับเป็นหัวนี้ตอนเปิดอยู่
+  ['worlds.html', 'โลก', null, ['otherworld.html']],
   ['catalog.html', 'การ์ดทั้งหมด'],
-  ['gdd.html', 'เอกสารออกแบบเกม (GDD)'],
-  ['design.html', 'การออกแบบ'],
   ['dev/index.html', 'ห้องผู้พัฒนา'],
 ];
 
@@ -35,13 +33,12 @@ export const NAV_CSS = `
 // คำนวณซ้ำหลังฟอนต์โหลด เพราะความกว้างลิงก์เปลี่ยนเมื่อ Sarabun มาแทนฟอนต์สำรอง
 const NAV_SCRIPT = `<script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script>`;
 
-// file = path ใต้ docs/ เช่น gdd.html · design-lore.html · spec/lore-finance-series.html
-// หน้า design-<เรื่อง> อยู่ใต้เมนู "การออกแบบ" ⇒ ลิงก์นั้นได้ aria-current="true" (ไม่ใช่ page เพราะไม่ใช่หน้านั้นเอง)
+// file = path ใต้ docs/ เช่น about.html · spec/lore-finance-series.html
 export function navHtml(file) {
   const up = '../'.repeat(file.split('/').length - 1);
-  const cur = (href) => (href === file ? ' aria-current="page"' : href === 'design.html' && /^design-.+\.html$/.test(file) ? ' aria-current="true"' : '');
-  const a = (href, text, cls) => `<a${cls ? ` class="${cls}"` : ''} href="${up}${href}"${cur(href)}>${text}</a>`;
-  const links = NAV_MENU.map(([h, t, c]) => a(h, t, c)).join('');
+  const cur = (href, also = []) => (href === file || also.includes(file) ? ' aria-current="page"' : '');
+  const a = (href, text, cls, also) => `<a${cls ? ` class="${cls}"` : ''} href="${up}${href}"${cur(href, also)}>${text}</a>`;
+  const links = NAV_MENU.map(([h, t, c, also]) => a(h, t, c, also)).join('');
   return `<nav class="top" aria-label="หน้าอื่น">${a('index.html', 'NEXT LIFE', 'brand')}<div class="links">${links}</div>${a('play.html', 'เล่นเกม', 'play')}</nav>${NAV_SCRIPT}`;
 }
 
@@ -64,4 +61,74 @@ export function navBlocks(html) {
     return a < 0 || b < a ? null : html.slice(a + s.length, b);
   };
   return { css: pick(NAV_CSS_START, NAV_CSS_END), nav: pick(NAV_START, NAV_END), count: html.split(NAV_START).length - 1 };
+}
+
+// แถบห้องผู้พัฒนา: หน้า dev เขียนมือวางแถบนี้ไว้เอง · หน้าที่ build สร้างใต้ dev/ (คำตัดสินเกม) ใช้ชิ้นนี้ ⇒ แท็บเพิ่ม/ย้ายต้องแก้หน้าเขียนมือด้วย (ด่าน site:check เทียบแท็บ)
+export const DEV_TABS = [
+  ['dev/index.html', 'สารบัญ'],
+  ['dev/spec.html', 'ภาคผนวกสเปก'],
+  ['dev/plan.html', 'สเปก/แผน'],
+  ['dev/design.html', 'คำตัดสินเกม'],
+  ['dev/ui.html', 'การออกแบบ'],
+  ['dev/maps/continent.html', 'แผนที่'],
+  ['dev/ui-redo/tweak.html', 'ต้นแบบ UI'],
+  ['dev/archive/index.html', 'คลังเก่า'],
+];
+export const DEV_NAV_CSS = `
+.nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
+.nl-nav{font:15px/1.4 Sarabun,"Noto Sans Thai",system-ui,sans-serif;text-align:left}
+.nl-nav a{text-decoration:none;color:inherit}
+.nl-in{max-width:1040px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
+.nl-top{background:#1F2430;color:#F4EFE3}
+.nl-top>.nl-in{min-height:52px;flex-wrap:wrap;column-gap:12px}
+.nl-brand{font-weight:700;margin-right:auto;padding:12px 0}
+.nl-main{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.nl-main a{padding:13px 8px 11px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-main a[aria-current]{border-bottom-color:#D6A64A;font-weight:600}
+.nl-swap{border:1px solid #6B7080;padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
+.nl-swap:hover,.nl-main a:hover{opacity:1;color:#fff}
+.nl-dev .nl-top{background:#2F3833}
+.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:#8A6A2E;color:#F4EFE3;vertical-align:2px}
+.nl-tabs{background:#F3EEE2;color:#1F2430;border-bottom:1px solid #D8D0C0}
+.nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
+.nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-tabs a[aria-current]{border-bottom-color:#A23B2C;font-weight:600}
+.nl-tabs.nl-sub{background:#EBE4D5;font-size:14px}
+@media (max-width:640px){
+.nl-top>.nl-in{padding:0}
+.nl-brand{padding:12px 16px}
+.nl-swap{margin-right:16px}
+.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid #343A48}
+}
+`;
+// file = path ใต้ docs/ เช่น dev/design-lore.html · หน้าเรื่องของคำตัดสินเกมอยู่ใต้แท็บนั้น ⇒ aria-current="true" (ไม่ใช่ page เพราะไม่ใช่หน้านั้นเอง)
+export function devNavHtml(file) {
+  const up = '../'.repeat(file.split('/').length - 1);
+  const cur = (href) => (href === file ? ' aria-current="page"' : href === 'dev/design.html' && /^dev\/design-.+\.html$/.test(file) ? ' aria-current="true"' : '');
+  const tabs = DEV_TABS.map(([h, t]) => `<a href="${up}${h}"${cur(h)}>${t}</a>`).join('');
+  return `<!--nav--><style>${DEV_NAV_CSS}</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="${up}dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="${up}index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in">${tabs}</div></div></div>`;
+}
+
+// หน้าส่งต่อของ URL ที่ย้ายไป (GitHub Pages ไม่มี redirect ฝั่งเซิร์ฟเวอร์) — noindex ไม่ใช้ canonical (คำตัดสินเจ้าของ) · พก #ส่วนในหน้าไปด้วย
+// from/to = path ใต้ docs/ · build เขียนทุกรอบ จึงไม่หายเมื่อ build ซ้ำ · MOVED_MARK ให้ build/ด่านแยกหน้าส่งต่อออกจากหน้าค้าง
+export const MOVED_MARK = '<meta name="next-life-moved"';
+export function movedHtml(from, to, title) {
+  const href = '../'.repeat(from.split('/').length - 1) + to;
+  title = title.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  return `<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+${MOVED_MARK} content="${to}">
+<meta http-equiv="refresh" content="0; url=${href}">
+<title>ย้ายแล้ว · ${title}</title>
+<script>location.replace(${JSON.stringify(href)} + location.hash)</script>
+</head>
+<body style="font-family:Sarabun,sans-serif;padding:24px">
+<p>หน้านี้ย้ายไปแล้ว — <a href="${href}">${title}</a></p>
+</body>
+</html>
+`;
 }

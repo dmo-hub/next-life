@@ -1,5 +1,5 @@
 {
- "version": "v0.6.36",
+ "version": "v0.6.67",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -307,6 +307,12 @@
   "after_ancestor_far_01",
   "after_ancestor_debt_01",
   "after_ancestor_quiet_01",
+  "after_loop_common_dhamma_01",
+  "after_loop_common_offering_01",
+  "after_loop_common_elder_01",
+  "after_loop_common_review_01",
+  "after_loop_common_home_01",
+  "after_loop_common_queue_01",
   "bel_fortune_market",
   "bel_fortune_market_rite",
   "bel_fortune_cards",
@@ -735,12 +741,15 @@
  ],
  "storage": [
   "next-life-book-v1",
+  "next-life-deaths-v1",
   "next-life-isekai-speed-v1",
   "next-life-memorial-seen-v1",
   "next-life-memorial-v1",
+  "next-life-notes-seen-v1",
   "next-life-pics-v1",
   "next-life-save-v1",
   "next-life-save-v2",
+  "next-life-skills-v1",
   "next-life-whisper-v1"
  ]
 }

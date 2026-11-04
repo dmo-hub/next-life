@@ -95,6 +95,11 @@ events:
         text: "เสนอชื่อตัวเอง"
         effects: {money: {unit: income_x, amount: -1}, network: 2, happiness: -1}
         merit: [{cat: help_others, level: 2}, {cat: oppress_subjects, level: 1}]
+      - id: cut_own_pay
+        text: "ขอนายลดเงินเดือนตัวเองแทนตัดคน"
+        requires: {nature: bold}
+        effects: {money: {unit: income_x, amount: -0.5}, relations: 2, network: 1}
+        merit: [{cat: help_others, level: 2}]
 
   - id: dilemma_father_care_01
     type: A

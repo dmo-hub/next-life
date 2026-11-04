@@ -16,6 +16,8 @@ const traced = (o) =>
 function walk(node, path, covered, key) {
   if (typeof node === 'number' || (typeof node === 'string' && NUMERIC_STRING.test(node))) {
     if (INDEX_KEYS.has(key)) return;
+    // รหัส commit ที่บังเอิญเป็นเลขฐานสิบล้วน (เช่น 9180898) ไม่ใช่ตัวเลขข้อมูล
+    if (key === 'sha' && typeof node === 'string') return;
     checked++;
     if (typeof node === 'string') problems.push(`${path}: ตัวเลขเก็บเป็นสตริง`);
     else if (!Number.isFinite(node)) problems.push(`${path}: ไม่ใช่ตัวเลขจำกัด`);

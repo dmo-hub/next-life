@@ -1,0 +1,17 @@
+# สกิลที่ชีวิตไทยได้ลงคลังตอนจบ (06s) — แกนรวมทุกแหล่งที่ชีวิตนั้นเข้า แสดงบนการ์ดปรโลกให้ผู้เล่นเลือก 1 อย่าง
+# ต่อคีย์: { <id ของแหล่ง>: [id สกิลใน ISEKAI_SKILLS] } · ว่างทุกคีย์ = การ์ดปรโลกรูปเดิม
+#
+# job      = อาชีพตอนตาย (id ใน occupations.list ของ data/finance.json)
+# title    = ฉายาส่วนตัวที่ได้ (TITLES ใน src/engine/titles.mjs)
+# pattern  = แบบแผนชีวิต (ALL_PATTERNS ใน src/engine/titles.mjs)
+# cause    = สาเหตุตาย (groups ใน data/death-causes.json) · ชีวิตที่หายตัวไม่มีสาเหตุ
+# goal     = เป้าตระกูลที่สำเร็จในรุ่นนี้ (FAMILY_GOALS ใน src/engine/titles.mjs)
+# focus    = โฟกัสที่ทุ่มเทสะสมครบ chain_years ของ content/rules/focus.yaml (id โฟกัสในไฟล์นั้น)
+# lifeGoal = เป้าชีวิตส่วนตัว — ระบบยังไม่มี เว้นว่างไว้
+job: {}
+title: {}
+pattern: {}
+cause: {}
+goal: {}
+focus: {}
+lifeGoal: {}

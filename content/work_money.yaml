@@ -310,6 +310,12 @@ events:
         effects: {happiness: 1, health: 1, money: {unit: income_x, amount: 0.5}}
         sets_flags: [online_seller]
         merit: [{cat: neutral}]
+      - id: pack_every_night
+        text: "แพ็กของเองทุกคืน ตอบแชตครบทุกคน"
+        requires: {nature: duty}
+        effects: {money: {unit: income_x, amount: 1}, relations: 1}
+        sets_flags: [online_seller]
+        merit: [{cat: neutral}]
 
   - id: work_guarantor_chase_01
     type: A

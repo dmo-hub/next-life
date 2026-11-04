@@ -17,7 +17,7 @@ const DRY = !!process.env.DRY;
 const BASE = process.env.BASE;
 if (BASE && !DRY) throw new Error('BASE ใช้ได้กับ DRY=1 เท่านั้น');
 const git = (...a) => execFileSync('git', ['-C', wt, ...a], { encoding: 'utf8' }).trim();
-const BUILD = new Set(['docs/play.html', 'docs/catalog.html', 'docs/spoilers.html', 'docs/spec.html', 'docs/guide.html', 'docs/otherworld.html', 'docs/gdd.html', 'docs/index.html', 'docs/about.html']);
+const BUILD = new Set(['docs/play.html', 'docs/catalog.html', 'docs/spoilers.html', 'docs/spec.html', 'docs/guide.html', 'docs/otherworld.html', 'docs/worlds.html', 'docs/dev/spec.html', 'docs/index.html', 'docs/about.html']);
 
 const g = JSON.parse(fs.readFileSync(notesFile, 'utf8'));
 const strs = (v) => Array.isArray(v) && v.length > 0 && v.every((s) => typeof s === 'string' && s.trim());
@@ -70,7 +70,7 @@ let out = html.replace(anchor[0], anchor[0] + block);
 // เจ้าของสั่งให้หัวกำลังทำรวมงานค้างทั้งหมดทุกครั้งที่ปล่อย — ส่ง soon = แทนทั้งรายการ ไม่ต่อท้าย กันของที่ปล่อยแล้วค้างอยู่
 if (g.soon) {
   // กำลังทำแบ่งหมวดด้วย <h3> แล้ว — regex ข้างล่างแทนแค่ <ul> แรก = ทับหมวดแรก ทิ้งที่เหลือเงียบ
-  if (/<h3>/.test(out.match(/<h2>กำลังทำ<\/h2>([\s\S]*?)<h2>/)?.[1] ?? '')) throw new Error('whatsnew กำลังทำแบ่งหมวดแล้ว — ห้ามส่ง soon · แก้มือในหมวดที่ตรง');
+  if (/<h3[\s>]/.test(out.match(/<h2>กำลังทำ<\/h2>([\s\S]*?)<h2>/)?.[1] ?? '')) throw new Error('whatsnew กำลังทำแบ่งหมวดแล้ว — ห้ามส่ง soon · แก้มือในหมวดที่ตรง');
   const soonRe = /(<h2>กำลังทำ<\/h2>[\s\S]*?<ul>)[\s\S]*?(\r?\n  <\/ul>)/;
   if (!soonRe.test(out)) throw new Error('หารายการกำลังทำใน whatsnew ไม่เจอ');
   const items = g.soon.map((s) => `${eol}    <li><span class="tag soon">กำลังทำ</span>${s}</li>`).join('');
