@@ -12,7 +12,7 @@ import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './cou
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
-import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends } from './isekai.mjs';
+import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
 
@@ -100,7 +100,7 @@ function signPact(st, p) {
 // น้ำหนักทางผลหลังเอียงตาม multipliers และอารมณ์ · การ์ดที่มีทั้งทางสำเร็จและไม่สำเร็จ ตัดโอกาสสำเร็จรวมไว้ okMin–okMax (B112) โดยปรับสองกลุ่มตามสัดส่วน
 // (ไม่ดึงเลขสุ่มเพิ่ม · ป้าย % กับผลจริงใช้ตัวเดียวกัน)
 const outcomeWeights = (st, ev, c) => {
-  const m = (moodCard(ev) ? moodMul(st) : 1) * pactLuck(st);
+  const m = (moodCard(ev) ? moodMul(st) : 1) * pactLuck(st) * thaiSkillMul(st.skills, ev?.category);
   const w = c.outcomes.map((o) => o.weight * poolMultiplier(st, o.multipliers) * (o.ok ? m : 1));
   const ok = w.reduce((a, x, i) => a + (c.outcomes[i].ok ? x : 0), 0);
   const all = w.reduce((a, x) => a + x, 0);
@@ -251,6 +251,8 @@ export function newLife(seed, content, heir = null) {
     flags: {},
     // ธงของรุ่นก่อนที่ทายาทได้รู้ {ธง: ชั้น} — แยกจาก flags เพราะ flags คือสิ่งที่ตัวเองเคยทำ (ฉายา/ความเสี่ยงตายอ่านอยู่)
     parentFlags: heir?.parentFlags ?? {},
+    // สกิลที่พกมาจากคลัง [{ id, lv }] (06s) ใช้ทั้งชีวิตนี้และชาติต่างโลกที่ตามมา · ไม่พก = ไม่มีช่อง (state เท่าก่อนมีสกิลข้ามชาติ)
+    ...(heir?.skills?.length && { skills: heir.skills }),
     scheduled: [],
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
@@ -389,14 +391,18 @@ function outcomeFx(st, c, ev) {
 // โอกาสได้ทางสำเร็จ ปัดเป็นขั้น PCT_STEP ไม่โชว์ 0/100 · ผลของตัวเลือกลงก่อนสุ่มทาง (choose)
 // จึงคิดบนค่าหลังผลตัวเลือกในสำเนา ไม่แตะ state จริง
 export const PCT_STEP = 5;
-export function successPct(st, c, ev = null) {
+// ค่าดิบไม่ปัด — harness ที่วัดผลเอียงเล็ก ๆ (ผลเบาสกิล k) เห็นต่างกันต่ำกว่าขั้นป้าย
+export function successP(st, c, ev = null) {
   const fx = c.effects ?? {};
   const p = { ...st, flags: { ...st.flags } };
   for (const k of STAT_KEYS) if (fx[k]) p[k] = clamp(p[k] + levelValue(fx[k]));
   for (const f of c.sets_flags ?? []) p.flags[f] = true;
   for (const f of c.clears_flags ?? []) delete p.flags[f];
   const w = outcomeWeights(p, ev, c);
-  const r = w.reduce((s, x, i) => s + (c.outcomes[i].ok ? x : 0), 0) / w.reduce((s, x) => s + x, 0);
+  return w.reduce((s, x, i) => s + (c.outcomes[i].ok ? x : 0), 0) / w.reduce((s, x) => s + x, 0);
+}
+export function successPct(st, c, ev = null) {
+  const r = successP(st, c, ev);
   return Math.max(PCT_STEP, Math.min(100 - PCT_STEP, Math.round((r * 100) / PCT_STEP) * PCT_STEP));
 }
 
@@ -1432,6 +1438,11 @@ function drawCard(st) {
     }
     if (card.kind === 'warn') st.pending = { warn: true, choices: card.choices };
     if (card.kind === 'memory') st.pending = { memory: true, choices: card.choices };
+    // ปุ่มสร้างตอนการ์ดออก ไม่ใช่ตอนเข้าคิว — ขั้นที่เห็นต้องเป็นขั้นปัจจุบัน
+    if (card.kind === 'upgrade') {
+      Object.assign(card, { title: SKILL_UP.title, text: SKILL_UP.text, ...upgradeOffer(st.skills) });
+      st.pending = { upgrade: true, choices: card.choices };
+    }
     return emit(st, card);
   }
   for (;;) {
@@ -1859,6 +1870,16 @@ export function choose(st, idx, loan) {
     st.lastImage = ev.choices[idx];
     return;
   }
+  // ปุ่มสุดท้าย = ผ่าน · ไม่ดึงเลขสุ่ม
+  if (ev?.upgrade) {
+    const s = st.skills[idx];
+    if (!s && idx !== st.skills.length) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    if (s && s.lv >= SKILL.top) throw new Error('ตัวเลือกนี้ล็อกอยู่');
+    st.pending = null;
+    if (s) st.skills = st.skills.map((x) => (x === s ? { ...x, lv: skillUp(x.lv, x.cap) } : x));
+    st.log.push({ id: 'upgrade', age: st.age, choice: idx, text: ev.choices[idx] });
+    return;
+  }
   if (ev?.entry) {
     if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
@@ -1877,6 +1898,7 @@ export function choose(st, idx, loan) {
         // ค่าจริงของชีวิตนี้ตอนข้าม (B136) — ผลในต่างโลกสะท้อนกลับชุดนี้ แล้ว tripBack เขียนลง st
         real: realAt(st),
         hints: st.content.nearHints,
+        carry: st.skills ?? [],
         overlapStage: overlapStageOf(st),
       });
       return;
@@ -1923,8 +1945,9 @@ export function choose(st, idx, loan) {
   // ตัวเลือกตรงไม่มีการ์ดผล — ของที่ได้เล่าเป็นการ์ดผลใบเดียว (lint ห้าม loot บนตัวเลือกที่มี outcomes)
   if (gotC) after.unshift({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: gotC });
   let doom, wound;
+  let o = null;
   if (c.outcomes?.length) {
-    const o = weighted(st.rng, c.outcomes, outcomeWeights(st, ev, c));
+    o = weighted(st.rng, c.outcomes, outcomeWeights(st, ev, c));
     doom = o.effects?.die;
     // ตัวเลือกที่มีทางตาย (ห้องบอส): ชีวิตหมดจากบาดแผลทางอื่นของตัวเลือกเดียวกันก็ตายในดันเจียน ไม่ใช่ด้วยโรค
     wound = c.outcomes.find((x) => x.effects?.die)?.effects.die;
@@ -1977,6 +2000,11 @@ export function choose(st, idx, loan) {
       st.advance = false;
     }
     return;
+  }
+  // ผลที่ให้อัปเกรด (06s) → การ์ดอัปเกรดต่อจากการ์ดผล ก่อนเรื่องต่อ · ไม่ได้พกสกิลมา = ไม่มีการ์ด
+  if (st.skills?.length && (c.upgrade || o?.upgrade)) {
+    const at = after.findIndex((x) => x.kind !== 'result');
+    after.splice(at < 0 ? after.length : at, 0, { kind: 'upgrade', age: st.age, stage: stageOf(st.age) });
   }
   // เตือนต่อท้ายการ์ดผลของตัวเลือกนี้ ก่อนเรื่องต่อ — เรื่องต่อที่ทำชีวิตหมดล้างคิว การ์ดเตือนที่อยู่หลังจะไม่เคยออก
   if (!st.dead && crossedLow(st, st.health, WARN.human)) {
@@ -2123,6 +2151,8 @@ function tripBack(st) {
   st.trip = null;
   (st.trips ??= []).push(tripLineage(isk));
   tripSettle(st, isk);
+  // ตายในทริปก็เขียนกลับ — ชาติต่างโลกหลังปรโลกพกชุดนี้ต่อ
+  if (st.skills) st.skills = skillsBack(st.skills, isk);
   if (!isk.home) {
     st.tripLost = true;
     st.dead = true;

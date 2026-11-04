@@ -10,10 +10,10 @@ import { loadEvents, loadEra, loadContent, checkNames } from '../src/node/load.m
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
 import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT } from '../src/engine/career.mjs';
 import { newLife, CLASSES, SEXES, fill } from '../src/engine/life.mjs';
-import { MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
+import { CATEGORIES, MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
 import { SCENES } from '../src/engine/afterlife.mjs';
 import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenText } from '../src/engine/merit.mjs';
-import { ISEKAI_EVENTS, ISEKAI_MERIT } from '../src/engine/isekai.mjs';
+import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../src/engine/isekai.mjs';
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 
 const root = new URL('../', import.meta.url);
@@ -68,6 +68,16 @@ const controls = {
 };
 for (const [name, args] of Object.entries(controls)) if (!checkMeritTable(...args).length) fails.push(`merit-table ตัวควบคุม "${name}" ไม่ตก`);
 rows.push(['merit-table ตัวควบคุม', `${Object.keys(controls).length} แบบ`]);
+// ผลเบาชาติไทยของสกิล (06s): ของจริงผ่าน · ตัวควบคุมผิดทีละอย่างต้องตก
+const skThai = checkSkillThai(CATEGORIES);
+rows.push(['skill-thai', skThai.length ? `ตก ${skThai.length} ข้อ` : `ผ่าน (${Object.values(ISEKAI_SKILLS).filter((s) => s.thai).length} สกิล)`]);
+for (const t of skThai) fails.push(`skill-thai: ${t}`);
+const skControls = {
+  'หมวดสะกดผิด': [CATEGORIES, { ...ISEKAI_SKILLS, sword: { ...ISEKAI_SKILLS.sword, thai: { cats: ['healt'] } } }],
+  'cats ว่าง': [CATEGORIES, { ...ISEKAI_SKILLS, sword: { ...ISEKAI_SKILLS.sword, thai: { cats: [] } } }],
+  'k ติดลบ': [CATEGORIES, ISEKAI_SKILLS, -0.1],
+};
+for (const [name, args] of Object.entries(skControls)) if (!checkSkillThai(...args).length) fails.push(`skill-thai ตัวควบคุม "${name}" ไม่ตก`);
 // ขั้นค่าซ้อนทับ (โลกซ้อนทับ ใบ 09): ทุกเคสเป็นการ์ดเดียวกัน ต่างแค่ช่องนี้ — ตกต้องตกที่ช่อง overlap_stage เท่านั้น ผ่านต้องไม่มีปัญหาเลย
 const overlapCard = (extra) => ({ id: 'overlap_case_01', type: 'A', stage: 'ทำงาน', years: [2500, 2650], weight: 1, text: 'ข้อความการ์ด', ...extra, choices: [1, 2, 3, 4].map((n) => ({ text: `ทางเลือก ${n}`, merit: [{ cat: 'neutral' }] })) });
 const overlapCases = [

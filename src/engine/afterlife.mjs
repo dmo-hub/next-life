@@ -6,11 +6,11 @@ import { makeRng, mixSeed } from './rng.mjs';
 import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
-import { goalsMet } from './titles.mjs';
+import { goalsMet, titlesOf } from './titles.mjs';
 import { heirPets, letterTo } from './family.mjs';
 import { CHRONIC } from './death.mjs';
 import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf } from './life.mjs';
-import { ISEKAI, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
+import { ISEKAI, ISEKAI_SKILLS, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 import { warnPick } from './warn.mjs';
 
@@ -145,6 +145,26 @@ function sceneCard(af, ev) {
   });
 }
 
+// สกิลที่ชีวิตไทยนี้ลงคลังได้ (06s) จากตาราง content.skillMap — อ่านอย่างเดียว ไม่ดึงเลขสุ่ม
+// ตารางว่างไม่คำนวณแหล่งเลย ⇒ เนื้อยังไม่จ่ายก็เดินเท่าเดิม · เรียงตามลำดับ ISEKAI_SKILLS ให้การ์ดเหมือนกันทุกเครื่อง
+export function thaiEarn(st) {
+  const map = st.content.skillMap;
+  if (!map || Object.values(map).every((m) => !Object.keys(m).length)) return [];
+  const t = titlesOf(st);
+  const chain = st.content.focus?.chain_years ?? Infinity;
+  const src = {
+    job: st.occupation ? [st.occupation] : [],
+    title: t.titles.map((x) => x.id),
+    pattern: t.pattern ? [t.pattern.id] : [],
+    cause: isGone(st) || !st.cause ? [] : [st.cause],
+    goal: goalsMet(st, (st.estate?.money ?? 0) < 0),
+    focus: Object.keys(st.focusYears ?? {}).filter((id) => st.focusYears[id] >= chain),
+    lifeGoal: [],
+  };
+  const got = new Set(Object.entries(src).flatMap(([k, ids]) => ids.flatMap((id) => map[k]?.[id] ?? [])));
+  return Object.keys(ISEKAI_SKILLS).filter((id) => got.has(id)).map((id) => ({ id, name: ISEKAI_SKILLS[id].name, lv: 1 }));
+}
+
 function verdictCard(af) {
   const ledger = af.st.ledger;
   const x = verdictLevel(ledger);
@@ -155,6 +175,8 @@ function verdictCard(af) {
   af.thaiVerdict ??= af.verdict;
   const where = realm.id === 'human' ? 'ไปเกิดเป็นมนุษย์ทันที ไม่ต้องรอ' : `ไปภูมิ${realm.name} กำหนด ${term} ปีของภูมินั้น`;
   const back = af.from ? `ดวงวิญญาณของ${af.from.name}ถูกดึงกลับจากต่างโลกมายืนหน้าปรโลกอีกครั้ง ` : '';
+  // ชาติต่างโลกให้สกิลบนการ์ดจบของมันแล้ว — ตอนกลับมาปรโลกจึงไม่ให้ซ้ำจากชีวิตไทยเดิม
+  const earn = af.from ? [] : thaiEarn(af.st);
   return emitAfter(af, {
     kind: 'verdict',
     type: 'B',
@@ -162,6 +184,7 @@ function verdictCard(af) {
     text: `${back}เทวดาผู้ถือบัญชีชักบุญกับบาปมาดูทั้งสองฝ่าย ฝ่ายใดหนักก็ไปฝ่ายนั้น พญายมชี้ว่า${where}`,
     reckoning: reckoning(ledger),
     note: 'กติกาแฟนตาซีของเกม ได้แรงบันดาลใจจากไตรภูมิพระร่วงและคติไทย',
+    ...(earn.length && { earn }),
     choices: [],
   });
 }
@@ -240,6 +263,8 @@ function closeIsekai(af) {
   af.isekaiLives.push(isekaiLineage(isk, (af.st.gen ?? 1) + 1 + af.isekaiLives.length));
   // บัญชีเดียวของดวงวิญญาณ (B26 · B68a-2): ชาติต่างโลกที่จบแล้วเขียนกลับลง af.st.ledger ปรโลกรอบใหม่และบันทึกการกระทำ (noteDeed) จึงอ่านที่เดียวกัน
   af.st.ledger = isk.ledger;
+  // ขั้นที่อัปในชาตินี้ติดไปชาติต่างโลกถัดไป (sendToIsekai อ่าน af.st.skills)
+  if (af.st.skills) af.st.skills = skillsBack(af.st.skills, isk);
   af.from = { name: isk.name, run: isk.run, memory: isekaiMemory(isk), real: isk.real };
   af.isekai = null;
   af.path = null;
@@ -268,6 +293,8 @@ function sendToIsekai(af) {
     // ค่าโลกจริงตอนข้าม (B100) — รอบต่างโลกติดกันใช้ค่าจริงที่สะท้อนมาจากรอบก่อน
     real: prev?.real ?? realAt(af.st),
     hints: af.st.content.nearHints,
+    // ชุดที่พกตอนเกิดชีวิตไทยนี้ ใช้ต่อทุกชาติต่างโลกที่ตามมาจนเกิดใหม่ (06s)
+    carry: af.st.skills ?? [],
     // โลกจำของที่ชาติต่างโลกก่อน ๆ ทั้งเซฟสร้างไว้ (B68h) — รวมชาติที่เพิ่งจบในช่วงนี้ซึ่งยังไม่ลงผังของชาติไทย
     // ทริปไปกลับของชาตินี้ (B68m) ยังไม่ลงผัง — ส่งเป็นแถวชั่วคราว
     lore: isekaiWorldLore([...(af.st.lineage ?? []), { trips: af.st.trips }, ...af.isekaiLives]),
@@ -519,10 +546,10 @@ function makeHeir(af, r) {
   };
 }
 
-// รุ่นถัดไป: ชีวิตใหม่จาก heir ที่การ์ดส่งต่อสร้างไว้
-export function nextLife(af) {
+// รุ่นถัดไป: ชีวิตใหม่จาก heir ที่การ์ดส่งต่อสร้างไว้ · carry = id สกิลที่ผู้เล่นเลือกพกจากคลัง (06s · bookCarryOffers) · book = คลังของผู้เล่น ให้การ์ดอัปเกรดรู้ขั้นคลัง
+export function nextLife(af, carry = [], book = {}) {
   if (!af.heir) throw new Error('ยังไม่ถึงการ์ดส่งต่อ');
-  return newLife(af.heir.seed, af.st.content, af.heir);
+  return newLife(af.heir.seed, af.st.content, { ...af.heir, skills: carryPick(carry, book) });
 }
 
 // harness/หน้าเว็บเดินช่วงที่ 7 ด้วยฟังก์ชันชุดเดียวกัน · บอทได้ af (มี pending.choices ให้อ่านป้ายบุญบาปแบบเดียวกับการ์ดชีวิต)

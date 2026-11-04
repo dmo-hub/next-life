@@ -39,18 +39,72 @@ export const GODDESS_VOWS = [
 const ISEKAI_SALT = 0x15e4a1;
 
 export const ISEKAI_SKILLS = {
-  appraise: { name: 'ประเมินค่า', desc: 'มองทะลุของและคน · ตัวเลือกสายสังเกต +20%', tag: 'appraise' },
-  storage: { name: 'กล่องมิติไร้ขีดจำกัด', desc: 'เก็บได้ทุกอย่าง · ค้าขาย +20% · ได้ทองเพิ่มครึ่งเท่า', tag: 'trade' },
-  allmagic: { name: 'เวททุกธาตุ', desc: 'ร่ายได้ครบไฟ น้ำ ลม ดิน แสง มืด · ตัวเลือกเวท +20%', tag: 'magic' },
-  sword: { name: 'วิชาดาบศักดิ์สิทธิ์', desc: 'ดาบเดียวผ่าภูเขา · ตัวเลือกต่อสู้ +20%', tag: 'fight' },
-  tongue: { name: 'ลิ้นทองเทวี', desc: 'พูดได้ทุกภาษา คนฟังแล้วเคลิ้ม · ตัวเลือกเจรจา +20%', tag: 'talk' },
-  cook: { name: 'ฝีมือครัวจากโลกเดิม', desc: 'รสมือแม่ค้าตลาดนัด · ตัวเลือกทำอาหาร +25%', tag: 'cook', add: 25 },
+  appraise: { name: 'ประเมินค่า', desc: 'มองทะลุของและคน · ตัวเลือกสายสังเกต +20%', tag: 'appraise', thai: { cats: ['work_money'] } },
+  storage: { name: 'กล่องมิติไร้ขีดจำกัด', desc: 'เก็บได้ทุกอย่าง · ค้าขาย +20% · ได้ทองเพิ่มครึ่งเท่า', tag: 'trade', thai: { cats: ['work_money'] } },
+  allmagic: { name: 'เวททุกธาตุ', desc: 'ร่ายได้ครบไฟ น้ำ ลม ดิน แสง มืด · ตัวเลือกเวท +20%', tag: 'magic', thai: { cats: ['study'] } },
+  sword: { name: 'วิชาดาบศักดิ์สิทธิ์', desc: 'ดาบเดียวผ่าภูเขา · ตัวเลือกต่อสู้ +20%', tag: 'fight', thai: { cats: ['health'] } },
+  tongue: { name: 'ลิ้นทองเทวี', desc: 'พูดได้ทุกภาษา คนฟังแล้วเคลิ้ม · ตัวเลือกเจรจา +20%', tag: 'talk', thai: { cats: ['society'] } },
+  cook: { name: 'ฝีมือครัวจากโลกเดิม', desc: 'รสมือแม่ค้าตลาดนัด · ตัวเลือกทำอาหาร +25%', tag: 'cook', add: 25, thai: { cats: ['family'] } },
   stealth: { name: 'ซ่อนตัวระดับเทพ', desc: 'ไม่มีใครสังเกตเห็น · ตัวเลือกแอบ/หนี +20%', tag: 'sneak' },
-  regen: { name: 'ฟื้นฟูอัตโนมัติ', desc: 'ชีวิตฟื้น +6 ทุกเหตุการณ์' },
-  exp: { name: 'ประสบการณ์ ×2', desc: 'ค่าสถานะที่ได้เพิ่มเป็นสองเท่า' },
+  regen: { name: 'ฟื้นฟูอัตโนมัติ', desc: 'ชีวิตฟื้น +6 ทุกเหตุการณ์', thai: { cats: ['health'] } },
+  exp: { name: 'ประสบการณ์ ×2', desc: 'ค่าสถานะที่ได้เพิ่มเป็นสองเท่า', thai: { cats: ['study', 'work_money'] } },
   luck: { name: 'โชคเทพธิดา', desc: 'โชค +15 ตั้งแต่เกิด' },
   rbd: { name: 'ย้อนเวลาเมื่อตาย', desc: 'ตายครั้งแรกเวลาจะย้อนกลับ ฟื้นด้วยชีวิต 40' },
 };
+
+// สกิลข้ามชาติ (06s): carry = พกไปชาติใหม่ได้กี่อย่าง · top = ขั้นสูงสุด · step = โอกาสที่เพิ่มต่อขั้นที่เกินขั้น 1
+// ขั้น 1 ได้ค่าเดิมของสกิล ⇒ ชาติที่ไม่มีการอัปเกรดเดินเท่าก่อนมีขั้น
+export const SKILL = { carry: 3, top: 3, step: 10 };
+// ผลเบาชาติไทย: ชาติไทยไม่มีแท็กตัวเลือกให้สกิลจับ ⇒ เอียงทั้งหมวดการ์ดแทน — ทาง ok ของการ์ดหมวดที่ตรงคูณ 1 + k × ผลรวมขั้นของสกิลที่ตรง
+// (ยังโดนเพดาน okMax · ไม่ดึงเลขสุ่ม) · k = 0.1 ≈ +2–3 จุดต่อหมวดที่ขั้น 1 — เบาพอไม่ทำให้ชีวิตยาวขึ้น (วัดด้วย harness/skills.mjs)
+export const THAI_SKILL = { k: 0.1 };
+export function thaiSkillMul(skills, cat, k = THAI_SKILL.k) {
+  if (!k || !cat || !skills?.length) return 1;
+  let lv = 0;
+  for (const s of skills) if (ISEKAI_SKILLS[s.id]?.thai?.cats.includes(cat)) lv += s.lv;
+  return 1 + k * lv;
+}
+// หมวดของผลเบาอยู่ในแกน ไม่ผ่านด่านเนื้อหา — lint-test ตรวจกับรายการหมวดของด่าน (หมวดสะกดผิด = ผลเบาเงียบหาย)
+export function checkSkillThai(cats, skills = ISEKAI_SKILLS, k = THAI_SKILL.k) {
+  const out = [];
+  if (!(k >= 0)) out.push(`THAI_SKILL.k ต้องไม่ติดลบ (ได้ ${k})`);
+  for (const [id, s] of Object.entries(skills)) {
+    if (s.thai === undefined) continue;
+    if (!Array.isArray(s.thai?.cats) || !s.thai.cats.length) { out.push(`${id}: thai.cats ต้องเป็นรายการหมวดอย่างน้อย 1`); continue; }
+    for (const c of s.thai.cats) if (!cats.includes(c)) out.push(`${id}: ไม่รู้จักหมวด ${c}`);
+  }
+  return out;
+}
+const skillLv = (isk, s) => isk.lv?.[s] ?? 1;
+const skillAdd = (isk, s) => (ISEKAI_SKILLS[s].add ?? 20) + SKILL.step * (skillLv(isk, s) - 1);
+// คลังสกิลอยู่ในเครื่องผู้เล่นแบบสมุดฉายา (UI เก็บ ไม่อยู่ในเซฟ) — แกนแค่คำนวณ · จำขั้นสูงสุดที่เคยถึง ไม่ลด
+// ลงซ้ำ = +1 ขั้น · ลงด้วยขั้นที่อัปถึงในชาติ (lv) สูงกว่า = ได้ขั้นนั้น
+export function skillBookAdd(book, id, lv = 1) {
+  if (!ISEKAI_SKILLS[id]) throw new Error(`ไม่รู้จักสกิล ${id}`);
+  const was = book?.[id] ?? 0;
+  const to = Math.min(SKILL.top, Math.max(was ? was + 1 : 1, lv));
+  return { book: { ...book, [id]: to }, up: to > was };
+}
+export const bookCarryOffers = (book) => Object.keys(ISEKAI_SKILLS).filter((id) => book?.[id] > 0).map((id) => ({ id, name: ISEKAI_SKILLS[id].name, desc: ISEKAI_SKILLS[id].desc, lv: book[id] }));
+// ชุดที่พกไปชาติใหม่ · ทุกตัวเริ่มขั้น 1 แม้คลังจำขั้นสูงกว่า (isd-1) · cap = ขั้นในคลังที่การ์ดอัปเกรดเร่งไปถึงได้ เก็บเฉพาะ > 1
+export function carryPick(ids = [], book = {}) {
+  if (ids.length > SKILL.carry) throw new Error(`พกได้ไม่เกิน ${SKILL.carry} อย่าง`);
+  if (new Set(ids).size !== ids.length) throw new Error('พกสกิลซ้ำ');
+  for (const id of ids) if (!ISEKAI_SKILLS[id]) throw new Error(`ไม่รู้จักสกิล ${id}`);
+  return ids.map((id) => ({ id, lv: 1, ...(book?.[id] > 1 && { cap: Math.min(SKILL.top, book[id]) }) }));
+}
+// อัปเกรดหนึ่งครั้ง: ยังต่ำกว่าขั้นในคลัง = ขึ้นทีละ 2 แต่ไม่เกินขั้นคลัง (Q2 ก) · ถึงแล้วขึ้นทีละ 1
+export const skillUp = (lv, cap = 1) => Math.min(SKILL.top, lv < cap ? Math.min(cap, lv + 2) : lv + 1);
+export const SKILL_UP = { title: 'ฝีมือที่คมขึ้น', text: 'เรื่องที่ผ่านมาทำให้ของที่ติดตัวมาคมขึ้นอีกขั้น จะฝึกอย่างไหน', pass: 'ยังไม่ฝึกตอนนี้', top: 'ขั้นสูงสุดแล้ว' };
+// ปุ่มการ์ดอัปเกรด = สกิลที่ถือเรียงตามลำดับที่ได้ + ปุ่มผ่านท้ายสุด · ขั้นสูงสุดแล้ว = ล็อก ⇒ ปุ่มผ่านกดได้เสมอ การ์ดไม่ค้าง
+export const upgradeOffer = (held) => ({
+  choices: [...held.map((s) => `${ISEKAI_SKILLS[s.id].name} · ขั้น ${s.lv}${s.lv < SKILL.top ? ` → ${skillUp(s.lv, s.cap)}` : ''}`), SKILL_UP.pass],
+  desc: [...held.map((s) => ISEKAI_SKILLS[s.id].desc), ''],
+  fx: [...held.map(() => ''), ''],
+  locked: [...held.map((s) => (s.lv >= SKILL.top ? SKILL_UP.top : null)), null],
+});
+// ขั้นที่อัปในชาติต่างโลกกลับลงชุดที่พกของชีวิตไทย — ชาติต่างโลกถัดไป/ช่วงที่เหลือของชีวิตไทยใช้ขั้นนั้นต่อ · ของขวัญประจำชาติไม่ติดกลับ
+export const skillsBack = (skills, isk) => skills.map((s) => ({ ...s, lv: skillLv(isk, s.id) }));
 
 export const ISEKAI_WORLDS = {
   hero: {
@@ -1554,7 +1608,8 @@ export function entryCard(st, stage) {
 // trip = ไปกลับกลางชีวิต (B68m · tripRoll + age/wit จากชีวิตไทย) — ข้ามห้องสีขาว บทบาทมาจากการทอย เริ่มที่อายุไทย เลือกกลับบนการ์ดทางกลับ = จบแบบกลับบ้าน
 // legends = คนต่างโลกรุ่นก่อนที่แต่ละโลกจำชื่อได้ ({ world: [{ name, ending, dark }] } จาก isekaiWorldLegends)
 // legacy = เริ่มด้วยแฟ้มบทบาท 4 โลกเดิม — เส้นทดสอบของ harness เท่านั้น (ผู้เล่นใหม่เข้าไม่ได้) จนกว่าการ์ด 4 โลกจะถูกลบ (06c)
-export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null, hints = null, legacy = false, overlapStage = 0 }) {
+// carry = สกิลที่พกมาจากชีวิตไทยของดวงวิญญาณนี้ [{ id, lv }] (06s) — ของขวัญของชาติสุ่มจากที่เหลือ
+export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null, hints = null, legacy = false, carry = [], overlapStage = 0 }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
   const vow = blessed ? GODDESS_VOWS[(seed >>> 0) % GODDESS_VOWS.length].id : null;
@@ -1562,8 +1617,12 @@ export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null
     rng, karma, past, run, memory, blessed, fated, ledger, vow, vowKept: null, vowHit: false,
     real: real && { ...real, stats: { ...real.stats } },
     worldOffers: legacy ? isekaiRoleOffers(rng, karma, ISEKAI.worlds + (blessed ? 1 : 0)) : contOffers(rng, CONT_LIFE.offers + (blessed ? 1 : 0)),
-    skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).slice(0, sk),
-    role: null, world: null, name: '', skills: [], st: null, inner: null, flags: {},
+    // สับทั้งรายการก่อนกรองของที่พกมา — เลขสุ่มที่ใช้เท่ากันไม่ว่าพกอะไร
+    skillOffers: isekaiShuffle(rng, Object.keys(ISEKAI_SKILLS)).filter((s) => !carry.some((c) => c.id === s)).slice(0, sk),
+    role: null, world: null, name: '', skills: carry.map((c) => c.id), st: null, inner: null, flags: {},
+    // isk.lv เก็บเฉพาะสกิลที่เกินขั้น 1 — ชาติที่ไม่มีการอัปเกรด state เท่าก่อนมีขั้น (lifehash)
+    ...(carry.some((c) => c.lv > 1) && { lv: Object.fromEntries(carry.filter((c) => c.lv > 1).map((c) => [c.id, c.lv])) }),
+    ...(carry.some((c) => c.cap > 1) && { cap: Object.fromEntries(carry.filter((c) => c.cap > 1).map((c) => [c.id, c.cap])) }),
     know: null, knowLast: null, loreAll: lore, worldLore: [], lore: [],
     legendAll: legends, worldLegends: [], legend: null, fameDark: 0, potions: [], lifeAdd: 0,
     age: 0, focus: null, focusOffers: [], stageShown: null, due: null, used: [], later: [], finaleDone: false,
@@ -1624,7 +1683,7 @@ export function isekaiChance(isk, c, withSkills = true) {
   if (!c.stat && !c.know) return null;
   const base = c.know ? isk.know[c.know] + isk.inner.wit * ISEKAI_KNOW_T.wit : isk.st[c.stat];
   let v = 50 + (base - isekaiDc(isk, c)) * 4;
-  if (withSkills) for (const s of isekaiAids(isk, c)) v += ISEKAI_SKILLS[s].add ?? 20;
+  if (withSkills) for (const s of isekaiAids(isk, c)) v += skillAdd(isk, s);
   for (const b of [c.bonus, c.bonus2]) if (b && isk.flags[b.flag]) v += b.add;
   if (c.stat === 'cha') v += isekaiFameCha(isk);
   return isekaiClamp(Math.round(v), 5, 95);
@@ -1692,6 +1751,8 @@ function isekaiBegin(isk, r) {
   for (const k of Object.keys(ISEKAI_STAT)) isk.st[k] = Math.max(1, r.stat[k] + shift);
   if (isk.memory) isk.st[isk.memory] += ISEKAI.memory;
   if (isk.fated) isk.st.luk += GODDESS.fatedLuck;
+  // โชคเทพธิดาที่พกมาได้ผลตั้งแต่เกิดแบบเดียวกับเลือกเป็นของขวัญ (ของขวัญกรองตัวที่พกออกแล้ว ไม่บวกซ้ำ)
+  if (isekaiHas(isk, 'luck')) isk.st.luk += 15;
   isk.inner = { joy: ISEKAI_TIME.joy, wit: ISEKAI_TIME.wit };
   isk.know = Object.fromEntries(Object.keys(ISEKAI_KNOW).map((k) => [k, 0]));
   isk.worldLore = isk.loreAll[isk.world] ?? [];
@@ -2022,8 +2083,12 @@ export function nextIsekaiCard(isk) {
   }
   if (isk.step === 'result') {
     const r = isk.last;
-    isk.step = 'tick';
+    isk.step = isk.up ? 'upgrade' : 'tick';
     return isekaiCard(isk, { step: 'result', title: r.title, text: r.text, age: isk.age, ok: r.ok, stat: r.stat, deltas: r.deltas, sys: r.sys, choices: [] });
+  }
+  // ค้างที่ step นี้จนเลือก (เซฟกลางการ์ดกลับมาใบเดิม) · ไม่ดึงเลขสุ่ม
+  if (isk.step === 'upgrade') {
+    return isekaiCard(isk, { step: 'upgrade', title: SKILL_UP.title, text: SKILL_UP.text, age: isk.age, ...upgradeOffer(isk.skills.map((id) => ({ id, lv: skillLv(isk, id), cap: isk.cap?.[id] }))) });
   }
   if (isk.step === 'over') throw new Error('ชาติต่างโลกจบแล้ว — ปรโลกรับช่วงต่อ');
   if (isk.step === 'tick' && isk.court) return isekaiCourtCard(isk);
@@ -2074,6 +2139,8 @@ export function nextIsekaiCard(isk) {
       ...(isk.lore.length && { lore: isk.lore.map((id) => ISEKAI_LORE[id]) }),
       // ชาตินี้จะอยู่ในตำนานของโลกนี้ (B68i) — ช่องเฉพาะชาติที่ดังถึงเกณฑ์
       ...(isk.legend && { legend: { name: isk.legend.name, dark: isk.legend.dark } }),
+      // สกิลที่ถือตอนจบให้ผู้เล่นเลือกลงคลัง 1 อย่าง (06s) — UI เรียก skillBookAdd เอง การ์ดไม่เปลี่ยนสถานะเกม
+      ...(isk.skills.length && { earn: isk.skills.map((id) => ({ id, name: ISEKAI_SKILLS[id].name, lv: skillLv(isk, id) })) }),
     });
   }
   const stage = isekaiStageOf(isk);
@@ -2229,6 +2296,16 @@ export function chooseIsekai(isk, idx) {
     isk.step = 'tick';
     return;
   }
+  // ปุ่มสุดท้าย = ผ่าน · isk.up ลบทิ้งไม่ตั้ง false ให้ state หลังการ์ดเท่ากับชาติที่ไม่เคยได้การ์ดนี้
+  if (isk.step === 'upgrade') {
+    const id = isk.skills[idx];
+    if (!id && idx !== isk.skills.length) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    if (id && skillLv(isk, id) >= SKILL.top) throw new Error('ตัวเลือกนี้ล็อกอยู่');
+    if (id) (isk.lv ??= {})[id] = skillUp(skillLv(isk, id), isk.cap?.[id]);
+    delete isk.up;
+    isk.step = 'tick';
+    return;
+  }
   if (isk.step !== 'event') throw new Error('การ์ดนี้ไม่มีตัวเลือก');
   const ev = isekaiById[isk.due];
   const c = ev.choices[idx];
@@ -2296,6 +2373,8 @@ export function chooseIsekai(isk, idx) {
     } else isk.dead = true;
   }
   isekaiWarnCheck(isk);
+  // ผลที่ให้อัปเกรด (06s) → การ์ดอัปเกรดต่อจากใบผล · ตายในผลนี้ไม่มีให้ฝึกต่อ
+  if (out.upgrade && !isk.dead && isk.skills.length) isk.up = true;
   // ฉากเด่นบนการ์ดจบ: ผลที่ขยับค่ามากสุด · ทองหารห้าสิบให้ชั่งกับค่าอื่นได้ · สกิลช่วยไว้/ตายนับเพิ่ม
   const weight = Object.entries(deltas).reduce((s, [k, v]) => s + Math.abs(k === 'gold' ? v / 50 : v), 0) + (aid ? 10 : 0) + (isk.dead ? 50 : 0);
   (isk.marks ??= []).push({ text: `${title} · ${said}`, weight });

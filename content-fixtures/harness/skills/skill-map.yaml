@@ -1,0 +1,14 @@
+# ตารางสกิลทดสอบของ 06s — ให้ harness/skills.mjs เดินทางลงคลังจากชีวิตไทยได้ระหว่างที่ content/rules/skill-map.yaml ยังว่าง
+# อยู่นอก content/ จึงไม่เข้าเกม · โหลดผ่าน loadSkillMap ตัวเดียวกับของจริง (ผิดรูป = harness ล้มตั้งแต่โหลด)
+# แหล่งเลือกให้ชีวิตบอทเข้าได้บ่อยพอวัด ไม่ได้เสนอเป็นเนื้อจริง
+job:
+  farmer: [sword]
+  labor: [regen]
+  service: [tongue]
+  clerk: [storage]
+  professional: [allmagic]
+  manager: [appraise]
+cause:
+  accident: [stealth]
+  heart: [exp]
+  cancer: [cook]
