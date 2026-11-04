@@ -640,22 +640,32 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
   .scene { height:64px; }
   .choice .fx span { white-space:normal; }
 }
-/* เลย์เอาต์คอม (ui-redo ใบ 09 · เจ้าของเคาะราวซ้าย + ลิ้นชัก): จอกว้างแถบเมนูล่างกลายเป็นราวซ้ายค้าง · แผงเปิดเป็นลิ้นชักขวาเต็มความสูง ไม่มีแผงเปิดค้าง
+/* เลย์เอาต์คอม (ui-redo ใบ 09 · เจ้าของเคาะราวซ้าย + ลิ้นชัก): จอกว้างแถบเมนูล่างกลายเป็นราวซ้ายค้าง · แผงเปิดเป็นลิ้นชักขวาเต็มความสูง (จอกว้างมากเป็นแผงค้าง ใบ 67 ด้านล่าง)
    · มือถือแนวนอนเตี้ยใช้ราวแคบด้วย — แถบล่าง 60px กินหนึ่งในหกของจอสูง 360 · ราวกว้างเพิ่มตามรอยบากฝั่งซ้าย ป้ายปุ่มจึงไม่ถูกบีบ */
 @media (min-width: 1024px), (orientation: landscape) and (max-height: 540px) {
-  :root { --rail-w:calc(220px + env(safe-area-inset-left)); }
+  :root { --rail-w:calc(220px + env(safe-area-inset-left)); --sheet-w:420px; }
   body:has(.mnav) { padding-bottom:0; padding-left:var(--rail-w); }
   .mnav { top:0; right:auto; width:var(--rail-w); max-width:none; flex-direction:column; gap:4px; margin:0; padding:max(16px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left)); border-top:0; border-right:1px solid var(--rule2); box-shadow:4px 0 16px rgb(0 0 0 / .06); }
   .mnav button { flex:none; flex-direction:row; justify-content:flex-start; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
   .mnav button:hover { background:var(--paper2); }
   .mnav button[aria-expanded="true"] { background:var(--paper2); box-shadow:inset 3px 0 0 var(--fl); }
   .mnav .new-dot { position:static; margin-left:6px; }
-  .sheet { top:0; bottom:0; left:auto; width:min(420px, 100vw - var(--rail-w)); max-width:none; max-height:none; margin:0; padding-right:max(20px, env(safe-area-inset-right)); border-left:1px solid var(--rule2); border-radius:0; box-shadow:-10px 0 30px rgb(0 0 0 / .2); }
+  .sheet { top:0; bottom:0; left:auto; width:min(var(--sheet-w), 100vw - var(--rail-w)); max-width:none; max-height:none; margin:0; padding-right:max(20px, env(safe-area-inset-right)); border-left:1px solid var(--rule2); border-radius:0; box-shadow:-10px 0 30px rgb(0 0 0 / .2); }
 }
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --rail-w:calc(96px + env(safe-area-inset-left)); }
   .mnav { gap:2px; padding:max(8px, env(safe-area-inset-top)) 6px max(8px, env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left)); }
   .mnav button { justify-content:center; min-height:44px; padding:0 4px; font-size:13px; }
+}
+/* ราว/แผงเริ่มใต้หัวเว็บ (ui-redo ใบ 67 · เจ้าของเลือกจากภาพ): หัวเว็บกว้างเต็มจอทับช่องราว · --hd = ขอบล่างหัวที่วัดขณะเลื่อน เลื่อนพ้นแล้วชิดบน
+   · มือถือแนวนอนเตี้ยคงราวเต็มสูงแบบเดิม (หัวบางอยู่แล้ว) */
+@media (min-width: 1024px) {
+  body:has(.mnav) .logo { margin-left:calc(-1 * var(--rail-w)); }
+  .mnav, .sheet { top:var(--hd, 0px); }
+  /* แผงค้าง (เกณฑ์ความกว้างอยู่ที่ PIN_MQ ใน app.mjs): การ์ดเลื่อนไปช่องกลางระหว่างราวกับแผง ไม่ถูกบัง · ไม่มีเงาลิ้นชัก ไม่เลื่อนเข้า */
+  body:has(.sheet.pin) { padding-right:var(--sheet-w); }
+  body:has(.sheet.pin) .logo { margin-right:calc(-1 * var(--sheet-w)); }
+  .sheet.pin { box-shadow:none; animation:none; }
 }
 @media (prefers-reduced-motion: no-preference) and (min-width: 1024px), (prefers-reduced-motion: no-preference) and (orientation: landscape) and (max-height: 540px) {
   .sheet { animation:drw .2s ease-out; }
