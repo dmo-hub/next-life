@@ -19,7 +19,7 @@ const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'focus', 'run'],
+  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
@@ -499,6 +499,15 @@ export const rules = [
       if (e.herald_of === undefined) return;
       if (typeof e.herald_of !== 'string' || !ctx.eras.has(e.herald_of)) r('.herald_of', `ไม่มีเหตุการณ์บ้านเมือง "${e.herald_of}" (${[...ctx.eras].join(' ')})`);
       if (['weight', 'at_age', 'era', 'repeat', 'prelude', 'first_of'].some((k) => e[k] !== undefined)) r('.herald_of', 'ใบลางห้ามมี weight/at_age/era/repeat/prelude/first_of — ออกได้ทางเดียวคือปีก่อนภัย');
+    },
+  },
+  {
+    id: 'ambient-shape',
+    desc: 'ambient = true เท่านั้น · การ์ดบรรยากาศที่แบบชีวิต (titles picksAfter) ไม่นับ — ต้องเป็นการ์ดกองสุ่ม (มี weight) ไม่ใช่ใบลาง',
+    event(e, ctx, r) {
+      if (e.ambient === undefined) return;
+      if (e.ambient !== true) r('.ambient', `ambient ต้องเป็น true (ได้ ${JSON.stringify(e.ambient)}) — ไม่ใช่ ambient ให้ลบช่องออก`);
+      if (e.weight === undefined || e.herald_of !== undefined) r('.ambient', 'การ์ดบรรยากาศต้องมี weight และไม่ใช่ใบลาง (herald_of ข้ามแบบชีวิตอยู่แล้ว)');
     },
   },
   {

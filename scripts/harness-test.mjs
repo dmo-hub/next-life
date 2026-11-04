@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT } from '../src/engine/index.mjs';
+import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
@@ -704,6 +704,24 @@ const f2 = (v) => v.toFixed(2);
     oldDetail = `ค้าง ${held.length} ใบ · เล่นต่อจบอายุ ${age}`;
   }
   check('ป้ายหมวดการ์ดผล: เซฟเก่าโหลดได้ การ์ดค้างตกหมวดกลาง', oldOk, oldDetail);
+}
+
+// ใบ 133 การ์ดบรรยากาศ (ambient): เลือกแล้วต้องไม่เข้าแกนแบบชีวิต (picksAfter) · ชีวิตเดียวกันเล่นทั้งสองชุด
+// ตัวควบคุม: ถอด ambient ⇒ ตัวเลือกของการ์ดชุดเดียวกันต้องโผล่ใน picksAfter ไม่งั้นข้อแรกผ่านเพราะการ์ดไม่ออก
+{
+  const base = loadContent();
+  const ids = new Set(base.events.filter((e) => e.ambient).map((e) => e.id));
+  const bare = { ...base, events: base.events.map((e) => (e.ambient ? { ...e, ambient: undefined } : e)) };
+  let seen = 0, kept = 0, ctl = 0;
+  for (let i = 0; i < 60; i++) {
+    const s = mixSeed(0x133a, i);
+    const a = playLife(s, base, random).state;
+    seen += a.log.filter((l) => ids.has(l.id)).length;
+    kept += picksAfter(a, 0).filter((p) => ids.has(p.ev?.id)).length;
+    ctl += picksAfter(playLife(s, bare, random).state, 0).filter((p) => ids.has(p.ev?.id)).length;
+  }
+  check('ใบ 133 การ์ด ambient ไม่ถูกนับในแบบชีวิต', ids.size > 0 && seen > 0 && kept === 0, `${ids.size} ใบ · เลือก ${seen} ครั้ง · นับเข้า ${kept}`);
+  check('ใบ 133 ตัวควบคุม: ถอด ambient ⇒ นับเข้าแบบชีวิต', ctl > 0, `นับเข้า ${ctl}`);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
