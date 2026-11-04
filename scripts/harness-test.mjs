@@ -668,6 +668,44 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 159 เซฟเก่าชีวิตแรกไม่มีช่องความจำ', !('past' in o1));
 }
 
+// ป้ายหมวดการ์ดผล (ui-redo 60): ทุกการ์ดผลทุกแหล่งมีป้ายในรายการ · หมวดกลาง ≤ ครึ่ง · ผลตัวเลือกพกเหตุการณ์ต้นทาง
+// เซฟเก่า (การ์ดค้างไม่มีป้าย) โหลดได้ และจออ่านเป็นหมวดกลาง
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const n = {};
+  let bad = 0, total = 0, noEv = 0, snap = null;
+  const see = (c, st) => {
+    if (c.kind !== 'result') return;
+    total++;
+    if (!E.RESULT_TAGS.includes(c.tag)) bad++;
+    else n[c.tag] = (n[c.tag] ?? 0) + 1;
+    // เสี่ยงของโฟกัสได้ทิศจากผลค่าด้วย แต่ไม่ได้มาจากการ์ดเลือก จึงไม่มีต้นทาง
+    if (['good', 'bad', E.TAG_MID, 'loot'].includes(c.tag) && !c.focusRisk && !c.evId) noEv++;
+    // เซฟแบบก่อนใบนี้: ลบป้ายจากภาพถ่ายทั้งก้อน — ถ่ายตอนยังมีการ์ดผลรอในคิว
+    if (!snap && st?.queue?.some((x) => x.kind === 'result')) snap = JSON.stringify(JSON.parse(E.snapshot({ st }, content)), (k, v) => (k === 'tag' || k === 'evId' ? undefined : v));
+  };
+  for (let i = 0; i < 60; i++) {
+    const { state } = playLife(mixSeed(60, i), content, BOTS.สุ่ม, see);
+    playAfterlife(state, BOTS.สุ่ม, (c) => see(c));
+  }
+  const mid = n[E.TAG_MID] ?? 0;
+  const top = Object.entries(n).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(' · ');
+  check('ป้ายหมวดการ์ดผล: ทุกใบมีป้ายในรายการ', total > 0 && bad === 0, `${total} ใบ · ไม่มีป้าย ${bad}`);
+  check('ป้ายหมวดการ์ดผล: หมวดกลาง ≤ ครึ่ง', mid * 2 <= total, `กลาง ${mid}/${total} · ${top}`);
+  check('ป้ายหมวดการ์ดผล: ผลตัวเลือกพก evId', noEv === 0, `ขาด ${noEv}`);
+  check('ป้ายหมวดการ์ดผล: ทิศนับเฉพาะค่าที่ไม่ซ่อน', E.fxTag({ health: -2, network: 3 }) === 'bad' && E.fxTag({ health: -2 }, ['health']) === E.TAG_MID && E.fxTag({ happiness: 1, money: -3 }) === 'good');
+  let oldOk = false, oldDetail = 'ไม่มีชีวิตที่มีการ์ดผลค้างคิว';
+  if (snap) {
+    const back = E.restore(snap, content).st;
+    const held = back.queue.filter((x) => x.kind === 'result');
+    const { age } = playLife(back.seed, content, BOTS.สุ่ม, null, back);
+    oldOk = held.length > 0 && held.every((x) => x.tag === undefined && E.resultTag(x) === E.TAG_MID) && age > 0;
+    oldDetail = `ค้าง ${held.length} ใบ · เล่นต่อจบอายุ ${age}`;
+  }
+  check('ป้ายหมวดการ์ดผล: เซฟเก่าโหลดได้ การ์ดค้างตกหมวดกลาง', oldOk, oldDetail);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {
