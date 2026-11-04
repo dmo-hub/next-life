@@ -29,13 +29,11 @@ export const GEN_PAGES = [
 export function buildSite(content, root = new URL('../../', import.meta.url), facts = siteFacts(content)) {
   const at = (p) => new URL(p, root);
   const out = [];
-  // แผนงานหน้าแรกอ่านหมวดจาก whatsnew ก่อน (ui-redo 23)
-  const cats = soonCats(readFileSync(at('docs/whatsnew.html'), 'utf8'));
   for (const name of FACT_PAGES) {
     const file = at(`docs/${name}.html`);
     const html = readFileSync(file, 'utf8');
     const filled = injectFacts(html, facts, `docs/${name}.html`);
-    const next = injectNav(name === 'index' ? injectRoadmap(filled, cats, 'docs/index.html') : filled, `${name}.html`);
+    const next = injectNav(filled, `${name}.html`);
     if (next !== html) writeFileSync(file, next);
     out.push(name);
   }
@@ -73,7 +71,8 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   }
   for (const file of NAV_PAGES) {
     const html = readFileSync(at(`docs/${file}`), 'utf8');
-    const next = injectNav(file === 'whatsnew.html' ? soonIds(html) : html, file);
+    // แถวหมวดแผนงานใต้หัวกำลังทำ (ui-redo 69) อ่านหมวดจากหน้าเดียวกัน
+    const next = injectNav(file === 'whatsnew.html' ? injectRoadmap(soonIds(html), soonCats(html), 'docs/whatsnew.html') : html, file);
     if (next !== html) writeFileSync(at(`docs/${file}`), next);
   }
   // กล่องรหัส (ui-redo 72) ฉีดท้ายสุด — หน้าที่ build สร้างใหม่ข้างบนต้องได้บล็อกด้วย · play.html (build.mjs เขียน) ไม่ติดรหัสอยู่แล้ว

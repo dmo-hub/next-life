@@ -1,4 +1,4 @@
-// แผนงานบนหน้าแรก (ui-redo 23): ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew (เจ้าของเคาะ: ไม่มีตัวเลขจำนวน) — build ดึงจาก whatsnew ทุกครั้ง ผู้รวมงานเขียนที่เดียว
+// แถวหมวดแผนงาน (ui-redo 23 · ย้ายจากหน้าแรกมาใต้หัวกำลังทำใน whatsnew เอง ui-redo 69): ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew (เจ้าของเคาะ: ไม่มีตัวเลขจำนวน) — build ดึงจาก whatsnew ทุกครั้ง ผู้รวมงานเขียนที่เดียว
 // ลิงก์ไปหัวหมวดด้วย id ที่ build เติมให้ <h3> ในหัวนั้นเอง — text fragment ใช้ไม่ได้ เพราะชื่อหมวดอย่าง "ต่างโลก" เจอในแถบบนก่อนหัวหมวด
 export const ROAD_START = '<!--ROADMAP:START-->';
 export const ROAD_END = '<!--ROADMAP:END-->';
@@ -26,7 +26,8 @@ export function soonIds(html) {
   return html.slice(0, at[0]) + part + html.slice(at[1]);
 }
 
-export const roadmapHtml = (cats) => `<ul class="road-l">${cats.map((c) => `<li><a href="whatsnew.html#${c.id}">${c.name}</a></li>`).join('')}</ul>`;
+// แถวอยู่ในหน้า whatsnew เอง ⇒ ลิงก์ #id ในหน้าเดียวกัน
+export const roadmapHtml = (cats) => `<ul class="road-l">${cats.map((c) => `<li><a href="#${c.id}">${c.name}</a></li>`).join('')}</ul>`;
 
 export function injectRoadmap(html, cats, where) {
   const a = html.indexOf(ROAD_START);

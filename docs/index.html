@@ -36,15 +36,6 @@
   .world .state { font-size: 13px; opacity: .85; }
   .world.dark a { color: #F0D78C; }
   h2 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 8px; }
-  details.sys { margin: 0 0 24px; }
-  details.sys summary { cursor: pointer; font-family: Pridi, serif; font-size: 20px; min-height: 44px; display: flex; align-items: center; }
-  details.sys summary h2 { display: inline; margin: 0; }
-  ul { padding-left: 22px; margin: 0 0 24px; }
-  .footnote { font-size: 13px; color: #4A4F5C; margin: 0 0 16px; }
-  .road { margin: 0 0 32px; }
-  .road-l { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
-  .road-l a { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 14px; background: #F4EFE3; border: 1px solid #C9BFA9; color: #1F2430; text-decoration: none; }
-  .road-l a:hover, .road-l a:focus-visible { border-color: #A23B2C; outline: none; }
   footer { font-size: 13px; color: #4A4F5C; }
   /*NAV-CSS:START*/
   nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
@@ -89,24 +80,7 @@
     </section>
   </div>
 
-  <section class="road" aria-labelledby="road-h">
-    <h2 id="road-h">กำลังทำ</h2>
-    <p class="footnote">ระบบที่ตัดสินแล้วแต่ยังไม่เข้าเกม กดหมวดเพื่ออ่านรายละเอียดในแพตช์โน้ต</p>
-    <!--ROADMAP:START--><ul class="road-l"><li><a href="whatsnew.html#soon-หน้าจอและเว็บ">หน้าจอและเว็บ</a></li><li><a href="whatsnew.html#soon-เรียน-งาน-และการเมือง">เรียน งาน และการเมือง</a></li><li><a href="whatsnew.html#soon-เงิน-ตลาด-หนี้-และประวัติติดตัว">เงิน ตลาด หนี้ และประวัติติดตัว</a></li><li><a href="whatsnew.html#soon-คนรอบตัว-คู่ชีวิต-และลูก">คนรอบตัว คู่ชีวิต และลูก</a></li><li><a href="whatsnew.html#soon-ข้ามรุ่นและตระกูล">ข้ามรุ่นและตระกูล</a></li><li><a href="whatsnew.html#soon-ผล-คำใบ้-และบทสรุป">ผล คำใบ้ และบทสรุป</a></li><li><a href="whatsnew.html#soon-ยุค-เรื่องพิเศษ-และสีสัน">ยุค เรื่องพิเศษ และสีสัน</a></li><li><a href="whatsnew.html#soon-ปรโลก">ปรโลก</a></li><li><a href="whatsnew.html#soon-ต่างโลก">ต่างโลก</a></li><li><a href="whatsnew.html#soon-โลกซ้อนทับ">โลกซ้อนทับ</a></li></ul><!--ROADMAP:END-->
-  </section>
 
-  <details class="sys"><summary><h2>ระบบหลัก</h2>&nbsp;· กดเปิด</summary>
-  <ul>
-    <li>ค่าสถานะบนจอ 4 ตัว (ชีวิต · ความสุข · ความรู้ · ความสัมพันธ์) กับเงินเป็นบาท · ตัวเลือกบอกผลแค่ทิศทาง</li>
-    <li>บางตัวเลือกมีเรื่องต่อให้เลือกอีกในปีเดียวกัน หรือย้อนกลับมาเป็นการ์ดใหม่อีกหลายปีให้หลัง · ป้ายบนตัวเลือกบอกแค่ว่ามีเรื่องตามมา</li>
-    <li>ตายตามตารางชีพจริงรายปี สุขภาพ และกรรม · ไม่มีเพดานอายุตายตัว</li>
-    <li>บัญชีบุญบาปซ่อนไว้ เฉลยที่ปรโลก · ทางลัดทุจริตบอกราคาบาปเป็นคำ ไม่บอกตัวเลข (ได้แรงบันดาลใจจากไตรภูมิพระร่วง) · กรรมตามทันได้ในชาตินี้</li>
-    <li>ครอบครัวมีชื่อ อายุ และความผูกพันรายคน ตายแล้วเกิดเป็น<span data-fact="kinNames">ลูก · หลาน · เหลน</span>ของตัวเองได้</li>
-    <li>การเงิน: เงินฝาก หุ้น ทอง ที่ดิน ธุรกิจ หนี้ · ผลตอบแทนปีอดีตใช้ค่าจริง</li>
-    <li>ชีวิต <span data-fact="patterns">22</span> แบบ ฉายา <span data-fact="titles">28</span> ตัว และฉายาตระกูล <span data-fact="familyTitles">11</span> ตัว · สมุดฉายาเก็บตัวที่เคยได้</li>
-  </ul>
-  </details>
-  <p class="footnote">เล่นต่อได้หลายรุ่น · ชีวิตที่กำลังเล่นบันทึกไว้ในเบราว์เซอร์เครื่องนี้ ปิดหน้าแล้วกลับมาเล่นต่อได้ · สมุดฉายาจำไว้ในเบราว์เซอร์เครื่องนี้ · ตายแล้วแชร์ภาพการ์ดได้ (มือถือแชร์ตรง · คอมบันทึกเป็นไฟล์) · เกม ไม่ใช่คำแนะนำการลงทุน</p>
   <footer>โปรเจกต์ส่วนตัว · ข้อมูลการเงินในเกมเป็นข้อมูลเพื่อออกแบบเกม ไม่ใช่คำแนะนำการลงทุน · แฟนตาซีในเกมได้แรงบันดาลใจจากคติไทย ไม่ได้อ้างว่าเป็นคำสอน</footer>
 </div></main>
 </body>
