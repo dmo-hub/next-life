@@ -5,7 +5,7 @@
 import { allocOptions } from './finance.mjs';
 import { meritId, SIN_CATS } from './merit.mjs';
 import { CLASSES, LEVELS, RETIRE_AGE, riskLabel, netWorth, totalDebt, standingOf, stageOf, erasShown } from './life.mjs';
-import { expectedDeathAge, eraEventsAt, protoYear } from './era.mjs';
+import { expectedDeathAge } from './era.mjs';
 import { nationalIncome } from './birth.mjs';
 import { ladderOf } from './rank.mjs';
 
@@ -278,14 +278,9 @@ export function lifeFacts(st) {
     // มีทางผิดให้เลือกแต่ไม่เลือก
     else if (p.ev.choices.some((c) => tags(c).some((t) => SIN_CATS.includes(t.id)))) declined++;
   }
-  // เหตุการณ์บ้านเมืองที่ทันตอนเป็นผู้ใหญ่ · ปีอนาคตวนปีต้นแบบ เหตุการณ์ชื่อเดียวกันจึงนับแยกตามปีที่เกิด
-  const crises = new Set();
-  for (let a = 20; a <= st.age; a++) {
-    const y = st.birthYear + a;
-    for (const e of eraEventsAt(era, st.seed, y)) if (e.kind === 'economy') crises.add(`${e.id}@${y - (protoYear(era, st.seed, y) - e.from)}`);
-  }
-  // ภัยนับเฉพาะกลุ่มที่ขึ้นการ์ดให้เห็น — ปีที่กลุ่มเหตุถูกซ่อน (ออกแล้ว/เว้นช่วง) ผู้เล่นไม่รู้ว่ารอดอะไรมา
-  const disasters = new Set(erasShown(st, st.age).filter(({ e, age }) => age >= 20 && e.kind !== 'economy').map(({ e }) => e.id));
+  // เหตุบ้านเมืองที่ทันตอนเป็นผู้ใหญ่ นับเฉพาะกลุ่มที่ขึ้นการ์ดให้เห็น — ปีที่กลุ่มเหตุถูกซ่อน (ออกแล้ว/เว้นช่วง) ผู้เล่นไม่รู้ว่ารอดอะไรมา
+  const crises = new Set(), disasters = new Set();
+  for (const { e, age } of erasShown(st, st.age)) if (age >= 20) (e.kind === 'economy' ? crises : disasters).add(e.id);
   const worth = netWorth(st);
   return {
     st,
