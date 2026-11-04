@@ -344,12 +344,14 @@ function standParts(card) {
 // จอแคบให้ตัดบรรทัดได้แค่ที่ตัวคั่น — เบราว์เซอร์ตัดคำไทยกลาง "ราย|ได้" ได้แม้เว้นวรรคแบบไม่ตัด จึงต้องห่อ span
 const metaLine = (row, parts) => parts.forEach((t, i) => row.append(...(i ? [' · '] : []), el('span', null, t)));
 
-// ป้ายแกนเงินสั้นพอวางข้างกราฟ: 15k · 1.2 ล้าน
+// ป้ายแกนเงินสั้นพอวางข้างกราฟ เป็นคำไทย: 1.5 หมื่น · 1.2 ล้าน (ผู้เล่นไม่คุ้น "k")
 function shortBaht(v) {
   const a = Math.abs(v), sign = v < 0 ? '−' : '';
   const num = (x) => String(Number(x.toFixed(x < 10 ? 1 : 0)));
   if (a >= 1e6) return `${sign}${num(a / 1e6)} ล้าน`;
-  if (a >= 1e3) return `${sign}${num(a / 1e3)}k`;
+  if (a >= 1e5) return `${sign}${num(a / 1e5)} แสน`;
+  if (a >= 1e4) return `${sign}${num(a / 1e4)} หมื่น`;
+  if (a >= 1e3) return `${sign}${num(a / 1e3)} พัน`;
   return `${sign}${Math.round(a)}`;
 }
 

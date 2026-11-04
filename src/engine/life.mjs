@@ -135,7 +135,8 @@ export function jobText(st, age = st.age) {
     if (st.school && age >= SCHOOL_FROM) return `กำลังเรียน${TRACKS[st.school].name}`;
     return age < SCHOOL_FROM ? 'ยังไม่เข้าเรียน' : 'ยังไม่ทำงาน';
   }
-  return isWorking(st, age) || age < RETIRE_AGE ? rankName(st) : `เกษียณ (เคยเป็น${rankName({ ...st, office: null })})`;
+  // เกษียณก่อนกำหนด (fx.retire ตั้ง retiredAt) ไม่ต้องรอ 60 ถึงขึ้น "เกษียณ"
+  return isWorking(st, age) || age < Math.min(RETIRE_AGE, st.retiredAt ?? Infinity) ? rankName(st) : `เกษียณ (เคยเป็น${rankName({ ...st, office: null })})`;
 }
 
 // เงินเก็บต่อปี เป็นบาทของปีนั้น: ค่าจ้างตามอาชีพ × ภาค ทั้งปี × อัตราออม (ใบ 14)
