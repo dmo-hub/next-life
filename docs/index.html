@@ -41,6 +41,11 @@
   details.sys summary h2 { display: inline; margin: 0; }
   ul { padding-left: 22px; margin: 0 0 24px; }
   .footnote { font-size: 13px; color: #4A4F5C; margin: 0 0 16px; }
+  .road { margin: 0 0 32px; }
+  .road-l { list-style: none; padding: 0; margin: 8px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+  .road-l a { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; padding: 8px 14px; background: #F4EFE3; border: 1px solid #C9BFA9; color: #1F2430; text-decoration: none; }
+  .road-l a span { flex: none; font-size: 13px; color: #4A4F5C; }
+  .road-l a:hover, .road-l a:focus-visible { border-color: #A23B2C; outline: none; }
   footer { font-size: 13px; color: #4A4F5C; }
   /*NAV-CSS:START*/
   nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
@@ -84,6 +89,12 @@
       <a class="play alt" href="worlds.html">ชาตินี้ · ปรโลก · ต่างโลก</a>
     </section>
   </div>
+
+  <section class="road" aria-labelledby="road-h">
+    <h2 id="road-h">กำลังทำ</h2>
+    <p class="footnote">ระบบที่ตัดสินแล้วแต่ยังไม่เข้าเกม แยกตามหมวด กดหมวดเพื่ออ่านรายละเอียดในแพตช์โน้ต</p>
+    <!--ROADMAP:START--><ul class="road-l"><li><a href="whatsnew.html#soon-หน้าจอและเว็บ">หน้าจอและเว็บ<span>3 เรื่อง</span></a></li><li><a href="whatsnew.html#soon-เรียน-งาน-และการเมือง">เรียน งาน และการเมือง<span>5 เรื่อง</span></a></li><li><a href="whatsnew.html#soon-เงิน-ตลาด-หนี้-และประวัติติดตัว">เงิน ตลาด หนี้ และประวัติติดตัว<span>5 เรื่อง</span></a></li><li><a href="whatsnew.html#soon-คนรอบตัว-คู่ชีวิต-และลูก">คนรอบตัว คู่ชีวิต และลูก<span>4 เรื่อง</span></a></li><li><a href="whatsnew.html#soon-ข้ามรุ่นและตระกูล">ข้ามรุ่นและตระกูล<span>4 เรื่อง</span></a></li><li><a href="whatsnew.html#soon-ผล-คำใบ้-และบทสรุป">ผล คำใบ้ และบทสรุป<span>4 เรื่อง</span></a></li><li><a href="whatsnew.html#soon-ยุค-เรื่องพิเศษ-และสีสัน">ยุค เรื่องพิเศษ และสีสัน<span>5 เรื่อง</span></a></li><li><a href="whatsnew.html#soon-ปรโลก">ปรโลก<span>7 เรื่อง</span></a></li><li><a href="whatsnew.html#soon-ต่างโลก">ต่างโลก<span>6 เรื่อง</span></a></li><li><a href="whatsnew.html#soon-โลกซ้อนทับ">โลกซ้อนทับ<span>5 เรื่อง</span></a></li></ul><!--ROADMAP:END-->
+  </section>
 
   <details class="sys"><summary><h2>ระบบหลัก</h2>&nbsp;· กดเปิด</summary>
   <ul>
