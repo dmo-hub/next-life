@@ -49,7 +49,8 @@ check('ตัวเลขบนหน้าเท่าค่าจริง', w
 // 2) ตัวควบคุม: ข้อมูลเปลี่ยน (ตัดการ์ดออก 1 ใบ · ฉายาหาย 1 ตัว) ⇒ เลขที่ฉีดต้องเปลี่ยนตาม — ไม่งั้นข้อ 1 ผ่านเพราะเขียนเลขมือตรงกันพอดี
 const less = { ...content, events: content.events.slice(1) };
 const f2 = { ...siteFacts(less), titles: String(Number(facts.titles) - 1) };
-const probe = injectFacts(read('index.html'), f2);
+// ฉายาย้ายจากหน้าแรกไปกลไกในเกม (ui-redo 69) ⇒ ตรวจสองหน้ารวมกัน
+const probe = injectFacts(read('index.html'), f2) + injectFacts(read('about.html'), f2);
 const moved = ['cards', 'titles'].every((k) => probe.includes(`data-fact="${k}">${f2[k]}<`) && f2[k] !== facts[k]);
 check('ตัวควบคุม: ข้อมูลเปลี่ยนแล้วเลขบนหน้าเปลี่ยนตาม', !moved, ` (การ์ด ${facts.cards} → ${f2.cards} · ฉายา ${facts.titles} → ${f2.titles})`);
 
@@ -292,20 +293,25 @@ const cssMiss = GAME_CSS_PAGES.filter((f) => gameCssBlock(read(f)) !== liveCss);
 const cssCtl = gameCssBlock(read(GAME_CSS_PAGES[0])) !== `${liveCss} `;
 check('หน้า tweak ใช้ CSS เกมชุดปัจจุบัน', cssMiss.length || !cssCtl, ` ${GAME_CSS_PAGES.length} หน้า${cssMiss.length ? ` · เก่า ${cssMiss.join(' ')}` : ''} · ตัวควบคุม${cssCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
-// 7d) แผนงานหน้าแรก (ui-redo 23): แถวหมวดบน index = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
+// 7d) แผนงาน (ui-redo 23 · ย้ายไป whatsnew ui-redo 69): แถวหมวดใต้หัวกำลังทำ = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
 // · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)
 // ตัวควบคุม: เติมหมวดใหม่ 1 หมวดใน whatsnew ⇒ กล่องที่คาดต้องเปลี่ยน · ถอด id หัวแรก ⇒ ลิงก์ต้องหาปลายทางไม่เจอ
 const wn = read('whatsnew.html');
 const roadCats = soonCats(wn);
 const roadIn = (html) => { const a = html.indexOf(ROAD_START); const b = html.indexOf(ROAD_END); return a < 0 || b < a ? null : html.slice(a + ROAD_START.length, b); };
-const roadNow = roadIn(read('index.html'));
+const roadNow = roadIn(wn);
+// หน้าแรกเหลือหัว + ปุ่มเล่น + การ์ดโลก + footer (ui-redo 69) — กล่องแผนงาน/ระบบหลักกลับมา = ตก
+const homeLeftIn = (html) => ['ROADMAP:START', 'class="road"', 'class="sys"', '>ระบบหลัก<', 'class="footnote"'].filter((s) => html.includes(s));
+const homeLeft = homeLeftIn(read('index.html'));
+const homeCtl = homeLeftIn(read('index.html').replace('<footer>', '<details class="sys"><summary><h2>ระบบหลัก</h2></summary></details>\n  <footer>')).length === 2;
+const coreAbout = read('about.html').includes('<h2 id="core">ระบบหลัก</h2>');
 const roadNoId = (w) => soonCats(w).filter((c) => !w.includes(`id="${c.id}"`)).map((c) => c.name);
 const relSrc = readFileSync(new URL('../scripts/rel.mjs', import.meta.url), 'utf8');
 const relSees = /\/<h3\[\\s>\]\//.test(relSrc);
 const wnMore = wn.replace('<h2>แพตช์โน้ต</h2>', '<h3>หมวดทดสอบ</h3>\n  <ul>\n    <li>x</li>\n  </ul>\n\n  <h2>แพตช์โน้ต</h2>');
 const roadCtl = roadmapHtml(soonCats(wnMore)) !== roadNow && roadNoId(wn.replace(`<h3 id="${roadCats[0]?.id}">`, '<h3>')).length === 1;
-const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'กล่องบน index ไม่ตรง whatsnew (build ใหม่)', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
-check('แผนงานหน้าแรกตรงหมวดกำลังทำใน whatsnew และลิงก์ถึงหัวหมวด', roadBad.length || !roadCtl, ` ${roadCats.length} หมวด${roadBad.length ? ` · ${roadBad.join(' | ')}` : ''} · ตัวควบคุม${roadCtl ? 'จับได้' : 'จับไม่ได้'}`);
+const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'แถวหมวดใน whatsnew ไม่ตรงหัวกำลังทำ (build ใหม่)', homeLeft.length && `หน้าแรกยังมี ${homeLeft.join(' ')}`, !coreAbout && 'about ไม่มีหัวระบบหลัก', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
+check('แถวหมวดใต้หัวกำลังทำใน whatsnew ตรงหมวดและลิงก์ถึงหัวหมวด · หน้าแรกไม่มีแผนงาน/ระบบหลัก · about มีระบบหลัก', roadBad.length || !roadCtl || !homeCtl, ` ${roadCats.length} หมวด${roadBad.length ? ` · ${roadBad.join(' | ')}` : ''} · ตัวควบคุม${roadCtl && homeCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) หน้าโลกที่เล่นได้ (three-worlds 08): บอกแค่ทางที่ผู้เล่นเห็นบนจอเสมอ — ทางลับที่เป็นเหตุสุ่ม (ทริปศาลทั้งตัว court.mjs) ห้ามมีแม้แต่คำ
 // · ทางเกิดครบทุกทางจาก PATHS · แผนภาพ 3 กล่องไม่มีป้ายบนลูกศร (svg มีแค่ <text> ชื่อฉาก) · ลิงก์ไปหน้าต่างโลก
