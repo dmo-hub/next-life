@@ -24,6 +24,7 @@ import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs'
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, PUBLIC_HIDE } from '../src/site/gate.mjs';
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
 import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsTweak } from '../src/site/docs-tweak.mjs';
+import { CARD_ART_PAGE, cardArtData, cardArtBlock, CAT_ART } from '../src/site/card-art-tweak.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -311,6 +312,21 @@ const dtMiss = [
 ];
 const dtCtl = dtBlock && JSON.stringify({ ...dtBlock, pages: dtBlock.pages.slice(1) }) !== JSON.stringify(dtNow) && !injectDocsTweak(dtHtml, dtNow, 'ctl').includes(`${DOCS_TWEAK_START}null`);
 check('หน้า tweak เว็บเอกสารมีทุกหน้าในขอบเขต', dtMiss.length || !dtCtl, ` ${dtFiles.length} หน้า${dtMiss.length ? ` · ${dtMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${dtCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7c5) หน้า tweak ภาพบนการ์ด (ui-redo 58): บล็อกในหน้า = รูปทรงจาก art.mjs + ตัวเลขหมวดในไฟล์ของ harness ตอนนี้ · ทุกหมวดมีภาพ · หมวดกลาง ≤ ครึ่ง (ข้อ 92)
+// ตัวควบคุม: ถอดหมวดแรกจากบล็อก ⇒ ต้องไม่ตรง
+const caBlock = cardArtBlock(readOr(CARD_ART_PAGE) ?? '');
+const caNow = cardArtData();
+const caCats = caNow.counts.cats;
+const caMid = caCats.find((c) => c.k === 'mid');
+const caMiss = [
+  ...(JSON.stringify(caBlock) !== JSON.stringify(caNow) ? [`ค้าง ${CARD_ART_PAGE} (build ใหม่)`] : []),
+  ...(!caMid ? ['ไม่มีหมวดกลาง mid'] : caMid.n * 2 > caNow.counts.total - caNow.counts.skipped ? [`หมวดกลางเกินครึ่ง ${caMid.n}`] : []),
+  ...Object.keys(CAT_ART).filter((k) => !caCats.some((c) => c.k === k)).map((k) => `ภาพเกิน ${k}`),
+  ...caCats.filter((c) => !c.samples.length && c.n).map((c) => `ไม่มีข้อความตัวอย่าง ${c.k}`),
+];
+const caCtl = caBlock && JSON.stringify({ ...caBlock, counts: { ...caBlock.counts, cats: caBlock.counts.cats.slice(1) } }) !== JSON.stringify(caNow);
+check('หน้า tweak ภาพบนการ์ดใช้ภาพ+ตัวเลขหมวดชุดปัจจุบัน', caMiss.length || !caCtl, ` ${caCats.length} หมวด${caMiss.length ? ` · ${caMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${caCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) แผนงาน (ui-redo 23 · ย้ายไป whatsnew ui-redo 69): แถวหมวดใต้หัวกำลังทำ = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
 // · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)

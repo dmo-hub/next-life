@@ -15,6 +15,7 @@ import { gatedFiles, injectGate, readGateHash } from './gate.mjs';
 import { injectSeo, sitemapXml, faviconSvg, SITEMAP, FAVICON_SVG } from './seo.mjs';
 import { ART_INK } from '../ui/art.mjs';
 import { DOCS_TWEAK_PAGE, docsTweakData, injectDocsTweak } from './docs-tweak.mjs';
+import { CARD_ART_PAGE, cardArtData, injectCardArt } from './card-art-tweak.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
@@ -84,6 +85,10 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   const dtNext = injectDocsTweak(dt, docsTweakData(at('docs/'), readFileSync(at('src/ui/template.html'), 'utf8')), `docs/${DOCS_TWEAK_PAGE}`);
   if (dtNext !== dt) writeFileSync(at(`docs/${DOCS_TWEAK_PAGE}`), dtNext);
   out.push(DOCS_TWEAK_PAGE.replace(/\.html$/, ''));
+  // หน้า tweak ภาพบนการ์ด (ui-redo 58): รูปทรงจาก art.mjs + ตัวเลขหมวดที่ harness/result-cats.mjs เขียนไว้
+  const ca = readFileSync(at(`docs/${CARD_ART_PAGE}`), 'utf8');
+  const caNext = injectCardArt(ca, cardArtData(), `docs/${CARD_ART_PAGE}`);
+  if (caNext !== ca) writeFileSync(at(`docs/${CARD_ART_PAGE}`), caNext);
   // กล่องรหัส (ui-redo 72) ฉีดท้ายสุด — หน้าที่ build สร้างใหม่ข้างบนต้องได้บล็อกด้วย · play.html (build.mjs เขียน) ไม่ติดรหัสอยู่แล้ว
   const hash = readGateHash();
   for (const file of gatedFiles(at('docs/'))) {
