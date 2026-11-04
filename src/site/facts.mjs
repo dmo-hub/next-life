@@ -1,21 +1,52 @@
 // ตัวเลขบนหน้าเว็บ (B65) — คิดจากข้อมูล/โค้ดชุดเดียวกับเกมทุกครั้งที่ build หน้าเว็บจึงไม่ค้างเลขเก่าเมื่อระบบเปลี่ยน
 // หน้า docs อ้างด้วย <span data-fact="ชื่อ">…</span> · ห้ามมีค่าบัญชีบุญบาปรายชีวิต มีแต่กติกาที่ผู้เล่นอ่านได้อยู่แล้ว
 import { readFileSync } from 'node:fs';
-import { ALL_PATTERNS, TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, ISEKAI_CATS, LEGACY, PATTERN_FROM, ENTRY, ENTRY_EVENTS, GODDESS, GODDESS_VOWS, COURT_SCENES, CONT_LIFE, CONT_REGIONS, CONT_RACES, ISEKAI_CAREERS, ISEKAI_CAREER_T } from '../engine/index.mjs';
+import { ALL_PATTERNS, TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, ISEKAI_CATS, LEGACY, PATTERN_FROM, ENTRY, ENTRY_EVENTS, GODDESS, GODDESS_VOWS, COURT_SCENES, CONT_LIFE, CONT_REGIONS, CONT_RACES, ISEKAI_CAREERS, ISEKAI_CAREER_T, PATHS, HEIR_AGE } from '../engine/index.mjs';
 import { isekaiCardCount } from './otherworld.mjs';
+import { warnWords } from '../ui/labels.mjs';
 
 const th = (n) => n.toLocaleString('en-US');
 
-export function siteFacts(content, appSrc = readFileSync(new URL('../ui/app.mjs', import.meta.url), 'utf8')) {
-  const pick = (re) => appSrc.match(re)?.[1] ?? '';
+// เลขเวอร์ชันอยู่ไฟล์นี้ไฟล์เดียว: bump แก้แค่ไฟล์นี้ · build ฉีดเข้าเกม (versionLines) และหน้าเว็บ (data-fact) ⇒ ไม่มีซอร์สอื่นถือเลขให้ชนกันตอน merge
+export const VERSION_FILE = new URL('../version.json', import.meta.url);
+export const readVersion = () => JSON.parse(readFileSync(VERSION_FILE, 'utf8'));
+export const versionLines = ({ version, build }) => `const APP_VERSION = ${JSON.stringify(version)};\nconst APP_BUILD = ${JSON.stringify(build)};\n`;
+
+// แจ้งอัปเดตในเกม (ui-redo 22): รุ่นที่มีโน้ตในแพตช์โน้ตของ whatsnew (ที่ npm run rel เขียน) ใหม่สุดก่อน — ข้อความชุดเดียวกับหน้าเว็บ ไม่มีที่สองให้ลืมแก้
+// bump ของเลนไม่เขียนโน้ต ⇒ รุ่นที่ไม่มีข้อถูกข้าม เกมจำ "รุ่นล่าสุดที่มีโน้ต" แทนเลขรุ่นจริง · เก็บ NOTE_KEEP รุ่น พอรวมรุ่นที่ยังไม่เห็นได้โดยไม่ฝังประวัติทั้งหมด
+// ข้อความถอดแท็กเหลือข้อความล้วน (ป้ายกติกาเป็นคำนำหน้า) แล้วตัดที่ NOTE_CUT ตัวอักษรตรงช่องว่าง ≈ 2 บรรทัดบนแผ่นที่จอ 390 (วัดใน site:check ไม่ได้ — วัดด้วยเบราว์เซอร์)
+const ENT = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ' };
+export const NOTE_KEEP = 20;
+export const NOTE_CUT = 90;
+const plain = (li) => li.replace(/<span class="tag rule">([^<]*)<\/span>/g, '$1: ').replace(/<[^>]+>/g, '').replace(/&[#\w]+;/g, (e) => ENT[e] ?? e).replace(/\s+/g, ' ').trim();
+export function noteCut(t) {
+  if (t.length <= NOTE_CUT) return t;
+  const head = t.slice(0, NOTE_CUT - 1);
+  const sp = head.lastIndexOf(' ');
+  return `${(sp > NOTE_CUT * 0.6 ? head.slice(0, sp) : head).replace(/[\s·:]+$/, '')}…`;
+}
+export function releaseLog(html, keep = NOTE_KEEP) {
+  const part = html.slice(Math.max(0, html.indexOf('<h2>แพตช์โน้ต</h2>')));
+  const out = [];
+  for (const m of part.matchAll(/<h3>(v[\d.]+) <small>[^<]*<\/small><\/h3>\s*<ul>([\s\S]*?)<\/ul>/g)) {
+    const items = [...m[2].matchAll(/<li>([\s\S]*?)<\/li>/g)].map(([, li]) => noteCut(plain(li))).filter(Boolean);
+    if (items.length) out.push({ v: m[1], items });
+    if (out.length >= keep) break;
+  }
+  return out;
+}
+export const notesLines = (log) => `const RELEASE_NOTES = ${JSON.stringify(log)};\n`;
+
+export function siteFacts(content, ver = readVersion()) {
   const era = content.era;
   // ใบศาลเฉียดตาย (B153) ใช้ stage ระหว่างชาติแต่ออกกลางชีวิต — นับเป็นการ์ดช่วงมีชีวิต ไม่ใช่ฉากปรโลก
   const life = content.events.filter((e) => e.stage !== 'ระหว่างชาติ' || COURT_SCENES.includes(e.scene));
   const regions = era.birth.regions;
   const lottery = content.events.filter((e) => e.belief?.kind === 'lottery_numen').map((e) => e.belief);
   return {
-    version: pick(/APP_VERSION = '([^']+)'/),
-    build: pick(/APP_BUILD = '([^']+)'/),
+    version: ver.version,
+    warnWords: warnWords(),
+    build: ver.build,
     yearFrom: String(era.births.from),
     futureFrom: String(era.future.recent),
     yearTo: String(era.births.from + era.births.w.length - 1),
@@ -67,6 +98,10 @@ export function siteFacts(content, appSrc = readFileSync(new URL('../ui/app.mjs'
     contCareers: String(Object.keys(ISEKAI_CAREERS).length),
     contCareerYears: String(ISEKAI_CAREER_T.years),
     contFame: String(CONT_LIFE.fame),
+    // ทางเกิดที่ปรโลก (หน้า worlds) — ข้อความเดียวกับปุ่มบนการ์ดทางเกิด
+    ...Object.fromEntries(PATHS.map((p) => [`path${p.id[0].toUpperCase()}${p.id.slice(1)}`, p.text])),
+    heirAgeFrom: String(HEIR_AGE[0]),
+    heirAgeTo: String(HEIR_AGE[1]),
   };
 }
 

@@ -7,7 +7,7 @@
 // k มีผลเฉพาะชีวิตที่พกสกิล ⇒ ด่านชีวิตเดี่ยว (lifehash/stats) วัดผล k ไม่ได้ · --ctl 0 ข้ามตัวควบคุมตอนวัดหลายค่า
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
-import { playLife, playAfterlife, nextLife, newLife, mixSeed, makeRng, bookAdd, bookCarryOffers, thaiSkillMul, successP, THAI_SKILL, SKILL, ISEKAI_SKILLS, ISEKAI_EVENTS } from '../src/engine/index.mjs';
+import { playLife, playAfterlife, nextLife, newLife, mixSeed, makeRng, skillBookAdd, bookCarryOffers, thaiSkillMul, successP, THAI_SKILL, SKILL, ISEKAI_SKILLS, ISEKAI_EVENTS } from '../src/engine/index.mjs';
 import { loadContent, loadSkillMap } from '../src/node/load.mjs';
 import { random } from './bots.mjs';
 
@@ -62,7 +62,7 @@ function run(off, lives) {
       const earn = (card, key) => {
         if (off === 'isekaiEarn' && key === 'isekaiEarn') return;
         const e = card.earn[rng.int(0, card.earn.length - 1)];
-        const r = bookAdd(book, e.id, e.lv);
+        const r = skillBookAdd(book, e.id, e.lv);
         if ((r.book[e.id] ?? 0) < (book[e.id] ?? 0)) s.bookDown++;
         if (r.up) { s.inBook[e.id] = (s.inBook[e.id] ?? 0) + 1; if (book[e.id]) s.bookUp++; }
         book = r.book;

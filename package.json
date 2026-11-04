@@ -5,6 +5,7 @@
   "scripts": {
     "build": "node build.mjs",
     "bump": "node scripts/bump-version.mjs",
+    "rel": "node scripts/rel.mjs",
     "sim": "node harness/run.mjs --n 1000 --seed 1",
     "gate": "node harness/run.mjs --n 20000 --seed 1",
     "merit": "node harness/merit.mjs --n 20000 --seed 1",
@@ -12,6 +13,9 @@
     "lineage": "node harness/lineage.mjs --n 2000 --gens 3 --seed 1",
     "isekai": "node harness/isekai.mjs --n 4000 --seed 1",
     "titles": "node harness/titles.mjs --n 2000 --gens 3 --seed 1",
+    "omen-ctl": "node harness/omen-ctl.mjs --n 2000 --gens 3 --seed 1",
+    "overlap": "node harness/overlap.mjs --n 1000 --gens 4 --seed 1",
+    "career:sim": "node harness/career-sim.mjs --n 1000 --seed 1",
     "save": "node harness/save.mjs --n 120 --seed 1",
     "stats": "node harness/stats.mjs --n 2000 --seed 1",
     "belief": "node harness/belief.mjs --n 20000 --seed 1",

@@ -3,7 +3,7 @@
 // · ฐานะชาติหน้าขยับตามกรรมทั้งสองทาง (ใบ 05 แรงทุกทาง) · หนี้ไม่ตกถึงลูก · ทุกฉากในเนื้อหาออกได้จริง · ค่าแถบไม่หลุด
 import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier, COURT_SCENES, makeRng } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
-import { stuckCard, unfilledIn } from './gates.mjs';
+import { stuckCard, unfilledIn, heirChain } from './gates.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
@@ -327,6 +327,38 @@ const deadForced = deadHeir.filter((id) => {
   return true;
 });
 check(`การ์ดที่กั้นด้วยธงพ่อแม่ออกได้จริงทุกใบ (${heirFired.size} ใบ · ไม่นับใบที่มีแค่ตัวคูณ · ไม่ออกเอง ${deadHeir.length} ใบลองถือธงซ้ำ ${HEIR_RETRY} ชีวิต)`, deadForced.length, deadForced.length ? ` ไม่เคยออก: ${deadForced.join(' ')}` : '');
+// ผู้อ่านธงที่ตั้งได้แค่ในชีวิตทายาท (heirChain ใน gates.mjs · full ข้ามพวกนี้ที่ด่าน 2) ต้องออก/กดได้จริง
+// ตามธรรมชาติหายากเกินตัดสิน (คำฝากบนการ์ดทุน 0 ใน 1,500 ชีวิตตระกูล) ⇒ ทายาทถือธงพ่อแม่ต้นโซ่ + บอทกดตัวเลือกที่ตั้งธงโซ่และกดผู้อ่านเมื่อเปิด
+// ถือธงอย่างเดียวไม่พอ: การ์ดตามซองไม่มี weight ออกจากนัดของตัวเลือก "เก็บไว้" เท่านั้น
+// ซองคำฝากถึงมือผ่าน heir.letter ที่ nextLife ตั้งจากธง wish_letter_* (afterlife.mjs) ไม่ใช่กองสุ่ม ⇒ แนบซองเอง · nextLife ส่งซองเดียว ⇒ ชีวิตละต้นโซ่เดียว วนกัน
+const chain = heirChain(content.events);
+const chainWant = new Set([...[...chain.events].filter((id) => !chain.parent.has(id)), ...chain.choices]);
+const setsChain = (c) => [c, ...[].concat(c.outcomes ?? [])].some((n) => (n?.sets_flags ?? []).some((fl) => chain.flags.has(fl)));
+const chainRoots = [...new Set([...chain.parent].filter((id) => byId.get(id).choices?.some(setsChain)).flatMap((id) => byId.get(id).when.parent_flags.has))];
+const letterOf = (fl) => (fl.startsWith('wish_letter_') ? { age: HEIR[fl]?.from_age ?? 0, from: 'ปู่', cause: [], by: null } : null);
+const chainHit = new Set();
+const obey = (card, rng, h) => {
+  const ev = h.pending;
+  const open = openChoices(card);
+  if (ev?.id === card.id && ev.choices?.length === card.choices.length) {
+    const key = (i) => `${ev.id}#${ev.choices[i].id ?? i}`;
+    const read = open.find((i) => chain.choices.has(key(i)));
+    if (read !== undefined) { chainHit.add(key(read)); return read; }
+    const set = open.find((i) => setsChain(ev.choices[i]));
+    if (set !== undefined) return set;
+  }
+  return BOTS.สุ่ม(card, rng, h);
+};
+let chainLives = 0;
+for (let i = 0; chainRoots.length && i < HEIR_RETRY && [...chainWant].some((k) => !chainHit.has(k)); i++) {
+  const s = mixSeed(seed, 9700 + i);
+  const p = newLife(s, content);
+  const root = chainRoots[i % chainRoots.length];
+  chainLives++;
+  playLife(s, content, obey, (card) => { if (chainWant.has(card.id)) chainHit.add(card.id); }, newLife(s, content, { birthYear: p.birthYear, sex: p.sex, region: { name: p.region, ses: p.ses }, cls: p.cls, bonus: {}, parentFlags: { [root]: 1 }, letter: letterOf(root) }));
+}
+const chainDead = [...chainWant].filter((k) => !chainHit.has(k));
+check(`ผู้อ่านธงของทายาทตามโซ่ออก/กดได้จริงทุกตัว (${chainWant.size} ตัว · ทายาทถือธงต้นโซ่ทีละตัว ${chainRoots.join(' ') || '-'} · ${chainLives} ชีวิต)`, chainDead.length, chainDead.length ? ` ไม่เคยถึง: ${chainDead.join(' ')}` : '');
 console.log(`ทางลูกบังคับ: ถือธงพ่อแม่ ${withFlag}/${forced} ชีวิต · การ์ดอ่านธงพ่อแม่ ${heirReaders.length} ใบ · ไม่เคยออก ${deadHeir.length}${deadHeir.length ? `: ${deadHeir.join(' ')}` : ''}`);
 if (!sceneIds.length) fails.push('ไม่มีฉากระหว่างชาติในเนื้อหา');
 if (fails.length) {

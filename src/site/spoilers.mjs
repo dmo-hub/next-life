@@ -5,6 +5,7 @@ import { parse } from 'yaml';
 import { STAGES, STAT_LABELS, MERIT_LEVELS, MERIT_WEIGHTS, SIN_CATS, FLAG_CATS, TRACKS, REALMS, FAMILY_ROLE_NAMES, meritId, meritName, debtName, assetName, EXAM_PASS } from '../engine/index.mjs';
 import { AFTER, CATEGORY, esc, text, choiceText } from './catalog.mjs';
 import { isekaiSpoilersHtml, isekaiNav } from './otherworld.mjs';
+import { careerHtml, careerSim } from './career.mjs';
 
 const YEAR_ALL = [2400, 2700];
 const sgn = (n) => (n > 0 ? `+${n}` : String(n).replace('-', '−'));
@@ -114,6 +115,7 @@ function mults(m, L) {
   if (m.wish) out.push(`ยกกำลังตามระดับบัญชีบุญบาป (ฐาน ${m.wish})`);
   if (m.rank) out.push(`×${m.rank} ต่อขั้นตำแหน่งที่ไต่ขึ้น (ทบกัน)`);
   if (m.family_fame) out.push(`×${m.family_fame} ต่อระดับชื่อเสียงตระกูล (ทบกัน)`);
+  if (m.overlap_stage !== undefined) out.push(`×${m.overlap_stage} ต่อขั้นค่าซ้อนทับ (ทบกัน)`);
   for (const k of Object.keys(MONEY_TH)) if (m[k]) out.push(`×${m[k].v} เมื่อ${moneyBound(k, m[k])}`);
   return out;
 }
@@ -154,6 +156,7 @@ function conditions(e, L) {
   for (const s of e.systems ?? []) out.push(`หลังมี${L.sys(s)}`);
   if (w.region) out.push(`ภาค${any(w.region.map(esc))}`);
   if (w.sex) out.push(`เพศ${any(w.sex.map(esc))}`);
+  if (w.overlap_stage) out.push(`ค่าซ้อนทับขั้น ${range(w.overlap_stage)}`);
   if (w.class) out.push(`ฐานะ${any(w.class.map(esc))}`);
   if (w.occupation) out.push(`ทำงาน${any(w.occupation.map((o) => esc(L.occ(o))))}`);
   if (w.ladder) out.push(any(w.ladder.map((l) => esc(L.ladder(l)))));
@@ -258,7 +261,7 @@ function card(e, L, byId) {
   ].join('');
 }
 
-export function spoilersHtml(content, flags = flagNames(), systems = systemNames()) {
+export function spoilersHtml(content, flags = flagNames(), systems = systemNames(), sim = careerSim()) {
   const L = labels(content, flags, systems);
   const byId = new Map(content.events.map((e) => [e.id, e]));
   const groups = [...STAGES.map((s) => s.name), AFTER].map((stage) => ({ stage, events: content.events.filter((e) => e.stage === stage) })).filter((g) => g.events.length);
@@ -266,5 +269,7 @@ export function spoilersHtml(content, flags = flagNames(), systems = systemNames
   const body = groups
     .map((g, i) => `<details id="s${i}"><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map((e) => card(e, L, byId)).join('')}</div></details>`)
     .join('\n');
-  return `<nav class="toc">${nav}${isekaiNav(groups.length)}</nav>\n${body}\n${isekaiSpoilersHtml(groups.length, merit)}`;
+  // เส้นทางงาน (ui-redo ใบ 21) ต่อท้ายการ์ดชาติไทย ก่อนส่วนต่างโลก — ไม่มี <article> ด่านนับการ์ดบนหน้าจึงนับเท่าเดิม
+  const career = careerHtml(content, L, sim);
+  return `<nav class="toc">${nav}${career ? '<a href="#career">เส้นทางงาน</a>' : ''}${isekaiNav(groups.length)}</nav>\n${body}\n${career}\n${isekaiSpoilersHtml(groups.length, merit)}`;
 }

@@ -15,8 +15,6 @@
   h1 { font-family: Srisakdi, serif; color: #F0D78C; font-size: clamp(30px, 6vw, 44px); margin: 0 0 8px; line-height: 1.25; }
   header p { margin: 0; color: #E3D6B5; }
   header a { color: #F0D78C; }
-  nav.site { margin-top: 10px; font-size: 14px; }
-  nav.site a { display: inline-block; padding: 6px 4px; min-height: 32px; }
   main { padding: 24px 16px 64px; }
   h2 { font-family: Pridi, serif; font-size: 22px; margin: 30px 0 8px; }
   h3 { font-size: 17px; margin: 18px 0 4px; }
@@ -37,13 +35,47 @@
   a.play:hover, a.play:focus-visible { border-color: #D9B45A; outline: none; }
   footer { font-size: 13px; color: #4A4F5C; margin-top: 32px; }
   a { color: #A23B2C; }
+  /* กติกาทีละระบบ (ย้ายจากหน้า GDD เดิม) */
+  .rules section { background: #F4EFE3; color: #1F2430; border: 1px solid #C9BFA9; padding: 16px 20px; margin: 0 0 16px; text-align: left; }
+  .rules section.dark { background: #17110D; color: #EFE3C2; border-color: #5A4630; }
+  .rules section.dark a { color: #F0D78C; }
+  .rules h2 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 8px; }
+  .rules h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
+  .rules ul, .rules ol { padding-left: 22px; margin: 0 0 8px; }
+  .rules li { margin: 0 0 6px; }
+  .rules p { margin: 0 0 8px; }
+  .rules .note { font-size: 14px; color: #4A4F5C; }
+  .rules section.dark .note { color: #CFC3A6; }
+  .rules .tbl { overflow-x: auto; margin: 6px 0 10px; }
+  .rules table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  .rules th, .rules td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; }
+  .rules th { background: #E9E2D2; font-weight: 600; }
+  .rules section.dark th { background: #2A2017; }
+  .rules section.dark th, .rules section.dark td { border-color: #5A4630; }
+  .rules code { font-size: 13px; background: #E9E2D2; padding: 0 4px; overflow-wrap: anywhere; }
+  .rules section.dark code { background: #2A2017; }
+  .rules .flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 10px; font-size: 14px; }
+  .rules .flow span { border: 1px solid #1F2430; padding: 2px 10px; background: #fff; }
+  .rules .flow i { font-style: normal; color: #A23B2C; }
+  .rules section.dark .flow span { background: #221912; border-color: #D9B45A; }
+  /*NAV-CSS:START*/
+  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
+  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: #F0D78C; }
+  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+/*NAV-CSS:END*/
 </style>
 </head>
 <body>
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">NEXT LIFE</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="worlds.html">ชาตินี้ · ปรโลก · ต่างโลก</a><a class="dark" href="otherworld.html" aria-current="page">ต่างโลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="design.html">การออกแบบ</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
 <header><div class="w">
   <h1>ต่างโลก</h1>
   <p>โลกที่สองของเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด เทพธิดาต่างโลกพาวิญญาณไปเกิดใหม่ในโลกแฟนตาซีที่มีเวทมนตร์และกิลด์นักผจญภัย</p>
-  <nav class="site"><a href="index.html">หน้าแรก</a> · <a href="play.html">เล่นเกม</a> · <a href="about.html">กลไกในเกม</a> · <a href="catalog.html">การ์ดทั้งหมด</a> · <a href="whatsnew.html">แพตช์โน้ต</a> · <a href="gdd.html">เอกสารออกแบบเกม</a></nav>
 </div></header>
 <main><div class="w">
   <div class="box">
@@ -60,6 +92,7 @@
     <li>รับสกิลโกงจากเทพธิดาหนึ่งอย่าง เช่น ประเมินค่า กล่องมิติ ฝีมือครัวจากโลกเดิม</li>
     <li>ทุ่มเทสายเดียวกันครบ <span data-fact="contCareerYears">3</span> ปีได้อาชีพติดตัว (มี <span data-fact="contCareers">5</span> อาชีพ เช่น นักดาบ จอมเวท พ่อค้า) · ตอนจบดูจากชื่อเสียงกับอาชีพที่ได้</li>
     <li>ทุกชาติทวีปสุ่มขั้วอำนาจ (มหาอำนาจ แคว้นขาลง แคว้นมาแรง) ข้อพิพาทใหญ่ และดันเจียนลับไว้ · มีกองการ์ดของตัวเองแล้ว: เรื่องประจำแคว้นที่อยู่ ข้อพิพาทที่กำลังเกิด และขั้วอำนาจที่อยู่ใกล้ (ตอนนี้มีตัวอย่างชนิดละใบ) · ดันเจียนลับยังไม่มีการ์ดพาไป</li>
+    <li>ตระกูลที่ข้ามไปกลับระหว่างสองโลกหลายรุ่น โลกเริ่มซ้อนทับกัน · ในชาติไทยได้ยินข่าวลือแปลก ๆ ที่มีแต่ตัวเองได้ยิน · ในต่างโลกมีคนจำหน้าได้ว่าเหมือน "ผู้มาจากอีกฟาก"</li>
     <li>เล่นเป็นการ์ดทีละใบ ตายแล้วกลับไปให้ปรโลกเดิมตัดสิน</li>
     <li>เซฟที่เริ่มชาติต่างโลกก่อนมีทวีป ยังเล่นบทบาทเดิมจาก 4 โลกต่อได้จนจบชาติ</li>
   </ul>
@@ -95,6 +128,25 @@
     <li>บัญชีบุญบาปเป็นบัญชีเดียวของดวงวิญญาณ ไปต่างโลกก็พกกรรมไปด้วยแบบเดียวกับเกิดใหม่ ต่างโลกจึงไม่ใช่ทางล้างบาป · บัญชียังซ่อนและเฉลยที่ปรโลกที่เดียวเหมือนเดิม</li>
     <li>ตายในต่างโลกแล้วกลับมาปรโลกเดิม ปรโลกตัดสินจากชาติต่างโลก แล้วการ์ดทางเกิดให้เลือกกลับโลกเดิมตามกรรม หรืออยู่ต่างโลกต่อ (อยู่ติดกันได้จำนวนชาติจำกัด)</li>
   </ul>
+
+  <div class="rules">
+  <section id="isekai" class="dark"><h2 id="rules">กติกาต่างโลกทั้งหมด</h2>
+    <ul>
+      <li>อยู่ในวงหลักของเกม ไม่ได้เป็นโหมดแยก (ต้นแบบเกมสั้น isekai.html ลบแล้ว)</li>
+      <li>ทางเข้า: (1) ทางที่ 3 บนการ์ดเลือกทางในปรโลก · (2) เทพธิดามาเอง โอกาสขึ้นกับกรรม (บุญเต็ม 40% · กลาง ๆ 20% · บาปเต็ม 5%) · (3) การ์ดชวนระหว่างมีชีวิต <span data-fact="entryKinds">7</span> แบบ ช่วงอายุ <span data-fact="entryFirst">13–18</span> แน่นอน และ <span data-fact="entryLater">25–45 และ 50–75</span> ช่วงละ <span data-fact="entryLaterPct">50</span>% ไม่เกิน <span data-fact="entryMax">3</span> ครั้ง ปฏิเสธได้ทุกครั้ง · <span data-fact="entryGone">3</span> แบบทำให้ "หายตัว" · (4) ประตูไปแล้วกลับได้ อยู่ที่นั่น 3–12 ปีแล้วกลับมาพร้อมของ</li>
+      <li>คำสัตย์ต่อเทพธิดา <span data-fact="vowCount">2</span> แบบ (ไม่ฆ่า · ช่วยคน) · รักษาได้บุญ ผิดคำติดตัวถาวร · ถูกชวนแล้วตอบรับได้โชค +<span data-fact="fatedLuck">10</span></li>
+      <li>ในต่างโลก: ห้องขาวเลือกแฟ้มเกิด 1 ใน <span data-fact="contOffers">3</span> ใบ แต่ละใบบอกเผ่ากับแคว้นที่จะไปเกิดในทวีปเอเธอร์การ์ด (<span data-fact="contRegions">20</span> แคว้น <span data-fact="contRaces">8</span> เผ่า เช่น มนุษย์ เอลฟ์ คนแคระ) → เลือกสกิลโกง 1 ใน 3 จาก 11 สกิล → เวลาเดินเองปีละ tick (แก่แล้ว 5 ปี) ผู้เล่นเลือกว่าจะทุ่มให้อะไร → การ์ดต่างโลก <span data-fact="isekaiCards">106</span> ใบ → ตอนจบ: ชาติทวีปดูจากชื่อเสียง (ถึง <span data-fact="contFame">30</span>) กับอาชีพที่ได้ (ทุ่มสายเดียวครบ <span data-fact="contCareerYears">3</span> ปี) ได้ทั้งคู่ = ดีที่สุด · อย่างใดอย่างหนึ่ง = ดี · ไม่ได้เลย = แย่ · ชาติบทบาทจาก 4 โลกเดิม (เซฟเก่า) ยังจบตามเป้าหมายและชื่อเสียงของบทบาท ดีที่สุด/ดี/แย่ · ทั้งสองแบบตายก่อนได้</li>
+      <li>ค่าสถานะ HP พลัง เวท บารมี โชค + ทอง ชื่อเสียง เกจเป้าหมาย · บนจอขึ้นแค่ ชีวิต (= HP) · พลัง · เวท · โชค และบรรทัดทอง/ชื่อเสียง · บารมีกับเกจเป้าหมายยังคิดอยู่แต่ไม่ขึ้นจอ · ค่าเริ่มเชื่อมกับค่าชีวิตไทย (สุขภาพ→พลัง · ความรู้→เวท · ความสัมพันธ์→บารมี · ความสุข→โชค · คอนเน็คชั่น→ชื่อเสียง) · เช็ก 50 + (ค่า − ความยาก) × 4 ในกรอบ 5–95 · บาปเพิ่มความยากได้ถึง 4</li>
+      <li>ย้ายแคว้น (ชาติทวีป): ตั้งโฟกัสสำรวจดินแดนครบ 2 ปีเต็มนับจากเกิดหรือย้ายครั้งก่อน ได้การ์ดทางแยก เลือกย้ายไปแคว้นที่มีถนนติดกัน (สุ่มไม่เกิน 3 แคว้น) หรืออยู่ที่เดิม · อยู่ที่เดิมตัวนับเริ่มใหม่ · ชาติบทบาทจาก 4 โลกเดิมไม่มีการ์ดนี้</li>
+      <li>สุ่มต่อชาติทวีป: มหาอำนาจ 1 · ขาลง 1–2 · มาแรง 1–2 จากแคว้นที่มีผู้ปกครอง (ไม่ซ้ำกัน) + ข้อพิพาทหลัก 1 ใน 8 · ดันเจียนลับ 3–4 จุด (ยังไม่มีการ์ดพาไป)</li>
+      <li>กองการ์ดทวีป (ชาติทวีปเท่านั้น · การ์ดหนึ่งใบอยู่กองเดียว): <b>ประจำแคว้น</b> ขึ้นเมื่ออยู่แคว้นนั้น (น้ำหนัก 2) · <b>ข้อพิพาท</b> ขึ้นเมื่อตรงข้อพิพาทของชาติ (2) · <b>ขั้วอำนาจ</b> ขึ้นเมื่ออยู่ในหรือติดแคว้นมหาอำนาจ/ขาลง/มาแรง (1) · ชื่อแคว้นและขั้วอำนาจในข้อความเปลี่ยนตามชาติที่เล่น · ต่อท้ายกองการ์ดทุกโลกเดิม · ตอนนี้มีการ์ดตัวอย่างกองละ 1 ใบ · ชาติบทบาทเดิมไม่เห็นกองนี้</li>
+      <li>ไปต่างโลกทั้งตัวพกบุญบาปไปครบไม่หัก (ประตูนับเป็นไปทั้งตัว) · การ์ดเสียงเรียกไม่บอกผลล่วงหน้า รู้จากเรื่องหลังตอบรับ</li>
+      <li>บัญชีกรรมเป็นของวิญญาณเดียวกันทั้งสองโลก · อยู่ต่างโลกติดกันได้ 4 ชาติ · กลับมาแล้วเลือกเป็นลูกหลานไม่ได้</li>
+      <li><b>ค่าซ้อนทับของตระกูล</b>: +1 ทุกครั้งที่ตระกูลกลับเข้าโลกที่เคยออกมาแล้ว (เกิดกลับไทยหลังชาติต่างโลก · ทริปที่กลับบ้านได้ · กลับเข้าต่างโลกอีกหลังเคยออก) · ทริปที่หลงไม่กลับ เกิดไทยต่อไทย และช่วงปรโลกไม่นับ · ตกทอดถึงทายาทแบบบัญชีกรรม ตระกูลใหม่เริ่ม 0 · ค่าเป็นขั้น 0–4 ตอนนี้เปิดขั้น 1 (ค่า 1) ขั้น 2–4 ยังไม่ตั้งเกณฑ์ · การ์ดขั้นซ้อนทับไม่อยู่ในกองสุ่ม เกมนัดให้ต่อชีวิตตามขั้น (1 · 1–2 · 2–4 ใบ อายุ 15–60) · ขั้น 1 ในชาติไทย = ข่าวลือที่มีแต่ตัวเราได้ยิน · ในต่างโลก = การ์ด "หน้าคุ้น" (ขั้น 1–4 อ่านค่าตอนข้าม) · ตระกูลที่ไม่เคยข้ามโลกไม่เจอการ์ดชุดนี้</li>
+      <li>ลงโค้ดแล้วแต่ยังไปไม่ถึง (รอเกณฑ์ขั้น 3): สายอาชีพนักล่า 4 ขั้น เข้าได้ทางการ์ดรับสมัครทางเดียว · ดันเจียนในไทย 4 ประตู การ์ดทางเข้า → กลางทาง (ถอยได้) → ห้องบอส นับเป็นโควตาใบเดียว คนนอกสายถูกดึงเข้าแล้วรอดเสมอ นักล่าตายในห้องบอสได้ · ของติดตัว 3 ช่อง (เครื่องราง อาวุธ ชุด) + ย่าม 3 ชิ้น ได้จากดันเจียนตามลำดับ ไม่สุ่ม เต็มแล้วขายทิ้งเอง · แผงตัวฉันโชว์ของติดตัวเมื่อถึงขั้น 3 หรือมีของ</li>
+    </ul>
+  </section>
+  </div>
 
   <h2><span class="tag soon">กำลังทำ</span>ต่างโลกในเกมหลัก</h2>
   <p class="lead">ระบบที่เจ้าของเกมตัดสินแล้ว แต่ยังไม่เข้าเกม</p>
@@ -133,7 +185,7 @@
     <li><span class="tag soon">กำลังทำ</span>ต่างโลกในเกมหลักจะไม่มีเรื่องทาส การใส่ร้ายทางเพศ หรือฮาเร็ม ฉากตลาดในเกมสั้นจะเปลี่ยนตอนย้ายเข้าเกมหลัก</li>
   </ul>
 
-  <footer>โปรเจกต์ส่วนตัว · แฟนตาซีในเกมไม่ได้อ้างว่าเป็นคำสอน · เวอร์ชันเกมหลัก <span data-fact="version">v0.6.30</span> (<span data-fact="build">2026-11-03</span>)</footer>
+  <footer>โปรเจกต์ส่วนตัว · แฟนตาซีในเกมไม่ได้อ้างว่าเป็นคำสอน · เวอร์ชันเกมหลัก <span data-fact="version">v0.6.43</span> (<span data-fact="build">2026-11-04</span>)</footer>
 </div></main>
 </body>
 </html>

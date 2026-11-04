@@ -338,7 +338,7 @@ export function shelfPicArt(host, events, got, all) {
 // ---- ผังตระกูล: วงต่อรุ่นเรียงซ้าย→ขวา จบที่ "คุณ" · ชาติต่างโลกลอยแถวบน ----
 // rows = แถว lineage ที่จะโชว์ (เรียงรุ่น) · more = รุ่นที่ย่อไว้ก่อนหน้า · now = ฐานะตอนนี้ของผู้เล่น · classes = ลำดับฐานะต่ำ→สูง
 // prev = ชาติไทยล่าสุดของทั้งผัง — แถวที่โชว์อาจเป็นต่างโลกล้วน แต่ทางที่มา/ทิศฐานะยังเทียบกับชาติไทย
-const SA_PATH = { child: 'กลับมาเป็นลูกหลาน', isekai: 'กลับจากต่างโลก' };
+const SA_PATH = { child: 'กลับมาเป็นลูกหลาน', blood: 'เล่นต่อเป็นลูกหลาน', isekai: 'กลับจากต่างโลก' };
 const SA_REALM_COL = { นรก: '#b0412e', เปรต: '#8a5a8a', ดิรัจฉาน: '#6f7d3a', มนุษย์: '#c9b27a', เทวดา: '#f0d78c', ต่างโลก: '#7aa2c8' };
 const saMix = (a, b, t) => `rgb(${saRgb(a).map((v, i) => Math.round(v + (saRgb(b)[i] - v) * t)).join(',')})`;
 export function shelfLineageArt(host, rows, more, now, classes, youWord = 'คุณ', prev = rows.findLast((l) => !l.isekai)) {

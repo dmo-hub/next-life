@@ -79,7 +79,7 @@ const skillLv = (isk, s) => isk.lv?.[s] ?? 1;
 const skillAdd = (isk, s) => (ISEKAI_SKILLS[s].add ?? 20) + SKILL.step * (skillLv(isk, s) - 1);
 // คลังสกิลอยู่ในเครื่องผู้เล่นแบบสมุดฉายา (UI เก็บ ไม่อยู่ในเซฟ) — แกนแค่คำนวณ · จำขั้นสูงสุดที่เคยถึง ไม่ลด
 // ลงซ้ำ = +1 ขั้น · ลงด้วยขั้นที่อัปถึงในชาติ (lv) สูงกว่า = ได้ขั้นนั้น
-export function bookAdd(book, id, lv = 1) {
+export function skillBookAdd(book, id, lv = 1) {
   if (!ISEKAI_SKILLS[id]) throw new Error(`ไม่รู้จักสกิล ${id}`);
   const was = book?.[id] ?? 0;
   const to = Math.min(SKILL.top, Math.max(was ? was + 1 : 1, lv));
@@ -1609,7 +1609,7 @@ export function entryCard(st, stage) {
 // legends = คนต่างโลกรุ่นก่อนที่แต่ละโลกจำชื่อได้ ({ world: [{ name, ending, dark }] } จาก isekaiWorldLegends)
 // legacy = เริ่มด้วยแฟ้มบทบาท 4 โลกเดิม — เส้นทดสอบของ harness เท่านั้น (ผู้เล่นใหม่เข้าไม่ได้) จนกว่าการ์ด 4 โลกจะถูกลบ (06c)
 // carry = สกิลที่พกมาจากชีวิตไทยของดวงวิญญาณนี้ [{ id, lv }] (06s) — ของขวัญของชาติสุ่มจากที่เหลือ
-export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null, hints = null, legacy = false, carry = [] }) {
+export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null, blessed = false, fated = false, ledger = newLedger(), real = null, lore = {}, legends = {}, trip = null, hints = null, legacy = false, carry = [], overlapStage = 0 }) {
   const rng = makeRng(mixSeed(seed ^ ISEKAI_SALT, run));
   const sk = ISEKAI.skills + (karma >= ISEKAI.karmaSkill ? 1 : 0) - (karma <= -ISEKAI.karmaSkill ? 1 : 0) + (blessed ? 1 : 0);
   const vow = blessed ? GODDESS_VOWS[(seed >>> 0) % GODDESS_VOWS.length].id : null;
@@ -1629,6 +1629,8 @@ export function startIsekai({ seed, karma = 0, past = '', run = 0, memory = null
     step: 'world', last: null, rbdUsed: false, dead: false, natural: false, ending: null, log: [], chron: [], cards: 0,
     // ทริปศาล (B153): hints = คำใบ้จากเนื้อหา (ผู้เรียกส่ง content.nearHints) · court = ใบศาลที่รอออก visit|summons
     hints, court: null,
+    // ขั้นค่าซ้อนทับของตระกูลตอนข้าม (ผู้เรียกคิดจาก overlapStageOf — ค่าไม่ขยับระหว่างอยู่ต่างโลก) · ใส่ช่องเฉพาะเมื่อ > 0 ⇒ ตระกูลค่า 0 สถานะเท่าเดิมทุกไบต์
+    ...(overlapStage && { overlapStage }),
   };
   // ขั้วอำนาจ · ข้อพิพาท · ดันเจียนลับของชาตินี้ (stream ของทวีปเอง) — 06c เริ่มใช้
   if (!legacy) isk.nation = contNation(mixSeed(seed, run));
@@ -1938,7 +1940,9 @@ function isekaiDrink(isk, id) {
 
 // เหตุการณ์ความรู้มาหาเมื่อรู้ถึงขั้นของเรื่อง · ความรู้อันตรายเฉพาะวัยผู้ใหญ่ขึ้นไป · ของที่โลกนี้จำแล้วไม่ต้องคิดค้นซ้ำ
 const ISEKAI_ADULT = ['adult', 'middle', 'old'];
-const isekaiKnowOpen = (isk, e, stage) => (!e.know || isk.know[e.know.cat] >= e.know.min) && (!e.adult || ISEKAI_ADULT.includes(stage.id)) && (!e.loreOf || !isk.worldLore.includes(e.loreOf)) && (!e.legend || isekaiLegends(isk).some((l) => isekaiLegendKind(l) === e.legend)) && (!e.bless || isk.karma > 0 || isk.blessed);
+const isekaiKnowOpen = (isk, e, stage) => (!e.know || isk.know[e.know.cat] >= e.know.min) && (!e.adult || ISEKAI_ADULT.includes(stage.id)) && (!e.loreOf || !isk.worldLore.includes(e.loreOf)) && (!e.legend || isekaiLegends(isk).some((l) => isekaiLegendKind(l) === e.legend)) && (!e.bless || isk.karma > 0 || isk.blessed) && isekaiOverlapOk(isk, e);
+// การ์ดอ่านแค่ขั้นค่าซ้อนทับ [จาก, ถึง] เหมือน when.overlap_stage ฝั่งไทย · กรองในกองเท่านั้น ไม่ดึงเลขสุ่ม
+const isekaiOverlapOk = (isk, e) => !e.overlap_stage || ((isk.overlapStage ?? 0) >= e.overlap_stage[0] && (isk.overlapStage ?? 0) <= e.overlap_stage[1]);
 
 // ขั้วอำนาจที่ผู้เล่นอยู่หรืออยู่ติด (ขาลง/มาแรงมีได้ 2 แคว้น) — ไม่มี = null
 const contPowerAt = (isk, kind) => {
@@ -2135,7 +2139,7 @@ export function nextIsekaiCard(isk) {
       ...(isk.lore.length && { lore: isk.lore.map((id) => ISEKAI_LORE[id]) }),
       // ชาตินี้จะอยู่ในตำนานของโลกนี้ (B68i) — ช่องเฉพาะชาติที่ดังถึงเกณฑ์
       ...(isk.legend && { legend: { name: isk.legend.name, dark: isk.legend.dark } }),
-      // สกิลที่ถือตอนจบให้ผู้เล่นเลือกลงคลัง 1 อย่าง (06s) — UI เรียก bookAdd เอง การ์ดไม่เปลี่ยนสถานะเกม
+      // สกิลที่ถือตอนจบให้ผู้เล่นเลือกลงคลัง 1 อย่าง (06s) — UI เรียก skillBookAdd เอง การ์ดไม่เปลี่ยนสถานะเกม
       ...(isk.skills.length && { earn: isk.skills.map((id) => ({ id, name: ISEKAI_SKILLS[id].name, lv: skillLv(isk, id) })) }),
     });
   }
