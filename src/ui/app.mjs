@@ -2067,7 +2067,8 @@ function render(card) {
       if (card.inherit.length) {
         const box = el('div', 'recap');
         box.append(el('div', 'h', card.age > 0 ? 'สิ่งที่สืบทอดจากรุ่นก่อน' : 'สิ่งที่สืบทอดจากชาติก่อน'), list(card.inherit, 'picks'));
-        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageView(st.lineage, st.cls, LINEAGE_BRIEF));
+        // เจ้าของสั่งไม่ย่อรุ่นต้นทางซ้าย — ผังบนการ์ดแรกเกิดโชว์ครบทุกรุ่น (ภาพบีบป้ายเองเมื่อรุ่นถี่)
+        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageView(st.lineage, st.cls));
         body.append(box);
       }
       choices.append(enter(button(BTN.next, null, next)));
