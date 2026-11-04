@@ -163,7 +163,7 @@ export function careerHtml(content, L, sim = careerSim()) {
     return `<h3>${esc(L.ladder(lad))} <small>${occs.length} อาชีพ</small></h3><div class="jobs">${body}</div>`;
   });
   const office = careers.office;
-  if (office) sections.push(`<h3>${esc(office.name)} <small>ทำควบงานเดิมได้ถึงระดับท้องถิ่น</small></h3><div class="jobs">${unitHtml(OFFICE_UNIT, office.name, `ขั้น ${office.steps.map((s) => s.name).join(' · ')}`, [], [], sim, ctx, L2)}</div>`);
+  if (office) sections.push(`<h3>${esc(office.name)} <small>ทำควบงานเดิมได้ถึงระดับท้องถิ่น</small></h3><div class="jobs">${unitHtml(OFFICE_UNIT, office.name, `ขั้น ${office.steps.filter((s) => !s.vacant).map((s) => s.name).join(' · ')}`, [], [], sim, ctx, L2)}</div>`);
   const lead = sim
     ? `ผลจำลอง ${sim.lives.toLocaleString('en-US')} ชีวิต (บอท ${sim.bots.length} แบบ แบบละ ${sim.perBot.toLocaleString('en-US')} ชีวิต · เกมรุ่น ${esc(sim.sha)}) · เลขในกรอบ = ชีวิตที่เจอ ÷ ชีวิตที่เคยทำงานนั้น เจอกี่ครั้งก็นับครั้งเดียว ไม่ใช่โอกาสของผลสุ่มบนการ์ด`
     : 'ยังไม่มีไฟล์ผลจำลอง — รายการด้านล่างมาจากข้อมูลการ์ดอย่างเดียว ไม่มีเลข';
