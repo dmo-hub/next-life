@@ -592,8 +592,13 @@ function lineageView(all, now, brief = all.length, youWord) {
   box.append(d);
   // การ์ดสร้างก่อนติดหน้า (และจอหมุน/ย่อได้ภายหลัง) ภาพที่วาดไว้ถูก CSS ยืดจนวงกลมเป็นวงรี — วาดใหม่ทุกครั้งที่ความกว้างจริงเปลี่ยน
   if (cv && typeof ResizeObserver === 'function') {
+    let shown = false;
     const ro = new ResizeObserver(() => {
-      if (!cv.isConnected) return ro.disconnect();
+      // ยังไม่ติดหน้า = รอ (ครั้งแรกยิงได้ก่อนการ์ดถูกแปะ) · เคยติดแล้วหลุด = การ์ดถูกทิ้ง เลิกสังเกต
+      if (!cv.isConnected) return shown ? ro.disconnect() : undefined;
+      shown = true;
+      // ซ่อนอยู่ (กว้าง 0) ยังวัดไม่ได้ — รอให้โผล่ก่อน ไม่งั้นวาดซ้ำวน
+      if (!cv.offsetWidth) return;
       // ภาพกว้างขั้นต่ำ 280 (saCanvas) — เทียบกับความกว้างที่วาดได้จริง ไม่งั้นจอแคบวาดซ้ำไม่จบ
       const want = Math.max(280, cv.offsetWidth);
       if (Math.abs(want - cv.width / (window.devicePixelRatio || 1)) < 2) return;
