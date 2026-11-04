@@ -21,7 +21,7 @@ import { uiPage, designMoved, tweakPages, cssVars, UI_PAGE, UI_MOVED_FROM } from
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
-import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN } from '../src/site/gate.mjs';
+import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, PUBLIC_HIDE } from '../src/site/gate.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -516,6 +516,41 @@ check('หน้าเฉลยวาดทุกเงื่อนไขแล�
   };
   const ctlBad = Object.entries(ctl).filter(([, rp]) => !gateGap(files, rp).length).map(([k]) => k);
   check('หน้าเว็บติดรหัสครบ (กล่องใน head · hash ปัจจุบัน · noindex) หน้าแรก/ตัวเกมไม่ติด', miss.length || ctlBad.length || files.length < 20, ` ${files.length} หน้า · hash ${gateHash ? 'ตั้งแล้ว' : 'ยังไม่ตั้ง (กล่องบอกว่ายังเปิดไม่ได้)'}${miss.length ? ` · ${miss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
+}
+
+// ซ่อนโลกที่สามบนหน้าไม่ติดรหัส (ui-redo 70): หน้าแรก · หน้าส่งต่อทั้งหน้า และ <head> ของ play.html (ตัวเกมใน body ไม่นับ)
+// นับข้อความที่เห็น + title + ค่าในแอตทริบิวต์ที่คนหรือเครื่องอ่าน (content · alt · title · aria-label) — คอมเมนต์/CSS/สคริปต์ไม่นับ
+// ตัวควบคุม: ใส่คำกลับในย่อหน้าหน้าแรก · ใน description · ใน title ของ play · ในชื่อหน้าส่งต่อ ⇒ ต้องถูกจับทุกแบบ
+{
+  const seen = (html) => {
+    const h = html.replace(/<!--[\s\S]*?-->/g, '').replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, '');
+    const attrs = [...h.matchAll(/\s(?:content|alt|title|aria-label)="([^"]*)"/gi)].map((m) => m[1]);
+    return `${h.replace(/<[^>]+>/g, ' ')} ${attrs.join(' ')}`;
+  };
+  const headOf = (html) => html.slice(0, html.search(/<\/head>/i));
+  const moved = [];
+  const walk = (dir) => {
+    for (const d of readdirSync(new URL(dir, docs), { withFileTypes: true })) {
+      const f = `${dir}${d.name}`;
+      if (d.isDirectory()) walk(`${f}/`);
+      else if (f.endsWith('.html') && read(f).includes(MOVED_MARK)) moved.push(f);
+    }
+  };
+  walk('');
+  const pages = (rd) => [['index.html', seen(rd('index.html'))], ['play.html <head>', seen(headOf(rd('play.html')))], ...moved.map((f) => [f, seen(rd(f))])];
+  const hits = (rd) => pages(rd).filter(([, t]) => PUBLIC_HIDE.test(t)).map(([f, t]) => `${f}: "${t.match(PUBLIC_HIDE)[0]}"`);
+  const miss = hits(read);
+  const swap = (want, fn) => (f) => (f === want ? fn(read(f)) : read(f));
+  const ctl = {
+    'ย่อหน้าหน้าแรก': swap('index.html', (h) => h.replace('</footer>', ' ต่างโลก</footer>')),
+    description: swap('index.html', (h) => h.replace('<meta name="description" content="', '<meta name="description" content="isekai ')),
+    'title play': swap('play.html', (h) => h.replace('</title>', ' ต่างโลก</title>')),
+    'หน้าส่งต่อ': swap(moved[0], (h) => h.replace('</title>', ' ต่างโลก</title>')),
+  };
+  const ctlBad = Object.entries(ctl).filter(([, rd]) => !hits(rd).length).map(([k]) => k);
+  // ตัวเกมยังพาไปต่างโลกได้ — คำต้องยังอยู่ใน body ของ play.html (ไม่ได้ตัดตัวเกม)
+  const gameKeeps = PUBLIC_HIDE.test(read('play.html').slice(headOf(read('play.html')).length));
+  check('หน้าไม่ติดรหัส (หน้าแรก · head ของ play · หน้าส่งต่อ) ไม่มีคำต่างโลก ตัวเกมคงเดิม', miss.length || ctlBad.length || !moved.length || !gameKeeps, ` ${pages(read).length} หน้า (ส่งต่อ ${moved.length})${miss.length ? ` · เจอ ${miss.join(' | ')}` : ''}${gameKeeps ? '' : ' · ตัวเกมไม่มีคำ (ตัดเกิน)'} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
 }
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
