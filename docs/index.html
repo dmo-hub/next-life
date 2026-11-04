@@ -10,10 +10,6 @@
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
-  nav.top { background: #17110D; border-bottom: 1px solid #5A4630; overflow-x: auto; white-space: nowrap; padding: 0 12px; }
-  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; }
-  nav.top a.dark { color: #F0D78C; }
-  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; outline: none; }
   header { background: #1F2430; color: #F4EFE3; min-height: 100svh; display: flex; align-items: center; text-align: center; padding: 32px 16px; }
   .w { max-width: 960px; margin: 0 auto; }
   header .w { display: flex; flex-direction: column; align-items: center; }
@@ -46,10 +42,21 @@
   ul { padding-left: 22px; margin: 0 0 24px; }
   .footnote { font-size: 13px; color: #4A4F5C; margin: 0 0 16px; }
   footer { font-size: 13px; color: #4A4F5C; }
+  /*NAV-CSS:START*/
+  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
+  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: #F0D78C; }
+  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+/*NAV-CSS:END*/
 </style>
 </head>
 <body>
-<nav class="top" aria-label="หน้าอื่น"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="otherworld.html" class="dark">ต่างโลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="gdd.html">เอกสารออกแบบเกม (GDD)</a></nav>
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html" aria-current="page">เกิดใหม่ทั้งที</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a class="dark" href="otherworld.html">ต่างโลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="gdd.html">เอกสารออกแบบเกม (GDD)</a><a href="design.html">การออกแบบ</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
 <header><div class="w">
   <span class="tag">เล่นได้ · <span data-fact="version">v0.6.32</span> · <span data-fact="build">2026-11-04</span></span>
   <h1><span>เกิดใหม่ทั้งที</span> <span>ชาตินี้ขอชิงมาเกิด</span><span class="sub">NEXT LIFE · ชีวิตคนไทยหลายรุ่น กับต่างโลกอีกหนึ่งโลก</span></h1>

@@ -15,8 +15,6 @@
   h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
   header p { margin: 0; color: #E3DDD0; }
   header a { color: #F4EFE3; }
-  nav.site { margin-top: 10px; font-size: 14px; }
-  nav.site a { display: inline-block; padding: 6px 4px; min-height: 32px; }
   nav.toc { font-size: 14px; columns: 2 220px; margin: 0; padding-left: 22px; }
   main { padding: 24px 16px 64px; }
   section { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 16px 20px; margin: 0 0 16px; }
@@ -60,13 +58,25 @@
   pre code { background: none; padding: 0; }
   .tw { overflow-x: auto; margin: 0 0 12px; }
   .tw th, .tw td { overflow-wrap: normal; }
+  /*NAV-CSS:START*/
+  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
+  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: #F0D78C; }
+  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+/*NAV-CSS:END*/
 </style>
 </head>
 <body>
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">เกิดใหม่ทั้งที</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a class="dark" href="otherworld.html">ต่างโลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="gdd.html" aria-current="page">เอกสารออกแบบเกม (GDD)</a><a href="design.html">การออกแบบ</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
 <header><div class="w">
   <h1>เอกสารออกแบบเกม (GDD)</h1>
   <p>ภาพรวมทั้งเกมในหน้าเดียว เขียนตามโค้ดที่เล่นได้จริง · เวอร์ชัน <span data-fact="version">v0.6.32</span></p>
-  <nav class="site"><a href="index.html">หน้าแรก</a> · <a href="play.html">เล่นเกม</a> · <a href="about.html">กลไกในเกม</a> · <a href="otherworld.html">ต่างโลก</a> · <a href="catalog.html">การ์ดทั้งหมด</a> · <a href="spoilers.html">เฉลย</a> · <a href="whatsnew.html">แพตช์โน้ต</a></nav>
+  <p>อยากรู้ผลทุกตัวเลือก → <a href="spoilers.html">หน้าเฉลยการ์ดทั้งหมด</a> (⚠ สปอยล์ทั้งเกม)</p>
 </div></header>
 <main><div class="w">
   <p class="lead"><span class="tag">มีเฉลย</span>หน้านี้เปิดกลไกที่ในเกมซ่อนไว้ เช่น บัญชีบุญบาปและตัวคูณกรรม ตัวเลขที่อยู่ในกรอบ <code>data-fact</code> ใส่ให้อัตโนมัติตอน build ส่วนค่าอื่นคัดจากโค้ดเมื่อ 28 ต.ค. 2569 ที่มาของคำตัดสินแต่ละเรื่องอยู่ใน<a href="#spec">ภาคผนวกสเปกและรีเสิร์ช</a></p>

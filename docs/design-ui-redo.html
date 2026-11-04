@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>หน้าจอใหม่ทั้งเกม (ui-redo) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<meta name="description" content="หน้าจอใหม่ทั้งเกม (ui-redo) — คำตัดสินการออกแบบของเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด ตามสำเนาใน repo">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi:wght@400;600&family=Sarabun:wght@400;600&display=swap">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
+  header { background: #1F2430; color: #F4EFE3; padding: 32px 16px 28px; }
+  .w { max-width: 900px; margin: 0 auto; }
+  h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
+  header p { margin: 0; color: #E3DDD0; }
+  header a { color: #F4EFE3; }
+  main { padding: 24px 16px 64px; }
+  h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
+  ul, ol { padding-left: 22px; margin: 0 0 8px; }
+  li { margin: 0 0 6px; }
+  p { margin: 0 0 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: #E9E2D2; font-weight: 600; }
+  code { font-size: 13px; background: #E9E2D2; padding: 0 4px; }
+  a { color: #A23B2C; }
+  .spec-toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 0 0 16px; font-size: 14px; }
+  .spec-toc > div { border: 1px solid #C9BFA9; background: #FBF8F1; padding: 10px 14px; }
+  .spec-toc h3 { margin: 0 0 4px; }
+  .spec-toc li > a { line-height: 1.5; padding: 4px 0; }
+  .spec-toc li small { display: block; }
+  .spec-toc .sub a { display: block; color: #4A4F5C; padding: 4px 0; }
+  .spec-toc small { color: #4A4F5C; }
+  details.doc { border: 1px solid #C9BFA9; background: #FBF8F1; padding: 8px 14px; margin: 0 0 8px; overflow-wrap: anywhere; }
+  details.doc > summary { font-family: Pridi, serif; font-size: 17px; cursor: pointer; padding: 6px 0; min-height: 32px; }
+  details.doc h3 { font-size: 18px; }
+  details.doc h4 { font-family: Pridi, serif; font-size: 16px; margin: 14px 0 4px; }
+  details.doc h5 { font-size: 15px; margin: 12px 0 4px; }
+  .lead { font-size: 14px; color: #4A4F5C; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; color: #A23B2C; }
+  .src { font-size: 13px; color: #4A4F5C; }
+  pre { background: #1F2430; color: #F4EFE3; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
+  pre code { background: none; padding: 0; }
+  .tw { overflow-x: auto; margin: 0 0 12px; }
+  .tw th, .tw td { overflow-wrap: normal; }
+  /*NAV-CSS:START*/
+  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
+  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: #F0D78C; }
+  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+/*NAV-CSS:END*/
+</style>
+</head>
+<body>
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">เกิดใหม่ทั้งที</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a class="dark" href="otherworld.html">ต่างโลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="gdd.html">เอกสารออกแบบเกม (GDD)</a><a href="design.html" aria-current="true">การออกแบบ</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
+<header><div class="w">
+  <h1>หน้าจอใหม่ทั้งเกม (ui-redo)</h1>
+  <p>เรื่อง ui-redo · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.32</span></p>
+</div></header>
+<main><div class="w">
+<p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
+<nav class="spec-toc" id="design-toc" aria-label="สารบัญหน้านี้"><div><h3>ในหน้านี้</h3><ol><li><a href="#d-ui-redo-MAP">MAP: หน้าจอใหม่ทั้งเกม (ui-redo)</a><div class="sub"><a href="#d-ui-redo-MAP-h1">Destination</a><a href="#d-ui-redo-MAP-h2">Notes</a><a href="#d-ui-redo-MAP-h3">Decisions so far</a><a href="#d-ui-redo-MAP-h4">Not yet specified</a><a href="#d-ui-redo-MAP-h5">Out of scope</a></div></li><li><a href="#d-ui-redo-decisions">รื้อหน้าเล่นเกม play.html — คำตอบที่ตัดสิน</a></li></ol></div></nav>
+<details class="doc" id="d-ui-redo-MAP" open><summary>MAP: หน้าจอใหม่ทั้งเกม (ui-redo)</summary><p class="src">ไฟล์ต้นฉบับ design/ui-redo/MAP.md · <a href="#design-toc">กลับสารบัญ</a></p>
+<p>repos: next-life · ตั้งเมื่อ 2026-11-03 (ใบ 01–16 มีมาก่อน · สเปก SPEC.md · คำตัดสิน <a href="#d-ui-redo-decisions"><code>../ui-redo-decisions.md</code></a>)</p>
+<h3 id="d-ui-redo-MAP-h1">Destination</h3>
+<p>หน้าจอเกมทุกโลกและเว็บเอกสารอยู่บนโครงใหม่ (แถบสถานะ · เมนูล่าง · แผง · การ์ดตาย) ตาม SPEC.md เข้า main ครบ ไม่มี branch UI ค้าง</p>
+<h3 id="d-ui-redo-MAP-h2">Notes</h3>
+<ul><li>ทำในเลน C · ส่งตรวจผ่านผู้รวมงาน · 390/1280 ล้น 0</li><li>⚠ ป้าย <code>claimed:</code> ในใบ 01–04 ยังเป็น <code>no</code> แต่ 03/04 มี branch แล้ว (lane-c/shell-statusbar · lane-c/menu-life) และงานต่อยอดอยู่ใน train65 — ตรวจตอนปิดใบ ไม่ใช่ว่าไม่ได้ทำ</li><li>ขบวน 65 (main ยังไม่ได้รับ): ใบ 03–12 + หน้าแรก ผ่าน lane-c/train65 → death-share c0430d5 · ใบ 13 3c13223 · ใบ 14 a74ee72</li><li>จอช่องไอเทม B78 (world-overlap ใบ 23 · engine 944d08a) = งานเลน C ต่อจากใบ 14 — คำตัดสินอยู่ world-overlap decisions 101/105</li></ul>
+<h3 id="d-ui-redo-MAP-h3">Decisions so far</h3>
+<ul><li>ใบ 01–14 ดูสถานะในแต่ละใบ (ไม่ย้าย) · ใบ 13 ธีมกรมท่า · ใบ 14 contrast <code>--dg #FF8A8A</code> (popup 2026-11-03)</li><li>(2026-11-03 · popup เจ้าของ) ตั้งแผนที่นี้ + รับ backlog UI 3 ข้อเป็นใบ 17–19 + ใบตัดสิน branch ค้าง 20 · B12 หน้าตรวจเนื้อหามาที่นี่ (fog)</li><li>แผงพับ 3 อันเป็นแถบแท็บ: แทนโดยใบ 06/11 · ไม่ทำแท็บในแผงครอบครัว</li><li>แยกบรรทัดฐานะกับเงิน: แทนโดยใบ 03/07 · ปิด</li><li>ตัดสิน branch UI ค้าง: ลบ 15 ตัวหลังขบวน 65 เข้า main · focus-page เก็บ (rebase) · site-map/ui-proto ทิ้ง · nav เดียวไปใบ 16</li><li>หน้าเฉลยแยกตามงาน: (2026-11-04 · เจ้าของผ่าน integrator + popup planner) ทางเข้า → การ์ดระหว่างงาน → ทางออก · % = ชีวิตที่เคยทำงานนี้เจอ · สายยศ 6 หัว + อาชีพหัวย่อย · ไฟล์ผลจำลองใน data/ รันแยก + site:check เตือนค้าง · ยังไม่มีเลน</li></ul>
+<h3 id="d-ui-redo-MAP-h4">Not yet specified</h3>
+<ul><li>ใบ 15 ปรโลกบนโครงใหม่ — รอเกมในปรโลก (three-worlds) ชัดก่อน</li><li>คำใบ้ค่าซ้อนในแผงตัวฉัน (world-overlap decisions 102/103 ม่านบาง/ขาด/พัง) — แผงตัวฉันชาติไทยยังไม่มี</li><li>B12 หน้าตรวจเนื้อหา (ร่างเฟส 5 เก่า · เฟส v2 &quot;ท้าย&quot;)</li></ul>
+<h3 id="d-ui-redo-MAP-h5">Out of scope</h3>
+<ul><li>(ยังไม่มี)</li></ul>
+</details>
+<details class="doc" id="d-ui-redo-decisions" open><summary>รื้อหน้าเล่นเกม play.html — คำตอบที่ตัดสิน</summary><p class="src">ไฟล์ต้นฉบับ design/ui-redo/decisions.md · <a href="#design-toc">กลับสารบัญ</a></p>
+<h4 id="d-ui-redo-decisions-h1">2026-11-02 (grilling · เจ้าของยืนยัน &quot;ตรง ส่งเลน C เลย&quot;)</h4>
+<ol><li>ขอบเขต: หน้าเล่นเกม play.html</li><li>ปัญหาหลัก: ปุ่ม/แผงเยอะ รก · หาของไม่เจอ · มือถือใช้ยาก · หน้าตาเก่า/ไม่สวย</li><li>วิธีทำ: รื้อทั้งโครงและสไตล์</li><li>จอ: มือถือก่อน + คอมมีเลย์เอาต์จริง</li><li>ทางเข้าระบบ: แถบเมนูล่าง</li><li>การ์ดรายปี: การ์ดเด่น + แถบสถานะย่อ</li><li>สไตล์: ให้เลน C ทำต้นแบบ 2–3 แบบให้เลือก</li><li>การ์ดตาย: หน้าสรุปสั้น + แท็บ</li><li>โลกอื่น: โครงเดียว เปลี่ยนธีมสีตามโลก</li><li>หน้าตั้งค่า: ไม่เพิ่ม</li><li>ลำดับ: ต้นแบบก่อน → ทำทีละชิ้น</li><li>ปุ่มเมนูล่าง: ให้เลน C เสนอในต้นแบบ</li><li>ปล่อย: ปล่อยจริงทีละชิ้น</li><li>เว็บเอกสาร: ตามทีหลัง เฉพาะสี/ฟอนต์/เมนู</li></ol>
+<p>ผังเว็บเอกสาร: ทางกลาง · compare-references.html: ไม่ย้ายหน้านี้ขึ้นเว็บ</p>
+<h4 id="d-ui-redo-decisions-h2">2026-11-02 — ui-redo ใบ 02: ค่าที่เจ้าของปรับในหน้า tweak (lane-c/ui-proto f78afb4 · docs/dev/ui-redo/tweak.html) — คำต่อคำ</h4>
+<p>เริ่มจาก A · ปรับเพิ่ม 12 ค่า</p>
+<ul><li>เลย์เอาต์หลัก: เมนูบนมือถือ ล่าง · เมนูบนคอม ราวซ้าย · แผงบนคอม ลิ้นชักเมื่อกด (เดิม ขวาเปิดค้าง) · ความกว้างการ์ดสูงสุด 800px (เดิม 560px) · ระยะขอบรอบการ์ด 36px (เดิม 16px)</li><li>เลย์เอาต์ย่อย: แถบสถานะ สองแถว (เดิม แถวเดียว) · ชุดเมนู ชุด A 5 ปุ่ม · แท็บหน้าการ์ดตาย เลือกเอง: สรุป · ชีวิตนี้ · ครอบครัว · ตระกูล · ฉายา · อนุสรณ์ (เดิม สรุป · ครอบครัว · เส้นชีวิต · ยุคสมัย · อนุสรณ์) · ที่วางสัตว์เลี้ยง ท้ายแผงครอบครัว · หน้าเปิด แบบเดิม</li><li>จุดย่อย: ปุ่มตัวเลือก มีเลข 1 2 3 · ป้ายใกล้ตาย ขอบจอแดง + หัวใจ (เดิม ซ้อนช่องอายุ) · แถบค่า แถบเส้น · ป้ายฉายา ริบบิ้น · ฟอนต์หัวเรื่อง Noto Sans Thai (เดิม Pridi) · ฟอนต์เนื้อ Noto Sans Thai (เดิม Sarabun) · ขนาดตัวอักษรเนื้อ 16px · มุมโค้ง 10px (เดิม 2px) · เงา บาง (เดิม ไม่มี) · ชุดสีฐาน A กระดาษ · สีแถบค่า #015EC1 · สีเน้น #B73824</li><li>หมายเหตุเจ้าของ: <strong>แถบเส้น ใช้ ตัวเลข + ลูกศร</strong></li><li>JSON: {&quot;base&quot;:&quot;a&quot;,&quot;mNav&quot;:&quot;bottom&quot;,&quot;dNav&quot;:&quot;side&quot;,&quot;dPanel&quot;:&quot;drawer&quot;,&quot;cardW&quot;:800,&quot;pad&quot;:36,&quot;sbar&quot;:&quot;two&quot;,&quot;menu&quot;:&quot;5&quot;,&quot;dPre&quot;:&quot;custom&quot;,&quot;dTabs&quot;:[&quot;สรุป&quot;,&quot;ชีวิตนี้&quot;,&quot;ครอบครัว&quot;,&quot;ตระกูล&quot;,&quot;ฉายา&quot;,&quot;อนุสรณ์&quot;],&quot;pet&quot;:&quot;family&quot;,&quot;home&quot;:&quot;old&quot;,&quot;choice&quot;:&quot;kbd&quot;,&quot;dying&quot;:&quot;edge&quot;,&quot;meter&quot;:&quot;bar&quot;,&quot;title&quot;:&quot;rb&quot;,&quot;hFont&quot;:&quot;Noto Sans Thai&quot;,&quot;bFont&quot;:&quot;Noto Sans Thai&quot;,&quot;fs&quot;:16,&quot;radius&quot;:10,&quot;shadow&quot;:&quot;soft&quot;,&quot;pal&quot;:&quot;a&quot;,&quot;col&quot;:{&quot;fl&quot;:&quot;#015EC1&quot;,&quot;ac&quot;:&quot;#B73824&quot;}}</li><li>ใบ 02 ต่อ (popup 2026-11-02 เย็น): แถบค่า = <strong>แบบ 1 แถบเส้น + ตัวเลข + ลูกศร</strong> (meter=barnum · ลูกศร = ค่าที่เปลี่ยนในปีนี้ เฉพาะที่เกมยอมเผย) · แท็บตาย: กราฟชีวิต + ยุค → &quot;ชีวิตนี้&quot; · ผังตระกูล → &quot;ตระกูล&quot; · สายด่วน → &quot;สรุป&quot; (ตามเลน C เสนอ) · ข้อชน SPEC 1/2/3/5/6 ผู้รวมงานตัดสินให้ค่า tweak ชนะ (สองแถว · ขอบแดง+หัวใจ+aria &quot;ใกล้ตาย&quot; · ลิ้นชัก · อาชีพในแผงตัวฉัน · ลูกศรไม่เผยค่าซ่อน)</li></ul>
+<h4 id="d-ui-redo-decisions-h3">2026-11-02 ~23:00 — หน้าแรก docs/index.html: ทับ &quot;หน้าเปิด แบบเดิม&quot; ของใบ 02 (เจ้าของ ผ่านผู้รวมงาน · คำต่อคำ)</h4>
+<ul><li>เจ้าของ: &quot;re ui หน้า &lt;local&gt;&quot; · เลือกทาง &quot;2+3&quot; = ทำหน้า tweak ของหน้าแรก (preset ปรับสด คัดลอกค่า แบบ tweak.html เดิม) โดย preset เป็นโครงใหม่ทั้งหน้า 2–3 แบบ (ลำดับเนื้อหา · เดโม · ปุ่มเข้าเล่น) ให้เจ้าของเลือก แล้วค่อยลงจริง</li><li>⇒ ค่า <code>&quot;home&quot;:&quot;old&quot;</code> ใน JSON ใบ 02 ไม่ใช้แล้ว · รอค่าจากหน้า <code>ui-redo/home-tweak.html</code> (เลน C · สร้างจาก <code>ui-redo/home-tweak/gen.mjs</code> อ่าน docs/index.html จริง) · ลงจริงที่ docs/index.html (หน้าเขียนมือ · build ฉีดแค่ data-fact + เดโม ``)</li></ul>
+<h4 id="d-ui-redo-decisions-h4">2026-11-03 01:08 — หน้าแรก docs/index.html: ค่าจาก home-tweak.html (เจ้าของวาง · คำต่อคำ)</h4>
+<p>หน้าแรก: เริ่มจาก C · เปิดเกมทันที</p>
+<ul><li>ลำดับใต้หัวหน้า: สองโลก → ภาพหน้าเกมจริง → ระบบหลัก (ปรับ)</li><li>แบบหัวหน้า: เต็มจอ โลโก้กลาง แบบหน้าเกม</li><li>คำอธิบายเซฟ (บันทึกในเบราว์เซอร์): ย้ายไปท้ายหน้า</li><li>ปุ่ม เริ่มเล่น: ปุ่มใหญ่เต็มแถว</li><li>แถบปุ่มติดล่างจอ: ไม่มี (เดิม) (ปรับ · เดิม โผล่เมื่อเลื่อนผ่านหัวหน้า)</li><li>ปุ่ม ต่างโลกคืออะไร: ย้ายไปอยู่ในกล่องต่างโลก</li><li>เดโมการ์ด: ไม่มี (ปรับ · เดิม ส่วนของตัวเองตามลำดับ (เดิม))</li><li>ภาพหน้าเกม: แถวเลื่อนแนวนอน</li><li>ลิงก์หน้าอื่น: แถบลิงก์บนสุดของหน้า</li><li>ระบบหลัก: พับไว้ กดเปิด</li><li>สีและฟอนต์: เดิม (Pridi · Sarabun · มุมเหลี่ยม) (ปรับ · เดิม ตามหน้าเล่นใหม่ (Noto · มุม 10 · เงาบาง))</li><li>หมายเหตุ: 1. สองโลก (ชาติไทย · ต่างโลก)  เพิ่มปรโลก</li><li>ภาพหน้าเกมจริง เอาออก</li><li>ลองการ์ดหนึ่งใบ ย้ายไป การ์ดทั้งหมดในเกม</li><li>JSON: {&quot;base&quot;:&quot;c&quot;,&quot;hero&quot;:&quot;full&quot;,&quot;note&quot;:&quot;foot&quot;,&quot;play&quot;:&quot;big&quot;,&quot;sticky&quot;:&quot;off&quot;,&quot;alt&quot;:&quot;worlds&quot;,&quot;demo&quot;:&quot;off&quot;,&quot;shots&quot;:&quot;strip&quot;,&quot;links&quot;:&quot;nav&quot;,&quot;systems&quot;:&quot;fold&quot;,&quot;skin&quot;:&quot;old&quot;,&quot;order&quot;:[&quot;worlds&quot;,&quot;shots&quot;,&quot;demo&quot;,&quot;systems&quot;,&quot;links&quot;]}</li><li>ผู้รวมงานอ่าน: หมายเหตุชนะค่าใน JSON — ภาพหน้าเกมจริงเอาออก (ไม่ใช่ &quot;shots&quot;:&quot;strip&quot;) · กล่องสองโลกเพิ่มปรโลกเป็นสามโลก · ส่วน &quot;ลองการ์ดหนึ่งใบ&quot; ย้ายไปหน้า การ์ดทั้งหมดในเกม (catalog)</li></ul>
+</details>
+<script>(() => { const open = () => { const t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); const d = t && t.closest('details'); if (d && !d.open) { d.open = true; t.scrollIntoView(); } }; addEventListener('hashchange', open); open(); })();</script>
+</div></main>
+</body>
+</html>
