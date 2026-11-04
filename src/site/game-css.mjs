@@ -3,7 +3,7 @@
 export const GAME_CSS_START = '/*GAME-CSS:START*/';
 export const GAME_CSS_END = '/*GAME-CSS:END*/';
 // หน้าใต้ docs/ ที่ใช้ CSS เกม
-export const GAME_CSS_PAGES = ['dev/ui-redo/entry-tweak.html', 'dev/ui-redo/fx-icons-tweak.html'];
+export const GAME_CSS_PAGES = ['dev/ui-redo/entry-tweak.html', 'dev/ui-redo/fx-icons-tweak.html', 'dev/ui-redo/shelf-tabs-tweak.html'];
 
 // ฟอนต์ฝัง (base64) ของเกมไม่ตามมา — หน้า tweak โหลดฟอนต์ชุดเดียวกันจากเว็บ ไฟล์จึงไม่บวม
 export function gameCss(template) {
