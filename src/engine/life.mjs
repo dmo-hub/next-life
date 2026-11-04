@@ -297,11 +297,16 @@ export function newLife(seed, content, heir = null) {
   // พ่อ/แม่ที่จากไปก่อนเราเกิด (ทางในตระกูล) เป็นประวัติครอบครัวตั้งแต่แรก
   for (const p of st.parents) if (!p.alive) inherit(st, p.cause);
   petsAtBirth(st, heir, CLASSES.indexOf(cls));
+  if (heir?.start) skipToAge(st, heir.start.age);
+  // เริ่มกลางวัย = เงินของบ้านเป็นบาทของปีที่เริ่ม (yearlySaving อ่านปีจาก st.age)
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
   // การ์ดเปิดชีวิตมาก่อนการ์ดมรดกตอนแรกเกิด — ต้องเล่ามรดกก่อน receiveLegacy ล้าง st.legacy
   st.due.push(introCard(st, heir));
-  if (st.legacy?.age === 0) receiveLegacy(st, birthYear, stageOf(0));
-  st.trail.push({ year: birthYear, money: Math.round(st.money) });
+  // ทางเป็นลูก legacy.age >= 0 ⇒ อายุ 0 ได้ผลเท่าเดิม · เริ่มกลางวัย มรดกถึงมือปีที่เริ่ม (รุ่นก่อนตายปีนี้)
+  if (st.legacy && st.legacy.age <= st.age) receiveLegacy(st, birthYear + st.age, stageOf(st.age));
+  if (st.age > 0 && st.letter && !st.letter.read && !st.legacy && st.age >= st.letter.age) receiveLetter(st);
+  if (heir?.start) startSchool(st, birthYear + st.age);
+  st.trail.push({ year: birthYear + st.age, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
   st.stageMark = markStage(st);
   lifeFocusBorn(st, heir?.focus);
@@ -770,6 +775,68 @@ function invest(st, { asset, share }) {
   st.alloc = next;
 }
 
+// จบช่วงเรียน: ได้วุฒิ แล้วออกด่านเรียนต่อ หรือการ์ดหางานถ้าเป็นช่วงสุดท้าย
+function finishTrack(st, year) {
+  const track = st.school && TRACKS[st.school];
+  if (!track || st.age !== track.until) return;
+  if (eduRank(track.edu) > eduRank(st.edu)) st.edu = track.edu;
+  if (track.exam) for (const ev of preludes(st, track.exam, year)) st.due.push({ kind: 'eraEvent', ev, age: st.age });
+  if (track.gate) st.due.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
+  else {
+    st.school = null;
+    if (track.ladder) applyEffects(st, { ladder: track.ladder });
+    else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
+  }
+}
+
+// เริ่มกลางวัย (B76 ผู้สืบสายเลือด): คนที่โตมาแล้วจริง ไม่เล่นวัยเด็กซ้ำ · ค่าสถานะเดินตามธรรมชาติของปีที่ข้าม ไม่มีเหตุการณ์ ไม่ดึงเลขสุ่มของโลก
+// พ่อแม่: คนที่มีอายุตายจริง (คนในครอบครัวรุ่นก่อน) ตายตามนั้น · คนที่สร้างใหม่ยังอยู่ · รุ่นก่อน (ancestor) ตายปีที่เริ่มผ่านมรดก
+function skipToAge(st, age) {
+  const era = st.content.era;
+  while (st.age < age) {
+    st.age += 1;
+    const year = st.birthYear + st.age;
+    st.price *= 1 + inflationRate(era, st.seed, year) / 100;
+    const r = healthDecay(st.age);
+    st.health = clamp(st.health * (1 - r));
+    st.healthNatural *= 1 - r;
+    st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
+    st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * moodMul(st) * (100 - st.knowledge)) / 100);
+    st.relations = clamp(st.relations * (1 - RELATION_FADE));
+    for (const p of st.parents) {
+      if (!p.alive) continue;
+      p.age += 1;
+      if (p.diesAt !== undefined && !p.ancestor && p.age >= p.diesAt) {
+        p.diedAge = p.age;
+        parentDied(st, p, year);
+      }
+    }
+  }
+  st.lowWarned = st.health <= WARN.human;
+  st.standing = [{ age: st.age, cls: CLASSES.indexOf(st.cls) }];
+}
+
+// ช่วงเรียนตามอายุจริง: ถึงมัธยมปลายเสมอ (16–18) · 18 = เพิ่งจบ ออกด่านสอบ/ทางต่อปีนี้
+// 19–22 = เรียนมหาวิทยาลัยถ้าความรู้ถึงเกณฑ์ (ปีจบ = ออกการ์ดหางานปีนี้) · ไม่ถึง = เลิกเรียนแล้ว หางานทันที
+function startSchool(st, year) {
+  st.edu = TRACKS.lower.edu;
+  if (st.age <= TRACKS.upper.until) {
+    st.school = 'upper';
+    finishTrack(st, year);
+    return;
+  }
+  st.edu = TRACKS.upper.edu;
+  if (st.knowledge >= HEIR_UNI_KNOW) {
+    st.school = 'uni';
+    finishTrack(st, year);
+    return;
+  }
+  st.school = null;
+  st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
+}
+// เกณฑ์เดียวกับด่านสอบโรงเรียนดัง (career.mjs) — มหาวิทยาลัยรัฐเองไม่มีเกณฑ์ล็อก มีแต่โอกาสสอบติด
+const HEIR_UNI_KNOW = 55;
+
 // เดินหนึ่งปี: ทุกอย่างไหลเป็นรายปีในลูปนี้ที่เดียว การกระโดดหลายปีจึงได้ผลเท่ากับเดินทีละปีเสมอ
 function stepYear(st) {
   const prevStage = stageOf(st.age);
@@ -841,18 +908,7 @@ function stepYear(st) {
     st.due.push({ kind: 'stage', age: st.age, stage, text: `เข้าสู่ช่วง${stage}`, recap: stageRecap(st, st.age - 1) });
     st.stageMark = markStage(st);
   }
-  // จบช่วงเรียน: ได้วุฒิ แล้วออกด่านเรียนต่อ หรือการ์ดหางานถ้าเป็นช่วงสุดท้าย
-  const track = st.school && TRACKS[st.school];
-  if (track && st.age === track.until) {
-    if (eduRank(track.edu) > eduRank(st.edu)) st.edu = track.edu;
-    if (track.exam) for (const ev of preludes(st, track.exam, year)) st.due.push({ kind: 'eraEvent', ev, age: st.age });
-    if (track.gate) st.due.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
-    else {
-      st.school = null;
-      if (track.ladder) applyEffects(st, { ladder: track.ladder });
-      else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
-    }
-  }
+  finishTrack(st, year);
   // สายยศ (B40): ปีในขั้นนับตามความสุข ถึงคิวแล้วการ์ดเลื่อนขั้น · ผู้ใหญ่บ้าน/กำนันพ้นตำแหน่งตอนเกษียณ · ครบวาระ/ถูกชวนลงสมัคร = การ์ดเลือกตั้ง
   // การ์ดงบ/ครบวาระของคนมีตำแหน่งการเมืองกินโควตากองสุ่มแบบเรื่องต่อ — เจอทุกวาระ ชีวิตจึงยาวขึ้นเฉพาะสายนี้ (หางด่าน 4)
   // ไม่หัก: การ์ดเลื่อนขั้น (ออกกับคนทำงานแทบทุกคน) · ใบชวนลงสมัครครั้งแรก (ออกกับทุกคนที่คอนเน็คชั่นถึง แม้ไม่ลง) — หักแล้วชีวิตสั้นลงทั้งกระดาน ไม่ใช่แค่หาง
@@ -1271,7 +1327,8 @@ function lockReason(st, c, extra = 0) {
 }
 
 // ดัชนีตัวเลือกที่กดได้ — บอทเลือกจากชุดนี้เท่านั้น · ไม่มีตัวล็อก = ทุกตัว (ลำดับสุ่มของบอทจึงเหมือนก่อนมีการล็อก)
-export const openChoices = (card) => card.choices.map((_, i) => i).filter((i) => !card.locked?.[i]);
+// manual = ปุ่มที่คนกดได้แต่บอทไม่กด (B76 เล่นต่อเป็นผู้สืบสายเลือด) — หน้าจอไม่อ่านชุดนี้ ปุ่มยังกดได้ · ไม่มีฟิลด์ = ชุดเท่าเดิม
+export const openChoices = (card) => card.choices.map((_, i) => i).filter((i) => !card.locked?.[i] && !card.manual?.[i]);
 
 // เดินปีละครั้งจนมีการ์ดถึงกำหนดหรือตาย คืนการ์ดใบถัดไป
 export function nextCard(st) {

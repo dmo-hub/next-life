@@ -98,6 +98,17 @@ export function startAfterlife(st) {
 const livingKin = (st, role) => (st.kin ?? []).filter((m) => m.role === role && m.alive);
 const hasKids = (st) => (st.kin ? livingKin(st, 'child').length + livingKin(st, 'grandchild').length > 0 : !!st.flags.has_kids);
 
+// ผู้สืบสายเลือดที่เล่นต่อได้ (B76): ลูก/หลานที่ยังอยู่ อายุจริงปีที่ตายอยู่ในช่วง · หน้าเลือกคนของต่างโลก (isekai ใบ 21) ใช้รายชื่อชุดเดียวกัน
+// เรียงตามลำดับในบ้าน (เกิดก่อนก่อน) ไม่ดึงเลขสุ่ม · state ก่อนมีระบบครอบครัว (ไม่มี kin) = ไม่มีรายชื่อ
+export const HEIR_AGE = [16, 22];
+export function heirCandidates(st) {
+  const year = st.birthYear + st.age;
+  return (st.kin ?? [])
+    .filter((m) => (m.role === 'child' || m.role === 'grandchild') && m.alive)
+    .map((m) => ({ id: m.id, name: m.name, sex: m.sex, role: m.role, age: year - m.born }))
+    .filter((m) => m.age >= HEIR_AGE[0] && m.age <= HEIR_AGE[1]);
+}
+
 // ฉากของช่วงที่ 7: เนื้อหาที่ตรงเงื่อนไขของผู้ตาย สุ่มตามน้ำหนัก · ด่าน afterlife-coverage รับประกันว่ามีใบไม่มีเงื่อนไขเสมอ
 function pickScene(af, scene) {
   const realm = af.verdict?.realm.id;
@@ -161,6 +172,8 @@ export const PATHS = [
   { id: 'child', text: 'เฝ้าลูกหลาน แล้วกลับมาเกิดในตระกูลเดิม เป็นลูก หลาน หรือเหลน' },
   { id: 'reborn', text: 'ไปตามกรรม แล้วเกิดใหม่ที่ไหนก็ได้' },
   { id: 'isekai', text: 'ตามเทพธิดาต่างโลกไปเกิดในโลกแฟนตาซีก่อน' },
+  // B76: ต่อท้ายเสมอ ดัชนีทางเดิมจึงไม่ขยับ · ขึ้นเฉพาะเมื่อมีรายชื่อ ไม่มี = การ์ดเท่าเดิมทุกไบต์
+  { id: 'blood', text: 'เล่นต่อเป็นผู้สืบสายเลือด' },
 ];
 // กลับจากต่างโลก: ลูกหลานชาติไทยห่างไปหลายรุ่นแล้ว จึงกลับได้ทางตามกรรมเท่านั้น · ทางที่ 3 = อยู่ต่างโลกต่อ ติดเพดานชาติติดกัน
 const FROM_ISEKAI_PATHS = {
@@ -171,10 +184,15 @@ const FROM_ISEKAI_PATHS = {
 const pathLocked = (af, id) => {
   if (id === 'child') return af.from ? 'ลูกหลานในโลกเดิมห่างไปหลายรุ่นแล้ว' : hasKids(af.st) ? null : 'ไม่มีลูกหลานให้กลับไปเกิด';
   if (id === 'isekai' && af.from && af.from.run >= ISEKAI.stay) return 'เทพธิดาบอกว่าวิญญาณนี้อยู่ต่างโลกนานพอแล้ว';
+  if (id === 'blood' && !pathHeirs(af).length) return 'ไม่มีลูกหลานวัยที่เล่นต่อได้';
   return null;
 };
+// กลับจากต่างโลก = ลูกหลานห่างไปหลายรุ่นแล้ว ไม่มีรายชื่อ
+const pathHeirs = (af) => (af.from ? [] : heirCandidates(af.st));
 function pathCard(af) {
-  af.pending = { path: true, choices: PATHS.map(() => ({ merit: [] })) };
+  const heirs = pathHeirs(af);
+  const paths = PATHS.filter((p) => p.id !== 'blood' || heirs.length);
+  af.pending = { path: true, choices: paths.map(() => ({ merit: [] })) };
   const base = af.from
     ? 'เทพธิดาต่างโลกยืนรออยู่ข้างพญายม ถามว่าจะกลับไปเกิดในโลกเดิม หรือจะไปต่างโลกอีกรอบ'
     : hasKids(af.st) ? 'ก่อนไปตามคำตัดสิน ดวงวิญญาณเลือกได้ว่าจะกลับไปใกล้ลูกหลาน หรือปล่อยวางแล้วไปเกิดตามกรรม' : 'ไม่มีลูกหลานให้เฝ้า ดวงวิญญาณไปเกิดตามกรรม';
@@ -182,8 +200,10 @@ function pathCard(af) {
     kind: 'path',
     type: 'B',
     text: af.blessed && !af.from ? `${base} · มีหญิงผมสีเงินยืนโบกมือรออยู่ข้างทาง บอกว่าเป็นเทพธิดาจากอีกโลกหนึ่ง` : base,
-    choices: PATHS.map((p) => (af.from ? FROM_ISEKAI_PATHS[p.id] : p.text)),
-    locked: PATHS.map((p) => pathLocked(af, p.id)),
+    choices: paths.map((p) => (af.from ? FROM_ISEKAI_PATHS[p.id] : p.text)),
+    locked: paths.map((p) => pathLocked(af, p.id)),
+    // ปุ่มสายเลือดคนกดได้ บอทไม่กด (openChoices) · หน้าเลือกคนอ่าน heirs แล้วส่ง id กลับทาง chooseAfter
+    ...(heirs.length && { manual: paths.map((p) => p.id === 'blood'), heirs }),
   });
 }
 
@@ -198,7 +218,7 @@ function carryCard(af) {
   af.heir = makeHeir(af, r);
   const h = af.heir;
   const amount = carryAmount(h);
-  const who = af.path === 'child' ? `กลับมาเกิดเป็น${kinTier(h.tier).name}ของตัวเอง` : af.from ? 'กลับจากต่างโลกมาเกิดใหม่' : 'ไปเกิดใหม่';
+  const who = af.path === 'blood' ? `เล่นต่อเป็น${h.name} ${kinTier(h.tier).name}อายุ ${h.start.age} ปี` : af.path === 'child' ? `กลับมาเกิดเป็น${kinTier(h.tier).name}ของตัวเอง` : af.from ? 'กลับจากต่างโลกมาเกิดใหม่' : 'ไปเกิดใหม่';
   return emitAfter(af, {
     kind: 'carry',
     type: 'B',
@@ -211,7 +231,7 @@ function carryCard(af) {
 }
 
 // ผังตระกูล (ใบ 05: เลิกเมื่อไรก็ดูได้) — หน้าจอวาดระหว่างชีวิตจาก st.lineage และบนการ์ดส่งต่อ
-export const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่นที่ ${l.gen} · ${l.name} · ต่างโลก (${l.world}) · ${l.ending}` : `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ${l.province ? `${placeName(l.province)} · ` : ''}ฐานะ${l.cls} · ${lifeEndWord(l.gone)} ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${kinTier(l.tier).name}` : ''}${l.trips?.some((t) => t.home) ? ` · เคยไปต่างโลกแล้วกลับมา ${l.trips.filter((t) => t.home).length} ครั้ง` : ''}`);
+export const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่นที่ ${l.gen} · ${l.name} · ต่างโลก (${l.world}) · ${l.ending}` : `รุ่นที่ ${l.gen} · ${l.name ? `${l.name} · ` : ''}${l.sex} · ${l.province ? `${placeName(l.province)} · ` : ''}ฐานะ${l.cls} · ${lifeEndWord(l.gone)} ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${kinTier(l.tier).name}` : l.path === 'blood' ? ` · เล่นต่อเป็น${kinTier(l.tier).name}` : ''}${l.trips?.some((t) => t.home) ? ` · เคยไปต่างโลกแล้วกลับมา ${l.trips.filter((t) => t.home).length} ครั้ง` : ''}`);
 
 // ชาติต่างโลกจบ (การ์ดตอนจบออกไปแล้ว): ลงผังตระกูลเป็นรุ่นของตัวเอง แล้วเปิดปรโลกรอบใหม่ให้ชาตินั้น
 // ยมทูต/เทวทูตเป็นฉากของชีวิตไทย (เนื้อหาอ่านค่าชาติไทย) จึงเริ่มที่คำตัดสิน
@@ -283,12 +303,17 @@ function addBonus(af, fx = {}) {
   for (const k of STAT_KEYS) if (fx[k]) af.bonus[k] = Math.max(-FATE.bonusCap, Math.min(FATE.bonusCap, (af.bonus[k] ?? 0) + levelValue(fx[k])));
 }
 
-export function chooseAfter(af, idx) {
+// heirId = คนที่เลือกจากรายชื่อ card.heirs (เฉพาะปุ่มสายเลือด)
+export function chooseAfter(af, idx, heirId = null) {
   if (af.isekai) return chooseIsekai(af.isekai, idx);
   const p = af.pending;
   if (p?.path) {
-    const path = PATHS[idx];
+    const path = idx < p.choices.length ? PATHS[idx] : null;
     if (!path || pathLocked(af, path.id)) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    if (path.id === 'blood') {
+      if (!pathHeirs(af).some((m) => m.id === heirId)) throw new Error('ต้องเลือกคนจากรายชื่อผู้สืบสายเลือด');
+      af.blood = heirId;
+    }
     af.pending = null;
     af.path = path.id;
     if (path.id === 'isekai') sendToIsekai(af);
@@ -374,15 +399,17 @@ function makeHeir(af, r) {
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
   const fame = Math.min(FAME.names.length - 1, nextFame(st, death) + goals.length);
-  if (af.path === 'child') {
+  // ทางสายเลือด (B76) = คนที่ผู้เล่นเลือก ชั้นตามบทบาท ไม่สุ่มชั้น/คน · ที่เหลือคิดแบบทางเป็นลูก (พ่อแม่ มรดก ธงรุ่นก่อน)
+  const blood = af.path === 'blood' ? st.kin.find((m) => m.id === af.blood) : null;
+  if (af.path === 'child' || blood) {
     // บ้านของรุ่นถัดไปคือบ้านของคนในชาติก่อน — อาชีพของครอบครัวจึงเป็นงานสุดท้ายของเขา ไม่สุ่มใหม่
     occupation = st.occupation;
-    tier = weighted(rng, KIN_TIERS, KIN_TIERS.map((t) => t.w));
+    tier = blood ? KIN_TIERS[blood.role === 'child' ? 0 : 1] : weighted(rng, KIN_TIERS, KIN_TIERS.map((t) => t.w));
     // ลูก/หลานที่ยังอยู่จริง (B36a): เกิดเป็นคนหนึ่งในนั้น · ไม่มีลูกเหลือแต่มีหลาน = ชั้นลูกเลื่อนเป็นหลาน · สุ่มเลือกคนจาก kinRng ของชีวิตก่อน
     const kids = livingKin(st, 'child'), grand = livingKin(st, 'grandchild');
     if (st.kin && tier.tier === 1 && !kids.length) tier = KIN_TIERS[1];
     const pickOne = (list) => (list.length ? list[st.kinRng.int(0, list.length - 1)] : null);
-    const me = st.kin ? (tier.tier === 1 ? pickOne(kids) : tier.tier === 2 ? pickOne(grand) : null) : null;
+    const me = blood ?? (st.kin ? (tier.tier === 1 ? pickOne(kids) : tier.tier === 2 ? pickOne(grand) : null) : null);
     const link = me?.role === 'grandchild' ? st.kin.find((m) => m.id === me.of) ?? null : tier.tier > 1 ? pickOne(kids) : null;
     const spouse = (st.kin ?? []).filter((m) => m.role === 'spouse').at(-1) ?? null;
     if (me) ({ sex, name } = me);
@@ -440,7 +467,8 @@ function makeHeir(af, r) {
       letter = { age: Math.max(legacy.age, st.content.heir[sent].from_age ?? 0), from: `${legacy.from} ${st.name}`, cause: causeWords(st.cause ?? 'other', st.age), by: to && to.id !== me?.id ? to.name ?? null : null };
     }
     // ปีเกมไม่เกินปีเกิดสุดท้ายในข้อมูล — เนื้อหา/ข้อมูลยุคครอบถึงช่วงนั้น · หน้าจอไม่แสดงปีอยู่แล้ว
-    birthYear = Math.min(lastBirth, year);
+    // สายเลือดเกิดจริงแล้ว — ตัดปีเกิดทำให้อายุตอนเริ่มเพี้ยนจากอายุจริง
+    birthYear = blood ? blood.born : Math.min(lastBirth, year);
   } else {
     birthYear = pickBirthYear(rng, era);
     region = pickRegion(rng, era.birth);
@@ -484,6 +512,8 @@ function makeHeir(af, r) {
     ...(tier && lifeFocusKid(st) && { focus: lifeFocusKid(st) }),
     // ประตูเข้าสายที่รุ่นก่อนเปิดไว้ ส่งต่อเฉพาะทายาทในตระกูล
     ...(tier && lifeGatesOpen(st).length && { gates: lifeGatesOpen(st) }),
+    // เริ่มกลางวัย (B76): อายุจริงปีที่รุ่นก่อนตาย · newLife อ่านแล้วข้ามวัยเด็ก
+    ...(blood && { start: { age: st.birthYear + st.age - blood.born, kinId: blood.id } }),
     fame,
     ...(overlap && { overlap }),
   };
