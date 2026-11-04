@@ -906,6 +906,9 @@ function heraldNextYear(st, year) {
   }
   if (st.age < HERALD_MIN_AGE) return;
   if (st.lastEraAge !== null && st.age + 1 - st.lastEraAge < ERA_GAP) return;
+  // เพดานต่อชีวิต: ภัยทุกชนิดได้ลาง = แฟนตาซีเกินเป้า 5–8 ใบ/ชีวิตทุกบอท · นับจาก st.done ไม่เพิ่มคีย์ใน st (lifehash hash ทั้งก้อน)
+  let left = HERALD_PER_LIFE - st.content.events.filter((c) => c.herald_of && st.done[c.id]).length;
+  if (left <= 0) return;
   for (const e of eraEventsAt(st.content.era, st.seed, year + 1)) {
     const answers = st.content.events.filter((c) => c.era === e.id);
     if (answers.some((c) => st.done[c.id])) continue;
@@ -917,9 +920,11 @@ function heraldNextYear(st, year) {
     st.done[h.id] = true;
     st.due.push({ kind: 'eraEvent', ev: h, age: st.age });
     if (st.age >= HERALD_QUOTA_FROM) takeYearQuota(st);
+    if (--left <= 0) return;
   }
 }
 const HERALD_MIN_AGE = 18;
+const HERALD_PER_LIFE = 1;
 const HERALD_QUOTA_FROM = 18;
 const HERALD_FLAG = 'braced:';
 
