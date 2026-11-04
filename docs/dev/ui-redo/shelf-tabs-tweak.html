@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ปุ่มแท็บชั้นสมุด 5 แบบ (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<title>ปุ่มแท็บชั้นสมุด 9 แบบ (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Sarabun:wght@400;600;700&display=swap">
@@ -73,7 +73,7 @@
   <aside class="ctl" id="ctl"></aside>
   <main class="view">
     <div class="vbar">
-      <span class="seg" id="mode"><button type="button" data-m="one">แบบที่เลือก · 360/390/1280 × สองธีม</button><button type="button" data-m="all">เทียบ 5 แบบ · 390</button></span>
+      <span class="seg" id="mode"><button type="button" data-m="one">แบบที่เลือก · 360/390/1280 × สองธีม</button><button type="button" data-m="all">เทียบทุกแบบ · 390</button></span>
       <span class="seg" id="theme"><button type="button" data-t="a">กระดาษ</button><button type="button" data-t="b">ลายรดน้ำ</button></span>
     </div>
     <p class="note">กดปุ่มแท็บในจอได้ทุกจอ (ทุกจอเปิดเล่มเดียวกัน) · จุดแดง = ของใหม่ เปิดแท็บแล้วจุดหาย · ตัวเลขบนจอเป็นตัวอย่างตามภาพเจ้าของ (ใบ 163) · แถบ grid3 = 3 ช่องที่จอมือถือ 6 ช่องที่จอคอมตามหน้า tweak B67 · แบบ ง: แท็บที่เปิดต่อกับแผงได้เฉพาะแถวล่างของ 3 ช่อง (แถวบนเป็นป้ายลอย) · จอคอม 6 ช่องแถวเดียวต่อได้ทุกแท็บ</p>
@@ -670,7 +670,32 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
     ['under', 'ข ขีดเส้นใต้'],
     ['seg', 'ค กล่องเหลี่ยมติดกัน'],
     ['mark', 'ง ป้ายคั่นหน้าต่อแผงเนื้อหา'],
+    ['track', 'จ แทร็กเลื่อน แท็บที่เปิดลอยขึ้น'],
+    ['icon', 'ฉ ไอคอนบนชื่อ + แถบบน'],
+    ['dock', 'ช แผงมืด ไอคอน + แถบทองล่าง'],
+    ['glow', 'ซ ชิปเรืองแสง'],
   ];
+  // ที่มาของแต่ละแบบ: เกมใน study-games ที่ใช้แท็บแบบนี้ (อ่านจาก CSS ของเกมนั้น)
+  const SRC = {
+    old: 'ของเกมตอนนี้ · คล้าย doom365 / Fortunes of Siam (pill ทึบสีทอง)',
+    spine: 'ข้อเสนอเดิม (ui-redo ข้อ 94)',
+    under: 'ข้อเสนอเดิม (ui-redo ข้อ 94)',
+    seg: 'ข้อเสนอเดิม (ui-redo ข้อ 94)',
+    mark: 'ข้อเสนอเดิม · แบบเดียวกับแท็บแผงตรวจของ หนึ่งตระกูล (Dynasty Sim)',
+    track: 'Football Life — แถบแท็บเป็นรางสีอ่อน แท็บที่เปิดเป็นแผ่นสีกระดาษมีเงา ปุ่มกว้างเท่ากัน',
+    icon: 'Way of Xian (เส้นทางเซียน) — ไอคอนเหนือชื่อ แท็บที่เปิดพื้นอมสี + แถบหนาด้านบน ไม่มีกรอบ',
+    dock: 'gameslash.app — แผงสีเข้ม ไอคอนใหญ่ แท็บที่เปิดตัวหนังสือทอง + แถบทองด้านล่าง (สีเปิดของแบบนี้คงทอง)',
+    glow: 'Afterfall — ชิปมุมมน แท็บที่เปิดไล่สีอุ่นมีแสงเรือง',
+  };
+  // ไอคอนเส้นบางต่อแท็บ (แบบ ฉ ช) — ร่างใหม่ ไม่ได้ลอกจากเกมต้นแบบ
+  const ICON = {
+    m: '<path d="M6 4h10a2 2 0 0 1 2 2v14H8a2 2 0 0 1-2-2z"/><path d="M6 17a2 2 0 0 1 2-2h10"/><path d="M10 8h5"/>',
+    s: '<path d="M12 3c3 4 5 6 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-8z"/>',
+    t: '<circle cx="12" cy="9" r="5"/><path d="M9 13.5 7.5 21l4.5-2.5 4.5 2.5-1.5-7.5"/>',
+    k: '<path d="M12 3l2.6 5.5 6 .8-4.4 4.1 1.1 6L12 16.6 6.7 19.4l1.1-6L3.4 9.3l6-.8z"/>',
+    p: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/>',
+    d: '<path d="M12 21v-7"/><path d="M12 14c-4 0-6-3-6-6 3 0 5 1 6 3 1-2 3-3 6-3 0 3-2 6-6 6z"/><path d="M9 21h6"/>',
+  };
   // สีเล่มที่เปิดต่อธีม: ค่าตัวแปรของเกม · ตัวหนังสือบนสีนั้น (ข ขีดเส้นใต้ใช้สีนี้เป็นตัวหนังสือแทน)
   const OPEN = {
     a: [['ink', 'หมึก', 'var(--paper)'], ['red', 'แดง', '#fff'], ['green', 'เขียว', '#fff'], ['blue', 'น้ำเงิน', '#fff']],
@@ -683,6 +708,10 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
     under: { r: 0, l: 3, raise: 0, a: 'red', b: 'gold' },
     seg: { r: 10, l: 1, raise: 0, a: 'ink', b: 'gold' },
     mark: { r: 10, l: 2, raise: 0, a: 'red', b: 'gold' },
+    track: { r: 8, l: 1, raise: 0, a: 'ink', b: 'gold' },
+    icon: { r: 0, l: 4, raise: 0, a: 'red', b: 'gold' },
+    dock: { r: 8, l: 3, raise: 0, a: 'ink', b: 'gold' },
+    glow: { r: 7, l: 1, raise: 0, a: 'red', b: 'gold' },
   };
   const clone = (o) => JSON.parse(JSON.stringify(o));
   let cfg = clone(DEF), ui = { v: 'spine', mode: 'one', theme: 'a', tab: 'm', seen: [], focus: false }, note = '';
@@ -732,6 +761,29 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
 .v-mark button { border:var(--tl) solid var(--tfaint); border-bottom:0; border-radius:var(--tr) var(--tr) 0 0; background:var(--tbook); }
 .v-mark button[aria-pressed="true"] { background:var(--tcard); color:var(--tu); border-color:var(--to); border-top-width:calc(var(--tl) + 2px); font-weight:700; padding-bottom:calc(4px + var(--tl)); }
 .v-mark + .bk-panel { border:var(--tl) solid var(--to); border-radius:0 0 var(--tr) var(--tr); padding:12px; }
+/* จ แทร็ก (Football Life): รางสีอ่อน · แท็บที่เปิดเป็นแผ่นลอยมีเงา ตัวหนังสือสีเปิด */
+.card.a { --ttrack:var(--paper2); --tmuted:var(--muted); } .card.b { --ttrack:#0D0907; --tmuted:var(--sand); }
+.v-track { gap:4px; padding:4px; background:var(--ttrack); border-radius:calc(var(--tr) + 4px); }
+.v-track button { border-radius:var(--tr); color:var(--tmuted); font-weight:600; }
+.v-track button[aria-pressed="true"] { background:var(--tcell); color:var(--to); font-weight:700; box-shadow:0 1px 4px rgb(0 0 0 / .15), inset 0 0 0 var(--tl) var(--tfaint); }
+/* ฉ ไอคอน (Way of Xian): ไอคอนเหนือชื่อ ไม่มีกรอบ · ที่เปิดพื้นอมสี + แถบบนหนา */
+.v-icon, .v-dock { align-items:stretch; }
+.v-icon button, .v-dock button { flex-direction:column; row-gap:2px; padding:6px 2px; }
+.v-icon svg, .v-dock svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; opacity:.75; }
+.v-icon button[aria-pressed="true"] svg, .v-dock button[aria-pressed="true"] svg { opacity:1; }
+.v-icon { column-gap:2px; row-gap:2px; border-bottom:1px solid var(--tfaint); }
+.v-icon button { border-radius:var(--tr); color:var(--tmuted); font-weight:600; }
+.v-icon button[aria-pressed="true"] { background:color-mix(in srgb, var(--to) 14%, transparent); color:var(--tu); font-weight:700; box-shadow:inset 0 var(--tl) 0 var(--to); }
+/* ช แผงมืด (gameslash): แผงเข้มทุกธีม ไอคอนใหญ่ · ที่เปิดทอง + แถบล่าง */
+.v-dock { gap:2px; padding:4px; background:#14100C; border-radius:var(--tr); }
+.v-dock button { border-radius:calc(var(--tr) - 2px); color:#D8CDB4; font-size:12px; }
+.v-dock svg { width:26px; height:26px; }
+.v-dock button[aria-pressed="true"] { color:var(--gold2); background:linear-gradient(rgb(217 180 90 / .16), rgb(217 180 90 / .04)); box-shadow:inset 0 calc(-1 * var(--tl)) 0 var(--gold); font-weight:700; }
+.v-dock .new-dot { box-shadow:0 0 0 1px #14100C; }
+/* ซ ชิปเรือง (Afterfall): ชิปมุมมน · ที่เปิดไล่สีจากสีเปิดไปทางสว่าง + แสงเรือง */
+.v-glow { gap:6px; }
+.v-glow button { border:var(--tl) solid var(--tfaint); border-radius:var(--tr); background:var(--tcell); font-weight:700; }
+.v-glow button[aria-pressed="true"] { background-color:var(--to); background-image:linear-gradient(to top right, var(--to), color-mix(in srgb, var(--to) 82%, #fff)); color:var(--tof); border-color:color-mix(in srgb, var(--to) 70%, #fff); box-shadow:0 0 18px -4px var(--to); }
 `;
   const GCSS = $('gcss').content.querySelector('style').textContent;
   const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Srisakdi:wght@700&display=swap';
@@ -745,7 +797,8 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
       const fresh = dot && k !== ui.tab && !ui.seen.includes(k) ? '<span class="new-dot" aria-label="มีของใหม่"></span>' : '';
       // แท็บไม่มีเลข: จุดอยู่ช่องเลข ตัดลงบรรทัดสองได้ — ติดท้ายชื่อแล้ว สถิติวิญญาณ ล้นปุ่มที่จอ 360
       const num = n || fresh ? ` <span class="n">${n}${fresh}</span>` : '';
-      return `<button type="button" data-tab="${k}" aria-pressed="${k === ui.tab}"${ui.focus && i === 1 ? ' class="fv"' : ''}><span class="l">${label}</span>${num}</button>`;
+      const ic = v === 'icon' || v === 'dock' ? `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>` : '';
+      return `<button type="button" data-tab="${k}" aria-pressed="${k === ui.tab}"${ui.focus && i === 1 ? ' class="fv"' : ''}>${ic}<span class="l">${label}</span>${num}</button>`;
     }).join('');
     const t = TABS.find(([k]) => k === ui.tab);
     return `<article class="card ${theme} shelf-view" style="${vars}"><div class="top"><b>${GAME}</b><small>ชั้นสมุด</small></div>
@@ -758,12 +811,21 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
   const rgb = (s) => (s.match(/[\d.]+/g) || []).map(Number);
   const lum = ([r, g, b]) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  // พื้นจริงหลังตัวหนังสือ: ซ้อนชั้นโปร่งแสงลงจนถึงชั้นทึบ (ฉ พื้นอมสี 14% · ช ไล่สีบาง) · ชั้นที่มีไล่สีใช้สีแรกของ background-image — ไม่ซ้อน = วัดกับสีผิดชั้น
   const bgOf = (el, win) => {
+    const layers = [];
     for (let e = el; e; e = e.parentElement) {
-      const c = rgb(win.getComputedStyle(e).backgroundColor);
-      if (c.length >= 3 && (c.length < 4 || c[3] > 0)) return c;
+      const cs = win.getComputedStyle(e);
+      const g = cs.backgroundImage.match(/rgba?\([^)]*\)/);
+      for (const src of g ? [g[0], cs.backgroundColor] : [cs.backgroundColor]) {
+        const c = rgb(src);
+        const a = c.length >= 4 ? c[3] : 1;
+        if (c.length >= 3 && a > 0) layers.push([c.slice(0, 3), a]);
+      }
+      if (layers.length && layers[layers.length - 1][1] >= 1) break;
     }
-    return [255, 255, 255];
+    if (!layers.length || layers[layers.length - 1][1] < 1) layers.push([[255, 255, 255], 1]);
+    return layers.reduceRight((under, [c, a]) => c.map((x, i) => x * a + under[i] * (1 - a)), [0, 0, 0]);
   };
   function measure(f, w) {
     const d = f.contentDocument, win = f.contentWindow;
@@ -861,7 +923,7 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
       const xs = [...results.values()].filter((x) => x.v === ui.v && x.theme === t);
       return [t, xs.length ? { off: +Math.min(...xs.map((x) => x.off)).toFixed(2), on: +Math.min(...xs.map((x) => x.on)).toFixed(2) } : null];
     }));
-    return JSON.stringify({ page: 'shelf-tabs-tweak', ticket: 63, pick: ui.v, pickName: VARIANTS.find(([v]) => v === ui.v)[1], radius: c.r, line: c.l, ...(ui.v === 'spine' ? { raise: c.raise } : {}), openPaper: c.a, openLacquer: c.b, contrast: cr, bar: 'grid3', note }, null, 1);
+    return JSON.stringify({ page: 'shelf-tabs-tweak', ticket: 63, pick: ui.v, pickName: VARIANTS.find(([v]) => v === ui.v)[1], source: SRC[ui.v], radius: c.r, line: c.l, ...(ui.v === 'spine' ? { raise: c.raise } : {}), openPaper: c.a, openLacquer: c.b, contrast: cr, bar: 'grid3', note }, null, 1);
   }
 
   function panel() {
@@ -871,6 +933,7 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
     $('ctl').innerHTML = `<h1>ปุ่มแท็บชั้นสมุด</h1>
       <p class="hint">เจ้าของ: "ตัวเลือกวงรีด้านบน อยากเปลี่ยนเป็นดีไซน์อื่น" · เลือกแบบ ปรับค่า แล้วกด <b>คัดลอกค่า</b> วางตอบในแชท (ใบ 64) · แถบ 6 แท็บ grid3 ตาม JSON ใบ 163 · CSS ในจอคือ CSS เกมตอนนี้</p>
       <div class="row"><span class="lb">แบบปุ่ม</span><div class="seg" id="vsel">${VARIANTS.map(([v, t]) => `<button type="button" data-sel="${v}" class="${v === ui.v ? 'on' : ''}">${t}</button>`).join('')}</div></div>
+      <p class="hint">ที่มา: ${SRC[ui.v]}</p>
       <h2>ค่าปรับของแบบนี้</h2>
       ${range('r', 'มุมโค้ง (px)', 0, 24)}
       ${range('l', ui.v === 'under' ? 'เส้นใต้ (px)' : 'เส้น (px)', 1, 4)}
