@@ -63,7 +63,8 @@ function inheritText(st, heir) {
   const ancestor = st.parents.find((p) => p.ancestor);
   // เซฟก่อน B18 ไม่มี legacy.from — ทางเป็นลูกชั้นเดียวยังมีพ่อ/แม่ที่เป็นชาติก่อนให้เรียก
   const who = heir.legacy?.from ?? (ancestor ? parentWord(ancestor) : null);
-  if (prev.path === 'child' && who) out.push(`ชาติก่อนเฝ้าลูกหลานไว้ แล้วกลับมาเกิดเป็น${kinTier(prev.tier).name}ของตัวเอง — ${who}ของคุณคือคุณในชาติก่อน`);
+  if (prev.path === 'blood' && who) out.push(`รุ่นก่อนจากไปแล้ว คุณเล่นต่อเป็น${kinTier(prev.tier).name}ที่ยังอยู่ — ${who}ของคุณคือคุณในรุ่นก่อน`);
+  else if (prev.path === 'child' && who) out.push(`ชาติก่อนเฝ้าลูกหลานไว้ แล้วกลับมาเกิดเป็น${kinTier(prev.tier).name}ของตัวเอง — ${who}ของคุณคือคุณในชาติก่อน`);
   else if (away.length) out.push(`ชาติก่อนตามเทพธิดาไปต่างโลก ${away.length} ชาติ (ล่าสุด: ${away.at(-1).name} · ${away.at(-1).ending}) แล้วกลับมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม`);
   else out.push('ชาติก่อนไปตามกรรม แล้วมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม');
   out.push(`กรรมที่ติดตัวมาจากชาติก่อน${carryAmount(heir)}`);
@@ -91,10 +92,13 @@ function lineageBrief(lineage) {
 export function introCard(st, heir) {
   return {
     kind: 'intro',
-    age: 0,
-    stage: stageOf(0),
+    age: st.age,
+    stage: stageOf(st.age),
     gen: st.gen,
-    text: `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${provinceLabel(st)} ได้ชื่อจริงว่า “${st.realName}” ชื่อเล่นว่า “${st.name}”`,
+    // ผู้สืบสายเลือด (B76) เริ่มกลางวัย — ไม่ได้เกิดใหม่ เล่าเป็นการรับช่วงชีวิตคนที่โตแล้ว
+    text: st.age > 0
+      ? `คุณเล่นต่อเป็น “${st.name}” วัย ${st.age} ปี ที่${provinceLabel(st)} ชื่อจริงว่า “${st.realName}”`
+      : `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${provinceLabel(st)} ได้ชื่อจริงว่า “${st.realName}” ชื่อเล่นว่า “${st.name}”`,
     story: [familyText(st), eraText(st)],
     // heir ที่ไม่มีรุ่นก่อน (harness สร้างทับค่าเกิดเฉย ๆ) ไม่มีอะไรให้สืบทอด
     inherit: heir && st.lineage.length ? inheritText(st, heir) : [],
