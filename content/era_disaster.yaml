@@ -220,7 +220,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: tsunami
-    when: {age: [0, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
+    when: {age: [5, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ทะเลถอยหนี"
     text: "เช้าวันหยุดที่ชายหาด น้ำทะเลลดลงไปไกลผิดปกติ ปลาดิ้นอยู่บนทรายเต็มไปหมด เด็ก ๆ ทั้งหาดวิ่งกรูลงไปเก็บ คุณกำลังจะวิ่งตามเพื่อน"
     choices:
@@ -334,7 +334,7 @@ events:
     text: "น้ำเหนือไหลเข้าเมือง ชั้นล่างของบ้านจมไปแล้ว พ่อแม่ขนของขึ้นชั้นสองกันทั้งคืน ส่วนคุณนั่งมองปลาว่ายผ่านประตูบ้าน ตื่นเต้นมากกว่ากลัว"
     choices:
       - id: basin_ride
-        text: "ขอนั่งกะละมังลอยในบ้าน"
+        text: "คลานลงไปนั่งในกะละมังลอยน้ำ"
         outcomes:
           - {weight: 2, ok: true, text: "พ่อจับกะละมังไว้ไม่ปล่อย ทั้งบ้านได้หัวเราะในวันที่ทุกคนเครียด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "กะละมังคว่ำ สำลักน้ำ พ่อแม่ไม่ให้ลงชั้นล่างอีกเลย", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}

@@ -12,7 +12,7 @@ events:
     text: "ลูกหมาผอมโซเดินตามคุณกลับจากตลาดจนถึงหน้าบ้าน นั่งกระดิกหางอยู่หน้าประตูไม่ยอมไปไหน ผู้ใหญ่ในบ้านยืนกอดอกมองอยู่ที่ชาน"
     choices:
       - id: beg_keep
-        text: "อ้อนที่บ้านขอเลี้ยง"
+        text: "กอดลูกหมาไว้ ร้องไม่ยอมปล่อย"
         effects: {happiness: 2, relations: 1}
         family: [{add: pet, kind: หมา, life: [10, 15]}]
         merit: [{cat: dana, level: 1}]
@@ -26,7 +26,7 @@ events:
         merit: [{cat: neutral}]
       - id: ask_neighbor
         nature: social
-        text: "ไปถามข้างบ้านว่าของใคร"
+        text: "เดินตามลูกหมาไปหน้าบ้านข้าง ๆ"
         effects: {relations: 1}
         merit: [{cat: help_others, level: 1}]
 
@@ -448,7 +448,7 @@ events:
         effects: {happiness: 1, relations: 1}
         merit: [{cat: neutral}]
       - id: ask_monk
-        text: "ขอที่บ้านไปใส่บาตรให้มัน"
+        text: "ตามผู้ใหญ่ไปใส่บาตรให้มัน"
         effects: {happiness: 1}
         merit: [{cat: dana, level: 1}]
       - id: draw_picture
@@ -456,7 +456,7 @@ events:
         effects: {happiness: 1, knowledge: 1}
         merit: [{cat: neutral}]
       - id: beg_new
-        text: "ขอที่บ้านรับตัวใหม่"
+        text: "ร้องหามันทุกคืน จนได้ตัวใหม่"
         effects: {happiness: 2}
         family: [{add: pet, kind: หมา, life: [10, 15]}]
         merit: [{cat: dana, level: 1}]

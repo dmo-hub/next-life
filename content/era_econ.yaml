@@ -41,7 +41,7 @@ events:
     text: "น้ำมันขึ้นอีกรอบ ไฟฟ้าดับบ่อย โรงงานที่พ่อทำงานลดกะเหลือวันเว้นวัน แม่จุดเทียนกินข้าวแทบทุกคืน คุณได้ยินพ่อแม่คุยกันเรื่องเงินตอนดึก"
     choices:
       - id: no_snack_money
-        text: "เลิกขอขนม เก็บไว้ให้แม่"
+        text: "ไม่งอแงหาขนมอีก"
         effects: {happiness: -1, relations: 1, money: {unit: income_x, amount: 0.1}}
         merit: [{cat: neutral}]
       - id: ride_fruit_cart
@@ -110,7 +110,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: tom_yum_kung
-    when: {age: [0, 18], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
+    when: {age: [5, 18], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ต้มยำกุ้งเดือดทั้งบ้าน"
     text: "ข่าวค่าเงินบาทลอยตัว พ่อเงียบไปทั้งคืน บริษัทพ่อปิดกะทันหัน หนี้บ้านเพิ่มเท่าตัวในพริบตา แม่ถามคุณว่าอยากย้ายบ้านไหม"
     choices:
@@ -210,13 +210,13 @@ events:
     text: "ธนาคารใหญ่ฝั่งอเมริกาล้ม ออเดอร์โรงงานแถวบ้านหายไปครึ่ง แม่โดนพักงานไม่มีกำหนด คุณดีใจที่แม่อยู่บ้านทุกวัน ส่วนแม่นั่งดูประกาศรับสมัครงานทุกคืน"
     choices:
       - id: bake_with_mom
-        text: "ชวนแม่ทำขนมเล่นในครัว"
+        text: "เกาะขาแม่เข้าครัว เล่นแป้งขนม"
         outcomes:
           - {weight: 2, ok: true, text: "บราวนี่ถาดแรกถูกจองหมดจากกลุ่มแม่บ้าน ครัวกลายเป็นร้านเล็ก ๆ", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [online_seller], merit: [{cat: neutral}]}
           - {weight: 1, text: "เตาอบระเบิด ขนมไหม้ แต่คุณได้กินขนมไหม้ฟรีเป็นเดือน", effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: want_toys
-        text: "งอแงขอของเล่นเหมือนเดิม"
+        text: "งอแงร้องหาของเล่นเหมือนเดิม"
         effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
       - id: temple_saturday

@@ -1,0 +1,53 @@
+# ผิดกติกาเดียว: การ์ดอายุ 0–3 มีตัวเลือกเป็นคำขอ + การ์ดต่อ (next) ของมันมีคำพูด ⇒ ตก 2 จุด
+# ไม่ตก: ร้องไห้/ของ บนการ์ดทารก · คำพูดบนการ์ดเริ่ม 5 ขวบ และการ์ดต่อของการ์ดนั้น
+events:
+  - id: bad_case_01
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    when: {age: [0, 3]}
+    text: "ฝนตกหนักทั้งคืน ไฟดับ"
+    choices:
+      - text: "ร้องไห้ขอนม"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "พี่เลี้ยงอุ้มไว้จนหลับ", next: bad_case_02}
+          - {weight: 1, text: "หลับไปเอง"}
+      - {text: "ร้องไห้จนเช้า", merit: [{cat: neutral}]}
+      - {text: "คลานไปหาของเล่น", merit: [{cat: neutral}]}
+      - {text: "หลับต่อ", merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    text: "เช้าวันรุ่งขึ้นน้ำยังไม่ลด"
+    choices:
+      - {text: "บอกพี่เลี้ยงว่าหิวข้าว", merit: [{cat: neutral}]}
+      - {text: "นอนต่อ", merit: [{cat: neutral}]}
+      - {text: "ยิ้มให้พี่เลี้ยง", merit: [{cat: neutral}]}
+      - {text: "กอดตุ๊กตา", merit: [{cat: neutral}]}
+  - id: bad_case_03
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    when: {age: [5, 12]}
+    text: "ฝนตกหนักทั้งคืน ไฟดับ"
+    choices:
+      - text: "ขอพี่เลี้ยงจุดเทียน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "พี่เลี้ยงจุดเทียนให้", next: bad_case_04}
+          - {weight: 1, text: "เทียนหมดบ้าน"}
+      - {text: "ทางเลือกอื่น 2", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 3", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 4", merit: [{cat: neutral}]}
+  - id: bad_case_04
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    text: "เช้าวันรุ่งขึ้นน้ำยังไม่ลด"
+    choices:
+      - {text: "ถามพี่เลี้ยงว่าไปโรงเรียนไหม", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 2", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 3", merit: [{cat: neutral}]}
+      - {text: "ทางเลือกอื่น 4", merit: [{cat: neutral}]}
