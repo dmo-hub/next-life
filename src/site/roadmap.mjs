@@ -1,4 +1,4 @@
-// แผนงานบนหน้าแรก (ui-redo 23): หมวดของหัว "กำลังทำ" ใน whatsnew + จำนวนเรื่องต่อหมวด — build ดึงจาก whatsnew ทุกครั้ง ผู้รวมงานเขียนที่เดียว
+// แผนงานบนหน้าแรก (ui-redo 23): ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew (เจ้าของเคาะ: ไม่มีตัวเลขจำนวน) — build ดึงจาก whatsnew ทุกครั้ง ผู้รวมงานเขียนที่เดียว
 // ลิงก์ไปหัวหมวดด้วย id ที่ build เติมให้ <h3> ในหัวนั้นเอง — text fragment ใช้ไม่ได้ เพราะชื่อหมวดอย่าง "ต่างโลก" เจอในแถบบนก่อนหัวหมวด
 export const ROAD_START = '<!--ROADMAP:START-->';
 export const ROAD_END = '<!--ROADMAP:END-->';
@@ -10,16 +10,12 @@ const soonPart = (html) => {
 };
 export const soonId = (name) => `soon-${name.trim().replace(/\s+/g, '-')}`;
 
-// [{ name, id, count }] ตามลำดับใน whatsnew · count = <li> ใต้หัวนั้นถึงหัวถัดไป
+// [{ name, id }] ตามลำดับใน whatsnew
 export function soonCats(html) {
   const at = soonPart(html);
   if (!at) return [];
   const part = html.slice(...at);
-  const heads = [...part.matchAll(/<h3(?:\s[^>]*)?>([^<]+)<\/h3>/g)];
-  return heads.map((m, i) => {
-    const body = part.slice(m.index + m[0].length, heads[i + 1]?.index ?? part.length);
-    return { name: m[1].trim(), id: soonId(m[1]), count: (body.match(/<li[\s>]/g) ?? []).length };
-  });
+  return [...part.matchAll(/<h3(?:\s[^>]*)?>([^<]+)<\/h3>/g)].map((m) => ({ name: m[1].trim(), id: soonId(m[1]) }));
 }
 
 // เติม id ให้หัวหมวดใน "กำลังทำ" (ทับ id เดิมถ้ามี) · ส่วนอื่นของหน้าไม่แตะ
@@ -30,7 +26,7 @@ export function soonIds(html) {
   return html.slice(0, at[0]) + part + html.slice(at[1]);
 }
 
-export const roadmapHtml = (cats) => `<ul class="road-l">${cats.map((c) => `<li><a href="whatsnew.html#${c.id}">${c.name}<span>${c.count} เรื่อง</span></a></li>`).join('')}</ul>`;
+export const roadmapHtml = (cats) => `<ul class="road-l">${cats.map((c) => `<li><a href="whatsnew.html#${c.id}">${c.name}</a></li>`).join('')}</ul>`;
 
 export function injectRoadmap(html, cats, where) {
   const a = html.indexOf(ROAD_START);
