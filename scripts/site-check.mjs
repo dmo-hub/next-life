@@ -4,7 +4,7 @@
 // · หน้าเฉลย (B88) ครบทุกการ์ด/ตัวเลือก/ผลสุ่ม และเฉลยจริง — กฎ "ไม่หลุดบุญบาป" ของหน้ารวมการ์ดไม่ใช้กับหน้านี้
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
-import { siteFacts, injectFacts, readVersion, versionLines } from '../src/site/facts.mjs';
+import { siteFacts, injectFacts, readVersion, versionLines, releaseLog, notesLines, NOTE_CUT } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
 import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
 import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_ROLES, roleInfo, ISEKAI_SKILLS, ISEKAI_CAREERS, CONT_REGIONS, CONT_RACES, CONT_END, contBirth, makeRng } from '../src/engine/index.mjs';
@@ -17,6 +17,8 @@ import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS } from '../src/site/nav.mjs';
+import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
+import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -226,6 +228,21 @@ const navCtl =
 const curOk = navHtml('design-lore.html').includes('href="design.html" aria-current="true"') && navHtml('spec/lore-finance-series.html').includes('href="../play.html"');
 check('ทุกหน้ามีแถบบนชุดเดียวและชี้หน้าปัจจุบัน', navMiss.length || !navCtl || !curOk, ` ${navFiles.length} หน้า${navMiss.length ? ` · ${navMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${navCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
+// 7d) แผนงานหน้าแรก (ui-redo 23): แถวหมวดบน index = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
+// · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)
+// ตัวควบคุม: เติมหมวดใหม่ 1 หมวดใน whatsnew ⇒ กล่องที่คาดต้องเปลี่ยน · ถอด id หัวแรก ⇒ ลิงก์ต้องหาปลายทางไม่เจอ
+const wn = read('whatsnew.html');
+const roadCats = soonCats(wn);
+const roadIn = (html) => { const a = html.indexOf(ROAD_START); const b = html.indexOf(ROAD_END); return a < 0 || b < a ? null : html.slice(a + ROAD_START.length, b); };
+const roadNow = roadIn(read('index.html'));
+const roadNoId = (w) => soonCats(w).filter((c) => !w.includes(`id="${c.id}"`)).map((c) => c.name);
+const relSrc = readFileSync(new URL('../scripts/rel.mjs', import.meta.url), 'utf8');
+const relSees = /\/<h3\[\\s>\]\//.test(relSrc);
+const wnMore = wn.replace('<h2>แพตช์โน้ต</h2>', '<h3>หมวดทดสอบ</h3>\n  <ul>\n    <li>x</li>\n  </ul>\n\n  <h2>แพตช์โน้ต</h2>');
+const roadCtl = roadmapHtml(soonCats(wnMore)) !== roadNow && roadNoId(wn.replace(`<h3 id="${roadCats[0]?.id}">`, '<h3>')).length === 1;
+const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'กล่องบน index ไม่ตรง whatsnew (build ใหม่)', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
+check('แผนงานหน้าแรกตรงหมวดกำลังทำใน whatsnew และลิงก์ถึงหัวหมวด', roadBad.length || !roadCtl, ` ${roadCats.length} หมวด${roadBad.length ? ` · ${roadBad.join(' | ')}` : ''} · ตัวควบคุม${roadCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
 // 7d) หน้าโลกที่เล่นได้ (three-worlds 08): บอกแค่ทางที่ผู้เล่นเห็นบนจอเสมอ — ทางลับที่เป็นเหตุสุ่ม (ทริปศาลทั้งตัว court.mjs) ห้ามมีแม้แต่คำ
 // · ทางเกิดครบทุกทางจาก PATHS · แผนภาพ 3 กล่องไม่มีป้ายบนลูกศร (svg มีแค่ <text> ชื่อฉาก) · ลิงก์ไปหน้าต่างโลก
 // ตัวควบคุม: เติมคำทางลับ 1 คำ · ป้ายบนลูกศร 1 ป้าย ⇒ ต้องถูกจับ
@@ -275,6 +292,32 @@ const held = verHeld(srcTexts);
 const playVer = (html, v) => html.includes(versionLines(v));
 const verCtl = verHeld([['ui/app.mjs', `${appSrc}\nconst APP_VERSION = '${ver.version}';`]]).length > 0 && !playVer(play, { ...ver, version: 'v0.0.00' });
 check('เลขเวอร์ชันอยู่ที่ src/version.json ที่เดียว และเกมใช้เลขนั้น', held.length || !playVer(play, ver) || !verCtl, ` ${ver.version} · ${ver.build} · ซอร์ส ${srcTexts.length} ไฟล์${held.length ? ` · ถือเลขเอง: ${held.join(' ')}` : ''}${playVer(play, ver) ? '' : ' · play.html ไม่ได้ build จากเลขนี้'} · ตัวควบคุม${verCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 9c) แจ้งอัปเดตในเกม (ui-redo 22): เกมที่ build แล้วฝังรุ่นที่มีโน้ตชุดเดียวกับแพตช์โน้ต · ข้อความไม่มีแท็ก/entity หลุด และไม่ยาวเกินเพดานตัด
+// รุ่นปัจจุบันไม่มีโน้ต (bump ของเลน) = เตือน ไม่ตก — แผ่นใช้รุ่นล่าสุดที่มีโน้ต
+// ตัวควบคุม: ล้างข้อของรุ่นบนสุดใน whatsnew ⇒ รุ่นนั้นต้องหลุดจากชุด และชุดที่ได้ต้องไม่ตรงที่ฝัง
+const wnNow = read('whatsnew.html');
+const notesLog = releaseLog(wnNow);
+const notesIn = (html, log) => html.includes(notesLines(log));
+const notesDirty = notesLog.flatMap((r) => r.items).filter((t) => /[<>]|&[#\w]+;/.test(t) || t.length > NOTE_CUT);
+const topV = notesLog[0]?.v;
+const wnEmptied = topV ? wnNow.replace(new RegExp(`(<h3>${topV.replace(/\./g, '\\.')} <small>[^<]*</small></h3>\\s*<ul>)[\\s\\S]*?(</ul>)`), '$1$2') : wnNow;
+const cutLog = releaseLog(wnEmptied);
+const notesCtl = !!topV && cutLog[0]?.v !== topV && !notesIn(play, cutLog);
+if (topV !== ver.version) console.log(`  ⚠ ${ver.version} ไม่มีข้อในแพตช์โน้ต — แผ่นแจ้งอัปเดตใช้ ${topV ?? '(ไม่มีรุ่นไหนมีโน้ต)'} (เตือน ไม่ตก)`);
+check('แจ้งอัปเดตในเกม: เกมฝังรุ่นที่มีโน้ตชุดเดียวกับแพตช์โน้ต ข้อความล้วนไม่เกินเพดาน', !notesLog.length || !notesIn(play, notesLog) || notesDirty.length || !notesCtl, ` ${notesLog.length} รุ่น · ล่าสุด ${topV} ${notesLog[0]?.items.length ?? 0} ข้อ${notesIn(play, notesLog) ? '' : ' · play.html ไม่ได้ build จากแพตช์โน้ตนี้'}${notesDirty.length ? ` · ข้อความไม่สะอาด ${notesDirty.length}: ${notesDirty[0].slice(0, 60)}` : ''} · ตัวควบคุม${notesCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 9a2) ภาพฉากสำคัญ (ui-redo 31): ทุกชิ้นของทุกฉากเป็น path จริง (ลืม ... กับตัวช่วยที่คืนหลายชิ้น = ชิ้นนั้นหายจากภาพเงียบ ๆ) · การ์ดที่ผูกใน SCENE_OF มีอยู่จริง · ฉากที่ผูกมีภาพ
+// ตัวควบคุม: id การ์ดปลอม 1 ตัว · ชิ้นภาพซ้อน array 1 ชิ้น ⇒ ต้องถูกจับ
+const sceneMap = [...(appSrc.match(/const SCENE_OF = new Map\(\[([\s\S]*?)\]\);/)?.[1] ?? '').matchAll(/\['([\w-]+)', '([\w-]+)'\]/g)].map((m) => [m[1], m[2]]);
+const sceneUsed = [...sceneMap.map(([, v]) => v), ...(appSrc.match(/const BIRTH_SCENE = \[([^\]]*)\]/)?.[1] ?? '').match(/[\w-]+/g) ?? [], ...[...appSrc.matchAll(/sceneSvg\(gone \? '([\w-]+)' : '([\w-]+)'/g)].flatMap((m) => [m[1], m[2]])];
+const ENGINE_CARDS = ['early_retire'];
+const sceneBadParts = (ids, get) => ids.filter((id) => !get(id) || get(id).parts.some((x) => !x || typeof x.d !== 'string'));
+const sceneNoCard = (pairs, evs) => pairs.filter(([id]) => !evs.has(id) && !ENGINE_CARDS.includes(id)).map(([id]) => id);
+const evIds = new Set(content.events.map((e) => e.id));
+const sceneMiss = [...sceneBadParts([...new Set(sceneUsed)], sceneArt).map((id) => `ภาพ ${id} พัง/ไม่มี`), ...sceneNoCard(sceneMap, evIds).map((id) => `ไม่มีการ์ด ${id}`)];
+const sceneCtl = sceneNoCard([...sceneMap, ['no_such_card', 'death']], evIds).includes('no_such_card') && sceneBadParts(['death'], () => ({ parts: [...sceneArt('death').parts, [sceneArt('death').parts[0]]] })).length === 1;
+check('ภาพฉากสำคัญ: ทุกชิ้นวาดได้ · การ์ดที่ผูกมีจริง', sceneMiss.length || sceneMap.length < 5 || !sceneCtl, ` ${ART_SCENE_IDS.length} ภาพ · ผูก ${sceneMap.length} การ์ด + แรกเกิด + การ์ดตาย${sceneMiss.length ? ` · ${sceneMiss.join(' | ')}` : ''} · ตัวควบคุม${sceneCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 9b) เกมเปิดออฟไลน์ได้: ฟอนต์ฝังครบทุกแบบที่หน้าใช้ ไม่ดึงจากเว็บอื่น · ตัวควบคุม: หน้าที่ยังมี <link> Google Fonts ต้องถูกจับ
 const PLAY_FACES = ['Noto Sans Thai 400', 'Noto Sans Thai 600', 'Sarabun 400', 'Sarabun 600', 'Srisakdi 700'];

@@ -66,6 +66,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .grow .av { width:56px; height:56px; }
 /* แผ่นภาพยุค: รักดำ+ทองทุกธีม (สีอยู่ในตัวภาพ) — ธีมสว่างจึงเป็นแผ่นเข้มบนพื้นขาวเหมือนกรอบภาพ */
 .era-art { display:block; width:100%; height:auto; aspect-ratio:5 / 2; }
+/* ภาพฉากบนการ์ดแรกเกิด/การ์ดตาย: เล็กพอให้ปุ่มไปต่ออยู่จอแรก */
+.era-art.scene-sm { width:min(100%, 150px); margin:0 auto 6px; }
 .same { margin-left:8px; padding:1px 6px; border:1px solid currentColor; border-radius:var(--rc); font:400 11px/1.4 var(--ft); white-space:nowrap; opacity:0.85; vertical-align:2px; }
 .bar { position:relative; height:6px; }
 .bar i { position:absolute; left:0; top:0; display:block; height:6px; }
@@ -78,6 +80,8 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .sb-who { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.3; }
 .sb-who b { font-weight:600; overflow-wrap:anywhere; }
 .sb-who small { font-size:12px; color:var(--muted); overflow-wrap:anywhere; }
+/* ป้ายพักแทนบรรทัดจังหวัด: บรรทัดเดียวเสมอ แถวไม่สูงขึ้น */
+.sb-who small.rest { color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .sb-age { display:flex; align-items:center; gap:4px; white-space:nowrap; }
 .sb-age > b { font-size:20px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
 .sb-age small { font-size:12px; }
@@ -159,6 +163,10 @@ body:has(.mnav) .foot { display:none; }
 .mr a, .mr button { all:unset; box-sizing:border-box; display:block; width:100%; min-height:48px; line-height:48px; font-size:15px; font-weight:600; color:var(--ink); cursor:pointer; }
 .mr a:focus-visible, .mr button:focus-visible { outline:2px solid currentColor; outline-offset:-2px; }
 .mr-w > p { margin:12px 0 0; font-size:12px; color:var(--muted); }
+.nt-v { margin:4px 0 0; font-size:13px; color:var(--muted); }
+.nt-l { margin:8px 0 12px; padding-left:20px; }
+.nt-l li { margin:0 0 8px; overflow-wrap:anywhere; }
+.nt > a { display:inline-block; min-height:44px; line-height:44px; font-weight:600; color:var(--ink); }
 .mo p { margin:16px 0 0; font-size:13px; color:var(--ink2); }
 .body { padding:18px 20px 8px; display:flex; flex-direction:column; gap:8px; }
 .body h3 { margin:0; font-size:24px; line-height:1.35; }
@@ -227,6 +235,9 @@ body:has(.mnav) .foot { display:none; }
 .help .help-row { display:flex; flex-direction:column; gap:2px; }
 .help .help-call, .help > a { display:inline-flex; align-items:center; min-height:44px; overflow-wrap:anywhere; }
 .help .help-call { font-weight:600; }
+/* คำเตือนเนื้อหา (ui-redo 25) — การ์ดแรกเกิดตระกูลใหม่ + หน้าเล่นต่อ · สีตามการ์ดที่วางอยู่ */
+.warn-line { margin:8px 0 0; font-size:13px; line-height:1.5; opacity:.85; }
+.warn-line a { color:inherit; font-weight:600; text-decoration:underline; }
 .help small, .help .note { font-size:12.5px; overflow-wrap:anywhere; }
 .help a { color:inherit; } .help small a { white-space:nowrap; }
 .lineage .lh { font-size:12px; font-weight:600; margin:6px 0 2px; }

@@ -70,7 +70,7 @@ let out = html.replace(anchor[0], anchor[0] + block);
 // เจ้าของสั่งให้หัวกำลังทำรวมงานค้างทั้งหมดทุกครั้งที่ปล่อย — ส่ง soon = แทนทั้งรายการ ไม่ต่อท้าย กันของที่ปล่อยแล้วค้างอยู่
 if (g.soon) {
   // กำลังทำแบ่งหมวดด้วย <h3> แล้ว — regex ข้างล่างแทนแค่ <ul> แรก = ทับหมวดแรก ทิ้งที่เหลือเงียบ
-  if (/<h3>/.test(out.match(/<h2>กำลังทำ<\/h2>([\s\S]*?)<h2>/)?.[1] ?? '')) throw new Error('whatsnew กำลังทำแบ่งหมวดแล้ว — ห้ามส่ง soon · แก้มือในหมวดที่ตรง');
+  if (/<h3[\s>]/.test(out.match(/<h2>กำลังทำ<\/h2>([\s\S]*?)<h2>/)?.[1] ?? '')) throw new Error('whatsnew กำลังทำแบ่งหมวดแล้ว — ห้ามส่ง soon · แก้มือในหมวดที่ตรง');
   const soonRe = /(<h2>กำลังทำ<\/h2>[\s\S]*?<ul>)[\s\S]*?(\r?\n  <\/ul>)/;
   if (!soonRe.test(out)) throw new Error('หารายการกำลังทำใน whatsnew ไม่เจอ');
   const items = g.soon.map((s) => `${eol}    <li><span class="tag soon">กำลังทำ</span>${s}</li>`).join('');

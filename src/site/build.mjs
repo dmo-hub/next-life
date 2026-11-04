@@ -8,6 +8,7 @@ import { guideHtml } from './guide.mjs';
 import { demoHtml } from './demo.mjs';
 import { designPages, designHtml } from './design.mjs';
 import { injectNav } from './nav.mjs';
+import { soonCats, soonIds, injectRoadmap } from './roadmap.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
@@ -25,10 +26,13 @@ export const GEN_PAGES = [
 export function buildSite(content, root = new URL('../../', import.meta.url), facts = siteFacts(content)) {
   const at = (p) => new URL(p, root);
   const out = [];
+  // แผนงานหน้าแรกอ่านหมวดจาก whatsnew ก่อน (ui-redo 23)
+  const cats = soonCats(readFileSync(at('docs/whatsnew.html'), 'utf8'));
   for (const name of FACT_PAGES) {
     const file = at(`docs/${name}.html`);
     const html = readFileSync(file, 'utf8');
-    const next = injectNav(injectFacts(html, facts, `docs/${name}.html`), `${name}.html`);
+    const filled = injectFacts(html, facts, `docs/${name}.html`);
+    const next = injectNav(name === 'index' ? injectRoadmap(filled, cats, 'docs/index.html') : filled, `${name}.html`);
     if (next !== html) writeFileSync(file, next);
     out.push(name);
   }
@@ -55,7 +59,7 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   for (const f of readdirSync(at('docs/')).filter((n) => /^design-.+\.html$/.test(n) && !made.has(n))) unlinkSync(at(`docs/${f}`));
   for (const file of NAV_PAGES) {
     const html = readFileSync(at(`docs/${file}`), 'utf8');
-    const next = injectNav(html, file);
+    const next = injectNav(file === 'whatsnew.html' ? soonIds(html) : html, file);
     if (next !== html) writeFileSync(at(`docs/${file}`), next);
   }
   return { facts, pages: out };

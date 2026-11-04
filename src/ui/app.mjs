@@ -1,7 +1,7 @@
 import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible } from '../engine/index.mjs';
-import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK } from './art.mjs';
+import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfPicArt, shelfLineageArt } from './shelfart.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
@@ -55,13 +55,56 @@ function veil(card, i) {
   if (keys.length) veiled.set(card.age, [...(veiled.get(card.age) ?? []), ...keys]);
 }
 
+// ป้ายเตือนพัก (ui-redo 24 · เจ้าของเคาะ): นับเวลาเฉพาะตอนแท็บเห็นอยู่ ครบ REST.at → บรรทัดจังหวัดบนแถบสถานะกลายเป็นป้ายพัก REST.show แล้วคืนบรรทัดเดิมและเริ่มนับใหม่
+// ไม่มีแผ่น ไม่หยุดเกม · ซ่อนแท็บนานถึง REST.reset = ถือว่าพักแล้ว เริ่มนับใหม่ · ปรโลกไม่มีแถบสถานะจึงไม่มีป้าย
+// ทางทดสอบ: play.html?rest=<วินาที> ย่นทั้งชุดเป็นวินาทีเท่านั้น (ป้ายขึ้นที่วินาทีนั้น · ขึ้นค้างเท่ากัน · ซ่อนครึ่งหนึ่งนับเป็นพัก)
+// เวลาอยู่ในหน่วยความจำ ไม่เก็บลงเซฟ ⇒ ผลเกม/บอทไม่ขยับ · รีโหลดเริ่มนับใหม่
+const REST_TEST = Number(new URLSearchParams(location.search).get('rest')) || 0;
+const REST = REST_TEST > 0 ? { at: REST_TEST * 1000, show: REST_TEST * 1000, reset: REST_TEST * 500, tick: 250 } : { at: 2 * 3600e3, show: 10 * 60e3, reset: 5 * 60e3, tick: 30e3 };
+const REST_TEXT = 'เล่นมา 2 ชม. แล้ว พักสายตาหน่อย';
+let restMs = 0;
+let restLast = document.hidden ? null : performance.now();
+let restHidden = null;
+const restOn = () => restMs >= REST.at;
+// แถบที่วาดอยู่แล้วสลับข้อความเองโดยไม่วาดการ์ดใหม่ — data-where เก็บบรรทัดเดิมไว้คืน
+function restPaint() {
+  for (const small of document.querySelectorAll('.sb-who small[data-where]')) {
+    small.textContent = restOn() ? REST_TEXT : small.dataset.where;
+    small.classList.toggle('rest', restOn());
+  }
+}
+function restStep() {
+  const now = performance.now();
+  if (restLast !== null) restMs += now - restLast;
+  restLast = document.hidden ? null : now;
+  if (restMs >= REST.at + REST.show) restMs = 0;
+  restPaint();
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    restStep();
+    restHidden = performance.now();
+  } else {
+    if (restHidden !== null && performance.now() - restHidden >= REST.reset) restMs = 0;
+    restHidden = null;
+    restLast = performance.now();
+    restPaint();
+  }
+});
+setInterval(restStep, REST.tick);
+const whereLine = (text) => {
+  const small = el('small', restOn() ? 'rest' : null, restOn() ? REST_TEXT : text);
+  small.dataset.where = text;
+  return small;
+};
+
 // แถบสถานะสองแถว (ui-redo ใบ 03): แถวบน อวตาร · ชื่อ+ที่ · อายุ · แถวล่าง ค่า 4 ตัว ชื่อ ตัวเลข ลูกศรปีนี้ แล้วแถบเส้น
 // ใกล้ตาย = หัวใจข้างอายุ + ขอบจอแดง (CSS จับ .sb.dying) · โปรแกรมอ่านจออ่าน "ใกล้ตาย" จากหัวใจ ไม่พึ่งสี
 function statusBar(card, s) {
   const bar = el('header', 'sb');
   const r1 = el('div', 'sb-r1');
   const who = el('span', 'sb-who');
-  who.append(el('b', null, `${genLabel()}${st.name}`), el('small', null, `${provinceLabel(st)} · ช่วง${card.stage}`));
+  who.append(el('b', null, `${genLabel()}${st.name}`), whereLine(`${provinceLabel(st)} · ช่วง${card.stage}`));
   const age = el('span', 'sb-age');
   age.append(el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : String(card.age)));
   if (!card.funeral) age.append(el('small', null, ' ปี'));
@@ -182,6 +225,7 @@ function lifeMenu(card, box) {
   return nav;
 }
 // การ์ดใต้แผงเป็น inert: แตะหรือปุ่มลัดตัวเลขไม่ไปเลือกตัวเลือกที่ถูกบังอยู่ · Esc หรือกดปุ่มเมนูเดิมซ้ำ = ปิด
+// from ว่าง = แผงที่เกมเปิดเอง (แจ้งอัปเดต) — ปิดแล้วโฟกัสกลับปุ่มแรกของจอใต้แผง
 let sheetClose = null;
 function openSheet(title, content, box, from) {
   const sheet = el('section', 'sheet');
@@ -196,13 +240,13 @@ function openSheet(title, content, box, from) {
   sheetClose = () => {
     sheet.remove();
     box.inert = false;
-    from.setAttribute('aria-expanded', 'false');
+    from?.setAttribute('aria-expanded', 'false');
     sheetClose = null;
-    from.focus();
+    (from ?? box.querySelector('button, a'))?.focus();
   };
   shut.onclick = closeSheet;
   box.inert = true;
-  from.setAttribute('aria-expanded', 'true');
+  from?.setAttribute('aria-expanded', 'true');
   root.append(sheet);
   shut.focus();
 }
@@ -867,6 +911,18 @@ const ERA_EVENTS = CONTENT.era.events;
 useIsekaiCards(CONTENT.isekai);
 // การ์ดรับมือที่รวมข่าวบ้านเมือง (B58) ไม่มีการ์ดบ้านเมืองแยก — หาเหตุการณ์จากการ์ดเนื้อหาที่ผูกไว้
 const ERA_OF = new Map(CONTENT.events.filter((c) => c.era).map((c) => [c.id, c.era]));
+// ภาพฉากสำคัญ (ui-redo 31): การ์ดจริงที่ผูกภาพ — แต่งงาน = การ์ดที่ตั้งธง married · มีลูก = การ์ดที่ตั้งธง has_kids · เกษียณ = การ์ดอายุ 60 + โครงการเกษียณก่อนกำหนด
+// แรกเกิดเลือกตามฐานะบ้าน (ชุดเดียวกับรูปตัวละคร) · การ์ดตาย/หายตัวผูกในหน้าการ์ดตาย · การ์ดอื่นไม่มีภาพ หน้าตาเดิม
+const SCENE_OF = new Map([['young_wedding_01', 'wed_ask'], ['remarry_wedding_work_01', 'wed_rite'], ['remarry_wedding_mid_01', 'wed_rite'], ['remarry_wedding_old_01', 'wed_rite'], ['young_baby_01', 'baby_news'], ['work_house_01', 'baby_home'], ['retirement', 'retire_home'], ['early_retire', 'retire_early']]);
+const BIRTH_SCENE = ['birth_poor', 'birth_mid', 'birth_rich'];
+// ภาพเล็ก (sm) บนการ์ดแรกเกิด/การ์ดตาย: ปุ่มไปต่อยังอยู่จอแรก 390 · data-scene ให้ด่านจอหาเจอ
+function sceneSvg(id, sm) {
+  const s = sceneArt(id);
+  if (!s) return null;
+  const svg = artSvg(`era-art scene-art${sm ? ' scene-sm' : ''}`, ERA_ART_W, ERA_ART_H, s.parts);
+  svg.dataset.scene = id;
+  return svg;
+}
 const eraName = (id) => ERA_EVENTS.find((e) => e.id === id)?.name ?? id;
 function memoRead() {
   try {
@@ -1856,6 +1912,8 @@ function render(card) {
     top.append(el('b', null, gone ? LOST.head : 'ด้วยรักและอาลัย'));
     box.append(top);
     // หนังสืองานศพบอกอายุ ไม่บอกปี พ.ศ. — ปีเกมไม่ขึ้นจอ (B14 ข้อ 12)
+    const scene = sceneSvg(gone ? 'gone' : 'death', true);
+    if (scene) body.append(scene);
     body.append(portrait(card.age), el('h3', null, fullName()), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
     const why = causeOf(card.cause, card.age);
     if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
@@ -1916,6 +1974,10 @@ function render(card) {
     // ภาพยุค (B56): การ์ดบ้านเมือง + การ์ดรับมือที่ผูกยุคไว้ (B58) ได้ภาพของยุคนั้น · ยุคที่ไม่มีภาพ = หน้าตาเดิม
     const eraPic = eraArt(card.kind === 'era' ? card.id : card.kind === 'event' ? ERA_OF.get(card.id) : null);
     if (eraPic) body.append(artSvg('era-art', ERA_ART_W, ERA_ART_H, eraPic));
+    else {
+      const scene = card.kind === 'intro' ? sceneSvg(BIRTH_SCENE[artTier(standingOf(st))], true) : SCENE_OF.has(card.id) && sceneSvg(SCENE_OF.get(card.id), false);
+      if (scene) body.append(scene);
+    }
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
     body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));
     if (card.news?.story) body.append(el('p', 'news', card.news.story));
@@ -1931,6 +1993,8 @@ function render(card) {
       body.append(el('span', 'stamp', 'แรกเกิด'));
       body.append(el('h3', 'lead', card.text));
       body.append(el('p', 'horo', horoscope(st)));
+      // การ์ดแรกเกิดของตระกูลใหม่ = จุดเริ่มเกมของคนไม่มีเซฟ (คนมีเซฟเห็นที่หน้าเล่นต่อ)
+      if (st.gen === 1 && card.age === 0) body.append(warnLine());
       const odds = birthOddsLine();
       if (odds) body.append(sourced(el('p', 'sub', odds), birthOddsSrc()));
       // บรรทัดแรกเป็นเรื่องของบ้าน · ที่เหลือเป็นบรรยากาศยุค ตัวรอง
@@ -2145,6 +2209,15 @@ function helpBox() {
   box.append(all, el('p', 'note', HELP_NOTE));
   return box;
 }
+// บรรทัดเตือนเนื้อหาชุดเดียวกับหน้าแรกเว็บ + สายด่วนสุขภาพจิต · ไม่ต้องกดรับ
+function warnLine() {
+  const mind = HELP.find((h) => h.id === 'mind');
+  const p = el('p', 'warn-line', `ผู้เล่นวัยรุ่นขึ้นไป · เรื่องจริงบางเรื่องหนัก: ${warnWords()} · ถ้าเล่นแล้วไม่สบายใจ `);
+  const call = el('a', null, `โทร ${mind.tel}`);
+  call.href = `tel:${mind.tel}`;
+  p.append(call, ' ได้ตลอด 24 ชม.');
+  return p;
+}
 function helpRow(h) {
   const row = el('div', 'help-row');
   const call = el('a', 'help-call', `${h.label} · ${h.call}`);
@@ -2288,7 +2361,19 @@ function morePanel() {
     dayNew();
   };
   const link = (text, href) => Object.assign(el('a', null, text), { href });
-  for (const x of [day, link('คู่มือ', 'guide.html'), link('กลไกในเกม', 'about.html'), link('หน้าแรก', 'index.html')]) {
+  // อัปเดตล่าสุด: เปลี่ยนเนื้อแผงเดิมเป็นรายการรุ่นนี้ ปุ่มกลับไปการ์ดยังใช้ปิดได้เหมือนเดิม
+  const news = el('button', null, NOTES_TITLE);
+  news.type = 'button';
+  news.onclick = () => {
+    const sheet = wrap.closest('.sheet');
+    sheet?.setAttribute('aria-label', NOTES_TITLE);
+    const h = sheet?.querySelector('.sheet-h h2');
+    if (h) h.textContent = NOTES_TITLE;
+    wrap.replaceWith(notesPanel());
+    notesMark();
+    sheet?.querySelector('.sheet-x')?.focus();
+  };
+  for (const x of [day, news, link('คู่มือ', 'guide.html'), link('กลไกในเกม', 'about.html'), link('หน้าแรก', 'index.html')]) {
     const li = el('li');
     li.append(x);
     ul.append(li);
@@ -2296,6 +2381,61 @@ function morePanel() {
   const wrap = el('div', 'mr-w');
   wrap.append(ul, el('p', null, 'เกม ไม่ใช่คำแนะนำการลงทุน'));
   return wrap;
+}
+
+// แจ้งอัปเดตในเกม (ui-redo 22 · เจ้าของเคาะ): มีรุ่นที่มีโน้ตซึ่งเบราว์เซอร์นี้ยังไม่เห็น (รวมคนเปิดครั้งแรก) → แผ่นทับจอแรกก่อนกดอะไร วันละไม่เกินครั้ง
+// RELEASE_NOTES = รุ่นที่มีโน้ตใหม่สุดก่อน (build ดึงจากแพตช์โน้ต) · แผ่นรวมข้อของทุกรุ่นที่ยังไม่เห็น ไม่เกิน NOTES_MAX ข้อ · เปิดครั้งแรกเห็นแค่รุ่นล่าสุด
+// key เก็บ { v: รุ่นล่าสุดที่มีโน้ตตอนปิดแผ่น, day: วันที่แผ่นขึ้นเองครั้งล่าสุด } · localStorage ใช้ไม่ได้ = ขึ้นทุกครั้งที่เปิดแต่ปิดได้ เกมเล่นต่อตามเดิม
+// จอแรกของเซฟกลางชีวิตคือหน้า "เล่นต่อ" ไม่ใช่การ์ดที่ค้าง ⇒ แผ่นไม่แทรกกลางการ์ด · หน้า "เกมอัปเดตแล้ว" ของเซฟเก่ามีเรื่องให้อ่านอยู่แล้ว ไม่ซ้อน
+const NOTES_KEY = 'next-life-notes-seen-v1';
+const NOTES_TITLE = 'อัปเดตล่าสุด';
+const NOTES_MAX = 5;
+let notesSkip = false;
+const notesDay = () => new Date().toLocaleDateString('en-CA');
+function notesRead() {
+  try {
+    const s = JSON.parse(localStorage.getItem(NOTES_KEY) ?? 'null');
+    return s && typeof s === 'object' ? s : {};
+  } catch {
+    return {};
+  }
+}
+function notesWrite(patch) {
+  try {
+    localStorage.setItem(NOTES_KEY, JSON.stringify({ ...notesRead(), ...patch }));
+  } catch {}
+}
+const notesMark = () => notesWrite({ v: RELEASE_NOTES[0]?.v });
+// รุ่นที่ยังไม่เห็น: ใหม่กว่ารุ่นที่จำไว้ · ไม่เคยจำ = รุ่นล่าสุดรุ่นเดียว · รุ่นที่จำหลุดจากชุดที่ฝัง = ทั้งชุด (ถูกตัดที่ NOTES_MAX อยู่แล้ว)
+function notesUnseen() {
+  const { v } = notesRead();
+  if (!v) return RELEASE_NOTES.slice(0, 1);
+  const i = RELEASE_NOTES.findIndex((r) => r.v === v);
+  return i < 0 ? RELEASE_NOTES : RELEASE_NOTES.slice(0, i);
+}
+function notesPanel(log = RELEASE_NOTES.slice(0, 1)) {
+  const wrap = el('div', 'nt');
+  const vs = log.map((r) => r.v);
+  wrap.append(el('p', 'nt-v', vs.length > 1 ? `เวอร์ชัน ${vs.at(-1)} ถึง ${vs[0]}` : `เวอร์ชัน ${vs[0] ?? APP_VERSION}`));
+  const items = log.flatMap((r) => r.items);
+  const ul = el('ul', 'nt-l');
+  for (const t of items.slice(0, NOTES_MAX)) ul.append(el('li', null, t));
+  const all = Object.assign(el('a', null, items.length > NOTES_MAX ? `ดูทั้งหมด ${items.length} ข้อในแพตช์โน้ต` : 'อ่านแพตช์โน้ตทุกเวอร์ชัน'), { href: vs[0] ? `whatsnew.html#:~:text=${vs[0]}` : 'whatsnew.html' });
+  wrap.append(ul, all);
+  return wrap;
+}
+function notesBoot() {
+  if (notesSkip || notesRead().day === notesDay()) return;
+  const log = notesUnseen();
+  const box = root.firstElementChild;
+  if (!log.length || !box) return;
+  notesWrite({ day: notesDay() });
+  openSheet(NOTES_TITLE, notesPanel(log), box, null);
+  const shut = sheetClose;
+  sheetClose = () => {
+    notesMark();
+    shut();
+  };
 }
 function kinList(members) {
   const rank = (m) => FAMILY_ORDER.indexOf(m.role) * 2 + (m.alive ? 0 : 1);
@@ -2447,7 +2587,7 @@ function isekaiBar(card, s, where) {
   const ini = el('span', 'av ini', [...s.name][0]);
   ini.setAttribute('aria-hidden', 'true');
   const who = el('span', 'sb-who');
-  who.append(el('b', null, s.name), el('small', null, `${genLabel()}${st.name} · ${where}`));
+  who.append(el('b', null, s.name), whereLine(`${genLabel()}${st.name} · ${where}`));
   const age = el('span', 'sb-age');
   age.append(el('b', null, String(s.age)), el('small', null, ' ปี'));
   if (card.step !== 'end' && s.hp <= HEALTH_WARN) {
@@ -2996,12 +3136,14 @@ function linkAsk(card, seed) {
 function home(card) {
   const where = af ? `ระหว่างชาติ หลัง${lifeEndWord(isGone(st))} ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
+  choices.before(warnLine());
   choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.shelf, null, () => openShelf()));
 }
 
 // เซฟจากเวอร์ชันที่เนื้อหาต่างกัน (B122): เซฟคือ seed + ลำดับปุ่ม เล่นซ้ำบนเนื้อหาใหม่ไม่ได้ชีวิตเดิม จึงเริ่มชีวิตใหม่
 // สมุดทุกเล่มในชั้นสมุดและบันทึกชีวิตแยก key ไว้ ไม่โดนล้าง
 function staleSave(seed) {
+  notesSkip = true;
   const choices = homeCard('เกมอัปเดตแล้ว', ['ชีวิตที่ค้างไว้เล่นต่อไม่ได้', 'เนื้อเรื่องเปลี่ยนตั้งแต่เล่นครั้งก่อน เริ่มชีวิตใหม่ในเวอร์ชันนี้ได้เลย · สมุดในชั้นสมุดยังอยู่ครบ']);
   choices.append(enter(button(seed === null ? 'เริ่มชีวิตใหม่' : 'เกิดตามลิงก์เพื่อน', null, () => (seed === null ? start() : startLink(seed)))), button(BTN.shelf, null, () => openShelf()));
 }
@@ -3046,3 +3188,4 @@ function boot() {
 }
 
 boot();
+notesBoot();
