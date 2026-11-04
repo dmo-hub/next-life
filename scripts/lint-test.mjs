@@ -8,7 +8,7 @@ import { strings, isObj } from '../src/node/lint/util.mjs';
 import { parentRefs } from '../src/node/lint/flags.mjs';
 import { loadEvents, loadEra, loadContent, checkNames } from '../src/node/load.mjs';
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
-import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT } from '../src/engine/career.mjs';
+import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT, CHILD_UNTIL, SCHOOL_FROM } from '../src/engine/career.mjs';
 import { newLife, CLASSES, SEXES, fill } from '../src/engine/life.mjs';
 import { CATEGORIES, MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
 import { SCENES } from '../src/engine/afterlife.mjs';
@@ -230,6 +230,24 @@ for (const [t, track] of Object.entries(TRACKS)) {
 }
 for (const s of careerTexts) for (const b of ctx.banned) if (b.re.test(s)) fails.push(`การ์ดเรียน/งาน: โดนคำต้องห้าม ${b.id} "${s}"`);
 rows.push(['การ์ดเรียน/งานจากแกน', `${careerCards} ใบ · ${careerTexts.size} ข้อความ`]);
+
+// เสียงเด็ก (B61): การ์ดเรียน/งานที่แกนสร้างก่อน CHILD_UNTIL ต้องไม่มีตัวเลือกเสียงผู้ใหญ่ — ไล่ทุกอายุที่ออกได้ × ฐานะ × คอนเน็คชั่น
+// ตัวควบคุม: การ์ดหางานวัยผู้ใหญ่ต้องโดนกติกาเดียวกัน ไม่งั้นคำที่จับไม่ตรงกับข้อความจริงในแกน
+const ADULT_VOICE = /^(จ่าย|ทุ่มเงิน|ฝากเส้น)/;
+const adultVoice = (ev) => ev.choices.map((c) => c.text).filter((t) => ADULT_VOICE.test(t));
+let childCards = 0;
+const childVoice = (ev, where) => {
+  childCards++;
+  checkCareer(ev, where);
+  for (const t of adultVoice(ev)) fails.push(`${where}: ตัวเลือกเสียงผู้ใหญ่ก่อนอายุ ${CHILD_UNTIL} "${t}"`);
+};
+childVoice(schoolGate(Object.assign(newLife(1, career), { school: 'primary', age: TRACKS.primary.until })), 'ด่านจบประถม');
+for (let age = SCHOOL_FROM; age < CHILD_UNTIL; age++) for (const cls of CLASSES) for (const network of [0, 50, 100]) for (const edu of [null, 'ประถม']) {
+  childVoice(jobCard(Object.assign(newLife(age, career), { cls, network, edu, age })), `การ์ดหางานอายุ ${age} ${cls} คอนเน็คชั่น ${network}`);
+}
+const adultCtl = CLASSES.flatMap((cls) => adultVoice(jobCard(Object.assign(newLife(1, career), { cls, network: 100, edu: 'มัธยม', age: 22 }))));
+if (!adultCtl.length) fails.push('เสียงเด็ก: ตัวควบคุมการ์ดหางานอายุ 22 ไม่โดนกติกา — ADULT_VOICE ไม่ตรงข้อความในแกนแล้ว');
+rows.push(['เสียงเด็กการ์ดเรียน/งาน', `${childCards} ใบ · ตัวควบคุมผู้ใหญ่ ${adultCtl.length} ตัวเลือก`]);
 
 // ทะเบียนธงต้องไม่มีชื่อค้างที่ไม่มีเนื้อหาไหนใช้ — ตรวจกับ content/ จริง (ด่านรายไฟล์มองไม่เห็นทั้งชุด)
 const realDocs = dir('content/').map((f) => load('content/', f));
