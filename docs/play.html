@@ -1760,6 +1760,9 @@ const pay = (amount) => ({ money: cash(-amount) });
 const SIN_LIGHT = [{ cat: 'greed_harm', level: 1 }];
 // ทางขอพร: น้ำหนักทางสำเร็จเอียงตามบัญชีบุญบาปแบบต่อเนื่อง (บุญน้อย = เอียงน้อย) — หน้าจอโชว์ ? ไม่โชว์ %
 const WISH = 3;
+// ก่อนอายุนี้ผู้เล่นยังเป็นเด็ก (B61): ด่านจบประถมและการ์ดหางานพูดด้วยเสียงเด็ก — ขอที่บ้าน · อ่านหนังสือ · ขอผู้ใหญ่ช่วย
+// ผลเงิน/บาป/วุฒิเท่าเดิมทุกทาง เงินที่จ่ายยังเป็นเงินก้อนเดียวกับตัวผู้เล่น ไม่แยกเงินบ้าน
+const CHILD_UNTIL = TRACKS.lower.until;
 
 // ด่านเรียนต่อตอนจบช่วงเรียน · ทุกด่านมีทาง "ออกไปทำงาน" ที่ไม่ล็อก การ์ดจึงไม่ค้าง
 function schoolGate(st) {
@@ -1772,16 +1775,16 @@ function schoolGate(st) {
       choices: [
         { text: 'เรียนต่อ ม.ต้นใกล้บ้าน', effects: { school: 'lower', knowledge: 1 } },
         {
-          text: 'สอบเข้า ม.ต้นโรงเรียนดังในเมือง',
-          requires: { money: cash(0.3), reason: 'ค่าเทอมค่ารถไม่พอ' },
+          text: 'อ่านหนังสือสอบโรงเรียนดังในเมือง',
+          requires: { money: cash(0.3), reason: 'ที่บ้านไม่มีค่าเทอมค่ารถให้' },
           outcomes: [
             { weight: 1, ok: true, multipliers: { stats: { knowledge: 2 } }, text: 'สอบติดโรงเรียนดัง เพื่อนใหม่มาจากทั่วเมือง', effects: { school: 'lower', network: 2, ...pay(0.3) } },
             { weight: 1, text: 'สอบไม่ติด กลับมาเรียนโรงเรียนใกล้บ้าน', effects: { school: 'lower', happiness: -1 } },
           ],
         },
         {
-          text: 'จ่ายแป๊ะเจี๊ยะเข้าโรงเรียนดัง',
-          requires: { money: cash(1), reason: 'เงินไม่พอจ่ายแป๊ะเจี๊ยะ' },
+          text: 'ขอผู้ปกครองจ่ายแป๊ะเจี๊ยะ',
+          requires: { money: cash(1), reason: 'ที่บ้านไม่มีเงินจ่ายแป๊ะเจี๊ยะ' },
           effects: pay(1),
           merit: SIN_LIGHT,
           outcomes: [
@@ -1791,7 +1794,7 @@ function schoolGate(st) {
         },
         {
           text: 'ขอพรหลวงพ่อก่อนสอบโรงเรียนดัง',
-          requires: { money: cash(0.3), reason: 'ค่าเทอมค่ารถไม่พอ' },
+          requires: { money: cash(0.3), reason: 'ที่บ้านไม่มีค่าเทอมค่ารถให้' },
           outcomes: [
             { weight: 1, ok: true, multipliers: { wish: WISH, stats: { knowledge: 2 } }, text: 'สอบติดโรงเรียนดัง เพื่อนใหม่มาจากทั่วเมือง', effects: { school: 'lower', network: 2, ...pay(0.3) } },
             { weight: 1, text: 'สอบไม่ติด กลับมาเรียนโรงเรียนใกล้บ้าน', effects: { school: 'lower', happiness: -1 } },
@@ -1945,16 +1948,20 @@ function jobCard(st) {
   }
   // ทางพิเศษเล็งงานที่ดีที่สุดที่วุฒิถึง · ไม่มีงานไหนวุฒิถึงเลย = ไม่มีทางพิเศษ
   const target = picked.filter((o) => !tooLow(o)).at(-1);
+  const child = st.age < CHILD_UNTIL;
   if (target) {
     const k = okWeight(target);
+    const tutor = child
+      ? { text: `ขอค่าติวสมัคร${target.name}`, hint: 'ขอเงินที่บ้านไปเรียนพิเศษก่อนไปสมัคร', requires: { money: cash(0.5), reason: 'ที่บ้านไม่มีเงินค่าติวให้' } }
+      : { text: `ทุ่มเงินติวสมัคร${target.name}`, requires: { money: cash(0.5), reason: 'เงินไม่พอค่าติว' } };
     choices.push(
-      { text: `ทุ่มเงินติวสมัคร${target.name}`, requires: { money: cash(0.5), reason: 'เงินไม่พอค่าติว' }, effects: pay(0.5), outcomes: apply(target, k * 2.5, { stats: { network: 1.6, knowledge: 1.4 } }) },
+      { ...tutor, effects: pay(0.5), outcomes: apply(target, k * 2.5, { stats: { network: 1.6, knowledge: 1.4 } }) },
       {
-        text: `ฝากเส้นเข้า${target.name}`,
-        requires: { stats: { network: { min: 50 } }, reason: 'ไม่มีคนรู้จักให้ฝาก' },
+        text: child ? `ขอผู้ใหญ่ฝากเข้า${target.name}` : `ฝากเส้นเข้า${target.name}`,
+        requires: { stats: { network: { min: 50 } }, reason: child ? 'ไม่มีผู้ใหญ่ที่รู้จักให้ฝาก' : 'ไม่มีคนรู้จักให้ฝาก' },
         merit: SIN_LIGHT,
         outcomes: [
-          { weight: k * 4, ok: true, text: `ได้งาน${target.name}ตามที่ฝากไว้`, effects: { job: target.id } },
+          { weight: k * 4, ok: true, text: `ได้งาน${target.name}ตามที่${child ? 'ผู้ใหญ่' : ''}ฝากไว้`, effects: { job: target.id } },
           { weight: 1, text: 'เรื่องฝากงานรู้ถึงหูหัวหน้า ถูกเลิกจ้างก่อนเริ่มงาน', effects: { job: 'labor', happiness: -1, relations: -1 } },
         ],
       },
@@ -1964,7 +1971,7 @@ function jobCard(st) {
   return {
     id: 'first_job',
     type: 'A',
-    text: `อายุ ${st.age} ปี ${st.edu ? `วุฒิ${st.edu}` : 'ไม่มีวุฒิ'} ถึงเวลาหางานทำ เงินติดตัว {เงิน} บาท`,
+    text: `อายุ ${st.age} ปี ${st.edu ? `วุฒิ${st.edu}` : 'ไม่มีวุฒิ'} ${child ? 'ต้องออกไปหางานช่วยที่บ้าน' : 'ถึงเวลาหางานทำ'} เงินติดตัว {เงิน} บาท`,
     choices,
   };
 }
