@@ -5,6 +5,7 @@ import { parse } from 'yaml';
 import { STAGES, STAT_LABELS, MERIT_LEVELS, MERIT_WEIGHTS, SIN_CATS, FLAG_CATS, TRACKS, REALMS, FAMILY_ROLE_NAMES, meritId, meritName, debtName, assetName, EXAM_PASS } from '../engine/index.mjs';
 import { AFTER, CATEGORY, esc, text, choiceText } from './catalog.mjs';
 import { isekaiSpoilersHtml, isekaiNav } from './otherworld.mjs';
+import { careerHtml, careerSim } from './career.mjs';
 
 const YEAR_ALL = [2400, 2700];
 const sgn = (n) => (n > 0 ? `+${n}` : String(n).replace('-', '−'));
@@ -260,7 +261,7 @@ function card(e, L, byId) {
   ].join('');
 }
 
-export function spoilersHtml(content, flags = flagNames(), systems = systemNames()) {
+export function spoilersHtml(content, flags = flagNames(), systems = systemNames(), sim = careerSim()) {
   const L = labels(content, flags, systems);
   const byId = new Map(content.events.map((e) => [e.id, e]));
   const groups = [...STAGES.map((s) => s.name), AFTER].map((stage) => ({ stage, events: content.events.filter((e) => e.stage === stage) })).filter((g) => g.events.length);
@@ -268,5 +269,7 @@ export function spoilersHtml(content, flags = flagNames(), systems = systemNames
   const body = groups
     .map((g, i) => `<details id="s${i}"><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map((e) => card(e, L, byId)).join('')}</div></details>`)
     .join('\n');
-  return `<nav class="toc">${nav}${isekaiNav(groups.length)}</nav>\n${body}\n${isekaiSpoilersHtml(groups.length, merit)}`;
+  // เส้นทางงาน (ui-redo ใบ 21) ต่อท้ายการ์ดชาติไทย ก่อนส่วนต่างโลก — ไม่มี <article> ด่านนับการ์ดบนหน้าจึงนับเท่าเดิม
+  const career = careerHtml(content, L, sim);
+  return `<nav class="toc">${nav}${career ? '<a href="#career">เส้นทางงาน</a>' : ''}${isekaiNav(groups.length)}</nav>\n${body}\n${career}\n${isekaiSpoilersHtml(groups.length, merit)}`;
 }

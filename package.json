@@ -15,6 +15,7 @@
     "titles": "node harness/titles.mjs --n 2000 --gens 3 --seed 1",
     "omen-ctl": "node harness/omen-ctl.mjs --n 2000 --gens 3 --seed 1",
     "overlap": "node harness/overlap.mjs --n 1000 --gens 4 --seed 1",
+    "career:sim": "node harness/career-sim.mjs --n 1000 --seed 1",
     "save": "node harness/save.mjs --n 120 --seed 1",
     "stats": "node harness/stats.mjs --n 2000 --seed 1",
     "belief": "node harness/belief.mjs --n 20000 --seed 1",

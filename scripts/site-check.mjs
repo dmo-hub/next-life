@@ -14,6 +14,7 @@ import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
 import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
 import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
+import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS } from '../src/site/nav.mjs';
 
@@ -132,6 +133,17 @@ const iskLeak = hidden.filter((t) => cards.includes(escHtml(t)));
 if (/ความยาก|class="rk"/.test(cardsIsk)) iskLeak.push('ความยาก/ผล');
 check('หน้ารวมการ์ดส่วนต่างโลกไม่เฉลยผลหรือตอนจบ', iskLeak.length || !cardsIsk, iskLeak.length ? ` · เจอ ${iskLeak.slice(0, 3).join(' | ')}` : ` (ตรวจ ${hidden.length} ข้อความ)`);
 check('หน้ารวมการ์ดลิงก์ไปหน้าเฉลย และหน้าเฉลยมีป้ายเตือนสปอยล์', !cards.includes('href="spoilers.html"') || !spoil.includes('class="warn"'));
+// 5b) เส้นทางงาน (ui-redo ใบ 21): ทุกอาชีพในทุกสายของ careers.json + การเมือง มีกล่องบนหน้า
+// ผลจำลองค้าง (การ์ดเพิ่ม/ลบ/เปลี่ยน id หลังรันจำลอง) = เตือน ไม่ตก — จำลองรันสั่งแยก ไม่ผูก build
+const occsOf = (l) => (l.occs ? l.occs.length : new Set(l.steps.map((x) => x.occ)).size);
+const jobWant = Object.values(content.era.careers.ladders).reduce((s, l) => s + occsOf(l), 0) + (content.era.careers.office ? 1 : 0);
+const jobGot = (spoilTh.match(/<div class="job">/g) ?? []).length;
+check('หน้าเฉลยมีเส้นทางงานครบทุกอาชีพในทุกสาย', jobGot !== jobWant || !spoilTh.includes('id="career"'), ` ${jobGot}/${jobWant}`);
+const drift = simDrift(content);
+if (drift.noFile) console.log(`⚠ เตือน: ไม่มี ${SIM_FILE} — หน้าเฉลยส่วนเส้นทางงานไม่มีเลข · รัน npm run career:sim`);
+else if (drift.missing.length || drift.gone.length)
+  console.log(`⚠ เตือน: ผลจำลองเส้นทางงานค้าง — การ์ดใหม่ไม่มีผล ${drift.missing.length} (${drift.missing.slice(0, 5).join(', ')}) · การ์ดที่หายจากกอง ${drift.gone.length} (${drift.gone.slice(0, 5).join(', ')}) · รัน npm run career:sim แล้ว build`);
+else console.log(`ผลจำลองเส้นทางงานตรงชุดการ์ดในกอง (${careerSim().cards.length} ใบ · เกมรุ่น ${careerSim().sha})`);
 
 // 6b) ชาติใหม่เกิดในทวีป (06d): ส่วนหลักของหน้าเฉลยมีครบทุกแคว้น เผ่า อาชีพ · หน้าที่ผู้เล่นใหม่อ่านไม่พูดถึงการเลือกบทบาท (กลุ่มพับชาติเก่ายกเว้น)
 // · โอกาสต่อแฟ้มบนหน้าเท่าที่ contBirth สุ่มจริง ±1 จุด
