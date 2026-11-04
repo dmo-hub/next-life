@@ -39,15 +39,15 @@ export const GODDESS_VOWS = [
 const ISEKAI_SALT = 0x15e4a1;
 
 export const ISEKAI_SKILLS = {
-  appraise: { name: 'ประเมินค่า', desc: 'มองทะลุของและคน · ตัวเลือกสายสังเกต +20%', tag: 'appraise' },
-  storage: { name: 'กล่องมิติไร้ขีดจำกัด', desc: 'เก็บได้ทุกอย่าง · ค้าขาย +20% · ได้ทองเพิ่มครึ่งเท่า', tag: 'trade' },
-  allmagic: { name: 'เวททุกธาตุ', desc: 'ร่ายได้ครบไฟ น้ำ ลม ดิน แสง มืด · ตัวเลือกเวท +20%', tag: 'magic' },
-  sword: { name: 'วิชาดาบศักดิ์สิทธิ์', desc: 'ดาบเดียวผ่าภูเขา · ตัวเลือกต่อสู้ +20%', tag: 'fight' },
-  tongue: { name: 'ลิ้นทองเทวี', desc: 'พูดได้ทุกภาษา คนฟังแล้วเคลิ้ม · ตัวเลือกเจรจา +20%', tag: 'talk' },
-  cook: { name: 'ฝีมือครัวจากโลกเดิม', desc: 'รสมือแม่ค้าตลาดนัด · ตัวเลือกทำอาหาร +25%', tag: 'cook', add: 25 },
+  appraise: { name: 'ประเมินค่า', desc: 'มองทะลุของและคน · ตัวเลือกสายสังเกต +20%', tag: 'appraise', thai: { cats: ['work_money'] } },
+  storage: { name: 'กล่องมิติไร้ขีดจำกัด', desc: 'เก็บได้ทุกอย่าง · ค้าขาย +20% · ได้ทองเพิ่มครึ่งเท่า', tag: 'trade', thai: { cats: ['work_money'] } },
+  allmagic: { name: 'เวททุกธาตุ', desc: 'ร่ายได้ครบไฟ น้ำ ลม ดิน แสง มืด · ตัวเลือกเวท +20%', tag: 'magic', thai: { cats: ['study'] } },
+  sword: { name: 'วิชาดาบศักดิ์สิทธิ์', desc: 'ดาบเดียวผ่าภูเขา · ตัวเลือกต่อสู้ +20%', tag: 'fight', thai: { cats: ['health'] } },
+  tongue: { name: 'ลิ้นทองเทวี', desc: 'พูดได้ทุกภาษา คนฟังแล้วเคลิ้ม · ตัวเลือกเจรจา +20%', tag: 'talk', thai: { cats: ['society'] } },
+  cook: { name: 'ฝีมือครัวจากโลกเดิม', desc: 'รสมือแม่ค้าตลาดนัด · ตัวเลือกทำอาหาร +25%', tag: 'cook', add: 25, thai: { cats: ['family'] } },
   stealth: { name: 'ซ่อนตัวระดับเทพ', desc: 'ไม่มีใครสังเกตเห็น · ตัวเลือกแอบ/หนี +20%', tag: 'sneak' },
-  regen: { name: 'ฟื้นฟูอัตโนมัติ', desc: 'ชีวิตฟื้น +6 ทุกเหตุการณ์' },
-  exp: { name: 'ประสบการณ์ ×2', desc: 'ค่าสถานะที่ได้เพิ่มเป็นสองเท่า' },
+  regen: { name: 'ฟื้นฟูอัตโนมัติ', desc: 'ชีวิตฟื้น +6 ทุกเหตุการณ์', thai: { cats: ['health'] } },
+  exp: { name: 'ประสบการณ์ ×2', desc: 'ค่าสถานะที่ได้เพิ่มเป็นสองเท่า', thai: { cats: ['study'] } },
   luck: { name: 'โชคเทพธิดา', desc: 'โชค +15 ตั้งแต่เกิด' },
   rbd: { name: 'ย้อนเวลาเมื่อตาย', desc: 'ตายครั้งแรกเวลาจะย้อนกลับ ฟื้นด้วยชีวิต 40' },
 };
@@ -55,6 +55,26 @@ export const ISEKAI_SKILLS = {
 // สกิลข้ามชาติ (06s): carry = พกไปชาติใหม่ได้กี่อย่าง · top = ขั้นสูงสุด · step = โอกาสที่เพิ่มต่อขั้นที่เกินขั้น 1
 // ขั้น 1 ได้ค่าเดิมของสกิล ⇒ ชาติที่ไม่มีการอัปเกรดเดินเท่าก่อนมีขั้น
 export const SKILL = { carry: 3, top: 3, step: 10 };
+// ผลเบาชาติไทย: ชาติไทยไม่มีแท็กตัวเลือกให้สกิลจับ ⇒ เอียงทั้งหมวดการ์ดแทน — ทาง ok ของการ์ดหมวดที่ตรงคูณ 1 + k × ผลรวมขั้นของสกิลที่ตรง
+// (ยังโดนเพดาน okMax · ไม่ดึงเลขสุ่ม) · k = 0 ⇒ ชีวิตเท่าก่อนมีผลเบา จนกว่าจะวัดแล้วเคาะค่า
+export const THAI_SKILL = { k: 0 };
+export function thaiSkillMul(skills, cat, k = THAI_SKILL.k) {
+  if (!k || !cat || !skills?.length) return 1;
+  let lv = 0;
+  for (const s of skills) if (ISEKAI_SKILLS[s.id]?.thai?.cats.includes(cat)) lv += s.lv;
+  return 1 + k * lv;
+}
+// หมวดของผลเบาอยู่ในแกน ไม่ผ่านด่านเนื้อหา — lint-test ตรวจกับรายการหมวดของด่าน (หมวดสะกดผิด = ผลเบาเงียบหาย)
+export function checkSkillThai(cats, skills = ISEKAI_SKILLS, k = THAI_SKILL.k) {
+  const out = [];
+  if (!(k >= 0)) out.push(`THAI_SKILL.k ต้องไม่ติดลบ (ได้ ${k})`);
+  for (const [id, s] of Object.entries(skills)) {
+    if (s.thai === undefined) continue;
+    if (!Array.isArray(s.thai?.cats) || !s.thai.cats.length) { out.push(`${id}: thai.cats ต้องเป็นรายการหมวดอย่างน้อย 1`); continue; }
+    for (const c of s.thai.cats) if (!cats.includes(c)) out.push(`${id}: ไม่รู้จักหมวด ${c}`);
+  }
+  return out;
+}
 const skillLv = (isk, s) => isk.lv?.[s] ?? 1;
 const skillAdd = (isk, s) => (ISEKAI_SKILLS[s].add ?? 20) + SKILL.step * (skillLv(isk, s) - 1);
 // คลังสกิลอยู่ในเครื่องผู้เล่นแบบสมุดฉายา (UI เก็บ ไม่อยู่ในเซฟ) — แกนแค่คำนวณ · จำขั้นสูงสุดที่เคยถึง ไม่ลด

@@ -10,10 +10,10 @@ import { loadEvents, loadEra, loadContent, checkNames } from '../src/node/load.m
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
 import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT } from '../src/engine/career.mjs';
 import { newLife, CLASSES, SEXES, fill } from '../src/engine/life.mjs';
-import { MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
+import { CATEGORIES, MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
 import { SCENES } from '../src/engine/afterlife.mjs';
 import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenText } from '../src/engine/merit.mjs';
-import { ISEKAI_EVENTS, ISEKAI_MERIT } from '../src/engine/isekai.mjs';
+import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../src/engine/isekai.mjs';
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 
 const root = new URL('../', import.meta.url);
@@ -68,6 +68,16 @@ const controls = {
 };
 for (const [name, args] of Object.entries(controls)) if (!checkMeritTable(...args).length) fails.push(`merit-table ตัวควบคุม "${name}" ไม่ตก`);
 rows.push(['merit-table ตัวควบคุม', `${Object.keys(controls).length} แบบ`]);
+// ผลเบาชาติไทยของสกิล (06s): ของจริงผ่าน · ตัวควบคุมผิดทีละอย่างต้องตก
+const skThai = checkSkillThai(CATEGORIES);
+rows.push(['skill-thai', skThai.length ? `ตก ${skThai.length} ข้อ` : `ผ่าน (${Object.values(ISEKAI_SKILLS).filter((s) => s.thai).length} สกิล)`]);
+for (const t of skThai) fails.push(`skill-thai: ${t}`);
+const skControls = {
+  'หมวดสะกดผิด': [CATEGORIES, { ...ISEKAI_SKILLS, sword: { ...ISEKAI_SKILLS.sword, thai: { cats: ['healt'] } } }],
+  'cats ว่าง': [CATEGORIES, { ...ISEKAI_SKILLS, sword: { ...ISEKAI_SKILLS.sword, thai: { cats: [] } } }],
+  'k ติดลบ': [CATEGORIES, ISEKAI_SKILLS, -0.1],
+};
+for (const [name, args] of Object.entries(skControls)) if (!checkSkillThai(...args).length) fails.push(`skill-thai ตัวควบคุม "${name}" ไม่ตก`);
 // ป้ายบุญบาปต่างโลก (B68c) อยู่นอก yaml ไม่ผ่านด่านเนื้อหา — ตรวจ id/ลำดับตัวเลือก/หมวด/ระดับ ที่นี่แทน
 const iskById = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
 let iskTags = 0;

@@ -12,7 +12,7 @@ import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './cou
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
-import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack } from './isekai.mjs';
+import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
 
@@ -100,7 +100,7 @@ function signPact(st, p) {
 // น้ำหนักทางผลหลังเอียงตาม multipliers และอารมณ์ · การ์ดที่มีทั้งทางสำเร็จและไม่สำเร็จ ตัดโอกาสสำเร็จรวมไว้ okMin–okMax (B112) โดยปรับสองกลุ่มตามสัดส่วน
 // (ไม่ดึงเลขสุ่มเพิ่ม · ป้าย % กับผลจริงใช้ตัวเดียวกัน)
 const outcomeWeights = (st, ev, c) => {
-  const m = (moodCard(ev) ? moodMul(st) : 1) * pactLuck(st);
+  const m = (moodCard(ev) ? moodMul(st) : 1) * pactLuck(st) * thaiSkillMul(st.skills, ev?.category);
   const w = c.outcomes.map((o) => o.weight * poolMultiplier(st, o.multipliers) * (o.ok ? m : 1));
   const ok = w.reduce((a, x, i) => a + (c.outcomes[i].ok ? x : 0), 0);
   const all = w.reduce((a, x) => a + x, 0);
