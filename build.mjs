@@ -38,6 +38,15 @@ const fonts = PLAY_FONTS.map(([family, weight, file]) => {
 }).join('\n');
 
 writeFileSync(new URL('./docs/play.html', import.meta.url), read('./src/ui/template.html').replace('/*__FONTS__*/', () => fonts).replace('/*__SCRIPT__*/', () => script));
+// หน้า tweak ที่ต้องหน้าตาเกมจริง (ui-redo 46): ฉีด CSS ของ template + ฟอนต์หน้าเล่นตอน build — หน้าไม่ลอก CSS เอง แก้เกมแล้วต้นแบบตามทันที
+const GAME_CSS = ['/*GAME-CSS:START*/', '/*GAME-CSS:END*/'];
+const gameCss = read('./src/ui/template.html').match(/<style>([\s\S]*?)<\/style>/)[1].replace('/*__FONTS__*/', () => fonts.split('\n').filter((f) => f.includes('Noto Sans Thai')).join('\n'));
+for (const page of ['./docs/dev/ui-redo/head-tweak.html']) {
+  const html = read(page);
+  const [a, b] = GAME_CSS.map((m) => html.indexOf(m));
+  if (a < 0 || b < a) throw new Error(`${page}: ต้องมี ${GAME_CSS.join(' … ')}`);
+  writeFileSync(new URL(page, import.meta.url), html.slice(0, a + GAME_CSS[0].length) + gameCss + html.slice(b));
+}
 console.log(`docs/play.html: ${content.events.length} เหตุการณ์ · ข้อมูลยุค ${JSON.stringify(content.era).length.toLocaleString('en-US')} ตัวอักษร`);
 const site = buildSite(content);
 console.log(`docs/ หน้าเว็บ: ${site.pages.join(' · ')} · ${site.facts.version}`);
