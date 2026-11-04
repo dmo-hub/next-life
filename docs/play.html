@@ -327,6 +327,10 @@ body:has(.mnav) .foot { display:none; }
 .a .choice { border:1px solid var(--ink); background:#FFFDF7; }
 .a .choice:hover, .a .choice:focus-visible { background:var(--ink); color:var(--paper); outline:none; }
 .a .choice .fx { color:var(--green); } .a .choice:hover .fx, .a .choice:focus-visible .fx { color:#CFE3E0; }
+/* คำอธิบายสกิลใต้ชื่อปุ่ม (06s: จอเลือกพก · การ์ดฝึกสกิล · เลือกลงสมุด) · ปุ่มเลือกพกที่กดไว้มีแถบซ้าย */
+.a .choice .idesc, .b .choice .idesc { display:block; margin-top:2px; font-size:12px; }
+.a .choice .idesc { color:var(--muted); } .a .choice:hover .idesc, .a .choice:focus-visible .idesc { color:#CFE3E0; }
+.a .choice[aria-pressed="true"] { box-shadow:inset 5px 0 0 var(--green); }
 .a .stamp { border:2px solid var(--red); color:var(--red); }
 .a .recap { border:1px solid var(--rule); border-radius:var(--r); background:#FBF7EE; }
 
@@ -343,7 +347,9 @@ body:has(.mnav) .foot { display:none; }
 .b .choice { border:1px solid var(--bronze2); background:var(--lacquer2); color:var(--cream); }
 .b .choice:hover, .b .choice:focus-visible { border-color:var(--gold); background:#2E2218; outline:none; }
 .b .choice .fx { color:var(--gold); }
-.b .picks, .b .tree summary { color:#E3D6B3; }
+.b .choice .idesc { color:var(--cream); opacity:0.8; }
+.b .picks, .b .tree summary, .b .tab-bar button { color:#E3D6B3; }
+.b .tab-bar button[aria-pressed="true"] { background:var(--gold); border-color:var(--gold); color:var(--lacquer); }
 .b .recap { border:1px solid var(--bronze); background:var(--lacquer2); }
 .b .recap .h { color:var(--gold); }
 .scene { height:96px; background:var(--lacquer2); border-bottom:1px solid var(--bronze); }
@@ -10392,7 +10398,7 @@ function lifeTitles(card) {
   if (!card.lifeTitles) {
     const t = titlesOf(st);
     card.lifeTitles = { ...t };
-    bookAdd(t);
+    titleBookAdd(t);
     card.lifeTitles.clue = titleClue(`${st.seed}:${st.gen}`, t);
     picsAdd();
     card.memo = memoAdd(t);
@@ -10512,7 +10518,7 @@ function bookWrite(b) {
 }
 // n = รายการที่เพิ่งเปิดแต่ผู้เล่นยังไม่ได้ดู (จุดแดง B116) · id ฉายากับชีวิตแบบคนละกลุ่มกัน จึงติดหัวกลุ่มกันชนชื่อ
 const newKey = (group, id) => `${group}:${id}`;
-function bookAdd(t) {
+function titleBookAdd(t) {
   const b = bookRead();
   const add = (group, xs, id) => {
     if (xs.includes(id)) return xs;
@@ -10717,12 +10723,59 @@ function picsSeen() {
   picsWrite(p);
 }
 
+// สมุดสกิล (06s): สกิลที่ดวงวิญญาณเคยได้ สะสมข้ามชีวิตแบบสมุดฉายา · ไม่อยู่ในเซฟ (ล้างตระกูลแล้วยังอยู่)
+// s = { id: ขั้นสูงสุดที่เคยถึง } คำนวณด้วย bookAdd ของแกน · e = การ์ดที่ลงสมุดไปแล้ว — รีโหลดกลับมาที่การ์ดเดิม ลงซ้ำ = ขั้นขึ้นฟรี
+// n = สกิลที่เพิ่งลงแต่ยังไม่เปิดดู (จุดแดงแบบสมุดฉายา)
+const SKILLS_KEY = 'next-life-skills-v1';
+const SKILL_IDS = Object.keys(ISEKAI_SKILLS);
+const SKILLS_EARN_MAX = 200;
+function skillsRead() {
+  try {
+    const k = JSON.parse(localStorage.getItem(SKILLS_KEY) ?? '{}') ?? {};
+    const s = Object.fromEntries(Object.entries(k.s ?? {}).filter(([id, lv]) => ISEKAI_SKILLS[id] && Number.isInteger(lv) && lv > 0).map(([id, lv]) => [id, Math.min(SKILL.top, lv)]));
+    return { s, e: Array.isArray(k.e) ? k.e : [], n: Array.isArray(k.n) ? k.n.filter((id) => s[id]) : [] };
+  } catch {
+    return { s: {}, e: [], n: [] };
+  }
+}
+function skillsWrite(k) {
+  try {
+    localStorage.setItem(SKILLS_KEY, JSON.stringify(k));
+  } catch {
+    // ไม่มีที่เก็บ — สมุดสกิลไม่จำ ชาติหน้าจึงไม่มีอะไรให้พก
+  }
+}
+// ลงสมุด 1 อย่างต่อการ์ด · การ์ดนี้ลงไปแล้ว = null
+function skillsEarn(key, id, lv) {
+  const k = skillsRead();
+  if (k.e.includes(key)) return null;
+  const was = k.s[id] ?? 0;
+  k.s = bookAdd(k.s, id, lv).book;
+  k.e = [...k.e, key].slice(-SKILLS_EARN_MAX);
+  if (!k.n.includes(id)) k.n.push(id);
+  skillsWrite(k);
+  shelfDot();
+  return { was, lv: k.s[id] };
+}
+function skillsSeen() {
+  const k = skillsRead();
+  k.n = [];
+  skillsWrite(k);
+}
+const skillsGot = (k) => Object.keys(k.s).length;
+// คำใบ้ของ ??? บอกชนิดแหล่งที่ได้ ไม่บอกชื่อ — ชี้ทางแบบคำใบ้ฉายา · ทุกสกิลเป็นของขวัญเทพธิดาในต่างโลกได้
+const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', pattern: 'แบบชีวิต', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'สิ่งที่ทุ่มเท', lifeGoal: 'เป้าชีวิต' };
+function skillHint(id) {
+  const kinds = Object.entries(CONTENT.skillMap ?? {}).filter(([, m]) => Object.values(m).some((xs) => xs.includes(id))).map(([k]) => SKILL_SRC[k]).filter(Boolean);
+  return kinds.length ? `ของขวัญเทพธิดาในต่างโลก หรือชีวิตไทยที่มี${kinds.join('/')}ที่ใช่` : 'ของขวัญเทพธิดาในต่างโลก';
+}
+
 // จุดแดงที่ทางเข้าชั้นสมุด (B116 → B130): ชีวิตใหม่ในสมุดอนุสรณ์ · ฉายาใหม่ · ภาพใหม่ ที่ยังไม่เปิดดู
 // ลิงก์ท้ายหน้าซ่อนในฉากที่มีเมนู แต่ยังเป็นทางเข้าของต่างโลก/ปรโลก ⇒ ติดจุดทั้งสองที่
-const shelfFresh = () => ({ m: memoUnseen(), t: bookRead().n, p: picsRead().n });
+const shelfFresh = () => ({ m: memoUnseen(), t: bookRead().n, p: picsRead().n, k: skillsRead().n });
 function shelfDot() {
   const f = shelfFresh();
-  const n = f.m.length + f.t.length + f.p.length;
+  const n = f.m.length + f.t.length + f.p.length + f.k.length;
   for (const a of document.querySelectorAll('#shelfLink, .mnav [data-menu="shelf"]')) {
     a.querySelector('.new-dot')?.remove();
     if (n) a.append(newDot(`มีของใหม่ในชั้นสมุด ${n}`));
@@ -10754,7 +10807,7 @@ function memoFull(card) {
 
 // ชั้นสมุด (B130): เล่มเดียว 3 แท็บ อนุสรณ์ · ฉายา · ภาพบ้านเมือง · เปิดทับหน้าที่อยู่ แล้วคืนหน้าเดิมทั้งก้อนตอนกลับ — ไม่แตะ st ไม่ลงเซฟ
 // fresh = ของใหม่ตอนเปิดชั้นครั้งแรก — เปิดแท็บแล้วล้างจุดในที่เก็บ แต่ป้าย "ใหม่" ยังอยู่จนออกจากชั้น สลับแท็บไปมาก็ยังหาเจอ
-const SHELF_TABS = [['m', 'อนุสรณ์'], ['t', 'ฉายา'], ['p', 'ภาพบ้านเมือง']];
+const SHELF_TABS = [['m', 'อนุสรณ์'], ['t', 'ฉายา'], ['k', 'สกิล'], ['p', 'ภาพบ้านเมือง']];
 function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh()) {
   // เปิดจากเมนู/ท้ายหน้า/หน้าเล่นต่อ: ไปแท็บที่มีของใหม่ก่อน
   tab ??= SHELF_TABS.find(([k]) => fresh[k].length)?.[0] ?? 'm';
@@ -10768,7 +10821,7 @@ function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh(
   const m = memoRead();
   const b = bookRead();
   const p = picsRead();
-  const count = { m: `${m.l.length}`, t: `${bookGot(b)}/${BOOK_ALL}`, p: `${picsGot(p)}/${PIC_ALL}` };
+  const count = { m: `${m.l.length}`, t: `${bookGot(b)}/${BOOK_ALL}`, p: `${picsGot(p)}/${PIC_ALL}`, k: `${skillsGot(skillsRead())}/${SKILL_IDS.length}` };
   const choices = homeCard('ชั้นสมุด', ['ชั้นสมุด']);
   root.firstChild.classList.add('shelf-view');
   const body = root.querySelector('.body');
@@ -10779,13 +10832,14 @@ function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh(
     const x = el('button', null, `${label} ${count[k]}`);
     x.setAttribute('aria-pressed', String(k === tab));
     // จุดบนแท็บอื่นที่ยังไม่ได้เปิด — แท็บที่เปิดอยู่ล้างจุดแล้ว
-    if (k !== tab && (k === 'm' ? memoUnseen() : k === 't' ? bookRead().n : picsRead().n).length) x.append(newDot('มีของใหม่'));
+    if (k !== tab && shelfFresh()[k].length) x.append(newDot('มีของใหม่'));
     x.onclick = () => again(k);
     tabs.append(x);
   }
   body.append(tabs);
   if (tab === 't') titleShelf(body, fresh.t);
   else if (tab === 'p') picShelf(body, fresh.p);
+  else if (tab === 'k') skillShelf(body, fresh.k);
   else memoShelf(body, choices, fresh.m, again);
   shelfDot();
   choices.prepend(enter(button('กลับ', null, back)));
@@ -10870,6 +10924,23 @@ function picShelf(body, fresh) {
     body.append(s);
   }
   picsSeen();
+}
+// แท็บสมุดสกิล (06s): ขั้นในสมุด = ขั้นสูงสุดที่เคยถึง · ยังไม่เคยได้ = ??? + คำใบ้แหล่ง
+function skillShelf(body, fresh) {
+  const k = skillsRead();
+  body.append(el('p', 'bk-intro', `สกิลที่ดวงวิญญาณนี้เคยได้ สะสมข้ามชีวิต · ได้แล้ว ${skillsGot(k)}/${SKILL_IDS.length} · ก่อนไปเกิดเลือกพกได้ ${SKILL.carry} อย่าง ทุกอย่างเริ่มขั้น 1 แต่ฝึกถึงขั้นในสมุดได้เร็วกว่าครั้งแรก`), shelfBar(skillsGot(k), SKILL_IDS.length));
+  const ul = el('ul', 'bk-list');
+  for (const id of SKILL_IDS) {
+    const x = ISEKAI_SKILLS[id];
+    const lv = k.s[id];
+    const li = el('li', lv ? 'got' : 'lock');
+    if (lv) li.append(el('b', null, `${x.name} · ขั้น ${lv}`), ` — ${x.desc}`);
+    else li.append(el('b', null, '???'), skillHint(id));
+    if (fresh.includes(id)) li.append(newTag());
+    ul.append(li);
+  }
+  body.append(ul);
+  skillsSeen();
 }
 
 // ภาพแชร์รับเฉพาะช่องที่ไล่ชื่อไว้ตรงนี้ — บัญชีบุญบาปบนการ์ดตายหลุดลงภาพไม่ได้ แม้แกนเกมจะเติมช่องใหม่ให้การ์ด
@@ -11305,7 +11376,7 @@ const growLabel = (stage) => `เติบโตเป็น${stage === 'หน�
 // รูปบนป้ายคนหาย/หนังสืองานศพ = ตัวละครเองตอนอายุนั้น ชุดเดียวกับภาพแชร์ — หุ่นเทาตายตัวเดิมไม่บอกว่าเป็นใคร
 const portrait = (age) => artSvg('por', AVATAR_SIZE, AVATAR_SIZE, avatarParts(age));
 
-const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา', warn: 'ใกล้ตาย', memory: 'ความทรงจำ' };
+const KICKER = { intro: 'เปิดชีวิต', stage: 'เปลี่ยนช่วงชีวิต', era: 'บ้านเมือง', omen: 'ลาง', alloc: 'เงินเก็บ', result: 'ผลที่ตามมา', warn: 'ใกล้ตาย', memory: 'ความทรงจำ', upgrade: 'สกิลที่พกมา · เลือกฝึก' };
 // ป้ายคนหาย (B139) — ถ้อยคำของคนที่บ้านที่ยังรอ: ไม่อาลัย ไม่บอกเหตุ (B110) · will[0] ไม่มีพินัยกรรม · will[1] มี
 const LOST = {
   head: 'ประกาศตามหาคนหาย',
@@ -11459,6 +11530,8 @@ const FX = {
       const q = (s) => ov.querySelector(s);
       const name = q('.fx-name');
       name.textContent = o.name;
+      // แถบเดียวกันใช้กับสกิลที่ลงสมุด/ขึ้นขั้น (06s) — ป้ายใต้แถบบอกว่าเป็นอะไร
+      if (o.sub) q('.fx-sub').textContent = o.sub;
       // ชื่อฉายายาวเกินแถบ ⇒ บีบให้พอดีแถบ ไม่ล้นออกนอกผ้า
       if (name.getComputedTextLength() > 210) {
         name.setAttribute('textLength', 210);
@@ -11726,7 +11799,12 @@ function render(card) {
         const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
         const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);
-        const b = numbered(button(c, fx, () => (veil(card, i), play(lifePick(i))), card.hints?.[i]), ++n);
+        const b = numbered(button(c, fx, () => {
+          veil(card, i);
+          play(lifePick(i));
+          if (card.kind === 'upgrade') upgradeFx(card, i);
+        }, card.hints?.[i]), ++n);
+        if (card.kind === 'upgrade' && card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
         if (why) b.disabled = true;
         choices.append(b, ...loanButtons(card, i));
       });
@@ -12158,6 +12236,81 @@ function petsWaiting(s) {
 
 const clip = (t, n) => (t.length > n ? `${t.slice(0, n - 1)}…` : t);
 
+// เลือกสกิลลงสมุด 1 อย่าง (06s) บนการ์ดจบต่างโลก/การ์ดปรโลก — นอกลำดับปุ่มเซฟ แกนไม่เปลี่ยนสถานะ ไม่กดก็ไปต่อได้
+// key = การ์ดใบนี้ของชีวิตนี้ · รีโหลดกลับมาที่ใบเดิมเห็นว่าลงไปแล้ว
+function earnBox(earn, key) {
+  const box = el('div', 'recap earn');
+  const done = (line) => box.replaceChildren(el('div', 'h', 'ลงสมุดสกิลแล้ว'), ...(line ? [el('p', 'sub', line)] : []), shelfButton(`เปิดชั้นสมุด · สกิล ${skillsGot(skillsRead())}/${SKILL_IDS.length}`, 'k'));
+  if (skillsRead().e.includes(key)) {
+    done(null);
+    return box;
+  }
+  box.append(el('div', 'h', 'เลือกสกิล 1 อย่างลงสมุด'), el('p', 'sub', 'สกิลในสมุดเลือกพกไปชาติหน้าได้ · ได้ซ้ำ = ขั้นในสมุดขึ้น'));
+  const book = skillsRead().s;
+  for (const x of earn) {
+    const was = book[x.id] ?? 0;
+    const to = bookAdd(book, x.id, x.lv).book[x.id];
+    const tag = !was ? `ใหม่ · ขั้น ${to}` : to > was ? `ขั้น ${was} → ${to}` : 'ขั้นสูงสุดแล้ว';
+    const b = button(x.name, tag, () => {
+      const r = skillsEarn(key, x.id, x.lv);
+      if (!r) return done(null);
+      done(r.was ? (r.lv > r.was ? `${x.name} ขึ้นเป็นขั้น ${r.lv}` : `${x.name} ขั้นสูงสุดอยู่แล้ว`) : `${x.name} · ขั้น ${r.lv}`);
+      if (!fxReduced() && r.lv > r.was) fxPlay(fxOv(), 'titleA', { tier: r.lv >= SKILL.top ? 'legend' : 'rare', name: x.name, sub: r.was ? `สกิลขึ้นขั้น ${r.lv}` : 'สกิลใหม่ลงสมุด' });
+    });
+    b.firstChild.append(el('small', 'idesc', ISEKAI_SKILLS[x.id].desc));
+    // ขั้นสูงสุดแล้ว ลงซ้ำไม่ได้อะไร — กันเสียสิทธิ์เลือกของการ์ดใบนี้
+    if (to === was) b.disabled = true;
+    box.append(b);
+  }
+  return box;
+}
+
+// การ์ดฝึกสกิล (06s): แถบผ้าชื่อสกิลหลังกด · ปุ่มท้าย (ยังไม่ฝึก) ไม่มีเอฟเฟกต์ · ขั้นใหม่อ่านจากป้ายปุ่มที่แกนเขียน
+function upgradeFx(card, i) {
+  if (i >= card.choices.length - 1 || fxReduced()) return;
+  const [name] = card.choices[i].split(' · ');
+  const lv = /→ (\d+)$/.exec(card.choices[i])?.[1];
+  fxPlay(fxOv(), 'titleA', { tier: +lv >= SKILL.top ? 'legend' : 'rare', name, sub: lv ? `สกิลขึ้นขั้น ${lv}` : 'สกิลขึ้นขั้น' });
+}
+
+// เลือกพกก่อนไปเกิด (06s): จากสมุดสกิล ≤ SKILL.carry แล้วไปเกิดด้วยปุ่มเซฟเดิม — ชุดที่พกอยู่ในสถานะชีวิตใหม่ ภาพถ่ายเซฟเก็บไปเอง
+// สมุดว่าง = ไปเกิดทันทีเหมือนก่อนมีสกิลข้ามชาติ · บรรทัดตามไป/ไม่ตามไป (dsd-2) ไม่บอกตัวเลข
+let carryNext = [];
+function rebirth() {
+  const offers = bookCarryOffers(skillsRead().s);
+  if (!offers.length) return play(T.rebirth);
+  const prev = [...root.childNodes];
+  const pick = [];
+  const draw = () => {
+    const choices = homeCard('ก่อนไปเกิด', ['เลือกสกิลที่จะพกไปชาติหน้า', `พกได้ ${SKILL.carry} อย่าง ใช้ทั้งชีวิตไทยและชาติต่างโลกที่ตามมา · ทุกอย่างเริ่มขั้น 1 แต่ฝึกถึงขั้นในสมุดได้เร็วกว่าครั้งแรก`]);
+    const body = root.querySelector('.body');
+    const name = (id) => ISEKAI_SKILLS[id].name;
+    const left = offers.filter((o) => !pick.includes(o.id));
+    body.append(el('p', 'sub', pick.length ? `ตามไป: ${pick.map(name).join(' · ')}` : 'ตามไป: ไม่มีสกิลใดตามไป'));
+    if (left.length) body.append(el('p', 'sub', `ไม่ตามไป: ${left.map((o) => o.name).join(' · ')} — ยังอยู่ในสมุด`));
+    for (const o of offers) {
+      const on = pick.includes(o.id);
+      const full = !on && pick.length >= SKILL.carry;
+      const b = button(o.name, full ? `พกครบ ${SKILL.carry} แล้ว` : on ? 'พกไป' : `ขั้น ${o.lv} ในสมุด`, () => {
+        if (on) pick.splice(pick.indexOf(o.id), 1);
+        else pick.push(o.id);
+        draw();
+        root.querySelector(`[data-skill="${o.id}"]`)?.focus();
+      });
+      b.dataset.skill = o.id;
+      b.setAttribute('aria-pressed', String(on));
+      b.firstChild.append(el('small', 'idesc', o.desc));
+      if (full) b.disabled = true;
+      choices.append(b);
+    }
+    choices.append(enter(button(pick.length ? 'ไปเกิดพร้อมสกิลที่พก' : 'ไปเกิดโดยไม่พกสกิล', null, () => {
+      carryNext = [...pick];
+      play(T.rebirth);
+    })), button('กลับ', null, () => root.replaceChildren(...prev)));
+  };
+  draw();
+}
+
 // ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะ — ชีวิตจบแล้ว
 const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ปรโลก', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ' };
 const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา' };
@@ -12180,6 +12333,7 @@ function renderAfter(card) {
   if (card.kind === 'verdict') body.append(el('h3', null, `ภูมิ${card.realm}`));
   body.append(el(card.title || card.kind === 'verdict' ? 'p' : 'h3', card.title || card.kind === 'verdict' ? null : 'lead', card.text));
   if (card.reckoning) body.append(reckoningBox(card.reckoning, af.st.deeds));
+  if (card.earn) body.append(earnBox(card.earn, `${save.seed}:${st.gen}:v`));
   if (card.lineage) {
     body.append(el('div', 'kicker', 'ผังตระกูล'));
     body.append(af.heir ? lineageView(af.heir.lineage, af.heir.cls, af.heir.lineage.length, 'รุ่นถัดไป') : list(card.lineage, 'picks'));
@@ -12189,7 +12343,7 @@ function renderAfter(card) {
   }
   if (card.note) body.append(el('p', 'note', card.note));
   if (card.done) {
-    choices.append(enter(button(BTN.rebirth, null, () => play(T.rebirth))));
+    choices.append(enter(button(BTN.rebirth, null, rebirth)));
     choices.append(button(BTN.newFamily, null, start));
   } else if (card.choices.length) {
     const offer = () => choices.replaceChildren(...card.choices.map((c, i) => {
@@ -12225,7 +12379,7 @@ function heirPick(card, i, choices, back) {
 }
 
 // ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
-const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ช่วงวัยใหม่ · เลือกสิ่งที่ทุ่มเท', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก', warn: 'ใกล้ตาย', move: 'ทางแยก · เลือกแคว้น' };
+const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ช่วงวัยใหม่ · เลือกสิ่งที่ทุ่มเท', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก', warn: 'ใกล้ตาย', move: 'ทางแยก · เลือกแคว้น', upgrade: 'สกิลที่ติดตัว · เลือกฝึก' };
 // จดหมายเหตุบนการ์ดจบ (B68b ชิ้น 3): แบ่งตามช่วงวัย เก่าอยู่บน ช่วงสุดท้ายเปิดค้าง (เจ้าของเคาะ)
 // บรรทัดรับได้ทั้งสตริง "อายุ N · …" ของเซฟเก่า และ { age, until?, stage, kind, text, deltas } ของ engine — มี deltas ถึงขึ้น chip
 // ตาหลายปีของ engine บอกปลายช่วงเป็น until · จอใช้ชื่อ to ชุดเดียวกับที่แยกจากสตริง
@@ -12466,6 +12620,7 @@ function renderIsekai(card) {
   if (card.lore?.length) body.append(el('p', 'isys', `โลกนี้จะจำ${card.lore.length > 1 ? `${card.lore.slice(0, -1).join(' ')} และ${card.lore.at(-1)}` : card.lore[0]}ไว้หลังคุณจากไป`));
   // ต่างโลกไม่มีฉายาของตัวเอง — เบาะแสชี้ฉายาของโลกเดิมที่ชาติหน้ายังไปเก็บได้ (B108 ใช้สองโลก)
   if (card.step === 'end' && !card.trip) clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
+  if (card.step === 'end' && card.earn) body.append(earnBox(card.earn, `${save.seed}:${st.gen}:${card.trip ? `t${card.life}` : `i${card.run}`}`));
   if (card.highlights?.length) body.append(el('p', 'isys', 'ฉากที่จำได้ไม่ลืม'), list(card.highlights, 'picks'));
   if (card.log?.length) {
     const d = el('details', 'tree');
@@ -12482,7 +12637,10 @@ function renderIsekai(card) {
       const why = card.locked?.[i];
       // ใบทุ่มเทจากการ์ดเตือน (B161) ติดป้าย "ฟื้นชีวิต" ที่ทางที่ engine ชี้
       const tags = [card.fx?.[i], card.step === 'focus' && i === card.current && 'ทำอยู่', card.step === 'focus' && i === card.suggest && 'แนะนำ · ฟื้นชีวิต'].filter(Boolean).join(' · ');
-      const b = button(c, why ?? (card.step === 'focus' ? tags : card.fx?.[i]), () => play(pick(i)));
+      const b = button(c, why ?? (card.step === 'focus' ? tags : card.fx?.[i]), () => {
+        play(pick(i));
+        if (card.step === 'upgrade') upgradeFx(card, i);
+      });
       if (card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
       if (why) b.disabled = true;
       choices.append(b);
@@ -12629,7 +12787,8 @@ function step(tok) {
   }
   if (tok === T.afterNext) return nextAfterCard(af);
   if (tok === T.rebirth) {
-    st = nextLife(af);
+    st = nextLife(af, carryNext, carryNext.length ? skillsRead().s : {});
+    carryNext = [];
     af = null;
     curAge = null;
     bookReset();
