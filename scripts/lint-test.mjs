@@ -326,6 +326,23 @@ try {
   rows.push(['isekai overlap_stage ตก/ผ่าน', `${iskOverlapCases.length} เคส`]);
 }
 
+// ชื่อที่ src/ui import ต้องมีจริงในไฟล์ปลายทาง — build ต่อไฟล์เป็นสคริปต์เดียวแล้วตัด import ทิ้ง ชื่อหายจึงไม่พังตอน build แต่พังทั้งเกมตอนกด (bookAdd v0.6.55)
+{
+  const uiDir = new URL('src/ui/', root);
+  const IMPORT = /import\s*\{([^}]*)\}\s*from\s*['"](\.[^'"]+)['"]/g;
+  let n = 0;
+  for (const f of readdirSync(uiDir).filter((x) => x.endsWith('.mjs')).sort()) {
+    for (const [, names, spec] of readFileSync(new URL(f, uiDir), 'utf8').matchAll(IMPORT)) {
+      const mod = await import(new URL(spec, new URL(f, uiDir)));
+      for (const name of names.split(',').map((s) => s.trim().split(/\s+as\s+/)[0]).filter(Boolean)) {
+        n++;
+        if (!(name in mod)) fails.push(`ui-imports: src/ui/${f} import ${name} จาก ${spec} แต่ไฟล์นั้นไม่มี export ชื่อนี้ (MISSING ${name})`);
+      }
+    }
+  }
+  rows.push(['ui-imports (src/ui ← import)', `${n} ชื่อ`]);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 console.log(`\nกติกา ${ruleIds.length} · ไฟล์ bad ${bad.length} · คำต้องห้าม ${ctx.banned.length} ข้อ`);
