@@ -1,7 +1,7 @@
 // หน้าคู่มือสั้น (B121): ป้ายปุ่ม ค่าสถานะ และช่วงชีวิตอ่านจากค่ากลางที่เกมใช้ — ป้ายในเกมเปลี่ยน คู่มือเปลี่ยนตามตอน build
 // ไม่บอกสูตรหรือบุญบาป (กติกาเดียวกับคำอธิบายค่าสถานะในเกม) · ตัวเลขค่าสถานะบอกได้เพราะเกมแสดงบนแถบอยู่แล้ว
 import { STAGES, AFTERLIFE_STAGE } from '../engine/index.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, FOLLOW_WORD } from '../ui/labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, FOLLOW_WORD, warnWords } from '../ui/labels.mjs';
 import { esc } from './catalog.mjs';
 
 // ความหมายของปุ่มเดินเรื่อง — คีย์ต้องตรง BTN ทุกตัว (site-check นับ)
@@ -79,5 +79,5 @@ export function guideHtml() {
 <li>เกมอัปเดตเนื้อเรื่องแล้วชีวิตเก่ายังเล่นต่อได้ในหน้าเวอร์ชันเดิม เกมจะพาไปเอง</li>
 <li>เลขเวอร์ชันมุมบนของเกมกดได้ พาไปแพตช์โน้ตของเวอร์ชันนั้น</li>
 </ul></section>
-<section id="help"><h2>ช่วยจริง</h2><p>เรื่องในเกมบางเรื่องหนัก ถ้าใกล้ตัวคุณ ในชีวิตจริงมีคนรับฟังและช่วยได้ฟรี</p><ul>${real}</ul><p><small>${esc(HELP_NOTE)}</small></p></section>`;
+<section id="help"><h2>ช่วยจริง</h2><p>เรื่องในเกมบางเรื่องหนัก (${esc(warnWords())} — บรรทัดเดียวกันนี้ขึ้นบนการ์ดแรกเกิดของตระกูลใหม่และหน้าเล่นต่อ) ถ้าใกล้ตัวคุณ ในชีวิตจริงมีคนรับฟังและช่วยได้ฟรี</p><ul>${real}</ul><p><small>${esc(HELP_NOTE)}</small></p></section>`;
 }
