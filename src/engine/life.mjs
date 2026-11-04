@@ -42,6 +42,18 @@ export const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations', 'netw
 // ป้ายที่ผู้เล่นเห็น (ปุ่ม · เหตุล็อก · ฉากเกิด · หน้าเฉลย) — health ขึ้นว่า "ชีวิต" เพราะหมดแล้วตาย · network เป็นค่าซ่อน ป้ายจึงเป็นคำคนพูด ไม่ใช่ชื่อค่า
 // บอทใน harness อ่านป้ายย้อนกลับจากตารางนี้ เปลี่ยนคำแล้วบอทตามเอง
 export const STAT_LABELS = { health: 'ชีวิต', happiness: 'ความสุข', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'เส้นสาย', money: 'เงิน' };
+// ป้ายหมวดการ์ดผล (ui-redo 60): จอเลือกภาพตามหมวด · จับจากข้อมูลบนการ์ด (แหล่ง · ชนิดข่าว · ทิศผลค่า) ไม่ดึงเลขสุ่ม ไม่อ่านคำในข้อความ
+// ทิศนับเฉพาะค่าที่ลูกศรบนแถบโชว์ (network เป็นค่าซ่อน) และไม่ถูก hidden ของการ์ด/ตัวเลือกปิดไว้ — ป้ายห้ามเผยค่าที่ซ่อน
+// ไม่มีป้าย (การ์ดค้างในเซฟเก่า · repairLife ไม่เติม) = หมวดกลาง ⇒ จออ่านผ่าน resultTag เท่านั้น
+export const TAG_MID = 'mid';
+export const RESULT_TAGS = ['good', 'bad', TAG_MID, 'loot', 'loss', 'sick', 'pet', 'inherit', 'retire', 'bankrupt', 'nature', 'search', 'survive', 'trip', 'belief', 'afterlife'];
+export const resultTag = (card) => card.tag ?? TAG_MID;
+const TAG_STATS = STAT_KEYS.filter((k) => k !== 'network');
+export function fxTag(fx, hidden = []) {
+  let n = 0;
+  for (const k of TAG_STATS) if (fx?.[k] && !hidden.includes(k)) n += fx[k];
+  return n > 0 ? 'good' : n < 0 ? 'bad' : TAG_MID;
+}
 
 // ช่วงชีวิต (ใบ 03) · ระหว่างชาติไม่ใช่ช่วงอายุ แต่จองชื่อไว้ให้ใบที่ทำหลังตาย
 export const STAGES = [
@@ -496,7 +508,7 @@ function faceDeath(st, cause, opts = {}) {
     // เสี่ยงของโฟกัสที่ทอยตายไว้ต้องหายด้วย ไม่งั้นรอดปีนี้แล้วปีถัดไปตายด้วยเหตุเดิมทันที
     st.focusDoom = undefined;
     st.health = Math.max(st.health, st.healthNatural, 1);
-    return { fate: 'survive', card: { kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: PACT.surviveText } };
+    return { fate: 'survive', card: { kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: PACT.surviveText, tag: 'survive' } };
   }
   if (st.flags.cheat_death) {
     // ไปศาลก่อน แล้วตายปีนี้ด้วยสาเหตุเดิม · afterQueue = การ์ดผลที่รอในคิวเล่าก่อนเข้าศาล
@@ -765,7 +777,7 @@ function receiveLegacy(st, year, stage) {
       : debt
         ? `${who}จากไปพร้อมหนี้ ทายาทรับผิดไม่เกินมรดกที่ได้ หนี้ที่เหลือจึงไม่ตกถึงเรา`
         : `${who}จากไป ไม่มีทรัพย์เหลือเป็นมรดก`;
-  st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text });
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text, tag: 'inherit' });
 }
 
 // จดหมายคำฝาก (afterfall-3): ตามหลังการ์ดมรดก ⇒ ไม่มีทางออกขณะผู้ฝากยังอยู่ · ไม่กินโควตาปี ไม่ดึงเลขสุ่ม
@@ -878,13 +890,13 @@ function stepYear(st) {
   ageParents(st, year);
   // คนในบ้านจากไปเองปีนี้ = การ์ดแจ้งทุกครั้ง ก่อนเหตุการณ์ของปี
   // digest = ชนิดข่าวญาติ/สัตว์ (ui-redo ใบ 27) ให้จอรวมหลายใบติดกันเป็นใบเดียว · ป้ายคงที่ไม่ดึงเลขสุ่ม · ข่าวตัวเรา/เงิน/ตำแหน่งไม่ติด จึงคงใบเดี่ยว
-  for (const l of ageKin(st, year, yearlySaving(st))) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l, ...(careHelp(l.cause) && { help: careHelp(l.cause) }), digest: 'kin_loss' });
-  for (const n of kinIllNews(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), ...n, digest: 'kin_ill' });
-  for (const m of petArrivals(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: petArriveText(m), digest: 'pet' });
+  for (const l of ageKin(st, year, yearlySaving(st))) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l, ...(careHelp(l.cause) && { help: careHelp(l.cause) }), digest: 'kin_loss', tag: 'loss' });
+  for (const n of kinIllNews(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), ...n, digest: 'kin_ill', tag: 'sick' });
+  for (const m of petArrivals(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: petArriveText(m), digest: 'pet', tag: 'pet' });
   if (st.terminal && !st.terminal.told) {
     st.terminal.told = true;
     st.terminal.toldAge = st.age;
-    st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: ILL_TEXT[st.terminal.cause], illness: { cause: st.terminal.cause, left: st.terminal.age - st.age } });
+    st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: ILL_TEXT[st.terminal.cause], illness: { cause: st.terminal.cause, left: st.terminal.age - st.age }, tag: 'sick' });
   }
   // ผลตอบแทนคิดกับเงินต้นปีก่อนเงินเก็บของปีนี้เข้า · ติดลบ = หนี้ ทบดอกเบี้ยเงินกู้ของปีนั้น
   const era = st.content.era;
@@ -936,7 +948,7 @@ function stepYear(st) {
     if (promoDue(st)) st.due.push({ kind: 'eraEvent', ev: promoCard(st), age: st.age });
   }
   if (st.office && !officeFull(st) && st.age >= RETIRE_AGE) {
-    st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeStep(st).name}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง` });
+    st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeStep(st).name}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง`, tag: 'retire' });
     st.office = null;
   }
   if (budgetDue(st)) officeDueCard(budgetCard(st));
@@ -1129,7 +1141,7 @@ function checkBankrupt(st, year, stage) {
   st.flags.bankrupt = true;
   st.happiness = clamp(st.happiness - LEVELS[2]);
   st.relations = clamp(st.relations - LEVELS[1]);
-  st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: 'ศาลสั่งล้มละลาย ทรัพย์ที่มีถูกนำไปชำระเจ้าหนี้ หนี้ที่เหลือถูกล้าง เริ่มนับหนึ่งใหม่' });
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: 'ศาลสั่งล้มละลาย ทรัพย์ที่มีถูกนำไปชำระเจ้าหนี้ หนี้ที่เหลือถูกล้าง เริ่มนับหนึ่งใหม่', tag: 'bankrupt' });
 }
 
 // กู้ก้อนใหม่: เงินกู้เข้ากระเป๋าทั้งก้อน แล้วผ่อนคืนทุกปีใน stepYear · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
@@ -1622,7 +1634,7 @@ function lifeFocusRisk(st, id, r, i) {
   if (r.cause) (st.focusWarn ??= {})[key] = st.age;
   applyEffects(st, r.fx ?? {});
   for (const f of r.flags ?? []) raiseFlag(st, f);
-  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: r.cause ? r.warn : r.text, focusRisk: key });
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: r.cause ? r.warn : r.text, focusRisk: key, tag: r.cause ? 'sick' : fxTag(r.fx) });
 }
 
 // ทายาททางสายเลือด (โฟกัสใบ 03): เริ่มชาติด้วยตัวเด็กของหมวดโฟกัสหลักของพ่อแม่ (kid ในทะเบียน) · ไม่มีหมวด/ไม่มีตัวเด็ก = ตามน้ำ
@@ -1660,7 +1672,7 @@ function natureLock(st) {
   delete st.naturePts;
   delete st.focusBorn;
   if (id) st.nature = id;
-  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: id ? `คุณโตมาเป็นคน${c.natures[id].name}` : NATURE_NONE, nature: id });
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: id ? `คุณโตมาเป็นคน${c.natures[id].name}` : NATURE_NONE, nature: id, tag: 'nature' });
 }
 // ตัวคูณนิสัยของการ์ดใบนี้: ค่าตรงนิสัย (เงินนับเฉพาะการ์ดหมวดใน cards) + การ์ดขึ้นเงินเดือนเมื่ออาชีพตรงสาย · ไม่มีนิสัย = null คูณ 1 ทุกค่า
 function natureBoost(st, ev) {
@@ -1854,7 +1866,7 @@ export function choose(st, idx, loan) {
     if (!c) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
     st.log.push({ id: GONE_SEARCH.id, age: st.age, choice: idx, text: c.text });
-    st.queue.push({ kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: c.reply });
+    st.queue.push({ kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: c.reply, tag: 'search' });
     return;
   }
   if (ev?.warn) {
@@ -1943,7 +1955,7 @@ export function choose(st, idx, loan) {
   // สายมูก่อการ์ดของตัวเองได้ (ผลหวยสายมู) — มาก่อนผลสุ่มของตัวเลือก
   const after = beliefChoice(st, ev, c);
   // ตัวเลือกตรงไม่มีการ์ดผล — ของที่ได้เล่าเป็นการ์ดผลใบเดียว (lint ห้าม loot บนตัวเลือกที่มี outcomes)
-  if (gotC) after.unshift({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: gotC });
+  if (gotC) after.unshift({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: gotC, tag: 'loot', evId: ev.id });
   let doom, wound;
   let o = null;
   if (c.outcomes?.length) {
@@ -1957,7 +1969,7 @@ export function choose(st, idx, loan) {
     const gotO = o.effects?.loot && gainLoot(st, o.effects.loot);
     applyChoice(st, ev, o, text);
     if (c.filial) filialNote(st, c.filial, filialScore(o.merit), true);
-    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') + (gotO ? ` · ${gotO}` : '') });
+    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') + (gotO ? ` · ${gotO}` : ''), tag: fxTag(o.effects, [...(ev.hidden ?? []), ...(c.hidden ?? [])]), evId: ev.id });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
     if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow)) {
@@ -2174,7 +2186,7 @@ function tripBack(st) {
   st.away = (st.away ?? 0) + away - isk.trip.thai;
   st.advance = false;
   const when = isk.trip.thai ? `ผ่านไป ${isk.trip.thai} ปี` : 'ผ่านไปแค่ไม่กี่เดือน';
-  return emit(st, { kind: 'result', type: 'B', trip: true, age: st.age, stage: stageOf(st.age), text: `ลืมตาอีกทีก็ยืนอยู่หน้าบ้านหลังเดิม ในต่างโลกคุณอยู่มา ${away} ปี แต่ที่นี่${when} คนที่บ้านนึกว่าคุณหายตัวไป` });
+  return emit(st, { kind: 'result', type: 'B', trip: true, tag: 'trip', age: st.age, stage: stageOf(st.age), text: `ลืมตาอีกทีก็ยืนอยู่หน้าบ้านหลังเดิม ในต่างโลกคุณอยู่มา ${away} ปี แต่ที่นี่${when} คนที่บ้านนึกว่าคุณหายตัวไป` });
 }
 
 function queueFuneral(st) {

@@ -391,7 +391,7 @@ function chooseLoop(af, ev, idx) {
   if (o) addLoop(l, o.effects);
   l.health = clamp100(l.health - LOOP.drain);
   l.year++;
-  if (o?.text) af.queue.push({ kind: 'result', type: 'B', text: fill(o.text, af.st), choices: [], loop: true });
+  if (o?.text) af.queue.push({ kind: 'result', type: 'B', text: fill(o.text, af.st), choices: [], loop: true, tag: 'afterlife', evId: ev.id });
 }
 
 // การ์ดถัดไปของช่วงที่ 7 · การ์ด carry (done) เป็นใบสุดท้าย แล้วผู้เรียกต่อ nextLife
@@ -460,7 +460,7 @@ export function chooseAfter(af, idx, heirId = null) {
   const o = weighted(af.rng, c.outcomes, c.outcomes.map((x) => x.weight * poolMultiplier(af.st, x.multipliers)));
   noteDeed(af.st, text, () => recordMerit(af.st.ledger, o.merit, p.id), null);
   addBonus(af, o.effects);
-  if (o.text) af.queue.push({ kind: 'result', type: 'B', text: fill(o.text, af.st), choices: [] });
+  if (o.text) af.queue.push({ kind: 'result', type: 'B', text: fill(o.text, af.st), choices: [], tag: 'afterlife', evId: p.id });
 }
 
 // ส่งต่อบัญชี: ฝั่งที่ชี้ปลายทางถูกหัก spend × |สุทธิที่ปรโลก| (ไม่ติดลบ) แล้วคูณ r ทั้งสองฝั่งและทุกหมวด
