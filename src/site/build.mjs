@@ -7,7 +7,8 @@ import { injectSpec, SPEC_PAGE } from './spec.mjs';
 import { guideHtml } from './guide.mjs';
 import { demoHtml } from './demo.mjs';
 import { designPages, designHtml, DESIGN_AT } from './design.mjs';
-import { injectNav, movedHtml } from './nav.mjs';
+import { injectNav } from './nav.mjs';
+import { uiPage, designMoved, UI_PAGE } from './ui.mjs';
 import { soonCats, soonIds, injectRoadmap } from './roadmap.mjs';
 import { GAME_CSS_PAGES, gameCss, injectGameCss } from './game-css.mjs';
 
@@ -53,9 +54,12 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   const designOut = designPages(new URL('design/', root));
   for (const [file, page] of designOut) {
     writeFileSync(at(`docs/${DESIGN_AT}${file}`), designHtml(designTpl, page, file));
-    writeFileSync(at(`docs/${file}`), movedHtml(file, DESIGN_AT + file, page.title));
+    writeFileSync(at(`docs/${file}`), designMoved(file, page.title));
     out.push(DESIGN_AT + file.replace(/\.html$/, ''));
   }
+  // หน้าดีไซน์ UI (ui-redo 44) ใช้แม่แบบเดียวกับหน้าคำตัดสินเกม ⇒ แถบห้องผู้พัฒนา + noindex ชุดเดียวกัน
+  writeFileSync(at(`docs/${UI_PAGE}`), designHtml(designTpl, uiPage(content, at('docs/')), UI_PAGE.slice(DESIGN_AT.length)));
+  out.push(UI_PAGE.replace(/\.html$/, ''));
   // เรื่องที่ถูกรวม/ลบออกจาก design/ ทิ้งหน้าเก่าไว้ = ลิงก์ค้างที่ไม่ตรงต้นฉบับ · ที่เดิมที่เป็นหน้าเนื้อ (ไม่ใช่หน้าส่งต่อ) ก็ลบ
   const made = new Set(designOut.map(([f]) => f));
   for (const dir of ['docs/', `docs/${DESIGN_AT}`]) for (const f of readdirSync(at(dir)).filter((n) => /^design-.+\.html$/.test(n) && !made.has(n))) unlinkSync(at(`${dir}${f}`));

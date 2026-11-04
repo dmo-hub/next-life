@@ -69,6 +69,7 @@ export const DEV_TABS = [
   ['dev/spec.html', 'ภาคผนวกสเปก'],
   ['dev/plan.html', 'สเปก/แผน'],
   ['dev/design.html', 'คำตัดสินเกม'],
+  ['dev/ui.html', 'การออกแบบ'],
   ['dev/maps/continent.html', 'แผนที่'],
   ['dev/ui-redo/tweak.html', 'ต้นแบบ UI'],
   ['dev/archive/index.html', 'คลังเก่า'],
