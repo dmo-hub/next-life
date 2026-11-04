@@ -135,6 +135,11 @@ if (focusRotten.length) {
   console.log(`  ✗ รายการยกเว้นอ้าง id ที่ไม่มีในเนื้อหาแล้ว: ${focusRotten.join(' · ')}`);
   fails.push('ด่าน 2 รายการยกเว้นโฟกัส');
 }
+// ลางภัยยุคมีเพดานต่อชีวิต (herald-cap) ⇒ คนที่ถึงวัยชราตอนภัยมาเคยผ่านภัยอื่นช่วงผู้ใหญ่แล้ว ลางถูกใช้ไปก่อนเสมอ
+// ธงเตรียม (braced:) จึงแทบไม่มีตอนใบรับมือวัยชราขึ้น · วัดต้นไม้ไม่มีเพดาน 3,000 ชีวิต: gfc/oil2/tyk_old ถือธง 95/4/3 กด 17/3/0 · มีเพดาน ถือธง 1/0/0 กด 0
+// ตัวเลือกยังทำงาน (ไม่มีเพดานกดได้) — ตายเพราะเพดานลางที่เจ้าของเคาะ ไม่ใช่เนื้อหาเสีย · คิดจากข้อมูล ใบรับมือช่วงชราใบใหม่เข้ารายการเอง
+const HERALD_OLD = new Set(content.events.filter((e) => e.era && e.stage === 'ชรา').flatMap((e) => (e.choices ?? []).filter((c) => c.id === 'use_braced').map((c) => `${e.id}#${c.id}`)));
+console.log(`ข้ามที่ด่าน 2 (เพดานลางภัยยุคต่อชีวิต: วัยชราใช้ลางไปกับภัยช่วงผู้ใหญ่แล้ว): ตัวเลือก ${HERALD_OLD.size} — ${[...HERALD_OLD].join(' · ')}`);
 // ฐานเทียบรอบก่อนคิดจาก seed ตายตัวเท่านั้น — รวม seed สุ่มแล้วตัวที่รอดเพราะ seed สุ่มจะกลายเป็น "ตายใหม่" ในรอบหน้า
 function deadOf(runs) {
   const fired = new Map(), picks = new Set(), flags = new Set();
@@ -149,7 +154,7 @@ function deadOf(runs) {
   return {
     fired,
     events: content.events.filter((e) => !fired.has(e.id) && !HEIR_ONLY.has(e.id) && !COURT_ONLY.has(e.id) && !FOCUS_ONLY.has(e.id)).map((e) => e.id),
-    choices: dead.filter((id) => !FOCUS_ONLY.has(id)),
+    choices: dead.filter((id) => !FOCUS_ONLY.has(id) && !HERALD_OLD.has(id)),
     thinChoices: thin,
     flags: FLAGS.filter((x) => !flags.has(x) && !sideFlags.has(x) && !HEIR_FLAGS.has(x) && !COURT_FLAGS.has(x)),
   };
