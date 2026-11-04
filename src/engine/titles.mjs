@@ -311,7 +311,7 @@ export const TITLES = [
   { id: 'grateful', tier: 'ทั่วไป', name: 'ลูกกตัญญู', hint: 'เลือกดูแลพ่อแม่ซ้ำแล้วซ้ำอีก', test: (f) => (f.tagCount.care_parents ?? 0) >= 2 },
   { id: 'giver', tier: 'ทั่วไป', name: 'มือที่ไม่เคยหุบ', hint: 'ให้ทานบ่อยจนเป็นนิสัย', test: (f) => (f.tagCount.dana ?? 0) >= 3 },
   { id: 'parent', tier: 'ทั่วไป', name: 'พ่อแม่ของใครสักคน', hint: 'มีลูกให้ห่วง', test: (f) => has(f, 'has_kids') },
-  { id: 'storm', tier: 'ทั่วไป', name: 'ผ่านมรสุมเศรษฐกิจ', hint: 'เป็นผู้ใหญ่ทันวิกฤตเศรษฐกิจหลายครั้ง', test: (f) => f.crises >= 3 },
+  { id: 'storm', tier: 'ทั่วไป', name: 'ผ่านมรสุมเศรษฐกิจ', hint: 'เป็นผู้ใหญ่ทันวิกฤตเศรษฐกิจหลายครั้ง', test: (f) => f.crises >= 2 },
   { id: 'homeowner', tier: 'ทั่วไป', name: 'มีบ้านเป็นของตัวเอง', hint: 'ได้บ้านมาด้วยน้ำพักน้ำแรง', test: (f) => has(f, 'home_owner') },
   { id: 'runner', tier: 'ทั่วไป', name: 'นักวิ่งตอนเช้า', hint: 'ดูแลร่างกายเป็นกิจวัตร', test: (f) => has(f, 'sporty') },
   { id: 'first_grad', tier: 'หายาก', name: 'บัณฑิตคนแรกของบ้าน', hint: 'เรียนจบสูงกว่าที่บ้านเคยมีใครได้', test: (f) => f.st.edu === 'อุดมศึกษา' && LOW_FAMILY_OCC.includes(f.st.familyOcc) },
