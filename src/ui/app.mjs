@@ -1768,11 +1768,14 @@ function fxDust(ov, seed) {
 
 // reduced-motion: พลิกเหลือ fade 150ms · ฉากตาย/ฉายาไม่เล่นเลย (การ์ดบอกเรื่องเดียวกันอยู่แล้ว)
 const FX_RM = 150;
+// การ์ดที่มีให้เลือก ≥2 ทาง: ตัวกันคลิกค้างต่อหลังภาพพลิกจบจนครบเท่านี้ — กดรัวจากใบก่อนไม่หลุดไปเลือกใบใหม่
+// การ์ดปุ่มเดียว/โหมดลดภาพเคลื่อนไหวคงค่าเดิมของภาพ
+const FX_CHOICE_HOLD = 700;
 const fxReduced = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 let fxCur = null;
 let fxSeen = null;
 let fxUid = 0;
-// บล็อกคลิกได้ไม่เกิน block ms · หลังจากนั้นคลิกแรกข้ามไปภาพจบแล้วปุ่มทำงานต่อทันที · then = จังหวะถัดไป เล่นต่อเมื่อจบเองเท่านั้น
+// บล็อกคลิกได้ไม่เกิน block ms (o.hold ยืดได้ถึงหลังภาพจบ) · หลังจากนั้นคลิกแรกข้ามไปภาพจบแล้วปุ่มทำงานต่อทันที · then = จังหวะถัดไป เล่นต่อเมื่อจบเองเท่านั้น
 function fxPlay(stage, name, o = {}, then = null) {
   const fx = FX[name];
   const parts = fx.build(stage, o);
@@ -1780,15 +1783,19 @@ function fxPlay(stage, name, o = {}, then = null) {
   const total = rm ? FX_RM : typeof fx.dur === 'function' ? fx.dur(o) : fx.dur;
   const t0 = performance.now();
   let raf = 0;
+  let done = false;
   const fin = (natural) => {
     cancelAnimationFrame(raf);
-    if (fxCur === me) fxCur = null;
+    // ภาพจบเองก่อนครบเวลากัน = ตัวกันยังอยู่ (ตัวเดิม) · คลิกหลังครบเวลาแค่ปลดตัวกัน
+    if (fxCur === me && !(natural && performance.now() < me.until)) fxCur = null;
+    if (done) return;
+    done = true;
     fx.frame(parts, 1);
     stage.style.opacity = '';
     fx.end(parts, natural);
     if (natural) then?.();
   };
-  const me = { until: t0 + Math.min(fx.block, total), skip: () => fin(false) };
+  const me = { until: t0 + Math.max(Math.min(fx.block, total), rm ? 0 : o.hold ?? 0), skip: () => fin(false) };
   const tick = (now) => {
     const t = fxClamp((now - t0) / total);
     if (rm) stage.style.opacity = t;
@@ -1810,7 +1817,9 @@ function fxCard(box, card) {
   fxCur?.skip();
   if (fxSeen === card) return;
   fxSeen = card;
-  if (card.kind !== 'death') return fxPlay(box, 'flipA');
+  // นับเฉพาะทางที่กดได้ — การ์ดที่ล็อกจนเหลือทางเดียวกดพลาดไม่ได้ผลต่างอะไร
+  const open = (card.choices ?? []).filter((_, i) => !card.locked?.[i]).length;
+  if (card.kind !== 'death') return fxPlay(box, 'flipA', open >= 2 ? { hold: FX_CHOICE_HOLD } : {});
   if (fxReduced()) return;
   const top = lifeTitles(card).titles[0];
   const tier = top && FX_TIER[top.tier];
