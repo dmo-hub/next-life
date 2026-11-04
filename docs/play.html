@@ -3151,6 +3151,8 @@ function newLife(seed, content, heir = null) {
     parentFlags: heir?.parentFlags ?? {},
     // สกิลที่พกมาจากคลัง [{ id, lv }] (06s) ใช้ทั้งชีวิตนี้และชาติต่างโลกที่ตามมา · ไม่พก = ไม่มีช่อง (state เท่าก่อนมีสกิลข้ามชาติ)
     ...(heir?.skills?.length && { skills: heir.skills }),
+    // ค่าที่ได้จากช่องพกที่ไม่ใช้ (ใบ 201) — การ์ดเกิดบอกเป็นคำ · เซฟเก่าไม่มี = ไม่มีบรรทัด
+    ...(heir?.spare && { spare: heir.spare }),
     scheduled: [],
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
@@ -8518,9 +8520,32 @@ function makeHeir(af, r) {
 }
 
 // รุ่นถัดไป: ชีวิตใหม่จาก heir ที่การ์ดส่งต่อสร้างไว้ · carry = id สกิลที่ผู้เล่นเลือกพกจากคลัง (06s · bookCarryOffers) · book = คลังของผู้เล่น ให้การ์ดอัปเกรดรู้ขั้นคลัง
-function nextLife(af, carry = [], book = {}) {
+// offered = การ์ดเลือกสกิลขึ้นจริง (สมุดไม่ว่าง) — ผู้เรียกบอก ไม่เดาจาก carry ว่าง ⇒ บอท/harness ที่เรียก nextLife(af) เดินเท่าเดิม
+function nextLife(af, carry = [], book = {}, offered = false) {
   if (!af.heir) throw new Error('ยังไม่ถึงการ์ดส่งต่อ');
-  return newLife(af.heir.seed, af.st.content, { ...af.heir, skills: carryPick(carry, book) });
+  const heir = { ...af.heir, skills: carryPick(carry, book) };
+  const spare = offered ? SKILL.carry - carry.length : 0;
+  if (!spare) return newLife(heir.seed, af.st.content, heir);
+  // ค่าเข้าเกณฑ์ดูจากค่าเริ่มสุดท้ายของชีวิตเดียวกันที่ยังไม่ได้ค่าเพิ่ม (ฐาน+jitter+bonus หลัง clamp)
+  // ได้ 0 ค่ายังส่ง spare: [] ไป — การ์ดเกิดขึ้นบรรทัดสำรองแทน (decisions 360)
+  const keys = spareKeys(newLife(heir.seed, af.st.content, heir), spare, heir.seed);
+  const bonus = { ...heir.bonus };
+  for (const k of keys) bonus[k] = (bonus[k] ?? 0) + SPARE_STAT;
+  return newLife(heir.seed, af.st.content, { ...heir, bonus, spare: keys });
+}
+
+// ช่องพกที่ไม่ใช้แลกเป็นค่าเริ่ม (decisions 355–359): ช่องละ 1 ค่าสุ่มไม่ซ้ำ +SPARE_STAT · ไม่อยู่ใต้ FATE.bonusCap (ของแลก ไม่ใช่ผลกรรม)
+// สุ่มเฉพาะค่าที่บวกได้เต็ม (≤ SPARE_MAX) · เข้าเกณฑ์น้อยกว่าช่องว่าง = ได้เท่าที่มี
+// stream แยกจาก seed ของ heir — ไม่กินเลขสุ่มของโลก ชีวิตใหม่ต่างจากพกเต็มเฉพาะผลของค่าเริ่ม
+// filter = false ใช้เป็นตัวควบคุมของด่านเท่านั้น (ต้องเห็นค่าชน 100)
+const SPARE_STAT = 10;
+const SPARE_MAX = 100 - SPARE_STAT;
+function spareKeys(base, spare, seed, filter = true) {
+  const rng = makeRng(seed ^ 0x2b7e1516);
+  const pool = STAT_KEYS.filter((k) => !filter || base[k] <= SPARE_MAX);
+  const out = [];
+  while (out.length < spare && pool.length) out.push(...pool.splice(rng.int(0, pool.length - 1), 1));
+  return out;
 }
 
 // harness/หน้าเว็บเดินช่วงที่ 7 ด้วยฟังก์ชันชุดเดียวกัน · บอทได้ af (มี pending.choices ให้อ่านป้ายบุญบาปแบบเดียวกับการ์ดชีวิต)
@@ -8632,6 +8657,12 @@ function lineageBrief(lineage) {
 }
 
 // การ์ดใบแรกของทุกชีวิต — เล่าเรื่อง ไม่มีตัวเลือก (หน้าจอให้ปุ่ม "ต่อไป")
+// ค่าเริ่มที่แลกจากช่องพกสกิลที่ไม่ใช้ (ใบ 201 · decisions 359): บอกเป็นคำว่าค่าไหนเด่น ไม่มีตัวเลข · เส้นสายเป็นค่าซ่อน จึงเล่าเป็นคำคนพูด
+const SPARE_WORDS = { health: 'ร่างกายแข็งแรงกว่าเด็กรุ่นเดียวกัน', happiness: 'อารมณ์ดี เลี้ยงง่าย', knowledge: 'หัวไว เรียนรู้เร็ว', relations: 'เป็นที่รักของคนรอบตัว', network: 'มีผู้ใหญ่เอ็นดูคอยช่วยเหลือ' };
+// ได้ 0 ค่า (ทุกค่าเด่นเกินเกณฑ์อยู่แล้ว) — บรรทัดสำรอง ไม่สัญญาจำนวน ไม่ผัดไปชาติหน้า
+const SPARE_NONE = 'ติดตัวมาแต่เกิด: เด็กคนนี้โดดเด่นรอบด้านอยู่แล้ว ช่องที่เว้นไว้จึงไม่มีอะไรเติมได้อีก';
+const spareText = (keys) => (keys.length ? `ติดตัวมาแต่เกิด: ${keys.map((k) => SPARE_WORDS[k]).join(' · ')}` : SPARE_NONE);
+
 function introCard(st, heir) {
   return {
     kind: 'intro',
@@ -8642,7 +8673,7 @@ function introCard(st, heir) {
     text: st.age > 0
       ? `คุณเล่นต่อเป็น “${st.name}” วัย ${st.age} ปี ที่${provinceLabel(st)} ชื่อจริงว่า “${st.realName}”`
       : `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${provinceLabel(st)} ได้ชื่อจริงว่า “${st.realName}” ชื่อเล่นว่า “${st.name}”`,
-    story: [familyText(st), eraText(st)],
+    story: [familyText(st), eraText(st), ...(st.spare ? [spareText(st.spare)] : [])],
     // heir ที่ไม่มีรุ่นก่อน (harness สร้างทับค่าเกิดเฉย ๆ) ไม่มีอะไรให้สืบทอด
     inherit: heir && st.lineage.length ? inheritText(st, heir) : [],
     lineage: lineageBrief(st.lineage),
@@ -12733,14 +12764,16 @@ function upgradeFx(card, i) {
 
 // เลือกพกก่อนไปเกิด (06s): จากสมุดสกิล ≤ SKILL.carry แล้วไปเกิดด้วยปุ่มเซฟเดิม — ชุดที่พกอยู่ในสถานะชีวิตใหม่ ภาพถ่ายเซฟเก็บไปเอง
 // สมุดว่าง = ไปเกิดทันทีเหมือนก่อนมีสกิลข้ามชาติ · บรรทัดตามไป/ไม่ตามไป (dsd-2) ไม่บอกตัวเลข
+// carryOffered = การ์ดเลือกขึ้นจริง ⇒ ช่องที่ไม่พกแลกเป็นค่าเริ่ม (decisions 355) · สมุดว่างไปเกิดทันที ไม่ได้
 let carryNext = [];
+let carryOffered = false;
 function rebirth() {
   const offers = bookCarryOffers(skillsRead().s);
   if (!offers.length) return play(T.rebirth);
   const prev = [...root.childNodes];
   const pick = [];
   const draw = () => {
-    const choices = homeCard('ก่อนไปเกิด', ['เลือกสกิลที่จะพกไปชาติหน้า', `พกได้ ${SKILL.carry} อย่าง ใช้ทั้งชีวิตไทยและชาติต่างโลกที่ตามมา · ทุกอย่างเริ่มขั้น 1 แต่ฝึกถึงขั้นในสมุดได้เร็วกว่าครั้งแรก`]);
+    const choices = homeCard('ก่อนไปเกิด', ['เลือกสกิลที่จะพกไปชาติหน้า', `พกได้ ${SKILL.carry} อย่าง ใช้ทั้งชีวิตไทยและชาติต่างโลกที่ตามมา · ทุกอย่างเริ่มขั้น 1 แต่ฝึกถึงขั้นในสมุดได้เร็วกว่าครั้งแรก`, 'ช่องที่ไม่พก ชาติหน้าได้พื้นฐานดีขึ้นแทน']);
     const body = root.querySelector('.body');
     const name = (id) => ISEKAI_SKILLS[id].name;
     const left = offers.filter((o) => !pick.includes(o.id));
@@ -12763,6 +12796,7 @@ function rebirth() {
     }
     choices.append(enter(button(pick.length ? 'ไปเกิดพร้อมสกิลที่พก' : 'ไปเกิดโดยไม่พกสกิล', null, () => {
       carryNext = [...pick];
+      carryOffered = true;
       play(T.rebirth);
     })), button('กลับ', null, () => root.replaceChildren(...prev)));
   };
@@ -13271,8 +13305,9 @@ function step(tok) {
   }
   if (tok === T.afterNext) return nextAfterCard(af);
   if (tok === T.rebirth) {
-    st = nextLife(af, carryNext, carryNext.length ? skillsRead().s : {});
+    st = nextLife(af, carryNext, carryNext.length ? skillsRead().s : {}, carryOffered);
     carryNext = [];
+    carryOffered = false;
     af = null;
     curAge = null;
     bookReset();
