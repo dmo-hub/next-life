@@ -1,5 +1,5 @@
 {
- "version": "v0.6.56",
+ "version": "v0.6.57",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -307,6 +307,12 @@
   "after_ancestor_far_01",
   "after_ancestor_debt_01",
   "after_ancestor_quiet_01",
+  "after_loop_common_dhamma_01",
+  "after_loop_common_offering_01",
+  "after_loop_common_elder_01",
+  "after_loop_common_review_01",
+  "after_loop_common_home_01",
+  "after_loop_common_queue_01",
   "bel_fortune_market",
   "bel_fortune_market_rite",
   "bel_fortune_cards",

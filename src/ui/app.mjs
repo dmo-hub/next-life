@@ -1,4 +1,4 @@
-import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers } from '../engine/index.mjs';
+import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
@@ -1888,7 +1888,8 @@ function fxOvEnd(ov, natural) {
 const FX = {
   // เส้นทองวิ่งรอบกรอบการ์ด แล้วเนื้อการ์ดค่อยขึ้น (ui-redo ใบ 37 · แบบ B ของต้นแบบ fx-proto) · ขนาดเส้นวัดจากการ์ดจริงตอนเริ่ม
   // reduced-motion ไม่วาดเส้น — fxPlay จางทั้งใบให้เอง
-  flipB: { dur: 520, block: 280,
+  // block 0: คลิกแรกระหว่างพลิกข้ามภาพแล้วปุ่มทำงานทันที — ผู้เล่นไม่ต้องรอภาพก่อนกด
+  flipB: { dur: 520, block: 0,
     build: (card) => {
       const kids = [...card.children];
       if (fxReduced()) return { kids, line: null, svg: null };
@@ -1999,14 +2000,11 @@ function fxDust(ov, seed) {
 
 // reduced-motion: พลิกเหลือ fade 150ms · ฉากตาย/ฉายาไม่เล่นเลย (การ์ดบอกเรื่องเดียวกันอยู่แล้ว)
 const FX_RM = 150;
-// การ์ดที่มีให้เลือก ≥2 ทาง: ตัวกันคลิกค้างต่อหลังภาพพลิกจบจนครบเท่านี้ — กดรัวจากใบก่อนไม่หลุดไปเลือกใบใหม่
-// การ์ดปุ่มเดียว/โหมดลดภาพเคลื่อนไหวคงค่าเดิมของภาพ
-const FX_CHOICE_HOLD = 700;
 const fxReduced = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 let fxCur = null;
 let fxSeen = null;
 let fxUid = 0;
-// บล็อกคลิกได้ไม่เกิน block ms (o.hold ยืดได้ถึงหลังภาพจบ) · หลังจากนั้นคลิกแรกข้ามไปภาพจบแล้วปุ่มทำงานต่อทันที · then = จังหวะถัดไป เล่นต่อเมื่อจบเองเท่านั้น
+// บล็อกคลิกได้ไม่เกิน block ms · หลังจากนั้นคลิกแรกข้ามไปภาพจบแล้วปุ่มทำงานต่อทันที · then = จังหวะถัดไป เล่นต่อเมื่อจบเองเท่านั้น
 function fxPlay(stage, name, o = {}, then = null) {
   const fx = FX[name];
   const parts = fx.build(stage, o);
@@ -2026,7 +2024,7 @@ function fxPlay(stage, name, o = {}, then = null) {
     fx.end(parts, natural);
     if (natural) then?.();
   };
-  const me = { until: t0 + Math.max(Math.min(fx.block, total), rm ? 0 : o.hold ?? 0), skip: () => fin(false) };
+  const me = { until: t0 + Math.min(fx.block, total), skip: () => fin(false) };
   const tick = (now) => {
     const t = fxClamp((now - t0) / total);
     if (rm) stage.style.opacity = t;
@@ -2048,9 +2046,7 @@ function fxCard(box, card) {
   fxCur?.skip();
   if (fxSeen === card) return;
   fxSeen = card;
-  // นับเฉพาะทางที่กดได้ — การ์ดที่ล็อกจนเหลือทางเดียวกดพลาดไม่ได้ผลต่างอะไร
-  const open = (card.choices ?? []).filter((_, i) => !card.locked?.[i]).length;
-  if (card.kind !== 'death') return fxPlay(box, 'flipB', open >= 2 ? { hold: FX_CHOICE_HOLD } : {});
+  if (card.kind !== 'death') return fxPlay(box, 'flipB');
   if (fxReduced()) return;
   const top = lifeTitles(card).titles[0];
   const tier = top && FX_TIER[top.tier];
@@ -2740,16 +2736,25 @@ function rebirth() {
   draw();
 }
 
-// ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะ — ชีวิตจบแล้ว
-const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ปรโลก', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ' };
-const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา' };
+// ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะชีวิต — ชีวิตจบแล้ว (วงปรโลกมีแถบ 4 ค่าของตัวเอง)
+const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ปรโลก', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ', loop: 'ปีทิพย์' };
+const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา', loopEnd: 'ครบวง' };
+// วงปรโลก (03a): แถว 4 ค่าแบบแถบสถานะ ใต้หัวการ์ด · ชีวิตทิพย์ต่ำ = สีเตือนแบบชีวิต
+function loopBar(l) {
+  const ul = el('ul', 'sb-m');
+  for (const k of LOOP_KEYS) ul.append(meterLi(LOOP_LABELS[k], Math.round(l[k]), k === 'health' && l[k] <= HEALTH_WARN));
+  // กรอบ .sb ให้ระยะขอบเท่าแถบสถานะชีวิต
+  const bar = el('div', 'sb');
+  bar.append(ul);
+  return bar;
+}
 function renderAfter(card) {
   if (card.kind === 'isekai') return renderIsekai(card);
   root.replaceChildren();
   const box = el('article', 'card b af');
   const top = el('div', 'top');
   // หัวแถบเป็นชื่อเกมเหมือนหน้าเปิด (ui-redo 66 · เจ้าของ) · ฉากที่อยู่บอกด้วยป้ายบนการ์ดแทน
-  top.append(el('b', null, GAME_NAME), el('small', null, `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
+  top.append(el('b', null, GAME_NAME), el('small', null, card.loop ? `${genLabel()}${st.name} · ภูมิ${af.verdict.realm.name} · ปีที่ ${card.loop.year}/${card.loop.years}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
   const body = el('div', 'body');
   const choices = el('div', 'choices');
   const next = () => play(T.afterNext);
@@ -2786,6 +2791,7 @@ function renderAfter(card) {
   } else choices.append(enter(button(BTN.next, null, next)));
   if (card.kind === 'verdict') choices.append(copyButton(() => summaryText(st.age, card.realm)));
   box.append(top);
+  if (card.loop) box.append(loopBar(card.loop));
   if (court) box.append(courtScene());
   box.append(body, choices);
   root.append(panels(box));
