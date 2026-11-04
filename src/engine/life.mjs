@@ -1263,6 +1263,8 @@ function lockReason(st, c, extra = 0) {
   // อายุตามกฎหมายบอกเหตุผลของตัวเอง — reason ของเนื้อหาเขียนไว้ให้เงื่อนไขอื่น (เช่น "สั่งไว้แล้ว")
   if (q.age && st.age < (q.age.min ?? 0)) return `อายุยังไม่ถึง ${q.age.min} ปี`;
   if (q.age && st.age > (q.age.max ?? Infinity)) return `อายุเกิน ${q.age.max} ปี`;
+  // ตัวเลือกวัยโตของนิสัย (B41) — บอกนิสัยที่ขาดเป็นคำ ผู้เล่นจึงรู้ว่าวัยเด็กแบบไหนเปิดทางนี้
+  if (q.nature && st.nature !== q.nature) return `ต้องเป็นคน${st.content.focus?.natures?.[q.nature]?.name ?? ''}`;
   const why = [];
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
   const purse = (st.dead ? deadPurse(st) : st.money) + extra;
