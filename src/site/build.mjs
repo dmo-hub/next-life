@@ -3,14 +3,14 @@ import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs';
 import { siteFacts, injectFacts } from './facts.mjs';
 import { catalogHtml } from './catalog.mjs';
 import { spoilersHtml } from './spoilers.mjs';
-import { injectSpec } from './spec.mjs';
+import { injectSpec, SPEC_PAGE } from './spec.mjs';
 import { guideHtml } from './guide.mjs';
 import { demoHtml } from './demo.mjs';
 import { designPages, designHtml } from './design.mjs';
 import { injectNav } from './nav.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
-export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds', 'gdd'];
+export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
 // หน้าเขียนมือที่ไม่มีตัวเลขจาก data แต่ต้องมีแถบบนชุดเดียวกัน — ไฟล์อยู่ใต้ docs/
 export const NAV_PAGES = ['whatsnew.html', 'cards.html', 'spec/lore-finance-series.html'];
 // หน้าที่ build สร้างทั้งหน้าจากแม่แบบ src/site/<ชื่อ>.html — หน้าเฉลย (B88) แยกจากหน้ารวมการ์ดเพราะหน้ารวมการ์ดห้ามเผยผล/บุญบาป
@@ -28,12 +28,16 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   for (const name of FACT_PAGES) {
     const file = at(`docs/${name}.html`);
     const html = readFileSync(file, 'utf8');
-    // GDD มีภาคผนวกสเปกจาก docs/spec — สร้างใหม่ทุก build
-    const faced = injectFacts(html, facts, `docs/${name}.html`);
-    const next = injectNav(name === 'gdd' ? injectSpec(faced) : faced, `${name}.html`);
+    const next = injectNav(injectFacts(html, facts, `docs/${name}.html`), `${name}.html`);
     if (next !== html) writeFileSync(file, next);
     out.push(name);
   }
+  // ภาคผนวกสเปกจาก docs/spec — สร้างใหม่ทุก build · หน้าห้องผู้พัฒนามีแถบของตัวเอง ไม่ฉีดแถบบน
+  const specFile = at(SPEC_PAGE);
+  const specOld = readFileSync(specFile, 'utf8');
+  const specNext = injectSpec(specOld);
+  if (specNext !== specOld) writeFileSync(specFile, specNext);
+  out.push('dev/spec');
   for (const [name, slot, html] of GEN_PAGES) {
     const page = injectFacts(readFileSync(at(`src/site/${name}.html`), 'utf8'), facts, `src/site/${name}.html`).replace(slot, () => html(content));
     writeFileSync(at(`docs/${name}.html`), injectNav(page, `${name}.html`));

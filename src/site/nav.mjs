@@ -12,7 +12,6 @@ export const NAV_MENU = [
   ['worlds.html', 'ชาตินี้ · ปรโลก · ต่างโลก'],
   ['otherworld.html', 'ต่างโลก', 'dark'],
   ['catalog.html', 'การ์ดทั้งหมด'],
-  ['gdd.html', 'เอกสารออกแบบเกม (GDD)'],
   ['design.html', 'การออกแบบ'],
   ['dev/index.html', 'ห้องผู้พัฒนา'],
 ];
@@ -35,7 +34,7 @@ export const NAV_CSS = `
 // คำนวณซ้ำหลังฟอนต์โหลด เพราะความกว้างลิงก์เปลี่ยนเมื่อ Sarabun มาแทนฟอนต์สำรอง
 const NAV_SCRIPT = `<script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script>`;
 
-// file = path ใต้ docs/ เช่น gdd.html · design-lore.html · spec/lore-finance-series.html
+// file = path ใต้ docs/ เช่น about.html · design-lore.html · spec/lore-finance-series.html
 // หน้า design-<เรื่อง> อยู่ใต้เมนู "การออกแบบ" ⇒ ลิงก์นั้นได้ aria-current="true" (ไม่ใช่ page เพราะไม่ใช่หน้านั้นเอง)
 export function navHtml(file) {
   const up = '../'.repeat(file.split('/').length - 1);

@@ -49,7 +49,7 @@ const moved = ['cards', 'titles'].every((k) => probe.includes(`data-fact="${k}">
 check('ตัวควบคุม: ข้อมูลเปลี่ยนแล้วเลขบนหน้าเปลี่ยนตาม', !moved, ` (การ์ด ${facts.cards} → ${f2.cards} · ฉายา ${facts.titles} → ${f2.titles})`);
 
 // 3) ลิงก์ภายในเว็บไม่ตาย (ไฟล์ · รูป · ที่มาจากหน้าใน docs/ และ docs/spec/ ที่หน้าเว็บลิงก์ถึง)
-const all = [...pages, 'cards', 'whatsnew', 'archive/cards-v1', 'archive/overview-v1'];
+const all = [...pages, 'cards', 'whatsnew', 'archive/cards-v1', 'archive/overview-v1', 'dev/index', 'dev/spec'];
 const dead = [];
 for (const p of all) {
   const html = read(`${p}.html`);
@@ -153,17 +153,17 @@ const contMiss = (html) => {
   return [...Object.values(CONT_REGIONS), ...Object.values(CONT_RACES), ...Object.values(ISEKAI_CAREERS)].filter((x) => !has(x.name)).map((x) => x.name);
 };
 const ROLE_TALK = /เทพธิดายื่นบทบาท|เลือกบทบาท|บทบาทตอนเกิด/;
-const newPages = { 'catalog ต่างโลก': noOld(cardsIsk), 'spoilers ต่างโลก': noOld(spoilIsk), otherworld: read('otherworld.html'), index: read('index.html'), about: read('about.html'), gdd: read('gdd.html') };
+const newPages = { 'catalog ต่างโลก': noOld(cardsIsk), 'spoilers ต่างโลก': noOld(spoilIsk), otherworld: read('otherworld.html'), index: read('index.html'), about: read('about.html') };
 const roleLeft = Object.entries(newPages).filter(([, h]) => ROLE_TALK.test(h)).map(([p]) => p);
-// gdd เล่าตอนจบชาติทวีปด้วยเกณฑ์ชื่อเสียงจากโค้ด — ไม่งั้นเหลือแค่ระดับตอนจบของบทบาท 4 โลกเดิม
+// หน้าต่างโลก (กติกาต่างโลกทั้งหมด ย้ายจากหน้า GDD เดิม) เล่าตอนจบชาติทวีปด้วยเกณฑ์ชื่อเสียงจากโค้ด — ไม่งั้นเหลือแค่ระดับตอนจบของบทบาท 4 โลกเดิม
 const endTalk = (html) => html.includes('data-fact="contFame"');
-if (!endTalk(newPages.gdd)) roleLeft.push('gdd (ตอนจบชาติทวีป)');
+if (!endTalk(newPages.otherworld)) roleLeft.push('otherworld (ตอนจบชาติทวีป)');
 const spoilNew = noOld(spoilIsk);
 const contGone = contMiss(spoilNew);
 const regGone = Object.values(CONT_REGIONS).filter((g) => !noOld(cardsIsk).includes(`<b>${escHtml(g.name)}</b>`)).map((g) => g.name);
 // ตัวควบคุม: ใส่คำเลือกบทบาทกลับในส่วนใหม่ · ตัดแคว้นแรกออกจากหน้าเฉลย ⇒ ทั้งคู่ต้องถูกจับ
 const firstReg = Object.values(CONT_REGIONS)[0].name;
-const ctl = ROLE_TALK.test(`${spoilNew}<p>เทพธิดายื่นบทบาทให้เลือก</p>`) && !endTalk(newPages.gdd.replaceAll('data-fact="contFame"', '')) && contMiss(spoilNew.replaceAll(`<b>${escHtml(firstReg)}</b>`, '')).includes(firstReg);
+const ctl = ROLE_TALK.test(`${spoilNew}<p>เทพธิดายื่นบทบาทให้เลือก</p>`) && !endTalk(newPages.otherworld.replaceAll('data-fact="contFame"', '')) && contMiss(spoilNew.replaceAll(`<b>${escHtml(firstReg)}</b>`, '')).includes(firstReg);
 check('ส่วนต่างโลกพูดถึงทวีปแทนบทบาท: ครบทุกแคว้น เผ่า อาชีพ · ไม่มีคำเลือกบทบาทนอกกลุ่มชาติเก่า', contGone.length || regGone.length || roleLeft.length || !ctl, ` แคว้น ${Object.keys(CONT_REGIONS).length} · เผ่า ${Object.keys(CONT_RACES).length} · อาชีพ ${Object.keys(ISEKAI_CAREERS).length}${contGone.length ? ` · หน้าเฉลยขาด ${contGone.join(' ')}` : ''}${regGone.length ? ` · หน้ารวมการ์ดขาด ${regGone.join(' ')}` : ''}${roleLeft.length ? ` · ยังพูดถึงบทบาท: ${roleLeft.join(' ')}` : ''} · ตัวควบคุม${ctl ? 'จับได้' : 'จับไม่ได้'}`);
 const N_BIRTH = 10000;
 const brng = makeRng(0xb127);
@@ -177,12 +177,12 @@ const oddOff = Object.keys(CONT_REGIONS).filter((id) => odds[id] === undefined |
 check('โอกาสต่อแฟ้มบนหน้าเฉลยตรงที่เกมสุ่ม ±1 จุด', oddOff.length, ` ${Object.keys(odds).length}/${Object.keys(CONT_REGIONS).length} แคว้น · สุ่ม ${N_BIRTH} ครั้ง${oddOff.length ? ` · เพี้ยน ${oddOff.map((id) => `${id} หน้า ${odds[id]}% เกม ${((100 * (born[id] ?? 0)) / N_BIRTH).toFixed(1)}%`).join(' | ')}` : ''}`);
 
 // 7) ภาคผนวกสเปกใน GDD (B115): ทุกไฟล์ .md ใน docs/spec มีหัวข้อบนหน้า · URL อ้างอิงทุกตัวในต้นฉบับกดได้ · หน้าเว็บไม่พาไปหน้า tree/blob บน GitHub อีก
-const gdd = read('gdd.html');
-const spec = gdd.slice(gdd.indexOf(SPEC_START), gdd.indexOf(SPEC_END));
+const specPage = read('dev/spec.html');
+const spec = specPage.slice(specPage.indexOf(SPEC_START), specPage.indexOf(SPEC_END));
 const specHref = new Set([...spec.matchAll(/href="([^"]+)"/g)].map((m) => m[1].replace(/&amp;/g, '&')));
 const urlsIn = (hrefs) => specFiles().flatMap((f) => bareUrls(readFileSync(new URL(f, SPEC_DIR), 'utf8')).filter((u) => !hrefs.has(u)).map((u) => `${f} ${u}`));
 const noDoc = specFiles().filter((f) => !spec.includes(`<details class="doc" id="${docId(f)}">`));
-const noHtml = specHtmlFiles().filter((f) => !specHref.has(`spec/${f}`));
+const noHtml = specHtmlFiles().filter((f) => !specHref.has(`../spec/${f}`));
 const unlinked = urlsIn(specHref);
 // ตัวควบคุม: ตัด URL อ้างอิงตัวแรกออกจากชุด href แล้วด่านต้องจับได้ — กันด่านที่ผ่านเพราะนับไม่เจออะไรเลย
 const firstUrl = specFiles().flatMap((f) => bareUrls(readFileSync(new URL(f, SPEC_DIR), 'utf8')))[0];
@@ -221,8 +221,8 @@ const navBad = (file, raw) => {
 const navMiss = navFiles.map((f) => [f, navBad(f, read(f))]).filter(([, why]) => why).map(([f, why]) => `${f} ${why}`);
 const navCtl =
   navBad('index.html', read('index.html').replace(/<!--NAV:START-->[\s\S]*?<!--NAV:END-->/, '')) === 'ไม่มีแถบ' &&
-  navBad('gdd.html', read('about.html')) === 'แถบไม่ตรง' &&
-  navBad('gdd.html', read('gdd.html').replace('<header>', '<nav class="top"><a href="index.html">หน้าแรก</a></nav><header>')) === 'แถบซ้อน';
+  navBad('worlds.html', read('about.html')) === 'แถบไม่ตรง' &&
+  navBad('about.html', read('about.html').replace('<header>', '<nav class="top"><a href="index.html">หน้าแรก</a></nav><header>')) === 'แถบซ้อน';
 const curOk = navHtml('design-lore.html').includes('href="design.html" aria-current="true"') && navHtml('spec/lore-finance-series.html').includes('href="../play.html"');
 check('ทุกหน้ามีแถบบนชุดเดียวและชี้หน้าปัจจุบัน', navMiss.length || !navCtl || !curOk, ` ${navFiles.length} หน้า${navMiss.length ? ` · ${navMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${navCtl ? 'จับได้' : 'จับไม่ได้'}`);
 

@@ -53,6 +53,29 @@
   .tres { margin: 12px 0 8px !important; padding: 10px 12px; background: #1F2430; color: #F4EFE3; }
   .tact a { font-family: Pridi, serif; color: #A23B2C; font-size: 18px; display: inline-block; min-height: 44px; line-height: 44px; margin-right: 12px; }
   .tact button { font: inherit; min-height: 44px; padding: 0 14px; background: transparent; border: 1px solid #C9BFA9; color: #1F2430; cursor: pointer; }
+  /* กติกาทีละระบบ (ย้ายจากหน้า GDD เดิม) */
+  .rules section { background: #F4EFE3; color: #1F2430; border: 1px solid #C9BFA9; padding: 16px 20px; margin: 0 0 16px; text-align: left; }
+  .rules section.dark { background: #17110D; color: #EFE3C2; border-color: #5A4630; }
+  .rules section.dark a { color: #F0D78C; }
+  .rules h2 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 8px; }
+  .rules h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
+  .rules ul, .rules ol { padding-left: 22px; margin: 0 0 8px; }
+  .rules li { margin: 0 0 6px; }
+  .rules p { margin: 0 0 8px; }
+  .rules .note { font-size: 14px; color: #4A4F5C; }
+  .rules section.dark .note { color: #CFC3A6; }
+  .rules .tbl { overflow-x: auto; margin: 6px 0 10px; }
+  .rules table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  .rules th, .rules td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; }
+  .rules th { background: #E9E2D2; font-weight: 600; }
+  .rules section.dark th { background: #2A2017; }
+  .rules section.dark th, .rules section.dark td { border-color: #5A4630; }
+  .rules code { font-size: 13px; background: #E9E2D2; padding: 0 4px; overflow-wrap: anywhere; }
+  .rules section.dark code { background: #2A2017; }
+  .rules .flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 10px; font-size: 14px; }
+  .rules .flow span { border: 1px solid #1F2430; padding: 2px 10px; background: #fff; }
+  .rules .flow i { font-style: normal; color: #A23B2C; }
+  .rules section.dark .flow span { background: #221912; border-color: #D9B45A; }
   /*NAV-CSS:START*/
   nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
   nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
@@ -67,13 +90,35 @@
 </style>
 </head>
 <body>
-<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">NEXT LIFE</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="worlds.html">ชาตินี้ · ปรโลก · ต่างโลก</a><a class="dark" href="otherworld.html">ต่างโลก</a><a href="catalog.html" aria-current="page">การ์ดทั้งหมด</a><a href="gdd.html">เอกสารออกแบบเกม (GDD)</a><a href="design.html">การออกแบบ</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">NEXT LIFE</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="worlds.html">ชาตินี้ · ปรโลก · ต่างโลก</a><a class="dark" href="otherworld.html">ต่างโลก</a><a href="catalog.html" aria-current="page">การ์ดทั้งหมด</a><a href="design.html">การออกแบบ</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
 <header><div class="w">
   <h1>การ์ดทั้งหมดในเกม</h1>
   <p>การ์ด <span data-fact="cards">453</span> ใบ เป็นช่วงชีวิต <span data-fact="lifeCards">425</span> ใบ (รวมการ์ดรับมือเหตุการณ์บ้านเมือง <span data-fact="eraCards">25</span> ใบ) และฉากที่ปรโลก <span data-fact="afterCards">28</span> ใบ · ชาติต่างโลกอีก <span data-fact="isekaiCards">106</span> ใบ · การ์ดใหม่ขึ้นหน้านี้เองทุกครั้งที่เกมอัปเดต</p>
   <p>มีแค่สิ่งที่เห็นบนจอตอนเล่น ส่วนผลของแต่ละทางกับบุญบาปไม่ได้บอกไว้ คำที่ขีดเส้นประคือช่องที่เกมเติมชื่อหรืออายุของชีวิตนั้น · เวอร์ชัน <span data-fact="version">v0.6.36</span></p>
 </div></header>
 <main><div class="w">
+  <div class="rules">
+  <section id="content"><h2>การ์ดแต่ละหมวดและกติกาเนื้อหา</h2>
+    <p>การ์ดทั้งหมด <span data-fact="cards">453</span> ใบ: ช่วงมีชีวิต <span data-fact="lifeCards">425</span> ใบ · ปรโลก <span data-fact="afterCards">28</span> ใบ · ต่างโลกเก็บแยกอยู่ในแกนเกม · เหตุการณ์บ้านเมืองจริง <span data-fact="eraEvents">9</span> เรื่อง (เฉพาะเศรษฐกิจและภัยพิบัติ)</p>
+    <div class="tbl"><table>
+      <tr><th>หมวด</th><th>จำนวน</th><th>ไฟล์หลัก</th></tr>
+      <tr><td>งานและเงิน</td><td>98</td><td>work_*, business, debt, corruption, lottery</td></tr>
+      <tr><td>สุขภาพ</td><td>51</td><td>*_health, stats_extremes</td></tr>
+      <tr><td>ครอบครัว</td><td>42</td><td>child_family, old_family, pets</td></tr>
+      <tr><td>สังคม</td><td>36</td><td>era_*, echoes, sex_roles</td></tr>
+      <tr><td>ความเชื่อ</td><td>22</td><td>belief</td></tr>
+      <tr><td>การเรียน</td><td>10</td><td>teen, scholarship_bond</td></tr>
+      <tr><td>ระหว่างชาติ</td><td>28</td><td>afterlife</td></tr>
+    </table></div>
+    <p class="note">นับจาก <code>loadContent()</code> วันที่ 28 ต.ค. · ฟิลด์แนวการ์ดในเนื้อหามี A 238 ใบ · B 49 ใบ แต่หน้าจอวาดแนว A ทุกใบ (เจ้าของเคาะ ดูหัวข้อ 17)</p>
+    <h3>กติกาเนื้อหา</h3>
+    <ul>
+      <li>AI ร่าง แล้วเจ้าของคัดและแก้ · ด่าน lint ราว 70 กติกา ตกข้อเดียวไม่รับทั้งชุด</li>
+      <li>คำต้องห้าม 9 ธีม: สถาบัน · การเมืองจริง · ล้อเลียนพระ · โทษภาค · แนะนำการลงทุน · องค์กรจริงโกง · พิธีกรรมได้ผลจริง · ไล่ผีปอบ/ผีกะแล้วเป็นเรื่องดี · ตัวกรองจับได้ไม่ครบโดยตั้งใจ เจ้าของยังต้องอ่านทุกใบ</li>
+      <li>ห้ามวาดพระสงฆ์หรือพระพุทธรูป · ข่าวลือผีปอบต้องเล่าให้เห็นผลเสียของการกล่าวหา</li>
+    </ul>
+  </section>
+  </div>
 <nav class="toc"><a href="#s0">เด็ก <small>44</small></a><a href="#s1">วัยรุ่น <small>34</small></a><a href="#s2">หนุ่มสาว <small>59</small></a><a href="#s3">ทำงาน <small>148</small></a><a href="#s4">กลางคน <small>81</small></a><a href="#s5">ชรา <small>50</small></a><a href="#s6">ระหว่างชาติ <small>37</small></a><a href="#s7">ต่างโลก <small>106</small></a></nav>
 <!--demo-->
 <section class="try" aria-labelledby="try-h">
