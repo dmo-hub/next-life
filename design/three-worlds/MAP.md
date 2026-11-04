@@ -20,7 +20,7 @@ repos: next-life · ตั้งเมื่อ 2026-10-28 · รวม isekai/M
 
 ### Notes ต่างโลก (เดิม isekai/MAP.md)
 
-- ทำงานในเลน D (`D:/Project/Mini Project/next-life-lane-d` · branch `lane-d` · session `next-life-lane-d`) · ส่งตรวจผ่านผู้รวมงานตามกติกา `../build/LANES.md` (humanizer ข้อความผู้เล่นเห็น · ไม่รัน full เอง · cherry-pick + bump ถัดจาก main)
+- ทำงานในเลน D (`<local>` · branch `lane-d` · session `next-life-lane-d`) · ส่งตรวจผ่านผู้รวมงานตามกติกา `../build/LANES.md` (humanizer ข้อความผู้เล่นเห็น · ไม่รัน full เอง · cherry-pick + bump ถัดจาก main)
 - **แผนที่นี้รวมงานลงมือ** (override "plan, don't do") — ใบแบบ task ลงโค้ดได้ แต่ทุกใบที่แตะ `afterlife.mjs` · `app.mjs` · `life.mjs` ต้องเช็กใบเลนอื่นที่ชนก่อน (B66 · B54 · B55 · B67a · B38a · B67c · B26 · B37a/B58)
 - ศัพท์ (ใช้ตามนี้): **ต่างโลก** = โลกแฟนตาซีโลกที่สองของเกม · **ชาติต่างโลก** = ชีวิตหนึ่งชีวิตในต่างโลก นับเป็น 1 รุ่นในผังตระกูล · **เทพธิดาต่างโลก** = ผู้พาวิญญาณไปต่างโลก · **ทางเกิดที่ 3** = ตัวเลือกบนการ์ดทางเกิด · **ปรโลก** = ฉากตัดสินหลังตาย (B66 เปลี่ยนจาก "ศาลพญายม" — คอมเมนต์ `isekai.mjs` ยังใช้ "ศาล" ต้องตามแก้)
 - skill ที่ใช้: `grilling` + `domain-modeling` (ใบ grilling) · `humanizer` (ข้อความผู้เล่นเห็น) · `playwright-mcp`/smoke script (เบราว์เซอร์)
