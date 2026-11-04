@@ -226,6 +226,17 @@ body:has(.mnav) .foot { display:none; }
 .choice .fx span { white-space:nowrap; }
 /* ปุ่มล็อกใช้ช่องป้ายผลวางเหตุผลเป็นประโยค — ก้อนเดียวไม่มี " · " ห้ามตัดแล้วยาวเกินครึ่งปุ่มจนล้นจอมือถือ (B174) */
 .choice:disabled .fx span { white-space:normal; }
+/* ป้ายผลไอคอน (ui-redo 54): ชิปพื้นจางสีตามทิศทั้งชิ้น · ลูกศรติดท้ายทุกชิ้น จอขาวดำ/ตาบอดสีจึงแยกขึ้นลงได้จากรูป
+   สีขึ้น/ลงแยกตามพื้นการ์ด — ชาติไทยพื้นสว่างใช้สีเข้ม · ต่างโลก/ระหว่างชาติ และปุ่มชาติไทยตอนชี้ (พื้นกลับเป็นสีเข้ม) ใช้สีสว่าง */
+.choice { --fx-up:#2F6B66; --fx-dn:#B73824; }
+.i .choice, .b .choice, .a .choice:hover, .a .choice:focus-visible { --fx-up:#7FE0A8; --fx-dn:#FF8A7A; }
+.choice .fx .fxp { display:inline-flex; align-items:center; }
+.choice .fx .fxp > [aria-hidden] { display:inline-flex; align-items:center; gap:2px; }
+.choice .fx .fxp svg { width:1.15em; height:1.15em; flex:none; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+.choice .fx .fxp b { font-weight:600; }
+.choice .fx .up, .choice .fx .dn { padding:0 5px; border-radius:999px; }
+.choice .fx .up { color:var(--fx-up); background:color-mix(in srgb, var(--fx-up) 16%, transparent); }
+.choice .fx .dn { color:var(--fx-dn); background:color-mix(in srgb, var(--fx-dn) 16%, transparent); }
 /* ปุ่มกู้มาจ่าย (B111) ห้อยใต้ตัวเลือกที่ขาดเงิน — ย่อและเยื้องให้เห็นว่าเป็นทางของปุ่มบน ไม่ใช่ตัวเลือกใหม่ */
 .choice.loan { min-height:40px; margin:-4px 0 0 24px; padding:6px 12px; font-size:13.5px; }
 /* ชื่อตัวเลือกบนปุ่มกู้ยาวได้ทั้งประโยค — บรรทัดเดียวตัดท้ายด้วย … ไม่งั้นปุ่มกู้สูงกว่าตัวเลือกเอง · min-width:0 ให้ก้อนข้อความหดในแถว flex ได้ */
@@ -9757,6 +9768,49 @@ const FOLLOW_WORD = { later: 'มีผลภายหลัง' };
 // หัวใจข้างอายุบนแถบสถานะตอนชีวิตใกล้หมด — ตัวห่อมี aria-label "ใกล้ตาย" ไอคอนจึงซ่อนจากโปรแกรมอ่านจอ
 const HEART_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14S1.5 9.8 1.5 5.6A3.4 3.4 0 0 1 8 4a3.4 3.4 0 0 1 6.5 1.6C14.5 9.8 8 14 8 14z"/></svg>';
 
+// ป้ายผลบนปุ่มตัวเลือก (ui-redo 54 ตาม JSON ที่เจ้าของเลือก): ไอคอนเส้นต่อค่า + ลูกศร + ชิปสีตามทิศ · คู่มือวาดด้วยฟังก์ชันเดียวกัน
+// ป้ายอ่านจากข้อความที่แกนส่งมา ไม่ใช่จากผลดิบ — ค่าที่แกนซ่อนเป็น ? อยู่แล้วจึงไม่มีทางได้ไอคอนเฉพาะตัว · ค่าที่ไม่มีไอคอน (บารมี เงินเทา ชาติหน้า …) คงเป็นคำ
+const FX_ICON_PATH = {
+  heart: 'M8 13.5S2 10 2 5.8A3 3 0 0 1 8 4.5a3 3 0 0 1 6 1.3C14 10 8 13.5 8 13.5z',
+  smile: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM5.5 9.5q2.5 2.5 5 0M6 6.5h0M10 6.5h0',
+  book: 'M2 3.5h4.5Q8 3.5 8 5v8.5q0-1.5-1.5-1.5H2zM14 3.5H9.5Q8 3.5 8 5v8.5q0-1.5 1.5-1.5H14z',
+  people: 'M5.5 7.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM1.5 13.5q0-4 4-4t4 4M11 7a1.8 1.8 0 1 0 0-3.6M11.5 9.5q3 .5 3 4',
+  coin: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM8 4.5v7M10 6.2Q9.5 5.5 8 5.5T6 6.7Q6 8 8 8t2 1.3T8 10.5 6 9.8',
+  case: 'M2 5.5h12v8H2zM5.5 5.5V3.5h5v2M2 9h12',
+  link: 'M6.5 9.5l3-3M7 4.5l1.2-1.2a2.6 2.6 0 0 1 3.7 3.7L10.7 8.2M9 11.5l-1.2 1.2a2.6 2.6 0 0 1-3.7-3.7L5.3 7.8',
+  bolt: 'M9 1.5L3.5 9H8l-1 5.5L12.5 7H8z',
+  spark: 'M8 1.5v4M8 10.5v4M1.5 8h4M10.5 8h4M3.5 3.5l2 2M10.5 10.5l2 2M12.5 3.5l-2 2M5.5 10.5l-2 2',
+  clover: 'M8 8C5 8 3 6 4.5 4.2S8 4 8 8zm0 0c0-3 2-5 3.8-3.5S12 8 8 8zm0 0c3 0 5 2 3.5 3.8S8 12 8 8zm0 0c0 3-2 5-3.8 3.5S4 8 8 8zm0 0l2.5 6',
+  star: 'M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z',
+  ask: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM6.2 6.2Q6.4 4.6 8 4.6t1.8 1.5Q9.8 7.2 8 7.8v1.4M8 11.2h0',
+};
+const FX_ICON_OF = { ชีวิต: 'heart', ความสุข: 'smile', ความรู้: 'book', ความสัมพันธ์: 'people', เงิน: 'coin', รายได้: 'case', เส้นสาย: 'link', พลัง: 'bolt', เวท: 'spark', โชค: 'clover', ทอง: 'coin', ชื่อเสียง: 'star' };
+const fxIcon = (name) => `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="${FX_ICON_PATH[name]}"/></svg>`;
+const fxEscHtml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const FX_ARROW_SAID = { '↑': 'เพิ่ม', '↓': 'ลด' };
+// ชิ้นที่ตาเห็นต่างจากคำที่ควรอ่าน: ซ่อนชิ้นที่เห็นจากโปรแกรมอ่านจอ แล้วอ่านคำเต็มแทน
+const fxSr = (cls, vis, said) => `<span class="${cls}"><span aria-hidden="true">${vis}</span><span class="sr">${fxEscHtml(said)}</span></span>`;
+function fxPiece(text) {
+  const stat = text.match(/^(.+?)[\s ]([↑↓])(?:[\s ](ระยะยาว))?$/);
+  if (stat) {
+    const [, name, arrow, long] = stat;
+    const face = FX_ICON_OF[name] ? fxIcon(FX_ICON_OF[name]) : fxEscHtml(name);
+    return fxSr(`fxp ${arrow === '↑' ? 'up' : 'dn'}`, `${face}<b>${arrow}</b>${long ? `<small>${long}</small>` : ''}`, `${name}${FX_ARROW_SAID[arrow]}${long ? ` ${long}` : ''}`);
+  }
+  // ป้าย ? ไอคอนกลางตัวเดียวทุกค่า — ไอคอนต่อค่าจะบอกว่าค่าไหนถูกซ่อน
+  if (text === '?') return fxSr('fxp', fxIcon('ask'), 'ไม่รู้ผล');
+  const pct = text.match(/^สำเร็จ ~(\d+)%$/);
+  if (pct) return fxSr('fxp', fxEscHtml(text), `สำเร็จราว ${pct[1]}%`);
+  if (text === 'สำเร็จ ?') return fxSr('fxp', fxEscHtml(text), 'สำเร็จ ไม่รู้โอกาส');
+  if (/^\d+%$/.test(text)) return fxSr('fxp', fxEscHtml(text), `โอกาส ${text}`);
+  // ลูกศรที่หลงอยู่กลางคำอื่นยังอ่านเป็นคำ — โปรแกรมอ่านจออ่าน ↑ ว่า "upwards arrow"
+  return `<span>${text.split(/([↑↓])/).map((b) => (FX_ARROW_SAID[b] ? `<span aria-hidden="true">${b}</span><span class="sr">${FX_ARROW_SAID[b]}</span>` : fxEscHtml(b))).join('')}</span>`;
+}
+// ป้ายแต่ละค่าเป็นก้อนเดียว ตัดบรรทัดได้แค่ระหว่างก้อน — ไม่งั้นคำไทยหักกลางคำ
+const fxHtml = (fx) => fx.split(' · ').map(fxPiece).join(' · ');
+// ตารางไอคอนในคู่มือ: เฉพาะค่าที่มีไอคอนจริง ตามลำดับที่ส่งมา
+const fxIconRow = (names) => names.filter((n) => FX_ICON_OF[n]).map((n) => `<span class="fxk">${fxIcon(FX_ICON_OF[n])}${fxEscHtml(n)}</span>`).join(' ');
+
 // ป้ายปุ่มเดินเรื่องที่คู่มืออธิบาย — ปุ่มที่ผูกกับสถานการณ์เฉพาะ (ลบสมุด · ยกเลิก) ยังเขียนตรงในหน้าจอ
 const BTN = {
   next: 'ต่อไป',
@@ -9849,7 +9903,7 @@ function yearDelta(age, s) {
   const hide = new Set([...(veiled.get(from.age) ?? []), ...(veiled.get(age) ?? [])]);
   return Object.fromEntries(SHOWN_STATS.filter((k) => !hide.has(k)).map((k) => [k, Math.round(s[k]) - Math.round(from.base[k])]));
 }
-// อ่านเหตุการณ์ดิบจาก st.pending แบบเดียวกับป้าย "ฟรี" · ไม่มีเหตุการณ์ดิบแต่ป้ายผลขึ้น ? = ซ่อนทั้งแถบ ดีกว่าเผยค่าที่ซ่อน
+// อ่านเหตุการณ์ดิบจาก st.pending (ตัวที่การ์ดนี้ตั้งไว้) · ไม่มีเหตุการณ์ดิบแต่ป้ายผลขึ้น ? = ซ่อนทั้งแถบ ดีกว่าเผยค่าที่ซ่อน
 function veil(card, i) {
   const ev = card.kind === 'event' && card.id && st.pending?.id === card.id ? st.pending : null;
   const keys = ev ? [...(ev.hidden ?? []), ...(ev.choices?.[i]?.hidden ?? [])] : card.fx?.[i]?.split(' · ').includes('?') ? SHOWN_STATS : [];
@@ -11495,37 +11549,6 @@ function loanButtons(card, i) {
   });
 }
 
-// ลูกศรบนป้ายผลโปรแกรมอ่านจออ่านเป็น "upwards arrow" — ซ่อนลูกศรแล้วอ่านเป็นคำแทน ตาเห็นเหมือนเดิม
-const ARROW_WORD = { '↑': 'เพิ่ม', '↓': 'ลด' };
-function fxPart(text) {
-  const s = el('span');
-  for (const bit of text.split(/([↑↓])/)) {
-    if (!ARROW_WORD[bit]) {
-      if (bit) s.append(bit);
-      continue;
-    }
-    const a = el('span', null, bit);
-    a.setAttribute('aria-hidden', 'true');
-    s.append(a, el('span', 'sr', ARROW_WORD[bit]));
-  }
-  return s;
-}
-
-// ป้าย "ฟรี" (B116): ทางที่ไม่แตะเงินเลยทุกผลลัพธ์ บนการ์ดที่มีทางอื่นต้องจ่าย · การ์ดที่ไม่มีใครจ่ายไม่ติด ไม่งั้นทุกปุ่มขึ้น "ฟรี" จนไม่บอกอะไร
-// อ่านเหตุการณ์ดิบจาก st.pending (ตัวที่การ์ดนี้ตั้งไว้) อย่างเดียว · เงินที่เหตุการณ์ซ่อน (?) นับว่าอาจจ่าย — ห้ามติดฟรีแล้วเฉลยค่าที่ซ่อน
-const moneySign = (m) => Math.sign(typeof m === 'object' ? m.amount : m);
-// กู้ = จ่ายคืนทีหลัง · ปิดหนี้ = จ่ายก้อน — ทั้งคู่ไม่ใช่ "ฟรี" แม้ช่องเงินจะไม่ติดลบ
-const paysOut = (fx) => !!fx && ((fx.money !== undefined && moneySign(fx.money) < 0) || !!fx.invest || !!fx.debt || !!fx.settle);
-function freeChoices(card) {
-  // การ์ดจัดสรรเงิน/ต่างโลกเข้า branch เดียวกันแต่ไม่มี id — id ว่างเท่ากันได้ จึงเช็กชนิดก่อน
-  const ev = card.kind === 'event' && card.id && st.pending?.id === card.id ? st.pending : null;
-  if (!Array.isArray(ev?.choices)) return null;
-  const hidden = (c) => [...(ev.hidden ?? []), ...(c.hidden ?? [])].includes('money');
-  const pays = ev.choices.map((c) => hidden(c) || !!c.requires?.money || paysOut(c.effects) || (c.outcomes ?? []).some((o) => paysOut(o.effects)));
-  if (!pays.some(Boolean)) return null;
-  return pays.map((p) => !p);
-}
-
 // ไอคอนบรรทัดผลย้อนบนการ์ด · ป้ายล่วงหน้าบนปุ่มตัวเลือกเจ้าของสั่งซ่อน — ผู้เล่นไม่รู้ล่วงหน้าว่าทางไหนมีเรื่องตามมา
 const followIcon = (k) => {
   const s = el('span');
@@ -11540,9 +11563,8 @@ function button(label, fx, onclick, hint = null) {
   if (hint) main.append(el('small', 'hint', hint));
   b.append(main);
   if (fx) {
-    // ป้ายแต่ละค่าเป็นก้อนเดียว ตัดบรรทัดได้แค่ระหว่างก้อน — ไม่งั้นคำไทยหักกลางคำ
     const tag = el('span', 'fx');
-    fx.split(' · ').forEach((part, i) => tag.append(...(i ? [' · '] : []), fxPart(part)));
+    tag.innerHTML = fxHtml(fx);
     b.append(tag);
   }
   b.onclick = onclick;
@@ -12066,14 +12088,13 @@ function render(card) {
         body.append(ul);
       }
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
-      const free = freeChoices(card);
       let n = 0;
       card.choices.forEach((c, i) => {
         // ตัวเลือกประตูเข้าสายที่ยังไม่เปิด (โฟกัสใบ 04) ไม่บอกว่ามีอยู่ — ต่างจากตัวที่ล็อกด้วยเงิน/ค่าสถานะ
         if (card.hidden?.[i]) return;
         const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
-        const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);
+        const fx = why ?? card.fx?.[i];
         const b = numbered(button(c, fx, () => {
           veil(card, i);
           play(lifePick(i));
@@ -12085,7 +12106,7 @@ function render(card) {
       });
       // การ์ดเล่าเรื่อง (choices: []) ไม่มีปุ่มให้เลือก — ต้องมีทางไปใบถัดไป
       if (!card.choices.length) choices.append(enter(button(BTN.next, null, next)));
-      const tip = whisperFor(card, free);
+      const tip = whisperFor(card);
       if (tip) body.append(tip);
       if (card.choices.length > 1) choices.append(foldLater(box, body, choices, card));
     }
@@ -12103,7 +12124,6 @@ const WHISPER_KEY = 'next-life-whisper-v1';
 const WHISPERS = [
   ['locked', (c) => c.locked?.some(Boolean), 'ปุ่มจาง ๆ คือทางที่ตอนนี้ยังไปไม่ได้ เหตุผลเขียนไว้บนปุ่ม บางทางแค่รอโตอีกหน่อยหรือมีเงินพอ'],
   ['chance', (c) => c.fx?.some((f) => /สำเร็จ|เสี่ยง/.test(f ?? '')), 'ทางที่บอกโอกาสสำเร็จหรือความเสี่ยงไว้ ผลยังไม่แน่นอน ค่าสถานะตอนนี้ช่วยเอียงผลได้บ้าง'],
-  ['free', (c, free) => free?.some(Boolean), 'ป้าย "ฟรี" คือทางที่ไม่ต้องควักเงินเลย ไม่ว่าผลจะออกมาทางไหน'],
   ['school', (c) => c.id?.startsWith('school_gate_'), 'เรียนจบชั้นหนึ่งแล้วจะเรียนต่อหรือออกมาทำงานก็ได้ ความรู้ช่วยสอบเข้าที่ดี ส่วนเงินที่บ้านตัดสินว่าที่ไหนส่งไหว'],
   ['job', (c) => c.id === 'first_job', 'งานแรกขึ้นกับวุฒิที่มี คนรู้จักเยอะยิ่งเจองานค่าแรงดี รายได้ต่อเดือนดูได้ที่ปุ่ม เงิน ในเมนูท้ายจอ'],
   ['alloc', (c) => c.kind === 'alloc', 'ทุกช่วงได้ทบทวนเงินเก็บ ตัวเลขที่เห็นเป็นผลของช่วงที่ผ่านมา ไม่ได้บอกช่วงหน้า และของแพงขึ้นทุกปี เงินที่เก็บเฉย ๆ จึงซื้อของได้น้อยลง'],
@@ -12128,10 +12148,10 @@ function whisperWrite(w) {
 // เก็บชาติที่ปิดไว้แค่ไม่กี่ชาติล่าสุด — ชาติเก่ากว่านั้นไม่มีทางกลับไปเล่นแล้ว
 const WHISPER_OFF_KEEP = 8;
 const lifeKey = () => `${save?.seed}:${st.gen}`;
-function whisperFor(card, free) {
+function whisperFor(card) {
   const w = whisperRead();
   if (w.off.includes(lifeKey())) return null;
-  const hit = WHISPERS.find(([id, when]) => !w.seen.includes(id) && when(card, free));
+  const hit = WHISPERS.find(([id, when]) => !w.seen.includes(id) && when(card));
   if (!hit) return null;
   // นับว่าเห็นตั้งแต่ขึ้นจอ: กดตัวเลือกไปเลยโดยไม่ปิดกล่องก็ไม่กระซิบเรื่องเดิมซ้ำ
   w.seen.push(hit[0]);
@@ -12875,6 +12895,8 @@ function speedRow(onChange) {
   return row;
 }
 
+// ผลทุ่มเทจากแกนเป็นคำรวม "พลัง · เวท ขึ้น" — แตกเป็นชิ้นละค่า ป้ายจึงได้ไอคอน+ลูกศรแบบเดียวกับการ์ดเหตุการณ์
+const focusUp = (fx) => (fx?.endsWith(' ขึ้น') ? fx.slice(0, -' ขึ้น'.length).split(' · ').map((k) => `${k} ↑`).join(' · ') : fx);
 function renderIsekai(card) {
   clearTimeout(tickTimer);
   tickAgain = null;
@@ -12928,7 +12950,7 @@ function renderIsekai(card) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
       // ใบทุ่มเทจากการ์ดเตือน (B161) ติดป้าย "ฟื้นชีวิต" ที่ทางที่ engine ชี้
-      const tags = [card.fx?.[i], card.step === 'focus' && i === card.current && 'ทำอยู่', card.step === 'focus' && i === card.suggest && 'แนะนำ · ฟื้นชีวิต'].filter(Boolean).join(' · ');
+      const tags = [focusUp(card.fx?.[i]), card.step === 'focus' && i === card.current && 'ทำอยู่', card.step === 'focus' && i === card.suggest && 'แนะนำ · ฟื้นชีวิต'].filter(Boolean).join(' · ');
       const b = button(c, why ?? (card.step === 'focus' ? tags : card.fx?.[i]), () => {
         play(pick(i));
         if (card.step === 'upgrade') upgradeFx(card, i);

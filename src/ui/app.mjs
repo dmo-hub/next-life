@@ -48,7 +48,7 @@ function yearDelta(age, s) {
   const hide = new Set([...(veiled.get(from.age) ?? []), ...(veiled.get(age) ?? [])]);
   return Object.fromEntries(SHOWN_STATS.filter((k) => !hide.has(k)).map((k) => [k, Math.round(s[k]) - Math.round(from.base[k])]));
 }
-// อ่านเหตุการณ์ดิบจาก st.pending แบบเดียวกับป้าย "ฟรี" · ไม่มีเหตุการณ์ดิบแต่ป้ายผลขึ้น ? = ซ่อนทั้งแถบ ดีกว่าเผยค่าที่ซ่อน
+// อ่านเหตุการณ์ดิบจาก st.pending (ตัวที่การ์ดนี้ตั้งไว้) · ไม่มีเหตุการณ์ดิบแต่ป้ายผลขึ้น ? = ซ่อนทั้งแถบ ดีกว่าเผยค่าที่ซ่อน
 function veil(card, i) {
   const ev = card.kind === 'event' && card.id && st.pending?.id === card.id ? st.pending : null;
   const keys = ev ? [...(ev.hidden ?? []), ...(ev.choices?.[i]?.hidden ?? [])] : card.fx?.[i]?.split(' · ').includes('?') ? SHOWN_STATS : [];
@@ -1694,37 +1694,6 @@ function loanButtons(card, i) {
   });
 }
 
-// ลูกศรบนป้ายผลโปรแกรมอ่านจออ่านเป็น "upwards arrow" — ซ่อนลูกศรแล้วอ่านเป็นคำแทน ตาเห็นเหมือนเดิม
-const ARROW_WORD = { '↑': 'เพิ่ม', '↓': 'ลด' };
-function fxPart(text) {
-  const s = el('span');
-  for (const bit of text.split(/([↑↓])/)) {
-    if (!ARROW_WORD[bit]) {
-      if (bit) s.append(bit);
-      continue;
-    }
-    const a = el('span', null, bit);
-    a.setAttribute('aria-hidden', 'true');
-    s.append(a, el('span', 'sr', ARROW_WORD[bit]));
-  }
-  return s;
-}
-
-// ป้าย "ฟรี" (B116): ทางที่ไม่แตะเงินเลยทุกผลลัพธ์ บนการ์ดที่มีทางอื่นต้องจ่าย · การ์ดที่ไม่มีใครจ่ายไม่ติด ไม่งั้นทุกปุ่มขึ้น "ฟรี" จนไม่บอกอะไร
-// อ่านเหตุการณ์ดิบจาก st.pending (ตัวที่การ์ดนี้ตั้งไว้) อย่างเดียว · เงินที่เหตุการณ์ซ่อน (?) นับว่าอาจจ่าย — ห้ามติดฟรีแล้วเฉลยค่าที่ซ่อน
-const moneySign = (m) => Math.sign(typeof m === 'object' ? m.amount : m);
-// กู้ = จ่ายคืนทีหลัง · ปิดหนี้ = จ่ายก้อน — ทั้งคู่ไม่ใช่ "ฟรี" แม้ช่องเงินจะไม่ติดลบ
-const paysOut = (fx) => !!fx && ((fx.money !== undefined && moneySign(fx.money) < 0) || !!fx.invest || !!fx.debt || !!fx.settle);
-function freeChoices(card) {
-  // การ์ดจัดสรรเงิน/ต่างโลกเข้า branch เดียวกันแต่ไม่มี id — id ว่างเท่ากันได้ จึงเช็กชนิดก่อน
-  const ev = card.kind === 'event' && card.id && st.pending?.id === card.id ? st.pending : null;
-  if (!Array.isArray(ev?.choices)) return null;
-  const hidden = (c) => [...(ev.hidden ?? []), ...(c.hidden ?? [])].includes('money');
-  const pays = ev.choices.map((c) => hidden(c) || !!c.requires?.money || paysOut(c.effects) || (c.outcomes ?? []).some((o) => paysOut(o.effects)));
-  if (!pays.some(Boolean)) return null;
-  return pays.map((p) => !p);
-}
-
 // ไอคอนบรรทัดผลย้อนบนการ์ด · ป้ายล่วงหน้าบนปุ่มตัวเลือกเจ้าของสั่งซ่อน — ผู้เล่นไม่รู้ล่วงหน้าว่าทางไหนมีเรื่องตามมา
 const followIcon = (k) => {
   const s = el('span');
@@ -1739,9 +1708,8 @@ function button(label, fx, onclick, hint = null) {
   if (hint) main.append(el('small', 'hint', hint));
   b.append(main);
   if (fx) {
-    // ป้ายแต่ละค่าเป็นก้อนเดียว ตัดบรรทัดได้แค่ระหว่างก้อน — ไม่งั้นคำไทยหักกลางคำ
     const tag = el('span', 'fx');
-    fx.split(' · ').forEach((part, i) => tag.append(...(i ? [' · '] : []), fxPart(part)));
+    tag.innerHTML = fxHtml(fx);
     b.append(tag);
   }
   b.onclick = onclick;
@@ -2265,14 +2233,13 @@ function render(card) {
         body.append(ul);
       }
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
-      const free = freeChoices(card);
       let n = 0;
       card.choices.forEach((c, i) => {
         // ตัวเลือกประตูเข้าสายที่ยังไม่เปิด (โฟกัสใบ 04) ไม่บอกว่ามีอยู่ — ต่างจากตัวที่ล็อกด้วยเงิน/ค่าสถานะ
         if (card.hidden?.[i]) return;
         const why = lockText(card, i);
         // ตัวเลือกที่ล็อกยังแสดงให้เห็นทางที่พลาด · ป้ายผลแทนด้วยเหตุผลที่กดไม่ได้
-        const fx = why ?? (free?.[i] ? [card.fx?.[i], 'ฟรี'].filter(Boolean).join(' · ') : card.fx?.[i]);
+        const fx = why ?? card.fx?.[i];
         const b = numbered(button(c, fx, () => {
           veil(card, i);
           play(lifePick(i));
@@ -2284,7 +2251,7 @@ function render(card) {
       });
       // การ์ดเล่าเรื่อง (choices: []) ไม่มีปุ่มให้เลือก — ต้องมีทางไปใบถัดไป
       if (!card.choices.length) choices.append(enter(button(BTN.next, null, next)));
-      const tip = whisperFor(card, free);
+      const tip = whisperFor(card);
       if (tip) body.append(tip);
       if (card.choices.length > 1) choices.append(foldLater(box, body, choices, card));
     }
@@ -2302,7 +2269,6 @@ const WHISPER_KEY = 'next-life-whisper-v1';
 const WHISPERS = [
   ['locked', (c) => c.locked?.some(Boolean), 'ปุ่มจาง ๆ คือทางที่ตอนนี้ยังไปไม่ได้ เหตุผลเขียนไว้บนปุ่ม บางทางแค่รอโตอีกหน่อยหรือมีเงินพอ'],
   ['chance', (c) => c.fx?.some((f) => /สำเร็จ|เสี่ยง/.test(f ?? '')), 'ทางที่บอกโอกาสสำเร็จหรือความเสี่ยงไว้ ผลยังไม่แน่นอน ค่าสถานะตอนนี้ช่วยเอียงผลได้บ้าง'],
-  ['free', (c, free) => free?.some(Boolean), 'ป้าย "ฟรี" คือทางที่ไม่ต้องควักเงินเลย ไม่ว่าผลจะออกมาทางไหน'],
   ['school', (c) => c.id?.startsWith('school_gate_'), 'เรียนจบชั้นหนึ่งแล้วจะเรียนต่อหรือออกมาทำงานก็ได้ ความรู้ช่วยสอบเข้าที่ดี ส่วนเงินที่บ้านตัดสินว่าที่ไหนส่งไหว'],
   ['job', (c) => c.id === 'first_job', 'งานแรกขึ้นกับวุฒิที่มี คนรู้จักเยอะยิ่งเจองานค่าแรงดี รายได้ต่อเดือนดูได้ที่ปุ่ม เงิน ในเมนูท้ายจอ'],
   ['alloc', (c) => c.kind === 'alloc', 'ทุกช่วงได้ทบทวนเงินเก็บ ตัวเลขที่เห็นเป็นผลของช่วงที่ผ่านมา ไม่ได้บอกช่วงหน้า และของแพงขึ้นทุกปี เงินที่เก็บเฉย ๆ จึงซื้อของได้น้อยลง'],
@@ -2327,10 +2293,10 @@ function whisperWrite(w) {
 // เก็บชาติที่ปิดไว้แค่ไม่กี่ชาติล่าสุด — ชาติเก่ากว่านั้นไม่มีทางกลับไปเล่นแล้ว
 const WHISPER_OFF_KEEP = 8;
 const lifeKey = () => `${save?.seed}:${st.gen}`;
-function whisperFor(card, free) {
+function whisperFor(card) {
   const w = whisperRead();
   if (w.off.includes(lifeKey())) return null;
-  const hit = WHISPERS.find(([id, when]) => !w.seen.includes(id) && when(card, free));
+  const hit = WHISPERS.find(([id, when]) => !w.seen.includes(id) && when(card));
   if (!hit) return null;
   // นับว่าเห็นตั้งแต่ขึ้นจอ: กดตัวเลือกไปเลยโดยไม่ปิดกล่องก็ไม่กระซิบเรื่องเดิมซ้ำ
   w.seen.push(hit[0]);
@@ -3074,6 +3040,8 @@ function speedRow(onChange) {
   return row;
 }
 
+// ผลทุ่มเทจากแกนเป็นคำรวม "พลัง · เวท ขึ้น" — แตกเป็นชิ้นละค่า ป้ายจึงได้ไอคอน+ลูกศรแบบเดียวกับการ์ดเหตุการณ์
+const focusUp = (fx) => (fx?.endsWith(' ขึ้น') ? fx.slice(0, -' ขึ้น'.length).split(' · ').map((k) => `${k} ↑`).join(' · ') : fx);
 function renderIsekai(card) {
   clearTimeout(tickTimer);
   tickAgain = null;
@@ -3127,7 +3095,7 @@ function renderIsekai(card) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
       // ใบทุ่มเทจากการ์ดเตือน (B161) ติดป้าย "ฟื้นชีวิต" ที่ทางที่ engine ชี้
-      const tags = [card.fx?.[i], card.step === 'focus' && i === card.current && 'ทำอยู่', card.step === 'focus' && i === card.suggest && 'แนะนำ · ฟื้นชีวิต'].filter(Boolean).join(' · ');
+      const tags = [focusUp(card.fx?.[i]), card.step === 'focus' && i === card.current && 'ทำอยู่', card.step === 'focus' && i === card.suggest && 'แนะนำ · ฟื้นชีวิต'].filter(Boolean).join(' · ');
       const b = button(c, why ?? (card.step === 'focus' ? tags : card.fx?.[i]), () => {
         play(pick(i));
         if (card.step === 'upgrade') upgradeFx(card, i);
