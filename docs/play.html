@@ -237,6 +237,9 @@ body:has(.mnav) .foot { display:none; }
 .help .help-row { display:flex; flex-direction:column; gap:2px; }
 .help .help-call, .help > a { display:inline-flex; align-items:center; min-height:44px; overflow-wrap:anywhere; }
 .help .help-call { font-weight:600; }
+/* คำเตือนเนื้อหา (ui-redo 25) — การ์ดแรกเกิดตระกูลใหม่ + หน้าเล่นต่อ · สีตามการ์ดที่วางอยู่ */
+.warn-line { margin:8px 0 0; font-size:13px; line-height:1.5; opacity:.85; }
+.warn-line a { color:inherit; font-weight:600; text-decoration:underline; }
 .help small, .help .note { font-size:12.5px; overflow-wrap:anywhere; }
 .help a { color:inherit; } .help small a { white-space:nowrap; }
 .lineage .lh { font-size:12px; font-weight:600; margin:6px 0 2px; }
@@ -9343,6 +9346,10 @@ const HELP = [
   { id: 'scam', label: 'โดนหลอกออนไลน์', call: 'โทร 1441', tel: '1441', org: 'กองบัญชาการตำรวจสืบสวนสอบสวนอาชญากรรมทางเทคโนโลยี · 24 ชม.', web: 'https://www.ccib.go.th/' },
   { id: 'bankrupt', label: 'เรื่องล้มละลาย/บังคับคดี', call: '1111 กด 79', tel: '1111,79', org: 'กรมบังคับคดี', web: 'https://www.led.go.th/th' },
 ];
+// คำเตือนเนื้อหา (ui-redo 25): หน้าแรกเว็บ (data-fact warnWords) กับการ์ดแรกเกิด/หน้าเล่นต่อในเกมอ่านชุดนี้ชุดเดียว
+// เติมคำเฉพาะเรื่องที่มีการ์ดจริงในเกมแล้ว (การนอกใจรอการ์ดนอกใจเข้าเกม)
+const WARN_WORDS = ['ความตาย', 'หนี้', 'การสูญเสีย', 'ความรุนแรง'];
+const warnWords = (w = WARN_WORDS) => `${w.slice(0, -1).join(' ')} และ${w.at(-1)}`;
 const HELP_NOTE = 'เกมนี้ไม่รับเงินจากลิงก์เหล่านี้ และไม่รับบริจาค · ข้อมูลตรวจเมื่อ ตุลาคม 2569';
 
 // ค่าบนจอ 4 ตัวทุกโลก (B162) — "ชีวิต" ช่องแรกเสมอเพราะเป็นค่าที่หมดแล้วตาย · ค่าที่ไม่อยู่ในรายการยังอยู่ในแกนเกมและมีผลเท่าเดิม แค่ไม่ขึ้นจอ
@@ -11337,6 +11344,8 @@ function render(card) {
       body.append(el('span', 'stamp', 'แรกเกิด'));
       body.append(el('h3', 'lead', card.text));
       body.append(el('p', 'horo', horoscope(st)));
+      // การ์ดแรกเกิดของตระกูลใหม่ = จุดเริ่มเกมของคนไม่มีเซฟ (คนมีเซฟเห็นที่หน้าเล่นต่อ)
+      if (st.gen === 1 && card.age === 0) body.append(warnLine());
       const odds = birthOddsLine();
       if (odds) body.append(sourced(el('p', 'sub', odds), birthOddsSrc()));
       // บรรทัดแรกเป็นเรื่องของบ้าน · ที่เหลือเป็นบรรยากาศยุค ตัวรอง
@@ -11550,6 +11559,15 @@ function helpBox() {
   Object.assign(all, { href: 'guide.html#help', target: '_blank', rel: 'noopener' });
   box.append(all, el('p', 'note', HELP_NOTE));
   return box;
+}
+// บรรทัดเตือนเนื้อหาชุดเดียวกับหน้าแรกเว็บ + สายด่วนสุขภาพจิต · ไม่ต้องกดรับ
+function warnLine() {
+  const mind = HELP.find((h) => h.id === 'mind');
+  const p = el('p', 'warn-line', `ผู้เล่นวัยรุ่นขึ้นไป · เรื่องจริงบางเรื่องหนัก: ${warnWords()} · ถ้าเล่นแล้วไม่สบายใจ `);
+  const call = el('a', null, `โทร ${mind.tel}`);
+  call.href = `tel:${mind.tel}`;
+  p.append(call, ' ได้ตลอด 24 ชม.');
+  return p;
 }
 function helpRow(h) {
   const row = el('div', 'help-row');
@@ -12469,6 +12487,7 @@ function linkAsk(card, seed) {
 function home(card) {
   const where = af ? `ระหว่างชาติ หลัง${lifeEndWord(isGone(st))} ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
+  choices.before(warnLine());
   choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.shelf, null, () => openShelf()));
 }
 

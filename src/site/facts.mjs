@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { ALL_PATTERNS, TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, ISEKAI_CATS, LEGACY, PATTERN_FROM, ENTRY, ENTRY_EVENTS, GODDESS, GODDESS_VOWS, COURT_SCENES, CONT_LIFE, CONT_REGIONS, CONT_RACES, ISEKAI_CAREERS, ISEKAI_CAREER_T, PATHS } from '../engine/index.mjs';
 import { isekaiCardCount } from './otherworld.mjs';
+import { warnWords } from '../ui/labels.mjs';
 
 const th = (n) => n.toLocaleString('en-US');
 
@@ -44,6 +45,7 @@ export function siteFacts(content, ver = readVersion()) {
   const lottery = content.events.filter((e) => e.belief?.kind === 'lottery_numen').map((e) => e.belief);
   return {
     version: ver.version,
+    warnWords: warnWords(),
     build: ver.build,
     yearFrom: String(era.births.from),
     futureFrom: String(era.future.recent),

@@ -1,7 +1,7 @@
 import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfPicArt, shelfLineageArt } from './shelfart.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
@@ -1975,6 +1975,8 @@ function render(card) {
       body.append(el('span', 'stamp', 'แรกเกิด'));
       body.append(el('h3', 'lead', card.text));
       body.append(el('p', 'horo', horoscope(st)));
+      // การ์ดแรกเกิดของตระกูลใหม่ = จุดเริ่มเกมของคนไม่มีเซฟ (คนมีเซฟเห็นที่หน้าเล่นต่อ)
+      if (st.gen === 1 && card.age === 0) body.append(warnLine());
       const odds = birthOddsLine();
       if (odds) body.append(sourced(el('p', 'sub', odds), birthOddsSrc()));
       // บรรทัดแรกเป็นเรื่องของบ้าน · ที่เหลือเป็นบรรยากาศยุค ตัวรอง
@@ -2188,6 +2190,15 @@ function helpBox() {
   Object.assign(all, { href: 'guide.html#help', target: '_blank', rel: 'noopener' });
   box.append(all, el('p', 'note', HELP_NOTE));
   return box;
+}
+// บรรทัดเตือนเนื้อหาชุดเดียวกับหน้าแรกเว็บ + สายด่วนสุขภาพจิต · ไม่ต้องกดรับ
+function warnLine() {
+  const mind = HELP.find((h) => h.id === 'mind');
+  const p = el('p', 'warn-line', `ผู้เล่นวัยรุ่นขึ้นไป · เรื่องจริงบางเรื่องหนัก: ${warnWords()} · ถ้าเล่นแล้วไม่สบายใจ `);
+  const call = el('a', null, `โทร ${mind.tel}`);
+  call.href = `tel:${mind.tel}`;
+  p.append(call, ' ได้ตลอด 24 ชม.');
+  return p;
 }
 function helpRow(h) {
   const row = el('div', 'help-row');
@@ -3107,6 +3118,7 @@ function linkAsk(card, seed) {
 function home(card) {
   const where = af ? `ระหว่างชาติ หลัง${lifeEndWord(isGone(st))} ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
+  choices.before(warnLine());
   choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.shelf, null, () => openShelf()));
 }
 
