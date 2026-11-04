@@ -3164,7 +3164,8 @@ function linkAsk(card, seed) {
 function home(card) {
   const where = af ? `ระหว่างชาติ หลัง${lifeEndWord(isGone(st))} ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
-  choices.before(warnLine());
+  // ใส่ใน .body ให้ได้ขอบซ้ายขวาเดียวกับหัวการ์ด
+  choices.previousElementSibling.append(warnLine());
   choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.shelf, null, () => openShelf()));
 }
 
