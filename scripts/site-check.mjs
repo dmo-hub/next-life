@@ -178,12 +178,12 @@ check('ภาคผนวกสเปกใน GDD ครบทุกไฟล�
 const gh = all.flatMap((p) => [...read(`${p}.html`).matchAll(/https?:\/\/github\.com\/[^"\s]*\/(?:tree|blob)\/[^"\s]*/g)].map((m) => `${p}.html → ${m[0]}`));
 check('หน้าเว็บไม่ลิงก์ไปหน้า tree/blob บน GitHub', gh.length, ` ${all.length} หน้า${gh.length ? ` · เจอ ${gh.slice(0, 3).join(' | ')}` : ''}`);
 
-// 7b) หน้าการออกแบบ: ทุกไฟล์ใน design/ มีหัวข้อบนหน้าของเรื่องนั้น · หน้าใน docs/ ตรงกับที่ build จาก design/ ตอนนี้ (sync สำเนาใหม่แล้วลืม build = ตก)
+// 7b) หน้าการออกแบบ: ทุกไฟล์ใน design/ มีหัวข้อบนหน้าของเรื่องนั้น · หน้าใน docs/ ตรงกับที่ build จาก design/ ตอนนี้ (sync สำเนาใหม่แล้วลืม build = ตก · git checkout ได้ CRLF ไม่นับ)
 // ตัวควบคุม: ถอดเอกสารแรกออกจากหน้าสารบัญ ⇒ ต้องถูกจับว่าไม่ครบ และไม่ตรงของที่ build
 const designTpl = injectFacts(readFileSync(new URL('../src/site/design.html', import.meta.url), 'utf8'), facts);
 const designGap = (out, readPage) => [
   ...designFiles().filter((f) => !readPage(designPage(f))?.includes(`<details class="doc" id="${docId(f)}"`)).map((f) => `ไม่มี ${f}`),
-  ...out.filter(([f, pg]) => readPage(f) !== designHtml(designTpl, pg)).map(([f]) => `ค้าง ${f}`),
+  ...out.filter(([f, pg]) => readPage(f)?.replace(/\r\n/g, '\n') !== designHtml(designTpl, pg)).map(([f]) => `ค้าง ${f}`),
 ];
 const designMiss = designGap(designOut, (f) => (existsSync(new URL(f, docs)) ? read(f) : null));
 const cutFirst = designOut.map(([f, pg], i) => [f, i ? pg : { ...pg, body: pg.body.replace(/<details class="doc"[\s\S]*?<\/details>/, '') }]);
