@@ -84,6 +84,7 @@ npm run rel -- <notes.json> [worktree]
 | `npm run shots` | ตรวจล้นจอ/console ทุกหน้าเว็บ 390/1280 + ถ่ายภาพจอเกม เริ่ม · กลางชีวิต · ตาย ลง `docs/dev/shots/` (แล้ว build ให้หน้าดีไซน์ UI ขึ้นภาพ) · `-- --check` ตรวจอย่างเดียว ไม่เขียนภาพ (ต้องมี playwright-core) |
 | `npm run fetch:data` · `fetch:finance` | ดึงข้อมูล World Bank / WHO ใหม่ (ต้องต่อเน็ต) |
 | `npm run bump` | เลื่อนเลขเวอร์ชันบนหัวเกม (`-- minor` = เลขกลาง) |
+| `npm run site:password` | ตั้งรหัสหน้าเว็บที่ติดรหัส (ทุกหน้า `docs/` ยกเว้นหน้าแรก + ตัวเกม): พิมพ์รหัส 2 รอบ → เก็บแค่ SHA-256 ใน `src/site/gate.json` แล้ว build · รหัสจริงห้ามลง repo/commit |
 
 คำสั่งที่เหลือใน `package.json` (`overlap` · `continuity` · `isekai` · `family` · `causes` ฯลฯ) อ่านหัวไฟล์ใน `harness/` ของแต่ละตัว
 

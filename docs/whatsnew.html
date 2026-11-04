@@ -1,6 +1,31 @@
 <!doctype html>
 <html lang="th">
 <head>
+<!--GATE:START--><meta name="robots" content="noindex"><style>html:not(.nl-open) body>*:not(#nl-gate){display:none!important}
+html:not(.nl-open):not(.nl-js) body::before{content:"\E15 \E49 \E2D \E07 \E40 \E1B \E34 \E14  JavaScript \E08 \E36 \E07 \E08 \E30 \E40 \E1B \E34 \E14 \E2B \E19 \E49 \E32 \E19 \E35 \E49 \E44 \E14 \E49 ";display:block;padding:48px 24px;font:16px/1.6 Sarabun,"Noto Sans Thai",sans-serif;text-align:center}
+#nl-gate{box-sizing:border-box;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#17110D;color:#F4EFE3;font:16px/1.6 Sarabun,"Noto Sans Thai",sans-serif}
+#nl-gate *{box-sizing:border-box}
+#nl-gate form{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}
+#nl-gate h1{margin:0;font-size:22px;color:#F0D78C}
+#nl-gate p{margin:0}
+#nl-gate input{min-height:44px;padding:8px 12px;font:inherit;color:#17110D;background:#F4EFE3;border:1px solid #5A4630;border-radius:6px}
+#nl-gate button{min-height:44px;padding:0 16px;font:inherit;font-weight:700;color:#17110D;background:#F0D78C;border:0;border-radius:6px;cursor:pointer}
+#nl-gate input:focus-visible,#nl-gate button:focus-visible,#nl-gate a:focus-visible{outline:3px solid #F0D78C;outline-offset:2px}
+#nl-gate .err{min-height:1.6em;color:#F2A38F}
+#nl-gate nav{display:flex;flex-wrap:wrap;gap:4px 16px}
+#nl-gate a{color:#E3DDD0;display:inline-block;line-height:44px}</style><script>(()=>{const K="next-life-gate",H="03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",d=document.documentElement;
+try{if(sessionStorage.getItem(K)===String(H)){d.classList.add('nl-open');return}}catch(e){}
+d.classList.add('nl-js');
+addEventListener('DOMContentLoaded',()=>{const g=document.createElement('div');g.id='nl-gate';
+g.innerHTML='<form role="dialog" aria-modal="true" aria-labelledby="nl-gate-h"><h1 id="nl-gate-h">หน้านี้ต้องใส่รหัส</h1><p>หน้าเอกสารของเกมเปิดเฉพาะคนที่มีรหัส · ตัวเกมเล่นได้เลยไม่ต้องใส่</p><label for="nl-gate-pw">รหัส</label><input id="nl-gate-pw" type="password" autocomplete="current-password" required><button type="submit">เข้า</button><p class="err" role="alert"></p><nav aria-label="หน้าที่ไม่ต้องใส่รหัส"><a href="index.html">หน้าแรก</a><a href="play.html">เล่นเกม</a></nav></form>';
+document.body.prepend(g);const f=g.querySelector('form'),i=g.querySelector('input'),e=g.querySelector('.err');i.focus();
+if(!H){e.textContent='ยังไม่ได้ตั้งรหัส หน้านี้จึงยังเปิดไม่ได้';i.disabled=true;g.querySelector('button').disabled=true;return}
+f.addEventListener('submit',async(ev)=>{ev.preventDefault();e.textContent='';
+if(!(window.crypto&&crypto.subtle)){e.textContent='เบราว์เซอร์นี้ตรวจรหัสไม่ได้ (ต้องเปิดผ่าน https)';return}
+const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(i.value));
+const x=[...new Uint8Array(b)].map((n)=>n.toString(16).padStart(2,'0')).join('');
+if(x!==H){e.textContent='รหัสไม่ถูก ลองใหม่อีกครั้ง';i.select();i.focus();return}
+try{sessionStorage.setItem(K,H)}catch(e){}g.remove();d.classList.add('nl-open');d.classList.remove('nl-js')})})})()</script><!--GATE:END-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>แพตช์โน้ต · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
@@ -18,6 +43,9 @@
   main { padding: 24px 16px 64px; }
   h2 { font-family: Pridi, serif; font-size: 22px; margin: 32px 0 8px; }
   h3 { font-size: 17px; margin: 20px 0 4px; }
+  .road-l { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .road-l a { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 14px; background: #F4EFE3; border: 1px solid #C9BFA9; color: #1F2430; text-decoration: none; }
+  .road-l a:hover, .road-l a:focus-visible { border-color: #A23B2C; outline: none; }
   h3 small { font-weight: 400; color: #4A4F5C; font-size: 13px; margin-left: 6px; }
   ul { padding-left: 22px; margin: 0 0 12px; }
   li { margin: 0 0 6px; }
@@ -48,6 +76,7 @@
 
   <h2>กำลังทำ</h2>
   <p class="lead">ระบบที่ตัดสินแล้วแต่ยังไม่เข้าเกม ลำดับและรายละเอียดอาจเปลี่ยนได้</p>
+  <!--ROADMAP:START--><ul class="road-l"><li><a href="#soon-หน้าจอและเว็บ">หน้าจอและเว็บ</a></li><li><a href="#soon-เรียน-งาน-และการเมือง">เรียน งาน และการเมือง</a></li><li><a href="#soon-เงิน-ตลาด-หนี้-และประวัติติดตัว">เงิน ตลาด หนี้ และประวัติติดตัว</a></li><li><a href="#soon-คนรอบตัว-คู่ชีวิต-และลูก">คนรอบตัว คู่ชีวิต และลูก</a></li><li><a href="#soon-ข้ามรุ่นและตระกูล">ข้ามรุ่นและตระกูล</a></li><li><a href="#soon-ผล-คำใบ้-และบทสรุป">ผล คำใบ้ และบทสรุป</a></li><li><a href="#soon-ยุค-เรื่องพิเศษ-และสีสัน">ยุค เรื่องพิเศษ และสีสัน</a></li><li><a href="#soon-ปรโลก">ปรโลก</a></li><li><a href="#soon-ต่างโลก">ต่างโลก</a></li><li><a href="#soon-โลกซ้อนทับ">โลกซ้อนทับ</a></li></ul><!--ROADMAP:END-->
   <h3 id="soon-หน้าจอและเว็บ">หน้าจอและเว็บ</h3>
   <ul>
     <li><span class="tag soon">กำลังทำ</span><b>บันทึกชีวิต</b> ประวัติคู่ชีวิต · จอปรโลกโฉมใหม่</li>
@@ -136,6 +165,29 @@
 
   <h2>แพตช์โน้ต</h2>
   <p class="lead">การเปลี่ยนแปลงทีละเวอร์ชัน ใหม่สุดอยู่บน · ป้าย <span class="tag rule">กติกา</span> คือกติกาเกมที่เปลี่ยน</p>
+
+  <h3>v0.6.61 <small>4 พ.ย. 2569</small></h3>
+  <ul>
+    <li>หน้าต้นแบบใหม่ให้เจ้าของเลือกแบบ: จัดหน้าเอกสารทั้งเว็บ (คู่มือ อัปเดต เกี่ยวกับ โลก ฯลฯ) ดูของจริงแต่ละหน้าพร้อมปรับได้</li>
+  </ul>
+
+  <h3>v0.6.60 <small>4 พ.ย. 2569</small></h3>
+  <ul>
+    <li>แชร์ลิงก์หน้าแรกแล้วขึ้นภาพปกและคำอธิบายเกม · มีไอคอนเกมบนแท็บเบราว์เซอร์ · มีแผนผังเว็บให้เครื่องมือค้นหาเจอหน้าแรกและหน้าเล่นเกม</li>
+  </ul>
+
+  <h3>v0.6.59 <small>4 พ.ย. 2569</small></h3>
+  <ul>
+    <li>เปลี่ยนรหัสหน้าที่ติดรหัส · รหัสเดิมใช้ไม่ได้แล้ว</li>
+    <li>หน้าแรกเหลือการ์ดชาตินี้กับปรโลก · ปุ่มดูโลกย้ายไปอยู่ในการ์ดปรโลก</li>
+  </ul>
+
+  <h3>v0.6.58 <small>4 พ.ย. 2569</small></h3>
+  <ul>
+    <li>หน้าคู่มือ อัปเดต เกี่ยวกับ โลก รวมการ์ด เฉลย และห้องผู้พัฒนา ถามรหัสก่อนเปิด · หน้าแรกและหน้าเล่นเกมเปิดได้ตามเดิม</li>
+    <li>หน้าแรกเหลือแค่หัวเกม ปุ่มเริ่มเล่น และการ์ดโลก · หัวข้อกำลังทำย้ายไปหน้าอัปเดต · ระบบหลักย้ายไปต้นหน้าเกี่ยวกับ</li>
+    <li>หน้าต้นแบบใหม่ให้เจ้าของเลือกแบบ: แถบแท็บในสมุด 9 แบบ</li>
+  </ul>
 
   <h3>v0.6.57 <small>4 พ.ย. 2569</small></h3>
   <ul>

@@ -21,6 +21,9 @@ import { uiPage, designMoved, tweakPages, cssVars, UI_PAGE, UI_MOVED_FROM } from
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
+import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, PUBLIC_HIDE } from '../src/site/gate.mjs';
+import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
+import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsTweak } from '../src/site/docs-tweak.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -48,7 +51,8 @@ check('ตัวเลขบนหน้าเท่าค่าจริง', w
 // 2) ตัวควบคุม: ข้อมูลเปลี่ยน (ตัดการ์ดออก 1 ใบ · ฉายาหาย 1 ตัว) ⇒ เลขที่ฉีดต้องเปลี่ยนตาม — ไม่งั้นข้อ 1 ผ่านเพราะเขียนเลขมือตรงกันพอดี
 const less = { ...content, events: content.events.slice(1) };
 const f2 = { ...siteFacts(less), titles: String(Number(facts.titles) - 1) };
-const probe = injectFacts(read('index.html'), f2);
+// ฉายาย้ายจากหน้าแรกไปกลไกในเกม (ui-redo 69) ⇒ ตรวจสองหน้ารวมกัน
+const probe = injectFacts(read('index.html'), f2) + injectFacts(read('about.html'), f2);
 const moved = ['cards', 'titles'].every((k) => probe.includes(`data-fact="${k}">${f2[k]}<`) && f2[k] !== facts[k]);
 check('ตัวควบคุม: ข้อมูลเปลี่ยนแล้วเลขบนหน้าเปลี่ยนตาม', !moved, ` (การ์ด ${facts.cards} → ${f2.cards} · ฉายา ${facts.titles} → ${f2.titles})`);
 
@@ -200,11 +204,14 @@ check('หน้าเว็บไม่ลิงก์ไปหน้า tree/b
 // ตัวควบคุม: ถอดเอกสารแรกออกจากหน้าสารบัญ ⇒ ต้องถูกจับว่าไม่ครบ และไม่ตรงของที่ build
 const designTpl = injectFacts(readFileSync(new URL('../src/site/design.html', import.meta.url), 'utf8'), facts);
 const lf = (s) => s?.replace(/\r\n/g, '\n');
+// หน้าที่ build เขียนได้กล่องรหัสต่อท้ายเสมอ (ui-redo 72) ⇒ ของคาดหวังต้องผ่าน injectGate ชุดเดียวกัน
+const gateHash = readGateHash();
+const gated = (html, file) => injectGate(html, gateHash, file);
 // หน้าอยู่ใต้ DESIGN_AT · ที่เดิมใต้ docs/ ต้องเป็นหน้าส่งต่อไปหน้าใหม่ (ui-redo 43) — หน้าส่งต่อไม่นับเป็น "เกิน"
 const readOr = (p) => (existsSync(new URL(p, docs)) ? read(p) : null);
 const designGap = (out, readPage, readOld = readOr) => [
   ...designFiles().filter((f) => !readPage(designPage(f))?.includes(`<details class="doc" id="${docId(f)}"`)).map((f) => `ไม่มี ${f}`),
-  ...out.filter(([f, pg]) => lf(readPage(f)) !== lf(designHtml(designTpl, pg, f))).map(([f]) => `ค้าง ${f}`),
+  ...out.filter(([f, pg]) => lf(readPage(f)) !== lf(gated(designHtml(designTpl, pg, f), DESIGN_AT + f))).map(([f]) => `ค้าง ${f}`),
   ...out.filter(([f, pg]) => lf(readOld(f)) !== designMoved(f, pg.title)).map(([f]) => `ไม่มีหน้าส่งต่อ ${f}`),
   // หน้าเรื่องที่ถูกรวม/ลบแล้วยังค้าง ทั้งที่ใหม่และที่เดิม
   ...readdirSync(new URL(DESIGN_AT, docs)).filter((n) => /^design-.+\.html$/.test(n) && !out.some(([f]) => f === n)).map((n) => `เกิน ${DESIGN_AT}${n}`),
@@ -212,7 +219,7 @@ const designGap = (out, readPage, readOld = readOr) => [
 ];
 const designMiss = designGap(designOut, (f) => readOr(DESIGN_AT + f));
 const cutFirst = designOut.map(([f, pg], i) => [f, i ? pg : { ...pg, body: pg.body.replace(/<details class="doc"[\s\S]*?<\/details>/, '') }]);
-const designCtl = designGap(designOut, (f) => designHtml(designTpl, cutFirst.find(([x]) => x === f)[1], f)).length >= 2;
+const designCtl = designGap(designOut, (f) => gated(designHtml(designTpl, cutFirst.find(([x]) => x === f)[1], f), DESIGN_AT + f)).length >= 2;
 // ตัวควบคุมหน้าส่งต่อ: ลบหน้าส่งต่อ 1 ไฟล์ ⇒ ต้องถูกจับ
 const movedCtl = designGap(designOut, (f) => readOr(DESIGN_AT + f), (f) => (f === designOut[0][0] ? null : readOr(f))).some((x) => x.startsWith('ไม่มีหน้าส่งต่อ'));
 check('หน้าคำตัดสินเกมใต้ dev/ ครบทุกไฟล์ใน design/ ตรงของที่ build และที่เดิมเป็นหน้าส่งต่อ', designMiss.length || !designCtl || !movedCtl, ` ไฟล์ ${designFiles().length} · ${designOut.length} หน้า${designMiss.length ? ` · ${designMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${designCtl && movedCtl ? 'จับได้' : 'จับไม่ได้'}`);
@@ -250,7 +257,7 @@ const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.
 // · ชิ้นส่วนตัวอย่างอยู่ใน iframe sandbox ว่าง (ไม่มีสคริปต์ ไม่มี same-origin ⇒ แตะ localStorage ไม่ได้) และ srcdoc ไม่มี <script
 // ตัวควบคุม: แก้สีในเกม 1 ค่า ⇒ หน้าที่ build ต้องเปลี่ยนและมีค่าใหม่ · ถอดลิงก์ tweak 1 ลิงก์ ⇒ ต้องนับขาด · เติม allow-scripts ⇒ ต้องถูกจับ
 const uiTpl = readFileSync(new URL('../src/ui/template.html', import.meta.url), 'utf8');
-const uiBuilt = (tpl) => designHtml(designTpl, uiPage(content, docs, tpl), UI_PAGE.slice(DESIGN_AT.length));
+const uiBuilt = (tpl) => gated(designHtml(designTpl, uiPage(content, docs, tpl), UI_PAGE.slice(DESIGN_AT.length)), UI_PAGE);
 const uiNow = uiBuilt(uiTpl);
 const uiHtml = readOr(UI_PAGE) ?? '';
 const uiColors = cssVars(uiTpl.match(/<style>([\s\S]*?)<\/style>/)[1]).flatMap((g) => g.vars).filter(([, v]) => /^(#|rgba?\(|hsla?\()/i.test(v));
@@ -288,20 +295,42 @@ const cssMiss = GAME_CSS_PAGES.filter((f) => gameCssBlock(read(f)) !== liveCss);
 const cssCtl = gameCssBlock(read(GAME_CSS_PAGES[0])) !== `${liveCss} `;
 check('หน้า tweak ใช้ CSS เกมชุดปัจจุบัน', cssMiss.length || !cssCtl, ` ${GAME_CSS_PAGES.length} หน้า${cssMiss.length ? ` · เก่า ${cssMiss.join(' ')}` : ''} · ตัวควบคุม${cssCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
-// 7d) แผนงานหน้าแรก (ui-redo 23): แถวหมวดบน index = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
+// 7c4) หน้า tweak เว็บเอกสาร (ui-redo 32): รายการในหน้า = ขอบเขตที่คิดจาก docs/ ตอนนี้ + :root หน้าเล่นตอนนี้ · ไม่มีหน้านอกขอบเขต (ตัวเกม คลังเก่า หน้า tweak หน้าส่งต่อ) · ทุกหน้ามีไฟล์จริง
+// ตัวควบคุม: ถอดหน้า 1 หน้าจากบล็อก ⇒ ต้องไม่ตรง · ขอบเขตที่คิดได้ต้องมีครบชุดหลักที่ใบงานระบุ
+const dtHtml = readOr(DOCS_TWEAK_PAGE) ?? '';
+const dtNow = docsTweakData(docs, uiTpl);
+const dtBlock = docsTweakBlock(dtHtml);
+const dtFiles = dtNow.pages.map((p) => p.f);
+const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'cards.html', 'spoilers.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', 'dev/maps/politics.html', 'dev/archive/index.html'];
+const dtOut = (f) => f === 'play.html' || f.startsWith('archive/') || f.startsWith('dev/ui-redo/') || /tweak/.test(f) || read(f).includes(MOVED_MARK);
+const dtMiss = [
+  ...(JSON.stringify(dtBlock) !== JSON.stringify(dtNow) ? [`ค้าง ${DOCS_TWEAK_PAGE} (build ใหม่)`] : []),
+  ...dtMust.filter((f) => !dtFiles.includes(f)).map((f) => `ขาด ${f}`),
+  ...dtFiles.filter((f) => !existsSync(new URL(f, docs)) || dtOut(f)).map((f) => `เกิน ${f}`),
+  ...(dtNow.pages.filter((p) => p.k === 'map').length !== dtFiles.filter((f) => f.startsWith('dev/maps/')).length ? ['dev/maps ไม่ได้ชนิดแผนที่'] : []),
+];
+const dtCtl = dtBlock && JSON.stringify({ ...dtBlock, pages: dtBlock.pages.slice(1) }) !== JSON.stringify(dtNow) && !injectDocsTweak(dtHtml, dtNow, 'ctl').includes(`${DOCS_TWEAK_START}null`);
+check('หน้า tweak เว็บเอกสารมีทุกหน้าในขอบเขต', dtMiss.length || !dtCtl, ` ${dtFiles.length} หน้า${dtMiss.length ? ` · ${dtMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${dtCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7d) แผนงาน (ui-redo 23 · ย้ายไป whatsnew ui-redo 69): แถวหมวดใต้หัวกำลังทำ = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
 // · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)
 // ตัวควบคุม: เติมหมวดใหม่ 1 หมวดใน whatsnew ⇒ กล่องที่คาดต้องเปลี่ยน · ถอด id หัวแรก ⇒ ลิงก์ต้องหาปลายทางไม่เจอ
 const wn = read('whatsnew.html');
 const roadCats = soonCats(wn);
 const roadIn = (html) => { const a = html.indexOf(ROAD_START); const b = html.indexOf(ROAD_END); return a < 0 || b < a ? null : html.slice(a + ROAD_START.length, b); };
-const roadNow = roadIn(read('index.html'));
+const roadNow = roadIn(wn);
+// หน้าแรกเหลือหัว + ปุ่มเล่น + การ์ดโลก + footer (ui-redo 69) — กล่องแผนงาน/ระบบหลักกลับมา = ตก
+const homeLeftIn = (html) => ['ROADMAP:START', 'class="road"', 'class="sys"', '>ระบบหลัก<', 'class="footnote"'].filter((s) => html.includes(s));
+const homeLeft = homeLeftIn(read('index.html'));
+const homeCtl = homeLeftIn(read('index.html').replace('<footer>', '<details class="sys"><summary><h2>ระบบหลัก</h2></summary></details>\n  <footer>')).length === 2;
+const coreAbout = read('about.html').includes('<h2 id="core">ระบบหลัก</h2>');
 const roadNoId = (w) => soonCats(w).filter((c) => !w.includes(`id="${c.id}"`)).map((c) => c.name);
 const relSrc = readFileSync(new URL('../scripts/rel.mjs', import.meta.url), 'utf8');
 const relSees = /\/<h3\[\\s>\]\//.test(relSrc);
 const wnMore = wn.replace('<h2>แพตช์โน้ต</h2>', '<h3>หมวดทดสอบ</h3>\n  <ul>\n    <li>x</li>\n  </ul>\n\n  <h2>แพตช์โน้ต</h2>');
 const roadCtl = roadmapHtml(soonCats(wnMore)) !== roadNow && roadNoId(wn.replace(`<h3 id="${roadCats[0]?.id}">`, '<h3>')).length === 1;
-const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'กล่องบน index ไม่ตรง whatsnew (build ใหม่)', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
-check('แผนงานหน้าแรกตรงหมวดกำลังทำใน whatsnew และลิงก์ถึงหัวหมวด', roadBad.length || !roadCtl, ` ${roadCats.length} หมวด${roadBad.length ? ` · ${roadBad.join(' | ')}` : ''} · ตัวควบคุม${roadCtl ? 'จับได้' : 'จับไม่ได้'}`);
+const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'แถวหมวดใน whatsnew ไม่ตรงหัวกำลังทำ (build ใหม่)', homeLeft.length && `หน้าแรกยังมี ${homeLeft.join(' ')}`, !coreAbout && 'about ไม่มีหัวระบบหลัก', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
+check('แถวหมวดใต้หัวกำลังทำใน whatsnew ตรงหมวดและลิงก์ถึงหัวหมวด · หน้าแรกไม่มีแผนงาน/ระบบหลัก · about มีระบบหลัก', roadBad.length || !roadCtl || !homeCtl, ` ${roadCats.length} หมวด${roadBad.length ? ` · ${roadBad.join(' | ')}` : ''} · ตัวควบคุม${roadCtl && homeCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) หน้าโลกที่เล่นได้ (three-worlds 08): บอกแค่ทางที่ผู้เล่นเห็นบนจอเสมอ — ทางลับที่เป็นเหตุสุ่ม (ทริปศาลทั้งตัว court.mjs) ห้ามมีแม้แต่คำ
 // · ทางเกิดครบทุกทางจาก PATHS · แผนภาพ 3 กล่องไม่มีป้ายบนลูกศร (svg มีแค่ <text> ชื่อฉาก) · ลิงก์ไปหน้าต่างโลก
@@ -473,6 +502,126 @@ const fakeMiss = silent([fake]);
 const fakeCaught = ['when.zz_fake', 'multipliers(การ์ด).zz_fake', 'requires.zz_fake', 'multipliers(ผล).zz_fake'].every((k) => fakeMiss.has(k));
 const missLines = [...missing].map(([k, ids]) => `${k} ${ids.size} ใบ เช่น ${[...ids].slice(0, 3).join(',')}`);
 check('หน้าเฉลยวาดทุกเงื่อนไขและตัวคูณที่การ์ดใช้', missing.size || !fakeCaught, ` key ไม่ขึ้นหน้า ${missing.size}${missLines.length ? `: ${missLines.join(' | ')}` : ''} · ตัวควบคุม${fakeCaught ? 'จับได้' : 'จับไม่ได้'}`);
+
+// กล่องรหัส (ui-redo 72): ทุกหน้า docs/ ที่ไม่ใช่หน้าแรก/ตัวเกม/หน้าส่งต่อ มีบล็อกชุดเดียวใน <head> ตรง hash ปัจจุบัน + noindex · หน้าแรก/ตัวเกมไม่มี
+// ตัวควบคุม: ถอดบล็อก · hash อื่น · ย้ายไปท้าย body · ใส่บล็อกให้หน้าแรก ⇒ ต้องถูกจับทุกแบบ
+{
+  const BLOCK = /<!--GATE:START-->[\s\S]*?<!--GATE:END-->/;
+  const gateGap = (files, readPage) => [
+    ...files.flatMap((f) => {
+      const html = readPage(f);
+      const blk = gateBlockOf(html);
+      if (!blk) return [`ไม่มีกล่องรหัส ${f}`];
+      const head = html.search(/<\/head>/i);
+      return [
+        ...(blk.count !== 1 ? [`กล่องรหัสซ้ำ ${f}`] : []),
+        ...(blk.body !== gateBlock(gateHash, f) ? [`กล่องรหัสไม่ตรง hash ปัจจุบัน ${f}`] : []),
+        ...(head < 0 || html.search(BLOCK) > head ? [`กล่องรหัสไม่อยู่ใน <head> ${f}`] : []),
+        ...(!blk.body.includes('<meta name="robots" content="noindex">') ? [`ไม่มี noindex ${f}`] : []),
+      ];
+    }),
+    ...GATE_OPEN.filter((f) => gateBlockOf(readPage(f))).map((f) => `หน้าไม่ติดรหัสมีกล่อง ${f}`),
+  ];
+  const files = gatedFiles(docs);
+  const miss = gateGap(files, read);
+  const [g0, g1] = files;
+  const other = gateHash === 'f'.repeat(64) ? 'e'.repeat(64) : 'f'.repeat(64);
+  const only = (want, fn) => (f) => (f === want ? fn(read(f), f) : read(f));
+  const ctl = {
+    ถอดบล็อก: only(g0, (h) => h.replace(BLOCK, '')),
+    'hash อื่น': only(g0, (h, f) => injectGate(h, other, f)),
+    'ท้าย body': only(g1, (h) => { const b = h.match(BLOCK)[0]; return h.replace(BLOCK, '').replace(/<\/body>/i, `${b}</body>`); }),
+    หน้าแรกติด: only('index.html', (h, f) => injectGate(h, gateHash, f)),
+  };
+  const ctlBad = Object.entries(ctl).filter(([, rp]) => !gateGap(files, rp).length).map(([k]) => k);
+  check('หน้าเว็บติดรหัสครบ (กล่องใน head · hash ปัจจุบัน · noindex) หน้าแรก/ตัวเกมไม่ติด', miss.length || ctlBad.length || files.length < 20, ` ${files.length} หน้า · hash ${gateHash ? 'ตั้งแล้ว' : 'ยังไม่ตั้ง (กล่องบอกว่ายังเปิดไม่ได้)'}${miss.length ? ` · ${miss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
+}
+
+// ซ่อนโลกที่สามบนหน้าไม่ติดรหัส (ui-redo 70): หน้าแรก · หน้าส่งต่อทั้งหน้า และ <head> ของ play.html (ตัวเกมใน body ไม่นับ)
+// นับข้อความที่เห็น + title + ค่าในแอตทริบิวต์ที่คนหรือเครื่องอ่าน (content · alt · title · aria-label) — คอมเมนต์/CSS/สคริปต์ไม่นับ
+// ตัวควบคุม: ใส่คำกลับในย่อหน้าหน้าแรก · ใน description · ใน title ของ play · ในชื่อหน้าส่งต่อ ⇒ ต้องถูกจับทุกแบบ
+{
+  const seen = (html) => {
+    const h = html.replace(/<!--[\s\S]*?-->/g, '').replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, '');
+    const attrs = [...h.matchAll(/\s(?:content|alt|title|aria-label)="([^"]*)"/gi)].map((m) => m[1]);
+    return `${h.replace(/<[^>]+>/g, ' ')} ${attrs.join(' ')}`;
+  };
+  const headOf = (html) => html.slice(0, html.search(/<\/head>/i));
+  const moved = [];
+  const walk = (dir) => {
+    for (const d of readdirSync(new URL(dir, docs), { withFileTypes: true })) {
+      const f = `${dir}${d.name}`;
+      if (d.isDirectory()) walk(`${f}/`);
+      else if (f.endsWith('.html') && read(f).includes(MOVED_MARK)) moved.push(f);
+    }
+  };
+  walk('');
+  const pages = (rd) => [['index.html', seen(rd('index.html'))], ['play.html <head>', seen(headOf(rd('play.html')))], ...moved.map((f) => [f, seen(rd(f))])];
+  const hits = (rd) => pages(rd).filter(([, t]) => PUBLIC_HIDE.test(t)).map(([f, t]) => `${f}: "${t.match(PUBLIC_HIDE)[0]}"`);
+  const miss = hits(read);
+  const swap = (want, fn) => (f) => (f === want ? fn(read(f)) : read(f));
+  const ctl = {
+    'ย่อหน้าหน้าแรก': swap('index.html', (h) => h.replace('</footer>', ' ต่างโลก</footer>')),
+    description: swap('index.html', (h) => h.replace('<meta name="description" content="', '<meta name="description" content="isekai ')),
+    'title play': swap('play.html', (h) => h.replace('</title>', ' ต่างโลก</title>')),
+    'หน้าส่งต่อ': swap(moved[0], (h) => h.replace('</title>', ' ต่างโลก</title>')),
+  };
+  const ctlBad = Object.entries(ctl).filter(([, rd]) => !hits(rd).length).map(([k]) => k);
+  // ตัวเกมยังพาไปต่างโลกได้ — คำต้องยังอยู่ใน body ของ play.html (ไม่ได้ตัดตัวเกม)
+  const gameKeeps = PUBLIC_HIDE.test(read('play.html').slice(headOf(read('play.html')).length));
+  check('หน้าไม่ติดรหัส (หน้าแรก · head ของ play · หน้าส่งต่อ) ไม่มีคำต่างโลก ตัวเกมคงเดิม', miss.length || ctlBad.length || !moved.length || !gameKeeps, ` ${pages(read).length} หน้า (ส่งต่อ ${moved.length})${miss.length ? ` · เจอ ${miss.join(' | ')}` : ''}${gameKeeps ? '' : ' · ตัวเกมไม่มีคำ (ตัดเกิน)'} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
+}
+
+// SEO หน้าแรก + sitemap (ui-redo 68 · ข้อ 102): canonical · og:image ไฟล์จริง 1200×630 < 300KB · JSON-LD parse ได้ มี VideoGame + WebSite ไม่มีคำซ่อน
+// · บล็อกตรงของที่ build จาก title/description ปัจจุบัน · head ของ play มี description + canonical · sitemap ทุก URL มีไฟล์จริง ไม่ติดรหัส ไม่ noindex
+// ตัวควบคุม: ถอด canonical · JSON-LD พัง · ภาพผิดขนาด · ใส่หน้าติดรหัสใน sitemap ⇒ ต้องถูกจับทุกแบบ
+{
+  const pngSize = (buf) => (buf?.length > 24 && buf.toString('latin1', 12, 16) === 'IHDR' ? [buf.readUInt32BE(16), buf.readUInt32BE(20)] : null);
+  const fileOf = (url) => (url.startsWith(SITE) ? decodeURIComponent(url.slice(SITE.length)) || 'index.html' : null);
+  const bin = (f) => (existsSync(new URL(f, docs)) ? readFileSync(new URL(f, docs)) : null);
+  const seoGap = ({ index, play, sitemap, png }) => {
+    const out = [];
+    const a = index.indexOf(SEO_START);
+    const b = index.indexOf(SEO_END);
+    const blk = a < 0 || b < a ? '' : index.slice(a + SEO_START.length, b);
+    if (!blk) return ['หน้าแรกไม่มีบล็อก SEO'];
+    if (blk.trim() !== seoBlock(pageMeta(index, 'docs/index.html'))) out.push('บล็อก SEO ไม่ตรง title/description ปัจจุบัน (build ใหม่)');
+    if (!blk.includes(`<link rel="canonical" href="${SITE}">`)) out.push('ไม่มี canonical');
+    const img = blk.match(/<meta property="og:image" content="([^"]+)">/)?.[1];
+    const dim = pngSize(png);
+    if (img !== SITE + OG_IMAGE || !png) out.push(`og:image ไม่มีไฟล์ ${img}`);
+    else if (dim?.[0] !== OG_W || dim?.[1] !== OG_H || png.length >= 300 * 1024) out.push(`og:image ${dim?.join('×')} ${Math.round(png.length / 1024)}KB`);
+    let ld = null;
+    try { ld = JSON.parse(blk.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] ?? ''); } catch {}
+    const types = Array.isArray(ld) ? ld.map((x) => x['@type']) : [];
+    if (!types.includes('VideoGame') || !types.includes('WebSite')) out.push(`JSON-LD ${ld ? `ได้ ${types.join(',')}` : 'parse ไม่ได้'}`);
+    if (PUBLIC_HIDE.test(blk)) out.push('บล็อก SEO มีคำซ่อน');
+    for (const f of [FAVICON_SVG, FAVICON_PNG, TOUCH_ICON]) if (!existsSync(new URL(f, docs))) out.push(`ไม่มี ${f}`);
+    const head = play.slice(0, play.search(/<\/head>/i));
+    if (!/<meta name="description" content="[^"]+">/.test(head) || !head.includes(`<link rel="canonical" href="${SITE}play.html">`)) out.push('head ของ play ไม่มี description/canonical');
+    const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    if (lf(sitemap) !== sitemapXml()) out.push('sitemap ไม่ตรงของที่ build');
+    for (const u of locs) {
+      const f = fileOf(u);
+      const html = f && existsSync(new URL(f, docs)) ? (f === 'index.html' ? index : read(f)) : null;
+      if (!html) out.push(`sitemap ลิงก์ตาย ${u}`);
+      else if (gateBlockOf(html) || /<meta name="robots" content="[^"]*noindex/.test(html)) out.push(`sitemap มีหน้า noindex ${u}`);
+    }
+    return out;
+  };
+  const now = { index: read('index.html'), play: read('play.html'), sitemap: read(SITEMAP), png: bin(OG_IMAGE) };
+  const miss = seoGap(now);
+  const fakePng = Buffer.from(now.png ?? Buffer.alloc(32));
+  fakePng.writeUInt32BE(OG_W - 1, 16);
+  const ctl = {
+    'ถอด canonical': { ...now, index: now.index.replace(/<link rel="canonical"[^>]*>\n/, '') },
+    'JSON-LD พัง': { ...now, index: now.index.replace('<script type="application/ld+json">[', '<script type="application/ld+json">[,') },
+    'ภาพผิดขนาด': { ...now, png: fakePng },
+    'sitemap มีหน้าติดรหัส': { ...now, sitemap: now.sitemap.replace('</urlset>', `  <url><loc>${SITE}about.html</loc></url>\n</urlset>`) },
+  };
+  const ctlBad = Object.entries(ctl).filter(([, v]) => !seoGap(v).length).map(([k]) => k);
+  check('SEO หน้าแรก (canonical · og:image จริง · JSON-LD) · play มี description/canonical · sitemap ทุก URL ไฟล์จริงไม่ noindex', miss.length || ctlBad.length, ` sitemap ${[...now.sitemap.matchAll(/<loc>/g)].length} URL${miss.length ? ` · ${miss.join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
+}
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 process.exit(fail ? 1 : 0);

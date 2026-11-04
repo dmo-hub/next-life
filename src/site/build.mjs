@@ -1,5 +1,5 @@
 // หน้าเว็บนอกตัวเกม (B65): ฉีดตัวเลขลงหน้าที่เขียนมือ + สร้างหน้ารวมการ์ดและหน้าเฉลยจากแม่แบบ · เรียกจาก build.mjs ทุกครั้ง
-import { readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, unlinkSync, existsSync } from 'node:fs';
 import { siteFacts, injectFacts } from './facts.mjs';
 import { catalogHtml } from './catalog.mjs';
 import { spoilersHtml } from './spoilers.mjs';
@@ -11,6 +11,10 @@ import { injectNav } from './nav.mjs';
 import { uiPage, designMoved, UI_PAGE } from './ui.mjs';
 import { soonCats, soonIds, injectRoadmap } from './roadmap.mjs';
 import { GAME_CSS_PAGES, gameCss, injectGameCss } from './game-css.mjs';
+import { gatedFiles, injectGate, readGateHash } from './gate.mjs';
+import { injectSeo, sitemapXml, faviconSvg, SITEMAP, FAVICON_SVG } from './seo.mjs';
+import { ART_INK } from '../ui/art.mjs';
+import { DOCS_TWEAK_PAGE, docsTweakData, injectDocsTweak } from './docs-tweak.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
@@ -28,13 +32,12 @@ export const GEN_PAGES = [
 export function buildSite(content, root = new URL('../../', import.meta.url), facts = siteFacts(content)) {
   const at = (p) => new URL(p, root);
   const out = [];
-  // แผนงานหน้าแรกอ่านหมวดจาก whatsnew ก่อน (ui-redo 23)
-  const cats = soonCats(readFileSync(at('docs/whatsnew.html'), 'utf8'));
   for (const name of FACT_PAGES) {
     const file = at(`docs/${name}.html`);
     const html = readFileSync(file, 'utf8');
     const filled = injectFacts(html, facts, `docs/${name}.html`);
-    const next = injectNav(name === 'index' ? injectRoadmap(filled, cats, 'docs/index.html') : filled, `${name}.html`);
+    // SEO หน้าแรก (ui-redo 68) อ่าน title/description หลังฉีดเลขแล้ว
+    const next = injectNav(name === 'index' ? injectSeo(filled, 'docs/index.html') : filled, `${name}.html`);
     if (next !== html) writeFileSync(file, next);
     out.push(name);
   }
@@ -72,8 +75,22 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   }
   for (const file of NAV_PAGES) {
     const html = readFileSync(at(`docs/${file}`), 'utf8');
-    const next = injectNav(file === 'whatsnew.html' ? soonIds(html) : html, file);
+    // แถวหมวดแผนงานใต้หัวกำลังทำ (ui-redo 69) อ่านหมวดจากหน้าเดียวกัน
+    const next = injectNav(file === 'whatsnew.html' ? injectRoadmap(soonIds(html), soonCats(html), 'docs/whatsnew.html') : html, file);
     if (next !== html) writeFileSync(at(`docs/${file}`), next);
   }
+  // หน้า tweak เว็บเอกสาร (ui-redo 32): รายการหน้าคิดหลังทุกหน้าข้างบนเขียนเสร็จ ⇒ หน้าที่เพิ่ง build ใหม่อยู่ในรายการด้วย
+  const dt = readFileSync(at(`docs/${DOCS_TWEAK_PAGE}`), 'utf8');
+  const dtNext = injectDocsTweak(dt, docsTweakData(at('docs/'), readFileSync(at('src/ui/template.html'), 'utf8')), `docs/${DOCS_TWEAK_PAGE}`);
+  if (dtNext !== dt) writeFileSync(at(`docs/${DOCS_TWEAK_PAGE}`), dtNext);
+  out.push(DOCS_TWEAK_PAGE.replace(/\.html$/, ''));
+  // กล่องรหัส (ui-redo 72) ฉีดท้ายสุด — หน้าที่ build สร้างใหม่ข้างบนต้องได้บล็อกด้วย · play.html (build.mjs เขียน) ไม่ติดรหัสอยู่แล้ว
+  const hash = readGateHash();
+  for (const file of gatedFiles(at('docs/'))) {
+    const html = readFileSync(at(`docs/${file}`), 'utf8');
+    const next = injectGate(html, hash, file);
+    if (next !== html) writeFileSync(at(`docs/${file}`), next);
+  }
+  for (const [file, body] of [[SITEMAP, sitemapXml()], [FAVICON_SVG, faviconSvg(ART_INK)]]) if (!existsSync(at(`docs/${file}`)) || readFileSync(at(`docs/${file}`), 'utf8').replace(/\r\n/g, '\n') !== body) writeFileSync(at(`docs/${file}`), body);
   return { facts, pages: out };
 }

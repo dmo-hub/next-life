@@ -9,6 +9,7 @@ import { STAT_LABELS } from '../engine/life.mjs';
 import { SHOWN_STATS, BTN } from '../ui/labels.mjs';
 import { movedHtml } from './nav.mjs';
 import { DESIGN_AT } from './design.mjs';
+import { PUBLIC_HIDE } from './gate.mjs';
 
 export const UI_PAGE = 'dev/ui.html';
 // หน้าที่ย้ายมาหน้านี้ — design.html เดิมคือดีไซน์ UI ตามคำเจ้าของ (ข้อ 42 · 57) ไม่ใช่สารบัญคำตัดสินเกม
@@ -146,4 +147,5 @@ export function uiPage(content, docs, tpl = readFileSync(TEMPLATE, 'utf8')) {
 }
 
 // หน้าส่งต่อของที่เดิมใต้ docs/ ของหน้าคำตัดสินเกม — design.html ไปหน้านี้ ที่เหลือไปหน้าเดิมใต้ dev/
-export const designMoved = (file, title) => (file === UI_MOVED_FROM ? movedHtml(file, UI_PAGE, UI_TITLE) : movedHtml(file, DESIGN_AT + file, title));
+// หน้าส่งต่อไม่ติดรหัส (ui-redo 70) ⇒ ชื่อเรื่องที่มีคำซ่อนใช้ชื่อกลาง
+export const designMoved = (file, title) => (file === UI_MOVED_FROM ? movedHtml(file, UI_PAGE, UI_TITLE) : movedHtml(file, DESIGN_AT + file, PUBLIC_HIDE.test(title) ? 'คำตัดสินเกม' : title));

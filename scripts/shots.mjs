@@ -10,6 +10,7 @@ import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { UI_SHOTS_AT, UI_SHOT_W } from '../src/site/ui.mjs';
+import { GATE_KEY, readGateHash } from '../src/site/gate.mjs';
 
 const require = createRequire(import.meta.url);
 let pw;
@@ -24,7 +25,9 @@ const pageUrl = (p) => new URL(p, docs).href;
 
 // ตรึงเวลา + สุ่มของหน้า (mulberry32) ก่อนสคริปต์เกมรัน · localStorage ว่างทุกครั้ง (ไม่มีการ์ดเล่นต่อ)
 // clock = เวลาเดินด้วย page.clock แทน — หน้าเล่นมีตัวกันคลิกรอแอนิเมชันจบ (fxGate) เวลานิ่งที่ 0 จะกดอะไรไม่ได้เลย
-const freeze = ({ seed, clock }) => {
+// หน้าติดรหัส (ui-redo 72): ตั้งค่าผ่านด่านไว้ก่อน ⇒ วัดล้นจอจากเนื้อหน้าจริง ไม่ใช่กล่องรหัส
+const gate = [GATE_KEY, String(readGateHash())];
+const freeze = ({ seed, clock, gate }) => {
   let a = seed >>> 0;
   Math.random = () => {
     a = (a + 0x6d2b79f5) >>> 0;
@@ -43,6 +46,7 @@ const freeze = ({ seed, clock }) => {
     performance.now = () => Date.now() - d0;
   }
   try { localStorage.clear(); } catch {}
+  try { sessionStorage.setItem(...gate); } catch {}
 };
 
 const browser = await pw.chromium.launch(process.env.PW_EXE ? { executablePath: process.env.PW_EXE } : {});
@@ -53,7 +57,7 @@ async function open(file, width, seed = 7) {
   const errors = [];
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
   page.on('pageerror', (e) => errors.push(String(e)));
-  await page.addInitScript(freeze, { seed });
+  await page.addInitScript(freeze, { seed, gate });
   await page.goto(pageUrl(file));
   return { page, errors };
 }
@@ -89,7 +93,7 @@ async function playLife(w, t) {
   // install อย่างเดียวเวลายังเดินตามนาฬิกาจริง ⇒ seed ชีวิต (Date.now ^ performance.now) ต่างทุกรอบ · pauseAt หยุดไว้ เดินเฉพาะ runFor
   await page.clock.install({ time: t });
   await page.clock.pauseAt(t + 1000);
-  await page.addInitScript(freeze, { seed: 7, clock: true });
+  await page.addInitScript(freeze, { seed: 7, clock: true, gate });
   await page.goto(pageUrl('play.html'));
   await page.clock.runFor(2000);
   if (await page.locator('.sheet').count()) {
