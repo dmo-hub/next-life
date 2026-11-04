@@ -2203,6 +2203,8 @@ function render(card) {
         if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageView(st.lineage, st.cls));
         body.append(box);
       }
+      // ใบสืบทอดยาว/จอเตี้ยดันปุ่มหลุดใต้เมนูล่าง — ปุ่มติดจอแทนการพับเนื้อ (เจ้าของสั่งผังตระกูลครบทุกรุ่น)
+      choices.classList.add('pin');
       choices.append(enter(button(BTN.next, null, next)));
       if (canReroll()) choices.append(button(BTN.reroll, 'ได้ครั้งเดียว', reroll));
     } else if (card.kind === 'stage') {

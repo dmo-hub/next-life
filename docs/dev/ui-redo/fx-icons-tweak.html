@@ -248,6 +248,10 @@ body:has(.mnav) .foot { display:none; }
 .a .spark.echo path:not(.hit) { stroke:var(--ink2); } .a .spark .mk.arc circle { fill:var(--ink2); stroke:none; } .a .echo-list { color:var(--ink2); }
 .b .spark.echo path:not(.hit) { stroke:var(--gold2); } .b .spark .mk.arc circle { fill:var(--gold2); stroke:none; } .b .echo-list { color:var(--sand); }
 .choices { padding:8px 20px 20px; display:flex; flex-direction:column; gap:10px; margin-top:auto; }
+/* การ์ดเปิดชีวิต (ui-redo ใบ 74): ปุ่มติดเหนือเมนูล่างเมื่อเนื้อยาวเกินจอ · sticky ยังกินที่ในการ์ด เลื่อนสุดแล้วบรรทัดท้ายจึงอยู่เหนือปุ่ม ไม่จมใต้ปุ่ม
+   · พื้นทึบสีกระดาษ เนื้อที่เลื่อนผ่านไม่ทะลุหลังปุ่ม · เงาบนบอกว่ายังมีเนื้อต่อข้างใต้ */
+.choices.pin { position:sticky; bottom:0; z-index:2; background:var(--paper); border-radius:0 0 var(--rk) var(--rk); box-shadow:0 -10px 12px -10px rgb(0 0 0 / .18); }
+body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)); }
 .choice { all:unset; box-sizing:border-box; min-height:52px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; border-radius:var(--r); cursor:pointer; font-size:15px; }
 /* เลขปุ่มลัดนำหน้าตัวเลือก (ui-redo ใบ 02) — ข้อความตัวเลือกกินที่ที่เหลือ ป้ายผลยังชิดขวา */
 .choice > kbd { display:inline-grid; place-items:center; width:26px; height:26px; flex:none; font:600 13px/1 var(--ft); border:1px solid var(--rule2); border-radius:var(--rc); color:var(--muted); }
@@ -602,6 +606,7 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
   .mnav button:hover { background:var(--paper2); }
   .mnav button[aria-expanded="true"] { background:var(--paper2); box-shadow:inset 3px 0 0 var(--fl); }
   .mnav .new-dot { position:static; margin-left:6px; }
+  body:has(.mnav) .choices.pin { bottom:env(safe-area-inset-bottom); }
   .sheet { top:0; bottom:0; left:auto; width:min(var(--sheet-w), 100vw - var(--rail-w)); max-width:none; max-height:none; margin:0; padding-right:max(20px, env(safe-area-inset-right)); border-left:1px solid var(--rule2); border-radius:0; box-shadow:-10px 0 30px rgb(0 0 0 / .2); }
 }
 @media (orientation: landscape) and (max-height: 540px) {
