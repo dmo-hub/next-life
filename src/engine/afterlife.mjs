@@ -29,9 +29,27 @@ export const REALMS = [
   { id: 'deva', name: 'เทวดา', upTo: Infinity },
 ];
 export const realmOf = (x) => REALMS.find((r) => x <= r.upTo);
-// ฉากที่เนื้อหาเขียนได้ · realm/ancestor แยกตามภูมิได้ด้วย field realm
-export const SCENES = ['transfer', 'devaduta', 'realm', 'ancestor'];
-export const REALM_SCENES = ['realm', 'ancestor'];
+// ฉากที่เนื้อหาเขียนได้ · realm/ancestor/loop แยกตามภูมิได้ด้วย field realm · loop = การ์ดปีละใบในวงปรโลก
+export const SCENES = ['transfer', 'devaduta', 'realm', 'ancestor', 'loop'];
+export const REALM_SCENES = ['realm', 'ancestor', 'loop'];
+
+// วงปรโลก (03a): หลังฉากภูมิปลายทาง อยู่ในภูมิปีละ 1 การ์ด จนครบปีหรือชีวิตทิพย์หมด แล้วไปการ์ดส่งต่อ
+// 4 ค่าบนจอใช้คีย์ค่าสถานะเดิม สเกล 0–100 แบบแถบชีวิต — การ์ดวงเขียน effects ชุดเดียวกับฉากอื่นได้ แต่ผลลงค่าวง ไม่ใช่ค่าเริ่มชาติหน้า
+// ปีทิพย์ = base + |สุทธิ| ÷ div เพดาน cap · ชีวิตทิพย์ลดเองปีละ drain + ผลการ์ด · ปัญญาธรรม/ความผูกพันเริ่มที่ inherit × ความรู้/ความสัมพันธ์ตอนตาย
+// เข้าวงเฉพาะทางเป็นลูก/เกิดใหม่ — คนถูกเรียกตัวและทางต่างโลกไปเล่นชาติต่างโลกแทน
+// วงใช้ stream สุ่มของตัวเองและไม่แตะบัญชี/ค่าเริ่มชาติหน้า ⇒ ทายาทเกิดเหมือนก่อนมีวงทุกไบต์
+export const LOOP = {
+  base: 3,
+  div: 2,
+  cap: 30,
+  drain: 2,
+  inherit: 0.5,
+  start: { hell: { health: 30, happiness: 10 }, peta: { health: 40, happiness: 25 }, beast: { health: 50, happiness: 40 }, human: { health: 60, happiness: 50 }, deva: { health: 100, happiness: 90 } },
+  paths: ['child', 'reborn'],
+};
+export const LOOP_LABELS = { health: 'ชีวิตทิพย์', happiness: 'สุข/ทุกข์', knowledge: 'ปัญญาธรรม', relations: 'ความผูกพัน' };
+export const LOOP_KEYS = Object.keys(LOOP_LABELS);
+export const loopYears = (net) => Math.min(LOOP.cap, LOOP.base + Math.floor(Math.abs(net) / LOOP.div));
 
 // ส่งต่อข้ามชาติ (ใบ 09): ฝั่งที่ชี้ปลายทางถูกหักไปส่วนหนึ่งก่อน แล้วสุ่มส่งต่อ min–max ของที่เหลือ
 export const CARRY = { spend: 0.5, min: 0.3, max: 0.7 };
@@ -75,8 +93,10 @@ export function startAfterlife(st) {
     st,
     rng: makeRng(st.seed ^ 0x1b873593),
     botRng: makeRng(st.seed ^ 0x2545f491),
-    steps: ['transfer', 'devaduta', 'verdict', 'path', 'scene', 'carry'],
+    // เซฟก่อนมีวงเก็บ steps ชุดเดิม (ไม่มี loop) ⇒ โหลดแล้วเล่นแบบเดิมจนเกิด
+    steps: ['transfer', 'devaduta', 'verdict', 'path', 'scene', 'loop', 'carry'],
     i: 0,
+    loop: null,
     queue: [],
     pending: null,
     bonus: {},
@@ -110,11 +130,11 @@ export function heirCandidates(st) {
 }
 
 // ฉากของช่วงที่ 7: เนื้อหาที่ตรงเงื่อนไขของผู้ตาย สุ่มตามน้ำหนัก · ด่าน afterlife-coverage รับประกันว่ามีใบไม่มีเงื่อนไขเสมอ
-function pickScene(af, scene) {
+function pickScene(af, scene, rng = af.rng) {
   const realm = af.verdict?.realm.id;
   const pool = af.st.content.events.filter((e) => e.stage === AFTERLIFE_STAGE && e.scene === scene && (!e.realm || e.realm.includes(realm)) && whenOk(af.st, e.when));
   if (!pool.length) throw new Error(`ไม่มีฉาก ${scene} ที่ออกได้ (ภูมิ ${realm})`);
-  return weighted(af.rng, pool, pool.map((e) => (e.weight ?? 1) * poolMultiplier(af.st, e.multipliers)));
+  return weighted(rng, pool, pool.map((e) => (e.weight ?? 1) * poolMultiplier(af.st, e.multipliers)));
 }
 
 // ผลของฉากระหว่างชาติต่อค่าสถานะ = ค่าเริ่มของชาติหน้า · บุญบาปไม่ขึ้นป้ายเหมือนการ์ดชีวิต
@@ -150,10 +170,12 @@ function verdictCard(af) {
   const x = verdictLevel(ledger);
   const realm = realmOf(x);
   // กำหนดเวลาในภูมิ (ใบ 02: โทษมีกำหนดเวลา) เป็นสีสันของการ์ด — เวลานรกเทียบเวลามนุษย์ไม่ได้ จึงไม่ผูกปีเกิดชาติหน้า
-  const term = realm.id === 'human' ? 0 : Math.max(1, Math.round(Math.abs(netLedger(ledger)) * 10));
+  // รอบที่มีวงต่อ (steps มี loop) กำหนดเท่าปีทิพย์ที่จะเล่นจริง — คำบนการ์ดกับจำนวนปีในวงต้องตรงกัน
+  const loops = af.steps.includes('loop') && !af.st.flags?.isekai_call;
+  const term = loops ? loopYears(netLedger(ledger)) : realm.id === 'human' ? 0 : Math.max(1, Math.round(Math.abs(netLedger(ledger)) * 10));
   af.verdict = { x, net: netLedger(ledger), realm, term };
   af.thaiVerdict ??= af.verdict;
-  const where = realm.id === 'human' ? 'ไปเกิดเป็นมนุษย์ทันที ไม่ต้องรอ' : `ไปภูมิ${realm.name} กำหนด ${term} ปีของภูมินั้น`;
+  const where = loops ? (realm.id === 'human' ? `รอเกิดเป็นมนุษย์อีก ${term} ปีทิพย์` : `ไปภูมิ${realm.name} กำหนด ${term} ปีทิพย์`) : realm.id === 'human' ? 'ไปเกิดเป็นมนุษย์ทันที ไม่ต้องรอ' : `ไปภูมิ${realm.name} กำหนด ${term} ปีของภูมินั้น`;
   const back = af.from ? `ดวงวิญญาณของ${af.from.name}ถูกดึงกลับจากต่างโลกมายืนหน้าปรโลกอีกครั้ง ` : '';
   return emitAfter(af, {
     kind: 'verdict',
@@ -277,14 +299,93 @@ function sendToIsekai(af) {
   });
 }
 
+const clamp100 = (v) => Math.max(0, Math.min(100, v));
+
+function startLoop(af) {
+  const st = af.st;
+  const realm = af.verdict.realm.id;
+  const half = (k) => Math.round(clamp100(st[k] ?? 50) * LOOP.inherit);
+  return { rng: makeRng(st.seed ^ 0x3c6ef372), realm, year: 0, years: loopYears(af.verdict.net), ...LOOP.start[realm], knowledge: half('knowledge'), relations: half('relations'), cards: 0, end: null };
+}
+const loopOver = (l) => l.year >= l.years || l.health <= 0;
+
+// การ์ดในวงไม่นับใน af.cards (เหมือนการ์ดต่างโลก) — ความยาววงขึ้นกับปีทิพย์ แยกจากด่านความยาวฉากระหว่างชาติ
+// ทุกใบพกค่าวงตอนนั้นไปให้จอวาดแถบ · year = ปีของใบนั้น (การ์ดปีใหม่ = ปีที่กำลังเล่น · การ์ดผล/จบวง = ปีที่เพิ่งผ่าน)
+function loopEmit(af, card) {
+  const l = af.loop;
+  l.cards++;
+  const { rng, cards, ...view } = l;
+  return { stage: AFTERLIFE_STAGE, ...card, loop: { ...view, year: card.kind === 'scene' ? l.year + 1 : l.year } };
+}
+
+function loopFx(c) {
+  const out = Object.entries(c.effects ?? {}).filter(([k]) => LOOP_KEYS.includes(k)).map(([k, v]) => `${LOOP_LABELS[k]} ${v > 0 ? '↑' : '↓'}`);
+  if (c.outcomes?.length) out.push('?');
+  return out.join(' · ');
+}
+
+function loopCard(af) {
+  const ev = pickScene(af, 'loop', af.loop.rng);
+  af.pending = ev;
+  return loopEmit(af, {
+    kind: 'scene',
+    id: ev.id,
+    type: 'B',
+    scene: 'loop',
+    title: ev.title ? fill(ev.title, af.st) : null,
+    text: fill(ev.text, af.st),
+    choices: ev.choices.map((c) => fill(c.text, af.st)),
+    ...choiceHints(ev, af.st),
+    fx: ev.choices.map(loopFx),
+  });
+}
+
+function loopEndCard(af) {
+  const l = af.loop;
+  l.end = l.health <= 0 ? 'spent' : 'served';
+  const text = l.end === 'spent'
+    ? `ชีวิตทิพย์หมดลงในปีที่ ${l.year} ก่อนครบกำหนด ${l.years} ปี ดวงวิญญาณจึงถูกพาไปรอเกิดเร็วกว่าที่ชี้ไว้`
+    : `ครบกำหนด ${l.years} ปีทิพย์ในภูมิ${af.verdict.realm.name} ดวงวิญญาณถูกพาไปรอเกิด`;
+  return loopEmit(af, { kind: 'loopEnd', type: 'B', text, choices: [] });
+}
+
+function addLoop(l, fx = {}) {
+  for (const k of LOOP_KEYS) if (fx[k]) l[k] = clamp100(l[k] + levelValue(fx[k]));
+}
+
+// ผลในวงลงค่าวงอย่างเดียว · ป้ายบุญบาปบนการ์ดวงเป็น neutral (ด่าน lint) จึงไม่ลงบัญชี · ปีเดินหลังผลการ์ด
+function chooseLoop(af, ev, idx) {
+  const c = ev.choices[idx];
+  if (!c) throw new Error('ตัวเลือกไม่ถูกต้อง');
+  af.pending = null;
+  const l = af.loop;
+  addLoop(l, c.effects);
+  const o = c.outcomes?.length ? weighted(l.rng, c.outcomes, c.outcomes.map((x) => x.weight * poolMultiplier(af.st, x.multipliers))) : null;
+  if (o) addLoop(l, o.effects);
+  l.health = clamp100(l.health - LOOP.drain);
+  l.year++;
+  if (o?.text) af.queue.push({ kind: 'result', type: 'B', text: fill(o.text, af.st), choices: [], loop: true });
+}
+
 // การ์ดถัดไปของช่วงที่ 7 · การ์ด carry (done) เป็นใบสุดท้าย แล้วผู้เรียกต่อ nextLife
 export function nextAfterCard(af) {
   if (af.pending) throw new Error('ยังมีการ์ดที่รอเลือก');
   if (af.isekai?.ending) closeIsekai(af);
   // การ์ดต่างโลกไม่นับใน af.cards — ความยาวช่วงที่ 7 (ด่าน lineage) วัดเฉพาะการ์ดระหว่างชาติ
   if (af.isekai) return { stage: AFTERLIFE_STAGE, ...nextIsekaiCard(af.isekai) };
-  if (af.queue.length) return emitAfter(af, af.queue.shift());
+  if (af.queue.length) {
+    const q = af.queue.shift();
+    return q.loop ? loopEmit(af, q) : emitAfter(af, q);
+  }
   const step = af.steps[af.i++];
+  if (step === 'loop') {
+    if (!LOOP.paths.includes(af.path)) return nextAfterCard(af);
+    af.loop ??= startLoop(af);
+    if (loopOver(af.loop)) return loopEndCard(af);
+    // ค้างที่ขั้นวงจนจบวง — เซฟกลางวงเก็บ i ชี้ขั้นนี้
+    af.i--;
+    return loopCard(af);
+  }
   if (step === 'transfer' || step === 'devaduta') return sceneCard(af, pickScene(af, step));
   if (step === 'verdict') return verdictCard(af);
   // กดรับการ์ดชวนในชีวิต (B68d) = ถูกเรียกไปแล้ว ไม่มีการ์ดเลือกทางเกิด
@@ -319,6 +420,7 @@ export function chooseAfter(af, idx, heirId = null) {
     if (path.id === 'isekai') sendToIsekai(af);
     return;
   }
+  if (p?.scene === 'loop') return chooseLoop(af, p, idx);
   const c = p?.choices[idx];
   if (!c) throw new Error('ตัวเลือกไม่ถูกต้อง');
   af.pending = null;
