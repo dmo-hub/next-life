@@ -3,8 +3,12 @@
 // object ที่ถูกอ้างหลายที่ (af.st = st · kinLoss ชี้คนใน kin · thaiVerdict) เก็บครั้งเดียวแล้วอ้างด้วยเลข — ต่อกลับเป็นตัวเดียวกัน
 import { makeRng } from './rng.mjs';
 import { pickRealName } from './birth.mjs';
+import { OFFICE_V1 } from './rank.mjs';
 
 export const SNAP_V = 1;
+// o = รุ่นเลขขั้นการเมืองในภาพถ่าย · ภาพถ่ายไม่มี o = เลขขั้นก่อนรวบผู้ใหญ่บ้าน/กำนัน (05a) — แปลงตอนโหลด ไม่ขึ้น SNAP_V เพราะโครงภาพถ่ายเหมือนเดิม
+export const OFFICE_SCHEME = 2;
+const OFFICE_V1_SUB = ['ผู้ใหญ่บ้าน', 'กำนัน'];
 const isRng = (v) => typeof v.next === 'function' && typeof v.int === 'function';
 
 export function snapshot(root, content) {
@@ -30,7 +34,7 @@ export function snapshot(root, content) {
     const body = Array.isArray(v) ? v.map(enc) : Object.fromEntries(Object.entries(v).map(([k, x]) => [k, enc(x)]));
     return shared ? { $id: ids.get(v), $v: body } : body;
   };
-  return JSON.stringify({ v: SNAP_V, root: enc(root) });
+  return JSON.stringify({ v: SNAP_V, o: OFFICE_SCHEME, root: enc(root) });
 }
 
 // การ์ดเนื้อหาที่ id หายจากเนื้อหาใหม่ = null (ผู้เรียกทิ้งแล้วจั่วใหม่) · ตัวสุ่มคืนเป็นตัวใหม่ที่เดินต่อจากเลขเดิม
@@ -56,7 +60,30 @@ export function restore(text, content) {
     }
     return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, dec(x)]));
   };
-  return dec(snap.root);
+  const root = dec(snap.root);
+  if (snap.o !== OFFICE_SCHEME) officeV1(root, content);
+  return root;
+}
+
+// เลขขั้นการเมืองของเซฟเก่าอยู่ 3 ที่: ตำแหน่งตอนนี้ (office.rank) · ตำแหน่งสูงสุด (officeTop) · ผังตระกูล/ผลการ์ดเลือกตั้งที่ค้าง (office เป็นเลข)
+// เดินทั้งก้อนครั้งเดียว ข้ามเนื้อหาเกม — object ที่อ้างซ้ำ (af.st = st) แปลงครั้งเดียว · กำนัน/ผู้ใหญ่บ้านเดิมเก็บเป็นชื่อย่อยของผู้นำท้องถิ่น
+function officeV1(root, content) {
+  const skip = new Set([content, ...content.events]);
+  const seen = new Set();
+  const map = (r) => (r >= 0 ? OFFICE_V1[r] ?? r : r);
+  const walk = (v) => {
+    if (v === null || typeof v !== 'object' || skip.has(v) || seen.has(v) || typeof v.next === 'function') return;
+    seen.add(v);
+    if (typeof v.officeTop === 'number') v.officeTop = map(v.officeTop);
+    if (typeof v.office === 'number') v.office = map(v.office);
+    else if (typeof v.office?.rank === 'number' && !seen.has(v.office)) {
+      seen.add(v.office);
+      if (OFFICE_V1_SUB[v.office.rank]) v.office.sub = OFFICE_V1_SUB[v.office.rank];
+      v.office.rank = map(v.office.rank);
+    }
+    for (const x of Array.isArray(v) ? v : Object.values(v)) walk(x);
+  };
+  walk(root);
 }
 
 // ซ่อมสถานะชีวิตหลังโหลดบนเนื้อหาใหม่: ของที่อ้าง id แล้ว id หาย ให้ทางปลอดภัยแทนการพัง

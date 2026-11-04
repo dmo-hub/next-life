@@ -350,14 +350,14 @@ const lastN = (xs, n, ok) => xs.length >= n && xs.slice(-n).every(ok);
 // เป้าตระกูล (B95b · เจ้าของเคาะ) — ได้ฉายาทุกรุ่นที่ยังเข้าเงื่อนไข · ชื่อเสียง +1 ครั้งเดียวต่อตระกูล (afterlife.mjs นับจาก lineage[].goals)
 // ฐานะตอนตายอ่านจากจุดท้ายของ standing · rags = เกิดชั้น 1–2 แล้วภายในสามรุ่น (นับรุ่นนั้นด้วย) มีคนตายในฐานะ 9–10
 const deathCls = (l) => l.standing?.at(-1)?.cls ?? CLASSES.indexOf(l.cls);
-// service = รับราชการสายที่มีบำนาญ (พลเรือน ทหาร ตำรวจ) · office 2 = นายก อบต.
+// service = รับราชการสายที่มีบำนาญ (พลเรือน ทหาร ตำรวจ) · office 1 = นายก อบต.
 const RAGS = { from: 1, to: 8, within: 3 };
 const runOf = (ch, n, ok) => ch.some((_, i) => i + n <= ch.length && ch.slice(i, i + n).every(ok));
 const rags = (ch) => ch.some((l, i) => CLASSES.indexOf(l.cls) <= RAGS.from && ch.slice(i, i + RAGS.within).some((m) => deathCls(m) >= RAGS.to));
 export const FAMILY_GOALS = [
   { id: 'goal_rags', name: 'จากยากไร้สู่มั่งคั่ง', hint: 'รุ่นที่เกิดมายากไร้ ภายในสามรุ่นมีคนจากไปอย่างมั่งคั่ง', test: (ch) => rags(ch) },
   { id: 'goal_service', name: 'สามรุ่นรับราชการ', hint: 'สามรุ่นติดกันรับราชการจนมีบำนาญ', test: (ch) => runOf(ch, 3, (l) => l.service) },
-  { id: 'goal_politics', name: 'ตระกูลการเมือง', hint: 'สองรุ่นได้ตำแหน่งตั้งแต่นายก อบต. ขึ้นไป', test: (ch) => ch.filter((l) => (l.office ?? -1) >= 2).length >= 2 },
+  { id: 'goal_politics', name: 'ตระกูลการเมือง', hint: 'สองรุ่นได้ตำแหน่งตั้งแต่นายก อบต. ขึ้นไป', test: (ch) => ch.filter((l) => (l.office ?? -1) >= 1).length >= 2 },
   { id: 'goal_great', name: 'ตระกูลใหญ่', hint: 'ชื่อเสียงตระกูลขึ้นถึงขั้นสูงสุด', test: (ch) => ch.some((l) => (l.fame ?? 0) >= 3) },
 ];
 // ผังตระกูลรวมชีวิตนี้ตอนตาย — แถวท้ายมีฐานะตอนตาย (ตายพร้อมหนี้ = 0) กับชื่อเสียงที่รับมา

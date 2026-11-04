@@ -2,7 +2,7 @@
 // อ่านอย่างเดียว ไม่ดึงเลขสุ่ม ไม่เขียน state — ชีวิตเดินเหมือนไม่มีป้าย
 // บอกทิศ ไม่บอกเลขเกณฑ์ ไม่บอกโอกาส · ด่านที่ตัดสินด้วยน้ำหนัก (สอบมหาวิทยาลัย เลือกตั้ง) ไม่บอกเงื่อนไข · บุญบาปไม่ขึ้นป้าย
 import { TRACKS } from './career.mjs';
-import { PROMO, OFFICE, officeFull, stepName, ladderOf } from './rank.mjs';
+import { PROMO, OFFICE, officeFull, officeNext, stepName, ladderOf } from './rank.mjs';
 import { isWorking, moodMul, schoolOf } from './life.mjs';
 
 // ข้อความสั้นแบบ "ขาด…" — ป้ายต้องไม่ทำให้แถบหัวการ์ดตกบรรทัดเพิ่ม (เจ้าของเคาะ B89 A6)
@@ -25,7 +25,7 @@ function schoolGoal(st) {
 // ครบวาระเมื่อไร + ขั้นที่ลุ้นต่อ · ยอดสาย = ไม่ขึ้น · ท้องถิ่นที่พ้นตำแหน่งตามอายุก่อนครบวาระ = ไม่ขึ้น
 function officeGoal(st) {
   const steps = st.content.era.careers.office.steps;
-  const up = steps[st.office.rank + 1];
+  const up = steps[officeNext(steps, st.office.rank)];
   if (!up) return null;
   if (!officeFull(st) && st.office.next > OFFICE.ageTo + 1) return null;
   const n = st.office.next - st.age;

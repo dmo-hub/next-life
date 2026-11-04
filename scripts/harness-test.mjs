@@ -465,6 +465,71 @@ const f2 = (v) => v.toFixed(2);
   check('ไอเทม: เซฟก่อนมีระบบโหลดได้ ช่องว่าง', !!old && !('items' in old) && Object.values(E.itemsOf(old).wear).every((x) => x === null));
 }
 
+// 05a ผู้นำท้องถิ่น: บันไดรวบผู้ใหญ่บ้าน/กำนัน · ชนะแล้วได้ชื่อย่อยแบบสุ่ม · หัวหน้าพรรคเป็นช่องว่างที่ชิงข้าม · เซฟเลขขั้นเก่าแปลงตอนโหลด
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const steps = content.era.careers.office.steps;
+  const subs = new Set();
+  for (let i = 0; i < 60; i++) {
+    const st = newLife(mixSeed(5, i), content);
+    st.age = 40;
+    E.setOffice(st, 0);
+    subs.add(st.office.sub);
+  }
+  check('ผู้นำท้องถิ่น: บันได 5 ขั้น ไม่มีขั้นกำนันแยก · ชนะได้ทั้งผู้ใหญ่บ้านและกำนัน (60 ชีวิต)', steps.length === 5 && steps[0].name === 'ผู้นำท้องถิ่น' && !steps.some((s) => s.name === 'กำนัน') && subs.has('ผู้ใหญ่บ้าน') && subs.has('กำนัน') && subs.size === 2, `${steps.map((s) => s.name).join(' → ')} · ${[...subs].join(' ')}`);
+  const st = newLife(mixSeed(5, 1), content);
+  st.ses = 'rural';
+  st.age = 40;
+  const winText = E.officeCard(st).choices[0].outcomes[0].text;
+  E.setOffice(st, 0);
+  const sub = st.office.sub;
+  st.age += 4;
+  E.setOffice(st, 0);
+  const kept = st.office.sub === sub;
+  const name = E.rankName(st);
+  const upCard = E.officeCard(st);
+  st.office = { rank: 2, since: st.age, next: st.age };
+  const mpCard = E.officeCard(st);
+  check('ผู้นำท้องถิ่น: การ์ดบอกชื่อย่อยตรงผล · รักษาตำแหน่งชื่อเดิม · ป้าย "ผู้นำท้องถิ่น (…)" · ชิงต่อ = นายก อบต. · ส.ส. ชิงข้ามช่องหัวหน้าพรรคไปนายกฯ', winText.endsWith(sub) && kept && name.endsWith(`ผู้นำท้องถิ่น (${sub})`) && upCard.id === 'office_1' && upCard.choices[0].text.includes('นายก อบต.') && mpCard.id === 'office_4' && mpCard.choices[0].outcomes[0].effects.office === 4, `${winText} · ${name} · ${upCard.choices[0].text} · ${mpCard.id}`);
+
+  // เซฟเก่า: กำนัน (ขั้น 1 เดิม) · ตำแหน่งสูงสุดกำนัน · ผังตระกูลรุ่นก่อนเป็น ส.ส. (ขั้น 3 เดิม) · ค้างการ์ดเลือกตั้งที่ชิงนายก อบต. (ขั้น 2 เดิม)
+  let life;
+  let card;
+  // ชีวิตแรกที่อยู่ถึง 40 (เซฟกลางชีวิตแบบคนนั่งตำแหน่งจริง)
+  for (let i = 0; i < 40 && !(life?.age >= 40); i++) {
+    life = newLife(mixSeed(5, 100 + i), content);
+    card = E.nextCard(life);
+    for (let k = 0; k < 300 && life.age < 40 && card.kind !== 'death' && !life.dead; k++) { if (card.choices?.length) E.choose(life, openChoices(card)[0] ?? 0); card = E.nextCard(life); }
+    if (card.kind === 'death' || life.dead) life.age = 0;
+  }
+  life.office = { rank: 1, since: life.age, next: life.age + 4 };
+  life.officeTop = 1;
+  life.lineage = [{ gen: 1, name: 'ปู่', sex: 'm', province: life.province, cls: life.cls, age: 70, cause: 'other', standing: [{ age: 70, cls: 3 }], fame: 1, office: 3, broke: false }];
+  const v1 = () => { const j = JSON.parse(E.snapshot({ st: life, af: null, card, ui: {} }, content)); delete j.o; return JSON.stringify(j); };
+  const pendCard = { id: 'office_2', category: 'society', type: 'A', text: 'ครบวาระกำนันแล้ว', choices: [{ text: 'ลงสมัครนายก อบต.', outcomes: [{ weight: 1, ok: true, text: 'ชนะ', effects: { office: 2 } }] }] };
+  const pj = JSON.parse(E.snapshot({ st: life, af: null, card: pendCard, ui: {} }, content));
+  delete pj.o;
+  const pendBack = E.restore(JSON.stringify(pj), content).card.choices[0].outcomes[0].effects.office;
+  const root = E.restore(v1(), content);
+  const s = root.st;
+  const stale = E.repairLife(s, root.card);
+  check('เซฟเก่ากำนัน: โหลดแล้วเป็นผู้นำท้องถิ่น (กำนัน) · ตำแหน่งสูงสุด 0 · ผังตระกูล ส.ส. = 2 · ผลการ์ดค้างชิงนายก อบต. = 1', s.office.rank === 0 && s.office.sub === 'กำนัน' && E.rankName(s).endsWith('ผู้นำท้องถิ่น (กำนัน)') && s.officeTop === 0 && s.lineage[0].office === 2 && pendBack === 1, `${E.rankName(s)} · top ${s.officeTop} · lineage ${s.lineage[0].office} · การ์ดค้าง ${pendBack}`);
+  let c = stale ? E.nextCard(s) : root.card;
+  const rng = makeRng(7);
+  let crash = null;
+  try {
+    for (let k = 0; k < 400 && c.kind !== 'death'; k++) {
+      if (c.choices?.length) { const open = openChoices(c); E.choose(s, open.length ? open[Math.floor(rng.next() * open.length)] : 0); }
+      c = E.nextCard(s);
+    }
+  } catch (e) { crash = String(e).slice(0, 120); }
+  check('เซฟเก่ากำนัน: เซฟตอนอายุ 40+ เล่นต่อจนตายไม่พัง', life.age >= 40 && !crash && c.kind === 'death', crash ?? `เซฟอายุ ${life.age} · ตายอายุ ${s.age}`);
+  // ตัวควบคุม: ภาพถ่ายรุ่นใหม่ (มี o) ต้องไม่ถูกแปลงซ้ำ — ไม่งั้นเลขขั้นเซฟใหม่เลื่อนลงทุกครั้งที่โหลด
+  const again = E.restore(E.snapshot({ st: life, af: null, card, ui: {} }, content), content).st;
+  check('  ตัวควบคุม: เซฟรุ่นใหม่โหลดแล้วเลขขั้นเดิม (ไม่แปลงซ้ำ)', again.office.rank === 1 && !again.office.sub && again.lineage[0].office === 3);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {

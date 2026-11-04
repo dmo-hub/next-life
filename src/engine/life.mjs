@@ -6,7 +6,7 @@ import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIn
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt, firstPay } from './finance.mjs';
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS, meritId, MERIT_LEVELS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './career.mjs';
-import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
+import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeName, budgetDue, budgetCard } from './rank.mjs';
 import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
 import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './court.mjs';
 import { introCard, eraStory } from './intro.mjs';
@@ -865,7 +865,7 @@ function stepYear(st) {
     if (promoDue(st)) st.due.push({ kind: 'eraEvent', ev: promoCard(st), age: st.age });
   }
   if (st.office && !officeFull(st) && st.age >= RETIRE_AGE) {
-    st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeStep(st).name}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง` });
+    st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeName(st)}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง` });
     st.office = null;
   }
   if (budgetDue(st)) officeDueCard(budgetCard(st));

@@ -379,9 +379,9 @@ export function loadCareers(fin) {
     return v;
   };
   const occIds = new Set(fin.occupations.map((o) => o.id));
-  const step = ({ name, occ, mul, suffix, full, pay }) => {
+  const step = ({ name, occ, mul, suffix, full, pay, subs, vacant }) => {
     if (occ && !occIds.has(occ)) throw new Error(`ขั้น ${name} อ้างอาชีพที่ไม่มี: ${occ}`);
-    return { name, occ, mul, suffix, full, ...(pay && { pay: pay.v * (mw(fin.refYear) / mw(pay.y)) }) };
+    return { name, occ, mul, suffix, full, ...(pay && { pay: pay.v * (mw(fin.refYear) / mw(pay.y)) }), ...(subs && { subs: subs.map(step) }), ...(vacant && { vacant }) };
   };
   const ladders = Object.fromEntries(Object.entries(c.ladders).map(([id, l]) => {
     for (const o of l.occs ?? []) if (!occIds.has(o)) throw new Error(`สาย ${id} อ้างอาชีพที่ไม่มี: ${o}`);

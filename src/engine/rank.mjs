@@ -53,13 +53,24 @@ PROMO.police = [
 // ผู้ใหญ่บ้าน/กำนันอยู่ได้ถึงอายุ 60 ตามกฎหมาย — ชวนลงสมัครครั้งแรกจึงหยุดก่อนนั้น (ซ้ำค่า RETIRE_AGE ของ life.mjs เพื่อไม่ import วน)
 const RETIRE_AT = 60;
 // net = ส่วนของค่าตอบแทนท้องถิ่นที่เหลือจริง · ติดลบ = ควักเนื้อเกินค่าตอบแทน (−0.25 = ขาดทุนหนึ่งในสี่ของค่าตอบแทน · −0.5 ขึ้นไปล้มละลายเกิน 8% บนฐานที่มีเงินสัตว์ B44) — ผู้ใหญ่บ้าน/กำนันต้องช่วยงานบวช งานศพ ค่าน้ำมันวิ่งงานชาวบ้าน (ค่าตั้ง)
-// campaign = ค่าหาเสียงต่อการลงสมัคร เป็นเท่าของเงินเก็บต่อปี × (ขั้น+1)
-export const OFFICE = { net: -0.25, campaign: 1.5, term: 4, entry: 0.2, minNet: 45, ageFrom: 25, ageTo: RETIRE_AT - 1, keep: 2.5, fame: 0.5, odds: [2, 1.2, 0.8, 0.5, 0.018] };
+// campaign = ค่าหาเสียงต่อการลงสมัคร เป็นเท่าของเงินเก็บต่อปี × tier ของขั้น
+// tier = น้ำหนักขั้นที่ค่าหาเสียง/งบกลางวาระ/ระดับยั่วทุจริตคูณ — คงค่าของบันไดก่อนรวบผู้ใหญ่บ้านกับกำนัน (05a) ขั้นเดิมจึงหนักเท่าเดิม
+// ขั้น 3 หัวหน้าพรรค = ช่องว่าง (vacant) จองเลขไว้ให้ 05b ไม่ต้องแปลงเลขเซฟซ้ำ — ยังไม่มีใครชิง odds/tier ของช่องนี้จึงยังไม่ใช้
+export const OFFICE = { net: -0.25, campaign: 1.5, term: 4, entry: 0.2, minNet: 45, ageFrom: 25, ageTo: RETIRE_AT - 1, keep: 2.5, fame: 0.5, odds: [2, 0.8, 0.5, 0.5, 0.018], tier: [1, 3, 4, 4, 5] };
+// เลขขั้นเซฟก่อนรวบ (ผู้ใหญ่บ้าน 0 · กำนัน 1 · นายก อบต. 2 · ส.ส. 3 · นายกฯ 4) → เลขขั้นตอนนี้ · save.mjs แปลงตอนโหลด
+export const OFFICE_V1 = [0, 0, 1, 2, 4];
 
 export const ladderOf = (st) => st.ladder && st.content.era.careers.ladders[st.ladder.id];
 const stepOf = (st) => ladderOf(st).steps[st.ladder.rank];
 export const officeStep = (st) => st.office && st.content.era.careers.office.steps[st.office.rank];
 export const officeFull = (st) => !!officeStep(st)?.full;
+// ขั้นผู้นำท้องถิ่นชนะแล้วเป็นผู้ใหญ่บ้านหรือกำนัน: ทอยจาก seed + อายุ ไม่ดึง stream ใด ๆ — ชีวิตที่ไม่ชนะเลขสุ่มไม่ขยับ · การ์ดกับผลได้ชื่อเดียวกัน
+const subOf = (step, st) => step.subs && step.subs[((Math.imul(st.seed ^ 0x2545f491, 0x9e3779b1) ^ st.age) >>> 0) % step.subs.length];
+const officeSub = (st) => officeStep(st)?.subs?.find((s) => s.name === st.office.sub);
+// ชื่อตำแหน่งบนจอ: ขั้นที่มีชื่อย่อย = "ผู้นำท้องถิ่น (กำนัน)"
+export const officeName = (st) => (officeSub(st) ? `${officeStep(st).name} (${st.office.sub})` : officeStep(st).name);
+// ขั้นถัดไปที่ชิงได้ (ข้ามช่องว่าง) · ไม่มี = -1
+export const officeNext = (steps, r) => steps.findIndex((s, i) => i > r && !s.vacant);
 
 // ค่าจ้างตามบัญชีเงินเดือน (บาท/เดือน ของปีอ้างอิงค่าจ้าง) ปรับตามดัชนีค่าแรงขั้นต่ำแบบเดียวกับอาชีพ — บัญชีเป็นของทั้งประเทศ จึงไม่คูณสัดส่วนภาค
 const scaled = (st, baht, year) => baht * (minWage(st.content.era, st.seed, year) / minWage(st.content.era, st.seed, st.content.era.finance.refYear));
@@ -74,7 +85,7 @@ export function jobWage(st, year) {
 }
 
 // ค่าตอบแทนตำแหน่งการเมือง/เดือน: ขั้นท้องถิ่นบวกเพิ่มจากงาน · ขั้นเต็มเวลาผู้เรียกใช้แทนงาน
-export const officePay = (st, year) => (st.office ? scaled(st, officeStep(st).pay, year) * (officeFull(st) ? 1 : OFFICE.net) : 0);
+export const officePay = (st, year) => (st.office ? scaled(st, (officeSub(st) ?? officeStep(st)).pay, year) * (officeFull(st) ? 1 : OFFICE.net) : 0);
 
 // ชื่อขั้น: ขั้นที่มีชื่อแทนชื่ออาชีพ · ขั้นไม่มีชื่อ = ชื่ออาชีพ (+คำต่อท้ายของสายอาชีพ)
 export const stepName = (st, rank) => {
@@ -86,7 +97,7 @@ export const stepName = (st, rank) => {
 export function rankName(st) {
   const job = st.ladder ? stepName(st, st.ladder.rank) : st.occupationName;
   if (!st.office) return job;
-  return officeFull(st) ? officeStep(st).name : `${job} · ${officeStep(st).name}`;
+  return officeFull(st) ? officeName(st) : `${job} · ${officeName(st)}`;
 }
 
 // เข้าสายตามงานที่ได้ (effects.job): อาชีพที่มีสายเอกชน/สายอาชีพสั้นเริ่มขั้นของอาชีพนั้น · งานอื่นออกจากสายเดิม
@@ -121,7 +132,11 @@ export function promote(st, n) {
 
 // ผลของการ์ดเลือกตั้ง: เลขขั้นที่ได้ · -1 = หลุดจากตำแหน่ง
 export function setOffice(st, rank) {
+  const prev = st.office;
   st.office = rank < 0 ? null : { rank, since: st.age, next: st.age + OFFICE.term };
+  // ชนะรักษาตำแหน่งเดิม = ชื่อย่อยเดิม · ชนะเข้าขั้นใหม่ = ทอยชื่อย่อย (ผลเดียวกับที่การ์ดบอก)
+  const step = st.office && st.content.era.careers.office.steps[rank];
+  if (step?.subs) st.office.sub = prev?.rank === rank && prev.sub ? prev.sub : subOf(step, st).name;
   // ตำแหน่งสูงสุดที่เคยได้ — ชื่อเสียงตระกูล/เป้าตระกูลการเมืองอ่านตอนตาย (ตำแหน่งปัจจุบันหายเมื่อแพ้)
   if (rank >= 0) st.officeTop = Math.max(st.officeTop ?? -1, rank);
 }
@@ -200,39 +215,44 @@ export function officeDue(st) {
 // คนกรุงเทพฯ ไม่มีหมู่บ้าน เริ่มที่ขั้นแรกที่เป็นงานเต็มเวลา
 export function officeCard(st) {
   const steps = st.content.era.careers.office.steps;
-  const first = st.ses === 'bkk' ? steps.findIndex((s) => s.full) : 0;
+  const first = st.ses === 'bkk' ? steps.findIndex((s) => s.full && !s.vacant) : 0;
   const cur = st.office ? st.office.rank : -1;
-  const up = cur < 0 ? first : cur + 1;
-  const canUp = up < steps.length;
+  const next = cur < 0 ? first : officeNext(steps, cur);
+  const canUp = next >= 0;
+  // ยอดบันได: id คงเลขท้ายบันไดแบบเดิม
+  const up = canUp ? next : steps.length;
+  // ขั้นที่มีชื่อย่อย ผลชนะบอกชื่อย่อยที่จะได้ (setOffice ทอยด้วยค่าเดียวกัน)
+  const won = (r) => subOf(steps[r], st)?.name ?? steps[r].name;
+  const curName = cur >= 0 && officeName(st);
   const odds = (r) => OFFICE.odds[r] ?? OFFICE.odds.at(-1);
   const lift = { stats: { network: 1.6, relations: 1.4 } };
-  const run = (r, w, multipliers = lift, text = `ชนะ ได้เป็น${steps[r].name}`) => [
+  const run = (r, w, multipliers = lift, text = `ชนะ ได้เป็น${won(r)}`) => [
     { weight: w, ok: true, multipliers, text, effects: { office: r, network: 1 } },
-    { weight: 1, text: cur < 0 ? 'แพ้เลือกตั้ง คะแนนห่างคนที่ชนะไม่มาก' : `แพ้ หลุดจากตำแหน่ง${steps[cur].name}`, effects: { office: -1, happiness: -1 } },
+    { weight: 1, text: cur < 0 ? 'แพ้เลือกตั้ง คะแนนห่างคนที่ชนะไม่มาก' : `แพ้ หลุดจากตำแหน่ง${curName}`, effects: { office: -1, happiness: -1 } },
   ];
   const choices = [];
   if (canUp) {
-    const cost = rankCash(OFFICE.campaign * (up + 1));
+    const cost = rankCash(OFFICE.campaign * OFFICE.tier[up]);
     choices.push({ text: `ลงสมัคร${steps[up].name} หาเสียงด้วยผลงาน`, requires: { money: cost, reason: 'เงินไม่พอค่าหาเสียง' }, effects: { money: { ...cost, amount: -cost.amount } }, outcomes: run(up, odds(up)) });
     choices.push({
       text: `ลงสมัคร${steps[up].name} แจกเงินซื้อเสียง`,
-      requires: { money: rankCash(1 + up), reason: 'เงินไม่พอแจก' },
-      effects: { money: rankCash(-(1 + up)) },
+      requires: { money: rankCash(OFFICE.tier[up]), reason: 'เงินไม่พอแจก' },
+      effects: { money: rankCash(-OFFICE.tier[up]) },
       merit: VOTE_BUY,
       outcomes: [
-        { weight: odds(up) * 2.5, ok: true, text: `ชนะ ได้เป็น${steps[up].name}`, effects: { office: up } },
+        { weight: odds(up) * 2.5, ok: true, text: `ชนะ ได้เป็น${won(up)}`, effects: { office: up } },
         { weight: 1, text: 'กกต. แจกใบแดง ถูกตัดสิทธิ์ลงสมัครไปอีกหลายปี', effects: { office: -1, happiness: -2, relations: -1 }, sets_flags: ['caught_fraud'] },
       ],
     });
     choices.push({ text: `ไหว้ขอพรก่อนลงสมัคร${steps[up].name}`, outcomes: run(up, odds(up), { ...lift, wish: RANK_WISH }) });
   }
-  if (cur >= 0) choices.push({ text: `ลงรักษาตำแหน่ง${steps[cur].name}`, outcomes: run(cur, OFFICE.keep, lift, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
+  if (cur >= 0) choices.push({ text: `ลงรักษาตำแหน่ง${curName}`, outcomes: run(cur, OFFICE.keep, lift, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
   choices.push(cur < 0 ? { text: 'ขอบคุณ แต่ไม่ลงสมัคร', effects: { office: -1 } } : { text: 'วางมือ ไม่ลงอีกแล้ว', effects: { office: -1, happiness: 1 } });
   return {
     id: `office_${up}`,
     category: 'society',
     type: 'A',
-    text: cur < 0 ? `อายุ ${st.age} ปี คนในพื้นที่มาชวนให้ลงสมัคร${steps[up].name}` : `อายุ ${st.age} ปี ครบวาระ${steps[cur].name}แล้ว จะเอายังไงต่อ`,
+    text: cur < 0 ? `อายุ ${st.age} ปี คนในพื้นที่มาชวนให้ลงสมัคร${steps[up].name}` : `อายุ ${st.age} ปี ครบวาระ${curName}แล้ว จะเอายังไงต่อ`,
     choices,
   };
 }
@@ -284,7 +304,7 @@ export function severanceDays(st) {
 }
 
 // ขั้นยศ + ตำแหน่งการเมืองรวมเป็นระดับเดียว — การ์ดยั่วทุจริตออกถี่ขึ้นตามระดับ (multipliers.rank)
-export const rankLevel = (st) => (st.ladder?.rank ?? 0) + (st.office ? st.office.rank + 1 : 0);
+export const rankLevel = (st) => (st.ladder?.rank ?? 0) + (st.office ? OFFICE.tier[st.office.rank] : 0);
 
 // โครงการเกษียณก่อนกำหนด (B40): ลูกจ้างอายุ EARLY.from–EARLY.to ทอยจาก rankRng ครั้งเดียวต่อปี ออกได้ครั้งเดียวในชีวิต
 // ราชการ/ทหาร/ตำรวจไม่มีโครงการนี้ · ตำแหน่งการเมืองเต็มเวลาไม่ใช่ลูกจ้าง
@@ -332,8 +352,8 @@ export const ladderStartPay = (st, id, year) => scaled(st, st.content.era.career
 // ออกปีที่นั่งตำแหน่งครบครึ่งวาระ ไม่ดึงเลขสุ่ม
 export const budgetDue = (st) => !!st.office && st.age === st.office.since + OFFICE.term / 2;
 export function budgetCard(st) {
-  const name = officeStep(st).name;
-  const k = 1 + st.office.rank;
+  const name = officeName(st);
+  const k = OFFICE.tier[st.office.rank];
   return {
     id: `office_budget_${st.office.rank}`,
     category: 'society',
