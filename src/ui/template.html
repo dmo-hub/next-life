@@ -256,6 +256,21 @@ body:has(.mnav) .foot { display:none; }
 /* ชั้นสมุด (B130): แท็บเป็นปุ่มกด (aria-pressed) ไม่ใช่ tablist — เปลี่ยนแท็บ = วาดหน้าใหม่ทั้งหน้า */
 .bk-intro { margin:0; font-size:13px; color:var(--muted); }
 .shelf-art { display:block; width:100%; border:1px solid var(--ink2); border-radius:8px; }
+/* แถบภาพย่อภาพบ้านเมือง (ui-redo ใบ 41): ช่องตัดแถวตามความกว้าง ความสูงตามเนื้อ · พื้นรักเหมือนภาพหัวแท็บอื่น */
+.pic-strip { border:1px solid var(--ink2); border-radius:8px; background:linear-gradient(var(--lacquer2), var(--lacquer)); padding:10px 8px 8px; color:var(--cream); }
+.pic-strip > .h { font-size:13px; font-weight:700; color:var(--gold2); margin:0 0 8px; }
+.pic-row { display:grid; grid-template-columns:repeat(auto-fill, minmax(64px, 1fr)); gap:6px; }
+.pic-th { display:flex; flex-direction:column; align-items:center; gap:2px; min-width:0; }
+.pic-th .pic { width:100%; aspect-ratio:5 / 4; display:grid; place-items:center; border:1.5px solid var(--gold); border-radius:3px; overflow:hidden; background:var(--lacquer2); }
+.pic-th .pic svg { width:100%; height:100%; display:block; }
+.pic-th.lock .pic { border:1px solid var(--bronze); background:#2a1f15; }
+.pic-th.lock .pic b { font-size:12px; color:var(--bronze2); }
+.pic-th.fresh .pic { box-shadow:0 0 0 2px var(--cream), 0 0 10px var(--gold2); }
+.pic-th .n { font-size:10px; color:var(--cream); }
+.pic-th.lock .n { color:#8a7a5a; }
+.pic-th .dot { display:block; width:6px; height:6px; border-radius:50%; background:var(--gold); }
+.pic-th.lock .dot { background:var(--bronze2); }
+.pic-th .yr { font-size:10px; color:var(--sand); }
 .lineage-view { display:grid; gap:6px; }
 .lineage-text summary { cursor:pointer; font-size:13px; color:var(--muted); min-height:44px; display:flex; align-items:center; }
 .bk-tabs { display:flex; flex-wrap:wrap; gap:6px; }
