@@ -78,7 +78,7 @@
 </style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html" aria-current="true">คำตัดสินเกม</a><a href="../dev/ui.html">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/ui-redo/tweak.html">ต้นแบบ UI</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div>
 <header><div class="w">
   <h1>ชีวิตไทยลึกขึ้น — ใบค้างของโลกปกติจัดตามเฟส v2</h1>
-  <p>เรื่อง thai-life-deep · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.65</span></p>
+  <p>เรื่อง thai-life-deep · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.67</span></p>
 </div></header>
 <main><div class="w">
 <p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
@@ -369,6 +369,9 @@
 <h4 id="d-thai-life-deep-decisions-h70">2026-11-04 19:44 · ใบ 133 เทศกาลทำ &quot;ลูกนกหัดบิน&quot; ตกด่าน titles (คิว integrator · popup เจ้าของ 1 รอบ)</h4>
 <p>ที่มา: เลน A 133 ด่าน titles ลูกนกหัดบิน ฐาน 37 → 30 · เส้น 36 · integrator เสนอ 3 ทาง</p>
 <ol><li>เจ้าของเลือก &quot;เทศกาลไม่นับแบบชีวิต&quot;: การ์ดเทศกาลใบ 133 ติดธง ambient ไม่นับเข้าแกนแบบชีวิต แบบเดียวกับการ์ดลางภัย · การ์ด 8 ใบ อายุ/น้ำหนักคงเดิม · ไม่เลือก: จำกัดอายุ 9–12/ลดน้ำหนัก · ถอยการ์ดเด็ก 4 ใบ · เกณฑ์: titles ลูกนกหัดบินกลับ ≥ 36 · ด่านอื่นของใบ 133 ตามเดิม</li></ol>
+<h4 id="d-thai-life-deep-decisions-h71">2026-11-05 00:00 · ใบ 159 เกณฑ์พรสวรรค์ติดชาติ (popup ผู้รวมงาน · ส่งต่อ next-life-planner)</h4>
+<p>ที่มา: เลน B ใบ 159 ตั้งเอง <code>PAST_TALENT = { years: 10, mul: 1.1 }</code> (lane-b/159-past-life ff71fb2 src/engine) · เจ้าของยืนยันผ่าน integrator</p>
+<ol><li>พรสวรรค์ติดชาติ: อาชีพหลักชาติก่อนทำ <strong>≥ 10 ปี</strong> ⇒ ชาตินี้อาชีพนั้นเริ่มตัวคูณรายได้ ×1.1 · ใช้ค่าที่เลนตั้งไว้ ไม่ต้องแก้โค้ด · ตัวคูณ 1.1 ตามเกณฑ์เดิมใบ 159 บรรทัด 17</li></ol>
 </details>
 <script>(() => { const open = () => { const t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); const d = t && t.closest('details'); if (d && !d.open) { d.open = true; t.scrollIntoView(); } }; addEventListener('hashchange', open); open(); })();</script>
 </div></main>

@@ -100,6 +100,22 @@ for (const [name, extra, pass] of overlapCases) {
   if (!ok) fails.push(`overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกที่ช่อง overlap_stage'} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
 }
 rows.push(['overlap_stage ตก/ผ่าน', `${overlapCases.length} เคส`]);
+// ความจำชาติก่อน (ใบ 159): การ์ดเดียวกัน ต่างแค่ช่อง when.past_life — ตกต้องตกที่ past_life เท่านั้น · ช่องที่ไม่มีแล้ว (ตัวควบคุม) ต้องตกด้วย
+const pastCases = [
+  ['มีชาติก่อน', { any: true }, true],
+  ['จังหวัดเดิม + ช่าง', { province: 'same', job: ['craft'] }, true],
+  ['พรสวรรค์', { talent: true }, true],
+  ['ช่องที่ไม่มี', { lover: ['x'] }, false],
+  ['อาชีพไม่รู้จัก', { job: ['wizard'] }, false],
+  ['ภูมิเป็นชื่อไทย', { realm: ['นรก'] }, false],
+  ['ว่าง', {}, false],
+];
+for (const [name, past, pass] of pastCases) {
+  const ps = lintDocs([{ file: `past-case:${name}`, doc: { events: [overlapCard({ when: { past_life: past } })] } }], ctx);
+  const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.path.includes('.past_life'));
+  if (!ok) fails.push(`past_life "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกที่ช่อง past_life'} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
+}
+rows.push(['past_life ตก/ผ่าน', `${pastCases.length} เคส`]);
 // ป้ายบุญบาปต่างโลก (B68c) อยู่นอก yaml ไม่ผ่านด่านเนื้อหา — ตรวจ id/ลำดับตัวเลือก/หมวด/ระดับ ที่นี่แทน
 const iskById = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
 let iskTags = 0;
