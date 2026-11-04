@@ -10574,6 +10574,7 @@ function lifeTitles(card) {
     titleBookAdd(t);
     card.lifeTitles.clue = titleClue(`${st.seed}:${st.gen}`, t);
     picsAdd();
+    deathAdd(card);
     card.memo = memoAdd(t);
     // สมุดเต็ม: ผู้เล่นลบแถวแล้วกดกลับ หน้าเดิมถูกคืนทั้งก้อน ไม่วาดใหม่ — ต้องลองลงซ้ำเองตอนกลับ
     if (card.memo === 'full') card.memoRetry = () => (card.memo = memoAdd(t));
@@ -10943,12 +10944,45 @@ function skillHint(id) {
   return kinds.length ? `ของขวัญเทพธิดาในต่างโลก หรือชีวิตไทยที่มี${kinds.join('/')}ที่ใช่` : 'ของขวัญเทพธิดาในต่างโลก';
 }
 
+// หน้า "เคยจากไปแบบนี้" (doom-1): สาเหตุตายที่เคยเจอ สะสมข้ามชีวิต · key ใหม่เพราะสมุดอนุสรณ์ไม่เคยเก็บสาเหตุ ⇒ นับจากชีวิตหลังอัปเดต
+// ไม่ชวนตามหาทางตาย: ไม่มีช่อง ??? ไม่มีจำนวนเต็ม ไม่มีจุดแดง · ลงเฉพาะสาเหตุที่การ์ดตายบอกผู้เล่น
+// (หายตัว · ไม่ทราบเหตุก่อนชรา ไม่บอก) และทำร้ายตัวเองไม่ลงแม้วันหนึ่งการ์ดจะบอก
+const DEATH_KEY = 'next-life-deaths-v1';
+const DEATH_GROUPS = [
+  ['ร่างกาย', ['newborn', 'infection', 'pneumonia', 'heart', 'stroke', 'cancer', 'diabetes_kidney', 'liver', 'chronic_resp']],
+  ['อุบัติเหตุ', ['road', 'accident']],
+  ['อื่น ๆ', null],
+];
+function deathRead() {
+  try {
+    const d = JSON.parse(localStorage.getItem(DEATH_KEY) ?? '{}') ?? {};
+    return { c: Array.isArray(d.c) ? d.c.filter((k) => typeof k === 'string') : [] };
+  } catch {
+    return { c: [] };
+  }
+}
+function deathWrite(d) {
+  try {
+    localStorage.setItem(DEATH_KEY, JSON.stringify(d));
+  } catch {
+    // ไม่มีที่เก็บ — หน้านี้ว่าง เกมเล่นต่อได้
+  }
+}
+// เรียกครั้งเดียวต่อการ์ดตาย (lifeTitles) · สาเหตุซ้ำไม่เพิ่มแถว
+function deathAdd(card) {
+  if (card.cause === 'self_harm' || !causeOf(card.cause, card.age)) return;
+  const d = deathRead();
+  if (d.c.includes(card.cause)) return;
+  d.c.push(card.cause);
+  deathWrite(d);
+}
+
 // จุดแดงที่ทางเข้าชั้นสมุด (B116 → B130): ชีวิตใหม่ในสมุดอนุสรณ์ · ฉายาใหม่ · ภาพใหม่ ที่ยังไม่เปิดดู
-// ลิงก์ท้ายหน้าซ่อนในฉากที่มีเมนู แต่ยังเป็นทางเข้าของต่างโลก/ปรโลก ⇒ ติดจุดทั้งสองที่
-const shelfFresh = () => ({ m: memoUnseen(), t: bookRead().n, p: picsRead().n, k: skillsRead().n });
+// ลิงก์ท้ายหน้าซ่อนในฉากที่มีเมนู แต่ยังเป็นทางเข้าของต่างโลก/ปรโลก ⇒ ติดจุดทั้งสองที่ · หน้าเคยจากไปไม่มีจุด (d ว่างเสมอ)
+const shelfFresh = () => ({ m: memoUnseen(), t: bookRead().n, p: picsRead().n, k: skillsRead().n, d: [] });
 function shelfDot() {
   const f = shelfFresh();
-  const n = f.m.length + f.t.length + f.p.length + f.k.length;
+  const n = f.m.length + f.t.length + f.p.length + f.k.length + f.d.length;
   for (const a of document.querySelectorAll('#shelfLink, .mnav [data-menu="shelf"]')) {
     a.querySelector('.new-dot')?.remove();
     if (n) a.append(newDot(`มีของใหม่ในชั้นสมุด ${n}`));
@@ -10978,9 +11012,9 @@ function memoFull(card) {
   return box;
 }
 
-// ชั้นสมุด (B130): เล่มเดียว 3 แท็บ อนุสรณ์ · ฉายา · ภาพบ้านเมือง · เปิดทับหน้าที่อยู่ แล้วคืนหน้าเดิมทั้งก้อนตอนกลับ — ไม่แตะ st ไม่ลงเซฟ
+// ชั้นสมุด (B130): เล่มเดียว 4 แท็บ อนุสรณ์ · ฉายา · ภาพบ้านเมือง · เคยจากไป · เปิดทับหน้าที่อยู่ แล้วคืนหน้าเดิมทั้งก้อนตอนกลับ — ไม่แตะ st ไม่ลงเซฟ
 // fresh = ของใหม่ตอนเปิดชั้นครั้งแรก — เปิดแท็บแล้วล้างจุดในที่เก็บ แต่ป้าย "ใหม่" ยังอยู่จนออกจากชั้น สลับแท็บไปมาก็ยังหาเจอ
-const SHELF_TABS = [['m', 'อนุสรณ์'], ['t', 'ฉายา'], ['k', 'สกิล'], ['p', 'ภาพบ้านเมือง']];
+const SHELF_TABS = [['m', 'อนุสรณ์'], ['t', 'ฉายา'], ['k', 'สกิล'], ['p', 'ภาพบ้านเมือง'], ['d', 'เคยจากไป']];
 function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh()) {
   // เปิดจากเมนู/ท้ายหน้า/หน้าเล่นต่อ: ไปแท็บที่มีของใหม่ก่อน
   tab ??= SHELF_TABS.find(([k]) => fresh[k].length)?.[0] ?? 'm';
@@ -10994,7 +11028,7 @@ function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh(
   const m = memoRead();
   const b = bookRead();
   const p = picsRead();
-  const count = { m: `${m.l.length}`, t: `${bookGot(b)}/${BOOK_ALL}`, p: `${picsGot(p)}/${PIC_ALL}`, k: `${skillsGot(skillsRead())}/${SKILL_IDS.length}` };
+  const count = { m: `${m.l.length}`, t: `${bookGot(b)}/${BOOK_ALL}`, p: `${picsGot(p)}/${PIC_ALL}`, k: `${skillsGot(skillsRead())}/${SKILL_IDS.length}`, d: `${deathRead().c.length}` };
   const choices = homeCard('ชั้นสมุด', ['ชั้นสมุด']);
   root.firstChild.classList.add('shelf-view');
   const body = root.querySelector('.body');
@@ -11013,6 +11047,7 @@ function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh(
   if (tab === 't') titleShelf(body, fresh.t);
   else if (tab === 'p') picShelf(body, fresh.p);
   else if (tab === 'k') skillShelf(body, fresh.k);
+  else if (tab === 'd') deathShelf(body);
   else memoShelf(body, choices, fresh.m, again);
   shelfDot();
   choices.prepend(enter(button('กลับ', null, back)));
@@ -11138,6 +11173,26 @@ function skillShelf(body, fresh) {
   }
   body.append(ul);
   skillsSeen();
+}
+
+// แท็บเคยจากไป: หมวดละกล่อง เฉพาะสาเหตุที่เคยเจอ · หมวดที่ยังไม่เจอไม่ขึ้น · วัยชรา (other) ได้ป้ายจากอายุสุดท้ายของตาราง
+function deathShelf(body) {
+  const { c } = deathRead();
+  body.append(el('p', 'bk-intro', 'ทางที่ชีวิตก่อน ๆ ในเครื่องนี้เคยจากไป สะสมข้ามชีวิต · สาเหตุเดิมไม่ลงซ้ำ'));
+  const known = DEATH_GROUPS.flatMap(([, ks]) => ks ?? []);
+  let shown = 0;
+  for (const [name, keys] of DEATH_GROUPS) {
+    const words = (keys ?? c.filter((k) => !known.includes(k))).filter((k) => c.includes(k)).map((k) => causeWords(k, MAX_AGE)).filter(Boolean);
+    if (!words.length) continue;
+    const s = el('section', 'bk-sec');
+    s.append(el('div', 'h', name));
+    const ul = el('ul', 'bk-list');
+    for (const w of words) ul.append(el('li', 'got', `จากไป${w.join('')}`));
+    s.append(ul);
+    body.append(s);
+    shown += words.length;
+  }
+  if (!shown) body.append(el('p', 'sub', 'ยังไม่มีชีวิตที่จากไปลงหน้านี้'));
 }
 
 // ภาพแชร์รับเฉพาะช่องที่ไล่ชื่อไว้ตรงนี้ — บัญชีบุญบาปบนการ์ดตายหลุดลงภาพไม่ได้ แม้แกนเกมจะเติมช่องใหม่ให้การ์ด
