@@ -9,6 +9,7 @@ export const NAV_MENU = [
   ['guide.html', 'วิธีเล่น'],
   ['whatsnew.html', 'แพตช์โน้ต'],
   ['about.html', 'กลไกในเกม'],
+  ['worlds.html', 'ชาตินี้ · ปรโลก · ต่างโลก'],
   ['otherworld.html', 'ต่างโลก', 'dark'],
   ['catalog.html', 'การ์ดทั้งหมด'],
   ['gdd.html', 'เอกสารออกแบบเกม (GDD)'],
