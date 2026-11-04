@@ -19,6 +19,8 @@ export const readGateHash = (file = GATE_CONFIG) => {
   if (sha256 !== null && !/^[0-9a-f]{64}$/.test(sha256)) throw new Error('src/site/gate.json: sha256 ต้องเป็น hex 64 ตัวหรือ null');
   return sha256;
 };
+// "off": true = ปิดกล่องรหัสชั่วคราว (เจ้าของสั่ง) · hash เดิมยังเก็บไว้ ลบ off แล้ว build = กลับมาถามรหัส · site:password เขียนไฟล์ใหม่จึงเปิดคืนเอง
+export const GATE_OFF = JSON.parse(readFileSync(GATE_CONFIG, 'utf8')).off === true;
 
 // file = path ใต้ docs/ · html ใช้แยกหน้าส่งต่อ
 export const isGated = (file, html) => !GATE_OPEN.includes(file) && !html.includes(MOVED_MARK);
@@ -71,7 +73,8 @@ if(x!==H){e.textContent='รหัสไม่ถูก ลองใหม่อ
 try{sessionStorage.setItem(K,H)}catch(e){}g.remove();d.classList.add('nl-open');d.classList.remove('nl-js')})})})()`;
 
 // noindex อยู่ในบล็อกเสมอ (ข้อ 106) — หน้าที่มี noindex ของตัวเองอยู่แล้วได้ซ้ำ ค่าเดียวกัน ไม่ขัดกัน
-export function gateBlock(hash, file) {
+export function gateBlock(hash, file, off = GATE_OFF) {
+  if (off) return '<meta name="robots" content="noindex">';
   const up = '../'.repeat(file.split('/').length - 1);
   return `<meta name="robots" content="noindex"><style>${GATE_CSS}</style><script>${gateScript(hash, up).replace(/<\/script/gi, '<\\/script')}</script>`;
 }
