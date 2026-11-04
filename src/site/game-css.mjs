@@ -1,9 +1,9 @@
-// CSS ตัวเกมสำหรับหน้า tweak ใต้ docs/dev/ (thai-life-deep 185 · ui-redo 46): หน้าเขียนมือวาง marker ไว้ใน <template> แล้ว build เติม CSS จาก template.html ทุกรอบ
+// CSS ตัวเกมสำหรับหน้า tweak ใต้ docs/dev/ (thai-life-deep 185 · ui-redo 46 · 52): หน้าเขียนมือวาง marker ไว้ใน <template> แล้ว build เติม CSS จาก template.html ทุกรอบ
 // หน้าเอาไปใส่ iframe srcdoc เอง — CSS เกมมีกฎ body/:root ที่จะทับหน้าควบคุมถ้าใส่ตรง · ไม่โหลด play.html เพราะ fetch ใช้กับ file:// ไม่ได้
 export const GAME_CSS_START = '/*GAME-CSS:START*/';
 export const GAME_CSS_END = '/*GAME-CSS:END*/';
 // หน้าใต้ docs/ ที่ใช้ CSS เกม
-export const GAME_CSS_PAGES = ['dev/ui-redo/entry-tweak.html'];
+export const GAME_CSS_PAGES = ['dev/ui-redo/entry-tweak.html', 'dev/ui-redo/fx-icons-tweak.html'];
 
 // ฟอนต์ฝัง (base64) ของเกมไม่ตามมา — หน้า tweak โหลดฟอนต์ชุดเดียวกันจากเว็บ ไฟล์จึงไม่บวม
 export function gameCss(template) {
