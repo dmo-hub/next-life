@@ -309,3 +309,7 @@ challenge pass (planner ทำเอง · 🌙 ห้าม subagent ⇒ design
 106. หน้าติดรหัส: เจ้าของเลือก "กล่องถามรหัสหน้าฉาก" (JS บังหน้า · เนื้อยังอยู่ใน HTML · view-source อ่านได้ — เจ้าของรับรู้ ไม่ใช่กันจริง) · หน้า: guide whatsnew about worlds catalog dev/** + otherworld (ข้อ 104) · cards spoilers archive spec ติดด้วย (planner เคาะ: หน้าลูกของกลุ่มเดียวกัน) · เมนู: เจ้าของเลือก "คงเมนู กดแล้วถามรหัส" · รหัส: เก็บแค่ SHA-256 ใน JS **ห้ามเขียนรหัสจริงลง repo/แชท/ใบ** · เจ้าของตั้งเองผ่านสคริปต์ที่เลนทำ · ผ่านแล้วจำ sessionStorage · หน้าติดรหัสใส่ noindex · play + index ไม่ติด
 107. ผลต่อใบ 68 SEO (ทับข้อ 101 ส่วนรายการ): sitemap เหลือ index + play · หน้าติดรหัสทุกหน้า noindex ไม่อยู่ใน sitemap
 108. คิว: ทุกใบ UI/เว็บล้วน ลัดคิว · 68 69 70 72 แตะ docs/ + nav.mjs ชุดเดียวกัน ⇒ ผู้รวมงานจ่ายเลนเดียวเรียง 72 → 69 → 70 → 68 · 71 แยกเลนได้ (src/ui/app.mjs)
+
+### 2026-11-04 19:44 · ด่าน import ui↔engine (คิว integrator · planner เคาะ ไม่ต้องถามเจ้าของ)
+ที่มา: integrator — v0.6.55 (d54400d) hotfix "bookAdd is not defined" หลัง merge 8b2fb24 เปลี่ยนชื่อเป็น skillBookAdd · ต้นแบบตรวจ 10 บรรทัด main เดิม MISSING bookAdd · ใหม่ 0
+109. ใบ 73 ด่าน lint:test ตรวจชื่อ import src/ui ← engine มีจริง · ไม่ใช่ UI แต่กันเกมพังทั้งเกม ⇒ ลัดคิวแบบใบ UI (ขยายกฎข้อ 78 เฉพาะใบด่านกันพังทั้งเกม)
