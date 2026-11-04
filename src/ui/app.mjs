@@ -1,5 +1,5 @@
 import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE } from '../engine/index.mjs';
-import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt } from './art.mjs';
+import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
 
@@ -789,16 +789,15 @@ function lifeTitles(card) {
 }
 const TITLES_SHOWN = 3;
 
-// ป้ายริบบิ้นบนใบมรณะย่อ (ui-redo ใบ 10 · ค่าเคาะใบ 02 "ริบบิ้น"): ฉายาเด่นของชีวิตนี้เท่าที่แผงฉายาโชว์ ที่เหลือบอกเป็นจำนวน
-// ไม่มีฉายา = ไม่มีแถว (แผงฉายาด้านล่างบอก "ยังไม่ได้ฉายา" อยู่แล้ว)
-function ribbons(card) {
+// ฉายาบนใบมรณะ (ui-redo 57 · แบบ line ของหนังสืองานศพ): ฉายาเด่นของชีวิตนี้เท่าที่แผงฉายาโชว์ เรียงในบรรทัดเดียว ที่เหลือบอกเป็นจำนวน
+// ไม่มีฉายา = ไม่มีบรรทัด (แผงฉายาด้านล่างบอก "ยังไม่ได้ฉายา" อยู่แล้ว)
+function titleLine(card) {
   const { titles } = lifeTitles(card);
   if (!titles.length) return null;
-  const ul = el('ul', 'd-rb');
-  ul.setAttribute('aria-label', 'ฉายาที่ได้ชีวิตนี้');
-  for (const t of titles.slice(0, TITLES_SHOWN)) ul.append(el('li', null, t.name));
-  if (titles.length > TITLES_SHOWN) ul.append(el('li', 'more-n', `อีก ${titles.length - TITLES_SHOWN} ฉายา`));
-  return ul;
+  const p = el('p', 'd-tl');
+  p.append(el('span', 'k', 'ฉายา'), ` ${titles.slice(0, TITLES_SHOWN).map((t) => t.name).join(' · ')}`);
+  if (titles.length > TITLES_SHOWN) p.append(' · ', el('span', 'more-n', `อีก ${titles.length - TITLES_SHOWN} ฉายา`));
+  return p;
 }
 
 // บันทึกการตาย (ใบ 04): แบบชีวิต 1 + ฉายาเด่น 3 + ปุ่มดูทั้งหมด · ฉายาตระกูลแยกหัวข้อ
@@ -994,6 +993,17 @@ function sceneSvg(id, sm) {
   const svg = artSvg(`era-art scene-art${sm ? ' scene-sm' : ''}`, ERA_ART_W, ERA_ART_H, s.parts);
   svg.dataset.scene = id;
   return svg;
+}
+// ภาพฉากใบมรณะเป็นพื้นหลังจางทั้งใบ (ui-redo 57): รูปทรงเดิมตัดกรอบแผ่นออก สีเส้นมาจาก CSS — แผ่นทึบกับกรอบทองจะกลายเป็นแถบเทาทับข้อความ
+function sceneBg(id) {
+  const s = sceneArt(id);
+  if (!s) return null;
+  const wrap = el('div', 'd-bg');
+  wrap.setAttribute('aria-hidden', 'true');
+  const svg = artSvg('scene-art', ERA_ART_W, ERA_ART_H, s.parts.slice(ERA_FRAME.length));
+  svg.dataset.scene = id;
+  wrap.append(svg);
+  return wrap;
 }
 const eraName = (id) => ERA_EVENTS.find((e) => e.id === id)?.name ?? id;
 function memoRead() {
@@ -2108,18 +2118,28 @@ function render(card) {
     if (gone) box.classList.add('lost');
     top.append(el('b', null, gone ? LOST.head : 'ด้วยรักและอาลัย'));
     box.append(top);
+    const bg = sceneBg(gone ? 'gone' : 'death');
+    if (bg) box.append(bg);
+    // หนังสืองานศพ (ui-redo 57): รูป ชื่อ อายุ สาเหตุ เป็นหัวกลางใบไม่มีกรอบ · ข้อมูลเป็นตารางสองคอลัมน์ · ปุ่มไปต่อท้ายข้อมูล
     // หนังสืองานศพบอกอายุ ไม่บอกปี พ.ศ. — ปีเกมไม่ขึ้นจอ (B14 ข้อ 12)
-    const scene = sceneSvg(gone ? 'gone' : 'death', true);
-    if (scene) body.append(scene);
-    body.append(portrait(card.age), el('h3', null, fullName()), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
+    const head = el('div', 'd-head');
+    head.append(portrait(card.age), el('h3', null, fullName()), el('p', 'dates', `${genLabel()}${gone ? `หายตัวเมื่ออายุ ${card.age} ปี` : `สิริอายุ ${card.age} ปี`}`));
     const why = causeOf(card.cause, card.age);
-    if (why) body.append(el('p', 'sub', `จากไป${why.join('')}`));
-    body.append(el('p', null, `${st.sex} · ${provinceLabel(st)} · ฐานะ${classNow(st)} · ${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`));
-    const net = gone ? (card.summary.money < 0 ? LOST.debt : LOST.money) : card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
-    body.append(el('p', 'sub', `${net} ${baht(card.summary.money)}`));
+    if (why) head.append(el('p', 'sub', `จากไป${why.join('')}`));
+    body.append(head);
     if (gone) body.append(el('p', 'call', LOST.call));
-    const rb = ribbons(card);
-    if (rb) body.append(rb);
+    const tl = titleLine(card);
+    if (tl) body.append(tl);
+    const facts = el('dl', 'd-facts');
+    const fact = (k, v, cls) => facts.append(el('dt', null, k), el('dd', cls, v));
+    fact('เพศ', st.sex);
+    fact('จังหวัด', provinceLabel(st));
+    fact('ฐานะ', classNow(st));
+    fact('งาน', card.job);
+    if (st.edu) fact('วุฒิ', st.edu);
+    const net = gone ? (card.summary.money < 0 ? LOST.debt : LOST.money) : card.summary.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
+    fact(net, baht(card.summary.money), card.summary.money < 0 ? 'neg' : undefined);
+    body.append(facts);
     // ใบมรณะย่อ (ui-redo ใบ 10): ด้านบนพอดีจอแรกแล้วตามด้วยปุ่มไปต่อทันที — รายละเอียดอยู่ในแท็บใต้ปุ่ม (ใบ 11)
     // ชิ้นใต้ปุ่มมีคลาส body ⇒ จอแนวนอนเตี้ย panels() ยังวางไว้คอลัมน์กลางต่อจากปุ่ม
     const rest = el('div', 'body d-rest');

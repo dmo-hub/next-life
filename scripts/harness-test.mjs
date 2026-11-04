@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT } from '../src/engine/index.mjs';
+import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
@@ -666,6 +666,62 @@ const f2 = (v) => v.toFixed(2);
   const o2 = old(mk(craft)), o1 = old(s1);
   check('ใบ 159 เซฟเก่าชีวิตที่ 2 โหลดได้ มีความจำจากผังตระกูล', o2.past?.lives === heir.lineage.filter((l) => !l.isekai).length && o2.past.job === null && !o2.talent && KEYS.every((k) => k in o2.past), JSON.stringify(o2.past));
   check('ใบ 159 เซฟเก่าชีวิตแรกไม่มีช่องความจำ', !('past' in o1));
+}
+
+// ป้ายหมวดการ์ดผล (ui-redo 60): ทุกการ์ดผลทุกแหล่งมีป้ายในรายการ · หมวดกลาง ≤ ครึ่ง · ผลตัวเลือกพกเหตุการณ์ต้นทาง
+// เซฟเก่า (การ์ดค้างไม่มีป้าย) โหลดได้ และจออ่านเป็นหมวดกลาง
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const n = {};
+  let bad = 0, total = 0, noEv = 0, snap = null;
+  const see = (c, st) => {
+    if (c.kind !== 'result') return;
+    total++;
+    if (!E.RESULT_TAGS.includes(c.tag)) bad++;
+    else n[c.tag] = (n[c.tag] ?? 0) + 1;
+    // เสี่ยงของโฟกัสได้ทิศจากผลค่าด้วย แต่ไม่ได้มาจากการ์ดเลือก จึงไม่มีต้นทาง
+    if (['good', 'bad', E.TAG_MID, 'loot'].includes(c.tag) && !c.focusRisk && !c.evId) noEv++;
+    // เซฟแบบก่อนใบนี้: ลบป้ายจากภาพถ่ายทั้งก้อน — ถ่ายตอนยังมีการ์ดผลรอในคิว
+    if (!snap && st?.queue?.some((x) => x.kind === 'result')) snap = JSON.stringify(JSON.parse(E.snapshot({ st }, content)), (k, v) => (k === 'tag' || k === 'evId' ? undefined : v));
+  };
+  for (let i = 0; i < 60; i++) {
+    const { state } = playLife(mixSeed(60, i), content, BOTS.สุ่ม, see);
+    playAfterlife(state, BOTS.สุ่ม, (c) => see(c));
+  }
+  const mid = n[E.TAG_MID] ?? 0;
+  const top = Object.entries(n).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(' · ');
+  check('ป้ายหมวดการ์ดผล: ทุกใบมีป้ายในรายการ', total > 0 && bad === 0, `${total} ใบ · ไม่มีป้าย ${bad}`);
+  check('ป้ายหมวดการ์ดผล: หมวดกลาง ≤ ครึ่ง', mid * 2 <= total, `กลาง ${mid}/${total} · ${top}`);
+  check('ป้ายหมวดการ์ดผล: ผลตัวเลือกพก evId', noEv === 0, `ขาด ${noEv}`);
+  check('ป้ายหมวดการ์ดผล: ทิศนับเฉพาะค่าที่ไม่ซ่อน', E.fxTag({ health: -2, network: 3 }) === 'bad' && E.fxTag({ health: -2 }, ['health']) === E.TAG_MID && E.fxTag({ happiness: 1, money: -3 }) === 'good');
+  let oldOk = false, oldDetail = 'ไม่มีชีวิตที่มีการ์ดผลค้างคิว';
+  if (snap) {
+    const back = E.restore(snap, content).st;
+    const held = back.queue.filter((x) => x.kind === 'result');
+    const { age } = playLife(back.seed, content, BOTS.สุ่ม, null, back);
+    oldOk = held.length > 0 && held.every((x) => x.tag === undefined && E.resultTag(x) === E.TAG_MID) && age > 0;
+    oldDetail = `ค้าง ${held.length} ใบ · เล่นต่อจบอายุ ${age}`;
+  }
+  check('ป้ายหมวดการ์ดผล: เซฟเก่าโหลดได้ การ์ดค้างตกหมวดกลาง', oldOk, oldDetail);
+}
+
+// ใบ 133 การ์ดบรรยากาศ (ambient): เลือกแล้วต้องไม่เข้าแกนแบบชีวิต (picksAfter) · ชีวิตเดียวกันเล่นทั้งสองชุด
+// ตัวควบคุม: ถอด ambient ⇒ ตัวเลือกของการ์ดชุดเดียวกันต้องโผล่ใน picksAfter ไม่งั้นข้อแรกผ่านเพราะการ์ดไม่ออก
+{
+  const base = loadContent();
+  const ids = new Set(base.events.filter((e) => e.ambient).map((e) => e.id));
+  const bare = { ...base, events: base.events.map((e) => (e.ambient ? { ...e, ambient: undefined } : e)) };
+  let seen = 0, kept = 0, ctl = 0;
+  for (let i = 0; i < 60; i++) {
+    const s = mixSeed(0x133a, i);
+    const a = playLife(s, base, random).state;
+    seen += a.log.filter((l) => ids.has(l.id)).length;
+    kept += picksAfter(a, 0).filter((p) => ids.has(p.ev?.id)).length;
+    ctl += picksAfter(playLife(s, bare, random).state, 0).filter((p) => ids.has(p.ev?.id)).length;
+  }
+  check('ใบ 133 การ์ด ambient ไม่ถูกนับในแบบชีวิต', ids.size > 0 && seen > 0 && kept === 0, `${ids.size} ใบ · เลือก ${seen} ครั้ง · นับเข้า ${kept}`);
+  check('ใบ 133 ตัวควบคุม: ถอด ambient ⇒ นับเข้าแบบชีวิต', ctl > 0, `นับเข้า ${ctl}`);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
