@@ -29,6 +29,10 @@ export const NAV_CSS = `
   @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
 `;
 
+// 390: ลิงก์หน้าปัจจุบันอาจอยู่นอกส่วนที่เห็นของแถบที่ล้น ⇒ ตั้ง scrollLeft ของแถบเอง (scrollIntoView เลื่อนทั้งหน้าแนวตั้งด้วย) · ไม่มี JS แถบยังใช้ได้เหมือนเดิม
+// คำนวณซ้ำหลังฟอนต์โหลด เพราะความกว้างลิงก์เปลี่ยนเมื่อ Sarabun มาแทนฟอนต์สำรอง
+const NAV_SCRIPT = `<script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script>`;
+
 // file = path ใต้ docs/ เช่น gdd.html · design-lore.html · spec/lore-finance-series.html
 // หน้า design-<เรื่อง> อยู่ใต้เมนู "การออกแบบ" ⇒ ลิงก์นั้นได้ aria-current="true" (ไม่ใช่ page เพราะไม่ใช่หน้านั้นเอง)
 export function navHtml(file) {
@@ -36,7 +40,7 @@ export function navHtml(file) {
   const cur = (href) => (href === file ? ' aria-current="page"' : href === 'design.html' && /^design-.+\.html$/.test(file) ? ' aria-current="true"' : '');
   const a = (href, text, cls) => `<a${cls ? ` class="${cls}"` : ''} href="${up}${href}"${cur(href)}>${text}</a>`;
   const links = NAV_MENU.map(([h, t, c]) => a(h, t, c)).join('');
-  return `<nav class="top" aria-label="หน้าอื่น">${a('index.html', 'เกิดใหม่ทั้งที', 'brand')}<div class="links">${links}</div>${a('play.html', 'เล่นเกม', 'play')}</nav>`;
+  return `<nav class="top" aria-label="หน้าอื่น">${a('index.html', 'เกิดใหม่ทั้งที', 'brand')}<div class="links">${links}</div>${a('play.html', 'เล่นเกม', 'play')}</nav>${NAV_SCRIPT}`;
 }
 
 const swap = (html, start, end, body, where) => {
