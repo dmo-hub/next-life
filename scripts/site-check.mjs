@@ -21,7 +21,7 @@ import { uiPage, designMoved, tweakPages, cssVars, UI_PAGE, UI_MOVED_FROM } from
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
-import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, PUBLIC_HIDE } from '../src/site/gate.mjs';
+import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, GATE_OFF, PUBLIC_HIDE } from '../src/site/gate.mjs';
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
 import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsTweak } from '../src/site/docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, cardArtBlock, CAT_ART } from '../src/site/card-art-tweak.mjs';
@@ -545,12 +545,13 @@ check('หน้าเฉลยวาดทุกเงื่อนไขแล�
   const only = (want, fn) => (f) => (f === want ? fn(read(f), f) : read(f));
   const ctl = {
     ถอดบล็อก: only(g0, (h) => h.replace(BLOCK, '')),
-    'hash อื่น': only(g0, (h, f) => injectGate(h, other, f)),
+    // ปิดชั่วคราว: บล็อกไม่มี hash ⇒ ตัวควบคุม hash อื่นใช้ไม่ได้ · ใช้บล็อกตอนเปิดแทน
+    ...(GATE_OFF ? { 'บล็อกตอนเปิด': only(g0, (h) => h.replace(BLOCK, `<!--GATE:START-->${gateBlock(other, g0, false)}<!--GATE:END-->`)) } : { 'hash อื่น': only(g0, (h, f) => injectGate(h, other, f)) }),
     'ท้าย body': only(g1, (h) => { const b = h.match(BLOCK)[0]; return h.replace(BLOCK, '').replace(/<\/body>/i, `${b}</body>`); }),
     หน้าแรกติด: only('index.html', (h, f) => injectGate(h, gateHash, f)),
   };
   const ctlBad = Object.entries(ctl).filter(([, rp]) => !gateGap(files, rp).length).map(([k]) => k);
-  check('หน้าเว็บติดรหัสครบ (กล่องใน head · hash ปัจจุบัน · noindex) หน้าแรก/ตัวเกมไม่ติด', miss.length || ctlBad.length || files.length < 20, ` ${files.length} หน้า · hash ${gateHash ? 'ตั้งแล้ว' : 'ยังไม่ตั้ง (กล่องบอกว่ายังเปิดไม่ได้)'}${miss.length ? ` · ${miss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
+  check('หน้าเว็บติดรหัสครบ (กล่องใน head · hash ปัจจุบัน · noindex) หน้าแรก/ตัวเกมไม่ติด', miss.length || ctlBad.length || files.length < 20, ` ${files.length} หน้า · hash ${GATE_OFF ? 'ปิดชั่วคราว (เหลือ noindex)' : gateHash ? 'ตั้งแล้ว' : 'ยังไม่ตั้ง (กล่องบอกว่ายังเปิดไม่ได้)'}${miss.length ? ` · ${miss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
 }
 
 // ซ่อนโลกที่สามบนหน้าไม่ติดรหัส (ui-redo 70): หน้าแรก · หน้าส่งต่อทั้งหน้า และ <head> ของ play.html (ตัวเกมใน body ไม่นับ)

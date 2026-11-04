@@ -15,6 +15,7 @@ import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMu
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
+import { pastLifeOk, pastTalent, talentStart } from './past.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -135,7 +136,8 @@ export function jobText(st, age = st.age) {
     if (st.school && age >= SCHOOL_FROM) return `กำลังเรียน${TRACKS[st.school].name}`;
     return age < SCHOOL_FROM ? 'ยังไม่เข้าเรียน' : 'ยังไม่ทำงาน';
   }
-  return isWorking(st, age) || age < RETIRE_AGE ? rankName(st) : `เกษียณ (เคยเป็น${rankName({ ...st, office: null })})`;
+  // เกษียณก่อนกำหนด (fx.retire ตั้ง retiredAt) ไม่ต้องรอ 60 ถึงขึ้น "เกษียณ"
+  return isWorking(st, age) || age < Math.min(RETIRE_AGE, st.retiredAt ?? Infinity) ? rankName(st) : `เกษียณ (เคยเป็น${rankName({ ...st, office: null })})`;
 }
 
 // เงินเก็บต่อปี เป็นบาทของปีนั้น: ค่าจ้างตามอาชีพ × ภาค ทั้งปี × อัตราออม (ใบ 14)
@@ -240,6 +242,9 @@ export function newLife(seed, content, heir = null) {
     fame: heir?.fame ?? 0,
     // ค่าซ้อนทับของตระกูล (overlapOf) — ใส่ช่องเฉพาะเมื่อ > 0 ⇒ ตระกูลที่ไม่เคยข้ามโลกได้สถานะเท่าเดิมทุกไบต์ · เซฟเก่าไม่มีช่อง = 0
     ...(heir?.overlap && { overlap: heir.overlap }),
+    // ความจำข้ามชาติ (past.mjs) + อาชีพที่ติดพรสวรรค์มา — ชีวิตแรกไม่มีช่อง
+    ...(heir?.past && { past: heir.past }),
+    ...(pastTalent(heir?.past) && { talent: pastTalent(heir.past) }),
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // จดหมายคำฝากของรุ่นก่อน (afterfall-3) {age, from, cause, by} — ออกหลังมรดกถึงมือเท่านั้น
@@ -650,16 +655,17 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
     st.occupation = o.id;
     st.occupationName = o.name;
     if (st.workFrom === null) st.workFrom = st.age;
-    // ตัวคูณรายได้ผูกกับงานเดิม เปลี่ยนงานแล้วเริ่มนับใหม่
-    st.incomeMult = 1;
+    // ตัวคูณรายได้ผูกกับงานเดิม เปลี่ยนงานแล้วเริ่มนับใหม่ · งานตรงพรสวรรค์ติดชาติเริ่มสูงกว่านิดหนึ่ง
+    st.incomeMult = talentStart(st);
     st.jobSince = st.age;
     enterByJob(st, o.id);
   }
   if (fx.ladder) {
     if (st.workFrom === null) st.workFrom = st.age;
-    st.incomeMult = 1;
     st.jobSince = st.age;
     enterLadder(st, fx.ladder);
+    // วัดพรสวรรค์หลังเข้าสาย — อาชีพเปลี่ยนตามขั้นแรกของสาย
+    st.incomeMult = talentStart(st);
     // ทางแรกของสาย (B170): การ์ด first_of ออกปีที่เข้าสาย ครั้งเดียวต่อชีวิต (เข้าสายซ้ำไม่ออกอีก) · แทนการ์ดกองสุ่มหนึ่งใบแบบผลย้อน ชีวิตจึงไม่ยาวขึ้น
     const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id]);
     if (first) {
@@ -862,6 +868,11 @@ function stepYear(st) {
     // บำนาญข้าราชการ (B40): ค่าจ้างสุดท้าย × ปีรับราชการ ÷ div ไม่เกิน cap เท่าของค่าจ้างสุดท้าย
     const pen = st.content.era.careers.pension;
     st.pension = ladderOf(st)?.pension ? Math.min(pen.cap, (st.age + 1 - st.ladder.from) / pen.div) * jobWage(st, st.birthYear + st.age) * 12 / st.price : 0;
+  }
+  // ปีทำงานต่ออาชีพ — อาชีพหลักที่ชาติถัดไปจำได้ (past.mjs) · ช่องเกิดปีแรกที่ทำงาน
+  if (isWorking(st)) {
+    const w = (st.workYears ??= {});
+    w[st.occupation] = (w[st.occupation] ?? 0) + 1;
   }
 
   st.age += 1;
@@ -1778,6 +1789,7 @@ export function whenOk(st, when) {
   }
   if (when.parent_flags && !parentFlagsOk(st, when.parent_flags)) return false;
   if (when.dark_gate && !darkGateOk(st)) return false;
+  if (when.past_life && !pastLifeOk(st, when.past_life)) return false;
   return !when.flags || flagsOk(st, when.flags);
 }
 
