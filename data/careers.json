@@ -298,22 +298,27 @@
     "name": "การเมือง",
     "steps": [
       {
-        "name": "ผู้ใหญ่บ้าน",
-        "pay": {
-          "v": 10000,
-          "y": 2566,
-          "source": "https://www.thaipbs.or.th/news/content/331385",
-          "note": "ค่าตอบแทนหลังปรับ 1 ต.ค. 2566"
-        }
-      },
-      {
-        "name": "กำนัน",
-        "pay": {
-          "v": 12000,
-          "y": 2566,
-          "source": "https://www.prachachat.net/politics/news-1231609",
-          "note": "ค่าตอบแทนหลังปรับ 1 ต.ค. 2566"
-        }
+        "name": "ผู้นำท้องถิ่น",
+        "subs": [
+          {
+            "name": "ผู้ใหญ่บ้าน",
+            "pay": {
+              "v": 10000,
+              "y": 2566,
+              "source": "https://www.thaipbs.or.th/news/content/331385",
+              "note": "ค่าตอบแทนหลังปรับ 1 ต.ค. 2566"
+            }
+          },
+          {
+            "name": "กำนัน",
+            "pay": {
+              "v": 12000,
+              "y": 2566,
+              "source": "https://www.prachachat.net/politics/news-1231609",
+              "note": "ค่าตอบแทนหลังปรับ 1 ต.ค. 2566"
+            }
+          }
+        ]
       },
       {
         "name": "นายก อบต.",
@@ -333,6 +338,11 @@
           "source": "https://www.thaipbs.or.th/now/content/172",
           "note": "เงินประจำตำแหน่ง 71,230 + เงินเพิ่ม 42,330"
         }
+      },
+      {
+        "name": "หัวหน้าพรรค",
+        "full": true,
+        "vacant": true
       },
       {
         "name": "นายกรัฐมนตรี",
