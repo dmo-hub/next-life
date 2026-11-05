@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { loadContent } from './src/node/load.mjs';
-import { buildSite } from './src/site/build.mjs';
+import { buildSite, toLf } from './src/site/build.mjs';
 import { readVersion, versionLines, releaseLog, notesLines } from './src/site/facts.mjs';
 
 const read = (p) => readFileSync(new URL(p, import.meta.url), 'utf8');
@@ -37,7 +37,7 @@ const fonts = PLAY_FONTS.map(([family, weight, file]) => {
   return `@font-face { font-family:"${family}"; font-weight:${weight}; font-style:normal; font-display:swap; src:url(data:font/woff2;base64,${b64}) format('woff2'); }`;
 }).join('\n');
 
-writeFileSync(new URL('./docs/play.html', import.meta.url), read('./src/ui/template.html').replace('/*__FONTS__*/', () => fonts).replace('/*__SCRIPT__*/', () => script));
+writeFileSync(new URL('./docs/play.html', import.meta.url), toLf(read('./src/ui/template.html').replace('/*__FONTS__*/', () => fonts).replace('/*__SCRIPT__*/', () => script)));
 // หน้า tweak ที่ต้องหน้าตาเกมจริง (ui-redo 46): ฉีด CSS ของ template + ฟอนต์หน้าเล่นตอน build — หน้าไม่ลอก CSS เอง แก้เกมแล้วต้นแบบตามทันที
 const GAME_CSS = ['/*GAME-CSS:START*/', '/*GAME-CSS:END*/'];
 const gameCss = read('./src/ui/template.html').match(/<style>([\s\S]*?)<\/style>/)[1].replace('/*__FONTS__*/', () => fonts.split('\n').filter((f) => f.includes('Noto Sans Thai')).join('\n'));
@@ -45,7 +45,7 @@ for (const page of ['./docs/dev/tweak/head-tweak.html', './docs/dev/tweak/death-
   const html = read(page);
   const [a, b] = GAME_CSS.map((m) => html.indexOf(m));
   if (a < 0 || b < a) throw new Error(`${page}: ต้องมี ${GAME_CSS.join(' … ')}`);
-  writeFileSync(new URL(page, import.meta.url), html.slice(0, a + GAME_CSS[0].length) + gameCss + html.slice(b));
+  writeFileSync(new URL(page, import.meta.url), toLf(html.slice(0, a + GAME_CSS[0].length) + gameCss + html.slice(b)));
 }
 console.log(`docs/play.html: ${content.events.length} เหตุการณ์ · ข้อมูลยุค ${JSON.stringify(content.era).length.toLocaleString('en-US')} ตัวอักษร`);
 const site = buildSite(content);

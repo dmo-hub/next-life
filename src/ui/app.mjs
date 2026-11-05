@@ -1,4 +1,4 @@
-import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE } from '../engine/index.mjs';
+import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
@@ -496,6 +496,12 @@ function lifeChart(life, deathAge, cause) {
   box.append(svg, legend, cap);
   const echoes = echoBand(x, W, deathAge, cap);
   if (echoes) box.append(el('div', 'h', 'เหตุและผล'), ...echoes);
+  const arcs = arcSummary(st);
+  if (arcs.length) {
+    const list = el('ol', 'echo-list');
+    for (const a of arcs) list.append(el('li', null, `${a.name} · ${a.n} ตอน · ${a.end ? 'จบเรื่องแล้ว' : 'ยังค้างอยู่'}`));
+    box.append(el('div', 'h', 'เรื่องต่อเนื่อง'), list);
+  }
   const money = sparkline(life.money, 0, deathAge, true);
   if (money) box.append(el('div', 'h', 'เงินติดตัว'), money);
   return fold(box, `ทั้งชีวิต · อายุ 0–${deathAge}`);
@@ -2186,6 +2192,8 @@ function render(card) {
       ef.append(`มาจากที่คุณเลือกตอนอายุ ${card.echoFrom}`);
       body.append(ef);
     }
+    // สายเรื่องรายคน (krung-1): ตอนแรกไม่มีระยะห่างให้บอก
+    if (card.kind === 'event' && card.arc) body.append(el('span', 'ef', `เรื่องต่อเนื่อง ตอนที่ ${card.arc.n}${card.arc.gap ? ` · ผ่านมา ${card.arc.gap} ปีจากตอนก่อน` : ''}`));
 
     if (card.kind === 'intro') {
       // ผู้สืบสายเลือด (B76) เริ่มกลางวัย ไม่ได้เกิดใหม่
