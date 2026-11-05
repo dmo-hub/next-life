@@ -119,7 +119,7 @@ function statusBar(card, s) {
     heart.setAttribute('aria-label', 'ใกล้ตาย');
     age.append(heart);
   }
-  r1.append(avatar(card.age), who, age);
+  r1.append(avatar(card.age), who, sbRight(age, lifeMoneyRow(s)));
   const delta = st.dead ? null : yearDelta(card.age, s);
   const ul = el('ul', 'sb-m');
   for (const k of SHOWN_STATS) {
@@ -135,8 +135,14 @@ function statusBar(card, s) {
     }
     ul.append(li);
   }
-  bar.append(r1, lifeMoneyRow(s), ul);
+  bar.append(r1, ul);
   return bar;
+}
+// คอลัมน์ขวาของแถวบน (ui-redo 109 · ข้อ 233): อายุ แล้วฐานะ + เงินสด (ต่างโลก "ทอง") ใต้อายุ — แถบเหลือสองส่วน ไม่มีแถวเงินแยก
+function sbRight(age, money) {
+  const right = el('span', 'sb-right');
+  right.append(age, money);
+  return right;
 }
 // หัวการ์ด (ui-redo ข้อ 161–162): แถวใต้ชื่อมีแค่คำ ไม่มีเกจ — ตัวเต็ม (เงินกู้ · รายได้ · ตำแหน่ง) อยู่แผงตัวฉัน/แผงเงิน (ข้อ 61)
 // อาชีพเป็นบรรทัดแยกจากบรรทัดจังหวัด ป้ายพักทับแค่บรรทัดจังหวัด (data-where) อาชีพจึงยังอยู่
@@ -2967,12 +2973,12 @@ function isekaiBar(card, s, where) {
     heart.setAttribute('aria-label', 'ใกล้ตาย');
     age.append(heart);
   }
-  r1.append(ini, who, age);
-  const ul = el('ul', 'sb-m');
-  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN, undefined, 'hp'), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false, undefined, k)));
   const row = el('div', 'hd-row');
   row.append(headCash('ทอง', s.gold.toLocaleString('en-US')));
-  bar.append(r1, row, ul);
+  r1.append(ini, who, sbRight(age, row));
+  const ul = el('ul', 'sb-m');
+  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN, undefined, 'hp'), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false, undefined, k)));
+  bar.append(r1, ul);
   return bar;
 }
 // เกจทองต่างโลก: หลอดเต็ม = ทองตั้งต้นของร่าง + ISEKAI_GOLD_SPAN · ทองที่หาได้ทั้งชาติแทบไม่ขึ้นกับทองตั้งต้น
