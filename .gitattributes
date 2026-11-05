@@ -1,6 +1,6 @@
 # eol=lf: build เขียน LF ล้วน (toLf ใน src/site/build.mjs) — checkout เป็น CRLF แล้ว git จะเห็นว่าแก้ทุกครั้งที่ build
 # จน checkout/stash ไม่ยอม · หน้าเขียนมือก็โดน เพราะ build ฉีดตัวเลขเขียนทับ (แค่ EOL ไม่เปลี่ยนวิธี merge)
-docs/*.html text eol=lf
+docs/**/*.html text eol=lf
 
 # ไฟล์ที่ build สร้างทั้งไฟล์ (play.html + GEN_PAGES ใน src/site/build.mjs)
 # merge=build: ตอน merge เก็บฝั่งตัวเองไว้ ไม่ต่อข้อความ — CONTENT ใน play.html อยู่บรรทัดเดียว สอง branch แก้ content คนละที่ก็ชนทุกครั้ง

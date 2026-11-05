@@ -6,7 +6,7 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
 import { siteFacts, injectFacts, readVersion, versionLines, releaseLog, notesLines, NOTE_CUT } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
-import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
+import { FACT_PAGES, GEN_PAGES, toLf } from '../src/site/build.mjs';
 import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_ROLES, roleInfo, ISEKAI_SKILLS, ISEKAI_CAREERS, CONT_REGIONS, CONT_RACES, CONT_END, contBirth, makeRng } from '../src/engine/index.mjs';
 import { isekaiCardCount, ISEKAI_SECTION, contEndTitles, text as isekaiText } from '../src/site/otherworld.mjs';
 import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR, SPEC_START, SPEC_END } from '../src/site/spec.mjs';
@@ -329,7 +329,7 @@ check('ทุกหน้ามีแถบบนชุดเดียวแล�
 
 // 7c3) หน้า tweak ที่ใช้ CSS เกม (thai-life-deep 185): บล็อกในหน้า = CSS ของ template.html ตอนนี้ — แก้ CSS เกมแล้วลืม build = หน้า tweak โชว์หน้าตาเก่า
 // ตัวควบคุม: CSS ที่ต่างไป 1 ตัวอักษรต้องไม่ผ่าน
-const liveCss = gameCss(readFileSync(new URL('../src/ui/template.html', import.meta.url), 'utf8'));
+const liveCss = toLf(gameCss(readFileSync(new URL('../src/ui/template.html', import.meta.url), 'utf8')));
 const cssMiss = GAME_CSS_PAGES.filter((f) => gameCssBlock(read(f)) !== liveCss);
 const cssCtl = gameCssBlock(read(GAME_CSS_PAGES[0])) !== `${liveCss} `;
 check('หน้า tweak ใช้ CSS เกมชุดปัจจุบัน', cssMiss.length || !cssCtl, ` ${GAME_CSS_PAGES.length} หน้า${cssMiss.length ? ` · เก่า ${cssMiss.join(' ')}` : ''} · ตัวควบคุม${cssCtl ? 'จับได้' : 'จับไม่ได้'}`);
@@ -566,10 +566,16 @@ const gotBuild = mergeBuild(attrs);
 const handBuild = FACT_PAGES.filter((n) => gotBuild.has(`docs/${n}.html`));
 // ตัวควบคุม: เติมหน้าเขียนมือเข้ารายการแล้วต้องตก
 const ctlCaught = !sameSet(mergeBuild([...attrs, [`docs/${FACT_PAGES[0]}.html`, 'merge=build']]));
-const lfAttr = attrs.some(([p, ...w]) => p === 'docs/*.html' && w.includes('eol=lf'));
-const crPages = wantBuild.filter((p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8').includes('\r'));
-check('.gitattributes merge=build ครบหน้าที่ build สร้าง ไม่มีหน้าเขียนมือ · docs eol=lf · ไฟล์ build ไม่มี CR', !sameSet(gotBuild) || handBuild.length || !ctlCaught || !lfAttr || crPages.length,
-  ` merge=build ${gotBuild.size}/${wantBuild.length}${handBuild.length ? ` หน้ามือ ${handBuild.join(',')}` : ''} · eol=lf ${lfAttr ? 'มี' : 'ไม่มี'}${crPages.length ? ` · มี CR ${crPages.join(',')}` : ''} · ตัวควบคุม${ctlCaught ? 'จับได้' : 'จับไม่ได้'}`);
+// eol=lf ต้องครอบโฟลเดอร์ย่อย (docs/dev · docs/spec ฯลฯ) — `docs/*.html` ไม่ข้าม / ⇒ หน้าย่อยออกเป็น CRLF แล้วขึ้น M ทุก build
+// ตัวควบคุม: ถอดบรรทัด eol ⇒ ต้องตก
+const lfOf = (lines) => lines.some(([p, ...w]) => p === 'docs/**/*.html' && w.includes('eol=lf'));
+const lfAttr = lfOf(attrs);
+const lfCtl = !lfOf(attrs.filter(([, ...w]) => !w.includes('eol=lf')));
+const allHtml = (dir) => readdirSync(new URL(dir, docs), { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? allHtml(`${dir}${d.name}/`) : d.name.endsWith('.html') ? [`${dir}${d.name}`] : []));
+const htmlAll = allHtml('');
+const crPages = htmlAll.filter((f) => read(f).includes('\r'));
+check('.gitattributes merge=build ครบหน้าที่ build สร้าง ไม่มีหน้าเขียนมือ · docs/** eol=lf · html ทุกโฟลเดอร์ไม่มี CR', !sameSet(gotBuild) || handBuild.length || !ctlCaught || !lfAttr || !lfCtl || crPages.length,
+  ` merge=build ${gotBuild.size}/${wantBuild.length}${handBuild.length ? ` หน้ามือ ${handBuild.join(',')}` : ''} · eol=lf ${lfAttr ? 'มี' : 'ไม่มี'} · มี CR ${crPages.length}/${htmlAll.length} หน้า${crPages.length ? ` (${crPages.slice(0, 5).join(',')})` : ''} · ตัวควบคุม merge=build ${ctlCaught ? 'จับได้' : 'จับไม่ได้'} · ถอด eol ${lfCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // กล่องรหัส (ui-redo 72): ทุกหน้า docs/ ที่ไม่ใช่หน้าแรก/ตัวเกม/หน้าส่งต่อ มีบล็อกชุดเดียวใน <head> ตรง hash ปัจจุบัน + noindex · หน้าแรก/ตัวเกมไม่มี
 // ตัวควบคุม: ถอดบล็อก · hash อื่น · ย้ายไปท้าย body · ใส่บล็อกให้หน้าแรก ⇒ ต้องถูกจับทุกแบบ

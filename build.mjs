@@ -45,7 +45,7 @@ for (const page of ['./docs/dev/tweak/head-tweak.html', './docs/dev/tweak/death-
   const html = read(page);
   const [a, b] = GAME_CSS.map((m) => html.indexOf(m));
   if (a < 0 || b < a) throw new Error(`${page}: ต้องมี ${GAME_CSS.join(' … ')}`);
-  writeFileSync(new URL(page, import.meta.url), html.slice(0, a + GAME_CSS[0].length) + gameCss + html.slice(b));
+  writeFileSync(new URL(page, import.meta.url), toLf(html.slice(0, a + GAME_CSS[0].length) + gameCss + html.slice(b)));
 }
 console.log(`docs/play.html: ${content.events.length} เหตุการณ์ · ข้อมูลยุค ${JSON.stringify(content.era).length.toLocaleString('en-US')} ตัวอักษร`);
 const site = buildSite(content);
