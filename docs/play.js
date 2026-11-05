@@ -3151,6 +3151,12 @@ function stepYear(st) {
   if (isWorking(st)) {
     const w = (st.workYears ??= {});
     w[st.occupation] = (w[st.occupation] ?? 0) + 1;
+    // ช่วงงานตามอายุ (ui-redo 131) ให้แผงตัวฉันเรียงประวัติงาน · ปีว่างงานคั่น = ช่วงใหม่ · workYears คงไว้ให้ past/titles
+    // เซฟก่อนมีช่องนี้เริ่มนับจากปีที่เล่นต่อ — ปีก่อนหน้าจอคิดจาก workYears ลบผลรวมช่วง ไม่เดาอายุย้อนหลัง
+    const spans = (st.workSpans ??= []);
+    const last = spans.at(-1);
+    if (last?.occ === st.occupation && last.to === st.age - 1) last.to = st.age;
+    else spans.push({ occ: st.occupation, from: st.age, to: st.age });
   }
 
   st.age += 1;
@@ -9613,7 +9619,7 @@ function statusBar(card, s) {
   bar.append(r1, lifeMoneyRow(s), ul);
   return bar;
 }
-// หัวการ์ด (ui-redo ข้อ 161–162): แถวใต้ชื่อมีแค่คำ ไม่มีเกจ — ตัวเต็ม (เงินกู้ · รายได้ · ตำแหน่ง) อยู่แผงตัวฉัน/แผงเงิน (ข้อ 61)
+// หัวการ์ด (ui-redo ข้อ 161–162): แถวใต้ชื่อมีแค่คำ ไม่มีเกจ — ตัวเต็ม (เงินกู้ · รายได้ · ตำแหน่ง) อยู่แผงตัวฉัน (ข้อ 61 · เงินรวมเข้าแผงตัวฉันแล้ว ui-redo 131)
 // อาชีพเป็นบรรทัดแยกจากบรรทัดจังหวัด ป้ายพักทับแค่บรรทัดจังหวัด (data-where) อาชีพจึงยังอยู่
 const headJob = (text) => el('small', 'hd-job', text);
 // เกษียณบนหัวการ์ดเหลือคำเดียว — "เคยเป็น…" ยาวจนตกบรรทัดที่ 390 และแผงตัวฉันบอกครบอยู่แล้ว
@@ -9630,7 +9636,7 @@ function headCash(label, value, warn = null) {
 }
 function lifeMoneyRow(s) {
   const row = el('div', 'hd-row');
-  // เงินกู้เป็นยอดค้างของสัญญา ไม่หักจากเงินสด (เหมือนแผงเงิน) — มีกู้ชนะติดลบเมื่อเป็นทั้งคู่ เพราะเป็นเหตุที่ผู้เล่นต้องทำอะไรต่อ
+  // เงินกู้เป็นยอดค้างของสัญญา ไม่หักจากเงินสด (เหมือนช่องเงินในแผงตัวฉัน) — มีกู้ชนะติดลบเมื่อเป็นทั้งคู่ เพราะเป็นเหตุที่ผู้เล่นต้องทำอะไรต่อ
   const warn = totalDebt(st) > 0 ? 'มีกู้' : s.money < 0 ? 'ติดลบ' : null;
   row.append(el('span', 'mk', 'ฐานะ'), el('span', 'hd-word', classNow(st)), headCash('เงินสด', shortBaht(Math.round(s.money)), warn));
   return row;
@@ -9692,7 +9698,8 @@ function focusBar(card, open = false) {
 
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทยและต่างโลก · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
 // ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ
-const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบครัว'], ['money', 'เงิน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
+// เงินไม่มีปุ่มของตัวเอง อยู่ในแผงตัวฉันก่อนโฟกัส (ui-redo 131 · ข้อ 229) — ชาติไทยเหลือ 4 ปุ่มเท่าต่างโลก
+const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบครัว'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
 // ต่างโลกไม่มีครอบครัวกับเงินบาทให้ดู — ทอง ชื่อเสียง อาชีพอยู่ในแผงตัวฉันของร่างนี้ (ui-redo ใบ 13)
 // สกิลแยกปุ่มเพราะสมุดสกิล (06s-3) จะมาต่อที่แผงนี้ · ไม่มีปุ่มความเร็ว: ใบตาไม่เดินเอง ผู้เล่นกด "ต่อ" เองแบบชาติไทย (ui-redo 81)
 const ISEKAI_MENU = [['me', 'ตัวฉัน'], ['skill', 'สกิล'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
@@ -9704,7 +9711,7 @@ function lifeMenu(card, box, after = false) {
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
   const isk = card.kind === 'isekai';
-  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), skill: () => isekaiSkillPanel(card.status), family: after ? clanPanel : familyPanel, money: () => moneyPanel(card), more: morePanel, past: pastPanel };
+  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), skill: () => isekaiSkillPanel(card.status), family: after ? clanPanel : familyPanel, more: morePanel, past: pastPanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
   const views = { shelf: () => openShelf() };
   // ต่างโลกช่วงยังไม่มีร่าง (ไม่มีหน้าต่างสถานะ) ไม่มีอะไรให้แผงตัวฉันกับสกิลโชว์
@@ -9804,27 +9811,92 @@ const closeSheet = (keep) => sheetClose?.(keep);
 
 // แผงตัวฉัน: ค่าเต็มคู่คำอธิบาย · โฟกัส · ฐานะและงาน (ย้ายมาจากใต้แถบสถานะของการ์ด) · ไม่มีลูกศรปีนี้ — ลูกศรอยู่บนแถบสถานะที่เดียว
 // การ์ดตายเปิดได้เหมือนกัน เห็นค่าตอนจากไป แต่ไม่มีโฟกัส (ชีวิตจบแล้ว)
+// เงินอยู่ก่อนโฟกัส คำอธิบาย "เงิน · หนี้" อยู่ใต้เงินที่เดียว (ui-redo 131 · ข้อ 229) · ประวัติงานท้ายฐานะและงาน (ข้อ 231)
 function mePanel(card) {
   const s = statsOf(st);
   const help = new Map(STAT_HELP);
   const wrap = el('div', 'me');
+  // คำอธิบายทุกชิ้นพับด้วยปุ่มเดียว (ข้อ 230) — เกจกับยอดเงินไม่พับ
+  const hp = [];
   const ul = el('ul', 'me-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
     const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN && !st.dead, String(v), k);
-    if (help.has(STAT_LABELS[k])) li.append(el('p', null, help.get(STAT_LABELS[k])));
+    if (help.has(STAT_LABELS[k])) li.append(hp[hp.push(el('p', null, help.get(STAT_LABELS[k]))) - 1]);
     ul.append(li);
   }
-  const shown = new Set(SHOWN_STATS.map((k) => STAT_LABELS[k]));
+  const shown = new Set([...SHOWN_STATS.map((k) => STAT_LABELS[k]), MONEY_HELP]);
   const dl = el('dl');
   for (const [k, v] of STAT_HELP) if (!shown.has(k)) dl.append(el('dt', null, k), el('dd', null, v));
-  wrap.append(el('h3', null, 'ค่าสถานะ'), ul, dl);
+  hp.push(dl);
+  const hh = el('div', 'me-hh');
+  const fold = el('button', 'me-fold');
+  fold.type = 'button';
+  const setOpen = (open) => {
+    for (const e of hp) e.hidden = !open;
+    fold.setAttribute('aria-expanded', String(open));
+    fold.textContent = open ? 'ซ่อนคำอธิบาย' : 'ดูคำอธิบาย';
+  };
+  fold.onclick = () => {
+    const open = fold.getAttribute('aria-expanded') !== 'true';
+    setOpen(open);
+    meHelpSave(open);
+  };
+  hh.append(el('h3', null, 'ค่าสถานะ'), fold);
+  wrap.append(hh, ul, dl, el('h3', null, 'เงิน'), moneyBox(card, hp));
   if (!st.dead && card.kind !== 'death') wrap.append(el('h3', null, 'โฟกัส'), focusBar(card));
   const meta = el('p', 'meta');
   metaLine(meta, standParts(card));
   wrap.append(el('h3', null, 'ฐานะและงาน'), meta);
+  const wh = workHistory();
+  if (wh) wrap.append(el('h3', null, 'งานที่เคยทำ'), wh);
   if (itemsVisible(st)) wrap.append(el('h3', null, 'ของติดตัว'), kitList());
+  setOpen(meHelpOpen());
   return wrap;
+}
+const MONEY_HELP = 'เงิน · หนี้';
+// พับ/กางคำอธิบายจำในเครื่อง ไม่ลงเซฟเกม (ข้อ 230) · ไม่เคยกด = พับ · storage ปิด = พับทุกครั้ง ไม่พัง
+const ME_HELP_KEY = 'next-life-me-help-v1';
+function meHelpOpen() {
+  try {
+    return localStorage.getItem(ME_HELP_KEY) === 'open';
+  } catch {
+    return false;
+  }
+}
+function meHelpSave(open) {
+  try {
+    localStorage.setItem(ME_HELP_KEY, open ? 'open' : 'closed');
+  } catch {
+    // ไม่มี storage: ค่าพับอยู่แค่แผงนี้
+  }
+}
+// ประวัติงานเรียงช่วงอายุจาก st.workSpans (ข้อ 231) · ปีที่ทำก่อนมีช่องนี้ (เซฟเก่า) ขึ้นเป็นปีรวมต่ออาชีพไว้ก่อน ไม่มีอายุ
+// เพราะไม่รู้ว่าทำช่วงไหน — เจ้าของเคาะไม่เดาอายุย้อนหลัง · ยังไม่เคยทำงาน = ไม่มีหัวนี้
+function workHistory() {
+  const occs = st.content.era.finance.occupations;
+  const name = (id) => occs.find((o) => o.id === id)?.name ?? id;
+  const spans = st.workSpans ?? [];
+  const inSpans = {};
+  for (const x of spans) inSpans[x.occ] = (inSpans[x.occ] ?? 0) + x.to - x.from + 1;
+  const ul = el('ul', 'wh wh-me');
+  for (const [id, n] of Object.entries(st.workYears ?? {})) {
+    const left = n - (inSpans[id] ?? 0);
+    if (left <= 0) continue;
+    const li = el('li');
+    li.append(el('span', null, name(id)), el('b', 'num', `${left} ปี`));
+    ul.append(li);
+  }
+  const last = spans.at(-1);
+  // ปีนี้ยังไม่ถูกนับ (นับตอนขึ้นปี) — ช่วงที่จบปีที่แล้วด้วยอาชีพเดิมและยังทำอยู่คือช่วงปัจจุบัน
+  const now = !st.dead && isWorking(st) && last?.occ === st.occupation && last.to === st.age - 1;
+  for (const x of spans) {
+    const li = el('li');
+    const to = x === last && now ? 'ตอนนี้' : x.to === x.from ? '' : x.to;
+    li.append(el('span', 'wh-age', `อายุ ${x.from}${to === '' ? '' : `–${to}`}`), el('span', null, name(x.occ)));
+    ul.append(li);
+  }
+  return ul.childElementCount ? ul : null;
 }
 // ของติดตัว (B78): ช่องสวมใส่ตามทะเบียน + กระเป๋า n/cap · ไม่มีปุ่มใส่/ถอด — ของลงช่องเองตอนได้ เป้เต็มขายเอง
 // ช่องว่างเขียนว่า "ว่าง" ให้เห็นว่ามีช่องรออยู่ (หัวนี้โชว์เฉพาะเมื่อ itemsVisible)
@@ -11660,7 +11732,7 @@ function render(card) {
     share.append(el('summary', null, BTN.share), menu);
     rest.append(share);
   } else {
-    // ฐานะ/งานอยู่แผงตัวฉัน (ui-redo ใบ 04) · เงินอยู่แผงเงิน (ใบ 07) — ใต้แถบสถานะเหลือแค่เนื้อการ์ด
+    // ฐานะ/งาน/เงินอยู่แผงตัวฉัน (ui-redo ใบ 04 · 131) — ใต้แถบสถานะเหลือแค่เนื้อการ์ด
     box.append(statusBar(card, s));
     // ตัวคูณนิสัย (B41) มีผลกับตัวเลือกก่อนหน้า — บอกบนใบถัดไปแทนการ์ดผลเพิ่ม
     if (card.because) body.append(el('p', 'note', card.because));
@@ -12054,9 +12126,9 @@ function deathTabs(card, parts) {
   pick(deathTabOf.get(card) ?? 0);
   return wrap;
 }
-// แผงเงิน (ui-redo ใบ 07): ย้ายบรรทัดเงินใต้แถบสถานะมาเป็นช่องละแถว · ค่าชุดเดียวกับที่การ์ดเคยบอก ไม่เปิดตัวเลขที่เกมซ่อน
-// ปุ่มกู้ยังอยู่บนการ์ดเพราะเป็นทางเลือกของการ์ดนั้น ไม่ใช่ข้อมูล
-function moneyPanel(card) {
+// ช่องเงินในแผงตัวฉัน (ui-redo ใบ 07 → 131): ย้ายบรรทัดเงินใต้แถบสถานะมาเป็นช่องละแถว · ค่าชุดเดียวกับที่การ์ดเคยบอก ไม่เปิดตัวเลขที่เกมซ่อน
+// ปุ่มกู้ยังอยู่บนการ์ดเพราะเป็นทางเลือกของการ์ดนั้น ไม่ใช่ข้อมูล · คำอธิบายใต้ยอดเข้ากลุ่มพับของแผงตัวฉัน (hp)
+function moneyBox(card, hp) {
   const s = statsOf(st);
   // คนตายไม่มีรายได้ต่อ — การ์ดตายเห็นแค่ที่ทิ้งไว้
   const working = !st.dead && isWorking(st, card.age);
@@ -12073,7 +12145,9 @@ function moneyPanel(card) {
   const wrap = el('div', 'mo');
   const dl = el('dl');
   for (const [k, v, neg] of rows) dl.append(el('dt', null, k), el('dd', neg ? 'num neg' : 'num', v));
-  wrap.append(dl, el('p', null, new Map(STAT_HELP).get('เงิน · หนี้')));
+  const note = el('p', null, new Map(STAT_HELP).get(MONEY_HELP));
+  hp.push(note);
+  wrap.append(dl, note);
   return wrap;
 }
 // แผงเพิ่มเติม: ลิงก์ท้ายหน้าเดิมทั้งชุด — ฉากที่มีเมนูซ่อนท้ายหน้า ที่นี่จึงเป็นทางเข้าเดียว · ไม่มีหน้าตั้งค่า (ui-redo ข้อ 10)
