@@ -264,7 +264,7 @@ textarea { width:100%; font:12px/1.5 ui-monospace,monospace; border:1px solid #C
     doc.getElementById('nl-gate')?.remove();
     let st = doc.getElementById('nl-tw');
     if (!st) { st = doc.createElement('style'); st.id = 'nl-tw'; doc.head.append(st); }
-    if (cfg.skin === 'new' && !doc.getElementById('nl-tw-font')) doc.head.insertAdjacentHTML('beforeend', '<link id="nl-tw-font" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600&display=swap">');
+    if (cfg.skin === 'new' && !doc.getElementById('nl-tw-font')) doc.head.insertAdjacentHTML('beforeend', '<link id="nl-tw-font" rel="stylesheet" href="' + new URL('../../fonts/fonts.css', location.href).href + '">');
     st.textContent = css(cfg, fr.dataset.f);
     return doc;
   }
