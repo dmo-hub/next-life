@@ -16,6 +16,7 @@ import { injectSeo, sitemapXml, faviconSvg, SITEMAP, FAVICON_SVG } from './seo.m
 import { ART_INK } from '../ui/art.mjs';
 import { DOCS_TWEAK_PAGE, docsTweakData, injectDocsTweak } from './docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, injectCardArt } from './card-art-tweak.mjs';
+import { CARD_SPOIL_PAGE, cardSpoilData, injectCardSpoil } from './card-spoil-tweak.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
@@ -100,6 +101,10 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   const ca = readFileSync(at(`docs/${CARD_ART_PAGE}`), 'utf8');
   const caNext = injectCardArt(ca, cardArtData(), `docs/${CARD_ART_PAGE}`);
   put(at(`docs/${CARD_ART_PAGE}`), caNext, ca);
+  // หน้า tweak T14 หน้าการ์ดรวม (ui-redo 126): CSS หน้ารวมการ์ด/หน้าเฉลย + token + การ์ดจริงทั้งสองแบบ
+  const cs = readFileSync(at(`docs/${CARD_SPOIL_PAGE}`), 'utf8');
+  put(at(`docs/${CARD_SPOIL_PAGE}`), injectCardSpoil(cs, cardSpoilData(content, root), `docs/${CARD_SPOIL_PAGE}`), cs);
+  out.push(CARD_SPOIL_PAGE.replace(/\.html$/, ''));
   // กล่องรหัส (ui-redo 72) ฉีดท้ายสุด — หน้าที่ build สร้างใหม่ข้างบนต้องได้บล็อกด้วย · play.html (build.mjs เขียน) ไม่ติดรหัสอยู่แล้ว
   const hash = readGateHash();
   for (const file of gatedFiles(at('docs/'))) {
