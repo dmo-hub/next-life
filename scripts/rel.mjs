@@ -1,8 +1,9 @@
 // ปล่อยเวอร์ชัน: เขียนโน้ตลง docs/whatsnew.html → bump เลข → เลื่อนฐานด่าน keep → commit (ไม่ push ไม่ tag)
 // npm run rel -- <notes.json> [worktree]   (ไม่ส่ง worktree = โฟลเดอร์ปัจจุบัน)
-//   notes.json = {"tag": "...", "shas": ["abc1234"], "note": ["ข้อความข้อละบรรทัด ไม่ต้องใส่ <li> (ตัวนี้ครอบให้ · ใส่เองได้ <li> ซ้อน)"], "soon": ["..."]?, "minor": true?}
+//   notes.json = {"tag": "...", "shas": ["abc1234"], "note": ["ข้อความข้อละบรรทัด ไม่ต้องใส่ <li> (ตัวนี้ครอบให้ · ใส่เองได้ <li> ซ้อน)"], "done": ["96", "B114"]?, "soon": ["..."]?, "minor": true?}
 //   tag = ชื่อขบวน (ขึ้นใน commit) · shas = commit ที่ปล่อยรอบนี้ (cherry-pick ให้ · ใช้ NOPICK=1 ถ้า merge ไว้แล้ว)
-//   หัว "กำลังทำ" ใน whatsnew แบ่งหมวดด้วย <h3> — แก้มือในหมวดที่ตรง และลบข้อที่ปล่อยแล้วออก · ห้ามส่ง soon (ตัวนี้ปฏิเสธ)
+//   done = ใบที่รอบนี้ปิด — ถอดเลขออกจากข้อใน "กำลังทำ" (เลขหมด = ถอดทั้งข้อ · หมวดว่าง = ถอดหมวด) และเติมลง src/site/tickets-done.json
+//     เลขที่ไม่มีข้อไหนอ้าง = throw · ข้อใหม่เขียนมือในหมวดที่ตรงพร้อม data-tickets · ห้ามส่ง soon (หัวแบ่งหมวดด้วย <h3> แล้ว ตัวนี้ปฏิเสธ)
 // env: NOPICK=1 ข้าม cherry-pick (merge --no-ff ไว้แล้ว · shas เก็บเป็นหลักฐาน)
 //      DRY=1 พิมพ์เวอร์ชันใหม่ + บล็อก whatsnew ไม่เขียนไฟล์ ไม่ pick ไม่ bump ไม่ commit
 //        BASE=<rev> (DRY เท่านั้น) อ่าน app.mjs/whatsnew.html จาก rev แทนดิสก์ — เทียบกับขบวนที่ปล่อยไปแล้วได้โดยไม่ต้องมี worktree ชั่วคราว
@@ -10,6 +11,7 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { DONE_FILE, TICKET_ID, dropDone } from '../src/site/roadmap.mjs';
 
 const [notesFile, wt = process.cwd()] = process.argv.slice(2);
 if (!notesFile) throw new Error('ใช้: npm run rel -- <notes.json> [worktree]');
@@ -24,6 +26,7 @@ const strs = (v) => Array.isArray(v) && v.length > 0 && v.every((s) => typeof s 
 if (typeof g.tag !== 'string' || !g.tag.trim() || g.tag.startsWith('TODO')) throw new Error('notes.json: tag ว่าง/TODO');
 if (!strs(g.shas)) throw new Error('notes.json: shas ต้องเป็นรายการ sha ไม่ว่าง');
 if (!strs(g.note)) throw new Error('notes.json: note ต้องเป็นรายการข้อความไม่ว่าง');
+if (g.done !== undefined && (!strs(g.done) || g.done.some((id) => !TICKET_ID.test(id)))) throw new Error(`notes.json: done ต้องเป็นรายการเลขใบ เช่น "96" "B114": ${JSON.stringify(g.done)}`);
 if (g.soon !== undefined && !strs(g.soon)) throw new Error('notes.json: soon ถ้าส่งต้องเป็นรายการไม่ว่าง (ไม่ส่ง = คงของเดิม)');
 
 // อ่านจาก rev ใน DRY+BASE · ที่เหลืออ่านดิสก์ — BASE ทำให้ dry-run ย้อนเทียบขบวนเก่าได้
@@ -76,13 +79,30 @@ if (g.soon) {
   const items = g.soon.map((s) => `${eol}    <li><span class="tag soon">กำลังทำ</span>${s}</li>`).join('');
   out = out.replace(soonRe, (_, head, tail) => head + items + tail);
 }
+// ใบที่ปิดรอบนี้: ถอดออกจากกำลังทำ + จดลงรายการปิดแล้ว — site:check ใช้รายการนี้จับข้อที่ค้างทั้งที่ใบปิดแล้ว
+let drop = null;
+let doneOut = null;
+if (g.done) {
+  drop = dropDone(out, g.done);
+  if (drop.unknown.length) throw new Error(`notes.json done: ไม่มีข้อไหนในกำลังทำอ้างใบ ${drop.unknown.join(' ')} (พิมพ์ผิด หรือถอดมือไปแล้ว)`);
+  out = drop.html;
+  let doneNow = {};
+  try {
+    doneNow = JSON.parse(read(DONE_FILE));
+  } catch (e) {
+    // ขบวนก่อนใบ 128 ไม่มีไฟล์นี้ — ย้อนเทียบด้วย BASE ได้ ไม่ใช่ความผิด
+    if (!BASE) throw e;
+  }
+  doneOut = { ...doneNow, ...Object.fromEntries(g.done.map((id) => [id, ver])) };
+}
 
 if (DRY) {
+  if (drop) console.log(`ใบที่ปิด: ${g.done.join(' ')}${eol}  ถอดทั้งข้อ: ${drop.removed.join(' | ') || '-'}${eol}  ถอดเลขบางใบ: ${drop.trimmed.join(' | ') || '-'}`);
   console.log(`เวอร์ชัน: v${cur[1]}.${cur[2]}.${cur[3]} → ${ver}${BASE ? ` (อ่านจาก ${BASE})` : ''}`);
   console.log('บล็อก whatsnew:');
   console.log(block.replace(/\r/g, '').trimEnd());
   const soonOf = (h) => h.match(/<h2>กำลังทำ<\/h2>[\s\S]*?<\/ul>/)?.[0] ?? '';
-  console.log(`กำลังทำ: ${!g.soon ? 'คงเดิม (ไม่ส่ง soon)' : soonOf(out) === soonOf(html) ? 'ส่ง soon แต่ตรงของเดิมทุกไบต์' : `แทนเป็น ${g.soon.length} ข้อ`}`);
+  console.log(`กำลังทำ: ${!g.soon ? (drop ? 'ถอดตาม done ข้างบน' : 'คงเดิม (ไม่ส่ง done/soon)') : soonOf(out) === soonOf(html) ? 'ส่ง soon แต่ตรงของเดิมทุกไบต์' : `แทนเป็น ${g.soon.length} ข้อ`}`);
   if (process.env.DRY_OUT) {
     fs.writeFileSync(process.env.DRY_OUT, out);
     console.log(`whatsnew ที่จะได้ → ${process.env.DRY_OUT}`);
@@ -91,6 +111,7 @@ if (DRY) {
 }
 
 fs.writeFileSync(path.join(wt, 'docs/whatsnew.html'), out);
+if (doneOut) fs.writeFileSync(path.join(wt, DONE_FILE), `${JSON.stringify(doneOut, null, 2)}\n`);
 execFileSync('npm', ['run', '-s', 'bump', ...(g.minor ? ['minor'] : [])], { cwd: wt, stdio: 'ignore', shell: true });
 // ด่าน keep เทียบกับเวอร์ชันที่ปล่อยล่าสุด — เลื่อนฐานใน commit bump เดียวกัน ไม่งั้นขบวนถัดไปเทียบกับฐานเก่า
 const KEEP = ['harness/keep-ids.json', 'harness/fixtures/keep-snaps.json'];
@@ -100,6 +121,6 @@ const docs = git('diff', '--name-only', '--', 'docs').split('\n').filter(Boolean
 const eolOnly = new Set(docs.filter((f) => !git('diff', '--ignore-cr-at-eol', '--name-only', '--', f)));
 const addDocs = [...docs.filter((f) => !eolOnly.has(f)), ...git('ls-files', '--others', '--exclude-standard', '--', 'docs').split('\n').filter(Boolean)];
 if (eolOnly.size) console.log(`  ข้าม EOL ล้วน: ${[...eolOnly].join(' ')}`);
-git('add', '--', verFile, ...addDocs, ...KEEP.filter((f) => fs.existsSync(path.join(wt, f))));
+git('add', '--', verFile, ...addDocs, ...(doneOut ? [DONE_FILE] : []),...KEEP.filter((f) => fs.existsSync(path.join(wt, f))));
 git('commit', '-q', '-m', `chore(ui): bump demo version ${ver} for ${g.tag}`);
 console.log(`  ${ver} ${git('rev-parse', '--short', 'HEAD')}`);

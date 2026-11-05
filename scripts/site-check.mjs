@@ -18,7 +18,7 @@ import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml } from '../src/site/nav.mjs';
 import { uiPage, designMoved, tweakPages, tweakMoved, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
-import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
+import { soonCats, soonId, soonItems, roadmapHtml, dropDone, soonTicketProblems, DONE_FILE, TICKET_ID, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, GATE_OFF, PUBLIC_HIDE } from '../src/site/gate.mjs';
@@ -385,6 +385,23 @@ const wnMore = wn.replace('<h2>แพตช์โน้ต</h2>', '<h3>หมว
 const roadCtl = roadmapHtml(soonCats(wnMore)) !== roadNow && roadNoId(wn.replace(`<h3 id="${roadCats[0]?.id}">`, '<h3>')).length === 1;
 const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'แถวหมวดใน whatsnew ไม่ตรงหัวกำลังทำ (build ใหม่)', homeLeft.length && `หน้าแรกยังมี ${homeLeft.join(' ')}`, !coreAbout && 'about ไม่มีหัวระบบหลัก', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
 check('แถวหมวดใต้หัวกำลังทำใน whatsnew ตรงหมวดและลิงก์ถึงหัวหมวด · หน้าแรกไม่มีแผนงาน/ระบบหลัก · about มีระบบหลัก', roadBad.length || !roadCtl || !homeCtl, ` ${roadCats.length} หมวด${roadBad.length ? ` · ${roadBad.join(' | ')}` : ''} · ตัวควบคุม${roadCtl && homeCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7d) ข้อในกำลังทำผูกกับใบ (ui-redo 128): ทุกข้อมี data-tickets หรือ data-backlog · ไม่มีข้อที่ใบปิดแล้วยังค้าง (รายการปิดแล้วอยู่ใน repo ที่ rel.mjs เขียน)
+// · rel.mjs ถอดได้จริง: ปิดทุกใบของหมวดแรก ⇒ หมวดหายทั้งหมวดพร้อมแถวลิงก์ · เลขที่ไม่มีใครอ้าง ⇒ unknown
+// ตัวควบคุม: ข้อปลอมผูกกับใบที่ปิดแล้ว ⇒ ตก · ข้อไม่มีป้าย ⇒ ตก
+const doneIds = Object.keys(JSON.parse(readFileSync(new URL(`../${DONE_FILE}`, import.meta.url), 'utf8')));
+const soonNow = soonItems(wn);
+const tkBad = [...(!doneIds.length || doneIds.some((id) => !TICKET_ID.test(id)) ? [`${DONE_FILE} ว่าง/เลขแปลก`] : []), ...soonTicketProblems(wn, doneIds)];
+const fakeLi = (a) => wn.replace(/(<h2>กำลังทำ<\/h2>[\s\S]*?<ul>)/, `$1\n    <li${a}><span class="tag soon">กำลังทำ</span><b>ข้อทดสอบ</b></li>`);
+const firstCat = soonNow[0]?.cat;
+const firstIds = [...new Set(soonNow.filter((it) => it.cat === firstCat).flatMap((it) => it.tickets))];
+const dropCat = dropDone(wn, firstIds);
+const tkCtl = soonTicketProblems(fakeLi(` data-tickets="${doneIds[0]}"`), doneIds).length > tkBad.length
+  && soonTicketProblems(fakeLi(''), doneIds).length > tkBad.length
+  && soonItems(wn).length === soonNow.length
+  && (soonNow.some((it) => it.cat === firstCat && it.backlog) || (!soonCats(dropCat.html).some((c) => c.name === firstCat) && !roadIn(dropCat.html).includes(soonId(firstCat)) && !dropCat.unknown.length))
+  && dropDone(wn, ['zz999']).unknown[0] === 'zz999';
+check('ข้อในกำลังทำผูกกับใบ และไม่มีข้อที่ใบปิดแล้วค้าง', tkBad.length || !tkCtl, ` ${soonNow.length} ข้อ · backlog ${soonNow.filter((it) => it.backlog).length} · ปิดแล้ว ${doneIds.length} ใบ${tkBad.length ? ` · ${tkBad.slice(0, 5).join(' | ')}${tkBad.length > 5 ? ` …อีก ${tkBad.length - 5}` : ''}` : ''} · ตัวควบคุม${tkCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) หน้าโลกที่เล่นได้ (three-worlds 08): บอกแค่ทางที่ผู้เล่นเห็นบนจอเสมอ — ทางลับที่เป็นเหตุสุ่ม (ทริปศาลทั้งตัว court.mjs) ห้ามมีแม้แต่คำ
 // · ทางเกิดครบทุกทางจาก PATHS · แผนภาพ 3 กล่องไม่มีป้ายบนลูกศร (svg มีแค่ <text> ชื่อฉาก) · ลิงก์ไปหน้าต่างโลก
