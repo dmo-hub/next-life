@@ -1,13 +1,12 @@
 # ฟอนต์ของทั้งเว็บ (ต้นฉบับ)
 
 build.mjs คัดลอก `*.woff2` ที่อยู่ในตาราง `FONTS` (src/site/fonts.mjs) ไป `docs/fonts/` และเขียน `docs/fonts/fonts.css` — ทุกหน้าใช้ไฟล์ชุดเดียวกัน ไม่ดึง Google Fonts (ui-redo 96 · ข้อ 205)
-หน้าเล่นฝัง `@font-face` ของ 5 แบบที่ใช้ใน `<style>` ชี้ `fonts/*.woff2` · service worker เก็บไว้ให้เปิดออฟไลน์ · ภาพแชร์ (canvas) รอ `document.fonts.load` ก่อนวาดจึงได้ Srisakdi จริง
+หน้าเล่นฝัง `@font-face` ของ 4 แบบที่ใช้ใน `<style>` ชี้ `fonts/*.woff2` · service worker เก็บไว้ให้เปิดออฟไลน์ · ภาพแชร์ (canvas) รอ `document.fonts.load` ก่อนวาดจึงได้ Srisakdi จริง
 
 - ต้นทาง: Google Fonts `github.com/google/fonts` → `ofl/<ตระกูล>` (TTF) · สัญญาอนุญาต SIL OFL 1.1 (`*-OFL.txt`)
-- หน้าเล่นใช้ 5 แบบ: Noto Sans Thai 400/600 (หัวและเนื้อ) · Sarabun 400/600 (ภาพแชร์และภาพชั้นสมุดที่วาดลง canvas) · Srisakdi 700
+- หน้าเล่นใช้ 4 แบบ: Sarabun 400/600 (เนื้อ + ภาพแชร์และภาพชั้นสมุดที่วาดลง canvas) · Maitree 600 (หัว) · Srisakdi 700 — Noto Sans Thai ถอดแล้ว (ui-redo 105 · ข้อ 216)
 - Sarabun มีแค่ 400/600 (ข้อ 216 · หน้าที่ขอ 700/ตัวเอียงได้ 600 แทน)
-- หน้าเอกสาร: Pridi 400/600 + Sarabun 400/600 · หน้า tweak/ต้นแบบ: Noto Sans Thai 700 · Srisakdi 400 · Mitr · Mali · IBM Plex Sans Thai · Noto Serif Thai
-- Maitree 400/500/600 · Pridi 500 · IBM Plex Sans Thai 400: หน้า tweak T1 ใช้ · หน้าผู้เล่นยังไม่ใช้จนกว่าใบ token ลงจริง
+- หน้าเอกสาร: Maitree 500/600 (หัว) + Sarabun 400/600 (เนื้อ) · Srisakdi 700 ชื่อเกมหัวหน้าแรก · หน้า tweak/ต้นแบบ/แผนที่ dev: Noto Sans Thai · Srisakdi 400 · Pridi · Mitr · Mali · IBM Plex Sans Thai · Noto Serif Thai
 - เพิ่มแบบใหม่: ตัดไฟล์ตามข้างล่าง วางในโฟลเดอร์นี้ แล้วเติมแถวในตาราง `FONTS` (site-check ตรวจว่าไฟล์ใน docs/fonts ตรงต้นฉบับและ fonts.css ตรงตาราง)
 - ตัดด้วย fonttools (ไม่อยู่ใน package.json — รันครั้งเดียวนอกเกม: `pip install --user fonttools brotli`)
 - Noto Sans Thai / Noto Serif Thai ต้นทางเป็นฟอนต์แปรผัน (`NotoSansThai[wdth,wght].ttf`) — ตรึงน้ำหนักก่อนตัด: `python -m fontTools.varLib.instancer NotoSansThai[wdth,wght].ttf wght=400 wdth=100 -o i400.ttf` (600/700 เหมือนกัน)
