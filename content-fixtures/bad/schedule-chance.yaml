@@ -1,0 +1,22 @@
+# ผิดกติกาเดียว: chance ของผลย้อนเกิน 1
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ตกลง", schedules: [{event: bad_case_02, after_years: [1, 2], chance: 1.5}], merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
