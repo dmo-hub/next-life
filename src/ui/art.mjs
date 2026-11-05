@@ -335,6 +335,30 @@ const ART_SCENES = {
   retire_home: ['เปลญวนใต้ต้นไม้ แดดเย็นวันเกษียณ', [ART_GROUND, ...artPalm(40, 66), artLine('M48 40q40 22 80 0', { w: 1.6 }), artLine('M128 40l8-14M128 40v26', { stroke: ART_INK.bronze2, w: 2 }), artLine(artCirc(160, 30, 9), { stroke: ART_INK.cream, w: 1.2 }), artLine('M146 46h28M150 52h20', { stroke: ART_INK.cream, w: 1 })]],
   retire_early: ['ถือกล่องของออกจากที่ทำงาน', [ART_GROUND, artLine('M120 66V18h48v48M128 26h8v8h-8zM144 26h8v8h-8zM128 42h8v8h-8zM144 42h8v8h-8zM138 66v-10h12v10', { w: 1.2 }), ...artPerson(70, 66, 1.6), artBox(76, 42, 16, 10), artLine('M30 30q10-8 20 0', { stroke: ART_INK.cream, w: 1 })]],
   death: ['เทียนคู่ ธูป และดอกบัว', [ART_GROUND, ...artCandle(64), ...artCandle(130), artLine('M100 66V52M96 52h8', { w: 1.2 }), artLine('M97 52l-3-22M100 52v-24M103 52l3-22', { stroke: ART_INK.bronze2, w: 1 }), artFill(artCirc(94, 30, 1.2), ART_INK.cream), artFill(artCirc(100, 28, 1.2), ART_INK.cream), artFill(artCirc(106, 30, 1.2), ART_INK.cream), ...artLotus(40, 64), ...artLotus(160, 64)]],
+  // ปรโลก (ui-redo 15): ศาล · สวรรค์ · นรก — ไม่วาดพระหรือพระพุทธรูป · นรกภาพเดียวก่อน (ขุมนรกยังไม่เคาะ)
+  after_court: ['ศาลาตัดสิน โต๊ะวางบัญชีบุญบาป ตะเกียงสองข้าง', [
+    ART_GROUND,
+    artLine('M64 32L100 12L136 32M74 32L100 18L126 32M100 12V6M64 32q-6 0-6-6M136 32q6 0 6-6'),
+    artLine('M70 32V66M130 32V66', { w: 1.4 }),
+    artLine('M84 66V50h32v16M80 50h40', { w: 1.2 }),
+    artLine('M89 49q5.5-5 11 0q5.5-5 11 0', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M44 66h8M48 66V48M156 66h-8M152 66V48', { stroke: ART_INK.bronze2, w: 1.2 }),
+    artFlame(48, 38), artFlame(152, 38),
+  ]],
+  after_heaven: ['วิมานบนหมู่เมฆ ดาวรอบฟ้า', [
+    artLine(`M28 66${'a8 8 0 0 1 16 0'.repeat(9)}`, { stroke: ART_INK.cream }),
+    artLine('M76 56h48M82 56V40h36v16M96 56v-9h8v9', { w: 1.2 }),
+    artLine('M78 40L100 26L122 40M88 30L100 20L112 30M100 20V10M78 40q-5 0-5-5M122 40q5 0 5-5'),
+    artStar(40, 20), artStar(160, 18), artStar(148, 34), artStar(54, 32),
+    artFill(artCirc(30, 36, 1.2) + artCirc(172, 40, 1.2), ART_INK.cream),
+  ]],
+  after_hell: ['กระทะทองแดงบนกองไฟ ภูเขาหนามสองข้าง', [
+    ART_GROUND,
+    artLine('M30 66L40 42L46 52L54 34L64 66M136 66L146 34L154 52L160 42L170 66', { stroke: ART_INK.bronze2, w: 1 }),
+    artLine('M66 40h68M70 40l6 18h48l6-18M82 58v8M118 58v8', { w: 1.4 }),
+    artLine('M88 32q2-4 0-8M100 30q2-4 0-8M112 32q2-4 0-8', { stroke: ART_INK.cream, w: 1 }),
+    artFlame(90, 57), artFlame(100, 56), artFlame(110, 57),
+  ]],
   gone: ['ทางที่ไม่มีใครเห็นปลาย โคมแขวนรอ', [artLine('M30 66l60-40M170 66l-60-40', { stroke: ART_INK.bronze2, w: 1 }), artLine('M88 28h24', { stroke: ART_INK.bronze2, w: 0.8 }), artLine('M150 66V22h14', { w: 1.4 }), artLine('M160 22v6M154 28h12v12h-12z', { w: 1.2 }), artFlame(160, 30), artLine('M92 60l2-4M100 52l2-4M106 44l2-4', { stroke: ART_INK.cream, w: 1 })]],
 };
 export const ART_SCENE_IDS = Object.keys(ART_SCENES);
