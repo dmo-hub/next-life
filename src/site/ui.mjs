@@ -77,11 +77,13 @@ export function menuLabels(name, src = readFileSync(APP, 'utf8')) {
 // ที่เดิมใต้ dev/ui-redo/ เป็นหน้าส่งต่อมาหัว → [path ใต้ docs/, ชื่อหน้า, id หัว, ที่เดิม]
 export const UI_TWEAK_AT = 'dev/tweak/';
 export const UI_TWEAK_FROM = 'dev/ui-redo/';
+// หน้าที่ไม่ได้มาจาก dev/ui-redo/ → ที่เดิมของมัน · ต้นแบบการ์ด v2 เดิมเป็นหน้าเอกสารชั้นบนสุด (ui-redo 99 · ข้อ 179)
+export const UI_TWEAK_FROM_AT = { 'cards.html': 'cards.html' };
 export function tweakPages(docs) {
   return readdirSync(new URL(UI_TWEAK_AT, docs))
     .filter((n) => n.endsWith('.html'))
     .sort()
-    .map((n) => [`${UI_TWEAK_AT}${n}`, readFileSync(new URL(UI_TWEAK_AT + n, docs), 'utf8').match(/<title>([^<]*)<\/title>/)?.[1]?.split(' · ')[0] ?? n, `ui-t-${n.replace(/(-tweak)?\.html$/, '')}`, UI_TWEAK_FROM + n]);
+    .map((n) => [`${UI_TWEAK_AT}${n}`, readFileSync(new URL(UI_TWEAK_AT + n, docs), 'utf8').match(/<title>([^<]*)<\/title>/)?.[1]?.split(' · ')[0] ?? n, `ui-t-${n.replace(/(-tweak)?\.html$/, '')}`, UI_TWEAK_FROM_AT[n] ?? UI_TWEAK_FROM + n]);
 }
 
 // ป้ายสถานะของหัว = ป้ายในแถวของหัวนั้นบนสารบัญห้องผู้พัฒนา (แก้ป้ายที่เดียว) · id → HTML ของป้าย
@@ -102,7 +104,7 @@ function specimens(content, src) {
   const { card } = demoCard(content);
   const vals = [72, 58, 41, 18];
   const deltas = [3, -2, 0, -5];
-  const sb = `<header class="sb"><div class="sb-r1"><span class="sb-who"><b>สมชาย ใจดี</b><small>ขอนแก่น · ช่วง${esc(card.stage)}</small></span><span class="sb-age"><b>${card.age}</b><small> ปี</small></span></div><ul class="sb-m">${SHOWN_STATS.map((k, i) => meter(k, vals[i], deltas[i])).join('')}</ul></header>`;
+  const sb = `<header class="sb"><div class="sb-r1"><span class="sb-who"><b>สมชาย ใจดี</b><small>ขอนแก่น · ช่วง${esc(card.stage)}</small><small class="hd-job">พนักงานบริษัท</small></span><span class="sb-age"><b>${card.age}</b><small> ปี</small></span></div><div class="hd-row"><span class="mk">ฐานะ</span><span class="hd-word">ชนชั้นกลาง</span><span class="hd-cash red"><span class="mk">เงินสด</span><b>1.2 แสน</b><span class="lw">มีกู้</span></span></div><ul class="sb-m">${SHOWN_STATS.map((k, i) => meter(k, vals[i], deltas[i])).join('')}</ul></header>`;
   const life = `<article class="card a">${sb}<div class="body"><span class="kicker">ช่วง${esc(card.stage)} · อายุ ${card.age}</span><h3>${esc(card.title)}</h3><p>${esc(card.text)}</p></div><div class="choices">${card.choices.map((t, i) => choice(i + 1, t, card.fx[i])).join('')}${choice(0, 'ทางที่ยังไม่เปิด', 'ล็อก · ต้องมีความรู้ 60', true)}</div></article>`;
   const nav = (labels) => `<nav class="mnav" aria-label="เมนู">${labels.map((l, i) => `<button type="button"${i ? '' : ' aria-expanded="true"'}><span>${esc(l)}</span></button>`).join('')}</nav>`;
   const after = `<article class="card b af"><div class="top"><b>ระหว่างชาติ</b><small>สมชาย ใจดี · จากไปอายุ 78</small></div><div class="body"><span class="kicker">ทางเกิด</span><h3 class="lead">ตัวอย่างการ์ดลายรดน้ำ (ธีม B)</h3></div><div class="choices">${choice(1, BTN.rebirth, 'ตามบุญที่ทำมา')}${choice(2, BTN.newFamily, null)}</div></article>`;

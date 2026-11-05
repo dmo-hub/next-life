@@ -1,7 +1,9 @@
 import { playLife, mixSeed } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { gate3a, gate3b, gate4, addGroup } from './gates.mjs';
-import { random as randomBot } from './bots.mjs';
+// ด่าน 3b ใช้บอทสุ่มตัวเดียวกับ npm run full (มีโฟกัส · ไม่แตะทางสุขภาพ decisions 335)
+import { BOTS } from './bots.mjs';
+const randomBot = BOTS.สุ่ม;
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {

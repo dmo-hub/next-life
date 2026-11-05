@@ -1,0 +1,40 @@
+# การ์ดสายเรื่องผูก first_of (ตัวคุมเลื่อนไม่ได้) + arc_end บนการ์ดที่ไม่มี arc + arc_end ไม่ใช่ true
+events:
+  - id: bad_case_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    first_of: police
+    arc: peer_friend
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ไปหา", merit: [{cat: neutral}]}
+      - {text: "โทรคุย", merit: [{cat: neutral}]}
+      - {text: "ส่งข้อความ", merit: [{cat: neutral}]}
+      - {text: "ไม่ไป", merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ไปหา", merit: [{cat: neutral}], arc_end: true}
+      - {text: "โทรคุย", merit: [{cat: neutral}]}
+      - {text: "ส่งข้อความ", merit: [{cat: neutral}]}
+      - {text: "ไม่ไป", merit: [{cat: neutral}]}
+  - id: bad_case_03
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    arc: peer_friend
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ไปหา", merit: [{cat: neutral}], arc_end: 1}
+      - {text: "โทรคุย", merit: [{cat: neutral}]}
+      - {text: "ส่งข้อความ", merit: [{cat: neutral}]}
+      - {text: "ไม่ไป", merit: [{cat: neutral}]}
