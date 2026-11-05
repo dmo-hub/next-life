@@ -8,8 +8,7 @@ export const FONTS = [
   ['Noto Sans Thai', 700, 'NotoSansThai-Bold'],
   ['Sarabun', 400, 'Sarabun-Regular'],
   ['Sarabun', 600, 'Sarabun-SemiBold'],
-  ['Sarabun', 600, 'Sarabun-SemiBoldItalic', true],
-  ['Sarabun', 700, 'Sarabun-Bold'],
+  // Sarabun มีแค่ 400/600 (ui-redo ข้อ 216): หน้าที่ขอ 700/ตัวเอียง เบราว์เซอร์ใช้ 600 แทน
   ['Srisakdi', 400, 'Srisakdi-Regular'],
   ['Srisakdi', 700, 'Srisakdi-Bold'],
   ['Pridi', 400, 'Pridi-Regular'],

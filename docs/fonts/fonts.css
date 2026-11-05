@@ -3,8 +3,6 @@
 @font-face { font-family:"Noto Sans Thai"; font-weight:700; font-style:normal; font-display:swap; src:url(NotoSansThai-Bold.woff2) format('woff2'); }
 @font-face { font-family:"Sarabun"; font-weight:400; font-style:normal; font-display:swap; src:url(Sarabun-Regular.woff2) format('woff2'); }
 @font-face { font-family:"Sarabun"; font-weight:600; font-style:normal; font-display:swap; src:url(Sarabun-SemiBold.woff2) format('woff2'); }
-@font-face { font-family:"Sarabun"; font-weight:600; font-style:italic; font-display:swap; src:url(Sarabun-SemiBoldItalic.woff2) format('woff2'); }
-@font-face { font-family:"Sarabun"; font-weight:700; font-style:normal; font-display:swap; src:url(Sarabun-Bold.woff2) format('woff2'); }
 @font-face { font-family:"Srisakdi"; font-weight:400; font-style:normal; font-display:swap; src:url(Srisakdi-Regular.woff2) format('woff2'); }
 @font-face { font-family:"Srisakdi"; font-weight:700; font-style:normal; font-display:swap; src:url(Srisakdi-Bold.woff2) format('woff2'); }
 @font-face { font-family:"Pridi"; font-weight:400; font-style:normal; font-display:swap; src:url(Pridi-Regular.woff2) format('woff2'); }
