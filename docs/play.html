@@ -12062,14 +12062,16 @@ const FX = {
       const star = (x, y, r, f) => `<path d="M${x} ${y - r}L${x + r * 0.3} ${y - r * 0.3}L${x + r} ${y}L${x + r * 0.3} ${y + r * 0.3}L${x} ${y + r}L${x - r * 0.3} ${y + r * 0.3}L${x - r} ${y}L${x - r * 0.3} ${y - r * 0.3}z" fill="${f}"/>`;
       const name = (fill) => `<text class="fx-name" x="150" y="110" text-anchor="middle" font-size="${T.fs}" fill="${fill}"></text>`;
       const sub = (fill) => `<text class="fx-sub" x="150" y="160" text-anchor="middle" font-size="11" fill="${fill}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`;
+      // ม่าน 0.6 ยังเห็นตัวหนังสือการ์ดสว่างทะลุ ⇒ ชื่อ+ป้ายต้องมีพื้นทึบรองของตัวเอง (ui-redo ข้อ 183) · กว้างพอชื่อที่ถูกบีบเต็ม nameW
+      const plate = (stroke) => `<rect class="fx-plate" x="${150 - T.nameW / 2 - 12}" y="86" width="${T.nameW + 24}" height="84" rx="8" fill="${FX_INK.lacquer2}" stroke="${stroke}" stroke-width="0.8" stroke-opacity="0.5"/>`;
       let inner;
       if (!leg) {
-        inner = `<g class="fx-medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="30" fill="${FX_INK.lacquer2}" stroke="${T.rare}" stroke-width="${w}"/>${star(150, 48, 13, T.rare)}</g>${name(FX_INK.cream)}<path class="fx-line" d="M70 120h160" stroke="${T.rare}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(T.rare)}`;
+        inner = `${plate(T.rare)}<g class="fx-medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="30" fill="${FX_INK.lacquer2}" stroke="${T.rare}" stroke-width="${w}"/>${star(150, 48, 13, T.rare)}</g>${name(FX_INK.cream)}<path class="fx-line" d="M70 120h160" stroke="${T.rare}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(T.rare)}`;
       } else {
         const petals = Array.from({ length: 12 }, (_, i) => `<path class="fx-petal" d="M150 48q-9 -22 0 -42q9 20 0 42z" transform="rotate(${i * 30} 150 48)" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="0.6"/>`).join('');
         const R = 30 + T.glow * 0.5;
         const dots = Array.from({ length: 16 }, (_, i) => `<circle class="fx-dot" cx="${150 + R * Math.cos(i * Math.PI / 8)}" cy="${48 + R * Math.sin(i * Math.PI / 8)}" r="1.8" fill="${FX_INK.gold2}"/>`).join('');
-        inner = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${FX_INK.gold2}"/><stop offset=".55" stop-color="${T.leg}"/><stop offset="1" stop-color="${FX_INK.bronze2}"/></linearGradient></defs><g>${dots}</g><g>${petals}</g><g class="fx-medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="26" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="${w}"/><circle cx="150" cy="48" r="21" fill="none" stroke="${T.legInk}" stroke-width="0.8"/>${star(150, 42, 9, T.legInk)}${star(139, 56, 5, T.legInk)}${star(161, 56, 5, T.legInk)}</g>${name(FX_INK.gold2)}<path class="fx-line" d="M70 119h160M90 124h120" stroke="${T.leg}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(FX_INK.gold2)}`;
+        inner = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${FX_INK.gold2}"/><stop offset=".55" stop-color="${T.leg}"/><stop offset="1" stop-color="${FX_INK.bronze2}"/></linearGradient></defs>${plate(T.leg)}<g>${dots}</g><g>${petals}</g><g class="fx-medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="26" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="${w}"/><circle cx="150" cy="48" r="21" fill="none" stroke="${T.legInk}" stroke-width="0.8"/>${star(150, 42, 9, T.legInk)}${star(139, 56, 5, T.legInk)}${star(161, 56, 5, T.legInk)}</g>${name(FX_INK.gold2)}<path class="fx-line" d="M70 119h160M90 124h120" stroke="${T.leg}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(FX_INK.gold2)}`;
       }
       ov.innerHTML = `<div class="fx-veil"></div><div class="fx-title">${fxSvg(300, 170, inner)}</div>`;
       const q = (s) => ov.querySelector(s);
@@ -12082,11 +12084,13 @@ const FX = {
         nm.setAttribute('textLength', T.nameW);
         nm.setAttribute('lengthAdjust', 'spacingAndGlyphs');
       }
-      return { ov, leg, veil: ov.firstChild, medal: q('.fx-medal'), name: nm, line: q('.fx-line'), sub: q('.fx-sub'), petals: [...ov.querySelectorAll('.fx-petal')], dots: [...ov.querySelectorAll('.fx-dot')] };
+      return { ov, leg, veil: ov.firstChild, plate: q('.fx-plate'), medal: q('.fx-medal'), name: nm, line: q('.fx-line'), sub: q('.fx-sub'), petals: [...ov.querySelectorAll('.fx-petal')], dots: [...ov.querySelectorAll('.fx-dot')] };
     },
     dur: (o) => (o.tier === 'legend' ? FX_TITLE.durLeg : FX_TITLE.durRare), block: 300,
     frame: (p, t) => {
       p.veil.style.opacity = 0.6 * fxOut(fxSpan(t, 0, 0.2));
+      // พื้นรองขึ้นเต็มก่อนชื่อเริ่มโผล่ (0.3) — ชื่อไม่เคยซ้อนตัวหนังสือการ์ดแม้เฟรมเดียว
+      p.plate.style.opacity = fxSpan(t, 0.15, 0.3);
       p.medal.style.transform = `scale(${1.7 - 0.7 * fxOut(fxSpan(t, 0, 0.3))})`;
       p.medal.style.opacity = fxSpan(t, 0, 0.12);
       p.name.style.opacity = fxSpan(t, 0.3, 0.55);
