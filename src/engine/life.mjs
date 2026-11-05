@@ -270,6 +270,8 @@ export function newLife(seed, content, heir = null) {
     parentFlags: heir?.parentFlags ?? {},
     // สกิลที่พกมาจากคลัง [{ id, lv }] (06s) ใช้ทั้งชีวิตนี้และชาติต่างโลกที่ตามมา · ไม่พก = ไม่มีช่อง (state เท่าก่อนมีสกิลข้ามชาติ)
     ...(heir?.skills?.length && { skills: heir.skills }),
+    // ค่าที่ได้จากช่องพกที่ไม่ใช้ (ใบ 201) — การ์ดเกิดบอกเป็นคำ · เซฟเก่าไม่มี = ไม่มีบรรทัด
+    ...(heir?.spare && { spare: heir.spare }),
     scheduled: [],
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด

@@ -2754,14 +2754,16 @@ function upgradeFx(card, i) {
 
 // เลือกพกก่อนไปเกิด (06s): จากสมุดสกิล ≤ SKILL.carry แล้วไปเกิดด้วยปุ่มเซฟเดิม — ชุดที่พกอยู่ในสถานะชีวิตใหม่ ภาพถ่ายเซฟเก็บไปเอง
 // สมุดว่าง = ไปเกิดทันทีเหมือนก่อนมีสกิลข้ามชาติ · บรรทัดตามไป/ไม่ตามไป (dsd-2) ไม่บอกตัวเลข
+// carryOffered = การ์ดเลือกขึ้นจริง ⇒ ช่องที่ไม่พกแลกเป็นค่าเริ่ม (decisions 355) · สมุดว่างไปเกิดทันที ไม่ได้
 let carryNext = [];
+let carryOffered = false;
 function rebirth() {
   const offers = bookCarryOffers(skillsRead().s);
   if (!offers.length) return play(T.rebirth);
   const prev = [...root.childNodes];
   const pick = [];
   const draw = () => {
-    const choices = homeCard('ก่อนไปเกิด', ['เลือกสกิลที่จะพกไปชาติหน้า', `พกได้ ${SKILL.carry} อย่าง ใช้ทั้งชีวิตไทยและชาติต่างโลกที่ตามมา · ทุกอย่างเริ่มขั้น 1 แต่ฝึกถึงขั้นในสมุดได้เร็วกว่าครั้งแรก`]);
+    const choices = homeCard('ก่อนไปเกิด', ['เลือกสกิลที่จะพกไปชาติหน้า', `พกได้ ${SKILL.carry} อย่าง ใช้ทั้งชีวิตไทยและชาติต่างโลกที่ตามมา · ทุกอย่างเริ่มขั้น 1 แต่ฝึกถึงขั้นในสมุดได้เร็วกว่าครั้งแรก`, 'ช่องที่ไม่พก ชาติหน้าได้พื้นฐานดีขึ้นแทน']);
     const body = root.querySelector('.body');
     const name = (id) => ISEKAI_SKILLS[id].name;
     const left = offers.filter((o) => !pick.includes(o.id));
@@ -2784,6 +2786,7 @@ function rebirth() {
     }
     choices.append(enter(button(pick.length ? 'ไปเกิดพร้อมสกิลที่พก' : 'ไปเกิดโดยไม่พกสกิล', null, () => {
       carryNext = [...pick];
+      carryOffered = true;
       play(T.rebirth);
     })), button('กลับ', null, () => root.replaceChildren(...prev)));
   };
@@ -3306,8 +3309,9 @@ function step(tok) {
   }
   if (tok === T.afterNext) return nextAfterCard(af);
   if (tok === T.rebirth) {
-    st = nextLife(af, carryNext, carryNext.length ? skillsRead().s : {});
+    st = nextLife(af, carryNext, carryNext.length ? skillsRead().s : {}, carryOffered);
     carryNext = [];
+    carryOffered = false;
     af = null;
     curAge = null;
     bookReset();
