@@ -1686,14 +1686,6 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .ix-k { font-size:12px; font-weight:600; letter-spacing:0.08em; color:#6FE3FF; }
 .ix-t { font-size:19px; line-height:1.5; color:#E8ECFF; }
 .ix-ask { margin:0 0 4px; font-size:14px; font-weight:600; }
-.ispeed { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; font-size:14px; }
-.ispeed button { min-width:56px; min-height:44px; padding:2px 8px; border:1px solid #2A3478; border-radius:6px; background:#0E1024; color:#A6AEDB; font:inherit; cursor:pointer; }
-.ispeed button[aria-pressed=&quot;true&quot;] { border-color:#6FE3FF; color:#6FE3FF; background:#1E2350; }
-.ispeed button:focus-visible { outline:2px solid #6FE3FF; outline-offset:1px; }
-.itimer { margin:8px 20px 0; height:4px; border-radius:999px; background:#05060F; overflow:hidden; }
-.itimer i { display:block; height:100%; width:0; background:#6FE3FF; }
-@keyframes itick { from { width:0; } to { width:100%; } }
-@media (prefers-reduced-motion: reduce) { .itimer i { animation:none !important; } }
 /* เอฟเฟกต์ B-fx (ตัวเล่นใน app.mjs) — การ์ดใหม่: เส้นทองวาดทับขอบการ์ด ไม่รับคลิก · overflow:visible ให้เส้นครึ่งนอกขอบไม่ถูกตัด */
 .fx-trace-on { position:relative; }
 .fx-trace { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; z-index:2; }
@@ -2303,14 +2295,6 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .ix-k { font-size:12px; font-weight:600; letter-spacing:0.08em; color:#6FE3FF; }
 .ix-t { font-size:19px; line-height:1.5; color:#E8ECFF; }
 .ix-ask { margin:0 0 4px; font-size:14px; font-weight:600; }
-.ispeed { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; font-size:14px; }
-.ispeed button { min-width:56px; min-height:44px; padding:2px 8px; border:1px solid #2A3478; border-radius:6px; background:#0E1024; color:#A6AEDB; font:inherit; cursor:pointer; }
-.ispeed button[aria-pressed=&quot;true&quot;] { border-color:#6FE3FF; color:#6FE3FF; background:#1E2350; }
-.ispeed button:focus-visible { outline:2px solid #6FE3FF; outline-offset:1px; }
-.itimer { margin:8px 20px 0; height:4px; border-radius:999px; background:#05060F; overflow:hidden; }
-.itimer i { display:block; height:100%; width:0; background:#6FE3FF; }
-@keyframes itick { from { width:0; } to { width:100%; } }
-@media (prefers-reduced-motion: reduce) { .itimer i { animation:none !important; } }
 /* เอฟเฟกต์ B-fx (ตัวเล่นใน app.mjs) — การ์ดใหม่: เส้นทองวาดทับขอบการ์ด ไม่รับคลิก · overflow:visible ให้เส้นครึ่งนอกขอบไม่ถูกตัด */
 .fx-trace-on { position:relative; }
 .fx-trace { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; z-index:2; }
@@ -2436,7 +2420,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 }
 @keyframes drw { from { transform:translateX(100%); } }
 
-#app{padding:0 12px 12px}.card{min-height:0}.mnav{position:static;margin-top:8px}body:has(.mnav){padding-bottom:0}</style></head><body><div id=&quot;app&quot;><h4 style=&quot;margin:16px 0 6px;font:600 14px var(--ft)&quot;>การ์ดต่างโลก + แถบเมนูต่างโลก</h4><article class=&quot;card i&quot;><div class=&quot;top&quot;><b>ต่างโลก</b><small>ตัวอย่างธีมต่างโลก</small></div><div class=&quot;body&quot;><span class=&quot;kicker&quot;>ปีแรก</span><h3>ตัวอย่างการ์ดต่างโลก</h3><p>สีพื้นและสีตัวอักษรสลับตามตัวแปรธีมต่างโลกของเกม</p></div><div class=&quot;choices&quot;><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>1</kbd><span>ต่อไป</span></button></div></article><nav class=&quot;mnav&quot; aria-label=&quot;เมนู&quot;><button type=&quot;button&quot; aria-expanded=&quot;true&quot;><span>ตัวฉัน</span></button><button type=&quot;button&quot;><span>สกิล</span></button><button type=&quot;button&quot;><span>ความเร็ว</span></button><button type=&quot;button&quot;><span>สมุด</span></button><button type=&quot;button&quot;><span>เพิ่มเติม</span></button></nav></div></body></html>"></iframe></figure>
+#app{padding:0 12px 12px}.card{min-height:0}.mnav{position:static;margin-top:8px}body:has(.mnav){padding-bottom:0}</style></head><body><div id=&quot;app&quot;><h4 style=&quot;margin:16px 0 6px;font:600 14px var(--ft)&quot;>การ์ดต่างโลก + แถบเมนูต่างโลก</h4><article class=&quot;card i&quot;><div class=&quot;top&quot;><b>ต่างโลก</b><small>ตัวอย่างธีมต่างโลก</small></div><div class=&quot;body&quot;><span class=&quot;kicker&quot;>ปีแรก</span><h3>ตัวอย่างการ์ดต่างโลก</h3><p>สีพื้นและสีตัวอักษรสลับตามตัวแปรธีมต่างโลกของเกม</p></div><div class=&quot;choices&quot;><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>1</kbd><span>ต่อไป</span></button></div></article><nav class=&quot;mnav&quot; aria-label=&quot;เมนู&quot;><button type=&quot;button&quot; aria-expanded=&quot;true&quot;><span>ตัวฉัน</span></button><button type=&quot;button&quot;><span>สกิล</span></button><button type=&quot;button&quot;><span>สมุด</span></button><button type=&quot;button&quot;><span>เพิ่มเติม</span></button></nav></div></body></html>"></iframe></figure>
 <h2 id="ui-shots">ภาพจอเกม 390 / 1280</h2>
 <p>ภาพจาก <code>npm run shots</code> (ใบ 45) — เลนที่แก้จอเกมรันแล้ว commit ภาพ</p>
 <div class="shots"><div><h3>เริ่มชีวิต</h3><p><img src="shots/start-390.png" alt="จอเริ่มชีวิต กว้าง 390" loading="lazy" style="max-width:100%;height:auto"></p><p><img src="shots/start-1280.png" alt="จอเริ่มชีวิต กว้าง 1280" loading="lazy" style="max-width:100%;height:auto"></p></div><div><h3>กลางชีวิต</h3><p><img src="shots/mid-390.png" alt="จอกลางชีวิต กว้าง 390" loading="lazy" style="max-width:100%;height:auto"></p><p><img src="shots/mid-1280.png" alt="จอกลางชีวิต กว้าง 1280" loading="lazy" style="max-width:100%;height:auto"></p></div><div><h3>ตาย</h3><p><img src="shots/death-390.png" alt="จอตาย กว้าง 390" loading="lazy" style="max-width:100%;height:auto"></p><p><img src="shots/death-1280.png" alt="จอตาย กว้าง 1280" loading="lazy" style="max-width:100%;height:auto"></p></div></div>
