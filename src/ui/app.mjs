@@ -1,7 +1,7 @@
-import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary } from '../engine/index.mjs';
+import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
@@ -178,46 +178,108 @@ function meterLi(label, v, low, shown = String(v), icon = null) {
   return li;
 }
 
-// ปุ่มโฟกัสชีวิต (B163): แถบเต็มใต้ค่าสถานะ — การ์ดกว้างไม่เกิน 460 ทุกจอ ข้างค่าสถานะไม่มีที่พอ
-// ไม่ใช่ตัวเลือกของการ์ด (อยู่นอก .choices · ไม่มีเลขปุ่มลัด) · เปลี่ยนแล้วเซฟทันที ผลไปคิดตอนสิ้นปี
+// แท็บโฟกัสชาติไทย (ui-redo 50 · ข้อ 65 68 69 · JSON 47 แบบ ก รายการเดียว): ตอนนี้ · เปลี่ยนเป็น · ปณิธาน
+// ไม่ใช่ตัวเลือกของการ์ด (ไม่มีเลขปุ่มลัด) · เปลี่ยนแล้วเซฟทันที ผลไปคิดตอนสิ้นปี
 const focusName = (id) => (id === FOCUS_FLOW ? FOCUS_FLOW_NAME : lifeFocusDefs(st)[id].name);
 const focusFx = (id) => (id === FOCUS_FLOW ? 'ไม่ทุ่มเรื่องไหนเป็นพิเศษ' : focusWords(lifeFocusDefs(st)[id], STAT_LABELS));
-function focusBar(card, open = false) {
+// ปีสะสมเป็นคำ ไม่บอกเลขเกณฑ์ (ข้อ 68) · ชำนาญแล้ว = ครบปีที่ต่อสายได้ ตัวเดียวกับที่แกนใช้เปิดปลายสาย
+function focusWord(id) {
+  const n = st.focusYears?.[id] ?? 0;
+  if (!n) return null;
+  return n >= st.content.focus.chain_years ? el('span', 'ft-word full', 'ชำนาญแล้ว') : el('span', 'ft-word', 'เริ่มชำนาญ');
+}
+const stageIdx = (name) => STAGES.findIndex((s) => s.name === name);
+// ปณิธาน = สายต้น → ปลาย (after ในทะเบียน) ที่ยังมีความหมายตอนนี้: เลือกได้อยู่ · เคยทุ่มต้นสายแล้ว · หรือยังทันช่วงวัยของปลายสาย
+// สถานะอ่านจาก focusMet ตัวเดียวกับที่แกนเปิดปลายสาย — ครบในช่วงวัยไหนเปิดตั้งแต่ช่วงถัดไป
+function focusGoals(offers) {
+  const defs = lifeFocusDefs(st);
+  const stage = stageOf(st.age);
+  const now = stageIdx(stage);
+  const later = (d) => !d.stages || d.stages.some((s) => stageIdx(s) > now);
+  const rows = [];
+  for (const [id, d] of Object.entries(defs)) {
+    if (!d.after) continue;
+    const from = d.after;
+    const met = st.focusMet?.[from];
+    const tried = (st.focusYears?.[from] ?? 0) > 0;
+    let cls = '', text;
+    if (offers.includes(id)) [cls, text] = ['open', `${focusName(from)}ชำนาญแล้ว · เลือกได้ในช่วงนี้`];
+    else if (met === stage) text = `${focusName(from)}ชำนาญแล้ว · เลือกได้ตั้งแต่ช่วงวัยถัดไป`;
+    else if (met !== undefined) [cls, text] = later(d) || d.stages?.includes(stage) ? ['', `${focusName(from)}ชำนาญแล้ว · ยังไม่เข้าเงื่อนไขตอนนี้`] : ['gone', `${focusName(from)}ชำนาญแล้ว · ช่วงวัยที่เลือกได้ผ่านไปแล้ว`];
+    else if (!later(d)) continue;
+    else if (tried) text = `${focusName(from)}เริ่มชำนาญ · ทุ่มต่ออีกหน่อยจะเปิด`;
+    else if (offers.includes(from)) text = 'ยังไม่ได้ทุ่ม';
+    else continue;
+    const li = el('li', cls || null);
+    li.append(el('b', null, `${focusName(from)} → ${d.name}`), el('span', 'st', text));
+    rows.push(li);
+  }
+  return rows;
+}
+function focusPanel(card) {
+  const wrap = el('div', 'ft');
+  if (st.dead || card.kind === 'death') {
+    wrap.append(...focusSummary());
+    return wrap;
+  }
   const cur = st.focus ?? FOCUS_FLOW;
-  const wrap = el('div', 'focus');
-  const btn = el('button', 'focus-btn');
-  btn.type = 'button';
-  btn.setAttribute('aria-expanded', String(open));
-  const fx = focusFx(cur);
-  btn.append(el('span', 'focus-k', 'โฟกัส'), el('b', null, focusName(cur)), el('span', 'focus-fx', fx), el('span', 'focus-go', open ? 'ปิด' : 'เปลี่ยน'));
-  const pick = el('div', 'focus-pick');
-  pick.hidden = !open;
-  for (const id of lifeFocusOffers(st)) {
+  const defs = lifeFocusDefs(st);
+  const nowBox = el('div', 'ft-now');
+  nowBox.append(el('b', null, focusName(cur)), ...[focusWord(cur)].filter(Boolean), el('span', 'ft-fx', focusFx(cur)));
+  const offers = lifeFocusOffers(st);
+  const ul = el('ul', 'ft-list');
+  for (const id of offers) {
     const b = el('button', id === cur ? 'on' : null);
     b.type = 'button';
+    b.dataset.focus = id;
     b.setAttribute('aria-pressed', String(id === cur));
-    b.append(el('b', null, focusName(id)), el('span', 'focus-fx', focusFx(id)));
+    b.append(el('b', null, focusName(id)), ...[focusWord(id)].filter(Boolean));
+    if (defs[id]?.after) b.append(el('span', 'ft-new', 'ปลายสาย'));
+    b.append(el('span', 'ft-fx', focusFx(id)));
     b.onclick = () => {
       setLifeFocus(st, id);
       saveWrite(card);
-      const next = focusBar(card);
+      const next = focusPanel(card);
       wrap.replaceWith(next);
-      next.querySelector('.focus-btn').focus();
+      next.querySelector(`[data-focus="${id}"]`)?.focus();
     };
-    pick.append(b);
+    const li = el('li');
+    li.append(b);
+    ul.append(li);
   }
-  btn.onclick = () => {
-    const next = focusBar(card, pick.hidden);
-    wrap.replaceWith(next);
-    next.querySelector('.focus-btn').focus();
-  };
-  wrap.append(btn, pick);
+  const goals = focusGoals(offers);
+  const chain = el('ul', 'ft-chain');
+  chain.append(...goals);
+  wrap.append(el('h3', null, 'ตอนนี้'), nowBox, el('h3', null, 'เปลี่ยนเป็น'), ul, el('h3', null, 'ปณิธาน'), goals.length ? chain : el('p', 'ft-note', 'ช่วงวัยนี้ไม่มีสายที่ต่อได้'));
   return wrap;
+}
+// ตอนตาย/ปรโลก (ข้อ 69): เรื่องที่ทุ่มมากสุด = focusMain ตัวเดียวกับที่ทายาทรับ · เรื่องอื่นเรียงตามปีที่ทุ่ม ไม่บอกตัวเลข
+function focusSummary() {
+  const defs = lifeFocusDefs(st);
+  const main = focusMain(st, defs);
+  const head = el('h3', null, 'ชาตินี้ทุ่มเทมากสุด');
+  if (!main) return [head, el('p', 'ft-note', `${FOCUS_FLOW_NAME} ไม่ได้ทุ่มเรื่องไหนเต็มปี`)];
+  const box = el('div', 'ft-now');
+  box.append(el('b', null, focusName(main)), ...[focusWord(main)].filter(Boolean));
+  const kid = defs[main].kid;
+  if (kid && defs[kid]) box.append(el('span', 'ft-fx', `ทายาทในตระกูลเริ่มชาติด้วย${defs[kid].name}`));
+  const ys = st.focusYears ?? {};
+  const rest = Object.keys(defs).filter((id) => id !== main && ys[id] > 0).sort((a, b) => ys[b] - ys[a]);
+  if (!rest.length) return [head, box];
+  const ul = el('ul', 'ft-ro ft-list');
+  for (const id of rest) {
+    const li = el('li', null, `${focusName(id)} `);
+    const w = focusWord(id);
+    if (w) li.append(w);
+    ul.append(li);
+  }
+  return [head, box, el('h3', null, 'เรื่องอื่นที่เคยทุ่ม'), ul];
 }
 
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทยและต่างโลก · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
 // ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ
-const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบครัว'], ['money', 'เงิน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
+// โฟกัสแยกแท็บระหว่างตัวฉัน–ครอบครัว (ui-redo 50) · ชาติไทยมีไอคอนคู่ป้าย ต่างโลก/ปรโลกยังเป็นป้ายอย่างเดียวจนใบ 51
+const LIFE_MENU = [['me', 'ตัวฉัน'], ['focus', 'โฟกัส'], ['family', 'ครอบครัว'], ['money', 'เงิน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
 // ต่างโลกไม่มีครอบครัวกับเงินบาทให้ดู — ทอง ชื่อเสียง อาชีพอยู่ในแผงตัวฉันของร่างนี้ (ui-redo ใบ 13)
 // สกิลแยกปุ่มเพราะสมุดสกิล (06s-3) จะมาต่อที่แผงนี้ · ไม่มีปุ่มความเร็ว: ใบตาไม่เดินเอง ผู้เล่นกด "ต่อ" เองแบบชาติไทย (ui-redo 81)
 const ISEKAI_MENU = [['me', 'ตัวฉัน'], ['skill', 'สกิล'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
@@ -229,7 +291,7 @@ function lifeMenu(card, box, after = false) {
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
   const isk = card.kind === 'isekai';
-  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), skill: () => isekaiSkillPanel(card.status), family: after ? clanPanel : familyPanel, money: () => moneyPanel(card), more: morePanel, past: pastPanel };
+  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), focus: () => focusPanel(card), skill: () => isekaiSkillPanel(card.status), family: after ? clanPanel : familyPanel, money: () => moneyPanel(card), more: morePanel, past: pastPanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
   const views = { shelf: () => openShelf() };
   // ต่างโลกช่วงยังไม่มีร่าง (ไม่มีหน้าต่างสถานะ) ไม่มีอะไรให้แผงตัวฉันกับสกิลโชว์
@@ -238,6 +300,7 @@ function lifeMenu(card, box, after = false) {
     const b = el('button', null);
     b.type = 'button';
     b.dataset.menu = id;
+    if (!isk && !after) b.insertAdjacentHTML('beforeend', menuIcon(id));
     b.append(el('span', null, label));
     if (sheets[id]) {
       b.setAttribute('aria-expanded', 'false');
@@ -327,8 +390,8 @@ function openSheet(title, content, box, from, id) {
 }
 const closeSheet = (keep) => sheetClose?.(keep);
 
-// แผงตัวฉัน: ค่าเต็มคู่คำอธิบาย · โฟกัส · ฐานะและงาน (ย้ายมาจากใต้แถบสถานะของการ์ด) · ไม่มีลูกศรปีนี้ — ลูกศรอยู่บนแถบสถานะที่เดียว
-// การ์ดตายเปิดได้เหมือนกัน เห็นค่าตอนจากไป แต่ไม่มีโฟกัส (ชีวิตจบแล้ว)
+// แผงตัวฉัน: ค่าเต็มคู่คำอธิบาย · ฐานะและงาน (ย้ายมาจากใต้แถบสถานะของการ์ด) · ไม่มีลูกศรปีนี้ — ลูกศรอยู่บนแถบสถานะที่เดียว
+// โฟกัสย้ายไปแท็บของตัวเองแล้ว (ui-redo 50) · การ์ดตายเปิดได้เหมือนกัน เห็นค่าตอนจากไป
 function mePanel(card) {
   const s = statsOf(st);
   const help = new Map(STAT_HELP);
@@ -344,7 +407,6 @@ function mePanel(card) {
   const dl = el('dl');
   for (const [k, v] of STAT_HELP) if (!shown.has(k)) dl.append(el('dt', null, k), el('dd', null, v));
   wrap.append(el('h3', null, 'ค่าสถานะ'), ul, dl);
-  if (!st.dead && card.kind !== 'death') wrap.append(el('h3', null, 'โฟกัส'), focusBar(card));
   const meta = el('p', 'meta');
   metaLine(meta, standParts(card));
   wrap.append(el('h3', null, 'ฐานะและงาน'), meta);
@@ -2495,6 +2557,10 @@ function pastPanel() {
   const fam = el('div', 'fam');
   fam.append(...kinParts(kin.filter((m) => !ANIMAL_ROLES.includes(m.role))), ...kinParts(kin.filter((m) => ANIMAL_ROLES.includes(m.role)), true));
   wrap.prepend(head);
+  // ปรโลกไม่มีแท็บโฟกัส — สรุปทุ่มเทมากสุดของชีวิตที่จบมาอยู่ในชีวิตที่แล้ว (ข้อ 69)
+  const ft = el('div', 'ft');
+  ft.append(...focusSummary());
+  wrap.append(ft);
   if (fam.childElementCount) wrap.append(fam);
   return wrap;
 }
