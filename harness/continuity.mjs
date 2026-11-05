@@ -108,12 +108,13 @@ for (const [name, bot] of Object.entries(BOTS)) {
       const c = card.kind === 'event' && byId[card.id]?.choices?.[idx];
       for (const w of c ? [c, ...(c.outcomes ?? [])] : []) for (const sc of w.schedules ?? []) booked.push([sc.event, at + sc.after_years[0], at + sc.after_years[1]]);
       if (c) {
-        for (const sc of c.schedules ?? []) addExpect(sc.event, 1);
+        // ผลย้อนมีโอกาส (gameslash-2) — ยอดคาดคูณ chance ไม่งั้นปลายทางที่ตั้งใจให้ออกน้อยถูกนับว่าไม่ถึงเป้า
+        for (const sc of c.schedules ?? []) addExpect(sc.event, sc.chance ?? 1);
         const total = (c.outcomes ?? []).reduce((a, o) => a + (o.weight ?? 1), 0);
         for (const o of c.outcomes ?? []) {
           const share = (o.weight ?? 1) / total;
           if (o.next) addExpect(o.next, share);
-          for (const sc of o.schedules ?? []) addExpect(sc.event, share);
+          for (const sc of o.schedules ?? []) addExpect(sc.event, share * (sc.chance ?? 1));
         }
       }
       return idx;

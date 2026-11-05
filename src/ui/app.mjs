@@ -1909,7 +1909,7 @@ function priceSrc() {
   return inData(era.src.cpi, [era.future.from, era.future.to]) ? [true, `คำนวณจาก${srcText('เงินเฟ้อรายปี', era.src.cpi)}`] : [false, 'บางปีที่ใช้ยังไม่มีข้อมูลเงินเฟ้อ เกมใช้ค่าประมาณแทน'];
 }
 
-// เอฟเฟกต์ 3 จังหวะ (B-fx · เจ้าของเลือกแบบ A ทั้งสาม): พลิกการ์ดใหม่ทุกใบ · ตะเกียงดับตอนตาย · แถบผ้าคลี่เมื่อได้ฉายาหายาก/ตำนาน
+// เอฟเฟกต์ 3 จังหวะ (B-fx · เจ้าของเลือกแบบ A ทั้งสาม): พลิกการ์ดใหม่ทุกใบ · ตะเกียงดับตอนตาย · ตราเหรียญเมื่อได้ฉายาหายาก/ตำนาน (ข้อ 160 แทนแถบผ้าคลี่)
 // frame(parts, t) ขึ้นกับ t 0..1 อย่างเดียว ⇒ ข้าม = frame(1) · สีชุด ART_INK ไม่รับค่าบุญบาป — ตายแบบเดียวทุกกรรม ห้ามเผยกรรมผ่านเอฟเฟกต์
 const fxClamp = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
 const fxSpan = (t, a, b) => fxClamp((t - a) / (b - a));
@@ -1917,9 +1917,9 @@ const fxOut = (x) => 1 - (1 - x) ** 3;
 const fxIn = (x) => x * x * x;
 const fxBack = (x) => 1 + 2.2 * (x - 1) ** 3 + 1.2 * (x - 1) ** 2;
 const fxSvg = (w, h, inner, cls = '') => `<svg class="${cls}" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">${inner}</svg>`;
-// สุ่มแบบมี seed ตายตัว — ผงทองเหมือนกันทุกชีวิตทุกครั้ง
-const fxRng = (s) => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 const FX_INK = ART_INK;
+// ค่าเจ้าของเคาะ (ui-redo ข้อ 160) = DEF ของหน้า tweak title-fx · หายาก = เงิน ตำนาน = ทอง โลหะคนละชนิด
+const FX_TITLE = { rare: '#C9CDD3', leg: ART_INK.gold, legInk: ART_INK.lacquer, frameW: 1.6, glow: 46, fs: 17, nameW: 200, durRare: 900, durLeg: 1400 };
 // ฉากซ้อนเต็มจอของตาย/ฉายา — จบเองค่อยจางออก · ถูกข้ามหายทันที
 const fxOv = () => document.body.appendChild(el('div', 'fx-ov'));
 function fxOvEnd(ov, natural) {
@@ -1980,66 +1980,51 @@ const FX = {
       p.cap.style.transform = `translateY(${6 * (1 - fxSpan(t, 0.55, 1))}px)`;
     },
     end: (p, natural) => fxOvEnd(p.ov, natural) },
-  // แถบผ้าคลี่ + แสงวิ่ง · ตำนาน = กรอบคู่ + รัศมีหมุนช้า + ผงทองพุ่งรอบแถบ
-  titleA: {
+  // ตราเหรียญ (ui-redo ข้อ 160 · แบบ medal ของหน้า tweak title-fx) — ภาพนิ่งหายาก/ตำนานต้องแยกด้วยตา (ข้อ 39)
+  // หายาก = เหรียญรักขอบเงิน ดาวดวงเดียว ขีดเส้นเดียว · ตำนาน = เหรียญทองล้อมกลีบบัว 12 กลีบ วงจุดทอง ดาว 3 ดวง ชื่อทองขีดสองเส้น
+  title: {
     build: (ov, o) => {
       const leg = o.tier === 'legend';
       const id = `fx${++fxUid}`;
-      const rays = leg ? `<g class="fx-rays" style="transform-origin:150px 60px">${Array.from({ length: 16 }, (_, i) => `<path d="M150 60L${150 + 140 * Math.cos(i * Math.PI / 8 - 0.06)} ${60 + 140 * Math.sin(i * Math.PI / 8 - 0.06)}L${150 + 140 * Math.cos(i * Math.PI / 8 + 0.06)} ${60 + 140 * Math.sin(i * Math.PI / 8 + 0.06)}z" fill="${FX_INK.gold2}"/>`).join('')}</g>` : '';
-      ov.innerHTML = `<div class="fx-veil"></div><div class="fx-title">${fxSvg(300, 120, `<defs><linearGradient id="${id}s" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><clipPath id="${id}c"><path d="M40 38h220v44h-220z"/></clipPath></defs>${rays}<g class="fx-ribbon" style="transform-origin:150px 60px"><path d="M40 46h-26l10 14l-10 14h26z" fill="${FX_INK.bronze2}"/><path d="M260 46h26l-10 14l10 14h-26z" fill="${FX_INK.bronze2}"/><path d="M40 38h220v44h-220z" fill="${FX_INK.lacquer2}" stroke="${FX_INK.gold}" stroke-width="${leg ? 2 : 1.4}"/>${leg ? `<path d="M45 43h210v34h-210z" fill="none" stroke="${FX_INK.gold2}" stroke-width="0.8"/>` : ''}<text class="fx-name" x="150" y="${leg ? 67 : 66}" text-anchor="middle" font-size="${leg ? 19 : 17}" fill="${leg ? FX_INK.gold2 : FX_INK.cream}"></text><rect class="fx-shine" x="-60" y="38" width="60" height="44" fill="url(#${id}s)" clip-path="url(#${id}c)"/></g><text class="fx-sub" x="150" y="108" text-anchor="middle" font-size="11" fill="${FX_INK.gold}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`)}</div>${leg ? '<canvas></canvas>' : ''}`;
+      const T = FX_TITLE, w = T.frameW;
+      const star = (x, y, r, f) => `<path d="M${x} ${y - r}L${x + r * 0.3} ${y - r * 0.3}L${x + r} ${y}L${x + r * 0.3} ${y + r * 0.3}L${x} ${y + r}L${x - r * 0.3} ${y + r * 0.3}L${x - r} ${y}L${x - r * 0.3} ${y - r * 0.3}z" fill="${f}"/>`;
+      const name = (fill) => `<text class="fx-name" x="150" y="110" text-anchor="middle" font-size="${T.fs}" fill="${fill}"></text>`;
+      const sub = (fill) => `<text class="fx-sub" x="150" y="160" text-anchor="middle" font-size="11" fill="${fill}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`;
+      let inner;
+      if (!leg) {
+        inner = `<g class="fx-medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="30" fill="${FX_INK.lacquer2}" stroke="${T.rare}" stroke-width="${w}"/>${star(150, 48, 13, T.rare)}</g>${name(FX_INK.cream)}<path class="fx-line" d="M70 120h160" stroke="${T.rare}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(T.rare)}`;
+      } else {
+        const petals = Array.from({ length: 12 }, (_, i) => `<path class="fx-petal" d="M150 48q-9 -22 0 -42q9 20 0 42z" transform="rotate(${i * 30} 150 48)" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="0.6"/>`).join('');
+        const R = 30 + T.glow * 0.5;
+        const dots = Array.from({ length: 16 }, (_, i) => `<circle class="fx-dot" cx="${150 + R * Math.cos(i * Math.PI / 8)}" cy="${48 + R * Math.sin(i * Math.PI / 8)}" r="1.8" fill="${FX_INK.gold2}"/>`).join('');
+        inner = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${FX_INK.gold2}"/><stop offset=".55" stop-color="${T.leg}"/><stop offset="1" stop-color="${FX_INK.bronze2}"/></linearGradient></defs><g>${dots}</g><g>${petals}</g><g class="fx-medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="26" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="${w}"/><circle cx="150" cy="48" r="21" fill="none" stroke="${T.legInk}" stroke-width="0.8"/>${star(150, 42, 9, T.legInk)}${star(139, 56, 5, T.legInk)}${star(161, 56, 5, T.legInk)}</g>${name(FX_INK.gold2)}<path class="fx-line" d="M70 119h160M90 124h120" stroke="${T.leg}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(FX_INK.gold2)}`;
+      }
+      ov.innerHTML = `<div class="fx-veil"></div><div class="fx-title">${fxSvg(300, 170, inner)}</div>`;
       const q = (s) => ov.querySelector(s);
-      const name = q('.fx-name');
-      name.textContent = o.name;
-      // แถบเดียวกันใช้กับสกิลที่ลงสมุด/ขึ้นขั้น (06s) — ป้ายใต้แถบบอกว่าเป็นอะไร
+      const nm = q('.fx-name');
+      nm.textContent = o.name;
+      // ตราเดียวกันใช้กับสกิลที่ลงสมุด/ขึ้นขั้น (06s) — ป้ายใต้ชื่อบอกว่าเป็นอะไร
       if (o.sub) q('.fx-sub').textContent = o.sub;
-      // ชื่อฉายายาวเกินแถบ ⇒ บีบให้พอดีแถบ ไม่ล้นออกนอกผ้า
-      if (name.getComputedTextLength() > 210) {
-        name.setAttribute('textLength', 210);
-        name.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+      // ชื่อยาวเกินเส้นใต้ชื่อ ⇒ บีบให้พอดี ไม่ล้นจอ 390
+      if (nm.getComputedTextLength() > T.nameW) {
+        nm.setAttribute('textLength', T.nameW);
+        nm.setAttribute('lengthAdjust', 'spacingAndGlyphs');
       }
-      return { ov, leg, veil: ov.firstChild, ribbon: q('.fx-ribbon'), name, shine: q('.fx-shine'), rays: q('.fx-rays'), sub: q('.fx-sub'), dust: leg && fxDust(ov, 9) };
+      return { ov, leg, veil: ov.firstChild, medal: q('.fx-medal'), name: nm, line: q('.fx-line'), sub: q('.fx-sub'), petals: [...ov.querySelectorAll('.fx-petal')], dots: [...ov.querySelectorAll('.fx-dot')] };
     },
-    dur: (o) => (o.tier === 'legend' ? 1400 : 900), block: 300,
+    dur: (o) => (o.tier === 'legend' ? FX_TITLE.durLeg : FX_TITLE.durRare), block: 300,
     frame: (p, t) => {
-      const u = p.leg ? fxSpan(t, 0, 0.3) : fxSpan(t, 0, 0.4);
       p.veil.style.opacity = 0.6 * fxOut(fxSpan(t, 0, 0.2));
-      p.ribbon.style.transform = `scaleX(${fxBack(u)})`;
-      p.ribbon.style.opacity = fxSpan(t, 0, 0.08);
-      p.name.style.opacity = fxSpan(t, 0.25, 0.5);
-      p.sub.style.opacity = fxSpan(t, 0.45, 0.7);
-      p.shine.setAttribute('x', -60 + 380 * fxSpan(t, 0.45, 0.85));
-      if (p.leg) {
-        p.rays.style.opacity = 0.35 * fxOut(fxSpan(t, 0.2, 0.6));
-        p.rays.style.transform = `rotate(${24 * t}deg) scale(${0.6 + 0.4 * fxOut(fxSpan(t, 0.2, 0.7))})`;
-        p.dust(fxSpan(t, 0.25, 1));
-      }
+      p.medal.style.transform = `scale(${1.7 - 0.7 * fxOut(fxSpan(t, 0, 0.3))})`;
+      p.medal.style.opacity = fxSpan(t, 0, 0.12);
+      p.name.style.opacity = fxSpan(t, 0.3, 0.55);
+      p.line.style.strokeDashoffset = 100 * (1 - fxOut(fxSpan(t, 0.4, 0.7)));
+      p.sub.style.opacity = fxSpan(t, 0.55, 0.8);
+      p.petals.forEach((x, i) => { x.style.opacity = fxSpan(t, 0.25 + i * 0.025, 0.35 + i * 0.025); });
+      p.dots.forEach((x, i) => { x.style.opacity = fxSpan(t, 0.6 + i * 0.012, 0.66 + i * 0.012); });
     },
     end: (p, natural) => fxOvEnd(p.ov, natural) },
 };
-
-// ผงทองพุ่งออกจากกลางแล้วตกช้า (แนวคิด poof) — คืนฟังก์ชันวาดตาม k
-function fxDust(ov, seed) {
-  const cv = ov.querySelector('canvas'), r = ov.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
-  cv.width = r.width * dpr;
-  cv.height = r.height * dpr;
-  const ctx = cv.getContext('2d');
-  ctx.scale(dpr, dpr);
-  const rnd = fxRng(seed), cx = r.width / 2, cy = r.height / 2, ps = [];
-  for (let i = 0; i < 46; i++) {
-    const a = rnd() * Math.PI * 2, v = 50 + 90 * rnd();
-    ps.push({ vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.6, s: 1 + 2 * rnd(), c: rnd() < 0.5 ? FX_INK.gold2 : FX_INK.gold });
-  }
-  return (k) => {
-    ctx.clearRect(0, 0, r.width, r.height);
-    if (k <= 0 || k >= 1) return;
-    ctx.globalAlpha = 1 - k;
-    for (const q of ps) {
-      ctx.fillStyle = q.c;
-      ctx.fillRect(cx + q.vx * fxOut(k), cy + q.vy * fxOut(k) + 30 * k * k, q.s, q.s);
-    }
-    ctx.globalAlpha = 1;
-  };
-}
 
 // reduced-motion: พลิกเหลือ fade 150ms · ฉากตาย/ฉายาไม่เล่นเลย (การ์ดบอกเรื่องเดียวกันอยู่แล้ว)
 const FX_RM = 150;
@@ -2083,7 +2068,7 @@ function fxPlay(stage, name, o = {}, then = null) {
   fxCur = me;
 }
 const FX_TIER = { ตำนาน: 'legend', หายาก: 'rare' };
-// เรียกท้ายทุกตัววาดการ์ด: การ์ดใหม่ = พลิก · การ์ดตาย = ตะเกียงดับ แล้วต่อแถบผ้าคลี่ถ้าฉายาเด่นเป็นหายาก/ตำนาน
+// เรียกท้ายทุกตัววาดการ์ด: การ์ดใหม่ = พลิก · การ์ดตาย = ตะเกียงดับ แล้วต่อตราเหรียญถ้าฉายาเด่นเป็นหายาก/ตำนาน
 // วาดซ้ำการ์ดเดิม (สลับแท็บ) ไม่เล่นซ้ำ
 function fxCard(box, card) {
   fxCur?.skip();
@@ -2094,7 +2079,7 @@ function fxCard(box, card) {
   const top = lifeTitles(card).titles[0];
   const tier = top && FX_TIER[top.tier];
   const gone = isGone(st);
-  fxPlay(fxOv(), 'deathA', { head: gone ? 'หายไปจากบ้าน' : 'จากไปอย่างสงบ', sub: `${genLabel()}${lifeEndWord(gone)} ${card.age}` }, tier && (() => fxPlay(fxOv(), 'titleA', { tier, name: top.name })));
+  fxPlay(fxOv(), 'deathA', { head: gone ? 'หายไปจากบ้าน' : 'จากไปอย่างสงบ', sub: `${genLabel()}${lifeEndWord(gone)} ${card.age}` }, tier && (() => fxPlay(fxOv(), 'title', { tier, name: top.name })));
 }
 const fxGate = (e) => {
   if (!fxCur) return;
@@ -2754,7 +2739,7 @@ function earnBox(earn, key) {
       const r = skillsEarn(key, x.id, x.lv);
       if (!r) return done(null);
       done(r.was ? (r.lv > r.was ? `${x.name} ขึ้นเป็นขั้น ${r.lv}` : `${x.name} ขั้นสูงสุดอยู่แล้ว`) : `${x.name} · ขั้น ${r.lv}`);
-      if (!fxReduced() && r.lv > r.was) fxPlay(fxOv(), 'titleA', { tier: r.lv >= SKILL.top ? 'legend' : 'rare', name: x.name, sub: r.was ? `สกิลขึ้นขั้น ${r.lv}` : 'สกิลใหม่ลงสมุด' });
+      if (!fxReduced() && r.lv > r.was) fxPlay(fxOv(), 'title', { tier: r.lv >= SKILL.top ? 'legend' : 'rare', name: x.name, sub: r.was ? `สกิลขึ้นขั้น ${r.lv}` : 'สกิลใหม่ลงสมุด' });
     });
     b.firstChild.append(el('small', 'idesc', ISEKAI_SKILLS[x.id].desc));
     // ขั้นสูงสุดแล้ว ลงซ้ำไม่ได้อะไร — กันเสียสิทธิ์เลือกของการ์ดใบนี้
@@ -2764,24 +2749,26 @@ function earnBox(earn, key) {
   return box;
 }
 
-// การ์ดฝึกสกิล (06s): แถบผ้าชื่อสกิลหลังกด · ปุ่มท้าย (ยังไม่ฝึก) ไม่มีเอฟเฟกต์ · ขั้นใหม่อ่านจากป้ายปุ่มที่แกนเขียน
+// การ์ดฝึกสกิล (06s): ตราเหรียญชื่อสกิลหลังกด · ปุ่มท้าย (ยังไม่ฝึก) ไม่มีเอฟเฟกต์ · ขั้นใหม่อ่านจากป้ายปุ่มที่แกนเขียน
 function upgradeFx(card, i) {
   if (i >= card.choices.length - 1 || fxReduced()) return;
   const [name] = card.choices[i].split(' · ');
   const lv = /→ (\d+)$/.exec(card.choices[i])?.[1];
-  fxPlay(fxOv(), 'titleA', { tier: +lv >= SKILL.top ? 'legend' : 'rare', name, sub: lv ? `สกิลขึ้นขั้น ${lv}` : 'สกิลขึ้นขั้น' });
+  fxPlay(fxOv(), 'title', { tier: +lv >= SKILL.top ? 'legend' : 'rare', name, sub: lv ? `สกิลขึ้นขั้น ${lv}` : 'สกิลขึ้นขั้น' });
 }
 
 // เลือกพกก่อนไปเกิด (06s): จากสมุดสกิล ≤ SKILL.carry แล้วไปเกิดด้วยปุ่มเซฟเดิม — ชุดที่พกอยู่ในสถานะชีวิตใหม่ ภาพถ่ายเซฟเก็บไปเอง
 // สมุดว่าง = ไปเกิดทันทีเหมือนก่อนมีสกิลข้ามชาติ · บรรทัดตามไป/ไม่ตามไป (dsd-2) ไม่บอกตัวเลข
+// carryOffered = การ์ดเลือกขึ้นจริง ⇒ ช่องที่ไม่พกแลกเป็นค่าเริ่ม (decisions 355) · สมุดว่างไปเกิดทันที ไม่ได้
 let carryNext = [];
+let carryOffered = false;
 function rebirth() {
   const offers = bookCarryOffers(skillsRead().s);
   if (!offers.length) return play(T.rebirth);
   const prev = [...root.childNodes];
   const pick = [];
   const draw = () => {
-    const choices = homeCard('ก่อนไปเกิด', ['เลือกสกิลที่จะพกไปชาติหน้า', `พกได้ ${SKILL.carry} อย่าง ใช้ทั้งชีวิตไทยและชาติต่างโลกที่ตามมา · ทุกอย่างเริ่มขั้น 1 แต่ฝึกถึงขั้นในสมุดได้เร็วกว่าครั้งแรก`]);
+    const choices = homeCard('ก่อนไปเกิด', ['เลือกสกิลที่จะพกไปชาติหน้า', `พกได้ ${SKILL.carry} อย่าง ใช้ทั้งชีวิตไทยและชาติต่างโลกที่ตามมา · ทุกอย่างเริ่มขั้น 1 แต่ฝึกถึงขั้นในสมุดได้เร็วกว่าครั้งแรก`, 'ช่องที่ไม่พก ชาติหน้าได้พื้นฐานดีขึ้นแทน']);
     const body = root.querySelector('.body');
     const name = (id) => ISEKAI_SKILLS[id].name;
     const left = offers.filter((o) => !pick.includes(o.id));
@@ -2804,6 +2791,7 @@ function rebirth() {
     }
     choices.append(enter(button(pick.length ? 'ไปเกิดพร้อมสกิลที่พก' : 'ไปเกิดโดยไม่พกสกิล', null, () => {
       carryNext = [...pick];
+      carryOffered = true;
       play(T.rebirth);
     })), button('กลับ', null, () => root.replaceChildren(...prev)));
   };
@@ -3333,8 +3321,9 @@ function step(tok) {
   }
   if (tok === T.afterNext) return nextAfterCard(af);
   if (tok === T.rebirth) {
-    st = nextLife(af, carryNext, carryNext.length ? skillsRead().s : {});
+    st = nextLife(af, carryNext, carryNext.length ? skillsRead().s : {}, carryOffered);
     carryNext = [];
+    carryOffered = false;
     af = null;
     curAge = null;
     bookReset();
