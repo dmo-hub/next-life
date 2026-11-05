@@ -226,7 +226,21 @@ body:has(.mnav) .foot { display:none; }
 .me dd { margin:0; color:var(--ink2); }
 .me .focus { padding:0; }
 .me .meta { margin:0; padding:0; font-size:14px; }
-/* แผงเงิน (ใบ 07): ป้ายซ้าย ตัวเลขชิดขวาหลักตรงกัน กวาดตาเทียบได้ · ตัวเลขยาวตัดบรรทัดได้ ไม่ดันจอล้น */
+/* หัวค่าสถานะคู่ปุ่มพับคำอธิบาย (ui-redo 131) — ปุ่มหน้าตาเดียวกับ "กลับไปการ์ด" แตะได้ 44px */
+.me-hh { display:flex; align-items:baseline; gap:12px; margin:16px 0 8px; }
+.me-hh h3 { flex:1; margin:0; }
+.me-fold { all:unset; min-height:44px; padding:0 4px; font-size:13px; font-weight:600; color:var(--ink); text-decoration:underline; text-underline-offset:2px; cursor:pointer; white-space:nowrap; }
+.me-fold:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+/* .me dl ตั้ง display:grid ทับ hidden ของเบราว์เซอร์ — คำอธิบายที่พับต้องหายจริง */
+.me [hidden] { display:none; }
+.me .mo dl { margin-top:0; }
+/* ประวัติงาน: ช่วงอายุคอลัมน์ซ้ายกว้างเท่ากันให้กวาดตาลง · แถวปีรวมของเซฟเก่าเลขชิดขวา */
+.wh { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:14px; }
+.wh li { display:flex; justify-content:space-between; gap:12px; overflow-wrap:anywhere; }
+.wh-me li .num { color:var(--ink2); font-weight:600; white-space:nowrap; }
+.wh .wh-age { flex:none; min-width:7.5em; color:var(--ink2); font-variant-numeric:tabular-nums; }
+.wh li:has(.wh-age) { justify-content:flex-start; }
+/* ช่องเงิน (ใบ 07 · อยู่ในแผงตัวฉันตั้งแต่ 131): ป้ายซ้าย ตัวเลขชิดขวาหลักตรงกัน กวาดตาเทียบได้ · ตัวเลขยาวตัดบรรทัดได้ ไม่ดันจอล้น */
 .mo dl { margin:12px 0 0; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:10px 16px; font-size:15px; }
 .mo dt { color:var(--ink2); white-space:nowrap; }
 .mo dd { margin:0; text-align:right; font-weight:600; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
