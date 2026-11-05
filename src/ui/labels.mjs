@@ -27,6 +27,10 @@ const FX_ICON_PATH = {
 };
 const FX_ICON_OF = { ชีวิต: 'heart', ความสุข: 'smile', ความรู้: 'book', ความสัมพันธ์: 'people', เงิน: 'coin', รายได้: 'case', เส้นสาย: 'link', พลัง: 'bolt', เวท: 'spark', โชค: 'clover', ทอง: 'coin', ชื่อเสียง: 'star' };
 const fxIcon = (name) => `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="${FX_ICON_PATH[name]}"/></svg>`;
+// ไอคอนหน้าชื่อค่าบนแถบสถานะ/แผงตัวฉัน (ui-redo 80 · ข้อ 140–141): ชุดเดียวกับป้ายผล ผู้เล่นจับคู่ป้ายบนปุ่มกับค่าบนแถบได้
+// อ่านตาม key ค่า ไม่ใช่ชื่อไทย — วงปรโลกใช้ key ชาติไทยแต่ชื่อต่าง (ชีวิตทิพย์ ปัญญาธรรม …) · ค่าที่ไม่มีในตาราง = ไม่มีไอคอน
+const STAT_ICON_OF = { health: 'heart', happiness: 'smile', knowledge: 'book', relations: 'people', hp: 'heart', str: 'bolt', mag: 'spark', luk: 'clover', gold: 'coin' };
+export const statIcon = (key) => (STAT_ICON_OF[key] ? fxIcon(STAT_ICON_OF[key]) : '');
 const fxEscHtml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const FX_ARROW_SAID = { '↑': 'เพิ่ม', '↓': 'ลด' };
 // ชิ้นที่ตาเห็นต่างจากคำที่ควรอ่าน: ซ่อนชิ้นที่เห็นจากโปรแกรมอ่านจอ แล้วอ่านคำเต็มแทน
