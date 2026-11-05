@@ -6,7 +6,7 @@ build.mjs คัดลอก `*.woff2` ที่อยู่ในตารา�
 - ต้นทาง: Google Fonts `github.com/google/fonts` → `ofl/<ตระกูล>` (TTF) · สัญญาอนุญาต SIL OFL 1.1 (`*-OFL.txt`)
 - หน้าเล่นใช้ 5 แบบ: Noto Sans Thai 400/600 (หัวและเนื้อ) · Sarabun 400/600 (ภาพแชร์และภาพชั้นสมุดที่วาดลง canvas) · Srisakdi 700
 - หน้าเอกสาร: Pridi 400/600 + Sarabun 400/600 · หน้า tweak/ต้นแบบ: Noto Sans Thai 700 · Sarabun 700/600 ตัวเอียง · Srisakdi 400 · Mitr · Mali · IBM Plex Sans Thai · Noto Serif Thai
-- Maitree 400/500/600 เตรียมให้ token ทิศ 1 (T1) — ยังไม่มีหน้าไหนใช้
+- Maitree 400/500/600 · Pridi 500 · IBM Plex Sans Thai 400: หน้า tweak T1 ใช้ · หน้าผู้เล่นยังไม่ใช้จนกว่าใบ token ลงจริง
 - เพิ่มแบบใหม่: ตัดไฟล์ตามข้างล่าง วางในโฟลเดอร์นี้ แล้วเติมแถวในตาราง `FONTS` (site-check ตรวจว่าไฟล์ใน docs/fonts ตรงต้นฉบับและ fonts.css ตรงตาราง)
 - ตัดด้วย fonttools (ไม่อยู่ใน package.json — รันครั้งเดียวนอกเกม: `pip install --user fonttools brotli`)
 - Noto Sans Thai / Noto Serif Thai ต้นทางเป็นฟอนต์แปรผัน (`NotoSansThai[wdth,wght].ttf`) — ตรึงน้ำหนักก่อนตัด: `python -m fontTools.varLib.instancer NotoSansThai[wdth,wght].ttf wght=400 wdth=100 -o i400.ttf` (600/700 เหมือนกัน)

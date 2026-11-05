@@ -6,8 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>T1 ชุดสี + ฟอนต์กลาง (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Sarabun:wght@400;600;700&family=Maitree:wght@500;600&family=Pridi:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;600&family=Noto+Serif+Thai:wght@400;600&display=swap">
+<link rel="stylesheet" href="../../fonts/fonts.css">
 <style>
   /* หน้า tweak T1 token กลาง (ui-redo 102 · SPEC ใบ 94 §1 §4) — จอเกมอยู่ใน iframe ที่ใช้ CSS ตัวเกมจริงจาก template.html (build เติมใน <template id="gcss">)
      token ใหม่ฉีดเป็น <style id="ov"> ทับ :root ของเกม · preset 0 ที่ยังไม่แก้ = ไม่ฉีดเลย (เห็นเกมตอนนี้ตรง ๆ) */
@@ -689,7 +688,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   const clone = (o) => JSON.parse(JSON.stringify(o));
   const GCSS = $('gcss').content.querySelector('style').textContent;
-  const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Sarabun:wght@400;600&family=Maitree:wght@500;600&family=Pridi:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;600&family=Noto+Serif+Thai:wght@400;600&family=Srisakdi:wght@700&display=swap';
+  const FONTS = new URL('../../fonts/fonts.css', location.href).href;
 
   // ---------- ชุด 0 = ค่าในเกมตอนนี้ อ่านจาก CSS เกมที่ build เติม (แก้สีในเกม ชุด 0 ตามเอง) ----------
   const rule = (sel) => { const i = GCSS.indexOf(sel + ' {'); const j = i < 0 ? GCSS.indexOf(sel + '{') : i; return j < 0 ? '' : GCSS.slice(j, GCSS.indexOf('}', j)); };
