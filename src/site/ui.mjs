@@ -77,11 +77,13 @@ export function menuLabels(name, src = readFileSync(APP, 'utf8')) {
 // ที่เดิมใต้ dev/ui-redo/ เป็นหน้าส่งต่อมาหัว → [path ใต้ docs/, ชื่อหน้า, id หัว, ที่เดิม]
 export const UI_TWEAK_AT = 'dev/tweak/';
 export const UI_TWEAK_FROM = 'dev/ui-redo/';
+// หน้าที่ไม่ได้มาจาก dev/ui-redo/ → ที่เดิมของมัน · ต้นแบบการ์ด v2 เดิมเป็นหน้าเอกสารชั้นบนสุด (ui-redo 99 · ข้อ 179)
+export const UI_TWEAK_FROM_AT = { 'cards.html': 'cards.html' };
 export function tweakPages(docs) {
   return readdirSync(new URL(UI_TWEAK_AT, docs))
     .filter((n) => n.endsWith('.html'))
     .sort()
-    .map((n) => [`${UI_TWEAK_AT}${n}`, readFileSync(new URL(UI_TWEAK_AT + n, docs), 'utf8').match(/<title>([^<]*)<\/title>/)?.[1]?.split(' · ')[0] ?? n, `ui-t-${n.replace(/(-tweak)?\.html$/, '')}`, UI_TWEAK_FROM + n]);
+    .map((n) => [`${UI_TWEAK_AT}${n}`, readFileSync(new URL(UI_TWEAK_AT + n, docs), 'utf8').match(/<title>([^<]*)<\/title>/)?.[1]?.split(' · ')[0] ?? n, `ui-t-${n.replace(/(-tweak)?\.html$/, '')}`, UI_TWEAK_FROM_AT[n] ?? UI_TWEAK_FROM + n]);
 }
 
 // ป้ายสถานะของหัว = ป้ายในแถวของหัวนั้นบนสารบัญห้องผู้พัฒนา (แก้ป้ายที่เดียว) · id → HTML ของป้าย
