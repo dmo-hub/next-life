@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="th">
+<head>
+<!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ปรับเลย์เอาต์เว็บเอกสาร (tweak) · next-life</title>
+<style>
+* { box-sizing:border-box; }
+body { margin:0; background:#DCD6CB; color:#1F2430; font:15px/1.55 Sarabun,"Noto Sans Thai",system-ui,sans-serif; }
+.app { display:grid; grid-template-columns:340px minmax(0,1fr); min-height:100vh; }
+.ctl { position:sticky; top:0; height:100vh; overflow:auto; padding:14px 16px 40px; background:#F7F2E7; border-right:1px solid #CFC4AD; }
+.ctl h1 { font-size:18px; margin:0 0 4px; }
+.ctl h2 { font-size:14px; margin:18px 0 6px; color:#4A4F5C; }
+.hint { font-size:13px; color:#4A4F5C; margin:0 0 8px; }
+.pre { display:grid; gap:6px; }
+.pre button { text-align:left; font:inherit; padding:8px 10px; border:1px solid #CFC4AD; border-radius:10px; background:#FBF8F1; cursor:pointer; color:inherit; }
+.pre button b { display:block; }
+.pre button span { font-size:12px; color:#4A4F5C; }
+.pre button.on { border:2px solid #B73824; }
+.row { margin:0 0 10px; }
+.row > b { display:block; font-size:13px; font-weight:600; margin-bottom:3px; }
+.row > b i, .row > b output { font-style:normal; font-weight:400; }
+.row > b i { color:#B73824; }
+.seg { display:flex; flex-wrap:wrap; gap:4px; }
+.seg button { font:inherit; font-size:13px; min-height:32px; padding:2px 10px; border:1px solid #CFC4AD; border-radius:999px; background:#FBF8F1; cursor:pointer; color:inherit; }
+.seg button.on { background:#1F2430; color:#F7F2E7; border-color:#1F2430; }
+input[type=range] { width:100%; accent-color:#B73824; }
+.ord { list-style:none; padding:0; margin:0; display:grid; gap:4px; }
+.ord li { display:flex; align-items:center; gap:6px; padding:3px 6px; background:#FBF8F1; border:1px solid #CFC4AD; border-radius:8px; font-size:13px; }
+.ord li.ow { border-left:4px solid #D9B45A; }
+.ord li span { flex:1; min-width:0; }
+.ord button { font:inherit; width:32px; height:32px; border:1px solid #CFC4AD; border-radius:6px; background:#fff; cursor:pointer; }
+.ord button:disabled { opacity:.3; cursor:default; }
+textarea { width:100%; font:12px/1.5 ui-monospace,monospace; border:1px solid #CFC4AD; border-radius:8px; padding:6px; }
+.btns { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+.btns button { font:inherit; min-height:36px; padding:4px 14px; border-radius:8px; border:1px solid #CFC4AD; background:#FBF8F1; cursor:pointer; color:inherit; }
+.btns .pri { background:#B73824; color:#fff; border-color:#B73824; }
+#msg, #ovf { font-size:13px; color:#2F6B66; min-height:1.4em; margin:0; }
+#ovf.bad { color:#B73824; }
+.view { padding:12px 16px 40px; min-width:0; }
+.vbar { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; margin-bottom:10px; font-size:13px; }
+.vbar select { font:inherit; min-height:36px; max-width:100%; padding:2px 6px; border:1px solid #CFC4AD; border-radius:8px; background:#FBF8F1; }
+.vbar .nav button { font:inherit; min-height:36px; min-width:36px; border:1px solid #CFC4AD; border-radius:8px; background:#FBF8F1; cursor:pointer; }
+.stage { display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start; }
+.cap { font-size:13px; font-weight:600; margin:0 0 6px; overflow-wrap:anywhere; }
+.frame { overflow:hidden; background:#fff; border-radius:10px; box-shadow:0 8px 30px rgb(0 0 0 / .18); }
+.frame iframe { border:0; display:block; transform-origin:0 0; }
+.warn { background:#FFF1DE; border:1px solid #D8A65A; padding:8px 12px; border-radius:8px; font-size:14px; }
+@media (max-width:860px) { .app { grid-template-columns:1fr; } .ctl { position:static; height:auto; border-right:0; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="ctl" id="ctl" aria-label="แผงปรับค่า"></aside>
+  <main class="view">
+    <div class="vbar" id="vbar"></div>
+    <p class="warn" id="filewarn" hidden>หน้านี้ต้องเปิดผ่านเว็บ (http/https) — เปิดจากไฟล์ในเครื่องตรง ๆ เบราว์เซอร์ไม่ให้เติม CSS ลงหน้าตัวอย่าง จึงเห็นแต่หน้าเดิม</p>
+    <div id="stage"></div>
+  </main>
+</div>
+<script>
+(() => {
+  // build เติมรายการหน้า (คิดจากโฟลเดอร์ docs/) + ตัวแปร :root ของหน้าเล่น ⇒ หน้าใหม่เข้ารายการเอง สีตามเกมเสมอ
+  const D = /*DOCS-TWEAK:START*/{"pages":[{"f":"about.html","t":"กลไกในเกม","g":"เอกสารผู้เล่น","k":"read"},{"f":"cards.html","t":"ต้นแบบการ์ด v2","g":"เอกสารผู้เล่น","k":"wide"},{"f":"catalog.html","t":"การ์ดทั้งหมด","g":"เอกสารผู้เล่น","k":"wide"},{"f":"guide.html","t":"วิธีเล่น","g":"เอกสารผู้เล่น","k":"read"},{"f":"index.html","t":"เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด","g":"เอกสารผู้เล่น","k":"read"},{"f":"otherworld.html","t":"ต่างโลก","g":"เอกสารผู้เล่น","k":"read"},{"f":"spec/lore-finance-series.html","t":"ข้อมูลเกมจำลองชีวิต","g":"เอกสารผู้เล่น","k":"read"},{"f":"spoilers.html","t":"เฉลยการ์ดทั้งหมด (สปอยล์)","g":"เอกสารผู้เล่น","k":"wide"},{"f":"whatsnew.html","t":"แพตช์โน้ต","g":"เอกสารผู้เล่น","k":"read"},{"f":"worlds.html","t":"ชาตินี้","g":"เอกสารผู้เล่น","k":"read"},{"f":"dev/design-adopt-study.html","t":"สเปกนำผลศึกษาเกม (B158) เข้า next-life พร้อมแจกเลน","g":"การออกแบบ","k":"wide"},{"f":"dev/design-lore.html","t":"ข้อมูลอ้างอิง (lore)","g":"การออกแบบ","k":"wide"},{"f":"dev/design-thai-life-deep.html","t":"ชีวิตไทยลึกขึ้น — ใบค้างของโลกปกติจัดตามเฟส v2","g":"การออกแบบ","k":"wide"},{"f":"dev/design-three-worlds.html","t":"เกม next-life 3 โลก — ปกติ","g":"การออกแบบ","k":"wide"},{"f":"dev/design-ui-redo.html","t":"หน้าจอใหม่ทั้งเกม (ui-redo)","g":"การออกแบบ","k":"wide"},{"f":"dev/design-world-overlap.html","t":"โลกซ้อนทับ — ข้ามโลกซ้ำบ่อย กำแพงโลกบาง ของแต่ละโลกรั่วเข้าหากัน จนถึงจบโลก","g":"การออกแบบ","k":"wide"},{"f":"dev/design.html","t":"คำตัดสินเกม","g":"การออกแบบ","k":"wide"},{"f":"dev/ui.html","t":"ดีไซน์ UI","g":"การออกแบบ","k":"wide"},{"f":"dev/archive/b176-samples.html","t":"B176 ตัวอย่างภาพชั้นสมุด 3 แท็บ","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/archive/fx-proto.html","t":"ต้นแบบเอฟเฟกต์ 3 จังหวะ — next-life (B-fx ขั้น 1)","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/archive/index.html","t":"คลังต้นแบบเก่า","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/archive/isekai-life-v1.html","t":"หนึ่งในต่างโลก","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/index.html","t":"ห้องผู้พัฒนา","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/maps/afterlife.html","t":"ผังภูมิ 5 ในปรโลก","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/maps/continent.html","t":"แผนที่ทวีปเอเธอร์การ์ด","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/maps/dungeon.html","t":"แผนที่ชั้นในดันเจียนลับ","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/maps/lineage.html","t":"ผังตระกูล — next-life","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/maps/milestones.html","t":"หลักไมล์ 8 สาย — โลกหลัก","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/maps/politics.html","t":"ผังบันไดการเมือง","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/plan.html","t":"แผนเฟส + แกนต่อเนื่อง","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/spec.html","t":"ภาคผนวกสเปกและรีเสิร์ช","g":"ห้องผู้พัฒนา","k":"wide"}],"vars":{"--page":"#E4DDCF","--ink":"#1F2430","--ink2":"#3A3F4B","--muted":"#4A4F5C","--paper":"#F7F2E7","--paper2":"#E9E1CF","--rule":"#B9AE97","--rule2":"#CFC4AD","--red":"#B73824","--green":"#2F6B66","--blue":"#35558A","--lacquer":"#17110D","--lacquer2":"#221912","--gold":"#D9B45A","--gold2":"#F0D78C","--cream":"#EFE3C2","--bronze":"#5A4630","--bronze2":"#8A6D3B","--sand":"#BFAE86","--fl":"#015EC1","--dg":"#B3261E","--track":"#E2D9C6","--ft":"\"Noto Sans Thai\",system-ui,sans-serif","--r":"10px","--rk":"15px","--rc":"999px","--sh":"0 1px 2px rgb(0 0 0 / .06), 0 8px 24px rgb(0 0 0 / .08)","--cw":"800px","--pad-y":"36px","--pad-x":"32px"}}/*DOCS-TWEAK:END*/;
+  const V = D.vars;
+  const UP = '../../';
+  const KEY = 'nl-docs-tweak';
+  // หน้าตัวอย่าง "โลก" (decisions 41): ยังไม่มีไฟล์จริง — ประกอบจาก worlds.html + otherworld.html ตอนเปิด
+  const WORLD = { f: 'world', t: 'โลก (ตัวอย่างรวม worlds + otherworld)', g: 'เอกสารผู้เล่น', k: 'read' };
+  const PAGES = [...D.pages];
+  PAGES.splice(PAGES.findIndex((p) => p.f === 'worlds.html') + 1, 0, WORLD);
+  const byF = Object.fromEntries(PAGES.map((p) => [p.f, p]));
+
+  const CTRL = [
+    ['ฐาน', [
+      { k: 'skin', t: 'สี ฟอนต์ มุม', o: [['new', 'ตามหน้าเล่นใหม่ (กระดาษ · Noto Sans Thai)'], ['old', 'คงสีเดิม (#E6E0D3 · Sarabun)']] },
+    ]],
+    ['ความกว้างและระยะ', [
+      { k: 'read', t: 'กว้างหน้าอ่าน', n: [640, 960, 20], u: 'px' },
+      { k: 'wide', t: 'กว้างหน้าตาราง/การ์ด', n: [900, 1280, 20], u: 'px' },
+      { k: 'mapx', t: 'หน้าแผนที่ (dev/maps) กว้างกว่าหน้าอ่าน', n: [280, 840, 40], u: 'px' },
+      { k: 'px', t: 'ขอบซ้ายขวา', n: [12, 32, 2], u: 'px' },
+      { k: 'gy', t: 'ช่องไฟระหว่างหัวข้อ', n: [16, 48, 2], u: 'px' },
+    ]],
+    ['หัวหน้าและท้ายหน้า', [
+      { k: 'head', t: 'แบบหัวหน้า (หน้าแรกคงหัวเต็มจอโลโก้กลาง)', o: [['band', 'แถบมืดเต็มกว้าง'], ['paper', 'พื้นกระดาษ เส้นแดงล่าง'], ['slim', 'แถบมืดเตี้ย']] },
+      { k: 'hfont', t: 'ฟอนต์หัวข้อ', o: [['pridi', 'Pridi (เดิม)'], ['noto', 'ฟอนต์หน้าเล่น']] },
+      { k: 'foot', t: 'ท้ายหน้า', o: [['plain', 'ตัวเล็กสีเทา (เดิม)'], ['rule', 'เส้นคั่นด้านบน'], ['band', 'แถบมืด']] },
+    ]],
+    ['ชิ้นส่วนร่วม', [
+      { k: 'rad', t: 'มุม', o: [['0', 'เหลี่ยม (เดิม)'], ['r', 'มน 10 (ปุ่มเกม)'], ['rk', 'มน 15 (การ์ดเกม)']] },
+      { k: 'card', t: 'การ์ด/กล่อง', o: [['flat', 'เส้นขอบ'], ['shadow', 'เส้นขอบ + เงาแบบการ์ดเกม']] },
+      { k: 'table', t: 'ตาราง', o: [['grid', 'เส้นทุกช่อง (เดิม)'], ['rows', 'เส้นแนวนอน'], ['zebra', 'แถวสลับสี']] },
+      { k: 'tag', t: 'ป้าย', o: [['box', 'กรอบเหลี่ยม (เดิม)'], ['pill', 'แคปซูล']] },
+      { k: 'btn', t: 'ปุ่ม', o: [['square', 'เหลี่ยม'], ['round', 'มนตามค่ามุม']] },
+      { k: 'callout', t: 'กล่องหมายเหตุ', o: [['box', 'กรอบรอบ'], ['bar', 'แถบซ้าย']] },
+    ]],
+    ['หน้าโลก (worlds + otherworld)', [
+      { k: 'ow', t: 'ธีมส่วนต่างโลก', o: [['gold', 'พื้นมืดหัวทอง (แบบหน้าต่างโลกเดิม)'], ['band', 'แถบทองซ้าย พื้นเดียวกับหน้า'], ['paper', 'เหมือนส่วนอื่น']] },
+    ]],
+  ];
+  const ROWS = CTRL.flatMap(([, r]) => r);
+  const PRESET = {
+    a: { name: 'ก · ตามหน้าเล่น', why: 'สีฟอนต์มุมจากเกม · หัวมืด · การ์ดมีเงา · ตารางเส้นแนวนอน', cfg: { skin: 'new', read: 760, wide: 1040, mapx: 520, px: 16, gy: 28, head: 'band', hfont: 'noto', foot: 'rule', rad: 'rk', card: 'shadow', table: 'rows', tag: 'pill', btn: 'round', callout: 'bar', ow: 'gold', order: null } },
+    b: { name: 'ข · อ่านสบาย', why: 'กว้างขึ้น ช่องไฟมาก · หัวพื้นกระดาษ · ตารางแถวสลับสี', cfg: { skin: 'new', read: 840, wide: 1120, mapx: 560, px: 20, gy: 36, head: 'paper', hfont: 'noto', foot: 'plain', rad: 'r', card: 'flat', table: 'zebra', tag: 'pill', btn: 'round', callout: 'box', ow: 'band', order: null } },
+    c: { name: 'ค · คงสีเดิม เกลาโครง', why: 'สีฟอนต์เดิม · ความกว้างสามขนาดเท่ากันทุกหน้า', cfg: { skin: 'old', read: 760, wide: 1040, mapx: 440, px: 16, gy: 24, head: 'band', hfont: 'pridi', foot: 'plain', rad: '0', card: 'flat', table: 'grid', tag: 'box', btn: 'square', callout: 'box', ow: 'gold', order: null } },
+  };
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  let base = 'a';
+  let cfg = clone(PRESET.a.cfg);
+  let note = '';
+  const ui = { page: 'guide.html', two: 'dev/maps/politics.html', view: 'both' };
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (s && s.cfg) {
+      base = PRESET[s.base] ? s.base : 'a';
+      cfg = Object.assign(clone(PRESET[base].cfg), s.cfg);
+      note = s.note || '';
+      Object.assign(ui, s.ui);
+    }
+  } catch (e) { /* storage ปิด — ยังคัดลอกค่าได้ */ }
+  if (!byF[ui.page]) ui.page = 'guide.html';
+  if (!byF[ui.two]) ui.two = PAGES[0].f;
+  const store = () => { try { localStorage.setItem(KEY, JSON.stringify({ base, cfg, note, ui })); } catch (e) { /* ข้าม */ } };
+
+  // ---------- CSS กลางที่เติมลงหน้าจริง ----------
+  // ไม่ทับ: ตัวอย่างธีมการ์ดใน cards.html (.opts) · แถบบน · แถบห้องผู้พัฒนา · กล่องรหัส
+  const X = ':not(:is(.opts, .nl-nav, nav.top, #nl-gate) *)';
+  const RAD = { 0: '0', r: V['--r'], rk: V['--rk'] };
+  function css(c, f) {
+    const p = byF[f] || { k: 'wide' };
+    const map = p.k === 'map';
+    const home = f === 'index.html';
+    // หัวหน้าลายไทย (Srisakdi) ของหน้าแรกและหน้าโลกเป็นธีมของหน้า ไม่ใช่หัวข้อทั่วไป
+    const thaiHead = home || f === 'worlds.html' || f === 'otherworld.html' || f === 'world';
+    // แผนที่กว้างพิเศษ (ข้อ 28) แต่ผูกกับหน้าอ่าน — ขยับหน้าอ่านแล้วแผนที่ขยับตาม สัดส่วนทั้งเว็บไม่แตกกัน
+    const W = map ? c.read + c.mapx : c[p.k];
+    const rad = RAD[c.rad];
+    // หัวหน้าบางหน้ามีคลาสของตัวเอง (cards: header.pg) — :not(#tw) ดันความเฉพาะให้ค่ากลางชนะ
+    const H = 'body>header:not(#tw)';
+    const L = [`:root{--tw-w:${W}px;--tw-px:${c.px}px;--tw-gy:${c.gy}px;--tw-rad:${rad}}`];
+    if (c.skin === 'new' && !map) {
+      L.push(`body{background:${V['--page']};color:${V['--ink']};font-family:${V['--ft']};font-size:16px;line-height:1.6}`);
+      // ตัวอย่างการ์ดใน cards.html ใช้ฟอนต์เนื้อเดิมของหน้าเทียบกัน
+      L.push(`.opts{font-family:Sarabun,"Noto Sans Thai",sans-serif}`);
+      if (!home) L.push(`${H}{background:${V['--lacquer']};border-bottom:1px solid ${V['--bronze']}}`);
+      L.push(`main :is(table,section,.box,.panel)${X}{border-color:${V['--rule2']}}`);
+      L.push(`main th${X}{background:${V['--paper2']}}`);
+    }
+    // ความกว้าง: หน้าใช้ .w เป็นกล่องกลาง · หน้าที่ไม่มี .w ใช้ main เอง · dev/maps ใช้ .wrap
+    if (map) L.push(`.wrap{max-width:var(--tw-w);margin-left:auto;margin-right:auto;padding-left:var(--tw-px);padding-right:var(--tw-px)}`);
+    else {
+      L.push(`.w${X}{max-width:var(--tw-w)!important}`);
+      L.push(`body>main:not(:has(.w)):not(#app){max-width:var(--tw-w);margin-left:auto;margin-right:auto}`);
+      L.push(`:is(body>main,${H},body>footer){padding-left:var(--tw-px);padding-right:var(--tw-px)}`);
+      L.push(`body>main{padding-top:var(--tw-gy)}`);
+      L.push(`main h2${X}:not(:first-child){margin-top:var(--tw-gy)}`);
+      L.push(`main :is(section,.box)${X}{margin-bottom:calc(var(--tw-gy) * .6)}`);
+      // กันล้นแนวนอนที่ 390: ลิงก์/รหัสยาวตัดคำ · ตารางกว้างเลื่อนในตัวเองแทนดันทั้งหน้า (หน้าเดิมบางหน้าล้นอยู่แล้ว)
+      L.push(`main${X}{overflow-wrap:anywhere}@media (max-width:640px){main table${X}{display:block;max-width:100%;overflow-x:auto}}`);
+    }
+    if (!home && !map) {
+      const dark = c.skin === 'new' ? V['--lacquer'] : '#1F2430';
+      if (c.head === 'paper') L.push(`${H}{background:${c.skin === 'new' ? V['--paper'] : '#F4EFE3'};color:${V['--ink']};border-bottom:3px solid ${V['--red']}}${H} :is(h1,p,a){color:${V['--ink']}}${H} p{color:${V['--muted']}}`);
+      if (c.head === 'band') L.push(`${H}{background:${dark}}`);
+      if (c.head === 'slim') L.push(`${H}{background:${dark};padding-top:16px;padding-bottom:14px}${H} h1{font-size:clamp(22px,4vw,28px);margin-bottom:4px}${H} p{font-size:14px}`);
+    }
+    if (c.hfont === 'noto') L.push(`${thaiHead ? 'main' : `:is(main,${H})`} :is(h1,h2,h3)${X}{font-family:${V['--ft']};font-weight:600}`);
+    if (c.foot !== 'plain') {
+      const ft = `:is(main footer,body>footer)${X}`;
+      if (c.foot === 'rule') L.push(`${ft}{border-top:1px solid ${V['--rule']};padding-top:12px;margin-top:var(--tw-gy)}`);
+      if (c.foot === 'band') L.push(`${ft}{background:${V['--lacquer']};color:${V['--cream']};padding:16px var(--tw-px);margin-top:var(--tw-gy);border-radius:var(--tw-rad)}${ft} a{color:${V['--gold2']}}`);
+    }
+    const box = `main :is(section,.box,.panel,.world,a.card,.card,.tcard)${X}`;
+    L.push(`${box}{border-radius:var(--tw-rad)}`);
+    L.push(c.card === 'shadow' ? `${box}{box-shadow:${V['--sh']}}` : `${box}{box-shadow:none}`);
+    if (c.table !== 'grid') {
+      L.push(`table${X} :is(th,td){border-left:0;border-right:0}table${X} th{border-bottom:2px solid ${V['--rule']}}`);
+      if (c.table === 'zebra') L.push(`table${X} tr:nth-child(even) td{background:rgb(0 0 0 / .035)}`);
+    }
+    if (c.tag === 'pill') L.push(`.tag${X}{border-radius:${V['--rc']};padding-left:10px;padding-right:10px}`);
+    L.push(`:is(a.play,a.btn,main button)${X}{border-radius:${c.btn === 'round' ? `var(--tw-rad,${V['--r']})` : '0'}}`);
+    const co = `:is(.note,.warn,blockquote,.callout)${X}`;
+    L.push(c.callout === 'bar'
+      ? `${co}{border:0;border-left:4px solid ${V['--red']};background:${V['--paper']};padding:10px 14px;border-radius:0 var(--tw-rad) var(--tw-rad) 0}`
+      : `${co}{border:1px solid ${V['--rule']};background:${V['--paper']};padding:10px 14px;border-radius:var(--tw-rad)}`);
+    if (f === 'world') {
+      if (c.ow === 'gold') L.push(`.tw-ow{background:${V['--lacquer']};color:${V['--cream']};padding:14px 16px;border-radius:var(--tw-rad);margin:0 0 calc(var(--tw-gy) * .6)}.tw-ow :is(h2,h3,a){color:${V['--gold2']}}.tw-ow :is(p,li){color:${V['--cream']}}`);
+      if (c.ow === 'band') L.push(`.tw-ow{border-left:4px solid ${V['--gold']};padding-left:14px}.tw-ow h2{color:${V['--bronze2']}}`);
+    }
+    return L.join('\n');
+  }
+
+  // ---------- หน้าโลก: ตัดเนื้อสองหน้าเป็นหัว แล้วเรียงตามค่า ----------
+  let worldKeys = null; // [{k, t, ow}] จากหน้าจริงรอบแรกที่เปิด
+  const groupsOf = (wrap, pre, ow) => {
+    const out = [];
+    let cur = null;
+    for (const el of [...wrap.children]) {
+      if (el.tagName === 'FOOTER' || el.tagName === 'SCRIPT') continue;
+      const h = el.tagName === 'H2' ? el : el.tagName === 'SECTION' ? el.querySelector('h2') : null;
+      if (h || !cur) {
+        // ป้ายสถานะในหัว (เล่นได้แล้ว · กำลังทำ) ไม่ใช่ชื่อหัว
+        const c = h && h.cloneNode(true);
+        c?.querySelectorAll('.tag').forEach((x) => x.remove());
+        const t = `${ow ? 'ต่างโลก · ' : ''}${c ? c.textContent.replace(/\s+/g, ' ').trim() : 'ส่วนนำ'}`;
+        cur = { k: `${pre}:${t}`, t, ow, els: [] };
+        out.push(cur);
+      }
+      cur.els.push(el);
+    }
+    return out;
+  };
+  async function buildWorld(doc) {
+    const html = await (await fetch(UP + 'otherworld.html')).text();
+    const od = new DOMParser().parseFromString(html, 'text/html');
+    const style = [...od.querySelectorAll('head style')].map((s) => s.textContent).filter((t) => !t.includes('#nl-gate')).join('\n');
+    doc.head.insertAdjacentHTML('beforeend', `<style>${style}</style>`);
+    const wrap = doc.querySelector('main .w');
+    const foot = wrap.querySelector(':scope > footer');
+    const g = groupsOf(wrap, 'ชาตินี้', false);
+    const ohead = od.querySelector('body > header .w');
+    const lead = doc.createElement('div');
+    if (ohead) lead.innerHTML = ohead.innerHTML.replace(/<h1([^>]*)>/, '<h2$1>').replace(/<\/h1>/, '</h2>');
+    const og = groupsOf(od.querySelector('main .w'), 'ต่างโลก', true);
+    og.unshift({ k: 'ต่างโลก:หัวหน้าต่างโลก', t: 'ต่างโลก · หัวหน้า (ชื่อ + คำนำ)', ow: true, els: [lead] });
+    const all = [...g, ...og];
+    worldKeys = all.map(({ k, t, ow }) => ({ k, t, ow }));
+    const slot = {};
+    for (const x of all) {
+      const d = doc.createElement('div');
+      d.className = `tw-g${x.ow ? ' tw-ow' : ''}`;
+      d.dataset.k = x.k;
+      for (const el of x.els) d.append(el.ownerDocument === doc ? el : doc.importNode(el, true));
+      slot[x.k] = d;
+    }
+    wrap.replaceChildren();
+    doc.querySelector('body > header h1').textContent = 'โลก';
+    doc.title = 'โลก · ตัวอย่างหน้ารวม';
+    return { wrap, slot, foot };
+  }
+  const orderNow = () => {
+    if (!worldKeys) return [];
+    const ks = worldKeys.map((x) => x.k);
+    const kept = (cfg.order || []).filter((k) => ks.includes(k));
+    return [...kept, ...ks.filter((k) => !kept.includes(k))];
+  };
+  function placeWorld(w) {
+    w.wrap.replaceChildren(...orderNow().map((k) => w.slot[k]).filter(Boolean), ...(w.foot ? [w.foot] : []));
+  }
+
+  // ---------- กรอบหน้าตัวอย่าง ----------
+  const live = new Set(); // iframe ที่เปิดอยู่ — เปลี่ยนค่าแล้วเติม CSS ใหม่ทุกกรอบโดยไม่โหลดหน้าใหม่
+  let fileBlocked = false;
+  function dress(fr) {
+    let doc;
+    try { doc = fr.contentDocument; } catch (e) { doc = null; }
+    if (!doc || !doc.documentElement) { fileBlocked = true; document.getElementById('filewarn').hidden = false; return null; }
+    // หน้าแม่ผ่านกล่องรหัสแล้ว หน้าในกรอบเป็นแท็บเดียวกัน — เปิดให้เลยไม่ต้องถามซ้ำ
+    doc.documentElement.classList.add('nl-open');
+    doc.getElementById('nl-gate')?.remove();
+    let st = doc.getElementById('nl-tw');
+    if (!st) { st = doc.createElement('style'); st.id = 'nl-tw'; doc.head.append(st); }
+    if (cfg.skin === 'new' && !doc.getElementById('nl-tw-font')) doc.head.insertAdjacentHTML('beforeend', '<link id="nl-tw-font" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600&display=swap">');
+    st.textContent = css(cfg, fr.dataset.f);
+    return doc;
+  }
+  function mount(fr) {
+    fr.addEventListener('load', async () => {
+      const doc = dress(fr);
+      if (!doc) return;
+      // ลิงก์ในหน้าพาไปหน้าอื่นได้ — นับเป็นหน้านั้นเพื่อใช้ความกว้างให้ถูกชนิด
+      const at = decodeURIComponent(new URL(fr.contentWindow.location.href).pathname).replace(/^.*?\/(?=(dev|spec)\/|[^/]+\.html$)/, '');
+      if (fr._w || fr.dataset.f !== 'world') { fr._w = null; if (byF[at]) { fr.dataset.f = at; dress(fr); } }
+      if (fr.dataset.f === 'world' && !fr._w) {
+        fr._w = await buildWorld(doc);
+        placeWorld(fr._w);
+        paint();
+      }
+    });
+    live.add(fr);
+  }
+  const srcOf = (f) => UP + (f === 'world' ? 'worlds.html' : f);
+  const frame = (f, w, maxW, cap) => {
+    const h = w === 390 ? 844 : 800;
+    const s = Math.min(1, maxW / w);
+    return `<div><p class="cap">${cap}</p><div class="frame" style="width:${Math.round(w * s)}px;height:${Math.round(h * s)}px"><iframe data-f="${f}" title="${cap}" style="width:${w}px;height:${h}px;transform:scale(${s})" src="${srcOf(f)}"></iframe></div></div>`;
+  };
+  const vbar = document.getElementById('vbar');
+  const stage = document.getElementById('stage');
+  const VIEWS = [['both', 'มือถือ + คอม'], ['390', 'มือถือ 390'], ['1280', 'คอม 1280'], ['two', 'เทียบ 2 หน้า']];
+  const pick = (id, cur) => `<select id="${id}" aria-label="เลือกหน้า">${['เอกสารผู้เล่น', 'การออกแบบ', 'ห้องผู้พัฒนา'].map((g) => `<optgroup label="${g}">${PAGES.filter((p) => p.g === g).map((p) => `<option value="${p.f}"${p.f === cur ? ' selected' : ''}>${p.f === 'world' ? p.t : `${p.f} · ${p.t}`}</option>`).join('')}</optgroup>`).join('')}</select>`;
+  function draw() {
+    const real = PAGES.length - 1;
+    vbar.innerHTML = `<b>หน้า</b>${pick('pg', ui.page)}<span class="nav"><button type="button" data-step="-1" aria-label="หน้าก่อน">‹</button> <button type="button" data-step="1" aria-label="หน้าถัดไป">›</button></span><small>${real} หน้าในขอบเขต + หน้าตัวอย่างโลก</small>${ui.view === 'two' ? `<b>เทียบกับ</b>${pick('pg2', ui.two)}` : ''}<span class="seg">${VIEWS.map(([v, l]) => `<button type="button" data-view="${v}" class="${ui.view === v ? 'on' : ''}">${l}</button>`).join('')}</span>`;
+    live.clear();
+    const Wd = stage.clientWidth || 900;
+    const t = (f) => (f === 'world' ? WORLD.t : f);
+    if (ui.view === 'both') {
+      const m = Math.min(390, Wd * 0.3);
+      stage.innerHTML = `<div class="stage">${frame(ui.page, 390, m, `${t(ui.page)} · 390`)}${frame(ui.page, 1280, Wd - m - 16, `${t(ui.page)} · 1280`)}</div>`;
+    } else if (ui.view === 'two') {
+      stage.innerHTML = `<div class="stage">${frame(ui.page, 1280, (Wd - 16) / 2, `${t(ui.page)} · 1280`)}${frame(ui.two, 1280, (Wd - 16) / 2, `${t(ui.two)} · 1280`)}</div>`;
+    } else {
+      stage.innerHTML = `<div class="stage">${frame(ui.page, Number(ui.view), Wd, `${t(ui.page)} · ${ui.view}`)}</div>`;
+    }
+    stage.querySelectorAll('iframe').forEach(mount);
+  }
+  const redress = () => live.forEach((fr) => { if (fr.isConnected) { dress(fr); if (fr._w) placeWorld(fr._w); } });
+
+  // ---------- แผงปรับ ----------
+  const ctl = document.getElementById('ctl');
+  const label = (c, v) => (c.n ? `${v} ${c.u}` : (c.o.find(([x]) => x === v) || [, v])[1]);
+  const changed = (k) => JSON.stringify(cfg[k]) !== JSON.stringify(PRESET[base].cfg[k]);
+  function paint() {
+    const ord = orderNow();
+    const wk = Object.fromEntries((worldKeys || []).map((x) => [x.k, x]));
+    ctl.innerHTML = `<h1>ปรับเลย์เอาต์เว็บเอกสาร</h1>
+      <p class="hint">ค่าชุดเดียวใช้กับทุกหน้า · จอขวาเป็นหน้าจริงจาก build ล่าสุด (สลับหน้าค่าไม่หาย) · สีฟอนต์มุมของแบบ "ตามหน้าเล่น" อ่านจากเกมตอน build · เสร็จแล้วกด <b>คัดลอกค่า</b> ท้ายแผง</p>
+      <h2>แบบตั้งต้น</h2>
+      <div class="pre">${Object.entries(PRESET).map(([k, p]) => `<button type="button" data-pre="${k}" class="${k === base ? 'on' : ''}"><b>${p.name}</b><span>${p.why}</span></button>`).join('')}</div>
+      ${CTRL.map(([h, rows]) => `<h2>${h}</h2>${rows.map((c) => c.n
+        ? `<div class="row"><b><label for="r-${c.k}">${c.t}</label> <output id="o-${c.k}">${cfg[c.k]} ${c.u}</output>${changed(c.k) ? ' <i>ปรับแล้ว</i>' : ''}</b><input type="range" id="r-${c.k}" data-n="${c.k}" min="${c.n[0]}" max="${c.n[1]}" step="${c.n[2]}" value="${cfg[c.k]}"></div>`
+        : `<div class="row"><b>${c.t}${changed(c.k) ? ' <i>ปรับแล้ว</i>' : ''}</b><div class="seg">${c.o.map(([v, l]) => `<button type="button" data-k="${c.k}" data-v="${v}" class="${cfg[c.k] === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>`).join('')}`).join('')}
+      <div class="row"><b>ลำดับหัวในหน้าโลก${cfg.order ? ' <i>ปรับแล้ว</i>' : ''}</b>${worldKeys
+        ? `<ol class="ord">${ord.map((k, i) => `<li class="${wk[k].ow ? 'ow' : ''}"><span>${i + 1}. ${wk[k].t}</span><button type="button" data-up="${i}" ${i ? '' : 'disabled'} aria-label="เลื่อนขึ้น">↑</button><button type="button" data-down="${i}" ${i < ord.length - 1 ? '' : 'disabled'} aria-label="เลื่อนลง">↓</button></li>`).join('')}</ol><small>แถบทองซ้าย = หัวจากหน้าต่างโลก</small>`
+        : `<p class="hint">เปิดหน้า "โลก" ในตัวเลือกหน้าก่อน รายการหัวจะขึ้นที่นี่ <button type="button" data-go="world">เปิดหน้าโลก</button></p>`}</div>
+      <h2>ตรวจ</h2>
+      <div class="btns"><button type="button" id="scan">ตรวจล้นแนวนอนที่ 390 ทุกหน้า</button></div>
+      <p id="ovf" role="status"></p>
+      <h2>ส่งคำตอบ</h2>
+      <textarea id="note" rows="3" placeholder="หมายเหตุถึงเลน (ถ้ามี)">${note.replace(/</g, '&lt;')}</textarea>
+      <div class="btns"><button type="button" class="pri" id="copy">คัดลอกค่า</button><button type="button" id="reset">รีเซ็ตเป็นแบบ ${PRESET[base].name.split(' ')[0]}</button></div>
+      <p id="msg" role="status"></p>
+      <textarea id="out" rows="8" readonly aria-label="ข้อความที่จะคัดลอก"></textarea>`;
+    document.getElementById('out').value = answer();
+  }
+  function answer() {
+    const L = [`เว็บเอกสาร: เริ่มจาก ${PRESET[base].name}`];
+    for (const c of ROWS) {
+      const was = PRESET[base].cfg[c.k];
+      L.push(`- ${c.t}: ${label(c, cfg[c.k])}${cfg[c.k] !== was ? ` (ปรับ · เดิม ${label(c, was)})` : ''}`);
+    }
+    if (worldKeys) {
+      const wk = Object.fromEntries(worldKeys.map((x) => [x.k, x.t]));
+      L.push(`- ลำดับหัวหน้าโลก: ${orderNow().map((k) => wk[k]).join(' → ')}${cfg.order ? ' (ปรับ)' : ''}`);
+    }
+    if (note.trim()) L.push(`- หมายเหตุ: ${note.trim()}`);
+    L.push(`- JSON: ${JSON.stringify({ base, ...cfg, order: cfg.order || (worldKeys ? orderNow() : null) })}`);
+    return L.join('\n');
+  }
+  const after = () => { paint(); store(); redress(); };
+  ctl.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.pre) { base = b.dataset.pre; const o = cfg.order; cfg = clone(PRESET[base].cfg); cfg.order = o; }
+    else if (b.dataset.k) cfg[b.dataset.k] = b.dataset.v;
+    else if (b.dataset.up || b.dataset.down) {
+      const ord = orderNow();
+      const i = Number(b.dataset.up ?? b.dataset.down);
+      const j = b.dataset.up ? i - 1 : i + 1;
+      [ord[i], ord[j]] = [ord[j], ord[i]];
+      cfg.order = ord;
+    } else if (b.dataset.go) { ui.page = b.dataset.go; store(); draw(); return; }
+    else if (b.id === 'reset') { if (!confirm('รีเซ็ตทุกค่ากลับเป็นแบบตั้งต้น?')) return; cfg = clone(PRESET[base].cfg); }
+    else if (b.id === 'copy') { copy(); return; }
+    else if (b.id === 'scan') { scan(); return; }
+    else return;
+    after();
+  });
+  ctl.addEventListener('input', (e) => {
+    const n = e.target.dataset.n;
+    if (n) {
+      cfg[n] = Number(e.target.value);
+      document.getElementById(`o-${n}`).textContent = `${cfg[n]} px`;
+      document.getElementById('out').value = answer();
+      store();
+      redress();
+    } else if (e.target.id === 'note') { note = e.target.value; document.getElementById('out').value = answer(); store(); }
+  });
+  // ปล่อยแถบเลื่อนแล้วค่อยวาดแผงใหม่ (ป้าย "ปรับแล้ว") — วาดระหว่างลากจะหลุดโฟกัสแถบ
+  ctl.addEventListener('change', (e) => { if (e.target.dataset.n) paint(); });
+  vbar.addEventListener('click', (e) => {
+    const v = e.target.closest('[data-view]');
+    const s = e.target.closest('[data-step]');
+    if (v) ui.view = v.dataset.view;
+    else if (s) { const i = PAGES.findIndex((p) => p.f === ui.page); ui.page = PAGES[(i + Number(s.dataset.step) + PAGES.length) % PAGES.length].f; }
+    else return;
+    store(); draw();
+  });
+  vbar.addEventListener('change', (e) => {
+    if (e.target.id === 'pg') ui.page = e.target.value;
+    else if (e.target.id === 'pg2') ui.two = e.target.value;
+    else return;
+    store(); draw();
+  });
+  async function copy() {
+    const o = document.getElementById('out');
+    o.value = answer();
+    try { await navigator.clipboard.writeText(o.value); } catch (e) { o.select(); document.execCommand('copy'); }
+    document.getElementById('msg').textContent = 'คัดลอกแล้ว — วางตอบในแชทได้เลย';
+  }
+  // เปิดทุกหน้าทีละหน้าในกรอบซ่อนกว้าง 390 ด้วยค่าตอนนี้ แล้ววัดว่าเนื้อกว้างเกินจอไหม
+  async function scan() {
+    const o = document.getElementById('ovf');
+    const host = document.createElement('div');
+    host.style.cssText = 'position:fixed;left:-2000px;top:0;width:390px;height:844px;overflow:hidden';
+    document.body.append(host);
+    const bad = [];
+    let i = 0;
+    for (const p of PAGES) {
+      o.className = '';
+      o.textContent = `กำลังตรวจ ${++i}/${PAGES.length} · ${p.f}`;
+      const fr = document.createElement('iframe');
+      fr.dataset.f = p.f;
+      fr.style.cssText = 'width:390px;height:844px;border:0';
+      host.replaceChildren(fr);
+      await new Promise((ok) => { fr.onload = ok; fr.src = srcOf(p.f); });
+      const doc = dress(fr);
+      if (!doc) break;
+      if (p.f === 'world') placeWorld(await buildWorld(doc));
+      await new Promise((ok) => setTimeout(ok, 120));
+      const w = doc.documentElement.scrollWidth;
+      if (w > 391) bad.push(`${p.f} (${w}px)`);
+    }
+    host.remove();
+    if (fileBlocked) { o.className = 'bad'; o.textContent = 'ตรวจไม่ได้ — ต้องเปิดหน้านี้ผ่านเว็บ'; return; }
+    o.className = bad.length ? 'bad' : '';
+    o.textContent = bad.length ? `ล้น ${bad.length} หน้า: ${bad.join(' · ')}` : `ไม่ล้นทั้ง ${PAGES.length} หน้า`;
+  }
+  let rt;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(draw, 150); });
+  paint();
+  draw();
+})();
+</script>
+</body>
+</html>

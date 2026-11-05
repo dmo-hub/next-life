@@ -71,7 +71,6 @@ export const DEV_TABS = [
   ['dev/design.html', 'คำตัดสินเกม'],
   ['dev/ui.html', 'การออกแบบ'],
   ['dev/maps/continent.html', 'แผนที่'],
-  ['dev/ui-redo/tweak.html', 'ต้นแบบ UI'],
   ['dev/archive/index.html', 'คลังเก่า'],
 ];
 export const DEV_NAV_CSS = `
@@ -109,7 +108,7 @@ export function devNavHtml(file) {
   return `<!--nav--><style>${DEV_NAV_CSS}</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="${up}dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="${up}index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in">${tabs}</div></div></div>`;
 }
 
-// หน้าส่งต่อของ URL ที่ย้ายไป (GitHub Pages ไม่มี redirect ฝั่งเซิร์ฟเวอร์) — noindex ไม่ใช้ canonical (คำตัดสินเจ้าของ) · พก #ส่วนในหน้าไปด้วย
+// หน้าส่งต่อของ URL ที่ย้ายไป (GitHub Pages ไม่มี redirect ฝั่งเซิร์ฟเวอร์) — noindex ไม่ใช้ canonical (คำตัดสินเจ้าของ) · พก #ส่วนในหน้าไปด้วย เว้นปลายทางระบุหัวไว้แล้ว (หน้าที่ย้ายมาเป็นหัวในหน้าอื่น)
 // from/to = path ใต้ docs/ · build เขียนทุกรอบ จึงไม่หายเมื่อ build ซ้ำ · MOVED_MARK ให้ build/ด่านแยกหน้าส่งต่อออกจากหน้าค้าง
 export const MOVED_MARK = '<meta name="next-life-moved"';
 export function movedHtml(from, to, title) {
@@ -124,7 +123,7 @@ export function movedHtml(from, to, title) {
 ${MOVED_MARK} content="${to}">
 <meta http-equiv="refresh" content="0; url=${href}">
 <title>ย้ายแล้ว · ${title}</title>
-<script>location.replace(${JSON.stringify(href)} + location.hash)</script>
+<script>location.replace(${JSON.stringify(href)}${to.includes('#') ? '' : ' + location.hash'})</script>
 </head>
 <body style="font-family:Sarabun,sans-serif;padding:24px">
 <p>หน้านี้ย้ายไปแล้ว — <a href="${href}">${title}</a></p>
