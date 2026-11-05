@@ -16,7 +16,7 @@ import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
 import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
-import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml } from '../src/site/nav.mjs';
+import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml, DEV_MAPS, DEV_MAPS_PAGE, mapsMoved } from '../src/site/nav.mjs';
 import { uiPage, designMoved, tweakPages, tweakMoved, tweakStatus, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
@@ -330,6 +330,24 @@ const liveCtl =
   liveBad(uiHtml.replace(`<h2 id="${UI_LIVE_ID}">`, '<h2>')).length > 0 &&
   liveBad(uiHtml.replace(`<iframe title="${UI_LIVE_TITLE}"`, `<iframe title="${UI_LIVE_TITLE}" sandbox="allow-scripts"`)).includes('กรอบต้นแบบมี sandbox');
 check('ต้นแบบปรับสดอยู่ในหน้าดีไซน์ UI รันสคริปต์ จำค่าคีย์เดิม คัดลอกได้ ที่เดิมส่งต่อ', liveMiss.length || !liveCtl, `${liveMiss.length ? ` ${liveMiss.slice(0, 4).join(' | ')} ·` : ''} ตัวควบคุม${liveCtl ? 'จับได้' : 'จับไม่ได้'}`);
+// 7e3) dev/maps หน้าเดียว (ui-redo 101): ทุกผังมีหัว · ปุ่มสลับ · สคริปต์ห่อของตัวเอง · id ในหน้าไม่ซ้ำ (เดิมทุกหน้าใช้ map/info/here) · ที่เดิมส่งต่อมา #ผัง
+// ตัวควบคุม: ถอดหัวผังแรก ⇒ ต้องนับขาด · id ซ้ำ ⇒ ต้องถูกจับ
+const mapsGap = (html) => {
+  const ids = [...html.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]);
+  const dup = [...new Set(ids.filter((x, i) => ids.indexOf(x) !== i))];
+  return [
+    ...DEV_MAPS.flatMap(([id]) => [
+      ...(html.includes(`<section id="${id}"`) ? [] : [`ขาดหัว ${id}`]),
+      ...(html.includes(`<a href="#${id}">`) ? [] : [`ขาดปุ่ม ${id}`]),
+      ...(html.includes(`MAPS.${id} = () => {\nconst document = mapDoc('${id}');`) ? [] : [`สคริปต์ไม่ห่อ ${id}`]),
+    ]),
+    ...(dup.length ? [`id ซ้ำ ${dup.slice(0, 3).join(' ')}`] : []),
+  ];
+};
+const mapsHtml = lf(readOr(DEV_MAPS_PAGE) ?? '');
+const mapsMiss = [...mapsGap(mapsHtml), ...DEV_MAPS.filter((m) => lf(readOr(`dev/maps/${m[0]}.html`)) !== mapsMoved(m)).map(([id]) => `dev/maps/${id}.html ไม่ส่งต่อมา #${id}`)];
+const mapsCtl = mapsGap(mapsHtml.replace(`<section id="${DEV_MAPS[0][0]}"`, '<section')).length === 1 && mapsGap(mapsHtml.replace('</body>', `<i id="${DEV_MAPS[0][0]}"></i></body>`)).some((x) => x.startsWith('id ซ้ำ'));
+check('dev/maps หน้าเดียวสลับครบทุกผัง id ไม่ซ้ำ ที่เดิมส่งต่อ', mapsMiss.length || !mapsCtl, ` ผัง ${DEV_MAPS.length}${mapsMiss.length ? ` · ${mapsMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${mapsCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('หน้าห้องผู้พัฒนามีแท็บครบชุดเดียวกัน', devMiss.length || !devCtl || !devCur, ` ${devFiles.length} หน้า${devMiss.length ? ` · ${devMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${devCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('ทุกหน้ามีแถบบนชุดเดียวและชี้หน้าปัจจุบัน', navMiss.length || !navCtl || !curOk, ` ${navFiles.length} หน้า${navMiss.length ? ` · ${navMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${navCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
@@ -346,7 +364,7 @@ const dtHtml = readOr(DOCS_TWEAK_PAGE) ?? '';
 const dtNow = docsTweakData(docs, uiTpl);
 const dtBlock = docsTweakBlock(dtHtml);
 const dtFiles = dtNow.pages.map((p) => p.f);
-const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spoilers.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', 'dev/maps/politics.html', 'dev/archive/index.html'];
+const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spoilers.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', DEV_MAPS_PAGE, 'dev/archive/index.html'];
 const dtOut = (f) => f === 'play.html' || f.startsWith('archive/') || f.startsWith('dev/ui-redo/') || /tweak/.test(f) || read(f).includes(MOVED_MARK);
 const dtMiss = [
   ...(JSON.stringify(dtBlock) !== JSON.stringify(dtNow) ? [`ค้าง ${DOCS_TWEAK_PAGE} (build ใหม่)`] : []),
