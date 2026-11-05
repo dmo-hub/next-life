@@ -10,6 +10,7 @@ import { SHOWN_STATS, BTN } from '../ui/labels.mjs';
 import { movedHtml } from './nav.mjs';
 import { DESIGN_AT } from './design.mjs';
 import { PUBLIC_HIDE } from './gate.mjs';
+import { FONT_DIR, fontsCss, playFonts } from './fonts.mjs';
 
 export const UI_PAGE = 'dev/ui.html';
 // หน้าที่ย้ายมาหน้านี้ — design.html เดิมคือดีไซน์ UI ตามคำเจ้าของ (ข้อ 42 · 57) ไม่ใช่สารบัญคำตัดสินเกม
@@ -26,7 +27,6 @@ export const UI_LIVE_TITLE = 'ต้นแบบปรับสด';
 const LIVE_SRC = new URL('ui-live.html', import.meta.url);
 
 const TEMPLATE = new URL('../ui/template.html', import.meta.url);
-const FONTS_DIR = new URL('../ui/fonts/', import.meta.url);
 const APP = new URL('../ui/app.mjs', import.meta.url);
 
 // CSS ทั้งก้อนในแท็ก style แรกของหน้าเล่น · ช่องฟอนต์ใส่ฟอนต์จริงของเกม
@@ -36,22 +36,12 @@ export function gameCss(tpl = readFileSync(TEMPLATE, 'utf8')) {
   return m[1].replace('/*__FONTS__*/', () => fontFaces());
 }
 
-// ชื่อไฟล์ฟอนต์ = <ชื่อตระกูลติดกัน>-<น้ำหนัก>.woff2 แบบเดียวกับที่ build.mjs ฝังในหน้าเล่น
-const WEIGHT = { Regular: 400, SemiBold: 600, Bold: 700 };
-export function gameFonts(dir = FONTS_DIR) {
-  return readdirSync(dir)
-    .filter((f) => f.endsWith('.woff2'))
-    .sort()
-    .map((f) => {
-      const [fam, w] = f.replace(/\.woff2$/, '').split('-');
-      return { file: f, family: fam.replace(/([a-z])([A-Z])/g, '$1 $2'), weight: WEIGHT[w] ?? 400 };
-    });
+// ฟอนต์ที่หน้าเล่นใช้ จากตารางกลาง (src/site/fonts.mjs) — ไม่อ่านจากโฟลเดอร์ เพราะโฟลเดอร์มีฟอนต์ของหน้าอื่นด้วย (ui-redo 96)
+export function gameFonts() {
+  return playFonts().map(([family, weight, file]) => ({ file: `${file}.woff2`, family, weight }));
 }
-function fontFaces(dir = FONTS_DIR) {
-  return gameFonts(dir)
-    .map((f) => `@font-face { font-family:"${f.family}"; font-weight:${f.weight}; font-style:normal; src:url(data:font/woff2;base64,${readFileSync(new URL(f.file, dir)).toString('base64')}) format('woff2'); }`)
-    .join('\n');
-}
+// หน้านี้อยู่ docs/dev/ · iframe srcdoc ใช้ที่อยู่ของหน้าแม่ ⇒ ชี้ ../fonts/ ไฟล์ชุดเดียวกับหน้าเล่น
+const fontFaces = () => fontsCss(playFonts(), `../${FONT_DIR}`).trimEnd();
 
 // บล็อกที่มีแต่ตัวแปร (:root · ธีมต่างโลก) → [{sel, vars:[[ชื่อ, ค่า]]}] · คอมเมนต์ตัดทิ้งก่อน
 export function cssVars(css) {

@@ -3531,6 +3531,8 @@ if (logoEl && window.ResizeObserver) new ResizeObserver(headEdge).observe(logoEl
 
 // ภาพถ่าย v2 ก่อน · ไม่มีจึงลองเซฟ v1 (เล่นซ้ำตรงการ์ดเดิม = เขียนทับเป็น v2 ทันที) · v1 ไม่ตรง/เซฟเสีย = หน้าเกมอัปเดต
 function boot() {
+  // ล้างโครงหน้าเปิดที่มากับ HTML (template.html) — ทุกทางข้างล่างวาดจอใหม่ลง root
+  root.replaceChildren();
   const seed = linkSeed();
   dropLinkSeed();
   let card = snapRead();
