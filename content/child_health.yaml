@@ -33,6 +33,7 @@ events:
           - {weight: 2, text: "ไข้ขึ้นกลางห้อง เลือดกำเดาไหลไม่หยุด ต้องนอนโรงพยาบาลเป็นอาทิตย์", effects: {health: -2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: kill_larvae
+        nature: learn
         text: "ชี้โอ่งลูกน้ำให้ผู้ใหญ่ทั้งซอยดู"
         outcomes:
           - {weight: 2, ok: true, text: "ผู้ใหญ่ทั้งซอยคว่ำโอ่งตามที่คุณชี้ ปีนั้นไม่มีใครในซอยป่วยอีกเลย", effects: {health: 1, relations: 2, happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: help_others, level: 1}], multipliers: {stats: {relations: 2}}}
@@ -50,6 +51,7 @@ events:
     text: "อายุ {อายุ} ขวบ วิ่งไล่จับปลาแล้วลื่นตกคลอง ลุงข้างบ้านกระโดดลงไปคว้าขึ้นมาทัน ตัวเปียกโชก ไอสำลักน้ำ แม่วิ่งมากอดคุณตัวสั่น เรียก '{ชื่อ} {ชื่อ}' ไม่หยุด"
     choices:
       - id: swim_lessons
+        nature: bold
         text: "ขอแม่ไปเรียนว่ายน้ำให้เป็น"
         schedules: [{event: echo_health_swim_save_01, after_years: [12, 20]}]
         effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.2}}
@@ -67,6 +69,7 @@ events:
           - {weight: 1, text: "หมอเจอปอดอักเสบจากน้ำคลองแต่เนิ่น ๆ ฉีดยาไม่กี่วันก็หาย", effects: {health: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: thank_uncle
+        nature: social
         text: "เก็บขนมไปให้ลุงทุกวัน"
         effects: {relations: 2, happiness: -1}
         merit: [{cat: dana, level: 1}]
@@ -94,10 +97,12 @@ events:
           - {weight: 1, text: "กระดูกติดเบี้ยวนิด ๆ ยกแขนสุดไม่ได้ แต่ดันโยนลูกเปตองแม่นผิดคน", effects: {health: -2, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: hospital_cast
+        nature: bold
         text: "กัดฟันไม่ร้องตอนหมอใส่เฝือก"
         effects: {health: 1, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
       - id: tutor_instead
+        nature: learn
         text: "ใส่เฝือกแล้วนั่งอ่านหนังสือแทน"
         effects: {health: 1, knowledge: 2, happiness: -2, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
@@ -107,6 +112,7 @@ events:
         effects: {health: -1, relations: -2}
         merit: [{cat: neutral}]
       - id: gymnastics
+        nature: bold
         text: "ปีนเก่งขนาดนี้ ขอเรียนยิมนาสติก"
         requires: {stats: {health: {min: 60}}, reason: "ร่างกายยังไม่แข็งแรงพอ"}
         outcomes:
@@ -125,6 +131,7 @@ events:
     text: "อายุ {อายุ} ขวบ เพื่อนร่วมห้องขึ้นผื่นแดงไปครึ่งห้อง ครูนัดเด็กทุกคนไปฉีดวัคซีนที่อนามัย ข้างบ้านลือว่าฉีดแล้วไข้ขึ้น ส่วนคุณกลัวเข็มที่สุดในโลก"
     choices:
       - id: vaccinate
+        nature: bold
         text: "กัดฟันยื่นแขนให้หมอฉีด"
         effects: {health: 1, happiness: -1}
         merit: [{cat: neutral}]
@@ -139,6 +146,7 @@ events:
           - {weight: 2, text: "หัดลงปอด นอนโรงพยาบาลจนเกือบไม่รอด ปอดไม่เหมือนเดิมอีกเลย", effects: {health: -3, chronic: {health: -1}, money: {unit: income_x, amount: -0.5}}, sets_flags: [weak_lungs], schedules: [{event: child_lungs_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: rally_parents
+        nature: social
         text: "ชวนเพื่อนทั้งห้องไปฉีดด้วยกัน"
         outcomes:
           - {weight: 2, ok: true, text: "จูงมือกันไปฉีดทั้งแก๊ง ห้องนี้ไม่มีใครติดหัดอีกเลย", effects: {health: 1, relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}], multipliers: {stats: {relations: 2}}}
@@ -156,6 +164,7 @@ events:
     text: "อายุ {อายุ} ขวบ ติดน้ำหวานกับลูกอมจนฟันดำเป็นแถบ คืนนี้ปวดฟันร้องไห้ทั้งคืน แก้มบวมข้างเดียวเหมือนอมไข่ไว้"
     choices:
       - id: pull_and_ban
+        nature: duty
         text: "ยอมถอนฟัน แล้วเลิกน้ำหวานเอง"
         effects: {health: 1, happiness: -2}
         merit: [{cat: neutral}]
@@ -194,6 +203,7 @@ events:
     text: "อายุ {อายุ} ขวบ ไอหอบหวีดทุกครั้งที่ฝุ่นควันลง หมอบอกแม่ว่าคุณเป็นหอบหืดกับภูมิแพ้ ต้องอยู่กับมันไปอีกนาน"
     choices:
       - id: inhaler
+        nature: duty
         text: "พกยาพ่นติดตัวทุกวัน ไม่ลืม"
         effects: {health: 1, happiness: -1, money: {unit: income_x, amount: -0.2}}
         merit: [{cat: neutral}]
@@ -236,11 +246,13 @@ events:
         clears_flags: [weak_lungs]
         merit: [{cat: neutral}]
       - id: daily_inhaler
+        nature: duty
         text: "พ่นยาเองทุกวัน ไม่ขาดสักวัน"
         effects: {happiness: -1, chronic: {health: 1}, money: {unit: income_x, amount: -0.2}}
         clears_flags: [weak_lungs]
         merit: [{cat: neutral}]
       - id: swim_team
+        nature: bold
         text: "สมัครชมรมว่ายน้ำฝึกปอดเอง"
         outcomes:
           - {weight: 1, ok: true, text: "ปีเดียวปอดแข็งแรงกว่าเด็กรุ่นเดียวกัน โค้ชดึงเข้าทีมว่ายน้ำ", effects: {health: 1, chronic: {health: 1}}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {stats: {health: 1.5}, flags: {sporty: 2}}}
@@ -268,6 +280,7 @@ events:
     text: "แข่งจบไม่ทันข้ามวัน โค้ชทีมจังหวัดมาเคาะประตูบ้าน ขอตัวคุณไปเข้าค่ายเก็บตัว ซ้อมทุกเย็นจนค่ำ เสาร์อาทิตย์ไม่ได้กลับบ้าน พ่อแม่บอกให้คุณเลือกเอง"
     choices:
       - id: join_camp
+        nature: bold
         text: "ไปค่ายเลย ล่าเหรียญให้ได้"
         outcomes:
           - {weight: 1, ok: true, text: "คว้าเหรียญทองกีฬานักเรียน รูปขึ้นบอร์ดหน้าโรงเรียน ทั้งตำบลรู้จักชื่อ", effects: {health: 1, happiness: 2, network: 2, money: {unit: income_x, amount: -0.2}}, sets_flags: [sporty], merit: [{cat: neutral}], multipliers: {stats: {health: 2}}}
@@ -278,10 +291,12 @@ events:
         effects: {health: 1, happiness: 1}
         merit: [{cat: neutral}]
       - id: quit_for_books
+        nature: learn
         text: "เลิกกีฬา กลับมาตั้งใจเรียน"
         effects: {knowledge: 1, happiness: -2}
         merit: [{cat: neutral}]
       - id: give_spot
+        nature: social
         text: "ยกที่ให้เพื่อนที่บ้านจนกว่า"
         outcomes:
           - {weight: 2, ok: true, text: "เพื่อนไปคว้าเหรียญกลับมา แม่เพื่อนเอาข้าวต้มมัดมาให้ทุกวันพระไปอีกหลายปี", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 2}]}
@@ -314,6 +329,7 @@ events:
         effects: {relations: 1, money: {unit: income_x, amount: 0.05}}
         merit: [{cat: neutral}]
       - id: give_kindergarten
+        nature: social
         text: "แจกที่เหลือให้น้องอนุบาล"
         effects: {happiness: 1, relations: 2}
         merit: [{cat: dana, level: 1}]
@@ -341,6 +357,7 @@ events:
         effects: {health: 1, happiness: -1}
         merit: [{cat: neutral}]
       - id: practice_breath
+        nature: duty
         text: "ฝึกหายใจตามที่ครูสอน"
         merit: [{cat: neutral}]
         outcomes:

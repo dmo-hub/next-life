@@ -15,6 +15,7 @@ events:
         sets_flags: [likes_clips]
         merit: [{cat: neutral}]
       - text: "คืนโทรศัพท์แม่ ออกไปวิ่งเล่น"
+        nature: bold
         effects: {health: 1, happiness: -1}
         merit: [{cat: neutral}]
       - text: "แอบโพสต์คลิปแมวลงเน็ต"
@@ -23,6 +24,7 @@ events:
           - {weight: 3, text: "มีคนดูเจ็ดคน หกคนคือญาติ", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ขอแม่ไปเรียนวาดรูปแทน"
+        nature: learn
         effects: {knowledge: 1, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
 
@@ -44,13 +46,16 @@ events:
         effects: {money: {unit: income_x, amount: -0.8}}
         merit: [{cat: neutral}]
       - text: "นั่งทำการบ้านกับพ่อแม่ทุกคืน"
+        nature: learn
         effects: {knowledge: 2, relations: 2, happiness: -1}
         sets_flags: [good_student]
         merit: [{cat: neutral}]
       - text: "เสาร์อาทิตย์ขอเล่นเต็มที่"
+        nature: bold
         effects: {happiness: 2, health: 1, knowledge: -1}
         merit: [{cat: neutral}]
       - text: "ไปช่วยพ่อแม่ขายของแทน"
+        nature: duty
         effects: {knowledge: 1, relations: 1, money: {unit: income_x, amount: 0.2}}
         merit: [{cat: neutral}]
 
@@ -65,18 +70,22 @@ events:
     text: "โค้ชประจำอำเภอเห็นคุณวิ่งไล่หมาทั้งสนามโรงเรียน เลยมาชวนเข้าทีมกีฬา ซ้อมทุกเย็นหกโมงถึงสองทุ่ม"
     choices:
       - text: "เข้าทีม ซ้อมจริงจังทุกเย็น"
+        nature: bold
         outcomes:
           - {weight: 3, ok: true, multipliers: {stats: {health: 2}}, text: "ได้เหรียญทองระดับจังหวัด ร่างกายแข็งแรงขึ้นทุกปี", effects: {health: 2, happiness: 2}, sets_flags: [sporty], next: kid_sport_school_01, merit: [{cat: neutral}]}
           - {weight: 1, text: "ล้มเข่าพลิกกลางสนาม ต้องเข้าเฝือกครึ่งปี", effects: {health: -3, happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "เล่นแค่สนุก ๆ กับเพื่อนตอนเย็น"
+        nature: social
         effects: {health: 1, happiness: 1}
         sets_flags: [sporty]
         merit: [{cat: neutral}]
       - text: "ปฏิเสธโค้ช กลัวเรียนไม่ทันเพื่อน"
+        nature: learn
         effects: {knowledge: 1, health: -1, happiness: -1}
         merit: [{cat: neutral}]
       - text: "อาสาช่วยโค้ชเก็บอุปกรณ์"
+        nature: duty
         effects: {relations: 2, happiness: -1}
         merit: [{cat: help_others, level: 1}]
 
@@ -96,6 +105,7 @@ events:
         sets_flags: [bullied]
         merit: [{cat: neutral}]
       - text: "ขอไปเรียนมวยไทยป้องกันตัว"
+        nature: bold
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "เดือนต่อมาไม่มีใครกล้าแตะกล่องข้าวอีกเลย", effects: {health: 1, happiness: 2}, sets_flags: [bullied, sporty], merit: [{cat: neutral}]}
           - {weight: 1, text: "ต่อยคืนจนโดนเรียกผู้ปกครอง เพื่อนยิ่งเหม็นหน้า", effects: {relations: -2, health: -1}, sets_flags: [bullied], merit: [{cat: neutral}]}
@@ -110,6 +120,7 @@ events:
         sets_flags: [bullied]
         merit: [{cat: neutral}]
       - text: "ชวนเพื่อนไปยืนเผชิญหน้าด้วยกัน"
+        nature: social
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}, karma: 1.4}, text: "ยืนกันเป็นแถว เด็กคนนั้นถอยแล้วไม่กล้าแตะกล่องข้าวอีกเลย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ทะเลาะกันกลางสนาม พรุ่งนี้โดนแกล้งหนักกว่าเดิม", effects: {happiness: -2, relations: -2, health: -1}, merit: [{cat: neutral}]}
@@ -159,6 +170,7 @@ events:
         effects: {happiness: 1, relations: -1, income_mult: 0.85}
         merit: [{cat: neutral}]
       - text: "ขอป้าข้างบ้านมาช่วยคุยกับพ่อแม่"
+        nature: social
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {relations: 2}}, text: "พ่อแม่หัดคุยกันดี ๆ บ้านกลับมาหัวเราะได้", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "คุยได้สองครั้งก็ทะเลาะกันต่อหน้าป้า", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
@@ -189,11 +201,13 @@ events:
         effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
       - text: "ตามพ่อแม่ไปที่ทำงานทุกวัน"
+        nature: duty
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "จำงานพ่อแม่ได้หมด ลูกค้าชมว่าฉลาด", effects: {knowledge: 2, relations: 1}, sets_flags: [good_student], merit: [{cat: neutral}]}
           - {weight: 2, text: "เบื่อจนวิ่งหายในตลาดครึ่งวัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}], next: kid_lost_market_01}
         merit: [{cat: neutral}]
       - text: "ขอไปค่ายฟุตบอลภาคฤดูร้อน"
+        nature: bold
         effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.2}}
         sets_flags: [sporty]
         merit: [{cat: neutral}]
@@ -213,9 +227,11 @@ events:
           - {weight: 1, text: "แมวตื่นกล้องวิ่งหนีเข้าป่าหลังบ้าน หาเจออีกทีสามวันต่อมา งานล่ม", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ให้ญาติยืมแมวไปงานบวชฟรี ๆ"
+        nature: social
         effects: {happiness: 1, relations: 2}
         merit: [{cat: help_others, level: 1}]
       - text: "ปฏิเสธ ขอกลับไปตั้งใจเรียน"
+        nature: learn
         effects: {knowledge: 1, happiness: -1}
         merit: [{cat: neutral}]
       - text: "เปิดช่องคลิปของตัวเองจริงจัง"
@@ -235,6 +251,7 @@ events:
     text: "สองวันหลังได้เหรียญ โรงเรียนกีฬาประจำจังหวัดส่งจดหมายมาชวนเข้าเรียนประจำ กินนอนที่หอ ค่าเทอมครึ่งหนึ่ง แต่ได้กลับบ้านเดือนละครั้ง"
     choices:
       - text: "ไปอยู่หอโรงเรียนกีฬา"
+        nature: bold
         requires: {money: {unit: income_x, amount: 0.5}, reason: "เงินที่บ้านไม่พอค่าเทอม"}
         effects: {money: {unit: income_x, amount: -0.5}}
         outcomes:
@@ -249,6 +266,7 @@ events:
         effects: {knowledge: 1, happiness: -1}
         merit: [{cat: neutral}]
       - text: "สอนน้อง ๆ ในซอยวิ่งด้วย"
+        nature: social
         effects: {relations: 2, happiness: 1}
         sets_flags: [sporty]
         merit: [{cat: help_others, level: 1}]
@@ -262,6 +280,7 @@ events:
     text: "เดินตามแมวเข้าซอยเล็กในตลาด หันกลับมาอีกทีไม่รู้จักร้านไหนเลย เสียงประกาศตามหาเด็กดังมาจากลำโพงไกล ๆ แต่ฟังไม่ออกว่าเรียกชื่อใคร"
     choices:
       - id: ask_vendor
+        nature: social
         text: "เข้าไปถามคนขายผลไม้"
         merit: [{cat: neutral}]
         outcomes:
@@ -272,6 +291,7 @@ events:
         effects: {knowledge: 1, happiness: 1}
         merit: [{cat: neutral}]
       - id: find_way
+        nature: bold
         text: "หาทางกลับเองตามกลิ่นร้านขนม"
         merit: [{cat: neutral}]
         outcomes:

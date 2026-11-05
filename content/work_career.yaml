@@ -84,6 +84,7 @@ events:
           - {weight: 1, text: "อดนอนจนหลับในที่ทำงาน หัวหน้าเรียกตักเตือน", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
       - {id: save_five_years, text: "เก็บเงินอีกห้าปีค่อยว่ากัน", effects: {happiness: -1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
       - {id: give_recipe, text: "ยกสูตรให้น้องที่บ้านไปทำแทน", effects: {relations: 2, happiness: 1}, merit: [{cat: dana, level: 1}]}
+      - {id: night_course, text: "ลงคอร์สกลางคืนเรื่องที่ฝันไว้", requires: {nature: learn}, effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
 
   - id: career_dream_crossroad_01
     type: A

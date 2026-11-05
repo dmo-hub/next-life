@@ -24,11 +24,12 @@ function card(e) {
   ].join('');
 }
 
-export function catalogHtml(content) {
+// demo = เดโมการ์ดเล่นได้ (demo.mjs) วางหลังสารบัญ — ส่งแยกเพราะเดโมเปิดผลของทางที่กด ส่วนรายการการ์ดห้ามเผยผล
+export function catalogHtml(content, demo = '') {
   const groups = [...STAGES.map((s) => s.name), AFTER].map((stage) => ({ stage, events: content.events.filter((e) => e.stage === stage) })).filter((g) => g.events.length);
   const nav = groups.map((g, i) => `<a href="#s${i}">${esc(g.stage)} <small>${g.events.length}</small></a>`).join('');
   const body = groups
     .map((g, i) => `<details id="s${i}"${i === 0 ? ' open' : ''}><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map(card).join('')}</div></details>`)
     .join('\n');
-  return `<nav class="toc">${nav}${isekaiNav(groups.length)}</nav>\n${body}\n${isekaiCatalogHtml(groups.length)}`;
+  return `<nav class="toc">${nav}${isekaiNav(groups.length)}</nav>\n${demo ? `${demo}\n` : ''}${body}\n${isekaiCatalogHtml(groups.length)}`;
 }

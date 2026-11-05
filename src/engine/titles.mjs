@@ -4,8 +4,8 @@
 // (การกระทำนั้นผู้เล่นเห็นในข้อความอยู่แล้ว) ไม่รวมยอด ไม่หักกลบ ไม่บอกฝั่งที่หนักกว่า
 import { allocOptions } from './finance.mjs';
 import { meritId, SIN_CATS } from './merit.mjs';
-import { CLASSES, LEVELS, RETIRE_AGE, riskLabel, netWorth, totalDebt, standingOf, stageOf } from './life.mjs';
-import { expectedDeathAge, eraEventsAt, protoYear } from './era.mjs';
+import { CLASSES, LEVELS, RETIRE_AGE, riskLabel, netWorth, totalDebt, standingOf, stageOf, erasShown } from './life.mjs';
+import { expectedDeathAge } from './era.mjs';
 import { nationalIncome } from './birth.mjs';
 import { ladderOf } from './rank.mjs';
 
@@ -42,6 +42,9 @@ export function picksAfter(st, from = PATTERN_FROM) {
       continue;
     }
     const ev = idx.get(l.id);
+    // ใบลางภัยยุคเป็นเสียงเตือนที่ทุกคนได้ยิน (ออกตั้งแต่อายุ 6) ไม่ใช่ทางชีวิต — นับแล้วแกนเสี่ยง/บ้านเกิดของเด็กเอียงจนแบบชีวิตสั้นหาย
+    // การ์ดบรรยากาศ (ambient · เทศกาล) ทุกคนเจอตามปฏิทิน ไม่ได้บอกทางชีวิต — ข้ามด้วยเหตุผลเดียวกับใบลาง
+    if (ev?.herald_of || ev?.ambient) continue;
     const c = ev?.choices[l.choice];
     if (c) out.push({ age: l.age, ev, c, text: l.text });
   }
@@ -276,12 +279,9 @@ export function lifeFacts(st) {
     // มีทางผิดให้เลือกแต่ไม่เลือก
     else if (p.ev.choices.some((c) => tags(c).some((t) => SIN_CATS.includes(t.id)))) declined++;
   }
-  // เหตุการณ์บ้านเมืองที่ทันตอนเป็นผู้ใหญ่ · ปีอนาคตวนปีต้นแบบ เหตุการณ์ชื่อเดียวกันจึงนับแยกตามปีที่เกิด
+  // เหตุบ้านเมืองที่ทันตอนเป็นผู้ใหญ่ นับเฉพาะกลุ่มที่ขึ้นการ์ดให้เห็น — ปีที่กลุ่มเหตุถูกซ่อน (ออกแล้ว/เว้นช่วง) ผู้เล่นไม่รู้ว่ารอดอะไรมา
   const crises = new Set(), disasters = new Set();
-  for (let a = 20; a <= st.age; a++) {
-    const y = st.birthYear + a;
-    for (const e of eraEventsAt(era, st.seed, y)) (e.kind === 'economy' ? crises : disasters).add(`${e.id}@${y - (protoYear(era, st.seed, y) - e.from)}`);
-  }
+  for (const { e, age } of erasShown(st, st.age)) if (age >= 20) (e.kind === 'economy' ? crises : disasters).add(e.id);
   const worth = netWorth(st);
   return {
     st,
@@ -312,7 +312,7 @@ export const TITLES = [
   { id: 'grateful', tier: 'ทั่วไป', name: 'ลูกกตัญญู', hint: 'เลือกดูแลพ่อแม่ซ้ำแล้วซ้ำอีก', test: (f) => (f.tagCount.care_parents ?? 0) >= 2 },
   { id: 'giver', tier: 'ทั่วไป', name: 'มือที่ไม่เคยหุบ', hint: 'ให้ทานบ่อยจนเป็นนิสัย', test: (f) => (f.tagCount.dana ?? 0) >= 3 },
   { id: 'parent', tier: 'ทั่วไป', name: 'พ่อแม่ของใครสักคน', hint: 'มีลูกให้ห่วง', test: (f) => has(f, 'has_kids') },
-  { id: 'storm', tier: 'ทั่วไป', name: 'ผ่านมรสุมเศรษฐกิจ', hint: 'เป็นผู้ใหญ่ทันวิกฤตเศรษฐกิจหลายครั้ง', test: (f) => f.crises >= 3 },
+  { id: 'storm', tier: 'ทั่วไป', name: 'ผ่านมรสุมเศรษฐกิจ', hint: 'เป็นผู้ใหญ่ทันวิกฤตเศรษฐกิจหลายครั้ง', test: (f) => f.crises >= 2 },
   { id: 'homeowner', tier: 'ทั่วไป', name: 'มีบ้านเป็นของตัวเอง', hint: 'ได้บ้านมาด้วยน้ำพักน้ำแรง', test: (f) => has(f, 'home_owner') },
   { id: 'runner', tier: 'ทั่วไป', name: 'นักวิ่งตอนเช้า', hint: 'ดูแลร่างกายเป็นกิจวัตร', test: (f) => has(f, 'sporty') },
   { id: 'first_grad', tier: 'หายาก', name: 'บัณฑิตคนแรกของบ้าน', hint: 'เรียนจบสูงกว่าที่บ้านเคยมีใครได้', test: (f) => f.st.edu === 'อุดมศึกษา' && LOW_FAMILY_OCC.includes(f.st.familyOcc) },
@@ -328,7 +328,7 @@ export const TITLES = [
   { id: 'folk_sage', tier: 'หายาก', name: 'ปราชญ์ชาวบ้าน', hint: 'รู้มากโดยไม่ต้องมีปริญญา', test: (f) => f.st.knowledge >= 95 && (!f.st.edu || f.st.edu === 'ประถม') },
   { id: 'outlived', tier: 'หายาก', name: 'อายุยืนเกินคาด', hint: 'อยู่นานกว่าคนรุ่นเดียวกันมาก', test: (f) => f.age >= f.expected + 25 },
   { id: 'clean_hands', tier: 'หายาก', name: 'มือสะอาดในที่สกปรก', hint: 'เจอทางลัดหลายครั้งแต่ไม่เคยเลือก', test: (f) => f.declined >= 10 && f.sinPicks === 0 },
-  { id: 'survivor', tier: 'ทั่วไป', name: 'รอดมาได้ทุกภัย', hint: 'ผ่านภัยพิบัติใหญ่มาหลายครั้ง', test: (f) => f.disasters >= 6 },
+  { id: 'survivor', tier: 'ทั่วไป', name: 'รอดมาได้ทุกภัย', hint: 'ผ่านภัยพิบัติใหญ่มาหลายครั้ง', test: (f) => f.disasters >= 3 },
   { id: 'lucky_number', tier: 'ทั่วไป', name: 'ผู้รอเลขเด็ด', hint: 'ซื้อหวยจนเป็นนิสัย', test: (f) => has(f, 'lottery_habit') },
   { id: 'grandparent', tier: 'หายาก', name: 'ผู้เลี้ยงหลานแทนพ่อแม่', hint: 'รับหลานมาเลี้ยงเอง', test: (f) => has(f, 'raised_grandkids') },
   { id: 'centenarian', tier: 'ตำนาน', name: 'ร้อยปีไม่สาย', hint: 'อยู่ถึงร้อยปี', test: (f) => f.age >= 100 },

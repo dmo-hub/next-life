@@ -8,12 +8,12 @@ import { strings, isObj } from '../src/node/lint/util.mjs';
 import { parentRefs } from '../src/node/lint/flags.mjs';
 import { loadEvents, loadEra, loadContent, checkNames } from '../src/node/load.mjs';
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
-import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT } from '../src/engine/career.mjs';
+import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT, CHILD_UNTIL, SCHOOL_FROM } from '../src/engine/career.mjs';
 import { newLife, CLASSES, SEXES, fill } from '../src/engine/life.mjs';
-import { MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
+import { CATEGORIES, MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
 import { SCENES } from '../src/engine/afterlife.mjs';
 import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenText } from '../src/engine/merit.mjs';
-import { ISEKAI_EVENTS, ISEKAI_MERIT } from '../src/engine/isekai.mjs';
+import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../src/engine/isekai.mjs';
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 
 const root = new URL('../', import.meta.url);
@@ -68,6 +68,54 @@ const controls = {
 };
 for (const [name, args] of Object.entries(controls)) if (!checkMeritTable(...args).length) fails.push(`merit-table ตัวควบคุม "${name}" ไม่ตก`);
 rows.push(['merit-table ตัวควบคุม', `${Object.keys(controls).length} แบบ`]);
+// ผลเบาชาติไทยของสกิล (06s): ของจริงผ่าน · ตัวควบคุมผิดทีละอย่างต้องตก
+const skThai = checkSkillThai(CATEGORIES);
+rows.push(['skill-thai', skThai.length ? `ตก ${skThai.length} ข้อ` : `ผ่าน (${Object.values(ISEKAI_SKILLS).filter((s) => s.thai).length} สกิล)`]);
+for (const t of skThai) fails.push(`skill-thai: ${t}`);
+const skControls = {
+  'หมวดสะกดผิด': [CATEGORIES, { ...ISEKAI_SKILLS, sword: { ...ISEKAI_SKILLS.sword, thai: { cats: ['healt'] } } }],
+  'cats ว่าง': [CATEGORIES, { ...ISEKAI_SKILLS, sword: { ...ISEKAI_SKILLS.sword, thai: { cats: [] } } }],
+  'k ติดลบ': [CATEGORIES, ISEKAI_SKILLS, -0.1],
+};
+for (const [name, args] of Object.entries(skControls)) if (!checkSkillThai(...args).length) fails.push(`skill-thai ตัวควบคุม "${name}" ไม่ตก`);
+// ขั้นค่าซ้อนทับ (โลกซ้อนทับ ใบ 09): ทุกเคสเป็นการ์ดเดียวกัน ต่างแค่ช่องนี้ — ตกต้องตกที่ช่อง overlap_stage เท่านั้น ผ่านต้องไม่มีปัญหาเลย
+const overlapCard = (extra) => ({ id: 'overlap_case_01', type: 'A', stage: 'ทำงาน', years: [2500, 2650], weight: 1, text: 'ข้อความการ์ด', ...extra, choices: [1, 2, 3, 4].map((n) => ({ text: `ทางเลือก ${n}`, merit: [{ cat: 'neutral' }] })) });
+const overlapCases = [
+  ['when [1, 2]', { when: { overlap_stage: [1, 2] } }, true],
+  ['when [0, 4]', { when: { overlap_stage: [0, 4] } }, true],
+  ['ตัวคูณ 2', { multipliers: { overlap_stage: 2 } }, true],
+  ['ตัวคูณ 0', { multipliers: { overlap_stage: 0 } }, true],
+  ['when ขั้น 5', { when: { overlap_stage: [1, 5] } }, false],
+  ['when ติดลบ', { when: { overlap_stage: [-1, 2] } }, false],
+  ['when ไม่ใช่จำนวนเต็ม', { when: { overlap_stage: [1.5, 2] } }, false],
+  ['when ข้อความ', { when: { overlap_stage: ['1', 2] } }, false],
+  ['when ตัวเลขเดียว', { when: { overlap_stage: 1 } }, false],
+  ['when min > max', { when: { overlap_stage: [3, 1] } }, false],
+  ['ตัวคูณติดลบ', { multipliers: { overlap_stage: -1 } }, false],
+  ['ตัวคูณข้อความ', { multipliers: { overlap_stage: '2' } }, false],
+];
+for (const [name, extra, pass] of overlapCases) {
+  const ps = lintDocs([{ file: `overlap-case:${name}`, doc: { events: [overlapCard(extra)] } }], ctx);
+  const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.path.endsWith('.overlap_stage'));
+  if (!ok) fails.push(`overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกที่ช่อง overlap_stage'} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
+}
+rows.push(['overlap_stage ตก/ผ่าน', `${overlapCases.length} เคส`]);
+// ความจำชาติก่อน (ใบ 159): การ์ดเดียวกัน ต่างแค่ช่อง when.past_life — ตกต้องตกที่ past_life เท่านั้น · ช่องที่ไม่มีแล้ว (ตัวควบคุม) ต้องตกด้วย
+const pastCases = [
+  ['มีชาติก่อน', { any: true }, true],
+  ['จังหวัดเดิม + ช่าง', { province: 'same', job: ['craft'] }, true],
+  ['พรสวรรค์', { talent: true }, true],
+  ['ช่องที่ไม่มี', { lover: ['x'] }, false],
+  ['อาชีพไม่รู้จัก', { job: ['wizard'] }, false],
+  ['ภูมิเป็นชื่อไทย', { realm: ['นรก'] }, false],
+  ['ว่าง', {}, false],
+];
+for (const [name, past, pass] of pastCases) {
+  const ps = lintDocs([{ file: `past-case:${name}`, doc: { events: [overlapCard({ when: { past_life: past } })] } }], ctx);
+  const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.path.includes('.past_life'));
+  if (!ok) fails.push(`past_life "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกที่ช่อง past_life'} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
+}
+rows.push(['past_life ตก/ผ่าน', `${pastCases.length} เคส`]);
 // ป้ายบุญบาปต่างโลก (B68c) อยู่นอก yaml ไม่ผ่านด่านเนื้อหา — ตรวจ id/ลำดับตัวเลือก/หมวด/ระดับ ที่นี่แทน
 const iskById = Object.fromEntries(ISEKAI_EVENTS.map((e) => [e.id, e]));
 let iskTags = 0;
@@ -104,13 +152,21 @@ for (const sex of SEXES) {
 rows.push(['ช่องแทนค่าแกนเติมครบ', `${Object.keys(PLACEHOLDERS).length} ช่อง × ${SEXES.length} เพศ`]);
 
 // ชื่อเล่น (B27): ผ่านด่านของ loader แล้ว ยังต้องไม่โดนคำต้องห้ามของเนื้อหา · ด่านต้องจับชื่อที่หลุดรายการ avoid/ยุคมีรู
+// ชื่อจริงขึ้นจอได้เหมือนชื่อเล่น (pickRealName) และผู้เล่นพิมพ์ชื่อเองไม่ได้ — รายการนี้คือที่เดียวที่กันชื่อนักการเมือง/สถาบันได้
 const namesRaw = JSON.parse(readFileSync(new URL('data/names.json', root), 'utf8'));
 const nameFrom = namesRaw.eras[0].from, nameTo = namesRaw.eras.at(-1).to;
-let nameCount = 0;
-for (const e of namesRaw.eras) for (const sex of SEXES) for (const n of e[sex]) {
-  nameCount++;
-  for (const b of ctx.banned) if (b.re.test(n)) fails.push(`ชื่อ ${e.from} ${sex}: โดนคำต้องห้าม ${b.id} "${n}"`);
-}
+const bannedNames = (names) => names.eras.flatMap((e) => SEXES.flatMap((sex) => [[sex, e[sex]], [`จริง${sex}`, e.จริง[sex]]].flatMap(([kind, xs]) =>
+  xs.flatMap((n) => ctx.banned.filter((b) => b.re.test(n)).map((b) => ({ id: b.id, msg: `ชื่อ ${e.from} ${kind}: โดนคำต้องห้าม ${b.id} "${n}"` }))))));
+const nameCount = namesRaw.eras.reduce((t, e) => t + SEXES.reduce((u, sex) => u + e[sex].length + e.จริง[sex].length, 0), 0);
+for (const { msg } of bannedNames(namesRaw)) fails.push(msg);
+// ตัวควบคุมคำต้องห้าม: ชื่อเล่นและชื่อจริงต้องจับได้ทั้งการเมืองจริงและสถาบัน
+const withReal = (sex, n) => ({ ...namesRaw, eras: [{ ...namesRaw.eras[0], จริง: { ...namesRaw.eras[0].จริง, [sex]: [...namesRaw.eras[0].จริง[sex], n] } }, ...namesRaw.eras.slice(1)] });
+const bannedControls = [
+  ['ชื่อเล่นชนนักการเมือง', 'real_politics', { ...namesRaw, eras: [{ ...namesRaw.eras[0], ชาย: [...namesRaw.eras[0].ชาย, 'ทักษิณ'] }, ...namesRaw.eras.slice(1)] }],
+  ['ชื่อจริงชนนักการเมือง', 'real_politics', withReal('หญิง', 'ยิ่งลักษณ์')],
+  ['ชื่อจริงชนสถาบัน', 'monarchy', withReal('ชาย', 'เจ้าฟ้าชาย')],
+];
+for (const [name, id, n] of bannedControls) if (!bannedNames(n).some((x) => x.id === id)) fails.push(`names ตัวควบคุม "${name}" ไม่ตก ${id}`);
 for (const p of checkNames(namesRaw, nameFrom, nameTo)) fails.push(`names: ${p}`);
 const withFirst = (k, xs) => ({ ...namesRaw, eras: [{ ...namesRaw.eras[0], [k]: xs }, ...namesRaw.eras.slice(1)] });
 const nameControls = {
@@ -131,7 +187,7 @@ for (let s = 1; s <= 200; s++) {
   if (newLife(s, nameContent, { ...nameHeir, lineage: [{ gen: 1, name: free }] }).name === free) nameClash++;
 }
 if (nameClash) fails.push(`รุ่นถัดไปได้ชื่อซ้ำรุ่นก่อน ${nameClash} ครั้งใน 200 seed`);
-rows.push(['ชื่อเล่น', `${nameCount} ชื่อ · ${namesRaw.eras.length} ยุค ${nameFrom}–${nameTo} · ตัวควบคุม ${Object.keys(nameControls).length} แบบ`]);
+rows.push(['ชื่อเล่น+ชื่อจริง', `${nameCount} ชื่อ · ${namesRaw.eras.length} ยุค ${nameFrom}–${nameTo} · ตัวควบคุม ${Object.keys(nameControls).length + bannedControls.length} แบบ`]);
 
 // การ์ดจัดสรรเงินสร้างในแกน ไม่ผ่านด่านเนื้อหา — ตรวจทุกปีของเกม: ≥4 ตัวเลือก · ยาว · คำต้องห้าม · หุ้นไม่โผล่ก่อน 2518
 const era = loadEra();
@@ -183,6 +239,24 @@ for (const [t, track] of Object.entries(TRACKS)) {
 for (const s of careerTexts) for (const b of ctx.banned) if (b.re.test(s)) fails.push(`การ์ดเรียน/งาน: โดนคำต้องห้าม ${b.id} "${s}"`);
 rows.push(['การ์ดเรียน/งานจากแกน', `${careerCards} ใบ · ${careerTexts.size} ข้อความ`]);
 
+// เสียงเด็ก (B61): การ์ดเรียน/งานที่แกนสร้างก่อน CHILD_UNTIL ต้องไม่มีตัวเลือกเสียงผู้ใหญ่ — ไล่ทุกอายุที่ออกได้ × ฐานะ × คอนเน็คชั่น
+// ตัวควบคุม: การ์ดหางานวัยผู้ใหญ่ต้องโดนกติกาเดียวกัน ไม่งั้นคำที่จับไม่ตรงกับข้อความจริงในแกน
+const ADULT_VOICE = /^(จ่าย|ทุ่มเงิน|ฝากเส้น)/;
+const adultVoice = (ev) => ev.choices.map((c) => c.text).filter((t) => ADULT_VOICE.test(t));
+let childCards = 0;
+const childVoice = (ev, where) => {
+  childCards++;
+  checkCareer(ev, where);
+  for (const t of adultVoice(ev)) fails.push(`${where}: ตัวเลือกเสียงผู้ใหญ่ก่อนอายุ ${CHILD_UNTIL} "${t}"`);
+};
+childVoice(schoolGate(Object.assign(newLife(1, career), { school: 'primary', age: TRACKS.primary.until })), 'ด่านจบประถม');
+for (let age = SCHOOL_FROM; age < CHILD_UNTIL; age++) for (const cls of CLASSES) for (const network of [0, 50, 100]) for (const edu of [null, 'ประถม']) {
+  childVoice(jobCard(Object.assign(newLife(age, career), { cls, network, edu, age })), `การ์ดหางานอายุ ${age} ${cls} คอนเน็คชั่น ${network}`);
+}
+const adultCtl = CLASSES.flatMap((cls) => adultVoice(jobCard(Object.assign(newLife(1, career), { cls, network: 100, edu: 'มัธยม', age: 22 }))));
+if (!adultCtl.length) fails.push('เสียงเด็ก: ตัวควบคุมการ์ดหางานอายุ 22 ไม่โดนกติกา — ADULT_VOICE ไม่ตรงข้อความในแกนแล้ว');
+rows.push(['เสียงเด็กการ์ดเรียน/งาน', `${childCards} ใบ · ตัวควบคุมผู้ใหญ่ ${adultCtl.length} ตัวเลือก`]);
+
 // ทะเบียนธงต้องไม่มีชื่อค้างที่ไม่มีเนื้อหาไหนใช้ — ตรวจกับ content/ จริง (ด่านรายไฟล์มองไม่เห็นทั้งชุด)
 const realDocs = dir('content/').map((f) => load('content/', f));
 const used = new Set();
@@ -227,6 +301,24 @@ for (const f of heir.unread) fails.push(`ทะเบียน heir: "${f}" ไ�
 if (!heirCheck(flagReg, []).unread.length) fails.push('ทะเบียน heir: ตัวควบคุม "ไม่มีการ์ด" ไม่ตก');
 rows.push(['ทะเบียน heir:', `${Object.keys(flagReg.heir ?? {}).length} ธง · ตัวควบคุม ${Object.keys(heirControls).length + 1} แบบ · ไม่มีการ์ดอ่าน ${heir.unread.length}`]);
 
+// ป้ายนิสัย (B41): ไฟล์ bad จับได้แค่ทางเดียว — ไล่ทุกทางที่กติกาต้องตก จากการ์ดฐานที่ผ่าน แก้ทีละจุด
+const natureProblems = (e, c = ctx) => lintDocs([{ file: 'nature-control', doc: { events: [e] } }], c).filter((p) => p.rule === 'nature-tag');
+const natureBase = { id: 'nature_ctl_01', type: 'A', stage: 'เด็ก', years: [2500, 2650], when: { age: [6, 12] }, text: 'ข้อความการ์ด', choices: ['ตกลง', 'ทางเลือกอื่น 2', 'ทางเลือกอื่น 3', 'ทางเลือกอื่น 4'].map((text) => ({ text, merit: [{ cat: 'neutral' }] })) };
+const natureCard = (patch, choice) => Object.fromEntries(Object.entries({ ...natureBase, ...patch, choices: [{ ...natureBase.choices[0], ...choice }, ...natureBase.choices.slice(1)] }).filter(([, v]) => v !== undefined));
+const natureId = Object.keys(ctx.natures)[0];
+const natureOk = natureProblems(natureCard({}, { nature: natureId }));
+for (const p of natureOk) fails.push(`nature-tag: การ์ดฐานต้องผ่าน ${formatProblem(p)}`);
+const natureControls = {
+  'ป้ายนิสัยที่ไม่มี': [natureCard({}, { nature: 'no_such' })],
+  'requires.nature ที่ไม่มี': [natureCard({ stage: 'ทำงาน', when: undefined }, { requires: { nature: 'no_such' } })],
+  'ป้ายบนการ์ดอายุ 0–5': [natureCard({ when: { age: [0, 5] } }, { nature: natureId })],
+  'ป้ายบนการ์ด at_age 3': [natureCard({ when: undefined, at_age: 3 }, { nature: natureId })],
+  'ป้ายบนการ์ดวัยโต': [natureCard({ stage: 'ทำงาน', when: undefined }, { nature: natureId })],
+  'ไม่มีทะเบียนนิสัย': [natureCard({}, { nature: natureId }), { ...ctx, natures: {} }],
+};
+for (const [name, args] of Object.entries(natureControls)) if (!natureProblems(...args).length) fails.push(`nature-tag: ตัวควบคุม "${name}" ไม่ตก`);
+rows.push(['ป้ายนิสัย nature-tag', `การ์ดฐาน ${natureOk.length ? 'ตก' : 'ผ่าน'} · ตัวควบคุม ${Object.keys(natureControls).length} แบบ`]);
+
 try {
   const real = loadEvents();
   rows.push(['content/', `ผ่าน ${real.length} เหตุการณ์`]);
@@ -255,6 +347,42 @@ try {
   const real = lintIsekai(dir('content/isekai/').map((f) => load('content/isekai/', f)));
   for (const p of real) fails.push(`content/isekai: ${formatIsekaiProblem(p)}`);
   rows.push(['content/isekai/', `${real.length ? `ตก ${real.length} ข้อ` : 'ผ่าน'} · กติกา ${ISEKAI_RULES.length} · ไฟล์ bad ${files.length}`]);
+  // ขั้นค่าซ้อนทับฝั่งต่างโลก (ใบ 15): การ์ดเดียวกันต่างแค่ช่องนี้ — ตกต้องตกด้วย isekai-overlap อย่างเดียว ผ่านต้องไม่มีปัญหาเลย
+  const iskOverlapCard = (stage) => ({ id: 'overlap_case_isk', power: 'major', ch: [2], ...(stage !== undefined && { overlap_stage: stage }), title: 'ชื่อ', text: 'ข้อความ', choices: [{ t: 'ก', text: 'ผลก' }, { t: 'ข', text: 'ผลข' }] });
+  const iskOverlapCases = [
+    ['ไม่มีช่อง', undefined, true],
+    ['[1, 4]', [1, 4], true],
+    ['[0, 0]', [0, 0], true],
+    ['ขั้น 5', [1, 5], false],
+    ['ติดลบ', [-1, 2], false],
+    ['ไม่ใช่จำนวนเต็ม', [1.5, 2], false],
+    ['ข้อความ', ['1', 2], false],
+    ['ตัวเลขเดียว', 1, false],
+    ['จาก > ถึง', [3, 1], false],
+  ];
+  for (const [name, stage, pass] of iskOverlapCases) {
+    const ps = lintIsekai([{ file: `isekai-overlap-case:${name}`, doc: { cards: [iskOverlapCard(stage)] } }]);
+    const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.rule === 'isekai-overlap');
+    if (!ok) fails.push(`isekai overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกด้วย isekai-overlap'} ได้ [${ps.map(formatIsekaiProblem).join(' | ') || 'ผ่าน'}]`);
+  }
+  rows.push(['isekai overlap_stage ตก/ผ่าน', `${iskOverlapCases.length} เคส`]);
+}
+
+// ชื่อที่ src/ui import ต้องมีจริงในไฟล์ปลายทาง — build ต่อไฟล์เป็นสคริปต์เดียวแล้วตัด import ทิ้ง ชื่อหายจึงไม่พังตอน build แต่พังทั้งเกมตอนกด (bookAdd v0.6.55)
+{
+  const uiDir = new URL('src/ui/', root);
+  const IMPORT = /import\s*\{([^}]*)\}\s*from\s*['"](\.[^'"]+)['"]/g;
+  let n = 0;
+  for (const f of readdirSync(uiDir).filter((x) => x.endsWith('.mjs')).sort()) {
+    for (const [, names, spec] of readFileSync(new URL(f, uiDir), 'utf8').matchAll(IMPORT)) {
+      const mod = await import(new URL(spec, new URL(f, uiDir)));
+      for (const name of names.split(',').map((s) => s.trim().split(/\s+as\s+/)[0]).filter(Boolean)) {
+        n++;
+        if (!(name in mod)) fails.push(`ui-imports: src/ui/${f} import ${name} จาก ${spec} แต่ไฟล์นั้นไม่มี export ชื่อนี้ (MISSING ${name})`);
+      }
+    }
+  }
+  rows.push(['ui-imports (src/ui ← import)', `${n} ชื่อ`]);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

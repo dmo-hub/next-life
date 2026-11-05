@@ -5,6 +5,7 @@
   "scripts": {
     "build": "node build.mjs",
     "bump": "node scripts/bump-version.mjs",
+    "rel": "node scripts/rel.mjs",
     "sim": "node harness/run.mjs --n 1000 --seed 1",
     "gate": "node harness/run.mjs --n 20000 --seed 1",
     "merit": "node harness/merit.mjs --n 20000 --seed 1",
@@ -12,6 +13,9 @@
     "lineage": "node harness/lineage.mjs --n 2000 --gens 3 --seed 1",
     "isekai": "node harness/isekai.mjs --n 4000 --seed 1",
     "titles": "node harness/titles.mjs --n 2000 --gens 3 --seed 1",
+    "omen-ctl": "node harness/omen-ctl.mjs --n 2000 --gens 3 --seed 1",
+    "overlap": "node harness/overlap.mjs --n 1000 --gens 4 --seed 1",
+    "career:sim": "node harness/career-sim.mjs --n 1000 --seed 1",
     "save": "node harness/save.mjs --n 120 --seed 1",
     "stats": "node harness/stats.mjs --n 2000 --seed 1",
     "belief": "node harness/belief.mjs --n 20000 --seed 1",
@@ -19,6 +23,7 @@
     "causes": "node harness/causes.mjs --n 20000 --seed 1",
     "near": "node harness/near-death.mjs --n 20000 --seed 1",
     "pact": "node harness/pact.mjs --n 2000 --seed 1",
+    "skills": "node harness/skills.mjs --n 200 --seed 1",
     "grey": "node harness/grey.mjs --n 500 --seed 1",
     "density": "node harness/density.mjs --n 2000 --seed 1",
     "repeat": "node harness/repeat.mjs --n 2000 --seed 1",
@@ -36,7 +41,9 @@
     "harness:test": "node scripts/harness-test.mjs",
     "fetch:data": "node scripts/fetch-data.mjs",
     "site:check": "node scripts/site-check.mjs",
-    "shots": "node scripts/shots.mjs"
+    "site:password": "node scripts/set-password.mjs",
+    "shots": "node scripts/shots.mjs",
+    "og": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "yaml": "2.8.1"

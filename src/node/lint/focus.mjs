@@ -1,7 +1,7 @@
 // โฟกัสชีวิต (B163): ทะเบียน content/rules/focus.yaml ต้องถูกรูปก่อนแกนอ่าน · การ์ดที่ติดป้ายหมวดโฟกัสต้องอ้างป้ายที่มีจริง
 import { CATEGORIES, EFFECT_KEYS, STAGE_AGES, SCHOOL_VALUES } from './vocab.mjs';
-import { isObj, isInt, list } from './util.mjs';
-import { FOCUS_NEEDS } from '../../engine/life.mjs';
+import { isObj, isInt, list, choicesOf } from './util.mjs';
+import { FOCUS_NEEDS, STAT_KEYS } from '../../engine/life.mjs';
 
 export const FOCUS_GROUPS = ['work', 'people', 'body', 'gate'];
 // คำบนปุ่มห้ามบอกตัวเลขและห้ามพูดถึงบัญชีบุญบาป (ผลบุญบาปแตะได้ แต่เป็นความลับ)
@@ -10,6 +10,17 @@ const STAGE_SET = new Set(Object.keys(STAGE_AGES));
 
 // ป้ายที่การ์ดใช้ถ่วงได้ = category ของการ์ด + ป้ายเพิ่มในทะเบียน
 export const focusTags = (doc) => [...CATEGORIES, ...Object.keys(doc?.tags ?? {})];
+
+// ป้าย nature บนตัวเลือกการ์ดนับแต้มได้ถึง nature_age · การ์ดอายุ 0–5 ยังไม่ใช่การเลือกของเด็กเอง จึงไม่ติดป้าย
+export const NATURE_CARD_FROM = 6;
+// ช่วงอายุที่การ์ดออกได้ = ช่วงวัย ∩ when.age ∩ at_age
+function cardAges(e) {
+  let [lo, hi] = STAGE_AGES[e.stage] ?? [0, 120];
+  const w = isObj(e.when) ? e.when.age : undefined;
+  if (Array.isArray(w) && w.length === 2) [lo, hi] = [Math.max(lo, w[0]), Math.min(hi, w[1])];
+  if (isInt(e.at_age)) [lo, hi] = [Math.max(lo, e.at_age), Math.min(hi, e.at_age)];
+  return [lo, hi];
+}
 
 // ผลเป็นระดับ ±1..±3 แบบการ์ด · เงิน = {unit: income_x, amount} (ผลต่อปีและผลเสี่ยงใช้รูปเดียวกัน)
 function checkFx(fx, at, out, need = true) {
@@ -26,6 +37,22 @@ export function checkFocus(doc, ctx = {}) {
   if (!isObj(doc)) return ['ทะเบียนโฟกัสต้องเป็น object'];
   for (const k of ['year_scale', 'spend_scale', 'card_mul', 'chain_years']) if (!(typeof doc[k] === 'number' && doc[k] > 0)) out.push(`${k} ต้องเป็นเลขบวก`);
   const tags = new Set(focusTags(doc));
+  // นิสัยจากวัยเด็ก (B41): มาเป็นชุด — มีทะเบียนนิสัย ต้องมีอายุล็อกและแต้มทายาท
+  if (doc.natures !== undefined) {
+    if (!isObj(doc.natures) || !Object.keys(doc.natures).length) out.push('natures ต้องมีอย่างน้อย 1 ตัว');
+    for (const [id, n] of Object.entries(isObj(doc.natures) ? doc.natures : {})) {
+      if (!(isObj(n) && typeof n.name === 'string' && n.name && !FOCUS_BANNED.test(n.name))) {
+        out.push(`natures.${id}.name ต้องเป็นข้อความ ไม่มีตัวเลข/คำบุญบาป`);
+        continue;
+      }
+      if (n.stat !== undefined && ![...STAT_KEYS, 'money'].includes(n.stat)) out.push(`natures.${id}.stat ไม่ใช่ค่าที่คูณได้: ${n.stat}`);
+      for (const t of list(n.cards)) if (!CATEGORIES.includes(t)) out.push(`natures.${id}.cards ไม่ใช่หมวดการ์ด: ${t}`);
+      for (const j of list(n.jobs)) if (ctx.jobs && !ctx.jobs.includes(j)) out.push(`natures.${id}.jobs ไม่รู้จักอาชีพ ${j}`);
+    }
+    if (!(typeof doc.nature_mul === 'number' && doc.nature_mul >= 1)) out.push('nature_mul ต้องเป็นเลข ≥ 1');
+    if (!(isInt(doc.nature_age) && doc.nature_age > 0 && doc.nature_age < STAGE_AGES['วัยรุ่น'][0])) out.push('nature_age ต้องเป็นอายุช่วงเด็ก');
+    if (!(typeof doc.heir_nature === 'number' && doc.heir_nature >= 0 && doc.heir_nature <= 1)) out.push('heir_nature ต้องอยู่ระหว่าง 0–1');
+  }
   if (!isObj(doc.focuses) || !Object.keys(doc.focuses).length) out.push('focuses ต้องมีอย่างน้อย 1 ตัว');
   for (const [id, f] of Object.entries(doc.focuses ?? {})) {
     const at = `focuses.${id}`;
@@ -42,6 +69,9 @@ export function checkFocus(doc, ctx = {}) {
     if (f.after === id) out.push(`${at}.after อ้างตัวเอง`);
     // ตัวเด็กต้องเลือกได้ตั้งแต่เด็ก ไม่งั้นทายาทรอจนโต
     if (f.kid && doc.focuses[f.kid] && !(doc.focuses[f.kid].stages ?? ['เด็ก']).includes('เด็ก')) out.push(`${at}.kid ต้องเป็นโฟกัสที่เปิดช่วงเด็ก: ${f.kid}`);
+    if (f.nature !== undefined && !doc.natures?.[f.nature]) out.push(`${at}.nature อ้างนิสัยที่ไม่มี: ${f.nature}`);
+    // แต้มนิสัยนับแค่ช่วงเด็ก — โฟกัสที่เปิดหลังเด็กติด nature ไปก็ไม่ได้แต้ม
+    if (f.nature !== undefined && !(f.stages ?? ['เด็ก']).includes('เด็ก')) out.push(`${at}.nature ต้องเป็นโฟกัสที่เปิดช่วงเด็ก`);
     checkFx(f.fx, `${at}.fx`, out);
     if (f.career !== undefined && !(isObj(f.career) && typeof f.career.rank === 'number' && typeof f.career.raise === 'number' && f.career.raise > -1)) out.push(`${at}.career ต้องเป็น {rank: เลข, raise: เลข}`);
     if (f.risk !== undefined && !(Array.isArray(f.risk) && f.risk.length)) out.push(`${at}.risk ต้องเป็นรายการ`);
@@ -88,6 +118,21 @@ export const rules = [
         for (const id of ids) if (!ctx.gateFocuses.includes(id)) r(`.choices[${i}].gate`, `ไม่ใช่โฟกัสหมวด gate: ${id}`);
       });
       if (gated && gated === cs.length) r('.choices', 'ทุกตัวเลือกติดประตู — ชีวิตที่ประตูปิดจะได้การ์ดไม่มีตัวเลือก');
+    },
+  },
+  {
+    id: 'nature-tag',
+    desc: `nature ของตัวเลือก และ requires.nature = id นิสัยใน content/rules/focus.yaml · ป้าย nature ติดได้เฉพาะการ์ดที่ออกได้ช่วงอายุ ${NATURE_CARD_FROM}–nature_age (แต้มนับถึงอายุล็อก)`,
+    event(e, ctx, r) {
+      const ids = Object.keys(ctx.natures ?? {});
+      const [lo, hi] = cardAges(e);
+      for (const { c, path } of choicesOf(e)) {
+        const q = isObj(c.requires) ? c.requires : {};
+        for (const [id, at] of [[c.nature, `${path}.nature`], [q.nature, `${path}.requires.nature`]]) {
+          if (id !== undefined && !ids.includes(id)) r(at, `อ้างนิสัยที่ไม่มี: ${JSON.stringify(id)} (${ids.join(' ') || 'ไม่มีทะเบียนนิสัย'})`);
+        }
+        if (c.nature !== undefined && !(hi >= NATURE_CARD_FROM && lo <= ctx.natureAge)) r(`${path}.nature`, `การ์ดออกอายุ ${lo}–${hi} ไม่แตะช่วง ${NATURE_CARD_FROM}–${ctx.natureAge} — ป้ายไม่ได้แต้ม`);
+      }
     },
   },
 ];

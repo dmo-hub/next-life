@@ -18,7 +18,7 @@ const artFill = (d, fill = ART_INK.gold2) => ({ d, fill });
 
 // กรอบแผ่นภาพยุค: ขอบทองคู่ + ลายกนกม้วนที่มุม (ลายไทยทองบนพื้นเข้ม)
 export const ERA_ART_W = 200, ERA_ART_H = 80;
-const ERA_FRAME = [
+export const ERA_FRAME = [
   { d: `M0 0h${ERA_ART_W}v${ERA_ART_H}h-${ERA_ART_W}z`, fill: ART_INK.lacquer2 },
   artLine(`M4 4h${ERA_ART_W - 8}v${ERA_ART_H - 8}h-${ERA_ART_W - 8}z`, { w: 1.2 }),
   artLine(`M7 7h${ERA_ART_W - 14}v${ERA_ART_H - 14}h-${ERA_ART_W - 14}z`, { stroke: ART_INK.bronze2, w: 0.6 }),
@@ -309,6 +309,38 @@ export const ERA_PICS = {
 export function eraPicArt(id, slot) {
   const pic = ERA_PICS[id]?.find(([k]) => k === slot);
   return pic ? [...ERA_FRAME, ...pic[3]] : null;
+}
+
+// ภาพฉากสำคัญของชีวิต (ui-redo 31): เกิด · แต่ง · มีลูก · เกษียณ · ตาย — กรอบ สี และขนาดเดียวกับภาพยุค · ฉากละ 1–3 ภาพ
+// [ป้ายบรรยายภาพ, รูปทรง] · ผู้เรียกเลือกฉากจากการ์ด (app.mjs SCENE_OF) — ไฟล์นี้ไม่รู้จัก id การ์ด
+const artCradle = (x, y) => [artLine(`M${x} ${y}q22 16 44 0`, { w: 1.6 }), artFill(artCirc(x + 22, y + 4, 4), ART_INK.cream), artLine(`M${x + 14} ${y + 6}q8 6 16 0`, { stroke: ART_INK.bronze2, w: 1 })];
+const artCrib = (x, y, w = 50) => [
+  artLine(`M${x} ${y}h${w}M${x} ${y + 18}h${w}M${x} ${y - 4}v28M${x + w} ${y - 4}v28`, { w: 1.4 }),
+  artLine(Array.from({ length: Math.floor(w / 8) - 1 }, (_, i) => `M${x + 8 * (i + 1)} ${y}v18`).join(''), { w: 0.8 }),
+  artFill(artCirc(x + w / 2, y + 8, 4), ART_INK.cream),
+];
+const artStar = (x, y) => artLine(`M${x} ${y - 3}v6M${x - 3} ${y}h6`, { stroke: ART_INK.cream, w: 1 });
+const artGift = (x, y) => [artBox(x, y, 14, 12), artLine(`M${x + 3} ${y}q4-5 4 0q0-5 4 0`, { w: 1 })];
+const artRing = (x, y) => [artLine(artCirc(x, y, 6), { w: 1.6 }), artFill(`M${x - 3} ${y - 6}l3-5l3 5z`, ART_INK.cream)];
+const artCandle = (x) => [artLine(`M${x} 66V40h6v26`, { w: 1.2 }), artFlame(x + 3, 30)];
+const artLotus = (x, y) => [artFill(`M${x} ${y}q-6-10 0-18q6 8 0 18z`), artFill(`M${x} ${y}q-12-4-14-12q10 0 14 12z`, ART_INK.bronze2), artFill(`M${x} ${y}q12-4 14-12q-10 0-14 12z`, ART_INK.bronze2)];
+const ART_SCENES = {
+  birth_poor: ['บ้านใต้ถุนสูง เปลผ้าแขวนรอบเด็กแรกเกิด', [ART_GROUND, artStilt(28), artLine('M100 18h60M108 18v20M152 18v20', { w: 1.2 }), ...artCradle(108, 38), artLine('M162 66V20', { stroke: ART_INK.bronze2, w: 2 }), artStar(76, 18), artStar(180, 30)]],
+  birth_mid: ['บ้านในเมือง เตียงเด็กข้างหน้าต่าง', [ART_GROUND, artHouse(28, 66, 1.6), ...artCrib(104, 40), artLine('M129 14v10M119 24h20M121 24v6M137 24v6', { stroke: ART_INK.cream, w: 1 }), artStar(172, 22)]],
+  birth_rich: ['เตียงเด็กมีมุ้งครอบ กล่องของขวัญรอบห้อง', [ART_GROUND, artLine('M96 22q34-16 68 0v40M96 22v40', { stroke: ART_INK.cream, w: 1 }), ...artCrib(104, 38), ...artGift(40, 54), ...artGift(58, 54), ...artGift(49, 42), artLine('M176 66V36M170 40q6-10 12 0', { w: 1.2 }), artFlame(176, 26)]],
+  wed_ask: ['ขอแต่งงานข้างเตาหมูกระทะ', [ART_GROUND, artLine('M60 54h80M68 54v12M132 54v12', { w: 1.2 }), artLine('M84 54q16-16 32 0M80 54h40', { w: 1.6 }), artLine('M92 40q2-6 0-10M100 38q2-6 0-10M108 40q2-6 0-10', { stroke: ART_INK.cream, w: 1 }), ...artPerson(44, 66, 1.4), ...artPerson(156, 66, 1.4), ...artRing(100, 20)]],
+  wed_rite: ['รดน้ำสังข์ มงคลแฝดคล้องคู่บ่าวสาว', [ART_GROUND, ...artPerson(80, 66, 1.6), ...artPerson(120, 66, 1.6), artLine('M70 30q10-10 20 0M110 30q10-10 20 0M90 26q10-6 20 0', { stroke: ART_INK.cream, w: 1.2 }), artLine('M150 30q10-6 18 0l-4 6h-10z', { w: 1.2 }), artLine('M150 36q-4 6-8 8', { stroke: ART_INK.cream, w: 1, }), ...artLotus(40, 64), ...artLotus(166, 64)]],
+  baby_news: ['ที่ตรวจขึ้นสองขีด', [artLine('M64 46h72v12h-72zM82 46v12M90 46v12', { w: 1.6 }), artLine('M110 49h14v6h-14z', { stroke: ART_INK.bronze2, w: 1 }), artFill('M100 30c-4-6-12-2-8 4l8 8l8-8c4-6-4-10-8-4z'), artStar(62, 26), artStar(140, 24)]],
+  baby_home: ['บ้านหลังแรก รถเข็นเด็กหน้าบ้าน', [ART_GROUND, artHouse(36, 66, 1.8), artLine('M128 50h30q0 10-10 10h-14zM128 50q-2-10 8-14', { w: 1.4 }), artWheel(134, 63, 3), artWheel(152, 63, 3), artLine('M158 50l8-8', { w: 1.4 }), artStar(110, 20)]],
+  retire_home: ['เปลญวนใต้ต้นไม้ แดดเย็นวันเกษียณ', [ART_GROUND, ...artPalm(40, 66), artLine('M48 40q40 22 80 0', { w: 1.6 }), artLine('M128 40l8-14M128 40v26', { stroke: ART_INK.bronze2, w: 2 }), artLine(artCirc(160, 30, 9), { stroke: ART_INK.cream, w: 1.2 }), artLine('M146 46h28M150 52h20', { stroke: ART_INK.cream, w: 1 })]],
+  retire_early: ['ถือกล่องของออกจากที่ทำงาน', [ART_GROUND, artLine('M120 66V18h48v48M128 26h8v8h-8zM144 26h8v8h-8zM128 42h8v8h-8zM144 42h8v8h-8zM138 66v-10h12v10', { w: 1.2 }), ...artPerson(70, 66, 1.6), artBox(76, 42, 16, 10), artLine('M30 30q10-8 20 0', { stroke: ART_INK.cream, w: 1 })]],
+  death: ['เทียนคู่ ธูป และดอกบัว', [ART_GROUND, ...artCandle(64), ...artCandle(130), artLine('M100 66V52M96 52h8', { w: 1.2 }), artLine('M97 52l-3-22M100 52v-24M103 52l3-22', { stroke: ART_INK.bronze2, w: 1 }), artFill(artCirc(94, 30, 1.2), ART_INK.cream), artFill(artCirc(100, 28, 1.2), ART_INK.cream), artFill(artCirc(106, 30, 1.2), ART_INK.cream), ...artLotus(40, 64), ...artLotus(160, 64)]],
+  gone: ['ทางที่ไม่มีใครเห็นปลาย โคมแขวนรอ', [artLine('M30 66l60-40M170 66l-60-40', { stroke: ART_INK.bronze2, w: 1 }), artLine('M88 28h24', { stroke: ART_INK.bronze2, w: 0.8 }), artLine('M150 66V22h14', { w: 1.4 }), artLine('M160 22v6M154 28h12v12h-12z', { w: 1.2 }), artFlame(160, 30), artLine('M92 60l2-4M100 52l2-4M106 44l2-4', { stroke: ART_INK.cream, w: 1 })]],
+};
+export const ART_SCENE_IDS = Object.keys(ART_SCENES);
+export function sceneArt(id) {
+  const s = ART_SCENES[id];
+  return s ? { label: s[0], parts: [...ERA_FRAME, ...s[1]] } : null;
 }
 
 // ฐานะ 10 ระดับของ standingOf → จน/กลาง/รวย ตามชื่อระดับ (ยากไร้–ค่อนข้างจน · ชนชั้นกลางล่าง–กลางบน · มีอันจะกิน–มั่งคั่ง)
