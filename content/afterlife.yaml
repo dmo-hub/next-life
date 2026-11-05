@@ -749,3 +749,146 @@ events:
       - text: "ปล่อยวาง ให้คนเป็นว่ากันเอง"
         effects: {happiness: 1}
         merit: [{cat: bhavana, level: 1}]
+
+  # ---- scene loop (กองกลางชั่วคราว · ใบ 107) ----
+  # วงปรโลกปีละใบ · ผล effects ลงค่าวง (ชีวิตทิพย์ สุข/ทุกข์ ปัญญาธรรม ความผูกพัน) ไม่ใช่ค่าเริ่มชาติหน้า · ไม่ลงบัญชี ป้ายเป็น neutral
+  # เขียนให้ออกได้ทุกภูมิ — กองเฉพาะภูมิมาทีหลัง
+  - id: after_loop_common_dhamma_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: loop
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    title: "เสียงธรรมจากที่ไกล"
+    text: "ปีนี้มีเสียงสวดลอยมาจากที่ไหนสักแห่ง ฟังไม่ออกทุกคำ แต่จังหวะคุ้นหูเหมือนเคยได้ยินตอนยังมีลมหายใจ"
+    choices:
+      - text: "นั่งฟังจนจบ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - text: "ฟังไป นึกถึงคนข้างหลังไป"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - text: "ฟังพอให้ใจสงบ แล้วพัก"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - text: "เดินตามเสียงไปให้ถึงต้นทาง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "ไปถึงศาลาเก่าที่ไม่มีใครอยู่ เหลือแต่เสียงก้องอยู่ในเสา ฟังแล้วเข้าใจอะไรขึ้นมานิดหนึ่ง", effects: {knowledge: 1, health: -1}}
+          - {weight: 1, text: "เดินจนเหนื่อย เสียงก็เงียบไปก่อนจะถึง", effects: {health: -1}}
+
+  - id: after_loop_common_offering_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: loop
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    title: "มีคนกรวดน้ำมาถึง"
+    text: "ปีนี้มีส่วนบุญส่งมาถึงอีกครั้ง หยดน้ำอุ่น ๆ ไหลมาตามทาง ไม่รู้ว่าใครในโลกมนุษย์ยังจำชื่อได้"
+    choices:
+      - text: "รับไว้ แล้วขอบคุณในใจ"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - text: "แบ่งให้ดวงวิญญาณที่ยืนอยู่ข้าง ๆ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - text: "ตามสายน้ำไปดูว่าใครทำให้"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - text: "นึกน้อยใจว่าทำไมมาแค่นี้"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: after_loop_common_elder_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: loop
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    title: "คนรุ่นก่อน"
+    text: "ระหว่างทางเจอคนที่จากไปก่อนหน้าหลายปี หน้าตายังเหมือนเดิม เขาเรียกชื่อเล่นของคุณก่อนที่คุณจะจำเขาได้"
+    choices:
+      - text: "นั่งคุยเรื่องบ้านเก่า"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - text: "ถามว่าอยู่ที่นี่มานานแค่ไหนแล้ว"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - text: "ขอโทษเรื่องที่ค้างใจกันอยู่"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "เขายิ้ม บอกว่าลืมไปนานแล้ว คุณเพิ่งรู้ว่าแบกเรื่องนี้มาคนเดียว", effects: {happiness: 2}}
+          - {weight: 1, text: "เขาเงียบไปนาน แล้วเดินจากไปโดยไม่ตอบ", effects: {happiness: -1, knowledge: 1}}
+      - text: "เลี่ยงไป ไม่อยากรื้อเรื่องเก่า"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: after_loop_common_review_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: loop
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    title: "ภาพชาติก่อน"
+    text: "ปีนี้ภาพชีวิตที่ผ่านมาย้อนกลับมาให้ดูเป็นตอน ๆ ทั้งเรื่องที่ภูมิใจและเรื่องที่อยากลืม"
+    choices:
+      - text: "ดูให้จบทั้งเรื่องดีเรื่องร้าย"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - text: "หยุดดูเฉพาะตอนที่มีความสุข"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - text: "ดูตอนที่เคยทำให้คนอื่นเสียใจ"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - text: "หันหลังให้ เก็บแรงไว้ก่อน"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+
+  - id: after_loop_common_home_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: loop
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    title: "บ้านเก่าในความฝัน"
+    text: "ปีนี้คิดถึงบ้านหลังเดิมขึ้นมาจนเห็นภาพชัด ประตูเปิดอยู่ มีเสียงคนคุยกันข้างใน"
+    choices:
+      - text: "แวะกลับไปดูให้หายคิดถึง"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - text: "เข้าฝันคนในบ้าน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "เขาตื่นมาเล่าให้คนทั้งบ้านฟัง มีคนจุดธูปบอกว่าคิดถึง", effects: {relations: 2}}
+          - {weight: 1, text: "เขาตื่นมาแล้วจำอะไรไม่ได้ คุณเหนื่อยเปล่า", effects: {health: -1}}
+      - text: "ปล่อยให้บ้านเป็นของคนที่ยังอยู่"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - text: "นั่งมองอยู่ห่าง ๆ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: after_loop_common_queue_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: loop
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    title: "แถวรอเกิด"
+    text: "ดวงวิญญาณมาต่อแถวยาวไม่เห็นหัวแถว ทุกคนถือป้ายชื่อของตัวเอง บางคนยังงงว่ามาอยู่ตรงนี้ได้อย่างไร"
+    choices:
+      - text: "ช่วยคนที่เพิ่งมาหาที่ของตัวเอง"
+        effects: {knowledge: 1, happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - text: "แอบแซงคิว"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ไม่มีใครเห็น แต่ยืนอยู่ตรงนั้นแล้วใจไม่สงบเลย", effects: {happiness: -1}}
+          - {weight: 1, text: "เจ้าหน้าที่จับได้ ส่งกลับไปท้ายแถว", effects: {health: -1}}
+      - text: "นั่งพักนิ่ง ๆ รอไป"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - text: "ชวนคนข้างหน้าคุยเรื่องชาติก่อน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]

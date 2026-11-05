@@ -5,6 +5,7 @@ import { parse } from 'yaml';
 import { STAGES, STAT_LABELS, MERIT_LEVELS, MERIT_WEIGHTS, SIN_CATS, FLAG_CATS, TRACKS, REALMS, FAMILY_ROLE_NAMES, meritId, meritName, debtName, assetName, EXAM_PASS } from '../engine/index.mjs';
 import { AFTER, CATEGORY, esc, text, choiceText } from './catalog.mjs';
 import { isekaiSpoilersHtml, isekaiNav } from './otherworld.mjs';
+import { careerHtml, careerSim } from './career.mjs';
 
 const YEAR_ALL = [2400, 2700];
 const sgn = (n) => (n > 0 ? `+${n}` : String(n).replace('-', '−'));
@@ -20,6 +21,24 @@ const FILIAL_TH = { self: 'ดูแลเอง', share: 'แบ่งเวร
 export function flagNames(root = new URL('../../', import.meta.url)) {
   const doc = parse(readFileSync(new URL('content/rules/flags.yaml', root), 'utf8'));
   return { ...doc.flags, ...Object.fromEntries(Object.entries(doc.prefixes ?? {}).map(([k, v]) => [`${k}:`, v])) };
+}
+
+// ชื่อกลุ่มสาเหตุตายของ when.past_life.cause — อ่านไฟล์ข้อมูลเดียวกับที่ lint ตรวจ id
+const CAUSE_TH = Object.fromEntries(Object.entries(JSON.parse(readFileSync(new URL('../../data/death-causes.json', import.meta.url), 'utf8')).groups).map(([k, g]) => [k, g.label]));
+const PAST_CAUSE_TH = { ...CAUSE_TH, gone: 'หายไปต่างโลก' };
+
+// ความจำชาติก่อน (ใบ 159) เป็นคำที่ผู้อ่านเฉลยเข้าใจ — any:false ใช้คู่ช่องอื่นไม่ได้ (lint)
+function pastCond(p, L) {
+  if (!p) return [];
+  if (p.any === false) return ['ชีวิตแรก (ไม่มีชาติก่อน)'];
+  const out = [];
+  if (p.any) out.push('มีชาติก่อน');
+  if (p.province) out.push(p.province === 'same' ? 'เกิดจังหวัดเดียวกับชาติก่อน' : 'เกิดคนละจังหวัดกับชาติก่อน');
+  if (p.job) out.push(`ชาติก่อนทำงาน${any(p.job.map((o) => esc(L.occ(o))))}นานที่สุด`);
+  if (p.cause) out.push(`ชาติก่อนจบด้วย${any(p.cause.map((c) => esc(PAST_CAUSE_TH[c] ?? c)))}`);
+  if (p.realm) out.push(`เคยไป${any(p.realm.map((r) => REALMS.find((x) => x.id === r)?.name ?? r))}สักชาติ`);
+  if (p.talent !== undefined) out.push(p.talent ? 'มีพรสวรรค์ติดชาติ' : 'ไม่มีพรสวรรค์ติดชาติ');
+  return out;
 }
 
 // ชื่อระบบอยู่ในไฟล์ข้อมูลแต่ loader ไม่ส่งต่อให้แกน (แกนใช้แค่ปีเริ่ม) — อ่านไฟล์เดียวกันตรง ๆ
@@ -46,7 +65,9 @@ function labels(content, flags, systems) {
   // none = ไม่ได้อยู่สายเลื่อนขั้นใด (แกนเทียบ st.ladder?.id ?? 'none')
   const ladders = content.era.careers?.ladders ?? {};
   const ladder = (id) => (id === 'none' ? 'ไม่อยู่สายเลื่อนขั้น' : ((n) => (n.startsWith('สาย') ? n : `สาย${n}`))(ladders[id]?.name ?? id));
-  return { occ: (id) => occ[id] ?? id, era: (id) => era[id] ?? id, sys, flag, ladder };
+  // นิสัยจากวัยเด็ก (B41) อยู่ในกติกาทุ่มเท content.focus.natures
+  const nature = (id) => content.focus?.natures?.[id]?.name ?? id;
+  return { occ: (id) => occ[id] ?? id, era: (id) => era[id] ?? id, sys, flag, ladder, nature };
 }
 
 // เงินในผล: ตัวเลขเปล่า = บาทของปีนั้น · income_x = เท่าของเงินเก็บต่อปี · fixed_baht = บาทของปีอ้างอิง ปรับตามเงินเฟ้อ (moneyValue ในแกน)
@@ -114,6 +135,7 @@ function mults(m, L) {
   if (m.wish) out.push(`ยกกำลังตามระดับบัญชีบุญบาป (ฐาน ${m.wish})`);
   if (m.rank) out.push(`×${m.rank} ต่อขั้นตำแหน่งที่ไต่ขึ้น (ทบกัน)`);
   if (m.family_fame) out.push(`×${m.family_fame} ต่อระดับชื่อเสียงตระกูล (ทบกัน)`);
+  if (m.overlap_stage !== undefined) out.push(`×${m.overlap_stage} ต่อขั้นค่าซ้อนทับ (ทบกัน)`);
   for (const k of Object.keys(MONEY_TH)) if (m[k]) out.push(`×${m[k].v} เมื่อ${moneyBound(k, m[k])}`);
   return out;
 }
@@ -154,6 +176,7 @@ function conditions(e, L) {
   for (const s of e.systems ?? []) out.push(`หลังมี${L.sys(s)}`);
   if (w.region) out.push(`ภาค${any(w.region.map(esc))}`);
   if (w.sex) out.push(`เพศ${any(w.sex.map(esc))}`);
+  if (w.overlap_stage) out.push(`ค่าซ้อนทับขั้น ${range(w.overlap_stage)}`);
   if (w.class) out.push(`ฐานะ${any(w.class.map(esc))}`);
   if (w.occupation) out.push(`ทำงาน${any(w.occupation.map((o) => esc(L.occ(o))))}`);
   if (w.ladder) out.push(any(w.ladder.map((l) => esc(L.ladder(l)))));
@@ -173,6 +196,7 @@ function conditions(e, L) {
   out.push(...flagCond(w.flags, L));
   // ธงของพ่อแม่รุ่นก่อน ไม่ใช่ของตัวละคร — การ์ดจึงออกเฉพาะชีวิตที่เกิดเป็นลูกของรุ่นก่อน
   out.push(...flagCond(w.parent_flags, L, 'เกิดเป็นลูกของรุ่นก่อนที่'));
+  out.push(...pastCond(w.past_life, L));
   if (e.realm) out.push(`ไป${any(e.realm.map((r) => REALMS.find((x) => x.id === r)?.name ?? r))}`);
   if (e.repeat) out.push(`ออกซ้ำได้ ${e.repeat.max} ครั้ง เว้น ${e.repeat.gap} ปี`);
   if (e.weight !== undefined) out.push(`น้ำหนักในกองสุ่ม ${e.weight}`);
@@ -187,6 +211,7 @@ function locks(q, L) {
   if (q.age) out.push(`อายุ${q.age.min !== undefined ? ` ≥ ${q.age.min}` : ''}${q.age.max !== undefined ? ` ≤ ${q.age.max}` : ''}`);
   if (q.edu) out.push(`จบ${esc(Array.isArray(q.edu) ? q.edu.join(' หรือ ') : q.edu)}`);
   for (const f of q.family ?? []) out.push(famCond(f));
+  if (q.nature) out.push(`เป็นคน${esc(L.nature(q.nature))}`);
   out.push(...flagCond(q.flags, L));
   return [`เลือกได้เมื่อ ${out.join(' · ')}${q.reason ? ` · ไม่ผ่านจอบอก "${esc(q.reason)}"` : ''}`];
 }
@@ -201,6 +226,8 @@ function cardRef(id, byId) {
 function extras(node, L, byId) {
   const out = [...flagsLine(node, L)];
   for (const f of node.family ?? []) out.push(family(f, L));
+  // ป้าย nature: บนตัวเลือกวัยเด็กสะสมแต้มนิสัย (B41) — หน้าเฉลยบอกว่าตัวเลือกไหนปั้นนิสัยอะไร
+  if (node.nature) out.push(`แต้มนิสัย${esc(L.nature(node.nature))} +1`);
   for (const s of node.schedules ?? []) out.push(`นัดการ์ด ${cardRef(s.event, byId)} อีก ${range(s.after_years, ' ปี')}${s.chance < 1 ? ` (โอกาส ${Math.round(s.chance * 100)}%)` : ''}`);
   if (node.next) out.push(`ต่อด้วยการ์ด ${cardRef(node.next, byId)}`);
   if (node.redeem) out.push(`แก้บน: ${REDEEM_TH[node.redeem] ?? esc(node.redeem)}`);
@@ -258,7 +285,7 @@ function card(e, L, byId) {
   ].join('');
 }
 
-export function spoilersHtml(content, flags = flagNames(), systems = systemNames()) {
+export function spoilersHtml(content, flags = flagNames(), systems = systemNames(), sim = careerSim()) {
   const L = labels(content, flags, systems);
   const byId = new Map(content.events.map((e) => [e.id, e]));
   const groups = [...STAGES.map((s) => s.name), AFTER].map((stage) => ({ stage, events: content.events.filter((e) => e.stage === stage) })).filter((g) => g.events.length);
@@ -266,5 +293,7 @@ export function spoilersHtml(content, flags = flagNames(), systems = systemNames
   const body = groups
     .map((g, i) => `<details id="s${i}"><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map((e) => card(e, L, byId)).join('')}</div></details>`)
     .join('\n');
-  return `<nav class="toc">${nav}${isekaiNav(groups.length)}</nav>\n${body}\n${isekaiSpoilersHtml(groups.length, merit)}`;
+  // เส้นทางงาน (ui-redo ใบ 21) ต่อท้ายการ์ดชาติไทย ก่อนส่วนต่างโลก — ไม่มี <article> ด่านนับการ์ดบนหน้าจึงนับเท่าเดิม
+  const career = careerHtml(content, L, sim);
+  return `<nav class="toc">${nav}${career ? '<a href="#career">เส้นทางงาน</a>' : ''}${isekaiNav(groups.length)}</nav>\n${body}\n${career}\n${isekaiSpoilersHtml(groups.length, merit)}`;
 }

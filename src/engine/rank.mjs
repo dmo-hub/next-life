@@ -34,6 +34,12 @@ export const PROMO = {
     { years: 5, need: { knowledge: 35 }, odds: 2 },
     { years: 7, need: { relations: 50 }, odds: 1 },
   ],
+  // นักล่า (โลกซ้อนทับขั้น 3): ขั้นล่างวัดร่างกาย ขั้นบนวัดเส้นสาย
+  hunter: [
+    { years: 3, need: { health: 50 }, odds: 3 },
+    { years: 4, need: { health: 55, knowledge: 50 }, odds: 2 },
+    { years: 5, need: { network: 60 }, odds: 1 },
+  ],
 };
 // ตำรวจไต่ช้ากว่าทหาร — คนเข้าสายตำรวจมากกว่า (เปิดรับกลางทาง) ยอดสองสายจึงหายากใกล้กัน
 PROMO.police = [
@@ -103,14 +109,15 @@ function syncOcc(st) {
   st.occupationName = o.name;
 }
 
-// ผลของการ์ดเลื่อนขั้น: +1 = ได้เลื่อน · 0 = ไม่ได้ รอบหน้านับปีครึ่งหนึ่ง
+// ผลของการ์ดเลื่อนขั้น: +1 = ได้เลื่อน · 0 = ไม่ได้ รอบหน้านับปีใหม่เต็มรอบ
+// (เดิมนับครึ่งรอบ การ์ดขั้นเดิมวนกลับมาทุก 2–4 ปี เจ้าของเห็นว่าซ้ำ)
 export function promote(st, n) {
   if (n > 0) {
     st.ladder.rank += 1;
     st.ladder.since = st.age;
-    st.ladder.prog = 0;
-    syncOcc(st);
-  } else st.ladder.prog /= 2;
+  }
+  st.ladder.prog = 0;
+  if (n > 0) syncOcc(st);
 }
 
 // ผลของการ์ดเลือกตั้ง: เลขขั้นที่ได้ · -1 = หลุดจากตำแหน่ง

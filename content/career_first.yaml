@@ -507,3 +507,31 @@ events:
         text: "ให้ชาวบ้านมาปลูกผักแทน"
         merit: [{cat: help_others, level: 1}]
         effects: {relations: 2}
+
+  # ทางแรกของนักล่า: ภารกิจแรกในเกต ไม่มีผลย้อนตามมา (ดันเจียนเป็นของใบถัดไป)
+  - id: first_hunter_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    first_of: hunter
+    title: "เกตแรก"
+    text: "ภารกิจแรกหลังจบฝึก หัวหน้าทีมให้คุณเดินรั้งท้ายถือไฟฉาย พอฝุ่นจางลง ผลึกสีม่วงก้อนเท่ากำปั้นกลิ้งมาหยุดที่ปลายเท้า ไม่มีใครในทีมหันมาเห็น ขณะที่เพื่อนร่วมรุ่นอีกคนนอนเจ็บอยู่หลังกองหิน"
+    choices:
+      - id: hand_in
+        text: "ส่งผลึกให้หัวหน้าทีมตามกฎ"
+        merit: [{cat: sila, level: 1}]
+        effects: {network: 1, happiness: 1}
+      - id: pocket
+        text: "แอบเก็บผลึกไว้ขายเอง"
+        hint: "ราคา: บาปเบา"
+        merit: [{cat: greed_harm, level: 1}]
+        effects: {money: {unit: income_x, amount: 0.3}, relations: -1}
+      - id: carry_friend
+        text: "วางไฟฉาย ไปแบกเพื่อนออกมา"
+        merit: [{cat: help_others, level: 1}]
+        effects: {health: -1, relations: 2}
+      - id: guard_exit
+        text: "ขอย้ายไปเฝ้าทางออกเกต"
+        merit: [{cat: neutral}]
+        effects: {income_mult: 0.95, happiness: 1, network: -1}

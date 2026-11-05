@@ -1,0 +1,36 @@
+# ทางตายบนตัวเลือกตรง · ผลสุ่มของตัวเลือกที่ไม่ล็อกนักล่า · สาเหตุนอกกลุ่มบาดเจ็บ — ใบ ok ทางตายอยู่หลัง requires hunter
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", effects: {die: accident}, merit: [{cat: neutral}]}
+      - text: "ทางที่สอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "รอด", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่รอด", effects: {die: assault}, merit: [{cat: neutral}]}
+      - text: "ทางที่สาม"
+        requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่า"}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "รอด", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่รอด", effects: {die: cancer}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: ok_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - text: "ทางที่หนึ่ง"
+        requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่า"}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "รอด", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่รอด", effects: {die: accident}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", sets_flags: [hunter], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}

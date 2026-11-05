@@ -1,0 +1,27 @@
+# การ์ดบรรยากาศที่ ambient ไม่ใช่ true + การ์ดบรรยากาศที่ไม่อยู่ในกองสุ่ม (ไม่มี weight) — การ์ดเทศกาลจริงใน content/festivals.yaml ผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    ambient: 1
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ไปงาน", merit: [{cat: neutral}]}
+      - {text: "อยู่บ้าน", merit: [{cat: neutral}]}
+      - {text: "ไปกับเพื่อน", merit: [{cat: neutral}]}
+      - {text: "ไม่สนใจ", merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    ambient: true
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ไปงาน", merit: [{cat: neutral}]}
+      - {text: "อยู่บ้าน", merit: [{cat: neutral}]}
+      - {text: "ไปกับเพื่อน", merit: [{cat: neutral}]}
+      - {text: "ไม่สนใจ", merit: [{cat: neutral}]}

@@ -4,6 +4,9 @@ import { EXAM_PASS, BOND_FLAG } from '../../engine/career.mjs';
 import { DEBT_FLAGS } from '../../engine/life.mjs';
 import { isObj, isRange, list, effectSites, choicesOf } from './util.mjs';
 
+// รอบหลายใบที่ผู้เล่นต้องเดินจนจบ (ดันเจียนไทย)
+const RUNS = ['dungeon'];
+
 function flagRefs(e) {
   const out = [];
   for (const { node, path } of effectSites(e)) {
@@ -111,6 +114,23 @@ export const rules = [
           if (!t || node.next === x.e.id) { r(x, p, `เรื่องต่อ "${node.next}" ไม่มีอยู่ หรือชี้กลับเหตุการณ์ตัวเอง`); continue; }
           if (t.stage !== x.e.stage) r(x, p, `เรื่องต่อ "${node.next}" อยู่ช่วง${t.stage} ไม่ใช่ช่วง${x.e.stage} — ออกอายุเดียวกันกับการ์ดผล`);
           if (t.at_age !== undefined || t.weight !== undefined || t.era !== undefined) r(x, p, `เรื่องต่อ "${node.next}" มี at_age/weight/era — จะออกเองนอกเรื่องต่อ`);
+        }
+      }
+    },
+  },
+  {
+    // แกนเลื่อนโรคกลางรอบเฉพาะเมื่อใบถัดไปอยู่รอบเดียวกัน — ใบในที่ลืมใส่ run ทำให้คนป่วยตายตั้งแต่ใบเข้าเงียบ ๆ
+    id: 'run-chain',
+    desc: `run = ${RUNS.join('|')} (หลายใบต่อกันด้วย next เป็นรอบเดียว · สุขภาพหมดกลางรอบตายที่ใบสุดท้าย) · เรื่องต่อจากใบที่มี run ต้องชี้ใบที่ run เดียวกัน`,
+    all(events, ctx, r) {
+      const byId = new Map(events.map((x) => [x.e.id, x.e]));
+      for (const x of events) {
+        if (x.e.run === undefined) continue;
+        if (!RUNS.includes(x.e.run)) { r(x, '.run', `ต้องเป็น ${RUNS.join('|')} ได้ ${JSON.stringify(x.e.run)}`); continue; }
+        for (const { node, path } of effectSites(x.e)) {
+          if (!path.includes('outcomes') || node.next === undefined) continue;
+          const t = byId.get(node.next);
+          if (t && t.run !== x.e.run) r(x, `${path}.next`, `เรื่องต่อ "${node.next}" ไม่มี run: ${x.e.run} — โรคที่ถึงคิวกลางรอบจะตายที่ใบนี้แทนใบสุดท้าย`);
         }
       }
     },

@@ -1,0 +1,31 @@
+# ของไม่มีในทะเบียน · รายการว่าง · id ซ้ำ · loot บนตัวเลือกที่มี outcomes · ผลสุ่มไม่มี text — ใบ ok วาง loot ถูกที่
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", effects: {loot: [no_such_item]}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", effects: {loot: []}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", effects: {loot: [dg_knife, dg_knife]}, merit: [{cat: neutral}]}
+      - text: "ทางที่สี่"
+        effects: {loot: [dg_vest]}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "รอด", merit: [{cat: neutral}]}
+          - {weight: 1, effects: {loot: [dg_fang]}, merit: [{cat: neutral}]}
+  - id: ok_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", effects: {loot: [dg_takrut, dg_knife]}, merit: [{cat: neutral}]}
+      - text: "ทางที่สอง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "รอด", effects: {loot: [dg_vest]}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่ได้อะไร", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}

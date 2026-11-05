@@ -16,6 +16,9 @@ const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 const SELF = fileURLToPath(import.meta.url);
 const REPO = path.resolve(path.dirname(SELF), '..');
+// LIFEHASH_DROP=k1,k2: คีย์ที่ใบตั้งใจเพิ่มบนการ์ดให้จออ่าน (ไม่ใช่ผลเกม) กรองออกก่อน hash ทั้งสองฝั่ง — env ส่งถึง worker ลูกเอง
+// ใช้คู่กับรอบไม่กรองเป็นตัวควบคุม: ไม่กรองต้องต่าง ไม่งั้นคีย์นั้นไม่ได้อยู่บนการ์ดจริง
+const DROP = new Set((process.env.LIFEHASH_DROP ?? '').split(',').filter(Boolean));
 // บอทตัดสินครั้งที่เท่านี้ของชีวิตถูกบังคับให้กดตัวเลือกเปิดอื่น — ช้าพอให้พ้นการ์ดเปิดชีวิต เร็วพอให้ผลลามทั้งชีวิต
 const CTL_AT = 10;
 const CTL_MIN = { life: 0.9, isekai: 0.9, chain: 0.9 };
@@ -39,7 +42,7 @@ async function hashLives(root, n, seed, ctl, world) {
   const { loadContent } = await imp('src/node/load.mjs');
   const { BOTS } = await imp('harness/bots.mjs');
   const content = loadContent();
-  const skip = (k, v) => (k === 'content' ? undefined : v);
+  const skip = (k, v) => (k === 'content' || DROP.has(k) ? undefined : v);
   const out = {};
   for (const [name, bot] of Object.entries(BOTS)) {
     out[name] = [];

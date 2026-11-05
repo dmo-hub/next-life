@@ -1,0 +1,15 @@
+# ตัวแทนที่กองทวีปไม่มี
+cards:
+  - id: bad_x
+    regions: [helvard]
+    ch: [2]
+    title: ชื่อ
+    text: ข่าวจาก{ชื่อ}มาถึง{land}
+    choices:
+      - t: ก
+        text: ผลก
+      - t: ข
+        stat: luk
+        dc: 10
+        win: { text: ชนะ }
+        lose: { text: แพ้ }

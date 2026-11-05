@@ -23,8 +23,9 @@ const r = {
   // ชี้ต้นเหตุ (blame ใน gates.mjs) ต้องรู้ว่าแต่ละชีวิตเจออะไรตอนอายุเท่าไร — รายชีวิตของบอทสุ่ม (ด่าน 3b/4 ตัดสินบอทนี้ตัวเดียว):
   // [กลุ่ม 3b, อายุตาย, ส่วนต่างอายุ, หลุดช่วงด่าน 4 (null = ไม่ถึง 60), ลำดับเหตุการณ์ในเนื้อหา, อายุที่เจอ]
   lives: [],
-  // การ์ดเหตุการณ์ในชีวิต (ไม่นับระหว่างชาติ) ต่อ ช่วงวัย|หมวด · แฟนตาซี (แนว B) และหวยสายมูต่อชีวิต
-  cells: new Map(), fantasy: new Map(), numen: 0,
+  // การ์ดเหตุการณ์ในชีวิต (ไม่นับระหว่างชาติ) ต่อ ช่วงวัย|หมวด · แฟนตาซีต่อชีวิต (แนว B + ลางบัญชี + ลางภัยยุค) และหวยสายมู
+  // fantasyParts = ผลรวมใบแยกชนิด — ส่วน b ต้องเท่าตัวนับแบบเดิม (B อย่างเดียว) ที่ sha เดียวกัน
+  cells: new Map(), fantasy: new Map(), fantasyParts: { b: 0, omen: 0, herald: 0 }, numen: 0,
 };
 const t0 = Date.now();
 const pick = BOTS[bot];
@@ -44,13 +45,26 @@ for (let i = 0; i < n; i++) {
     for (const k of STAT_KEYS) if (!(st[k] >= 0 && st[k] <= 100)) r.statBad++;
     if (!Number.isFinite(st.money)) r.statBad++;
     for (const f of Object.keys(st.flags)) r.flags.add(f.split(':')[0]);
+    // ลางบัญชีไม่ใช่การ์ดเหตุการณ์ แต่ MAP นับเป็นแฟนตาซีในชีวิต
+    if (card.kind === 'omen') {
+      fantasy++;
+      r.fantasyParts.omen++;
+    }
     if (card.kind !== 'event') return;
     seen.add(card.id);
     if (!seenAt.has(card.id)) seenAt.set(card.id, card.age);
     // หาจากเนื้อหาด้วย id — การ์ดเล่าเรื่อง (0 ตัวเลือก) ไม่ตั้ง st.pending · การ์ดที่แกนสร้างเอง (หางาน) ไม่อยู่ในเนื้อหา
     const ev = content.events[INDEX.get(card.id)] ?? {};
     inc(r.cells, `${card.stage}|${ev.category ?? '-'}`);
-    if (card.type === 'B') fantasy++;
+    if (card.type === 'B') {
+      fantasy++;
+      r.fantasyParts.b++;
+    }
+    // ลางภัยยุคเป็นแนว A แต่เจ้าของเคาะให้นับในเป้า · ใบลางที่ติดแนว B นับไปแล้วข้างบน ไม่นับซ้ำ
+    if (ev.herald_of) {
+      r.fantasyParts.herald++;
+      if (card.type !== 'B') fantasy++;
+    }
     if (ev.belief?.kind === 'lottery_numen') r.numen++;
   };
   const { age, cards, state } = playLife(mixSeed(seed, i), content, choose, onCard);
