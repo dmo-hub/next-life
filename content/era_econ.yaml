@@ -110,11 +110,11 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: tom_yum_kung
-    when: {age: [5, 18], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
+    when: {age: [0, 18], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ต้มยำกุ้งเดือดทั้งบ้าน"
     text: "ข่าวค่าเงินบาทลอยตัว พ่อเงียบไปทั้งคืน บริษัทพ่อปิดกะทันหัน หนี้บ้านเพิ่มเท่าตัวในพริบตา แม่ถามคุณว่าอยากย้ายบ้านไหม"
     choices:
-      - text: "บอกแม่ว่าย้ายไปห้องแถวก็ได้"
+      - text: "ซุกอกแม่ ยอมย้ายไปห้องแถว"
         effects: {happiness: -2, relations: 1, money: {unit: income_x, amount: 0.5}}
         merit: [{cat: neutral}]
       - text: "ช่วยพ่อห่อแซนด์วิชไปขายทุกเช้า"
@@ -123,7 +123,7 @@ events:
           - {weight: 2, ok: true, text: "แซนด์วิชของพ่อขายหมดทุกเช้า คนในตึกเรียกพ่อว่าเสี่ยแซนด์วิช", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: 0.5}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
           - {weight: 1, text: "ขนมปังเหลือทุกวัน คุณกินแซนด์วิชเป็นข้าวสามมื้อจนโต", effects: {health: -1, money: {unit: income_x, amount: -0.3}}, sets_flags: [street_vendor], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - text: "ร้องไห้ขอแม่อย่าขายบ้าน"
+      - text: "ร้องไห้กอดเสาบ้าน ไม่ยอมไป"
         effects: {happiness: 1, health: -1, money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
       - text: "ไปอยู่กับย่า ช่วยย่าทำสวน"

@@ -220,7 +220,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: tsunami
-    when: {age: [5, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
+    when: {age: [0, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ทะเลถอยหนี"
     text: "เช้าวันหยุดที่ชายหาด น้ำทะเลลดลงไปไกลผิดปกติ ปลาดิ้นอยู่บนทรายเต็มไปหมด เด็ก ๆ ทั้งหาดวิ่งกรูลงไปเก็บ คุณกำลังจะวิ่งตามเพื่อน"
     choices:
@@ -237,13 +237,13 @@ events:
           - {weight: 1, text: "คลื่นซัดไปไกลเกือบกิโล รอดเพราะเกาะต้นมะพร้าวไว้ทั้งคืน กลายเป็นข่าวไปทั้งประเทศ", effects: {health: -3, relations: 2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: shout_warning
-        text: "ตะโกนเรียกเพื่อน ๆ กลับขึ้นมา"
+        text: "ร้องลั่นจนเพื่อน ๆ หันกลับขึ้นมา"
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {relations: 2}}, text: "เพื่อน ๆ วิ่งตามขึ้นเนินทันกันหลายคน ทุกปีพ่อแม่เพื่อนมาขอบคุณ", effects: {relations: 3}, merit: [{cat: help_others, level: 2}]}
           - {weight: 1, text: "ไม่มีใครฟัง ต้องวิ่งเอาตัวรอดจนหอบ", effects: {health: -1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
       - id: move_inland
-        text: "ฝันร้าย ขอพ่อแม่ย้ายไปไกลทะเล"
+        text: "ฝันร้ายทุกคืน พ่อแม่ย้ายไกลทะเล"
         effects: {health: 1, happiness: -1, income_mult: 0.8}
         merit: [{cat: neutral}]
 
