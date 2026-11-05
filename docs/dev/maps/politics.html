@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ผังบันไดการเมือง</title>
+<style>
+  :root { --ink: #3b2a1a; --paper: #efe3c2; }
+  body { margin: 0; background: #1b2230; color: #f1e7cf; font-family: "Sarabun", "Leelawadee UI", system-ui, sans-serif; }
+  .wrap { display: flex; gap: 14px; padding: 14px; flex-wrap: wrap; align-items: flex-start; }
+  .mapbox { flex: 1 1 820px; max-width: 1200px; }
+  canvas { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: 0 4px 24px #000a; cursor: pointer; }
+  aside { flex: 0 0 340px; font-size: 14px; }
+  .card { background: var(--paper); color: var(--ink); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 2px 10px #0006; }
+  .card h2 { font-size: 16px; margin: 0 0 6px; }
+  .muted { color: #6b5638; }
+  select, input { font: inherit; padding: 3px; }
+  select { width: 100%; margin-top: 4px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  td { padding: 3px 4px; border-top: 1px solid #d6c59c; vertical-align: top; }
+  #parties tr { cursor: pointer; }
+  #parties tr.on { background: #f3d98a; }
+  ul, ol { margin: 4px 0 0; padding-left: 18px; }
+  .big { font-size: 22px; font-weight: 700; color: #8a3b12; }
+</style>
+</head>
+<body>
+<!--nav--><style>
+.nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
+.nl-nav{font:15px/1.4 Sarabun,"Noto Sans Thai",system-ui,sans-serif;text-align:left}
+.nl-nav a{text-decoration:none;color:inherit}
+.nl-in{max-width:1040px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
+.nl-top{background:#1F2430;color:#F4EFE3}
+.nl-top>.nl-in{min-height:52px;flex-wrap:wrap;column-gap:12px}
+.nl-brand{font-weight:700;margin-right:auto;padding:12px 0}
+.nl-main{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.nl-main a{padding:13px 8px 11px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-main a[aria-current]{border-bottom-color:#D6A64A;font-weight:600}
+.nl-swap{border:1px solid #6B7080;padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
+.nl-swap:hover,.nl-main a:hover{opacity:1;color:#fff}
+.nl-dev .nl-top{background:#2F3833}
+.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:#8A6A2E;color:#F4EFE3;vertical-align:2px}
+.nl-tabs{background:#F3EEE2;color:#1F2430;border-bottom:1px solid #D8D0C0}
+.nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
+.nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-tabs a[aria-current]{border-bottom-color:#A23B2C;font-weight:600}
+.nl-tabs.nl-sub{background:#EBE4D5;font-size:14px}
+@media (max-width:640px){
+.nl-top>.nl-in{padding:0}
+.nl-brand{padding:12px 16px}
+.nl-swap{margin-right:16px}
+.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid #343A48}
+}
+</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../../dev/index.html">สารบัญ</a><a href="../../dev/spec.html">ภาคผนวกสเปก</a><a href="../../dev/plan.html">สเปก/แผน</a><a href="../../dev/design.html">คำตัดสินเกม</a><a href="../../dev/ui.html">การออกแบบ</a><a href="../../dev/maps/continent.html" aria-current="page">แผนที่</a><a href="../../dev/archive/index.html">คลังเก่า</a></div></div><div class="nl-tabs nl-sub" role="navigation" aria-label="หน้าในหมวดแผนที่"><div class="nl-in"><a href="../../dev/maps/continent.html">ทวีป</a><a href="../../dev/maps/afterlife.html">ปรโลก</a><a href="../../dev/maps/dungeon.html">ดันเจียน</a><a href="../../dev/maps/lineage.html">ตระกูล</a><a href="../../dev/maps/milestones.html">หลักไมล์</a><a href="../../dev/maps/politics.html" aria-current="page">การเมือง</a></div></div></div><!--/nav-->
+<div class="wrap">
+  <div class="mapbox"><canvas id="map" width="1200" height="800"></canvas></div>
+  <aside>
+    <div class="card">
+      <h2>ตอนนี้อยู่ขั้น</h2>
+      <select id="here"><option value="">— ยังไม่ลงการเมือง —</option></select>
+      <div style="margin-top:6px">อยู่ขั้นนี้มาแล้ว <input id="years" type="number" min="0" step="1" style="width:60px"> ปี</div>
+      <div id="term" style="margin-top:6px"></div>
+      <div style="margin-top:8px">สังกัดพรรค <select id="party"><option value="">— ไม่สังกัด —</option></select></div>
+    </div>
+    <div class="card" id="info"><span class="muted">คลิกขั้นบนผังเพื่อดูวาระ</span></div>
+    <div class="card">
+      <h2>ทางขึ้นหัวหน้าพรรค (ครบ 3 ทาง)</h2>
+      <ol id="paths"></ol>
+    </div>
+    <div class="card">
+      <h2>ทะเบียนพรรค (คลิกแถว = สังกัด)</h2>
+      <table id="parties"></table>
+      <div style="margin-top:8px"><b>ชื่อสำรอง (ตั้งพรรคเอง)</b></div>
+      <div id="spare" style="font-size:13px"></div>
+    </div>
+    <div class="card">
+      <h2>กติกา (รอบ 8 + 14)</h2>
+      <ul>
+        <li>เข้าพรรคตอนลง ส.ส. ครั้งแรก (สุ่ม 3 จากทะเบียน) หรือการ์ดพรรคมาชวน · ท้องถิ่นไม่สังกัด</li>
+        <li>ย้ายพรรค: การ์ดดูด ส.ส. → ได้เงิน · ความสัมพันธ์ลด</li>
+        <li>ค่าพรรคมีผลตลอดที่เป็นสมาชิก</li>
+        <li>โอกาสชนะเลือกตั้งบนจอเป็นคำ ไม่โชว์ตัวเลข</li>
+      </ul>
+      <div class="muted" style="margin-top:6px;font-size:12px">ยังไม่ได้ตัดสิน: เงินตั้งพรรค · เกณฑ์คอนเน็คชั่นทางอัตโนมัติ · ขนาด ×1.5/ครึ่ง/ลดตามปี · ข้อมูลจาก politics-list-draft.md</div>
+    </div>
+  </aside>
+</div>
+<script src="core.js"></script>
+<script>
+const { fbm, buildGrid, regions, paintLand, drawBorders, vignette, decorate, cartouche, icon, label, pin, badge, load, save, canvasPoint } = MapCore;
+// ---- ข้อมูลตาม politics-list-draft.md (รอบ 14) · เรียงล่างขึ้นบน ----
+const LADDER = [
+  { step: 'ผู้นำท้องถิ่น (สุ่มผู้ใหญ่บ้าน/กำนัน)', short: 'ผู้นำท้องถิ่น', term: 'อยู่ถึงอายุ 60 ไม่มีเลือกตั้งซ้ำ', note: 'ตามกฎหมายจริง · โค้ดเดิมเลือกตั้งทุก 4 ปี ต้องแก้', icon: 'temple', land: '#a9c46a', deco: 'paddy' },
+  { step: 'นายก อบต.', short: 'นายก อบต.', term: '4 ปี', note: '', icon: 'city', land: '#bcc77a', deco: 'grass' },
+  { step: 'ส.ส.', short: 'ส.ส.', term: '4 ปี', note: 'ขั้นแรกที่สังกัดพรรค', icon: 'flag', land: '#c9b67a', deco: 'hill' },
+  { step: 'หัวหน้าพรรค', short: 'หัวหน้าพรรค', term: 'พรรคโหวตซ้ำทุก 4 ปี', note: 'ขั้น + สถานะคู่กับ ส.ส.', icon: 'tower', land: '#bfa27a', deco: 'mountain' },
+  { step: 'นายกฯ', short: 'นายกฯ', term: '4 ปี · รวมไม่เกิน 8 ปี', note: 'ส.ส. ทุกคนลุ้นได้ หัวหน้าพรรคได้เปรียบ', icon: 'castle', land: '#d8c59a', deco: 'peak' },
+];
+const PATHS = [
+  ['การ์ดโหวตในพรรค', 'ส.ส. ครบ 1 สมัย · ใช้คอนเน็คชั่น + ชื่อเสียงตระกูล · แพ้ยังเป็น ส.ส.'],
+  ['ตั้งพรรคเอง', 'เงินก้อนใหญ่ · เป็นหัวหน้าทันที · ชื่อจากชื่อสำรอง · เลือกข้อดี 1 จากตาราง + ข้อเสีย "พรรคใหม่"'],
+  ['อัตโนมัติ', 'ส.ส. ครบ 2 สมัย + คอนเน็คชั่นถึงเกณฑ์ ไม่มีการ์ด'],
+];
+const PARTIES = [
+  ['เพื่อไทไท', 'เพื่อไทย', 'ชนะง่าย เหนือ/อีสาน', 'คดียุบพรรคสุ่มออก'],
+  ['ก้าวไกลกว่า', 'ก้าวไกล', 'ชนะง่าย กทม./เมือง · +ความรู้', 'ดีเกินไปก็โดน ×1.5'],
+  ['ภูมิใจทั่วไทย', 'ภูมิใจไทย', '+คอนเน็คชั่น (บ้านใหญ่)', 'ความสัมพันธ์ลด (โดนมองเป็นงูเห่า)'],
+  ['ประชาปัตย์', 'ประชาธิปัตย์', 'ชนะง่าย ใต้ · +ความสัมพันธ์', 'พรรคขาลง โอกาสลดตามปี'],
+  ['รวมชาติสร้างไทย', 'รวมไทยสร้างชาติ', 'ไม่โดนกลั่นแกล้ง · คดีเบา', 'ความสุขลด (อึดอัด)'],
+  ['พลังประชาชื่น', 'พลังประชารัฐ', 'ค่าหาเสียงครึ่งเดียว (ทุนหนา)', 'ชนะยากขึ้นช่วงคนเบื่อ'],
+  ['ชาวนาก้าวหน้า', '—', 'ชนะง่ายชนบท · +สุขภาพ', 'เงินตำแหน่งน้อย (พรรคเล็ก)'],
+  ['คนบ้านเรา', '—', '+ความสุข · +ความสัมพันธ์', 'ชิงนายกฯ ยากมาก'],
+];
+const SPARE = [
+  ['ไทยสร้างใหม่', 'ไทยสร้างไทย'],
+  ['ชาติไทยพัฒนากว่า', 'ชาติไทยพัฒนา'],
+  ['ประชาชาติไทย', 'ประชาชาติ'],
+  ['เสรีรวมใจ', 'เสรีรวมไทย'],
+  ['ไทยภักดีดี', 'ไทยภักดี'],
+  ['พลังธรรมะ', 'พลังธรรม'],
+];
+const TERM = 4;
+const PM_CAP = 8;
+// ขั้นแรกที่สังกัดพรรค (index ใน LADDER) — ต่ำกว่านี้ไม่สังกัด
+const PARTY_FROM = 2;
+
+// ---- ผัง: บันได 5 ขั้น ซ้ายล่าง → ขวาบน · แต่ละขั้นเป็นเขตของตัวเอง ----
+const W = 1200, H = 800, STEP = 3;
+const X0 = 70, COL = 212, FLOOR = 760;
+// window.top อ่านอย่างเดียวในเบราว์เซอร์ — ชื่อ top ระดับบนสุดทำสคริปต์ทั้งหน้าตาย (SyntaxError)
+const stepTop = (k) => 690 - k * 115;
+const colOf = (x) => Math.floor((x - X0) / COL);
+const cx = (k) => X0 + COL * k + COL / 2;
+const isLand = (x, y) => {
+  const k = colOf(x);
+  if (k < 0 || k >= LADDER.length) return false;
+  return y > stepTop(k) + 10 * (fbm(x / 50, k * 7) - 0.5) && y < FLOOR - 6 * (fbm(x / 60, 3) - 0.5);
+};
+const SEEDS = Object.fromEntries(LADDER.map((r, k) => [r.short, [[cx(k), (stepTop(k) + FLOOR) / 2]]]));
+const NAMES = LADDER.map((r) => r.short);
+const G = buildGrid({ w: W, h: H, step: STEP, seeds: SEEDS, isLand, allow: (x, y, n) => colOf(x) === NAMES.indexOf(n) });
+const { cells } = regions(G);
+const at = (k) => [cx(k), stepTop(k) + 42];
+
+const cv = document.getElementById('map');
+const ctx = cv.getContext('2d');
+const base = document.createElement('canvas');
+base.width = W; base.height = H;
+(function paintBase() {
+  const b = base.getContext('2d');
+  paintLand(b, G, (n) => LADDER[NAMES.indexOf(n)].land, { cx: 900, cy: 120, r0: 60, r1: 1100, inner: '#9cc3dc', outer: '#3a5d7a', shore: [190, 215, 230], waves: false });
+  drawBorders(b, G);
+  LADDER.forEach((r, k) => {
+    const [x, y] = at(k);
+    decorate(b, cells[r.short], [[x, y], [x - 60, y + 40], [x + 60, y + 40], [x, y + 50]], r.deco);
+  });
+  cartouche(b, 'บันไดการเมือง', 'ไต่จากท้องถิ่นถึงนายกฯ · สังกัดพรรคตั้งแต่ ส.ส.', { w: 360 });
+  // เส้นแบ่ง สังกัด/ไม่สังกัดพรรค
+  b.save();
+  const xp = X0 + COL * PARTY_FROM;
+  b.strokeStyle = 'rgba(60,30,15,.7)'; b.setLineDash([6, 6]); b.lineWidth = 2;
+  b.beginPath(); b.moveTo(xp, stepTop(PARTY_FROM) - 40); b.lineTo(xp, FLOOR + 20); b.stroke();
+  b.restore();
+  label(b, '← ไม่สังกัดพรรค', xp - 70, FLOOR + 30, { size: 13, color: '#f1e7cf' });
+  label(b, 'สังกัดพรรค →', xp + 60, FLOOR + 30, { size: 13, color: '#f1e7cf' });
+  vignette(b, W, H);
+})();
+
+// ทางขึ้นหัวหน้าพรรค 3 เส้น: ส.ส. → หัวหน้าพรรค · โค้งซ้อนกันเหนือขั้น
+function paths(c, active) {
+  const [x1, y1] = [cx(2) + 40, stepTop(2) - 6];
+  const [x2, y2] = [cx(3) - 40, stepTop(3) - 6];
+  PATHS.forEach((p, i) => {
+    // ระยะโค้งห่างพอให้วงเลข + ชื่อทางไม่ทับกัน (วงอยู่กลางโค้ง ห่างกันครึ่งหนึ่งของ lift)
+    const lift = 46 + i * 60;
+    const mx = (x1 + x2) / 2, my = Math.min(y1, y2) - lift;
+    c.save();
+    c.strokeStyle = active === 3 ? '#8a3b12' : 'rgba(60,35,20,.75)'; c.lineWidth = 2.2;
+    c.beginPath(); c.moveTo(x1, y1); c.quadraticCurveTo(mx, my, x2, y2); c.stroke();
+    c.beginPath(); c.moveTo(x2, y2); c.lineTo(x2 - 10, y2 - 4); c.lineTo(x2 - 4, y2 - 11); c.closePath(); c.fillStyle = c.strokeStyle; c.fill();
+    c.restore();
+    const bx = 0.25 * x1 + 0.5 * mx + 0.25 * x2, by = 0.25 * y1 + 0.5 * my + 0.25 * y2;
+    badge(c, bx, by, String(i + 1), '#8a3b12', 10);
+    label(c, p[0], bx + 14 + c.measureText(p[0]).width / 2, by + 5, { size: 12 });
+  });
+  // ส.ส. ทุกคนลุ้นนายกฯ ได้ — เส้นประข้ามหัวหน้าพรรค
+  const [sx, sy] = [cx(2), stepTop(2) - 4], [ex, ey] = [cx(4) - 30, stepTop(4) - 10];
+  c.save();
+  c.strokeStyle = 'rgba(255,245,215,.85)'; c.setLineDash([4, 6]); c.lineWidth = 2;
+  c.beginPath(); c.moveTo(sx, sy); c.bezierCurveTo(sx, sy - 300, ex - 200, ey - 80, ex, ey); c.stroke();
+  c.restore();
+  label(c, 'ส.ส. ทุกคนลุ้นนายกฯ ได้ · หัวหน้าพรรคได้เปรียบ', cx(3), stepTop(4) - 70, { size: 13, color: '#2e1e10' });
+}
+
+let sel = null;
+let here = load('aethergard-politics-here', '');
+let years = load('aethergard-politics-years', 0);
+let party = load('aethergard-politics-party', '');
+
+function render() {
+  ctx.drawImage(base, 0, 0);
+  const focus = sel || here;
+  if (focus) {
+    ctx.fillStyle = 'rgba(20,15,10,.35)';
+    for (const n of NAMES) if (n !== focus) for (const [x, y] of cells[n]) ctx.fillRect(x - 1, y - 1, STEP, STEP);
+  }
+  paths(ctx, NAMES.indexOf(focus));
+  LADDER.forEach((r, k) => {
+    const [x, y] = at(k);
+    icon(ctx, r.icon, x, y, { gold: k === LADDER.length - 1 });
+    label(ctx, r.short, x, y + 32, { size: 17 });
+    label(ctx, r.term, x, y + 50, { size: 12, color: '#3b2a1a' });
+    badge(ctx, X0 + COL * k + 16, stepTop(k) + 16, String(k + 1), '#3b2a1a', 10);
+  });
+  if (here) {
+    const k = NAMES.indexOf(here);
+    const [x, y] = at(k);
+    pin(ctx, x - 38, y + 6);
+    badge(ctx, x + 50, y - 8, String(years), '#8a3b12', 13);
+    label(ctx, 'ปี', x + 72, y - 3, { size: 12, color: '#2e1e10' });
+    if (party && k >= PARTY_FROM) label(ctx, `พรรค${party}`, x, y + 70, { size: 13, color: '#8a3b12' });
+  }
+}
+
+function info(n) {
+  const el = document.getElementById('info');
+  if (!n) { el.innerHTML = '<span class="muted">คลิกขั้นบนผังเพื่อดูวาระ</span>'; return; }
+  const k = NAMES.indexOf(n), r = LADDER[k];
+  el.innerHTML = `<h2>ขั้น ${k + 1} · ${r.step}</h2>
+    <div>วาระ: <b>${r.term}</b></div>
+    ${r.note ? `<div class="muted" style="margin-top:4px">${r.note}</div>` : ''}
+    <div style="margin-top:4px">${k >= PARTY_FROM ? 'สังกัดพรรค · ค่าพรรคมีผล' : 'ไม่สังกัดพรรค'}</div>`;
+}
+function termInfo() {
+  const el = document.getElementById('term');
+  if (!here) { el.innerHTML = ''; return; }
+  const k = NAMES.indexOf(here);
+  if (k === 0) { el.innerHTML = '<span class="muted">อยู่ถึงอายุ 60 · ไม่มีเลือกตั้งซ้ำ</span>'; return; }
+  const n = Math.floor(years / TERM) + 1;
+  const left = TERM - (years % TERM);
+  let s = `สมัยที่ <span class="big">${n}</span> · อีก ${left} ปีถึง${k === 3 ? 'พรรคโหวตซ้ำ' : 'เลือกตั้ง'}`;
+  if (k === 4) s += years >= PM_CAP ? ' <b>(ครบเพดาน 8 ปี)</b>' : ` · เหลือ ${PM_CAP - years} ปีถึงเพดาน ${PM_CAP}`;
+  el.innerHTML = s;
+}
+function partyRows() {
+  document.getElementById('parties').innerHTML = PARTIES.map(([n, ref, pro, con]) =>
+    `<tr data-p="${n}" class="${n === party ? 'on' : ''}"><td><b>${n}</b>${ref !== '—' ? `<div class="muted">ล้อ ${ref}</div>` : ''}</td><td>+ ${pro}<br>− ${con}</td></tr>`).join('');
+}
+
+const hereEl = document.getElementById('here'), yearsEl = document.getElementById('years'), partyEl = document.getElementById('party');
+for (const r of LADDER) hereEl.add(new Option(r.short, r.short));
+for (const [n] of [...PARTIES, ...SPARE]) partyEl.add(new Option(n, n));
+hereEl.value = here; yearsEl.value = years; partyEl.value = party;
+hereEl.addEventListener('change', () => { here = hereEl.value; save('aethergard-politics-here', here); sel = null; info(here || null); termInfo(); render(); });
+yearsEl.addEventListener('input', () => { years = Math.max(0, Math.floor(Number(yearsEl.value) || 0)); save('aethergard-politics-years', years); termInfo(); render(); });
+const setParty = (p) => { party = p; partyEl.value = p; save('aethergard-politics-party', p); partyRows(); render(); };
+partyEl.addEventListener('change', () => setParty(partyEl.value));
+document.getElementById('parties').addEventListener('click', (e) => {
+  const tr = e.target.closest('tr');
+  if (tr) setParty(tr.dataset.p === party ? '' : tr.dataset.p);
+});
+cv.addEventListener('click', (e) => {
+  const [x, y] = canvasPoint(cv, e);
+  const v = G.at(Math.floor(x / STEP), Math.floor(y / STEP));
+  const hit = v >= 0 ? G.names[v] : null;
+  sel = hit && hit !== sel ? hit : null;
+  info(sel || here || null);
+  render();
+});
+document.getElementById('paths').innerHTML = PATHS.map(([t, d]) => `<li><b>${t}</b> — ${d}</li>`).join('');
+document.getElementById('spare').innerHTML = SPARE.map(([n, ref]) => `${n} <span class="muted">(${ref})</span>`).join(' · ');
+partyRows();
+info(here || null);
+termInfo();
+render();
+</script>
+</body>
+</html>

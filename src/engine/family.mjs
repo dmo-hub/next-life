@@ -496,6 +496,19 @@ export function funeralWho(st, guests) {
   return parts.length ? { text: parts.join(' · '), came: n } : null;
 }
 
+// ผู้รับจดหมายคำฝาก (afterfall-3): คนเดียว ชี้จาก state ล้วนไม่ดึงเลขสุ่ม · สายเลือดก่อน แล้วคนนอกสายเลือดตามลำดับกลุ่ม
+// กลุ่มเดียวกันเอา bond สูงสุด เท่ากัน = id น้อย · LETTER_BOND = ไม่มีเกณฑ์ (เจ้าของเคาะ: ใครยังมีชีวิตก็รับได้) แยกจาก FUNERAL_WHO.come
+export const LETTER_TO = [['child', 'grandchild'], ['peer'], ['spouse']];
+export const LETTER_BOND = 0;
+export function letterTo(st) {
+  for (const roles of LETTER_TO) {
+    const ok = (st.kin ?? []).filter((m) => roles.includes(m.role) && m.alive && (m.bond ?? BOND_START[m.role]) >= LETTER_BOND);
+    if (ok.length) return ok.reduce((a, m) => ((m.bond ?? BOND_START[m.role]) > (a.bond ?? BOND_START[a.role]) || ((m.bond ?? BOND_START[m.role]) === (a.bond ?? BOND_START[a.role]) && m.id < a.id) ? m : a));
+  }
+  return null;
+}
+export const letterToText = (m) => (m.name ? `${WHO_WORD[m.role]} ${m.name}` : WHO_WORD[m.role]);
+
 // รายชื่อให้แผงครอบครัว (B36c) อ่านอย่างเดียว — ช่องที่ไล่ไว้เท่านั้น ไม่มีค่าบัญชีหรือค่าที่อนุมานกรรมได้
 export function familyOf(st) {
   const year = kinYearOf(st);

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="th">
 <head>
+<!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ต้นแบบการ์ด v2 · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
@@ -269,9 +270,21 @@ section.d > p { margin:0 0 16px; color:#3A3F4B; font-size:15px; max-width:760px;
 .ans button:focus-visible { outline:2px solid #F0D78C; outline-offset:2px; }
 .ans small { color:#C9C3B6; }
 footer.pg { font-size:13px; color:#4A4F5C; margin-top:32px; }
+  /*NAV-CSS:START*/
+  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
+  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: #F0D78C; }
+  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+/*NAV-CSS:END*/
 </style>
 </head>
 <body>
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">NEXT LIFE</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="worlds.html">โลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="s-house" viewBox="0 0 76 30"><rect x="0" y="24" width="76" height="6" fill="#B9AE97"/><rect x="8" y="10" width="20" height="14" fill="#8A6A4F"/><rect x="6" y="8" width="24" height="3" fill="#A23B2C"/><rect x="10" y="6" width="16" height="2" fill="#A23B2C"/><rect x="15" y="16" width="5" height="8" fill="#3B2E25"/><rect x="44" y="12" width="4" height="4" fill="#E0B08A"/><rect x="44" y="11" width="4" height="1" fill="#1F2430"/><rect x="43" y="16" width="6" height="5" fill="#2F6B66"/><rect x="44" y="21" width="2" height="3" fill="#1F2430"/><rect x="47" y="21" width="2" height="3" fill="#1F2430"/><rect x="56" y="14" width="10" height="10" fill="#C9C0AA"/><rect x="57" y="15" width="8" height="4" fill="#F4EFE3"/><rect x="60" y="20" width="2" height="4" fill="#1F2430"/><rect x="66" y="4" width="5" height="5" fill="#E9C46A"/></symbol>
@@ -288,7 +301,7 @@ footer.pg { font-size:13px; color:#4A4F5C; margin-top:32px; }
 <header class="pg"><div class="w">
   <h1>ต้นแบบการ์ด v2 · เลือกหน้าตาและธีม</h1>
   <p>ทุกใบในหน้านี้เป็นตัวเลือกให้ตัดสิน ยังไม่ใช่หน้าตาในเกม เกมจะเปลี่ยนตามก็ต่อเมื่อเลือกแล้ว แต่ละชนิดมี 2–3 ทาง ทางที่เขียนว่า “ใช้อยู่” คือหน้าตาตอนนี้ ปุ่มบนการ์ดกดแล้วไม่มีอะไรเกิดขึ้น ข้อความเป็นตัวอย่าง</p>
-  <p>ติ๊ก “เลือกทางนี้” ใต้การ์ดที่ชอบ แล้วคัดลอกสรุปท้ายหน้าส่งกลับมา สิ่งที่ติ๊กไว้จำในเบราว์เซอร์เครื่องนี้ · <a href="catalog.html">การ์ดทั้งหมดในเกม</a> · <a href="archive/cards-v1.html">ต้นแบบรุ่นแรก</a> · <a href="play.html">เล่นเกม</a></p>
+  <p>ติ๊ก “เลือกทางนี้” ใต้การ์ดที่ชอบ แล้วคัดลอกสรุปท้ายหน้าส่งกลับมา สิ่งที่ติ๊กไว้จำในเบราว์เซอร์เครื่องนี้ · <a href="catalog.html">การ์ดทั้งหมดในเกม</a> · <a href="archive/cards-v1.html">ต้นแบบรุ่นแรก</a></p>
 </div></header>
 
 <main><div class="w">

@@ -3,14 +3,17 @@
 //    + การ์ดที่ถูกอ้าง (ผลย้อน schedules · การ์ดต่อ next · การ์ดที่ปลดภาพ) — คำนวณจากเนื้อหาตอนรัน · การ์ดอื่นหาย = เตือนพร้อมชื่อ ไม่ตก
 // ข. ชื่อ key ที่เก็บในเครื่องผู้เล่น (localStorage ใน src/ui/app.mjs) ห้ามหาย — เปลี่ยนชื่อ key = ของใน key นั้นหายทั้งก้อน
 // ค. เซฟภาพถ่ายของเวอร์ชันฐาน โหลดด้วยแกนปัจจุบัน (restore → repairLife แบบหน้าเว็บ) แล้วเล่นต่อจนจบ: พัง 0 · ค่าติดมาไม่ตรง 0 · การ์ดค้างใช้ไม่ได้ 0
+//    เซฟกลางระหว่างชาติ (รวมกลางวงปรโลก) เล่นต่อจนการ์ดส่งต่อแล้วเกิดรุ่นถัดไป · ฐานยังไม่มีเซฟแบบนี้ = สร้างสดจากแกนนี้ตรวจแทน
+//    + เซฟระหว่างชาติก่อนมีวงปรโลก (harness/fixtures/keep-after-old.json) ต้องเล่นแบบเดิมจนเกิด ไม่มีการ์ดวงโผล่
 // ตัวควบคุม (รันทุกครั้ง): ตัด id 1 ตัว → ก ต้องเห็น · ตัดการ์ดที่เซฟค้าง → ค ต้องเห็น stale · เซฟรูปแบบอื่น → restore ต้องพัง
 // --save (ผู้รวมงานรันหลัง bump): เขียนฐานใหม่ทั้งสองไฟล์จากเวอร์ชันนี้ · ไม่มีฐาน = ตก ไม่ใช่ผ่านเงียบ
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
-import { newLife, nextCard, choose, makeRng, mixSeed, TITLES, ALL_PATTERNS, FAMILY_TITLES } from '../src/engine/index.mjs';
+import { newLife, nextCard, choose, makeRng, mixSeed, TITLES, ALL_PATTERNS, FAMILY_TITLES, startAfterlife, nextAfterCard, chooseAfter, nextLife } from '../src/engine/index.mjs';
 import { snapshot, restore, repairLife, SNAP_V } from '../src/engine/save.mjs';
 import { ERA_PICS } from '../src/ui/art.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { effectSites } from '../src/node/lint/util.mjs';
+import { readVersion } from '../src/site/facts.mjs';
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i < 0 ? d : process.argv[i + 1]; };
 const SAVE = process.argv.includes('--save');
@@ -19,12 +22,17 @@ const N = Number(arg('--n', 16));
 const SEED = Number(arg('--seed', 1));
 const IDS_FILE = new URL('./keep-ids.json', import.meta.url);
 const SNAPS_FILE = new URL('./fixtures/keep-snaps.json', import.meta.url);
+const OLD_AFTER_FILE = new URL('./fixtures/keep-after-old.json', import.meta.url);
+// เซฟกลางระหว่างชาติ 1 ใน 4 ของชุด
+const N_AFTER = Math.round(N / 4);
 const SNAPS_MAX_KB = 300;
 const PLAY_MAX = 400;
+// ระหว่างชาติสุ่มกดทางต่างโลกได้ — ชาติต่างโลกเล่นอยู่ในระหว่างชาติ ยาวได้หลายร้อยใบ
+const AFTER_MAX = 3000;
 
 const content = loadContent();
 const app = readFileSync(new URL('../src/ui/app.mjs', import.meta.url), 'utf8');
-const version = app.match(/const APP_VERSION = '([^']+)'/)?.[1] ?? '?';
+const { version } = readVersion();
 
 // การ์ดที่ของอื่นอ้างถึง: ผลย้อน/การ์ดต่อจากตัวเลือก + การ์ดที่ปลดภาพในสมุดภาพ (ช่อง era ของการ์ด · PIC_FOLLOW ของหน้าเว็บ)
 function referencedEvents() {
@@ -60,7 +68,7 @@ const firstOpen = (card) => Math.max(0, (card.choices ?? []).findIndex((_, i) =>
 const kept = (st) => ({ age: st.age, money: Math.round(st.money), flags: Object.keys(st.flags).sort().join(), gen: st.gen ?? 1 });
 function makeSnaps() {
   const out = [];
-  for (let i = 0; out.length < N && i < N * 6; i++) {
+  for (let i = 0; out.length < N - N_AFTER && i < N * 6; i++) {
     const st = newLife(mixSeed(0x6b656570, i), content);
     const stop = 10 + (i * 37) % 60;
     let card = nextCard(st);
@@ -71,6 +79,29 @@ function makeSnaps() {
     if (card.kind === 'death' || st.dead) continue;
     out.push({ snap: snapshot({ st, af: null, card, ui: {} }, content), kept: kept(st), pending: st.pending?.id ?? null });
   }
+  return [...out, ...makeAfterSnaps(N_AFTER)];
+}
+// เซฟกลางระหว่างชาติ: เล่นจนตายด้วยตัวเลือกแรก แล้วหยุดที่การ์ดระหว่างชาติใบที่ 3–22 (ทางเกิดกดตัวแรก = เป็นลูก/เกิดใหม่ ⇒ ถึงวงปรโลก)
+function makeAfterSnaps(n) {
+  const out = [];
+  for (let i = 0; out.length < n && i < n * 6; i++) {
+    const st = newLife(mixSeed(0x61667465, i), content);
+    let card = nextCard(st);
+    for (let k = 0; k < 2000 && card.kind !== 'death'; k++) {
+      if (card.choices?.length) choose(st, firstOpen(card));
+      card = nextCard(st);
+    }
+    if (card.kind !== 'death') continue;
+    const af = startAfterlife(st);
+    const stop = 3 + (i * 7) % 20;
+    card = nextAfterCard(af);
+    for (let k = 0; k < stop && !card.done; k++) {
+      if (card.choices?.length) chooseAfter(af, firstOpen(card));
+      card = nextAfterCard(af);
+    }
+    if (card.done || af.isekai) continue;
+    out.push({ snap: snapshot({ st, af, card, ui: {} }, content), kept: kept(st), pending: af.pending?.id ?? null, after: true, loop: af.loop?.year ?? null });
+  }
   return out;
 }
 // โหลดแบบหน้าเว็บแล้วเล่นต่อจนจบ · rng ของการเล่นต่อจาก --seed (ชุดเซฟเดิม ทางเล่นต่างกัน)
@@ -80,15 +111,33 @@ function replay(s, cont, seed) {
   try { root = restore(s.snap, cont); } catch (e) { r.restoreFail = 1; r.err = String(e).slice(0, 100); return r; }
   const st = root.st;
   let card = root.card;
+  const rng = makeRng(seed);
+  const pickOpen = (c) => {
+    const open = c.choices.map((_, i) => i).filter((i) => !c.locked?.[i]);
+    return open.length ? open[Math.floor(rng.next() * open.length)] : 0;
+  };
+  // ระหว่างชาติ: ทางเดียวกับ snapRead ของหน้าเว็บ (การ์ดที่ค้างหายจากเนื้อหาใหม่ = จั่วใหม่) แล้วเดินจนเกิดรุ่นถัดไป
+  if (root.af) {
+    const af = root.af;
+    if (JSON.stringify(kept(st)) !== JSON.stringify(s.kept)) r.keptBad = 1;
+    r.loopCards = 0;
+    try {
+      if (!af.isekai && card.choices?.length && !af.pending) { r.stale = 1; card = nextAfterCard(af); }
+      for (let k = 0; k < AFTER_MAX && !card.done; k++) {
+        if (card.loop) r.loopCards++;
+        if (card.choices?.length) chooseAfter(af, pickOpen(card));
+        card = nextAfterCard(af);
+      }
+      if (!card.done) throw new Error(`ระหว่างชาติไม่จบใน ${AFTER_MAX} การ์ด`);
+      nextLife(af);
+    } catch (e) { r.playFail = 1; r.err = String(e).slice(0, 100); }
+    return r;
+  }
   if (repairLife(st, card)) { r.stale = 1; card = nextCard(st); }
   if (JSON.stringify(kept(st)) !== JSON.stringify(s.kept)) r.keptBad = 1;
-  const rng = makeRng(seed);
   try {
     for (let k = 0; k < PLAY_MAX && card.kind !== 'death'; k++) {
-      if (card.choices?.length) {
-        const open = card.choices.map((_, i) => i).filter((i) => !card.locked?.[i]);
-        choose(st, open.length ? open[Math.floor(rng.next() * open.length)] : 0);
-      }
+      if (card.choices?.length) choose(st, pickOpen(card));
       card = nextCard(st);
     }
     if (card.kind !== 'death') throw new Error(`ไม่จบใน ${PLAY_MAX} การ์ด`);
@@ -137,6 +186,23 @@ for (const s of snaps) {
 const staleOk = snaps.filter((s) => s.pending && lost.events.includes(s.pending)).length;
 check(`ค. เซฟของ ${snapsVer} (${snaps.length} เซฟ · ${kb.toFixed(0)} KB · เล่นต่อ seed ${SEED}) โหลด+เล่นต่อจนจบ`, sum.restoreFail + sum.keptBad + sum.playFail + Math.max(0, sum.stale - staleOk), ` · restore พัง ${sum.restoreFail} · ค่าไม่ตรง ${sum.keptBad} · เล่นต่อพัง ${sum.playFail} · การ์ดค้างใช้ไม่ได้ ${sum.stale} (ยอมตามการ์ดหาย ${staleOk})${errs.length ? ` · ${errs.join(' | ')}` : ''}`);
 check(`  เซฟฐานไม่เกิน ${SNAPS_MAX_KB} KB`, kb > SNAPS_MAX_KB ? 1 : 0, ` (${kb.toFixed(0)} KB)`);
+
+// เซฟกลางระหว่างชาติของแกนนี้ (สร้างสด): ภาพถ่าย → โหลด → เล่นต่อจนเกิด · ต้องมีเซฟกลางวงปรโลกอย่างน้อย 1
+{
+  const fresh = makeAfterSnaps(N_AFTER);
+  const rs = fresh.map((s, i) => replay(s, content, mixSeed(SEED, 100 + i)));
+  const bad = rs.reduce((n, r) => n + r.restoreFail + r.keptBad + r.playFail + r.stale, 0);
+  const inLoop = fresh.filter((s) => s.loop !== null).length;
+  check(`ค′ เซฟกลางระหว่างชาติของแกนนี้ (${fresh.length} เซฟ · กลางวงปรโลก ${inLoop}) โหลด+เล่นต่อจนเกิด`, bad + (inLoop ? 0 : 1), rs.find((r) => r.err) ? ` · ${rs.find((r) => r.err).err}` : '');
+}
+// เซฟระหว่างชาติก่อนมีวงปรโลก: เล่นแบบเดิมจนเกิด ไม่มีการ์ดวงโผล่ (เซฟเก่ากลางฉาก 6 ขั้น)
+{
+  const ok = existsSync(OLD_AFTER_FILE);
+  const old = ok ? JSON.parse(readFileSync(OLD_AFTER_FILE, 'utf8')) : { snaps: [], version: '?' };
+  const rs = old.snaps.map((s, i) => replay(s, content, mixSeed(SEED, 200 + i)));
+  const bad = rs.reduce((n, r) => n + r.restoreFail + r.keptBad + r.playFail + r.stale + (r.loopCards ? 1 : 0), 0);
+  check(`ค″ เซฟระหว่างชาติก่อนมีวงของ ${old.version} (${old.snaps.length} เซฟ) เล่นแบบเดิมจนเกิด`, bad + (ok && old.snaps.length ? 0 : 1), rs.find((r) => r.err) ? ` · ${rs.find((r) => r.err).err}` : '');
+}
 
 // ตัวควบคุม: ตัววัดต้องเห็นของพังที่ทำขึ้นเอง ไม่งั้นด่านนี้ผ่านเงียบได้
 {

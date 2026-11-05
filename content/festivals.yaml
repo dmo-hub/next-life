@@ -1,0 +1,254 @@
+# การ์ดเทศกาล (fl-5 · ใบ 133): สงกรานต์ · เข้าพรรษา · ลอยกระทง · ปีใหม่ เทศกาลละ 2 ใบ (เด็ก / โต) — เกมนับเป็นปี ไม่มีปฏิทิน การ์ดจึงสุ่มออกเว้นหลายปี
+# บุญบาปตามคติจริงของงานนั้น: รดน้ำดำหัวผู้ใหญ่ = ดูแลบุพการี · ถวายเทียนพรรษา/ขนทรายเข้าวัด = ทาน · งดเหล้าเข้าพรรษา = ศีล · สวดมนต์ข้ามปี = ภาวนา · ดื่มฉลองจนเมา = สุราเมรัย
+# ผลเบาทุกใบ (±1–2) — การ์ดบรรยากาศ ไม่ใช่ทางลัดเปลี่ยนชีวิต · ผู้ใหญ่ในบ้านเรียกรวม ๆ เพราะใบเด็กไม่ผูกว่าพ่อหรือแม่ยังอยู่
+events:
+  - id: fest_songkran_kid_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 3, max: 2}
+    ambient: true
+    when: {age: [6, 12]}
+    title: "สงกรานต์ที่บ้าน"
+    text: "อายุ {อายุ} ขวบ เช้าวันสงกรานต์ผู้ใหญ่ในบ้านผสมน้ำอบไทยใส่ขันไว้รดน้ำดำหัวตายาย เด็กข้างบ้านถือปืนฉีดน้ำมายืนรออยู่หน้าประตูตั้งแต่เจ็ดโมง"
+    choices:
+      - id: elders
+        text: "ถือขันน้ำอบไปรดน้ำขอพรตายาย"
+        effects: {relations: 1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: sand
+        text: "ช่วยยายขนทรายเข้าวัด"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: dana, level: 1}]
+      - id: splash
+        text: "ออกไปสาดน้ำกับเด็กข้างบ้าน"
+        outcomes:
+          - {weight: 3, ok: true, text: "เล่นจนตัวเปื่อย กลับบ้านมาหลับตั้งแต่หัวค่ำ", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลื่นล้มบนพื้นปูนเปียก เข่าถลอกเป็นแผลใหญ่ อดเล่นไปอีกสองวัน", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watch
+        text: "นั่งดูขบวนแห่พระจากบนรั้ว"
+        outcomes:
+          - {weight: 2, ok: true, text: "เห็นขบวนแห่ชัดกว่าใคร คนในขบวนสาดน้ำขึ้นมาให้จนเปียกทั้งตัว", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รั้วโยกตอนคนเบียด หล่นลงมาข้อเท้าแพลง ต้องนั่งดูต่อบนเก้าอี้หน้าบ้าน", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: fest_songkran_adult_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 4, max: 3}
+    ambient: true
+    when: {family: [{role: parent, alive: true}]}
+    title: "วันหยุดยาวสงกรานต์"
+    text: "อายุ {อายุ} ปี สงกรานต์ปีนี้หยุดห้าวัน ตั๋วรถทัวร์กลับบ้านเต็มทุกเที่ยว ที่บ้านโทรมาถามตั้งแต่ต้นเดือนว่าปีนี้จะกลับไหม"
+    choices:
+      - id: home
+        text: "จองรถรอบดึก กลับไปรดน้ำดำหัว"
+        effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: care_parents, level: 1}]
+      - id: send
+        text: "โอนเงินกลับบ้าน แล้วนอนพัก"
+        effects: {health: 1, relations: -1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: party
+        text: "เล่นน้ำกับเพื่อน ตั้งวงจนเช้า"
+        outcomes:
+          - {weight: 2, ok: true, text: "สนุกจนเสียงแหบ เพื่อนในแผนกสนิทกันขึ้นอีกหลายคน", effects: {happiness: 2, network: 1}, merit: [{cat: intoxicants, level: 1}]}
+          - {weight: 1, text: "ขากลับรถเพื่อนเฉี่ยวมอเตอร์ไซค์ ไม่มีใครเจ็บหนักแต่ค่าซ่อมหารกันหลายคน", effects: {happiness: -1, health: -1, money: {unit: income_x, amount: -0.15}}, merit: [{cat: intoxicants, level: 1}]}
+        merit: [{cat: intoxicants, level: 1}]
+      - id: shift
+        text: "รับกะแทนเพื่อน เอาค่าแรงสามแรง"
+        effects: {money: {unit: income_x, amount: 0.05}, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: fest_lent_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 3, max: 2}
+    ambient: true
+    when: {age: [6, 12]}
+    title: "แห่เทียนเข้าพรรษา"
+    text: "อายุ {อายุ} ขวบ วันเข้าพรรษาโรงเรียนพานักเรียนเดินแห่เทียนไปถวายวัดประจำหมู่บ้าน ครูให้แต่ละคนเลือกว่าจะช่วยงานไหน"
+    choices:
+      - id: carve
+        text: "ช่วยครูแกะลายบนต้นเทียน"
+        effects: {knowledge: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: tray
+        text: "ถือพานดอกไม้เดินหน้าขบวน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: drum
+        text: "ตีกลองยาวท้ายขบวน"
+        outcomes:
+          - {weight: 2, ok: true, text: "ตีเข้าจังหวะจนพวกผู้ใหญ่ท้ายขบวนลุกขึ้นรำตาม", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตีเร็วกว่าคนอื่นจนขบวนเดินสะดุด ครูยึดไม้กลองไปถือเอง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: snack
+        text: "แอบไปซื้อน้ำแข็งใสหน้าวัด"
+        outcomes:
+          - {weight: 1, ok: true, text: "กลับเข้าแถวทันก่อนครูนับหัว ได้น้ำแข็งใสมาครึ่งถ้วย", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูนับหัวขาดไปหนึ่ง เดินตามหาจนเจอ เลยโดนให้ถือพานแทนตลอดทาง", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: fest_lent_adult_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 4, max: 3}
+    ambient: true
+    title: "สามเดือนในพรรษา"
+    text: "อายุ {อายุ} ปี เข้าพรรษาปีนี้คนแถวบ้านชวนกันงดเหล้าครบพรรษา ป้าที่วัดเดินมาถามว่าจะร่วมถวายเทียนกับผ้าอาบน้ำฝนไหม"
+    choices:
+      - id: abstain
+        text: "รับปากงดเหล้าให้ครบพรรษา"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "ครบพรรษาจริง นอนหลับดีขึ้น เงินที่เคยหมดไปกับวงเหล้าเหลือเก็บ", effects: {health: 2, happiness: 1}, merit: [{cat: sila, level: 1}]}
+          - {weight: 1, text: "เดือนที่สองมีงานเลี้ยงส่งเพื่อน แก้วแรกยกแล้วก็ตามมาอีกหลายแก้ว", effects: {happiness: -1}, merit: [{cat: intoxicants, level: 1}]}
+        merit: [{cat: sila, level: 1}]
+      - id: offer
+        text: "ร่วมถวายเทียนกับผ้าอาบน้ำฝน"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: dana, level: 1}]
+      - id: alms
+        text: "ตื่นเช้าใส่บาตรหน้าบ้านทุกวันพระ"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: dana, level: 1}]
+      - id: skip
+        text: "ปีนี้งานยุ่ง ไม่ได้ทำอะไรพิเศษ"
+        effects: {}
+        merit: [{cat: neutral}]
+
+  - id: fest_loykrathong_kid_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 3, max: 2}
+    ambient: true
+    when: {age: [6, 12]}
+    title: "กระทงใบตอง"
+    text: "อายุ {อายุ} ขวบ คืนวันเพ็ญเดือนสิบสอง ผู้ใหญ่ในบ้านตัดใบตองมากองไว้หน้าบ้าน ริมคลองมีเด็กโตกว่าลงไปเดินในน้ำตื้นหาเหรียญในกระทงที่ติดตลิ่ง"
+    choices:
+      - id: fold
+        text: "นั่งพับกลีบใบตองกับยาย"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: buy
+        text: "ขอเงินซื้อกระทงขนมปังหน้าวัด"
+        outcomes:
+          - {weight: 2, ok: true, text: "กระทงลอยออกไปกลางคลองไกลกว่าของทุกคน ปลามาตอดขนมปังรอบกระทง", effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขนมปังอุ้มน้ำ กระทงล่มตั้งแต่ยังไม่พ้นท่าน้ำ ยืนมองอยู่นาน", effects: {happiness: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wish
+        text: "ตัดเล็บใส่กระทง อธิษฐานยาว"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: coins
+        text: "ลงไปหาเหรียญในน้ำกับเด็กโต"
+        outcomes:
+          - {weight: 2, ok: true, text: "ได้เหรียญมากำมือหนึ่ง เอาไปซื้อลูกชิ้นทอดแบ่งเพื่อน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เหยียบเศษแก้วใต้น้ำ เท้าเป็นแผล โดนดุไปทั้งคืน", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: fest_loykrathong_adult_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 4, max: 3}
+    ambient: true
+    title: "คืนลอยกระทง"
+    text: "อายุ {อายุ} ปี คืนลอยกระทง ริมน้ำคนแน่นจนเดินไม่ได้ กลุ่มเพื่อนนัดกันตั้งแต่บ่าย คนที่คุยด้วยบ่อย ๆ ช่วงนี้ก็ถามว่าคืนนี้ไปไหน"
+    choices:
+      - id: together
+        text: "ชวนคนที่คุยด้วยไปลอยด้วยกัน"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.4}}, text: "อธิษฐานพร้อมกันหน้ากระทง คุยกันต่อจนรถเมล์เที่ยวสุดท้าย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาตอบว่ามีนัดกับเพื่อนแล้ว คืนนั้นเลยลอยคนเดียว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: friends
+        text: "ไปกับกลุ่มเพื่อน ถ่ายรูปจนดึก"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: sell
+        text: "ตั้งโต๊ะขายกระทงริมทางเดิน"
+        effects: {money: {unit: income_x, amount: 0.05}, health: -1}
+        merit: [{cat: neutral}]
+      - id: clean
+        text: "อาสาเก็บกระทงจากน้ำหลังงาน"
+        effects: {relations: 1, network: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: fest_newyear_kid_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 3, max: 2}
+    ambient: true
+    when: {age: [6, 12]}
+    title: "คืนข้ามปี"
+    text: "อายุ {อายุ} ขวบ คืนสิ้นปีญาติมานั่งล้อมวงหน้าบ้าน ทีวีเปิดรอนับถอยหลัง ยายเตรียมเสื้อขาวจะไปสวดมนต์ข้ามปีที่วัด ถามว่าใครจะไปด้วย"
+    choices:
+      - id: chant
+        text: "ใส่เสื้อขาวตามยายไปสวดมนต์"
+        effects: {relations: 1}
+        merit: [{cat: bhavana, level: 1}]
+      - id: fireworks
+        text: "ขอน้าจุดพลุเล็กหน้าบ้าน"
+        outcomes:
+          - {weight: 2, ok: true, text: "น้าจับมือช่วยจุด ประกายไฟพุ่งขึ้นฟ้าตอนทีวีนับถึงศูนย์พอดี", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประกายไฟกระเด็นโดนหลังมือเป็นแผลพอง ยายทายาสีฟันให้ทั้งคืน", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sleep
+        text: "หลับไปก่อนเที่ยงคืน"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: gifts
+        text: "จับฉลากของขวัญกับพี่น้อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "จับได้กล่องสีไม้ใหม่เอี่ยมที่อยากได้มานาน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "จับได้ผ้าเช็ดหน้าของน้า แต่ของที่ตัวเองห่อไปทำให้น้องยิ้มทั้งคืน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: fest_newyear_adult_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 4, max: 3}
+    ambient: true
+    title: "งานเลี้ยงปีใหม่"
+    text: "อายุ {อายุ} ปี ปลายปีที่ทำงานจัดงานเลี้ยงจับฉลาก กระเช้าของขวัญกองเต็มโต๊ะหน้าห้องหัวหน้า คืนวันที่สามสิบเอ็ดเพื่อนชวนไปนับถอยหลังกลางเมือง"
+    choices:
+      - id: basket
+        text: "ซื้อกระเช้าสวัสดีปีใหม่หัวหน้า"
+        effects: {network: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: temple
+        text: "ไปสวดมนต์ข้ามปีที่วัดใกล้บ้าน"
+        effects: {happiness: 1}
+        merit: [{cat: bhavana, level: 1}]
+      - id: home
+        text: "กินข้าวกับคนที่บ้านแล้วนอนเร็ว"
+        effects: {relations: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: countdown
+        text: "นับถอยหลังกับเพื่อน ดื่มถึงเช้า"
+        effects: {happiness: 2, health: -1, network: 1}
+        merit: [{cat: intoxicants, level: 1}]

@@ -168,8 +168,8 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 3
-    title: "ฤกษ์เปิดร้าน"
-    text: "ร้านใกล้พร้อมเปิดแล้ว ผู้ใหญ่ในบ้านอยากให้รอฤกษ์ที่ดูไว้ อีกเกือบเดือน ค่าเช่าร้านเดินทุกวันแม้ยังไม่เปิด"
+    title: "ฤกษ์เปิดสาขาใหม่"
+    text: "สาขาใหม่ของร้านใกล้พร้อมเปิดแล้ว ผู้ใหญ่ในบ้านอยากให้รอฤกษ์ที่ดูไว้ อีกเกือบเดือน ค่าเช่าที่ใหม่เดินทุกวันแม้ยังไม่เปิด"
     lore_ref: lore-finance-belief.md#B
     when: {flags: {has: [own_business]}, family: [{role: parent, alive: true}]}
     belief: {kind: auspicious_time, tradition: ผสม}

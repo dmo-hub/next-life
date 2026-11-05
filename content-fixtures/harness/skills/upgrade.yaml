@@ -1,0 +1,5 @@
+# จุดออกการ์ดอัปเกรดทดสอบของ 06s — เนื้อจริงยังไม่มีตัวเลือก/ผลที่ใส่ upgrade: true · harness/skills.mjs ใส่ให้ในหน่วยความจำเท่านั้น
+# thai   = หมวดการ์ดชีวิตไทยที่ทาง ok ทุกทางได้ upgrade: true
+# isekai = id เหตุการณ์ต่างโลก (ISEKAI_EVENTS) ที่ทุกตัวเลือกได้ upgrade: true
+thai: [study]
+isekai: [h0, n0, m0, v0, s0]

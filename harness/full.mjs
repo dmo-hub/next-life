@@ -9,10 +9,9 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { parse } from 'yaml';
 import { loadContent } from '../src/node/load.mjs';
-import { effectSites } from '../src/node/lint/util.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 import { playLife, mixSeed, COURT_SCENES } from '../src/engine/index.mjs';
-import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS } from './gates.mjs';
+import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS, heirChain, reachChain, CHAIN_ROOTS } from './gates.mjs';
 
 const args = process.argv.slice(2);
 const has = (name) => args.includes(`--${name}`);
@@ -103,11 +102,22 @@ for (const [flag, bot] of Object.entries(SIDE_REACH)) {
 }
 // การ์ดที่ when.parent_flags.has ออกได้เฉพาะทายาทของรุ่นที่ถือธง — ชีวิตที่นี่เป็นรุ่นเดียว parentFlags ว่างเสมอ ⇒ ถึงไม่ได้โดยโครงสร้าง
 // ด่านว่าใบพวกนี้ออกได้จริงอยู่ที่ npm run lineage · ธงที่มีแต่ใบพวกนี้ตั้งก็ถึงไม่ได้ด้วยเหตุเดียวกัน · ใบที่ผู้อ่านธงพ่อแม่แค่คูณโอกาสยังตัดสินที่นี่
-const HEIR_ONLY = new Set(content.events.filter((e) => e.when?.parent_flags?.has?.length).map((e) => e.id));
-const setters = new Map();
-for (const e of content.events) for (const { node } of effectSites(e)) for (const fl of node.sets_flags ?? []) setters.set(fl, [...(setters.get(fl) ?? []), e.id]);
-const HEIR_FLAGS = new Set([...setters].filter(([, ids]) => ids.every((id) => HEIR_ONLY.has(id))).map(([fl]) => fl));
-console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run lineage): การ์ดที่ต้องมีธงพ่อแม่ ${HEIR_ONLY.size} ใบ · ธงที่มีแต่การ์ดพวกนั้นตั้ง ${HEIR_FLAGS.size} ตัว${HEIR_FLAGS.size ? ` (${[...HEIR_FLAGS].join(' · ')})` : ''}`);
+// ผู้อ่านธงพวกนั้น (when.flags.has · requires.flags.has) ถึงไม่ได้ต่อเป็นโซ่ (heirChain ใน gates.mjs) — af3-heed ตกด่าน 2 ครั้งแรกเพราะข้ามแค่ชั้นแรก
+// FULL_HEIR_CHAIN=off ข้ามแค่ชั้นแรกแบบเดิม (ตัวควบคุม: ผู้อ่านธงทายาทต้องกลับมาตก)
+// ใบที่ when.overlap_stage ขั้นต่ำ ≥ 1 (โลกซ้อนทับ) ก็ถึงไม่ได้แบบเดียวกัน: ค่าซ้อนทับขึ้นแค่ตอนกลับเข้าต่างโลกที่เคยออก ต้องหลายรุ่น · บอทหลักไม่รับชวน
+// โซ่ตาม reachChain (ธง · next · first_of) ด่านว่าถึงได้จริงอยู่ที่ npm run overlap · FULL_OVERLAP_CHAIN=off ไม่ข้ามโซ่นี้เลย (ตัวควบคุม: ทั้งโซ่ต้องกลับมาตก)
+const chainOff = process.env.FULL_HEIR_CHAIN === 'off';
+const overlapOff = process.env.FULL_OVERLAP_CHAIN === 'off';
+const { parent: HEIR_PARENT, events: HEIR_EVENTS, choices: HEIR_CHOICE_SET, flags: HEIR_FLAG_SET, setters } = heirChain(content.events, { chain: !chainOff });
+const OV = overlapOff ? { roots: new Set(), events: new Set(), choices: new Set(), flags: new Set() } : reachChain(content.events, CHAIN_ROOTS.overlap);
+const heirChained = [...HEIR_EVENTS].filter((id) => !HEIR_PARENT.has(id));
+const ovChained = [...OV.events].filter((id) => !OV.roots.has(id));
+const ids = (xs) => (xs.length ? ` (${xs.join(' · ')})` : '');
+console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run lineage): การ์ดที่ต้องมีธงพ่อแม่ ${HEIR_PARENT.size} ใบ · ธงที่มีแต่ของทายาทตั้ง ${HEIR_FLAG_SET.size} ตัว${ids([...HEIR_FLAG_SET])} · ผู้อ่านธงพวกนั้นตามโซ่ การ์ด ${heirChained.length}${ids(heirChained)} · ตัวเลือก ${HEIR_CHOICE_SET.size}${ids([...HEIR_CHOICE_SET])}${chainOff ? ' · ตัวควบคุมปิดโซ่' : ''}`);
+console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run overlap): การ์ดขั้นซ้อนทับ ≥ 1 ${OV.roots.size} ใบ${ids([...OV.roots])} · ตามโซ่ การ์ด ${ovChained.length}${ids(ovChained)} · ตัวเลือก ${OV.choices.size}${ids([...OV.choices])} · ธง ${OV.flags.size}${ids([...OV.flags])}${overlapOff ? ' · ตัวควบคุมไม่ข้ามโซ่นี้' : ''}`);
+const HEIR_ONLY = new Set([...HEIR_EVENTS, ...OV.events]);
+const HEIR_CHOICES = new Set([...HEIR_CHOICE_SET, ...OV.choices]);
+const HEIR_FLAGS = new Set([...HEIR_FLAG_SET, ...OV.flags]);
 // ใบศาล (B153) แกนแทรกเองตอนเฉียดตาย/ถูกเรียกตัว และบอทศาลเลือกแทน — ไม่จั่วจากกองและไม่ผ่านบอทหลัก ⇒ ด่าน 2 ตัดสินไม่ได้
 // ด่านว่าออกครบลำดับและถูกเรียกตัวทุกชีวิตที่ถือธงอยู่ที่ npm run near · ธง cheat_death ข้ามเฉพาะตอนยังไม่มีการ์ดตั้ง (near ตั้งเอง) — มีการ์ดตั้งเมื่อไรกลับมาตัดสินที่นี่
 const COURT_ONLY = new Set(content.events.filter((e) => COURT_SCENES.includes(e.scene)).map((e) => e.id));
@@ -118,13 +128,14 @@ console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ np
 // ตัวเลือกมูใส่เฉพาะ bel_amulet_center#rent_stall — ถอดแล้วด่าน 2 ตกที่ seed2 611300284 · อีก 3 ตัวถอดแล้วยังถึงทุก seed ที่ลอง จึงไม่ใส่ · id ที่ไม่มีในเนื้อหาแล้ว = ตก (กันรายการเน่า)
 // ร้านอาหาร/แฟรนไชส์ (open_restaurant · copy_own_brand): บอทหลักกด ~1–7 ครั้งต่อ 51,000 ชีวิต ⇒ ด่าน 2 (24,000) ตก/ผ่านตามดวง seed สุ่ม
 // gate-reach บังคับโฟกัสธุรกิจ 1,000 ชีวิต กด 48 · 34 · ไม่โฟกัส 0 · ถอดแล้วด่าน 2 ตกที่ seed2 595696240 · 611300284
-// hire_chef · buy_franchise ถอดแล้วยังถึงทุก seed2 ที่ลอง จึงไม่ใส่
+// hire_chef · open_restaurant_rite: ลางภัยยุคกินโควตากองสุ่ม การ์ดร้านขึ้นน้อยลง ~5% · 6 บอท × 4,000 × seed 1–3 (72,000 ชีวิต) กด 1 · 8 (ก่อนมีลาง 2 · 12) ⇒ ตกที่ seed2 802194961 ตามดวงเหมือน open_restaurant
+// buy_franchise (gate business): 6 บอท × 2,000 × seed 1–5 + 623506564 (72,000 ชีวิต) กด 4 · หลังมีการ์ดเทศกาลกินช่องกอง การ์ดขึ้นน้อยลง ~6% กด 1 ⇒ ตกที่ seed2 623506564 ตามดวง · gate-reach บังคับโฟกัสธุรกิจ 1,000 ชีวิต การ์ดออก 161 · กดได้ 161 · กด 44 · ไม่โฟกัส 0
 // career_poach_cornered_01#3 (ลาออกเปิดกิจการ · gate business): กด 1–3 ครั้งต่อ 51,000 ชีวิต · บังคับโฟกัสธุรกิจถึงได้ ไม่โฟกัส 0
 // ด่าน 2 รวม seed 1 ตายตัวทุกรอบ ⇒ ผ่าน/ตกขึ้นกับว่าชีวิต seed 1 ชุดนั้นมีคนกดหรือไม่ ไม่ใช่ seed สุ่ม
 // FULL_FOCUS_DROP=<id> ถอดออกจากรายการชั่วคราว (ตัวควบคุม: ถอดแล้วด่าน 2 ต้องตก)
 const FOCUS_ONLY_WHY = 'ต้องโฟกัสธุรกิจ/มูครบ 3 ปี · พิสูจน์ใน biz-reach 18/18 + gate-reach มู > 0';
 const FOCUS_ONLY_EVENTS = ['biz_grocery_rival_01', 'biz_credit_book_01', 'era_econ_gfc_cafe_01', 'mid_risky_chase_01', 'career_dream_crossroad_01', 'young_shop_rush_01'];
-const FOCUS_ONLY_CHOICES = ['biz_grocery_01#open_grocery', 'biz_grocery_01#credit_book', 'debt_guarantor_ask_01#joint_shop', 'era_econ_gfc_adult_01#0', 'era_econ_oil2_farm_01#3', 'mid_crisis_01#quit_dream', 'mid_risky_bet_01#all_in', 'career_dream_01#quit_for_dream', 'young_shop_01#cafe', 'young_shop_01#chicken_rice', 'young_shop_01#partner', 'young_shop_01#chicken_rice_rite', 'bel_amulet_center#rent_stall', 'biz_restaurant_01#open_restaurant', 'biz_franchise_01#copy_own_brand', 'career_poach_cornered_01#3'];
+const FOCUS_ONLY_CHOICES = ['biz_grocery_01#open_grocery', 'biz_grocery_01#credit_book', 'debt_guarantor_ask_01#joint_shop', 'era_econ_gfc_adult_01#0', 'era_econ_oil2_farm_01#3', 'mid_crisis_01#quit_dream', 'mid_risky_bet_01#all_in', 'career_dream_01#quit_for_dream', 'young_shop_01#cafe', 'young_shop_01#chicken_rice', 'young_shop_01#partner', 'young_shop_01#chicken_rice_rite', 'bel_amulet_center#rent_stall', 'biz_restaurant_01#open_restaurant', 'biz_restaurant_01#hire_chef', 'biz_restaurant_01#open_restaurant_rite','biz_franchise_01#copy_own_brand', 'biz_franchise_01#buy_franchise', 'career_poach_cornered_01#3'];
 const focusDrop = process.env.FULL_FOCUS_DROP;
 const FOCUS_ONLY = new Set([...FOCUS_ONLY_EVENTS, ...FOCUS_ONLY_CHOICES].filter((id) => id !== focusDrop));
 const choiceIds = new Set(content.events.flatMap((e) => (e.choices ?? []).map((c, i) => `${e.id}#${c.id ?? i}`)));
@@ -134,6 +145,11 @@ if (focusRotten.length) {
   console.log(`  ✗ รายการยกเว้นอ้าง id ที่ไม่มีในเนื้อหาแล้ว: ${focusRotten.join(' · ')}`);
   fails.push('ด่าน 2 รายการยกเว้นโฟกัส');
 }
+// ลางภัยยุคมีเพดานต่อชีวิต (herald-cap) ⇒ คนที่ถึงวัยชราตอนภัยมาเคยผ่านภัยอื่นช่วงผู้ใหญ่แล้ว ลางถูกใช้ไปก่อนเสมอ
+// ธงเตรียม (braced:) จึงแทบไม่มีตอนใบรับมือวัยชราขึ้น · วัดต้นไม้ไม่มีเพดาน 3,000 ชีวิต: gfc/oil2/tyk_old ถือธง 95/4/3 กด 17/3/0 · มีเพดาน ถือธง 1/0/0 กด 0
+// ตัวเลือกยังทำงาน (ไม่มีเพดานกดได้) — ตายเพราะเพดานลางที่เจ้าของเคาะ ไม่ใช่เนื้อหาเสีย · คิดจากข้อมูล ใบรับมือช่วงชราใบใหม่เข้ารายการเอง
+const HERALD_OLD = new Set(content.events.filter((e) => e.era && e.stage === 'ชรา').flatMap((e) => (e.choices ?? []).filter((c) => c.id === 'use_braced').map((c) => `${e.id}#${c.id}`)));
+console.log(`ข้ามที่ด่าน 2 (เพดานลางภัยยุคต่อชีวิต: วัยชราใช้ลางไปกับภัยช่วงผู้ใหญ่แล้ว): ตัวเลือก ${HERALD_OLD.size} — ${[...HERALD_OLD].join(' · ')}`);
 // ฐานเทียบรอบก่อนคิดจาก seed ตายตัวเท่านั้น — รวม seed สุ่มแล้วตัวที่รอดเพราะ seed สุ่มจะกลายเป็น "ตายใหม่" ในรอบหน้า
 function deadOf(runs) {
   const fired = new Map(), picks = new Set(), flags = new Set();
@@ -148,7 +164,7 @@ function deadOf(runs) {
   return {
     fired,
     events: content.events.filter((e) => !fired.has(e.id) && !HEIR_ONLY.has(e.id) && !COURT_ONLY.has(e.id) && !FOCUS_ONLY.has(e.id)).map((e) => e.id),
-    choices: dead.filter((id) => !FOCUS_ONLY.has(id)),
+    choices: dead.filter((id) => !FOCUS_ONLY.has(id) && !HEIR_CHOICES.has(id) && !HERALD_OLD.has(id)),
     thinChoices: thin,
     flags: FLAGS.filter((x) => !flags.has(x) && !sideFlags.has(x) && !HEIR_FLAGS.has(x) && !COURT_FLAGS.has(x)),
   };
@@ -229,7 +245,8 @@ for (const s of STAGES) {
 }
 console.log(`ช่องบาง ${thin.length} ช่อง — ชุดเนื้อหาถัดไปเริ่มจากช่องเหล่านี้`);
 
-// เป้า 5–8 ใบต่อชีวิต (MAP) นับการ์ดแนว B ในช่วงมีชีวิต ไม่นับระหว่างชาติ · หวยสายมูนับรวม
+// เป้า 5–8 ใบต่อชีวิต (MAP) นับการ์ดแนว B + ลางบัญชี + ลางภัยยุค ในช่วงมีชีวิต ไม่นับระหว่างชาติ · หวยสายมูนับรวม
+// "แบบเดิม" = แนว B อย่างเดียว เป็นตัวควบคุมของตัวนับ: sha เดียวกันต้องเท่าค่าเฉลี่ยรอบก่อนทุกหลัก
 // เกินครึ่งของเป้าขั้นต่ำ = ยกให้เจ้าของเคาะ — เกณฑ์คงที่ ไม่ลอยตามจำนวนแฟนตาซีที่เนื้อหามีตอนนั้น
 const FANTASY = [5, 8];
 const NUMEN_WARN = FANTASY[0] / 2;
@@ -245,7 +262,9 @@ for (const b of Object.keys(BOTS)) {
   const warn = mean < FANTASY[0] || mean > FANTASY[1] ? ' ⚠ นอกเป้า' : '';
   const numen = r.numen / n;
   const half = numen > NUMEN_WARN ? ` ⚠ หวยสายมูเกิน ${NUMEN_WARN} ใบ ยกให้เจ้าของเคาะ` : '';
-  console.log(`  ${b.padEnd(10)} เฉลี่ย ${f(mean)} ใบ · ในเป้า ${f((inBand / n) * 100, 1)}% ของชีวิต · หวยสายมู ${f(numen)} ใบ${warn}${half}`);
+  const p = r.fantasyParts;
+  const parts = ` · แยก: B (= เฉลี่ยแบบเดิม) ${f(p.b / n)} · ลางบัญชี ${f(p.omen / n)} · ลางภัยยุค ${f(p.herald / n)}`;
+  console.log(`  ${b.padEnd(10)} เฉลี่ย ${f(mean)} ใบ · ในเป้า ${f((inBand / n) * 100, 1)}% ของชีวิต · หวยสายมู ${f(numen)} ใบ${warn}${half}${parts}`);
 }
 
 // ---- จังหวะบังคับ: เทียบรอบก่อน (seed ตายตัวเท่านั้น — seed สุ่มเปลี่ยนทุกรอบ) ----
