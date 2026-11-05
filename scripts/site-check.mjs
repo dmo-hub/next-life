@@ -27,7 +27,6 @@ import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injec
 import { CARD_ART_PAGE, cardArtData, cardArtBlock, CAT_ART } from '../src/site/card-art-tweak.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
 import { PLAY_FILES, playAssets, playScripts, swJs } from '../src/site/play-files.mjs';
-import { HOME_HEAD_PAGE, homeHead, homeHeadBlock } from '../src/site/home-head.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -340,14 +339,6 @@ const liveCss = toLf(gameCss(readFileSync(new URL('../src/ui/template.html', imp
 const cssMiss = GAME_CSS_PAGES.filter((f) => gameCssBlock(read(f)) !== liveCss);
 const cssCtl = gameCssBlock(read(GAME_CSS_PAGES[0])) !== `${liveCss} `;
 check('หน้า tweak ใช้ CSS เกมชุดปัจจุบัน', cssMiss.length || !cssCtl, ` ${GAME_CSS_PAGES.length} หน้า${cssMiss.length ? ` · เก่า ${cssMiss.join(' ')}` : ''} · ตัวควบคุม${cssCtl ? 'จับได้' : 'จับไม่ได้'}`);
-
-// 7c3b) หน้า tweak T3 (ui-redo 104): บล็อกในหน้า = CSS + เนื้อของหน้าแรกตอนนี้ — แก้หน้าแรกแล้วลืม build = preset 0 ไม่ใช่หน้าแรกจริง · ตัวอย่างไม่มีสคริปต์และคำต่างโลก
-// ตัวควบคุม: หน้าแรกที่ต่างไป 1 ตัวอักษรต้องไม่ผ่าน
-const hhLive = homeHead(read('index.html'));
-const hhIn = homeHeadBlock(read(HOME_HEAD_PAGE));
-const hhMiss = [hhIn.css !== hhLive.css && 'CSS', hhIn.body !== hhLive.body && 'เนื้อ', /<script|ต่างโลก/.test(hhIn.body ?? '') && 'มีสคริปต์/คำต่างโลก', !(hhIn.body ?? '').includes('class="play big"') && 'ไม่มีปุ่มเริ่ม'].filter(Boolean);
-const hhCtl = homeHead(read('index.html').replace('</h1>', ' </h1>')).body !== hhIn.body;
-check('หน้า tweak T3 ใช้หน้าแรกชุดปัจจุบัน', hhMiss.length || !hhCtl, `${hhMiss.length ? ` เก่า/ผิด: ${hhMiss.join(' ')} ·` : ''} ตัวควบคุม${hhCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7c4) หน้า tweak เว็บเอกสาร (ui-redo 32): รายการในหน้า = ขอบเขตที่คิดจาก docs/ ตอนนี้ + :root หน้าเล่นตอนนี้ · ไม่มีหน้านอกขอบเขต (ตัวเกม คลังเก่า หน้า tweak หน้าส่งต่อ) · ทุกหน้ามีไฟล์จริง
 // ตัวควบคุม: ถอดหน้า 1 หน้าจากบล็อก ⇒ ต้องไม่ตรง · ขอบเขตที่คิดได้ต้องมีครบชุดหลักที่ใบงานระบุ

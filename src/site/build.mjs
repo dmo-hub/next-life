@@ -16,13 +16,11 @@ import { injectSeo, sitemapXml, faviconSvg, SITEMAP, FAVICON_SVG } from './seo.m
 import { ART_INK } from '../ui/art.mjs';
 import { DOCS_TWEAK_PAGE, docsTweakData, injectDocsTweak } from './docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, injectCardArt } from './card-art-tweak.mjs';
-import { HOME_HEAD_PAGE, injectHomeHead } from './home-head.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
 // หน้าเขียนมือที่ไม่มีตัวเลขจาก data แต่ต้องมีแถบบนชุดเดียวกัน — ไฟล์อยู่ใต้ docs/
-// หน้า tweak T2 (ui-redo 103) ใช้แถบตัวจริงเป็นตัวอย่าง — marker อยู่ใน <template> ของหน้า ไม่ขึ้นเป็นแถบของหน้าเอง
-export const NAV_PAGES = ['whatsnew.html', 'spec/lore-finance-series.html', 'dev/tweak/t2-header-tweak.html'];
+export const NAV_PAGES = ['whatsnew.html', 'spec/lore-finance-series.html'];
 // หน้าที่ build สร้างทั้งหน้าจากแม่แบบ src/site/<ชื่อ>.html — หน้าเฉลย (B88) แยกจากหน้ารวมการ์ดเพราะหน้ารวมการ์ดห้ามเผยผล/บุญบาป
 export const GEN_PAGES = [
   // เดโมการ์ดเล่นได้ (B121) อยู่หน้ารวมการ์ด ไม่ใช่หน้าแรก
@@ -93,9 +91,6 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     const next = injectNav(file === 'whatsnew.html' ? injectRoadmap(soonIds(html), soonCats(html), 'docs/whatsnew.html') : html, file);
     put(at(`docs/${file}`), next, html);
   }
-  // หน้า tweak T3 (ui-redo 104) อ่านหน้าแรกที่เพิ่งฉีดเลข + แถบบนข้างบน
-  const hh = readFileSync(at(`docs/${HOME_HEAD_PAGE}`), 'utf8');
-  put(at(`docs/${HOME_HEAD_PAGE}`), injectHomeHead(hh, readFileSync(at('docs/index.html'), 'utf8'), `docs/${HOME_HEAD_PAGE}`), hh);
   // หน้า tweak เว็บเอกสาร (ui-redo 32): รายการหน้าคิดหลังทุกหน้าข้างบนเขียนเสร็จ ⇒ หน้าที่เพิ่ง build ใหม่อยู่ในรายการด้วย
   const dt = readFileSync(at(`docs/${DOCS_TWEAK_PAGE}`), 'utf8');
   const dtNext = injectDocsTweak(dt, docsTweakData(at('docs/'), readFileSync(at('src/ui/template.html'), 'utf8')), `docs/${DOCS_TWEAK_PAGE}`);

@@ -7,8 +7,8 @@ export const T1 = {
 };
 // ตัวหนังสือรองบนพื้นคราม (ค่าจากหน้า tweak T2/T3 ที่เคาะ) · ห้องผู้พัฒนาใช้ตัวเดียวกัน
 const ON_HEAD = { 'on-head': '#E7E2D4', 'on-head2': '#D8D2C2', 'on-head3': '#BFB49A', title: '#F4ECDC' };
-// กล่องมืดในหน้าเอกสาร (ปรโลก/ระหว่างชาติ) = พื้นดำรักชุดเดียวกับการ์ด B ในเกม (ข้อ 222)
-const LACQUER = { lacquer: '#17110D', lacquer2: 'color-mix(in srgb, #17110D 88%, #E8CF8A)', bronze: 'color-mix(in srgb, #D9B45A 35%, #17110D)' };
+// กล่องมืดในหน้าเอกสาร (ปรโลก/ระหว่างชาติ) = ดำรักชุดเดิมของการ์ด B ในเกม — สีโลกอื่นคงเดิมจนใบ 121 (ข้อ 228)
+const LACQUER = { lacquer: '#17110D', lacquer2: '#221912', bronze: '#5A4630' };
 
 // --fh/--fb = หัว Maitree เนื้อ Sarabun (ข้อ 210 216) · --r มุมปุ่ม/ช่อง · --rk มุมการ์ด · หน้าเอกสารไม่มีเงา (ข้อ 217)
 export const SITE_ROOT = `:root { ${Object.entries({ ...T1, ...ON_HEAD, ...LACQUER }).map(([k, v]) => `--${k}:${v};`).join(' ')} --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }`;
