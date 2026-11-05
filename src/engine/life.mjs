@@ -272,6 +272,8 @@ export function newLife(seed, content, heir = null) {
     taboos: heir?.taboos ?? {},
     // สกิลที่พกมาจากคลัง [{ id, lv }] (06s) ใช้ทั้งชีวิตนี้และชาติต่างโลกที่ตามมา · ไม่พก = ไม่มีช่อง (state เท่าก่อนมีสกิลข้ามชาติ)
     ...(heir?.skills?.length && { skills: heir.skills }),
+    // ค่าที่ได้จากช่องพกที่ไม่ใช้ (ใบ 201) — การ์ดเกิดบอกเป็นคำ · เซฟเก่าไม่มี = ไม่มีบรรทัด
+    ...(heir?.spare && { spare: heir.spare }),
     scheduled: [],
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
@@ -1271,6 +1273,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
   if (ev.id === FUNERAL.rite) st.funeralPick ??= pickRite(st, ev);
+  if (ev.arc) arcFired(st, ev);
   return emit(st, {
     kind: 'event',
     id: ev.id,
@@ -1281,6 +1284,8 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     ...(news && { news }),
     // ผลย้อน: อายุตอนเลือกตัวเลือกที่นัดการ์ดนี้ไว้
     ...(echoFrom !== undefined && { echoFrom }),
+    // สายเรื่องรายคน: ตอนที่เท่าไร ห่างตอนก่อนกี่ปี — ป้ายบนการ์ด · harness นับระยะจากช่องนี้
+    ...(ev.arc && { arc: { key: ev.arc, n: st.arcs[ev.arc].n, ...(st.arcs[ev.arc].gap && { gap: st.arcs[ev.arc].gap }) } }),
     ...parentFrom(st, ev),
     funeral: ev.id === FUNERAL.wishes || ev.id === FUNERAL.rite,
     age: st.age,
@@ -1563,6 +1568,7 @@ function drawCard(st) {
     }
     // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
     const year = st.birthYear + st.age;
+    arcDefer(st);
     let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
     // ผลย้อนที่นัดไว้ปีนี้กินโควตาแบบเรื่องต่อ — หลักไมล์ที่ออกจาก dueAt เหมือนกันไม่หัก
     if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age)) takeYearQuota(st);
@@ -1612,11 +1618,42 @@ export function takeYearQuota(st) {
   st.poolOwed = (st.poolOwed ?? 0) + 1;
 }
 
+// สายเรื่องรายคน (krung-1): การ์ดที่มี arc เดินใต้โควตาปีเดิม ไม่ใช่ตัวคุมแยก — ใบกองสุ่มเป็นใบกองอยู่แล้ว ใบนัด/เรื่องต่อหักโควตาตามเดิม ชีวิตจึงไม่ยาวขึ้น
+// ตอนใหม่ของสายใดก็ตามห่างตอนล่าสุดของทุกสาย ≥ gap ปี (ปีละไม่เกินตอนเดียวมาด้วย) · คนเดิม (สายเดียวกัน) ห่าง ≥ same ปี
+// คูลดาวน์รายคนข้อนี้คือ reigns-2 ของการ์ดคนมีชื่อ · ใบกองทั่วไปใช้ repeat.gap เดิม · เนื้อหาไม่มี arc = ไม่แตะเลขสุ่ม/สถานะเลย
+export const ARC = { gap: 2, same: 4 };
+const arcLast = (st) => Math.max(-Infinity, ...Object.values(st.arcs ?? {}).map((a) => a.age));
+export const arcFrom = (st, key) => Math.max(arcLast(st) + ARC.gap, (st.arcs?.[key]?.age ?? -Infinity) + ARC.same);
+// กองสุ่มไม่หยิบสายที่ปิดแล้ว · นัด/เรื่องต่อที่ผู้เขียนผูกไว้ยังออกได้หลังปิด (เล่าผลที่ตามมา)
+const arcPoolOk = (st, e) => !e.arc || (!st.arcs?.[e.arc]?.end && st.age >= arcFrom(st, e.arc));
+// เรื่องต่อของสายเดียวกันปีเดียวกัน = ตอนเดียวกัน ไม่ติดระยะเว้น
+const arcNextOk = (st, ev, follow) => !follow.arc || (follow.arc === ev.arc && st.arcs?.[ev.arc]?.age === st.age) || st.age >= arcFrom(st, follow.arc);
+
+// นัดของสายที่ตรงปีเว้นเลื่อนไปปีแรกที่ออกได้ ไม่ถูกกรองทิ้งเงียบ — อายุที่เลือก (from) ติดไปด้วย ป้ายผลย้อนจึงยังบอกที่มาถูก
+function arcDefer(st) {
+  if (!st.scheduled.length) return;
+  const ix = lifeEventIndex(st.content.events);
+  for (const x of st.scheduled) {
+    const e = x.age === st.age && ix.pos.has(x.event) && st.content.events[ix.pos.get(x.event)];
+    if (e?.arc && !st.done[e.id]) x.age = Math.max(x.age, arcFrom(st, e.arc));
+  }
+}
+
+// จดตอนตอนการ์ดออก (eventCard จุดเดียว ทุกทางเข้า) · ช่องใส่เมื่อมีค่า
+function arcFired(st, ev) {
+  const a = st.arcs?.[ev.arc];
+  if (a?.age === st.age) return;
+  (st.arcs ??= {})[ev.arc] = { n: (a?.n ?? 0) + 1, age: st.age, ...(a && { gap: st.age - a.age }), ...(a?.end && { end: true }) };
+}
+
+// หน้าจบ: ทุกสายที่เปิดในชีวิตนี้ · ชื่อจากทะเบียน content.arcs
+export const arcSummary = (st) => Object.entries(st.arcs ?? {}).map(([key, a]) => ({ key, name: st.content.arcs?.[key]?.name ?? key, n: a.n, end: !!a.end }));
+
 // กองสุ่ม (B14): เหตุการณ์ไม่มี at_age แต่มี weight · ใบเดิมไม่ซ้ำในชีวิต เว้นแต่ตั้ง repeat · ไม่มีใบที่เกิดได้ = ไม่ดึงเลขสุ่ม
 // ชีวิตที่เนื้อหาไม่มีกองจึงได้ชะตาเดิมทุกหลัก
 function drawPool(st, year) {
   const stage = stageOf(st.age);
-  const pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
+  const pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e));
   // รอบที่กองแห้งนับแยกช่วงวัย — harness/pace.mjs อ่านเป็นรายการกองที่ต้องเติม (ไม่ออกไปกับการ์ด)
   if (!pool.length) (st.poolDry ??= {})[stage] = (st.poolDry[stage] ?? 0) + 1;
   if (!pool.length || st.rng.next() >= POOL_CHANCE[stage]) return null;
@@ -1898,7 +1935,18 @@ function applyChoice(st, ev, c, text) {
   for (const f of c.sets_flags ?? []) raiseFlag(st, f);
   for (const f of c.clears_flags ?? []) delete st.flags[f];
   applyFamily(st, c, ev.category === 'family' && c.effects?.relations > 0 ? c.effects.relations : 0);
-  for (const s of c.schedules ?? []) st.scheduled.push({ event: s.event, age: st.age + st.rng.int(s.after_years[0], s.after_years[1]), from: st.age, pick: text });
+  for (const s of c.schedules ?? []) {
+    const age = st.age + st.rng.int(s.after_years[0], s.after_years[1]);
+    // ผลย้อนมีโอกาส (gameslash-2): ไม่ใส่ chance หรือ chance 1 = ไม่สุ่มเพิ่ม เลขสุ่มของชีวิตเดิมไม่ขยับ
+    // ไม่ผ่าน = ไม่นัด แต่จดใน echoes ช่องเดียวกับคู่เหตุและผล (missed) — หน้าจบ/สมุดเล่าได้ว่ารอดผลย้อนมา
+    const chance = s.chance;
+    if (chance < 1 && st.rng.next() >= chance) {
+      const target = st.content.events.find((e) => e.id === s.event);
+      (st.echoes ??= []).push({ from: st.age, age, pick: text, title: target?.title ? fill(target.title, st) : null, missed: true });
+    } else st.scheduled.push({ event: s.event, age, from: st.age, pick: text });
+  }
+  // ปิดสายเรื่องรายคน: หน้าจบบอกว่าจบแล้ว · กองสุ่มเลิกหยิบตอนใหม่ของสายนี้
+  if (c.arc_end && ev.arc) st.arcs[ev.arc].end = true;
 }
 
 // แรงที่เราดูแลพ่อแม่ (B167): บุญดูแลพ่อแม่บวก บาปทำร้ายผู้ใหญ่ลบ ตามระดับของป้าย — ป้ายหมวดอื่นบนตัวเลือกเดียวกันไม่นับ
@@ -2045,7 +2093,7 @@ export function choose(st, idx, loan) {
     if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') + (gotO ? ` · ${gotO}` : ''), tag: fxTag(o.effects, [...(ev.hidden ?? []), ...(c.hidden ?? [])]), evId: ev.id });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
-    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow)) {
+    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow) && arcNextOk(st, ev, follow)) {
       st.done[follow.id] = true;
       st.fired[follow.id] = { n: (st.fired[follow.id]?.n ?? 0) + 1, age: st.age };
       beliefFired(st, follow);

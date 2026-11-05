@@ -1,5 +1,5 @@
 {
- "version": "v0.6.70",
+ "version": "v0.6.76",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -750,7 +750,6 @@
  "storage": [
   "next-life-book-v1",
   "next-life-deaths-v1",
-  "next-life-isekai-speed-v1",
   "next-life-memorial-seen-v1",
   "next-life-memorial-v1",
   "next-life-notes-seen-v1",
