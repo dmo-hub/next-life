@@ -4,67 +4,98 @@
 <!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ปรับป้ายผลบนปุ่มเป็นไอคอน (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<title>T1 ช่วงคั่น: สีโลกอื่นก่อน T11 (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="robots" content="noindex">
+<link rel="stylesheet" href="../../fonts/fonts.css">
 <style>
-  /* หน้า tweak ป้ายผลบนปุ่ม (ui-redo 52) — การ์ดอยู่ใน iframe ที่ใช้ CSS ตัวเกมจริงจาก template.html (build เติมใน <template id="gcss">) · หน้านี้คุมแค่แผงปรับค่า */
-  body { margin: 0; background: #E6E0D3; color: #1F2430; font: 15px/1.55 Sarabun, "Noto Sans Thai", system-ui, sans-serif; }
-  .lay { display: grid; grid-template-columns: 340px minmax(0, 1fr); align-items: start; }
+  /* หน้า tweak ช่วงคั่น (ui-redo 129 · ข้อ 213–217): ใบ 105 ลงชุด T1 แล้วทำอะไรกับการ์ด B · ต่างโลก · ปรโลก · ภาพแชร์ ก่อนธีมโลก T11 (ใบ 120/121)
+     จอเกมอยู่ใน iframe ที่ใช้ CSS เกมจริงจาก template.html (build เติมใน <template id="gcss">) · ชุด 0 = ไม่ทับอะไร = เกมตอนนี้ */
+  body { margin: 0; background: #E6E0D3; color: #1F2430; font: 15px/1.55 Sarabun, system-ui, sans-serif; }
+  .lay { display: grid; grid-template-columns: 360px minmax(0, 1fr); align-items: start; }
   .ctl { position: sticky; top: 0; height: 100vh; overflow-y: auto; background: #F3EEE2; border-right: 1px solid #D8D0C0; padding: 14px 14px 40px; box-sizing: border-box; }
   .ctl h1 { margin: 0 0 4px; font-size: 19px; line-height: 1.3; }
-  .ctl .hint { margin: 0 0 10px; font-size: 13px; color: #5A5F6B; }
+  .ctl .hint { margin: 6px 0 10px; font-size: 13px; color: #5A5F6B; }
   .ctl h2 { margin: 18px 0 6px; font-size: 15px; padding-top: 10px; border-top: 1px solid #D8D0C0; }
   .row { margin: 8px 0 10px; }
   .row > .lb { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .tok { display: grid; grid-template-columns: 34px 78px minmax(0, 1fr); gap: 6px; align-items: center; margin: 4px 0; font-size: 12px; }
+  .tok input[type=color] { width: 34px; height: 28px; padding: 0; border: 1px solid #C9BFA9; background: #fff; cursor: pointer; }
+  .tok input[type=text] { font: 12px ui-monospace, monospace; width: 100%; box-sizing: border-box; padding: 4px; border: 1px solid #C9BFA9; border-radius: 4px; }
+  .tok input[type=text].err { border-color: #B3261E; }
+  .tok input:disabled { opacity: .5; cursor: not-allowed; }
+  .tok span b { font-family: ui-monospace, monospace; font-weight: 600; }
+  .ed { color: #7A5A12; font-weight: 600; }
   .seg { display: flex; flex-wrap: wrap; gap: 4px; }
-  .seg button, .btns button { font: inherit; font-size: 13px; padding: 4px 9px; border: 1px solid #C9BFA9; background: #fff; color: #1F2430; cursor: pointer; border-radius: 4px; }
+  .seg button, .btns button { font: inherit; font-size: 13px; padding: 4px 9px; border: 1px solid #C9BFA9; background: #fff; color: #1F2430; cursor: pointer; border-radius: 4px; min-height: 32px; text-align: left; }
   .seg button.on { background: #1F2430; color: #fff; border-color: #1F2430; }
+  .seg button:disabled { opacity: .5; cursor: not-allowed; }
+  .seg.col { flex-direction: column; }
   .btns { display: flex; flex-wrap: wrap; gap: 6px; }
   .btns .pri { background: #2563eb; color: #fff; border-color: #2563eb; }
-  .btns .pre { font-weight: 600; }
-  .btns .pre.on { background: #A23B2C; color: #fff; border-color: #A23B2C; }
-  input[type=text] { font: inherit; font-size: 13px; padding: 3px 6px; width: 100%; box-sizing: border-box; }
-  .icons { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 8px; align-items: center; font-size: 13px; }
-  .icons input { width: 100%; }
-  .cols { display: flex; gap: 10px; flex-wrap: wrap; font-size: 13px; }
-  .cols label { display: flex; gap: 4px; align-items: center; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid #2563eb; outline-offset: 1px; }
   textarea { font: inherit; font-size: 13px; width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #C9BFA9; border-radius: 4px; resize: vertical; background: #fff; }
+  #out { font: 11px/1.4 ui-monospace, monospace; }
   #msg { font-size: 13px; color: #15803d; min-height: 1.4em; }
+  table.cr { border-collapse: collapse; font-size: 12px; width: 100%; }
+  table.cr th, table.cr td { border: 1px solid #D8D0C0; padding: 3px 5px; text-align: left; vertical-align: top; }
+  table.cr th[colspan] { background: #EAE3D3; }
+  table.cr td.n { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  table.cr .pair { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 20px; font-weight: 600; font-size: 12px; border: 1px solid #0002; }
+  .ok { color: #15803d; font-weight: 600; } .bad { color: #B3261E; font-weight: 600; } .info { color: #5A5F6B; }
   .view { padding: 12px 16px 24px; min-width: 0; }
   .vbar { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-bottom: 10px; font-size: 13px; }
-  .frames { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
-  .frames.w390 { grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); }
-  .frames.gray .box { filter: grayscale(1); }
+  .note { font-size: 13px; color: #4A4F5B; margin: 0 0 10px; max-width: 1100px; }
+  .sc { margin: 0 0 22px; }
+  .sc > h2 { font-size: 16px; margin: 0 0 8px; }
+  .frames { display: grid; grid-template-columns: minmax(0, 390px) minmax(0, 1fr); gap: 14px 18px; align-items: start; }
+  .frames.cmp { grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); }
   .fr h3 { margin: 0 0 6px; font-size: 14px; }
   .fr h3 small { font-weight: 400; color: #5A5F6B; }
   .fr .box { position: relative; overflow: hidden; box-shadow: 0 6px 30px rgb(0 0 0 / .14); background: #E4DDCF; }
   .fr iframe { border: 0; display: block; transform-origin: 0 0; }
-  .fr .sr-out { margin: 6px 0 0; font-size: 12px; color: #4A4F5B; }
-  .note { font-size: 13px; color: #4A4F5B; margin: 0 0 10px; }
-  @media (max-width: 860px) { .lay { grid-template-columns: 1fr; } .ctl { position: static; height: auto; border-right: 0; border-bottom: 1px solid #D8D0C0; } }
+  @media (max-width: 860px) { .lay { grid-template-columns: 1fr; } .ctl { position: static; height: auto; border-right: 0; border-bottom: 1px solid #D8D0C0; } .frames { grid-template-columns: minmax(0, 1fr); } }
 </style>
+</head>
+<body>
+
+<div class="lay">
+  <aside class="ctl" id="ctl"></aside>
+  <main class="view">
+    <div class="vbar">
+      <span class="seg" id="mode"><button type="button" data-m="one">ชุดที่เลือก · 4 จอ × 390 + 1280</button><button type="button" data-m="cmp">เทียบ 4 ชุด · จอเดียว 390</button></span>
+      <span class="seg" id="scene"></span>
+    </div>
+    <p class="note">ทุกชุด (ยกเว้นชุด 0) ลงชุดสีชาติไทย T1 ตามที่เคาะแล้ว (ข้อ 209–211 · เนื้อ Sarabun) เหมือนกันหมด — ต่างกันแค่สิ่งที่ใบ 105 ทำกับโลกอื่น · ชุด 0 = เกมตอนนี้ไม่ทับอะไร (ต่างโลกกรมท่าฟ้าเรือง #6FE3FF ใบ 13 · ปรโลกดำทอง ใบ 15) · การ์ด B = การ์ดลายรดน้ำ (ระหว่างชาติ + ปรโลก ใช้ --lacquer) · ภาพแชร์วาดสูตรเดียวกับเกม (app.mjs shareBlob · สีจาก --lacquer --gold --gold2 --cream --sand --bronze) ข้อความตัวอย่าง ไม่มีรูปตัวละคร · ปุ่มตัวแรกค้างสถานะ "ชี้อยู่" · ธีมโลกจริงเป็นงาน T11 (ใบ 120/121) หน้านี้เลือกแค่ช่วงคั่น</p>
+    <div id="frames"></div>
+  </main>
+</div>
+
+<!-- build เติม CSS ของ src/ui/template.html ระหว่าง marker ทุกรอบ (src/site/game-css.mjs) — ใช้ใส่ใน iframe เท่านั้น -->
 <template id="gcss"><style>/*GAME-CSS:START*/
 
 /* สีมาจากต้นแบบการ์ด (ใบ 06) — ทาง A ทะเบียนราษฎร์ · ทาง B ลายรดน้ำ · ไม่สลับตามโหมดมืดเพราะสีเป็นตัวบอกแนวการ์ด */
-/* ui-redo ใบ 02 (เจ้าของเคาะ): ชุดสี A กระดาษ · แถบค่า --fl · สีเน้น --red · Noto Sans Thai หัว/เนื้อ 16px · มุม 10 (การ์ด 15 · ชิป/ปุ่มเลขกลม) · เงาบาง
+/* ui-redo ใบ 105 ลง T1 (ข้อ 209–211 · 215–217): ชุดคราม — หมึก = ปุ่มหลัก = หัวเว็บ #1B2A4A · หัว Maitree เนื้อ Sarabun · มุม 6 (การ์ด 8) · เงาทองเฉพาะการ์ดในเกม
+   · --red = ชาด เหลือแค่ตรา/ขีดฆ่า (ข้อ 215) · --line-strong = ขอบที่บอกว่ากดได้ (--rule เป็นเส้นประดับ ต่ำกว่า 3:1)
+   · การ์ด B + ภาพแชร์ · ต่างโลก · ระหว่างชาติ/ปรโลก คงสีเดิมจนใบ 121 (ข้อ 228 ชุด ก) · แถบค่า --fl รอ T6
    · การ์ดกว้างสุด 800 · ขอบรอบการ์ด 36 บนล่าง 32 ข้าง ค่าเดียวทุกจอ (ต้นแบบ tweak.html) */
 :root {
-  --page:#E4DDCF; --ink:#1F2430; --ink2:#3A3F4B; --muted:#4A4F5C;
-  --paper:#F7F2E7; --paper2:#E9E1CF; --rule:#B9AE97; --rule2:#CFC4AD; --red:#B73824; --green:#2F6B66; --blue:#35558A;
+  --page:#F4ECDC; --ink:#1B2A4A; --ink2:color-mix(in srgb, #1B2A4A 70%, #5B5648); --muted:#5B5648;
+  --paper:#FBF6EA; --paper2:color-mix(in srgb, #FBF6EA 45%, #F4ECDC); --rule:#C9B98F; --rule2:color-mix(in srgb, #C9B98F 60%, #FBF6EA); --line-strong:#8C7A52;
+  --red:#A62B1F; --green:#2F6B4F; --blue:#7A5C12; --head:#1B2A4A;
   --lacquer:#17110D; --lacquer2:#221912; --gold:#D9B45A; --gold2:#F0D78C; --cream:#EFE3C2; --bronze:#5A4630; --bronze2:#8A6D3B; --sand:#BFAE86;
   --fl:#015EC1; --dg:#B3261E; --track:#E2D9C6;
-  --ft:"Noto Sans Thai",system-ui,sans-serif;
-  --r:10px; --rk:15px; --rc:999px; --sh:0 1px 2px rgb(0 0 0 / .06), 0 8px 24px rgb(0 0 0 / .08);
+  --ft:Sarabun,system-ui,sans-serif; --fh:Maitree,serif;
+  --r:6px; --rk:8px; --rc:999px; --sh:0 1px 0 var(--gold), 0 6px 18px color-mix(in srgb, var(--ink) 10%, transparent);
   --cw:800px; --pad-y:36px; --pad-x:32px;
 }
 * { box-sizing:border-box; }
 body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--ft); }
 /* viewport-fit=cover ให้ env(safe-area-inset-*) มีค่า แต่หน้าก็ลามใต้รอยบาก/แถบโฮม — ทุกขอบที่ติดจอต้องกันเอง */
-.logo { background:var(--lacquer); text-align:center; padding:calc(10px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 6px max(16px, env(safe-area-inset-left)); border-bottom:1px solid var(--bronze); }
+.logo { background:var(--head); text-align:center; padding:calc(10px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 6px max(16px, env(safe-area-inset-left)); border-bottom:1px solid var(--bronze); }
 .logo b { font-family:Srisakdi,serif; font-weight:700; font-size:34px; line-height:1.2; color:var(--gold); }
 .logo b span { display:inline-block; }
-.logo small { display:block; font-size:12px; letter-spacing:0.12em; color:var(--sand); }
-.logo .ver { text-decoration:none; display:inline-block; margin-top:4px; padding:1px 9px; border:1px solid var(--bronze); border-radius:999px; font-size:11px; font-weight:600; color:var(--sand); white-space:nowrap; }
+.logo small { display:block; font-size:12px; letter-spacing:0.12em; color:color-mix(in srgb, var(--cream) 85%, var(--head)); }
+.logo .ver { text-decoration:none; display:inline-block; margin-top:4px; padding:1px 9px; border:1px solid var(--bronze); border-radius:999px; font-size:12px; font-weight:600; color:var(--sand); white-space:nowrap; }
 .logo a.ver:hover, .logo a.ver:focus-visible { text-decoration:underline; outline:none; }
 .logo .saved { display:inline-block; margin:4px 0 0 6px; font-size:11px; color:var(--sand); white-space:nowrap; }
 .logo .saved:not(:empty)::before { content:'\25CF  '; color:#7FC4B8; }
@@ -80,13 +111,13 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 /* ข้อความสำหรับโปรแกรมอ่านจอเท่านั้น */
 .sr { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 /* จุดแดง "ใหม่" (B116): ชั้นสมุด · แท็บในชั้นสมุด · แผงฉายา/เหตุการณ์ — ป้ายอ่านจอบอกความหมายแทนสี */
-.new-dot { display:inline-block; width:8px; height:8px; margin-left:6px; border-radius:50%; background:var(--red); vertical-align:middle; flex:none; }
-.new-tag { margin-left:6px; padding:0 5px; border:1px solid var(--red); border-radius:3px; color:var(--red); font-size:11px; font-weight:600; white-space:nowrap; }
+.new-dot { display:inline-block; width:8px; height:8px; margin-left:6px; border-radius:50%; background:var(--blue); vertical-align:middle; flex:none; }
+.new-tag { margin-left:6px; padding:0 5px; border:1px solid var(--blue); border-radius:3px; color:var(--blue); font-size:12px; font-weight:600; white-space:nowrap; }
 /* .body/.choices ตั้ง display:flex ทับ hidden ของเบราว์เซอร์ — การ์ดที่พับไว้ (B117) ต้องหายจริง */
 .card [hidden] { display:none !important; }
 /* กล่องกระซิบ (B117): เส้นประ ตัวเอียง แยกจากเนื้อเรื่องของการ์ด · ปุ่มเป็นลิงก์เล็ก ไม่ปนกับตัวเลือกของเกม */
 .whisper { margin-top:4px; padding:8px 12px; border:1px dashed var(--rule); border-radius:var(--r); background:#FBF7EE; display:flex; flex-direction:column; gap:4px; }
-.whisper .h { font-size:12px; font-weight:600; color:var(--red); }
+.whisper .h { font-size:12px; font-weight:600; color:var(--blue); }
 .whisper p { font-family:var(--ft); font-size:14px; color:var(--ink2); }
 .whisper-row { display:flex; flex-wrap:wrap; gap:0 16px; }
 .whisper .more, .choices .later { all:unset; min-height:44px; cursor:pointer; font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:2px; }
@@ -117,7 +148,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .sb-r1 { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
 .sb .av { width:36px; height:36px; }
 .sb-who { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.3; }
-.sb-who b { font-weight:600; overflow-wrap:anywhere; }
+.sb-who b { font-family:var(--fh); font-weight:600; overflow-wrap:anywhere; }
 .sb-who small { font-size:12px; color:var(--muted); overflow-wrap:anywhere; }
 /* ป้ายพักแทนบรรทัดจังหวัด: บรรทัดเดียวเสมอ แถวไม่สูงขึ้น */
 .sb-who small.rest { color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -129,9 +160,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .hd-cash { margin-left:auto; display:flex; align-items:baseline; gap:4px; white-space:nowrap; }
 .hd-cash b { font-size:14px; font-variant-numeric:tabular-nums; }
 .hd-cash.red b, .hd-cash .lw { color:var(--dg); }
-.hd-cash .lw { font-size:11px; font-weight:600; }
+.hd-cash .lw { font-size:12px; font-weight:600; }
 .sb-age { display:flex; align-items:center; gap:4px; white-space:nowrap; }
-.sb-age > b { font-size:20px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
+.sb-age > b { font-size:20px; font-weight:600; line-height:1; font-variant-numeric:tabular-nums; }
 .sb-age small { font-size:12px; }
 .sb-age .same { margin-left:4px; }
 .sb-heart svg { display:block; width:18px; height:18px; fill:var(--dg); }
@@ -139,7 +170,13 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .sb-m li { flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:3px; }
 .mh { display:flex; flex-wrap:wrap; align-items:baseline; column-gap:3px; }
 .mk { font-size:11px; line-height:1.3; color:var(--muted); }
-.mh .num { margin-left:auto; font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
+.mh .mk svg { width:1em; height:1em; margin-right:1px; vertical-align:-0.15em; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+/* จอมือถือช่องค่าเหลือ 56–64px ไอคอน+ชื่อ+เลขไม่พอบรรทัดเดียว (เลขตก ชื่อยาวหักคำ) ⇒ 2×2 แบบพาแนลซ้ายจอคอม · การ์ดกว้างเต็ม 460 ที่จอ >520 4 ช่องพอ */
+@media (max-width: 520px) {
+  .sb-m { flex-wrap:wrap; gap:6px 10px; }
+  .sb-m li { flex:1 1 calc(50% - 10px); }
+}
+.mh .num { margin-left:auto; font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
 .mh em { font-style:normal; font-size:10px; font-weight:600; color:var(--fl); white-space:nowrap; }
 .mh em.dn { color:var(--dg); }
 .br { display:block; height:6px; margin-top:auto; border-radius:var(--rc); background:var(--track); overflow:hidden; }
@@ -149,7 +186,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 /* ใกล้ตาย: ขอบจอแดงทั้งจอ ผูกกับแถบสถานะด้วย :has จึงหายเองเมื่อการ์ดถัดไปไม่ใกล้ตาย · ไม่มีภาพเคลื่อนไหว */
 body:has(.sb.dying)::after { content:''; position:fixed; inset:0; z-index:9; pointer-events:none; box-shadow:inset 0 0 0 3px var(--dg), inset 0 0 60px rgb(220 40 30 / .5); }
 /* ตัวเลขในสรุปช่วงวัย: ต้นช่วง → ตอนนี้ คู่กับลูกศรทิศ */
-.delta .num { font-weight:700; font-variant-numeric:tabular-nums; }
+.delta .num { font-weight:600; font-variant-numeric:tabular-nums; }
 .meta { padding:0 20px 8px; font-size:12px; }
 .meta span { white-space:nowrap; }
 .tree { padding:0 20px 8px; font-size:12px; }
@@ -172,6 +209,8 @@ body:has(.mnav) { padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)
 .mnav { position:fixed; left:0; right:0; bottom:0; z-index:8; display:flex; max-width:calc(var(--cw) + 2 * var(--pad-x)); margin:0 auto; padding:0 max(8px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px, env(safe-area-inset-left)); background:var(--paper); border-top:1px solid var(--rule2); box-shadow:0 -4px 16px rgb(0 0 0 / .06); }
 .mnav button { all:unset; box-sizing:border-box; flex:1 1 0; min-width:0; min-height:var(--nav-h); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:4px 2px; font-size:13px; font-weight:600; color:var(--ink); text-align:center; cursor:pointer; }
 .mnav button[aria-expanded="true"] { color:var(--fl); box-shadow:inset 0 3px 0 var(--fl); }
+/* แท็บที่เลือกเป็นคราม เฉพาะจอชาติไทย (ข้อ 223: token ไทยห้ามขึ้นจอโลกอื่น) */
+body:has(#app > .card.a) .mnav button[aria-expanded="true"] { color:var(--ink); box-shadow:inset 0 3px 0 var(--ink); }
 .mnav button:focus-visible { outline:2px solid currentColor; outline-offset:-4px; }
 /* จุดของใหม่ (ใบ 05) มุมขวาบนของคำ ไม่ดันป้ายปุ่มให้เบี้ยว · ฉากที่มีเมนู ลิงก์ท้ายหน้าทั้งชุดย้ายเข้าปุ่มสมุดกับแผงเพิ่มเติม (ใบ 08) ท้ายหน้าจึงซ่อน */
 .mnav button { position:relative; }
@@ -206,7 +245,7 @@ body:has(.mnav) .foot { display:none; }
 /* แผงเงิน (ใบ 07): ป้ายซ้าย ตัวเลขชิดขวาหลักตรงกัน กวาดตาเทียบได้ · ตัวเลขยาวตัดบรรทัดได้ ไม่ดันจอล้น */
 .mo dl { margin:12px 0 0; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:10px 16px; font-size:15px; }
 .mo dt { color:var(--ink2); white-space:nowrap; }
-.mo dd { margin:0; text-align:right; font-weight:700; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.mo dd { margin:0; text-align:right; font-weight:600; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .mo dd.neg { color:var(--dg); }
 /* แผงเพิ่มเติม (ใบ 08): แถวละลิงก์เต็มกว้าง แตะง่ายบนมือถือ · ปุ่มชาติประจำวันหน้าตาเดียวกับลิงก์ */
 .mr { list-style:none; margin:8px 0 0; padding:0; }
@@ -220,8 +259,8 @@ body:has(.mnav) .foot { display:none; }
 .nt > a { display:inline-block; min-height:44px; line-height:44px; font-weight:600; color:var(--ink); }
 .mo p { margin:16px 0 0; font-size:13px; color:var(--ink2); }
 .body { padding:18px 20px 8px; display:flex; flex-direction:column; gap:8px; }
-.body h3 { margin:0; font-size:24px; line-height:1.35; }
-.body h3.lead { font-size:19px; font-weight:400; }
+.body h3 { margin:0; font-family:var(--fh); font-size:24px; line-height:1.35; }
+.body h3.lead { font-family:var(--ft); font-size:19px; font-weight:400; }
 .body p { margin:0; font-size:15px; }
 .kicker { font-size:12px; font-weight:600; letter-spacing:0.06em; }
 .body p.news { margin:0; padding-left:10px; border-left:2px solid currentColor; font-size:14px; opacity:0.8; }
@@ -252,7 +291,7 @@ body:has(.mnav) .foot { display:none; }
 .spark .mk circle { stroke-width:1.5; }
 .spark .mk:focus-visible circle, .spark .mk:hover circle { stroke-width:3; }
 .mk-cap { margin:0; font-size:12px; min-height:1.5em; overflow-wrap:anywhere; }
-.a .spark .mk.ev circle { fill:var(--paper); stroke:var(--ink2); } .a .spark .mk.death circle { fill:var(--red); stroke:var(--ink); }
+.a .spark .mk.ev circle { fill:var(--paper); stroke:var(--ink2); } .a .spark .mk.death circle { fill:var(--dg); stroke:var(--ink); }
 .a .mk-cap { color:var(--muted); }
 .spark.echo path { fill:none; stroke-width:1.5; } .spark.echo path.hit { stroke:transparent; stroke-width:12; }
 .spark .mk.arc:focus-visible path:not(.hit), .spark .mk.arc:hover path:not(.hit) { stroke-width:3; }
@@ -291,7 +330,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .choice.loan .of { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .choice .hint { display:block; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
 /* ป้ายทางที่มีผลตามมา: ไอคอนต่อท้ายข้อความตัวเลือก + บรรทัดอธิบายใต้ชุดปุ่ม */
-.ef { display:flex; align-items:center; gap:5px; margin:2px 0 4px; font-size:13px; font-weight:600; color:var(--red); }
+.ef { display:flex; align-items:center; gap:5px; margin:2px 0 4px; font-size:13px; font-weight:600; color:var(--blue); }
 .ef svg { width:14px; height:14px; flex:none; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
 .i .ef { color:#FFB4C8; }
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
@@ -371,22 +410,23 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .stamp { align-self:flex-start; font-family:var(--ft); font-weight:600; padding:4px 10px; transform:rotate(-3deg); font-size:16px; }
 
 /* ทาง A — ทะเบียนราษฎร์: กระดาษ หมึก ตราประทับแดง */
-.a { background:var(--paper); border:1px solid #C9BFA9; color:var(--ink); }
+.a { background:var(--paper); border:1px solid var(--rule); color:var(--ink); }
 .a .top { background:var(--ink); color:var(--paper); }
-.a .top b { font-family:var(--ft); font-size:16px; font-weight:600; }
+.a .top b { font-family:var(--fh); font-size:16px; font-weight:600; }
 .a .meta { color:var(--muted); padding-top:8px; }
-.a .bar { background:#E2D9C6; } .a .bar i { background:var(--green); } .a .bar b { background:var(--red); }
-.a .kicker { color:var(--red); }
+.a .bar { background:#E2D9C6; } .a .bar i { background:var(--green); } .a .bar b { background:var(--dg); }
+.a .kicker { color:var(--blue); }
 .a .body h3 { font-family:var(--ft); font-weight:600; }
 .a .body h3.lead { font-family:var(--ft); }
 .a .body p, .a .items, .a .picks { color:var(--ink2); }
 .a .sub, .a .note, .a .body .horo { color:var(--muted); }
 .a .spark .nom { stroke:var(--green); } .a .spark .dot { fill:var(--green); }
 .a .spark .grid { stroke:var(--rule2); } .a .spark .zero { stroke:var(--ink2); }
-.a .spark .neg { fill:var(--red); fill-opacity:0.08; }
+.a .spark .neg { fill:var(--dg); fill-opacity:0.08; }
 .a .spark text { fill:var(--muted); }
 .a .band0 { fill:var(--paper2); fill-opacity:0.55; } .a .band1 { fill:transparent; }
-.a .ln0 { stroke:var(--red); } .a .ln1 { stroke:var(--bronze2); } .a .ln2 { stroke:var(--blue); } .a .ln3 { stroke:var(--green); } .a .ln4 { stroke:var(--ink); }
+/* ชาดไม่ใช่สีข้อมูลแล้ว (ข้อ 215) · --blue เป็นทองเข้มใกล้ --bronze2 ⇒ เส้นแรกใช้น้ำเงินแถบค่าให้ 5 เส้นยังแยกกันได้ */
+.a .ln0 { stroke:var(--fl); } .a .ln1 { stroke:var(--bronze2); } .a .ln2 { stroke:var(--blue); } .a .ln3 { stroke:var(--green); } .a .ln4 { stroke:var(--ink); }
 .a .lifechart { border:1px solid var(--rule); border-radius:var(--r); background:#FBF7EE; }
 .b .band0 { fill:var(--bronze); fill-opacity:0.25; } .b .band1 { fill:transparent; }
 .b .ln0 { stroke:#E07A5F; } .b .ln1 { stroke:var(--gold); } .b .ln2 { stroke:#8FB3E0; } .b .ln3 { stroke:#7FC4B8; } .b .ln4 { stroke:var(--cream); }
@@ -394,14 +434,14 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 /* กราฟฐานะตระกูล (B95): ขาลงเส้นประ + สีแดง ขาขึ้นเส้นทึบ — ตาบอดสีก็ยังแยกได้ · ขึ้นได้ทั้งการ์ดทาง A ทาง B และปรโลก */
 .spark .sg { stroke-width:2.2; stroke-linecap:round; } .spark .sg.sd { stroke-dasharray:5 3; } .spark .sg.se { stroke-width:1.6; }
 .legend .key .sg { stroke-width:2; }
-.a .sg.su { stroke:var(--green); } .a .sg.sd { stroke:var(--red); } .a .sg.se { stroke:var(--ink2); }
-.a .spark .mk.broke rect { fill:var(--red); stroke:var(--ink); stroke-width:1.5; } .a .spark .mk.nx circle { fill:var(--paper); stroke:var(--ink); stroke-dasharray:2 1.5; }
-.a .legend .mk.broke rect { fill:var(--red); stroke:var(--ink); stroke-width:1; }
+.a .sg.su { stroke:var(--green); } .a .sg.sd { stroke:var(--dg); } .a .sg.se { stroke:var(--ink2); }
+.a .spark .mk.broke rect { fill:var(--dg); stroke:var(--ink); stroke-width:1.5; } .a .spark .mk.nx circle { fill:var(--paper); stroke:var(--ink); stroke-dasharray:2 1.5; }
+.a .legend .mk.broke rect { fill:var(--dg); stroke:var(--ink); stroke-width:1; }
 .b .sg.su { stroke:var(--gold2); } .b .sg.sd { stroke:#E39A8A; } .b .sg.se { stroke:var(--sand); }
 .b .spark text, .b .mk-cap, .b .lifechart .h { fill:var(--sand); color:var(--sand); } .b .spark .grid { stroke:var(--bronze2); }
 .b .spark .mk.ev circle { fill:var(--lacquer); stroke:var(--gold2); } .b .spark .mk.nx circle { fill:var(--lacquer); stroke:var(--cream); stroke-dasharray:2 1.5; }
 .b .spark .mk.broke rect, .b .legend .mk.broke rect { fill:#E39A8A; stroke:var(--cream); stroke-width:1.5; }
-.a .choice { border:1px solid var(--ink); background:#FFFDF7; }
+.a .choice { border:1px solid var(--line-strong); background:#FFFDF7; font-size:15px; }
 .a .choice:hover, .a .choice:focus-visible { background:var(--ink); color:var(--paper); outline:none; }
 .a .choice .fx { color:var(--green); } .a .choice:hover .fx, .a .choice:focus-visible .fx { color:#CFE3E0; }
 /* คำอธิบายสกิลใต้ชื่อปุ่ม (06s: จอเลือกพก · การ์ดฝึกสกิล · เลือกลงสมุด) · ปุ่มเลือกพกที่กดไว้มีแถบซ้าย */
@@ -471,7 +511,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .d-tab-bar { display:flex; flex-wrap:wrap; gap:6px; }
 .d-tab-bar button { all:unset; box-sizing:border-box; cursor:pointer; min-height:36px; padding:0 12px; border:1px solid #1F1F1F; border-radius:999px; font-size:14px; display:inline-flex; align-items:center; }
 .d-tab-bar button[aria-selected="true"] { background:#1F1F1F; color:#FFFFFF; font-weight:600; }
-.d-tab-bar button:focus-visible { outline:2px solid var(--red); outline-offset:2px; }
+.d-tab-bar button:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
 .d-pane { display:flex; flex-direction:column; gap:10px; padding-top:12px; }
 .d-pane[hidden] { display:none; }
 .mem .d-pane h3 { margin:8px 0 0; font-family:var(--ft); font-size:14px; font-weight:600; color:var(--muted); text-align:left; }
@@ -482,7 +522,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .d-share > summary::-webkit-details-marker { display:none; }
 .d-share > summary::after { content:'\25BE'; }
 .d-share[open] > summary::after { content:'\25B4'; }
-.d-share > summary:focus-visible { outline:2px solid var(--red); outline-offset:2px; }
+.d-share > summary:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
 .d-share-in { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
 .d-share .choice { flex:1 1 auto; min-height:44px; padding:6px 12px; justify-content:center; font-size:14px; background:transparent; border-style:dashed; }
 /* ป้ายตามหาคนหาย (B139): กระดาษประกาศติดเสา หัวแดงตัวหนา — ต่างจากหนังสืองานศพขาวดำ ให้รู้ว่ายังไม่มีใครถือว่าจากไป */
@@ -647,277 +687,334 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 }
 @keyframes drw { from { transform:translateX(100%); } }
 /*GAME-CSS:END*/</style></template>
-</head>
-<body>
-
-<div class="lay">
-<aside class="ctl" id="ctl" aria-label="แผงปรับค่า">
-  <h1>ปรับป้ายผลบนปุ่ม</h1>
-  <p class="hint">เปลี่ยนคำในป้ายขวาของปุ่มตัวเลือกเป็นไอคอน/อิโมจิ + สี · จอขวาใช้ CSS ตัวเกมจริง · เปิด "ขาวดำ" เช็กว่าแยกขึ้น/ลงได้โดยไม่ต้องดูสี · ค่าจำไว้ในเครื่อง · เลือกเสร็จกดคัดลอกแล้ววางส่ง</p>
-  <p class="hint">ค่าที่เกมซ่อนไว้ (ป้าย ?) ยังเป็นไอคอนกลางตัวเดียว ไม่มีไอคอนบอกว่าซ่อนค่าไหน · ใต้แต่ละจอมีบรรทัด "อ่านจอ" = คำที่โปรแกรมอ่านจอจะอ่าน</p>
-  <div class="row"><span class="lb">เริ่มจาก</span><div class="btns" id="pre"></div></div>
-  <div id="rows"></div>
-  <h2>ไอคอนต่อค่า</h2>
-  <p class="hint">ใส่อิโมจิหรือตัวอักษรเอง · ชุด ข ใช้ไอคอนเส้น พิมพ์ชื่อไอคอน (heart smile book people coin case link bolt spark clover star) หรือใส่อิโมจิแทนก็ได้</p>
-  <div class="icons" id="icons"></div>
-  <h2>สี</h2>
-  <div class="cols" id="cols"></div>
-  <h2>คัดลอกส่ง</h2>
-  <div class="row"><span class="lb">หมายเหตุถึงทีม</span><textarea id="note" rows="3" placeholder="เช่น ชอบชุด ก แต่ขอลูกศรตัวใหญ่ขึ้น"></textarea></div>
-  <div class="btns"><button type="button" class="pri" id="copy">คัดลอก JSON</button><button type="button" id="reset">ล้างค่ากลับ preset</button></div>
-  <p id="msg" role="status"></p>
-  <textarea id="out" rows="8" readonly aria-label="JSON ที่จะคัดลอก"></textarea>
-</aside>
-<main class="view">
-  <div class="vbar">
-    <span class="seg" id="vp"><button type="button" data-v="360">มือถือ 360</button><button type="button" data-v="390">มือถือ 390</button><button type="button" data-v="1280">คอม 1280</button></span>
-    <span class="seg" id="gray"><button type="button" data-v="off">สี</button><button type="button" data-v="on">ขาวดำ</button></span>
-  </div>
-  <p class="note">แต่ละจอมีคู่ "ของเดิม" (คำล้วนแบบที่เกมใช้อยู่) ให้เทียบ · ปุ่มที่ล็อกยังเป็นคำบอกเหตุผล ไม่เปลี่ยนเป็นไอคอน</p>
-  <div class="frames" id="frames"></div>
-</main>
-</div>
 <script>
 (() => {
-  // ---------- ป้ายตัวอย่าง: เก็บเป็นชิ้น (token) ไม่ใช่สตริง ⇒ ทุกชุดไอคอนวาดจากชิ้นเดียวกัน ----------
-  // ชื่อค่าตาม STAT_LABELS (src/engine/life.mjs) + รายได้ · ต่างโลกตาม ISEKAI_FX (src/engine/isekai.mjs)
-  // hide = ป้าย ? ที่ fixedFx ใส่แทนค่าที่เหตุการณ์ซ่อน (B169) — ไม่มีชื่อค่าติดมา จึงวาดไอคอนเฉพาะตัวไม่ได้ตั้งแต่ต้น
-  const STAT = ['ชีวิต', 'ความสุข', 'ความรู้', 'ความสัมพันธ์', 'เงิน', 'รายได้', 'เส้นสาย'];
-  const ISK = ['ชีวิต', 'พลัง', 'เวท', 'โชค', 'ทอง', 'ชื่อเสียง'];
-  const up = (n, long) => ({ k: 'stat', n, d: 1, long });
-  const dn = (n, long) => ({ k: 'stat', n, d: -1, long });
-  const T = (t) => ({ k: 'text', t });
-  // ผลต่างโลกจากโฟกัส (isekaiFocusFx) เป็น "พลัง · เวท ขึ้น" = ขึ้นทุกตัว
-  const SAMPLES = [
-    { id: 'th1', world: 'a', title: 'ชาติไทย · การ์ดเลือกทาง', sub: 'ค่าขึ้นลง · ฟรี · %สำเร็จ', age: 15, kicker: 'ช่วงวัยรุ่น', h: 'หาเงินเองครั้งแรก', p: 'ที่บ้านเงินเริ่มตึง ร้านหมูกระทะข้างตลาดรับเด็กล้างจาน ส่วนเพื่อนชวนไปแบกของที่ท่าเรือ ได้เงินมากกว่าเท่าตัว',
-      choices: [['ล้างจาน เอาเงินช่วยบ้าน', [dn('ความรู้'), up('ความสัมพันธ์'), up('เงิน'), { k: 'free' }]], ['ไปแบกของที่ท่าเรือ', [{ k: 'pct', v: 50 }, { k: 'free' }]], ['ขายเคสมือถือออนไลน์', [dn('เงิน'), { k: 'pct', v: 45 }]]] },
-    { id: 'th2', world: 'a', title: 'ชาติไทย · ค่าซ่อน + ค่าอื่น', sub: 'ป้าย ? · สำเร็จ ? · ระยะยาว · ล็อก', age: 34, kicker: 'ช่วงทำงาน', h: 'ข้อเสนอจากหัวหน้าเก่า', p: 'หัวหน้าเก่าชวนไปเปิดบริษัทด้วยกัน บอกว่าเส้นสายมีพร้อม ขาดแค่คนลงแรง แต่เพื่อนร่วมงานกระซิบว่าเขาเคยเชิดเงินหุ้นส่วนมาแล้ว',
-      choices: [['ลาออกไปลุยด้วย', [dn('ชีวิต'), { k: 'hide' }]], ['ทำต่อที่เดิม ขอขึ้นเงินเดือน', [up('รายได้'), up('เส้นสาย')]], ['ไปทำบุญถามหลวงพ่อก่อน', [up('ความสุข', true), { k: 'pctq' }]], ['ลงขันซื้อหุ้นส่วน', null, 'ต้องมีเงิน 200,000 บาท']] },
-    { id: 'th3', world: 'a', title: 'ชาติไทย · ซ่อนทั้งแถบ', sub: 'หวยสายมู (ป้าย ? ล้วน) · เสี่ยง', age: 52, kicker: 'ช่วงกลางคน', h: 'เลขเด็ดจากศาลเจ้า', p: 'ป้าข้างบ้านฝันเห็นงูใหญ่พันเสาศาลเจ้า ตื่นมาก็จดเลขให้ทั้งซอย',
-      choices: [['ซื้อตามเลขในฝัน', [{ k: 'hide' }]], ['ลงขันกับป้า แบ่งกันคนละครึ่ง', [T('เสี่ยงกลาง')]], ['ไม่ซื้อ', null]] },
-    { id: 'isk1', world: 'i', title: 'ต่างโลก · เหตุการณ์', sub: '%ผ่าน + สกิลช่วย · ใช้ทอง', age: 19, kicker: 'เหตุการณ์ · อายุ 19', h: 'ปีศาจที่หมู่บ้านชายป่า', p: 'ชาวบ้านมาขอให้ช่วย ปีศาจสามตัวลงมาจากเขาทุกคืน',
-      choices: [['ถือดาบบุกเข้าไปเอง', [{ k: 'pct', v: 65, w: 1 }, { k: 'aid', n: 'ดาบเพลิง', v: 10 }]], ['พาชาวบ้านหลบเข้าโบสถ์', [{ k: 'pct', v: 40, w: 1 }]], ['จ้างทหารรับจ้าง', [{ k: 'gold', v: 200 }]]] },
-    { id: 'isk2', world: 'i', title: 'ต่างโลก · เลือกสิ่งที่ทุ่มเท', sub: 'ค่าที่ขึ้นต่อปี · ทำอยู่', age: 20, kicker: 'เลือกสิ่งที่ทุ่มเท', h: 'ปีนี้จะทุ่มเทกับอะไร', p: 'ฤดูหนาวมาถึง ถนนปิด เหลือเวลาฝึกตัวเองทั้งปี',
-      choices: [['ฝึกดาบกับหัวหน้าองครักษ์', [up('พลัง'), up('ชีวิต'), T('ทำอยู่')]], ['อ่านตำราในหอเวท', [up('เวท')]], ['รับงานกิลด์', [up('ทอง'), up('ชื่อเสียง')]]] },
-  ];
+  const KEY = 'next-life-t1-worlds-tweak-v1';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const GCSS = $('gcss').content.querySelector('style').textContent;
+  const FONTS = new URL('../../fonts/fonts.css', location.href).href;
 
-  // ---------- ชุดไอคอน ----------
-  // ไอคอนเส้น 16px ขีดเดียว (ชุด ข) · สีตาม currentColor ⇒ ชิปขึ้น/ลงคุมสีเอง
-  const SVG = {
-    heart: 'M8 13.5S2 10 2 5.8A3 3 0 0 1 8 4.5a3 3 0 0 1 6 1.3C14 10 8 13.5 8 13.5z',
-    smile: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM5.5 9.5q2.5 2.5 5 0M6 6.5h0M10 6.5h0',
-    book: 'M2 3.5h4.5Q8 3.5 8 5v8.5q0-1.5-1.5-1.5H2zM14 3.5H9.5Q8 3.5 8 5v8.5q0-1.5 1.5-1.5H14z',
-    people: 'M5.5 7.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM1.5 13.5q0-4 4-4t4 4M11 7a1.8 1.8 0 1 0 0-3.6M11.5 9.5q3 .5 3 4',
-    coin: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM8 4.5v7M10 6.2Q9.5 5.5 8 5.5T6 6.7Q6 8 8 8t2 1.3T8 10.5 6 9.8',
-    case: 'M2 5.5h12v8H2zM5.5 5.5V3.5h5v2M2 9h12',
-    link: 'M6.5 9.5l3-3M7 4.5l1.2-1.2a2.6 2.6 0 0 1 3.7 3.7L10.7 8.2M9 11.5l-1.2 1.2a2.6 2.6 0 0 1-3.7-3.7L5.3 7.8',
-    bolt: 'M9 1.5L3.5 9H8l-1 5.5L12.5 7H8z',
-    spark: 'M8 1.5v4M8 10.5v4M1.5 8h4M10.5 8h4M3.5 3.5l2 2M10.5 10.5l2 2M12.5 3.5l-2 2M5.5 10.5l-2 2',
-    clover: 'M8 8C5 8 3 6 4.5 4.2S8 4 8 8zm0 0c0-3 2-5 3.8-3.5S12 8 8 8zm0 0c3 0 5 2 3.5 3.8S8 12 8 8zm0 0c0 3-2 5-3.8 3.5S4 8 8 8zm0 0l2.5 6',
-    star: 'M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z',
-    target: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM8 8h0',
-    ask: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM6.2 6.2Q6.4 4.6 8 4.6t1.8 1.5Q9.8 7.2 8 7.8v1.4M8 11.2h0',
-    tag: 'M2 2.5h5.5l6.5 6.5-5 5-6.5-6.5zM5 5h0',
-  };
-  const svg = (name) => `<svg viewBox="0 0 16 16" width="1.15em" height="1.15em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.2em"><path d="${SVG[name]}"/></svg>`;
-  // ขึ้น/ลง: รูปทรงต่างกันเสมอ (decisions 74 — ขาวดำต้องแยกได้)
-  const DIRS = { arrow: ['↑', '↓'], tri: ['▲', '▼'], sign: ['+', '−'], dbl: ['⇧', '⇩'] };
-  const KEYS = [...new Set([...STAT, ...ISK])];
-  const BASE = {
-    dir: 'tri', color: 'mark', chip: 'off', word: 'icon', size: '100', sep: 'gap', free: 'chip', pct: 'icon', hide: 'icon',
-    upA: '#2F6B66', dnA: '#B73824', upI: '#7FE0A8', dnI: '#FF8A7A',
-  };
-  const PRESET = {
-    a: { name: 'ก อิโมจิ', icons: { ชีวิต: '❤️', ความสุข: '😊', ความรู้: '📖', ความสัมพันธ์: '🤝', เงิน: '💰', รายได้: '💼', เส้นสาย: '🔗', พลัง: '💪', เวท: '✨', โชค: '🍀', ทอง: '🪙', ชื่อเสียง: '⭐', free: '🆓', pct: '🎯', hide: '❔' } },
-    b: { name: 'ข ไอคอนเส้น + ชิป', dir: 'arrow', chip: 'on', color: 'all', icons: { ชีวิต: 'heart', ความสุข: 'smile', ความรู้: 'book', ความสัมพันธ์: 'people', เงิน: 'coin', รายได้: 'case', เส้นสาย: 'link', พลัง: 'bolt', เวท: 'spark', โชค: 'clover', ทอง: 'coin', ชื่อเสียง: 'star', free: 'tag', pct: 'target', hide: 'ask' } },
-    c: { name: 'ค คำเดิม + ลูกศรสี', dir: 'tri', word: 'word', color: 'mark', free: 'word', pct: 'word', hide: 'word', icons: {} },
-  };
-  const ROWS = [
-    ['word', 'ไอคอนหรือคำ', [['icon', 'ไอคอนล้วน'], ['both', 'ไอคอน + คำ'], ['word', 'คำล้วน']]],
-    ['dir', 'รูปขึ้น/ลง', Object.entries(DIRS).map(([k, [u, d]]) => [k, `${u} ${d}`])],
-    ['color', 'ลงสีตรงไหน', [['mark', 'เฉพาะลูกศร'], ['all', 'ทั้งชิ้น'], ['none', 'ไม่ลงสี']]],
-    ['chip', 'พื้นชิป', [['off', 'ไม่มี'], ['on', 'มีพื้นจาง']]],
-    ['size', 'ขนาดป้าย', [['100', '12px (เดิม)'], ['115', '14px'], ['130', '16px']]],
-    ['sep', 'คั่นระหว่างชิ้น', [['dot', '·'], ['gap', 'เว้นวรรค']]],
-    ['free', 'ป้าย "ฟรี"', [['word', 'คำ'], ['icon', 'ไอคอน'], ['chip', 'ชิปกรอบ']]],
-    ['pct', '"สำเร็จ ~N%"', [['word', 'คำเดิม'], ['icon', 'ไอคอน + N%'], ['short', 'N% ล้วน']]],
-    ['hide', 'ป้าย ? (ค่าซ่อน)', [['word', '?'], ['icon', 'ไอคอนกลาง']]],
+  // ---------- ค่าเกมตอนนี้ (อ่านจาก CSS เกมที่ build เติม — แก้สีในเกมแล้วชุด 0 ตามเอง) ----------
+  const rule = (sel) => { const i = GCSS.indexOf(sel + ' {'); const j = i < 0 ? GCSS.indexOf(sel + '{') : i; return j < 0 ? '' : GCSS.slice(j, GCSS.indexOf('}', j)); };
+  const v = (txt, k, d) => txt.match(new RegExp(`--${k}:\\s*([^;]+);`))?.[1].trim() || d;
+  const ROOT = rule(':root'), ISK = rule('body:has(#app > .card.i)'), AFP = rule('body:has(#app > .card.af)');
+  const NOW = { lacquer: v(ROOT, 'lacquer', '#17110D'), wbg: v(ISK, 'page', '#0B0D20'), wsurf: v(ISK, 'paper', '#161A3A'), wink: v(ISK, 'ink', '#E8ECFF'), wacc: v(ISK, 'fl', '#6FE3FF'), apage: v(AFP, 'page', '#0E0A08') };
+
+  // ชุดสีชาติไทย T1 ที่เจ้าของเคาะ (ui-redo-decisions ข้อ 209–211 · JSON ใบ 102) — หน้านี้ไม่ให้แก้ (เคาะแล้ว)
+  const T1 = { bg: '#F4ECDC', surface: '#FBF6EA', ink: '#1B2A4A', muted: '#5B5648', accent: '#1B2A4A', head: '#1B2A4A', headink: '#E8CF8A', accent2: '#7A5C12', gold: '#D9B45A', seal: '#A62B1F', good: '#2F6B4F', bad: '#B3261E', line: '#C9B98F', 'line-strong': '#8C7A52' };
+  const T1W = { wbg: '#0F1A33', wsurf: '#17264A', wink: '#F1E6C8', wacc: '#D9B45A' };
+
+  // b: การ์ด B + ภาพแชร์ (keep = --lacquer เดิม · kram = ตระกูลรดน้ำผสมจาก lacquer ใหม่) · isk: ต่างโลก (keep = hex เกม · json = 4 token T1) · afp: พื้นหน้าปรโลก (keep = ดำเดิม · b = ผสมจากการ์ด B)
+  const PRESETS = [
+    { id: '0', name: '0 เกมตอนนี้ (ไม่ทับอะไร)', pure: true, b: 'keep', isk: 'keep', afp: 'keep', c: { lacquer: NOW.lacquer, ...T1W } },
+    { id: 'ก', name: 'ก 105 ไม่แตะโลกอื่น · การ์ด B + ภาพแชร์คง #17110D', b: 'keep', isk: 'keep', afp: 'keep', c: { lacquer: NOW.lacquer, ...T1W } },
+    { id: 'ข', name: 'ข ไม่แตะโลกอื่น · การ์ด B + ภาพแชร์เป็นคราม', b: 'kram', isk: 'keep', afp: 'keep', c: { lacquer: T1.head, ...T1W } },
+    { id: 'ค', name: 'ค ตาม JSON T1 ทุกตัว · ต่างโลกกรมท่าหัวทอง', b: 'kram', isk: 'json', afp: 'keep', c: { lacquer: T1.head, ...T1W } },
   ];
-  const KEY = 'next-life-fx-icons-tweak-v1';
-  const ui = { vp: '390', gray: 'off', pre: 'a' };
-  let cfg = {};
-  const fresh = (p) => ({ ...BASE, ...PRESET[p], icons: { ...PRESET[p].icons } });
+  const KNOBS = [
+    ['b', 'การ์ด B (ลายรดน้ำ) + ภาพแชร์', [['keep', 'คง --lacquer เดิม (ดำรัก)'], ['kram', 'ตามค่า lacquer ข้างล่าง (คราม = หัวเว็บ T1)']]],
+    ['isk', 'ต่างโลก', [['keep', 'คง hex เกม (กรมท่าฟ้าเรือง ใบ 13)'], ['json', 'ตาม wbg/wsurf/wink/wacc ข้างล่าง']]],
+    ['afp', 'ระหว่างชาติ + ปรโลก (.card.b.af ตัวเดียวกัน)', [['keep', 'การ์ดตามการ์ด B · พื้นหน้าคงดำ (ใบ 15)'], ['b', 'การ์ดตามการ์ด B · พื้นหน้าผสมจาก lacquer'], ['pin', 'ตรึงดำเดิมทั้งการ์ดและพื้น (การ์ด B ครามเหลือแค่ภาพแชร์ + แถบภาพชั้นสมุด)']]],
+  ];
+  const TOK = [['lacquer', 'การ์ด B / ภาพแชร์ พื้น', 'b'], ['wbg', 'ต่างโลก พื้นหน้า', 'isk'], ['wsurf', 'ต่างโลก การ์ด', 'isk'], ['wink', 'ต่างโลก ตัวหนังสือ', 'isk'], ['wacc', 'ต่างโลก เน้น · ปุ่มที่ชี้', 'isk']];
+  const SCENES = [['b', 'ระหว่างชาติ · การ์ด B'], ['af', 'ปรโลก · การ์ด B บนพื้นปรโลก'], ['i', 'ต่างโลก'], ['share', 'ภาพแชร์']];
+
+  let S = { base: 1, cur: clone(PRESETS[1]), mode: 'one', scene: 'b' }, note = '';
   try {
-    const s = JSON.parse(localStorage.getItem(KEY));
-    if (s?.cfg?.icons) { cfg = s.cfg; Object.assign(ui, s.ui ?? {}); document.getElementById('note').value = s.note ?? ''; }
-  } catch (e) { /* ค่าเสีย/ไม่มี storage — เริ่มจาก preset */ }
-  if (!cfg.icons) cfg = fresh(ui.pre);
-  const store = () => { try { localStorage.setItem(KEY, JSON.stringify({ cfg, ui, note: document.getElementById('note').value })); } catch (e) { /* file:// บางเบราว์เซอร์ปิด storage — ยังคัดลอกได้ */ } };
-
-  // ---------- วาดป้าย ----------
-  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-  const icon = (k) => { const v = cfg.icons[k] ?? ''; return SVG[v] ? svg(v) : esc(v); };
-  // คำที่โปรแกรมอ่านจออ่าน = คำเต็มแบบป้ายเดิม (fxPart แปลงลูกศรเป็น "เพิ่ม/ลด")
-  const said = (t) => t.k === 'stat' ? `${t.n}${t.d > 0 ? 'เพิ่ม' : 'ลด'}${t.long ? ' ระยะยาว' : ''}` : t.k === 'free' ? 'ฟรี' : t.k === 'pct' ? (t.w ? `โอกาส ${t.v}%` : `สำเร็จราว ${t.v}%`) : t.k === 'pctq' ? 'สำเร็จ ไม่รู้โอกาส' : t.k === 'hide' ? 'ไม่รู้ผล' : t.k === 'aid' ? `${t.n} ช่วย ${t.v}%` : t.k === 'gold' ? `ใช้ทอง ${t.v}` : t.t;
-  // ข้อความเดิมของเกม (ของเดิม) — ตรงกับ fixedFx/outcomeFx/isekaiEventCard
-  const oldText = (t) => t.k === 'stat' ? `${t.n} ${t.d > 0 ? '↑' : '↓'}${t.long ? ' ระยะยาว' : ''}` : t.k === 'free' ? 'ฟรี' : t.k === 'pct' ? (t.w ? `${t.v}%` : `สำเร็จ ~${t.v}%`) : t.k === 'pctq' ? 'สำเร็จ ?' : t.k === 'hide' ? '?' : t.k === 'aid' ? `${t.n} +${t.v}%` : t.k === 'gold' ? `ใช้ทอง ${t.v}` : t.t;
-  const tint = (c) => (cfg.chip === 'on' ? `background:color-mix(in srgb, ${c} 16%, transparent);padding:0 5px;border-radius:999px;` : '');
-  const piece = (t, world) => {
-    const [u, d] = DIRS[cfg.dir];
-    const upC = world === 'i' ? cfg.upI : cfg.upA;
-    const dnC = world === 'i' ? cfg.dnI : cfg.dnA;
-    const wrap = (vis, style = '') => `<span class="fxp" style="${style}"><span aria-hidden="true">${vis}</span><span class="sr">${esc(said(t))}</span></span>`;
-    if (t.k === 'stat') {
-      const c = t.d > 0 ? upC : dnC;
-      const mark = cfg.color === 'mark' ? `<b style="color:${c}">${t.d > 0 ? u : d}</b>` : `<b>${t.d > 0 ? u : d}</b>`;
-      const ic = icon(t.n);
-      const face = cfg.word === 'word' || !ic ? esc(t.n) : cfg.word === 'both' ? `${ic} ${esc(t.n)}` : ic;
-      return wrap(`${face} ${mark}${t.long ? ' ระยะยาว' : ''}`, `${cfg.color === 'all' ? `color:${c};` : ''}${tint(c)}`);
-    }
-    if (t.k === 'free') {
-      if (cfg.free === 'icon' && icon('free')) return wrap(icon('free'));
-      if (cfg.free === 'chip') return wrap('ฟรี', 'border:1px solid currentColor;padding:0 5px;border-radius:999px;');
-      return wrap('ฟรี');
-    }
-    if (t.k === 'pct' || t.k === 'pctq') {
-      const n = t.k === 'pct' ? `${t.w ? '' : '~'}${t.v}%` : '?';
-      if (cfg.pct === 'icon' && icon('pct')) return wrap(`${icon('pct')} ${n}`);
-      if (cfg.pct === 'short') return wrap(n);
-      return wrap(esc(oldText(t)));
-    }
-    // ค่าซ่อน: ไอคอนกลางตัวเดียวทุกค่า — ห้ามมีไอคอนต่อค่า (decisions 73)
-    if (t.k === 'hide') return wrap(cfg.hide === 'icon' && icon('hide') ? icon('hide') : '?');
-    return wrap(esc(oldText(t)));
+    const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (s && s.cur && PRESETS[s.base]) { S = { ...S, ...s, cur: { ...clone(PRESETS[s.base]), ...s.cur, c: { ...PRESETS[s.base].c, ...s.cur.c } } }; note = s.note || ''; }
+  } catch (e) { /* storage ปิด — ใช้ค่าเริ่ม */ }
+  const store = () => { try { localStorage.setItem(KEY, JSON.stringify({ ...S, note })); } catch (e) { /* file:// บางเบราว์เซอร์ปิด storage */ } };
+  const edits = () => {
+    const p = PRESETS[S.base], out = [];
+    for (const [k] of KNOBS) if (S.cur[k] !== p[k]) out.push(k);
+    for (const [k] of TOK) if (S.cur.c[k].toLowerCase() !== p.c[k].toLowerCase()) out.push(k);
+    return out;
   };
-  const SEP = { dot: ' · ', gap: ' ' };
-  const fxNew = (toks, world) => `<span class="fx" style="font-size:${(12 * +cfg.size) / 100}px">${toks.map((t) => piece(t, world)).join(SEP[cfg.sep])}</span>`;
-  const fxOld = (toks) => `<span class="fx">${toks.map((t) => `<span>${esc(oldText(t))}</span>`).join(' · ')}</span>`;
 
-  // ---------- markup การ์ด: ชื่อคลาสตาม src/ui/app.mjs (statusBar · button · numbered · isekai card) ----------
-  const STATS = [['ชีวิต', 72], ['ความสุข', 52], ['ความรู้', 66], ['ความสัมพันธ์', 61]];
-  const sb = (age) => `<header class="sb"><div class="sb-r1"><span class="av ini" aria-hidden="true">ห</span><span class="sb-who"><b>หนุ่ม</b><small>จ.อุบลราชธานี</small></span><span class="sb-age"><b>${age}</b><small> ปี</small></span></div><ul class="sb-m">${STATS.map(([k, v]) => `<li><span class="mh"><span class="mk">${k}</span><b class="num">${v}</b></span><span class="br"><i style="width:${v}%"></i></span></li>`).join('')}</ul></header>`;
-  const btn = (label, fx, n, lock) => `<button class="choice"${lock ? ' disabled' : ` data-key="${n}"`}>${lock ? '' : `<kbd aria-hidden="true">${n}</kbd>`}<span>${esc(label)}</span>${fx}</button>`;
-  const cardHtml = (s, old) => {
-    let n = 0;
-    const choices = s.choices.map(([label, toks, lock]) => btn(label, lock ? `<span class="fx"><span>${esc(lock)}</span></span>` : toks ? (old ? fxOld(toks) : fxNew(toks, s.world)) : '', ++n, lock)).join('');
-    const body = `<span class="kicker">${esc(s.kicker)}</span><h3>${esc(s.h)}</h3><p>${esc(s.p)}</p>`;
-    if (s.world === 'i') return `<article class="card i"><div class="top"><b>ต่างโลก</b><small>ชาติต่างโลกที่ 1 · อายุ ${s.age}</small></div><div class="body">${body}</div><div class="choices">${choices}</div></article>`;
-    return `<article class="card a pn pn2"><div class="p-left">${sb(s.age)}</div><div class="p-mid"><div class="body">${body}</div><div class="choices">${choices}</div></div></article>`;
+  // ---------- CSS ที่ฉีด ----------
+  const mix = (a, n, b) => `color-mix(in srgb, ${a} ${n}%, ${b})`;
+  // ชาติไทย T1 (ชุดเดียวกับ t1-tokens-tweak.html ชุด 1 + ฟอนต์เนื้อ Sarabun) — ไม่รวมตระกูลรดน้ำ (lacquer cream sand bronze gold2) ที่แยกไปอยู่ knob การ์ด B
+  const thaiCss = () => `:root{${Object.entries(T1).map(([k, x]) => `--t-${k}:${x};`).join('')}
+--page:var(--t-bg);--paper:var(--t-surface);--paper2:${mix('var(--t-surface)', 45, 'var(--t-bg)')};--ink:var(--t-ink);--ink2:${mix('var(--t-ink)', 70, 'var(--t-muted)')};--muted:var(--t-muted);
+--rule:var(--t-line);--rule2:${mix('var(--t-line)', 60, 'var(--t-surface)')};--red:var(--t-seal);--green:var(--t-good);--blue:var(--t-accent2);--dg:var(--t-bad);--gold:var(--t-gold);
+--ft:"Sarabun",system-ui,sans-serif;--r:6px;--rk:8px;--sh:0 1px 0 var(--t-gold), 0 6px 18px ${mix('var(--t-ink)', 10, 'transparent')};}
+.logo{background:var(--t-head);}
+.logo b{color:var(--t-gold);} .logo small{color:${mix('var(--t-headink)', 85, 'var(--t-head)')};}
+.a .top{background:var(--t-accent);color:var(--t-surface);}
+.a .choice{border-color:var(--t-line-strong);}
+.a .choice:hover,.a .choice:focus-visible,.a .choice.hv{background:var(--t-accent);color:var(--t-surface);}
+body:has(#app > .card.a) .mnav button[aria-expanded="true"]{color:var(--t-accent);box-shadow:inset 0 3px 0 var(--t-accent);}
+.body h3:not(.lead){font-family:"Maitree",serif;}
+.b .body h3:not(.lead){font-family:Srisakdi,serif;}
+`;
+  // การ์ด B ตามค่า lacquer: ตัวแปรตระกูลรดน้ำผสมแบบเดียวกับ t1-tokens-tweak (ใบ 102) — ตัวที่เกมใช้บนการ์ด B และภาพแชร์
+  const bCss = (c) => `:root{--lacquer:${c.lacquer};--lacquer2:${mix(c.lacquer, 88, T1.headink)};--cream:${T1.headink};--gold2:${mix(T1.gold, 50, T1.headink)};--sand:${mix(T1.headink, 75, c.lacquer)};--bronze:${mix(T1.gold, 35, c.lacquer)};--bronze2:${mix(T1.gold, 60, c.lacquer)};}
+.b .choice:hover,.b .choice:focus-visible,.b .choice.hv{background:${mix(c.lacquer, 80, T1.headink)};}
+`;
+  const afCss = (c) => `body:has(#app > .card.af){--page:${mix(c.lacquer, 70, '#000')};--paper:var(--lacquer);--paper2:var(--lacquer2);--rule2:var(--bronze);--track:var(--lacquer2);}
+body:has(#app > .card.af) .logo,.af .sb{background:${mix(c.lacquer, 85, '#000')};}
+`;
+  // ตรึงตระกูลรดน้ำค่าเกมเดิมเฉพาะในจอ .af — ตัวแปรอ่านจาก :root เกม (ค่าเดิม) ไม่ฝัง hex ซ้ำ
+  const PIN = ['lacquer', 'lacquer2', 'cream', 'gold2', 'sand', 'bronze', 'bronze2'];
+  const pinCss = () => `body:has(#app > .card.af){${PIN.map((k) => `--${k}:${v(ROOT, k, '')};`).join('')}}
+body:has(#app > .card.af) .b .choice:hover,body:has(#app > .card.af) .b .choice:focus-visible,body:has(#app > .card.af) .b .choice.hv{background:${rule('.b .choice:hover, .b .choice:focus-visible').match(/background:\s*([^;]+);/)?.[1] ?? 'var(--lacquer2)'};}
+`;
+  const iskCss = (c) => {
+    const line = mix(c.wink, 25, c.wbg), mut = mix(c.wink, 72, c.wbg);
+    return `body:has(#app > .card.i){--page:${c.wbg};--paper:${c.wsurf};--paper2:${mix(c.wsurf, 80, c.wink)};--ink:${c.wink};--ink2:${mix(c.wink, 88, c.wbg)};--muted:${mut};--rule2:${line};--fl:${c.wacc};}
+body:has(#app > .card.i) .logo{background:${c.wbg};border-bottom-color:${line};}
+body:has(#app > .card.i) .logo b{color:${c.wacc};}
+body:has(#app > .card.i) .logo small{color:${mut};}
+body:has(#app > .card.i) .mnav button[aria-expanded="true"]{color:${c.wacc};box-shadow:inset 0 3px 0 ${c.wacc};}
+.i{background:${c.wsurf};color:${c.wink};border-color:${line};}
+.i .top{border-bottom-color:${line};} .i .top b{color:${c.wacc};} .i .top small,.i .note{color:${mut};}
+.i .body h3{color:${c.wink};} .i .body p{color:${mix(c.wink, 90, c.wsurf)};}
+.i .sb{background:${mix(c.wsurf, 85, c.wbg)};}
+.i .sb-who small.hd-job{color:${c.wink};}
+.i .choice{background:${c.wbg};color:${c.wink};border-color:${line};}
+.i .choice .fx{color:${c.wacc};}
+.i .choice:hover,.i .choice:focus-visible,.i .choice.hv{border-color:${c.wacc};background:${mix(c.wacc, 14, c.wsurf)};}
+`;
   };
-  const srLine = (s) => s.choices.filter(([, t, lock]) => t && !lock).map(([l, t]) => `${l}: ${t.map(said).join(', ')}`).join(' | ');
+  const ovCss = (p) => (p.pure ? '' : thaiCss() + (p.b === 'kram' ? bCss(p.c) : '') + (p.afp === 'b' ? afCss(p.c) : p.afp === 'pin' && p.b === 'kram' ? pinCss() : '') + (p.isk === 'json' ? iskCss(p.c) : ''));
+  // สถานะ "ชี้อยู่" ของปุ่มตัวแรก: ลอกกฎ :hover ของปุ่มจาก CSS เกมเป็น .hv (ค่าเกมตอนนี้ตามมาเอง ไม่ฝัง hex ซ้ำ)
+  const HV = [...GCSS.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter(([, s]) => s.includes(':hover') && s.includes('.choice')).map(([, s, b]) => `${s.replace(/:hover/g, '.hv').trim()}{${b}}`).join('\n');
+  const FIX = `${HV}\n.choice.hv > kbd{border-color:currentColor;color:inherit}#app{padding:0 12px 12px}.card{min-height:0 !important}@media (max-width:700px){.mnav{position:static;margin-top:8px}body:has(.mnav){padding-bottom:0}}body{overflow:hidden}`;
 
-  // ---------- จอ: iframe ต่อใบ · srcdoc = CSS เกม + การ์ด ⇒ media query ของเกมเห็นความกว้างจริง ----------
-  const GCSS = document.getElementById('gcss').content.querySelector('style').textContent;
-  const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600&family=Sarabun:wght@400;600&family=Srisakdi:wght@700&display=swap';
-  // ชิ้นป้ายต้องไม่หักกลางชิ้น (กฎเดียวกับ .choice .fx span ของเกม)
-  const doc = (html) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><link rel="stylesheet" href="${FONTS}"><style>${GCSS}</style><style>body{overflow:hidden}.choice .fx .fxp{white-space:nowrap;display:inline-block}.choice .fx .fxp *{white-space:nowrap}</style></head><body><main id="app">${html}</main></body></html>`;
-  const frames = document.getElementById('frames');
-  const fit = (f) => {
-    const box = f.parentElement;
-    const w = +ui.vp;
-    const s = Math.min(1, box.clientWidth / w);
-    // วัดจากก้นการ์ด ไม่ใช่ scrollHeight — CSS เกมมีความสูงขั้นต่ำตามจอ ยืด iframe แล้วจอก็สูงตามไม่หยุด
-    const a = f.contentDocument?.querySelector('article');
-    const h = a ? Math.ceil(a.getBoundingClientRect().bottom + 24) : 600;
+  // ---------- ฉาก: markup ตามคลาสเกมจริง (app.mjs renderAfter · renderIsekai) ----------
+  const choice = (t, fx, off, hv) => `<button class="choice${hv ? ' hv' : ''}" type="button"${off ? ' disabled' : ''}><span>${t}</span>${fx ? `<span class="fx"><span>${fx}</span></span>` : ''}</button>`;
+  const nav = (ls) => `<nav class="mnav" aria-label="เมนู">${ls.map((l, i) => `<button type="button"${i ? '' : ' aria-expanded="true"'}><span>${l}</span></button>`).join('')}</nav>`;
+  const logo = '<div class="logo"><b>เกิดใหม่ทั้งที</b><small>ชาตินี้ขอชิงมาเกิด</small></div>';
+  const MARK = {
+    b: `${logo}<div id="app"><article class="card b af"><div class="top"><b>เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</b><small>สมชาย ใจดี · จากไปอายุ 78</small></div><div class="body"><span class="kicker">ทางเกิด</span><h3>เกิดใหม่ตามบุญ</h3><h3 class="lead">บุญที่ทำมาพาไปเกิดในบ้านที่พอมีพอกิน</h3><p class="note">ชีวิตนี้ทำบุญ 41 ครั้ง · บาป 12 ครั้ง</p></div><div class="choices">${choice('เกิดใหม่', 'ตามบุญที่ทำมา', false, true)}${choice('ตระกูลใหม่', null)}${choice('ไปต่างโลก', 'ล็อก · ต้องมีบารมี 30', true)}</div></article>${nav(['ตัวฉัน', 'สมุด', 'เพิ่มเติม'])}</div>`,
+    af: `${logo}<div id="app"><article class="card b af"><div class="top"><b>เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</b><small>สมชาย ใจดี · ภูมิดาวดึงส์ · ปีที่ 3/10</small></div><div class="body"><span class="kicker">ปีในภูมิ</span><h3>สวนนันทวัน</h3><p>เทวดาชวนฟังธรรมใต้ต้นปาริชาต กลิ่นดอกไม้ลอยมาไกล</p><div class="recap"><div class="h">บัญชีบุญบาป เฉลยที่ปรโลก</div><div class="scale"><div class="heavy"><b>บุญ</b><span class="sum">128</span><span>ใส่บาตร 40</span></div><div><b>บาป</b><span class="sum">37</span><span>โกหก 12</span></div></div><p class="sub">หนักไปทางบุญ</p></div></div><div class="choices">${choice('ฟังธรรมต่อ', '▲ บุญ', false, true)}${choice('ลงไปดูลูกหลาน', null)}</div></article>${nav(['ตัวฉัน', 'สมุด', 'เพิ่มเติม'])}</div>`,
+    i: `${logo}<div id="app"><article class="card i"><div class="top"><b>ต่างโลก · ปีที่ 3</b><small>สมชาย ใจดี · ชาติต่างโลกที่ 1</small></div><div class="body"><span class="kicker">เหตุการณ์ · อายุ 19</span><h3>ประตูหินเรืองแสง</h3><p>เทพธิดาบอกว่าหลังประตูคือดันเจียนชั้นสอง</p><p class="iok">สำเร็จ</p><p class="ibad">พลาด</p><p class="note">ระดับ +1 · มานา −5</p><p class="isys">สกิลช่วยไว้ 1 ครั้งในชาตินี้</p></div><div class="choices">${choice('เข้าไปทันที', '▲ ระดับ', false, true)}${choice('กลับไปฝึกสกิล', null)}${choice('ท้าบอส', 'ล็อก · ต้องระดับ 10', true)}</div></article>${nav(['ตัวฉัน', 'โฟกัส', 'สกิล', 'สมุด', 'เพิ่มเติม'])}</div>`,
+    share: `<div class="shw"><canvas id="sh" width="1080" height="1920" aria-label="ภาพแชร์ตัวอย่าง"></canvas></div>`,
+  };
+  const SHARE_FRAME = '.shw{padding:16px;display:flex;justify-content:center}.shw canvas{width:100%;max-width:540px;height:auto;display:block;box-shadow:0 6px 24px rgb(0 0 0 / .25)}';
+  const srcdoc = (sc, p) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><link rel="stylesheet" href="${FONTS}"><style>${GCSS}</style><style>${FIX}${sc === 'share' ? SHARE_FRAME : ''}</style><style id="ov">${ovCss(p)}</style></head><body>${MARK[sc]}</body></html>`;
+
+  // ภาพแชร์: ลอกโครงจาก app.mjs shareBlob (กรอบทอง + ข้อความกลาง) · สีอ่านจาก :root ของกรอบ = ที่เกมอ่านจริง
+  function drawShare(f) {
+    const d = f.contentDocument, cv = d?.getElementById('sh');
+    if (!cv) return;
+    const ctx = cv.getContext('2d'), W = 1080, H = 1920, cx = W / 2, maxW = W - 200;
+    const css = f.contentWindow.getComputedStyle(d.documentElement);
+    const c = (k) => css.getPropertyValue(`--${k}`).trim();
+    ctx.fillStyle = c('lacquer'); ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = c('gold'); ctx.lineWidth = 4; ctx.strokeRect(40, 40, W - 80, H - 80);
+    ctx.strokeStyle = c('bronze2'); ctx.lineWidth = 1.5; ctx.strokeRect(56, 56, W - 112, H - 112);
+    ctx.fillStyle = c('gold');
+    for (const [x, y] of [[40, 40], [W - 40, 40], [40, H - 40], [W - 40, H - 40]]) { ctx.save(); ctx.translate(x, y); ctx.rotate(Math.PI / 4); ctx.fillRect(-11, -11, 22, 22); ctx.restore(); }
+    ctx.textAlign = 'center';
+    let y = 0, draw = false;
+    const text = (s, font, color, lineH, gap = 0) => {
+      const px = Number(font.match(/(\d+)px/)[1]);
+      let k = 1;
+      for (; k > 0.6; k -= 0.05) { ctx.font = font.replace(/\d+px/, `${Math.round(px * k)}px`); if (ctx.measureText(s).width <= maxW) break; }
+      ctx.fillStyle = color; y += lineH * k; if (draw) ctx.fillText(s, cx, y); y += gap;
+    };
+    const rule = (gap) => { y += gap; if (draw) { ctx.strokeStyle = c('bronze'); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx - 180, y); ctx.lineTo(cx + 180, y); ctx.stroke(); } y += gap; };
+    const layout = () => {
+      for (const part of ['เกิดใหม่ทั้งที', 'ชาตินี้ขอชิงมาเกิด']) text(part, '700 84px Srisakdi, serif', c('gold'), 96);
+      text('NEXT LIFE', '600 28px Sarabun, sans-serif', c('sand'), 44);
+      y += 18; text('ชาติประจำวัน 5 พ.ย.', '600 46px Sarabun, sans-serif', c('gold2'), 60, 28);
+      rule(44);
+      if (draw) { ctx.fillStyle = c('lacquer'); ctx.fillRect(cx - 54, y - 50, 108, 12); ctx.strokeStyle = c('gold'); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, y - 44, 38, 0, Math.PI * 2); ctx.fillStyle = c('lacquer2'); ctx.fill(); ctx.stroke(); }
+      text('สมชาย ใจดี', '700 72px Srisakdi, serif', c('cream'), 84, 4);
+      text('จากไปอายุ 78', '700 96px Srisakdi, serif', c('gold2'), 110, 16);
+      text('ชาย · ขอนแก่น · ชนชั้นกลาง', '400 40px Sarabun, sans-serif', c('cream'), 58);
+      text('ข้าราชการครู', '400 36px Sarabun, sans-serif', c('sand'), 52);
+      rule(44);
+      text('ชีวิตแบบ', '600 30px Sarabun, sans-serif', c('gold'), 44);
+      text('ครูของแผ่นดิน', '700 76px Srisakdi, serif', c('gold2'), 92);
+      text('สอนหนังสือจนเกษียณ ลูกศิษย์มากราบทุกปี', '400 32px Sarabun, sans-serif', c('sand'), 48);
+      y += 36; text('ฉายาหายากที่สุด', '600 30px Sarabun, sans-serif', c('gold'), 44);
+      text('ปราชญ์ชาวบ้าน', '700 68px Srisakdi, serif', c('gold2'), 84);
+      text('หายาก', '400 32px Sarabun, sans-serif', c('sand'), 48);
+    };
+    layout(); y = 80 + Math.max(0, (H - 140 - 80 - y) / 2); draw = true; layout();
+    ctx.font = '400 30px Sarabun, sans-serif'; ctx.fillStyle = c('sand'); ctx.fillText('dmo-hub.github.io/next-life', cx, H - 72);
+  }
+
+  // ---------- สี + contrast ----------
+  const cv = document.createElement('canvas'); cv.width = cv.height = 1;
+  const cx = cv.getContext('2d', { willReadFrequently: true });
+  const toRgba = (css) => { cx.clearRect(0, 0, 1, 1); cx.fillStyle = '#000'; cx.fillStyle = css; cx.fillRect(0, 0, 1, 1); const d = cx.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255]; };
+  const lum = ([r, g, b]) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  const bgOf = (el, win) => {
+    const layers = [];
+    for (let e = el; e; e = e.parentElement) { const c = toRgba(win.getComputedStyle(e).backgroundColor); if (c[3] > 0) layers.push(c); if (c[3] >= 1) break; }
+    if (!layers.length || layers[layers.length - 1][3] < 1) layers.push([255, 255, 255, 1]);
+    return layers.reduceRight((u, c) => [0, 1, 2].map((i) => c[i] * c[3] + u[i] * (1 - c[3])), [0, 0, 0]);
+  };
+  // คู่ที่วัดในจอ · t = ตัวหนังสือ ≥4.5 · u = ขอบปุ่มกดได้ ≥3 (เทียบพื้นการ์ด) · tok = token ชาติไทย T1 ถ้าหลุดไปอยู่บนการ์ดโลกนี้ (ข้อ 214: ของร่วมทุกโลก)
+  // · x = โชว์ค่าให้รู้ ไม่ตัดผ่าน/ตก
+  const PROBES = {
+    b: [['t', '.b .top b', 'ชื่อเกมทองบนหัวการ์ด'], ['t', '.b .top small', 'คำรองบนหัว'], ['t', '.b .kicker', 'ป้ายเล็กทอง'], ['t', '.b .body h3:not(.lead)', 'หัวการ์ด'], ['t', '.b .body h3.lead', 'เนื้อ (lead)'], ['t', '.b .note', 'หมายเหตุ'], ['t', '.b .choice.hv > span', 'ปุ่มที่ชี้'], ['t', '.b .choice:not(.hv):not([disabled]) > span', 'ปุ่ม'], ['u', '.b .choice:not(.hv):not([disabled])', 'ขอบปุ่มบนการ์ด'], ['t', '.logo small', 'คำรองหัวเว็บ']],
+    af: [['t', '.b .top small', 'คำรองบนหัว'], ['t', '.b .body h3', 'หัวการ์ด'], ['t', '.b .body p:not(.sub)', 'เนื้อ'], ['t', '.recap .h', 'หัวกล่องบุญบาป'], ['t', '.scale .sum', 'ตัวเลขบุญบาป'], ['t', '.b .choice.hv > span', 'ปุ่มที่ชี้'], ['u', '.b .choice:not(.hv)', 'ขอบปุ่มบนการ์ด'], ['x', '!card-page', 'การ์ด B เทียบพื้นหน้าปรโลก (แยกการ์ดจากพื้น)']],
+    i: [['t', '.i .top b', 'หัวการ์ด (สีเน้น)'], ['t', '.i .top small', 'คำรองบนหัว'], ['t', '.i .kicker', 'ป้ายเล็ก'], ['t', '.i .body h3', 'หัวเหตุการณ์'], ['t', '.i .body p:not([class])', 'เนื้อ'], ['t', '.i .iok', 'สำเร็จ'], ['t', '.i .ibad', 'พลาด'], ['t', '.i .note', 'ตัวรอง'], ['t', '.i .isys', 'กรอบข้อความระบบ'], ['t', '.i .choice.hv > span', 'ปุ่มที่ชี้'], ['u', '.i .choice:not(.hv):not([disabled])', 'ขอบปุ่มบนการ์ด'], ['u', '.i .choice.hv', 'ขอบปุ่มที่ชี้ (wacc)'],
+      ['tok', 'good', 'T1 ขึ้น/ดี บนการ์ดต่างโลก'], ['tok', 'bad', 'T1 ติดลบ บนการ์ดต่างโลก'], ['tok', 'accent', 'T1 accent คราม บนการ์ดต่างโลก'], ['tok', 'muted', 'T1 ตัวรอง บนการ์ดต่างโลก'], ['tok', 'seal', 'T1 ชาด บนการ์ดต่างโลก'], ['x', '!b-wsurf', 'การ์ด B (lacquer) เทียบการ์ดต่างโลก — ใกล้ 1 = สองโลกแยกด้วยสีไม่ออก']],
+    share: [['t', 'cream', 'ชื่อ · ที่มา'], ['t', 'gold', 'ชื่อเกม · หัวเรื่องเล็ก'], ['t', 'gold2', 'อายุ · แบบชีวิต · ฉายา'], ['t', 'sand', 'คำรอง · URL'], ['x', 'bronze2', 'กรอบใน (ประดับ)']],
+  };
+  const live = []; // { f, w, p, sc, small }
+  const firstOf = (sc) => live.find((x) => x.sc === sc && x.p === S.cur && x.w === 390);
+  function measureScene(sc) {
+    const fr = firstOf(sc), d = fr?.f.contentDocument, win = fr?.f.contentWindow;
+    if (!d?.body) return null;
+    const out = [];
+    const card = d.querySelector('.card'), cardBg = card && bgOf(card, win);
+    for (const [kind, sel, label] of PROBES[sc]) {
+      let fg, bg;
+      if (sc === 'share') { const cs = win.getComputedStyle(d.documentElement); fg = toRgba(cs.getPropertyValue(`--${sel}`)); bg = toRgba(cs.getPropertyValue('--lacquer')); }
+      else if (kind === 'tok') { fg = toRgba(T1[sel]); bg = cardBg; }
+      else if (sel === '!card-page') { fg = cardBg; bg = toRgba(win.getComputedStyle(d.body).backgroundColor); }
+      else if (sel === '!b-wsurf') { fg = toRgba(S.cur.pure || S.cur.b === 'keep' ? NOW.lacquer : S.cur.c.lacquer); bg = cardBg; }
+      else {
+        const el = d.querySelector(sel);
+        if (!el) continue;
+        const cs = win.getComputedStyle(el);
+        if (kind === 'u') { fg = toRgba(cs.borderTopColor); bg = bgOf(el.parentElement, win); } else { fg = toRgba(cs.color); bg = bgOf(el, win); }
+      }
+      if (!fg || !bg) continue;
+      const r = ratio(fg, bg), need = kind === 'u' ? 3 : kind === 'x' ? 0 : 4.5;
+      out.push({ sc, kind, label, r, need, ok: !need || r >= need, fg, bg });
+    }
+    return out;
+  }
+  function measureFrame(f) {
+    const d = f.contentDocument, win = f.contentWindow;
+    if (!d?.body) return null;
+    let cMin = 99, cAt = '', fMin = 99;
+    for (const el of d.body.querySelectorAll('*')) {
+      if (!el.offsetParent && el.tagName !== 'BODY') continue;
+      if (el.closest('[disabled]')) continue;
+      if (![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
+      const cs = win.getComputedStyle(el), px = parseFloat(cs.fontSize);
+      if (px < fMin) fMin = px;
+      const r = ratio(toRgba(cs.color), bgOf(el, win));
+      if (r < cMin) { cMin = r; cAt = `${el.tagName.toLowerCase()}.${String(el.className).trim().split(/\s+/).join('.')} «${el.textContent.trim().slice(0, 12)}»`; }
+    }
+    return { cMin, cAt, fMin };
+  }
+
+  // ---------- กรอบ ----------
+  const fit = (f, w) => {
+    const box = f.parentElement, s = Math.min(1, box.clientWidth / w), b = f.contentDocument?.body;
+    const h = b ? Math.ceil(Math.max(200, ...[...b.querySelectorAll('body > *, #app > *')].map((e) => e.getBoundingClientRect().bottom + (f.contentWindow.scrollY || 0))) + 16) : 600;
     Object.assign(f.style, { width: `${w}px`, height: `${h}px`, transform: `scale(${s})` });
     box.style.height = `${Math.ceil(h * s)}px`;
   };
-  const frame = (title, sub, html, sr) => {
+  function report(x) {
+    if (x.sc === 'share') drawShare(x.f);
+    fit(x.f, x.w);
+    const m = x.sc === 'share' ? null : measureFrame(x.f);
+    x.small.innerHTML = m ? `${x.w}px · contrast ต่ำสุดในจอ <span class="${m.cMin >= 4.5 ? 'ok' : 'bad'}" title="${esc(m.cAt)}">${m.cMin.toFixed(2)}</span> · ตัวเล็กสุด <span class="${m.fMin >= 12 ? 'ok' : 'bad'}">${m.fMin}px</span>${m.cMin >= 4.5 ? '' : ` · ที่ ${esc(m.cAt)}`}` : `${x.w}px · ภาพจริง 1080 × 1920`;
+    after();
+  }
+  function frame(title, sc, p, w) {
     const wrap = document.createElement('section');
     wrap.className = 'fr';
-    wrap.innerHTML = `<h3>${esc(title)} <small>${esc(sub)}</small></h3><div class="box"><iframe title="${esc(title)}"></iframe></div>${sr ? `<p class="sr-out">อ่านจอ: ${esc(sr)}</p>` : ''}`;
-    const f = wrap.querySelector('iframe');
-    f.addEventListener('load', () => { fit(f); f.contentDocument.fonts?.ready.then(() => fit(f)); });
-    f.srcdoc = doc(html);
+    wrap.innerHTML = `<h3>${esc(title)} <small></small></h3><div class="box"><iframe title="${esc(title)}"></iframe></div>`;
+    const x = { f: wrap.querySelector('iframe'), w, p, sc, small: wrap.querySelector('small') };
+    x.f.addEventListener('load', () => { report(x); x.f.contentDocument.fonts?.ready.then(() => report(x)); });
+    x.f.srcdoc = srcdoc(sc, p);
+    live.push(x);
     return wrap;
-  };
-  const draw = () => {
-    const list = [];
-    for (const s of SAMPLES) list.push(frame(s.title, s.sub, cardHtml(s, false), srLine(s)), frame(`${s.title} · ของเดิม`, 'คำล้วนตอนนี้', cardHtml(s, true)));
-    frames.className = `frames w${ui.vp === '1280' ? '1280' : '390'}${ui.gray === 'on' ? ' gray' : ''}`;
-    frames.replaceChildren(...list);
-    out();
-  };
-  addEventListener('resize', () => frames.querySelectorAll('iframe').forEach(fit));
-
-  // ---------- แผงควบคุม ----------
-  const rows = document.getElementById('rows');
-  const segs = {};
-  for (const [k, label, opt] of ROWS) {
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.innerHTML = `<span class="lb">${label}</span>`;
-    const seg = document.createElement('div');
-    seg.className = 'seg';
-    for (const [v, t] of opt) {
-      const b = document.createElement('button');
-      Object.assign(b, { type: 'button', textContent: t });
-      b.dataset.v = v;
-      b.onclick = () => { cfg[k] = v; sync(); draw(); };
-      seg.append(b);
+  }
+  function draw() {
+    live.length = 0;
+    const host = $('frames'), groups = [];
+    const group = (title, list, cmp) => { const g = document.createElement('section'); g.className = 'sc'; g.innerHTML = `<h2>${esc(title)}</h2>`; const fr = document.createElement('div'); fr.className = `frames${cmp ? ' cmp' : ''}`; fr.append(...list); g.append(fr); return g; };
+    if (S.mode === 'cmp') {
+      const [k, l] = SCENES.find(([s]) => s === S.scene);
+      groups.push(group(l, PRESETS.map((p, i) => frame(i === S.base ? `${S.cur.name}${edits().length ? ' (แก้แล้ว)' : ''}` : p.name, k, i === S.base ? S.cur : p, 390)), true));
+    } else {
+      for (const [k, l] of SCENES) groups.push(group(l, [390, 1280].map((w) => frame(`${l}`, k, S.cur, w))));
     }
-    segs[k] = seg;
-    row.append(seg);
-    rows.append(row);
+    host.replaceChildren(...groups);
+    document.querySelectorAll('#mode button').forEach((b) => b.classList.toggle('on', b.dataset.m === S.mode));
+    $('scene').style.display = S.mode === 'cmp' ? '' : 'none';
+    document.querySelectorAll('#scene button').forEach((b) => b.classList.toggle('on', b.dataset.s === S.scene));
+    after();
   }
-  const icons = document.getElementById('icons');
-  const ICON_ROWS = [...KEYS.map((k) => [k, k]), ['free', 'ฟรี'], ['pct', '%สำเร็จ'], ['hide', 'ค่าซ่อน ?']];
-  for (const [k, label] of ICON_ROWS) {
-    const l = document.createElement('label');
-    l.textContent = label;
-    l.htmlFor = `i-${k}`;
-    const inp = Object.assign(document.createElement('input'), { type: 'text', id: `i-${k}` });
-    inp.oninput = () => { cfg.icons[k] = inp.value.trim(); draw(); };
-    icons.append(l, inp);
+  function restyle() {
+    for (const x of live) {
+      const ov = x.f.contentDocument?.getElementById('ov');
+      if (!ov) continue;
+      ov.textContent = ovCss(x.p);
+      requestAnimationFrame(() => report(x));
+    }
+    after();
   }
-  const cols = document.getElementById('cols');
-  for (const [k, label] of [['upA', 'ไทย ขึ้น'], ['dnA', 'ไทย ลง'], ['upI', 'ต่างโลก ขึ้น'], ['dnI', 'ต่างโลก ลง']]) {
-    const l = document.createElement('label');
-    const inp = Object.assign(document.createElement('input'), { type: 'color', id: `c-${k}` });
-    inp.oninput = () => { cfg[k] = inp.value; draw(); };
-    l.append(inp, label);
-    cols.append(l);
-  }
-  const pre = document.getElementById('pre');
-  for (const [p, v] of Object.entries(PRESET)) {
-    const b = document.createElement('button');
-    Object.assign(b, { type: 'button', className: 'pre', textContent: v.name });
-    b.dataset.p = p;
-    b.onclick = () => { ui.pre = p; cfg = fresh(p); sync(); draw(); };
-    pre.append(b);
-  }
-  const vp = document.getElementById('vp');
-  vp.querySelectorAll('button').forEach((b) => (b.onclick = () => { ui.vp = b.dataset.v; sync(); draw(); }));
-  const gray = document.getElementById('gray');
-  gray.querySelectorAll('button').forEach((b) => (b.onclick = () => { ui.gray = b.dataset.v; sync(); draw(); }));
-  const sync = () => {
-    for (const [k, seg] of Object.entries(segs)) seg.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === cfg[k]));
-    for (const [k] of ICON_ROWS) { const f = document.getElementById(`i-${k}`); if (f !== document.activeElement) f.value = cfg.icons[k] ?? ''; }
-    for (const k of ['upA', 'dnA', 'upI', 'dnI']) document.getElementById(`c-${k}`).value = cfg[k];
-    pre.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.p === ui.pre));
-    vp.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === ui.vp));
-    gray.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === ui.gray));
-  };
-  // JSON ส่งเจ้าของ: ค่าที่ใช้ลงเกม · changed = ช่องที่ต่างจาก preset ที่เริ่ม (ไอคอนนับรายค่า)
-  const out = () => {
-    const base = fresh(ui.pre);
-    const changed = [
-      ...Object.keys(BASE).filter((k) => cfg[k] !== base[k]),
-      ...ICON_ROWS.map(([k]) => k).filter((k) => (cfg.icons[k] ?? '') !== (base.icons[k] ?? '')).map((k) => `icons.${k}`),
-    ];
-    const { name, ...rest } = cfg;
-    const o = { page: 'fx-icons-tweak (ui-redo 52)', preset: PRESET[ui.pre].name, changed, ...rest, note: document.getElementById('note').value };
-    document.getElementById('out').value = JSON.stringify(o, null, 1);
+  let rows = [];
+  function after() {
+    rows = SCENES.flatMap(([k]) => measureScene(k) || []);
+    const fails = rows.filter((x) => !x.ok);
+    const sw = (x) => `<span class="pair" style="background:rgb(${x.bg.slice(0, 3)});color:rgb(${x.fg.slice(0, 3)})">ก</span>`;
+    const seen = new Set(rows.map((x) => x.sc));
+    $('cr').innerHTML = `<table class="cr"><tr><th></th><th>คู่</th><th>ค่า</th></tr>${SCENES.filter(([k]) => seen.has(k)).map(([k, l]) => `<tr><th colspan="3">${esc(l)}</th></tr>${rows.filter((x) => x.sc === k).map((x) => `<tr><td>${sw(x)}</td><td>${esc(x.label)}</td><td class="n"><span class="${x.kind === 'x' ? 'info' : x.ok ? 'ok' : 'bad'}">${x.r.toFixed(2)}</span>${x.need ? ` <small class="info">≥${x.need}</small>` : ''}</td></tr>`).join('')}`).join('')}</table>
+      <p class="hint">${rows.length ? (fails.length ? `<span class="bad">ตก ${fails.length} คู่</span>` : '<span class="ok">ผ่านทุกคู่</span>') : 'รอจอโหลด'} · วัดจากสีที่จอเกมคำนวณจริง (ชุดที่เลือก จอ 390)${S.mode === 'cmp' ? ' · โหมดเทียบวัดแค่จอที่เปิด' : ''} · แถว "T1 … บนการ์ดต่างโลก" = ถ้าใบ 105 ใช้ token ไทยตัวนั้นบนการ์ดต่างโลก</p>`;
+    $('out').value = output(fails);
     store();
-  };
-  document.getElementById('note').oninput = out;
-  document.getElementById('copy').onclick = async () => {
-    const o = document.getElementById('out');
-    try { await navigator.clipboard.writeText(o.value); } catch (e) { o.select(); document.execCommand('copy'); }
-    document.getElementById('msg').textContent = 'คัดลอกแล้ว วางส่งได้เลย';
-  };
-  document.getElementById('reset').onclick = () => { cfg = fresh(ui.pre); sync(); draw(); };
-  sync();
+  }
+  function output(fails) {
+    const p = S.cur;
+    return JSON.stringify({
+      page: 't1-worlds-tweak', ticket: 129, base: PRESETS[S.base].id, baseName: PRESETS[S.base].name, edited: edits(),
+      bCard: p.pure ? 'now' : p.b, isekai: p.pure ? 'now' : p.isk, afterPage: p.pure ? 'now' : p.afp,
+      tokens: p.pure ? { lacquer: NOW.lacquer, wbg: NOW.wbg, wsurf: NOW.wsurf, wink: NOW.wink, wacc: NOW.wacc } : { lacquer: p.b === 'kram' ? p.c.lacquer : NOW.lacquer, ...(p.isk === 'json' ? { wbg: p.c.wbg, wsurf: p.c.wsurf, wink: p.c.wink, wacc: p.c.wacc } : {}) },
+      contrastFail: fails.map((x) => `${x.sc}: ${x.label} ${x.r.toFixed(2)}`), note,
+    }, null, 1);
+  }
+
+  // ---------- แผง ----------
+  const hex6 = (x) => { const t = x.trim(); if (/^#[0-9a-f]{6}$/i.test(t)) return t.toUpperCase(); if (/^#[0-9a-f]{3}$/i.test(t)) return ('#' + t.slice(1).split('').map((c) => c + c).join('')).toUpperCase(); return null; };
+  let tid = 0;
+  const later = () => { clearTimeout(tid); tid = setTimeout(restyle, 120); };
+  function panel() {
+    const p = S.cur, base = PRESETS[S.base], ed = new Set(edits()), lock = !!p.pure;
+    const tok = ([k, label, knob]) => { const off = lock || p[knob] !== (knob === 'b' ? 'kram' : 'json'); return `<div class="tok"><input type="color" data-c="${k}" value="${esc(hex6(p.c[k]) || '#000000')}" aria-label="${esc(label)}"${off ? ' disabled' : ''}><input type="text" data-h="${k}" value="${esc(p.c[k])}" aria-label="${esc(label)} hex"${off ? ' disabled' : ''}><span><b>--${k}</b> ${esc(label)}${ed.has(k) ? ` <span class="ed">แก้ (เดิม ${esc(base.c[k])})</span>` : ''}${off && !lock ? ' <small class="info">(ไม่ใช้ในตัวเลือกนี้)</small>' : ''}</span></div>`; };
+    const knob = ([k, label, opts]) => `<div class="row"><span class="lb">${esc(label)}${ed.has(k) ? ' <span class="ed">แก้</span>' : ''}</span><div class="seg col">${opts.map(([val, t]) => `<button type="button" data-k="${k}" data-v="${val}" class="${p[k] === val ? 'on' : ''}"${lock ? ' disabled' : ''}>${esc(t)}</button>`).join('')}</div></div>`;
+    $('ctl').innerHTML = `<h1>T1 ช่วงคั่น: สีโลกอื่นก่อน T11</h1>
+      <p class="hint">ใบ 129 · ข้อ 213–214: ใบ 105 ลงชุดสี T1 แล้วทำอะไรกับการ์ด B · ต่างโลก · ปรโลก · ภาพแชร์ ระหว่างรอธีมโลกใบ 120/121 · เลือกชุด ปรับได้ แล้วกด <b>คัดลอกค่า</b> วางตอบในแชท · ค่าที่ปรับจำไว้ในเครื่อง</p>
+      <div class="row"><span class="lb">ชุดตั้งต้น</span><div class="seg col" id="psel">${PRESETS.map((x, i) => `<button type="button" data-p="${i}" class="${i === S.base ? 'on' : ''}">${esc(x.name)}</button>`).join('')}</div></div>
+      <div class="btns"><button type="button" id="reset">คืนค่าชุดนี้${ed.size ? ` (แก้ ${ed.size})` : ''}</button></div>
+      <h2>ทำอะไรกับโลกอื่น</h2>${lock ? '<p class="hint">ชุด 0 = เกมตอนนี้ ปรับไม่ได้ · เลือก ก ข ค แล้วปรับต่อ</p>' : ''}
+      ${KNOBS.map(knob).join('')}
+      <h2>สี (hex)</h2>${TOK.map(tok).join('')}
+      <p class="hint">เกมตอนนี้: การ์ด B ${esc(NOW.lacquer)} · ต่างโลก พื้น ${esc(NOW.wbg)} การ์ด ${esc(NOW.wsurf)} ตัว ${esc(NOW.wink)} เน้น ${esc(NOW.wacc)} · พื้นปรโลก ${esc(NOW.apage)} · ค่า lacquer2 cream sand bronze gold2 ผสมจาก lacquer + ทอง/ครีมหัวเว็บ T1 แบบหน้า T1 (ใบ 102)</p>
+      <h2>contrast ทุกคู่ (สด)</h2><div id="cr"></div>
+      <h2>คัดลอก</h2><div class="row"><span class="lb">หมายเหตุถึงผู้พัฒนา</span><textarea id="note" rows="3">${esc(note)}</textarea></div>
+      <div class="btns"><button type="button" class="pri" id="copy">คัดลอกค่า</button></div><p id="msg"></p>
+      <textarea id="out" rows="10" readonly aria-label="ข้อความที่จะคัดลอก"></textarea>`;
+    document.querySelectorAll('[data-p]').forEach((b) => b.onclick = () => { S.base = +b.dataset.p; S.cur = clone(PRESETS[S.base]); panel(); draw(); });
+    $('reset').onclick = () => { S.cur = clone(PRESETS[S.base]); panel(); draw(); };
+    document.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { S.cur[b.dataset.k] = b.dataset.v; panel(); restyle(); });
+    const setC = (k, x) => { S.cur.c[k] = x; const t = document.querySelector(`[data-h="${k}"]`), c = document.querySelector(`[data-c="${k}"]`); if (t !== document.activeElement) t.value = x; if (c !== document.activeElement) c.value = hex6(x) || '#000000'; later(); };
+    document.querySelectorAll('[data-c]').forEach((i) => { i.oninput = () => setC(i.dataset.c, i.value.toUpperCase()); i.onchange = () => panel(); });
+    document.querySelectorAll('[data-h]').forEach((i) => {
+      i.oninput = () => { const h = hex6(i.value); i.classList.toggle('err', !h); if (h) setC(i.dataset.h, h); };
+      i.onchange = () => { if (hex6(i.value)) panel(); };
+    });
+    $('note').oninput = (e) => { note = e.target.value; after(); };
+    $('copy').onclick = async () => {
+      const o = $('out');
+      try { await navigator.clipboard.writeText(o.value); } catch (e) { o.select(); document.execCommand('copy'); }
+      $('msg').textContent = 'คัดลอกแล้ว — วางตอบในแชทได้เลย';
+    };
+    after();
+  }
+
+  $('scene').innerHTML = SCENES.map(([k, l]) => `<button type="button" data-s="${k}">${esc(l)}</button>`).join('');
+  document.querySelectorAll('#mode button').forEach((b) => b.onclick = () => { S.mode = b.dataset.m; draw(); });
+  document.querySelectorAll('#scene button').forEach((b) => b.onclick = () => { S.scene = b.dataset.s; draw(); });
+  addEventListener('resize', () => live.forEach((x) => fit(x.f, x.w)));
+  panel();
   draw();
 })();
 </script>

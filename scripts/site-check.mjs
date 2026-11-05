@@ -17,7 +17,7 @@ import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml } from '../src/site/nav.mjs';
-import { uiPage, designMoved, tweakPages, tweakMoved, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
+import { uiPage, designMoved, tweakPages, tweakMoved, tweakStatus, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
@@ -25,6 +25,8 @@ import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
 import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsTweak } from '../src/site/docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, cardArtBlock, CAT_ART } from '../src/site/card-art-tweak.mjs';
+import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
+import { PLAY_FILES, playAssets, playScripts, swJs } from '../src/site/play-files.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -52,13 +54,13 @@ check('ตัวเลขบนหน้าเท่าค่าจริง', w
 // 2) ตัวควบคุม: ข้อมูลเปลี่ยน (ตัดการ์ดออก 1 ใบ · ฉายาหาย 1 ตัว) ⇒ เลขที่ฉีดต้องเปลี่ยนตาม — ไม่งั้นข้อ 1 ผ่านเพราะเขียนเลขมือตรงกันพอดี
 const less = { ...content, events: content.events.slice(1) };
 const f2 = { ...siteFacts(less), titles: String(Number(facts.titles) - 1) };
-// ฉายาย้ายจากหน้าแรกไปกลไกในเกม (ui-redo 69) ⇒ ตรวจสองหน้ารวมกัน
-const probe = injectFacts(read('index.html'), f2) + injectFacts(read('about.html'), f2);
+// ฉายาย้ายจากหน้าแรกไปกลไกในเกม (ui-redo 69) · เลขการ์ดเหลือแค่หน้ารวมการ์ดหลังหน้าแรกเหลือแค่หัว (ui-redo 105) ⇒ ตรวจหลายหน้ารวมกัน
+const probe = ['index.html', 'about.html', 'catalog.html'].map((p) => injectFacts(read(p), f2)).join('');
 const moved = ['cards', 'titles'].every((k) => probe.includes(`data-fact="${k}">${f2[k]}<`) && f2[k] !== facts[k]);
 check('ตัวควบคุม: ข้อมูลเปลี่ยนแล้วเลขบนหน้าเปลี่ยนตาม', !moved, ` (การ์ด ${facts.cards} → ${f2.cards} · ฉายา ${facts.titles} → ${f2.titles})`);
 
 // 3) ลิงก์ภายในเว็บไม่ตาย (ไฟล์ · รูป · ที่มาจากหน้าใน docs/ และ docs/spec/ ที่หน้าเว็บลิงก์ถึง)
-const all = [...pages, 'cards', 'whatsnew', 'archive/cards-v1', 'archive/overview-v1', 'dev/index', 'dev/spec'];
+const all = [...pages, 'dev/tweak/cards', 'whatsnew', 'archive/cards-v1', 'archive/overview-v1', 'dev/index', 'dev/spec'];
 const dead = [];
 for (const p of all) {
   const html = read(`${p}.html`);
@@ -277,6 +279,8 @@ const uiTweakGap = (html) => {
     ];
   });
 };
+// แถวในสารบัญห้องผู้พัฒนาที่ชี้หัว tweak (ui.html#ui-t-*) ต้องมีหน้าจริงใต้ dev/tweak/ — ลบหน้า tweak ที่ลงเกมแล้วต้องเอาแถวออกด้วย ไม่งั้นลิงก์ไปหัวที่ไม่มี
+const devRowGap = (indexHtml) => Object.keys(tweakStatus(docs, indexHtml)).filter((id) => id.startsWith('ui-t-') && !uiTweaks.some((t) => t[2] === id)).map((id) => `dev/index ชี้หัวที่ไม่มีหน้า #${id}`);
 const uiFrameBad = (html) => {
   // กรอบต้นแบบปรับสด (7e2) และกรอบหน้า tweak (src=) ตั้งใจรันสคริปต์ — ด่านนี้ดูแค่ชิ้นส่วนตัวอย่าง
   const frames = [...html.matchAll(/<iframe[^>]*>/g)].map((m) => m[0]).filter((f) => !f.includes(`title="${UI_LIVE_TITLE}"`) && !f.includes(' src="'));
@@ -287,6 +291,7 @@ const uiMiss = [
   ...(lf(readOr(UI_MOVED_FROM)) !== designMoved(UI_MOVED_FROM, '') ? [`${UI_MOVED_FROM} ไม่ส่งต่อมา ${UI_PAGE}`] : []),
   ...uiColors.filter(([, v]) => !uiHtml.includes(`background:${v}`)).map(([k]) => `ไม่มีสี ${k}`),
   ...uiTweakGap(uiHtml),
+  ...devRowGap(),
   ...(uiFrameBad(uiHtml) ? ['iframe ไม่ปิดสคริปต์'] : []),
 ];
 const [uiK, uiV] = uiColors[0] ?? ['', ''];
@@ -294,7 +299,8 @@ const uiRecolor = uiBuilt(uiTpl.replace(`${uiK}:${uiV}`, `${uiK}:#010203`));
 const uiCtl =
   uiRecolor !== uiNow && uiRecolor.includes('background:#010203') &&
   (uiTweaks.length === 0 || uiTweakGap(uiHtml.replace(`<h2 id="${uiTweaks[0][2]}">`, '<h2>')).length === 1) &&
-  uiFrameBad(uiHtml.replace(' sandbox=""', ' sandbox="allow-scripts"'));
+  uiFrameBad(uiHtml.replace(' sandbox=""', ' sandbox="allow-scripts"')) &&
+  devRowGap((readOr('dev/index.html') ?? '').replace('<ul', '<ul><li><a href="ui.html#ui-t-gone">x</a></li>')).length === 1;
 check('หน้าดีไซน์ UI ตรงของที่ build สีจากเกมครบ ลิงก์ tweak ครบ ตัวอย่างไม่รันสคริปต์', uiMiss.length || !uiCtl, ` สี ${uiColors.length} · tweak ${uiTweaks.length}${uiMiss.length ? ` · ${uiMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${uiCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7e2) ต้นแบบปรับสด (ui-redo 76): หัวในหน้าดีไซน์ UI มีกรอบที่รันสคริปต์ได้และไม่มี sandbox (sandbox ไม่มี allow-same-origin ⇒ localStorage throw ค่าที่เจ้าของปรับไว้หาย)
@@ -313,7 +319,7 @@ const liveBad = (html) => {
     ...(doc.includes('navigator.clipboard.writeText') ? [] : ['ไม่มีคัดลอก']),
   ];
 };
-const liveLinks = [...devFiles, ...readdirSync(docs).filter((n) => n.endsWith('.html'))].filter((f) => !read(f).includes(MOVED_MARK) && [UI_LIVE_FROM, ...uiTweaks.map((t) => t[3])].some((o) => read(f).includes(`${o.slice(4)}"`)));
+const liveLinks = [...devFiles, ...readdirSync(docs).filter((n) => n.endsWith('.html'))].filter((f) => !read(f).includes(MOVED_MARK) && [UI_LIVE_FROM, ...uiTweaks.map((t) => t[3])].some((o) => read(f).includes(o.startsWith('dev/') ? `${o.slice(4)}"` : `"${'../'.repeat(f.split('/').length - 1)}${o}"`)));
 const liveMiss = [
   ...liveBad(uiHtml),
   ...(lf(readOr(UI_LIVE_FROM)) !== liveMoved() ? [`${UI_LIVE_FROM} ไม่ส่งต่อมา ${UI_PAGE}#${UI_LIVE_ID}`] : []),
@@ -340,7 +346,7 @@ const dtHtml = readOr(DOCS_TWEAK_PAGE) ?? '';
 const dtNow = docsTweakData(docs, uiTpl);
 const dtBlock = docsTweakBlock(dtHtml);
 const dtFiles = dtNow.pages.map((p) => p.f);
-const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'cards.html', 'spoilers.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', 'dev/maps/politics.html', 'dev/archive/index.html'];
+const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spoilers.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', 'dev/maps/politics.html', 'dev/archive/index.html'];
 const dtOut = (f) => f === 'play.html' || f.startsWith('archive/') || f.startsWith('dev/ui-redo/') || /tweak/.test(f) || read(f).includes(MOVED_MARK);
 const dtMiss = [
   ...(JSON.stringify(dtBlock) !== JSON.stringify(dtNow) ? [`ค้าง ${DOCS_TWEAK_PAGE} (build ใหม่)`] : []),
@@ -373,10 +379,10 @@ const wn = read('whatsnew.html');
 const roadCats = soonCats(wn);
 const roadIn = (html) => { const a = html.indexOf(ROAD_START); const b = html.indexOf(ROAD_END); return a < 0 || b < a ? null : html.slice(a + ROAD_START.length, b); };
 const roadNow = roadIn(wn);
-// หน้าแรกเหลือหัว + ปุ่มเล่น + การ์ดโลก + footer (ui-redo 69) — กล่องแผนงาน/ระบบหลักกลับมา = ตก
+// หน้าแรกเหลือแค่หัว + ปุ่มเล่น (ui-redo 105 · ข้อ 220) — กล่องแผนงาน/ระบบหลักกลับมา = ตก
 const homeLeftIn = (html) => ['ROADMAP:START', 'class="road"', 'class="sys"', '>ระบบหลัก<', 'class="footnote"'].filter((s) => html.includes(s));
 const homeLeft = homeLeftIn(read('index.html'));
-const homeCtl = homeLeftIn(read('index.html').replace('<footer>', '<details class="sys"><summary><h2>ระบบหลัก</h2></summary></details>\n  <footer>')).length === 2;
+const homeCtl = homeLeftIn(read('index.html').replace('</div></header>', '<details class="sys"><summary><h2>ระบบหลัก</h2></summary></details>\n</div></header>')).length === 2;
 const coreAbout = read('about.html').includes('<h2 id="core">ระบบหลัก</h2>');
 const roadNoId = (w) => soonCats(w).filter((c) => !w.includes(`id="${c.id}"`)).map((c) => c.name);
 const relSrc = readFileSync(new URL('../scripts/rel.mjs', import.meta.url), 'utf8');
@@ -417,7 +423,8 @@ const litCaught = literal(`button('${BTN.next}', null, f)`).length === 1;
 check('คู่มือมีป้ายปุ่มจากค่ากลางครบ และเกมไม่เขียนป้ายซ้ำ', noGuide.length || literal(appSrc).length || !litCaught, ` ปุ่ม ${Object.keys(BTN).length - noGuide.length}/${Object.keys(BTN).length}${literal(appSrc).length ? ` · เขียนตรง: ${literal(appSrc).join(' ')}` : ''} · ตัวควบคุม${litCaught ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 9) เลขรุ่นในเกมลิงก์แพตช์โน้ต (B121): text fragment เลื่อนไปที่คำแรกที่ตรง ⇒ เลขรุ่นแต่ละตัวต้องโผล่ครั้งแรกที่หัวข้อของรุ่นนั้น
-const play = read('play.html');
+// หน้าเล่นแยกไฟล์ (ui-redo 96): เลขรุ่น/โน้ต/โค้ดอยู่ใน play.js · ด่านที่อ่าน "ตัวเกม" อ่าน HTML + สคริปต์รวมกัน
+const play = `${read('play.html')}\n${read(PLAY_FILES.app)}`;
 const notes = read('whatsnew.html');
 const vers = [...notes.matchAll(/<h3>(v\d+\.\d+\.\d+)/g)].map((m) => [m[1], m.index + 4]);
 const early = vers.filter(([v, at]) => notes.search(new RegExp(`${v.replace(/\./g, '\\.')}(?!\\d)`)) !== at).map(([v]) => v);
@@ -462,15 +469,56 @@ const sceneMiss = [...sceneBadParts([...new Set(sceneUsed)], sceneArt).map((id) 
 const sceneCtl = sceneNoCard([...sceneMap, ['no_such_card', 'death']], evIds).includes('no_such_card') && sceneBadParts(['death'], () => ({ parts: [...sceneArt('death').parts, [sceneArt('death').parts[0]]] })).length === 1;
 check('ภาพฉากสำคัญ: ทุกชิ้นวาดได้ · การ์ดที่ผูกมีจริง', sceneMiss.length || sceneMap.length < 5 || !sceneCtl, ` ${ART_SCENE_IDS.length} ภาพ · ผูก ${sceneMap.length} การ์ด + แรกเกิด + การ์ดตาย${sceneMiss.length ? ` · ${sceneMiss.join(' | ')}` : ''} · ตัวควบคุม${sceneCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
-// 9b) เกมเปิดออฟไลน์ได้: ฟอนต์ฝังครบทุกแบบที่หน้าใช้ ไม่ดึงจากเว็บอื่น · ตัวควบคุม: หน้าที่ยังมี <link> Google Fonts ต้องถูกจับ
-const PLAY_FACES = ['Noto Sans Thai 400', 'Noto Sans Thai 600', 'Sarabun 400', 'Sarabun 600', 'Srisakdi 700'];
-const fontGap = (html) => [
-  ...PLAY_FACES.filter((f) => { const [, fam, w] = /^(.+) (\d+)$/.exec(f); return !new RegExp(`@font-face \\{ font-family:"${fam}"; font-weight:${w};[^}]*src:url\\(data:font/woff2;base64,[A-Za-z0-9+/]{1000}`).test(html); }),
-  ...(/fonts\.(googleapis|gstatic)\.com/.test(html) ? ['ดึง Google Fonts'] : []),
-];
-const fontMiss = fontGap(play);
-const fontCtl = fontGap(play.replace('<style>', '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun"><style>')).length > 0;
-check('เกมฝังฟอนต์ไทยครบ ไม่ดึงฟอนต์จากเว็บอื่น', fontMiss.length || !fontCtl, ` ${PLAY_FACES.length - fontMiss.filter((x) => PLAY_FACES.includes(x)).length}/${PLAY_FACES.length} แบบ${fontMiss.length ? ` · ขาด ${fontMiss.join(' ')}` : ''} · ตัวควบคุม${fontCtl ? 'จับได้' : 'จับไม่ได้'}`);
+// 9b) ฟอนต์ไฟล์ในเว็บชุดเดียวทุกหน้า (ui-redo 96 · ข้อ 205): หน้าเล่นมี @font-face ครบทุกแบบที่ใช้ ชี้ fonts/*.woff2 ที่มีจริงและตรงต้นฉบับ src/ui/fonts
+// · fonts.css ตรงตาราง FONTS · ทุกไฟล์ใต้ docs/ (html/js/css) ไม่ดึง Google Fonts
+// ตัวควบคุม: ถอด @font-face หนึ่งแบบ · เติม <link> Google Fonts ในหน้าเอกสาร · ลบไฟล์ฟอนต์หนึ่งไฟล์ ⇒ ต้องถูกจับทุกแบบ
+{
+  const srcFont = (f) => readFileSync(new URL(`../src/ui/fonts/${f}.woff2`, import.meta.url));
+  const has = (f) => existsSync(new URL(`${FONT_DIR}${f}.woff2`, docs)) && readFileSync(new URL(`${FONT_DIR}${f}.woff2`, docs)).equals(srcFont(f));
+  const playGap = (html, ok = has) => playFonts().filter(([fam, w, f]) => !html.includes(`@font-face { font-family:"${fam}"; font-weight:${w}; font-style:normal; font-display:swap; src:url(${FONT_DIR}${f}.woff2) format('woff2'); }`) || !ok(f)).map(([fam, w]) => `${fam} ${w}`);
+  const webFiles = (dir = '') => readdirSync(new URL(dir, docs), { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? webFiles(`${dir}${d.name}/`) : /\.(html|js|css)$/.test(d.name) ? [`${dir}${d.name}`] : []));
+  const GOOGLE = /fonts\.(googleapis|gstatic)\.com/;
+  const googleIn = (rd) => webFiles().filter((f) => GOOGLE.test(rd(f)));
+  const cssOk = existsSync(new URL(FONT_CSS, docs)) && toLf(read(FONT_CSS)) === fontsCss(FONTS, '');
+  const fileMiss = FONTS.filter(([, , f]) => !has(f)).map(([, , f]) => f);
+  const miss = [...playGap(read('play.html')).map((x) => `หน้าเล่นขาด ${x}`), ...googleIn(read).map((f) => `ดึง Google Fonts ${f}`), ...fileMiss.map((f) => `ไม่มี/ไม่ตรง ${FONT_DIR}${f}.woff2`), ...(cssOk ? [] : [`${FONT_CSS} ไม่ตรงตาราง`])];
+  const [f0] = playFonts();
+  const ctl = {
+    'ถอด @font-face': playGap(read('play.html').replace(`font-family:"${f0[0]}"; font-weight:${f0[1]};`, '')).length > 0,
+    'Google Fonts ในหน้าเอกสาร': googleIn((f) => (f === 'guide.html' ? read(f).replace('</head>', '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi"></head>') : read(f))).includes('guide.html'),
+    'ไฟล์ฟอนต์หาย': playGap(read('play.html'), (f) => f !== f0[2] && has(f)).length > 0,
+  };
+  const ctlBad = Object.entries(ctl).filter(([, v]) => !v).map(([k]) => k);
+  check('ฟอนต์ไฟล์ในเว็บชุดเดียว: หน้าเล่นครบทุกแบบ · ไฟล์ตรงต้นฉบับ · fonts.css ตรงตาราง · ไม่มีไฟล์ไหนดึง Google Fonts', miss.length || ctlBad.length, ` หน้าเล่น ${PLAY_FACES.length} แบบ · ไฟล์ ${FONTS.length - fileMiss.length}/${FONTS.length} · ตรวจ ${webFiles().length} ไฟล์${miss.length ? ` · ${miss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(' ')}` : 'จับได้'}`);
+}
+
+// 9b2) หน้าเล่นแยกไฟล์ (ui-redo 96 · ข้อ 192 203 204): HTML ≤ 100 KB · สคริปต์ชื่อคงที่ต่อ ?v=เลขรุ่น defer ข้อมูลก่อนโค้ด · service worker เก็บชุดเดียวกัน
+// · โครงหน้าเปิด (หัว + ปุ่มเริ่ม) อยู่ใน HTML ก่อนสคริปต์ · boot() ล้างโครงก่อนวาดจอจริง
+// ตัวควบคุม: หน้าแบบเดิม (ฝังสคริปต์) เกินเพดาน · สลับลำดับสคริปต์ · เลขรุ่นอื่น · ตัดโครงหน้าเปิด ⇒ ต้องถูกจับทุกแบบ
+{
+  const PLAY_MAX = 100 * 1024;
+  const html = read('play.html');
+  const bytes = (s) => Buffer.byteLength(s, 'utf8');
+  const fontFiles = playFonts().map(([, , f]) => `${FONT_DIR}${f}.woff2`);
+  const shellOf = (h) => h.match(/<main id="app">([\s\S]*?)<\/main>/)?.[1] ?? '';
+  const splitGap = (h, v = ver.version, sw = read(PLAY_FILES.sw)) => [
+    ...(bytes(h) > PLAY_MAX ? [`play.html ${bytes(h).toLocaleString('en-US')} B เกิน`] : []),
+    ...(!h.includes(playScripts(v)) ? ['สคริปต์ไม่ตรงชุด (ลำดับ/ ?v= / defer)'] : []),
+    ...(h.indexOf(playAssets(v)[0]) > h.indexOf(playAssets(v)[1]) ? ['ข้อมูลมาหลังโค้ด'] : []),
+    ...(toLf(sw) !== swJs(v, fontFiles) ? ['sw.js ไม่ตรงรุ่น/ชุดไฟล์'] : []),
+    ...(!/<header class="logo">/.test(h.slice(0, h.indexOf('<script'))) || !/<button[^>]*>[^<]+<\/button>/.test(shellOf(h)) ? ['ไม่มีหัว/ปุ่มเริ่มก่อนสคริปต์'] : []),
+  ];
+  const bootClears = /function boot\(\) \{\s*(?:\/\/[^\n]*\n\s*)*root\.replaceChildren\(\);/.test(appSrc);
+  const miss = [...splitGap(html), ...(bootClears ? [] : ['boot() ไม่ล้างโครงหน้าเปิด'])];
+  const ctl = {
+    'หน้าแบบฝังสคริปต์': splitGap(`${html}<script>${read(PLAY_FILES.data)}${read(PLAY_FILES.app)}</script>`).length > 0,
+    'สลับลำดับ': splitGap(html.replace(playScripts(ver.version), playScripts(ver.version).split('\n').slice(0, 2).reverse().join('\n') + '\n' + playScripts(ver.version).split('\n')[2])).length > 0,
+    'เลขรุ่นอื่น': splitGap(html, 'v0.0.00').length > 0 && splitGap(html, ver.version, swJs('v0.0.00', fontFiles)).length > 0,
+    'ตัดโครงหน้าเปิด': splitGap(html.replace(/(<main id="app">)[\s\S]*?(<\/main>)/, '$1$2')).length > 0,
+  };
+  const ctlBad = Object.entries(ctl).filter(([, v]) => !v).map(([k]) => k);
+  check('หน้าเล่นแยกไฟล์: HTML ≤ 100 KB · สคริปต์ ?v=เลขรุ่น ข้อมูลก่อนโค้ด · service worker ชุดเดียวกัน · หัว + ปุ่มเริ่มขึ้นก่อนสคริปต์', miss.length || ctlBad.length, ` play.html ${bytes(html).toLocaleString('en-US')} B · ${PLAY_FILES.data} ${bytes(read(PLAY_FILES.data)).toLocaleString('en-US')} B · ${PLAY_FILES.app} ${bytes(read(PLAY_FILES.app)).toLocaleString('en-US')} B${miss.length ? ` · ${miss.join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(' ')}` : 'จับได้'}`);
+}
 
 // 10) เดโมการ์ดบนหน้ารวมการ์ด (B121): ทุกทางมีผลให้อ่าน มีข้อความผลจริงอย่างน้อยหนึ่งทาง ไม่แตะ storage/network · build ซ้ำได้หน้าเดิม
 const demo = cards.slice(cards.indexOf(DEMO_START), cards.indexOf(DEMO_END));
@@ -560,7 +608,7 @@ check('หน้าเฉลยวาดทุกเงื่อนไขแล�
 // merge=build เก็บไฟล์ฝั่งตัวเองตอน merge — ใส่กับหน้าเขียนมือ = เนื้อที่อีก branch เขียนหายเงียบ · หน้าสร้างใหม่ที่ไม่ได้ใส่ = ชนทุก merge
 const attrs = readFileSync(new URL('../.gitattributes', import.meta.url), 'utf8').split(/\r?\n/).map((l) => l.trim().split(/\s+/));
 const mergeBuild = (lines) => new Set(lines.filter(([p, ...w]) => !p.startsWith('#') && w.includes('merge=build')).map(([p]) => p));
-const wantBuild = ['play', ...GEN_PAGES.map(([name]) => name)].map((n) => `docs/${n}.html`);
+const wantBuild = [...['play', ...GEN_PAGES.map(([name]) => name)].map((n) => `docs/${n}.html`), ...[...Object.values(PLAY_FILES), FONT_CSS].map((f) => `docs/${f}`)];
 const sameSet = (got) => got.size === wantBuild.length && wantBuild.every((p) => got.has(p));
 const gotBuild = mergeBuild(attrs);
 const handBuild = FACT_PAGES.filter((n) => gotBuild.has(`docs/${n}.html`));
@@ -572,7 +620,7 @@ const lfOf = (lines) => lines.some(([p, ...w]) => p === 'docs/**/*.html' && w.in
 const lfAttr = lfOf(attrs);
 const lfCtl = !lfOf(attrs.filter(([, ...w]) => !w.includes('eol=lf')));
 const allHtml = (dir) => readdirSync(new URL(dir, docs), { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? allHtml(`${dir}${d.name}/`) : d.name.endsWith('.html') ? [`${dir}${d.name}`] : []));
-const htmlAll = allHtml('');
+const htmlAll = [...allHtml(''), ...Object.values(PLAY_FILES), FONT_CSS];
 const crPages = htmlAll.filter((f) => read(f).includes('\r'));
 check('.gitattributes merge=build ครบหน้าที่ build สร้าง ไม่มีหน้าเขียนมือ · docs/** eol=lf · html ทุกโฟลเดอร์ไม่มี CR', !sameSet(gotBuild) || handBuild.length || !ctlCaught || !lfAttr || !lfCtl || crPages.length,
   ` merge=build ${gotBuild.size}/${wantBuild.length}${handBuild.length ? ` หน้ามือ ${handBuild.join(',')}` : ''} · eol=lf ${lfAttr ? 'มี' : 'ไม่มี'} · มี CR ${crPages.length}/${htmlAll.length} หน้า${crPages.length ? ` (${crPages.slice(0, 5).join(',')})` : ''} · ตัวควบคุม merge=build ${ctlCaught ? 'จับได้' : 'จับไม่ได้'} · ถอด eol ${lfCtl ? 'จับได้' : 'จับไม่ได้'}`);
@@ -636,14 +684,14 @@ check('.gitattributes merge=build ครบหน้าที่ build สร้
   const miss = hits(read);
   const swap = (want, fn) => (f) => (f === want ? fn(read(f)) : read(f));
   const ctl = {
-    'ย่อหน้าหน้าแรก': swap('index.html', (h) => h.replace('</footer>', ' ต่างโลก</footer>')),
+    'ย่อหน้าหน้าแรก': swap('index.html', (h) => h.replace('</p>\n  <a class="play big"', ' ต่างโลก</p>\n  <a class="play big"')),
     description: swap('index.html', (h) => h.replace('<meta name="description" content="', '<meta name="description" content="isekai ')),
     'title play': swap('play.html', (h) => h.replace('</title>', ' ต่างโลก</title>')),
     'หน้าส่งต่อ': swap(moved[0], (h) => h.replace('</title>', ' ต่างโลก</title>')),
   };
   const ctlBad = Object.entries(ctl).filter(([, rd]) => !hits(rd).length).map(([k]) => k);
   // ตัวเกมยังพาไปต่างโลกได้ — คำต้องยังอยู่ใน body ของ play.html (ไม่ได้ตัดตัวเกม)
-  const gameKeeps = PUBLIC_HIDE.test(read('play.html').slice(headOf(read('play.html')).length));
+  const gameKeeps = PUBLIC_HIDE.test(`${read('play.html').slice(headOf(read('play.html')).length)}${read(PLAY_FILES.app)}`);
   check('หน้าไม่ติดรหัส (หน้าแรก · head ของ play · หน้าส่งต่อ) ไม่มีคำต่างโลก ตัวเกมคงเดิม', miss.length || ctlBad.length || !moved.length || !gameKeeps, ` ${pages(read).length} หน้า (ส่งต่อ ${moved.length})${miss.length ? ` · เจอ ${miss.join(' | ')}` : ''}${gameKeeps ? '' : ' · ตัวเกมไม่มีคำ (ตัดเกิน)'} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
 }
 

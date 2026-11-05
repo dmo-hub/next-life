@@ -44,18 +44,18 @@ export function gatedFiles(docs) {
 const NOJS = 'ต้องเปิด JavaScript จึงจะเปิดหน้านี้ได้';
 const cssText = (s) => [...s].map((c) => (c.charCodeAt(0) > 126 ? `\\${c.charCodeAt(0).toString(16).toUpperCase()} ` : c)).join('');
 const GATE_CSS = `html:not(.nl-open) body>*:not(#nl-gate){display:none!important}
-html:not(.nl-open):not(.nl-js) body::before{content:"${cssText(NOJS)}";display:block;padding:48px 24px;font:16px/1.6 Sarabun,"Noto Sans Thai",sans-serif;text-align:center}
-#nl-gate{box-sizing:border-box;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#17110D;color:#F4EFE3;font:16px/1.6 Sarabun,"Noto Sans Thai",sans-serif}
+html:not(.nl-open):not(.nl-js) body::before{content:"${cssText(NOJS)}";display:block;padding:48px 24px;font:16px/1.6 var(--fb);text-align:center}
+#nl-gate{box-sizing:border-box;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--head);color:var(--title);font:16px/1.6 var(--fb)}
 #nl-gate *{box-sizing:border-box}
 #nl-gate form{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}
-#nl-gate h1{margin:0;font-size:22px;color:#F0D78C}
+#nl-gate h1{margin:0;font-size:22px;font-family:var(--fh);font-weight:600;color:var(--headink)}
 #nl-gate p{margin:0}
-#nl-gate input{min-height:44px;padding:8px 12px;font:inherit;color:#17110D;background:#F4EFE3;border:1px solid #5A4630;border-radius:6px}
-#nl-gate button{min-height:44px;padding:0 16px;font:inherit;font-weight:700;color:#17110D;background:#F0D78C;border:0;border-radius:6px;cursor:pointer}
-#nl-gate input:focus-visible,#nl-gate button:focus-visible,#nl-gate a:focus-visible{outline:3px solid #F0D78C;outline-offset:2px}
-#nl-gate .err{min-height:1.6em;color:#F2A38F}
+#nl-gate input{min-height:44px;padding:8px 12px;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r)}
+#nl-gate button{min-height:44px;padding:0 16px;font:inherit;font-weight:600;color:var(--head);background:var(--gold);border:0;border-radius:var(--r);cursor:pointer}
+#nl-gate input:focus-visible,#nl-gate button:focus-visible,#nl-gate a:focus-visible{outline:3px solid var(--headink);outline-offset:2px}
+#nl-gate .err{min-height:1.6em;color:color-mix(in srgb, var(--bad) 40%, white)}
 #nl-gate nav{display:flex;flex-wrap:wrap;gap:4px 16px}
-#nl-gate a{color:#E3DDD0;display:inline-block;line-height:44px}`;
+#nl-gate a{color:var(--on-head);display:inline-block;line-height:44px}`;
 
 // ไม่มี crypto.subtle (เปิดผ่าน http ที่ไม่ใช่ localhost) = เทียบรหัสไม่ได้ ⇒ บอกตรง ๆ ไม่ปล่อยผ่าน
 const gateScript = (hash, up) => `(()=>{const K=${JSON.stringify(GATE_KEY)},H=${JSON.stringify(hash)},d=document.documentElement;

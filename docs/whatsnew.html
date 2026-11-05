@@ -6,39 +6,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>แพตช์โน้ต · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="description" content="ของใหม่ในเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิดแต่ละเวอร์ชัน กติกาที่เปลี่ยน และระบบที่กำลังทำ">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi:wght@400;600&family=Sarabun:wght@400;600&display=swap">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
-  header { background: #1F2430; color: #F4EFE3; padding: 32px 16px 28px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.7; }
+  header { background: var(--head); color: var(--title); padding: 32px 16px 28px; }
   .w { max-width: 760px; margin: 0 auto; }
-  h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
-  header p { margin: 0; color: #E3DDD0; }
-  header a { color: #F4EFE3; }
+  h1 { font-family: var(--fh); font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
+  header p { margin: 0; color: var(--on-head); }
+  header a { color: var(--title); }
   main { padding: 24px 16px 64px; }
-  h2 { font-family: Pridi, serif; font-size: 22px; margin: 32px 0 8px; }
+  h2 { font-family: var(--fh); font-size: 22px; margin: 32px 0 8px; }
   h3 { font-size: 17px; margin: 20px 0 4px; }
   .road-l { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
-  .road-l a { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 14px; background: #F4EFE3; border: 1px solid #C9BFA9; color: #1F2430; text-decoration: none; }
-  .road-l a:hover, .road-l a:focus-visible { border-color: #A23B2C; outline: none; }
-  h3 small { font-weight: 400; color: #4A4F5C; font-size: 13px; margin-left: 6px; }
+  .road-l a { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 14px; background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink); text-decoration: none; }
+  .road-l a:hover, .road-l a:focus-visible { border-color: var(--ink); outline: none; }
+  h3 small { font-weight: 400; color: var(--muted); font-size: 13px; margin-left: 6px; }
   ul { padding-left: 22px; margin: 0 0 12px; }
   li { margin: 0 0 6px; }
   .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; }
-  .rule { color: #A23B2C; } .soon { color: #2F6B66; }
-  .lead { margin: 0 0 8px; color: #3A3F4B; }
-  a { color: #A23B2C; }
+  .rule { color: var(--accent2); } .soon { color: var(--good); }
+  .lead { margin: 0 0 8px; color: var(--muted); }
+  a { color: var(--accent2); }
   /*NAV-CSS:START*/
-  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
-  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
-  nav.top a.dark { color: #F0D78C; }
-  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  :root { --bg:#F4ECDC; --surface:#FBF6EA; --ink:#1B2A4A; --muted:#5B5648; --accent:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --seal:#A62B1F; --good:#2F6B4F; --bad:#B3261E; --line:#C9B98F; --line-strong:#8C7A52; --on-head:#E7E2D4; --on-head2:#D8D2C2; --on-head3:#BFB49A; --title:#F4ECDC; --lacquer:#17110D; --lacquer2:#221912; --bronze:#5A4630; --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }
+  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
+  nav.top a { display: inline-block; color: var(--on-head); text-decoration: none; padding: 0 10px; line-height: 40px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: var(--headink); }
+  nav.top a[aria-current] { color: var(--headink); font-weight: 600; }
   nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
-  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .brand { font-weight: 600; color: var(--headink); padding-left: 0; white-space: nowrap; }
   nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
-  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
-  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+  nav.top a.play { background: var(--gold); color: var(--head); border-radius: var(--r); line-height: 28px; padding: 0 12px; font-weight: 600; white-space: nowrap; }
+  nav.top a.play:focus-visible { outline: 2px solid var(--headink); outline-offset: 2px; }
+  body > header:not(.home) { background: var(--head); color: var(--title); padding: 16px 16px 18px; }
+  body > header:not(.home) h1 { font-family: var(--fh); font-weight: 600; color: var(--title); }
+  body > header:not(.home) p { color: var(--on-head2); }
+  body > header:not(.home) a { color: var(--headink); text-decoration: underline; text-underline-offset: 3px; }
+  main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
 /*NAV-CSS:END*/
 </style>
 </head>
@@ -59,9 +65,7 @@
     <li><span class="tag soon">กำลังทำ</span><b>แท็บโฟกัส</b> ในเมนูข้างระหว่างตัวฉันกับครอบครัว ทั้งชาติไทยและต่างโลก</li>
     <li><span class="tag soon">กำลังทำ</span><b>ภาพตามหมวดบนการ์ดผล</b> และภาพแรกเกิดจางหลังข้อความ</li>
     <li><span class="tag soon">กำลังทำ</span><b>ปุ่มแท็บในสมุดแบบใหม่</b></li>
-    <li><span class="tag soon">กำลังทำ</span><b>ชุดสีและฟอนต์ใหม่ทั้งเว็บ</b> หัวเว็บกับหัวหน้าแรกเปลี่ยนพร้อมกัน</li>
     <li><span class="tag soon">กำลังทำ</span><b>หน้าตาในเกมรอบใหม่</b> เมนู แถบสถานะ การ์ดรายปีกับปุ่มตัวเลือก ป้ายผล ตราฉายา การ์ดตาย และธีมต่างโลกกับปรโลก</li>
-    <li><span class="tag soon">กำลังทำ</span><b>หน้าเล่นเปิดเร็วขึ้น</b> ครั้งต่อไปโหลดจากเครื่อง เล่นต่อได้แม้เน็ตหลุด</li>
     <li><span class="tag soon">กำลังทำ</span><b>ใช้คีย์บอร์ดได้ทั้งเกม</b> กด Tab ข้ามไปเนื้อหา ลิ้นชักที่เปิดอยู่ไม่ทำโฟกัสหลุด</li>
     <li><span class="tag soon">กำลังทำ</span><b>รวมหน้าเว็บ</b> หน้าเกี่ยวกับย้ายเข้าวิธีเล่น · การ์ดทั้งหมดกับเฉลยอยู่หน้าเดียว กดดูผลเองทีละใบ · หน้าอ่านเอกสารจัดใหม่</li>
   </ul>
@@ -152,6 +156,50 @@
 
   <h2>แพตช์โน้ต</h2>
   <p class="lead">การเปลี่ยนแปลงทีละเวอร์ชัน ใหม่สุดอยู่บน · ป้าย <span class="tag rule">กติกา</span> คือกติกาเกมที่เปลี่ยน</p>
+
+  <h3>v0.6.84 <small>5 พ.ย. 2569</small></h3>
+  <ul>
+    <li>ทั้งเว็บและหน้าเล่นเปลี่ยนเป็นชุดสีคราม-ทอง ตัวหัว Maitree ตัวเนื้อ Sarabun</li>
+    <li>หัวเว็บแบบใหม่ และหน้าแรกเหลือหัวเต็มจอกับปุ่มเริ่มเล่น</li>
+    <li>ลิงก์ในเนื้อความขีดเส้นใต้ อ่านง่ายขึ้น</li>
+  </ul>
+
+  <h3>v0.6.83 <small>5 พ.ย. 2569</small></h3>
+  <ul>
+    <li>ห้องผู้พัฒนามีหน้าลองแผงตัวฉันแบบใหม่ รวมเงินเข้าแผงตัวฉัน ปุ่มพับคำอธิบายค่าสถานะ และประวัติงาน ไว้เลือกก่อนลงจริง</li>
+  </ul>
+
+  <h3>v0.6.82 <small>5 พ.ย. 2569</small></h3>
+  <ul>
+    <li>ห้องผู้พัฒนา: เอาหน้าลองแบบที่ลงเกมแล้วออก (เอฟเฟกต์ได้ฉายา · ป้ายผลบนปุ่มเป็นไอคอน)</li>
+  </ul>
+
+  <h3>v0.6.81 <small>5 พ.ย. 2569</small></h3>
+  <ul>
+    <li>ค่าสถานะบนการ์ดทุกโลกมีไอคอนหน้าชื่อ ชุดเดียวกับป้ายผลบนปุ่ม · จอมือถือเรียงค่าเป็น 2 แถว ตัวเลขไม่ตกบรรทัด</li>
+  </ul>
+
+  <h3>v0.6.80 <small>5 พ.ย. 2569</small></h3>
+  <ul>
+    <li>หน้าเกมเปิดเร็วขึ้น ไฟล์ใหญ่เก็บไว้ในเครื่องตั้งแต่เปิดครั้งแรก เปิดครั้งต่อไปไม่ต้องโหลดใหม่ และเล่นต่อได้แม้ไม่มีเน็ต · ฟอนต์ทุกหน้าโหลดจากเว็บเกมเอง</li>
+  </ul>
+
+  <h3>v0.6.79 <small>5 พ.ย. 2569</small></h3>
+  <ul>
+    <li>ห้องผู้พัฒนามีหน้าลองหัวหน้าแรกแบบใหม่ ใช้หน้าแรกชุดปัจจุบันเป็นตัวตั้ง ไว้เลือกก่อนลงจริง</li>
+    <li>ห้องผู้พัฒนามีหน้าเลือกสีโลกอื่นช่วงก่อนธีมโลกใหม่ เทียบ 3 ทางสำหรับการ์ดระหว่างชาติ ปรโลก ต่างโลก และภาพแชร์</li>
+  </ul>
+
+  <h3>v0.6.78 <small>5 พ.ย. 2569</small></h3>
+  <ul>
+    <li>ห้องผู้พัฒนามีหน้าลองหัวเว็บแบบใหม่ ใช้ชุดสีครามกับแถบเมนูจริงของเว็บ ไว้เลือกก่อนลงจริง</li>
+  </ul>
+
+  <h3>v0.6.77 <small>5 พ.ย. 2569</small></h3>
+  <ul>
+    <li>ต้นแบบการ์ดรุ่นสอง (หน้าตาการ์ดทุกชนิด + ชุดธีม) ย้ายไปอยู่ในหน้าดีไซน์ UI ของห้องผู้พัฒนา · ลิงก์เดิมพาไปที่ใหม่ให้</li>
+    <li>ห้องผู้พัฒนามีหน้าลองชุดสีทั้งเว็บ เทียบสีครามชุดใหม่กับสีชาดเดิม ไว้เลือกก่อนลงจริง</li>
+  </ul>
 
   <h3>v0.6.76 <small>5 พ.ย. 2569</small></h3>
   <ul>
