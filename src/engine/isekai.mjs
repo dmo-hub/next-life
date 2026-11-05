@@ -345,7 +345,7 @@ export const ISEKAI_WARN = {
   text: 'แผลเก่ายังไม่ทันหาย แผลใหม่ก็มาซ้ำ ลุกจากที่นอนแต่ละเช้ายากขึ้นทุกวัน ถ้ายังฝืนแบบนี้ต่อ ชาตินี้คงจบเร็วกว่าที่คิด',
   focus: 'เปลี่ยนโฟกัส',
   rest: 'rest',
-  ask: 'ร่างกายต้องการพัก ช่วงนี้จะทุ่มเทกับอะไร',
+  ask: 'ร่างกายต้องการพัก ช่วงนี้จะโฟกัสอะไร',
 };
 
 // ความรู้จากโลกเดิม (B68h · เจ้าของเคาะ): 9 หมวด เริ่มศูนย์ทุกหมวด เป็นค่าซ่อนแบบ joy/wit · โตจากเหตุการณ์ของหมวด + ทางลัดทุ่มเท + อ่านตำรา
@@ -2211,7 +2211,7 @@ export function nextIsekaiCard(isk) {
     ...(entered && { entered: true }),
     ...(entered?.lore && { lore: entered.lore }),
     ...(revived && { sys: 'เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว' }),
-    ...(!revived && (opened.length || hired.length) && { sys: [hired.length && `ได้เป็น${hired.map((c) => ISEKAI_CAREERS[c].name).join(' · ')}แล้ว`, opened.length && `ความรู้จากโลกเดิมมากพอแล้ว ทุ่มเทได้อีกทาง · ${opened.map((id) => isekaiFocusDef(isk, id).name).join(' · ')}`].filter(Boolean).join(' · ') }),
+    ...(!revived && (opened.length || hired.length) && { sys: [hired.length && `ได้เป็น${hired.map((c) => ISEKAI_CAREERS[c].name).join(' · ')}แล้ว`, opened.length && `ความรู้จากโลกเดิมมากพอแล้ว โฟกัสได้อีกทาง · ${opened.map((id) => isekaiFocusDef(isk, id).name).join(' · ')}`].filter(Boolean).join(' · ') }),
     focus: isk.focusOffers.indexOf(isk.focus),
     focusChoices: isk.focusOffers.map((id) => isekaiFocusDef(isk, id).name),
     focusFx: isk.focusOffers.map((id) => isekaiFocusFx(isk, id)),
