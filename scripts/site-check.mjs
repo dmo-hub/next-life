@@ -6,7 +6,7 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
 import { siteFacts, injectFacts, readVersion, versionLines, releaseLog, notesLines, NOTE_CUT } from '../src/site/facts.mjs';
 import { catalogHtml } from '../src/site/catalog.mjs';
-import { FACT_PAGES, GEN_PAGES } from '../src/site/build.mjs';
+import { FACT_PAGES, GEN_PAGES, toLf } from '../src/site/build.mjs';
 import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_ROLES, roleInfo, ISEKAI_SKILLS, ISEKAI_CAREERS, CONT_REGIONS, CONT_RACES, CONT_END, contBirth, makeRng } from '../src/engine/index.mjs';
 import { isekaiCardCount, ISEKAI_SECTION, contEndTitles, text as isekaiText } from '../src/site/otherworld.mjs';
 import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR, SPEC_START, SPEC_END } from '../src/site/spec.mjs';
@@ -17,7 +17,7 @@ import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml } from '../src/site/nav.mjs';
-import { uiPage, designMoved, tweakPages, cssVars, UI_PAGE, UI_MOVED_FROM } from '../src/site/ui.mjs';
+import { uiPage, designMoved, tweakPages, tweakMoved, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
@@ -263,13 +263,23 @@ const uiNow = uiBuilt(uiTpl);
 const uiHtml = readOr(UI_PAGE) ?? '';
 const uiColors = cssVars(uiTpl.match(/<style>([\s\S]*?)<\/style>/)[1]).flatMap((g) => g.vars).filter(([, v]) => /^(#|rgba?\(|hsla?\()/i.test(v));
 const uiTweaks = tweakPages(docs);
+// หน้า tweak เป็นหัวในหน้านี้ (ui-redo 79): ทุกหน้าใต้ dev/tweak/ มีลิงก์ในสารบัญ · หัว · กรอบที่ชี้ไฟล์และไม่มี sandbox (คีย์ localStorage เดิม) · ที่เดิมเป็นหน้าส่งต่อมาหัว
 const uiTweakGap = (html) => {
   const box = html.match(/<ul id="ui-tweaks">([\s\S]*?)<\/ul>/)?.[1] ?? '';
-  const hrefs = [...box.matchAll(/href="([^"]+)"/g)].map((m) => `dev/${m[1]}`);
-  return [...uiTweaks.filter(([f]) => !hrefs.includes(f)).map(([f]) => `ขาดลิงก์ ${f}`), ...hrefs.filter((h) => !existsSync(new URL(h, docs))).map((h) => `ลิงก์ตาย ${h}`)];
+  const frame = (f) => html.match(new RegExp(`<iframe[^>]* src="${f.slice(4)}"[^>]*>`))?.[0];
+  return uiTweaks.flatMap((t) => {
+    const [f, , id, from] = t;
+    return [
+      ...(box.includes(`href="#${id}"`) ? [] : [`ขาดลิงก์ ${id}`]),
+      ...(html.includes(`<h2 id="${id}">`) ? [] : [`ขาดหัว ${id}`]),
+      ...(!frame(f) ? [`ขาดกรอบ ${f}`] : /sandbox/.test(frame(f)) ? [`กรอบมี sandbox ${f}`] : []),
+      ...(lf(readOr(from)) !== tweakMoved(t) ? [`${from} ไม่ส่งต่อมา #${id}`] : []),
+    ];
+  });
 };
 const uiFrameBad = (html) => {
-  const frames = [...html.matchAll(/<iframe[^>]*>/g)].map((m) => m[0]);
+  // กรอบต้นแบบปรับสด (7e2) และกรอบหน้า tweak (src=) ตั้งใจรันสคริปต์ — ด่านนี้ดูแค่ชิ้นส่วนตัวอย่าง
+  const frames = [...html.matchAll(/<iframe[^>]*>/g)].map((m) => m[0]).filter((f) => !f.includes(`title="${UI_LIVE_TITLE}"`) && !f.includes(' src="'));
   return !frames.length || frames.some((f) => !/ sandbox=""/.test(f) || /&lt;script|<script/i.test(f));
 };
 const uiMiss = [
@@ -283,15 +293,43 @@ const [uiK, uiV] = uiColors[0] ?? ['', ''];
 const uiRecolor = uiBuilt(uiTpl.replace(`${uiK}:${uiV}`, `${uiK}:#010203`));
 const uiCtl =
   uiRecolor !== uiNow && uiRecolor.includes('background:#010203') &&
-  (uiTweaks.length === 0 || uiTweakGap(uiHtml.replace(/(<ul id="ui-tweaks">)<li>[\s\S]*?<\/li>/, '$1')).length === 1) &&
+  (uiTweaks.length === 0 || uiTweakGap(uiHtml.replace(`<h2 id="${uiTweaks[0][2]}">`, '<h2>')).length === 1) &&
   uiFrameBad(uiHtml.replace(' sandbox=""', ' sandbox="allow-scripts"'));
 check('หน้าดีไซน์ UI ตรงของที่ build สีจากเกมครบ ลิงก์ tweak ครบ ตัวอย่างไม่รันสคริปต์', uiMiss.length || !uiCtl, ` สี ${uiColors.length} · tweak ${uiTweaks.length}${uiMiss.length ? ` · ${uiMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${uiCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7e2) ต้นแบบปรับสด (ui-redo 76): หัวในหน้าดีไซน์ UI มีกรอบที่รันสคริปต์ได้และไม่มี sandbox (sandbox ไม่มี allow-same-origin ⇒ localStorage throw ค่าที่เจ้าของปรับไว้หาย)
+// · สคริปต์ยังจำค่าใต้คีย์เดิมและคัดลอกลง clipboard · tweak.html เดิมเป็นหน้าส่งต่อมาหัวนี้ · ไม่มีลิงก์/แท็บชี้ tweak.html เดิมเหลือ
+// ตัวควบคุม: ถอดหัวออก ⇒ ต้องตก · ใส่ sandbox="allow-scripts" ⇒ ต้องตก
+const liveBad = (html) => {
+  const h = html.indexOf(`<h2 id="${UI_LIVE_ID}">`);
+  const open = `<iframe title="${UI_LIVE_TITLE}"`;
+  const a = h < 0 ? -1 : html.indexOf(open, h);
+  const s = a < 0 ? -1 : html.indexOf(' srcdoc="', a);
+  if (s < 0) return ['ไม่มีหัวต้นแบบปรับสด'];
+  const doc = html.slice(s + 9, html.indexOf('"', s + 9)).replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+  return [
+    ...(html.slice(a, s).includes('sandbox') ? ['กรอบต้นแบบมี sandbox'] : []),
+    ...(doc.includes("const KEY = 'uiredo02-tweak'") ? [] : ['คีย์ localStorage เปลี่ยน']),
+    ...(doc.includes('navigator.clipboard.writeText') ? [] : ['ไม่มีคัดลอก']),
+  ];
+};
+const liveLinks = [...devFiles, ...readdirSync(docs).filter((n) => n.endsWith('.html'))].filter((f) => !read(f).includes(MOVED_MARK) && [UI_LIVE_FROM, ...uiTweaks.map((t) => t[3])].some((o) => read(f).includes(`${o.slice(4)}"`)));
+const liveMiss = [
+  ...liveBad(uiHtml),
+  ...(lf(readOr(UI_LIVE_FROM)) !== liveMoved() ? [`${UI_LIVE_FROM} ไม่ส่งต่อมา ${UI_PAGE}#${UI_LIVE_ID}`] : []),
+  ...liveLinks.map((f) => `${f} ยังลิงก์หน้า tweak ที่เดิม`),
+  ...(DEV_TABS.some(([h]) => h === UI_LIVE_FROM) ? ['แท็บ dev ยังมี tweak.html'] : []),
+];
+const liveCtl =
+  liveBad(uiHtml.replace(`<h2 id="${UI_LIVE_ID}">`, '<h2>')).length > 0 &&
+  liveBad(uiHtml.replace(`<iframe title="${UI_LIVE_TITLE}"`, `<iframe title="${UI_LIVE_TITLE}" sandbox="allow-scripts"`)).includes('กรอบต้นแบบมี sandbox');
+check('ต้นแบบปรับสดอยู่ในหน้าดีไซน์ UI รันสคริปต์ จำค่าคีย์เดิม คัดลอกได้ ที่เดิมส่งต่อ', liveMiss.length || !liveCtl, `${liveMiss.length ? ` ${liveMiss.slice(0, 4).join(' | ')} ·` : ''} ตัวควบคุม${liveCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('หน้าห้องผู้พัฒนามีแท็บครบชุดเดียวกัน', devMiss.length || !devCtl || !devCur, ` ${devFiles.length} หน้า${devMiss.length ? ` · ${devMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${devCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('ทุกหน้ามีแถบบนชุดเดียวและชี้หน้าปัจจุบัน', navMiss.length || !navCtl || !curOk, ` ${navFiles.length} หน้า${navMiss.length ? ` · ${navMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${navCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7c3) หน้า tweak ที่ใช้ CSS เกม (thai-life-deep 185): บล็อกในหน้า = CSS ของ template.html ตอนนี้ — แก้ CSS เกมแล้วลืม build = หน้า tweak โชว์หน้าตาเก่า
 // ตัวควบคุม: CSS ที่ต่างไป 1 ตัวอักษรต้องไม่ผ่าน
-const liveCss = gameCss(readFileSync(new URL('../src/ui/template.html', import.meta.url), 'utf8'));
+const liveCss = toLf(gameCss(readFileSync(new URL('../src/ui/template.html', import.meta.url), 'utf8')));
 const cssMiss = GAME_CSS_PAGES.filter((f) => gameCssBlock(read(f)) !== liveCss);
 const cssCtl = gameCssBlock(read(GAME_CSS_PAGES[0])) !== `${liveCss} `;
 check('หน้า tweak ใช้ CSS เกมชุดปัจจุบัน', cssMiss.length || !cssCtl, ` ${GAME_CSS_PAGES.length} หน้า${cssMiss.length ? ` · เก่า ${cssMiss.join(' ')}` : ''} · ตัวควบคุม${cssCtl ? 'จับได้' : 'จับไม่ได้'}`);
@@ -518,6 +556,26 @@ const fakeMiss = silent([fake]);
 const fakeCaught = ['when.zz_fake', 'multipliers(การ์ด).zz_fake', 'requires.zz_fake', 'multipliers(ผล).zz_fake'].every((k) => fakeMiss.has(k));
 const missLines = [...missing].map(([k, ids]) => `${k} ${ids.size} ใบ เช่น ${[...ids].slice(0, 3).join(',')}`);
 check('หน้าเฉลยวาดทุกเงื่อนไขและตัวคูณที่การ์ดใช้', missing.size || !fakeCaught, ` key ไม่ขึ้นหน้า ${missing.size}${missLines.length ? `: ${missLines.join(' | ')}` : ''} · ตัวควบคุม${fakeCaught ? 'จับได้' : 'จับไม่ได้'}`);
+
+// merge=build เก็บไฟล์ฝั่งตัวเองตอน merge — ใส่กับหน้าเขียนมือ = เนื้อที่อีก branch เขียนหายเงียบ · หน้าสร้างใหม่ที่ไม่ได้ใส่ = ชนทุก merge
+const attrs = readFileSync(new URL('../.gitattributes', import.meta.url), 'utf8').split(/\r?\n/).map((l) => l.trim().split(/\s+/));
+const mergeBuild = (lines) => new Set(lines.filter(([p, ...w]) => !p.startsWith('#') && w.includes('merge=build')).map(([p]) => p));
+const wantBuild = ['play', ...GEN_PAGES.map(([name]) => name)].map((n) => `docs/${n}.html`);
+const sameSet = (got) => got.size === wantBuild.length && wantBuild.every((p) => got.has(p));
+const gotBuild = mergeBuild(attrs);
+const handBuild = FACT_PAGES.filter((n) => gotBuild.has(`docs/${n}.html`));
+// ตัวควบคุม: เติมหน้าเขียนมือเข้ารายการแล้วต้องตก
+const ctlCaught = !sameSet(mergeBuild([...attrs, [`docs/${FACT_PAGES[0]}.html`, 'merge=build']]));
+// eol=lf ต้องครอบโฟลเดอร์ย่อย (docs/dev · docs/spec ฯลฯ) — `docs/*.html` ไม่ข้าม / ⇒ หน้าย่อยออกเป็น CRLF แล้วขึ้น M ทุก build
+// ตัวควบคุม: ถอดบรรทัด eol ⇒ ต้องตก
+const lfOf = (lines) => lines.some(([p, ...w]) => p === 'docs/**/*.html' && w.includes('eol=lf'));
+const lfAttr = lfOf(attrs);
+const lfCtl = !lfOf(attrs.filter(([, ...w]) => !w.includes('eol=lf')));
+const allHtml = (dir) => readdirSync(new URL(dir, docs), { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? allHtml(`${dir}${d.name}/`) : d.name.endsWith('.html') ? [`${dir}${d.name}`] : []));
+const htmlAll = allHtml('');
+const crPages = htmlAll.filter((f) => read(f).includes('\r'));
+check('.gitattributes merge=build ครบหน้าที่ build สร้าง ไม่มีหน้าเขียนมือ · docs/** eol=lf · html ทุกโฟลเดอร์ไม่มี CR', !sameSet(gotBuild) || handBuild.length || !ctlCaught || !lfAttr || !lfCtl || crPages.length,
+  ` merge=build ${gotBuild.size}/${wantBuild.length}${handBuild.length ? ` หน้ามือ ${handBuild.join(',')}` : ''} · eol=lf ${lfAttr ? 'มี' : 'ไม่มี'} · มี CR ${crPages.length}/${htmlAll.length} หน้า${crPages.length ? ` (${crPages.slice(0, 5).join(',')})` : ''} · ตัวควบคุม merge=build ${ctlCaught ? 'จับได้' : 'จับไม่ได้'} · ถอด eol ${lfCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // กล่องรหัส (ui-redo 72): ทุกหน้า docs/ ที่ไม่ใช่หน้าแรก/ตัวเกม/หน้าส่งต่อ มีบล็อกชุดเดียวใน <head> ตรง hash ปัจจุบัน + noindex · หน้าแรก/ตัวเกมไม่มี
 // ตัวควบคุม: ถอดบล็อก · hash อื่น · ย้ายไปท้าย body · ใส่บล็อกให้หน้าแรก ⇒ ต้องถูกจับทุกแบบ

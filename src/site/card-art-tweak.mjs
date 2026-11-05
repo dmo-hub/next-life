@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { ART_INK, ERA_FRAME, sceneArt } from '../ui/art.mjs';
 
-export const CARD_ART_PAGE = 'dev/ui-redo/card-art-tweak.html';
+export const CARD_ART_PAGE = 'dev/tweak/card-art-tweak.html';
 export const CARD_ART_START = '/*CARD-ART:START*/';
 export const CARD_ART_END = '/*CARD-ART:END*/';
 export const CARD_ART_COUNTS = new URL('./card-art-tweak.json', import.meta.url);

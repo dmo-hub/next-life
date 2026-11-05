@@ -1,0 +1,4 @@
+# ทะเบียนสายของ fixture harness/arcs.mjs — รูปเดียวกับ content/rules/arcs.yaml
+arcs:
+  fx_friend: {name: เพื่อนสมัยเรียน}
+  fx_rival: {name: คู่แข่งสมัยเรียน}
