@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="th">
+<head>
+<!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ต้นแบบการ์ด v2 · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<meta name="description" content="หน้าให้เจ้าของเกมเลือกแนวหน้าตาการ์ดรุ่นสอง ทุกชนิดทั้งชาติไทยและต่างโลก พร้อมชุดธีม">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;600&family=Pridi:wght@400;600&family=Sarabun:wght@400;600&family=Srisakdi:wght@400;700&display=swap">
+<style>
+/* หน้าให้ตัดสิน ไม่ใช่หน้าตาจริงในเกม — สีของแต่ละทางเขียนตรงในคลาสของทางนั้น เทียบกันได้โดยไม่ผูกกับ play.html */
+* { box-sizing:border-box; }
+body { margin:0; background:#E6E0D3; color:#1F2430; font:16px/1.65 Sarabun,"Noto Sans Thai",system-ui,sans-serif; }
+header.pg { background:#1F2430; color:#F4EFE3; padding:32px 16px 28px; }
+.w { max-width:1120px; margin:0 auto; }
+h1 { font-family:Pridi,serif; font-size:clamp(26px,5vw,36px); margin:0 0 8px; line-height:1.3; }
+header.pg p { margin:0 0 6px; color:#E3DDD0; max-width:720px; }
+header.pg a { color:#F4EFE3; }
+main { padding:20px 16px 64px; }
+.toc { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 28px; padding:0; list-style:none; }
+.toc a { display:inline-block; min-height:44px; padding:8px 12px; line-height:28px; background:#F4EFE3; border:1px solid #C9BFA9; color:#1F2430; text-decoration:none; font-size:14px; }
+.toc a:hover, .toc a:focus-visible { border-color:#1F2430; outline:none; }
+section.d { margin:0 0 56px; scroll-margin-top:12px; }
+section.d > h2 { font-family:Pridi,serif; font-size:24px; margin:0 0 4px; line-height:1.35; }
+section.d > h2 small { font-family:Sarabun,sans-serif; font-size:13px; font-weight:400; color:#4A4F5C; }
+section.d > p { margin:0 0 16px; color:#3A3F4B; font-size:15px; max-width:760px; }
+.grp { font-family:Pridi,serif; font-size:30px; margin:8px 0 20px; padding-top:12px; border-top:2px solid #1F2430; }
+.opts { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:28px; align-items:start; }
+.opt { display:flex; flex-direction:column; gap:10px; min-width:0; }
+.opt > .lab { display:flex; flex-direction:column; gap:2px; }
+.opt > .lab b { font-size:15px; }
+.opt > .lab span { font-size:13px; color:#4A4F5C; }
+/* ปุ่มเลือก = radio จริง ผู้ดูแป้นพิมพ์กดได้ · ทางที่เลือกได้ขอบหนา */
+.pick { display:flex; align-items:center; gap:10px; min-height:44px; padding:6px 12px; border:1px dashed #8A8270; background:#F4EFE3; cursor:pointer; font-size:14px; font-weight:600; }
+.pick input { width:20px; height:20px; margin:0; accent-color:#A23B2C; }
+.pick:has(input:checked) { border:2px solid #A23B2C; color:#A23B2C; background:#FFF8EC; }
+.pick:has(input:focus-visible) { outline:2px solid #1F2430; outline-offset:2px; }
+.flag { align-self:flex-start; font-size:11px; font-weight:600; letter-spacing:.06em; padding:1px 8px; border:1px solid currentColor; color:#2F6B66; }
+
+/* ---------- โครงการ์ดกลาง ---------- */
+.k { display:flex; flex-direction:column; min-height:430px; overflow:hidden; overflow-wrap:anywhere; }
+.k .hd { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 16px; }
+.k .hd b { font-size:15px; } .k .hd small { font-size:12px; text-align:right; }
+.k .bd { padding:14px 16px 6px; display:flex; flex-direction:column; gap:8px; }
+.k .kick { font-size:12px; font-weight:600; letter-spacing:.06em; }
+.k h3 { margin:0; font-size:22px; line-height:1.35; }
+.k p { margin:0; font-size:15px; }
+.k .ch { padding:8px 16px 16px; display:flex; flex-direction:column; gap:8px; margin-top:auto; }
+.k .c { all:unset; box-sizing:border-box; min-height:48px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer; font-size:14px; }
+.k .c .fx { font-size:12px; flex-shrink:0; max-width:45%; text-align:right; }
+.k .c:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.k .stats { display:flex; gap:8px; padding:10px 16px; font-size:11px; }
+.k .stats > div { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.k .bar { height:5px; } .k .bar i { display:block; height:100%; }
+.scene { display:block; width:100%; height:auto; }
+.px { shape-rendering:crispEdges; }
+
+/* D1 A ทะเบียนราษฎร์ (ใช้อยู่) */
+.reg { background:#F4EFE3; border:1px solid #C9BFA9; color:#1F2430; }
+.reg .hd { background:#1F2430; color:#F4EFE3; } .reg .hd b { font-family:Pridi,serif; }
+.reg .stats { border-bottom:1px dashed #B9AE97; color:#4A4F5C; } .reg .bar { background:#E2D9C6; } .reg .bar i { background:#2F6B66; }
+.reg .kick { color:#A23B2C; } .reg h3 { font-family:Pridi,serif; } .reg p { color:#3A3F4B; }
+.reg .c { border:1px solid #1F2430; background:#FFFDF7; } .reg .c .fx { color:#2F6B66; }
+/* D1 B สมุดภาพ */
+.pic { background:#FBF6EA; border:1px solid #CDBF9F; color:#2A2420; }
+.pic .banner { position:relative; background:#CFE0D6; }
+.pic .banner .era { position:absolute; left:12px; bottom:10px; background:#2A2420; color:#FBF6EA; font-size:12px; padding:2px 8px; }
+.pic .hd { padding-top:10px; } .pic .hd b { font-family:Pridi,serif; font-size:17px; } .pic .hd small { color:#6B5E4E; }
+.pic h3 { font-family:Pridi,serif; font-size:24px; } .pic p { color:#4A3F35; }
+.pic .c { border-bottom:1px solid #CDBF9F; padding-left:0; padding-right:0; } .pic .c::before { content:"\25B8"; color:#A23B2C; }
+.pic .c > span:first-of-type { flex:1; } .pic .c .fx { color:#2F6B66; }
+/* D1 C ไพ่วางมือ */
+.deck { background:#2F4A3F; color:#F1EBDD; border:1px solid #1E3029; }
+.deck .hd { border-bottom:1px solid #4E6B5E; } .deck .hd b { font-family:Pridi,serif; } .deck .hd small { color:#C9D6CC; }
+.deck .bd { background:#F1EBDD; color:#2A2420; margin:12px 16px 0; padding:12px 14px; border-radius:6px; }
+.deck .kick { color:#A23B2C; } .deck h3 { font-family:Pridi,serif; font-size:20px; }
+.deck .hand { display:flex; gap:10px; padding:14px 16px 16px; margin-top:auto; overflow-x:auto; scroll-snap-type:x mandatory; }
+.deck .hand .c { flex:0 0 112px; min-height:150px; flex-direction:column; justify-content:space-between; align-items:flex-start; scroll-snap-align:start; background:#FFFDF7; color:#2A2420; border-radius:8px; border:2px solid #D9B45A; padding:10px; font-size:13px; line-height:1.45; }
+.deck .hand .c .fx { max-width:none; text-align:left; color:#2F6B66; }
+.deck .hand .c:hover { transform:translateY(-4px); }
+
+/* D2 A ลายรดน้ำ (ใช้อยู่) */
+.lac { background:#17110D; color:#EFE3C2; border:1px solid #5A4630; }
+.lac .hd { border-bottom:1px solid #5A4630; } .lac .hd b { font-family:Srisakdi,serif; font-size:20px; color:#D9B45A; } .lac .hd small { color:#BFAE86; }
+.lac .kick { color:#D9B45A; } .lac h3 { font-family:Srisakdi,serif; color:#F0D78C; font-size:26px; } .lac p { color:#E3D6B3; }
+.lac .c { border:1px solid #8A6D3B; background:#221912; } .lac .c .fx { color:#D9B45A; }
+/* D2 B ผ้ายันต์ */
+.yan { background:#F3EDE0 repeating-linear-gradient(90deg, transparent 0 22px, rgba(162,59,44,.06) 22px 23px); border:3px double #A23B2C; color:#3A1E18; }
+.yan .hd { border-bottom:2px solid #A23B2C; color:#A23B2C; } .yan .hd b { font-family:Srisakdi,serif; font-size:22px; }
+.yan .seal { align-self:center; width:64px; height:64px; }
+.yan .kick { color:#A23B2C; text-align:center; } .yan h3 { font-family:Srisakdi,serif; color:#7A2418; text-align:center; font-size:26px; } .yan p { color:#4A2A22; }
+.yan .c { border:1px solid #A23B2C; background:#FFF9EF; } .yan .c .fx { color:#A23B2C; }
+/* D2 C แสงเทียน */
+.can { background:radial-gradient(circle at 50% 30%, #4A3216 0%, #1A120B 55%, #0D0906 100%); color:#F2E2C0; border:1px solid #3A2A18; }
+.can .hd small { color:#BFA57A; } .can .hd b { font-family:Pridi,serif; color:#F6C66A; }
+.can .flame { align-self:center; width:40px; height:56px; }
+.can .kick { color:#F6C66A; text-align:center; } .can h3 { font-family:Pridi,serif; text-align:center; color:#FFE3A6; } .can p { color:#E6D3AE; text-align:center; }
+.can .c { border:1px solid rgba(246,198,106,.45); background:rgba(0,0,0,.35); } .can .c .fx { color:#F6C66A; }
+
+/* D3 A มรณบัตร (ใช้อยู่) */
+.cert { background:#F4EFE3; border:1px solid #C9BFA9; color:#1F2430; }
+.cert .hd { background:#1F2430; color:#F4EFE3; } .cert .hd b { font-family:Pridi,serif; }
+.cert .stamp { align-self:flex-start; border:2px solid #A23B2C; color:#A23B2C; font-family:Pridi,serif; font-weight:600; padding:2px 10px; transform:rotate(-3deg); }
+.cert h3 { font-family:Pridi,serif; } .cert p { color:#3A3F4B; } .cert .sub { font-size:13px; color:#4A4F5C; }
+.cert .c { border:1px solid #1F2430; background:#FFFDF7; }
+/* D3 B หนังสืองานศพ */
+.mem { background:#FFFFFF; border:12px solid #1F1F1F; outline:1px solid #8A8A8A; outline-offset:-6px; color:#1F1F1F; text-align:center; }
+.mem .hd { justify-content:center; padding-top:16px; } .mem .hd b { font-family:Srisakdi,serif; font-size:20px; }
+.mem .por { align-self:center; width:84px; height:96px; border:1px solid #1F1F1F; padding:4px; }
+.mem h3 { font-family:Srisakdi,serif; font-size:26px; } .mem p { color:#3A3A3A; } .mem .sub { font-size:13px; color:#5A5A5A; }
+.mem .c { justify-content:center; border:1px solid #1F1F1F; }
+/* D3 C ศิลาจารึก */
+.stone { background:linear-gradient(160deg,#8C8A84,#6F6D68); border-radius:60px 60px 6px 6px; color:#2C2B28; border:2px solid #55534F; }
+.stone .hd { justify-content:center; padding-top:22px; } .stone .hd b { font-family:Srisakdi,serif; font-size:22px; color:#2C2B28; text-shadow:0 1px 0 rgba(255,255,255,.35); }
+.stone h3, .stone p { text-align:center; text-shadow:0 1px 0 rgba(255,255,255,.3); } .stone h3 { font-family:Srisakdi,serif; font-size:28px; } .stone .sub { font-size:13px; color:#3A3936; }
+.stone .c { border:1px solid #3A3936; background:rgba(255,255,255,.15); color:#1F1E1C; }
+
+/* D4 ปรโลก */
+.court { background:#17110D; color:#EFE3C2; border:1px solid #5A4630; }
+.court .hd { border-bottom:1px solid #5A4630; } .court .hd b { font-family:Srisakdi,serif; font-size:20px; color:#D9B45A; } .court .hd small { color:#BFAE86; }
+.court h3 { font-family:Srisakdi,serif; color:#F0D78C; font-size:26px; } .court p { color:#E3D6B3; }
+.court .scale { display:flex; gap:10px; } .court .scale > div { flex:1; min-width:0; border:1px solid #5A4630; padding:8px; font-size:13px; display:flex; flex-direction:column; gap:2px; }
+.court .scale .heavy { border-color:#D9B45A; } .court .scale b { font-family:Srisakdi,serif; color:#F0D78C; font-size:18px; }
+.court .c { border:1px solid #8A6D3B; background:#221912; } .court .c .fx { color:#D9B45A; }
+.full { position:relative; background:#0E0A07; color:#EFE3C2; border:1px solid #5A4630; }
+.full > .scene { position:absolute; inset:0; height:100%; width:100%; }
+.full .hd, .full .bd, .full .ch { position:relative; } .full .hd b { font-family:Srisakdi,serif; color:#D9B45A; font-size:20px; } .full .hd small { color:#BFAE86; }
+.full .bd { margin-top:150px; background:linear-gradient(180deg, rgba(14,10,7,0), rgba(14,10,7,.92) 30%); padding-top:30px; }
+.full h3 { font-family:Srisakdi,serif; color:#F0D78C; font-size:28px; } .full p { color:#E3D6B3; }
+.full .c { border:1px solid #8A6D3B; background:rgba(34,25,18,.92); } .full .c .fx { color:#D9B45A; }
+.leaf { background:#2A1E14; color:#3A2A18; border:1px solid #1A120B; }
+.leaf .hd { color:#E7CF9A; } .leaf .hd b { font-family:Srisakdi,serif; font-size:20px; }
+.leaf .strip { margin:0 12px; padding:6px 18px; background:linear-gradient(180deg,#E6CD95,#D6B676); border-radius:4px; position:relative; font-size:14px; }
+.leaf .strip::before, .leaf .strip::after { content:""; position:absolute; top:50%; width:6px; height:6px; margin-top:-3px; border-radius:50%; background:#2A1E14; }
+.leaf .strip::before { left:5px; } .leaf .strip::after { right:5px; }
+.leaf .strip b { font-family:Srisakdi,serif; font-size:20px; color:#5A2A12; }
+.leaf .c { border:1px solid #8A6D3B; background:#3A2A1C; color:#F0DEB4; } .leaf .c .fx { color:#E7CF9A; }
+
+/* D5 ต่างโลก */
+.sys { background:linear-gradient(180deg,rgba(30,35,80,.98),rgba(22,26,58,.98)); border:1px solid #3B4BA8; border-radius:10px; color:#E8ECFF; box-shadow:0 0 24px rgba(59,75,168,.35); }
+.sys .hd { border-bottom:1px solid #3B4BA8; font-family:Mitr,sans-serif; color:#6FE3FF; } .sys .hd small { color:#A6AEDB; font-family:Sarabun,sans-serif; }
+.sys .kick { color:#B48CFF; } .sys h3 { font-family:Mitr,sans-serif; font-weight:600; } .sys p { color:#D3D8F5; }
+.sys .c { border:1px solid #3B4BA8; border-radius:8px; background:rgba(14,16,36,.6); } .sys .c .fx { color:#6FE3FF; }
+.adv { background:#6B4426; padding:10px; border-radius:6px; color:#3B2614; }
+.adv .in { background:#F1E2BF repeating-linear-gradient(0deg, transparent 0 27px, rgba(107,68,38,.12) 27px 28px); border-radius:3px; display:flex; flex-direction:column; flex:1; }
+.adv .hd { border-bottom:1px solid #B48E5E; } .adv .hd b { font-family:Pridi,serif; } .adv .hd small { color:#7A5634; }
+.adv .kick { color:#8E2F1E; } .adv h3 { font-family:Pridi,serif; } .adv p { color:#4A3220; }
+.adv .c { border:1px solid #6B4426; background:#FBF1D9; } .adv .c .fx { color:#8E2F1E; }
+.him { background:#13234A; border:2px solid #D9B45A; outline:4px solid #13234A; outline-offset:-8px; color:#E9EEFF; }
+.him .hd { background:repeating-linear-gradient(90deg,#D9B45A 0 10px,#B88E36 10px 20px); color:#13234A; } .him .hd b { font-family:Srisakdi,serif; font-size:20px; }
+.him .kick { color:#F0D78C; } .him h3 { font-family:Srisakdi,serif; color:#F0D78C; font-size:26px; } .him p { color:#D5DCF5; }
+.him .c { border:1px solid #D9B45A; background:#1B2F5E; } .him .c .fx { color:#F0D78C; }
+
+/* D6 กระเป๋า */
+.bag { background:#F4EFE3; border:1px solid #C9BFA9; color:#1F2430; }
+.bag .hd { background:#1F2430; color:#F4EFE3; } .bag .hd b { font-family:Pridi,serif; }
+.bag .h4 { font-size:13px; font-weight:600; color:#A23B2C; }
+.bag .c, .dex .c { border:1px solid #1F2430; background:#FFFDF7; }
+.mkt .c { border:1px solid #2A2420; background:#FFFFFF; }
+.slots { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+.slot { aspect-ratio:1; border:1px solid #8A8270; background:#FFFDF7; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; line-height:1.3; text-align:center; padding:2px; }
+.slot.e { border-style:dashed; color:#8A8270; background:transparent; } .slot.on { border:2px solid #2F6B66; }
+.slot svg { width:26px; height:26px; }
+.rows { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; }
+.rows li { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 0; border-bottom:1px dashed #B9AE97; font-size:14px; }
+.rows li small { display:block; font-size:12px; color:#4A4F5C; }
+.rows .tag { font-size:11px; border:1px solid currentColor; padding:0 6px; white-space:nowrap; color:#2F6B66; }
+.rows .tag.off { color:#8A8270; }
+.doll { display:grid; grid-template-columns:1fr 72px 1fr; gap:6px; align-items:center; }
+.doll .col { display:flex; flex-direction:column; gap:6px; }
+.doll .slot { aspect-ratio:auto; min-height:52px; }
+.doll summary, .bag summary { cursor:pointer; min-height:44px; display:flex; align-items:center; font-size:13px; font-weight:600; }
+
+/* D7 ดันเจี้ยน */
+.dun { background:#1C2420; color:#DCE6DE; border:1px solid #2F3D36; }
+.dun .hd { border-bottom:1px solid #3A4A42; } .dun .hd b { font-family:Pridi,serif; color:#B8E0C2; } .dun .hd small { color:#93A89A; }
+.dun .kick { color:#E0A458; } .dun h3 { font-family:Pridi,serif; } .dun p { color:#C3D0C6; }
+.dun .c { border:1px solid #4E6358; background:#24302A; } .dun .c .fx { color:#E0A458; }
+.depth { display:flex; gap:3px; } .depth i { flex:1; height:8px; background:#2F3D36; } .depth i.on { background:#E0A458; } .depth i.now { background:#F3D37A; }
+.ladder { display:grid; grid-template-columns:72px minmax(0,1fr); }
+.ladder ol { list-style:none; margin:0; padding:10px 0 10px 10px; display:flex; flex-direction:column-reverse; gap:4px; font-size:12px; }
+.ladder li { padding:4px 6px; border:1px solid #3A4A42; color:#93A89A; } .ladder li.now { border-color:#F3D37A; color:#F3D37A; } .ladder li.done { color:#DCE6DE; }
+.doors { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; padding:8px 16px 16px; margin-top:auto; }
+.k .doors .c { flex-direction:column; justify-content:flex-end; align-items:center; min-height:130px; text-align:center; border-radius:40px 40px 2px 2px; padding:8px 6px; font-size:13px; }
+.k .doors .c .fx { max-width:none; text-align:center; }
+
+/* D8 มอนสเตอร์ */
+.mon { background:#140E14; color:#EDE0EA; border:1px solid #3E2A3B; }
+.mon .hd { border-bottom:1px solid #3E2A3B; } .mon .hd b { font-family:Srisakdi,serif; font-size:20px; color:#F09ACB; } .mon .hd small { color:#B79AB0; }
+.mon h3 { font-family:Srisakdi,serif; font-size:28px; color:#FFD3EC; } .mon p { color:#D9C7D4; }
+.mon .beast { max-width:150px; align-self:center; }
+.mon .weak { display:flex; flex-wrap:wrap; gap:6px; font-size:12px; } .mon .weak span { border:1px solid #7A4C70; padding:1px 8px; } .mon .weak .q { color:#B79AB0; border-style:dashed; }
+.mon .c { border:1px solid #7A4C70; background:#22172A; } .mon .c .fx { color:#F09ACB; }
+.dex { background:#F4EFE3; border:1px solid #C9BFA9; color:#1F2430; }
+.dex .hd { background:#1F2430; color:#F4EFE3; } .dex .hd b { font-family:Pridi,serif; }
+.dex .g { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.dex .g div { border:1px solid #B9AE97; background:#FFFDF7; padding:6px; font-size:12px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; min-height:64px; }
+.dex .g div.q { background:#E9E1CF; color:#8A8270; border-style:dashed; }
+.dex .g svg { width:40px; height:40px; }
+.dex .tip { font-size:13px; color:#4A4F5C; }
+.note-b { background:#FFFDF5 repeating-linear-gradient(0deg, transparent 0 29px, #C9D7E8 29px 30px); border:1px solid #B9AE97; color:#20324F; box-shadow:4px 4px 0 #C9BFA9; }
+.note-b .hd { border-bottom:2px solid #C25B4E; } .note-b .hd b { font-family:Srisakdi,serif; font-size:20px; } .note-b .hd small { color:#4A5A75; }
+.note-b h3 { font-family:Srisakdi,serif; font-size:26px; } .note-b p { color:#2A3B5A; line-height:30px; }
+.note-b .c { border:1px solid #20324F; background:#FFFFFF; } .note-b .c .fx { color:#C25B4E; }
+
+/* D9 ตลาด */
+.mkt { background:#FFF8EA; border:1px solid #D8C49C; color:#2A2420; }
+.mkt .awn { height:22px; background:repeating-linear-gradient(90deg,#C8452F 0 22px,#FFF8EA 22px 44px); border-bottom:3px solid #8E2F1E; }
+.mkt .hd b { font-family:Pridi,serif; } .mkt .hd small { color:#6B5E4E; }
+.mkt .rows li { border-bottom-color:#D8C49C; }
+.mkt .buy { all:unset; cursor:pointer; min-height:36px; padding:0 12px; display:inline-flex; align-items:center; border:1px solid #2A2420; background:#FFFFFF; font-size:13px; white-space:nowrap; }
+.mkt .buy:focus-visible { outline:2px solid #2A2420; }
+.tabs { display:grid; grid-template-columns:1fr 1fr; border-bottom:2px solid #2A2420; }
+.tabs span { text-align:center; padding:8px; font-size:14px; font-weight:600; } .tabs .on { background:#2A2420; color:#FFF8EA; }
+.warn { font-size:12px; color:#A23B2C; }
+.rcpt { background:#FFFFFF; color:#222; border:1px solid #CFCFCF; font-family:"Courier New",Sarabun,monospace; }
+.rcpt .hd { justify-content:center; flex-direction:column; gap:0; border-bottom:1px dashed #777; } .rcpt .hd b { font-family:Pridi,serif; font-size:17px; }
+.rcpt .ln { display:flex; justify-content:space-between; gap:8px; font-size:13px; } .rcpt .tot { border-top:1px dashed #777; padding-top:6px; font-weight:700; }
+.rcpt .c { border:1px solid #222; justify-content:center; font-family:Sarabun,sans-serif; }
+
+/* D10 สายมืด */
+.grim { background:#120A0A; color:#EAD9D2; border:1px solid #5C1E1A; }
+.grim .hd { border-bottom:1px solid #5C1E1A; } .grim .hd b { font-family:Srisakdi,serif; font-size:20px; color:#E0533F; } .grim .hd small { color:#A98C85; }
+.grim h3 { font-family:Srisakdi,serif; color:#F07A66; font-size:26px; } .grim p { color:#D6BFB7; }
+.grim .rows li { border-bottom-color:#3A1A17; } .grim .rows li small { color:#A98C85; } .grim .rows .tag { color:#E0533F; }
+.grim .c { border:1px solid #7A2620; background:#1E0F0E; } .grim .c .fx { color:#E0533F; }
+.reg .c.dark { border:2px solid #5C1E1A; background:#2A1513; color:#F3DCD5; } .reg .c.dark .fx { color:#F07A66; }
+.reg .c.dark small { display:block; font-size:11px; letter-spacing:.06em; color:#F07A66; }
+.reg.shade { box-shadow:inset 0 0 0 1px #C9BFA9, inset 0 0 70px 22px rgba(40,10,8,.55); }
+
+/* ---------- ธีม: การ์ดชุดเดียวกัน เปลี่ยนแค่ตัวแปร ---------- */
+.tgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px; align-items:start; }
+.tcell { display:flex; flex-direction:column; gap:6px; min-width:0; }
+.tcell > b { font-size:14px; }
+.th { --bg:#F4EFE3; --ink:#1F2430; --sub:#3A3F4B; --hdbg:#1F2430; --hdink:#F4EFE3; --acc:#A23B2C; --line:#1F2430; --btn:#FFFDF7; --fxc:#2F6B66; --bar:#E2D9C6; --fill:#2F6B66; --hf:Pridi,serif; --fs:15px;
+  background:var(--bg); color:var(--ink); border:1px solid var(--line); min-height:360px; font-size:var(--fs); }
+.th .hd { background:var(--hdbg); color:var(--hdink); } .th .hd b { font-family:var(--hf); }
+.th .stats { color:var(--sub); } .th .bar { background:var(--bar); } .th .bar i { background:var(--fill); }
+.th .kick { color:var(--acc); } .th h3 { font-family:var(--hf); } .th p { color:var(--sub); font-size:var(--fs); }
+.th .c { border:1px solid var(--line); background:var(--btn); color:var(--ink); font-size:calc(var(--fs) - 1px); } .th .c .fx { color:var(--fxc); }
+.t-after { --bg:#17110D; --ink:#EFE3C2; --sub:#E3D6B3; --hdbg:#17110D; --hdink:#D9B45A; --acc:#D9B45A; --line:#8A6D3B; --btn:#221912; --fxc:#D9B45A; --bar:#3A2C1F; --fill:#D9B45A; --hf:Srisakdi,serif; }
+.t-other { --bg:#161A3A; --ink:#E8ECFF; --sub:#D3D8F5; --hdbg:#1E2350; --hdink:#6FE3FF; --acc:#B48CFF; --line:#3B4BA8; --btn:#0E1024; --fxc:#6FE3FF; --bar:#0B0D20; --fill:#5EE6A0; --hf:Mitr,sans-serif; }
+.t-dun { --bg:#1C2420; --ink:#DCE6DE; --sub:#C3D0C6; --hdbg:#24302A; --hdink:#B8E0C2; --acc:#E0A458; --line:#4E6358; --btn:#24302A; --fxc:#E0A458; --bar:#2F3D36; --fill:#E0A458; }
+/* ทางที่เปลี่ยนแค่หัวกับกรอบ: เนื้อในคงสีกระดาษทุกฉาก */
+.frame .th.t-after, .frame .th.t-other, .frame .th.t-dun { --bg:#F4EFE3; --ink:#1F2430; --sub:#3A3F4B; --btn:#FFFDF7; --fxc:#2F6B66; --bar:#E2D9C6; --fill:#2F6B66; border-width:4px; }
+.frame .th.t-after { --line:#8A6D3B; --acc:#8A6D3B; } .frame .th.t-other { --line:#3B4BA8; --acc:#3B4BA8; } .frame .th.t-dun { --line:#4E6358; --acc:#8A5A1E; }
+.p-light { --bg:#FFFFFF; --ink:#16181D; --sub:#3A3F4B; --hdbg:#F0F0F0; --hdink:#16181D; --acc:#B23A2A; --line:#C8C8C8; --btn:#FFFFFF; --fxc:#1F6B5E; --bar:#E6E6E6; --fill:#1F6B5E; --hf:Sarabun,sans-serif; }
+.p-night { --bg:#15171C; --ink:#E6E8EE; --sub:#B9BEC9; --hdbg:#0D0E12; --hdink:#E6E8EE; --acc:#F08A6E; --line:#3A3F4B; --btn:#1E2129; --fxc:#7FD1BF; --bar:#2A2E37; --fill:#7FD1BF; --hf:Sarabun,sans-serif; }
+.p-khoi { --bg:#E9DCC0; --ink:#2B1D10; --sub:#4A3520; --hdbg:#2B1D10; --hdink:#E9DCC0; --acc:#8E2F1E; --line:#6B4E2E; --btn:#F2E7CF; --fxc:#5A4012; --bar:#D6C6A2; --fill:#8E2F1E; --hf:Srisakdi,serif; }
+.p-big { --bg:#FFFFFF; --ink:#000000; --sub:#000000; --hdbg:#000000; --hdink:#FFFFFF; --acc:#B00000; --line:#000000; --btn:#FFFFFF; --fxc:#005A3C; --bar:#BDBDBD; --fill:#000000; --hf:Sarabun,sans-serif; --fs:18px; border-width:2px; }
+.p-big .c { border-width:2px; min-height:56px; }
+.p-sepia { --bg:#EADBC4; --ink:#3B2A1A; --sub:#5A4632; --hdbg:#5A4632; --hdink:#F3E7D2; --acc:#7A4A2A; --line:#8A6E52; --btn:#F3E7D2; --fxc:#5A4632; --bar:#D3BFA1; --fill:#7A4A2A; }
+.setmock { background:#F4EFE3; border:1px solid #C9BFA9; padding:12px; display:flex; flex-direction:column; gap:8px; font-size:14px; max-width:520px; }
+.setmock b { font-family:Pridi,serif; }
+.setmock .opt-row { display:flex; flex-wrap:wrap; gap:6px; }
+.setmock .opt-row span { border:1px solid #1F2430; padding:4px 10px; } .setmock .opt-row .on { background:#1F2430; color:#F4EFE3; }
+.chk { display:flex; align-items:center; gap:8px; min-height:44px; padding:4px 10px; border:1px dashed #8A8270; background:#F4EFE3; font-size:14px; font-weight:600; cursor:pointer; }
+.chk input { width:20px; height:20px; margin:0; accent-color:#A23B2C; }
+.chk:has(input:checked) { border:2px solid #A23B2C; color:#A23B2C; }
+.chk:has(input:focus-visible) { outline:2px solid #1F2430; outline-offset:2px; }
+
+/* ---------- แผงสรุปคำตอบ ---------- */
+.ans { background:#1F2430; color:#F4EFE3; padding:18px; display:flex; flex-direction:column; gap:10px; }
+.ans h2 { font-family:Pridi,serif; margin:0; font-size:22px; }
+.ans pre { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; font:14px/1.7 Sarabun,sans-serif; background:#2A303D; padding:10px 12px; }
+.ans .act { display:flex; flex-wrap:wrap; gap:8px; }
+.ans button { all:unset; cursor:pointer; min-height:44px; padding:0 16px; display:inline-flex; align-items:center; border:1px solid #F4EFE3; font-weight:600; font-size:14px; }
+.ans button:focus-visible { outline:2px solid #F0D78C; outline-offset:2px; }
+.ans small { color:#C9C3B6; }
+footer.pg { font-size:13px; color:#4A4F5C; margin-top:32px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="s-house" viewBox="0 0 76 30"><rect x="0" y="24" width="76" height="6" fill="#B9AE97"/><rect x="8" y="10" width="20" height="14" fill="#8A6A4F"/><rect x="6" y="8" width="24" height="3" fill="#A23B2C"/><rect x="10" y="6" width="16" height="2" fill="#A23B2C"/><rect x="15" y="16" width="5" height="8" fill="#3B2E25"/><rect x="44" y="12" width="4" height="4" fill="#E0B08A"/><rect x="44" y="11" width="4" height="1" fill="#1F2430"/><rect x="43" y="16" width="6" height="5" fill="#2F6B66"/><rect x="44" y="21" width="2" height="3" fill="#1F2430"/><rect x="47" y="21" width="2" height="3" fill="#1F2430"/><rect x="56" y="14" width="10" height="10" fill="#C9C0AA"/><rect x="57" y="15" width="8" height="4" fill="#F4EFE3"/><rect x="60" y="20" width="2" height="4" fill="#1F2430"/><rect x="66" y="4" width="5" height="5" fill="#E9C46A"/></symbol>
+    <symbol id="s-court" viewBox="0 0 76 30"><rect x="0" y="25" width="76" height="5" fill="#3A2C1F"/><rect x="30" y="6" width="16" height="19" fill="#5A1A14"/><rect x="28" y="4" width="20" height="3" fill="#D9B45A"/><rect x="34" y="1" width="8" height="3" fill="#F0D78C"/><rect x="36" y="10" width="4" height="4" fill="#C98A5A"/><rect x="35" y="14" width="6" height="7" fill="#2F2A6B"/><rect x="36" y="9" width="4" height="1" fill="#F0D78C"/><rect x="12" y="17" width="3" height="3" fill="#C98A5A"/><rect x="11" y="20" width="5" height="5" fill="#EFE3C2"/><rect x="4" y="3" width="1" height="1" fill="#F0D78C"/><rect x="68" y="5" width="1" height="1" fill="#F0D78C"/><rect x="60" y="2" width="1" height="1" fill="#F0D78C"/><rect x="18" y="6" width="1" height="1" fill="#F0D78C"/></symbol>
+    <symbol id="s-cave" viewBox="0 0 76 30"><rect x="0" y="0" width="76" height="30" fill="#0F1512"/><rect x="0" y="0" width="76" height="6" fill="#26332C"/><rect x="0" y="0" width="10" height="30" fill="#26332C"/><rect x="66" y="0" width="10" height="30" fill="#26332C"/><rect x="0" y="25" width="76" height="5" fill="#2F3D36"/><rect x="26" y="8" width="24" height="17" fill="#070A09"/><rect x="36" y="18" width="4" height="7" fill="#E0A458"/><rect x="37" y="15" width="2" height="3" fill="#F3D37A"/><rect x="16" y="6" width="2" height="5" fill="#3A4A42"/><rect x="58" y="6" width="2" height="7" fill="#3A4A42"/></symbol>
+    <symbol id="s-ghost" viewBox="0 0 30 30"><rect x="11" y="4" width="8" height="8" fill="#F2D3C2"/><rect x="10" y="2" width="10" height="3" fill="#1A0E14"/><rect x="9" y="5" width="2" height="9" fill="#1A0E14"/><rect x="19" y="5" width="2" height="9" fill="#1A0E14"/><rect x="12" y="7" width="2" height="1" fill="#1A0E14"/><rect x="16" y="7" width="2" height="1" fill="#1A0E14"/><rect x="14" y="12" width="2" height="4" fill="#C2405A"/><rect x="13" y="16" width="4" height="3" fill="#8E2F4A"/><rect x="14" y="19" width="2" height="5" fill="#C2405A"/><rect x="6" y="9" width="2" height="2" fill="#7FE3A0"/><rect x="22" y="9" width="2" height="2" fill="#7FE3A0"/><rect x="4" y="14" width="1" height="1" fill="#7FE3A0"/><rect x="25" y="15" width="1" height="1" fill="#7FE3A0"/></symbol>
+    <symbol id="s-person" viewBox="0 0 20 24"><rect x="7" y="2" width="6" height="6" fill="#C98A5A"/><rect x="7" y="1" width="6" height="2" fill="#1F2430"/><rect x="5" y="8" width="10" height="8" fill="#5A5A5A"/><rect x="6" y="16" width="3" height="6" fill="#1F2430"/><rect x="11" y="16" width="3" height="6" fill="#1F2430"/></symbol>
+    <symbol id="s-amulet" viewBox="0 0 12 12"><rect x="5" y="0" width="2" height="2" fill="#8A6D3B"/><rect x="3" y="2" width="6" height="8" fill="#D9B45A"/><rect x="4" y="3" width="4" height="6" fill="#8A6D3B"/><rect x="5" y="4" width="2" height="3" fill="#F0D78C"/></symbol>
+    <symbol id="s-watch" viewBox="0 0 12 12"><rect x="4" y="0" width="4" height="3" fill="#5A4630"/><rect x="4" y="9" width="4" height="3" fill="#5A4630"/><rect x="2" y="3" width="8" height="6" fill="#BFC4C8"/><rect x="3" y="4" width="6" height="4" fill="#FFFFFF"/><rect x="6" y="5" width="1" height="2" fill="#1F2430"/></symbol>
+    <symbol id="s-car" viewBox="0 0 12 12"><rect x="1" y="5" width="10" height="4" fill="#A23B2C"/><rect x="3" y="3" width="6" height="2" fill="#A23B2C"/><rect x="4" y="4" width="4" height="1" fill="#CFE0EA"/><rect x="2" y="9" width="2" height="2" fill="#1F2430"/><rect x="8" y="9" width="2" height="2" fill="#1F2430"/></symbol>
+  </defs>
+</svg>
+
+<header class="pg"><div class="w">
+  <h1>ต้นแบบการ์ด v2 · เลือกหน้าตาและธีม</h1>
+  <p>ทุกใบในหน้านี้เป็นตัวเลือกให้ตัดสิน ยังไม่ใช่หน้าตาในเกม เกมจะเปลี่ยนตามก็ต่อเมื่อเลือกแล้ว แต่ละชนิดมี 2–3 ทาง ทางที่เขียนว่า “ใช้อยู่” คือหน้าตาตอนนี้ ปุ่มบนการ์ดกดแล้วไม่มีอะไรเกิดขึ้น ข้อความเป็นตัวอย่าง</p>
+  <p>ติ๊ก “เลือกทางนี้” ใต้การ์ดที่ชอบ แล้วคัดลอกสรุปท้ายหน้าส่งกลับมา สิ่งที่ติ๊กไว้จำในเบราว์เซอร์เครื่องนี้ · <a href="../../catalog.html" target="_top">การ์ดทั้งหมดในเกม</a> · <a href="../../archive/cards-v1.html" target="_top">ต้นแบบรุ่นแรก</a></p>
+</div></header>
+
+<main><div class="w">
+<ul class="toc">
+  <li><a href="#d1">ชีวิต</a></li><li><a href="#d2">ความเชื่อ</a></li><li><a href="#d3">มรณบัตร</a></li><li><a href="#d4">ปรโลก</a></li><li><a href="#d5">ต่างโลก</a></li>
+  <li><a href="#d6">กระเป๋า</a></li><li><a href="#d7">ดันเจี้ยน</a></li><li><a href="#d8">มอนสเตอร์</a></li><li><a href="#d9">ตลาด</a></li><li><a href="#d10">สายมืด</a></li>
+  <li><a href="#t1">ธีมตามฉาก</a></li><li><a href="#t2">ธีมที่ผู้เล่นเลือก</a></li><li><a href="#t3">ธีมทับฉาก</a></li><li><a href="#ans">สรุปคำตอบ</a></li>
+</ul>
+
+<h2 class="grp">การ์ดที่มีในเกมแล้ว</h2>
+
+<section class="d" id="d1" data-q="D1" data-name="การ์ดชีวิต">
+  <h2>D1 · การ์ดชีวิต <small>เรื่องเรียน งาน เงิน ครอบครัว · การ์ดที่เห็นบ่อยที่สุด</small></h2>
+  <p>ชีวิตหนึ่งเห็นการ์ดแบบนี้เกือบสองร้อยใบ ต้องอ่านเร็วบนมือถือ และต้องมีที่ให้ตัวเลือก 3–4 ทางเสมอ</p>
+  <div class="opts">
+    <div class="opt">
+      <div class="lab"><b>ทาง A · ทะเบียนราษฎร์</b><span>กระดาษ หมึก ตราแดง เหมือนเอกสารราชการ อ่านง่ายที่สุด แต่หน้าตาเรียบ</span></div>
+      <span class="flag">ใช้อยู่</span>
+      <article class="k reg">
+        <div class="hd"><b>อายุ 21 · ช่วงหนุ่มสาว</b><small>สมใจ · ขอนแก่น</small></div>
+        <div class="stats"><div>สุขภาพ<div class="bar"><i style="width:78%"></i></div></div><div>ความสุข<div class="bar"><i style="width:61%"></i></div></div><div>ความรู้<div class="bar"><i style="width:54%"></i></div></div><div>เงิน<div class="bar"><i style="width:30%"></i></div></div></div>
+        <div class="bd"><span class="kick">ช่วงหนุ่มสาว</span><h3>วันจับใบดำใบแดง</h3><p>หมายเรียกมาถึงบ้านตั้งแต่ต้นเดือน พี่ชายข้างบ้านสมัครไปเองเพราะอยากได้สิทธิ์เรียนต่อ</p></div>
+        <div class="ch"><button class="c"><span>ไปจับตามปกติ ปล่อยให้เป็นดวง</span><span class="fx">?</span></button><button class="c"><span>สมัครใจเป็นทหาร</span><span class="fx">ความรู้ ↑ · ความสัมพันธ์ ↓</span></button><button class="c"><span>ขอผ่อนผันไว้ก่อน</span><span class="fx">ความสุข ↑</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D1" value="A"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง B · สมุดภาพ</b><span>ภาพฉากพิกเซลเต็มหัวการ์ด มีป้ายปี พ.ศ. รู้สึกเหมือนพลิกอัลบั้ม ต้องวาดภาพเพิ่มตามหมวด</span></div>
+      <article class="k pic">
+        <div class="banner"><svg class="scene px" viewBox="0 0 76 30" aria-hidden="true"><use href="#s-house"/></svg><span class="era">พ.ศ. 2535</span></div>
+        <div class="hd"><b>สมใจ อายุ 21</b><small>ขอนแก่น</small></div>
+        <div class="bd"><h3>วันจับใบดำใบแดง</h3><p>หมายเรียกมาถึงบ้านตั้งแต่ต้นเดือน พี่ชายข้างบ้านสมัครไปเองเพราะอยากได้สิทธิ์เรียนต่อ</p></div>
+        <div class="ch"><button class="c"><span>ไปจับตามปกติ ปล่อยให้เป็นดวง</span><span class="fx">?</span></button><button class="c"><span>สมัครใจเป็นทหาร</span><span class="fx">ความรู้ ↑ · ความสัมพันธ์ ↓</span></button><button class="c"><span>ขอผ่อนผันไว้ก่อน</span><span class="fx">ความสุข ↑</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D1" value="B"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง C · ไพ่วางมือ</b><span>เรื่องอยู่บนโต๊ะ ตัวเลือกเป็นไพ่เรียงแถวล่าง มือถือปัดซ้ายขวา ดูเป็นเกมขึ้น แต่ป้ายยาวต้องย่อ</span></div>
+      <article class="k deck">
+        <div class="hd"><b>อายุ 21</b><small>สมใจ · ขอนแก่น</small></div>
+        <div class="bd"><span class="kick">ช่วงหนุ่มสาว</span><h3>วันจับใบดำใบแดง</h3><p>หมายเรียกมาถึงบ้านตั้งแต่ต้นเดือน พี่ชายข้างบ้านสมัครไปเองเพราะอยากได้สิทธิ์เรียนต่อ</p></div>
+        <div class="hand"><button class="c"><span>จับตามปกติ</span><span class="fx">?</span></button><button class="c"><span>สมัครเป็นทหาร</span><span class="fx">ความรู้ ↑<br>ความสัมพันธ์ ↓</span></button><button class="c"><span>ขอผ่อนผัน</span><span class="fx">ความสุข ↑</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D1" value="C"> เลือกทางนี้</label>
+    </div>
+  </div>
+</section>
+
+<section class="d" id="d2" data-q="D2" data-name="การ์ดความเชื่อและลาง">
+  <h2>D2 · การ์ดความเชื่อและลาง <small>ผี เจ้าที่ บนบาน ดูดวง ลางบอกเหตุ</small></h2>
+  <p>ต้องดูต่างจากการ์ดชีวิตทันทีที่ขึ้นจอ ผู้เล่นจะได้รู้ว่าเรื่องนี้ไม่ใช่เรื่องธรรมดา</p>
+  <div class="opts">
+    <div class="opt">
+      <div class="lab"><b>ทาง A · ลายรดน้ำ</b><span>พื้นรักดำ ตัวทอง ขลังและเข้ากับปรโลก แต่ใช้สีชุดเดียวกับฉากหลังตาย</span></div>
+      <span class="flag">ใช้อยู่</span>
+      <article class="k lac">
+        <div class="hd"><b>ลาง</b><small>สมใจ · อายุ 34</small></div>
+        <div class="bd"><span class="kick">คืนแรกในบ้านใหม่</span><h3>ศาลที่ยังไม่ได้ตั้ง</h3><p>ประตูหลังบ้านเปิดเองสองครั้ง ยายโทรมาถามว่าตั้งศาลพระภูมิหรือยัง</p></div>
+        <div class="ch"><button class="c"><span>หาฤกษ์ตั้งศาลให้ถูกพิธี</span><span class="fx">เงิน ↓ · ความสุข ↑</span></button><button class="c"><span>บอกยายว่าลมพัดแรง</span><span class="fx">?</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D2" value="A"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง B · ผ้ายันต์</b><span>ผ้าขาวหมึกแดง ยันต์กลางการ์ด สว่างกว่า อ่านง่ายตอนกลางวัน แยกจากปรโลกชัด</span></div>
+      <article class="k yan">
+        <div class="hd"><b>ลาง</b><small>สมใจ · อายุ 34</small></div>
+        <div class="bd">
+          <svg class="seal" viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke="#A23B2C" stroke-width="1.5"><rect x="4" y="4" width="32" height="32"/><path d="M4 4 L36 36 M36 4 L4 36"/><circle cx="20" cy="20" r="9"/><path d="M20 4 V36 M4 20 H36"/></g></svg>
+          <span class="kick">คืนแรกในบ้านใหม่</span><h3>ศาลที่ยังไม่ได้ตั้ง</h3><p>ประตูหลังบ้านเปิดเองสองครั้ง ยายโทรมาถามว่าตั้งศาลพระภูมิหรือยัง</p></div>
+        <div class="ch"><button class="c"><span>หาฤกษ์ตั้งศาลให้ถูกพิธี</span><span class="fx">เงิน ↓ · ความสุข ↑</span></button><button class="c"><span>บอกยายว่าลมพัดแรง</span><span class="fx">?</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D2" value="B"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง C · แสงเทียน</b><span>มืดเกือบทั้งใบ มีแสงอุ่นตรงกลาง ชวนขนลุกที่สุด ตัวหนังสือต้องใหญ่ไว้</span></div>
+      <article class="k can">
+        <div class="hd"><b>ลาง</b><small>สมใจ · อายุ 34</small></div>
+        <div class="bd">
+          <svg class="flame px" viewBox="0 0 10 14" aria-hidden="true"><rect x="4" y="0" width="2" height="2" fill="#FFE3A6"/><rect x="3" y="2" width="4" height="3" fill="#F6C66A"/><rect x="4" y="5" width="2" height="1" fill="#E07A2F"/><rect x="2" y="6" width="6" height="8" fill="#EFE3C2"/></svg>
+          <span class="kick">คืนแรกในบ้านใหม่</span><h3>ศาลที่ยังไม่ได้ตั้ง</h3><p>ประตูหลังบ้านเปิดเองสองครั้ง ยายโทรมาถามว่าตั้งศาลพระภูมิหรือยัง</p></div>
+        <div class="ch"><button class="c"><span>หาฤกษ์ตั้งศาลให้ถูกพิธี</span><span class="fx">เงิน ↓ · ความสุข ↑</span></button><button class="c"><span>บอกยายว่าลมพัดแรง</span><span class="fx">?</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D2" value="C"> เลือกทางนี้</label>
+    </div>
+  </div>
+</section>
+
+<section class="d" id="d3" data-q="D3" data-name="มรณบัตร">
+  <h2>D3 · มรณบัตร <small>หน้าจบชีวิต · ใบที่คนจะแคปไปแชร์</small></h2>
+  <p>ใบนี้ต้องมีชื่อ อายุ ชีวิตแบบไหน ฉายา และบันทึกที่ผู้เล่นเขียนไว้ ส่วนกราฟทั้งชีวิตที่ต่อท้ายเหมือนกันทุกทาง</p>
+  <div class="opts">
+    <div class="opt">
+      <div class="lab"><b>ทาง A · ใบมรณบัตร</b><span>เอกสารราชการ ตราประทับ “ถึงแก่กรรม” เข้าชุดกับการ์ดชีวิตทาง A</span></div>
+      <span class="flag">ใช้อยู่</span>
+      <article class="k cert">
+        <div class="hd"><b>มรณบัตร</b><small>สมใจ · สิริอายุ 78 ปี</small></div>
+        <div class="bd"><span class="stamp">ถึงแก่กรรม</span><h3>สมใจ ตายอายุ 78</h3><p>หญิง · ขอนแก่น · ฐานะปานกลาง · ครูประถม</p><p class="sub">ชีวิตแบบต้นมะม่วงหน้าบ้าน · ฉายา ครูของหมู่บ้าน</p><p class="sub">บันทึกเมื่ออายุ 45 “ลูกโตแล้ว แม่ยังห่วงอยู่ดี”</p></div>
+        <div class="ch"><button class="c"><span>ไปช่วงระหว่างชาติ</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D3" value="A"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง B · หนังสืองานศพ</b><span>ขาวดำ กรอบหนา รูปตรงกลาง เหมือนหนังสือแจกงานศพ ซึ้งกว่าแต่หม่น</span></div>
+      <article class="k mem">
+        <div class="hd"><b>ด้วยรักและอาลัย</b></div>
+        <div class="bd"><svg class="por px" viewBox="0 0 20 24" aria-hidden="true"><rect width="20" height="24" fill="#E8E8E8"/><use href="#s-person"/></svg><h3>สมใจ</h3><p>พ.ศ. 2490 – 2568 · สิริอายุ 78 ปี</p><p class="sub">ชีวิตแบบต้นมะม่วงหน้าบ้าน · ฉายา ครูของหมู่บ้าน</p><p class="sub">“ลูกโตแล้ว แม่ยังห่วงอยู่ดี” · เขียนไว้เมื่ออายุ 45</p></div>
+        <div class="ch"><button class="c"><span>ไปช่วงระหว่างชาติ</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D3" value="B"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง C · ศิลาจารึก</b><span>แผ่นหินโค้ง ตัวอักษรสลัก ดูเป็นตำนานของตระกูล เข้ากับผังตระกูลหลายรุ่น</span></div>
+      <article class="k stone">
+        <div class="hd"><b>ณ ที่นี้</b></div>
+        <div class="bd"><h3>สมใจ</h3><p>เกิด 2490 ขอนแก่น · ตาย 2568 อายุ 78</p><p class="sub">ชีวิตแบบต้นมะม่วงหน้าบ้าน · ครูของหมู่บ้าน</p><p class="sub">“ลูกโตแล้ว แม่ยังห่วงอยู่ดี”</p></div>
+        <div class="ch"><button class="c"><span>ไปช่วงระหว่างชาติ</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D3" value="C"> เลือกทางนี้</label>
+    </div>
+  </div>
+</section>
+
+<section class="d" id="d4" data-q="D4" data-name="ปรโลก">
+  <h2>D4 · ปรโลก <small>เปิดบัญชีบุญบาป แล้วเลือกทางเกิด</small></h2>
+  <p>ฉากเดียวที่เฉลยบุญบาป ต้องขลังและดูตาชั่งออกทันทีว่าฝั่งไหนหนัก</p>
+  <div class="opts">
+    <div class="opt">
+      <div class="lab"><b>ทาง A · ลายรดน้ำ + ตาชั่ง</b><span>แถบภาพพิกเซลบนหัว ตาชั่งสองฝั่ง ฝั่งที่หนักได้ขอบทอง</span></div>
+      <span class="flag">ใช้อยู่</span>
+      <article class="k court">
+        <div class="hd"><b>ปรโลก</b><small>สมใจ · ตายอายุ 78</small></div>
+        <svg class="scene px" viewBox="0 0 76 30" aria-hidden="true"><use href="#s-court"/></svg>
+        <div class="bd"><h3>ภูมิสวรรค์</h3><p>เทวดาผู้ถือบัญชีอ่านทีละหน้า แล้วชั่งว่าฝ่ายไหนหนักกว่า</p><div class="scale"><div class="heavy"><b>บุญ</b><span>ดูแลแม่จนวาระสุดท้าย</span><span>ทำบุญทุกวันพระ</span></div><div><b>บาป</b><span>โกงเงินแชร์เพื่อน</span></div></div></div>
+        <div class="ch"><button class="c"><span>ไปเกิดตามกรรม</span><span class="fx">ชาติหน้า</span></button><button class="c"><span>ขอเฝ้าลูกหลาน</span><span class="fx">รอส่วนบุญ</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D4" value="A"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง B · ฉากเต็มใบ</b><span>ภาพปรโลกเต็มการ์ด ตัวหนังสือลอยบนเงาด้านล่าง เหมือนฉากคั่นในหนัง</span></div>
+      <article class="k full">
+        <svg class="scene px" viewBox="0 0 76 60" preserveAspectRatio="xMidYMin slice" aria-hidden="true"><rect width="76" height="60" fill="#0E0A07"/><use href="#s-court" width="76" height="30" y="4"/></svg>
+        <div class="hd"><b>ปรโลก</b><small>สมใจ · ตายอายุ 78</small></div>
+        <div class="bd"><h3>ภูมิสวรรค์</h3><p>บุญหนักกว่าบาป · ดูแลแม่จนวาระสุดท้ายหนักที่สุด</p></div>
+        <div class="ch"><button class="c"><span>ไปเกิดตามกรรม</span><span class="fx">ชาติหน้า</span></button><button class="c"><span>ขอเฝ้าลูกหลาน</span><span class="fx">รอส่วนบุญ</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D4" value="B"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง C · ใบลาน</b><span>บัญชีจารลงใบลานทีละแผ่น อ่านเหมือนคัมภีร์ แต่กินที่แนวตั้งมาก</span></div>
+      <article class="k leaf">
+        <div class="hd"><b>ปรโลก</b><small>สมใจ · ตายอายุ 78</small></div>
+        <div class="bd" style="padding-left:0;padding-right:0">
+          <div class="strip"><b>ภูมิสวรรค์</b></div>
+          <div class="strip">ฝ่ายบุญ · ดูแลแม่จนวาระสุดท้าย · ทำบุญทุกวันพระ</div>
+          <div class="strip">ฝ่ายบาป · โกงเงินแชร์เพื่อน</div>
+          <div class="strip">บุญหนักกว่า</div>
+        </div>
+        <div class="ch"><button class="c"><span>ไปเกิดตามกรรม</span><span class="fx">ชาติหน้า</span></button><button class="c"><span>ขอเฝ้าลูกหลาน</span><span class="fx">รอส่วนบุญ</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D4" value="C"> เลือกทางนี้</label>
+    </div>
+  </div>
+</section>
+
+<section class="d" id="d5" data-q="D5" data-name="การ์ดต่างโลก">
+  <h2>D5 · การ์ดต่างโลก <small>เหตุการณ์ในโลกแฟนตาซี</small></h2>
+  <p>อยู่ในเกมเดียวกับชาติไทย แต่ต้องรู้ทันทีว่าข้ามโลกมาแล้ว</p>
+  <div class="opts">
+    <div class="opt">
+      <div class="lab"><b>ทาง A · หน้าต่างระบบ</b><span>กรอบเรืองแสงสีคราม แบบเกมต่างโลกทั่วไป คนเล่นสายนี้คุ้นตา แต่ห่างจากกลิ่นไทย</span></div>
+      <span class="flag">ใช้อยู่ในหน้าต่างโลก</span>
+      <article class="k sys">
+        <div class="hd"><b>เหตุการณ์</b><small>4/12</small></div>
+        <div class="bd"><span class="kick">ป่าหิมพานต์ชั้นนอก</span><h3>กินรีติดบ่วงพราน</h3><p>เสียงร้องดังมาจากพุ่มไม้ ปีกข้างหนึ่งติดบ่วงเชือก พรานยังไม่กลับมา</p></div>
+        <div class="ch"><button class="c"><span>ตัดบ่วงปล่อยไป</span><span class="fx">เสน่ห์ · 70%</span></button><button class="c"><span>รอพรานแล้วขอซื้อ</span><span class="fx">ใช้ทอง 30</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D5" value="A"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง B · สมุดนักผจญภัย</b><span>ปกหนัง กระดาษมีเส้น เหมือนบันทึกเดินทาง อุ่นและอ่านง่าย</span></div>
+      <article class="k adv"><div class="in">
+        <div class="hd"><b>บันทึกวันที่ 4</b><small>ป่าหิมพานต์ชั้นนอก</small></div>
+        <div class="bd"><span class="kick">เหตุการณ์</span><h3>กินรีติดบ่วงพราน</h3><p>เสียงร้องดังมาจากพุ่มไม้ ปีกข้างหนึ่งติดบ่วงเชือก พรานยังไม่กลับมา</p></div>
+        <div class="ch"><button class="c"><span>ตัดบ่วงปล่อยไป</span><span class="fx">เสน่ห์ · 70%</span></button><button class="c"><span>รอพรานแล้วขอซื้อ</span><span class="fx">ใช้ทอง 30</span></button></div>
+      </div></article>
+      <label class="pick"><input type="radio" name="D5" value="B"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง C · หิมพานต์ครามทอง</b><span>พื้นคราม ขอบลายทอง ต่างโลกที่ยังเป็นไทย สีครามแยกจากปรโลกได้</span></div>
+      <article class="k him">
+        <div class="hd"><b>ต่างโลก</b><small>4/12</small></div>
+        <div class="bd"><span class="kick">ป่าหิมพานต์ชั้นนอก</span><h3>กินรีติดบ่วงพราน</h3><p>เสียงร้องดังมาจากพุ่มไม้ ปีกข้างหนึ่งติดบ่วงเชือก พรานยังไม่กลับมา</p></div>
+        <div class="ch"><button class="c"><span>ตัดบ่วงปล่อยไป</span><span class="fx">เสน่ห์ · 70%</span></button><button class="c"><span>รอพรานแล้วขอซื้อ</span><span class="fx">ใช้ทอง 30</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D5" value="C"> เลือกทางนี้</label>
+    </div>
+  </div>
+</section>
+
+<h2 class="grp">ชิ้นที่กำลังจะมา</h2>
+
+<section class="d" id="d6" data-q="D6" data-name="กระเป๋าและช่องสวมใส่">
+  <h2>D6 · กระเป๋า + ช่องสวมใส่ <small>ใบ B78 · ใช้ทั้งสองโลก</small></h2>
+  <p>ช่องสวมใส่มีผลเมื่อใส่ ส่วนกระเป๋าเก็บของที่ยังไม่ใช้ ความจุคงที่ เต็มแล้วต้องทิ้งหรือยกให้คนอื่นก่อน</p>
+  <div class="opts">
+    <div class="opt">
+      <div class="lab"><b>ทาง A · ตารางช่อง</b><span>ช่องสี่เหลี่ยมแบบเกมทั่วไป เห็นที่ว่างทันที</span></div>
+      <article class="k bag">
+        <div class="hd"><b>กระเป๋า</b><small>ใช้ไป 5 จาก 12 ช่อง</small></div>
+        <div class="bd"><span class="h4">สวมใส่อยู่</span>
+          <div class="slots"><div class="slot on"><svg class="px" viewBox="0 0 12 12" aria-hidden="true"><use href="#s-amulet"/></svg>พระเครื่อง</div><div class="slot on"><svg class="px" viewBox="0 0 12 12" aria-hidden="true"><use href="#s-watch"/></svg>นาฬิกา</div><div class="slot on"><svg class="px" viewBox="0 0 12 12" aria-hidden="true"><use href="#s-car"/></svg>รถกระบะ</div><div class="slot e">ว่าง</div></div>
+          <span class="h4">ในกระเป๋า</span>
+          <div class="slots"><div class="slot">ยาหม่อง</div><div class="slot">ตำรากับข้าว</div><div class="slot e"></div><div class="slot e"></div><div class="slot e"></div><div class="slot e"></div><div class="slot e"></div><div class="slot e"></div></div></div>
+        <div class="ch"><button class="c"><span>ปิดกระเป๋า</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D6" value="A"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง B · รายการลิ้นชัก</b><span>เรียงเป็นบรรทัด มีคำบอกผลสั้น ๆ อ่านบนมือถือง่ายสุด แต่ไม่ค่อยเหมือนเกม</span></div>
+      <article class="k bag">
+        <div class="hd"><b>ของติดตัว</b><small>5/12</small></div>
+        <div class="bd"><ul class="rows">
+          <li><span>พระเครื่อง<small>ใจนิ่งขึ้นเวลาเจอเรื่องร้าย</small></span><span class="tag">ใส่อยู่</span></li>
+          <li><span>นาฬิกาข้อมือ<small>ไปไหนตรงเวลา</small></span><span class="tag">ใส่อยู่</span></li>
+          <li><span>รถกระบะ<small>ผ่อนอีก 3 ปี</small></span><span class="tag">ใส่อยู่</span></li>
+          <li><span>ยาหม่อง<small>ใช้ได้ครั้งเดียว</small></span><span class="tag off">ในกระเป๋า</span></li>
+          <li><span>ตำรากับข้าว<small>ของสะสม</small></span><span class="tag off">ในกระเป๋า</span></li>
+        </ul></div>
+        <div class="ch"><button class="c"><span>ปิด</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D6" value="B"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง C · หุ่นตัวละคร</b><span>รูปตัวละครตรงกลาง ช่องสวมใส่อยู่รอบตัว เห็นว่าใส่อะไรตรงไหน กระเป๋าพับไว้ด้านล่าง</span></div>
+      <article class="k bag">
+        <div class="hd"><b>สมใจ · อายุ 34</b><small>สวมใส่ 3 จาก 4</small></div>
+        <div class="bd"><div class="doll">
+          <div class="col"><div class="slot on">คอ<br>พระเครื่อง</div><div class="slot on">ข้อมือ<br>นาฬิกา</div></div>
+          <svg class="px" viewBox="0 0 20 24" aria-hidden="true"><use href="#s-person"/></svg>
+          <div class="col"><div class="slot e">มือ<br>ว่าง</div><div class="slot on">พาหนะ<br>รถกระบะ</div></div>
+        </div><details><summary>กระเป๋า · 2 ชิ้น</summary><p>ยาหม่อง · ตำรากับข้าว</p></details></div>
+        <div class="ch"><button class="c"><span>ปิด</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D6" value="C"> เลือกทางนี้</label>
+    </div>
+  </div>
+</section>
+
+<section class="d" id="d7" data-q="D7" data-name="ดันเจี้ยน">
+  <h2>D7 · ดันเจี้ยน <small>ใบ B80 · ชาติไทยเป็นถ้ำ บ้านร้าง โบราณสถาน · ต่างโลกเป็นดันเจี้ยนแฟนตาซี</small></h2>
+  <p>ลงทีละชั้น ทุกชั้นเลือกว่าจะสู้ หลบ เก็บของ หรือถอย ลึกขึ้นเสี่ยงขึ้น ตัวอย่างสลับฉากไทยกับต่างโลก ทางที่เลือกใช้กับทั้งสองโลก</p>
+  <div class="opts">
+    <div class="opt">
+      <div class="lab"><b>ทาง A · การ์ดทีละชั้น</b><span>การ์ดแบบเดิม มีแถบความลึกบนหัว เรียบง่าย ทำได้เร็ว</span></div>
+      <article class="k dun">
+        <div class="hd"><b>ถ้ำหลวงหลังวัดร้าง</b><small>ชั้น 3 จาก 7</small></div>
+        <div class="bd"><div class="depth" role="img" aria-label="ความลึก ชั้น 3 จาก 7"><i class="on"></i><i class="on"></i><i class="now"></i><i></i><i></i><i></i><i></i></div>
+          <svg class="scene px" viewBox="0 0 76 30" aria-hidden="true"><use href="#s-cave"/></svg>
+          <span class="kick">ชั้นที่ 3</span><h3>ไหโบราณกลางทางเดิน</h3><p>ฝาไหผูกด้ายสายสิญจน์ไว้แน่น ข้างในมีเสียงเหมือนคนกระซิบ</p></div>
+        <div class="ch"><button class="c"><span>แกะด้ายเปิดดู</span><span class="fx">เสี่ยงสูง</span></button><button class="c"><span>เดินอ้อมไป</span><span class="fx">ปลอดภัย</span></button><button class="c"><span>กลับขึ้นข้างบน</span><span class="fx">เก็บของที่ได้</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D7" value="A"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง B · บันไดชั้น</b><span>แผนที่ชั้นด้านซ้าย การ์ดด้านขวา เห็นว่าลงมาลึกแค่ไหน เหลืออีกเท่าไร</span></div>
+      <article class="k dun">
+        <div class="hd"><b>หอคอยจอมมาร</b><small>ต่างโลก</small></div>
+        <div class="ladder">
+          <ol aria-label="ชั้นของดันเจี้ยน"><li class="done">ชั้น 1</li><li class="done">ชั้น 2</li><li class="now">ชั้น 3</li><li>ชั้น 4</li><li>ชั้น 5</li><li>???</li></ol>
+          <div class="bd"><span class="kick">ชั้นที่ 3</span><h3>ห้องกระจกเงา</h3><p>เงาในกระจกขยับช้ากว่าตัวจริงครึ่งจังหวะ</p></div>
+        </div>
+        <div class="ch"><button class="c"><span>ทุบกระจก</span><span class="fx">พลัง · 55%</span></button><button class="c"><span>เดินผ่านไปเงียบ ๆ</span><span class="fx">โชค · 60%</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D7" value="B"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง C · ประตูสามบาน</b><span>ทุกชั้นเลือกประตู มีคำใบ้สั้น ๆ ลุ้นกว่า แต่เล่าเรื่องได้น้อยกว่า</span></div>
+      <article class="k dun">
+        <div class="hd"><b>บ้านร้างท้ายซอย</b><small>ชั้น 2 จาก 5</small></div>
+        <div class="bd"><div class="depth" role="img" aria-label="ความลึก ชั้น 2 จาก 5"><i class="on"></i><i class="now"></i><i></i><i></i><i></i></div><h3>ทางแยกสามทาง</h3><p>ไฟฉายเหลือแบตครึ่งเดียว ห้องที่เงียบที่สุดอาจไม่ใช่ห้องที่ปลอดภัย</p></div>
+        <div class="doors"><button class="c"><span>ห้องพระ</span><span class="fx">กลิ่นธูป</span></button><button class="c"><span>ห้องครัว</span><span class="fx">เสียงช้อน</span></button><button class="c"><span>ใต้ถุน</span><span class="fx">มืดสนิท</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D7" value="C"> เลือกทางนี้</label>
+    </div>
+  </div>
+</section>
+
+<section class="d" id="d8" data-q="D8" data-name="มอนสเตอร์">
+  <h2>D8 · มอนสเตอร์ <small>ใบ B81 · ผีไทยกับสัตว์หิมพานต์ · แต่ละตัวมีจุดอ่อนต่างกัน</small></h2>
+  <p>บางตัวต้องสู้ บางตัวต้องเจรจาหรือทำบุญส่ง บางตัวต้องหนี เจอแล้วเก็บลงสมุดสะสม</p>
+  <div class="opts">
+    <div class="opt">
+      <div class="lab"><b>ทาง A · การ์ดเผชิญหน้า</b><span>ภาพตัวใหญ่ จุดอ่อนที่ยังไม่รู้เป็น ??? รู้เพิ่มเมื่อเจอซ้ำหรือถามคนที่รู้</span></div>
+      <article class="k mon">
+        <div class="hd"><b>เผชิญหน้า</b><small>ทุ่งนาตอนสองทุ่ม</small></div>
+        <div class="bd"><svg class="scene px beast" viewBox="0 0 30 30" aria-hidden="true"><use href="#s-ghost"/></svg><h3>กระสือ</h3><p>แสงสีเขียวลอยต่ำเหนือคันนา มุ่งไปทางเล้าไก่ของบ้านลุงเชย</p>
+          <div class="weak"><span>กลัวหนามไผ่</span><span class="q">???</span><span class="q">???</span></div></div>
+        <div class="ch"><button class="c"><span>เอากิ่งไผ่ไล่</span><span class="fx">รู้จุดอ่อน</span></button><button class="c"><span>ปิดไฟเงียบ ๆ รอเช้า</span><span class="fx">หนี</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D8" value="A"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง B · หน้าสมุดสะสม</b><span>ตารางทุกตัว ตัวที่ยังไม่เจอเป็น ??? ชวนเก็บให้ครบ ใช้คู่กับทาง A หรือ C ได้</span></div>
+      <article class="k dex">
+        <div class="hd"><b>สมุดผี</b><small>เจอแล้ว 4/18</small></div>
+        <div class="bd"><div class="g">
+          <div><svg class="px" viewBox="0 0 30 30" aria-hidden="true"><use href="#s-ghost"/></svg>กระสือ</div>
+          <div>ปอบ</div><div>กุมารทอง</div><div>นางตานี</div>
+          <div class="q">???</div><div class="q">???</div>
+        </div><p class="tip">แตะตัวที่เจอแล้วเพื่ออ่านจุดอ่อนที่รู้</p></div>
+        <div class="ch"><button class="c"><span>ปิดสมุด</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D8" value="B"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง C · บันทึกหมอผี</b><span>หน้าสมุดมีเส้นบรรทัด ลายมือ เล่าเหมือนหมอผีจดไว้ น่ากลัวน้อยลง ได้เรื่องเล่ามากขึ้น</span></div>
+      <article class="k note-b">
+        <div class="hd"><b>บันทึกหมอผี</b><small>หน้า 12</small></div>
+        <div class="bd"><h3>ปอบ</h3><p>ชอบบ้านที่คนในบ้านทะเลาะกันบ่อย กินของดิบตอนกลางคืน กลัวหมอธรรมกับเสียงสวด จุดอ่อนข้อที่สามยังจดไม่ได้</p></div>
+        <div class="ch"><button class="c"><span>นิมนต์หมอธรรมมาไล่</span><span class="fx">เงิน ↓</span></button><button class="c"><span>ทำบุญอุทิศให้</span><span class="fx">ส่งไปดี</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D8" value="C"> เลือกทางนี้</label>
+    </div>
+  </div>
+</section>
+
+<section class="d" id="d9" data-q="D9" data-name="ตลาด">
+  <h2>D9 · ตลาด <small>ใบ B70 · เปิดจากปุ่มบนจอ · ราคาเป็นบาทของปีนั้น</small></h2>
+  <p>ของมีผลซื้อได้ปีละครั้งต่อชิ้น ร้านถูกเสี่ยงได้ของปลอม ผ่อนหรือสมัครสมาชิกจ่ายรายปีได้ ผลบอกแค่ทิศ ไม่บอกตัวเลข</p>
+  <div class="opts">
+    <div class="opt">
+      <div class="lab"><b>ทาง A · แผงตลาด</b><span>กันสาดแดงขาว รายการของพร้อมราคา ปุ่มซื้อทุกแถว คนไทยคุ้นตา</span></div>
+      <article class="k mkt">
+        <div class="awn" aria-hidden="true"></div>
+        <div class="hd"><b>ตลาดเช้า · พ.ศ. 2540</b><small>เงินติดตัว 12,400 บาท</small></div>
+        <div class="bd"><ul class="rows">
+          <li><span>ยาบำรุงเลือด<small>สุขภาพ ↑ นิดหน่อย</small></span><button class="buy">120 บาท</button></li>
+          <li><span>พจนานุกรมอังกฤษ<small>ความรู้ ↑</small></span><button class="buy">350 บาท</button></li>
+          <li><span>พระเครื่องเลียนแบบรุ่นดัง<small>ของติดตัว · ส่งต่อได้</small></span><button class="buy">2,500 บาท</button></li>
+          <li><span>แสตมป์ที่ระลึก<small>ของสะสม</small></span><button class="buy">80 บาท</button></li>
+        </ul></div>
+        <div class="ch"><button class="c"><span>ออกจากตลาด</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D9" value="A"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง B · สองร้าน</b><span>สลับแท็บร้านทางการกับตลาดนัด ของเดียวกันราคาต่างกัน เห็นทางเสี่ยงชัด</span></div>
+      <article class="k mkt">
+        <div class="hd"><b>ซื้อของ</b><small>เงินติดตัว 12,400 บาท</small></div>
+        <div class="tabs"><span>ร้านทางการ</span><span class="on">ตลาดนัด</span></div>
+        <div class="bd"><ul class="rows">
+          <li><span>นาฬิกาแบรนด์<small>ของติดตัว · ราคาร้าน 9,000</small></span><button class="buy">1,500 บาท</button></li>
+          <li><span>อาหารเสริมนำเข้า<small>สุขภาพ ↑ · ราคาร้าน 900</small></span><button class="buy">250 บาท</button></li>
+        </ul><p class="warn">ของตลาดนัดอาจเป็นของปลอม ได้ผลครึ่งเดียวหรือไม่ได้เลย</p></div>
+        <div class="ch"><button class="c"><span>ออกจากตลาด</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D9" value="B"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง C · ตะกร้าใบเสร็จ</b><span>หยิบลงตะกร้าแล้วจ่ายทีเดียว ใบเสร็จบอกยอดกับรายการรายปี เหมาะกับซื้อหลายชิ้น</span></div>
+      <article class="k rcpt">
+        <div class="hd"><b>ใบเสร็จ</b><small>ร้านสหกรณ์ · 12 ส.ค. 2540</small></div>
+        <div class="bd">
+          <div class="ln"><span>ยาบำรุงเลือด ×1</span><span>120</span></div>
+          <div class="ln"><span>พจนานุกรมอังกฤษ ×1</span><span>350</span></div>
+          <div class="ln"><span>ฟิตเนส สมาชิกรายปี</span><span>3,600/ปี</span></div>
+          <div class="ln tot"><span>จ่ายวันนี้</span><span>4,070 บาท</span></div>
+          <div class="ln"><span>เหลือ</span><span>8,330 บาท</span></div>
+        </div>
+        <div class="ch"><button class="c"><span>จ่ายเงิน</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D9" value="C"> เลือกทางนี้</label>
+    </div>
+  </div>
+</section>
+
+<section class="d" id="d10" data-q="D10" data-name="ทักษะสายมืด">
+  <h2>D10 · ทักษะสายมืด <small>ใบ B82 · ไสยดำ อาชญากรรม การเมืองสกปรก สกิลต้องสาป</small></h2>
+  <p>ได้ผลเร็วแต่บาปตามตัว ห้ามบอกตัวเลขบาปตอนใช้ หน้าตาต้องเตือนว่าเป็นทางมืดโดยไม่บอกว่าหนักแค่ไหน</p>
+  <div class="opts">
+    <div class="opt">
+      <div class="lab"><b>ทาง A · ตำราต้องห้าม</b><span>หน้ารวมทักษะสายมืดแยกจากทักษะปกติ ปกดำตัวแดง</span></div>
+      <article class="k grim">
+        <div class="hd"><b>ตำราต้องห้าม</b><small>ฝึกแล้ว 2 วิชา</small></div>
+        <div class="bd"><h3>วิชาที่รู้</h3><ul class="rows">
+          <li><span>ทำเสน่ห์<small>คนรอบตัวใจอ่อนง่ายขึ้น</small></span><span class="tag">ชำนาญ</span></li>
+          <li><span>สะเดาะกุญแจ<small>เข้าที่ห้ามเข้าได้</small></span><span class="tag">เริ่มหัด</span></li>
+          <li><span>???<small>ต้องเจอครูก่อน</small></span><span class="tag">ยังไม่รู้</span></li>
+        </ul></div>
+        <div class="ch"><button class="c"><span>ปิดตำรา</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D10" value="A"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง B · ตัวเลือกมืดบนการ์ดเดิม</b><span>ไม่มีหน้าแยก ทักษะสายมืดโผล่เป็นตัวเลือกพิเศษบนการ์ดปกติ ขอบแดงเข้ม มีป้าย “ทางมืด”</span></div>
+      <article class="k reg">
+        <div class="hd"><b>อายุ 38 · ช่วงทำงาน</b><small>สมใจ · ขอนแก่น</small></div>
+        <div class="bd"><span class="kick">ช่วงทำงาน</span><h3>งบซ่อมถนนหมู่บ้าน</h3><p>ผู้รับเหมาเสนอเงินก้อนให้ ถ้าเซ็นรับงานโดยไม่ตรวจวัสดุ</p></div>
+        <div class="ch"><button class="c"><span>ตรวจวัสดุให้ครบก่อนเซ็น</span><span class="fx">ความสัมพันธ์ ↑</span></button><button class="c dark"><span><small>ทางมืด · การเมืองสกปรก</small>รับเงินแล้วเซ็นให้</span><span class="fx">เงิน ↑↑</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D10" value="B"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง C · เงาลามขอบการ์ด</b><span>ยิ่งใช้ทางมืดบ่อย ขอบการ์ดทุกใบยิ่งมืดลง บอกเป็นภาพ ไม่บอกตัวเลข ใช้คู่กับทาง A หรือ B ได้</span></div>
+      <article class="k reg shade">
+        <div class="hd"><b>อายุ 52 · ช่วงกลางคน</b><small>สมใจ · ขอนแก่น</small></div>
+        <div class="bd"><span class="kick">ช่วงกลางคน</span><h3>ฝันเห็นคนเก่า</h3><p>คนที่เคยโดนของจากเรา มายืนปลายเตียงเจ็ดคืนติดกัน</p></div>
+        <div class="ch"><button class="c"><span>ไปทำบุญแก้กรรม</span><span class="fx">เงิน ↓</span></button><button class="c"><span>ช่างมัน</span><span class="fx">?</span></button></div>
+      </article>
+      <label class="pick"><input type="radio" name="D10" value="C"> เลือกทางนี้</label>
+    </div>
+  </div>
+</section>
+
+<h2 class="grp">ธีม</h2>
+
+<template id="tcard">
+  <article class="k th">
+    <div class="hd"><b>อายุ 34 · ช่วงทำงาน</b><small>สมใจ</small></div>
+    <div class="stats"><div>สุขภาพ<div class="bar"><i style="width:72%"></i></div></div><div>ความสุข<div class="bar"><i style="width:58%"></i></div></div><div>เงิน<div class="bar"><i style="width:40%"></i></div></div></div>
+    <div class="bd"><span class="kick">ช่วงทำงาน</span><h3>ย้ายไปทำงานกรุงเทพ</h3><p>บริษัทให้เงินเดือนเพิ่มเกือบเท่าตัว แต่ต้องทิ้งแม่ไว้ที่บ้านคนเดียว</p></div>
+    <div class="ch"><button class="c"><span>ย้ายไป ส่งเงินกลับบ้าน</span><span class="fx">เงิน ↑ · ความสัมพันธ์ ↓</span></button><button class="c"><span>อยู่บ้านต่อ</span><span class="fx">ความสุข ↑</span></button></div>
+  </article>
+</template>
+
+<section class="d" id="t1" data-q="T1" data-name="ธีมตามโลกและฉาก">
+  <h2>T1 · ธีมตามโลกและฉาก <small>เกมเปลี่ยนเองตามที่ตัวละครอยู่</small></h2>
+  <p>การ์ดใบเดียวกันวางในสี่ฉาก: ชาติไทย ปรโลก ต่างโลก ดันเจี้ยน · ทาง A เปลี่ยนทั้งใบ · ทาง B เปลี่ยนแค่หัวการ์ดกับกรอบ เนื้อในเป็นกระดาษ อ่านง่ายเท่ากันทุกฉาก</p>
+  <div class="opts" style="grid-template-columns:minmax(0,1fr)">
+    <div class="opt">
+      <div class="lab"><b>ทาง A · เปลี่ยนทั้งใบ</b><span>บรรยากาศเปลี่ยนชัดที่สุด ฉากมืดอ่านยากขึ้นนิดหน่อย</span></div>
+      <div class="tgrid" data-themes="t-thai:ชาติไทย t-after:ปรโลก t-other:ต่างโลก t-dun:ดันเจี้ยน"></div>
+      <label class="pick"><input type="radio" name="T1" value="A"> เลือกทางนี้</label>
+    </div>
+    <div class="opt">
+      <div class="lab"><b>ทาง B · เปลี่ยนแค่หัวกับกรอบ</b><span>ดูหัวการ์ดก็รู้ว่าอยู่ฉากไหน ตัวหนังสืออ่านง่ายเท่าเดิม</span></div>
+      <div class="tgrid frame" data-themes="t-thai:ชาติไทย t-after:ปรโลก t-other:ต่างโลก t-dun:ดันเจี้ยน"></div>
+      <label class="pick"><input type="radio" name="T1" value="B"> เลือกทางนี้</label>
+    </div>
+  </div>
+</section>
+
+<section class="d" id="t2" data-q="T2" data-name="ธีมที่ผู้เล่นเลือกเอง" data-multi="1">
+  <h2>T2 · ธีมที่ผู้เล่นเลือกเอง <small>ติ๊กได้หลายชุด · ชุดไหนอยากให้มีในเกม</small></h2>
+  <p>ปุ่ม “ธีม” อยู่มุมบนของจอเกม กดแล้วขึ้นแผ่นเลือกแบบข้างล่าง ชุดแรกคือตามฉากแบบ T1 ชุดอื่นผู้เล่นเลือกเอง เกมจำไว้ในเครื่อง</p>
+  <div class="setmock" aria-label="ตัวอย่างแผ่นเลือกธีม"><b>ธีม</b><div class="opt-row"><span class="on">ตามฉาก</span><span>สว่าง</span><span>กลางคืน</span><span>สมุดข่อย</span><span>อ่านง่าย</span><span>ภาพเก่า</span></div></div>
+  <div class="tgrid" style="margin-top:16px" data-themes="t-thai:ตามฉาก_(ค่าเริ่ม) p-light:สว่าง p-night:กลางคืน p-khoi:สมุดข่อย p-big:อ่านง่าย_ตัวใหญ่ p-sepia:ภาพเก่า" data-check="T2"></div>
+</section>
+
+<section class="d" id="t3" data-q="T3" data-name="ธีมผู้เล่นทับธีมฉาก">
+  <h2>T3 · ธีมที่ผู้เล่นเลือกทับธีมฉากไหม</h2>
+  <p>สมมติผู้เล่นเลือก “กลางคืน” แล้วตายไปปรโลก จะเห็นปรโลกแบบไหน</p>
+  <div class="opts">
+    <div class="opt"><div class="lab"><b>ทาง A · ทับทุกฉาก</b><span>ผู้เล่นได้ตามที่เลือกตลอด แต่ปรโลกกับต่างโลกจะดูคล้ายชาติไทย</span></div><label class="pick"><input type="radio" name="T3" value="A"> เลือกทางนี้</label></div>
+    <div class="opt"><div class="lab"><b>ทาง B · ทับเฉพาะชาติไทย</b><span>ปรโลก ต่างโลก ดันเจี้ยน ใช้สีฉากเสมอ บรรยากาศไม่หาย</span></div><label class="pick"><input type="radio" name="T3" value="B"> เลือกทางนี้</label></div>
+    <div class="opt"><div class="lab"><b>ทาง C · ไม่ทับ ปรับแค่สว่างหรือมืด</b><span>ทุกฉากคงสีตัวเอง ผู้เล่นปรับได้แค่ความสว่างกับขนาดตัวหนังสือ</span></div><label class="pick"><input type="radio" name="T3" value="C"> เลือกทางนี้</label></div>
+  </div>
+</section>
+
+<section class="ans" id="ans">
+  <h2>สรุปคำตอบ</h2>
+  <pre id="sum"></pre>
+  <div class="act"><button type="button" id="copy">คัดลอกสรุป</button><button type="button" id="reset">ล้างที่เลือก</button></div>
+  <small id="msg" aria-live="polite">ยังไม่ได้คัดลอก</small>
+</section>
+
+<footer class="pg">ภาพพิกเซลทุกภาพวาดเป็น SVG เอง · ชื่อร้าน ตัวละคร และราคาเป็นตัวอย่าง · ต้นแบบรุ่นแรกอยู่ที่ <a href="../../archive/cards-v1.html" target="_top">archive/cards-v1.html</a></footer>
+</div></main>
+
+<script>
+(() => {
+  // วางการ์ดชุดเดียวกันในทุกธีม — แก้ข้อความที่ template ที่เดียว ทุกช่องเทียบกันได้ตรง · ชื่อธีมใช้ _ แทนเว้นวรรค
+  const tpl = document.getElementById('tcard');
+  for (const grid of document.querySelectorAll('[data-themes]')) {
+    for (const item of grid.dataset.themes.split(' ')) {
+      const [cls, raw] = item.split(':');
+      const name = raw.replace(/_/g, ' ');
+      const cell = document.createElement('div');
+      cell.className = 'tcell';
+      const b = document.createElement('b');
+      b.textContent = name;
+      const card = tpl.content.firstElementChild.cloneNode(true);
+      card.classList.add(cls);
+      cell.append(b, card);
+      if (grid.dataset.check) {
+        const lab = document.createElement('label');
+        lab.className = 'chk';
+        const inp = document.createElement('input');
+        inp.type = 'checkbox';
+        inp.name = grid.dataset.check;
+        inp.value = name;
+        lab.append(inp, ' ใส่ชุดนี้ในเกม');
+        cell.append(lab);
+      }
+      grid.append(cell);
+    }
+  }
+
+  // ที่ติ๊กไว้จำในเครื่องผู้ดู — ปิดหน้าแล้วกลับมาเลือกต่อได้ · ที่เก็บพังก็ยังใช้หน้าได้ แค่ไม่จำ
+  const KEY = 'next-life-cards-v2-picks';
+  const sections = [...document.querySelectorAll('section.d[data-q]')];
+  const read = () => {
+    try {
+      return JSON.parse(localStorage.getItem(KEY)) ?? {};
+    } catch {
+      return {};
+    }
+  };
+  const write = (v) => {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(v));
+    } catch {
+      // ไม่มีที่เก็บ
+    }
+  };
+  const saved = read();
+  for (const inp of document.querySelectorAll('section.d input')) {
+    const v = saved[inp.name];
+    if (Array.isArray(v) ? v.includes(inp.value) : v === inp.value) inp.checked = true;
+  }
+  const state = () => {
+    const out = {};
+    for (const s of sections) {
+      const xs = [...s.querySelectorAll('input:checked')].map((i) => i.value);
+      out[s.dataset.q] = s.dataset.multi ? xs : xs[0] ?? null;
+    }
+    return out;
+  };
+  const sum = document.getElementById('sum');
+  const text = () => {
+    const st = state();
+    return ['ต้นแบบการ์ด v2 · ที่เลือก', ...sections.map((s) => {
+      const v = st[s.dataset.q];
+      const val = Array.isArray(v) ? (v.length ? v.join(' · ') : 'ยังไม่เลือก') : v ? `ทาง ${v}` : 'ยังไม่เลือก';
+      return `${s.dataset.q} ${s.dataset.name}: ${val}`;
+    })].join('\n');
+  };
+  const refresh = () => {
+    sum.textContent = text();
+  };
+  document.addEventListener('change', (e) => {
+    if (!e.target.closest('section.d')) return;
+    write(state());
+    refresh();
+  });
+  refresh();
+  const msg = document.getElementById('msg');
+  document.getElementById('copy').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(text());
+      msg.textContent = 'คัดลอกแล้ว วางส่งได้เลย';
+    } catch {
+      // เปิดจากไฟล์ในเครื่อง/เบราว์เซอร์เก่าคัดลอกเองไม่ได้ — เลือกข้อความไว้ให้กดคัดลอกเอง
+      const r = document.createRange();
+      r.selectNodeContents(sum);
+      getSelection().removeAllRanges();
+      getSelection().addRange(r);
+      msg.textContent = 'คัดลอกอัตโนมัติไม่ได้ เลือกข้อความไว้ให้แล้ว กดคัดลอกเองได้เลย';
+    }
+  });
+  document.getElementById('reset').addEventListener('click', () => {
+    for (const inp of document.querySelectorAll('section.d input:checked')) inp.checked = false;
+    write({});
+    refresh();
+    msg.textContent = 'ล้างแล้ว';
+  });
+})();
+</script>
+</body>
+</html>

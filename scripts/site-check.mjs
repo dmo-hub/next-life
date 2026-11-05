@@ -58,7 +58,7 @@ const moved = ['cards', 'titles'].every((k) => probe.includes(`data-fact="${k}">
 check('ตัวควบคุม: ข้อมูลเปลี่ยนแล้วเลขบนหน้าเปลี่ยนตาม', !moved, ` (การ์ด ${facts.cards} → ${f2.cards} · ฉายา ${facts.titles} → ${f2.titles})`);
 
 // 3) ลิงก์ภายในเว็บไม่ตาย (ไฟล์ · รูป · ที่มาจากหน้าใน docs/ และ docs/spec/ ที่หน้าเว็บลิงก์ถึง)
-const all = [...pages, 'cards', 'whatsnew', 'archive/cards-v1', 'archive/overview-v1', 'dev/index', 'dev/spec'];
+const all = [...pages, 'dev/tweak/cards', 'whatsnew', 'archive/cards-v1', 'archive/overview-v1', 'dev/index', 'dev/spec'];
 const dead = [];
 for (const p of all) {
   const html = read(`${p}.html`);
@@ -313,7 +313,7 @@ const liveBad = (html) => {
     ...(doc.includes('navigator.clipboard.writeText') ? [] : ['ไม่มีคัดลอก']),
   ];
 };
-const liveLinks = [...devFiles, ...readdirSync(docs).filter((n) => n.endsWith('.html'))].filter((f) => !read(f).includes(MOVED_MARK) && [UI_LIVE_FROM, ...uiTweaks.map((t) => t[3])].some((o) => read(f).includes(`${o.slice(4)}"`)));
+const liveLinks = [...devFiles, ...readdirSync(docs).filter((n) => n.endsWith('.html'))].filter((f) => !read(f).includes(MOVED_MARK) && [UI_LIVE_FROM, ...uiTweaks.map((t) => t[3])].some((o) => read(f).includes(o.startsWith('dev/') ? `${o.slice(4)}"` : `"${'../'.repeat(f.split('/').length - 1)}${o}"`)));
 const liveMiss = [
   ...liveBad(uiHtml),
   ...(lf(readOr(UI_LIVE_FROM)) !== liveMoved() ? [`${UI_LIVE_FROM} ไม่ส่งต่อมา ${UI_PAGE}#${UI_LIVE_ID}`] : []),
@@ -340,7 +340,7 @@ const dtHtml = readOr(DOCS_TWEAK_PAGE) ?? '';
 const dtNow = docsTweakData(docs, uiTpl);
 const dtBlock = docsTweakBlock(dtHtml);
 const dtFiles = dtNow.pages.map((p) => p.f);
-const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'cards.html', 'spoilers.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', 'dev/maps/politics.html', 'dev/archive/index.html'];
+const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spoilers.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', 'dev/maps/politics.html', 'dev/archive/index.html'];
 const dtOut = (f) => f === 'play.html' || f.startsWith('archive/') || f.startsWith('dev/ui-redo/') || /tweak/.test(f) || read(f).includes(MOVED_MARK);
 const dtMiss = [
   ...(JSON.stringify(dtBlock) !== JSON.stringify(dtNow) ? [`ค้าง ${DOCS_TWEAK_PAGE} (build ใหม่)`] : []),
