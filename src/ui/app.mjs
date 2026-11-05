@@ -195,17 +195,19 @@ const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบคร�
 // ต่างโลกไม่มีครอบครัวกับเงินบาทให้ดู — ทอง ชื่อเสียง อาชีพอยู่ในแผงตัวฉันของร่างนี้ (ui-redo ใบ 13)
 // สกิลแยกปุ่มเพราะสมุดสกิล (06s-3) จะมาต่อที่แผงนี้ · ความเร็วย้ายจากการ์ดมาที่เมนู (ใบ 14)
 const ISEKAI_MENU = [['me', 'ตัวฉัน'], ['skill', 'สกิล'], ['speed', 'ความเร็ว'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
-function lifeMenu(card, box) {
+// ปรโลก (ui-redo ใบ 15 · ชุด A ของใบ 02): ชีวิตจบแล้ว ไม่มีเงินหรือโฟกัสให้ดู — ตัวฉันกลายเป็นชีวิตที่แล้ว · ครอบครัวกลายเป็นตระกูล
+const AFTER_MENU = [['past', 'ชีวิตที่แล้ว'], ['family', 'ตระกูล'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
+function lifeMenu(card, box, after = false) {
   // การ์ดใหม่วาดทับทั้ง root แผงเดิมหายไปด้วยแล้ว
   sheetClose = null;
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
   const isk = card.kind === 'isekai';
-  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), skill: () => isekaiSkillPanel(card.status), speed: speedPanel, family: familyPanel, money: () => moneyPanel(card), more: morePanel };
+  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), skill: () => isekaiSkillPanel(card.status), speed: speedPanel, family: after ? clanPanel : familyPanel, money: () => moneyPanel(card), more: morePanel, past: pastPanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
   const views = { shelf: () => openShelf() };
   // ต่างโลกช่วงยังไม่มีร่าง (ไม่มีหน้าต่างสถานะ) ไม่มีอะไรให้แผงตัวฉันกับสกิลโชว์
-  const items = isk ? ISEKAI_MENU.filter(([id]) => (id !== 'me' && id !== 'skill') || card.status) : LIFE_MENU;
+  const items = after ? AFTER_MENU : isk ? ISEKAI_MENU.filter(([id]) => (id !== 'me' && id !== 'skill') || card.status) : LIFE_MENU;
   for (const [id, label] of items) {
     const b = el('button', null);
     b.type = 'button';
@@ -233,10 +235,10 @@ function lifeMenu(card, box) {
     nav.append(b);
   }
   // แผงเปิดค้างตามที่เลือกไว้ทุกการ์ด — การ์ดใหม่วาด root ใหม่ทั้งก้อน · รอ render ต่อเมนูเข้า root ก่อนค่อยเปิด
-  // ต่างโลกไม่มีครอบครัว/เงิน ชีวิตไทยไม่มีสกิล/ความเร็ว ⇒ แผงที่เลือกไว้ไม่มีในเมนูนี้ เปิดตัวฉันแทน
+  // ต่างโลกไม่มีครอบครัว/เงิน ชีวิตไทยไม่มีสกิล/ความเร็ว ⇒ แผงที่เลือกไว้ไม่มีในเมนูนี้ เปิดตัวฉันแทน (ปรโลกเปิดชีวิตที่แล้ว)
   pinMenu = () => {
     if (!box.isConnected) return;
-    const it = items.find(([id]) => id === pinId && sheets[id]) ?? items.find(([id]) => id === 'me');
+    const it = items.find(([id]) => id === pinId && sheets[id]) ?? items.find(([id]) => id === (after ? 'past' : 'me'));
     const b = it && nav.querySelector(`[data-menu="${it[0]}"]`);
     if (b) openSheet(it[1], sheets[it[0]](), box, b, it[0]);
   };
@@ -747,29 +749,6 @@ function deedsPart(deeds) {
   all.append(list(deeds.map((d) => `${deedLine(d)} · ${d.bad ? 'บาป' : 'บุญ'}${deedLevel(d)}`), 'picks'));
   part.append(all);
   return part;
-}
-
-// แถบภาพพิกเซลปรโลก (ต้นแบบการ์ด B2) — ทำเครื่องหมายฉากปรโลกให้ต่างจากการ์ดระหว่างชาติใบอื่น
-const COURT_PX = [
-  [0, 25, 76, 5, '#3A2C1F'], [30, 6, 16, 19, '#5A1A14'], [28, 4, 20, 3, '#D9B45A'], [34, 1, 8, 3, '#F0D78C'],
-  [36, 10, 4, 4, '#C98A5A'], [35, 14, 6, 7, '#2F2A6B'], [36, 9, 4, 1, '#F0D78C'],
-  [12, 17, 3, 3, '#C98A5A'], [11, 20, 5, 5, '#EFE3C2'],
-  [4, 3, 1, 1, '#F0D78C'], [68, 5, 1, 1, '#F0D78C'], [60, 2, 1, 1, '#F0D78C'], [18, 6, 1, 1, '#F0D78C'],
-];
-function courtScene() {
-  const wrap = el('div', 'scene');
-  const svg = document.createElementNS(SVG, 'svg');
-  svg.setAttribute('viewBox', '0 0 76 30');
-  svg.setAttribute('preserveAspectRatio', 'xMidYMax meet');
-  svg.setAttribute('shape-rendering', 'crispEdges');
-  svg.setAttribute('aria-hidden', 'true');
-  for (const [x, y, w, h, fill] of COURT_PX) {
-    const r = document.createElementNS(SVG, 'rect');
-    for (const [k, v] of Object.entries({ x, y, width: w, height: h, fill })) r.setAttribute(k, v);
-    svg.append(r);
-  }
-  wrap.append(svg);
-  return wrap;
 }
 
 // แบบชีวิต/ฉายาคิดครั้งเดียวต่อการ์ดตาย แล้วลงสมุดฉายา — กดย้อน/วาดซ้ำไม่นับซ้ำ
@@ -2483,6 +2462,25 @@ function familyPanel() {
   wrap.append(...kinParts(all.filter((m) => !ANIMAL_ROLES.includes(m.role))), ...clanParts(), ...kinParts(all.filter((m) => ANIMAL_ROLES.includes(m.role)), true));
   return wrap;
 }
+// แผงปรโลก (ui-redo ใบ 15): st ยังเป็นคนที่เพิ่งตายจนกว่าจะไปเกิด — แผงจึงอ่านชีวิตที่จบแล้วจากตัวเดียวกับการ์ดตาย
+function pastPanel() {
+  const why = causeOf(st.cause ?? 'other', st.age);
+  const head = el('p', 'meta');
+  metaLine(head, [fullName(), `${lifeEndWord(isGone(st))} ${st.age}`, why && `จากไป${why.join('')}`].filter(Boolean));
+  const wrap = mePanel({ kind: 'death', job: jobText(st) });
+  const kin = familyOf(st);
+  const fam = el('div', 'fam');
+  fam.append(...kinParts(kin.filter((m) => !ANIMAL_ROLES.includes(m.role))), ...kinParts(kin.filter((m) => ANIMAL_ROLES.includes(m.role)), true));
+  wrap.prepend(head);
+  if (fam.childElementCount) wrap.append(fam);
+  return wrap;
+}
+// กราฟฐานะตระกูลผูกสีกับชุดการ์ด — ปรโลกใช้ชุดลายรดน้ำ (.b) ชุดกระดาษ (.a) ปนตัวแปรหน้าดำทองแล้วกราฟเป็นก้อนเทา
+function clanPanel() {
+  const wrap = el('div', 'fam b');
+  wrap.append(...clanParts());
+  return wrap;
+}
 // ชิ้นของแผงครอบครัวที่การ์ดตายแยกไปลงแท็บ ครอบครัว · ตระกูล (ui-redo ใบ 11)
 // หัวนับเฉพาะคน — สัตว์นับแยกที่หัวของมันเอง ไม่งั้น "ยังอยู่ 3 คน" รวมหมากับฝูงไก่
 function kinParts(members, animals = false) {
@@ -2785,6 +2783,7 @@ function rebirth() {
 // ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะชีวิต — ชีวิตจบแล้ว (วงปรโลกมีแถบ 4 ค่าของตัวเอง)
 const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ปรโลก', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ', loop: 'ปีทิพย์' };
 const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา', loopEnd: 'ครบวง' };
+const AFTER_REALM_ART = { deva: 'after_heaven', hell: 'after_hell' };
 // วงปรโลก (03a): แถว 4 ค่าแบบแถบสถานะ ใต้หัวการ์ด · ชีวิตทิพย์ต่ำ = สีเตือนแบบชีวิต
 function loopBar(l) {
   const ul = el('ul', 'sb-m');
@@ -2805,6 +2804,10 @@ function renderAfter(card) {
   const choices = el('div', 'choices');
   const next = () => play(T.afterNext);
   const court = card.kind === 'verdict' || card.scene === 'devaduta';
+  // ภาพปรโลก (ui-redo 15): ศาลบนการ์ดตัดสิน · สวรรค์/นรกเฉพาะการ์ดที่อยู่ในภูมินั้นแล้ว (ภูมิปลายทาง · วงปี) — ภูมิอื่นยังไม่มีภาพ
+  const realm = (card.loop || card.scene === 'realm') && af.verdict?.realm?.id;
+  const pic = court ? 'after_court' : AFTER_REALM_ART[realm];
+  if (pic) body.append(sceneSvg(pic, false));
   body.append(el('span', 'kicker', card.kind === 'scene' ? AFTER_KICKER[card.scene] : AFTER_TOP[card.kind]));
   if (card.title) body.append(el('h3', null, card.title));
   if (card.scene === 'devaduta') {
@@ -2838,9 +2841,8 @@ function renderAfter(card) {
   if (card.kind === 'verdict') choices.append(copyButton(() => summaryText(st.age, card.realm)));
   box.append(top);
   if (card.loop) box.append(loopBar(card.loop));
-  if (court) box.append(courtScene());
   box.append(body, choices);
-  root.append(panels(box));
+  root.append(panels(box, false), lifeMenu(card, box, true));
   fxCard(box, card);
 }
 
