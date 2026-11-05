@@ -340,13 +340,19 @@ check('กองทวีป: การ์ดแคว้น/ข้อพิพ�
 
 // ทางแยกที่ต้องมีบอทถึง: ตอนจบทุกแบบของทุกบทบาท (+ ตายกลางทาง) · ทุกบทบาท · ทุกสกิล · ทุกเหตุการณ์ · ทุกตัวเลือก
 const missing = (want, got) => want.filter((x) => !got.has(x));
+// การ์ดขั้นซ้อนทับ (overlap_stage) ออกเฉพาะชาติที่ข้ามมาตอนตระกูลขั้น ≥ 1 — ด่านนี้เริ่มชาติต่างโลกเองโดยไม่มีตระกูล จึงถึงไม่ได้โดยโครงสร้าง
+// ด่านว่าการ์ดพวกนี้ถึงได้จริงอยู่ที่ npm run overlap · ISEKAI_OVERLAP_SKIP=off ไม่ข้าม (ตัวควบคุม: การ์ดพวกนี้ต้องกลับมาตก)
+const overlapOff = process.env.ISEKAI_OVERLAP_SKIP === 'off';
+const OVERLAP_ONLY = new Set(overlapOff ? [] : ISEKAI_EVENTS.filter((e) => e.overlap_stage).map((e) => e.id));
+console.log(`ข้ามที่ด่านมีบอทถึง (ตัดสินที่ npm run overlap): การ์ดขั้นซ้อนทับ ${OVERLAP_ONLY.size} ใบ${OVERLAP_ONLY.size ? ` (${[...OVERLAP_ONLY].join(' · ')})` : ''}${overlapOff ? ' · ตัวควบคุมไม่ข้าม' : ''}`);
+const reachEvents = ISEKAI_EVENTS.filter((e) => !OVERLAP_ONLY.has(e.id));
 const wantEnd = Object.keys(ISEKAI_ROLES).flatMap((r) => Object.keys(roleInfo(r).end).map((t) => `${r}:${t}`).concat(`${r}:death`)).concat([...Object.keys(CONT_END), 'death'].map((t) => `${CONT_LIFE.world}:${t}`));
 const reach = {
   ตอนจบ: missing(wantEnd, seen.end),
   บทบาท: missing(Object.keys(ISEKAI_ROLES), seen.role),
   สกิล: missing(Object.keys(ISEKAI_SKILLS), seen.skill),
-  เหตุการณ์: missing(ISEKAI_EVENTS.map((e) => e.id), seen.event),
-  ตัวเลือก: missing(ISEKAI_EVENTS.flatMap((e) => e.choices.map((_, j) => `${e.id}#${j}`)), seen.choice),
+  เหตุการณ์: missing(reachEvents.map((e) => e.id), seen.event),
+  ตัวเลือก: missing(reachEvents.flatMap((e) => e.choices.map((_, j) => `${e.id}#${j}`)), seen.choice),
   ทางลัดความรู้: missing(Object.keys(ISEKAI_KNOW), seen.shortcut),
   แคว้นเกิด: missing(Object.keys(CONT_REGIONS), contSeen.region),
   แคว้นที่ย้ายเข้า: missing(Object.keys(CONT_REGIONS), contSeen.movedIn),
