@@ -1,7 +1,7 @@
 import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon } from './labels.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
@@ -124,7 +124,7 @@ function statusBar(card, s) {
   const ul = el('ul', 'sb-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
-    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN);
+    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN, String(v), k);
     const d = delta?.[k];
     if (d) {
       const em = el('em', d < 0 ? 'dn' : null);
@@ -162,10 +162,14 @@ function lifeMoneyRow(s) {
 }
 // ช่องค่าหนึ่งช่อง: ป้าย ตัวเลข แถบเส้น — แถบสถานะกับแผงตัวฉันของทั้งสองโลกใช้ตัวเดียวกัน หน้าตาจึงไม่แยกกันเพี้ยน
 // shown = ตัวเลขบนป้ายเมื่อไม่ใช่ค่าเดียวกับความยาวแถบ (เกจทองต่างโลก: แถบเป็น % ของสเกล ป้ายเป็นทองจริง)
-function meterLi(label, v, low, shown = String(v)) {
+// icon = key ค่าสำหรับไอคอนหน้าชื่อ · ไอคอน aria-hidden ชื่อค่ายังเป็นข้อความเดิม โปรแกรมอ่านจออ่านเท่าเดิม
+function meterLi(label, v, low, shown = String(v), icon = null) {
   const li = el('li', low ? 'low' : null);
   const head = el('span', 'mh');
-  head.append(el('span', 'mk', label), el('b', 'num', shown));
+  const mk = el('span', 'mk', label);
+  const svg = icon && statIcon(icon);
+  if (svg) mk.insertAdjacentHTML('afterbegin', svg);
+  head.append(mk, el('b', 'num', shown));
   const track = el('span', 'br');
   const fill = el('i');
   fill.style.width = `${v}%`;
@@ -332,7 +336,7 @@ function mePanel(card) {
   const ul = el('ul', 'me-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
-    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN && !st.dead);
+    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN && !st.dead, String(v), k);
     if (help.has(STAT_LABELS[k])) li.append(el('p', null, help.get(STAT_LABELS[k])));
     ul.append(li);
   }
@@ -2809,7 +2813,7 @@ const AFTER_REALM_ART = { deva: 'after_heaven', hell: 'after_hell' };
 // วงปรโลก (03a): แถว 4 ค่าแบบแถบสถานะ ใต้หัวการ์ด · ชีวิตทิพย์ต่ำ = สีเตือนแบบชีวิต
 function loopBar(l) {
   const ul = el('ul', 'sb-m');
-  for (const k of LOOP_KEYS) ul.append(meterLi(LOOP_LABELS[k], Math.round(l[k]), k === 'health' && l[k] <= HEALTH_WARN));
+  for (const k of LOOP_KEYS) ul.append(meterLi(LOOP_LABELS[k], Math.round(l[k]), k === 'health' && l[k] <= HEALTH_WARN, undefined, k));
   // กรอบ .sb ให้ระยะขอบเท่าแถบสถานะชีวิต
   const bar = el('div', 'sb');
   bar.append(ul);
@@ -2965,7 +2969,7 @@ function isekaiBar(card, s, where) {
   }
   r1.append(ini, who, age);
   const ul = el('ul', 'sb-m');
-  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
+  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN, undefined, 'hp'), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false, undefined, k)));
   const row = el('div', 'hd-row');
   row.append(headCash('ทอง', s.gold.toLocaleString('en-US')));
   bar.append(r1, row, ul);
@@ -2985,12 +2989,12 @@ function isekaiGoldFill(k, gold) {
 function isekaiMePanel(s) {
   const wrap = el('div', 'me');
   const ul = el('ul', 'me-m');
-  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
+  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN, undefined, 'hp'), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false, undefined, k)));
   // ชาติต่างโลกหลังตายอยู่ใน af.isekai · ทริประหว่างชาติไทยอยู่ใน st.trip
   const k = af?.isekai ?? st?.trip;
   const gold = isekaiGoldFill(k, s.gold);
   if (gold !== null) {
-    const li = meterLi('ทอง', Math.round(gold * 1000) / 10, false, s.gold.toLocaleString('en-US'));
+    const li = meterLi('ทอง', Math.round(gold * 1000) / 10, false, s.gold.toLocaleString('en-US'), 'gold');
     li.classList.add('gold');
     // ขีด = ทองตั้งต้นของร่างจากตาราง (ไม่ใช่ทองหลังพกมา) · ร่างเริ่ม 0 ขีดชิดซ้ายมองไม่เห็น จึงไม่วาด
     const start = isekaiGoldFill(k, isekaiGoldStart(k));
