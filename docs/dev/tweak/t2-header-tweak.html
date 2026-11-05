@@ -6,8 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>T2 หัวเว็บ + nav (tweak) · เกิดใหม่ทั้งที</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Maitree:wght@500;600&family=Pridi:wght@400;600&family=Sarabun:wght@400;600&display=swap">
+<link rel="stylesheet" href="../../fonts/fonts.css">
 <style>
   /* หน้า tweak T2 หัวเว็บ + nav (ui-redo 103 · SPEC ใบ 94 §4 แถว T2 · ข้อ 135 136 199 201)
      แถบบน (nav.top) มาจาก NAV_CSS/navHtml ของ src/site/nav.mjs ที่ build ฉีดระหว่าง marker ใน <template> ข้างล่าง — หน้าไม่ลอกแถบเอง
@@ -74,7 +73,7 @@
   const NAV_CSS = $('navcss').content.querySelector('style').textContent;
   // ตัด <script> ของแถบออก (เลื่อนลิงก์หน้าปัจจุบัน) — กรอบตัวอย่างไม่ต้องรัน และลิงก์ในกรอบไม่พาไปไหน
   const NAV_HTML = $('navsrc').innerHTML.replace(/<script[\s\S]*?<\/script>/g, '').replace(/href="[^"]*"/g, 'href="#"');
-  const FONTS = 'https://fonts.googleapis.com/css2?family=Maitree:wght@500;600&family=Pridi:wght@400;600&family=Sarabun:wght@400;600&display=swap';
+  const FONTS = new URL('../../fonts/fonts.css', location.href).href;
 
   // ค่าที่ปรับได้ · ทุกสีเป็น hex · ความสูงเป็น px
   // preset 0 = ของบนเว็บตอนนี้: แถบบน NAV_CSS (#17110D) + หัวหน้าแบบหลักข้อ 135 (#1F2430 · Pridi · 32/28)
