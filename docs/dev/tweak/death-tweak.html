@@ -145,6 +145,15 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .sb-who small { font-size:12px; color:var(--muted); overflow-wrap:anywhere; }
 /* ป้ายพักแทนบรรทัดจังหวัด: บรรทัดเดียวเสมอ แถวไม่สูงขึ้น */
 .sb-who small.rest { color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* หัวการ์ด (ui-redo ข้อ 161–162): แถวอาชีพเข้มกว่าบรรทัดจังหวัด · แถวฐานะ/เงินสดใต้ชื่อ ไม่มีเกจ · เงินสดชิดขวา */
+.sb-who small.hd-job { color:var(--ink); font-weight:600; }
+.i .sb-who small.hd-job { color:#E8ECFF; }
+.hd-row { display:flex; flex-wrap:wrap; align-items:baseline; column-gap:8px; margin:-2px 0 10px; font-size:12px; min-width:0; }
+.hd-word { font-weight:600; white-space:nowrap; }
+.hd-cash { margin-left:auto; display:flex; align-items:baseline; gap:4px; white-space:nowrap; }
+.hd-cash b { font-size:14px; font-variant-numeric:tabular-nums; }
+.hd-cash.red b, .hd-cash .lw { color:var(--dg); }
+.hd-cash .lw { font-size:11px; font-weight:600; }
 .sb-age { display:flex; align-items:center; gap:4px; white-space:nowrap; }
 .sb-age > b { font-size:20px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
 .sb-age small { font-size:12px; }
