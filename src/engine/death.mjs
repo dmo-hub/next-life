@@ -136,11 +136,21 @@ export const HIT_KILL = (HIT.hi - 1) / (HIT.hi - HIT.lo);
 export const isAcute = (key) => key !== 'other' && !CHRONIC.includes(key);
 // ส่วนของเส้นธรรมชาติที่หลอดหายไปกับความแก่ — ขนาดที่ทำให้เหตุเฉียบพลันฆ่าเพิ่มเท่าส่วน other ของตารางพอดี
 // เหตุที่ฆ่าเพราะส่วนนี้ (ถ้าไม่แก่จะรอด) นับสาเหตุเป็น other ⇒ ทั้งอัตราตายและสัดส่วนสาเหตุยังตรงข้อมูล
-export function frailOf(st, py, age, k) {
-  const keys = st.content.era.causes.keys;
-  const hz = causeHazards(st, py, age, k);
-  const acute = hz.reduce((s, x, j) => s + (isAcute(keys[j]) ? x : 0), 0);
-  const other = hz[keys.indexOf('other')] ?? 0;
+// คิดจากสัดส่วนของประชากร ไม่ผ่านปัจจัยเสี่ยงรายคน — หลอดส่วนแก่ไม่ฟื้น ถ้าใช้ค่ารายคน ปีที่เสี่ยงเฉียบพลันลดลงชั่วคราว
+// (เลิกงานเสี่ยง ฯลฯ) other/acute พุ่งแล้วค้างทั้งชีวิต ⇒ หลอดต่ำเกินเส้นตั้งแต่วัยกลางคน
+// สัดส่วนรายปีปฏิทินแกว่งแรง (ปีเดียวกระโดด 3–5 เท่า) — ค่าไม่ลดจึงต้องเฉลี่ยหน้าต่างย้อนหลังก่อน ไม่งั้นเก็บยอดแหลมไว้
+export const FRAIL_WINDOW = 5;
+export function frailOf(st, year, age) {
+  const era = st.content.era;
+  const keys = era.causes.keys;
+  const oj = keys.indexOf('other');
+  let acute = 0;
+  let other = 0;
+  for (let k = 0; k < FRAIL_WINDOW && age - k >= 0; k++) {
+    const s = causeShares(era, st.sex, protoYear(era, st.seed, year - k), age - k);
+    acute += s.reduce((sum, x, j) => sum + (isAcute(keys[j]) ? x : 0), 0);
+    other += s[oj] ?? 0;
+  }
   return acute > 0 ? Math.min(1, ((HIT.hi - 1) * other) / acute) : 0;
 }
 

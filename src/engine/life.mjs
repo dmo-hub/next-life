@@ -453,7 +453,7 @@ function fixedFx(ev, c) {
 // ตัวคูณอิงส่วนต่างจากเส้นสุขภาพตามธรรมชาติของชีวิตนั้น ไม่ใช่ค่าคงที่ — ชีวิตที่ไม่มีเหตุการณ์จึงได้ qx จริงพอดี
 // และสุขภาพที่ไหลลงตามวัยไม่ถูกนับซ้ำกับ qx ที่สูงขึ้นตามวัยอยู่แล้ว · สุขภาพแย่เพิ่มความเสี่ยงแรงกว่าสุขภาพดีลด
 export function healthMultiplier(st) {
-  const d = st.health - st.healthNatural;
+  const d = st.health - (st.healthNatural - (st.frail ?? 0));
   return d < 0 ? 1 - d / 50 : Math.max(0.6, 1 - d / 150);
 }
 
@@ -475,7 +475,7 @@ function barYear(st) {
   const py = protoYear(era, st.seed, st.birthYear + st.age);
   const age = bodyAge(st);
   if (age >= MAX_AGE || qx(era, st.sex, py, age) >= 1) return;
-  const want = st.healthNatural * frailOf(st, py, age, 1);
+  const want = st.healthNatural * frailOf(st, st.birthYear + st.age, age);
   if (want > (st.frail ?? 0)) {
     st.health = clamp(st.health - (want - (st.frail ?? 0)));
     st.frail = want;
