@@ -35,6 +35,46 @@ export function splitDeadChoices(events, fired, explored, picks, min = MIN_EXPEC
   return { dead, thin };
 }
 
+// รากของของที่ชีวิตรุ่นเดียวของบอทหลัก (full) ถึงไม่ได้โดยโครงสร้าง — ด่านว่าถึงได้จริงอยู่ที่ harness ที่เล่นหลายรุ่น
+// heir: parentFlags ว่างเสมอในรุ่นเดียว (ตัดสินที่ lineage) · overlap: ค่าซ้อนทับขึ้นแค่ตอนกลับเข้าต่างโลกที่เคยออก (ตัดสินที่ overlap)
+export const CHAIN_ROOTS = {
+  heir: (e) => !!e.when?.parent_flags?.has?.length,
+  overlap: (e) => (e.when?.overlap_stage?.[0] ?? 0) >= 1,
+};
+
+// โซ่จากราก: ของที่ตั้งได้แค่จากของในโซ่ (ธง · สายงานจาก effects.ladder) เป็นของโซ่ → ผู้อ่านเข้าโซ่ต่อ … วนจนนิ่ง
+// ผู้อ่าน: การ์ด when.flags.has · ตัวเลือก requires.flags.has (has ต้องครบทุกตัว ขาดตัวเดียวก็ถึงไม่ได้) · การ์ด first_of (ออกได้ทางเดียวคือ effects.ladder)
+// · การ์ดปลายทาง next ที่ทุกทางเข้ามาจากในโซ่ (lint next-target กันปลายทางไม่ให้อยู่กองสุ่ม) · chain: false = รากอย่างเดียว ไม่ไล่ต่อ (ตัวควบคุม)
+export function reachChain(events, root, { chain = true } = {}) {
+  const roots = new Set(events.filter(root).map((e) => e.id));
+  const evs = new Set(roots), choices = new Set(), setters = new Map(), into = new Map();
+  const push = (m, k, v) => m.set(k, [...(m.get(k) ?? []), v]);
+  for (const e of events) (e.choices ?? []).forEach((c, i) => {
+    const site = { ev: e.id, key: `${e.id}#${c.id ?? i}` };
+    for (const node of [c, ...[].concat(c.outcomes ?? [])]) {
+      for (const fl of node?.sets_flags ?? []) push(setters, fl, site);
+      if (node?.effects?.ladder) push(setters, `ladder:${node.effects.ladder}`, site);
+      if (node?.next) push(into, node.next, site);
+    }
+  });
+  const inChain = (x) => evs.has(x.ev) || choices.has(x.key);
+  const needs = (own, has) => (has ?? []).some((fl) => own.has(fl));
+  for (;;) {
+    const own = new Set([...setters].filter(([, xs]) => xs.every(inChain)).map(([tok]) => tok));
+    const before = evs.size + choices.size;
+    if (chain) for (const e of events) {
+      if (needs(own, e.when?.flags?.has) || (e.first_of && own.has(`ladder:${e.first_of}`)) || into.get(e.id)?.every(inChain)) evs.add(e.id);
+      (e.choices ?? []).forEach((c, i) => needs(own, c.requires?.flags?.has) && choices.add(`${e.id}#${c.id ?? i}`));
+    }
+    if (evs.size + choices.size === before) return { roots, events: evs, choices, flags: new Set([...own].filter((t) => !t.startsWith('ladder:'))), setters };
+  }
+}
+
+export const heirChain = (events, opts) => {
+  const c = reachChain(events, CHAIN_ROOTS.heir, opts);
+  return { ...c, parent: c.roots };
+};
+
 function cardGate(cardsOver60, name, min, max, paused, pausedText) {
   const xs = [...cardsOver60].sort((a, b) => a - b);
   const inRange = xs.filter((c) => c >= min && c <= max).length;

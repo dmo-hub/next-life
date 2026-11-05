@@ -16,16 +16,19 @@ events:
         effects: {health: 1, happiness: -1, relations: -1, income_mult: 1.2}
         merit: [{cat: neutral}]
       - id: rebuild_boat
+        nature: duty
         text: "ช่วยพ่อขนไม้ต่อเรือลำใหม่"
         outcomes:
           - {weight: 3, ok: true, text: "พ่อกู้เงินต่อเรือจนเสร็จ หลังพายุปลาชุกผิดปกติ ใช้หนี้หมดในปีเดียว", effects: {happiness: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เรือรั่วกลางทะเล พ่อกลับมาได้แต่เจ็บหนัก คุณต้องหยุดเรียนมาช่วยแม่หาเงินใช้หนี้", effects: {happiness: -2, knowledge: -1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: shelter_neighbors
+        nature: social
         text: "แบ่งที่นอนให้เด็กบ้านหลังคาพัง"
         effects: {health: -1, relations: 2, happiness: 1}
         merit: [{cat: help_others, level: 1}]
       - id: boarding_school
+        nature: learn
         text: "ขอไปเรียนประจำในเมือง"
         effects: {knowledge: 2, relations: -2}
         merit: [{cat: neutral}]
@@ -93,6 +96,12 @@ events:
         text: "ปิดทีวี ไปวิ่งให้หายเครียด"
         effects: {health: 1, relations: -1}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ของที่มัดไว้รอด เอาไปแจกชายฝั่ง"
+        requires: {flags: {has: ["braced:typhoon_gay"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:typhoon_gay"]
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
 
   # ---------- SARS ----------
   - id: era_dis_sars_kid_01
@@ -197,6 +206,12 @@ events:
         text: "อาสาช่วยคัดกรองที่สนามบิน"
         effects: {health: -1, relations: 2, knowledge: 1}
         merit: [{cat: help_others, level: 2}]
+      - id: use_braced
+        text: "แจกหน้ากากที่ตุนไว้ให้เพื่อนบ้าน"
+        requires: {flags: {has: ["braced:sars"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:sars"]
+        effects: {relations: 2, health: 1}
+        merit: [{cat: help_others, level: 1}]
 
   # ---------- สึนามิ ----------
   - id: era_dis_tsunami_kid_01
@@ -267,6 +282,12 @@ events:
         text: "ปิดข่าว ไม่อยากรับรู้อีก"
         effects: {health: 1, happiness: 1, relations: -1}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "รอสายญาติ เขาจำทางหนีที่เล่าไว้"
+        requires: {flags: {has: ["braced:tsunami"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:tsunami"]
+        effects: {happiness: 2, relations: 2}
+        merit: [{cat: neutral}]
 
   # ---------- น้ำท่วมใหญ่ ----------
   - id: era_dis_flood_kid_01
@@ -286,6 +307,7 @@ events:
           - {weight: 1, text: "เหยียบเศษแก้วใต้น้ำ แผลติดเชื้อต้องนอนโรงพยาบาล", effects: {health: -2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: evacuate_shelter
+        nature: social
         text: "ช่วยแจกข้าวที่ศูนย์พักพิง"
         effects: {happiness: -1, relations: 2, knowledge: 1}
         merit: [{cat: help_others, level: 1}]
@@ -294,6 +316,7 @@ events:
         effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
       - id: build_boats
+        nature: duty
         text: "ช่วยพ่อแม่ทาสีเรือขายริมถนน"
         outcomes:
           - {weight: 2, ok: true, text: "เรือขายดีเป็นเทน้ำเทท่า คุณทาสีจนมือเลอะทั้งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 1.5}}, merit: [{cat: neutral}]}
@@ -359,6 +382,12 @@ events:
         text: "ย้ายกลับไปอยู่บ้านเกิดทำสวน"
         effects: {health: 1, happiness: 1, chronic: {health: 1}, income_mult: 0.8}
         merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ของในบ้านยกขึ้นที่สูงไว้แล้ว"
+        requires: {flags: {has: ["braced:great_flood"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:great_flood"]
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
 
   # ---------- โควิด-19 ----------
   - id: era_dis_covid_kid_01
@@ -372,11 +401,13 @@ events:
     text: "โรคระบาดทั่วโลก โรงเรียนปิด ครูสอนผ่านจอ แต่บ้านมีมือถือเครื่องเดียว แม่ต้องใช้ขายของ พ่อต้องใช้รับงาน คุณต้องใช้เรียน"
     choices:
       - id: buy_tablet
+        nature: learn
         text: "ขอแท็บเล็ตเป็นของขวัญวันเกิด"
         requires: {money: {unit: income_x, amount: 0.5}, reason: "ที่บ้านไม่มีเงินพอซื้อแท็บเล็ต"}
         effects: {knowledge: 2, health: -1, money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
       - id: help_live_sell
+        nature: duty
         text: "ช่วยแม่ไลฟ์ขายของแทนเรียน"
         effects: {knowledge: -1}
         outcomes:
@@ -468,6 +499,12 @@ events:
         requires: {flags: {has: [kept_savings]}, reason: "ไม่มีเงินสำรองเก็บไว้"}
         clears_flags: [kept_savings]
         effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "อยู่บ้านกับของที่ตุนไว้ครบเดือน"
+        requires: {flags: {has: ["braced:covid19"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:covid19"]
+        effects: {health: 1, happiness: 1}
         merit: [{cat: neutral}]
 
   # ---------- เรื่องต่อ (ออกทาง next เท่านั้น) ----------

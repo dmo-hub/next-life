@@ -1,5 +1,5 @@
 import { makeRng, mixSeed } from './rng.mjs';
-import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord } from './family.mjs';
+import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
@@ -7,14 +7,15 @@ import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, ass
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS, meritId, MERIT_LEVELS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './career.mjs';
 import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
-import { beliefOk, beliefFired, beliefChoice } from './belief.mjs';
+import { beliefOk, beliefFired, beliefChoice, moneyTight } from './belief.mjs';
 import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './court.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
-import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends } from './isekai.mjs';
+import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
+import { pastLifeOk, pastTalent, talentStart } from './past.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
@@ -42,6 +43,18 @@ export const STAT_KEYS = ['health', 'happiness', 'knowledge', 'relations', 'netw
 // ป้ายที่ผู้เล่นเห็น (ปุ่ม · เหตุล็อก · ฉากเกิด · หน้าเฉลย) — health ขึ้นว่า "ชีวิต" เพราะหมดแล้วตาย · network เป็นค่าซ่อน ป้ายจึงเป็นคำคนพูด ไม่ใช่ชื่อค่า
 // บอทใน harness อ่านป้ายย้อนกลับจากตารางนี้ เปลี่ยนคำแล้วบอทตามเอง
 export const STAT_LABELS = { health: 'ชีวิต', happiness: 'ความสุข', knowledge: 'ความรู้', relations: 'ความสัมพันธ์', network: 'เส้นสาย', money: 'เงิน' };
+// ป้ายหมวดการ์ดผล (ui-redo 60): จอเลือกภาพตามหมวด · จับจากข้อมูลบนการ์ด (แหล่ง · ชนิดข่าว · ทิศผลค่า) ไม่ดึงเลขสุ่ม ไม่อ่านคำในข้อความ
+// ทิศนับเฉพาะค่าที่ลูกศรบนแถบโชว์ (network เป็นค่าซ่อน) และไม่ถูก hidden ของการ์ด/ตัวเลือกปิดไว้ — ป้ายห้ามเผยค่าที่ซ่อน
+// ไม่มีป้าย (การ์ดค้างในเซฟเก่า · repairLife ไม่เติม) = หมวดกลาง ⇒ จออ่านผ่าน resultTag เท่านั้น
+export const TAG_MID = 'mid';
+export const RESULT_TAGS = ['good', 'bad', TAG_MID, 'loot', 'loss', 'sick', 'pet', 'inherit', 'retire', 'bankrupt', 'nature', 'search', 'survive', 'trip', 'belief', 'afterlife'];
+export const resultTag = (card) => card.tag ?? TAG_MID;
+const TAG_STATS = STAT_KEYS.filter((k) => k !== 'network');
+export function fxTag(fx, hidden = []) {
+  let n = 0;
+  for (const k of TAG_STATS) if (fx?.[k] && !hidden.includes(k)) n += fx[k];
+  return n > 0 ? 'good' : n < 0 ? 'bad' : TAG_MID;
+}
 
 // ช่วงชีวิต (ใบ 03) · ระหว่างชาติไม่ใช่ช่วงอายุ แต่จองชื่อไว้ให้ใบที่ทำหลังตาย
 export const STAGES = [
@@ -100,7 +113,7 @@ function signPact(st, p) {
 // น้ำหนักทางผลหลังเอียงตาม multipliers และอารมณ์ · การ์ดที่มีทั้งทางสำเร็จและไม่สำเร็จ ตัดโอกาสสำเร็จรวมไว้ okMin–okMax (B112) โดยปรับสองกลุ่มตามสัดส่วน
 // (ไม่ดึงเลขสุ่มเพิ่ม · ป้าย % กับผลจริงใช้ตัวเดียวกัน)
 const outcomeWeights = (st, ev, c) => {
-  const m = (moodCard(ev) ? moodMul(st) : 1) * pactLuck(st);
+  const m = (moodCard(ev) ? moodMul(st) : 1) * pactLuck(st) * thaiSkillMul(st.skills, ev?.category);
   const w = c.outcomes.map((o) => o.weight * poolMultiplier(st, o.multipliers) * (o.ok ? m : 1));
   const ok = w.reduce((a, x, i) => a + (c.outcomes[i].ok ? x : 0), 0);
   const all = w.reduce((a, x) => a + x, 0);
@@ -135,7 +148,8 @@ export function jobText(st, age = st.age) {
     if (st.school && age >= SCHOOL_FROM) return `กำลังเรียน${TRACKS[st.school].name}`;
     return age < SCHOOL_FROM ? 'ยังไม่เข้าเรียน' : 'ยังไม่ทำงาน';
   }
-  return isWorking(st, age) || age < RETIRE_AGE ? rankName(st) : `เกษียณ (เคยเป็น${rankName({ ...st, office: null })})`;
+  // เกษียณก่อนกำหนด (fx.retire ตั้ง retiredAt) ไม่ต้องรอ 60 ถึงขึ้น "เกษียณ"
+  return isWorking(st, age) || age < Math.min(RETIRE_AGE, st.retiredAt ?? Infinity) ? rankName(st) : `เกษียณ (เคยเป็น${rankName({ ...st, office: null })})`;
 }
 
 // เงินเก็บต่อปี เป็นบาทของปีนั้น: ค่าจ้างตามอาชีพ × ภาค ทั้งปี × อัตราออม (ใบ 14)
@@ -238,8 +252,15 @@ export function newLife(seed, content, heir = null) {
     gen: heir?.gen ?? 1,
     // ชื่อเสียงตระกูล 0–3 (B95b) ส่งต่อจากรุ่นก่อน · การ์ดเอียงตาม multipliers.family_fame
     fame: heir?.fame ?? 0,
+    // ค่าซ้อนทับของตระกูล (overlapOf) — ใส่ช่องเฉพาะเมื่อ > 0 ⇒ ตระกูลที่ไม่เคยข้ามโลกได้สถานะเท่าเดิมทุกไบต์ · เซฟเก่าไม่มีช่อง = 0
+    ...(heir?.overlap && { overlap: heir.overlap }),
+    // ความจำข้ามชาติ (past.mjs) + อาชีพที่ติดพรสวรรค์มา — ชีวิตแรกไม่มีช่อง
+    ...(heir?.past && { past: heir.past }),
+    ...(pastTalent(heir?.past) && { talent: pastTalent(heir.past) }),
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
+    // จดหมายคำฝากของรุ่นก่อน (afterfall-3) {age, from, cause, by} — ออกหลังมรดกถึงมือเท่านั้น
+    letter: heir?.letter ?? null,
     // อายุที่ธงแต่ละตัวติดครั้งแรก — ระหว่างชาติอ่านอายุตอนมีลูก
     flagAge: {},
     omenTone: null,
@@ -249,6 +270,8 @@ export function newLife(seed, content, heir = null) {
     parentFlags: heir?.parentFlags ?? {},
     // ข้อห้ามตระกูล {ชนิด: ระยะรุ่น} (dynasty-3) — แยกจาก parentFlags เพราะถือได้ไกลกว่าเพดาน tier · เซฟเก่าไม่มีช่องนี้ อ่านแบบ ?.
     taboos: heir?.taboos ?? {},
+    // สกิลที่พกมาจากคลัง [{ id, lv }] (06s) ใช้ทั้งชีวิตนี้และชาติต่างโลกที่ตามมา · ไม่พก = ไม่มีช่อง (state เท่าก่อนมีสกิลข้ามชาติ)
+    ...(heir?.skills?.length && { skills: heir.skills }),
     scheduled: [],
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
@@ -295,15 +318,21 @@ export function newLife(seed, content, heir = null) {
   // พ่อ/แม่ที่จากไปก่อนเราเกิด (ทางในตระกูล) เป็นประวัติครอบครัวตั้งแต่แรก
   for (const p of st.parents) if (!p.alive) inherit(st, p.cause);
   petsAtBirth(st, heir, CLASSES.indexOf(cls));
+  if (heir?.start) skipToAge(st, heir.start.age);
+  // เริ่มกลางวัย = เงินของบ้านเป็นบาทของปีที่เริ่ม (yearlySaving อ่านปีจาก st.age)
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
   // การ์ดเปิดชีวิตมาก่อนการ์ดมรดกตอนแรกเกิด — ต้องเล่ามรดกก่อน receiveLegacy ล้าง st.legacy
   st.due.push(introCard(st, heir));
-  if (st.legacy?.age === 0) receiveLegacy(st, birthYear, stageOf(0));
-  st.trail.push({ year: birthYear, money: Math.round(st.money) });
+  // ทางเป็นลูก legacy.age >= 0 ⇒ อายุ 0 ได้ผลเท่าเดิม · เริ่มกลางวัย มรดกถึงมือปีที่เริ่ม (รุ่นก่อนตายปีนี้)
+  if (st.legacy && st.legacy.age <= st.age) receiveLegacy(st, birthYear + st.age, stageOf(st.age));
+  if (st.age > 0 && st.letter && !st.letter.read && !st.legacy && st.age >= st.letter.age) receiveLetter(st);
+  if (heir?.start) startSchool(st, birthYear + st.age);
+  st.trail.push({ year: birthYear + st.age, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
   st.stageMark = markStage(st);
   lifeFocusBorn(st, heir?.focus);
   if (heir?.gates?.length) st.gates = [...heir.gates];
+  overlapPlan(st);
   return st;
 }
 
@@ -381,14 +410,18 @@ function outcomeFx(st, c, ev) {
 // โอกาสได้ทางสำเร็จ ปัดเป็นขั้น PCT_STEP ไม่โชว์ 0/100 · ผลของตัวเลือกลงก่อนสุ่มทาง (choose)
 // จึงคิดบนค่าหลังผลตัวเลือกในสำเนา ไม่แตะ state จริง
 export const PCT_STEP = 5;
-export function successPct(st, c, ev = null) {
+// ค่าดิบไม่ปัด — harness ที่วัดผลเอียงเล็ก ๆ (ผลเบาสกิล k) เห็นต่างกันต่ำกว่าขั้นป้าย
+export function successP(st, c, ev = null) {
   const fx = c.effects ?? {};
   const p = { ...st, flags: { ...st.flags } };
   for (const k of STAT_KEYS) if (fx[k]) p[k] = clamp(p[k] + levelValue(fx[k]));
   for (const f of c.sets_flags ?? []) p.flags[f] = true;
   for (const f of c.clears_flags ?? []) delete p.flags[f];
   const w = outcomeWeights(p, ev, c);
-  const r = w.reduce((s, x, i) => s + (c.outcomes[i].ok ? x : 0), 0) / w.reduce((s, x) => s + x, 0);
+  return w.reduce((s, x, i) => s + (c.outcomes[i].ok ? x : 0), 0) / w.reduce((s, x) => s + x, 0);
+}
+export function successPct(st, c, ev = null) {
+  const r = successP(st, c, ev);
   return Math.max(PCT_STEP, Math.min(100 - PCT_STEP, Math.round((r * 100) / PCT_STEP) * PCT_STEP));
 }
 
@@ -482,7 +515,7 @@ function faceDeath(st, cause, opts = {}) {
     // เสี่ยงของโฟกัสที่ทอยตายไว้ต้องหายด้วย ไม่งั้นรอดปีนี้แล้วปีถัดไปตายด้วยเหตุเดิมทันที
     st.focusDoom = undefined;
     st.health = Math.max(st.health, st.healthNatural, 1);
-    return { fate: 'survive', card: { kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: PACT.surviveText } };
+    return { fate: 'survive', card: { kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: PACT.surviveText, tag: 'survive' } };
   }
   if (st.flags.cheat_death) {
     // ไปศาลก่อน แล้วตายปีนี้ด้วยสาเหตุเดิม · afterQueue = การ์ดผลที่รอในคิวเล่าก่อนเข้าศาล
@@ -532,7 +565,22 @@ export const FILL = {
   ผม: (st) => (st.sex === 'หญิง' ? 'ฉัน' : 'ผม'),
   ลูกดูแลแบบเรา: (st) => filialMirrorText(st),
   พ่อแม่ที่ป่วย: (st) => illParentWord(st),
+  // จดหมายคำฝาก (afterfall-3): ฝั่งผู้ฝากอ่านคนรอบตัวตอนตาย · ฝั่งทายาทอ่าน st.letter ที่ระหว่างชาติสร้างไว้
+  ผู้รับซอง: (st) => (letterTo(st) ? letterToText(letterTo(st)) : 'คนข้างหลัง'),
+  ผู้ฝาก: (st) => st.letter?.from ?? 'ผู้ใหญ่รุ่นก่อน',
+  // ไม่บอกเหตุ (self_harm · other ก่อนชรา) ก็ยังต้องได้คำ — "ที่จากไปแล้ว" ไม่เผยเหตุ และช่องไม่ว่าง
+  เหตุผู้ฝาก: (st) => st.letter?.cause?.join('') ?? 'แล้ว',
+  ผู้ยื่นซอง: (st) => st.letter?.by ?? 'คนในบ้าน',
 };
+
+// สาเหตุการตาย (B110 · เจ้าของเคาะ): ป้ายสั้นภาษาคน [คำเชื่อม, คำนาม] — หน้าจอและจดหมายคำฝากใช้ตารางเดียวกัน
+// self_harm ไม่อยู่ในตารางโดยตั้งใจ: ห้ามขึ้นจอจนกว่าแกนจะมีข้อความระวัง + สายด่วน 1323 · other ที่ยังไม่ชราไม่บอกอะไร
+const CAUSE_TEXT = {
+  infection: ['ด้วย', 'โรคติดเชื้อ'], pneumonia: ['ด้วย', 'ปอดอักเสบ'], heart: ['ด้วย', 'โรคหัวใจ'], stroke: ['ด้วย', 'โรคหลอดเลือดสมอง'],
+  cancer: ['ด้วย', 'โรคมะเร็ง'], diabetes_kidney: ['ด้วย', 'โรคเบาหวานและไต'], liver: ['ด้วย', 'โรคตับ'], chronic_resp: ['ด้วย', 'โรคปอดเรื้อรัง'],
+  road: ['จาก', 'อุบัติเหตุบนท้องถนน'], accident: ['จาก', 'อุบัติเหตุ'], assault: ['เพราะ', 'ถูกทำร้าย'], newborn: ['ด้วย', 'ภาวะแทรกซ้อนแรกเกิด'],
+};
+export const causeWords = (cause, age) => (cause === 'other' ? (age >= STAGES.at(-1).from ? ['ด้วย', 'วัยชรา'] : null) : CAUSE_TEXT[cause] ?? null);
 export function fill(text, st) {
   return text.replace(/\{([^{}]*)\}/g, (m, k) => (FILL[k] ? String(FILL[k](st)) : m));
 }
@@ -584,12 +632,15 @@ function homePays(st) {
 }
 
 // hurt = ตัวคูณส่วนที่ติดลบของค่าและเงิน (ญาติช่วยประคองตอนเจอผลร้าย) · ส่วนที่เป็นบวกไม่แตะ
-function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
+// nat = ตัวคูณนิสัย (natureBoost) ส่วนที่เป็นบวกของค่าตรงนิสัยเท่านั้น · คืน true เมื่อตัวคูณมีผล (ป้าย "เพราะคุณเป็นคน…")
+function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
+  let hit = false;
   const cut = (v) => (v < 0 ? v * hurt : v);
-  for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + cut(levelValue(fx[k]) * ss));
+  const up = (k, v) => (nat?.stat === k && v > 0 ? ((hit = true), v * nat.mul) : v);
+  for (const k of STAT_KEYS) if (fx[k]) st[k] = clamp(st[k] + cut(up(k, levelValue(fx[k]) * ss)));
   if (fx.money?.grey) greyAdd(st, moneyValue(st, fx.money) * s);
   else if (fx.money) {
-    st.money += cut(moneyValue(st, fx.money) * s);
+    st.money += cut(up('money', moneyValue(st, fx.money) * s));
     homePays(st);
   }
   if (fx.grey_seize) greySeize(st, fx.grey_seize);
@@ -604,7 +655,10 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
   if (fx.debt) borrow(st, fx.debt, s);
   if (fx.settle) settle(st, fx.settle);
   if (fx.complain) for (const d of st.debts) complainDebt(st.content.era, d);
-  if (fx.income_mult) st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * fx.income_mult ** s));
+  if (fx.income_mult) {
+    const m = nat?.job && fx.income_mult > 1 ? ((hit = true), 1 + (fx.income_mult - 1) * nat.mul) : fx.income_mult;
+    st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * m ** s));
+  }
   if (fx.school) {
     st.school = fx.school === 'none' ? null : fx.school;
     if (!st.school && st.workFrom === null) st.needJob = true;
@@ -615,16 +669,17 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
     st.occupation = o.id;
     st.occupationName = o.name;
     if (st.workFrom === null) st.workFrom = st.age;
-    // ตัวคูณรายได้ผูกกับงานเดิม เปลี่ยนงานแล้วเริ่มนับใหม่
-    st.incomeMult = 1;
+    // ตัวคูณรายได้ผูกกับงานเดิม เปลี่ยนงานแล้วเริ่มนับใหม่ · งานตรงพรสวรรค์ติดชาติเริ่มสูงกว่านิดหนึ่ง
+    st.incomeMult = talentStart(st);
     st.jobSince = st.age;
     enterByJob(st, o.id);
   }
   if (fx.ladder) {
     if (st.workFrom === null) st.workFrom = st.age;
-    st.incomeMult = 1;
     st.jobSince = st.age;
     enterLadder(st, fx.ladder);
+    // วัดพรสวรรค์หลังเข้าสาย — อาชีพเปลี่ยนตามขั้นแรกของสาย
+    st.incomeMult = talentStart(st);
     // ทางแรกของสาย (B170): การ์ด first_of ออกปีที่เข้าสาย ครั้งเดียวต่อชีวิต (เข้าสายซ้ำไม่ออกอีก) · แทนการ์ดกองสุ่มหนึ่งใบแบบผลย้อน ชีวิตจึงไม่ยาวขึ้น
     const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id]);
     if (first) {
@@ -641,6 +696,35 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1) {
     else delete st.chronic[k];
     st.chronicAge[k] = st.age;
   }
+  return hit;
+}
+
+// ไอเทมติดตัว (B78): state สร้างตอนได้ชิ้นแรก — ชีวิตที่ไม่เคยได้ของและเซฟก่อนมีระบบจึงไม่มีช่องนี้ ผู้อ่านใช้ itemsOf ได้ช่องว่าง
+export const itemsOf = (st) => st.items ?? { wear: Object.fromEntries(Object.keys(st.content.items.slots).map((k) => [k, null])), bag: [], cap: st.content.items.cap };
+// จอโชว์ช่องไอเทมเมื่อโลกซ้อนทับถึงขั้น 3 หรือมีของแล้ว — ก่อนนั้นช่องว่างเปล่าบอกใบ้ระบบที่ผู้เล่นยังไปไม่ถึง
+export const itemsVisible = (st) => overlapStageOf(st) >= 3 || (st.items ? Object.values(st.items.wear).some(Boolean) || st.items.bag.length > 0 : false);
+
+// ไม่ดึงเลขสุ่ม: ได้ชิ้นแรกในลิสต์ที่ยังไม่มี ครบแล้วไม่ได้เพิ่ม · ลงช่องชนิดตรงถ้าว่าง ไม่งั้นเข้าเป้ · เป้เต็มขายทันที (ไม่มีปุ่มทิ้ง/ให้)
+// คืนข้อความที่ผู้เล่นเห็น หรือ null เมื่อไม่ได้อะไร
+function gainLoot(st, ids) {
+  const reg = st.content.items;
+  const it = itemsOf(st);
+  const id = ids.find((x) => !Object.values(it.wear).includes(x) && !it.bag.includes(x));
+  if (!id) return null;
+  st.items = it;
+  const item = reg.list[id];
+  let where;
+  if (!it.wear[item.slot]) {
+    it.wear[item.slot] = id;
+    where = ` ใส่ช่อง${reg.slots[item.slot]}`;
+  } else if (it.bag.length < it.cap) {
+    it.bag.push(id);
+    where = ' เก็บเข้าเป้';
+  } else {
+    st.money += moneyValue(st, item.sell);
+    where = ' แต่เป้เต็ม เลยขายต่อได้เงินแทน';
+  }
+  return `${item.text} · ได้${item.name}${where}`;
 }
 
 // เรื้อรังไหลทุกปี แล้วจางลงระดับละ 1 ทุก CHRONIC_FADE ปีนับจากครั้งล่าสุดที่ระดับเปลี่ยน
@@ -701,7 +785,18 @@ function receiveLegacy(st, year, stage) {
       : debt
         ? `${who}จากไปพร้อมหนี้ ทายาทรับผิดไม่เกินมรดกที่ได้ หนี้ที่เหลือจึงไม่ตกถึงเรา`
         : `${who}จากไป ไม่มีทรัพย์เหลือเป็นมรดก`;
-  st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text });
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text, tag: 'inherit' });
+}
+
+// จดหมายคำฝาก (afterfall-3): ตามหลังการ์ดมรดก ⇒ ไม่มีทางออกขณะผู้ฝากยังอยู่ · ไม่กินโควตาปี ไม่ดึงเลขสุ่ม
+// ใบที่ออกเลือกจาก parent_flags (ชนิดคำฝาก) · ธงไม่ถึงชั้นนี้ = ไม่มีใบ
+function receiveLetter(st) {
+  st.letter = { ...st.letter, read: true };
+  const ev = st.content.events.find((e) => e.id.startsWith(LETTER.read) && whenOk(st, e.when));
+  if (!ev) return;
+  st.done[ev.id] = true;
+  st.fired[ev.id] = { n: 1, age: st.age };
+  st.due.push({ kind: 'eraEvent', ev, age: st.age });
 }
 
 // ย้ายสัดส่วน share ของเงินทั้งหมดเข้าสินทรัพย์เดียว · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
@@ -713,10 +808,73 @@ function invest(st, { asset, share }) {
   st.alloc = next;
 }
 
+// จบช่วงเรียน: ได้วุฒิ แล้วออกด่านเรียนต่อ หรือการ์ดหางานถ้าเป็นช่วงสุดท้าย
+function finishTrack(st, year) {
+  const track = st.school && TRACKS[st.school];
+  if (!track || st.age !== track.until) return;
+  if (eduRank(track.edu) > eduRank(st.edu)) st.edu = track.edu;
+  if (track.exam) for (const ev of preludes(st, track.exam, year)) st.due.push({ kind: 'eraEvent', ev, age: st.age });
+  if (track.gate) st.due.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
+  else {
+    st.school = null;
+    if (track.ladder) applyEffects(st, { ladder: track.ladder });
+    else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
+  }
+}
+
+// เริ่มกลางวัย (B76 ผู้สืบสายเลือด): คนที่โตมาแล้วจริง ไม่เล่นวัยเด็กซ้ำ · ค่าสถานะเดินตามธรรมชาติของปีที่ข้าม ไม่มีเหตุการณ์ ไม่ดึงเลขสุ่มของโลก
+// พ่อแม่: คนที่มีอายุตายจริง (คนในครอบครัวรุ่นก่อน) ตายตามนั้น · คนที่สร้างใหม่ยังอยู่ · รุ่นก่อน (ancestor) ตายปีที่เริ่มผ่านมรดก
+function skipToAge(st, age) {
+  const era = st.content.era;
+  while (st.age < age) {
+    st.age += 1;
+    const year = st.birthYear + st.age;
+    st.price *= 1 + inflationRate(era, st.seed, year) / 100;
+    const r = healthDecay(st.age);
+    st.health = clamp(st.health * (1 - r));
+    st.healthNatural *= 1 - r;
+    st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
+    st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * moodMul(st) * (100 - st.knowledge)) / 100);
+    st.relations = clamp(st.relations * (1 - RELATION_FADE));
+    for (const p of st.parents) {
+      if (!p.alive) continue;
+      p.age += 1;
+      if (p.diesAt !== undefined && !p.ancestor && p.age >= p.diesAt) {
+        p.diedAge = p.age;
+        parentDied(st, p, year);
+      }
+    }
+  }
+  st.lowWarned = st.health <= WARN.human;
+  st.standing = [{ age: st.age, cls: CLASSES.indexOf(st.cls) }];
+}
+
+// ช่วงเรียนตามอายุจริง: ถึงมัธยมปลายเสมอ (16–18) · 18 = เพิ่งจบ ออกด่านสอบ/ทางต่อปีนี้
+// 19–22 = เรียนมหาวิทยาลัยถ้าความรู้ถึงเกณฑ์ (ปีจบ = ออกการ์ดหางานปีนี้) · ไม่ถึง = เลิกเรียนแล้ว หางานทันที
+function startSchool(st, year) {
+  st.edu = TRACKS.lower.edu;
+  if (st.age <= TRACKS.upper.until) {
+    st.school = 'upper';
+    finishTrack(st, year);
+    return;
+  }
+  st.edu = TRACKS.upper.edu;
+  if (st.knowledge >= HEIR_UNI_KNOW) {
+    st.school = 'uni';
+    finishTrack(st, year);
+    return;
+  }
+  st.school = null;
+  st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
+}
+// เกณฑ์เดียวกับด่านสอบโรงเรียนดัง (career.mjs) — มหาวิทยาลัยรัฐเองไม่มีเกณฑ์ล็อก มีแต่โอกาสสอบติด
+const HEIR_UNI_KNOW = 55;
+
 // เดินหนึ่งปี: ทุกอย่างไหลเป็นรายปีในลูปนี้ที่เดียว การกระโดดหลายปีจึงได้ผลเท่ากับเดินทีละปีเสมอ
 function stepYear(st) {
   const prevStage = stageOf(st.age);
   lifeFocusYear(st);
+  natureLock(st);
   // ปีสุดท้ายที่ทำงานต้องวัดก่อนขึ้นอายุ — ขึ้นแล้ว isWorking เป็นเท็จ
   // คนที่ยังนั่งตำแหน่งเต็มเวลาหลังเกษียณวัดใหม่ทุกปีจนเลิกทำงาน — ปีที่ปกติถึงเกษียณได้ค่าเดิม
   if (isWorking(st) && st.age + 1 >= RETIRE_AGE) {
@@ -724,6 +882,11 @@ function stepYear(st) {
     // บำนาญข้าราชการ (B40): ค่าจ้างสุดท้าย × ปีรับราชการ ÷ div ไม่เกิน cap เท่าของค่าจ้างสุดท้าย
     const pen = st.content.era.careers.pension;
     st.pension = ladderOf(st)?.pension ? Math.min(pen.cap, (st.age + 1 - st.ladder.from) / pen.div) * jobWage(st, st.birthYear + st.age) * 12 / st.price : 0;
+  }
+  // ปีทำงานต่ออาชีพ — อาชีพหลักที่ชาติถัดไปจำได้ (past.mjs) · ช่องเกิดปีแรกที่ทำงาน
+  if (isWorking(st)) {
+    const w = (st.workYears ??= {});
+    w[st.occupation] = (w[st.occupation] ?? 0) + 1;
   }
 
   st.age += 1;
@@ -739,13 +902,14 @@ function stepYear(st) {
   flowChronic(st);
   ageParents(st, year);
   // คนในบ้านจากไปเองปีนี้ = การ์ดแจ้งทุกครั้ง ก่อนเหตุการณ์ของปี
-  for (const l of ageKin(st, year, yearlySaving(st))) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l, ...(careHelp(l.cause) && { help: careHelp(l.cause) }) });
-  for (const n of kinIllNews(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), ...n });
-  for (const m of petArrivals(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: petArriveText(m) });
+  // digest = ชนิดข่าวญาติ/สัตว์ (ui-redo ใบ 27) ให้จอรวมหลายใบติดกันเป็นใบเดียว · ป้ายคงที่ไม่ดึงเลขสุ่ม · ข่าวตัวเรา/เงิน/ตำแหน่งไม่ติด จึงคงใบเดี่ยว
+  for (const l of ageKin(st, year, yearlySaving(st))) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l, ...(careHelp(l.cause) && { help: careHelp(l.cause) }), digest: 'kin_loss', tag: 'loss' });
+  for (const n of kinIllNews(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), ...n, digest: 'kin_ill', tag: 'sick' });
+  for (const m of petArrivals(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: petArriveText(m), digest: 'pet', tag: 'pet' });
   if (st.terminal && !st.terminal.told) {
     st.terminal.told = true;
     st.terminal.toldAge = st.age;
-    st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: ILL_TEXT[st.terminal.cause], illness: { cause: st.terminal.cause, left: st.terminal.age - st.age } });
+    st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: ILL_TEXT[st.terminal.cause], illness: { cause: st.terminal.cause, left: st.terminal.age - st.age }, tag: 'sick' });
   }
   // ผลตอบแทนคิดกับเงินต้นปีก่อนเงินเก็บของปีนี้เข้า · ติดลบ = หนี้ ทบดอกเบี้ยเงินกู้ของปีนั้น
   const era = st.content.era;
@@ -764,6 +928,7 @@ function stepYear(st) {
   homePays(st);
   const stage = stageOf(st.age);
   if (st.legacy && st.age >= st.legacy.age) receiveLegacy(st, year, stage);
+  if (st.letter && !st.letter.read && !st.legacy && st.age >= st.letter.age) receiveLetter(st);
   st.trail.push({ year, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
 
@@ -783,18 +948,7 @@ function stepYear(st) {
     st.due.push({ kind: 'stage', age: st.age, stage, text: `เข้าสู่ช่วง${stage}`, recap: stageRecap(st, st.age - 1) });
     st.stageMark = markStage(st);
   }
-  // จบช่วงเรียน: ได้วุฒิ แล้วออกด่านเรียนต่อ หรือการ์ดหางานถ้าเป็นช่วงสุดท้าย
-  const track = st.school && TRACKS[st.school];
-  if (track && st.age === track.until) {
-    if (eduRank(track.edu) > eduRank(st.edu)) st.edu = track.edu;
-    if (track.exam) for (const ev of preludes(st, track.exam, year)) st.due.push({ kind: 'eraEvent', ev, age: st.age });
-    if (track.gate) st.due.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
-    else {
-      st.school = null;
-      if (track.ladder) applyEffects(st, { ladder: track.ladder });
-      else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
-    }
-  }
+  finishTrack(st, year);
   // สายยศ (B40): ปีในขั้นนับตามความสุข ถึงคิวแล้วการ์ดเลื่อนขั้น · ผู้ใหญ่บ้าน/กำนันพ้นตำแหน่งตอนเกษียณ · ครบวาระ/ถูกชวนลงสมัคร = การ์ดเลือกตั้ง
   // การ์ดงบ/ครบวาระของคนมีตำแหน่งการเมืองกินโควตากองสุ่มแบบเรื่องต่อ — เจอทุกวาระ ชีวิตจึงยาวขึ้นเฉพาะสายนี้ (หางด่าน 4)
   // ไม่หัก: การ์ดเลื่อนขั้น (ออกกับคนทำงานแทบทุกคน) · ใบชวนลงสมัครครั้งแรก (ออกกับทุกคนที่คอนเน็คชั่นถึง แม้ไม่ลง) — หักแล้วชีวิตสั้นลงทั้งกระดาน ไม่ใช่แค่หาง
@@ -807,7 +961,7 @@ function stepYear(st) {
     if (promoDue(st)) st.due.push({ kind: 'eraEvent', ev: promoCard(st), age: st.age });
   }
   if (st.office && !officeFull(st) && st.age >= RETIRE_AGE) {
-    st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeStep(st).name}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง` });
+    st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeStep(st).name}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง`, tag: 'retire' });
     st.office = null;
   }
   if (budgetDue(st)) officeDueCard(budgetCard(st));
@@ -816,14 +970,18 @@ function stepYear(st) {
   if (recruitDue(st)) st.due.push({ kind: 'eraEvent', ev: recruitCard(st), age: st.age });
   if (isWorking(st) && earlyDue(st)) st.due.push({ kind: 'eraEvent', ev: earlyCard(st), age: st.age });
   if (isAllocAge(st.age)) st.due.push(allocCard(st, year, stage));
-  // ทุกภาคเจอได้ เกิดซ้ำได้ (B14 ข้อ 13) · เว้นอย่างน้อย ERA_GAP ปีไม่ให้ถี่จนกลบเรื่องชีวิต — ปีที่เว้น เงินยังเสียตามปีต้นแบบ
-  const eras = eraEventsAt(st.content.era, st.seed, year);
+  // ทุกภาคเจอได้ · เว้นอย่างน้อย ERA_GAP ปีไม่ให้ถี่จนกลบเรื่องชีวิต — ปีที่เว้น เงินยังเสียตามปีต้นแบบ
+  // ปีต้นแบบวนได้ แต่เหตุจริงครั้งเดียวในประวัติศาสตร์ (B99a): กลุ่มเหตุเดิมออกครั้งเดียวต่อชีวิต ทั้งการ์ดเล่าและใบรับมือ · ปีที่ข้าม เงินยังเสียตามปีต้นแบบ
+  let eras = eraEventsAt(st.content.era, st.seed, year);
+  if (eras.length) {
+    const seen = erasSeen(st, st.age - 1);
+    eras = eras.filter((e) => !seen.has(e.id));
+  }
   if (eras.length && (st.lastEraAge === null || st.age - st.lastEraAge >= ERA_GAP)) {
     st.lastEraAge = st.age;
     for (const e of eras) {
       // เล่าเหตุการณ์บ้านเมืองก่อนเสมอ · มีการ์ดเนื้อหาผูกไว้ = ตามด้วยการ์ดให้เลือกรับมือ
       st.due.push({ kind: 'era', id: e.id, age: st.age, stage, eraKind: e.kind, text: e.name, story: eraStory(st, e) });
-      // ใบรับมือเดิมไม่ออกซ้ำในชีวิตเดียว — เหตุการณ์เกิดซ้ำได้ แต่ข้อความ/ผลเดิมทุกตัวอักษรอ่านเหมือนบั๊ก · ครั้งหลังเล่าแค่การ์ดบ้านเมือง
       const ev = st.content.events.find((c) => c.era === e.id && !st.done[c.id] && whenOk(st, c.when) && (c.when?.age || c.stage === stage));
       if (ev) {
         st.done[ev.id] = true;
@@ -831,7 +989,70 @@ function stepYear(st) {
       }
     }
   }
+  heraldNextYear(st, year);
 }
+
+// กลุ่มเหตุบ้านเมืองที่ออกแล้วถึงอายุ upTo — ไล่ย้อนจาก seed + ปีเกิดด้วยกติกาเดียวกับ stepYear แทนการเก็บคีย์ใหม่ใน st
+// lifehash hash state ทั้งก้อน: เก็บคีย์ = ทุกชีวิตที่เจอเหตุบ้านเมืองขยับ · ไล่ย้อน = ขยับเฉพาะชีวิตที่เคยเจอซ้ำ
+function erasSeen(st, upTo) {
+  return new Set(erasShown(st, upTo).map(({ e }) => e.id));
+}
+
+// เหตุบ้านเมืองที่ขึ้นการ์ดเล่าจริงถึงอายุ upTo พร้อมอายุที่ออก — ฉายาที่นับภัยต้องนับเฉพาะที่ผู้เล่นเห็น ไม่ใช่ทุกปีต้นแบบที่วนมา
+export function erasShown(st, upTo) {
+  const shown = [], seen = new Set();
+  let last = null;
+  for (let a = 1; a <= upTo; a++) {
+    const es = eraEventsAt(st.content.era, st.seed, st.birthYear + a).filter((e) => !seen.has(e.id));
+    if (!es.length || (last !== null && a - last < ERA_GAP)) continue;
+    last = a;
+    for (const e of es) {
+      seen.add(e.id);
+      shown.push({ e, age: a });
+    }
+  }
+  return shown;
+}
+
+// ลางภัยยุค (afterfall-1): ปีหน้ามีภัยที่จะได้ใบรับมือครั้งแรก = ใบ herald_of ออกปีนี้ให้เตรียมตัว
+// ปีภัยคำนวณจาก seed ได้ล่วงหน้า (protoYear) จึงไม่ดึงเลขสุ่ม · ERA_GAP ตัดปีไหนก็รู้ก่อนเหมือนกัน — ลางเกือบไม่หลอก นอกจากตายก่อน
+// ผู้ใหญ่: แทนการ์ดกองสุ่มหนึ่งใบแบบ first_of ชีวิตจึงไม่ยาวขึ้น · ลางเริ่มอายุ 18 (เด็ก/วัยรุ่นเตรียมอะไรเองไม่ได้ · ลางก่อน 18 ทำแบบชีวิตสั้นลูกนกหัดบินหาย จน full ตก)
+// ก่อน HERALD_QUOTA_FROM ไม่กินโควตา (ใบกองสุ่มวัยเด็กมีน้อย เบียดออกแล้วแบบชีวิตสั้นหายครึ่ง) — ตอนนี้เท่า HERALD_MIN_AGE ทุกลางจึงกินโควตา · แยกค่าไว้ถ้าลดอายุลางอีก
+function heraldNextYear(st, year) {
+  // ของที่เตรียมไว้ใช้ได้แค่ปีภัย — ไม่กดใช้ในใบรับมือก็หมดอายุ ธงไม่ค้างไปปลดอะไรตอนแก่
+  for (const f of Object.keys(st.flags)) {
+    if (f.startsWith(HERALD_FLAG) && st.age - st.flagAge[f] > 1) {
+      delete st.flags[f];
+      delete st.flagAge[f];
+    }
+  }
+  if (st.age < HERALD_MIN_AGE) return;
+  if (st.lastEraAge !== null && st.age + 1 - st.lastEraAge < ERA_GAP) return;
+  // เพดานต่อชีวิต: ภัยทุกชนิดได้ลาง = แฟนตาซีเกินเป้า 5–8 ใบ/ชีวิตทุกบอท · นับจาก st.done ไม่เพิ่มคีย์ใน st (lifehash hash ทั้งก้อน)
+  let left = HERALD_PER_LIFE - st.content.events.filter((c) => c.herald_of && st.done[c.id]).length;
+  if (left <= 0) return;
+  const next = eraEventsAt(st.content.era, st.seed, year + 1);
+  // กลุ่มเหตุที่เจอแล้วจะไม่ออกอีก ลางของมันจึงหลอก
+  const seen = next.length ? erasSeen(st, st.age) : null;
+  for (const e of next) {
+    if (seen.has(e.id)) continue;
+    const answers = st.content.events.filter((c) => c.era === e.id);
+    if (answers.some((c) => st.done[c.id])) continue;
+    // ช่วงอายุปีหน้าไม่มีใบรับมือ (วิกฤตเศรษฐกิจวัยรุ่นนอกโรงเรียน) = ลางไม่มีใบให้ใช้ของที่เตรียม · เงื่อนไขอื่นของปีหน้ายังเดาไม่ได้
+    const age = st.age + 1;
+    if (!answers.some((c) => (c.when?.age ? age >= c.when.age[0] && age <= c.when.age[1] : c.stage === stageOf(age)))) continue;
+    const h = st.content.events.find((c) => c.herald_of === e.id && !st.done[c.id] && inYears(c, year) && whenOk(st, c.when));
+    if (!h) continue;
+    st.done[h.id] = true;
+    st.due.push({ kind: 'eraEvent', ev: h, age: st.age });
+    if (st.age >= HERALD_QUOTA_FROM) takeYearQuota(st);
+    if (--left <= 0) return;
+  }
+}
+const HERALD_MIN_AGE = 18;
+const HERALD_PER_LIFE = 1;
+const HERALD_QUOTA_FROM = 18;
+const HERALD_FLAG = 'braced:';
 
 // การ์ดนำของด่านสอบ (B63): ไม่อยู่ในกองสุ่ม ออกในคิวก่อนด่านปีเดียวกัน — "พรุ่งนี้สอบ" จึงตามด้วยด่านจริงเสมอ
 // ทอย chance หลังผ่านเงื่อนไขแล้วเท่านั้น ชีวิตที่ไม่เข้าเงื่อนไขจึงไม่กิน rng ของโลก
@@ -933,7 +1154,7 @@ function checkBankrupt(st, year, stage) {
   st.flags.bankrupt = true;
   st.happiness = clamp(st.happiness - LEVELS[2]);
   st.relations = clamp(st.relations - LEVELS[1]);
-  st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: 'ศาลสั่งล้มละลาย ทรัพย์ที่มีถูกนำไปชำระเจ้าหนี้ หนี้ที่เหลือถูกล้าง เริ่มนับหนึ่งใหม่' });
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: 'ศาลสั่งล้มละลาย ทรัพย์ที่มีถูกนำไปชำระเจ้าหนี้ หนี้ที่เหลือถูกล้าง เริ่มนับหนึ่งใหม่', tag: 'bankrupt' });
 }
 
 // กู้ก้อนใหม่: เงินกู้เข้ากระเป๋าทั้งก้อน แล้วผ่อนคืนทุกปีใน stepYear · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
@@ -1160,11 +1381,14 @@ function lockReason(st, c, extra = 0) {
     const g = greyLaunderLock(st);
     if (g) return g;
   }
+  if (c.letter && !letterTo(st)) return LETTER.nobody;
   const q = c.requires;
   if (!q) return null;
   // อายุตามกฎหมายบอกเหตุผลของตัวเอง — reason ของเนื้อหาเขียนไว้ให้เงื่อนไขอื่น (เช่น "สั่งไว้แล้ว")
   if (q.age && st.age < (q.age.min ?? 0)) return `อายุยังไม่ถึง ${q.age.min} ปี`;
   if (q.age && st.age > (q.age.max ?? Infinity)) return `อายุเกิน ${q.age.max} ปี`;
+  // ตัวเลือกวัยโตของนิสัย (B41) — บอกนิสัยที่ขาดเป็นคำ ผู้เล่นจึงรู้ว่าวัยเด็กแบบไหนเปิดทางนี้
+  if (q.nature && st.nature !== q.nature) return `ต้องเป็นคน${st.content.focus?.natures?.[q.nature]?.name ?? ''}`;
   const why = [];
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
   const purse = (st.dead ? deadPurse(st) : st.money) + extra;
@@ -1229,10 +1453,19 @@ function payReluctance(st, c) {
 }
 
 // ดัชนีตัวเลือกที่กดได้ — บอทเลือกจากชุดนี้เท่านั้น · ไม่มีตัวล็อก = ทุกตัว (ลำดับสุ่มของบอทจึงเหมือนก่อนมีการล็อก)
-export const openChoices = (card) => card.choices.map((_, i) => i).filter((i) => !card.locked?.[i]);
+// manual = ปุ่มที่คนกดได้แต่บอทไม่กด (B76 เล่นต่อเป็นผู้สืบสายเลือด) — หน้าจอไม่อ่านชุดนี้ ปุ่มยังกดได้ · ไม่มีฟิลด์ = ชุดเท่าเดิม
+export const openChoices = (card) => card.choices.map((_, i) => i).filter((i) => !card.locked?.[i] && !card.manual?.[i]);
 
 // เดินปีละครั้งจนมีการ์ดถึงกำหนดหรือตาย คืนการ์ดใบถัดไป
+// ป้าย "เพราะคุณเป็นคน…" ติดการ์ดใบถัดไปหลังตัวเลือกที่ตัวคูณนิสัยมีผล — ไม่เพิ่มการ์ด ชีวิตจึงยาวเท่าเดิม (เจ้าของเคาะ)
 export function nextCard(st) {
+  const card = drawCard(st);
+  if (!st.because) return card;
+  const text = st.because;
+  delete st.because;
+  return { ...card, because: text };
+}
+function drawCard(st) {
   // ทริปศาล (B153) ช่องแยกจาก st.trip — st.trip ผูกก้อนต่างโลกทั้งก้อน
   if (st.court && !(st.court.afterQueue && st.queue.length)) {
     const card = courtCard(st);
@@ -1279,6 +1512,11 @@ export function nextCard(st) {
     }
     if (card.kind === 'warn') st.pending = { warn: true, choices: card.choices };
     if (card.kind === 'memory') st.pending = { memory: true, choices: card.choices };
+    // ปุ่มสร้างตอนการ์ดออก ไม่ใช่ตอนเข้าคิว — ขั้นที่เห็นต้องเป็นขั้นปัจจุบัน
+    if (card.kind === 'upgrade') {
+      Object.assign(card, { title: SKILL_UP.title, text: SKILL_UP.text, ...upgradeOffer(st.skills) });
+      st.pending = { upgrade: true, choices: card.choices };
+    }
     return emit(st, card);
   }
   for (;;) {
@@ -1410,6 +1648,8 @@ export const lifeFocusDefs = (st) => st.content.focus?.focuses ?? {};
 export const lifeFocusOffers = (st) => [FOCUS_FLOW, ...focusOffers(lifeFocusDefs(st), stageOf(st.age), lifeFocusOk(st), st)];
 export function setLifeFocus(st, id) {
   if (!lifeFocusOffers(st).includes(id)) throw new Error(`โฟกัสนี้เลือกตอนนี้ไม่ได้: ${id}`);
+  // ผู้เล่นเปลี่ยนเองแล้ว ปีทุ่มเทหลังจากนี้นับแต้มนิสัยเต็ม · กดตัวเดิมที่รับจากพ่อแม่ไม่ใช่การเปลี่ยน
+  if ((st.focus ?? FOCUS_FLOW) !== id) delete st.focusBorn;
   focusSet(st, id, st.age);
   delete st.focusHeir;
 }
@@ -1422,9 +1662,11 @@ function lifeFocusYear(st) {
     delete st.focusHeir;
   }
   if (!st.focus) return;
+  const full = st.focusAt < st.age;
   const id = focusYearEnd(st, c.focuses, stageOf(st.age), lifeFocusOk(st), st.age, c.chain_years);
   if (!id) return;
   const def = c.focuses[id];
+  if (full) naturePoint(st, def.nature, st.focusBorn ? c.heir_nature : 1);
   // ผลเงินเป็นเท่าของรายได้ จึงคิดเฉพาะปีที่มีรายได้ของตัวเอง · ค่าใช้จ่ายหรี่ด้วย spend_scale และหักได้ไม่เกินส่วนหนึ่งของเงินเก็บ (ไม่กู้มาทุ่ม)
   // เจ้าของเคาะ "ผลเงินชนด่าน finance = finance ชนะ": หักเต็มกินเงินเก็บไว้ใช้ยามเกษียณ ชีวิตที่ทุ่มยาวล้มละลายเกินกรอบ
   const { money, ...rest } = def.fx;
@@ -1454,7 +1696,7 @@ function lifeFocusRisk(st, id, r, i) {
   if (r.cause) (st.focusWarn ??= {})[key] = st.age;
   applyEffects(st, r.fx ?? {});
   for (const f of r.flags ?? []) raiseFlag(st, f);
-  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: r.cause ? r.warn : r.text, focusRisk: key });
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: r.cause ? r.warn : r.text, focusRisk: key, tag: r.cause ? 'sick' : fxTag(r.fx) });
 }
 
 // ทายาททางสายเลือด (โฟกัสใบ 03): เริ่มชาติด้วยตัวเด็กของหมวดโฟกัสหลักของพ่อแม่ (kid ในทะเบียน) · ไม่มีหมวด/ไม่มีตัวเด็ก = ตามน้ำ
@@ -1467,6 +1709,41 @@ function lifeFocusBorn(st, kid) {
   if (!kid || !lifeFocusDefs(st)[kid]) return;
   if (lifeFocusOffers(st).includes(kid)) focusSet(st, kid, -1);
   else st.focusHeir = kid;
+  st.focusBorn = true;
+}
+
+// นิสัยจากวัยเด็ก (B41): แต้มสะสมถึงอายุ nature_age แล้วล็อกตัวเดียวถาวร · เนื้อหาที่ไม่มีทะเบียนนิสัย = ไม่มีระบบนี้ ชีวิตเดินเหมือนเดิมทุกหลัก
+// ทายาทเริ่มชาติด้วยทุ่มเทตัวเด็กของพ่อแม่ — นับปีเต็มเท่าลูกที่เลือกเอง ทายาทแทบทุกคนจะได้นิสัยพ่อแม่ จึงนับแค่ heir_nature จนผู้เล่นเปลี่ยนเอง
+// ตัวที่ได้แต้มล่าสุดย้ายไปท้าย naturePts เสมอ แต้มเสมอกันจึงเลือกตัวท้าย (ตัวที่ได้แต้มล่าสุด)
+const NATURE_NONE = 'ยังไม่รู้ว่าตัวเองเป็นคนแบบไหน';
+function naturePoint(st, id, n) {
+  const c = st.content.focus;
+  if (!id || !n || !c?.natures?.[id] || st.age > c.nature_age) return;
+  const pts = (st.naturePts ??= {});
+  const v = (pts[id] ?? 0) + n;
+  delete pts[id];
+  pts[id] = v;
+}
+// ปิดปีอายุ nature_age: การ์ดบอกนิสัยออกก่อนการ์ดเข้าช่วงวัยถัดไป · ไม่มีแต้ม (ตามน้ำ ไม่กดป้าย) = ไม่มีนิสัยเด่น
+function natureLock(st) {
+  const c = st.content.focus;
+  if (!c?.natures || st.age !== c.nature_age) return;
+  const pts = st.naturePts ?? {};
+  let id = null;
+  for (const [k, v] of Object.entries(pts)) if (v > 0 && (!id || v >= pts[id])) id = k;
+  delete st.naturePts;
+  delete st.focusBorn;
+  if (id) st.nature = id;
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: id ? `คุณโตมาเป็นคน${c.natures[id].name}` : NATURE_NONE, nature: id, tag: 'nature' });
+}
+// ตัวคูณนิสัยของการ์ดใบนี้: ค่าตรงนิสัย (เงินนับเฉพาะการ์ดหมวดใน cards) + การ์ดขึ้นเงินเดือนเมื่ออาชีพตรงสาย · ไม่มีนิสัย = null คูณ 1 ทุกค่า
+function natureBoost(st, ev) {
+  const n = st.nature && st.content.focus?.natures?.[st.nature];
+  if (!n) return null;
+  const stat = n.stat && (n.stat !== 'money' || !n.cards || n.cards.includes(ev.category)) ? n.stat : null;
+  const job = !!n.jobs?.includes(st.occupation) && isWorking(st);
+  if (!stat && !job) return null;
+  return { stat, job, mul: st.content.focus.nature_mul, text: `เพราะคุณเป็นคน${n.name} ผลดีเมื่อกี้เลยมากขึ้นอีกนิด` };
 }
 // ประตูเข้าสาย (โฟกัสใบ 04 · เจ้าของเคาะ: ล็อกแค่ประตู): เปิดเมื่อโฟกัสนั้นสะสมครบ chain_years · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
 // · การ์ดชวน (ธง gate:<โฟกัส>) เปิดให้ได้โดยไม่ต้องโฟกัส เช่น นักธุรกิจถูกชวนลงการเมือง
@@ -1521,6 +1798,7 @@ export function poolMultiplier(st, m) {
   // ขอพร: เอียงตามบัญชีแบบต่อเนื่อง บุญน้อยเอียงน้อย บาปหนักกลับทิศ
   if (m.wish) x *= m.wish ** ledgerLevel(st.ledger);
   if (m.family_fame) x *= m.family_fame ** (st.fame ?? 0);
+  if (m.overlap_stage !== undefined) x *= m.overlap_stage ** overlapStageOf(st);
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
   for (const [f, v] of Object.entries(m.parent_flags ?? {})) if (st.parentFlags?.[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
@@ -1562,6 +1840,7 @@ export function whenOk(st, when) {
   if (when.class && !when.class.includes(classNow(st))) return false;
   if (when.region && !when.region.includes(st.region)) return false;
   if (when.sex && !when.sex.includes(st.sex)) return false;
+  if (when.overlap_stage && !inRange(overlapStageOf(st), when.overlap_stage)) return false;
   for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;
   // อาชีพนับเมื่อมีงานของตัวเองแล้ว — อาชีพครอบครัวก่อนทำงานไม่ทำให้การ์ดที่ทำงานออก
   if (when.occupation && !(st.workFrom !== null && when.occupation.includes(st.occupation))) return false;
@@ -1572,8 +1851,25 @@ export function whenOk(st, when) {
     if (MONEY_KEYS.some((k) => when[k] && !inBound(r[k], when[k]))) return false;
   }
   if (when.parent_flags && !parentFlagsOk(st, when.parent_flags)) return false;
+  if (when.dark_gate && !darkGateOk(st)) return false;
+  if (when.past_life && !pastLifeOk(st, when.past_life)) return false;
   return !when.flags || flagsOk(st, when.flags);
 }
+
+// ประตูทางมืด (B99a): ข้อเสนอผิดกฎหมายถึงคนที่ทั้งเงินตึงและเคยเลือกทางบาปเองชาตินี้ถึงเกณฑ์ — คนจนที่มือสะอาดไม่ถูกชวน
+// นับจากตัวเลือกที่กดจริงใน st.log ไม่อ่านบัญชีบุญบาปซ่อน · log เริ่มใหม่ทุกชาติ บาปชาติก่อนจึงไม่นับ
+export const DARK_GATE = { picks: 2 };
+export function sinPicks(st) {
+  const ix = lifeEventIndex(st.content.events);
+  let n = 0;
+  for (const l of st.log) {
+    const i = ix.pos.get(l.id);
+    const c = i === undefined ? null : st.content.events[i].choices?.[l.choice];
+    if (c?.merit?.some((t) => SIN_CATS.includes(meritId(t.cat)))) n++;
+  }
+  return n;
+}
+export const darkGateOk = (st) => moneyTight(st) && sinPicks(st) >= DARK_GATE.picks;
 
 // ธงจากเนื้อหา (ตัวเลือก · ผลลัพธ์ · การ์ดที่แกนสร้าง · เสี่ยงของโฟกัส) ติดผ่านจุดนี้จุดเดียว — ผลที่ต้องเกิดตอนธงติดจึงดักได้ที่เดียว
 // ธงจากบัญชีบุญบาป (recordMerit) ไม่ผ่านที่นี่: ไม่จดอายุที่ได้มาตั้งแต่เดิม
@@ -1641,7 +1937,7 @@ export function choose(st, idx, loan) {
     if (!c) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
     st.log.push({ id: GONE_SEARCH.id, age: st.age, choice: idx, text: c.text });
-    st.queue.push({ kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: c.reply });
+    st.queue.push({ kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: c.reply, tag: 'search' });
     return;
   }
   if (ev?.warn) {
@@ -1657,6 +1953,16 @@ export function choose(st, idx, loan) {
     st.lastImage = ev.choices[idx];
     return;
   }
+  // ปุ่มสุดท้าย = ผ่าน · ไม่ดึงเลขสุ่ม
+  if (ev?.upgrade) {
+    const s = st.skills[idx];
+    if (!s && idx !== st.skills.length) throw new Error('ตัวเลือกไม่ถูกต้อง');
+    if (s && s.lv >= SKILL.top) throw new Error('ตัวเลือกนี้ล็อกอยู่');
+    st.pending = null;
+    if (s) st.skills = st.skills.map((x) => (x === s ? { ...x, lv: skillUp(x.lv, x.cap) } : x));
+    st.log.push({ id: 'upgrade', age: st.age, choice: idx, text: ev.choices[idx] });
+    return;
+  }
   if (ev?.entry) {
     if (!ev.choices[idx]) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
@@ -1665,6 +1971,7 @@ export function choose(st, idx, loan) {
     const n = st.trips?.length ?? 0;
     const trip = idx === ENTRY.accept && tripRoll(st.seed, ev.entry, n);
     if (trip) {
+      if (overlapLeftIsekai(st)) overlapStep(st);
       st.log.push({ id: `isekai_${ev.entry}`, age: st.age, choice: idx, text: ev.choices[idx].text });
       st.trip = startIsekai({
         seed: (st.seed ^ TRIP.salt ^ Math.imul(n + 1, 0x9e3779b1)) >>> 0, past: st.name, ledger: st.ledger,
@@ -1674,6 +1981,8 @@ export function choose(st, idx, loan) {
         // ค่าจริงของชีวิตนี้ตอนข้าม (B136) — ผลในต่างโลกสะท้อนกลับชุดนี้ แล้ว tripBack เขียนลง st
         real: realAt(st),
         hints: st.content.nearHints,
+        carry: st.skills ?? [],
+        overlapStage: overlapStageOf(st),
       });
       return;
     }
@@ -1703,8 +2012,13 @@ export function choose(st, idx, loan) {
   const pool = ev.weight && ev.age === undefined && !ev.era;
   const s = pool ? poolEffectScale(stageOf(st.age)) : 1;
   const ss = pool ? poolStatScale(stageOf(st.age)) : 1;
-  applyEffects(st, c.effects, s, ss);
+  // ใบในรอบเดียวกัน (ev.run) ที่สุขภาพหมดอยู่ก่อนกด = โรคที่ถึงคิวกลางรอบ ไม่ใช่ผลของใบนี้ — จำไว้ก่อนผลของตัวเลือกลง
+  const ill = ev.run !== undefined && st.health <= 0;
+  const nat = natureBoost(st, ev);
+  let because = applyEffects(st, c.effects, s, ss, 1, nat);
+  const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
+  naturePoint(st, c.nature, 1);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
   st.log.push({ id: ev.id, age: st.age, choice: idx, text, ...(loan !== undefined && { loan }) });
@@ -1713,13 +2027,22 @@ export function choose(st, idx, loan) {
   // การ์ดที่ตัวเลือกนี้ก่อ (ผล → เรื่องต่อ → หางาน) เข้าหัวคิวตามลำดับ ก่อนการ์ดอื่นของปีที่รออยู่
   // สายมูก่อการ์ดของตัวเองได้ (ผลหวยสายมู) — มาก่อนผลสุ่มของตัวเลือก
   const after = beliefChoice(st, ev, c);
+  // ตัวเลือกตรงไม่มีการ์ดผล — ของที่ได้เล่าเป็นการ์ดผลใบเดียว (lint ห้าม loot บนตัวเลือกที่มี outcomes)
+  if (gotC) after.unshift({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: gotC, tag: 'loot', evId: ev.id });
+  let doom, wound;
+  let o = null;
   if (c.outcomes?.length) {
-    const o = weighted(st.rng, c.outcomes, outcomeWeights(st, ev, c));
-    const helper = !o.ok && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
-    applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1);
+    o = weighted(st.rng, c.outcomes, outcomeWeights(st, ev, c));
+    doom = o.effects?.die;
+    // ตัวเลือกที่มีทางตาย (ห้องบอส): ชีวิตหมดจากบาดแผลทางอื่นของตัวเลือกเดียวกันก็ตายในดันเจียน ไม่ใช่ด้วยโรค
+    wound = c.outcomes.find((x) => x.effects?.die)?.effects.die;
+    // ตายในการ์ด ญาติประคองไม่ได้ — ป้าย "หนักแค่ครึ่งเดียว" จะขัดกับมรณบัตรใบถัดไป
+    const helper = !o.ok && !doom && hurts(st, o.effects) ? (kinAid(st) ?? netAid(st, ev, o)) : null;
+    because = applyEffects(st, o.effects, s, ss, helper ? KIN_AID.scale : 1, nat) || because;
+    const gotO = o.effects?.loot && gainLoot(st, o.effects.loot);
     applyChoice(st, ev, o, text);
     if (c.filial) filialNote(st, c.filial, filialScore(o.merit), true);
-    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') });
+    if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') + (gotO ? ` · ${gotO}` : ''), tag: fxTag(o.effects, [...(ev.hidden ?? []), ...(c.hidden ?? [])]), evId: ev.id });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
     if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow)) {
@@ -1730,6 +2053,14 @@ export function choose(st, idx, loan) {
       after.push({ kind: 'eraEvent', ev: follow, age: st.age });
     }
   }
+  if (because) st.because = nat.text;
+  // จดหมายคำฝาก: เลือกคำฝากใบย่อยก่อน แล้วคำสั่งเสียกลับมาตามปกติ
+  const pick = c.letter && st.content.events.find((e) => e.id === LETTER.pick);
+  if (pick) {
+    st.done[pick.id] = true;
+    st.fired[pick.id] = { n: 1, age: st.age };
+    after.push({ kind: 'eraEvent', ev: pick, age: st.age });
+  }
   // คำสั่งเสียเลือกได้หลายข้อ: สั่งเรื่องหนึ่งแล้วการ์ดกลับมาให้สั่งต่อ ข้อที่สั่งแล้วล็อกด้วยธงของมันเอง
   if (ev.id === FUNERAL.wishes && (c.sets_flags ?? []).some((f) => f.startsWith('wish_'))) after.push({ kind: 'eraEvent', ev, age: st.age });
   // เลิกเรียนแล้วหางานทันที
@@ -1739,8 +2070,11 @@ export function choose(st, idx, loan) {
   }
   // ชีวิตหมดจากผลการ์ด = ตายในการ์ดนั้น (B160) ไม่รอขอบปี · การ์ดผลยังเล่าก่อน · เรื่องต่อ หางาน และการ์ดที่รอในปีนั้นไม่ออกแล้ว
   // การ์ดงานศพเลือกหลังตายแล้ว ⇒ ไม่ตัดสินซ้ำ
-  if (!st.dead && !st.court && st.health <= 0) {
-    const d = faceDeath(st, healthCause(st), { afterQueue: true });
+  // ผลที่สั่งตาย (ดันเจียนของนักล่า) เดินทางเดียวกัน แต่สาเหตุมาจากการ์ด ไม่ใช่โรคตามสุขภาพ
+  // โรคที่ถึงคิวกลางรอบรอให้รอบจบก่อน (ตัดกลางรอบ = ผู้เล่นไม่รู้ว่าออกจากเกตหรือไม่) แล้วตายด้วยโรคที่ใบสุดท้าย — บาดแผลของห้องบอสไม่ใช่เหตุ
+  const runOn = ill && !doom && after.some((x) => x.kind === 'eraEvent' && x.ev.run === ev.run);
+  if (!st.dead && !st.court && !runOn && (doom || st.health <= 0)) {
+    const d = faceDeath(st, doom ?? (ill ? undefined : wound) ?? healthCause(st), { afterQueue: true });
     st.queue = after.filter((x) => x.kind === 'result');
     st.due = [];
     if (d.fate === 'dead') queueFuneral(st);
@@ -1751,6 +2085,11 @@ export function choose(st, idx, loan) {
       st.advance = false;
     }
     return;
+  }
+  // ผลที่ให้อัปเกรด (06s) → การ์ดอัปเกรดต่อจากการ์ดผล ก่อนเรื่องต่อ · ไม่ได้พกสกิลมา = ไม่มีการ์ด
+  if (st.skills?.length && (c.upgrade || o?.upgrade)) {
+    const at = after.findIndex((x) => x.kind !== 'result');
+    after.splice(at < 0 ? after.length : at, 0, { kind: 'upgrade', age: st.age, stage: stageOf(st.age) });
   }
   // เตือนต่อท้ายการ์ดผลของตัวเลือกนี้ ก่อนเรื่องต่อ — เรื่องต่อที่ทำชีวิตหมดล้างคิว การ์ดเตือนที่อยู่หลังจะไม่เคยออก
   if (!st.dead && crossedLow(st, st.health, WARN.human)) {
@@ -1807,6 +2146,7 @@ function deathCard(st) {
   }
   // มีทรัพย์ให้แบ่ง + ลูกที่ยังอยู่ถึงเกณฑ์ = เรื่องพินัยกรรม (afterlife.mjs หักส่วนที่เสียไปกับการทะเลาะ) · ลูกคนเดียวไม่มีใครให้ทะเลาะด้วย
   if (card.summary.money > 0 && !card.short && disputes(st)) card.will = !!st.flags.wish_will;
+  if (st.flags.wish_letter && letterTo(st)) card.letter = `ฝากจดหมายไว้กับ${letterToText(letterTo(st))}`;
   return card;
 }
 
@@ -1823,6 +2163,8 @@ export const FUNERAL = {
   // ลูกที่ยังอยู่ตั้งแต่เท่านี้ถึงมีการแบ่งมรดกกันเอง (เจ้าของเคาะ A9)
   disputeKids: 2,
 };
+// จดหมายคำฝาก (afterfall-3): ใบเลือกคำฝากตามหลังคำสั่งเสีย · ใบที่ทายาทอ่านขึ้นต้นด้วย read (ใบละชนิดคำฝาก)
+export const LETTER = { pick: 'funeral_letter_01', read: 'heir_letter_', nobody: 'ไม่มีใครให้ฝาก' };
 const guestBase = (st) => 20 + st.relations * 2 + st.network * 3;
 // แขกมาส่งตามความสัมพันธ์/คอนเน็คชั่น คูณขนาดงาน — ปัดสิบ ไม่ใช่ยอดนับจริง · ไม่มีงานศพ = 0
 export const funeralGuests = (st) => (st.funeral ? Math.round(((FUNERAL.guests[st.funeral.id] ?? 1) * guestBase(st)) / 10) * 10 : 0);
@@ -1855,22 +2197,60 @@ export function tripSettle(st, isk) {
   if (isk.home) for (const k of STAT_KEYS) st[k] = clamp(isk.real.stats[k]);
 }
 
+// ค่าซ้อนทับ (โลกซ้อนทับ): ตัวนับเดียวของตระกูล ขึ้นทีละ 1 ทุกครั้งที่กลับเข้าโลกที่เคยออกไป ไม่มีทางลด · ไปกับทายาทเหมือนบัญชีบุญบาป
+// ไม่ดึงเลขสุ่ม — ชีวิตที่ไม่ข้ามโลกเดินเท่าเดิม · เริ่มตระกูลใหม่ (newLife ไม่มี heir) = 0
+export const overlapOf = (st) => st?.overlap ?? 0;
+export function overlapStep(st) {
+  st.overlap = overlapOf(st) + 1;
+}
+// ขั้นของค่าซ้อนทับ 0–4: การ์ดอ่านแค่ขั้น ไม่อ่านค่าดิบ · ขั้น 1 = ค่า 1 ล็อก · ขั้น 2–4 ไปไม่ถึงจนใบ 16 วัดบอทอัตราจริงแล้วใส่เลข
+export const OVERLAP_STAGE_MIN = [0, 1, Infinity, Infinity, Infinity];
+// อ่านค่าสดทุกครั้ง — ขึ้นขั้นกลางชีวิต (ทริปกลับบ้าน) การ์ดขั้นใหม่ออกได้ปีถัดไปเลย
+export const overlapStageOf = (st) => OVERLAP_STAGE_MIN.findLastIndex((min) => overlapOf(st) >= min);
+// ตระกูลเคยออกจากต่างโลกมาแล้ว = มีชาติต่างโลกลงผัง (กลับมาเกิดแล้ว) หรือทริปที่กลับถึงบ้าน · ทริปหลงตายในต่างโลก ไม่นับว่าออก
+// เข้าต่างโลกอีกเมื่อจริง = กลับเข้าโลกที่เคยออกไป +1 (เกิด · ถูกเรียก · ทริป)
+export const overlapLeftIsekai = (st) => [...(st.lineage ?? []), { trips: st.trips }].some((l) => l.isekai || l.trips?.some((t) => t.home));
+
+// ตารางนัดการ์ดซ้อนทับต่อชีวิต: ลอกแบบตารางนัดการ์ดชวนต่างโลก — สุ่มจาก stream แยกของ seed ไม่ดึง st.rng
+// ขั้น 0 ไม่มีตารางและไม่เพิ่มช่องใด ⇒ ตระกูลค่า 0 เดินเท่าเดิมทุกหลัก · การ์ดซ้อนทับไม่อยู่ในกองสุ่ม ออกทางนัดนี้ทางเดียว
+// นัดลง st.scheduled จึงกินโควตาปีแบบผลย้อน (ชีวิตไม่ยาวขึ้น) · ขั้น 1 อย่างน้อย 1 ใบ ให้คนที่ข้ามโลกครั้งแรกเห็นผลแน่นอน
+// ขั้นขึ้นกลางชีวิตได้ทางเดียวคือทริปกลับบ้าน ⇒ ทิ้งนัดที่ยังไม่ออกแล้วสุ่มใหม่ด้วย stream ของรอบนั้น หลังเดินปีที่หายไปแล้ว
+export const OVERLAP_PLAN = { salt: 0x3c6ef372, prefix: 'overlap_', ages: [15, 60], quota: [[0, 0], [1, 1], [1, 2], [2, 4], [2, 4]] };
+// stage ส่งเองได้เฉพาะด่าน — ขั้น 2–4 ยังไม่มีเลขเกณฑ์ให้ตระกูลจริงไปถึง
+export function overlapPlan(st, run = 0, stage = overlapStageOf(st)) {
+  if (!stage) return;
+  st.scheduled = st.scheduled.filter((x) => !x.overlap);
+  const rng = makeRng(mixSeed(st.seed ^ OVERLAP_PLAN.salt, run));
+  const [lo, hi] = OVERLAP_PLAN.quota[stage];
+  const from = Math.max(st.age + 1, OVERLAP_PLAN.ages[0]);
+  const pool = st.content.events.filter((e) => e.id.startsWith(OVERLAP_PLAN.prefix) && !st.done[e.id] && inRange(stage, e.when?.overlap_stage));
+  for (let left = rng.int(lo, hi); left > 0 && pool.length && from <= OVERLAP_PLAN.ages[1]; left--) {
+    const [ev] = pool.splice(rng.int(0, pool.length - 1), 1);
+    st.scheduled.push({ event: ev.id, age: rng.int(from, OVERLAP_PLAN.ages[1]), overlap: true });
+  }
+}
+
 // ปีที่หายไปเดินด้วย stepYear ปกติ (เงิน คนในบ้าน ด่านเรียน) แต่ไม่ทอยตายและไม่จับกอง — ตัวไม่อยู่ เรื่องของปีนั้นจึงมาเป็นข่าวหลังกลับ
 function tripBack(st) {
   const isk = st.trip;
   st.trip = null;
   (st.trips ??= []).push(tripLineage(isk));
   tripSettle(st, isk);
+  // ตายในทริปก็เขียนกลับ — ชาติต่างโลกหลังปรโลกพกชุดนี้ต่อ
+  if (st.skills) st.skills = skillsBack(st.skills, isk);
   if (!isk.home) {
     st.tripLost = true;
     st.dead = true;
     return nextCard(st);
   }
+  // กลับถึงบ้าน = กลับเข้าโลกที่เคยออกไป · ทริปหลงไม่ได้กลับ จึงไม่นับ
+  overlapStep(st);
   const away = isk.age - isk.trip.from;
   const c = tripCarry(isk);
   st.network = clamp(st.network + c.network);
   st.knowledge = clamp(st.knowledge + c.knowledge);
   for (let i = 0; i < isk.trip.thai; i++) stepYear(st);
+  overlapPlan(st, st.trips.length);
   // ใบตัดสินใจที่ถึงกำหนดทุกปี (เลื่อนขั้น ทบทวนเงิน ช่วงวัย) ซ้อนกันหลายใบ — เก็บใบล่าสุดของแต่ละเรื่อง ใบเก่าสร้างจากสถานะที่ไม่ใช่แล้ว
   const key = (c) => (c.kind === 'eraEvent' ? `e:${c.ev.id}` : ['alloc', 'stage', 'omen'].includes(c.kind) ? c.kind : null);
   st.due = st.due.filter((c, i) => !key(c) || !st.due.slice(i + 1).some((d) => key(d) === key(c))).map((c) => ({ ...c, age: st.age }));
@@ -1879,7 +2259,7 @@ function tripBack(st) {
   st.away = (st.away ?? 0) + away - isk.trip.thai;
   st.advance = false;
   const when = isk.trip.thai ? `ผ่านไป ${isk.trip.thai} ปี` : 'ผ่านไปแค่ไม่กี่เดือน';
-  return emit(st, { kind: 'result', type: 'B', trip: true, age: st.age, stage: stageOf(st.age), text: `ลืมตาอีกทีก็ยืนอยู่หน้าบ้านหลังเดิม ในต่างโลกคุณอยู่มา ${away} ปี แต่ที่นี่${when} คนที่บ้านนึกว่าคุณหายตัวไป` });
+  return emit(st, { kind: 'result', type: 'B', trip: true, tag: 'trip', age: st.age, stage: stageOf(st.age), text: `ลืมตาอีกทีก็ยืนอยู่หน้าบ้านหลังเดิม ในต่างโลกคุณอยู่มา ${away} ปี แต่ที่นี่${when} คนที่บ้านนึกว่าคุณหายตัวไป` });
 }
 
 function queueFuneral(st) {

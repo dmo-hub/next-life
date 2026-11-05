@@ -1,6 +1,6 @@
 // กติกาฉากช่วงที่ 7 (B06): ฉากระหว่างชาติอ่านโดย afterlife.mjs ไม่ใช่ลูปชีวิต — ฟิลด์ที่ลูปชีวิตใช้จึงไม่มีผลที่นี่
 import { AFTERLIFE_STAGE, STAT_KEYS } from './vocab.mjs';
-import { SCENES, REALM_SCENES, REALMS } from '../../engine/afterlife.mjs';
+import { SCENES, REALM_SCENES, REALMS, LOOP_KEYS } from '../../engine/afterlife.mjs';
 import { COURT_SCENES, NEAR_DEATH } from '../../engine/court.mjs';
 import { meritId } from '../../engine/merit.mjs';
 import { isObj, list, choicesOf, effectSites } from './util.mjs';
@@ -31,6 +31,11 @@ export const rules = [
         for (const k of DEAD_NODE_KEYS) if (node[k] !== undefined) r(`${path}.${k}`, `ฉากระหว่างชาติไม่มี ${k}`);
         const fx = isObj(node.effects) ? Object.keys(node.effects) : [];
         for (const k of fx) if (!STAT_KEYS.includes(k)) r(`${path}.effects.${k}`, `ผลในระหว่างชาติมีแค่ค่าสถานะ (${STAT_KEYS.join(' ')}) = ค่าเริ่มชาติหน้า`);
+        // การ์ดวงปรโลก: ผลลงค่าวง 4 ค่า (แกนไม่อ่านคีย์อื่น) · แกนไม่ลงบัญชีในวง — ป้ายที่ไม่ใช่ neutral จะหายเงียบ
+        if (e.scene === 'loop') {
+          for (const k of fx) if (STAT_KEYS.includes(k) && !LOOP_KEYS.includes(k)) r(`${path}.effects.${k}`, `ผลในวงปรโลกมีแค่ ${LOOP_KEYS.join(' ')}`);
+          if (list(node.merit).some((t) => !isObj(t) || meritId(t.cat) !== 'neutral')) r(`${path}.merit`, 'การ์ดวงปรโลกไม่ลงบัญชี — ป้ายต้องเป็น neutral');
+        }
       }
     },
   },

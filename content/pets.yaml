@@ -25,6 +25,7 @@ events:
         effects: {}
         merit: [{cat: neutral}]
       - id: ask_neighbor
+        nature: social
         text: "ไปถามข้างบ้านว่าของใคร"
         effects: {relations: 1}
         merit: [{cat: help_others, level: 1}]

@@ -27,11 +27,17 @@ function familyText(st) {
   const [mom, dad] = [st.parents.find((p) => p.sex === 'หญิง'), st.parents.find((p) => p.sex === 'ชาย')];
   // ชื่ออาชีพที่มีคำว่าอาชีพในตัว ("วิชาชีพ") ต่อกับ "ทำอาชีพ" แล้วซ้ำคำ
   const occ = st.occupationName.includes('ชีพ') ? `ทำงาน${st.occupationName}` : `ทำอาชีพ${st.occupationName}`;
-  return `ครอบครัวฐานะ${st.cls} แม่อายุ ${mom.age} พ่ออายุ ${dad.age} ทางบ้าน${occ}`;
+  // เริ่มกลางวัย (B76): พ่อ/แม่ที่ตายไปแล้วเก็บอายุตอนตาย ไม่ใช่อายุวันนี้ · รุ่นก่อน (ancestor) ตายปีที่เริ่ม
+  // แต่ยัง alive ตอนการ์ดนี้เกิด (ตายตอนรับมรดกหลังการ์ด) จึงดูจากอายุตายแทน
+  const gone = (p) => !p.alive || (p.ancestor && p.age >= p.diesAt);
+  const say = (p, w) => (st.age > 0 && gone(p) ? `${w}จากไปแล้ว` : `${w}อายุ ${p.age}`);
+  return `ครอบครัวฐานะ${st.cls} ${say(mom, 'แม่')} ${say(dad, 'พ่อ')} ทางบ้าน${occ}`;
 }
 
 // อัตราตายทารกอ่านปีต้นแบบเดียวกับบันทึกตายตอนเด็ก — โลกของชีวิตนี้ยืมสถิติปีนั้นทั้งชุด
 function eraText(st) {
+  // เริ่มกลางวัย (B76) พ้นขวบปีแรกมาแล้ว — อัตราตายทารกไม่ใช่เรื่องของคนนี้ เหลือแค่บรรยากาศรุ่นที่เกิด
+  if (st.age > 0) return cohortText(st.content.era, st.birthYear);
   const imr = infantMortality(st.content.era, st.sex, protoYear(st.content.era, st.seed, st.birthYear));
   return `${cohortText(st.content.era, st.birthYear)} · ยุคนั้นทารก${st.sex}ไทยราว ${Math.round(imr)} คนในทุก 1,000 คน ไม่รอดถึงขวบปีแรก`;
 }
@@ -63,12 +69,15 @@ function inheritText(st, heir) {
   const ancestor = st.parents.find((p) => p.ancestor);
   // เซฟก่อน B18 ไม่มี legacy.from — ทางเป็นลูกชั้นเดียวยังมีพ่อ/แม่ที่เป็นชาติก่อนให้เรียก
   const who = heir.legacy?.from ?? (ancestor ? parentWord(ancestor) : null);
-  if (prev.path === 'child' && who) out.push(`ชาติก่อนเฝ้าลูกหลานไว้ แล้วกลับมาเกิดเป็น${kinTier(prev.tier).name}ของตัวเอง — ${who}ของคุณคือคุณในชาติก่อน`);
+  if (prev.path === 'blood' && who) out.push(`รุ่นก่อนจากไปแล้ว คุณเล่นต่อเป็น${kinTier(prev.tier).name}ที่ยังอยู่ — ${who}ของคุณคือคุณในรุ่นก่อน`);
+  else if (prev.path === 'child' && who) out.push(`ชาติก่อนเฝ้าลูกหลานไว้ แล้วกลับมาเกิดเป็น${kinTier(prev.tier).name}ของตัวเอง — ${who}ของคุณคือคุณในชาติก่อน`);
   else if (away.length) out.push(`ชาติก่อนตามเทพธิดาไปต่างโลก ${away.length} ชาติ (ล่าสุด: ${away.at(-1).name} · ${away.at(-1).ending}) แล้วกลับมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม`);
   else out.push('ชาติก่อนไปตามกรรม แล้วมาเกิดใหม่ในบ้านที่ไม่เกี่ยวกับตระกูลเดิม');
   out.push(`กรรมที่ติดตัวมาจากชาติก่อน${carryAmount(heir)}`);
   const d = CLASSES.indexOf(st.cls) - CLASSES.indexOf(prev.cls);
-  out.push(d ? `ฐานะ ${d > 0 ? '↑' : '↓'} — เกิดในบ้านที่ฐานะ${d > 0 ? 'ดีกว่า' : 'ด้อยกว่า'}ชาติก่อน (ชาติก่อนฐานะ${prev.cls})` : `ฐานะ — ใกล้เคียงชาติก่อน (ฐานะ${prev.cls})`);
+  // ทางสายเลือดอยู่บ้านเดิม ไม่ได้เกิดใหม่ — บอกฐานะบ้านตอนนี้เทียบฐานะที่รุ่นก่อนเกิดมา
+  if (prev.path === 'blood') out.push(`ฐานะ${d ? ` ${d > 0 ? '↑' : '↓'}` : ''} — ฐานะบ้านตอนนี้${st.cls} (รุ่นก่อนเกิดมาฐานะ${prev.cls})`);
+  else out.push(d ? `ฐานะ ${d > 0 ? '↑' : '↓'} — เกิดในบ้านที่ฐานะ${d > 0 ? 'ดีกว่า' : 'ด้อยกว่า'}ชาติก่อน (ชาติก่อนฐานะ${prev.cls})` : `ฐานะ — ใกล้เคียงชาติก่อน (ฐานะ${prev.cls})`);
   if (who && heir.legacy) {
     out.push(legacyText(heir.legacy, who));
     for (const k of ['relations', 'network']) {
@@ -91,10 +100,13 @@ function lineageBrief(lineage) {
 export function introCard(st, heir) {
   return {
     kind: 'intro',
-    age: 0,
-    stage: stageOf(0),
+    age: st.age,
+    stage: stageOf(st.age),
     gen: st.gen,
-    text: `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${provinceLabel(st)} ได้ชื่อจริงว่า “${st.realName}” ชื่อเล่นว่า “${st.name}”`,
+    // ผู้สืบสายเลือด (B76) เริ่มกลางวัย — ไม่ได้เกิดใหม่ เล่าเป็นการรับช่วงชีวิตคนที่โตแล้ว
+    text: st.age > 0
+      ? `คุณเล่นต่อเป็น “${st.name}” วัย ${st.age} ปี ที่${provinceLabel(st)} ชื่อจริงว่า “${st.realName}”`
+      : `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${provinceLabel(st)} ได้ชื่อจริงว่า “${st.realName}” ชื่อเล่นว่า “${st.name}”`,
     story: [familyText(st), eraText(st)],
     // heir ที่ไม่มีรุ่นก่อน (harness สร้างทับค่าเกิดเฉย ๆ) ไม่มีอะไรให้สืบทอด
     inherit: heir && st.lineage.length ? inheritText(st, heir) : [],

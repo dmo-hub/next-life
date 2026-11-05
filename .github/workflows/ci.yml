@@ -1,0 +1,26 @@
+name: quick gates
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:test
+      - run: npm run harness:test
+      - run: npm run site:check
+      - run: npm run check:data
+      # docs/*.html in the PR must match what build.mjs produces
+      - run: node build.mjs
+      - run: git diff --ignore-cr-at-eol --exit-code -- docs

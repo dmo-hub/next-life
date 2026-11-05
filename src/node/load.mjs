@@ -8,11 +8,13 @@ import { lintDocs, formatProblem } from './lint/index.mjs';
 import { MERIT_CATS } from './lint/vocab.mjs';
 import { checkMeritTable } from '../engine/merit.mjs';
 import { DEBTS } from '../engine/finance.mjs';
-import { PLACEHOLDERS, MAX_LEN } from './lint/vocab.mjs';
+import { PLACEHOLDERS, MAX_LEN, ID_RE } from './lint/vocab.mjs';
+import { isObj, isMoney } from './lint/util.mjs';
 import { NEAR_HINT_LEVELS } from '../engine/court.mjs';
 import { checkFocus } from './lint/focus.mjs';
 import { lintIsekai, formatIsekaiProblem } from './lint/isekai.mjs';
-import { useIsekaiCards } from '../engine/isekai.mjs';
+import { useIsekaiCards, ISEKAI_SKILLS } from '../engine/isekai.mjs';
+import { TITLES, ALL_PATTERNS, FAMILY_GOALS } from '../engine/titles.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -430,9 +432,39 @@ export function loadNearHints(p = 'content/rules/near-hints.yaml') {
 function loadFocus() {
   const doc = parse(read('content/rules/focus.yaml'));
   const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
-  const bad = checkFocus(doc, { causes, flags: Object.keys(parse(read('content/rules/flags.yaml')).flags) });
+  const jobs = JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id);
+  const bad = checkFocus(doc, { causes, jobs, flags: Object.keys(parse(read('content/rules/flags.yaml')).flags) });
   if (bad.length) throw new Error(`content/rules/focus.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
-  return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, focuses: doc.focuses };
+  return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, focuses: doc.focuses, ...(doc.natures && { natures: doc.natures, nature_age: doc.nature_age, heir_nature: doc.heir_nature, nature_mul: doc.nature_mul }) };
+}
+
+// สกิลตอนจบชีวิตไทย (06s): id แหล่งหรือ id สกิลพิมพ์ผิด = สกิลไม่เคยออกเงียบ ๆ จึงหยุด build
+// lifeGoal ยังไม่มีระบบให้เทียบ id — ตรวจแค่สกิล
+export function loadSkillMap(p = 'content/rules/skill-map.yaml', focus = loadFocus()) {
+  const doc = parse(read(p)) ?? {};
+  const known = {
+    job: json('data/finance.json').occupations.list.map((o) => o.id),
+    title: TITLES.map((t) => t.id),
+    pattern: ALL_PATTERNS.map((x) => x.id),
+    cause: Object.keys(json('data/death-causes.json').groups),
+    goal: FAMILY_GOALS.map((g) => g.id),
+    focus: Object.keys(focus.focuses),
+    lifeGoal: null,
+  };
+  const bad = Object.keys(doc).filter((k) => !(k in known)).map((k) => `คีย์ ${k} ไม่มีในแกน (${Object.keys(known).join(' ')})`);
+  const map = {};
+  for (const [key, ids] of Object.entries(known)) {
+    const m = doc[key] ?? {};
+    if (typeof m !== 'object' || Array.isArray(m)) { bad.push(`${key} ต้องเป็น { id: [สกิล] }`); continue; }
+    for (const [id, skills] of Object.entries(m)) {
+      if (ids && !ids.includes(id)) bad.push(`${key}.${id} ไม่มีในแหล่งของคีย์นี้`);
+      if (!Array.isArray(skills) || !skills.length) bad.push(`${key}.${id} ต้องเป็นรายการสกิลอย่างน้อย 1`);
+      else for (const s of skills) if (!ISEKAI_SKILLS[s]) bad.push(`${key}.${id} ชี้สกิล ${s} ที่ไม่มี`);
+    }
+    map[key] = m;
+  }
+  if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return map;
 }
 
 // การ์ดทวีป (06c-2): รูปการ์ดต่างโลก ไม่ใช่ events ของโลกหลัก จึงอยู่โฟลเดอร์แยก (loadEvents ไม่อ่านโฟลเดอร์ย่อย) ด่านแยก
@@ -446,7 +478,26 @@ export function loadIsekaiCards(dir = 'content/isekai/') {
   return cards;
 }
 
+// ทะเบียนไอเทม (B78): แกนวางของลงช่องตามชนิด — ชนิดสะกดผิด/ไม่มีราคาขาย = ของหายเงียบตอนช่องเต็ม จึงหยุดที่ตอนโหลด
+export function loadItems(p = 'content/rules/items.yaml') {
+  const doc = parse(read(p));
+  const slots = isObj(doc?.slots) ? doc.slots : {};
+  const bad = [];
+  if (!Object.keys(slots).length) bad.push('slots ต้องมีอย่างน้อย 1 ช่อง');
+  if (!Number.isInteger(doc?.cap) || doc.cap < 1) bad.push(`cap ต้องเป็นเลขเต็ม ≥ 1 ได้ ${doc?.cap}`);
+  for (const [id, it] of Object.entries(doc?.items ?? {})) {
+    if (!ID_RE.test(id)) bad.push(`${id}: id ต้องเป็น a-z0-9_`);
+    if (!Object.hasOwn(slots, it?.slot)) bad.push(`${id}: slot ต้องเป็น ${Object.keys(slots).join('|')} ได้ ${it?.slot}`);
+    if (typeof it?.name !== 'string' || !it.name.trim() || it.name.length > MAX_LEN.title) bad.push(`${id}: name ต้องเป็นข้อความไม่ว่าง ≤ ${MAX_LEN.title}`);
+    if (typeof it?.text !== 'string' || !it.text.trim() || it.text.length > MAX_LEN.text) bad.push(`${id}: text ต้องเป็นข้อความไม่ว่าง ≤ ${MAX_LEN.text}`);
+    if (!isMoney(it?.sell)) bad.push(`${id}: sell ต้องเป็นเงิน {unit, amount}`);
+  }
+  if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return { slots, cap: doc.cap, list: doc.items ?? {} };
+}
+
 export function loadContent() {
   const events = loadEvents();
-  return { events, era: loadEra(), heir: loadHeir(), taboo: loadTaboo(events), nearHints: loadNearHints(), focus: loadFocus(), isekai: loadIsekaiCards() };
+  const focus = loadFocus();
+  return { events, era: loadEra(), heir: loadHeir(), taboo: loadTaboo(events), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus) };
 }
