@@ -461,7 +461,7 @@ export function healthMultiplier(st) {
 // ทุกที่ที่อ่านตารางชีพ/สัดส่วนสาเหตุ/ช่วงป่วยใช้อายุนี้ (B110) ไม่งั้นคนกลับจากต่างโลกตายตามอายุไทย
 const bodyAge = (st) => st.age + (st.away ?? 0);
 
-// หลอดรายปี (ใบ 190 · decisions 324 328 337) หลังไหลตามวัย: แผลจากเหตุเฉียบพลันฟื้นคืนหาเส้น · ส่วนเกินเส้นจางช้า
+// หลอดรายปี (ใบ 190 · decisions 324 328 337) หลังไหลตามวัย: แผลจากเหตุเฉียบพลันฟื้นคืนหาเส้น · ส่วนเกินเส้นจางช้า ส่วนขาดอื่นฟื้นช้าเท่ากัน
 // ความแก่ (สาเหตุ other) กดหลอดเงียบไม่ฟื้น ไม่มีการ์ด · เส้นที่ผู้เล่นเห็น = เส้นธรรมชาติ − ส่วนแก่ · ไม่ดึงเลขสุ่ม
 function barYear(st) {
   const line = st.healthNatural - (st.frail ?? 0);
@@ -471,6 +471,7 @@ function barYear(st) {
     if (st.health < line) st.health = clamp(Math.min(line, st.health + back));
   }
   if (st.health > line) st.health = clamp(st.health - (st.health - line) * HIT.excessFade);
+  else if (st.health < line) st.health = clamp(st.health + (line - st.health) * HIT.mend);
   const era = st.content.era;
   const py = protoYear(era, st.seed, st.birthYear + st.age);
   const age = bodyAge(st);
