@@ -104,7 +104,7 @@ function statusBar(card, s) {
   const bar = el('header', 'sb');
   const r1 = el('div', 'sb-r1');
   const who = el('span', 'sb-who');
-  who.append(el('b', null, `${genLabel()}${st.name}`), whereLine(`${provinceLabel(st)} · ช่วง${card.stage}`));
+  who.append(el('b', null, `${genLabel()}${st.name}`), whereLine(`${provinceLabel(st)} · ช่วง${card.stage}`), headJob(lifeJob(card.age)));
   const age = el('span', 'sb-age');
   age.append(el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : String(card.age)));
   if (!card.funeral) age.append(el('small', null, ' ปี'));
@@ -135,8 +135,30 @@ function statusBar(card, s) {
     }
     ul.append(li);
   }
-  bar.append(r1, ul);
+  bar.append(r1, lifeMoneyRow(s), ul);
   return bar;
+}
+// หัวการ์ด (ui-redo ข้อ 161–162): แถวใต้ชื่อมีแค่คำ ไม่มีเกจ — ตัวเต็ม (เงินกู้ · รายได้ · ตำแหน่ง) อยู่แผงตัวฉัน/แผงเงิน (ข้อ 61)
+// อาชีพเป็นบรรทัดแยกจากบรรทัดจังหวัด ป้ายพักทับแค่บรรทัดจังหวัด (data-where) อาชีพจึงยังอยู่
+const headJob = (text) => el('small', 'hd-job', text);
+// เกษียณบนหัวการ์ดเหลือคำเดียว — "เคยเป็น…" ยาวจนตกบรรทัดที่ 390 และแผงตัวฉันบอกครบอยู่แล้ว
+const lifeJob = (age) => {
+  const t = jobText(st, age);
+  return t.startsWith('เกษียณ (') ? 'เกษียณ' : t;
+};
+function headCash(label, value, warn = null) {
+  const cash = el('span', warn ? 'hd-cash red' : 'hd-cash');
+  cash.append(el('span', 'mk', label), el('b', null, value));
+  // แดงต้องมีคำกำกับ ไม่พึ่งสีอย่างเดียว
+  if (warn) cash.append(el('span', 'lw', warn));
+  return cash;
+}
+function lifeMoneyRow(s) {
+  const row = el('div', 'hd-row');
+  // เงินกู้เป็นยอดค้างของสัญญา ไม่หักจากเงินสด (เหมือนแผงเงิน) — มีกู้ชนะติดลบเมื่อเป็นทั้งคู่ เพราะเป็นเหตุที่ผู้เล่นต้องทำอะไรต่อ
+  const warn = totalDebt(st) > 0 ? 'มีกู้' : s.money < 0 ? 'ติดลบ' : null;
+  row.append(el('span', 'mk', 'ฐานะ'), el('span', 'hd-word', classNow(st)), headCash('เงินสด', shortBaht(Math.round(s.money)), warn));
+  return row;
 }
 // ช่องค่าหนึ่งช่อง: ป้าย ตัวเลข แถบเส้น — แถบสถานะกับแผงตัวฉันของทั้งสองโลกใช้ตัวเดียวกัน หน้าตาจึงไม่แยกกันเพี้ยน
 // shown = ตัวเลขบนป้ายเมื่อไม่ใช่ค่าเดียวกับความยาวแถบ (เกจทองต่างโลก: แถบเป็น % ของสเกล ป้ายเป็นทองจริง)
@@ -2937,7 +2959,8 @@ function isekaiBar(card, s, where) {
   const ini = el('span', 'av ini', [...s.name][0]);
   ini.setAttribute('aria-hidden', 'true');
   const who = el('span', 'sb-who');
-  who.append(el('b', null, s.name), whereLine(`${genLabel()}${st.name} · ${where}`));
+  // ช่องอาชีพต่างโลก = บทบาท/ชีวิตบนทวีป (ข้อ 60) · ทองไม่มีหลอดบนหัวการ์ด หลอดอยู่แผงตัวฉัน (ข้อ 162)
+  who.append(el('b', null, s.name), whereLine(`${genLabel()}${st.name} · ${where}`), headJob(s.world));
   const age = el('span', 'sb-age');
   age.append(el('b', null, String(s.age)), el('small', null, ' ปี'));
   if (card.step !== 'end' && s.hp <= HEALTH_WARN) {
@@ -2951,7 +2974,9 @@ function isekaiBar(card, s, where) {
   r1.append(ini, who, age);
   const ul = el('ul', 'sb-m');
   ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
-  bar.append(r1, ul);
+  const row = el('div', 'hd-row');
+  row.append(headCash('ทอง', s.gold.toLocaleString('en-US')));
+  bar.append(r1, row, ul);
   return bar;
 }
 // เกจทองต่างโลก: หลอดเต็ม = ทองตั้งต้นของร่าง + ISEKAI_GOLD_SPAN · ทองที่หาได้ทั้งชาติแทบไม่ขึ้นกับทองตั้งต้น
