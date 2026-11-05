@@ -3,7 +3,7 @@
 export const GAME_CSS_START = '/*GAME-CSS:START*/';
 export const GAME_CSS_END = '/*GAME-CSS:END*/';
 // หน้าใต้ docs/ ที่ใช้ CSS เกม
-export const GAME_CSS_PAGES = ['dev/tweak/entry-tweak.html', 'dev/tweak/shelf-tabs-tweak.html', 'dev/tweak/card-art-tweak.html', 'dev/tweak/t1-tokens-tweak.html', 'dev/tweak/t1-worlds-tweak.html'];
+export const GAME_CSS_PAGES = ['dev/tweak/entry-tweak.html', 'dev/tweak/shelf-tabs-tweak.html', 'dev/tweak/card-art-tweak.html', 'dev/tweak/t1-tokens-tweak.html', 'dev/tweak/t1-worlds-tweak.html', 'dev/tweak/me-panel-tweak.html'];
 
 // ฟอนต์ฝัง (base64) ของเกมไม่ตามมา — หน้า tweak โหลดฟอนต์ชุดเดียวกันจากเว็บ ไฟล์จึงไม่บวม
 export function gameCss(template) {
