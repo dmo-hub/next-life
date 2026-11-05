@@ -97,6 +97,12 @@ function lineageBrief(lineage) {
 }
 
 // การ์ดใบแรกของทุกชีวิต — เล่าเรื่อง ไม่มีตัวเลือก (หน้าจอให้ปุ่ม "ต่อไป")
+// ค่าเริ่มที่แลกจากช่องพกสกิลที่ไม่ใช้ (ใบ 201 · decisions 359): บอกเป็นคำว่าค่าไหนเด่น ไม่มีตัวเลข · เส้นสายเป็นค่าซ่อน จึงเล่าเป็นคำคนพูด
+const SPARE_WORDS = { health: 'ร่างกายแข็งแรงกว่าเด็กรุ่นเดียวกัน', happiness: 'อารมณ์ดี เลี้ยงง่าย', knowledge: 'หัวไว เรียนรู้เร็ว', relations: 'เป็นที่รักของคนรอบตัว', network: 'มีผู้ใหญ่เอ็นดูคอยช่วยเหลือ' };
+// ได้ 0 ค่า (ทุกค่าเด่นเกินเกณฑ์อยู่แล้ว) — บรรทัดสำรอง ไม่สัญญาจำนวน ไม่ผัดไปชาติหน้า
+const SPARE_NONE = 'ติดตัวมาแต่เกิด: เด็กคนนี้โดดเด่นรอบด้านอยู่แล้ว ช่องที่เว้นไว้จึงไม่มีอะไรเติมได้อีก';
+const spareText = (keys) => (keys.length ? `ติดตัวมาแต่เกิด: ${keys.map((k) => SPARE_WORDS[k]).join(' · ')}` : SPARE_NONE);
+
 export function introCard(st, heir) {
   return {
     kind: 'intro',
@@ -107,7 +113,7 @@ export function introCard(st, heir) {
     text: st.age > 0
       ? `คุณเล่นต่อเป็น “${st.name}” วัย ${st.age} ปี ที่${provinceLabel(st)} ชื่อจริงว่า “${st.realName}”`
       : `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${provinceLabel(st)} ได้ชื่อจริงว่า “${st.realName}” ชื่อเล่นว่า “${st.name}”`,
-    story: [familyText(st), eraText(st)],
+    story: [familyText(st), eraText(st), ...(st.spare ? [spareText(st.spare)] : [])],
     // heir ที่ไม่มีรุ่นก่อน (harness สร้างทับค่าเกิดเฉย ๆ) ไม่มีอะไรให้สืบทอด
     inherit: heir && st.lineage.length ? inheritText(st, heir) : [],
     lineage: lineageBrief(st.lineage),

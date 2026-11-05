@@ -29,7 +29,7 @@ const KEYS = {
   debt: ['kind', 'amount'],
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
-  schedule: ['event', 'after_years'],
+  schedule: ['event', 'after_years', 'chance'],
   when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', 'dark_gate', 'past_life', ...MONEY_KEYS],
   pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
