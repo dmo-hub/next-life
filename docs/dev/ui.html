@@ -78,7 +78,7 @@
 </style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html">คำตัดสินเกม</a><a href="../dev/ui.html" aria-current="page">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div>
 <header><div class="w">
   <h1>ดีไซน์ UI</h1>
-  <p>สี ตัวอักษร ชิ้นส่วนของหน้าเล่น คำตัดสิน UI หน้า tweak และต้นแบบปรับสด · โครงหน้า เนื้อครบ ยังไม่จัดสวย · เวอร์ชัน <span data-fact="version">v0.6.69</span></p>
+  <p>สี ตัวอักษร ชิ้นส่วนของหน้าเล่น คำตัดสิน UI หน้า tweak และต้นแบบปรับสด · โครงหน้า เนื้อครบ ยังไม่จัดสวย · เวอร์ชัน <span data-fact="version">v0.6.70</span></p>
 </div></header>
 <main><div class="w">
 <p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
@@ -1348,6 +1348,9 @@ body:has(.mnav) .foot { display:none; }
 .me-m p { margin:0; font-size:13px; color:var(--ink2); }
 .me-m .low .mk, .me-m .low .num { color:var(--dg); }
 .me-m .low .br i { background:var(--dg); }
+/* ขีดทองตั้งต้นบนเกจทองต่างโลก: ยื่นพ้นหลอดบนล่าง — สีหมึกตัดทั้งพื้นหลอดและแถบเติม ไม่ว่าแถบเลยขีดหรือยัง */
+.me-m .gold .br { position:relative; overflow:visible; }
+.me-m .gold .tick { position:absolute; top:-3px; bottom:-3px; width:2px; margin-left:-1px; border-radius:1px; background:var(--ink); }
 .me dl { margin:12px 0 0; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 12px; font-size:13px; }
 .me dt { font-weight:600; color:var(--ink2); white-space:nowrap; }
 .me dd { margin:0; color:var(--ink2); }
@@ -1950,6 +1953,9 @@ body:has(.mnav) .foot { display:none; }
 .me-m p { margin:0; font-size:13px; color:var(--ink2); }
 .me-m .low .mk, .me-m .low .num { color:var(--dg); }
 .me-m .low .br i { background:var(--dg); }
+/* ขีดทองตั้งต้นบนเกจทองต่างโลก: ยื่นพ้นหลอดบนล่าง — สีหมึกตัดทั้งพื้นหลอดและแถบเติม ไม่ว่าแถบเลยขีดหรือยัง */
+.me-m .gold .br { position:relative; overflow:visible; }
+.me-m .gold .tick { position:absolute; top:-3px; bottom:-3px; width:2px; margin-left:-1px; border-radius:1px; background:var(--ink); }
 .me dl { margin:12px 0 0; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 12px; font-size:13px; }
 .me dt { font-weight:600; color:var(--ink2); white-space:nowrap; }
 .me dd { margin:0; color:var(--ink2); }
