@@ -1195,6 +1195,7 @@
 <h3><code>.choice</code></h3><ul class="sws"><li><span class="sw" style="background:#2F6B66"></span><code>--fx-up</code> <small>#2F6B66</small></li><li><span class="sw" style="background:#B73824"></span><code>--fx-dn</code> <small>#B73824</small></li></ul>
 <h3><code>.i .choice, .b .choice, .a .choice:hover, .a .choice:focus-visible</code></h3><ul class="sws"><li><span class="sw" style="background:#7FE0A8"></span><code>--fx-up</code> <small>#7FE0A8</small></li><li><span class="sw" style="background:#FF8A7A"></span><code>--fx-dn</code> <small>#FF8A7A</small></li></ul>
 <h3><code>body:has(#app &gt; .card.i)</code></h3><ul class="sws"><li><span class="sw" style="background:#0B0D20"></span><code>--page</code> <small>#0B0D20</small></li><li><span class="sw" style="background:#A6AEDB"></span><code>--muted</code> <small>#A6AEDB</small></li><li><span class="sw" style="background:#E8ECFF"></span><code>--ink</code> <small>#E8ECFF</small></li><li><span class="sw" style="background:#D3D8F5"></span><code>--ink2</code> <small>#D3D8F5</small></li><li><span class="sw" style="background:#161A3A"></span><code>--paper</code> <small>#161A3A</small></li><li><span class="sw" style="background:#232A5E"></span><code>--paper2</code> <small>#232A5E</small></li><li><span class="sw" style="background:#3B4BA8"></span><code>--rule2</code> <small>#3B4BA8</small></li><li><span class="sw" style="background:#6FE3FF"></span><code>--fl</code> <small>#6FE3FF</small></li><li><span class="sw" style="background:#FF8A8A"></span><code>--dg</code> <small>#FF8A8A</small></li><li><span class="sw" style="background:#262C5A"></span><code>--track</code> <small>#262C5A</small></li></ul>
+<h3><code>body:has(#app &gt; .card.af)</code></h3><ul class="sws"><li><span class="sw" style="background:#0E0A08"></span><code>--page</code> <small>#0E0A08</small></li><li><span class="sw" style="background:#BFAE86"></span><code>--muted</code> <small>#BFAE86</small></li><li><span class="sw" style="background:#EFE3C2"></span><code>--ink</code> <small>#EFE3C2</small></li><li><span class="sw" style="background:#E3D6B3"></span><code>--ink2</code> <small>#E3D6B3</small></li><li><span class="sw" style="background:#17110D"></span><code>--paper</code> <small>#17110D</small></li><li><span class="sw" style="background:#2A2018"></span><code>--paper2</code> <small>#2A2018</small></li><li><span class="sw" style="background:#5A4630"></span><code>--rule2</code> <small>#5A4630</small></li><li><span class="sw" style="background:#D9B45A"></span><code>--fl</code> <small>#D9B45A</small></li><li><span class="sw" style="background:#FF8A7A"></span><code>--dg</code> <small>#FF8A7A</small></li><li><span class="sw" style="background:#2A2018"></span><code>--track</code> <small>#2A2018</small></li></ul>
 <h3>ค่าอื่น</h3><table><tr><th>ที่</th><th>ตัวแปร</th><th>ค่า</th></tr><tr><td><code>:root</code></td><td><code>--ft</code></td><td>&quot;Noto Sans Thai&quot;,system-ui,sans-serif</td></tr><tr><td><code>:root</code></td><td><code>--r</code></td><td>10px</td></tr><tr><td><code>:root</code></td><td><code>--rk</code></td><td>15px</td></tr><tr><td><code>:root</code></td><td><code>--rc</code></td><td>999px</td></tr><tr><td><code>:root</code></td><td><code>--sh</code></td><td>0 1px 2px rgb(0 0 0 / .06), 0 8px 24px rgb(0 0 0 / .08)</td></tr><tr><td><code>:root</code></td><td><code>--cw</code></td><td>800px</td></tr><tr><td><code>:root</code></td><td><code>--pad-y</code></td><td>36px</td></tr><tr><td><code>:root</code></td><td><code>--pad-x</code></td><td>32px</td></tr><tr><td><code>:root</code></td><td><code>--chrome</code></td><td>136px</td></tr><tr><td><code>:root</code></td><td><code>--nav-h</code></td><td>60px</td></tr><tr><td><code>:root</code></td><td><code>--rail-w</code></td><td>calc(220px + env(safe-area-inset-left))</td></tr><tr><td><code>:root</code></td><td><code>--sheet-w</code></td><td>420px</td></tr><tr><td><code>:root</code></td><td><code>--rail-w</code></td><td>calc(96px + env(safe-area-inset-left))</td></tr></table>
 <h2 id="ui-fonts">ตัวอักษร</h2>
 <p>ฟอนต์ที่ฝังในหน้าเล่น (<code>src/ui/fonts</code>) — ตัวอย่างวาดด้วยฟอนต์จริงของเกมอยู่ต้นกรอบแรกในหัวชิ้นส่วนตัวอย่าง</p>
@@ -1582,8 +1583,6 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .b .tab-bar button[aria-pressed=&quot;true&quot;] { background:var(--gold); border-color:var(--gold); color:var(--lacquer); }
 .b .recap { border:1px solid var(--bronze); background:var(--lacquer2); }
 .b .recap .h { color:var(--gold); }
-.scene { height:96px; background:var(--lacquer2); border-bottom:1px solid var(--bronze); }
-.scene svg { display:block; width:100%; height:100%; }
 .scale { display:flex; gap:12px; }
 .scale > div { flex:1; min-width:0; border:1px solid var(--bronze); padding:10px; display:flex; flex-direction:column; gap:4px; font-size:13px; overflow-wrap:anywhere; }
 .scale > div.heavy { border-color:var(--gold); }
@@ -1706,6 +1705,13 @@ body:has(#app > .card.i) .logo b { font-family:var(--ft); font-weight:600; font-
 body:has(#app > .card.i) .logo small, body:has(#app > .card.i) .logo .ver, body:has(#app > .card.i) .logo .saved { color:#A6AEDB; }
 body:has(#app > .card.i) .logo .ver { border-color:#3B4BA8; }
 body:has(#app > .card.i) .foot a { color:#D3D8F5; }
+/* ui-redo ใบ 15: ปรโลกชุดดำทองของต้นแบบ (ค่าที่เจ้าของไม่ได้ปรับ) — การ์ดลายรดน้ำเดิม หน้า แถบ 4 ค่า เมนู และแผงเข้าชุดเดียวกัน */
+body:has(#app > .card.af) { --page:#0E0A08; --muted:#BFAE86; --ink:#EFE3C2; --ink2:#E3D6B3; --paper:#17110D; --paper2:#2A2018; --rule2:#5A4630; --fl:#D9B45A; --dg:#FF8A7A; --track:#2A2018; }
+body:has(#app > .card.af) .logo { background:#120D0A; }
+body:has(#app > .card.af) .logo b { color:var(--gold); }
+body:has(#app > .card.af) .logo small, body:has(#app > .card.af) .logo .ver, body:has(#app > .card.af) .logo .saved { color:var(--sand); }
+body:has(#app > .card.af) .foot a { color:var(--ink2); }
+.af .sb { background:#120D0A; }
 /* แถบโฟกัสต่างโลก (05a): โครง .focus ของโลกหลัก สีชุดต่างโลก · ทางที่ทำอยู่เด่นสีทอง ไม่จางแบบตัวเลือกล็อก */
 .ifocusbar { padding:8px 20px 0; }
 .ifocusbar button { border-color:#2A3478; background:#0E1024; color:#E8ECFF; }
@@ -1769,7 +1775,6 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
   .p-mid .body p { font-size:14px; }
   .p-mid .choice { min-height:44px; padding:6px 12px; font-size:14px; }
   .era-art { width:min(100%, 160px); }
-  .scene { height:64px; }
   .choice .fx span { white-space:normal; }
 }
 /* เลย์เอาต์คอม (ui-redo ใบ 09 · เจ้าของเคาะราวซ้าย + ลิ้นชัก): จอกว้างแถบเมนูล่างกลายเป็นราวซ้ายค้าง · แผงเปิดเป็นลิ้นชักขวาเต็มความสูง (จอกว้างมากเป็นแผงค้าง ใบ 67 ด้านล่าง)
@@ -2187,8 +2192,6 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .b .tab-bar button[aria-pressed=&quot;true&quot;] { background:var(--gold); border-color:var(--gold); color:var(--lacquer); }
 .b .recap { border:1px solid var(--bronze); background:var(--lacquer2); }
 .b .recap .h { color:var(--gold); }
-.scene { height:96px; background:var(--lacquer2); border-bottom:1px solid var(--bronze); }
-.scene svg { display:block; width:100%; height:100%; }
 .scale { display:flex; gap:12px; }
 .scale > div { flex:1; min-width:0; border:1px solid var(--bronze); padding:10px; display:flex; flex-direction:column; gap:4px; font-size:13px; overflow-wrap:anywhere; }
 .scale > div.heavy { border-color:var(--gold); }
@@ -2311,6 +2314,13 @@ body:has(#app > .card.i) .logo b { font-family:var(--ft); font-weight:600; font-
 body:has(#app > .card.i) .logo small, body:has(#app > .card.i) .logo .ver, body:has(#app > .card.i) .logo .saved { color:#A6AEDB; }
 body:has(#app > .card.i) .logo .ver { border-color:#3B4BA8; }
 body:has(#app > .card.i) .foot a { color:#D3D8F5; }
+/* ui-redo ใบ 15: ปรโลกชุดดำทองของต้นแบบ (ค่าที่เจ้าของไม่ได้ปรับ) — การ์ดลายรดน้ำเดิม หน้า แถบ 4 ค่า เมนู และแผงเข้าชุดเดียวกัน */
+body:has(#app > .card.af) { --page:#0E0A08; --muted:#BFAE86; --ink:#EFE3C2; --ink2:#E3D6B3; --paper:#17110D; --paper2:#2A2018; --rule2:#5A4630; --fl:#D9B45A; --dg:#FF8A7A; --track:#2A2018; }
+body:has(#app > .card.af) .logo { background:#120D0A; }
+body:has(#app > .card.af) .logo b { color:var(--gold); }
+body:has(#app > .card.af) .logo small, body:has(#app > .card.af) .logo .ver, body:has(#app > .card.af) .logo .saved { color:var(--sand); }
+body:has(#app > .card.af) .foot a { color:var(--ink2); }
+.af .sb { background:#120D0A; }
 /* แถบโฟกัสต่างโลก (05a): โครง .focus ของโลกหลัก สีชุดต่างโลก · ทางที่ทำอยู่เด่นสีทอง ไม่จางแบบตัวเลือกล็อก */
 .ifocusbar { padding:8px 20px 0; }
 .ifocusbar button { border-color:#2A3478; background:#0E1024; color:#E8ECFF; }
@@ -2374,7 +2384,6 @@ body:has(#app > .card.i) .foot a { color:#D3D8F5; }
   .p-mid .body p { font-size:14px; }
   .p-mid .choice { min-height:44px; padding:6px 12px; font-size:14px; }
   .era-art { width:min(100%, 160px); }
-  .scene { height:64px; }
   .choice .fx span { white-space:normal; }
 }
 /* เลย์เอาต์คอม (ui-redo ใบ 09 · เจ้าของเคาะราวซ้าย + ลิ้นชัก): จอกว้างแถบเมนูล่างกลายเป็นราวซ้ายค้าง · แผงเปิดเป็นลิ้นชักขวาเต็มความสูง (จอกว้างมากเป็นแผงค้าง ใบ 67 ด้านล่าง)
