@@ -2,39 +2,44 @@
 import {
   STAT_KEYS, EFFECT_KEYS, CLASSES, SEXES, STAGE_AGES, STAGE_NAMES, CATEGORIES, PLACEHOLDERS,
   ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE, EDU, SCHOOL_VALUES,
-  meritCat,
+  meritCat, AFTERLIFE_STAGE,
 } from './vocab.mjs';
-import { INCOME_MULT, MONEY_KEYS, PACT } from '../../engine/life.mjs';
+import { INCOME_MULT, MONEY_KEYS, PACT, OVERLAP_STAGE_MIN } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
 import { PET_KINDS, HERD_KINDS, PET_CAUSES, FILIAL_WAYS } from '../../engine/family.mjs';
 import { CHRONIC, ILL_YEARS, HEREDITARY, CARE_CAUSES } from '../../engine/death.mjs';
 import { SIN_CATS } from '../../engine/merit.mjs';
+import { REALMS } from '../../engine/afterlife.mjs';
+import { PAST_GONE, PAST_PROVINCE } from '../../engine/past.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
 // คนที่ when.kin_illness เลือกได้ = พ่อแม่ + คนในบ้านที่แกนออกการ์ดแจ้งป่วย (เพื่อนรุ่นไม่แจ้ง)
 const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
+// ตายในดันเจียนไม่มีกลุ่มสาเหตุของตัวเอง — ลงกลุ่มบาดเจ็บเดิมให้ด่าน causes และสถิติตายตามอายุยังเทียบ WHO ได้
+const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'focus'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate'],
-  outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family'],
+  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade'],
+  outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   debt: ['kind', 'amount'],
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', 'dark_gate', 'past_life', ...MONEY_KEYS],
+  pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
   family: ['role', 'sex', 'age', 'alive', 'count', 'health', 'relations'],
-  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', ...MONEY_KEYS],
+  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
-  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'reason'],
+  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'reason'],
   belief: ['kind', 'tradition', 'outside_canon', 'vow', 'trigger', 'cap_per_life', 'prize_table', 'stake', 'odds_modifier'],
   vow: ['deadline_years', 'due_event', 'redeem_full_cost', 'redeem_light_cost', 'defer_once'],
   trigger: ['money_state'],
@@ -53,6 +58,7 @@ function* shaped(e) {
     }
     if (isObj(w.flags)) yield ['whenFlags', w.flags, '.when.flags'];
     if (isObj(w.parent_flags)) yield ['whenFlags', w.parent_flags, '.when.parent_flags'];
+    if (isObj(w.past_life)) yield ['pastLife', w.past_life, '.when.past_life'];
     for (const k of MONEY_KEYS) if (isObj(w[k])) yield ['bound', w[k], `.when.${k}`];
     for (const [i, f] of list(w.family).entries()) {
       if (!isObj(f)) continue;
@@ -135,6 +141,8 @@ function checkMultipliers(m, at, r) {
     if (!isObj(m[k]) || Object.entries(m[k]).some(([kk, v]) => !of.includes(kk) || !positive(v))) r(`${at}.${k}`, `ต้องเป็น {${of.join('|')}: เลขบวก}`);
   }
   for (const k of ['karma', 'family_fame', 'wish']) if (m[k] !== undefined && !positive(m[k])) r(`${at}.${k}`, 'ต้องเป็นเลขบวก');
+  // 0 ได้: ขั้น 0 คูณ 1 (x ** 0) ขั้น 1 ขึ้นไปปิดการ์ด — การ์ดชีวิตปกติที่หายเมื่อโลกเริ่มซ้อน
+  if (m.overlap_stage !== undefined && !ratio(m.overlap_stage)) r(`${at}.overlap_stage`, 'ต้องเป็นตัวเลข ≥ 0 (คูณยกกำลังตามขั้นค่าซ้อนทับ)');
   if (m.flags !== undefined && (!isObj(m.flags) || Object.entries(m.flags).some(([f, v]) => !FLAG_RE.test(f) || !positive(v)))) r(`${at}.flags`, 'ต้องเป็น {ชื่อธง: เลขบวก}');
   for (const k of MONEY_KEYS) if (m[k] !== undefined && !(ratioBound(m[k]) && positive(m[k].v))) r(`${at}.${k}`, 'ต้องเป็น {min, max, v} อัตราส่วน ≥ 0 อย่างน้อยหนึ่งขอบ v เป็นเลขบวก');
 }
@@ -301,6 +309,8 @@ export const rules = [
       if (w.class !== undefined && !nonEmptySubset(w.class, CLASSES)) r('.when.class', `class ต้องเป็นรายการจาก ${CLASSES.join(' ')}`);
       if (w.region !== undefined && !nonEmptySubset(w.region, ctx.regions)) r('.when.region', `region ต้องเป็นรายการจาก ${ctx.regions.join(' · ')}`);
       if (w.sex !== undefined && !nonEmptySubset(w.sex, SEXES)) r('.when.sex', `sex ต้องเป็นรายการจาก ${SEXES.join(' ')}`);
+      const top = OVERLAP_STAGE_MIN.length - 1;
+      if (w.overlap_stage !== undefined && !isRange(w.overlap_stage, 0, top)) r('.when.overlap_stage', `overlap_stage ต้องเป็น [จาก, ถึง] ขั้น 0–${top} จำนวนเต็ม`);
       if (w.stats !== undefined) {
         if (!isObj(w.stats)) r('.when.stats', 'stats ต้องเป็น object');
         else for (const [k, b] of Object.entries(w.stats)) if (!bound(b)) r(`.when.stats.${k}`, 'ต้องเป็น {min, max} 0–100 min ≤ max');
@@ -483,15 +493,33 @@ export const rules = [
     },
   },
   {
+    id: 'herald-of-shape',
+    desc: 'herald_of = id เหตุการณ์บ้านเมือง (afterfall-1) · ใบลางออกปีก่อนภัยที่จะได้ใบรับมือครั้งแรกเท่านั้น — ห้ามมี weight/at_age/era/repeat/prelude/first_of',
+    event(e, ctx, r) {
+      if (e.herald_of === undefined) return;
+      if (typeof e.herald_of !== 'string' || !ctx.eras.has(e.herald_of)) r('.herald_of', `ไม่มีเหตุการณ์บ้านเมือง "${e.herald_of}" (${[...ctx.eras].join(' ')})`);
+      if (['weight', 'at_age', 'era', 'repeat', 'prelude', 'first_of'].some((k) => e[k] !== undefined)) r('.herald_of', 'ใบลางห้ามมี weight/at_age/era/repeat/prelude/first_of — ออกได้ทางเดียวคือปีก่อนภัย');
+    },
+  },
+  {
+    id: 'ambient-shape',
+    desc: 'ambient = true เท่านั้น · การ์ดบรรยากาศที่แบบชีวิต (titles picksAfter) ไม่นับ — ต้องเป็นการ์ดกองสุ่ม (มี weight) ไม่ใช่ใบลาง',
+    event(e, ctx, r) {
+      if (e.ambient === undefined) return;
+      if (e.ambient !== true) r('.ambient', `ambient ต้องเป็น true (ได้ ${JSON.stringify(e.ambient)}) — ไม่ใช่ ambient ให้ลบช่องออก`);
+      if (e.weight === undefined || e.herald_of !== undefined) r('.ambient', 'การ์ดบรรยากาศต้องมี weight และไม่ใช่ใบลาง (herald_of ข้ามแบบชีวิตอยู่แล้ว)');
+    },
+  },
+  {
     id: 'choice-lock',
-    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, sex?, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
+    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, sex?, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), nature?: id นิสัย (เหตุผลแกนเขียนเอง), reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
     event(e, ctx, r) {
       const cs = choicesOf(e);
       for (const { c, path } of cs) {
         const q = c.requires;
         if (q === undefined) continue;
         const at = `${path}.requires`;
-        if (!isObj(q) || !['money', 'stats', 'flags', 'edu', 'family', 'age'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags edu family หรือ age อย่างน้อยหนึ่งอย่าง'); continue; }
+        if (!isObj(q) || !['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags edu family age หรือ nature อย่างน้อยหนึ่งอย่าง'); continue; }
         // อายุตามกฎหมาย (เช่น พินัยกรรม 15 ปีขึ้นไป) — แกนเขียนเหตุผล "อายุยังไม่ถึง N ปี" เอง
         if (q.age !== undefined && !(isObj(q.age) && (q.age.min !== undefined || q.age.max !== undefined) && [q.age.min, q.age.max].every((v) => v === undefined || (Number.isInteger(v) && v >= 0 && v <= 120)))) r(`${at}.age`, 'ต้องเป็น {min, max} จำนวนเต็ม 0–120');
         // ตัวเลือกที่พูดถึงคนในบ้านล็อกได้เมื่อไม่มีคนนั้น (เงื่อนไขชุดเดียวกับ when.family)
@@ -552,7 +580,7 @@ export const rules = [
   },
   {
     id: 'rank-shape',
-    desc: 'สายยศ (B40): effects.severance = true (จ่ายเงินชดเชยเลิกจ้างตามอายุงาน) · when.ladder = รายการ id สายใน data/careers.json หรือ none · multipliers.rank = เลขบวก (คูณยกกำลังตามขั้นยศ+ตำแหน่ง)',
+    desc: 'สายยศ (B40): effects.severance = true (จ่ายเงินชดเชยเลิกจ้างตามอายุงาน) · effects.ladder = id สายใน data/careers.json (เข้าสายที่ขั้นแรก) · when.ladder = รายการ id สายใน data/careers.json หรือ none · multipliers.rank = เลขบวก (คูณยกกำลังตามขั้นยศ+ตำแหน่ง)',
     event(e, ctx, r) {
       const ids = [...ctx.ladders, 'none'];
       const wl = isObj(e.when) ? e.when.ladder : undefined;
@@ -562,10 +590,41 @@ export const rules = [
         if (path.includes('outcomes')) mults.push([node.multipliers, `${path}.multipliers`]);
         const fx = isObj(node.effects) ? node.effects : {};
         if (fx.severance !== undefined && fx.severance !== true) r(`${path}.effects.severance`, 'ใช้ได้แค่ true');
+        if (fx.ladder !== undefined && !ctx.ladders.includes(fx.ladder)) r(`${path}.effects.ladder`, `ต้องเป็น id สาย ${ctx.ladders.join('|')} ได้ ${JSON.stringify(fx.ladder)}`);
       }
       for (const [m, at] of mults) {
         const v = isObj(m) ? m.rank : undefined;
         if (v !== undefined && !positive(v)) r(`${at}.rank`, 'ต้องเป็นเลขบวก');
+      }
+    },
+  },
+  {
+    // คนถูกดึงเข้าดันเจียนครั้งแรกรอดเสมอ ⇒ ทางตายต้องอยู่หลังตัวเลือกที่ล็อกให้นักล่าเท่านั้น
+    id: 'dungeon-die',
+    desc: `effects.die = ${DUNGEON_CAUSES.join('|')} (ตายในดันเจียน · กลุ่มสาเหตุเดิมใน data/death-causes.json) — ใช้ได้เฉพาะผลสุ่มของตัวเลือกที่ requires.flags.has มี hunter`,
+    event(e, ctx, r) {
+      for (const { node, path, choice } of effectSites(e)) {
+        const d = isObj(node.effects) ? node.effects.die : undefined;
+        if (d === undefined) continue;
+        if (!DUNGEON_CAUSES.includes(d)) r(`${path}.effects.die`, `ต้องเป็น ${DUNGEON_CAUSES.join('|')} ได้ ${JSON.stringify(d)}`);
+        else if (node === choice) r(`${path}.effects.die`, 'ใช้ได้แค่ในผลสุ่ม (outcomes) — การ์ดผลต้องเล่าเหตุก่อนมรณบัตร');
+        else if (!list(choice.requires?.flags?.has).includes('hunter')) r(`${path}.effects.die`, 'ตัวเลือกต้อง requires.flags.has มี hunter — คนถูกดึงเข้าดันเจียนรอดเสมอ');
+      }
+    },
+  },
+  {
+    id: 'loot-shape',
+    desc: 'effects.loot = รายการ id ไม่ซ้ำใน content/rules/items.yaml (ได้ชิ้นแรกที่ยังไม่มี) — บนตัวเลือกที่ไม่มี outcomes หรือบนผลสุ่มที่มี text (ข้อความของที่ได้ต่อท้ายการ์ดผล)',
+    event(e, ctx, r) {
+      for (const { node, path, choice } of effectSites(e)) {
+        const l = isObj(node.effects) ? node.effects.loot : undefined;
+        if (l === undefined) continue;
+        const p = `${path}.effects.loot`;
+        if (!Array.isArray(l) || !l.length) { r(p, 'ต้องเป็นรายการ id ไม่ว่าง'); continue; }
+        for (const id of l) if (!ctx.items.includes(id)) r(p, `ไม่มีของ ${JSON.stringify(id)} ในทะเบียน content/rules/items.yaml`);
+        if (new Set(l).size !== l.length) r(p, 'id ซ้ำในรายการ');
+        if (node === choice && choice.outcomes?.length) r(p, 'ตัวเลือกที่มี outcomes ใส่ loot ที่ผลสุ่มแทน');
+        if (node !== choice && !node.text) r(p, 'ผลสุ่มที่ให้ของต้องมี text — ข้อความของที่ได้ต่อท้ายการ์ดผล');
       }
     },
   },
@@ -669,6 +728,43 @@ export const rules = [
       if (h === undefined) return;
       if (!isObj(h) || Object.keys(h).some((k) => k !== 'causes')) return r('.when.heredity', 'heredity ต้องเป็น {causes?}');
       if (h.causes !== undefined && !(Array.isArray(h.causes) && h.causes.length && h.causes.every((x) => HEREDITARY.includes(x)))) r('.when.heredity.causes', `causes ต้องเป็นรายการจาก ${HEREDITARY.join(' ')}`);
+    },
+  },
+  {
+    id: 'skill-shape',
+    desc: 'upgrade = true บนตัวเลือกหรือทางผล — การ์ดอัปเกรดสกิลที่พกมาออกต่อจากการ์ดผล (06s) · ไม่ใช้ไม่ต้องใส่',
+    event(e, ctx, r) {
+      for (const { node, path } of effectSites(e)) if (node.upgrade !== undefined && node.upgrade !== true) r(`${path}.upgrade`, 'upgrade ใช้ได้แค่ true');
+    },
+  },
+  {
+    id: 'dark-gate',
+    desc: 'when.dark_gate = true — ข้อเสนอผิดกฎหมาย (B99a) ออกเฉพาะคนเงินตึงที่เลือกทางบาปเองถึงเกณฑ์ · การ์ดต้องมีทางบาปให้เลือก ไม่งั้นประตูไม่มีอะไรให้เปิด',
+    event(e, ctx, r) {
+      const g = isObj(e.when) ? e.when.dark_gate : undefined;
+      if (g === undefined) return;
+      if (g !== true) return r('.when.dark_gate', 'dark_gate ต้องเป็น true');
+      const sin = (m) => list(m).some((t) => SIN_CATS.includes(t?.cat));
+      if (!choicesOf(e).some(({ c }) => sin(c.merit) || list(c.outcomes).some((o) => isObj(o) && sin(o.merit)))) r('.when.dark_gate', 'การ์ด dark_gate ต้องมีตัวเลือกที่ลงป้ายบาป');
+    },
+  },
+  {
+    id: 'past-life',
+    desc: `when.past_life = ความจำชาติก่อน (ใบ 159): any true/false · province ${PAST_PROVINCE.join('|')} · job [id อาชีพ] · cause [กลุ่มสาเหตุตาย | ${PAST_GONE}] · realm [${REALMS.map((x) => x.id).join('|')}] เคยไปสักชาติ · talent true/false — อย่างน้อยหนึ่งช่อง · ใช้ในฉากระหว่างชาติไม่ได้ (ฉากนั้นอ่านชีวิตที่เพิ่งจบ)`,
+    event(e, ctx, r) {
+      const w = isObj(e.when) ? e.when.past_life : undefined;
+      if (w === undefined) return;
+      const p = '.when.past_life';
+      if (!isObj(w) || !Object.keys(w).length) return r(p, 'past_life ต้องเป็น object ที่มีอย่างน้อยหนึ่งช่อง');
+      if (e.stage === AFTERLIFE_STAGE) r(p, 'ฉากระหว่างชาติใช้ past_life ไม่ได้');
+      for (const k of ['any', 'talent']) if (w[k] !== undefined && typeof w[k] !== 'boolean') r(`${p}.${k}`, `${k} ต้องเป็น true/false`);
+      if (w.any === false && Object.keys(w).length > 1) r(`${p}.any`, 'any: false (ไม่มีชาติก่อน) ใช้คู่ช่องอื่นไม่ได้ — การ์ดไม่มีวันออก');
+      if (w.province !== undefined && !PAST_PROVINCE.includes(w.province)) r(`${p}.province`, `province ต้องเป็น ${PAST_PROVINCE.join(' ')}`);
+      if (w.job !== undefined && !nonEmptySubset(w.job, ctx.occupations)) r(`${p}.job`, `job ต้องเป็นรายการจาก ${ctx.occupations.join(' ')}`);
+      const causes = [...(ctx.causes ?? []), PAST_GONE];
+      if (w.cause !== undefined && !nonEmptySubset(w.cause, causes)) r(`${p}.cause`, `cause ต้องเป็นรายการจาก ${causes.join(' ')}`);
+      const realms = REALMS.map((x) => x.id);
+      if (w.realm !== undefined && !nonEmptySubset(w.realm, realms)) r(`${p}.realm`, `realm ต้องเป็นรายการจาก ${realms.join(' ')}`);
     },
   },
 ];

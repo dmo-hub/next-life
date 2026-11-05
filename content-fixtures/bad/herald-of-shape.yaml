@@ -1,0 +1,27 @@
+# ใบลางชี้เหตุการณ์ที่ไม่มี + ใบลางที่ยังอยู่ในกองสุ่ม (มี weight) — ใบลางน้ำท่วมไม่มี weight ใน good/herald-of.yaml ผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    herald_of: meteor
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "เตรียมตัว", merit: [{cat: neutral}]}
+      - {text: "รอดูก่อน", merit: [{cat: neutral}]}
+      - {text: "ถามคนแก่", merit: [{cat: neutral}]}
+      - {text: "ไม่สนใจ", merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    herald_of: great_flood
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "เตรียมตัว", merit: [{cat: neutral}]}
+      - {text: "รอดูก่อน", merit: [{cat: neutral}]}
+      - {text: "ถามคนแก่", merit: [{cat: neutral}]}
+      - {text: "ไม่สนใจ", merit: [{cat: neutral}]}

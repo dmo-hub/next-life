@@ -43,6 +43,13 @@ events:
       - id: enough
         text: "พอแค่นี้ ไม่มีอะไรค้างใจแล้ว"
         merit: [{cat: neutral}]
+      # จดหมายคำฝาก (afterfall-3): แกนล็อก "ไม่มีใครให้ฝาก" เมื่อตอนตายไม่มีลูกหลาน/เพื่อน/คู่ชีวิตเหลืออยู่ (letter: true · letterTo ใน family.mjs)
+      - id: letter
+        text: "เขียนจดหมายคำฝากทิ้งไว้"
+        letter: true
+        requires: {flags: {not: [wish_letter]}, reason: "เขียนไว้แล้ว"}
+        sets_flags: [wish_letter]
+        merit: [{cat: neutral}]
 
   - id: funeral_rite_01
     type: A
@@ -79,4 +86,232 @@ events:
         merit: [{cat: dana, level: 3}]
       - id: temple
         text: "ให้วัดหรือมูลนิธิช่วยจัดให้"
+        merit: [{cat: neutral}]
+
+  # ---------- จดหมายคำฝาก (afterfall-3) · ไม่อยู่ในกองสุ่ม ----------
+  # ใบเลือกคำฝาก: แกนต่อท้ายตัวเลือก letter ของคำสั่งเสีย · ธง wish_letter_* ส่งถึงทายาทผ่านทะเบียน heir:
+  - id: funeral_letter_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    title: "จดหมายคำฝาก"
+    text: "มือสั่นจนต้องเขียนช้า ๆ ซองนี้จะฝากไว้กับ{ผู้รับซอง} ให้ส่งต่อถึงคนรุ่นหลังเมื่อถึงเวลา กระดาษมีที่พอสำหรับเรื่องเดียว"
+    choices:
+      - id: study
+        text: "เรียนให้สูงเท่าที่ไหว"
+        sets_flags: [wish_letter_study]
+        merit: [{cat: neutral}]
+      - id: kin
+        text: "ดูแลกันเอง อย่าแตกกันเรื่องมรดก"
+        sets_flags: [wish_letter_kin]
+        merit: [{cat: neutral}]
+      - id: home
+        text: "บ้านเกิดอย่าขายทิ้ง"
+        sets_flags: [wish_letter_home]
+        merit: [{cat: neutral}]
+      - id: save
+        text: "เก็บเงินไว้ก้อนหนึ่งเสมอ"
+        sets_flags: [wish_letter_save]
+        merit: [{cat: neutral}]
+
+  # ใบที่ทายาทอ่าน (id ขึ้นต้น heir_letter_): แกนดันเข้าคิวตามหลังการ์ดมรดก ปีที่ผู้ฝากตาย ไม่ก่อนอายุ 13 · ใบละชนิดคำฝาก
+  - id: heir_letter_study_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [13, 120], parent_flags: {has: [wish_letter_study]}}
+    title: "ซองจากรุ่นก่อน"
+    text: "{ผู้ยื่นซอง}ยื่นซองเก่าให้ ข้างในเป็นลายมือของ{ผู้ฝาก}ที่จากไป{เหตุผู้ฝาก} เขียนไว้สั้น ๆ ว่า \"เรียนให้สูงเท่าที่ไหว ความรู้ไม่มีใครยึดไปได้\""
+    choices:
+      - id: keep
+        text: "เก็บไว้ จะทำตามที่ฝาก"
+        sets_flags: [heed_study]
+        schedules: [{event: heir_heed_study_01, after_years: [1, 3]}]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: fold
+        text: "อ่านแล้วพับเก็บใส่ลิ้นชัก"
+        merit: [{cat: neutral}]
+      - id: later
+        text: "ยังไม่พร้อมจะอ่าน"
+        merit: [{cat: neutral}]
+      - id: share
+        text: "อ่านให้คนในบ้านฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: heir_letter_kin_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [13, 120], parent_flags: {has: [wish_letter_kin]}}
+    title: "ซองจากรุ่นก่อน"
+    text: "{ผู้ยื่นซอง}ยื่นซองเก่าให้ ข้างในเป็นลายมือของ{ผู้ฝาก}ที่จากไป{เหตุผู้ฝาก} เขียนไว้สั้น ๆ ว่า \"ดูแลกันเอง อย่าให้เงินทองมาทำให้พี่น้องไม่มองหน้ากัน\""
+    choices:
+      - id: keep
+        text: "เก็บไว้ จะทำตามที่ฝาก"
+        sets_flags: [heed_kin]
+        schedules: [{event: heir_heed_kin_01, after_years: [1, 3]}]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: fold
+        text: "อ่านแล้วพับเก็บใส่ลิ้นชัก"
+        merit: [{cat: neutral}]
+      - id: later
+        text: "ยังไม่พร้อมจะอ่าน"
+        merit: [{cat: neutral}]
+      - id: share
+        text: "อ่านให้คนในบ้านฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: heir_letter_home_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [13, 120], parent_flags: {has: [wish_letter_home]}}
+    title: "ซองจากรุ่นก่อน"
+    text: "{ผู้ยื่นซอง}ยื่นซองเก่าให้ ข้างในเป็นลายมือของ{ผู้ฝาก}ที่จากไป{เหตุผู้ฝาก} เขียนไว้สั้น ๆ ว่า \"บ้านหลังนี้อย่าขายทิ้ง ถึงจะไปไกลแค่ไหน ให้มีที่กลับ\""
+    choices:
+      - id: keep
+        text: "เก็บไว้ จะทำตามที่ฝาก"
+        sets_flags: [heed_home]
+        schedules: [{event: heir_heed_home_01, after_years: [1, 3]}]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: fold
+        text: "อ่านแล้วพับเก็บใส่ลิ้นชัก"
+        merit: [{cat: neutral}]
+      - id: later
+        text: "ยังไม่พร้อมจะอ่าน"
+        merit: [{cat: neutral}]
+      - id: share
+        text: "อ่านให้คนในบ้านฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: heir_letter_save_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [13, 120], parent_flags: {has: [wish_letter_save]}}
+    title: "ซองจากรุ่นก่อน"
+    text: "{ผู้ยื่นซอง}ยื่นซองเก่าให้ ข้างในเป็นลายมือของ{ผู้ฝาก}ที่จากไป{เหตุผู้ฝาก} เขียนไว้สั้น ๆ ว่า \"เก็บเงินไว้ก้อนหนึ่งเสมอ วันที่ลำบากจะได้ไม่ต้องก้มหัวให้ใคร\""
+    choices:
+      - id: keep
+        text: "เก็บไว้ จะทำตามที่ฝาก"
+        # รับปากเรื่องเงินเก็บ = มีเงินสำรองแบบ gs-5 ⇒ ตัวเลือก "ใช้เงินสำรอง" ในการ์ดเดิมเปิดเอง
+        sets_flags: [heed_save, kept_savings]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: fold
+        text: "อ่านแล้วพับเก็บใส่ลิ้นชัก"
+        merit: [{cat: neutral}]
+      - id: later
+        text: "ยังไม่พร้อมจะอ่าน"
+        merit: [{cat: neutral}]
+      - id: share
+        text: "อ่านให้คนในบ้านฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+
+  # การ์ดตามซอง (ทาง D): การ์ดเป้าหมายในกองสุ่มออกหลังเปิดซองน้อยเกินกว่าคำฝากจะมีความหมาย
+  # จึงนัดจากตัวเลือก "เก็บไว้" ให้ออกแน่นอน 1–3 ปีหลังเปิดซอง · ชีวิตที่ไม่ได้รับปากไม่มีนัด ไม่ดึงเลขสุ่มเพิ่ม
+  # เพดานอายุ 55 กั้นไม่ให้คำฝากเรื่องเรียน/บ้านเกิดโผล่ตอนชรา — นัดที่เลยเพดานหายเงียบตามตั้งใจ
+  # ← heir_letter_study_01 "เก็บไว้ จะทำตามที่ฝาก"
+  - id: heir_heed_study_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [14, 55], flags: {has: [heed_study]}}
+    title: "ประกาศรับสมัครภาคค่ำ"
+    text: "ใบประกาศรับสมัครเรียนภาคค่ำติดอยู่หน้าที่ว่าการอำเภอ ค่าเรียนไม่แพง แต่ต้องนั่งเรียนหลังเลิกงานทุกคืน ซองจากรุ่นก่อนในลิ้นชักยังเขียนไว้ว่าความรู้ไม่มีใครยึดไปได้"
+    choices:
+      - id: night_class
+        text: "สมัครเรียนภาคค่ำ"
+        effects: {knowledge: 2, happiness: -1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: read_alone
+        text: "ยืมหนังสือมาอ่านเองทุกคืน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: pass_on
+        text: "เก็บเงินไว้ให้เด็กในบ้านเรียน"
+        effects: {money: {unit: income_x, amount: -0.3}, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: next_year
+        text: "ไว้ปีหน้าค่อยว่ากัน"
+        merit: [{cat: neutral}]
+      - id: heed_letter
+        text: "เรียนต่อตามที่รับปากในจดหมาย"
+        requires: {flags: {has: [heed_study]}, reason: "ไม่ได้รับปากใครไว้"}
+        effects: {knowledge: 3, happiness: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+
+  # ← heir_letter_kin_01 "เก็บไว้ จะทำตามที่ฝาก"
+  - id: heir_heed_kin_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [14, 55], flags: {has: [heed_kin]}}
+    title: "ที่ดินของรุ่นก่อน"
+    text: "ญาติ ๆ นัดกันมาคุยเรื่องแบ่งที่ดินที่รุ่นก่อนทิ้งไว้ คุยไปได้ไม่ถึงชั่วโมงเสียงก็เริ่มดัง บางคนลุกออกไปยืนหน้าบ้านไม่ยอมกลับเข้ามา"
+    choices:
+      - id: stay_out
+        text: "นั่งเงียบ ไม่เข้าไปยุ่ง"
+        merit: [{cat: neutral}]
+      - id: take_less
+        text: "ยอมรับส่วนที่น้อยกว่า ให้จบ ๆ"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: fight
+        text: "เถียงเอาส่วนของตัวเองให้ได้"
+        effects: {relations: -2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: elder
+        text: "เชิญผู้ใหญ่บ้านมาช่วยตัดสิน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: heed_letter
+        text: "ทำตามจดหมาย ดึงทุกคนกลับมาคุย"
+        requires: {flags: {has: [heed_kin]}, reason: "ไม่ได้รับปากใครไว้"}
+        effects: {relations: 3, happiness: 1}
+        merit: [{cat: neutral}]
+
+  # ← heir_letter_home_01 "เก็บไว้ จะทำตามที่ฝาก"
+  - id: heir_heed_home_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [14, 55], flags: {has: [heed_home]}}
+    title: "นายหน้าที่บ้านเกิด"
+    text: "นายหน้ามาเดินดูบ้านเกิดหลังเก่า บอกว่าแถวนี้กำลังจะมีถนนตัดผ่าน ถ้าขายตอนนี้ได้ราคาดี ญาติหลายคนเริ่มคิดเลขในใจ"
+    choices:
+      - id: sell_split
+        text: "ขาย แล้วแบ่งเงินกัน"
+        effects: {money: {unit: income_x, amount: 0.5}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: let_kin
+        text: "ให้ญาติตัดสินกันเอง"
+        merit: [{cat: neutral}]
+      - id: wait_road
+        text: "รอถนนตัดเสร็จค่อยขาย"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: ask_price
+        text: "ไปถามราคาที่อื่นก่อน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: heed_letter
+        text: "ไม่ขาย ตามที่รับปากในจดหมาย"
+        requires: {flags: {has: [heed_home]}, reason: "ไม่ได้รับปากใครไว้"}
+        effects: {happiness: 1, relations: 1}
         merit: [{cat: neutral}]

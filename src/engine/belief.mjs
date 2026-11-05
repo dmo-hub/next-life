@@ -104,7 +104,7 @@ function buyTicket(st, ev) {
     st.happiness = Math.min(100, st.happiness + LEVELS[joy]);
     text = prizeText(st, p, baht);
   }
-  return { kind: 'result', type: ev.type ?? 'B', age: st.age, stage: stageOf(st.age), text };
+  return { kind: 'result', type: ev.type ?? 'B', age: st.age, stage: stageOf(st.age), text, tag: 'belief', evId: ev.id };
 }
 
 // กิจกรรมสายมูที่ "ทำ" จริง (ใบ 12 ตัวนับให้ใบ 04): ซื้อใบ · จ่ายเงิน · ตั้งธง (บน/เครื่องราง/หวังผล) · แก้บน

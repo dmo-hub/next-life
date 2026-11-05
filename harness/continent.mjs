@@ -67,6 +67,18 @@ export function contChecks({ n = 10000, seed = 1, nation = contNation, birth = c
   return out;
 }
 
+// กองทวีป (06c-2): การ์ดนี้ไม่ควรมาหาชาตินี้ที่แคว้นนี้ไหม — เขียนแยกจากตัวกรองของแกน (CONT_DECK) ให้ตัวควบคุมที่เปิดตัวกรองทิ้งถูกจับได้
+// ชาติเก่า (มีบทบาท) ไม่มีแคว้น/ชาติ ⇒ การ์ดกองทวีปมาเมื่อไรผิดทุกใบ · การ์ดนอกกอง (ไม่มีช่องผูก) = ไม่ตัดสิน
+export function contDeckWrong(isk, ev, region) {
+  if (!ev.regions && !ev.dispute && !ev.power) return false;
+  if (isk.role || !isk.nation || !CONT_REGIONS[region]) return true;
+  if (ev.regions) return !ev.regions.includes(region);
+  if (ev.dispute) return ev.dispute !== isk.nation.dispute;
+  const p = isk.nation.powers;
+  const ids = ev.power === 'major' ? [p.major] : p[ev.power] ?? [];
+  return !ids.some((id) => id === region || contNeighbors(region).includes(id));
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? Number(process.argv[i + 1]) : d; };
   const n = arg('--n', 10000), seed = arg('--seed', 1);

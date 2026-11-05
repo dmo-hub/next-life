@@ -1,0 +1,13 @@
+# ตัวควบคุม: หมวดไม่รู้จัก
+cards:
+  - id: bad_x
+    regions: [helvard]
+    ch: [2]
+    title: ชื่อ
+    text: ข้อความ
+    choices:
+      - t: ก
+        text: ผลก
+        merit: [{ cat: nope, level: 1 }]
+      - t: ข
+        text: ผลข

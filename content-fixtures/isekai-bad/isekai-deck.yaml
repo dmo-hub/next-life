@@ -1,0 +1,16 @@
+# ตัวควบคุม: ผูกสองกอง + แคว้นที่ไม่มีจริง
+cards:
+  - id: bad_x
+    regions: [atlantis]
+    dispute: plague
+    ch: [2]
+    title: ชื่อ
+    text: ข้อความ
+    choices:
+      - t: ก
+        text: ผลก
+      - t: ข
+        stat: luk
+        dc: 10
+        win: { text: ชนะ }
+        lose: { text: แพ้ }
