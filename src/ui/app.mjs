@@ -2963,8 +2963,22 @@ function isekaiMePanel(s) {
   const ul = el('ul', 'me-m');
   ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
   // ชาติต่างโลกหลังตายอยู่ใน af.isekai · ทริประหว่างชาติไทยอยู่ใน st.trip
-  const gold = isekaiGoldFill(af?.isekai ?? st?.trip, s.gold);
-  if (gold !== null) ul.append(meterLi('ทอง', Math.round(gold * 1000) / 10, false, s.gold.toLocaleString('en-US')));
+  const k = af?.isekai ?? st?.trip;
+  const gold = isekaiGoldFill(k, s.gold);
+  if (gold !== null) {
+    const li = meterLi('ทอง', Math.round(gold * 1000) / 10, false, s.gold.toLocaleString('en-US'));
+    li.classList.add('gold');
+    // ขีด = ทองตั้งต้นของร่างจากตาราง (ไม่ใช่ทองหลังพกมา) · ร่างเริ่ม 0 ขีดชิดซ้ายมองไม่เห็น จึงไม่วาด
+    const start = isekaiGoldFill(k, isekaiGoldStart(k));
+    if (start > 0) {
+      const tick = el('span', 'tick');
+      tick.style.left = `${Math.round(start * 1000) / 10}%`;
+      tick.title = 'ขีด = ทองตอนเริ่มชาติ';
+      li.querySelector('.br').append(tick);
+      li.append(el('span', 'sr', 'ขีดบนหลอดคือทองตอนเริ่มชาติ'));
+    }
+    ul.append(li);
+  }
   const dl = el('dl');
   dl.append(el('dt', null, 'ทอง'), el('dd', null, s.gold.toLocaleString('en-US')), el('dt', null, 'ชื่อเสียง'), el('dd', null, String(s.fame)));
   const who = el('p', 'meta');
