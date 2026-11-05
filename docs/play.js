@@ -982,7 +982,7 @@ const assetName = (id) => ASSET_BY_ID.get(id)?.name ?? id;
 
 // น้ำหนักต่อระดับ 1–3 ไม่เป็นเส้นตรง ให้ป้ายระดับ 3 เป็นเรื่องใหญ่จริง แบบเดียวกับ LEVELS ของค่าสถานะ
 const MERIT_LEVELS = { 1: 1, 2: 2.5, 3: 4 };
-// น้ำหนักต่อหมวด: คติไม่ได้จัดลำดับความหนักของบาป 8 หมวด จึงเท่ากันหมด · vow_broken เป็นธงไม่มีระดับ น้ำหนักทั้งก้อน
+// น้ำหนักต่อหมวด: คติไม่ได้จัดลำดับความหนักของบาปตามคติ (พระมาลัย 8 + ไตรภูมิ 2) จึงเท่ากันหมด · vow_broken เป็นธงไม่มีระดับ น้ำหนักทั้งก้อน
 // หมวดที่เป็นกลไกเกมตั้งเอง (GAME_CATS) ต้องเบากว่าระดับ 1 ของหมวดตามคติทุกหมวด (ใบ 09/12 — ห้ามหนักเท่าบาปตามคติ)
 // สามหมวดท้ายเป็นของต่างโลก (B68c) · ฆ่าเพื่อแต้มเป็นปาณาติบาตตามคติ จึงหนักเท่าหมวดเดิม
 const MERIT_WEIGHTS = {
@@ -994,6 +994,9 @@ const MERIT_WEIGHTS = {
   love_charm: 1,
   oppress_subjects: 1,
   intoxicants: 1,
+  // ไตรภูมิ ตาราง 16 ขุม (ใบ 202): ฆ่าสัตว์ (โลหกุมภ · สีลกัต) · มิจฉาทิฏฐิ (ขุมที่ 16) — หมวดตามคติ จึงหนักเท่าหมวดเดิม
+  kill_animal: 1,
+  wrong_view: 1,
   vow_broken: 0.5,
   dana: 1,
   sila: 1,
@@ -1010,7 +1013,7 @@ const MERIT_WEIGHTS = {
   // สัญญากับมาร (B156) — กลไกเกมตั้งเอง ความหนักมาจากระดับ 3 + ไม่จางข้ามชาติ (FULL_CARRY ใน afterlife) ไม่ใช่น้ำหนักหมวด
   mara_pact: 0.5,
 };
-const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'vow_broken', 'kill_for_gain', 'cheat_exploit', 'forbidden_knowledge', 'against_nature', 'mara_pact'];
+const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'kill_animal', 'wrong_view', 'vow_broken', 'kill_for_gain', 'cheat_exploit', 'forbidden_knowledge', 'against_nature', 'mara_pact'];
 const FLAG_CATS = ['vow_broken'];
 const GAME_CATS = ['vow_broken', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge', 'against_nature', 'mara_pact'];
 // หมวดที่ไม่นับเป็นบาปตามคติพระมาลัยที่หน้าเว็บอ้าง (ส่วนใหญ่ใช้เฉพาะต่างโลก · mara_pact ใช้ได้ทั้งสองโลก)
@@ -1018,7 +1021,7 @@ const ISEKAI_CATS = ['kill_for_gain', 'cheat_exploit', 'keep_goddess_vow', 'forb
 // ชื่อไทยที่เนื้อหาใช้แทน id ได้ (ใบ 12 เขียนหมวดเป็นไทย) — ต้องตรงกับ vocab ของด่าน build
 const TH = {
   โลภจนเบียดเบียน: 'greed_harm', รบกวนนักบวช: 'disturb_monk', ด่าตีพ่อแม่ผู้ใหญ่: 'abuse_elders', ตัดสินไม่เป็นธรรม: 'unjust_judgment',
-  ผิดเมียผู้อื่น: 'adultery', เสน่ห์ยาแฝด: 'love_charm', กดขี่ผู้ใต้ปกครอง: 'oppress_subjects', ดื่มสุรา: 'intoxicants', บนแล้วไม่แก้: 'vow_broken',
+  ผิดเมียผู้อื่น: 'adultery', เสน่ห์ยาแฝด: 'love_charm', กดขี่ผู้ใต้ปกครอง: 'oppress_subjects', ดื่มสุรา: 'intoxicants', ฆ่าสัตว์: 'kill_animal', มิจฉาทิฏฐิ: 'wrong_view', บนแล้วไม่แก้: 'vow_broken',
   ทาน: 'dana', ศีล: 'sila', ภาวนา: 'bhavana', ดูแลพ่อแม่: 'care_parents', ช่วยคน: 'help_others', กลาง: 'neutral',
   ฆ่าเพื่อแต้ม: 'kill_for_gain', ใช้สกิลโกงเอาเปรียบ: 'cheat_exploit', รักษาสัญญาเทพธิดา: 'keep_goddess_vow',
   ความรู้อันตราย: 'forbidden_knowledge', ฝืนธรรมชาติ: 'against_nature', สัญญากับมาร: 'mara_pact',
