@@ -8,6 +8,7 @@
 @font-face { font-family:"Srisakdi"; font-weight:400; font-style:normal; font-display:swap; src:url(Srisakdi-Regular.woff2) format('woff2'); }
 @font-face { font-family:"Srisakdi"; font-weight:700; font-style:normal; font-display:swap; src:url(Srisakdi-Bold.woff2) format('woff2'); }
 @font-face { font-family:"Pridi"; font-weight:400; font-style:normal; font-display:swap; src:url(Pridi-Regular.woff2) format('woff2'); }
+@font-face { font-family:"Pridi"; font-weight:500; font-style:normal; font-display:swap; src:url(Pridi-Medium.woff2) format('woff2'); }
 @font-face { font-family:"Pridi"; font-weight:600; font-style:normal; font-display:swap; src:url(Pridi-SemiBold.woff2) format('woff2'); }
 @font-face { font-family:"Mitr"; font-weight:400; font-style:normal; font-display:swap; src:url(Mitr-Regular.woff2) format('woff2'); }
 @font-face { font-family:"Mitr"; font-weight:500; font-style:normal; font-display:swap; src:url(Mitr-Medium.woff2) format('woff2'); }
@@ -17,6 +18,7 @@
 @font-face { font-family:"Maitree"; font-weight:600; font-style:normal; font-display:swap; src:url(Maitree-SemiBold.woff2) format('woff2'); }
 @font-face { font-family:"Mali"; font-weight:500; font-style:normal; font-display:swap; src:url(Mali-Medium.woff2) format('woff2'); }
 @font-face { font-family:"Mali"; font-weight:600; font-style:normal; font-display:swap; src:url(Mali-SemiBold.woff2) format('woff2'); }
+@font-face { font-family:"IBM Plex Sans Thai"; font-weight:400; font-style:normal; font-display:swap; src:url(IBMPlexSansThai-Regular.woff2) format('woff2'); }
 @font-face { font-family:"IBM Plex Sans Thai"; font-weight:500; font-style:normal; font-display:swap; src:url(IBMPlexSansThai-Medium.woff2) format('woff2'); }
 @font-face { font-family:"IBM Plex Sans Thai"; font-weight:600; font-style:normal; font-display:swap; src:url(IBMPlexSansThai-SemiBold.woff2) format('woff2'); }
 @font-face { font-family:"Noto Serif Thai"; font-weight:400; font-style:normal; font-display:swap; src:url(NotoSerifThai-Regular.woff2) format('woff2'); }
