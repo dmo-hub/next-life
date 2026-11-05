@@ -73,6 +73,19 @@ export const DEV_TABS = [
   ['dev/maps/continent.html', 'แผนที่'],
   ['dev/archive/index.html', 'คลังเก่า'],
 ];
+
+// ผังทั้งหกอยู่หน้าเดียว สลับด้วย #<ผัง> (ui-redo 101 · ข้อ 189) · ที่เดิมแต่ละผังเป็นหน้าส่งต่อที่ build เขียนทุกรอบ
+// แท็บ "แผนที่" ยังชี้ continent.html — หน้าเขียนมือทุกหน้ามีแท็บนี้ ส่งต่อพาเข้าผังทวีปเองจึงไม่ต้องไล่แก้ทุกหน้า
+export const DEV_MAPS_PAGE = 'dev/maps/index.html';
+export const DEV_MAPS = [
+  ['continent', 'ทวีป', 'แผนที่ทวีปเอเธอร์การ์ด'],
+  ['afterlife', 'ปรโลก', 'ผังภูมิ 5 ในปรโลก'],
+  ['dungeon', 'ดันเจียน', 'แผนที่ชั้นในดันเจียนลับ'],
+  ['lineage', 'ตระกูล', 'ผังตระกูล'],
+  ['milestones', 'หลักไมล์', 'หลักไมล์ 8 สาย — โลกหลัก'],
+  ['politics', 'การเมือง', 'ผังบันไดการเมือง'],
+];
+export const mapsMoved = ([id, , title]) => movedHtml(`dev/maps/${id}.html`, `${DEV_MAPS_PAGE}#${id}`, title);
 export const DEV_NAV_CSS = `
 .nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
 .nl-nav{font:15px/1.4 Sarabun,"Noto Sans Thai",system-ui,sans-serif;text-align:left}
