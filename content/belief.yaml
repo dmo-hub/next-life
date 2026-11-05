@@ -509,3 +509,36 @@ events:
       - {id: chant, text: "นั่งฟังพระสวดจนจบ", effects: {happiness: 1}, merit: [{cat: bhavana, level: 1}]}
       - {id: host, text: "ช่วยเจ้าภาพล้างจาน", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
       - {id: ask, text: "ปรึกษาคนในบ้านเรื่องรายจ่าย", effects: {relations: 1}, merit: [{cat: neutral}]}
+
+  # โกงความตาย (ใบ 206 · B153) — พิธียืมชื่อคนอื่นมาต่อชะตาตัวเอง ตั้งธง cheat_death ⇒ ถึงคราวตายถูกเรียกตัวไปศาล (court_summons_*) แล้วตายปีเดิมสาเหตุเดิม
+  # บาปฝืนธรรมชาติลงที่ตัวเลือกนี้ที่เดียว — ใบศาล summons ไม่ลงบาปซ้ำ · สืบชะตาที่วัดเป็นพิธีปกติ ไม่ตั้งธง
+  - id: bel_borrow_name_01
+    type: B
+    category: belief
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {illness: {}}
+    title: "ยืมชื่อต่อชะตา"
+    text: "หลังหมอบอกผลตรวจ เพื่อนรุ่นเดียวกันพาไปหาอาจารย์ในซอยลึก อาจารย์ดูวันเกิดแล้วบอกว่าชะตาขาด ถ้าอยากอยู่ต่อ ให้เขียนชื่อคนที่ยังไม่ถึงคราวลงผ้ายันต์ แล้วเผาพร้อมชื่อตัวเอง ใครมารับจะได้จดผิดคน ส่วนเจ้าของชื่อจะเป็นอย่างไร อาจารย์ไม่ได้พูดถึง"
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: amulet, tradition: ผสม}
+    choices:
+      - id: borrow_name
+        text: "ยอมทำพิธียืมชื่อ"
+        cost: {unit: fixed_baht, amount: 5000, ref_year: 2560}
+        sets_flags: [cheat_death]
+        effects: {happiness: 1}
+        merit: [{cat: against_nature, level: 2}]
+      - id: temple_rite
+        text: "ไปทำบุญสืบชะตาที่วัดแทน"
+        cost: {unit: fixed_baht, amount: 500, ref_year: 2560}
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: ask_family
+        text: "กลับไปเล่าให้ลูกหลานฟังก่อน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: decline
+        text: "ขอบคุณแล้วขอตัวกลับ"
+        merit: [{cat: neutral}]

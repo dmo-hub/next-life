@@ -119,7 +119,8 @@ const HEIR_ONLY = new Set([...HEIR_EVENTS, ...OV.events]);
 const HEIR_CHOICES = new Set([...HEIR_CHOICE_SET, ...OV.choices]);
 const HEIR_FLAGS = new Set([...HEIR_FLAG_SET, ...OV.flags]);
 // ใบศาล (B153) แกนแทรกเองตอนเฉียดตาย/ถูกเรียกตัว และบอทศาลเลือกแทน — ไม่จั่วจากกองและไม่ผ่านบอทหลัก ⇒ ด่าน 2 ตัดสินไม่ได้
-// ด่านว่าออกครบลำดับและถูกเรียกตัวทุกชีวิตที่ถือธงอยู่ที่ npm run near · ธง cheat_death ข้ามเฉพาะตอนยังไม่มีการ์ดตั้ง (near ตั้งเอง) — มีการ์ดตั้งเมื่อไรกลับมาตัดสินที่นี่
+// ด่านว่าออกครบลำดับและถูกเรียกตัวทุกชีวิตที่ถือธงอยู่ที่ npm run near · ธง cheat_death มีการ์ดตั้งแล้ว (bel_borrow_name_01#borrow_name) ตัวกรองถอดเอง ⇒ ตัวเลือกตั้งธงตัดสินที่ด่าน 2 ตามปกติ
+// ตัวกรองคงไว้: ถ้าการ์ดตั้งถูกถอดออก ธงนี้กลับมาข้ามเอง ไม่ตกปลอม "ธงไม่มีใครตั้ง"
 const COURT_ONLY = new Set(content.events.filter((e) => COURT_SCENES.includes(e.scene)).map((e) => e.id));
 const COURT_FLAGS = new Set(['cheat_death'].filter((fl) => !setters.has(fl)));
 console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run near): ใบศาล ${COURT_ONLY.size} ใบ · ธงที่ยังไม่มีการ์ดตั้ง ${COURT_FLAGS.size} ตัว${COURT_FLAGS.size ? ` (${[...COURT_FLAGS].join(' · ')})` : ''}`);

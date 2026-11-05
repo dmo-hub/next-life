@@ -36,6 +36,7 @@ const leakOf = (card) => [...keys(card)].filter((k) => LEAK.test(k)).length + [.
 let reach30 = 0, near30 = 0, nearLives = 0, twice = 0, badOrder = 0, leaks = 0, courtCards = 0, wrongCause = 0;
 const levels = {};
 const base = [];
+const cardFlag = [], cardSummons = new Set();
 for (let i = 0; i < n; i++) {
   let near = 0;
   const seq = [];
@@ -44,6 +45,8 @@ for (let i = 0; i < n; i++) {
     if (card.court) {
       courtCards++;
       leaks += leakOf(card);
+      // ใบ summons ของชีวิตที่ได้ธงจากการ์ดเอง ไม่ใช่ทริปเฉียดตาย — นับแยกที่ด่านธงจากการ์ด
+      if (card.court === 'summons') { cardSummons.add(i); return; }
       seq.push(card.id === 'court_hint' ? 'hint' : card.id.startsWith('near_') ? 'near' : 'visit');
       if (card.id.startsWith('near_')) {
         near++;
@@ -64,6 +67,19 @@ for (let i = 0; i < n; i++) {
     if (st.nearDeath != null) near30++;
   }
   base.push({ age: r.age, cause: st.cause });
+  if (st.flags.cheat_death) cardFlag.push(i);
+}
+
+// ธงจากการ์ดจริง (ใบ 206): บอทสุ่มกดตัวเลือกที่ตั้ง cheat_death เอง ⇒ ถูกเรียกตัวทุกชีวิต · ชีวิตเดียวกันบนเนื้อหาที่ตัวเลือกพวกนั้นไม่ตั้งธง ต้องตายอายุ+สาเหตุเดิมและไม่ไปศาล
+const setsCheat = (c) => (c.sets_flags ?? []).includes('cheat_death');
+const noCheat = { ...content, events: content.events.map((e) => (e.choices?.some(setsCheat) ? { ...e, choices: e.choices.map((c) => (setsCheat(c) ? { ...c, sets_flags: c.sets_flags.filter((f) => f !== 'cheat_death') } : c)) } : e)) };
+const setterChoices = content.events.flatMap((e) => (e.choices ?? []).filter(setsCheat).map((c) => `${e.id}#${c.id}`));
+let cardMiss = 0, cardMoved = 0;
+for (const i of cardFlag) {
+  if (!cardSummons.has(i)) cardMiss++;
+  let court = false;
+  const r = playLife(mixSeed(seed, i), noCheat, random, (card) => { if (card.court === 'summons') court = true; });
+  if (court || r.age !== base[i].age || r.state.cause !== base[i].cause) cardMoved++;
 }
 
 const flagAge = args.includes('--ctl-flag-age') ? 30 : 0;
@@ -96,6 +112,8 @@ console.log(`[near-death] n ${n} seed ${seed} · band ${NEAR_DEATH.band} · minA
 check('เฉียดตาย ≤1 ครั้งต่อชีวิต', twice === 0, `เกิน 1 ครั้ง ${twice} ชีวิต · เคยเฉียดตาย ${nearLives} ชีวิต`);
 check(`สัดส่วนเฉียดตายในชีวิตที่ถึง 30 อยู่ในกรอบ ${TARGET.map((x) => `${x * 100}%`).join('–')}`, share >= TARGET[0] && share <= TARGET[1], `${near30}/${reach30} = ${pct(near30, reach30)}`);
 check('ทริปเฉียดตายออกครบลำดับ near → visit → คำใบ้', badOrder === 0, `ผิดลำดับ ${badOrder} · ใบ near สาเหตุไม่ตรง ${wrongCause} · ระดับคำใบ้ ${JSON.stringify(levels)}`);
+check(`ได้ธงจากการ์ด (${setterChoices.join(' · ') || 'ไม่มีตัวเลือกตั้งธง'}) ⇒ ถูกเรียกตัวทุกชีวิต`, setterChoices.length > 0 && cardFlag.length > 0 && cardMiss === 0, `${cardFlag.length - cardMiss}/${cardFlag.length}`);
+check('ได้ธงจากการ์ดแล้วตายอายุ+สาเหตุเดิม', cardMoved === 0, `ต่างจากชีวิตเดียวกันที่ตัวเลือกไม่ตั้งธง ${cardMoved}/${cardFlag.length}`);
 check('การ์ดศาลไม่เผยบัญชี', leaks + summonsLeak === 0, `${leaks + summonsLeak} จุด · การ์ดศาล ${courtCards}`);
 if (flagAge) {
   console.log(`ตัวควบคุม: ธงติดตอน ${flagAge} · ถูกเรียกตัว ${summoned}/${n} (ต้องน้อยกว่า n) · ตายต่างจากไม่ถือธง ${ageMoved}`);
