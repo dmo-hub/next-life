@@ -10,73 +10,80 @@
 <style>
   * { box-sizing: border-box; }
   html { scroll-padding-top: 12px; }
-  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
-  header { background: #1F2430; color: #F4EFE3; padding: 32px 16px 28px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.7; }
+  header { background: var(--head); color: var(--title); padding: 32px 16px 28px; }
   .w { max-width: 960px; margin: 0 auto; }
-  h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
-  header p { margin: 0 0 6px; color: #E3DDD0; max-width: 680px; }
-  header a { color: #F4EFE3; }
+  h1 { font-family: var(--fh); font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
+  header p { margin: 0 0 6px; color: var(--on-head); max-width: 680px; }
+  header a { color: var(--title); }
   main { padding: 20px 16px 64px; }
-  a { color: #7A2E22; }
+  a { color: var(--accent2); }
   .toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin: 0 0 28px; }
-  .toc section { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 14px 16px; }
-  .toc h2 { font-family: Pridi, serif; font-size: 20px; margin: 0 0 6px; }
+  .toc section { background: var(--surface); border: 1px solid var(--line); padding: 14px 16px; }
+  .toc h2 { font-family: var(--fh); font-size: 20px; margin: 0 0 6px; }
   .toc ol { margin: 0; padding-left: 22px; }
   .toc li { margin: 0 0 6px; }
-  .toc li > a { color: #1F2430; font-weight: 600; line-height: 1.5; padding: 4px 0; display: inline; }
-  .toc small { color: #4A4F5C; }
+  .toc li > a { color: var(--ink); font-weight: 600; line-height: 1.5; padding: 4px 0; display: inline; }
+  .toc small { color: var(--muted); }
   .toc .sub { font-size: 14px; line-height: 1.5; }
-  .toc .sub a { display: block; color: #4A4F5C; padding: 3px 0; }
-  .doc { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 18px 20px; margin: 0 0 20px; overflow-wrap: anywhere; }
-  .doc > h2 { font-family: Pridi, serif; font-size: clamp(22px, 4vw, 28px); line-height: 1.35; margin: 0 0 4px; }
-  .doc h3 { font-family: Pridi, serif; font-size: 21px; margin: 24px 0 6px; border-bottom: 1px solid #C9BFA9; padding-bottom: 2px; }
-  .doc h4 { font-family: Pridi, serif; font-size: 18px; margin: 18px 0 4px; }
+  .toc .sub a { display: block; color: var(--muted); padding: 3px 0; }
+  .doc { background: var(--surface); border: 1px solid var(--line); padding: 18px 20px; margin: 0 0 20px; overflow-wrap: anywhere; }
+  .doc > h2 { font-family: var(--fh); font-size: clamp(22px, 4vw, 28px); line-height: 1.35; margin: 0 0 4px; }
+  .doc h3 { font-family: var(--fh); font-size: 21px; margin: 24px 0 6px; border-bottom: 1px solid var(--line); padding-bottom: 2px; }
+  .doc h4 { font-family: var(--fh); font-size: 18px; margin: 18px 0 4px; }
   .doc h5 { font-size: 16px; margin: 14px 0 4px; }
   .doc p { margin: 0 0 10px; }
   .doc ul, .doc ol { margin: 0 0 10px; padding-left: 22px; }
   .doc li { margin: 0 0 4px; }
   .doc li ul, .doc li ol { margin: 4px 0 0; }
-  .src { font-size: 13px; color: #4A4F5C; }
-  code { font-family: ui-monospace, Consolas, monospace; font-size: .88em; background: #E6E0D3; padding: 0 4px; }
-  pre { background: #1F2430; color: #F4EFE3; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
+  .src { font-size: 13px; color: var(--muted); }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: .88em; background: var(--bg); padding: 0 4px; }
+  pre { background: var(--head); color: var(--title); padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
   pre code { background: none; padding: 0; font-size: inherit; }
   .tw { overflow-x: auto; margin: 0 0 12px; }
-  table { border-collapse: collapse; font-size: 14px; background: #FBF8F1; min-width: 100%; }
-  th, td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; overflow-wrap: normal; }
-  th { background: #E6E0D3; font-weight: 600; }
+  table { border-collapse: collapse; font-size: 14px; background: var(--surface); min-width: 100%; }
+  th, td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; vertical-align: top; overflow-wrap: normal; }
+  th { background: var(--bg); font-weight: 600; }
   .toc { display: flex; flex-wrap: wrap; gap: 8px; }
-  .toc a { display: inline-block; padding: 8px 12px; min-height: 44px; line-height: 28px; background: #F4EFE3; border: 1px solid #C9BFA9; color: #1F2430; text-decoration: none; }
-  .toc a:hover, .toc a:focus-visible { border-color: #1F2430; outline: none; }
-  main section { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 16px 20px; margin: 0 0 16px; }
-  main section h2 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 8px; }
+  .toc a { display: inline-block; padding: 8px 12px; min-height: 44px; line-height: 28px; background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink); text-decoration: none; }
+  .toc a:hover, .toc a:focus-visible { border-color: var(--ink); outline: none; }
+  main section { background: var(--surface); border: 1px solid var(--line); padding: 16px 20px; margin: 0 0 16px; }
+  main section h2 { font-family: var(--fh); font-size: 22px; margin: 0 0 8px; }
   main section p, main section ul, main section ol { margin: 0 0 8px; }
   main section ul, main section ol { padding-left: 22px; }
-  .stages small { color: #4A4F5C; }
-  .gi { display: inline-flex; vertical-align: -2px; color: #A23B2C; }
+  .stages small { color: var(--muted); }
+  .gi { display: inline-flex; vertical-align: -2px; color: var(--accent2); }
   .gi svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .fx { white-space: nowrap; font-size: 14px; border: 1px solid #C9BFA9; padding: 0 6px; background: #FBF8F1; }
+  .fx { white-space: nowrap; font-size: 14px; border: 1px solid var(--line); padding: 0 6px; background: var(--surface); }
   /* ป้ายผลไอคอนชุดเดียวกับปุ่มในเกม (fxHtml ใน labels.mjs) · สีชาติไทยเพราะพื้นหน้านี้สว่าง */
   .fx .fxp, .fx .fxp > [aria-hidden], .fxk { display: inline-flex; align-items: center; gap: 2px; vertical-align: -2px; }
   .fx svg, .fxk svg { width: 1.15em; height: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   .fx .up, .fx .dn { padding: 0 5px; border-radius: 999px; }
-  .fx .up { color: #2F6B66; background: color-mix(in srgb, #2F6B66 16%, transparent); }
-  .fx .dn { color: #B73824; background: color-mix(in srgb, #B73824 16%, transparent); }
+  .fx .up { color: var(--good); background: color-mix(in srgb, var(--good) 16%, transparent); }
+  .fx .dn { color: var(--bad); background: color-mix(in srgb, var(--bad) 16%, transparent); }
   .fxk { margin-right: 6px; white-space: nowrap; }
-  b.btn { display: inline-block; font-weight: 600; border: 1px solid #1F2430; padding: 0 8px; background: #FBF8F1; white-space: nowrap; }
+  b.btn { display: inline-block; font-weight: 600; border: 1px solid var(--line-strong); padding: 0 8px; background: var(--surface); white-space: nowrap; }
   dl { margin: 0; } dt { font-weight: 600; margin-top: 8px; } dd { margin: 0 0 4px; }
-  kbd { font-family: ui-monospace, Consolas, monospace; font-size: 13px; border: 1px solid #8E8574; border-bottom-width: 2px; padding: 0 5px; background: #FBF8F1; }
-  footer { font-size: 13px; color: #4A4F5C; margin-top: 32px; }
+  kbd { font-family: ui-monospace, Consolas, monospace; font-size: 13px; border: 1px solid var(--line-strong); border-bottom-width: 2px; padding: 0 5px; background: var(--surface); }
+  footer { font-size: 13px; color: var(--muted); margin-top: 32px; }
   /*NAV-CSS:START*/
-  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
-  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
-  nav.top a.dark { color: #F0D78C; }
-  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  :root { --bg:#F4ECDC; --surface:#FBF6EA; --ink:#1B2A4A; --muted:#5B5648; --accent:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --seal:#A62B1F; --good:#2F6B4F; --bad:#B3261E; --line:#C9B98F; --line-strong:#8C7A52; --on-head:#E7E2D4; --on-head2:#D8D2C2; --on-head3:#BFB49A; --title:#F4ECDC; --lacquer:#17110D; --lacquer2:#221912; --bronze:#5A4630; --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }
+  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
+  nav.top a { display: inline-block; color: var(--on-head); text-decoration: none; padding: 0 10px; line-height: 40px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: var(--headink); }
+  nav.top a[aria-current] { color: var(--headink); font-weight: 600; }
   nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
-  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .brand { font-weight: 600; color: var(--headink); padding-left: 0; white-space: nowrap; }
   nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
-  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
-  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+  nav.top a.play { background: var(--gold); color: var(--head); border-radius: var(--r); line-height: 28px; padding: 0 12px; font-weight: 600; white-space: nowrap; }
+  nav.top a.play:focus-visible { outline: 2px solid var(--headink); outline-offset: 2px; }
+  body > header:not(.home) { background: var(--head); color: var(--title); padding: 16px 16px 18px; }
+  body > header:not(.home) h1 { font-family: var(--fh); font-weight: 600; color: var(--title); }
+  body > header:not(.home) p { color: var(--on-head2); }
+  body > header:not(.home) a { color: var(--headink); text-decoration: underline; text-underline-offset: 3px; }
+  main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
 /*NAV-CSS:END*/
 </style>
 </head>
@@ -148,7 +155,9 @@
 <li>เลขเวอร์ชันมุมบนของเกมกดได้ พาไปแพตช์โน้ตของเวอร์ชันนั้น</li>
 </ul></section>
 <section id="help"><h2>ช่วยจริง</h2><p>เรื่องในเกมบางเรื่องหนัก (ความตาย หนี้ การสูญเสีย และความรุนแรง — บรรทัดเดียวกันนี้ขึ้นบนการ์ดแรกเกิดของตระกูลใหม่และหน้าเล่นต่อ) ถ้าใกล้ตัวคุณ ในชีวิตจริงมีคนรับฟังและช่วยได้ฟรี</p><ul><li><a href="tel:1323">อยากมีคนคุยด้วย · โทร 1323</a> — สายด่วนสุขภาพจิต กรมสุขภาพจิต · ฟรี 24 ชม. · <a href="https://www.dmh.go.th/" rel="noopener">เว็บทางการ</a></li><li><a href="tel:1413">อยากเลิกเหล้า · โทร 1413</a> — ศูนย์ปรึกษาเพื่อการเลิกสุราและการเสพติด · <a href="https://www.1413.in.th/" rel="noopener">เว็บทางการ</a></li><li><a href="tel:1441">โดนหลอกออนไลน์ · โทร 1441</a> — กองบัญชาการตำรวจสืบสวนสอบสวนอาชญากรรมทางเทคโนโลยี · 24 ชม. · <a href="https://www.ccib.go.th/" rel="noopener">เว็บทางการ</a></li><li><a href="tel:1111,79">เรื่องล้มละลาย/บังคับคดี · 1111 กด 79</a> — กรมบังคับคดี · <a href="https://www.led.go.th/th" rel="noopener">เว็บทางการ</a></li></ul><p><small>เกมนี้ไม่รับเงินจากลิงก์เหล่านี้ และไม่รับบริจาค · ข้อมูลตรวจเมื่อ ตุลาคม 2569</small></p></section>
-  <footer>อยากรู้ว่าอะไรมาจากข้อมูลจริง อะไรเป็นสมมติฐานเกม → <a href="about.html">กลไกในเกม</a> · ของใหม่แต่ละเวอร์ชัน → <a href="whatsnew.html">แพตช์โน้ต</a> · เกมนี้ไม่ใช่คำแนะนำการลงทุน</footer>
+  <footer>อยากรู้ว่าอะไรมาจากข้อมูลจริง อะไรเป็นสมมติฐานเกม → <a href="about.html">กลไกในเกม</a> · ของใหม่แต่ละเวอร์ชัน → <a href="whatsnew.html">แพตช์โน้ต</a></footer>
+  <!-- คำปฏิเสธย้ายมาจากหน้าแรก (ui-redo 105 · ข้อ 220) — ห้ามหายจากเว็บ -->
+  <footer>โปรเจกต์ส่วนตัว · ข้อมูลการเงินในเกมเป็นข้อมูลเพื่อออกแบบเกม ไม่ใช่คำแนะนำการลงทุน · แฟนตาซีในเกมได้แรงบันดาลใจจากคติไทย ไม่ได้อ้างว่าเป็นคำสอน</footer>
 </div></main>
 </body>
 </html>

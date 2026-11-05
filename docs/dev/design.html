@@ -10,38 +10,38 @@
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
-  header { background: #1F2430; color: #F4EFE3; padding: 32px 16px 28px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.7; }
+  header { background: var(--head); color: var(--title); padding: 32px 16px 28px; }
   .w { max-width: 900px; margin: 0 auto; }
-  h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
-  header p { margin: 0; color: #E3DDD0; }
-  header a { color: #F4EFE3; }
+  h1 { font-family: var(--fh); font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
+  header p { margin: 0; color: var(--on-head); }
+  header a { color: var(--title); }
   main { padding: 24px 16px 64px; }
-  h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
+  h3 { font-family: var(--fh); font-size: 17px; margin: 16px 0 4px; }
   ul, ol { padding-left: 22px; margin: 0 0 8px; }
   li { margin: 0 0 6px; }
   p { margin: 0 0 8px; }
   table { border-collapse: collapse; width: 100%; font-size: 14px; }
-  th, td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; }
-  th { background: #E9E2D2; font-weight: 600; }
-  code { font-size: 13px; background: #E9E2D2; padding: 0 4px; }
-  a { color: #A23B2C; }
+  th, td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: var(--bg); font-weight: 600; }
+  code { font-size: 13px; background: var(--bg); padding: 0 4px; }
+  a { color: var(--accent2); }
   .spec-toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 0 0 16px; font-size: 14px; }
-  .spec-toc > div { border: 1px solid #C9BFA9; background: #FBF8F1; padding: 10px 14px; }
+  .spec-toc > div { border: 1px solid var(--line); background: var(--surface); padding: 10px 14px; }
   .spec-toc h3 { margin: 0 0 4px; }
   .spec-toc li > a { line-height: 1.5; padding: 4px 0; }
   .spec-toc li small { display: block; }
-  .spec-toc .sub a { display: block; color: #4A4F5C; padding: 4px 0; }
-  .spec-toc small { color: #4A4F5C; }
-  details.doc { border: 1px solid #C9BFA9; background: #FBF8F1; padding: 8px 14px; margin: 0 0 8px; overflow-wrap: anywhere; }
-  details.doc > summary { font-family: Pridi, serif; font-size: 17px; cursor: pointer; padding: 6px 0; min-height: 32px; }
+  .spec-toc .sub a { display: block; color: var(--muted); padding: 4px 0; }
+  .spec-toc small { color: var(--muted); }
+  details.doc { border: 1px solid var(--line); background: var(--surface); padding: 8px 14px; margin: 0 0 8px; overflow-wrap: anywhere; }
+  details.doc > summary { font-family: var(--fh); font-size: 17px; cursor: pointer; padding: 6px 0; min-height: 32px; }
   details.doc h3 { font-size: 18px; }
-  details.doc h4 { font-family: Pridi, serif; font-size: 16px; margin: 14px 0 4px; }
+  details.doc h4 { font-family: var(--fh); font-size: 16px; margin: 14px 0 4px; }
   details.doc h5 { font-size: 15px; margin: 12px 0 4px; }
-  .lead { font-size: 14px; color: #4A4F5C; }
-  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; color: #A23B2C; }
-  .src { font-size: 13px; color: #4A4F5C; }
-  pre { background: #1F2430; color: #F4EFE3; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
+  .lead { font-size: 14px; color: var(--muted); }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; color: var(--accent2); }
+  .src { font-size: 13px; color: var(--muted); }
+  pre { background: var(--head); color: var(--title); padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
   pre code { background: none; padding: 0; }
   .tw { overflow-x: auto; margin: 0 0 12px; }
   .tw th, .tw td { overflow-wrap: normal; }
@@ -49,30 +49,31 @@
 </head>
 <body>
 <!--nav--><style>
+:root { --bg:#F4ECDC; --surface:#FBF6EA; --ink:#1B2A4A; --muted:#5B5648; --accent:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --seal:#A62B1F; --good:#2F6B4F; --bad:#B3261E; --line:#C9B98F; --line-strong:#8C7A52; --on-head:#E7E2D4; --on-head2:#D8D2C2; --on-head3:#BFB49A; --title:#F4ECDC; --lacquer:#17110D; --lacquer2:#221912; --bronze:#5A4630; --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }
 .nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
-.nl-nav{font:15px/1.4 Sarabun,"Noto Sans Thai",system-ui,sans-serif;text-align:left}
+.nl-nav{font:15px/1.4 var(--fb);text-align:left}
 .nl-nav a{text-decoration:none;color:inherit}
 .nl-in{max-width:1040px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
-.nl-top{background:#1F2430;color:#F4EFE3}
+.nl-top{background:var(--head);color:var(--title)}
 .nl-top>.nl-in{min-height:52px;flex-wrap:wrap;column-gap:12px}
-.nl-brand{font-weight:700;margin-right:auto;padding:12px 0}
+.nl-brand{font-weight:600;margin-right:auto;padding:12px 0}
 .nl-main{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
 .nl-main a{padding:13px 8px 11px;border-bottom:3px solid transparent;white-space:nowrap}
-.nl-main a[aria-current]{border-bottom-color:#D6A64A;font-weight:600}
-.nl-swap{border:1px solid #6B7080;padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
-.nl-swap:hover,.nl-main a:hover{opacity:1;color:#fff}
-.nl-dev .nl-top{background:#2F3833}
-.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:#8A6A2E;color:#F4EFE3;vertical-align:2px}
-.nl-tabs{background:#F3EEE2;color:#1F2430;border-bottom:1px solid #D8D0C0}
+.nl-main a[aria-current]{border-bottom-color:var(--gold);font-weight:600}
+.nl-swap{border:1px solid var(--line-strong);padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
+.nl-swap:hover,.nl-main a:hover{opacity:1;color:var(--surface)}
+.nl-dev .nl-top{background:var(--head)}
+.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:var(--accent2);color:var(--surface);vertical-align:2px}
+.nl-tabs{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--line)}
 .nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
 .nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
-.nl-tabs a[aria-current]{border-bottom-color:#A23B2C;font-weight:600}
-.nl-tabs.nl-sub{background:#EBE4D5;font-size:14px}
+.nl-tabs a[aria-current]{border-bottom-color:var(--accent2);font-weight:600}
+.nl-tabs.nl-sub{background:var(--bg);font-size:14px}
 @media (max-width:640px){
 .nl-top>.nl-in{padding:0}
 .nl-brand{padding:12px 16px}
 .nl-swap{margin-right:16px}
-.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid #343A48}
+.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid var(--line-strong)}
 }
 </style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html" aria-current="page">คำตัดสินเกม</a><a href="../dev/ui.html">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div>
 <header><div class="w">

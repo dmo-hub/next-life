@@ -17,7 +17,7 @@ export const FONTS = [
   ['Mitr', 400, 'Mitr-Regular'],
   ['Mitr', 500, 'Mitr-Medium'],
   ['Mitr', 600, 'Mitr-SemiBold'],
-  // Maitree: หน้า tweak T1 ใช้ · หน้าผู้เล่นยังไม่ใช้จนกว่าใบ token ลงจริง
+  // Maitree = ตัวหัวทุกหน้า (ui-redo 105 · ข้อ 209)
   ['Maitree', 400, 'Maitree-Regular'],
   ['Maitree', 500, 'Maitree-Medium'],
   ['Maitree', 600, 'Maitree-SemiBold'],
@@ -29,8 +29,9 @@ export const FONTS = [
   ['Noto Serif Thai', 400, 'NotoSerifThai-Regular'],
   ['Noto Serif Thai', 600, 'NotoSerifThai-SemiBold'],
 ];
-// หน้าเล่น: Noto Sans Thai = หัวและเนื้อ · Sarabun = ภาพแชร์และภาพชั้นสมุด (canvas) · Srisakdi มีแค่ 700 ที่ใช้ (ทุกจุดเป็นตัวหนา)
-export const PLAY_FACES = ['Noto Sans Thai 400', 'Noto Sans Thai 600', 'Sarabun 400', 'Sarabun 600', 'Srisakdi 700'];
+// หน้าเล่น: Sarabun = เนื้อ + ภาพแชร์/ภาพชั้นสมุด (canvas) · Maitree 600 = หัว (หัวที่ขอ 700 ได้ 600) · Srisakdi มีแค่ 700 ที่ใช้ (ทุกจุดเป็นตัวหนา)
+// Noto Sans Thai ถอดจากหน้าเล่น (ข้อ 216) · ยังอยู่ใน FONTS เพราะหน้า tweak/แผนที่ dev ยังใช้
+export const PLAY_FACES = ['Sarabun 400', 'Sarabun 600', 'Maitree 600', 'Srisakdi 700'];
 export const FONT_DIR = 'fonts/';
 export const FONT_CSS = `${FONT_DIR}fonts.css`;
 
