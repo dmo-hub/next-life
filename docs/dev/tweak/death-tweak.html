@@ -4,91 +4,100 @@
 <!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ปรับการ์ดตาย / หน้าไว้อาลัย (tweak) · next-life</title>
+<title>T10 การ์ดตาย book: กรอบ ลาย ตรา (tweak) · next-life</title>
+<link rel="stylesheet" href="../../fonts/fonts.css">
 <style>
-* { box-sizing:border-box; }
-body { margin:0; background:#DCD6CB; color:#1F2430; font:15px/1.55 Sarabun,"Noto Sans Thai",system-ui,sans-serif; }
-.bar { position:sticky; top:0; z-index:5; background:#1F2430; color:#F4EFE3; padding:10px 14px; display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; }
-.bar h1 { margin:0; font-size:16px; flex:1 1 100%; }
-.bar button { font:inherit; font-size:13px; min-height:32px; padding:0 12px; border-radius:999px; border:1px solid #D9B45A; background:transparent; color:#F0D78C; cursor:pointer; }
-.bar button.on { background:#D9B45A; color:#1F2430; }
-@media (max-width:700px) { .bar { position:static; } }
-main { max-width:1680px; margin:0 auto; padding:14px; display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:16px; align-items:start; }
-@media (max-width:900px) { main { grid-template-columns:1fr; } }
-.intro { font-size:14px; margin:0 0 10px; }
-h2 { font-size:16px; margin:18px 0 6px; }
-.grid { display:flex; flex-wrap:wrap; gap:14px; align-items:flex-start; }
-.ex { margin:0; }
-.ex figcaption { font-size:12px; font-weight:700; margin-bottom:4px; }
-.ex figcaption span { font-weight:400; opacity:.8; }
-.ex.pick figcaption { color:#B73824; }
-.fr { overflow:hidden; border:1px solid #B9AE97; border-radius:8px; background:#E4DDCF; }
-.fr iframe { display:block; border:0; transform-origin:0 0; }
-.side { position:sticky; top:100px; }
-@media (max-width:900px) { .side { position:static; } }
-.panel { border:1px solid #B9AE97; border-radius:10px; background:#E9E1CF; padding:10px 12px; }
-.panel h2 { margin:0 0 6px; font-size:15px; }
-.panel label { display:grid; grid-template-columns:1fr auto; gap:4px 8px; align-items:center; font-size:13px; margin:7px 0; }
-.panel label input[type=range] { grid-column:1 / -1; width:100%; }
-.panel select { font:inherit; font-size:13px; max-width:170px; }
-.panel button { font:inherit; font-size:13px; min-height:32px; padding:0 12px; border-radius:999px; border:1px solid #3A3F4B; background:#F4EFE3; cursor:pointer; margin:8px 8px 0 0; }
-textarea { width:100%; height:110px; font:12px/1.4 ui-monospace,Consolas,monospace; margin-top:8px; }
+  /* หน้า tweak T10 (ui-redo 118 · SPEC §4 แถว T10 · ข้อ 199 201): หนังสืองานศพบนการ์ดตาย — กรอบ · ลาย · ตรา --seal
+     จอเกมอยู่ใน iframe ที่ใช้ CSS เกมจริงจาก template.html (build เติมใน <template id="game-css">) · ชุด 0 = เกมตอนนี้ ไม่ทับอะไร
+     markup ลอกโครงจาก app.mjs render() ฝั่ง card.kind === 'death' (d-head · d-tl · d-facts · deathTabs · d-share) */
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #E6E0D3; color: #1F2430; font: 15px/1.55 Sarabun, system-ui, sans-serif; }
+  .lay { display: grid; grid-template-columns: 360px minmax(0, 1fr); align-items: start; }
+  .ctl { position: sticky; top: 0; height: 100vh; overflow-y: auto; background: #F3EEE2; border-right: 1px solid #D8D0C0; padding: 14px 14px 40px; }
+  .ctl h1 { margin: 0 0 4px; font-size: 19px; line-height: 1.3; }
+  .ctl .hint { margin: 6px 0 10px; font-size: 13px; color: #5A5F6B; }
+  .ctl h2 { margin: 18px 0 6px; font-size: 15px; padding-top: 10px; border-top: 1px solid #D8D0C0; }
+  .row { margin: 8px 0 10px; }
+  .row > .lb { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .row > .lb output { font-weight: 400; font-variant-numeric: tabular-nums; }
+  .row input[type=range] { width: 100%; }
+  .row input[type=color] { width: 44px; height: 32px; padding: 0 2px; border: 1px solid #C9BFA9; background: #fff; vertical-align: middle; }
+  .ed { color: #7A5A12; font-weight: 600; }
+  .seg { display: flex; flex-wrap: wrap; gap: 4px; }
+  .seg button, .btns button { font: inherit; font-size: 13px; padding: 4px 9px; border: 1px solid #C9BFA9; background: #fff; color: #1F2430; cursor: pointer; border-radius: 4px; min-height: 32px; text-align: left; }
+  .seg button.on { background: #1F2430; color: #fff; border-color: #1F2430; }
+  .seg button:disabled, .row input:disabled { opacity: .5; cursor: not-allowed; }
+  .sws { display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: middle; }
+  .sws button { width: 26px; height: 26px; min-height: 0; padding: 0; border: 1px solid #0004; border-radius: 4px; cursor: pointer; }
+  .btns { display: flex; flex-wrap: wrap; gap: 6px; }
+  .btns .pri { background: #2563eb; color: #fff; border-color: #2563eb; }
+  button:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid #2563eb; outline-offset: 1px; }
+  textarea { font: inherit; font-size: 13px; width: 100%; padding: 6px 8px; border: 1px solid #C9BFA9; border-radius: 4px; resize: vertical; background: #fff; }
+  #out { font: 11px/1.4 ui-monospace, monospace; }
+  #msg { font-size: 13px; color: #15803d; min-height: 1.4em; }
+  table.cr { border-collapse: collapse; font-size: 12px; width: 100%; }
+  table.cr th, table.cr td { border: 1px solid #D8D0C0; padding: 3px 5px; text-align: left; vertical-align: top; }
+  table.cr td.n { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  table.cr .pair { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 20px; font-weight: 600; font-size: 12px; border: 1px solid #0002; }
+  .ok { color: #15803d; font-weight: 600; } .bad { color: #B3261E; font-weight: 600; } .info { color: #5A5F6B; }
+  .view { padding: 12px 16px 24px; min-width: 0; }
+  .vbar { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-bottom: 10px; font-size: 13px; }
+  .note { font-size: 13px; color: #4A4F5B; margin: 0 0 10px; max-width: 1100px; }
+  .sc { margin: 0 0 22px; }
+  .sc > h2 { font-size: 16px; margin: 0 0 8px; }
+  .sc.pick > h2 { color: #7A5A12; }
+  .frames { display: grid; grid-template-columns: minmax(0, 390px) minmax(0, 1fr); gap: 14px 18px; align-items: start; }
+  .fr h3 { margin: 0 0 6px; font-size: 14px; }
+  .fr h3 small { font-weight: 400; color: #5A5F6B; }
+  .fr .box { position: relative; overflow: hidden; box-shadow: 0 6px 30px rgb(0 0 0 / .14); background: #E4DDCF; }
+  .fr iframe { border: 0; display: block; transform-origin: 0 0; }
+  @media (max-width: 860px) { .lay { grid-template-columns: 1fr; } .ctl { position: static; height: auto; border-right: 0; border-bottom: 1px solid #D8D0C0; } .frames { grid-template-columns: minmax(0, 1fr); } }
 </style>
 </head>
 <body>
 
-<div class="bar">
-  <h1>การ์ดตาย / หน้าไว้อาลัย · แบบใหม่ 3 แบบเทียบแบบปัจจุบัน · ยังไม่ลงเกม</h1>
-  <span>จอ</span>
-  <button type="button" data-w="360">360</button>
-  <button type="button" data-w="390" class="on">390</button>
-  <button type="button" data-w="1280">1280</button>
-  <span>แสดง</span>
-  <button type="button" data-show="all" class="on">ทุกชีวิต</button>
-  <button type="button" data-show="pick">เฉพาะแบบที่เลือก</button>
+<div class="lay">
+  <aside class="ctl" id="ctl"></aside>
+  <main class="view">
+    <div class="vbar">
+      <span>ดู</span><span class="seg" id="mode"><button type="button" data-m="cmp">เทียบทุกชุด (ชีวิตเดียว)</button><button type="button" data-m="set">ชุดที่เลือก (ทุกชีวิต)</button></span>
+      <span>ชีวิต</span><span class="seg" id="smp"></span>
+      <span>แท็บที่เปิด</span><span class="seg" id="tab"></span>
+      <span>เมนูแชร์</span><span class="seg" id="shr"><button type="button" data-s="0">ปิด</button><button type="button" data-s="1">เปิด</button></span>
+    </div>
+    <p class="note">ทุกช่องเป็นการ์ดตายในจอเกมจำลอง (iframe กว้างเท่าจอจริง 390 คู่ 1280) ใช้ CSS เกมจริงที่ build ฉีดมา · ชีวิตจริง 6 แบบจากบอทของ harness (เด็กตาย · คนแก่รวย · ฉายาเยอะสุด · หลอดชีวิตหมด · ตายพร้อมหนี้ · หายตัวไปต่างโลก) · รายชื่อคนในบ้านในแท็บครอบครัวเป็นตัวอย่างคงที่ไว้ดูการขีดฆ่าชื่อคนที่จากไป · ใบนี้ปรับแค่กรอบ ลาย ตรา ของหนังสืองานศพ — ข้อมูล แท็บ 6 ตัว ปุ่มไปต่อ 1 ปุ่ม + เมนูแชร์ 1 ปุ่ม (ใบ 12) อยู่ครบทุกชุด · ป้ายตามหาคนหายคงหน้าตาเดิม (ไม่มีตรา ไม่ใช่งานศพ) · แท็บในจอกดได้</p>
+    <div id="frames"></div>
+  </main>
 </div>
-<main>
-<div id="out">
-  <p class="intro">ทุกช่องเป็นจอเกมจำลองใน iframe กว้างเท่าจอจริง ใช้ CSS กับฟอนต์ของเกมที่ build ฉีดมา · แถวคือชีวิตจริง 6 แบบ (เล่นด้วยบอทของ harness: เด็กตาย · คนแก่รวย · ฉายาเยอะสุด · หลอดชีวิตหมด · ตายพร้อมหนี้ · หายตัวไปต่างโลก) · คอลัมน์แรกคือแบบปัจจุบันไว้เทียบ · ข้อมูลเดิมอยู่ครบทุกแบบ ย้ายที่ได้แต่ไม่หาย · แท็บ 6 ตัวชื่อเดิม · เลือกแบบกับปรับค่าทางขวาแล้วคัดลอก JSON</p>
-  <div id="rows"></div>
-</div>
-<div class="side"><div class="panel">
-  <h2>เลือก/ปรับค่า</h2>
-  <label>แบบ <select id="layout"><option value="book">ก · หนังสืองานศพ (กรอบทองกลาง)</option><option value="side">ข · หัวข้าง ปุ่มขึ้นก่อน</option><option value="plate">ค · แผ่นจารึก (อายุเป็นจุดเด่น)</option></select></label>
-  <label>ฉายาแบบ <select id="titleStyle"><option value="auto">ตามแบบ</option><option value="ribbon">ริบบิ้น</option><option value="tag">ป้ายมีระดับ</option><option value="line">บรรทัดเดียว</option></select></label>
-  <label>โชว์ฉายากี่อัน (ที่เหลือ = อีก N ฉายา) <output data-for="shown"></output><input id="shown" type="range" min="1" max="6" step="1"></label>
-  <label>ปุ่มไปช่วงระหว่างชาติ <select id="btnPos"><option value="auto">ตามแบบ</option><option value="top">ต่อจากหัว</option><option value="bottom">ท้ายข้อมูล</option></select></label>
-  <label>ขนาดรูป <output data-for="por"></output><input id="por" type="range" min="56" max="140" step="4"></label>
-  <label>สีเน้น (ริบบิ้น · ปุ่ม) <input id="accent" type="color"></label>
-  <label>สีกรอบทอง <input id="gold" type="color"></label>
-  <label>ภาพฉากตาย <select id="scene"><option value="on">โชว์</option><option value="off">ซ่อน</option></select></label>
-  <button type="button" id="copy">คัดลอก JSON</button><button type="button" id="reset">ค่าเริ่ม</button>
-  <textarea id="json" readonly aria-label="ค่าที่เลือก (JSON)"></textarea>
-</div></div>
-</main>
+
+<!-- build เติม CSS ของ src/ui/template.html ระหว่าง marker ทุกรอบ (build.mjs รายการหน้าฉีด GAME-CSS) — ใช้ใส่ใน iframe เท่านั้น -->
 <template id="game-css"><style>/*GAME-CSS:START*/
-@font-face { font-family:"Noto Sans Thai"; font-weight:400; font-style:normal; font-display:swap; src:url(../../fonts/NotoSansThai-Regular.woff2) format('woff2'); }
-@font-face { font-family:"Noto Sans Thai"; font-weight:600; font-style:normal; font-display:swap; src:url(../../fonts/NotoSansThai-SemiBold.woff2) format('woff2'); }
+@font-face { font-family:"Sarabun"; font-weight:400; font-style:normal; font-display:swap; src:url(../../fonts/Sarabun-Regular.woff2) format('woff2'); }
+@font-face { font-family:"Sarabun"; font-weight:600; font-style:normal; font-display:swap; src:url(../../fonts/Sarabun-SemiBold.woff2) format('woff2'); }
+@font-face { font-family:"Maitree"; font-weight:600; font-style:normal; font-display:swap; src:url(../../fonts/Maitree-SemiBold.woff2) format('woff2'); }
 /* สีมาจากต้นแบบการ์ด (ใบ 06) — ทาง A ทะเบียนราษฎร์ · ทาง B ลายรดน้ำ · ไม่สลับตามโหมดมืดเพราะสีเป็นตัวบอกแนวการ์ด */
-/* ui-redo ใบ 02 (เจ้าของเคาะ): ชุดสี A กระดาษ · แถบค่า --fl · สีเน้น --red · Noto Sans Thai หัว/เนื้อ 16px · มุม 10 (การ์ด 15 · ชิป/ปุ่มเลขกลม) · เงาบาง
+/* ui-redo ใบ 105 ลง T1 (ข้อ 209–211 · 215–217): ชุดคราม — หมึก = ปุ่มหลัก = หัวเว็บ #1B2A4A · หัว Maitree เนื้อ Sarabun · มุม 6 (การ์ด 8) · เงาทองเฉพาะการ์ดในเกม
+   · --red = ชาด เหลือแค่ตรา/ขีดฆ่า (ข้อ 215) · --line-strong = ขอบที่บอกว่ากดได้ (--rule เป็นเส้นประดับ ต่ำกว่า 3:1)
+   · การ์ด B + ภาพแชร์ · ต่างโลก · ระหว่างชาติ/ปรโลก คงสีเดิมจนใบ 121 (ข้อ 228 ชุด ก) · แถบค่า --fl รอ T6
    · การ์ดกว้างสุด 800 · ขอบรอบการ์ด 36 บนล่าง 32 ข้าง ค่าเดียวทุกจอ (ต้นแบบ tweak.html) */
 :root {
-  --page:#E4DDCF; --ink:#1F2430; --ink2:#3A3F4B; --muted:#4A4F5C;
-  --paper:#F7F2E7; --paper2:#E9E1CF; --rule:#B9AE97; --rule2:#CFC4AD; --red:#B73824; --green:#2F6B66; --blue:#35558A;
+  --page:#F4ECDC; --ink:#1B2A4A; --ink2:color-mix(in srgb, #1B2A4A 70%, #5B5648); --muted:#5B5648;
+  --paper:#FBF6EA; --paper2:color-mix(in srgb, #FBF6EA 45%, #F4ECDC); --rule:#C9B98F; --rule2:color-mix(in srgb, #C9B98F 60%, #FBF6EA); --line-strong:#8C7A52;
+  --red:#A62B1F; --green:#2F6B4F; --blue:#7A5C12; --head:#1B2A4A;
   --lacquer:#17110D; --lacquer2:#221912; --gold:#D9B45A; --gold2:#F0D78C; --cream:#EFE3C2; --bronze:#5A4630; --bronze2:#8A6D3B; --sand:#BFAE86;
   --fl:#015EC1; --dg:#B3261E; --track:#E2D9C6;
-  --ft:"Noto Sans Thai",system-ui,sans-serif;
-  --r:10px; --rk:15px; --rc:999px; --sh:0 1px 2px rgb(0 0 0 / .06), 0 8px 24px rgb(0 0 0 / .08);
+  --ft:Sarabun,system-ui,sans-serif; --fh:Maitree,serif;
+  --r:6px; --rk:8px; --rc:999px; --sh:0 1px 0 var(--gold), 0 6px 18px color-mix(in srgb, var(--ink) 10%, transparent);
   --cw:800px; --pad-y:36px; --pad-x:32px;
 }
 * { box-sizing:border-box; }
 body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--ft); }
 /* viewport-fit=cover ให้ env(safe-area-inset-*) มีค่า แต่หน้าก็ลามใต้รอยบาก/แถบโฮม — ทุกขอบที่ติดจอต้องกันเอง */
-.logo { background:var(--lacquer); text-align:center; padding:calc(10px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 6px max(16px, env(safe-area-inset-left)); border-bottom:1px solid var(--bronze); }
+.logo { background:var(--head); text-align:center; padding:calc(10px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 6px max(16px, env(safe-area-inset-left)); border-bottom:1px solid var(--bronze); }
 .logo b { font-family:Srisakdi,serif; font-weight:700; font-size:34px; line-height:1.2; color:var(--gold); }
 .logo b span { display:inline-block; }
-.logo small { display:block; font-size:12px; letter-spacing:0.12em; color:var(--sand); }
-.logo .ver { text-decoration:none; display:inline-block; margin-top:4px; padding:1px 9px; border:1px solid var(--bronze); border-radius:999px; font-size:11px; font-weight:600; color:var(--sand); white-space:nowrap; }
+.logo small { display:block; font-size:12px; letter-spacing:0.12em; color:color-mix(in srgb, var(--cream) 85%, var(--head)); }
+.logo .ver { text-decoration:none; display:inline-block; margin-top:4px; padding:1px 9px; border:1px solid var(--bronze); border-radius:999px; font-size:12px; font-weight:600; color:var(--sand); white-space:nowrap; }
 .logo a.ver:hover, .logo a.ver:focus-visible { text-decoration:underline; outline:none; }
 .logo .saved { display:inline-block; margin:4px 0 0 6px; font-size:11px; color:var(--sand); white-space:nowrap; }
 .logo .saved:not(:empty)::before { content:'\25CF  '; color:#7FC4B8; }
@@ -104,13 +113,13 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 /* ข้อความสำหรับโปรแกรมอ่านจอเท่านั้น */
 .sr { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 /* จุดแดง "ใหม่" (B116): ชั้นสมุด · แท็บในชั้นสมุด · แผงฉายา/เหตุการณ์ — ป้ายอ่านจอบอกความหมายแทนสี */
-.new-dot { display:inline-block; width:8px; height:8px; margin-left:6px; border-radius:50%; background:var(--red); vertical-align:middle; flex:none; }
-.new-tag { margin-left:6px; padding:0 5px; border:1px solid var(--red); border-radius:3px; color:var(--red); font-size:11px; font-weight:600; white-space:nowrap; }
+.new-dot { display:inline-block; width:8px; height:8px; margin-left:6px; border-radius:50%; background:var(--blue); vertical-align:middle; flex:none; }
+.new-tag { margin-left:6px; padding:0 5px; border:1px solid var(--blue); border-radius:3px; color:var(--blue); font-size:12px; font-weight:600; white-space:nowrap; }
 /* .body/.choices ตั้ง display:flex ทับ hidden ของเบราว์เซอร์ — การ์ดที่พับไว้ (B117) ต้องหายจริง */
 .card [hidden] { display:none !important; }
 /* กล่องกระซิบ (B117): เส้นประ ตัวเอียง แยกจากเนื้อเรื่องของการ์ด · ปุ่มเป็นลิงก์เล็ก ไม่ปนกับตัวเลือกของเกม */
 .whisper { margin-top:4px; padding:8px 12px; border:1px dashed var(--rule); border-radius:var(--r); background:#FBF7EE; display:flex; flex-direction:column; gap:4px; }
-.whisper .h { font-size:12px; font-weight:600; color:var(--red); }
+.whisper .h { font-size:12px; font-weight:600; color:var(--blue); }
 .whisper p { font-family:var(--ft); font-size:14px; color:var(--ink2); }
 .whisper-row { display:flex; flex-wrap:wrap; gap:0 16px; }
 .whisper .more, .choices .later { all:unset; min-height:44px; cursor:pointer; font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:2px; }
@@ -141,7 +150,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .sb-r1 { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
 .sb .av { width:36px; height:36px; }
 .sb-who { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.3; }
-.sb-who b { font-weight:600; overflow-wrap:anywhere; }
+.sb-who b { font-family:var(--fh); font-weight:600; overflow-wrap:anywhere; }
 .sb-who small { font-size:12px; color:var(--muted); overflow-wrap:anywhere; }
 /* ป้ายพักแทนบรรทัดจังหวัด: บรรทัดเดียวเสมอ แถวไม่สูงขึ้น */
 .sb-who small.rest { color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -153,9 +162,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .hd-cash { margin-left:auto; display:flex; align-items:baseline; gap:4px; white-space:nowrap; }
 .hd-cash b { font-size:14px; font-variant-numeric:tabular-nums; }
 .hd-cash.red b, .hd-cash .lw { color:var(--dg); }
-.hd-cash .lw { font-size:11px; font-weight:600; }
+.hd-cash .lw { font-size:12px; font-weight:600; }
 .sb-age { display:flex; align-items:center; gap:4px; white-space:nowrap; }
-.sb-age > b { font-size:20px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
+.sb-age > b { font-size:20px; font-weight:600; line-height:1; font-variant-numeric:tabular-nums; }
 .sb-age small { font-size:12px; }
 .sb-age .same { margin-left:4px; }
 .sb-heart svg { display:block; width:18px; height:18px; fill:var(--dg); }
@@ -169,7 +178,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
   .sb-m { flex-wrap:wrap; gap:6px 10px; }
   .sb-m li { flex:1 1 calc(50% - 10px); }
 }
-.mh .num { margin-left:auto; font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
+.mh .num { margin-left:auto; font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
 .mh em { font-style:normal; font-size:10px; font-weight:600; color:var(--fl); white-space:nowrap; }
 .mh em.dn { color:var(--dg); }
 .br { display:block; height:6px; margin-top:auto; border-radius:var(--rc); background:var(--track); overflow:hidden; }
@@ -179,7 +188,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 /* ใกล้ตาย: ขอบจอแดงทั้งจอ ผูกกับแถบสถานะด้วย :has จึงหายเองเมื่อการ์ดถัดไปไม่ใกล้ตาย · ไม่มีภาพเคลื่อนไหว */
 body:has(.sb.dying)::after { content:''; position:fixed; inset:0; z-index:9; pointer-events:none; box-shadow:inset 0 0 0 3px var(--dg), inset 0 0 60px rgb(220 40 30 / .5); }
 /* ตัวเลขในสรุปช่วงวัย: ต้นช่วง → ตอนนี้ คู่กับลูกศรทิศ */
-.delta .num { font-weight:700; font-variant-numeric:tabular-nums; }
+.delta .num { font-weight:600; font-variant-numeric:tabular-nums; }
 .meta { padding:0 20px 8px; font-size:12px; }
 .meta span { white-space:nowrap; }
 .tree { padding:0 20px 8px; font-size:12px; }
@@ -202,6 +211,8 @@ body:has(.mnav) { padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)
 .mnav { position:fixed; left:0; right:0; bottom:0; z-index:8; display:flex; max-width:calc(var(--cw) + 2 * var(--pad-x)); margin:0 auto; padding:0 max(8px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px, env(safe-area-inset-left)); background:var(--paper); border-top:1px solid var(--rule2); box-shadow:0 -4px 16px rgb(0 0 0 / .06); }
 .mnav button { all:unset; box-sizing:border-box; flex:1 1 0; min-width:0; min-height:var(--nav-h); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:4px 2px; font-size:13px; font-weight:600; color:var(--ink); text-align:center; cursor:pointer; }
 .mnav button[aria-expanded="true"] { color:var(--fl); box-shadow:inset 0 3px 0 var(--fl); }
+/* แท็บที่เลือกเป็นคราม เฉพาะจอชาติไทย (ข้อ 223: token ไทยห้ามขึ้นจอโลกอื่น) */
+body:has(#app > .card.a) .mnav button[aria-expanded="true"] { color:var(--ink); box-shadow:inset 0 3px 0 var(--ink); }
 .mnav button:focus-visible { outline:2px solid currentColor; outline-offset:-4px; }
 /* จุดของใหม่ (ใบ 05) มุมขวาบนของคำ ไม่ดันป้ายปุ่มให้เบี้ยว · ฉากที่มีเมนู ลิงก์ท้ายหน้าทั้งชุดย้ายเข้าปุ่มสมุดกับแผงเพิ่มเติม (ใบ 08) ท้ายหน้าจึงซ่อน */
 .mnav button { position:relative; }
@@ -236,7 +247,7 @@ body:has(.mnav) .foot { display:none; }
 /* แผงเงิน (ใบ 07): ป้ายซ้าย ตัวเลขชิดขวาหลักตรงกัน กวาดตาเทียบได้ · ตัวเลขยาวตัดบรรทัดได้ ไม่ดันจอล้น */
 .mo dl { margin:12px 0 0; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:10px 16px; font-size:15px; }
 .mo dt { color:var(--ink2); white-space:nowrap; }
-.mo dd { margin:0; text-align:right; font-weight:700; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.mo dd { margin:0; text-align:right; font-weight:600; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .mo dd.neg { color:var(--dg); }
 /* แผงเพิ่มเติม (ใบ 08): แถวละลิงก์เต็มกว้าง แตะง่ายบนมือถือ · ปุ่มชาติประจำวันหน้าตาเดียวกับลิงก์ */
 .mr { list-style:none; margin:8px 0 0; padding:0; }
@@ -250,8 +261,8 @@ body:has(.mnav) .foot { display:none; }
 .nt > a { display:inline-block; min-height:44px; line-height:44px; font-weight:600; color:var(--ink); }
 .mo p { margin:16px 0 0; font-size:13px; color:var(--ink2); }
 .body { padding:18px 20px 8px; display:flex; flex-direction:column; gap:8px; }
-.body h3 { margin:0; font-size:24px; line-height:1.35; }
-.body h3.lead { font-size:19px; font-weight:400; }
+.body h3 { margin:0; font-family:var(--fh); font-size:24px; line-height:1.35; }
+.body h3.lead { font-family:var(--ft); font-size:19px; font-weight:400; }
 .body p { margin:0; font-size:15px; }
 .kicker { font-size:12px; font-weight:600; letter-spacing:0.06em; }
 .body p.news { margin:0; padding-left:10px; border-left:2px solid currentColor; font-size:14px; opacity:0.8; }
@@ -282,7 +293,7 @@ body:has(.mnav) .foot { display:none; }
 .spark .mk circle { stroke-width:1.5; }
 .spark .mk:focus-visible circle, .spark .mk:hover circle { stroke-width:3; }
 .mk-cap { margin:0; font-size:12px; min-height:1.5em; overflow-wrap:anywhere; }
-.a .spark .mk.ev circle { fill:var(--paper); stroke:var(--ink2); } .a .spark .mk.death circle { fill:var(--red); stroke:var(--ink); }
+.a .spark .mk.ev circle { fill:var(--paper); stroke:var(--ink2); } .a .spark .mk.death circle { fill:var(--dg); stroke:var(--ink); }
 .a .mk-cap { color:var(--muted); }
 .spark.echo path { fill:none; stroke-width:1.5; } .spark.echo path.hit { stroke:transparent; stroke-width:12; }
 .spark .mk.arc:focus-visible path:not(.hit), .spark .mk.arc:hover path:not(.hit) { stroke-width:3; }
@@ -321,7 +332,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .choice.loan .of { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .choice .hint { display:block; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
 /* ป้ายทางที่มีผลตามมา: ไอคอนต่อท้ายข้อความตัวเลือก + บรรทัดอธิบายใต้ชุดปุ่ม */
-.ef { display:flex; align-items:center; gap:5px; margin:2px 0 4px; font-size:13px; font-weight:600; color:var(--red); }
+.ef { display:flex; align-items:center; gap:5px; margin:2px 0 4px; font-size:13px; font-weight:600; color:var(--blue); }
 .ef svg { width:14px; height:14px; flex:none; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
 .i .ef { color:#FFB4C8; }
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
@@ -401,22 +412,23 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .stamp { align-self:flex-start; font-family:var(--ft); font-weight:600; padding:4px 10px; transform:rotate(-3deg); font-size:16px; }
 
 /* ทาง A — ทะเบียนราษฎร์: กระดาษ หมึก ตราประทับแดง */
-.a { background:var(--paper); border:1px solid #C9BFA9; color:var(--ink); }
+.a { background:var(--paper); border:1px solid var(--rule); color:var(--ink); }
 .a .top { background:var(--ink); color:var(--paper); }
-.a .top b { font-family:var(--ft); font-size:16px; font-weight:600; }
+.a .top b { font-family:var(--fh); font-size:16px; font-weight:600; }
 .a .meta { color:var(--muted); padding-top:8px; }
-.a .bar { background:#E2D9C6; } .a .bar i { background:var(--green); } .a .bar b { background:var(--red); }
-.a .kicker { color:var(--red); }
+.a .bar { background:#E2D9C6; } .a .bar i { background:var(--green); } .a .bar b { background:var(--dg); }
+.a .kicker { color:var(--blue); }
 .a .body h3 { font-family:var(--ft); font-weight:600; }
 .a .body h3.lead { font-family:var(--ft); }
 .a .body p, .a .items, .a .picks { color:var(--ink2); }
 .a .sub, .a .note, .a .body .horo { color:var(--muted); }
 .a .spark .nom { stroke:var(--green); } .a .spark .dot { fill:var(--green); }
 .a .spark .grid { stroke:var(--rule2); } .a .spark .zero { stroke:var(--ink2); }
-.a .spark .neg { fill:var(--red); fill-opacity:0.08; }
+.a .spark .neg { fill:var(--dg); fill-opacity:0.08; }
 .a .spark text { fill:var(--muted); }
 .a .band0 { fill:var(--paper2); fill-opacity:0.55; } .a .band1 { fill:transparent; }
-.a .ln0 { stroke:var(--red); } .a .ln1 { stroke:var(--bronze2); } .a .ln2 { stroke:var(--blue); } .a .ln3 { stroke:var(--green); } .a .ln4 { stroke:var(--ink); }
+/* ชาดไม่ใช่สีข้อมูลแล้ว (ข้อ 215) · --blue เป็นทองเข้มใกล้ --bronze2 ⇒ เส้นแรกใช้น้ำเงินแถบค่าให้ 5 เส้นยังแยกกันได้ */
+.a .ln0 { stroke:var(--fl); } .a .ln1 { stroke:var(--bronze2); } .a .ln2 { stroke:var(--blue); } .a .ln3 { stroke:var(--green); } .a .ln4 { stroke:var(--ink); }
 .a .lifechart { border:1px solid var(--rule); border-radius:var(--r); background:#FBF7EE; }
 .b .band0 { fill:var(--bronze); fill-opacity:0.25; } .b .band1 { fill:transparent; }
 .b .ln0 { stroke:#E07A5F; } .b .ln1 { stroke:var(--gold); } .b .ln2 { stroke:#8FB3E0; } .b .ln3 { stroke:#7FC4B8; } .b .ln4 { stroke:var(--cream); }
@@ -424,14 +436,14 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 /* กราฟฐานะตระกูล (B95): ขาลงเส้นประ + สีแดง ขาขึ้นเส้นทึบ — ตาบอดสีก็ยังแยกได้ · ขึ้นได้ทั้งการ์ดทาง A ทาง B และปรโลก */
 .spark .sg { stroke-width:2.2; stroke-linecap:round; } .spark .sg.sd { stroke-dasharray:5 3; } .spark .sg.se { stroke-width:1.6; }
 .legend .key .sg { stroke-width:2; }
-.a .sg.su { stroke:var(--green); } .a .sg.sd { stroke:var(--red); } .a .sg.se { stroke:var(--ink2); }
-.a .spark .mk.broke rect { fill:var(--red); stroke:var(--ink); stroke-width:1.5; } .a .spark .mk.nx circle { fill:var(--paper); stroke:var(--ink); stroke-dasharray:2 1.5; }
-.a .legend .mk.broke rect { fill:var(--red); stroke:var(--ink); stroke-width:1; }
+.a .sg.su { stroke:var(--green); } .a .sg.sd { stroke:var(--dg); } .a .sg.se { stroke:var(--ink2); }
+.a .spark .mk.broke rect { fill:var(--dg); stroke:var(--ink); stroke-width:1.5; } .a .spark .mk.nx circle { fill:var(--paper); stroke:var(--ink); stroke-dasharray:2 1.5; }
+.a .legend .mk.broke rect { fill:var(--dg); stroke:var(--ink); stroke-width:1; }
 .b .sg.su { stroke:var(--gold2); } .b .sg.sd { stroke:#E39A8A; } .b .sg.se { stroke:var(--sand); }
 .b .spark text, .b .mk-cap, .b .lifechart .h { fill:var(--sand); color:var(--sand); } .b .spark .grid { stroke:var(--bronze2); }
 .b .spark .mk.ev circle { fill:var(--lacquer); stroke:var(--gold2); } .b .spark .mk.nx circle { fill:var(--lacquer); stroke:var(--cream); stroke-dasharray:2 1.5; }
 .b .spark .mk.broke rect, .b .legend .mk.broke rect { fill:#E39A8A; stroke:var(--cream); stroke-width:1.5; }
-.a .choice { border:1px solid var(--ink); background:#FFFDF7; }
+.a .choice { border:1px solid var(--line-strong); background:#FFFDF7; font-size:15px; }
 .a .choice:hover, .a .choice:focus-visible { background:var(--ink); color:var(--paper); outline:none; }
 .a .choice .fx { color:var(--green); } .a .choice:hover .fx, .a .choice:focus-visible .fx { color:#CFE3E0; }
 /* คำอธิบายสกิลใต้ชื่อปุ่ม (06s: จอเลือกพก · การ์ดฝึกสกิล · เลือกลงสมุด) · ปุ่มเลือกพกที่กดไว้มีแถบซ้าย */
@@ -501,7 +513,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .d-tab-bar { display:flex; flex-wrap:wrap; gap:6px; }
 .d-tab-bar button { all:unset; box-sizing:border-box; cursor:pointer; min-height:36px; padding:0 12px; border:1px solid #1F1F1F; border-radius:999px; font-size:14px; display:inline-flex; align-items:center; }
 .d-tab-bar button[aria-selected="true"] { background:#1F1F1F; color:#FFFFFF; font-weight:600; }
-.d-tab-bar button:focus-visible { outline:2px solid var(--red); outline-offset:2px; }
+.d-tab-bar button:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
 .d-pane { display:flex; flex-direction:column; gap:10px; padding-top:12px; }
 .d-pane[hidden] { display:none; }
 .mem .d-pane h3 { margin:8px 0 0; font-family:var(--ft); font-size:14px; font-weight:600; color:var(--muted); text-align:left; }
@@ -512,7 +524,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .d-share > summary::-webkit-details-marker { display:none; }
 .d-share > summary::after { content:'\25BE'; }
 .d-share[open] > summary::after { content:'\25B4'; }
-.d-share > summary:focus-visible { outline:2px solid var(--red); outline-offset:2px; }
+.d-share > summary:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
 .d-share-in { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
 .d-share .choice { flex:1 1 auto; min-height:44px; padding:6px 12px; justify-content:center; font-size:14px; background:transparent; border-style:dashed; }
 /* ป้ายตามหาคนหาย (B139): กระดาษประกาศติดเสา หัวแดงตัวหนา — ต่างจากหนังสืองานศพขาวดำ ให้รู้ว่ายังไม่มีใครถือว่าจากไป */
@@ -678,192 +690,339 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 @keyframes drw { from { transform:translateX(100%); } }
 /*GAME-CSS:END*/</style></template>
 <script>
-// ชีวิตจริงจาก engine (สคริปต์ lane-a-probes/ui55-death-samples.mjs · seed 77 · 150 ชีวิตต่อบอท) — ข้อความเรียงแบบเดียวกับการ์ด death ใน app.mjs
+// ชีวิตจริงจาก engine (บอทของ harness · seed 77 · 150 ชีวิตต่อบอท) — ข้อความเรียงแบบเดียวกับการ์ด death ใน app.mjs
 const DATA = {"samples":{"kid":{"bot":"สายครอบครัว","seed":104,"gone":false,"age":10,"cause":"infection","gen":1,"hp":false,"name":"อำนาจ (เบียร์)","why":"ด้วยโรคติดเชื้อ","facts":"ชาย · กรุงเทพมหานคร · ฐานะมีอันจะกิน · กำลังเรียนประถม","money":8062,"debt":0,"bankruptcies":0,"grey":0,"note":"ยุคนั้นเด็กชายอายุ 10 ปีจากไปราว 14 คนในทุก 10,000 คนต่อปี","outlive":"ชายไทยที่เกิดปีเดียวกัน 92% อยู่ได้นานกว่าคุณ","pattern":"ลูกนกหัดบิน","titles":[{"name":"นักวิ่งตอนเช้า","tier":"ทั่วไป","hint":"ดูแลร่างกายเป็นกิจวัตร"}],"por":"<svg class=\"por\" viewBox=\"0 0 40 40\" aria-hidden=\"true\"><path d=\"M0 20a20 20 0 1 0 40 0a20 20 0 1 0 -40 0z\" fill=\"#221912\"/><path d=\"M11 40v-8q0-3 3-3h12q3 0 3 3v8z\" fill=\"#6B1F1A\"/><path d=\"M18 24h4v5.5h-4z\" fill=\"#E0B48A\"/><path d=\"M10.8 15.9a9.2 9.2 0 1 0 18.4 0a9.2 9.2 0 1 0 -18.4 0z\" fill=\"#1F1A17\"/><path d=\"M12.1 17.8a7.9 7.9 0 1 0 15.8 0a7.9 7.9 0 1 0 -15.8 0z\" fill=\"#E0B48A\"/><path d=\"M12.1 16.2q7.9 -7.65 15.8 0q-7.9 -2.9749999999999996 -15.8 0z\" fill=\"#1F1A17\"/><path d=\"M16.5 18.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0zM21.700000000000003 18.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0z\" fill=\"#1F1A17\"/><path d=\"M18.2 20.8q1.8 1.4 3.6 0\" fill=\"none\" stroke=\"#8A4B3A\" stroke-width=\"0.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M16 29.5q4 5 8 0\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"0.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M18.7 33.6a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0z\" fill=\"#F0D78C\"/><path d=\"M0.6000000000000014 20a19.4 19.4 0 1 0 38.8 0a19.4 19.4 0 1 0 -38.8 0z\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg>"},"rich":{"bot":"สุ่ม","seed":12,"gone":false,"age":98,"cause":"chronic_resp","gen":1,"hp":false,"name":"ลลิล (ใบบุญ)","why":"ด้วยโรคปอดเรื้อรัง","facts":"หญิง · จ.เชียงใหม่ · ฐานะมั่งคั่ง · เกษียณ (เคยเป็นพลตำรวจเอก) · วุฒิมัธยม","money":1705996823,"debt":0,"bankruptcies":0,"grey":46081,"note":null,"outlive":"หญิงไทยที่เกิดปีเดียวกัน 6% อยู่ได้นานกว่าคุณ","pattern":"คลองส่งน้ำ","titles":[{"name":"จากศูนย์สู่เศรษฐี","tier":"ตำนาน","hint":"เกิดลำบากที่สุด จากไปพร้อมทรัพย์มหาศาล"},{"name":"ผู้เคยก้าวพลาด","tier":"หายาก","hint":"เคยถูกจับได้เพราะเลือกทางลัด"},{"name":"ผู้แบกหนี้แทนคนอื่น","tier":"หายาก","hint":"เซ็นค้ำให้คนที่ไว้ใจ"},{"name":"เศรษฐีเงียบ","tier":"หายาก","hint":"เกิดไม่สูง แต่จากไปพร้อมทรัพย์ก้อนใหญ่"},{"name":"มือไม่เคยว่าง","tier":"ทั่วไป","hint":"ทำงานยาวนานหลายสิบปี"},{"name":"คนค้าขายหัวใจสู้","tier":"ทั่วไป","hint":"หาเลี้ยงชีพด้วยการค้าขายรายวัน"},{"name":"มือที่ไม่เคยหุบ","tier":"ทั่วไป","hint":"ให้ทานบ่อยจนเป็นนิสัย"},{"name":"นักวิ่งตอนเช้า","tier":"ทั่วไป","hint":"ดูแลร่างกายเป็นกิจวัตร"}],"por":"<svg class=\"por\" viewBox=\"0 0 40 40\" aria-hidden=\"true\"><path d=\"M0 20a20 20 0 1 0 40 0a20 20 0 1 0 -40 0z\" fill=\"#221912\"/><path d=\"M8 40v-11q0-3 3-3h18q3 0 3 3v11z\" fill=\"#6B1F1A\"/><path d=\"M18 20.5h4v6h-4z\" fill=\"#E0B48A\"/><path d=\"M12.3 13.9a7.7 7.7 0 1 0 15.4 0a7.7 7.7 0 1 0 -15.4 0z\" fill=\"#D8D4CC\"/><path d=\"M17 6.5a3 3 0 1 0 6 0a3 3 0 1 0 -6 0z\" fill=\"#D8D4CC\"/><path d=\"M13.6 15.8a6.4 6.4 0 1 0 12.8 0a6.4 6.4 0 1 0 -12.8 0z\" fill=\"#E0B48A\"/><path d=\"M13.6 14.2q6.4 -6.3 12.8 0q-6.4 -2.4499999999999997 -12.8 0z\" fill=\"#D8D4CC\"/><path d=\"M16.5 16.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0zM21.700000000000003 16.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0z\" fill=\"#1F1A17\"/><path d=\"M18.2 18.8q1.8 1.4 3.6 0\" fill=\"none\" stroke=\"#8A4B3A\" stroke-width=\"0.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M15.499999999999998 16.2a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0zM20.700000000000003 16.2a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0zM19.3 16.2h1.4\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"0.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M16 26.5q4 5 8 0\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"0.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M18.7 30.6a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0z\" fill=\"#F0D78C\"/><path d=\"M10 40v-10M30 40v-10\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"0.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M0.6000000000000014 20a19.4 19.4 0 1 0 38.8 0a19.4 19.4 0 1 0 -38.8 0z\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg>"},"titles":{"bot":"สายสุขภาพ","seed":111,"gone":false,"age":104,"cause":"heart","gen":1,"hp":false,"name":"นงลักษณ์ (หนู)","why":"ด้วยโรคหัวใจ","facts":"หญิง · จ.นครราชสีมา · ฐานะชนชั้นกลางล่าง · เกษียณ (เคยเป็นเกษตรกร) · วุฒิมัธยม","money":-593948,"debt":0,"bankruptcies":1,"grey":0,"note":null,"outlive":"หญิงไทยที่เกิดปีเดียวกัน ไม่ถึง 1% อยู่ได้นานกว่าคุณ","pattern":"ต้นโพธิ์ลานวัด","titles":[{"name":"ร้อยปีไม่สาย","tier":"ตำนาน","hint":"อยู่ถึงร้อยปี"},{"name":"อายุยืนเกินคาด","tier":"หายาก","hint":"อยู่นานกว่าคนรุ่นเดียวกันมาก"},{"name":"มือสะอาดในที่สกปรก","tier":"หายาก","hint":"เจอทางลัดหลายครั้งแต่ไม่เคยเลือก"},{"name":"ผู้ไม่เคยเลือกทางมืด","tier":"หายาก","hint":"ทั้งชีวิตไม่เคยเลือกทางผิดเลยสักครั้ง"},{"name":"มือไม่เคยว่าง","tier":"ทั่วไป","hint":"ทำงานยาวนานหลายสิบปี"},{"name":"คนค้าขายหัวใจสู้","tier":"ทั่วไป","hint":"หาเลี้ยงชีพด้วยการค้าขายรายวัน"},{"name":"ลูกกตัญญู","tier":"ทั่วไป","hint":"เลือกดูแลพ่อแม่ซ้ำแล้วซ้ำอีก"},{"name":"มือที่ไม่เคยหุบ","tier":"ทั่วไป","hint":"ให้ทานบ่อยจนเป็นนิสัย"},{"name":"มีบ้านเป็นของตัวเอง","tier":"ทั่วไป","hint":"ได้บ้านมาด้วยน้ำพักน้ำแรง"},{"name":"นักวิ่งตอนเช้า","tier":"ทั่วไป","hint":"ดูแลร่างกายเป็นกิจวัตร"},{"name":"ผู้แบกหนี้จนวันสุดท้าย","tier":"ทั่วไป","hint":"ยังผ่อนไม่หมดจนวันที่จากไป"},{"name":"รอดมาได้ทุกภัย","tier":"ทั่วไป","hint":"ผ่านภัยพิบัติใหญ่มาหลายครั้ง"},{"name":"ผู้รอเลขเด็ด","tier":"ทั่วไป","hint":"ซื้อหวยจนเป็นนิสัย"}],"por":"<svg class=\"por\" viewBox=\"0 0 40 40\" aria-hidden=\"true\"><path d=\"M0 20a20 20 0 1 0 40 0a20 20 0 1 0 -40 0z\" fill=\"#221912\"/><path d=\"M8 40v-11q0-3 3-3h18q3 0 3 3v11z\" fill=\"#3A5F8F\"/><path d=\"M18 20.5h4v6h-4z\" fill=\"#E0B48A\"/><path d=\"M12.3 13.9a7.7 7.7 0 1 0 15.4 0a7.7 7.7 0 1 0 -15.4 0z\" fill=\"#D8D4CC\"/><path d=\"M17 6.5a3 3 0 1 0 6 0a3 3 0 1 0 -6 0z\" fill=\"#D8D4CC\"/><path d=\"M13.6 15.8a6.4 6.4 0 1 0 12.8 0a6.4 6.4 0 1 0 -12.8 0z\" fill=\"#E0B48A\"/><path d=\"M13.6 14.2q6.4 -6.3 12.8 0q-6.4 -2.4499999999999997 -12.8 0z\" fill=\"#D8D4CC\"/><path d=\"M16.5 16.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0zM21.700000000000003 16.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0z\" fill=\"#1F1A17\"/><path d=\"M18.2 18.8q1.8 1.4 3.6 0\" fill=\"none\" stroke=\"#8A4B3A\" stroke-width=\"0.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M15.499999999999998 16.2a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0zM20.700000000000003 16.2a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0zM19.3 16.2h1.4\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"0.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M17 26l3 4l3-4\" fill=\"none\" stroke=\"#EFE3C2\" stroke-width=\"0.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M0.6000000000000014 20a19.4 19.4 0 1 0 38.8 0a19.4 19.4 0 1 0 -38.8 0z\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg>"},"hp":{"bot":"สายเงิน","seed":54,"gone":false,"age":63,"cause":"cancer","gen":1,"hp":true,"name":"ณัฐธิดา (ครีม)","why":"ด้วยโรคมะเร็ง","facts":"หญิง · จ.อุดรธานี · ฐานะชนชั้นกลางบน · เกษียณ (เคยเป็นรับจ้างทั่วไประดับหัวหน้า) · วุฒิมัธยม","money":1440500,"debt":18511,"bankruptcies":0,"grey":18590,"note":null,"outlive":"หญิงไทยที่เกิดปีเดียวกัน 82% อยู่ได้นานกว่าคุณ","pattern":"ร้านโชห่วยหัวมุม","titles":[{"name":"ผู้เคยก้าวพลาด","tier":"หายาก","hint":"เคยถูกจับได้เพราะเลือกทางลัด"},{"name":"มือไม่เคยว่าง","tier":"ทั่วไป","hint":"ทำงานยาวนานหลายสิบปี"},{"name":"ลูกกตัญญู","tier":"ทั่วไป","hint":"เลือกดูแลพ่อแม่ซ้ำแล้วซ้ำอีก"},{"name":"มือที่ไม่เคยหุบ","tier":"ทั่วไป","hint":"ให้ทานบ่อยจนเป็นนิสัย"},{"name":"พ่อแม่ของใครสักคน","tier":"ทั่วไป","hint":"มีลูกให้ห่วง"},{"name":"มีบ้านเป็นของตัวเอง","tier":"ทั่วไป","hint":"ได้บ้านมาด้วยน้ำพักน้ำแรง"},{"name":"นักวิ่งตอนเช้า","tier":"ทั่วไป","hint":"ดูแลร่างกายเป็นกิจวัตร"},{"name":"ผู้แบกหนี้จนวันสุดท้าย","tier":"ทั่วไป","hint":"ยังผ่อนไม่หมดจนวันที่จากไป"},{"name":"ใจดีจนโดนหลอก","tier":"ทั่วไป","hint":"ไว้ใจคนผิดเรื่องเงิน"},{"name":"รอดมาได้ทุกภัย","tier":"ทั่วไป","hint":"ผ่านภัยพิบัติใหญ่มาหลายครั้ง"}],"por":"<svg class=\"por\" viewBox=\"0 0 40 40\" aria-hidden=\"true\"><path d=\"M0 20a20 20 0 1 0 40 0a20 20 0 1 0 -40 0z\" fill=\"#221912\"/><path d=\"M8 40v-11q0-3 3-3h18q3 0 3 3v11z\" fill=\"#3A5F8F\"/><path d=\"M18 20.5h4v6h-4z\" fill=\"#E0B48A\"/><path d=\"M12.3 13.9a7.7 7.7 0 1 0 15.4 0a7.7 7.7 0 1 0 -15.4 0z\" fill=\"#D8D4CC\"/><path d=\"M17 6.5a3 3 0 1 0 6 0a3 3 0 1 0 -6 0z\" fill=\"#D8D4CC\"/><path d=\"M13.6 15.8a6.4 6.4 0 1 0 12.8 0a6.4 6.4 0 1 0 -12.8 0z\" fill=\"#E0B48A\"/><path d=\"M13.6 14.2q6.4 -6.3 12.8 0q-6.4 -2.4499999999999997 -12.8 0z\" fill=\"#D8D4CC\"/><path d=\"M16.5 16.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0zM21.700000000000003 16.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0z\" fill=\"#1F1A17\"/><path d=\"M18.2 18.8q1.8 1.4 3.6 0\" fill=\"none\" stroke=\"#8A4B3A\" stroke-width=\"0.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M15.499999999999998 16.2a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0zM20.700000000000003 16.2a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0zM19.3 16.2h1.4\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"0.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M17 26l3 4l3-4\" fill=\"none\" stroke=\"#EFE3C2\" stroke-width=\"0.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M0.6000000000000014 20a19.4 19.4 0 1 0 38.8 0a19.4 19.4 0 1 0 -38.8 0z\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg>"},"debt":{"bot":"สายเงิน","seed":39,"gone":false,"age":103,"cause":"chronic_resp","gen":1,"hp":false,"name":"ชนาธิป (เจได)","why":"ด้วยโรคปอดเรื้อรัง","facts":"ชาย · จ.ลพบุรี · ฐานะร่ำรวย · เกษียณ (เคยเป็นเกษตรกรระดับหัวหน้า) · วุฒิประถม","money":-8068413,"debt":0,"bankruptcies":1,"grey":97609,"note":null,"outlive":"ชายไทยที่เกิดปีเดียวกัน ไม่ถึง 1% อยู่ได้นานกว่าคุณ","pattern":"ร้านโชห่วยหัวมุม","titles":[{"name":"ร้อยปีไม่สาย","tier":"ตำนาน","hint":"อยู่ถึงร้อยปี"},{"name":"ผู้เคยก้าวพลาด","tier":"หายาก","hint":"เคยถูกจับได้เพราะเลือกทางลัด"},{"name":"อายุยืนเกินคาด","tier":"หายาก","hint":"อยู่นานกว่าคนรุ่นเดียวกันมาก"},{"name":"มือไม่เคยว่าง","tier":"ทั่วไป","hint":"ทำงานยาวนานหลายสิบปี"},{"name":"คนค้าขายหัวใจสู้","tier":"ทั่วไป","hint":"หาเลี้ยงชีพด้วยการค้าขายรายวัน"},{"name":"ลูกกตัญญู","tier":"ทั่วไป","hint":"เลือกดูแลพ่อแม่ซ้ำแล้วซ้ำอีก"},{"name":"มือที่ไม่เคยหุบ","tier":"ทั่วไป","hint":"ให้ทานบ่อยจนเป็นนิสัย"},{"name":"พ่อแม่ของใครสักคน","tier":"ทั่วไป","hint":"มีลูกให้ห่วง"},{"name":"นักวิ่งตอนเช้า","tier":"ทั่วไป","hint":"ดูแลร่างกายเป็นกิจวัตร"},{"name":"ผู้แบกหนี้จนวันสุดท้าย","tier":"ทั่วไป","hint":"ยังผ่อนไม่หมดจนวันที่จากไป"},{"name":"รอดมาได้ทุกภัย","tier":"ทั่วไป","hint":"ผ่านภัยพิบัติใหญ่มาหลายครั้ง"}],"por":"<svg class=\"por\" viewBox=\"0 0 40 40\" aria-hidden=\"true\"><path d=\"M0 20a20 20 0 1 0 40 0a20 20 0 1 0 -40 0z\" fill=\"#221912\"/><path d=\"M8 40v-11q0-3 3-3h18q3 0 3 3v11z\" fill=\"#6B1F1A\"/><path d=\"M18 20.5h4v6h-4z\" fill=\"#E0B48A\"/><path d=\"M10.9 14a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0zM23.9 14a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0z\" fill=\"#D8D4CC\"/><path d=\"M13.6 15.8a6.4 6.4 0 1 0 12.8 0a6.4 6.4 0 1 0 -12.8 0z\" fill=\"#E0B48A\"/><path d=\"M16.5 16.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0zM21.700000000000003 16.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0z\" fill=\"#1F1A17\"/><path d=\"M18.2 18.8q1.8 1.4 3.6 0\" fill=\"none\" stroke=\"#8A4B3A\" stroke-width=\"0.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M15.499999999999998 16.2a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0zM20.700000000000003 16.2a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0zM19.3 16.2h1.4\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"0.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M16 26.5q4 5 8 0\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"0.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M18.7 30.6a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0z\" fill=\"#F0D78C\"/><path d=\"M10 40v-10M30 40v-10\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"0.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M0.6000000000000014 20a19.4 19.4 0 1 0 38.8 0a19.4 19.4 0 1 0 -38.8 0z\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg>"},"gone":{"bot":"ต่างโลก","seed":137,"gone":true,"age":44,"cause":"other","gen":1,"hp":false,"name":"ประนอม (แป๋ว)","why":null,"facts":"หญิง · จ.นครราชสีมา · ฐานะยากไร้ · รับจ้างทั่วไประดับหัวหน้า · วุฒิประถม","money":270722,"debt":0,"bankruptcies":0,"grey":0,"note":null,"outlive":null,"pattern":"ต้นโพธิ์ลานวัด","titles":[{"name":"ผู้แบกหนี้แทนคนอื่น","tier":"หายาก","hint":"เซ็นค้ำให้คนที่ไว้ใจ"},{"name":"ปราชญ์ชาวบ้าน","tier":"หายาก","hint":"รู้มากโดยไม่ต้องมีปริญญา"},{"name":"คนค้าขายหัวใจสู้","tier":"ทั่วไป","hint":"หาเลี้ยงชีพด้วยการค้าขายรายวัน"},{"name":"ผ่านมรสุมเศรษฐกิจ","tier":"ทั่วไป","hint":"เป็นผู้ใหญ่ทันวิกฤตเศรษฐกิจหลายครั้ง"},{"name":"นักวิ่งตอนเช้า","tier":"ทั่วไป","hint":"ดูแลร่างกายเป็นกิจวัตร"}],"por":"<svg class=\"por\" viewBox=\"0 0 40 40\" aria-hidden=\"true\"><path d=\"M0 20a20 20 0 1 0 40 0a20 20 0 1 0 -40 0z\" fill=\"#221912\"/><path d=\"M8 40v-12q0-3 3-3h18q3 0 3 3v12z\" fill=\"#7A5C3A\"/><path d=\"M11.5 14h17v14h-17z\" fill=\"#2A2420\"/><path d=\"M18 19.5h4v6h-4z\" fill=\"#E0B48A\"/><path d=\"M12.3 12.9a7.7 7.7 0 1 0 15.4 0a7.7 7.7 0 1 0 -15.4 0z\" fill=\"#2A2420\"/><path d=\"M13.6 14.8a6.4 6.4 0 1 0 12.8 0a6.4 6.4 0 1 0 -12.8 0z\" fill=\"#E0B48A\"/><path d=\"M13.6 13.2q6.4 -6.3 12.8 0q-6.4 -2.4499999999999997 -12.8 0z\" fill=\"#2A2420\"/><path d=\"M16.5 15.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0zM21.700000000000003 15.2a0.9 0.9 0 1 0 1.8 0a0.9 0.9 0 1 0 -1.8 0z\" fill=\"#1F1A17\"/><path d=\"M18.2 17.8q1.8 1.4 3.6 0\" fill=\"none\" stroke=\"#8A4B3A\" stroke-width=\"0.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M26 30h3.5v3.5h-3.5z\" fill=\"#5A4630\"/><path d=\"M0.6000000000000014 20a19.4 19.4 0 1 0 38.8 0a19.4 19.4 0 1 0 -38.8 0z\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg>"}},"scene":{"death":"<svg class=\"era-art scene-art scene-sm\" viewBox=\"0 0 200 80\" aria-hidden=\"true\"><path d=\"M0 0h200v80h-200z\" fill=\"#221912\"/><path d=\"M4 4h192v72h-192z\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M7 7h186v66h-186z\" fill=\"none\" stroke=\"#8A6D3B\" stroke-width=\"0.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M10 22q0-12 12-12q-6 3-6 8q0 4 4 4q3 0 3-3\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M190 22q0-12-12-12q6 3 6 8q0 4-4 4q-3 0-3-3\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M10 58q0 12 12 12q-6-3-6-8q0-4 4-4q3 0 3 3\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M190 58q0 12-12 12q6-3 6-8q0-4-4-4q-3 0-3 3\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M26 66H174\" fill=\"none\" stroke=\"#8A6D3B\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M64 66V40h6v26\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M67 30c3 4 4 7 0 9c-4-2-3-5 0-9z\" fill=\"#F0D78C\"/><path d=\"M130 66V40h6v26\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M133 30c3 4 4 7 0 9c-4-2-3-5 0-9z\" fill=\"#F0D78C\"/><path d=\"M100 66V52M96 52h8\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M97 52l-3-22M100 52v-24M103 52l3-22\" fill=\"none\" stroke=\"#8A6D3B\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M92.8 30a1.2 1.2 0 1 0 2.4 0a1.2 1.2 0 1 0 -2.4 0z\" fill=\"#EFE3C2\"/><path d=\"M98.8 28a1.2 1.2 0 1 0 2.4 0a1.2 1.2 0 1 0 -2.4 0z\" fill=\"#EFE3C2\"/><path d=\"M104.8 30a1.2 1.2 0 1 0 2.4 0a1.2 1.2 0 1 0 -2.4 0z\" fill=\"#EFE3C2\"/><path d=\"M40 64q-6-10 0-18q6 8 0 18z\" fill=\"#F0D78C\"/><path d=\"M40 64q-12-4-14-12q10 0 14 12z\" fill=\"#8A6D3B\"/><path d=\"M40 64q12-4 14-12q-10 0-14 12z\" fill=\"#8A6D3B\"/><path d=\"M160 64q-6-10 0-18q6 8 0 18z\" fill=\"#F0D78C\"/><path d=\"M160 64q-12-4-14-12q10 0 14 12z\" fill=\"#8A6D3B\"/><path d=\"M160 64q12-4 14-12q-10 0-14 12z\" fill=\"#8A6D3B\"/><\/svg>","gone":"<svg class=\"era-art scene-art scene-sm\" viewBox=\"0 0 200 80\" aria-hidden=\"true\"><path d=\"M0 0h200v80h-200z\" fill=\"#221912\"/><path d=\"M4 4h192v72h-192z\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M7 7h186v66h-186z\" fill=\"none\" stroke=\"#8A6D3B\" stroke-width=\"0.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M10 22q0-12 12-12q-6 3-6 8q0 4 4 4q3 0 3-3\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M190 22q0-12-12-12q6 3 6 8q0 4-4 4q-3 0-3-3\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M10 58q0 12 12 12q-6-3-6-8q0-4 4-4q3 0 3 3\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M190 58q0 12-12 12q6-3 6-8q0-4-4-4q-3 0-3 3\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M30 66l60-40M170 66l-60-40\" fill=\"none\" stroke=\"#8A6D3B\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M88 28h24\" fill=\"none\" stroke=\"#8A6D3B\" stroke-width=\"0.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M150 66V22h14\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M160 22v6M154 28h12v12h-12z\" fill=\"none\" stroke=\"#D9B45A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M160 30c3 4 4 7 0 9c-4-2-3-5 0-9z\" fill=\"#F0D78C\"/><path d=\"M92 60l2-4M100 52l2-4M106 44l2-4\" fill=\"none\" stroke=\"#EFE3C2\" stroke-width=\"1\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg>"}};
-const ROWS = [['kid', 'เด็กตาย'], ['rich', 'คนแก่รวย'], ['titles', 'ฉายาเยอะสุด'], ['hp', 'หลอดชีวิตหมด'], ['debt', 'ตายพร้อมหนี้'], ['gone', 'หายตัวไปต่างโลก']];
-const LAYOUTS = [['now', 'ปัจจุบัน (อ้างอิง)'], ['book', 'ก หนังสืองานศพ'], ['side', 'ข หัวข้าง'], ['plate', 'ค แผ่นจารึก']];
-const DEATH_TABS = ['สรุป', 'ชีวิตนี้', 'ครอบครัว', 'ตระกูล', 'ฉายา', 'อนุสรณ์'];
-const DEF = { layout: 'book', titleStyle: 'auto', shown: 3, btnPos: 'auto', por: 96, accent: '#B73824', gold: '#D9B45A', scene: 'on' };
-const KEY = 'next-life-death-tweak-v1';
-let P = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') };
-let W = 390, SHOW = 'all';
-const GAME = document.getElementById('game-css').content.querySelector('style').textContent;
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-const baht = (v) => `${Math.round(v).toLocaleString('en-US')} บาท`;
-const LOST = { head: 'ประกาศตามหาคนหาย', money: 'ทรัพย์ที่ทิ้งไว้', debt: 'หนี้ที่ทิ้งไว้', call: 'ใครพบเห็น โปรดแจ้งคนที่บ้าน ทุกคนยังรออยู่' };
+(() => {
+  const KEY = 'next-life-t10-death-tweak-v1';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const GCSS = $('game-css').content.querySelector('style').textContent;
+  const FONTS = new URL('../../fonts/fonts.css', location.href).href;
 
-// ชิ้นข้อมูลชุดเดียวที่ทุกแบบต้องมีครบ — ด่านเบราว์เซอร์เทียบข้อความเหล่านี้กับทุกช่อง
-function pieces(l) {
-  const factKeys = ['เพศ', 'จังหวัด', 'ฐานะ', 'งาน', 'วุฒิ'];
-  const fp = l.facts.split(' · ');
-  return {
-    head: l.gone ? LOST.head : 'ด้วยรักและอาลัย',
-    name: l.name,
-    dates: `${l.gen > 1 ? `รุ่นที่ ${l.gen} · ` : ''}${l.gone ? `หายตัวเมื่ออายุ ${l.age} ปี` : `สิริอายุ ${l.age} ปี`}`,
-    why: l.why ? `จากไป${l.why}` : null,
-    facts: fp,
-    factRows: fp.map((v, i) => [factKeys[i] ?? '', v.replace(/^ฐานะ|^วุฒิ/, '')]),
-    netLabel: l.gone ? (l.money < 0 ? LOST.debt : LOST.money) : l.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ',
-    net: baht(l.money),
-    call: l.gone ? LOST.call : null,
-    titles: l.titles,
-    btn: 'ไปช่วงระหว่างชาติ',
+  // ---------- ข้อมูล (ป้าย/ลำดับลอกจาก app.mjs + labels.mjs BTN) ----------
+  const ROWS = [['kid', 'เด็กตาย'], ['rich', 'คนแก่รวย'], ['titles', 'ฉายาเยอะสุด'], ['hp', 'หลอดชีวิตหมด'], ['debt', 'ตายพร้อมหนี้'], ['gone', 'หายตัวไปต่างโลก']];
+  const DEATH_TABS = ['สรุป', 'ชีวิตนี้', 'ครอบครัว', 'ตระกูล', 'ฉายา', 'อนุสรณ์'];
+  const LOST = { head: 'ประกาศตามหาคนหาย', money: 'ทรัพย์ที่ทิ้งไว้', debt: 'หนี้ที่ทิ้งไว้', call: 'ใครพบเห็น โปรดแจ้งคนที่บ้าน ทุกคนยังรออยู่' };
+  const TITLES_SHOWN = 3;
+  const baht = (v) => `${Math.round(v).toLocaleString('en-US')} บาท`;
+  // ภาพฉากเป็นพื้นหลังจาง: ตัดกรอบแผ่น 7 ชิ้นแรก (ERA_FRAME ใน art.mjs) แบบ sceneBg() ของเกม
+  const sceneBg = (id) => `<div class="d-bg" aria-hidden="true">${DATA.scene[id].replace(/^<svg[^>]*?class="[^"]*"/, '<svg class="scene-art"').replace(/^(<svg[^>]*>)((?:<path[^>]*\/>){7})/, '$1')}</div>`;
+  // คนในบ้านตัวอย่างคงที่ (ข้อมูลบอทไม่ได้เก็บครอบครัว) — ไว้ดูการขีดฆ่าชื่อคนตาย (kinList ใบ 28: ขีดเฉพาะชื่อ แถวไม่จาง)
+  const KIN = {
+    kid: [['พ่อ · สมศักดิ์', 'อายุ 41 · สนิทกันมาก'], ['แม่ · วิไล', 'อายุ 38 · สนิทกันมาก'], ['ปู่ · บุญมี', null, 77]],
+    def: [['พ่อ · สมพงษ์', null, 72], ['แม่ · บุญเรือน', null, 80], ['คู่ชีวิต · ประเสริฐ', 'อายุ 66 · สนิทกันมาก'], ['ลูกชาย · ต้น', 'อายุ 40 · ห่างกัน']],
   };
-}
-const shownTitles = (x) => x.titles.slice(0, P.shown);
-const moreN = (x) => (x.titles.length > P.shown ? `อีก ${x.titles.length - P.shown} ฉายา` : null);
-function titlesHtml(x, style) {
-  if (!x.titles.length) return '';
-  const more = moreN(x);
-  if (style === 'line') return `<p class="dt-line"><span class="dt-k">ฉายา</span> ${shownTitles(x).map((t) => esc(t.name)).join(' · ')}${more ? ` · <span class="dt-more">${more}</span>` : ''}</p>`;
-  if (style === 'tag') return `<ul class="dt-tags" aria-label="ฉายาที่ได้ชีวิตนี้">${shownTitles(x).map((t) => `<li class="t-${t.tier === 'ตำนาน' ? 'leg' : t.tier === 'หายาก' ? 'rare' : 'com'}"><b>${esc(t.name)}</b>${t.tier && t.tier !== 'ทั่วไป' ? `<small>${t.tier}</small>` : ''}</li>`).join('')}${more ? `<li class="more-n">${more}</li>` : ''}</ul>`;
-  return `<ul class="d-rb" aria-label="ฉายาที่ได้ชีวิตนี้">${shownTitles(x).map((t) => `<li>${esc(t.name)}</li>`).join('')}${more ? `<li class="more-n">${more}</li>` : ''}</ul>`;
-}
-// แท็บ 6 ตัวชื่อเดิม · ใบนี้ไม่ออกแบบเนื้อแท็บใหม่ เนื้อแท็บสรุปใช้บรรทัดจริงของชีวิตนั้น
-function tabsHtml(l) {
-  const sum = [l.outlive, l.debt ? `หนี้ผ่อนค้าง ${baht(l.debt)}` : null, l.bankruptcies ? `เคยล้มละลาย ${l.bankruptcies} ครั้ง` : null, l.grey ? `เงินเทาที่หายไปกับตัว ${baht(l.grey)}` : null, l.note].filter(Boolean);
-  return `<div class="body d-rest"><div class="d-tabs"><div class="d-tab-bar" role="tablist" aria-label="รายละเอียดชีวิตนี้">${DEATH_TABS.map((t, i) => `<button type="button" role="tab" aria-selected="${i === 0}">${t}</button>`).join('')}</div><div class="d-pane" role="tabpanel">${sum.map((s) => `<p class="sub">${esc(s)}</p>`).join('')}<p class="sub dt-dim">แท็บชีวิตนี้ · ครอบครัว · ตระกูล · ฉายา · อนุสรณ์ เนื้อเดิม</p></div></div><details class="d-share"><summary>แชร์ชีวิตนี้</summary><div class="d-share-in"><button class="choice" type="button"><span>บันทึกภาพการ์ด</span></button><button class="choice" type="button"><span>แชร์ภาพการ์ด</span></button><button class="choice" type="button"><span>คัดลอกสรุป</span></button><button class="choice" type="button"><span>ชวนเพื่อนเกิดชีวิตเดียวกัน</span></button></div></details></div>`;
-}
-const btnHtml = (x) => `<div class="choices"><button class="choice" type="button"><span>${x.btn}</span></button></div>`;
-const sceneHtml = (l) => (P.scene === 'on' ? DATA.scene[l.gone ? 'gone' : 'death'] : '');
-
-function cardHtml(l, lay) {
-  const x = pieces(l);
-  const cls = `card a mem${l.gone ? ' lost' : ''} lay-${lay}`;
-  const pos = P.btnPos === 'auto' ? { now: 'after', book: 'bottom', side: 'top', plate: 'bottom' }[lay] : P.btnPos;
-  const style = P.titleStyle === 'auto' ? { now: 'ribbon', book: 'line', side: 'tag', plate: 'tag' }[lay] : P.titleStyle;
-  const why = x.why ? `<p class="sub">${esc(x.why)}</p>` : '';
-  const call = x.call ? `<p class="call">${x.call}</p>` : '';
-  const dl = `<dl class="dt-facts">${x.factRows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}<dt>${x.netLabel}</dt><dd class="${l.money < 0 ? 'neg' : ''}">${x.net}</dd></dl>`;
-  let body;
-  if (lay === 'now') {
-    // แบบปัจจุบัน: ลำดับเดียวกับ app.mjs (ภาพฉาก · รูป · ชื่อ · อายุ · สาเหตุ · ข้อมูล · ทรัพย์ · ริบบิ้น) แล้วปุ่ม
-    body = `<div class="body">${sceneHtml(l)}${l.por}<h3>${esc(x.name)}</h3><p class="dates">${x.dates}</p>${why}<p>${esc(x.facts.join(' · '))}</p><p class="sub">${x.netLabel} ${x.net}</p>${call}${titlesHtml(x, P.titleStyle === 'auto' ? 'ribbon' : style)}</div>${btnHtml(x)}`;
-  } else if (lay === 'book') {
-    body = `<div class="body"><div class="dt-frame">${sceneHtml(l)}${l.por}<h3>${esc(x.name)}</h3><p class="dates">${x.dates}</p>${why}</div>${pos === 'top' ? btnHtml(x) : ''}${call}${titlesHtml(x, style)}${dl}</div>${pos !== 'top' ? btnHtml(x) : ''}`;
-  } else if (lay === 'side') {
-    body = `<div class="body"><div class="dt-head">${l.por}<div class="dt-hw"><h3>${esc(x.name)}</h3><p class="dates">${x.dates}</p>${why}</div></div>${call}</div>${pos === 'top' ? btnHtml(x) : ''}<div class="body dt-cols"><div>${dl}</div><div>${titlesHtml(x, style)}</div></div>${sceneHtml(l) ? `<div class="body dt-scene">${sceneHtml(l)}</div>` : ''}${pos !== 'top' ? btnHtml(x) : ''}`;
-  } else {
-    const num = `<p class="dt-age"><b>${l.age}</b><span>${l.gone ? 'ปีตอนหายตัว' : 'ปี'}</span></p>`;
-    body = `<div class="body"><div class="dt-stone"><p class="dt-h">${x.head}</p>${sceneHtml(l)}${num}<div class="dt-nm">${l.por}<div><h3>${esc(x.name)}</h3><p class="dates">${x.dates}</p></div></div>${why}</div>${pos === 'top' ? btnHtml(x) : ''}${call}<ul class="dt-chips">${x.facts.map((f) => `<li>${esc(f)}</li>`).join('')}<li class="${l.money < 0 ? 'neg' : ''}">${x.netLabel} ${x.net}</li></ul>${titlesHtml(x, style)}</div>${pos !== 'top' ? btnHtml(x) : ''}`;
+  function famHtml(id) {
+    const ks = KIN[id] ?? KIN.def;
+    const alive = ks.filter((k) => k[2] == null).length;
+    const rows = ks.map(([who, info, died]) => (died != null ? `<li class="dead"><s>${esc(who)}</s> · จากไปตอนอายุ ${died}</li>` : `<li>${esc(who)} · ${esc(info)}</li>`)).join('');
+    return `<div class="fam"><h3>คนในบ้าน · ยังอยู่ ${alive} ${alive === ks.length ? 'คน' : `จาก ${ks.length} คน`}</h3><ul class="picks">${rows}</ul><h3>สัตว์เลี้ยง</h3><ul class="picks"><li class="gone">หมา · ด่าง · ไม่ได้อยู่กับเราแล้ว</li></ul></div>`;
   }
-  return `<div id="app"><article class="${cls}"><div class="top"><b>${x.head}</b></div>${body}${tabsHtml(l)}</article></div>`;
-}
+  function cardHtml(id, p, tab, shareOpen) {
+    const l = DATA.samples[id], gone = l.gone;
+    const fp = l.facts.split(' · ');
+    const factRows = fp.map((v, i) => [['เพศ', 'จังหวัด', 'ฐานะ', 'งาน', 'วุฒิ'][i] ?? '', v.replace(/^ฐานะ|^วุฒิ/, '')]);
+    const net = gone ? (l.money < 0 ? LOST.debt : LOST.money) : l.money < 0 ? 'ตายพร้อมหนี้' : 'ทรัพย์สุทธิ';
+    const dates = `${l.gen > 1 ? `รุ่นที่ ${l.gen} · ` : ''}${gone ? `หายตัวเมื่ออายุ ${l.age} ปี` : `สิริอายุ ${l.age} ปี`}`;
+    const why = l.why ? `<p class="sub">จากไป${esc(l.why)}</p>` : '';
+    const tl = l.titles.length ? `<p class="d-tl"><span class="k">ฉายา</span> ${l.titles.slice(0, TITLES_SHOWN).map((t) => esc(t.name)).join(' · ')}${l.titles.length > TITLES_SHOWN ? ` · <span class="more-n">อีก ${l.titles.length - TITLES_SHOWN} ฉายา</span>` : ''}</p>` : '';
+    const dl = `<dl class="d-facts">${factRows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}<dt>${net}</dt><dd${l.money < 0 ? ' class="neg"' : ''}>${baht(l.money)}</dd></dl>`;
+    // ตราไม่มีชื่อผู้ตาย (เขียนชื่อด้วยหมึกแดง = แช่ง · ข้อ 154) · ป้ายคนหายไม่มีตรา (ยังไม่มีใครถือว่าจากไป B139)
+    const seal = !gone && p.seal !== 'none' ? `<span class="d-seal" aria-hidden="true">${p.smark === 'flower' ? FLOWER : 'อาลัย'}</span>` : '';
+    const at = (pos) => (p.spos === pos ? seal : '');
+    const sum = [!gone && l.outlive, l.debt ? `หนี้ผ่อนค้าง ${baht(l.debt)}` : null, l.bankruptcies ? `เคยล้มละลาย ${l.bankruptcies} ครั้ง` : null, l.grey ? `เงินเทาที่หายไปกับตัว ${baht(l.grey)}` : null, !gone && l.note].filter(Boolean).map((s) => `<p class="sub">${esc(s)}</p>`).join('');
+    const panes = [
+      sum,
+      '<p class="sub">กราฟชีวิต + ยุคที่ผ่าน (เนื้อเดิม ใบนี้ไม่แตะ)</p>',
+      famHtml(id),
+      '<div class="fam"><h3>กราฟฐานะตระกูล</h3><p class="sub">ผังตระกูล + กราฟฐานะ (เนื้อเดิม ใบนี้ไม่แตะ)</p></div>',
+      `<div class="recap titles"><div class="h">แบบชีวิตนี้</div><p class="pattern">${esc(l.pattern)}</p><ul class="picks">${l.titles.map((t) => `<li>${esc(t.name)}${t.tier && t.tier !== 'ทั่วไป' ? ` · ${esc(t.tier)}` : ''}</li>`).join('')}</ul></div>`,
+      `<p class="sub">${gone ? 'ยังไม่มีงานศพ คนที่บ้านยังรอข่าวอยู่' : 'ไม่มีบันทึกงานศพ'}</p><button class="more" type="button">เปิดสมุดอนุสรณ์</button>`,
+    ];
+    const tabs = `<div class="d-tabs"><div class="d-tab-bar" role="tablist" aria-label="รายละเอียดชีวิตนี้">${DEATH_TABS.map((t, i) => `<button type="button" role="tab" id="d-tab-${i}" aria-controls="d-pane-${i}" aria-selected="${i === tab}" tabindex="${i === tab ? 0 : -1}">${t}</button>`).join('')}</div>${panes.map((h, i) => `<div class="d-pane" id="d-pane-${i}" role="tabpanel" aria-labelledby="d-tab-${i}"${i === tab ? '' : ' hidden'}>${h}</div>`).join('')}</div>`;
+    const share = `<details class="d-share"${shareOpen ? ' open' : ''}><summary>แชร์ชีวิตนี้</summary><div class="d-share-in"><button class="choice" type="button"><span>บันทึกภาพการ์ด</span></button><button class="choice" type="button"><span>แชร์ภาพการ์ด</span></button><button class="choice" type="button"><span>คัดลอกสรุป</span></button>${l.gen === 1 ? '<button class="choice" type="button"><span>ชวนเพื่อนเกิดชีวิตเดียวกัน</span></button>' : ''}</div></details>`;
+    return `<div id="app"><article class="card a mem${gone ? ' lost' : ''}"><div class="top"><b>${gone ? LOST.head : 'ด้วยรักและอาลัย'}</b></div>${at('tr')}${sceneBg(gone ? 'gone' : 'death')}<div class="body"><div class="d-head">${l.por}<h3>${esc(l.name)}</h3><p class="dates">${dates}</p>${why}</div>${at('head')}${gone ? `<p class="call">${LOST.call}</p>` : ''}${tl}${dl}${at('end')}</div><div class="choices"><button class="choice" type="button"><span>ไปช่วงระหว่างชาติ</span></button></div><div class="body d-rest">${tabs}${share}</div></article></div>`;
+  }
 
-const PROTO = `
-.card { min-height:0 !important; }
-.mem .por { width:var(--por); height:var(--por); }
-.mem .d-rb li { background:var(--acc); }
-.mem .choices > .choice { background:var(--acc); border-color:var(--acc); }
-.dt-dim { opacity:.7; }
-.dt-k { font-weight:600; color:var(--muted); margin-right:4px; }
-.dt-line { text-align:center; font-size:14px; } .dt-more { color:var(--muted); }
-.dt-tags { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:6px; }
-.dt-tags li { display:flex; align-items:baseline; gap:6px; padding:3px 10px; border:1px solid #1F1F1F; border-radius:999px; font-size:13px; }
-.dt-tags li small { font-size:11px; font-weight:600; }
-.dt-tags li.t-leg { border-color:var(--gd); background:color-mix(in srgb, var(--gd) 22%, transparent); }
-.dt-tags li.t-leg small { color:#8A6D3B; }
-.dt-tags li.t-rare { border-color:var(--acc); } .dt-tags li.t-rare small { color:var(--acc); }
-.dt-tags li.more-n { border:0; padding-left:2px; color:var(--muted); }
-.dt-facts { margin:0; display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 12px; font-size:14px; }
-.dt-facts dt { color:var(--muted); font-weight:600; white-space:nowrap; } .dt-facts dd { margin:0; overflow-wrap:anywhere; }
-.dt-facts .neg, .dt-chips .neg { color:var(--dg); font-weight:600; }
-/* ก หนังสืองานศพ: รูป ชื่อ อายุ อยู่ในกรอบทองคู่กลางการ์ด · ข้อมูลเป็นตารางสองคอลัมน์ใต้กรอบ */
-.lay-book .dt-frame { display:flex; flex-direction:column; align-items:center; gap:6px; padding:14px 12px 12px; border:3px double var(--gd); border-radius:var(--r); text-align:center; }
-.lay-book .dt-frame h3 { text-align:center; } .lay-book .dt-frame .sub { text-align:center; }
-.lay-book .dt-facts { max-width:440px; margin:0 auto; width:100%; }
-/* ข หัวข้าง: รูปซ้ายชื่อขวา ปุ่มขึ้นทันทีใต้หัว · ข้อมูลกับฉายาแบ่งสองคอลัมน์เมื่อจอกว้าง */
-.lay-side .dt-head { display:flex; gap:14px; align-items:center; }
-.lay-side .dt-head .por { align-self:flex-start; flex:none; }
-.lay-side .dt-hw { min-width:0; } .lay-side .dt-hw h3 { text-align:left !important; font-size:26px; } .lay-side .dt-hw .dates { text-align:left !important; margin:0; }
-.lay-side .dt-cols { display:grid; gap:12px; padding-top:4px; }
-@media (min-width:640px) { .lay-side .dt-cols { grid-template-columns:1fr 1fr; } }
-.lay-side .dt-scene { padding-top:0; } .lay-side .dt-scene svg { opacity:.85; }
-/* ค แผ่นจารึก: แผ่นสีรักกรอบทอง อายุตัวใหญ่เป็นจุดเด่น · ข้อมูลเป็นชิป · ปุ่มท้าย · หัวคำอาลัยย้ายเข้าแผ่น (แถบบนซ่อน ไม่ซ้ำสองที่) */
-.lay-plate .top { display:none; }
-.lay-plate .dt-stone { position:relative; display:flex; flex-direction:column; align-items:center; gap:4px; padding:16px 14px 14px; background:var(--lacquer); color:var(--cream); border:1px solid var(--gd); outline:1px solid var(--gd); outline-offset:-6px; border-radius:var(--r); text-align:center; }
-.lay-plate .dt-stone h3 { color:var(--gold2) !important; font-size:24px !important; margin:0; }
-.lay-plate .dt-stone .dates, .lay-plate .dt-stone .sub { color:var(--sand) !important; margin:0; }
-.lay-plate .dt-stone svg.scene-art { opacity:.9; }
-.lay-plate .dt-age { margin:0; line-height:1; } .lay-plate .dt-age b { font-size:56px; font-weight:700; color:var(--gd); font-variant-numeric:tabular-nums; } .lay-plate .dt-age span { margin-left:6px; font-size:14px; color:var(--sand); }
-.lay-plate .dt-nm { display:flex; align-items:center; gap:10px; text-align:left; } .lay-plate .dt-nm .por { flex:none; width:calc(var(--por) * .6); height:calc(var(--por) * .6); border-color:var(--gd); background:var(--paper); }
-.lay-plate .dt-nm h3, .lay-plate .dt-nm .dates { text-align:left !important; }
-.lay-plate .dt-chips { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:6px; }
-.lay-plate .dt-chips li { padding:2px 10px; border:1px solid var(--rule); border-radius:999px; font-size:13px; background:var(--paper2); }
-.lay-plate .dt-stone p.dt-h { margin:0; font-family:Srisakdi,serif; font-size:20px; font-weight:700; color:var(--gd); }
-`;
-const paramCss = () => `:root { --acc:${P.accent}; --gd:${P.gold}; --por:${P.por}px; }`;
-const doc = (body) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${GAME}</style><style>${PROTO}${paramCss()}</style></head><body>${body}</body></html>`;
+  // ---------- ลาย (SVG เป็น data URI · สีกับความจางฝังในภาพ) ----------
+  const uri = (svg) => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+  // ดอกไม้จันทน์ 8 กลีบ สีตามตัวหนังสือบนตรา
+  const FLOWER = '<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 3c2 3 2 6 0 9c-2-3-2-6 0-9zM12 21c2-3 2-6 0-9c-2 3-2 6 0 9zM3 12c3-2 6-2 9 0c-3 2-6 2-9 0zM21 12c-3-2-6-2-9 0c3 2 6 2 9 0z"/><path d="M5.6 5.6c3.5.7 5.6 2.8 6.4 6.4c-3.5-.7-5.7-2.9-6.4-6.4zM18.4 18.4c-3.5-.7-5.6-2.8-6.4-6.4c3.5.7 5.7 2.9 6.4 6.4zM18.4 5.6c-.7 3.5-2.8 5.6-6.4 6.4c.7-3.5 2.9-5.7 6.4-6.4zM5.6 18.4c.7-3.5 2.8-5.6 6.4-6.4c-.7 3.5-2.9 5.7-6.4 6.4z"/></g></svg>';
+  // ลายประจำยาม: ดอกสี่กลีบในข้าวหลามตัด ต่อกันเป็นตาราง
+  const prajam = (c, o) => uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><g fill="none" stroke="${c}" stroke-opacity="${o}" stroke-width="1.2" stroke-linejoin="round"><path d="M20 4l16 16-16 16L4 20z"/><path d="M20 11c3 3 3 6 0 9c-3-3-3-6 0-9zM20 29c3-3 3-6 0-9c-3 3-3 6 0 9zM11 20c3-3 6-3 9 0c-3 3-6 3-9 0zM29 20c-3-3-6-3-9 0c3 3 6 3 9 0z"/></g></svg>`);
+  // กนกแถบ: เส้นเดียวกับลายกนกแถบล่างหัวหน้าแรก (T3 ข้อ 219)
+  const kanok = (c, o, flip) => uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><g fill="none" stroke="${c}" stroke-opacity="${o}" stroke-width="1.4" stroke-linecap="round"${flip ? ' transform="translate(0 40) scale(1 -1)"' : ''}><path d="M20 38c-7-4-10-11-7-18 1 4 4 6 6 6-3-5-2-12 3-17 0 5 3 8 6 10 3 3 3 8 0 11 2-1 4-3 4-6 3 6 0 12-6 14"/><path d="M20 38c-3-3-3-7 0-9 2-1 4 0 4 2s-2 3-3 2"/></g></svg>`);
+  // มุมกนก: ม้วนเส้นเข้ามุมบนซ้าย แล้วหมุนไปอีก 3 มุม
+  const corner = (c, rot) => uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><g fill="none" stroke="${c}" stroke-width="1.6" stroke-linecap="round" transform="rotate(${rot} 20 20)"><path d="M3 37V9q0-6 6-6h28"/><path d="M8 32V14q0-6 6-6h18"/><path d="M14 14c4 0 6 2 6 6c-3 0-4-2-3-4"/></g></svg>`);
 
-function frame(host, cap, body, pick, tag) {
-  const fig = document.createElement('figure');
-  fig.className = `ex${pick ? ' pick' : ''}`;
-  fig.innerHTML = `<figcaption>${cap}</figcaption><div class="fr"><iframe title="${cap.replace(/<[^>]+>/g, '')}" loading="lazy"></iframe></div>`;
-  Object.assign(fig.dataset, tag);
-  host.append(fig);
-  const avail = W === 1280 ? 760 : W + 2;
-  const s = Math.min(1, (avail - 2) / W);
-  const ifr = fig.querySelector('iframe');
-  const box = fig.querySelector('.fr');
-  const size = (hh) => { ifr.style.width = `${W}px`; ifr.style.height = `${hh}px`; ifr.style.transform = `scale(${s})`; box.style.width = `${W * s + 2}px`; box.style.height = `${hh * s + 2}px`; };
-  size(900);
-  ifr.addEventListener('load', () => { const d = ifr.contentDocument; if (d) size(d.documentElement.scrollHeight); });
-  ifr.srcdoc = doc(body);
-}
-function render() {
-  const rows = document.getElementById('rows');
-  rows.innerHTML = '';
-  for (const [id, label] of ROWS) {
-    const l = DATA.samples[id];
-    if (!l) continue;
-    const h = document.createElement('h2');
-    h.textContent = `${label} · ${l.name} อายุ ${l.age} · ฉายา ${l.titles.length}`;
-    const g = document.createElement('div');
-    g.className = 'grid';
-    rows.append(h, g);
-    for (const [lay, name] of LAYOUTS) {
-      if (SHOW === 'pick' && lay !== 'now' && lay !== P.layout) continue;
-      frame(g, `${name}${lay === P.layout ? ' <span>← เลือกอยู่</span>' : ''}`, cardHtml(l, lay), lay === P.layout, { sample: id, layout: lay });
+  // ---------- ชุดตั้งต้น · ชุด 0 = ค่าในเกมตอนนี้ (template.html .a.mem) ----------
+  const NOW = { frame: 'thick', fw: 12, fc: '#1F1F1F', inner: 'on', ic: '#8A8A8A', io: 6, rad: 0, cs: 28, paper: '#FFFFFF', pat: 'none', pc: '#1F1F1F', po: 0.08, ps: 40, seal: 'none', smark: 'word', spos: 'tr', sc: '#A62B1F', ss: 52, srot: -8 };
+  const PRESETS = [
+    { id: 0, name: '0 · เกมตอนนี้ (กรอบดำหนา 12 · เส้นในเทา · ไม่มีลาย ไม่มีตรา)', pure: true, ...NOW },
+    { id: 1, name: 'ก · สมุดไว้ทุกข์ (กรอบดำ 8 · กนกแถบบน-ล่าง · ตรากลมมุมขวาบน)', ...NOW, fw: 8, ic: '#1F1F1F', io: 5, pat: 'band', po: 0.2, ps: 32, seal: 'round', spos: 'tr', ss: 52, srot: -8 },
+    { id: 2, name: 'ข · กระดาษงาช้าง (เส้นคู่สีครั่งเข้ม · ลายประจำยามจาง · ตราเหลี่ยมท้ายข้อมูล)', ...NOW, frame: 'double', fw: 7, fc: '#3A2A1E', inner: 'off', rad: 4, paper: '#FBF6EA', pat: 'prajam', pc: '#5A4630', po: 0.07, ps: 44, seal: 'square', smark: 'word', spos: 'end', sc: '#8E2A1E', ss: 56, srot: 4 },
+    { id: 3, name: 'ค · เส้นบาง มุมกนก (ขาว · ไม่มีลาย · ตราดอกไม้จันทน์ใต้อายุ)', ...NOW, frame: 'corner', fw: 2, inner: 'off', cs: 36, seal: 'round', smark: 'flower', spos: 'head', ss: 44, srot: 0 },
+  ];
+  const KNOBS = [
+    ['h', 'กรอบ'],
+    ['frame', 'แบบกรอบ', 'seg', [['thick', 'เส้นหนา'], ['double', 'เส้นคู่'], ['corner', 'เส้นบาง + มุมกนก'], ['none', 'ไม่มีกรอบ']]],
+    ['fw', 'ความหนากรอบ (px)', 'range', [1, 16, 1]],
+    ['fc', 'สีกรอบ', 'color', ['#1F1F1F', '#3A2A1E', '#1B2A4A', '#5A4630']],
+    ['inner', 'เส้นในกรอบ', 'seg', [['on', 'มี'], ['off', 'ไม่มี']]],
+    ['ic', 'สีเส้นใน', 'color', ['#8A8A8A', '#1F1F1F', '#8C7A52']],
+    ['io', 'เส้นในห่างขอบ (px)', 'range', [3, 14, 1]],
+    ['rad', 'มุมโค้ง (px)', 'range', [0, 16, 1]],
+    ['cs', 'ขนาดมุมกนก (px)', 'range', [16, 56, 2]],
+    ['h', 'ลาย'],
+    ['paper', 'สีกระดาษ', 'seg', [['#FFFFFF', 'ขาว'], ['#FBF6EA', 'กระดาษ (--paper)'], ['#F6F1E7', 'งาช้างอ่อน']]],
+    ['pat', 'ลายบนใบ', 'seg', [['none', 'ไม่มี'], ['band', 'กนกแถบบน-ล่าง'], ['prajam', 'ประจำยามทั้งใบ']]],
+    ['pc', 'สีลาย', 'color', ['#1F1F1F', '#5A4630', '#8C7A52']],
+    ['po', 'ความเข้มลาย', 'range', [0.02, 0.6, 0.01]],
+    ['ps', 'ขนาดลาย (px)', 'range', [16, 72, 2]],
+    ['h', 'ตรา --seal'],
+    ['seal', 'ทรงตรา', 'seg', [['none', 'ไม่มี'], ['round', 'วงกลม'], ['square', 'สี่เหลี่ยม']]],
+    ['smark', 'ในตรา', 'seg', [['word', 'คำ "อาลัย"'], ['flower', 'ดอกไม้จันทน์']]],
+    ['spos', 'ที่วางตรา', 'seg', [['tr', 'มุมขวาบน'], ['head', 'ใต้อายุ/สาเหตุ'], ['end', 'ท้ายตารางข้อมูล']]],
+    ['sc', 'สีตรา (--seal)', 'color', ['#A62B1F', '#8E2A1E', '#7A2E12', '#1F1F1F']],
+    ['ss', 'ขนาดตรา (px)', 'range', [36, 80, 2]],
+    ['srot', 'เอียงตรา (องศา)', 'range', [-15, 15, 1]],
+  ];
+  const off = (p, k) => p.pure
+    || (['inner', 'ic', 'io'].includes(k) && (p.frame === 'none' || p.frame === 'corner'))
+    || (['ic', 'io'].includes(k) && p.inner === 'off')
+    || (k === 'fw' && p.frame === 'none') || (k === 'fc' && p.frame === 'none')
+    || (k === 'cs' && p.frame !== 'corner')
+    || (['pc', 'po', 'ps'].includes(k) && p.pat === 'none')
+    || (['smark', 'spos', 'sc', 'ss', 'srot'].includes(k) && p.seal === 'none');
+
+  // CSS ที่ทับเกม — เฉพาะหนังสืองานศพ (.mem ที่ไม่ใช่ .lost) · ชุด 0 ไม่ใส่อะไร
+  function css(p) {
+    if (p.pure) return '';
+    const B = '.a.mem:not(.lost)';
+    const lay = [];
+    if (p.frame === 'corner') { const s = `${p.cs}px ${p.cs}px`; const at = ['left 6px top 6px', 'right 6px top 6px', 'right 6px bottom 6px', 'left 6px bottom 6px']; [0, 90, 180, 270].forEach((r, i) => lay.push(`${corner(p.fc, r)} ${at[i]} / ${s} no-repeat`)); }
+    if (p.pat === 'band') lay.push(`${kanok(p.pc, p.po)} left top / ${p.ps}px ${p.ps}px repeat-x`, `${kanok(p.pc, p.po, true)} left bottom / ${p.ps}px ${p.ps}px repeat-x`);
+    if (p.pat === 'prajam') lay.push(`${prajam(p.pc, p.po)} center / ${p.ps}px ${p.ps}px repeat`);
+    const border = p.frame === 'none' ? 'border:0' : p.frame === 'double' ? `border:${Math.max(3, p.fw)}px double ${p.fc}` : `border:${p.fw}px solid ${p.fc}`;
+    const outline = p.frame !== 'none' && p.frame !== 'corner' && p.inner === 'on' ? `outline:1px solid ${p.ic};outline-offset:-${p.io}px` : 'outline:0';
+    const round = p.seal === 'round';
+    return `${B}{${border};${outline};border-radius:${p.rad}px;background:${[...lay, p.paper].join(',')}}
+${p.frame === 'none' ? `${B}{box-shadow:0 2px 14px rgb(0 0 0 / .18)}` : ''}
+${p.pat === 'band' || p.frame === 'corner' ? `${B} .top{padding-top:${Math.max(18, p.pat === 'band' ? p.ps * 0.6 : 0, p.frame === 'corner' ? p.cs * 0.7 : 0)}px}${B} .d-rest{padding-bottom:${Math.max(p.pat === 'band' ? Math.round(p.ps * 0.8) : 0, p.frame === 'corner' ? Math.round(p.cs * 0.8) : 0)}px}` : ''}
+${B} .d-seal{--seal:${p.sc};display:grid;place-items:center;flex:none;width:${p.ss}px;height:${p.ss}px;background:var(--seal);color:${p.paper};border-radius:${round ? '50%' : '6px'};outline:1.5px solid ${p.paper};outline-offset:-${Math.round(p.ss * 0.1)}px;transform:rotate(${p.srot}deg);font:700 ${Math.max(12, Math.round(p.ss * 0.28))}px/1 Srisakdi,serif;letter-spacing:0;user-select:none}
+${B} .d-seal svg{width:62%;height:62%}
+${B} > .d-seal{position:absolute;right:${p.frame === 'none' ? 12 : p.fw + 10}px;top:${p.frame === 'none' ? 12 : p.fw + 10}px;z-index:1}
+${B} .body > .d-seal{align-self:center}
+${B} .body > .d-seal:last-child{align-self:flex-end;margin-top:-4px}`;
+  }
+
+  // ---------- สถานะ ----------
+  let S = { base: 1, cur: clone(PRESETS[1]), mode: 'cmp', smp: 'rich', tab: 0, share: 0 }, note = '';
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (s && PRESETS[s.base]) { S = { ...S, ...s, cur: { ...clone(PRESETS[s.base]), ...s.cur } }; note = s.note || ''; }
+  } catch (e) { /* เซฟเสีย = เริ่มชุด ก */ }
+  const store = () => { try { localStorage.setItem(KEY, JSON.stringify({ ...S, note })); } catch (e) { /* file:// บางเบราว์เซอร์ปิด storage */ } };
+  const edits = () => Object.keys(NOW).filter((k) => S.cur[k] !== PRESETS[S.base][k]);
+
+  const srcdoc = (id, p) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${FONTS}"><style>${GCSS}</style><style>.card{min-height:0 !important}${css(p)}</style></head><body>${cardHtml(id, p, S.tab, S.share === 1)}</body></html>`;
+
+  // ---------- สี + contrast ----------
+  const cv = document.createElement('canvas'); cv.width = cv.height = 1;
+  const cx = cv.getContext('2d', { willReadFrequently: true });
+  const toRgba = (c) => { cx.clearRect(0, 0, 1, 1); cx.fillStyle = '#000'; cx.fillStyle = c; cx.fillRect(0, 0, 1, 1); const d = cx.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255]; };
+  const lum = ([r, g, b]) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+  const mix = (fg, bg, a) => [0, 1, 2].map((i) => fg[i] * a + bg[i] * (1 - a));
+  const bgOf = (el, win) => {
+    const layers = [];
+    for (let e = el; e; e = e.parentElement) { const c = toRgba(win.getComputedStyle(e).backgroundColor); if (c[3] > 0) layers.push(c); if (c[3] >= 1) break; }
+    if (!layers.length || layers[layers.length - 1][3] < 1) layers.push([255, 255, 255, 1]);
+    return layers.reduceRight((u, c) => [0, 1, 2].map((i) => c[i] * c[3] + u[i] * (1 - c[3])), [0, 0, 0]);
+  };
+  // t = ตัวหนังสือ ≥ 4.5 · u = ขอบชิ้นกดได้ ≥ 3 · g = ตรา/กรอบเทียบพื้น ≥ 3 (ภาพ ไม่ใช่ปุ่ม) · ชิ้นที่ไม่อยู่ในจอ = ไม่มีแถว
+  const PROBES = [
+    ['t', '.mem .top b', 'หัวคำอาลัย / ป้ายประกาศ'], ['t', '.mem .d-head h3', 'ชื่อผู้ตาย'], ['t', '.mem .d-head .dates', 'อายุ'], ['t', '.mem .d-head .sub', 'สาเหตุ'],
+    ['t', '.d-tl .k', 'ป้าย "ฉายา"'], ['t', '.d-tl .more-n', 'อีก N ฉายา'], ['t', '.d-facts dt', 'หัวตารางข้อมูล'], ['t', '.d-facts dd', 'ค่าในตาราง'], ['t', '.d-facts .neg', 'ยอดติดลบ'],
+    ['t', '.mem .choices > .choice span', 'ปุ่มไปต่อ'], ['t', '.d-tab-bar button[aria-selected="false"]', 'แท็บที่ไม่ได้เลือก'], ['t', '.d-tab-bar button[aria-selected="true"]', 'แท็บที่เลือก'],
+    ['u', '.d-tab-bar button', 'ขอบแท็บ'], ['u', '.d-share > summary', 'ขอบเมนูแชร์'], ['t', '.d-share > summary', 'ป้ายเมนูแชร์'], ['t', '.dead s', 'ชื่อคนที่จากไป (ขีดฆ่า)'],
+    ['t', '.d-seal', 'ตัวบนตรา'], ['g', '.d-seal', 'ตราเทียบกระดาษ'], ['g', '.a.mem:not(.lost)', 'กรอบเทียบพื้นเว็บ'], ['p', '.mem .d-head h3', 'ชื่อทับเส้นลาย (แย่สุด)'], ['p', '.d-facts dt', 'หัวตารางทับเส้นลาย (แย่สุด)'],
+  ];
+  function measure(x) {
+    const d = x.f.contentDocument, win = x.f.contentWindow;
+    if (!d?.body) return [];
+    const out = [];
+    for (const [kind, sel, label] of PROBES) {
+      const el = [...d.querySelectorAll(sel)].find((e) => e.getClientRects().length);
+      if (!el) continue;
+      const cs = win.getComputedStyle(el);
+      let fg, bg, need = kind === 't' || kind === 'p' ? 4.5 : 3;
+      if (kind === 'u') { fg = toRgba(cs.borderTopColor); bg = bgOf(el.parentElement, win); }
+      else if (kind === 'g' && el.classList.contains('d-seal')) { fg = toRgba(cs.backgroundColor); bg = bgOf(el.parentElement, win); }
+      else if (kind === 'g') { if (x.p.frame === 'none' && !x.p.pure) continue; fg = toRgba(cs.borderTopColor); bg = bgOf(el.parentElement, win); }
+      else if (kind === 'p') { if (x.p.pure || x.p.pat === 'none' || el.closest('.lost')) continue; fg = toRgba(cs.color); bg = mix(toRgba(x.p.pc), bgOf(el, win), x.p.po); }
+      else { fg = toRgba(cs.color); bg = bgOf(el, win); }
+      let op = 1;
+      for (let e = el; e && e !== d.body; e = e.parentElement) op *= parseFloat(win.getComputedStyle(e).opacity);
+      fg = mix(fg, bg, (fg[3] ?? 1) * op);
+      const r = ratio(fg, bg);
+      out.push({ kind, label, r, need, ok: r >= need, fg, bg, at: `${x.id} ${x.w}` });
     }
+    return out;
   }
-}
+  function scan(x) {
+    const d = x.f.contentDocument, win = x.f.contentWindow;
+    let cMin = 99, cAt = '', fMin = 99;
+    for (const el of d.body.querySelectorAll('*')) {
+      if (!el.getClientRects().length || el.closest('[hidden],svg')) continue;
+      if (![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
+      const cs = win.getComputedStyle(el), px = parseFloat(cs.fontSize);
+      if (px < fMin) fMin = px;
+      const r = ratio(toRgba(cs.color), bgOf(el, win));
+      if (r < cMin) { cMin = r; cAt = `${el.tagName.toLowerCase()}.${String(el.className).trim().split(/\s+/).join('.')} «${el.textContent.trim().slice(0, 12)}»`; }
+    }
+    return { cMin, cAt, fMin, wide: d.documentElement.scrollWidth > x.w + 1 };
+  }
 
-const $ = (s) => document.querySelector(s);
-function save() { localStorage.setItem(KEY, JSON.stringify(P)); $('#json').value = JSON.stringify(P); }
-function sync() {
-  for (const k of Object.keys(DEF)) {
-    const i = document.getElementById(k);
-    if (i) i.value = P[k];
-    const o = document.querySelector(`output[data-for="${k}"]`);
-    if (o) o.textContent = P[k];
+  // ---------- กรอบ iframe ----------
+  const live = [];
+  // จอกว้างสูง ≤540 เข้า media จอแนวนอนเตี้ยของเกม (การ์ดกลายเป็นพาแนลสามคอลัมน์) ⇒ กรอบกว้างสูงอย่างน้อย 720
+  const fit = (x) => {
+    const box = x.f.parentElement, s = Math.min(1, box.clientWidth / x.w), d = x.f.contentDocument;
+    const h = Math.max(x.w >= 1000 ? 720 : 400, Math.ceil(d?.documentElement.scrollHeight ?? 900));
+    Object.assign(x.f.style, { width: `${x.w}px`, height: `${h}px`, transform: `scale(${s})` });
+    box.style.height = `${Math.ceil(h * s)}px`;
+  };
+  function report(x) {
+    fit(x);
+    const m = scan(x);
+    x.small.innerHTML = `${x.w}px · contrast ต่ำสุดในจอ <span class="${m.cMin >= 4.5 ? 'ok' : 'bad'}" title="${esc(m.cAt)}">${m.cMin.toFixed(2)}</span> · ตัวเล็กสุด <span class="${m.fMin >= 12 ? 'ok' : 'bad'}">${m.fMin}px</span>${m.wide ? ' · <span class="bad">ล้นแนวนอน</span>' : ''}${m.cMin >= 4.5 ? '' : ` · ที่ ${esc(m.cAt)}`}`;
+    after();
   }
-}
-let t = 0;
-for (const k of Object.keys(DEF)) {
-  const i = document.getElementById(k);
-  if (!i) continue;
-  i.addEventListener('input', () => {
-    P[k] = i.type === 'range' ? Number(i.value) : i.value;
-    const o = document.querySelector(`output[data-for="${k}"]`);
-    if (o) o.textContent = P[k];
-    save();
-    clearTimeout(t);
-    t = setTimeout(render, 120);
-  });
-}
-for (const b of document.querySelectorAll('[data-w]')) b.addEventListener('click', () => { W = Number(b.dataset.w); for (const x of document.querySelectorAll('[data-w]')) x.classList.toggle('on', x === b); render(); });
-for (const b of document.querySelectorAll('[data-show]')) b.addEventListener('click', () => { SHOW = b.dataset.show; for (const x of document.querySelectorAll('[data-show]')) x.classList.toggle('on', x === b); render(); });
-$('#copy').addEventListener('click', async () => {
-  const txt = JSON.stringify(P);
-  $('#json').value = txt;
-  try { await navigator.clipboard.writeText(txt); $('#copy').textContent = 'คัดลอกแล้ว'; } catch { $('#json').select(); $('#copy').textContent = 'กด Ctrl+C'; }
-  setTimeout(() => { $('#copy').textContent = 'คัดลอก JSON'; }, 1500);
-});
-$('#reset').addEventListener('click', () => { P = { ...DEF }; sync(); save(); render(); });
-window.PIECES = (id) => pieces(DATA.samples[id]);
-sync();
-save();
-render();
+  // แท็บในจอกดได้ (เหมือน deathTabs) — เปลี่ยนแค่กรอบนั้น
+  function wire(x) {
+    const d = x.f.contentDocument;
+    const bs = [...d.querySelectorAll('.d-tab-bar button')];
+    bs.forEach((b, i) => (b.onclick = () => { bs.forEach((o, j) => { o.setAttribute('aria-selected', String(i === j)); o.tabIndex = i === j ? 0 : -1; d.getElementById(`d-pane-${j}`).hidden = i !== j; }); report(x); }));
+    d.querySelector('.d-share')?.addEventListener('toggle', () => report(x));
+  }
+  function frame(title, id, p, w) {
+    const wrap = document.createElement('section');
+    wrap.className = 'fr';
+    wrap.innerHTML = `<h3><small></small></h3><div class="box"><iframe title="${esc(title)} ${w}"></iframe></div>`;
+    const x = { f: wrap.querySelector('iframe'), w, p, id, small: wrap.querySelector('small') };
+    Object.assign(x.f.dataset, { sample: id, w, preset: p === S.cur ? 'cur' : p.id });
+    x.f.addEventListener('load', () => { wire(x); report(x); x.f.contentDocument.fonts?.ready.then(() => report(x)); });
+    x.f.srcdoc = srcdoc(id, p);
+    live.push(x);
+    return wrap;
+  }
+  function group(title, pick, id, p) {
+    const g = document.createElement('section');
+    g.className = `sc${pick ? ' pick' : ''}`;
+    g.innerHTML = `<h2>${esc(title)}</h2>`;
+    const fr = document.createElement('div');
+    fr.className = 'frames';
+    fr.append(frame(title, id, p, 390), frame(title, id, p, 1280));
+    g.append(fr);
+    return g;
+  }
+  function draw() {
+    live.length = 0;
+    const L = (id) => { const l = DATA.samples[id]; return `${ROWS.find((r) => r[0] === id)[1]} · ${l.name} อายุ ${l.age} · ฉายา ${l.titles.length}`; };
+    const gs = S.mode === 'cmp'
+      ? PRESETS.map((x, i) => (i === S.base ? group(`${S.cur.name}${edits().length ? ' (แก้แล้ว)' : ''} ← เลือกอยู่ · ${L(S.smp)}`, true, S.smp, S.cur) : group(`${x.name} · ${L(S.smp)}`, false, S.smp, x)))
+      : ROWS.map(([id]) => group(L(id), false, id, S.cur));
+    $('frames').replaceChildren(...gs);
+    bar();
+    after();
+  }
+  function bar() {
+    $('mode').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.m === S.mode));
+    $('smp').innerHTML = ROWS.map(([id, l]) => `<button type="button" data-id="${id}" class="${id === S.smp ? 'on' : ''}"${S.mode === 'set' ? ' disabled' : ''}>${l}</button>`).join('');
+    $('smp').querySelectorAll('button').forEach((b) => (b.onclick = () => { S.smp = b.dataset.id; draw(); }));
+    $('tab').innerHTML = DEATH_TABS.map((t, i) => `<button type="button" data-t="${i}" class="${i === S.tab ? 'on' : ''}">${t}</button>`).join('');
+    $('tab').querySelectorAll('button').forEach((b) => (b.onclick = () => { S.tab = +b.dataset.t; draw(); }));
+    $('shr').querySelectorAll('button').forEach((b) => b.classList.toggle('on', +b.dataset.s === S.share));
+  }
+  let rows = [];
+  function after() {
+    // แย่สุดต่อคู่ จากทุกจอของชุดที่เลือก (ทุกชีวิต ทุกความกว้างที่โชว์อยู่)
+    const all = live.filter((x) => x.p === S.cur).flatMap(measure);
+    const worst = new Map();
+    for (const r of all) { const k = `${r.kind}|${r.label}`; if (!worst.has(k) || r.r < worst.get(k).r) worst.set(k, r); }
+    rows = [...worst.values()];
+    const fails = rows.filter((x) => !x.ok);
+    const sw = (x) => `<span class="pair" style="background:rgb(${x.bg.slice(0, 3).map(Math.round)});color:rgb(${x.fg.slice(0, 3).map(Math.round)})">ก</span>`;
+    if ($('cr')) $('cr').innerHTML = `<table class="cr"><tr><th></th><th>คู่</th><th>ค่า</th></tr>${rows.map((x) => `<tr><td>${sw(x)}</td><td>${esc(x.label)} <small class="info">${esc(x.at)}</small></td><td class="n"><span class="${x.ok ? 'ok' : 'bad'}">${x.r.toFixed(2)}</span> <small class="info">≥${x.need}</small></td></tr>`).join('')}</table>
+      <p class="hint">${rows.length ? (fails.length ? `<span class="bad">ตก ${fails.length} คู่</span>` : '<span class="ok">ผ่านทุกคู่</span>') : 'รอจอโหลด'} · วัดจากสีที่จอเกมคำนวณจริง (ค่าแย่สุดจากทุกจอของชุดที่เลือก) รวมความจาง · ตัวหนังสือ ≥ 4.5 · ขอบกดได้ ≥ 3 · ตรา/กรอบ ≥ 3 · "ทับเส้นลาย" = ตัวหนังสือบนจุดที่เส้นลายผ่าน</p>`;
+    if ($('out')) $('out').value = output(fails);
+    store();
+  }
+  function output(fails) {
+    const p = S.cur;
+    return JSON.stringify({
+      page: 'death-tweak', tweak: 'T10', ticket: 118, base: PRESETS[S.base].id, baseName: PRESETS[S.base].name, edited: edits(),
+      frame: { type: p.frame, width: p.fw, color: p.fc, inner: p.frame === 'thick' || p.frame === 'double' ? (p.inner === 'on' ? { color: p.ic, offset: p.io } : null) : null, radius: p.rad, corner: p.frame === 'corner' ? p.cs : null },
+      paper: p.paper, pattern: p.pat === 'none' ? null : { type: p.pat, color: p.pc, strength: p.po, size: p.ps },
+      seal: p.seal === 'none' ? null : { shape: p.seal, mark: p.smark, place: p.spos, color: p.sc, size: p.ss, rotate: p.srot },
+      contrastFail: fails.map((x) => `${x.label} ${x.r.toFixed(2)} (${x.at})`), note,
+    }, null, 1);
+  }
+
+  // ---------- แผงควบคุม ----------
+  function panel() {
+    const p = S.cur, ed = new Set(edits());
+    const lab = (k, t) => `<span class="lb"><span>${esc(t)}${ed.has(k) ? ' <span class="ed">แก้</span>' : ''}</span>${typeof p[k] === 'number' ? `<output>${p[k]}</output>` : ''}</span>`;
+    const knob = ([k, t, ty, o]) => {
+      if (k === 'h') return `<h2>${esc(t)}</h2>`;
+      const dis = off(p, k) ? ' disabled' : '';
+      if (ty === 'seg') return `<div class="row">${lab(k, t)}<div class="seg">${o.map(([v, n]) => `<button type="button" data-k="${k}" data-v="${v}" class="${p[k] === v ? 'on' : ''}"${dis}>${esc(n)}</button>`).join('')}</div></div>`;
+      if (ty === 'range') return `<div class="row">${lab(k, t)}<input type="range" data-k="${k}" min="${o[0]}" max="${o[1]}" step="${o[2]}" value="${p[k]}"${dis}></div>`;
+      return `<div class="row">${lab(k, t)}<input type="color" data-k="${k}" value="${p[k]}"${dis}><span class="sws">${o.map((c) => `<button type="button" data-k="${k}" data-v="${c}" title="${c}" style="background:${c}"${dis}></button>`).join('')}</span></div>`;
+    };
+    $('ctl').innerHTML = `<h1>T10 การ์ดตาย book: กรอบ · ลาย · ตรา</h1>
+      <p class="hint">ui-redo 118 · SPEC §4 แถว T10 · ข้อ 121–123 (หนังสืองานศพ) · เลือกชุด ปรับได้ แล้วกด <b>คัดลอกค่า</b> วางตอบในแชท · ค่าจำไว้ในเครื่อง</p>
+      <div class="row"><span class="lb">ชุดตั้งต้น</span><div class="seg">${PRESETS.map((x, i) => `<button type="button" data-p="${i}" class="${i === S.base ? 'on' : ''}">${esc(x.name)}</button>`).join('')}</div></div>
+      <div class="btns"><button type="button" id="reset">คืนค่าชุดนี้${ed.size ? ` (แก้ ${ed.size})` : ''}</button></div>
+      ${p.pure ? '<p class="hint">ชุด 0 = เกมตอนนี้ ปรับไม่ได้ · เลือก ก ข ค แล้วปรับต่อ</p>' : ''}
+      ${KNOBS.map(knob).join('')}
+      <p class="hint">ที่ต้องรักษา (ทุกชุด): แท็บ 6 ตัวชื่อเดิม · ข้อมูลเดิมครบ · ชื่อคนที่จากไปขีดฆ่า · ปุ่มไปต่อ 1 + เมนูแชร์ 1 ปุ่มกางในที่ (ใบ 12) · ตราไม่มีชื่อผู้ตาย และชื่อคงหมึกดำ (ห้ามแดงกับชื่อ ข้อ 154) · ตราเป็นภาพประดับ ไม่ใช่ปุ่ม · ป้ายตามหาคนหายไม่มีตรา · ภาพที่บันทึก/แชร์ (วาดด้วย canvas) ใบนี้ไม่แตะ</p>
+      <h2>contrast ทุกคู่ (สด)</h2><div id="cr"></div>
+      <h2>คัดลอก</h2><div class="row"><span class="lb">หมายเหตุถึงผู้พัฒนา</span><textarea id="note" rows="3">${esc(note)}</textarea></div>
+      <div class="btns"><button type="button" class="pri" id="copy">คัดลอกค่า</button></div><p id="msg"></p>
+      <textarea id="out" rows="10" readonly aria-label="ข้อความที่จะคัดลอก"></textarea>`;
+    document.querySelectorAll('[data-p]').forEach((b) => (b.onclick = () => { S.base = +b.dataset.p; S.cur = clone(PRESETS[S.base]); panel(); draw(); }));
+    $('reset').onclick = () => { S.cur = clone(PRESETS[S.base]); panel(); draw(); };
+    let t = 0;
+    const set = (k, v) => { S.cur[k] = typeof NOW[k] === 'number' ? Number(v) : v; clearTimeout(t); t = setTimeout(() => { panel(); draw(); }, 150); };
+    $('ctl').querySelectorAll('button[data-k]').forEach((b) => (b.onclick = () => set(b.dataset.k, b.dataset.v)));
+    $('ctl').querySelectorAll('input[data-k]').forEach((i) => (i.oninput = () => { const o = i.closest('.row').querySelector('output'); if (o) o.textContent = i.value; set(i.dataset.k, i.value); }));
+    $('note').oninput = (e) => { note = e.target.value; after(); };
+    $('copy').onclick = async () => {
+      const o = $('out');
+      try { await navigator.clipboard.writeText(o.value); } catch (e) { o.select(); document.execCommand('copy'); }
+      $('msg').textContent = 'คัดลอกแล้ว — วางตอบในแชทได้เลย';
+    };
+    after();
+  }
+  $('mode').querySelectorAll('button').forEach((b) => (b.onclick = () => { S.mode = b.dataset.m; draw(); }));
+  $('shr').querySelectorAll('button').forEach((b) => (b.onclick = () => { S.share = +b.dataset.s; draw(); }));
+  addEventListener('resize', () => live.forEach(fit));
+  // ด่านเบราว์เซอร์: ข้อมูลที่ทุกชุดต้องมีครบ (อ่านจาก DOM ของทุกจอที่โชว์อยู่)
+  window.T10 = {
+    check: () => live.map((x) => {
+      const d = x.f.contentDocument, l = DATA.samples[x.id], txt = d.body.textContent;
+      const need = [l.name, ...l.facts.split(' · ').map((v) => v.replace(/^ฐานะ|^วุฒิ/, '')), Math.round(l.money).toLocaleString('en-US'), ...l.titles.slice(0, TITLES_SHOWN).map((t) => t.name)];
+      if (l.why) need.push(l.why);
+      return { id: x.id, w: x.w, preset: x.f.dataset.preset, miss: need.filter((s) => !txt.includes(s)), tabs: d.querySelectorAll('.d-tab-bar button').length, go: d.querySelectorAll('.mem > .choices > .choice').length, share: d.querySelectorAll('.d-share > summary').length, strike: d.querySelectorAll('.dead s').length, sealOnLost: d.querySelectorAll('.lost .d-seal').length, wide: d.documentElement.scrollWidth > x.w + 1 };
+    }),
+    rows: () => rows,
+  };
+  panel();
+  draw();
+})();
 </script>
 </body>
 </html>

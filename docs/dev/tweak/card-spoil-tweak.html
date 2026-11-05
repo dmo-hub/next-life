@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="th">
+<head>
+<!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T14 หน้าการ์ดรวม: ปุ่มดูผลและกล่องเฉลย (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<style>
+  /* หน้า tweak T14 (ui-redo 126 · ข้อ 177 187 199 201): หน้ารวมการ์ด + หน้าเฉลยรวมเป็นหน้าเดียว เปิดเฉลยทีละใบ
+     จออยู่ใน iframe ที่ใช้ CSS จริงของหน้ารวมการ์ด/หน้าเฉลย + การ์ดจริง (build เติมใน <script id="csd">) · ชุด 0 = เว็บตอนนี้ ไม่ทับอะไร
+     เฉลยไม่อยู่ใน DOM ของจอจนกดปุ่ม ⇒ Ctrl+F ไม่เจอ · ข้อมูลอยู่ในสคริปต์ JSON ซึ่งเบราว์เซอร์ไม่ค้น */
+  body { margin: 0; background: #E6E0D3; color: #1F2430; font: 15px/1.55 Sarabun, system-ui, sans-serif; }
+  .lay { display: grid; grid-template-columns: 360px minmax(0, 1fr); align-items: start; }
+  .ctl { position: sticky; top: 0; height: 100vh; overflow-y: auto; background: #F3EEE2; border-right: 1px solid #D8D0C0; padding: 14px 14px 40px; box-sizing: border-box; }
+  .ctl h1 { margin: 0 0 4px; font-size: 19px; line-height: 1.3; }
+  .ctl .hint { margin: 6px 0 10px; font-size: 13px; color: #5A5F6B; }
+  .ctl h2 { margin: 18px 0 6px; font-size: 15px; padding-top: 10px; border-top: 1px solid #D8D0C0; }
+  .row { margin: 8px 0 10px; }
+  .row > .lb { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .ed { color: #7A5A12; font-weight: 600; }
+  .why { display: block; font-size: 12px; color: #7A2E12; font-weight: 400; }
+  .seg { display: flex; flex-wrap: wrap; gap: 4px; }
+  .seg button, .btns button { font: inherit; font-size: 13px; padding: 4px 9px; border: 1px solid #C9BFA9; background: #fff; color: #1F2430; cursor: pointer; border-radius: 4px; min-height: 32px; text-align: left; }
+  .seg button.on { background: #1F2430; color: #fff; border-color: #1F2430; }
+  .seg button:disabled { opacity: .5; cursor: not-allowed; }
+  .seg.col { flex-direction: column; }
+  .btns { display: flex; flex-wrap: wrap; gap: 6px; }
+  .btns .pri { background: #2563eb; color: #fff; border-color: #2563eb; }
+  button:focus-visible, textarea:focus-visible { outline: 2px solid #2563eb; outline-offset: 1px; }
+  textarea { font: inherit; font-size: 13px; width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #C9BFA9; border-radius: 4px; resize: vertical; background: #fff; }
+  #out { font: 11px/1.4 ui-monospace, monospace; }
+  #msg { font-size: 13px; color: #15803d; min-height: 1.4em; }
+  table.cr { border-collapse: collapse; font-size: 12px; width: 100%; }
+  table.cr th, table.cr td { border: 1px solid #D8D0C0; padding: 3px 5px; text-align: left; vertical-align: top; }
+  table.cr th[colspan] { background: #EAE3D3; }
+  table.cr td.n { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  table.cr .pair { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 20px; font-weight: 600; font-size: 12px; border: 1px solid #0002; }
+  .ok { color: #15803d; font-weight: 600; } .bad { color: #B3261E; font-weight: 600; } .info { color: #5A5F6B; }
+  .view { padding: 12px 16px 24px; min-width: 0; }
+  .vbar { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-bottom: 10px; font-size: 13px; }
+  .note { font-size: 13px; color: #4A4F5B; margin: 0 0 10px; max-width: 1100px; }
+  .sc { margin: 0 0 22px; }
+  .sc > h2 { font-size: 16px; margin: 0 0 8px; }
+  .frames { display: grid; grid-template-columns: minmax(0, 390px) minmax(0, 1fr); gap: 14px 18px; align-items: start; }
+  .fr h3 { margin: 0 0 6px; font-size: 14px; }
+  .fr h3 small { font-weight: 400; color: #5A5F6B; }
+  .fr .box { position: relative; overflow: hidden; box-shadow: 0 6px 30px rgb(0 0 0 / .14); background: #E4DDCF; }
+  .fr iframe { border: 0; display: block; transform-origin: 0 0; }
+  @media (max-width: 860px) { .lay { grid-template-columns: 1fr; } .ctl { position: static; height: auto; border-right: 0; border-bottom: 1px solid #D8D0C0; } .frames { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+
+<div class="lay">
+  <aside class="ctl" id="ctl"></aside>
+  <main class="view">
+    <div class="vbar">
+      <span class="btns"><button type="button" id="reload">วาดจอใหม่ (ปิดเฉลยที่เปิดไว้)</button></span>
+      <span id="gate" class="info"></span>
+    </div>
+    <p class="note">การ์ดจริง 3 ใบจากเกม (ผลสุ่มหลายทาง + บุญบาป · ทางที่ล็อกด้วยเงื่อนไข · การ์ดสั้นสองตัวเลือก) วางแบบหน้ารวมการ์ด · ข้อ 177 187: รวมหน้าการ์ดทั้งหมดกับหน้าเฉลยเป็นหน้าเดียว เฉลยพับไว้ต่อใบ · <b>ก่อนกด</b> = จอที่เปิดหน้าเข้ามา ไม่มีผลบนจอและค้นคำ (Ctrl+F) ไม่เจอ · <b>หลังกด</b> = เปิดเฉลยใบแรกให้ดู (แบบทีละตัวเลือกเปิดข้อแรก) · ปุ่มในจอกดได้จริง · ชุด 0 = เว็บตอนนี้: หน้ารวมการ์ดไม่มีปุ่ม เฉลยอยู่อีกหน้า (spoilers.html) จอหลังกดจึงเป็นการ์ดของหน้าเฉลย</p>
+    <div id="frames"></div>
+  </main>
+</div>
+
+<!-- build เติม CSS ของ src/site/catalog.html + spoilers.html + token เว็บ + การ์ดจริงทั้งสองแบบระหว่าง marker ทุกรอบ (src/site/card-spoil-tweak.mjs) -->
+<script type="application/json" id="csd">/*CARD-SPOIL:START*/{"css":{"root":":root { --bg:#F4ECDC; --surface:#FBF6EA; --ink:#1B2A4A; --muted:#5B5648; --accent:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --seal:#A62B1F; --good:#2F6B4F; --bad:#B3261E; --line:#C9B98F; --line-strong:#8C7A52; --on-head:#E7E2D4; --on-head2:#D8D2C2; --on-head3:#BFB49A; --title:#F4ECDC; --lacquer:#17110D; --lacquer2:#221912; --bronze:#5A4630; --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }","catalog":"* { box-sizing: border-box; }\n  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.65; }\n  header { background: var(--head); color: var(--title); padding: 32px 16px 28px; }\n  .w { max-width: 1040px; margin: 0 auto; }\n  h1 { font-family: var(--fh); font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }\n  header p { margin: 0 0 6px; color: var(--on-head); max-width: 680px; }\n  header a { color: var(--title); }\n  main { padding: 20px 16px 64px; }\n  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }\n  .toc a { display: inline-block; padding: 8px 12px; min-height: 44px; line-height: 28px; background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink); text-decoration: none; }\n  .toc a:hover, .toc a:focus-visible { border-color: var(--ink); outline: none; }\n  .toc small, summary small { color: var(--muted); font-weight: 400; }\n  details { margin: 0 0 16px; }\n  summary { font-family: var(--fh); font-size: 22px; cursor: pointer; padding: 8px 0; min-height: 44px; }\n  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 8px; }\n  .c { background: var(--surface); border: 1px solid var(--line); padding: 14px 16px; overflow-wrap: anywhere; }\n  .c h4 { font-family: var(--fh); font-size: 18px; margin: 0 0 4px; }\n  .c p { margin: 0 0 8px; }\n  .c ul { margin: 0; padding-left: 20px; font-size: 15px; }\n  .c li { margin: 0 0 2px; }\n  .tags span { display: inline-block; font-size: 12px; border: 1px solid currentColor; padding: 0 6px; margin-right: 6px; opacity: .8; }\n  .ph { font-style: normal; border-bottom: 1px dashed currentColor; }\n  .none { font-size: 14px; opacity: .75; }\n  footer { font-size: 13px; color: var(--muted); margin-top: 32px; }\n  .c.x { background: var(--bg); border-color: var(--line); border-left: 4px solid var(--head); }\n  .c.x h4 { color: var(--ink); }\n  details h3 { font-family: var(--fh); font-size: 18px; margin: 16px 0 0; }\n  details h3 small { color: var(--muted); font-weight: 400; }\n  .lead { margin: 0 0 8px; max-width: 760px; }\n  .try { margin: 0 0 28px; }\n  .try h2 { font-family: var(--fh); font-size: 22px; margin: 0 0 8px; }\n  .try .lead { margin: 0 0 12px; font-size: 15px; }\n  .tcard { background: var(--surface); border: 1px solid var(--line); padding: 18px 20px; max-width: 560px; }\n  .tcard .kick { font-size: 13px; color: var(--muted); margin: 0 0 2px; }\n  .tcard h3 { font-family: var(--fh); font-size: 22px; margin: 0 0 6px; }\n  .tcard p { margin: 0 0 12px; }\n  .tch { display: grid; gap: 8px; }\n  .tch button { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 44px; padding: 8px 12px; text-align: left; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); cursor: pointer; }\n  .tch button:hover:not(:disabled), .tch button:focus-visible { border-color: var(--line-strong); outline: none; }\n  .tch button:disabled { cursor: default; opacity: .55; }\n  .tch button.on { opacity: 1; border: 2px solid var(--accent2); }\n  .tch .fx { font-size: 13px; color: var(--muted); white-space: nowrap; }\n  .tres { margin: 12px 0 8px !important; padding: 10px 12px; background: var(--head); color: var(--title); }\n  .tact a { font-family: var(--fh); color: var(--accent2); font-size: 18px; display: inline-block; min-height: 44px; line-height: 44px; margin-right: 12px; }\n  .tact button { font: inherit; min-height: 44px; padding: 0 14px; background: transparent; border: 1px solid var(--line-strong); color: var(--ink); cursor: pointer; }\n  /* กติกาทีละระบบ (ย้ายจากหน้า GDD เดิม) */\n  .rules section { background: var(--surface); color: var(--ink); border: 1px solid var(--line); padding: 16px 20px; margin: 0 0 16px; text-align: left; }\n  .rules section.dark { background: var(--lacquer); color: var(--headink); border-color: var(--bronze); }\n  .rules section.dark a { color: var(--headink); }\n  .rules h2 { font-family: var(--fh); font-size: 22px; margin: 0 0 8px; }\n  .rules h3 { font-family: var(--fh); font-size: 17px; margin: 16px 0 4px; }\n  .rules ul, .rules ol { padding-left: 22px; margin: 0 0 8px; }\n  .rules li { margin: 0 0 6px; }\n  .rules p { margin: 0 0 8px; }\n  .rules .note { font-size: 14px; color: var(--muted); }\n  .rules section.dark .note { color: var(--on-head3); }\n  .rules .tbl { overflow-x: auto; margin: 6px 0 10px; }\n  .rules table { border-collapse: collapse; width: 100%; font-size: 14px; }\n  .rules th, .rules td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; vertical-align: top; }\n  .rules th { background: var(--bg); font-weight: 600; }\n  .rules section.dark th { background: var(--lacquer2); }\n  .rules section.dark th, .rules section.dark td { border-color: var(--bronze); }\n  .rules code { font-size: 13px; background: var(--bg); padding: 0 4px; overflow-wrap: anywhere; }\n  .rules section.dark code { background: var(--lacquer2); }\n  .rules .flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 10px; font-size: 14px; }\n  .rules .flow span { border: 1px solid var(--line-strong); padding: 2px 10px; background: var(--surface); }\n  .rules .flow i { font-style: normal; color: var(--accent2); }\n  .rules section.dark .flow span { background: var(--lacquer2); border-color: var(--gold); }","spoilers":"* { box-sizing: border-box; }\n  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.65; }\n  header { background: var(--head); color: var(--title); padding: 32px 16px 28px; }\n  .w { max-width: 1040px; margin: 0 auto; }\n  h1 { font-family: var(--fh); font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }\n  header p { margin: 0 0 6px; color: var(--on-head); max-width: 680px; }\n  header a { color: var(--title); }\n  .warn { background: var(--head); color: var(--title); padding: 14px 16px; border-left: 6px solid var(--gold); }\n  .warn .w { display: block; }\n  .warn b { font-size: 18px; }\n  .warn p { margin: 4px 0 0; }\n  .warn a { color: var(--title); }\n  main { padding: 20px 16px 64px; }\n  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }\n  .toc a { display: inline-block; padding: 8px 12px; min-height: 44px; line-height: 28px; background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink); text-decoration: none; }\n  .toc a:hover, .toc a:focus-visible { border-color: var(--ink); outline: none; }\n  .toc small, summary small { color: var(--muted); font-weight: 400; }\n  details { margin: 0 0 16px; }\n  summary { font-family: var(--fh); font-size: 22px; cursor: pointer; padding: 8px 0; min-height: 44px; }\n  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 12px; margin-top: 8px; }\n  .c { background: var(--surface); border: 1px solid var(--line); padding: 14px 16px; overflow-wrap: anywhere; min-width: 0; }\n  .c h4 { font-family: var(--fh); font-size: 18px; margin: 0 0 4px; }\n  .c p { margin: 0 0 8px; }\n  .when { font-size: 14px; color: var(--muted); border-left: 3px solid var(--line); padding-left: 8px; }\n  .chs { margin: 8px 0 0; padding-left: 22px; }\n  .chs > li { margin: 0 0 12px; padding-top: 8px; border-top: 1px dashed var(--line); }\n  .ch { font-weight: 600; }\n  .out { margin: 4px 0 0; padding-left: 18px; font-size: 15px; }\n  .out li { margin: 0 0 6px; }\n  .fx, .mul, .ex, .lock, .nm { font-size: 14px; margin: 0 0 4px; }\n  .mul, .ex, .nm { color: var(--muted); }\n  .lock { color: var(--accent2); }\n  .pct { display: inline-block; min-width: 4.2em; font-variant-numeric: tabular-nums; }\n  .ok { font-size: 12px; border: 1px solid currentColor; padding: 0 5px; }\n  .m { display: inline-block; padding: 0 6px; font-size: 13px; font-weight: 600; }\n  .m.good { background: color-mix(in srgb, var(--good) 14%, var(--surface)); color: var(--good); }\n  .m.sin { background: color-mix(in srgb, var(--bad) 12%, var(--surface)); color: var(--accent2); }\n  .fl small { opacity: .75; }\n  .tags span { display: inline-block; font-size: 12px; border: 1px solid currentColor; padding: 0 6px; margin-right: 6px; opacity: .8; }\n  .ph { font-style: normal; border-bottom: 1px dashed currentColor; }\n  .none { font-size: 14px; opacity: .75; }\n  footer { font-size: 13px; color: var(--muted); margin-top: 32px; }\n  .c.x { background: var(--bg); border-color: var(--line); border-left: 4px solid var(--head); }\n  .c.x h4 { color: var(--ink); }\n  .c.x .chs > li { border-color: var(--line); }\n  .c.x ul { margin: 0; padding-left: 20px; font-size: 15px; }\n  .c.x ul > li { margin: 0 0 8px; }\n  details h3 { font-family: var(--fh); font-size: 18px; margin: 16px 0 0; }\n  details h3 small { color: var(--muted); font-weight: 400; }\n  .lead { margin: 0 0 8px; max-width: 760px; }\n  .rules { margin: 0 0 8px; padding-left: 20px; font-size: 15px; max-width: 760px; }\n  .rk { display: inline-block; font-size: 12px; border: 1px solid currentColor; padding: 0 5px; }\n  .ends small { color: var(--muted); }\n  .jobs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 12px; margin-top: 8px; }\n  .job { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent2); padding: 14px 16px; overflow-wrap: anywhere; min-width: 0; }\n  .job h4 { font-family: var(--fh); font-size: 18px; margin: 0 0 4px; }\n  .job h4 small { display: block; font-family: var(--fb); font-size: 13px; color: var(--muted); font-weight: 400; }\n  .job .lives { font-size: 14px; color: var(--muted); margin: 0 0 6px; }\n  .job .sub { font-weight: 600; margin: 10px 0 2px; padding-top: 6px; border-top: 1px dashed var(--line); }\n  .sl { margin: 0; padding-left: 0; list-style: none; font-size: 15px; }\n  .sl li { margin: 0 0 4px; padding-left: 4.6em; text-indent: -4.6em; }\n  .sim { display: inline-block; min-width: 4.2em; text-indent: 0; font-variant-numeric: tabular-nums; color: var(--ink); background: var(--bg); padding: 0 5px; }\n  .rare { font-size: 13px; color: var(--muted); margin: 2px 0 4px; }"},"cards":[{"id":"teen_first_smoke_01","stage":"วัยรุ่น","catalog":"\u003carticle class=\"c a\">\u003ch4>บุหรี่มวนแรก\u003c/h4>\u003cp class=\"tags\">\u003cspan>สุขภาพ\u003c/span>\u003c/p>\u003cp>หลังเลิกเรียน รุ่นพี่ยื่นบุหรี่มวนหนึ่งมาให้ ทั้งวงเงียบกริบ จ้องรอดูว่าจะกล้าสูบไหม\u003c/p>\u003cul>\u003cli>สูบโชว์ให้ดูเท่\u003c/li>\u003cli>ลองสูบ แล้วสำลักหนัก\u003c/li>\u003cli>ปฏิเสธแล้วเดินหนี\u003c/li>\u003cli>แอบบอกครูฝ่ายปกครอง\u003c/li>\u003c/ul>\u003c/article>","spoil":"\u003carticle class=\"c a\" id=\"teen_first_smoke_01\">\u003ch4>บุหรี่มวนแรก\u003c/h4>\u003cp class=\"tags\">\u003cspan>สุขภาพ\u003c/span>\u003c/p>\u003cp class=\"when\">ออกเมื่อ: พ.ศ. 2500–2650 · เรียนมัธยมต้น หรือ มัธยมปลาย หรือ ปวช. · น้ำหนักในกองสุ่ม 2\u003c/p>\u003cp class=\"when\">โอกาสออก: ×1.5 ถ้ารุ่นก่อน\u003cspan class=\"fl\" title=\"smoker\">สูบบุหรี่\u003c/span> · ×0.07 ถ้าเพศหญิง\u003c/p>\u003cp>หลังเลิกเรียน รุ่นพี่ยื่นบุหรี่มวนหนึ่งมาให้ ทั้งวงเงียบกริบ จ้องรอดูว่าจะกล้าสูบไหม\u003c/p>\u003col class=\"chs\">\u003cli>\u003cp class=\"ch\">สูบโชว์ให้ดูเท่\u003c/p>\u003cp class=\"fx\">ชีวิต −1 · ความสุข +1 · ความสัมพันธ์ +1\u003c/p>\u003cp class=\"nm\">ไม่มีบุญบาป ไม่ว่าผลออกทางไหน\u003c/p>\u003cp class=\"ex\">ติดตัว: \u003cspan class=\"fl\" title=\"smoker\">สูบบุหรี่\u003c/span>\u003c/p>\u003c/li>\u003cli>\u003cp class=\"ch\">ลองสูบ แล้วสำลักหนัก\u003c/p>\u003cp class=\"nm\">ไม่มีบุญบาป ไม่ว่าผลออกทางไหน\u003c/p>\u003col class=\"out\">\u003cli>\u003cp>\u003cb class=\"pct\">66.67%\u003c/b> \u003cspan class=\"ok\">สำเร็จ\u003c/span> ไอจนน้ำตาไหล ทั้งวงหัวเราะ แต่ไม่มีใครชวนอีกเลย\u003c/p>\u003cp class=\"fx\">ความสุข −1\u003c/p>\u003c/li>\u003cli>\u003cp>\u003cb class=\"pct\">33.33%\u003c/b> สำลักแต่ฝืนสูบต่อทุกวันจนติดงอมแงม\u003c/p>\u003cp class=\"fx\">ชีวิต −1\u003c/p>\u003cp class=\"ex\">ติดตัว: \u003cspan class=\"fl\" title=\"smoker\">สูบบุหรี่\u003c/span>\u003c/p>\u003c/li>\u003c/ol>\u003c/li>\u003cli>\u003cp class=\"ch\">ปฏิเสธแล้วเดินหนี\u003c/p>\u003cp class=\"nm\">ไม่มีบุญบาป ไม่ว่าผลออกทางไหน\u003c/p>\u003col class=\"out\">\u003cli>\u003cp>\u003cb class=\"pct\">66.67%\u003c/b> \u003cspan class=\"ok\">สำเร็จ\u003c/span> รุ่นพี่ยักไหล่ ไม่ว่าอะไร\u003c/p>\u003cp class=\"fx\">ชีวิต +1\u003c/p>\u003cp class=\"mul\">×1.3 เมื่อเส้นสายสูง (÷1.3 เมื่อต่ำ)\u003c/p>\u003c/li>\u003cli>\u003cp>\u003cb class=\"pct\">33.33%\u003c/b> รุ่นพี่ล้อว่าลูกแหง่ไปทั้งเทอม\u003c/p>\u003cp class=\"fx\">ชีวิต +1 · ความสุข −2\u003c/p>\u003cp class=\"ex\">ติดตัว: \u003cspan class=\"fl\" title=\"bullied\">เคยโดนแกล้งที่โรงเรียน\u003c/span>\u003c/p>\u003c/li>\u003c/ol>\u003c/li>\u003cli>\u003cp class=\"ch\">แอบบอกครูฝ่ายปกครอง\u003c/p>\u003cp class=\"fx\">\u003cspan class=\"m good\">บุญ ช่วยคน ระดับ 1 (+1)\u003c/span>\u003c/p>\u003col class=\"out\">\u003cli>\u003cp>\u003cb class=\"pct\">50.00%\u003c/b> \u003cspan class=\"ok\">สำเร็จ\u003c/span> ครูจับได้คาหนังคาเขา ไม่มีใครรู้ว่าใครบอก\u003c/p>\u003cp class=\"fx\">ความสัมพันธ์ +1 · \u003cspan class=\"m good\">บุญ ช่วยคน ระดับ 1 (+1)\u003c/span>\u003c/p>\u003c/li>\u003cli>\u003cp>\u003cb class=\"pct\">50.00%\u003c/b> ความแตกว่าใครฟ้อง ทั้งสายชั้นเลิกคุยด้วย\u003c/p>\u003cp class=\"fx\">ความสุข −1 · ความสัมพันธ์ −2 · \u003cspan class=\"m good\">บุญ ช่วยคน ระดับ 1 (+1)\u003c/span>\u003c/p>\u003cp class=\"ex\">ติดตัว: \u003cspan class=\"fl\" title=\"bullied\">เคยโดนแกล้งที่โรงเรียน\u003c/span> · ต่อด้วยการ์ด \u003ca href=\"#teen_snitch_gate_01\">หน้าประตูโรงเรียน\u003c/a>\u003c/p>\u003c/li>\u003c/ol>\u003c/li>\u003c/ol>\u003c/article>"},{"id":"career_transfer_01","stage":"ทำงาน","catalog":"\u003carticle class=\"c a\">\u003ch4>คำสั่งย้ายด่วน\u003c/h4>\u003cp class=\"tags\">\u003cspan>งานและเงิน\u003c/span>\u003c/p>\u003cp>ประกาศติดบอร์ดเช้าวันจันทร์ ชื่อ\u003ci class=\"ph\">ชื่อ\u003c/i>อยู่บรรทัดแรก ย้ายไปประจำสาขาต่างจังหวัด มีผลต้นเดือนหน้า\u003c/p>\u003cul>\u003cli>ไปตามคำสั่ง ลองดูสักตั้ง\u003c/li>\u003cli>ขนครอบครัวไปด้วยกันทั้งบ้าน\u003c/li>\u003cli>ใช้เส้นสายขอยกเลิกคำสั่ง\u003c/li>\u003cli>ลาออก หางานใหม่ใกล้บ้าน\u003c/li>\u003c/ul>\u003c/article>","spoil":"\u003carticle class=\"c a\" id=\"career_transfer_01\">\u003ch4>คำสั่งย้ายด่วน\u003c/h4>\u003cp class=\"tags\">\u003cspan>งานและเงิน\u003c/span>\u003c/p>\u003cp class=\"when\">ออกเมื่อ: พ.ศ. 2500–2650 · ทำงานพนักงานสำนักงาน หรือ ช่างเทคนิค หรือ วิชาชีพ หรือ ผู้บริหาร · ไม่อยู่สายเลื่อนขั้น หรือ สายเอกชน หรือ สายอาชีพ · ออกซ้ำได้ 2 ครั้ง เว้น 7 ปี · น้ำหนักในกองสุ่ม 2\u003c/p>\u003cp class=\"when\">โอกาสออก: ×1.2 ถ้า\u003cspan class=\"fl\" title=\"married\">แต่งงานแล้ว\u003c/span>\u003c/p>\u003cp>ประกาศติดบอร์ดเช้าวันจันทร์ ชื่อ\u003ci class=\"ph\">ชื่อ\u003c/i>อยู่บรรทัดแรก ย้ายไปประจำสาขาต่างจังหวัด มีผลต้นเดือนหน้า\u003c/p>\u003col class=\"chs\">\u003cli>\u003cp class=\"ch\">ไปตามคำสั่ง ลองดูสักตั้ง\u003c/p>\u003col class=\"out\">\u003cli>\u003cp>\u003cb class=\"pct\">50.00%\u003c/b> \u003cspan class=\"ok\">สำเร็จ\u003c/span> สาขาเล็กแต่งานเห็นผลไว ผู้บริหารจับตา ได้ขึ้นเงินเดือนก่อนเพื่อนรุ่นเดียวกัน\u003c/p>\u003cp class=\"fx\">เส้นสาย +2 · รายได้ ×1.2\u003c/p>\u003cp class=\"mul\">×1.3 เมื่อเส้นสายสูง (÷1.3 เมื่อต่ำ)\u003c/p>\u003c/li>\u003cli>\u003cp>\u003cb class=\"pct\">25.00%\u003c/b> เหงาจนต้องกินเหล้าทุกคืน คนที่บ้านเริ่มห่างเหิน\u003c/p>\u003cp class=\"fx\">ชีวิต −1 · ความสุข −2 · ความสัมพันธ์ −2 · \u003cspan class=\"m sin\">บาป ดื่มสุรา ระดับ 1 (−1)\u003c/span>\u003c/p>\u003c/li>\u003cli>\u003cp>\u003cb class=\"pct\">25.00%\u003c/b> \u003cspan class=\"ok\">สำเร็จ\u003c/span> เจ้าของกิจการท้องถิ่นชอบฝีมือ ชวนออกมาร่วมกิจการด้วยกัน\u003c/p>\u003cp class=\"fx\">ความสุข +2 · รายได้ ×1.4\u003c/p>\u003cp class=\"ex\">ติดตัว: \u003cspan class=\"fl\" title=\"own_business\">ทำกิจการของตัวเอง\u003c/span>\u003c/p>\u003c/li>\u003c/ol>\u003c/li>\u003cli>\u003cp class=\"ch\">ขนครอบครัวไปด้วยกันทั้งบ้าน\u003c/p>\u003cp class=\"fx\">ความสุข +1 · ความสัมพันธ์ +2 · เงิน −1 เท่าของเงินเก็บต่อปี\u003c/p>\u003cp class=\"nm\">ไม่มีบุญบาป ไม่ว่าผลออกทางไหน\u003c/p>\u003c/li>\u003cli>\u003cp class=\"ch\">ใช้เส้นสายขอยกเลิกคำสั่ง\u003c/p>\u003cp class=\"lock\">เลือกได้เมื่อ เส้นสาย ≥ 50 · ไม่ผ่านจอบอก \"ยังไม่มีคนรู้จักพอจะช่วยได้\"\u003c/p>\u003cp class=\"fx\">\u003cspan class=\"m sin\">บาป โลภจนเบียดเบียน ระดับ 1 (−1)\u003c/span>\u003c/p>\u003col class=\"out\">\u003cli>\u003cp>\u003cb class=\"pct\">50.00%\u003c/b> \u003cspan class=\"ok\">สำเร็จ\u003c/span> ผู้ใหญ่โทรศัพท์สายเดียว คำสั่งถูกเปลี่ยนเป็นชื่อคนอื่น\u003c/p>\u003cp class=\"fx\">ความสุข +1 · ความสัมพันธ์ −1\u003c/p>\u003cp class=\"mul\">×1.5 เมื่อเส้นสายสูง (÷1.5 เมื่อต่ำ)\u003c/p>\u003c/li>\u003cli>\u003cp>\u003cb class=\"pct\">50.00%\u003c/b> เรื่องรั่วถึงหูผู้บริหาร โดนย้ายไกลกว่าเดิมแถมถูกลดขั้น\u003c/p>\u003cp class=\"fx\">ความสุข −2 · รายได้ ×0.85\u003c/p>\u003c/li>\u003c/ol>\u003c/li>\u003cli>\u003cp class=\"ch\">ลาออก หางานใหม่ใกล้บ้าน\u003c/p>\u003cp class=\"fx\">ความสุข −1 · ความสัมพันธ์ +1 · ได้งานค้าขายและบริการ\u003c/p>\u003cp class=\"nm\">ไม่มีบุญบาป ไม่ว่าผลออกทางไหน\u003c/p>\u003c/li>\u003c/ol>\u003c/article>"},{"id":"pet_lost_01","stage":"หนุ่มสาว","catalog":"\u003carticle class=\"c a\">\u003ch4>สัตว์ในบ้านหายไป\u003c/h4>\u003cp class=\"tags\">\u003cspan>ครอบครัว\u003c/span>\u003c/p>\u003cp>คืนที่ฟ้าร้องหนัก \u003ci class=\"ph\">ชื่อสัตว์\u003c/i>หายไปจากบ้าน เช้ามาข้างบ้านบอกว่าเห็นวิ่งไปทางถนนใหญ่\u003c/p>\u003cul>\u003cli>ลางานออกตามหาทั้งวัน\u003c/li>\u003cli>โพสต์ตามหาในกลุ่มหมู่บ้าน\u003c/li>\u003cli>เปิดประตูรอที่บ้าน\u003c/li>\u003cli>ทำใจ แล้วรับตัวใหม่มาแทน\u003c/li>\u003c/ul>\u003c/article>","spoil":"\u003carticle class=\"c a\" id=\"pet_lost_01\">\u003ch4>สัตว์ในบ้านหายไป\u003c/h4>\u003cp class=\"tags\">\u003cspan>ครอบครัว\u003c/span>\u003c/p>\u003cp class=\"when\">ออกเมื่อ: พ.ศ. 2500–2650 · มีสัตว์คู่ใจที่ยังอยู่ · น้ำหนักในกองสุ่ม 2\u003c/p>\u003cp>คืนที่ฟ้าร้องหนัก \u003ci class=\"ph\">ชื่อสัตว์\u003c/i>หายไปจากบ้าน เช้ามาข้างบ้านบอกว่าเห็นวิ่งไปทางถนนใหญ่\u003c/p>\u003col class=\"chs\">\u003cli>\u003cp class=\"ch\">ลางานออกตามหาทั้งวัน\u003c/p>\u003cp class=\"nm\">ไม่มีบุญบาป ไม่ว่าผลออกทางไหน\u003c/p>\u003col class=\"out\">\u003cli>\u003cp>\u003cb class=\"pct\">75.00%\u003c/b> \u003cspan class=\"ok\">สำเร็จ\u003c/span> เจอ\u003ci class=\"ph\">ชื่อสัตว์\u003c/i>ตัวสั่นอยู่ใต้ศาลาวัด พอเห็นหน้าก็วิ่งมาหาทันที\u003c/p>\u003cp class=\"fx\">ความสุข +2\u003c/p>\u003cp class=\"ex\">ความผูกพันกับสัตว์คู่ใจ +10\u003c/p>\u003c/li>\u003cli>\u003cp>\u003cb class=\"pct\">25.00%\u003c/b> ตามหาสามวันก็ไม่เจอ ชามข้าวยังวางอยู่ที่เดิม\u003c/p>\u003cp class=\"fx\">ความสุข −3\u003c/p>\u003cp class=\"ex\">สัตว์คู่ใจตาย\u003c/p>\u003c/li>\u003c/ol>\u003c/li>\u003cli>\u003cp class=\"ch\">โพสต์ตามหาในกลุ่มหมู่บ้าน\u003c/p>\u003cp class=\"nm\">ไม่มีบุญบาป ไม่ว่าผลออกทางไหน\u003c/p>\u003col class=\"out\">\u003cli>\u003cp>\u003cb class=\"pct\">66.67%\u003c/b> \u003cspan class=\"ok\">สำเร็จ\u003c/span> มีคนทักมาตอนดึก เขาเลี้ยงไว้ให้ก่อนแล้ว\u003c/p>\u003cp class=\"fx\">ความสุข +1 · ความสัมพันธ์ +1\u003c/p>\u003cp class=\"mul\">×1.5 เมื่อเส้นสายสูง (÷1.5 เมื่อต่ำ)\u003c/p>\u003c/li>\u003cli>\u003cp>\u003cb class=\"pct\">33.33%\u003c/b> มีแต่คนกดเศร้าให้ ไม่มีใครเห็นเลย\u003c/p>\u003cp class=\"fx\">ความสุข −3\u003c/p>\u003cp class=\"ex\">สัตว์คู่ใจตาย\u003c/p>\u003c/li>\u003c/ol>\u003c/li>\u003cli>\u003cp class=\"ch\">เปิดประตูรอที่บ้าน\u003c/p>\u003cp class=\"fx\">ความสุข −1\u003c/p>\u003cp class=\"nm\">ไม่มีบุญบาป ไม่ว่าผลออกทางไหน\u003c/p>\u003c/li>\u003cli>\u003cp class=\"ch\">ทำใจ แล้วรับตัวใหม่มาแทน\u003c/p>\u003cp class=\"fx\">ความสุข −1 · \u003cspan class=\"m good\">บุญ ทาน ระดับ 1 (+1)\u003c/span>\u003c/p>\u003cp class=\"ex\">สัตว์คู่ใจจากไป · ได้สัตว์คู่ใจ: แมว (อายุขัย 12–18 ปี)\u003c/p>\u003c/li>\u003c/ol>\u003c/article>"}]}/*CARD-SPOIL:END*/</script>
+<script>
+(() => {
+  const KEY = 'next-life-card-spoil-tweak-v1';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const FONTS = new URL('../../fonts/fonts.css', location.href).href;
+  const raw = $('csd').textContent;
+  const D = JSON.parse(raw.slice(raw.indexOf('*/') + 2, raw.lastIndexOf('/*')));
+
+  // ---------- แยกชิ้นการ์ดจริง (parse ใน <template> = ไม่วาด ไม่ค้นเจอ) ----------
+  const frag = (html) => { const t = document.createElement('template'); t.innerHTML = html; return t.content; };
+  const CARDS = D.cards.map((c) => {
+    const cat = frag(c.catalog).querySelector('article');
+    const sp = frag(c.spoil).querySelector('article');
+    const shown = [...cat.querySelectorAll(':scope > ul > li')].map((li) => li.innerHTML);
+    // ต่อตัวเลือก: ข้อความบนจอ (p.ch ตัดป้ายซ่อนออก) + ชิ้นเฉลยที่เหลือ · ทางซ่อนบนจอไม่มีคู่ในหน้ารวมการ์ด
+    const choices = [...sp.querySelectorAll(':scope > ol.chs > li')].map((li) => {
+      const ch = li.querySelector(':scope > p.ch');
+      const hidden = !!ch?.querySelector('small');
+      const rest = [...li.children].filter((e) => e !== ch).map((e) => e.outerHTML).join('');
+      return { li: li.outerHTML, rest, hidden };
+    });
+    return {
+      id: c.id, stage: c.stage, catalog: c.catalog, spoil: c.spoil,
+      head: [...cat.children].filter((e) => !(e.tagName === 'UL' || e.matches('p.none'))).map((e) => e.outerHTML).join(''),
+      none: cat.querySelector(':scope > p.none')?.outerHTML ?? '',
+      shown, when: [...sp.querySelectorAll(':scope > p.when')].map((e) => e.outerHTML).join(''), choices,
+      pcts: [...sp.querySelectorAll('.pct')].map((e) => e.textContent.trim()),
+    };
+  });
+
+  // ---------- ชุด + knob ----------
+  // unit: card = ปุ่มเดียวเปิดเฉลยทั้งใบ · choice = ปุ่มต่อตัวเลือก
+  // pos (ทั้งใบ): end = ท้ายการ์ด · head = ข้างชื่อการ์ด · full = เต็มกว้างท้ายการ์ด
+  // show (ทั้งใบ): below = กางใต้การ์ด (การ์ดยาวขึ้น) · flip = แทนที่ข้อความและตัวเลือก (พลิกหลังการ์ด)
+  // store: template = DOM ว่างจนกด (Ctrl+F ไม่เจอ) — details / until-found ชนข้อ 187 ปิดไว้ให้เห็นเหตุผล
+  const PRESETS = [
+    { id: '0', name: '0 เว็บตอนนี้ (หน้ารวมการ์ดไม่มีปุ่ม · เฉลยอยู่หน้าแยก)', pure: true, unit: 'card', btn: 'line', pos: 'end', label: 'all', show: 'below', warn: 'on', close: 'on', bg: 'bg', line: 'left', radius: '0', pad: '12', fs: '15', grid: '280', store: 'template' },
+    { id: 'ก', name: 'ก ปุ่มขอบท้ายการ์ด "ดูผลทุกทาง" · กล่องพื้นกระดาษเข้ม เส้นซ้ายทอง', unit: 'card', btn: 'line', pos: 'end', label: 'all', show: 'below', warn: 'on', close: 'on', bg: 'bg', line: 'left', radius: '0', pad: '12', fs: '15', grid: '360', store: 'template' },
+    { id: 'ข', name: 'ข ลิงก์ "ดูผล" ต่อตัวเลือก · กางใต้ข้อนั้น เส้นประบน ไม่มีพื้น', unit: 'choice', btn: 'link', pos: 'end', label: 'short', show: 'below', warn: 'off', close: 'off', bg: 'none', line: 'dash', radius: '0', pad: '8', fs: '14', grid: '360', store: 'template' },
+    { id: 'ค', name: 'ค ปุ่มครามเต็มกว้าง "เฉลย (สปอยล์)" · พลิกหลังการ์ดแทนข้อความ', unit: 'card', btn: 'solid', pos: 'full', label: 'spoil', show: 'flip', warn: 'on', close: 'on', bg: 'tint', line: 'frame', radius: '8', pad: '12', fs: '15', grid: '440', store: 'template' },
+  ];
+  const LABEL = { all: ['ดูผลทุกทาง', 'ซ่อนผล'], short: ['ดูผล', 'ซ่อนผล'], spoil: ['เฉลย (สปอยล์)', 'ปิดเฉลย'] };
+  const KNOBS = [
+    ['unit', 'เปิดเฉลยทีละ', [['card', 'ทั้งใบ (ปุ่มเดียวต่อการ์ด)'], ['choice', 'ตัวเลือก (ปุ่มต่อข้อ)']]],
+    ['btn', 'ปุ่มดูผล · ทรง', [['line', 'ปุ่มขอบ (แบบปุ่มสารบัญ)'], ['link', 'ลิงก์ขีดเส้นใต้'], ['solid', 'ปุ่มทึบคราม']]],
+    ['pos', 'ปุ่มดูผล · ที่วาง (ทั้งใบ)', [['end', 'ท้ายการ์ด ชิดซ้าย'], ['head', 'ข้างชื่อการ์ด'], ['full', 'ท้ายการ์ด เต็มกว้าง']]],
+    ['label', 'ปุ่มดูผล · คำ', [['all', 'ดูผลทุกทาง / ซ่อนผล'], ['short', 'ดูผล / ซ่อนผล'], ['spoil', 'เฉลย (สปอยล์) / ปิดเฉลย']]],
+    ['show', 'กล่องเฉลย · กางแบบ (ทั้งใบ)', [['below', 'กางใต้ตัวเลือก (การ์ดยาวขึ้น)'], ['flip', 'พลิกหลังการ์ด (แทนข้อความ+ตัวเลือก)']]],
+    ['warn', 'กล่องเฉลย · บรรทัดเตือนสปอยล์', [['on', 'มี'], ['off', 'ไม่มี']]],
+    ['close', 'กล่องเฉลย · ปุ่มปิดท้ายกล่อง', [['on', 'มี (ปิดได้ทั้งจากปุ่มบนและท้ายกล่อง)'], ['off', 'ไม่มี (ปุ่มเดิมสลับเป็นซ่อน)']]],
+    ['bg', 'กล่องเฉลย · พื้น', [['none', 'ไม่มีพื้น (พื้นการ์ด)'], ['bg', 'กระดาษเข้ม (--bg)'], ['tint', 'ทองจาง (accent2 8%)'], ['ink', 'ครามจาง (ink 6%)']]],
+    ['line', 'กล่องเฉลย · เส้น', [['none', 'ไม่มี'], ['left', 'เส้นซ้าย 4px ทองเข้ม'], ['dash', 'เส้นประบน (แบบหน้าเฉลย)'], ['frame', 'กรอบ 1px']]],
+    ['radius', 'กล่องเฉลย · มุม', [['0', '0'], ['6', '6px (--r)'], ['8', '8px (--rk)']]],
+    ['pad', 'กล่องเฉลย · ระยะใน', [['8', '8px'], ['12', '12px'], ['16', '16px']]],
+    ['fs', 'กล่องเฉลย · ขนาดตัวผล', [['14', '14px'], ['15', '15px (หน้าเฉลยตอนนี้)'], ['16', '16px']]],
+    ['grid', 'การ์ดกว้างขั้นต่ำ (คอลัมน์ที่ 1280)', [['280', '280px (หน้ารวมการ์ดตอนนี้ · 3 คอลัมน์)'], ['360', '360px (2 คอลัมน์)'], ['440', '440px (หน้าเฉลยตอนนี้ · 2 คอลัมน์)']]],
+    ['store', 'เก็บเฉลยก่อนกด (ข้อ 187)', [['template', 'นอก DOM จนกด — สร้างกล่องตอนกด'], ['details', '<details> พับ', 'ชนข้อ 187: Chrome ค้นเจอแล้วกางเอง'], ['found', 'hidden="until-found"', 'ชนข้อ 187: ออกแบบมาให้ค้นเจอ']]],
+  ];
+  const SCENES = [['closed', 'ก่อนกด (เพิ่งเปิดหน้า)'], ['open', 'หลังกด (เปิดเฉลยใบแรก)']];
+  const WS = [390, 1280];
+
+  let S = { base: 1, cur: clone(PRESETS[1]) }, note = '';
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (s && s.cur && PRESETS[s.base]) { S = { base: s.base, cur: { ...clone(PRESETS[s.base]), ...s.cur } }; note = s.note || ''; }
+  } catch (e) { /* storage ปิด — ใช้ค่าเริ่ม */ }
+  const store = () => { try { localStorage.setItem(KEY, JSON.stringify({ ...S, note })); } catch (e) { /* file:// บางเบราว์เซอร์ปิด storage */ } };
+  const edits = () => KNOBS.map(([k]) => k).filter((k) => S.cur[k] !== PRESETS[S.base][k]);
+
+  // ---------- markup ----------
+  const btn = (p, i, j, open) => {
+    const [on, off] = LABEL[p.label];
+    return `<button type="button" class="sp-btn sp-${p.btn}${p.unit === 'card' && p.pos === 'full' ? ' sp-full' : ''}" data-c="${i}"${j === undefined ? '' : ` data-j="${j}"`} aria-expanded="${open}">${open ? off : on}</button>`;
+  };
+  const warn = (p) => (p.warn === 'on' ? '<p class="spl-w"><span aria-hidden="true">⚠</span> สปอยล์: ผลของทุกทางและบุญบาป</p>' : '');
+  const closeBtn = (p, i, j) => (p.close === 'on' ? `<p class="spl-x"><button type="button" class="sp-btn sp-link" data-c="${i}"${j === undefined ? '' : ` data-j="${j}"`} data-x="1">${LABEL[p.label][1]}</button></p>` : '');
+  // กล่องเฉลยสร้างตอนกดเท่านั้น — ก่อนกดไม่มีชิ้นเฉลยใน DOM
+  const boxCard = (p, c, i) => `<div class="spl" id="spl-${i}">${warn(p)}${c.when}<ol class="chs">${c.choices.map((x) => x.li).join('')}</ol>${closeBtn(p, i)}</div>`;
+  const boxChoice = (p, c, i, j) => `<div class="spl spl-one" id="spl-${i}-${j}">${warn(p)}${c.choices.filter((x) => !x.hidden)[j].rest}${closeBtn(p, i, j)}</div>`;
+  function card(p, c, i, open) {
+    const o = open.has(`${i}`);
+    if (p.unit === 'choice') {
+      const shown = c.choices.filter((x) => !x.hidden);
+      const lis = c.shown.map((t, j) => { const oj = open.has(`${i}-${j}`); return `<li><span class="sp-t">${t}</span> ${btn(p, i, j, oj)}${oj ? boxChoice(p, c, i, j) : ''}</li>`; }).join('');
+      const anyOpen = shown.some((_, j) => open.has(`${i}-${j}`));
+      return `<article class="c a t14">${c.head}${anyOpen ? c.when : ''}${c.shown.length ? `<ul>${lis}</ul>` : c.none}</article>`;
+    }
+    const head = p.pos === 'head' ? c.head.replace(/<\/h4>/, `</h4><p class="sp-hd">${btn(p, i, undefined, o)}</p>`) : c.head;
+    const flip = o && p.show === 'flip';
+    const body = flip ? c.head.match(/<h4>[\s\S]*?<\/h4>/)[0] + (p.pos === 'head' ? `<p class="sp-hd">${btn(p, i, undefined, o)}</p>` : '') : `${head}${c.shown.length ? `<ul>${c.shown.map((t) => `<li>${t}</li>`).join('')}</ul>` : c.none}`;
+    return `<article class="c a t14">${body}${o ? boxCard(p, c, i) : ''}${p.pos === 'head' ? '' : `<p class="sp-ft">${btn(p, i, undefined, o)}</p>`}</article>`;
+  }
+  const section = (inner, n) => `<main><div class="w"><details open><summary>ตัวอย่างการ์ด <small>${n} ใบ</small></summary><div class="grid">${inner}</div></details></div></main>`;
+  // ชุด 0: ก่อนกด = การ์ดหน้ารวมการ์ดเดิม (ไม่มีปุ่ม) · หลังกด = ไปหน้าเฉลย ป้ายเตือน + การ์ดเฉลยเดิม
+  const MARK0 = {
+    closed: () => section(CARDS.map((c) => c.catalog).join(''), CARDS.length) + '<main><div class="w"><footer>อยากรู้ผลของทุกทางกับบุญบาป → <a href="#">หน้าเฉลยการ์ดทั้งหมด</a> (⚠ สปอยล์ทั้งเกม)</footer></div></main>',
+    open: () => `<div class="warn" role="note"><div class="w"><b>⚠ สปอยล์ทั้งเกม</b><p>หน้านี้เฉลยทุกอย่างที่เกมซ่อนไว้ รวมถึงบุญบาปของแต่ละทาง</p></div></div>${section(CARDS.map((c) => c.spoil).join(''), CARDS.length)}`,
+  };
+  const markNew = (p, open) => section(CARDS.map((c, i) => card(p, c, i, open)).join(''), CARDS.length);
+
+  // CSS ใหม่ที่หน้านี้เสนอ — ใช้ token เว็บ ไม่ฝัง hex
+  const BG = { none: 'transparent', bg: 'var(--bg)', tint: 'color-mix(in srgb, var(--accent2) 8%, var(--surface))', ink: 'color-mix(in srgb, var(--ink) 6%, var(--surface))' };
+  const LINE = { none: 'border:0', left: 'border:0;border-left:4px solid var(--accent2)', dash: 'border:0;border-top:1px dashed var(--line)', frame: 'border:1px solid var(--line-strong)' };
+  const newCss = (p) => `.grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,${p.grid}px),1fr))}
+.sp-btn{font:inherit;font-size:15px;min-height:44px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--ink);background:transparent;border:1px solid var(--line-strong);padding:0 14px;border-radius:var(--r)}
+.sp-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.sp-btn.sp-line[aria-expanded="true"]{border-color:var(--ink)}
+.sp-btn.sp-link{border:0;padding:0 4px;border-radius:0;text-decoration:underline;text-underline-offset:3px;font-weight:600}
+.sp-btn.sp-solid{background:var(--head);color:var(--title);border-color:var(--head)}
+.sp-btn.sp-full{display:flex;width:100%;justify-content:center}
+.sp-ft{margin:10px 0 0}.sp-hd{margin:-2px 0 6px}
+.t14 ul .sp-btn{font-size:14px;min-height:44px}
+.spl{margin:10px 0 0;padding:${p.pad}px;font-size:${p.fs}px;background:${BG[p.bg]};${LINE[p.line]};border-radius:${p.line === 'left' || p.line === 'dash' ? '0' : p.radius}px}
+.spl .chs{margin:0;padding-left:22px}.spl .chs>li:first-child{border-top:0;padding-top:0}
+.spl .out,.spl .fx,.spl .mul,.spl .ex,.spl .lock,.spl .nm{font-size:${Math.max(13, p.fs - 1)}px}
+.spl-one{margin:6px 0 4px}.spl-one .out{padding-left:18px}
+.spl-w{font-size:13px;font-weight:600;color:var(--accent2);margin:0 0 6px}
+.spl-x{margin:6px 0 0}`;
+  const srcdoc = (sc, p, open) => {
+    const base = p.pure ? (sc === 'open' ? D.css.spoilers : D.css.catalog) : `${D.css.catalog}\n${D.css.spoilers}`;
+    return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="${FONTS}"><style>${D.css.root}</style><style>${base}</style><style>${p.pure ? '' : newCss(p)}</style><style>html,body{overflow:hidden}main{padding-top:12px}</style></head><body>${p.pure ? MARK0[sc]() : markNew(p, open)}</body></html>`;
+  };
+
+  // ---------- สี + contrast ----------
+  const cv = document.createElement('canvas'); cv.width = cv.height = 1;
+  const cx = cv.getContext('2d', { willReadFrequently: true });
+  const toRgba = (css) => { cx.clearRect(0, 0, 1, 1); cx.fillStyle = '#000'; cx.fillStyle = css; cx.fillRect(0, 0, 1, 1); const d = cx.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255]; };
+  const lum = ([r, g, b]) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  const bgOf = (el, win) => {
+    const layers = [];
+    for (let e = el; e; e = e.parentElement) { const c = toRgba(win.getComputedStyle(e).backgroundColor); if (c[3] > 0) layers.push(c); if (c[3] >= 1) break; }
+    if (!layers.length || layers[layers.length - 1][3] < 1) layers.push([255, 255, 255, 1]);
+    return layers.reduceRight((u, c) => [0, 1, 2].map((i) => c[i] * c[3] + u[i] * (1 - c[3])), [0, 0, 0]);
+  };
+  // คู่ที่วัด (จอหลังกด กว้าง 390) · t = ตัวหนังสือ ≥ 4.5 · u = ขอบปุ่มกดได้ ≥ 3 เทียบพื้นการ์ด · ไม่มีชิ้นในจอ = ไม่โชว์แถว
+  const PROBES = [['t', '.c h4', 'ชื่อการ์ด'], ['t', '.c > p:not(.tags):not(.when):not(.sp-ft):not(.sp-hd)', 'ข้อความการ์ด'], ['t', '.sp-btn', 'ปุ่มดูผล'], ['u', '.sp-btn', 'ขอบปุ่มดูผล'], ['t', '.spl-w', 'บรรทัดเตือนสปอยล์'], ['t', '.warn b', 'ป้ายเตือนหน้าเฉลย'], ['t', '.when', 'ออกเมื่อ'], ['t', '.ch', 'ตัวเลือก'], ['t', '.out p', 'ผลสุ่ม'], ['t', '.pct', 'โอกาส %'], ['t', '.c .fx', 'ค่าที่ขยับ'], ['t', '.mul', 'ตัวคูณ'], ['t', '.ex', 'ผลต่อ'], ['t', '.lock', 'เงื่อนไขล็อก'], ['t', '.nm', 'ไม่มีบุญบาป'], ['t', '.m.good', 'ป้ายบุญ'], ['t', '.m.sin', 'ป้ายบาป']];
+  const live = []; // { f, w, p, sc, small, open }
+  function measureScene(x) {
+    const d = x?.f.contentDocument, win = x?.f.contentWindow;
+    if (!d?.body) return [];
+    const out = [];
+    for (const [kind, sel, label] of PROBES) {
+      const el = [...d.querySelectorAll(sel)].find((e) => e.getClientRects().length);
+      if (!el) continue;
+      const cs = win.getComputedStyle(el);
+      if (kind === 'u' && !(parseFloat(cs.borderTopWidth) > 0)) continue;
+      let fg, bg;
+      if (kind === 'u') { fg = toRgba(cs.borderTopColor); bg = bgOf(el.parentElement, win); } else { fg = toRgba(cs.color); bg = bgOf(el, win); }
+      let op = 1;
+      for (let e = el; e && e !== d.body; e = e.parentElement) op *= parseFloat(win.getComputedStyle(e).opacity);
+      fg = [0, 1, 2].map((i) => fg[i] * fg[3] * op + bg[i] * (1 - fg[3] * op));
+      const r = ratio(fg, bg), need = kind === 'u' ? 3 : 4.5;
+      out.push({ kind, label, r, need, ok: r >= need, fg, bg });
+    }
+    return out;
+  }
+  function measureFrame(f) {
+    const d = f.contentDocument, win = f.contentWindow;
+    if (!d?.body) return null;
+    let cMin = 99, cAt = '', fMin = 99, small = 0;
+    for (const el of d.body.querySelectorAll('*')) {
+      if (!el.getClientRects().length || el.closest('svg')) continue;
+      if (![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
+      const cs = win.getComputedStyle(el), px = parseFloat(cs.fontSize);
+      if (px < fMin) fMin = px;
+      const r = ratio(toRgba(cs.color), bgOf(el, win));
+      if (r < cMin) { cMin = r; cAt = `${el.tagName.toLowerCase()}.${String(el.className).trim().split(/\s+/).join('.')} «${el.textContent.trim().slice(0, 12)}»`; }
+    }
+    for (const b of d.querySelectorAll('.sp-btn')) if (b.getBoundingClientRect().height < 44) small++;
+    return { cMin, cAt, fMin, small };
+  }
+  // ด่านข้อ 187 ต่อจอก่อนกด: ไม่มีชิ้นเฉลยใน DOM (ซ่อนก็นับ) + ข้อความบนจอไม่มีตัวเลข % ของผลสุ่ม
+  function spoilFree(x) {
+    const d = x.f.contentDocument;
+    if (!d?.body) return null;
+    const nodes = d.querySelectorAll('.out, .pct, .m, .chs, details:not([open]) .out').length;
+    const text = d.body.textContent;
+    const hit = CARDS.flatMap((c) => c.pcts).filter((t) => t && text.includes(t)).length;
+    return { ok: !nodes && !hit, nodes, hit };
+  }
+
+  // ---------- กรอบ ----------
+  const fit = (x) => {
+    const f = x.f, box = f.parentElement, s = Math.min(1, box.clientWidth / x.w), d = f.contentDocument;
+    const h = Math.max(300, Math.ceil(d?.documentElement.scrollHeight ?? 600));
+    Object.assign(f.style, { width: `${x.w}px`, height: `${h}px`, transform: `scale(${s})` });
+    box.style.height = `${Math.ceil(h * s)}px`;
+  };
+  function report(x) {
+    fit(x);
+    const m = measureFrame(x.f);
+    const g = x.sc === 'closed' && !x.p.pure ? spoilFree(x) : null;
+    x.small.innerHTML = m ? `${x.w}px · contrast ต่ำสุด <span class="${m.cMin >= 4.5 ? 'ok' : 'bad'}" title="${esc(m.cAt)}">${m.cMin.toFixed(2)}</span> · ตัวเล็กสุด <span class="${m.fMin >= 12 ? 'ok' : 'bad'}">${m.fMin}px</span>${m.small ? ` · <span class="bad">ปุ่มเตี้ยกว่า 44px ${m.small}</span>` : ''}${g ? ` · เฉลยก่อนกด <span class="${g.ok ? 'ok' : 'bad'}">${g.ok ? 'ไม่มี' : `เจอ ${g.nodes + g.hit}`}</span>` : ''}${m.cMin >= 4.5 ? '' : ` · ที่ ${esc(m.cAt)}`}` : '';
+    x.gate = g;
+    after();
+  }
+  // ปุ่มในจอกดได้: วาดกรอบนั้นใหม่ด้วยชุดเปิดใหม่ (กล่องเฉลยเกิดตอนกด) · คืนโฟกัสปุ่มเดิม
+  function wire(x) {
+    const d = x.f.contentDocument;
+    d?.querySelectorAll('.sp-btn[data-c]').forEach((b) => b.addEventListener('click', (e) => {
+      e.preventDefault();
+      const k = b.dataset.j === undefined ? b.dataset.c : `${b.dataset.c}-${b.dataset.j}`;
+      if (x.open.has(k)) x.open.delete(k); else x.open.add(k);
+      x.focus = k;
+      x.f.srcdoc = srcdoc(x.sc, x.p, x.open);
+    }));
+    if (x.focus !== undefined) {
+      const [c, j] = x.focus.split('-');
+      d?.querySelector(`.sp-btn[data-c="${c}"]${j === undefined ? ':not([data-j])' : `[data-j="${j}"]`}:not([data-x])`)?.focus();
+    }
+  }
+  function frame(title, sc, p, w) {
+    const wrap = document.createElement('section');
+    wrap.className = 'fr';
+    wrap.innerHTML = `<h3>${esc(title)} <small></small></h3><div class="box"><iframe title="${esc(title)} ${w}"></iframe></div>`;
+    // ทีละตัวเลือก: เปิดข้อแรกที่มีผลสุ่ม ให้เห็นกล่องเต็ม
+    const j0 = Math.max(0, CARDS[0].choices.filter((c) => !c.hidden).findIndex((c) => c.rest.includes('class="out"')));
+    const open = new Set(sc === 'open' ? [p.unit === 'choice' ? `0-${j0}` : '0'] : []);
+    const x = { f: wrap.querySelector('iframe'), w, p, sc, small: wrap.querySelector('small'), open };
+    x.f.addEventListener('load', () => { wire(x); report(x); x.f.contentDocument.fonts?.ready.then(() => report(x)); });
+    x.f.srcdoc = srcdoc(sc, p, open);
+    live.push(x);
+    return wrap;
+  }
+  function draw() {
+    live.length = 0;
+    const groups = SCENES.map(([k, l]) => {
+      const g = document.createElement('section');
+      g.className = 'sc';
+      g.innerHTML = `<h2>${esc(l)}</h2>`;
+      const fr = document.createElement('div');
+      fr.className = 'frames';
+      fr.append(...WS.map((w) => frame(l, k, S.cur, w)));
+      g.append(fr);
+      return g;
+    });
+    $('frames').replaceChildren(...groups);
+    after();
+  }
+  let rows = [];
+  function after() {
+    const first = live.find((x) => x.sc === 'open' && x.w === 390);
+    rows = measureScene(first);
+    const fails = rows.filter((x) => !x.ok);
+    const gates = live.filter((x) => x.gate);
+    const gateOk = gates.length ? gates.every((x) => x.gate.ok) : null;
+    $('gate').innerHTML = S.cur.pure ? 'ชุด 0: เฉลยอยู่อีกหน้า หน้ารวมการ์ดไม่มีผลอยู่แล้ว' : gateOk === null ? 'รอจอโหลด' : `ข้อ 187 จอก่อนกด: ${gateOk ? '<span class="ok">ไม่มีเฉลยใน DOM และไม่มี % บนจอ ทั้ง 390 และ 1280</span>' : '<span class="bad">มีเฉลยก่อนกด</span>'}`;
+    const sw = (x) => `<span class="pair" style="background:rgb(${x.bg.slice(0, 3)});color:rgb(${x.fg.slice(0, 3)})">ก</span>`;
+    if ($('cr')) $('cr').innerHTML = `<table class="cr"><tr><th></th><th>คู่</th><th>ค่า</th></tr>${rows.map((x) => `<tr><td>${sw(x)}</td><td>${esc(x.label)}</td><td class="n"><span class="${x.ok ? 'ok' : 'bad'}">${x.r.toFixed(2)}</span> <small class="info">≥${x.need}</small></td></tr>`).join('')}</table>
+      <p class="hint">${rows.length ? (fails.length ? `<span class="bad">ตก ${fails.length} คู่</span>` : '<span class="ok">ผ่านทุกคู่</span>') : 'รอจอโหลด'} · วัดสีที่จอคำนวณจริง (จอหลังกด 390) รวมความจาง · ตัวหนังสือ ≥ 4.5 · ขอบปุ่มกดได้ ≥ 3 · ลิงก์ไม่มีขอบ ไม่วัดขอบ</p>`;
+    if ($('out')) $('out').value = output(fails, gateOk);
+    store();
+  }
+  function output(fails, gateOk) {
+    const p = S.cur;
+    const keys = KNOBS.map(([k]) => k).filter((k) => !(p.unit === 'choice' && (k === 'pos' || k === 'show')));
+    return JSON.stringify({
+      page: 'card-spoil-tweak', ticket: 126, tweak: 'T14', items: [177, 187], base: PRESETS[S.base].id, baseName: PRESETS[S.base].name, edited: edits(),
+      ...Object.fromEntries(keys.map((k) => [k, p[k]])),
+      noSpoilBeforeClick: p.pure ? null : gateOk, contrastFail: fails.map((x) => `${x.label} ${x.r.toFixed(2)}`), note,
+    }, null, 1);
+  }
+
+  // ---------- แผงควบคุม ----------
+  function panel() {
+    const p = S.cur, ed = new Set(edits()), lock = !!p.pure;
+    const off = (k) => lock || (p.unit === 'choice' && (k === 'pos' || k === 'show')) || (k === 'radius' && (p.line === 'left' || p.line === 'dash'));
+    const knob = ([k, label, opts]) => `<div class="row"><span class="lb">${esc(label)}${ed.has(k) ? ' <span class="ed">แก้</span>' : ''}</span><div class="seg col">${opts.map(([val, t, why]) => `<button type="button" data-k="${k}" data-v="${val}" class="${p[k] === val ? 'on' : ''}"${off(k) || why ? ' disabled' : ''}>${esc(t)}${why ? `<span class="why">${esc(why)}</span>` : ''}</button>`).join('')}</div></div>`;
+    $('ctl').innerHTML = `<h1>T14 หน้าการ์ดรวม: ปุ่มดูผล · กล่องเฉลย</h1>
+      <p class="hint">ui-redo 126 · ข้อ 177 187 · เลือกชุด ปรับได้ แล้วกด <b>คัดลอกค่า</b> วางตอบในแชท · ค่าที่ปรับจำไว้ในเครื่อง</p>
+      <div class="row"><span class="lb">ชุดตั้งต้น</span><div class="seg col">${PRESETS.map((x, i) => `<button type="button" data-p="${i}" class="${i === S.base ? 'on' : ''}">${esc(x.name)}</button>`).join('')}</div></div>
+      <div class="btns"><button type="button" id="reset">คืนค่าชุดนี้${ed.size ? ` (แก้ ${ed.size})` : ''}</button></div>
+      <h2>ปรับ</h2>${lock ? '<p class="hint">ชุด 0 = เว็บตอนนี้ ปรับไม่ได้ · เลือก ก ข ค แล้วปรับต่อ</p>' : ''}
+      ${KNOBS.map(knob).join('')}
+      <p class="hint">ที่ต้องรักษา: ไม่มีผลก่อนกด · Ctrl+F ไม่เจอเฉลยที่ยังไม่เปิด (ด่านสดบนแถบบนจอ) · ปุ่มสูง ≥ 44px · แบบทีละตัวเลือก: ทางที่ซ่อนบนจอ (ไม่มีในหน้ารวมการ์ด) ไม่มีปุ่ม ขึ้นเฉพาะแบบทั้งใบ · "ออกเมื่อ" ขึ้นเมื่อเปิดข้อใดข้อหนึ่ง · มุมใช้กับพื้น/กรอบ เส้นซ้ายกับเส้นประบนเป็นมุมฉาก</p>
+      <h2>contrast ทุกคู่ (สด)</h2><div id="cr"></div>
+      <h2>คัดลอก</h2><div class="row"><span class="lb">หมายเหตุถึงผู้พัฒนา</span><textarea id="note" rows="3">${esc(note)}</textarea></div>
+      <div class="btns"><button type="button" class="pri" id="copy">คัดลอกค่า</button></div><p id="msg"></p>
+      <textarea id="out" rows="10" readonly aria-label="ข้อความที่จะคัดลอก"></textarea>`;
+    document.querySelectorAll('[data-p]').forEach((b) => b.onclick = () => { S.base = +b.dataset.p; S.cur = clone(PRESETS[S.base]); panel(); draw(); });
+    $('reset').onclick = () => { S.cur = clone(PRESETS[S.base]); panel(); draw(); };
+    document.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { S.cur[b.dataset.k] = b.dataset.v; panel(); draw(); });
+    $('note').oninput = (e) => { note = e.target.value; after(); };
+    $('copy').onclick = async () => {
+      const o = $('out');
+      try { await navigator.clipboard.writeText(o.value); } catch (e) { o.select(); document.execCommand('copy'); }
+      $('msg').textContent = 'คัดลอกแล้ว — วางตอบในแชทได้เลย';
+    };
+    after();
+  }
+
+  $('reload').onclick = () => draw();
+  addEventListener('resize', () => live.forEach(fit));
+  panel();
+  draw();
+})();
+</script>
+</body>
+</html>
