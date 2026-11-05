@@ -887,9 +887,10 @@ ${B} .body > .d-seal:last-child{align-self:flex-end;margin-top:-4px}`;
 
   // ---------- กรอบ iframe ----------
   const live = [];
+  // จอกว้างสูง ≤540 เข้า media จอแนวนอนเตี้ยของเกม (การ์ดกลายเป็นพาแนลสามคอลัมน์) ⇒ กรอบกว้างสูงอย่างน้อย 720
   const fit = (x) => {
     const box = x.f.parentElement, s = Math.min(1, box.clientWidth / x.w), d = x.f.contentDocument;
-    const h = Math.max(400, Math.ceil(d?.documentElement.scrollHeight ?? 900));
+    const h = Math.max(x.w >= 1000 ? 720 : 400, Math.ceil(d?.documentElement.scrollHeight ?? 900));
     Object.assign(x.f.style, { width: `${x.w}px`, height: `${h}px`, transform: `scale(${s})` });
     box.style.height = `${Math.ceil(h * s)}px`;
   };
