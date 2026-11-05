@@ -77,8 +77,8 @@ export function tweakPages(docs) {
 }
 
 // ป้ายสถานะของหัว = ป้ายในแถวของหัวนั้นบนสารบัญห้องผู้พัฒนา (แก้ป้ายที่เดียว) · id → HTML ของป้าย
-export function tweakStatus(docs) {
-  const html = readFileSync(new URL('dev/index.html', docs), 'utf8');
+// html ส่งเข้าได้ให้ด่านลองแถวที่ไม่มีหน้า
+export function tweakStatus(docs, html = readFileSync(new URL('dev/index.html', docs), 'utf8')) {
   return Object.fromEntries([...html.matchAll(/<a href="ui\.html#([a-z0-9-]+)">[^<]*<\/a>((?:<span class="st [a-z]+">[^<]*<\/span>)*)/g)].map((m) => [m[1], m[2]]));
 }
 const PUBLIC_TITLE = (t) => (PUBLIC_HIDE.test(t) ? 'หน้า tweak' : t);

@@ -9,7 +9,7 @@ export const DOCS_TWEAK_PAGE = 'dev/tweak/docs-tweak.html';
 export const DOCS_TWEAK_START = '/*DOCS-TWEAK:START*/';
 export const DOCS_TWEAK_END = '/*DOCS-TWEAK:END*/';
 
-// นอกขอบเขต (ข้อ 25 33): ตัวเกม · คลังเก่าของเว็บ · หน้า tweak ทุกหน้า (บางหน้าใน dev/ui-redo/ ชื่อไม่มีคำ tweak เช่น title-fx) · หน้าส่งต่อ (เนื้ออยู่ปลายทาง)
+// นอกขอบเขต (ข้อ 25 33): ตัวเกม · คลังเก่าของเว็บ · หน้า tweak ทุกหน้า (บางหน้าใน dev/ui-redo/ ชื่อไม่มีคำ tweak) · หน้าส่งต่อ (เนื้ออยู่ปลายทาง)
 const OUT = (f, html) => f === 'play.html' || f.startsWith('archive/') || f.startsWith('dev/ui-redo/') || f.startsWith('dev/tweak/') || /tweak[^/]*\.html$/.test(f) || html.includes(MOVED_MARK);
 
 // กลุ่มในตัวเลือกหน้า + ชนิดความกว้าง: อ่าน = หน้าข้อความยาว · กว้าง = ตาราง/การ์ด · แผนที่ = dev/maps (พื้นมืดตามโลก ข้อ 28)

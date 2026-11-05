@@ -17,7 +17,7 @@ import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml } from '../src/site/nav.mjs';
-import { uiPage, designMoved, tweakPages, tweakMoved, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
+import { uiPage, designMoved, tweakPages, tweakMoved, tweakStatus, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
@@ -280,6 +280,8 @@ const uiTweakGap = (html) => {
     ];
   });
 };
+// แถวในสารบัญห้องผู้พัฒนาที่ชี้หัว tweak (ui.html#ui-t-*) ต้องมีหน้าจริงใต้ dev/tweak/ — ลบหน้า tweak ที่ลงเกมแล้วต้องเอาแถวออกด้วย ไม่งั้นลิงก์ไปหัวที่ไม่มี
+const devRowGap = (indexHtml) => Object.keys(tweakStatus(docs, indexHtml)).filter((id) => id.startsWith('ui-t-') && !uiTweaks.some((t) => t[2] === id)).map((id) => `dev/index ชี้หัวที่ไม่มีหน้า #${id}`);
 const uiFrameBad = (html) => {
   // กรอบต้นแบบปรับสด (7e2) และกรอบหน้า tweak (src=) ตั้งใจรันสคริปต์ — ด่านนี้ดูแค่ชิ้นส่วนตัวอย่าง
   const frames = [...html.matchAll(/<iframe[^>]*>/g)].map((m) => m[0]).filter((f) => !f.includes(`title="${UI_LIVE_TITLE}"`) && !f.includes(' src="'));
@@ -290,6 +292,7 @@ const uiMiss = [
   ...(lf(readOr(UI_MOVED_FROM)) !== designMoved(UI_MOVED_FROM, '') ? [`${UI_MOVED_FROM} ไม่ส่งต่อมา ${UI_PAGE}`] : []),
   ...uiColors.filter(([, v]) => !uiHtml.includes(`background:${v}`)).map(([k]) => `ไม่มีสี ${k}`),
   ...uiTweakGap(uiHtml),
+  ...devRowGap(),
   ...(uiFrameBad(uiHtml) ? ['iframe ไม่ปิดสคริปต์'] : []),
 ];
 const [uiK, uiV] = uiColors[0] ?? ['', ''];
@@ -297,7 +300,8 @@ const uiRecolor = uiBuilt(uiTpl.replace(`${uiK}:${uiV}`, `${uiK}:#010203`));
 const uiCtl =
   uiRecolor !== uiNow && uiRecolor.includes('background:#010203') &&
   (uiTweaks.length === 0 || uiTweakGap(uiHtml.replace(`<h2 id="${uiTweaks[0][2]}">`, '<h2>')).length === 1) &&
-  uiFrameBad(uiHtml.replace(' sandbox=""', ' sandbox="allow-scripts"'));
+  uiFrameBad(uiHtml.replace(' sandbox=""', ' sandbox="allow-scripts"')) &&
+  devRowGap((readOr('dev/index.html') ?? '').replace('<ul', '<ul><li><a href="ui.html#ui-t-gone">x</a></li>')).length === 1;
 check('หน้าดีไซน์ UI ตรงของที่ build สีจากเกมครบ ลิงก์ tweak ครบ ตัวอย่างไม่รันสคริปต์', uiMiss.length || !uiCtl, ` สี ${uiColors.length} · tweak ${uiTweaks.length}${uiMiss.length ? ` · ${uiMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${uiCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7e2) ต้นแบบปรับสด (ui-redo 76): หัวในหน้าดีไซน์ UI มีกรอบที่รันสคริปต์ได้และไม่มี sandbox (sandbox ไม่มี allow-same-origin ⇒ localStorage throw ค่าที่เจ้าของปรับไว้หาย)
