@@ -67,7 +67,6 @@ export function navBlocks(html) {
 export const DEV_TABS = [
   ['dev/index.html', 'สารบัญ'],
   ['dev/spec.html', 'ภาคผนวกสเปก'],
-  ['dev/plan.html', 'สเปก/แผน'],
   ['dev/design.html', 'คำตัดสินเกม'],
   ['dev/ui.html', 'การออกแบบ'],
   ['dev/maps/continent.html', 'แผนที่'],

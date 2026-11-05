@@ -18,7 +18,7 @@ import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml } from '../src/site/nav.mjs';
 import { uiPage, designMoved, tweakPages, tweakMoved, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
-import { soonCats, soonId, soonItems, roadmapHtml, dropDone, soonTicketProblems, DONE_FILE, TICKET_ID, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
+import { soonCats, soonId, soonItems, roadmapHtml, dropDone, soonTicketProblems, DONE_FILE, TICKET_ID, ROAD_START, ROAD_END, PLAN_ID, PLAN_FROM, planPart, planProblems } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, GATE_OFF, PUBLIC_HIDE } from '../src/site/gate.mjs';
@@ -340,7 +340,7 @@ const dtHtml = readOr(DOCS_TWEAK_PAGE) ?? '';
 const dtNow = docsTweakData(docs, uiTpl);
 const dtBlock = docsTweakBlock(dtHtml);
 const dtFiles = dtNow.pages.map((p) => p.f);
-const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spoilers.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', 'dev/maps/politics.html', 'dev/archive/index.html'];
+const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spoilers.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/spec.html', 'dev/maps/politics.html', 'dev/archive/index.html'];
 const dtOut = (f) => f === 'play.html' || f.startsWith('archive/') || f.startsWith('dev/ui-redo/') || /tweak/.test(f) || read(f).includes(MOVED_MARK);
 const dtMiss = [
   ...(JSON.stringify(dtBlock) !== JSON.stringify(dtNow) ? [`ค้าง ${DOCS_TWEAK_PAGE} (build ใหม่)`] : []),
@@ -381,7 +381,8 @@ const coreAbout = read('about.html').includes('<h2 id="core">ระบบหล�
 const roadNoId = (w) => soonCats(w).filter((c) => !w.includes(`id="${c.id}"`)).map((c) => c.name);
 const relSrc = readFileSync(new URL('../scripts/rel.mjs', import.meta.url), 'utf8');
 const relSees = /\/<h3\[\\s>\]\//.test(relSrc);
-const wnMore = wn.replace('<h2>แพตช์โน้ต</h2>', '<h3>หมวดทดสอบ</h3>\n  <ul>\n    <li>x</li>\n  </ul>\n\n  <h2>แพตช์โน้ต</h2>');
+// เติมท้ายหัวกำลังทำ = ก่อน <h2 ถัดไป (ส่วนแผนข้างหน้าคั่นก่อนแพตช์โน้ตแล้ว ui-redo 100)
+const wnMore = wn.replace(/(<h2>กำลังทำ<\/h2>[\s\S]*?)(<h2[\s>])/, '$1<h3>หมวดทดสอบ</h3>\n  <ul>\n    <li>x</li>\n  </ul>\n\n  $2');
 const roadCtl = roadmapHtml(soonCats(wnMore)) !== roadNow && roadNoId(wn.replace(`<h3 id="${roadCats[0]?.id}">`, '<h3>')).length === 1;
 const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'แถวหมวดใน whatsnew ไม่ตรงหัวกำลังทำ (build ใหม่)', homeLeft.length && `หน้าแรกยังมี ${homeLeft.join(' ')}`, !coreAbout && 'about ไม่มีหัวระบบหลัก', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
 check('แถวหมวดใต้หัวกำลังทำใน whatsnew ตรงหมวดและลิงก์ถึงหัวหมวด · หน้าแรกไม่มีแผนงาน/ระบบหลัก · about มีระบบหลัก', roadBad.length || !roadCtl || !homeCtl, ` ${roadCats.length} หมวด${roadBad.length ? ` · ${roadBad.join(' | ')}` : ''} · ตัวควบคุม${roadCtl && homeCtl ? 'จับได้' : 'จับไม่ได้'}`);
@@ -402,6 +403,25 @@ const tkCtl = soonTicketProblems(fakeLi(` data-tickets="${doneIds[0]}"`), doneId
   && (soonNow.some((it) => it.cat === firstCat && it.backlog) || (!soonCats(dropCat.html).some((c) => c.name === firstCat) && !roadIn(dropCat.html).includes(soonId(firstCat)) && !dropCat.unknown.length))
   && dropDone(wn, ['zz999']).unknown[0] === 'zz999';
 check('ข้อในกำลังทำผูกกับใบ และไม่มีข้อที่ใบปิดแล้วค้าง', tkBad.length || !tkCtl, ` ${soonNow.length} ข้อ · backlog ${soonNow.filter((it) => it.backlog).length} · ปิดแล้ว ${doneIds.length} ใบ${tkBad.length ? ` · ${tkBad.slice(0, 5).join(' | ')}${tkBad.length > 5 ? ` …อีก ${tkBad.length - 5}` : ''}` : ''} · ตัวควบคุม${tkCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7d) แผนข้างหน้า (ui-redo 100): ส่วนแผนในแพตช์โน้ตอยู่นอกหัวกำลังทำ · ไม่มีคำห้าม · หัวกำลังทำอ่านได้ครบเท่าตอนไม่มีส่วนแผน · dev/plan เป็นหน้าส่งต่อมาที่นี่ และไม่อยู่ในแถบห้องผู้พัฒนา
+// ตัวควบคุม: เติมคำ "ใบ" ในส่วนแผน ⇒ ตก · ย้ายส่วนแผนเข้าไปในหัวกำลังทำ ⇒ ตก
+const planAt = planPart(wn);
+const planSect = planAt ? wn.slice(...planAt) : '';
+const wnNoPlan = planAt ? wn.slice(0, planAt[0]) + wn.slice(planAt[1]) : wn;
+// ส่วนแผนเปิดด้วย <h2> ⇒ ถ้าวางกลางหัวกำลังทำ ข้อที่ตามหลังหลุดจากหัว — เทียบกับหน้าเดียวกันที่ถอดส่วนแผนออก
+const soonShort = (w) => JSON.stringify(soonCats(w)) !== JSON.stringify(soonCats(wnNoPlan)) || soonItems(w).length !== soonItems(wnNoPlan).length;
+const planBadOf = (w) => [...planProblems(w), ...(soonShort(w) ? ['หัวกำลังทำอ่านได้ไม่เท่าตอนไม่มีส่วนแผน'] : [])];
+const planPage = readOr(PLAN_FROM) ?? '';
+const planBad = [
+  ...planBadOf(wn),
+  ...(!planPage.includes(`${MOVED_MARK} content="whatsnew.html#${PLAN_ID}"`) ? [`${PLAN_FROM} ไม่ใช่หน้าส่งต่อไป whatsnew#${PLAN_ID}`] : []),
+  ...(DEV_TABS.some(([h]) => h === PLAN_FROM) ? [`แถบห้องผู้พัฒนายังมี ${PLAN_FROM}`] : []),
+];
+const planCtl = !!planAt
+  && planBadOf(wn.replace('</ol>', '<li>ข้อทดสอบใบ 1</li></ol>')).length > planBadOf(wn).length
+  && planBadOf(wnNoPlan.replace('<p class="lead">ระบบที่ตัดสินแล้ว', `${planSect}<p class="lead">ระบบที่ตัดสินแล้ว`)).length > planBadOf(wn).length;
+check('แผนข้างหน้าอยู่ในแพตช์โน้ตเป็นภาษาผู้เล่น นอกหัวกำลังทำ · dev/plan ส่งต่อมาที่นี่', planBad.length || !planCtl, ` ${(planSect.match(/<li[\s>]/g) ?? []).length} ข้อ${planBad.length ? ` · ${planBad.join(' | ')}` : ''} · ตัวควบคุม${planCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) หน้าโลกที่เล่นได้ (three-worlds 08): บอกแค่ทางที่ผู้เล่นเห็นบนจอเสมอ — ทางลับที่เป็นเหตุสุ่ม (ทริปศาลทั้งตัว court.mjs) ห้ามมีแม้แต่คำ
 // · ทางเกิดครบทุกทางจาก PATHS · แผนภาพ 3 กล่องไม่มีป้ายบนลูกศร (svg มีแค่ <text> ชื่อฉาก) · ลิงก์ไปหน้าต่างโลก

@@ -5,7 +5,9 @@ export const ROAD_END = '<!--ROADMAP:END-->';
 
 const soonPart = (html) => {
   const a = html.indexOf('<h2>กำลังทำ</h2>');
-  const b = a < 0 ? -1 : html.indexOf('<h2>', a + 1);
+  // หัวถัดไปอาจมี id (แผนข้างหน้า <h2 id="plan">) — หาแค่ '<h2>' จะเลยไปนับข้อแผนเป็นข้อกำลังทำ
+  const rest = a < 0 ? -1 : html.slice(a + 1).search(/<h2[\s>]/);
+  const b = rest < 0 ? -1 : a + 1 + rest;
   return a < 0 ? null : [a, b < 0 ? html.length : b];
 };
 export const soonId = (name) => `soon-${name.trim().replace(/\s+/g, '-')}`;
@@ -104,6 +106,31 @@ export function soonTicketProblems(html, done) {
     const shown = it.tickets.filter((id) => /[A-Za-z]/.test(id) && it.text.includes(id));
     if (shown.length || /ใบ\s*\d|data-tickets/.test(it.text)) bad.push(`เลขใบโผล่บนจอ: ${tag}`);
   }
+  return bad;
+}
+
+// แผนข้างหน้า (ui-redo 100): แผนเฟสเขียนใหม่เป็นภาษาผู้เล่นในหน้าแพตช์โน้ต — นอกหัวกำลังทำ (แถวหมวดอ่าน <h3> ในหัวนั้น) · dev/plan เป็นหน้าส่งต่อมาที่นี่
+// หน้าสาธารณะ ⇒ ห้ามคำของห้องผู้พัฒนาและคำของโลกที่ยังปิดอยู่ ("ใบ" จับ "คำใบ้" ด้วยโดยตั้งใจ — เลี่ยงคำนั้นในส่วนนี้)
+export const PLAN_ID = 'plan';
+export const PLAN_FROM = 'dev/plan.html';
+export const PLAN_BANNED = ['ใบ', 'harness', 'เลน', 'ต่างโลก'];
+export function planPart(html) {
+  const a = html.indexOf(`<h2 id="${PLAN_ID}">`);
+  if (a < 0) return null;
+  const b = html.indexOf('<h2', a + 1);
+  return [a, b < 0 ? html.length : b];
+}
+export function planProblems(html) {
+  const at = planPart(html);
+  if (!at) return ['ไม่มีหัวแผนข้างหน้า'];
+  const part = html.slice(...at);
+  const bad = [];
+  const soon = soonPart(html);
+  if (soon && at[0] >= soon[0] && at[0] < soon[1]) bad.push('แผนข้างหน้าอยู่ในหัวกำลังทำ');
+  if (/<h3[\s>]/.test(part)) bad.push('แผนข้างหน้ามี <h3> (แถวหมวดจะนับปน)');
+  if ((part.match(/<li[\s>]/g) ?? []).length < 3) bad.push('แผนข้างหน้าไม่ถึง 3 ข้อ');
+  const text = part.replace(/<[^>]+>/g, ' ').toLowerCase();
+  for (const w of PLAN_BANNED) if (text.includes(w)) bad.push(`แผนข้างหน้ามีคำ "${w}"`);
   return bad;
 }
 
