@@ -9402,6 +9402,10 @@ const FX_ICON_PATH = {
 };
 const FX_ICON_OF = { ชีวิต: 'heart', ความสุข: 'smile', ความรู้: 'book', ความสัมพันธ์: 'people', เงิน: 'coin', รายได้: 'case', เส้นสาย: 'link', พลัง: 'bolt', เวท: 'spark', โชค: 'clover', ทอง: 'coin', ชื่อเสียง: 'star' };
 const fxIcon = (name) => `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="${FX_ICON_PATH[name]}"/></svg>`;
+// ไอคอนหน้าชื่อค่าบนแถบสถานะ/แผงตัวฉัน (ui-redo 80 · ข้อ 140–141): ชุดเดียวกับป้ายผล ผู้เล่นจับคู่ป้ายบนปุ่มกับค่าบนแถบได้
+// อ่านตาม key ค่า ไม่ใช่ชื่อไทย — วงปรโลกใช้ key ชาติไทยแต่ชื่อต่าง (ชีวิตทิพย์ ปัญญาธรรม …) · ค่าที่ไม่มีในตาราง = ไม่มีไอคอน
+const STAT_ICON_OF = { health: 'heart', happiness: 'smile', knowledge: 'book', relations: 'people', hp: 'heart', str: 'bolt', mag: 'spark', luk: 'clover', gold: 'coin' };
+const statIcon = (key) => (STAT_ICON_OF[key] ? fxIcon(STAT_ICON_OF[key]) : '');
 const fxEscHtml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const FX_ARROW_SAID = { '↑': 'เพิ่ม', '↓': 'ลด' };
 // ชิ้นที่ตาเห็นต่างจากคำที่ควรอ่าน: ซ่อนชิ้นที่เห็นจากโปรแกรมอ่านจอ แล้วอ่านคำเต็มแทน
@@ -9595,7 +9599,7 @@ function statusBar(card, s) {
   const ul = el('ul', 'sb-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
-    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN);
+    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN, String(v), k);
     const d = delta?.[k];
     if (d) {
       const em = el('em', d < 0 ? 'dn' : null);
@@ -9633,10 +9637,14 @@ function lifeMoneyRow(s) {
 }
 // ช่องค่าหนึ่งช่อง: ป้าย ตัวเลข แถบเส้น — แถบสถานะกับแผงตัวฉันของทั้งสองโลกใช้ตัวเดียวกัน หน้าตาจึงไม่แยกกันเพี้ยน
 // shown = ตัวเลขบนป้ายเมื่อไม่ใช่ค่าเดียวกับความยาวแถบ (เกจทองต่างโลก: แถบเป็น % ของสเกล ป้ายเป็นทองจริง)
-function meterLi(label, v, low, shown = String(v)) {
+// icon = key ค่าสำหรับไอคอนหน้าชื่อ · ไอคอน aria-hidden ชื่อค่ายังเป็นข้อความเดิม โปรแกรมอ่านจออ่านเท่าเดิม
+function meterLi(label, v, low, shown = String(v), icon = null) {
   const li = el('li', low ? 'low' : null);
   const head = el('span', 'mh');
-  head.append(el('span', 'mk', label), el('b', 'num', shown));
+  const mk = el('span', 'mk', label);
+  const svg = icon && statIcon(icon);
+  if (svg) mk.insertAdjacentHTML('afterbegin', svg);
+  head.append(mk, el('b', 'num', shown));
   const track = el('span', 'br');
   const fill = el('i');
   fill.style.width = `${v}%`;
@@ -9803,7 +9811,7 @@ function mePanel(card) {
   const ul = el('ul', 'me-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
-    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN && !st.dead);
+    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN && !st.dead, String(v), k);
     if (help.has(STAT_LABELS[k])) li.append(el('p', null, help.get(STAT_LABELS[k])));
     ul.append(li);
   }
@@ -12280,7 +12288,7 @@ const AFTER_REALM_ART = { deva: 'after_heaven', hell: 'after_hell' };
 // วงปรโลก (03a): แถว 4 ค่าแบบแถบสถานะ ใต้หัวการ์ด · ชีวิตทิพย์ต่ำ = สีเตือนแบบชีวิต
 function loopBar(l) {
   const ul = el('ul', 'sb-m');
-  for (const k of LOOP_KEYS) ul.append(meterLi(LOOP_LABELS[k], Math.round(l[k]), k === 'health' && l[k] <= HEALTH_WARN));
+  for (const k of LOOP_KEYS) ul.append(meterLi(LOOP_LABELS[k], Math.round(l[k]), k === 'health' && l[k] <= HEALTH_WARN, undefined, k));
   // กรอบ .sb ให้ระยะขอบเท่าแถบสถานะชีวิต
   const bar = el('div', 'sb');
   bar.append(ul);
@@ -12436,7 +12444,7 @@ function isekaiBar(card, s, where) {
   }
   r1.append(ini, who, age);
   const ul = el('ul', 'sb-m');
-  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
+  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN, undefined, 'hp'), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false, undefined, k)));
   const row = el('div', 'hd-row');
   row.append(headCash('ทอง', s.gold.toLocaleString('en-US')));
   bar.append(r1, row, ul);
@@ -12456,12 +12464,12 @@ function isekaiGoldFill(k, gold) {
 function isekaiMePanel(s) {
   const wrap = el('div', 'me');
   const ul = el('ul', 'me-m');
-  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
+  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN, undefined, 'hp'), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false, undefined, k)));
   // ชาติต่างโลกหลังตายอยู่ใน af.isekai · ทริประหว่างชาติไทยอยู่ใน st.trip
   const k = af?.isekai ?? st?.trip;
   const gold = isekaiGoldFill(k, s.gold);
   if (gold !== null) {
-    const li = meterLi('ทอง', Math.round(gold * 1000) / 10, false, s.gold.toLocaleString('en-US'));
+    const li = meterLi('ทอง', Math.round(gold * 1000) / 10, false, s.gold.toLocaleString('en-US'), 'gold');
     li.classList.add('gold');
     // ขีด = ทองตั้งต้นของร่างจากตาราง (ไม่ใช่ทองหลังพกมา) · ร่างเริ่ม 0 ขีดชิดซ้ายมองไม่เห็น จึงไม่วาด
     const start = isekaiGoldFill(k, isekaiGoldStart(k));
