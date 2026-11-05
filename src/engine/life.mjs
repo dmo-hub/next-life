@@ -1,7 +1,7 @@
 import { makeRng, mixSeed } from './rng.mjs';
 import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
-import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp } from './death.mjs';
+import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp, HIT, HIT_KILL, isAcute, frailOf } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt, firstPay } from './finance.mjs';
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS, meritId, MERIT_LEVELS } from './merit.mjs';
@@ -461,16 +461,57 @@ export function healthMultiplier(st) {
 // ทุกที่ที่อ่านตารางชีพ/สัดส่วนสาเหตุ/ช่วงป่วยใช้อายุนี้ (B110) ไม่งั้นคนกลับจากต่างโลกตายตามอายุไทย
 const bodyAge = (st) => st.age + (st.away ?? 0);
 
-// ผลรวมทุกสาเหตุ (B110) — ปัจจัยเสี่ยงเอียงทั้งสาเหตุและโอกาสตายรวม
+// หลอดรายปี (ใบ 190 · decisions 324 328 337) หลังไหลตามวัย: แผลจากเหตุเฉียบพลันฟื้นคืนหาเส้น · ส่วนเกินเส้นจางช้า
+// ความแก่ (สาเหตุ other) กดหลอดเงียบไม่ฟื้น ไม่มีการ์ด · เส้นที่ผู้เล่นเห็น = เส้นธรรมชาติ − ส่วนแก่ · ไม่ดึงเลขสุ่ม
+function barYear(st) {
+  const line = st.healthNatural - (st.frail ?? 0);
+  if (st.wound > 0) {
+    const back = st.wound * HIT.heal;
+    st.wound -= back;
+    if (st.health < line) st.health = clamp(Math.min(line, st.health + back));
+  }
+  if (st.health > line) st.health = clamp(st.health - (st.health - line) * HIT.excessFade);
+  const era = st.content.era;
+  const py = protoYear(era, st.seed, st.birthYear + st.age);
+  const age = bodyAge(st);
+  if (age >= MAX_AGE || qx(era, st.sex, py, age) >= 1) return;
+  const want = st.healthNatural * frailOf(st, py, age, 1);
+  if (want > (st.frail ?? 0)) {
+    st.health = clamp(st.health - (want - (st.frail ?? 0)));
+    st.frail = want;
+  }
+}
+
+// ส่วนเหตุของปีนี้ (ใบ 190): โรคเรื้อรังส่วนที่ยังไม่มีนัด (เด็กเล็ก) ตายตรงตามเดิม · เหตุเฉียบพลันเป็นโอกาสเกิดเหตุที่กดหลอด
+// ตัวคูณมีแค่กรรม — สุขภาพมีผลผ่านหลอดที่เหลือตอนโดนกดแทน
+function yearHazards(st, py, age) {
+  const keys = st.content.era.causes.keys;
+  const hz = causeHazards(st, py, age, karmaMultiplier(st.ledger));
+  // เด็กเล็กยังไม่มีนัดจากปีก่อนครบทุกระยะ — ส่วนที่นัดไม่ถึงของโรคเรื้อรังตายปีนี้เลย
+  const span = ILL_YEARS[1] - ILL_YEARS[0] + 1;
+  const unscheduled = (span - Math.max(0, Math.min(span, age - ILL_YEARS[0] + 1))) / span;
+  const chronic = hz.map((x, j) => (CHRONIC.includes(keys[j]) ? x * unscheduled : 0));
+  const acute = hz.map((x, j) => (isAcute(keys[j]) ? x : 0));
+  const cSum = chronic.reduce((s, x) => s + x, 0);
+  const event = Math.min(1 - cSum, acute.reduce((s, x) => s + x, 0) / HIT_KILL);
+  return { keys, hz, chronic, acute, cSum, event };
+}
+// โอกาสที่เหตุหนึ่งครั้งฆ่าคนที่หลอดเหลือ h (hit สุ่มเท่ากันช่วง lo–hi เท่าของเส้นธรรมชาติ)
+const hitKills = (st) => Math.max(0, Math.min(1, (HIT.hi - st.health / Math.max(st.healthNatural, 1e-9)) / (HIT.hi - HIT.lo)));
+const hitRng = (st) => (st.hitRng ??= makeRng(st.seed ^ HIT.salt));
+
+// โอกาสตายรวมของปีนี้ (B110 · ใบ 190) — ปัจจัยเสี่ยงเอียงทั้งสาเหตุและโอกาสตาย · หลอดยิ่งต่ำยิ่งตายง่าย
 export function deathChance(st) {
   const py = protoYear(st.content.era, st.seed, st.birthYear + st.age);
   const age = bodyAge(st);
-  if (qx(st.content.era, st.sex, py, age) >= 1) return 1;
-  return Math.min(1, causeHazards(st, py, age, healthMultiplier(st) * karmaMultiplier(st.ledger)).reduce((s, x) => s + x, 0));
+  if (st.health <= 0 || qx(st.content.era, st.sex, py, age) >= 1) return 1;
+  const { cSum, event } = yearHazards(st, py, age);
+  return Math.min(1, cSum + event * hitKills(st));
 }
 
 // ตายปีนี้ด้วยสาเหตุอะไร · null = รอด — ดึง st.rng ครั้งเดียวต่อปีเท่าเดิม สาเหตุและนัดป่วยใช้ causeRng แยก
 // โรคเรื้อรังไม่ตายปีที่สุ่มโดน แต่นัดตายอีก 1–3 ปีข้างหน้าด้วยโอกาสของอายุนั้น (scheduleIllness) — ผลรวมยังตรงตารางชีพ
+// เหตุเฉียบพลัน (ใบ 190): กดหลอด เกินหลอด = ตาย · ไม่เกิน = รอดเป็นแผล (st.wound ฟื้นใน stepYear)
 function deathRoll(st) {
   const u = st.rng.next();
   if (st.terminal && st.age >= st.terminal.age) return st.terminal.cause;
@@ -478,16 +519,17 @@ function deathRoll(st) {
   const py = protoYear(era, st.seed, st.birthYear + st.age);
   const age = bodyAge(st);
   if (qx(era, st.sex, py, age) >= 1) return 'other';
-  const keys = era.causes.keys;
-  const hz = causeHazards(st, py, age, healthMultiplier(st) * karmaMultiplier(st.ledger));
-  // เด็กเล็กยังไม่มีนัดจากปีก่อนครบทุกระยะ — ส่วนที่นัดไม่ถึงของโรคเรื้อรังตายปีนี้เลย
-  const span = ILL_YEARS[1] - ILL_YEARS[0] + 1;
-  const unscheduled = (span - Math.max(0, Math.min(span, age - ILL_YEARS[0] + 1))) / span;
-  const now = hz.map((x, j) => (CHRONIC.includes(keys[j]) ? x * unscheduled : x));
-  const sum = now.reduce((s, x) => s + x, 0);
-  if (u < sum) return pickCause(st.causeRng, keys, now);
-  // เฉียดตาย (B153) ต้องไหลต่อไปนัดป่วยเหมือนรอดปกติ — ข้ามแล้ว causeRng ขาดหนึ่งครั้ง นัดโรคทั้งชีวิตเลื่อน
-  nearMiss(st, u - sum, keys, now);
+  const { keys, hz, chronic, acute, cSum, event } = yearHazards(st, py, age);
+  if (u < cSum) return pickCause(st.causeRng, keys, chronic);
+  if (u < cSum + event) {
+    const hit = st.healthNatural * (HIT.lo + (HIT.hi - HIT.lo) * hitRng(st).next());
+    if (hit >= st.health) return hit < st.health + (st.frail ?? 0) ? 'other' : pickCause(st.causeRng, keys, acute);
+    st.health = clamp(st.health - hit);
+    st.wound = (st.wound ?? 0) + hit;
+  }
+  // เฉียดตาย (B153) ช่องต่อจากช่องเกิดเหตุ ขนาดเท่าเดิม ⇒ อัตราเฉียดตายไม่ขยับ
+  // ต้องไหลต่อไปนัดป่วยเหมือนรอดปกติ — ข้ามแล้ว causeRng ขาดหนึ่งครั้ง นัดโรคทั้งชีวิตเลื่อน
+  else nearMiss(st, u - cSum - event, keys, hz);
   if (!st.terminal) scheduleIllness(st);
   return null;
 }
@@ -524,6 +566,8 @@ function faceDeath(st, cause, opts = {}) {
   }
   st.dead = true;
   st.cause = cause;
+  // ตายเมื่อหลอดหมดเท่านั้น (ใบ 190) — การ์ดตายเห็นหลอด 0 ทุกทาง
+  st.health = 0;
   return { fate: 'dead' };
 }
 
@@ -833,6 +877,7 @@ function skipToAge(st, age) {
     const r = healthDecay(st.age);
     st.health = clamp(st.health * (1 - r));
     st.healthNatural *= 1 - r;
+    barYear(st);
     st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
     st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * moodMul(st) * (100 - st.knowledge)) / 100);
     st.relations = clamp(st.relations * (1 - RELATION_FADE));
@@ -896,6 +941,7 @@ function stepYear(st) {
   const r = healthDecay(st.age);
   st.health = clamp(st.health * (1 - r));
   st.healthNatural *= 1 - r;
+  barYear(st);
   st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
   st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * moodMul(st) * (100 - st.knowledge)) / 100);
   st.relations = clamp(st.relations * (1 - RELATION_FADE));
@@ -1429,6 +1475,7 @@ function drawCard(st) {
     if (c.mode !== 'summons') return nextCard(st);
     st.dead = true;
     st.cause = c.cause;
+    st.health = 0;
     return queueFuneral(st) ? nextCard(st) : deathCard(st);
   }
   if (st.trip) {

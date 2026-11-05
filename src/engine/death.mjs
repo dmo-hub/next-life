@@ -125,6 +125,25 @@ export function causeHazards(st, py, age, k) {
   return era.causes.keys.map((key, j) => base * k * s[j] * (riskOf(st, key) / normOf(era, st.sex, key, b)));
 }
 
+// ใบ 190 (decisions 319 324 328 337): ตารางชีพไม่ฆ่าตรงแล้ว — ตายเมื่อหลอดสุขภาพหมดเท่านั้น
+// เหตุเฉียบพลัน/อุบัติเหตุ = เกิดเหตุแล้วกดหลอด hit = เส้นธรรมชาติ × สุ่ม lo–hi · hit ≥ หลอดที่เหลือ = ตาย ไม่ถึง = รอดเป็นแผล
+// โอกาสเกิดเหตุ = ส่วนของ qx ÷ โอกาสที่เหตุหนึ่งครั้งฆ่าคนบนเส้นธรรมชาติ ⇒ คนบนเส้นตายเท่าตารางเดิม · หลอดสูงกว่าเส้นรอดง่ายกว่าเอง
+// แทนตัวคูณสุขภาพเดิม (1−d/50) ที่ทำให้คนรอดเหตุเสี่ยงสูงตลอดชีวิต — แผลฟื้นคืนทีละปี (heal = สัดส่วนของแผลที่คืนต่อปี)
+// ส่วนเกินเส้นจางเอง excessFade ต่อปี · ขนาดกดสุ่มจาก stream แยก (salt) ไม่ดึง st.rng/causeRng
+export const HIT = { lo: 0.1, hi: 1.5, heal: 0.5, excessFade: 0.05, salt: 0x2545f491 };
+export const HIT_KILL = (HIT.hi - 1) / (HIT.hi - HIT.lo);
+// สาเหตุที่มาแบบเหตุครั้งเดียว · other (แก่) ไม่ทอยแล้ว เป็นหลอดลดเงียบแทน (frailOf) · โรคเรื้อรังนัดล่วงหน้าตามเดิม
+export const isAcute = (key) => key !== 'other' && !CHRONIC.includes(key);
+// ส่วนของเส้นธรรมชาติที่หลอดหายไปกับความแก่ — ขนาดที่ทำให้เหตุเฉียบพลันฆ่าเพิ่มเท่าส่วน other ของตารางพอดี
+// เหตุที่ฆ่าเพราะส่วนนี้ (ถ้าไม่แก่จะรอด) นับสาเหตุเป็น other ⇒ ทั้งอัตราตายและสัดส่วนสาเหตุยังตรงข้อมูล
+export function frailOf(st, py, age, k) {
+  const keys = st.content.era.causes.keys;
+  const hz = causeHazards(st, py, age, k);
+  const acute = hz.reduce((s, x, j) => s + (isAcute(keys[j]) ? x : 0), 0);
+  const other = hz[keys.indexOf('other')] ?? 0;
+  return acute > 0 ? Math.min(1, ((HIT.hi - 1) * other) / acute) : 0;
+}
+
 // สุ่มสาเหตุตามน้ำหนัก · เฉพาะดัชนีที่ allow ยอม (ไม่ใส่ = ทุกตัว)
 export function pickCause(rng, keys, w, allow = null) {
   let sum = 0;
