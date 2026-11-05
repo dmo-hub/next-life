@@ -6,8 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>T1 ช่วงคั่น: สีโลกอื่นก่อน T11 (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap">
+<link rel="stylesheet" href="../../fonts/fonts.css">
 <style>
   /* หน้า tweak ช่วงคั่น (ui-redo 129 · ข้อ 213–217): ใบ 105 ลงชุด T1 แล้วทำอะไรกับการ์ด B · ต่างโลก · ปรโลก · ภาพแชร์ ก่อนธีมโลก T11 (ใบ 120/121)
      จอเกมอยู่ใน iframe ที่ใช้ CSS เกมจริงจาก template.html (build เติมใน <template id="gcss">) · ชุด 0 = ไม่ทับอะไร = เกมตอนนี้ */
@@ -683,7 +682,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   const clone = (o) => JSON.parse(JSON.stringify(o));
   const GCSS = $('gcss').content.querySelector('style').textContent;
-  const FONTS = 'https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&family=Maitree:wght@500;600&family=Noto+Sans+Thai:wght@400;600&family=Srisakdi:wght@700&display=swap';
+  const FONTS = new URL('../../fonts/fonts.css', location.href).href;
 
   // ---------- ค่าเกมตอนนี้ (อ่านจาก CSS เกมที่ build เติม — แก้สีในเกมแล้วชุด 0 ตามเอง) ----------
   const rule = (sel) => { const i = GCSS.indexOf(sel + ' {'); const j = i < 0 ? GCSS.indexOf(sel + '{') : i; return j < 0 ? '' : GCSS.slice(j, GCSS.indexOf('}', j)); };

@@ -6,8 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>T3 หัวหน้าแรก (tweak) · เกิดใหม่ทั้งที</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Maitree:wght@500;600&family=Pridi:wght@400;600&family=Sarabun:wght@400;600&family=Srisakdi:wght@700&display=swap">
+<link rel="stylesheet" href="../../fonts/fonts.css">
 <style>
   /* หน้า tweak T3 หัวหน้าแรก (ui-redo 104 · SPEC ใบ 94 §4 แถว T3 · ข้อ 198 199 201)
      CSS + เนื้อหน้าแรกตัวจริงมาจาก docs/index.html ที่ build ฉีดระหว่าง marker ใน <template> ข้างล่าง (src/site/home-head.mjs) — หน้าไม่ลอกหัวเอง และเปิดจาก file:// ได้
@@ -131,7 +130,7 @@
   const KEY = 'next-life-t3-home-head-tweak-v1';
   const HOME_CSS = $('homecss').content.querySelector('style').textContent;
   const HOME_BODY = $('homebody').innerHTML;
-  const FONTS = 'https://fonts.googleapis.com/css2?family=Maitree:wght@500;600&family=Pridi:wght@400;600&family=Sarabun:wght@400;600&family=Srisakdi:wght@700&display=swap';
+  const FONTS = new URL('../../fonts/fonts.css', location.href).href;
 
   // ชุด T1 ที่เจ้าของเคาะ (ข้อ 209–211) + แถบบน T2 ที่เคาะ (ข้อ 218 ชุด 3 คราม ก้อนเดียวเตี้ย)
   const T1 = { head: '#1B2A4A', headink: '#E8CF8A', gold: '#D9B45A', bg: '#F4ECDC', surface: '#FBF6EA', ink: '#1B2A4A', muted: '#5B5648', lineStrong: '#8C7A52' };
