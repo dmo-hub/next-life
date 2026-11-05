@@ -16,6 +16,7 @@ import { injectSeo, sitemapXml, faviconSvg, SITEMAP, FAVICON_SVG } from './seo.m
 import { ART_INK } from '../ui/art.mjs';
 import { DOCS_TWEAK_PAGE, docsTweakData, injectDocsTweak } from './docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, injectCardArt } from './card-art-tweak.mjs';
+import { HOME_HEAD_PAGE, injectHomeHead } from './home-head.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
@@ -92,6 +93,9 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     const next = injectNav(file === 'whatsnew.html' ? injectRoadmap(soonIds(html), soonCats(html), 'docs/whatsnew.html') : html, file);
     put(at(`docs/${file}`), next, html);
   }
+  // หน้า tweak T3 (ui-redo 104) อ่านหน้าแรกที่เพิ่งฉีดเลข + แถบบนข้างบน
+  const hh = readFileSync(at(`docs/${HOME_HEAD_PAGE}`), 'utf8');
+  put(at(`docs/${HOME_HEAD_PAGE}`), injectHomeHead(hh, readFileSync(at('docs/index.html'), 'utf8'), `docs/${HOME_HEAD_PAGE}`), hh);
   // หน้า tweak เว็บเอกสาร (ui-redo 32): รายการหน้าคิดหลังทุกหน้าข้างบนเขียนเสร็จ ⇒ หน้าที่เพิ่ง build ใหม่อยู่ในรายการด้วย
   const dt = readFileSync(at(`docs/${DOCS_TWEAK_PAGE}`), 'utf8');
   const dtNext = injectDocsTweak(dt, docsTweakData(at('docs/'), readFileSync(at('src/ui/template.html'), 'utf8')), `docs/${DOCS_TWEAK_PAGE}`);
