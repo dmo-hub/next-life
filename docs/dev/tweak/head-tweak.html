@@ -326,9 +326,6 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .help .help-row { display:flex; flex-direction:column; gap:2px; }
 .help .help-call, .help > a { display:inline-flex; align-items:center; min-height:44px; overflow-wrap:anywhere; }
 .help .help-call { font-weight:600; }
-/* คำเตือนเนื้อหา (ui-redo 25) — การ์ดแรกเกิดตระกูลใหม่ + หน้าเล่นต่อ · สีตามการ์ดที่วางอยู่ */
-.warn-line { margin:8px 0 0; font-size:13px; line-height:1.5; opacity:.85; }
-.warn-line a { color:inherit; font-weight:600; text-decoration:underline; }
 .help small, .help .note { font-size:12.5px; overflow-wrap:anywhere; }
 .help a { color:inherit; } .help small a { white-space:nowrap; }
 .lineage .lh { font-size:12px; font-weight:600; margin:6px 0 2px; }
@@ -473,6 +470,14 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .d-bg svg { position:absolute; left:50%; top:0; width:100%; height:auto; transform:translateX(-50%); opacity:0.1; }
 .d-bg [fill]:not([fill="none"]) { fill:currentColor; }
 .d-bg [stroke] { stroke:currentColor; }
+/* พื้นหลังแรกเกิด (ui-redo 61 · ข้อ 116): ชิดบนกลางของเนื้อการ์ด กว้างเต็ม จาง 0.1 · isolation ของ .body กัน z-index ติดลบไม่ให้ลงใต้พื้นการ์ด
+   ธีม a สำริดอ่อนลง 5% จาก --bronze: ตัวอักษรแดงทับเส้นภาพได้ 4.47 ต่ำกว่าเกณฑ์ 4.5 (ข้อ 117) — สีเข้มขึ้นทำให้พื้นมืดลง contrast ยิ่งตก */
+.body.has-bg { position:relative; isolation:isolate; }
+.b-bg { position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none; color:#624F3A; }
+.b .b-bg { color:var(--gold); }
+.b-bg svg { position:absolute; left:50%; top:0; width:100%; height:auto; transform:translateX(-50%); opacity:0.1; }
+.b-bg [fill]:not([fill="none"]) { fill:currentColor; }
+.b-bg [stroke] { stroke:currentColor; }
 .mem .top { background:transparent; color:#1F1F1F; justify-content:center; padding-top:18px; }
 .mem .top b { font-family:Srisakdi,serif; font-size:22px; font-weight:700; }
 .por { align-self:center; width:96px; height:96px; border:1px solid #1F1F1F; padding:4px; }
