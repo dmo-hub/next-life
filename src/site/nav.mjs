@@ -36,7 +36,7 @@ export const NAV_CSS = `
   body > header:not(.home) p { color: var(--on-head2); }
   body > header:not(.home) a { color: var(--headink); text-decoration: underline; text-underline-offset: 3px; }
   main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
-  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
 `;
 
 // 390: ลิงก์หน้าปัจจุบันอาจอยู่นอกส่วนที่เห็นของแถบที่ล้น ⇒ ตั้ง scrollLeft ของแถบเอง (scrollIntoView เลื่อนทั้งหน้าแนวตั้งด้วย) · ไม่มี JS แถบยังใช้ได้เหมือนเดิม
@@ -84,30 +84,31 @@ export const DEV_TABS = [
   ['dev/archive/index.html', 'คลังเก่า'],
 ];
 export const DEV_NAV_CSS = `
+${SITE_ROOT}
 .nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
-.nl-nav{font:15px/1.4 Sarabun,"Noto Sans Thai",system-ui,sans-serif;text-align:left}
+.nl-nav{font:15px/1.4 var(--fb);text-align:left}
 .nl-nav a{text-decoration:none;color:inherit}
 .nl-in{max-width:1040px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
-.nl-top{background:#1F2430;color:#F4EFE3}
+.nl-top{background:var(--head);color:var(--title)}
 .nl-top>.nl-in{min-height:52px;flex-wrap:wrap;column-gap:12px}
-.nl-brand{font-weight:700;margin-right:auto;padding:12px 0}
+.nl-brand{font-weight:600;margin-right:auto;padding:12px 0}
 .nl-main{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
 .nl-main a{padding:13px 8px 11px;border-bottom:3px solid transparent;white-space:nowrap}
-.nl-main a[aria-current]{border-bottom-color:#D6A64A;font-weight:600}
-.nl-swap{border:1px solid #6B7080;padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
-.nl-swap:hover,.nl-main a:hover{opacity:1;color:#fff}
-.nl-dev .nl-top{background:#2F3833}
-.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:#8A6A2E;color:#F4EFE3;vertical-align:2px}
-.nl-tabs{background:#F3EEE2;color:#1F2430;border-bottom:1px solid #D8D0C0}
+.nl-main a[aria-current]{border-bottom-color:var(--gold);font-weight:600}
+.nl-swap{border:1px solid var(--line-strong);padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
+.nl-swap:hover,.nl-main a:hover{opacity:1;color:var(--surface)}
+.nl-dev .nl-top{background:var(--head)}
+.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:var(--accent2);color:var(--surface);vertical-align:2px}
+.nl-tabs{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--line)}
 .nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
 .nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
-.nl-tabs a[aria-current]{border-bottom-color:#A23B2C;font-weight:600}
-.nl-tabs.nl-sub{background:#EBE4D5;font-size:14px}
+.nl-tabs a[aria-current]{border-bottom-color:var(--accent2);font-weight:600}
+.nl-tabs.nl-sub{background:var(--bg);font-size:14px}
 @media (max-width:640px){
 .nl-top>.nl-in{padding:0}
 .nl-brand{padding:12px 16px}
 .nl-swap{margin-right:16px}
-.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid #343A48}
+.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid var(--line-strong)}
 }
 `;
 // file = path ใต้ docs/ เช่น dev/design-lore.html · หน้าเรื่องของคำตัดสินเกมอยู่ใต้แท็บนั้น ⇒ aria-current="true" (ไม่ใช่ page เพราะไม่ใช่หน้านั้นเอง)

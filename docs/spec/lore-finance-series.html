@@ -6,11 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ข้อมูลเกมจำลองชีวิต</title>
 <style>
-:root{--bg:#fbfaf7;--fg:#1d1f23;--mut:#5d636e;--line:#e3e0d8;--card:#fff;--acc:#1f5f8b;--warn:#9a5b00;--warnbg:#fff4e0;--bad:#a1281e;--badbg:#fde9e7;--ok:#1d6b3a}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--fg:#e7e5df;--mut:#a3a7ad;--line:#2c3036;--card:#1c1f23;--acc:#7fb6dd;--warn:#f0b357;--warnbg:#3a2c12;--bad:#f08a80;--badbg:#3b1d1a;--ok:#7fd29a}}
-:root[data-theme="dark"]{--bg:#15171a;--fg:#e7e5df;--mut:#a3a7ad;--line:#2c3036;--card:#1c1f23;--acc:#7fb6dd;--warn:#f0b357;--warnbg:#3a2c12;--bad:#f08a80;--badbg:#3b1d1a;--ok:#7fd29a}
+/* ชื่อเดิมของหน้า → token กลาง (ui-redo 105) · ไม่มีโหมดมืดแล้ว ทั้งเว็บชุดเดียว */
+:root{--fg:var(--ink);--mut:var(--muted);--card:var(--surface);--acc:var(--accent2);--warn:var(--accent2);--warnbg:color-mix(in srgb, var(--gold) 16%, var(--surface));--badbg:color-mix(in srgb, var(--bad) 10%, var(--surface));--ok:var(--good)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 "Sarabun","Noto Sans Thai",system-ui,sans-serif}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 var(--fb)}
 main{max-width:960px;margin:0 auto;padding:24px 16px 48px}
 h1{font-size:1.5rem;margin:0 0 4px}
 h2{font-size:1.1rem;margin:28px 0 8px;padding-bottom:4px;border-bottom:2px solid var(--line)}
@@ -28,7 +27,7 @@ a{color:var(--acc);word-break:break-all}
 .asm{background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc)}
 .note{margin-top:28px;padding:12px;border:1px solid var(--line);background:var(--card);color:var(--mut);font-size:.88rem}
   /*NAV-CSS:START*/
-  :root { --bg:#F4ECDC; --surface:#FBF6EA; --ink:#1B2A4A; --muted:#5B5648; --accent:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --seal:#A62B1F; --good:#2F6B4F; --bad:#B3261E; --line:#C9B98F; --line-strong:#8C7A52; --on-head:#E7E2D4; --on-head2:#D8D2C2; --on-head3:#BFB49A; --title:#F4ECDC; --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }
+  :root { --bg:#F4ECDC; --surface:#FBF6EA; --ink:#1B2A4A; --muted:#5B5648; --accent:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --seal:#A62B1F; --good:#2F6B4F; --bad:#B3261E; --line:#C9B98F; --line-strong:#8C7A52; --on-head:#E7E2D4; --on-head2:#D8D2C2; --on-head3:#BFB49A; --title:#F4ECDC; --lacquer:#17110D; --lacquer2:color-mix(in srgb, #17110D 88%, #E8CF8A); --bronze:color-mix(in srgb, #D9B45A 35%, #17110D); --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }
   nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
   nav.top a { display: inline-block; color: var(--on-head); text-decoration: none; padding: 0 10px; line-height: 40px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
   nav.top a.dark { color: var(--headink); }
@@ -43,7 +42,7 @@ a{color:var(--acc);word-break:break-all}
   body > header:not(.home) p { color: var(--on-head2); }
   body > header:not(.home) a { color: var(--headink); text-decoration: underline; text-underline-offset: 3px; }
   main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
-  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
 /*NAV-CSS:END*/
 </style>
 </head>

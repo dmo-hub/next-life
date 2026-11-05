@@ -55,8 +55,8 @@ check('ตัวเลขบนหน้าเท่าค่าจริง', w
 // 2) ตัวควบคุม: ข้อมูลเปลี่ยน (ตัดการ์ดออก 1 ใบ · ฉายาหาย 1 ตัว) ⇒ เลขที่ฉีดต้องเปลี่ยนตาม — ไม่งั้นข้อ 1 ผ่านเพราะเขียนเลขมือตรงกันพอดี
 const less = { ...content, events: content.events.slice(1) };
 const f2 = { ...siteFacts(less), titles: String(Number(facts.titles) - 1) };
-// ฉายาย้ายจากหน้าแรกไปกลไกในเกม (ui-redo 69) ⇒ ตรวจสองหน้ารวมกัน
-const probe = injectFacts(read('index.html'), f2) + injectFacts(read('about.html'), f2);
+// ฉายาย้ายจากหน้าแรกไปกลไกในเกม (ui-redo 69) · เลขการ์ดเหลือแค่หน้ารวมการ์ดหลังหน้าแรกเหลือแค่หัว (ui-redo 105) ⇒ ตรวจหลายหน้ารวมกัน
+const probe = ['index.html', 'about.html', 'catalog.html'].map((p) => injectFacts(read(p), f2)).join('');
 const moved = ['cards', 'titles'].every((k) => probe.includes(`data-fact="${k}">${f2[k]}<`) && f2[k] !== facts[k]);
 check('ตัวควบคุม: ข้อมูลเปลี่ยนแล้วเลขบนหน้าเปลี่ยนตาม', !moved, ` (การ์ด ${facts.cards} → ${f2.cards} · ฉายา ${facts.titles} → ${f2.titles})`);
 
@@ -388,10 +388,10 @@ const wn = read('whatsnew.html');
 const roadCats = soonCats(wn);
 const roadIn = (html) => { const a = html.indexOf(ROAD_START); const b = html.indexOf(ROAD_END); return a < 0 || b < a ? null : html.slice(a + ROAD_START.length, b); };
 const roadNow = roadIn(wn);
-// หน้าแรกเหลือหัว + ปุ่มเล่น + การ์ดโลก + footer (ui-redo 69) — กล่องแผนงาน/ระบบหลักกลับมา = ตก
+// หน้าแรกเหลือแค่หัว + ปุ่มเล่น (ui-redo 105 · ข้อ 220) — กล่องแผนงาน/ระบบหลักกลับมา = ตก
 const homeLeftIn = (html) => ['ROADMAP:START', 'class="road"', 'class="sys"', '>ระบบหลัก<', 'class="footnote"'].filter((s) => html.includes(s));
 const homeLeft = homeLeftIn(read('index.html'));
-const homeCtl = homeLeftIn(read('index.html').replace('<footer>', '<details class="sys"><summary><h2>ระบบหลัก</h2></summary></details>\n  <footer>')).length === 2;
+const homeCtl = homeLeftIn(read('index.html').replace('</div></header>', '<details class="sys"><summary><h2>ระบบหลัก</h2></summary></details>\n</div></header>')).length === 2;
 const coreAbout = read('about.html').includes('<h2 id="core">ระบบหลัก</h2>');
 const roadNoId = (w) => soonCats(w).filter((c) => !w.includes(`id="${c.id}"`)).map((c) => c.name);
 const relSrc = readFileSync(new URL('../scripts/rel.mjs', import.meta.url), 'utf8');
@@ -693,7 +693,7 @@ check('.gitattributes merge=build ครบหน้าที่ build สร้
   const miss = hits(read);
   const swap = (want, fn) => (f) => (f === want ? fn(read(f)) : read(f));
   const ctl = {
-    'ย่อหน้าหน้าแรก': swap('index.html', (h) => h.replace('</footer>', ' ต่างโลก</footer>')),
+    'ย่อหน้าหน้าแรก': swap('index.html', (h) => h.replace('</p>\n  <a class="play big"', ' ต่างโลก</p>\n  <a class="play big"')),
     description: swap('index.html', (h) => h.replace('<meta name="description" content="', '<meta name="description" content="isekai ')),
     'title play': swap('play.html', (h) => h.replace('</title>', ' ต่างโลก</title>')),
     'หน้าส่งต่อ': swap(moved[0], (h) => h.replace('</title>', ' ต่างโลก</title>')),
