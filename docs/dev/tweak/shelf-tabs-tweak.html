@@ -6,8 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ปุ่มแท็บชั้นสมุด 9 แบบ (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Sarabun:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../../fonts/fonts.css">
 <style>
   /* หน้า tweak ปุ่มแท็บชั้นสมุด (ui-redo 63) — จอชั้นสมุดอยู่ใน iframe ที่ใช้ CSS ตัวเกมจริงจาก template.html (build เติมใน <template id="gcss">) · หน้านี้คุมแค่แผงปรับค่า */
   body { margin: 0; background: #E6E0D3; color: #1F2430; font: 15px/1.55 Sarabun, "Noto Sans Thai", system-ui, sans-serif; }
@@ -795,7 +794,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 .v-glow button[aria-pressed="true"] { background-color:var(--to); background-image:linear-gradient(to top right, var(--to), color-mix(in srgb, var(--to) 82%, #fff)); color:var(--tof); border-color:color-mix(in srgb, var(--to) 70%, #fff); box-shadow:0 0 18px -4px var(--to); }
 `;
   const GCSS = $('gcss').content.querySelector('style').textContent;
-  const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Srisakdi:wght@700&display=swap';
+  const FONTS = new URL('../../fonts/fonts.css', location.href).href;
   const doc = (html) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><link rel="stylesheet" href="${FONTS}"><style>${GCSS}</style><style>${PROTO}body{overflow:hidden}</style></head><body><main id="app">${html}</main></body></html>`;
 
   function shelf(v, theme) {

@@ -6,8 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ภาพบนการ์ด: พื้นหลังแรกเกิด + ภาพหมวดการ์ดผล (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Sarabun:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../../fonts/fonts.css">
 <style>
   /* หน้า tweak ภาพบนการ์ด (ui-redo 58) — การ์ดอยู่ใน iframe ที่ใช้ CSS ตัวเกมจริงจาก template.html (build เติมใน <template id="gcss">) · หน้านี้คุมแค่แผงปรับค่า */
   body { margin: 0; background: #E6E0D3; color: #1F2430; font: 15px/1.55 Sarabun, "Noto Sans Thai", system-ui, sans-serif; }
@@ -779,7 +778,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 .tw-sm .scene-sm { width:min(100%, var(--tw)); }
 `;
   const GCSS = $('gcss').content.querySelector('style').textContent;
-  const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Srisakdi:wght@700&display=swap';
+  const FONTS = new URL('../../fonts/fonts.css', location.href).href;
   const doc = (html) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><link rel="stylesheet" href="${FONTS}"><style>${GCSS}</style><style>${PROTO}</style></head><body>${html}</body></html>`;
 
   // ---------- วัดในจอ: contrast ข้อความบนภาพ · ปุ่มไปต่อจอแรก · ล้น ----------

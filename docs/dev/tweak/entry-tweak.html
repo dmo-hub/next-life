@@ -774,7 +774,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 
   // ---------- จอ: iframe ต่อใบ · srcdoc = CSS เกม + การ์ด ⇒ media query ของเกมเห็นความกว้างจริง 390/1280 ----------
   const GCSS = document.getElementById('gcss').content.querySelector('style').textContent;
-  const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600&family=Sarabun:wght@400;600&family=Srisakdi:wght@700&display=swap';
+  const FONTS = new URL('../../fonts/fonts.css', location.href).href;
   const doc = (html) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><link rel="stylesheet" href="${FONTS}"><style>${GCSS}</style><style>body{overflow:hidden}</style></head><body><main id="app">${html}</main></body></html>`;
   const frames = document.getElementById('frames');
   const fit = (f) => {
