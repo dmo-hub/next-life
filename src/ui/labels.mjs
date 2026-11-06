@@ -17,6 +17,7 @@ export const MENU_ICON = {
   family: '<circle cx="8" cy="8" r="2.8"/><circle cx="16.5" cy="9" r="2.3"/><path d="M3 19c.8-3.4 3-5 5-5s4.2 1.6 5 5M13.5 19c.5-2.4 1.6-3.8 3-3.8s2.6 1.4 3.2 3.8"/>',
   money: '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/>',
   shelf: '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>',
+  skill: '<path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/>',
   more: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
 };
 export const menuIcon = (id) => (MENU_ICON[id] ? `<svg viewBox="0 0 24 24" aria-hidden="true">${MENU_ICON[id]}</svg>` : '');
