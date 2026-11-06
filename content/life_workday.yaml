@@ -1,0 +1,472 @@
+# การ์ดชีวิตผู้ใหญ่ชุด workday (ใบ 241 จากร่าง 240)
+events:
+  - id: workday_gift_swap_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [22, 30], occupation: [clerk, technician, manager]}
+    title: "ฉลากเบอร์สิบเจ็ด"
+    text: "งานเลี้ยงปีใหม่บริษัทตั้งงบของขวัญสามร้อยบาท คุณจับฉลากได้กล่องห่อกระดาษทอง แกะออกมาเป็นกระติกน้ำเก็บความเย็น ใบที่สามของปีนี้ อีกฝั่งโต๊ะ น้องฝ่ายบัญชีกำลังมองหม้อทอดไร้น้ำมันในมือตัวเองด้วยสีหน้าเดียวกัน"
+    choices:
+      - id: swap
+        text: "ยื่นกระติกขอแลกหม้อทอด"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้องรับไปทันที บอกว่าห้องเช่ามีปลั๊กไม่พอเสียบหม้อ คุณได้ทอดปีกไก่กินทั้งเดือน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้องยิ้มแล้วกอดหม้อแน่นขึ้น กระติกใบที่สามไปเข้าตู้ข้างอีกสองใบ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep
+        text: "เก็บไว้ ใส่น้ำแข็งไปทำงาน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: regift
+        text: "ห่อใหม่ไว้จับฉลากปีหน้า"
+        effects: {money: {unit: income_x, amount: 0.01}}
+        merit: [{cat: neutral}]
+      - id: auction
+        text: "เปิดประมูลกระติกกลางเวที"
+        outcomes:
+          - {weight: 1, ok: true, text: "พิธีกรเล่นด้วย ราคาไต่จากสิบบาทไปสามร้อย ผู้จัดการฝ่ายขายยกมือสุดท้ายเพราะอยากได้ไมค์", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: 0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีใครยกมือ พิธีกรตัดเข้าเพลงต่อ คุณยืนถือกระติกกลางเวทีอีกครึ่งท่อน", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_leave_left_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2540, 2650]
+    weight: 0.5
+    when: {age: [31, 45], occupation: [clerk, technician, manager]}
+    title: "วันลาเหลือเจ็ดวัน"
+    text: "ต้นเดือนพฤศจิกา ฝ่ายบุคคลส่งอีเมลเตือนว่าวันลาพักร้อนที่ไม่ได้ใช้ทบไปปีหน้าได้แค่สามวัน คุณเหลือเจ็ด งานปิดงบสิ้นปีเริ่มกองบนโต๊ะ คนในแผนกจองลาไปแล้วสองคน ปฏิทินช่วงหยุดยาวปีใหม่ก็เต็มไปด้วยชื่อคนอื่นแล้ว"
+    choices:
+      - id: trip
+        text: "ลาสี่วัน ขับรถขึ้นเหนือ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตื่นมาเจอหมอกบนดอย ปิดเครื่องได้ครบสี่วัน กลับมางานยังอยู่ที่เดิมไม่หนีไปไหน", effects: {happiness: 2, health: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถติดขึ้นดอยหกชั่วโมง ถึงที่พักก็มีสายจากออฟฟิศถามรหัสตู้เอกสาร", effects: {happiness: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hometown
+        text: "ลากลับบ้านเกิดไปช่วยงานบ้าน"
+        effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: skip
+        text: "ทิ้งไว้ อยู่ปิดงบให้จบ"
+        effects: {network: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: mon_fri
+        text: "ลาจันทร์กับศุกร์สลับกันทั้งเดือน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้หยุดสามวันติดกันสี่รอบ ทั้งแผนกเริ่มเรียกคุณว่าคนวันศุกร์", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าเห็นตารางแล้วย้ายประชุมประจำสัปดาห์มาไว้วันจันทร์ที่คุณลาพอดี", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_errand_leave_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59], occupation: [clerk, technician, factory, manager], family: [{role: parent, sex: หญิง, alive: true}]}
+    title: "บัตรหายวันพุธ"
+    text: "บัตรประชาชนของแม่หายไปพร้อมกระเป๋าสตางค์ที่ตลาด ทำใหม่ต้องไปสำนักงานเขตด้วยตัวเองในเวลาราชการ ถ่ายรูปและพิมพ์ลายนิ้วมือ คุณเหลือวันลากิจอีกสามวัน แต่วันพุธนี้มีตรวจงานประจำไตรมาส ญาติที่ว่างที่สุดในบ้านขับรถไม่เป็น"
+    choices:
+      - id: take_leave
+        text: "ใช้วันลากิจ พาแม่ไปเอง"
+        effects: {relations: 2, network: -1}
+        merit: [{cat: neutral}]
+      - id: half_day
+        text: "ขอหัวหน้าเข้างานสายครึ่งวัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คิวที่เขตสั้นกว่าที่คิด ถึงออฟฟิศสิบโมงครึ่ง พร้อมเรื่องเล่าว่าแม่ขอถ่ายรูปบัตรใหม่สามรอบ", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลายนิ้วมือแม่จางจนเจ้าหน้าที่ต้องลองถึงรอบที่เก้า ครึ่งวันกลายเป็นทั้งวัน", effects: {relations: 1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: relative
+        text: "ฝากญาติพาแม่นั่งรถโดยสารไป"
+        effects: {relations: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: bring_office
+        text: "พาแม่มารอที่ออฟฟิศ เที่ยงค่อยไป"
+        outcomes:
+          - {weight: 1, ok: true, text: "แม่นั่งโต๊ะรับแขก แจกขนมทั้งชั้น ทีมตรวจงานถามว่าบ้านคุณขายขนมหรือเปล่า", effects: {relations: 1, happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แม่นั่งรอห้าชั่วโมงแล้วบ่นยาวทั้งทางไปเขต ว่าห้องแอร์ออฟฟิศหนาวกว่าหน้าหนาวที่บ้าน", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_sick_cert_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2555, 2650]
+    weight: 0.5
+    when: {age: [22, 30], occupation: [clerk, technician, factory, service, manager]}
+    title: "ไข้วันที่สาม"
+    text: "ไข้ขึ้นตั้งแต่วันจันทร์ ลาป่วยไปสองวันด้วยข้อความสั้น ๆ ในกลุ่มแชตงาน เช้าวันพุธยังลุกจากเตียงไม่ไหว ฝ่ายบุคคลทักมาสุภาพว่าถ้าลาวันที่สามขอใบรับรองแพทย์ด้วยนะคะ คลินิกหน้าซอยเปิดห้าโมงเย็น"
+    choices:
+      - id: clinic
+        text: "ลากตัวไปคลินิกเย็นนี้"
+        effects: {health: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: hospital
+        text: "ไปโรงพยาบาลรัฐ ใช้สิทธิที่มี"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: push_through
+        text: "ฝืนเข้างาน ไม่ต้องใช้ใบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "นั่งทำงานในหน้ากากทั้งวัน งานเสร็จ ไข้ก็ลดตอนเย็น", effects: {network: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไข้กลับมาตอนบ่าย คนข้างโต๊ะเริ่มไอตาม สัปดาห์หน้าแผนกลาป่วยกันสามคน", effects: {health: -2, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: thermometer
+        text: "ส่งรูปปรอทวัดไข้แทนใบหมอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝ่ายบุคคลส่งสติกเกอร์หัวเราะกลับมา บอกว่ารอบนี้ผ่านให้ แต่ถ้าลาวันพฤหัสต้องมีใบ", effects: {happiness: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปรอทในรูปขึ้นสามสิบหกจุดห้า คุณถ่ายผิดอัน ข้อความถัดไปเงียบไปสามชั่วโมง", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_ot_dayoff_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 40], occupation: [clerk, technician, factory]}
+    title: "ค่าโอทีกลายเป็นวันหยุด"
+    text: "เดือนนี้อยู่ดึกไปสิบสองคืน รวมวันเสาร์อีกสอง สลิปเงินเดือนออกมาไม่มีบรรทัดค่าล่วงเวลา ฝ่ายบุคคลอธิบายว่าปีนี้ให้เก็บเป็นวันหยุดชดเชยแทน ใช้ได้ภายในสามเดือน เพื่อนข้างโต๊ะยังกดเครื่องคิดเลขว่าหายไปเท่าไร"
+    choices:
+      - id: accept
+        text: "รับวันหยุดไป ไม่อยากมีเรื่อง"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: ask_rule
+        text: "ถามฝ่ายบุคคลว่ากฎหมายว่าไง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝ่ายบุคคลเปิดดูแล้วเงียบไปหนึ่งวัน สลิปเดือนหน้ามีบรรทัดค่าล่วงเวลากลับมา พร้อมยอดย้อนหลัง", effects: {knowledge: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้คำตอบว่าจะนำเรียนผู้บริหาร เรื่องหายไปพร้อมอีเมลฉบับนั้น", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: group_letter
+        text: "ชวนทั้งแผนกเขียนเรื่องรวมกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยื่นพร้อมกันสิบเอ็ดชื่อ บริษัทยอมจ่ายเป็นเงินย้อนหลังทุกคน", effects: {relations: 1, network: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนถอนชื่อทีละคนจนเหลือคุณกับอีกหนึ่ง จดหมายเลยนอนอยู่ในลิ้นชัก", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: all_at_once
+        text: "ใช้วันหยุดชดเชยรวดเดียวทั้งหมด"
+        outcomes:
+          - {weight: 1, ok: true, text: "หยุดได้ห้าวันติด รวมเสาร์อาทิตย์เป็นเก้าวัน หัวหน้าเซ็นให้เพราะเป็นกติกาที่บริษัทออกเอง", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าเซ็นให้สองวัน ที่เหลือบอกว่าช่วงนี้งานยุ่ง ไว้ค่อยว่ากัน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_freelance_wait_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [32, 45], occupation: [clerk, technician, manager]}
+    title: "ช่างภาพไม่รับสาย"
+    text: "บริษัทจ้างช่างภาพอิสระมาถ่ายรูปสินค้าทำแคตตาล็อกปีใหม่ รับงานเป็นชิ้น จ่ายเมื่อส่งงาน คุณเป็นคนประสาน พรุ่งนี้เช้าต้องส่งโรงพิมพ์ รูปมาไม่ถึงครึ่ง โทรไปสามสาย ไม่มีใครรับ หัวหน้าเดินผ่านโต๊ะคุณเป็นรอบที่สี่"
+    choices:
+      - id: chase
+        text: "ขับรถไปตามถึงบ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช่างภาพเปิดประตูมาพร้อมรูปครบชุด บอกว่าโทรศัพท์ตกน้ำตั้งแต่เมื่อวาน", effects: {network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บ้านปิดเงียบ คนข้างบ้านบอกว่าออกไปรับงานแต่งต่างจังหวัด กลับมะรืน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: delay_print
+        text: "แจ้งหัวหน้า ขอเลื่อนโรงพิมพ์"
+        effects: {knowledge: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: old_photos
+        text: "ใช้รูปแคตตาล็อกปีที่แล้วไปก่อน"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: shoot_self
+        text: "ยืมกล้อง ถ่ายเองบนโต๊ะประชุม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผ้าม่านห้องประชุมกลายเป็นฉากหลัง รูปออกมาดีจนฝ่ายขายขอให้ถ่ายต่อทุกปี", effects: {knowledge: 1, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทุกรูปมีเงาคุณติดมุมขวาล่าง โรงพิมพ์โทรมาถามว่าตั้งใจหรือเปล่า", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_late_chat_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2555, 2650]
+    weight: 0.5
+    when: {age: [23, 30], occupation: [clerk, technician, manager]}
+    title: "ข้อความตอนสี่ทุ่ม"
+    text: "เดือนนี้ชั่วโมงทำงานยืดออกเกือบทุกคืน กลับถึงห้องได้ไม่ถึงชั่วโมง สี่ทุ่มสิบห้า กลุ่มแชตงานเด้งขึ้นจอ หัวหน้าส่งไฟล์ชื่อขึ้นต้นว่าด่วน ท้ายข้อความพิมพ์ว่าไม่รีบนะ คุณเพิ่งซดบะหมี่ไปคำแรก"
+    choices:
+      - id: reply_now
+        text: "ตอบทันที เปิดคอมทำต่อ"
+        effects: {network: 1, health: -1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: morning
+        text: "ปิดเสียง ค่อยตอบตอนเช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "เช้ามาหัวหน้าทักว่าไฟล์เมื่อคืนส่งผิด ไม่ต้องทำแล้ว", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เช้ามาเจอข้อความตามอีกสี่รอบ ตัวสุดท้ายเป็นสติกเกอร์ยิ้ม", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: status
+        text: "ตั้งสถานะเลิกงานหกโมงเย็นถาวร"
+        effects: {happiness: 1, health: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: noodle_photo
+        text: "ส่งรูปบะหมี่กลับไปแทนคำตอบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวหน้าส่งรูปบะหมี่ของตัวเองกลับมา เรื่องงานไม่มีใครพูดถึงอีกจนเช้า", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ส่งผิดกลุ่ม เข้าไปกลุ่มที่มีผู้บริหารอยู่สามคน ทุกคนอ่านแล้ว ไม่มีใครตอบ", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_self_review_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 58], occupation: [clerk, technician, manager]}
+    title: "แบบประเมินตัวเองสิบสองข้อ"
+    text: "ฤดูประเมินผลปลายปีมาถึง แบบฟอร์มให้คะแนนตัวเองหนึ่งถึงห้าในสิบสองหัวข้อ ปีก่อนคุณให้สามทุกข้อเพราะเกรงใจ หัวหน้าก็ให้สามตาม โบนัสตามผลงานผูกกับคะแนนนี้ น้องใหม่ในทีมให้ตัวเองห้าทุกข้อพร้อมแนบรูป"
+    choices:
+      - id: honest
+        text: "ให้ตามจริง แนบตัวเลขผลงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวหน้าขีดเพิ่มให้สองข้อ ปีนี้โบนัสขยับขึ้นครึ่งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าบอกว่าเกณฑ์ปีนี้เปลี่ยน ทั้งทีมได้สามเท่ากันหมด", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: humble
+        text: "ให้สามทุกข้อเหมือนเดิม"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: talk_first
+        text: "ขอคุยกับหัวหน้าก่อนกรอก"
+        effects: {network: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: all_five
+        text: "ให้ห้าทุกข้อ แนบรูปมากกว่าน้อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวหน้าหัวเราะในห้องประเมินแล้วให้สี่ทุกข้อ มากกว่าที่เคยได้มาสิบปี", effects: {happiness: 1, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าไล่ถามทีละรูปว่าเป็นผลงานข้อไหน ใช้เวลาไปสองชั่วโมงเต็ม", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_payday_wait_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [22, 26], occupation: [clerk, technician, factory, service]}
+    title: "อีกสามวันเงินเดือนออก"
+    text: "วันที่ยี่สิบเจ็ด ยอดในบัญชีเหลือสองร้อยสิบสามบาท ค่ารถเหลือพอไปกลับสองวัน บะหมี่ซองในลิ้นชักโต๊ะทำงานเหลือซองเดียว รสที่ไม่มีใครชอบ เพื่อนในแผนกชวนไปกินชาบูวันศุกร์ เงินเดือนออกวันที่สามสิบ"
+    choices:
+      - id: stretch
+        text: "บะหมี่ ไข่ต้ม ข้าวเปล่า จนถึงวัน"
+        effects: {health: -1, happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: borrow
+        text: "ยืมเพื่อนห้าร้อย คืนวันสามสิบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนโอนมาพร้อมสติกเกอร์ แล้วทวงดอกเบี้ยเป็นชาบูมื้อหน้า", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เงินเดือนเข้าแล้วคุณลืมโอนคืนไปสองวัน เพื่อนทักทวงกลางกลุ่มแชตแผนก", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: advance
+        text: "ขอเบิกเงินเดือนล่วงหน้า"
+        effects: {network: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: veggie_shabu
+        text: "ไปชาบู กินแต่ผักกับน้ำซุป"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งโต๊ะเห็นแล้วคีบเนื้อมาให้คนละชิ้น สุดท้ายคุณอิ่มกว่าทุกคน", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านคิดราคาต่อหัวเท่ากันทุกคน เงินที่เหลือคือเศษสิบสามบาท", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_car_break_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2540, 2650]
+    weight: 0.5
+    when: {age: [31, 45], occupation: [clerk, technician, factory, manager]}
+    title: "รถดับหน้าไม้กั้น"
+    text: "ปลายเดือน รถคันเดียวที่ใช้ขับไปทำงานดับสนิทตรงไม้กั้นหน้าป้อมยามบริษัท อู่โทรมาบอกว่าไดชาร์จพัง ค่าซ่อมราวครึ่งเดือนของเงินเดือน บัญชีออมที่ตั้งใจหยอดเดือนละหนึ่งในสิบของรายได้ ทั้งปีหยอดได้ไม่ถึงที่ตั้งไว้"
+    choices:
+      - id: savings
+        text: "ถอนเงินออมทั้งหมดจ่ายค่าซ่อม"
+        effects: {happiness: -2, knowledge: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: installment
+        text: "รูดบัตรผ่อนสิบเดือนไม่มีดอก"
+        effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: bus
+        text: "จอดไว้ นั่งรถเมล์จนเงินเดือนออก"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: guard_fix
+        text: "ให้ยามช่วยเข็นแล้วซ่อมกันเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยามเคยเป็นช่างอู่มาสิบปี ซ่อมเสร็จในพักเที่ยง คิดแค่ค่าอะไหล่กับข้าวมันไก่สองห่อ", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: -0.15}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เข็นไปได้สามเมตร ไม้กั้นลงมาฟาดหลังคา ป้อมยามมีคนออกมาดูเต็ม", effects: {happiness: -1, money: {unit: income_x, amount: -0.6}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_boss_order_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2535, 2650]
+    weight: 0.5
+    when: {age: [46, 55], occupation: [clerk, technician, manager]}
+    title: "สไลด์ห้าสิบหน้าตามสั่ง"
+    text: "พรุ่งนี้นำเสนอลูกค้าเจ้าใหญ่ หัวหน้าสั่งให้ใส่ตัวเลขทุกตัวของทั้งปีให้ครบห้าสิบหน้า คุณรู้จากประสบการณ์ยี่สิบปีว่าลูกค้าคนนี้ฟังได้ไม่เกินสิบนาที ทุกคนในห้องประชุมพยักหน้าพร้อมกันตอนหัวหน้าพูดจบ"
+    choices:
+      - id: obey
+        text: "ทำตามเงียบ ๆ ครบห้าสิบหน้า"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: propose
+        text: "ขอห้านาทีเสนอแบบสั้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวหน้าฟังจบแล้วบอกว่าเดี๋ยวลองแบบนี้ ลูกค้าเซ็นสัญญาในยี่สิบนาที", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าบอกว่าแบบนี้เคยลองแล้วเมื่อสิบปีก่อน ตอนที่คุณยังอยู่แผนกอื่น", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: two_decks
+        text: "ทำสองชุด เก็บแบบสั้นไว้ในเครื่อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกค้าหาวตอนหน้าสิบสอง หัวหน้าหันมาถามเบา ๆ ว่ามีแบบอื่นไหม", effects: {network: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ห้าสิบหน้าผ่านไปราบรื่น ชุดสั้นอยู่ในเครื่องต่อไปอีกหลายปี", effects: {health: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: timer
+        text: "ตั้งนาฬิกาจับเวลาไว้กลางโต๊ะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกค้าเห็นนาฬิกาแล้วหัวเราะ ขอข้ามไปหน้าสุดท้ายเอง หัวหน้ายกความดีให้นาฬิกา", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้ายกนาฬิกามาวางตรงหน้าคุณ แล้วให้คุณเป็นคนพูดครบห้าสิบหน้า", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_chili_pickup_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2550, 2650]
+    weight: 0.5
+    when: {age: [24, 30], occupation: [clerk, technician, manager]}
+    title: "น้ำพริกใต้โต๊ะคุณ"
+    text: "เพื่อนร่วมแผนกขายน้ำพริกทำเองหลังเลิกงาน โต๊ะคุณอยู่ติดลิฟต์ สามสิบกระปุกเลยมากองใต้โต๊ะคุณ คนทั้งตึกแวะมารับทั้งวัน เมื่อคืนตีหนึ่งเพื่อนส่งข้อความมาขอให้ช่วยตอบลูกค้าที่ถามว่ามีแบบไม่เผ็ดไหม เช้านี้ประชุมเจ็ดโมงครึ่ง"
+    choices:
+      - id: pickup_point
+        text: "เป็นจุดรับของต่อ ไม่คิดอะไร"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: move_out
+        text: "ขอให้ย้ายไปห้องเก็บของ"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: answer_night
+        text: "ช่วยตอบลูกค้าตีหนึ่งให้"
+        effects: {health: -1, relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: fee
+        text: "ขอค่าฝากกระปุกละห้าบาท"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนตกลงทันที แถมน้ำพริกกุ้งให้หนึ่งกระปุกทุกรอบที่ของมา", effects: {happiness: 1, money: {unit: income_x, amount: 0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนขึ้นราคากระปุกละห้าบาทแล้วติดป้ายว่าเป็นค่าฝากโต๊ะคุณ", effects: {relations: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sign
+        text: "ติดป้ายจุดรับน้ำพริกหน้าลิฟต์"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนตึกข้างเดินข้ามมาซื้อ เพื่อนยกให้คุณเป็นลูกค้าคนสำคัญ ได้กินฟรีทั้งปี", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝ่ายอาคารถ่ายรูปป้ายไปเข้าที่ประชุมประจำเดือน ชื่อคุณอยู่ในรายงานด้วย", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_desk_clear_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [59, 59], occupation: [clerk, technician, factory, manager]}
+    title: "ลิ้นชักสามสิบปี"
+    text: "อีกเดือนเดียวจะเกษียณ ฝ่ายบุคคลขอให้เคลียร์โต๊ะก่อนวันสุดท้าย เงินก้อนสุดท้ายจะเข้าบัญชีปลายเดือนหน้า คุณเปิดลิ้นชักเจอปากกาหมึกแห้งสี่สิบด้าม สลิปเงินเดือนใบแรก และกุญแจห้องที่รื้อไปแล้วตอนปรับปรุงตึก"
+    choices:
+      - id: thank_desks
+        text: "เดินขอบคุณทีละโต๊ะ"
+        effects: {relations: 1, network: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: frame_slip
+        text: "เก็บสลิปใบแรกใส่กรอบ"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: return_key
+        text: "เอากุญแจไปคืนฝ่ายอาคาร"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช่างอาคารรุ่นเดียวกันจำกุญแจได้ ชวนนั่งเล่าเรื่องตึกเก่าจนเลยเวลาเลิกงาน", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝ่ายอาคารให้เซ็นใบรับคืนสามแผ่น เพราะไม่มีแบบฟอร์มสำหรับห้องที่ไม่มีแล้ว", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pens
+        text: "แจกปากกาสี่สิบด้ามเป็นที่ระลึก"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้องแต่ละคนได้ปากกาพร้อมเรื่องเล่าหนึ่งเรื่อง ช่วงพักเที่ยงลากยาวไปถึงบ่ายสาม", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีด้ามไหนเขียนออก ทั้งแผนกนั่งขีดกระดาษพร้อมกันแล้วเงยหน้ามองคุณ", effects: {happiness: 1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_senior_parttime_01
+    type: A
+    category: work_money
+    stage: ชรา
+    years: [2560, 2650]
+    weight: 0.5
+    when: {age: [62, 72]}
+    title: "เครื่องคิดเงินจอสัมผัส"
+    text: "ร้านหนังสือในห้างรับพนักงานวัยเกษียณทำวันละสี่ชั่วโมง คุณได้ป้ายชื่อกับเสื้อกั๊กสีเขียว หัวหน้ากะอายุรุ่นหลานสอนสแกนคิวอาร์ห้านาทีแล้วรีบไปต่อ จอเด้งถามว่าสะสมแต้มไหม ลูกค้าคนแรกต่อคิวมาพร้อมหนังสือสิบสองเล่ม"
+    choices:
+      - id: ask_again
+        text: "เรียกหัวหน้ากะมาสอนซ้ำ"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: notebook
+        text: "จดทุกขั้นลงสมุดเล่มเล็ก"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: recommend
+        text: "ขอไปเดินแนะนำหนังสือแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกค้าประจำเริ่มมาถามหาคุณ ร้านย้ายคุณไปประจำมุมหนังสือเก่าถาวร", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกค้าเดินตามคุณไปทั้งร้านเพื่อขอจ่ายเงิน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mental_math
+        text: "จดราคาด้วยมือ คิดเลขในใจ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คิดเสร็จก่อนเครื่องโหลดเสร็จ คนต่อแถวยืนดูแล้วปรบมือให้", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยอดตรงทุกบาท แต่ลูกค้าคนที่สิบสองขอใบกำกับภาษีเต็มรูป", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: workday_weekend_ot_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2555, 2650]
+    weight: 0.5
+    when: {age: [46, 59], occupation: [clerk, technician, factory, manager]}
+    title: "เสาร์นี้สองเท่า เลยหกโมงสาม"
+    text: "ปิดงบสิ้นเดือนไม่ทัน หัวหน้าขอให้ทั้งแผนกมาวันเสาร์ ค่าทำงานวันหยุดได้สองเท่า ถ้าเลยหกโมงเย็นได้สามเท่า เสาร์นี้ตรงกับงานบวชลูกพี่ลูกน้องที่บ้านเกิด ห่างไปสามร้อยกิโล คนในแผนกเริ่มลงชื่อในกลุ่มแชตแล้ว"
+    choices:
+      - id: work
+        text: "มาทำงาน อยู่ยาวถึงค่ำ"
+        effects: {relations: -1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: go_home
+        text: "กลับบ้านเกิดไปงานบวช"
+        effects: {relations: 2, network: -1}
+        merit: [{cat: neutral}]
+      - id: both
+        text: "ทำงานเช้า ขับรถตามไปตอนบ่าย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทันแห่นาครอบสุดท้าย ญาติยกให้เป็นคนขับรถส่งทุกคนกลับบ้าน", effects: {relations: 1, health: -1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปถึงตอนเขาเก็บเต็นท์ เหลือแต่ข้าวต้มหม้อสุดท้าย", effects: {health: -1, happiness: -1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: laptop_tent
+        text: "หอบคอมไปปิดงบในงานบวช"
+        outcomes:
+          - {weight: 1, ok: true, text: "นั่งปิดงบใต้เต็นท์ ป้า ๆ ยกขนมมาวางให้ทุกชั่วโมง งานเสร็จพอดีตอนแห่นาค", effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สัญญาณมีแค่ตรงประตูวัด ส่งงานไม่ทัน ญาติบ่นว่ามาแต่ตัว ใจไม่มา", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

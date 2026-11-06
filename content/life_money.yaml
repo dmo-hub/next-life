@@ -1,0 +1,488 @@
+# การ์ดชีวิตผู้ใหญ่ชุด money (ใบ 241 จากร่าง 240)
+# รอบแก้ตามข้อค้าน: ใส่ when.year ตามปี since ของแถวที่อ้าง (years คง [2500, 2650])
+# ไม่ใช้ ticket: true เพราะ lint belief (ค) จำกัด ticket ไว้เฉพาะ lottery_numen ใน belief.yaml · ใบสลากจึงไม่มีผลถูกรางวัลเลย
+# ธงหนี้ (in_debt/loan_shark) ไม่ใช้ตาม brief · ใบที่เคยสมมติว่ามีหนี้อยู่ก่อน เขียนใหม่ให้หนี้เกิดในใบเอง หรือย้ายผู้เล่นไปเป็นบุคคลที่สาม
+events:
+  - id: money_piggy_day_01
+    type: A
+    category: work_money
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [7, 12], year: [2562, 2650]}
+    title: "กระปุกวันออมแห่งชาติ"
+    text: "วันออมแห่งชาติ ผู้ใหญ่ในบ้านพาไปต่อคิวที่ธนาคารตั้งแต่เช้า ฝากครบห้าร้อยได้กระปุกที่ระลึกใบใหม่ ช่องหยอดแคบพอดีเหรียญสิบ เช้าวันรุ่งขึ้นเพื่อนทั้งห้องเริ่มอวดว่ากระปุกตัวเองหนักแค่ไหนแล้ว"
+    choices:
+      - id: drop_daily
+        text: "หยอดเหรียญสิบทุกวันไม่เว้น"
+        effects: {knowledge: 1, happiness: -1, money: {unit: fixed_baht, amount: 1500, ref_year: 2562}}
+        merit: [{cat: neutral}]
+      - id: half_snack
+        text: "ค่าขนมครึ่งกิน ครึ่งหยอด"
+        effects: {happiness: 1, money: {unit: fixed_baht, amount: 700, ref_year: 2562}}
+        merit: [{cat: neutral}]
+      - id: open_toy
+        text: "ครบเดือนแคะออกซื้อของเล่น"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: shake_nightly
+        text: "เขย่าฟังเสียงทุกคืนก่อนนอน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฟังทุกคืนจนแยกออกว่าเหรียญห้ากับเหรียญสิบเสียงไม่เหมือนกัน ครูดนตรีชมว่าหูดีทั้งที่ไม่รู้ว่าฝึกมาจากไหน", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขย่าแรงจนจุกยางข้างใต้หลุด เหรียญกลิ้งเข้าใต้ตู้เย็นสามเหรียญ คืนนั้นนอนคว่ำเอาไม้บรรทัดเขี่ยจนหลับคาพื้น", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_class_share_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2545, 2650]
+    weight: 0.5
+    when: {age: [14, 17]}
+    title: "วงแชร์ค่าขนมหลังห้อง"
+    text: "หัวหน้าห้องตั้งวงแชร์ค่าขนม สิบคน คนละยี่สิบบาททุกวันจันทร์ ใครอยากได้ก้อนก่อนต้องเขียนดอกลงกระดาษพับใส่กล่องดินสอ สัปดาห์นี้คนหนึ่งจะเอาเงินไปซื้อรองเท้าสตั๊ด อีกคนจะเอาไปเติมเกม"
+    choices:
+      - id: wait_last
+        text: "รอรับก้อนท้ายสุด เก็บดอกเต็ม"
+        effects: {knowledge: 1, happiness: -1, money: {unit: fixed_baht, amount: 60, ref_year: 2565}}
+        merit: [{cat: neutral}]
+      - id: bid_first
+        text: "เขียนดอกสูง ขอก้อนแรก"
+        effects: {happiness: 1, money: {unit: fixed_baht, amount: -40, ref_year: 2565}}
+        merit: [{cat: neutral}]
+      - id: stay_out
+        text: "ไม่เข้าวง เก็บใส่กระเป๋าเอง"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+      - id: hold_box
+        text: "ขอเป็นคนถือกล่องดินสอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "จดบัญชีหลังสมุดคณิตจนครบวงไม่ขาดสักบาท ทั้งห้องเรียกคุณว่าเหรัญญิก ครูประจำชั้นยังมาขอดูวิธีจด", effects: {network: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กล่องดินสอหายในคาบพละ เจอใต้โต๊ะครูวันรุ่งขึ้น เงินครบทุกบาท แต่สามวันนั้นไม่มีใครยอมคุยกับคุณ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_app_fee_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2560, 2650]
+    weight: 0.5
+    when: {age: [21, 30], year: [2564, 2650]}
+    title: "ยอดเข้าไม่เท่ายอดกู้"
+    text: "อีกห้าวันเงินเดือนออก เงินในบัญชีเหลือสามร้อย โฆษณาในมือถือบอกกู้ได้ในห้านาทีไม่ต้องใช้เอกสาร กดขอสองพัน หน้าจอยืนยันบอกว่าจะได้รับพันสอง ที่เหลือเป็นค่าดำเนินการ ครบเจ็ดวันคืนเต็มสองพัน"
+    choices:
+      - id: take_it
+        text: "กดยืนยัน รับพันสอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คืนตรงวันเงินเดือนออก จากนั้นแอปส่งข้อความชวนเพิ่มวงเงินสองเท่าทุกเช้าเจ็ดโมง", effects: {money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เงินเดือนเข้าช้าไปหนึ่งวัน ค่าปรับขึ้นบนหน้าจอเท่าค่ากับข้าวทั้งอาทิตย์", effects: {happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_advance
+        text: "ขอเบิกเงินเดือนล่วงหน้า"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: ask_cousin
+        text: "ทักญาติขอยืมห้าร้อย"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+      - id: noodle_week
+        text: "กินบะหมี่ซองห้าวันติด"
+        outcomes:
+          - {weight: 1, ok: true, text: "คิดสูตรได้ห้าแบบ ใส่ไข่ ใส่ผักบุ้ง ใส่น้ำพริกเผา โพสต์ลงกลุ่มคนทำงานแล้วมีคนแชร์ไปหลายร้อย", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วันที่สี่ท้องไส้เริ่มประท้วง ต้องแวะร้านขายยา เสียเงินมากกว่าค่าบะหมี่ทั้งห้าวัน", effects: {health: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_card_bill_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2555, 2650]
+    weight: 0.5
+    when: {age: [23, 30], year: [2564, 2650]}
+    title: "ใบแจ้งยอดหลังปีใหม่"
+    text: "ปีใหม่รูดบัตรซื้อของขวัญจับฉลาก ตั๋วรถกลับบ้าน กับเสื้อสามตัวที่ลดราคาตอนตีหนึ่ง ใบแจ้งยอดบัตรมาถึงกลางเดือน ช่องจ่ายขั้นต่ำตัวเลขเล็กจนดูน่ารัก ส่วนช่องยอดเต็มตัวเลขยาวจนเกือบล้นกรอบ"
+    choices:
+      - id: pay_full
+        text: "จ่ายเต็ม กินไข่เจียวทั้งเดือน"
+        effects: {knowledge: 1, happiness: -1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: pay_min
+        text: "จ่ายขั้นต่ำไปก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เดือนนี้หายใจคล่อง เดือนถัดมาได้ค่าคอมก้อนใหญ่ ปิดยอดได้ก่อนดอกพอกเกินค่าข้าวหนึ่งมื้อ", effects: {happiness: 1, money: {unit: income_x, amount: -0.32}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เดือนแรกโล่ง แต่สามเดือนผ่านไปยอดลดช้ากว่าที่คิด ดอกที่คิดรายวันกินไปทุกรอบ", effects: {happiness: 1, money: {unit: income_x, amount: -0.38}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: split_ten
+        text: "โทรขอแบ่งจ่ายสิบงวด"
+        effects: {happiness: -1, money: {unit: income_x, amount: -0.35}}
+        merit: [{cat: neutral}]
+      - id: return_shirts
+        text: "หอบเสื้อสามตัวไปขอคืนร้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้ายยังไม่แกะ ร้านยอมคืนเงินเข้าบัตร ยอดในใบแจ้งหนี้รอบหน้าหายไปหนึ่งบรรทัด", effects: {happiness: 1, money: {unit: income_x, amount: -0.25}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พนักงานชี้ป้ายเล็กใต้เคาน์เตอร์ สินค้าลดราคาไม่รับคืน คุณใส่เสื้อตัวหนึ่งกลับบ้านเลยเพราะเหงื่อออก", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_washer_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2555, 2650]
+    weight: 0.5
+    when: {age: [25, 30], year: [2569, 2650]}
+    title: "เครื่องซักผ้าหยุดกลางเดือน"
+    text: "เครื่องซักผ้าหยุดหมุนทั้งที่น้ำยังเต็มถัง ในนั้นมีชุดทำงานสี่ชุด ร้านเครื่องใช้ไฟฟ้าบอกรูดบัตรผ่อนศูนย์เปอร์เซ็นต์สิบงวดได้ทันที แต่วงเงินบัตรจะถูกกันไว้เต็มราคา กลุ่มซื้อขายของคนในหอมีมือสองลงขายเมื่อเช้า"
+    choices:
+      - id: zero_pct
+        text: "รูดบัตรผ่อนสิบงวด"
+        outcomes:
+          - {weight: 1, ok: true, text: "เครื่องใหม่มาส่งถึงห้องวันรุ่งขึ้น สิบเดือนนั้นไม่มีเรื่องต้องรูดบัตรอีกเลย", effects: {happiness: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดือนถัดมาฟันกรามปวดจนต้องถอน ยื่นบัตรที่คลินิกแล้ววงเงินไม่พอ ต้องวิ่งไปกดเงินสดแบบเสียค่าธรรมเนียม", effects: {happiness: -1, money: {unit: income_x, amount: -0.18}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: used_one
+        text: "ไปดูเครื่องมือสองในกลุ่มหอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของเก่าย้ายไปทำงานต่างประเทศ เครื่องยังใหม่ แถมตะกร้าผ้ากับไม้แขวนอีกหนึ่งมัด", effects: {happiness: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ใช้ได้สองอาทิตย์ เสียงปั่นดังเหมือนเครื่องบินขึ้น ห้องข้าง ๆ มาเคาะประตูตอนสามทุ่ม", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hand_wash
+        text: "ซักมือไปก่อนจนสิ้นเดือน"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: fix_self
+        text: "เปิดฝาหลังซ่อมเองตามคลิป"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอถุงเท้าข้างหนึ่งพันใบพัดอยู่ ดึงออกแล้วเครื่องหมุนต่อทันที ลงทุนไปแค่ไขควงหนึ่งด้าม", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประกอบคืนแล้วเหลือน็อตสามตัวที่ไม่รู้มาจากตรงไหน สุดท้ายต้องจ้างช่างมาประกอบให้ใหม่", effects: {happiness: -1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_tv_zero_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2545, 2650]
+    weight: 0.5
+    when: {age: [31, 45], year: [2562, 2650]}
+    title: "ทีวีจอใหญ่ผ่อนศูนย์"
+    text: "ห้างลดราคากลางปี ทีวีจอใหญ่เท่าประตูห้องน้ำ ป้ายบอกผ่อนศูนย์เปอร์เซ็นต์สิบงวด เซลส์ยื่นใบสมัครพร้อมปากกา ในสมุดรายจ่ายยังมีค่างวดรถ ค่างวดมือถือ กับค่าผ่อนแอร์ที่เพิ่งเริ่มเมื่อเดือนก่อน"
+    choices:
+      - id: sign_now
+        text: "เซ็นเลย ฟุตบอลโลกใกล้แล้ว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทันดูนัดเปิดสนามพอดี ค่างวดทุกก้อนตัดเงินเดือนลงตัวไม่ขาดไม่เกิน", effects: {happiness: 2, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ค่างวดสี่ก้อนตัดชนกันวันเดียว เงินเดือนไม่พอถึงสิ้นเดือน ต้องดูบอลจอใหญ่คู่กับบะหมี่ถ้วย", effects: {happiness: -1, money: {unit: income_x, amount: -0.18}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: count_first
+        text: "กลับไปนับค่างวดก่อนตัดสิน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: smaller_cash
+        text: "เอาจอเล็กลงหนึ่งขนาด จ่ายสด"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.08}}
+        merit: [{cat: neutral}]
+      - id: measure_wall
+        text: "ขอยืมตลับเมตรกลับไปวัดผนัง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผนังยาวพอดีเป๊ะ กลับมาเซ็นวันรุ่งขึ้น เซลส์ขำจนแถมขาแขวนให้ฟรี", effects: {happiness: 2, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลืมวัดรวมขอบ ทีวีมาถึงยาวกว่าผนังสองคืบ ตู้เสื้อผ้าต้องย้ายไปยืนหน้าห้องน้ำแทน", effects: {happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_app_contacts_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2560, 2650]
+    weight: 0.5
+    when: {age: [31, 45], year: [2564, 2650]}
+    title: "สายตามหนี้ที่ไม่ใช่ของคุณ"
+    text: "เบอร์แปลกโทรเข้ามือถือคุณตั้งแต่แปดโมง ถามหาเพื่อนร่วมแผนกด้วยเสียงไม่สุภาพ ว่าค้างค่างวดแอปเงินกู้ เบอร์คุณติดไปกับรายชื่อในเครื่องเขาตอนกดอนุญาตแอป พักเที่ยงสายที่สองก็มา ส่วนเขานั่งก้มหน้าอยู่โต๊ะข้าง ๆ"
+    choices:
+      - id: talk_friend
+        text: "ชวนเพื่อนไปคุยกันตามลำพัง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเล่าว่ากู้มาจ่ายค่าโรงพยาบาลคนที่บ้าน คุณช่วยไล่ยอดจริงจนรู้ว่าเหลือเท่าไร คืนนั้นเขาส่งข้อความขอบคุณมายาวเหยียด", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาขอโทษซ้ำจนคุยต่อไม่ได้ สัปดาห์นั้นเขาเลี่ยงไปกินข้าวคนเดียวทุกวัน", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: block_it
+        text: "บล็อกเบอร์ ไม่ยุ่งเรื่องคนอื่น"
+        outcomes:
+          - {weight: 1, ok: true, text: "บล็อกไปสองเบอร์ สายก็เงียบ คุณกลับไปทำงานต่อได้ทั้งบ่าย", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บล็อกเบอร์หนึ่ง อีกเบอร์โผล่มาแทนทุกวัน จนคุณไม่กล้ารับสายแปลกแม้แต่ของบุรุษไปรษณีย์", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: file_complaint
+        text: "ร้องเรียนช่องทางรับเรื่องทวงหนี้"
+        outcomes:
+          - {weight: 2, ok: true, text: "ส่งบันทึกเสียงกับเวลาที่โทรเข้าไปครบ สองสัปดาห์ต่อมาสายทวงที่โทรหาคุณหยุดลง เพื่อนขอวิธีไปยื่นเรื่องของตัวเองด้วย", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรื่องรับไว้แล้ว แต่ระหว่างรอสายยังเข้ามาอีกเกือบเดือน", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: read_law
+        text: "รับสาย อ่านกฎหมายทวงหนี้ให้ฟัง"
+        outcomes:
+          - {weight: 1, ok: true, text: "อ่านถึงมาตราที่สอง ปลายสายเงียบไปแล้ววางเอง เพื่อนทั้งแผนกหันมามองเหมือนเพิ่งเห็นทนายครั้งแรก", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยังเปิดหาไม่เจอว่ามาตราไหน ปลายสายพูดแทรกเร็วกว่าที่คุณเลื่อนจอ สุดท้ายคุณวางก่อน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_gold_box_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "ทองในกล่องกำมะหยี่"
+    text: "สองปีมานี้คุณแวะร้านทองหน้าตลาดทุกสิ้นเดือน ซื้อทีละสลึงเก็บในกล่องกำมะหยี่ใต้ตู้ เมื่อคืนฝนตกหนักจนหลังคาครัวพัง ช่างตีราคาซ่อมเกือบเท่าทองทั้งกล่อง ราคาทองวันนี้สูงกว่าตอนซื้อชิ้นแรกอยู่พอสมควร"
+    choices:
+      - id: sell_all
+        text: "ขายทั้งกล่อง ซ่อมให้จบ"
+        effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: borrow_fix
+        text: "กู้มาซ่อม เก็บทองไว้ก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ปีต่อมาราคาทองขึ้นอีก ขายครึ่งกล่องปิดเงินกู้ได้หมด ที่เหลือยังนอนอยู่ในกล่องเหมือนเดิม", effects: {happiness: 1, money: {unit: income_x, amount: 0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ราคาทองย่อลงทั้งปี ดอกเงินกู้เดินทุกเดือน สุดท้ายต้องขายทองตอนราคาต่ำกว่าวันที่หลังคาพัง", effects: {happiness: -1, money: {unit: income_x, amount: -0.15}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tarp_wait
+        text: "ขึงผ้าใบไว้จนพ้นหน้าฝน"
+        effects: {health: -1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: sell_by_sheet
+        text: "ขายทีละสลึง ตามที่ช่างมุงเสร็จ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช่างมุงเสร็จทีละแผ่น คุณเดินไปร้านทองทีละสลึง เจ้าของร้านจำหน้าได้จนชวนนั่งกินน้ำแข็งไส", effects: {happiness: 1, network: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ราคาทองลดลงทุกวันที่เดินไปขาย ช่างยังเสร็จช้ากว่าที่บอกไปครึ่งเดือน", effects: {happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_line_lender_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45], occupation: [factory]}
+    title: "หัวหน้าสายพานปล่อยเงิน"
+    text: "ค่าเช่าห้องครบกำหนดพรุ่งนี้ แต่เงินเดือนเข้าอีกสามวัน หัวหน้าสายพานกระซิบที่โรงอาหารว่าให้ยืมได้ ร้อยละสิบต่อเดือน หักดอกตั้งแต่วันรับเงิน สิ้นเดือนทีไรคนครึ่งไลน์ผลิตยืนต่อแถวหน้าล็อกเกอร์ของเขา"
+    choices:
+      - id: borrow_boss
+        text: "ยืมจากหัวหน้า หักดอกไว้"
+        outcomes:
+          - {weight: 1, ok: true, text: "เงินเดือนเข้าก็คืนทันที หัวหน้าตบไหล่บอกว่าคนคืนตรงแบบนี้ยืมได้ทุกเมื่อ", effects: {network: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ดอกที่หักไว้ก่อนทำให้เงินที่ได้มาขาดค่าเช่าไปนิด พอคืนครบ สิ้นเดือนคุณก็ไปยืนต่อแถวหน้าล็อกเกอร์อีกรอบ", effects: {happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_landlord
+        text: "ขอเจ้าของห้องเลื่อนสามวัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของห้องยอมเลื่อน ขอแค่ให้ช่วยแบกถังน้ำดื่มขึ้นชั้นสามจนครบเดือน", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของห้องยอมเลื่อน แต่คิดค่าปรับวันละห้าสิบ เขียนใส่กระดาษแปะประตูให้ทั้งตึกเห็น", effects: {happiness: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gate_sale
+        text: "เปิดท้ายขายของเก่าหน้าโรงงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หม้อหุงข้าวเก่ากับรองเท้าสองคู่ขายหมดก่อนเลิกกะ ได้พอค่าเช่าพอดี คนกะดึกยังมาถามหารอบหน้า", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยามหน้าโรงงานให้เก็บของภายในห้านาที ขายได้แค่ไม้แขวนเสื้อหนึ่งมัด", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: fix_taps
+        text: "ขอจ่ายค่าเช่าเป็นแรงซ่อมก๊อก"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไล่ซ่อมก๊อกรั่วทั้งตึกสิบสองห้อง เจ้าของห้องหักค่าเช่าให้ครึ่งเดือน ห้องอื่นเริ่มเรียกคุณว่าช่างประจำตึก", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ก๊อกห้องแรกไขแรงไปจนเกลียวรูด น้ำพุ่งท่วมถึงบันได ค่าเช่ายังต้องจ่ายเต็มแถมค่าอะไหล่", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_share_silent_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2555, 2650]
+    weight: 0.5
+    when: {age: [33, 45], year: [2563, 2650]}
+    title: "ท้าวแชร์ไม่อ่านแชต"
+    text: "วงแชร์ในกลุ่มแชตยี่สิบคน คุณส่งตรงทุกเดือนมาสิบงวด รอรับก้อนท้ายวง สามวันก่อนท้าวแชร์ยังส่งสติกเกอร์ดอกไม้ทักอรุณสวัสดิ์ วันนี้ข้อความทวงในกลุ่มขึ้นว่ายังไม่มีใครอ่าน โทรไปก็ไม่มีคนรับ"
+    choices:
+      - id: group_up
+        text: "รวมสมาชิกวงไปแจ้งความ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เรื่องถึงศาลปีครึ่ง ได้เงินคืนบางส่วน สมาชิกวงสองคนกลายเป็นเพื่อนสนิทที่นัดกินข้าวกันทุกเดือน", effects: {relations: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตำรวจรับเรื่อง แต่ท้าวแชร์ไม่มีทรัพย์เหลือให้ยึดสักชิ้น เงินสิบงวดหายไปทั้งก้อน", effects: {happiness: -1, network: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_phone
+        text: "รอ เผื่อเขาแค่มือถือหาย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เดือนต่อมาท้าวแชร์โผล่มาพร้อมซองเงินกับเรื่องเล่าความยาวสามหน้ากระดาษ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "รอจนกลุ่มเงียบ ไอคอนกลุ่มกลายเป็นวงกลมสีเทา เงินสิบงวดหายไปพร้อมกัน", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: go_house
+        text: "ขับรถไปหาที่บ้านท้าวแชร์"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนในบ้านเปิดประตูรับ ยอมเซ็นหนังสือรับสภาพหนี้ให้ไว้ แล้วทยอยโอนคืนเดือนละนิดจนได้คืนครึ่งหนึ่ง", effects: {knowledge: 1, money: {unit: income_x, amount: -0.15}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บ้านติดป้ายให้เช่า ยามหมู่บ้านบอกว่ามีคนมาถามหาแบบคุณทุกวัน เงินสิบงวดตามไปไม่ถึง", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swap_icon
+        text: "เปลี่ยนรูปกลุ่มเป็นหน้าท้าวแชร์"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนในกลุ่มหัวเราะครั้งแรกในรอบสัปดาห์ แล้วเทข้อมูลที่แต่ละคนรู้ จนรู้ว่าเขาไปพักบ้านญาติจังหวัดไหน ส่วนเงินยังไม่กลับมา", effects: {relations: 1, network: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ท้าวแชร์ออกจากกลุ่มทันทีที่เห็นรูป ประวัติการโอนในแชตหายไปกับเขาครึ่งหนึ่ง", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_paddy_tree_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59], occupation: [farmer], year: [2563, 2650]}
+    title: "คันนาทรุดก่อนวันหวยออก"
+    text: "เช้านี้คันนาฝั่งถนนทรุดไปอีกช่วง รอยล้อรถกระบะลึกเท่าข้อเท้า ต้นข้าวริมคันล้มราบไปสองแปลง ต้นเหตุคือคนที่ขับมาจอดกันทุกปลายงวด เดินไปขอเลขกับต้นตะเคียนเก่ากลางนาของคุณ ผ้าเจ็ดสีงอกเพิ่มทุกงวด"
+    choices:
+      - id: fence_it
+        text: "ล้อมรั้วกันคันนา"
+        effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: sell_stall
+        text: "ตั้งแผงขายน้ำเย็นริมถนน"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้ำเย็นหมดสามลังทุกงวด รายได้จากแผงพอค่าซ่อมคันนากับค่าปุ๋ยทั้งฤดู", effects: {network: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนมาเต็มคันนาแต่ไม่มีใครซื้อ ทุกคนพกน้ำมาจากบ้านเอง", effects: {happiness: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: let_be
+        text: "ปล่อยไป ซ่อมคันนาเองทุกงวด"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: parking_sign
+        text: "ปักป้ายว่าต้นนี้ไม่มีที่จอด"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนอ่านป้ายแล้วหัวเราะ ยอมจอดริมถนนเดินเข้ามาแทน ต้นข้าวรอดทั้งแปลง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มีคนถ่ายรูปป้ายลงกลุ่มคนรักเลข งวดถัดมารถมาเพิ่มเป็นสองเท่า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_two_stalls_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59], year: [2565, 2650]}
+    multipliers: {flags: {lottery_habit: 2}}
+    title: "สองแผงหน้าตลาด"
+    text: "ตลาดเช้ามีแผงสลากสองแผงตั้งห่างกันสิบก้าว แผงแรกมีเลขท้ายที่คุณซื้อประจำ แต่ขายเกินราคาบนใบสามสิบบาท แผงที่สองติดป้ายตัวโตว่าขายตามราคา เลขในแผงไม่มีตัวไหนคุ้นตาเลย"
+    choices:
+      - id: pay_extra
+        text: "จ่ายเพิ่ม เอาเลขประจำ"
+        effects: {happiness: 1, money: {unit: fixed_baht, amount: -110, ref_year: 2565}}
+        merit: [{cat: neutral}]
+      - id: fair_stall
+        text: "ซื้อแผงตามราคา เลขไหนก็ได้"
+        effects: {money: {unit: fixed_baht, amount: -80, ref_year: 2565}}
+        merit: [{cat: neutral}]
+      - id: skip_buy
+        text: "ไม่ซื้อ เอาไปซื้อปาท่องโก๋"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: count_buyers
+        text: "ยืนนับว่าแผงไหนคนซื้อมากกว่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "นับได้แผงตามราคาชนะเจ็ดต่อสาม คนขายแผงแรกเห็นเข้าเลยยอมขายตามราคาให้คุณเป็นคนแรก", effects: {happiness: 1, network: 1, money: {unit: fixed_baht, amount: -80, ref_year: 2565}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยืนนานจนคนขายทั้งสองแผงคิดว่าคุณเป็นเจ้าหน้าที่ เก็บแผงกลับบ้านเร็วกว่าทุกวัน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_daily_rate_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59], occupation: [service, craft, labor, farmer], year: [2566, 2650]}
+    title: "ดอกวันละนิดเดียว"
+    text: "เช้านี้มีนามบัตรเงินด่วนเสียบไว้ใต้ตาชั่งทุกแผงในตลาดนัด เขียนว่าดอกวันละหนึ่งเปอร์เซ็นต์ ฟังดูนิดเดียว คุณหยิบเครื่องคิดเลขของแผงมาคูณสามร้อยหกสิบห้า ได้สามร้อยหกสิบห้าเปอร์เซ็นต์ต่อปี กดซ้ำอีกรอบก็ยังเท่าเดิม"
+    choices:
+      - id: warn_row
+        text: "เดินบอกแผงข้าง ๆ ทั้งแถว"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนขายผักแผงท้ายแถวเกือบโทรไปแล้วเมื่อวาน เธอเลี้ยงกาแฟคุณทั้งอาทิตย์", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แผงข้าง ๆ พยักหน้าฟังแต่ไม่ทิ้งนามบัตร บางคนเหน็บไว้หลังแผงเผื่อวันฝนตก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: report_it
+        text: "ถ่ายรูปส่งหน่วยงานรับเรื่อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "สองอาทิตย์ต่อมาไม่มีนามบัตรเสียบใต้ตาชั่งอีก ประธานตลาดติดประกาศเบอร์ร้องเรียนไว้ที่ห้องน้ำ", effects: {knowledge: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรื่องรับไว้ แต่นามบัตรชุดใหม่สีสดกว่าเดิมมาเสียบแทนในเดือนเดียว", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep_card
+        text: "เก็บนามบัตรใส่ลิ้นชักไว้ก่อน"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: start_jar
+        text: "ตั้งกระปุกสำรองแผง วันละยี่สิบ"
+        effects: {knowledge: 1, money: {unit: income_x, amount: 0.03}}
+        merit: [{cat: neutral}]
+      - id: show_calc
+        text: "เอาเครื่องคิดเลขไปกดให้คนแจกดู"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนแจกนามบัตรมองตัวเลขบนจอแล้วเงียบไปนาน ก่อนเก็บนามบัตรที่เหลือลงกระเป๋า แผงข้าง ๆ ปรบมือให้", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาหยิบเครื่องคิดเลขไปกดเอง ได้เลขเดียวกันแล้วยิ้ม บอกว่าก็ไม่ได้ปิดบังใคร", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_coop_slip_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [50, 59], occupation: [clerk, professional], year: [2567, 2650]}
+    title: "ตารางผ่อนสองแบบ"
+    text: "สายไฟในบ้านเก่าจนต้องเดินใหม่ทั้งหลัง คุณยื่นกู้สหกรณ์ออมทรัพย์ที่ทำงาน เจ้าหน้าที่วางตารางสองแผ่น ผ่อนสิบปีงวดหนักจนสลิปเงินเดือนเหลือไม่ถึงค่ากับข้าว หรือผ่อนยาวถึงอายุแปดสิบ งวดเบาลงเกือบครึ่ง"
+    choices:
+      - id: stretch_80
+        text: "เซ็นแบบผ่อนยาวถึงแปดสิบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "งวดเบาจนเงินเดือนเหลือพอใช้ ทุกเดือนคุณโปะเพิ่มนิดหน่อย ปิดได้ก่อนเกษียณหลายปี", effects: {happiness: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "สบายไปหลายปี จนวันเกษียณเจ้าหน้าที่ยื่นตัวเลขดอกรวมทั้งหมดมาให้ดู สูงกว่าค่าเดินสายไฟเกือบเท่าตัว", effects: {happiness: -1, money: {unit: income_x, amount: -0.25}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ten_years
+        text: "ผ่อนสิบปี อดทนช่วงงวดหนัก"
+        effects: {happiness: -1, health: -1, money: {unit: income_x, amount: -0.12}}
+        merit: [{cat: neutral}]
+      - id: room_by_room
+        text: "เก็บเงินเดินสายไฟทีละห้อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ปีเดียวเสร็จครบทุกห้อง ไม่ต้องเซ็นอะไรสักแผ่น ช่างไฟกลายเป็นคนคุ้นหน้าคุ้นตาในบ้าน", effects: {knowledge: 1, money: {unit: income_x, amount: -0.08}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ห้องที่ยังไม่ได้เดินสายไฟช็อตกลางดึก ปลั๊กไหม้ดำ ต้องรื้อทำใหม่แพงกว่าเดิม", effects: {happiness: -1, health: -1, money: {unit: income_x, amount: -0.12}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: line_by_line
+        text: "นั่งไล่ทุกแถวกับเจ้าหน้าที่"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: ask_100
+        text: "ขอผ่อนถึงร้อยปีไปเลยได้ไหม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหน้าที่หัวเราะจนแว่นตก บอกว่าถ้าอยู่ถึงร้อยจะมาเลี้ยงข้าวเอง แล้วชี้ช่องโปะเงินต้นให้ดูว่าทำได้ทุกเดือน", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าหน้าที่ไม่ขำ กดเครื่องคิดเลขโชว์ดอกรวมแบบร้อยปีให้ดูจริงจัง คุณนั่งเงียบไปทั้งบ่าย", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: money_allowance_day_01
+    type: A
+    category: work_money
+    stage: ชรา
+    years: [2552, 2650]
+    weight: 0.5
+    when: {age: [60, 79], year: [2554, 2650]}
+    title: "เงินผู้สูงอายุเข้าต้นเดือน"
+    text: "ต้นเดือนเงินผู้สูงอายุเข้าบัญชีพร้อมกันทั้งตำบล หน้าตู้กดเงินข้างเทศบาลมีคนวัยเดียวกันต่อแถวตั้งแต่เจ็ดโมง ในกระเป๋ามีใบนัดหมอ ข้อความจากหลานว่าสงกรานต์จะกลับบ้าน กับกระบอกไม้ไผ่ที่ยังหยอดไม่เต็ม"
+    choices:
+      - id: medicine
+        text: "ซื้อยาก่อน ที่เหลือค่อยว่ากัน"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: grandkid_gift
+        text: "กันไว้ซื้อของฝากหลาน"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: fill_bamboo
+        text: "หยอดกระบอกไม้ไผ่ให้เต็ม"
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: treat_queue
+        text: "เลี้ยงก๋วยเตี๋ยวคนทั้งแถว"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนในแถวช่วยกันออกคนละนิด กลายเป็นนัดกินก๋วยเตี๋ยวทุกต้นเดือนที่ไม่มีใครยอมขาด", effects: {happiness: 1, relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แถวยาวกว่าที่นับไว้ เงินหายไปเกือบครึ่งเดือน แต่ร้านก๋วยเตี๋ยวจำหน้าได้ไปทั้งปี", effects: {happiness: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

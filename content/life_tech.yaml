@@ -1,0 +1,522 @@
+# การ์ดชีวิตผู้ใหญ่ชุด tech (ใบ 241 จากร่าง 240)
+# แถวที่ไม่ใช้: 2 ซ้ำ old_family สายจากเจ้าหน้าที่ · 4 ไลฟ์ขายของซ้ำหลายใบ · 10 ตู้โทรศัพท์ซ้ำ cadet · 11 12 เพจเจอร์ซ้ำ meme_pager_01
+# ของยุคเก่า (ร้านเน็ต โทรศัพท์บ้าน โปรแกรมแชตบนคอม) ลงวัยที่ใช้ของนั้นจริง แต่ years ยังเต็มช่วงตามใบงาน — ใบเหล่านี้ออกในปีอนาคตได้
+# รอบแก้ตามข้อค้าน: voice_clone ย้ายกลางคน+เสียงเพื่อน (เลี่ยง old_phone_scam_01) · lotus พลิกเป็นเช้าที่ภาพไม่มา (ตรง quote แถว 0 · เลี่ยง social_goodmorning_01)
+# allowance ตัดส่งต่อ ใส่กดลิงก์ · net_cafe เปลี่ยนเป็นคืนพิมพ์รายงาน (เลี่ยง teen_gaming_01) · free_review ไม่ผูกชนิดร้าน · ปรับผลตัวเลือกที่ชนะ/แพ้ทุกกรณี
+events:
+  - id: tech_sms_parcel_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2562, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "พัสดุตกค้าง กรุณาชำระ"
+    text: "สั่งพัดลมตัวใหม่ไว้สามวันยังไม่มาส่ง ตอนเที่ยงข้อความเด้งเข้ามือถือ แจ้งว่าพัสดุของคุณตกค้างเพราะที่อยู่ไม่ครบ ให้กดลิงก์ยืนยันพร้อมจ่ายค่าส่งเพิ่มสิบเก้าบาท ชื่อผู้ส่งดูเหมือนบริษัทขนส่งจริงทุกตัวอักษร"
+    choices:
+      - id: tap_pay
+        text: "กดลิงก์ จ่ายสิบเก้าบาทให้จบ"
+        outcomes:
+          - {weight: 1, text: "หน้าเว็บขอเลขบัตรครบทุกหลัก กรอกเสร็จไม่ถึงชั่วโมง ยอดในบัญชีหายไปก้อนหนึ่ง", effects: {happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กรอกถึงหน้าขอรหัสแล้วสะดุดใจ ปิดจอทัน แต่ต้องโทรอายัดบัตรทั้งบ่าย", effects: {happiness: -1, knowledge: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: check_order
+        text: "เปิดเลขพัสดุในร้านที่สั่งเอง"
+        effects: {knowledge: 1}
+        sets_flags: [scam_aware]
+        merit: [{cat: neutral}]
+      - id: wait_rider
+        text: "ไม่กดอะไร รอคนส่งโทรมาเอง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: reply_elephant
+        text: "ตอบกลับว่าพัสดุคือช้างหนึ่งเชือก"
+        outcomes:
+          - {weight: 1, ok: true, text: "อีกฝั่งเงียบหาย คุณแคปจอส่งเข้ากลุ่มเพื่อน ฮากันทั้งออฟฟิศ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เบอร์นั้นรู้แล้วว่าเบอร์คุณยังใช้อยู่ อาทิตย์นั้นข้อความแจ้งรางวัลเด้งมาวันละสามรอบ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_cheap_coat_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2558, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "เสื้อกันหนาวตัวละร้อย"
+    text: "เลื่อนฟีดก่อนนอนเจอร้านขายเสื้อกันหนาวลดเก้าสิบเปอร์เซ็นต์ รีวิวห้าดาวเรียงยาว ทุกรีวิวเขียนว่าของดีมากค่ะเหมือนกันหมด แม่ค้าทักมาเองว่าเหลือสามตัวสุดท้าย โอนก่อนได้ราคานี้ เก็บเงินปลายทางไม่ได้"
+    choices:
+      - id: transfer
+        text: "โอนเลย ของดีไม่รอใคร"
+        outcomes:
+          - {weight: 1, text: "สามอาทิตย์ต่อมาได้กล่องเปล่ากับผ้าเช็ดหน้าหนึ่งผืน หน้าร้านปิดไปแล้ว", effects: {happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ของมาจริง ตัวเล็กกว่าในรูปครึ่งหนึ่ง ใส่ได้แต่ยกแขนไม่ขึ้น", effects: {money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: cod_only
+        text: "ขอเก็บเงินปลายทางเท่านั้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "แม่ค้าไม่ตอบอีกเลย แล้วบล็อกคุณภายในห้านาที คุณรู้คำตอบโดยไม่ต้องจ่ายสักบาท", effects: {happiness: -1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "แม่ค้ายอม ของมาส่งถึงบ้านจริง แต่เป็นคนละรุ่นกับในรูป บางจนลมพัดทะลุ", effects: {money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: search_name
+        text: "เอาชื่อบัญชีไปค้นในเน็ตก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ค้นจนเลยเที่ยงคืน เจอชื่อบัญชีเดียวกันอยู่ในกลุ่มคนโดนโกงสิบกว่าโพสต์", effects: {knowledge: 1, health: -1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ค้นทั้งคืนไม่เจออะไรเลย ตื่นมาเสื้อสามตัวสุดท้ายถูกขายหมดแล้ว", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: haggle_hat
+        text: "ต่อเหลือห้าสิบ ขอแถมหมวกด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "แม่ค้ายอมทันทีแถมถุงเท้าอีกคู่ ยิ่งง่ายยิ่งแปลก คุณเลยไม่โอน เก็บแชตไว้อ่านขำ", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แม่ค้ายอมจริง คุณใจอ่อนโอนห้าสิบ ได้รูปหมวกส่งกลับมาหนึ่งรูป ไม่มีหมวก", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_post_viral_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2552, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "โพสต์ระบายที่ไปไกลเกินบ้าน"
+    text: "เมื่อคืนคุณโพสต์เล่าว่าลูกค้าเรียกแก้งานตอนตีหนึ่ง ตั้งใจให้เพื่อนสิบกว่าคนอ่าน เช้านี้ยอดแชร์เกินสองหมื่น คนแปลกหน้าเข้ามาเถียงกันว่าคุณผิดหรือลูกค้าผิด บางคนเริ่มเดาชื่อบริษัทถูก"
+    choices:
+      - id: delete_post
+        text: "ลบโพสต์ทิ้งทันที"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: explain_long
+        text: "เขียนชี้แจงยาวสามหน้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนส่วนใหญ่เข้าใจ มีบริษัทอื่นทักมาชวนคุยงาน", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชี้แจงแล้วคนย้ายไปเถียงกันในโพสต์ใหม่ต่ออีกสามวัน", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mute_all
+        text: "ปิดแจ้งเตือน ไปทำงานตามปกติ"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: fried_rice
+        text: "โพสต์รูปข้าวผัดตัวเองกลบกระแส"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนเลิกเถียงเรื่องงานแล้วแห่มาติว่าไข่ดาวไหม้ ยอดคอมเมนต์แซงโพสต์แรก", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มีคนแคปรูปข้าวผัดไปต่อท้ายว่าหนีประเด็น เรื่องยาวขึ้นอีกวัน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_group_dig_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2558, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "ขุดโพสต์เก่าในกลุ่มแผนก"
+    text: "เพื่อนร่วมแผนกส่งอีเมลผิดคนไปหนึ่งฉบับ ไม่ได้เสียหายอะไรมาก แต่ในแชตกลุ่มเล็กที่ไม่มีเขา มีคนเริ่มแคปโพสต์เก่าของเขาเมื่อห้าปีก่อนมาแปะ ตามด้วยสติกเกอร์หัวเราะ ทุกคนรอดูว่าคุณจะส่งอะไรตาม"
+    choices:
+      - id: laugh_along
+        text: "ส่งสติกเกอร์หัวเราะตามน้ำ"
+        outcomes:
+          - {weight: 2, text: "ขำกันได้สองวัน กลุ่มก็หาคนใหม่มาขุดต่อ คุณเริ่มสงสัยว่ามีกลุ่มที่ไม่มีคุณอยู่ไหม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ภาพแคปหลุดไปถึงเจ้าตัว ชื่อคุณอยู่ในภาพนั้นด้วย", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: say_enough
+        text: "พิมพ์ว่าพอเถอะ เรื่องแค่นี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "กลุ่มเงียบไปครู่หนึ่ง แล้วเปลี่ยนไปคุยเรื่องข้าวเที่ยง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มีคนตอบว่าคนดีมาแล้ว คืนนั้นคุณถูกเชิญออกจากกลุ่ม", effects: {network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: read_quiet
+        text: "อ่านแล้วเงียบ ไม่ส่งอะไร"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: tell_him
+        text: "ทักไปเตือนเจ้าตัวตรง ๆ"
+        effects: {relations: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: drum_cat
+        text: "ส่งคลิปแมวตีกลองตัดบทกลางวง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งกลุ่มหันมาหาคลิปแมวมาแข่งกันจนเลิกงาน เรื่องอีเมลจมหายไปใต้คลิปที่สี่สิบ", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีใครเปิดคลิป แมวตีกลองถูกเลื่อนหายไปใต้ภาพแคปอีกยี่สิบภาพ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_free_review_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2558, 2650]
+    weight: 0.5
+    when: {age: [46, 59], flags: {has: [own_business]}}
+    title: "ขอลองก่อน แล้วจะรีวิวให้"
+    text: "ร้านของคุณเพิ่งติดป้ายหน้าร้านได้สามเดือน ชายถือไม้กันสั่นเดินเข้ามา บอกว่ามีคนติดตามเป็นแสน ขอของในร้านไปลองฟรีหนึ่งชุดแล้วจะรีวิวให้ ถ้าไม่สะดวกเขาก็จะเขียนตามจริง"
+    choices:
+      - id: treat_free
+        text: "ให้ฟรี เผื่อคนแห่มาจริง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คลิปขึ้นจริง ยอดวิวไม่ถึงพัน แต่ป้าข้างร้านเห็นแล้วพาเพื่อนมาอุดหนุนสามคน", effects: {happiness: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สองอาทิตย์ไม่มีคลิป ไม้กันสั่นอันเดิมไปโผล่ที่ร้านฝั่งตรงข้าม", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: half_price
+        text: "ลดครึ่งราคา แลกกับรีวิว"
+        effects: {network: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: no_free
+        text: "บอกว่าร้านนี้ไม่มีของฟรี"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาจ่ายครบแล้วเงียบหายไป ไม่มีรีวิวไหนตามมา", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คืนนั้นร้านได้หนึ่งดาว พร้อมรูปหน้าร้านที่ถ่ายจากมุมมืดที่สุด", effects: {happiness: -2, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: follower_discount
+        text: "ลดให้ตามยอดคนติดตาม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เปิดมาเจอคนติดตามสี่สิบสามคน คุณลดให้สี่สิบสามสตางค์ เขาหัวเราะแล้วจ่ายเต็มราคา", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยอดเป็นแสนจริง เขาถ่ายคลิปคุณนั่งกดเครื่องคิดเลข คนดูชอบแต่ร้านโดนแซวเรื่องงกไปทั้งเดือน", effects: {network: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_phone_line_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2515, 2540]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "ใบจองเบอร์โทรศัพท์บ้าน"
+    text: "ใบจองหมายเลขโทรศัพท์บ้านแปะข้างปฏิทินมาสามปี ทุกครั้งที่จะคุยกับใครต้องไปยืมเครื่องที่ร้านโชห่วยหัวซอย วันนี้มีชายแปลกหน้ามาเคาะประตู บอกว่ามีเส้นที่ชุมสาย จ่ายเพิ่มหน่อยได้สายภายในเดือนนี้"
+    choices:
+      - id: pay_broker
+        text: "จ่ายเลย เบื่อยืมเครื่องคนอื่น"
+        outcomes:
+          - {weight: 1, ok: true, text: "อาทิตย์ถัดมาช่างมาปีนเสาเดินสายจริง เสียงกริ่งแรกทั้งบ้านวิ่งไปแย่งกันรับ", effects: {happiness: 2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "จ่ายแล้วชายคนนั้นไม่กลับมาอีก ใบจองยังแปะอยู่ที่เดิม", effects: {happiness: -2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_turn
+        text: "รอคิวตามระบบ ยืมเครื่องร้านต่อ"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: ask_office
+        text: "ไปถามที่สำนักงานเองก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหน้าที่บอกว่าคิวยังอีกสองปี และไม่มีใครชื่อนั้นทำงานที่นี่", effects: {knowledge: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลางานไปทั้งวัน ต่อแถวสามช่อง แต่ไม่มีใครตอบได้", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: share_line
+        text: "ขอพ่วงสายจากบ้านข้าง ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "บ้านข้าง ๆ ยอม ทุกครั้งที่กริ่งดังสองบ้านวิ่งมาพร้อมกัน จนสนิทกันไปเอง", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บิลเดือนแรกของบ้านข้าง ๆ ขึ้นสามเท่า เจ้าของบ้านเดินมาถามด้วยสีหน้าเรียบ ๆ", effects: {relations: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: camp_exchange
+        text: "นั่งเฝ้าหน้าชุมสายจนช่างเห็นใจ"
+        outcomes:
+          - {weight: 1, ok: true, text: "วันที่สามช่างเลี้ยงกาแฟ แล้วเปิดสมุดให้ดูว่าคิวคุณอยู่อาทิตย์หน้าพอดี", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นั่งเฝ้าห้าวันจนยามจำหน้าได้ คิวยังอยู่ที่เดิม หลังขดไปทั้งอาทิตย์", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_phone_bill_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2538, 2556]
+    weight: 0.5
+    when: {age: [38, 45], family: [{role: child, alive: true, age: [13, 18]}]}
+    title: "บิลโทรศัพท์เดือนนี้"
+    text: "บิลโทรศัพท์บ้านเดือนนี้ยาวสองหน้า เบอร์เดิมเบอร์เดียวเรียงลงมาทุกคืนสี่ทุ่มถึงเที่ยงคืน ลูกบอกว่าคุยการบ้านกับเพื่อน แต่เมื่อคืนคุณเดินผ่าน ได้ยินแต่เสียงหัวเราะกับคำว่า วางก่อนสิ"
+    choices:
+      - id: ten_minutes
+        text: "ตั้งกติกาโทรได้คืนละสิบนาที"
+        effects: {relations: -1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: just_pay
+        text: "จ่ายไป อีกไม่กี่ปีก็โตแล้ว"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: own_phone
+        text: "ซื้อมือถือเติมเงินให้แยกไปเลย"
+        effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: pick_up
+        text: "ยกหูเครื่องในห้องนอนร่วมวงคุย"
+        outcomes:
+          - {weight: 1, ok: true, text: "อีกฝั่งทักสวัสดีอย่างสุภาพ คุยกันสามคนจนรู้ว่าการบ้านมีจริง แค่ทำกันช้ามาก", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งสายเงียบกริบ คืนนั้นไม่มีใครในบ้านพูดกับคุณ แต่บิลเดือนหน้าเหลือครึ่ง", effects: {relations: -2, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_morning_lotus_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2556, 2650]
+    weight: 0.5
+    when: {age: [31, 45], family: [{role: parent, sex: หญิง, alive: true}]}
+    title: "เช้านี้ไม่มีดอกบัว"
+    text: "ทุกเช้าหกโมงตรง แม่ส่งภาพดอกบัวกับคำว่าสวัสดีเข้ากลุ่มครอบครัว ไม่เคยขาดสักวันมาสามปี เช้านี้เจ็ดโมงแล้วกลุ่มยังเงียบ ข้อความล่าสุดยังเป็นภาพของเมื่อวาน คุณเพิ่งรู้ตัวว่าภาพนั้นคือวิธีบอกว่าสบายดี"
+    choices:
+      - id: call_now
+        text: "โทรหาทันที"
+        outcomes:
+          - {weight: 1, ok: true, text: "แม่รับสายเสียงงัวเงีย มือถือแบตหมดทั้งคืนเพราะลืมเสียบสาย คุยกันต่ออีกสิบนาที", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สายไม่ว่างสามรอบ ใจคุณหล่นไปถึงตาตุ่ม ห้านาทีต่อมาแม่โทรกลับ บอกว่าคุยกับป้าอยู่", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_aunt
+        text: "ทักถามน้าในกลุ่ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้าส่งรูปแม่ยืนเลือกผักที่ตลาดเช้ามาให้ มือถือลืมไว้บ้าน", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งกลุ่มแตกตื่นโทรหาแม่พร้อมกันห้าสาย แม่บ่นเรื่องนี้ไปทั้งอาทิตย์", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_noon
+        text: "รอถึงเที่ยงก่อนค่อยถาม"
+        outcomes:
+          - {weight: 1, ok: true, text: "สิบโมงภาพดอกบัวมาพร้อมคำว่าไปทำบุญแต่เช้า คุณถอนหายใจยาวกลางห้องประชุม", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งเช้าทำงานไม่เข้าหัว เปิดดูกลุ่มทุกห้านาทีจนหัวหน้าถามว่ารอข่าวอะไร", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: flower_first
+        text: "ส่งภาพดอกไม้ไปทักก่อนเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ภาพดอกบัวสามภาพเด้งกลับทันที ตามด้วยคำว่า วันนี้ตื่นสาย ขอบใจที่ทักนะ", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ภาพของคุณขึ้นว่ายังไม่อ่านจนเที่ยง บ่ายแม่ตอบมาว่ามือถือตกน้ำ ยืมเครื่องป้าพิมพ์มา", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_allowance_rumor_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2558, 2650]
+    weight: 0.5
+    when: {age: [60, 85]}
+    title: "เบี้ยผู้สูงอายุจะขึ้นสามเท่า"
+    text: "กลุ่มแชตคนในซอยเด้งตั้งแต่เช้า ข้อความตัวแดงบอกว่าเบี้ยผู้สูงอายุจะเพิ่มเป็นสามเท่าเดือนหน้า ใครยังไม่ลงชื่อให้กดลิงก์ภายในวันนี้ ป้าห้องข้าง ๆ ลงไปแล้ว กำลังเล็งตู้เย็นใหม่"
+    choices:
+      - id: click_link
+        text: "กดลิงก์ลงชื่อไว้ก่อน"
+        outcomes:
+          - {weight: 1, text: "หน้าเว็บขอเลขบัตรประชาชนกับรหัสบัญชี กรอกครบไม่ถึงชั่วโมง เงินเก็บหายไปก้อนหนึ่ง", effects: {happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "พอหน้าเว็บขอรหัสบัญชีก็สะดุดใจ ปิดทิ้งทัน แล้วโทรถามธนาคารจนแน่ใจ", effects: {knowledge: 1, happiness: -1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_grandkid
+        text: "ถามหลานที่ใช้มือถือคล่อง"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: ask_office
+        text: "ไปถามเจ้าหน้าที่ที่สำนักงานเอง"
+        effects: {knowledge: 2, health: -1}
+        sets_flags: [scam_aware]
+        merit: [{cat: neutral}]
+      - id: wait_check
+        text: "ตอบในกลุ่มว่ารอเช็กก่อนนะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตอนบ่ายหน่วยงานประกาศว่าข่าวนี้ไม่จริง คนในซอยยกให้เป็นคนรอบคอบประจำกลุ่ม", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าห้องข้าง ๆ ตอบว่าอิจฉาเหรอ แล้วไม่ทักคุณไปหลายวัน", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: see_fridge
+        text: "ไปดูตู้เย็นกับป้าก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เดินดูตู้เย็นกันทั้งบ่ายแต่ไม่ซื้อ ขากลับเห็นป้ายประกาศว่าข่าวนั้นไม่จริง", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าวางมัดจำตู้เย็นไปแล้ว คุณต้องช่วยพูดกับร้านขอเงินคืนอีกสองวัน", effects: {relations: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_voice_clone_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2566, 2650]
+    weight: 0.5
+    when: {age: [46, 59]}
+    title: "เสียงเพื่อนเก่าที่เร่งเกินไป"
+    text: "เบอร์แปลกโทรเข้าตอนสองทุ่ม เสียงปลายสายเหมือนเพื่อนสนิทสมัยเรียนทุกจังหวะ จนถึงเสียงหัวเราะติดคอ บอกว่าขับรถเฉี่ยวคน ต้องโอนห้าหมื่นภายในครึ่งชั่วโมง ห้ามบอกใคร ไม่งั้นเรื่องจะใหญ่"
+    choices:
+      - id: run_atm
+        text: "รีบไปตู้เอทีเอ็มตอนนี้เลย"
+        outcomes:
+          - {weight: 2, text: "เงินออกจากบัญชีไปแล้ว เช้ามาเพื่อนตัวจริงโทรมาชวนกินข้าวด้วยเสียงสดใส", effects: {happiness: -2, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "พนักงานร้านข้างตู้เห็นมือสั่น ถามเรื่องราว แล้วชวนโทรหาเพื่อนเบอร์เดิมก่อนกดโอน", effects: {happiness: -1, knowledge: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: call_back
+        text: "วางสาย โทรเบอร์เพื่อนที่มีอยู่"
+        effects: {knowledge: 1, relations: 1}
+        sets_flags: [scam_aware]
+        merit: [{cat: neutral}]
+      - id: secret_question
+        text: "ถามชื่อเล่นครูประจำชั้นสมัยนั้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "ปลายสายเงียบไปสามวินาทีแล้ววางเอง คุณยิ้มไปจนถึงเช้า", effects: {happiness: 2, knowledge: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปลายสายตอบมั่ว ๆ แล้ววางไป แต่คุณใจเต้นจนนอนไม่หลับทั้งคืน", effects: {health: -1, knowledge: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sing_school
+        text: "ให้ร้องเพลงโรงเรียนให้ฟังก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ปลายสายอ้ำอึ้ง ร้องได้ครึ่งท่อนผิดคีย์แล้ววางหนี คุณร้องต่อจนจบเพลงคนเดียว", effects: {happiness: 2}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปลายสายร้องตามได้เกือบทั้งท่อน คุณเริ่มลังเล ต้องไล่โทรหาเพื่อนร่วมรุ่นจนดึก", effects: {health: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_new_phone_01
+    type: A
+    category: study
+    stage: ชรา
+    years: [2556, 2650]
+    weight: 0.5
+    when: {age: [60, 85]}
+    title: "รูปต้นพริกต้องถึงกลุ่ม"
+    text: "ได้มือถือจอใหญ่มาเครื่องแรก ตัวหนังสือปรับใหญ่จนหนึ่งจอมีสามคำ วันนี้อยากส่งรูปต้นพริกที่ออกดอกเข้ากลุ่มเพื่อนชมรม กดมาสิบนาทีได้รูปพื้นห้องไปสองรูป กับรูปนิ้วโป้งอีกหนึ่ง"
+    choices:
+      - id: wait_grandkid
+        text: "รอหลานกลับมาสอนตอนเย็น"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: try_alone
+        text: "นั่งกดเองจนกว่าจะได้"
+        outcomes:
+          - {weight: 1, ok: true, text: "รูปต้นพริกขึ้นในกลุ่มตอนสามทุ่ม มีคนกดหัวใจเจ็ดคน", effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รูปนิ้วโป้งเข้ากลุ่มไปห้ารูป เพื่อนชมรมโทรมาถามว่าเป็นอะไรหรือเปล่า", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: calls_only
+        text: "ใช้รับสายอย่างเดียวก็พอ"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: club_class
+        text: "ลงเรียนคลาสมือถือที่ชมรม"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: voice_tour
+        text: "อัดเสียงบรรยายต้นพริกแทนรูป"
+        outcomes:
+          - {weight: 1, ok: true, text: "อัดยาวสามนาทีเล่าดอกพริกทีละดอก เพื่อนชมรมฟังจบแล้วอัดเสียงกลับมาเล่าเรื่องต้นมะนาวของตัวเอง", effects: {relations: 1, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งสามนาทีได้ยินแต่เสียงลมกับเสียงไก่ข้างบ้าน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_net_cafe_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2540, 2555]
+    weight: 0.5
+    when: {age: [13, 18]}
+    title: "รายงานส่งพรุ่งนี้เช้า"
+    text: "สองทุ่มคืนก่อนส่งรายงาน ร้านเน็ตหน้าโรงเรียนมีคิวรอเครื่องพิมพ์สิบคน แผ่นที่เก็บไฟล์มาเปิดแล้วขึ้นว่าอ่านไม่ได้ เพื่อนที่มาด้วยกันนั่งเล่นเกมอยู่เครื่องข้าง ๆ ร้านปิดสี่ทุ่ม ในกระเป๋าเหลือยี่สิบบาท"
+    choices:
+      - id: retype
+        text: "พิมพ์ใหม่ทั้งเล่มตอนนี้เลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "พิมพ์เสร็จสี่ทุ่มขาดห้านาที ทันเครื่องพิมพ์คิวสุดท้ายพอดี", effects: {knowledge: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พิมพ์ได้ครึ่งเล่มร้านก็ปิดไฟไล่ ครึ่งหลังต้องเขียนมือจนตีหนึ่ง", effects: {knowledge: 1, health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: handwrite
+        text: "กลับบ้านไปเขียนด้วยมือ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครูชมว่าลายมือตั้งใจ ให้คะแนนเต็มส่วนความเรียบร้อย", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูหักคะแนนเพราะสั่งให้พิมพ์ แต่เนื้อหาคุณจำได้ขึ้นใจ", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_friend
+        text: "ขอเพื่อนวางเกมมาช่วยพิมพ์"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนบ่นสองคำแล้วพิมพ์ให้คนละครึ่ง เสร็จเร็วกว่าที่คิด แลกกับน้ำแดงหนึ่งแก้ว", effects: {relations: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนพิมพ์ไปดูจอเกมไป ส่วนของเขามีคำผิดเต็มหน้า ครูวงแดงทั้งแผ่น", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: snack_owner
+        text: "จ้างพี่ร้านด้วยขนมถุงหนึ่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่ร้านกินขนมไปกู้ไฟล์ไป แผ่นเปิดได้ในสามนาที พิมพ์ออกมาสวยกว่าที่คุณทำเอง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่ร้านรับขนมแล้วชี้ไปท้ายคิว บอกว่าขนมแซงคิวไม่ได้ ถุงนั้นหมดก่อนถึงคิวคุณ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_night_status_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2543, 2555]
+    weight: 0.5
+    when: {age: [19, 25]}
+    title: "สถานะเศร้าตอนตีหนึ่ง"
+    text: "ตีหนึ่งคุณเปลี่ยนสถานะในโปรแกรมแชตบนคอมเป็นเนื้อเพลงอกหัก ไม่ได้อกหักจริง แค่เพลงเข้ากับฝนข้างนอก หน้าต่างแชตเด้งขึ้นมุมจอ คนที่คุณแอบชอบพิมพ์มาว่า เป็นอะไรหรือเปล่า แล้วขึ้นว่ากำลังพิมพ์"
+    choices:
+      - id: tell_truth
+        text: "บอกตรง ๆ ว่าแค่ชอบเพลงนี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุยเรื่องเพลงกันจนตีสาม ได้รายชื่อเพลงใหม่สิบเพลงกับนัดกินข้าวจริงหนึ่งนัด", effects: {happiness: 2, relations: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อีกฝ่ายตอบว่าอ๋อ แล้วออฟไลน์ คุณนั่งจ้องจออยู่พักหนึ่งก่อนไปนอน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: play_sad
+        text: "ตอบเศร้า ๆ ให้เขาเป็นห่วงต่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาปลอบยาวสองชั่วโมง คุณได้ใจเขาไปนิด แต่เริ่มรู้สึกผิดตั้งแต่ชั่วโมงแรก", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนอีกสามคนเห็นสถานะแล้วทักมาพร้อมกัน เรื่องไม่มีอะไรกลายเป็นข่าวทั้งรุ่น", effects: {network: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: fake_offline
+        text: "แกล้งออฟไลน์ไปนอน"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: country_song
+        text: "เปลี่ยนสถานะเป็นเพลงลูกทุ่งทันที"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาพิมพ์ฮ่ายาวเต็มบรรทัด แล้วส่งเพลงลูกทุ่งกลับมาอีกเพลง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาคิดว่าคุณล้อเลียนที่เขาเป็นห่วง พิมพ์ว่าโอเค แล้วเงียบไปหลายวัน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_chat_meetup_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2540, 2555]
+    weight: 0.5
+    when: {age: [19, 30]}
+    title: "นัดเจอคนจากห้องแชต"
+    text: "คุยกับคนในห้องแชตมาสามเดือน รู้ว่าชอบหมูปิ้งกับเพลงเดียวกัน แต่ไม่เคยเห็นหน้า รูปโปรไฟล์เป็นรูปทะเลมาตลอด วาเลนไทน์ปีนี้เขาชวนเจอที่ห้างกลางเมือง ทุ่มตรงหน้าร้านไอศกรีม ใส่เสื้อลายสก็อต"
+    choices:
+      - id: friends_nearby
+        text: "ไปด้วย ให้เพื่อนนั่งโต๊ะข้าง ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขามาจริง ใส่เสื้อลายสก็อตถือกุหลาบหนึ่งดอก เพื่อนโต๊ะข้าง ๆ แอบชูนิ้วโป้งให้", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รอสองชั่วโมงไม่มีใครมา เพื่อนเลี้ยงไอศกรีมปลอบ ห้องแชตนั้นเงียบไปตลอด", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาเห็นเพื่อนโต๊ะข้าง ๆ แอบถ่ายรูป เลยขอตัวกลับก่อนไอศกรีมจะละลาย", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: go_alone
+        text: "ไปคนเดียว ไม่บอกใคร"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุยกันสองคนถูกคอกว่าในแชต เดินหาหมูปิ้งเจ้าประจำของเขาจนห้างปิด", effects: {happiness: 3, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนที่มาไม่ตรงกับที่เล่าไว้สักอย่าง เขาชวนไปที่อื่นต่อ คุณขอตัวขึ้นแท็กซี่กลับ", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: see_face_first
+        text: "ขอโทรเห็นหน้ากันก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หน้าตรงกับเสียง คุยกันสบายใจขึ้น แล้วเลื่อนนัดเป็นวันเสาร์กลางวัน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาอ้างว่ากล้องเสียทุกครั้ง สุดท้ายคุณเลิกนัดเอง", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: chat_only
+        text: "ไม่ไป ขอคุยในแชตต่อ"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: plaid_spy
+        text: "ใส่ลายสก็อตไปยืนแอบดูก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เห็นเขาก่อนแล้วเดินเข้าไปทัก ลายสก็อตสองตัวยืนคู่กันเหมือนนัดมาเป็นทีม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หน้าร้านมีคนใส่ลายสก็อตยืนอยู่หกคน รวมคุณด้วย ไม่มีใครกล้าทักใคร", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tech_night_raid_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2545, 2650]
+    weight: 0.5
+    when: {age: [22, 30]}
+    title: "นัดตีบอสตีสอง"
+    text: "ทีมในเกมออนไลน์นัดตีบอสใหญ่ตอนตีสอง บอสเกิดเดือนละครั้ง ขาดตัวรักษาไม่ได้ และตัวรักษามีคุณคนเดียว พรุ่งนี้แปดโมงมีประชุมกับหัวหน้า ในแชตทีมมีเลขนับถอยหลังเด้งขึ้นทุกห้านาที"
+    choices:
+      - id: stay_raid
+        text: "อยู่ตีบอสจนจบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "บอสล้มตอนตีสามครึ่ง ได้ของหายากชิ้นแรก เข้าประชุมตาแดงแต่ยิ้มได้ทั้งชั่วโมง", effects: {happiness: 2, network: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บอสไม่ล้ม ทีมลองซ้ำจนฟ้าสาง คุณสัปหงกตอนหัวหน้าเอ่ยชื่อคุณกลางห้องประชุม", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sleep_now
+        text: "บอกทีมว่าขอนอน"
+        effects: {health: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: find_sub
+        text: "หาตัวรักษาสำรองให้ทีมก่อนนอน"
+        effects: {network: 1, health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: sleep_in_game
+        text: "เปิดเกมทิ้งไว้ แล้วนอนกอดเมาส์"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตื่นมาเจอบอสล้ม ตัวคุณยืนนิ่งมุมห้องแต่รอดเลยได้ของด้วย คอเคล็ดเพราะนอนท่าเดียวทั้งคืน", effects: {happiness: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตัวรักษายืนนิ่งทั้งรอบ ทีมแพ้ยกชุด ตื่นมาเจอข้อความยี่สิบหน้า กับชื่อคุณที่ถูกเชิญออกจากทีม", effects: {network: -2, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
