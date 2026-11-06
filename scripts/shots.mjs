@@ -133,6 +133,94 @@ async function playLife(w, t) {
   await ctx.close();
   return { got, errors };
 }
+// พื้นหลังแรกเกิด (ui-redo 61 · ข้อ 80 88): การ์ดเปิดชีวิตที่ 360/390/1280 — ภาพเป็นของตกแต่ง (aria-hidden + data-scene) ·
+// contrast ข้อความในเนื้อการ์ด ≥ 4.5 · ปุ่มไปต่ออยู่จอแรกที่ 390 (เหนือเมนูล่าง)
+// contrast แย่สุด = ตัวหนังสือทับเส้นภาพเต็มความเข้ม (สีเส้น × ความจาง ทับพื้นการ์ด) แบบหน้า tweak ใบ 58 · ข้อความที่ไม่ทับกรอบภาพวัดกับพื้นอย่างเดียว
+// ตัวควบคุมในหน้าเดียวกัน: ภาพเข้ม 0.5 ต้องตก contrast · ปุ่มไม่ติดจอ + เนื้อยาว ต้องตกจอแรก — ตัววัดที่ผ่านทุกอย่างจับอะไรไม่ได้
+const BIRTH_VIEW = { 360: 780, 390: 844, 1280: 800 };
+const birthMeasure = () => {
+  const rgb = (s) => (s.match(/[\d.]+/g) || []).map(Number);
+  const lum = ([r, g, b]) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  const mix = (top, under, a) => top.map((x, i) => x * a + under[i] * (1 - a));
+  const opaque = (e) => {
+    for (; e; e = e.parentElement) {
+      const c = rgb(getComputedStyle(e).backgroundColor);
+      if (c.length >= 3 && (c.length < 4 || c[3] >= 1)) return c.slice(0, 3);
+    }
+    return [255, 255, 255];
+  };
+  const hit = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+  const card = document.querySelector('#app > .card');
+  const layer = card?.querySelector('.body > .b-bg');
+  const pic = layer?.querySelector('svg[data-scene]');
+  const box = pic?.getBoundingClientRect();
+  const tint = pic && rgb(getComputedStyle(pic.querySelector('path')).stroke);
+  const op = pic ? Number(getComputedStyle(pic).opacity) : 0;
+  let cr = 99, worst = '';
+  for (const e of card?.querySelectorAll('.body h3, .body p, .body .kicker, .body .stamp, .body li, .body a, .choices .choice span') ?? []) {
+    if (!e.textContent.trim() || !e.getClientRects().length) continue;
+    const bg = opaque(e);
+    const under = pic && [...e.getClientRects()].some((r) => hit(r, box)) ? mix(tint, bg, op) : bg;
+    const c = ratio(rgb(getComputedStyle(e).color), under);
+    if (c < cr) { cr = c; worst = e.tagName.toLowerCase() + (e.className ? `.${e.className}` : ''); }
+  }
+  const btn = card?.querySelector('.choices .choice');
+  const nav = document.querySelector('.mnav')?.getBoundingClientRect();
+  const fold = nav && nav.top > innerHeight / 2 ? nav.top : innerHeight;
+  return {
+    kicker: card?.querySelector('.kicker')?.textContent ?? '',
+    scene: pic?.dataset.scene ?? '',
+    hidden: layer?.getAttribute('aria-hidden') === 'true',
+    small: !!card?.querySelector('.scene-sm'),
+    warn: !!document.querySelector('.warn-line'),
+    cr, worst, op,
+    btn: btn ? Math.round(btn.getBoundingClientRect().bottom) : 1e9,
+    fold: Math.round(fold),
+    over: document.documentElement.scrollWidth - innerWidth,
+  };
+};
+async function birthCard(w) {
+  const ctx = await browser.newContext({ viewport: { width: w, height: BIRTH_VIEW[w] }, reducedMotion: 'reduce' });
+  const page = await ctx.newPage();
+  const errors = [];
+  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.clock.install({ time: T0 });
+  await page.clock.pauseAt(T0 + 1000);
+  await page.addInitScript(freeze, { seed: 7, clock: true, gate });
+  await page.goto(pageUrl('play.html'));
+  await page.clock.runFor(2000);
+  if (await page.locator('.sheet').count()) {
+    await page.keyboard.press('Escape');
+    await page.clock.runFor(1000);
+  }
+  const m = await page.evaluate(birthMeasure);
+  await page.addStyleTag({ content: '.b-bg svg { opacity:0.5 !important; }' });
+  const dark = await page.evaluate(birthMeasure);
+  await page.addStyleTag({ content: '.b-bg svg { opacity:0.1 !important; } .choices.pin { position:static !important; } .body.has-bg { padding-bottom:1200px !important; }' });
+  const low = await page.evaluate(birthMeasure);
+  await ctx.close();
+  return { m, dark, low, errors };
+}
+for (const w of Object.keys(BIRTH_VIEW).map(Number)) {
+  const { m, dark, low, errors } = await birthCard(w);
+  const bad = [
+    m.kicker !== 'เปิดชีวิต' && `ไม่ถึงการ์ดเปิดชีวิต (${m.kicker || 'ไม่มีการ์ด'})`,
+    !m.scene && 'ไม่มีภาพพื้นหลัง data-scene',
+    m.scene && !m.hidden && 'ภาพพื้นหลังไม่ aria-hidden',
+    m.small && 'ยังมีภาพเล็กกลางบน',
+    m.warn && 'ยังมีบรรทัดคำเตือน',
+    m.cr < 4.5 && `contrast ${m.cr.toFixed(2)} (${m.worst})`,
+    w === 390 && m.btn > m.fold && `ปุ่มไปต่อตกจอ ${m.btn}/${m.fold}`,
+    m.over > 0 && `ล้น ${m.over}px`,
+    errors.length && `error ${errors.length} (${errors[0].slice(0, 120)})`,
+    dark.cr >= 4.5 && `ตัวควบคุมภาพเข้มไม่ตก (${dark.cr.toFixed(2)})`,
+    w === 390 && low.btn <= low.fold && `ตัวควบคุมปุ่มตกจอไม่ตก (${low.btn}/${low.fold})`,
+  ].filter(Boolean);
+  if (bad.length) fail++;
+  console.log(`play.html แรกเกิด @${w}: ภาพ ${m.scene || '-'} จาง ${m.op} · contrast ต่ำสุด ${m.cr.toFixed(2)} (${m.worst}) · ปุ่มไปต่อ ${m.btn}/${m.fold}${w === 390 ? '' : ' (ข้อมูล)'} · ตัวควบคุม เข้ม ${dark.cr.toFixed(2)} · ปุ่ม ${low.btn}/${low.fold}${bad.length ? ` → ตก: ${bad.join(' · ')}` : ''}`);
+}
 const write = !process.argv.includes('--check');
 const shotDir = new URL(UI_SHOTS_AT, docs);
 if (write) mkdirSync(shotDir, { recursive: true });
