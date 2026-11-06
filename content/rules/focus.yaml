@@ -28,8 +28,8 @@ nature_age: 12
 heir_nature: 0.5
 nature_mul: 1.1
 natures:
-  social: {name: เข้ากับคนง่าย, stat: relations, jobs: [service, manager]}
-  learn: {name: ใฝ่รู้, stat: knowledge, jobs: [professional, clerk, technician]}
+  social: {name: เข้ากับคนง่าย, stat: relations, jobs: [service, manager, senior_officer]}
+  learn: {name: ใฝ่รู้, stat: knowledge, jobs: [professional, clerk, technician, officer]}
   duty: {name: ขยันรับผิดชอบ, stat: money, cards: [work_money], jobs: [farmer, craft, labor, factory]}
   bold: {name: ใจกล้า, stat: health}
 tags: {}
