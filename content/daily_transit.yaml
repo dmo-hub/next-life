@@ -1,0 +1,519 @@
+# การ์ดชีวิตประจำวันไทยชุด transit (ใบ 239 จากร่าง 238)
+events:
+  - id: transit_ticket_tube_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [7, 12], year: [2500, 2562]}
+    title: "เสียงกระบอกท้ายรถ"
+    text: "รถเมล์คันนี้โคลงทุกหลุม กระเป๋ารถเมล์เดินสวนมาจากท้ายรถ เขย่ากระบอกเก็บตั๋วดังแกร๊กแกร๊กเป็นจังหวะ คุณกำเหรียญค่ารถจนมือชื้น ลื่นนิดเดียวมันจะกลิ้งไปอยู่ใต้เบาะคนแปลกหน้า"
+    choices:
+      - id: hold_tight
+        text: "กำไว้แน่น รอเขาเดินมาถึง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: show_early
+        text: "ชูเหรียญให้เห็นแต่ไกล"
+        outcomes:
+          - {weight: 2, ok: true, text: "กระเป๋าพยักหน้า ฉีกตั๋วยื่นให้ถึงที่ คุณเก็บตั๋วไว้ในสมุดการบ้าน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถเบรก เหรียญกระเด็น ผู้ใหญ่ครึ่งคันก้มหาให้ คุณอยากมุดตามเหรียญไปด้วย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_count
+        text: "ถามว่ากระบอกนี้เก็บตั๋วกี่ใบ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: shake_back
+        text: "เขย่ากล่องดินสอตอบเป็นจังหวะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "กระเป๋าหัวเราะ เขย่ากระบอกตอบสองที ทั้งรถได้ฟังวงดนตรีไปถึงตลาด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝากล่องเปิดกลางทาง ดินสอไหลไปถึงหน้ารถ คนขับส่งยางลบคืนตอนติดไฟแดง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_school_van_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [7, 12], school: [primary, lower]}
+    title: "แถวหลังรถรับส่ง"
+    text: "รถรับส่งมาจอดปากซอยเวลาเดิมทุกเช้า ลุงคนขับจำได้ว่าใครเมารถ ใครลืมกระเป๋าประจำ เช้านี้เพื่อนแถวหลังเพิ่งนึกออกว่ามีการบ้านเลขต้องส่งคาบแรก แล้วทุกหัวในรถก็หันมามองสมุดของคุณ"
+    choices:
+      - id: lend_book
+        text: "ส่งสมุดให้ลอกบนรถ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลอกทันก่อนถึงประตูโรงเรียน ค่าสมุดวันนี้คือขนมหนึ่งถุงเต็ม", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถตกหลุมพอดี เลขเจ็ดกลายเป็นเส้นยาวเหมือนกันทั้งแถว ครูจับได้ในสามวินาที", effects: {relations: -1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: recite
+        text: "ท่องสูตรคูณคนเดียวจนถึงโรงเรียน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: swap_snack
+        text: "ชวนแลกขนมให้ลืมเรื่องการบ้าน"
+        effects: {relations: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: ask_driver
+        text: "ถามลุงคนขับว่าข้อเจ็ดตอบอะไร"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงตอบทันทีตอนไฟแดง บอกว่าขับรถให้ครูเลขมาสิบปี ถูกเป๊ะแต่อธิบายวิธีทำไม่ได้", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ลุงตอบอย่างมั่นใจ ทั้งรถเขียนตาม ทั้งรถผิดข้อเดียวกันหมด", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_third_class_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [14, 18]}
+    title: "ชั้นสามเบาะไม่เอน"
+    text: "ปิดเทอมคุณนั่งรถไฟชั้นสามไปบ้านญาติคนเดียว เก้าอี้ตั้งฉากเอนไม่ได้ พัดลมเพดานส่ายมาหาทีละครึ่งนาที ลมหน้าต่างมีกลิ่นทุ่งปนควันเครื่อง ยังเหลืออีกเจ็ดชั่วโมง ป้าที่นั่งตรงข้ามเริ่มแกะห่อข้าว"
+    choices:
+      - id: sleep_upright
+        text: "หลับทั้งที่นั่งตัวตรง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตื่นมาคอเอียง แต่ข้ามไปได้สี่สถานีแบบไม่ต้องรับรู้ ลงรถไปยังสดชื่น", effects: {happiness: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คอพับทุกโค้ง สะดุ้งตื่นทีไรก็เจอป้ามองอยู่", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: talk_aunt
+        text: "ชวนป้าตรงข้ามคุย"
+        effects: {relations: 1, network: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: watch_field
+        text: "ยกหน้าต่างขึ้นสุด นั่งดูทุ่ง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: fan_bet
+        text: "ท้าป้าทายว่าพัดลมจะหันมาหาใคร"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครึ่งตู้มาร่วมวงเดิมพันด้วยขนมปัง ถึงปลายทางคุณได้ข้าวเหนียวไปสองห่อ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แพ้ป้าสามตาซ้อน ค่าปรับคือหิ้วตะกร้าให้จนถึงปลายทาง", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_canal_boat_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [19, 30], year: [2533, 2650], region: [กรุงเทพฯ และปริมณฑล]}
+    title: "เรือคลองขึ้นราคา"
+    text: "เรือคลองเข้าท่าไม่เคยหยุดสนิท ต้องก้าวข้ามกราบให้ทันจังหวะ ป้ายหน้าท่าบอกขึ้นค่าเรือสองบาททุกระยะ ไปกลับทั้งเดือนก็เท่าข้าวราดแกงสองจาน แต่รถบนถนนเหนือคลองยังไม่ขยับมาตั้งแต่เมื่อวาน"
+    choices:
+      - id: keep_paying
+        text: "จ่ายต่อ เรือยังเร็วกว่ารถ"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: move_room
+        text: "ย้ายห้องไปใกล้ที่ทำงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เดินสิบนาทีถึง ได้นอนเพิ่มทุกเช้า ค่าห้องแพงขึ้นแต่ไม่ต้องดมคลองอีก", effects: {happiness: 2, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ห้องใหม่อยู่เหนือร้านผัดกะเพรา เสื้อทุกตัวหอมตลอดวัน คนรอบตัวหิวเวลาคุณเดินผ่าน", effects: {happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: walk_pier
+        text: "เดินเพิ่มหนึ่งท่าให้ระยะสั้นลง"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: back_to_bus
+        text: "กลับไปนั่งรถเมล์ แล้วออกเร็วขึ้น"
+        effects: {health: -1, money: {unit: income_x, amount: 0.01}}
+        merit: [{cat: neutral}]
+      - id: tarp_duty
+        text: "อาสาดึงผ้าใบแลกค่าเรือ"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้ำคลองกระเซ็นมาพอดี คุณดึงทันทั้งแถว คนเก็บเงินส่ายหน้าแล้วยกให้เที่ยวหนึ่ง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ดึงช้าไปจังหวะเดียว ทั้งแถวหันมามองคุณด้วยเสื้อเปียกครึ่งตัว", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_van_moved_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [19, 30], year: [2561, 2650]}
+    title: "จุดขึ้นรถตู้ย้ายวันแรก"
+    text: "เย็นวันศุกร์คุณจะนั่งรถตู้ไปต่างจังหวัด แต่จุดขึ้นรถย้ายไปอยู่ใต้ทางด่วนตั้งแต่เช้านี้ ป้ายใหม่ยังเขียนด้วยปากกาเมจิก คิวแต่ละสายปนกันจนไม่รู้ว่าแถวไหนของใคร เที่ยวสุดท้ายของสายคุณออกในอีกสี่สิบนาที"
+    choices:
+      - id: ask_staff
+        text: "ถามเจ้าหน้าที่ที่ยืนโบกรถ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาชี้แถวถูกในประโยคเดียว คุณได้ที่นั่งหลังคนขับ", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาก็เพิ่งย้ายมาวันนี้ ชี้ไปสามแถว คุณได้เดินครบทั้งสามแถว", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: follow_crowd
+        text: "เดินตามคนหิ้วกระเป๋าใบใหญ่"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาไปจังหวัดเดียวกัน ถึงแถวทันเที่ยวสุดท้ายพอดี ได้เพื่อนคุยไปทั้งทาง", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาไปอีกภาค คุณรู้ตัวตอนได้ยินคนเรียกชื่อจังหวัดที่ไม่เคยไป", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: take_coach
+        text: "ทิ้งรถตู้ ไปขึ้นรถทัวร์แทน"
+        effects: {happiness: 1, health: -1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: stay_friend
+        text: "ค้างห้องเพื่อน ไปเช้าพรุ่งนี้"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: shout_province
+        text: "ตะโกนชื่อจังหวัดหาเพื่อนร่วมทาง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ห้าคนยกมือพร้อมกัน กลายเป็นแถวที่ถูกต้องที่สุดในลานใต้ทางด่วน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีใครตอบ มีแต่คนขายน้ำเดินมาถามว่ารับน้ำเปล่าไหม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_wrong_bus_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45]}
+    title: "เลขสายเดียวกัน คนละป้าย"
+    text: "มีธุระในกรุงต้องไปให้ทันสิบโมง รถเลขสายที่ต้องการจอดเทียบ คุณกระโดดขึ้นก่อนดูป้าย แล้วเพิ่งเห็นว่าคันนี้เป็นรถเมล์ครีมแดงหน้าต่างเปิด ไม่มีป้าย ปอ. อย่างคันที่เพื่อนบอก ถนนข้างหน้าแยกคนละฝั่ง ลมร้อนเป่าเข้าหน้าเต็ม ๆ"
+    choices:
+      - id: ride_on
+        text: "นั่งต่อ ไปตั้งหลักปลายทาง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เส้นนี้อ้อมแต่รถน้อย ถึงช้าไปสิบนาที ผมทรงใหม่จากแรงลมไม่มีใครถาม", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ปลายทางคือท่ารถอีกฟากเมือง ธุระเลื่อนไปอาทิตย์หน้า เสื้อมีกลิ่นควันติดมาด้วย", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_air
+        text: "ลงป้ายหน้า รอคันติดป้าย ปอ."
+        effects: {knowledge: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: take_win
+        text: "ลงแล้วโบกวินไปให้ทัน"
+        effects: {happiness: 1, health: -1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: poll_bus
+        text: "ตะโกนถามทั้งรถว่าใครรู้ทาง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าสามคนชี้สามทาง ลุงท้ายรถเคาะให้ ได้ทางลัดพร้อมเบอร์ร้านส้มตำ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งรถเถียงกันจนลืมป้ายตัวเอง คุณก็ลืมด้วย", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_platform_crush_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], year: [2560, 2650]}
+    title: "ปล่อยไปอีกสองขบวน"
+    text: "อาทิตย์นี้ต้องเข้ากรุงไปอบรม หกโมงเย็นบนชานชาลารถไฟฟ้า ป้ายในสถานีบอกว่าขนคนมาแล้วหลายพันล้านเที่ยว เย็นนี้คนเหล่านั้นเหมือนมายืนรอขบวนเดียวกับคุณ ปล่อยไปแล้วสองขบวน ขบวนที่สามมีช่องว่างขนาดคนผอมครึ่งตัว เสียงเตือนประตูกำลังจะดัง"
+    choices:
+      - id: squeeze_in
+        text: "แทรกตัวเข้าไปให้ได้"
+        outcomes:
+          - {weight: 1, ok: true, text: "เข้าทันหนึ่งตัวครึ่ง ไม่ต้องจับราวก็ยืนได้ เพราะไม่มีที่ให้ล้ม", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กระเป๋าติดอยู่นอกประตูไปสามสถานี คุณยืนบิดตัวจนหลังยอกไปอาทิตย์หนึ่ง", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: let_go
+        text: "ปล่อยขบวนนี้ด้วย ยืนรอต่อ"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: back_to_terminal
+        text: "นั่งย้อนไปต้นสายเอาที่นั่ง"
+        effects: {happiness: 1, health: -1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: bus_below
+        text: "ลงไปรอรถเมล์ข้างล่างดีกว่า"
+        effects: {health: -1, money: {unit: income_x, amount: 0.01}}
+        merit: [{cat: neutral}]
+      - id: fake_stomach
+        text: "โวยว่าปวดท้อง ขอทางด่วนหน่อย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช่องว่างเปิดเป็นวงรอบตัว คุณได้ที่ยืนสบายที่สุดตั้งแต่เคยขึ้นรถไฟฟ้า", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนหลบจริง แต่ในตู้มีคนรู้จัก พรุ่งนี้เขาทักเรื่องท้องก่อนทักสวัสดี", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_rain_meter_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45]}
+    title: "ศุกร์สิ้นเดือน ฝนเท"
+    text: "ห้าโมงครึ่ง เพิ่งออกจากที่ประชุมในกรุง ถนนทั้งเส้นกลายเป็นลานจอดรถ แท็กซี่ห้าคันเปิดกระจกถามว่าไปไหนแล้วส่ายหน้า คันที่หกยอมไปแต่ไม่กดมิเตอร์ บอกเหมาสามเท่า นัดถัดไปเหลือชั่วโมงเดียว ในรองเท้าเริ่มมีน้ำ"
+    choices:
+      - id: pay_flat
+        text: "ยอมจ่ายเหมา ขึ้นก่อนเปียกกว่านี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนขับรู้ซอยลัดจริง ถึงทันแบบเสื้อยังหมาด ๆ", effects: {happiness: 1, network: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "จ่ายเหมาแล้วรถก็ยังไม่ขยับ ได้นั่งฟังวิทยุจนรายการจบสองรายการ", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: note_plate
+        text: "จดทะเบียนไว้ โทรสายด่วนร้องเรียน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหน้าที่รับเรื่องจดเลขรถไว้ คุณไม่ได้ขึ้นรถ แต่ได้เดินฝนแบบสะใจ", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คู่สายเต็ม เพลงรอสายฟังจนจำได้ ฝนซาพอดีตอนมีคนรับ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wade_station
+        text: "ลุยน้ำเดินไปหารถไฟฟ้า"
+        effects: {health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: move_date
+        text: "โทรเลื่อนนัด แล้วหลบฝนหาข้าวกิน"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: press_meter
+        text: "เอื้อมมือไปกดมิเตอร์ให้เอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนขับอึ้งไปสามวินาที แล้วหัวเราะ ปล่อยให้มิเตอร์วิ่งไปจนถึงที่", effects: {happiness: 2, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "มิเตอร์ขึ้นจริง รถก็จอดจริง เขาชี้ให้ลงตรงแอ่งน้ำลึกที่สุดของถนน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_highway_home_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], family: [{role: child, alive: true, age: [4, 12]}]}
+    title: "แปดชั่วโมงยังไม่พ้นจังหวัด"
+    text: "สงกรานต์นี้ยืมรถญาติพาลูกกลับบ้านเกิด ออกตั้งแต่ตีห้า ตอนนี้บ่ายโมง ถนนสายใหญ่ขาออกขยับทีละหนึ่งคัน ลูกถามว่าถึงยังเป็นรอบที่สี่สิบ ขนมหมด น้ำเหลือครึ่งขวด ปั๊มข้างหน้าคิวห้องน้ำยาวถึงที่เติมลม"
+    choices:
+      - id: stop_pump
+        text: "เข้าปั๊ม ยอมต่อคิวห้องน้ำ"
+        effects: {health: 1, relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: push_on
+        text: "ขับต่อ ถึงก่อนค่ำก็พอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "พ้นคอขวดแล้วถนนโล่งเหมือนคนละประเทศ ถึงบ้านทันกินข้าวเย็นวงใหญ่", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถึงตอนสี่ทุ่ม ทั้งบ้านหลับหมดแล้ว เหลือหลังคุณที่ยังนั่งอยู่บนรถ", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: side_road
+        text: "เลี้ยวออกถนนเส้นในตามป้าย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทางคดผ่านทุ่งกับวัด ลูกได้ดูควายเป็นตัวครั้งแรกในรอบปี", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปเจอรถอีกร้อยคันที่คิดเหมือนกันหมด ถนนเส้นนี้แคบกว่าเดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: roadside_food
+        text: "จอดซื้อไก่ย่างข้าวเหนียวข้างทาง"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: silence_prize
+        text: "ตั้งรางวัลให้คนเงียบได้นานสุด"
+        outcomes:
+          - {weight: 1, ok: true, text: "รถเงียบได้ยี่สิบนาที เสียงเดียวที่ดังคือท้องร้องของคุณเอง", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกหลับตั้งแต่นาทีแรก ตื่นมาตอนถึงบ้านแล้วทวงรางวัลก่อนไหว้ผู้ใหญ่ ราคารางวัลขึ้นตามชั่วโมงที่หลับ", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_first_car_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], year: [2554, 2556], flags: {not: [has_car]}}
+    title: "รถคันแรก ภาษีคืน"
+    text: "ปีนี้รัฐคืนภาษีให้คนซื้อรถคันแรก ที่โชว์รูมคนเดินเลือกแน่นเหมือนงานกาชาด เซลส์ยื่นตารางผ่อนเจ็ดปี บอกว่าจองเดือนนี้ยังทันรอบ คนโต๊ะข้าง ๆ กรอกเอกสารไปยิ้มไป คุณบวกเงินเดือนกับค่างวดในหัวสามรอบแล้วเลขยังไม่ลงตัว"
+    choices:
+      - id: long_loan
+        text: "ออกรถใหม่ ผ่อนยาวเจ็ดปี"
+        effects: {debt: {kind: car, amount: {unit: income_x, amount: 5}}, money: {unit: income_x, amount: -5}, happiness: 1}
+        sets_flags: [has_car]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้กลิ่นรถใหม่ทุกเช้า ญาติเริ่มโทรมาขอติดรถไปงานบวช", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "งวดแรกยังยิ้ม งวดที่สิบเริ่มกินข้าวไข่เจียวทุกเย็น รถจอดตากแดดสวยมาก", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: second_hand
+        text: "ซื้อมือสองต่อจากรุ่นพี่"
+        requires: {money: {unit: income_x, amount: 2}}
+        effects: {money: {unit: income_x, amount: -2}}
+        sets_flags: [has_car]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่ได้ภาษีคืน แอร์เย็นเฉพาะฝั่งคนขับ แต่จ่ายครั้งเดียวจบ นอนหลับสบาย", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปีแรกคุณรู้จักช่างซอยหลังบ้านดีกว่ารู้จักเพื่อนบ้าน", effects: {network: 1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+      - id: save_more
+        text: "เก็บเงินต่ออีกปีค่อยว่ากัน"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: stay_public
+        text: "นั่งรถโดยสารต่อไป นอนหลับดีกว่า"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: test_lunch
+        text: "ขอลองขับไปกินข้าวกลางวันก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เซลส์นั่งไปด้วยแล้วเลี้ยงข้าวอีกต่างหาก คุณขอคิดก่อน คนเดียวในโชว์รูมที่กำไรวันนี้", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กลับมาเซลส์ยื่นปากการอ พูดไม่ออกจนลงชื่อใบจองไปครึ่งชื่อ ค่ามัดจำเลยไม่ได้คืน", effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_last_conductor_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59], year: [2555, 2562], region: [กรุงเทพฯ และปริมณฑล]}
+    title: "วันท้าย ๆ ของกระบอกตั๋ว"
+    text: "กระเป๋ารถเมล์สายประจำที่ทอนเงินให้คุณมาหลายปี บอกว่าเดือนหน้ารถจะติดเครื่องแตะบัตรแทนคน เขายังจำได้ว่าคุณลงป้ายไหนโดยไม่ต้องถาม วันนี้เขย่ากระบอกช้ากว่าทุกวัน แล้วถามลอย ๆ ว่ารู้จักใครรับคนวัยนี้ทำงานบ้าง"
+    choices:
+      - id: refer_job
+        text: "ฝากเบอร์ร้านคนรู้จักให้"
+        outcomes:
+          - {weight: 1, ok: true, text: "เดือนถัดมาเขาไปเป็นคนเฝ้าลานจอดรถ ยังเรียกรถให้ถอยด้วยเสียงกระเป๋า", effects: {relations: 1, network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านนั้นรับแต่คนอายุน้อย คุณต้องขึ้นรถไปบอกเขาเองแบบไม่รู้จะมองตรงไหน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bring_coffee
+        text: "พรุ่งนี้ซื้อกาแฟถุงขึ้นมาฝาก"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: keep_ticket
+        text: "ขอตั๋วม้วนสุดท้ายไว้เป็นที่ระลึก"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: just_pay
+        text: "ยื่นค่ารถ พูดอะไรไม่ออก"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: big_note
+        text: "ยื่นแบงก์พันให้ทอนครั้งสุดท้าย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาหัวเราะลั่นรถ บอกว่ารอคนกล้ามาหลายปี แล้วเดินขอแลกแบงก์จนครบทั้งคัน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาทอนครบเป็นเหรียญทั้งหมด คุณเดินจับกางเกงลงป้ายทั้งสองมือ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_win_vest_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59]}
+    title: "เสื้อวินมีค่าเช่า"
+    text: "รายจ่ายเดือนนี้นำหน้ารายรับ เพื่อนชวนเอามอเตอร์ไซค์มาวิ่งปากซอยตอนเย็น เสื้อวินตัวนี้ไม่ได้มาฟรี ต้องจ่ายค่าเช่าเสื้อก่อน น้ำมันก็ของตัวเอง พี่หัวแถวชี้ม้านั่งตัวท้าย บอกคนใหม่รอคิวหลังสุด ฝนตกเมื่อไหร่ค่อยได้วิ่งก่อน"
+    choices:
+      - id: pay_rent
+        text: "จ่ายค่าเช่า วิ่งเย็นนี้เลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เดือนแรกพอหักค่าเช่ากับน้ำมันแล้วเหลือค่ากับข้าว ขาประจำเริ่มจำหน้าได้", effects: {network: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งเดือนวิ่งได้ไม่ถึงค่าเช่า ได้แต่ผิวแขนสองสีกับเสียงถอนใจของตัวเองตอนนับเงิน", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: night_shift
+        text: "ขอวิ่งกะดึกที่ไม่มีใครแย่ง"
+        effects: {health: -1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: parcels_only
+        text: "รับส่งของอย่างเดียว ไม่เช่าเสื้อ"
+        effects: {knowledge: 1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: pass_on
+        text: "ขอบคุณเพื่อน แล้วหาทางอื่น"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: half_vest
+        text: "ขอเช่าครึ่งตัวในราคาครึ่งเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่หัวแถวขำจนลดให้เดือนแรก ชื่อคุณในวินคือครึ่งตัว", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาไม่ขำ คิวคุณไปอยู่ถัดจากม้านั่งขาหัก ได้ผู้โดยสารเฉพาะวันที่ฝนตกหนัก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_tuktuk_haggle_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59]}
+    title: "ต่อราคาแข่งเสียงเครื่อง"
+    text: "เพื่อนรุ่นเดียวกันนัดเที่ยวในเมือง โบกตุ๊กตุ๊กหน้าตลาด เครื่องดังจนต้องตะโกนต่อราคา คนขับตะโกนกลับว่ารถแบบนี้เข้ามาวิ่งในไทยตั้งแต่ราวปี 2503 ราคาก็ต้องสมความเก๋า เพื่อนอีกสามคนหันมามองคุณ คนที่ขึ้นชื่อว่าต่อราคาเก่งที่สุดในรุ่น"
+    choices:
+      - id: haggle_hard
+        text: "ต่อลงครึ่งหนึ่ง แล้วทำท่าเดินหนี"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเรียกกลับตอนก้าวที่สาม ได้ราคาที่เอาไปคุยในวงข้าวได้ทั้งปี", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาไม่เรียก คันอื่นในลานบอกราคาแพงกว่าเดิม เพื่อนเดินตามคุณแบบไม่พูดสักคำ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pay_asked
+        text: "จ่ายตามที่บอก ไม่อยากตะโกนแล้ว"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: split_four
+        text: "หารสี่คน ต่อนิดเดียวพอ"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: walk_it
+        text: "เดินไปเอง ใกล้แค่สองแยก"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: outshout
+        text: "ท้าแข่งตะโกนกับเสียงเครื่อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณตะโกนชนะไปหนึ่งคำ คนขับหัวเราะจนลดให้สิบบาท เพื่อนเล่าเรื่องนี้ทุกงานเลี้ยงรุ่น", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เสียงแหบตั้งแต่คำที่สอง ได้ราคาเดิมกับคอที่เจ็บไปสองวัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_free_ride_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85], year: [2560, 2650]}
+    title: "บัตรประชาชนใบเบิกทาง"
+    text: "เข้ากรุงมาเยี่ยมญาติช่วงเทศกาล ปีนี้คนสูงอายุนั่งรถไฟฟ้าบางสายฟรี คุณกำบัตรประชาชนไปยืนหน้าประตูกั้น บันไดเลื่อนเร็วกว่าที่จำได้ ตู้ขายตั๋วพูดเองได้ ข้างหลังมีเด็กรุ่นหลานรออย่างสุภาพ สุภาพจนรู้สึกได้"
+    choices:
+      - id: ask_staff
+        text: "ชูบัตรเรียกพนักงาน"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: ask_youth
+        text: "ขอเด็กข้างหลังช่วยพาผ่าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กพาไปถึงชานชาลา ชี้ฝั่งให้ด้วย คุณได้ข่าวคราวของรุ่นนี้เพิ่มอีกเรื่อง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เด็กอธิบายเร็วมาก คุณพยักหน้าตลอด แล้วยืนอยู่ที่เดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: take_taxi
+        text: "กลับลงไปขึ้นแท็กซี่ จบ"
+        effects: {health: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: ride_all_line
+        text: "นั่งสุดสายแล้วย้อนกลับให้คุ้ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เห็นหลังคาทั้งเมืองในวันเดียว ลงมาพร้อมเรื่องเล่าให้คนแถวบ้านไปอีกเดือน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลับตั้งแต่รอบแรก ตื่นมาพนักงานแตะไหล่บอกว่าสุดสายแล้วครั้งที่สอง", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: transit_pier_moved_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85], region: [กรุงเทพฯ และปริมณฑล]}
+    title: "ท่าเรือเดิมไม่จอดแล้ว"
+    text: "ทุกวันพระคุณนั่งเรือด่วนไปทำบุญวัดริมน้ำ ลงท่าเดิมมาหลายสิบปี วันนี้เรือแล่นผ่านหน้าท่าไปเฉย ๆ คนเป่านกหวีดท้ายเรือบอกยกเลิกท่านี้ ย้ายไปจอดอีกท่าแล้ว ต้องเดินย้อนกลางแดด หิ้วปิ่นโตกับถุงดอกไม้ เข่าไม่เหมือนเมื่อก่อน"
+    choices:
+      - id: walk_back
+        text: "เดินย้อนกลับ พักทุกร่มไม้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถึงทันก่อนเพล เจอร้านน้ำเต้าหู้ใหม่กลางทาง ทางนี้ก็ไม่เลวนัก", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เข่าประท้วงตั้งแต่ร่มไม้ที่สาม ถึงวัดแล้วลุกจากศาลาไม่ไหวไปครู่ใหญ่", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: cross_ferry
+        text: "จ่ายเพิ่ม ต่อเรือข้ามฟากอีกลำ"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: next_time
+        text: "นั่งเรือกลับ ไว้วันพระหน้า"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: ask_regular
+        text: "ถามขาประจำบนเรือว่าไปทางไหนกัน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: yell_lost
+        text: "ตะโกนบอกนายท้ายว่าเรือหลงทาง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนทั้งลำขำ นายท้ายเป่านกหวีดตอบ คนนั่งข้าง ๆ ช่วยหิ้วปิ่นโตไปถึงประตูวัด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นายท้ายไม่ได้ยิน คุณตะโกนซ้ำจนเสียงแหบ ถึงวัดอีกทีฉันเพลเสร็จไปแล้ว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

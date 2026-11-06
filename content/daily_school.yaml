@@ -1,0 +1,475 @@
+# การ์ดชีวิตประจำวันไทยชุด school (ใบ 239 จากร่าง 238)
+events:
+  - id: school_name_stitch_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [6, 7], school: [primary]}
+    title: "ชื่อบนอกเสื้อ"
+    text: "คืนก่อนเปิดเทอม ป.1 ชุดนักเรียนตัวใหม่ยังมีกลิ่นร้าน บนอกเสื้อต้องมีชื่อ ถุงเท้ากับรองเท้าก็ต้องมีด้วย กันหายตอนวิชาพละ ร้านปักหน้าตลาดคิดเงินตามตัวอักษร และชื่อจริงของคุณยาวกว่าใครในห้อง"
+    choices:
+      - id: full_name
+        text: "ขอปักชื่อเต็มครบทุกตัวอักษร"
+        outcomes:
+          - {weight: 2, ok: true, text: "ครูอ่านชื่อได้ตั้งแต่หน้าประตู เช้าเดียวทั้งห้องรู้จักคุณ", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตัวสุดท้ายล้นเข้ารักแร้ เพื่อนเลยเรียกคุณแค่พยางค์ที่อ่านออก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nickname
+        text: "ขอปักแค่ชื่อสั้น ๆ พอ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: pen_socks
+        text: "เขียนชื่อในถุงเท้าเองด้วยปากกา"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: inside_out
+        text: "กลับเสื้อด้านในออก อยากโชว์ชื่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครูจับกลับด้านให้ที่หน้าประตู แล้วจำชื่อคุณได้คนแรกของห้อง", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ด้านหลังของรอยปักอ่านไม่ออก ทั้งวันครูเรียกคุณว่าหนูคนนั้น", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_scout_scarf_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [10, 12], school: [primary, lower]}
+    title: "ผ้าผูกคอยังตากอยู่ที่บ้าน"
+    text: "วันที่ 1 กรกฎาคม ทั้งกองลูกเสือต้องเดินสวนสนามรอบสนาม ซ้อมกันมาทั้งสัปดาห์จนเท้าตรงเป็นจังหวะ มาถึงโรงเรียนคุณเพิ่งนึกได้ว่าผ้าผูกคอยังตากอยู่ราวหลังบ้าน ผู้กำกับเริ่มเดินตรวจจากหัวแถวแล้ว"
+    choices:
+      - id: borrow
+        text: "ยืมผ้าสำรองจากหมู่ข้าง ๆ"
+        outcomes:
+          - {weight: 2, ok: true, text: "ได้ผ้ามาทันก่อนผู้กำกับถึงตัว เพื่อนหมู่ข้างทวงเป็นขนมหนึ่งถุง", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้ผ้ามาแต่สีผิดหมู่ เดินสวนสนามทั้งแถวมีคุณคนเดียวสีนี้", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tell_leader
+        text: "บอกผู้กำกับตรง ๆ ว่าลืม"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: trade_knot
+        text: "ผูกเงื่อนให้เพื่อน แลกผ้าสำรอง"
+        outcomes:
+          - {weight: 2, ok: true, text: "ผูกเสร็จสามคน ได้ผ้ามาหนึ่งผืนพอดีก่อนผู้กำกับถึงตัว", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผูกเงื่อนช่วยเพื่อนเพลินจนผู้กำกับมาถึงตัวก่อน ผ้ายังไม่ได้สักผืน", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hanky
+        text: "พับผ้าเช็ดหน้าเป็นผ้าผูกคอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้กำกับมองอยู่นาน แล้วบอกว่าเงื่อนดีกว่าผ้า ให้ผ่าน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดินไปครึ่งสนาม ผ้าหลุดกลางขบวน แถวหลังเหยียบผ่านอย่างพร้อมเพรียง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_hair_ruler_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [13, 15], school: [lower]}
+    title: "ไม้บรรทัดวันจันทร์"
+    text: "เปิดเทอมมาระเบียบใหม่ติดหน้าห้อง ผมต้องไม่เกินติ่งหู ตรวจทุกเช้าวันจันทร์ ครูเวรเดินมาพร้อมไม้บรรทัดกับสมุดจด ผมคุณเลยติ่งหูไปหนึ่งข้อนิ้ว เพื่อนข้างหลังกระซิบว่ามีคนแชร์เรื่องนี้กันทั้งจังหวัดแล้ว"
+    choices:
+      - id: cut_it
+        text: "เลิกเรียนไปตัดตามระเบียบ"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: council
+        text: "เสนอสภานักเรียนขอทบทวน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งห้องลงชื่อให้ ครูประจำชั้นรับไปคุยต่อ เทอมนี้เลื่อนการตรวจออกไปก่อน", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ที่ประชุมรับเรื่องไว้พิจารณา และพิจารณาอยู่จนปิดเทอม", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pin_up
+        text: "หนีบผมซ่อนไว้ก่อนถึงคิว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผ่านไปได้อีกหนึ่งสัปดาห์ กิ๊บสี่ตัวทำงานหนักกว่าคุณ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กิ๊บดีดหลุดตอนเคารพธง ผมตกลงมาต่อหน้าครูเวรพอดี", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: measure_daily
+        text: "ตั้งสถานีวัดผมในห้องน้ำทุกเช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณรู้ความยาวผมทุกคนในห้องเป็นมิลลิเมตร เพื่อนมาต่อคิวก่อนเข้าแถว", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม้บรรทัดของคุณเริ่มที่เลขหนึ่ง ทั้งห้องเลยยาวเกินติ่งหูกันหมด", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_bank_queue_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [16, 17], school: [upper, voc]}
+    title: "คิวหน้าธนาคารก่อนแปดโมง"
+    text: "คอร์สสดของติวเตอร์ตัวดังเปิดรับเช้านี้ ที่นั่งแถวหน้าได้ตามลำดับการโอนเงิน เสาร์อาทิตย์ของคุณจะหายไปวันละสามชั่วโมงทั้งเทอม ธนาคารยังไม่เปิด แต่หน้าประตูมีเด็กชุดพละนั่งอ่านชีทอยู่แล้วสิบกว่าคน"
+    choices:
+      - id: line_up
+        text: "ต่อคิวจนธนาคารเปิด"
+        requires: {money: {unit: income_x, amount: 0.2}, reason: "เงินเก็บไม่พอค่าคอร์ส"}
+        effects: {money: {unit: income_x, amount: -0.2}}
+        outcomes:
+          - {weight: 2, ok: true, text: "ได้สลิปต้น ๆ ของสาขา แถวสามเป็นของคุณทั้งเทอม", effects: {knowledge: 2, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โอนเสร็จแถวหน้าเต็มแล้ว คุณได้นั่งดูครูผ่านจอท้ายห้อง", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: replay
+        text: "รอลงคอร์สดูย้อนหลัง"
+        requires: {money: {unit: income_x, amount: 0.1}, reason: "เงินเก็บไม่พอค่าคอร์ส"}
+        effects: {knowledge: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: self_study
+        text: "อ่านเอง เก็บเสาร์อาทิตย์ไว้"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: sleeping_bag
+        text: "แบกถุงนอนไปเฝ้าตั้งแต่เมื่อคืน"
+        requires: {money: {unit: income_x, amount: 0.2}, reason: "เงินเก็บไม่พอค่าคอร์ส"}
+        effects: {money: {unit: income_x, amount: -0.2}}
+        outcomes:
+          - {weight: 1, ok: true, text: "ยามปลุกตอนตีห้าพร้อมถามว่าคุณมาฝากหรือมาถอน เช้านั้นคุณคือคิวหนึ่ง", effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝนลงตีสอง ถุงนอนอุ้มน้ำ ได้คิวหนึ่งพร้อมไข้หนึ่งสัปดาห์", effects: {knowledge: 1, health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_new_system_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [17, 17], school: [upper, voc]}
+    title: "รุ่นแรกของระบบใหม่"
+    text: "ครูแนะแนวกางกระดาษแผ่นใหญ่หน้าห้อง ปีหน้าการสอบเข้ามหาวิทยาลัยเปลี่ยนระบบ รุ่นคุณเป็นรุ่นแรก รุ่นพี่ที่ติดแล้วก็บอกอะไรไม่ได้เพราะไม่เคยเจอ ครูเองยังวงปากกาแดงผิดไปสองรอบตั้งแต่ยังไม่จบแผ่น"
+    choices:
+      - id: first_round
+        text: "ทำแฟ้มผลงานไว้ยื่นรอบแรก"
+        outcomes:
+          - {weight: 1, ok: true, text: "แฟ้มผ่านรอบสัมภาษณ์ซ้อมของโรงเรียน ครูขอยืมไปเป็นตัวอย่างให้ทั้งห้อง", effects: {knowledge: 1, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ครูแนะแนวคืนแฟ้มพร้อมโพสต์อิทแปดแผ่น บอกว่ายังมีเวลาแก้อีกทั้งปี", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: main_round
+        text: "ทุ่มอ่านไว้สู้รอบสอบกลางรอบเดียว"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: ask_seniors
+        text: "ไล่ถามรุ่นพี่ให้ครบทุกคน"
+        effects: {network: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: wall_chart
+        text: "ทำตารางสีเต็มผนังห้องนอน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนแห่มาถ่ายรูปตาราง และคุณทันทุกกำหนดของโรงเรียนแบบเฉียดฉิว", effects: {relations: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตารางครบทุกช่อง ยกเว้นวันสอบย่อยของโรงเรียน ซึ่งผ่านไปเมื่อวาน", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_fresher_list_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [19, 20], school: [uni, hvoc]}
+    title: "ใบรับน้องเขียนว่าสมัครใจ"
+    text: "สัปดาห์แรกของปี 1 ใบกิจกรรมคณะเขียนตัวโตว่าสมัครใจ ไม่บังคับ ไม่ตะคอก รุ่นพี่ปีนี้ถือแค่น้ำเย็นกับรายชื่อ เพื่อนร่วมชั้นยังถามกันเบา ๆ ว่าไม่ไปจริง ๆ ได้เหรอ รุ่นพี่ตอบว่าได้ แล้วยื่นน้ำให้อีกขวด"
+    choices:
+      - id: join_games
+        text: "ไปเล่นเกมทำความรู้จักทั้งวัน"
+        outcomes:
+          - {weight: 2, ok: true, text: "เย็นนั้นได้กลุ่มกินข้าวประจำ และคนจดเลคเชอร์ที่ลายมืออ่านออก", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เกมยืดยาวจนค่ำ ได้เพื่อนสองคนกับเสียงแหบหนึ่งสัปดาห์", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: party_only
+        text: "ไปแค่งานเลี้ยงคณะตอนท้าย"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: opt_out
+        text: "ไม่ไป ใช้เวลาหางานพิเศษแทน"
+        effects: {money: {unit: income_x, amount: 0.1}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hundred_names
+        text: "ท่องชื่อเพื่อนครบร้อยในคืนเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "เช้าวันถัดมาเรียกถูกเกือบหมด ใครก็อยากนั่งข้างคนจำชื่อได้", effects: {relations: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนชื่อเล่นซ้ำกันสามคน คุณเรียกผิดครบทั้งสาม แล้วตีสองก็หายไปเปล่า", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_free_list_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], family: [{role: child, alive: true, age: [3, 6]}]}
+    title: "เรียนฟรีกับใบรายการ"
+    text: "ลูกเริ่มเข้าโรงเรียนปีแรก ประกาศหน้าโรงเรียนเขียนว่าเรียนฟรี แล้วใบรายการก็กลับมากับกระเป๋าหนึ่งแผ่น ค่าชุดพละ ค่ากิจกรรม ค่าอุปกรณ์ ค่าประกัน ในวงผู้ปกครองหน้าประตูมีคนถามขึ้นมาว่าฟรีนี่คิดจากบรรทัดไหน"
+    choices:
+      - id: pay_all
+        text: "จ่ายตามใบให้จบเรื่อง"
+        effects: {money: {unit: income_x, amount: -0.2}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: ask_school
+        text: "ถามครูว่าบรรทัดไหนจำเป็นจริง"
+        outcomes:
+          - {weight: 2, ok: true, text: "ครูขีดออกให้สามบรรทัด ผู้ปกครองคนอื่นเดินมาขอถ่ายรูปใบของคุณ", effects: {network: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูอธิบายครบทุกบรรทัดด้วยรอยยิ้ม ยอดเท่าเดิม", effects: {knowledge: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hand_me_down
+        text: "ไปขอชุดเก่าจากญาติที่ลูกโตแล้ว"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: calculator
+        text: "กดเครื่องคิดเลขตามตอนครูอ่าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณเจอยอดบวกเกินหนึ่งบรรทัด ครูแก้ให้ทันที วงผู้ปกครองตั้งคุณเป็นเหรัญญิก", effects: {network: 2, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เสียงปุ่มดังทั้งห้อง ครูหยุดรอให้คุณกดเสร็จ แล้วถามว่าได้เท่าไหร่", effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_loan_slip_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], year: [2568, 2650]}
+    title: "บรรทัดใหม่ในสลิปรุ่นน้อง"
+    text: "ข่าวเย็นบอกว่าตั้งแต่เมษายน นายจ้างต้องหักเงินเดือนคนที่ค้างหนี้กู้ยืมเพื่อการศึกษาเดือนละ 3,000 บาท ข่าวยังไม่จบ รุ่นน้องจากโรงเรียนเก่าก็ทักมา ส่งรูปสลิปที่มีบรรทัดใหม่โผล่ขึ้นมา ถามว่าพี่เคยเจอแบบนี้ไหม"
+    choices:
+      - id: restructure
+        text: "พาไปขอปรับโครงสร้างหนี้"
+        outcomes:
+          - {weight: 2, ok: true, text: "ยอดหักต่อเดือนลดลงครึ่งหนึ่ง รุ่นน้องส่งรูปสลิปใหม่มาพร้อมขนมหนึ่งกล่อง", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คิวที่สำนักงานยาวจนหมดวันลา ได้กลับมาแค่บัตรคิวกับวันนัดครั้งหน้า", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_hr
+        text: "แนะให้ถามฝ่ายบุคคลให้ชัดก่อน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: payoff_plan
+        text: "ช่วยทำตารางเร่งปิดยอดทั้งคืน"
+        effects: {knowledge: 1, relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: shoebox
+        text: "ขุดสัญญาเก่าจากกล่องรองเท้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่เจอสัญญา เจอใบเกรด ม.6 ของคุณแทน ถ่ายส่งไปให้รุ่นน้องหัวเราะจนลืมเครียด", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นั่งอ่านใบเกรดตัวเองจนตีหนึ่ง ข้อความรุ่นน้องยังขึ้นว่าอ่านแล้วไม่ตอบ", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_term_delay_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [33, 45], family: [{role: child, alive: true, age: [6, 12]}]}
+    title: "ชุดใหม่รอเปิดเทอม"
+    text: "ประกาศมาว่าเลื่อนเปิดเทอมออกไปอีกเดือน ชุดนักเรียนตัวใหม่แขวนรออยู่ในตู้ ลูกอยู่บ้านทั้งวันและดูจะสูงขึ้นทุกสัปดาห์ เช้านี้ลองใส่ดู แขนเสื้อเริ่มหนีข้อมือแล้ว ส่วนที่ทำงานยังให้เข้าตามเวลาเดิม"
+    choices:
+      - id: neighbor
+        text: "ฝากเพื่อนบ้านดูตอนกลางวัน"
+        outcomes:
+          - {weight: 2, ok: true, text: "เพื่อนบ้านเลี้ยงเก่งกว่าที่คิด ลูกกลับมาพร้อมสูตรน้ำพริกหนึ่งถ้วย", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกติดละครบ่ายกับเพื่อนบ้านจนเล่าเรื่องย่อให้ฟังทุกเย็น", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: to_work
+        text: "พาลูกไปนั่งที่ทำงานด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกกลายเป็นขวัญใจแผนก ทุกโต๊ะมีขนมแบ่งให้", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าเดินมาเจอเด็กนั่งเก้าอี้ตัวเอง แล้วถามว่าแผนกไหนรับเพิ่ม", effects: {network: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: home_timetable
+        text: "ตั้งตารางเรียนเองทุกเย็น"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: height_chart
+        text: "ทำกราฟความสูงติดประตูทุกเช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "กราฟชันจนคุณหัวเราะคนเดียว เส้นนั้นยังอยู่บนวงกบอีกหลายปี", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กราฟบอกตรง ๆ ว่าชุดใหม่ในตู้จะกลายเป็นชุดเก่าก่อนได้ใส่สักวัน", effects: {money: {unit: income_x, amount: -0.1}, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_parade_costume_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [34, 45], family: [{role: child, alive: true, age: [8, 15]}]}
+    title: "พาเหรดพรุ่งนี้เช้า"
+    text: "สามทุ่มกว่า ลูกเพิ่งหยิบใบแจ้งยับ ๆ จากก้นกระเป๋า พรุ่งนี้วันกีฬาสี สีของลูกเดินขบวนธีมทะเล ครูเขียนว่าให้ผู้ปกครองช่วยจัดชุดให้ ร้านเครื่องเขียนปิดแล้ว ในบ้านมีถุงดำ กล่องกระดาษ กับเทปกาวครึ่งม้วน"
+    choices:
+      - id: all_night
+        text: "ตัดถุงดำเป็นสาหร่ายทั้งคืน"
+        outcomes:
+          - {weight: 2, ok: true, text: "ตีหนึ่งเสร็จ เช้านั้นลูกเดินขบวนเหมือนกองสาหร่ายมีชีวิต ครูขอถ่ายรูปเก็บ", effects: {relations: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สาหร่ายหลุดไปทีละเส้นตามทางเดินขบวน สนามดูเหมือนน้ำลง", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: parent_group
+        text: "ถามวงผู้ปกครองว่าใครมีเหลือ"
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - id: talk_teacher
+        text: "ให้ใส่ชุดพละ แล้วเขียนโน้ตถึงครู"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: foil_fish
+        text: "เอาฟอยล์ในครัวพันตัวเป็นปลา"
+        outcomes:
+          - {weight: 1, ok: true, text: "แดดเช้ากระทบฟอยล์ ทั้งสนามหันมามองปลาตัวเดียวในขบวน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดินครบหนึ่งรอบ ฟอยล์ยับจนปลาตัวนั้นดูเหมือนห่อข้าว ลูกขอถอดกลางสนาม", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_empty_envelope_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [36, 45], family: [{role: child, alive: true, age: [5, 12]}]}
+    title: "ซองที่ไม่รู้จะยื่นใคร"
+    text: "โรงเรียนดังของจังหวัดรับย้ายกลางปีแค่ไม่กี่ที่ ญาติผู้ใหญ่กระซิบในงานเลี้ยงว่าบ้านอื่นเขาแป๊ะเจี๊ยะกันหมื่นหนึ่ง ต้องรู้จักคนข้างใน คุณกลับมานั่งมองซองเปล่าบนโต๊ะ ใบสมัครของลูกยังไม่ได้กรอกสักช่อง"
+    choices:
+      - id: normal_route
+        text: "ยื่นตามระบบแล้วรอผล"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกติดสำรองอันดับท้ายและได้เข้าจริง ซองนั้นเอาไปใส่ใบเสร็จค่าไฟ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไม่ติด ลูกบอกว่าดีแล้ว เพื่อนเก่ายังอยู่ที่เดิม", effects: {relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: receipt
+        text: "ถามว่าบริจาคแบบมีใบเสร็จได้ไหม"
+        effects: {knowledge: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: near_home
+        text: "เลิกวิ่ง เลือกโรงเรียนใกล้บ้าน"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: pretty_envelope
+        text: "เลือกซองสวยแล้วเดินวนห้องธุรการ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหน้าที่ถามว่ามาติดต่ออะไร คุณขอใบสมัครแล้วกลับบ้าน ซองยังสวยเหมือนเดิม", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดินวนรอบที่สี่ ภารโรงยกเก้าอี้มาให้ คิดว่าคุณมาคุมสอบ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_reunion_button_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59]}
+    title: "กระดุมเม็ดที่สาม"
+    text: "โรงเรียนเก่าครบรอบ จัดคืนสู่เหย้าศิษย์เก่าทุกรุ่น กลุ่มรุ่นนัดกันใส่ชุดนักเรียนไปถ่ายรูปหน้าอาคารไม้หลังเดิม คุณขุดเสื้อตัวนั้นขึ้นมาจากกล่อง ชื่อที่ปักยังอยู่ครบ กระดุมเม็ดที่สามยังไม่รับปากว่าจะติด"
+    choices:
+      - id: all_day
+        text: "ไปเต็มวัน ซื้อเสื้อรุ่นใส่แทน"
+        effects: {relations: 1, network: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: evening
+        text: "แวะแค่ช่วงเย็นตอนเลี้ยงโต๊ะจีน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: donate_skip
+        text: "ลงขันค่าซ่อมอาคาร แล้วไม่ไป"
+        effects: {money: {unit: income_x, amount: -0.1}, network: 2}
+        merit: [{cat: neutral}]
+      - id: force_button
+        text: "ฝืนติดให้ครบ เดินตัวตรงทั้งงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "รอดทั้งงาน รูปหมู่ออกมาคุณดูอายุน้อยที่สุด เพราะไม่กล้าหายใจ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตอนกดชัตเตอร์ เม็ดที่สามดีดลงแก้วเพื่อน ทุกคนจำงานนี้ไปอีกสิบปี", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_hair_news_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 55], year: [2568, 2570]}
+    title: "ข่าวที่มาช้าไปหลายสิบปี"
+    text: "ร้านตัดผมเปิดข่าวเช้า ศาลสั่งเพิกถอนกฎทรงผมนักเรียน เด็กมัธยมในร้านยิ้มจนเห็นฟันกราม ช่างที่ตัดให้คุณมาตั้งแต่สมัยนั้นหันมาบอกว่าจำได้ วันก่อนเปิดเทอมคุณเคยมาต่อรองขอเหลือไว้อีกนิด แล้วถามว่าวันนี้เอาทรงอะไร"
+    choices:
+      - id: grow_it
+        text: "ไว้ยาวฉลองให้ตัวเองวัยสิบห้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "สามเดือนต่อมาทรงผมนี้มีชื่อเรียกในที่ทำงาน คุณยังไม่อยากตัด", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผมที่เหลือไม่ค่อยร่วมมือ ช่างบอกว่ากลับมาได้เสมอ", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tell_teens
+        text: "เล่ารุ่นคุณให้เด็กในร้านฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: ask_teen
+        text: "ถามเด็กว่าโรงเรียนว่ายังไงต่อ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: blank_order
+        text: "นั่งเงียบ นึกทรงที่อยากได้ไม่ออก"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช่างตัดแบบเดิมให้ คุณรู้สึกผิดกับข่าวเล็กน้อย แต่ดูดีเท่าเดิม", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลายสิบปีที่ไม่เคยเลือก พอให้เลือกก็ชี้รูปผิดข้าง ออกจากร้านเหมือนปกเทปปีเก่า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_wai_flower_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59]}
+    title: "ขอดอกเข็มหน้าบ้าน"
+    text: "เย็นวันพุธ เด็กข้างบ้านมายืนเกาะรั้ว ขอดอกเข็มกับหญ้าแพรกไปทำพานไหว้ครูพรุ่งนี้ ห้องไหนพานสวยได้ขึ้นบอร์ดหน้าโรงเรียน ต้นเข็มหน้าบ้านคุณเพิ่งตัดแต่งไปเมื่อเช้า เหลือช่อเดียวที่ตั้งใจเก็บไว้ไหว้พระ"
+    choices:
+      - id: give_bunch
+        text: "ตัดให้ทั้งช่อ"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: half_bunch
+        text: "แบ่งให้ครึ่ง เก็บไหว้พระครึ่ง"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: help_tray
+        text: "นั่งช่วยเย็บพานด้วยกันจนเสร็จ"
+        outcomes:
+          - {weight: 2, ok: true, text: "พานออกมาแข็งแรงกว่าของทุกห้อง เด็กเอารูปมาอวดหน้ารั้วเย็นวันพฤหัส", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มือคุณยังจำได้แต่ตาไม่ค่อยเห็น พานเอียงไปทางทิศที่ครูไม่ได้นั่ง", effects: {relations: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: flower_lecture
+        text: "เล่าความหมายทีละดอกจนฟ้ามืด"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กจำได้หมด พรุ่งนี้เล่าต่อหน้าห้อง ครูถามว่าใครสอน", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถึงดอกมะเขือ เด็กกลับบ้านไปตั้งแต่เมื่อไหร่ไม่รู้ ดอกเข็มก็ไม่ได้เอาไป", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: school_elder_roll_01
+    type: A
+    category: study
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 75]}
+    title: "เช็กชื่อรุ่นที่เก้า"
+    text: "เสียงตามสายของเทศบาลประกาศรับนักเรียนโรงเรียนผู้สูงอายุรุ่นใหม่ เรียนทุกวันพุธที่ศาลาชุมชน มีเช็กชื่อ มีการบ้าน มีหัวหน้าห้อง จบแล้วได้ใบประกาศ เพื่อนบ้านรุ่นเดียวกันชะโงกข้ามรั้วมาถามว่าจะนั่งโต๊ะไหน"
+    choices:
+      - id: front_row
+        text: "สมัครเลย ขอนั่งแถวหน้า"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: same_desk
+        text: "ชวนเพื่อนบ้านนั่งโต๊ะเดียวกัน"
+        outcomes:
+          - {weight: 2, ok: true, text: "ลอกการบ้านกันเหมือนสมัย ป.5 ทุกพุธกลายเป็นวันที่รอ", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุยกันจนครูรุ่นหลานจับแยกโต๊ะ เรื่องนี้เล่าได้ทั้งเดือน", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sit_in
+        text: "ขอนั่งฟังดูก่อนหนึ่งคาบ"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: two_hours_early
+        text: "แต่งตัวเรียบร้อยไปก่อนสองชั่วโมง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้เป็นคนเปิดศาลา เจ้าหน้าที่มาถึงก็ยกตำแหน่งหัวหน้าห้องให้เลย", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปผิดวัน ศาลามีหมาหนึ่งตัวกับไม้กวาดหนึ่งอัน คุณนั่งรอจนได้ถามหมาว่ารุ่นไหน", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

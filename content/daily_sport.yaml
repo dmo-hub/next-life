@@ -1,0 +1,529 @@
+# การ์ดชีวิตประจำวันไทยชุด sport (ใบ 239 จากร่าง 238)
+events:
+  - id: sport_takraw_ring_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [8, 12], school: [primary, lower]}
+    title: "วงตะกร้อที่ไม่มีใครยอมออก"
+    text: "เลิกเรียนแล้ววงตะกร้อยังตั้งอยู่กลางลานโรงเรียน ลูกตกพื้นทุกสามเตะ แต่ไม่มีใครยอมออกจากวงเพราะกลัวเสียที่ รุ่นพี่คนหนึ่งเงยหน้ามาถามคุณว่าจะเอายังไง"
+    choices:
+      - id: join_ring
+        text: "แทรกตัวเข้าวงเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เตะโดนด้วยข้างเท้าครั้งแรก ลูกลอยข้ามหัวรุ่นพี่ไปจริง ๆ ทั้งวงร้องเฮ", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เตะวืดสามครั้งติด ครั้งที่สี่ล้มก้นกระแทก แต่ไม่มีใครไล่ออกจากวง", effects: {relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: fetch_ball
+        text: "อาสาวิ่งเก็บลูกก่อน"
+        effects: {health: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: solo_practice
+        text: "ไปหัดเดาะคนเดียวหลังอาคาร"
+        effects: {health: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: self_referee
+        text: "ประกาศตัวเป็นกรรมการกลางวง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งวงยอมเพราะขี้เกียจเถียง ได้เป่านกหวีดด้วยปากจนมืด", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกตะกร้อมาเข้าหน้าพอดีตอนกำลังตัดสิน ทั้งวงให้แต้มกับคนเตะ", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_estate_pitch_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [9, 12]}
+    title: "สนามหญ้าในรั้วหมู่บ้าน"
+    text: "สนามเล็กกลางหมู่บ้านจัดสรรหญ้าเรียบกว่าลานดินหลังวัดเยอะ กลุ่มคุณเลยเดินเข้ามาเตะบอลกันทุกเย็นทั้งที่ไม่มีใครบ้านอยู่ในนี้ วันนี้ลุงยามปั่นจักรยานมาจอดข้างสนาม ถามคุณคนแรกว่าบ้านเลขที่อะไร"
+    choices:
+      - id: tell_truth
+        text: "บอกตรง ๆ ว่าอยู่นอกหมู่บ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงนิ่งไปพักหนึ่งแล้วบอกว่าเลิกก่อนมืดก็แล้วกัน พรุ่งนี้ยังมาได้", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงพาทั้งกลุ่มเดินออกประตู บอลอยู่ในมือคุณตลอดทางกลับ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_insiders
+        text: "ขอให้เด็กในหมู่บ้านช่วยพูด"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: back_to_dirt
+        text: "หอบบอลกลับไปลานดินหลังวัด"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: pole_number
+        text: "ตอบเลขที่ที่เห็นบนเสาไฟ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงจดลงสมุดแล้วปั่นต่อ เย็นนั้นกลุ่มคุณเตะจนครบสองครึ่ง", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เลขนั้นคือบ้านพักของลุงเอง กว่าจะได้เข้าสนามอีกก็อีกสามวัน", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_takraw_net_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [13, 16], school: [lower, upper, voc]}
+    title: "ตะกร้อมีตาข่าย"
+    text: "คาบพละครูขึงตาข่ายกลางสนามแบดแล้วบอกว่าวันนี้เรียนเซปักตะกร้อ ข้างละสามคน ห้ามใช้มือ เพื่อนในห้องเถียงกันทันทีว่าชื่อแบบนี้กีฬาไทยจริงหรือเปล่า ครูยื่นกติกาแผ่นเดียวให้คุณอ่านออกเสียงให้ทั้งห้องฟัง"
+    choices:
+      - id: read_rules
+        text: "อ่านกติกาให้ทั้งห้องฟัง"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: ask_name
+        text: "ถามครูว่าชื่อนี้มาจากไหน"
+        outcomes:
+          - {weight: 2, ok: true, text: "ครูเล่าว่าเป็นชื่อที่สองชาติใช้ภาษาตัวเองร่วมกัน ห้องเงียบ เถียงกันต่อไม่ได้", effects: {knowledge: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูให้ไปค้นมาเป็นการบ้าน ทั้งห้องหันมามองคุณพร้อมกัน", effects: {knowledge: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: serve_first
+        text: "ขอลงสนาม เสิร์ฟก่อนเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกข้ามตาข่ายตั้งแต่ครั้งแรก ฝั่งตรงข้ามยืนมองกันเอง", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกติดตาข่ายสามครั้งติด ครูบอกให้กลับไปอ่านแผ่นกติกาก่อน", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: flying_kick
+        text: "ขอลองกระโดดฟาดแบบในทีวี"
+        outcomes:
+          - {weight: 1, ok: true, text: "ขาฟาดโดนลูกจริงหนึ่งครั้งในชีวิต เพื่อนเล่าเกินจริงไปอีกหลายเทอม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ขาเกี่ยวตาข่ายเสาล้มทั้งแถบ ครูให้คุณขึงใหม่จนหมดคาบ", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_class_bet_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [14, 18], school: [lower, upper, voc]}
+    title: "สมุดเล่มเล็กหลังห้อง"
+    text: "พักเที่ยงเพื่อนหลังห้องจดชื่อลงสมุดเล่มเล็ก ใครจะทายผลบอลคืนนี้ต้องวางค่าขนมไว้ก่อน สัปดาห์ที่แล้วมีคนในห้องเสียจนไม่มีค่าข้าวไปสามวัน เขายื่นปากกามาให้คุณ บอกว่าใคร ๆ ก็เล่น"
+    choices:
+      - id: say_no
+        text: "บอกว่าไม่เล่น แล้วกินข้าวต่อ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: small_stake
+        text: "ลองวางแค่ค่าน้ำแก้วเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทายถูกครั้งแรก สัปดาห์ถัดมาคุณวางเพิ่มเอง แล้วก็เสียคืนทั้งหมด", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เสียไป ชื่อคุณยังอยู่ในสมุด เขาทักทุกเช้าว่าคืนนี้เอาคู่ไหน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tell_teacher
+        text: "เล่าให้ครูฟังตามตรง"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: real_match
+        text: "ท้าแข่งเตะจริงหลังเลิกเรียนแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลงสนามกันครึ่งห้อง สมุดเล่มเล็กถูกทิ้งไว้ในกระเป๋าทั้งเย็น", effects: {health: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มาตามนัดสองคน เตะกันจนมืด วันรุ่งขึ้นหลังห้องหาว่าคุณทำวงเขาแตก", effects: {health: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep_pen
+        text: "รับปากกาไว้ แล้วเดินกลับโต๊ะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ด้ามนี้เขียนลื่นจนคุณจดการบ้านด้วยมันทั้งเทอม เขาไม่เคยเดินมาทวง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาเดินตามมาทวงปากกาถึงโต๊ะ ต่อหน้าเพื่อนทั้งแถวหน้า", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_cheer_card_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [19, 23], school: [uni]}
+    title: "แผ่นสีบนอัฒจันทร์"
+    text: "เหลือสามสัปดาห์จะถึงฟุตบอลประเพณี ชมรมมายืนหน้าห้องเรียนหาคนซ้อมแปรอักษร พาเหรดก็ยังขาดคนแบกหุ่น ทุกคนรู้ว่าผลการแข่งขันไม่มีใครจำได้เกินสองปี แต่ไม่มีใครกล้าพูด สัปดาห์ซ้อมยังตรงกับสอบกลางภาคพอดี"
+    choices:
+      - id: full_card
+        text: "ลงซ้อมแปรอักษรเต็มที่"
+        effects: {happiness: 2, relations: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: backstage
+        text: "ช่วยหลังฉาก เย็บหุ่นพาเหรด"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: game_day_only
+        text: "ไปแค่วันงาน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: study_instead
+        text: "อ่านหนังสือสอบดีกว่า"
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: wrong_colour
+        text: "แอบพลิกผิดสีให้รู้ว่ามีตัวตน"
+        outcomes:
+          - {weight: 1, ok: true, text: "จุดแดงจุดเดียวกลางคำอวยพร เพื่อนแถวหลังขำจนพลิกผิดตามทั้งแถว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประธานเชียร์นับแถวเจอคุณ ปีนี้ได้ยืนนับแถวแทนเขาจนจบงาน", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_stadium_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [22, 30]}
+    title: "แพ้ทีไรก็ยังไปสนาม"
+    text: "เพื่อนคนเดิมชวนไปดูทีมชาติอีกแล้ว ทั้งที่นัดก่อนกลับบ้านมาด้วยเสียงแหบกับสกอร์ที่ไม่อยากเล่าต่อ รอบนี้ว่ากันว่าคนจะมาเต็มสนามกว่าสี่หมื่น ตั๋วโค้งไกลราคาเท่าข้าวสามวัน รถกลับบ้านหลังจบเกมก็อย่าหวัง"
+    choices:
+      - id: go_along
+        text: "ไปด้วยกัน เสียงแหบก็แหบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยิงนาทีสุดท้าย คนแปลกหน้ากอดคุณทั้งแถว ตอนนี้จำหน้ากันไม่ได้แล้ว", effects: {happiness: 3, relations: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "แพ้เหมือนเดิม นั่งรอรถร้องเพลงเชียร์กับคนที่เพิ่งรู้จัก", effects: {happiness: 1, network: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watch_home
+        text: "ดูทีวีที่บ้าน เปิดเสียงดัง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: skip_ticket
+        text: "ขอผ่าน ตั๋วแพงไป"
+        effects: {relations: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: outside_only
+        text: "ไปกินหมูปิ้งฟังเสียงหน้าสนาม"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: face_paint
+        text: "ทาหน้าสามสีนั่งรถเมล์ไปสนาม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กบนรถขอถ่ายรูปด้วย กระเป๋ารถเมล์ไม่เก็บค่าตั๋ว", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เหงื่อไหลพาสีเข้าตาตั้งแต่ครึ่งแรก ดูจบด้วยตาข้างเดียว", effects: {happiness: 1, health: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_wc_night_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager]}
+    title: "นัดตีสอง ประชุมแปดโมง"
+    text: "บอลโลกปีนี้ดูฟรีครบทุกนัด ฟังเป็นข่าวดีจนเปิดตารางแล้วเจอว่าคู่ที่รอเตะตีสอง ส่วนปฏิทินงานเขียนว่าแปดโมงเช้าต้องรายงานยอดต่อหน้าหัวหน้า เพื่อนร่วมงานยังเดินมาถามอยู่เลยว่าคืนนี้ใครไปร้านข้าวต้ม"
+    choices:
+      - id: alarm_2am
+        text: "ตั้งปลุกตีสอง ดูให้ครบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ประตูชัยนาทีท้าย ตาค้างถึงเช้า พูดในห้องประชุมเร็วผิดปกติแต่รอด", effects: {happiness: 3, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ดูจบแล้วผล็อยหลับ ตื่นอีกทีแปดโมงสิบ หัวหน้าโทรมาเอง", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: morning_highlight
+        text: "นอนปกติ ดูไฮไลต์ตอนเช้า"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: congee_shop
+        text: "ไปร้านข้าวต้มกับเพื่อนจนสว่าง"
+        effects: {network: 1, relations: 1, health: -1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: finish_report
+        text: "ไม่ดู ทำรายงานให้เสร็จ"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: five_coffees
+        text: "ดูครบแล้วซดกาแฟห้าแก้วเข้าประชุม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้เห็นประตูชัยสด ๆ พูดจบก่อนเวลาครึ่งชั่วโมง มือสั่นแต่ตัวเลขครบ", effects: {happiness: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กาแฟเอาไม่อยู่ หลับคาเก้าอี้ตอนหัวหน้าถามความเห็น เสียงกรนเข้ารายงานการประชุม", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_office_bet_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager]}
+    title: "คนเดินถามในครัวออฟฟิศ"
+    text: "คืนนี้มีบอลนัดใหญ่ พี่ฝ่ายบัญชีเดินวนในครัวออฟฟิศถามทีละคนว่าเอาทีมไหน ข่าวว่าคนแทงบอลลงเฉลี่ยนัดละพันกว่าบาท แล้วก็ไม่ได้หยุดที่นัดเดียว คนโต๊ะข้างคุณเพิ่งขอเบิกเงินเดือนล่วงหน้าเมื่อวาน พี่คนนั้นมาหยุดตรงหน้าคุณพอดี"
+    choices:
+      - id: no_bet
+        text: "ส่ายหน้า เปิดกล่องข้าวต่อ"
+        effects: {relations: -1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: little_bet
+        text: "ลงนิดหน่อยพอมีเรื่องคุย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้คืนมาเท่าค่าข้าวเที่ยง นัดถัดมาพี่คนนั้นเดินมาหาคุณก่อนใคร", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "บอกตัวเองว่านิดเดียว ปลายเดือนรวมเลขแล้วไม่นิด", effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: follow_all
+        text: "ตามเพื่อนเต็มที่ เอาคืนนัดหน้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ชนะนัดนั้น เงินก้อนอยู่ไม่ถึงสิ้นเดือนเพราะนัดถัดมาลงเป็นสองเท่า", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "นัดเดียวกลายเป็นทั้งฤดูกาล ถึงคิวคุณต้องไปขอเบิกเงินเดือนล่วงหน้าบ้าง", effects: {happiness: -2, relations: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: treat_team
+        text: "เอาเงินก้อนนั้นเลี้ยงข้าวทีมแทน"
+        effects: {relations: 1, network: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: coffee_bet
+        text: "ทายผลกันด้วยกาแฟแทนเงิน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งแผนกหันมาทายกาแฟกันแทน พี่คนนั้นเดินออกจากครัวไปเงียบ ๆ", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แพ้ห้านัดติด ติดหนี้กาแฟสิบเจ็ดแก้ว ใบจดแปะเต็มจอคอมพิวเตอร์", effects: {happiness: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_pitch_split_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager, factory, service]}
+    title: "หารค่าสนามเย็นวันศุกร์"
+    text: "ทีมที่ทำงานจองสนามหนึ่งชั่วโมงราคาพันกว่าบาท นัดไว้สิบสี่คน ถึงเวลามาเจ็ดคน ที่เหลือส่งข่าวว่าติดงาน คนจองคือคุณ เจ้าของสนามยืนถือสมุดรอเก็บเงิน ส่วนคนที่มาแล้วเริ่มมองหน้ากันตอนได้ยินยอดต่อหัว"
+    choices:
+      - id: split_present
+        text: "หารเท่ากันตามคนที่มา"
+        effects: {health: 1, relations: -1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: cover_first
+        text: "ออกส่วนที่ขาดไปก่อน ตามทีหลัง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตามครบในสามวัน ทุกคนจ่ายพร้อมคำขอโทษและสัญญาว่านัดหน้ามาแน่", effects: {relations: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตามได้ครึ่งเดียว ตำแหน่งในทีมของคุณกลายเป็นคนทวงเงิน", effects: {happiness: -1, health: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: invite_neighbors
+        text: "ชวนคนจากสนามข้าง ๆ มาหารด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทีมข้าง ๆ เดินมาร่วมหาร ได้เตะครบสองฝั่งเต็มสนาม", effects: {network: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทีมข้าง ๆ บอกว่าจ่ายสนามตัวเองไปแล้ว คุณยืนอายอยู่กลางสนาม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: free_field
+        text: "ย้ายไปเตะสนามฟรีหลังโรงเรียน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฟรีจริง พื้นแข็งจริง เตะได้ครึ่งชั่วโมงก็ต้องคืนสนามให้เด็ก ส่วนค่าสนามที่จองไว้ยังต้องจ่าย", effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปถึงแล้วเด็กเต็มสนาม ทีมยืนรอจนมืด แล้วย้ายไปตั้งวงร้านข้าวต้มแทน", effects: {relations: 1, health: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: discipline_board
+        text: "ตั้งกรรมการวินัยทีมกลางสนาม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ค่าปรับคนเบี้ยวได้ผล นัดหน้ามาครบ แล้วทุกคนหันมาโหวตให้คุณจ่ายค่าน้ำ", effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นัดประชุมกรรมการครั้งแรก มาคุณคนเดียว", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_first_race_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45]}
+    title: "ค่าสมัครไม่ใช่แค่ค่าสมัคร"
+    text: "เพื่อนร่วมงานชวนลงงานวิ่งครั้งแรก ค่าสมัครยังพอไหว แต่พอเข้าร้าน พนักงานถามลักษณะเท้า เสนอถุงเท้ากันพองกับนาฬิกาจับชีพจร คนในกลุ่มพูดถึงเสื้อกับเหรียญมากกว่าระยะ ส่วนสถิติสูงสุดของคุณคือวิ่งไล่รถเมล์เมื่อเช้า"
+    choices:
+      - id: short_race
+        text: "สมัครระยะสั้นสุด รองเท้าคู่เดิม"
+        outcomes:
+          - {weight: 2, ok: true, text: "เข้าเส้นชัยท้ายแถว เหรียญแขวนอยู่ที่โต๊ะทำงานสามเดือน", effects: {health: 2, happiness: 2, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เท้าพองตั้งแต่กิโลที่สอง เดินจนจบ เหรียญยังได้เท่าคนวิ่ง", effects: {health: -1, happiness: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: full_kit
+        text: "ซื้อครบชุดก่อนเริ่มซ้อม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ของแพงกดดันให้ซ้อมจริง สามเดือนผ่านไปวิ่งถึงหน้าปากซอยไม่หอบ", effects: {health: 2, money: {unit: income_x, amount: -0.5}}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ซ้อมสองวันแล้วของทั้งชุดย้ายไปอยู่บนหลังตู้", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: free_park
+        text: "วิ่งฟรีในสวนแถวบ้านพอ"
+        effects: {health: 1}
+        sets_flags: [sporty]
+        merit: [{cat: neutral}]
+      - id: sideline
+        text: "ไปเป็นกองเชียร์ถือป้ายข้างทาง"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: front_pack
+        text: "ออกตัวตามกลุ่มหน้าเท่าที่ไหว"
+        outcomes:
+          - {weight: 1, ok: true, text: "นำกลุ่มอยู่สองร้อยเมตร รูปจากช่างภาพเป็นรูปเดียวที่ดูเหมือนนักวิ่ง", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หมดแรงที่จุดให้น้ำแรก ที่เหลือเดินกับคุณป้าที่แซงไปตั้งแต่กิโลสาม", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_bike_gear_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59]}
+    title: "คันเดิมปั่นไม่ได้หรือ"
+    text: "เสาร์เช้ากลุ่มเพื่อนรุ่นเดียวกันนัดปั่นจักรยานเลียบคลอง หลังจากหมอบอกให้ออกกำลังกันคนละรอบ เพื่อนชี้คันใหม่ราคาเท่ามอเตอร์ไซค์ บอกว่าถ้าจะเข้ากลุ่มก็เปลี่ยนเถอะ ส่วนคันในโรงรถของคุณมีตะกร้าหน้ากับกระดิ่ง"
+    choices:
+      - id: buy_new
+        text: "ซื้อคันใหม่ตามเพื่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ปั่นทุกเสาร์จริง กางเกงเอวลงไปหนึ่งเบอร์ บัญชีลงไปมากกว่านั้น", effects: {health: 2, money: {unit: income_x, amount: -1}}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปั่นสองเสาร์ แล้วคันใหม่ก็กลายเป็นราวตากผ้าที่แพงที่สุดในซอย", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: borrow_old
+        text: "ขอยืมคันเก่าเพื่อนไปก่อน"
+        effects: {relations: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: basket_bike
+        text: "ปั่นคันมีตะกร้าไปนี่แหละ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตะกร้าใส่ปาท่องโก๋ได้ ทั้งกลุ่มจอดรอคุณที่ทุกโค้ง", effects: {health: 1, relations: 2}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตามไม่ทันตั้งแต่สะพานแรก ถึงบ้านก่อนแดดแรง เสาร์ถัดมากลุ่มไม่ได้ทักมา", effects: {health: 1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: walk_instead
+        text: "ไม่เข้ากลุ่ม เดินเร็วรอบบ้าน"
+        effects: {health: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: full_uniform
+        text: "ซื้อชุดปั่นเต็มยศ ขี่คันเดิม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยืนข้างรถแล้วดูเหมือนปั่นมาไกล คนแปลกหน้ามาถามเส้นทางสามคน", effects: {happiness: 2, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชุดรัดกว่าที่คิด นั่งไม่ลงต้องยืนกินโจ๊กหน้าร้านทั้งชาม", effects: {happiness: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_spouse_bet_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59], family: [{role: spouse, alive: true}]}
+    title: "ซองค่าน้ำค่าไฟบางลง"
+    text: "กลางเดือนแท้ ๆ เงินในซองค่าน้ำค่าไฟหายไปอีกแล้ว คู่ชีวิตของคุณนั่งดูบอลเงียบกว่าทุกที ตามองจอแต่มือกำกระดาษจดเลข วันนี้มีคนแปลกหน้าโทรเข้าเบอร์บ้านมาถามหา คุณเจอกระดาษแบบเดียวกันเป็นปึกอยู่ในลิ้นชักตั้งแต่เมื่อเช้า"
+    choices:
+      - id: talk_straight
+        text: "วางปึกกระดาษแล้วคุยตรง ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุยกันจนดึก ได้ตัวเลขจริงมาหนึ่งชุด แล้วเริ่มใช้หนี้กันทีละก้อน", effects: {relations: 2, happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทะเลาะกันทั้งคืน เช้าต่อมาอีกฝ่ายรับปาก แล้วเดือนถัดมาซองก็บางอีก", effects: {relations: -2, happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hold_passbook
+        text: "ขอถือสมุดบัญชีไว้เอง"
+        effects: {relations: -1, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
+      - id: let_it_go
+        text: "ปล่อยให้เจอเอง เป็นบทเรียน"
+        effects: {relations: -2, happiness: -1, money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+      - id: seek_counsel
+        text: "ชวนกันไปหาคนช่วยเรื่องติดพนัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไปด้วยกันครั้งแรกโดยไม่มีใครพูดในรถ ครั้งที่สามเริ่มพูด หนี้ก้อนเดิมยังต้องใช้ต่อ", effects: {relations: 1, knowledge: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อีกฝ่ายไม่ยอมไป คุณไปคนเดียว ได้เบอร์โทรกับวิธีกันเงินเก็บกลับมา", effects: {knowledge: 1, happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: offside_questions
+        text: "นั่งถามกติกาล้ำหน้าทุกนัด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถามจนอีกฝ่ายหงุดหงิดปิดทีวี แล้วก็คุยกันเรื่องอื่นเป็นครั้งแรกในรอบเดือน", effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้ความรู้เรื่องล้ำหน้าครบ แต่ซองเดือนนี้ก็ยังบางเท่าเดิม", effects: {knowledge: 1, happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_waikhru_tv_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59]}
+    title: "ดูท่าไหว้ครูในร้านก๋วยเตี๋ยว"
+    text: "บ่ายอาทิตย์ร้านก๋วยเตี๋ยวเปิดมวยทีวี นักมวยกำลังรำไหว้ครู ลุงโต๊ะข้าง ๆ บอกว่าดูท่าก็รู้ค่าย ย่างสามขุมต่อด้วยเสือลากหางแบบนี้ต้องค่ายนั้นแน่ อีกโต๊ะเถียงว่าคนละเรื่อง ทั้งร้านหันมาหาคุณ เพราะคุณเพิ่งพยักหน้าโดยไม่ได้ตั้งใจ"
+    choices:
+      - id: ask_uncle
+        text: "ถามลุงว่าแต่ละท่าหมายถึงอะไร"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: admit
+        text: "ยอมรับว่าดูไม่ออก"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: cheer_red
+        text: "ก้มกินต่อ เชียร์มุมแดงเงียบ ๆ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: take_side
+        text: "เข้าข้างลุงเต็มตัว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงแถมปาท่องโก๋ให้ แล้วนัดคุณดูคู่เอกอาทิตย์หน้า", effects: {network: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อีกโต๊ะยกตำราขึ้นมาเถียงต่อ ก๋วยเตี๋ยวอืดคาชาม", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: demo_step
+        text: "ลุกสาธิตย่างสามขุมข้างโต๊ะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งร้านปรบมือ เจ้าของร้านบอกว่าชามนี้ไม่คิดค่าพิเศษ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขุมที่สามไปเจอขาโต๊ะ ชามก๋วยเตี๋ยวเอียง เข่าก็เอียงตาม", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_medal_night_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59]}
+    title: "ทั้งซอยลุ้นท่ายกสุดท้าย"
+    text: "คืนนี้นักยกน้ำหนักไทยลงแข่งโอลิมปิก ทีวีเครื่องเดียวหน้าร้านของชำมีคนนั่งล้อมทั้งซอย เด็กนอนตักผู้ใหญ่ หมาเดินผ่านไปมา ก่อนถึงท่ายกสุดท้ายคนข้างหลังบอกให้นั่งลง จอไม่เห็น ทั้งที่คุณยืนอยู่เพราะเหน็บกิน"
+    choices:
+      - id: stay_all
+        text: "นั่งดูจนจบกับคนทั้งซอย"
+        effects: {relations: 1, happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: wake_kids
+        text: "ปลุกเด็กในซอยมาดูท่าสุดท้าย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กตาปรือเห็นบาร์เหล็กขึ้นเหนือหัว แล้วถามว่าหนักเท่าหมากี่ตัว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เด็กตื่นครบ แต่ท่านั้นยกไม่ขึ้น คุณเลยได้กล่อมนอนทั้งซอย", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sleep_early
+        text: "กลับไปนอน ตื่นเช้าดูผล"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: call_relative
+        text: "โทรเล่าญาติที่ต่างจังหวัดทีละท่า"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: lift_crate
+        text: "ยกลังน้ำอัดลมตามนักกีฬา"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลังขึ้นเหนือหัวจริง ทั้งซอยนับให้เป็นเหรียญที่สองของคืนนี้", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลังยอกตั้งแต่ครึ่งทาง เจ้าของร้านเอายาหม่องมาให้พร้อมบิลค่าขวดแตก", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sport_taichi_park_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85]}
+    title: "ลานไทเก๊กหกโมงเช้า"
+    text: "ช่วงนี้คุณตื่นเช้าแบบไม่มีที่ต้องไป เดินเข้าสวนแล้วเจอชมรมไทเก๊กตั้งแถวรวมตัวกันเหมือนทุกเช้า ผู้นำแถวอายุแปดสิบกว่าเคลื่อนมือช้าเหมือนคนงมปลาในน้ำ ป้าแถวหลังกวักมือเรียก บอกว่ามีที่ว่างข้างต้นมะขามพอดี"
+    choices:
+      - id: join_line
+        text: "เข้าแถวลองวันแรก"
+        outcomes:
+          - {weight: 2, ok: true, text: "เมื่อยขาที่ไม่เคยรู้ว่ามี เดือนต่อมาคุณตื่นก่อนนาฬิกาเพื่อมาให้ทันแถว", effects: {health: 2, network: 1, happiness: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทำผิดข้างตลอดเพลง เมื่อยจนเดินกลับบ้านไม่ไหว ป้าแถวหลังบอกว่าปีแรกทุกคนเป็นแบบนี้", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: solo_tree
+        text: "ฝึกคนเดียวหลังต้นไม้"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: just_walk
+        text: "เดินรอบสวนดูไปก่อน"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: bring_friend
+        text: "กลับไปชวนเพื่อนวัยเดียวกันมาด้วย"
+        effects: {relations: 2}
+        merit: [{cat: neutral}]
+      - id: slower_leader
+        text: "เคลื่อนมือให้ช้ากว่าผู้นำแถว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช้าจนทั้งแถวหันมาดู ผู้นำแถวพยักหน้าหนึ่งครั้ง ป้าบอกว่าเขาไม่เคยทำแบบนี้", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพลงจบแล้วคุณยังอยู่ท่าที่สาม ชมรมมอบหน้าที่ดูแลกาน้ำชาให้", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
