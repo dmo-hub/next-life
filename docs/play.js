@@ -695,6 +695,17 @@ function heirPets(st, birthYear, tier) {
   return pets.length ? pets : undefined;
 }
 
+// คนตายที่ตระกูลโลกซ้อนจำได้ (ผีญาติดึงไปใช้) — เฉพาะคนที่ตายก่อนเรา · พ่อ/แม่ที่เป็นผู้เล่นรุ่นก่อนคือชาติก่อนของเราเอง ไม่ใช่วิญญาณอื่น · ฝูงสัตว์ไม่มีตัวตนรายตัว
+// เก็บเลขรุ่นแทนปีตาย: ผีสุ่มเอียงหารุ่นใกล้ ไม่ได้กรองว่าไปเกิดแล้วหรือยัง
+function deadKinOf(st) {
+  const gen = st.gen ?? 1;
+  const one = (m, role) => ({ name: m.name ?? null, role, bond: m.bond ?? BOND_START[role], cause: m.cause ?? null, gen });
+  return [
+    ...st.parents.filter((p) => !p.alive && !p.ancestor).map((p) => one(p, 'parent')),
+    ...(st.kin ?? []).filter((m) => !m.alive && m.role !== 'herd').map((m) => one(m, m.role)),
+  ];
+}
+
 // มรณบัตร: ใครรับเลี้ยงสัตว์ต่อ — คู่ชีวิต > ลูก > หลาน ที่ยังอยู่ ไม่มีใคร = เพื่อนบ้าน
 function petsAfter(st) {
   const pets = (st.kin ?? []).filter((m) => ANIMAL.includes(m.role) && m.alive && !m.left);
@@ -3205,6 +3216,8 @@ function newLife(seed, content, heir = null) {
     // ความจำข้ามชาติ (past.mjs) + อาชีพที่ติดพรสวรรค์มา — ชีวิตแรกไม่มีช่อง
     ...(heir?.past && { past: heir.past }),
     ...(pastTalent(heir?.past) && { talent: pastTalent(heir.past) }),
+    // คนตายที่ตระกูลจำได้ (deadKinOf) — มีเฉพาะตระกูลค่าซ้อน > 0 · เซฟเก่าไม่มีช่อง = ยังไม่มีผีญาติ
+    ...(heir?.deadKin && { deadKin: heir.deadKin }),
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // จดหมายคำฝากของรุ่นก่อน (afterfall-3) {age, from, cause, by} — ออกหลังมรดกถึงมือเท่านั้น
@@ -8661,6 +8674,8 @@ function makeHeir(af, r) {
   const ledger = carryLedger(af.st.ledger, net, carried);
   // ทายาทเกิดในโลกปกติเสมอ — รอบนี้มีชาติต่างโลกคั่น = กลับเข้าโลกที่เคยออกไป +1 (ชาติต่างโลกติดกันหลายรอบก็กลับครั้งเดียว) · ปรโลกคั่นชาติไม่นับ
   const overlap = overlapOf(st) + (af.isekaiLives.length ? 1 : 0);
+  // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
+  const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1 + af.isekaiLives.length,
@@ -8694,6 +8709,7 @@ function makeHeir(af, r) {
     ...(overlap && { overlap }),
     // ความจำข้ามชาติไปกับทุกทางเกิด · ภูมิ = ภูมิที่ปรโลกชี้ให้ชาติไทย (แบบแถวผังตระกูล)
     past: pastOf(st, thai.realm.id, isGone(st)),
+    ...(deadKin.length && { deadKin }),
   };
 }
 
