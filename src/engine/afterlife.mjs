@@ -133,7 +133,7 @@ export function heirCandidates(st) {
 // ฉากของช่วงที่ 7: เนื้อหาที่ตรงเงื่อนไขของผู้ตาย สุ่มตามน้ำหนัก · ด่าน afterlife-coverage รับประกันว่ามีใบไม่มีเงื่อนไขเสมอ
 function pickScene(af, scene, rng = af.rng) {
   const realm = af.verdict?.realm.id;
-  const pool = af.st.content.events.filter((e) => e.stage === AFTERLIFE_STAGE && e.scene === scene && (!e.realm || e.realm.includes(realm)) && whenOk(af.st, e.when));
+  const pool = af.st.content.events.filter((e) => e.stage === AFTERLIFE_STAGE && e.scene === scene && (!e.realm || e.realm.includes(realm)) && whenOk(af.st, e.when) && (scene !== 'loop' || knownOk(af.loop, e)));
   if (!pool.length) throw new Error(`ไม่มีฉาก ${scene} ที่ออกได้ (ภูมิ ${realm})`);
   return weighted(rng, pool, pool.map((e) => (e.weight ?? 1) * poolMultiplier(af.st, e.multipliers)));
 }
@@ -352,17 +352,32 @@ function loopFx(c) {
   return out.join(' · ');
 }
 
+// คนรู้จักในวง (ใบ 204 · decisions 375 379 380 395): ใบที่มี meet พาคนใหม่เข้ารายชื่อ · ใบที่มี known ต่อเรื่องกับคนเดิม
+// รายชื่ออยู่ใน af.loop เท่านั้น — af ไม่ข้ามไปชาติหน้า จบวงแล้วรายชื่อจึงหายเอง · เซฟเก่ากลางวงไม่มีช่อง = รายชื่อว่าง
+// คนหนึ่งโผล่ได้ KNOWN_MAX ครั้งต่อวง (นับใบ meet ด้วย) · เปิดภูมิไหนให้เนื้อหาใส่ realm เอง แกนไม่ผูกชื่อภูมิ
+export const KNOWN_MAX = 2;
+const knownOf = (l, id) => (l?.known ?? []).find((p) => p.id === id);
+const knownOk = (l, e) => (e.meet ? !knownOf(l, e.meet.id) : e.known ? (knownOf(l, e.known)?.n ?? KNOWN_MAX) < KNOWN_MAX : true);
+// ชื่อสุ่มจาก stream แยก (seed ชีวิต × ปีในวง) — ไม่กินเลขสุ่มของวง การ์ดที่ออกถัดไปจึงไม่ขยับเพราะชื่อ
+const meetName = (af, names) => names[makeRng(mixSeed(af.st.seed ^ 0x1f123bb5, af.loop.year)).int(0, names.length - 1)];
+const knownText = (who, s) => (who ? s.replaceAll('{คนรู้จัก}', who.name).replaceAll('{เรื่องคนรู้จัก}', who.did ?? '') : s);
+
 function loopCard(af) {
-  const ev = pickScene(af, 'loop', af.loop.rng);
+  const l = af.loop;
+  const ev = pickScene(af, 'loop', l.rng);
   af.pending = ev;
+  let who = ev.known ? knownOf(l, ev.known) : null;
+  if (ev.meet) (l.known ??= []).push((who = { id: ev.meet.id, name: meetName(af, ev.meet.names), did: null, n: 0 }));
+  if (who) who.n++;
+  const put = (s) => fill(knownText(who, s), af.st);
   return loopEmit(af, {
     kind: 'scene',
     id: ev.id,
     type: 'B',
     scene: 'loop',
-    title: ev.title ? fill(ev.title, af.st) : null,
-    text: fill(ev.text, af.st),
-    choices: ev.choices.map((c) => fill(c.text, af.st)),
+    title: ev.title ? put(ev.title) : null,
+    text: put(ev.text),
+    choices: ev.choices.map((c) => put(c.text)),
     ...choiceHints(ev, af.st),
     fx: ev.choices.map(loopFx),
   });
@@ -387,12 +402,14 @@ function chooseLoop(af, ev, idx) {
   if (!c) throw new Error('ตัวเลือกไม่ถูกต้อง');
   af.pending = null;
   const l = af.loop;
+  const who = knownOf(l, ev.meet?.id ?? ev.known);
+  if (ev.meet && who) who.did = c.remember;
   addLoop(l, c.effects);
   const o = c.outcomes?.length ? weighted(l.rng, c.outcomes, c.outcomes.map((x) => x.weight * poolMultiplier(af.st, x.multipliers))) : null;
   if (o) addLoop(l, o.effects);
   l.health = clamp100(l.health - LOOP.drain);
   l.year++;
-  if (o?.text) af.queue.push({ kind: 'result', type: 'B', text: fill(o.text, af.st), choices: [], loop: true, tag: 'afterlife', evId: ev.id });
+  if (o?.text) af.queue.push({ kind: 'result', type: 'B', text: fill(knownText(who, o.text), af.st), choices: [], loop: true, tag: 'afterlife', evId: ev.id });
 }
 
 // การ์ดถัดไปของช่วงที่ 7 · การ์ด carry (done) เป็นใบสุดท้าย แล้วผู้เรียกต่อ nextLife

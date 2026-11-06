@@ -1,0 +1,39 @@
+# คนรู้จักในวงผิดรูป (ใบ 204): ใบ meet ตัวเลือกไม่มี remember · ใบ known ชี้ id ที่ไม่มีใบ meet · {คนรู้จัก} บนใบธรรมดา
+events:
+  - id: bad_case_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: loop
+    years: [2400, 2700]
+    text: "ข้อความการ์ด {คนรู้จัก}"
+    choices:
+      - {text: "ทางที่หนึ่ง", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: B
+    stage: ระหว่างชาติ
+    scene: loop
+    realm: [hell]
+    years: [2400, 2700]
+    meet: {id: bad_person, names: [ก]}
+    text: "ข้อความการ์ด {คนรู้จัก}"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}], remember: "เรื่องหนึ่ง"}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}], remember: "เรื่องสาม"}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}], remember: "เรื่องสี่"}
+  - id: bad_case_03
+    type: B
+    stage: ระหว่างชาติ
+    scene: loop
+    realm: [hell]
+    years: [2400, 2700]
+    known: nobody_here
+    text: "ข้อความการ์ด {คนรู้จัก} {เรื่องคนรู้จัก}"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
