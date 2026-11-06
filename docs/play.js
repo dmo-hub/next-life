@@ -9392,6 +9392,7 @@ const HEART_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14S1
 
 // ไอคอนแถบเมนู (ui-redo 50 ตาม JSON 47): เส้นบางชุดเดียวของเมนู แยกจากไอคอนค่าในป้ายผล — "ตัวฉัน" เป็นคนเดียว ไม่ใช่สองคนแบบค่าความสัมพันธ์ ตาจึงไม่สับสนเมนูกับค่า
 const MENU_ICON = {
+  past: '<path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/><path d="M12 8v4l3 2"/>',
   me: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
   focus: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.8"/>',
   family: '<circle cx="8" cy="8" r="2.8"/><circle cx="16.5" cy="9" r="2.3"/><path d="M3 19c.8-3.4 3-5 5-5s4.2 1.6 5 5M13.5 19c.5-2.4 1.6-3.8 3-3.8s2.6 1.4 3.2 3.8"/>',
@@ -9755,7 +9756,7 @@ function focusPanel(card) {
 function focusSummary() {
   const defs = lifeFocusDefs(st);
   const main = focusMain(st, defs);
-  const head = el('h3', null, 'ชาตินี้ทุ่มเทมากสุด');
+  const head = el('h3', null, af ? 'ชาติที่แล้วทุ่มเทมากสุด' : 'ชาตินี้ทุ่มเทมากสุด');
   if (!main) return [head, el('p', 'ft-note', `${FOCUS_FLOW_NAME} ไม่ได้ทุ่มเรื่องไหนเต็มปี`)];
   const box = el('div', 'ft-now');
   box.append(el('b', null, focusName(main)), ...[focusWord(main)].filter(Boolean));
@@ -9776,14 +9777,14 @@ function focusSummary() {
 
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทยและต่างโลก · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
 // ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ
-// โฟกัสแยกแท็บระหว่างตัวฉัน–ครอบครัว (ui-redo 50) · ชาติไทยมีไอคอนคู่ป้าย ต่างโลก/ปรโลกยังเป็นป้ายอย่างเดียวจนใบ 51
+// โฟกัสแยกแท็บระหว่างตัวฉัน–ครอบครัว (ui-redo 50) · ชาติไทยกับปรโลกมีไอคอนคู่ป้าย ต่างโลกยังเป็นป้ายอย่างเดียวจนใบ 51
 // เงินไม่มีปุ่มของตัวเอง อยู่ในแผงตัวฉัน (ui-redo 131 · ข้อ 229)
 const LIFE_MENU = [['me', 'ตัวฉัน'], ['focus', 'โฟกัส'], ['family', 'ครอบครัว'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
 // ต่างโลกไม่มีครอบครัวกับเงินบาทให้ดู — ทอง ชื่อเสียง อาชีพอยู่ในแผงตัวฉันของร่างนี้ (ui-redo ใบ 13)
 // สกิลแยกปุ่มเพราะสมุดสกิล (06s-3) จะมาต่อที่แผงนี้ · ไม่มีปุ่มความเร็ว: ใบตาไม่เดินเอง ผู้เล่นกด "ต่อ" เองแบบชาติไทย (ui-redo 81)
 const ISEKAI_MENU = [['me', 'ตัวฉัน'], ['skill', 'สกิล'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
-// ปรโลก (ui-redo ใบ 15 · ชุด A ของใบ 02): ชีวิตจบแล้ว ไม่มีเงินหรือโฟกัสให้ดู — ตัวฉันกลายเป็นชีวิตที่แล้ว · ครอบครัวกลายเป็นตระกูล
-const AFTER_MENU = [['past', 'ชีวิตที่แล้ว'], ['family', 'ตระกูล'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
+// ปรโลก (ui-redo ใบ 15 · ชุด A ของใบ 02): ชีวิตจบแล้ว ไม่มีเงินให้ดู — ตัวฉันกลายเป็นชีวิตที่แล้ว · ครอบครัวกลายเป็นตระกูล · โฟกัสเป็นสรุปชาติที่แล้ว เปลี่ยนไม่ได้
+const AFTER_MENU = [['past', 'ชีวิตที่แล้ว'], ['focus', 'โฟกัส'], ['family', 'ตระกูล'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
 function lifeMenu(card, box, after = false) {
   // การ์ดใหม่วาดทับทั้ง root แผงเดิมหายไปด้วยแล้ว
   sheetClose = null;
@@ -9799,7 +9800,7 @@ function lifeMenu(card, box, after = false) {
     const b = el('button', null);
     b.type = 'button';
     b.dataset.menu = id;
-    if (!isk && !after) b.insertAdjacentHTML('beforeend', menuIcon(id));
+    if (!isk) b.insertAdjacentHTML('beforeend', menuIcon(id));
     b.append(el('span', null, label));
     if (sheets[id]) {
       b.setAttribute('aria-expanded', 'false');
@@ -12122,10 +12123,6 @@ function pastPanel() {
   const fam = el('div', 'fam');
   fam.append(...kinParts(kin.filter((m) => !ANIMAL_ROLES.includes(m.role))), ...kinParts(kin.filter((m) => ANIMAL_ROLES.includes(m.role)), true));
   wrap.prepend(head);
-  // ปรโลกไม่มีแท็บโฟกัส — สรุปทุ่มเทมากสุดของชีวิตที่จบมาอยู่ในชีวิตที่แล้ว (ข้อ 69)
-  const ft = el('div', 'ft');
-  ft.append(...focusSummary());
-  wrap.append(ft);
   if (fam.childElementCount) wrap.append(fam);
   return wrap;
 }
