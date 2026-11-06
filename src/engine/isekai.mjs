@@ -2148,7 +2148,7 @@ export function nextIsekaiCard(isk) {
   }
   const stage = isekaiStageOf(isk);
   // เข้าช่วงวัยใหม่ไม่หยุดถามแล้ว (ui-redo 83 · ข้อ 149): รายการทางเลือกเปลี่ยนตามวัย โฟกัสเดิมที่ไม่มีในช่วงนี้กลับตามน้ำ
-  // แล้วใบตาแรกของช่วงบอกผู้เล่นแทน · เปลี่ยนโฟกัสได้ทุกเมื่อจากแผงตัวฉัน (setIsekaiFocus)
+  // แล้วใบตาแรกของช่วงบอกผู้เล่นแทน · เปลี่ยนโฟกัสได้ทุกเมื่อจากแท็บโฟกัส (setIsekaiFocus)
   // เซฟก่อนใบนี้ที่ค้างอยู่บนใบทุ่มเทเข้าช่วงวัย (ไม่ใช่จากการ์ดเตือน) ไม่มีใบนั้นแล้ว — เดินต่อเป็นใบตา
   if (isk.step === 'focus' && !isk.focusWarn) isk.step = 'tick';
   let entered = null;
@@ -2254,7 +2254,7 @@ function isekaiEventCard(isk, ev) {
   });
 }
 
-// เปลี่ยนโฟกัสจากแผงตัวฉัน (ui-redo 83 · แบบ setLifeFocus ชาติไทย): ไม่ใช่ตัวเลือกของการ์ด ไม่ดึงเลขสุ่ม ไม่เดินการ์ด
+// เปลี่ยนโฟกัสจากแท็บโฟกัส (ui-redo 83 51 · แบบ setLifeFocus ชาติไทย): ไม่ใช่ตัวเลือกของการ์ด ไม่ดึงเลขสุ่ม ไม่เดินการ์ด
 // ผลไปคิดที่ใบตาถัดไป · เซฟ v2 เป็นภาพถ่ายสถานะ โหลดแล้วได้โฟกัสเดิม · ใบเลือกจากการ์ดเตือนยังเลือกผ่านการ์ด
 export const isekaiFocusOpen = (isk) => !!isk && ['tick', 'event', 'result', 'move', 'upgrade', 'warn'].includes(isk.step) && !isk.dead && !isk.natural && !isk.home && !!isk.focusOffers?.length;
 export function setIsekaiFocus(isk, id) {
