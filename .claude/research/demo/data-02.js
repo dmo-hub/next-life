@@ -79,7 +79,7 @@
       "บอกเพื่อนว่าไม่ได้สนใจทางนี้ เพื่อนพยักหน้าแล้วถามว่าสนใจทางไหนแทน", { pending: "ข้อเสนอ รอเคาะ", decline: true });
   };
   // NOTE: invitations must NOT appear every year — the coordinator draws them by chance (never two years in a row).
-  var INV_COND = C({ sex: "ชาย", yearMin: 2501, school: ["lower", "upper", "voc"], flagsNot: ["cadet_dream", "cadet_declined", "cadet_let_go"] });   // งาน b: เลิกฝันแล้วไม่เชิญซ้ำ (เจ้าของเคาะ 2026-11-06)
+  var INV_COND = C({ sex: "ชาย", yearMin: 2501, school: ["lower", "upper", "voc"], flagsNot: ["cadet_dream", "cadet_declined", "cadet_let_go", "cadet_declined_seat"] });   // งาน b: เลิกฝันแล้วไม่เชิญซ้ำ (เจ้าของเคาะ 2026-11-06) · Q-A1: ปีที่มีใบประกาศปีที่สอง (INV-R) ไม่ออกซ้อน
   var POOL_COND = function (o) {
     var b = { sex: "ชาย", school: ["lower", "upper", "voc"], flagsNot: ["cadet_dream"] };
     for (var k in o) b[k] = o[k];

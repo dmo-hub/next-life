@@ -119,6 +119,7 @@ flags:
   # >>> nl-writer b001 flag cadet_dream
   cadet_dream: "ตั้งใจจะสอบเตรียมทหาร"
   # <<< nl-writer b001 flag cadet_dream
+  cadet_declined_seat: "ติดเตรียมทหารแล้วสละสิทธิ์ทุกเหล่า (แกนตั้ง · ปีหน้ายังสอบได้ · การ์ดเชิญปกติกันไว้ ใบเชิญรอบใหม่ออกแทน)"
   # >>> nl-writer b001 flag cadet_declined
   cadet_declined: "ขอไม่ให้เตือนเรื่องสอบเตรียมทหารอีก"
   # <<< nl-writer b001 flag cadet_declined

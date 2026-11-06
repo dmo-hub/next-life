@@ -3570,7 +3570,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
       "บอกเพื่อนว่าไม่ได้สนใจทางนี้ เพื่อนพยักหน้าแล้วถามว่าสนใจทางไหนแทน", { pending: "ข้อเสนอ รอเคาะ", decline: true });
   };
   // NOTE: invitations must NOT appear every year — the coordinator draws them by chance (never two years in a row).
-  var INV_COND = C({ sex: "ชาย", yearMin: 2501, school: ["lower", "upper", "voc"], flagsNot: ["cadet_dream", "cadet_declined", "cadet_let_go"] });   // งาน b: เลิกฝันแล้วไม่เชิญซ้ำ (เจ้าของเคาะ 2026-11-06)
+  var INV_COND = C({ sex: "ชาย", yearMin: 2501, school: ["lower", "upper", "voc"], flagsNot: ["cadet_dream", "cadet_declined", "cadet_let_go", "cadet_declined_seat"] });   // งาน b: เลิกฝันแล้วไม่เชิญซ้ำ (เจ้าของเคาะ 2026-11-06) · Q-A1: ปีที่มีใบประกาศปีที่สอง (INV-R) ไม่ออกซ้อน
   var POOL_COND = function (o) {
     var b = { sex: "ชาย", school: ["lower", "upper", "voc"], flagsNot: ["cadet_dream"] };
     for (var k in o) b[k] = o[k];
@@ -4070,7 +4070,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
   },
   "variantOf": "E2",
   "replaces": null,
-  "text": "{ชื่อ} อยากสอบเข้าโรงเรียนเตรียมทหาร ถ้าสอบติดก็เรียนฟรี แต่ก่อนสอบต้องมีค่าติว ค่าสมัคร และค่ารถเข้าเมือง มื้อเย็นวันนี้ ผู้ใหญ่ในบ้านกำลังคุยกันว่าเดือนหน้าเงินจะไม่พอใช้",
+  "text": "{ชื่อ} อยากสอบเข้าโรงเรียนเตรียมทหาร ถ้าสอบติดก็เรียนฟรี แต่ก่อนสอบต้องมีค่าติว ค่าสมัคร และค่ารถเข้าเมือง {เงินไม่พอ}",
   "options": [
    {
     "label": "บอกที่บ้านตรง ๆ ว่าอยากสอบ",
@@ -6178,7 +6178,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
   },
   "variantOf": null,
   "replaces": null,
-  "text": "เปิดเทอมแล้ว นาฬิกาปลุกดังตอนตีห้า ข้างนอกยังมืด ลมเย็นลอดหน้าต่างเข้ามา เมื่อวานที่ราวดึงข้อในสนามโรงเรียน {ชื่อ} ดึงได้แค่สามครั้งก็ห้อยตัวค้าง เพื่อนข้างราวหัวเราะจนต้องหันหน้าหนี",
+  "text": "{ค่าย:เปิดเทอมแล้ว }นาฬิกาปลุกดังตอนตีห้า ข้างนอกยังมืด ลมเย็นลอดหน้าต่างเข้ามา เมื่อวานที่ราวดึงข้อในสนามโรงเรียน {ชื่อ} ดึงได้แค่สามครั้งก็ห้อยตัวค้าง เพื่อนข้างราวหัวเราะจนต้องหันหน้าหนี",
   "options": [
    {
     "label": "ออกไปวิ่งกับพ่อทุกเช้า",
@@ -11138,7 +11138,7 @@ window.DEMO_PHASE2 = (function () {
   }
   var E = [
     { id: "PT1", title: "ตีห้ารอบหมู่บ้าน", ageMin: 13, ageMax: 18, kind: "pool", weight: 1, repeatable: true, cond: C(),
-      text: "เปิดเทอมแล้ว กลับมาซ้อมเองที่บ้าน นาฬิกาปลุกดังตีห้า ข้างนอกยังมืด หมาข้างบ้านเงยหน้ามองแล้วนอนต่อ",
+      text: "{ค่าย:เปิดเทอมแล้ว กลับมาซ้อมเองที่บ้าน }นาฬิกาปลุกดังตีห้า ข้างนอกยังมืด หมาข้างบ้านเงยหน้ามองแล้วนอนต่อ",
       contextLines: [
         { when: { regions: ["เหนือ"] }, line: "ลมหนาวจากดอยพัดลงมาถึงหน้าบ้าน" },
         { when: { regions: ["ใต้", "ตะวันออก"] }, line: "ได้ยินเสียงคลื่นตั้งแต่หัวซอย" },
@@ -11158,7 +11158,7 @@ window.DEMO_PHASE2 = (function () {
         { label: "กลับบ้านไปดูการ์ตูน", fx: { happiness: 1 }, setFlags: [], result: "ราวเหล็กว่างอยู่อย่างนั้นจนมืด" }] },
 
     { id: "PT3", title: "น้ำลึกห้าสิบเมตร", ageMin: 13, ageMax: 18, kind: "pool", weight: 1, repeatable: false, cond: C({ flagsNot: ["can_swim"] }),
-      text: "เกณฑ์ว่ายน้ำห้าสิบเมตรยังเป็นข้อเดียวที่ยังทำไม่ได้ ช่วงเปิดเทอม ใกล้บ้านมีที่ให้ฝึกอยู่ที่เดียว",
+      text: "เกณฑ์ว่ายน้ำห้าสิบเมตรยังเป็นข้อเดียวที่ยังทำไม่ได้ {ค่าย:ช่วงเปิดเทอม }ใกล้บ้านมีที่ให้ฝึกอยู่ที่เดียว",
       contextLines: [
         { when: { regions: ["ใต้", "ตะวันออก"] }, line: "ทะเลหน้าหาดตอนเช้าคลื่นเรียบ ชาวประมงพายเรือออกไปไกลแล้ว" },
         { when: { notRegions: ["ใต้", "ตะวันออก"] }, line: "สระเทศบาลค่าเข้าครั้งละยี่สิบบาท หรือคลองหลังวัดที่เด็กแถวนั้นกระโดดเล่นทุกเย็น" }],
@@ -11493,7 +11493,7 @@ function seasonCard() {
   const k = S.stats.knowledge, h = S.stats.health, why = S.lastFail;   // kept until he sits again, so a skipped year still gets the reminder
   const mark = ok => ok ? '✓' : '✗';
   const last = ({ written: 'ปีก่อนตกตั้งแต่ข้อเขียน', land: 'ปีก่อนพลาดที่สนามพลศึกษา', swim: 'ปีก่อนไปไม่ถึงขอบสระ',
-    medical: 'ปีก่อนตกที่ห้องตรวจร่างกาย', noshow: 'ปีก่อนผ่านข้อเขียน แต่ไม่ได้ไปสอบพลศึกษา', injury: 'ปีก่อนซ้อมหนักจนเจ็บก่อนวันสอบพละ', noshow_iv: 'ปีก่อนผ่านถึงรอบสัมภาษณ์ แต่ไม่ได้ไปสัมภาษณ์', interview: 'ปีก่อนตกรอบสัมภาษณ์', noreport: 'ปีก่อนติดแล้ว แต่ไม่ไปรายงานตัว' })[why] || 'ปีก่อนยังไม่ติด';
+    medical: 'ปีก่อนตกที่ห้องตรวจร่างกาย', noshow: 'ปีก่อนผ่านข้อเขียน แต่ไม่ได้ไปสอบพลศึกษา', injury: 'ปีก่อนซ้อมหนักจนเจ็บก่อนวันสอบพละ', noshow_iv: 'ปีก่อนผ่านถึงรอบสัมภาษณ์ แต่ไม่ได้ไปสัมภาษณ์', interview: 'ปีก่อนตกรอบสัมภาษณ์', noreport: 'ปีก่อนติดแล้ว แต่ไม่ไปรายงานตัว', declined: 'ปีก่อนติดแล้ว แต่สละสิทธิ์ทุกเหล่า' })[why] || 'ปีก่อนยังไม่ติด';
   return { id: '__SEASON', title: 'ฤดูสอบวนกลับมา', kind: 'scheduled', repeatable: true,
     text: `ใบปลิวกวดวิชาเตรียมทหารเริ่มติดเต็มบอร์ดหน้าโรงเรียนอีกครั้ง เหลืออีกไม่กี่เดือนก็ถึงวันสอบ\n${last}\n\n` +
       `ตอนนี้ ${S.name}: ความรู้ ${k} ${mark(k >= KNOW_MIN)}${k < KNOW_MIN ? ` (ขาดอีก ${KNOW_MIN - k})` : ''} · ${bodyReach(h)}` +
@@ -11538,6 +11538,7 @@ function waitCard(id) {
 function resolve(id) {
   if (id === '__CRITERIA') return criteriaCard();
   if (id === '__SEASON') return seasonCard();
+  if (id === 'INV-R') return returnInviteCard();
   if (id === '__E9R') return retryEveCard();
   if (id === '__MORNR') return retryMorningCard();
   if (id === '__CRIT2') return { ...criteriaCard(true), options: [
@@ -11701,9 +11702,16 @@ const DIALECT = { 'ตะวันออกเฉียงเหนือ': 'เ
 const dialect = t => { const p = DIALECT[S.region]; return t.replaceAll('นะ{ถิ่น}', p || 'นะ').replaceAll('ๆ{ถิ่น}', p ? 'ๆ ' + p : 'ๆ').replaceAll('{ถิ่น}', p || ''); };
 // {ผู้ใหญ่} = คนในบ้านคนเดียว (elder) · {ผู้ใหญ่ทายาท} = คนในบ้านที่เคยใส่เครื่องแบบ (มีพ่อ = พ่อ) · {ที่ตั้ง} = ที่ตั้ง รร.ตท. ตามปี
 const heirElder = () => (S.family === 'both' || S.family === 'fatherOnly') ? 'พ่อ' : elder();
-const campus = () => year() < 2543 ? 'กรุงเทพฯ' : 'นครนายก';   // ย้ายไปนครนายก 4 พ.ค. 2543
+// ที่ตั้ง รร.ตท. ตามยุค (เจ้าของเคาะ 2026-11-06 · เกมจริง numbers.campus_*): 2501–2504 ถ.ราชดำเนิน · 2504–2542 ถ.พระรามที่ 4 · 4 พ.ค. 2543 นครนายก
+const CAMPUS_NAYOK_YEAR = 2543, CAMPUS_RAMA4_YEAR = 2504;
+const campus = () => year() < CAMPUS_NAYOK_YEAR ? 'กรุงเทพฯ' : 'นครนายก';
 const fill = t => dialect((t || '').replaceAll('{ชื่อเต็ม}', fullName()).replaceAll('{ชื่อ}', S.name).replaceAll('{เหล่า}', leanBranch())
+  .replaceAll('{เงินไม่พอ}', moneyTalk())
+  .replace(/\{ค่าย:([^}]*)\}/g, (_, s) => S.flags.has('cadet_prep_camp') ? s : '')   // D1 รอบ 2: คำบอกช่วงเวลาเฉพาะเด็กค่าย
   .replaceAll('{ผู้ใหญ่ทายาท}', heirElder()).replaceAll('{ผู้ใหญ่}', elder()).replaceAll('{ที่ตั้ง}', campus()));
+// D2 รอบ 2 · E2-ค บรรทัดเปิดตามคนในบ้าน (ประโยคต่อจากนั้นคงเดิม)
+const moneyTalk = () => S.family === 'both' ? 'มื้อเย็นนี้พ่อกับแม่คุยกันเสียงเบา ๆ ว่าเดือนหน้าเงินจะไม่พอใช้'
+  : `มื้อเย็นนี้${elder()}นั่งนับเงินในกระป๋อง บ่นเบา ๆ ว่าเดือนหน้าคงไม่พอใช้`;
 function leanBranch() {
   const l = [...S.flags].find(f => f.startsWith('cadet_lean:'));
   if (l) return BRANCH[l.split(':')[1]] || l.split(':')[1];
@@ -11809,7 +11817,7 @@ function choose(e, o) {
     else if (o._report === 'wait') S.p2.steps = [() => extraDaysCard(), () => reportAsk(1)];
     else S.p2.steps = [() => noReportCard(), () => letDownCard('report'), () => failedCard()];
   }
-  if (o._pick) { if (o._pick === 'none') { S.p2.steps = [() => declinedCard(), () => { finish('สละสิทธิ์ทุกเหล่า · ปีหน้ายังสอบใหม่ได้ถ้าอายุไม่เกิน'); return 'END'; }]; } else S.p2.steps = [() => packNotice(o._pick)]; }
+  if (o._pick) { if (o._pick === 'none') { S.p2.steps = [() => declinedCard(), () => declineNextYear()]; } else S.p2.steps = [() => packNotice(o._pick)]; }
   if (o._how && S.p2) S.p2.how = o._how;
   if (o._flow && S.p2) Object.assign(S.p2, o._flow);   // temporary scene memory (announce brief §5: rehearsed …)
   if (o._reprep === 'again') {
@@ -11873,6 +11881,12 @@ function choose(e, o) {
     S.trainGain = (S.trainGain || 0) + gain - cut;
     deltas = deltas.map(([k, d]) => k === 'health' ? [k, d - cut] : [k, d]);
   }
+  // INV-R เลือกสอบ = กลับเข้าเส้นปกติปีสอบซ้ำ: ใบแจ้งสิทธิสอบปีนี้ → ใบสมัคร → แผ่นเกณฑ์ → ติวอีกรอบไหม → วันสอบ
+  if (e.id === 'INV-R' && S.flags.has('cadet_dream')) {
+    S.everFailed = true;
+    const n = 'S' + S.age; S.done.delete(n);
+    if (!S.queue.includes(n)) S.queue.push(n);
+  }
   // family funding follow-ups
   if (!hadSupport && S.flags.has('cadet_family_support')) onFamilySupport();
   if (S.cls === 'mid' && S.flags.has('cadet_family_told') && !S.flags.has('cadet_family_support')
@@ -11925,7 +11939,7 @@ function examDoor() {
   next();
 }
 const LASTFAIL_NOTE = { written: 'ปีก่อนพลาดตั้งแต่ข้อเขียน', land: 'ปีก่อนพลาดที่สนามพลศึกษา', injury: 'ปีก่อนข้อเท้าพลิกก่อนวันสอบพละ',
-  interview: 'ปีก่อนพลาดที่ห้องสัมภาษณ์', noshow: 'ปีก่อนผ่านข้อเขียนแต่ไม่ได้ไปสอบพละ', noshow_iv: 'ปีก่อนมาถึงรอบสัมภาษณ์แต่ไม่ได้ไป', noreport: 'ปีก่อนติดแล้วแต่ไม่ได้ไปรายงานตัว' };
+  interview: 'ปีก่อนพลาดที่ห้องสัมภาษณ์', noshow: 'ปีก่อนผ่านข้อเขียนแต่ไม่ได้ไปสอบพละ', noshow_iv: 'ปีก่อนมาถึงรอบสัมภาษณ์แต่ไม่ได้ไป', noreport: 'ปีก่อนติดแล้วแต่ไม่ได้ไปรายงานตัว', declined: 'ปีก่อนติดแล้วแต่สละสิทธิ์ทุกเหล่า' };
 function retryEveCard() {
   const last = S.age >= 18, note = LASTFAIL_NOTE[S.lastFail] || 'ปีก่อนยังไม่ติด';
   return { id: '__E9R', title: last ? 'คืนก่อนสอบ ครั้งสุดท้าย' : 'คืนก่อนสอบ ปีที่สอง', kind: 'exam', repeatable: true,
@@ -12104,6 +12118,16 @@ function friendScoreLine(pass) {
   return `เพื่อนติวบอกว่า "เฮ้ย ${mung()}ได้${numTh(mine)} ${ku()}ได้${numTh(theirs)} ติดทั้งคู่ เลี้ยงหน่อยดิ"`;
 }
 const bestRank = pass => pass.map(b => S.p2.ranks?.[b]).filter(Boolean).sort((a, b) => a.rank - b.rank)[0];
+// D3 รอบ 2 · X6b ทายาท หยิบหมวกเก่า (ตัด "ตา") · เดโมไม่เก็บว่าใครใส่เครื่องแบบ → มีพ่อ = พ่อ · ไม่มีพ่อ = แม่
+function heirHatLine() {
+  const hat = `หมวก${S.heir === 'police' ? 'ตำรวจ' : 'ทหาร'}ใบเก่า`;
+  const dad = hasFather() || !hasMother();   // ไม่มีพ่อแม่ = หมวกของพ่อ
+  const uni = dad ? 'พ่อ' : 'แม่', young = dad ? 'หนุ่ม' : 'สาว';
+  const alive = dad ? hasFather() : hasMother();
+  if (alive) return `${uni}หยิบ${hat}ออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${uni}ตอน${young} ๆ{ถิ่น}"`;
+  if (S.family === 'none') return `ป้าหยิบ${hat}ของ${uni}ออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${uni}เอ็งตอน${young} ๆ{ถิ่น}"`;
+  return `{ผู้ใหญ่}หยิบหมวกใบเก่าของ${uni}ออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${uni}ตอน${young} ๆ{ถิ่น}"`;   // คนใส่เครื่องแบบเสียแล้ว อีกคนยังอยู่
+}
 const loudspeakerOk = () => S.cls === 'poor' && examFar() && eraR() !== 'ค';   // บ้านต่างจังหวัด ยุค ก–ข
 function announceCard(round) {
   const web = year() >= WEB_YEAR, body = round === 'body', fin = round === 'final';
@@ -12323,7 +12347,7 @@ function x3Card() {
     pray: { ก: 'ยกมือไหว้ใต้คาง ใจนิ่งขึ้น ทั้งที่รู้ว่าผลออกไปตั้งแต่วันสอบ' },
     paper: { ก: `${paperOpt(false).result}\n${PAPER_HEAD} ทีละเหล่า` },
   })[how];
-  const block = P.branches.map(b => P.written[b] ? `${BR_TH[b]} · ลำดับ ${50 + Math.floor(Math.random() * 400)} · ผ่าน`
+  const block = P.branches.map(b => P.written[b] ? `${BR_TH[b]} · ลำดับ ${20 + (25 - (P.scores[b] || 0)) * 30 + Math.floor(Math.random() * 29)} · ผ่าน`   // G1 รอบ 2: ลำดับตามคะแนน
     : `${BR_TH[b]} · ไม่มีเลขของเรา${fr[P.reason?.[b]] ? `\n   ${fr[P.reason[b]]}` : ''}`);
   if (!none && fail.some(b => S.flags.has('cadet_lean:' + b))) block.push('เหล่าที่อยากได้ที่สุดไม่มีชื่อ แต่อีกแผ่นมี');
   const summary = all ? (P.branches.length > 1 ? 'ผ่านครบทุกสนามที่สมัคร' : 'สนามเดียวที่สมัคร มีเลขของเรา')
@@ -12469,8 +12493,7 @@ function cheerCard(pass, fail, round = 'phys') {
   }
   else if (!fin) L.push((iv ? JOY_IV : JOY_WRITTEN)[S.family] || (iv ? JOY_IV : JOY_WRITTEN).none);
   else L.push(joyFinal() || '');
-  // F2 · ทายาท: คนที่เคยใส่เครื่องแบบเป็นคนสวมหมวกให้ · มีพ่อ = หมวกพ่อ · ไม่มีพ่อ = หมวกตา
-  if (S.heir && fin) L.push(`{ผู้ใหญ่ทายาท}หยิบหมวก${S.heir === 'police' ? 'ตำรวจ' : 'ทหาร'}ใบเก่าออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือนตอน${hasFather() ? 'พ่อ' : 'ตา'}หนุ่ม ๆ{ถิ่น}"`);
+  if (S.heir && fin) L.push(heirHatLine());
   if (!iv && !fin && (S.flags.has('cadet_prep_group') || S.flags.has('cadet_bond_a'))) L.push(friendWrittenLine());
   if (S.flags.has('cadet_senior_tutor') || S.flags.has('knows_senior')) L.push(fin ? 'รุ่นพี่บอกสั้น ๆ ว่า "ยินดีต้อนรับน้องใหม่ เจอกันที่{ที่ตั้ง}นะ"' : iv ? 'รุ่นพี่บอกสั้น ๆ ว่า "สัมภาษณ์ตอบไปตามจริงนะ อย่าไปท่องมา เขาดูออก"' : 'รุ่นพี่บอกสั้น ๆ ว่า "ดีใจด้วยน้อง แต่พละโหดกว่านี้เยอะนะ ซ้อมไว้เลย"');
   // E2 · บรรทัดตามฐานะรอบสุดท้าย + ข้อ 4 ปากคน (ลำดับที่จาก S.p2.ranks) รอบละ 1 บรรทัด
@@ -12540,7 +12563,7 @@ function bodyBoard() {
          : { label: 'โทรบอกที่บ้านทันที', fx: { relations: 1 }, result: 'ปลายสายดังขึ้นก่อนจะพูดจบ' },
        { label: 'ไล่ดูอีกรอบให้แน่ใจ', fx: {}, result: 'อ่านเลขทีละตัว ตรงทุกตัว' },
        { label: 'ยิ้มกว้างจนแก้มตึง', fx: { happiness: 1 }, result: 'เหลืออีกรอบเดียว ยิ้มได้ก่อนก็ไม่เสียหาย' },
-       { label: 'ไปแสดงความยินดีกับคนที่ผ่านด้วยกัน', fx: { network: 1 }, result: 'แลกเบอร์กันไว้ เผื่อได้เจอกันอีกที่นครนายก' }];
+       { label: 'ไปแสดงความยินดีกับคนที่ผ่านด้วยกัน', fx: { network: 1 }, result: `${year() < MOBILE_YEAR ? 'จดที่อยู่กันไว้' : 'แลกเบอร์กันไว้'} เผื่อได้เจอกันอีกที่{ที่ตั้ง}` }];
   return asCard({ id: 'X4r', title: 'ประกาศผลพลศึกษาและตรวจร่างกาย', text, options: opts });
 }
 // ---- interview: one sitting for every branch still in (owner 2026-11-05)
@@ -12743,7 +12766,7 @@ const REPORT_DAYS = 2;
 function packNotice(b) {
   S.p2.chosen = b;
   S.p2.steps = [() => farewellSchool(), () => farewellFriends(), () => reportAsk(0)];
-  return statusCard('หนังสือแจ้งรายงานตัว', `โรงเรียนเตรียมทหาร (ต่อ ${BR_TH[b]}) เปิดรับรายงานตัวที่นครนายก ${REPORT_DAYS * 2} วัน ใช้ ${REPORT_DAYS} วันแรกเก็บของและบอกลาได้\nเตรียมเสื้อผ้าตามรายการ ตัดผมสั้นเกรียน เอาบัตรประชาชนกับหนังสือแจ้งฉบับนี้มาด้วย`);
+  return statusCard('หนังสือแจ้งรายงานตัว', `โรงเรียนเตรียมทหาร (ต่อ ${BR_TH[b]}) เปิดรับรายงานตัวที่{ที่ตั้ง} ${REPORT_DAYS * 2} วัน ใช้ ${REPORT_DAYS} วันแรกเก็บของและบอกลาได้\nเตรียมเสื้อผ้าตามรายการ ตัดผมสั้นเกรียน เอาบัตรประชาชนกับหนังสือแจ้งฉบับนี้มาด้วย`);
 }
 function farewellSchool() {
   return asCard({ id: 'X9a', title: 'วันที่ 1 · โรงเรียนเก่า',
@@ -12767,7 +12790,7 @@ function reportAsk(n) {
   const last = n > 0;
   return asCard({ id: last ? 'X9d' : 'X9c', title: last ? 'วันสุดท้ายของการรายงานตัว' : 'ครบสองวันแล้ว',
     text: last ? 'วันนี้เป็นวันสุดท้ายที่โรงเรียนเตรียมทหารรับรายงานตัว ไม่ไปวันนี้ สิทธิ์จะหลุดไปถึงตัวสำรอง'
-               : `ครบ ${REPORT_DAYS} วันแล้ว กระเป๋าพร้อม หนังสือแจ้งอยู่ในซอง จะออกเดินทางไปนครนายกเลยไหม`,
+               : `ครบ ${REPORT_DAYS} วันแล้ว กระเป๋าพร้อม หนังสือแจ้งอยู่ในซอง จะออกเดินทางไป{ที่ตั้ง}เลยไหม`,
     options: [
       { label: 'ไปเลย', _report: 'go', result: 'ยกกระเป๋าขึ้นรถ ไม่หันกลับไปมองบ้าน กลัวจะไม่อยากไป' },
       { label: last ? 'ไม่ไป' : 'ขออีกสองวัน', _report: last ? 'no' : 'wait', result: last ? 'นั่งดูนาฬิกาจนเลยเวลาปิดรับรายงานตัว' : 'วางกระเป๋าไว้ที่เดิม บอกตัวเองว่าขอเวลาอีกนิด' }] });
@@ -12802,17 +12825,46 @@ function declinedCard() {
   S.lastFail = 'declined';
   const home = secretNow() ? 'ที่บ้านไม่รู้ด้วยซ้ำว่าเคยติด' : '{ผู้ใหญ่}ถามซ้ำสองรอบว่าแน่ใจแล้วนะ แล้วก็ไม่ถามอีก';
   return asCard({ id: 'X8-สละ', title: 'ใบแจ้งที่ไม่ได้ใช้',
-    text: `ชื่อ {ชื่อ} อยู่บนป้ายของ${(S.p2.final || []).map(b => BR_TH[b]).join(' ')} แต่ตัดสินใจแล้วว่าปีนี้จะไม่ไปรายงานตัว ใบแจ้งผลพับเก็บไว้ในลิ้นชัก\n${home}`,
+    text: `ชื่อ {ชื่อ} อยู่บนป้ายของ ${(S.p2.final || []).map(b => BR_TH[b]).join(' ')} แต่ตัดสินใจแล้วว่าปีนี้จะไม่ไปรายงานตัว ใบแจ้งผลพับเก็บไว้ในลิ้นชัก\n${home}`,
     options: [
       { label: 'เก็บใบแจ้งไว้เป็นที่ระลึก', fx: { happiness: 1 }, result: 'บางคืนยังหยิบขึ้นมาอ่าน แล้วก็พับเก็บที่เดิม' },
       { label: 'กลับไปเรียนต่อตามเดิม', fx: { knowledge: 1 }, result: 'เปิดเทอมแรกเพื่อนถามว่าไม่ไปแล้วเหรอ ตอบว่าปีนี้ยังไม่ไป' },
       { label: 'ยกหนังสือติวให้รุ่นน้อง', fx: { relations: 1 }, merit: { help_others: 1 }, result: 'รุ่นน้องรับไปด้วยมือสองข้าง ถามว่าพี่ติดแล้วทำไมไม่ไป' },
       { label: 'ไม่อยากคิดถึงมันอีก', fx: { happiness: -1 }, result: 'ใบแจ้งยัดไว้ใต้กองหนังสือ ไม่หยิบออกมาอีก อย่างน้อยก็ปีนี้' }] });
 }
+// Q-A1 (ก): ปีหน้าอายุยังสมัครได้ → นัด "ใบประกาศปีที่สอง" (INV-R) ปีหน้า แล้วเล่นต่อ · เกินอายุ = จบเส้น (เกมจริง S.returnHold)
+const LAST_AGE = 18;
+function declineNextYear() {
+  if (S.age + 1 > LAST_AGE) { finish('สละสิทธิ์ทุกเหล่า · ปีหน้าอายุพ้นเกณฑ์รับสมัครแล้ว ชีวิตเดินต่อตามทางอื่นของเกม'); return 'END'; }
+  S.sched.push({ id: 'INV-R', age: S.age + 1 });
+  S.p2 = null;
+  S.flags.delete('cadet_exam_door');   // ไม่ใช้ endExamYear: ห้ามตั้ง cadet_dream กลับ (INV-R ต้องไม่มีธงฝัน)
+  S.age++;
+  beginYear();
+  return 'END';
+}
+// INV-R · ใบประกาศปีที่สอง (บท S1 · cadet_invite_return_01 · เกมจริง S.returnInvite) · ทุกทางล้าง cadet_declined_seat
+function returnInviteCard() {
+  if (!(S.sex === 'ชาย' && S.flags.has('cadet_declined_seat') && !S.flags.has('cadet_dream') && !S.flags.has('cadet_let_go'))) return null;
+  const lines = [secretNow() ? 'ปีก่อนที่บ้านไม่รู้ ปีนี้ก็ยังไม่มีใครรู้' : '{ผู้ใหญ่}เห็นแล้วไม่พูดอะไร แค่วางใบประกาศไว้บนโต๊ะกินข้าว',
+    S.age >= LAST_AGE ? 'ปีนี้คือปีสุดท้ายที่อายุยังสมัครได้' : ''].filter(Boolean);
+  const clear = ['cadet_declined_seat'];
+  return { id: 'INV-R', title: 'ใบประกาศปีที่สอง', kind: 'invite', repeatable: true,
+    text: `ปีก่อนติดแล้วไม่ไป ปีนี้ใบประกาศกลับมาติดบอร์ดอีก หัวกระดาษเหมือนเดิมทุกตัว ใบแจ้งผลปีก่อนยังพับอยู่ในลิ้นชัก {ชื่อ} ยืนอ่านอยู่นานกว่าใคร\n${lines.join('\n')}`,
+    options: [
+      { label: 'สมัครอีกรอบ คราวนี้ไปให้ถึง', fx: { happiness: 1 }, setFlags: ['cadet_dream'], clearFlags: clear, result: 'หยิบใบแจ้งปีก่อนออกมาวางข้างใบสมัครใหม่' },
+      { label: 'สมัคร คราวนี้เลือกเหล่าให้ตรงใจ', fx: { knowledge: 1 }, setFlags: ['cadet_dream'], clearFlags: clear, result: 'กางรายชื่อสี่เหล่าบนโต๊ะ ปีนี้รู้แล้วว่าใจอยู่ตรงไหน' },
+      { label: 'ไม่สอบ ทางที่เลือกไว้ดีแล้ว', fx: { happiness: 1 }, setFlags: ['cadet_let_go'], clearFlags: clear, result: 'ฉีกใบประกาศเป็นสองท่อน แล้วก็ไม่ได้คิดถึงมันอีก' },
+      { label: 'ไปถามครูแนะแนวก่อนตัดสินใจ', fx: { network: 1 }, clearFlags: clear,
+        outcomes: [{ p: 2, setFlags: ['cadet_dream'], result: 'ครูบอกว่า "ติดมาแล้วครั้งหนึ่ง ปีนี้ก็ติดได้ ลองอีกทีเถอะ"' },
+          { p: 1, setFlags: ['cadet_let_go'], result: 'ครูถามกลับว่าปีก่อนทำไมไม่ไป ตอบไม่ได้ เลยตัดสินใจไม่สมัคร' }] }] };
+}
 function arriveCard(b) {
   S.title = 'นตท.';   // คำนำหน้าเริ่มวันรายงานตัวตามของจริง (เจ้าของเคาะ A 2026-11-06) · เฟส 3 เปลี่ยนเป็น นนร./นนอ./นรต.
   S.p2.steps = [() => { finish(`ติดเตรียมทหาร (ต่อ ${BR_TH[b]}) · จะติดยศตอนอายุ ${S.age + 7} · เฟสถัดไปคือชีวิตในโรงเรียนเตรียมทหาร`); return 'END'; }];
-  return statusCard('รายงานตัวที่นครนายก', `รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BR_TH[b]} อีกเจ็ดปีจะได้ติดยศ\nลงชื่อเสร็จ เจ้าหน้าที่ขานชื่อใหม่ว่า นตท.{ชื่อเต็ม} เป็นครั้งแรก`);
+  const y = year(), gate = y >= CAMPUS_NAYOK_YEAR ? 'รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ'
+    : `รถเมล์จอดหน้าประตูโรงเรียนเตรียมทหารริมถนน${y < CAMPUS_RAMA4_YEAR ? 'ราชดำเนิน' : 'พระรามที่ 4'} ตอนเช้ามืด รถเริ่มติดตั้งแต่ฟ้ายังไม่สว่าง รุ่นพี่ในชุดฝึกยืนเรียงรับ`;   // ที่ตั้งตามยุค
+  return statusCard('รายงานตัวที่{ที่ตั้ง}', `${gate}\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BR_TH[b]} อีกเจ็ดปีจะได้ติดยศ\nลงชื่อเสร็จ เจ้าหน้าที่ขานชื่อใหม่ว่า นตท.{ชื่อเต็ม} เป็นครั้งแรก`);
 }
 function passedCard(b) {
   S.p2.chosen = b;
@@ -12897,7 +12949,7 @@ function renderSide() {
 }
 
 window.__demoState = () => S;   // test hook only
-window.__demoAnnounce = { x2wCard, x3aCard, x3Card, x3bCard, applyForm, finalBoard, bodyBoard, cheerCard, failedCard, arriveCard, announceCard, bodyWaitCard, declinedCard, show, fill };   // test hook only (announce scenes · apply form · voice pass)
+window.__demoAnnounce = { x2wCard, x3aCard, x3Card, x3bCard, applyForm, finalBoard, bodyBoard, cheerCard, failedCard, arriveCard, announceCard, bodyWaitCard, declinedCard, declineNextYear, returnInviteCard, packNotice, reportAsk, show, fill };   // test hook only (announce scenes · apply form · voice pass)
 setup();
 })();
 </script>

@@ -20,23 +20,23 @@ events:
         text: "พูดเรื่องนี้ให้ได้ภายในวันนี้"
         effects: {happiness: 1}
         merit: [{cat: neutral}]
-        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
+        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_poor_one, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
       - id: list_costs
         text: "จดค่าใช้จ่ายให้ครบก่อนพูด"
         effects: {knowledge: 1}
         merit: [{cat: neutral}]
-        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
+        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_poor_one, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
       - id: ask_friend
         text: "ถามเพื่อนว่าบอกที่บ้านยังไง"
         effects: {relations: 1}
         merit: [{cat: neutral}]
-        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
+        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_poor_one, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
       - id: wait_year
         text: "รอจังหวะดี ๆ ไว้ปีหน้า"
         hint: "ได้คุยช้าลง เวลาเตรียมตัวก็สั้นลง"
         effects: {happiness: -1}
         merit: [{cat: neutral}]
-        schedules: [{event: cadet_tell_none, after_years: [1, 1]}, {event: cadet_tell_poor, after_years: [1, 1]}, {event: cadet_tell_mother, after_years: [1, 1]}, {event: cadet_tell_father, after_years: [1, 1]}]
+        schedules: [{event: cadet_tell_none, after_years: [1, 1]}, {event: cadet_tell_poor, after_years: [1, 1]}, {event: cadet_tell_poor_one, after_years: [1, 1]}, {event: cadet_tell_mother, after_years: [1, 1]}, {event: cadet_tell_father, after_years: [1, 1]}]
   # <<< nl-writer b003 evt cadet_tell_family
   # >>> nl-writer b003 evt cadet_tell_none
   - id: cadet_tell_none
@@ -93,9 +93,9 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], age: [13, 17], class: [ยากไร้, ยากจนมาก, ยากจน, ค่อนข้างจน], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
+    when: {sex: [ชาย], age: [13, 17], class: [ยากไร้, ยากจนมาก, ยากจน, ค่อนข้างจน], family: [{role: parent, alive: true, count: [2, 2]}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "เรียนฟรี แต่ค่าติวไม่ฟรี"
-    text: "มื้อเย็นนี้ผู้ใหญ่ในบ้านคุยกันเสียงเบา ๆ ว่าเดือนหน้าเงินจะไม่พอใช้ {ชื่อ} กินข้าวเงียบ ๆ ถ้าสอบติดก็เรียนฟรีจริง แต่ก่อนจะถึงวันนั้นยังมีค่าติว ค่าสมัคร กับค่ารถเข้าเมือง"
+    text: "มื้อเย็นนี้พ่อกับแม่คุยกันเสียงเบา ๆ ว่าเดือนหน้าเงินจะไม่พอใช้ {ชื่อ} กินข้าวเงียบ ๆ ถ้าสอบติดก็เรียนฟรีจริง แต่ก่อนจะถึงวันนั้นยังมีค่าติว ค่าสมัคร กับค่ารถเข้าเมือง"
     choices:
       - id: tell
         text: "บอกที่บ้านตรง ๆ ว่าอยากสอบ"
@@ -132,6 +132,51 @@ events:
         clears_flags: [cadet_dream]
         merit: [{cat: neutral}]
   # <<< nl-writer b003 evt cadet_tell_poor
+
+  # S2 2026-11-06 (D2 · เจ้าของเลือก ก): แยกจาก cadet_tell_poor — พ่อแม่ไม่ครบ ใช้ {ผู้ใหญ่} (แม่/พ่อ/ป้า) นั่งนับเงิน · ใบเดิมเหลือเฉพาะพ่อแม่ครบ
+  - id: cadet_tell_poor_one
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2501, 2650]
+    when: {sex: [ชาย], age: [13, 17], class: [ยากไร้, ยากจนมาก, ยากจน, ค่อนข้างจน], family: [{role: parent, alive: true, count: [0, 1]}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
+    title: "เรียนฟรี แต่ค่าติวไม่ฟรี"
+    text: "มื้อเย็นนี้{ผู้ใหญ่}นั่งนับเงินในกระป๋อง บ่นเบา ๆ ว่าเดือนหน้าคงไม่พอใช้ {ชื่อ} กินข้าวเงียบ ๆ ถ้าสอบติดก็เรียนฟรีจริง แต่ก่อนจะถึงวันนั้นยังมีค่าติว ค่าสมัคร กับค่ารถเข้าเมือง"
+    choices:
+      - id: tell
+        text: "บอกที่บ้านตรง ๆ ว่าอยากสอบ"
+        sets_flags: [cadet_family_told]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 6.5, text: "ที่บ้านไม่ห้าม แต่ไม่มีเงินค่าติวให้ ผู้ใหญ่ในบ้านไปขอยืมข้อสอบเก่าจากบ้านข้าง ๆ มาให้อ่าน", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_relative, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_loanshark, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_village, after_years: [0, 0]}, {event: cadet_fund_coop, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_pawn, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_cattle, after_years: [0, 0]}], merit: [{cat: neutral}]}
+      - id: read_alone
+        text: "บอกที่บ้าน แต่จะอ่านเองไม่ติว"
+        effects: {relations: 1}
+        sets_flags: [cadet_family_told]
+        merit: [{cat: neutral}]
+      - id: earn_fee
+        text: "บอก แล้วรับจ้างหาค่าสมัครเอง"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.1}}
+        sets_flags: [cadet_family_told]
+        merit: [{cat: neutral}]
+      - id: keep_secret
+        text: "ยังไม่บอก ไม่อยากให้ที่บ้านกังวล"
+        hint: "ค่าใช้จ่ายต้องหาเอง"
+        effects: {relations: -1}
+        sets_flags: [cadet_family_secret]
+        schedules: [{event: cadet_papers_found, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: let_go
+        text: "เลิกคิด ช่วยงานที่บ้านดีกว่า"
+        effects: {happiness: -2}
+        sets_flags: [cadet_let_go]
+        clears_flags: [cadet_dream]
+        merit: [{cat: neutral}]
   # >>> nl-writer b003 evt cadet_tell_mother
   - id: cadet_tell_mother
     type: A

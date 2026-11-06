@@ -555,6 +555,8 @@ export const FILL = {
   จังหวัด: (st) => provinceLabel(st),
   เงิน: (st) => Math.round(st.money).toLocaleString('en-US'),
   ชื่อ: (st) => st.name,
+  // ผู้ใหญ่คนเดียวที่ดูแลในบ้าน (เจ้าของเคาะ ก 2026-11-06 · ใช้แทน "ผู้ใหญ่ในบ้าน" ที่หมายถึงคนเดียว): แม่ยังอยู่ = แม่ · มีแต่พ่อ = พ่อ · ไม่มีพ่อแม่ = ป้า
+  ผู้ใหญ่: (st) => (st.parents?.find((p) => p.sex === 'หญิง')?.alive ? 'แม่' : st.parents?.find((p) => p.sex === 'ชาย')?.alive ? 'พ่อ' : 'ป้า'),
   // ชื่อ + นามสกุล (บท S1 2026-11-06 ใช้กับ "นตท.{ชื่อเต็ม}") · เกมยังไม่มีนามสกุล = ชื่อเฉย ๆ · คำนำหน้าไม่ใส่ใน {ชื่อ}/{ชื่อเต็ม} (เจ้าของเคาะ A1)
   ชื่อเต็ม: (st) => (st.surname ? `${st.name} ${st.surname}` : st.name),
   ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
@@ -834,6 +836,8 @@ function trackExit(st, track, year, out = st.due) {
   if (track.gate) out.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
   else {
     st.school = null;
+    // จบโรงเรียนนายร้อยเข้าบันไดยศ: เลิกเป็น นตท. (G2 เจ้าของเคาะ 2026-11-06) · เฟส 3 ค่อยใส่ยศจริง
+    if (track.ladder && st.title === 'นตท.') delete st.title;
     if (track.ladder) applyEffects(st, { ladder: track.ladder });
     else dueJob(st);
   }

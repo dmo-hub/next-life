@@ -1,6 +1,6 @@
 # เส้นเตรียมทหาร · สนามสอบ (เฟส 2) และฉากปีสอบซ้ำ — engine: src/engine/cadet.mjs
 # ที่มา: demo ที่เจ้าของเล่นและเคาะแล้ว (.claude/research/demo/data-04.js · cadet-phase1-demo.html) 2026-11-05
-# ธงที่ engine ตั้งเอง (ไม่อยู่ในทะเบียนธงเพราะยังไม่มีการ์ดเนื้อหาอ่าน): cadet_body_seen · cadet_passed · cadet_retry · cadet_declined_seat (สละสิทธิ์ทุกเหล่า · ปีหน้ายังสอบได้) · cadet_branch:<เหล่า> (ลงทะเบียนเป็น prefix)
+# ธงที่ engine ตั้งเอง (ไม่อยู่ในทะเบียนธงเพราะยังไม่มีการ์ดเนื้อหาอ่าน): cadet_body_seen · cadet_passed · cadet_retry · cadet_branch:<เหล่า> (ลงทะเบียนเป็น prefix)
 # numbers = ค่าที่เจ้าของเคาะ · fx ในไฟล์นี้เป็นหน่วย demo (1 = fx_unit แต้ม)
 numbers:
   written_min: 13
@@ -28,6 +28,10 @@ numbers:
       from: [cadet_life_branch_map_phone]
   # ปีเรียนหลังสอบติด: เตรียมทหาร prep_years + โรงเรียนเหล่า academy_years = ติดยศ (เจ้าของเคาะ 2026-11-06 · ทอ. อนุมาน)
   prep_years: 2
+  # ที่ตั้งโรงเรียนเตรียมทหารตามยุค (บท S1 · เจ้าของรับ 2026-11-06): ก่อน campus_nayok_year อยู่กรุงเทพฯ
+  # (ก่อน campus_rama4_year ถนนราชดำเนิน · จากนั้นถนนพระรามที่ 4) · ตั้งแต่ 4 พ.ค. 2543 อยู่นครนายก
+  campus_rama4_year: 2504
+  campus_nayok_year: 2543
   # คะแนนรวม · ลำดับที่ ตอนประกาศผลรอบสุดท้าย (เจ้าของเคาะ C1–C4 2026-11-06) · ลำดับเป็นตัวเลขเล่าเรื่อง ไม่ตัดสินผ่าน/ตก (เส้นแต่ละรอบยังตัดสินเหมือนเดิม)
   seats:                     # ที่นั่งรายเหล่า ปี 2568 ใช้ทุกยุค
     army: 270
