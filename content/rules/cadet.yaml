@@ -21,6 +21,8 @@ numbers:
   fx_unit: 5
   commission_after: 7
   last_age: 18
+  # ถือธงนี้ = กองสุ่มจั่วเฉพาะใบที่ when.flags.has มีธงนี้ (ชีวิตเด็กเตรียมทหาร · cadet_life.yaml)
+  pool_focus_flag: cadet_dream
 branches:
   army: ทบ.
   navy: ทร.

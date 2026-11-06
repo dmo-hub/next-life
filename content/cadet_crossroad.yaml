@@ -94,7 +94,7 @@ events:
       - id: army
         text: "คุยกับรุ่นพี่ที่จะไปทหารบก"
         effects: {happiness: 1}
-        sets_flags: ["cadet_lean:army"]
+        sets_flags: ["cadet_lean:army", knows_senior, cadet_met_senior]
         schedules:
           - {event: cadet_tell_family, after_years: [0, 0]}
           - {event: cadet_prep_choice, after_years: [1, 1]}
@@ -102,7 +102,7 @@ events:
       - id: navy
         text: "คุยกับรุ่นพี่ที่จะไปทหารเรือ"
         effects: {happiness: 1}
-        sets_flags: ["cadet_lean:navy"]
+        sets_flags: ["cadet_lean:navy", knows_senior, cadet_met_senior]
         schedules:
           - {event: cadet_tell_family, after_years: [0, 0]}
           - {event: cadet_prep_choice, after_years: [1, 1]}
@@ -110,7 +110,7 @@ events:
       - id: airforce
         text: "คุยกับรุ่นพี่ที่จะไปทหารอากาศ"
         effects: {happiness: 1}
-        sets_flags: ["cadet_lean:airforce"]
+        sets_flags: ["cadet_lean:airforce", knows_senior, cadet_met_senior]
         schedules:
           - {event: cadet_tell_family, after_years: [0, 0]}
           - {event: cadet_prep_choice, after_years: [1, 1]}
@@ -118,16 +118,7 @@ events:
       - id: police
         text: "คุยกับรุ่นพี่ที่จะไปเป็นตำรวจ"
         effects: {happiness: 1}
-        sets_flags: ["cadet_lean:police"]
-        schedules:
-          - {event: cadet_tell_family, after_years: [0, 0]}
-          - {event: cadet_prep_choice, after_years: [1, 1]}
-        merit: [{cat: neutral}]
-      - id: tutor
-        text: "ขอรุ่นพี่ช่วยติวให้"
-        hint: "ได้คนช่วยดูทาง แต่ต้องรักษาคำพูด"
-        effects: {network: 1}
-        sets_flags: [cadet_senior_tutor]
+        sets_flags: ["cadet_lean:police", knows_senior, cadet_met_senior]
         schedules:
           - {event: cadet_tell_family, after_years: [0, 0]}
           - {event: cadet_prep_choice, after_years: [1, 1]}
@@ -135,14 +126,10 @@ events:
       - id: slow
         text: "ยังไม่เลือกเหล่า ค่อยเป็นค่อยไป"
         effects: {knowledge: 1}
+        sets_flags: [knows_senior, cadet_met_senior]
         schedules:
           - {event: cadet_tell_family, after_years: [0, 0]}
           - {event: cadet_prep_choice, after_years: [2, 2]}
-        merit: [{cat: neutral}]
-      - id: step_back
-        text: "ขอคิดดูก่อน ยังไม่ผูกมัด"
-        effects: {happiness: 1}
-        clears_flags: [cadet_dream]
         merit: [{cat: neutral}]
   # <<< nl-writer b001 evt cadet_senior_visit_01
 
@@ -152,7 +139,7 @@ events:
     category: study
     stage: วัยรุ่น
     years: [2506, 2650]
-    when: {sex: [ชาย], school: [lower], flags: {has: [cadet_dream, knows_senior]}}
+    when: {sex: [ชาย], school: [lower], flags: {has: [cadet_dream, knows_senior], not: [cadet_met_senior]}}
     title: "พี่คนเดิมหน้าบ้าน"
     text: "ปิดภาคนี้พี่ที่เคยวิ่งผ่านหน้าบ้านกลับมาอีก รู้จากผู้ใหญ่ในซอยว่า {ชื่อ} เขียนเตรียมทหารลงกระดาษแนะแนว เลยชวนมานั่งที่ศาลา เล่าว่าเพื่อนรุ่นเดียวกันแยกไปสี่ทาง ทหารบก ทหารเรือ ทหารอากาศ ตำรวจ ไม่ต้องรีบเลือก"
     choices:
@@ -188,26 +175,12 @@ events:
           - {event: cadet_tell_family, after_years: [0, 0]}
           - {event: cadet_prep_choice, after_years: [1, 1]}
         merit: [{cat: neutral}]
-      - id: tutor
-        text: "ขอรุ่นพี่ช่วยติวให้"
-        hint: "ได้คนช่วยดูทาง แต่ต้องรักษาคำพูด"
-        effects: {network: 1}
-        sets_flags: [cadet_senior_tutor]
-        schedules:
-          - {event: cadet_tell_family, after_years: [0, 0]}
-          - {event: cadet_prep_choice, after_years: [1, 1]}
-        merit: [{cat: neutral}]
       - id: slow
         text: "ยังไม่เลือกเหล่า ค่อยเป็นค่อยไป"
         effects: {knowledge: 1}
         schedules:
           - {event: cadet_tell_family, after_years: [0, 0]}
           - {event: cadet_prep_choice, after_years: [2, 2]}
-        merit: [{cat: neutral}]
-      - id: step_back
-        text: "ขอคิดดูก่อน ยังไม่ผูกมัด"
-        effects: {happiness: 1}
-        clears_flags: [cadet_dream]
         merit: [{cat: neutral}]
   # <<< nl-writer b001 evt cadet_senior_neighbor_01
 

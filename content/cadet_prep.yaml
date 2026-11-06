@@ -677,10 +677,11 @@ events:
         schedules: [{event: cadet_slack_home, after_years: [1, 1]}, {event: cadet_slack_camp, after_years: [1, 1]}]
         merit: [{cat: neutral}]
       - id: senior
-        text: "ติวกับรุ่นพี่ที่รับปากไว้"
-        requires: {flags: {has: [cadet_senior_tutor]}, reason: "ยังไม่มีรุ่นพี่รับปากจะติวให้"}
+        text: "ขอรุ่นพี่ช่วยติวให้"
+        hint: "ได้คนช่วยดูทาง แต่ต้องรักษาคำพูด"
+        requires: {flags: {has: [knows_senior]}, reason: "ยังไม่รู้จักรุ่นพี่ที่จะขอให้ติว"}
         effects: {knowledge: 1, network: 1}
-        sets_flags: [cadet_prep_senior, cadet_tips]
+        sets_flags: [cadet_prep_senior, cadet_tips, cadet_senior_tutor]
         schedules: [{event: cadet_slack_home, after_years: [1, 1]}, {event: cadet_slack_camp, after_years: [1, 1]}]
         merit: [{cat: neutral}]
       - id: self_read

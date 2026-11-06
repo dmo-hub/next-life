@@ -1572,7 +1572,10 @@ export function takeYearQuota(st) {
 // ชีวิตที่เนื้อหาไม่มีกองจึงได้ชะตาเดิมทุกหลัก
 function drawPool(st, year) {
   const stage = stageOf(st.age);
-  const pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
+  let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
+  // เส้นเตรียมทหาร (เจ้าของ 2026-11-06): ถือธงนี้อยู่ = จั่วเฉพาะใบที่ต้องมีธงนี้ เรื่องชีวิตวัยรุ่นทั่วไปพักไว้ก่อน
+  const focusFlag = st.content.cadet?.numbers?.pool_focus_flag;
+  if (focusFlag && st.flags[focusFlag]) pool = pool.filter((e) => e.when?.flags?.has?.includes(focusFlag));
   // รอบที่กองแห้งนับแยกช่วงวัย — harness/pace.mjs อ่านเป็นรายการกองที่ต้องเติม (ไม่ออกไปกับการ์ด)
   if (!pool.length) (st.poolDry ??= {})[stage] = (st.poolDry[stage] ?? 0) + 1;
   if (!pool.length || st.rng.next() >= POOL_CHANCE[stage]) return null;

@@ -1,0 +1,537 @@
+# ชีวิตเด็กเตรียมทหาร (อายุ 13–18) — การ์ดกองสุ่มหลังตัดสินใจสอบ (ถือ cadet_dream)
+# ระหว่างถือ cadet_dream กองสุ่มวัยรุ่นจั่วเฉพาะใบที่ when.flags.has มี cadet_dream (numbers.pool_focus_flag ใน rules/cadet.yaml)
+# ยกจากเดโม data-06.js (MIL1–MIL12 · เจ้าของ 2026-11-06) · ตัดบรรทัดตามบริบท (ภาค/ชนชั้น/ค่ายติว) เพราะ schema การ์ดยังไม่มี
+events:
+  - id: cadet_life_first_crewcut
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 1
+    when:
+      sex:
+        - ชาย
+      age:
+        - 13
+        - 15
+      flags:
+        has:
+          - cadet_dream
+    title: หัวเกรียนครั้งแรก
+    text: ร้านตัดผมหน้าตลาดมีรูปทรงผมนักเรียนเตรียมทหารติดข้างกระจก ช่างถามว่าเอาแบบเดิมหรือแบบในรูป
+    choices:
+      - id: c1
+        text: เอาแบบในรูป เกรียนสามด้าน
+        effects:
+          happiness: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: ขอสั้นกว่าเดิมนิดเดียวก่อน
+        effects:
+          relations: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ถามช่างว่าใครที่สอบติดเคยมาตัด
+        effects:
+          network: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: ไว้ผมยาวต่ออีกปี
+        effects:
+          happiness: 1
+        merit:
+          - cat: neutral
+  - id: cadet_life_rd_drill
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 1.2
+    when:
+      sex:
+        - ชาย
+      age:
+        - 15
+        - 18
+      school:
+        - upper
+        - voc
+      flags:
+        has:
+          - cadet_dream
+    title: ชั่วโมงรักษาดินแดน
+    text: บ่ายวันพฤหัสครูฝึก รด. สั่งแถวกลางสนามแดดเปรี้ยง ยืนตรงสิบนาทีแรกมีคนเป็นลมไปสองคน ครูฝึกเดินมาหยุดตรงหน้า {ชื่อ}
+    choices:
+      - id: c1
+        text: ยืนตรงต่อ ไม่กะพริบตา
+        effects:
+          health: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: ขานรับเสียงดังกว่าทุกคน
+        effects:
+          network: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ถามครูฝึกเรื่องสอบเตรียมทหาร
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: พยุงเพื่อนที่เป็นลมไปหลบร่ม
+        effects:
+          relations: 1
+        merit:
+          - cat: neutral
+  - id: cadet_life_kids_day_camp
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 1
+    when:
+      sex:
+        - ชาย
+      age:
+        - 13
+        - 14
+      flags:
+        has:
+          - cadet_dream
+    title: วันเด็กในค่าย
+    text: วันเด็กปีนี้ค่ายทหารใกล้บ้านเปิดให้เข้าชม รถถังจอดเรียงให้ปีน เด็กเล็กต่อแถวยาว {ชื่อ} มากับน้องข้างบ้าน แต่สายตาไปหยุดที่โต๊ะรับสมัครข้อมูลโรงเรียนเตรียมทหาร
+    choices:
+      - id: c1
+        text: ไปยืนถามที่โต๊ะรับสมัคร
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: พาน้องไปปีนรถถังก่อน
+        effects:
+          relations: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ถ่ายรูปคู่กับทหารที่ยืนเวร
+        effects:
+          happiness: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: แอบดูทหารใหม่ฝึกแถวหลังเต็นท์
+        effects:
+          health: 1
+        merit:
+          - cat: neutral
+  - id: cadet_life_nickname_captain
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 1
+    when:
+      sex:
+        - ชาย
+      age:
+        - 13
+        - 17
+      flags:
+        has:
+          - cadet_dream
+    title: เพื่อนเรียก 'ผู้กอง'
+    text: เพื่อนในห้องรู้แล้วว่า {ชื่อ} จะสอบเตรียมทหาร ตั้งแต่สัปดาห์ก่อนก็เรียกว่า 'ผู้กอง' ทุกครั้งที่เดินเข้าห้อง บางคนทำท่าวันทยหัตถ์ล้อ
+    choices:
+      - id: c1
+        text: วันทยหัตถ์ตอบให้ถูกท่า
+        effects:
+          relations: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: หัวเราะไปด้วย ไม่ถือ
+        effects:
+          happiness: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ชวนเพื่อนที่ล้อมาวิ่งตอนเช้า
+        effects:
+          health: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: เงียบ แล้วกลับไปอ่านหนังสือ
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+  - id: cadet_life_evening_news
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 0.9
+    when:
+      sex:
+        - ชาย
+      age:
+        - 13
+        - 18
+      flags:
+        has:
+          - cadet_dream
+    title: ข่าวภาคค่ำ
+    text: ข่าวภาคค่ำมีรายงานทหารช่วยน้ำท่วม แบกกระสอบทรายกันทั้งคืน ผู้ใหญ่ในบ้านหันมามอง {ชื่อ} แวบหนึ่ง แล้วกลับไปดูทีวีต่อ
+    choices:
+      - id: c1
+        text: ถามที่บ้านว่าถ้าเป็นเราจะไปไหม
+        effects:
+          relations: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: จดชื่อหน่วยที่ไปช่วยไว้
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ลุกไปวิดพื้นข้างทีวี
+        effects:
+          health: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: นึกถึงตัวเองในชุดนั้น
+        effects:
+          happiness: 1
+        merit:
+          - cat: neutral
+  - id: cadet_life_old_exam_swap
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 1
+    when:
+      sex:
+        - ชาย
+      age:
+        - 14
+        - 17
+      flags:
+        has:
+          - cadet_dream
+    title: ข้อสอบเก่าแลกกัน
+    text: ที่โรงเรียนมีเด็กอีกสามคนที่จะสอบเตรียมทหารปีเดียวกัน แต่ละคนมีข้อสอบเก่าคนละชุด คนหนึ่งเสนอให้ถ่ายเอกสารแลกกัน
+    choices:
+      - id: c1
+        text: แลกครบทุกชุด แล้วนัดติวด้วยกัน
+        effects:
+          knowledge: 1
+          relations: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: แลก แต่ขออ่านคนเดียว
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ให้ชุดของตัวเองไปฟรี ๆ
+        effects:
+          network: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: ไม่แลก เก็บไว้อ่านเอง
+        effects:
+          happiness: -1
+        merit:
+          - cat: neutral
+  - id: cadet_life_oath_parade_tv
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 0.8
+    when:
+      sex:
+        - ชาย
+      age:
+        - 13
+        - 18
+      flags:
+        has:
+          - cadet_dream
+    title: พิธีถวายสัตย์ทางทีวี
+    text: ทีวีถ่ายทอดพิธีสวนสนามถวายสัตย์ปฏิญาณ แถวนักเรียนนายร้อยเดินเท้าพร้อมกันจนพื้นสนามสั่น {ชื่อ} นั่งดูตั้งแต่แถวแรกจนแถวสุดท้าย
+    choices:
+      - id: c1
+        text: นับก้าวตามจนจำจังหวะได้
+        effects:
+          health: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: ทายว่าแถวไหนเป็นเหล่าไหน
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ชวนที่บ้านมานั่งดูด้วย
+        effects:
+          relations: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: ปิดทีวีแล้วไปอ่านหนังสือต่อ
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+  - id: cadet_life_conscript_home
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 0.9
+    when:
+      sex:
+        - ชาย
+      age:
+        - 14
+        - 17
+      flags:
+        has:
+          - cadet_dream
+    title: พี่ทหารเกณฑ์กลับบ้าน
+    text: ลูกชายบ้านท้ายซอยจับได้ใบแดงเมื่อปีก่อน วันนี้ลาพักกลับบ้าน ผิวคล้ำ หัวเกรียน นั่งอยู่ที่ร้านน้ำชาหน้าซอย
+    choices:
+      - id: c1
+        text: ไปนั่งถามเรื่องการฝึก
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: ขอให้สอนท่ากายบริหาร
+        effects:
+          health: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ถามว่าทำไมไม่สอบเป็นนายร้อย
+        effects:
+          network: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: แค่ทักทายแล้วเดินผ่าน
+        effects:
+          happiness: 1
+        merit:
+          - cat: neutral
+  - id: cadet_life_branch_map
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 0.9
+    when:
+      sex:
+        - ชาย
+      age:
+        - 14
+        - 17
+      flags:
+        has:
+          - cadet_dream
+    title: แผนที่เหล่า
+    text: ครูภูมิศาสตร์ให้ทำรายงานเรื่องอะไรก็ได้ {ชื่อ} เลือกเรื่องที่ตั้งของโรงเรียนเหล่าทัพ ปักหมุดบนแผนที่ประเทศ
+    choices:
+      - id: c1
+        text: ทำครบสี่เหล่า มีรูปประกอบ
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: เน้นเหล่าที่ใจเอียงไป
+        effects:
+          happiness: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ชวนเพื่อนที่จะสอบด้วยกันทำ
+        effects:
+          relations: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: โทรถามรุ่นพี่ที่อยู่ในนั้นจริง
+        effects:
+          network: 1
+        merit:
+          - cat: neutral
+  - id: cadet_life_tutor_billboard
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 0.8
+    when:
+      sex:
+        - ชาย
+      age:
+        - 15
+        - 17
+      flags:
+        has:
+          - cadet_dream
+    title: ป้ายหน้าค่ายติว
+    text: หน้าค่ายติวในเมืองขึ้นป้ายรายชื่อคนสอบติดเมื่อปีก่อน ชื่อเรียงยาวสองแผ่น มีรูปหน้าตรงในชุดนักเรียนเตรียมทหารทุกคน
+    choices:
+      - id: c1
+        text: ยืนอ่านทุกชื่อ
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: จดชื่อคนจากอำเภอเดียวกันไว้
+        effects:
+          network: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: นึกภาพรูปตัวเองบนป้าย
+        effects:
+          happiness: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: เดินผ่านไปเฉย ๆ
+        merit:
+          - cat: neutral
+  - id: cadet_life_traffic_police
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 0.8
+    when:
+      sex:
+        - ชาย
+      age:
+        - 13
+        - 17
+      flags:
+        has:
+          - cadet_dream
+    title: ตำรวจจราจรหน้าโรงเรียน
+    text: เช้านี้ฝนตก ตำรวจจราจรหน้าโรงเรียนยืนโบกรถอยู่คนเดียว เด็กข้ามถนนกันไม่เป็นแถว {ชื่อ} ยืนรออยู่ที่ขอบฟุตบาท
+    choices:
+      - id: c1
+        text: อาสาช่วยจัดแถวเด็กข้ามถนน
+        effects:
+          relations: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: ถามตำรวจว่าเข้ามาทางไหน
+        effects:
+          network: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ยืนดูท่าโบกรถ
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: วิ่งข้ามไปก่อนจะสาย
+        effects:
+          health: 1
+        merit:
+          - cat: neutral
+  - id: cadet_life_midterm_night
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 1
+    repeat:
+      gap: 1
+      max: 3
+    when:
+      sex:
+        - ชาย
+      age:
+        - 14
+        - 17
+      flags:
+        has:
+          - cadet_dream
+    title: คืนก่อนสอบกลางภาค
+    text: พรุ่งนี้สอบกลางภาค แต่หนังสือที่เปิดค้างอยู่บนโต๊ะเป็นข้อสอบเก่าเตรียมทหาร ไม่ใช่หนังสือเรียน
+    choices:
+      - id: c1
+        text: อ่านหนังสือเรียนให้จบก่อน
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+      - id: c2
+        text: แบ่งเวลาอย่างละครึ่ง
+        effects:
+          knowledge: 1
+        merit:
+          - cat: neutral
+      - id: c3
+        text: อ่านข้อสอบเก่าต่อ
+        effects:
+          happiness: 1
+        merit:
+          - cat: neutral
+      - id: c4
+        text: ปิดไฟนอน พรุ่งนี้ค่อยว่ากัน
+        effects:
+          health: 1
+        merit:
+          - cat: neutral
