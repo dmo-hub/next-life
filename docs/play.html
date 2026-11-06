@@ -594,13 +594,6 @@ body:has(#app > .card.af) .logo b { color:var(--gold); }
 body:has(#app > .card.af) .logo small, body:has(#app > .card.af) .logo .ver, body:has(#app > .card.af) .logo .saved { color:var(--sand); }
 body:has(#app > .card.af) .foot a { color:var(--ink2); }
 .af .sb { background:#120D0A; }
-/* แถบโฟกัสต่างโลก (05a): โครง .focus ของโลกหลัก สีชุดต่างโลก · ทางที่ทำอยู่เด่นสีทอง ไม่จางแบบตัวเลือกล็อก */
-.ifocusbar { padding:8px 20px 0; }
-.ifocusbar button { border-color:#2A3478; background:#0E1024; color:#E8ECFF; }
-.ifocusbar button:hover, .ifocusbar button:focus-visible { border-color:#6FE3FF; background:#1E2350; }
-.ifocusbar .focus-fx, .ifocusbar .focus-go { color:#6FE3FF; opacity:1; }
-.ifocusbar .focus-pick .on { border-color:#F2C94C; background:#1E2350; }
-.ifocusbar .focus-pick .on .focus-fx { color:#F2C94C; }
 /* จดหมายเหตุบนการ์ดจบ — ป้ายอายุทอง เส้นซ้ายบอกชนิดบรรทัดแบบต้นแบบ · ช่วงวัยพับได้ ชีวิตยาวราวร้อยบรรทัดจึงไม่ดันปุ่มลงไปไกล */
 .ichron .istage { margin-top:6px; }
 .ichron .istage > summary { cursor:pointer; font-size:13px; color:#6FE3FF; }
@@ -698,8 +691,8 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 <!-- โครงหน้าเปิด (ui-redo 96): ขึ้นจอก่อนสคริปต์จบ และยังเห็นเมื่อปิด JavaScript · boot() ใน app.mjs ล้างทิ้งแล้ววาดจอจริง -->
 <main id="app"><article class="card a"><div class="top"><b>เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</b><small>เริ่มชีวิต</small></div><div class="body"><h3 class="lead">เกิดเป็นคนไทยทีละชีวิต เลือกทีละการ์ด</h3><noscript><p class="sub">เกมนี้ต้องเปิด JavaScript ในเบราว์เซอร์ก่อนจึงเล่นได้</p></noscript></div><div class="choices"><button type="button">เริ่มชีวิต</button></div></article></main>
 <footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <span class="foot-shelf"><a href="#" id="shelfLink">ชั้นสมุด</a> · </span><a href="#" id="dayLink">ชาติประจำวัน</a> · <a href="about.html">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
-<script src="play-data.js?v=v0.6.101" defer></script>
-<script src="play.js?v=v0.6.101" defer></script>
+<script src="play-data.js?v=v0.6.103" defer></script>
+<script src="play.js?v=v0.6.103" defer></script>
 <script>if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
 </body>
 </html>

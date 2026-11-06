@@ -7,7 +7,7 @@
 // ตัวควบคุม: --h0 ส่ง h = {} (บุญ/บาปโลกหลักต้องตก) · --nofx ลบป้ายผล (ครอบครัว/สุขภาพ/เงินต้องตกทั้งสองโลก)
 // --noid ลบ id ของการ์ดต่างโลก (บุญ/บาปต่างโลกอ่าน ISEKAI_MERIT ตาม id ไม่ใช่ h — ต้องตก)
 import { playLife, mixSeed, makeRng, openChoices } from '../src/engine/index.mjs';
-import { startIsekai, nextIsekaiCard, chooseIsekai } from '../src/engine/isekai.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusPick } from '../src/engine/isekai.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
 
@@ -46,6 +46,8 @@ for (let i = 0; i < m; i++) {
   for (let g = 0; g < 400; g++) {
     const card = nextIsekaiCard(s);
     if (card.step === 'end') break;
+    // ใบทุ่มเทเข้าช่วงวัยถอดแล้ว (ui-redo 83) — ตั้งทางแรกแบบที่บอทนี้เคยกดบนใบนั้น
+    if (card.entered) isekaiFocusPick(s, 0);
     if (!card.choices.length) continue;
     const open = openChoices(card);
     if (open.length >= 2) {
