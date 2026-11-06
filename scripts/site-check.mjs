@@ -5,7 +5,7 @@
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
 import { siteFacts, injectFacts, readVersion, versionLines, releaseLog, notesLines, NOTE_CUT } from '../src/site/facts.mjs';
-import { catalogHtml } from '../src/site/catalog.mjs';
+import { visible, spoilOnly } from '../src/site/catalog.mjs';
 import { FACT_PAGES, GEN_PAGES, toLf } from '../src/site/build.mjs';
 import { meritName, meritId, MERIT_WEIGHTS, ISEKAI_EVENTS, ISEKAI_ROLES, roleInfo, ISEKAI_SKILLS, ISEKAI_CAREERS, CONT_REGIONS, CONT_RACES, CONT_END, contBirth, makeRng } from '../src/engine/index.mjs';
 import { isekaiCardCount, ISEKAI_SECTION, contEndTitles, text as isekaiText } from '../src/site/otherworld.mjs';
@@ -13,19 +13,18 @@ import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR, SPEC_START, SPEC_E
 import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
 import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
-import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
+import { catalogHtml, spoilerBacks, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
-import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml } from '../src/site/nav.mjs';
+import { navHtml, navBlocks, NAV_CSS, devNavHtml, injectDevNav, DEV_TABS, MOVED_MARK, movedHtml, DEV_MAPS, DEV_MAPS_PAGE, mapsMoved } from '../src/site/nav.mjs';
 import { uiPage, designMoved, tweakPages, tweakMoved, tweakStatus, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, GATE_OFF, PUBLIC_HIDE } from '../src/site/gate.mjs';
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
-import { DOCS_TWEAK_PAGE, T12_DOCS_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsTweak } from '../src/site/docs-tweak.mjs';
+import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsLayout, injectDocsTweak, pageKind } from '../src/site/docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, cardArtBlock, CAT_ART } from '../src/site/card-art-tweak.mjs';
-import { CARD_SPOIL_PAGE, cardSpoilData, cardSpoilBlock } from '../src/site/card-spoil-tweak.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
 import { PLAY_FILES, playAssets, playScripts, swJs } from '../src/site/play-files.mjs';
 
@@ -81,20 +80,28 @@ const cut = (html) => {
   return i < 0 ? [html, ''] : [html.slice(0, i), html.slice(i)];
 };
 const escHtml = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-const cards = read('catalog.html');
-const [cardsTh, cardsIsk] = cut(cards);
+// หน้าเดียวอ่านสองชั้น (ข้อ 187): ก่อนกด = ตัด <template> ออก ใช้กฎห้ามเผยผลเดิม · เฉลย = เนื้อ template ใช้กฎนับชิ้นเดิม
+const page = read('catalog.html');
+const cards = visible(page);
+const MORE = '<section class="more"';
+const moreAt = page.indexOf(MORE);
+const [pageTh, pageIsk] = cut(page.slice(0, moreAt));
+const [moreJobs, moreIsk] = page.slice(moreAt).split('<h2 id="isk-more">');
+const cardsTh = visible(pageTh);
+const cardsIsk = visible(pageIsk);
 const shown = (cardsTh.match(/<article class="c /g) ?? []).length;
 check('หน้ารวมการ์ดมีครบทุกใบ', shown !== content.events.length, ` ${shown}/${content.events.length}`);
 const cats = Object.keys(MERIT_WEIGHTS).flatMap((id) => [id, meritName(id)]).filter((s) => s && s !== 'neutral' && s.length > 1);
-const leak = [/"weight"|multipliers|"merit"|outcomes/, /บัญชีบุญบาป\s*[-+]?\d/, /[+-]\d+\s*(?:สุขภาพ|ความสุข|ความรู้|ความสัมพันธ์|คอนเน็คชั่น)/];
-const leaks = leak.filter((re) => re.test(catalogHtml(content))).map(String);
+// แถวสุดท้าย = คลาสที่มีแค่ในเนื้อเฉลย — ผลจริงเขียน "ชีวิต +1" regex ตัวเลขข้างบนจับไม่ได้ ถ้า template หลุดต้องตกที่นี่
+const leak = [/"weight"|multipliers|"merit"|outcomes/, /บัญชีบุญบาป\s*[-+]?\d/, /[+-]\d+\s*(?:สุขภาพ|ความสุข|ความรู้|ความสัมพันธ์|คอนเน็คชั่น)/, /<b class="pct">|<span class="m (?:good|sin)">|<p class="when">|<ol class="chs">|<b class="sim"/];
+const leaks = leak.filter((re) => re.test(visible(catalogHtml(content)))).map(String);
 // ชื่อหมวดบุญบาปภาษาไทยอาจเป็นคำธรรมดาในข้อความการ์ด — นับเฉพาะ id อังกฤษของหมวด
 const ids = cats.filter((s) => /^[a-z_]+$/.test(s) && new RegExp(`\\b${s}\\b`).test(cards));
 check('หน้ารวมการ์ดไม่มีผล/น้ำหนัก/ป้ายบุญบาป', leaks.length || ids.length, leaks.length || ids.length ? ` · เจอ ${[...leaks, ...ids].join(' ')}` : '');
 
 // 5) หน้าเฉลย: นับชิ้นบนหน้าเทียบ content ตรง ๆ — ตัวสร้างทำตกหล่นสักทาง (ตัวเลือกซ่อน · ผลสุ่ม · ป้ายบุญบาป) เลขจะไม่เท่า
-const spoil = read('spoilers.html');
-const [spoilTh, spoilIsk] = cut(spoil);
+const spoilTh = spoilOnly(pageTh);
+const spoilIsk = `${spoilOnly(pageIsk)}\n${spoilOnly(moreIsk ?? '')}`;
 const nodes = content.events.flatMap((e) => e.choices.flatMap((c) => [c, ...(c.outcomes ?? [])]));
 const want = {
   การ์ด: content.events.length,
@@ -103,17 +110,43 @@ const want = {
   ป้ายบุญบาป: nodes.flatMap((n) => n.merit ?? []).filter((t) => meritId(t.cat) !== 'neutral').length,
 };
 const got = {
-  การ์ด: (spoilTh.match(/<article class="c /g) ?? []).length,
+  การ์ด: (pageTh.match(/<template data-spoil=/g) ?? []).length,
   ตัวเลือก: (spoilTh.match(/<p class="ch">/g) ?? []).length,
   ผลสุ่ม: (spoilTh.match(/<b class="pct">/g) ?? []).length,
   ป้ายบุญบาป: (spoilTh.match(/<span class="m (?:good|sin)">/g) ?? []).length,
 };
 const off = Object.keys(want).filter((k) => want[k] !== got[k] || !want[k]);
 check('หน้าเฉลยครบทุกการ์ด ตัวเลือก ผลสุ่ม ป้ายบุญบาป', off.length, ` ${Object.keys(want).map((k) => `${k} ${got[k]}/${want[k]}`).join(' · ')}`);
+// 5a) การ์ดกับ template คู่กัน 1:1 · ลิงก์ในหน้าชี้ id ที่อยู่ใน DOM ก่อนกด (ในเฉลยก็ลิงก์ไปการ์ดอื่น) · id ไม่ซ้ำ
+// การ์ดเลือกสกิล/บทบาทไม่มี id ไม่มีปุ่ม — เฉลยอยู่กล่องท้ายหน้า
+const hostsOff = (html) => {
+  const out = [];
+  for (const m of html.matchAll(/<article class="c [ax]"(?: id="([^"]*)")?>([\s\S]*?)<\/article>/g)) {
+    const tpl = [...m[2].matchAll(/<template data-spoil="([^"]*)">/g)].map((t) => t[1]);
+    if (m[1] ? tpl.length !== 1 || tpl[0] !== m[1] : tpl.length) out.push(m[1] ?? 'การ์ดไม่มี id');
+  }
+  const slots = (html.match(/<template data-spoil=/g) ?? []).length;
+  const btns = (html.match(/<button type="button" class="sp-btn" aria-expanded="false">ดูผล<\/button>/g) ?? []).length;
+  if (slots !== btns) out.push(`template ${slots} ปุ่ม ${btns}`);
+  return out;
+};
+const pairOff = hostsOff(page);
+const firstTpl = page.match(/<template data-spoil="[^"]*">[\s\S]*?<\/template>/)[0];
+check('การ์ดกับ template เฉลยคู่กัน 1:1', pairOff.length || !hostsOff(page.replace(firstTpl, '')).length, ` ${(page.match(/<template data-spoil=/g) ?? []).length} ใบ${pairOff.length ? ` · ไม่คู่ ${pairOff.slice(0, 5).join(' ')}` : ''}`);
+const idsOf = (html) => [...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
+const domIds = idsOf(cards);
+const dupIds = domIds.filter((id, i) => domIds.indexOf(id) !== i);
+const linkOff = (html) => [...new Set([...html.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]))].filter((id) => !idsOf(visible(html)).includes(id));
+const badLinks = linkOff(page);
+const tplIds = idsOf(spoilOnly(page));
+const firstCard = spoilOnly(page).match(/href="#([^"]+)"/)?.[1];
+const linkCtl = !!firstCard && linkOff(page.replaceAll(` id="${firstCard}"`, '')).includes(firstCard);
+check('ลิงก์ในหน้าการ์ดชี้ id นอก template · id ไม่ซ้ำ', badLinks.length || dupIds.length || tplIds.length || !linkCtl, ` ${domIds.length} id${badLinks.length ? ` · ตาย ${badLinks.slice(0, 5).join(' ')}` : ''}${dupIds.length ? ` · ซ้ำ ${dupIds.slice(0, 5).join(' ')}` : ''}${tplIds.length ? ` · id ใน template ${tplIds.slice(0, 5).join(' ')}` : ''} · ตัวควบคุม${linkCtl ? 'จับได้' : 'จับไม่ได้'}`);
 // 6) ส่วนต่างโลก: นับเทียบโมดูลในเอนจินตรง ๆ · หน้ารวมการ์ดห้ามมีข้อความผลสำเร็จ/พลาด ชื่อตอนจบ หรือความยาก
 const ISEKAI_ROLE_INFO = Object.keys(ISEKAI_ROLES).map(roleInfo);
 const iskWant = {
-  การ์ด: isekaiCardCount(),
+  // การ์ดเลือกสกิล/บทบาทเฉลยในกล่องท้ายหน้า เหลือแฟ้มเกิดใบเดียวที่มี template
+  การ์ด: ISEKAI_EVENTS.length + 1,
   ตัวเลือก: ISEKAI_EVENTS.reduce((s, e) => s + e.choices.length, 0),
   ผล: ISEKAI_EVENTS.reduce((s, e) => s + e.choices.reduce((n, c) => n + (c.stat || c.know ? 2 : 1), 0), 0),
   // บทบาทที่ไม่มีเนื้อเรื่องของโลกมีแค่ 3 ตอนจบ ไม่มีตอนจบพิเศษ
@@ -123,7 +156,7 @@ const iskWant = {
   สกิล: Object.keys(ISEKAI_SKILLS).length,
 };
 const iskGot = {
-  การ์ด: (spoilIsk.match(/<article class="c x"/g) ?? []).length,
+  การ์ด: (pageIsk.match(/<template data-spoil=/g) ?? []).length,
   ตัวเลือก: (spoilIsk.match(/<p class="ch">/g) ?? []).length,
   ผล: (spoilIsk.match(/<b class="rk">/g) ?? []).length,
   ตอนจบ: (spoilIsk.match(/<li class="end">/g) ?? []).length,
@@ -144,13 +177,13 @@ const hidden = [
 const iskLeak = hidden.filter((t) => cards.includes(escHtml(t)));
 if (/ความยาก|class="rk"/.test(cardsIsk)) iskLeak.push('ความยาก/ผล');
 check('หน้ารวมการ์ดส่วนต่างโลกไม่เฉลยผลหรือตอนจบ', iskLeak.length || !cardsIsk, iskLeak.length ? ` · เจอ ${iskLeak.slice(0, 3).join(' | ')}` : ` (ตรวจ ${hidden.length} ข้อความ)`);
-check('หน้ารวมการ์ดลิงก์ไปหน้าเฉลย และหน้าเฉลยมีป้ายเตือนสปอยล์', !cards.includes('href="spoilers.html"') || !spoil.includes('class="warn"'));
+check('spoilers.html เป็นหน้าส่งต่อไปหน้าการ์ด และหน้าการ์ดไม่ลิงก์กลับ', !read('spoilers.html').includes(`${MOVED_MARK} content="catalog.html"`) || cards.includes('href="spoilers.html"'));
 // 5b) เส้นทางงาน (ui-redo ใบ 21): ทุกอาชีพในทุกสายของ careers.json + การเมือง มีกล่องบนหน้า
 // ผลจำลองค้าง (การ์ดเพิ่ม/ลบ/เปลี่ยน id หลังรันจำลอง) = เตือน ไม่ตก — จำลองรันสั่งแยก ไม่ผูก build
 const occsOf = (l) => (l.occs ? l.occs.length : new Set(l.steps.map((x) => x.occ)).size);
 const jobWant = Object.values(content.era.careers.ladders).reduce((s, l) => s + occsOf(l), 0) + (content.era.careers.office ? 1 : 0);
-const jobGot = (spoilTh.match(/<div class="job">/g) ?? []).length;
-check('หน้าเฉลยมีเส้นทางงานครบทุกอาชีพในทุกสาย', jobGot !== jobWant || !spoilTh.includes('id="career"'), ` ${jobGot}/${jobWant}`);
+const jobGot = (moreJobs.match(/<div class="job">/g) ?? []).length;
+check('หน้าเฉลยมีเส้นทางงานครบทุกอาชีพในทุกสาย', jobGot !== jobWant || !moreJobs.includes('id="career"'), ` ${jobGot}/${jobWant}`);
 const drift = simDrift(content);
 if (drift.noFile) console.log(`⚠ เตือน: ไม่มี ${SIM_FILE} — หน้าเฉลยส่วนเส้นทางงานไม่มีเลข · รัน npm run career:sim`);
 else if (drift.missing.length || drift.gone.length)
@@ -210,7 +243,7 @@ const designTpl = injectFacts(readFileSync(new URL('../src/site/design.html', im
 const lf = (s) => s?.replace(/\r\n/g, '\n');
 // หน้าที่ build เขียนได้กล่องรหัสต่อท้ายเสมอ (ui-redo 72) ⇒ ของคาดหวังต้องผ่าน injectGate ชุดเดียวกัน
 const gateHash = readGateHash();
-const gated = (html, file) => injectGate(html, gateHash, file);
+const gated = (html, file) => injectGate(injectDocsLayout(html, pageKind(file), file), gateHash, file);
 // หน้าอยู่ใต้ DESIGN_AT · ที่เดิมใต้ docs/ ต้องเป็นหน้าส่งต่อไปหน้าใหม่ (ui-redo 43) — หน้าส่งต่อไม่นับเป็น "เกิน"
 const readOr = (p) => (existsSync(new URL(p, docs)) ? read(p) : null);
 const designGap = (out, readPage, readOld = readOr) => [
@@ -256,7 +289,11 @@ const devTabMiss = (html) => {
 };
 const devMiss = devFiles.map((f) => [f, read(f)]).filter(([, h]) => h.includes('class="nl-tabs"')).map(([f, h]) => [f, devTabMiss(h)]).filter(([, m]) => m.length).map(([f, m]) => `${f} ขาด ${m.join(' ')}`);
 const devCtl = devTabMiss(read('dev/index.html').replace(/<a href="[^"]*dev\/design\.html"[^>]*>คำตัดสินเกม<\/a>/, '')).length === 1;
-const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.html" aria-current="true"') && devNavHtml('dev/design.html').includes('href="../dev/design.html" aria-current="page"');
+const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.html" aria-current="true"') && devNavHtml('dev/design.html').includes('href="../dev/design.html" aria-current="page"') && devNavHtml(DEV_MAPS_PAGE).includes('href="../../dev/maps/continent.html" aria-current="page"') && devNavHtml('dev/archive/fx-proto.html').includes('href="../../dev/archive/index.html" aria-current="true"') && devNavHtml('dev/plan.html').includes('href="../dev/index.html" aria-current="true"');
+// 7c3) แถบเว็บแทนแถวบนห้องผู้พัฒนา (ข้อ 292 293): ทุกหน้าที่มีแถวแท็บตรงแถบที่ build เขียน และมีแถบเว็บแถบเดียว · ตัวควบคุม: คืนแถวบนเดิม ⇒ ต้องถูกจับ
+const devBarBad = (f, h) => lf(h) !== lf(injectDevNav(h, f)) || h.split('<nav class="top"').length !== 2;
+const devBarMiss = devFiles.filter((f) => read(f).includes('class="nl-tabs"') && devBarBad(f, read(f)));
+const devBarCtl = devBarBad('dev/index.html', read('dev/index.html').replace('<div class="nl-nav nl-dev">', '<div class="nl-nav nl-dev"><div class="nl-top"></div>'));
 // 7e) หน้าดีไซน์ UI (ui-redo 44): ตรงของที่ build ตอนนี้ · design.html เดิมส่งต่อมาที่นี่ · สีทุกตัวแปรในเกมขึ้นหน้า · ลิงก์ tweak ครบทุกหน้า tweak และปลายทางมีจริง
 // · ชิ้นส่วนตัวอย่างอยู่ใน iframe sandbox ว่าง (ไม่มีสคริปต์ ไม่มี same-origin ⇒ แตะ localStorage ไม่ได้) และ srcdoc ไม่มี <script
 // ตัวควบคุม: แก้สีในเกม 1 ค่า ⇒ หน้าที่ build ต้องเปลี่ยนและมีค่าใหม่ · ถอดลิงก์ tweak 1 ลิงก์ ⇒ ต้องนับขาด · เติม allow-scripts ⇒ ต้องถูกจับ
@@ -331,7 +368,26 @@ const liveCtl =
   liveBad(uiHtml.replace(`<h2 id="${UI_LIVE_ID}">`, '<h2>')).length > 0 &&
   liveBad(uiHtml.replace(`<iframe title="${UI_LIVE_TITLE}"`, `<iframe title="${UI_LIVE_TITLE}" sandbox="allow-scripts"`)).includes('กรอบต้นแบบมี sandbox');
 check('ต้นแบบปรับสดอยู่ในหน้าดีไซน์ UI รันสคริปต์ จำค่าคีย์เดิม คัดลอกได้ ที่เดิมส่งต่อ', liveMiss.length || !liveCtl, `${liveMiss.length ? ` ${liveMiss.slice(0, 4).join(' | ')} ·` : ''} ตัวควบคุม${liveCtl ? 'จับได้' : 'จับไม่ได้'}`);
+// 7e3) dev/maps หน้าเดียว (ui-redo 101): ทุกผังมีหัว · ปุ่มสลับ · สคริปต์ห่อของตัวเอง · id ในหน้าไม่ซ้ำ (เดิมทุกหน้าใช้ map/info/here) · ที่เดิมส่งต่อมา #ผัง
+// ตัวควบคุม: ถอดหัวผังแรก ⇒ ต้องนับขาด · id ซ้ำ ⇒ ต้องถูกจับ
+const mapsGap = (html) => {
+  const ids = [...html.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]);
+  const dup = [...new Set(ids.filter((x, i) => ids.indexOf(x) !== i))];
+  return [
+    ...DEV_MAPS.flatMap(([id]) => [
+      ...(html.includes(`<section id="${id}"`) ? [] : [`ขาดหัว ${id}`]),
+      ...(html.includes(`<a href="#${id}">`) ? [] : [`ขาดปุ่ม ${id}`]),
+      ...(html.includes(`MAPS.${id} = () => {\nconst document = mapDoc('${id}');`) ? [] : [`สคริปต์ไม่ห่อ ${id}`]),
+    ]),
+    ...(dup.length ? [`id ซ้ำ ${dup.slice(0, 3).join(' ')}`] : []),
+  ];
+};
+const mapsHtml = lf(readOr(DEV_MAPS_PAGE) ?? '');
+const mapsMiss = [...mapsGap(mapsHtml), ...DEV_MAPS.filter((m) => lf(readOr(`dev/maps/${m[0]}.html`)) !== mapsMoved(m)).map(([id]) => `dev/maps/${id}.html ไม่ส่งต่อมา #${id}`)];
+const mapsCtl = mapsGap(mapsHtml.replace(`<section id="${DEV_MAPS[0][0]}"`, '<section')).length === 1 && mapsGap(mapsHtml.replace('</body>', `<i id="${DEV_MAPS[0][0]}"></i></body>`)).some((x) => x.startsWith('id ซ้ำ'));
+check('dev/maps หน้าเดียวสลับครบทุกผัง id ไม่ซ้ำ ที่เดิมส่งต่อ', mapsMiss.length || !mapsCtl, ` ผัง ${DEV_MAPS.length}${mapsMiss.length ? ` · ${mapsMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${mapsCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('หน้าห้องผู้พัฒนามีแท็บครบชุดเดียวกัน', devMiss.length || !devCtl || !devCur, ` ${devFiles.length} หน้า${devMiss.length ? ` · ${devMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${devCtl ? 'จับได้' : 'จับไม่ได้'}`);
+check('หน้าห้องผู้พัฒนาใช้แถบเว็บชุดเดียวกับที่ build เขียน', devBarMiss.length || !devBarCtl, ` ${devBarMiss.length ? `ค้าง ${devBarMiss.slice(0, 4).join(' ')} (build ใหม่)` : 'ตรงทุกหน้า'} · ตัวควบคุม${devBarCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('ทุกหน้ามีแถบบนชุดเดียวและชี้หน้าปัจจุบัน', navMiss.length || !navCtl || !curOk, ` ${navFiles.length} หน้า${navMiss.length ? ` · ${navMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${navCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7c3) หน้า tweak ที่ใช้ CSS เกม (thai-life-deep 185): บล็อกในหน้า = CSS ของ template.html ตอนนี้ — แก้ CSS เกมแล้วลืม build = หน้า tweak โชว์หน้าตาเก่า
@@ -347,11 +403,11 @@ const dtHtml = readOr(DOCS_TWEAK_PAGE) ?? '';
 const dtNow = docsTweakData(docs, uiTpl);
 const dtBlock = docsTweakBlock(dtHtml);
 const dtFiles = dtNow.pages.map((p) => p.f);
-const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spoilers.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', 'dev/maps/politics.html', 'dev/archive/index.html'];
+const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', DEV_MAPS_PAGE, 'dev/archive/index.html'];
 const dtOut = (f) => f === 'play.html' || f.startsWith('archive/') || f.startsWith('dev/ui-redo/') || /tweak/.test(f) || read(f).includes(MOVED_MARK);
 const dtMiss = [
   ...(JSON.stringify(dtBlock) !== JSON.stringify(dtNow) ? [`ค้าง ${DOCS_TWEAK_PAGE} (build ใหม่)`] : []),
-  ...(JSON.stringify(docsTweakBlock(readOr(T12_DOCS_PAGE) ?? '')) !== JSON.stringify(dtNow) ? [`ค้าง ${T12_DOCS_PAGE} (build ใหม่)`] : []),
+  ...dtNow.pages.filter((p) => lf(read(p.f)) !== lf(injectDocsLayout(read(p.f), p.k, p.f)) || !read(p.f).includes('DOCS-LAYOUT:START')).map((p) => `เลย์เอาต์ค้าง ${p.f} (build ใหม่)`),
   ...dtMust.filter((f) => !dtFiles.includes(f)).map((f) => `ขาด ${f}`),
   ...dtFiles.filter((f) => !existsSync(new URL(f, docs)) || dtOut(f)).map((f) => `เกิน ${f}`),
   ...(dtNow.pages.filter((p) => p.k === 'map').length !== dtFiles.filter((f) => f.startsWith('dev/maps/')).length ? ['dev/maps ไม่ได้ชนิดแผนที่'] : []),
@@ -373,23 +429,6 @@ const caMiss = [
 ];
 const caCtl = caBlock && JSON.stringify({ ...caBlock, counts: { ...caBlock.counts, cats: caBlock.counts.cats.slice(1) } }) !== JSON.stringify(caNow);
 check('หน้า tweak ภาพบนการ์ดใช้ภาพ+ตัวเลขหมวดชุดปัจจุบัน', caMiss.length || !caCtl, ` ${caCats.length} หมวด${caMiss.length ? ` · ${caMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${caCtl ? 'จับได้' : 'จับไม่ได้'}`);
-
-// 7c6) หน้า tweak T14 หน้าการ์ดรวม (ui-redo 126): บล็อกในหน้า = CSS หน้ารวมการ์ด/หน้าเฉลย + token + การ์ดจริงตอนนี้ · นอกบล็อกไม่มีเนื้อเฉลย (Ctrl+F ไม่เจอก่อนกด ข้อ 187)
-// ตัวควบคุม: CSS หน้ารวมการ์ดต่างไป 1 ตัวอักษร ⇒ ต้องไม่ตรง · ย้ายเฉลยการ์ดแรกออกนอกบล็อก ⇒ ต้องถูกจับ
-const csHtml = readOr(CARD_SPOIL_PAGE) ?? '';
-const csBlock = cardSpoilBlock(csHtml);
-const csNow = cardSpoilData(content);
-const csOutside = (html) => {
-  const b = cardSpoilBlock(html);
-  const rest = html.replace(/<script type="application\/json" id="csd">[\s\S]*?<\/script>/, '');
-  return (b?.cards ?? []).filter((c) => (c.spoil.match(/<b class="pct">[^<]*<\/b>/g) ?? []).some((m) => rest.includes(m))).map((c) => c.id);
-};
-const csMiss = [
-  ...(!csBlock ? [`ไม่มีบล็อก ${CARD_SPOIL_PAGE}`] : JSON.stringify(csBlock) !== JSON.stringify(csNow) ? [`ค้าง ${CARD_SPOIL_PAGE} (build ใหม่)`] : []),
-  ...csOutside(csHtml).map((id) => `เฉลยนอกบล็อก ${id}`),
-];
-const csCtl = !!csBlock && JSON.stringify({ ...csBlock, css: { ...csBlock.css, catalog: `${csBlock.css.catalog} ` } }) !== JSON.stringify(csNow) && csOutside(csHtml.replace('</body>', `${csBlock.cards[0].spoil}</body>`)).length > 0;
-check('หน้า tweak T14 ใช้ CSS+การ์ดหน้าการ์ดรวมชุดปัจจุบัน เฉลยไม่อยู่นอกบล็อก', csMiss.length || !csCtl, ` ${csNow.cards.length} ใบ${csMiss.length ? ` · ${csMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${csCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) แผนงาน (ui-redo 23 · ย้ายไป whatsnew ui-redo 69): แถวหมวดใต้หัวกำลังทำ = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
 // · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)
@@ -565,8 +604,7 @@ const fNames = flagNames();
 const sNames = systemNames();
 const drawn = (e) => {
   try {
-    const html = spoilersHtml({ ...content, events: [e] }, fNames, sNames);
-    return html.slice(html.indexOf('<article'), html.indexOf('</article>'));
+    return spoilerBacks({ ...content, events: [e] }, [e.id], fNames, sNames)[0];
   } catch (err) {
     return `throw ${err.message}`;
   }
