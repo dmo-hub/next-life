@@ -57,32 +57,28 @@ body.b .fx-front { background:var(--lacquer2); border-color:var(--bronze2); colo
 </head>
 <body class="a">
 <!--nav--><style>
+nav.top, .nl-nav { --bg:#F4ECDC; --ink:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --line:#C9B98F; --on-head:#E7E2D4; --fb:Sarabun,system-ui,sans-serif; --r:6px; }
+  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
+  nav.top a { display: inline-block; color: var(--on-head); text-decoration: none; padding: 0 10px; line-height: 40px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: var(--headink); }
+  nav.top a[aria-current] { color: var(--headink); font-weight: 600; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 600; color: var(--headink); padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: var(--gold); color: var(--head); border-radius: var(--r); line-height: 28px; padding: 0 12px; font-weight: 600; white-space: nowrap; }
+  nav.top a.play:focus-visible { outline: 2px solid var(--headink); outline-offset: 2px; }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
+
 .nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
-.nl-nav{font:15px/1.4 Sarabun,"Noto Sans Thai",system-ui,sans-serif;text-align:left}
+.nl-nav{font:15px/1.4 var(--fb);text-align:left}
 .nl-nav a{text-decoration:none;color:inherit}
-.nl-in{max-width:1040px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
-.nl-top{background:#1F2430;color:#F4EFE3}
-.nl-top>.nl-in{min-height:52px;flex-wrap:wrap;column-gap:12px}
-.nl-brand{font-weight:700;margin-right:auto;padding:12px 0}
-.nl-main{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
-.nl-main a{padding:13px 8px 11px;border-bottom:3px solid transparent;white-space:nowrap}
-.nl-main a[aria-current]{border-bottom-color:#D6A64A;font-weight:600}
-.nl-swap{border:1px solid #6B7080;padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
-.nl-swap:hover,.nl-main a:hover{opacity:1;color:#fff}
-.nl-dev .nl-top{background:#2F3833}
-.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:#8A6A2E;color:#F4EFE3;vertical-align:2px}
-.nl-tabs{background:#F3EEE2;color:#1F2430;border-bottom:1px solid #D8D0C0}
+.nl-in{max-width:1280px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
+.nl-tabs{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--line)}
 .nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
 .nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
-.nl-tabs a[aria-current]{border-bottom-color:#A23B2C;font-weight:600}
-.nl-tabs.nl-sub{background:#EBE4D5;font-size:14px}
-@media (max-width:640px){
-.nl-top>.nl-in{padding:0}
-.nl-brand{padding:12px 16px}
-.nl-swap{margin-right:16px}
-.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid #343A48}
-}
-</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../../dev/index.html">สารบัญ</a><a href="../../dev/spec.html">ภาคผนวกสเปก</a><a href="../../dev/plan.html">สเปก/แผน</a><a href="../../dev/design.html">คำตัดสินเกม</a><a href="../../dev/ui.html">การออกแบบ</a><a href="../../dev/maps/continent.html">แผนที่</a><a href="../../dev/archive/index.html" aria-current="page">คลังเก่า</a></div></div><div class="nl-tabs nl-sub" role="navigation" aria-label="หน้าในหมวดคลังเก่า"><div class="nl-in"><a href="../../dev/archive/index.html">สารบัญคลัง</a><a href="../../archive/cards-v1.html">การ์ด v1</a><a href="../../archive/overview-v1.html">ภาพรวม v1</a><a href="../../dev/archive/isekai-life-v1.html">ต่างโลก v1</a><a href="../../dev/archive/fx-proto.html" aria-current="page">เอฟเฟกต์การ์ด</a><a href="../../dev/archive/b176-samples.html">สมุด 3 แท็บ</a></div></div></div><!--/nav-->
+.nl-tabs a[aria-current]{border-bottom-color:var(--accent2);font-weight:600}
+.nl-tabs.nl-sub{background:var(--bg);font-size:14px}
+</style><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="../../index.html">NEXT LIFE</a><div class="links"><a href="../../guide.html">วิธีเล่น</a><a href="../../whatsnew.html">แพตช์โน้ต</a><a href="../../about.html">กลไกในเกม</a><a href="../../worlds.html">โลก</a><a href="../../catalog.html">การ์ดทั้งหมด</a><a href="../../dev/index.html" aria-current="true">ห้องผู้พัฒนา</a></div><a class="play" href="../../play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../../dev/index.html">สารบัญ</a><a href="../../dev/spec.html">ภาคผนวกสเปก</a><a href="../../dev/plan.html">สเปก/แผน</a><a href="../../dev/design.html">คำตัดสินเกม</a><a href="../../dev/ui.html">การออกแบบ</a><a href="../../dev/maps/continent.html">แผนที่</a><a href="../../dev/archive/index.html" aria-current="true">คลังเก่า</a></div></div><div class="nl-tabs nl-sub" role="navigation" aria-label="หน้าในหมวดคลังเก่า"><div class="nl-in"><a href="../../dev/archive/index.html">สารบัญคลัง</a><a href="../../archive/cards-v1.html">การ์ด v1</a><a href="../../archive/overview-v1.html">ภาพรวม v1</a><a href="../../dev/archive/isekai-life-v1.html">ต่างโลก v1</a><a href="../../dev/archive/fx-proto.html" aria-current="page">เอฟเฟกต์การ์ด</a><a href="../../dev/archive/b176-samples.html">สมุด 3 แท็บ</a></div></div></div><!--/nav-->
 <header>
   <h1>ต้นแบบเอฟเฟกต์ 3 จังหวะ · B-fx ขั้น 1 · ยังไม่ลงเกม</h1>
   <label><input type="checkbox" id="tTheme"> ธีมเข้ม (b)</label>
