@@ -9781,7 +9781,7 @@ function focusPanel(card) {
     if (defs[id]?.after) b.append(el('span', 'ft-new', 'ปลายสาย'));
     b.append(el('span', 'ft-fx', focusFx(id)));
     b.onclick = () => {
-      src.set(f.id);
+      setLifeFocus(st, id);
       saveWrite(card);
       const next = focusPanel(card);
       wrap.replaceWith(next);
