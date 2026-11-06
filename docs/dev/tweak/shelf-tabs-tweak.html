@@ -997,7 +997,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
       const xs = [...results.values()].filter((x) => x.v === ui.v && x.theme === t);
       return [t, xs.length ? { off: +Math.min(...xs.map((x) => x.off)).toFixed(2), on: +Math.min(...xs.map((x) => x.on)).toFixed(2) } : null];
     }));
-    return JSON.stringify({ page: 'shelf-tabs-tweak', ticket: 114, layout: c.g, pick: ui.v, pickName: VARIANTS.find(([v]) => v === ui.v)[1], source: SRC[ui.v], radius: c.r, line: c.l, ...(ui.v === 'spine' ? { raise: c.raise } : {}), openPaper: c.a, openLacquer: c.b, contrast: cr, bar: 'grid3', note }, null, 1);
+    return JSON.stringify({ page: 'shelf-tabs-tweak', ticket: 114, layout: c.g, pick: ui.v, pickName: VARIANTS.find(([v]) => v === ui.v)[1], source: SRC[ui.v], radius: c.r, line: c.l, ...(ui.v === 'spine' ? { raise: c.raise } : {}), openPaper: c.a, openLacquer: c.b, contrast: cr, note }, null, 1);
   }
 
   function panel() {
