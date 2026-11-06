@@ -6,6 +6,7 @@ import { spoilersHtml } from './spoilers.mjs';
 import { injectSpec, SPEC_PAGE } from './spec.mjs';
 import { guideHtml } from './guide.mjs';
 import { demoHtml } from './demo.mjs';
+import { focusHtml } from './focus.mjs';
 import { designPages, designHtml, DESIGN_AT } from './design.mjs';
 import { injectNav, injectDevNav, DEV_NAV_PAGES, DEV_MAPS, mapsMoved } from './nav.mjs';
 import { uiPage, designMoved, liveMoved, tweakPages, tweakMoved, UI_PAGE, UI_LIVE_FROM } from './ui.mjs';
@@ -29,6 +30,8 @@ export const GEN_PAGES = [
   ['spoilers', '<!--__SPOILERS__-->', spoilersHtml],
   // คู่มือสั้น (B121) ป้ายปุ่มดึงจาก src/ui/labels.mjs ที่เกมใช้
   ['guide', '<!--__GUIDE__-->', guideHtml],
+  // โฟกัสชีวิต: รายการ/เงื่อนไข/ป้ายดึงจาก content.focus กับโมดูลต่างโลก ระดับคู่มือ ไม่เฉลยตัวเลข
+  ['focus', '<!--__FOCUS__-->', focusHtml],
 ];
 
 // ไฟล์ที่ build เขียนเป็น LF ล้วนเสมอ: แม่แบบ/โมดูลที่ checkout บน Windows เป็น CRLF จะทำให้ผลออกมาปนสองแบบ

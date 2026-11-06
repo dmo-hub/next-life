@@ -13,6 +13,8 @@ import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR, SPEC_START, SPEC_E
 import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
 import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
+import { NEED_TEXT } from '../src/site/focus.mjs';
+import { focusWords, STAT_LABELS, FOCUS_NEEDS, ISEKAI_FOCUS, ISEKAI_KNOW } from '../src/engine/index.mjs';
 import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
@@ -787,6 +789,25 @@ check('.gitattributes merge=build ครบหน้าที่ build สร้
   const ctlBad = Object.entries(ctl).filter(([, v]) => !seoGap(v).length).map(([k]) => k);
   check('SEO หน้าแรก (canonical · og:image จริง · JSON-LD) · play มี description/canonical · sitemap ทุก URL ไฟล์จริงไม่ noindex', miss.length || ctlBad.length, ` sitemap ${[...now.sitemap.matchAll(/<loc>/g)].length} URL${miss.length ? ` · ${miss.join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
 }
+
+// 12) หน้าโฟกัส: ทุกโฟกัสโลกนี้ขึ้นพร้อมป้ายเดียวกับปุ่มในเกม · ทุ่มเท/ทางลัด/อาชีพต่างโลกครบ · เงื่อนไข need มีคำครบ
+// · ระดับคู่มือ: ไม่มีข้อความเสี่ยง (ผลที่เกิดจริง) หรือตัวเลขโอกาส/ตัวคูณ · หน้าที่มีเมนูลิงก์มาที่หน้านี้
+const focusPage = read('focus.html');
+const fdefs = content.focus.focuses;
+const focusGap = (html) => [
+  ...Object.entries(fdefs).filter(([id, d]) => !new RegExp(`<tr id="f-${id}"><td[^>]*><b>${escHtml(d.name)}</b>[\\s\\S]*?${escHtml(focusWords(d, STAT_LABELS))}`).test(html)).map(([, d]) => d.name),
+  ...[...Object.values(ISEKAI_FOCUS), ...Object.values(ISEKAI_KNOW).map((k) => k.focus), ...Object.values(ISEKAI_CAREERS)].filter((x) => !html.includes(`<b>${escHtml(x.name)}</b>`)).map((x) => x.name),
+];
+const riskTexts = Object.values(fdefs).flatMap((d) => (d.risk ?? []).map((r) => r.text ?? r.warn));
+const focusLeak = (html) => [...riskTexts.filter((t) => html.includes(escHtml(t))), ...(/\d\s*%|×\s*\d|\d+\.\d+/.test(html.slice(html.indexOf('<main'))) ? ['ตัวเลขโอกาส/ตัวคูณ'] : [])];
+const needOff = [...Object.keys(FOCUS_NEEDS).filter((k) => !NEED_TEXT[k]), ...Object.keys(NEED_TEXT).filter((k) => !FOCUS_NEEDS[k])];
+const noLink = !read('guide.html').includes('href="focus.html"');
+// ตัวควบคุม: ตัดโฟกัสแรกออก · แปะข้อความเสี่ยงตัวแรก ⇒ ต้องถูกจับทั้งคู่
+const f0 = Object.values(fdefs)[0];
+const focusCtl = focusGap(focusPage.replaceAll(`<b>${escHtml(f0.name)}</b>`, '')).includes(f0.name) && focusLeak(`${focusPage}<p>${escHtml(riskTexts[0])}</p>`).length > 0;
+const fGap = focusGap(focusPage);
+const fLeak = focusLeak(focusPage);
+check('หน้าโฟกัสครบทุกโฟกัสพร้อมป้ายเดียวกับเกม ไม่เผยผลเสี่ยงหรือตัวเลข และหน้าวิธีเล่นลิงก์ถึง', fGap.length || fLeak.length || needOff.length || noLink || !focusCtl, ` ขาด ${fGap.join(',')} · เผย ${fLeak.join(',')} · need ${needOff.join(',')} · ลิงก์ ${noLink} · ตัวควบคุม ${focusCtl}`);
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 process.exit(fail ? 1 : 0);
