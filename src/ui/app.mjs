@@ -1376,6 +1376,13 @@ function memoFull(card) {
 // ชั้นสมุด (B130): เล่มเดียว 4 แท็บ อนุสรณ์ · ฉายา · ภาพบ้านเมือง · เคยจากไป · เปิดทับหน้าที่อยู่ แล้วคืนหน้าเดิมทั้งก้อนตอนกลับ — ไม่แตะ st ไม่ลงเซฟ
 // fresh = ของใหม่ตอนเปิดชั้นครั้งแรก — เปิดแท็บแล้วล้างจุดในที่เก็บ แต่ป้าย "ใหม่" ยังอยู่จนออกจากชั้น สลับแท็บไปมาก็ยังหาเจอ
 const SHELF_TABS = [['m', 'อนุสรณ์'], ['t', 'ฉายา'], ['k', 'สกิล'], ['p', 'ภาพบ้านเมือง'], ['d', 'เคยจากไป']];
+const SHELF_ICON = {
+  m: '<path d="M6 4h10a2 2 0 0 1 2 2v14H8a2 2 0 0 1-2-2z"/><path d="M6 17a2 2 0 0 1 2-2h10"/><path d="M10 8h5"/>',
+  t: '<circle cx="12" cy="9" r="5"/><path d="M9 13.5 7.5 21l4.5-2.5 4.5 2.5-1.5-7.5"/>',
+  k: '<path d="M12 3l2.6 5.5 6 .8-4.4 4.1 1.1 6L12 16.6 6.7 19.4l1.1-6L3.4 9.3l6-.8z"/>',
+  p: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/>',
+  d: '<path d="M12 21v-7"/><path d="M12 14c-4 0-6-3-6-6 3 0 5 1 6 3 1-2 3-3 6-3 0 3-2 6-6 6z"/><path d="M9 21h6"/>',
+};
 function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh()) {
   // เปิดจากเมนู/ท้ายหน้า/หน้าเล่นต่อ: ไปแท็บที่มีของใหม่ก่อน
   tab ??= SHELF_TABS.find(([k]) => fresh[k].length)?.[0] ?? 'm';
@@ -1386,10 +1393,6 @@ function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh(
     shelfDot();
     onBack?.();
   };
-  const m = memoRead();
-  const b = bookRead();
-  const p = picsRead();
-  const count = { m: `${m.l.length}`, t: `${bookGot(b)}/${BOOK_ALL}`, p: `${picsGot(p)}/${PIC_ALL}`, k: `${skillsGot(skillsRead())}/${SKILL_IDS.length}`, d: `${deathRead().c.length}` };
   const choices = homeCard('ชั้นสมุด', ['ชั้นสมุด']);
   root.firstChild.classList.add('shelf-view');
   const body = root.querySelector('.body');
@@ -1397,7 +1400,9 @@ function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh(
   tabs.setAttribute('role', 'group');
   tabs.setAttribute('aria-label', 'เล่มในชั้นสมุด');
   for (const [k, label] of SHELF_TABS) {
-    const x = el('button', null, `${label} ${count[k]}`);
+    const x = el('button');
+    x.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${SHELF_ICON[k]}</svg>`;
+    x.append(el('span', null, label));
     x.setAttribute('aria-pressed', String(k === tab));
     // จุดบนแท็บอื่นที่ยังไม่ได้เปิด — แท็บที่เปิดอยู่ล้างจุดแล้ว
     if (k !== tab && shelfFresh()[k].length) x.append(newDot('มีของใหม่'));
@@ -1919,7 +1924,7 @@ document.addEventListener('keydown', (e) => {
 
 // แนวการ์ดของโลกนี้ทางเดียว (ทาง A กระดาษเก่า) — โลกละธีม: ลางกับเหตุการณ์ความเชื่อไม่แยกเป็นแสงเทียนแล้ว
 // สีมืดทองเป็นของปรโลกที่เดียว (renderAfter) · ต่างโลกมีธีมของตัวเอง · มรณบัตร = หนังสืองานศพบนฐานทาง A
-const styleOf = (card) => (card.kind === 'death' ? 'a mem' : 'a');
+const styleOf = (card) => (card.kind === 'death' ? 'a mem' : 'a yc');
 
 // ภาพจาก art.mjs (B56) วาดเป็น SVG — ชุดรูปทรงเดียวกับที่ภาพแชร์วาดลง canvas
 function artSvg(cls, w, h, parts) {
