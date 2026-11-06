@@ -1994,8 +1994,8 @@ const fxIn = (x) => x * x * x;
 const fxBack = (x) => 1 + 2.2 * (x - 1) ** 3 + 1.2 * (x - 1) ** 2;
 const fxSvg = (w, h, inner, cls = '') => `<svg class="${cls}" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">${inner}</svg>`;
 const FX_INK = ART_INK;
-// ค่าเจ้าของเคาะ (ui-redo ข้อ 160) = DEF ของหน้า tweak title-fx · หายาก = เงิน ตำนาน = ทอง โลหะคนละชนิด
-const FX_TITLE = { rare: '#C9CDD3', leg: ART_INK.gold, legInk: ART_INK.lacquer, frameW: 1.6, glow: 46, fs: 17, nameW: 200, durRare: 900, durLeg: 1400 };
+// ค่าเจ้าของเคาะ (ui-redo ข้อ 160 · 242–244) · หายาก = เงิน ตำนาน = ทอง โลหะคนละชนิด
+const FX_TITLE = { rare: '#C9CDD3', leg: ART_INK.gold, legInk: ART_INK.lacquer, frameW: 1.6, glow: 46, fs: 18, subFs: 12, nameW: 200, durRare: 900, durLeg: 1400 };
 // ฉากซ้อนเต็มจอของตาย/ฉายา — จบเองค่อยจางออก · ถูกข้ามหายทันที
 const fxOv = () => document.body.appendChild(el('div', 'fx-ov'));
 function fxOvEnd(ov, natural) {
@@ -2056,26 +2056,27 @@ const FX = {
       p.cap.style.transform = `translateY(${6 * (1 - fxSpan(t, 0.55, 1))}px)`;
     },
     end: (p, natural) => fxOvEnd(p.ov, natural) },
-  // ตราเหรียญ (ui-redo ข้อ 160 · แบบ medal ของหน้า tweak title-fx) — ภาพนิ่งหายาก/ตำนานต้องแยกด้วยตา (ข้อ 39)
-  // หายาก = เหรียญรักขอบเงิน ดาวดวงเดียว ขีดเส้นเดียว · ตำนาน = เหรียญทองล้อมกลีบบัว 12 กลีบ วงจุดทอง ดาว 3 ดวง ชื่อทองขีดสองเส้น
+  // ตราแปดเหลี่ยม (ui-redo ข้อ 160 · 242) — ภาพนิ่งหายาก/ตำนานต้องแยกด้วยตา (ข้อ 39)
+  // หายาก = ตรารักขอบเงิน เส้นในจาง ดาวดวงเดียว ขีดเส้นเดียว · ตำนาน = ตราทองล้อมกลีบบัว 12 กลีบ วงจุดทอง ดาว 3 ดวง ชื่อทองขีดสองเส้น
   title: {
     build: (ov, o) => {
       const leg = o.tier === 'legend';
       const id = `fx${++fxUid}`;
       const T = FX_TITLE, w = T.frameW;
       const star = (x, y, r, f) => `<path d="M${x} ${y - r}L${x + r * 0.3} ${y - r * 0.3}L${x + r} ${y}L${x + r * 0.3} ${y + r * 0.3}L${x} ${y + r}L${x - r * 0.3} ${y + r * 0.3}L${x - r} ${y}L${x - r * 0.3} ${y - r * 0.3}z" fill="${f}"/>`;
+      const oct = (r) => Array.from({ length: 8 }, (_, i) => { const a = Math.PI / 8 + i * Math.PI / 4; return `${(150 + r * Math.cos(a)).toFixed(2)},${(48 + r * Math.sin(a)).toFixed(2)}`; }).join(' ');
       const name = (fill) => `<text class="fx-name" x="150" y="110" text-anchor="middle" font-size="${T.fs}" fill="${fill}"></text>`;
-      const sub = (fill) => `<text class="fx-sub" x="150" y="160" text-anchor="middle" font-size="11" fill="${fill}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`;
+      const sub = (fill) => `<text class="fx-sub" x="150" y="160" text-anchor="middle" font-size="${T.subFs}" fill="${fill}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`;
       // ม่าน 0.6 ยังเห็นตัวหนังสือการ์ดสว่างทะลุ ⇒ ชื่อ+ป้ายต้องมีพื้นทึบรองของตัวเอง (ui-redo ข้อ 183) · กว้างพอชื่อที่ถูกบีบเต็ม nameW
       const plate = (stroke) => `<rect class="fx-plate" x="${150 - T.nameW / 2 - 12}" y="86" width="${T.nameW + 24}" height="84" rx="8" fill="${FX_INK.lacquer2}" stroke="${stroke}" stroke-width="0.8" stroke-opacity="0.5"/>`;
       let inner;
       if (!leg) {
-        inner = `${plate(T.rare)}<g class="fx-medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="30" fill="${FX_INK.lacquer2}" stroke="${T.rare}" stroke-width="${w}"/>${star(150, 48, 13, T.rare)}</g>${name(FX_INK.cream)}<path class="fx-line" d="M70 120h160" stroke="${T.rare}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(T.rare)}`;
+        inner = `${plate(T.rare)}<g class="fx-medal" style="transform-origin:150px 48px"><polygon points="${oct(30)}" fill="${FX_INK.lacquer2}" stroke="${T.rare}" stroke-width="${w}"/><polygon points="${oct(25)}" fill="none" stroke="${T.rare}" stroke-width="0.7" stroke-opacity="0.7"/>${star(150, 48, 12, T.rare)}</g>${name(FX_INK.cream)}<path class="fx-line" d="M70 120h160" stroke="${T.rare}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(T.rare)}`;
       } else {
-        const petals = Array.from({ length: 12 }, (_, i) => `<path class="fx-petal" d="M150 48q-9 -22 0 -42q9 20 0 42z" transform="rotate(${i * 30} 150 48)" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="0.6"/>`).join('');
+        const petals = Array.from({ length: 12 }, (_, i) => `<path class="fx-petal" d="M150 48q-9 -20.8 0 -40q9 19.2 0 40z" transform="rotate(${i * 30} 150 48)" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="0.6"/>`).join('');
         const R = 30 + T.glow * 0.5;
         const dots = Array.from({ length: 16 }, (_, i) => `<circle class="fx-dot" cx="${150 + R * Math.cos(i * Math.PI / 8)}" cy="${48 + R * Math.sin(i * Math.PI / 8)}" r="1.8" fill="${FX_INK.gold2}"/>`).join('');
-        inner = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${FX_INK.gold2}"/><stop offset=".55" stop-color="${T.leg}"/><stop offset="1" stop-color="${FX_INK.bronze2}"/></linearGradient></defs>${plate(T.leg)}<g>${dots}</g><g>${petals}</g><g class="fx-medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="26" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="${w}"/><circle cx="150" cy="48" r="21" fill="none" stroke="${T.legInk}" stroke-width="0.8"/>${star(150, 42, 9, T.legInk)}${star(139, 56, 5, T.legInk)}${star(161, 56, 5, T.legInk)}</g>${name(FX_INK.gold2)}<path class="fx-line" d="M70 119h160M90 124h120" stroke="${T.leg}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(FX_INK.gold2)}`;
+        inner = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${FX_INK.gold2}"/><stop offset=".55" stop-color="${T.leg}"/><stop offset="1" stop-color="${FX_INK.bronze2}"/></linearGradient></defs>${plate(T.leg)}<g>${dots}</g><g>${petals}</g><g class="fx-medal" style="transform-origin:150px 48px"><polygon points="${oct(27)}" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="${w}"/><polygon points="${oct(22)}" fill="none" stroke="${T.legInk}" stroke-width="0.8"/>${star(150, 42, 9, T.legInk)}${star(139, 56, 5, T.legInk)}${star(161, 56, 5, T.legInk)}</g>${name(FX_INK.gold2)}<path class="fx-line" d="M70 119h160M90 124h120" stroke="${T.leg}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(FX_INK.gold2)}`;
       }
       ov.innerHTML = `<div class="fx-veil"></div><div class="fx-title">${fxSvg(300, 170, inner)}</div>`;
       const q = (s) => ov.querySelector(s);
@@ -2831,7 +2832,7 @@ function earnBox(earn, key) {
   return box;
 }
 
-// การ์ดฝึกสกิล (06s): ตราเหรียญชื่อสกิลหลังกด · ปุ่มท้าย (ยังไม่ฝึก) ไม่มีเอฟเฟกต์ · ขั้นใหม่อ่านจากป้ายปุ่มที่แกนเขียน
+// การ์ดฝึกสกิล (06s): ตราชื่อสกิลหลังกด · ปุ่มท้าย (ยังไม่ฝึก) ไม่มีเอฟเฟกต์ · ขั้นใหม่อ่านจากป้ายปุ่มที่แกนเขียน
 function upgradeFx(card, i) {
   if (i >= card.choices.length - 1 || fxReduced()) return;
   const [name] = card.choices[i].split(' · ');
