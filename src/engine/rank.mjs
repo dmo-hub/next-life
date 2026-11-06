@@ -229,6 +229,11 @@ export function officeCard(st) {
   }
   if (cur >= 0) choices.push({ text: `ลงรักษาตำแหน่ง${steps[cur].name}`, outcomes: run(cur, OFFICE.keep, lift, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
   choices.push(cur < 0 ? { text: 'ขอบคุณ แต่ไม่ลงสมัคร', effects: { office: -1 } } : { text: 'วางมือ ไม่ลงอีกแล้ว', effects: { office: -1, happiness: 1 } });
+  // ตำแหน่งบนสุดไม่มีขั้นให้ลงต่อ เหลือแค่ลงรักษากับวางมือ ทางที่เติมจึงแยกเป็นเส้นขอพรกับส่งไม้ต่อ
+  if (!canUp && cur >= 0) {
+    choices.push({ text: `ไหว้ขอพรก่อนลงรักษาตำแหน่ง${steps[cur].name}`, outcomes: run(cur, OFFICE.keep, { ...lift, wish: RANK_WISH }, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
+    choices.push({ text: 'ดันคนสนิทลงแทน คุมอยู่เบื้องหลัง', effects: { office: -1, network: 1 } });
+  }
   return {
     id: `office_${up}`,
     category: 'society',

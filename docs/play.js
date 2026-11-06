@@ -1632,6 +1632,11 @@ function officeCard(st) {
   }
   if (cur >= 0) choices.push({ text: `ลงรักษาตำแหน่ง${steps[cur].name}`, outcomes: run(cur, OFFICE.keep, lift, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
   choices.push(cur < 0 ? { text: 'ขอบคุณ แต่ไม่ลงสมัคร', effects: { office: -1 } } : { text: 'วางมือ ไม่ลงอีกแล้ว', effects: { office: -1, happiness: 1 } });
+  // ตำแหน่งบนสุดไม่มีขั้นให้ลงต่อ เหลือแค่ลงรักษากับวางมือ ทางที่เติมจึงแยกเป็นเส้นขอพรกับส่งไม้ต่อ
+  if (!canUp && cur >= 0) {
+    choices.push({ text: `ไหว้ขอพรก่อนลงรักษาตำแหน่ง${steps[cur].name}`, outcomes: run(cur, OFFICE.keep, { ...lift, wish: RANK_WISH }, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
+    choices.push({ text: 'ดันคนสนิทลงแทน คุมอยู่เบื้องหลัง', effects: { office: -1, network: 1 } });
+  }
   return {
     id: `office_${up}`,
     category: 'society',
@@ -1934,6 +1939,8 @@ function pickCause(rng, keys, w, allow = null) {
 const NEAR_DEATH = { band: 1, minAge: 15, causes: ['road', 'accident'], salt: 0x7f4a7c15 };
 // คำใบ้ยาวเกินจะเป็นหัวการ์ด ⇒ หัวสั้นคงที่ ข้อความลงเนื้อ
 const HINT_TITLE = 'ก่อนลืมตา';
+// ปฏิกิริยาล้วน ไม่มีผลลงบัญชี — ใบนี้ห้ามขยับ karmaMultiplier เหมือนใบเยือนอื่น
+const HINT_CHOICES = ['นิ่งฟังจนเสียงจางไป', 'ถามกลับว่าหมายความว่าอะไร', 'ยกมือไหว้ทั้งที่ยังมองไม่เห็นใคร', 'พยายามลืมตาให้เร็วที่สุด'];
 const COURT_SCENES = ['near', 'visit', 'summons'];
 // ระดับคำใบ้จากบัญชีสุทธิ (ช่วงเดียวกับ verdictLevel −1..1) · ขอบตามภูมิที่ปรโลก: นรก ≤ −0.5 · เปรต/ดิรัจฉาน < 0 · เทวดา > 2/3
 const NEAR_HINT_LEVELS = [
@@ -1982,11 +1989,15 @@ function courtCard(st) {
   while (c.i < c.steps.length) {
     const step = c.steps[c.i];
     if (step === 'hint') {
-      c.i++;
       const lines = st.content.nearHints?.[hintLevel(st.ledger)];
-      if (!lines?.length) continue;
+      if (!lines?.length) {
+        c.i++;
+        continue;
+      }
       const text = lines[Math.floor(courtRng(st).next() * lines.length)];
-      return { ...courtBase(st, c.mode), id: 'court_hint', title: HINT_TITLE, text, choices: [], fx: [], locked: [] };
+      c.ev = { id: 'court_hint', choices: HINT_CHOICES.map((x) => ({ text: x, merit: [] })) };
+      c.wait = true;
+      return { ...courtBase(st, c.mode), id: 'court_hint', title: HINT_TITLE, text, choices: [...HINT_CHOICES], fx: HINT_CHOICES.map(() => ''), locked: HINT_CHOICES.map(() => null) };
     }
     const ev = courtEvent(st, step);
     if (!ev) {
@@ -7053,37 +7064,37 @@ const ENTRY_EVENTS = {
   circle: {
     bands: [0, 1, 2], gone: true,
     text: 'เดินกลับบ้านตอนค่ำ จู่ ๆ ใต้เท้าก็มีวงกลมเรืองแสงสีฟ้าขึ้นมา มีเสียงผู้หญิงเรียกชื่อคุณอยู่ในวง',
-    choices: ['ก้าวเข้าไปในวง', 'ถอยออกมาแล้วรีบเดินกลับบ้าน'],
+    choices: ['ก้าวเข้าไปในวง', 'ถอยออกมาแล้วรีบเดินกลับบ้าน', 'ยกมือถือถ่ายวงไว้เป็นหลักฐาน', 'ตะโกนถามว่าใครเรียก'],
   },
   puzzle: {
     bands: [0], gone: true,
     text: 'เกมมือถือที่ไม่เคยโหลดโผล่ขึ้นมาในเครื่อง ด่านสุดท้ายถามว่าถ้าแก้ปริศนาข้อนี้ได้ จะยอมไปช่วยโลกอื่นไหม',
-    choices: ['พิมพ์คำตอบแล้วกดยอม', 'ลบแอปทิ้ง'],
+    choices: ['พิมพ์คำตอบแล้วกดยอม', 'ลบแอปทิ้ง', 'แคปหน้าจอส่งให้เพื่อนดู', 'ปิดเครื่องแล้ววางไว้ห่างตัว'],
   },
   rescue: {
     bands: [0, 1, 2],
     text: 'เด็กคนหนึ่งวิ่งตามลูกบอลลงไปกลางถนน รถกำลังมา ไม่มีใครอยู่ใกล้กว่าคุณ',
-    choices: ['วิ่งเข้าไปผลักเด็กออก', 'ตะโกนเรียก เด็กหันมาทันพอดี'],
+    choices: ['วิ่งเข้าไปผลักเด็กออก', 'ตะโกนเรียก เด็กหันมาทันพอดี', 'โบกมือสุดแขนให้รถชะลอ', 'กดแตรรถที่จอดอยู่ข้างทาง'],
   },
   overwork: {
     bands: [1],
     text: 'ทำงานติดกันมาเป็นเดือน คืนนี้ง่วงจนตาจะปิด รู้สึกแปลก ๆ ว่าถ้าหลับตอนนี้คงไม่ได้ตื่นที่เดิม',
-    choices: ['ปล่อยให้หลับไป', 'ลุกไปล้างหน้า พรุ่งนี้ขอลาพัก'],
+    choices: ['ปล่อยให้หลับไป', 'ลุกไปล้างหน้า พรุ่งนี้ขอลาพัก', 'ชงกาแฟแก้วใหญ่แล้วลุยงานต่อ', 'โทรหาเพื่อนให้คุยเป็นเพื่อน'],
   },
   dream: {
     bands: [2],
     text: 'คืนนี้หลับสบายเป็นพิเศษ ในฝันมีประตูไม้บานหนึ่งแง้มอยู่ แสงอุ่น ๆ ลอดออกมา',
-    choices: ['เดินเข้าประตู', 'หันหลังกลับ ตื่นมาตอนเช้าตามปกติ'],
+    choices: ['เดินเข้าประตู', 'หันหลังกลับ ตื่นมาตอนเช้าตามปกติ', 'ยืนมองอยู่ตรงนั้นจนฝันจบ', 'จำทางไปประตูไว้ในหัว'],
   },
   truck: {
     bands: [1, 2],
     text: 'รถบรรทุกคันหนึ่งพุ่งมาทางม้าลาย ในหัวแวบขึ้นมาว่า แบบนี้ในนิยายเขาได้ไปต่างโลกกันนี่นา',
-    choices: ['ยืนนิ่ง ลองดูสักตั้ง', 'กระโดดหลบตามสัญชาตญาณ'],
+    choices: ['ยืนนิ่ง ลองดูสักตั้ง', 'กระโดดหลบตามสัญชาตญาณ', 'ตะโกนเตือนคนขับสุดเสียง', 'ยกแขนบังหน้าแล้วถอยหลัง'],
   },
   door: {
     bands: [1, 2], trip: true, gone: true,
     text: 'ประตูห้องเก็บของที่ปิดตายมาหลายปีแง้มออกเอง ข้างในเป็นทุ่งหญ้ากับท้องฟ้าที่มีดวงจันทร์สองดวง ลมพัดกลิ่นดอกไม้แปลก ๆ ออกมา',
-    choices: ['ก้าวข้ามธรณีประตูไปดู', 'ปิดประตูแล้วล็อกกุญแจ'],
+    choices: ['ก้าวข้ามธรณีประตูไปดู', 'ปิดประตูแล้วล็อกกุญแจ', 'แง้มส่องดูจากข้างนอก', 'เคาะถามว่ามีใครอยู่ไหม'],
   },
 };
 
@@ -7163,7 +7174,7 @@ function entryCard(st, stage) {
     kind: 'event', id: `isekai_${o.id}`, entry: o.id, gone: !!e.gone, ...(e.trip && { trip: true }), type: 'B', national: false, funeral: false,
     age: st.age, stage, title: null, text: e.text, choices: [...e.choices],
     // ปุ่มไม่บอกว่าตาย หายตัว หรือได้กลับ — ผู้เล่นรู้จากเรื่องหลังกดรับ
-    fx: ['', ''], locked: [null, null],
+    fx: e.choices.map(() => ''), locked: e.choices.map(() => null),
   };
 }
 

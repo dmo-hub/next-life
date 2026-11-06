@@ -446,6 +446,20 @@ const f2 = (v) => v.toFixed(2);
   check('ขั้นค่าซ้อนทับ: ขั้น 2–4 ยังไปไม่ถึงจนใบ 16 ใส่เกณฑ์ (ค่าสูงแค่ไหนก็ขั้น 1)', E.OVERLAP_STAGE_MIN.length === 5 && E.OVERLAP_STAGE_MIN[1] === 1 && E.overlapStageOf(st) === 1, String(E.overlapStageOf(st)));
 }
 
+// การ์ดจากโค้ดมีครบ 4 ปุ่ม และปุ่มที่เติมต่อท้าย: การ์ดชวนข้ามโลกกดปุ่มใหม่แล้วชีวิตเดินต่อเหมือนปฏิเสธ
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const entries = Object.entries(E.ENTRY_EVENTS);
+  check('ปุ่มการ์ดโค้ด: การ์ดชวนข้ามโลกทุกแบบมี 4 ปุ่ม', entries.every(([, e]) => e.choices.length === 4), entries.map(([k, e]) => `${k}:${e.choices.length}`).join(' '));
+  const st = newLife(mixSeed(1, 4300), content);
+  st.age = 20;
+  const [id, e] = entries[0];
+  st.pending = { entry: id, choices: e.choices.map((text) => ({ text })) };
+  E.choose(st, 3);
+  check('ปุ่มการ์ดโค้ด: ปุ่มที่เติมไม่พาข้ามโลก', !st.dead && !st.trip && !st.flags.isekai_call);
+}
+
 // ไอเทมติดตัว (B78): ห้องบอสให้ชิ้นแรกที่ยังไม่มี · ช่องชนิดตรงว่างก่อน แล้วเป้ · เป้เต็มขาย · ครบแล้วไม่ได้เพิ่ม · ชีวิต/เซฟที่ไม่เคยได้ของไม่มีช่อง
 {
   const E = await import('../src/engine/index.mjs');
