@@ -181,6 +181,7 @@ function conditions(e, L) {
   if (w.region) out.push(`ภาค${any(w.region.map(esc))}`);
   if (w.province) out.push(`จังหวัด${any(w.province.map(esc))}`);
   if (w.sex) out.push(`เพศ${any(w.sex.map(esc))}`);
+  if (w.identity) out.push(`อัตลักษณ์${any(w.identity.map(esc))}`);
   if (w.overlap_stage) out.push(`ค่าซ้อนทับขั้น ${range(w.overlap_stage)}`);
   if (w.kin_ghost) out.push(`ผีญาติ${any(w.kin_ghost.map((m) => (m === 'haunt' ? 'มาทวง' : 'มาเตือน')))}`);
   if (w.class) out.push(`ฐานะ${any(w.class.map(esc))}`);
