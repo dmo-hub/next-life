@@ -291,7 +291,11 @@ events:
     lore_ref: lore-finance-belief.md#B
     when: {flags: {has: [hope_set:mw_robe]}}
     belief: {kind: merit_wish, tradition: พุทธ}
-    choices: []
+    choices:
+      - {id: ledger, text: "ลุกมาจดรายจ่ายใหม่ทีละบรรทัด", merit: [{cat: neutral}]}
+      - {id: talk, text: "เล่าให้คนใกล้ตัวฟัง", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - {id: temple, text: "แวะวัดอีกครั้ง คราวนี้ไม่ขออะไร", merit: [{cat: bhavana, level: 1}]}
+      - {id: letgo, text: "เลิกนับว่าบุญคืนมาเท่าไร", merit: [{cat: neutral}]}
 
   - id: bel_merit_wish_birthday
     type: B
@@ -317,7 +321,11 @@ events:
     lore_ref: lore-finance-belief.md#B
     when: {flags: {has: [hope_set:mw_birthday]}}
     belief: {kind: merit_wish, tradition: พุทธ}
-    choices: []
+    choices:
+      - {id: cut, text: "ขีดรายจ่ายที่ตัดได้ออก", merit: [{cat: neutral}]}
+      - {id: ask, text: "ถามคนรู้จักว่าเก็บเงินกันยังไง", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - {id: chant, text: "นั่งสวดมนต์ให้ใจนิ่งก่อน", merit: [{cat: bhavana, level: 1}]}
+      - {id: close, text: "ปิดสมุดบัญชี ไม่เปิดอีกสักพัก", merit: [{cat: neutral}]}
 
   # บนบาน/แก้บน — ผลของเรื่องที่บนเป็นอิสระจากการบน · แก้ตามกำลังมีทุกใบ ≤0.05 เท่าเงินเก็บต่อปี · เลื่อนได้ครั้งเดียว
   # ศาลเจ้าก่อนสอบไม่อยู่ในกองสุ่ม (B63): แกนวางไว้หน้าด่านสอบเข้ามหาวิทยาลัยปีจบ ม.ปลาย/ปวช. · แก้บนทวงเฉพาะคนที่สอบติด (exam_pass:uni)
