@@ -611,6 +611,11 @@ const CADET = (() => {
     info(st).passAge = st.age;
     info(st).commissionAge = st.age + commissionYears(st, b);   // บันไดยศเริ่มที่อายุนี้ (ตร. 6 ปี · เหล่าอื่น 7 ปี)
     info(st).branch = b;
+    // ⚠ ชั่วคราว จนกว่าเปิดเฟส 3 (เจ้าของเคาะ 2026-11-06): เข้า track โรงเรียนนายร้อยเดิมของ career.mjs
+    // กันการ์ดสอบมหาวิทยาลัย/ด่านเลือกทางเรียน/หางานหลังสอบติด · track นี้ให้วุฒิ + เข้าบันไดยศเองที่อายุ until
+    // ข้อจำกัดที่เจ้าของรับไว้: (ก) ติดยศที่ 22 ตายตัว ยังไม่ตาม commissionAge (ข) ทร./ทอ. เข้าบันได army (ค) ช่วงเรียนใช้กองปกติ
+    st.school = b === 'police' ? 'police_cadet' : 'cadet';
+    st.needJob = false;
     st.cadet.p2.steps = [['end']];
     return status('รายงานตัวที่นครนายก', `รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BT(st, b)} อีก${TH_YEARS[commissionYears(st, b)] ?? commissionYears(st, b)}ปีจะได้ติดยศ`);
   };
