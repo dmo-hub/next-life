@@ -2258,6 +2258,12 @@ function render(card) {
     if (gone) box.classList.add('lost');
     top.append(el('b', null, gone ? LOST.head : 'ด้วยรักและอาลัย'));
     box.append(top);
+    // ตราไม่มีชื่อผู้ตาย: เขียนชื่อด้วยหมึกแดงถือเป็นการแช่ง (ข้อ 154) · คนหายไม่มีตรา ยังไม่มีใครถือว่าจากไป (B139)
+    if (!gone) {
+      const seal = el('span', 'd-seal', 'อาลัย');
+      seal.setAttribute('aria-hidden', 'true');
+      box.append(seal);
+    }
     const bg = sceneBg(gone ? 'gone' : 'death');
     if (bg) box.append(bg);
     // หนังสืองานศพ (ui-redo 57): รูป ชื่อ อายุ สาเหตุ เป็นหัวกลางใบไม่มีกรอบ · ข้อมูลเป็นตารางสองคอลัมน์ · ปุ่มไปต่อท้ายข้อมูล
