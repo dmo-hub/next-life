@@ -11621,7 +11621,9 @@ function next() {
   beginYear();
 }
 
-const fill = t => (t || '').replaceAll('{ชื่อ}', S.name).replaceAll('{เหล่า}', leanBranch());
+// {ชื่อ} = ชื่อเฉย ๆ ในตัวบท · {ชื่อเต็ม} = คำนำหน้า + ชื่อ (เจ้าของเคาะ A1 2026-11-06: นตท. ไม่ใส่ใน {ชื่อ})
+const fullName = () => `${S.title || ''}${S.name}`;
+const fill = t => (t || '').replaceAll('{ชื่อเต็ม}', fullName()).replaceAll('{ชื่อ}', S.name).replaceAll('{เหล่า}', leanBranch());
 function leanBranch() {
   const l = [...S.flags].find(f => f.startsWith('cadet_lean:'));
   if (l) return BRANCH[l.split(':')[1]] || l.split(':')[1];
@@ -11935,6 +11937,7 @@ function judgeWritten(b) {
   S.p2.reason = S.p2.reason || {};
   S.p2.reason[b] = ok ? null : (sc < WRITTEN_MIN && S.stats.knowledge < KNOW_MIN ? 'both' : sc < WRITTEN_MIN ? 'quiz' : 'knowledge');
   S.p2.lastScore = sc;
+  (S.p2.know ??= {})[b] = S.stats.knowledge;   // ความรู้ ณ วันสอบเหล่านี้ (บล็อกคะแนน · คะแนนรวม)
   S.log.push(`ข้อเขียน ${BR_TH[b]}: ${sc}/25 · ความรู้ ${S.stats.knowledge} → ${ok ? 'ผ่าน' : 'ไม่ผ่าน'}`);
 }
 
@@ -12136,6 +12139,40 @@ function x3aCard() {
   return asCard({ id: 'X3a-' + e, title: 'เช้าวันประกาศผล', text: `${text}${ctx ? '\n' + ctx : ''}\nเลขประจำตัวสอบ ${S.p2.examNo}`, options });
 }
 
+// ============ บล็อกคะแนน · คะแนนรวม · ลำดับที่ (เจ้าของเคาะ B/C1–C4 2026-11-06 · research cadet-titles-scores-ranks.md) ============
+// บล็อกตัวเลขแยกใต้บล็อกผลทุกรอบ ทั้งติดและไม่ติด · ของจริงไม่ประกาศคะแนน/ลำดับ = เล่าแบบเกม (S1 §2)
+// ลำดับ = ตัวเลขเล่าเรื่องให้สอดคล้องกับเส้นเดิม ไม่แตะสมดุล (C2 ก) · ตกสัมภาษณ์เฉียด = ตัวสำรอง = ไม่ติด
+const SEATS = { army: 270, navy: 90, airforce: 137, police: 315 };   // ที่นั่งปี 2568 ใช้ทุกยุค (C3)
+const RESERVE_SHARE = 0.4;    // ตัวสำรองนับถึง 40% ของที่นั่ง (C3)
+const RESERVE_GAP = 2;        // สัมภาษณ์ขาดเส้นไม่เกินเท่านี้ = ตัวสำรอง (C2 ก)
+const TOTAL_DIV = { know: 4, body: 4 };   // รวม 100 = ข้อเขียน 25 + ความรู้/4 + ชีวิต/4 + สัมภาษณ์ 25 (C1)
+function writtenScoreLine(b) {
+  // เหตุคิดจากตัวเลขจริง (ไม่อ่าน reason ที่เก็บไว้) — บรรทัดตัวเลขจะไม่ขัดกับตัวมันเอง
+  const sc = S.p2.scores[b] || 0, k = S.p2.know?.[b] ?? S.stats.knowledge, q = sc < WRITTEN_MIN, kn = k < KNOW_MIN, why = q && kn ? 'both' : kn ? 'knowledge' : q ? 'quiz' : null;
+  if (why === 'both') return `${BR_TH[b]} แบบวัด ${sc}/25 · ความรู้ ${k} ไม่ถึงเกณฑ์ทั้งคู่ (เส้น ${WRITTEN_MIN} · ${KNOW_MIN})`;
+  if (why === 'knowledge') return `${BR_TH[b]} แบบวัด ${sc}/25 ผ่านเส้น · ความรู้ ${k} เกณฑ์ ${KNOW_MIN} ขาดอีก ${KNOW_MIN - k}`;
+  if (why === 'quiz') return `${BR_TH[b]} ได้ ${sc}/25 ขาดอีก ${WRITTEN_MIN - sc} ถึงเส้น ${WRITTEN_MIN} · ความรู้ ${k}`;
+  return `${BR_TH[b]} ได้ ${sc}/25 (เส้น ${WRITTEN_MIN}) · ความรู้ ${k} (เกณฑ์ ${KNOW_MIN})`;
+}
+const bodyScoreLine = live => `ชีวิตวันสอบ ${S.p2.bodyH ?? S.stats.health} · ` + live.map(b => `${BR_TH[b]} เกณฑ์ ${BODY_MIN[b]} ${S.p2.body?.[b] ? 'ผ่าน' : 'ไม่ผ่าน'}`).join(' · ');
+const ivScoreLine = () => `สัมภาษณ์ ${S.p2.iv || 0}/25 (เส้น ${IV_MIN})`;
+const totalOf = b => (S.p2.scores[b] || 0) + Math.round((S.p2.know?.[b] ?? S.stats.knowledge) / TOTAL_DIV.know) + Math.round((S.p2.bodyH ?? S.stats.health) / TOTAL_DIV.body) + (S.p2.iv || 0);
+// ลำดับรายเหล่าของคนที่ถึงรอบสุดท้าย · จำไว้ใน S.p2.ranks ให้ฉากหลังใช้ต่อ
+function finalRank(b, passed) {
+  const seats = SEATS[b], resMax = Math.floor(seats * RESERVE_SHARE), total = totalOf(b);
+  let rank, kind;
+  if (passed) { kind = 'pass'; rank = Math.max(1, Math.min(seats, Math.round(seats * Math.min(1, Math.max(0.02, (100 - total) / 50)) * (0.85 + 0.3 * Math.random())))); }
+  else if (IV_MIN - (S.p2.iv || 0) <= RESERVE_GAP) { kind = 'reserve'; rank = seats + Math.max(1, Math.min(resMax, Math.ceil(resMax * ((IV_MIN - (S.p2.iv || 0)) / RESERVE_GAP) * (0.4 + 0.6 * Math.random())))); }
+  else { kind = 'out'; rank = seats + resMax + 1 + Math.floor(Math.random() * seats); }
+  return ((S.p2.ranks ??= {})[b] = { total, rank, seats, kind, reserveNo: kind === 'reserve' ? rank - seats : null });
+}
+function finalScoreLine(b, r) {
+  const head = `${BR_TH[b]} รวม ${r.total}/100 · ลำดับที่ ${r.rank}`;
+  if (r.kind === 'pass') return `${head} จาก ${r.seats} ที่นั่ง · ตัวจริง`;
+  if (r.kind === 'reserve') return `${head} · ที่นั่งมี ${r.seats} · ตัวสำรองลำดับที่ ${r.reserveNo} ปีนี้ชื่อไม่ถูกเรียก (ไม่ติด)`;
+  return `${head} · ที่นั่งมี ${r.seats} · ไม่ติด`;
+}
+
 // ---------- X3 · ผลทุกสนาม ใบเดียว (§7.3) ----------
 function x3Card() {
   const P = S.p2, e = eraR(), how = P.how || 'self', secret = secretNow();
@@ -12185,7 +12222,8 @@ function x3Card() {
   if (none) S.p2.steps = [() => failedCard()];
   else S.p2.steps = [() => x3bCard(pass, fail), () => physAsk('phys'), () => nearExamCard(), () => bodyDayCard(), () => judgeBody(),
     () => bodyWaitCard(), () => announceCard('body'), () => bodyBoard()];
-  return asCard({ id: none ? 'X3-N' : 'X3-P', title: 'ผลทุกสนาม', text: `${text}\n\n(ข้อเขียนผ่านเมื่อได้ ≥ ${WRITTEN_MIN}/25 และความรู้ ≥ ${KNOW_MIN})`, options: opts });
+  // บล็อกคะแนน (B) แทนบรรทัดเกณฑ์ท้ายการ์ดเดิม
+  return asCard({ id: none ? 'X3-N' : 'X3-P', title: 'ผลทุกสนาม', text: `${text}\n\n${P.branches.map(writtenScoreLine).join('\n')}`, options: opts });
 }
 
 // ---------- X3b · คนรอบตัวฉลอง (§7.4) · options = the 5 round-two prep ways of the old board ----------
@@ -12341,7 +12379,7 @@ function bodyBoard() {
   })[S.p2.how] || `ไล่หาเลข ${no}`;
   const lines = live.map(b => `${BR_TH[b]} (เกณฑ์ชีวิต ${BODY_MIN[b]}) ${S.p2.body[b] ? 'ผ่าน' : 'ไม่ผ่าน'}`);
   let text = `${head}\n${S.p2.bodyHead || ''}\n\n${lines.join('\n')}\n\n` +
-    `${all ? 'ผ่านพลศึกษาและตรวจร่างกายครบทุกเหล่า' : none ? 'ไม่ผ่านพลศึกษาสักเหล่า' : `ผ่าน ${pass.length} จาก ${live.length} เหล่า`} · ชีวิตวันสอบ ${h}`;
+    `${all ? 'ผ่านพลศึกษาและตรวจร่างกายครบทุกเหล่า' : none ? 'ไม่ผ่านพลศึกษาสักเหล่า' : `ผ่าน ${pass.length} จาก ${live.length} เหล่า`}\n\n${bodyScoreLine(live)}`;   // บล็อกคะแนน (B)
   if (none) S.p2.steps = [() => failedCard()];
   else S.p2.steps = [() => cheerCard(pass, fail, 'iv'), () => physAsk('iv'), () => ivEveCard(), () => ivIntroCard(), () => { queueInterview(); return null; }];
   const opts = none
@@ -12485,6 +12523,7 @@ function judgeBody() {
     : any ? (live.every(b => S.p2.body[b]) ? 'ผ่านทุกสถานี ห้องตรวจสุดท้ายประทับตราให้' : 'บางสถานีทำได้ไม่ถึงเกณฑ์ของบางเหล่า')
     : 'วิ่งพันเมตรเข้าเส้นช้ากว่าเวลาที่กำหนด';
   S.p2.bodyHead = head;
+  S.p2.bodyH = h;   // ชีวิตวันสอบพละ (บล็อกคะแนน · คะแนนรวม)
   return null;   // results are announced a day later (owner 2026-11-05)
 }
 function judgePhysical() {
@@ -12525,7 +12564,10 @@ function finalBoard() {
     paper: [PAPER_HEAD, paperLine(none ? 'none' : pass.length === S.p2.branches.length ? 'all' : 'some', false)].filter(Boolean).join('\n'),
   })[S.p2.how] || `ไล่หาเลข ${no}`;
   const lines = S.p2.branches.map(b => pass.includes(b) ? `${BR_TH[b]} ติด` : `${BR_TH[b]} ไม่ติด (${why(b)})`);
-  const text = `${head}\n\n${lines.join('\n')}\n\n${none ? 'ปีนี้ไม่ติดสักเหล่า' : pass.length === S.p2.branches.length ? 'ติดครบทุกเหล่าที่สมัคร' : `ติด ${pass.length} จาก ${S.p2.branches.length} เหล่า`}`;
+  // บล็อกคะแนน + รวม + ลำดับ (B · C1–C4): ทุกเหล่าที่ถึงรอบสุดท้าย (ผ่านข้อเขียนและพละ)
+  const reached = S.p2.branches.filter(b => S.p2.written[b] && S.p2.body?.[b]);
+  const scoreBlock = reached.length ? [ivScoreLine(), ...reached.map(b => finalScoreLine(b, finalRank(b, pass.includes(b))))].join('\n') : '';
+  const text = `${head}\n\n${lines.join('\n')}\n\n${none ? 'ปีนี้ไม่ติดสักเหล่า' : pass.length === S.p2.branches.length ? 'ติดครบทุกเหล่าที่สมัคร' : `ติด ${pass.length} จาก ${S.p2.branches.length} เหล่า`}${scoreBlock ? '\n\n' + scoreBlock : ''}`;
   S.log.push(`ประกาศผลสุดท้าย: ${none ? 'ไม่ติด' : 'ติด ' + pass.map(b => BR_TH[b]).join(' ')}`);
   S.p2.final = pass;
   S.p2.steps = none ? [() => failedCard()] : [() => cheerCard(pass, fail, 'final'), () => chooseOrPack(pass)];
@@ -12604,6 +12646,7 @@ function finalResult() {
   return asCard(c, { id: c.id || 'X8', options: [...passed.map(b => ({ label: `เลือก ${BR_TH[b]}`, _pick: b })), { label: 'สละสิทธิ์ทั้งหมด', _pick: 'none' }] });
 }
 function arriveCard(b) {
+  S.title = 'นตท.';   // คำนำหน้าเริ่มวันรายงานตัวตามของจริง (เจ้าของเคาะ A 2026-11-06) · เฟส 3 เปลี่ยนเป็น นนร./นนอ./นรต.
   S.p2.steps = [() => { finish(`ติดเตรียมทหาร (ต่อ ${BR_TH[b]}) · จะติดยศตอนอายุ ${S.age + 7} · เฟสถัดไปคือชีวิตในโรงเรียนเตรียมทหาร`); return 'END'; }];
   return statusCard('รายงานตัวที่นครนายก', `รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BR_TH[b]} อีกเจ็ดปีจะได้ติดยศ`);
 }
@@ -12672,7 +12715,7 @@ function finish(msg) {
 function renderSide() {
   if (!S) { side.innerHTML = `<h3>ข้อมูลใน demo</h3><p class="warn">โหลดเหตุการณ์ ${EVENTS.length} ใบ</p>`; return; }
   side.innerHTML = `
-    <h3>${S.name} · ${S.sex} · ${S.region}</h3>
+    <h3>${fullName()} · ${S.sex} · ${S.region}</h3>${S.title ? '<p class="hint">นักเรียนเตรียมทหาร</p>' : ''}
     ${STATS.map(([k, l]) => k === 'money'
       ? `<div class="stat"><span>${l}</span><span>${'฿'.repeat(Math.min(S.stats.money, 10)) || '—'}</span><span>${S.stats.money}</span></div>`
       : `<div class="stat"><span>${l}</span><div class="bar"><i style="width:${S.stats[k]}%"></i></div><span>${S.stats[k]}</span></div>`).join('')}
@@ -12681,7 +12724,7 @@ function renderSide() {
 }
 
 window.__demoState = () => S;   // test hook only
-window.__demoAnnounce = { x2wCard, x3aCard, x3Card, x3bCard, applyForm };   // test hook only (announce scenes · apply form)
+window.__demoAnnounce = { x2wCard, x3aCard, x3Card, x3bCard, applyForm, finalBoard, bodyBoard };   // test hook only (announce scenes · apply form)
 setup();
 })();
 </script>
