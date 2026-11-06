@@ -1,5 +1,6 @@
 # การ์ดเฉพาะเพศ + ความคาดหวังทางสังคมตามเพศ/ยุค (B109) — เพศกำเนิดจาก st.sex · ไม่มีตัวเลือกไหนผิดเพราะเป็นเพศนั้น
-# ผลต่างตามยุคเขียนด้วย when.year (ช่องว่างค่าแรงยุคก่อน 2540) · การ์ดอัตลักษณ์รอ state identity ของแกน
+# ผลต่างตามยุคเขียนด้วย when.year (ช่องว่างค่าแรงยุคก่อน 2540)
+# อัตลักษณ์ (ใบ 215): ค่าเดียว หญิงข้ามเพศ ตั้งจากการ์ดวัยรุ่นที่ผู้เล่นเลือก · ไม่มีตัวเลือกไหนเป็นมุกหรือถูกลงโทษเพราะเป็นตัวเอง
 events:
   - id: sex_lottery_01
     type: A
@@ -7,7 +8,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 4
-    when: {age: [21, 21], sex: [ชาย]}
+    when: {age: [21, 21], sex: [ชาย], identity: [ตามเพศกำเนิด]}
     title: "วันจับใบดำใบแดง"
     text: "อายุ {อายุ} หน้าที่ว่าการอำเภอเช้านี้มีแต่ผู้ชายรุ่นเดียวกันยืนเข้าแถว บางคนพกพระเต็มคอ บางคนแม่มายืนกุมมือรอข้างรั้ว ชื่อ {ชื่อ} อยู่คิวที่สามสิบเจ็ด"
     choices:
@@ -152,4 +153,143 @@ events:
       - id: let_it_go
         text: "วางซองคืนที่เดิม แล้วทำงานต่อ"
         effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ค้นพบตัวเอง: ทางเดียวที่ตั้งอัตลักษณ์ · ใบวัยรุ่น weight 0.5 ตามใบวัยรุ่นชุดใหม่ (decisions 416)
+  - id: sex_identity_found_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [14, 19], sex: [ชาย], identity: [ตามเพศกำเนิด]}
+    title: "หลังเวทีนางนพมาศ"
+    text: "งานลอยกระทงของโรงเรียนปีนี้ พี่ปอที่ทุกคนรู้ว่าเป็นสาวประเภทสองชวนไปช่วยหลังเวที ระหว่างรอคิว พี่ยื่นชุดไทยสำรองมาให้ลองใส่ บอกว่าไม่มีใครบังคับ ใส่แล้วไม่ใช่ก็ถอด ไม่มีใครว่า"
+    choices:
+      - id: this_is_me
+        text: "ลองใส่ แล้วรู้ว่านี่คือตัวเอง"
+        effects: {identity: หญิงข้ามเพศ, happiness: 2}
+        merit: [{cat: neutral}]
+      - id: help_backstage
+        text: "ช่วยพี่แต่งหน้าอยู่หลังเวที"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: cheer_front
+        text: "ขอบคุณพี่ แล้วไปเชียร์ข้างล่าง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: go_home
+        text: "กลับบ้านไปช่วยที่บ้านเตรียมกระทง"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ครอบครัวตามยุค: ก่อน 2540 บ้านส่วนใหญ่ไม่มีคำอธิบาย · หลังนั้นมีคำให้คุยกันมากขึ้น · ไม่มีตัวเลือกให้ทิ้งตัวตน
+  - id: sex_identity_family_old_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [15, 25], year: [2500, 2539], identity: [หญิงข้ามเพศ], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
+    title: "เรื่องที่พ่อไม่ถาม"
+    text: "แม่เจอกระโปรงในกระเป๋านักเรียน คืนนั้นบ้านเงียบกว่าทุกคืน พ่อไม่พูดสักคำ แม่บอกแค่ว่ากลัวคนข้างบ้านจะว่า ทีวีช่วงนี้มีแต่ละครที่เอากะเทยมาเป็นตัวตลก ไม่มีใครในบ้านรู้ว่าจะคุยเรื่องนี้ยังไง"
+    choices:
+      - id: talk_mother
+        text: "นั่งคุยกับแม่ตรง ๆ ทีละนิด"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: dress_outside
+        text: "ใส่ชุดที่ใช่ตอนอยู่กับเพื่อน"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: leave_for_city
+        text: "ตั้งใจเรียนให้ได้ไปเรียนในเมือง"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: wait_time
+        text: "รอให้เวลาช่วยให้พ่อเข้าใจเอง"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: sex_identity_family_new_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [15, 25], year: [2540, 2650], identity: [หญิงข้ามเพศ], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
+    title: "บอกที่บ้าน"
+    text: "แม่เห็นรูปในโทรศัพท์ที่เพื่อนแท็กมา ถามตรง ๆ ตอนกินข้าวเย็น พ่อวางช้อนแล้วถามว่าลูกแน่ใจแล้วใช่ไหม ป้าในกลุ่มไลน์ครอบครัวยังส่งข่าวคลินิกรักษาให้หายมาให้อ่าน ส่วนน้องบอกว่าเพื่อนที่โรงเรียนก็มีหลายคน"
+    choices:
+      - id: tell_all
+        text: "เล่าให้ทุกคนฟังว่าเป็นใคร"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: ask_doctor
+        text: "ชวนพ่อแม่ไปคุยกับหมอด้วยกัน"
+        effects: {relations: 1, knowledge: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: mute_group
+        text: "ปิดเสียงกลุ่มไลน์ ใช้ชีวิตต่อ"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: give_time
+        text: "ขอให้พ่อแม่ใช้เวลาทำความเข้าใจ"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  # เกณฑ์ทหาร (รีเสิร์ช 215-conscription-research.md): ก่อน 2557 ได้ยกเว้นแต่ สด.43 ระบุโรคจิตถาวร · ตั้งแต่ 2557 ยื่นใบรับรองแพทย์ได้จำพวก 2 ไม่ต้องจับ
+  # ไม่มีทางจับใบแดง — ผลทหารเกณฑ์ไม่เกิดกับค่านี้ตามกติกาจริง · ผลต่างอยู่ที่ใบ สด.43 กับวันนั้น
+  - id: sex_lottery_trans_old_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [21, 21], year: [2500, 2556], sex: [ชาย], identity: [หญิงข้ามเพศ]}
+    title: "ใบ สด.43"
+    text: "วันตรวจเลือก คุณผมยาวประบ่า ใส่เสื้อผ้าแบบที่ใส่ทุกวัน กรรมการเรียกไปตรวจแยก แล้วให้ใบ สด.43 กลับบ้าน ไม่ต้องเป็นทหาร แต่ช่องเหตุผลเขียนว่า โรคจิตถาวร พี่ที่เคยผ่านมาก่อนบอกว่าใบนี้ต้องใช้สมัครงานไปอีกนาน"
+    choices:
+      - id: keep_quiet
+        text: "เก็บใบไว้ ไม่ให้ใครเห็น"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: private_job
+        text: "หางานเอกชนที่ไม่ขอดูใบนี้"
+        effects: {network: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: join_group
+        text: "หาเพื่อนที่เจอเรื่องเดียวกัน"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: laugh_it_off
+        text: "บอกตัวเองว่าเราไม่ได้ป่วย"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: sex_lottery_trans_new_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [21, 21], year: [2557, 2650], sex: [ชาย], identity: [หญิงข้ามเพศ]}
+    title: "จำพวกที่ 2"
+    text: "ก่อนวันตรวจเลือกต้องไปตรวจร่างกายกับจิตแพทย์ที่โรงพยาบาลรัฐเอาใบรับรองมา วันนั้นคุณยืนในแถวเดียวกับผู้ชายรุ่นเดียวกัน กรรมการดูเอกสารแล้วจัดเป็นจำพวกที่ 2 ไม่ต้องจับใบ ใบ สด.43 เขียนว่า ภาวะเพศสภาพไม่ตรงกับเพศกำเนิด"
+    choices:
+      - id: go_ready
+        text: "เตรียมเอกสารครบ ไปแต่เช้า"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: friend_along
+        text: "ชวนเพื่อนข้ามเพศไปเป็นเพื่อนกัน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: help_queue
+        text: "ช่วยน้องในแถวที่ไม่มีใบรับรอง"
+        effects: {network: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: just_finish
+        text: "ทำให้จบเร็ว ๆ แล้วกลับบ้าน"
+        effects: {}
         merit: [{cat: neutral}]

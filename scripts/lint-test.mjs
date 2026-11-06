@@ -108,6 +108,24 @@ for (const [name, extra, pass] of overlapCases) {
   if (!ok) fails.push(`overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกที่ช่อง overlap_stage'} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
 }
 rows.push(['overlap_stage ตก/ผ่าน', `${overlapCases.length} เคส`]);
+// อัตลักษณ์ (ใบ 215): การ์ดเดียวกัน ต่างแค่ when/effects.identity — ตกต้องตกที่ช่อง identity เท่านั้น
+const idCard = (when, fx) => ({ id: 'identity_case_01', type: 'A', stage: 'วัยรุ่น', years: [2500, 2650], weight: 1, text: 'ข้อความการ์ด', ...(when && { when }), choices: [1, 2, 3, 4].map((n) => ({ text: `ทางเลือก ${n}`, ...(n === 1 && fx && { effects: fx }), merit: [{ cat: 'neutral' }] })) });
+const idCases = [
+  ['ตั้งค่า กั้นชาย', { sex: ['ชาย'] }, { identity: 'หญิงข้ามเพศ' }, true],
+  ['ล้างค่า กั้นชาย', { sex: ['ชาย'] }, { identity: 'ตามเพศกำเนิด' }, true],
+  ['when หญิงข้ามเพศ', { identity: ['หญิงข้ามเพศ'] }, null, true],
+  ['ตั้งค่า ไม่กั้นเพศ', null, { identity: 'หญิงข้ามเพศ' }, false],
+  ['ตั้งค่า กั้นหญิง', { sex: ['หญิง'] }, { identity: 'หญิงข้ามเพศ' }, false],
+  ['ตั้งค่า กั้นทั้งสองเพศ', { sex: ['ชาย', 'หญิง'] }, { identity: 'หญิงข้ามเพศ' }, false],
+  ['ค่าที่ตัดไปแล้ว (เกย์)', { sex: ['ชาย'] }, { identity: 'เกย์' }, false],
+  ['when ค่าไม่รู้จัก', { identity: ['ทอม'] }, null, false],
+];
+for (const [name, when, fx, pass] of idCases) {
+  const ps = lintDocs([{ file: `identity-case:${name}`, doc: { events: [idCard(when, fx)] } }], ctx);
+  const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.path.endsWith('.identity'));
+  if (!ok) fails.push(`identity "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกที่ช่อง identity'} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
+}
+rows.push(['identity ตก/ผ่าน', `${idCases.length} เคส`]);
 // ความจำชาติก่อน (ใบ 159): การ์ดเดียวกัน ต่างแค่ช่อง when.past_life — ตกต้องตกที่ past_life เท่านั้น · ช่องที่ไม่มีแล้ว (ตัวควบคุม) ต้องตกด้วย
 const pastCases = [
   ['มีชาติก่อน', { any: true }, true],

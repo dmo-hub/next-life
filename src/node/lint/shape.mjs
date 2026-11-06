@@ -7,7 +7,7 @@ import {
 import { INCOME_MULT, MONEY_KEYS, PACT, OVERLAP_STAGE_MIN } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
-import { PET_KINDS, HERD_KINDS, PET_CAUSES, FILIAL_WAYS } from '../../engine/family.mjs';
+import { PET_KINDS, HERD_KINDS, PET_CAUSES, FILIAL_WAYS, IDENTITY, IDENTITIES } from '../../engine/family.mjs';
 import { CHRONIC, ILL_YEARS, HEREDITARY, CARE_CAUSES } from '../../engine/death.mjs';
 import { SIN_CATS } from '../../engine/merit.mjs';
 import { REALMS } from '../../engine/afterlife.mjs';
@@ -23,14 +23,14 @@ const KEYS = {
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot', 'identity'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   debt: ['kind', 'amount'],
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years', 'chance'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', 'dark_gate', 'past_life', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'sex', 'identity', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', 'dark_gate', 'past_life', ...MONEY_KEYS],
   pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
@@ -309,6 +309,7 @@ export const rules = [
       if (w.class !== undefined && !nonEmptySubset(w.class, CLASSES)) r('.when.class', `class ต้องเป็นรายการจาก ${CLASSES.join(' ')}`);
       if (w.region !== undefined && !nonEmptySubset(w.region, ctx.regions)) r('.when.region', `region ต้องเป็นรายการจาก ${ctx.regions.join(' · ')}`);
       if (w.sex !== undefined && !nonEmptySubset(w.sex, SEXES)) r('.when.sex', `sex ต้องเป็นรายการจาก ${SEXES.join(' ')}`);
+      if (w.identity !== undefined && !nonEmptySubset(w.identity, IDENTITIES)) r('.when.identity', `identity ต้องเป็นรายการจาก ${IDENTITIES.join(' ')}`);
       const top = OVERLAP_STAGE_MIN.length - 1;
       if (w.overlap_stage !== undefined && !isRange(w.overlap_stage, 0, top)) r('.when.overlap_stage', `overlap_stage ต้องเป็น [จาก, ถึง] ขั้น 0–${top} จำนวนเต็ม`);
       if (w.stats !== undefined) {
@@ -569,6 +570,13 @@ export const rules = [
         const fx = isObj(node.effects) ? node.effects : {};
         if (fx.job !== undefined && !occ.includes(fx.job)) r(`${path}.effects.job`, `อาชีพ "${fx.job}" ไม่รู้จัก (${occ.join(' ')})`);
         if (fx.school !== undefined && !SCHOOL_VALUES.includes(fx.school)) r(`${path}.effects.school`, `ต้องเป็น ${SCHOOL_VALUES.join(' ')}`);
+        // ตั้งอัตลักษณ์ได้เฉพาะการ์ดที่กั้น when.sex ไว้แค่เพศกำเนิดที่ค่านั้นใช้ได้ — ไม่งั้นเพศกำเนิดหญิงได้ค่าที่ไม่มีความหมาย
+        if (fx.identity !== undefined) {
+          const birth = IDENTITY[fx.identity]?.birth;
+          const sexes = isObj(e.when) ? e.when.sex : undefined;
+          if (!IDENTITIES.includes(fx.identity)) r(`${path}.effects.identity`, `ต้องเป็น ${IDENTITIES.join(' ')}`);
+          else if (birth && !(Array.isArray(sexes) && sexes.length && sexes.every((x) => birth.includes(x)))) r(`${path}.effects.identity`, `การ์ดต้องกั้น when.sex เป็น ${birth.join(' ')}`);
+        }
       }
       for (const [m, at] of mults) {
         const o = isObj(m) ? m.occupation : undefined;
