@@ -46,6 +46,15 @@
   .tw { overflow-x: auto; margin: 0 0 12px; }
   .tw th, .tw td { overflow-wrap: normal; }
 </style>
+<!--DOCS-LAYOUT:START--><style>
+.w:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){max-width:1280px!important}body>main:not(:has(.w)):not(#app){max-width:1280px;margin-left:auto;margin-right:auto}:is(body>main,body>header,body>footer){padding-left:24px;padding-right:24px}
+main h2:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(:first-child){margin-top:28px}main :is(section,.box):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){margin-bottom:17px}
+main:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){overflow-wrap:anywhere}main .st:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){white-space:normal;max-width:100%}@media (max-width:640px){main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){display:block;max-width:100%;overflow-x:auto}}
+main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) :is(th,td):not(:is(.dark,.dark *)){border:1px solid var(--line)}main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) th:not(:is(.dark,.dark *)){background:var(--bg);color:var(--ink)}
+main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){padding:20px 24px;box-shadow:none}main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(.dark){background:var(--surface)}
+main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r)}
+.tag:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border-radius:0}
+</style><!--DOCS-LAYOUT:END-->
 </head>
 <body>
 <!--nav--><style>
@@ -73,7 +82,7 @@
 </style><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="../index.html">NEXT LIFE</a><div class="links"><a href="../guide.html">วิธีเล่น</a><a href="../whatsnew.html">แพตช์โน้ต</a><a href="../about.html">กลไกในเกม</a><a href="../worlds.html">โลก</a><a href="../catalog.html">การ์ดทั้งหมด</a><a href="../dev/index.html" aria-current="true">ห้องผู้พัฒนา</a></div><a class="play" href="../play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html" aria-current="true">คำตัดสินเกม</a><a href="../dev/ui.html">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div><!--/nav-->
 <header><div class="w">
   <h1>โลกซ้อนทับ — ข้ามโลกซ้ำบ่อย กำแพงโลกบาง ของแต่ละโลกรั่วเข้าหากัน จนถึงจบโลก</h1>
-  <p>เรื่อง world-overlap · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.93</span></p>
+  <p>เรื่อง world-overlap · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.96</span></p>
 </div></header>
 <main><div class="w">
 <p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
