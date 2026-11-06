@@ -69,6 +69,7 @@ async function hashLives(root, n, seed, ctl, world) {
           see(card);
           if (card.step === 'end') break;
           if (card.choices.length) E.chooseIsekai(isk, pick(card, rng, {}));
+          else if (card.entered && E.isekaiFocusPick) E.isekaiFocusPick(isk, pick(E.isekaiFocusCard(isk), rng, {}));
         }
         h.update(`|${JSON.stringify(isk, skip)}`);
       } else if (world === 'chain') {

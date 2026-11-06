@@ -12,7 +12,6 @@ docs/fonts/*.css text eol=lf
 # หน้าเขียนมือ index/about/otherworld/gdd ห้ามใส่ merge=build — build แค่ฉีดตัวเลข เนื้อที่เหลือต้อง merge จริง
 docs/play.html     merge=build
 docs/catalog.html  merge=build
-docs/spoilers.html merge=build
 docs/guide.html    merge=build
 docs/focus.html    merge=build
 # หน้าเล่นแยกไฟล์ (ui-redo 96): ข้อมูล · สคริปต์ · service worker · CSS ฟอนต์ build สร้างทั้งไฟล์ (src/site/play-files.mjs · fonts.mjs)
