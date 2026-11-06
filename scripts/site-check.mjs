@@ -23,7 +23,7 @@ import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, GATE_OFF, PUBLIC_HIDE } from '../src/site/gate.mjs';
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
-import { DOCS_TWEAK_PAGE, T12_DOCS_PAGE, T13_DEV_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsTweak } from '../src/site/docs-tweak.mjs';
+import { DOCS_TWEAK_PAGE, T13_DEV_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsLayout, injectDocsTweak, pageKind } from '../src/site/docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, cardArtBlock, CAT_ART } from '../src/site/card-art-tweak.mjs';
 import { CARD_SPOIL_PAGE, cardSpoilData, cardSpoilBlock } from '../src/site/card-spoil-tweak.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
@@ -210,7 +210,7 @@ const designTpl = injectFacts(readFileSync(new URL('../src/site/design.html', im
 const lf = (s) => s?.replace(/\r\n/g, '\n');
 // หน้าที่ build เขียนได้กล่องรหัสต่อท้ายเสมอ (ui-redo 72) ⇒ ของคาดหวังต้องผ่าน injectGate ชุดเดียวกัน
 const gateHash = readGateHash();
-const gated = (html, file) => injectGate(html, gateHash, file);
+const gated = (html, file) => injectGate(injectDocsLayout(html, pageKind(file), file), gateHash, file);
 // หน้าอยู่ใต้ DESIGN_AT · ที่เดิมใต้ docs/ ต้องเป็นหน้าส่งต่อไปหน้าใหม่ (ui-redo 43) — หน้าส่งต่อไม่นับเป็น "เกิน"
 const readOr = (p) => (existsSync(new URL(p, docs)) ? read(p) : null);
 const designGap = (out, readPage, readOld = readOr) => [
@@ -369,7 +369,8 @@ const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worl
 const dtOut = (f) => f === 'play.html' || f.startsWith('archive/') || f.startsWith('dev/ui-redo/') || /tweak/.test(f) || read(f).includes(MOVED_MARK);
 const dtMiss = [
   ...(JSON.stringify(dtBlock) !== JSON.stringify(dtNow) ? [`ค้าง ${DOCS_TWEAK_PAGE} (build ใหม่)`] : []),
-  ...[T12_DOCS_PAGE, T13_DEV_PAGE].filter((f) => JSON.stringify(docsTweakBlock(readOr(f) ?? '')) !== JSON.stringify(dtNow)).map((f) => `ค้าง ${f} (build ใหม่)`),
+  ...(JSON.stringify(docsTweakBlock(readOr(T13_DEV_PAGE) ?? '')) !== JSON.stringify(dtNow) ? [`ค้าง ${T13_DEV_PAGE} (build ใหม่)`] : []),
+  ...dtNow.pages.filter((p) => lf(read(p.f)) !== lf(injectDocsLayout(read(p.f), p.k, p.f)) || !read(p.f).includes('DOCS-LAYOUT:START')).map((p) => `เลย์เอาต์ค้าง ${p.f} (build ใหม่)`),
   ...dtMust.filter((f) => !dtFiles.includes(f)).map((f) => `ขาด ${f}`),
   ...dtFiles.filter((f) => !existsSync(new URL(f, docs)) || dtOut(f)).map((f) => `เกิน ${f}`),
   ...(dtNow.pages.filter((p) => p.k === 'map').length !== dtFiles.filter((f) => f.startsWith('dev/maps/')).length ? ['dev/maps ไม่ได้ชนิดแผนที่'] : []),
