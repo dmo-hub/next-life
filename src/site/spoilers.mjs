@@ -134,6 +134,7 @@ function mults(m, L) {
   if (m.karma) out.push(`×${m.karma} เมื่อบุญมากกว่าบาป (÷${m.karma} เมื่อบาปมากกว่า)`);
   if (m.wish) out.push(`ยกกำลังตามระดับบัญชีบุญบาป (ฐาน ${m.wish})`);
   if (m.rank) out.push(`×${m.rank} ต่อขั้นตำแหน่งที่ไต่ขึ้น (ทบกัน)`);
+  if (m.hunter_rank) out.push(`×${m.hunter_rank} ต่อขั้นในสายนักล่า (ทบกัน)`);
   if (m.family_fame) out.push(`×${m.family_fame} ต่อระดับชื่อเสียงตระกูล (ทบกัน)`);
   if (m.overlap_stage !== undefined) out.push(`×${m.overlap_stage} ต่อขั้นค่าซ้อนทับ (ทบกัน)`);
   for (const k of Object.keys(MONEY_TH)) if (m[k]) out.push(`×${m[k].v} เมื่อ${moneyBound(k, m[k])}`);
