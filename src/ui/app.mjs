@@ -2393,7 +2393,10 @@ function render(card) {
       if (card.story) body.append(el('p', null, card.story));
       // ตรวจเจอโรค (B110): บอกเวลาที่เหลือให้เตรียมใจ (เจ้าของเคาะ) · left = ปีก่อนถึงนัด 0 = ปีนี้
       if (card.illness) body.append(el('p', 'sub', card.illness.left ? `หมอว่าเหลือเวลาราว ${card.illness.left} ปี` : 'หมอว่านี่อาจเป็นปีสุดท้าย'));
-      choices.append(enter(button(BTN.next, null, next)));
+      // ปุ่มปฏิกิริยาทุกปุ่มคือ "ถัดไป" — ไม่ส่งอะไรเข้าแกน ชีวิตเดินเหมือนการ์ดผลปุ่มเดียว
+      const reacts = card.kind === 'result' && CONTENT.resultReacts?.[card.tag];
+      if (reacts) choices.append(...reacts.map((w, i) => numbered(button(w, null, next), i + 1)));
+      else choices.append(enter(button(BTN.next, null, next)));
     } else if (card.entry) {
       entryOffer(card, body, choices);
     } else {

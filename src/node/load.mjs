@@ -3,7 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { brassLx, e0FromLx, stdFor, MAX_AGE } from '../engine/era.mjs';
 import { normCdf } from '../engine/birth.mjs';
-import { CLASSES } from '../engine/life.mjs';
+import { CLASSES, RESULT_TAGS } from '../engine/life.mjs';
 import { lintDocs, formatProblem } from './lint/index.mjs';
 import { MERIT_CATS } from './lint/vocab.mjs';
 import { checkMeritTable } from '../engine/merit.mjs';
@@ -396,6 +396,20 @@ const loadHeir = () => parse(read('content/rules/flags.yaml')).heir ?? {};
 
 // คำใบ้ที่ศาลตอนเฉียดตาย (B153) ระดับละหลายข้อความ — ไม่ใช่การ์ด จึงตรวจตอนโหลดแทนด่านเนื้อหา
 // ห้ามเลขคู่คำบุญ/บาป (กติกาเดียวกับด่านการ์ดไม่เผยบัญชีของ harness)
+export const REACT_COUNT = 4;
+const REACT_MAX = 32;
+export function loadResultReacts(p = 'content/rules/result-reacts.yaml') {
+  const doc = parse(read(p)) ?? {};
+  const bad = [];
+  for (const [tag, words] of Object.entries(doc)) {
+    if (!RESULT_TAGS.includes(tag)) bad.push(`หมวด ${tag} ไม่มีในแกน`);
+    if (!Array.isArray(words) || words.length !== REACT_COUNT || new Set(words).size !== REACT_COUNT) bad.push(`${tag} ต้องมี ${REACT_COUNT} คำไม่ซ้ำ`);
+    else for (const w of words) if (typeof w !== 'string' || !w.trim() || w.length > REACT_MAX) bad.push(`${tag} คำว่างหรือยาวเกิน ${REACT_MAX}: ${w}`);
+  }
+  if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return doc;
+}
+
 export function loadNearHints(p = 'content/rules/near-hints.yaml') {
   const doc = parse(read(p));
   const ids = NEAR_HINT_LEVELS.map((l) => l.id);
@@ -496,5 +510,5 @@ export const loadCadet = (p = 'content/rules/cadet.yaml') => parse(read(p));
 export function loadContent() {
   const events = loadEvents();
   const focus = loadFocus();
-  return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet: loadCadet() };
+  return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet: loadCadet() };
 }
