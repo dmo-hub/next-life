@@ -31,6 +31,14 @@
       "branch": "EX",
       "base": "c6aadad707f506a046c5b958d758b9469672479f",
       "created": "2026-11-05T11:03:33.084Z"
+    },
+    {
+      "id": "b005",
+      "topic": "cadet_life ผล 2 ทาง + การ์ดแยกตามบริบท (ธงกันเห็นซ้ำ)",
+      "brief": ".claude/research/cadet-life-outcomes.md",
+      "branch": "EX",
+      "base": "c6aadad707f506a046c5b958d758b9469672479f",
+      "created": "2026-11-06T11:59:46.145Z"
     }
   ]
 }

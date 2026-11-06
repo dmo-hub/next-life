@@ -191,6 +191,9 @@ prefixes:
   # >>> nl-writer b004 flag cadet_branch
   cadet_branch: "ติดเตรียมทหารต่อเหล่านี้ (id = army · navy · airforce · police)"
   # <<< nl-writer b004 flag cadet_branch
+  # >>> nl-writer b005 flag cadet_life_seen
+  cadet_life_seen: "เห็นเรื่องนี้ในชีวิตเด็กเตรียมทหารแล้ว กันใบแยกตามบริบทออกซ้ำ (id = first_crewcut · kids_day_camp · evening_news · old_exam_swap · conscript_home · branch_map · tutor_billboard)"
+  # <<< nl-writer b005 flag cadet_life_seen
   vow_open: "บนบานไว้ ยังไม่แก้บน"
   hope_set: "ทำบุญหวังผล รอดูว่าเงินดีขึ้นไหม"
   has_amulet: "มีเครื่องราง/สักยันต์ชนิดนี้"

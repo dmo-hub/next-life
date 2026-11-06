@@ -19,10 +19,25 @@ numbers:
   photo_year: 2550
   phone_board_year: 2558
   fx_unit: 5
-  commission_after: 7
+  # ปีเริ่มยุค (เจ้าของเคาะ 2026-11-06) · เงื่อนไขในไฟล์นี้อ้างชื่อค่าได้ด้วย yearFrom / yearBefore
+  mobile_year: 2542          # มือถือโทรคุยได้ (หลักฐาน 2542) · การ์ดโทรหาบ้าน I4
+  phone_result_year: 2567    # ดูไฟล์ผลสอบในจอ/เพจ · ฉากเช้าวันประกาศ X3a
+  era_cards:                 # การ์ดเนื้อหาที่ years ผูกกับปีเริ่มยุค · build ตรวจให้ตรงค่าเสมอ (src/node/load.mjs checkCadetEraCards)
+    mobile_year:
+      before: [cadet_life_branch_map]
+      from: [cadet_life_branch_map_phone]
+  # ปีเรียนหลังสอบติด: เตรียมทหาร prep_years + โรงเรียนเหล่า academy_years = ติดยศ (เจ้าของเคาะ 2026-11-06 · ทอ. อนุมาน)
+  prep_years: 2
+  academy_years:
+    police: 4
+    army: 5
+    navy: 5
+    airforce: 5
   last_age: 18
   # ถือธงนี้ = กองสุ่มจั่วเฉพาะใบที่ when.flags.has มีธงนี้ (ชีวิตเด็กเตรียมทหาร · cadet_life.yaml)
   pool_focus_flag: cadet_dream
+  dream_pool_rounds: 4      # จั่วกี่รอบต่อปีตอนถือธง (เจ้าของเคาะ 2026-11-06)
+  dream_pool_chance: 0.8    # โอกาสต่อรอบตอนถือธง · ผลการ์ดยังหรี่ด้วยรอบปกติของวัย
 branches:
   army: ทบ.
   navy: ทร.
@@ -1124,7 +1139,7 @@ interludes:
       heir: null
       notHeir: null
       yearMin: null
-      yearMax: 2544
+      yearBefore: mobile_year
       school: null
       flagsHas: null
       flagsNot:
@@ -1258,6 +1273,7 @@ interludes:
         requires:
           flagsHas:
             - cadet_family_secret
+        lockReason: ที่บ้านรู้อยู่แล้วว่ามาสอบ
         merit:
           sila: 1
       - label: ไม่โทร เดินกลับที่พัก
@@ -1286,7 +1302,7 @@ interludes:
       heir: null
       notHeir: null
       yearMin: null
-      yearMax: 2544
+      yearBefore: mobile_year
       school: null
       flagsHas:
         - cadet_family_secret
@@ -1420,6 +1436,7 @@ interludes:
         requires:
           flagsHas:
             - cadet_family_secret
+        lockReason: ที่บ้านรู้อยู่แล้วว่ามาสอบ
         merit:
           sila: 1
       - label: ไม่โทร เดินกลับที่พัก
@@ -1447,7 +1464,7 @@ interludes:
       notRegions: null
       heir: null
       notHeir: null
-      yearMin: 2545
+      yearFrom: mobile_year
       yearMax: null
       school: null
       flagsHas: null
@@ -1582,6 +1599,7 @@ interludes:
         requires:
           flagsHas:
             - cadet_family_secret
+        lockReason: ที่บ้านรู้อยู่แล้วว่ามาสอบ
         merit:
           sila: 1
       - label: ไม่โทร เดินกลับที่พัก
@@ -1610,7 +1628,7 @@ interludes:
       notRegions: null
       heir: null
       notHeir: null
-      yearMin: 2545
+      yearFrom: mobile_year
       yearMax: null
       school: null
       flagsHas:
@@ -1745,6 +1763,7 @@ interludes:
         requires:
           flagsHas:
             - cadet_family_secret
+        lockReason: ที่บ้านรู้อยู่แล้วว่ามาสอบ
         merit:
           sila: 1
       - label: ไม่โทร เดินกลับที่พัก

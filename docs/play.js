@@ -2029,10 +2029,13 @@ const CADET = (() => {
   const POOR = ['ยากไร้', 'ยากจนมาก', 'ยากจน', 'ค่อนข้างจน'];
   const RICH = ['ชนชั้นกลางบน', 'มีอันจะกิน', 'มั่งคั่ง', 'ร่ำรวย'];
   const TH_NUM = ['', 'หนึ่ง', 'สอง', 'สาม', 'สี่'];
+  const TH_YEARS = { 5: 'ห้า', 6: 'หก', 7: 'เจ็ด', 8: 'แปด' };
 
   // ---------- helpers ----------
   const D = (st) => st.content.cadet ?? {};
   const N = (st) => D(st).numbers ?? {};
+  // ปีจากรายงานตัวถึงติดยศ = เตรียมทหาร + โรงเรียนเหล่า (numbers.prep_years + academy_years) · ติดยศที่อายุสอบติด + ค่านี้
+  const commissionYears = (st, b) => (N(st).prep_years ?? 2) + (N(st).academy_years?.[b] ?? 5);
   const BT = (st, b) => (D(st).branches ?? {})[b] ?? b;
   const info = (st) => (st.cadetInfo ??= { tries: 0 });
   function rand(st) {
@@ -2058,6 +2061,8 @@ const CADET = (() => {
   const checker = (st) => (secretNow(st) ? 'เพื่อนสนิท' : elder(st));
   const txt = (v) => (typeof v === 'string' ? v : v?.text ?? '');
 
+  // ปีเริ่มยุคอ้างชื่อค่าใน numbers ได้ (เช่น yearFrom: mobile_year) แทนเลขฝัง
+  const yearOf = (st, v) => (typeof v === 'string' ? N(st)[v] : v);
   // เงื่อนไขในไฟล์เนื้อหา (สคีมา demo) · คีย์ที่ไม่รู้จักถือว่าผ่าน เหมือน demo
   function condOk(st, c) {
     if (!c) return true;
@@ -2071,6 +2076,8 @@ const CADET = (() => {
     if (c.anyFlags && !c.anyFlags.some((f) => has(st, f))) return false;
     if (c.yearMin && year(st) < c.yearMin) return false;
     if (c.yearMax && year(st) > c.yearMax) return false;
+    if (c.yearFrom && year(st) < yearOf(st, c.yearFrom)) return false;
+    if (c.yearBefore && year(st) >= yearOf(st, c.yearBefore)) return false;
     if (c.school?.length && !c.school.includes(st.school)) return false;
     if (c.flagsHas?.some((f) => (f.endsWith(':') ? !hasPrefix(st, f) : !has(st, f)))) return false;
     if (c.flagsNot?.some((f) => (f.endsWith(':') ? hasPrefix(st, f) : has(st, f)))) return false;
@@ -2082,6 +2089,9 @@ const CADET = (() => {
     if (c.poor === false && clsGroup(st) === 'poor') return false;
     return true;
   }
+  // requires ของตัวเลือก: คีย์ rival* ล็อกไว้จนกว่าจะมีระบบเพื่อนคู่แข่ง (เจ้าของเคาะ 2026-11-06) · ที่เหลือใช้ condOk
+  const reqOk = (st, r) => !Object.keys(r).some((k) => k.startsWith('rival')) && condOk(st, r);
+  const lockOf = (st, o) => o.lock ?? (o.requires && !reqOk(st, o.requires) ? fill(o.lockReason ?? 'ยังเลือกไม่ได้', st) : null);
   const firstOk = (st, list) => [].concat(list ?? []).find((c) => !c.cond || condOk(st, c.cond)) ?? [].concat(list ?? [])[0];
 
   // fx หน่วย demo → แต้มจริง (เงินไม่ใช้ — หน่วยเงินของ demo ไม่ใช่บาท)
@@ -2102,7 +2112,9 @@ const CADET = (() => {
     let text = fill(c.text ?? '', st);
     const hit = (c.contextLines ?? []).find((x) => condOk(st, x.when));
     if (hit) text += ' ' + fill(hit.line, st);
-    const options = c.options?.length ? c.options : [{ label: 'ต่อ' }];
+    // ล็อกปุ่ม (เจ้าของเคาะ 2026-11-06): requires ไม่ผ่าน = ล็อก พร้อม lockReason จากเนื้อหา · ล็อกครบทุกปุ่ม = ปลดปุ่มสุดท้าย กันเกมค้าง
+    const options = (c.options?.length ? c.options : [{ label: 'ต่อ' }]).map((o) => ({ ...o, lock: lockOf(st, o) }));
+    if (options.every((o) => o.lock)) options[options.length - 1].lock = null;
     st.cadet.cur = options;
     st.cadet.curId = c.id;
     return {
@@ -2126,13 +2138,15 @@ const CADET = (() => {
   // หลังเลือกตัวเลือกของการ์ดเนื้อหาปกติ: ตั้งใจสอบครั้งแรก · ยื่นใบสมัคร · เช้าวันสอบ
   function _cadetAfterChoice(st, ev, c, flagsBefore) {
     if (st.sex !== 'ชาย') return;
-    const I = info(st);
     const nowDream = has(st, 'cadet_dream');
+    const applies = (c.schedules ?? []).some((s) => /^cadet_exam_night/.test(s.event));
+    // ยังไม่เคยแตะเส้นนี้ = ไม่สร้าง cadetInfo (ไม่ให้ค่าค้างในเซฟของชายทุกคน)
+    if (!st.cadetInfo && !nowDream && !applies && ev.id !== 'cadet_exam_morning') return;
+    const I = info(st);
     if (nowDream && !flagsBefore.cadet_dream && !I.criteria) {
       I.criteria = true;
       start(st, [['criteria']]);
     }
-    const applies = (c.schedules ?? []).some((s) => /^cadet_exam_night/.test(s.event));
     if (applies) {
       // ยื่นใบสมัคร = เลือกเหล่าตอนนี้ (ไม่ใช่เช้าวันสอบ) · ปีสอบซ้ำ: แผ่นเกณฑ์ → ติวอีกรอบไหม → ติว/รอ → คืนก่อนสอบแบบปีที่สอง
       I.order = [];
@@ -2270,7 +2284,7 @@ const CADET = (() => {
     const picked = I.order.length ? `\n\nติ๊กแล้ว: ${I.order.map((b) => BT(st, b)).join(' → ')} (ลำดับนี้คือลำดับวันสอบ)` : '\n\nติ๊กตามลำดับที่อยากสอบ แต่ละเหล่าสอบคนละวัน';
     return C('apply', ap.title ?? 'ช่องเหล่าในใบสมัคร', (ap.text ?? 'เลือกเหล่าที่จะสมัครสอบ') + picked, [
       ...left.map((b) => ({ label: tog(b).label, hint: tog(b).hint, _toggle: b })),
-      { label: `ส่งใบสมัคร${I.order.length ? ` (${I.order.length} เหล่า)` : ''}`, _submit: true, lock: I.order.length ? null : 'ยังไม่ได้ติ๊กสักช่อง' }], { contextLines: ap.contextLines });
+      { label: `ส่งใบสมัคร${I.order.length ? ` (${I.order.length} เหล่า)` : ''}`, _submit: true, lock: I.order.length ? null : ap.submit?.lockReason ?? 'ยังไม่ได้ติ๊กสักช่อง' }], { contextLines: ap.contextLines });
   };
 
   S.reprep = (st) => {
@@ -2613,9 +2627,10 @@ const CADET = (() => {
     st.flags.cadet_passed = true;
     st.flags[`cadet_branch:${b}`] = true;
     info(st).passAge = st.age;
+    info(st).commissionAge = st.age + commissionYears(st, b);   // บันไดยศเริ่มที่อายุนี้ (ตร. 6 ปี · เหล่าอื่น 7 ปี)
     info(st).branch = b;
     st.cadet.p2.steps = [['end']];
-    return status('รายงานตัวที่นครนายก', `รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BT(st, b)} อีกเจ็ดปีจะได้ติดยศ`);
+    return status('รายงานตัวที่นครนายก', `รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BT(st, b)} อีก${TH_YEARS[commissionYears(st, b)] ?? commissionYears(st, b)}ปีจะได้ติดยศ`);
   };
   S.end = () => 'END';
 
@@ -3728,7 +3743,7 @@ function finishTrack(st, year) {
   else {
     st.school = null;
     if (track.ladder) applyEffects(st, { ladder: track.ladder });
-    else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
+    else dueJob(st);
   }
 }
 
@@ -3775,7 +3790,13 @@ function startSchool(st, year) {
     return;
   }
   st.school = null;
-  st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
+  dueJob(st);
+}
+
+// การ์ดหางาน: ระหว่างถือธงฝันเตรียมทหาร เลื่อนไว้ (needJob) ออกหลังธงหลุด (เจ้าของเคาะ 2026-11-06)
+function dueJob(st) {
+  if (st.flags.cadet_dream) st.needJob = true;
+  else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
 }
 // เกณฑ์เดียวกับด่านสอบโรงเรียนดัง (career.mjs) — มหาวิทยาลัยรัฐเองไม่มีเกณฑ์ล็อก มีแต่โอกาสสอบติด
 const HEIR_UNI_KNOW = 55;
@@ -4480,7 +4501,14 @@ function poolTurn(st) {
   if (st.poolAge === st.age) return;
   st.poolAge = st.age;
   st.poolLeft = poolRounds(stageOf(st.age));
+  // เส้นเตรียมทหาร (เจ้าของเคาะ 2026-11-06): ถือธงอยู่ = จั่ว numbers.dream_pool_rounds รอบ · ผลการ์ดยังหรี่ด้วยรอบปกติของวัย (poolStatScale)
+  // รอบที่ตกไปกองปกติ (กองเฉพาะว่าง) ใช้ได้ไม่เกินรอบของชีวิตปกติ
+  if (dreamPool(st)) {
+    st.poolNormalLeft = st.poolLeft;
+    st.poolLeft = st.content.cadet.numbers.dream_pool_rounds ?? st.poolLeft;
+  }
 }
+const dreamPool = (st) => { const f = st.content.cadet?.numbers?.pool_focus_flag; return !!f && !!st.flags[f]; };
 
 // โควตาการ์ด: การ์ดเรื่องต่อ (next) ผลย้อน (schedules) และการ์ดงบ/เลือกตั้งของตำแหน่งการเมือง แทนที่การ์ดกองสุ่มหนึ่งใบ — ติดค้างไว้ แล้วทิ้งการ์ดกองสุ่มใบถัดไปที่จั่วได้
 // หักเป็นใบ ไม่ใช่รอบจั่ว เพราะรอบหนึ่งออกการ์ดแค่ตามโอกาส POOL_CHANCE · ปีที่จั่วไม่ได้อีกแล้วค้างไปหักปีถัดไป
@@ -4526,11 +4554,18 @@ function drawPool(st, year) {
   const stage = stageOf(st.age);
   let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e));
   // เส้นเตรียมทหาร (เจ้าของ 2026-11-06): ถือธงนี้อยู่ = จั่วเฉพาะใบที่ต้องมีธงนี้ เรื่องชีวิตวัยรุ่นทั่วไปพักไว้ก่อน
-  const focusFlag = st.content.cadet?.numbers?.pool_focus_flag;
-  if (focusFlag && st.flags[focusFlag]) pool = pool.filter((e) => e.when?.flags?.has?.includes(focusFlag));
+  // ถือธงอยู่: จั่วถี่ขึ้นตาม numbers.dream_pool_chance (รอบต่อปีตั้งใน poolTurn) · กองเฉพาะว่าง = กลับไปกองปกติ ด้วยโอกาสและรอบของชีวิตปกติ
+  let chance = POOL_CHANCE[stage];
+  if (dreamPool(st)) {
+    const focus = pool.filter((e) => e.when?.flags?.has?.includes(st.content.cadet.numbers.pool_focus_flag));
+    if (focus.length) {
+      pool = focus;
+      chance = st.content.cadet.numbers.dream_pool_chance ?? chance;
+    } else if (!(st.poolNormalLeft-- > 0)) return null;
+  }
   // รอบที่กองแห้งนับแยกช่วงวัย — harness/pace.mjs อ่านเป็นรายการกองที่ต้องเติม (ไม่ออกไปกับการ์ด)
   if (!pool.length) (st.poolDry ??= {})[stage] = (st.poolDry[stage] ?? 0) + 1;
-  if (!pool.length || st.rng.next() >= POOL_CHANCE[stage]) return null;
+  if (!pool.length || st.rng.next() >= chance) return null;
   // การ์ดทาง B (สายมู/ลาง) มีเป้าจำนวนต่อชีวิต — จับหลายรอบแล้วหรี่น้ำหนักตามรอบ ไม่ให้ล้นเป้า
   const b = poolEffectScale(stage);
   return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers) * (e.type === 'B' ? b : 1) * lifeFocusMul(st, e)));
@@ -4978,7 +5013,8 @@ function choose(st, idx, loan) {
   // คำสั่งเสียเลือกได้หลายข้อ: สั่งเรื่องหนึ่งแล้วการ์ดกลับมาให้สั่งต่อ ข้อที่สั่งแล้วล็อกด้วยธงของมันเอง
   if (ev.id === FUNERAL.wishes && (c.sets_flags ?? []).some((f) => f.startsWith('wish_'))) after.push({ kind: 'eraEvent', ev, age: st.age });
   // เลิกเรียนแล้วหางานทันที
-  if (st.needJob) {
+  if (st.needJob && st.flags.cadet_passed) st.needJob = false;   // สอบติดเตรียมทหารแล้ว ไม่ต้องหางาน
+  if (st.needJob && !st.flags.cadet_dream) {
     st.needJob = false;
     after.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
   }

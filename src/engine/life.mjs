@@ -819,7 +819,7 @@ function finishTrack(st, year) {
   else {
     st.school = null;
     if (track.ladder) applyEffects(st, { ladder: track.ladder });
-    else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
+    else dueJob(st);
   }
 }
 
@@ -866,7 +866,13 @@ function startSchool(st, year) {
     return;
   }
   st.school = null;
-  st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
+  dueJob(st);
+}
+
+// การ์ดหางาน: ระหว่างถือธงฝันเตรียมทหาร เลื่อนไว้ (needJob) ออกหลังธงหลุด (เจ้าของเคาะ 2026-11-06)
+function dueJob(st) {
+  if (st.flags.cadet_dream) st.needJob = true;
+  else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
 }
 // เกณฑ์เดียวกับด่านสอบโรงเรียนดัง (career.mjs) — มหาวิทยาลัยรัฐเองไม่มีเกณฑ์ล็อก มีแต่โอกาสสอบติด
 const HEIR_UNI_KNOW = 55;
@@ -1571,7 +1577,14 @@ function poolTurn(st) {
   if (st.poolAge === st.age) return;
   st.poolAge = st.age;
   st.poolLeft = poolRounds(stageOf(st.age));
+  // เส้นเตรียมทหาร (เจ้าของเคาะ 2026-11-06): ถือธงอยู่ = จั่ว numbers.dream_pool_rounds รอบ · ผลการ์ดยังหรี่ด้วยรอบปกติของวัย (poolStatScale)
+  // รอบที่ตกไปกองปกติ (กองเฉพาะว่าง) ใช้ได้ไม่เกินรอบของชีวิตปกติ
+  if (dreamPool(st)) {
+    st.poolNormalLeft = st.poolLeft;
+    st.poolLeft = st.content.cadet.numbers.dream_pool_rounds ?? st.poolLeft;
+  }
 }
+const dreamPool = (st) => { const f = st.content.cadet?.numbers?.pool_focus_flag; return !!f && !!st.flags[f]; };
 
 // โควตาการ์ด: การ์ดเรื่องต่อ (next) ผลย้อน (schedules) และการ์ดงบ/เลือกตั้งของตำแหน่งการเมือง แทนที่การ์ดกองสุ่มหนึ่งใบ — ติดค้างไว้ แล้วทิ้งการ์ดกองสุ่มใบถัดไปที่จั่วได้
 // หักเป็นใบ ไม่ใช่รอบจั่ว เพราะรอบหนึ่งออกการ์ดแค่ตามโอกาส POOL_CHANCE · ปีที่จั่วไม่ได้อีกแล้วค้างไปหักปีถัดไป
@@ -1617,11 +1630,18 @@ function drawPool(st, year) {
   const stage = stageOf(st.age);
   let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e));
   // เส้นเตรียมทหาร (เจ้าของ 2026-11-06): ถือธงนี้อยู่ = จั่วเฉพาะใบที่ต้องมีธงนี้ เรื่องชีวิตวัยรุ่นทั่วไปพักไว้ก่อน
-  const focusFlag = st.content.cadet?.numbers?.pool_focus_flag;
-  if (focusFlag && st.flags[focusFlag]) pool = pool.filter((e) => e.when?.flags?.has?.includes(focusFlag));
+  // ถือธงอยู่: จั่วถี่ขึ้นตาม numbers.dream_pool_chance (รอบต่อปีตั้งใน poolTurn) · กองเฉพาะว่าง = กลับไปกองปกติ ด้วยโอกาสและรอบของชีวิตปกติ
+  let chance = POOL_CHANCE[stage];
+  if (dreamPool(st)) {
+    const focus = pool.filter((e) => e.when?.flags?.has?.includes(st.content.cadet.numbers.pool_focus_flag));
+    if (focus.length) {
+      pool = focus;
+      chance = st.content.cadet.numbers.dream_pool_chance ?? chance;
+    } else if (!(st.poolNormalLeft-- > 0)) return null;
+  }
   // รอบที่กองแห้งนับแยกช่วงวัย — harness/pace.mjs อ่านเป็นรายการกองที่ต้องเติม (ไม่ออกไปกับการ์ด)
   if (!pool.length) (st.poolDry ??= {})[stage] = (st.poolDry[stage] ?? 0) + 1;
-  if (!pool.length || st.rng.next() >= POOL_CHANCE[stage]) return null;
+  if (!pool.length || st.rng.next() >= chance) return null;
   // การ์ดทาง B (สายมู/ลาง) มีเป้าจำนวนต่อชีวิต — จับหลายรอบแล้วหรี่น้ำหนักตามรอบ ไม่ให้ล้นเป้า
   const b = poolEffectScale(stage);
   return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers) * (e.type === 'B' ? b : 1) * lifeFocusMul(st, e)));
@@ -2069,7 +2089,8 @@ export function choose(st, idx, loan) {
   // คำสั่งเสียเลือกได้หลายข้อ: สั่งเรื่องหนึ่งแล้วการ์ดกลับมาให้สั่งต่อ ข้อที่สั่งแล้วล็อกด้วยธงของมันเอง
   if (ev.id === FUNERAL.wishes && (c.sets_flags ?? []).some((f) => f.startsWith('wish_'))) after.push({ kind: 'eraEvent', ev, age: st.age });
   // เลิกเรียนแล้วหางานทันที
-  if (st.needJob) {
+  if (st.needJob && st.flags.cadet_passed) st.needJob = false;   // สอบติดเตรียมทหารแล้ว ไม่ต้องหางาน
+  if (st.needJob && !st.flags.cadet_dream) {
     st.needJob = false;
     after.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
   }
