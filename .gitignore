@@ -1,2 +1,7 @@
 node_modules/
 .cache/
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/next-life-contributor/
+.vscode/
