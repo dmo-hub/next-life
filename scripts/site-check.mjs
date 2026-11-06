@@ -27,6 +27,7 @@ import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
 import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsLayout, injectDocsTweak, pageKind } from '../src/site/docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, cardArtBlock, CAT_ART } from '../src/site/card-art-tweak.mjs';
+import { CARD_PIC_PAGE, cardPicData, cardPicBlock } from '../src/site/card-pic-tweak.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
 import { PLAY_FILES, playAssets, playScripts, swJs } from '../src/site/play-files.mjs';
 
@@ -431,6 +432,19 @@ const caMiss = [
 ];
 const caCtl = caBlock && JSON.stringify({ ...caBlock, counts: { ...caBlock.counts, cats: caBlock.counts.cats.slice(1) } }) !== JSON.stringify(caNow);
 check('หน้า tweak ภาพบนการ์ดใช้ภาพ+ตัวเลขหมวดชุดปัจจุบัน', caMiss.length || !caCtl, ` ${caCats.length} หมวด${caMiss.length ? ` · ${caMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${caCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7c6) หน้า tweak ภาพประจำการ์ด (ใบ 209): บล็อกในหน้า = รูปทรง + ข้อความการ์ดจริงตอนนี้ · ตัวอย่าง 8 ใบ ครบ 3 โลก + ฉากยาก 5 ใบ · มีป้ายในสารบัญห้องผู้พัฒนา
+// ตัวควบคุม: ถอดภาพแรกจากบล็อก ⇒ ต้องไม่ตรง
+const cpBlock = cardPicBlock(readOr(CARD_PIC_PAGE) ?? '');
+const cpNow = cardPicData();
+const cpMiss = [
+  ...(JSON.stringify(cpBlock) !== JSON.stringify(cpNow) ? [`ค้าง ${CARD_PIC_PAGE} (build ใหม่)`] : []),
+  ...(cpNow.pics.filter((p) => !p.hard).length === 8 && cpNow.pics.filter((p) => p.hard).length === 5 ? [] : [`ตัวอย่าง ${cpNow.pics.length} ใบ`]),
+  ...['a', 'af', 'i'].filter((w) => !cpNow.pics.some((p) => p.world === w)).map((w) => `ไม่มีตัวอย่างโลก ${w}`),
+  ...(tweakStatus(docs, read('dev/index.html'))['ui-t-card-pic'] ? [] : ['ไม่มีป้ายใน dev/index']),
+];
+const cpCtl = cpBlock && JSON.stringify({ ...cpBlock, pics: cpBlock.pics.slice(1) }) !== JSON.stringify(cpNow);
+check('หน้า tweak ภาพประจำการ์ดใช้ภาพ+ข้อความการ์ดชุดปัจจุบัน', cpMiss.length || !cpCtl, ` ${cpNow.pics.length} ภาพ${cpMiss.length ? ` · ${cpMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${cpCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) แผนงาน (ui-redo 23 · ย้ายไป whatsnew ui-redo 69): แถวหมวดใต้หัวกำลังทำ = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
 // · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)

@@ -146,17 +146,6 @@ body:has(.sb.dying)::after { content:''; position:fixed; inset:0; z-index:9; poi
 .tree { padding:0 20px 8px; font-size:12px; }
 .tree summary { cursor:pointer; }
 .tree .picks { font-size:12px; }
-/* ปุ่มโฟกัสชีวิต (B163): ชื่อโฟกัสกับทิศผลตัดบรรทัดได้ ป้าย "เปลี่ยน" ชิดขวาไม่ตกบรรทัด */
-.focus { padding:0 20px 8px; font-size:12px; }
-.focus button { all:unset; box-sizing:border-box; width:100%; min-height:44px; display:flex; flex-wrap:wrap; align-items:center; gap:2px 8px; padding:6px 10px; border:1px solid color-mix(in srgb, currentColor 35%, transparent); border-radius:var(--r); cursor:pointer; overflow-wrap:anywhere; }
-.focus button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
-.focus-btn b { font-size:14px; }
-.focus-k { font-weight:600; opacity:0.8; }
-.focus-fx { opacity:0.8; }
-.focus-go { margin-left:auto; text-decoration:underline; text-underline-offset:2px; white-space:nowrap; }
-.focus-pick { display:flex; flex-direction:column; gap:4px; margin-top:4px; }
-.focus-pick[hidden] { display:none; }
-.focus-pick .on { border-style:solid; border-color:currentColor; font-weight:600; }
 /* แถบเมนูล่าง (ui-redo ใบ 04): ติดขอบล่างจอ กว้างเท่าการ์ด · หน้าเว้นท้ายเท่าความสูงแถบ ท้ายการ์ดจึงไม่ถูกบัง */
 :root { --nav-h:60px; }
 body:has(.mnav) { padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)); }
@@ -194,7 +183,6 @@ body:has(.mnav) .foot { display:none; }
 .me dl { margin:12px 0 0; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 12px; font-size:13px; }
 .me dt { font-weight:600; color:var(--ink2); white-space:nowrap; }
 .me dd { margin:0; color:var(--ink2); }
-.me .focus { padding:0; }
 .me .meta { margin:0; padding:0; font-size:14px; }
 /* แท็บโฟกัส (ui-redo 50 · JSON 47 แบบ ก รายการเดียว): ตัวที่ถืออยู่เป็นกรอบสีเน้น · ปีสะสมเป็นป้ายคำ ไม่มีเลข
    · ป้ายชำนาญแล้วใช้สีพื้นแผ่นเป็นตัวอักษร — ชุดปรโลกสีเน้นเป็นทอง ตัวขาวบนทองอ่านไม่ออก */
@@ -333,9 +321,6 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .help .help-row { display:flex; flex-direction:column; gap:2px; }
 .help .help-call, .help > a { display:inline-flex; align-items:center; min-height:44px; overflow-wrap:anywhere; }
 .help .help-call { font-weight:600; }
-/* คำเตือนเนื้อหา (ui-redo 25) — การ์ดแรกเกิดตระกูลใหม่ + หน้าเล่นต่อ · สีตามการ์ดที่วางอยู่ */
-.warn-line { margin:8px 0 0; font-size:13px; line-height:1.5; opacity:.85; }
-.warn-line a { color:inherit; font-weight:600; text-decoration:underline; }
 .help small, .help .note { font-size:12.5px; overflow-wrap:anywhere; }
 .help a { color:inherit; } .help small a { white-space:nowrap; }
 .lineage .lh { font-size:12px; font-weight:600; margin:6px 0 2px; }
@@ -491,6 +476,14 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .d-bg svg { position:absolute; left:50%; top:0; width:100%; height:auto; transform:translateX(-50%); opacity:0.1; }
 .d-bg [fill]:not([fill="none"]) { fill:currentColor; }
 .d-bg [stroke] { stroke:currentColor; }
+/* พื้นหลังแรกเกิด (ui-redo 61 · ข้อ 116): ชิดบนกลางของเนื้อการ์ด กว้างเต็ม จาง 0.1 · isolation ของ .body กัน z-index ติดลบไม่ให้ลงใต้พื้นการ์ด
+   ธีม a สำริดอ่อนลง 5% จาก --bronze: ตัวอักษรแดงทับเส้นภาพได้ 4.47 ต่ำกว่าเกณฑ์ 4.5 (ข้อ 117) — สีเข้มขึ้นทำให้พื้นมืดลง contrast ยิ่งตก */
+.body.has-bg { position:relative; isolation:isolate; }
+.b-bg { position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none; color:#624F3A; }
+.b .b-bg { color:var(--gold); }
+.b-bg svg { position:absolute; left:50%; top:0; width:100%; height:auto; transform:translateX(-50%); opacity:0.1; }
+.b-bg [fill]:not([fill="none"]) { fill:currentColor; }
+.b-bg [stroke] { stroke:currentColor; }
 .mem .top { background:transparent; color:#1F1F1F; justify-content:center; padding-top:19.2px; }
 .mem .top b { font-family:Srisakdi,serif; font-size:22px; font-weight:700; }
 .por { align-self:center; width:96px; height:96px; border:1px solid #1F1F1F; padding:4px; }
@@ -637,7 +630,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   .p-side .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
   .top { padding:8px 16px; }
   .sb { padding:8px 12px; }
-  .meta, .tree, .focus { padding-left:12px; padding-right:12px; }
+  .meta, .tree { padding-left:12px; padding-right:12px; }
   /* พาแนลซ้ายแคบ: หัวการ์ดตัดบรรทัดเป็นแถว (ไม่งั้นอายุเหลือคำละบรรทัด) · ค่าสถานะ 2 ช่องต่อแถว (4 ค่า = 2×2) ป้าย "ความสัมพันธ์" ไม่ขาดกลางคำ */
   .p-left .top { flex-wrap:wrap; gap:4px 10px; }
   .p-left .top small { flex-basis:100%; text-align:left; }
@@ -691,8 +684,8 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 <!-- โครงหน้าเปิด (ui-redo 96): ขึ้นจอก่อนสคริปต์จบ และยังเห็นเมื่อปิด JavaScript · boot() ใน app.mjs ล้างทิ้งแล้ววาดจอจริง -->
 <main id="app"><article class="card a"><div class="top"><b>เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</b><small>เริ่มชีวิต</small></div><div class="body"><h3 class="lead">เกิดเป็นคนไทยทีละชีวิต เลือกทีละการ์ด</h3><noscript><p class="sub">เกมนี้ต้องเปิด JavaScript ในเบราว์เซอร์ก่อนจึงเล่นได้</p></noscript></div><div class="choices"><button type="button">เริ่มชีวิต</button></div></article></main>
 <footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <span class="foot-shelf"><a href="#" id="shelfLink">ชั้นสมุด</a> · </span><a href="#" id="dayLink">ชาติประจำวัน</a> · <a href="about.html">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
-<script src="play-data.js?v=v0.6.102" defer></script>
-<script src="play.js?v=v0.6.102" defer></script>
+<script src="play-data.js?v=v0.6.107" defer></script>
+<script src="play.js?v=v0.6.107" defer></script>
 <script>if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
 </body>
 </html>
