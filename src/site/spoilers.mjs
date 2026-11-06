@@ -176,6 +176,7 @@ function conditions(e, L) {
   for (const s of e.systems ?? []) out.push(`หลังมี${L.sys(s)}`);
   if (w.region) out.push(`ภาค${any(w.region.map(esc))}`);
   if (w.sex) out.push(`เพศ${any(w.sex.map(esc))}`);
+  if (w.identity) out.push(`อัตลักษณ์${any(w.identity.map(esc))}`);
   if (w.overlap_stage) out.push(`ค่าซ้อนทับขั้น ${range(w.overlap_stage)}`);
   if (w.class) out.push(`ฐานะ${any(w.class.map(esc))}`);
   if (w.occupation) out.push(`ทำงาน${any(w.occupation.map((o) => esc(L.occ(o))))}`);
