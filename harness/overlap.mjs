@@ -15,7 +15,13 @@
 //   (10) สายนักล่า (ใบ 19): ขั้น 3 เข้าสายผ่านการ์ดรับสมัคร ชื่องานเป็นขั้นนักล่า เลื่อนขั้นได้ · ขั้น 0–1 เข้าสาย 0 · ปฏิเสธการ์ดแล้วทำงานบริการไม่ถูกจับเข้าสาย
 //   (11) ดันเจียนไทย (ใบ 21): ขั้น 3 รอบละ 2–3 ใบ · คนถูกดึงตายในดันเจียน 0 · นักล่าตายด้วย accident/assault · ค่าซ้อนไม่ขยับ · ขั้น 0–1 ไม่เจอ
 //        โรคที่ถึงคิวกลางรอบตายท้ายรอบ 0 ตัดกลางทาง (ชุดบังคับสุขภาพ 0 ก่อนใบเข้า) · ห้องบอสทางไม่ตายลงโรค ไม่ใช่บาดแผล
-import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, overlapStageOf, overlapPlan, PATHS, ENTRY, ISEKAI_EVENTS } from '../src/engine/index.mjs';
+//   (13) คนตายที่ตระกูลจำ (ใบ 13): ทายาทค่า > 0 = รายชื่อเดิม + คนตายของชาตินี้ที่ด่านนับเอง (พ่อแม่ที่ไม่ใช่ผู้เล่นรุ่นก่อน · คนใน kin ยกเว้นฝูงสัตว์)
+//        ทายาทค่า 0 ไม่มีช่อง · ฟิลด์ครบชุด ไม่มีปีตาย/ภูมิ · รายชื่อติดถึงชีวิตถัดไป · ฝั่งข้ามโลกมีรายชื่อ > 0 · ตัวควบคุมไม่มีเลย
+//        พิมพ์จำนวนเฉลี่ยต่อรุ่น + ขนาดเซฟรุ่นสุดท้าย (วัดเพดาน localStorage ที่ --gens สูง)
+//   (14) ผีทั่วไป (ใบ 25): ฝั่งข้ามโลกออก > 0 · ไม่ออกในชีวิตขั้น 0 · ตัวควบคุมออก 0 · ตัวเลือกทานดันบัญชีทานขึ้นอย่างน้อยระดับ 1 ก่อนการ์ดถัดไป
+//        ต้องมีคนเลือกทานจริง > 0 ครั้ง ไม่งั้นตัววัดบัญชีไม่ได้วัดอะไร · ออกทางตารางนัด (ข้อ 8) จึงนับรวมโควตาขั้นด้วย
+import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, overlapStageOf, overlapPlan, snapshot, PATHS, ENTRY, ISEKAI_EVENTS } from '../src/engine/index.mjs';
+import { MERIT_LEVELS, meritId } from '../src/engine/merit.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
 
@@ -62,6 +68,34 @@ const watchIsekai = (r) => {
   };
 };
 
+const GHOST = 'overlap_ghost_';
+const danaPicks = new Map(content.events.filter((e) => e.id.startsWith(GHOST)).map((e) => [e.id, new Set(e.choices.flatMap((c, k) => (c.merit.some((m) => meritId(m.cat) === 'dana') ? [k] : [])))]));
+// บัญชีทานอ่านก่อนการ์ดผีแล้วเทียบตอนการ์ดถัดไป (ตัวเลือกลงบัญชีระหว่างสองจังหวะนี้) — ตัวเลือกอื่นไม่ตรวจ เพราะทานจากที่อื่นขึ้นช่วงเดียวกันได้
+const watchGhost = (r) => {
+  let wait = null;
+  return (card, st) => {
+    if (wait) {
+      const pick = st.log.slice(wait.at).find((e) => e.id === wait.id);
+      if (pick && danaPicks.get(wait.id).has(pick.choice)) {
+        r.ghostDana++;
+        // บัญชีสะสมทศนิยม ⇒ ผลต่างระดับ 1 พอดีออกมา 0.9999… ได้ — เผื่อ 1e-9
+        if ((st.ledger.byCat.dana ?? 0) - wait.dana < MERIT_LEVELS[1] - 1e-9) r.ghostDanaBad++;
+      }
+      wait = null;
+    }
+    if (!card.id?.startsWith(GHOST)) return;
+    r.ghost++;
+    if (overlapStageOf(st) < 1) r.ghostBad++;
+    wait = { id: card.id, at: st.log.length, dana: st.ledger.byCat.dana ?? 0 };
+  };
+};
+
+const DEAD_KEYS = 'bond,cause,gen,name,role';
+const deadHere = (s) => s.parents.filter((p) => !p.alive && !p.ancestor).length + (s.kin ?? []).filter((m) => !m.alive && m.role !== 'herd').length;
+const deadOf = (s) => s?.deadKin?.length ?? 0;
+const P_CHILD = PATHS.findIndex((p) => p.id === 'child');
+const kidPath = (bot) => (card, rng, h) => (card.kind === 'path' && !card.locked?.[P_CHILD] && P_CHILD < card.choices.length ? P_CHILD : bot(card, rng, h));
+
 const P_ISEKAI = PATHS.findIndex((p) => p.id === 'isekai');
 const P_REBORN = PATHS.findIndex((p) => p.id === 'reborn');
 // จากต่างโลกอยู่ต่ออีกรอบ — ให้มีตัวอย่างชาติต่างโลกติดกัน (ต้องได้ +1 ครั้งเดียวตอนกลับ)
@@ -97,13 +131,15 @@ const fail = (msg) => fails.push(msg);
 let resetChecked = 0;
 for (const [name, base] of Object.entries(BOTS)) {
   for (const [mode, bot] of [['ข้าม', crosser(base)], ['ไม่ข้าม', stayer(base)]]) {
-    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, rumor: 0, bad: 0, drop: 0, families: 0, top: 0, iskLives: 0, iskStage: {}, iskBad: 0, iskCard: 0, iskCardBad: 0, iskById: {}, plan: {}, planBad: 0, replan: 0, replanDiff: 0, replanSame: 0, replanSameDiff: 0, replanShow: '' };
+    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, rumor: 0, bad: 0, drop: 0, families: 0, top: 0, iskLives: 0, iskStage: {}, iskBad: 0, iskCard: 0, iskCardBad: 0, iskById: {}, plan: {}, planBad: 0, replan: 0, replanDiff: 0, replanSame: 0, replanSameDiff: 0, replanShow: '', deadByGen: Array.from({ length: gens }, () => []), deadBad: 0, deadMax: 0, kidAncestor: 0, saveBytes: [], deadBytes: [], ghost: 0, ghostBad: 0, ghostDana: 0, ghostDanaBad: 0 };
     rows.push(r);
     const watch = watchIsekai(r);
+    const ghost = watchGhost(r);
     for (let i = 0; i < n; i++) {
       let st = null;
       let prev = 0;
       let left = false;
+      let last = null;
       for (let g = 0; g < gens; g++) {
         const start = overlapOf(st);
         // ตารางนัดซ้อนทับที่ชีวิตเห็นก่อน/หลังทริปกลับบ้าน — จดจากการ์ดแรกของชีวิตและการ์ดแรกหลังจำนวนทริปกลับบ้านขยับ
@@ -112,6 +148,7 @@ for (const [name, base] of Object.entries(BOTS)) {
         const planOf = (s) => JSON.stringify((s.scheduled ?? []).filter((x) => x.overlap).map((x) => [x.event, x.age]));
         const { state } = playLife(mixSeed(seed, i * 7919 + g), content, bot, (card, s) => {
           watch(card, s.trip, s);
+          ghost(card, s);
           if (s.trip) return;
           const h = (s.trips ?? []).filter((t) => t.home).length;
           if (h !== homes) {
@@ -160,7 +197,15 @@ for (const [name, base] of Object.entries(BOTS)) {
         if (v < prev) r.drop++;
         prev = v;
         r.byGen[g].push(v);
-        if (g === gens - 1) break;
+        r.deadByGen[g].push(deadOf(state));
+        if (g === gens - 1) {
+          last = state;
+          if (v > 0) {
+            r.saveBytes.push(snapshot(state, content).length);
+            r.deadBytes.push(JSON.stringify(state.deadKin ?? []).length);
+          }
+          break;
+        }
         const af = playAfterlife(state, bot, (card, a) => watch(card, a.isekai, a.st));
         const back = af.isekaiLives.length ? 1 : 0;
         const reBorn = back && left ? 1 : 0;
@@ -169,8 +214,14 @@ for (const [name, base] of Object.entries(BOTS)) {
         r.reBorn += reBorn;
         if (af.isekaiLives.length > 1) r.chain++;
         if (overlapOf(af.heir) - v !== back + reBorn) r.bad++;
+        const want = overlapOf(af.heir) ? deadOf(state) + deadHere(state) : 0;
+        const list = af.heir.deadKin ?? [];
+        if (list.length !== want || (!want && 'deadKin' in af.heir)) r.deadBad++;
+        if (list.some((d) => Object.keys(d).sort().join() !== DEAD_KEYS)) r.deadBad++;
+        r.deadMax = Math.max(r.deadMax, list.length);
         st = nextLife(af);
         if (overlapOf(st) !== overlapOf(af.heir)) r.bad++;
+        if (deadOf(st) !== list.length) r.deadBad++;
       }
       if (prev > 0) {
         r.families++;
@@ -179,6 +230,17 @@ for (const [name, base] of Object.entries(BOTS)) {
         const fresh = newLife(mixSeed(seed ^ 0x0e1a9, i), content);
         resetChecked++;
         if (overlapOf(fresh) !== 0 || 'overlap' in fresh) fail(`${name}: เริ่มตระกูลใหม่ได้ค่า ${overlapOf(fresh)}`);
+        // ฝั่งข้ามไม่เคยเลือกทางเป็นลูก ⇒ ต่ออีกไม่เกิน 3 รุ่นทางเป็นลูก ให้มีพ่อ/แม่ที่เป็นผู้เล่นรุ่นก่อนตายอยู่ในชาติที่ค่า > 0 (ต้องไม่ถูกจำ)
+        if (mode === 'ข้าม') {
+          let s = last;
+          for (let k = 0; k < 3; k++) {
+            const af = playAfterlife(s, kidPath(base));
+            if (s.parents.some((p) => p.ancestor && !p.alive)) r.kidAncestor++;
+            if ((af.heir.deadKin?.length ?? 0) !== deadOf(s) + deadHere(s)) r.deadBad++;
+            if (af.path !== 'child') break;
+            ({ state: s } = playLife(mixSeed(seed, i * 7919 + gens + k), content, base, undefined, nextLife(af)));
+          }
+        }
       }
     }
     if (r.bad) fail(`${name} ${mode}: บัญชีเหยียบซ้ำไม่ตรง ${r.bad} จุด`);
@@ -189,6 +251,11 @@ for (const [name, base] of Object.entries(BOTS)) {
     if (r.iskCardBad) fail(`${name} ${mode}: การ์ด ${ISK_CARD}* ออกในชาติต่างโลกขั้น 0 ${r.iskCardBad} ครั้ง`);
     if (mode === 'ไม่ข้าม' && r.iskCard) fail(`${name} ไม่ข้าม: การ์ด ${ISK_CARD}* ออก ${r.iskCard} ครั้ง`);
     if (r.planBad) fail(`${name} ${mode}: การ์ด ${PLAN_PREFIX}* ต่อชีวิตนอกโควตาของขั้น ${r.planBad} ชีวิต`);
+    if (r.deadBad) fail(`${name} ${mode}: รายชื่อคนตายไม่ตรง ${r.deadBad} จุด`);
+    if (mode === 'ไม่ข้าม' && r.deadMax) fail(`${name} ไม่ข้าม: มีรายชื่อคนตาย ${r.deadMax} คน`);
+    if (r.ghostBad) fail(`${name} ${mode}: การ์ด ${GHOST}* ออกในชีวิตขั้น 0 ${r.ghostBad} ครั้ง`);
+    if (mode === 'ไม่ข้าม' && r.ghost) fail(`${name} ไม่ข้าม: การ์ด ${GHOST}* ออก ${r.ghost} ครั้ง`);
+    if (r.ghostDanaBad) fail(`${name} ${mode}: เลือกทำบุญให้ผีแล้วบัญชีทานไม่ขึ้นระดับ 1 ${r.ghostDanaBad} ครั้ง`);
   }
 }
 
@@ -205,6 +272,10 @@ const iskStage = {};
 for (const r of cross) for (const [k, v] of Object.entries(r.iskStage)) iskStage[k] = (iskStage[k] ?? 0) + v;
 if (!iskStage[1]) fail('ไม่มีชาติต่างโลกที่เห็นขั้น ≥ 1 — ตัววัดขั้นฝั่งต่างโลกไม่ได้วัดอะไร');
 if (!sum('iskCard')) fail(`ฝั่งข้ามโลกไม่มีการ์ด ${ISK_CARD}* ออกเลย`);
+if (!cross.some((r) => r.deadMax)) fail('ฝั่งข้ามโลกไม่มีตระกูลไหนจำคนตายได้ — ตัววัดรายชื่อไม่ได้วัดอะไร');
+if (!sum('ghost')) fail(`ฝั่งข้ามโลกไม่มีการ์ด ${GHOST}* ออกเลย`);
+if (!sum('ghostDana')) fail('ไม่มีใครเลือกทำบุญให้ผีทั่วไป — ตัววัดบัญชีทานไม่ได้วัดอะไร');
+if (!sum('kidAncestor')) fail('ไม่มีชาติค่า > 0 ที่พ่อ/แม่ผู้เล่นรุ่นก่อนตาย — ตัววัด "ไม่จำชาติก่อนของตัวเอง" ไม่ได้วัดอะไร');
 const iskById = (id) => cross.reduce((s, r) => s + (r.iskById[id] ?? 0), 0);
 const iskMiss = ISK_STAGED.filter((e) => !iskById(e.id));
 if (!ISK_STAGED.length) fail('ไม่มีการ์ดต่างโลกติด overlap_stage ในกอง — ด่านรายใบไม่ได้วัดอะไร');
@@ -299,12 +370,25 @@ for (const k of Object.keys(planBy).sort()) {
 }
 console.log(`  ทริปกลับบ้านแล้วตารางเปลี่ยน: ${sum('replanDiff')}/${sum('replan')} ครั้ง · เฉพาะขั้น ≥ 1 ทั้งก่อนและหลัง ${sum('replanSameDiff')}/${sum('replanSame')} · ตัวอย่าง ${cross.find((r) => r.replanShow)?.replanShow ?? '-'}`);
 console.log(`  แกนนัดบนการ์ดโพรบ 6 ใบ × 400: ${synth.join(' | ')}`);
+const deadGen = Array.from({ length: gens }, (_, g) => {
+  const cs = cross.flatMap((r) => r.deadByGen[g]);
+  const vs = cross.flatMap((r) => r.byGen[g]);
+  const on = cs.filter((_, k) => vs[k] > 0);
+  const off = cs.filter((_, k) => vs[k] === 0);
+  return `รุ่น ${g + 1} ค่า>0 ${mean(on).toFixed(1)} คน (${on.length} ตระกูล) · ค่า 0 ${mean(off).toFixed(1)}`;
+});
+console.log(`คนตายที่ตระกูลจำ (ฝั่งข้ามโลก เฉลี่ยตอนจบชีวิต · ตัวควบคุมสูงสุด ${Math.max(...rows.filter((r) => r.mode === 'ไม่ข้าม').map((r) => r.deadMax))} · ต่อทางเป็นลูกที่พ่อ/แม่รุ่นก่อนตาย ${sum('kidAncestor')} ชาติ ไม่ถูกจำ):${deadGen.join(' | ')}`);
+console.log(`ผีทั่วไป (${GHOST}*): ข้าม ${sum('ghost')} ครั้ง · ออกในชีวิตขั้น 0 ${rows.reduce((s, r) => s + r.ghostBad, 0)} · ไม่ข้าม ${rows.filter((r) => r.mode === 'ไม่ข้าม').reduce((s, r) => s + r.ghost, 0)} · เลือกทำบุญ ${sum('ghostDana')} ครั้ง ทานไม่ขึ้น ${rows.reduce((s, r) => s + r.ghostDanaBad, 0)}`);
+const saves = cross.flatMap((r) => r.saveBytes);
+const deads = cross.flatMap((r) => r.deadBytes);
+const kb = (b) => `${(b / 1024).toFixed(1)} KB`;
+if (saves.length) console.log(`ขนาดเซฟรุ่น ${gens} (ตระกูลค่า > 0 ${saves.length} ตระกูล): เฉลี่ย ${kb(mean(saves))} · สูงสุด ${kb(Math.max(...saves))} · ส่วนรายชื่อคนตาย เฉลี่ย ${kb(mean(deads))} สูงสุด ${kb(Math.max(...deads))} · รายชื่อยาวสุด ${Math.max(...cross.map((r) => r.deadMax))} คน`);
 if (fails.length) {
   for (const f of fails) console.log(`✗ ${f}`);
   console.log(`ด่านค่าซ้อนทับตก ${fails.length} ข้อ`);
   process.exitCode = 1;
 } else {
-  console.log(`ด่านค่าซ้อนทับผ่าน: บัญชีเหยียบซ้ำตรงทุกชีวิต · เกิดกลับ ${sum('born')} · ทริปกลับบ้าน ${sum('trip')} · เข้าซ้ำ ทริป ${sum('reTrip')} เกิด ${sum('reBorn')} · ทริปหลงไม่นับ ${sum('lost')} · ข่าวลือออก ${sum('rumor')} · ชาติต่างโลกเห็นขั้นตรง ${sum('iskLives')} ชาติ · การ์ดต่างโลกขั้น ≥ 1 ออก ${sum('iskCard')} · ค่าไม่ลด · ตัวควบคุม = 0`);
+  console.log(`ด่านค่าซ้อนทับผ่าน: บัญชีเหยียบซ้ำตรงทุกชีวิต · เกิดกลับ ${sum('born')} · ทริปกลับบ้าน ${sum('trip')} · เข้าซ้ำ ทริป ${sum('reTrip')} เกิด ${sum('reBorn')} · ทริปหลงไม่นับ ${sum('lost')} · ข่าวลือออก ${sum('rumor')} · ชาติต่างโลกเห็นขั้นตรง ${sum('iskLives')} ชาติ · การ์ดต่างโลกขั้น ≥ 1 ออก ${sum('iskCard')} · ผีทั่วไปออก ${sum('ghost')} ทำบุญ ${sum('ghostDana')} · ค่าไม่ลด · ตัวควบคุม = 0`);
 }
 
 // (10) สายนักล่า (ใบ 19): ขั้น 3 เข้าสายผ่านการ์ดรับสมัคร ชื่องานเป็นขั้นนักล่า เลื่อนขั้นได้ · ขั้น 0–1 เข้าสาย 0 · คนทำงานบริการไม่ถูกจับเข้าสายเอง

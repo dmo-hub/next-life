@@ -255,7 +255,7 @@ events:
         requires: {stats: {knowledge: {min: 60}}, reason: "พื้นความรู้ยังไม่พอสอบเข้า"}
         effects: {knowledge: 2, money: {unit: income_x, amount: -1}}
         outcomes:
-          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}, occupation: {professional: 1.5, manager: 1.5}}, text: "เรียนจบพอดีตลาดฟื้น ได้งานสายใหม่เงินดีกว่าเดิม", effects: {happiness: 1, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}, occupation: {professional: 1.5, manager: 1.5, officer: 1.5, senior_officer: 1.5}}, text: "เรียนจบพอดีตลาดฟื้น ได้งานสายใหม่เงินดีกว่าเดิม", effects: {happiness: 1, income_mult: 1.3}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เรียนจบแต่ตลาดงานยังซบ ต้องรับงานเงินน้อยกว่าเดิม", effects: {happiness: -1, income_mult: 0.9}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - text: "ขายของมือสองทางเน็ต"

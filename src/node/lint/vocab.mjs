@@ -19,7 +19,7 @@ export { AFTERLIFE_STAGE };
 // หมวดเนื้อหาตามใบ 07 (ช่วงวัย × หมวด)
 export const CATEGORIES = ['study', 'work_money', 'family', 'health', 'belief', 'society'];
 
-// หมวดบุญบาป: บาป 8 หมวดพระมาลัย + หมวด 9 ที่เกมตั้งเอง (ใบ 09/12) · บุญ ทาน/ศีล/ภาวนา + ประจำวัน · กลาง
+// หมวดบุญบาป: บาป 8 หมวดพระมาลัย + 2 หมวดไตรภูมิ + หมวด 9 ที่เกมตั้งเอง (ใบ 09/12) · บุญ ทาน/ศีล/ภาวนา + ประจำวัน · กลาง
 // ชื่อไทยรับเป็นชื่อแทนได้ ตัวอย่างในใบ 12 เขียนหมวดเป็นไทย
 export const MERIT_CATS = [
   { id: 'greed_harm', th: 'โลภจนเบียดเบียน', kind: 'sin' },
@@ -30,6 +30,9 @@ export const MERIT_CATS = [
   { id: 'love_charm', th: 'เสน่ห์ยาแฝด', kind: 'sin' },
   { id: 'oppress_subjects', th: 'กดขี่ผู้ใต้ปกครอง', kind: 'sin' },
   { id: 'intoxicants', th: 'ดื่มสุรา', kind: 'sin' },
+  // ไตรภูมิ (ใบ 202) · มิจฉาทิฏฐิติดที่การกระทำที่ทำร้ายคนอื่นเท่านั้น ห้ามติดตัวเลือกไม่เชื่อ/ไม่ไปวัด/ไม่ทำบุญ
+  { id: 'kill_animal', th: 'ฆ่าสัตว์', kind: 'sin' },
+  { id: 'wrong_view', th: 'มิจฉาทิฏฐิ', kind: 'sin' },
   { id: 'vow_broken', th: 'บนแล้วไม่แก้', kind: 'sin', flag: true },
   { id: 'dana', th: 'ทาน', kind: 'merit' },
   { id: 'sila', th: 'ศีล', kind: 'merit' },
@@ -53,7 +56,12 @@ export const meritCat = (name) => CAT_BY_NAME.get(name);
 
 // ช่องแทนค่าข้อความ (ใบ 07) กับค่าที่ยาวที่สุดที่เติมได้ — ด่านความยาววัดหลังแทนค่าพวกนี้
 // {ครับ} {ผม} เติมตามเพศของชีวิตนั้น (ครับ/ค่ะ · ผม/ฉัน) · แกนเติมทุกช่องผ่าน FILL ใน life.mjs
+// ช่องที่แกนวงปรโลกเติมเอง (afterlife.mjs knownText) ไม่ใช่ fill(st) — ด่าน lint-test ช่องที่แกนเติมจึงข้าม · ด่านจริงอยู่ harness-test ใบ 204
+export const KNOWN_PLACEHOLDERS = ['คนรู้จัก', 'เรื่องคนรู้จัก'];
 export const PLACEHOLDERS = {
+  // คนรู้จักในวงปรโลก (ใบ 204) — ใช้ได้เฉพาะใบ meet/known (ด่าน loop-known)
+  คนรู้จัก: 'ก'.repeat(20),
+  เรื่องคนรู้จัก: 'ก'.repeat(60),
   ชื่อ: 'ก'.repeat(20),
   อายุ: '120',
   จังหวัด: 'ภาคตะวันออกเฉียงเหนือ',

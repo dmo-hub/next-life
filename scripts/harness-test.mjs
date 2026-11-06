@@ -446,6 +446,67 @@ const f2 = (v) => v.toFixed(2);
   check('ขั้นค่าซ้อนทับ: ขั้น 2–4 ยังไปไม่ถึงจนใบ 16 ใส่เกณฑ์ (ค่าสูงแค่ไหนก็ขั้น 1)', E.OVERLAP_STAGE_MIN.length === 5 && E.OVERLAP_STAGE_MIN[1] === 1 && E.overlapStageOf(st) === 1, String(E.overlapStageOf(st)));
 }
 
+// ตัวคูณเกตนับเฉพาะขั้นในสายนักล่า: ตำแหน่งการเมืองหรือยศสายอื่นไม่ได้ตัวคูณ ต่างจาก multipliers.rank ที่รวมทั้งคู่
+{
+  const E = await import('../src/engine/index.mjs');
+  const st = newLife(mixSeed(1, 4200), loadContent());
+  const m = { hunter_rank: 1.3 };
+  st.ladder = { id: 'hunter', rank: 2 };
+  check('ขั้นนักล่า: สายนักล่าขั้น 2 คูณยกกำลัง 2', near(E.poolMultiplier(st, m), 1.69));
+  st.office = { rank: 1 };
+  check('ขั้นนักล่า: ตำแหน่งการเมืองไม่เพิ่มตัวคูณเกต · rank เดิมยังเพิ่ม', near(E.poolMultiplier(st, m), 1.69) && near(E.poolMultiplier(st, { rank: 2 }), 2 ** 4));
+  st.ladder = { id: 'army', rank: 3 };
+  check('ขั้นนักล่า: ยศสายอื่น + ตำแหน่งการเมืองคูณ 1', near(E.poolMultiplier(st, m), 1));
+}
+
+// ใบตามเกตที่ปล่อยไว้: นัดจากทาง pass ไม่ติดป้ายตารางซ้อน ⇒ ทอยตารางใหม่ไม่ล้าง ไม่กินโควตาซ้อน · ถึงคิวกินโควตาปี 1 · ขั้นไม่ใช่ 3–4 ตอนถึงคิว = ไม่ออก
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const BREACH = 'dungeon_breach_01';
+  const gate = content.events.find((e) => e.id === 'overlap_dungeon_01');
+  const pass = gate.choices.findIndex((c) => c.id === 'pass');
+  const keep = [...E.OVERLAP_STAGE_MIN];
+  [2, 3, 4].forEach((i) => { E.OVERLAP_STAGE_MIN[i] = i; });
+  try {
+    const gaps = new Set();
+    let row;
+    for (let i = 0; i < 40; i++) {
+      const st = newLife(mixSeed(1, 4000 + i), content);
+      st.flags.hunter = true;
+      st.age = 30;
+      st.overlap = 3;
+      st.pending = gate;
+      E.choose(st, pass);
+      row = st.scheduled.find((x) => x.event === BREACH);
+      gaps.add(row ? row.age - 30 : -1);
+      if (i === 0) {
+        E.overlapPlan(st, 1);
+        check('ใบตามเกต: ทอยตารางซ้อนใหม่ไม่ล้างนัด · นัดไม่ติดป้ายโควตาซ้อน · id ไม่ขึ้น overlap_', st.scheduled.some((x) => x.event === BREACH) && !row?.overlap && !BREACH.startsWith(E.OVERLAP_PLAN.prefix));
+      }
+    }
+    check('ใบตามเกต: pass นัด 1–2 ปี ออกครบทั้งสองค่า', [...gaps].sort().join() === '1,2', [...gaps].sort().join());
+    const due = (overlap) => {
+      const st = newLife(mixSeed(1, 4100), content);
+      st.flags.hunter = true;
+      st.age = 30;
+      st.overlap = overlap;
+      st.scheduled = [{ event: BREACH, age: 30, from: 29, pick: 'x' }];
+      // การ์ดเปิดชีวิตค้างใน due จะออกก่อนและบังนัด
+      st.due = [];
+      st.advance = false;
+      const owed = st.poolOwed ?? 0;
+      const card = E.nextCard(st);
+      return { id: card.id, owed: (st.poolOwed ?? 0) - owed, done: Boolean(st.done[BREACH]) };
+    };
+    const at = [1, 2, 3, 4].map(due);
+    check('ใบตามเกต: ถึงคิวขั้น 3–4 ออก กินโควตาปี 1', at.slice(2).every((x) => x.id === BREACH && x.owed === 1), JSON.stringify(at.slice(2)));
+    check('ใบตามเกต: ถึงคิวขั้น 1–2 ไม่ออก ไม่กินโควตา', at.slice(0, 2).every((x) => x.id !== BREACH && x.owed === 0 && !x.done), JSON.stringify(at.slice(0, 2)));
+  } finally {
+    keep.forEach((v, i) => { E.OVERLAP_STAGE_MIN[i] = v; });
+  }
+}
+
 // ไอเทมติดตัว (B78): ห้องบอสให้ชิ้นแรกที่ยังไม่มี · ช่องชนิดตรงว่างก่อน แล้วเป้ · เป้เต็มขาย · ครบแล้วไม่ได้เพิ่ม · ชีวิต/เซฟที่ไม่เคยได้ของไม่มีช่อง
 {
   const E = await import('../src/engine/index.mjs');
@@ -723,6 +784,84 @@ const f2 = (v) => v.toFixed(2);
   }
   check('ใบ 133 การ์ด ambient ไม่ถูกนับในแบบชีวิต', ids.size > 0 && seen > 0 && kept === 0, `${ids.size} ใบ · เลือก ${seen} ครั้ง · นับเข้า ${kept}`);
   check('ใบ 133 ตัวควบคุม: ถอด ambient ⇒ นับเข้าแบบชีวิต', ctl > 0, `นับเข้า ${ctl}`);
+}
+
+// คนรู้จักในวงนรก (ใบ 204): ใบต่อเรื่องออกหลังเจอเท่านั้น แทนชื่อ + สิ่งที่เลือกไว้ · คนละไม่เกิน KNOWN_MAX ใบต่อวง
+// · จบวงแล้วชาติหน้าไม่มีรายชื่อ · เซฟเก่ากลางวง (ไม่มีช่อง known) โหลดได้ รายชื่อว่าง เล่นจนจบวงได้
+{
+  const E = await import('../src/engine/index.mjs');
+  const { KNOWN_MAX } = await import('../src/engine/afterlife.mjs');
+  const { snapshot, restore } = await import('../src/engine/save.mjs');
+  const content = loadContent();
+  const P = (id) => E.PATHS.findIndex((p) => p.id === id);
+  const meetEv = content.events.find((e) => e.meet);
+  const knownEv = content.events.find((e) => e.known === meetEv?.meet.id);
+  const hell = (k) => {
+    const { state } = playLife(mixSeed(1, 2040 + k), content, BOTS.สุ่ม);
+    state.ledger.sin += 200;
+    return state;
+  };
+  const drive = (af, { stop, card: shown } = {}) => {
+    const loop = [];
+    let card = shown ?? E.nextAfterCard(af);
+    for (;;) {
+      if (card.loop && card.kind === 'scene') loop.push(card);
+      if (stop?.(card, af)) return { af, card, loop };
+      if (card.choices?.length) E.chooseAfter(af, card.kind === 'path' ? P('reborn') : Math.max(0, (card.locked ?? []).findIndex((x) => !x)));
+      if (card.done) return { af, card, loop };
+      card = E.nextAfterCard(af);
+    }
+  };
+  let order = 0, named = 0, pairs = 0, over = 0, capped = 0, lives = 0, leak = 0;
+  for (let k = 0; k < 60; k++) {
+    const { af, loop } = drive(E.startAfterlife(hell(k)));
+    if (af.loop?.realm !== 'hell') continue;
+    lives++;
+    const m = loop.findIndex((c) => c.id === meetEv.id);
+    const kn = loop.findIndex((c) => c.id === knownEv.id);
+    if (kn >= 0 && (m < 0 || kn < m)) order++;
+    for (const p of af.loop.known ?? []) {
+      if (p.n > KNOWN_MAX) over++;
+      if (p.n === KNOWN_MAX) capped++;
+    }
+    if (m >= 0 && kn >= 0) {
+      pairs++;
+      const who = af.loop.known[0];
+      const shown = [loop[m], loop[kn]].flatMap((c) => [c.title ?? '', c.text, ...c.choices]).join(' ');
+      if (loop[kn].text.includes(who.name) && loop[kn].text.includes(who.did) && loop[m].text.includes(who.name) && !/[{}]/.test(shown)) named++;
+    }
+    // จบวง → ชาติหน้าไม่มีรายชื่อค้าง
+    if (/hell_neighbor|"known"/.test(JSON.stringify(E.nextLife(af), (key, v) => (key === 'content' ? undefined : v)))) leak++;
+  }
+  check('ใบ 204 ใบต่อเรื่องออกหลังเจอเท่านั้น · แทนชื่อคนเดิม + สิ่งที่เลือกไว้', lives > 0 && pairs > 0 && order === 0 && named === pairs, `นรก ${lives} วง · เจอแล้วต่อเรื่อง ${pairs} · ข้อความถูก ${named} · ต่อก่อนเจอ ${order}`);
+  check(`ใบ 204 คนเดียวโผล่ไม่เกิน ${KNOWN_MAX} ครั้งต่อวง (มีวงที่ถึงเพดาน)`, over === 0 && capped > 0, `เกิน ${over} · ถึงเพดาน ${capped}`);
+  check('ใบ 204 จบวงแล้วชาติหน้าไม่มีรายชื่อค้าง', lives > 0 && leak === 0, `ค้าง ${leak}/${lives}`);
+
+  // เซฟเก่ากลางวงนรก: ถอดช่อง known ออกจากภาพถ่าย (แบบเซฟก่อนมีระบบ) → โหลด → เล่นจนจบวง
+  let oldOk = 0, oldN = 0, oldBad = 0;
+  for (let k = 0; k < 60 && oldN < 5; k++) {
+    const mid = drive(E.startAfterlife(hell(k)), { stop: (c) => c.loop?.year === 2 && c.kind === 'scene' });
+    if (mid.af.loop?.realm !== 'hell' || mid.card.done) continue;
+    oldN++;
+    const snap = JSON.parse(snapshot({ st: mid.af.st, af: mid.af, card: mid.card, ui: {} }, content));
+    const strip = (v) => {
+      if (Array.isArray(v)) v.forEach(strip);
+      else if (v && typeof v === 'object') { delete v.known; Object.values(v).forEach(strip); }
+    };
+    strip(snap);
+    try {
+      const r = restore(JSON.stringify(snap), content);
+      const empty = !(r.af.loop.known ?? []).length;
+      const done = drive(r.af, { card: r.card });
+      const [m, kn] = [meetEv, knownEv].map((ev) => done.loop.findIndex((c) => c.id === ev.id));
+      const early = kn >= 0 && (m < 0 || kn < m);
+      if (empty && done.card.done && !early) oldOk++;
+    } catch (e) {
+      oldBad++;
+      if (oldBad === 1) console.log(`  เซฟเก่ากลางวง: ${e.message}`);
+    }
+  }
+  check('ใบ 204 เซฟเก่ากลางวงนรก (ไม่มีช่องรายชื่อ) โหลดได้ รายชื่อว่าง เล่นจนจบวง', oldN > 0 && oldOk === oldN, `${oldOk}/${oldN} · throw ${oldBad}`);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

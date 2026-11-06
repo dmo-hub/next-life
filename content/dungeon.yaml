@@ -6,6 +6,7 @@
 # (แกนลงสาเหตุบาดแผลตามทางตายของตัวเลือกนั้น) — ใบเข้า/ใบกลาง/สายถูกดึงห้ามลดสุขภาพ ไม่งั้นชีวิตหมดในดันเจียนแล้วลงสาเหตุเป็นโรค
 # ทุกใบในรอบมี run: dungeon — สุขภาพหมดอยู่ก่อนเปิดใบ (โรคถึงคิว) แกนให้เดินจนจบรอบแล้วตายด้วยโรคที่ใบสุดท้าย
 # ไม่ใช่ทริปต่างโลก: ไม่แตะ st.trip และไม่ขึ้นค่าซ้อนทับ
+# hunter_rank คูณน้ำหนักยกกำลังขั้นในสายนักล่า ขั้นฝึกหัดจึงเท่าเลขฐาน · ขั้นสูงเจอซุ่มและทางตายบ่อยขึ้น แลกกับทางชนะใหญ่
 events:
   - id: overlap_dungeon_01
     type: A
@@ -23,7 +24,7 @@ events:
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 3, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "ทีมเข้าประตูพร้อมกันครบทุกคน ทางเดินหินชื้นทอดลึกลงไปข้างหน้า", effects: {knowledge: 1}, next: dungeon_hunt_mid_01, merit: [{cat: neutral}]}
-          - {weight: 1, text: "มีตัวซุ่มรออยู่ตั้งแต่ปากประตู ทีมฝ่าเข้าไปได้แต่เสียของไปครึ่งเป้", effects: {happiness: -1}, next: dungeon_hunt_mid_01, merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {hunter_rank: 1.3}, text: "มีตัวซุ่มรออยู่ตั้งแต่ปากประตู ทีมฝ่าเข้าไปได้แต่เสียของไปครึ่งเป้", effects: {happiness: -1}, next: dungeon_hunt_mid_01, merit: [{cat: neutral}]}
       - id: pulled
         text: "ถูกแรงเกตดูดเข้าไป"
         sets_flags: [dungeon_pulled]
@@ -35,6 +36,7 @@ events:
         text: "ให้ทีมอื่นรับงานนี้แทน"
         requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่าที่ถือบัตรกิลด์"}
         effects: {money: {unit: income_x, amount: -0.2}, happiness: 1}
+        schedules: [{event: dungeon_breach_01, after_years: [1, 2]}]
         merit: [{cat: neutral}]
       - id: evacuate
         text: "พาคนแถวนั้นหลบออกจากรัศมีเกต"
@@ -89,7 +91,7 @@ events:
         text: "พาทีมบุกต่อไปห้องบอส"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 3, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณอ่านทางกับดักออก ทีมผ่านโถงไปถึงหน้าประตูหินได้ครบ", effects: {knowledge: 1}, next: dungeon_hunt_boss_01, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณอ่านทางกับดักออก ทีมผ่านโถงไปถึงหน้าประตูหินได้ครบ", effects: {knowledge: 1, money: {unit: income_x, amount: 0.2}}, next: dungeon_hunt_boss_01, merit: [{cat: neutral}]}
           - {weight: 1, text: "กับดักอีกตัวดีดเป้คุณขาด ของที่เก็บมาหล่นหายในเหว", effects: {happiness: -1}, next: dungeon_hunt_boss_01, merit: [{cat: neutral}]}
       - id: carry_out
         text: "แบกเพื่อนที่เจ็บออกไปก่อน"
@@ -121,28 +123,28 @@ events:
         requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่าที่ถือบัตรกิลด์"}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 6, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "ทีมล้มบอสได้ กิลด์ตีราคาผลึกที่ขนออกมาได้ก้อนใหญ่ ชื่อคุณขึ้นกระดานกิลด์", effects: {money: {unit: income_x, amount: 2}, network: 2, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
+          - {weight: 6, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}, hunter_rank: 1.2}, text: "ทีมล้มบอสได้ กิลด์ตีราคาผลึกที่ขนออกมาได้ก้อนใหญ่ ชื่อคุณขึ้นกระดานกิลด์", effects: {money: {unit: income_x, amount: 2}, network: 2, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
           - {weight: 3, text: "ล้มบอสได้แต่คุณโดนหางฟาดจนซี่โครงร้าว ส่วนแบ่งผลึกแทบไม่พอค่าหมอ", effects: {health: -2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
-          - {weight: 1.5, text: "บอสสะบัดหางกวาดทั้งแนว ทีมลากร่างคุณออกจากเกตได้ แต่คุณไม่ได้ลืมตาขึ้นมาอีก", effects: {die: assault}, merit: [{cat: neutral}]}
+          - {weight: 0.4, multipliers: {hunter_rank: 1.3}, text: "บอสสะบัดหางกวาดทั้งแนว ทีมลากร่างคุณออกจากเกตได้ แต่คุณไม่ได้ลืมตาขึ้นมาอีก", effects: {die: assault}, merit: [{cat: neutral}]}
       - id: weak_spot
         text: "อ่านจังหวะแล้วตีจุดอ่อน"
         requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่าที่ถือบัตรกิลด์"}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 6, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณเห็นเกล็ดที่แตกอยู่ใต้คอ ตีครั้งเดียวบอสก็ทรุด ทีมแบ่งผลึกกันอย่างงาม", effects: {money: {unit: income_x, amount: 1.5}, network: 1, knowledge: 1, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
+          - {weight: 6, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}, hunter_rank: 1.2}, text: "คุณเห็นเกล็ดที่แตกอยู่ใต้คอ ตีครั้งเดียวบอสก็ทรุด ทีมแบ่งผลึกกันอย่างงาม", effects: {money: {unit: income_x, amount: 1.5}, network: 1, knowledge: 1, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
           - {weight: 3, text: "จังหวะพลาดไปนิดเดียว เพดานถล่มลงมาทับขาคุณ ทีมต้องหามออก", effects: {health: -2}, merit: [{cat: neutral}]}
-          - {weight: 1.5, text: "เสาหินที่บอสชนพังลงมาทั้งต้น ทีมขุดหาคุณจนเกตปิด", effects: {die: accident}, merit: [{cat: neutral}]}
+          - {weight: 0.4, multipliers: {hunter_rank: 1.3}, text: "เสาหินที่บอสชนพังลงมาทั้งต้น ทีมขุดหาคุณจนเกตปิด", effects: {die: accident}, merit: [{cat: neutral}]}
       - id: decoy
         text: "ล่อบอสไว้ให้ทีมหนีออกไป"
         requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่าที่ถือบัตรกิลด์"}
         merit: [{cat: help_others, level: 2}]
         outcomes:
-          - {weight: 5, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณวิ่งวนจนบอสหลงทาง ทีมออกครบทุกคน กิลด์ให้เบี้ยกล้าหาญพิเศษ", effects: {money: {unit: income_x, amount: 0.8}, network: 2, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
+          - {weight: 5, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}, hunter_rank: 1.2}, text: "คุณวิ่งวนจนบอสหลงทาง ทีมออกครบทุกคน กิลด์ให้เบี้ยกล้าหาญพิเศษ", effects: {money: {unit: income_x, amount: 0.8}, network: 2, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
           - {weight: 3, text: "ทีมออกไปได้ คุณหนีตามมาทีหลังพร้อมรอยกรงเล็บยาวตลอดหลัง", effects: {health: -2, network: 1}, merit: [{cat: neutral}]}
-          - {weight: 1.5, text: "ทีมออกไปได้ครบทุกคน แต่คนที่ล่อบอสไว้ไม่ได้ตามออกมา", effects: {die: assault}, merit: [{cat: neutral}]}
+          - {weight: 0.4, multipliers: {hunter_rank: 1.3}, text: "ทีมออกไปได้ครบทุกคน แต่คนที่ล่อบอสไว้ไม่ได้ตามออกมา", effects: {die: assault}, merit: [{cat: neutral}]}
       - id: back_off
         text: "ถอยออกก่อนบอสตื่น"
-        effects: {money: {unit: income_x, amount: 0.3}, happiness: -1}
+        effects: {money: {unit: income_x, amount: 0.6}, happiness: -1}
         merit: [{cat: neutral}]
 
   # สายถูกดึง (ครั้งแรก): รอดเสมอ — ไม่มีผลลดสุขภาพ ไม่มี die · ใบกลางจบได้เลย 2 ทาง ไปทางออก 2 ทาง
@@ -200,4 +202,35 @@ events:
       - id: bag_keep
         text: "เก็บของในเป้ไว้เอง"
         effects: {money: {unit: income_x, amount: 0.8}, loot: [dg_crossbow, dg_armband]}
+        merit: [{cat: greed_harm, level: 1}]
+
+  # ใบตามของทาง pass: มาทาง schedules จึงกินโควตาปี 1 แบบผลย้อน · id ไม่ขึ้น overlap_ ตารางนัดของขั้นจึงไม่หยิบ ไม่กินโควตาซ้อน
+  # ส่งเกตหลายครั้งในชีวิตเดียวก็เจอใบนี้ครั้งเดียว (นัดข้าม id ที่ออกแล้ว) · ไม่อยู่ในรอบดันเจียนจึงไม่มี run: dungeon
+  # ไม่มีทางตาย ⇒ ห้ามลดสุขภาพตามกติกาหัวไฟล์ ราคาของทางยึดคืนจึงเป็นเงินกับความสุข · 3 ทาง ยึดคืน/ย้ายหนี/ซ้ำเติม ทางยึดคืนแยกแนวหน้า/แนวหลังให้ครบ 4 ตัวเลือกตาม lint
+  - id: dungeon_breach_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {overlap_stage: [3, 4]}
+    title: "เกตที่ไม่มีใครปิดแตก"
+    text: "เกตที่คุณส่งต่อให้ทีมอื่นไม่มีใครปิดทัน คืนนี้มันแตกออกมาทั้งย่าน ซอยที่เคยมีรถเข็นขายของมีแต่เงาตัวอะไรเดินเต็มถนน ทหารตั้งด่านกั้นปากซอย คนแถวนั้นหอบข้าวของหนีออกมาไม่ขาดสาย"
+    choices:
+      - id: reclaim
+        text: "เข้าไปช่วยยึดย่านคืน"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "ทีมกวาดทีละซอยจนรุ่งสาง ป้าร้านข้าวแกงจำหน้าคุณได้ ตักข้าวมาให้ทั้งทีมไม่คิดเงิน", effects: {network: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยึดคืนได้แค่ครึ่งย่าน อีกครึ่งถูกล้อมรั้วเป็นเขตหวงห้าม คุณควักเงินตัวเองซื้อน้ำซื้อยาให้ทีมจนหมดกระเป๋า", effects: {money: {unit: income_x, amount: -0.3}, happiness: -1}, merit: [{cat: neutral}]}
+      - id: reclaim_support
+        text: "ส่งเสบียงให้ทีมยึดคืนจากแนวหลัง"
+        effects: {money: {unit: income_x, amount: -0.3}, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: move_away
+        text: "ย้ายออกจากแถบนั้นไปเลย"
+        effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: exploit
+        text: "กดราคาซื้อของจากคนที่หนีออกมา"
+        effects: {money: {unit: income_x, amount: 0.6}, relations: -1}
         merit: [{cat: greed_harm, level: 1}]

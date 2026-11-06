@@ -19,8 +19,8 @@ const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'breaks'],
+  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc', 'meet', 'known'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'remember', 'breaks'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
@@ -36,7 +36,7 @@ const KEYS = {
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
   family: ['role', 'sex', 'age', 'alive', 'count', 'health', 'relations'],
-  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
+  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', 'hunter_rank', 'overlap_stage', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
   requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'reason', 'reluctant'],
@@ -140,7 +140,7 @@ function checkMultipliers(m, at, r) {
     if (m[k] === undefined) continue;
     if (!isObj(m[k]) || Object.entries(m[k]).some(([kk, v]) => !of.includes(kk) || !positive(v))) r(`${at}.${k}`, `ต้องเป็น {${of.join('|')}: เลขบวก}`);
   }
-  for (const k of ['karma', 'family_fame', 'wish']) if (m[k] !== undefined && !positive(m[k])) r(`${at}.${k}`, 'ต้องเป็นเลขบวก');
+  for (const k of ['karma', 'family_fame', 'wish', 'hunter_rank']) if (m[k] !== undefined && !positive(m[k])) r(`${at}.${k}`, 'ต้องเป็นเลขบวก');
   // 0 ได้: ขั้น 0 คูณ 1 (x ** 0) ขั้น 1 ขึ้นไปปิดการ์ด — การ์ดชีวิตปกติที่หายเมื่อโลกเริ่มซ้อน
   if (m.overlap_stage !== undefined && !ratio(m.overlap_stage)) r(`${at}.overlap_stage`, 'ต้องเป็นตัวเลข ≥ 0 (คูณยกกำลังตามขั้นค่าซ้อนทับ)');
   if (m.flags !== undefined && (!isObj(m.flags) || Object.entries(m.flags).some(([f, v]) => !FLAG_RE.test(f) || !positive(v)))) r(`${at}.flags`, 'ต้องเป็น {ชื่อธง: เลขบวก}');

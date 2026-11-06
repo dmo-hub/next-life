@@ -322,7 +322,7 @@ events:
     title: "ตัวแทนประกันที่หน้าบ้าน"
     text: "ตรวจสุขภาพประจำปีเจอค่าน้ำตาลเริ่มแดง วันรุ่งขึ้นหลานของเพื่อนบ้านถือแฟ้มประกันมานั่งรอที่หน้าประตู"
     weight: 2
-    multipliers: {flags: {married: 1.3, has_kids: 1.3}, occupation: {clerk: 1.3, professional: 1.2}}
+    multipliers: {flags: {married: 1.3, has_kids: 1.3}, occupation: {clerk: 1.3, professional: 1.2, officer: 1.2, senior_officer: 1.2}}
     choices:
       - id: buy_health
         text: "ทำประกันสุขภาพเต็มวงเงิน"

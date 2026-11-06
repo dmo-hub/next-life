@@ -892,3 +892,57 @@ events:
       - text: "ชวนคนข้างหน้าคุยเรื่องชาติก่อน"
         effects: {relations: 1}
         merit: [{cat: neutral}]
+
+  # ---- คนรู้จักในวงนรก (ใบ 204) — การ์ดตัวอย่างคู่เดียว ชุดจริงอยู่ใบ 205 ----
+  # meet พาคนใหม่เข้ารายชื่อของวง · known ต่อเรื่องกับคนเดิม อ่านสิ่งที่เลือกไว้ผ่าน remember · คนละไม่เกิน 2 ใบต่อวง
+  - id: after_loop_hell_meet_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: loop
+    realm: [hell]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    meet: {id: hell_neighbor, names: [เผือก, แสง, บุญมา, ทองดี, เย็น, จันทร์]}
+    title: "คนข้างกระทะ"
+    text: "ปีนี้มีคนชื่อ{คนรู้จัก}ถูกพามาทนทุกข์อยู่ข้าง ๆ ร้องครางทั้งคืน พอเสียงเงียบลงก็หันมาถามว่าคุณมาอยู่ที่นี่เพราะอะไร"
+    choices:
+      - text: "เล่าความผิดของตัวเองให้ฟังตรง ๆ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+        remember: "คุณเล่าความผิดของตัวเองให้ฟังตรง ๆ"
+      - text: "ปลอบว่าสักวันก็ต้องพ้น"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+        remember: "คุณปลอบว่าสักวันก็ต้องพ้น"
+      - text: "หันหน้าหนี ไม่อยากคุยกับใคร"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+        remember: "คุณหันหน้าหนีไม่ยอมคุยด้วย"
+      - text: "ถามถึงบ้านเกิด เผื่อเคยรู้จักกัน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+        remember: "คุณถามถึงบ้านเกิดเผื่อเคยรู้จักกันมาก่อน"
+
+  - id: after_loop_hell_known_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: loop
+    realm: [hell]
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    known: hell_neighbor
+    title: "{คนรู้จัก}ผ่านมาอีก"
+    text: "{คนรู้จัก}ถูกพาผ่านมาทางนี้อีกครั้ง จำคุณได้ทันที ยังพูดถึงปีที่{เรื่องคนรู้จัก}"
+    choices:
+      - text: "ขอโทษเรื่องปีนั้น แล้วนั่งคุยกัน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - text: "ชวนกันท่องบทสวดที่ยังจำได้"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - text: "ช่วยแบกทุกข์ให้เขาครึ่งหนึ่ง"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - text: "ทำเป็นไม่เห็น ปล่อยให้เดินผ่านไป"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]

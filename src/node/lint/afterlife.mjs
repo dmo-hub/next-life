@@ -3,7 +3,7 @@ import { AFTERLIFE_STAGE, STAT_KEYS } from './vocab.mjs';
 import { SCENES, REALM_SCENES, REALMS, LOOP_KEYS } from '../../engine/afterlife.mjs';
 import { COURT_SCENES, NEAR_DEATH } from '../../engine/court.mjs';
 import { meritId } from '../../engine/merit.mjs';
-import { isObj, list, choicesOf, effectSites } from './util.mjs';
+import { isObj, list, choicesOf, effectSites, textsOf, placeholdersIn } from './util.mjs';
 
 const REALM_IDS = REALMS.map((r) => r.id);
 // คนตายไม่มีเงิน/งาน/ธงให้เปลี่ยน · ไม่มีปีให้นัด — ผลมีแค่ป้ายบุญบาปกับค่าเริ่มชาติหน้า
@@ -57,8 +57,41 @@ export const rules = [
     },
   },
   {
+    id: 'loop-known',
+    desc: 'คนรู้จักในวง (ใบ 204): meet {id, names} / known ใช้ได้เฉพาะ scene loop และใบเดียวมีได้อย่างเดียว · meet.id a-z0-9_ ไม่ซ้ำ · names ข้อความไม่ว่าง ≥ 1 · ทุกตัวเลือกของใบ meet มี remember (ข้อความที่ใบ known อ่านเป็น {เรื่องคนรู้จัก}) · remember มีแค่บนใบ meet · known ชี้ meet.id ที่มีจริง · {คนรู้จัก} {เรื่องคนรู้จัก} ใช้ได้เฉพาะใบ meet/known ({เรื่องคนรู้จัก} เฉพาะ known)',
+    all(events, ctx, r) {
+      const meets = new Map();
+      for (const x of events) {
+        const { e } = x;
+        if (e.meet === undefined) continue;
+        if (meets.has(e.meet?.id)) r(x, '.meet.id', `meet.id ${JSON.stringify(e.meet?.id)} ซ้ำกับ ${meets.get(e.meet.id)}`);
+        else meets.set(e.meet?.id, e.id);
+      }
+      for (const x of events) {
+        const { e } = x;
+        const loop = e.stage === AFTERLIFE_STAGE && e.scene === 'loop';
+        if ((e.meet !== undefined || e.known !== undefined) && !loop) r(x, e.meet !== undefined ? '.meet' : '.known', 'meet/known ใช้ได้เฉพาะ scene loop');
+        if (e.meet !== undefined && e.known !== undefined) r(x, '.known', 'ใบเดียวมีได้แค่ meet หรือ known');
+        if (e.meet !== undefined) {
+          if (!isObj(e.meet) || typeof e.meet.id !== 'string' || !/^[a-z0-9_]+$/.test(e.meet.id)) r(x, '.meet.id', 'meet.id ต้องเป็น a-z0-9_');
+          if (!Array.isArray(e.meet?.names) || !e.meet.names.length || !e.meet.names.every((n) => typeof n === 'string' && n.trim())) r(x, '.meet.names', 'meet.names ต้องเป็นรายการชื่อไม่ว่าง ≥ 1');
+        }
+        if (e.known !== undefined && !meets.has(e.known)) r(x, '.known', `ไม่มีใบ meet ที่ id ${JSON.stringify(e.known)}`);
+        for (const { c, path } of choicesOf(e)) {
+          if (e.meet !== undefined && (typeof c.remember !== 'string' || !c.remember.trim())) r(x, `${path}.remember`, 'ตัวเลือกของใบ meet ต้องมี remember');
+          if (e.meet === undefined && c.remember !== undefined) r(x, `${path}.remember`, 'remember ใช้ได้เฉพาะใบ meet');
+        }
+        for (const { path, s } of textsOf(e)) {
+          const ks = placeholdersIn(s);
+          if (ks.includes('คนรู้จัก') && e.meet === undefined && e.known === undefined) r(x, path, '{คนรู้จัก} ใช้ได้เฉพาะใบ meet/known');
+          if (ks.includes('เรื่องคนรู้จัก') && e.known === undefined) r(x, path, '{เรื่องคนรู้จัก} ใช้ได้เฉพาะใบ known');
+        }
+      }
+    },
+  },
+  {
     id: 'court-shape',
-    desc: `ทริปศาลขณะยังมีชีวิต (scene ${COURT_SCENES.join('|')}): ไม่มี when/weight/realm · ตัวเลือกไม่มี effects (ค่าสถานะเข้าสูตรชีวิต อายุตายจะเลื่อน) · near/visit ป้ายบุญบาปเป็น neutral ล้วน · near: ${NEAR_DEATH.causes.join('|')} มีเฉพาะ scene near และไม่มีตัวเลือก`,
+    desc: `ทริปศาลขณะยังมีชีวิต (scene ${COURT_SCENES.join('|')}): ไม่มี when/weight/realm · ตัวเลือกไม่มี effects (ค่าสถานะเข้าสูตรชีวิต อายุตายจะเลื่อน) · near/visit ป้ายบุญบาปเป็น neutral ล้วน · near: ${NEAR_DEATH.causes.join('|')} มีเฉพาะ scene near`,
     event(e, ctx, r) {
       const court = e.stage === AFTERLIFE_STAGE && COURT_SCENES.includes(e.scene);
       if (e.near !== undefined && !(court && e.scene === 'near')) r('.near', 'near ใช้ได้เฉพาะ scene near');
@@ -66,7 +99,6 @@ export const rules = [
       for (const k of ['when', 'weight', 'realm', 'multipliers']) if (e[k] !== undefined) r(`.${k}`, `ฉากศาลไม่มี ${k} — แกนเลือกใบเอง`);
       if (e.scene === 'near') {
         if (!NEAR_DEATH.causes.includes(e.near)) r('.near', `scene near ต้องมี near: ${NEAR_DEATH.causes.join('|')}`);
-        if (Array.isArray(e.choices) && e.choices.length) r('.choices', 'ใบเกือบตายเป็นการ์ดเล่าเรื่อง choices: []');
       }
       for (const { c, path } of choicesOf(e)) {
         if (c.effects !== undefined) r(`${path}.effects`, 'ฉากศาลไม่มีผลต่อค่าสถานะ');

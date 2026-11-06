@@ -6,7 +6,7 @@ import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIn
 import { monthlyWage, minWage, pickOccupation, portfolioReturn, lendingRate, assetOpen, assetName, isAllocAge, allocOptions, periodReturns, formatReturn, ALLOC, DISCLAIMER, newDebt, payDebt, debtDone, debtOpen, debtName, complainDebt, firstPay } from './finance.mjs';
 import { newLedger, recordMerit, addMerit, karmaMultiplier, omenTone, omenText, OMEN, netLedger, ledgerLevel, meritName, SIN_CATS, meritId, MERIT_LEVELS } from './merit.mjs';
 import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './career.mjs';
-import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
+import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, hunterRank, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
 import { beliefOk, beliefFired, beliefChoice, moneyTight } from './belief.mjs';
 import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './court.mjs';
 import { cadetActive, cadetCard, chooseCadet, cadetAfterChoice } from './cadet.mjs';
@@ -213,6 +213,8 @@ export function newLife(seed, content, heir = null) {
     occupation: occupation.id,
     occupationName: occupation.name,
     familyOcc: occupation.id,
+    // บ้านสายยศ (afterlife ส่งมาเมื่ออาชีพสุดท้ายของพ่อแม่เป็นขั้นยศ) · ไม่มีคีย์ = สืบต่อด้วยอาชีพบ้านตามปกติ
+    ...(heir?.familyLadder && { familyLadder: heir.familyLadder }),
     workFrom: null,
     // สายยศ/ตำแหน่ง (B40 · rank.mjs): ขั้นในสายอาชีพ · ตำแหน่งการเมือง · บำนาญต่อปีเป็นบาทค่าเงินปีเกิด
     ladder: null,
@@ -258,6 +260,8 @@ export function newLife(seed, content, heir = null) {
     // ความจำข้ามชาติ (past.mjs) + อาชีพที่ติดพรสวรรค์มา — ชีวิตแรกไม่มีช่อง
     ...(heir?.past && { past: heir.past }),
     ...(pastTalent(heir?.past) && { talent: pastTalent(heir.past) }),
+    // คนตายที่ตระกูลจำได้ (deadKinOf) — มีเฉพาะตระกูลค่าซ้อน > 0 · เซฟเก่าไม่มีช่อง = ยังไม่มีผีญาติ
+    ...(heir?.deadKin && { deadKin: heir.deadKin }),
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // จดหมายคำฝากของรุ่นก่อน (afterfall-3) {age, from, cause, by} — ออกหลังมรดกถึงมือเท่านั้น
@@ -1536,6 +1540,8 @@ function drawCard(st) {
     if (st.cadet.cur) throw new Error('ยังมีการ์ดที่รอเลือก');
     const card = cadetCard(st);
     if (card) return emit(st, card);
+    // ขั้นของ cadet เติมคิวได้ ต้องเปิดคิวก่อนลงไปขึ้นปี
+    if (st.queue.length) return nextCard(st);
   }
   for (;;) {
     if (st.advance) {
@@ -1856,6 +1862,7 @@ export function poolMultiplier(st, m) {
   for (const [f, v] of Object.entries(m.parent_flags ?? {})) if (st.parentFlags?.[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
   if (m.rank) x *= m.rank ** rankLevel(st);
+  if (m.hunter_rank) x *= m.hunter_rank ** hunterRank(st);
   // ตัวคูณเงิน {min, max, v}: อัตราส่วนอยู่ในช่วง = คูณ v · คำนวณเฉพาะการ์ดที่ใช้ เพราะกองสุ่มเรียกทุกใบทุกปี
   if (MONEY_KEYS.some((k) => m[k])) {
     const r = moneyRatios(st);

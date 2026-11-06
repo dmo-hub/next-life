@@ -10,9 +10,9 @@ import { loadEvents, loadEra, loadContent, checkNames } from '../src/node/load.m
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
 import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT, CHILD_UNTIL, SCHOOL_FROM } from '../src/engine/career.mjs';
 import { newLife, CLASSES, SEXES, fill } from '../src/engine/life.mjs';
-import { CATEGORIES, MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
+import { CATEGORIES, MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS, KNOWN_PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
 import { SCENES } from '../src/engine/afterlife.mjs';
-import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenText } from '../src/engine/merit.mjs';
+import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenText, SIN_CATS, ISEKAI_CATS, GAME_CATS, meritName, meritId } from '../src/engine/merit.mjs';
 import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../src/engine/isekai.mjs';
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 
@@ -68,6 +68,14 @@ const controls = {
 };
 for (const [name, args] of Object.entries(controls)) if (!checkMeritTable(...args).length) fails.push(`merit-table ตัวควบคุม "${name}" ไม่ตก`);
 rows.push(['merit-table ตัวควบคุม', `${Object.keys(controls).length} แบบ`]);
+// หมวดบาปไตรภูมิ (ใบ 202): บาปตามคติชาติไทย หนักเท่าหมวดเดิม · ไม่ใช่หมวดต่างโลก/กลไกเกม · ชื่อบนการ์ดคิดบัญชีเป็นไทย
+for (const [id, th] of [['kill_animal', 'ฆ่าสัตว์'], ['wrong_view', 'มิจฉาทิฏฐิ']]) {
+  if (!SIN_CATS.includes(id)) fails.push(`ใบ 202: ${id} ไม่อยู่ใน SIN_CATS`);
+  if (ISEKAI_CATS.includes(id) || GAME_CATS.includes(id)) fails.push(`ใบ 202: ${id} ต้องไม่อยู่ใน ISEKAI_CATS/GAME_CATS`);
+  if (MERIT_WEIGHTS[id] !== 1) fails.push(`ใบ 202: ${id} น้ำหนัก ${MERIT_WEIGHTS[id]} ไม่ใช่ 1`);
+  if (meritName(id) !== th || meritId(th) !== id) fails.push(`ใบ 202: ${id} ชื่อแสดง ${meritName(id)} ไม่ใช่ ${th}`);
+}
+rows.push(['ใบ 202 หมวดไตรภูมิ', 'kill_animal · wrong_view']);
 // ผลเบาชาติไทยของสกิล (06s): ของจริงผ่าน · ตัวควบคุมผิดทีละอย่างต้องตก
 const skThai = checkSkillThai(CATEGORIES);
 rows.push(['skill-thai', skThai.length ? `ตก ${skThai.length} ข้อ` : `ผ่าน (${Object.values(ISEKAI_SKILLS).filter((s) => s.thai).length} สกิล)`]);
@@ -143,7 +151,7 @@ if (omenMiss) fails.push(`omenText คืนค่าที่ไม่ใช่
 // ทุกช่องในรายการปิดของด่าน build ต้องมีตัวเติมในแกน ไม่งั้นผ่านด่านแต่โผล่ดิบบนการ์ด · ทั้งสองเพศ
 for (const sex of SEXES) {
   const st = { ...newLife(1, loadContent()), sex };
-  for (const k of Object.keys(PLACEHOLDERS)) {
+  for (const k of Object.keys(PLACEHOLDERS).filter((x) => !KNOWN_PLACEHOLDERS.includes(x))) {
     const out = fill(`{${k}}`, st);
     if (/[{}]/.test(out) || !out.trim()) fails.push(`ช่อง {${k}} แกนไม่เติม (${sex}): "${out}"`);
     else if (out.length > PLACEHOLDERS[k].length) fails.push(`ช่อง {${k}} เติมแล้วยาว ${out.length} เกินค่ายาวสุดที่ด่านความยาวใช้ (${PLACEHOLDERS[k].length}) — แก้ PLACEHOLDERS`);
@@ -213,6 +221,8 @@ rows.push(['การ์ดจัดสรร 2500–2700', `${seenLabels.size} 
 // ≥4 ตัวเลือก · มีทางไม่ล็อก · ยาว · คำต้องห้าม · ผล job/school ชี้ของที่มีจริง
 const career = { ...loadContent(), events: [] };
 const occIds = career.era.finance.occupations.map((o) => o.id);
+// อาชีพตามขั้นยศได้จากการเข้าสายเท่านั้น — การ์ดหางานเสนอเป็นงานตรง ๆ = คนนอกสายได้ยศโดยไม่มีสาย
+const rankOccs = career.era.finance.occupations.filter((o) => !o.birth).map((o) => o.id);
 const careerTexts = new Set();
 let careerCards = 0;
 function checkCareer(ev, where) {
@@ -226,12 +236,20 @@ function checkCareer(ev, where) {
       if (node.text) careerTexts.add(node.text);
       const fx = node.effects ?? {};
       if (fx.job !== undefined && !occIds.includes(fx.job)) fails.push(`${where}: อาชีพ ${fx.job} ไม่มีจริง`);
+      if (rankOccs.includes(fx.job)) fails.push(`${where}: เสนออาชีพตามขั้นยศ ${fx.job} เป็นงาน`);
       if (fx.school !== undefined && !SCHOOL_VALUES.includes(fx.school)) fails.push(`${where}: ช่วงเรียน ${fx.school} ไม่มีจริง`);
     }
   }
 }
 for (const cls of CLASSES) for (const network of [0, 50, 100]) for (const [i, edu] of [null, ...EDU].entries()) {
   checkCareer(jobCard(Object.assign(newLife(i + 1, career), { cls, network, edu, age: 22 })), `การ์ดหางาน ${cls} คอนเน็คชั่น ${network} วุฒิ ${edu}`);
+}
+// บ้านสายยศ (ทายาทของคนที่ตายในขั้นยศ): สืบต่องานบ้าน = เข้าสายของพ่อแม่ ไม่ใช่รับอาชีพยศไปตรง ๆ
+for (const occ of rankOccs) for (const lad of Object.keys(career.era.careers.ladders).filter((id) => career.era.careers.ladders[id].steps.some((s) => s.occ === occ))) {
+  const where = `การ์ดหางาน บ้าน ${occ} สาย ${lad}`;
+  const ev = jobCard(Object.assign(newLife(1, career), { cls: CLASSES[3], network: 50, edu: 'อุดมศึกษา', age: 22, familyOcc: occ, familyLadder: lad }));
+  checkCareer(ev, where);
+  if (!ev.choices.some((c) => c.effects?.ladder === lad)) fails.push(`${where}: ไม่มีทางสืบต่อเข้าสาย ${lad}`);
 }
 for (const [t, track] of Object.entries(TRACKS)) {
   if (track.gate) checkCareer(schoolGate(Object.assign(newLife(1, career), { school: t, age: track.until })), `ด่านเรียนต่อ ${t}`);

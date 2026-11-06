@@ -96,7 +96,7 @@ export function enterByJob(st, occ) {
   st.ladder = id ? { id, rank: L[id].start?.[occ] ?? 0, since: st.age, prog: 0 } : null;
 }
 
-// เข้าสายราชการ/ทหาร/ตำรวจ (effects.ladder): อาชีพเปลี่ยนตามขั้น ให้การ์ดเนื้อหาที่กรองด้วยอาชีพยังเจอคนในสายนี้
+// เข้าสายราชการ/ทหาร/ตำรวจ (effects.ladder): อาชีพเปลี่ยนตามขั้น (officer · senior_officer) ให้การ์ดที่กรองด้วยอาชีพแยกคนในสายนี้จากภาคเอกชนได้
 export function enterLadder(st, id) {
   st.ladder = { id, rank: 0, since: st.age, prog: 0, from: st.age };
   syncOcc(st);
@@ -286,6 +286,8 @@ export function severanceDays(st) {
 
 // ขั้นยศ + ตำแหน่งการเมืองรวมเป็นระดับเดียว — การ์ดยั่วทุจริตออกถี่ขึ้นตามระดับ (multipliers.rank)
 export const rankLevel = (st) => (st.ladder?.rank ?? 0) + (st.office ? st.office.rank + 1 : 0);
+// ขั้นในสายนักล่าล้วน: ตัวคูณเกตไม่นับตำแหน่งการเมืองหรือยศสายอื่น คนนอกสายได้ 0 จึงคูณ 1 เท่ากับไม่มีตัวคูณ
+export const hunterRank = (st) => (st.ladder?.id === 'hunter' ? st.ladder.rank : 0);
 
 // โครงการเกษียณก่อนกำหนด (B40): ลูกจ้างอายุ EARLY.from–EARLY.to ทอยจาก rankRng ครั้งเดียวต่อปี ออกได้ครั้งเดียวในชีวิต
 // ราชการ/ทหาร/ตำรวจไม่มีโครงการนี้ · ตำแหน่งการเมืองเต็มเวลาไม่ใช่ลูกจ้าง
