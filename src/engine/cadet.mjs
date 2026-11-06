@@ -2,7 +2,7 @@
 // st.cadet = ลำดับขั้นที่กำลังเล่น (null = ไม่มี) · st.cadetInfo = ความจำข้ามปี (สอบกี่ครั้ง · ตกเพราะอะไร · ใบสมัคร)
 // ทุกค่าใน state เป็นข้อมูลล้วน (เซฟได้) · สุ่มจาก stream ของตัวเอง (seed ^ SALT + ตัวนับ) ไม่แตะ rng ของโลก
 // เนื้อหา/ตัวเลข: content/rules/cadet.yaml (ที่มา: demo ที่เจ้าของเคาะ 2026-11-05) · fx ในไฟล์นั้นเป็นหน่วย demo (×numbers.fx_unit แต้ม)
-import { STAT_KEYS, fill, stageOf } from './life.mjs';
+import { STAT_KEYS, fill, stageOf, fxTag, TAG_MID } from './life.mjs';
 
 // ทั้งไฟล์อยู่ใน scope เดียว — build ต่อทุกไฟล์เป็นสคริปต์เดียว ชื่อภายในจึงต้องไม่หลุดไปชนไฟล์อื่น
 const CADET = (() => {
@@ -149,6 +149,9 @@ const CADET = (() => {
     applyFx(st, o.fx);
     setFlags(st, o);
     let result = o.result;
+    // ป้ายหมวดการ์ดผล (ui-redo 60): ทิศจากผลค่ารวมของตัวเลือก + ผลสุ่ม · ต้นทาง = การ์ดเส้นเตรียมทหารที่เพิ่งเลือก
+    const fxSum = { ...o.fx };
+    const evId = `cadet:${K.curId}`;
     // ผลสุ่มของตัวเลือก (outcomes: p + fx + result)
     const outs = (o.outcomes ?? []).filter((x) => !x.whenFlag || has(st, x.whenFlag));
     if (outs.length) {
@@ -157,6 +160,7 @@ const CADET = (() => {
       for (const x of outs) if ((r -= x.p ?? 1) <= 0) { pick = x; break; }
       result = pick.result ?? result;
       applyFx(st, pick.fx);
+      for (const [k, v] of Object.entries(pick.fx ?? {})) fxSum[k] = (fxSum[k] ?? 0) + v;
       for (const f of pick.setFlags ?? []) st.flags[f] = true;
       if (pick._injure && P) P.steps = [['injury'], ['failed']];
     }
@@ -178,7 +182,7 @@ const CADET = (() => {
     if (o._report === 'go') P.steps = [['arrive', P.chosen]];
     if (o._report === 'wait') P.steps = [['extraDays'], ['reportAsk', 1]];
     if (o._report === 'no') P.steps = [['noReport'], ['letDown', 'report'], ['failed']];
-    if (result) K.steps.unshift(['res', result]);
+    if (result) K.steps.unshift(['res', result, fxTag(fxSum), evId]);
   }
 
   // ปีสอบซ้ำ "ติวอีกรอบ": ใบเลือกวิธีติวของเนื้อหาเดิมกลับมา + ใบความตั้งใจ/ฝึกพละ แล้วคืนก่อนสอบแบบปีที่สอง
@@ -199,12 +203,14 @@ const CADET = (() => {
   // ---------- steps ----------
   const S = {};
   const STEP = S;
-  S.res = (st, text) => ({ kind: 'result', cadet: true, type: 'A', age: st.age, stage: stageOf(st.age), text: fill(text, st) });
+  // เซฟเก่าที่ค้างขั้น ['res', text] ไม่มีป้าย = หมวดกลาง (ตามกติกา resultTag)
+  S.res = (st, text, tag = TAG_MID, evId) => ({ kind: 'result', cadet: true, type: 'A', age: st.age, stage: stageOf(st.age), text: fill(text, st), tag, ...(evId && { evId }) });
 
   const bodyRule = (st) => { const b = N(st).body_min; return `ชีวิต ตร. ${b.police} · ทร. ${b.navy} · ทอ. ${b.airforce} · ทบ. ${b.army} ขึ้นไป (รวมว่ายน้ำ 50 เมตร)`; };
-  function bodyReach(st, h = Math.round(st.health)) {
+  // list = เหล่าที่จะเทียบ (ค่าเริ่ม = ทั้งสี่เหล่า · near_exam ส่งเฉพาะเหล่าที่ยังอยู่ในสนาม)
+  function bodyReach(st, h = Math.round(st.health), list = BR) {
     const b = N(st).body_min;
-    const ok = BR.filter((x) => h >= b[x]), next = BR.filter((x) => h < b[x]).sort((p, q) => b[p] - b[q])[0];
+    const ok = list.filter((x) => h >= b[x]), next = list.filter((x) => h < b[x]).sort((p, q) => b[p] - b[q])[0];
     return `ชีวิต ${h} → ${ok.length ? 'ถึง ' + ok.map((x) => BT(st, x)).join(' ') : 'ยังไม่ถึงสักเหล่า'}${next ? ` · ขาดอีก ${b[next] - h} ถึง ${BT(st, next)}` : ''}`;
   }
   function knowLine(st) {
@@ -451,7 +457,7 @@ const CADET = (() => {
       { label: 'ขอโทษ', fx, result: `${who}พยักหน้า แต่ไม่ได้มองหน้า` }, { label: 'อธิบายว่ายังไม่พร้อม', fx, result: 'พูดจบแล้วห้องก็เงียบเหมือนเดิม' },
       { label: 'ไม่พูดอะไร เข้าห้องไป', fx, result: 'ได้ยินเสียงล้างจานนานกว่าทุกวัน' }, { label: 'ออกไปนั่งข้างนอกคนเดียว', fx, result: 'กลับเข้าบ้านตอนไฟดับหมดแล้ว' }]);
   };
-  S.nearExam = (st) => C('near_exam', 'วันก่อนสอบพละ', `พรุ่งนี้เช้าคือวันพลศึกษาและตรวจร่างกาย ร่างกายตอนนี้ ${bodyReach(st)}\nเหลือวันนี้วันเดียว จะใช้มันยังไง`, [
+  S.nearExam = (st) => C('near_exam', 'วันก่อนสอบพละ', `พรุ่งนี้เช้าคือวันพลศึกษาและตรวจร่างกาย ร่างกายตอนนี้ ${bodyReach(st, undefined, st.cadet.p2.branches.filter((b) => st.cadet.p2.written[b]))}\nเหลือวันนี้วันเดียว จะใช้มันยังไง`, [
     { label: 'ซ้อมพละต่อแบบหนัก', hint: 'ได้ชีวิตเพิ่ม แต่อาจเจ็บจนสอบไม่ไหว',
       outcomes: [{ p: 1 - (N(st).exam_injury ?? 0.15), result: 'ซ้อมหนักอีกรอบ วิ่งพันเมตรเร็วที่สุดตั้งแต่เคยจับเวลา', fx: { health: 2 } },
         { p: N(st).exam_injury ?? 0.15, result: 'ข้อเท้าพลิกตอนกระโดดไกล ตกค่ำบวมจนลงน้ำหนักไม่ได้', _injure: true }] },
