@@ -1,7 +1,7 @@
-import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary } from '../engine/index.mjs';
+import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
@@ -119,12 +119,12 @@ function statusBar(card, s) {
     heart.setAttribute('aria-label', 'ใกล้ตาย');
     age.append(heart);
   }
-  r1.append(avatar(card.age), who, age);
+  r1.append(avatar(card.age), who, sbRight(age, lifeMoneyRow(s)));
   const delta = st.dead ? null : yearDelta(card.age, s);
   const ul = el('ul', 'sb-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
-    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN);
+    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN, String(v), k);
     const d = delta?.[k];
     if (d) {
       const em = el('em', d < 0 ? 'dn' : null);
@@ -135,10 +135,16 @@ function statusBar(card, s) {
     }
     ul.append(li);
   }
-  bar.append(r1, lifeMoneyRow(s), ul);
+  bar.append(r1, ul);
   return bar;
 }
-// หัวการ์ด (ui-redo ข้อ 161–162): แถวใต้ชื่อมีแค่คำ ไม่มีเกจ — ตัวเต็ม (เงินกู้ · รายได้ · ตำแหน่ง) อยู่แผงตัวฉัน/แผงเงิน (ข้อ 61)
+// คอลัมน์ขวาของแถวบน (ui-redo 109 · ข้อ 233): อายุ แล้วฐานะ + เงินสด (ต่างโลก "ทอง") ใต้อายุ — แถบเหลือสองส่วน ไม่มีแถวเงินแยก
+function sbRight(age, money) {
+  const right = el('span', 'sb-right');
+  right.append(age, money);
+  return right;
+}
+// หัวการ์ด (ui-redo ข้อ 161–162): แถวใต้ชื่อมีแค่คำ ไม่มีเกจ — ตัวเต็ม (เงินกู้ · รายได้ · ตำแหน่ง) อยู่แผงตัวฉัน (ข้อ 61 · เงินรวมเข้าแผงตัวฉันแล้ว ui-redo 131)
 // อาชีพเป็นบรรทัดแยกจากบรรทัดจังหวัด ป้ายพักทับแค่บรรทัดจังหวัด (data-where) อาชีพจึงยังอยู่
 const headJob = (text) => el('small', 'hd-job', text);
 // เกษียณบนหัวการ์ดเหลือคำเดียว — "เคยเป็น…" ยาวจนตกบรรทัดที่ 390 และแผงตัวฉันบอกครบอยู่แล้ว
@@ -155,17 +161,21 @@ function headCash(label, value, warn = null) {
 }
 function lifeMoneyRow(s) {
   const row = el('div', 'hd-row');
-  // เงินกู้เป็นยอดค้างของสัญญา ไม่หักจากเงินสด (เหมือนแผงเงิน) — มีกู้ชนะติดลบเมื่อเป็นทั้งคู่ เพราะเป็นเหตุที่ผู้เล่นต้องทำอะไรต่อ
+  // เงินกู้เป็นยอดค้างของสัญญา ไม่หักจากเงินสด (เหมือนช่องเงินในแผงตัวฉัน) — มีกู้ชนะติดลบเมื่อเป็นทั้งคู่ เพราะเป็นเหตุที่ผู้เล่นต้องทำอะไรต่อ
   const warn = totalDebt(st) > 0 ? 'มีกู้' : s.money < 0 ? 'ติดลบ' : null;
   row.append(el('span', 'mk', 'ฐานะ'), el('span', 'hd-word', classNow(st)), headCash('เงินสด', shortBaht(Math.round(s.money)), warn));
   return row;
 }
 // ช่องค่าหนึ่งช่อง: ป้าย ตัวเลข แถบเส้น — แถบสถานะกับแผงตัวฉันของทั้งสองโลกใช้ตัวเดียวกัน หน้าตาจึงไม่แยกกันเพี้ยน
 // shown = ตัวเลขบนป้ายเมื่อไม่ใช่ค่าเดียวกับความยาวแถบ (เกจทองต่างโลก: แถบเป็น % ของสเกล ป้ายเป็นทองจริง)
-function meterLi(label, v, low, shown = String(v)) {
+// icon = key ค่าสำหรับไอคอนหน้าชื่อ · ไอคอน aria-hidden ชื่อค่ายังเป็นข้อความเดิม โปรแกรมอ่านจออ่านเท่าเดิม
+function meterLi(label, v, low, shown = String(v), icon = null) {
   const li = el('li', low ? 'low' : null);
   const head = el('span', 'mh');
-  head.append(el('span', 'mk', label), el('b', 'num', shown));
+  const mk = el('span', 'mk', label);
+  const svg = icon && statIcon(icon);
+  if (svg) mk.insertAdjacentHTML('afterbegin', svg);
+  head.append(mk, el('b', 'num', shown));
   const track = el('span', 'br');
   const fill = el('i');
   fill.style.width = `${v}%`;
@@ -174,46 +184,109 @@ function meterLi(label, v, low, shown = String(v)) {
   return li;
 }
 
-// ปุ่มโฟกัสชีวิต (B163): แถบเต็มใต้ค่าสถานะ — การ์ดกว้างไม่เกิน 460 ทุกจอ ข้างค่าสถานะไม่มีที่พอ
-// ไม่ใช่ตัวเลือกของการ์ด (อยู่นอก .choices · ไม่มีเลขปุ่มลัด) · เปลี่ยนแล้วเซฟทันที ผลไปคิดตอนสิ้นปี
+// แท็บโฟกัสชาติไทย (ui-redo 50 · ข้อ 65 68 69 · JSON 47 แบบ ก รายการเดียว): ตอนนี้ · เปลี่ยนเป็น · ปณิธาน
+// ไม่ใช่ตัวเลือกของการ์ด (ไม่มีเลขปุ่มลัด) · เปลี่ยนแล้วเซฟทันที ผลไปคิดตอนสิ้นปี
 const focusName = (id) => (id === FOCUS_FLOW ? FOCUS_FLOW_NAME : lifeFocusDefs(st)[id].name);
 const focusFx = (id) => (id === FOCUS_FLOW ? 'ไม่ทุ่มเรื่องไหนเป็นพิเศษ' : focusWords(lifeFocusDefs(st)[id], STAT_LABELS));
-function focusBar(card, open = false) {
+// ปีสะสมเป็นคำ ไม่บอกเลขเกณฑ์ (ข้อ 68) · ชำนาญแล้ว = ครบปีที่ต่อสายได้ ตัวเดียวกับที่แกนใช้เปิดปลายสาย
+function focusWord(id) {
+  const n = st.focusYears?.[id] ?? 0;
+  if (!n) return null;
+  return n >= st.content.focus.chain_years ? el('span', 'ft-word full', 'ชำนาญแล้ว') : el('span', 'ft-word', 'เริ่มชำนาญ');
+}
+const stageIdx = (name) => STAGES.findIndex((s) => s.name === name);
+// ปณิธาน = สายต้น → ปลาย (after ในทะเบียน) ที่ยังมีความหมายตอนนี้: เลือกได้อยู่ · เคยทุ่มต้นสายแล้ว · หรือยังทันช่วงวัยของปลายสาย
+// สถานะอ่านจาก focusMet ตัวเดียวกับที่แกนเปิดปลายสาย — ครบในช่วงวัยไหนเปิดตั้งแต่ช่วงถัดไป
+function focusGoals(offers) {
+  const defs = lifeFocusDefs(st);
+  const stage = stageOf(st.age);
+  const now = stageIdx(stage);
+  const later = (d) => !d.stages || d.stages.some((s) => stageIdx(s) > now);
+  const rows = [];
+  for (const [id, d] of Object.entries(defs)) {
+    if (!d.after) continue;
+    const from = d.after;
+    const met = st.focusMet?.[from];
+    const tried = (st.focusYears?.[from] ?? 0) > 0;
+    let cls = '', text;
+    if (offers.includes(id)) [cls, text] = ['open', `${focusName(from)}ชำนาญแล้ว · เลือกได้ในช่วงนี้`];
+    else if (met === stage) text = `${focusName(from)}ชำนาญแล้ว · เลือกได้ตั้งแต่ช่วงวัยถัดไป`;
+    else if (met !== undefined) [cls, text] = later(d) || d.stages?.includes(stage) ? ['', `${focusName(from)}ชำนาญแล้ว · ยังไม่เข้าเงื่อนไขตอนนี้`] : ['gone', `${focusName(from)}ชำนาญแล้ว · ช่วงวัยที่เลือกได้ผ่านไปแล้ว`];
+    else if (!later(d)) continue;
+    else if (tried) text = `${focusName(from)}เริ่มชำนาญ · ทุ่มต่ออีกหน่อยจะเปิด`;
+    else if (offers.includes(from)) text = 'ยังไม่ได้ทุ่ม';
+    else continue;
+    const li = el('li', cls || null);
+    li.append(el('b', null, `${focusName(from)} → ${d.name}`), el('span', 'st', text));
+    rows.push(li);
+  }
+  return rows;
+}
+function focusPanel(card) {
+  const wrap = el('div', 'ft');
+  if (st.dead || card.kind === 'death') {
+    wrap.append(...focusSummary());
+    return wrap;
+  }
   const cur = st.focus ?? FOCUS_FLOW;
-  const wrap = el('div', 'focus');
-  const btn = el('button', 'focus-btn');
-  btn.type = 'button';
-  btn.setAttribute('aria-expanded', String(open));
-  const fx = focusFx(cur);
-  btn.append(el('span', 'focus-k', 'โฟกัส'), el('b', null, focusName(cur)), el('span', 'focus-fx', fx), el('span', 'focus-go', open ? 'ปิด' : 'เปลี่ยน'));
-  const pick = el('div', 'focus-pick');
-  pick.hidden = !open;
-  for (const id of lifeFocusOffers(st)) {
+  const defs = lifeFocusDefs(st);
+  const nowBox = el('div', 'ft-now');
+  nowBox.append(el('b', null, focusName(cur)), ...[focusWord(cur)].filter(Boolean), el('span', 'ft-fx', focusFx(cur)));
+  const offers = lifeFocusOffers(st);
+  const ul = el('ul', 'ft-list');
+  for (const id of offers) {
     const b = el('button', id === cur ? 'on' : null);
     b.type = 'button';
+    b.dataset.focus = id;
     b.setAttribute('aria-pressed', String(id === cur));
-    b.append(el('b', null, focusName(id)), el('span', 'focus-fx', focusFx(id)));
+    b.append(el('b', null, focusName(id)), ...[focusWord(id)].filter(Boolean));
+    if (defs[id]?.after) b.append(el('span', 'ft-new', 'ปลายสาย'));
+    b.append(el('span', 'ft-fx', focusFx(id)));
     b.onclick = () => {
       setLifeFocus(st, id);
       saveWrite(card);
-      const next = focusBar(card);
+      const next = focusPanel(card);
       wrap.replaceWith(next);
-      next.querySelector('.focus-btn').focus();
+      next.querySelector(`[data-focus="${id}"]`)?.focus();
     };
-    pick.append(b);
+    const li = el('li');
+    li.append(b);
+    ul.append(li);
   }
-  btn.onclick = () => {
-    const next = focusBar(card, pick.hidden);
-    wrap.replaceWith(next);
-    next.querySelector('.focus-btn').focus();
-  };
-  wrap.append(btn, pick);
+  const goals = focusGoals(offers);
+  const chain = el('ul', 'ft-chain');
+  chain.append(...goals);
+  wrap.append(el('h3', null, 'ตอนนี้'), nowBox, el('h3', null, 'เปลี่ยนเป็น'), ul, el('h3', null, 'ปณิธาน'), goals.length ? chain : el('p', 'ft-note', 'ช่วงวัยนี้ไม่มีสายที่ต่อได้'));
   return wrap;
+}
+// ตอนตาย/ปรโลก (ข้อ 69): เรื่องที่ทุ่มมากสุด = focusMain ตัวเดียวกับที่ทายาทรับ · เรื่องอื่นเรียงตามปีที่ทุ่ม ไม่บอกตัวเลข
+function focusSummary() {
+  const defs = lifeFocusDefs(st);
+  const main = focusMain(st, defs);
+  const head = el('h3', null, 'ชาตินี้ทุ่มเทมากสุด');
+  if (!main) return [head, el('p', 'ft-note', `${FOCUS_FLOW_NAME} ไม่ได้ทุ่มเรื่องไหนเต็มปี`)];
+  const box = el('div', 'ft-now');
+  box.append(el('b', null, focusName(main)), ...[focusWord(main)].filter(Boolean));
+  const kid = defs[main].kid;
+  if (kid && defs[kid]) box.append(el('span', 'ft-fx', `ทายาทในตระกูลเริ่มชาติด้วย${defs[kid].name}`));
+  const ys = st.focusYears ?? {};
+  const rest = Object.keys(defs).filter((id) => id !== main && ys[id] > 0).sort((a, b) => ys[b] - ys[a]);
+  if (!rest.length) return [head, box];
+  const ul = el('ul', 'ft-ro ft-list');
+  for (const id of rest) {
+    const li = el('li', null, `${focusName(id)} `);
+    const w = focusWord(id);
+    if (w) li.append(w);
+    ul.append(li);
+  }
+  return [head, box, el('h3', null, 'เรื่องอื่นที่เคยทุ่ม'), ul];
 }
 
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทยและต่างโลก · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
 // ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ
-const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบครัว'], ['money', 'เงิน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
+// โฟกัสแยกแท็บระหว่างตัวฉัน–ครอบครัว (ui-redo 50) · ชาติไทยมีไอคอนคู่ป้าย ต่างโลก/ปรโลกยังเป็นป้ายอย่างเดียวจนใบ 51
+// เงินไม่มีปุ่มของตัวเอง อยู่ในแผงตัวฉัน (ui-redo 131 · ข้อ 229)
+const LIFE_MENU = [['me', 'ตัวฉัน'], ['focus', 'โฟกัส'], ['family', 'ครอบครัว'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
 // ต่างโลกไม่มีครอบครัวกับเงินบาทให้ดู — ทอง ชื่อเสียง อาชีพอยู่ในแผงตัวฉันของร่างนี้ (ui-redo ใบ 13)
 // สกิลแยกปุ่มเพราะสมุดสกิล (06s-3) จะมาต่อที่แผงนี้ · ไม่มีปุ่มความเร็ว: ใบตาไม่เดินเอง ผู้เล่นกด "ต่อ" เองแบบชาติไทย (ui-redo 81)
 const ISEKAI_MENU = [['me', 'ตัวฉัน'], ['skill', 'สกิล'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
@@ -225,7 +298,7 @@ function lifeMenu(card, box, after = false) {
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
   const isk = card.kind === 'isekai';
-  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), skill: () => isekaiSkillPanel(card.status), family: after ? clanPanel : familyPanel, money: () => moneyPanel(card), more: morePanel, past: pastPanel };
+  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), focus: () => focusPanel(card), skill: () => isekaiSkillPanel(card.status), family: after ? clanPanel : familyPanel, more: morePanel, past: pastPanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
   const views = { shelf: () => openShelf() };
   // ต่างโลกช่วงยังไม่มีร่าง (ไม่มีหน้าต่างสถานะ) ไม่มีอะไรให้แผงตัวฉันกับสกิลโชว์
@@ -234,6 +307,7 @@ function lifeMenu(card, box, after = false) {
     const b = el('button', null);
     b.type = 'button';
     b.dataset.menu = id;
+    if (!isk && !after) b.insertAdjacentHTML('beforeend', menuIcon(id));
     b.append(el('span', null, label));
     if (sheets[id]) {
       b.setAttribute('aria-expanded', 'false');
@@ -323,29 +397,93 @@ function openSheet(title, content, box, from, id) {
 }
 const closeSheet = (keep) => sheetClose?.(keep);
 
-// แผงตัวฉัน: ค่าเต็มคู่คำอธิบาย · โฟกัส · ฐานะและงาน (ย้ายมาจากใต้แถบสถานะของการ์ด) · ไม่มีลูกศรปีนี้ — ลูกศรอยู่บนแถบสถานะที่เดียว
-// การ์ดตายเปิดได้เหมือนกัน เห็นค่าตอนจากไป แต่ไม่มีโฟกัส (ชีวิตจบแล้ว)
+// แผงตัวฉัน: ค่าเต็มคู่คำอธิบาย · เงิน · ฐานะและงาน (ย้ายมาจากใต้แถบสถานะของการ์ด) · ไม่มีลูกศรปีนี้ —
+// โฟกัสย้ายไปแท็บของตัวเองแล้ว (ui-redo 50) · การ์ดตายเปิดได้เหมือนกัน เห็นค่าตอนจากไป
+// คำอธิบาย "เงิน · หนี้" อยู่ใต้เงินที่เดียว (ui-redo 131 · ข้อ 229) · ประวัติงานท้ายฐานะและงาน
 function mePanel(card) {
   const s = statsOf(st);
   const help = new Map(STAT_HELP);
   const wrap = el('div', 'me');
+  // คำอธิบายทุกชิ้นพับด้วยปุ่มเดียว (ข้อ 230) — เกจกับยอดเงินไม่พับ
+  const hp = [];
   const ul = el('ul', 'me-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
-    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN && !st.dead);
-    if (help.has(STAT_LABELS[k])) li.append(el('p', null, help.get(STAT_LABELS[k])));
+    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN && !st.dead, String(v), k);
+    if (help.has(STAT_LABELS[k])) li.append(hp[hp.push(el('p', null, help.get(STAT_LABELS[k]))) - 1]);
     ul.append(li);
   }
-  const shown = new Set(SHOWN_STATS.map((k) => STAT_LABELS[k]));
+  const shown = new Set([...SHOWN_STATS.map((k) => STAT_LABELS[k]), MONEY_HELP]);
   const dl = el('dl');
   for (const [k, v] of STAT_HELP) if (!shown.has(k)) dl.append(el('dt', null, k), el('dd', null, v));
-  wrap.append(el('h3', null, 'ค่าสถานะ'), ul, dl);
-  if (!st.dead && card.kind !== 'death') wrap.append(el('h3', null, 'โฟกัส'), focusBar(card));
+  hp.push(dl);
+  const hh = el('div', 'me-hh');
+  const fold = el('button', 'me-fold');
+  fold.type = 'button';
+  const setOpen = (open) => {
+    for (const e of hp) e.hidden = !open;
+    fold.setAttribute('aria-expanded', String(open));
+    fold.textContent = open ? 'ซ่อนคำอธิบาย' : 'ดูคำอธิบาย';
+  };
+  fold.onclick = () => {
+    const open = fold.getAttribute('aria-expanded') !== 'true';
+    setOpen(open);
+    meHelpSave(open);
+  };
+  hh.append(el('h3', null, 'ค่าสถานะ'), fold);
+  wrap.append(hh, ul, dl, el('h3', null, 'เงิน'), moneyBox(card, hp));
   const meta = el('p', 'meta');
   metaLine(meta, standParts(card));
   wrap.append(el('h3', null, 'ฐานะและงาน'), meta);
+  const wh = workHistory();
+  if (wh) wrap.append(el('h3', null, 'งานที่เคยทำ'), wh);
   if (itemsVisible(st)) wrap.append(el('h3', null, 'ของติดตัว'), kitList());
+  setOpen(meHelpOpen());
   return wrap;
+}
+const MONEY_HELP = 'เงิน · หนี้';
+// พับ/กางคำอธิบายจำในเครื่อง ไม่ลงเซฟเกม (ข้อ 230) · ไม่เคยกด = พับ · storage ปิด = พับทุกครั้ง ไม่พัง
+const ME_HELP_KEY = 'next-life-me-help-v1';
+function meHelpOpen() {
+  try {
+    return localStorage.getItem(ME_HELP_KEY) === 'open';
+  } catch {
+    return false;
+  }
+}
+function meHelpSave(open) {
+  try {
+    localStorage.setItem(ME_HELP_KEY, open ? 'open' : 'closed');
+  } catch {
+    // ไม่มี storage: ค่าพับอยู่แค่แผงนี้
+  }
+}
+// ประวัติงานเรียงช่วงอายุจาก st.workSpans (ข้อ 231) · ปีที่ทำก่อนมีช่องนี้ (เซฟเก่า) ขึ้นเป็นปีรวมต่ออาชีพไว้ก่อน ไม่มีอายุ
+// เพราะไม่รู้ว่าทำช่วงไหน — เจ้าของเคาะไม่เดาอายุย้อนหลัง · ยังไม่เคยทำงาน = ไม่มีหัวนี้
+function workHistory() {
+  const occs = st.content.era.finance.occupations;
+  const name = (id) => occs.find((o) => o.id === id)?.name ?? id;
+  const spans = st.workSpans ?? [];
+  const inSpans = {};
+  for (const x of spans) inSpans[x.occ] = (inSpans[x.occ] ?? 0) + x.to - x.from + 1;
+  const ul = el('ul', 'wh wh-me');
+  for (const [id, n] of Object.entries(st.workYears ?? {})) {
+    const left = n - (inSpans[id] ?? 0);
+    if (left <= 0) continue;
+    const li = el('li');
+    li.append(el('span', null, name(id)), el('b', 'num', `${left} ปี`));
+    ul.append(li);
+  }
+  const last = spans.at(-1);
+  // ปีนี้ยังไม่ถูกนับ (นับตอนขึ้นปี) — ช่วงที่จบปีที่แล้วด้วยอาชีพเดิมและยังทำอยู่คือช่วงปัจจุบัน
+  const now = !st.dead && isWorking(st) && last?.occ === st.occupation && last.to === st.age - 1;
+  for (const x of spans) {
+    const li = el('li');
+    const to = x === last && now ? 'ตอนนี้' : x.to === x.from ? '' : x.to;
+    li.append(el('span', 'wh-age', `อายุ ${x.from}${to === '' ? '' : `–${to}`}`), el('span', null, name(x.occ)));
+    ul.append(li);
+  }
+  return ul.childElementCount ? ul : null;
 }
 // ของติดตัว (B78): ช่องสวมใส่ตามทะเบียน + กระเป๋า n/cap · ไม่มีปุ่มใส่/ถอด — ของลงช่องเองตอนได้ เป้เต็มขายเอง
 // ช่องว่างเขียนว่า "ว่าง" ให้เห็นว่ามีช่องรออยู่ (หัวนี้โชว์เฉพาะเมื่อ itemsVisible)
@@ -1918,8 +2056,8 @@ const fxIn = (x) => x * x * x;
 const fxBack = (x) => 1 + 2.2 * (x - 1) ** 3 + 1.2 * (x - 1) ** 2;
 const fxSvg = (w, h, inner, cls = '') => `<svg class="${cls}" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">${inner}</svg>`;
 const FX_INK = ART_INK;
-// ค่าเจ้าของเคาะ (ui-redo ข้อ 160) = DEF ของหน้า tweak title-fx · หายาก = เงิน ตำนาน = ทอง โลหะคนละชนิด
-const FX_TITLE = { rare: '#C9CDD3', leg: ART_INK.gold, legInk: ART_INK.lacquer, frameW: 1.6, glow: 46, fs: 17, nameW: 200, durRare: 900, durLeg: 1400 };
+// ค่าเจ้าของเคาะ (ui-redo ข้อ 160 · 242–244) · หายาก = เงิน ตำนาน = ทอง โลหะคนละชนิด
+const FX_TITLE = { rare: '#C9CDD3', leg: ART_INK.gold, legInk: ART_INK.lacquer, frameW: 1.6, glow: 46, fs: 18, subFs: 12, nameW: 200, durRare: 900, durLeg: 1400 };
 // ฉากซ้อนเต็มจอของตาย/ฉายา — จบเองค่อยจางออก · ถูกข้ามหายทันที
 const fxOv = () => document.body.appendChild(el('div', 'fx-ov'));
 function fxOvEnd(ov, natural) {
@@ -1980,26 +2118,27 @@ const FX = {
       p.cap.style.transform = `translateY(${6 * (1 - fxSpan(t, 0.55, 1))}px)`;
     },
     end: (p, natural) => fxOvEnd(p.ov, natural) },
-  // ตราเหรียญ (ui-redo ข้อ 160 · แบบ medal ของหน้า tweak title-fx) — ภาพนิ่งหายาก/ตำนานต้องแยกด้วยตา (ข้อ 39)
-  // หายาก = เหรียญรักขอบเงิน ดาวดวงเดียว ขีดเส้นเดียว · ตำนาน = เหรียญทองล้อมกลีบบัว 12 กลีบ วงจุดทอง ดาว 3 ดวง ชื่อทองขีดสองเส้น
+  // ตราแปดเหลี่ยม (ui-redo ข้อ 160 · 242) — ภาพนิ่งหายาก/ตำนานต้องแยกด้วยตา (ข้อ 39)
+  // หายาก = ตรารักขอบเงิน เส้นในจาง ดาวดวงเดียว ขีดเส้นเดียว · ตำนาน = ตราทองล้อมกลีบบัว 12 กลีบ วงจุดทอง ดาว 3 ดวง ชื่อทองขีดสองเส้น
   title: {
     build: (ov, o) => {
       const leg = o.tier === 'legend';
       const id = `fx${++fxUid}`;
       const T = FX_TITLE, w = T.frameW;
       const star = (x, y, r, f) => `<path d="M${x} ${y - r}L${x + r * 0.3} ${y - r * 0.3}L${x + r} ${y}L${x + r * 0.3} ${y + r * 0.3}L${x} ${y + r}L${x - r * 0.3} ${y + r * 0.3}L${x - r} ${y}L${x - r * 0.3} ${y - r * 0.3}z" fill="${f}"/>`;
+      const oct = (r) => Array.from({ length: 8 }, (_, i) => { const a = Math.PI / 8 + i * Math.PI / 4; return `${(150 + r * Math.cos(a)).toFixed(2)},${(48 + r * Math.sin(a)).toFixed(2)}`; }).join(' ');
       const name = (fill) => `<text class="fx-name" x="150" y="110" text-anchor="middle" font-size="${T.fs}" fill="${fill}"></text>`;
-      const sub = (fill) => `<text class="fx-sub" x="150" y="160" text-anchor="middle" font-size="11" fill="${fill}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`;
+      const sub = (fill) => `<text class="fx-sub" x="150" y="160" text-anchor="middle" font-size="${T.subFs}" fill="${fill}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`;
       // ม่าน 0.6 ยังเห็นตัวหนังสือการ์ดสว่างทะลุ ⇒ ชื่อ+ป้ายต้องมีพื้นทึบรองของตัวเอง (ui-redo ข้อ 183) · กว้างพอชื่อที่ถูกบีบเต็ม nameW
       const plate = (stroke) => `<rect class="fx-plate" x="${150 - T.nameW / 2 - 12}" y="86" width="${T.nameW + 24}" height="84" rx="8" fill="${FX_INK.lacquer2}" stroke="${stroke}" stroke-width="0.8" stroke-opacity="0.5"/>`;
       let inner;
       if (!leg) {
-        inner = `${plate(T.rare)}<g class="fx-medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="30" fill="${FX_INK.lacquer2}" stroke="${T.rare}" stroke-width="${w}"/>${star(150, 48, 13, T.rare)}</g>${name(FX_INK.cream)}<path class="fx-line" d="M70 120h160" stroke="${T.rare}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(T.rare)}`;
+        inner = `${plate(T.rare)}<g class="fx-medal" style="transform-origin:150px 48px"><polygon points="${oct(30)}" fill="${FX_INK.lacquer2}" stroke="${T.rare}" stroke-width="${w}"/><polygon points="${oct(25)}" fill="none" stroke="${T.rare}" stroke-width="0.7" stroke-opacity="0.7"/>${star(150, 48, 12, T.rare)}</g>${name(FX_INK.cream)}<path class="fx-line" d="M70 120h160" stroke="${T.rare}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(T.rare)}`;
       } else {
-        const petals = Array.from({ length: 12 }, (_, i) => `<path class="fx-petal" d="M150 48q-9 -22 0 -42q9 20 0 42z" transform="rotate(${i * 30} 150 48)" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="0.6"/>`).join('');
+        const petals = Array.from({ length: 12 }, (_, i) => `<path class="fx-petal" d="M150 48q-9 -20.8 0 -40q9 19.2 0 40z" transform="rotate(${i * 30} 150 48)" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="0.6"/>`).join('');
         const R = 30 + T.glow * 0.5;
         const dots = Array.from({ length: 16 }, (_, i) => `<circle class="fx-dot" cx="${150 + R * Math.cos(i * Math.PI / 8)}" cy="${48 + R * Math.sin(i * Math.PI / 8)}" r="1.8" fill="${FX_INK.gold2}"/>`).join('');
-        inner = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${FX_INK.gold2}"/><stop offset=".55" stop-color="${T.leg}"/><stop offset="1" stop-color="${FX_INK.bronze2}"/></linearGradient></defs>${plate(T.leg)}<g>${dots}</g><g>${petals}</g><g class="fx-medal" style="transform-origin:150px 48px"><circle cx="150" cy="48" r="26" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="${w}"/><circle cx="150" cy="48" r="21" fill="none" stroke="${T.legInk}" stroke-width="0.8"/>${star(150, 42, 9, T.legInk)}${star(139, 56, 5, T.legInk)}${star(161, 56, 5, T.legInk)}</g>${name(FX_INK.gold2)}<path class="fx-line" d="M70 119h160M90 124h120" stroke="${T.leg}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(FX_INK.gold2)}`;
+        inner = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${FX_INK.gold2}"/><stop offset=".55" stop-color="${T.leg}"/><stop offset="1" stop-color="${FX_INK.bronze2}"/></linearGradient></defs>${plate(T.leg)}<g>${dots}</g><g>${petals}</g><g class="fx-medal" style="transform-origin:150px 48px"><polygon points="${oct(27)}" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="${w}"/><polygon points="${oct(22)}" fill="none" stroke="${T.legInk}" stroke-width="0.8"/>${star(150, 42, 9, T.legInk)}${star(139, 56, 5, T.legInk)}${star(161, 56, 5, T.legInk)}</g>${name(FX_INK.gold2)}<path class="fx-line" d="M70 119h160M90 124h120" stroke="${T.leg}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(FX_INK.gold2)}`;
       }
       ov.innerHTML = `<div class="fx-veil"></div><div class="fx-title">${fxSvg(300, 170, inner)}</div>`;
       const q = (s) => ov.querySelector(s);
@@ -2181,7 +2320,7 @@ function render(card) {
     share.append(el('summary', null, BTN.share), menu);
     rest.append(share);
   } else {
-    // ฐานะ/งานอยู่แผงตัวฉัน (ui-redo ใบ 04) · เงินอยู่แผงเงิน (ใบ 07) — ใต้แถบสถานะเหลือแค่เนื้อการ์ด
+    // ฐานะ/งาน/เงินอยู่แผงตัวฉัน (ui-redo ใบ 04 · 131) — ใต้แถบสถานะเหลือแค่เนื้อการ์ด
     box.append(statusBar(card, s));
     // ตัวคูณนิสัย (B41) มีผลกับตัวเลือกก่อนหน้า — บอกบนใบถัดไปแทนการ์ดผลเพิ่ม
     if (card.because) body.append(el('p', 'note', card.because));
@@ -2491,6 +2630,10 @@ function pastPanel() {
   const fam = el('div', 'fam');
   fam.append(...kinParts(kin.filter((m) => !ANIMAL_ROLES.includes(m.role))), ...kinParts(kin.filter((m) => ANIMAL_ROLES.includes(m.role)), true));
   wrap.prepend(head);
+  // ปรโลกไม่มีแท็บโฟกัส — สรุปทุ่มเทมากสุดของชีวิตที่จบมาอยู่ในชีวิตที่แล้ว (ข้อ 69)
+  const ft = el('div', 'ft');
+  ft.append(...focusSummary());
+  wrap.append(ft);
   if (fam.childElementCount) wrap.append(fam);
   return wrap;
 }
@@ -2575,9 +2718,9 @@ function deathTabs(card, parts) {
   pick(deathTabOf.get(card) ?? 0);
   return wrap;
 }
-// แผงเงิน (ui-redo ใบ 07): ย้ายบรรทัดเงินใต้แถบสถานะมาเป็นช่องละแถว · ค่าชุดเดียวกับที่การ์ดเคยบอก ไม่เปิดตัวเลขที่เกมซ่อน
-// ปุ่มกู้ยังอยู่บนการ์ดเพราะเป็นทางเลือกของการ์ดนั้น ไม่ใช่ข้อมูล
-function moneyPanel(card) {
+// ช่องเงินในแผงตัวฉัน (ui-redo ใบ 07 → 131): ย้ายบรรทัดเงินใต้แถบสถานะมาเป็นช่องละแถว · ค่าชุดเดียวกับที่การ์ดเคยบอก ไม่เปิดตัวเลขที่เกมซ่อน
+// ปุ่มกู้ยังอยู่บนการ์ดเพราะเป็นทางเลือกของการ์ดนั้น ไม่ใช่ข้อมูล · คำอธิบายใต้ยอดเข้ากลุ่มพับของแผงตัวฉัน (hp)
+function moneyBox(card, hp) {
   const s = statsOf(st);
   // คนตายไม่มีรายได้ต่อ — การ์ดตายเห็นแค่ที่ทิ้งไว้
   const working = !st.dead && isWorking(st, card.age);
@@ -2594,7 +2737,9 @@ function moneyPanel(card) {
   const wrap = el('div', 'mo');
   const dl = el('dl');
   for (const [k, v, neg] of rows) dl.append(el('dt', null, k), el('dd', neg ? 'num neg' : 'num', v));
-  wrap.append(dl, el('p', null, new Map(STAT_HELP).get('เงิน · หนี้')));
+  const note = el('p', null, new Map(STAT_HELP).get(MONEY_HELP));
+  hp.push(note);
+  wrap.append(dl, note);
   return wrap;
 }
 // แผงเพิ่มเติม: ลิงก์ท้ายหน้าเดิมทั้งชุด — ฉากที่มีเมนูซ่อนท้ายหน้า ที่นี่จึงเป็นทางเข้าเดียว · ไม่มีหน้าตั้งค่า (ui-redo ข้อ 10)
@@ -2753,7 +2898,7 @@ function earnBox(earn, key) {
   return box;
 }
 
-// การ์ดฝึกสกิล (06s): ตราเหรียญชื่อสกิลหลังกด · ปุ่มท้าย (ยังไม่ฝึก) ไม่มีเอฟเฟกต์ · ขั้นใหม่อ่านจากป้ายปุ่มที่แกนเขียน
+// การ์ดฝึกสกิล (06s): ตราชื่อสกิลหลังกด · ปุ่มท้าย (ยังไม่ฝึก) ไม่มีเอฟเฟกต์ · ขั้นใหม่อ่านจากป้ายปุ่มที่แกนเขียน
 function upgradeFx(card, i) {
   if (i >= card.choices.length - 1 || fxReduced()) return;
   const [name] = card.choices[i].split(' · ');
@@ -2809,7 +2954,7 @@ const AFTER_REALM_ART = { deva: 'after_heaven', hell: 'after_hell' };
 // วงปรโลก (03a): แถว 4 ค่าแบบแถบสถานะ ใต้หัวการ์ด · ชีวิตทิพย์ต่ำ = สีเตือนแบบชีวิต
 function loopBar(l) {
   const ul = el('ul', 'sb-m');
-  for (const k of LOOP_KEYS) ul.append(meterLi(LOOP_LABELS[k], Math.round(l[k]), k === 'health' && l[k] <= HEALTH_WARN));
+  for (const k of LOOP_KEYS) ul.append(meterLi(LOOP_LABELS[k], Math.round(l[k]), k === 'health' && l[k] <= HEALTH_WARN, undefined, k));
   // กรอบ .sb ให้ระยะขอบเท่าแถบสถานะชีวิต
   const bar = el('div', 'sb');
   bar.append(ul);
@@ -2963,12 +3108,12 @@ function isekaiBar(card, s, where) {
     heart.setAttribute('aria-label', 'ใกล้ตาย');
     age.append(heart);
   }
-  r1.append(ini, who, age);
-  const ul = el('ul', 'sb-m');
-  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
   const row = el('div', 'hd-row');
   row.append(headCash('ทอง', s.gold.toLocaleString('en-US')));
-  bar.append(r1, row, ul);
+  r1.append(ini, who, sbRight(age, row));
+  const ul = el('ul', 'sb-m');
+  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN, undefined, 'hp'), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false, undefined, k)));
+  bar.append(r1, ul);
   return bar;
 }
 // เกจทองต่างโลก: หลอดเต็ม = ทองตั้งต้นของร่าง + ISEKAI_GOLD_SPAN · ทองที่หาได้ทั้งชาติแทบไม่ขึ้นกับทองตั้งต้น
@@ -2985,12 +3130,12 @@ function isekaiGoldFill(k, gold) {
 function isekaiMePanel(s) {
   const wrap = el('div', 'me');
   const ul = el('ul', 'me-m');
-  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
+  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN, undefined, 'hp'), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false, undefined, k)));
   // ชาติต่างโลกหลังตายอยู่ใน af.isekai · ทริประหว่างชาติไทยอยู่ใน st.trip
   const k = af?.isekai ?? st?.trip;
   const gold = isekaiGoldFill(k, s.gold);
   if (gold !== null) {
-    const li = meterLi('ทอง', Math.round(gold * 1000) / 10, false, s.gold.toLocaleString('en-US'));
+    const li = meterLi('ทอง', Math.round(gold * 1000) / 10, false, s.gold.toLocaleString('en-US'), 'gold');
     li.classList.add('gold');
     // ขีด = ทองตั้งต้นของร่างจากตาราง (ไม่ใช่ทองหลังพกมา) · ร่างเริ่ม 0 ขีดชิดซ้ายมองไม่เห็น จึงไม่วาด
     const start = isekaiGoldFill(k, isekaiGoldStart(k));
@@ -3531,6 +3676,8 @@ if (logoEl && window.ResizeObserver) new ResizeObserver(headEdge).observe(logoEl
 
 // ภาพถ่าย v2 ก่อน · ไม่มีจึงลองเซฟ v1 (เล่นซ้ำตรงการ์ดเดิม = เขียนทับเป็น v2 ทันที) · v1 ไม่ตรง/เซฟเสีย = หน้าเกมอัปเดต
 function boot() {
+  // ล้างโครงหน้าเปิดที่มากับ HTML (template.html) — ทุกทางข้างล่างวาดจอใหม่ลง root
+  root.replaceChildren();
   const seed = linkSeed();
   dropLinkSeed();
   let card = snapRead();

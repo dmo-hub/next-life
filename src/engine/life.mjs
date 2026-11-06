@@ -887,6 +887,12 @@ function stepYear(st) {
   if (isWorking(st)) {
     const w = (st.workYears ??= {});
     w[st.occupation] = (w[st.occupation] ?? 0) + 1;
+    // ช่วงงานตามอายุ (ui-redo 131) ให้แผงตัวฉันเรียงประวัติงาน · ปีว่างงานคั่น = ช่วงใหม่ · workYears คงไว้ให้ past/titles
+    // เซฟก่อนมีช่องนี้เริ่มนับจากปีที่เล่นต่อ — ปีก่อนหน้าจอคิดจาก workYears ลบผลรวมช่วง ไม่เดาอายุย้อนหลัง
+    const spans = (st.workSpans ??= []);
+    const last = spans.at(-1);
+    if (last?.occ === st.occupation && last.to === st.age - 1) last.to = st.age;
+    else spans.push({ occ: st.occupation, from: st.age, to: st.age });
   }
 
   st.age += 1;

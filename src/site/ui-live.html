@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ปรับหน้าเล่นสด (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Pridi:wght@400;600&family=Sarabun:wght@400;600;700&family=Srisakdi:wght@700&display=swap">
+<link rel="stylesheet" href="../fonts/fonts.css">
 <style>
   /* หน้า tweak (ui-redo 02) — ไฟล์เดียว ไม่พึ่ง proto.js/ภาพ ⇒ เปิด file:// ได้ · จอต้นแบบวาดใหม่ทุกครั้งที่ค่าเปลี่ยน */
   body { margin: 0; background: #E6E0D3; color: #1F2430; font: 15px/1.55 Sarabun, "Noto Sans Thai", system-ui, sans-serif; }
@@ -486,7 +485,7 @@
     ] },
   };
   const MENUS = {
-    thai: { 5: [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['money', 'เงิน', 'money'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['life', 'ชีวิต', 'life'], ['family', 'ครอบครัว', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['money', 'เงิน', 'money'], ['shelf', 'สมุด', 'shelf']] },
+    thai: { 5: [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['life', 'ชีวิต', 'life'], ['family', 'ครอบครัว', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['money', 'เงิน', 'money'], ['shelf', 'สมุด', 'shelf']] },
     isekai: { 5: [['me', 'ตัวฉัน', 'me'], ['skill', 'สกิล', 'skill'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['life', 'ชีวิต', 'life'], ['skill', 'สกิล', 'skill'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf']], '4more': [['me', 'ตัวฉัน', 'me'], ['skill', 'สกิล', 'skill'], ['job', 'อาชีพ', 'job'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf']] },
     after: { 5: [['past', 'ชีวิตที่แล้ว', 'past'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['past', 'ชีวิตที่แล้ว', 'past'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['past', 'ชีวิตที่แล้ว', 'past'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf']] },
   };
@@ -1026,7 +1025,7 @@
   ];
   // [หัวข้อ, key ใน cfg, ฉากที่ไปดู, [ค่า, ข้อความ] ของ A B C]
   const QS = [
-    ['ชุดปุ่มเมนูล่าง (ชาติไทย)', 'menu', 'year', [['5', 'ตัวฉัน · ครอบครัว · เงิน · สมุด · เพิ่มเติม'], ['4', 'ชีวิต (รวมเงิน) · ครอบครัว · สมุด · เพิ่มเติม'], ['4more', 'ตัวฉัน · ครอบครัว · เงิน · สมุด + ปุ่ม ⋯ บนแถบสถานะ']]],
+    ['ชุดปุ่มเมนูล่าง (ชาติไทย)', 'menu', 'year', [['5', 'ตัวฉัน (รวมเงิน) · ครอบครัว · สมุด · เพิ่มเติม'], ['4', 'ชีวิต (รวมเงิน) · ครอบครัว · สมุด · เพิ่มเติม'], ['4more', 'ตัวฉัน · ครอบครัว · เงิน · สมุด + ปุ่ม ⋯ บนแถบสถานะ']]],
     ['เมนูต่างโลก', 'menu', 'isekai', [['5', 'ตัวฉัน (รวมอาชีพ) · สกิล · ความเร็ว · สมุด · เพิ่มเติม'], ['4', 'ชีวิต · สกิล · ความเร็ว · สมุด'], ['4more', 'ตัวฉัน · สกิล · อาชีพ · ความเร็ว · สมุด']]],
     ['เมนูปรโลก', 'menu', 'after', [['5', 'ชีวิตที่แล้ว · ตระกูล · สมุด · เพิ่มเติม'], ['4', 'ชีวิตที่แล้ว · สมุด · เพิ่มเติม'], ['4more', 'ชีวิตที่แล้ว · ตระกูล · สมุด']]],
     ['แท็บการ์ดตาย', 'dPre', 'death', [['a', DSETS.a.join(' · ')], ['b', DSETS.b.join(' · ')], ['c', DSETS.c.join(' · ')]]],

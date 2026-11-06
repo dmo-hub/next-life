@@ -11,7 +11,8 @@ export const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
 export const text = (s) => esc(s).replace(/\{([^{}]*)\}/g, (m, k) => `<i class="ph">${esc(k)}</i>`);
 export const choiceText = (c) => c.text ?? c.label ?? '';
 
-function card(e) {
+// หน้า tweak T14 (card-spoil-tweak.mjs) ใช้การ์ดตัวเดียวกับหน้านี้
+export function catalogCard(e) {
   const tags = [e.era ? 'บ้านเมือง' : CATEGORY[e.category], e.belief ? 'ความเชื่อ' : null].filter((t, i, a) => t && a.indexOf(t) === i);
   const choices = (e.choices ?? []).filter((c) => !c.hidden).map((c) => `<li>${text(choiceText(c))}</li>`).join('');
   return [
@@ -29,7 +30,7 @@ export function catalogHtml(content, demo = '') {
   const groups = [...STAGES.map((s) => s.name), AFTER].map((stage) => ({ stage, events: content.events.filter((e) => e.stage === stage) })).filter((g) => g.events.length);
   const nav = groups.map((g, i) => `<a href="#s${i}">${esc(g.stage)} <small>${g.events.length}</small></a>`).join('');
   const body = groups
-    .map((g, i) => `<details id="s${i}"${i === 0 ? ' open' : ''}><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map(card).join('')}</div></details>`)
+    .map((g, i) => `<details id="s${i}"${i === 0 ? ' open' : ''}><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map(catalogCard).join('')}</div></details>`)
     .join('\n');
   return `<nav class="toc">${nav}${isekaiNav(groups.length)}</nav>\n${demo ? `${demo}\n` : ''}${body}\n${isekaiCatalogHtml(groups.length)}`;
 }

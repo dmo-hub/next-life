@@ -10,6 +10,7 @@ import { SHOWN_STATS, BTN } from '../ui/labels.mjs';
 import { movedHtml } from './nav.mjs';
 import { DESIGN_AT } from './design.mjs';
 import { PUBLIC_HIDE } from './gate.mjs';
+import { FONT_DIR, fontsCss, playFonts } from './fonts.mjs';
 
 export const UI_PAGE = 'dev/ui.html';
 // หน้าที่ย้ายมาหน้านี้ — design.html เดิมคือดีไซน์ UI ตามคำเจ้าของ (ข้อ 42 · 57) ไม่ใช่สารบัญคำตัดสินเกม
@@ -26,7 +27,6 @@ export const UI_LIVE_TITLE = 'ต้นแบบปรับสด';
 const LIVE_SRC = new URL('ui-live.html', import.meta.url);
 
 const TEMPLATE = new URL('../ui/template.html', import.meta.url);
-const FONTS_DIR = new URL('../ui/fonts/', import.meta.url);
 const APP = new URL('../ui/app.mjs', import.meta.url);
 
 // CSS ทั้งก้อนในแท็ก style แรกของหน้าเล่น · ช่องฟอนต์ใส่ฟอนต์จริงของเกม
@@ -36,22 +36,12 @@ export function gameCss(tpl = readFileSync(TEMPLATE, 'utf8')) {
   return m[1].replace('/*__FONTS__*/', () => fontFaces());
 }
 
-// ชื่อไฟล์ฟอนต์ = <ชื่อตระกูลติดกัน>-<น้ำหนัก>.woff2 แบบเดียวกับที่ build.mjs ฝังในหน้าเล่น
-const WEIGHT = { Regular: 400, SemiBold: 600, Bold: 700 };
-export function gameFonts(dir = FONTS_DIR) {
-  return readdirSync(dir)
-    .filter((f) => f.endsWith('.woff2'))
-    .sort()
-    .map((f) => {
-      const [fam, w] = f.replace(/\.woff2$/, '').split('-');
-      return { file: f, family: fam.replace(/([a-z])([A-Z])/g, '$1 $2'), weight: WEIGHT[w] ?? 400 };
-    });
+// ฟอนต์ที่หน้าเล่นใช้ จากตารางกลาง (src/site/fonts.mjs) — ไม่อ่านจากโฟลเดอร์ เพราะโฟลเดอร์มีฟอนต์ของหน้าอื่นด้วย (ui-redo 96)
+export function gameFonts() {
+  return playFonts().map(([family, weight, file]) => ({ file: `${file}.woff2`, family, weight }));
 }
-function fontFaces(dir = FONTS_DIR) {
-  return gameFonts(dir)
-    .map((f) => `@font-face { font-family:"${f.family}"; font-weight:${f.weight}; font-style:normal; src:url(data:font/woff2;base64,${readFileSync(new URL(f.file, dir)).toString('base64')}) format('woff2'); }`)
-    .join('\n');
-}
+// หน้านี้อยู่ docs/dev/ · iframe srcdoc ใช้ที่อยู่ของหน้าแม่ ⇒ ชี้ ../fonts/ ไฟล์ชุดเดียวกับหน้าเล่น
+const fontFaces = () => fontsCss(playFonts(), `../${FONT_DIR}`).trimEnd();
 
 // บล็อกที่มีแต่ตัวแปร (:root · ธีมต่างโลก) → [{sel, vars:[[ชื่อ, ค่า]]}] · คอมเมนต์ตัดทิ้งก่อน
 export function cssVars(css) {
@@ -87,8 +77,8 @@ export function tweakPages(docs) {
 }
 
 // ป้ายสถานะของหัว = ป้ายในแถวของหัวนั้นบนสารบัญห้องผู้พัฒนา (แก้ป้ายที่เดียว) · id → HTML ของป้าย
-export function tweakStatus(docs) {
-  const html = readFileSync(new URL('dev/index.html', docs), 'utf8');
+// html ส่งเข้าได้ให้ด่านลองแถวที่ไม่มีหน้า
+export function tweakStatus(docs, html = readFileSync(new URL('dev/index.html', docs), 'utf8')) {
   return Object.fromEntries([...html.matchAll(/<a href="ui\.html#([a-z0-9-]+)">[^<]*<\/a>((?:<span class="st [a-z]+">[^<]*<\/span>)*)/g)].map((m) => [m[1], m[2]]));
 }
 const PUBLIC_TITLE = (t) => (PUBLIC_HIDE.test(t) ? 'หน้า tweak' : t);
@@ -121,7 +111,7 @@ function specimens(content, src) {
 const frame = (css, title, parts, h) => {
   const body = parts.map(([t, b]) => `<h4 style="margin:16px 0 6px;font:600 14px var(--ft)">${esc(t)}</h4>${b}`).join('');
   const doc = `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>${css}\n#app{padding:0 12px 12px}.card{min-height:0}.mnav{position:static;margin-top:8px}body:has(.mnav){padding-bottom:0}</style></head><body><div id="app">${body}</div></body></html>`;
-  return `<figure class="ui-spec"><figcaption>${esc(title)}</figcaption><iframe title="${esc(title)}" sandbox="" style="width:100%;height:${h}px;border:1px solid #C9BFA9;background:#fff" srcdoc="${doc.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></iframe></figure>`;
+  return `<figure class="ui-spec"><figcaption>${esc(title)}</figcaption><iframe title="${esc(title)}" sandbox="" style="width:100%;height:${h}px;border:1px solid var(--line);background:var(--surface)" srcdoc="${doc.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></iframe></figure>`;
 };
 
 // ต้นแบบปรับสดต้องรันสคริปต์ จำค่าใน localStorage คีย์เดิม และคัดลอกลง clipboard ⇒ iframe ไม่มี sandbox (srcdoc ได้ origin ของหน้านี้ = origin เดียวกับหน้า tweak เดิม ค่าที่เจ้าของปรับไว้ยังอ่านได้)
@@ -148,7 +138,7 @@ export function uiPage(content, docs, tpl = readFileSync(TEMPLATE, 'utf8')) {
       return existsSync(new URL(f, docs)) ? `<p><img src="shots/${id}-${w}.png" alt="จอ${esc(name)} กว้าง ${w}" loading="lazy" style="max-width:100%;height:auto"></p>` : `<p class="wait">${w} px — ยังไม่มีภาพ (<code>${f}</code>)</p>`;
     }).join('')}</div>`;
   const body = [
-    '<style>.sws{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 12px}.sws li{display:flex;align-items:center;gap:8px;margin:0;min-width:0}.sws small{overflow-wrap:anywhere}.sw{flex:none;width:28px;height:28px;border:1px solid #1F2430}.ui-spec{margin:0 0 16px}.ui-spec figcaption{font-size:14px;font-weight:600;margin:0 0 4px}.fspec{margin:0 0 12px;overflow-wrap:anywhere}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.wait{color:#5A5F6B;font-size:14px}.st{display:inline-block;font-size:12px;font-weight:600;padding:0 6px;border:1px solid currentColor;margin-left:6px;white-space:nowrap;line-height:1.5}.st.done{color:#2F6B3A}.st.pick{color:#7A5A12}.st.wait{color:#A23B2C}.ui-live{width:min(1400px,calc(100vw - 32px));margin:0 0 16px calc(50% - min(700px,calc(50vw - 16px)))}.ui-live iframe{display:block;width:100%;height:min(900px,calc(100vh - 24px));min-height:560px;border:1px solid #C9BFA9;background:#E6E0D3}</style>',
+    '<style>.sws{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 12px}.sws li{display:flex;align-items:center;gap:8px;margin:0;min-width:0}.sws small{overflow-wrap:anywhere}.sw{flex:none;width:28px;height:28px;border:1px solid var(--ink)}.ui-spec{margin:0 0 16px}.ui-spec figcaption{font-size:14px;font-weight:600;margin:0 0 4px}.fspec{margin:0 0 12px;overflow-wrap:anywhere}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.wait{color:var(--muted);font-size:14px}.st{display:inline-block;font-size:12px;font-weight:600;padding:0 6px;border:1px solid currentColor;margin-left:6px;white-space:nowrap;line-height:1.5}.st.done{color:var(--good)}.st.pick{color:var(--accent2)}.st.wait{color:var(--ink)}.ui-live{width:min(1400px,calc(100vw - 32px));margin:0 0 16px calc(50% - min(700px,calc(50vw - 16px)))}.ui-live iframe{display:block;width:100%;height:min(900px,calc(100vh - 24px));min-height:560px;border:1px solid var(--line);background:var(--bg)}</style>',
     '<h2 id="ui-decisions">คำตัดสิน UI</h2>',
     `<p>หน้าเล่นใช้การ์ดใบเดียวกลางจอ แถบสถานะสองแถวบนการ์ด แถบเมนูล่าง · ธีมการ์ดสามแบบ: กระดาษ (ชีวิตนี้) · ลายรดน้ำ (ระหว่างชาติ) · ต่างโลก · งานปรับหน้าตาทุกชิ้นมีหน้า tweak ให้เจ้าของเลือกก่อนลงจริง · คำตัดสินเต็ม: <a href="design-ui-redo.html">คำตัดสินเกม เรื่อง ui-redo</a></p>`,
     `<h3>หน้า tweak (${tweaks.length + 1})</h3>`,

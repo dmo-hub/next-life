@@ -289,6 +289,13 @@ function card(e, L, byId) {
   ].join('');
 }
 
+// การ์ดเฉลยบางใบ (หน้า tweak T14 · card-spoil-tweak.mjs) — ตัวเดียวกับหน้าเฉลย ไม่เขียนซ้ำ
+export function spoilerCards(content, ids, flags = flagNames(), systems = systemNames()) {
+  const L = labels(content, flags, systems);
+  const byId = new Map(content.events.map((e) => [e.id, e]));
+  return ids.map((id) => card(byId.get(id), L, byId));
+}
+
 export function spoilersHtml(content, flags = flagNames(), systems = systemNames(), sim = careerSim()) {
   const L = labels(content, flags, systems);
   const byId = new Map(content.events.map((e) => [e.id, e]));

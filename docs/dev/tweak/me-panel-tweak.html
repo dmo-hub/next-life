@@ -4,67 +4,94 @@
 <!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ปรับป้ายผลบนปุ่มเป็นไอคอน (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<title>แผงตัวฉัน: รวมเงิน · พับคำอธิบาย · ประวัติงาน (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="robots" content="noindex">
+<link rel="stylesheet" href="../../fonts/fonts.css">
 <style>
-  /* หน้า tweak ป้ายผลบนปุ่ม (ui-redo 52) — การ์ดอยู่ใน iframe ที่ใช้ CSS ตัวเกมจริงจาก template.html (build เติมใน <template id="gcss">) · หน้านี้คุมแค่แผงปรับค่า */
-  body { margin: 0; background: #E6E0D3; color: #1F2430; font: 15px/1.55 Sarabun, "Noto Sans Thai", system-ui, sans-serif; }
-  .lay { display: grid; grid-template-columns: 340px minmax(0, 1fr); align-items: start; }
+  /* หน้า tweak แผงตัวฉัน (ui-redo 130 · ข้อ 225–227): ตัดปุ่มเงินรวมเข้าแผงตัวฉัน · ปุ่มพับคำอธิบายค่า · ประวัติงานเก่า
+     จอเกมอยู่ใน iframe ที่ใช้ CSS เกมจริงจาก template.html (build เติมใน <template id="gcss">) · ชุด 0 = เกมตอนนี้ ไม่ทับอะไร
+     markup ลอกโครงจาก app.mjs (statusBar · mePanel · moneyPanel · sidePanel · lifeMenu) — ข้อความคำอธิบายลอกจาก labels.mjs STAT_HELP */
+  body { margin: 0; background: #E6E0D3; color: #1F2430; font: 15px/1.55 Sarabun, system-ui, sans-serif; }
+  .lay { display: grid; grid-template-columns: 360px minmax(0, 1fr); align-items: start; }
   .ctl { position: sticky; top: 0; height: 100vh; overflow-y: auto; background: #F3EEE2; border-right: 1px solid #D8D0C0; padding: 14px 14px 40px; box-sizing: border-box; }
   .ctl h1 { margin: 0 0 4px; font-size: 19px; line-height: 1.3; }
-  .ctl .hint { margin: 0 0 10px; font-size: 13px; color: #5A5F6B; }
+  .ctl .hint { margin: 6px 0 10px; font-size: 13px; color: #5A5F6B; }
   .ctl h2 { margin: 18px 0 6px; font-size: 15px; padding-top: 10px; border-top: 1px solid #D8D0C0; }
   .row { margin: 8px 0 10px; }
   .row > .lb { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .ed { color: #7A5A12; font-weight: 600; }
+  .eng { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 4px; background: #7A2E12; color: #fff; font-size: 11px; font-weight: 600; }
   .seg { display: flex; flex-wrap: wrap; gap: 4px; }
-  .seg button, .btns button { font: inherit; font-size: 13px; padding: 4px 9px; border: 1px solid #C9BFA9; background: #fff; color: #1F2430; cursor: pointer; border-radius: 4px; }
+  .seg button, .btns button { font: inherit; font-size: 13px; padding: 4px 9px; border: 1px solid #C9BFA9; background: #fff; color: #1F2430; cursor: pointer; border-radius: 4px; min-height: 32px; text-align: left; }
   .seg button.on { background: #1F2430; color: #fff; border-color: #1F2430; }
+  .seg button:disabled { opacity: .5; cursor: not-allowed; }
+  .seg.col { flex-direction: column; }
   .btns { display: flex; flex-wrap: wrap; gap: 6px; }
   .btns .pri { background: #2563eb; color: #fff; border-color: #2563eb; }
-  .btns .pre { font-weight: 600; }
-  .btns .pre.on { background: #A23B2C; color: #fff; border-color: #A23B2C; }
-  input[type=text] { font: inherit; font-size: 13px; padding: 3px 6px; width: 100%; box-sizing: border-box; }
-  .icons { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 8px; align-items: center; font-size: 13px; }
-  .icons input { width: 100%; }
-  .cols { display: flex; gap: 10px; flex-wrap: wrap; font-size: 13px; }
-  .cols label { display: flex; gap: 4px; align-items: center; }
+  button:focus-visible, textarea:focus-visible { outline: 2px solid #2563eb; outline-offset: 1px; }
   textarea { font: inherit; font-size: 13px; width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #C9BFA9; border-radius: 4px; resize: vertical; background: #fff; }
+  #out { font: 11px/1.4 ui-monospace, monospace; }
   #msg { font-size: 13px; color: #15803d; min-height: 1.4em; }
+  table.cr { border-collapse: collapse; font-size: 12px; width: 100%; }
+  table.cr th, table.cr td { border: 1px solid #D8D0C0; padding: 3px 5px; text-align: left; vertical-align: top; }
+  table.cr th[colspan] { background: #EAE3D3; }
+  table.cr td.n { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  table.cr .pair { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 20px; font-weight: 600; font-size: 12px; border: 1px solid #0002; }
+  .ok { color: #15803d; font-weight: 600; } .bad { color: #B3261E; font-weight: 600; } .info { color: #5A5F6B; }
   .view { padding: 12px 16px 24px; min-width: 0; }
   .vbar { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-bottom: 10px; font-size: 13px; }
-  .frames { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
-  .frames.w390 { grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); }
-  .frames.gray .box { filter: grayscale(1); }
+  .note { font-size: 13px; color: #4A4F5B; margin: 0 0 10px; max-width: 1100px; }
+  .sc { margin: 0 0 22px; }
+  .sc > h2 { font-size: 16px; margin: 0 0 8px; }
+  .frames { display: grid; grid-template-columns: minmax(0, 390px) minmax(0, 1fr); gap: 14px 18px; align-items: start; }
+  .frames.one { grid-template-columns: minmax(0, 844px); }
   .fr h3 { margin: 0 0 6px; font-size: 14px; }
   .fr h3 small { font-weight: 400; color: #5A5F6B; }
   .fr .box { position: relative; overflow: hidden; box-shadow: 0 6px 30px rgb(0 0 0 / .14); background: #E4DDCF; }
   .fr iframe { border: 0; display: block; transform-origin: 0 0; }
-  .fr .sr-out { margin: 6px 0 0; font-size: 12px; color: #4A4F5B; }
-  .note { font-size: 13px; color: #4A4F5B; margin: 0 0 10px; }
-  @media (max-width: 860px) { .lay { grid-template-columns: 1fr; } .ctl { position: static; height: auto; border-right: 0; border-bottom: 1px solid #D8D0C0; } }
+  @media (max-width: 860px) { .lay { grid-template-columns: 1fr; } .ctl { position: static; height: auto; border-right: 0; border-bottom: 1px solid #D8D0C0; } .frames { grid-template-columns: minmax(0, 1fr); } }
 </style>
+</head>
+<body>
+
+<div class="lay">
+  <aside class="ctl" id="ctl"></aside>
+  <main class="view">
+    <div class="vbar">
+      <span class="btns"><button type="button" id="reload">จำลองเปิดเกมใหม่ (ดูค่าที่จำไว้)</button></span>
+      <span id="mem" class="info"></span>
+    </div>
+    <p class="note">ตัวอย่างเดียวทุกจอ: อายุ 42 ขอนแก่น · มีเงินกู้ + เงินเทา · เคยทำงาน 3 อาชีพ (รับจ้างทั่วไป → พนักงานโรงงาน → พนักงานสำนักงาน ตอนนี้) · 1280 = แผงค้างข้างการ์ด (เกม: กว้าง ≥ 1264 และสูง ≥ 541) · 390 = ลิ้นชักทับการ์ด (กรอบสูงตามแผงให้เห็นครบ จอจริงเลื่อนในแผง) · 844 × 390 = มือถือแนวนอน มีพาแนลขวา (เกมวันนี้โผล่เฉพาะฉากไม่มีเมนู · จอคอมสูง ≥ 541 ไม่มีพาแนลขวาเลย) · ปุ่มพับในจอกดได้ · ที่ไม่แตะ: เมนูต่างโลก/ปรโลก · ปีเกมไม่ขึ้นจอ (บอกแค่อายุ) · เงินเทาขึ้นเมื่อ &gt; 0 · การ์ดตายเปิดแผงได้ ไม่มีโฟกัส/รายได้</p>
+    <div id="frames"></div>
+  </main>
+</div>
+
+<!-- build เติม CSS ของ src/ui/template.html ระหว่าง marker ทุกรอบ (src/site/game-css.mjs) — ใช้ใส่ใน iframe เท่านั้น -->
 <template id="gcss"><style>/*GAME-CSS:START*/
 
 /* สีมาจากต้นแบบการ์ด (ใบ 06) — ทาง A ทะเบียนราษฎร์ · ทาง B ลายรดน้ำ · ไม่สลับตามโหมดมืดเพราะสีเป็นตัวบอกแนวการ์ด */
-/* ui-redo ใบ 02 (เจ้าของเคาะ): ชุดสี A กระดาษ · แถบค่า --fl · สีเน้น --red · Noto Sans Thai หัว/เนื้อ 16px · มุม 10 (การ์ด 15 · ชิป/ปุ่มเลขกลม) · เงาบาง
+/* ui-redo ใบ 105 ลง T1 (ข้อ 209–211 · 215–217): ชุดคราม — หมึก = ปุ่มหลัก = หัวเว็บ #1B2A4A · หัว Maitree เนื้อ Sarabun · มุม 6 (การ์ด 8) · เงาทองเฉพาะการ์ดในเกม
+   · --red = ชาด เหลือแค่ตรา/ขีดฆ่า (ข้อ 215) · --line-strong = ขอบที่บอกว่ากดได้ (--rule เป็นเส้นประดับ ต่ำกว่า 3:1)
+   · การ์ด B + ภาพแชร์ · ต่างโลก · ระหว่างชาติ/ปรโลก คงสีเดิมจนใบ 121 (ข้อ 228 ชุด ก) · แถบค่า --fl รอ T6
    · การ์ดกว้างสุด 800 · ขอบรอบการ์ด 36 บนล่าง 32 ข้าง ค่าเดียวทุกจอ (ต้นแบบ tweak.html) */
 :root {
-  --page:#E4DDCF; --ink:#1F2430; --ink2:#3A3F4B; --muted:#4A4F5C;
-  --paper:#F7F2E7; --paper2:#E9E1CF; --rule:#B9AE97; --rule2:#CFC4AD; --red:#B73824; --green:#2F6B66; --blue:#35558A;
+  --page:#F4ECDC; --ink:#1B2A4A; --ink2:color-mix(in srgb, #1B2A4A 70%, #5B5648); --muted:#5B5648;
+  --paper:#FBF6EA; --paper2:color-mix(in srgb, #FBF6EA 45%, #F4ECDC); --rule:#C9B98F; --rule2:color-mix(in srgb, #C9B98F 60%, #FBF6EA); --line-strong:#8C7A52;
+  --red:#A62B1F; --green:#2F6B4F; --blue:#7A5C12; --head:#1B2A4A;
   --lacquer:#17110D; --lacquer2:#221912; --gold:#D9B45A; --gold2:#F0D78C; --cream:#EFE3C2; --bronze:#5A4630; --bronze2:#8A6D3B; --sand:#BFAE86;
   --fl:#015EC1; --dg:#B3261E; --track:#E2D9C6;
-  --ft:"Noto Sans Thai",system-ui,sans-serif;
-  --r:10px; --rk:15px; --rc:999px; --sh:0 1px 2px rgb(0 0 0 / .06), 0 8px 24px rgb(0 0 0 / .08);
+  --ft:Sarabun,system-ui,sans-serif; --fh:Maitree,serif;
+  --r:6px; --rk:8px; --rc:999px; --sh:0 1px 0 var(--gold), 0 6px 18px color-mix(in srgb, var(--ink) 10%, transparent);
   --cw:800px; --pad-y:36px; --pad-x:32px;
 }
 * { box-sizing:border-box; }
 body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--ft); }
 /* viewport-fit=cover ให้ env(safe-area-inset-*) มีค่า แต่หน้าก็ลามใต้รอยบาก/แถบโฮม — ทุกขอบที่ติดจอต้องกันเอง */
-.logo { background:var(--lacquer); text-align:center; padding:calc(10px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 6px max(16px, env(safe-area-inset-left)); border-bottom:1px solid var(--bronze); }
+.logo { background:var(--head); text-align:center; padding:calc(10px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 6px max(16px, env(safe-area-inset-left)); border-bottom:1px solid var(--bronze); }
 .logo b { font-family:Srisakdi,serif; font-weight:700; font-size:34px; line-height:1.2; color:var(--gold); }
 .logo b span { display:inline-block; }
-.logo small { display:block; font-size:12px; letter-spacing:0.12em; color:var(--sand); }
-.logo .ver { text-decoration:none; display:inline-block; margin-top:4px; padding:1px 9px; border:1px solid var(--bronze); border-radius:999px; font-size:11px; font-weight:600; color:var(--sand); white-space:nowrap; }
+.logo small { display:block; font-size:12px; letter-spacing:0.12em; color:color-mix(in srgb, var(--cream) 85%, var(--head)); }
+.logo .ver { text-decoration:none; display:inline-block; margin-top:4px; padding:1px 9px; border:1px solid var(--bronze); border-radius:999px; font-size:12px; font-weight:600; color:var(--sand); white-space:nowrap; }
 .logo a.ver:hover, .logo a.ver:focus-visible { text-decoration:underline; outline:none; }
 .logo .saved { display:inline-block; margin:4px 0 0 6px; font-size:11px; color:var(--sand); white-space:nowrap; }
 .logo .saved:not(:empty)::before { content:'\25CF  '; color:#7FC4B8; }
@@ -80,13 +107,13 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 /* ข้อความสำหรับโปรแกรมอ่านจอเท่านั้น */
 .sr { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 /* จุดแดง "ใหม่" (B116): ชั้นสมุด · แท็บในชั้นสมุด · แผงฉายา/เหตุการณ์ — ป้ายอ่านจอบอกความหมายแทนสี */
-.new-dot { display:inline-block; width:8px; height:8px; margin-left:6px; border-radius:50%; background:var(--red); vertical-align:middle; flex:none; }
-.new-tag { margin-left:6px; padding:0 5px; border:1px solid var(--red); border-radius:3px; color:var(--red); font-size:11px; font-weight:600; white-space:nowrap; }
+.new-dot { display:inline-block; width:8px; height:8px; margin-left:6px; border-radius:50%; background:var(--blue); vertical-align:middle; flex:none; }
+.new-tag { margin-left:6px; padding:0 5px; border:1px solid var(--blue); border-radius:3px; color:var(--blue); font-size:12px; font-weight:600; white-space:nowrap; }
 /* .body/.choices ตั้ง display:flex ทับ hidden ของเบราว์เซอร์ — การ์ดที่พับไว้ (B117) ต้องหายจริง */
 .card [hidden] { display:none !important; }
 /* กล่องกระซิบ (B117): เส้นประ ตัวเอียง แยกจากเนื้อเรื่องของการ์ด · ปุ่มเป็นลิงก์เล็ก ไม่ปนกับตัวเลือกของเกม */
 .whisper { margin-top:4px; padding:8px 12px; border:1px dashed var(--rule); border-radius:var(--r); background:#FBF7EE; display:flex; flex-direction:column; gap:4px; }
-.whisper .h { font-size:12px; font-weight:600; color:var(--red); }
+.whisper .h { font-size:12px; font-weight:600; color:var(--blue); }
 .whisper p { font-family:var(--ft); font-size:14px; color:var(--ink2); }
 .whisper-row { display:flex; flex-wrap:wrap; gap:0 16px; }
 .whisper .more, .choices .later { all:unset; min-height:44px; cursor:pointer; font-size:13px; font-weight:600; text-decoration:underline; text-underline-offset:2px; }
@@ -117,7 +144,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .sb-r1 { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
 .sb .av { width:36px; height:36px; }
 .sb-who { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.3; }
-.sb-who b { font-weight:600; overflow-wrap:anywhere; }
+.sb-who b { font-family:var(--fh); font-weight:600; overflow-wrap:anywhere; }
 .sb-who small { font-size:12px; color:var(--muted); overflow-wrap:anywhere; }
 /* ป้ายพักแทนบรรทัดจังหวัด: บรรทัดเดียวเสมอ แถวไม่สูงขึ้น */
 .sb-who small.rest { color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -128,18 +155,35 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .hd-word { font-weight:600; white-space:nowrap; }
 .hd-cash { margin-left:auto; display:flex; align-items:baseline; gap:4px; white-space:nowrap; }
 .hd-cash b { font-size:14px; font-variant-numeric:tabular-nums; }
-.hd-cash.red b, .hd-cash .lw { color:var(--dg); }
-.hd-cash .lw { font-size:11px; font-weight:600; }
+/* ติดลบ/มีกู้ (ข้อ 235): ตัวเลขสีหมึก คำกำกับแดงอย่างเดียว ไม่มีกรอบ */
+.hd-cash .lw { color:var(--dg); }
+.hd-cash .lw { font-size:12px; font-weight:600; }
 .sb-age { display:flex; align-items:center; gap:4px; white-space:nowrap; }
-.sb-age > b { font-size:20px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
+.sb-age > b { font-size:18px; font-weight:600; line-height:1; font-variant-numeric:tabular-nums; }
 .sb-age small { font-size:12px; }
 .sb-age .same { margin-left:4px; }
+/* คอลัมน์ขวา (ข้อ 233): อายุบน ฐานะ + เงินสดใต้ ชิดขวา กว้างไม่เกินครึ่งแถว ชื่อ/ที่ยังมีที่ */
+.sb-right { flex:none; max-width:48%; display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+.sb-right .hd-row { margin:0; justify-content:flex-end; row-gap:0; text-align:right; }
+.sb-right .hd-cash { margin-left:0; }
 .sb-heart svg { display:block; width:18px; height:18px; fill:var(--dg); }
 .sb-m { list-style:none; margin:0; padding:0; display:flex; gap:10px; }
 .sb-m li { flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:3px; }
 .mh { display:flex; flex-wrap:wrap; align-items:baseline; column-gap:3px; }
 .mk { font-size:11px; line-height:1.3; color:var(--muted); }
-.mh .num { margin-left:auto; font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
+.mh .mk svg { width:1em; height:1em; margin-right:1px; vertical-align:-0.15em; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+/* แถบสถานะ (ข้อ 234): ไอคอน 125% เส้น 1.6 สีหมึก · ต่างโลกและช่องใกล้ตายใช้สีของแถว · แถบต่อท้ายเลขบรรทัดเดียว (เตี้ยลง) · แผงตัวฉันคงแบบเดิม */
+.sb-m .mk svg { width:1.25em; height:1.25em; stroke-width:1.6; color:var(--ink); }
+.i .sb-m .mk svg, .sb-m .low .mk svg { color:inherit; }
+.sb-m li { flex-direction:row; align-items:center; gap:6px; }
+.sb-m .mh { flex:none; flex-wrap:nowrap; }
+.sb-m .br { flex:1 1 auto; min-width:24px; margin-top:0; }
+/* จอมือถือช่องค่าเหลือ 56–64px ไอคอน+ชื่อ+เลขไม่พอบรรทัดเดียว (เลขตก ชื่อยาวหักคำ) ⇒ 2×2 แบบพาแนลซ้ายจอคอม · การ์ดกว้างเต็ม 460 ที่จอ >520 4 ช่องพอ */
+@media (max-width: 520px) {
+  .sb-m { flex-wrap:wrap; gap:6px 10px; }
+  .sb-m li { flex:1 1 calc(50% - 10px); }
+}
+.mh .num { margin-left:auto; font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
 .mh em { font-style:normal; font-size:10px; font-weight:600; color:var(--fl); white-space:nowrap; }
 .mh em.dn { color:var(--dg); }
 .br { display:block; height:6px; margin-top:auto; border-radius:var(--rc); background:var(--track); overflow:hidden; }
@@ -149,7 +193,7 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 /* ใกล้ตาย: ขอบจอแดงทั้งจอ ผูกกับแถบสถานะด้วย :has จึงหายเองเมื่อการ์ดถัดไปไม่ใกล้ตาย · ไม่มีภาพเคลื่อนไหว */
 body:has(.sb.dying)::after { content:''; position:fixed; inset:0; z-index:9; pointer-events:none; box-shadow:inset 0 0 0 3px var(--dg), inset 0 0 60px rgb(220 40 30 / .5); }
 /* ตัวเลขในสรุปช่วงวัย: ต้นช่วง → ตอนนี้ คู่กับลูกศรทิศ */
-.delta .num { font-weight:700; font-variant-numeric:tabular-nums; }
+.delta .num { font-weight:600; font-variant-numeric:tabular-nums; }
 .meta { padding:0 20px 8px; font-size:12px; }
 .meta span { white-space:nowrap; }
 .tree { padding:0 20px 8px; font-size:12px; }
@@ -172,6 +216,8 @@ body:has(.mnav) { padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)
 .mnav { position:fixed; left:0; right:0; bottom:0; z-index:8; display:flex; max-width:calc(var(--cw) + 2 * var(--pad-x)); margin:0 auto; padding:0 max(8px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px, env(safe-area-inset-left)); background:var(--paper); border-top:1px solid var(--rule2); box-shadow:0 -4px 16px rgb(0 0 0 / .06); }
 .mnav button { all:unset; box-sizing:border-box; flex:1 1 0; min-width:0; min-height:var(--nav-h); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:4px 2px; font-size:13px; font-weight:600; color:var(--ink); text-align:center; cursor:pointer; }
 .mnav button[aria-expanded="true"] { color:var(--fl); box-shadow:inset 0 3px 0 var(--fl); }
+/* แท็บที่เลือกเป็นคราม เฉพาะจอชาติไทย (ข้อ 223: token ไทยห้ามขึ้นจอโลกอื่น) */
+body:has(#app > .card.a) .mnav button[aria-expanded="true"] { color:var(--ink); box-shadow:inset 0 3px 0 var(--ink); }
 .mnav button:focus-visible { outline:2px solid currentColor; outline-offset:-4px; }
 /* จุดของใหม่ (ใบ 05) มุมขวาบนของคำ ไม่ดันป้ายปุ่มให้เบี้ยว · ฉากที่มีเมนู ลิงก์ท้ายหน้าทั้งชุดย้ายเข้าปุ่มสมุดกับแผงเพิ่มเติม (ใบ 08) ท้ายหน้าจึงซ่อน */
 .mnav button { position:relative; }
@@ -203,10 +249,48 @@ body:has(.mnav) .foot { display:none; }
 .me dd { margin:0; color:var(--ink2); }
 .me .focus { padding:0; }
 .me .meta { margin:0; padding:0; font-size:14px; }
-/* แผงเงิน (ใบ 07): ป้ายซ้าย ตัวเลขชิดขวาหลักตรงกัน กวาดตาเทียบได้ · ตัวเลขยาวตัดบรรทัดได้ ไม่ดันจอล้น */
+/* แท็บโฟกัส (ui-redo 50 · JSON 47 แบบ ก รายการเดียว): ตัวที่ถืออยู่เป็นกรอบสีเน้น · ปีสะสมเป็นป้ายคำ ไม่มีเลข
+   · ป้ายชำนาญแล้วใช้สีพื้นแผ่นเป็นตัวอักษร — ชุดปรโลกสีเน้นเป็นทอง ตัวขาวบนทองอ่านไม่ออก */
+.ft h3 { margin:16px 0 8px; font-size:14px; color:var(--muted); }
+.ft-now { border:1px solid var(--fl); border-radius:var(--r); padding:10px 12px; display:flex; flex-wrap:wrap; gap:2px 8px; align-items:center; }
+.ft-now b { font-size:16px; } .ft-now .ft-fx { flex-basis:100%; }
+.ft-word { display:inline-block; padding:0 8px; border-radius:999px; font-size:12px; font-weight:600; background:var(--paper2); color:var(--ink); white-space:nowrap; }
+.ft-word.full { background:var(--fl); color:var(--paper); }
+.ft-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.ft-list button { all:unset; box-sizing:border-box; width:100%; min-height:48px; padding:8px 12px; border:1px solid var(--rule2); border-radius:var(--r); display:flex; flex-wrap:wrap; gap:2px 8px; align-items:center; cursor:pointer; font-size:14px; overflow-wrap:anywhere; }
+.ft-list button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.ft-list button.on { border-color:var(--fl); box-shadow:inset 3px 0 0 var(--fl); font-weight:600; }
+.ft-fx { font-size:12px; color:var(--ink2); font-weight:400; }
+.ft-list .ft-fx { flex-basis:100%; }
+.ft-new { font-size:12px; font-weight:600; color:var(--fl); }
+.ft-chain { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:13px; }
+.ft-chain li { border-left:3px solid var(--rule2); padding:2px 0 2px 10px; }
+.ft-chain li.open { border-color:var(--fl); }
+.ft-chain li.gone { opacity:0.6; }
+.ft-chain .st { display:block; font-size:12px; color:var(--muted); }
+/* ดูอย่างเดียว (สรุปตอนตาย): ไม่มีกรอบแบบปุ่ม ไม่ให้ดูเหมือนกดได้ */
+.ft-ro { gap:0; } .ft-ro li { padding:8px 0; border-bottom:1px solid var(--rule2); font-size:14px; }
+.ft-note { font-size:13px; color:var(--muted); margin:8px 0 0; }
+/* ไอคอนเมนู (JSON 47 แบบ ข): เส้นบางสีตามป้าย ปุ่มที่เปิดอยู่เปลี่ยนสีทั้งไอคอนและป้าย */
+.mnav button svg { width:22px; height:22px; flex:none; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+/* หัวค่าสถานะคู่ปุ่มพับคำอธิบาย (ui-redo 131) — ปุ่มหน้าตาเดียวกับ "กลับไปการ์ด" แตะได้ 44px */
+.me-hh { display:flex; align-items:baseline; gap:12px; margin:16px 0 8px; }
+.me-hh h3 { flex:1; margin:0; }
+.me-fold { all:unset; min-height:44px; padding:0 4px; font-size:13px; font-weight:600; color:var(--ink); text-decoration:underline; text-underline-offset:2px; cursor:pointer; white-space:nowrap; }
+.me-fold:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+/* .me dl ตั้ง display:grid ทับ hidden ของเบราว์เซอร์ — คำอธิบายที่พับต้องหายจริง */
+.me [hidden] { display:none; }
+.me .mo dl { margin-top:0; }
+/* ประวัติงาน: ช่วงอายุคอลัมน์ซ้ายกว้างเท่ากันให้กวาดตาลง · แถวปีรวมของเซฟเก่าเลขชิดขวา */
+.wh { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:14px; }
+.wh li { display:flex; justify-content:space-between; gap:12px; overflow-wrap:anywhere; }
+.wh-me li .num { color:var(--ink2); font-weight:600; white-space:nowrap; }
+.wh .wh-age { flex:none; min-width:7.5em; color:var(--ink2); font-variant-numeric:tabular-nums; }
+.wh li:has(.wh-age) { justify-content:flex-start; }
+/* ช่องเงิน (ใบ 07 · อยู่ในแผงตัวฉันตั้งแต่ 131): ป้ายซ้าย ตัวเลขชิดขวาหลักตรงกัน กวาดตาเทียบได้ · ตัวเลขยาวตัดบรรทัดได้ ไม่ดันจอล้น */
 .mo dl { margin:12px 0 0; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:10px 16px; font-size:15px; }
 .mo dt { color:var(--ink2); white-space:nowrap; }
-.mo dd { margin:0; text-align:right; font-weight:700; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.mo dd { margin:0; text-align:right; font-weight:600; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .mo dd.neg { color:var(--dg); }
 /* แผงเพิ่มเติม (ใบ 08): แถวละลิงก์เต็มกว้าง แตะง่ายบนมือถือ · ปุ่มชาติประจำวันหน้าตาเดียวกับลิงก์ */
 .mr { list-style:none; margin:8px 0 0; padding:0; }
@@ -220,8 +304,8 @@ body:has(.mnav) .foot { display:none; }
 .nt > a { display:inline-block; min-height:44px; line-height:44px; font-weight:600; color:var(--ink); }
 .mo p { margin:16px 0 0; font-size:13px; color:var(--ink2); }
 .body { padding:18px 20px 8px; display:flex; flex-direction:column; gap:8px; }
-.body h3 { margin:0; font-size:24px; line-height:1.35; }
-.body h3.lead { font-size:19px; font-weight:400; }
+.body h3 { margin:0; font-family:var(--fh); font-size:24px; line-height:1.35; }
+.body h3.lead { font-family:var(--ft); font-size:19px; font-weight:400; }
 .body p { margin:0; font-size:15px; }
 .kicker { font-size:12px; font-weight:600; letter-spacing:0.06em; }
 .body p.news { margin:0; padding-left:10px; border-left:2px solid currentColor; font-size:14px; opacity:0.8; }
@@ -252,7 +336,7 @@ body:has(.mnav) .foot { display:none; }
 .spark .mk circle { stroke-width:1.5; }
 .spark .mk:focus-visible circle, .spark .mk:hover circle { stroke-width:3; }
 .mk-cap { margin:0; font-size:12px; min-height:1.5em; overflow-wrap:anywhere; }
-.a .spark .mk.ev circle { fill:var(--paper); stroke:var(--ink2); } .a .spark .mk.death circle { fill:var(--red); stroke:var(--ink); }
+.a .spark .mk.ev circle { fill:var(--paper); stroke:var(--ink2); } .a .spark .mk.death circle { fill:var(--dg); stroke:var(--ink); }
 .a .mk-cap { color:var(--muted); }
 .spark.echo path { fill:none; stroke-width:1.5; } .spark.echo path.hit { stroke:transparent; stroke-width:12; }
 .spark .mk.arc:focus-visible path:not(.hit), .spark .mk.arc:hover path:not(.hit) { stroke-width:3; }
@@ -291,7 +375,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .choice.loan .of { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .choice .hint { display:block; margin-top:3px; font-size:12.5px; line-height:1.45; opacity:0.75; }
 /* ป้ายทางที่มีผลตามมา: ไอคอนต่อท้ายข้อความตัวเลือก + บรรทัดอธิบายใต้ชุดปุ่ม */
-.ef { display:flex; align-items:center; gap:5px; margin:2px 0 4px; font-size:13px; font-weight:600; color:var(--red); }
+.ef { display:flex; align-items:center; gap:5px; margin:2px 0 4px; font-size:13px; font-weight:600; color:var(--blue); }
 .ef svg { width:14px; height:14px; flex:none; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
 .i .ef { color:#FFB4C8; }
 .recap { display:flex; flex-direction:column; gap:8px; padding:12px; }
@@ -371,22 +455,23 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .stamp { align-self:flex-start; font-family:var(--ft); font-weight:600; padding:4px 10px; transform:rotate(-3deg); font-size:16px; }
 
 /* ทาง A — ทะเบียนราษฎร์: กระดาษ หมึก ตราประทับแดง */
-.a { background:var(--paper); border:1px solid #C9BFA9; color:var(--ink); }
+.a { background:var(--paper); border:1px solid var(--rule); color:var(--ink); }
 .a .top { background:var(--ink); color:var(--paper); }
-.a .top b { font-family:var(--ft); font-size:16px; font-weight:600; }
+.a .top b { font-family:var(--fh); font-size:16px; font-weight:600; }
 .a .meta { color:var(--muted); padding-top:8px; }
-.a .bar { background:#E2D9C6; } .a .bar i { background:var(--green); } .a .bar b { background:var(--red); }
-.a .kicker { color:var(--red); }
+.a .bar { background:#E2D9C6; } .a .bar i { background:var(--green); } .a .bar b { background:var(--dg); }
+.a .kicker { color:var(--blue); }
 .a .body h3 { font-family:var(--ft); font-weight:600; }
 .a .body h3.lead { font-family:var(--ft); }
 .a .body p, .a .items, .a .picks { color:var(--ink2); }
 .a .sub, .a .note, .a .body .horo { color:var(--muted); }
 .a .spark .nom { stroke:var(--green); } .a .spark .dot { fill:var(--green); }
 .a .spark .grid { stroke:var(--rule2); } .a .spark .zero { stroke:var(--ink2); }
-.a .spark .neg { fill:var(--red); fill-opacity:0.08; }
+.a .spark .neg { fill:var(--dg); fill-opacity:0.08; }
 .a .spark text { fill:var(--muted); }
 .a .band0 { fill:var(--paper2); fill-opacity:0.55; } .a .band1 { fill:transparent; }
-.a .ln0 { stroke:var(--red); } .a .ln1 { stroke:var(--bronze2); } .a .ln2 { stroke:var(--blue); } .a .ln3 { stroke:var(--green); } .a .ln4 { stroke:var(--ink); }
+/* ชาดไม่ใช่สีข้อมูลแล้ว (ข้อ 215) · --blue เป็นทองเข้มใกล้ --bronze2 ⇒ เส้นแรกใช้น้ำเงินแถบค่าให้ 5 เส้นยังแยกกันได้ */
+.a .ln0 { stroke:var(--fl); } .a .ln1 { stroke:var(--bronze2); } .a .ln2 { stroke:var(--blue); } .a .ln3 { stroke:var(--green); } .a .ln4 { stroke:var(--ink); }
 .a .lifechart { border:1px solid var(--rule); border-radius:var(--r); background:#FBF7EE; }
 .b .band0 { fill:var(--bronze); fill-opacity:0.25; } .b .band1 { fill:transparent; }
 .b .ln0 { stroke:#E07A5F; } .b .ln1 { stroke:var(--gold); } .b .ln2 { stroke:#8FB3E0; } .b .ln3 { stroke:#7FC4B8; } .b .ln4 { stroke:var(--cream); }
@@ -394,14 +479,14 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 /* กราฟฐานะตระกูล (B95): ขาลงเส้นประ + สีแดง ขาขึ้นเส้นทึบ — ตาบอดสีก็ยังแยกได้ · ขึ้นได้ทั้งการ์ดทาง A ทาง B และปรโลก */
 .spark .sg { stroke-width:2.2; stroke-linecap:round; } .spark .sg.sd { stroke-dasharray:5 3; } .spark .sg.se { stroke-width:1.6; }
 .legend .key .sg { stroke-width:2; }
-.a .sg.su { stroke:var(--green); } .a .sg.sd { stroke:var(--red); } .a .sg.se { stroke:var(--ink2); }
-.a .spark .mk.broke rect { fill:var(--red); stroke:var(--ink); stroke-width:1.5; } .a .spark .mk.nx circle { fill:var(--paper); stroke:var(--ink); stroke-dasharray:2 1.5; }
-.a .legend .mk.broke rect { fill:var(--red); stroke:var(--ink); stroke-width:1; }
+.a .sg.su { stroke:var(--green); } .a .sg.sd { stroke:var(--dg); } .a .sg.se { stroke:var(--ink2); }
+.a .spark .mk.broke rect { fill:var(--dg); stroke:var(--ink); stroke-width:1.5; } .a .spark .mk.nx circle { fill:var(--paper); stroke:var(--ink); stroke-dasharray:2 1.5; }
+.a .legend .mk.broke rect { fill:var(--dg); stroke:var(--ink); stroke-width:1; }
 .b .sg.su { stroke:var(--gold2); } .b .sg.sd { stroke:#E39A8A; } .b .sg.se { stroke:var(--sand); }
 .b .spark text, .b .mk-cap, .b .lifechart .h { fill:var(--sand); color:var(--sand); } .b .spark .grid { stroke:var(--bronze2); }
 .b .spark .mk.ev circle { fill:var(--lacquer); stroke:var(--gold2); } .b .spark .mk.nx circle { fill:var(--lacquer); stroke:var(--cream); stroke-dasharray:2 1.5; }
 .b .spark .mk.broke rect, .b .legend .mk.broke rect { fill:#E39A8A; stroke:var(--cream); stroke-width:1.5; }
-.a .choice { border:1px solid var(--ink); background:#FFFDF7; }
+.a .choice { border:1px solid var(--line-strong); background:#FFFDF7; font-size:15px; }
 .a .choice:hover, .a .choice:focus-visible { background:var(--ink); color:var(--paper); outline:none; }
 .a .choice .fx { color:var(--green); } .a .choice:hover .fx, .a .choice:focus-visible .fx { color:#CFE3E0; }
 /* คำอธิบายสกิลใต้ชื่อปุ่ม (06s: จอเลือกพก · การ์ดฝึกสกิล · เลือกลงสมุด) · ปุ่มเลือกพกที่กดไว้มีแถบซ้าย */
@@ -471,7 +556,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .d-tab-bar { display:flex; flex-wrap:wrap; gap:6px; }
 .d-tab-bar button { all:unset; box-sizing:border-box; cursor:pointer; min-height:36px; padding:0 12px; border:1px solid #1F1F1F; border-radius:999px; font-size:14px; display:inline-flex; align-items:center; }
 .d-tab-bar button[aria-selected="true"] { background:#1F1F1F; color:#FFFFFF; font-weight:600; }
-.d-tab-bar button:focus-visible { outline:2px solid var(--red); outline-offset:2px; }
+.d-tab-bar button:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
 .d-pane { display:flex; flex-direction:column; gap:10px; padding-top:12px; }
 .d-pane[hidden] { display:none; }
 .mem .d-pane h3 { margin:8px 0 0; font-family:var(--ft); font-size:14px; font-weight:600; color:var(--muted); text-align:left; }
@@ -482,7 +567,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .d-share > summary::-webkit-details-marker { display:none; }
 .d-share > summary::after { content:'\25BE'; }
 .d-share[open] > summary::after { content:'\25B4'; }
-.d-share > summary:focus-visible { outline:2px solid var(--red); outline-offset:2px; }
+.d-share > summary:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
 .d-share-in { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
 .d-share .choice { flex:1 1 auto; min-height:44px; padding:6px 12px; justify-content:center; font-size:14px; background:transparent; border-style:dashed; }
 /* ป้ายตามหาคนหาย (B139): กระดาษประกาศติดเสา หัวแดงตัวหนา — ต่างจากหนังสืองานศพขาวดำ ให้รู้ว่ายังไม่มีใครถือว่าจากไป */
@@ -533,7 +618,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .fx-cap small { display:block; font-family:Sarabun,sans-serif; font-size:13px; color:var(--sand); }
 .fx-title { position:absolute; inset:0; display:grid; place-items:center; }
 .fx-title svg { overflow:visible; max-width:92vw; height:auto; }
-.fx-title .fx-name { font-family:Pridi,serif; font-weight:600; }
+.fx-title .fx-name { font-family:Maitree,serif; font-weight:600; }
 /* ทั้งหน้าเข้าธีมต่างโลกตามการ์ดที่ขึ้นจอ — ผูกกับการ์ดด้วย :has จึงไม่ต้องตามล้างธงทุกจุดที่วาดจอไทย */
 /* ui-redo ใบ 13: ชุดกรมท่าเรืองของต้นแบบลงตัวแปรหน้า — แถบสถานะ เมนูล่าง/ราวซ้าย และแผงจากเมนูเปลี่ยนสีตามโดยไม่มีกฎแยก */
 body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; --ink:#E8ECFF; --ink2:#D3D8F5; --paper:#161A3A; --paper2:#232A5E; --rule2:#3B4BA8; --fl:#6FE3FF; --dg:#FF8A8A; --track:#262C5A; }
@@ -620,7 +705,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   :root { --rail-w:calc(220px + env(safe-area-inset-left)); --sheet-w:420px; }
   body:has(.mnav) { padding-bottom:0; padding-left:var(--rail-w); }
   .mnav { top:0; right:auto; width:var(--rail-w); max-width:none; flex-direction:column; gap:4px; margin:0; padding:max(16px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left)); border-top:0; border-right:1px solid var(--rule2); box-shadow:4px 0 16px rgb(0 0 0 / .06); }
-  .mnav button { flex:none; flex-direction:row; justify-content:flex-start; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
+  .mnav button { flex:none; flex-direction:row; justify-content:flex-start; gap:10px; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
   .mnav button:hover { background:var(--paper2); }
   .mnav button[aria-expanded="true"] { background:var(--paper2); box-shadow:inset 3px 0 0 var(--fl); }
   .mnav .new-dot { position:static; margin-left:6px; }
@@ -630,7 +715,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --rail-w:calc(96px + env(safe-area-inset-left)); }
   .mnav { gap:2px; padding:max(8px, env(safe-area-inset-top)) 6px max(8px, env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left)); }
-  .mnav button { justify-content:center; min-height:44px; padding:0 4px; font-size:13px; }
+  .mnav button { flex-direction:column; justify-content:center; gap:2px; min-height:44px; padding:0 4px; font-size:13px; }
 }
 /* ราว/แผงเริ่มใต้หัวเว็บ (ui-redo ใบ 67 · เจ้าของเลือกจากภาพ): หัวเว็บกว้างเต็มจอทับช่องราว · --hd = ขอบล่างหัวที่วัดขณะเลื่อน เลื่อนพ้นแล้วชิดบน
    · มือถือแนวนอนเตี้ยคงราวเต็มสูงแบบเดิม (หัวบางอยู่แล้ว) */
@@ -647,277 +732,297 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 }
 @keyframes drw { from { transform:translateX(100%); } }
 /*GAME-CSS:END*/</style></template>
-</head>
-<body>
-
-<div class="lay">
-<aside class="ctl" id="ctl" aria-label="แผงปรับค่า">
-  <h1>ปรับป้ายผลบนปุ่ม</h1>
-  <p class="hint">เปลี่ยนคำในป้ายขวาของปุ่มตัวเลือกเป็นไอคอน/อิโมจิ + สี · จอขวาใช้ CSS ตัวเกมจริง · เปิด "ขาวดำ" เช็กว่าแยกขึ้น/ลงได้โดยไม่ต้องดูสี · ค่าจำไว้ในเครื่อง · เลือกเสร็จกดคัดลอกแล้ววางส่ง</p>
-  <p class="hint">ค่าที่เกมซ่อนไว้ (ป้าย ?) ยังเป็นไอคอนกลางตัวเดียว ไม่มีไอคอนบอกว่าซ่อนค่าไหน · ใต้แต่ละจอมีบรรทัด "อ่านจอ" = คำที่โปรแกรมอ่านจอจะอ่าน</p>
-  <div class="row"><span class="lb">เริ่มจาก</span><div class="btns" id="pre"></div></div>
-  <div id="rows"></div>
-  <h2>ไอคอนต่อค่า</h2>
-  <p class="hint">ใส่อิโมจิหรือตัวอักษรเอง · ชุด ข ใช้ไอคอนเส้น พิมพ์ชื่อไอคอน (heart smile book people coin case link bolt spark clover star) หรือใส่อิโมจิแทนก็ได้</p>
-  <div class="icons" id="icons"></div>
-  <h2>สี</h2>
-  <div class="cols" id="cols"></div>
-  <h2>คัดลอกส่ง</h2>
-  <div class="row"><span class="lb">หมายเหตุถึงทีม</span><textarea id="note" rows="3" placeholder="เช่น ชอบชุด ก แต่ขอลูกศรตัวใหญ่ขึ้น"></textarea></div>
-  <div class="btns"><button type="button" class="pri" id="copy">คัดลอก JSON</button><button type="button" id="reset">ล้างค่ากลับ preset</button></div>
-  <p id="msg" role="status"></p>
-  <textarea id="out" rows="8" readonly aria-label="JSON ที่จะคัดลอก"></textarea>
-</aside>
-<main class="view">
-  <div class="vbar">
-    <span class="seg" id="vp"><button type="button" data-v="360">มือถือ 360</button><button type="button" data-v="390">มือถือ 390</button><button type="button" data-v="1280">คอม 1280</button></span>
-    <span class="seg" id="gray"><button type="button" data-v="off">สี</button><button type="button" data-v="on">ขาวดำ</button></span>
-  </div>
-  <p class="note">แต่ละจอมีคู่ "ของเดิม" (คำล้วนแบบที่เกมใช้อยู่) ให้เทียบ · ปุ่มที่ล็อกยังเป็นคำบอกเหตุผล ไม่เปลี่ยนเป็นไอคอน</p>
-  <div class="frames" id="frames"></div>
-</main>
-</div>
 <script>
 (() => {
-  // ---------- ป้ายตัวอย่าง: เก็บเป็นชิ้น (token) ไม่ใช่สตริง ⇒ ทุกชุดไอคอนวาดจากชิ้นเดียวกัน ----------
-  // ชื่อค่าตาม STAT_LABELS (src/engine/life.mjs) + รายได้ · ต่างโลกตาม ISEKAI_FX (src/engine/isekai.mjs)
-  // hide = ป้าย ? ที่ fixedFx ใส่แทนค่าที่เหตุการณ์ซ่อน (B169) — ไม่มีชื่อค่าติดมา จึงวาดไอคอนเฉพาะตัวไม่ได้ตั้งแต่ต้น
-  const STAT = ['ชีวิต', 'ความสุข', 'ความรู้', 'ความสัมพันธ์', 'เงิน', 'รายได้', 'เส้นสาย'];
-  const ISK = ['ชีวิต', 'พลัง', 'เวท', 'โชค', 'ทอง', 'ชื่อเสียง'];
-  const up = (n, long) => ({ k: 'stat', n, d: 1, long });
-  const dn = (n, long) => ({ k: 'stat', n, d: -1, long });
-  const T = (t) => ({ k: 'text', t });
-  // ผลต่างโลกจากโฟกัส (isekaiFocusFx) เป็น "พลัง · เวท ขึ้น" = ขึ้นทุกตัว
-  const SAMPLES = [
-    { id: 'th1', world: 'a', title: 'ชาติไทย · การ์ดเลือกทาง', sub: 'ค่าขึ้นลง · ฟรี · %สำเร็จ', age: 15, kicker: 'ช่วงวัยรุ่น', h: 'หาเงินเองครั้งแรก', p: 'ที่บ้านเงินเริ่มตึง ร้านหมูกระทะข้างตลาดรับเด็กล้างจาน ส่วนเพื่อนชวนไปแบกของที่ท่าเรือ ได้เงินมากกว่าเท่าตัว',
-      choices: [['ล้างจาน เอาเงินช่วยบ้าน', [dn('ความรู้'), up('ความสัมพันธ์'), up('เงิน'), { k: 'free' }]], ['ไปแบกของที่ท่าเรือ', [{ k: 'pct', v: 50 }, { k: 'free' }]], ['ขายเคสมือถือออนไลน์', [dn('เงิน'), { k: 'pct', v: 45 }]]] },
-    { id: 'th2', world: 'a', title: 'ชาติไทย · ค่าซ่อน + ค่าอื่น', sub: 'ป้าย ? · สำเร็จ ? · ระยะยาว · ล็อก', age: 34, kicker: 'ช่วงทำงาน', h: 'ข้อเสนอจากหัวหน้าเก่า', p: 'หัวหน้าเก่าชวนไปเปิดบริษัทด้วยกัน บอกว่าเส้นสายมีพร้อม ขาดแค่คนลงแรง แต่เพื่อนร่วมงานกระซิบว่าเขาเคยเชิดเงินหุ้นส่วนมาแล้ว',
-      choices: [['ลาออกไปลุยด้วย', [dn('ชีวิต'), { k: 'hide' }]], ['ทำต่อที่เดิม ขอขึ้นเงินเดือน', [up('รายได้'), up('เส้นสาย')]], ['ไปทำบุญถามหลวงพ่อก่อน', [up('ความสุข', true), { k: 'pctq' }]], ['ลงขันซื้อหุ้นส่วน', null, 'ต้องมีเงิน 200,000 บาท']] },
-    { id: 'th3', world: 'a', title: 'ชาติไทย · ซ่อนทั้งแถบ', sub: 'หวยสายมู (ป้าย ? ล้วน) · เสี่ยง', age: 52, kicker: 'ช่วงกลางคน', h: 'เลขเด็ดจากศาลเจ้า', p: 'ป้าข้างบ้านฝันเห็นงูใหญ่พันเสาศาลเจ้า ตื่นมาก็จดเลขให้ทั้งซอย',
-      choices: [['ซื้อตามเลขในฝัน', [{ k: 'hide' }]], ['ลงขันกับป้า แบ่งกันคนละครึ่ง', [T('เสี่ยงกลาง')]], ['ไม่ซื้อ', null]] },
-    { id: 'isk1', world: 'i', title: 'ต่างโลก · เหตุการณ์', sub: '%ผ่าน + สกิลช่วย · ใช้ทอง', age: 19, kicker: 'เหตุการณ์ · อายุ 19', h: 'ปีศาจที่หมู่บ้านชายป่า', p: 'ชาวบ้านมาขอให้ช่วย ปีศาจสามตัวลงมาจากเขาทุกคืน',
-      choices: [['ถือดาบบุกเข้าไปเอง', [{ k: 'pct', v: 65, w: 1 }, { k: 'aid', n: 'ดาบเพลิง', v: 10 }]], ['พาชาวบ้านหลบเข้าโบสถ์', [{ k: 'pct', v: 40, w: 1 }]], ['จ้างทหารรับจ้าง', [{ k: 'gold', v: 200 }]]] },
-    { id: 'isk2', world: 'i', title: 'ต่างโลก · เลือกสิ่งที่ทุ่มเท', sub: 'ค่าที่ขึ้นต่อปี · ทำอยู่', age: 20, kicker: 'เลือกสิ่งที่ทุ่มเท', h: 'ปีนี้จะทุ่มเทกับอะไร', p: 'ฤดูหนาวมาถึง ถนนปิด เหลือเวลาฝึกตัวเองทั้งปี',
-      choices: [['ฝึกดาบกับหัวหน้าองครักษ์', [up('พลัง'), up('ชีวิต'), T('ทำอยู่')]], ['อ่านตำราในหอเวท', [up('เวท')]], ['รับงานกิลด์', [up('ทอง'), up('ชื่อเสียง')]]] },
-  ];
+  const KEY = 'next-life-me-panel-tweak-v1';
+  const MEM = 'next-life-me-panel-tweak-help';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const GCSS = $('gcss').content.querySelector('style').textContent;
+  const FONTS = new URL('../../fonts/fonts.css', location.href).href;
 
-  // ---------- ชุดไอคอน ----------
-  // ไอคอนเส้น 16px ขีดเดียว (ชุด ข) · สีตาม currentColor ⇒ ชิปขึ้น/ลงคุมสีเอง
-  const SVG = {
-    heart: 'M8 13.5S2 10 2 5.8A3 3 0 0 1 8 4.5a3 3 0 0 1 6 1.3C14 10 8 13.5 8 13.5z',
-    smile: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM5.5 9.5q2.5 2.5 5 0M6 6.5h0M10 6.5h0',
-    book: 'M2 3.5h4.5Q8 3.5 8 5v8.5q0-1.5-1.5-1.5H2zM14 3.5H9.5Q8 3.5 8 5v8.5q0-1.5 1.5-1.5H14z',
-    people: 'M5.5 7.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM1.5 13.5q0-4 4-4t4 4M11 7a1.8 1.8 0 1 0 0-3.6M11.5 9.5q3 .5 3 4',
-    coin: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM8 4.5v7M10 6.2Q9.5 5.5 8 5.5T6 6.7Q6 8 8 8t2 1.3T8 10.5 6 9.8',
-    case: 'M2 5.5h12v8H2zM5.5 5.5V3.5h5v2M2 9h12',
-    link: 'M6.5 9.5l3-3M7 4.5l1.2-1.2a2.6 2.6 0 0 1 3.7 3.7L10.7 8.2M9 11.5l-1.2 1.2a2.6 2.6 0 0 1-3.7-3.7L5.3 7.8',
-    bolt: 'M9 1.5L3.5 9H8l-1 5.5L12.5 7H8z',
-    spark: 'M8 1.5v4M8 10.5v4M1.5 8h4M10.5 8h4M3.5 3.5l2 2M10.5 10.5l2 2M12.5 3.5l-2 2M5.5 10.5l-2 2',
-    clover: 'M8 8C5 8 3 6 4.5 4.2S8 4 8 8zm0 0c0-3 2-5 3.8-3.5S12 8 8 8zm0 0c3 0 5 2 3.5 3.8S8 12 8 8zm0 0c0 3-2 5-3.8 3.5S4 8 8 8zm0 0l2.5 6',
-    star: 'M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z',
-    target: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM8 8h0',
-    ask: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM6.2 6.2Q6.4 4.6 8 4.6t1.8 1.5Q9.8 7.2 8 7.8v1.4M8 11.2h0',
-    tag: 'M2 2.5h5.5l6.5 6.5-5 5-6.5-6.5zM5 5h0',
-  };
-  const svg = (name) => `<svg viewBox="0 0 16 16" width="1.15em" height="1.15em" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-.2em"><path d="${SVG[name]}"/></svg>`;
-  // ขึ้น/ลง: รูปทรงต่างกันเสมอ (decisions 74 — ขาวดำต้องแยกได้)
-  const DIRS = { arrow: ['↑', '↓'], tri: ['▲', '▼'], sign: ['+', '−'], dbl: ['⇧', '⇩'] };
-  const KEYS = [...new Set([...STAT, ...ISK])];
-  const BASE = {
-    dir: 'tri', color: 'mark', chip: 'off', word: 'icon', size: '100', sep: 'gap', free: 'chip', pct: 'icon', hide: 'icon',
-    upA: '#2F6B66', dnA: '#B73824', upI: '#7FE0A8', dnI: '#FF8A7A',
-  };
-  const PRESET = {
-    a: { name: 'ก อิโมจิ', icons: { ชีวิต: '❤️', ความสุข: '😊', ความรู้: '📖', ความสัมพันธ์: '🤝', เงิน: '💰', รายได้: '💼', เส้นสาย: '🔗', พลัง: '💪', เวท: '✨', โชค: '🍀', ทอง: '🪙', ชื่อเสียง: '⭐', free: '🆓', pct: '🎯', hide: '❔' } },
-    b: { name: 'ข ไอคอนเส้น + ชิป', dir: 'arrow', chip: 'on', color: 'all', icons: { ชีวิต: 'heart', ความสุข: 'smile', ความรู้: 'book', ความสัมพันธ์: 'people', เงิน: 'coin', รายได้: 'case', เส้นสาย: 'link', พลัง: 'bolt', เวท: 'spark', โชค: 'clover', ทอง: 'coin', ชื่อเสียง: 'star', free: 'tag', pct: 'target', hide: 'ask' } },
-    c: { name: 'ค คำเดิม + ลูกศรสี', dir: 'tri', word: 'word', color: 'mark', free: 'word', pct: 'word', hide: 'word', icons: {} },
-  };
-  const ROWS = [
-    ['word', 'ไอคอนหรือคำ', [['icon', 'ไอคอนล้วน'], ['both', 'ไอคอน + คำ'], ['word', 'คำล้วน']]],
-    ['dir', 'รูปขึ้น/ลง', Object.entries(DIRS).map(([k, [u, d]]) => [k, `${u} ${d}`])],
-    ['color', 'ลงสีตรงไหน', [['mark', 'เฉพาะลูกศร'], ['all', 'ทั้งชิ้น'], ['none', 'ไม่ลงสี']]],
-    ['chip', 'พื้นชิป', [['off', 'ไม่มี'], ['on', 'มีพื้นจาง']]],
-    ['size', 'ขนาดป้าย', [['100', '12px (เดิม)'], ['115', '14px'], ['130', '16px']]],
-    ['sep', 'คั่นระหว่างชิ้น', [['dot', '·'], ['gap', 'เว้นวรรค']]],
-    ['free', 'ป้าย "ฟรี"', [['word', 'คำ'], ['icon', 'ไอคอน'], ['chip', 'ชิปกรอบ']]],
-    ['pct', '"สำเร็จ ~N%"', [['word', 'คำเดิม'], ['icon', 'ไอคอน + N%'], ['short', 'N% ล้วน']]],
-    ['hide', 'ป้าย ? (ค่าซ่อน)', [['word', '?'], ['icon', 'ไอคอนกลาง']]],
+  // ---------- ข้อมูลตัวอย่าง (ลอกค่าคงที่จาก labels.mjs · ป้ายจาก app.mjs) ----------
+  const ICON = {"health":"<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M8 13.5S2 10 2 5.8A3 3 0 0 1 8 4.5a3 3 0 0 1 6 1.3C14 10 8 13.5 8 13.5z\"/></svg>","happiness":"<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM5.5 9.5q2.5 2.5 5 0M6 6.5h0M10 6.5h0\"/></svg>","knowledge":"<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M2 3.5h4.5Q8 3.5 8 5v8.5q0-1.5-1.5-1.5H2zM14 3.5H9.5Q8 3.5 8 5v8.5q0-1.5 1.5-1.5H14z\"/></svg>","relations":"<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M5.5 7.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM1.5 13.5q0-4 4-4t4 4M11 7a1.8 1.8 0 1 0 0-3.6M11.5 9.5q3 .5 3 4\"/></svg>"};
+  const HELP = [["ชีวิต","ลดลงเองตามวัย · ยิ่งทรุดกว่าที่ร่างกายควรเป็นตามวัยยิ่งเสี่ยงตายในปีนั้น ดูแลจนดีกว่านั้นยิ่งอยู่ยืน · หมดแถบคือตาย"],["ความสุข","ค่อย ๆ กลับสู่ระดับเดิมของตัวเองทุกปี ช่วงสุขหรือทุกข์จึงไม่ค้างนาน · ล้มละลายทำให้ลดลง"],["ความรู้","เพิ่มขึ้นเองทีละน้อยตามวัย · ใช้สอบเข้าเรียนต่อ และช่วยให้ทางที่ต้องใช้หัวสำเร็จง่ายขึ้น"],["ความสัมพันธ์","จางลงเองทีละน้อยถ้าไม่ดูแล · ล้มละลายทำให้ลดลง · ถ้าไปเกิดเป็นลูกหลานในบ้านเดิม ติดตัวไปส่วนหนึ่ง"],["เงิน · หนี้","เงินเก็บโตหรือหดตามที่เลือกลงทุน · เงินติดตัวติดลบโดนดอกเบี้ยทบ · เงินกู้หักค่างวดทุกปี · หนี้ท่วมรายได้นานหลายปีจะล้มละลาย ทรัพย์เหลือศูนย์"],["ทุกค่า","บางทางเลือกต้องมีค่าถึงก่อนจึงกดได้ (ปุ่มบอกเหตุผล) · ค่าที่สูงหรือต่ำมากทำให้ผลบางเรื่องเอียงดีหรือร้าย และเปลี่ยนเรื่องที่จะเจอ"]];
+  const STATS = [['health', 'ชีวิต'], ['happiness', 'ความสุข'], ['knowledge', 'ความรู้'], ['relations', 'ความสัมพันธ์']];
+  const MONEY_HELP = 'เงิน · หนี้';
+  const LIVE = { age: 42, vals: { health: 64, happiness: 55, knowledge: 71, relations: 38 }, delta: { health: -2, knowledge: 1 } };
+  const DEAD = { age: 78, vals: { health: 0, happiness: 61, knowledge: 77, relations: 52 } };
+  // st.workYears = { occupation id: ปี } เรียงตามปีที่เริ่มนับ · ชื่อจาก era.finance.occupations (data/finance.json)
+  const JOBS = [{ id: 'labor', name: 'รับจ้างทั่วไป', years: 3, from: 19 }, { id: 'factory', name: 'พนักงานโรงงาน', years: 8, from: 22 }, { id: 'clerk', name: 'พนักงานสำนักงาน', years: 12, from: 30 }];
+  // ชีวิตที่จบแล้ว: งานสุดท้ายทำจนเกษียณ (เลิกนับปีที่อายุ 60)
+  const JOBS_DEAD = JOBS.map((j) => (j.id === 'clerk' ? { ...j, years: 30 } : j));
+  const LIFE_MENU = ['ตัวฉัน', 'ครอบครัว', 'เงิน', 'สมุด', 'เพิ่มเติม'];
+
+  // ---------- ชุด + knob ----------
+  // money: menu = ปุ่มเงินในเมนู (เกมตอนนี้) · before = ในแผงตัวฉันก่อนโฟกัส · after = หลังฐานะและงาน
+  // mhelp: คำอธิบายเงิน·หนี้ — both = ใต้เงินและในรายการคำอธิบาย (ซ้ำ = เกมตอนนี้ถ้ารวมเฉย ๆ) · under = ใต้เงินที่เดียว · dl = ในรายการคำอธิบายที่เดียว
+  // fold: none = กางเสมอ ไม่มีปุ่ม · open/closed = ค่าตั้งต้นเมื่อมีปุ่ม · remember = จำค่าที่กดล่าสุด (localStorage ของจอ ไม่ลงเซฟ)
+  // work: none · me = หัวในแผงตัวฉันทุกจอ · side = พาแนลขวาทุกฉาก (จอแนวนอน) + แผงตัวฉันจอที่ไม่มีพาแนลขวา
+  // fmt: years = "อาชีพ · N ปี" จาก st.workYears (UI ล้วน) · span = ลำดับช่วงอายุ (ต้องเพิ่มค่าใน engine)
+  const PRESETS = [
+    { id: '0', name: '0 เกมตอนนี้ (เมนูมีเงิน · กางเสมอ · ไม่มีประวัติงาน)', pure: true, money: 'menu', mhelp: 'both', fold: 'none', remember: 'no', work: 'none', fmt: 'years' },
+    { id: 'ก', name: 'ก เงินหลังฐานะและงาน · พับตั้งต้น จำค่า · ประวัติงานในแผงตัวฉัน (ปีรวม)', money: 'after', mhelp: 'dl', fold: 'closed', remember: 'yes', work: 'me', fmt: 'years' },
+    { id: 'ข', name: 'ข เงินก่อนโฟกัส · กางตั้งต้น ไม่จำ · ประวัติงานพาแนลขวา + แผงตัวฉัน (ช่วงอายุ)', money: 'before', mhelp: 'under', fold: 'open', remember: 'no', work: 'side', fmt: 'span' },
+    { id: 'ค', name: 'ค เงินก่อนโฟกัส · พับตั้งต้น จำค่า · ประวัติงานในแผงตัวฉัน (ช่วงอายุ)', money: 'before', mhelp: 'under', fold: 'closed', remember: 'yes', work: 'me', fmt: 'span' },
   ];
-  const KEY = 'next-life-fx-icons-tweak-v1';
-  const ui = { vp: '390', gray: 'off', pre: 'a' };
-  let cfg = {};
-  const fresh = (p) => ({ ...BASE, ...PRESET[p], icons: { ...PRESET[p].icons } });
+  const KNOBS = [
+    ['money', 'ข้อ 225 · เงินอยู่ไหน', [['menu', 'ปุ่ม "เงิน" ในเมนูล่าง (เกมตอนนี้)'], ['before', 'ในแผงตัวฉัน ก่อนโฟกัส (ต่อจากค่าสถานะ)'], ['after', 'ในแผงตัวฉัน หลังฐานะและงาน']]],
+    ['mhelp', 'ข้อ 225 · คำอธิบาย "เงิน · หนี้"', [['both', 'ทั้งใต้เงินและในรายการคำอธิบาย (ซ้ำ)'], ['under', 'ใต้เงินที่เดียว'], ['dl', 'ในรายการคำอธิบายที่เดียว']]],
+    ['fold', 'ข้อ 226 · ปุ่มพับคำอธิบายค่าสถานะ', [['none', 'ไม่มีปุ่ม กางเสมอ (เกมตอนนี้)'], ['open', 'มีปุ่ม · ตั้งต้นกาง'], ['closed', 'มีปุ่ม · ตั้งต้นพับ']]],
+    ['remember', 'ข้อ 226 · จำค่าพับ/กาง', [['no', 'ไม่จำ เปิดเกมใหม่กลับค่าตั้งต้น'], ['yes', 'จำในเครื่อง (localStorage ของจอ ไม่ลงเซฟ)']]],
+    ['work', 'ข้อ 227 · ประวัติงานอยู่ไหน', [['none', 'ไม่มี (เกมตอนนี้)'], ['me', 'ในแผงตัวฉันทุกจอ'], ['side', 'พาแนลขวาทุกฉาก (จอแนวนอน) + แผงตัวฉันจออื่น']]],
+    ['fmt', 'ข้อ 227 · รูปแบบประวัติงาน', [['years', 'อาชีพ · N ปี (จาก st.workYears · UI ล้วน)'], ['span', 'ลำดับช่วงอายุ (ต้องเพิ่มค่าใน engine)']]],
+  ];
+  const SCENES = [['life', 'ชีวิต · แผงตัวฉัน', [390, 1280]], ['death', 'การ์ดตาย · แผงตัวฉัน', [390, 1280]], ['land', 'มือถือแนวนอน · พาแนลขวา (แผงปิด)', [844]]];
+
+  let S = { base: 1, cur: clone(PRESETS[1]) }, note = '';
   try {
-    const s = JSON.parse(localStorage.getItem(KEY));
-    if (s?.cfg?.icons) { cfg = s.cfg; Object.assign(ui, s.ui ?? {}); document.getElementById('note').value = s.note ?? ''; }
-  } catch (e) { /* ค่าเสีย/ไม่มี storage — เริ่มจาก preset */ }
-  if (!cfg.icons) cfg = fresh(ui.pre);
-  const store = () => { try { localStorage.setItem(KEY, JSON.stringify({ cfg, ui, note: document.getElementById('note').value })); } catch (e) { /* file:// บางเบราว์เซอร์ปิด storage — ยังคัดลอกได้ */ } };
+    const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (s && s.cur && PRESETS[s.base]) { S = { base: s.base, cur: { ...clone(PRESETS[s.base]), ...s.cur } }; note = s.note || ''; }
+  } catch (e) { /* storage ปิด — ใช้ค่าเริ่ม */ }
+  const store = () => { try { localStorage.setItem(KEY, JSON.stringify({ ...S, note })); } catch (e) { /* file:// บางเบราว์เซอร์ปิด storage */ } };
+  // ค่าพับที่ "เกม" จำไว้ (จำลอง localStorage ของจอ) — แยกคีย์จากค่าหน้า tweak
+  const memRead = () => { try { return localStorage.getItem(MEM); } catch (e) { return null; } };
+  const memWrite = (v) => { try { v === null ? localStorage.removeItem(MEM) : localStorage.setItem(MEM, v); } catch (e) { /* ไม่มี storage */ } };
+  const edits = () => KNOBS.map(([k]) => k).filter((k) => S.cur[k] !== PRESETS[S.base][k]);
+  // สถานะพับตอนเปิดแผง: ไม่มีปุ่ม = กาง · จำ + มีค่าที่จำ = ค่านั้น · ไม่งั้นค่าตั้งต้น
+  const helpOpen = (p) => p.fold === 'none' || (p.remember === 'yes' && memRead() ? memRead() === 'open' : p.fold === 'open');
 
-  // ---------- วาดป้าย ----------
-  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-  const icon = (k) => { const v = cfg.icons[k] ?? ''; return SVG[v] ? svg(v) : esc(v); };
-  // คำที่โปรแกรมอ่านจออ่าน = คำเต็มแบบป้ายเดิม (fxPart แปลงลูกศรเป็น "เพิ่ม/ลด")
-  const said = (t) => t.k === 'stat' ? `${t.n}${t.d > 0 ? 'เพิ่ม' : 'ลด'}${t.long ? ' ระยะยาว' : ''}` : t.k === 'free' ? 'ฟรี' : t.k === 'pct' ? (t.w ? `โอกาส ${t.v}%` : `สำเร็จราว ${t.v}%`) : t.k === 'pctq' ? 'สำเร็จ ไม่รู้โอกาส' : t.k === 'hide' ? 'ไม่รู้ผล' : t.k === 'aid' ? `${t.n} ช่วย ${t.v}%` : t.k === 'gold' ? `ใช้ทอง ${t.v}` : t.t;
-  // ข้อความเดิมของเกม (ของเดิม) — ตรงกับ fixedFx/outcomeFx/isekaiEventCard
-  const oldText = (t) => t.k === 'stat' ? `${t.n} ${t.d > 0 ? '↑' : '↓'}${t.long ? ' ระยะยาว' : ''}` : t.k === 'free' ? 'ฟรี' : t.k === 'pct' ? (t.w ? `${t.v}%` : `สำเร็จ ~${t.v}%`) : t.k === 'pctq' ? 'สำเร็จ ?' : t.k === 'hide' ? '?' : t.k === 'aid' ? `${t.n} +${t.v}%` : t.k === 'gold' ? `ใช้ทอง ${t.v}` : t.t;
-  const tint = (c) => (cfg.chip === 'on' ? `background:color-mix(in srgb, ${c} 16%, transparent);padding:0 5px;border-radius:999px;` : '');
-  const piece = (t, world) => {
-    const [u, d] = DIRS[cfg.dir];
-    const upC = world === 'i' ? cfg.upI : cfg.upA;
-    const dnC = world === 'i' ? cfg.dnI : cfg.dnA;
-    const wrap = (vis, style = '') => `<span class="fxp" style="${style}"><span aria-hidden="true">${vis}</span><span class="sr">${esc(said(t))}</span></span>`;
-    if (t.k === 'stat') {
-      const c = t.d > 0 ? upC : dnC;
-      const mark = cfg.color === 'mark' ? `<b style="color:${c}">${t.d > 0 ? u : d}</b>` : `<b>${t.d > 0 ? u : d}</b>`;
-      const ic = icon(t.n);
-      const face = cfg.word === 'word' || !ic ? esc(t.n) : cfg.word === 'both' ? `${ic} ${esc(t.n)}` : ic;
-      return wrap(`${face} ${mark}${t.long ? ' ระยะยาว' : ''}`, `${cfg.color === 'all' ? `color:${c};` : ''}${tint(c)}`);
-    }
-    if (t.k === 'free') {
-      if (cfg.free === 'icon' && icon('free')) return wrap(icon('free'));
-      if (cfg.free === 'chip') return wrap('ฟรี', 'border:1px solid currentColor;padding:0 5px;border-radius:999px;');
-      return wrap('ฟรี');
-    }
-    if (t.k === 'pct' || t.k === 'pctq') {
-      const n = t.k === 'pct' ? `${t.w ? '' : '~'}${t.v}%` : '?';
-      if (cfg.pct === 'icon' && icon('pct')) return wrap(`${icon('pct')} ${n}`);
-      if (cfg.pct === 'short') return wrap(n);
-      return wrap(esc(oldText(t)));
-    }
-    // ค่าซ่อน: ไอคอนกลางตัวเดียวทุกค่า — ห้ามมีไอคอนต่อค่า (decisions 73)
-    if (t.k === 'hide') return wrap(cfg.hide === 'icon' && icon('hide') ? icon('hide') : '?');
-    return wrap(esc(oldText(t)));
+  // ---------- markup ตามคลาสเกม ----------
+  const baht = (v) => `${Math.round(v).toLocaleString('en-US')} บาท`;
+  const meter = ([k, label], v, d, low) => `<li${low ? ' class="low"' : ''}><span class="mh"><span class="mk">${ICON[k]}${label}</span><b class="num">${v}</b>${d ? `<em${d < 0 ? ' class="dn"' : ''}><span aria-hidden="true">${d > 0 ? '▲' : '▼'}</span>${Math.abs(d)}</em>` : ''}</span><span class="br"><i style="width:${v}%"></i></span></li>`;
+  const av = '<svg class="av" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" fill="#D8C8A8"/><circle cx="20" cy="16" r="7" fill="#8A6A48"/><path d="M6 40q14-18 28 0z" fill="#8A6A48"/></svg>';
+  const statusBar = (x, dead) => `<header class="sb"><div class="sb-r1">${av}<span class="sb-who"><b>สมชาย ใจดี</b><small>ขอนแก่น · ช่วง${dead ? 'ชรา' : 'วัยทำงาน'}</small><small class="hd-job">${dead ? 'เกษียณ' : 'พนักงานสำนักงาน'}</small></span><span class="sb-age"><b>${dead ? `จากไปอายุ ${x.age}` : x.age}</b>${dead ? '' : '<small> ปี</small>'}</span></div><div class="hd-row"><span class="mk">ฐานะ</span><span class="hd-word">ชนชั้นกลาง</span><span class="hd-cash red"><span class="mk">เงินสด</span><b>8.5 หมื่น</b><span class="lw">มีกู้</span></span></div><ul class="sb-m">${STATS.map((s) => meter(s, x.vals[s[0]], x.delta?.[s[0]], s[0] === 'health' && x.vals.health <= 20 && !dead)).join('')}</ul></header>`;
+  const choice = (n, t, fx) => `<button class="choice" type="button"><kbd>${n}</kbd><span>${t}</span>${fx ? `<span class="fx"><span>${fx}</span></span>` : ''}</button>`;
+  const lifeCard = (side) => `<article class="card a pn${side ? '' : ' pn2'}"><div class="p-left">${statusBar(LIVE)}</div><div class="p-mid"><div class="body"><span class="kicker">ช่วงวัยทำงาน · อายุ 42</span><h3>หัวหน้าชวนรับงานนอกเวลา</h3><p>บริษัทลูกค้าเสนอค่าจ้างพิเศษถ้ารับงานเสาร์อาทิตย์ เงินดี แต่ลูกเพิ่งเข้าเรียนประถม</p></div><div class="choices">${choice(1, 'รับงาน เก็บเงินปิดหนี้', 'เงิน ▲ · ความสัมพันธ์ ▼')}${choice(2, 'ปฏิเสธ อยู่กับครอบครัว', 'ความสัมพันธ์ ▲')}</div></div>${side ? sidePanel(side) : ''}</article>`;
+  const deathCard = () => `<article class="card a mem pn pn2"><div class="p-left"><div class="top"><b>มรณบัตร</b></div></div><div class="p-mid"><div class="body"><span class="kicker">จากไปอายุ ${DEAD.age}</span><h3>สมชาย ใจดี</h3><p>ขอนแก่น · ชนชั้นกลาง · เกษียณ (เคยเป็นพนักงานสำนักงาน)</p></div></div></article>`;
+  const nav = (p) => `<nav class="mnav" aria-label="เมนู">${LIFE_MENU.filter((l) => l !== 'เงิน' || p.money === 'menu').map((l, i) => `<button type="button"${i ? '' : ' aria-expanded="true"'}><span>${l}</span></button>`).join('')}</nav>`;
+  const logo = '<div class="logo"><b>เกิดใหม่ทั้งที</b><small>ชาตินี้ขอชิงมาเกิด</small></div>';
+
+  // ประวัติงาน: years อ่าน st.workYears ได้เลย · span ต้องมีอายุเริ่มของแต่ละช่วง (engine ยังไม่เก็บ) · อาชีพตอนนี้ไม่มีอายุจบ
+  const workList = (p, dead, cls) => {
+    const now = dead ? null : JOBS.at(-1).id;
+    const li = (j) => p.fmt === 'years'
+      ? `<li><span>${j.name}</span><b class="num">${j.years} ปี${j.id === now ? ' · ทำอยู่' : ''}</b></li>`
+      : `<li><span class="wh-age">อายุ ${j.from}–${j.id === now ? 'ตอนนี้' : j.from + j.years - 1}</span><span>${j.name}</span></li>`;
+    return `<ul class="wh ${cls}">${(dead ? JOBS_DEAD : JOBS).map(li).join('')}</ul>`;
   };
-  const SEP = { dot: ' · ', gap: ' ' };
-  const fxNew = (toks, world) => `<span class="fx" style="font-size:${(12 * +cfg.size) / 100}px">${toks.map((t) => piece(t, world)).join(SEP[cfg.sep])}</span>`;
-  const fxOld = (toks) => `<span class="fx">${toks.map((t) => `<span>${esc(oldText(t))}</span>`).join(' · ')}</span>`;
-
-  // ---------- markup การ์ด: ชื่อคลาสตาม src/ui/app.mjs (statusBar · button · numbered · isekai card) ----------
-  const STATS = [['ชีวิต', 72], ['ความสุข', 52], ['ความรู้', 66], ['ความสัมพันธ์', 61]];
-  const sb = (age) => `<header class="sb"><div class="sb-r1"><span class="av ini" aria-hidden="true">ห</span><span class="sb-who"><b>หนุ่ม</b><small>จ.อุบลราชธานี</small></span><span class="sb-age"><b>${age}</b><small> ปี</small></span></div><ul class="sb-m">${STATS.map(([k, v]) => `<li><span class="mh"><span class="mk">${k}</span><b class="num">${v}</b></span><span class="br"><i style="width:${v}%"></i></span></li>`).join('')}</ul></header>`;
-  const btn = (label, fx, n, lock) => `<button class="choice"${lock ? ' disabled' : ` data-key="${n}"`}>${lock ? '' : `<kbd aria-hidden="true">${n}</kbd>`}<span>${esc(label)}</span>${fx}</button>`;
-  const cardHtml = (s, old) => {
-    let n = 0;
-    const choices = s.choices.map(([label, toks, lock]) => btn(label, lock ? `<span class="fx"><span>${esc(lock)}</span></span>` : toks ? (old ? fxOld(toks) : fxNew(toks, s.world)) : '', ++n, lock)).join('');
-    const body = `<span class="kicker">${esc(s.kicker)}</span><h3>${esc(s.h)}</h3><p>${esc(s.p)}</p>`;
-    if (s.world === 'i') return `<article class="card i"><div class="top"><b>ต่างโลก</b><small>ชาติต่างโลกที่ 1 · อายุ ${s.age}</small></div><div class="body">${body}</div><div class="choices">${choices}</div></article>`;
-    return `<article class="card a pn pn2"><div class="p-left">${sb(s.age)}</div><div class="p-mid"><div class="body">${body}</div><div class="choices">${choices}</div></div></article>`;
+  function sidePanel(p) {
+    return `<aside class="p-side" aria-label="สมุดและฉายา"><div class="h">สมุด</div><p class="note">อนุสรณ์ 3 ชีวิต · ภาพบ้านเมือง 4/40</p><button class="more" type="button">เปิดชั้นสมุด</button><div class="h">ฉายา</div><p class="note">สะสมแล้ว 7/120</p><div class="bk-bar" aria-hidden="true"><i style="width:6%"></i></div><button class="more" type="button">ดูสมุดฉายา</button>${p.work === 'side' ? `<div class="h">งานที่เคยทำ</div>${workList(p, false, 'wh-side')}` : ''}</aside>`;
+  }
+  const moneyRows = (dead) => [
+    ['เงินติดตัว', baht(dead ? 1240000 : 85000)],
+    !dead && ['รายได้', `${baht(23800)}/เดือน`],
+    ['เงินกู้', dead ? 'ไม่มี' : baht(420000)],
+    ['เงินเทา', baht(dead ? 0 : 60000)],
+  ].filter((r) => r && !(r[0] === 'เงินเทา' && r[1] === baht(0)));
+  const moneyBox = (p, dead, open) => `<div class="mo"><dl>${moneyRows(dead).map(([k, v]) => `<dt>${k}</dt><dd class="num">${v}</dd>`).join('')}</dl>${p.mhelp !== 'dl' ? `<p class="hp"${open ? '' : ' hidden'}>${HELP.find(([k]) => k === MONEY_HELP)[1]}</p>` : ''}</div>`;
+  // แผงตัวฉัน: ลำดับตาม mePanel · เงินแทรกก่อนโฟกัสหรือหลังฐานะและงาน · คำอธิบายใต้เกจ + dl พับด้วยปุ่มเดียว
+  function mePanel(p, dead, open) {
+    const x = dead ? DEAD : LIVE;
+    const help = new Map(HELP), shown = new Set(STATS.map((s) => s[1]));
+    const dl = HELP.filter(([k]) => !shown.has(k) && !(k === MONEY_HELP && p.money !== 'menu' && p.mhelp === 'under'));
+    const fold = p.fold === 'none' ? '' : `<button type="button" class="me-fold" aria-expanded="${open}">${open ? 'ซ่อนคำอธิบาย' : 'ดูคำอธิบาย'}</button>`;
+    const stats = `<div class="me-hh"><h3>ค่าสถานะ</h3>${fold}</div><ul class="me-m">${STATS.map((s) => meter(s, x.vals[s[0]], 0, s[0] === 'health' && x.vals.health <= 20 && !dead).replace('</li>', `<p class="hp"${open ? '' : ' hidden'}>${help.get(s[1])}</p></li>`)).join('')}</ul><dl class="hp"${open ? '' : ' hidden'}>${dl.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
+    const money = p.money === 'menu' ? '' : `<h3>เงิน</h3>${moneyBox(p, dead, open)}`;
+    const focus = dead ? '' : '<h3>โฟกัส</h3><div class="focus"><button class="focus-btn" type="button" aria-expanded="false"><span class="focus-k">โฟกัส</span><b>ใช้ชีวิตตามน้ำ</b><span class="focus-fx">ไม่ทุ่มเรื่องไหนเป็นพิเศษ</span><span class="focus-go">เปลี่ยน</span></button></div>';
+    const stand = `<h3>ฐานะและงาน</h3><p class="meta"><span>ฐานะชนชั้นกลาง</span> · <span>${dead ? 'เกษียณ (เคยเป็นพนักงานสำนักงาน)' : 'พนักงานสำนักงาน'}</span>${dead ? ' · <span>วุฒิอาชีวะ</span>' : ''}</p>`;
+    const work = p.work === 'none' ? '' : `<h3>งานที่เคยทำ</h3>${workList(p, dead, 'wh-me')}`;
+    return `<div class="me">${stats}${p.money === 'before' ? money : ''}${focus}${stand}${p.money === 'after' ? money : ''}${work}</div>`;
+  }
+  const sheet = (p, dead, w, open) => `<section class="sheet${w >= 1264 ? ' pin' : ''}" aria-label="ตัวฉัน" data-menu="me"><div class="sheet-h"><h2>ตัวฉัน</h2><button class="sheet-x" type="button">กลับไปการ์ด</button></div>${mePanel(p, dead, open)}</section>`;
+  const MARK = {
+    life: (p, w, open) => `${logo}<div id="app">${lifeCard(null)}</div>${sheet(p, false, w, open)}${nav(p)}`,
+    death: (p, w, open) => `${logo}<div id="app">${deathCard()}</div>${sheet(p, true, w, open)}${nav(p)}`,
+    // ฉากมีเมนู: เกมวันนี้ panels(box, false) ไม่มีพาแนลขวา · ทาง side เปิดพาแนลขวาทุกฉาก
+    land: (p) => `${logo}<div id="app">${lifeCard(p.work === 'side' ? p : null)}</div>${nav(p)}`,
   };
-  const srLine = (s) => s.choices.filter(([, t, lock]) => t && !lock).map(([l, t]) => `${l}: ${t.map(said).join(', ')}`).join(' | ');
 
-  // ---------- จอ: iframe ต่อใบ · srcdoc = CSS เกม + การ์ด ⇒ media query ของเกมเห็นความกว้างจริง ----------
-  const GCSS = document.getElementById('gcss').content.querySelector('style').textContent;
-  const FONTS = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600&family=Sarabun:wght@400;600&family=Srisakdi:wght@700&display=swap';
-  // ชิ้นป้ายต้องไม่หักกลางชิ้น (กฎเดียวกับ .choice .fx span ของเกม)
-  const doc = (html) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><link rel="stylesheet" href="${FONTS}"><style>${GCSS}</style><style>body{overflow:hidden}.choice .fx .fxp{white-space:nowrap;display:inline-block}.choice .fx .fxp *{white-space:nowrap}</style></head><body><main id="app">${html}</main></body></html>`;
-  const frames = document.getElementById('frames');
-  const fit = (f) => {
-    const box = f.parentElement;
-    const w = +ui.vp;
-    const s = Math.min(1, box.clientWidth / w);
-    // วัดจากก้นการ์ด ไม่ใช่ scrollHeight — CSS เกมมีความสูงขั้นต่ำตามจอ ยืด iframe แล้วจอก็สูงตามไม่หยุด
-    const a = f.contentDocument?.querySelector('article');
-    const h = a ? Math.ceil(a.getBoundingClientRect().bottom + 24) : 600;
-    Object.assign(f.style, { width: `${w}px`, height: `${h}px`, transform: `scale(${s})` });
+  // CSS ใหม่ที่หน้านี้เสนอ (ยังไม่มีในเกม) — ใช้ตัวแปรสีเกม ไม่ฝัง hex
+  const NEW_CSS = `.me-hh{display:flex;align-items:baseline;gap:12px;margin:16px 0 8px}.me-hh h3{flex:1;margin:0}
+.me-fold{all:unset;min-height:44px;padding:0 4px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:underline;text-underline-offset:2px;cursor:pointer;white-space:nowrap}
+.me-fold:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.me [hidden]{display:none}
+.me .mo dl{margin-top:0}
+.wh{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.wh li{display:flex;justify-content:space-between;gap:12px;overflow-wrap:anywhere}
+.wh-me li .num{color:var(--ink2);font-weight:600;white-space:nowrap}
+.wh .wh-age{flex:none;min-width:7.5em;color:var(--ink2);font-variant-numeric:tabular-nums}
+.wh li:has(.wh-age){justify-content:flex-start}
+.wh-side{font-size:12px;gap:4px}.wh-side li{flex-direction:column;gap:0}.wh-side li .num{font-weight:600}.wh-side .wh-age{min-width:0}`;
+  // กรอบ: ปิดอนิเมชันลิ้นชัก (ภาพนิ่ง) · หน้า 390/1280 ไม่เลื่อน กรอบสูงตามแผง · แนวนอนคงสูง 390 (เงื่อนไขจอเตี้ยของเกม) เลื่อนในกรอบได้
+  const FIX = (sc) => `.sheet{animation:none !important}${sc === 'land' ? '' : 'html,body{overflow:hidden}'}`;
+  const srcdoc = (sc, p, w, open) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><link rel="stylesheet" href="${FONTS}"><style>${GCSS}</style><style>${FIX(sc)}</style><style>${p.pure ? '' : NEW_CSS}</style></head><body>${MARK[sc](p, w, open)}</body></html>`;
+
+  // ---------- สี + contrast ----------
+  const cv = document.createElement('canvas'); cv.width = cv.height = 1;
+  const cx = cv.getContext('2d', { willReadFrequently: true });
+  const toRgba = (css) => { cx.clearRect(0, 0, 1, 1); cx.fillStyle = '#000'; cx.fillStyle = css; cx.fillRect(0, 0, 1, 1); const d = cx.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255]; };
+  const lum = ([r, g, b]) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  const bgOf = (el, win) => {
+    const layers = [];
+    for (let e = el; e; e = e.parentElement) { const c = toRgba(win.getComputedStyle(e).backgroundColor); if (c[3] > 0) layers.push(c); if (c[3] >= 1) break; }
+    if (!layers.length || layers[layers.length - 1][3] < 1) layers.push([255, 255, 255, 1]);
+    return layers.reduceRight((u, c) => [0, 1, 2].map((i) => c[i] * c[3] + u[i] * (1 - c[3])), [0, 0, 0]);
+  };
+  // คู่ที่วัด · t = ตัวหนังสือ ≥ 4.5 · u = ขอบปุ่มกดได้ ≥ 3 (เทียบพื้นแผง) · ไม่มีชิ้นในจอ (knob ปิด) = ไม่โชว์แถว
+  const PROBES = {
+    life: [['t', '.me-hh h3', 'หัว ค่าสถานะ'], ['t', '.me-fold', 'ปุ่มพับ/กาง'], ['t', '.me-m .mk', 'ชื่อค่า'], ['t', '.me-m p', 'คำอธิบายใต้เกจ'], ['t', '.me dl dd', 'รายการคำอธิบาย'], ['t', '.me .mo dt', 'ป้ายเงิน'], ['t', '.me .mo dd', 'ยอดเงิน'], ['t', '.me .mo p', 'คำอธิบายเงิน'], ['t', '.me .focus-k', 'ป้ายโฟกัส'], ['u', '.me .focus-btn', 'ขอบปุ่มโฟกัส'], ['t', '.me .meta', 'ฐานะและงาน'], ['t', '.wh-me span', 'ชื่ออาชีพ'], ['t', '.wh-me .num, .wh-me .wh-age', 'ปี / ช่วงอายุ'], ['t', '.mnav button span', 'ป้ายเมนู']],
+    death: [['t', '.me-m .mk', 'ชื่อค่า'], ['t', '.me-fold', 'ปุ่มพับ/กาง'], ['t', '.me .mo dd', 'ยอดเงิน'], ['t', '.me .meta', 'ฐานะและงาน'], ['t', '.wh-me span', 'ชื่ออาชีพ'], ['t', '.wh-me .num, .wh-me .wh-age', 'ปี / ช่วงอายุ']],
+    land: [['t', '.p-side .h', 'หัวพาแนลขวา'], ['t', '.p-side .note', 'ข้อความรองพาแนล'], ['t', '.wh-side span', 'ชื่ออาชีพ (พาแนล)'], ['t', '.wh-side .num, .wh-side .wh-age', 'ปี / ช่วงอายุ (พาแนล)']],
+  };
+  const live = []; // { f, w, p, sc, small }
+  function measureScene(sc) {
+    const fr = live.find((x) => x.sc === sc), d = fr?.f.contentDocument, win = fr?.f.contentWindow;
+    if (!d?.body) return null;
+    const out = [];
+    for (const [kind, sel, label] of PROBES[sc]) {
+      const el = [...d.querySelectorAll(sel)].find((e) => e.getClientRects().length);
+      if (!el) continue;
+      const cs = win.getComputedStyle(el);
+      let fg, bg;
+      if (kind === 'u') { fg = toRgba(cs.borderTopColor); bg = bgOf(el.parentElement, win); } else { fg = toRgba(cs.color); bg = bgOf(el, win); }
+      // สีที่เกมใช้ทำจาง (opacity) — ผสมกับพื้นก่อนวัด
+      let op = 1;
+      for (let e = el; e && e !== d.body; e = e.parentElement) op *= parseFloat(win.getComputedStyle(e).opacity);
+      fg = [0, 1, 2].map((i) => fg[i] * fg[3] * op + bg[i] * (1 - fg[3] * op));
+      const r = ratio(fg, bg), need = kind === 'u' ? 3 : 4.5;
+      out.push({ sc, kind, label, r, need, ok: r >= need, fg, bg });
+    }
+    return out;
+  }
+  function measureFrame(f) {
+    const d = f.contentDocument, win = f.contentWindow;
+    if (!d?.body) return null;
+    let cMin = 99, cAt = '', fMin = 99;
+    for (const el of d.body.querySelectorAll('*')) {
+      if (!el.getClientRects().length || el.closest('[hidden],svg')) continue;
+      if (![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
+      const cs = win.getComputedStyle(el), px = parseFloat(cs.fontSize);
+      if (px < fMin) fMin = px;
+      const r = ratio(toRgba(cs.color), bgOf(el, win));
+      if (r < cMin) { cMin = r; cAt = `${el.tagName.toLowerCase()}.${String(el.className).trim().split(/\s+/).join('.')} «${el.textContent.trim().slice(0, 12)}»`; }
+    }
+    return { cMin, cAt, fMin };
+  }
+
+  // ---------- กรอบ ----------
+  // 390/1280: แผงเป็น fixed ⇒ กรอบสูงพอให้แผงไม่ต้องเลื่อน (ลิ้นชักสูงสุด = จอ − เมนู 60 − 24) · แนวนอนคง 390
+  const fit = (x) => {
+    const f = x.f, box = f.parentElement, s = Math.min(1, box.clientWidth / x.w), d = f.contentDocument;
+    let h = x.sc === 'land' ? 390 : x.w >= 1264 ? 800 : 844;
+    if (x.sc !== 'land' && d?.body) {
+      const sh = d.querySelector('.sheet'), app = d.getElementById('app');
+      const need = (sh ? sh.scrollHeight + (x.w >= 1264 ? 0 : 60 + 24) : 0);
+      h = Math.max(h, Math.ceil(need), Math.ceil((app?.getBoundingClientRect().bottom ?? 0) + 70));
+    }
+    Object.assign(f.style, { width: `${x.w}px`, height: `${h}px`, transform: `scale(${s})` });
     box.style.height = `${Math.ceil(h * s)}px`;
   };
-  const frame = (title, sub, html, sr) => {
+  function report(x) {
+    fit(x);
+    const m = measureFrame(x.f);
+    x.small.innerHTML = m ? `${x.w}px · contrast ต่ำสุดในจอ <span class="${m.cMin >= 4.5 ? 'ok' : 'bad'}" title="${esc(m.cAt)}">${m.cMin.toFixed(2)}</span> · ตัวเล็กสุด <span class="${m.fMin >= 12 ? 'ok' : 'bad'}">${m.fMin}px</span>${m.cMin >= 4.5 ? '' : ` · ที่ ${esc(m.cAt)}`}` : '';
+    after();
+  }
+  // ปุ่มพับในจอกดได้: สลับเฉพาะกรอบนั้น · โหมดจำ = เขียนค่าที่จำแล้ววาดทุกกรอบใหม่ (เหมือนเกมเปิดแผงครั้งหน้า)
+  function wire(x) {
+    const d = x.f.contentDocument, b = d?.querySelector('.me-fold');
+    if (!b) return;
+    b.onclick = () => {
+      const open = b.getAttribute('aria-expanded') !== 'true';
+      if (S.cur.remember === 'yes') { memWrite(open ? 'open' : 'closed'); draw(); return; }
+      b.setAttribute('aria-expanded', String(open));
+      b.textContent = open ? 'ซ่อนคำอธิบาย' : 'ดูคำอธิบาย';
+      d.querySelectorAll('.me .hp').forEach((e) => (e.hidden = !open));
+      report(x);
+    };
+  }
+  function frame(title, sc, p, w) {
     const wrap = document.createElement('section');
     wrap.className = 'fr';
-    wrap.innerHTML = `<h3>${esc(title)} <small>${esc(sub)}</small></h3><div class="box"><iframe title="${esc(title)}"></iframe></div>${sr ? `<p class="sr-out">อ่านจอ: ${esc(sr)}</p>` : ''}`;
-    const f = wrap.querySelector('iframe');
-    f.addEventListener('load', () => { fit(f); f.contentDocument.fonts?.ready.then(() => fit(f)); });
-    f.srcdoc = doc(html);
+    wrap.innerHTML = `<h3>${esc(title)} <small></small></h3><div class="box"><iframe title="${esc(title)} ${w}"></iframe></div>`;
+    const x = { f: wrap.querySelector('iframe'), w, p, sc, small: wrap.querySelector('small') };
+    x.f.addEventListener('load', () => { wire(x); report(x); x.f.contentDocument.fonts?.ready.then(() => report(x)); });
+    x.f.srcdoc = srcdoc(sc, p, w, helpOpen(p));
+    live.push(x);
     return wrap;
-  };
-  const draw = () => {
-    const list = [];
-    for (const s of SAMPLES) list.push(frame(s.title, s.sub, cardHtml(s, false), srLine(s)), frame(`${s.title} · ของเดิม`, 'คำล้วนตอนนี้', cardHtml(s, true)));
-    frames.className = `frames w${ui.vp === '1280' ? '1280' : '390'}${ui.gray === 'on' ? ' gray' : ''}`;
-    frames.replaceChildren(...list);
-    out();
-  };
-  addEventListener('resize', () => frames.querySelectorAll('iframe').forEach(fit));
+  }
+  function draw() {
+    live.length = 0;
+    const groups = SCENES.map(([k, l, ws]) => {
+      const g = document.createElement('section');
+      g.className = 'sc';
+      g.innerHTML = `<h2>${esc(l)}</h2>`;
+      const fr = document.createElement('div');
+      fr.className = `frames${ws.length === 1 ? ' one' : ''}`;
+      fr.append(...ws.map((w) => frame(l, k, S.cur, w)));
+      g.append(fr);
+      return g;
+    });
+    $('frames').replaceChildren(...groups);
+    const m = memRead();
+    $('mem').textContent = S.cur.fold === 'none' ? 'ไม่มีปุ่มพับ' : S.cur.remember === 'yes' ? `ค่าที่เกมจำไว้: ${m === 'open' ? 'กาง' : m === 'closed' ? 'พับ' : 'ยังไม่เคยกด (ใช้ค่าตั้งต้น)'}` : 'ไม่จำ — เปิดเกมใหม่กลับค่าตั้งต้นทุกครั้ง';
+    after();
+  }
+  let rows = [];
+  function after() {
+    rows = SCENES.flatMap(([k]) => measureScene(k) || []);
+    const fails = rows.filter((x) => !x.ok);
+    const sw = (x) => `<span class="pair" style="background:rgb(${x.bg.slice(0, 3)});color:rgb(${x.fg.slice(0, 3)})">ก</span>`;
+    const seen = new Set(rows.map((x) => x.sc));
+    if ($('cr')) $('cr').innerHTML = `<table class="cr"><tr><th></th><th>คู่</th><th>ค่า</th></tr>${SCENES.filter(([k]) => seen.has(k)).map(([k, l]) => `<tr><th colspan="3">${esc(l)}</th></tr>${rows.filter((x) => x.sc === k).map((x) => `<tr><td>${sw(x)}</td><td>${esc(x.label)}</td><td class="n"><span class="${x.ok ? 'ok' : 'bad'}">${x.r.toFixed(2)}</span> <small class="info">≥${x.need}</small></td></tr>`).join('')}`).join('')}</table>
+      <p class="hint">${rows.length ? (fails.length ? `<span class="bad">ตก ${fails.length} คู่</span>` : '<span class="ok">ผ่านทุกคู่</span>') : 'รอจอโหลด'} · วัดจากสีที่จอเกมคำนวณจริง (กรอบแรกของแต่ละฉาก) รวมความจาง (opacity) · ตัวหนังสือ ≥ 4.5 · ขอบปุ่มกดได้ ≥ 3</p>`;
+    if ($('out')) $('out').value = output(fails);
+    store();
+  }
+  function output(fails) {
+    const p = S.cur;
+    return JSON.stringify({
+      page: 'me-panel-tweak', ticket: 130, items: [225, 226, 227], base: PRESETS[S.base].id, baseName: PRESETS[S.base].name, edited: edits(),
+      money: { place: p.money, help: p.money === 'menu' ? 'panel' : p.mhelp },
+      statHelp: { button: p.fold !== 'none', start: p.fold === 'none' ? 'open' : p.fold, remember: p.fold !== 'none' && p.remember === 'yes' },
+      workHistory: { place: p.work, format: p.work === 'none' ? null : p.fmt, needsEngine: p.work !== 'none' && p.fmt === 'span' },
+      contrastFail: fails.map((x) => `${x.sc}: ${x.label} ${x.r.toFixed(2)}`), note,
+    }, null, 1);
+  }
 
   // ---------- แผงควบคุม ----------
-  const rows = document.getElementById('rows');
-  const segs = {};
-  for (const [k, label, opt] of ROWS) {
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.innerHTML = `<span class="lb">${label}</span>`;
-    const seg = document.createElement('div');
-    seg.className = 'seg';
-    for (const [v, t] of opt) {
-      const b = document.createElement('button');
-      Object.assign(b, { type: 'button', textContent: t });
-      b.dataset.v = v;
-      b.onclick = () => { cfg[k] = v; sync(); draw(); };
-      seg.append(b);
-    }
-    segs[k] = seg;
-    row.append(seg);
-    rows.append(row);
+  function panel() {
+    const p = S.cur, ed = new Set(edits()), lock = !!p.pure;
+    const off = (k) => lock || (k === 'mhelp' && p.money === 'menu') || (k === 'remember' && p.fold === 'none') || (k === 'fmt' && p.work === 'none');
+    const knob = ([k, label, opts]) => `<div class="row"><span class="lb">${esc(label)}${ed.has(k) ? ' <span class="ed">แก้</span>' : ''}</span><div class="seg col">${opts.map(([val, t]) => `<button type="button" data-k="${k}" data-v="${val}" class="${p[k] === val ? 'on' : ''}"${off(k) ? ' disabled' : ''}>${esc(t)}${k === 'fmt' && val === 'span' ? '<span class="eng">ค่า engine</span>' : ''}</button>`).join('')}</div></div>`;
+    $('ctl').innerHTML = `<h1>แผงตัวฉัน: เงิน · พับคำอธิบาย · ประวัติงาน</h1>
+      <p class="hint">ui-redo 130 · ข้อ 225–227 · เลือกชุด ปรับได้ แล้วกด <b>คัดลอกค่า</b> วางตอบในแชท · ค่าที่ปรับจำไว้ในเครื่อง</p>
+      <div class="row"><span class="lb">ชุดตั้งต้น</span><div class="seg col">${PRESETS.map((x, i) => `<button type="button" data-p="${i}" class="${i === S.base ? 'on' : ''}">${esc(x.name)}</button>`).join('')}</div></div>
+      <div class="btns"><button type="button" id="reset">คืนค่าชุดนี้${ed.size ? ` (แก้ ${ed.size})` : ''}</button></div>
+      <h2>ปรับ</h2>${lock ? '<p class="hint">ชุด 0 = เกมตอนนี้ ปรับไม่ได้ · เลือก ก ข ค แล้วปรับต่อ</p>' : ''}
+      ${KNOBS.map(knob).join('')}
+      <p class="hint"><span class="eng">ค่า engine</span> ลำดับช่วงอายุต้องเพิ่มค่าใหม่ในเซฟ (อายุเริ่มของแต่ละช่วงงาน) — engine วันนี้เก็บแค่ปีรวมต่ออาชีพ (st.workYears) · <b>เซฟเก่าไม่มีย้อนหลัง</b>: ช่วงก่อนอัปเดตจะไม่มีอายุให้ขึ้น · ปีรวมใช้ค่าที่มีอยู่แล้ว UI ล้วน เซฟเก่าขึ้นครบ</p>
+      <p class="hint">ข้อสังเกต: ตอนนี้คำอธิบาย "เงิน · หนี้" อยู่ทั้งแผงเงินและรายการคำอธิบายของแผงตัวฉัน — รวมแผงแล้วถ้าไม่เลือกจะซ้ำในแผงเดียว · พับแล้วคำอธิบายเงินพับไปด้วย · พาแนลขวาวันนี้ขึ้นเฉพาะจอแนวนอนเตี้ย (สูง ≤ 540) จอคอม 1280 ไม่มี ⇒ จอคอมอ่านประวัติงานจากแผงตัวฉันเสมอ</p>
+      <h2>contrast ทุกคู่ (สด)</h2><div id="cr"></div>
+      <h2>คัดลอก</h2><div class="row"><span class="lb">หมายเหตุถึงผู้พัฒนา</span><textarea id="note" rows="3">${esc(note)}</textarea></div>
+      <div class="btns"><button type="button" class="pri" id="copy">คัดลอกค่า</button><button type="button" id="forget">ล้างค่าพับที่เกมจำไว้</button></div><p id="msg"></p>
+      <textarea id="out" rows="10" readonly aria-label="ข้อความที่จะคัดลอก"></textarea>`;
+    document.querySelectorAll('[data-p]').forEach((b) => b.onclick = () => { S.base = +b.dataset.p; S.cur = clone(PRESETS[S.base]); panel(); draw(); });
+    $('reset').onclick = () => { S.cur = clone(PRESETS[S.base]); panel(); draw(); };
+    document.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { S.cur[b.dataset.k] = b.dataset.v; panel(); draw(); });
+    $('note').oninput = (e) => { note = e.target.value; after(); };
+    $('forget').onclick = () => { memWrite(null); draw(); };
+    $('copy').onclick = async () => {
+      const o = $('out');
+      try { await navigator.clipboard.writeText(o.value); } catch (e) { o.select(); document.execCommand('copy'); }
+      $('msg').textContent = 'คัดลอกแล้ว — วางตอบในแชทได้เลย';
+    };
+    after();
   }
-  const icons = document.getElementById('icons');
-  const ICON_ROWS = [...KEYS.map((k) => [k, k]), ['free', 'ฟรี'], ['pct', '%สำเร็จ'], ['hide', 'ค่าซ่อน ?']];
-  for (const [k, label] of ICON_ROWS) {
-    const l = document.createElement('label');
-    l.textContent = label;
-    l.htmlFor = `i-${k}`;
-    const inp = Object.assign(document.createElement('input'), { type: 'text', id: `i-${k}` });
-    inp.oninput = () => { cfg.icons[k] = inp.value.trim(); draw(); };
-    icons.append(l, inp);
-  }
-  const cols = document.getElementById('cols');
-  for (const [k, label] of [['upA', 'ไทย ขึ้น'], ['dnA', 'ไทย ลง'], ['upI', 'ต่างโลก ขึ้น'], ['dnI', 'ต่างโลก ลง']]) {
-    const l = document.createElement('label');
-    const inp = Object.assign(document.createElement('input'), { type: 'color', id: `c-${k}` });
-    inp.oninput = () => { cfg[k] = inp.value; draw(); };
-    l.append(inp, label);
-    cols.append(l);
-  }
-  const pre = document.getElementById('pre');
-  for (const [p, v] of Object.entries(PRESET)) {
-    const b = document.createElement('button');
-    Object.assign(b, { type: 'button', className: 'pre', textContent: v.name });
-    b.dataset.p = p;
-    b.onclick = () => { ui.pre = p; cfg = fresh(p); sync(); draw(); };
-    pre.append(b);
-  }
-  const vp = document.getElementById('vp');
-  vp.querySelectorAll('button').forEach((b) => (b.onclick = () => { ui.vp = b.dataset.v; sync(); draw(); }));
-  const gray = document.getElementById('gray');
-  gray.querySelectorAll('button').forEach((b) => (b.onclick = () => { ui.gray = b.dataset.v; sync(); draw(); }));
-  const sync = () => {
-    for (const [k, seg] of Object.entries(segs)) seg.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === cfg[k]));
-    for (const [k] of ICON_ROWS) { const f = document.getElementById(`i-${k}`); if (f !== document.activeElement) f.value = cfg.icons[k] ?? ''; }
-    for (const k of ['upA', 'dnA', 'upI', 'dnI']) document.getElementById(`c-${k}`).value = cfg[k];
-    pre.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.p === ui.pre));
-    vp.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === ui.vp));
-    gray.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === ui.gray));
-  };
-  // JSON ส่งเจ้าของ: ค่าที่ใช้ลงเกม · changed = ช่องที่ต่างจาก preset ที่เริ่ม (ไอคอนนับรายค่า)
-  const out = () => {
-    const base = fresh(ui.pre);
-    const changed = [
-      ...Object.keys(BASE).filter((k) => cfg[k] !== base[k]),
-      ...ICON_ROWS.map(([k]) => k).filter((k) => (cfg.icons[k] ?? '') !== (base.icons[k] ?? '')).map((k) => `icons.${k}`),
-    ];
-    const { name, ...rest } = cfg;
-    const o = { page: 'fx-icons-tweak (ui-redo 52)', preset: PRESET[ui.pre].name, changed, ...rest, note: document.getElementById('note').value };
-    document.getElementById('out').value = JSON.stringify(o, null, 1);
-    store();
-  };
-  document.getElementById('note').oninput = out;
-  document.getElementById('copy').onclick = async () => {
-    const o = document.getElementById('out');
-    try { await navigator.clipboard.writeText(o.value); } catch (e) { o.select(); document.execCommand('copy'); }
-    document.getElementById('msg').textContent = 'คัดลอกแล้ว วางส่งได้เลย';
-  };
-  document.getElementById('reset').onclick = () => { cfg = fresh(ui.pre); sync(); draw(); };
-  sync();
+
+  $('reload').onclick = () => draw();
+  addEventListener('resize', () => live.forEach(fit));
+  panel();
   draw();
 })();
 </script>
