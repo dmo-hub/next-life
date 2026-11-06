@@ -7,4 +7,8 @@ node_modules/
 !.claude/skills/frontend-design/
 !.claude/skills/theme-factory/
 !.claude/skills/tweaks/
+!.claude/skills/accessibility-auditor/
+!.claude/skills/changelog-generator/
+!.claude/skills/web-design-guidelines/
+!.claude/skills/web-performance-optimization/
 .vscode/
