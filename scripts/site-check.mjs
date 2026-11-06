@@ -92,7 +92,8 @@ const cardsIsk = visible(pageIsk);
 const shown = (cardsTh.match(/<article class="c /g) ?? []).length;
 check('หน้ารวมการ์ดมีครบทุกใบ', shown !== content.events.length, ` ${shown}/${content.events.length}`);
 const cats = Object.keys(MERIT_WEIGHTS).flatMap((id) => [id, meritName(id)]).filter((s) => s && s !== 'neutral' && s.length > 1);
-const leak = [/"weight"|multipliers|"merit"|outcomes/, /บัญชีบุญบาป\s*[-+]?\d/, /[+-]\d+\s*(?:สุขภาพ|ความสุข|ความรู้|ความสัมพันธ์|คอนเน็คชั่น)/];
+// แถวสุดท้าย = คลาสที่มีแค่ในเนื้อเฉลย — ผลจริงเขียน "ชีวิต +1" regex ตัวเลขข้างบนจับไม่ได้ ถ้า template หลุดต้องตกที่นี่
+const leak = [/"weight"|multipliers|"merit"|outcomes/, /บัญชีบุญบาป\s*[-+]?\d/, /[+-]\d+\s*(?:สุขภาพ|ความสุข|ความรู้|ความสัมพันธ์|คอนเน็คชั่น)/, /<b class="pct">|<span class="m (?:good|sin)">|<p class="when">|<ol class="chs">|<b class="sim"/];
 const leaks = leak.filter((re) => re.test(visible(catalogHtml(content)))).map(String);
 // ชื่อหมวดบุญบาปภาษาไทยอาจเป็นคำธรรมดาในข้อความการ์ด — นับเฉพาะ id อังกฤษของหมวด
 const ids = cats.filter((s) => /^[a-z_]+$/.test(s) && new RegExp(`\\b${s}\\b`).test(cards));
