@@ -26,6 +26,15 @@
   .box small { display: block; color: var(--muted); font-size: 13px; line-height: 1.5; }
   a { color: var(--accent2); }
 </style>
+<!--DOCS-LAYOUT:START--><style>
+.w:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){max-width:1280px!important}body>main:not(:has(.w)):not(#app){max-width:1280px;margin-left:auto;margin-right:auto}:is(body>main,body>header,body>footer){padding-left:24px;padding-right:24px}
+main h2:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(:first-child){margin-top:28px}main :is(section,.box):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){margin-bottom:17px}
+main:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){overflow-wrap:anywhere}main .st:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){white-space:normal;max-width:100%}@media (max-width:640px){main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){display:block;max-width:100%;overflow-x:auto}}
+main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) :is(th,td):not(:is(.dark,.dark *)){border:1px solid var(--line)}main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) th:not(:is(.dark,.dark *)){background:var(--bg);color:var(--ink)}
+main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){padding:20px 24px;box-shadow:none}main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(.dark){background:var(--surface)}
+main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r)}
+.tag:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border-radius:0}
+</style><!--DOCS-LAYOUT:END-->
 </head>
 <body>
 <!--nav--><style>
@@ -85,7 +94,6 @@
     <li><a href="ui.html#ui-live">ปรับหน้าเล่นสด</a><span class="st pick">เลือกแล้ว รอลงเกม</span><small>จอต้นแบบกดได้ ปรับเลย์เอาต์/ชิ้นย่อยสด · เริ่มจาก A/B/C · ตารางเทียบ 3 สไตล์ · คัดลอกคำตอบ</small></li>
     <li><a href="ui.html#ui-t-t1-tokens">T1 ชุดสี + ฟอนต์กลาง</a><span class="st pick">ชาติไทยลงเกมแล้ว (ใบ 105) · โลกอื่นคงสีเดิมรอใบ 120/121</span><small>ชุด 0 ปัจจุบัน · คราม (ink = accent) · ชาดเดิม · hex ทุก token · ฟอนต์หัว/เนื้อ · ขั้นอักษร · มุม · เงา · contrast ทุกคู่สี + วัดในจอ · 390 + 1280 · ใช้ CSS เกมจริง · คัดลอก JSON</small></li>
     <li><a href="ui.html#ui-t-t1-worlds">T1 ช่วงคั่น: สีโลกอื่นก่อน T11</a><span class="st pick">เลือกแล้ว ชุด ก ไม่แตะสีโลกอื่นจนใบ 121 (ข้อ 228)</span><small>ใบ 105 ลงชุดสี T1 แล้วทำอะไรกับการ์ด B · ต่างโลก · ปรโลก · ภาพแชร์ · ชุด 0 เกมตอนนี้ + ก ข ค · ปรับ hex · contrast สดทุกคู่รวม token ไทยบนการ์ดต่างโลก · 390 + 1280 · ใช้ CSS เกมจริง · คัดลอก JSON</small></li>
-    <li><a href="ui.html#ui-t-t12-docs">T12 หน้าเอกสาร: ความกว้าง ระยะ ตาราง กล่อง</a><span class="st pick">เลือกแล้ว (ข้อ 246–249) รอลงใบ 123</span><small>ใบ 122 · SPEC §4 แถว T12 · ชุด 0 เว็บตอนนี้ + ก (ข้อ 131) ข ค · กว้างหน้าอ่าน/หน้าตาราง/แผนที่ · ขอบ ช่องไฟ ระยะบรรทัด · ตาราง เส้น ระยะช่อง หัว ขนาด เลขชิดขวา · กล่อง เส้น มุม ระยะ พื้น ไม่มีเงา (ข้อ 217) · กล่องเตือน · ป้าย · ทุกหน้าเอกสารจริง · 390 + 1280 · contrast สด · data-fact/ป้ายกำลังทำยังแสดง · คัดลอก JSON</small></li>
     <li><a href="ui.html#ui-t-me-panel">แผงตัวฉัน: เงิน · พับคำอธิบาย · ประวัติงาน</a><span class="st pick">เลือกแล้ว รอลงใบ 131 · ประวัติงานแบบช่วงอายุ</span><small>ใบ 130 · ข้อ 225–227 · ชุด 0 เกมตอนนี้ + ก ข ค · ตัดปุ่มเงินรวมเข้าแผงตัวฉัน (ก่อนโฟกัส/หลังฐานะและงาน) · ปุ่มพับคำอธิบายค่า ตั้งต้น + จำค่า · ประวัติงาน ที่วาง + ปีรวม/ช่วงอายุ · 390 + 1280 + แนวนอน · contrast สด · ใช้ CSS เกมจริง · คัดลอก JSON</small></li>
     <li><a href="ui.html#ui-t-card-spoil">T14 หน้าการ์ดรวม: ปุ่มดูผล · กล่องเฉลย</a><span class="st pick">เลือกแล้ว ชุด ค ปรับ (ข้อ 236–238) รอลงใบ 127</span><small>ใบ 126 · ข้อ 177 187 · ชุด 0 เว็บตอนนี้ + ก ข ค · เปิดทั้งใบ/ทีละตัวเลือก · ทรง ที่วาง คำของปุ่ม · กล่องเฉลยกางใต้/พลิกหลังการ์ด พื้น เส้น มุม ระยะ · การ์ดจริง 3 ใบ · ด่านสดไม่มีเฉลยก่อนกด · 390 + 1280 · contrast สด · ใช้ CSS หน้าการ์ดรวม/หน้าเฉลยจริง · คัดลอก JSON</small></li>
     <li><a href="ui.html#ui-t-style-tones">ต้นแบบสไตล์ 4 ทิศ เทียบใบ 02</a><span class="st pick">เลือกแล้ว รอลงเกม</span><small>ใบ 02 สไตล์ปัจจุบัน + ทิศ 1–4 (ใบ 89) · หน้าเล่น · เมนู 6 ปุ่ม · การ์ดตาย 6 แท็บ · nav เอกสาร 5 เมนู · 390/1280 · คัดลอก JSON → ใบ 92</small></li>
