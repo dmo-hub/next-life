@@ -37,7 +37,7 @@ window.DEMO_PHASE2 = (function () {
     { when: { flagsHas: ["cadet_retry"] }, line: "ใบปีก่อนยังอยู่ในแฟ้ม รอยปากกาตรงช่องเดิมยังชัด" },
     { when: { flagsHas: ["cadet_family_secret"] }, line: "ค่าสมัครทุกช่องต้องออกเอง ที่บ้านยังไม่รู้ว่ามีใบนี้" },
     { when: { poor: true, flagsNot: ["cadet_family_support"] }, line: "ติ๊กเพิ่มหนึ่งช่อง ก็คือค่ารถอีกหนึ่งเที่ยว" },
-    { when: { flagsHas: ["cadet_family_support"] }, line: "ผู้ใหญ่ในบ้านนั่งข้าง ๆ คอยดูว่ากรอกครบทุกช่องไหม" }
+    { when: { flagsHas: ["cadet_family_support"] }, line: "{ผู้ใหญ่}นั่งข้าง ๆ คอยดูว่ากรอกครบทุกช่องไหม" }
   ];
   var branchToggles = [
     { branch: "army", label: "ติ๊กช่อง ทบ.", hint: "ภาคสนาม ที่นั่งไม่น้อย แต่คนแย่งมาก", fx: Z({ money: -1 }) },
@@ -126,7 +126,7 @@ window.DEMO_PHASE2 = (function () {
     mid: "ยังนึกถึงข้อหนึ่งที่ลังเลอยู่นาน",            // 13–19
     bad: "เมื่อวานมีหลายข้อที่ตอบไปแล้วอยากขอแก้"      // < 13
   };
-  var I1_OPTS = function () {
+  var I1_OPTS = function (home) {
     return [
       O("กินให้อิ่ม แล้วกลับไปนอน", null, { health: 1, money: -1 }, [], "หลับตั้งแต่หัวค่ำ ไม่ทันได้เปิดหนังสือ"),
       O("นั่งเทียบคำตอบกับคนอื่น", "อาจโล่งใจ หรืออาจนอนไม่หลับ", {}, [], null, { outcomes: [
@@ -134,16 +134,18 @@ window.DEMO_PHASE2 = (function () {
         OC(1, "ทุกคนตอบไม่เหมือนกันสักข้อ", { happiness: -1 }, [])
       ] }),
       O("ทักเด็กที่นั่งกินข้าง ๆ", null, { relations: 1 }, [], "คุยกันจนข้าวเย็นชืด เขาสมัครสนามเดียวกับเราพรุ่งนี้", { randomFlag: { flag: "cadet_met_c", p: 0.5, ifNot: true } }),
-      O("อดมื้อนี้ เก็บเงินไว้ค่ารถ", "ประหยัดได้ แต่ท้องว่าง", { health: -1 }, [], "ดื่มน้ำก๊อกหน้าสนามจนอิ่ม แล้วเดินไปป้ายรถเมล์")
+      // D1 (เจ้าของเคาะ 2026-11-06): การ์ดแบบบ้านห่อข้าวมา ไม่มีตัวเลือกอดข้าว
+      home ? O("แบ่งข้าวให้เด็กที่ไม่มีอะไรกิน", null, { relations: 1 }, [], "แบ่งครึ่งกล่องให้เด็กที่นั่งข้าง ๆ เขาบอกว่าพรุ่งนี้สอบสนามเดียวกัน")
+        : O("อดมื้อนี้ เก็บเงินไว้ค่ารถ", "ประหยัดได้ แต่ท้องว่าง", { health: -1 }, [], "ดื่มน้ำก๊อกหน้าสนามจนอิ่ม แล้วเดินไปป้ายรถเมล์")
     ];
   };
   var I1_TEXT = "สอบเสร็จบ่ายสาม หน้าสนามมีรถเข็นขายข้าวเรียงยาวจนสุดรั้ว เด็กหัวเกรียนนั่งกินกันตามขอบฟุตบาท บางคนยังเปิดหนังสือค้างไว้บนตัก พรุ่งนี้ยังมีอีกสนาม";
-  var I1_TEXT_HOME = "สอบเสร็จบ่ายสาม ผู้ใหญ่ในบ้านห่อข้าวมาให้ ยังอุ่นอยู่ในกล่อง เด็กหัวเกรียนนั่งกินกันตามขอบฟุตบาท บางคนยังเปิดหนังสือค้างไว้บนตัก พรุ่งนี้ยังมีอีกสนาม";
+  var I1_TEXT_HOME = "สอบเสร็จบ่ายสาม {ผู้ใหญ่}ห่อข้าวมาให้ ยังอุ่นอยู่ในกล่อง เด็กหัวเกรียนนั่งกินกันตามขอบฟุตบาท บางคนยังเปิดหนังสือค้างไว้บนตัก พรุ่งนี้ยังมีอีกสนาม";
 
   var I4_OPTS = function () {
     return [
       O("เล่าว่าเมื่อวานทำได้ดี", null, { happiness: 1, relations: 1 }, [], "ปลายสายหัวเราะ แล้วถามว่ากินข้าวหรือยัง", { requires: { flagsHas: ["cadet_family_told"] }, lockReason: "ที่บ้านยังไม่รู้ว่ามาสอบ" }),
-      O("บอกตามจริงว่าเหนื่อย", null, { relations: 1, happiness: 1 }, [], "ผู้ใหญ่ในบ้านบอกว่าเหนื่อยก็พัก ไม่มีใครว่า", { requires: { flagsHas: ["cadet_family_told"] }, lockReason: "ที่บ้านยังไม่รู้ว่ามาสอบ" }),
+      O("บอกตามจริงว่าเหนื่อย", null, { relations: 1, happiness: 1 }, [], "{ผู้ใหญ่}บอกว่าเหนื่อยก็พัก ไม่มีใครว่า", { requires: { flagsHas: ["cadet_family_told"] }, lockReason: "ที่บ้านยังไม่รู้ว่ามาสอบ" }),
       O("ขอเงินค่ารถเพิ่ม", "ได้เงิน แต่รู้ว่าที่บ้านต้องเจียด", { money: 1, relations: -1 }, [], "พรุ่งนี้เงินจะโอนมา ปลายสายเงียบไปนิดหนึ่งก่อนตอบ", { requires: { flagsHas: ["cadet_family_told"] }, lockReason: "ที่บ้านยังไม่รู้ว่ามาสอบ", fxIfPoor: Z({ money: 1, relations: -2 }) }),
       O("บอกว่าค้างบ้านเพื่อน สบายดี", null, { happiness: -1 }, [], "วางสายแล้วยืนอยู่หน้าตู้นานกว่าตอนคุย", { requires: { flagsHas: ["cadet_family_secret"] }, lockReason: "ที่บ้านรู้อยู่แล้วว่ามาสอบ" }),
       O("ยอมบอกว่ามาสอบ", null, {}, [], null, { requires: { flagsHas: ["cadet_family_secret"] }, merit: { sila: 1 },
@@ -157,7 +159,7 @@ window.DEMO_PHASE2 = (function () {
   var I4_TEXT = "ตู้โทรศัพท์หน้าสนามมีคนต่อคิวยาว เหรียญในมือพอคุยได้ไม่กี่นาที";
   var I4_TEXT_MOBILE = "สัญญาณโทรศัพท์หน้าสนามขึ้นแค่ขีดเดียว ต้องเดินไปยืนใต้ต้นไม้ถึงจะได้ยิน";
   var I4_SECRET = " ที่บ้านยังคิดว่า {ชื่อ} ค้างบ้านเพื่อน";
-  var MOBILE_YEAR = 2545; // demo · ปีเริ่มยุคมือถือ เจ้าของตั้ง
+  var MOBILE_YEAR = 2542; // owner 2026-11-06 · ปีเริ่มยุคมือถือ (หลักฐาน 2542)
 
   var I5_COMMON = function (special) {
     return [
@@ -175,7 +177,7 @@ window.DEMO_PHASE2 = (function () {
       O("นอนศาลาวัดแทนห้องพัก", null, { health: -1, relations: 1 }, [], "พระให้ยืมผ้าห่ม ยุงเยอะแต่หลับได้"),
       O("กินบะหมี่ซองทุกมื้อ", null, { health: -1, money: -1 }, [], "สามมื้อรสเดียวกัน แต่ยังมีค่ารถกลับบ้าน"),
       O("ยืมเพื่อนที่มาสอบด้วยกัน", null, { money: 1, relations: 1 }, [], "เพื่อนยื่นแบงก์ยับ ๆ ให้ บอกว่าคืนตอนติดยศก็ได้", { requires: { anyFlags: A_OR_C }, lockReason: "ไม่มีคนรู้จักให้ยืม" }),
-      O("ขอผู้ใหญ่ในบ้านส่งเงินมา", null, { money: 1, relations: -1 }, [], "เงินมาถึงพร้อมข้อความสั้น ๆ ว่าอย่าอดข้าว", { requires: { flagsHas: ["cadet_family_told"] }, lockReason: "ที่บ้านยังไม่รู้ว่ามาสอบ" }),
+      O("ขอ{ผู้ใหญ่}ส่งเงินมา", null, { money: 1, relations: -1 }, [], "เงินมาถึงพร้อมข้อความสั้น ๆ ว่าอย่าอดข้าว", { requires: { flagsHas: ["cadet_family_told"] }, lockReason: "ที่บ้านยังไม่รู้ว่ามาสอบ" }),
       O("ไม่ไปสนามที่เหลือ กลับบ้าน", "ประหยัดได้ แต่สนามที่เหลือจะไม่ได้สอบ", { happiness: -1 }, [], "บัตรสอบใบที่เหลือยังไม่ได้ใช้ พับเก็บไว้ในกระเป๋าเสื้อ", { withdrawRemaining: true })
     ];
   };
@@ -183,7 +185,7 @@ window.DEMO_PHASE2 = (function () {
   var interludes = [
     // I1 · ข้าวกล่องหน้าสนาม
     { id: "I1", title: "ข้าวกล่องหน้าสนาม", kind: "interlude", variantOf: null, priority: 5, cond: C(), text: I1_TEXT, options: I1_OPTS() },
-    { id: "I1-บ้าน", title: "ข้าวกล่องหน้าสนาม", kind: "interlude", variantOf: "I1", cond: C({ flagsHas: ["cadet_family_support"], regions: ["กลาง"] }), text: I1_TEXT_HOME, options: I1_OPTS() },
+    { id: "I1-บ้าน", title: "ข้าวกล่องหน้าสนาม", kind: "interlude", variantOf: "I1", cond: C({ flagsHas: ["cadet_family_support"], regions: ["กลาง"] }), text: I1_TEXT_HOME, options: I1_OPTS(true) },
     { id: "I1-ลับ", title: "ข้าวกล่องหน้าสนาม", kind: "interlude", variantOf: "I1", cond: C({ flagsHas: ["cadet_family_secret"] }), text: I1_TEXT + " ที่บ้านคิดว่าวันนี้ไปติวกับเพื่อน", options: I1_OPTS() },
     // I2 · ไปอีกสนาม (ไกลสนามเท่านั้น)
     { id: "I2", title: "ไปอีกสนาม", kind: "interlude", variantOf: null, priority: 4, once: true, cond: C({ regions: FAR }),
@@ -449,14 +451,14 @@ window.DEMO_PHASE2 = (function () {
   var chooseBranch = {
     id: "X8", title: "เลือกได้เหล่าเดียว", kind: "core",
     text: "ชื่อ {ชื่อ} อยู่บนป้ายมากกว่าหนึ่งแผ่น แต่ใบยืนยันสิทธิ์มีช่องให้เซ็นได้ช่องเดียว เหล่าที่ไม่ได้เลือก จะมีคนลำดับถัดไปได้ที่นั่งแทน",
-    contextLines: [{ when: { flagsHas: ["cadet_family_support"] }, line: "ผู้ใหญ่ในบ้านยืนอ่านป้ายอยู่ข้าง ๆ ไม่พูดว่าให้เลือกอะไร" }],
+    contextLines: [{ when: { flagsHas: ["cadet_family_support"] }, line: "{ผู้ใหญ่}ยืนอ่านป้ายอยู่ข้าง ๆ ไม่พูดว่าให้เลือกอะไร" }],
     note: "ปุ่มเหล่าแสดงเฉพาะเหล่าที่ติด",
     options: [
       pickBranch("army", "ทบ.", "ภาคสนาม ย้ายไปได้ทั่วประเทศ"),
       pickBranch("navy", "ทร.", "อยู่กลางทะเลนาน ห่างบ้านนาน"),
       pickBranch("airforce", "ทอ.", "ขั้นตอนเข้ม ตาต้องดีไปตลอด"),
       pickBranch("police", "ตร.", "อยู่กับประชาชนทุกวัน"),
-      O("เลือกตามที่ผู้ใหญ่ในบ้านอยาก", null, { relations: 1, happiness: -1 }, [], PICK_RESULT,
+      O("เลือกตามที่{ผู้ใหญ่}อยาก", null, { relations: 1, happiness: -1 }, [], PICK_RESULT,
         { requires: { flagsHas: ["cadet_family_told"] }, lockReason: "ที่บ้านยังไม่รู้ว่ามาสอบ", merit: { care_parents: 1 }, branchPick: "heirOrRandom" }),
       O("เลือกเหล่าเดียวกับเพื่อน", null, { relations: 1 }, [], "สองคนเซ็นช่องเดียวกัน ห่างกันแค่สองบรรทัด",
         { requires: { rivalSameBranch: true }, lockReason: "ไม่มีเพื่อนติดเหล่าเดียวกัน", branchPick: "rival", bondByRival: { A: "cadet_bond_a", C: "cadet_bond_c" } }),
@@ -483,24 +485,24 @@ window.DEMO_PHASE2 = (function () {
       contextLines: [{ when: { flagsHas: ["cadet_retry"] }, line: X9_RETRY }],
       options: [
         O("ขอโทษที่ไม่บอกตั้งแต่แรก", null, { relations: 1, happiness: 1 }, [], null, { merit: { sila: 1 }, clearFlags: ["cadet_family_secret"], outcomes: [
-          OC(0.5, "ผู้ใหญ่ในบ้านถามว่าทำไมไม่บอก แล้วจับปากกาเซ็นโดยไม่ถามอีก", {}, ["cadet_family_told"]),
+          OC(0.5, "{ผู้ใหญ่}ถามว่าทำไมไม่บอก แล้วจับปากกาเซ็นโดยไม่ถามอีก", {}, ["cadet_family_told"]),
           OC(0.5, "สามคืนแรกเงียบทั้งบ้าน คืนที่สี่ลายเซ็นก็มาอยู่บนใบนั้น", {}, ["cadet_family_told"])
         ] }),
         O("ยื่นใบให้เซ็นเงียบ ๆ", null, { relations: -1 }, ["cadet_family_told"], "ลายเซ็นมาครบ แต่มื้อเย็นคืนนั้นไม่มีใครถามเรื่องสอบเลย", { clearFlags: ["cadet_family_secret"] }),
         OPT_BOW()
       ].concat(OPT_TAIL()) },
     { id: "X9-ข", title: "ข่าวถึงบ้าน", kind: "core", variantOf: "X9", cond: C({ classes: ["poor"] }), altCond: { flagsHas: ["family_debt"] },
-      text: "ใบแจ้งวันรายงานตัวมีรายการของที่ต้องเตรียมยาวครึ่งหน้า ผู้ใหญ่ในบ้านอ่านจบแล้วเงียบไปนาน ก่อนจะยิ้มออกมา ถ้าเรียนจนจบ {ชื่อ} จะติดยศตอนอายุ{อายุติดยศ}",
+      text: "ใบแจ้งวันรายงานตัวมีรายการของที่ต้องเตรียมยาวครึ่งหน้า {ผู้ใหญ่}อ่านจบแล้วเงียบไปนาน ก่อนจะยิ้มออกมา ถ้าเรียนจนจบ {ชื่อ} จะติดยศตอนอายุ{อายุติดยศ}",
       header: "ติด {เหล่า}", onEnter: X9_ON_PASS,
       contextLines: [{ when: { flagsHas: ["cadet_retry"] }, line: X9_RETRY }],
       options: [OPT_BOW(), OPT_DEBT()].concat(OPT_TAIL()) },
     { id: "X9-ค", title: "ข่าวถึงบ้าน", kind: "core", variantOf: "X9", cond: C({ anyFlags: ["army_family", "police_family"] }),
-      text: "ผู้ใหญ่ในบ้านเปิดตู้ หยิบรูปถ่ายในกรอบเก่าที่สีซีดแล้วออกมาวางคู่กับใบแจ้งวันรายงานตัว ไม่มีใครพูดอะไร แต่ทั้งบ้านรู้ว่าอีกเจ็ดปีจะมีรูปใหม่มาวางข้างกัน",
+      text: "{ผู้ใหญ่ทายาท}เปิดตู้ หยิบรูปถ่ายในกรอบเก่าที่สีซีดแล้วออกมาวางคู่กับใบแจ้งวันรายงานตัว ไม่มีใครพูดอะไร แต่ทั้งบ้านรู้ว่าอีกเจ็ดปีจะมีรูปใหม่มาวางข้างกัน",
       header: "ติด {เหล่า}", onEnter: X9_ON_PASS,
       contextLines: [{ when: { flagsHas: ["cadet_retry"] }, line: X9_RETRY }],
       options: [OPT_BOW(), OPT_DEBT()].concat(OPT_TAIL()) },
     { id: "X9-ง", title: "ข่าวถึงบ้าน", kind: "core", variantOf: "X9", cond: C(),
-      text: "ผู้ใหญ่ในบ้านรออยู่ใต้ต้นไม้หน้ากองสอบตั้งแต่เช้า เห็นหน้า {ชื่อ} ก็รู้คำตอบก่อนจะได้พูด อีกไม่กี่เดือนต้องเข้าโรงเรียน ถ้าเรียนจนจบจะติดยศตอนอายุ{อายุติดยศ}",
+      text: "{ผู้ใหญ่}รออยู่ใต้ต้นไม้หน้ากองสอบตั้งแต่เช้า เห็นหน้า {ชื่อ} ก็รู้คำตอบก่อนจะได้พูด อีกไม่กี่เดือนต้องเข้าโรงเรียน ถ้าเรียนจนจบจะติดยศตอนอายุ{อายุติดยศ}",
       header: "ติด {เหล่า}", onEnter: X9_ON_PASS,
       contextLines: [{ when: { flagsHas: ["cadet_retry"] }, line: X9_RETRY }],
       options: [OPT_BOW(), OPT_DEBT()].concat(OPT_TAIL()) }

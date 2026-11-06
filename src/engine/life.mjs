@@ -146,6 +146,8 @@ export const schoolOf = (st, age = st.age) => (st.school && age >= SCHOOL_FROM ?
 // ป้ายสถานะงานบนจอ: ก่อนมีงานไม่โชว์อาชีพ (อาชีพตอนเกิดเป็นของครอบครัว ใช้คิดเงินติดตัวเท่านั้น)
 export function jobText(st, age = st.age) {
   if (st.workFrom === null) {
+    // นตท. (สอบติดเตรียมทหาร) ใช้ track โรงเรียนนายร้อยชั่วคราว — ป้ายบนจอต้องเป็นนักเรียนเตรียมทหาร (เจ้าของเคาะ A 2026-11-06)
+    if (st.title === 'นตท.') return 'นักเรียนเตรียมทหาร';
     if (st.school && age >= SCHOOL_FROM) return `กำลังเรียน${TRACKS[st.school].name}`;
     return age < SCHOOL_FROM ? 'ยังไม่เข้าเรียน' : 'ยังไม่ทำงาน';
   }
@@ -553,6 +555,8 @@ export const FILL = {
   จังหวัด: (st) => provinceLabel(st),
   เงิน: (st) => Math.round(st.money).toLocaleString('en-US'),
   ชื่อ: (st) => st.name,
+  // ชื่อ + นามสกุล (บท S1 2026-11-06 ใช้กับ "นตท.{ชื่อเต็ม}") · เกมยังไม่มีนามสกุล = ชื่อเฉย ๆ · คำนำหน้าไม่ใส่ใน {ชื่อ}/{ชื่อเต็ม} (เจ้าของเคาะ A1)
+  ชื่อเต็ม: (st) => (st.surname ? `${st.name} ${st.surname}` : st.name),
   ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
   ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
   ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',

@@ -191,7 +191,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 2
-    when: {age: [14, 14], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined]}}
+    when: {age: [14, 14], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined, cadet_let_go]}}
     title: "บอร์ดหน้าห้องธุรการ"
     text: "ระหว่างเดินไปโรงอาหาร {ชื่อ} ผ่านบอร์ดหน้าห้องธุรการ มีประกาศแข่งฟุตบอล รับสมัครชมรมดนตรี และประกาศสอบเตรียมทหารติดอยู่มุมหนึ่ง"
     choices:
@@ -237,7 +237,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 2
-    when: {age: [15, 15], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined, "cadet_invited:14"]}}
+    when: {age: [15, 15], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined, "cadet_invited:14", cadet_let_go]}}
     title: "คุยกันตอนพักเที่ยง"
     text: "ตอนพักเที่ยง เพื่อนคนหนึ่งเล่าว่าพี่ชายเพิ่งไปสอบเตรียมทหารมา อีกคนแย่งพูดเรื่องเกมที่เพิ่งออกใหม่ บทสนทนาก็ไหลไปเรื่องอื่น {ชื่อ} ยังกินข้าวไม่หมดจาน"
     choices:
@@ -283,7 +283,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 2
-    when: {age: [16, 16], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined, "cadet_invited:15"]}}
+    when: {age: [16, 16], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined, "cadet_invited:15", cadet_let_go]}}
     title: "ประกาศหน้าเสาธง"
     text: "เช้านี้ครูอ่านประกาศหน้าเสาธงหลายเรื่อง ทั้งทุนเรียนต่อ ค่ายอาสาช่วงปิดเทอม และรับสมัครสอบเตรียมทหาร ปีนี้ {ชื่อ} อายุถึงเกณฑ์สอบแล้ว ถ้าสมัครก็ต้องลงสนามท้ายปี"
     choices:
@@ -330,7 +330,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 2
-    when: {age: [17, 17], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined, "cadet_invited:16"]}}
+    when: {age: [17, 17], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined, "cadet_invited:16", cadet_let_go]}}
     title: "ใบประกาศอีกครั้ง"
     text: "ประกาศรับสมัครสอบเตรียมทหารติดบอร์ดอีกครั้ง อายุของ {ชื่อ} ยังสมัครได้อีกแค่สองครั้ง ส่วนเพื่อน ๆ เริ่มคุยกันเรื่องมหาวิทยาลัยกับงานแรกแล้ว"
     choices:
