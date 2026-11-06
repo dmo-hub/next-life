@@ -1,0 +1,25 @@
+# กู้กองทุนหมู่บ้านที่กั้นปีถูกทั้งสองแบบ — debt-before-open ต้องไม่ตก (ตัวควบคุมของ bad/debt-before-open.yaml)
+events:
+  - id: debt_coop_years_ok
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2544, 2650]
+    text: "ค่าปุ๋ยปีนี้แพงกว่าเงินที่เหลือในบ้าน"
+    choices:
+      - {text: "กู้กองทุนหมู่บ้านมาซื้อปุ๋ย", effects: {debt: {kind: coop, amount: {unit: income_x, amount: 0.5}}}, merit: [{cat: neutral}]}
+      - {text: "ใช้ปุ๋ยหมักแทน", merit: [{cat: neutral}]}
+      - {text: "ขอยืมญาติ", merit: [{cat: neutral}]}
+      - {text: "ลดแปลงปลูกลง", merit: [{cat: neutral}]}
+  - id: debt_coop_when_year_ok
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2520, 2650]
+    when: {year: [2544, 2650]}
+    text: "เครื่องสูบน้ำเสียกลางหน้าแล้ง"
+    choices:
+      - {text: "กู้กองทุนหมู่บ้านมาซ่อม", effects: {debt: {kind: coop, amount: {unit: income_x, amount: 0.3}}}, merit: [{cat: neutral}]}
+      - {text: "ยืมเครื่องเพื่อนบ้าน", merit: [{cat: neutral}]}
+      - {text: "ซ่อมเองแบบพอใช้", merit: [{cat: neutral}]}
+      - {text: "ปล่อยแปลงแห้งปีนี้", merit: [{cat: neutral}]}
