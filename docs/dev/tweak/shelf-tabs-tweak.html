@@ -4,7 +4,7 @@
 <!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ปุ่มแท็บชั้นสมุด 9 แบบ (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<title>T8 แท็บสมุด + ชั้นสมุด (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../../fonts/fonts.css">
 <style>
@@ -606,7 +606,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .fx-cap small { display:block; font-family:Sarabun,sans-serif; font-size:13px; color:var(--sand); }
 .fx-title { position:absolute; inset:0; display:grid; place-items:center; }
 .fx-title svg { overflow:visible; max-width:92vw; height:auto; }
-.fx-title .fx-name { font-family:Pridi,serif; font-weight:600; }
+.fx-title .fx-name { font-family:Maitree,serif; font-weight:600; }
 /* ทั้งหน้าเข้าธีมต่างโลกตามการ์ดที่ขึ้นจอ — ผูกกับการ์ดด้วย :has จึงไม่ต้องตามล้างธงทุกจุดที่วาดจอไทย */
 /* ui-redo ใบ 13: ชุดกรมท่าเรืองของต้นแบบลงตัวแปรหน้า — แถบสถานะ เมนูล่าง/ราวซ้าย และแผงจากเมนูเปลี่ยนสีตามโดยไม่มีกฎแยก */
 body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; --ink:#E8ECFF; --ink2:#D3D8F5; --paper:#161A3A; --paper2:#232A5E; --rule2:#3B4BA8; --fl:#6FE3FF; --dg:#FF8A8A; --track:#262C5A; }
@@ -722,7 +722,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 /*GAME-CSS:END*/</style></template>
 <script>
 (() => {
-  const KEY = 'next-life-shelf-tabs-tweak-v1';
+  const KEY = 'next-life-shelf-tabs-tweak-v2';
   const GAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
   // แท็บตาม JSON ใบ 163 (thai-life-deep ข้อ 343): สถิติวิญญาณถัดอนุสรณ์ ไม่มีตัวเลข · จุดของใหม่ · เลขตามภาพเจ้าของ
   const TABS = [
@@ -767,14 +767,14 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   };
   // สีเล่มที่เปิดต่อธีม: ค่าตัวแปรของเกม · ตัวหนังสือบนสีนั้น (ข ขีดเส้นใต้ใช้สีนี้เป็นตัวหนังสือแทน)
   const OPEN = {
-    a: [['ink', 'หมึก', 'var(--paper)'], ['red', 'แดง', '#fff'], ['green', 'เขียว', '#fff'], ['blue', 'น้ำเงิน', '#fff']],
+    a: [['ink', 'หมึก', 'var(--paper)'], ['red', 'แดง', '#fff'], ['green', 'เขียว', '#fff'], ['blue', 'น้ำตาลทอง (--blue)', '#fff']],
     b: [['gold', 'ทอง', 'var(--lacquer)'], ['gold2', 'ทองอ่อน', 'var(--lacquer)'], ['cream', 'ครีม', 'var(--lacquer)'], ['bronze2', 'สำริด', 'var(--cream)']],
   };
-  const HEX = { ink: '#1F2430', red: '#B73824', green: '#2F6B66', blue: '#35558A', gold: '#D9B45A', gold2: '#F0D78C', cream: '#EFE3C2', bronze2: '#8A6D3B' };
+  const HEX = { ink: '#1B2A4A', red: '#A62B1F', green: '#2F6B4F', blue: '#7A5C12', gold: '#D9B45A', gold2: '#F0D78C', cream: '#EFE3C2', bronze2: '#8A6D3B' };
   const DEF = {
     old: { r: 22, l: 1, raise: 0, a: 'ink', b: 'gold' },
     spine: { r: 4, l: 1, raise: 10, a: 'red', b: 'gold' },
-    under: { r: 0, l: 3, raise: 0, a: 'red', b: 'gold' },
+    under: { r: 0, l: 3, raise: 0, a: 'blue', b: 'gold' },
     seg: { r: 10, l: 1, raise: 0, a: 'ink', b: 'gold' },
     mark: { r: 10, l: 2, raise: 0, a: 'red', b: 'gold' },
     track: { r: 8, l: 1, raise: 0, a: 'ink', b: 'gold' },
@@ -782,8 +782,9 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
     dock: { r: 8, l: 3, raise: 0, a: 'ink', b: 'gold' },
     glow: { r: 7, l: 1, raise: 0, a: 'red', b: 'gold' },
   };
+  for (const d of Object.values(DEF)) d.g = 'wrap';
   const clone = (o) => JSON.parse(JSON.stringify(o));
-  let cfg = clone(DEF), ui = { v: 'spine', mode: 'one', theme: 'a', tab: 'm', seen: [], focus: false }, note = '';
+  let cfg = clone(DEF), ui = { v: 'under', mode: 'one', theme: 'a', tab: 'm', seen: [], focus: false }, note = '';
   try {
     const s = JSON.parse(localStorage.getItem(KEY) || 'null');
     if (s) { for (const k of Object.keys(DEF)) Object.assign(cfg[k], s.cfg?.[k]); Object.assign(ui, s.ui || {}); note = s.note || ''; }
@@ -794,6 +795,8 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 
   // ---------- ชิ้นต้นแบบในจอ: คลาส v-* ยังไม่มีในเกม (ใบ 65 ลงจริงตาม JSON ใบ 64) ----------
   const PROTO = `
+.bk-tabs.g3 { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); }
+.bk-tabs.g3 button { justify-content:center; }
 .card { min-height:0 !important; }
 .card.a { --tu:var(--ink); --tline:var(--ink2); --tbook:var(--paper2); --tcell:#FFFDF7; --tcard:var(--paper); --tfocus:var(--ink); --tfaint:var(--rule); }
 .card.b { --tu:var(--cream); --tline:var(--bronze2); --tbook:var(--lacquer2); --tcell:var(--lacquer2); --tcard:var(--lacquer); --tfocus:var(--gold2); --tfaint:var(--bronze2); }
@@ -859,19 +862,21 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   const doc = (html) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><link rel="stylesheet" href="${FONTS}"><style>${GCSS}</style><style>${PROTO}body{overflow:hidden}</style></head><body><main id="app">${html}</main></body></html>`;
 
   function shelf(v, theme) {
+    // ข้อ 129 ถอดตัวนับ · แบบ old คงไว้เพราะเกมตอนนี้ยังมี
+    const tabs = v === 'old' ? TABS : TABS.map((x) => [x[0], x[1], '', ...x.slice(3)]);
     const c = cfg[v];
     const open = OPEN[theme].find(([k]) => k === c[theme]) || OPEN[theme][0];
     const vars = `--tr:${c.r}px;--tl:${c.l}px;--traise:${c.raise}px;--to:var(--${open[0]});--tof:${open[2]}`;
-    const bar = TABS.map(([k, label, n, dot], i) => {
+    const bar = tabs.map(([k, label, n, dot], i) => {
       const fresh = dot && k !== ui.tab && !ui.seen.includes(k) ? '<span class="new-dot" aria-label="มีของใหม่"></span>' : '';
       // แท็บไม่มีเลข: จุดอยู่ช่องเลข ตัดลงบรรทัดสองได้ — ติดท้ายชื่อแล้ว สถิติวิญญาณ ล้นปุ่มที่จอ 360
       const num = n || fresh ? ` <span class="n">${n}${fresh}</span>` : '';
       const ic = v === 'icon' || v === 'dock' ? `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>` : '';
       return `<button type="button" data-tab="${k}" aria-pressed="${k === ui.tab}"${ui.focus && i === 1 ? ' class="fv"' : ''}>${ic}<span class="l">${label}</span>${num}</button>`;
     }).join('');
-    const t = TABS.find(([k]) => k === ui.tab);
+    const t = tabs.find(([k]) => k === ui.tab);
     return `<article class="card ${theme} shelf-view" style="${vars}"><div class="top"><b>${GAME}</b><small>ชั้นสมุด</small></div>
-      <div class="body"><div class="bk-tabs v-${v}" role="group" aria-label="เล่มในชั้นสมุด">${bar}</div>
+      <div class="body"><div class="bk-tabs v-${v}${cfg[v].g === 'grid3' ? ' g3' : ''}" role="group" aria-label="เล่มในชั้นสมุด">${bar}</div>
       <div class="bk-panel"><p class="bk-intro">${t[4]}</p><ul>${t[5].map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div></div>
       <div class="choices"><button type="button" class="choice"><span>กลับ</span></button></div></article>`;
   }
@@ -992,18 +997,19 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
       const xs = [...results.values()].filter((x) => x.v === ui.v && x.theme === t);
       return [t, xs.length ? { off: +Math.min(...xs.map((x) => x.off)).toFixed(2), on: +Math.min(...xs.map((x) => x.on)).toFixed(2) } : null];
     }));
-    return JSON.stringify({ page: 'shelf-tabs-tweak', ticket: 63, pick: ui.v, pickName: VARIANTS.find(([v]) => v === ui.v)[1], source: SRC[ui.v], radius: c.r, line: c.l, ...(ui.v === 'spine' ? { raise: c.raise } : {}), openPaper: c.a, openLacquer: c.b, contrast: cr, bar: 'grid3', note }, null, 1);
+    return JSON.stringify({ page: 'shelf-tabs-tweak', ticket: 114, layout: c.g, pick: ui.v, pickName: VARIANTS.find(([v]) => v === ui.v)[1], source: SRC[ui.v], radius: c.r, line: c.l, ...(ui.v === 'spine' ? { raise: c.raise } : {}), openPaper: c.a, openLacquer: c.b, contrast: cr, bar: 'grid3', note }, null, 1);
   }
 
   function panel() {
     const c = cfg[ui.v];
     const seg = (k, opts) => `<div class="seg">${opts.map(([v, t, sw]) => `<button type="button" data-k="${k}" data-v="${esc(v)}" class="${String(c[k] ?? ui[k]) === String(v) ? 'on' : ''}">${sw ? `<span class="sw" style="background:${sw}"></span>` : ''}${t}</button>`).join('')}</div>`;
     const range = (k, label, min, max) => `<div class="row"><span class="lb">${label} <output id="o-${k}">${c[k]}</output></span><input type="range" data-r="${k}" min="${min}" max="${max}" value="${c[k]}"></div>`;
-    $('ctl').innerHTML = `<h1>ปุ่มแท็บชั้นสมุด</h1>
+    $('ctl').innerHTML = `<h1>T8 แท็บสมุด + ชั้นสมุด</h1>
       <p class="hint">เจ้าของ: "ตัวเลือกวงรีด้านบน อยากเปลี่ยนเป็นดีไซน์อื่น" · เลือกแบบ ปรับค่า แล้วกด <b>คัดลอกค่า</b> วางตอบในแชท (ใบ 64) · แถบ 6 แท็บ grid3 ตาม JSON ใบ 163 · CSS ในจอคือ CSS เกมตอนนี้</p>
       <div class="row"><span class="lb">แบบปุ่ม</span><div class="seg" id="vsel">${VARIANTS.map(([v, t]) => `<button type="button" data-sel="${v}" class="${v === ui.v ? 'on' : ''}">${t}</button>`).join('')}</div></div>
       <p class="hint">ที่มา: ${SRC[ui.v]}</p>
       <h2>ค่าปรับของแบบนี้</h2>
+      <div class="row"><span class="lb">การจัดแท็บ</span>${seg('g', [['wrap', '3 ช่องมือถือ · 6 ช่องจอคอม'], ['grid3', '3 ช่องทุกจอ']])}</div>
       ${range('r', 'มุมโค้ง (px)', 0, 24)}
       ${range('l', ui.v === 'under' ? 'เส้นใต้ (px)' : 'เส้น (px)', 1, 4)}
       ${ui.v === 'spine' ? range('raise', 'เล่มที่เปิดยกสูงกว่า (px)', 0, 16) : ''}

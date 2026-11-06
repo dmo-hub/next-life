@@ -4,12 +4,11 @@
 <!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>T9 ฉายาตราเหรียญ (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<title>T6 การ์ดรายปี (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <link rel="stylesheet" href="../../fonts/fonts.css">
 <style>
-  /* หน้า tweak T9 (ui-redo 116 · SPEC §4 แถว T9 · ข้อ 160 183 199 201): ตราเหรียญตอนได้ฉายาหายาก/ตำนาน (และสกิลขึ้นขั้น)
-     จอเกมอยู่ใน iframe ที่ใช้ CSS เกมจริงจาก template.html (build เติมใน <template id="gcss">) · ชุด 0 = เกมตอนนี้ ไม่ทับอะไร
-     ตราลอกจาก app.mjs FX.title + FX_TITLE + ART_INK (art.mjs) — ชุด 0 ต้องวาดเท่าเกม · ทรงอื่นเป็นของใหม่ที่หน้านี้เสนอ */
+  /* หน้า tweak T6 (ui-redo 110 · SPEC §4 แถว T6 · ข้อ 199 201): การ์ดรายปี + ปุ่มตัวเลือก + แถบค่า
+     จอเกมอยู่ใน iframe ที่ใช้ CSS เกมจริงจาก template.html (build เติมใน <template id="gcss">) · ชุด 0 = เกมตอนนี้ ไม่ทับอะไร */
   body { margin: 0; background: #E6E0D3; color: #1F2430; font: 15px/1.55 Sarabun, system-ui, sans-serif; }
   .lay { display: grid; grid-template-columns: 360px minmax(0, 1fr); align-items: start; }
   .ctl { position: sticky; top: 0; height: 100vh; overflow-y: auto; background: #F3EEE2; border-right: 1px solid #D8D0C0; padding: 14px 14px 40px; box-sizing: border-box; }
@@ -41,7 +40,6 @@
   .note { font-size: 13px; color: #4A4F5B; margin: 0 0 10px; max-width: 1100px; }
   .sc { margin: 0 0 22px; }
   .sc > h2 { font-size: 16px; margin: 0 0 8px; }
-  /* จอ 1280 ลงแถวของตัวเองเต็มกว้าง ขนาดจริง (บทเรียนใบ 108) */
   .frames { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
   .frames .fr:first-child .box { max-width: 390px; }
   .fr h3 { margin: 0 0 6px; font-size: 14px; }
@@ -56,7 +54,7 @@
 <div class="lay">
   <aside class="ctl" id="ctl"></aside>
   <main class="view">
-    <p class="note">ทุกจอใช้ CSS เกมจริง · การ์ดสีสว่างใต้ม่าน 0.6 (กรณีแย่สุดของใบ 95) · ซ้าย 390 ล่าง 1280 ขนาดจริง (ตัดช่วงกลางจอ) · หัวกรอบบอกชื่อถูกบีบไหม contrast ต่ำสุด และตัวเล็กสุด · เลื่อน "เฟรม" ดูจังหวะ หรือกด "เล่น" ดูทั้งชุด · ฉายาชื่อจริงจากเกม (หายากยาวสุด · ตำนาน) + ตราสกิลขึ้นขั้น</p>
+    <p class="note">ทุกจอใช้ CSS เกมจริง · ข้อความการ์ดจริงจากเกม · บน 390 ล่าง 1280 ขนาดเท่าเกม (จอกว้างไม่พอจะย่อทั้งจอ) · ชุด 0 = เกมตอนนี้</p>
     <div id="frames"></div>
   </main>
 </div>
@@ -244,30 +242,6 @@ body:has(.mnav) .foot { display:none; }
 .me dd { margin:0; color:var(--ink2); }
 .me .focus { padding:0; }
 .me .meta { margin:0; padding:0; font-size:14px; }
-/* แท็บโฟกัส (ui-redo 50 · JSON 47 แบบ ก รายการเดียว): ตัวที่ถืออยู่เป็นกรอบสีเน้น · ปีสะสมเป็นป้ายคำ ไม่มีเลข
-   · ป้ายชำนาญแล้วใช้สีพื้นแผ่นเป็นตัวอักษร — ชุดปรโลกสีเน้นเป็นทอง ตัวขาวบนทองอ่านไม่ออก */
-.ft h3 { margin:16px 0 8px; font-size:14px; color:var(--muted); }
-.ft-now { border:1px solid var(--fl); border-radius:var(--r); padding:10px 12px; display:flex; flex-wrap:wrap; gap:2px 8px; align-items:center; }
-.ft-now b { font-size:16px; } .ft-now .ft-fx { flex-basis:100%; }
-.ft-word { display:inline-block; padding:0 8px; border-radius:999px; font-size:12px; font-weight:600; background:var(--paper2); color:var(--ink); white-space:nowrap; }
-.ft-word.full { background:var(--fl); color:var(--paper); }
-.ft-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
-.ft-list button { all:unset; box-sizing:border-box; width:100%; min-height:48px; padding:8px 12px; border:1px solid var(--rule2); border-radius:var(--r); display:flex; flex-wrap:wrap; gap:2px 8px; align-items:center; cursor:pointer; font-size:14px; overflow-wrap:anywhere; }
-.ft-list button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
-.ft-list button.on { border-color:var(--fl); box-shadow:inset 3px 0 0 var(--fl); font-weight:600; }
-.ft-fx { font-size:12px; color:var(--ink2); font-weight:400; }
-.ft-list .ft-fx { flex-basis:100%; }
-.ft-new { font-size:12px; font-weight:600; color:var(--fl); }
-.ft-chain { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:13px; }
-.ft-chain li { border-left:3px solid var(--rule2); padding:2px 0 2px 10px; }
-.ft-chain li.open { border-color:var(--fl); }
-.ft-chain li.gone { opacity:0.6; }
-.ft-chain .st { display:block; font-size:12px; color:var(--muted); }
-/* ดูอย่างเดียว (สรุปตอนตาย): ไม่มีกรอบแบบปุ่ม ไม่ให้ดูเหมือนกดได้ */
-.ft-ro { gap:0; } .ft-ro li { padding:8px 0; border-bottom:1px solid var(--rule2); font-size:14px; }
-.ft-note { font-size:13px; color:var(--muted); margin:8px 0 0; }
-/* ไอคอนเมนู (JSON 47 แบบ ข): เส้นบางสีตามป้าย ปุ่มที่เปิดอยู่เปลี่ยนสีทั้งไอคอนและป้าย */
-.mnav button svg { width:22px; height:22px; flex:none; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
 /* หัวค่าสถานะคู่ปุ่มพับคำอธิบาย (ui-redo 131) — ปุ่มหน้าตาเดียวกับ "กลับไปการ์ด" แตะได้ 44px */
 .me-hh { display:flex; align-items:baseline; gap:12px; margin:16px 0 8px; }
 .me-hh h3 { flex:1; margin:0; }
@@ -613,7 +587,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .fx-cap small { display:block; font-family:Sarabun,sans-serif; font-size:13px; color:var(--sand); }
 .fx-title { position:absolute; inset:0; display:grid; place-items:center; }
 .fx-title svg { overflow:visible; max-width:92vw; height:auto; }
-.fx-title .fx-name { font-family:Pridi,serif; font-weight:600; }
+.fx-title .fx-name { font-family:Maitree,serif; font-weight:600; }
 /* ทั้งหน้าเข้าธีมต่างโลกตามการ์ดที่ขึ้นจอ — ผูกกับการ์ดด้วย :has จึงไม่ต้องตามล้างธงทุกจุดที่วาดจอไทย */
 /* ui-redo ใบ 13: ชุดกรมท่าเรืองของต้นแบบลงตัวแปรหน้า — แถบสถานะ เมนูล่าง/ราวซ้าย และแผงจากเมนูเปลี่ยนสีตามโดยไม่มีกฎแยก */
 body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; --ink:#E8ECFF; --ink2:#D3D8F5; --paper:#161A3A; --paper2:#232A5E; --rule2:#3B4BA8; --fl:#6FE3FF; --dg:#FF8A8A; --track:#262C5A; }
@@ -700,7 +674,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   :root { --rail-w:calc(220px + env(safe-area-inset-left)); --sheet-w:420px; }
   body:has(.mnav) { padding-bottom:0; padding-left:var(--rail-w); }
   .mnav { top:0; right:auto; width:var(--rail-w); max-width:none; flex-direction:column; gap:4px; margin:0; padding:max(16px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left)); border-top:0; border-right:1px solid var(--rule2); box-shadow:4px 0 16px rgb(0 0 0 / .06); }
-  .mnav button { flex:none; flex-direction:row; justify-content:flex-start; gap:10px; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
+  .mnav button { flex:none; flex-direction:row; justify-content:flex-start; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
   .mnav button:hover { background:var(--paper2); }
   .mnav button[aria-expanded="true"] { background:var(--paper2); box-shadow:inset 3px 0 0 var(--fl); }
   .mnav .new-dot { position:static; margin-left:6px; }
@@ -710,7 +684,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --rail-w:calc(96px + env(safe-area-inset-left)); }
   .mnav { gap:2px; padding:max(8px, env(safe-area-inset-top)) 6px max(8px, env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left)); }
-  .mnav button { flex-direction:column; justify-content:center; gap:2px; min-height:44px; padding:0 4px; font-size:13px; }
+  .mnav button { justify-content:center; min-height:44px; padding:0 4px; font-size:13px; }
 }
 /* ราว/แผงเริ่มใต้หัวเว็บ (ui-redo ใบ 67 · เจ้าของเลือกจากภาพ): หัวเว็บกว้างเต็มจอทับช่องราว · --hd = ขอบล่างหัวที่วัดขณะเลื่อน เลื่อนพ้นแล้วชิดบน
    · มือถือแนวนอนเตี้ยคงราวเต็มสูงแบบเดิม (หัวบางอยู่แล้ว) */
@@ -729,55 +703,43 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 /*GAME-CSS:END*/</style></template>
 <script>
 (() => {
-  const KEY = 'next-life-t9-title-medal-tweak-v1';
+  const KEY = 'next-life-t6-year-card-tweak-v1';
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   const clone = (o) => JSON.parse(JSON.stringify(o));
   const GCSS = $('gcss').content.querySelector('style').textContent;
   const FONTS = new URL('../../fonts/fonts.css', location.href).href;
-
-  // ---------- ค่าเกม (art.mjs ART_INK · app.mjs FX_TITLE) ----------
-  const INK = { lacquer: '#17110D', lacquer2: '#221912', gold: '#D9B45A', gold2: '#F0D78C', cream: '#EFE3C2', bronze2: '#8A6D3B' };
-  const NAME_W = 200;
-  // ชื่อจริงจาก engine/titles.mjs TITLES · ป้ายสกิลตาม app.mjs (สกิลใหม่ลงสมุด / สกิลขึ้นขั้น N)
-  const SCENES = [
-    { id: 'rare', cap: 'หายาก · ชื่อสั้น', tier: 'rare', name: 'เศรษฐีเงียบ' },
-    { id: 'rareLong', cap: 'หายาก · ชื่อยาวสุดในเกม', tier: 'rare', name: 'ผู้เลี้ยงหลานแทนพ่อแม่' },
-    { id: 'leg', cap: 'ตำนาน', tier: 'legend', name: 'จากศูนย์สู่เศรษฐี' },
-    { id: 'skill', cap: 'สกิลขึ้นขั้นสูงสุด (ตราตำนาน)', tier: 'legend', name: 'ช่างไม้ฝีมือดี', sub: 'สกิลขึ้นขั้น 5' },
-  ];
-  const WIDTHS = [390, 1280];
+  const SIZES = [[390, 844], [1280, 800]];
+  const NAV_H = 60;
 
   // ---------- ชุด + knob ----------
-  // shape: medal = เหรียญกลม (เกมตอนนี้ ข้อ 160) · lotus = ดอกบัวบานจากฐาน · seal = ตราแปดเหลี่ยม · ribbon = เหรียญห้อยแพรสองชาย
-  const BASE = { shape: 'medal', font: 'Pridi', weight: 600, fs: 17, subFs: 11, rare: '#C9CDD3', leg: '#D9B45A', legInk: '#17110D', frameW: 1.6, mr: 30, glow: 46, petals: 12, stars: 3, plateR: 8, plateEdge: 0.5, durRare: 900, durLeg: 1400 };
+  // frame: none = เกมตอนนี้ · line = เส้นทองรอบใบ · kanok = มุมกนกสี่มุม
+  // btn: rect = ทรงเดียวกับเกม (มุมตาม btnR) · pill = มนเต็ม · tab = ขอบซ้ายหนา
+  // bar: line = เส้นมนบนราง (เกมตอนนี้) · solid = แถบทึบหนาไม่มน
+  const BASE = { cardR: 8, frame: 'none', frameW: 1, btn: 'rect', btnR: 6, btnBorder: 1, btnH: 52, kbdShape: 'round', bar: 'line', barH: 6 };
   const PRESETS = [
-    { ...BASE, id: '0', name: '0 เกมตอนนี้ (เหรียญกลม · Pridi 600 · 17)', pure: true },
-    { ...BASE, id: 'ก', name: 'ก เหรียญเดิม · Maitree 600 · 18 · ป้ายใต้ 12', font: 'Maitree', fs: 18, subFs: 12 },
-    { ...BASE, id: 'ข', name: 'ข ดอกบัวบาน · Noto Serif Thai 600 · ป้ายใต้ 12', shape: 'lotus', font: 'Noto Serif Thai', subFs: 12, petals: 8, plateR: 12 },
-    { ...BASE, id: 'ค', name: 'ค ตราแปดเหลี่ยม · Maitree · กลีบ 8 · ดาวดวงเดียว', shape: 'seal', font: 'Maitree', fs: 18, subFs: 12, petals: 8, stars: 1, plateR: 4, frameW: 2 },
-    { ...BASE, id: 'ง', name: 'ง เหรียญห้อยแพร · Srisakdi 700 · 19', shape: 'ribbon', font: 'Srisakdi', weight: 700, fs: 19, subFs: 12, plateR: 10 },
+    { ...BASE, id: '0', name: '0 เกมตอนนี้', pure: true },
+    { ...BASE, id: 'ก', name: 'ก เส้นทองรอบใบ · ปุ่มเดิม · แถบเส้น', frame: 'line' },
+    { ...BASE, id: 'ข', name: 'ข มุมกนก · ปุ่มเหลี่ยม · แถบทึบ', cardR: 2, frame: 'kanok', btnR: 2, kbdShape: 'square', bar: 'solid', barH: 8 },
+    { ...BASE, id: 'ค', name: 'ค ไม่มีกรอบ · ปุ่มมน · แถบเส้นบาง', cardR: 12, btn: 'pill', barH: 4 },
+    { ...BASE, id: 'ง', name: 'ง เส้นทอง · ปุ่มขอบซ้ายหนา · แถบทึบ', cardR: 4, frame: 'line', btn: 'tab', btnR: 2, bar: 'solid', barH: 8 },
   ];
-  const WEIGHTS = { Pridi: [400, 500, 600], Maitree: [400, 500, 600], 'Noto Serif Thai': [400, 600], Srisakdi: [400, 700], Mitr: [400, 500, 600] };
   const KNOBS = [
-    ['shape', 'ทรงตรา', [['medal', 'เหรียญกลม (เกมตอนนี้)'], ['lotus', 'ดอกบัวบานจากฐาน'], ['seal', 'ตราแปดเหลี่ยม'], ['ribbon', 'เหรียญห้อยแพรสองชาย']]],
-    ['font', 'ฟอนต์ชื่อฉายา', Object.keys(WEIGHTS).map((f) => [f, f === 'Pridi' ? 'Pridi (เกมตอนนี้)' : f])],
+    ['frame', 'กรอบการ์ด', [['none', 'ไม่มีกรอบ (เกมตอนนี้)'], ['line', 'เส้นทองรอบใบ'], ['kanok', 'มุมกนกสี่มุม']]],
+    ['btn', 'ทรงปุ่มตัวเลือก', [['rect', 'สี่เหลี่ยม (เกมตอนนี้)'], ['pill', 'มนเต็ม'], ['tab', 'ขอบซ้ายหนา']]],
+    ['kbdShape', 'ป้ายเลขบนปุ่ม', [['round', 'วงกลม (เกมตอนนี้)'], ['square', 'สี่เหลี่ยม']]],
+    ['bar', 'แถบค่า', [['line', 'เส้นมน (เกมตอนนี้)'], ['solid', 'ทึบไม่มน']]],
   ];
   const RANGES = [
-    ['fs', 'ขนาดชื่อ px', 14, 22, 1, (v) => `${v}px`],
-    ['subFs', 'ขนาดป้ายใต้ (ระดับ/สกิล) px', 11, 14, 1, (v) => `${v}px`],
-    ['mr', 'ขนาดตรา (รัศมี)', 24, 34, 1, (v) => v],
-    ['frameW', 'เส้นขอบตรา + เส้นใต้ชื่อ', 1, 3, 0.1, (v) => v.toFixed(1)],
-    ['glow', 'ระยะวงจุดทองรอบนอก (ตำนาน)', 20, 60, 2, (v) => v],
-    ['plateR', 'มุมพื้นรองใต้ชื่อ', 0, 14, 1, (v) => v],
-    ['plateEdge', 'ขอบพื้นรอง (ทึบ)', 0, 1, 0.05, (v) => v.toFixed(2)],
-    ['durRare', 'เวลา หายาก ms', 600, 1600, 50, (v) => v],
-    ['durLeg', 'เวลา ตำนาน ms', 900, 2200, 50, (v) => v],
+    ['cardR', 'มุมการ์ด px', 0, 16, 1, (v) => v],
+    ['frameW', 'เส้นกรอบ px', 1, 3, 0.5, (v) => v],
+    ['btnR', 'มุมปุ่ม px', 0, 12, 1, (v) => v],
+    ['btnBorder', 'เส้นขอบปุ่ม px', 1, 2, 0.5, (v) => v],
+    ['btnH', 'ความสูงปุ่ม px', 44, 60, 2, (v) => v],
+    ['barH', 'ความหนาแถบค่า px', 3, 12, 1, (v) => v],
   ];
-  const COLORS = [['rare', 'สีหายาก (เงิน)', '#C9CDD3'], ['leg', 'สีตำนาน (ทอง)', '--gold #D9B45A'], ['legInk', 'หมึกบนเหรียญทอง', '--lacquer #17110D']];
-  const SEGS = [['weight', 'น้ำหนัก'], ['petals', 'กลีบ (ตำนาน)', [8, 12, 16]], ['stars', 'ดาว (ตำนาน)', [1, 3]]];
 
-  let S = { base: 1, cur: clone(PRESETS[1]) }, note = '', T = 1;
+  let S = { base: 1, cur: clone(PRESETS[1]) }, note = '';
   try {
     const s = JSON.parse(localStorage.getItem(KEY) || 'null');
     if (s && s.cur && PRESETS[s.base]) { S = { base: s.base, cur: { ...clone(PRESETS[s.base]), ...s.cur } }; note = s.note || ''; }
@@ -786,89 +748,38 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   const KEYS = Object.keys(BASE);
   const edits = () => KEYS.filter((k) => S.cur[k] !== PRESETS[S.base][k]);
 
-  // ---------- ตรา (ลอก app.mjs FX.title · ชุด 0 = ค่าเท่าเกม) ----------
-  const star = (x, y, r, f) => `<path d="M${x} ${y - r}L${x + r * 0.3} ${y - r * 0.3}L${x + r} ${y}L${x + r * 0.3} ${y + r * 0.3}L${x} ${y + r}L${x - r * 0.3} ${y + r * 0.3}L${x - r} ${y}L${x - r * 0.3} ${y - r * 0.3}z" fill="${f}"/>`;
-  const oct = (r) => Array.from({ length: 8 }, (_, i) => { const a = Math.PI / 8 + i * Math.PI / 4; return `${(150 + r * Math.cos(a)).toFixed(2)},${(48 + r * Math.sin(a)).toFixed(2)}`; }).join(' ');
-  const ring = (n, R, a0 = 0, a1 = 2 * Math.PI, cy = 48) => Array.from({ length: n }, (_, i) => { const a = a0 + (a1 - a0) * (a1 - a0 >= 2 * Math.PI ? i / n : i / (n - 1)); return `<circle class="fx-dot" cx="${+(150 + R * Math.cos(a)).toFixed(2)}" cy="${+(cy + R * Math.sin(a)).toFixed(2)}" r="1.8" fill="${INK.gold2}"/>`; }).join('');
-  const petal = (cls, ang, len, wid, fill, stroke, sw, ox = 150, oy = 48) => `<path class="${cls}" d="M${ox} ${oy}q${-wid} ${-len * 0.52} 0 ${-len}q${wid} ${len * 0.48} 0 ${len}z" transform="rotate(${ang} ${ox} ${oy})" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
-  const legStars = (p, k, y = 48) => p.stars === 3 ? `${star(150, y - 6 * k, 9 * k, p.legInk)}${star(150 - 11 * k, y + 8 * k, 5 * k, p.legInk)}${star(150 + 11 * k, y + 8 * k, 5 * k, p.legInk)}` : star(150, y, 12 * k, p.legInk);
-  function medalSvg(x, p, uid) {
-    const leg = x.tier === 'legend', w = p.frameW, k = p.mr / 30, id = `t9${uid}`;
-    const grad = `url(#${id}g)`;
-    const name = `<text class="fx-name" x="150" y="110" text-anchor="middle" font-size="${p.fs}" fill="${leg ? INK.gold2 : INK.cream}"></text>`;
-    const sub = `<text class="fx-sub" x="150" y="160" text-anchor="middle" font-size="${p.subFs}" fill="${leg ? INK.gold2 : p.rare}">${esc(x.sub || (leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'))}</text>`;
-    const plate = `<rect class="fx-plate" x="${150 - NAME_W / 2 - 12}" y="86" width="${NAME_W + 24}" height="84" rx="${p.plateR}" fill="${INK.lacquer2}" stroke="${leg ? p.leg : p.rare}" stroke-width="0.8" stroke-opacity="${p.plateEdge}"/>`;
-    const line = leg ? `<path class="fx-line" d="M70 119h160M90 124h120" stroke="${p.leg}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>` : `<path class="fx-line" d="M70 120h160" stroke="${p.rare}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>`;
-    const defs = leg ? `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${INK.gold2}"/><stop offset=".55" stop-color="${p.leg}"/><stop offset="1" stop-color="${INK.bronze2}"/></linearGradient></defs>` : '';
-    const R = 30 * k + p.glow * 0.5;
-    const petalsAround = (len) => Array.from({ length: p.petals }, (_, i) => petal('fx-petal', i * 360 / p.petals, len * k, 9 * k, grad, INK.gold2, 0.6)).join('');
-    let back = '', mid = '', medal;
-    if (p.shape === 'medal') {
-      if (!leg) medal = `<circle class="fx-ring" cx="150" cy="48" r="${30 * k}" fill="${INK.lacquer2}" stroke="${p.rare}" stroke-width="${w}"/>${star(150, 48, 13 * k, p.rare)}`;
-      else { back = `<g>${ring(16, R)}</g>`; mid = `<g>${petalsAround(42)}</g>`; medal = `<circle class="fx-ring" cx="150" cy="48" r="${26 * k}" fill="${grad}" stroke="${INK.gold2}" stroke-width="${w}"/><circle cx="150" cy="48" r="${21 * k}" fill="none" stroke="${p.legInk}" stroke-width="0.8"/>${legStars(p, k, 48 - 0 * k)}`; }
-    } else if (p.shape === 'seal') {
-      if (!leg) medal = `<polygon class="fx-ring" points="${oct(30 * k)}" fill="${INK.lacquer2}" stroke="${p.rare}" stroke-width="${w}"/><polygon points="${oct(25 * k)}" fill="none" stroke="${p.rare}" stroke-width="0.7" stroke-opacity="0.7"/>${star(150, 48, 12 * k, p.rare)}`;
-      else { back = `<g>${ring(16, R)}</g>`; mid = `<g>${petalsAround(40)}</g>`; medal = `<polygon class="fx-ring" points="${oct(27 * k)}" fill="${grad}" stroke="${INK.gold2}" stroke-width="${w}"/><polygon points="${oct(22 * k)}" fill="none" stroke="${p.legInk}" stroke-width="0.8"/>${legStars(p, k)}`; }
-    } else if (p.shape === 'lotus') {
-      // บัวบานจากฐาน: หายาก = 5 กลีบเส้นเงิน · ตำนาน = กลีบทองชั้นนอก + กลีบในขอบทอง + จุดทองครึ่งวง
-      const by = 48 + 24 * k;
-      const fan = (n, spread, len, wid, fill, stroke, sw) => Array.from({ length: n }, (_, i) => petal('fx-petal', -spread + (2 * spread) * (n === 1 ? 0.5 : i / (n - 1)), len * k, wid * k, fill, stroke, sw, 150, by)).join('');
-      const base = (c) => `<path d="M${150 - 26 * k} ${by}q${26 * k} ${10 * k} ${52 * k} 0" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
-      if (!leg) medal = `${fan(5, 56, 44, 10, INK.lacquer2, p.rare, w)}${base(p.rare)}`;
-      else {
-        back = `<g>${ring(Math.max(7, p.petals + 1), R * 0.92, Math.PI, 2 * Math.PI, by)}</g>`;
-        mid = `<g>${fan(p.petals + 1, 78, 46, 9, grad, INK.gold2, 0.6)}</g>`;
-        medal = `${fan(5, 40, 34, 9, INK.lacquer2, INK.gold2, w)}${base(INK.gold2)}${p.stars === 3 ? `${star(150, by - 22 * k, 6 * k, INK.gold2)}${star(150 - 10 * k, by - 12 * k, 4 * k, INK.gold2)}${star(150 + 10 * k, by - 12 * k, 4 * k, INK.gold2)}` : star(150, by - 18 * k, 7 * k, INK.gold2)}`;
-      }
-    } else {
-      // ribbon: แพรสองชายออกข้างล่างเหรียญ วาดหลังเหรียญ · ปลายต่ำสุด y 85 < ขอบบนพื้นรอง 86 ⇒ ไม่ทับชื่อ
-      const tail = (s, fill, stroke) => `<path d="M${150 + s * 16 * k} ${48 + 16 * k}L${150 + s * 38 * k} ${48 + 30 * k}L${150 + s * 30 * k} ${48 + 30 * k}L${150 + s * 34 * k} ${48 + 37 * k}L${150 + s * 10 * k} ${48 + 24 * k}z" fill="${fill}" stroke="${stroke}" stroke-width="0.8"/>`;
-      if (!leg) { back = `<g>${tail(-1, INK.lacquer2, p.rare)}${tail(1, INK.lacquer2, p.rare)}</g>`; medal = `<circle class="fx-ring" cx="150" cy="48" r="${28 * k}" fill="${INK.lacquer2}" stroke="${p.rare}" stroke-width="${w}"/>${star(150, 48, 12 * k, p.rare)}`; }
-      else { back = `<g>${ring(16, R)}</g><g>${tail(-1, grad, INK.gold2)}${tail(1, grad, INK.gold2)}</g>`; medal = `<circle class="fx-ring" cx="150" cy="48" r="${26 * k}" fill="${grad}" stroke="${INK.gold2}" stroke-width="${w}"/><circle cx="150" cy="48" r="${21 * k}" fill="none" stroke="${p.legInk}" stroke-width="0.8"/>${legStars(p, k)}`; }
-    }
-    // ลำดับวาดเท่าเกม: พื้นรอง → จุด → กลีบ → ตรา → ชื่อ → เส้น → ป้าย
-    const inner = `${defs}${plate}${back}${mid}<g class="fx-medal" style="transform-origin:150px 48px">${medal}</g>${name}${line}${sub}`;
-    return `<svg class="" viewBox="0 0 300 170" width="300" height="170" aria-hidden="true">${inner}</svg>`;
-  }
-  // CSS ใหม่ (ยังไม่มีในเกม) — ชุด 0 ไม่ใส่ ใช้ .fx-title .fx-name ของเกม
-  const newCss = (p) => `.fx-title .fx-name{font-family:"${p.font}",serif;font-weight:${p.weight}}`;
-  // ภาพนิ่ง: ม่านค่าเท่าเกม · การ์ดสว่างใต้ม่าน · กรอบสูงพอให้ไม่เข้า media จอแนวนอนเตี้ย
-  const FIX = '.card{min-height:0 !important}html,body{overflow:hidden}';
-  const card = '<div id="app"><article class="card a"><div class="body"><span class="kicker">ช่วงชรา · อายุ 78</span><h3>ลูกหลานมาพร้อมหน้าวันเกิด</h3><p>หลานคนเล็กอ่านการ์ดอวยพรที่เขียนเองให้ฟังทั้งบ้าน คนรุ่นเดียวกันหลายคนจากไปแล้ว แต่บ้านนี้ยังมีเสียงหัวเราะ</p><p>เงินเก็บพอใช้ถึงวันสุดท้าย ไม่ต้องรบกวนใคร</p></div><div class="choices"><button class="choice" type="button"><kbd>1</kbd><span>ขอบคุณทุกคนที่มา</span></button><button class="choice" type="button"><kbd>2</kbd><span>เล่าเรื่องสมัยหนุ่มให้หลานฟัง</span></button></div></article></div>';
-  let uid = 0;
-  const srcdoc = (x, p) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><link rel="stylesheet" href="${FONTS}"><style>${GCSS}</style><style>${FIX}</style><style>${p.pure ? '' : newCss(p)}</style></head><body>${card}<div class="fx-ov"><div class="fx-veil"></div><div class="fx-title">${medalSvg(x, p, ++uid)}</div></div></body></html>`;
+  // ---------- ฉาก (ข้อความจาก content + labels.mjs) ----------
+  // ไอคอน + ป้ายผล ลอก labels.mjs (FX_ICON_PATH · fxPiece)
+  const ICON = { heart: 'M8 13.5S2 10 2 5.8A3 3 0 0 1 8 4.5a3 3 0 0 1 6 1.3C14 10 8 13.5 8 13.5z', smile: 'M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12zM5.5 9.5q2.5 2.5 5 0M6 6.5h0M10 6.5h0', book: 'M2 3.5h4.5Q8 3.5 8 5v8.5q0-1.5-1.5-1.5H2zM14 3.5H9.5Q8 3.5 8 5v8.5q0-1.5 1.5-1.5H14z', people: 'M5.5 7.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM1.5 13.5q0-4 4-4t4 4M11 7a1.8 1.8 0 1 0 0-3.6M11.5 9.5q3 .5 3 4' };
+  const svg = (k) => `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="${ICON[k]}"/></svg>`;
+  const fxp = (k, name, up) => `<span class="fxp ${up ? 'up' : 'dn'}"><span aria-hidden="true">${svg(k)}<b>${up ? '↑' : '↓'}</b></span><span class="sr">${name}${up ? 'เพิ่ม' : 'ลด'}</span></span>`;
+  const meter = (k, label, v, low) => `<li${low ? ' class="low"' : ''}><span class="mh"><span class="mk">${svg(k)}${label}</span><b class="num">${v}</b></span><span class="br"><i style="width:${v}%"></i></span></li>`;
+  const bar = `<header class="sb"><div class="sb-r1"><span class="sb-who"><b>สมชาย ใจดี</b><small>เชียงใหม่ · ช่วงทำงาน</small></span><span class="sb-age"><b>34</b><small> ปี</small></span></div><ul class="sb-m">${meter('heart', 'ชีวิต', 72)}${meter('smile', 'ความสุข', 58)}${meter('people', 'ความสัมพันธ์', 64)}${meter('book', 'ความรู้', 21, true)}</ul></header>`;
+  const pick = (n, t, fx) => `<button class="choice" type="button"><kbd aria-hidden="true">${n}</kbd><span>${t}</span>${fx ? `<span class="fx">${fx}</span>` : ''}</button>`;
+  const nav = '<nav class="mnav"><button type="button">ตัวฉัน</button><button type="button">ครอบครัว</button><button type="button">สมุด</button><button type="button">เพิ่มเติม</button></nav>';
+  const SCENES = [
+    { id: 'year', cap: 'การ์ดรายปี 4 ตัวเลือก', html: `<div id="app"><article class="card a">${bar}<div class="body"><span class="kicker">ช่วงทำงาน</span><h3>เก้าอี้หัวหน้าแผนก</h3><p>ตำแหน่งหัวหน้าแผนกว่างลง คุณกับเพื่อนร่วมงานอีกคนมีสิทธิ์เท่ากัน แต่เขาทำงานนานกว่าและเก่งกว่า เพื่อนเก่าของคุณเป็นกรรมการบริษัท บอกว่ายกหูโทรศัพท์ครั้งเดียวเรื่องก็จบ</p></div><div class="choices">${pick(1, 'ฝากชื่อกับเพื่อนที่เป็นกรรมการ')}${pick(2, 'แข่งกันตามผลงาน')}${pick(3, 'ถอยให้คนที่เก่งกว่า', `${fxp('people', 'ความสัมพันธ์', true)} · ${fxp('smile', 'ความสุข', false)}`)}${pick(4, 'ขอย้ายไปแผนกอื่น', fxp('book', 'ความรู้', true))}</div></article></div>` },
+    { id: 'birth', cap: 'การ์ดแรกเกิด ปุ่มต่อไป + ขอเกิดใหม่ (ต้องอยู่จอแรก 390)', pin: true, html: `<div id="app"><article class="card a"><div class="body"><div class="era-art scene-sm" aria-hidden="true" style="background:#17110D"></div><span class="kicker">แรกเกิด</span><h3>สมชาย ใจดี</h3><p>เกิดที่เชียงใหม่ ในบ้านช่างไม้ พ่อแม่ตั้งชื่อตามปู่ ปีนั้นฝนมาช้ากว่าทุกปี</p></div><div class="choices pin"><button class="choice" type="button"><span>ต่อไป</span></button><button class="choice" type="button"><span>ขอเกิดใหม่</span><span class="fx"><span>ได้ครั้งเดียว</span></span></button></div></article></div>` },
+  ];
 
-  // ---------- จังหวะ (ลอก FX.title.frame) ----------
-  const cl = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
-  const span = (t, a, b) => cl((t - a) / (b - a));
-  const out3 = (v) => 1 - (1 - v) ** 3;
-  function parts(d) {
-    const q = (s) => d.querySelector(s);
-    return { veil: q('.fx-veil'), plate: q('.fx-plate'), medal: q('.fx-medal'), name: q('.fx-name'), line: q('.fx-line'), sub: q('.fx-sub'), petals: [...d.querySelectorAll('.fx-petal')], dots: [...d.querySelectorAll('.fx-dot')] };
+  // ---------- CSS ใหม่ (ยังไม่มีในเกม) — ชุด 0 ไม่ใส่ ----------
+  // หมุนรอบกลางภาพ ไม่งั้นสามมุมหลุดกรอบ · 16px พอดีช่องว่างก่อนเนื้อ (padding การ์ด 20)
+  const corner = (r) => `<g transform="rotate(${r} 8 8)"><path d="M1 15V5q0-4 4-4h10M5 11V7q0-2 2-2h4" fill="none" stroke="#B08A35" stroke-width="1.2"/><circle cx="8" cy="8" r="1" fill="#B08A35"/></g>`;
+  const kanok = (r) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'>${corner(r)}</svg>`)}")`;
+  function newCss(p) {
+    const edge = p.frame === 'line' ? `box-shadow:inset 0 0 0 ${p.frameW}px var(--gold),var(--sh);` : '';
+    // ชั้นทับ ไม่ใช่พื้นการ์ด: แถบปุ่มติดล่างมีพื้นทึบบังมุมล่าง
+    const kn = p.frame === 'kanok' ? `.card{position:relative}.card::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background-image:${kanok(0)},${kanok(90)},${kanok(270)},${kanok(180)};background-repeat:no-repeat;background-position:3px 3px,calc(100% - 3px) 3px,3px calc(100% - 3px),calc(100% - 3px) calc(100% - 3px)}` : '';
+    const r = p.btn === 'pill' ? 999 : p.btnR;
+    const tab = p.btn === 'tab' ? 'border-left-width:5px;' : '';
+    const solid = p.bar === 'solid' ? 'border-radius:0;' : '';
+    return `.card{border-radius:${p.cardR}px;${edge}}${kn}.sb{border-radius:${p.cardR}px ${p.cardR}px 0 0}.choices.pin{border-radius:0 0 ${p.cardR}px ${p.cardR}px}
+.a .choice{min-height:${p.btnH}px;border-radius:${r}px;border-width:${p.btnBorder}px;${tab}}
+${p.kbdShape === 'square' ? '.choice>kbd{border-radius:3px}' : ''}
+.br{height:${p.barH}px;${solid}}.br i{${solid}}`;
   }
-  function frame(p, t) {
-    p.veil.style.opacity = 0.6 * out3(span(t, 0, 0.2));
-    p.plate.style.opacity = span(t, 0.15, 0.3);
-    p.medal.style.transform = `scale(${1.7 - 0.7 * out3(span(t, 0, 0.3))})`;
-    p.medal.style.opacity = span(t, 0, 0.12);
-    p.name.style.opacity = span(t, 0.3, 0.55);
-    p.line.style.strokeDashoffset = 100 * (1 - out3(span(t, 0.4, 0.7)));
-    p.sub.style.opacity = span(t, 0.55, 0.8);
-    p.petals.forEach((x, i) => { x.style.opacity = span(t, 0.25 + i * 0.025, 0.35 + i * 0.025); });
-    p.dots.forEach((x, i) => { x.style.opacity = span(t, 0.6 + i * 0.012, 0.66 + i * 0.012); });
-  }
-  // ชื่อยาวเกินเส้นใต้ชื่อ ⇒ บีบ (เท่าเกม) · คืนว่าบีบไหม
-  function fill(l) {
-    const d = l.f.contentDocument, nm = d?.querySelector('.fx-name');
-    if (!nm) return;
-    nm.removeAttribute('textLength'); nm.removeAttribute('lengthAdjust');
-    nm.textContent = l.x.name;
-    l.natural = nm.getComputedTextLength();
-    l.squeezed = l.natural > NAME_W;
-    if (l.squeezed) { nm.setAttribute('textLength', NAME_W); nm.setAttribute('lengthAdjust', 'spacingAndGlyphs'); }
-    l.p = parts(d);
-    frame(l.p, T);
-  }
+  const FIX = 'html,body{overflow:hidden}';
+  const srcdoc = (x, p) => `<!doctype html><html lang="th"><head><meta charset="utf-8"><link rel="stylesheet" href="${FONTS}"><style>${GCSS}</style><style>${FIX}</style><style>${p.pure ? '' : newCss(p)}</style></head><body>${x.html}${nav}</body></html>`;
 
   // ---------- สี + contrast ----------
   const cv = document.createElement('canvas'); cv.width = cv.height = 1;
@@ -877,65 +788,71 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   const lum = ([r, g, b]) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
   const mix = (top, a, under) => [0, 1, 2].map((i) => top[i] * a + under[i] * (1 - a));
-  const live = []; // { f, w, x, small }
-  // คู่ที่วัด (กรอบ 390 เฟรมจบ): t = ตัวหนังสือบนพื้นรอง ≥ 4.5 · g = เส้น/ขอบตรา ≥ 3 · ขอบตราวัดกับม่าน 0.6 ทับพื้นการ์ด (ตราไม่มีพื้นรอง)
-  function measureScene(x) {
-    const l = live.find((v) => v.x.id === x.id && v.w === 390), d = l?.f.contentDocument, win = l?.f.contentWindow;
-    if (!d?.querySelector('.fx-plate')) return null;
-    const plate = toRgba(d.querySelector('.fx-plate').getAttribute('fill'));
-    const veil = toRgba(win.getComputedStyle(d.querySelector('.fx-veil')).backgroundColor);
-    const paper = toRgba(win.getComputedStyle(d.querySelector('.card')).backgroundColor);
-    const behind = mix(veil, 0.6, paper);
-    // บัวไม่มีวงขอบ ⇒ ใช้เส้นกลีบแรกของตรา
-    const ringEl = d.querySelector('.fx-ring') || d.querySelector('.fx-medal [stroke]');
-    const ringCol = ringEl ? toRgba(ringEl.getAttribute('stroke')) : null;
-    const rows = [
-      ['t', 'ชื่อฉายา', toRgba(d.querySelector('.fx-name').getAttribute('fill')), plate, 4.5],
-      ['t', 'ป้ายใต้ (ระดับ/สกิล)', toRgba(d.querySelector('.fx-sub').getAttribute('fill')), plate, 4.5],
-      ['g', 'เส้นใต้ชื่อ', toRgba(d.querySelector('.fx-line').getAttribute('stroke')), plate, 3],
-    ];
-    if (ringCol) rows.push(['g', 'ขอบตรา บนม่าน', ringCol, behind, 3]);
-    return rows.map(([kind, label, fg, bg, need]) => { const r = ratio(fg, bg); return { sc: x.id, kind, label, r, need, ok: r >= need, fg, bg }; });
+  // พื้นจริงของ element: ไล่ขึ้นหาพื้นทึบ แล้วซ้อนพื้นโปร่งลงมาทีละชั้น
+  function bgOf(el, w) {
+    const stack = [];
+    for (let n = el; n; n = n.parentElement) {
+      const c = toRgba(w.getComputedStyle(n).backgroundColor);
+      if (c[3] > 0) stack.push(c);
+      if (c[3] === 1) break;
+    }
+    let out = [255, 255, 255];
+    for (const c of stack.reverse()) out = mix(c, c[3], out);
+    return out;
   }
-  // ตัวเล็กสุด (px บนจอ — svg ไม่ถูกย่อเพราะกว้าง 300 < 92vw) · ชื่อ/ป้ายอยู่ในพื้นรองไหม · ล้นจอไหม
-  function measureFrame(l) {
+  const PAIRS = [
+    ['.kicker', 't', 'ป้ายช่วงวัย'], ['.body h3', 't', 'หัวการ์ด'], ['.body p', 't', 'เนื้อการ์ด'], ['.choice', 't', 'ข้อความปุ่ม'],
+    ['.choice>kbd', 't', 'เลขบนปุ่ม'], ['.choice .fx .up', 't', 'ป้ายผลบนปุ่ม'], ['.sb-who small', 't', 'บรรทัดรองแถบสถานะ'], ['.mh .num', 't', 'เลขแถบค่า'],
+  ];
+  function measureScene(x, l) {
+    const d = l.f.contentDocument, w = l.f.contentWindow;
+    if (!d?.body) return [];
+    const rows = [];
+    const push = (label, kind, fg, bg) => { const r = ratio(fg, bg); rows.push({ sc: x.id, label, kind, r, fg, bg, ok: r >= (kind === 't' ? 4.5 : 3) }); };
+    for (const [sel, kind, label] of PAIRS) {
+      const el = d.querySelector(sel);
+      if (!el) continue;
+      const bg = bgOf(el, w), c = toRgba(w.getComputedStyle(el).color);
+      push(label, kind, mix(c, c[3], bg), bg);
+    }
+    const b = d.querySelector('.choice');
+    if (b) { const bg = bgOf(b.parentElement, w), c = toRgba(w.getComputedStyle(b).borderTopColor); push('ขอบปุ่ม', 'e', mix(c, c[3], bg), bg); }
+    const f = d.querySelector('.br i');
+    if (f) { const t = d.querySelector('.br'), bg = bgOf(t, w), c = toRgba(w.getComputedStyle(f).backgroundColor); push('แถบค่าบนราง', 'e', mix(c, c[3], bg), bg); }
+    return rows;
+  }
+  function checks(l) {
     const d = l.f.contentDocument;
-    const svg = d?.querySelector('.fx-title svg');
-    if (!svg) return null;
-    const sc = svg.getBoundingClientRect().width / 300;
-    const box = (s) => d.querySelector(s).getBoundingClientRect();
-    const pl = box('.fx-plate'), inside = ['.fx-name', '.fx-sub'].every((s) => { const b = box(s); return b.left >= pl.left - 0.5 && b.right <= pl.right + 0.5 && b.top >= pl.top - 0.5 && b.bottom <= pl.bottom + 0.5; });
-    const all = svg.getBoundingClientRect(), vw = d.documentElement.clientWidth;
-    let lo = 1e9, hi = -1e9;
-    for (const e of svg.querySelectorAll('*')) { if (!e.getBBox) continue; const b = e.getBoundingClientRect(); if (!b.width && !b.height) continue; lo = Math.min(lo, b.left); hi = Math.max(hi, b.right); }
-    const subPx = Math.round(S.cur.subFs * sc * 10) / 10, namePx = Math.round(S.cur.fs * sc * 10) / 10;
-    return { inside, over: lo < 0 || hi > vw, subPx, namePx, sc, all };
+    const bs = [...(d?.querySelectorAll('.choice') ?? [])];
+    if (!bs.length) return null;
+    const minH = Math.min(...bs.map((b) => b.getBoundingClientRect().height));
+    const bottom = Math.max(...bs.map((b) => b.getBoundingClientRect().bottom));
+    const limit = l.h - (l.w < 900 ? NAV_H : 0);
+    return { minH, bottom, limit, fold: !l.x.pin || bottom <= limit, over: d.documentElement.scrollWidth > l.w };
   }
 
-  // ---------- กรอบ ----------
-  const fit = (l) => {
-    const f = l.f, box = f.parentElement;
-    const wide = l.w > 900, s = wide ? 1 : Math.min(1, box.clientWidth / l.w), dx = wide ? Math.min(0, (box.clientWidth - l.w) / 2) : 0;
-    // กรอบกว้างต้องสูงเกิน 540 — ไม่งั้นเข้า media จอแนวนอนเตี้ยของเกม
-    const h = wide ? 720 : 640;
-    Object.assign(f.style, { width: `${l.w}px`, height: `${h}px`, transform: `translateX(${dx}px) scale(${s})` });
-    box.style.height = `${Math.ceil(h * s)}px`;
-  };
+  // ---------- จอ ----------
+  const live = [];
+  function fit(l) {
+    const box = l.f.parentElement, k = Math.min(1, box.clientWidth / l.w);
+    l.f.style.width = `${l.w}px`; l.f.style.height = `${l.h}px`;
+    l.f.style.transform = `scale(${k})`;
+    box.style.height = `${l.h * k}px`;
+  }
   function report(l) {
     fit(l);
-    fill(l);
-    const m = measureFrame(l);
-    l.m = m;
-    const rows = measureScene(l.x) || [];
-    const cMin = rows.filter((x) => x.kind === 't').reduce((a, x) => Math.min(a, x.r), 99);
-    l.small.innerHTML = m ? `${l.w}px · ${l.squeezed ? `<span class="info">ชื่อถูกบีบ ${Math.round(l.natural)}→${NAME_W}</span>` : 'ชื่อไม่ถูกบีบ'} · contrast ตัวหนังสือต่ำสุด <span class="${cMin >= 4.5 ? 'ok' : 'bad'}">${cMin === 99 ? '–' : cMin.toFixed(2)}</span> · ป้ายใต้ <span class="${m.subPx >= 12 ? 'ok' : 'bad'}">${m.subPx}px</span>${m.inside ? '' : ' · <span class="bad">ตัวหนังสือล้นพื้นรอง</span>'}${m.over ? ' · <span class="bad">ล้นจอ</span>' : ''}` : '';
+    l.c = checks(l);
+    l.rows = measureScene(l.x, l);
+    const m = l.c;
+    const worst = l.rows.filter((x) => x.kind === 't').reduce((a, x) => Math.min(a, x.r), 99);
+    l.small.innerHTML = m ? `${l.w}×${l.h} · ปุ่มเตี้ยสุด <span class="${m.minH >= 44 ? 'ok' : 'bad'}">${Math.round(m.minH)}px</span>${l.x.pin ? ` · ปุ่มล่างสุดที่ ${Math.round(m.bottom)} จากเส้น ${m.limit} <span class="${m.fold ? 'ok' : 'bad'}">${m.fold ? 'อยู่จอแรก' : 'หลุดจอแรก'}</span>` : ''}${m.over ? ' · <span class="bad">ล้นแนวนอน</span>' : ''} · contrast ตัวหนังสือต่ำสุด ${worst.toFixed(2)}` : '';
     after();
   }
-  function mkFrame(x, w) {
+  function mkFrame(x, [w, h]) {
     const wrap = document.createElement('section');
     wrap.className = 'fr';
     wrap.innerHTML = `<h3>${w}px <small></small></h3><div class="box"><iframe title="${esc(x.cap)} ${w}"></iframe></div>`;
-    const l = { f: wrap.querySelector('iframe'), w, x, small: wrap.querySelector('small') };
+    const l = { f: wrap.querySelector('iframe'), w, h, x, small: wrap.querySelector('small'), rows: [] };
     l.f.addEventListener('load', () => { report(l); l.f.contentDocument.fonts?.ready.then(() => report(l)); });
     l.f.srcdoc = srcdoc(x, S.cur);
     live.push(l);
@@ -946,95 +863,59 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
     $('frames').replaceChildren(...SCENES.map((x) => {
       const g = document.createElement('section');
       g.className = 'sc';
-      g.innerHTML = `<h2>${esc(x.cap)} · «${esc(x.name)}»</h2>`;
+      g.innerHTML = `<h2>${esc(x.cap)}</h2>`;
       const fr = document.createElement('div');
       fr.className = 'frames';
-      fr.append(...WIDTHS.map((w) => mkFrame(x, w)));
+      fr.append(...SIZES.map((s) => mkFrame(x, s)));
       g.append(fr);
       return g;
     }));
     after();
   }
   function after() {
-    const rows = SCENES.flatMap((x) => measureScene(x) || []);
+    const seen = new Set();
+    const rows = live.flatMap((l) => l.rows).filter((x) => { const k = `${x.sc}|${x.label}`; if (seen.has(k)) return false; seen.add(k); return true; });
     const fails = rows.filter((x) => !x.ok);
-    const sw = (x) => `<span class="pair" style="background:rgb(${x.bg.slice(0, 3).map(Math.round)});color:rgb(${x.fg.slice(0, 3)})">${x.kind === 't' ? 'ก' : '━'}</span>`;
-    const seen = new Set(rows.map((x) => x.sc));
-    if ($('cr')) $('cr').innerHTML = `<table class="cr"><tr><th></th><th>คู่</th><th>ค่า</th></tr>${SCENES.filter((x) => seen.has(x.id)).map((s) => `<tr><th colspan="3">${esc(s.cap)}</th></tr>${rows.filter((x) => x.sc === s.id).map((x) => `<tr><td>${sw(x)}</td><td>${esc(x.label)}</td><td class="n"><span class="${x.ok ? 'ok' : 'bad'}">${x.r.toFixed(2)}</span> <small class="info">≥${x.need}</small></td></tr>`).join('')}`).join('')}</table>
-      <p class="hint">${rows.length ? (fails.length ? `<span class="bad">ตก ${fails.length} คู่</span>` : '<span class="ok">ผ่านทุกคู่</span>') : 'รอจอโหลด'} · วัดจากสีที่วาดจริงในจอ 390 · ตัวหนังสือบนพื้นรอง ≥ 4.5 · เส้น/ขอบตรา ≥ 3 · ขอบตราวัดกับม่าน 0.6 ทับการ์ดสว่าง</p>`;
+    const sw = (x) => `<span class="pair" style="background:rgb(${x.bg.slice(0, 3).map(Math.round)});color:rgb(${x.fg.slice(0, 3).map(Math.round)})">${x.kind === 't' ? 'ก' : '━'}</span>`;
+    if ($('cr')) $('cr').innerHTML = `<table class="cr"><tr><th></th><th>คู่</th><th>ค่า</th></tr>${SCENES.map((s) => { const rs = rows.filter((x) => x.sc === s.id); return rs.length ? `<tr><th colspan="3">${esc(s.cap)}</th></tr>${rs.map((x) => `<tr><td>${sw(x)}</td><td>${esc(x.label)}</td><td class="n ${x.ok ? 'ok' : 'bad'}">${x.r.toFixed(2)}</td></tr>`).join('')}` : ''; }).join('')}</table>
+      <p class="hint">${rows.length ? (fails.length ? `<span class="bad">ตก ${fails.length} คู่</span>` : '<span class="ok">ผ่านทุกคู่</span>') : 'รอจอโหลด'} · ตัวหนังสือ ≥ 4.5 · ขอบกดได้และแถบ ≥ 3</p>`;
     if ($('out')) $('out').value = output(fails);
     store();
   }
   function output(fails) {
     const p = S.cur;
     return JSON.stringify({
-      page: 't9-title-medal-tweak', ticket: 116, items: [160, 183, 199, 201], base: PRESETS[S.base].id, baseName: PRESETS[S.base].name, edited: edits(),
-      shape: p.shape, font: { family: p.font, weight: p.weight, size: p.fs, subSize: p.subFs }, colors: { rare: p.rare, legend: p.leg, legendInk: p.legInk },
-      medal: { radius: p.mr, frameW: p.frameW, glow: p.glow, petals: p.petals, stars: p.stars }, plate: { radius: p.plateR, edge: p.plateEdge }, dur: { rare: p.durRare, legend: p.durLeg },
-      squeezed: [...new Set(live.filter((l) => l.squeezed).map((l) => l.x.name))], overflow: live.filter((l) => l.m && (l.m.over || !l.m.inside)).map((l) => `${l.x.id}@${l.w}`),
+      page: 't6-year-card-tweak', ticket: 110, items: [199, 201], base: PRESETS[S.base].id, baseName: PRESETS[S.base].name, edited: edits(),
+      card: { radius: p.cardR, frame: p.frame, frameW: p.frameW }, button: { shape: p.btn, radius: p.btnR, border: p.btnBorder, minHeight: p.btnH, kbd: p.kbdShape }, bar: { style: p.bar, height: p.barH },
+      lowButton: [...new Set(live.filter((l) => l.c && l.c.minH < 44).map((l) => `${l.x.id}@${l.w}`))], offFold: [...new Set(live.filter((l) => l.c && !l.c.fold).map((l) => `${l.x.id}@${l.w}`))],
       contrastFail: fails.map((x) => `${x.sc}: ${x.label} ${x.r.toFixed(2)}`), note,
     }, null, 1);
-  }
-
-  // ---------- เล่น ----------
-  let raf = 0;
-  function play() {
-    cancelAnimationFrame(raf);
-    const t0 = performance.now();
-    const tick = (now) => {
-      let more = false;
-      for (const l of live) {
-        if (!l.p) continue;
-        const dur = l.x.tier === 'legend' ? S.cur.durLeg : S.cur.durRare, t = cl((now - t0) / dur);
-        frame(l.p, t);
-        if (t < 1) more = true;
-      }
-      if (more) raf = requestAnimationFrame(tick);
-      else { T = 1; if ($('t')) { $('t').value = 1; $('o-t').textContent = '1.00'; } }
-    };
-    raf = requestAnimationFrame(tick);
   }
 
   // ---------- แผงควบคุม ----------
   function panel() {
     const p = S.cur, ed = new Set(edits()), lock = !!p.pure;
-    const knob = ([k, label, opts]) => `<div class="row"><span class="lb">${esc(label)}${ed.has(k) ? ' <span class="ed">แก้</span>' : ''}</span><div class="seg${k === 'shape' ? ' col' : ''}">${opts.map(([v, t]) => `<button type="button" data-k="${k}" data-v="${esc(v)}" class="${p[k] === v ? 'on' : ''}"${lock ? ' disabled' : ''}>${esc(t)}</button>`).join('')}</div></div>`;
-    const seg = ([k, label, vals]) => { const vs = vals || WEIGHTS[p.font]; return `<div class="row"><span class="lb">${esc(label)}${ed.has(k) ? ' <span class="ed">แก้</span>' : ''}</span><div class="seg">${vs.map((v) => `<button type="button" data-n="${k}" data-v="${v}" class="${p[k] === v ? 'on' : ''}"${lock ? ' disabled' : ''}>${v}</button>`).join('')}</div></div>`; };
-    const range = ([k, label, lo, hi, step, f]) => `<div class="row"><span class="lb">${esc(label)} <output id="o-${k}">${f(p[k])}</output>${ed.has(k) ? ' <span class="ed">แก้</span>' : ''}</span><input type="range" data-r="${k}" min="${lo}" max="${hi}" step="${step}" value="${p[k]}"${lock ? ' disabled' : ''}></div>`;
-    const color = ([k, label, game]) => `<div class="row"><span class="lb">${esc(label)}${ed.has(k) ? ' <span class="ed">แก้</span>' : ''}</span><input type="color" data-c="${k}" value="${p[k]}"${lock ? ' disabled' : ''}> <small class="info">${esc(p[k])} · เกม = ${esc(game)}</small></div>`;
-    $('ctl').innerHTML = `<h1>T9 ฉายาตราเหรียญ</h1>
-      <p class="hint">ui-redo 116 · SPEC §4 แถว T9 · เลือกชุด ปรับได้ แล้วกด <b>คัดลอกค่า</b> วางตอบในแชท · ค่าที่ปรับจำไว้ในเครื่อง</p>
+    const tag = (k) => (ed.has(k) ? ' <span class="ed">แก้</span>' : '');
+    const knob = ([k, label, opts]) => `<div class="row"><span class="lb">${esc(label)}${tag(k)}</span><div class="seg">${opts.map(([v, t]) => `<button type="button" data-k="${k}" data-v="${v}" class="${p[k] === v ? 'on' : ''}"${lock ? ' disabled' : ''}>${esc(t)}</button>`).join('')}</div></div>`;
+    const range = ([k, label, lo, hi, step, f]) => `<div class="row"><span class="lb">${esc(label)} <output id="o-${k}">${f(p[k])}</output>${tag(k)}</span><input type="range" data-r="${k}" min="${lo}" max="${hi}" step="${step}" value="${p[k]}"${lock ? ' disabled' : ''}></div>`;
+    $('ctl').innerHTML = `<h1>T6 การ์ดรายปี + ปุ่มตัวเลือก + แถบค่า</h1>
+      <p class="hint">ui-redo 110 · SPEC §4 แถว T6 · เลือกชุด ปรับได้ แล้วกด <b>คัดลอกค่า</b> วางตอบในแชท · ค่าที่ปรับจำไว้ในเบราว์เซอร์นี้</p>
       <div class="row"><span class="lb">ชุดตั้งต้น</span><div class="seg col">${PRESETS.map((x, i) => `<button type="button" data-p="${i}" class="${i === S.base ? 'on' : ''}">${esc(x.name)}</button>`).join('')}</div></div>
       <div class="btns"><button type="button" id="reset">คืนค่าชุดนี้${ed.size ? ` (แก้ ${ed.size})` : ''}</button></div>
-      <h2>ดูจังหวะ</h2>
-      <div class="row"><span class="lb">เฟรม <output id="o-t">${T.toFixed(2)}</output></span><input type="range" id="t" min="0" max="1" step="0.01" value="${T}"></div>
-      <div class="btns"><button type="button" class="pri" id="play">เล่น</button></div>
       <h2>ปรับ</h2>${lock ? '<p class="hint">ชุด 0 = เกมตอนนี้ ปรับไม่ได้ · เลือก ก–ง แล้วปรับต่อ</p>' : ''}
       ${KNOBS.map(knob).join('')}
-      ${SEGS.map(seg).join('')}
-      ${COLORS.map(color).join('')}
       ${RANGES.map(range).join('')}
-      <p class="hint">คงไว้ทุกชุด: พื้นรองทึบใต้ชื่อ (ใบ 95 · ปิดไม่ได้) · ม่าน 0.6 · พื้นรองขึ้นครบก่อนชื่อโผล่ · หายาก = เงิน เส้นเดียว · ตำนาน = ทอง เส้นคู่ (แยกด้วยตาข้อ 39) · ชื่อยาวเกิน 200 บีบให้พอดี · ชาติหนึ่งได้ฉายาไม่เกิน 3 (ตราขึ้นทีละใบ ตอนตายขึ้นเฉพาะฉายาเด่น) · reduced-motion ไม่เล่นตรา</p>
-      <p class="hint">ป้ายใต้ขึ้นแดงเมื่อ &lt;12px (ขั้นต่ำ T1) — เกมตอนนี้ 11px เป็นของเดิม</p>
+      <p class="hint">คงไว้ทุกชุด: ปุ่มเลข 1 2 3 · คีย์ 1–4 · สูงไม่ต่ำกว่า 44px · ปุ่มต่อไปกับขอเกิดใหม่ติดล่างจอแรก 390 · reduced-motion เฟด 150ms · ไม่หน่วงคลิก · data-scene และภาพพื้นหลัง aria-hidden · พลิกเส้นทอง 520ms ไม่ปรับในหน้านี้</p>
       <h2>contrast ทุกคู่ (สด)</h2><div id="cr"></div>
       <h2>คัดลอก</h2><div class="row"><span class="lb">หมายเหตุถึงผู้พัฒนา</span><textarea id="note" rows="3">${esc(note)}</textarea></div>
       <div class="btns"><button type="button" class="pri" id="copy">คัดลอกค่า</button></div><p id="msg"></p>
       <textarea id="out" rows="10" readonly aria-label="ข้อความที่จะคัดลอก"></textarea>`;
     document.querySelectorAll('[data-p]').forEach((b) => b.onclick = () => { S.base = +b.dataset.p; S.cur = clone(PRESETS[S.base]); panel(); draw(); });
     $('reset').onclick = () => { S.cur = clone(PRESETS[S.base]); panel(); draw(); };
-    document.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => {
-      S.cur[b.dataset.k] = b.dataset.v;
-      // ฟอนต์ใหม่ไม่มีน้ำหนักเดิม ⇒ ใช้ตัวหนาสุดที่มี
-      if (b.dataset.k === 'font' && !WEIGHTS[S.cur.font].includes(S.cur.weight)) S.cur.weight = WEIGHTS[S.cur.font].at(-1);
-      panel(); draw();
-    });
-    document.querySelectorAll('[data-n]').forEach((b) => b.onclick = () => { S.cur[b.dataset.n] = Number(b.dataset.v); panel(); draw(); });
+    document.querySelectorAll('[data-k]').forEach((b) => b.onclick = () => { S.cur[b.dataset.k] = b.dataset.v; panel(); draw(); });
     let t = 0;
     const later = () => { clearTimeout(t); t = setTimeout(() => { panel(); draw(); }, 150); };
     document.querySelectorAll('[data-r]').forEach((r) => r.oninput = () => { S.cur[r.dataset.r] = Number(r.value); $(`o-${r.dataset.r}`).textContent = RANGES.find(([k]) => k === r.dataset.r)[5](Number(r.value)); later(); });
-    document.querySelectorAll('[data-c]').forEach((c) => c.oninput = () => { S.cur[c.dataset.c] = c.value.toUpperCase(); later(); });
-    $('t').oninput = (e) => { cancelAnimationFrame(raf); T = Number(e.target.value); $('o-t').textContent = T.toFixed(2); live.forEach((l) => l.p && frame(l.p, T)); };
-    $('play').onclick = play;
     $('note').oninput = (e) => { note = e.target.value; after(); };
     $('copy').onclick = async () => {
       const o = $('out');
