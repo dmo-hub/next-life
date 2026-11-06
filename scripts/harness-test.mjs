@@ -446,6 +446,54 @@ const f2 = (v) => v.toFixed(2);
   check('ขั้นค่าซ้อนทับ: ขั้น 2–4 ยังไปไม่ถึงจนใบ 16 ใส่เกณฑ์ (ค่าสูงแค่ไหนก็ขั้น 1)', E.OVERLAP_STAGE_MIN.length === 5 && E.OVERLAP_STAGE_MIN[1] === 1 && E.overlapStageOf(st) === 1, String(E.overlapStageOf(st)));
 }
 
+// ใบตามเกตที่ปล่อยไว้: นัดจากทาง pass ไม่ติดป้ายตารางซ้อน ⇒ ทอยตารางใหม่ไม่ล้าง ไม่กินโควตาซ้อน · ถึงคิวกินโควตาปี 1 · ขั้นไม่ใช่ 3–4 ตอนถึงคิว = ไม่ออก
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const BREACH = 'dungeon_breach_01';
+  const gate = content.events.find((e) => e.id === 'overlap_dungeon_01');
+  const pass = gate.choices.findIndex((c) => c.id === 'pass');
+  const keep = [...E.OVERLAP_STAGE_MIN];
+  [2, 3, 4].forEach((i) => { E.OVERLAP_STAGE_MIN[i] = i; });
+  try {
+    const gaps = new Set();
+    let row;
+    for (let i = 0; i < 40; i++) {
+      const st = newLife(mixSeed(1, 4000 + i), content);
+      st.flags.hunter = true;
+      st.age = 30;
+      st.overlap = 3;
+      st.pending = gate;
+      E.choose(st, pass);
+      row = st.scheduled.find((x) => x.event === BREACH);
+      gaps.add(row ? row.age - 30 : -1);
+      if (i === 0) {
+        E.overlapPlan(st, 1);
+        check('ใบตามเกต: ทอยตารางซ้อนใหม่ไม่ล้างนัด · นัดไม่ติดป้ายโควตาซ้อน · id ไม่ขึ้น overlap_', st.scheduled.some((x) => x.event === BREACH) && !row?.overlap && !BREACH.startsWith(E.OVERLAP_PLAN.prefix));
+      }
+    }
+    check('ใบตามเกต: pass นัด 1–2 ปี ออกครบทั้งสองค่า', [...gaps].sort().join() === '1,2', [...gaps].sort().join());
+    const due = (overlap) => {
+      const st = newLife(mixSeed(1, 4100), content);
+      st.flags.hunter = true;
+      st.age = 30;
+      st.overlap = overlap;
+      st.scheduled = [{ event: BREACH, age: 30, from: 29, pick: 'x' }];
+      // การ์ดเปิดชีวิตค้างใน due จะออกก่อนและบังนัด
+      st.due = [];
+      st.advance = false;
+      const owed = st.poolOwed ?? 0;
+      const card = E.nextCard(st);
+      return { id: card.id, owed: (st.poolOwed ?? 0) - owed, done: Boolean(st.done[BREACH]) };
+    };
+    const at = [1, 2, 3, 4].map(due);
+    check('ใบตามเกต: ถึงคิวขั้น 3–4 ออก กินโควตาปี 1', at.slice(2).every((x) => x.id === BREACH && x.owed === 1), JSON.stringify(at.slice(2)));
+    check('ใบตามเกต: ถึงคิวขั้น 1–2 ไม่ออก ไม่กินโควตา', at.slice(0, 2).every((x) => x.id !== BREACH && x.owed === 0 && !x.done), JSON.stringify(at.slice(0, 2)));
+  } finally {
+    keep.forEach((v, i) => { E.OVERLAP_STAGE_MIN[i] = v; });
+  }
+}
+
 // ไอเทมติดตัว (B78): ห้องบอสให้ชิ้นแรกที่ยังไม่มี · ช่องชนิดตรงว่างก่อน แล้วเป้ · เป้เต็มขาย · ครบแล้วไม่ได้เพิ่ม · ชีวิต/เซฟที่ไม่เคยได้ของไม่มีช่อง
 {
   const E = await import('../src/engine/index.mjs');
