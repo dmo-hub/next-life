@@ -1,0 +1,571 @@
+# nl-writer file b001
+# ทางแยกเตรียมทหาร (อายุ 13–17 · ร่างให้เจ้าของเลือก) — ต่อจาก cadet_childhood.yaml (ธง saw_* knows_senior) ไป cadet_prep.yaml
+# ตั้งธง cadet_dream cadet_declined cadet_tips cadet_senior_tutor cadet_lean:<เหล่า> cadet_invited:<อายุ> saw_navy saw_airforce saw_police good_student
+# ทุกทางที่ตั้ง cadet_dream นัด cadet_tell_family ก่อน แล้วค่อย cadet_prep_choice (ทั้งสองใบอยู่ใน cadet_prep.yaml)
+# การ์ดชวนอายุ 14–17 เป็นใบกองสุ่ม อายุละใบ · ใบปีนี้ไม่ออกถ้าปีก่อนออกไปแล้ว (ธง cadet_invited:<อายุก่อนหน้า>)
+events:
+  # >>> nl-writer b001 evt cadet_guidance_boy_01
+  - id: cadet_guidance_boy_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2503, 2650]
+    at_age: 13
+    when: {sex: [ชาย], school: [lower]}
+    title: "กระดาษแนะแนว"
+    text: "คาบแนะแนว ครูแจกกระดาษให้เขียนว่าจบ ม.สามแล้วจะไปทางไหน บอร์ดหลังห้องมีใบปลิวติดซ้อนกันเต็ม ทั้งมหาวิทยาลัย วิทยาลัยเทคนิค เกษตร พยาบาล และเตรียมทหาร เพื่อนข้างโต๊ะเขียนเสร็จไปแล้ว {ชื่อ} ยังถือดินสอค้างอยู่"
+    choices:
+      - id: uni
+        text: "ตั้งใจเรียน ต่อมหาวิทยาลัย"
+        hint: "ต้องอ่านหนักไปอีกหลายปี"
+        effects: {knowledge: 1, happiness: -1}
+        sets_flags: [good_student]
+        merit: [{cat: neutral}]
+      - id: vocational
+        text: "เรียนสายอาชีพ มีวิชาติดตัว"
+        hint: "ได้ฝึกมือได้ทำงานเร็ว"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: cadet
+        text: "สอบเตรียมทหาร เป็นนายร้อย"
+        hint: "ไม่เสียค่าเทอม แต่ต้องสอบแข่ง"
+        effects: {knowledge: 1, happiness: -1}
+        sets_flags: [cadet_dream]
+        schedules:
+          - {event: cadet_senior_visit_01, after_years: [0, 0]}
+          - {event: cadet_senior_neighbor_01, after_years: [0, 0]}
+        merit: [{cat: neutral}]
+      - id: help_home
+        text: "ช่วยงานบ้าน หาเงินให้เร็ว"
+        hint: "ได้เงินเร็ว เวลาเรียนน้อยลง"
+        effects: {relations: 1, knowledge: -1, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - id: not_sure
+        text: "ยังไม่รู้ ขอใช้ชีวิตไปก่อน"
+        hint: "ยังมีเวลาคิด"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_guidance_boy_01
+
+  # >>> nl-writer b001 evt cadet_guidance_girl_01
+  - id: cadet_guidance_girl_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    at_age: 13
+    when: {sex: [หญิง], school: [lower]}
+    title: "กระดาษแนะแนว"
+    text: "คาบแนะแนว ครูแจกกระดาษให้เขียนว่าจบ ม.สามแล้วจะไปทางไหน บอร์ดหลังห้องมีใบปลิวมหาวิทยาลัยกับวิทยาลัยเทคนิคติดซ้อนกันอยู่ เพื่อนข้างโต๊ะเขียนเสร็จไปแล้ว {ชื่อ} ยังถือดินสอค้างอยู่"
+    choices:
+      - id: uni
+        text: "ตั้งใจเรียน ต่อมหาวิทยาลัย"
+        hint: "ต้องอ่านหนักไปอีกหลายปี"
+        effects: {knowledge: 1, happiness: -1}
+        sets_flags: [good_student]
+        merit: [{cat: neutral}]
+      - id: vocational
+        text: "เรียนสายอาชีพ มีวิชาติดตัว"
+        hint: "ได้ฝึกมือได้ทำงานเร็ว"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: help_home
+        text: "ช่วยงานบ้าน หาเงินให้เร็ว"
+        hint: "ได้เงินเร็ว เวลาเรียนน้อยลง"
+        effects: {relations: 1, knowledge: -1, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - id: not_sure
+        text: "ยังไม่รู้ ขอใช้ชีวิตไปก่อน"
+        hint: "ยังมีเวลาคิด"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_guidance_girl_01
+
+  # >>> nl-writer b001 evt cadet_senior_visit_01
+  - id: cadet_senior_visit_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2503, 2650]
+    when: {sex: [ชาย], school: [lower], flags: {has: [cadet_dream], not: [knows_senior]}}
+    title: "รุ่นพี่สี่เหล่า"
+    text: "สัปดาห์นั้นรุ่นพี่ศิษย์เก่าที่สอบติดเตรียมทหารกลับมาเยี่ยมโรงเรียน ครูแนะแนวเห็นกระดาษของ {ชื่อ} เลยนัดให้มาเจอที่ห้องแนะแนว รุ่นพี่สี่คนจะแยกไปทหารบก ทหารเรือ ทหารอากาศ และตำรวจ บอกว่าวันนี้แค่มาเล่าให้ฟัง เลือกทางไหนก็ได้"
+    choices:
+      - id: army
+        text: "คุยกับรุ่นพี่ที่จะไปทหารบก"
+        effects: {happiness: 1}
+        sets_flags: ["cadet_lean:army", knows_senior, cadet_met_senior]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [1, 1]}
+        merit: [{cat: neutral}]
+      - id: navy
+        text: "คุยกับรุ่นพี่ที่จะไปทหารเรือ"
+        effects: {happiness: 1}
+        sets_flags: ["cadet_lean:navy", knows_senior, cadet_met_senior]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [1, 1]}
+        merit: [{cat: neutral}]
+      - id: airforce
+        text: "คุยกับรุ่นพี่ที่จะไปทหารอากาศ"
+        effects: {happiness: 1}
+        sets_flags: ["cadet_lean:airforce", knows_senior, cadet_met_senior]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [1, 1]}
+        merit: [{cat: neutral}]
+      - id: police
+        text: "คุยกับรุ่นพี่ที่จะไปเป็นตำรวจ"
+        effects: {happiness: 1}
+        sets_flags: ["cadet_lean:police", knows_senior, cadet_met_senior]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [1, 1]}
+        merit: [{cat: neutral}]
+      - id: slow
+        text: "ยังไม่เลือกเหล่า ค่อยเป็นค่อยไป"
+        effects: {knowledge: 1}
+        sets_flags: [knows_senior, cadet_met_senior]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [2, 2]}
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_senior_visit_01
+
+  # >>> nl-writer b001 evt cadet_senior_neighbor_01
+  - id: cadet_senior_neighbor_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2506, 2650]
+    when: {sex: [ชาย], school: [lower], flags: {has: [cadet_dream, knows_senior], not: [cadet_met_senior]}}
+    title: "พี่คนเดิมหน้าบ้าน"
+    text: "ปิดภาคนี้พี่ที่เคยวิ่งผ่านหน้าบ้านกลับมาอีก รู้จากผู้ใหญ่ในซอยว่า {ชื่อ} เขียนเตรียมทหารลงกระดาษแนะแนว เลยชวนมานั่งที่ศาลา เล่าว่าเพื่อนรุ่นเดียวกันแยกไปสี่ทาง ทหารบก ทหารเรือ ทหารอากาศ ตำรวจ ไม่ต้องรีบเลือก"
+    choices:
+      - id: army
+        text: "ถามพี่เรื่องทหารบก"
+        effects: {happiness: 1}
+        sets_flags: ["cadet_lean:army"]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [1, 1]}
+        merit: [{cat: neutral}]
+      - id: navy
+        text: "ถามพี่เรื่องทหารเรือ"
+        effects: {happiness: 1}
+        sets_flags: ["cadet_lean:navy"]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [1, 1]}
+        merit: [{cat: neutral}]
+      - id: airforce
+        text: "ถามพี่เรื่องทหารอากาศ"
+        effects: {happiness: 1}
+        sets_flags: ["cadet_lean:airforce"]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [1, 1]}
+        merit: [{cat: neutral}]
+      - id: police
+        text: "ถามพี่เรื่องตำรวจ"
+        effects: {happiness: 1}
+        sets_flags: ["cadet_lean:police"]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [1, 1]}
+        merit: [{cat: neutral}]
+      - id: slow
+        text: "ยังไม่เลือกเหล่า ค่อยเป็นค่อยไป"
+        effects: {knowledge: 1}
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [2, 2]}
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_senior_neighbor_01
+
+  # >>> nl-writer b001 evt cadet_invite_14_01
+  - id: cadet_invite_14_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2501, 2650]
+    weight: 2
+    when: {age: [14, 14], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined]}}
+    title: "บอร์ดหน้าห้องธุรการ"
+    text: "ระหว่างเดินไปโรงอาหาร {ชื่อ} ผ่านบอร์ดหน้าห้องธุรการ มีประกาศแข่งฟุตบอล รับสมัครชมรมดนตรี และประกาศสอบเตรียมทหารติดอยู่มุมหนึ่ง"
+    choices:
+      - id: music
+        text: "สมัครชมรมดนตรีกับเพื่อน"
+        effects: {happiness: 1, relations: 1}
+        sets_flags: ["cadet_invited:14"]
+        merit: [{cat: neutral}]
+      - id: study
+        text: "ตั้งใจเรียนต่อ ม.ปลาย"
+        effects: {knowledge: 1, happiness: -1}
+        sets_flags: [good_student, "cadet_invited:14"]
+        merit: [{cat: neutral}]
+      - id: vocational
+        text: "สนใจสายอาชีพ ปวช."
+        effects: {knowledge: 1, network: 1}
+        sets_flags: ["cadet_invited:14"]
+        merit: [{cat: neutral}]
+      - id: ask
+        text: "ถามรุ่นพี่เรื่องสอบไว้เผื่อ"
+        effects: {knowledge: 1}
+        sets_flags: [cadet_tips, "cadet_invited:14"]
+        merit: [{cat: neutral}]
+      - id: commit
+        text: "ตั้งเป้า เริ่มเตรียมสอบปีนี้"
+        effects: {happiness: 1}
+        sets_flags: [cadet_dream, "cadet_invited:14"]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [0, 0]}
+        merit: [{cat: neutral}]
+      - id: decline
+        text: "ทางนี้ไม่ใช่ทางของเรา"
+        effects: {happiness: 1}
+        sets_flags: [cadet_declined, "cadet_invited:14"]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_invite_14_01
+
+  # >>> nl-writer b001 evt cadet_invite_15_01
+  - id: cadet_invite_15_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2501, 2650]
+    weight: 2
+    when: {age: [15, 15], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined, "cadet_invited:14"]}}
+    title: "คุยกันตอนพักเที่ยง"
+    text: "ตอนพักเที่ยง เพื่อนคนหนึ่งเล่าว่าพี่ชายเพิ่งไปสอบเตรียมทหารมา อีกคนแย่งพูดเรื่องเกมที่เพิ่งออกใหม่ บทสนทนาก็ไหลไปเรื่องอื่น {ชื่อ} ยังกินข้าวไม่หมดจาน"
+    choices:
+      - id: football
+        text: "ซ้อมบอลกับเพื่อนหลังเลิกเรียน"
+        effects: {health: 1, relations: 1}
+        sets_flags: ["cadet_invited:15"]
+        merit: [{cat: neutral}]
+      - id: study
+        text: "ตั้งใจเรียนต่อ ม.ปลาย"
+        effects: {knowledge: 1, happiness: -1}
+        sets_flags: [good_student, "cadet_invited:15"]
+        merit: [{cat: neutral}]
+      - id: vocational
+        text: "สนใจสายอาชีพ ปวช."
+        effects: {knowledge: 1, network: 1}
+        sets_flags: ["cadet_invited:15"]
+        merit: [{cat: neutral}]
+      - id: ask
+        text: "ถามเพื่อนว่าพี่ชายเตรียมยังไง"
+        effects: {knowledge: 1}
+        sets_flags: [cadet_tips, "cadet_invited:15"]
+        merit: [{cat: neutral}]
+      - id: commit
+        text: "ตั้งเป้า เริ่มเตรียมสอบปีนี้"
+        effects: {happiness: 1}
+        sets_flags: [cadet_dream, "cadet_invited:15"]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [0, 0]}
+        merit: [{cat: neutral}]
+      - id: decline
+        text: "ทางนี้ไม่ใช่ทางของเรา"
+        effects: {happiness: 1}
+        sets_flags: [cadet_declined, "cadet_invited:15"]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_invite_15_01
+
+  # >>> nl-writer b001 evt cadet_invite_16_01
+  - id: cadet_invite_16_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2501, 2650]
+    weight: 2
+    when: {age: [16, 16], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined, "cadet_invited:15"]}}
+    title: "ประกาศหน้าเสาธง"
+    text: "เช้านี้ครูอ่านประกาศหน้าเสาธงหลายเรื่อง ทั้งทุนเรียนต่อ ค่ายอาสาช่วงปิดเทอม และรับสมัครสอบเตรียมทหาร ปีนี้ {ชื่อ} อายุถึงเกณฑ์สอบแล้ว ถ้าสมัครก็ต้องลงสนามท้ายปี"
+    choices:
+      - id: volunteer
+        text: "สมัครค่ายอาสาช่วงปิดเทอม"
+        effects: {relations: 1, happiness: 1}
+        sets_flags: ["cadet_invited:16"]
+        merit: [{cat: neutral}]
+      - id: uni
+        text: "ทุ่มให้สอบมหาวิทยาลัย"
+        effects: {knowledge: 1, happiness: -1}
+        sets_flags: [good_student, "cadet_invited:16"]
+        merit: [{cat: neutral}]
+      - id: part_time
+        text: "หางานพิเศษ เก็บเงินไว้ก่อน"
+        effects: {knowledge: -1, money: {unit: income_x, amount: 0.3}}
+        sets_flags: ["cadet_invited:16"]
+        merit: [{cat: neutral}]
+      - id: ask
+        text: "ถามรุ่นพี่เรื่องสอบไว้เผื่อ"
+        effects: {knowledge: 1}
+        sets_flags: [cadet_tips, "cadet_invited:16"]
+        merit: [{cat: neutral}]
+      - id: commit
+        text: "สมัครเลย สอบท้ายปีนี้"
+        hint: "เตรียมตัวไม่ถึงปี เสี่ยงตกสูง"
+        effects: {happiness: 1}
+        sets_flags: [cadet_dream, "cadet_invited:16"]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [0, 0]}
+        merit: [{cat: neutral}]
+      - id: decline
+        text: "ทางนี้ไม่ใช่ทางของเรา"
+        effects: {happiness: 1}
+        sets_flags: [cadet_declined, "cadet_invited:16"]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_invite_16_01
+
+  # >>> nl-writer b001 evt cadet_invite_17_01
+  - id: cadet_invite_17_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2501, 2650]
+    weight: 2
+    when: {age: [17, 17], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream, cadet_declined, "cadet_invited:16"]}}
+    title: "ใบประกาศอีกครั้ง"
+    text: "ประกาศรับสมัครสอบเตรียมทหารติดบอร์ดอีกครั้ง อายุของ {ชื่อ} ยังสมัครได้อีกแค่สองครั้ง ส่วนเพื่อน ๆ เริ่มคุยกันเรื่องมหาวิทยาลัยกับงานแรกแล้ว"
+    choices:
+      - id: uni
+        text: "มุ่งมหาวิทยาลัยเต็มตัว"
+        effects: {knowledge: 1, happiness: 1}
+        sets_flags: [good_student]
+        merit: [{cat: neutral}]
+      - id: job
+        text: "จบแล้วหางานทำ"
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - id: keep
+        text: "เก็บใบประกาศไว้เป็นที่ระลึก"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: commit
+        text: "ขอลองสักครั้ง"
+        hint: "เหลือโอกาสสอบอีกไม่มาก"
+        effects: {happiness: 1}
+        sets_flags: [cadet_dream]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [0, 0]}
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_invite_17_01
+
+  # >>> nl-writer b001 evt cadet_scholar_flyers_01
+  - id: cadet_scholar_flyers_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2501, 2650]
+    weight: 1
+    when: {age: [14, 17], sex: [ชาย], school: [lower, upper, voc], class: [ยากไร้, ยากจนมาก, ยากจน, ค่อนข้างจน], flags: {not: [cadet_dream]}}
+    title: "ใบปลิวในลิ้นชักครู"
+    text: "ครูประจำชั้นเรียก {ชื่อ} ไปคุยหลังเลิกเรียน บอกว่าคะแนนดีพอจะเรียนต่อ แต่ค่าเทอมกับค่าหอในเมืองมากกว่าที่บ้านหาได้ทั้งปี ครูหยิบใบปลิวทุนหลายใบออกจากลิ้นชัก มีทั้งทุนเรียนครู ทุนพยาบาล และโรงเรียนเตรียมทหาร"
+    choices:
+      - id: teacher_grant
+        text: "ขอใบสมัครทุนเรียนครู"
+        hint: "ต้องสอบแข่งเหมือนกัน"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: work_home
+        text: "บอกครูว่าจะทำงานช่วยที่บ้าน"
+        effects: {relations: 1, knowledge: -1, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - id: cadet
+        text: "เลือกใบปลิวเตรียมทหาร"
+        hint: "เรียนฟรี แต่ค่าติวก่อนสอบไม่ฟรี"
+        effects: {knowledge: 1}
+        sets_flags: [cadet_dream]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [0, 0]}
+        merit: [{cat: neutral}]
+      - id: talk_home
+        text: "ขอกลับไปคุยกับที่บ้านก่อน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_scholar_flyers_01
+
+  # >>> nl-writer b001 evt cadet_navy_diver_tv_01
+  - id: cadet_navy_diver_tv_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2525, 2650]
+    weight: 1
+    when: {age: [14, 17], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream]}}
+    title: "นักประดาน้ำในจอทีวี"
+    text: "ข่าวค่ำฉายภาพเดิมซ้ำทั้งอาทิตย์ นักประดาน้ำของทหารเรือดำลงไปในน้ำขุ่นเพื่อพาคนที่ติดอยู่ออกมาทีละคน ทุกบ้านในซอยเปิดช่องเดียวกัน ผู้ใหญ่ในบ้านนั่งลุ้นจนข้าวเย็นชืด {ชื่อ} ขยับเข้าไปนั่งชิดจอ"
+    choices:
+      - id: pray
+        text: "ไหว้พระขอให้ทุกคนออกมาได้"
+        effects: {happiness: 1}
+        merit: [{cat: bhavana, level: 1}]
+      - id: swim
+        text: "ขอไปหัดว่ายน้ำที่สระอำเภอ"
+        hint: "ต้องเสียค่าสระ"
+        effects: {health: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: cartoon
+        text: "เปลี่ยนช่องไปดูการ์ตูน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hold_breath
+        text: "กลั้นหายใจตามนักประดาน้ำ"
+        effects: {health: 1}
+        sets_flags: [saw_navy]
+        merit: [{cat: neutral}]
+      - id: draw
+        text: "วาดรูปนักประดาน้ำติดฝาบ้าน"
+        effects: {happiness: 1}
+        sets_flags: [saw_navy]
+        merit: [{cat: neutral}]
+      - id: commit
+        text: "จะสอบเตรียมทหาร ไปเป็นทหารเรือ"
+        hint: "ต้องเตรียมตัวสอบแข่งจริงจัง"
+        effects: {happiness: 1}
+        sets_flags: [saw_navy, cadet_dream, "cadet_lean:navy"]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [0, 0]}
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_navy_diver_tv_01
+
+  # >>> nl-writer b001 evt cadet_mekong_patrol_01
+  - id: cadet_mekong_patrol_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2530, 2650]
+    weight: 1
+    when: {age: [14, 17], sex: [ชาย], school: [lower, upper, voc], region: [ตะวันออกเฉียงเหนือ, เหนือ], flags: {not: [cadet_dream]}}
+    title: "เรือตรวจกลางแม่น้ำโขง"
+    text: "งานแข่งเรือยาวช่วงออกพรรษา ริมโขงคนแน่นทั้งตลิ่ง เรือของหมู่บ้านข้าง ๆ พลิกคว่ำกลางลำน้ำ ฝีพายลอยคอเกาะไม้พายอยู่กลางกระแส เรือตรวจลำเล็กของทหารเรือที่ลอยลำเฝ้าอยู่เร่งเครื่องเข้าไปดึงขึ้นทีละคน"
+    choices:
+      - id: cheer_home
+        text: "กลับไปเชียร์เรือบ้านตัวเองต่อ"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: help_pull
+        text: "วิ่งไปช่วยดึงฝีพายขึ้นตลิ่ง"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: cheer_patrol
+        text: "ตะโกนเชียร์เรือตรวจจนเสียงแหบ"
+        effects: {happiness: 1}
+        sets_flags: [saw_navy]
+        merit: [{cat: neutral}]
+      - id: ask
+        text: "ถามว่าทหารเรือมาทำอะไรที่โขง"
+        effects: {knowledge: 1}
+        sets_flags: [saw_navy]
+        merit: [{cat: neutral}]
+      - id: commit
+        text: "จะสอบเตรียมทหาร ไปเป็นทหารเรือ"
+        hint: "ต้องเตรียมตัวสอบแข่งจริงจัง"
+        effects: {happiness: 1}
+        sets_flags: [saw_navy, cadet_dream, "cadet_lean:navy"]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [0, 0]}
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_mekong_patrol_01
+
+  # >>> nl-writer b001 evt cadet_first_flight_01
+  - id: cadet_first_flight_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2501, 2650]
+    weight: 1
+    when: {age: [14, 17], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream]}}
+    title: "ราคาของปีก"
+    text: "ครั้งแรกที่ได้ขึ้นเครื่องบิน {ชื่อ} นั่งริมหน้าต่างไม่ละสายตาจากปีกเลย ตอนลง นักบินยืนส่งผู้โดยสารหน้าประตู ญาติที่มาด้วยกระซิบว่าเรียนแบบนี้ต้องใช้เงินหลายล้าน แต่ถ้าเป็นนักบินทหารอากาศ ทางราชการฝึกให้"
+    choices:
+      - id: ask_pilot
+        text: "ถามนักบินว่าเริ่มจากตรงไหน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: ask_cost
+        text: "ถามญาติว่าเรียนเองแพงแค่ไหน"
+        hint: "ได้คำตอบที่ไม่อยากได้ยิน"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: sleep
+        text: "หลับยาวจนล้อแตะพื้น"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: note
+        text: "จดไว้ว่าทหารอากาศฝึกบินให้"
+        effects: {knowledge: 1}
+        sets_flags: [saw_airforce]
+        merit: [{cat: neutral}]
+      - id: commit
+        text: "จะสอบเตรียมทหาร ไปเป็นทหารอากาศ"
+        hint: "ต้องเตรียมตัวสอบแข่งจริงจัง"
+        effects: {happiness: 1}
+        sets_flags: [saw_airforce, cadet_dream, "cadet_lean:airforce"]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [0, 0]}
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_first_flight_01
+
+  # >>> nl-writer b001 evt cadet_checkpoint_01
+  - id: cadet_checkpoint_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2506, 2650]
+    weight: 1
+    when: {age: [14, 17], sex: [ชาย], school: [lower, upper, voc], flags: {not: [cadet_dream]}}
+    title: "ด่านขากลับ"
+    text: "ขากลับจากตลาดนัดในอำเภอ ด่านตรวจกลางทางโบกให้รถกระบะของบ้านจอด ไฟท้ายเสียไปข้างหนึ่ง ผู้ใหญ่ในบ้านพับแบงก์สอดไว้ใต้ใบขับขี่ แล้วยื่นออกไปทางหน้าต่าง {ชื่อ} นั่งเบาะข้างคนขับ เห็นทุกอย่าง"
+    choices:
+      - id: fix_light
+        text: "รับปากจะช่วยซ่อมไฟท้ายพรุ่งนี้"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: look_away
+        text: "มองออกนอกหน้าต่าง ไม่คิดอะไร"
+        merit: [{cat: neutral}]
+      - id: ask_loud
+        text: "ถามเสียงดังว่าใส่เงินไว้ทำไม"
+        outcomes:
+          - {weight: 1, text: "ตำรวจหัวเราะ ดึงแบงก์คืนมาวางบนตัก บอกแค่ว่าไปซ่อมไฟท้ายก่อนค่ำ", effects: {happiness: 1}, sets_flags: [saw_police], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ใหญ่ดุให้เงียบ ตำรวจทำเป็นไม่ได้ยิน รับไปแล้วโบกให้ผ่าน ทั้งรถเงียบไปจนถึงบ้าน", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: remember
+        text: "จำหน้ากับป้ายชื่อตำรวจไว้"
+        outcomes:
+          - {weight: 1, text: "ตำรวจสบตาแล้วชะงัก ยื่นใบขับขี่คืนมาพร้อมแบงก์ บอกให้ไปซ่อมไฟ ป้ายชื่อนั้นจำได้อีกนาน", effects: {knowledge: 1}, sets_flags: [saw_police], merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขารับไปโดยไม่มองหน้าใคร ชื่อบนป้ายติดอยู่ในหัวไปอีกนาน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: look_down
+        text: "ก้มหน้า ทำเป็นไม่เห็น"
+        outcomes:
+          - {weight: 1, text: "ได้ยินเสียงตำรวจบอกว่าเก็บเงินไว้ซื้อหลอดไฟเถอะ แล้วรถก็ออกตัว", merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถออกตัวต่อ ไม่มีใครในรถพูดถึงเรื่องนี้อีก", merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: remember_good
+        text: "นึกถึงตำรวจที่เคยช่วยคน"
+        requires: {flags: {has: [saw_police]}, reason: "ยังไม่เคยเห็นตำรวจใกล้ ๆ"}
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: commit
+        text: "จะสอบเตรียมทหาร ไปเป็นตำรวจ"
+        hint: "ต้องเตรียมตัวสอบแข่งจริงจัง"
+        effects: {happiness: 1}
+        sets_flags: [saw_police, cadet_dream, "cadet_lean:police"]
+        schedules:
+          - {event: cadet_tell_family, after_years: [0, 0]}
+          - {event: cadet_prep_choice, after_years: [0, 0]}
+        merit: [{cat: neutral}]
+  # <<< nl-writer b001 evt cadet_checkpoint_01
