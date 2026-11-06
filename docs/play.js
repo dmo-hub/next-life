@@ -4585,6 +4585,11 @@ function playLife(seed, content, pickChoice, onCard, st = newLife(seed, content)
     }
     if (card.trip && card.kind === 'isekai') {
       if (card.choices.length) choose(st, warnPick(card) >= 0 ? warnPick(card) : pickChoice.trip ? pickChoice.trip(card, bot) : tripAny(card, bot));
+      // ไม่มีใบทุ่มเทเข้าช่วงวัยแล้ว (ui-redo 83) — บอทตั้งโฟกัสตาแรกของช่วงจากใบเลือกรูปเดิม เหมือนผู้เล่นเปิดแผงตัวฉัน
+      else if (card.entered) {
+        const fc = isekaiFocusCard(st.trip);
+        isekaiFocusPick(st.trip, pickChoice.trip ? pickChoice.trip(fc, bot) : tripAny(fc, bot));
+      }
       continue;
     }
     // บอทคืนเลขตัวเลือก หรือ {i, loan} เมื่อกู้มาจ่าย (B111)
@@ -5255,7 +5260,7 @@ const ISEKAI_WARN = {
   text: 'แผลเก่ายังไม่ทันหาย แผลใหม่ก็มาซ้ำ ลุกจากที่นอนแต่ละเช้ายากขึ้นทุกวัน ถ้ายังฝืนแบบนี้ต่อ ชาตินี้คงจบเร็วกว่าที่คิด',
   focus: 'เปลี่ยนโฟกัส',
   rest: 'rest',
-  ask: 'ร่างกายต้องการพัก ช่วงนี้จะทุ่มเทกับอะไร',
+  ask: 'ร่างกายต้องการพัก ช่วงนี้จะโฟกัสอะไร',
 };
 
 // ความรู้จากโลกเดิม (B68h · เจ้าของเคาะ): 9 หมวด เริ่มศูนย์ทุกหมวด เป็นค่าซ่อนแบบ joy/wit · โตจากเหตุการณ์ของหมวด + ทางลัดทุ่มเท + อ่านตำรา
@@ -6619,7 +6624,10 @@ const isekaiShownAge = (a) => Math.floor(a + 1e-9);
 const isekaiOldAge = (isk) => (ISEKAI_STAGES.at(-1).from + (isk.lifeAdd ?? 0)) * isekaiPace(isk);
 const isekaiStageOf = (isk) => ISEKAI_STAGES.findLast((s) => isk.age >= s.from * isekaiPace(isk));
 // ทางลัดความรู้ใช้ id 'k:<หมวด>' · kc = หมวดที่ทางลัดนี้เติมความรู้และดึงเหตุการณ์
+// ตามน้ำ (ui-redo 83): ไม่มีการ์ดหยุดถามแล้ว ช่วงแรกของชาติกับช่วงวัยที่โฟกัสเดิมหลุดจึงเดินโดยไม่ตั้งโฟกัส — ไม่มีผลเพิ่ม ไม่ถ่วงการ์ด
+const ISEKAI_FLOW = { name: FOCUS_FLOW_NAME, gain: {}, lines: ['ใช้ชีวิตไปตามจังหวะของโลกนี้ ไม่ได้ทุ่มเทเรื่องไหนเป็นพิเศษ'] };
 const isekaiFocusDef = (isk, id) => {
+  if (!id || id === FOCUS_FLOW) return ISEKAI_FLOW;
   if (id === 'role') return isekaiFrame(isk).focus;
   if (id?.startsWith('k:')) return { ...ISEKAI_KNOW[id.slice(2)].focus, kc: id.slice(2) };
   if (id === TRIP_QUEST.id) return TRIP_QUEST.focus;
@@ -7054,22 +7062,31 @@ function nextIsekaiCard(isk) {
     });
   }
   const stage = isekaiStageOf(isk);
-  // ขึ้นช่วงวัยใหม่ = หยุดถามสิ่งที่ทุ่มเทครั้งเดียว (ทางเลือกเปลี่ยนตามวัย) · ระหว่างช่วงเปลี่ยนได้จากใบตา
-  if (isk.step === 'focus' || isk.stageShown !== stage.id) {
-    isk.step = 'focus';
+  // เข้าช่วงวัยใหม่ไม่หยุดถามแล้ว (ui-redo 83 · ข้อ 149): รายการทางเลือกเปลี่ยนตามวัย โฟกัสเดิมที่ไม่มีในช่วงนี้กลับตามน้ำ
+  // แล้วใบตาแรกของช่วงบอกผู้เล่นแทน · เปลี่ยนโฟกัสได้ทุกเมื่อจากแผงตัวฉัน (setIsekaiFocus)
+  // เซฟก่อนใบนี้ที่ค้างอยู่บนใบทุ่มเทเข้าช่วงวัย (ไม่ใช่จากการ์ดเตือน) ไม่มีใบนั้นแล้ว — เดินต่อเป็นใบตา
+  if (isk.step === 'focus' && !isk.focusWarn) isk.step = 'tick';
+  let entered = null;
+  if (isk.step !== 'focus' && isk.stageShown !== stage.id) {
+    isk.focusOffers = isekaiFocusOffers(isk, stage);
+    const lost = isk.focus && !isk.focusOffers.includes(isk.focus) ? isekaiFocusDef(isk, isk.focus).name : null;
+    if (lost) focusSet(isk, FOCUS_FLOW, isk.age);
+    // ใบตาแรกของชาติบอกว่าโลกนี้ยังจำอะไรจากคนต่างโลกรุ่นก่อน (เดิมอยู่บนใบทุ่มเทใบแรก)
+    const past = !isk.stageShown && isekaiLoreLine(isk);
+    entered = { stage: stage.name, ...(lost && { lost }), ...(past && { lore: past }) };
+    isk.stageShown = stage.id;
+  }
+  // การ์ดเตือน (B161) กด "เปลี่ยนโฟกัส" = ใบเลือกโฟกัสกลางช่วงวัย · suggest ชี้ทางฟื้นชีวิต
+  if (isk.step === 'focus') {
     isk.focusOffers = isekaiFocusOffers(isk, stage);
     if (!isk.focusOffers.includes(isk.focus)) focusSet(isk, FOCUS_FLOW, isk.age);
-    // ใบทุ่มเทใบแรกของชาติบอกว่าโลกนี้ยังจำอะไรจากคนต่างโลกรุ่นก่อน
-    const past = isekaiLoreLine(isk);
-    const remembered = !isk.stageShown && past ? ` ${past}` : '';
-    // มาจากการ์ดเตือน (B161) = กลางช่วงวัย ไม่ใช่เข้าช่วงใหม่ · suggest ชี้ทางฟื้นชีวิต
     return isekaiCard(isk, {
       step: 'focus', title: stage.name, age: isk.age,
-      text: isk.focusWarn ? ISEKAI_WARN.ask : `${isk.focus ? `เข้า${stage.name}แล้ว ช่วงนี้จะทุ่มเทกับอะไร หรือจะทำแบบเดิมต่อ` : `เข้า${stage.name}แล้ว ช่วงนี้จะทุ่มเทกับอะไร`}${remembered}`,
+      text: ISEKAI_WARN.ask,
       choices: isk.focusOffers.map((id) => isekaiFocusDef(isk, id).name),
       fx: isk.focusOffers.map((id) => isekaiFocusFx(isk, id)),
       current: isk.focusOffers.indexOf(isk.focus),
-      ...(isk.focusWarn && { warn: true, suggest: isk.focusOffers.indexOf(ISEKAI_WARN.rest) }),
+      warn: true, suggest: isk.focusOffers.indexOf(ISEKAI_WARN.rest),
     });
   }
   const before = { ...isk.st };
@@ -7093,7 +7110,8 @@ function nextIsekaiCard(isk) {
   const opened = isekaiKnowOffers(isk, stage).filter((id) => !isk.focusOffers.includes(id));
   isk.focusOffers.push(...opened);
   const f = isekaiFocusDef(isk, isk.focus);
-  const text = f.lines ? f.lines[Math.floor(from / isekaiPace(isk)) % f.lines.length] : `ทุ่มเทกับ${f.name}ไปอีกปี`;
+  const said = f.lines ? f.lines[Math.floor(from / isekaiPace(isk)) % f.lines.length] : `ทุ่มเทกับ${f.name}ไปอีกปี`;
+  const text = entered?.lost ? `เข้า${entered.stage} ${entered.lost}ไม่เหมาะกับวัยนี้แล้ว ช่วงนี้ใช้ชีวิตตามน้ำไปก่อน · ${said}` : said;
   const deltas = {};
   for (const k of Object.keys(isk.st)) {
     const d = Math.round(isk.st[k]) - Math.round(before[k]);
@@ -7104,8 +7122,11 @@ function nextIsekaiCard(isk) {
   isk.chron.push({ age: a0, ...(years > 1 && { until: a1 }), stage: stage.id, kind: 'tick', text, deltas });
   return isekaiCard(isk, {
     step: 'tick', title, text, age: from, years, stage: stage.name, deltas,
+    // ตาแรกของช่วงวัยใหม่: ตัวขับบอทตั้งโฟกัสตรงนี้ (แทนการ์ดทุ่มเทเดิม) · lore = บรรทัดความจำโลก ใบตาแรกของชาติ
+    ...(entered && { entered: true }),
+    ...(entered?.lore && { lore: entered.lore }),
     ...(revived && { sys: 'เสียงนาฬิกาดังในหัว เวลาย้อนกลับ · ย้อนเวลาเมื่อตาย ใช้ไปแล้ว' }),
-    ...(!revived && (opened.length || hired.length) && { sys: [hired.length && `ได้เป็น${hired.map((c) => ISEKAI_CAREERS[c].name).join(' · ')}แล้ว`, opened.length && `ความรู้จากโลกเดิมมากพอแล้ว ทุ่มเทได้อีกทาง · ${opened.map((id) => isekaiFocusDef(isk, id).name).join(' · ')}`].filter(Boolean).join(' · ') }),
+    ...(!revived && (opened.length || hired.length) && { sys: [hired.length && `ได้เป็น${hired.map((c) => ISEKAI_CAREERS[c].name).join(' · ')}แล้ว`, opened.length && `ความรู้จากโลกเดิมมากพอแล้ว โฟกัสได้อีกทาง · ${opened.map((id) => isekaiFocusDef(isk, id).name).join(' · ')}`].filter(Boolean).join(' · ') }),
     focus: isk.focusOffers.indexOf(isk.focus),
     focusChoices: isk.focusOffers.map((id) => isekaiFocusDef(isk, id).name),
     focusFx: isk.focusOffers.map((id) => isekaiFocusFx(isk, id)),
@@ -7148,6 +7169,28 @@ function isekaiEventCard(isk, ev) {
   });
 }
 
+// เปลี่ยนโฟกัสจากแผงตัวฉัน (ui-redo 83 · แบบ setLifeFocus ชาติไทย): ไม่ใช่ตัวเลือกของการ์ด ไม่ดึงเลขสุ่ม ไม่เดินการ์ด
+// ผลไปคิดที่ใบตาถัดไป · เซฟ v2 เป็นภาพถ่ายสถานะ โหลดแล้วได้โฟกัสเดิม · ใบเลือกจากการ์ดเตือนยังเลือกผ่านการ์ด
+const isekaiFocusOpen = (isk) => !!isk && ['tick', 'event', 'result', 'move', 'upgrade', 'warn'].includes(isk.step) && !isk.dead && !isk.natural && !isk.home && !!isk.focusOffers?.length;
+function setIsekaiFocus(isk, id) {
+  if (!isekaiFocusOpen(isk)) throw new Error('ตอนนี้เปลี่ยนโฟกัสไม่ได้');
+  if (id !== FOCUS_FLOW && !isk.focusOffers.includes(id)) throw new Error(`โฟกัสนี้เลือกตอนนี้ไม่ได้: ${id}`);
+  focusSet(isk, id, isk.age);
+}
+// ทางเลือกในแผง: ตามน้ำก่อน แล้วตามรายการของช่วงวัยนี้ · ป้ายผลต่อปีแบบเดียวกับใบเลือก
+const isekaiFocusList = (isk) => [FOCUS_FLOW, ...isk.focusOffers].map((id) => ({ id, name: isekaiFocusDef(isk, id).name, fx: id === FOCUS_FLOW ? 'ไม่ทุ่มเรื่องไหนเป็นพิเศษ' : isekaiFocusFx(isk, id), on: (isk.focus ?? FOCUS_FLOW) === id }));
+
+// ใบเลือกโฟกัสรูปเดียวกับใบทุ่มเทเดิม ไม่นับการ์ด ไม่ลงสถานะ — บอทตัดสินตอนตาแรกของช่วงวัย (card.entered) แทนใบที่ถอดไป
+// คืนเลขตัวเลือกให้ isekaiFocusPick · ผู้เล่นไม่เห็นใบนี้
+const isekaiFocusCard = (isk) => ({
+  kind: 'isekai', status: isekaiStatus(isk), run: isk.run, step: 'focus', title: isekaiStageOf(isk).name, age: isekaiShownAge(isk.age), text: '',
+  choices: isk.focusOffers.map((id) => isekaiFocusDef(isk, id).name),
+  fx: isk.focusOffers.map((id) => isekaiFocusFx(isk, id)),
+  current: isk.focusOffers.indexOf(isk.focus),
+});
+// ตาที่ชาติจบในปีนั้น (ตาย · หมดอายุ · กลับบ้าน) ไม่มีแผงให้เปลี่ยนแล้ว — บอทข้ามเหมือนผู้เล่นที่เปิดแผงไม่ได้
+const isekaiFocusPick = (isk, idx) => isekaiFocusOpen(isk) && setIsekaiFocus(isk, isk.focusOffers[idx] ?? FOCUS_FLOW);
+
 function chooseIsekai(isk, idx) {
   if (isk.step === 'world') {
     const r = isk.worldOffers[idx];
@@ -7170,6 +7213,7 @@ function chooseIsekai(isk, idx) {
     isk.step = 'tick';
     return;
   }
+  // ใบตาเลือกผ่าน token ได้คงไว้ให้เซฟ v1 ที่เล่นซ้ำจากลำดับปุ่ม · จอใหม่เปลี่ยนนอก token ด้วย setIsekaiFocus
   if (isk.step === 'focus' || isk.step === 'tick') {
     const f = isk.focusOffers[idx];
     if (!f) throw new Error('ตัวเลือกไม่ถูกต้อง');
@@ -7990,6 +8034,8 @@ function playAfterlife(st, pickChoice, onCard) {
     const card = nextAfterCard(af);
     onCard?.(card, af);
     if (card.choices?.length) chooseAfter(af, warnPick(card) >= 0 ? warnPick(card) : pickChoice(card, af.botRng, af));
+    // ชาติต่างโลกไม่มีใบทุ่มเทเข้าช่วงวัยแล้ว (ui-redo 83) — บอทตั้งโฟกัสตาแรกของช่วงจากใบเลือกรูปเดิม
+    else if (card.entered && af.isekai) isekaiFocusPick(af.isekai, pickChoice({ stage: card.stage, ...isekaiFocusCard(af.isekai) }, af.botRng, af));
     if (card.done) return af;
   }
 }
@@ -9791,7 +9837,7 @@ function lifeMenu(card, box, after = false) {
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
   const isk = card.kind === 'isekai';
-  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), focus: () => focusPanel(card), skill: () => isekaiSkillPanel(card.status), family: after ? clanPanel : familyPanel, more: morePanel, past: pastPanel };
+  const sheets = { me: () => (isk ? isekaiMePanel(card.status, card) : mePanel(card)), focus: () => focusPanel(card), skill: () => isekaiSkillPanel(card.status), family: after ? clanPanel : familyPanel, more: morePanel, past: pastPanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
   const views = { shelf: () => openShelf() };
   // ต่างโลกช่วงยังไม่มีร่าง (ไม่มีหน้าต่างสถานะ) ไม่มีอะไรให้แผงตัวฉันกับสกิลโชว์
@@ -10792,7 +10838,7 @@ function skillsSeen() {
 }
 const skillsGot = (k) => Object.keys(k.s).length;
 // คำใบ้ของ ??? บอกชนิดแหล่งที่ได้ ไม่บอกชื่อ — ชี้ทางแบบคำใบ้ฉายา · ทุกสกิลเป็นของขวัญเทพธิดาในต่างโลกได้
-const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', pattern: 'แบบชีวิต', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'สิ่งที่ทุ่มเท', lifeGoal: 'เป้าชีวิต' };
+const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', pattern: 'แบบชีวิต', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'โฟกัส', lifeGoal: 'เป้าชีวิต' };
 function skillHint(id) {
   const kinds = Object.entries(CONTENT.skillMap ?? {}).filter(([, m]) => Object.values(m).some((xs) => xs.includes(id))).map(([k]) => SKILL_SRC[k]).filter(Boolean);
   return kinds.length ? `ของขวัญเทพธิดาในต่างโลก หรือชีวิตไทยที่มี${kinds.join('/')}ที่ใช่` : 'ของขวัญเทพธิดาในต่างโลก';
@@ -12530,7 +12576,7 @@ function heirPick(card, i, choices, back) {
 }
 
 // ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
-const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ช่วงวัยใหม่ · เลือกสิ่งที่ทุ่มเท', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก', warn: 'ใกล้ตาย', move: 'ทางแยก · เลือกแคว้น', upgrade: 'สกิลที่ติดตัว · เลือกฝึก' };
+const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ใกล้ตาย · เลือกโฟกัส', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก', warn: 'ใกล้ตาย', move: 'ทางแยก · เลือกแคว้น', upgrade: 'สกิลที่ติดตัว · เลือกฝึก' };
 // จดหมายเหตุบนการ์ดจบ (B68b ชิ้น 3): แบ่งตามช่วงวัย เก่าอยู่บน ช่วงสุดท้ายเปิดค้าง (เจ้าของเคาะ)
 // บรรทัดรับได้ทั้งสตริง "อายุ N · …" ของเซฟเก่า และ { age, until?, stage, kind, text, deltas } ของ engine — มี deltas ถึงขึ้น chip
 // ตาหลายปีของ engine บอกปลายช่วงเป็น until · จอใช้ชื่อ to ชุดเดียวกับที่แยกจากสตริง
@@ -12627,7 +12673,7 @@ function isekaiGoldFill(k, gold) {
   return Math.min(1, Math.max(0, gold / (isekaiGoldStart(k) + ISEKAI_GOLD_SPAN)));
 }
 // แผงตัวฉันต่างโลก: ของที่เคยอัดในหน้าต่างสถานะบนการ์ด — ค่าเต็ม · ทอง ชื่อเสียง เผ่า · อาชีพ (สกิลอยู่แผงของมันเอง)
-function isekaiMePanel(s) {
+function isekaiMePanel(s, card) {
   const wrap = el('div', 'me');
   const ul = el('ul', 'me-m');
   ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN, undefined, 'hp'), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false, undefined, k)));
@@ -12651,8 +12697,9 @@ function isekaiMePanel(s) {
   const dl = el('dl');
   dl.append(el('dt', null, 'ทอง'), el('dd', null, s.gold.toLocaleString('en-US')), el('dt', null, 'ชื่อเสียง'), el('dd', null, String(s.fame)));
   const who = el('p', 'meta');
-  metaLine(who, [s.race, s.world, `อายุ ${s.age}`, s.stage, s.focus && `ทุ่มเทกับ${s.focus}`].filter(Boolean));
-  wrap.append(el('h3', null, 'ค่าสถานะ'), ul, dl, el('h3', null, 'ตัวตน'), who);
+  // โฟกัสมีหัวของตัวเองแล้ว ไม่ซ้ำในบรรทัดตัวตน (status ของใบเป็นค่าก่อนกดเปลี่ยน)
+  metaLine(who, [s.race, s.world, `อายุ ${s.age}`, s.stage].filter(Boolean));
+  wrap.append(el('h3', null, 'ค่าสถานะ'), ul, dl, ...isekaiFocusSlot(card), el('h3', null, 'ตัวตน'), who);
   // อาชีพตามโฟกัส (05a) — เซฟก่อนมีอาชีพไม่มีช่องนี้
   if (s.careers?.length) {
     const job = el('p', 'meta');
@@ -12672,31 +12719,43 @@ function isekaiSkillPanel(s) {
   wrap.append(chips);
   return wrap;
 }
-// แถบโฟกัสต่างโลก: หน้าตา/คลาสเดียวกับ focusBar โลกหลัก · กาง/พับในที่ ไม่สร้างกล่องใหม่
-function isekaiFocusBar(card, pick) {
-  const cur = card.focus;
-  const wrap = el('div', 'focus ifocusbar');
+// โฟกัสต่างโลก (ui-redo 83 · แบบชาติไทย): เปลี่ยนนอกการ์ดผ่าน setIsekaiFocus ไม่ใช่ token — ใบตาไม่มีแถบโฟกัสแล้ว
+// ส่วนนี้คืนหัว+ปุ่มเป็นก้อนเดียว วางแผงไหนก็ได้ (ใบ 51 ย้ายไปแท็บโฟกัสต่างโลก) · ช่วงที่เปลี่ยนไม่ได้ (ใบเลือกจากการ์ดเตือน · ตอนจบ) ไม่โชว์
+function isekaiFocusSlot(card) {
+  const isk = af?.isekai ?? st?.trip;
+  if (!isekaiFocusOpen(isk)) return [];
+  return [el('h3', null, 'โฟกัส'), isekaiFocusBar(card, isk)];
+}
+// กดเลือกแล้วเซฟทันที ผลไปคิดที่ใบตาถัดไป · วาดใหม่ทั้งก้อนเพราะป้ายบนปุ่มหลักกับตัวที่ทำอยู่เปลี่ยนพร้อมกัน
+function isekaiFocusBar(card, isk, open = false) {
+  const list = isekaiFocusList(isk);
+  const cur = list.find((f) => f.on) ?? list[0];
+  const wrap = el('div', 'focus');
+  const redraw = (next) => {
+    const bar = isekaiFocusBar(card, isk, next);
+    wrap.replaceWith(bar);
+    bar.querySelector('.focus-btn').focus();
+  };
   const btn = el('button', 'focus-btn');
   btn.type = 'button';
-  btn.setAttribute('aria-expanded', 'false');
-  const go = el('span', 'focus-go', 'เปลี่ยน');
-  btn.append(el('span', 'focus-k', 'โฟกัส'), el('b', null, card.focusChoices[cur] ?? ''), el('span', 'focus-fx', card.focusFx?.[cur] ?? ''), go);
-  const list = el('div', 'focus-pick');
-  list.hidden = true;
-  card.focusChoices.forEach((c, i) => {
-    const b = el('button', i === cur ? 'on' : null);
+  btn.setAttribute('aria-expanded', String(open));
+  btn.append(el('span', 'focus-k', 'โฟกัส'), el('b', null, cur.name), el('span', 'focus-fx', cur.fx), el('span', 'focus-go', open ? 'ปิด' : 'เปลี่ยน'));
+  btn.onclick = () => redraw(!open);
+  const pick = el('div', 'focus-pick');
+  pick.hidden = !open;
+  for (const f of list) {
+    const b = el('button', f.on ? 'on' : null);
     b.type = 'button';
-    b.setAttribute('aria-pressed', String(i === cur));
-    b.append(el('b', null, c), el('span', 'focus-fx', card.focusFx?.[i] ?? ''));
-    b.onclick = () => (i === cur ? btn.click() : play(pick(i)));
-    list.append(b);
-  });
-  btn.onclick = () => {
-    list.hidden = !list.hidden;
-    btn.setAttribute('aria-expanded', String(!list.hidden));
-    go.textContent = list.hidden ? 'เปลี่ยน' : 'ปิด';
-  };
-  wrap.append(btn, list);
+    b.setAttribute('aria-pressed', String(f.on));
+    b.append(el('b', null, f.name), el('span', 'focus-fx', f.fx));
+    b.onclick = () => {
+      setIsekaiFocus(isk, f.id);
+      saveWrite(card);
+      redraw(false);
+    };
+    pick.append(b);
+  }
+  wrap.append(btn, pick);
   return wrap;
 }
 // ผลทุ่มเทจากแกนเป็นคำรวม "พลัง · เวท ขึ้น" — แตกเป็นชิ้นละค่า ป้ายจึงได้ไอคอน+ลูกศรแบบเดียวกับการ์ดเหตุการณ์
@@ -12715,7 +12774,7 @@ function renderIsekai(card) {
   }
   const body = el('div', 'body');
   const choices = el('div', 'choices');
-  body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} · อายุ ${card.age}` : card.warn ? `${ISEKAI_KICKER.warn} · เลือกสิ่งที่ทุ่มเท` : ISEKAI_KICKER[card.step]));
+  body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} · อายุ ${card.age}` : card.warn ? ISEKAI_KICKER.focus : ISEKAI_KICKER[card.step]));
   body.append(el('h3', null, card.title), el('p', null, card.text));
   if (card.step === 'result' && card.ok !== null) body.append(el('p', card.ok ? 'iok' : 'ibad', card.ok ? 'สำเร็จ' : 'พลาด'));
   const deltas = Object.entries(card.deltas ?? {});
@@ -12733,7 +12792,9 @@ function renderIsekai(card) {
     v.append(el('span', 'h', 'คำสัญญากับเทพธิดา'), el('blockquote', null, card.vow.text), el('b', null, card.vow.kept ? 'รักษาไว้ได้' : 'ผิดคำสัญญา'));
     body.append(v);
   }
-  if (card.lore?.length) body.append(el('p', 'isys', `โลกนี้จะจำ${card.lore.length > 1 ? `${card.lore.slice(0, -1).join(' ')} และ${card.lore.at(-1)}` : card.lore[0]}ไว้หลังคุณจากไป`));
+  // ใบตาแรกของชาติ: lore เป็นประโยคความจำของโลกจากคนต่างโลกรุ่นก่อน (เดิมต่อท้ายใบทุ่มเทใบแรก) · ใบจบ: รายการที่โลกจะจำ
+  if (typeof card.lore === 'string') body.append(el('p', 'isys', card.lore));
+  else if (card.lore?.length) body.append(el('p', 'isys', `โลกนี้จะจำ${card.lore.length > 1 ? `${card.lore.slice(0, -1).join(' ')} และ${card.lore.at(-1)}` : card.lore[0]}ไว้หลังคุณจากไป`));
   // ต่างโลกไม่มีฉายาของตัวเอง — เบาะแสชี้ฉายาของโลกเดิมที่ชาติหน้ายังไปเก็บได้ (B108 ใช้สองโลก)
   if (card.step === 'end' && !card.trip) clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
   if (card.step === 'end' && card.earn) body.append(earnBox(card.earn, `${save.seed}:${st.gen}:${card.trip ? `t${card.life}` : `i${card.run}`}`));
@@ -12744,10 +12805,6 @@ function renderIsekai(card) {
     body.append(d);
   }
   if (card.chronicle?.length) body.append(chronicleBox(card.chronicle, s));
-  // แถบโฟกัสบนใบตา (05a · ปุ่มเดียวกับโลกหลัก แทนกริดเปิดตลอดของ B68b): กด "เปลี่ยน" กางรายการ
-  // ปุ่มเลือกยังเดินผ่าน pick เซฟจึงเล่นซ้ำได้ (ต่างจากโลกหลักที่เปลี่ยนนอกลำดับปุ่ม) · focusFx = ผลต่อปีของแต่ละทาง
-  let panel = null;
-  if (card.step === 'tick') panel = isekaiFocusBar(card, pick);
   if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
@@ -12764,9 +12821,7 @@ function renderIsekai(card) {
   }
   const nextTok = card.trip ? T.next : T.afterNext;
   if (!card.choices.length) choices.append(enter(button(BTN.next, null, () => play(nextTok))));
-  box.append(head);
-  if (panel) box.append(panel);
-  box.append(body, choices);
+  box.append(head, body, choices);
   root.append(panels(box, false), lifeMenu(card, box));
   shelfDot();
   fxCard(box, card);
