@@ -582,7 +582,7 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
   };
   const MENUS = {
     thai: { 5: [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['life', 'ชีวิต', 'life'], ['family', 'ครอบครัว', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['money', 'เงิน', 'money'], ['shelf', 'สมุด', 'shelf']] },
-    isekai: { 5: [['me', 'ตัวฉัน', 'me'], ['skill', 'สกิล', 'skill'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['life', 'ชีวิต', 'life'], ['skill', 'สกิล', 'skill'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf']], '4more': [['me', 'ตัวฉัน', 'me'], ['skill', 'สกิล', 'skill'], ['job', 'อาชีพ', 'job'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf']] },
+    isekai: { 5: [['me', 'ตัวฉัน', 'me'], ['focus', 'โฟกัส', 'focus'], ['skill', 'สกิล', 'skill'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['life', 'ชีวิต', 'life'], ['skill', 'สกิล', 'skill'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf']], '4more': [['me', 'ตัวฉัน', 'me'], ['skill', 'สกิล', 'skill'], ['job', 'อาชีพ', 'job'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf']] },
     after: { 5: [['past', 'ชีวิตที่แล้ว', 'past'], ['focus', 'โฟกัส', 'focus'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['past', 'ชีวิตที่แล้ว', 'past'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['past', 'ชีวิตที่แล้ว', 'past'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf']] },
   };
   const PANEL_T = { me: 'ตัวฉัน', life: 'ชีวิต', family: 'ครอบครัว', money: 'เงิน', shelf: 'สมุด', more: 'เพิ่มเติม', skill: 'สกิล', job: 'อาชีพ', speed: 'ความเร็ว', past: 'ชีวิตที่แล้ว', focus: 'โฟกัส' };
@@ -885,6 +885,7 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
     }
     if (id === 'skill' &amp;&amp; cfg.iSkill === 'carry') return `<p class=&quot;kk&quot;>พกข้ามชาติได้ 3 สกิล · ชาติใหม่เริ่มขั้น 1 แล้วโตเร็วจนถึงขั้นในสมุด</p><div class=&quot;carry&quot;><span class=&quot;f&quot;>${ic('skill')}ลูกไฟ<small>ในสมุด ขั้น 3<br>ตอนนี้ ขั้น 1</small></span><span class=&quot;f&quot;>${ic('skill')}โล่น้ำแข็ง<small>ในสมุด ขั้น 2<br>ตอนนี้ ขั้น 2</small></span><span>ว่าง</span></div><div class=&quot;follow&quot;><h4>ตามไปชาติหน้า</h4><ul><li>ลูกไฟ · โล่น้ำแข็ง (ขั้นในสมุดจำไว้)</li><li>ชื่อในตำนานของโลกนี้</li></ul><h4>ไม่ตามไป</h4><ul><li class=&quot;no&quot;>เดินเงา (ไม่ได้พก)</li><li class=&quot;no&quot;>ทองในกระเป๋า</li><li class=&quot;no&quot;>อาชีพนักผจญภัยกับระดับกิลด์</li></ul></div>`;
     if (id === 'more') return `<ul class=&quot;lst&quot;>${cfg.pet === 'more' ? `<li>${ic('pet')} สัตว์เลี้ยง<em>ขนุน · แมวส้ม</em></li>` : ''}${cfg.menu === '4more' ? `<li>${ic('money')} เงิน<em>฿184,000</em></li>` : ''}<li>${ic('shelf')} บันทึก/โหลดเกม</li><li>${ic('menu')} ตั้งค่า</li></ul>`;
+    if (id === 'focus' &amp;&amp; menuWorld(w) === 'isekai') return `<p class=&quot;kk&quot;>ตอนนี้</p><ul class=&quot;lst&quot;><li>${ic('focus')} ฝึกดาบ<em>เปลี่ยนในแท็บ</em></li></ul>`;
     if (id === 'focus') return `<p class=&quot;kk&quot;>ชาติที่แล้วทุ่มเทมากสุด</p><ul class=&quot;lst&quot;><li>${ic('focus')} งาน<em>ดูอย่างเดียว</em></li></ul>`;
     if (id === 'past') return `<ul class=&quot;tl&quot;><li>นิดา ศรีสุข<small>ตาย 74 ปี · ครูประถม · ขอนแก่น</small></li><li>ประยูร ทองดี<small>ตาย 81 ปี · ชาวนา</small></li></ul>`;
     if (id === 'skill') return `<ul class=&quot;lst&quot;><li>${ic('skill')} ลูกไฟ<em>ระดับ 3</em></li><li>${ic('skill')} โล่น้ำแข็ง<em>ระดับ 1</em></li></ul>`;
@@ -1123,7 +1124,7 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
   // [หัวข้อ, key ใน cfg, ฉากที่ไปดู, [ค่า, ข้อความ] ของ A B C]
   const QS = [
     ['ชุดปุ่มเมนูล่าง (ชาติไทย)', 'menu', 'year', [['5', 'ตัวฉัน (รวมเงิน) · ครอบครัว · สมุด · เพิ่มเติม'], ['4', 'ชีวิต (รวมเงิน) · ครอบครัว · สมุด · เพิ่มเติม'], ['4more', 'ตัวฉัน · ครอบครัว · เงิน · สมุด + ปุ่ม ⋯ บนแถบสถานะ']]],
-    ['เมนูต่างโลก', 'menu', 'isekai', [['5', 'ตัวฉัน (รวมอาชีพ) · สกิล · ความเร็ว · สมุด · เพิ่มเติม'], ['4', 'ชีวิต · สกิล · ความเร็ว · สมุด'], ['4more', 'ตัวฉัน · สกิล · อาชีพ · ความเร็ว · สมุด']]],
+    ['เมนูต่างโลก', 'menu', 'isekai', [['5', 'ตัวฉัน (รวมอาชีพ) · โฟกัส · สกิล · สมุด · เพิ่มเติม'], ['4', 'ชีวิต · สกิล · ความเร็ว · สมุด'], ['4more', 'ตัวฉัน · สกิล · อาชีพ · ความเร็ว · สมุด']]],
     ['เมนูปรโลก', 'menu', 'after', [['5', 'ชีวิตที่แล้ว · โฟกัส · ตระกูล · สมุด · เพิ่มเติม'], ['4', 'ชีวิตที่แล้ว · สมุด · เพิ่มเติม'], ['4more', 'ชีวิตที่แล้ว · ตระกูล · สมุด']]],
     ['แท็บการ์ดตาย', 'dPre', 'death', [['a', DSETS.a.join(' · ')], ['b', DSETS.b.join(' · ')], ['c', DSETS.c.join(' · ')]]],
     ['สัตว์เลี้ยง', 'pet', 'me', [['family', 'ท้ายแผงครอบครัว'], ['family', 'ท้ายแผงครอบครัว'], ['none', 'ยังไม่ทำแผง คงบรรทัดในการ์ดตาย']]],
@@ -1346,17 +1347,6 @@ body:has(.sb.dying)::after { content:''; position:fixed; inset:0; z-index:9; poi
 .tree { padding:0 20px 8px; font-size:12px; }
 .tree summary { cursor:pointer; }
 .tree .picks { font-size:12px; }
-/* ปุ่มโฟกัสชีวิต (B163): ชื่อโฟกัสกับทิศผลตัดบรรทัดได้ ป้าย &quot;เปลี่ยน&quot; ชิดขวาไม่ตกบรรทัด */
-.focus { padding:0 20px 8px; font-size:12px; }
-.focus button { all:unset; box-sizing:border-box; width:100%; min-height:44px; display:flex; flex-wrap:wrap; align-items:center; gap:2px 8px; padding:6px 10px; border:1px solid color-mix(in srgb, currentColor 35%, transparent); border-radius:var(--r); cursor:pointer; overflow-wrap:anywhere; }
-.focus button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
-.focus-btn b { font-size:14px; }
-.focus-k { font-weight:600; opacity:0.8; }
-.focus-fx { opacity:0.8; }
-.focus-go { margin-left:auto; text-decoration:underline; text-underline-offset:2px; white-space:nowrap; }
-.focus-pick { display:flex; flex-direction:column; gap:4px; margin-top:4px; }
-.focus-pick[hidden] { display:none; }
-.focus-pick .on { border-style:solid; border-color:currentColor; font-weight:600; }
 /* แถบเมนูล่าง (ui-redo ใบ 04): ติดขอบล่างจอ กว้างเท่าการ์ด · หน้าเว้นท้ายเท่าความสูงแถบ ท้ายการ์ดจึงไม่ถูกบัง */
 :root { --nav-h:60px; }
 body:has(.mnav) { padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)); }
@@ -1394,7 +1384,6 @@ body:has(.mnav) .foot { display:none; }
 .me dl { margin:12px 0 0; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 12px; font-size:13px; }
 .me dt { font-weight:600; color:var(--ink2); white-space:nowrap; }
 .me dd { margin:0; color:var(--ink2); }
-.me .focus { padding:0; }
 .me .meta { margin:0; padding:0; font-size:14px; }
 /* แท็บโฟกัส (ui-redo 50 · JSON 47 แบบ ก รายการเดียว): ตัวที่ถืออยู่เป็นกรอบสีเน้น · ปีสะสมเป็นป้ายคำ ไม่มีเลข
    · ป้ายชำนาญแล้วใช้สีพื้นแผ่นเป็นตัวอักษร — ชุดปรโลกสีเน้นเป็นทอง ตัวขาวบนทองอ่านไม่ออก */
@@ -1837,7 +1826,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   .p-side .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
   .top { padding:8px 16px; }
   .sb { padding:8px 12px; }
-  .meta, .tree, .focus { padding-left:12px; padding-right:12px; }
+  .meta, .tree { padding-left:12px; padding-right:12px; }
   /* พาแนลซ้ายแคบ: หัวการ์ดตัดบรรทัดเป็นแถว (ไม่งั้นอายุเหลือคำละบรรทัด) · ค่าสถานะ 2 ช่องต่อแถว (4 ค่า = 2×2) ป้าย &quot;ความสัมพันธ์&quot; ไม่ขาดกลางคำ */
   .p-left .top { flex-wrap:wrap; gap:4px 10px; }
   .p-left .top small { flex-basis:100%; text-align:left; }
@@ -2024,17 +2013,6 @@ body:has(.sb.dying)::after { content:''; position:fixed; inset:0; z-index:9; poi
 .tree { padding:0 20px 8px; font-size:12px; }
 .tree summary { cursor:pointer; }
 .tree .picks { font-size:12px; }
-/* ปุ่มโฟกัสชีวิต (B163): ชื่อโฟกัสกับทิศผลตัดบรรทัดได้ ป้าย &quot;เปลี่ยน&quot; ชิดขวาไม่ตกบรรทัด */
-.focus { padding:0 20px 8px; font-size:12px; }
-.focus button { all:unset; box-sizing:border-box; width:100%; min-height:44px; display:flex; flex-wrap:wrap; align-items:center; gap:2px 8px; padding:6px 10px; border:1px solid color-mix(in srgb, currentColor 35%, transparent); border-radius:var(--r); cursor:pointer; overflow-wrap:anywhere; }
-.focus button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
-.focus-btn b { font-size:14px; }
-.focus-k { font-weight:600; opacity:0.8; }
-.focus-fx { opacity:0.8; }
-.focus-go { margin-left:auto; text-decoration:underline; text-underline-offset:2px; white-space:nowrap; }
-.focus-pick { display:flex; flex-direction:column; gap:4px; margin-top:4px; }
-.focus-pick[hidden] { display:none; }
-.focus-pick .on { border-style:solid; border-color:currentColor; font-weight:600; }
 /* แถบเมนูล่าง (ui-redo ใบ 04): ติดขอบล่างจอ กว้างเท่าการ์ด · หน้าเว้นท้ายเท่าความสูงแถบ ท้ายการ์ดจึงไม่ถูกบัง */
 :root { --nav-h:60px; }
 body:has(.mnav) { padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)); }
@@ -2072,7 +2050,6 @@ body:has(.mnav) .foot { display:none; }
 .me dl { margin:12px 0 0; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 12px; font-size:13px; }
 .me dt { font-weight:600; color:var(--ink2); white-space:nowrap; }
 .me dd { margin:0; color:var(--ink2); }
-.me .focus { padding:0; }
 .me .meta { margin:0; padding:0; font-size:14px; }
 /* แท็บโฟกัส (ui-redo 50 · JSON 47 แบบ ก รายการเดียว): ตัวที่ถืออยู่เป็นกรอบสีเน้น · ปีสะสมเป็นป้ายคำ ไม่มีเลข
    · ป้ายชำนาญแล้วใช้สีพื้นแผ่นเป็นตัวอักษร — ชุดปรโลกสีเน้นเป็นทอง ตัวขาวบนทองอ่านไม่ออก */
@@ -2515,7 +2492,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   .p-side .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
   .top { padding:8px 16px; }
   .sb { padding:8px 12px; }
-  .meta, .tree, .focus { padding-left:12px; padding-right:12px; }
+  .meta, .tree { padding-left:12px; padding-right:12px; }
   /* พาแนลซ้ายแคบ: หัวการ์ดตัดบรรทัดเป็นแถว (ไม่งั้นอายุเหลือคำละบรรทัด) · ค่าสถานะ 2 ช่องต่อแถว (4 ค่า = 2×2) ป้าย &quot;ความสัมพันธ์&quot; ไม่ขาดกลางคำ */
   .p-left .top { flex-wrap:wrap; gap:4px 10px; }
   .p-left .top small { flex-basis:100%; text-align:left; }
@@ -2563,7 +2540,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 }
 @keyframes drw { from { transform:translateX(100%); } }
 
-#app{padding:0 12px 12px}.card{min-height:0}.mnav{position:static;margin-top:8px}body:has(.mnav){padding-bottom:0}</style></head><body><div id=&quot;app&quot;><h4 style=&quot;margin:16px 0 6px;font:600 14px var(--ft)&quot;>การ์ดต่างโลก + แถบเมนูต่างโลก</h4><article class=&quot;card i&quot;><div class=&quot;top&quot;><b>ต่างโลก</b><small>ตัวอย่างธีมต่างโลก</small></div><div class=&quot;body&quot;><span class=&quot;kicker&quot;>ปีแรก</span><h3>ตัวอย่างการ์ดต่างโลก</h3><p>สีพื้นและสีตัวอักษรสลับตามตัวแปรธีมต่างโลกของเกม</p></div><div class=&quot;choices&quot;><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>1</kbd><span>ต่อไป</span></button></div></article><nav class=&quot;mnav&quot; aria-label=&quot;เมนู&quot;><button type=&quot;button&quot; aria-expanded=&quot;true&quot;><span>ตัวฉัน</span></button><button type=&quot;button&quot;><span>สกิล</span></button><button type=&quot;button&quot;><span>สมุด</span></button><button type=&quot;button&quot;><span>เพิ่มเติม</span></button></nav></div></body></html>"></iframe></figure>
+#app{padding:0 12px 12px}.card{min-height:0}.mnav{position:static;margin-top:8px}body:has(.mnav){padding-bottom:0}</style></head><body><div id=&quot;app&quot;><h4 style=&quot;margin:16px 0 6px;font:600 14px var(--ft)&quot;>การ์ดต่างโลก + แถบเมนูต่างโลก</h4><article class=&quot;card i&quot;><div class=&quot;top&quot;><b>ต่างโลก</b><small>ตัวอย่างธีมต่างโลก</small></div><div class=&quot;body&quot;><span class=&quot;kicker&quot;>ปีแรก</span><h3>ตัวอย่างการ์ดต่างโลก</h3><p>สีพื้นและสีตัวอักษรสลับตามตัวแปรธีมต่างโลกของเกม</p></div><div class=&quot;choices&quot;><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>1</kbd><span>ต่อไป</span></button></div></article><nav class=&quot;mnav&quot; aria-label=&quot;เมนู&quot;><button type=&quot;button&quot; aria-expanded=&quot;true&quot;><span>ตัวฉัน</span></button><button type=&quot;button&quot;><span>โฟกัส</span></button><button type=&quot;button&quot;><span>สกิล</span></button><button type=&quot;button&quot;><span>สมุด</span></button><button type=&quot;button&quot;><span>เพิ่มเติม</span></button></nav></div></body></html>"></iframe></figure>
 <h2 id="ui-shots">ภาพจอเกม 390 / 1280</h2>
 <p>ภาพจาก <code>npm run shots</code> (ใบ 45) — เลนที่แก้จอเกมรันแล้ว commit ภาพ</p>
 <div class="shots"><div><h3>เริ่มชีวิต</h3><p><img src="shots/start-390.png" alt="จอเริ่มชีวิต กว้าง 390" loading="lazy" style="max-width:100%;height:auto"></p><p><img src="shots/start-1280.png" alt="จอเริ่มชีวิต กว้าง 1280" loading="lazy" style="max-width:100%;height:auto"></p></div><div><h3>กลางชีวิต</h3><p><img src="shots/mid-390.png" alt="จอกลางชีวิต กว้าง 390" loading="lazy" style="max-width:100%;height:auto"></p><p><img src="shots/mid-1280.png" alt="จอกลางชีวิต กว้าง 1280" loading="lazy" style="max-width:100%;height:auto"></p></div><div><h3>ตาย</h3><p><img src="shots/death-390.png" alt="จอตาย กว้าง 390" loading="lazy" style="max-width:100%;height:auto"></p><p><img src="shots/death-1280.png" alt="จอตาย กว้าง 1280" loading="lazy" style="max-width:100%;height:auto"></p></div></div>

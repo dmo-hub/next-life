@@ -212,17 +212,6 @@ body:has(.sb.dying)::after { content:''; position:fixed; inset:0; z-index:9; poi
 .tree { padding:0 20px 8px; font-size:12px; }
 .tree summary { cursor:pointer; }
 .tree .picks { font-size:12px; }
-/* ปุ่มโฟกัสชีวิต (B163): ชื่อโฟกัสกับทิศผลตัดบรรทัดได้ ป้าย "เปลี่ยน" ชิดขวาไม่ตกบรรทัด */
-.focus { padding:0 20px 8px; font-size:12px; }
-.focus button { all:unset; box-sizing:border-box; width:100%; min-height:44px; display:flex; flex-wrap:wrap; align-items:center; gap:2px 8px; padding:6px 10px; border:1px solid color-mix(in srgb, currentColor 35%, transparent); border-radius:var(--r); cursor:pointer; overflow-wrap:anywhere; }
-.focus button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
-.focus-btn b { font-size:14px; }
-.focus-k { font-weight:600; opacity:0.8; }
-.focus-fx { opacity:0.8; }
-.focus-go { margin-left:auto; text-decoration:underline; text-underline-offset:2px; white-space:nowrap; }
-.focus-pick { display:flex; flex-direction:column; gap:4px; margin-top:4px; }
-.focus-pick[hidden] { display:none; }
-.focus-pick .on { border-style:solid; border-color:currentColor; font-weight:600; }
 /* แถบเมนูล่าง (ui-redo ใบ 04): ติดขอบล่างจอ กว้างเท่าการ์ด · หน้าเว้นท้ายเท่าความสูงแถบ ท้ายการ์ดจึงไม่ถูกบัง */
 :root { --nav-h:60px; }
 body:has(.mnav) { padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)); }
@@ -260,7 +249,6 @@ body:has(.mnav) .foot { display:none; }
 .me dl { margin:12px 0 0; display:grid; grid-template-columns:auto minmax(0, 1fr); gap:6px 12px; font-size:13px; }
 .me dt { font-weight:600; color:var(--ink2); white-space:nowrap; }
 .me dd { margin:0; color:var(--ink2); }
-.me .focus { padding:0; }
 .me .meta { margin:0; padding:0; font-size:14px; }
 /* แท็บโฟกัส (ui-redo 50 · JSON 47 แบบ ก รายการเดียว): ตัวที่ถืออยู่เป็นกรอบสีเน้น · ปีสะสมเป็นป้ายคำ ไม่มีเลข
    · ป้ายชำนาญแล้วใช้สีพื้นแผ่นเป็นตัวอักษร — ชุดปรโลกสีเน้นเป็นทอง ตัวขาวบนทองอ่านไม่ออก */
@@ -703,7 +691,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   .p-side .more:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
   .top { padding:8px 16px; }
   .sb { padding:8px 12px; }
-  .meta, .tree, .focus { padding-left:12px; padding-right:12px; }
+  .meta, .tree { padding-left:12px; padding-right:12px; }
   /* พาแนลซ้ายแคบ: หัวการ์ดตัดบรรทัดเป็นแถว (ไม่งั้นอายุเหลือคำละบรรทัด) · ค่าสถานะ 2 ช่องต่อแถว (4 ค่า = 2×2) ป้าย "ความสัมพันธ์" ไม่ขาดกลางคำ */
   .p-left .top { flex-wrap:wrap; gap:4px 10px; }
   .p-left .top small { flex-basis:100%; text-align:left; }
