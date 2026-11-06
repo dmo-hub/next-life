@@ -2,7 +2,7 @@
 // st.cadet = ลำดับขั้นที่กำลังเล่น (null = ไม่มี) · st.cadetInfo = ความจำข้ามปี (สอบกี่ครั้ง · ตกเพราะอะไร · ใบสมัคร)
 // ทุกค่าใน state เป็นข้อมูลล้วน (เซฟได้) · สุ่มจาก stream ของตัวเอง (seed ^ SALT + ตัวนับ) ไม่แตะ rng ของโลก
 // เนื้อหา/ตัวเลข: content/rules/cadet.yaml (ที่มา: demo ที่เจ้าของเคาะ 2026-11-05) · fx ในไฟล์นั้นเป็นหน่วย demo (×numbers.fx_unit แต้ม)
-import { STAT_KEYS, fill, stageOf } from './life.mjs';
+import { STAT_KEYS, TAG_MID, fill, stageOf } from './life.mjs';
 
 // ทั้งไฟล์อยู่ใน scope เดียว — build ต่อทุกไฟล์เป็นสคริปต์เดียว ชื่อภายในจึงต้องไม่หลุดไปชนไฟล์อื่น
 const CADET = (() => {
@@ -199,7 +199,7 @@ const CADET = (() => {
   // ---------- steps ----------
   const S = {};
   const STEP = S;
-  S.res = (st, text) => ({ kind: 'result', cadet: true, type: 'A', age: st.age, stage: stageOf(st.age), text: fill(text, st) });
+  S.res = (st, text) => ({ kind: 'result', cadet: true, type: 'A', age: st.age, stage: stageOf(st.age), text: fill(text, st), tag: TAG_MID, evId: `cadet:${st.cadet.curId}` });
 
   const bodyRule = (st) => { const b = N(st).body_min; return `ชีวิต ตร. ${b.police} · ทร. ${b.navy} · ทอ. ${b.airforce} · ทบ. ${b.army} ขึ้นไป (รวมว่ายน้ำ 50 เมตร)`; };
   function bodyReach(st, h = Math.round(st.health)) {
