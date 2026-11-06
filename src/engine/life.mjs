@@ -884,6 +884,13 @@ function startSchool(st, year) {
 // การ์ดหางาน: ระหว่างถือธงฝันเตรียมทหาร เลื่อนไว้ (needJob) ออกหลังธงหลุด (เจ้าของเคาะ 2026-11-06)
 // ยังอยู่ในเส้นเตรียมทหาร: ถือธงฝัน · มีลำดับสนามสอบค้าง · หรือผ่านประตูสนามแล้วแต่ยังไม่จบปีสอบ (cadet_exam_door)
 // ประตูต้องนับ: ตัวเลือกเช้าวันสอบล้างธงฝันก่อนแกนเปิดลำดับสนามสอบ — ไม่นับ = การ์ดหางานที่เลื่อนไว้หลุดออกกลางสนามสอบ (S3 ข้อ B)
+// ปล่อยด่านจบ ม.6/ปวช. ที่เลื่อนไว้ (OQ-1) เมื่อพ้นเส้นสอบ · สอบติด = เปลี่ยน track ไปแล้ว ไม่มีด่านนี้ · out = คิวที่จะวางการ์ด
+function releaseTrack(st, out) {
+  if (!st.trackWait || cadetLive(st)) return;
+  st.trackWait = false;
+  const track = !st.flags.cadet_passed && st.school && TRACKS[st.school];
+  if (track) trackExit(st, track, st.birthYear + st.age, out);
+}
 const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet_exam_door && !st.flags.cadet_passed));
 function dueJob(st) {
   if (cadetLive(st)) st.needJob = true;
@@ -1506,6 +1513,13 @@ function drawCard(st) {
     if (st.cadet.cur) throw new Error('ยังมีการ์ดที่รอเลือก');
     const card = cadetCard(st);
     if (card) return emit(st, card);
+    // ปิดลำดับเส้นสอบแล้ว (ตก/สละสิทธิ์/เลิก): ปล่อยด่านจบ ม.6/ปวช. ที่รอผลทันทีในปีเดียวกัน — ใบท้ายปีเป็นการ์ดเส้นสอบ ไม่ผ่าน choose() ของการ์ดปกติ (S3 ข้อ 3 รั่ว)
+    const out = [];
+    releaseTrack(st, out);
+    if (out.length) {
+      st.queue.unshift(...out);
+      return nextCard(st);
+    }
   }
   for (;;) {
     if (st.advance) {
@@ -2105,12 +2119,8 @@ export function choose(st, idx, loan) {
   if (ev.id === FUNERAL.wishes && (c.sets_flags ?? []).some((f) => f.startsWith('wish_'))) after.push({ kind: 'eraEvent', ev, age: st.age });
   // เลิกเรียนแล้วหางานทันที
   if (st.needJob && st.flags.cadet_passed) st.needJob = false;   // สอบติดเตรียมทหารแล้ว ไม่ต้องหางาน
-  // ด่านจบ ม.6/ปวช. ที่รอผลสอบเตรียมทหาร: ธงฝันหลุดและจบสนามสอบแล้ว · สอบติด = เปลี่ยน track ไปแล้ว ไม่มีด่านนี้
-  if (st.trackWait && !cadetLive(st)) {
-    st.trackWait = false;
-    const track = !st.flags.cadet_passed && st.school && TRACKS[st.school];
-    if (track) trackExit(st, track, st.birthYear + st.age, after);
-  }
+  // ด่านจบ ม.6/ปวช. ที่รอผล: เลิกฝันจากการ์ดปกติ (ทางปิดลำดับเส้นสอบอยู่ใน nextCard)
+  releaseTrack(st, after);
   if (st.needJob && !cadetLive(st)) {
     st.needJob = false;
     after.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });

@@ -11882,10 +11882,13 @@ function applyForm() {
     <div class="opts">${BR.map(b => `<label style="display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px">
       <input type="checkbox" value="${b}" style="width:auto"> ${(P2().apply?.branchLabels || P2().branchLabels || BR_TH)[b] || BR_TH[b]}</label>`).join('')}
       <span class="hint">ติ๊กตามลำดับที่อยากสอบ · ลำดับที่ติ๊กคือลำดับวันสอบ · แต่ละเหล่าสอบคนละวัน</span>
-      <button class="primary" id="apply">ส่งใบสมัคร</button></div>`;
+      <button class="primary" id="apply" disabled>ส่งใบสมัคร<span class="hint" id="applyLock">🔒 ${ap.submit?.lockReason || 'ยังไม่ได้ติ๊กสักช่อง'}</span></button></div>`;
   const order = [];
+  // งาน G (เจ้าของเคาะ 2026-11-06): ล็อกปุ่มส่งตอนยังไม่ติ๊กสักช่อง เหมือนในเกม (cadet.mjs S.apply · lockReason จาก rules)
+  const lockSync = () => { $('#apply').disabled = !order.length; $('#applyLock').style.display = order.length ? 'none' : ''; };
   stage.querySelectorAll('input[type=checkbox]').forEach(cb => cb.onchange = () => {
     if (cb.checked) order.push(cb.value); else order.splice(order.indexOf(cb.value), 1);
+    lockSync();
   });
   $('#apply').onclick = () => {
     if (!order.length) return;
@@ -12678,7 +12681,7 @@ function renderSide() {
 }
 
 window.__demoState = () => S;   // test hook only
-window.__demoAnnounce = { x2wCard, x3aCard, x3Card, x3bCard };   // test hook only (announce scenes)
+window.__demoAnnounce = { x2wCard, x3aCard, x3Card, x3bCard, applyForm };   // test hook only (announce scenes · apply form)
 setup();
 })();
 </script>
