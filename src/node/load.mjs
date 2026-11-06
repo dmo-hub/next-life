@@ -490,8 +490,11 @@ export function loadArcs(events, p = 'content/rules/arcs.yaml') {
   return arcs;
 }
 
+// เส้นเตรียมทหาร: เนื้อหาสนามสอบ + ตัวเลขที่เจ้าของเคาะ (engine: src/engine/cadet.mjs)
+export const loadCadet = (p = 'content/rules/cadet.yaml') => parse(read(p));
+
 export function loadContent() {
   const events = loadEvents();
   const focus = loadFocus();
-  return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events) };
+  return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet: loadCadet() };
 }
