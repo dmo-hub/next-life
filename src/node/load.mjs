@@ -484,7 +484,17 @@ export function loadItems(p = 'content/rules/items.yaml') {
 // เส้นเตรียมทหาร: เนื้อหาสนามสอบ + ตัวเลขที่เจ้าของเคาะ (engine: src/engine/cadet.mjs)
 export const loadCadet = (p = 'content/rules/cadet.yaml') => parse(read(p));
 
+// ทะเบียนสายเรื่องรายคน (krung-1): ทุกคีย์ arc บนการ์ดต้องมีชื่อ — หน้าจบใช้บอกสถานะสาย · harness ส่งทะเบียนของ fixture เองได้
+export function loadArcs(events, p = 'content/rules/arcs.yaml') {
+  const arcs = parse(read(p))?.arcs ?? {};
+  const bad = Object.entries(arcs).filter(([, a]) => typeof a?.name !== 'string' || !a.name.trim()).map(([k]) => `สาย ${k} ไม่มี name`);
+  for (const e of events) if (e.arc && !arcs[e.arc]) bad.push(`การ์ด ${e.id} อ้างสาย ${e.arc} ที่ไม่มีในทะเบียน`);
+  if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return arcs;
+}
+
 export function loadContent() {
+  const events = loadEvents();
   const focus = loadFocus();
-  return { events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), cadet: loadCadet() };
+  return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet: loadCadet() };
 }

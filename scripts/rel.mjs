@@ -17,7 +17,7 @@ const DRY = !!process.env.DRY;
 const BASE = process.env.BASE;
 if (BASE && !DRY) throw new Error('BASE ใช้ได้กับ DRY=1 เท่านั้น');
 const git = (...a) => execFileSync('git', ['-C', wt, ...a], { encoding: 'utf8' }).trim();
-const BUILD = new Set(['docs/play.html', 'docs/catalog.html', 'docs/spoilers.html', 'docs/spec.html', 'docs/guide.html', 'docs/otherworld.html', 'docs/worlds.html', 'docs/dev/spec.html', 'docs/index.html', 'docs/about.html']);
+const BUILD = new Set(['docs/play.html', 'docs/play.js', 'docs/play-data.js', 'docs/sw.js', 'docs/fonts/fonts.css', 'docs/catalog.html', 'docs/spec.html', 'docs/guide.html', 'docs/otherworld.html', 'docs/worlds.html', 'docs/dev/spec.html', 'docs/index.html', 'docs/about.html']);
 
 const g = JSON.parse(fs.readFileSync(notesFile, 'utf8'));
 const strs = (v) => Array.isArray(v) && v.length > 0 && v.every((s) => typeof s === 'string' && s.trim());

@@ -1,7 +1,9 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { loadContent } from './src/node/load.mjs';
-import { buildSite } from './src/site/build.mjs';
+import { buildSite, toLf } from './src/site/build.mjs';
 import { readVersion, versionLines, releaseLog, notesLines } from './src/site/facts.mjs';
+import { FONTS, FONT_DIR, FONT_CSS, fontsCss, playFonts } from './src/site/fonts.mjs';
+import { PLAY_FILES, playScripts, swJs } from './src/site/play-files.mjs';
 
 const read = (p) => readFileSync(new URL(p, import.meta.url), 'utf8');
 
@@ -21,31 +23,40 @@ for (const f of files) {
   }
 }
 const code = files.map((f) => strip(read(f))).join('\n');
-const data = `const CONTENT = ${JSON.stringify(content).replace(/</g, '\\u003c')};\n`;
 // รุ่นปัจจุบันไม่มีโน้ต (bump ของเลน) = เตือนเฉย ๆ ไม่หยุด build · แผ่นในเกมใช้รุ่นล่าสุดที่มีโน้ต
 const ver = readVersion();
 const notes = releaseLog(read('./docs/whatsnew.html'));
 if (notes[0]?.v !== ver.version) console.warn(`⚠ ${ver.version} ไม่มีข้อในแพตช์โน้ต — แผ่นแจ้งอัปเดตในเกมใช้ ${notes[0]?.v ?? '(ไม่มีรุ่นไหนมีโน้ต)'}`);
-const script = `(() => {\n${versionLines(ver)}${notesLines(notes)}${data}${code}\n})();`.replace(/<\/script/gi, '<\\/script');
+// หน้าเล่นแยกไฟล์ (ui-redo 96 · ข้อ 192 203 204): HTML เหลือ CSS + โครงหน้าเปิด · ข้อมูลเกม/สคริปต์เป็นไฟล์ชื่อคงที่ต่อ ?v=เลขรุ่น ให้เบราว์เซอร์แคชได้
+// ข้อมูลอยู่ไฟล์แยกจากโค้ด: เนื้อหาเปลี่ยนบ่อยกว่าโค้ด และไฟล์ข้อมูลใหญ่กว่าโค้ดหลายเท่า
+const out = (rel, text) => {
+  const url = new URL(`./docs/${rel}`, import.meta.url);
+  const next = toLf(text);
+  if (!existsSync(url) || readFileSync(url, 'utf8') !== next) writeFileSync(url, next);
+};
+out(PLAY_FILES.data, `self.NL_CONTENT = ${JSON.stringify(content).replace(/</g, '\\u003c')};\n`);
+out(PLAY_FILES.app, `(() => {\n${versionLines(ver)}${notesLines(notes)}const CONTENT = self.NL_CONTENT;\n${code}\n})();\n`);
 
-// ฟอนต์ฝังในไฟล์ให้เกมเปิดออฟไลน์ได้ และภาพแชร์ (canvas) ได้ Srisakdi จริงไม่ตกไปฟอนต์สำรอง
-// ไฟล์ใน src/ui/fonts ตัดเหลือไทยทั้งบล็อก + ASCII + เครื่องหมายที่เกมใช้ (ชื่อสุ่ม/ข้อความประกอบไม่ตายตัว จึงไม่ตัดตามตัวที่ปรากฏ)
-// Srisakdi มีแค่ 700: ทุกที่ที่ใช้เป็นตัวหนา (font-weight 700 หรือ <b>) · Noto Sans Thai = ฟอนต์หน้าเล่น · Sarabun ยังใช้ในภาพแชร์และภาพชั้นสมุด (canvas)
-const PLAY_FONTS = [['Noto Sans Thai', 400, 'NotoSansThai-Regular'], ['Noto Sans Thai', 600, 'NotoSansThai-SemiBold'], ['Sarabun', 400, 'Sarabun-Regular'], ['Sarabun', 600, 'Sarabun-SemiBold'], ['Srisakdi', 700, 'Srisakdi-Bold']];
-const fonts = PLAY_FONTS.map(([family, weight, file]) => {
-  const b64 = readFileSync(new URL(`./src/ui/fonts/${file}.woff2`, import.meta.url)).toString('base64');
-  return `@font-face { font-family:"${family}"; font-weight:${weight}; font-style:normal; font-display:swap; src:url(data:font/woff2;base64,${b64}) format('woff2'); }`;
-}).join('\n');
-
-writeFileSync(new URL('./docs/play.html', import.meta.url), read('./src/ui/template.html').replace('/*__FONTS__*/', () => fonts).replace('/*__SCRIPT__*/', () => script));
+// ฟอนต์ไฟล์ในเว็บชุดเดียวทุกหน้า (ข้อ 205) · ต้นฉบับ src/ui/fonts ตัดเหลือไทยทั้งบล็อก + ASCII + เครื่องหมายที่เกมใช้ (src/ui/fonts/README.md)
+// ภาพแชร์ (canvas) รอ document.fonts.load ก่อนวาด ⇒ ได้ Srisakdi จริงแม้ฟอนต์ไม่ได้ฝังในหน้าแล้ว
+mkdirSync(new URL(`./docs/${FONT_DIR}`, import.meta.url), { recursive: true });
+for (const [, , file] of FONTS) {
+  const src = readFileSync(new URL(`./src/ui/fonts/${file}.woff2`, import.meta.url));
+  const dst = new URL(`./docs/${FONT_DIR}${file}.woff2`, import.meta.url);
+  if (!existsSync(dst) || !readFileSync(dst).equals(src)) writeFileSync(dst, src);
+}
+out(FONT_CSS, fontsCss(FONTS, ''));
+const playFaces = fontsCss(playFonts(), FONT_DIR).trimEnd();
+out(PLAY_FILES.sw, swJs(ver.version, playFonts().map(([, , f]) => `${FONT_DIR}${f}.woff2`)));
+writeFileSync(new URL('./docs/play.html', import.meta.url), toLf(read('./src/ui/template.html').replace('/*__FONTS__*/', () => playFaces).replace('<!--__SCRIPTS__-->', () => playScripts(ver.version))));
 // หน้า tweak ที่ต้องหน้าตาเกมจริง (ui-redo 46): ฉีด CSS ของ template + ฟอนต์หน้าเล่นตอน build — หน้าไม่ลอก CSS เอง แก้เกมแล้วต้นแบบตามทันที
 const GAME_CSS = ['/*GAME-CSS:START*/', '/*GAME-CSS:END*/'];
-const gameCss = read('./src/ui/template.html').match(/<style>([\s\S]*?)<\/style>/)[1].replace('/*__FONTS__*/', () => fonts.split('\n').filter((f) => f.includes('Noto Sans Thai')).join('\n'));
-for (const page of ['./docs/dev/tweak/head-tweak.html', './docs/dev/tweak/death-tweak.html']) {
+const gameCss = read('./src/ui/template.html').match(/<style>([\s\S]*?)<\/style>/)[1].replace('/*__FONTS__*/', () => fontsCss(playFonts().filter(([f]) => f !== 'Srisakdi'), `../../${FONT_DIR}`).trimEnd());
+for (const page of ['./docs/dev/tweak/head-tweak.html']) {
   const html = read(page);
   const [a, b] = GAME_CSS.map((m) => html.indexOf(m));
   if (a < 0 || b < a) throw new Error(`${page}: ต้องมี ${GAME_CSS.join(' … ')}`);
-  writeFileSync(new URL(page, import.meta.url), html.slice(0, a + GAME_CSS[0].length) + gameCss + html.slice(b));
+  writeFileSync(new URL(page, import.meta.url), toLf(html.slice(0, a + GAME_CSS[0].length) + gameCss + html.slice(b)));
 }
 console.log(`docs/play.html: ${content.events.length} เหตุการณ์ · ข้อมูลยุค ${JSON.stringify(content.era).length.toLocaleString('en-US')} ตัวอักษร`);
 const site = buildSite(content);

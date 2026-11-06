@@ -23,78 +23,57 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script type="application/ld+json">[{"@context":"https://schema.org","@type":"VideoGame","name":"เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด","alternateName":"Next Life","description":"เกมจำลองชีวิตคนไทยหลายรุ่น เกิดแบบสุ่มตามสถิติจริงของไทย ตายแล้วไปปรโลก เกิดเป็นลูกหลานหรือเกิดใหม่ตามกรรม เล่นได้บนเบราว์เซอร์ เกม ไม่ใช่คำแนะนำการลงทุน","inLanguage":"th","gamePlatform":"Web browser","applicationCategory":"GameApplication","url":"https://dmo-hub.github.io/next-life/","image":"https://dmo-hub.github.io/next-life/og.png","offers":{"@type":"Offer","price":"0","priceCurrency":"THB"}},{"@context":"https://schema.org","@type":"WebSite","name":"Next Life","alternateName":"เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด","url":"https://dmo-hub.github.io/next-life/","inLanguage":"th"}]</script>
 <!--SEO:END-->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi:wght@400;600&family=Sarabun:wght@400;600&family=Srisakdi:wght@700&display=swap">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
+  /* หัวหน้าแรก T3 (ui-redo 105 · ข้อ 219–221): คราม เต็มจอ · โลโก้ซ้าย · ลายกนกแถบล่าง · ปุ่มเริ่มใต้คำโปรย · หน้าเหลือแค่หัว (คำปฏิเสธย้ายไปหน้าวิธีเล่น) */
   * { box-sizing: border-box; }
-  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
-  header { background: #1F2430; color: #F4EFE3; min-height: 100svh; display: flex; align-items: center; text-align: center; padding: 32px 16px; }
-  .w { max-width: 960px; margin: 0 auto; }
-  header .w { display: flex; flex-direction: column; align-items: center; }
-  h1 { font-family: Srisakdi, serif; font-weight: 700; color: #D9B45A; font-size: clamp(34px, 9vw, 64px); line-height: 1.2; margin: 0; }
+  body { margin: 0; background: var(--head); color: var(--title); font-family: var(--fb); line-height: 1.7; }
+  /* เต็มจอหักแถบบน 40px ⇒ ลายกนกแถบล่างอยู่ในจอแรก */
+  header.home { min-height: calc(100svh - 40px); display: flex; align-items: center; padding: 32px 16px 88px; background: var(--head) url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2040%2040'%3E%3Cg%20fill%3D'none'%20stroke%3D'%23D9B45A'%20stroke-opacity%3D'0.10'%20stroke-width%3D'1.4'%20stroke-linecap%3D'round'%3E%3Cpath%20d%3D'M20%2038c-7-4-10-11-7-18%201%204%204%206%206%206-3-5-2-12%203-17%200%205%203%208%206%2010%203%203%203%208%200%2011%202-1%204-3%204-6%203%206%200%2012-6%2014'%2F%3E%3Cpath%20d%3D'M20%2038c-3-3-3-7%200-9%202-1%204%200%204%202s-2%203-3%202'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") repeat-x left bottom / 56px 56px; }
+  .w { max-width: 960px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; align-items: flex-start; }
+  h1 { font-family: Srisakdi, serif; font-weight: 700; color: var(--headink); font-size: clamp(34px, 9vw, 64px); line-height: 1.2; margin: 0; }
   h1 span { display: inline-block; }
-  h1 .sub { display: block; font-family: Sarabun, sans-serif; font-weight: 400; letter-spacing: .14em; font-size: 13px; color: #BFAE86; margin: 4px 0 14px; }
-  .tag { display: inline-block; border: 2px solid #A23B2C; color: #F4EFE3; background: #A23B2C; padding: 2px 10px; font-size: 13px; margin-bottom: 18px; }
-  header p { margin: 0 auto; max-width: 680px; color: #E3DDD0; }
-  a.play { display: inline-block; padding: 12px 28px; min-height: 44px; background: #A23B2C; color: #F4EFE3; font-family: Pridi, serif; font-size: 20px; text-decoration: none; border: 2px solid #A23B2C; }
-  a.play.big { display: block; width: 100%; max-width: 420px; margin: 20px 0 8px; padding: 14px 28px; font-size: 22px; }
-  a.play.alt { background: #17110D; border-color: #5A4630; color: #F0D78C; margin: 8px 0 0; padding: 8px 18px; font-size: 16px; }
-  a.play:hover, a.play:focus-visible { background: transparent; outline: none; }
-  header p.rate { margin-top: 12px; font-size: 14px; }
-  .rate b { display: inline-block; border: 1px solid #E3DDD0; padding: 0 8px; margin-right: 6px; font-weight: 600; }
-  .rate a { color: #F0D78C; }
-  .cue { margin-top: 28px !important; font-size: 13px; color: #BFAE86 !important; }
-  main { padding: 24px 16px 64px; }
-  .worlds { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 0 0 32px; }
-  .world { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 18px 20px; }
-  .world.dark { background: #17110D; color: #EFE3C2; border-color: #5A4630; }
-  .world h2 { margin-top: 0; }
-  .world.dark h2 { font-family: Srisakdi, serif; color: #F0D78C; }
-  .world p { margin: 0 0 8px; }
-  .world .state { font-size: 13px; opacity: .85; }
-  .world.dark a { color: #F0D78C; }
-  h2 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 8px; }
-  footer { font-size: 13px; color: #4A4F5C; }
+  h1 .sub { display: block; font-family: var(--fb); font-weight: 400; letter-spacing: .14em; font-size: 13px; color: var(--on-head3); margin: 4px 0 14px; }
+  .tag { display: inline-block; border: 2px solid var(--headink); color: var(--headink); background: transparent; padding: 2px 10px; font-size: 13px; margin-bottom: 18px; border-radius: var(--r); }
+  header p { margin: 0; max-width: 680px; color: var(--on-head); }
+  a.play.big { display: block; width: 100%; max-width: 420px; min-height: 44px; margin: 20px 0 8px; padding: 14px 28px; background: var(--gold); color: var(--head); border: 2px solid var(--gold); border-radius: var(--r); font-family: var(--fh); font-weight: 600; font-size: 22px; text-align: center; text-decoration: none; }
+  a.play.big:hover, a.play.big:focus-visible { background: transparent; color: var(--gold); outline: none; }
   /*NAV-CSS:START*/
-  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
-  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
-  nav.top a.dark { color: #F0D78C; }
-  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  :root { --bg:#F4ECDC; --surface:#FBF6EA; --ink:#1B2A4A; --muted:#5B5648; --accent:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --seal:#A62B1F; --good:#2F6B4F; --bad:#B3261E; --line:#C9B98F; --line-strong:#8C7A52; --on-head:#E7E2D4; --on-head2:#D8D2C2; --on-head3:#BFB49A; --title:#F4ECDC; --lacquer:#17110D; --lacquer2:#221912; --bronze:#5A4630; --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }
+  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
+  nav.top a { display: inline-block; color: var(--on-head); text-decoration: none; padding: 0 10px; line-height: 40px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: var(--headink); }
+  nav.top a[aria-current] { color: var(--headink); font-weight: 600; }
   nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
-  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .brand { font-weight: 600; color: var(--headink); padding-left: 0; white-space: nowrap; }
   nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
-  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
-  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+  nav.top a.play { background: var(--gold); color: var(--head); border-radius: var(--r); line-height: 28px; padding: 0 12px; font-weight: 600; white-space: nowrap; }
+  nav.top a.play:focus-visible { outline: 2px solid var(--headink); outline-offset: 2px; }
+  body > header:not(.home) { background: var(--head); color: var(--title); padding: 16px 16px 18px; }
+  body > header:not(.home) h1 { font-family: var(--fh); font-weight: 600; color: var(--title); }
+  body > header:not(.home) p { color: var(--on-head2); }
+  body > header:not(.home) a { color: var(--headink); text-decoration: underline; text-underline-offset: 3px; }
+  main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
 /*NAV-CSS:END*/
 </style>
+<!--DOCS-LAYOUT:START--><style>
+.w:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){max-width:960px!important}body>main:not(:has(.w)):not(#app){max-width:960px;margin-left:auto;margin-right:auto}:is(body>main,body>header,body>footer){padding-left:24px;padding-right:24px}
+main h2:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(:first-child){margin-top:28px}main :is(section,.box):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){margin-bottom:17px}
+main:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){overflow-wrap:anywhere}main .st:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){white-space:normal;max-width:100%}@media (max-width:640px){main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){display:block;max-width:100%;overflow-x:auto}}
+main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) :is(th,td):not(:is(.dark,.dark *)){border:1px solid var(--line)}main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) th:not(:is(.dark,.dark *)){background:var(--bg);color:var(--ink)}
+main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){padding:20px 24px;box-shadow:none}main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(.dark){background:var(--surface)}
+main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r)}
+.tag:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border-radius:0}
+</style><!--DOCS-LAYOUT:END-->
 </head>
 <body>
 <!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html" aria-current="page">NEXT LIFE</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="worlds.html">โลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
-<header><div class="w">
-  <span class="tag">เล่นได้ · <span data-fact="version">v0.6.69</span> · <span data-fact="build">2026-11-05</span></span>
+<main><header class="home"><div class="w">
+  <span class="tag">เล่นได้ · <span data-fact="version">v0.6.101</span> · <span data-fact="build">2026-11-06</span></span>
   <h1><span>เกิดใหม่ทั้งที</span> <span>ชาตินี้ขอชิงมาเกิด</span><span class="sub">NEXT LIFE · ชีวิตคนไทยหลายรุ่น</span></h1>
   <p>เกิดแบบสุ่มเป็นคนไทยหนึ่งคน ปี <span data-fact="yearFrom">2500</span>–<span data-fact="yearTo">2569</span> ตามสถิติจริง ใช้ชีวิตไปทีละการ์ด ตายแล้วไปปรโลก เปิดบัญชีบุญบาป แล้วเกิดเป็นลูกหลานหรือเกิดใหม่ตามกรรม</p>
   <a class="play big" href="play.html">เริ่มเล่น →</a>
-  <p class="rate"><b>ผู้เล่นวัยรุ่นขึ้นไป</b>เรื่องจริงบางเรื่องหนัก: <span data-fact="warnWords">ความตาย หนี้ การสูญเสีย และความรุนแรง</span> · ถ้าเล่นแล้วไม่สบายใจ โทร <a href="tel:1323">1323</a> ได้ตลอด 24 ชม.</p>
-  <p class="cue">เลื่อนลงดูว่าเกมเป็นยังไง ↓</p>
-</div></header>
-<main><div class="w">
-  <div class="worlds">
-    <section class="world">
-      <h2>ชาตินี้</h2>
-      <p>เกิดใน <span data-fact="provinces">77</span> จังหวัด ฐานะ <span data-fact="classes">10</span> ระดับตามยุคจริง เจอเหตุการณ์บ้านเมืองจริงอย่างต้มยำกุ้งหรือน้ำท่วมใหญ่ เรียน ทำงาน มีครอบครัว เก็บเงินลงทุน แล้วตายตามตารางชีพจริง</p>
-      <p class="state">การ์ดในเกม <span data-fact="cards">548</span> ใบ · <a href="catalog.html">ดูการ์ดทั้งหมด และลองเล่นการ์ดหนึ่งใบ</a></p>
-    </section>
-    <section class="world dark">
-      <h2>ปรโลก</h2>
-      <p>ตายแล้วไปปรโลก บัญชีบุญบาปเฉลยที่นั่นที่เดียว ได้ภูมิปลายทาง 1 ใน <span data-fact="realms">5</span> แล้วเลือกเฝ้าลูกหลานหรือเกิดใหม่</p>
-      <p class="state">ทางลัดทุจริตบอกราคาบาปเป็นคำ ไม่บอกตัวเลข · กรรมตามทันได้ในชาตินี้</p>
-      <a class="play alt" href="worlds.html">ชาตินี้ · ปรโลก</a>
-    </section>
-  </div>
-
-
-  <footer>โปรเจกต์ส่วนตัว · ข้อมูลการเงินในเกมเป็นข้อมูลเพื่อออกแบบเกม ไม่ใช่คำแนะนำการลงทุน · แฟนตาซีในเกมได้แรงบันดาลใจจากคติไทย ไม่ได้อ้างว่าเป็นคำสอน</footer>
-</div></main>
+</div></header></main>
 </body>
 </html>

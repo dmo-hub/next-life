@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="th">
+<head>
+<!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ต้นแบบสไตล์ 4 ทิศ เทียบใบ 02 (tweak) · ui-redo ใบ 91</title>
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<style>
+/* ต้นแบบใบ 91 · ค่าสีจากใบ 89 (design-skills/04-tones.md) · ใบ 02 = :root ของ src/ui/template.html @eda6266
+   ข้อมูลในฉากเป็นตัวอย่าง ไม่ใช่ข้อความเกมจริง · แผงล่างขวา = ปรับสด (T ซ่อน/แสดง · R คืนค่าเริ่ม) */
+:root { --ui:#1F2430; --uibg:#ECEAE4; --uiline:#C9C4B8; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--uibg); color:var(--ui); font:14px/1.5 "Noto Sans Thai",system-ui,sans-serif; }
+header.sb { position:sticky; top:0; z-index:5; display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; padding:10px 16px; background:#fff; border-bottom:1px solid var(--uiline); }
+header.sb h1 { font-size:16px; margin:0 8px 0 0; }
+.seg { display:inline-flex; border:1px solid var(--uiline); border-radius:8px; overflow:hidden; }
+.seg button { all:unset; cursor:pointer; padding:0 12px; min-height:36px; line-height:36px; font-size:13px; border-right:1px solid var(--uiline); }
+.seg button:last-child { border-right:0; }
+.seg button[aria-pressed="true"] { background:var(--ui); color:#fff; }
+.seg button:focus-visible { outline:2px solid #015EC1; outline-offset:-2px; }
+main { padding:20px 16px 120px; }
+.note { max-width:1280px; margin:0 auto 16px; color:#4A4F5C; font-size:13px; }
+.grid { display:flex; gap:20px; overflow-x:auto; padding-bottom:12px; align-items:flex-start; }
+.col { flex:none; }
+.col > b { display:block; font-size:13px; margin-bottom:6px; }
+.frame { width:390px; border:1px solid var(--uiline); border-radius:12px; overflow:hidden; background:#fff; }
+.frame.w1280 { width:1280px; }
+.single .frame { margin:0 auto; }
+.single .scene + .scene { margin-top:28px; }
+.scene > i { display:block; font-style:normal; font-size:12px; color:#4A4F5C; margin:0 auto 6px; max-width:1280px; }
+
+/* ===== ทิศ (tone) — ทุกฉากอ่านจากตัวแปรชุดนี้ ===== */
+.st { --fs:16px; --dens:1; --onacc:#fff; background:var(--bg); color:var(--ink); font-family:var(--fb); font-size:calc(var(--fs) * var(--sc, 1)); line-height:1.6; }
+.st[data-tone="0"] { --bg:#E4DDCF; --surface:#F7F2E7; --ink:#1F2430; --muted:#4A4F5C; --accent:#B73824; --accent2:#015EC1; --good:#2F6B66; --bad:#B3261E; --line:#B9AE97; --head:#17110D; --headink:#D9B45A; --fh:"Noto Sans Thai",sans-serif; --fb:"Noto Sans Thai",sans-serif; --flogo:Srisakdi,serif; --r:10px; --sh:0 1px 2px rgb(0 0 0/.06),0 8px 24px rgb(0 0 0/.08); --bw:1px; --wbg:#17110D; --wsurf:#221912; --wink:#EFE3C2; --wacc:#D9B45A; }
+.st[data-tone="1"] { --bg:#F4ECDC; --surface:#FBF6EA; --ink:#1B2A4A; --muted:#5B5648; --accent:#A62B1F; --accent2:#7A5C12; --good:#2F6B4F; --bad:#B3261E; --line:#C9B98F; --head:#1B2A4A; --headink:#E8CF8A; --fh:Maitree,serif; --fb:"Noto Sans Thai",sans-serif; --flogo:Maitree,serif; --r:6px; --sh:0 1px 0 #D9B45A, 0 6px 18px rgb(27 42 74/.10); --bw:1px; --wbg:#0F1A33; --wsurf:#17264A; --wink:#F1E6C8; --wacc:#D9B45A; }
+.st[data-tone="2"] { --bg:#EFE6D2; --surface:#FFFDF6; --ink:#2E2A24; --muted:#6B6254; --accent:#8C3B2A; --accent2:#3F5E7A; --good:#4A6B3A; --bad:#A8321F; --line:#D8CDB4; --head:#EFE6D2; --headink:#2E2A24; --fh:Mali,cursive; --fb:Sarabun,sans-serif; --flogo:Mali,cursive; --r:4px; --sh:0 1px 1px rgb(0 0 0/.08), 0 10px 20px -8px rgb(60 40 10/.25); --bw:1px; --wbg:#1E2A3A; --wsurf:#26364A; --wink:#F3EBD8; --wacc:#E3C77A; }
+.st[data-tone="3"] { --bg:#FFF7E6; --surface:#FFFFFF; --ink:#1F1A3D; --muted:#5A5578; --accent:#C2185B; --accent2:#5B2EE0; --good:#0E7A4D; --bad:#C62828; --line:#1F1A3D; --head:#FFFFFF; --headink:#1F1A3D; --fh:Mitr,sans-serif; --fb:"Noto Sans Thai",sans-serif; --flogo:Mitr,sans-serif; --r:22px; --sh:4px 4px 0 #1F1A3D; --bw:2px; --wbg:#120F26; --wsurf:#1D1840; --wink:#F2EEFF; --wacc:#22D3EE; }
+.st[data-tone="4"] { --bg:#FAFAF7; --surface:#FFFFFF; --ink:#1A1A1A; --muted:#5F5F5A; --accent:#0B5C6B; --accent2:#8A5A00; --good:#2E6B3A; --bad:#B42318; --line:#E2E2DC; --head:#FAFAF7; --headink:#1A1A1A; --fh:"IBM Plex Sans Thai",sans-serif; --fb:"Noto Serif Thai",serif; --flogo:"IBM Plex Sans Thai",sans-serif; --r:2px; --sh:none; --bw:1px; --wbg:#1C1A17; --wsurf:#26231F; --wink:#F2EBDD; --wacc:#E0B866; }
+.st[data-tone="4"] { --fs:17px; }
+.st.isekai { --bg:var(--wbg); --surface:var(--wsurf); --ink:var(--wink); --muted:color-mix(in srgb, var(--wink) 72%, var(--wbg)); --accent:var(--wacc); --line:color-mix(in srgb, var(--wink) 25%, var(--wbg)); --head:var(--wbg); --headink:var(--wacc); --onacc:var(--wbg); --good:#7FD4A8; --bad:#FF8A8A; }
+.st.isekai[data-tone="3"] { --sh:4px 4px 0 #22D3EE; }
+
+/* ===== ชิ้นส่วนร่วม ===== */
+.st .logo { background:var(--head); color:var(--headink); text-align:center; padding:calc(10px*var(--dens)) 16px; border-bottom:var(--bw) solid var(--line); }
+.st .logo b { font-family:var(--flogo); font-size:26px; line-height:1.2; }
+.st[data-tone="2"] .logo { background:repeating-linear-gradient(transparent 0 27px, #D8CDB4 27px 28px), var(--head); }
+.st .logo small { display:block; font-size:12px; opacity:.85; }
+.st .wrap { padding:calc(20px*var(--dens)) 16px; display:flex; flex-direction:column; gap:calc(14px*var(--dens)); }
+.st .card { position:relative; background:var(--surface); border:var(--bw) solid var(--line); border-radius:var(--r); box-shadow:var(--sh); padding:calc(18px*var(--dens)) 18px; }
+.st[data-tone="1"] .card { outline:1px solid #D9B45A; outline-offset:-6px; }
+.st[data-tone="1"] .card::before, .st[data-tone="1"] .card::after { content:""; position:absolute; width:22px; height:22px; border:1.5px solid #D9B45A; top:10px; left:10px; border-right:0; border-bottom:0; border-radius:10px 0 0 0; }
+.st[data-tone="1"] .card::after { left:auto; right:10px; transform:scaleX(-1); }
+.st[data-tone="2"] .card { background:repeating-linear-gradient(var(--surface) 0 31px, #ECE3CF 31px 32px); }
+.st[data-tone="2"] .card::before { content:""; position:absolute; top:-9px; left:50%; width:84px; height:20px; margin-left:-42px; background:rgb(214 196 150/.7); transform:rotate(-2deg); }
+.st[data-tone="4"] .card { border-width:0 0 1px; box-shadow:none; padding-left:0; padding-right:0; background:transparent; }
+.st h2, .st h3 { font-family:var(--fh); margin:0; font-weight:600; line-height:1.35; }
+.st h2 { font-size:1.3em; } .st h3 { font-size:1.05em; }
+.st .muted { color:var(--muted); font-size:.875em; }
+.st .age { font-family:var(--fh); color:var(--accent); font-size:.875em; font-weight:600; }
+.st[data-tone="2"] .age { display:inline-block; border:1.5px solid var(--accent); padding:0 8px; transform:rotate(-3deg); border-radius:3px; }
+.st[data-tone="4"] .age { font-size:2.2em; line-height:1; color:var(--ink); }
+.st p { margin:.4em 0; }
+.st .btn { all:unset; box-sizing:border-box; display:flex; align-items:center; gap:10px; width:100%; min-height:48px; padding:8px 14px; border:var(--bw) solid var(--line); border-radius:var(--r); background:var(--surface); color:var(--ink); cursor:pointer; font-family:var(--fb); transition:transform var(--mo,120ms), background var(--mo,120ms); }
+.st .btn .k { flex:none; width:28px; height:28px; display:grid; place-items:center; border-radius:50%; background:var(--accent); color:var(--onacc); font-size:.8em; font-weight:600; }
+.st .btn:hover { background:color-mix(in srgb, var(--accent) 7%, var(--surface)); }
+.st .btn:active { transform:translateY(1px) scale(.99); }
+.st[data-tone="3"] .btn:active { transform:translate(3px,3px); box-shadow:1px 1px 0 var(--line); }
+.st[data-tone="3"] .btn { box-shadow:var(--sh); }
+.st .btn:focus-visible { outline:3px solid var(--accent2); outline-offset:2px; }
+.st .choices { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+.st .cta { all:unset; box-sizing:border-box; min-height:48px; padding:0 18px; border-radius:var(--r); background:var(--accent); color:var(--onacc); font-weight:600; display:inline-flex; align-items:center; cursor:pointer; }
+.st .cta:focus-visible { outline:3px solid var(--accent2); outline-offset:2px; }
+.st .cta.ghost { background:transparent; color:var(--ink); border:var(--bw) solid var(--line); }
+.st .row { display:flex; gap:10px; flex-wrap:wrap; }
+.st .status { display:grid; grid-template-columns:repeat(auto-fill, minmax(92px,1fr)); gap:6px 12px; font-size:.8125em; }
+.st .status span { display:flex; justify-content:space-between; gap:6px; border-bottom:1px solid var(--line); padding:2px 0; }
+.st .up { color:var(--good); } .st .dn { color:var(--bad); }
+.st .head { display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; }
+.st .tag { font-size:.8125em; padding:0 8px; border:1px solid var(--line); border-radius:999px; color:var(--muted); }
+/* เมนูล่าง (390) · ราวซ้าย (1280) */
+.st .menu { display:grid; grid-template-columns:repeat(6,1fr); background:var(--surface); border-top:var(--bw) solid var(--line); }
+.st .menu.n5 { grid-template-columns:repeat(5,1fr); }
+.st .menu button { all:unset; cursor:pointer; min-height:56px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:13px; color:var(--muted); }
+.st .menu button[aria-current] { color:var(--accent); font-weight:600; }
+.st .menu button:focus-visible { outline:3px solid var(--accent2); outline-offset:-3px; }
+.st .menu svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.st .desk { display:grid; grid-template-columns:220px 1fr 380px; gap:20px; padding:20px; align-items:start; }
+.st .desk .menu { grid-template-columns:1fr; border:var(--bw) solid var(--line); border-radius:var(--r); padding:6px; }
+.st .desk .menu button { flex-direction:row; justify-content:flex-start; padding:0 12px; gap:10px; min-height:44px; border-radius:calc(var(--r) - 2px); }
+.st .desk .menu button[aria-current] { background:color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.st .panel { background:var(--surface); border:var(--bw) solid var(--line); border-radius:var(--r); padding:16px; box-shadow:var(--sh); }
+/* แท็บ */
+.st .tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.st .tabs.six { grid-template-columns:repeat(3,1fr); }
+.st .tabs button { all:unset; cursor:pointer; min-height:44px; text-align:center; font-size:.875em; border-bottom:2px solid transparent; color:var(--muted); }
+.st .tabs button[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--accent); font-weight:600; }
+.st[data-tone="3"] .tabs button { border:2px solid var(--line); border-radius:999px; }
+.st[data-tone="3"] .tabs button[aria-selected="true"] { background:var(--accent); color:var(--onacc); border-color:var(--accent); }
+.st .tabs button:focus-visible { outline:3px solid var(--accent2); outline-offset:1px; }
+.st .death { border-color:var(--bad); }
+.st .death h2 { color:var(--bad); }
+.st[data-tone="1"] .death { outline-color:var(--bad); }
+.st .strike { text-decoration:line-through; color:var(--muted); }
+/* เอกสาร */
+.st .nav { display:flex; flex-wrap:wrap; gap:4px 16px; padding:8px 16px; background:var(--head); color:var(--headink); font-size:.875em; }
+.st .nav a { color:inherit; text-decoration:none; min-height:44px; display:inline-flex; align-items:center; }
+.st .nav a[aria-current] { text-decoration:underline; text-underline-offset:4px; }
+.st .doc { max-width:760px; margin:0 auto; padding:24px 16px; }
+.st .doc h2 { margin-top:1.2em; padding-bottom:4px; border-bottom:1px solid var(--line); }
+.st .doc details { border:var(--bw) solid var(--line); border-radius:var(--r); padding:8px 12px; background:var(--surface); margin-top:10px; }
+.st .doc summary { cursor:pointer; min-height:44px; display:flex; align-items:center; font-weight:600; }
+.st .devtabs { display:flex; flex-wrap:wrap; gap:6px; padding:10px 16px; border-bottom:1px solid var(--line); }
+.st .devtabs a { min-height:44px; display:inline-flex; align-items:center; padding:0 12px; border-radius:var(--r); color:var(--ink); text-decoration:none; font-size:.875em; border:1px solid var(--line); }
+.st .devtabs a[aria-current] { background:var(--ink); color:var(--bg); }
+.st .mapbox { margin-top:12px; height:180px; border-radius:var(--r); background:radial-gradient(circle at 30% 40%, #2a3a5a, #0d1220); color:#D9E2F2; display:grid; place-items:center; font-size:.875em; }
+.st .maptabs { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+.st .maptabs span { padding:4px 10px; border:1px solid var(--line); border-radius:999px; font-size:.8125em; }
+@media (prefers-reduced-motion: reduce) { .st .btn, .st .btn:active { transition:opacity 150ms; transform:none; } }
+
+/* แผงปรับสด */
+#tw { position:fixed; right:16px; bottom:16px; z-index:9; width:300px; max-height:calc(100vh - 100px); overflow:auto; background:#fff; border:1px solid var(--uiline); border-radius:12px; box-shadow:0 8px 32px rgb(0 0 0/.18); padding:12px 14px; font-size:13px; }
+#tw[hidden] { display:none; }
+#tw h2 { font-size:14px; margin:0 0 8px; }
+#tw label { display:flex; justify-content:space-between; align-items:center; gap:8px; margin:6px 0; }
+#tw input[type=range] { width:130px; }
+#tw textarea { width:100%; height:64px; font:11px/1.4 ui-monospace,monospace; }
+#tw .rowb { display:flex; gap:6px; margin-top:6px; }
+#tw button { min-height:36px; padding:0 10px; border:1px solid var(--uiline); background:#fff; border-radius:6px; cursor:pointer; }
+#tw button:focus-visible { outline:2px solid #015EC1; }
+@media (max-width:560px) { #tw { left:16px; right:16px; width:auto; } }
+</style>
+</head>
+<body>
+<header class="sb">
+  <h1>ต้นแบบสไตล์ 4 ทิศ</h1>
+  <div class="seg" role="group" aria-label="ดู" id="mode"><button data-v="one">ทีละทิศ ทุกฉาก</button><button data-v="cmp">เทียบ 5 ทิศ ฉากเดียว</button></div>
+  <div class="seg" role="group" aria-label="ทิศ" id="tone"></div>
+  <div class="seg" role="group" aria-label="ฉาก" id="scene"></div>
+  <div class="seg" role="group" aria-label="ความกว้าง" id="width"><button data-v="390">390</button><button data-v="1280">1280</button></div>
+</header>
+<main>
+  <p class="note">ใบ 02 = สไตล์ปัจจุบัน (ตัวเทียบ) · ทิศ 1–4 จากใบ 89 · ข้อความในฉากเป็นตัวอย่าง · เมนู 6 ปุ่มตามข้อ 163 · การ์ดตาย 6 แท็บตามเกม · nav เอกสาร 5 เมนูตามข้อ 182 · เลือกแล้วกด "คัดลอก JSON" ในแผงล่างขวา (T ซ่อนแผง · R คืนค่า)</p>
+  <div id="out"></div>
+</main>
+<aside id="tw" aria-label="แผงปรับสด">
+  <h2>ปรับสด</h2>
+  <label>ทิศที่ชอบสุด <select id="pick"></select></label>
+  <label>ทิศรอง <select id="pick2"></select></label>
+  <label>ขนาดอักษร <input type="range" id="sc" min="0.9" max="1.2" step="0.05"></label>
+  <label>ความแน่น <input type="range" id="dens" min="0.7" max="1.3" step="0.05"></label>
+  <label>มุมโค้ง (แทนค่าทิศ) <input type="range" id="r" min="-1" max="28" step="1"></label>
+  <label>ความเร็วกดปุ่ม ms <input type="range" id="mo" min="0" max="300" step="20"></label>
+  <label>ลวดลาย <select id="orn"><option value="on">ตามทิศ</option><option value="off">ปิด</option></select></label>
+  <label style="display:block">หมายเหตุ <textarea id="memo" style="height:44px;font:12px/1.4 inherit"></textarea></label>
+  <textarea id="json" readonly aria-label="ค่า JSON"></textarea>
+  <div class="rowb"><button id="copy">คัดลอก JSON</button><button id="reset">คืนค่าเริ่ม</button></div>
+</aside>
+<script>
+const TONES = ['ใบ 02 ปัจจุบัน', '1 ไทยร่วมสมัย', '2 สมุดบันทึก', '3 เกมมือถือสดใส', '4 มินิมอลเน้นอ่าน'];
+const SCENES = [['year','การ์ดรายปี+แถบสถานะ'],['menu','เมนูล่าง/ราวซ้าย'],['death','การ์ดตาย'],['isekai','ต่างโลก'],['doc','หน้าเอกสาร'],['dev','หน้า dev']];
+const DEF = { mode:'one', tone:1, scene:'year', width:390, pick:-1, pick2:-1, sc:1, dens:1, r:-1, mo:120, orn:'on', memo:'' };
+const KEY = 'next-life-style-tweak-v1';
+let P = { ...DEF };
+try { P = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch {}
+const $ = s => document.querySelector(s);
+const I = { /* ไอคอนเส้นชุดเมนู · ตัวฉันเป็นวงหน้า ไม่ใช่ path ค่าความสัมพันธ์ (ข้อ 163) */
+  me:'<circle cx="12" cy="8" r="4"/><path d="M5 20c1.5-4 4-5.5 7-5.5s5.5 1.5 7 5.5"/>',
+  focus:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
+  family:'<path d="M3 11l9-7 9 7v9H3z"/><path d="M10 20v-5h4v5"/>',
+  money:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',
+  shelf:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>',
+  more:'<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>',
+  skill:'<path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/>' };
+const LIFE = [['me','ตัวฉัน'],['focus','โฟกัส'],['family','ครอบครัว'],['money','เงิน'],['shelf','สมุด'],['more','เพิ่มเติม']];
+const ISK = [['me','ตัวฉัน'],['focus','โฟกัส'],['skill','สกิล'],['shelf','สมุด'],['more','เพิ่มเติม']];
+const menu = (items, cur='me') => `<nav class="menu ${items.length===5?'n5':''}" aria-label="เมนู">${items.map(([k,l])=>`<button type="button"${k===cur?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${I[k]}</svg>${l}</button>`).join('')}</nav>`;
+const logo = sub => `<div class="logo"><b>เกิดใหม่ทั้งที</b><small>${sub}</small></div>`;
+const status = () => `<div class="status" aria-label="ค่าสถานะ (ตัวอย่าง)">
+  <span>สุขภาพ <b class="up" aria-label="72 เพิ่มขึ้น">72 ▲</b></span><span>ความสุข <b>58</b></span><span>ปัญญา <b class="dn" aria-label="64 ลดลง">64 ▼</b></span><span>เสน่ห์ <b>41</b></span><span>บุญ <b>?</b></span><span>ชื่อเสียง <b>12</b></span></div>`;
+const yearCard = () => `<article class="card"><div class="head"><span class="age">อายุ 24</span><span class="tag">ฐานะ พอมีพอกิน · เงินสด 18,500</span></div>
+  <h2>สอบติดราชการ</h2><p>จดหมายจากกรมมาถึงบ้าน พ่อยิ้มทั้งวัน แต่เพื่อนชวนไปเปิดร้านด้วยกันที่เชียงใหม่</p>
+  <div class="choices"><button class="btn" type="button"><span class="k">1</span>รับราชการ มั่นคงไว้ก่อน</button><button class="btn" type="button"><span class="k">2</span>ไปเปิดร้านกับเพื่อน</button><button class="btn" type="button"><span class="k">3</span>ขอเวลาคิดอีกปี</button></div></article>`;
+const scenes = {
+  year: w => w===1280 ? `${logo('ชาตินี้ขอชิงมาเกิด')}<div class="desk">${menu(LIFE)}<div class="wrap" style="padding:0">${status()}${yearCard()}</div><div class="panel"><h3>ตัวฉัน</h3><p class="muted">แผงค้างขวา (≥1264) · ใบ 09/67</p>${status()}</div></div>`
+    : `${logo('ชาตินี้ขอชิงมาเกิด')}<div class="wrap">${status()}${yearCard()}<div class="row"><button class="cta" type="button">ไปต่อ</button><button class="cta ghost" type="button">สุ่มใหม่</button></div></div>${menu(LIFE)}`,
+  menu: w => w===1280 ? `<div class="desk">${menu(LIFE,'focus')}<div class="panel"><h3>โฟกัส</h3><p>เป้าหมายปีนี้: เก็บเงินดาวน์บ้าน</p><p class="muted">แท็บโฟกัสรายการเดียว (ข้อ 163–165)</p></div><div></div></div>`
+    : `<div class="wrap"><div class="panel"><h3>โฟกัส</h3><p>เป้าหมายปีนี้: เก็บเงินดาวน์บ้าน</p><p class="muted">ลิ้นชักจากเมนูล่าง (&lt;560)</p></div></div>${menu(LIFE,'focus')}`,
+  death: () => `<div class="wrap"><article class="card death"><span class="age">อายุ 81 · ใกล้ตาย → จากไป</span><h2>สมชาย ใจดี</h2>
+    <div class="tabs six" role="tablist">${['สรุป','ชีวิตนี้','ครอบครัว','ตระกูล','ฉายา','อนุสรณ์'].map((t,i)=>`<button role="tab" aria-selected="${i===0}">${t}</button>`).join('')}</div>
+    <p>ข้าราชการบำนาญ · ลูก 3 คน · ฉายา "ผู้ไม่เคยผิดนัด"</p><p class="muted">คู่ชีวิต: <span class="strike">สมศรี</span> (จากไปก่อน 6 ปี)</p>
+    <div class="row"><button class="cta" type="button">เกิดใหม่</button><button class="cta ghost" type="button">แชร์</button></div></article></div>`,
+  isekai: w => `${logo('ต่างโลก · ปีที่ 3')}<div class="wrap">${status()}<article class="card"><span class="age">ระดับ 7</span><h2>ประตูหินเรืองแสง</h2><p>เทพธิดาบอกว่าหลังประตูคือดันเจี้ยนชั้นสอง</p><div class="choices"><button class="btn" type="button"><span class="k">1</span>เข้าไปทันที</button><button class="btn" type="button"><span class="k">2</span>กลับไปฝึกสกิล</button></div></article></div>${menu(ISK)}`,
+  doc: () => `<nav class="nav" aria-label="เว็บ"><a href="#" aria-current="page">วิธีเล่น</a><a href="#">แพตช์โน้ต</a><a href="#">โลก</a><a href="#">การ์ดทั้งหมด</a><a href="#">ห้องผู้พัฒนา</a></nav>
+    <div class="doc"><h2>เล่นยังไง</h2><p>ทุกปีคือการ์ดหนึ่งใบ เลือกทางแล้วชีวิตไปต่อ</p><h2 id="core">ระบบหลัก</h2><p>ค่าสถานะ 6 ตัว บางตัวซ่อนจนกว่าจะเจอ</p>
+    <details><summary>การ์ดตัวอย่าง · ดูผล</summary><p class="muted">เฉลยพับไว้ต่อใบ (ข้อ 177)</p></details></div>`,
+  dev: () => `<nav class="nav" aria-label="เว็บ"><a href="#">วิธีเล่น</a><a href="#">แพตช์โน้ต</a><a href="#">โลก</a><a href="#">การ์ดทั้งหมด</a><a href="#" aria-current="page">ห้องผู้พัฒนา</a></nav>
+    <div class="devtabs"><a href="#">สารบัญ</a><a href="#">สเปก</a><a href="#">คำตัดสินเกม</a><a href="#">UI</a><a href="#" aria-current="page">ผัง</a><a href="#">คลัง</a></div>
+    <div class="doc"><h2>ผังกติกา</h2><div class="maptabs">${['ทวีป','ปรโลก','ดันเจี้ยน','สายตระกูล','หมุดชีวิต','การเมือง'].map(t=>`<span>${t}</span>`).join('')}</div><div class="mapbox">ผัง canvas · พื้นมืดตามโลก (ข้อ 28)</div></div>` };
+function stage(t, sc, w) {
+  const iso = sc==='isekai' ? ' isekai' : '';
+  return `<div class="st${iso}" data-tone="${t}" style="${vars()}">${scenes[sc](w)}</div>`;
+}
+function vars() {
+  let s = `--sc:${P.sc};--dens:${P.dens};--mo:${P.mo}ms;`;
+  if (P.r >= 0) s += `--r:${P.r}px;`;
+  return s;
+}
+function render() {
+  const out = $('#out');
+  const wcls = P.width===1280 ? ' w1280' : '';
+  if (P.mode==='cmp') {
+    out.className = 'grid';
+    out.innerHTML = TONES.map((n,t)=>`<div class="col"><b>${n}</b><div class="frame${wcls}">${stage(t, P.scene, P.width)}</div></div>`).join('');
+  } else {
+    out.className = 'single';
+    out.innerHTML = SCENES.map(([k,l])=>`<section class="scene"><i>${l} · ${TONES[P.tone]}</i><div class="frame${wcls}">${stage(P.tone, k, P.width)}</div></section>`).join('');
+  }
+  document.body.classList.toggle('noorn', P.orn==='off');
+  for (const [id,key] of [['#mode','mode'],['#tone','tone'],['#scene','scene'],['#width','width']])
+    for (const b of document.querySelectorAll(id+' button')) b.setAttribute('aria-pressed', String(b.dataset.v)===String(P[key]));
+  $('#scene').style.display = P.mode==='cmp' ? '' : 'none';
+  $('#tone').style.display = P.mode==='one' ? '' : 'none';
+  save();
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(P)); } catch {} $('#json').value = JSON.stringify(P); }
+$('#tone').innerHTML = TONES.map((n,i)=>`<button data-v="${i}">${i===0?'02':i}</button>`).join('');
+$('#scene').innerHTML = SCENES.map(([k,l])=>`<button data-v="${k}">${l}</button>`).join('');
+const opts = '<option value="-1">ยังไม่เลือก</option>' + TONES.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
+$('#pick').innerHTML = opts; $('#pick2').innerHTML = opts;
+for (const [id,key,num] of [['#mode','mode'],['#tone','tone',1],['#scene','scene'],['#width','width',1]])
+  $(id).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; P[key] = num ? Number(b.dataset.v) : b.dataset.v; render(); });
+for (const k of ['pick','pick2','sc','dens','r','mo','orn','memo']) {
+  const el = $('#'+k); el.value = P[k];
+  el.addEventListener('input', () => { P[k] = ['orn','memo'].includes(k) ? el.value : Number(el.value); render(); });
+}
+$('#copy').addEventListener('click', async () => { const txt = JSON.stringify(P); try { await navigator.clipboard.writeText(txt); $('#copy').textContent = 'คัดลอกแล้ว'; } catch { $('#json').select(); $('#copy').textContent = 'กด Ctrl+C'; } });
+$('#reset').addEventListener('click', () => { P = { ...DEF }; for (const k of ['pick','pick2','sc','dens','r','mo','orn','memo']) $('#'+k).value = P[k]; render(); });
+document.addEventListener('keydown', e => { if (e.target.closest('input,textarea,select')) return; if (e.key==='t'||e.key==='T') $('#tw').hidden = !$('#tw').hidden; if (e.key==='r'||e.key==='R') $('#reset').click(); });
+render();
+</script>
+<style>body.noorn .st .card::before, body.noorn .st .card::after { display:none; } body.noorn .st .card { outline:none; } body.noorn .st[data-tone="2"] .card, body.noorn .st[data-tone="2"] .logo { background-image:none; }</style>
+</body>
+</html>

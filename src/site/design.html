@@ -6,42 +6,41 @@
 <meta name="robots" content="noindex">
 <title><!--__TITLE__--> · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="description" content="<!--__TITLE__--> — คำตัดสินการออกแบบของเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด ตามสำเนาใน repo">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi:wght@400;600&family=Sarabun:wght@400;600&display=swap">
+<link rel="stylesheet" href="../fonts/fonts.css">
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
-  header { background: #1F2430; color: #F4EFE3; padding: 32px 16px 28px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.7; }
+  header { background: var(--head); color: var(--title); padding: 32px 16px 28px; }
   .w { max-width: 900px; margin: 0 auto; }
-  h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
-  header p { margin: 0; color: #E3DDD0; }
-  header a { color: #F4EFE3; }
+  h1 { font-family: var(--fh); font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
+  header p { margin: 0; color: var(--on-head); }
+  header a { color: var(--title); }
   main { padding: 24px 16px 64px; }
-  h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
+  h3 { font-family: var(--fh); font-size: 17px; margin: 16px 0 4px; }
   ul, ol { padding-left: 22px; margin: 0 0 8px; }
   li { margin: 0 0 6px; }
   p { margin: 0 0 8px; }
   table { border-collapse: collapse; width: 100%; font-size: 14px; }
-  th, td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; }
-  th { background: #E9E2D2; font-weight: 600; }
-  code { font-size: 13px; background: #E9E2D2; padding: 0 4px; }
-  a { color: #A23B2C; }
+  th, td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; vertical-align: top; }
+  th { background: var(--bg); font-weight: 600; }
+  code { font-size: 13px; background: var(--bg); padding: 0 4px; }
+  a { color: var(--accent2); }
   .spec-toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 0 0 16px; font-size: 14px; }
-  .spec-toc > div { border: 1px solid #C9BFA9; background: #FBF8F1; padding: 10px 14px; }
+  .spec-toc > div { border: 1px solid var(--line); background: var(--surface); padding: 10px 14px; }
   .spec-toc h3 { margin: 0 0 4px; }
   .spec-toc li > a { line-height: 1.5; padding: 4px 0; }
   .spec-toc li small { display: block; }
-  .spec-toc .sub a { display: block; color: #4A4F5C; padding: 4px 0; }
-  .spec-toc small { color: #4A4F5C; }
-  details.doc { border: 1px solid #C9BFA9; background: #FBF8F1; padding: 8px 14px; margin: 0 0 8px; overflow-wrap: anywhere; }
-  details.doc > summary { font-family: Pridi, serif; font-size: 17px; cursor: pointer; padding: 6px 0; min-height: 32px; }
+  .spec-toc .sub a { display: block; color: var(--muted); padding: 4px 0; }
+  .spec-toc small { color: var(--muted); }
+  details.doc { border: 1px solid var(--line); background: var(--surface); padding: 8px 14px; margin: 0 0 8px; overflow-wrap: anywhere; }
+  details.doc > summary { font-family: var(--fh); font-size: 17px; cursor: pointer; padding: 6px 0; min-height: 32px; }
   details.doc h3 { font-size: 18px; }
-  details.doc h4 { font-family: Pridi, serif; font-size: 16px; margin: 14px 0 4px; }
+  details.doc h4 { font-family: var(--fh); font-size: 16px; margin: 14px 0 4px; }
   details.doc h5 { font-size: 15px; margin: 12px 0 4px; }
-  .lead { font-size: 14px; color: #4A4F5C; }
-  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; color: #A23B2C; }
-  .src { font-size: 13px; color: #4A4F5C; }
-  pre { background: #1F2430; color: #F4EFE3; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
+  .lead { font-size: 14px; color: var(--muted); }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; color: var(--accent2); }
+  .src { font-size: 13px; color: var(--muted); }
+  pre { background: var(--head); color: var(--title); padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
   pre code { background: none; padding: 0; }
   .tw { overflow-x: auto; margin: 0 0 12px; }
   .tw th, .tw td { overflow-wrap: normal; }

@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
+    "setup:git": "git config merge.build.name \"keep ours, rebuild after merge\" && git config merge.build.driver true",
     "bump": "node scripts/bump-version.mjs",
     "rel": "node scripts/rel.mjs",
     "sim": "node harness/run.mjs --n 1000 --seed 1",
@@ -27,6 +28,7 @@
     "grey": "node harness/grey.mjs --n 500 --seed 1",
     "density": "node harness/density.mjs --n 2000 --seed 1",
     "repeat": "node harness/repeat.mjs --n 2000 --seed 1",
+    "arcs": "node harness/arcs.mjs --n 300 --seed 1",
     "passive": "node harness/passive.mjs --n 2000 --seed 1",
     "botdiff": "node harness/botdiff.mjs --n 200 --seed 1",
     "continent": "node harness/continent.mjs --n 10000 --seed 1",

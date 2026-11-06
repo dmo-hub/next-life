@@ -19,9 +19,9 @@ const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade'],
-  outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade'],
+  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end'],
+  outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
   chronic: STAT_KEYS,
@@ -29,7 +29,7 @@ const KEYS = {
   debt: ['kind', 'amount'],
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
-  schedule: ['event', 'after_years'],
+  schedule: ['event', 'after_years', 'chance'],
   when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', 'dark_gate', 'past_life', ...MONEY_KEYS],
   pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
@@ -508,6 +508,23 @@ export const rules = [
       if (e.ambient === undefined) return;
       if (e.ambient !== true) r('.ambient', `ambient ต้องเป็น true (ได้ ${JSON.stringify(e.ambient)}) — ไม่ใช่ ambient ให้ลบช่องออก`);
       if (e.weight === undefined || e.herald_of !== undefined) r('.ambient', 'การ์ดบรรยากาศต้องมี weight และไม่ใช่ใบลาง (herald_of ข้ามแบบชีวิตอยู่แล้ว)');
+    },
+  },
+  {
+    id: 'arc-shape',
+    desc: 'arc = คีย์สายเรื่องรายคน (a-z0-9_ · ชื่ออยู่ทะเบียน content/rules/arcs.yaml) · ออกได้จากกองสุ่ม นัด หรือเรื่องต่อเท่านั้น — ห้ามมี at_age/era/first_of/herald_of/prelude (ทางเข้าที่ตัวคุมสายเลื่อนไม่ได้) · arc_end: true ใช้ได้เฉพาะการ์ดที่มี arc',
+    event(e, ctx, r) {
+      if (e.arc !== undefined) {
+        if (typeof e.arc !== 'string' || !ID_RE.test(e.arc)) r('.arc', `ต้องเป็นคีย์ a-z0-9_ ได้ ${JSON.stringify(e.arc)}`);
+        if (['at_age', 'era', 'first_of', 'herald_of', 'prelude'].some((k) => e[k] !== undefined)) r('.arc', 'การ์ดสายเรื่องห้ามมี at_age/era/first_of/herald_of/prelude — ออกได้จากกองสุ่ม นัด หรือเรื่องต่อ');
+      }
+      for (const { c, path } of choicesOf(e)) {
+        for (const [w, p] of [[c, path], ...list(c.outcomes).map((o, i) => [o, `${path}.outcomes[${i}]`])]) {
+          if (w?.arc_end === undefined) continue;
+          if (w.arc_end !== true) r(`${p}.arc_end`, `ต้องเป็น true ได้ ${JSON.stringify(w.arc_end)}`);
+          else if (e.arc === undefined) r(`${p}.arc_end`, 'arc_end ใช้ได้เฉพาะการ์ดที่มี arc');
+        }
+      }
     },
   },
   {

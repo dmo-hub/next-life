@@ -3,6 +3,7 @@
 // — พิสูจน์ว่าตัววัดจับผลจุดเกิดได้จริง ไม่ใช่เรียงถูกเพราะบังเอิญ · รันซ้ำ seed เดิมต้องได้ผลเดิมทุกหลัก
 import { playLife, openChoices, mixSeed, makeRng, CLASSES, standingOf } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
+import { BOTS } from './bots.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
@@ -21,11 +22,11 @@ const median = (xs) => {
 };
 const f = (v, d = 2) => (Number.isFinite(v) ? v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }) : '-');
 
-function run(content, count) {
+function run(content, count, bot = randomBot) {
   const out = [];
   for (let i = 0; i < count; i++) {
-    const { state } = playLife(mixSeed(seed, i), content, randomBot);
-    out.push({ d: CLASSES.indexOf(state.cls), ses: state.ses, decade: Math.floor(state.birthYear / 10) * 10, w: state.estate.moneyAtBirth, occ: state.occupation, bk: state.bankruptcies });
+    const { age, state } = playLife(mixSeed(seed, i), content, bot);
+    out.push({ age, d: CLASSES.indexOf(state.cls), ses: state.ses, decade: Math.floor(state.birthYear / 10) * 10, w: state.estate.moneyAtBirth, occ: state.occupation, bk: state.bankruptcies });
   }
   return out;
 }
@@ -197,6 +198,16 @@ const loanOk = loanErr === 0 && flagLeak === 0 && SOURCES.every((k) => bySource[
 console.log(`\nบอทกู้ ${LOAN_LIVES} ชีวิต: กู้อย่างน้อยครั้งหนึ่ง ${loanLives} ชีวิต · ` + SOURCES.map((k) => `${k} ${bySource[k] ?? 0}`).join(' · ') + ` · พัง ${loanErr} · ธงนอกระบบไม่ตรง ${flagLeak} → ${loanOk ? 'ผ่าน' : 'ตก'}`);
 console.log(`คนที่กู้: ตายพร้อมหนี้ ${f(loanLives ? (loanNeg / loanLives) * 100 : NaN)}% · ล้มละลาย ${f(loanLives ? (loanBk / loanLives) * 100 : NaN)}% (บอทเดิม ${f(negP)}% · ${f(bkP)}%)`);
 if (!loanOk) fails++;
+
+// บอทสายสุขภาพ (decisions 335): บอทข้างบนไม่มีโฟกัส ⇒ มองไม่เห็นว่าคนมีเงินจ่ายค่าดูแลตัวอยู่นานขึ้นแค่ไหน · พิมพ์เทียบ seed ชุดเดียวกัน ไม่ตัดสิน
+const HEALTH_LIVES = Math.min(n, 10000);
+const care = run(content, HEALTH_LIVES, BOTS.สายสุขภาพ);
+const base = real.slice(0, HEALTH_LIVES);
+const meanAge = (xs, ok) => {
+  const ys = xs.filter((x) => ok(x.d));
+  return ys.reduce((a, x) => a + x.age, 0) / ys.length;
+};
+console.log(`\nบอทสายสุขภาพ ${HEALTH_LIVES} ชีวิต (ไม่ตัดสิน · อายุตายเฉลี่ย ทรัพย์มัธยฐาน · วงเล็บ = บอทเดิม seed เดียวกัน): ` + BANDS.map(([b, ok]) => `${b} ${f(meanAge(care, ok))} ปี ${f(med(care, (x) => ok(x.d)), 0)} บาท (${f(meanAge(base, ok))} ปี ${f(med(base, (x) => ok(x.d)), 0)})`).join(' · '));
 
 console.log(fails ? `\nไม่ผ่าน ${fails} ด่าน` : '\nผ่านทั้งหมด');
 if (fails) process.exitCode = 1;
