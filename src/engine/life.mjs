@@ -814,8 +814,20 @@ function finishTrack(st, year) {
   const track = st.school && TRACKS[st.school];
   if (!track || st.age !== track.until) return;
   if (eduRank(track.edu) > eduRank(st.edu)) st.edu = track.edu;
-  if (track.exam) for (const ev of preludes(st, track.exam, year)) st.due.push({ kind: 'eraEvent', ev, age: st.age });
-  if (track.gate) st.due.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
+  // เส้นเตรียมทหาร (OQ-1 เจ้าของเคาะ): ยังถือธงฝัน/กำลังอยู่ในสนามสอบ = ด่านจบ ม.6/ปวช. รอจนรู้ผล (trackExit ออกทีหลังใน afterChoice)
+  // เฉพาะ ม.ปลาย/ปวช. — ด่านจบ ม.ต้น (เลือกเรียนต่อ) ต้องออกตามเวลา ไม่งั้นเลือก ม.ปลายช้าเกินอายุจบแล้วค้างในโรงเรียน
+  if (cadetLive(st) && (st.school === 'upper' || st.school === 'voc')) {
+    st.trackWait = true;
+    return;
+  }
+  trackExit(st, track, year);
+}
+
+// ทางออกของช่วงเรียน: ด่านสอบ/ด่านเรียนต่อ หรือบันไดยศ/หางาน
+// out = ที่วางการ์ด: ต้นปีใช้ st.due · ออกกลางปีหลังรู้ผลสอบใช้ after ของการ์ดที่เพิ่งเลือก (st.due รอขึ้นปีใหม่)
+function trackExit(st, track, year, out = st.due) {
+  if (track.exam) for (const ev of preludes(st, track.exam, year)) out.push({ kind: 'eraEvent', ev, age: st.age });
+  if (track.gate) out.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
   else {
     st.school = null;
     if (track.ladder) applyEffects(st, { ladder: track.ladder });
@@ -870,8 +882,11 @@ function startSchool(st, year) {
 }
 
 // การ์ดหางาน: ระหว่างถือธงฝันเตรียมทหาร เลื่อนไว้ (needJob) ออกหลังธงหลุด (เจ้าของเคาะ 2026-11-06)
+// ยังอยู่ในเส้นเตรียมทหาร: ถือธงฝัน · มีลำดับสนามสอบค้าง · หรือผ่านประตูสนามแล้วแต่ยังไม่จบปีสอบ (cadet_exam_door)
+// ประตูต้องนับ: ตัวเลือกเช้าวันสอบล้างธงฝันก่อนแกนเปิดลำดับสนามสอบ — ไม่นับ = การ์ดหางานที่เลื่อนไว้หลุดออกกลางสนามสอบ (S3 ข้อ B)
+const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet_exam_door && !st.flags.cadet_passed));
 function dueJob(st) {
-  if (st.flags.cadet_dream) st.needJob = true;
+  if (cadetLive(st)) st.needJob = true;
   else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
 }
 // เกณฑ์เดียวกับด่านสอบโรงเรียนดัง (career.mjs) — มหาวิทยาลัยรัฐเองไม่มีเกณฑ์ล็อก มีแต่โอกาสสอบติด
@@ -2090,7 +2105,13 @@ export function choose(st, idx, loan) {
   if (ev.id === FUNERAL.wishes && (c.sets_flags ?? []).some((f) => f.startsWith('wish_'))) after.push({ kind: 'eraEvent', ev, age: st.age });
   // เลิกเรียนแล้วหางานทันที
   if (st.needJob && st.flags.cadet_passed) st.needJob = false;   // สอบติดเตรียมทหารแล้ว ไม่ต้องหางาน
-  if (st.needJob && !st.flags.cadet_dream) {
+  // ด่านจบ ม.6/ปวช. ที่รอผลสอบเตรียมทหาร: ธงฝันหลุดและจบสนามสอบแล้ว · สอบติด = เปลี่ยน track ไปแล้ว ไม่มีด่านนี้
+  if (st.trackWait && !cadetLive(st)) {
+    st.trackWait = false;
+    const track = !st.flags.cadet_passed && st.school && TRACKS[st.school];
+    if (track) trackExit(st, track, st.birthYear + st.age, after);
+  }
+  if (st.needJob && !cadetLive(st)) {
     st.needJob = false;
     after.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
   }

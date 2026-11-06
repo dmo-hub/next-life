@@ -11,7 +11,6 @@ const CADET = (() => {
   const POOR = ['ยากไร้', 'ยากจนมาก', 'ยากจน', 'ค่อนข้างจน'];
   const RICH = ['ชนชั้นกลางบน', 'มีอันจะกิน', 'มั่งคั่ง', 'ร่ำรวย'];
   const TH_NUM = ['', 'หนึ่ง', 'สอง', 'สาม', 'สี่'];
-  const TH_YEARS = { 5: 'ห้า', 6: 'หก', 7: 'เจ็ด', 8: 'แปด' };
 
   // ---------- helpers ----------
   const D = (st) => st.content.cadet ?? {};
@@ -617,7 +616,7 @@ const CADET = (() => {
     st.school = b === 'police' ? 'police_cadet' : 'cadet';
     st.needJob = false;
     st.cadet.p2.steps = [['end']];
-    return status('รายงานตัวที่นครนายก', `รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BT(st, b)} อีก${TH_YEARS[commissionYears(st, b)] ?? commissionYears(st, b)}ปีจะได้ติดยศ`);
+    return status('รายงานตัวที่นครนายก', `รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BT(st, b)} อีกหลายปีจะได้ติดยศ`);   // ⚠ ชั่วคราว: ไม่ระบุจำนวนปีจนเปิดเฟส 3 (ตอนนี้ติดยศที่ 22 ตายตัว ไม่ตรง commissionYears)
   };
   S.end = () => 'END';
 
@@ -658,6 +657,8 @@ const CADET = (() => {
 
   return { cadetActive: _cadetActive, cadetAfterChoice: _cadetAfterChoice, cadetCard: _cadetCard, chooseCadet: _chooseCadet, cadetHolding: _cadetHolding };
 })();
+// ธงที่แกนเส้นนี้ตั้งเอง (ไม่มีตัวเลือกในเนื้อหาตั้ง) — lint flag-unset ยอมให้การ์ดอ้างได้
+export const CADET_SET_FLAGS = ['cadet_passed', 'cadet_retry', 'cadet_body_seen'];
 export const cadetActive = CADET.cadetActive;
 export const cadetAfterChoice = CADET.cadetAfterChoice;
 export const cadetCard = CADET.cadetCard;

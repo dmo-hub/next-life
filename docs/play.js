@@ -1158,7 +1158,6 @@ const EXAMS = [...new Set(Object.values(TRACKS).map((t) => t.exam).filter(Boolea
 // ธงที่แกนตั้งเมื่อสอบเข้ามหาวิทยาลัยติด (ทุกทางที่มีการสอบ) — การ์ดแก้บนตอนสอบเข้าอ่านธงนี้ ไม่ติด/ไม่ได้สอบ = ไม่ทวง
 const EXAM_PASS = 'exam_pass:uni';
 // สอบเข้าโรงเรียนนายร้อยต้องผ่านทั้งข้อเขียนและร่างกาย · สอบ ก.พ. ต้องจบปริญญา (B40)
-const CADET_NEED = { stats: { knowledge: { min: 45 }, health: { min: 50 } }, reason: 'ความรู้หรือชีวิตยังไม่ถึงเกณฑ์สอบ' };
 const SCHOOL_FROM = 6;
 // ทุนสอบชิงมีภาระใช้ทุน (B118): ธงค้างจนการ์ดชดใช้ทุนเคลียร์ · การ์ดอยู่ใน content/scholarship_bond.yaml
 const BOND_FLAG = 'scholar_bond';
@@ -1288,19 +1287,8 @@ function schoolGate(st) {
         ],
       },
       { text: 'ขอพรก่อนสอบมหาวิทยาลัยรัฐ', hint: uniHint, requires: uniLock, outcomes: exam({ wish: WISH, stats: { knowledge: 3, network: 1.5 } }) },
-      // ชื่อปุ่มสองโรงเรียนต้องแยกกันออกตั้งแต่อ่านครั้งแรก — ต่อกันแค่คำว่า "ตำรวจ" ผู้เล่นเดาไม่ออกว่าอันแรกคือทหาร (B125)
-      ...[
-        ['cadet', 'สอบเข้านายร้อย จปร. (ทหารบก)', 'ไม่เสียค่าเทอม · จบแล้วติดยศร้อยตรี'],
-        ['police_cadet', 'สอบเข้านายร้อยตำรวจ (สามพราน)', 'ไม่เสียค่าเทอม · จบแล้วติดยศร้อยตำรวจตรี'],
-      ].map(([school, text, hint]) => ({
-        text,
-        hint,
-        requires: CADET_NEED,
-        outcomes: [
-          { weight: 1, ok: true, multipliers: { stats: { knowledge: 2, health: 1.5 } }, text: `สอบติด ได้เข้า${TRACKS[school].name}`, effects: { school, network: 1 } },
-          { weight: 1.2, text: 'สอบไม่ติด ต้องออกหางานทำ', effects: { school: 'none', happiness: -1 } },
-        ],
-      })),
+      // ทางเข้าโรงเรียนนายร้อยตรงจากด่านนี้ถอดแล้ว (OQ-2 · CE-08 เจ้าของเคาะ): ทางหลักของนายร้อยคือเส้นเตรียมทหาร (cadet.mjs)
+      // ผู้หญิงยังเข้าทหาร/ตำรวจทางอื่นได้ตามเดิม · track cadet/police_cadet ยังใช้หลังสอบติดเตรียมทหาร
       { text: 'ออกไปหางานทำ', effects: { school: 'none' } },
     ],
   };
@@ -2029,7 +2017,6 @@ const CADET = (() => {
   const POOR = ['ยากไร้', 'ยากจนมาก', 'ยากจน', 'ค่อนข้างจน'];
   const RICH = ['ชนชั้นกลางบน', 'มีอันจะกิน', 'มั่งคั่ง', 'ร่ำรวย'];
   const TH_NUM = ['', 'หนึ่ง', 'สอง', 'สาม', 'สี่'];
-  const TH_YEARS = { 5: 'ห้า', 6: 'หก', 7: 'เจ็ด', 8: 'แปด' };
 
   // ---------- helpers ----------
   const D = (st) => st.content.cadet ?? {};
@@ -2635,7 +2622,7 @@ const CADET = (() => {
     st.school = b === 'police' ? 'police_cadet' : 'cadet';
     st.needJob = false;
     st.cadet.p2.steps = [['end']];
-    return status('รายงานตัวที่นครนายก', `รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BT(st, b)} อีก${TH_YEARS[commissionYears(st, b)] ?? commissionYears(st, b)}ปีจะได้ติดยศ`);
+    return status('รายงานตัวที่นครนายก', `รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BT(st, b)} อีกหลายปีจะได้ติดยศ`);   // ⚠ ชั่วคราว: ไม่ระบุจำนวนปีจนเปิดเฟส 3 (ตอนนี้ติดยศที่ 22 ตายตัว ไม่ตรง commissionYears)
   };
   S.end = () => 'END';
 
@@ -2676,6 +2663,8 @@ const CADET = (() => {
 
   return { cadetActive: _cadetActive, cadetAfterChoice: _cadetAfterChoice, cadetCard: _cadetCard, chooseCadet: _chooseCadet, cadetHolding: _cadetHolding };
 })();
+// ธงที่แกนเส้นนี้ตั้งเอง (ไม่มีตัวเลือกในเนื้อหาตั้ง) — lint flag-unset ยอมให้การ์ดอ้างได้
+const CADET_SET_FLAGS = ['cadet_passed', 'cadet_retry', 'cadet_body_seen'];
 const cadetActive = CADET.cadetActive;
 const cadetAfterChoice = CADET.cadetAfterChoice;
 const cadetCard = CADET.cadetCard;
@@ -3743,8 +3732,20 @@ function finishTrack(st, year) {
   const track = st.school && TRACKS[st.school];
   if (!track || st.age !== track.until) return;
   if (eduRank(track.edu) > eduRank(st.edu)) st.edu = track.edu;
-  if (track.exam) for (const ev of preludes(st, track.exam, year)) st.due.push({ kind: 'eraEvent', ev, age: st.age });
-  if (track.gate) st.due.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
+  // เส้นเตรียมทหาร (OQ-1 เจ้าของเคาะ): ยังถือธงฝัน/กำลังอยู่ในสนามสอบ = ด่านจบ ม.6/ปวช. รอจนรู้ผล (trackExit ออกทีหลังใน afterChoice)
+  // เฉพาะ ม.ปลาย/ปวช. — ด่านจบ ม.ต้น (เลือกเรียนต่อ) ต้องออกตามเวลา ไม่งั้นเลือก ม.ปลายช้าเกินอายุจบแล้วค้างในโรงเรียน
+  if (cadetLive(st) && (st.school === 'upper' || st.school === 'voc')) {
+    st.trackWait = true;
+    return;
+  }
+  trackExit(st, track, year);
+}
+
+// ทางออกของช่วงเรียน: ด่านสอบ/ด่านเรียนต่อ หรือบันไดยศ/หางาน
+// out = ที่วางการ์ด: ต้นปีใช้ st.due · ออกกลางปีหลังรู้ผลสอบใช้ after ของการ์ดที่เพิ่งเลือก (st.due รอขึ้นปีใหม่)
+function trackExit(st, track, year, out = st.due) {
+  if (track.exam) for (const ev of preludes(st, track.exam, year)) out.push({ kind: 'eraEvent', ev, age: st.age });
+  if (track.gate) out.push({ kind: 'eraEvent', ev: schoolGate(st), age: st.age });
   else {
     st.school = null;
     if (track.ladder) applyEffects(st, { ladder: track.ladder });
@@ -3799,8 +3800,11 @@ function startSchool(st, year) {
 }
 
 // การ์ดหางาน: ระหว่างถือธงฝันเตรียมทหาร เลื่อนไว้ (needJob) ออกหลังธงหลุด (เจ้าของเคาะ 2026-11-06)
+// ยังอยู่ในเส้นเตรียมทหาร: ถือธงฝัน · มีลำดับสนามสอบค้าง · หรือผ่านประตูสนามแล้วแต่ยังไม่จบปีสอบ (cadet_exam_door)
+// ประตูต้องนับ: ตัวเลือกเช้าวันสอบล้างธงฝันก่อนแกนเปิดลำดับสนามสอบ — ไม่นับ = การ์ดหางานที่เลื่อนไว้หลุดออกกลางสนามสอบ (S3 ข้อ B)
+const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet_exam_door && !st.flags.cadet_passed));
 function dueJob(st) {
-  if (st.flags.cadet_dream) st.needJob = true;
+  if (cadetLive(st)) st.needJob = true;
   else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
 }
 // เกณฑ์เดียวกับด่านสอบโรงเรียนดัง (career.mjs) — มหาวิทยาลัยรัฐเองไม่มีเกณฑ์ล็อก มีแต่โอกาสสอบติด
@@ -5019,7 +5023,13 @@ function choose(st, idx, loan) {
   if (ev.id === FUNERAL.wishes && (c.sets_flags ?? []).some((f) => f.startsWith('wish_'))) after.push({ kind: 'eraEvent', ev, age: st.age });
   // เลิกเรียนแล้วหางานทันที
   if (st.needJob && st.flags.cadet_passed) st.needJob = false;   // สอบติดเตรียมทหารแล้ว ไม่ต้องหางาน
-  if (st.needJob && !st.flags.cadet_dream) {
+  // ด่านจบ ม.6/ปวช. ที่รอผลสอบเตรียมทหาร: ธงฝันหลุดและจบสนามสอบแล้ว · สอบติด = เปลี่ยน track ไปแล้ว ไม่มีด่านนี้
+  if (st.trackWait && !cadetLive(st)) {
+    st.trackWait = false;
+    const track = !st.flags.cadet_passed && st.school && TRACKS[st.school];
+    if (track) trackExit(st, track, st.birthYear + st.age, after);
+  }
+  if (st.needJob && !cadetLive(st)) {
     st.needJob = false;
     after.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
   }
