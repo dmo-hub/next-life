@@ -1,7 +1,7 @@
-import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE } from '../engine/index.mjs';
+import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
@@ -104,7 +104,7 @@ function statusBar(card, s) {
   const bar = el('header', 'sb');
   const r1 = el('div', 'sb-r1');
   const who = el('span', 'sb-who');
-  who.append(el('b', null, `${genLabel()}${st.name}`), whereLine(`${provinceLabel(st)} · ช่วง${card.stage}`));
+  who.append(el('b', null, `${genLabel()}${st.name}`), whereLine(`${provinceLabel(st)} · ช่วง${card.stage}`), headJob(lifeJob(card.age)));
   const age = el('span', 'sb-age');
   age.append(el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : String(card.age)));
   if (!card.funeral) age.append(el('small', null, ' ปี'));
@@ -119,12 +119,12 @@ function statusBar(card, s) {
     heart.setAttribute('aria-label', 'ใกล้ตาย');
     age.append(heart);
   }
-  r1.append(avatar(card.age), who, age);
+  r1.append(avatar(card.age), who, sbRight(age, lifeMoneyRow(s)));
   const delta = st.dead ? null : yearDelta(card.age, s);
   const ul = el('ul', 'sb-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
-    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN);
+    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN, String(v), k);
     const d = delta?.[k];
     if (d) {
       const em = el('em', d < 0 ? 'dn' : null);
@@ -138,12 +138,44 @@ function statusBar(card, s) {
   bar.append(r1, ul);
   return bar;
 }
+// คอลัมน์ขวาของแถวบน (ui-redo 109 · ข้อ 233): อายุ แล้วฐานะ + เงินสด (ต่างโลก "ทอง") ใต้อายุ — แถบเหลือสองส่วน ไม่มีแถวเงินแยก
+function sbRight(age, money) {
+  const right = el('span', 'sb-right');
+  right.append(age, money);
+  return right;
+}
+// หัวการ์ด (ui-redo ข้อ 161–162): แถวใต้ชื่อมีแค่คำ ไม่มีเกจ — ตัวเต็ม (เงินกู้ · รายได้ · ตำแหน่ง) อยู่แผงตัวฉัน (ข้อ 61 · เงินรวมเข้าแผงตัวฉันแล้ว ui-redo 131)
+// อาชีพเป็นบรรทัดแยกจากบรรทัดจังหวัด ป้ายพักทับแค่บรรทัดจังหวัด (data-where) อาชีพจึงยังอยู่
+const headJob = (text) => el('small', 'hd-job', text);
+// เกษียณบนหัวการ์ดเหลือคำเดียว — "เคยเป็น…" ยาวจนตกบรรทัดที่ 390 และแผงตัวฉันบอกครบอยู่แล้ว
+const lifeJob = (age) => {
+  const t = jobText(st, age);
+  return t.startsWith('เกษียณ (') ? 'เกษียณ' : t;
+};
+function headCash(label, value, warn = null) {
+  const cash = el('span', warn ? 'hd-cash red' : 'hd-cash');
+  cash.append(el('span', 'mk', label), el('b', null, value));
+  // แดงต้องมีคำกำกับ ไม่พึ่งสีอย่างเดียว
+  if (warn) cash.append(el('span', 'lw', warn));
+  return cash;
+}
+function lifeMoneyRow(s) {
+  const row = el('div', 'hd-row');
+  // เงินกู้เป็นยอดค้างของสัญญา ไม่หักจากเงินสด (เหมือนช่องเงินในแผงตัวฉัน) — มีกู้ชนะติดลบเมื่อเป็นทั้งคู่ เพราะเป็นเหตุที่ผู้เล่นต้องทำอะไรต่อ
+  const warn = totalDebt(st) > 0 ? 'มีกู้' : s.money < 0 ? 'ติดลบ' : null;
+  row.append(el('span', 'mk', 'ฐานะ'), el('span', 'hd-word', classNow(st)), headCash('เงินสด', shortBaht(Math.round(s.money)), warn));
+  return row;
+}
 // ช่องค่าหนึ่งช่อง: ป้าย ตัวเลข แถบเส้น — แถบสถานะกับแผงตัวฉันของทั้งสองโลกใช้ตัวเดียวกัน หน้าตาจึงไม่แยกกันเพี้ยน
 // shown = ตัวเลขบนป้ายเมื่อไม่ใช่ค่าเดียวกับความยาวแถบ (เกจทองต่างโลก: แถบเป็น % ของสเกล ป้ายเป็นทองจริง)
-function meterLi(label, v, low, shown = String(v)) {
+// icon = key ค่าสำหรับไอคอนหน้าชื่อ · ไอคอน aria-hidden ชื่อค่ายังเป็นข้อความเดิม โปรแกรมอ่านจออ่านเท่าเดิม
+function meterLi(label, v, low, shown = String(v), icon = null) {
   const li = el('li', low ? 'low' : null);
   const head = el('span', 'mh');
-  head.append(el('span', 'mk', label), el('b', 'num', shown));
+  const mk = el('span', 'mk', label);
+  const svg = icon && statIcon(icon);
+  if (svg) mk.insertAdjacentHTML('afterbegin', svg);
+  head.append(mk, el('b', 'num', shown));
   const track = el('span', 'br');
   const fill = el('i');
   fill.style.width = `${v}%`;
@@ -152,64 +184,139 @@ function meterLi(label, v, low, shown = String(v)) {
   return li;
 }
 
-// ปุ่มโฟกัสชีวิต (B163): แถบเต็มใต้ค่าสถานะ — การ์ดกว้างไม่เกิน 460 ทุกจอ ข้างค่าสถานะไม่มีที่พอ
-// ไม่ใช่ตัวเลือกของการ์ด (อยู่นอก .choices · ไม่มีเลขปุ่มลัด) · เปลี่ยนแล้วเซฟทันที ผลไปคิดตอนสิ้นปี
+// แท็บโฟกัสชาติไทย (ui-redo 50 · ข้อ 65 68 69 · JSON 47 แบบ ก รายการเดียว): ตอนนี้ · เปลี่ยนเป็น · ปณิธาน
+// ไม่ใช่ตัวเลือกของการ์ด (ไม่มีเลขปุ่มลัด) · เปลี่ยนแล้วเซฟทันที ผลไปคิดตอนสิ้นปี
 const focusName = (id) => (id === FOCUS_FLOW ? FOCUS_FLOW_NAME : lifeFocusDefs(st)[id].name);
 const focusFx = (id) => (id === FOCUS_FLOW ? 'ไม่ทุ่มเรื่องไหนเป็นพิเศษ' : focusWords(lifeFocusDefs(st)[id], STAT_LABELS));
-function focusBar(card, open = false) {
-  const cur = st.focus ?? FOCUS_FLOW;
-  const wrap = el('div', 'focus');
-  const btn = el('button', 'focus-btn');
-  btn.type = 'button';
-  btn.setAttribute('aria-expanded', String(open));
-  const fx = focusFx(cur);
-  btn.append(el('span', 'focus-k', 'โฟกัส'), el('b', null, focusName(cur)), el('span', 'focus-fx', fx), el('span', 'focus-go', open ? 'ปิด' : 'เปลี่ยน'));
-  const pick = el('div', 'focus-pick');
-  pick.hidden = !open;
-  for (const id of lifeFocusOffers(st)) {
-    const b = el('button', id === cur ? 'on' : null);
-    b.type = 'button';
-    b.setAttribute('aria-pressed', String(id === cur));
-    b.append(el('b', null, focusName(id)), el('span', 'focus-fx', focusFx(id)));
-    b.onclick = () => {
-      setLifeFocus(st, id);
-      saveWrite(card);
-      const next = focusBar(card);
-      wrap.replaceWith(next);
-      next.querySelector('.focus-btn').focus();
-    };
-    pick.append(b);
+// ปีสะสมเป็นคำ ไม่บอกเลขเกณฑ์ (ข้อ 68) · ชำนาญแล้ว = ครบปีที่ต่อสายได้ ตัวเดียวกับที่แกนใช้เปิดปลายสาย
+function focusWord(id, h = st) {
+  const n = h.focusYears?.[id] ?? 0;
+  if (!n) return null;
+  return n >= st.content.focus.chain_years ? el('span', 'ft-word full', 'ชำนาญแล้ว') : el('span', 'ft-word', 'เริ่มชำนาญ');
+}
+const stageIdx = (name) => STAGES.findIndex((s) => s.name === name);
+// ปณิธาน = สายต้น → ปลาย (after ในทะเบียน) ที่ยังมีความหมายตอนนี้: เลือกได้อยู่ · เคยทุ่มต้นสายแล้ว · หรือยังทันช่วงวัยของปลายสาย
+// สถานะอ่านจาก focusMet ตัวเดียวกับที่แกนเปิดปลายสาย — ครบในช่วงวัยไหนเปิดตั้งแต่ช่วงถัดไป
+function focusGoals(offers) {
+  const defs = lifeFocusDefs(st);
+  const stage = stageOf(st.age);
+  const now = stageIdx(stage);
+  const later = (d) => !d.stages || d.stages.some((s) => stageIdx(s) > now);
+  const rows = [];
+  for (const [id, d] of Object.entries(defs)) {
+    if (!d.after) continue;
+    const from = d.after;
+    const met = st.focusMet?.[from];
+    const tried = (st.focusYears?.[from] ?? 0) > 0;
+    let cls = '', text;
+    if (offers.includes(id)) [cls, text] = ['open', `${focusName(from)}ชำนาญแล้ว · เลือกได้ในช่วงนี้`];
+    else if (met === stage) text = `${focusName(from)}ชำนาญแล้ว · เลือกได้ตั้งแต่ช่วงวัยถัดไป`;
+    else if (met !== undefined) [cls, text] = later(d) || d.stages?.includes(stage) ? ['', `${focusName(from)}ชำนาญแล้ว · ยังไม่เข้าเงื่อนไขตอนนี้`] : ['gone', `${focusName(from)}ชำนาญแล้ว · ช่วงวัยที่เลือกได้ผ่านไปแล้ว`];
+    else if (!later(d)) continue;
+    else if (tried) text = `${focusName(from)}เริ่มชำนาญ · ทุ่มต่ออีกหน่อยจะเปิด`;
+    else if (offers.includes(from)) text = 'ยังไม่ได้ทุ่ม';
+    else continue;
+    const li = el('li', cls || null);
+    li.append(el('b', null, `${focusName(from)} → ${d.name}`), el('span', 'st', text));
+    rows.push(li);
   }
-  btn.onclick = () => {
-    const next = focusBar(card, pick.hidden);
-    wrap.replaceWith(next);
-    next.querySelector('.focus-btn').focus();
-  };
-  wrap.append(btn, pick);
+  return rows;
+}
+// ส่วนร่วมของแท็บโฟกัสสองโลก: ตอนนี้ + เปลี่ยนเป็น · ชาติไทยต่อปณิธาน ต่างโลกไม่มีสายต้น–ปลาย
+// rows = { id, name, fx, on, tags } · pick เปลี่ยนค่าของโลกนั้น · draw วาดแผงใหม่ทั้งก้อนเพราะ "ตอนนี้" ต้องตาม
+function focusRows(wrap, now, rows, pick, draw) {
+  const nowBox = el('div', 'ft-now');
+  nowBox.append(el('b', null, now.name), ...now.tags, el('span', 'ft-fx', now.fx));
+  const ul = el('ul', 'ft-list');
+  for (const r of rows) {
+    const b = el('button', r.on ? 'on' : null);
+    b.type = 'button';
+    b.dataset.focus = r.id;
+    b.setAttribute('aria-pressed', String(r.on));
+    b.append(el('b', null, r.name), ...r.tags, el('span', 'ft-fx', r.fx));
+    b.onclick = () => {
+      pick(r.id);
+      const next = draw();
+      wrap.replaceWith(next);
+      next.querySelector(`[data-focus="${r.id}"]`)?.focus();
+    };
+    const li = el('li');
+    li.append(b);
+    ul.append(li);
+  }
+  wrap.append(el('h3', null, 'ตอนนี้'), nowBox, el('h3', null, 'เปลี่ยนเป็น'), ul);
+}
+function focusPanel(card) {
+  const wrap = el('div', 'ft');
+  if (st.dead || card.kind === 'death') {
+    wrap.append(...focusSummary());
+    return wrap;
+  }
+  const cur = st.focus ?? FOCUS_FLOW;
+  const defs = lifeFocusDefs(st);
+  const offers = lifeFocusOffers(st);
+  const tagsOf = (id) => [focusWord(id)].filter(Boolean);
+  const rows = offers.map((id) => ({ id, name: focusName(id), fx: focusFx(id), on: id === cur, tags: [...tagsOf(id), ...(defs[id]?.after ? [el('span', 'ft-new', 'ปลายสาย')] : [])] }));
+  focusRows(wrap, { name: focusName(cur), fx: focusFx(cur), tags: tagsOf(cur) }, rows, (id) => {
+    setLifeFocus(st, id);
+    saveWrite(card);
+  }, () => focusPanel(card));
+  const goals = focusGoals(offers);
+  const chain = el('ul', 'ft-chain');
+  chain.append(...goals);
+  wrap.append(el('h3', null, 'ปณิธาน'), goals.length ? chain : el('p', 'ft-note', 'ช่วงวัยนี้ไม่มีสายที่ต่อได้'));
   return wrap;
+}
+// ตอนตาย/ปรโลก (ข้อ 69): เรื่องที่ทุ่มมากสุด = focusMain ตัวเดียวกับที่ทายาทรับ · เรื่องอื่นเรียงตามปีที่ทุ่ม ไม่บอกตัวเลข
+function focusSummary() {
+  const defs = lifeFocusDefs(st);
+  const main = focusMain(st, defs);
+  const head = el('h3', null, af ? 'ชาติที่แล้วทุ่มเทมากสุด' : 'ชาตินี้ทุ่มเทมากสุด');
+  if (!main) return [head, el('p', 'ft-note', `${FOCUS_FLOW_NAME} ไม่ได้ทุ่มเรื่องไหนเต็มปี`)];
+  const box = el('div', 'ft-now');
+  box.append(el('b', null, focusName(main)), ...[focusWord(main)].filter(Boolean));
+  const kid = defs[main].kid;
+  if (kid && defs[kid]) box.append(el('span', 'ft-fx', `ทายาทในตระกูลเริ่มชาติด้วย${defs[kid].name}`));
+  const ys = st.focusYears ?? {};
+  const rest = Object.keys(defs).filter((id) => id !== main && ys[id] > 0).sort((a, b) => ys[b] - ys[a]);
+  if (!rest.length) return [head, box];
+  const ul = el('ul', 'ft-ro ft-list');
+  for (const id of rest) {
+    const li = el('li', null, `${focusName(id)} `);
+    const w = focusWord(id);
+    if (w) li.append(w);
+    ul.append(li);
+  }
+  return [head, box, el('h3', null, 'เรื่องอื่นที่เคยทุ่ม'), ul];
 }
 
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทยและต่างโลก · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
 // ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ
-const LIFE_MENU = [['me', 'ตัวฉัน'], ['family', 'ครอบครัว'], ['money', 'เงิน'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
+// โฟกัสแยกแท็บถัดจากตัวฉัน (ui-redo 50 51) · ทุกปุ่มทุกโลกมีไอคอนคู่ป้าย (ข้อ 260)
+// เงินไม่มีปุ่มของตัวเอง อยู่ในแผงตัวฉัน (ui-redo 131 · ข้อ 229)
+const LIFE_MENU = [['me', 'ตัวฉัน'], ['focus', 'โฟกัส'], ['family', 'ครอบครัว'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
 // ต่างโลกไม่มีครอบครัวกับเงินบาทให้ดู — ทอง ชื่อเสียง อาชีพอยู่ในแผงตัวฉันของร่างนี้ (ui-redo ใบ 13)
-// สกิลแยกปุ่มเพราะสมุดสกิล (06s-3) จะมาต่อที่แผงนี้ · ความเร็วย้ายจากการ์ดมาที่เมนู (ใบ 14)
-const ISEKAI_MENU = [['me', 'ตัวฉัน'], ['skill', 'สกิล'], ['speed', 'ความเร็ว'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
-function lifeMenu(card, box) {
+// สกิลแยกปุ่มเพราะสมุดสกิล (06s-3) จะมาต่อที่แผงนี้ · ไม่มีปุ่มความเร็ว: ใบตาไม่เดินเอง ผู้เล่นกด "ต่อ" เองแบบชาติไทย (ui-redo 81)
+const ISEKAI_MENU = [['me', 'ตัวฉัน'], ['focus', 'โฟกัส'], ['skill', 'สกิล'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
+// ปรโลก (ui-redo ใบ 15 · ชุด A ของใบ 02): ชีวิตจบแล้ว ไม่มีเงินให้ดู — ตัวฉันกลายเป็นชีวิตที่แล้ว · ครอบครัวกลายเป็นตระกูล · โฟกัสเป็นสรุปชาติที่แล้ว เปลี่ยนไม่ได้
+const AFTER_MENU = [['past', 'ชีวิตที่แล้ว'], ['focus', 'โฟกัส'], ['family', 'ตระกูล'], ['shelf', 'สมุด'], ['more', 'เพิ่มเติม']];
+function lifeMenu(card, box, after = false) {
   // การ์ดใหม่วาดทับทั้ง root แผงเดิมหายไปด้วยแล้ว
   sheetClose = null;
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
   const isk = card.kind === 'isekai';
-  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), skill: () => isekaiSkillPanel(card.status), speed: speedPanel, family: familyPanel, money: () => moneyPanel(card), more: morePanel };
+  const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), focus: () => (isk ? isekaiFocusPanel(card) : focusPanel(card)), skill: () => isekaiSkillPanel(card.status), family: after ? clanPanel : familyPanel, more: morePanel, past: pastPanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
   const views = { shelf: () => openShelf() };
   // ต่างโลกช่วงยังไม่มีร่าง (ไม่มีหน้าต่างสถานะ) ไม่มีอะไรให้แผงตัวฉันกับสกิลโชว์
-  const items = isk ? ISEKAI_MENU.filter(([id]) => (id !== 'me' && id !== 'skill') || card.status) : LIFE_MENU;
+  // ห้องสีขาวเลือกสกิลมีร่างแล้วแต่รายการโฟกัสเริ่มที่ใบตาแรก จึงกรองแท็บโฟกัสด้วยรายการ ไม่ใช่ร่าง
+  const items = after ? AFTER_MENU : isk ? ISEKAI_MENU.filter(([id]) => (id === 'focus' ? (af?.isekai ?? st?.trip)?.focusOffers?.length : (id !== 'me' && id !== 'skill') || card.status)) : LIFE_MENU;
   for (const [id, label] of items) {
     const b = el('button', null);
     b.type = 'button';
     b.dataset.menu = id;
+    b.insertAdjacentHTML('beforeend', menuIcon(id));
     b.append(el('span', null, label));
     if (sheets[id]) {
       b.setAttribute('aria-expanded', 'false');
@@ -233,10 +340,10 @@ function lifeMenu(card, box) {
     nav.append(b);
   }
   // แผงเปิดค้างตามที่เลือกไว้ทุกการ์ด — การ์ดใหม่วาด root ใหม่ทั้งก้อน · รอ render ต่อเมนูเข้า root ก่อนค่อยเปิด
-  // ต่างโลกไม่มีครอบครัว/เงิน ชีวิตไทยไม่มีสกิล/ความเร็ว ⇒ แผงที่เลือกไว้ไม่มีในเมนูนี้ เปิดตัวฉันแทน
+  // ต่างโลกไม่มีครอบครัว/เงิน ชีวิตไทยไม่มีสกิล ⇒ แผงที่เลือกไว้ไม่มีในเมนูนี้ เปิดตัวฉันแทน (ปรโลกเปิดชีวิตที่แล้ว)
   pinMenu = () => {
     if (!box.isConnected) return;
-    const it = items.find(([id]) => id === pinId && sheets[id]) ?? items.find(([id]) => id === 'me');
+    const it = items.find(([id]) => id === pinId && sheets[id]) ?? items.find(([id]) => id === (after ? 'past' : 'me'));
     const b = it && nav.querySelector(`[data-menu="${it[0]}"]`);
     if (b) openSheet(it[1], sheets[it[0]](), box, b, it[0]);
   };
@@ -299,29 +406,93 @@ function openSheet(title, content, box, from, id) {
 }
 const closeSheet = (keep) => sheetClose?.(keep);
 
-// แผงตัวฉัน: ค่าเต็มคู่คำอธิบาย · โฟกัส · ฐานะและงาน (ย้ายมาจากใต้แถบสถานะของการ์ด) · ไม่มีลูกศรปีนี้ — ลูกศรอยู่บนแถบสถานะที่เดียว
-// การ์ดตายเปิดได้เหมือนกัน เห็นค่าตอนจากไป แต่ไม่มีโฟกัส (ชีวิตจบแล้ว)
+// แผงตัวฉัน: ค่าเต็มคู่คำอธิบาย · เงิน · ฐานะและงาน (ย้ายมาจากใต้แถบสถานะของการ์ด) · ไม่มีลูกศรปีนี้ —
+// โฟกัสย้ายไปแท็บของตัวเองแล้ว (ui-redo 50) · การ์ดตายเปิดได้เหมือนกัน เห็นค่าตอนจากไป
+// คำอธิบาย "เงิน · หนี้" อยู่ใต้เงินที่เดียว (ui-redo 131 · ข้อ 229) · ประวัติงานท้ายฐานะและงาน
 function mePanel(card) {
   const s = statsOf(st);
   const help = new Map(STAT_HELP);
   const wrap = el('div', 'me');
+  // คำอธิบายทุกชิ้นพับด้วยปุ่มเดียว (ข้อ 230) — เกจกับยอดเงินไม่พับ
+  const hp = [];
   const ul = el('ul', 'me-m');
   for (const k of SHOWN_STATS) {
     const v = Math.round(s[k]);
-    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN && !st.dead);
-    if (help.has(STAT_LABELS[k])) li.append(el('p', null, help.get(STAT_LABELS[k])));
+    const li = meterLi(STAT_LABELS[k], v, k === 'health' && v <= HEALTH_WARN && !st.dead, String(v), k);
+    if (help.has(STAT_LABELS[k])) li.append(hp[hp.push(el('p', null, help.get(STAT_LABELS[k]))) - 1]);
     ul.append(li);
   }
-  const shown = new Set(SHOWN_STATS.map((k) => STAT_LABELS[k]));
+  const shown = new Set([...SHOWN_STATS.map((k) => STAT_LABELS[k]), MONEY_HELP]);
   const dl = el('dl');
   for (const [k, v] of STAT_HELP) if (!shown.has(k)) dl.append(el('dt', null, k), el('dd', null, v));
-  wrap.append(el('h3', null, 'ค่าสถานะ'), ul, dl);
-  if (!st.dead && card.kind !== 'death') wrap.append(el('h3', null, 'โฟกัส'), focusBar(card));
+  hp.push(dl);
+  const hh = el('div', 'me-hh');
+  const fold = el('button', 'me-fold');
+  fold.type = 'button';
+  const setOpen = (open) => {
+    for (const e of hp) e.hidden = !open;
+    fold.setAttribute('aria-expanded', String(open));
+    fold.textContent = open ? 'ซ่อนคำอธิบาย' : 'ดูคำอธิบาย';
+  };
+  fold.onclick = () => {
+    const open = fold.getAttribute('aria-expanded') !== 'true';
+    setOpen(open);
+    meHelpSave(open);
+  };
+  hh.append(el('h3', null, 'ค่าสถานะ'), fold);
+  wrap.append(hh, ul, dl, el('h3', null, 'เงิน'), moneyBox(card, hp));
   const meta = el('p', 'meta');
   metaLine(meta, standParts(card));
   wrap.append(el('h3', null, 'ฐานะและงาน'), meta);
+  const wh = workHistory();
+  if (wh) wrap.append(el('h3', null, 'งานที่เคยทำ'), wh);
   if (itemsVisible(st)) wrap.append(el('h3', null, 'ของติดตัว'), kitList());
+  setOpen(meHelpOpen());
   return wrap;
+}
+const MONEY_HELP = 'เงิน · หนี้';
+// พับ/กางคำอธิบายจำในเครื่อง ไม่ลงเซฟเกม (ข้อ 230) · ไม่เคยกด = พับ · storage ปิด = พับทุกครั้ง ไม่พัง
+const ME_HELP_KEY = 'next-life-me-help-v1';
+function meHelpOpen() {
+  try {
+    return localStorage.getItem(ME_HELP_KEY) === 'open';
+  } catch {
+    return false;
+  }
+}
+function meHelpSave(open) {
+  try {
+    localStorage.setItem(ME_HELP_KEY, open ? 'open' : 'closed');
+  } catch {
+    // ไม่มี storage: ค่าพับอยู่แค่แผงนี้
+  }
+}
+// ประวัติงานเรียงช่วงอายุจาก st.workSpans (ข้อ 231) · ปีที่ทำก่อนมีช่องนี้ (เซฟเก่า) ขึ้นเป็นปีรวมต่ออาชีพไว้ก่อน ไม่มีอายุ
+// เพราะไม่รู้ว่าทำช่วงไหน — เจ้าของเคาะไม่เดาอายุย้อนหลัง · ยังไม่เคยทำงาน = ไม่มีหัวนี้
+function workHistory() {
+  const occs = st.content.era.finance.occupations;
+  const name = (id) => occs.find((o) => o.id === id)?.name ?? id;
+  const spans = st.workSpans ?? [];
+  const inSpans = {};
+  for (const x of spans) inSpans[x.occ] = (inSpans[x.occ] ?? 0) + x.to - x.from + 1;
+  const ul = el('ul', 'wh wh-me');
+  for (const [id, n] of Object.entries(st.workYears ?? {})) {
+    const left = n - (inSpans[id] ?? 0);
+    if (left <= 0) continue;
+    const li = el('li');
+    li.append(el('span', null, name(id)), el('b', 'num', `${left} ปี`));
+    ul.append(li);
+  }
+  const last = spans.at(-1);
+  // ปีนี้ยังไม่ถูกนับ (นับตอนขึ้นปี) — ช่วงที่จบปีที่แล้วด้วยอาชีพเดิมและยังทำอยู่คือช่วงปัจจุบัน
+  const now = !st.dead && isWorking(st) && last?.occ === st.occupation && last.to === st.age - 1;
+  for (const x of spans) {
+    const li = el('li');
+    const to = x === last && now ? 'ตอนนี้' : x.to === x.from ? '' : x.to;
+    li.append(el('span', 'wh-age', `อายุ ${x.from}${to === '' ? '' : `–${to}`}`), el('span', null, name(x.occ)));
+    ul.append(li);
+  }
+  return ul.childElementCount ? ul : null;
 }
 // ของติดตัว (B78): ช่องสวมใส่ตามทะเบียน + กระเป๋า n/cap · ไม่มีปุ่มใส่/ถอด — ของลงช่องเองตอนได้ เป้เต็มขายเอง
 // ช่องว่างเขียนว่า "ว่าง" ให้เห็นว่ามีช่องรออยู่ (หัวนี้โชว์เฉพาะเมื่อ itemsVisible)
@@ -494,6 +665,12 @@ function lifeChart(life, deathAge, cause) {
   box.append(svg, legend, cap);
   const echoes = echoBand(x, W, deathAge, cap);
   if (echoes) box.append(el('div', 'h', 'เหตุและผล'), ...echoes);
+  const arcs = arcSummary(st);
+  if (arcs.length) {
+    const list = el('ol', 'echo-list');
+    for (const a of arcs) list.append(el('li', null, `${a.name} · ${a.n} ตอน · ${a.end ? 'จบเรื่องแล้ว' : 'ยังค้างอยู่'}`));
+    box.append(el('div', 'h', 'เรื่องต่อเนื่อง'), list);
+  }
   const money = sparkline(life.money, 0, deathAge, true);
   if (money) box.append(el('div', 'h', 'เงินติดตัว'), money);
   return fold(box, `ทั้งชีวิต · อายุ 0–${deathAge}`);
@@ -749,29 +926,6 @@ function deedsPart(deeds) {
   return part;
 }
 
-// แถบภาพพิกเซลปรโลก (ต้นแบบการ์ด B2) — ทำเครื่องหมายฉากปรโลกให้ต่างจากการ์ดระหว่างชาติใบอื่น
-const COURT_PX = [
-  [0, 25, 76, 5, '#3A2C1F'], [30, 6, 16, 19, '#5A1A14'], [28, 4, 20, 3, '#D9B45A'], [34, 1, 8, 3, '#F0D78C'],
-  [36, 10, 4, 4, '#C98A5A'], [35, 14, 6, 7, '#2F2A6B'], [36, 9, 4, 1, '#F0D78C'],
-  [12, 17, 3, 3, '#C98A5A'], [11, 20, 5, 5, '#EFE3C2'],
-  [4, 3, 1, 1, '#F0D78C'], [68, 5, 1, 1, '#F0D78C'], [60, 2, 1, 1, '#F0D78C'], [18, 6, 1, 1, '#F0D78C'],
-];
-function courtScene() {
-  const wrap = el('div', 'scene');
-  const svg = document.createElementNS(SVG, 'svg');
-  svg.setAttribute('viewBox', '0 0 76 30');
-  svg.setAttribute('preserveAspectRatio', 'xMidYMax meet');
-  svg.setAttribute('shape-rendering', 'crispEdges');
-  svg.setAttribute('aria-hidden', 'true');
-  for (const [x, y, w, h, fill] of COURT_PX) {
-    const r = document.createElementNS(SVG, 'rect');
-    for (const [k, v] of Object.entries({ x, y, width: w, height: h, fill })) r.setAttribute(k, v);
-    svg.append(r);
-  }
-  wrap.append(svg);
-  return wrap;
-}
-
 // แบบชีวิต/ฉายาคิดครั้งเดียวต่อการ์ดตาย แล้วลงสมุดฉายา — กดย้อน/วาดซ้ำไม่นับซ้ำ
 function lifeTitles(card) {
   if (!card.lifeTitles) {
@@ -995,13 +1149,15 @@ function sceneSvg(id, sm) {
   return svg;
 }
 // ภาพฉากใบมรณะเป็นพื้นหลังจางทั้งใบ (ui-redo 57): รูปทรงเดิมตัดกรอบแผ่นออก สีเส้นมาจาก CSS — แผ่นทึบกับกรอบทองจะกลายเป็นแถบเทาทับข้อความ
-function sceneBg(id) {
+// แรกเกิด (ui-redo 61) ใช้ตัวเดียวกันในเนื้อการ์ด · soft: เส้นรอง (สำริด) จางกว่าครึ่ง ภาพยังมีน้ำหนักสองระดับเหมือนแผ่นเดิมเมื่อทุกเส้นเป็นสีเดียว
+function sceneBg(id, cls = 'd-bg', soft = false) {
   const s = sceneArt(id);
   if (!s) return null;
-  const wrap = el('div', 'd-bg');
+  const wrap = el('div', cls);
   wrap.setAttribute('aria-hidden', 'true');
   const svg = artSvg('scene-art', ERA_ART_W, ERA_ART_H, s.parts.slice(ERA_FRAME.length));
   svg.dataset.scene = id;
+  if (soft) for (const p of svg.children) if (p.getAttribute('stroke') === ART_INK.bronze2 || p.getAttribute('fill') === ART_INK.bronze2) p.setAttribute('opacity', '0.55');
   wrap.append(svg);
   return wrap;
 }
@@ -1154,7 +1310,7 @@ function skillsSeen() {
 }
 const skillsGot = (k) => Object.keys(k.s).length;
 // คำใบ้ของ ??? บอกชนิดแหล่งที่ได้ ไม่บอกชื่อ — ชี้ทางแบบคำใบ้ฉายา · ทุกสกิลเป็นของขวัญเทพธิดาในต่างโลกได้
-const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', pattern: 'แบบชีวิต', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'สิ่งที่ทุ่มเท', lifeGoal: 'เป้าชีวิต' };
+const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', pattern: 'แบบชีวิต', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'โฟกัส', lifeGoal: 'เป้าชีวิต' };
 function skillHint(id) {
   const kinds = Object.entries(CONTENT.skillMap ?? {}).filter(([, m]) => Object.values(m).some((xs) => xs.includes(id))).map(([k]) => SKILL_SRC[k]).filter(Boolean);
   return kinds.length ? `ของขวัญเทพธิดาในต่างโลก หรือชีวิตไทยที่มี${kinds.join('/')}ที่ใช่` : 'ของขวัญเทพธิดาในต่างโลก';
@@ -1231,6 +1387,13 @@ function memoFull(card) {
 // ชั้นสมุด (B130): เล่มเดียว 4 แท็บ อนุสรณ์ · ฉายา · ภาพบ้านเมือง · เคยจากไป · เปิดทับหน้าที่อยู่ แล้วคืนหน้าเดิมทั้งก้อนตอนกลับ — ไม่แตะ st ไม่ลงเซฟ
 // fresh = ของใหม่ตอนเปิดชั้นครั้งแรก — เปิดแท็บแล้วล้างจุดในที่เก็บ แต่ป้าย "ใหม่" ยังอยู่จนออกจากชั้น สลับแท็บไปมาก็ยังหาเจอ
 const SHELF_TABS = [['m', 'อนุสรณ์'], ['t', 'ฉายา'], ['k', 'สกิล'], ['p', 'ภาพบ้านเมือง'], ['d', 'เคยจากไป']];
+const SHELF_ICON = {
+  m: '<path d="M6 4h10a2 2 0 0 1 2 2v14H8a2 2 0 0 1-2-2z"/><path d="M6 17a2 2 0 0 1 2-2h10"/><path d="M10 8h5"/>',
+  t: '<circle cx="12" cy="9" r="5"/><path d="M9 13.5 7.5 21l4.5-2.5 4.5 2.5-1.5-7.5"/>',
+  k: '<path d="M12 3l2.6 5.5 6 .8-4.4 4.1 1.1 6L12 16.6 6.7 19.4l1.1-6L3.4 9.3l6-.8z"/>',
+  p: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/>',
+  d: '<path d="M12 21v-7"/><path d="M12 14c-4 0-6-3-6-6 3 0 5 1 6 3 1-2 3-3 6-3 0 3-2 6-6 6z"/><path d="M9 21h6"/>',
+};
 function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh()) {
   // เปิดจากเมนู/ท้ายหน้า/หน้าเล่นต่อ: ไปแท็บที่มีของใหม่ก่อน
   tab ??= SHELF_TABS.find(([k]) => fresh[k].length)?.[0] ?? 'm';
@@ -1241,10 +1404,6 @@ function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh(
     shelfDot();
     onBack?.();
   };
-  const m = memoRead();
-  const b = bookRead();
-  const p = picsRead();
-  const count = { m: `${m.l.length}`, t: `${bookGot(b)}/${BOOK_ALL}`, p: `${picsGot(p)}/${PIC_ALL}`, k: `${skillsGot(skillsRead())}/${SKILL_IDS.length}`, d: `${deathRead().c.length}` };
   const choices = homeCard('ชั้นสมุด', ['ชั้นสมุด']);
   root.firstChild.classList.add('shelf-view');
   const body = root.querySelector('.body');
@@ -1252,7 +1411,9 @@ function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh(
   tabs.setAttribute('role', 'group');
   tabs.setAttribute('aria-label', 'เล่มในชั้นสมุด');
   for (const [k, label] of SHELF_TABS) {
-    const x = el('button', null, `${label} ${count[k]}`);
+    const x = el('button');
+    x.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${SHELF_ICON[k]}</svg>`;
+    x.append(el('span', null, label));
     x.setAttribute('aria-pressed', String(k === tab));
     // จุดบนแท็บอื่นที่ยังไม่ได้เปิด — แท็บที่เปิดอยู่ล้างจุดแล้ว
     if (k !== tab && shelfFresh()[k].length) x.append(newDot('มีของใหม่'));
@@ -1774,7 +1935,7 @@ document.addEventListener('keydown', (e) => {
 
 // แนวการ์ดของโลกนี้ทางเดียว (ทาง A กระดาษเก่า) — โลกละธีม: ลางกับเหตุการณ์ความเชื่อไม่แยกเป็นแสงเทียนแล้ว
 // สีมืดทองเป็นของปรโลกที่เดียว (renderAfter) · ต่างโลกมีธีมของตัวเอง · มรณบัตร = หนังสืองานศพบนฐานทาง A
-const styleOf = (card) => (card.kind === 'death' ? 'a mem' : 'a');
+const styleOf = (card) => (card.kind === 'death' ? 'a mem' : 'a yc');
 
 // ภาพจาก art.mjs (B56) วาดเป็น SVG — ชุดรูปทรงเดียวกับที่ภาพแชร์วาดลง canvas
 function artSvg(cls, w, h, parts) {
@@ -1902,7 +2063,7 @@ function priceSrc() {
   return inData(era.src.cpi, [era.future.from, era.future.to]) ? [true, `คำนวณจาก${srcText('เงินเฟ้อรายปี', era.src.cpi)}`] : [false, 'บางปีที่ใช้ยังไม่มีข้อมูลเงินเฟ้อ เกมใช้ค่าประมาณแทน'];
 }
 
-// เอฟเฟกต์ 3 จังหวะ (B-fx · เจ้าของเลือกแบบ A ทั้งสาม): พลิกการ์ดใหม่ทุกใบ · ตะเกียงดับตอนตาย · แถบผ้าคลี่เมื่อได้ฉายาหายาก/ตำนาน
+// เอฟเฟกต์ 3 จังหวะ (B-fx · เจ้าของเลือกแบบ A ทั้งสาม): พลิกการ์ดใหม่ทุกใบ · ตะเกียงดับตอนตาย · ตราเหรียญเมื่อได้ฉายาหายาก/ตำนาน (ข้อ 160 แทนแถบผ้าคลี่)
 // frame(parts, t) ขึ้นกับ t 0..1 อย่างเดียว ⇒ ข้าม = frame(1) · สีชุด ART_INK ไม่รับค่าบุญบาป — ตายแบบเดียวทุกกรรม ห้ามเผยกรรมผ่านเอฟเฟกต์
 const fxClamp = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
 const fxSpan = (t, a, b) => fxClamp((t - a) / (b - a));
@@ -1910,9 +2071,9 @@ const fxOut = (x) => 1 - (1 - x) ** 3;
 const fxIn = (x) => x * x * x;
 const fxBack = (x) => 1 + 2.2 * (x - 1) ** 3 + 1.2 * (x - 1) ** 2;
 const fxSvg = (w, h, inner, cls = '') => `<svg class="${cls}" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">${inner}</svg>`;
-// สุ่มแบบมี seed ตายตัว — ผงทองเหมือนกันทุกชีวิตทุกครั้ง
-const fxRng = (s) => () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 const FX_INK = ART_INK;
+// ค่าเจ้าของเคาะ (ui-redo ข้อ 160 · 242–244) · หายาก = เงิน ตำนาน = ทอง โลหะคนละชนิด
+const FX_TITLE = { rare: '#C9CDD3', leg: ART_INK.gold, legInk: ART_INK.lacquer, frameW: 1.6, glow: 46, fs: 18, subFs: 12, nameW: 200, durRare: 900, durLeg: 1400 };
 // ฉากซ้อนเต็มจอของตาย/ฉายา — จบเองค่อยจางออก · ถูกข้ามหายทันที
 const fxOv = () => document.body.appendChild(el('div', 'fx-ov'));
 function fxOvEnd(ov, natural) {
@@ -1973,66 +2134,56 @@ const FX = {
       p.cap.style.transform = `translateY(${6 * (1 - fxSpan(t, 0.55, 1))}px)`;
     },
     end: (p, natural) => fxOvEnd(p.ov, natural) },
-  // แถบผ้าคลี่ + แสงวิ่ง · ตำนาน = กรอบคู่ + รัศมีหมุนช้า + ผงทองพุ่งรอบแถบ
-  titleA: {
+  // ตราแปดเหลี่ยม (ui-redo ข้อ 160 · 242) — ภาพนิ่งหายาก/ตำนานต้องแยกด้วยตา (ข้อ 39)
+  // หายาก = ตรารักขอบเงิน เส้นในจาง ดาวดวงเดียว ขีดเส้นเดียว · ตำนาน = ตราทองล้อมกลีบบัว 12 กลีบ วงจุดทอง ดาว 3 ดวง ชื่อทองขีดสองเส้น
+  title: {
     build: (ov, o) => {
       const leg = o.tier === 'legend';
       const id = `fx${++fxUid}`;
-      const rays = leg ? `<g class="fx-rays" style="transform-origin:150px 60px">${Array.from({ length: 16 }, (_, i) => `<path d="M150 60L${150 + 140 * Math.cos(i * Math.PI / 8 - 0.06)} ${60 + 140 * Math.sin(i * Math.PI / 8 - 0.06)}L${150 + 140 * Math.cos(i * Math.PI / 8 + 0.06)} ${60 + 140 * Math.sin(i * Math.PI / 8 + 0.06)}z" fill="${FX_INK.gold2}"/>`).join('')}</g>` : '';
-      ov.innerHTML = `<div class="fx-veil"></div><div class="fx-title">${fxSvg(300, 120, `<defs><linearGradient id="${id}s" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><clipPath id="${id}c"><path d="M40 38h220v44h-220z"/></clipPath></defs>${rays}<g class="fx-ribbon" style="transform-origin:150px 60px"><path d="M40 46h-26l10 14l-10 14h26z" fill="${FX_INK.bronze2}"/><path d="M260 46h26l-10 14l10 14h-26z" fill="${FX_INK.bronze2}"/><path d="M40 38h220v44h-220z" fill="${FX_INK.lacquer2}" stroke="${FX_INK.gold}" stroke-width="${leg ? 2 : 1.4}"/>${leg ? `<path d="M45 43h210v34h-210z" fill="none" stroke="${FX_INK.gold2}" stroke-width="0.8"/>` : ''}<text class="fx-name" x="150" y="${leg ? 67 : 66}" text-anchor="middle" font-size="${leg ? 19 : 17}" fill="${leg ? FX_INK.gold2 : FX_INK.cream}"></text><rect class="fx-shine" x="-60" y="38" width="60" height="44" fill="url(#${id}s)" clip-path="url(#${id}c)"/></g><text class="fx-sub" x="150" y="108" text-anchor="middle" font-size="11" fill="${FX_INK.gold}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`)}</div>${leg ? '<canvas></canvas>' : ''}`;
+      const T = FX_TITLE, w = T.frameW;
+      const star = (x, y, r, f) => `<path d="M${x} ${y - r}L${x + r * 0.3} ${y - r * 0.3}L${x + r} ${y}L${x + r * 0.3} ${y + r * 0.3}L${x} ${y + r}L${x - r * 0.3} ${y + r * 0.3}L${x - r} ${y}L${x - r * 0.3} ${y - r * 0.3}z" fill="${f}"/>`;
+      const oct = (r) => Array.from({ length: 8 }, (_, i) => { const a = Math.PI / 8 + i * Math.PI / 4; return `${(150 + r * Math.cos(a)).toFixed(2)},${(48 + r * Math.sin(a)).toFixed(2)}`; }).join(' ');
+      const name = (fill) => `<text class="fx-name" x="150" y="110" text-anchor="middle" font-size="${T.fs}" fill="${fill}"></text>`;
+      const sub = (fill) => `<text class="fx-sub" x="150" y="160" text-anchor="middle" font-size="${T.subFs}" fill="${fill}">${leg ? 'ฉายาระดับตำนาน' : 'ฉายาระดับหายาก'}</text>`;
+      // ม่าน 0.6 ยังเห็นตัวหนังสือการ์ดสว่างทะลุ ⇒ ชื่อ+ป้ายต้องมีพื้นทึบรองของตัวเอง (ui-redo ข้อ 183) · กว้างพอชื่อที่ถูกบีบเต็ม nameW
+      const plate = (stroke) => `<rect class="fx-plate" x="${150 - T.nameW / 2 - 12}" y="86" width="${T.nameW + 24}" height="84" rx="8" fill="${FX_INK.lacquer2}" stroke="${stroke}" stroke-width="0.8" stroke-opacity="0.5"/>`;
+      let inner;
+      if (!leg) {
+        inner = `${plate(T.rare)}<g class="fx-medal" style="transform-origin:150px 48px"><polygon points="${oct(30)}" fill="${FX_INK.lacquer2}" stroke="${T.rare}" stroke-width="${w}"/><polygon points="${oct(25)}" fill="none" stroke="${T.rare}" stroke-width="0.7" stroke-opacity="0.7"/>${star(150, 48, 12, T.rare)}</g>${name(FX_INK.cream)}<path class="fx-line" d="M70 120h160" stroke="${T.rare}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(T.rare)}`;
+      } else {
+        const petals = Array.from({ length: 12 }, (_, i) => `<path class="fx-petal" d="M150 48q-9 -20.8 0 -40q9 19.2 0 40z" transform="rotate(${i * 30} 150 48)" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="0.6"/>`).join('');
+        const R = 30 + T.glow * 0.5;
+        const dots = Array.from({ length: 16 }, (_, i) => `<circle class="fx-dot" cx="${150 + R * Math.cos(i * Math.PI / 8)}" cy="${48 + R * Math.sin(i * Math.PI / 8)}" r="1.8" fill="${FX_INK.gold2}"/>`).join('');
+        inner = `<defs><linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${FX_INK.gold2}"/><stop offset=".55" stop-color="${T.leg}"/><stop offset="1" stop-color="${FX_INK.bronze2}"/></linearGradient></defs>${plate(T.leg)}<g>${dots}</g><g>${petals}</g><g class="fx-medal" style="transform-origin:150px 48px"><polygon points="${oct(27)}" fill="url(#${id}g)" stroke="${FX_INK.gold2}" stroke-width="${w}"/><polygon points="${oct(22)}" fill="none" stroke="${T.legInk}" stroke-width="0.8"/>${star(150, 42, 9, T.legInk)}${star(139, 56, 5, T.legInk)}${star(161, 56, 5, T.legInk)}</g>${name(FX_INK.gold2)}<path class="fx-line" d="M70 119h160M90 124h120" stroke="${T.leg}" stroke-width="${w}" pathLength="100" stroke-dasharray="100"/>${sub(FX_INK.gold2)}`;
+      }
+      ov.innerHTML = `<div class="fx-veil"></div><div class="fx-title">${fxSvg(300, 170, inner)}</div>`;
       const q = (s) => ov.querySelector(s);
-      const name = q('.fx-name');
-      name.textContent = o.name;
-      // แถบเดียวกันใช้กับสกิลที่ลงสมุด/ขึ้นขั้น (06s) — ป้ายใต้แถบบอกว่าเป็นอะไร
+      const nm = q('.fx-name');
+      nm.textContent = o.name;
+      // ตราเดียวกันใช้กับสกิลที่ลงสมุด/ขึ้นขั้น (06s) — ป้ายใต้ชื่อบอกว่าเป็นอะไร
       if (o.sub) q('.fx-sub').textContent = o.sub;
-      // ชื่อฉายายาวเกินแถบ ⇒ บีบให้พอดีแถบ ไม่ล้นออกนอกผ้า
-      if (name.getComputedTextLength() > 210) {
-        name.setAttribute('textLength', 210);
-        name.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+      // ชื่อยาวเกินเส้นใต้ชื่อ ⇒ บีบให้พอดี ไม่ล้นจอ 390
+      if (nm.getComputedTextLength() > T.nameW) {
+        nm.setAttribute('textLength', T.nameW);
+        nm.setAttribute('lengthAdjust', 'spacingAndGlyphs');
       }
-      return { ov, leg, veil: ov.firstChild, ribbon: q('.fx-ribbon'), name, shine: q('.fx-shine'), rays: q('.fx-rays'), sub: q('.fx-sub'), dust: leg && fxDust(ov, 9) };
+      return { ov, leg, veil: ov.firstChild, plate: q('.fx-plate'), medal: q('.fx-medal'), name: nm, line: q('.fx-line'), sub: q('.fx-sub'), petals: [...ov.querySelectorAll('.fx-petal')], dots: [...ov.querySelectorAll('.fx-dot')] };
     },
-    dur: (o) => (o.tier === 'legend' ? 1400 : 900), block: 300,
+    dur: (o) => (o.tier === 'legend' ? FX_TITLE.durLeg : FX_TITLE.durRare), block: 300,
     frame: (p, t) => {
-      const u = p.leg ? fxSpan(t, 0, 0.3) : fxSpan(t, 0, 0.4);
       p.veil.style.opacity = 0.6 * fxOut(fxSpan(t, 0, 0.2));
-      p.ribbon.style.transform = `scaleX(${fxBack(u)})`;
-      p.ribbon.style.opacity = fxSpan(t, 0, 0.08);
-      p.name.style.opacity = fxSpan(t, 0.25, 0.5);
-      p.sub.style.opacity = fxSpan(t, 0.45, 0.7);
-      p.shine.setAttribute('x', -60 + 380 * fxSpan(t, 0.45, 0.85));
-      if (p.leg) {
-        p.rays.style.opacity = 0.35 * fxOut(fxSpan(t, 0.2, 0.6));
-        p.rays.style.transform = `rotate(${24 * t}deg) scale(${0.6 + 0.4 * fxOut(fxSpan(t, 0.2, 0.7))})`;
-        p.dust(fxSpan(t, 0.25, 1));
-      }
+      // พื้นรองขึ้นเต็มก่อนชื่อเริ่มโผล่ (0.3) — ชื่อไม่เคยซ้อนตัวหนังสือการ์ดแม้เฟรมเดียว
+      p.plate.style.opacity = fxSpan(t, 0.15, 0.3);
+      p.medal.style.transform = `scale(${1.7 - 0.7 * fxOut(fxSpan(t, 0, 0.3))})`;
+      p.medal.style.opacity = fxSpan(t, 0, 0.12);
+      p.name.style.opacity = fxSpan(t, 0.3, 0.55);
+      p.line.style.strokeDashoffset = 100 * (1 - fxOut(fxSpan(t, 0.4, 0.7)));
+      p.sub.style.opacity = fxSpan(t, 0.55, 0.8);
+      p.petals.forEach((x, i) => { x.style.opacity = fxSpan(t, 0.25 + i * 0.025, 0.35 + i * 0.025); });
+      p.dots.forEach((x, i) => { x.style.opacity = fxSpan(t, 0.6 + i * 0.012, 0.66 + i * 0.012); });
     },
     end: (p, natural) => fxOvEnd(p.ov, natural) },
 };
-
-// ผงทองพุ่งออกจากกลางแล้วตกช้า (แนวคิด poof) — คืนฟังก์ชันวาดตาม k
-function fxDust(ov, seed) {
-  const cv = ov.querySelector('canvas'), r = ov.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
-  cv.width = r.width * dpr;
-  cv.height = r.height * dpr;
-  const ctx = cv.getContext('2d');
-  ctx.scale(dpr, dpr);
-  const rnd = fxRng(seed), cx = r.width / 2, cy = r.height / 2, ps = [];
-  for (let i = 0; i < 46; i++) {
-    const a = rnd() * Math.PI * 2, v = 50 + 90 * rnd();
-    ps.push({ vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.6, s: 1 + 2 * rnd(), c: rnd() < 0.5 ? FX_INK.gold2 : FX_INK.gold });
-  }
-  return (k) => {
-    ctx.clearRect(0, 0, r.width, r.height);
-    if (k <= 0 || k >= 1) return;
-    ctx.globalAlpha = 1 - k;
-    for (const q of ps) {
-      ctx.fillStyle = q.c;
-      ctx.fillRect(cx + q.vx * fxOut(k), cy + q.vy * fxOut(k) + 30 * k * k, q.s, q.s);
-    }
-    ctx.globalAlpha = 1;
-  };
-}
 
 // reduced-motion: พลิกเหลือ fade 150ms · ฉากตาย/ฉายาไม่เล่นเลย (การ์ดบอกเรื่องเดียวกันอยู่แล้ว)
 const FX_RM = 150;
@@ -2076,7 +2227,7 @@ function fxPlay(stage, name, o = {}, then = null) {
   fxCur = me;
 }
 const FX_TIER = { ตำนาน: 'legend', หายาก: 'rare' };
-// เรียกท้ายทุกตัววาดการ์ด: การ์ดใหม่ = พลิก · การ์ดตาย = ตะเกียงดับ แล้วต่อแถบผ้าคลี่ถ้าฉายาเด่นเป็นหายาก/ตำนาน
+// เรียกท้ายทุกตัววาดการ์ด: การ์ดใหม่ = พลิก · การ์ดตาย = ตะเกียงดับ แล้วต่อตราเหรียญถ้าฉายาเด่นเป็นหายาก/ตำนาน
 // วาดซ้ำการ์ดเดิม (สลับแท็บ) ไม่เล่นซ้ำ
 function fxCard(box, card) {
   fxCur?.skip();
@@ -2087,7 +2238,7 @@ function fxCard(box, card) {
   const top = lifeTitles(card).titles[0];
   const tier = top && FX_TIER[top.tier];
   const gone = isGone(st);
-  fxPlay(fxOv(), 'deathA', { head: gone ? 'หายไปจากบ้าน' : 'จากไปอย่างสงบ', sub: `${genLabel()}${lifeEndWord(gone)} ${card.age}` }, tier && (() => fxPlay(fxOv(), 'titleA', { tier, name: top.name })));
+  fxPlay(fxOv(), 'deathA', { head: gone ? 'หายไปจากบ้าน' : 'จากไปอย่างสงบ', sub: `${genLabel()}${lifeEndWord(gone)} ${card.age}` }, tier && (() => fxPlay(fxOv(), 'title', { tier, name: top.name })));
 }
 const fxGate = (e) => {
   if (!fxCur) return;
@@ -2118,6 +2269,12 @@ function render(card) {
     if (gone) box.classList.add('lost');
     top.append(el('b', null, gone ? LOST.head : 'ด้วยรักและอาลัย'));
     box.append(top);
+    // ตราไม่มีชื่อผู้ตาย: เขียนชื่อด้วยหมึกแดงถือเป็นการแช่ง (ข้อ 154) · คนหายไม่มีตรา ยังไม่มีใครถือว่าจากไป (B139)
+    if (!gone) {
+      const seal = el('span', 'd-seal', 'อาลัย');
+      seal.setAttribute('aria-hidden', 'true');
+      box.append(seal);
+    }
     const bg = sceneBg(gone ? 'gone' : 'death');
     if (bg) box.append(bg);
     // หนังสืองานศพ (ui-redo 57): รูป ชื่อ อายุ สาเหตุ เป็นหัวกลางใบไม่มีกรอบ · ข้อมูลเป็นตารางสองคอลัมน์ · ปุ่มไปต่อท้ายข้อมูล
@@ -2185,7 +2342,7 @@ function render(card) {
     share.append(el('summary', null, BTN.share), menu);
     rest.append(share);
   } else {
-    // ฐานะ/งานอยู่แผงตัวฉัน (ui-redo ใบ 04) · เงินอยู่แผงเงิน (ใบ 07) — ใต้แถบสถานะเหลือแค่เนื้อการ์ด
+    // ฐานะ/งาน/เงินอยู่แผงตัวฉัน (ui-redo ใบ 04 · 131) — ใต้แถบสถานะเหลือแค่เนื้อการ์ด
     box.append(statusBar(card, s));
     // ตัวคูณนิสัย (B41) มีผลกับตัวเลือกก่อนหน้า — บอกบนใบถัดไปแทนการ์ดผลเพิ่ม
     if (card.because) body.append(el('p', 'note', card.because));
@@ -2193,8 +2350,12 @@ function render(card) {
     // ภาพยุค (B56): การ์ดบ้านเมือง + การ์ดรับมือที่ผูกยุคไว้ (B58) ได้ภาพของยุคนั้น · ยุคที่ไม่มีภาพ = หน้าตาเดิม
     const eraPic = eraArt(card.kind === 'era' ? card.id : card.kind === 'event' ? ERA_OF.get(card.id) : null);
     if (eraPic) body.append(artSvg('era-art', ERA_ART_W, ERA_ART_H, eraPic));
-    else {
-      const scene = card.kind === 'intro' ? sceneSvg(BIRTH_SCENE[artTier(standingOf(st))], true) : SCENE_OF.has(card.id) && sceneSvg(SCENE_OF.get(card.id), false);
+    else if (card.kind === 'intro') {
+      // พื้นหลังจางใต้เนื้อการ์ด (ui-redo 61) แทนภาพเล็กกลางบน — ภาพแชร์ยังวาดแผ่นเดิมจาก sceneArt
+      const bg = sceneBg(BIRTH_SCENE[artTier(standingOf(st))], 'b-bg', true);
+      if (bg) body.classList.add('has-bg'), body.append(bg);
+    } else {
+      const scene = SCENE_OF.has(card.id) && sceneSvg(SCENE_OF.get(card.id), false);
       if (scene) body.append(scene);
     }
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
@@ -2207,14 +2368,14 @@ function render(card) {
       ef.append(`มาจากที่คุณเลือกตอนอายุ ${card.echoFrom}`);
       body.append(ef);
     }
+    // สายเรื่องรายคน (krung-1): ตอนแรกไม่มีระยะห่างให้บอก
+    if (card.kind === 'event' && card.arc) body.append(el('span', 'ef', `เรื่องต่อเนื่อง ตอนที่ ${card.arc.n}${card.arc.gap ? ` · ผ่านมา ${card.arc.gap} ปีจากตอนก่อน` : ''}`));
 
     if (card.kind === 'intro') {
       // ผู้สืบสายเลือด (B76) เริ่มกลางวัย ไม่ได้เกิดใหม่
       body.append(el('span', 'stamp', card.age > 0 ? 'รับช่วงชีวิต' : 'แรกเกิด'));
       body.append(el('h3', 'lead', card.text));
       body.append(el('p', 'horo', horoscope(st)));
-      // การ์ดแรกเกิดของตระกูลใหม่ = จุดเริ่มเกมของคนไม่มีเซฟ (คนมีเซฟเห็นที่หน้าเล่นต่อ)
-      if (st.gen === 1 && card.age === 0) body.append(warnLine());
       const odds = birthOddsLine();
       if (odds) body.append(sourced(el('p', 'sub', odds), birthOddsSrc()));
       // บรรทัดแรกเป็นเรื่องของบ้าน · ที่เหลือเป็นบรรยากาศยุค ตัวรอง
@@ -2439,15 +2600,6 @@ function helpBox() {
   box.append(all, el('p', 'note', HELP_NOTE));
   return box;
 }
-// บรรทัดเตือนเนื้อหาชุดเดียวกับหน้าแรกเว็บ + สายด่วนสุขภาพจิต · ไม่ต้องกดรับ
-function warnLine() {
-  const mind = HELP.find((h) => h.id === 'mind');
-  const p = el('p', 'warn-line', `ผู้เล่นวัยรุ่นขึ้นไป · เรื่องจริงบางเรื่องหนัก: ${warnWords()} · ถ้าเล่นแล้วไม่สบายใจ `);
-  const call = el('a', null, `โทร ${mind.tel}`);
-  call.href = `tel:${mind.tel}`;
-  p.append(call, ' ได้ตลอด 24 ชม.');
-  return p;
-}
 function helpRow(h) {
   const row = el('div', 'help-row');
   const call = el('a', 'help-call', `${h.label} · ${h.call}`);
@@ -2481,6 +2633,25 @@ function familyPanel() {
   // แผงอยู่นอกการ์ด สีกราฟฐานะตระกูลผูกกับชุดสีการ์ด (.a) — ไม่ใส่ กราฟเป็นก้อนดำ
   const wrap = el('div', 'fam a');
   wrap.append(...kinParts(all.filter((m) => !ANIMAL_ROLES.includes(m.role))), ...clanParts(), ...kinParts(all.filter((m) => ANIMAL_ROLES.includes(m.role)), true));
+  return wrap;
+}
+// แผงปรโลก (ui-redo ใบ 15): st ยังเป็นคนที่เพิ่งตายจนกว่าจะไปเกิด — แผงจึงอ่านชีวิตที่จบแล้วจากตัวเดียวกับการ์ดตาย
+function pastPanel() {
+  const why = causeOf(st.cause ?? 'other', st.age);
+  const head = el('p', 'meta');
+  metaLine(head, [fullName(), `${lifeEndWord(isGone(st))} ${st.age}`, why && `จากไป${why.join('')}`].filter(Boolean));
+  const wrap = mePanel({ kind: 'death', job: jobText(st) });
+  const kin = familyOf(st);
+  const fam = el('div', 'fam');
+  fam.append(...kinParts(kin.filter((m) => !ANIMAL_ROLES.includes(m.role))), ...kinParts(kin.filter((m) => ANIMAL_ROLES.includes(m.role)), true));
+  wrap.prepend(head);
+  if (fam.childElementCount) wrap.append(fam);
+  return wrap;
+}
+// กราฟฐานะตระกูลผูกสีกับชุดการ์ด — ปรโลกใช้ชุดลายรดน้ำ (.b) ชุดกระดาษ (.a) ปนตัวแปรหน้าดำทองแล้วกราฟเป็นก้อนเทา
+function clanPanel() {
+  const wrap = el('div', 'fam b');
+  wrap.append(...clanParts());
   return wrap;
 }
 // ชิ้นของแผงครอบครัวที่การ์ดตายแยกไปลงแท็บ ครอบครัว · ตระกูล (ui-redo ใบ 11)
@@ -2558,9 +2729,9 @@ function deathTabs(card, parts) {
   pick(deathTabOf.get(card) ?? 0);
   return wrap;
 }
-// แผงเงิน (ui-redo ใบ 07): ย้ายบรรทัดเงินใต้แถบสถานะมาเป็นช่องละแถว · ค่าชุดเดียวกับที่การ์ดเคยบอก ไม่เปิดตัวเลขที่เกมซ่อน
-// ปุ่มกู้ยังอยู่บนการ์ดเพราะเป็นทางเลือกของการ์ดนั้น ไม่ใช่ข้อมูล
-function moneyPanel(card) {
+// ช่องเงินในแผงตัวฉัน (ui-redo ใบ 07 → 131): ย้ายบรรทัดเงินใต้แถบสถานะมาเป็นช่องละแถว · ค่าชุดเดียวกับที่การ์ดเคยบอก ไม่เปิดตัวเลขที่เกมซ่อน
+// ปุ่มกู้ยังอยู่บนการ์ดเพราะเป็นทางเลือกของการ์ดนั้น ไม่ใช่ข้อมูล · คำอธิบายใต้ยอดเข้ากลุ่มพับของแผงตัวฉัน (hp)
+function moneyBox(card, hp) {
   const s = statsOf(st);
   // คนตายไม่มีรายได้ต่อ — การ์ดตายเห็นแค่ที่ทิ้งไว้
   const working = !st.dead && isWorking(st, card.age);
@@ -2577,7 +2748,9 @@ function moneyPanel(card) {
   const wrap = el('div', 'mo');
   const dl = el('dl');
   for (const [k, v, neg] of rows) dl.append(el('dt', null, k), el('dd', neg ? 'num neg' : 'num', v));
-  wrap.append(dl, el('p', null, new Map(STAT_HELP).get('เงิน · หนี้')));
+  const note = el('p', null, new Map(STAT_HELP).get(MONEY_HELP));
+  hp.push(note);
+  wrap.append(dl, note);
   return wrap;
 }
 // แผงเพิ่มเติม: ลิงก์ท้ายหน้าเดิมทั้งชุด — ฉากที่มีเมนูซ่อนท้ายหน้า ที่นี่จึงเป็นทางเข้าเดียว · ไม่มีหน้าตั้งค่า (ui-redo ข้อ 10)
@@ -2726,7 +2899,7 @@ function earnBox(earn, key) {
       const r = skillsEarn(key, x.id, x.lv);
       if (!r) return done(null);
       done(r.was ? (r.lv > r.was ? `${x.name} ขึ้นเป็นขั้น ${r.lv}` : `${x.name} ขั้นสูงสุดอยู่แล้ว`) : `${x.name} · ขั้น ${r.lv}`);
-      if (!fxReduced() && r.lv > r.was) fxPlay(fxOv(), 'titleA', { tier: r.lv >= SKILL.top ? 'legend' : 'rare', name: x.name, sub: r.was ? `สกิลขึ้นขั้น ${r.lv}` : 'สกิลใหม่ลงสมุด' });
+      if (!fxReduced() && r.lv > r.was) fxPlay(fxOv(), 'title', { tier: r.lv >= SKILL.top ? 'legend' : 'rare', name: x.name, sub: r.was ? `สกิลขึ้นขั้น ${r.lv}` : 'สกิลใหม่ลงสมุด' });
     });
     b.firstChild.append(el('small', 'idesc', ISEKAI_SKILLS[x.id].desc));
     // ขั้นสูงสุดแล้ว ลงซ้ำไม่ได้อะไร — กันเสียสิทธิ์เลือกของการ์ดใบนี้
@@ -2736,24 +2909,26 @@ function earnBox(earn, key) {
   return box;
 }
 
-// การ์ดฝึกสกิล (06s): แถบผ้าชื่อสกิลหลังกด · ปุ่มท้าย (ยังไม่ฝึก) ไม่มีเอฟเฟกต์ · ขั้นใหม่อ่านจากป้ายปุ่มที่แกนเขียน
+// การ์ดฝึกสกิล (06s): ตราชื่อสกิลหลังกด · ปุ่มท้าย (ยังไม่ฝึก) ไม่มีเอฟเฟกต์ · ขั้นใหม่อ่านจากป้ายปุ่มที่แกนเขียน
 function upgradeFx(card, i) {
   if (i >= card.choices.length - 1 || fxReduced()) return;
   const [name] = card.choices[i].split(' · ');
   const lv = /→ (\d+)$/.exec(card.choices[i])?.[1];
-  fxPlay(fxOv(), 'titleA', { tier: +lv >= SKILL.top ? 'legend' : 'rare', name, sub: lv ? `สกิลขึ้นขั้น ${lv}` : 'สกิลขึ้นขั้น' });
+  fxPlay(fxOv(), 'title', { tier: +lv >= SKILL.top ? 'legend' : 'rare', name, sub: lv ? `สกิลขึ้นขั้น ${lv}` : 'สกิลขึ้นขั้น' });
 }
 
 // เลือกพกก่อนไปเกิด (06s): จากสมุดสกิล ≤ SKILL.carry แล้วไปเกิดด้วยปุ่มเซฟเดิม — ชุดที่พกอยู่ในสถานะชีวิตใหม่ ภาพถ่ายเซฟเก็บไปเอง
 // สมุดว่าง = ไปเกิดทันทีเหมือนก่อนมีสกิลข้ามชาติ · บรรทัดตามไป/ไม่ตามไป (dsd-2) ไม่บอกตัวเลข
+// carryOffered = การ์ดเลือกขึ้นจริง ⇒ ช่องที่ไม่พกแลกเป็นค่าเริ่ม (decisions 355) · สมุดว่างไปเกิดทันที ไม่ได้
 let carryNext = [];
+let carryOffered = false;
 function rebirth() {
   const offers = bookCarryOffers(skillsRead().s);
   if (!offers.length) return play(T.rebirth);
   const prev = [...root.childNodes];
   const pick = [];
   const draw = () => {
-    const choices = homeCard('ก่อนไปเกิด', ['เลือกสกิลที่จะพกไปชาติหน้า', `พกได้ ${SKILL.carry} อย่าง ใช้ทั้งชีวิตไทยและชาติต่างโลกที่ตามมา · ทุกอย่างเริ่มขั้น 1 แต่ฝึกถึงขั้นในสมุดได้เร็วกว่าครั้งแรก`]);
+    const choices = homeCard('ก่อนไปเกิด', ['เลือกสกิลที่จะพกไปชาติหน้า', `พกได้ ${SKILL.carry} อย่าง ใช้ทั้งชีวิตไทยและชาติต่างโลกที่ตามมา · ทุกอย่างเริ่มขั้น 1 แต่ฝึกถึงขั้นในสมุดได้เร็วกว่าครั้งแรก`, 'ช่องที่ไม่พก ชาติหน้าได้พื้นฐานดีขึ้นแทน']);
     const body = root.querySelector('.body');
     const name = (id) => ISEKAI_SKILLS[id].name;
     const left = offers.filter((o) => !pick.includes(o.id));
@@ -2776,6 +2951,7 @@ function rebirth() {
     }
     choices.append(enter(button(pick.length ? 'ไปเกิดพร้อมสกิลที่พก' : 'ไปเกิดโดยไม่พกสกิล', null, () => {
       carryNext = [...pick];
+      carryOffered = true;
       play(T.rebirth);
     })), button('กลับ', null, () => root.replaceChildren(...prev)));
   };
@@ -2785,10 +2961,11 @@ function rebirth() {
 // ช่วงที่ 7 (ใบ 05 · 09): การ์ดลายรดน้ำทุกใบ · ไม่มีแถบค่าสถานะชีวิต — ชีวิตจบแล้ว (วงปรโลกมีแถบ 4 ค่าของตัวเอง)
 const AFTER_KICKER = { transfer: 'ส่วนบุญจากคนข้างหลัง', devaduta: 'ปรโลก', realm: 'ภูมิปลายทาง', ancestor: 'ผีบรรพบุรุษ', loop: 'ปีทิพย์' };
 const AFTER_TOP = { verdict: 'ปรโลก', path: 'ทางเกิด', carry: 'ส่งไปเกิด', result: 'ผลที่ตามมา', loopEnd: 'ครบวง' };
+const AFTER_REALM_ART = { deva: 'after_heaven', hell: 'after_hell' };
 // วงปรโลก (03a): แถว 4 ค่าแบบแถบสถานะ ใต้หัวการ์ด · ชีวิตทิพย์ต่ำ = สีเตือนแบบชีวิต
 function loopBar(l) {
   const ul = el('ul', 'sb-m');
-  for (const k of LOOP_KEYS) ul.append(meterLi(LOOP_LABELS[k], Math.round(l[k]), k === 'health' && l[k] <= HEALTH_WARN));
+  for (const k of LOOP_KEYS) ul.append(meterLi(LOOP_LABELS[k], Math.round(l[k]), k === 'health' && l[k] <= HEALTH_WARN, undefined, k));
   // กรอบ .sb ให้ระยะขอบเท่าแถบสถานะชีวิต
   const bar = el('div', 'sb');
   bar.append(ul);
@@ -2805,6 +2982,10 @@ function renderAfter(card) {
   const choices = el('div', 'choices');
   const next = () => play(T.afterNext);
   const court = card.kind === 'verdict' || card.scene === 'devaduta';
+  // ภาพปรโลก (ui-redo 15): ศาลบนการ์ดตัดสิน · สวรรค์/นรกเฉพาะการ์ดที่อยู่ในภูมินั้นแล้ว (ภูมิปลายทาง · วงปี) — ภูมิอื่นยังไม่มีภาพ
+  const realm = (card.loop || card.scene === 'realm') && af.verdict?.realm?.id;
+  const pic = court ? 'after_court' : AFTER_REALM_ART[realm];
+  if (pic) body.append(sceneSvg(pic, false));
   body.append(el('span', 'kicker', card.kind === 'scene' ? AFTER_KICKER[card.scene] : AFTER_TOP[card.kind]));
   if (card.title) body.append(el('h3', null, card.title));
   if (card.scene === 'devaduta') {
@@ -2838,9 +3019,8 @@ function renderAfter(card) {
   if (card.kind === 'verdict') choices.append(copyButton(() => summaryText(st.age, card.realm)));
   box.append(top);
   if (card.loop) box.append(loopBar(card.loop));
-  if (court) box.append(courtScene());
   box.append(body, choices);
-  root.append(panels(box));
+  root.append(panels(box, false), lifeMenu(card, box, true));
   fxCard(box, card);
 }
 
@@ -2861,7 +3041,7 @@ function heirPick(card, i, choices, back) {
 }
 
 // ต่างโลก (B68): การ์ดแนวหน้าต่างสถานะของเกม · ปุ่มเดินผ่าน afterPick/afterNext ชุดเดียวกับระหว่างชาติ เซฟจึงเล่นซ้ำได้
-const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ช่วงวัยใหม่ · เลือกสิ่งที่ทุ่มเท', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก', warn: 'ใกล้ตาย', move: 'ทางแยก · เลือกแคว้น', upgrade: 'สกิลที่ติดตัว · เลือกฝึก' };
+const ISEKAI_KICKER = { world: 'ห้องสีขาว · เลือกชีวิตใหม่', skill: 'ของขวัญจากเทพธิดา · เลือกสกิล', focus: 'ใกล้ตาย · เลือกโฟกัส', tick: 'จดหมายเหตุ', event: 'เหตุการณ์', result: 'ผลลัพธ์', end: 'ตอนจบในต่างโลก', warn: 'ใกล้ตาย', move: 'ทางแยก · เลือกแคว้น', upgrade: 'สกิลที่ติดตัว · เลือกฝึก' };
 // จดหมายเหตุบนการ์ดจบ (B68b ชิ้น 3): แบ่งตามช่วงวัย เก่าอยู่บน ช่วงสุดท้ายเปิดค้าง (เจ้าของเคาะ)
 // บรรทัดรับได้ทั้งสตริง "อายุ N · …" ของเซฟเก่า และ { age, until?, stage, kind, text, deltas } ของ engine — มี deltas ถึงขึ้น chip
 // ตาหลายปีของ engine บอกปลายช่วงเป็น until · จอใช้ชื่อ to ชุดเดียวกับที่แยกจากสตริง
@@ -2927,7 +3107,8 @@ function isekaiBar(card, s, where) {
   const ini = el('span', 'av ini', [...s.name][0]);
   ini.setAttribute('aria-hidden', 'true');
   const who = el('span', 'sb-who');
-  who.append(el('b', null, s.name), whereLine(`${genLabel()}${st.name} · ${where}`));
+  // ช่องอาชีพต่างโลก = บทบาท/ชีวิตบนทวีป (ข้อ 60) · ทองไม่มีหลอดบนหัวการ์ด หลอดอยู่แผงตัวฉัน (ข้อ 162)
+  who.append(el('b', null, s.name), whereLine(`${genLabel()}${st.name} · ${where}`), headJob(s.world));
   const age = el('span', 'sb-age');
   age.append(el('b', null, String(s.age)), el('small', null, ' ปี'));
   if (card.step !== 'end' && s.hp <= HEALTH_WARN) {
@@ -2938,9 +3119,11 @@ function isekaiBar(card, s, where) {
     heart.setAttribute('aria-label', 'ใกล้ตาย');
     age.append(heart);
   }
-  r1.append(ini, who, age);
+  const row = el('div', 'hd-row');
+  row.append(headCash('ทอง', s.gold.toLocaleString('en-US')));
+  r1.append(ini, who, sbRight(age, row));
   const ul = el('ul', 'sb-m');
-  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
+  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN, undefined, 'hp'), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false, undefined, k)));
   bar.append(r1, ul);
   return bar;
 }
@@ -2958,12 +3141,12 @@ function isekaiGoldFill(k, gold) {
 function isekaiMePanel(s) {
   const wrap = el('div', 'me');
   const ul = el('ul', 'me-m');
-  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false)));
+  ul.append(meterLi(ISEKAI_HP, s.hp, s.hp <= HEALTH_WARN, undefined, 'hp'), ...ISEKAI_SHOWN.map((k) => meterLi(ISEKAI_STAT[k], s[k], false, undefined, k)));
   // ชาติต่างโลกหลังตายอยู่ใน af.isekai · ทริประหว่างชาติไทยอยู่ใน st.trip
   const k = af?.isekai ?? st?.trip;
   const gold = isekaiGoldFill(k, s.gold);
   if (gold !== null) {
-    const li = meterLi('ทอง', Math.round(gold * 1000) / 10, false, s.gold.toLocaleString('en-US'));
+    const li = meterLi('ทอง', Math.round(gold * 1000) / 10, false, s.gold.toLocaleString('en-US'), 'gold');
     li.classList.add('gold');
     // ขีด = ทองตั้งต้นของร่างจากตาราง (ไม่ใช่ทองหลังพกมา) · ร่างเริ่ม 0 ขีดชิดซ้ายมองไม่เห็น จึงไม่วาด
     const start = isekaiGoldFill(k, isekaiGoldStart(k));
@@ -2979,7 +3162,8 @@ function isekaiMePanel(s) {
   const dl = el('dl');
   dl.append(el('dt', null, 'ทอง'), el('dd', null, s.gold.toLocaleString('en-US')), el('dt', null, 'ชื่อเสียง'), el('dd', null, String(s.fame)));
   const who = el('p', 'meta');
-  metaLine(who, [s.race, s.world, `อายุ ${s.age}`, s.stage, s.focus && `ทุ่มเทกับ${s.focus}`].filter(Boolean));
+  // โฟกัสอยู่แท็บของตัวเอง ไม่ซ้ำในบรรทัดตัวตน
+  metaLine(who, [s.race, s.world, `อายุ ${s.age}`, s.stage].filter(Boolean));
   wrap.append(el('h3', null, 'ค่าสถานะ'), ul, dl, el('h3', null, 'ตัวตน'), who);
   // อาชีพตามโฟกัส (05a) — เซฟก่อนมีอาชีพไม่มีช่องนี้
   if (s.careers?.length) {
@@ -3000,103 +3184,30 @@ function isekaiSkillPanel(s) {
   wrap.append(chips);
   return wrap;
 }
-// เปลี่ยนความเร็วระหว่างแผงเปิด: armTick วนรอแผงปิดด้วยความเร็วใหม่อยู่แล้ว แต่จาก "หยุด" ไม่มีรอบไหนวนอยู่ จึงต้องตั้งใหม่เอง
-function speedPanel() {
-  const wrap = el('div', 'me');
-  wrap.append(speedRow(() => tickAgain?.()), el('p', 'meta', 'ใบผลลัพธ์และใบที่ต้องเลือก หยุดรอเสมอ'));
+// แท็บโฟกัสต่างโลก (ui-redo 51 · ข้อ 165): เปลี่ยนนอกการ์ดผ่าน setIsekaiFocus ไม่ใช่ token · กดแล้วเซฟทันที ผลไปคิดที่ใบตาถัดไป
+// แกนปิดทางเปลี่ยน (ใบเตือนชีวิตต่ำเลือกบนการ์ด · ใบจบชาติ) แท็บยังอยู่ที่เดิม โชว์ตัวที่ถือ ปุ่มเมนูจึงไม่กระโดด
+function isekaiFocusPanel(card) {
+  const wrap = el('div', 'ft');
+  const isk = af?.isekai ?? st?.trip;
+  const list = isekaiFocusList(isk);
+  const cur = list.find((f) => f.on) ?? list[0];
+  // ตามน้ำไม่ใช่เรื่องที่ทุ่ม ไม่มีคำชำนาญ
+  const tagsOf = (id) => [id !== FOCUS_FLOW && focusWord(id, isk)].filter(Boolean);
+  if (!isekaiFocusOpen(isk)) {
+    const now = el('div', 'ft-now');
+    now.append(el('b', null, cur.name), ...tagsOf(cur.id), el('span', 'ft-fx', cur.fx));
+    wrap.append(el('h3', null, 'ตอนนี้'), now, el('p', 'ft-note', card.step === 'focus' ? 'เลือกโฟกัสบนการ์ดใบนี้' : 'ตอนนี้เปลี่ยนโฟกัสไม่ได้'));
+    return wrap;
+  }
+  focusRows(wrap, { ...cur, tags: tagsOf(cur.id) }, list.map((f) => ({ ...f, tags: tagsOf(f.id) })), (id) => {
+    setIsekaiFocus(isk, id);
+    saveWrite(card);
+  }, () => isekaiFocusPanel(card));
   return wrap;
 }
-// แถบโฟกัสต่างโลก: หน้าตา/คลาสเดียวกับ focusBar โลกหลัก · กาง/พับในที่ ไม่สร้างกล่องใหม่ (armTick ถือกล่องนี้ไว้ดูว่าชี้/โฟกัสอยู่ไหม)
-function isekaiFocusBar(card, pick) {
-  const cur = card.focus;
-  const wrap = el('div', 'focus ifocusbar');
-  const btn = el('button', 'focus-btn');
-  btn.type = 'button';
-  btn.setAttribute('aria-expanded', 'false');
-  const go = el('span', 'focus-go', 'เปลี่ยน');
-  btn.append(el('span', 'focus-k', 'โฟกัส'), el('b', null, card.focusChoices[cur] ?? ''), el('span', 'focus-fx', card.focusFx?.[cur] ?? ''), go);
-  const list = el('div', 'focus-pick');
-  list.hidden = true;
-  card.focusChoices.forEach((c, i) => {
-    const b = el('button', i === cur ? 'on' : null);
-    b.type = 'button';
-    b.setAttribute('aria-pressed', String(i === cur));
-    b.append(el('b', null, c), el('span', 'focus-fx', card.focusFx?.[i] ?? ''));
-    b.onclick = () => (i === cur ? btn.click() : play(pick(i)));
-    list.append(b);
-  });
-  btn.onclick = () => {
-    list.hidden = !list.hidden;
-    btn.setAttribute('aria-expanded', String(!list.hidden));
-    go.textContent = list.hidden ? 'เปลี่ยน' : 'ปิด';
-  };
-  wrap.append(btn, list);
-  return wrap;
-}
-// ตัวจับเวลา (B68b): ใบตาเดินเองแทนการกด "ต่อ" — ยิง afterNext ตัวเดียวกับปุ่ม เซฟจึงเล่นซ้ำได้เหมือนกดเอง
-// ความเร็วจำแยก key ไม่อยู่ในเซฟ เพราะไม่เปลี่ยนผลของชีวิต · ×1 = ตาละ 2 วินาที (เจ้าของเคาะ)
-const SPEED_KEY = 'next-life-isekai-speed-v1';
-const SPEEDS = [1, 2, 4, 0];
-const TICK_MS = 2000;
-let speed = speedRead();
-let tickTimer = null;
-// ตั้งเวลาใบตาที่ค้างอยู่ใหม่ — null เมื่อใบปัจจุบันไม่เดินเอง
-let tickAgain = null;
-function speedRead() {
-  try {
-    const v = Number(localStorage.getItem(SPEED_KEY) ?? 1);
-    return SPEEDS.includes(v) ? v : 1;
-  } catch {
-    return 1;
-  }
-}
-function speedWrite(v) {
-  speed = v;
-  try {
-    localStorage.setItem(SPEED_KEY, String(v));
-  } catch {
-    // ไม่มีที่เก็บ ก็จำแค่ในหน้านี้
-  }
-}
-// พักไว้ระหว่างแท็บถูกซ่อน หรือผู้เล่นชี้/โฟกัสแผงทุ่มเทอยู่ — ไม่ให้ใบเปลี่ยนใต้มือ · ใบหลุดจากจอแล้ว (ไปหน้าอื่น) ไม่กด
-// tok = token ของปุ่ม "ต่อ" ใบนั้น — ใบตาทริปกลางชีวิตเดินด้วย token ชีวิต ไม่ใช่ token ระหว่างชาติ
-function armTick(box, panel, bar, tok) {
-  clearTimeout(tickTimer);
-  bar.style.animation = 'none';
-  if (!speed) return;
-  const ms = TICK_MS / speed;
-  void bar.offsetWidth;
-  bar.style.animation = `itick ${ms}ms linear forwards`;
-  tickTimer = setTimeout(() => {
-    if (!box.isConnected) return;
-    // แถบโฟกัสกางอยู่ = ผู้เล่นกำลังเลือก เวลารอแม้เมาส์ออกนอกแถบ · ลิ้นชักเปิดอยู่ = การ์ดถูกบัง ใบไม่เปลี่ยนใต้แผง (แผงค้างไม่บัง เวลาเดินต่อ)
-    if (panel.matches(':hover, :focus-within') || panel.querySelector('[aria-expanded="true"]') || root.querySelector('.sheet:not(.pin)') || document.hidden) return armTick(box, panel, bar, tok);
-    play(tok);
-  }, ms);
-}
-function speedRow(onChange) {
-  const row = el('div', 'ispeed');
-  row.setAttribute('role', 'group');
-  row.setAttribute('aria-label', 'ความเร็วเวลา');
-  for (const v of SPEEDS) {
-    const b = el('button', null, v ? `×${v}` : 'หยุด');
-    b.type = 'button';
-    b.setAttribute('aria-pressed', String(v === speed));
-    b.addEventListener('click', () => {
-      speedWrite(v);
-      for (const x of row.children) x.setAttribute('aria-pressed', String(x === b));
-      onChange();
-    });
-    row.append(b);
-  }
-  return row;
-}
-
 // ผลทุ่มเทจากแกนเป็นคำรวม "พลัง · เวท ขึ้น" — แตกเป็นชิ้นละค่า ป้ายจึงได้ไอคอน+ลูกศรแบบเดียวกับการ์ดเหตุการณ์
 const focusUp = (fx) => (fx?.endsWith(' ขึ้น') ? fx.slice(0, -' ขึ้น'.length).split(' · ').map((k) => `${k} ↑`).join(' · ') : fx);
 function renderIsekai(card) {
-  clearTimeout(tickTimer);
-  tickAgain = null;
   root.replaceChildren();
   const box = el('article', 'card i');
   const s = card.status;
@@ -3110,7 +3221,7 @@ function renderIsekai(card) {
   }
   const body = el('div', 'body');
   const choices = el('div', 'choices');
-  body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} · อายุ ${card.age}` : card.warn ? `${ISEKAI_KICKER.warn} · เลือกสิ่งที่ทุ่มเท` : ISEKAI_KICKER[card.step]));
+  body.append(el('span', 'kicker', card.step === 'event' ? `${card.finale ? 'เหตุการณ์สุดท้าย' : 'เหตุการณ์'} · อายุ ${card.age}` : card.warn ? ISEKAI_KICKER.focus : ISEKAI_KICKER[card.step]));
   body.append(el('h3', null, card.title), el('p', null, card.text));
   if (card.step === 'result' && card.ok !== null) body.append(el('p', card.ok ? 'iok' : 'ibad', card.ok ? 'สำเร็จ' : 'พลาด'));
   const deltas = Object.entries(card.deltas ?? {});
@@ -3128,7 +3239,9 @@ function renderIsekai(card) {
     v.append(el('span', 'h', 'คำสัญญากับเทพธิดา'), el('blockquote', null, card.vow.text), el('b', null, card.vow.kept ? 'รักษาไว้ได้' : 'ผิดคำสัญญา'));
     body.append(v);
   }
-  if (card.lore?.length) body.append(el('p', 'isys', `โลกนี้จะจำ${card.lore.length > 1 ? `${card.lore.slice(0, -1).join(' ')} และ${card.lore.at(-1)}` : card.lore[0]}ไว้หลังคุณจากไป`));
+  // ใบตาแรกของชาติ: lore เป็นประโยคความจำของโลกจากคนต่างโลกรุ่นก่อน (เดิมต่อท้ายใบทุ่มเทใบแรก) · ใบจบ: รายการที่โลกจะจำ
+  if (typeof card.lore === 'string') body.append(el('p', 'isys', card.lore));
+  else if (card.lore?.length) body.append(el('p', 'isys', `โลกนี้จะจำ${card.lore.length > 1 ? `${card.lore.slice(0, -1).join(' ')} และ${card.lore.at(-1)}` : card.lore[0]}ไว้หลังคุณจากไป`));
   // ต่างโลกไม่มีฉายาของตัวเอง — เบาะแสชี้ฉายาของโลกเดิมที่ชาติหน้ายังไปเก็บได้ (B108 ใช้สองโลก)
   if (card.step === 'end' && !card.trip) clueRow(body, (card.clue ??= titleClue(`${st.seed}:${st.gen}:i${card.run}`)));
   if (card.step === 'end' && card.earn) body.append(earnBox(card.earn, `${save.seed}:${st.gen}:${card.trip ? `t${card.life}` : `i${card.run}`}`));
@@ -3139,10 +3252,6 @@ function renderIsekai(card) {
     body.append(d);
   }
   if (card.chronicle?.length) body.append(chronicleBox(card.chronicle, s));
-  // แถบโฟกัสบนใบตา (05a · ปุ่มเดียวกับโลกหลัก แทนกริดเปิดตลอดของ B68b): กด "เปลี่ยน" กางรายการ · กางอยู่/ชี้อยู่ = เวลาหยุดรอ (armTick)
-  // ปุ่มเลือกยังเดินผ่าน pick เซฟจึงเล่นซ้ำได้ (ต่างจากโลกหลักที่เปลี่ยนนอกลำดับปุ่ม) · focusFx = ผลต่อปีของแต่ละทาง
-  let panel = null;
-  if (card.step === 'tick') panel = isekaiFocusBar(card, pick);
   if (card.choices.length) {
     card.choices.forEach((c, i) => {
       const why = card.locked?.[i];
@@ -3159,18 +3268,7 @@ function renderIsekai(card) {
   }
   const nextTok = card.trip ? T.next : T.afterNext;
   if (!card.choices.length) choices.append(enter(button(BTN.next, null, () => play(nextTok))));
-  box.append(head);
-  if (panel) box.append(panel);
-  // ใบผลลัพธ์/ใบเลือกหยุดรอเสมอ (เจ้าของเคาะ) — การ์ดเหลือแค่เส้นเวลาของใบที่เดินเอง ปุ่มความเร็วอยู่ในเมนู (ใบ 14)
-  if (s && panel && !card.choices.length) {
-    const bar = el('i');
-    const t = el('div', 'itimer');
-    t.append(bar);
-    box.append(t);
-    tickAgain = () => armTick(box, panel, bar, nextTok);
-    tickAgain();
-  }
-  box.append(body, choices);
+  box.append(head, body, choices);
   root.append(panels(box, false), lifeMenu(card, box));
   shelfDot();
   fxCard(box, card);
@@ -3298,8 +3396,9 @@ function step(tok) {
   }
   if (tok === T.afterNext) return nextAfterCard(af);
   if (tok === T.rebirth) {
-    st = nextLife(af, carryNext, carryNext.length ? skillsRead().s : {});
+    st = nextLife(af, carryNext, carryNext.length ? skillsRead().s : {}, carryOffered);
     carryNext = [];
+    carryOffered = false;
     af = null;
     curAge = null;
     bookReset();
@@ -3535,8 +3634,6 @@ function linkAsk(card, seed) {
 function home(card) {
   const where = af ? `ระหว่างชาติ หลัง${lifeEndWord(isGone(st))} ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
-  // ใส่ใน .body ให้ได้ขอบซ้ายขวาเดียวกับหัวการ์ด
-  choices.previousElementSibling.append(warnLine());
   choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.shelf, null, () => openShelf()));
 }
 
@@ -3579,6 +3676,8 @@ if (logoEl && window.ResizeObserver) new ResizeObserver(headEdge).observe(logoEl
 
 // ภาพถ่าย v2 ก่อน · ไม่มีจึงลองเซฟ v1 (เล่นซ้ำตรงการ์ดเดิม = เขียนทับเป็น v2 ทันที) · v1 ไม่ตรง/เซฟเสีย = หน้าเกมอัปเดต
 function boot() {
+  // ล้างโครงหน้าเปิดที่มากับ HTML (template.html) — ทุกทางข้างล่างวาดจอใหม่ลง root
+  root.replaceChildren();
   const seed = linkSeed();
   dropLinkSeed();
   let card = snapRead();

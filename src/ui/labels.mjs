@@ -9,6 +9,19 @@ export const FOLLOW_WORD = { later: 'มีผลภายหลัง' };
 // หัวใจข้างอายุบนแถบสถานะตอนชีวิตใกล้หมด — ตัวห่อมี aria-label "ใกล้ตาย" ไอคอนจึงซ่อนจากโปรแกรมอ่านจอ
 export const HEART_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14S1.5 9.8 1.5 5.6A3.4 3.4 0 0 1 8 4a3.4 3.4 0 0 1 6.5 1.6C14.5 9.8 8 14 8 14z"/></svg>';
 
+// ไอคอนแถบเมนู (ui-redo 50 ตาม JSON 47): เส้นบางชุดเดียวของเมนู แยกจากไอคอนค่าในป้ายผล — "ตัวฉัน" เป็นคนเดียว ไม่ใช่สองคนแบบค่าความสัมพันธ์ ตาจึงไม่สับสนเมนูกับค่า
+export const MENU_ICON = {
+  past: '<path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/><path d="M12 8v4l3 2"/>',
+  me: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
+  focus: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.8"/>',
+  family: '<circle cx="8" cy="8" r="2.8"/><circle cx="16.5" cy="9" r="2.3"/><path d="M3 19c.8-3.4 3-5 5-5s4.2 1.6 5 5M13.5 19c.5-2.4 1.6-3.8 3-3.8s2.6 1.4 3.2 3.8"/>',
+  money: '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/>',
+  shelf: '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>',
+  skill: '<path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/>',
+  more: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+};
+export const menuIcon = (id) => (MENU_ICON[id] ? `<svg viewBox="0 0 24 24" aria-hidden="true">${MENU_ICON[id]}</svg>` : '');
+
 // ป้ายผลบนปุ่มตัวเลือก (ui-redo 54 ตาม JSON ที่เจ้าของเลือก): ไอคอนเส้นต่อค่า + ลูกศร + ชิปสีตามทิศ · คู่มือวาดด้วยฟังก์ชันเดียวกัน
 // ป้ายอ่านจากข้อความที่แกนส่งมา ไม่ใช่จากผลดิบ — ค่าที่แกนซ่อนเป็น ? อยู่แล้วจึงไม่มีทางได้ไอคอนเฉพาะตัว · ค่าที่ไม่มีไอคอน (บารมี เงินเทา ชาติหน้า …) คงเป็นคำ
 const FX_ICON_PATH = {
@@ -27,6 +40,10 @@ const FX_ICON_PATH = {
 };
 const FX_ICON_OF = { ชีวิต: 'heart', ความสุข: 'smile', ความรู้: 'book', ความสัมพันธ์: 'people', เงิน: 'coin', รายได้: 'case', เส้นสาย: 'link', พลัง: 'bolt', เวท: 'spark', โชค: 'clover', ทอง: 'coin', ชื่อเสียง: 'star' };
 const fxIcon = (name) => `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="${FX_ICON_PATH[name]}"/></svg>`;
+// ไอคอนหน้าชื่อค่าบนแถบสถานะ/แผงตัวฉัน (ui-redo 80 · ข้อ 140–141): ชุดเดียวกับป้ายผล ผู้เล่นจับคู่ป้ายบนปุ่มกับค่าบนแถบได้
+// อ่านตาม key ค่า ไม่ใช่ชื่อไทย — วงปรโลกใช้ key ชาติไทยแต่ชื่อต่าง (ชีวิตทิพย์ ปัญญาธรรม …) · ค่าที่ไม่มีในตาราง = ไม่มีไอคอน
+const STAT_ICON_OF = { health: 'heart', happiness: 'smile', knowledge: 'book', relations: 'people', hp: 'heart', str: 'bolt', mag: 'spark', luk: 'clover', gold: 'coin' };
+export const statIcon = (key) => (STAT_ICON_OF[key] ? fxIcon(STAT_ICON_OF[key]) : '');
 const fxEscHtml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const FX_ARROW_SAID = { '↑': 'เพิ่ม', '↓': 'ลด' };
 // ชิ้นที่ตาเห็นต่างจากคำที่ควรอ่าน: ซ่อนชิ้นที่เห็นจากโปรแกรมอ่านจอ แล้วอ่านคำเต็มแทน
@@ -73,7 +90,7 @@ export const HELP = [
   { id: 'scam', label: 'โดนหลอกออนไลน์', call: 'โทร 1441', tel: '1441', org: 'กองบัญชาการตำรวจสืบสวนสอบสวนอาชญากรรมทางเทคโนโลยี · 24 ชม.', web: 'https://www.ccib.go.th/' },
   { id: 'bankrupt', label: 'เรื่องล้มละลาย/บังคับคดี', call: '1111 กด 79', tel: '1111,79', org: 'กรมบังคับคดี', web: 'https://www.led.go.th/th' },
 ];
-// คำเตือนเนื้อหา (ui-redo 25): หน้าแรกเว็บ (data-fact warnWords) กับการ์ดแรกเกิด/หน้าเล่นต่อในเกมอ่านชุดนี้ชุดเดียว
+// คำเรื่องหนักในเกม: หัวข้อ "ช่วยจริง" ของหน้าคู่มืออ่านชุดนี้ (บรรทัดคำเตือนบนการ์ดแรกเกิด/หน้าเล่นต่อ/หน้าแรกถอดแล้ว ui-redo 61)
 // เติมคำเฉพาะเรื่องที่มีการ์ดจริงในเกมแล้ว (การนอกใจรอการ์ดนอกใจเข้าเกม)
 export const WARN_WORDS = ['ความตาย', 'หนี้', 'การสูญเสีย', 'ความรุนแรง'];
 export const warnWords = (w = WARN_WORDS) => `${w.slice(0, -1).join(' ')} และ${w.at(-1)}`;

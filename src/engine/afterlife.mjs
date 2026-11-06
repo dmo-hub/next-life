@@ -10,7 +10,7 @@ import { goalsMet, titlesOf } from './titles.mjs';
 import { heirPets, letterTo } from './family.mjs';
 import { CHRONIC } from './death.mjs';
 import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf } from './life.mjs';
-import { ISEKAI, ISEKAI_SKILLS, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
+import { ISEKAI, ISEKAI_SKILLS, SKILL, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 import { warnPick } from './warn.mjs';
 import { pastOf } from './past.mjs';
@@ -652,9 +652,32 @@ function makeHeir(af, r) {
 }
 
 // รุ่นถัดไป: ชีวิตใหม่จาก heir ที่การ์ดส่งต่อสร้างไว้ · carry = id สกิลที่ผู้เล่นเลือกพกจากคลัง (06s · bookCarryOffers) · book = คลังของผู้เล่น ให้การ์ดอัปเกรดรู้ขั้นคลัง
-export function nextLife(af, carry = [], book = {}) {
+// offered = การ์ดเลือกสกิลขึ้นจริง (สมุดไม่ว่าง) — ผู้เรียกบอก ไม่เดาจาก carry ว่าง ⇒ บอท/harness ที่เรียก nextLife(af) เดินเท่าเดิม
+export function nextLife(af, carry = [], book = {}, offered = false) {
   if (!af.heir) throw new Error('ยังไม่ถึงการ์ดส่งต่อ');
-  return newLife(af.heir.seed, af.st.content, { ...af.heir, skills: carryPick(carry, book) });
+  const heir = { ...af.heir, skills: carryPick(carry, book) };
+  const spare = offered ? SKILL.carry - carry.length : 0;
+  if (!spare) return newLife(heir.seed, af.st.content, heir);
+  // ค่าเข้าเกณฑ์ดูจากค่าเริ่มสุดท้ายของชีวิตเดียวกันที่ยังไม่ได้ค่าเพิ่ม (ฐาน+jitter+bonus หลัง clamp)
+  // ได้ 0 ค่ายังส่ง spare: [] ไป — การ์ดเกิดขึ้นบรรทัดสำรองแทน (decisions 360)
+  const keys = spareKeys(newLife(heir.seed, af.st.content, heir), spare, heir.seed);
+  const bonus = { ...heir.bonus };
+  for (const k of keys) bonus[k] = (bonus[k] ?? 0) + SPARE_STAT;
+  return newLife(heir.seed, af.st.content, { ...heir, bonus, spare: keys });
+}
+
+// ช่องพกที่ไม่ใช้แลกเป็นค่าเริ่ม (decisions 355–359): ช่องละ 1 ค่าสุ่มไม่ซ้ำ +SPARE_STAT · ไม่อยู่ใต้ FATE.bonusCap (ของแลก ไม่ใช่ผลกรรม)
+// สุ่มเฉพาะค่าที่บวกได้เต็ม (≤ SPARE_MAX) · เข้าเกณฑ์น้อยกว่าช่องว่าง = ได้เท่าที่มี
+// stream แยกจาก seed ของ heir — ไม่กินเลขสุ่มของโลก ชีวิตใหม่ต่างจากพกเต็มเฉพาะผลของค่าเริ่ม
+// filter = false ใช้เป็นตัวควบคุมของด่านเท่านั้น (ต้องเห็นค่าชน 100)
+export const SPARE_STAT = 10;
+const SPARE_MAX = 100 - SPARE_STAT;
+export function spareKeys(base, spare, seed, filter = true) {
+  const rng = makeRng(seed ^ 0x2b7e1516);
+  const pool = STAT_KEYS.filter((k) => !filter || base[k] <= SPARE_MAX);
+  const out = [];
+  while (out.length < spare && pool.length) out.push(...pool.splice(rng.int(0, pool.length - 1), 1));
+  return out;
 }
 
 // harness/หน้าเว็บเดินช่วงที่ 7 ด้วยฟังก์ชันชุดเดียวกัน · บอทได้ af (มี pending.choices ให้อ่านป้ายบุญบาปแบบเดียวกับการ์ดชีวิต)
@@ -664,6 +687,8 @@ export function playAfterlife(st, pickChoice, onCard) {
     const card = nextAfterCard(af);
     onCard?.(card, af);
     if (card.choices?.length) chooseAfter(af, warnPick(card) >= 0 ? warnPick(card) : pickChoice(card, af.botRng, af));
+    // ชาติต่างโลกไม่มีใบทุ่มเทเข้าช่วงวัยแล้ว (ui-redo 83) — บอทตั้งโฟกัสตาแรกของช่วงจากใบเลือกรูปเดิม
+    else if (card.entered && af.isekai) isekaiFocusPick(af.isekai, pickChoice({ stage: card.stage, ...isekaiFocusCard(af.isekai) }, af.botRng, af));
     if (card.done) return af;
   }
 }

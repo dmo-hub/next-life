@@ -2,7 +2,7 @@
 // หน้ารวมการ์ดได้แค่สิ่งที่จอแสดง (ชื่อโลก/สกิลพร้อมคำอธิบาย · ข้อความเหตุการณ์ · ตัวเลือก) · หน้าเฉลยได้ความยาก ผลสำเร็จ/พลาด ค่าที่ขยับ ธง และตอนจบ
 // ชาติใหม่เกิดในทวีป (06d): ส่วนหลักพูดถึงแฟ้มเกิด/เผ่า/แคว้น · บทบาท 4 โลกกับการ์ดเฉพาะโลกย้ายไปกลุ่มพับ "ชาติเก่า" (ยังเล่นถึงจากเซฟ)
 import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_ROLES, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_FOCUS, ISEKAI_CAREERS, ISEKAI_CAREER_T, GODDESS, GODDESS_VOWS, PATHS, CONT_LIFE, CONT_END, CONT_REGIONS, CONT_RACES, CONT_TIER, CONT_DISPUTES, CONT_MOVE, contRaceStart, meritName, roleInfo } from '../engine/index.mjs';
-import { esc, text as rawText } from './catalog.mjs';
+import { esc, text as rawText, spoilSlot } from './catalog.mjs';
 
 // เหตุการณ์ตำนาน (B68i) เรียกชื่อคนต่างโลกรุ่นก่อนตอนเล่น — หน้าเว็บแสดงเป็นช่องชื่อแบบเดียวกับ {ชื่อชาติก่อน}
 // site-check เทียบหน้ารวมการ์ดด้วยตัวนี้ตัวเดียวกัน ข้อความที่มีช่องชื่อจึงตรงกับที่หน้าแสดง
@@ -44,36 +44,42 @@ const oldHtml = (pick, draw) => {
   return `<details class="old" id="isk-old"><summary>${esc(ISEKAI_OLD)} <small>${n} ใบ</small></summary><p class="lead">ชาติต่างโลกที่เริ่มก่อนมีทวีปเลือกบทบาทจาก 4 โลก เซฟเดิมยังเล่นต่อได้จนจบชาติ ชาติใหม่ไม่เจอการ์ดกลุ่มนี้</p><h3>ก่อนเริ่มชาติ</h3><div class="grid">${pick}</div>${groupHtml(gs, draw)}</details>`;
 };
 
-// catalog.mjs กับไฟล์นี้ import กันไปมา — ห้ามเรียก esc/text ตอนโหลดโมดูล ต้องเรียกตอนสร้างหน้า
-const lead = () => `<p class="lead">เลือก "${esc(PATHS.find((p) => p.id === 'isekai').text)}" ที่ปรโลก แล้วใช้ชีวิตหนึ่งชาติในโลกแฟนตาซีที่เวลาเดินเอง ก่อนกลับไปให้ปรโลกตัดสิน · การ์ดสีม่วงคือการ์ดต่างโลก</p>`;
+const lead = () => `<p class="lead">เลือก "${esc(PATHS.find((p) => p.id === 'isekai').text)}" ที่ปรโลก แล้วใช้ชีวิตหนึ่งชาติในโลกแฟนตาซี ก่อนกลับไปให้ปรโลกตัดสิน · การ์ดสีม่วงคือการ์ดต่างโลก</p>`;
 
 function section(n, body) {
   return `<details id="s${n}"><summary>${ISEKAI_SECTION} <small>${isekaiCardCount()} ใบ</small></summary>${lead()}${body}</details>`;
 }
 export const isekaiNav = (n) => `<a href="#s${n}">${ISEKAI_SECTION} <small>${isekaiCardCount()}</small></a>`;
 
-// ─── หน้ารวมการ์ด: สิ่งที่จอแสดงเท่านั้น ───
-function pickCard(title, body, items) {
-  return `<article class="c x"><h4>${esc(title)}</h4>${tagLine(['ก่อนเริ่มชาติ'])}<p>${esc(body)}</p><ul>${items.join('')}</ul></article>`;
+// ─── ด้านหน้าการ์ด: สิ่งที่จอแสดงเท่านั้น ───
+// slot = เฉลยของการ์ดใบนี้ · ใบที่เฉลยอยู่กล่องท้ายหน้า (บทบาท · สกิล ข้อ 187) ไม่มีปุ่ม
+function pickCard(title, body, items, id = '', slot = '') {
+  return `<article class="c x"${id ? ` id="${id}"` : ''}><h4>${esc(title)}</h4><div class="sp-front">${tagLine(['ก่อนเริ่มชาติ'])}<p>${esc(body)}</p><ul>${items.join('')}</ul></div>${slot}</article>`;
 }
 const raceNames = (ids) => ids.map((r) => CONT_RACES[r].name).join(' · ');
 const ruler = (g) => (g.ruler ? `ผู้ปกครอง: ${g.ruler}` : 'ไม่มีผู้ปกครอง');
 // แฟ้มเกิดบนจอบอกเผ่า · แคว้น · แนวของแคว้น — หน้ารวมการ์ดบอกเท่านั้นพร้อมเผ่าที่เกิดได้ · น้ำหนักโอกาสเกิดอยู่หน้าเฉลย
-const birthPick = (desc) =>
-  pickCard('ห้องสีขาว', `เทพธิดายื่นแฟ้มเกิด ${CONT_LIFE.offers} ใบให้เลือก แต่ละใบบอกเผ่ากับแคว้นที่จะไปเกิดในทวีป${CONT_LIFE.name} (${Object.keys(CONT_REGIONS).length} แคว้น · ${Object.keys(CONT_RACES).length} เผ่า)`, Object.entries(CONT_REGIONS).map(([id, g]) => `<li><b>${esc(g.name)}</b> — ${esc(g.about)} · ${esc(ruler(g))} · เผ่าที่เกิดได้: ${esc(raceNames(g.races))}${desc(id, g)}</li>`));
-const rolePick = (desc) => pickCard('ห้องสีขาว (ชาติเก่า)', `เทพธิดายื่นบทบาทให้เลือก ${ISEKAI.worlds} จาก ${Object.keys(ISEKAI_ROLES).length} บทบาท`, Object.keys(ISEKAI_ROLES).map((id) => [id, roleInfo(id)]).map(([id, r]) => `<li><b>${esc(r.name)}</b> — ${esc(r.pitch)}${desc(id, r)}</li>`));
-const skillPick = (desc) => pickCard('ของขวัญจากเทพธิดา', `เลือกสกิลโกง 1 อย่างจาก ${ISEKAI.skills} อย่างที่สุ่มมา`, Object.entries(ISEKAI_SKILLS).map(([id, s]) => `<li><b>${esc(s.name)}</b> — ${esc(s.desc)}${desc(id, s)}</li>`));
+const birthItems = (desc) => Object.entries(CONT_REGIONS).map(([id, g]) => `<li><b>${esc(g.name)}</b> — ${esc(g.about)} · ${esc(ruler(g))} · เผ่าที่เกิดได้: ${esc(raceNames(g.races))}${desc(id, g)}</li>`);
+const birthPick = (slot) => pickCard('ห้องสีขาว', `เทพธิดายื่นแฟ้มเกิด ${CONT_LIFE.offers} ใบให้เลือก แต่ละใบบอกเผ่ากับแคว้นที่จะไปเกิดในทวีป${CONT_LIFE.name} (${Object.keys(CONT_REGIONS).length} แคว้น · ${Object.keys(CONT_RACES).length} เผ่า)`, birthItems(() => ''), 'isk-birth', slot);
+const roleItems = (desc) => Object.keys(ISEKAI_ROLES).map((id) => [id, roleInfo(id)]).map(([id, r]) => `<li><b>${esc(r.name)}</b> — ${esc(r.pitch)}${desc(id, r)}</li>`);
+const rolePick = () => pickCard('ห้องสีขาว (ชาติเก่า)', `เทพธิดายื่นบทบาทให้เลือก ${ISEKAI.worlds} จาก ${Object.keys(ISEKAI_ROLES).length} บทบาท`, roleItems(() => ''));
+const skillItems = (desc) => Object.entries(ISEKAI_SKILLS).map(([id, s]) => `<li><b>${esc(s.name)}</b> — ${esc(s.desc)}${desc(id, s)}</li>`);
+const skillPick = () => pickCard('ของขวัญจากเทพธิดา', `เลือกสกิลโกง 1 อย่างจาก ${ISEKAI.skills} อย่างที่สุ่มมา`, skillItems(() => ''));
 
-function plainEvent(e) {
-  return [`<article class="c x">`, `<h4>${esc(e.title)}</h4>`, tagLine(tags(e)), `<p>${text(e.text)}</p>`, `<ul>${e.choices.map((c) => `<li>${text(c.t)}</li>`).join('')}</ul>`, '</article>'].join('');
+function eventCard(e, back) {
+  return [`<article class="c x" id="isk-${esc(e.id)}">`, `<h4>${esc(e.title)}</h4>`, '<div class="sp-front">', tagLine(tags(e)), `<p>${text(e.text)}</p>`, `<ul>${e.choices.map((c) => `<li>${text(c.t)}</li>`).join('')}</ul>`, '</div>', spoilSlot(`isk-${e.id}`, back), '</article>'].join('');
 }
 
-export function isekaiCatalogHtml(n) {
-  const body = [`<h3>ก่อนเริ่มชาติ</h3><div class="grid">${birthPick(() => '')}${skillPick(() => '')}</div>`, groupHtml(groups(false), plainEvent), oldHtml(rolePick(() => ''), plainEvent)].join('');
+// meritTags = ตัววาดป้ายบุญบาปของเฉลยไทย — ส่งเข้ามาแทน import กลับ เพื่อให้ป้ายสองโลกหน้าตา/แต้มเดียวกัน
+export function isekaiCatalogHtml(n, meritTags) {
+  const src = flagSources();
+  const draw = (e) => eventCard(e, spoilBack(e, src, meritTags));
+  const birth = birthPick(spoilSlot('isk-birth', `<ul>${birthItems(birthSpoil).join('')}</ul>`));
+  const body = [`<h3>ก่อนเริ่มชาติ</h3><div class="grid">${birth}${skillPick()}</div>`, groupHtml(groups(false), draw), oldHtml(rolePick(), draw)].join('');
   return section(n, body);
 }
 
-// ─── หน้าเฉลย ───
+// ─── เฉลย ───
 // ธงต่างโลกเป็นของชาตินั้น ไม่มีชื่อไทยในทะเบียนธง — บอกว่าได้มาจากการ์ดไหนแทน ผู้อ่านกระโดดไปดูทางที่ปูไว้ได้
 function flagSources() {
   const src = new Map();
@@ -114,7 +120,7 @@ function rollLine(c, src) {
 }
 
 // ป้ายบุญบาปผูกเจตนาของตัวเลือก ไม่ผูกผลทอย จึงอยู่ระดับตัวเลือกบรรทัดเดียว · ตัวเลือกไม่มีป้าย = ไม่ลงบัญชี
-function spoilEvent(e, src, meritTags) {
+function spoilBack(e, src, meritTags) {
   const goalName = e.worlds?.length === 1 ? `ความคืบหน้า${roleInfo(e.worlds[0]).goal}` : 'ความคืบหน้าเป้าหมายของโลก';
   const choices = e.choices
     .map((c, i) => {
@@ -126,7 +132,8 @@ function spoilEvent(e, src, meritTags) {
       return `<li><p class="ch">${text(c.t)}</p>${lock}${merit}${rolled ? `<p class="mul">${rollLine(c, src).join(' · ')}</p>` : '<p class="mul">ไม่ต้องทอย ได้ผลนี้ทุกครั้ง</p>'}<ol class="out">${res}</ol></li>`;
     })
     .join('');
-  return [`<article class="c x" id="isk-${esc(e.id)}">`, `<h4>${esc(e.title)}</h4>`, tagLine([...tags(e), ...knowTags(e)]), `<p>${text(e.text)}</p>`, `<ol class="chs">${choices}</ol>`, '</article>'].join('');
+  const know = knowTags(e);
+  return `${know.length ? tagLine(know) : ''}<ol class="chs">${choices}</ol>`;
 }
 
 // ตอนจบตามกติกา isekaiEnding ในเอนจิน · เกณฑ์ 50 และข้อยกเว้นของกลืนกินเขียนตามโค้ดนั้น
@@ -201,7 +208,7 @@ function contSpoil() {
   const fame = CONT_LIFE.fame;
   const rule = { best: `ชื่อเสียง ≥ ${fame} และมีอาชีพ`, good: `ชื่อเสียง ≥ ${fame} หรือมีอาชีพ อย่างใดอย่างหนึ่ง (ไม่มีอาชีพ {อาชีพ} = คนดัง)`, bad: 'ไม่ถึงทั้งสองข้อ' };
   const ends = Object.entries(CONT_END).map(([k, [t, s]]) => `<li class="end"><b>${esc(FILL(t))}</b> — ${esc(rule[k])}<br><small>${esc(FILL(s))}</small></li>`);
-  return `<h3>เผ่า <small>${races.length} เผ่า</small></h3><ul class="rules">${races.join('')}</ul><h3>อาชีพ <small>${jobs.length} อาชีพ</small></h3><ul class="rules">${jobs.join('')}</ul><h3>ตอนจบชาติทวีป</h3><p class="ex">{อาชีพ} = อาชีพแรกที่ได้ · {แคว้น} = แคว้นที่เกิด</p><ul class="ends">${ends.join('')}</ul>`;
+  return { races: `<ul class="rl">${races.join('')}</ul>`, jobs: `<ul class="rl">${jobs.join('')}</ul>`, ends: `<p class="ex">{อาชีพ} = อาชีพแรกที่ได้ · {แคว้น} = แคว้นที่เกิด</p><ul class="ends">${ends.join('')}</ul>` };
 }
 
 // การ์ดที่ให้สกิลสุ่มไม่สุ่มโชคเทพธิดา (chooseIsekai) — สกิลอื่นได้ระหว่างทางด้วย
@@ -216,7 +223,7 @@ function rules(meritTags) {
   const keep = meritTags([{ cat: 'keep_goddess_vow', level: GODDESS.vowLevel }]).join('');
   const broke = meritTags([{ cat: 'vow_broken' }]).join('');
   const t = ISEKAI_TIME;
-  return `<ul class="rules">${[
+  return `<ul class="rl">${[
     `ชาติใหม่เกิดในทวีป${esc(CONT_LIFE.name)}: เทพธิดายื่นแฟ้มเกิด ${CONT_LIFE.offers} ใบ (เผ่า + แคว้น ไม่ซ้ำคู่กัน) สุ่มตามระดับโอกาสเกิดของแคว้น กรรมไม่ทำให้แฟ้มเอียง · ไม่มีเป้าหมาย ฉากเปิด หรือฉากสุดท้าย · คนที่ข้ามมาทั้งตัวเป็น${esc(CONT_RACES[CONT_LIFE.tripRace].name)} ลงแคว้นสุ่มที่${esc(CONT_RACES[CONT_LIFE.tripRace].name)}เกิดได้`,
     `เผ่าแก่ไม่เท่ากัน: อายุเริ่มช่วงวัย วัยชรา และปีที่นับเป็นอาชีพ คูณด้วยตัวคูณอายุของเผ่า · ทุ่มเทสายต้นทางของอาชีพรวมครบ ${ISEKAI_CAREER_T.years} ปี ได้อาชีพนั้นติดตัวทั้งชาติ ได้หลายอาชีพพร้อมกันได้`,
     `ย้ายแคว้น: ทุ่มเทกับ${esc(ISEKAI_FOCUS[CONT_MOVE.focus].name)}ครบ ${CONT_MOVE.years} ปีเต็มนับจากเกิดหรือทางแยกครั้งก่อน = ใบทางแยกยื่นแคว้นที่มีถนนติดกันสุ่มไม่เกิน ${CONT_MOVE.offers} แคว้น + อยู่ที่เดิม · ย้ายแล้วตอนจบเล่าเป็นคนของแคว้นใหม่ · ไม่ย้ายก็นับปีใหม่ · ชาติเก่าที่มีบทบาทไม่มีทางแยก`,
@@ -227,22 +234,22 @@ function rules(meritTags) {
     `อยู่ต่างโลกต่อติดกันได้ ${k.stay} รอบ แล้วต้องกลับโลกเดิมตามกรรม`,
     `กรรมจากปรโลก (−1 ถึง 1): ค่าเริ่มทุกตัวขยับ กรรม × ${k.karmaStat} (ปัดเศษ) · กรรม ≥ ${k.karmaSkill} ได้สกิลให้เลือกเพิ่ม 1 · ≤ −${k.karmaSkill} ลดลง 1 · บาปทำให้ทุกด่านยากขึ้นสูงสุด ${k.karmaDc}`,
     'โอกาสสำเร็จ = 50 + (ค่าที่ทอย − ความยาก) × 4 + สกิลตรงสาย + ธงที่ปูไว้ แล้วตัดให้อยู่ระหว่าง 5% ถึง 95%',
-    `เวลาเดินเองตาละ ${t.step} ปี (วัยชราตาละ ${t.oldStep} ปี) · ทุกตามีโอกาส ${Math.round(t.eventP * 100)}% ที่จะมีเหตุการณ์ให้ตัดสิน เรื่องสายเดียวกับที่ทุ่มเทอยู่โผล่บ่อยกว่า 3 เท่า · ชาติเก่า: ฉากเปิดมาก่อนตาแรก ฉากสุดท้ายมาเมื่อถึงอายุของบทบาท`,
+    `กดไปต่อหนึ่งตา เวลาผ่านไป ${t.step} ปี (วัยชราตาละ ${t.oldStep} ปี) · ทุกตามีโอกาส ${Math.round(t.eventP * 100)}% ที่จะมีเหตุการณ์ให้ตัดสิน เรื่องสายเดียวกับที่ทุ่มเทอยู่โผล่บ่อยกว่า 3 เท่า · ชาติเก่า: ฉากเปิดมาก่อนตาแรก ฉากสุดท้ายมาเมื่อถึงอายุของบทบาท`,
     `วัยชราเริ่มอายุ ${ISEKAI_STAGES.at(-1).from} · หลังจากนั้นร่างกายเสื่อมทุกปีแรงขึ้นเรื่อย ๆ จนสิ้นอายุ ความสุขดีทำให้แก่ช้า`,
     `ชีวิต (HP) หมด = ${esc(ISEKAI_DEATH[0])} (เว้นมีสกิล${esc(ISEKAI_SKILLS.rbd.name)} ฟื้นได้ครั้งเดียว) · ค่าสถานะที่สูงสุดตอนจบติดตัวไปชาติต่างโลกถัดไป +${k.memory}`,
   ].map((s) => `<li>${s}</li>`).join('')}</ul>`;
 }
 
-// meritTags = ตัววาดป้ายบุญบาปของหน้าเฉลยไทย — ส่งเข้ามาแทน import กลับ เพื่อให้ป้ายสองโลกหน้าตา/แต้มเดียวกัน
-export function isekaiSpoilersHtml(n, meritTags) {
-  const src = flagSources();
-  const body = [
-    rules(meritTags),
-    `<h3>ก่อนเริ่มชาติ</h3><div class="grid">${birthPick(birthSpoil)}${skillPick(skillSpoil)}</div>`,
-    contSpoil(),
-    groupHtml(groups(false), (e) => spoilEvent(e, src, meritTags)),
-    `<p class="ex">ตอนจบแบบตาย: <b>${esc(ISEKAI_DEATH[0])}</b> — ${esc(ISEKAI_DEATH[1])}</p>`,
-    oldHtml(rolePick(worldSpoil), (e) => spoilEvent(e, src, meritTags)),
+// เฉลยที่ไม่ผูกการ์ดใบใด: กล่องท้ายหน้า เปิดทีละกล่อง (ข้อ 187 207) · ชื่อกล่องไม่บอกเนื้อ
+export function isekaiBoxes(meritTags) {
+  const c = contSpoil();
+  const box = (id, title, body) => `<div class="sb" id="${id}"><h3>${esc(title)}</h3>${spoilSlot(id, body)}</div>`;
+  return [
+    box('isk-rules', 'กติกาต่างโลก', rules(meritTags)),
+    box('isk-races', 'เผ่า', c.races),
+    box('isk-jobs', 'อาชีพต่างโลก', c.jobs),
+    box('isk-ends', 'ตอนจบชาติทวีป', `${c.ends}<p class="ex">ตอนจบแบบตาย: <b>${esc(ISEKAI_DEATH[0])}</b> — ${esc(ISEKAI_DEATH[1])}</p>`),
+    box('isk-skills', 'สกิลต่างโลก', `<ul>${skillItems(skillSpoil).join('')}</ul>`),
+    box('isk-roles', `บทบาทต่างโลก (${ISEKAI_OLD})`, `<ul>${roleItems(worldSpoil).join('')}</ul>`),
   ].join('');
-  return section(n, body);
 }
