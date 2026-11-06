@@ -2217,7 +2217,7 @@ const CADET = (() => {
   // ---------- steps ----------
   const S = {};
   const STEP = S;
-  S.res = (st, text) => ({ kind: 'result', cadet: true, type: 'A', age: st.age, stage: stageOf(st.age), text: fill(text, st) });
+  S.res = (st, text) => ({ kind: 'result', cadet: true, type: 'A', age: st.age, stage: stageOf(st.age), text: fill(text, st), tag: TAG_MID, evId: `cadet:${st.cadet.curId}` });
 
   const bodyRule = (st) => { const b = N(st).body_min; return `ชีวิต ตร. ${b.police} · ทร. ${b.navy} · ทอ. ${b.airforce} · ทบ. ${b.army} ขึ้นไป (รวมว่ายน้ำ 50 เมตร)`; };
   function bodyReach(st, h = Math.round(st.health)) {
