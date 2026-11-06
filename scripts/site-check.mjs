@@ -25,6 +25,7 @@ import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
 import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsTweak } from '../src/site/docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, cardArtBlock, CAT_ART } from '../src/site/card-art-tweak.mjs';
+import { CARD_SPOIL_PAGE, cardSpoilData, cardSpoilBlock } from '../src/site/card-spoil-tweak.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
 import { PLAY_FILES, playAssets, playScripts, swJs } from '../src/site/play-files.mjs';
 
@@ -389,6 +390,23 @@ const caMiss = [
 ];
 const caCtl = caBlock && JSON.stringify({ ...caBlock, counts: { ...caBlock.counts, cats: caBlock.counts.cats.slice(1) } }) !== JSON.stringify(caNow);
 check('หน้า tweak ภาพบนการ์ดใช้ภาพ+ตัวเลขหมวดชุดปัจจุบัน', caMiss.length || !caCtl, ` ${caCats.length} หมวด${caMiss.length ? ` · ${caMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${caCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7c6) หน้า tweak T14 หน้าการ์ดรวม (ui-redo 126): บล็อกในหน้า = CSS หน้ารวมการ์ด/หน้าเฉลย + token + การ์ดจริงตอนนี้ · นอกบล็อกไม่มีเนื้อเฉลย (Ctrl+F ไม่เจอก่อนกด ข้อ 187)
+// ตัวควบคุม: CSS หน้ารวมการ์ดต่างไป 1 ตัวอักษร ⇒ ต้องไม่ตรง · ย้ายเฉลยการ์ดแรกออกนอกบล็อก ⇒ ต้องถูกจับ
+const csHtml = readOr(CARD_SPOIL_PAGE) ?? '';
+const csBlock = cardSpoilBlock(csHtml);
+const csNow = cardSpoilData(content);
+const csOutside = (html) => {
+  const b = cardSpoilBlock(html);
+  const rest = html.replace(/<script type="application\/json" id="csd">[\s\S]*?<\/script>/, '');
+  return (b?.cards ?? []).filter((c) => (c.spoil.match(/<b class="pct">[^<]*<\/b>/g) ?? []).some((m) => rest.includes(m))).map((c) => c.id);
+};
+const csMiss = [
+  ...(!csBlock ? [`ไม่มีบล็อก ${CARD_SPOIL_PAGE}`] : JSON.stringify(csBlock) !== JSON.stringify(csNow) ? [`ค้าง ${CARD_SPOIL_PAGE} (build ใหม่)`] : []),
+  ...csOutside(csHtml).map((id) => `เฉลยนอกบล็อก ${id}`),
+];
+const csCtl = !!csBlock && JSON.stringify({ ...csBlock, css: { ...csBlock.css, catalog: `${csBlock.css.catalog} ` } }) !== JSON.stringify(csNow) && csOutside(csHtml.replace('</body>', `${csBlock.cards[0].spoil}</body>`)).length > 0;
+check('หน้า tweak T14 ใช้ CSS+การ์ดหน้าการ์ดรวมชุดปัจจุบัน เฉลยไม่อยู่นอกบล็อก', csMiss.length || !csCtl, ` ${csNow.cards.length} ใบ${csMiss.length ? ` · ${csMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${csCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) แผนงาน (ui-redo 23 · ย้ายไป whatsnew ui-redo 69): แถวหมวดใต้หัวกำลังทำ = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
 // · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)
