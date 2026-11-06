@@ -1692,6 +1692,8 @@ function severanceDays(st) {
 
 // ขั้นยศ + ตำแหน่งการเมืองรวมเป็นระดับเดียว — การ์ดยั่วทุจริตออกถี่ขึ้นตามระดับ (multipliers.rank)
 const rankLevel = (st) => (st.ladder?.rank ?? 0) + (st.office ? st.office.rank + 1 : 0);
+// ขั้นในสายนักล่าล้วน: ตัวคูณเกตไม่นับตำแหน่งการเมืองหรือยศสายอื่น คนนอกสายได้ 0 จึงคูณ 1 เท่ากับไม่มีตัวคูณ
+const hunterRank = (st) => (st.ladder?.id === 'hunter' ? st.ladder.rank : 0);
 
 // โครงการเกษียณก่อนกำหนด (B40): ลูกจ้างอายุ EARLY.from–EARLY.to ทอยจาก rankRng ครั้งเดียวต่อปี ออกได้ครั้งเดียวในชีวิต
 // ราชการ/ทหาร/ตำรวจไม่มีโครงการนี้ · ตำแหน่งการเมืองเต็มเวลาไม่ใช่ลูกจ้าง
@@ -4752,6 +4754,7 @@ function poolMultiplier(st, m) {
   for (const [f, v] of Object.entries(m.parent_flags ?? {})) if (st.parentFlags?.[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
   if (m.rank) x *= m.rank ** rankLevel(st);
+  if (m.hunter_rank) x *= m.hunter_rank ** hunterRank(st);
   // ตัวคูณเงิน {min, max, v}: อัตราส่วนอยู่ในช่วง = คูณ v · คำนวณเฉพาะการ์ดที่ใช้ เพราะกองสุ่มเรียกทุกใบทุกปี
   if (MONEY_KEYS.some((k) => m[k])) {
     const r = moneyRatios(st);
