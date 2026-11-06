@@ -74,6 +74,16 @@ export const bondLabel = (b) => BOND_LEVELS.find(([min]) => b >= min)[1];
 const bondClamp = (b) => Math.max(0, Math.min(100, b));
 
 const kinOtherSex = (sex) => (sex === 'ชาย' ? 'หญิง' : 'ชาย');
+// อัตลักษณ์: ค่าเดียวที่เปิด (เจ้าของเคาะ decisions 423) · ได้จากการ์ดวัยรุ่นที่ผู้เล่นเลือก · ไม่มีช่อง = ตามเพศกำเนิด (ชีวิตเดิม/เซฟเก่าเท่าเดิม)
+// birth = เพศกำเนิดที่ตั้งค่านี้ได้ (lint ตรวจ when.sex ของการ์ดที่ตั้ง) · partner = เพศของคู่ · ตารางชีพยังตามเพศกำเนิด
+export const BIRTH_IDENTITY = 'ตามเพศกำเนิด';
+export const IDENTITY = { หญิงข้ามเพศ: { birth: ['ชาย'], partner: 'ชาย', speech: 'หญิง' } };
+export const IDENTITIES = [BIRTH_IDENTITY, ...Object.keys(IDENTITY)];
+export const identityOf = (st) => st.identity ?? BIRTH_IDENTITY;
+// เพศที่ตัวละครใช้พูดถึงตัวเอง (คำลงท้าย · สรรพนาม) — อัตลักษณ์ทับเพศกำเนิด
+export const speechSex = (st) => IDENTITY[st.identity]?.speech ?? st.sex;
+// ไม่ดึงเลขสุ่ม — ชีวิตที่ไม่มีอัตลักษณ์ได้คู่ต่างเพศกำเนิดเหมือนเดิมทุกหลัก
+const partnerSex = (st) => IDENTITY[st.identity]?.partner ?? kinOtherSex(st.sex);
 const kinInRange = (v, r) => !r || (v >= r[0] && v <= r[1]);
 const kinYearOf = (st) => st.birthYear + st.age;
 export const memberAge = (st, m, year = kinYearOf(st)) => (m.alive ? year - m.born : m.diedAge);
@@ -98,7 +108,7 @@ export function addMember(st, role, extra = {}) {
   const year = kinYearOf(st);
   const id = ++st.kinSeq;
   // สัตว์ติดบ้าน/ส่งต่อทายาทส่ง sex born maxAge มาเอง — ไม่ดึง kinRng ลำดับสุ่มของคนในบ้านจึงไม่ขยับ
-  const sex = extra.sex ?? (role === 'spouse' ? kinOtherSex(st.sex) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง');
+  const sex = extra.sex ?? (role === 'spouse' ? partnerSex(st) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง');
   const born = extra.born ?? (role === 'spouse' ? st.birthYear + st.kinRng.int(...KIN_SPOUSE_GAP) : role === 'peer' ? st.birthYear : year);
   // ชื่อคู่ใจสุ่มจาก seed+id ไม่ดึงเลข · ฝูงไม่มีชื่อ
   const name = role === 'herd' ? null : role === 'pet' ? (extra.name ?? petName(st, extra.kind, id)) : pickName(mixSeed(st.seed, 0x4b1d + id), sex, born, st.content.era.names, kinTakenNames(st));
