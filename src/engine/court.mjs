@@ -12,6 +12,8 @@ import { VERDICT_REF } from './afterlife.mjs';
 export const NEAR_DEATH = { band: 1, minAge: 15, causes: ['road', 'accident'], salt: 0x7f4a7c15 };
 // คำใบ้ยาวเกินจะเป็นหัวการ์ด ⇒ หัวสั้นคงที่ ข้อความลงเนื้อ
 const HINT_TITLE = 'ก่อนลืมตา';
+// ปฏิกิริยาล้วน ไม่มีผลลงบัญชี — ใบนี้ห้ามขยับ karmaMultiplier เหมือนใบเยือนอื่น
+const HINT_CHOICES = ['นิ่งฟังจนเสียงจางไป', 'ถามกลับว่าหมายความว่าอะไร', 'ยกมือไหว้ทั้งที่ยังมองไม่เห็นใคร', 'พยายามลืมตาให้เร็วที่สุด'];
 export const COURT_SCENES = ['near', 'visit', 'summons'];
 // ระดับคำใบ้จากบัญชีสุทธิ (ช่วงเดียวกับ verdictLevel −1..1) · ขอบตามภูมิที่ปรโลก: นรก ≤ −0.5 · เปรต/ดิรัจฉาน < 0 · เทวดา > 2/3
 export const NEAR_HINT_LEVELS = [
@@ -60,11 +62,15 @@ export function courtCard(st) {
   while (c.i < c.steps.length) {
     const step = c.steps[c.i];
     if (step === 'hint') {
-      c.i++;
       const lines = st.content.nearHints?.[hintLevel(st.ledger)];
-      if (!lines?.length) continue;
+      if (!lines?.length) {
+        c.i++;
+        continue;
+      }
       const text = lines[Math.floor(courtRng(st).next() * lines.length)];
-      return { ...courtBase(st, c.mode), id: 'court_hint', title: HINT_TITLE, text, choices: [], fx: [], locked: [] };
+      c.ev = { id: 'court_hint', choices: HINT_CHOICES.map((x) => ({ text: x, merit: [] })) };
+      c.wait = true;
+      return { ...courtBase(st, c.mode), id: 'court_hint', title: HINT_TITLE, text, choices: [...HINT_CHOICES], fx: HINT_CHOICES.map(() => ''), locked: HINT_CHOICES.map(() => null) };
     }
     const ev = courtEvent(st, step);
     if (!ev) {
