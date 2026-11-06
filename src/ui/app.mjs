@@ -1,7 +1,7 @@
 import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
-import { BTN, STAT_HELP, HELP, HELP_NOTE, warnWords, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
+import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
@@ -1140,13 +1140,15 @@ function sceneSvg(id, sm) {
   return svg;
 }
 // ภาพฉากใบมรณะเป็นพื้นหลังจางทั้งใบ (ui-redo 57): รูปทรงเดิมตัดกรอบแผ่นออก สีเส้นมาจาก CSS — แผ่นทึบกับกรอบทองจะกลายเป็นแถบเทาทับข้อความ
-function sceneBg(id) {
+// แรกเกิด (ui-redo 61) ใช้ตัวเดียวกันในเนื้อการ์ด · soft: เส้นรอง (สำริด) จางกว่าครึ่ง ภาพยังมีน้ำหนักสองระดับเหมือนแผ่นเดิมเมื่อทุกเส้นเป็นสีเดียว
+function sceneBg(id, cls = 'd-bg', soft = false) {
   const s = sceneArt(id);
   if (!s) return null;
-  const wrap = el('div', 'd-bg');
+  const wrap = el('div', cls);
   wrap.setAttribute('aria-hidden', 'true');
   const svg = artSvg('scene-art', ERA_ART_W, ERA_ART_H, s.parts.slice(ERA_FRAME.length));
   svg.dataset.scene = id;
+  if (soft) for (const p of svg.children) if (p.getAttribute('stroke') === ART_INK.bronze2 || p.getAttribute('fill') === ART_INK.bronze2) p.setAttribute('opacity', '0.55');
   wrap.append(svg);
   return wrap;
 }
@@ -2339,8 +2341,12 @@ function render(card) {
     // ภาพยุค (B56): การ์ดบ้านเมือง + การ์ดรับมือที่ผูกยุคไว้ (B58) ได้ภาพของยุคนั้น · ยุคที่ไม่มีภาพ = หน้าตาเดิม
     const eraPic = eraArt(card.kind === 'era' ? card.id : card.kind === 'event' ? ERA_OF.get(card.id) : null);
     if (eraPic) body.append(artSvg('era-art', ERA_ART_W, ERA_ART_H, eraPic));
-    else {
-      const scene = card.kind === 'intro' ? sceneSvg(BIRTH_SCENE[artTier(standingOf(st))], true) : SCENE_OF.has(card.id) && sceneSvg(SCENE_OF.get(card.id), false);
+    else if (card.kind === 'intro') {
+      // พื้นหลังจางใต้เนื้อการ์ด (ui-redo 61) แทนภาพเล็กกลางบน — ภาพแชร์ยังวาดแผ่นเดิมจาก sceneArt
+      const bg = sceneBg(BIRTH_SCENE[artTier(standingOf(st))], 'b-bg', true);
+      if (bg) body.classList.add('has-bg'), body.append(bg);
+    } else {
+      const scene = SCENE_OF.has(card.id) && sceneSvg(SCENE_OF.get(card.id), false);
       if (scene) body.append(scene);
     }
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
@@ -2361,8 +2367,6 @@ function render(card) {
       body.append(el('span', 'stamp', card.age > 0 ? 'รับช่วงชีวิต' : 'แรกเกิด'));
       body.append(el('h3', 'lead', card.text));
       body.append(el('p', 'horo', horoscope(st)));
-      // การ์ดแรกเกิดของตระกูลใหม่ = จุดเริ่มเกมของคนไม่มีเซฟ (คนมีเซฟเห็นที่หน้าเล่นต่อ)
-      if (st.gen === 1 && card.age === 0) body.append(warnLine());
       const odds = birthOddsLine();
       if (odds) body.append(sourced(el('p', 'sub', odds), birthOddsSrc()));
       // บรรทัดแรกเป็นเรื่องของบ้าน · ที่เหลือเป็นบรรยากาศยุค ตัวรอง
@@ -2586,15 +2590,6 @@ function helpBox() {
   Object.assign(all, { href: 'guide.html#help', target: '_blank', rel: 'noopener' });
   box.append(all, el('p', 'note', HELP_NOTE));
   return box;
-}
-// บรรทัดเตือนเนื้อหาชุดเดียวกับหน้าแรกเว็บ + สายด่วนสุขภาพจิต · ไม่ต้องกดรับ
-function warnLine() {
-  const mind = HELP.find((h) => h.id === 'mind');
-  const p = el('p', 'warn-line', `ผู้เล่นวัยรุ่นขึ้นไป · เรื่องจริงบางเรื่องหนัก: ${warnWords()} · ถ้าเล่นแล้วไม่สบายใจ `);
-  const call = el('a', null, `โทร ${mind.tel}`);
-  call.href = `tel:${mind.tel}`;
-  p.append(call, ' ได้ตลอด 24 ชม.');
-  return p;
 }
 function helpRow(h) {
   const row = el('div', 'help-row');
@@ -3648,8 +3643,6 @@ function linkAsk(card, seed) {
 function home(card) {
   const where = af ? `ระหว่างชาติ หลัง${lifeEndWord(isGone(st))} ${st.age}` : `อายุ ${st.age} · ${provinceLabel(st)}`;
   const choices = homeCard('เล่นต่อ', ['มีชีวิตที่เล่นค้างไว้', `${genLabel()}${st.name} · ${where}`]);
-  // ใส่ใน .body ให้ได้ขอบซ้ายขวาเดียวกับหัวการ์ด
-  choices.previousElementSibling.append(warnLine());
   choices.append(enter(button(BTN.resume, null, () => show(card))), button(BTN.newFamily, null, () => confirmNew(() => home(card))), button(BTN.shelf, null, () => openShelf()));
 }
 
