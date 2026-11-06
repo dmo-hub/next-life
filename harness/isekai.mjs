@@ -2,7 +2,7 @@
 // ด่าน: seed เดิมผลเดิม (รวดเดียว + เซฟ/โหลดกลางทาง) · จบได้ทุกชีวิตภายในเพดานการ์ด · ตอนจบ/บทบาท/สกิล/เหตุการณ์มีบอทถึง
 // · ค่าอยู่ในช่วง · การ์ดไม่เผยบุญบาป · ทางเลือกหลังจบ (กลับโลกเดิม/อยู่ต่อ) กับเพดานชาติติดกันผ่านปรโลกจริง
 // ใบต่างโลกถัดไปเติมด่านลงไฟล์นี้ (SPEC หัว Testing)
-import { startIsekai, nextIsekaiCard, chooseIsekai, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_TIME, ISEKAI_LINK, LINK, tripCarry, tripSettle, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, TRIP_QUEST, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed, WARN, ISEKAI_FOCUS } from '../src/engine/index.mjs';
+import { startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, ISEKAI, ISEKAI_ROLES, ISEKAI_SKILLS, ISEKAI_EVENTS, ISEKAI_STAT, ISEKAI_STAGES, ENTRY, roleInfo, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_TIME, ISEKAI_LINK, LINK, tripCarry, tripSettle, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, isekaiChance, ENTRY_EVENTS, TRIP, TRIP_QUEST, tripRoll, GONE_SEARCH, carryAmount, CARRY_WORDS, playLife, startAfterlife, nextAfterCard, chooseAfter, openChoices, makeRng, mixSeed, WARN, ISEKAI_FOCUS } from '../src/engine/index.mjs';
 import { CONT_LIFE, CONT_REGIONS, CONT_RACES, CONT_END, CONT_MOVE, contNeighbors } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
@@ -79,6 +79,14 @@ function play(cfg, bot, botRng, picks = []) {
     cards.push(card);
     trace.push(JSON.stringify(card));
     if (card.step === 'end') return { isk, trace, cards, picks: used, ended: true };
+    // ตาแรกของช่วงวัย (ui-redo 83): บอทเลือกโฟกัสจากใบรูปเดิมที่ผู้เล่นไม่เห็น · ลำดับ pick เดียวกับตัวเลือกการ์ด เซฟเล่นซ้ำจึงตรง
+    if (card.entered) {
+      const fc = isekaiFocusCard(isk);
+      const f = used.length < picks.length ? picks[used.length] : bot(fc, botRng, {});
+      used.push(f);
+      card.focusPick = fc.choices[f];
+      isekaiFocusPick(isk, f);
+    }
     if (!card.choices.length) continue;
     const k = used.length < picks.length ? picks[used.length] : bot(card, botRng, {});
     used.push(k);
@@ -159,8 +167,7 @@ Object.values(BOTS).forEach((bot, b) => {
       if (card.step === 'focus' && card.warn) {
         if (card.choices[card.suggest] !== ISEKAI_FOCUS.rest.name) warnFocusBad++;
         focusPick = card.choices[card.pick];
-      } else if (card.step === 'focus') focusPick = null;
-      else if (card.step === 'tick' && focusPick !== null) {
+      } else if (card.step === 'tick' && focusPick !== null) {
         if (card.focusChoices[card.focus] !== focusPick) warnFocusBad++;
         focusPick = null;
       }
@@ -181,7 +188,7 @@ Object.values(BOTS).forEach((bot, b) => {
       }
       if ([...strings(card)].some((s) => DECK_RAW.test(s))) deckRaw++;
       for (const name of card.step === 'focus' ? card.choices : card.step === 'tick' ? card.focusChoices : []) if (name === TRIP_QUEST.focus.name) tripEvBad++;
-      if (card.step === 'tick' && (card.choices.length || card.focusChoices.length < 2 || !(card.focus >= 0))) tickBad++;
+      if (card.step === 'tick' && (card.choices.length || card.focusChoices.length < 2 || !(card.focus >= -1))) tickBad++;
       // ความรู้โลกเดิม (B68h): เรื่องอันตรายเฉพาะวัยผู้ใหญ่ขึ้นไป · โลกจำเฉพาะตอนชื่อเสียงถึง · ทางลัดที่เปิดได้
       if (card.step === 'event' && EVENT[card.id].adult && !ADULT_NAMES.includes(card.status.stage)) knowAdultBad++;
       if (card.step === 'result' && card.sys?.startsWith('โลกนี้จะจำ')) {
@@ -211,7 +218,7 @@ Object.values(BOTS).forEach((bot, b) => {
     if (!cfg.legacy) {
       contLives++;
       const want = CONT_LIFE.offers + (cfg.blessed ? 1 : 0);
-      if (isk.role || !CONT_REGIONS[isk.region] || !CONT_RACES[isk.race] || !isk.nation || a.cards[0].choices.length !== want || a.cards.some((c) => c.step === 'focus' && c.choices.includes(roleInfo('commoner').focus.name))) contBad++;
+      if (isk.role || !CONT_REGIONS[isk.region] || !CONT_RACES[isk.race] || !isk.nation || a.cards[0].choices.length !== want || a.cards.some((c) => c.step === 'tick' && c.focusChoices.includes(roleInfo('commoner').focus.name))) contBad++;
       // แคว้นเกิด = ต้นทางของการย้ายครั้งแรก (06c-1 · isk.region คือแคว้นสุดท้าย)
       const moves = isk.moves ?? [];
       contSeen.region.add(moves[0]?.from ?? isk.region);
@@ -340,13 +347,19 @@ check('กองทวีป: การ์ดแคว้น/ข้อพิพ�
 
 // ทางแยกที่ต้องมีบอทถึง: ตอนจบทุกแบบของทุกบทบาท (+ ตายกลางทาง) · ทุกบทบาท · ทุกสกิล · ทุกเหตุการณ์ · ทุกตัวเลือก
 const missing = (want, got) => want.filter((x) => !got.has(x));
+// การ์ดขั้นซ้อนทับ (overlap_stage) ออกเฉพาะชาติที่ข้ามมาตอนตระกูลขั้น ≥ 1 — ด่านนี้เริ่มชาติต่างโลกเองโดยไม่มีตระกูล จึงถึงไม่ได้โดยโครงสร้าง
+// ด่านว่าการ์ดพวกนี้ถึงได้จริงอยู่ที่ npm run overlap · ISEKAI_OVERLAP_SKIP=off ไม่ข้าม (ตัวควบคุม: การ์ดพวกนี้ต้องกลับมาตก)
+const overlapOff = process.env.ISEKAI_OVERLAP_SKIP === 'off';
+const OVERLAP_ONLY = new Set(overlapOff ? [] : ISEKAI_EVENTS.filter((e) => e.overlap_stage).map((e) => e.id));
+console.log(`ข้ามที่ด่านมีบอทถึง (ตัดสินที่ npm run overlap): การ์ดขั้นซ้อนทับ ${OVERLAP_ONLY.size} ใบ${OVERLAP_ONLY.size ? ` (${[...OVERLAP_ONLY].join(' · ')})` : ''}${overlapOff ? ' · ตัวควบคุมไม่ข้าม' : ''}`);
+const reachEvents = ISEKAI_EVENTS.filter((e) => !OVERLAP_ONLY.has(e.id));
 const wantEnd = Object.keys(ISEKAI_ROLES).flatMap((r) => Object.keys(roleInfo(r).end).map((t) => `${r}:${t}`).concat(`${r}:death`)).concat([...Object.keys(CONT_END), 'death'].map((t) => `${CONT_LIFE.world}:${t}`));
 const reach = {
   ตอนจบ: missing(wantEnd, seen.end),
   บทบาท: missing(Object.keys(ISEKAI_ROLES), seen.role),
   สกิล: missing(Object.keys(ISEKAI_SKILLS), seen.skill),
-  เหตุการณ์: missing(ISEKAI_EVENTS.map((e) => e.id), seen.event),
-  ตัวเลือก: missing(ISEKAI_EVENTS.flatMap((e) => e.choices.map((_, j) => `${e.id}#${j}`)), seen.choice),
+  เหตุการณ์: missing(reachEvents.map((e) => e.id), seen.event),
+  ตัวเลือก: missing(reachEvents.flatMap((e) => e.choices.map((_, j) => `${e.id}#${j}`)), seen.choice),
   ทางลัดความรู้: missing(Object.keys(ISEKAI_KNOW), seen.shortcut),
   แคว้นเกิด: missing(Object.keys(CONT_REGIONS), contSeen.region),
   แคว้นที่ย้ายเข้า: missing(Object.keys(CONT_REGIONS), contSeen.movedIn),
@@ -395,27 +408,27 @@ check('กลับโลกเดิมลงผังตระกูลคร�
 check('ชาติต่างโลกถัดไปได้ของที่โลกจำจากผังตระกูล', loreCarryBad);
 check('ชาติต่างโลกถัดไปได้ตำนานชาติก่อนจากผังตระกูล', legendCarryBad + (legendRows ? 0 : 1), `แถวตำนานที่ส่งต่อ ${legendRows}`);
 
-// โลกจำ (B68h): ทุกโลกจำครบทุกอย่างแล้ว ⇒ เรื่องคิดค้นของที่มีอยู่แล้วไม่มาอีก · ใบทุ่มเทแรกบอกว่าโลกยังจำอะไร
+// โลกจำ (B68h): ทุกโลกจำครบทุกอย่างแล้ว ⇒ เรื่องคิดค้นของที่มีอยู่แล้วไม่มาอีก · ใบตาแรกบอกว่าโลกยังจำอะไร
 // แถวผังตระกูลพกรายการไปกลับได้ · ชาติที่ไม่มีของให้จำ แถวผังรูปเดิม
 const ALL_LORE = Object.fromEntries(WORLDS.map((w) => [w, Object.keys(ISEKAI_LORE)]));
 let loreSkipBad = 0, loreLineBad = 0;
 for (let i = 0; i < lives * 5; i++) {
   const a = play({ ...setup(i), lore: ALL_LORE }, BOTS.สุ่ม, makeRng(mixSeed(seed ^ 0x10e, i)));
   if (a.cards.some((c) => c.step === 'event' && EVENT[c.id].loreOf)) loreSkipBad++;
-  if (!a.cards.find((c) => c.step === 'focus')?.text.includes('ที่นี่ยังมี')) loreLineBad++;
+  if (!a.cards.find((c) => c.lore)?.lore.includes('ที่นี่ยังมี')) loreLineBad++;
 }
 const row = (lore) => isekaiLineage({ name: 'ก', role: 'commoner', world: 'commoner', ending: { title: 'จบ' }, lore }, 2);
 const trip = isekaiWorldLore([row(['soap']), row([]), row(['soap', 'ledger'])]);
 const tripBad = (JSON.stringify(trip) !== JSON.stringify({ commoner: ['soap', 'ledger'] }) ? 1 : 0) + ('lore' in row([]) ? 1 : 0);
-check('โลกที่จำแล้วไม่ต้องคิดค้นซ้ำ + บอกในใบทุ่มเทแรก', loreSkipBad + loreLineBad + tripBad, `${lives * 5} ชาติ`);
+check('โลกที่จำแล้วไม่ต้องคิดค้นซ้ำ + บอกในใบตาแรก', loreSkipBad + loreLineBad + tripBad, `${lives * 5} ชาติ`);
 
-// ตำนาน (B68i): แถวผังพกตำนานไปกลับได้ · ใบทุ่มเทแรกเล่าชื่อคนในตำนาน · บารมีได้โบนัสตามชื่อเสียง (มีเพดาน) โลกที่จำคนร้ายมากกว่าทำให้ยากขึ้น
+// ตำนาน (B68i): แถวผังพกตำนานไปกลับได้ · ใบตาแรกเล่าชื่อคนในตำนาน · บารมีได้โบนัสตามชื่อเสียง (มีเพดาน) โลกที่จำคนร้ายมากกว่าทำให้ยากขึ้น
 const legendRow = (legend) => isekaiLineage({ name: 'ก', role: 'commoner', world: 'commoner', ending: { title: 'จบ' }, lore: [], legend }, 2);
 const backL = isekaiWorldLegends([legendRow({ world: 'commoner', name: 'ก', ending: 'จบ', dark: false }), legendRow(null), { trips: [{ legend: { world: 'commoner', name: 'ข', ending: 'หาย', dark: true } }] }]);
 let legendUnitBad = (JSON.stringify(backL) !== JSON.stringify({ commoner: [{ name: 'ก', ending: 'จบ', dark: false }, { name: 'ข', ending: 'หาย', dark: true }] }) ? 1 : 0) + ('legend' in legendRow(null) ? 1 : 0);
 for (let i = 0; i < lives; i++) {
   const a = play({ ...setup(i), legends: LEG_HERO }, BOTS.สุ่ม, makeRng(mixSeed(seed ^ 0x1e9, i)));
-  if (!a.cards.find((c) => c.step === 'focus')?.text.includes(HERO.name)) legendUnitBad++;
+  if (!a.cards.find((c) => c.lore)?.lore.includes(HERO.name)) legendUnitBad++;
 }
 const fake = (fame, worldLegends) => ({ st: { cha: 10, str: 10, fame }, inner: { wit: 0 }, skills: [], flags: {}, karma: 0, worldLegends });
 const C = { stat: 'cha', dc: 10 };

@@ -89,9 +89,110 @@ flags:
   # โลกซ้อนทับขั้น 3: ใบรับสมัครนักล่าตั้ง · ตัวเลือกบุกดันเจียน (ทางที่ตายได้) ล็อกด้วยธงนี้
   hunter: "ถือบัตรนักล่าของกิลด์"
   dungeon_pulled: "เคยถูกเกตดึงเข้าดันเจียนแล้วรอดออกมา"
+  # >>> nl-writer b002 flag saw_army
+  # เส้นเตรียมทหาร เฟส 1 (วัยเด็ก → ประตูห้องสอบ)
+  saw_army: "เคยเห็นทหารบกทำงานใกล้ ๆ ตอนเด็ก"
+  # <<< nl-writer b002 flag saw_army
+  # >>> nl-writer b002 flag saw_navy
+  saw_navy: "เคยเห็นทหารเรือใกล้ ๆ ตอนเด็ก"
+  # <<< nl-writer b002 flag saw_navy
+  # >>> nl-writer b002 flag saw_airforce
+  saw_airforce: "เคยเห็นทหารอากาศ/เครื่องบินทหารใกล้ ๆ ตอนเด็ก"
+  # <<< nl-writer b002 flag saw_airforce
+  # >>> nl-writer b002 flag saw_police
+  saw_police: "เคยเห็นตำรวจทำงานใกล้ ๆ ตอนเด็ก"
+  # <<< nl-writer b002 flag saw_police
+  # >>> nl-writer b002 flag cadet_seen10
+  cadet_seen10: "ได้เห็นเครื่องแบบใกล้ ๆ ตอนสิบขวบแล้ว"
+  # <<< nl-writer b002 flag cadet_seen10
+  # >>> nl-writer b002 flag cadet_seen12
+  cadet_seen12: "ได้เห็นเครื่องแบบใกล้ ๆ ตอนสิบสองขวบแล้ว"
+  # <<< nl-writer b002 flag cadet_seen12
+  # >>> nl-writer b002 flag knows_senior
+  knows_senior: "รู้จักรุ่นพี่ที่สอบติดเตรียมทหาร"
+  # <<< nl-writer b002 flag knows_senior
+  # >>> nl-writer b002 flag cadet_tips
+  cadet_tips: "ได้คำแนะนำเรื่องสอบเตรียมทหารจากคนที่เคยผ่าน"
+  # <<< nl-writer b002 flag cadet_tips
+  # >>> nl-writer b001 flag cadet_senior_tutor
+  cadet_senior_tutor: "รุ่นพี่เตรียมทหารรับปากจะช่วยติว"
+  # <<< nl-writer b001 flag cadet_senior_tutor
+  cadet_met_senior: "ได้คุยกับรุ่นพี่สี่เหล่าที่โรงเรียนแล้ว (กันฉากพี่หน้าบ้านซ้ำ)"
+  # >>> nl-writer b001 flag cadet_dream
+  cadet_dream: "ตั้งใจจะสอบเตรียมทหาร"
+  # <<< nl-writer b001 flag cadet_dream
+  # >>> nl-writer b001 flag cadet_declined
+  cadet_declined: "ขอไม่ให้เตือนเรื่องสอบเตรียมทหารอีก"
+  # <<< nl-writer b001 flag cadet_declined
+  # >>> nl-writer b003 flag cadet_let_go
+  cadet_let_go: "เลิกคิดเรื่องสอบเตรียมทหารแล้ว"
+  # <<< nl-writer b003 flag cadet_let_go
+  # >>> nl-writer b003 flag cadet_family_told
+  cadet_family_told: "บอกที่บ้านแล้วว่าจะสอบเตรียมทหาร"
+  # <<< nl-writer b003 flag cadet_family_told
+  # >>> nl-writer b003 flag cadet_family_secret
+  cadet_family_secret: "แอบเตรียมสอบเตรียมทหารโดยไม่บอกที่บ้าน"
+  # <<< nl-writer b003 flag cadet_family_secret
+  # >>> nl-writer b003 flag cadet_family_support
+  cadet_family_support: "ที่บ้านออกค่าติวสอบเตรียมทหารให้"
+  # <<< nl-writer b003 flag cadet_family_support
+  # >>> nl-writer b003 flag cadet_share_half
+  cadet_share_half: "ที่บ้านออกค่าติวให้ได้ครึ่งเดียว"
+  # <<< nl-writer b003 flag cadet_share_half
+  # >>> nl-writer b003 flag cadet_share_most
+  cadet_share_most: "ที่บ้านออกค่าติวให้ได้เกือบทั้งหมด"
+  # <<< nl-writer b003 flag cadet_share_most
+  # >>> nl-writer b003 flag family_debt
+  family_debt: "ที่บ้านเป็นหนี้เพราะหาเงินค่าติวให้"
+  # <<< nl-writer b003 flag family_debt
+  # >>> nl-writer b003 flag cadet_prep_camp
+  cadet_prep_camp: "เตรียมสอบด้วยค่ายติว"
+  # <<< nl-writer b003 flag cadet_prep_camp
+  # >>> nl-writer b003 flag cadet_prep_group
+  cadet_prep_group: "เตรียมสอบด้วยกลุ่มติวกับเพื่อน"
+  # <<< nl-writer b003 flag cadet_prep_group
+  # >>> nl-writer b003 flag cadet_prep_self
+  cadet_prep_self: "เตรียมสอบด้วยการอ่านเอง"
+  # <<< nl-writer b003 flag cadet_prep_self
+  # >>> nl-writer b003 flag cadet_prep_senior
+  cadet_prep_senior: "เตรียมสอบโดยมีรุ่นพี่ช่วยติว"
+  # <<< nl-writer b003 flag cadet_prep_senior
+  # >>> nl-writer b003 flag can_swim
+  can_swim: "ว่ายน้ำเป็น"
+  # <<< nl-writer b003 flag can_swim
+  # >>> nl-writer b003 flag cadet_a_swims
+  cadet_a_swims: "เพื่อนติวว่ายน้ำได้แล้ว"
+  # <<< nl-writer b003 flag cadet_a_swims
+  # >>> nl-writer b003 flag cadet_bond_a
+  cadet_bond_a: "สนิทกับเพื่อนติวคนเดียวกัน"
+  # <<< nl-writer b003 flag cadet_bond_a
+  # >>> nl-writer b003 flag cadet_met_c
+  cadet_met_c: "เคยเจอเด็กที่สอบเตรียมทหารเป็นปีที่สอง"
+  # <<< nl-writer b003 flag cadet_met_c
+  # >>> nl-writer b003 flag cadet_bond_c
+  cadet_bond_c: "สนิทกับเด็กที่สอบเป็นปีที่สอง"
+  # <<< nl-writer b003 flag cadet_bond_c
+  # >>> nl-writer b003 flag refused_fixer
+  refused_fixer: "เคยปฏิเสธคนรับฝากสอบ"
+  # <<< nl-writer b003 flag refused_fixer
+  # >>> nl-writer b003 flag cadet_paid_fixer
+  cadet_paid_fixer: "ที่บ้านเคยจ่ายเงินให้คนรับฝากสอบ"
+  # <<< nl-writer b003 flag cadet_paid_fixer
+  # >>> nl-writer b003 flag cadet_exam_door
+  cadet_exam_door: "ไปถึงห้องสอบเตรียมทหารมาแล้ว"
+  # <<< nl-writer b003 flag cadet_exam_door
 
 # ธงมีพารามิเตอร์ <ชื่อ>:<id> — ทะเบียนเก็บแค่ชื่อหน้า · id หลัง : เป็นของการ์ดคู่นั้น
 prefixes:
+  # >>> nl-writer b001 flag cadet_lean
+  cadet_lean: "เอนไปทางเหล่านี้ตอนคิดเรื่องสอบเตรียมทหาร (id = army · navy · airforce · police)"
+  # <<< nl-writer b001 flag cadet_lean
+  # >>> nl-writer b001 flag cadet_invited
+  cadet_invited: "ได้ข่าวเรื่องรับสมัครเตรียมทหารแล้วในปีอายุนี้ (id = อายุ)"
+  # <<< nl-writer b001 flag cadet_invited
+  # >>> nl-writer b004 flag cadet_branch
+  cadet_branch: "ติดเตรียมทหารต่อเหล่านี้ (id = army · navy · airforce · police)"
+  # <<< nl-writer b004 flag cadet_branch
   vow_open: "บนบานไว้ ยังไม่แก้บน"
   hope_set: "ทำบุญหวังผล รอดูว่าเงินดีขึ้นไหม"
   has_amulet: "มีเครื่องราง/สักยันต์ชนิดนี้"

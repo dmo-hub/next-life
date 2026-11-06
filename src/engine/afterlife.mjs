@@ -10,7 +10,7 @@ import { goalsMet, titlesOf } from './titles.mjs';
 import { heirPets, letterTo } from './family.mjs';
 import { CHRONIC } from './death.mjs';
 import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf, TABOO } from './life.mjs';
-import { ISEKAI, ISEKAI_SKILLS, SKILL, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
+import { ISEKAI, ISEKAI_SKILLS, SKILL, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 import { warnPick } from './warn.mjs';
 import { pastOf } from './past.mjs';
@@ -699,6 +699,8 @@ export function playAfterlife(st, pickChoice, onCard) {
     const card = nextAfterCard(af);
     onCard?.(card, af);
     if (card.choices?.length) chooseAfter(af, warnPick(card) >= 0 ? warnPick(card) : pickChoice(card, af.botRng, af));
+    // ชาติต่างโลกไม่มีใบทุ่มเทเข้าช่วงวัยแล้ว (ui-redo 83) — บอทตั้งโฟกัสตาแรกของช่วงจากใบเลือกรูปเดิม
+    else if (card.entered && af.isekai) isekaiFocusPick(af.isekai, pickChoice({ stage: card.stage, ...isekaiFocusCard(af.isekai) }, af.botRng, af));
     if (card.done) return af;
   }
 }
