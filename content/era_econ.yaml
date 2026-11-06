@@ -59,6 +59,42 @@ events:
         effects: {health: 1, knowledge: 1, happiness: -1}
         merit: [{cat: neutral}]
 
+  # มุมใหม่ (ใบ 217): ชาวนา · ออกแทนใบผู้ใหญ่เมื่อ when ผ่าน
+  - id: era_econ_oil2_farmer_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: oil_crisis_2
+    when: {age: [19, 59], occupation: [farmer]}
+    title: "ค่าน้ำมันรถไถ"
+    text: "น้ำมันขึ้นราคาอีกรอบ ค่าจ้างรถไถกับค่าปุ๋ยแพงขึ้นเกือบเท่าตัว ข้าวยังราคาเดิม คนในหมู่บ้านนั่งคุยกันที่ศาลาว่าปีนี้จะทำนาทั้งหมดหรือแค่ครึ่ง"
+    choices:
+      - id: half_field
+        text: "ทำแค่ครึ่งแปลง ลดค่าใช้จ่าย"
+        effects: {happiness: -1, income_mult: 0.9}
+        merit: [{cat: neutral}]
+      - id: buffalo_back
+        text: "กลับไปใช้ควายไถแทนรถ"
+        effects: {health: -1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: share_tractor
+        text: "รวมเงินเพื่อนบ้านจ้างรถคันเดียว"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: borrow_coop
+        text: "กู้สหกรณ์มาลงทุนเต็มแปลง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ข้าวออกดี ขายแล้วใช้หนี้หมดในปีเดียว", effects: {happiness: 1, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ข้าวราคาตกตอนเก็บเกี่ยว หนี้สหกรณ์ค้างข้ามปี", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ใช้ปุ๋ยหมักที่ทำไว้แทนปุ๋ยซื้อ"
+        requires: {flags: {has: ["braced:oil_crisis_2"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:oil_crisis_2"]
+        effects: {health: 1, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
+
   - id: era_econ_oil2_adult_01
     type: A
     category: society
@@ -129,6 +165,40 @@ events:
       - text: "ไปอยู่กับย่า ช่วยย่าทำสวน"
         effects: {health: 1, relations: 2, knowledge: -1}
         merit: [{cat: care_parents, level: 1}]
+
+  # มุมใหม่ (ใบ 217): พนักงานบริษัทระดับกลาง · ออกแทนใบผู้ใหญ่เมื่อ when ผ่าน
+  - id: era_econ_tyk_office_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: tom_yum_kung
+    when: {age: [22, 59], occupation: [clerk, professional, manager]}
+    title: "กล่องกระดาษใบเดียว"
+    text: "บริษัทการเงินที่คุณทำงานถูกสั่งปิด ทุกคนได้กล่องกระดาษคนละใบเก็บของบนโต๊ะ ยามยืนเฝ้าประตู หน้าตึกมีคนถ่ายรูปพนักงานที่เดินออกมา"
+    choices:
+      - id: sell_street
+        text: "ใส่สูทออกไปขายของริมถนน"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.1}, network: 1}
+        merit: [{cat: neutral}]
+      - id: job_hunt
+        text: "ส่งใบสมัครทุกที่ ยอมเงินเดือนลด"
+        effects: {happiness: -1, income_mult: 0.85}
+        merit: [{cat: neutral}]
+      - id: go_upcountry
+        text: "กลับไปช่วยงานที่บ้านต่างจังหวัด"
+        effects: {relations: 2, income_mult: 0.8}
+        merit: [{cat: care_parents, level: 1}]
+      - id: study_more
+        text: "เอาเงินชดเชยไปเรียนต่อ"
+        effects: {knowledge: 2, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ใช้เงินเก็บที่ไม่ได้ฝากที่นั่น"
+        requires: {flags: {has: ["braced:tom_yum_kung"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:tom_yum_kung"]
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
 
   - id: era_econ_tyk_adult_01
     type: A
@@ -226,6 +296,42 @@ events:
       - id: hug_mom
         text: "นอนกอดแม่ตอนแม่เครียด"
         effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+
+  # มุมใหม่ (ใบ 217): คนงานโรงงานส่งออก · ออกแทนใบผู้ใหญ่เมื่อ when ผ่าน
+  - id: era_econ_gfc_factory_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: global_financial_crisis
+    when: {age: [19, 59], occupation: [factory]}
+    title: "ออเดอร์จากเมืองนอกหาย"
+    text: "ลูกค้าต่างประเทศยกเลิกออเดอร์ชิ้นส่วนติดกันสามล็อต โรงงานงดโอทีทั้งหมด ประกาศหน้าโรงอาหารว่าเดือนหน้าทำงานสัปดาห์ละสี่วัน"
+    choices:
+      - id: four_days
+        text: "ทำสี่วัน ที่เหลือรับจ้างทั่วไป"
+        effects: {health: -1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: take_package
+        text: "รับเงินชดเชยสมัครใจลาออก"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.4}, income_mult: 0.85}
+        merit: [{cat: neutral}]
+      - id: union_talk
+        text: "รวมชื่อเพื่อนขอคุยกับฝ่ายบุคคล"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "โรงงานยอมจ่ายครึ่งค่าแรงวันที่หยุด", effects: {relations: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชื่อคุณอยู่บนสุดของรายการ หัวหน้าเริ่มมองไม่เหมือนเดิม", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: learn_skill
+        text: "ไปเรียนช่างตอนเย็นวันหยุด"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ใช้เงินที่กันไว้จ่ายค่าบ้าน"
+        requires: {flags: {has: ["braced:global_financial_crisis"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:global_financial_crisis"]
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.1}}
         merit: [{cat: neutral}]
 
   - id: era_econ_gfc_adult_01
