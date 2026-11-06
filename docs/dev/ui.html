@@ -82,7 +82,7 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
 </style><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="../index.html">NEXT LIFE</a><div class="links"><a href="../guide.html">วิธีเล่น</a><a href="../whatsnew.html">แพตช์โน้ต</a><a href="../about.html">กลไกในเกม</a><a href="../worlds.html">โลก</a><a href="../catalog.html">การ์ดทั้งหมด</a><a href="../dev/index.html" aria-current="true">ห้องผู้พัฒนา</a></div><a class="play" href="../play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html">คำตัดสินเกม</a><a href="../dev/ui.html" aria-current="page">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div><!--/nav-->
 <header><div class="w">
   <h1>ดีไซน์ UI</h1>
-  <p>สี ตัวอักษร ชิ้นส่วนของหน้าเล่น คำตัดสิน UI หน้า tweak และต้นแบบปรับสด · โครงหน้า เนื้อครบ ยังไม่จัดสวย · เวอร์ชัน <span data-fact="version">v0.6.101</span></p>
+  <p>สี ตัวอักษร ชิ้นส่วนของหน้าเล่น คำตัดสิน UI หน้า tweak และต้นแบบปรับสด · โครงหน้า เนื้อครบ ยังไม่จัดสวย · เวอร์ชัน <span data-fact="version">v0.6.102</span></p>
 </div></header>
 <main><div class="w">
 <p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
@@ -1794,13 +1794,6 @@ body:has(#app > .card.af) .logo b { color:var(--gold); }
 body:has(#app > .card.af) .logo small, body:has(#app > .card.af) .logo .ver, body:has(#app > .card.af) .logo .saved { color:var(--sand); }
 body:has(#app > .card.af) .foot a { color:var(--ink2); }
 .af .sb { background:#120D0A; }
-/* แถบโฟกัสต่างโลก (05a): โครง .focus ของโลกหลัก สีชุดต่างโลก · ทางที่ทำอยู่เด่นสีทอง ไม่จางแบบตัวเลือกล็อก */
-.ifocusbar { padding:8px 20px 0; }
-.ifocusbar button { border-color:#2A3478; background:#0E1024; color:#E8ECFF; }
-.ifocusbar button:hover, .ifocusbar button:focus-visible { border-color:#6FE3FF; background:#1E2350; }
-.ifocusbar .focus-fx, .ifocusbar .focus-go { color:#6FE3FF; opacity:1; }
-.ifocusbar .focus-pick .on { border-color:#F2C94C; background:#1E2350; }
-.ifocusbar .focus-pick .on .focus-fx { color:#F2C94C; }
 /* จดหมายเหตุบนการ์ดจบ — ป้ายอายุทอง เส้นซ้ายบอกชนิดบรรทัดแบบต้นแบบ · ช่วงวัยพับได้ ชีวิตยาวราวร้อยบรรทัดจึงไม่ดันปุ่มลงไปไกล */
 .ichron .istage { margin-top:6px; }
 .ichron .istage > summary { cursor:pointer; font-size:13px; color:#6FE3FF; }
@@ -2479,13 +2472,6 @@ body:has(#app > .card.af) .logo b { color:var(--gold); }
 body:has(#app > .card.af) .logo small, body:has(#app > .card.af) .logo .ver, body:has(#app > .card.af) .logo .saved { color:var(--sand); }
 body:has(#app > .card.af) .foot a { color:var(--ink2); }
 .af .sb { background:#120D0A; }
-/* แถบโฟกัสต่างโลก (05a): โครง .focus ของโลกหลัก สีชุดต่างโลก · ทางที่ทำอยู่เด่นสีทอง ไม่จางแบบตัวเลือกล็อก */
-.ifocusbar { padding:8px 20px 0; }
-.ifocusbar button { border-color:#2A3478; background:#0E1024; color:#E8ECFF; }
-.ifocusbar button:hover, .ifocusbar button:focus-visible { border-color:#6FE3FF; background:#1E2350; }
-.ifocusbar .focus-fx, .ifocusbar .focus-go { color:#6FE3FF; opacity:1; }
-.ifocusbar .focus-pick .on { border-color:#F2C94C; background:#1E2350; }
-.ifocusbar .focus-pick .on .focus-fx { color:#F2C94C; }
 /* จดหมายเหตุบนการ์ดจบ — ป้ายอายุทอง เส้นซ้ายบอกชนิดบรรทัดแบบต้นแบบ · ช่วงวัยพับได้ ชีวิตยาวราวร้อยบรรทัดจึงไม่ดันปุ่มลงไปไกล */
 .ichron .istage { margin-top:6px; }
 .ichron .istage > summary { cursor:pointer; font-size:13px; color:#6FE3FF; }
