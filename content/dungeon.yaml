@@ -35,6 +35,7 @@ events:
         text: "ให้ทีมอื่นรับงานนี้แทน"
         requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่าที่ถือบัตรกิลด์"}
         effects: {money: {unit: income_x, amount: -0.2}, happiness: 1}
+        schedules: [{event: dungeon_breach_01, after_years: [1, 2]}]
         merit: [{cat: neutral}]
       - id: evacuate
         text: "พาคนแถวนั้นหลบออกจากรัศมีเกต"
@@ -200,4 +201,35 @@ events:
       - id: bag_keep
         text: "เก็บของในเป้ไว้เอง"
         effects: {money: {unit: income_x, amount: 0.8}, loot: [dg_crossbow, dg_armband]}
+        merit: [{cat: greed_harm, level: 1}]
+
+  # ใบตามของทาง pass: มาทาง schedules จึงกินโควตาปี 1 แบบผลย้อน · id ไม่ขึ้น overlap_ ตารางนัดของขั้นจึงไม่หยิบ ไม่กินโควตาซ้อน
+  # ส่งเกตหลายครั้งในชีวิตเดียวก็เจอใบนี้ครั้งเดียว (นัดข้าม id ที่ออกแล้ว) · ไม่อยู่ในรอบดันเจียนจึงไม่มี run: dungeon
+  # ไม่มีทางตาย ⇒ ห้ามลดสุขภาพตามกติกาหัวไฟล์ ราคาของทางยึดคืนจึงเป็นเงินกับความสุข · 3 ทาง ยึดคืน/ย้ายหนี/ซ้ำเติม ทางยึดคืนแยกแนวหน้า/แนวหลังให้ครบ 4 ตัวเลือกตาม lint
+  - id: dungeon_breach_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {overlap_stage: [3, 4]}
+    title: "เกตที่ไม่มีใครปิดแตก"
+    text: "เกตที่คุณส่งต่อให้ทีมอื่นไม่มีใครปิดทัน คืนนี้มันแตกออกมาทั้งย่าน ซอยที่เคยมีรถเข็นขายของมีแต่เงาตัวอะไรเดินเต็มถนน ทหารตั้งด่านกั้นปากซอย คนแถวนั้นหอบข้าวของหนีออกมาไม่ขาดสาย"
+    choices:
+      - id: reclaim
+        text: "เข้าไปช่วยยึดย่านคืน"
+        merit: [{cat: help_others, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "ทีมกวาดทีละซอยจนรุ่งสาง ป้าร้านข้าวแกงจำหน้าคุณได้ ตักข้าวมาให้ทั้งทีมไม่คิดเงิน", effects: {network: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยึดคืนได้แค่ครึ่งย่าน อีกครึ่งถูกล้อมรั้วเป็นเขตหวงห้าม คุณควักเงินตัวเองซื้อน้ำซื้อยาให้ทีมจนหมดกระเป๋า", effects: {money: {unit: income_x, amount: -0.3}, happiness: -1}, merit: [{cat: neutral}]}
+      - id: reclaim_support
+        text: "ส่งเสบียงให้ทีมยึดคืนจากแนวหลัง"
+        effects: {money: {unit: income_x, amount: -0.3}, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: move_away
+        text: "ย้ายออกจากแถบนั้นไปเลย"
+        effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: exploit
+        text: "กดราคาซื้อของจากคนที่หนีออกมา"
+        effects: {money: {unit: income_x, amount: 0.6}, relations: -1}
         merit: [{cat: greed_harm, level: 1}]
