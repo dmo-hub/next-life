@@ -11411,7 +11411,7 @@ document.addEventListener('keydown', (e) => {
 
 // แนวการ์ดของโลกนี้ทางเดียว (ทาง A กระดาษเก่า) — โลกละธีม: ลางกับเหตุการณ์ความเชื่อไม่แยกเป็นแสงเทียนแล้ว
 // สีมืดทองเป็นของปรโลกที่เดียว (renderAfter) · ต่างโลกมีธีมของตัวเอง · มรณบัตร = หนังสืองานศพบนฐานทาง A
-const styleOf = (card) => (card.kind === 'death' ? 'a mem' : 'a');
+const styleOf = (card) => (card.kind === 'death' ? 'a mem' : 'a yc');
 
 // ภาพจาก art.mjs (B56) วาดเป็น SVG — ชุดรูปทรงเดียวกับที่ภาพแชร์วาดลง canvas
 function artSvg(cls, w, h, parts) {
