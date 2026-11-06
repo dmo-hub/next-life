@@ -7,7 +7,7 @@ import { injectSpec, SPEC_PAGE } from './spec.mjs';
 import { guideHtml } from './guide.mjs';
 import { demoHtml } from './demo.mjs';
 import { designPages, designHtml, DESIGN_AT } from './design.mjs';
-import { injectNav, DEV_MAPS, mapsMoved } from './nav.mjs';
+import { injectNav, injectDevNav, DEV_NAV_PAGES, DEV_MAPS, mapsMoved } from './nav.mjs';
 import { uiPage, designMoved, liveMoved, tweakPages, tweakMoved, UI_PAGE, UI_LIVE_FROM } from './ui.mjs';
 import { soonCats, soonIds, injectRoadmap } from './roadmap.mjs';
 import { GAME_CSS_PAGES, gameCss, injectGameCss } from './game-css.mjs';
@@ -92,6 +92,10 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     // แถวหมวดแผนงานใต้หัวกำลังทำ (ui-redo 69) อ่านหมวดจากหน้าเดียวกัน
     const next = injectNav(file === 'whatsnew.html' ? injectRoadmap(soonIds(html), soonCats(html), 'docs/whatsnew.html') : html, file);
     put(at(`docs/${file}`), next, html);
+  }
+  for (const file of DEV_NAV_PAGES) {
+    const html = readFileSync(at(`docs/${file}`), 'utf8');
+    put(at(`docs/${file}`), injectDevNav(html, file), html);
   }
   // หน้า tweak เว็บเอกสาร (ui-redo 32): รายการหน้าคิดหลังทุกหน้าข้างบนเขียนเสร็จ ⇒ หน้าที่เพิ่ง build ใหม่อยู่ในรายการด้วย
   const dtData = docsTweakData(at('docs/'), readFileSync(at('src/ui/template.html'), 'utf8'));
