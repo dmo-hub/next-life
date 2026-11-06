@@ -87,7 +87,7 @@
 :root {
   --page:#F4ECDC; --ink:#1B2A4A; --ink2:color-mix(in srgb, #1B2A4A 70%, #5B5648); --muted:#5B5648;
   --paper:#FBF6EA; --paper2:color-mix(in srgb, #FBF6EA 45%, #F4ECDC); --rule:#C9B98F; --rule2:color-mix(in srgb, #C9B98F 60%, #FBF6EA); --line-strong:#8C7A52;
-  --red:#A62B1F; --green:#2F6B4F; --blue:#7A5C12; --head:#1B2A4A;
+  --red:#A62B1F; --seal:var(--red); --green:#2F6B4F; --blue:#7A5C12; --head:#1B2A4A;
   --lacquer:#17110D; --lacquer2:#221912; --gold:#D9B45A; --gold2:#F0D78C; --cream:#EFE3C2; --bronze:#5A4630; --bronze2:#8A6D3B; --sand:#BFAE86;
   --fl:#015EC1; --dg:#B3261E; --track:#E2D9C6;
   --ft:Sarabun,system-ui,sans-serif; --fh:Maitree,serif;
@@ -533,15 +533,20 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .deed { margin:0; display:flex; flex-direction:column; gap:2px; font-size:13px; overflow-wrap:anywhere; color:#E3D6B3; }
 .deed b { color:var(--gold2); font-size:12px; }
 .deed.bad b { color:#E39A8A; }
-/* มรณบัตร — หนังสืองานศพ (B83b D3 ทาง B): ขาวดำ กรอบหนา รูปกลางใบ · กราฟกับสรุปข้างในคงสีทาง A */
-.a.mem { position:relative; isolation:isolate; background:#FFFFFF; border:12px solid #1F1F1F; outline:1px solid #8A8A8A; outline-offset:-6px; color:#1F1F1F; }
+/* มรณบัตร — หนังสืองานศพ (B83b D3 ทาง B): ขาวดำ รูปกลางใบ · กราฟกับสรุปข้างในคงสีทาง A
+   กรอบเส้นคู่ไม่มีเส้นใน: เส้นในตกกลางช่องของเส้นคู่แล้วถมเป็นเส้นหนา (ข้อ 239) · ลายกนกแถบบน-ล่างเป็นของหนังสืองานศพเท่านั้น ป้ายคนหายคงกระดาษประกาศ */
+.a.mem { position:relative; isolation:isolate; color:#1F1F1F; }
+.a.mem:not(.lost) { border:8px double #1F1F1F; border-radius:0; background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%231F1F1F%22%20stroke-opacity%3D%220.2%22%20stroke-width%3D%221.4%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M20%2038c-7-4-10-11-7-18%201%204%204%206%206%206-3-5-2-12%203-17%200%205%203%208%206%2010%203%203%203%208%200%2011%202-1%204-3%204-6%203%206%200%2012-6%2014%22%2F%3E%3Cpath%20d%3D%22M20%2038c-3-3-3-7%200-9%202-1%204%200%204%202s-2%203-3%202%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") left top / 32px 32px repeat-x, url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%231F1F1F%22%20stroke-opacity%3D%220.2%22%20stroke-width%3D%221.4%22%20stroke-linecap%3D%22round%22%20transform%3D%22translate(0%2040)%20scale(1%20-1)%22%3E%3Cpath%20d%3D%22M20%2038c-7-4-10-11-7-18%201%204%204%206%206%206-3-5-2-12%203-17%200%205%203%208%206%2010%203%203%203%208%200%2011%202-1%204-3%204-6%203%206%200%2012-6%2014%22%2F%3E%3Cpath%20d%3D%22M20%2038c-3-3-3-7%200-9%202-1%204%200%204%202s-2%203-3%202%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") left bottom / 32px 32px repeat-x, #FFFFFF; }
+.a.mem:not(.lost) .d-rest { padding-bottom:26px; }
+/* ตราอยู่ใน .p-left หลัง panels() แต่ .p-left ไม่ตั้ง position ⇒ absolute ยึดมุมการ์ด */
+.d-seal { position:absolute; right:18px; top:18px; z-index:1; display:grid; place-items:center; width:52px; height:52px; border-radius:50%; background:var(--seal); color:#FFFFFF; outline:1.5px solid #FFFFFF; outline-offset:-5px; transform:rotate(-8deg); font:700 15px/1 Srisakdi,serif; user-select:none; }
 /* ภาพฉากเป็นพื้นหลังจาง (ui-redo 57 · ค่าแรกเกิดใบ 61: ชิดบนกลาง กว้างเต็ม จาง 0.1) — z-index ติดลบใต้เนื้อ แต่ isolation ของการ์ดกันไม่ให้ลงไปใต้พื้นขาว
    ทุกเส้นเป็นหมึกดำ (เจ้าของตั้งสีทองเป็น #000000) */
 .d-bg { position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none; color:#000000; }
 .d-bg svg { position:absolute; left:50%; top:0; width:100%; height:auto; transform:translateX(-50%); opacity:0.1; }
 .d-bg [fill]:not([fill="none"]) { fill:currentColor; }
 .d-bg [stroke] { stroke:currentColor; }
-.mem .top { background:transparent; color:#1F1F1F; justify-content:center; padding-top:18px; }
+.mem .top { background:transparent; color:#1F1F1F; justify-content:center; padding-top:19.2px; }
 .mem .top b { font-family:Srisakdi,serif; font-size:22px; font-weight:700; }
 .por { align-self:center; width:96px; height:96px; border:1px solid #1F1F1F; padding:4px; }
 .d-head { display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; }
@@ -581,7 +586,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .d-share-in { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
 .d-share .choice { flex:1 1 auto; min-height:44px; padding:6px 12px; justify-content:center; font-size:14px; background:transparent; border-style:dashed; }
 /* ป้ายตามหาคนหาย (B139): กระดาษประกาศติดเสา หัวแดงตัวหนา — ต่างจากหนังสืองานศพขาวดำ ให้รู้ว่ายังไม่มีใครถือว่าจากไป */
-.a.mem.lost { background:#FFF8E1; border:3px dashed #B3261E; outline:none; }
+.a.mem.lost { background:#FFF8E1; border:3px dashed #B3261E; }
 .lost .top { padding-top:20px; }
 .lost .top b { font-family:var(--ft); font-size:24px; font-weight:800; color:#B3261E; letter-spacing:0.02em; }
 .lost .por { border:2px solid #1F1F1F; }

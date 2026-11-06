@@ -52,7 +52,7 @@ writeFileSync(new URL('./docs/play.html', import.meta.url), toLf(read('./src/ui/
 // หน้า tweak ที่ต้องหน้าตาเกมจริง (ui-redo 46): ฉีด CSS ของ template + ฟอนต์หน้าเล่นตอน build — หน้าไม่ลอก CSS เอง แก้เกมแล้วต้นแบบตามทันที
 const GAME_CSS = ['/*GAME-CSS:START*/', '/*GAME-CSS:END*/'];
 const gameCss = read('./src/ui/template.html').match(/<style>([\s\S]*?)<\/style>/)[1].replace('/*__FONTS__*/', () => fontsCss(playFonts().filter(([f]) => f !== 'Srisakdi'), `../../${FONT_DIR}`).trimEnd());
-for (const page of ['./docs/dev/tweak/head-tweak.html', './docs/dev/tweak/death-tweak.html']) {
+for (const page of ['./docs/dev/tweak/head-tweak.html']) {
   const html = read(page);
   const [a, b] = GAME_CSS.map((m) => html.indexOf(m));
   if (a < 0 || b < a) throw new Error(`${page}: ต้องมี ${GAME_CSS.join(' … ')}`);
