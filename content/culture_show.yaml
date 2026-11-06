@@ -1,0 +1,450 @@
+# การ์ดวัฒนธรรมไทยชุด show (ใบ 216 จากร่าง 213)
+events:
+  - id: show_tonic_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [7, 12], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้]}
+    title: "หยุดตรงตอนจะรู้เรื่อง"
+    text: "รถหนังเข้าหมู่บ้าน ฉายฟรีตั้งแต่หัวค่ำ ฉายถึงตอนสำคัญก็หยุด คนขายเดินถือขวดยาออกมาพูดยาว ผู้ใหญ่รอบตัวถอนหายใจพร้อมกัน แล้วล้วงกระเป๋า"
+    choices:
+      - id: wait_awake
+        text: "นั่งรอ ไม่ยอมหลับ"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: try_tonic
+        text: "ขอผู้ใหญ่ซื้อยาให้ลองขวดหนึ่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "รสหวานขม กินแล้วคึกวิ่งรอบจอ ไม่รู้ว่าหายจากอะไร เพราะก็ไม่ได้เป็นอะไร", effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ท้องเสียตั้งแต่กลางเรื่อง ตอนจบต้องถามเอาจากเพื่อนวันรุ่งขึ้น", effects: {health: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: go_sleep
+        text: "ง่วงแล้ว กลับไปนอน"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: sell_too
+        text: "ออกไปยืนพูดขายยาแข่งคนขาย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนดูหัวเราะ คนขายยัดขนมใส่มือให้ถอยออกไปพ้นจอ", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ใหญ่หิ้วกลับมานั่งที่ แล้วซื้อยาขวดหนึ่งเป็นค่าขอโทษคนขาย", effects: {relations: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_mat_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [7, 12]}
+    title: "เสื่อไปก่อนคน"
+    text: "คืนนี้มีหนังกลางแปลงที่ลานโล่ง ผู้ใหญ่ในบ้านส่งคุณแบกเสื่อไปจองที่ตั้งแต่ตะวันยังไม่ตก จอผ้าขาวเพิ่งขึง ลำโพงเพิ่งตั้ง แถวหน้ามีเสื่อบ้านอื่นปูเต็มแล้ว ไม่มีคนนั่งสักคน"
+    choices:
+      - id: middle_row
+        text: "ปูแถวกลาง เสียงไม่แตกหู"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: guard_mat
+        text: "นั่งเฝ้าเสื่อคนเดียวจนมืด"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: under_speaker
+        text: "ปูใกล้ลำโพง ฟังคนพากย์ชัด ๆ"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: shift_mat
+        text: "เลื่อนเสื่อบ้านอื่นถอยไปนิดเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่มีใครรู้ บ้านคุณได้แถวหน้า ผู้ใหญ่ชมว่าเด็กคนนี้ไปเร็วดี", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของเสื่อมาทันพอดี ยืนรอให้คุณเลื่อนกลับเอง แล้วถามว่าเด็กบ้านไหน", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_crystal_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [9, 12]}
+    title: "เสียงจากก้อนแร่"
+    text: "พี่ข้างบ้านมีงานอดิเรกคือต่อวิทยุเครื่องแร่ฟังเอง นั่งขยับอยู่ครึ่งชั่วโมง ได้ยินคนพูดแผ่ว ๆ สองคำแล้วหายไป พี่ยื่นหูฟังมาให้คุณ ยืนยันว่าเมื่อกี้มีคนพูดจริง ๆ"
+    choices:
+      - id: learn_build
+        text: "ขอให้สอนต่อเครื่องเอง"
+        effects: {knowledge: 1, relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: write_report
+        text: "จดวิธีทำไปส่งครู"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: grab_turn
+        text: "ยึดหูฟังไว้ ฟังจนกว่าจะมีเสียง"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: alien_claim
+        text: "บอกเพื่อนว่าจับสัญญาณต่างดาวได้"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนต่อแถวมาขอฟัง ได้ยินเสียงซ่าแล้วพยักหน้าว่าใช่", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนมาฟังตรงจังหวะคนอ่านราคาข้าว ต่างดาวพูดไทยชัดมาก", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_cloth_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [13, 18], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้]}
+    title: "ผ้าล้อมกับหนังฟรี"
+    text: "คืนนี้มีหนังล้อมผ้า เก็บเงินหน้าทางเข้า อีกฝั่งหมู่บ้านมีหนังขายยาฉายฟรี แต่ฉายไปขายไป เงินในกระเป๋าคุณพอกินก๋วยเตี๋ยวหนึ่งชาม หรือเข้าดูหนึ่งรอบ อย่างใดอย่างหนึ่ง"
+    choices:
+      - id: pay_in
+        text: "จ่ายเงิน ดูให้จบเรื่อง"
+        effects: {happiness: 2, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: free_side
+        text: "ไปหนังฟรี ทนฟังขายยา"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: noodle
+        text: "กินก๋วยเตี๋ยว ฟังเสียงหนังเอา"
+        effects: {health: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: crawl_under
+        text: "มุดใต้ผ้าเข้าทางหลังจอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เข้ามาได้ นั่งหน้าตาเฉย คนข้าง ๆ เพิ่งมุดมาเหมือนกัน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนเก็บเงินยืนรออยู่ตรงนั้น ยกชายผ้าให้เองแล้วแบมือ จ่ายแล้วเข้าดูได้ แต่แถวหลังเห็นกันหมด", effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_combo_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [13, 18], school: [lower, upper, voc]}
+    title: "วงยังขาดอีกคน"
+    text: "เพื่อนตั้งวงสตริงคอมโบจะลงเวทีประกวด มีกีตาร์สองตัวที่เสียงไม่ตรงกัน กลองยืมของโรงเรียน ยังขาดอีกหนึ่งคน เวลาซ้อมชนเวลาติวพอดี เพื่อนบอกว่าตำแหน่งนี้ไม่ต้องเก่ง ขอแค่มาตรงเวลา"
+    choices:
+      - id: join_band
+        text: "เข้าวง เรื่องติวไว้ทีหลัง"
+        effects: {happiness: 2, relations: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: split_week
+        text: "ซ้อมเสาร์ อ่านหนังสืออาทิตย์"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: just_cheer
+        text: "อ่านหนังสือ รอเชียร์หน้าเวที"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: be_manager
+        text: "ขอเป็นผู้จัดการ ไม่เล่นอะไร"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้หาชุด จองรถ คุยกับเจ้าของเวที วงตกรอบแรก แต่เจ้าของเวทีชวนมาช่วยงานปีหน้า", effects: {network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เล่นไม่เป็นแต่สั่งเก่ง วงเลิกกันก่อนถึงวันประกวด", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_school_tv_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [13, 18], school: [lower, upper]}
+    title: "แถวหลังได้ออกทีวี"
+    text: "ครูเกณฑ์คุณเข้าวงลูกทุ่งของโรงเรียนแถวหลัง วงได้ออกทีวีในรายการประกวดนักเรียนมัธยม ที่ยืนของคุณอยู่มุมที่กล้องอาจไปไม่ถึง ที่บ้านโทรบอกญาติทุกจังหวัดให้เปิดดูแล้ว"
+    choices:
+      - id: practice_smile
+        text: "ซ้อมยิ้มให้กล้องทุกคืน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: tell_truth
+        text: "บอกที่บ้านว่าอยู่แถวหลัง"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: ask_front
+        text: "ขอครูขยับมาข้างหน้าสักเพลง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครูให้ขยับมาครึ่งก้าว ขึ้นจอสองวินาที ญาติทุกจังหวัดยืนยันว่าเห็น", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูให้กลับไปซ้อมท่าก่อน เรื่องแถวค่อยว่ากันชาติหน้า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wave_camera
+        text: "โบกมือให้กล้องตอนเพลงเศร้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "กล้องจับพอดี ญาติโทรมาถามทีละคนว่าคุณโบกให้ใคร", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูเห็นก่อนกล้อง รอบถัดไปคุณยืนหลังตู้ลำโพง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_ramwong_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [19, 30], flags: {not: [married]}}
+    title: "มาช่วยยกเก้าอี้เฉย ๆ"
+    text: "งานวัดปีนี้มีรำวงกลางลาน เสียงโทนดังตั้งแต่หัวค่ำ หญิงชายเดินวนกันเป็นวง คุณมาช่วยยกเก้าอี้เฉย ๆ แต่มีคนยื่นมือมาชวนแล้ว เก้าอี้ยังอยู่ในมืออีกข้าง"
+    choices:
+      - id: dance_on
+        text: "วางเก้าอี้ รำจนเลิกวง"
+        effects: {happiness: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: one_round
+        text: "รำรอบเดียวแล้วกลับไปยกเก้าอี้"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: keep_carrying
+        text: "ยกเก้าอี้ต่อ แกล้งไม่เห็นมือ"
+        effects: {network: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: fake_misstep
+        text: "แกล้งรำผิด เข้าคู่คนที่หมายตา"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนนั้นหัวเราะแล้วจับจังหวะให้ รำกันจบเพลงโดยไม่มีใครถามชื่อ", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รำชนคู่ข้างหน้าล้ม คนตีโทนหยุดรอให้คุณลุกก่อน", effects: {relations: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_molam_night_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [19, 30], region: [ตะวันออกเฉียงเหนือ], occupation: [farmer]}
+    title: "หมอลำกับนัดลงนา"
+    text: "คืนนี้มีหมอลำที่ลานวัด ลำกันดึก พรุ่งนี้เช้าคุณมีนัดลงนาตั้งแต่ไก่ยังไม่ตื่น คนรอบตัวก็มีนัดเดียวกัน แล้วก็ยังไม่มีใครลุกกลับ"
+    choices:
+      - id: till_end
+        text: "นั่งจนเลิก แล้วไปนาเลย"
+        effects: {happiness: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: till_midnight
+        text: "ฟังถึงเที่ยงคืนแล้วกลับ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: sleep_early
+        text: "นอนแต่หัวค่ำ เอาแรงไว้ลงนา"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: go_on_stage
+        text: "ขึ้นเวทีไปร้องแข่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เนื้อไม่ครบแต่เสียงดัง คนดูหัวเราะ หมอลำยื่นน้ำให้หนึ่งแก้วแล้วเชิญลง", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หมอลำตอบกลับคำเดียว คนในนาเอาไปพูดกันถึงหน้าเกี่ยว", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_karaoke_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], occupation: [clerk, manager, professional, technician, service]}
+    title: "ไมค์ของลูกค้าคนสำคัญ"
+    text: "หัวหน้าพาลูกค้าไปร้านคาราโอเกะย่านธุรกิจเพื่อคุยเรื่องสัญญา ลูกค้าร้องเพี้ยนมาสามเพลง ยังไม่คุยสักคำ แล้วยื่นไมค์มาทางคุณ"
+    choices:
+      - id: sing_worse
+        text: "ร้องเพี้ยนกว่าให้เขาสบายใจ"
+        effects: {network: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: press_songs
+        text: "ปรบมือ ขอเป็นคนกดเพลงให้"
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - id: sore_throat
+        text: "อ้างเจ็บคอ แล้วกลับไปนอน"
+        effects: {health: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: sing_to_win
+        text: "ร้องเต็มเสียง เอาให้ชนะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกค้าชอบใจ ขอคู่ต่ออีกสามเพลง สัญญาผ่านก่อนร้านปิด", effects: {network: 2, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้องดีเกินไปจนลูกค้าวางไมค์ หัวหน้าเตะขาใต้โต๊ะ", effects: {network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_satire_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้]}
+    title: "เพลงแซวในร้านกาแฟ"
+    text: "วิทยุในร้านกาแฟเปิดเพลงลูกทุ่งแทรกบทพูดแซวนักการเมือง คนในร้านหัวเราะก่อนมุกจบ ผู้ใหญ่บ้านที่เพิ่งประกาศจะลงสมัครอีกสมัยนั่งอยู่โต๊ะข้าง ๆ ยิ้มไม่ค่อยออก"
+    choices:
+      - id: laugh_loud
+        text: "หัวเราะดัง ๆ ตามคนในร้าน"
+        effects: {happiness: 1, relations: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: hum_quiet
+        text: "ฮัมตามเบา ๆ ไม่มองใคร"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: change_topic
+        text: "ชวนผู้ใหญ่บ้านคุยเรื่องอื่น"
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - id: own_joke
+        text: "แต่งมุกแซวคนในหมู่บ้านต่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนในร้านขอฟังซ้ำ พรุ่งนี้มีคนมาถามว่าตอนต่อไปจะแซวใคร", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มุกไปโดนเจ้าของร้าน กาแฟแก้วต่อไปต้องจ่ายสด", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_molam_live_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], region: [ตะวันออกเฉียงเหนือ], occupation: [labor, factory, service, clerk, technician], flags: {not: [home_owner]}}
+    title: "หมอลำในห้องเช่า"
+    text: "คุณย้ายจากบ้านมาเช่าห้องใกล้ที่ทำงาน คืนนี้เปิดหมอลำออนไลน์ดูตอนเที่ยงคืน คนในไลฟ์กดส่งเงินให้หมอลำกันรัว ๆ เสียงลอดผนังไปถึงห้องข้าง ๆ แล้วมีเสียงเคาะฝากลับมาเป็นจังหวะ"
+    choices:
+      - id: earphones
+        text: "ใส่หูฟัง ดูต่อเงียบ ๆ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: tip_live
+        text: "กดส่งเงินให้หมอลำตามเขาบ้าง"
+        effects: {happiness: 2, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: invite_next_door
+        text: "ชวนห้องข้าง ๆ มาดูด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ห้องข้าง ๆ เปิดประตูมาพร้อมข้าวเหนียว เป็นคนจังหวัดเดียวกัน อยู่ติดกันมาสองปีไม่เคยรู้", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ห้องข้าง ๆ ไม่เปิดประตู เสียงเคาะฝาหยุด เช้ามาเดินสวนกันไม่มองหน้า", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: dance_alone
+        text: "ลุกเต้นในห้องเช่าคนเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "เหงื่อออกเต็มตัว คืนนั้นหลับดีกว่าที่ผ่านมาทั้งเดือน", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ห้องล่างเคาะเพดานตามจังหวะ เช้ามาเจ้าของหอส่งข้อความมาหนึ่งย่อหน้า", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_tape_box_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59]}
+    title: "กล่องเทปใต้เตียง"
+    text: "รื้อบ้านเจอกล่องเทปคาสเซ็ตเก่า ปกซีด บางม้วนเส้นเทปยืด คนในกลุ่มนักสะสมทักมาว่าม้วนหายากขายได้ราคา เครื่องเล่นที่บ้านพังไปนานแล้ว คุณเอาดินสอหมุนม้วนเทปดู หมุนได้ แต่ไม่มีเสียง"
+    choices:
+      - id: sell_rare
+        text: "ขายม้วนหายาก เก็บเงินไว้"
+        effects: {happiness: -1, money: {unit: fixed_baht, amount: 2000, ref_year: 2560}}
+        merit: [{cat: neutral}]
+      - id: keep_all
+        text: "เก็บไว้ทั้งกล่อง ไม่ขาย"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: buy_player
+        text: "ซื้อเครื่องเล่นมาฟังอีกที"
+        effects: {happiness: 2, money: {unit: fixed_baht, amount: -1500, ref_year: 2560}}
+        merit: [{cat: neutral}]
+      - id: overprice
+        text: "ตั้งราคาแพงกว่าตลาดสามเท่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "มีคนยอมจ่ายจริง พร้อมเล่าเรื่องสมัยวัยรุ่นของเขาให้ฟังหนึ่งชั่วโมง", effects: {happiness: -1, network: 1, money: {unit: fixed_baht, amount: 6000, ref_year: 2560}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ประกาศค้างทั้งปี คนเข้ามาทักแค่ถามว่ายังเล่นได้ไหม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_two_radios_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59], family: [{role: child, alive: true, age: [13, 25]}]}
+    title: "บ้านนี้มีสองวิทยุ"
+    text: "คุณเปิดลูกทุ่งตั้งแต่เช้าตามเคย ลูกเปิดเพลงสตริงจากอีกห้องแข่งกัน ร้านเทปหน้าตลาดย้ายลูกทุ่งจากชั้นหน้าไปไว้ชั้นล่างข้างถ่านไฟฉาย"
+    choices:
+      - id: volume_war
+        text: "เร่งเสียงลูกทุ่งสู้"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: listen_theirs
+        text: "ขอฟังของลูกสักเพลง"
+        effects: {relations: 1, knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: split_time
+        text: "แบ่งเวลา เช้าคุณ เย็นลูก"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: mash_up
+        text: "ร้องลูกทุ่งใส่ทำนองสตริง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกหัวเราะออกมาจากห้อง แล้วร้องตามให้ท่อนหนึ่ง", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกปิดประตูห้อง แล้วไม่ออกมากินข้าวเย็น", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_quiz_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85], family: [{role: grandchild, alive: true}]}
+    title: "ตอบก่อนผู้แข่งขัน"
+    text: "เกมโชว์ทีวีคืนนี้ คุณตอบก่อนผู้แข่งขันได้สามข้อติด หลาน ๆ เริ่มเสนอให้ส่งคุณไปออกรายการ ข้อที่สี่คุณไม่รู้เลย แต่หลานหันมาหาคุณก่อนหันไปหาจอ"
+    choices:
+      - id: bluff
+        text: "ตอบมั่วด้วยเสียงมั่นใจ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถูกพอดี ตั้งแต่คืนนั้นหลานเอาการบ้านมาถามทุกวิชา", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ผิดไกลมาก หลานเอาไปล้อจนจบรายการ", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: too_easy
+        text: "บอกว่าข้อนี้ง่ายเกินจะตอบ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: team_up
+        text: "ชวนหลานช่วยกันตอบ"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: apply_real
+        text: "ส่งใบสมัครออกรายการจริง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ไปรอบคัดเลือก ตอบไม่ผ่าน แต่ได้เสื้อรายการมาใส่ทุกงาน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "รายการเงียบ คุณยังบอกทุกคนว่าเขาคงกำลังพิจารณา", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: show_forest_lige_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85], region: [ใต้]}
+    title: "เคยมีให้ดูทุกงาน"
+    text: "งานบวชคนข้างบ้านเปิดเครื่องเสียงทั้งคืน คุณเล่าให้เด็ก ๆ ฟังว่าสมัยก่อนงานไหนก็มีลิเกป่า ตามที่คนเฒ่าเล่าให้คุณฟังมาอีกที เด็กฟังจบแล้วถามว่าป่าไหน"
+    choices:
+      - id: old_friends
+        text: "ชวนเพื่อนเก่ามาช่วยกันเล่า"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: find_troupe
+        text: "พาเด็กไปหาคนที่ยังเล่นเป็น"
+        effects: {knowledge: 1, relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: let_it_be
+        text: "เล่าจบก็พอ ฟังเพลงต่อ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: show_moves
+        text: "ลุกขึ้นทำท่าให้ดูสักบท"
+        outcomes:
+          - {weight: 1, ok: true, text: "ท่าจำได้ครึ่งเดียว เด็กหัวเราะแล้วขอดูอีกรอบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้บทเดียว เข่าไม่ยอมกลับ ต้องมีคนช่วยพยุงลงจากท่า", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+# หมายเหตุถึงเจ้าของ
+# ชุดนี้ไม่มีการ์ดละครทีวี แถวยืนยันแล้วไม่มีแถวพฤติกรรมคนดูละคร ถ้าอยากได้ต้องรีเสิร์ชเพิ่มก่อน
+# show_tonic_01 กับ show_mat_01 เป็นหนังกลางแปลงช่วงอายุ 7-12 เหมือนกัน ถ้าตัดชุดให้เลือกไว้ใบเดียว
+# show_ramwong_01 เหลือแค่รำวงในงานวัด ไม่เล่าเรื่องนโยบายรัฐ เพราะปีจริง 2481-2485 อยู่ก่อนเกมเริ่ม
+# show_molam_live_01 ตัดเรื่องโรคระบาดออก ถ้าจะคงต้องเป็น era: covid19 ซึ่งขัดรูปชุดนี้

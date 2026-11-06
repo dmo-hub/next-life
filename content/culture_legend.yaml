@@ -1,0 +1,506 @@
+# การ์ดวัฒนธรรมไทยชุด legend (ใบ 216 จากร่าง 213)
+events:
+  - id: legend_ribbon_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [5, 8]}
+    title: "บอลหยุดใต้ผ้าสามสี"
+    text: "ต้นตะเคียนใหญ่ปากซอยผูกผ้าสามสีไว้รอบโคน ผู้ใหญ่เล่าว่ามีนางไม้อยู่ อย่าไปเล่นแถวนั้น บอลของคุณกลิ้งไปหยุดตรงโคน เพื่อนทุกคนถอยหลังพร้อมกันหนึ่งก้าว"
+    choices:
+      - id: wai_first
+        text: "ยกมือไหว้ก่อนค่อยเก็บ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: grab_run
+        text: "วิ่งไปคว้าแล้ววิ่งกลับ"
+        outcomes:
+          - {weight: 2, ok: true, text: "เก็บได้ เพื่อนยกให้เป็นคนกล้าไปจนถึงมื้อเย็น", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สะดุดรากไม้ เข่าถลอก ผู้ใหญ่ว่านางไม้เตือน ส่วนรากก็อยู่ตรงนั้นมาร้อยปีแล้ว", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: call_adult
+        text: "เรียกผู้ใหญ่มาเก็บให้"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: tie_ball
+        text: "เก็บเศษผ้ามาผูกบอลบ้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "บอลมีผ้าสามสี เพื่อนไม่กล้าเตะแรงอีกเลย คุณชนะทุกเกมไปหนึ่งสัปดาห์", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ป้าร้านชำเห็นเข้า ได้ยืนฟังเรื่องมารยาทกับต้นไม้ครึ่งชั่วโมง", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_shrine_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [6, 10], region: [กรุงเทพฯ และปริมณฑล, กลาง, ตะวันออก, ตะวันตก, ตะวันออกเฉียงเหนือ, ใต้]}
+    title: "น้ำแดงบนศาล"
+    text: "ศาลพระภูมิที่ตั้งไว้ตอนปลูกบ้านมีน้ำแดงวางอยู่ตั้งแต่เช้า บ่ายนี้แดดร้อนจัด ผู้ใหญ่ในบ้านหลับกันหมด เหลือแค่คุณกับขวดที่เหงื่อเกาะอยู่"
+    choices:
+      - id: one_sip
+        text: "จิบแค่อึกเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "หวานจัด ไม่มีใครรู้ ยกเว้นระดับน้ำในขวด", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้ำอุ่นและมีมดลอยสองตัว ปวดท้องถึงเย็น ผู้ใหญ่คนหนึ่งว่าพระภูมิ อีกคนว่ามด", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_ask
+        text: "รอผู้ใหญ่เก็บของไหว้แล้วขอกิน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: wai_sorry
+        text: "ยกมือขอโทษที่คิดไม่ดี"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: top_up
+        text: "ดื่มครึ่งแล้วเติมน้ำเปล่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "สีจางลงนิดเดียว ผู้ใหญ่ว่าน้ำแดงยี่ห้อนี้จืดลงทุกปี", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "สีจางเหมือนน้ำล้างแก้ว ถูกจับได้ตั้งแต่เดินผ่าน", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_glimmer_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [8, 12]}
+    title: "แสงวับในคลอง"
+    text: "ปิดเทอมไปบ้านญาติริมคลอง ตกค่ำมีแสงวับ ๆ ในน้ำแถวกอกล้วย เด็กแถวนั้นบอกว่าผีพรายกับนางพรายตานี ใครมองนานตาจะเหล่ ผู้ใหญ่พูดสั้น ๆ แค่ว่าอย่าลงท่าน้ำตอนมืด"
+    choices:
+      - id: poke_water
+        text: "เอาไม้เขี่ยน้ำดูใกล้ ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "แสงแตกเป็นริ้วแล้วกลับมาเหมือนเดิม เงยหน้าดู มีพระจันทร์ดวงเดียวกันอยู่บนฟ้า", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ท่าน้ำลื่น ตกลงไปแค่เอว จามไปสามวัน เด็กแถวนั้นยังยืนยันว่าพรายดึงขา", effects: {health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: fetch_adult
+        text: "ไปตามผู้ใหญ่มาดูด้วย"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: count_lights
+        text: "นั่งนับแสงบนบันไดบ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "นับได้สิบเจ็ด เด็กแถวนั้นบอกเมื่อวานมียี่สิบ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยุงกินจนนับไม่ไหว ขาลายกลับเข้าบ้าน", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: dare_kid
+        text: "ท้าเด็กแถวนั้นจับผีใส่ขวด"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขากลับมาพร้อมขวดเปล่า ชี้ไฟคาดหัวของคนจับกบอีกฝั่ง แล้วสองคนก็หัวเราะกันยาว", effects: {relations: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้ลูกอ๊อดกลับบ้านครึ่งขวด เด็กคนนั้นยืนยันว่ากลางคืนมันเป็นผี ป้าเทขวดทิ้งหน้าบ้าน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_chain_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [13, 15], school: [lower, upper, voc]}
+    title: "เสียงโซ่ตึกเก่า"
+    text: "รุ่นพี่เล่าว่าโรงเรียนนี้เคยเป็นเรือนจำ ห้องน้ำตึกเก่ามีเสียงเหมือนโซ่ลากพื้นตอนเย็น คาบสุดท้ายวันนี้คุณปวดเบาอยู่ตึกนั้น ห้องน้ำอีกตึกไกลพอจะเข้าเรียนไม่ทัน"
+    choices:
+      - id: hold_it
+        text: "กลั้นไว้จนเลิกเรียน"
+        effects: {health: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: go_group
+        text: "ชวนเพื่อนไปเป็นขบวน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: ask_janitor
+        text: "ไปถามนักการภารโรง"
+        outcomes:
+          - {weight: 2, ok: true, text: "เขาชูโซ่คล้องประตูให้ดู ลากเก็บทุกเย็นตอนปิดตึก ทำมายี่สิบปีแล้ว", effects: {knowledge: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาบอกไม่เคยได้ยิน แล้วถามว่าทำไมไม่อยู่ในห้องเรียน", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขายกนิ้วให้เงียบ เสียงโซ่ลากดังมาจากตึกเก่า ทั้งที่โซ่คล้องประตูอยู่ในมือเขา เขาบอกว่า เย็นนี้มาเร็ว", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: play_chain
+        text: "อัดเสียงโซ่ไปเปิดในห้องน้ำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนในห้องน้ำวิ่งออกมาทั้งแถว สัปดาห์ต่อมาเรื่องเล่ามีตอนใหม่ ที่มาของเสียงอยู่ในกระเป๋าคุณ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ครูฝ่ายปกครองอยู่ในห้องน้ำนั้น ได้ล้างห้องน้ำตึกเก่าทั้งสัปดาห์", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_webboard_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [15, 18], school: [lower, upper, voc]}
+    title: "กระทู้ห้องชั้นสี่"
+    text: "เว็บบอร์ดโรงเรียนมีคนเล่าว่าได้ยินเสียงผู้หญิงร้องไห้หลังห้องชั้น 4 คนตอบต่อกันสามสิบความเห็น ความเห็นล่าสุดเขียนว่า หลอนกันไป 5555 มีทุกที่ พรุ่งนี้สอบ คุณยังกดรีเฟรชอยู่"
+    choices:
+      - id: log_off
+        text: "ปิดคอม อ่านหนังสือสอบ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: ask_source
+        text: "ถามว่าใครได้ยินกับหูตัวเอง"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: stay_late
+        text: "พรุ่งนี้สอบเสร็จอยู่เย็นไปฟังเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอเพื่อนห้องข้าง ๆ นั่งร้องไห้เพราะอกหัก เลยนั่งเป็นเพื่อนจนมืด", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้ยินแต่พัดลมเพดานเอียง ๆ นั่งรอจนยามมาไล่กลับ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: write_sequel
+        text: "แต่งตอนต่อใส่รายละเอียดเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "กระทู้ขึ้นอันดับหนึ่ง มีคนมายืนยันว่าเห็นตามที่คุณแต่งทุกอย่าง", effects: {network: 2, knowledge: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "โพสต์จนตีสอง เช้านี้ตื่นมาทำข้อสอบได้ครึ่งเดียว", effects: {knowledge: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_paralysis_01
+    type: A
+    category: health
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [16, 18], school: [upper, voc]}
+    title: "มีอะไรนั่งทับอก"
+    text: "อ่านหนังสือโต้รุ่งมาสามคืน พอเคลิ้มก็รู้สึกตัวแต่ขยับไม่ได้ เหมือนมีอะไรกดทับอกอยู่ เช้านี้เล่าให้เพื่อนฟัง ทั้งห้องลงมติว่าผีอำ พรุ่งนี้ยังสอบอีกสองวิชา"
+    choices:
+      - id: sleep_full
+        text: "ปิดหนังสือ นอนให้ครบ"
+        effects: {health: 2, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: more_coffee
+        text: "ชงกาแฟ ไม่นอนมันเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่โดนอีกเพราะไม่ได้นอน คะแนนสอบดี ตาดำลงไปถึงคาง", effects: {knowledge: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หลับในห้องสอบตั้งแต่ข้อห้า ตื่นมาตัวแข็งอีกรอบ", effects: {knowledge: -1, health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_nurse
+        text: "ไปถามครูห้องพยาบาล"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครูว่าอดนอนกับเครียดสะสม ไม่ใช่ผีที่ไหน นอนเร็วขึ้นสองคืนก็หาย", effects: {knowledge: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูให้นอนห้องพยาบาลจนพลาดคาบติว เพื่อนจดให้แต่อ่านลายมือไม่ออก", effects: {knowledge: -2, health: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: brag_ghost
+        text: "บอกเพื่อนว่าผีมาติวให้ทุกคืน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งห้องขำ มีคนมาขอฝากผีช่วยดูวิชาเลขด้วย", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้ฉายา ผีติว ติดตัวไปจนเรียนจบ ครูก็เรียกด้วย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_howl_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [19, 26]}
+    title: "เสียงร้องเชิงเขา"
+    text: "กลางดึกที่แคมป์ในป่า มีเสียงร้อง กองกอย ดังมาจากเชิงเขา ตอนเย็นคนนำทางเล่าเรื่องผีโป่งขาเดียวไว้ แล้วเข้านอนไปก่อนใคร เพื่อนในเต็นท์สะกิดถามว่าเอาไงดี"
+    choices:
+      - id: torch_look
+        text: "ถือไฟฉายออกไปส่องดู"
+        outcomes:
+          - {weight: 1, ok: true, text: "เห็นค่างแก่ตัวหนึ่งปีนต้นไม้ไม่ขึ้น มันหันมามองแบบเหนื่อยใจ", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สะดุดเชือกเต็นท์ ข้อเท้าเคล็ด เดินกะเผลกไปจนจบทริป", effects: {health: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไฟจับหน้าค่างแก่ตัวหนึ่ง หน้าตาไม่เหมือนค่างที่เคยเห็น มันอ้าปากร้อง กองกอย ใส่คุณตรง ๆ แล้วไม่ยอมหันไปไหน", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hide_bag
+        text: "ซุกถุงนอนไม่พูดอะไร"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: fire_talk
+        text: "ก่อไฟคุยกันจนสว่าง"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: howl_back
+        text: "ร้องกองกอยตอบกลับไป"
+        outcomes:
+          - {weight: 1, ok: true, text: "เสียงเงียบไปทั้งเขา เช้านี้เพื่อนยกให้เป็นหัวหน้าแคมป์ คุณตอบรับได้แค่เสียงแหบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เต็นท์ข้าง ๆ ตื่นทั้งแถว เช้านี้ไม่มีใครแบ่งกาแฟให้คุณ", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_ward_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [19, 25]}
+    title: "คืนท้าโรงพยาบาลร้าง"
+    text: "เพื่อนชวนคืนวันศุกร์ไปท้าพิสูจน์โรงพยาบาลร้างนอกเมือง คนแถวนั้นลือว่ารถเข็นกับเตียงเลื่อนเอง ตอนแวะกินข้าว ป้าร้านส้มตำบอกว่าที่ปิดเพราะหาหมอมาอยู่ไม่ได้"
+    choices:
+      - id: go_dare
+        text: "ไปด้วย ถือไฟฉายนำหน้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไปถึงเจอแต่นั่งร้านกับถุงปูน ที่นี่กำลังปรับปรุงเป็นสถานพยาบาลใหม่ ยามชวนกินกาแฟ", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พื้นชั้นสองมีเศษกระจก รองเท้าทะลุ ได้เข้าโรงพยาบาลที่ยังเปิดอยู่จริง ๆ", effects: {health: -2, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_car
+        text: "รอในรถ ดูแลกุญแจให้"
+        effects: {relations: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: som_tam
+        text: "ชวนทุกคนกินส้มตำต่ออีกจาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนยอมตาม นั่งกันจนร้านปิด เรื่องท้าพิสูจน์กลายเป็นเรื่องแฟนเก่า", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนไปกันเอง คุณนั่งเฝ้าครกอยู่คนเดียว แล้วโดนล้อไปทั้งปี", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: on_gurney
+        text: "ไปนอนซ่อนบนรถเข็นรอเพื่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนร้องลั่นทั้งตึก เรื่องนี้ถูกเล่าซ้ำในทุกงานเลี้ยงรุ่น", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ล้อรถไหลลงทางลาดไปชนกำแพง คุณกลายเป็นหลักฐานว่ารถเข็นเลื่อนเองได้", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พื้นเรียบ แต่รถเข็นเริ่มเลื่อน พาคุณไปจอดหน้าห้องฉุกเฉินแล้วหยุดนิ่ง ไม่มีใครเข็น คุณกลับไปถึงรถก่อนใครทั้งหมด", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_lemon_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [25, 30], flags: {has: [has_car]}}
+    title: "มะนาวหน้าล้อป้ายแดง"
+    text: "วันรับรถจากโชว์รูม เซลส์วางมะนาวไว้หน้าล้อ บอกให้เหยียบแล้วไหว้ย่านางประจำรถ รายงานตัวเสียก่อน ผ้าสามสีกับพวงมาลัยรออยู่บนคอนโซล รถคันหลังในคิวรับรถเริ่มบีบแตร"
+    choices:
+      - id: full_rite
+        text: "ไหว้ครบ ผ้าสามสีพวงมาลัย"
+        effects: {happiness: 1, relations: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: step_lemon
+        text: "เหยียบมะนาวให้แตกครบ"
+        outcomes:
+          - {weight: 2, ok: true, text: "แตกครบเสียงดังน่าฟัง เซลส์ปรบมือเหมือนเพิ่งสอบผ่าน", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เท้าลงคันเร่งแรงไป กรวยหน้าโชว์รูมล้ม กันชนรถใหม่มีรอยแรกของชีวิต", effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: skip_it
+        text: "ขับออกเลย ไม่ไหว้อะไร"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: keep_lemon
+        text: "ขอมะนาวกลับไปตำน้ำพริก"
+        outcomes:
+          - {weight: 1, ok: true, text: "เซลส์หัวเราะแล้วใส่ถุงให้ เย็นนี้ได้น้ำพริกมื้อแรกของรถคันนี้", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เซลส์บอกว่าต้องใช้กับคันหลังต่อ ทั้งคิวมองคุณถือมะนาวเดินกลับไปวางคืน", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_nursery_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 40], family: [{role: child, alive: true, age: [0, 2]}]}
+    title: "เด็กร้องสามคืน"
+    text: "ลูกคนเล็กร้องกลางดึกมาสามคืน ตัวรุม ๆ ป้าข้างบ้านบอกว่าเป็นแม่ซื้อมาเล่นด้วย ให้ตามหมอทำขวัญมา คลินิกหมอเด็กปากซอยเปิดถึงสองทุ่ม คุณเพิ่งนอนรวมกันได้เจ็ดชั่วโมงในสามวัน"
+    choices:
+      - id: see_doctor
+        text: "พาไปหาหมอเด็ก"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: do_both
+        text: "ทำขวัญด้วย พาไปหาหมอด้วย"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.15}}
+        merit: [{cat: neutral}]
+      - id: rite_only
+        text: "ทำขวัญอย่างเดียว ไม่ไปหมอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เช้านี้ไข้ลดเองตามประสาเด็ก ป้าข้างบ้านรับความดีความชอบไปคนเดียว", effects: {happiness: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไข้ไม่ลด ตกเย็นก็ต้องพาไปหาหมออยู่ดี จ่ายสองทาง", effects: {happiness: -1, money: {unit: income_x, amount: -0.15}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_night
+        text: "รอดูอีกคืน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เช้ามาเจอฟันซี่ใหม่โผล่ คืนนี้ทั้งบ้านหลับยาว", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่ได้นอนอีกคืน ไข้ขึ้นตอนตีสาม ได้ไปห้องฉุกเฉินอยู่ดี", effects: {health: -1, happiness: -1, money: {unit: income_x, amount: -0.15}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: negotiate_crib
+        text: "ถามเปลว่าจะเล่นถึงกี่โมง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เปลไม่ตอบ ป้าข้างบ้านเห็นสภาพคุณแล้วพาเด็กไปหาหมอเอง เป็นแค่ฟันขึ้น คุณได้หลับสองชั่วโมง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าข้างบ้านได้ยินผ่านฝา เช้านี้ทั้งซอยรู้ว่าคุณคุยกับเปล แล้วยังต้องพาไปหาหมออยู่ดี", effects: {relations: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_hitchhiker_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], flags: {has: [has_car]}}
+    title: "หญิงสาวที่ทางแยก"
+    text: "ขับรถกลับจากงานดึกผ่านทางแยกที่ชาวบ้านลือกันว่ามีหญิงสาวโบกรถ ถนนมืด มีป้ายเตือนอุบัติเหตุ คืนนี้มีคนยืนโบกอยู่จริง ไฟหน้ารถยังส่องไม่ถึงหน้าเขา"
+    choices:
+      - id: stop_ask
+        text: "ชะลอ เปิดกระจกถามห่าง ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "พนักงานกะดึกรถเสีย คุณไปส่งถึงหน้าโรงงาน เธอบอกโบกตรงนี้ทุกเดือน ข่าวลือน่าจะเป็นเธอเอง", effects: {network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชะลอตกไหล่ทาง ยางแตก คนโบกเดินมาช่วยถือไฟฉายจนเปลี่ยนเสร็จ", effects: {money: {unit: income_x, amount: -0.1}, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: speed_past
+        text: "เร่งผ่าน มองกระจกหลังตลอด"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: tell_guard
+        text: "แวะปั๊มซื้อกาแฟ บอกคนเฝ้าปั๊ม"
+        effects: {network: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: wave_back
+        text: "ชะลอแล้วโบกมือตอบไปเฉย ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาโบกตอบ คุณโบกตอบ จนรถคันหลังบีบแตร", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาไม่โบกตอบ คุณเอามือลงช้า ๆ แล้วขับต่ออีกสิบกิโลแบบไม่เปิดเพลง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาโบกตอบ อีกสิบกิโลคุณมองกระจกหลัง เขานั่งอยู่เบาะหลัง มือยังโบกอยู่ แวะปั๊มเปิดไฟดู เบาะว่าง", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_bridge_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59]}
+    title: "ผีชุดแดงในกลุ่มแชต"
+    text: "กลุ่มแชตรุ่นส่งคลิปลือว่ามีผีชุดแดงกับผีสงครามโลกใต้สะพานใหญ่ พร้อมคำว่า ระวังนะ เพื่อนอีกสามคนส่งคลิปเดียวกันซ้ำ ไม่มีใครในกลุ่มเคยไปใต้สะพานนั้น"
+    choices:
+      - id: forward_clip
+        text: "ส่งต่อพร้อมคำว่า ระวังนะ"
+        effects: {network: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: post_debunk
+        text: "หาข่าวชาวบ้านมาส่งเข้ากลุ่ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ข่าวว่าคนอยู่ใต้สะพานกว่าสามสิบปีไม่เคยเจออะไร เพื่อนกดหัวใจสองคน แล้วกลับไปส่งคลิปกันต่อ", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนส่งคลิปตอบว่าชาวบ้านก็โดนผีบังตา แล้วเลิกทักคุณไปเลย", effects: {knowledge: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: go_look
+        text: "ไปดูเองวันหยุด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ใต้สะพานมีร้านก๋วยเตี๋ยวเรืออร่อย ชาวบ้านตักเพิ่มให้แล้วเล่าเรื่องคนมาถ่ายคลิป", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถติดไปกลับหกชั่วโมง ไม่เจออะไรนอกจากคนอื่นที่มาดูเหมือนกัน", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: green_ghost
+        text: "ปั่นต่อว่าเจอผีชุดเขียวด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนหัวเราะทั้งกลุ่ม ผีชุดเขียวกลายเป็นมุกประจำรุ่น", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มีคนเอาไปโพสต์เป็นเรื่องจริง สามวันต่อมามันย้อนกลับเข้ากลุ่มพร้อมคำว่า ระวังนะ", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_tiger_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 55]}
+    title: "คนเจ็บข้างทางเดินป่า"
+    text: "ทริปเดินป่าของชมรม พรานนำทางเล่าเรื่องเสือสมิงที่แปลงเป็นคนเจ็บหลอกคนเดินป่าไว้ตอนเที่ยง บ่ายนี้คุณเดินแยกกลุ่มมาไม่ไกล มีชายแปลกหน้านั่งกุมข้อเท้าข้างทาง เรียกให้ช่วย"
+    choices:
+      - id: help_him
+        text: "เข้าไปพยุงเลย"
+        outcomes:
+          - {weight: 2, ok: true, text: "คนคณะอื่นข้อเท้าแพลงจริง พยุงกันกลับถึงจุดพัก เขาเลี้ยงน้ำมะพร้าวคุณทั้งกลุ่ม", effects: {network: 1, health: -1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พยุงกันออกนอกทางจนหลง เจ้าหน้าที่ตามเจอตอนค่ำ พรานเงียบไปทั้งมื้อ", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: call_guide
+        text: "ตะโกนเรียกพรานนำทางก่อน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: walk_back
+        text: "เดินกลับกลุ่มไม่หันมอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คณะอื่นเดินผ่านมาช่วยเขาไปแล้ว ไม่มีใครรู้ว่าคุณอยู่ตรงนั้น", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตอนเย็นเจอเขาที่จุดพัก ข้อเท้าบวมเท่ามะพร้าว เงียบกันทั้งโต๊ะ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_tiger
+        text: "ถามก่อนว่าคุณกินคนไหม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาหัวเราะจนเจ็บข้อเท้าอีกรอบ ทั้งทริปเรียกคุณว่าด่านตรวจ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาเจ็บอยู่ ไม่ขำ เรื่องไปถึงกลุ่มก่อนคุณเดินถึง", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาไม่ตอบ ยิ้มกว้างกว่าที่คนยิ้มได้ แล้วเดินเข้าป่าด้วยข้อเท้าที่ไม่เจ็บเลย รอยที่ทิ้งไว้บนดินเป็นรอยเสือ", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_fireball_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 80]}
+    title: "ดวงไฟริมโขง"
+    text: "เพื่อนเก่าเหมารถตู้ไปริมโขงออกพรรษาปีนี้ คนแน่นตลิ่งรอดูดวงไฟขึ้นจากน้ำ คนในรถเรียกบั้งไฟผี ไกด์เรียกบั้งไฟพญานาค รถติดยาวตั้งแต่หน้าตลาดถึงตลิ่ง"
+    choices:
+      - id: wait_bank
+        text: "ปูเสื่อรอจนดึก"
+        outcomes:
+          - {weight: 1, ok: true, text: "เห็นดวงไฟสองดวงไกล ๆ คนรอบข้างร้องพร้อมกัน คุณร้องด้วยทั้งที่ยังไม่แน่ใจว่าเห็นอะไร", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้ำค้างลงหนัก ไม่เห็นอะไร กลับมาไอไปหนึ่งสัปดาห์", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watch_tv
+        text: "นอนดูถ่ายทอดที่โรงแรม"
+        outcomes:
+          - {weight: 1, ok: true, text: "นักวิชาการในทีวีว่าเป็นแก๊สจากแบคทีเรีย คุณหลับก่อนเขาพูดจบ ตื่นมาหลังไม่ปวด", effects: {health: 1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทีวีตัดไปดวงไฟตอนคุณเข้าห้องน้ำ จ่ายค่าห้องมาฟังเรื่องแบคทีเรียสามชั่วโมง", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tell_tales
+        text: "เล่าเรื่องสมัยก่อนให้คนข้างเสื่อ"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: fake_shout
+        text: "ชี้ไฟเรือแล้วตะโกนว่ามาแล้ว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งตลิ่งยกกล้องขึ้นพร้อมกัน คุณนั่งกินข้าวโพดดูคนดูไฟต่อ", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนข้างเสื่อเห็นว่าเป็นเรือหาปลา แล้วเลื่อนถุงข้าวโพดหนีคุณ", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: legend_mask_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 75]}
+    title: "หน้ากากงานบุญหลวง"
+    text: "ชมรมผู้สูงอายุเหมารถไปด่านซ้าย เมืองเลย ช่วงงานบุญหลวงเดือนเจ็ด ถนนเต็มไปด้วยคนใส่หน้ากากผีตาโขนเขย่ากระดิ่ง ตัวหนึ่งเดินมาหยอกคุณแล้วถามทางไปห้องน้ำด้วยเสียงวัยรุ่น"
+    choices:
+      - id: buy_mask
+        text: "บอกทางแล้วขอซื้อหน้ากากแบบนี้"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: ask_origin
+        text: "เดินไปส่ง ถามเรื่องผีตามคน"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: wrong_way
+        text: "ชี้ทางไปห้องน้ำผิดให้"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเดินหายไปหลังวัด อีกสิบนาทีได้ยินกระดิ่งวิ่งกลับมาทางเดิม เร็วกว่าตอนไปมาก", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาวนกลับมาพร้อมพวกอีกสิบตัว เขย่ากระดิ่งใส่คุณตลอดทั้งถนน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: join_parade
+        text: "ยืมหน้ากากระหว่างเขาเข้าห้องน้ำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "นักท่องเที่ยวขอถ่ายรูปด้วย ไม่มีใครรู้ว่าข้างในอายุเกินหกสิบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ในหน้ากากร้อนจัด เดินได้สองซอย ต้องนั่งพักในปั๊มจนหายเวียนหัว", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+# หมายเหตุผู้ร่าง
+# ข้อ must แก้ครบ 7 ข้อ · ข้อ should แก้ทุกข้อ ยกเว้น 3 จุดด้านล่างที่ต้องให้เจ้าของหรือผู้รวมงานเคาะ
+# รอเจ้าของเคาะ: legend_webboard_01 ออกได้ตั้งแต่ปี 2515 ก่อนมีเว็บบอร์ด · legend_bridge_01 ออกได้ตั้งแต่ปี 2546 ก่อนมีกลุ่มแชตและคลิปส่งต่อ · ใบงานกำหนด years เต็มช่วง จึงยังไม่ใส่ when.year · ถามว่ายอมผิดยุคแบบเพจเจอร์ของ 207 หรือจะกั้นปี
+# รอผู้รวมงานดู: legend_lemon_01 กั้น has_car แล้ว แต่ยังอยู่จังหวะเดียวกับ new_car_rite ใน young.yaml · ทำให้คนที่ออกรถไปหลายปีแล้วเจอวันรับรถอีกรอบได้ · ถ้าจะแก้ขาดต้องต่อใบนี้หลังตัวเลือกออกรถ ซึ่งต้องแตะ content เดิม
+# แถวรีเสิร์ชเพิ่ม น้ำแดง: thairath.co.th/horoscope/belief/2947942 (22 ก.ค. 2569) ข้อความ "ศาลพระภูมิ และ ศาลตายาย แม้จะสามารถถวายน้ำชา หรือน้ำเปล่าได้ แต่หลายบ้านก็นิยมถวายน้ำแดงคู่กัน" · เปิดหน้าจริงเจอข้อความนี้แล้ว
+# หน้าเดียวกันพูดถึงหลอดดูดเฉพาะของกุมารทอง และไม่มีเรื่องลาของ จึงตัด เสียบหลอด และ ลาของ ออกจาก legend_shrine_01
+# แถวรีเสิร์ชเพิ่ม ทำขวัญ: th.wikipedia.org/wiki/แม่ซื้อ มีข้อความ "ในบททำขวัญเด็กของนายพุ่ม คงอิศโร หมอทำขวัญจังหวัดสงขลา กล่าวว่าแม่ซื้อมีทั้งชายและหญิง" จึงคงคำว่าทำขวัญไว้ · หน้านี้ยืนยันว่าบททำขวัญเด็กเอ่ยถึงแม่ซื้อ ไม่ได้บอกว่าทำขวัญเป็นวิธีแก้เด็กป่วย
+# แก้เกินข้อค้าน: legend_lemon_01 เปลี่ยน category เป็น society เหตุผลเดียวกับ legend_hitchhiker_01 · legend_paralysis_01 เพิ่ม sleep_full เป็น health +2 เพื่อไม่ให้ ask_nurse ชนะทุกทาง · legend_nursery_01 มี 5 ตัวเลือก
+# เฉลยย้ายไปอยู่ในผล 4 ใบจาก 7: paralysis howl bridge fireball
+# ไม่ใช้ 5 แถว: ผีโพง (ติดธงแนวเดียวกับปอบ) · ผีแม่ม่าย และโค้งร้อยศพ (ผูกกับคนตายจริง) · ผีเสื้อสมุทร (ต้องเอ่ยชื่อตัวละคร) · เจิมรถมือสอง (young.yaml มีตัวเลือกเจิมรถแล้ว)
+# ไม่มีใบ category belief: lint belief-category บังคับต้องมีบล็อก belief และ lore_ref ซึ่งไม่ตรงรูปตัวอย่าง 207
+# เป็นแม่ซื้อ เขียนแบบนี้เพื่อเลี่ยง kin-unguarded จับคำว่าแม่ผิดตัว · เจ้าแม่ย่านาง เปลี่ยนเป็น ย่านางประจำรถ แล้ว
+# realYears ของแถวที่หน้าไม่ระบุปีใช้ช่วงกว้างตั้งแต่ต้นเกมถึงปีปัจจุบัน
+# ผลตรวจ: lintDocs รวม content เดิมได้ 0 ข้อ ทั้ง 7 ชุดย่อย ชุดละ 1-2 ใบ ผ่าน stdin พร้อมตรวจ type years weight merit อายุ และจำนวนตัวเลือกด้วยสคริปต์ ไม่มีการเติมค่าให้เอง · สูงสุด title 20 · text 171 · ตัวเลือก 32
+# ยังไม่ได้ตรวจ: ทั้ง 15 ใบในการรันเดียว และ npm run lint:test · ลองแล้ว: ส่งทั้งชุดผ่าน stdin → hook bash-length บล็อกที่ 28275 ตัวอักษร และงานนี้ห้ามเขียนไฟล์ · id ไม่ซ้ำกันดูจากร่าง ไม่ได้รันตรวจข้ามชุด
+# ยังไม่ได้วัดอัตราเจอ: ลองแล้ว: แบบในหน่วยความจำ → คำสั่งชนเพดานเดียวกัน และ normalize ใน load.mjs ไม่ได้ export · ต้องวางร่างเป็นไฟล์ในสำเนาแล้ววัดตาม recipe ก่อนยื่น weight ให้เจ้าของ

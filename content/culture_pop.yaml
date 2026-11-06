@@ -1,0 +1,478 @@
+# การ์ดวัฒนธรรมไทยชุด pop (ใบ 216 จากร่าง 213)
+events:
+  - id: pop_rubberband_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [8, 12], school: [primary, lower]}
+    title: "หนังยางเต็มกระเป๋า"
+    text: "พักเที่ยงหลังโรงอาหาร เพื่อนกระเป๋าตุงคนหนึ่งเทหนังยางลงพื้น ท้าให้คุณลงหมดกระเป๋าในตาเดียว วงนี้เล่นเป่ากบ ใครเป่าทับได้ก็กินเส้นของอีกฝ่าย"
+    choices:
+      - id: all_in
+        text: "ลงหมดกระเป๋าตาเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "เป่าทีเดียวทับพอดี บ่ายนี้กระเป๋ากางเกงตุงจนนั่งไม่ลง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เหลือกระเป๋าเปล่า เพื่อนคืนให้เส้นหนึ่งไว้ตั้งตัว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: one_band
+        text: "ไม่รับคำท้า ลงทีละเส้นเหมือนเดิม"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: half_bet
+        text: "ต่อรองขอลงแค่ครึ่งกระเป๋า"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: spit_trick
+        text: "แอบถ่วงหนังยางด้วยน้ำลาย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ชนะ แต่ไม่มีใครยอมเล่นกับเส้นนี้อีก", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "โดนจับได้ทั้งวง หลังจากนี้เส้นของคุณมีชื่อเรียกแล้ว", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_chain_jacks_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [7, 12], school: [primary, lower]}
+    title: "โซ่หมากเก็บยาวที่สุดในห้อง"
+    text: "พักเที่ยงคุณลากโซ่ออกมาต่อจนยาวถึงหน้าห้อง ห่วงสีพวกนี้ทุกคนมีไว้เล่นหมากเก็บ แต่ไม่มีใครต่อได้ยาวเท่าคุณ ครูเห็นเข้าก็ยึดไว้ บอกว่าจะคืนให้ถ้านับให้ฟังรวดเดียวไม่หลง"
+    choices:
+      - id: count_it
+        text: "นับทีละห่วงต่อหน้าครู"
+        outcomes:
+          - {weight: 2, ok: true, text: "นับรวดเดียวจบ ครูคืนให้แล้วถามว่าการบ้านเลขเสร็จหรือยัง", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นับหลงตอนร้อยกว่า ครูเอาโซ่ไปให้เด็กห้องอื่นนับต่อ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: friend_count
+        text: "ขอเพื่อนช่วยนับคนละครึ่ง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: start_over
+        text: "ปล่อยไป เริ่มต่อโซ่ใหม่"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: one_million
+        text: "ตอบหน้าตายว่าล้านห่วง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครูขำแล้วคืนให้ พร้อมการบ้านให้นับจนครบล้าน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูไม่ขำ คุณได้ยืนนับหน้าห้องจนหมดคาบ แล้วโซ่ก็ยังอยู่กับครู", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_hide_cloth_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [6, 9], school: [primary]}
+    title: "ผ้าอยู่ข้างหลังคุณ"
+    text: "พักกลางวันที่ลานโรงเรียน ทั้งวงนั่งล้อมร้องเพลงมอญซ่อนผ้า ทุกคนเริ่มกลั้นขำกันหมด มีคุณคนเดียวที่ยังร้องอย่างตั้งใจ"
+    choices:
+      - id: feel_behind
+        text: "เอามือคลำข้างหลังตัวเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอผ้าทัน วิ่งไล่รอบวงจนเหนื่อยแต่สะใจ", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คลำช้าไปจังหวะเดียว ผ้าฟาดหลังเบา ๆ เสียงหัวเราะดังกว่าผ้าเยอะ", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep_singing
+        text: "ร้องต่อ ไม่รู้ไม่ชี้"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: watch_faces
+        text: "ดูหน้าเพื่อนว่าใครขำหนักสุด"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: cloth_hat
+        text: "คว้าผ้าคลุมหัวตัวเองแล้วร้องต่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งวงขำจนลืมว่าใครต้องวิ่ง เกมจบตรงนั้น", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้องจบเพลงแล้วยังมองไม่เห็นทาง เดินชนคนนั่งไปสามคน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_water_bead_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [6, 10], school: [primary]}
+    title: "เม็ดพองน้ำหน้ารั้วโรงเรียน"
+    text: "เลิกเรียน เด็กทั้งแถวรุมแผงใกล้รั้วโรงเรียน ร้องขอเงินผู้ปกครองซื้อเม็ดเล็ก ๆ ที่แช่น้ำแล้วพองโต หน้าตาเหมือนลูกอม เพื่อนข้างคุณได้มาซองหนึ่งแล้ว กำลังหยิบเม็ดแรกขึ้นมาใกล้ปาก"
+    choices:
+      - id: grow_glass
+        text: "ซื้อไปแช่แก้วดูมันโต"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: taste_it
+        text: "ลองใส่ปากตามเพื่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คายทันก่อนมันลงคอ แล้วบ้วนปากที่ก๊อกหน้าโรงเรียนจนเพื่อนกลับไปก่อน", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กลืนลงไป ปวดท้องจนครูรีบพาส่งโรงพยาบาล", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tell_teacher
+        text: "บอกครูว่าเพื่อนจะกินมัน"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: plant_it
+        text: "หว่านลงกระถาง รอมันออกผล"
+        outcomes:
+          - {weight: 1, ok: true, text: "เม็ดพองจนดินล้นกระถาง คนในบ้านยืนมองนานแต่ไม่มีใครถาม", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รอทั้งเทอมไม่มีอะไรงอก ต้นเดิมในกระถางเฉาไปหนึ่งต้น", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_trading_card_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [9, 12], school: [primary, lower]}
+    title: "ใบหายากกับครูฝ่ายปกครอง"
+    text: "กลางคาบเพื่อนหลังห้องสะกิดขอแลกใบหายากที่คุณเพิ่งได้มา ใบแต้มพลังสูงแบบนี้ทั้งห้องมองกันตาค้าง คุณยังไม่ทันตอบ ครูฝ่ายปกครองก็เดินเข้าห้องมาค้นกระเป๋าทีละแถว"
+    choices:
+      - id: hide_sock
+        text: "ซ่อนไว้ในถุงเท้า"
+        outcomes:
+          - {weight: 2, ok: true, text: "ครูค้นไม่เจอ การ์ดงอนิดหน่อยและมีกลิ่นติดไปตลอดชีพ", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ใบหล่นตอนลุกยืน ครูคีบด้วยสองนิ้วแล้วริบใบนั้นไป", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hand_over
+        text: "ยื่นให้ครูเองก่อนโดนค้น"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: pass_friend
+        text: "ส่งต่อใต้โต๊ะให้เพื่อนคนนั้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนรอดและคืนให้ครบ เรื่องนี้เล่ากันอีกหลายปี", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนรอด แต่พรุ่งนี้บอกว่าก็แลกกันแล้วนี่", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: duel_teacher
+        text: "ท้าครูดวลการ์ดก่อนโดนค้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครูรู้กติกาดีกว่าที่คิด คุณแพ้ราบ แต่ครูปล่อยผ่าน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ครูไม่ตอบ แล้วเขียนชื่อคุณลงสมุดแทน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_mini_racer_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [9, 12]}
+    title: "มอเตอร์ตัวใหม่ของเพื่อน"
+    text: "เย็นนี้เพื่อนเอามอเตอร์ตัวใหม่มาอวดข้างราง บอกว่าแรงกว่าของทุกคันในซอย รถจิ๋วใส่ถ่านของคุณเพิ่งแพ้มันมาสามรอบ ค่าขนมทั้งเดือนของคุณแลกมอเตอร์แบบนี้ได้พอดี"
+    choices:
+      - id: buy_motor
+        text: "ทุ่มค่าขนมซื้อมอเตอร์"
+        outcomes:
+          - {weight: 2, ok: true, text: "รถพุ่งนำทั้งราง เดือนนี้กินข้าวเปล่าแต่ไม่บ่น", effects: {happiness: 2, network: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เข้าโค้งแรกรถบินออกรางแตกสองท่อน ค่าขนมทั้งเดือนไปด้วยกัน", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tune_self
+        text: "แต่งเองจากของที่มี"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: borrow_car
+        text: "ขอยืมรถเพื่อนลองสักรอบ"
+        outcomes:
+          - {weight: 2, ok: true, text: "แรงจริง เพื่อนยิ้มอยู่แต่ตาไม่ละจากรถเลย", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถเพื่อนหลุดโค้งล้อแตก ค่าขนมเดือนนี้ไปเป็นค่าชดใช้อยู่ดี", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: chase_car
+        text: "ปล่อยนอกรางแล้ววิ่งไล่รอบตึก"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถ่านหมดก่อนคุณ รถจอดรออยู่หน้าตึกอย่างสุภาพ", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถเลี้ยวลงท่อไปเอง คุณยืนฟังเสียงมอเตอร์เบาลงเรื่อย ๆ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_arcade_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [13, 18], school: [lower, upper, voc]}
+    title: "เหรียญสุดท้ายหน้าตู้"
+    text: "ยังไม่ทันวางกระเป๋า เด็กต่างโรงเรียนก็หยอดเข้ามาท้าคุณบนจอเกมต่อสู้ ร้านเกมตู้หลังเลิกเรียนแน่นเหมือนทุกวัน ในกระเป๋าคุณเหลือค่ารถกลับบ้านพอดี เป็นเหรียญเดียว"
+    choices:
+      - id: take_fight
+        text: "หยอดรับคำท้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ชนะจนมีคนยืนดูเต็มหลัง จบแล้วเดินกลับบ้านอย่างสง่า", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แพ้ในสิบวินาที เดินกลับบ้านหนึ่งชั่วโมง", effects: {happiness: -2, health: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bus_home
+        text: "เก็บไว้ ขึ้นรถกลับก่อนฝนตก"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: watch_pro
+        text: "ยืนดูคนเก่งเล่นจนค่ำ"
+        effects: {knowledge: 1, network: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: secret_move
+        text: "หยอดแล้วกดมั่ว บอกว่าเป็นท่าลับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ท่าออกเอง เด็กแถวนั้นจดตามกันใหญ่ คุณเดินกลับบ้านแบบคนมีสูตร", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตัวละครของคุณกระโดดอยู่กับที่จนหมดยก ส่วนคุณเดินกลับบ้าน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_tape_player_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [13, 18], school: [lower, upper, voc]}
+    title: "เครื่องแรกของตัวเอง"
+    text: "คืนนี้เงินในกระป๋องครบพอดี ค่าขนมที่เก็บมาทั้งปีซื้อเครื่องเล่นเทปพกพาได้หนึ่งเครื่อง คนในห้องอยากมีกันทั้งนั้น เดินไปไหนมีเพลงตามไปด้วย ที่บ้านเห็นกระป๋องเข้า บอกว่าเอาไปลงเรียนพิเศษดีกว่า"
+    choices:
+      - id: buy_it
+        text: "ซื้อเลย เงินของเราเอง"
+        effects: {happiness: 3, relations: -1}
+        merit: [{cat: neutral}]
+      - id: buy_used
+        text: "ซื้อมือสอง เหลือแบ่งให้ที่บ้าน"
+        outcomes:
+          - {weight: 2, ok: true, text: "เสียงยานนิดหน่อย แต่เป็นของคุณ ที่บ้านก็เลิกพูดเรื่องนี้", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เล่นได้สองม้วนแล้วเครื่องกินเทป ร้านมือสองปิดไปแล้ว", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tutor
+        text: "ไปเรียนพิเศษตามที่บอก"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: sell_tape
+        text: "ยืมเครื่องเพื่อนอัดเสียงร้องขาย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เงินก้อนเดิมยังอยู่ ขายได้สามม้วนเพราะฟังแล้วขำ ม้วนถัดไปมีคนจ้างไม่ให้ร้อง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เงินก้อนเดิมยังอยู่ แต่เพื่อนเอาม้วนไปอัดเพลงทับ เสียงคุณไม่เหลือหลักฐาน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_sticker_booth_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [14, 18]}
+    title: "ที่ว่างในตู้สติกเกอร์"
+    text: "ถึงคิวกลุ่มคุณหน้าตู้ถ่ายรูปสติกเกอร์พอดี คนที่คุณแอบชอบก็เดินผ่านมา ถ่ายแล้วตัดแบ่งแลกกับเพื่อนได้ และในตู้ยังเบียดได้อีกหนึ่งคน เพื่อนทั้งกลุ่มมองคุณ แล้วค่อย ๆ ขยับให้ที่ว่าง"
+    choices:
+      - id: invite
+        text: "ชวนเข้ามาถ่ายด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเข้ามาจริง หน้าคุณเบลอเพราะขยับ แต่แผ่นนั้นอยู่ในกระเป๋าสตางค์คุณ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขายิ้มแล้วบอกว่ารีบกลับ เพื่อนในตู้เงียบกันทั้งตู้", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: group_only
+        text: "ถ่ายกับกลุ่มเดิมตามแผน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: trade_friend
+        text: "ขอแลกรูปผ่านเพื่อนแทน"
+        outcomes:
+          - {weight: 2, ok: true, text: "เพื่อนเอามาให้จริง พร้อมถามว่าค่าจ้างเท่าไหร่", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนแลกมาได้ แล้วเก็บแผ่นนั้นไว้เอง", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: solo_ten
+        text: "ถ่ายเดี่ยวสิบแผ่นแล้วแจกเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "แจกหมดภายในบ่าย ไม่รู้ว่าเขาอยากได้หรือเกรงใจ", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "แจกไม่หมด ตู้ยังคายรูปหน้าคุณตามหลังมาอีกแผ่น", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_blind_box_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [20, 30]}
+    title: "ตัวซ้ำห้า"
+    text: "คุณแกะกล่องสุ่มตุ๊กตาฟันแหลมไปหกกล่อง ได้ตัวซ้ำห้า ตัวหายากในกลุ่มซื้อขายมีคนเสนอกันถึงหลักแสน เงินเหลืออีกสิบวันกว่าจะสิ้นเดือน ร้านยังเหลืออีกลัง"
+    choices:
+      - id: one_more
+        text: "เปิดอีกกล่อง กล่องสุดท้ายจริง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตัวลับโผล่จริง มือสั่นจนถ่ายรูปเบลอสามรอบ ขายต่อได้ภายในคืนนั้น", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ตัวซ้ำตัวที่หก ตอนนี้มันตั้งกลุ่มกันที่หัวเตียงแล้ว", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sell_dupes
+        text: "ขายตัวซ้ำในกลุ่มซื้อขาย"
+        outcomes:
+          - {weight: 2, ok: true, text: "ได้ทุนคืนเกือบหมด ผู้ซื้อโอนตรงเวลา", effects: {network: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ซื้อส่งสลิปมา เงินไม่เข้า ตุ๊กตาออกจากบ้านไปแล้ว", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: stop_here
+        text: "พอแล้ว เรียงไว้ที่หัวเตียง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: shake_box
+        text: "เขย่ากล่องฟังเสียงเดาตัวข้างใน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เดาถูกสามกล่องติด พนักงานเริ่มมองคุณแปลก ๆ", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เขย่าจนมุมกล่องบุบ พนักงานยื่นบิลให้", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_eight_bit_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [35, 45]}
+    title: "เซียนตลับประจำซอย"
+    text: "เพื่อนเก่าชี้มาที่คุณกลางงาน บอกทุกคนว่านี่แหละเซียนประจำซอย ทั้งห้องหันมาพร้อมกัน งานนี้คนรุ่นเดียวกันเอาเครื่องเกมตลับแปดบิตกลับมาต่อจอ ผู้ใหญ่เต็มห้องถือจอยท่าเดียวกับตอนสิบขวบ"
+    choices:
+      - id: prove_it
+        text: "นั่งลงจับจอยพิสูจน์"
+        outcomes:
+          - {weight: 1, ok: true, text: "นิ้วจำได้ก่อนสมอง ผ่านด่านแรกแล้วมีคนปรบมือ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สามชีวิตหมดก่อนน้ำแข็งในแก้วละลาย", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: secret_code
+        text: "กดสูตรเพิ่มชีวิตก่อนค่อยเล่น"
+        outcomes:
+          - {weight: 1, ok: true, text: "สูตรเข้า นิ้วยังจำได้ทั้งที่เบอร์โทรที่บ้านจำไม่ได้แล้ว", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นิ้วลืมสูตร ทั้งห้องเห็นว่าคุณโกงตั้งแต่ยังไม่เริ่ม", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tell_legend
+        text: "เล่าตำนานแทนการเล่น"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: blow_cart
+        text: "เป่าตลับสามทีตามธรรมเนียม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เกมติดพอดี ทั้งห้องพยักหน้าเหมือนเห็นหลักฐาน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เกมไม่ติด เจ้าของเครื่องดึงตลับกลับไปเช็ดโดยไม่พูดอะไร", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_corn_snack_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 40]}
+    title: "ขนมข้าวโพดรอบสอง"
+    text: "พนักงานมองตะกร้าที่มีสิบห้าซอง แล้วถามคุณว่ามีงานเลี้ยงเด็กหรือเปล่า ขนมข้าวโพดแถมการ์ดการ์ตูนเจ้าเดิมกลับมาขาย ผู้ใหญ่รุ่นคุณแห่ไปตามหาใบที่ขาด ส่วนที่บ้านคุณมีใบซ้ำจากรอบก่อนอยู่กล่องหนึ่ง"
+    choices:
+      - id: tell_truth
+        text: "ตอบตรง ๆ ว่าซื้อให้ตัวเอง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: whole_box
+        text: "ซื้อยกลังไปเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอใบที่ตามหามาตั้งแต่ประถม นั่งมองหน้าร้านอยู่พักใหญ่", effects: {happiness: 3, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้ใบซ้ำเต็มกล่อง ขนมกินไม่หมด ที่ทำงานได้อานิสงส์", effects: {relations: 1, health: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: trade_cafe
+        text: "เอาใบซ้ำที่บ้านไปแลกในคาเฟ่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ใบที่ขาดมาหนึ่งใบ กับคนรู้จักอายุเท่ากันอีกโต๊ะ", effects: {network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แลกไม่ได้ คนในคาเฟ่ก็มีใบเดียวกัน", effects: {network: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: party_of_one
+        text: "ตอบว่าใช่ งานเลี้ยงเด็กคนเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "พนักงานขำ แล้วใส่ซองแถมให้หนึ่งซอง", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พนักงานถามต่อว่าเด็กอายุเท่าไหร่ คุณเผลอตอบอายุตัวเอง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_comic_stall_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59]}
+    title: "เล่มละบาทในกล่องใต้เตียง"
+    text: "รื้อกล่องใต้เตียงเจอการ์ตูนเล่มละบาทกองหนึ่ง พวกที่เคยยืนอ่านหน้าแผงตลาดจนโดนไล่ ปกซีดจนแทบอ่านไม่ออก เล่มบนสุดปกหลังหายไปทั้งแผ่น ตอนจบขาดหายไปด้วย คุณจำไม่ได้แล้วว่าเรื่องลงเอยยังไง"
+    choices:
+      - id: read_all
+        text: "นั่งอ่านจนลืมกินข้าว"
+        effects: {happiness: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: find_ending
+        text: "ตามหาตอนจบจากคนเล่นของเก่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอคนมีเล่มนั้น เขาให้อ่านฟรีแลกกับฟังเรื่องแผงหนังสือ", effects: {network: 1, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาตั้งราคาเท่าค่าซ่อมรถ คุณเก็บเล่มนั้นกลับกล่องตามเดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: to_library
+        text: "ยกให้ห้องสมุดชุมชน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: tell_ending
+        text: "เล่าตอนจบที่แต่งเองว่าของจริง"
+        outcomes:
+          - {weight: 1, ok: true, text: "วงกาแฟหน้าตลาดเชื่อสนิท มีคนขอให้เล่าเล่มอื่นอีก", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "มีคนเคยอ่านนั่งอยู่ด้วย เขาเล่าตอนจบจริงให้ทั้งวงฟังช้า ๆ", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_kite_field_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85], region: [กรุงเทพฯ และปริมณฑล]}
+    title: "ว่าวกลับมาที่สนามหลวง"
+    text: "เพื่อนรุ่นเดียวกันโทรมาถามว่าเห็นข่าวหรือยัง ว่าวจุฬากับปักเป้ากลับมาสู้กันที่สนามหลวงเย็นนี้ ชมรมว่าวเป็นคนจัด คุณนึกว่าภาพนี้จบไปนานแล้ว เขาถามต่อว่าไปไหม สมัยก่อนคุณคุยไว้เยอะ"
+    choices:
+      - id: go_watch
+        text: "ไปนั่งดูเงียบ ๆ คนเดียว"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: take_friend
+        text: "ไปกับเพื่อน นั่งดูจนมืด"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: hold_line
+        text: "ขอลองจับสายป่านสักครู่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ว่าวนิ่งกลางลม คนในชมรมขอเบอร์ไว้ชวนมาสอนเด็ก", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลมตีสายบาดมือ คนในชมรมรีบรับคืนอย่างสุภาพ", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tall_tale
+        text: "เล่าว่าเคยชนะศึกนี้สิบปีซ้อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กแถวสนามเชื่อสนิท เพื่อนคุณแกล้งไม่ได้ยิน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนในชมรมยืนฟังอยู่ แล้วถามว่าปีไหน", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: pop_folk_toy_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85]}
+    title: "ป๋องแป๋งกับเด็กข้างบ้าน"
+    text: "เด็กข้างบ้านเงยหน้าจากมือถือหนึ่งวินาที ถามว่าของในมือคุณต่อไวไฟได้ไหม คุณกำลังนั่งทำป๋องแป๋งแบบที่เคยเล่นตอนเด็ก พอรู้ว่าไม่ได้ เขาก็ก้มกลับไป"
+    choices:
+      - id: make_together
+        text: "ชวนเด็กทำด้วยกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทำเสร็จหนึ่งอัน เด็กถ่ายคลิปลงมือถือ มีคนมาถามว่าซื้อได้ที่ไหน", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เด็กขออีกห้านาที ห้านาทีนั้นยาวไปถึงค่ำ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: give_center
+        text: "ยกให้ศูนย์เด็กเล็ก สอนครูทุกเช้า"
+        effects: {network: 1, happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: hang_home
+        text: "แขวนไว้หน้าบ้าน เล่นเอง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: follow_kid
+        text: "ถือเดินเล่นตามเด็กไปทั้งซอย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กไม่เงยหน้า แต่คนทั้งซอยรู้จักคุณแล้ว", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เด็กเดินเร็วกว่า คุณนั่งพักกลางซอย แล้วเล่นให้หมาแถวนั้นดู", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
