@@ -11,6 +11,7 @@ export const HEART_ICON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="
 
 // ไอคอนแถบเมนู (ui-redo 50 ตาม JSON 47): เส้นบางชุดเดียวของเมนู แยกจากไอคอนค่าในป้ายผล — "ตัวฉัน" เป็นคนเดียว ไม่ใช่สองคนแบบค่าความสัมพันธ์ ตาจึงไม่สับสนเมนูกับค่า
 export const MENU_ICON = {
+  past: '<path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/><path d="M12 8v4l3 2"/>',
   me: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
   focus: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.8"/>',
   family: '<circle cx="8" cy="8" r="2.8"/><circle cx="16.5" cy="9" r="2.3"/><path d="M3 19c.8-3.4 3-5 5-5s4.2 1.6 5 5M13.5 19c.5-2.4 1.6-3.8 3-3.8s2.6 1.4 3.2 3.8"/>',
