@@ -36,7 +36,7 @@ const KEYS = {
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
   family: ['role', 'sex', 'age', 'alive', 'count', 'health', 'relations'],
-  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
+  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', 'hunter_rank', 'overlap_stage', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
   requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'reason'],
@@ -140,7 +140,7 @@ function checkMultipliers(m, at, r) {
     if (m[k] === undefined) continue;
     if (!isObj(m[k]) || Object.entries(m[k]).some(([kk, v]) => !of.includes(kk) || !positive(v))) r(`${at}.${k}`, `ต้องเป็น {${of.join('|')}: เลขบวก}`);
   }
-  for (const k of ['karma', 'family_fame', 'wish']) if (m[k] !== undefined && !positive(m[k])) r(`${at}.${k}`, 'ต้องเป็นเลขบวก');
+  for (const k of ['karma', 'family_fame', 'wish', 'hunter_rank']) if (m[k] !== undefined && !positive(m[k])) r(`${at}.${k}`, 'ต้องเป็นเลขบวก');
   // 0 ได้: ขั้น 0 คูณ 1 (x ** 0) ขั้น 1 ขึ้นไปปิดการ์ด — การ์ดชีวิตปกติที่หายเมื่อโลกเริ่มซ้อน
   if (m.overlap_stage !== undefined && !ratio(m.overlap_stage)) r(`${at}.overlap_stage`, 'ต้องเป็นตัวเลข ≥ 0 (คูณยกกำลังตามขั้นค่าซ้อนทับ)');
   if (m.flags !== undefined && (!isObj(m.flags) || Object.entries(m.flags).some(([f, v]) => !FLAG_RE.test(f) || !positive(v)))) r(`${at}.flags`, 'ต้องเป็น {ชื่อธง: เลขบวก}');

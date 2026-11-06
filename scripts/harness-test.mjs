@@ -446,6 +446,19 @@ const f2 = (v) => v.toFixed(2);
   check('ขั้นค่าซ้อนทับ: ขั้น 2–4 ยังไปไม่ถึงจนใบ 16 ใส่เกณฑ์ (ค่าสูงแค่ไหนก็ขั้น 1)', E.OVERLAP_STAGE_MIN.length === 5 && E.OVERLAP_STAGE_MIN[1] === 1 && E.overlapStageOf(st) === 1, String(E.overlapStageOf(st)));
 }
 
+// ตัวคูณเกตนับเฉพาะขั้นในสายนักล่า: ตำแหน่งการเมืองหรือยศสายอื่นไม่ได้ตัวคูณ ต่างจาก multipliers.rank ที่รวมทั้งคู่
+{
+  const E = await import('../src/engine/index.mjs');
+  const st = newLife(mixSeed(1, 4200), loadContent());
+  const m = { hunter_rank: 1.3 };
+  st.ladder = { id: 'hunter', rank: 2 };
+  check('ขั้นนักล่า: สายนักล่าขั้น 2 คูณยกกำลัง 2', near(E.poolMultiplier(st, m), 1.69));
+  st.office = { rank: 1 };
+  check('ขั้นนักล่า: ตำแหน่งการเมืองไม่เพิ่มตัวคูณเกต · rank เดิมยังเพิ่ม', near(E.poolMultiplier(st, m), 1.69) && near(E.poolMultiplier(st, { rank: 2 }), 2 ** 4));
+  st.ladder = { id: 'army', rank: 3 };
+  check('ขั้นนักล่า: ยศสายอื่น + ตำแหน่งการเมืองคูณ 1', near(E.poolMultiplier(st, m), 1));
+}
+
 // ใบตามเกตที่ปล่อยไว้: นัดจากทาง pass ไม่ติดป้ายตารางซ้อน ⇒ ทอยตารางใหม่ไม่ล้าง ไม่กินโควตาซ้อน · ถึงคิวกินโควตาปี 1 · ขั้นไม่ใช่ 3–4 ตอนถึงคิว = ไม่ออก
 {
   const E = await import('../src/engine/index.mjs');
