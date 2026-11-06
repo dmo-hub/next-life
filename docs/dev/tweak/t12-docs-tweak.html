@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="th">
+<head>
+<!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>T12 หน้าเอกสาร: ความกว้าง ระยะ ตาราง กล่อง (tweak) · next-life</title>
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<style>
+* { box-sizing:border-box; }
+body { margin:0; background:#DCD6CB; color:#1F2430; font:15px/1.55 Sarabun,system-ui,sans-serif; }
+.app { display:grid; grid-template-columns:350px minmax(0,1fr); min-height:100vh; }
+.ctl { position:sticky; top:0; height:100vh; overflow:auto; padding:14px 16px 40px; background:#F7F2E7; border-right:1px solid #CFC4AD; }
+.ctl h1 { font-size:18px; margin:0 0 4px; }
+.ctl h2 { font-size:14px; margin:18px 0 6px; color:#4A4F5C; }
+.hint { font-size:13px; color:#4A4F5C; margin:0 0 8px; }
+.pre { display:grid; gap:6px; }
+.pre button { text-align:left; font:inherit; padding:8px 10px; border:1px solid #CFC4AD; border-radius:10px; background:#FBF8F1; cursor:pointer; color:inherit; }
+.pre button b { display:block; }
+.pre button span { font-size:12px; color:#4A4F5C; }
+.pre button.on { border:2px solid #1B2A4A; }
+.row { margin:0 0 10px; }
+.row > b { display:block; font-size:13px; font-weight:600; margin-bottom:3px; }
+.row > b i, .row > b output { font-style:normal; font-weight:400; }
+.row > b i { color:#7A5C12; }
+.seg { display:flex; flex-wrap:wrap; gap:4px; }
+.seg button { font:inherit; font-size:13px; min-height:32px; padding:2px 10px; border:1px solid #CFC4AD; border-radius:999px; background:#FBF8F1; cursor:pointer; color:inherit; }
+.seg button.on { background:#1B2A4A; color:#F7F2E7; border-color:#1B2A4A; }
+.seg button:disabled { opacity:.45; cursor:not-allowed; text-decoration:line-through; }
+.rng { display:flex; gap:6px; align-items:center; }
+.rng input[type=range] { flex:1; min-width:0; accent-color:#1B2A4A; }
+.rng button { font:inherit; font-size:12px; min-height:28px; padding:0 8px; border:1px solid #CFC4AD; border-radius:6px; background:#FBF8F1; cursor:pointer; }
+textarea { width:100%; font:12px/1.5 ui-monospace,monospace; border:1px solid #CFC4AD; border-radius:8px; padding:6px; }
+.btns { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+.btns button { font:inherit; min-height:36px; padding:4px 14px; border-radius:8px; border:1px solid #CFC4AD; background:#FBF8F1; cursor:pointer; color:inherit; }
+.btns .pri { background:#1B2A4A; color:#fff; border-color:#1B2A4A; }
+#msg, #ovf { font-size:13px; color:#2F6B4F; min-height:1.4em; margin:0; }
+#ovf.bad { color:#B3261E; }
+table.cr { width:100%; border-collapse:collapse; font-size:12px; }
+table.cr td { padding:3px 4px; border-bottom:1px solid #E2D9C6; vertical-align:middle; }
+table.cr td:last-child { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.sw { display:inline-block; width:22px; height:16px; border:1px solid #8C7A52; font:600 11px/14px Sarabun,sans-serif; text-align:center; vertical-align:middle; }
+.bad { color:#B3261E; font-weight:600; }
+.ok { color:#2F6B4F; }
+ul.keep { margin:0; padding-left:18px; font-size:13px; }
+.view { padding:12px 16px 40px; min-width:0; }
+.vbar { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; margin-bottom:10px; font-size:13px; }
+.vbar select { font:inherit; min-height:36px; max-width:100%; padding:2px 6px; border:1px solid #CFC4AD; border-radius:8px; background:#FBF8F1; }
+.vbar .nav button { font:inherit; min-height:36px; min-width:36px; border:1px solid #CFC4AD; border-radius:8px; background:#FBF8F1; cursor:pointer; }
+.stage { display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start; }
+.cap { font-size:13px; font-weight:600; margin:0 0 6px; overflow-wrap:anywhere; }
+.frame { overflow:hidden; background:#fff; border-radius:10px; box-shadow:0 8px 30px rgb(0 0 0 / .18); }
+.frame iframe { border:0; display:block; transform-origin:0 0; }
+.warn { background:#FFF1DE; border:1px solid #D8A65A; padding:8px 12px; border-radius:8px; font-size:14px; }
+@media (max-width:860px) { .app { grid-template-columns:1fr; } .ctl { position:static; height:auto; border-right:0; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="ctl" id="ctl" aria-label="แผงปรับค่า"></aside>
+  <main class="view">
+    <div class="vbar" id="vbar"></div>
+    <p class="warn" id="filewarn" hidden>หน้านี้ต้องเปิดผ่านเว็บ (http/https) — เปิดจากไฟล์ในเครื่องตรง ๆ เบราว์เซอร์ไม่ให้เติม CSS ลงหน้าตัวอย่าง จึงเห็นแต่หน้าเดิม</p>
+    <div id="stage"></div>
+  </main>
+</div>
+<script>
+(() => {
+  // build เติมรายการหน้า (คิดจากโฟลเดอร์ docs/ ชุดเดียวกับ docs-tweak) ⇒ หน้าใหม่เข้ารายการเอง
+  // สีทุกค่าอ้าง token ของหน้าจริง (var(--…) ที่แถบบนฉีด) ไม่มี hex ของหน้าเอกสารในไฟล์นี้ ⇒ แก้ token แล้วหน้านี้ตามทันที
+  const D = /*DOCS-TWEAK:START*/{"pages":[{"f":"about.html","t":"กลไกในเกม","g":"เอกสารผู้เล่น","k":"read"},{"f":"catalog.html","t":"การ์ดทั้งหมด","g":"เอกสารผู้เล่น","k":"wide"},{"f":"guide.html","t":"วิธีเล่น","g":"เอกสารผู้เล่น","k":"read"},{"f":"index.html","t":"เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด","g":"เอกสารผู้เล่น","k":"read"},{"f":"otherworld.html","t":"ต่างโลก","g":"เอกสารผู้เล่น","k":"read"},{"f":"spec/lore-finance-series.html","t":"ข้อมูลเกมจำลองชีวิต","g":"เอกสารผู้เล่น","k":"read"},{"f":"spoilers.html","t":"เฉลยการ์ดทั้งหมด (สปอยล์)","g":"เอกสารผู้เล่น","k":"wide"},{"f":"whatsnew.html","t":"แพตช์โน้ต","g":"เอกสารผู้เล่น","k":"read"},{"f":"worlds.html","t":"ชาตินี้","g":"เอกสารผู้เล่น","k":"read"},{"f":"dev/design-adopt-study.html","t":"สเปกนำผลศึกษาเกม (B158) เข้า next-life พร้อมแจกเลน","g":"การออกแบบ","k":"wide"},{"f":"dev/design-lore.html","t":"ข้อมูลอ้างอิง (lore)","g":"การออกแบบ","k":"wide"},{"f":"dev/design-thai-life-deep.html","t":"ชีวิตไทยลึกขึ้น — ใบค้างของโลกปกติจัดตามเฟส v2","g":"การออกแบบ","k":"wide"},{"f":"dev/design-three-worlds.html","t":"เกม next-life 3 โลก — ปกติ","g":"การออกแบบ","k":"wide"},{"f":"dev/design-ui-redo.html","t":"หน้าจอใหม่ทั้งเกม (ui-redo)","g":"การออกแบบ","k":"wide"},{"f":"dev/design-world-overlap.html","t":"โลกซ้อนทับ — ข้ามโลกซ้ำบ่อย กำแพงโลกบาง ของแต่ละโลกรั่วเข้าหากัน จนถึงจบโลก","g":"การออกแบบ","k":"wide"},{"f":"dev/design.html","t":"คำตัดสินเกม","g":"การออกแบบ","k":"wide"},{"f":"dev/ui.html","t":"ดีไซน์ UI","g":"การออกแบบ","k":"wide"},{"f":"dev/archive/b176-samples.html","t":"B176 ตัวอย่างภาพชั้นสมุด 3 แท็บ","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/archive/fx-proto.html","t":"ต้นแบบเอฟเฟกต์ 3 จังหวะ — next-life (B-fx ขั้น 1)","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/archive/index.html","t":"คลังต้นแบบเก่า","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/archive/isekai-life-v1.html","t":"หนึ่งในต่างโลก","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/index.html","t":"ห้องผู้พัฒนา","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/maps/afterlife.html","t":"ผังภูมิ 5 ในปรโลก","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/maps/continent.html","t":"แผนที่ทวีปเอเธอร์การ์ด","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/maps/dungeon.html","t":"แผนที่ชั้นในดันเจียนลับ","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/maps/lineage.html","t":"ผังตระกูล — next-life","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/maps/milestones.html","t":"หลักไมล์ 8 สาย — โลกหลัก","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/maps/politics.html","t":"ผังบันไดการเมือง","g":"ห้องผู้พัฒนา","k":"map"},{"f":"dev/plan.html","t":"แผนเฟส + แกนต่อเนื่อง","g":"ห้องผู้พัฒนา","k":"wide"},{"f":"dev/spec.html","t":"ภาคผนวกสเปกและรีเสิร์ช","g":"ห้องผู้พัฒนา","k":"wide"}],"vars":{"--page":"#F4ECDC","--ink":"#1B2A4A","--ink2":"color-mix(in srgb, #1B2A4A 70%, #5B5648)","--muted":"#5B5648","--paper":"#FBF6EA","--paper2":"color-mix(in srgb, #FBF6EA 45%, #F4ECDC)","--rule":"#C9B98F","--rule2":"color-mix(in srgb, #C9B98F 60%, #FBF6EA)","--line-strong":"#8C7A52","--red":"#A62B1F","--green":"#2F6B4F","--blue":"#7A5C12","--head":"#1B2A4A","--lacquer":"#17110D","--lacquer2":"#221912","--gold":"#D9B45A","--gold2":"#F0D78C","--cream":"#EFE3C2","--bronze":"#5A4630","--bronze2":"#8A6D3B","--sand":"#BFAE86","--fl":"#015EC1","--dg":"#B3261E","--track":"#E2D9C6","--ft":"Sarabun,system-ui,sans-serif","--fh":"Maitree,serif","--r":"6px","--rk":"8px","--rc":"999px","--sh":"0 1px 0 var(--gold), 0 6px 18px color-mix(in srgb, var(--ink) 10%, transparent)","--cw":"800px","--pad-y":"36px","--pad-x":"32px"}}/*DOCS-TWEAK:END*/ || { pages: [] };
+  const UP = '../../';
+  const KEY = 'nl-t12-docs-tweak';
+  const PAGES = D.pages;
+  const byF = Object.fromEntries(PAGES.map((p) => [p.f, p]));
+
+  // ค่า null = "ตามหน้าเดิม" (ไม่เติม CSS ข้อนั้น) ⇒ ชุด 0 คือหน้าจริงบนเว็บตอนนี้เป๊ะ
+  const CTRL = [
+    ['ความกว้าง', [
+      { k: 'read', t: 'หน้าอ่าน (index guide about whatsnew worlds otherworld lore)', n: [640, 1120, 20], u: 'px', was: '760 · หน้าแรก/วิธีเล่น 960' },
+      { k: 'wide', t: 'หน้าตาราง/การ์ด (catalog spoilers ห้องผู้พัฒนา ออกแบบ)', n: [900, 1440, 20], u: 'px', was: '900–1040 ต่างกันต่อหน้า' },
+      { k: 'mapx', t: 'dev/maps กว้างกว่าหน้าอ่านอีก', n: [0, 1000, 20], u: 'px', was: 'ตามหน้า' },
+    ]],
+    ['ระยะ', [
+      { k: 'px', t: 'ขอบซ้ายขวา', n: [12, 40, 2], u: 'px', was: '16' },
+      { k: 'gy', t: 'ช่องไฟเหนือหัวข้อ h2', n: [16, 56, 2], u: 'px', was: '28–32' },
+      { k: 'lh', t: 'ระยะบรรทัดเนื้อ', n: [1.4, 1.9, 0.05], u: '', was: '1.7' },
+      { k: 'pg', t: 'ช่องใต้ย่อหน้า/รายการ', n: [4, 20, 2], u: 'px', was: '8–12' },
+    ]],
+    ['ตาราง', [
+      { k: 'tStyle', t: 'เส้น', o: [['grid', 'ทุกช่อง'], ['rows', 'แนวนอน'], ['zebra', 'แนวนอน + แถวสลับสี'], ['open', 'ไม่มีเส้น เว้นใต้หัว']] },
+      { k: 'tPad', t: 'ระยะในช่อง', o: [['4/8', 'แน่น 4/8'], ['6/10', 'กลาง 6/10'], ['8/14', 'โปร่ง 8/14']] },
+      { k: 'tHead', t: 'พื้นหัวตาราง', o: [['bg', 'พื้นหน้า'], ['line', 'ทองจาง'], ['head', 'คราม ตัวขาว']] },
+      { k: 'tFont', t: 'ขนาดตัวในตาราง', o: [['13', '13'], ['14', '14'], ['15', '15'], ['16', '16']] },
+      { k: 'tNum', t: 'เลขในตาราง', o: [['tab', 'เลขกว้างเท่ากัน']] },
+    ]],
+    ['กล่อง', [
+      { k: 'bLine', t: 'เส้นขอบกล่อง', o: [['0', 'ไม่มี'], ['line', '1 ทองจาง'], ['strong', '1 ทองเข้ม'], ['line2', '2 ทองจาง']] },
+      { k: 'bRad', t: 'มุม', o: [['0', 'เหลี่ยม'], ['r', 'มน 6'], ['rk', 'มน 8'], ['12', 'มน 12']] },
+      { k: 'bPad', t: 'ระยะในกล่อง', o: [['12', '12'], ['16', '16'], ['20', '20'], ['24', '24']] },
+      { k: 'bBg', t: 'พื้นกล่อง', o: [['surface', 'กระดาษสว่าง'], ['bg', 'พื้นเดียวกับหน้า']] },
+      { k: 'shadow', t: 'เงากล่อง', o: [['none', 'ไม่มีเงา']], lock: 'เงา (ข้อ 217: เงาทองเฉพาะการ์ดในเกม)' },
+      { k: 'callout', t: 'กล่องเตือน (.warn · blockquote)', o: [['box', 'กรอบรอบ พื้นกระดาษ'], ['bar', 'แถบซ้ายทอง พื้นกระดาษ'], ['solid', 'พื้นคราม ตัวขาว']] },
+      { k: 'tag', t: 'ป้าย (.tag)', o: [['box', 'กรอบเหลี่ยม'], ['pill', 'แคปซูล'], ['fill', 'พื้นจาง ไม่มีกรอบ']] },
+    ]],
+  ];
+  const ROWS = CTRL.flatMap(([, r]) => r);
+  const KEEP = Object.fromEntries(ROWS.map((c) => [c.k, null]));
+  const PRESET = {
+    0: { name: '0 · เว็บตอนนี้', why: 'ไม่เติม CSS อะไรเลย — หน้าจริงหลังใบ 105 (ความกว้าง 760/900/960/1040 ต่างกันต่อหน้า)', cfg: { ...KEEP } },
+    a: { name: 'ก · ตามข้อ 131', why: 'อ่าน 960 · ตาราง/การ์ด 1280 · แผนที่ +840 · ขอบ 24 · ตารางเส้นแนวนอน · กล่องเส้นขอบไม่มีเงา · ป้ายกรอบเหลี่ยม', cfg: { ...KEEP, read: 960, wide: 1280, mapx: 840, px: 24, gy: 28, tStyle: 'rows', tPad: '6/10', tHead: 'bg', bLine: 'line', bRad: 'rk', bPad: '20', bBg: 'surface', shadow: 'none', callout: 'bar', tag: 'box' } },
+    b: { name: 'ข · อ่านแน่น', why: 'อ่าน 840 · กว้าง 1120 · ขอบ 20 · ตารางแถวสลับสี แน่น 14 · มุม 6 · ป้ายแคปซูล', cfg: { ...KEEP, read: 840, wide: 1120, mapx: 600, px: 20, gy: 24, lh: 1.65, pg: 8, tStyle: 'zebra', tPad: '4/8', tHead: 'line', tFont: '14', tNum: 'tab', bLine: 'line', bRad: 'r', bPad: '16', bBg: 'surface', shadow: 'none', callout: 'box', tag: 'pill' } },
+    c: { name: 'ค · โปร่ง', why: 'อ่าน 960 · กว้าง 1280 · ขอบ 32 · ช่องไฟ 40 · บรรทัด 1.8 · หัวตารางคราม · กล่องเส้นเข้ม เหลี่ยม · เตือนพื้นคราม', cfg: { ...KEEP, read: 960, wide: 1280, mapx: 840, px: 32, gy: 40, lh: 1.8, pg: 12, tStyle: 'grid', tPad: '8/14', tHead: 'head', tFont: '15', tNum: 'tab', bLine: 'strong', bRad: '0', bPad: '24', bBg: 'surface', shadow: 'none', callout: 'solid', tag: 'fill' } },
+  };
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  let base = 'a';
+  let cfg = clone(PRESET.a.cfg);
+  let note = '';
+  const ui = { page: 'about.html', view: 'both' };
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (s && s.cfg) {
+      base = PRESET[s.base] ? s.base : 'a';
+      cfg = Object.assign(clone(PRESET[base].cfg), s.cfg);
+      note = s.note || '';
+      Object.assign(ui, s.ui);
+    }
+  } catch (e) { /* storage ปิด — ยังคัดลอกค่าได้ */ }
+  if (!byF[ui.page]) ui.page = byF['about.html'] ? 'about.html' : (PAGES[0] || {}).f;
+  const store = () => { try { localStorage.setItem(KEY, JSON.stringify({ base, cfg, note, ui })); } catch (e) { /* ข้าม */ } };
+
+  // ---------- CSS ที่เติมลงหน้าจริง (เติม <style> อย่างเดียว ไม่แตะ markup ⇒ data-fact กับ markup ที่สคริปต์หาอยู่ครบ) ----------
+  // ไม่ทับ: ตัวอย่างการ์ด (.opts) · แถบบน · แถบห้องผู้พัฒนา · กล่องรหัส · กล่องมืด (section.dark มีชุดสีของตัวเอง)
+  const X = ':not(:is(.opts, .nl-nav, nav.top, #nl-gate) *)';
+  const RAD = { 0: '0', r: 'var(--r)', rk: 'var(--rk)', 12: '12px' };
+  function css(c, f) {
+    const p = byF[f] || { k: 'wide' };
+    const map = p.k === 'map';
+    const L = [];
+    const W = map ? (c.read != null && c.mapx != null ? c.read + c.mapx : null) : c[p.k];
+    if (W != null) {
+      if (map) L.push(`.wrap{max-width:${W}px;margin-left:auto;margin-right:auto}`);
+      else L.push(`.w${X}{max-width:${W}px!important}body>main:not(:has(.w)):not(#app){max-width:${W}px;margin-left:auto;margin-right:auto}`);
+    }
+    if (c.px != null) L.push(map ? `.wrap{padding-left:${c.px}px;padding-right:${c.px}px}` : `:is(body>main,body>header,body>footer){padding-left:${c.px}px;padding-right:${c.px}px}`);
+    if (c.gy != null) L.push(`main h2${X}:not(:first-child){margin-top:${c.gy}px}main :is(section,.box)${X}{margin-bottom:${Math.round(c.gy * 0.6)}px}`);
+    if (c.lh != null) L.push(`main${X}{line-height:${c.lh}}`);
+    if (c.pg != null) L.push(`main :is(p,ul,ol)${X}{margin-bottom:${c.pg}px}main li${X}{margin-bottom:${Math.round(c.pg / 2)}px}`);
+    // กันล้นแนวนอน: ตารางกว้างเลื่อนในตัวเองแทนดันทั้งหน้า · ป้ายสถานะ .st ห้องผู้พัฒนาไม่ตัดบรรทัดเลยดันหน้าล้นเมื่อคอลัมน์เปลี่ยน
+    if (W != null || c.px != null || c.tPad != null) L.push(`main${X}{overflow-wrap:anywhere}main .st${X}{white-space:normal;max-width:100%}@media (max-width:640px){main table${X}{display:block;max-width:100%;overflow-x:auto}}`);
+    const T = `main table${X}`;
+    const nd = ':not(:is(.dark,.dark *))';
+    if (c.tStyle) {
+      if (c.tStyle === 'grid') L.push(`${T} :is(th,td)${nd}{border:1px solid var(--line)}`);
+      else L.push(`${T} :is(th,td)${nd}{border:0;border-bottom:1px solid var(--line)}${T} th${nd}{border-bottom:2px solid var(--line-strong)}`);
+      if (c.tStyle === 'open') L.push(`${T} td${nd}{border-bottom:0}`);
+      if (c.tStyle === 'zebra') L.push(`${T} tr:nth-child(even) td${nd}{background:color-mix(in srgb, var(--line) 18%, var(--surface))}`);
+    }
+    if (c.tPad) { const [y, x] = c.tPad.split('/'); L.push(`${T} :is(th,td){padding:${y}px ${x}px}`); }
+    if (c.tHead) L.push(`${T} th${nd}{${c.tHead === 'head' ? 'background:var(--head);color:var(--title)' : c.tHead === 'line' ? 'background:color-mix(in srgb, var(--line) 35%, var(--surface));color:var(--ink)' : 'background:var(--bg);color:var(--ink)'}}`);
+    if (c.tFont) L.push(`${T}{font-size:${c.tFont}px}`);
+    if (c.tNum === 'tab') L.push(`${T}{font-variant-numeric:tabular-nums}`);
+    const B = `main :is(section,.box,.panel,.world,a.card,.card,.tcard)${X}`;
+    const Bl = `${B}:not(.dark)`;
+    if (c.bLine) L.push(`${Bl}{border:${c.bLine === '0' ? '0' : `${c.bLine === 'line2' ? 2 : 1}px solid var(${c.bLine === 'strong' ? '--line-strong' : '--line'})`}}`);
+    if (c.bRad) L.push(`${B}{border-radius:${RAD[c.bRad]}}`);
+    if (c.bPad) L.push(`${B}{padding:${c.bPad}px ${Math.round(c.bPad * 1.2)}px}`);
+    if (c.bBg) L.push(`${Bl}{background:var(--${c.bBg})}`);
+    if (c.shadow) L.push(`${B}{box-shadow:none}`);
+    const co = `main :is(.warn,blockquote,.callout)${X}`;
+    if (c.callout === 'box') L.push(`${co}{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:${RAD[c.bRad || 'r']}}`);
+    if (c.callout === 'bar') L.push(`${co}{border:0;border-left:4px solid var(--accent2);background:var(--surface);color:var(--ink);border-radius:0 ${RAD[c.bRad || 'r']} ${RAD[c.bRad || 'r']} 0}`);
+    if (c.callout === 'solid') L.push(`${co}{border:0;background:var(--accent);color:var(--title);border-radius:${RAD[c.bRad || 'r']}}`);
+    if (c.tag === 'box') L.push(`.tag${X}{border-radius:0}`);
+    if (c.tag === 'pill') L.push(`.tag${X}{border-radius:999px;padding-left:10px;padding-right:10px}`);
+    if (c.tag === 'fill') L.push(`.tag${X}{border-color:transparent;border-radius:var(--r);background:color-mix(in srgb, currentColor 12%, var(--surface))}`);
+    return L.join('\n');
+  }
+
+  // ---------- contrast สด: อ่านสีที่คำนวณแล้วในหน้าจริง แปลงผ่าน canvas (รองรับ color-mix) ----------
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 1;
+  const cx = cv.getContext('2d', { willReadFrequently: true });
+  const rgba = (s) => { cx.clearRect(0, 0, 1, 1); cx.fillStyle = '#000'; cx.fillStyle = s; cx.fillRect(0, 0, 1, 1); const d = cx.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255]; };
+  const over = (a, b) => [0, 1, 2].map((i) => Math.round(a[i] * a[3] + b[i] * (1 - a[3]))).concat(1);
+  function bgOf(el, win) {
+    const chain = [];
+    for (let e = el; e && e.nodeType === 1; e = e.parentElement) chain.push(rgba(win.getComputedStyle(e).backgroundColor));
+    let c = [255, 255, 255, 1];
+    for (const x of chain.reverse()) if (x[3] > 0) c = over(x, c);
+    return c;
+  }
+  const lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+  const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  const hex = (c) => '#' + c.slice(0, 3).map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+  // [ป้าย, selector, ชนิด] — text ต้อง ≥4.5 · ui (ขอบของที่กดได้) ต้อง ≥3 · info แสดงอย่างเดียว
+  const PAIRS = [
+    ['เนื้อความ', 'main p', 'text'],
+    ['คำนำ .lead', 'main .lead', 'text'],
+    ['ลิงก์ในเนื้อ', 'main :is(p,li,td) a:not([class])', 'text'],
+    ['หัวตาราง', 'main th:not(:is(.dark *))', 'text'],
+    ['ช่องตาราง', 'main td:not(:is(.dark *))', 'text'],
+    ['แถวสลับ', 'main tr:nth-child(even) td:not(:is(.dark *))', 'text'],
+    ['ตัวในกล่อง', 'main :is(section,.box):not(.dark) p', 'text'],
+    ['กล่องมืด', 'main section.dark p', 'text'],
+    ['โน้ต .note', 'main .note', 'text'],
+    ['กล่องเตือน', 'main :is(.warn,blockquote,.callout)', 'text'],
+    ['ป้าย .tag', 'main .tag', 'text'],
+    ['ท้ายหน้า', ':is(main footer,body>footer)', 'text'],
+    ['หัวหน้า h1', 'body>header h1', 'text'],
+    ['ขอบปุ่มลิงก์', 'main .road-l a', 'ui'],
+    ['ขอบกล่อง', 'main :is(section,.box):not(.dark)', 'info'],
+  ];
+  function measure(doc) {
+    const win = doc.defaultView;
+    return PAIRS.map(([t, sel, kind]) => {
+      const el = [...doc.querySelectorAll(sel)].find((e) => e.getClientRects().length);
+      if (!el) return { t, kind, none: true };
+      const s = win.getComputedStyle(el);
+      const bg = kind === 'text' ? bgOf(el, win) : bgOf(el.parentElement, win);
+      const fgRaw = rgba(kind === 'text' ? s.color : s.borderTopColor);
+      if (kind !== 'text' && (parseFloat(s.borderTopWidth) === 0 || fgRaw[3] === 0)) return { t, kind, none: true, why: 'ไม่มีเส้น' };
+      const fg = over(fgRaw, bg);
+      return { t, kind, fg, bg, r: ratio(fg, bg) };
+    });
+  }
+  // ข้อที่ต้องรักษา (SPEC §4 T12): data-fact ยังแสดง · markup ที่สคริปต์หา (whatsnew: p.lead ใต้หัว · ป้ายกำลังทำ) ยังอยู่และไม่ถูกซ่อน
+  function guards(doc, f) {
+    const shown = (e) => e.getClientRects().length > 0 || !!e.closest('details:not([open])');
+    const facts = [...doc.querySelectorAll('[data-fact]')];
+    const L = [`data-fact ${facts.length} จุด · ซ่อนอยู่ ${facts.filter((e) => !shown(e)).length}`];
+    const soon = [...doc.querySelectorAll('.tag.soon')];
+    if (soon.length) L.push(`ป้าย "กำลังทำ" ${soon.length} · ซ่อนอยู่ ${soon.filter((e) => !shown(e)).length}`);
+    const lead = doc.querySelectorAll('p.lead');
+    if (f === 'whatsnew.html') L.push(`p.lead ${lead.length} (สคริปต์ออกเวอร์ชันหา p.lead ใต้หัวเวอร์ชัน)`);
+    const bad = /ซ่อนอยู่ [1-9]/.test(L.join(' '));
+    return { L, bad };
+  }
+
+  // ---------- กรอบหน้าตัวอย่าง ----------
+  const live = new Set();
+  let report = null;
+  function dress(fr) {
+    let doc;
+    try { doc = fr.contentDocument; } catch (e) { doc = null; }
+    if (!doc || !doc.documentElement) { document.getElementById('filewarn').hidden = false; return null; }
+    // หน้าแม่ผ่านกล่องรหัสแล้ว หน้าในกรอบเป็นแท็บเดียวกัน
+    doc.documentElement.classList.add('nl-open');
+    doc.getElementById('nl-gate')?.remove();
+    let st = doc.getElementById('nl-tw');
+    if (!st) { st = doc.createElement('style'); st.id = 'nl-tw'; doc.head.append(st); }
+    st.textContent = css(cfg, fr.dataset.f);
+    return doc;
+  }
+  function check() {
+    const fr = [...live].find((x) => x.isConnected && x.dataset.w === '1280') || [...live].find((x) => x.isConnected);
+    let doc;
+    try { doc = fr && fr.contentDocument; } catch (e) { doc = null; }
+    if (!doc || !doc.body) return;
+    report = { cr: measure(doc), g: guards(doc, fr.dataset.f) };
+    paintCheck();
+  }
+  function mount(fr) {
+    fr.addEventListener('load', () => {
+      const doc = dress(fr);
+      if (!doc) return;
+      const at = decodeURIComponent(new URL(fr.contentWindow.location.href).pathname).replace(/^.*?\/(?=(dev|spec)\/|[^/]+\.html$)/, '');
+      if (byF[at] && at !== fr.dataset.f) { fr.dataset.f = at; dress(fr); }
+      (doc.fonts ? doc.fonts.ready : Promise.resolve()).then(check);
+    });
+    live.add(fr);
+  }
+  const frame = (f, w, maxW, cap) => {
+    const h = w === 390 ? 844 : 800;
+    const s = Math.min(1, maxW / w);
+    return `<div><p class="cap">${cap}</p><div class="frame" style="width:${Math.round(w * s)}px;height:${Math.round(h * s)}px"><iframe data-f="${f}" data-w="${w}" title="${cap}" style="width:${w}px;height:${h}px;transform:scale(${s})" src="${UP + f}"></iframe></div></div>`;
+  };
+  const vbar = document.getElementById('vbar');
+  const stage = document.getElementById('stage');
+  const VIEWS = [['both', 'มือถือ + คอม'], ['390', 'มือถือ 390'], ['1280', 'คอม 1280']];
+  const KIND = { read: 'หน้าอ่าน', wide: 'หน้าตาราง/การ์ด', map: 'แผนที่' };
+  const pick = () => `<select id="pg" aria-label="เลือกหน้า">${['เอกสารผู้เล่น', 'การออกแบบ', 'ห้องผู้พัฒนา'].map((g) => `<optgroup label="${g}">${PAGES.filter((p) => p.g === g).map((p) => `<option value="${p.f}"${p.f === ui.page ? ' selected' : ''}>${p.f} · ${p.t}</option>`).join('')}</optgroup>`).join('')}</select>`;
+  function draw() {
+    const p = byF[ui.page] || { k: 'wide' };
+    vbar.innerHTML = `<b>หน้า</b>${pick()}<span class="nav"><button type="button" data-step="-1" aria-label="หน้าก่อน">‹</button> <button type="button" data-step="1" aria-label="หน้าถัดไป">›</button></span><small>${PAGES.length} หน้า · หน้านี้ใช้ค่า${KIND[p.k]}</small><span class="seg">${VIEWS.map(([v, l]) => `<button type="button" data-view="${v}" class="${ui.view === v ? 'on' : ''}">${l}</button>`).join('')}</span>`;
+    live.clear();
+    const Wd = stage.clientWidth || 900;
+    if (ui.view === 'both') {
+      const m = Math.min(390, Wd * 0.3);
+      stage.innerHTML = `<div class="stage">${frame(ui.page, 390, m, `${ui.page} · 390`)}${frame(ui.page, 1280, Wd - m - 16, `${ui.page} · 1280`)}</div>`;
+    } else stage.innerHTML = `<div class="stage">${frame(ui.page, Number(ui.view), Wd, `${ui.page} · ${ui.view}`)}</div>`;
+    stage.querySelectorAll('iframe').forEach(mount);
+  }
+  let ct;
+  const redress = () => { live.forEach((fr) => { if (fr.isConnected) dress(fr); }); clearTimeout(ct); ct = setTimeout(check, 60); };
+
+  // ---------- แผงปรับ ----------
+  const ctl = document.getElementById('ctl');
+  const fmt = (c, v) => (v == null ? `ตามหน้าเดิม (${c.was || 'ต่างกันต่อหน้า'})` : c.n ? `${v}${c.u ? ` ${c.u}` : ''}` : (c.o.find(([x]) => x === v) || [, v])[1]);
+  const label = (c, v) => (v == null ? 'ตามหน้าเดิม' : fmt(c, v));
+  const changed = (k) => JSON.stringify(cfg[k]) !== JSON.stringify(PRESET[base].cfg[k]);
+  const mid = (c) => Math.round(((c.n[0] + c.n[1]) / 2) / c.n[2]) * c.n[2];
+  function paint() {
+    ctl.innerHTML = `<h1>T12 หน้าเอกสาร</h1>
+      <p class="hint">ความกว้าง · ระยะ · ตาราง · กล่อง — ค่าชุดเดียวใช้ทุกหน้าเอกสาร · จอขวาเป็นหน้าจริงจาก build ล่าสุด เติม CSS ทับอย่างเดียว (markup ไม่ถูกแตะ) · "ตามหน้าเดิม" = ไม่เติมข้อนั้น · ชุด 0 = เว็บตอนนี้ · เสร็จแล้วกด <b>คัดลอกค่า</b> ท้ายแผง</p>
+      <h2>ชุดตั้งต้น</h2>
+      <div class="pre">${Object.entries(PRESET).map(([k, p]) => `<button type="button" data-pre="${k}" class="${k === base ? 'on' : ''}"><b>${p.name}</b><span>${p.why}</span></button>`).join('')}</div>
+      ${CTRL.map(([h, rows]) => `<h2>${h}</h2>${rows.map((c) => c.n
+        ? `<div class="row"><b><label for="r-${c.k}">${c.t}</label> <output id="o-${c.k}">${fmt(c, cfg[c.k])}</output>${changed(c.k) ? ' <i>ปรับแล้ว</i>' : ''}</b><div class="rng"><input type="range" id="r-${c.k}" data-n="${c.k}" min="${c.n[0]}" max="${c.n[1]}" step="${c.n[2]}" value="${cfg[c.k] ?? mid(c)}"><button type="button" data-keep="${c.k}"${cfg[c.k] == null ? ' disabled' : ''}>ตามหน้าเดิม</button></div></div>`
+        : `<div class="row"><b>${c.t}${changed(c.k) ? ' <i>ปรับแล้ว</i>' : ''}</b><div class="seg"><button type="button" data-k="${c.k}" data-v="" class="${cfg[c.k] == null ? 'on' : ''}">ตามหน้าเดิม</button>${c.o.map(([v, l]) => `<button type="button" data-k="${c.k}" data-v="${v}" class="${cfg[c.k] === v ? 'on' : ''}">${l}</button>`).join('')}${c.lock ? `<button type="button" disabled title="ปิดตามกติกา">${c.lock}</button>` : ''}</div></div>`).join('')}`).join('')}
+      <h2>contrast สด (กรอบ 1280)</h2>
+      <div id="cr"><p class="hint">รอหน้าโหลด…</p></div>
+      <h2>ข้อที่ต้องรักษา</h2>
+      <div id="keep"></div>
+      <h2>ตรวจ</h2>
+      <div class="btns"><button type="button" id="scan">ตรวจล้นแนวนอน 390 + 1280 ทุกหน้า</button></div>
+      <p id="ovf" role="status"></p>
+      <h2>ส่งคำตอบ</h2>
+      <textarea id="note" rows="3" placeholder="หมายเหตุถึงเลน (ถ้ามี)">${note.replace(/</g, '&lt;')}</textarea>
+      <div class="btns"><button type="button" class="pri" id="copy">คัดลอกค่า</button><button type="button" id="reset">รีเซ็ตเป็นชุด ${PRESET[base].name.split(' ')[0]}</button></div>
+      <p id="msg" role="status"></p>
+      <textarea id="out" rows="8" readonly aria-label="ข้อความที่จะคัดลอก"></textarea>`;
+    document.getElementById('out').value = answer();
+    paintCheck();
+  }
+  function paintCheck() {
+    const cr = document.getElementById('cr');
+    const kp = document.getElementById('keep');
+    if (!cr || !report) return;
+    const min = { text: 4.5, ui: 3 };
+    if (report.cr.every((x) => x.none)) {
+      cr.innerHTML = '<p class="hint">หน้านี้ไม่มี &lt;main&gt; (แผนที่) สีเป็นงาน T13 · ที่นี่ปรับได้แค่ความกว้างกับขอบ · กรอบ 1280 แคบกว่าค่าแผนที่ เห็นผลบนจอกว้างกว่านั้น</p>';
+      kp.innerHTML = `<ul class="keep">${report.g.L.map((l) => `<li>${l}</li>`).join('')}</ul>`;
+      return;
+    }
+    cr.innerHTML = `<table class="cr">${report.cr.map((x) => x.none
+      ? `<tr><td>${x.t}</td><td colspan="2"><small>${x.why || 'ไม่มีในหน้านี้'}</small></td></tr>`
+      : `<tr><td>${x.t}</td><td><span class="sw" style="background:${hex(x.bg)};color:${hex(x.fg)}${x.kind !== 'text' ? `;border:2px solid ${hex(x.fg)}` : ''}">${x.kind === 'text' ? 'ก' : ''}</span></td><td class="${min[x.kind] && x.r < min[x.kind] ? 'bad' : 'ok'}">${x.r.toFixed(2)}${min[x.kind] ? ` / ${min[x.kind]}` : ' (ไม่ใช่ของกด)'}</td></tr>`).join('')}</table>`;
+    kp.innerHTML = `<ul class="keep">${report.g.L.map((l) => `<li class="${/ซ่อนอยู่ [1-9]/.test(l) ? 'bad' : ''}">${l}</li>`).join('')}<li>เติม &lt;style&gt; อย่างเดียว ไม่แก้ markup</li></ul>`;
+  }
+  function answer() {
+    const L = [`T12 หน้าเอกสาร: เริ่มจากชุด ${PRESET[base].name}`];
+    for (const c of ROWS) {
+      const was = PRESET[base].cfg[c.k];
+      L.push(`- ${c.t}: ${label(c, cfg[c.k])}${cfg[c.k] !== was ? ` (ปรับ · เดิม ${label(c, was)})` : ''}`);
+    }
+    if (note.trim()) L.push(`- หมายเหตุ: ${note.trim()}`);
+    L.push(`- JSON: ${JSON.stringify({ base, ...cfg })}`);
+    return L.join('\n');
+  }
+  const after = () => { paint(); store(); redress(); };
+  ctl.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b || b.disabled) return;
+    if (b.dataset.pre) { base = b.dataset.pre; cfg = clone(PRESET[base].cfg); }
+    else if (b.dataset.k) cfg[b.dataset.k] = b.dataset.v === '' ? null : b.dataset.v;
+    else if (b.dataset.keep) cfg[b.dataset.keep] = null;
+    else if (b.id === 'reset') { if (!confirm('รีเซ็ตทุกค่ากลับเป็นชุดตั้งต้น?')) return; cfg = clone(PRESET[base].cfg); }
+    else if (b.id === 'copy') { copy(); return; }
+    else if (b.id === 'scan') { scan(); return; }
+    else return;
+    after();
+  });
+  ctl.addEventListener('input', (e) => {
+    const n = e.target.dataset.n;
+    if (n) {
+      const c = ROWS.find((r) => r.k === n);
+      cfg[n] = Number(e.target.value);
+      document.getElementById(`o-${n}`).textContent = fmt(c, cfg[n]);
+      document.getElementById('out').value = answer();
+      store();
+      redress();
+    } else if (e.target.id === 'note') { note = e.target.value; document.getElementById('out').value = answer(); store(); }
+  });
+  // ปล่อยแถบเลื่อนแล้วค่อยวาดแผงใหม่ — วาดระหว่างลากจะหลุดโฟกัสแถบ
+  ctl.addEventListener('change', (e) => { if (e.target.dataset.n) paint(); });
+  vbar.addEventListener('click', (e) => {
+    const v = e.target.closest('[data-view]');
+    const s = e.target.closest('[data-step]');
+    if (v) ui.view = v.dataset.view;
+    else if (s) { const i = PAGES.findIndex((p) => p.f === ui.page); ui.page = PAGES[(i + Number(s.dataset.step) + PAGES.length) % PAGES.length].f; }
+    else return;
+    store(); draw();
+  });
+  vbar.addEventListener('change', (e) => { if (e.target.id === 'pg') { ui.page = e.target.value; store(); draw(); } });
+  async function copy() {
+    const o = document.getElementById('out');
+    o.value = answer();
+    try { await navigator.clipboard.writeText(o.value); } catch (e) { o.select(); document.execCommand('copy'); }
+    document.getElementById('msg').textContent = 'คัดลอกแล้ว — วางตอบในแชทได้เลย';
+  }
+  // เปิดทุกหน้าทีละหน้าในกรอบซ่อนทั้งสองความกว้างด้วยค่าตอนนี้ แล้ววัดว่าเนื้อกว้างเกินจอไหม
+  async function scan() {
+    const o = document.getElementById('ovf');
+    const host = document.createElement('div');
+    host.style.cssText = 'position:fixed;left:-3000px;top:0;height:844px;overflow:hidden';
+    document.body.append(host);
+    const bad = [];
+    let i = 0;
+    let blocked = false;
+    const total = PAGES.length * 2;
+    for (const w of [390, 1280]) {
+      host.style.width = `${w}px`;
+      for (const p of PAGES) {
+        o.className = '';
+        o.textContent = `กำลังตรวจ ${++i}/${total} · ${p.f} · ${w}`;
+        const fr = document.createElement('iframe');
+        fr.dataset.f = p.f;
+        fr.style.cssText = `width:${w}px;height:844px;border:0`;
+        host.replaceChildren(fr);
+        await new Promise((ok) => { fr.onload = ok; fr.src = UP + p.f; });
+        if (!dress(fr)) { blocked = true; break; }
+        await new Promise((ok) => setTimeout(ok, 120));
+        const sw = fr.contentDocument.documentElement.scrollWidth;
+        if (sw > w + 1) bad.push(`${p.f} @${w} (${sw}px)`);
+      }
+      if (blocked) break;
+    }
+    host.remove();
+    if (blocked) { o.className = 'bad'; o.textContent = 'ตรวจไม่ได้ — ต้องเปิดหน้านี้ผ่านเว็บ'; return; }
+    o.className = bad.length ? 'bad' : '';
+    o.textContent = bad.length ? `ล้น ${bad.length} จุด: ${bad.join(' · ')}` : `ไม่ล้นทั้ง ${PAGES.length} หน้า ทั้งสองจอ`;
+  }
+  let rt;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(draw, 150); });
+  paint();
+  draw();
+})();
+</script>
+</body>
+</html>
