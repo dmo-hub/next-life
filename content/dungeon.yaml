@@ -89,7 +89,7 @@ events:
         text: "พาทีมบุกต่อไปห้องบอส"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 3, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณอ่านทางกับดักออก ทีมผ่านโถงไปถึงหน้าประตูหินได้ครบ", effects: {knowledge: 1}, next: dungeon_hunt_boss_01, merit: [{cat: neutral}]}
+          - {weight: 3, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณอ่านทางกับดักออก ทีมผ่านโถงไปถึงหน้าประตูหินได้ครบ", effects: {knowledge: 1, money: {unit: income_x, amount: 0.2}}, next: dungeon_hunt_boss_01, merit: [{cat: neutral}]}
           - {weight: 1, text: "กับดักอีกตัวดีดเป้คุณขาด ของที่เก็บมาหล่นหายในเหว", effects: {happiness: -1}, next: dungeon_hunt_boss_01, merit: [{cat: neutral}]}
       - id: carry_out
         text: "แบกเพื่อนที่เจ็บออกไปก่อน"
@@ -123,7 +123,7 @@ events:
         outcomes:
           - {weight: 6, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "ทีมล้มบอสได้ กิลด์ตีราคาผลึกที่ขนออกมาได้ก้อนใหญ่ ชื่อคุณขึ้นกระดานกิลด์", effects: {money: {unit: income_x, amount: 2}, network: 2, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
           - {weight: 3, text: "ล้มบอสได้แต่คุณโดนหางฟาดจนซี่โครงร้าว ส่วนแบ่งผลึกแทบไม่พอค่าหมอ", effects: {health: -2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
-          - {weight: 1.5, text: "บอสสะบัดหางกวาดทั้งแนว ทีมลากร่างคุณออกจากเกตได้ แต่คุณไม่ได้ลืมตาขึ้นมาอีก", effects: {die: assault}, merit: [{cat: neutral}]}
+          - {weight: 0.4, text: "บอสสะบัดหางกวาดทั้งแนว ทีมลากร่างคุณออกจากเกตได้ แต่คุณไม่ได้ลืมตาขึ้นมาอีก", effects: {die: assault}, merit: [{cat: neutral}]}
       - id: weak_spot
         text: "อ่านจังหวะแล้วตีจุดอ่อน"
         requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่าที่ถือบัตรกิลด์"}
@@ -131,7 +131,7 @@ events:
         outcomes:
           - {weight: 6, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณเห็นเกล็ดที่แตกอยู่ใต้คอ ตีครั้งเดียวบอสก็ทรุด ทีมแบ่งผลึกกันอย่างงาม", effects: {money: {unit: income_x, amount: 1.5}, network: 1, knowledge: 1, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
           - {weight: 3, text: "จังหวะพลาดไปนิดเดียว เพดานถล่มลงมาทับขาคุณ ทีมต้องหามออก", effects: {health: -2}, merit: [{cat: neutral}]}
-          - {weight: 1.5, text: "เสาหินที่บอสชนพังลงมาทั้งต้น ทีมขุดหาคุณจนเกตปิด", effects: {die: accident}, merit: [{cat: neutral}]}
+          - {weight: 0.4, text: "เสาหินที่บอสชนพังลงมาทั้งต้น ทีมขุดหาคุณจนเกตปิด", effects: {die: accident}, merit: [{cat: neutral}]}
       - id: decoy
         text: "ล่อบอสไว้ให้ทีมหนีออกไป"
         requires: {flags: {has: [hunter]}, reason: "เฉพาะนักล่าที่ถือบัตรกิลด์"}
@@ -139,10 +139,10 @@ events:
         outcomes:
           - {weight: 5, ok: true, multipliers: {stats: {health: 2.0, knowledge: 1.2}}, text: "คุณวิ่งวนจนบอสหลงทาง ทีมออกครบทุกคน กิลด์ให้เบี้ยกล้าหาญพิเศษ", effects: {money: {unit: income_x, amount: 0.8}, network: 2, loot: [dg_takrut, dg_knife, dg_vest, dg_fang]}, merit: [{cat: neutral}]}
           - {weight: 3, text: "ทีมออกไปได้ คุณหนีตามมาทีหลังพร้อมรอยกรงเล็บยาวตลอดหลัง", effects: {health: -2, network: 1}, merit: [{cat: neutral}]}
-          - {weight: 1.5, text: "ทีมออกไปได้ครบทุกคน แต่คนที่ล่อบอสไว้ไม่ได้ตามออกมา", effects: {die: assault}, merit: [{cat: neutral}]}
+          - {weight: 0.4, text: "ทีมออกไปได้ครบทุกคน แต่คนที่ล่อบอสไว้ไม่ได้ตามออกมา", effects: {die: assault}, merit: [{cat: neutral}]}
       - id: back_off
         text: "ถอยออกก่อนบอสตื่น"
-        effects: {money: {unit: income_x, amount: 0.3}, happiness: -1}
+        effects: {money: {unit: income_x, amount: 0.6}, happiness: -1}
         merit: [{cat: neutral}]
 
   # สายถูกดึง (ครั้งแรก): รอดเสมอ — ไม่มีผลลดสุขภาพ ไม่มี die · ใบกลางจบได้เลย 2 ทาง ไปทางออก 2 ทาง
