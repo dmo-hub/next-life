@@ -14,7 +14,7 @@ import { GAME_CSS_PAGES, gameCss, injectGameCss } from './game-css.mjs';
 import { gatedFiles, injectGate, readGateHash } from './gate.mjs';
 import { injectSeo, sitemapXml, faviconSvg, SITEMAP, FAVICON_SVG } from './seo.mjs';
 import { ART_INK } from '../ui/art.mjs';
-import { DOCS_TWEAK_PAGES, docsTweakData, injectDocsTweak } from './docs-tweak.mjs';
+import { DOCS_TWEAK_PAGES, docsScope, docsTweakData, injectDocsLayout, injectDocsTweak } from './docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, injectCardArt } from './card-art-tweak.mjs';
 import { CARD_SPOIL_PAGE, cardSpoilData, injectCardSpoil } from './card-spoil-tweak.mjs';
 
@@ -93,6 +93,10 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     put(at(`docs/${file}`), next, html);
   }
   // หน้า tweak เว็บเอกสาร (ui-redo 32): รายการหน้าคิดหลังทุกหน้าข้างบนเขียนเสร็จ ⇒ หน้าที่เพิ่ง build ใหม่อยู่ในรายการด้วย
+  for (const { f, k } of docsScope(at('docs/'))) {
+    const html = readFileSync(at(`docs/${f}`), 'utf8');
+    put(at(`docs/${f}`), injectDocsLayout(html, k, `docs/${f}`), html);
+  }
   const dtData = docsTweakData(at('docs/'), readFileSync(at('src/ui/template.html'), 'utf8'));
   for (const file of DOCS_TWEAK_PAGES) {
     const dt = readFileSync(at(`docs/${file}`), 'utf8');
