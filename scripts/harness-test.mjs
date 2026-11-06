@@ -518,7 +518,8 @@ const f2 = (v) => v.toFixed(2);
     }
     return { lives, shown, closed };
   };
-  const sin = run(dark, 'สายบาป', 150);
+  // ใบนี้ออกราว 1% ของชีวิตสายบาป ตัวอย่างเล็กได้ 0 เพราะ seed เลื่อนเมื่อกองเปลี่ยน
+  const sin = run(dark, 'สายบาป', 600);
   const merit = run(dark, 'สายบุญ', 150);
   const open = run(dark.map((e) => ({ ...e, when: { ...e.when, dark_gate: undefined } })), 'สายบุญ', 150);
   check('ใบ B99a สายบาปจนถูกชวนทำผิด', sin.lives > 0, `${sin.lives}/150 ชีวิต`);

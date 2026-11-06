@@ -1,10 +1,10 @@
-// หน้าเฉลยการ์ด (B88): สร้างจาก content ทุกครั้งที่ build — ทุกตัวเลือก ทุกผลสุ่ม ค่าที่ขยับ เงิน บุญบาป และเงื่อนไขที่การ์ดออก
-// ข้อยกเว้นกติกา "ไม่เผยบุญบาป" เจ้าของเคาะเฉพาะหน้านี้ — ในเกมยังห้ามเหมือนเดิม และหน้ารวมการ์ด (catalog.mjs) ยังไม่เฉลย
+// เฉลยการ์ด (B88): สร้างจาก content ทุกครั้งที่ build — ทุกตัวเลือก ทุกผลสุ่ม ค่าที่ขยับ เงิน บุญบาป และเงื่อนไขที่การ์ดออก
+// ข้อยกเว้นกติกา "ไม่เผยบุญบาป" เจ้าของเคาะเฉพาะหน้าการ์ดรวม หลังกดดูผล (ข้อ 187) — ในเกมยังห้ามเหมือนเดิม
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 import { STAGES, STAT_LABELS, MERIT_LEVELS, MERIT_WEIGHTS, SIN_CATS, FLAG_CATS, TRACKS, REALMS, FAMILY_ROLE_NAMES, meritId, meritName, debtName, assetName, EXAM_PASS } from '../engine/index.mjs';
-import { AFTER, CATEGORY, esc, text, choiceText } from './catalog.mjs';
-import { isekaiSpoilersHtml, isekaiNav } from './otherworld.mjs';
+import { AFTER, esc, text, choiceText, catalogCard } from './catalog.mjs';
+import { isekaiCatalogHtml, isekaiNav, isekaiBoxes } from './otherworld.mjs';
 import { careerHtml, careerSim } from './career.mjs';
 
 const YEAR_ALL = [2400, 2700];
@@ -255,8 +255,8 @@ function outcomesHtml(c, L, byId) {
     .join('')}</ol>`;
 }
 
-function card(e, L, byId) {
-  const tags = [e.era ? 'บ้านเมือง' : CATEGORY[e.category], e.belief ? 'ความเชื่อ' : null].filter((t, i, a) => t && a.indexOf(t) === i);
+// ด้านหลังการ์ด: ชื่อการ์ดอยู่ด้านหน้าแล้ว ข้อความกับป้ายหมวดถูกแทนที่ตอนพลิก (ข้อ 237)
+function back(e, L, byId) {
   const choices = e.choices
     .map((c) => {
       const all = merit(c.merit);
@@ -274,26 +274,30 @@ function card(e, L, byId) {
   const cond = conditions(e, L);
   const odds = mults(e.multipliers, L);
   return [
-    `<article class="c a" id="${esc(e.id)}">`,
-    `<h4>${text(e.title ?? 'ไม่มีชื่อการ์ด')}</h4>`,
-    tags.length ? `<p class="tags">${tags.map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : '',
     cond.length ? `<p class="when">ออกเมื่อ: ${cond.join(' · ')}</p>` : '',
     odds.length ? `<p class="when">โอกาสออก: ${odds.join(' · ')}</p>` : '',
-    `<p>${text(e.text)}</p>`,
     choices ? `<ol class="chs">${choices}</ol>` : '<p class="none">การ์ดเล่าเรื่อง ไม่มีตัวเลือก</p>',
-    '</article>',
   ].join('');
 }
 
-export function spoilersHtml(content, flags = flagNames(), systems = systemNames(), sim = careerSim()) {
+// ด้านหลังการ์ดบางใบ — ด่าน site-check วัดว่าถอดเงื่อนไขแล้วเฉลยเปลี่ยน
+export function spoilerBacks(content, ids, flags = flagNames(), systems = systemNames()) {
+  const L = labels(content, flags, systems);
+  const byId = new Map(content.events.map((e) => [e.id, e]));
+  return ids.map((id) => back(byId.get(id), L, byId));
+}
+
+// demo = เดโมการ์ดเล่นได้ (demo.mjs) วางหลังสารบัญ
+export function catalogHtml(content, demo = '', flags = flagNames(), systems = systemNames(), sim = careerSim()) {
   const L = labels(content, flags, systems);
   const byId = new Map(content.events.map((e) => [e.id, e]));
   const groups = [...STAGES.map((s) => s.name), AFTER].map((stage) => ({ stage, events: content.events.filter((e) => e.stage === stage) })).filter((g) => g.events.length);
   const nav = groups.map((g, i) => `<a href="#s${i}">${esc(g.stage)} <small>${g.events.length}</small></a>`).join('');
   const body = groups
-    .map((g, i) => `<details id="s${i}"><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map((e) => card(e, L, byId)).join('')}</div></details>`)
+    .map((g, i) => `<details id="s${i}"${i === 0 ? ' open' : ''}><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map((e) => catalogCard(e, back(e, L, byId))).join('')}</div></details>`)
     .join('\n');
-  // เส้นทางงาน (ui-redo ใบ 21) ต่อท้ายการ์ดชาติไทย ก่อนส่วนต่างโลก — ไม่มี <article> ด่านนับการ์ดบนหน้าจึงนับเท่าเดิม
+  // เฉลยที่ไม่ผูกการ์ดใบใด (ข้อ 187 207) ท้ายหน้า เปิดทีละกล่อง — ไม่มี <article> ด่านนับการ์ดจึงนับเท่าเดิม
   const career = careerHtml(content, L, sim);
-  return `<nav class="toc">${nav}${career ? '<a href="#career">เส้นทางงาน</a>' : ''}${isekaiNav(groups.length)}</nav>\n${body}\n${career}\n${isekaiSpoilersHtml(groups.length, merit)}`;
+  const more = `<section class="more" id="more">${career}<h2 id="isk-more">ต่างโลก</h2><div class="jobs">${isekaiBoxes(merit)}</div></section>`;
+  return `<nav class="toc">${nav}${isekaiNav(groups.length)}${career ? '<a href="#career">เส้นทางงาน</a>' : ''}<a href="#isk-more">เฉลยต่างโลก</a></nav>\n${demo ? `${demo}\n` : ''}${body}\n${isekaiCatalogHtml(groups.length, merit)}\n${more}`;
 }

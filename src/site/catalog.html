@@ -4,78 +4,120 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>การ์ดทั้งหมด · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
-<meta name="description" content="การ์ดเหตุการณ์ทุกใบในเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด แยกตามช่วงวัย พร้อมข้อความและตัวเลือกที่ผู้เล่นเห็น">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi:wght@400;600&family=Sarabun:wght@400;600&display=swap">
+<meta name="description" content="การ์ดเหตุการณ์ทุกใบในเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด แยกตามช่วงวัย พร้อมข้อความและตัวเลือกที่ผู้เล่นเห็น กดดูผลของแต่ละใบได้">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.65; }
-  header { background: #1F2430; color: #F4EFE3; padding: 32px 16px 28px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.65; }
+  header { background: var(--head); color: var(--title); padding: 32px 16px 28px; }
   .w { max-width: 1040px; margin: 0 auto; }
-  h1 { font-family: Pridi, serif; font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
-  header p { margin: 0 0 6px; color: #E3DDD0; max-width: 680px; }
-  header a { color: #F4EFE3; }
+  h1 { font-family: var(--fh); font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
+  header p { margin: 0 0 6px; color: var(--on-head); max-width: 680px; }
+  header a { color: var(--title); }
   main { padding: 20px 16px 64px; }
   .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
-  .toc a { display: inline-block; padding: 8px 12px; min-height: 44px; line-height: 28px; background: #F4EFE3; border: 1px solid #C9BFA9; color: #1F2430; text-decoration: none; }
-  .toc a:hover, .toc a:focus-visible { border-color: #1F2430; outline: none; }
-  .toc small, summary small { color: #4A4F5C; font-weight: 400; }
+  .toc a { display: inline-block; padding: 8px 12px; min-height: 44px; line-height: 28px; background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink); text-decoration: none; }
+  .toc a:hover, .toc a:focus-visible { border-color: var(--ink); outline: none; }
+  .toc small, summary small { color: var(--muted); font-weight: 400; }
   details { margin: 0 0 16px; }
-  summary { font-family: Pridi, serif; font-size: 22px; cursor: pointer; padding: 8px 0; min-height: 44px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 8px; }
-  .c { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 14px 16px; overflow-wrap: anywhere; }
-  .c h4 { font-family: Pridi, serif; font-size: 18px; margin: 0 0 4px; }
+  summary { font-family: var(--fh); font-size: 22px; cursor: pointer; padding: 8px 0; min-height: 44px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 12px; margin-top: 8px; }
+  .c { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); padding: 14px 16px; overflow-wrap: anywhere; min-width: 0; }
+  .c h4 { font-family: var(--fh); font-size: 18px; margin: 0 0 4px; }
   .c p { margin: 0 0 8px; }
   .c ul { margin: 0; padding-left: 20px; font-size: 15px; }
   .c li { margin: 0 0 2px; }
   .tags span { display: inline-block; font-size: 12px; border: 1px solid currentColor; padding: 0 6px; margin-right: 6px; opacity: .8; }
   .ph { font-style: normal; border-bottom: 1px dashed currentColor; }
   .none { font-size: 14px; opacity: .75; }
-  footer { font-size: 13px; color: #4A4F5C; margin-top: 32px; }
-  .c.x { background: #ECEAF6; border-color: #A9A3CF; border-left: 4px solid #5B4FA3; }
-  .c.x h4 { color: #2E2766; }
-  details h3 { font-family: Pridi, serif; font-size: 18px; margin: 16px 0 0; }
-  details h3 small { color: #4A4F5C; font-weight: 400; }
+  footer { font-size: 13px; color: var(--muted); margin-top: 32px; }
+  .c.x { background: var(--bg); border-color: var(--line); border-left: 4px solid var(--head); }
+  .c.x h4 { color: var(--ink); }
+  details h3 { font-family: var(--fh); font-size: 18px; margin: 16px 0 0; }
+  details h3 small { color: var(--muted); font-weight: 400; }
   .lead { margin: 0 0 8px; max-width: 760px; }
   .try { margin: 0 0 28px; }
-  .try h2 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 8px; }
+  .try h2 { font-family: var(--fh); font-size: 22px; margin: 0 0 8px; }
   .try .lead { margin: 0 0 12px; font-size: 15px; }
-  .tcard { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 18px 20px; max-width: 560px; }
-  .tcard .kick { font-size: 13px; color: #4A4F5C; margin: 0 0 2px; }
-  .tcard h3 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 6px; }
+  .tcard { background: var(--surface); border: 1px solid var(--line); padding: 18px 20px; max-width: 560px; }
+  .tcard .kick { font-size: 13px; color: var(--muted); margin: 0 0 2px; }
+  .tcard h3 { font-family: var(--fh); font-size: 22px; margin: 0 0 6px; }
   .tcard p { margin: 0 0 12px; }
   .tch { display: grid; gap: 8px; }
-  .tch button { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 44px; padding: 8px 12px; text-align: left; font: inherit; color: #1F2430; background: #FBF8F1; border: 1px solid #C9BFA9; cursor: pointer; }
-  .tch button:hover:not(:disabled), .tch button:focus-visible { border-color: #1F2430; outline: none; }
+  .tch button { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 44px; padding: 8px 12px; text-align: left; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); cursor: pointer; }
+  .tch button:hover:not(:disabled), .tch button:focus-visible { border-color: var(--line-strong); outline: none; }
   .tch button:disabled { cursor: default; opacity: .55; }
-  .tch button.on { opacity: 1; border: 2px solid #A23B2C; }
-  .tch .fx { font-size: 13px; color: #4A4F5C; white-space: nowrap; }
-  .tres { margin: 12px 0 8px !important; padding: 10px 12px; background: #1F2430; color: #F4EFE3; }
-  .tact a { font-family: Pridi, serif; color: #A23B2C; font-size: 18px; display: inline-block; min-height: 44px; line-height: 44px; margin-right: 12px; }
-  .tact button { font: inherit; min-height: 44px; padding: 0 14px; background: transparent; border: 1px solid #C9BFA9; color: #1F2430; cursor: pointer; }
+  .tch button.on { opacity: 1; border: 2px solid var(--accent2); }
+  .tch .fx { font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .tres { margin: 12px 0 8px !important; padding: 10px 12px; background: var(--head); color: var(--title); }
+  .tact a { font-family: var(--fh); color: var(--accent2); font-size: 18px; display: inline-block; min-height: 44px; line-height: 44px; margin-right: 12px; }
+  .tact button { font: inherit; min-height: 44px; padding: 0 14px; background: transparent; border: 1px solid var(--line-strong); color: var(--ink); cursor: pointer; }
   /* กติกาทีละระบบ (ย้ายจากหน้า GDD เดิม) */
-  .rules section { background: #F4EFE3; color: #1F2430; border: 1px solid #C9BFA9; padding: 16px 20px; margin: 0 0 16px; text-align: left; }
-  .rules section.dark { background: #17110D; color: #EFE3C2; border-color: #5A4630; }
-  .rules section.dark a { color: #F0D78C; }
-  .rules h2 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 8px; }
-  .rules h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
+  .rules section { background: var(--surface); color: var(--ink); border: 1px solid var(--line); padding: 16px 20px; margin: 0 0 16px; text-align: left; }
+  .rules section.dark { background: var(--lacquer); color: var(--headink); border-color: var(--bronze); }
+  .rules section.dark a { color: var(--headink); }
+  .rules h2 { font-family: var(--fh); font-size: 22px; margin: 0 0 8px; }
+  .rules h3 { font-family: var(--fh); font-size: 17px; margin: 16px 0 4px; }
   .rules ul, .rules ol { padding-left: 22px; margin: 0 0 8px; }
   .rules li { margin: 0 0 6px; }
   .rules p { margin: 0 0 8px; }
-  .rules .note { font-size: 14px; color: #4A4F5C; }
-  .rules section.dark .note { color: #CFC3A6; }
+  .rules .note { font-size: 14px; color: var(--muted); }
+  .rules section.dark .note { color: var(--on-head3); }
   .rules .tbl { overflow-x: auto; margin: 6px 0 10px; }
   .rules table { border-collapse: collapse; width: 100%; font-size: 14px; }
-  .rules th, .rules td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; }
-  .rules th { background: #E9E2D2; font-weight: 600; }
-  .rules section.dark th { background: #2A2017; }
-  .rules section.dark th, .rules section.dark td { border-color: #5A4630; }
-  .rules code { font-size: 13px; background: #E9E2D2; padding: 0 4px; overflow-wrap: anywhere; }
-  .rules section.dark code { background: #2A2017; }
+  .rules th, .rules td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; vertical-align: top; }
+  .rules th { background: var(--bg); font-weight: 600; }
+  .rules section.dark th { background: var(--lacquer2); }
+  .rules section.dark th, .rules section.dark td { border-color: var(--bronze); }
+  .rules code { font-size: 13px; background: var(--bg); padding: 0 4px; overflow-wrap: anywhere; }
+  .rules section.dark code { background: var(--lacquer2); }
   .rules .flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 10px; font-size: 14px; }
-  .rules .flow span { border: 1px solid #1F2430; padding: 2px 10px; background: #fff; }
-  .rules .flow i { font-style: normal; color: #A23B2C; }
-  .rules section.dark .flow span { background: #221912; border-color: #D9B45A; }
+  .rules .flow span { border: 1px solid var(--line-strong); padding: 2px 10px; background: var(--surface); }
+  .rules .flow i { font-style: normal; color: var(--accent2); }
+  .rules section.dark .flow span { background: var(--lacquer2); border-color: var(--gold); }
+  /* ปุ่มดูผล + กล่องเฉลย ข้อ 236-238 */
+  .sp-ft { margin: auto 0 0; padding-top: 10px; }
+  .sp-btn { font: inherit; font-size: 15px; min-height: 44px; cursor: pointer; display: flex; width: 100%; align-items: center; justify-content: center; color: var(--ink); background: transparent; border: 1px solid var(--line-strong); padding: 0 14px; border-radius: var(--r); }
+  .sp-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .sp-btn[aria-expanded="true"] { border-color: var(--ink); }
+  .spl { margin: 10px 0 0; padding: 12px; font-size: 15px; background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--rk); }
+  .spl p { margin: 0 0 8px; }
+  .spl ul { margin: 0; padding-left: 20px; }
+  .spl ul > li { margin: 0 0 8px; }
+  .spl .spl-x { margin: 6px 0 0; }
+  .spl-x .sp-btn { display: inline-flex; width: auto; border: 0; padding: 0 4px; border-radius: 0; text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
+  .when { font-size: 14px; color: var(--muted); border-left: 3px solid var(--line); padding-left: 8px; }
+  .chs { margin: 0; padding-left: 22px; }
+  .chs > li { margin: 0 0 12px; padding-top: 8px; border-top: 1px dashed var(--line); }
+  .chs > li:first-child { border-top: 0; padding-top: 0; }
+  .ch { font-weight: 600; }
+  .spl .out { margin: 4px 0 0; padding-left: 18px; }
+  .out li { margin: 0 0 6px; }
+  .spl .fx, .mul, .ex, .lock, .nm { font-size: 14px; margin: 0 0 4px; }
+  .mul, .ex, .nm { color: var(--muted); }
+  .lock { color: var(--accent2); }
+  .pct { display: inline-block; min-width: 4.2em; font-variant-numeric: tabular-nums; }
+  .ok { font-size: 12px; border: 1px solid currentColor; padding: 0 5px; }
+  .m { display: inline-block; padding: 0 6px; font-size: 13px; font-weight: 600; }
+  .m.good { background: color-mix(in srgb, var(--good) 14%, var(--surface)); color: var(--good); }
+  .m.sin { background: color-mix(in srgb, var(--bad) 12%, var(--surface)); color: var(--accent2); }
+  .fl small { opacity: .75; }
+  .rl { font-size: 15px; }
+  .rk { display: inline-block; font-size: 12px; border: 1px solid currentColor; padding: 0 5px; }
+  .ends small { color: var(--muted); }
+  /* เฉลยที่ไม่ผูกการ์ด: เปิดทีละกล่อง */
+  .more h2 { font-family: var(--fh); font-size: 22px; margin: 24px 0 8px; }
+  .more h2 small, .more h3 small { color: var(--muted); font-weight: 400; }
+  .more > h3 { font-family: var(--fh); font-size: 18px; margin: 16px 0 0; }
+  .jobs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 12px; margin-top: 8px; align-items: start; }
+  .job, .sb { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent2); padding: 14px 16px; overflow-wrap: anywhere; min-width: 0; }
+  .job h4, .sb h3 { font-family: var(--fh); font-size: 18px; margin: 0 0 4px; }
+  .lives { font-size: 14px; color: var(--muted); margin: 0 0 6px; }
+  .job .sub { font-weight: 600; margin: 10px 0 2px; padding-top: 6px; border-top: 1px dashed var(--line); }
+  .spl .sl { margin: 0; padding-left: 0; list-style: none; font-size: 15px; }
+  .spl .sl > li { margin: 0 0 4px; padding-left: 4.6em; text-indent: -4.6em; }
+  .sim { display: inline-block; min-width: 4.2em; text-indent: 0; font-variant-numeric: tabular-nums; color: var(--ink); background: var(--surface); padding: 0 5px; }
+  .rare { font-size: 13px; color: var(--muted); margin: 2px 0 4px; }
   /*NAV-CSS:START*//*NAV-CSS:END*/
 </style>
 </head>
@@ -84,7 +126,7 @@
 <header><div class="w">
   <h1>การ์ดทั้งหมดในเกม</h1>
   <p>การ์ด <span data-fact="cards">0</span> ใบ เป็นช่วงชีวิต <span data-fact="lifeCards">0</span> ใบ (รวมการ์ดรับมือเหตุการณ์บ้านเมือง <span data-fact="eraCards">0</span> ใบ) และฉากที่ปรโลก <span data-fact="afterCards">0</span> ใบ · ชาติต่างโลกอีก <span data-fact="isekaiCards">0</span> ใบ · การ์ดใหม่ขึ้นหน้านี้เองทุกครั้งที่เกมอัปเดต</p>
-  <p>มีแค่สิ่งที่เห็นบนจอตอนเล่น ส่วนผลของแต่ละทางกับบุญบาปไม่ได้บอกไว้ คำที่ขีดเส้นประคือช่องที่เกมเติมชื่อหรืออายุของชีวิตนั้น · เวอร์ชัน <span data-fact="version">v0</span></p>
+  <p>บนการ์ดมีแค่สิ่งที่เห็นบนจอตอนเล่น ผลของแต่ละทาง โอกาส ค่าที่ขยับ บุญบาป และเงื่อนไขที่การ์ดออกซ่อนไว้จนกว่าจะกด "ดูผล" ที่ใบนั้น คำที่ขีดเส้นประคือช่องที่เกมเติมชื่อหรืออายุของชีวิตนั้น · เวอร์ชัน <span data-fact="version">v0</span></p>
 </div></header>
 <main><div class="w">
   <div class="rules">
@@ -110,7 +152,50 @@
   </section>
   </div>
 <!--__CATALOG__-->
-  <footer>การ์ดดำคือฉากแนวลายรดน้ำ (เรื่องสายมูและปรโลก) การ์ดสีกระดาษคือแนวทะเบียนราษฎร์ (เรื่องชีวิตประจำวัน) · การ์ดบางใบออกเฉพาะบางยุค บางภาค หรือหลังเลือกบางทางมาก่อน · <a href="archive/cards-v1.html">ต้นแบบหน้าตาการ์ดรุ่นแรก</a><br>อยากรู้ผลของทุกทางกับบุญบาป → <a href="spoilers.html">หน้าเฉลยการ์ดทั้งหมด</a> (⚠ สปอยล์ทั้งเกม)</footer>
+  <footer>การ์ดดำคือฉากแนวลายรดน้ำ (เรื่องสายมูและปรโลก) การ์ดสีกระดาษคือแนวทะเบียนราษฎร์ (เรื่องชีวิตประจำวัน) · การ์ดบางใบออกเฉพาะบางยุค บางภาค หรือหลังเลือกบางทางมาก่อน · <a href="archive/cards-v1.html">ต้นแบบหน้าตาการ์ดรุ่นแรก</a><br>วิธีอ่านผล: ตัวเลขค่าสถานะคือระดับผล 1–3 (เกมแปลงเป็นแต้มอีกที) · โอกาสเป็น % ตั้งต้น ตัวคูณใต้ผลแต่ละทางเปลี่ยนโอกาสตามชีวิตนั้น · บุญบาปในวงเล็บคือแต้มที่ลงบัญชี (น้ำหนักหมวด × ระดับ) ผลบนตัวเลือกลงทุกครั้ง ผลใต้ทางสุ่มลงเพิ่มเมื่อออกทางนั้น · ตัวเลขบนการ์ดต่างโลกเป็นแต้มจริงที่บวกลบ ไม่ใช่ระดับ · ส่วนเส้นทางงานใช้ % จากผลจำลอง (ชีวิตที่เจอ ÷ ชีวิตที่เคยทำงานนั้น) ไม่ใช่โอกาสของผลสุ่มบนการ์ด</footer>
 </div></main>
+<script>
+(() => {
+  const set = (btn, open) => {
+    const host = btn.closest('.c, .job, .sb');
+    const front = host.querySelector(':scope > .sp-front');
+    if (front) front.hidden = open;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = open ? 'ซ่อนผล' : 'ดูผล';
+    if (!open) return host.querySelector(':scope > .spl')?.remove();
+    const tpl = host.querySelector(':scope > template');
+    const box = document.createElement('div');
+    box.className = 'spl';
+    box.append(tpl.content.cloneNode(true));
+    const row = document.createElement('p');
+    row.className = 'spl-x';
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'sp-btn';
+    close.textContent = 'ซ่อนผล';
+    row.append(close);
+    box.append(row);
+    tpl.before(box);
+  };
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.sp-btn');
+    if (!btn) return;
+    const box = btn.closest('.spl');
+    if (!box) return set(btn, btn.getAttribute('aria-expanded') !== 'true');
+    const main = box.parentElement.querySelector(':scope > .sp-ft .sp-btn');
+    set(main, false);
+    main.focus();
+  });
+  // ลิงก์ไปการ์ดในหมวดที่พับอยู่ (ทั้งจากในเฉลยและ spoilers.html#ใบ) ต้องกางหมวดก่อนถึงเลื่อนไปถึง
+  const reveal = () => {
+    const to = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (!to) return;
+    for (let d = to.closest('details'); d; d = d.parentElement.closest('details')) d.open = true;
+    to.scrollIntoView();
+  };
+  addEventListener('hashchange', reveal);
+  reveal();
+})();
+</script>
 </body>
 </html>
