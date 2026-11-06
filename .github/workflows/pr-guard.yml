@@ -1,0 +1,30 @@
+name: pr guard
+
+# Separate from ci.yml so editing a PR body re-runs only this check, not the gates job.
+# pull_request does not fire while a PR conflicts with main: no check here means merge main first.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Run the base branch's copy so a PR cannot pass by editing the guard.
+      - env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git show "$BASE_SHA:scripts/pr-guard.mjs" > "$RUNNER_TEMP/pr-guard.mjs"
+          node "$RUNNER_TEMP/pr-guard.mjs" --base "$BASE_SHA" --head "$HEAD_SHA"

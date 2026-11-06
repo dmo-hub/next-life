@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>แผนที่และผัง · ห้องผู้พัฒนา</title>
+<style>
+  :root { --ink: #3b2a1a; --paper: #efe3c2; }
+  body { margin: 0; background: #2a2118; color: #f1e7cf; font-family: "Sarabun", "Leelawadee UI", system-ui, sans-serif; }
+  body[data-map="continent"] { background: #2a2118; }
+  body[data-map="afterlife"] { background: #17141f; }
+  body[data-map="dungeon"] { background: #1d1714; }
+  body[data-map="lineage"] { background: #1b1610; }
+  body[data-map="milestones"] { background: #1b1610; }
+  body[data-map="politics"] { background: #1b2230; }
+  .mp-sw, .mp-sw ~ section { box-sizing: border-box; max-width: 1800px; margin-left: auto; margin-right: auto; }
+  .mp-sw { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 12px 14px 0; }
+  .mp-sw h1 { font-size: 18px; margin: 0 8px 0 0; }
+  .mp-sw a { display: inline-block; min-height: 44px; line-height: 42px; padding: 0 14px; border: 1px solid #D9B45A; border-radius: 6px; color: #f1e7cf; text-decoration: none; }
+  .mp-sw a[aria-current] { background: #D9B45A; color: #1B1610; border-color: #D9B45A; font-weight: 700; }
+  .mp-sw a:focus-visible { outline: 2px solid #f0d78c; outline-offset: 2px; }
+  #continent .wrap { display: flex; gap: 14px; padding: 14px; flex-wrap: wrap; align-items: flex-start; }
+  #continent .mapbox { position: relative; flex: 1 1 820px; max-width: 1200px; }
+  #continent canvas { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: 0 4px 24px #000a; cursor: pointer; }
+  #continent aside { flex: 0 0 290px; font-size: 14px; }
+  #continent .card { background: var(--paper); color: var(--ink); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 2px 10px #0006; }
+  #continent .card h2 { font-size: 16px; margin: 0 0 6px; }
+  #continent .muted { color: #6b5638; }
+  #continent .go { color: #8a3b12; font-weight: 700; }
+  #continent select { width: 100%; font: inherit; padding: 4px; margin-top: 4px; }
+  #continent .lg { display: flex; align-items: center; gap: 8px; margin: 5px 0; font-size: 13px; }
+  #continent .sw { width: 28px; height: 0; border-top: 3px dashed; display: inline-block; }
+  #afterlife .wrap { display: flex; gap: 14px; padding: 14px; flex-wrap: wrap; align-items: flex-start; }
+  #afterlife .mapbox { flex: 1 1 820px; max-width: 1200px; }
+  #afterlife canvas { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: 0 4px 24px #000a; cursor: pointer; }
+  #afterlife aside { flex: 0 0 300px; font-size: 14px; }
+  #afterlife .card { background: var(--paper); color: var(--ink); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 2px 10px #0006; }
+  #afterlife .card h2 { font-size: 16px; margin: 0 0 6px; }
+  #afterlife .muted { color: #6b5638; }
+  #afterlife select, #afterlife input { font: inherit; padding: 3px; }
+  #afterlife select { width: 100%; margin-top: 4px; }
+  #afterlife table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  #afterlife td { padding: 3px 4px; border-top: 1px solid #d6c59c; vertical-align: top; }
+  #afterlife ul { margin: 4px 0 0; padding-left: 18px; }
+  #afterlife .big { font-size: 22px; font-weight: 700; color: #8a3b12; }
+  #dungeon .wrap { display: flex; gap: 14px; padding: 14px; flex-wrap: wrap; align-items: flex-start; }
+  #dungeon .mapbox { flex: 1 1 820px; max-width: 1200px; }
+  #dungeon canvas { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: 0 4px 24px #000a; cursor: pointer; }
+  #dungeon aside { flex: 0 0 290px; font-size: 14px; }
+  #dungeon .card { background: var(--paper); color: var(--ink); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 2px 10px #0006; }
+  #dungeon .card h2 { font-size: 16px; margin: 0 0 6px; }
+  #dungeon .muted { color: #6b5638; }
+  #dungeon select { width: 100%; font: inherit; padding: 4px; margin-top: 4px; }
+  #dungeon .row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+  #dungeon ul { margin: 4px 0 0; padding-left: 18px; }
+  #dungeon a { color: #8a3b12; }
+  #lineage .wrap { display: flex; gap: 14px; padding: 14px; flex-wrap: wrap; align-items: flex-start; }
+  #lineage .mapbox { flex: 1 1 820px; max-width: 1200px; }
+  #lineage canvas { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: 0 4px 24px #000a; }
+  #lineage aside { flex: 0 0 320px; font-size: 14px; }
+  #lineage .card { background: var(--paper); color: var(--ink); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 2px 10px #0006; }
+  #lineage .card h2 { font-size: 16px; margin: 0 0 6px; }
+  #lineage .muted { color: #6b5638; }
+  #lineage textarea { width: 100%; box-sizing: border-box; height: 110px; font: 13px/1.4 inherit; }
+  #lineage select, #lineage input, #lineage button { font: inherit; padding: 3px 6px; }
+  #lineage label.row { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+  #lineage table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  #lineage td { padding: 3px 4px; border-top: 1px solid #d6c59c; vertical-align: top; }
+  #lineage .x { cursor: pointer; color: #8a3b12; }
+  #milestones .wrap { display: flex; gap: 14px; padding: 14px; flex-wrap: wrap; align-items: flex-start; }
+  #milestones .mapbox { flex: 1 1 820px; max-width: 1200px; }
+  #milestones canvas { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: 0 4px 24px #000a; cursor: pointer; }
+  #milestones aside { flex: 0 0 300px; font-size: 14px; }
+  #milestones .card { background: var(--paper); color: var(--ink); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 2px 10px #0006; }
+  #milestones .card h2 { font-size: 16px; margin: 0 0 6px; }
+  #milestones .muted { color: #6b5638; }
+  #milestones table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  #milestones td { padding: 3px 4px; border-top: 1px solid #d6c59c; vertical-align: top; }
+  #milestones ol, #milestones ul { margin: 4px 0 0; padding-left: 18px; }
+  #milestones button { font: inherit; padding: 4px 10px; cursor: pointer; }
+  #politics .wrap { display: flex; gap: 14px; padding: 14px; flex-wrap: wrap; align-items: flex-start; }
+  #politics .mapbox { flex: 1 1 820px; max-width: 1200px; }
+  #politics canvas { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: 0 4px 24px #000a; cursor: pointer; }
+  #politics aside { flex: 0 0 340px; font-size: 14px; }
+  #politics .card { background: var(--paper); color: var(--ink); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 2px 10px #0006; }
+  #politics .card h2 { font-size: 16px; margin: 0 0 6px; }
+  #politics .muted { color: #6b5638; }
+  #politics select, #politics input { font: inherit; padding: 3px; }
+  #politics select { width: 100%; margin-top: 4px; }
+  #politics table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  #politics td { padding: 3px 4px; border-top: 1px solid #d6c59c; vertical-align: top; }
+  #politics #politics-parties tr { cursor: pointer; }
+  #politics #politics-parties tr.on { background: #f3d98a; }
+  #politics ul, #politics ol { margin: 4px 0 0; padding-left: 18px; }
+  #politics .big { font-size: 22px; font-weight: 700; color: #8a3b12; }
+</style>
+<!--DOCS-LAYOUT:START--><style>
+.wrap{max-width:1800px;margin-left:auto;margin-right:auto;padding-left:24px;padding-right:24px}.wrap>*{max-width:100%}
+</style><!--DOCS-LAYOUT:END-->
+</head>
+<body>
+<!--nav--><style>
+nav.top, .nl-nav { --bg:#F4ECDC; --ink:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --line:#C9B98F; --on-head:#E7E2D4; --fb:Sarabun,system-ui,sans-serif; --r:6px; }
+  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
+  nav.top a { display: inline-block; color: var(--on-head); text-decoration: none; padding: 0 10px; line-height: 40px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: var(--headink); }
+  nav.top a[aria-current] { color: var(--headink); font-weight: 600; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 600; color: var(--headink); padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: var(--gold); color: var(--head); border-radius: var(--r); line-height: 28px; padding: 0 12px; font-weight: 600; white-space: nowrap; }
+  nav.top a.play:focus-visible { outline: 2px solid var(--headink); outline-offset: 2px; }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
+
+.nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
+.nl-nav{font:15px/1.4 var(--fb);text-align:left}
+.nl-nav a{text-decoration:none;color:inherit}
+.nl-in{max-width:1800px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
+.nl-tabs{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--line)}
+.nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
+.nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
+.nl-tabs a[aria-current]{border-bottom-color:var(--accent2);font-weight:600}
+.nl-tabs.nl-sub{background:var(--bg);font-size:14px}
+</style><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="../../index.html">NEXT LIFE</a><div class="links"><a href="../../guide.html">วิธีเล่น</a><a href="../../whatsnew.html">แพตช์โน้ต</a><a href="../../about.html">กลไกในเกม</a><a href="../../worlds.html">โลก</a><a href="../../catalog.html">การ์ดทั้งหมด</a><a href="../../dev/index.html" aria-current="true">ห้องผู้พัฒนา</a></div><a class="play" href="../../play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../../dev/index.html">สารบัญ</a><a href="../../dev/spec.html">ภาคผนวกสเปก</a><a href="../../dev/plan.html">สเปก/แผน</a><a href="../../dev/design.html">คำตัดสินเกม</a><a href="../../dev/ui.html">การออกแบบ</a><a href="../../dev/maps/continent.html" aria-current="page">แผนที่</a><a href="../../dev/archive/index.html">คลังเก่า</a></div></div></div><!--/nav-->
+<nav class="mp-sw" aria-label="เลือกผัง"><h1>แผนที่และผัง</h1><a href="#continent">ทวีป</a><a href="#afterlife">ปรโลก</a><a href="#dungeon">ดันเจียน</a><a href="#lineage">ตระกูล</a><a href="#milestones">หลักไมล์</a><a href="#politics">การเมือง</a></nav>
+<section id="continent" class="mp" aria-label="แผนที่ทวีปเอเธอร์การ์ด" hidden>
+<div class="wrap">
+  <div class="mapbox"><canvas id="continent-map" width="1200" height="800"></canvas></div>
+  <aside>
+    <div class="card">
+      <h2>ตอนนี้อยู่ที่</h2>
+      <select id="continent-here"><option value="">— เลือกแคว้นที่อยู่ —</option></select>
+      <div id="continent-hereInfo" class="muted" style="margin-top:6px"></div>
+    </div>
+    <div class="card">
+      <h2>ทางลับ + ดันเจียนลับ</h2>
+      <label><input type="checkbox" id="continent-showSecret"> แสดงเครือข่ายทางลับ 6 เส้น</label>
+      <div class="muted" style="margin-top:8px">ปักดันเจียนในแคว้นที่คลิกอยู่:</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">
+        <button data-d="rumor">? ข่าวลือ</button><button data-d="found">⚔ เจอแล้ว</button><button data-d="done">✓ ผ่านแล้ว</button><button data-d="">ล้าง</button>
+      </div>
+      <div class="muted" style="margin-top:6px;font-size:12px">ดันเจียนสุ่มใหม่ทุกชีวิต 3–4 จุด · ปุ่มล้างทั้งหมดเมื่อเริ่มชีวิตใหม่ <button id="continent-clearDun">ล้างทั้งหมด</button></div>
+      <div style="margin-top:6px"><a href="#dungeon" style="color:#8a3b12">แผนที่ชั้นในดันเจียน →</a></div>
+    </div>
+    <div class="card" id="continent-info"><span class="muted">คลิกแคว้นบนแผนที่เพื่อดูข้อมูล</span></div>
+    <div class="card">
+      <h2>วิธีอ่าน</h2>
+      <div class="lg"><span class="sw" style="border-color:#7a4a1c"></span> ถนน — เดินไปแคว้นติดกัน ทีละแคว้น</div>
+      <div class="lg"><span class="sw" style="border-color:#2d6f9c"></span> เรือ — ข้ามทะเลไปแคว้นที่ไม่ติดกัน</div>
+      <div class="lg"><span class="sw" style="border-color:#c08a12"></span> ถนนหลวง — ทางค้าขายไปแคว้นที่ไม่ติดกัน</div>
+      <div class="lg"><span class="sw" style="border-color:#9b4dd6;border-top-style:dotted"></span> ทางลับ — ต้องมีการ์ดแผนที่ลับ ใช้ได้ใบละครั้ง</div>
+      <div class="lg"><span class="sw" style="border-color:#ffffff;border-top-style:dotted"></span> เรือเหาะ — ทางเดียวไปเกาะลอย</div>
+      <div class="lg">▲ เขากั้น — ติดกันแต่ข้ามไม่ได้</div>
+      <div class="lg"><i>ตัวเอียง</i> — ไม่มีผู้ปกครอง ตั้งถิ่นฐานเองได้</div>
+      <div class="muted" style="margin-top:6px;font-size:12px">ร่างเคาะแล้ว 2026-10-30 รอบ 15 + 21 · ข้อมูลจาก continent-list-draft.md</div>
+    </div>
+  </aside>
+</div>
+</section>
+<section id="afterlife" class="mp" aria-label="ผังภูมิ 5 ในปรโลก" hidden>
+<div class="wrap">
+  <div class="mapbox"><canvas id="afterlife-map" width="1200" height="800"></canvas></div>
+  <aside>
+    <div class="card">
+      <h2>ตอนนี้อยู่ภูมิ</h2>
+      <select id="afterlife-here"><option value="">— ยังไม่ตาย / ไม่ได้อยู่ปรโลก —</option></select>
+      <div style="margin-top:8px">บัญชีบุญบาปสุทธิ <input id="afterlife-net" type="number" step="1" style="width:80px"></div>
+      <div id="afterlife-years" style="margin-top:6px"></div>
+      <div style="margin-top:6px">อยู่มาแล้ว <input id="afterlife-year" type="number" min="0" step="1" style="width:60px"> ปีทิพย์</div>
+    </div>
+    <div class="card" id="afterlife-info"><span class="muted">คลิกภูมิบนผังเพื่อดูกองการ์ด</span></div>
+    <div class="card">
+      <h2>โฟกัสปรโลก 5 ตัว</h2>
+      <table id="afterlife-focus"></table>
+    </div>
+    <div class="card">
+      <h2>กติกา (รอบ 11 + 16)</h2>
+      <ul>
+        <li>ปีทิพย์ = 3 + |สุทธิ| ÷ 2 · เพดาน 30 · ปีละ 1 การ์ด</li>
+        <li>ชีวิตทิพย์หมดก่อนครบ = ไปเกิดเร็วขึ้น</li>
+        <li>ปุ่ม "ปล่อยวาง" ข้ามไปเกิด เสียผลที่ยังไม่ได้เสวย</li>
+        <li>4 ค่าบนจอ: ชีวิตทิพย์ · สุข/ทุกข์ · ปัญญาธรรม · ความผูกพัน</li>
+        <li>ร้านบุญอยู่ท้ายวง ก่อนไปเกิด</li>
+      </ul>
+      <div class="muted" style="margin-top:6px;font-size:12px">ยังไม่ได้ตัดสิน: สูตรเริ่มปัญญาธรรม/ความผูกพัน · จำนวนการ์ดต่อกอง · ขนาดผลโฟกัสเป็นตัวเลข · ข้อมูลจาก afterlife-list-draft.md</div>
+    </div>
+  </aside>
+</div>
+</section>
+<section id="dungeon" class="mp" aria-label="แผนที่ชั้นในดันเจียนลับ" hidden>
+<div class="wrap">
+  <div class="mapbox"><canvas id="dungeon-map" width="1200" height="800"></canvas></div>
+  <aside>
+    <div class="card">
+      <h2>ดันเจียนในแคว้น</h2>
+      <select id="dungeon-where"></select>
+      <div id="dungeon-whereInfo" class="muted" style="margin-top:6px"></div>
+      <div style="margin-top:8px">จำนวนชั้น (ไม่นับบอส)</div>
+      <select id="dungeon-floors"></select>
+    </div>
+    <div class="card">
+      <h2>รอบนี้</h2>
+      <div id="dungeon-runInfo"></div>
+      <div class="muted" style="margin-top:6px">คลิกห้องบนแผนที่ = เลือก · คลิกซ้ำ = เปลี่ยนชนิดการ์ดที่เจอ</div>
+      <div class="row"><button id="dungeon-reach">ลงถึงห้องที่เลือก</button><button id="dungeon-retreat">ถอยออก (เข้าใหม่เริ่มชั้น 1)</button></div>
+    </div>
+    <div class="card">
+      <h2>กติกา (รอบ 22)</h2>
+      <ul>
+        <li>เข้าครั้งเดียวยาวจนจบ 5–10 ชั้น + บอส</li>
+        <li>ชั้นละการ์ด: กับดัก / สมบัติ / มอนสเตอร์ · เสีย hp</li>
+        <li>ถอยออกได้ทุกชั้น เก็บของที่ได้ · เข้าใหม่เริ่มชั้น 1</li>
+        <li>ลึกขึ้น เสี่ยงตายมากขึ้น ของดีขึ้น · ตายในดันเจียนได้</li>
+        <li>บอสให้หินเทเลพอร์ตไปได้ทุกแคว้น (ใช้ใบละครั้ง)</li>
+      </ul>
+      <div class="muted" style="margin-top:6px;font-size:12px">ยังไม่ได้ตัดสิน: เนื้อการ์ดชั้น/บอส · รางวัลต่อความลึก — หน้านี้จึงมีแค่ป้ายชนิดห้อง</div>
+    </div>
+    <div class="card">
+      <h2>วิธีอ่าน</h2>
+      <div id="dungeon-legend"></div>
+      <div class="muted" style="margin-top:6px;font-size:12px">ข้อมูลจาก decisions.md รอบ 22 + continent-list-draft.md · ปักดันเจียนบน <a href="#continent">แผนที่ทวีป</a> แล้วแคว้นนั้นขึ้นบนสุดของรายการ</div>
+    </div>
+  </aside>
+</div>
+</section>
+<section id="lineage" class="mp" aria-label="ผังตระกูล" hidden>
+<div class="wrap">
+  <div class="mapbox">
+    <canvas id="lineage-map" width="1200" height="460"></canvas>
+    <div class="card" style="margin-top:12px"><h2>รุ่นในผัง</h2><table id="lineage-rows"></table></div>
+  </div>
+  <aside>
+    <div class="card">
+      <h2>วางข้อความผังตระกูลจากเกม</h2>
+      <div class="muted" style="font-size:12px">ในเกม: แท็บผังตระกูล → "อ่านเป็นข้อความ" → คัดลอกทุกบรรทัด "รุ่นที่ …" มาวาง</div>
+      <textarea id="lineage-paste" placeholder="รุ่นที่ 1 · สมชาย · ชาย · จ.ขอนแก่น · ฐานะยากจน · ตายอายุ 71 · ไปภูมิมนุษย์"></textarea>
+      <button id="lineage-load">แทนผังด้วยข้อความนี้</button> <span id="lineage-parsed" class="muted"></span>
+    </div>
+    <div class="card">
+      <h2>เพิ่มรุ่นเอง</h2>
+      <label class="row">ชื่อ <input id="lineage-fName" style="flex:1"></label>
+      <label class="row"><input id="lineage-fAway" type="checkbox"> ชาติต่างโลก · โลก <input id="lineage-fWorld" style="flex:1"></label>
+      <label class="row">ฐานะตอนตาย <select id="lineage-fCls" style="flex:1"></select></label>
+      <label class="row">อายุ <input id="lineage-fAge" type="number" min="0" max="120" value="70" style="width:70px"> <input id="lineage-fGone" type="checkbox"> หายตัว</label>
+      <label class="row">ภูมิที่ไป <select id="lineage-fRealm" style="flex:1"></select></label>
+      <label class="row">ทาง <select id="lineage-fPath" style="flex:1"></select></label>
+      <button id="lineage-add" style="margin-top:6px">เพิ่มต่อท้าย</button>
+    </div>
+    <div class="card">
+      <h2>ตระกูล</h2>
+      <label class="row">ชื่อเสียงตระกูล <select id="lineage-fame" style="flex:1"></select></label>
+      <div style="margin-top:6px">ฉายาตระกูลที่ได้</div>
+      <div id="lineage-titles"></div>
+      <div style="margin-top:8px"><button id="lineage-reset">ล้างผังทั้งหมด</button></div>
+    </div>
+  </aside>
+</div>
+</section>
+<section id="milestones" class="mp" aria-label="หลักไมล์ 8 สาย — โลกหลัก" hidden>
+<div class="wrap">
+  <div class="mapbox"><canvas id="milestones-map" width="1200" height="800"></canvas></div>
+  <aside>
+    <div class="card">
+      <h2>ตอนจบ (ร่าง · สูงสุด 3 สาย)</h2>
+      <ol id="milestones-ending"></ol>
+      <div class="muted" style="margin-top:6px;font-size:12px">ชื่อตอนจบตามหลักไมล์สูงสุด เรียงสายที่ไปไกลสุดก่อน · ถึงปลายสาย = ชื่อพิเศษของสาย</div>
+    </div>
+    <div class="card">
+      <h2>ถึงแล้วต่อสาย</h2>
+      <table id="milestones-sum"></table>
+      <div style="margin-top:8px"><button id="milestones-reset">ล้างทั้งหมด</button></div>
+    </div>
+    <div class="card">
+      <h2>กติกา (รอบ 20)</h2>
+      <ul>
+        <li>คลิกหลักไมล์ = ถึงขั้นนั้น · คลิกขั้นที่ถึงล่าสุดซ้ำ = ถอยหนึ่งขั้น</li>
+        <li>ไม่มีป้ายบนการ์ด — ดูหลักไมล์จากหน้ารวมอย่างเดียว</li>
+        <li>ถึงปลายสาย → ชื่อเสียงตระกูล +1</li>
+        <li>หลักไมล์ = แต้มในร้านบุญหลังตาย</li>
+      </ul>
+      <div class="muted" style="margin-top:6px;font-size:12px">ยังไม่ได้ตัดสิน: ชื่อตอนจบพิเศษต่อสาย · สเกลแต้มร้านบุญต่อหลักไมล์</div>
+    </div>
+  </aside>
+</div>
+</section>
+<section id="politics" class="mp" aria-label="ผังบันไดการเมือง" hidden>
+<div class="wrap">
+  <div class="mapbox"><canvas id="politics-map" width="1200" height="800"></canvas></div>
+  <aside>
+    <div class="card">
+      <h2>ตอนนี้อยู่ขั้น</h2>
+      <select id="politics-here"><option value="">— ยังไม่ลงการเมือง —</option></select>
+      <div style="margin-top:6px">อยู่ขั้นนี้มาแล้ว <input id="politics-years" type="number" min="0" step="1" style="width:60px"> ปี</div>
+      <div id="politics-term" style="margin-top:6px"></div>
+      <div style="margin-top:8px">สังกัดพรรค <select id="politics-party"><option value="">— ไม่สังกัด —</option></select></div>
+    </div>
+    <div class="card" id="politics-info"><span class="muted">คลิกขั้นบนผังเพื่อดูวาระ</span></div>
+    <div class="card">
+      <h2>ทางขึ้นหัวหน้าพรรค (ครบ 3 ทาง)</h2>
+      <ol id="politics-paths"></ol>
+    </div>
+    <div class="card">
+      <h2>ทะเบียนพรรค (คลิกแถว = สังกัด)</h2>
+      <table id="politics-parties"></table>
+      <div style="margin-top:8px"><b>ชื่อสำรอง (ตั้งพรรคเอง)</b></div>
+      <div id="politics-spare" style="font-size:13px"></div>
+    </div>
+    <div class="card">
+      <h2>กติกา (รอบ 8 + 14)</h2>
+      <ul>
+        <li>เข้าพรรคตอนลง ส.ส. ครั้งแรก (สุ่ม 3 จากทะเบียน) หรือการ์ดพรรคมาชวน · ท้องถิ่นไม่สังกัด</li>
+        <li>ย้ายพรรค: การ์ดดูด ส.ส. → ได้เงิน · ความสัมพันธ์ลด</li>
+        <li>ค่าพรรคมีผลตลอดที่เป็นสมาชิก</li>
+        <li>โอกาสชนะเลือกตั้งบนจอเป็นคำ ไม่โชว์ตัวเลข</li>
+      </ul>
+      <div class="muted" style="margin-top:6px;font-size:12px">ยังไม่ได้ตัดสิน: เงินตั้งพรรค · เกณฑ์คอนเน็คชั่นทางอัตโนมัติ · ขนาด ×1.5/ครึ่ง/ลดตามปี · ข้อมูลจาก politics-list-draft.md</div>
+    </div>
+  </aside>
+</div>
+</section>
+<script src="core.js"></script>
+<script>
+// ผังทั้งหกเคยเป็นหน้าละผัง สคริปต์แต่ละผังใช้ชื่อซ้ำกัน (W cv SEEDS) และ id ซ้ำกัน (map info here) ⇒ แต่ละผังรันในฟังก์ชันของตัวเอง
+// และเห็น document ที่ชี้เฉพาะ id ของผังตัวเอง (id ในหน้าขึ้นต้นด้วยชื่อผัง) · ผังเริ่มทำงานตอนเปิดครั้งแรก
+const MAPS = {};
+const mapDoc = (m) => {
+  const root = window.document.getElementById(m);
+  const fix = (s) => s.replace(/#([A-Za-z][\w-]*)/g, '#' + m + '-$1');
+  return {
+    getElementById: (id) => window.document.getElementById(m + '-' + id),
+    querySelector: (s) => root.querySelector(fix(s)),
+    querySelectorAll: (s) => root.querySelectorAll(fix(s)),
+    createElement: (t) => window.document.createElement(t),
+    fonts: window.document.fonts,
+  };
+};
+</script>
+<script>
+MAPS.continent = () => {
+const document = mapDoc('continent');
+const { fbm, pairKey: key, buildGrid, regions, paintLand, drawBorders, vignette, mountain, tree, decorate, compass, cartouche, icon, label, pin, badge, load, save, canvasPoint } = MapCore;
+// ---- ข้อมูลตาม continent-list-draft.md (รอบ 15 + 21) ----
+const R = {
+  'เฮลวาร์ด': { ruler: 'กษัตริย์', vibe: 'อาณาจักรมนุษย์ใหญ่ ขุนนางถือที่ดิน', races: 'มนุษย์ ชาวสัตว์', birth: 'บ่อยมาก', land: '#a9bf72', icon: 'castle' },
+  'เวอร์ดานี': { ruler: 'ดยุก', vibe: 'ลุ่มน้ำ ทุ่งนา ยุ้งฉางของทวีป', races: 'มนุษย์ ชาวสัตว์', birth: 'บ่อย', land: '#93c76a', icon: 'castle', deco: 'paddy' },
+  'มาริสฮาเวน': { ruler: 'สภาพ่อค้า', vibe: 'เมืองท่าเสรี', races: 'มนุษย์ ฮาล์ฟลิง', birth: 'บ่อย', land: '#c4c98e', icon: 'port' },
+  'เลียวเซล': { ruler: 'สภาอาวุโส', vibe: 'ป่าเอลฟ์', races: 'เอลฟ์', birth: 'กลาง', land: '#5f9a55', icon: 'tree', deco: 'forest' },
+  'กรอมดาล': { ruler: 'สภากิลด์', vibe: 'นครใต้ภู เหมือง', races: 'คนแคระ', birth: 'กลาง', land: '#9a8f80', icon: 'mine', deco: 'mountain' },
+  'ทุ่งเถ้าคาร์กัล': { ruler: 'สภาเผ่า', vibe: 'แดนพ่ายสงครามจอมมาร', races: 'ปีศาจ ออร์ค', birth: 'กลาง', land: '#7d6d66', icon: 'skull', deco: 'ash' },
+  'พนาไร้ชื่อ': { ruler: null, vibe: 'ป่ามอนสเตอร์', races: 'ออร์ค ชาวสัตว์', birth: 'กลาง', land: '#3f6e3d', deco: 'darkforest' },
+  'นอร์ธเวล': { ruler: 'หัวหน้าเผ่า', vibe: 'หิมะ 8 เดือน', races: 'มนุษย์', birth: 'น้อย', land: '#e3eaee', icon: 'hut', deco: 'snow' },
+  'ผาวายุ': { ruler: 'ผู้เฒ่า (คัดเลือก)', vibe: 'มังกรเฒ่าบนยอด', races: 'เชื้อมังกร', birth: 'หายาก', land: '#b0a596', icon: 'dragon', deco: 'peak' },
+  'หมู่เกาะเมฆา': { ruler: null, vibe: 'เกาะลอย ส่งของ', races: 'ฮาล์ฟลิง', birth: 'หายาก' },
+  'ผืนทรายชาด': { ruler: 'สภาคลัง', vibe: 'ชุมทางคาราวาน', races: 'มนุษย์ ออร์ค', birth: 'กลาง', land: '#dda56a', icon: 'tent', deco: 'dune' },
+  'เล็กซาเรีย': { ruler: 'สภารับรอง', vibe: 'นครสัญญา ทนาย', races: 'มนุษย์ คนแคระ', birth: 'น้อย', land: '#c1b98f', icon: 'city' },
+  'ออเรเลีย': { ruler: 'ประมุข (คัดเลือก)', vibe: 'นครศาสนจักร', races: 'มนุษย์', birth: 'น้อย', land: '#cfc690', icon: 'church' },
+  'ซีรอน': { ruler: 'อธิการ (คัดเลือก)', vibe: 'หอเวทมหาวิทยาลัย', races: 'เอลฟ์ มนุษย์', birth: 'น้อย', land: '#a6bb92', icon: 'tower' },
+  'บึงพันฝาย': { ruler: 'ผู้แทน', vibe: 'สาธารณรัฐสภาฝาย', races: 'ฮาล์ฟลิง', birth: 'กลาง', land: '#86a171', icon: 'hut', deco: 'marsh' },
+  'ปากเหวพันชั้น': { ruler: 'ผู้แทนเขต', vibe: 'เขตเสรีนักผจญภัย', races: 'ทุกเผ่า', birth: 'น้อย', land: '#968a72', icon: 'cave', deco: 'hill' },
+  'โคราลิส': { ruler: 'กัปตัน', vibe: 'เกาะโจรสลัด', races: 'มนุษย์ ชาวสัตว์', birth: 'น้อย', land: '#e0cf92', icon: 'flag' },
+  'เทือกพิษ': { ruler: null, vibe: 'ป่าอันตราย ของหายาก', races: 'ปีศาจ', birth: 'หายาก', land: '#5e5568', deco: 'poison' },
+  'โอรัน': { ruler: 'ผู้สำเร็จราชการ', vibe: 'เมืองหลวงเก่าล่มสลาย', races: 'มนุษย์', birth: 'น้อย', land: '#ab9f80', icon: 'ruin' },
+  'ทุ่งหญ้าเสียง': { ruler: null, vibe: 'เผ่าเร่ร่อน ม้า', races: 'ชาวสัตว์ ออร์ค', birth: 'กลาง', land: '#bccb74', deco: 'grass' },
+};
+const ADJ = {
+  'นอร์ธเวล': ['ผาวายุ', 'กรอมดาล', 'ทุ่งหญ้าเสียง'],
+  'ผาวายุ': ['นอร์ธเวล', 'กรอมดาล', 'หมู่เกาะเมฆา'],
+  'กรอมดาล': ['นอร์ธเวล', 'ผาวายุ', 'เฮลวาร์ด', 'ปากเหวพันชั้น'],
+  'เฮลวาร์ด': ['กรอมดาล', 'โอรัน', 'ออเรเลีย', 'เล็กซาเรีย', 'ผืนทรายชาด'],
+  'โอรัน': ['เฮลวาร์ด', 'ปากเหวพันชั้น', 'ทุ่งเถ้าคาร์กัล'],
+  'ปากเหวพันชั้น': ['กรอมดาล', 'โอรัน', 'เทือกพิษ'],
+  'ออเรเลีย': ['เฮลวาร์ด', 'ซีรอน', 'เวอร์ดานี'],
+  'ซีรอน': ['ออเรเลีย', 'เล็กซาเรีย', 'เลียวเซล'],
+  'เล็กซาเรีย': ['เฮลวาร์ด', 'ซีรอน', 'มาริสฮาเวน', 'ทุ่งหญ้าเสียง'],
+  'เลียวเซล': ['ซีรอน', 'พนาไร้ชื่อ', 'ทุ่งหญ้าเสียง'],
+  'พนาไร้ชื่อ': ['เลียวเซล', 'บึงพันฝาย'],
+  'เทือกพิษ': ['ปากเหวพันชั้น', 'ทุ่งเถ้าคาร์กัล'],
+  'ทุ่งเถ้าคาร์กัล': ['โอรัน', 'เทือกพิษ', 'ผืนทรายชาด'],
+  'ผืนทรายชาด': ['เฮลวาร์ด', 'ทุ่งเถ้าคาร์กัล', 'เวอร์ดานี'],
+  'เวอร์ดานี': ['ออเรเลีย', 'ผืนทรายชาด', 'บึงพันฝาย', 'มาริสฮาเวน'],
+  'บึงพันฝาย': ['เวอร์ดานี', 'พนาไร้ชื่อ', 'มาริสฮาเวน'],
+  'มาริสฮาเวน': ['เล็กซาเรีย', 'เวอร์ดานี', 'บึงพันฝาย', 'โคราลิส', 'หมู่เกาะเมฆา'],
+  'โคราลิส': ['มาริสฮาเวน'],
+  'หมู่เกาะเมฆา': ['ผาวายุ', 'มาริสฮาเวน'],
+  'ทุ่งหญ้าเสียง': ['นอร์ธเวล', 'เล็กซาเรีย', 'เลียวเซล'],
+};
+// เส้นทางที่แดนไม่ได้แตะกันบนแผนที่ — วาดเป็นเส้นทางพิเศษ
+const SPECIAL = {
+  'โคราลิส|มาริสฮาเวน': 'sea',
+  'มาริสฮาเวน|เล็กซาเรีย': 'trade',
+  'ผาวายุ|หมู่เกาะเมฆา': 'air',
+  'มาริสฮาเวน|หมู่เกาะเมฆา': 'air',
+};
+// เครือข่ายทางลับ (รอบ 22) — ซ่อนจนได้การ์ดแผนที่ลับ · ใช้ได้ใบละครั้ง
+const SECRET = [
+  ['เทือกพิษ', 'พนาไร้ชื่อ', 'ทางลับใต้พิภพ'],
+  ['ปากเหวพันชั้น', 'ซีรอน', 'ประตูมิติหอเวท'],
+  ['โอรัน', 'เวอร์ดานี', 'อุโมงค์ราชวงศ์เก่า'],
+  ['นอร์ธเวล', 'เลียวเซล', 'ทางน้ำแข็งใต้พไพร'],
+  ['ทุ่งเถ้าคาร์กัล', 'บึงพันฝาย', 'ทางเดินทัพจอมมาร'],
+  ['ผาวายุ', 'ผืนทรายชาด', 'โพรงมังกรใต้ทราย'],
+];
+const SKY = { x: 1090, y: 95 }; // หมู่เกาะเมฆาลอยเหนือทะเลมุมขวาบน
+
+// ---- แกนแผนที่ (ตรวจเขตติดกันด้วย node แล้ว: 17/20 คู่แดนแตะกัน · 3 คู่เป็นเส้นทางพิเศษ) ----
+const W = 1200, H = 800, STEP = 3;
+const SEEDS = {
+  'ผาวายุ': [[235, 150]],
+  'นอร์ธเวล': [[450, 95], [610, 100]],
+  'ทุ่งหญ้าเสียง': [[820, 150], [950, 220]],
+  'กรอมดาล': [[310, 225]],
+  'ปากเหวพันชั้น': [[130, 300]],
+  'เทือกพิษ': [[95, 470]],
+  'โอรัน': [[245, 395]],
+  'ทุ่งเถ้าคาร์กัล': [[210, 600]],
+  'ผืนทรายชาด': [[380, 565]],
+  'เฮลวาร์ด': [[430, 355]],
+  'เล็กซาเรีย': [[640, 285]],
+  'ออเรเลีย': [[560, 465]],
+  'ซีรอน': [[765, 400]],
+  'เลียวเซล': [[935, 330]],
+  'เวอร์ดานี': [[540, 640], [590, 735]],
+  'บึงพันฝาย': [[720, 640]],
+  'มาริสฮาเวน': [[790, 715], [700, 760]],
+  'พนาไร้ชื่อ': [[905, 560], [1010, 470]],
+  'โคราลิส': [[1110, 705]],
+};
+function isLand(x, y) {
+  const d = ((x - 560) / 545) ** 2 + ((y - 420) / 375) ** 2;
+  if (d + 0.45 * (fbm(x / 110, y / 110) - 0.5) < 1) return true;
+  const i = Math.hypot(x - 1110, y - 705) / 50;
+  return i + 0.5 * (fbm(x / 30, y / 30) - 0.5) < 1;
+}
+
+// ---- วาด ----
+const cv = document.getElementById('map');
+const ctx = cv.getContext('2d');
+// โคราลิสเป็นเกาะแยก — ช่องในวงเกาะเป็นของโคราลิสเท่านั้น และโคราลิสไม่ลามขึ้นแผ่นดินใหญ่
+const G = buildGrid({ w: W, h: H, step: STEP, seeds: SEEDS, isLand, allow: (x, y, n) => (Math.hypot(x - 1110, y - 705) < 90) === (n === 'โคราลิส') });
+const at = G.at;
+const town = (n) => (n === 'หมู่เกาะเมฆา' ? [SKY.x, SKY.y + 10] : SEEDS[n][0]);
+const ROUTES = new Set();
+for (const [a, ns] of Object.entries(ADJ)) for (const b of ns) ROUTES.add(key(a, b));
+
+// จุดในแต่ละแคว้น (ไว้โรยสัญลักษณ์ภูมิประเทศ) + เส้นแดนที่ไม่มีทาง
+const { cells, ridge } = regions(G, (a, b) => ROUTES.has(key(a, b)));
+
+const base = document.createElement('canvas');
+base.width = W; base.height = H;
+function paintBase() {
+  const b = base.getContext('2d');
+  paintLand(b, G, (n) => R[n].land, { cx: 560, cy: 420 });
+  drawBorders(b, G);
+  river(b);
+  for (const n of G.names) decorate(b, cells[n], SEEDS[n], R[n].deco);
+  // แนวเขากั้น — แดนติดกันแต่ไม่มีทาง
+  ridge.forEach(([x, y], k) => { if (k % 9 === 0) mountain(b, x, y, 7, '#857766', false); });
+  sky(b);
+  compass(b, 80, 720);
+  cartouche(b, 'ทวีปเอเธอร์การ์ด', '20 แคว้น · ย้ายได้ครั้งละ 1 ก้าวตามเส้นทาง');
+  vignette(b, W, H);
+}
+
+function river(b) {
+  // แม่น้ำสายใหญ่ของเวอร์ดานี ไหลจากเนินออเรเลียลงทะเลใต้
+  const pts = [[575, 430], [555, 520], [520, 600], [560, 680], [600, 760], [610, 810]];
+  b.strokeStyle = '#4b88b0'; b.lineCap = 'round';
+  for (let k = 0; k < pts.length - 1; k++) {
+    b.lineWidth = 2 + k * 1.1;
+    b.beginPath(); b.moveTo(...pts[k]);
+    const [x1, y1] = pts[k], [x2, y2] = pts[k + 1];
+    b.quadraticCurveTo((x1 + x2) / 2 + (k % 2 ? 22 : -22), (y1 + y2) / 2, x2, y2);
+    b.stroke();
+  }
+}
+function sky(b) {
+  // หมู่เกาะเมฆา: เกาะลอยเหนือทะเล
+  const cloud = (x, y, s) => { b.fillStyle = 'rgba(255,255,255,.85)'; for (const [dx, dy, r] of [[0, 0, 1], [0.8, 0.1, 0.8], [-0.8, 0.15, 0.75], [0.3, -0.45, 0.7]]) { b.beginPath(); b.arc(x + dx * s, y + dy * s, r * s, 0, Math.PI * 2); b.fill(); } };
+  for (const [dx, dy, s] of [[-38, 12, 22], [30, 0, 28], [0, 38, 18]]) {
+    const x = SKY.x + dx, y = SKY.y + dy;
+    b.fillStyle = 'rgba(0,0,0,.18)'; b.beginPath(); b.ellipse(x + 6, y + s + 40, s, s * 0.3, 0, 0, Math.PI * 2); b.fill();
+    b.beginPath(); b.moveTo(x - s, y); b.quadraticCurveTo(x, y + s * 1.6, x + s, y); b.closePath(); b.fillStyle = '#8a7356'; b.fill();
+    b.beginPath(); b.ellipse(x, y, s, s * 0.32, 0, 0, Math.PI * 2); b.fillStyle = '#9cc46e'; b.fill(); b.strokeStyle = '#3b2a1a'; b.lineWidth = 1.2; b.stroke();
+    tree(b, x - s * 0.3, y - 2, 4, '#3f7a3a');
+  }
+  cloud(SKY.x - 70, SKY.y + 55, 12); cloud(SKY.x + 72, SKY.y + 40, 10);
+}
+function routeStyle(kind) {
+  if (kind === 'sea') return { col: '#2d6f9c', dash: [8, 6], w: 2.5 };
+  if (kind === 'trade') return { col: '#c08a12', dash: [10, 5], w: 3 };
+  if (kind === 'secret') return { col: '#6a3d8f', dash: [3, 6], w: 2.5 };
+  if (kind === 'air') return { col: '#ffffff', dash: [2, 6], w: 2.5 };
+  return { col: '#7a4a1c', dash: [7, 4], w: 2.5 };
+}
+function drawRoutes(hot) {
+  const done = new Set();
+  for (const [a, ns] of Object.entries(ADJ)) for (const b of ns) {
+    const k = key(a, b);
+    if (done.has(k)) continue;
+    done.add(k);
+    const kind = SPECIAL[k] ?? 'road';
+    const st = routeStyle(kind);
+    const on = hot && (a === hot || b === hot);
+    const [x1, y1] = town(a), [x2, y2] = town(b);
+    // โค้งเล็กน้อยให้ดูเป็นทางจริง · ทางลับ/ทางการค้าโค้งมากกว่าเพื่อเลี่ยงตัวเมืองระหว่างทาง
+    const bend = kind === 'secret' ? 0.35 : kind === 'trade' ? 0.25 : kind === 'air' ? -0.08 : 0.12;
+    const mx = (x1 + x2) / 2 - (y2 - y1) * bend, my = (y1 + y2) / 2 + (x2 - x1) * bend;
+    ctx.save();
+    ctx.globalAlpha = hot && !on ? 0.25 : 1;
+    ctx.setLineDash([]);
+    ctx.strokeStyle = 'rgba(255,248,230,.6)'; ctx.lineWidth = st.w + 2.5;
+    if (kind !== 'air') { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.quadraticCurveTo(mx, my, x2, y2); ctx.stroke(); }
+    ctx.setLineDash(st.dash); ctx.strokeStyle = on ? '#d62f12' : st.col; ctx.lineWidth = on ? st.w + 1.5 : st.w;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.quadraticCurveTo(mx, my, x2, y2); ctx.stroke();
+    ctx.restore();
+  }
+}
+let sel = null;
+let showSecret = !!load('aethergard-secret', false);
+let dun = load('aethergard-dungeons', {});
+function drawSecret(hot) {
+  if (!showSecret) return;
+  for (const [a, b, name] of SECRET) {
+    const [x1, y1] = town(a), [x2, y2] = town(b);
+    const on = hot && (a === hot || b === hot);
+    const mx = (x1 + x2) / 2 - (y2 - y1) * 0.2, my = (y1 + y2) / 2 + (x2 - x1) * 0.2;
+    ctx.save();
+    ctx.globalAlpha = hot && !on ? 0.3 : 0.95;
+    ctx.setLineDash([3, 6]); ctx.lineCap = 'round';
+    ctx.strokeStyle = on ? '#e05cff' : '#9b4dd6'; ctx.lineWidth = on ? 4 : 3;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.quadraticCurveTo(mx, my, x2, y2); ctx.stroke();
+    // ชื่อทางกลางเส้น
+    const tx = 0.25 * x1 + 0.5 * mx + 0.25 * x2, ty = 0.25 * y1 + 0.5 * my + 0.25 * y2;
+    ctx.font = 'italic 12px Sarabun, sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 3; ctx.setLineDash([]);
+    ctx.strokeStyle = 'rgba(30,10,40,.8)'; ctx.strokeText(name, tx, ty); ctx.fillStyle = '#f0d9ff'; ctx.fillText(name, tx, ty);
+    ctx.restore();
+  }
+}
+function drawDungeons() {
+  for (const [n, st] of Object.entries(dun)) {
+    if (!st || !R[n]) continue;
+    const [x, y] = town(n);
+    badge(ctx, x + 22, y - 18, st === 'done' ? '✓' : st === 'found' ? '⚔' : '?', st === 'done' ? '#6b7a5a' : st === 'found' ? '#8a1c1c' : '#3d2a5c');
+  }
+}
+let here = load('aethergard-here', '');
+function render() {
+  ctx.drawImage(base, 0, 0);
+  const focus = sel || here || null;
+  if (focus && focus !== 'หมู่เกาะเมฆา') {
+    // ไฮไลต์แคว้นที่เลือก + แคว้นที่ไปต่อได้
+    const reach = new Set([focus, ...ADJ[focus]]);
+    ctx.save();
+    for (const n of G.names) {
+      if (reach.has(n)) continue;
+      ctx.fillStyle = 'rgba(30,20,10,.28)';
+      for (const [x, y] of cells[n]) ctx.fillRect(x - 1, y - 1, STEP, STEP);
+    }
+    ctx.restore();
+  }
+  drawRoutes(focus);
+  drawSecret(focus);
+  for (const n of Object.keys(R)) {
+    const [x, y] = town(n), r = R[n];
+    if (n !== 'หมู่เกาะเมฆา') icon(ctx, r.icon ?? 'camp', x, y, { gold: r.thai });
+    label(ctx, (r.thai ? '★ ' : '') + n, x, (n === 'หมู่เกาะเมฆา' ? y + 30 : y) + 27, { italic: !r.ruler, color: r.thai ? '#8a5a00' : '#2e1e10' });
+  }
+  drawDungeons();
+  if (here) { const [x, y] = town(here); pin(ctx, x, y); }
+}
+
+function info(n) {
+  const el = document.getElementById('info');
+  if (!n) { el.innerHTML = '<span class="muted">คลิกแคว้นบนแผนที่เพื่อดูข้อมูล</span>'; return; }
+  const r = R[n];
+  const via = (b) => { const k = SPECIAL[key(n, b)]; return k ? ` <span class="muted">(${{ sea: 'ทางเรือ', trade: 'ถนนการค้า', secret: 'ทางลับ', air: 'เรือเหาะ' }[k]})</span>` : ''; };
+  el.innerHTML = `<h2>${r.thai ? '★ ' : ''}${n}</h2>
+    <div>${r.vibe}</div>
+    <div class="muted" style="margin-top:6px">ผู้ปกครอง: ${r.ruler ?? 'ไม่มี — ตั้งถิ่นฐานเองได้'}</div>
+    <div class="muted">เผ่าที่เกิดได้: ${r.races} · โอกาสเกิด: ${r.birth}</div>
+    <div style="margin-top:8px">ย้ายต่อได้ 1 ก้าว:</div>
+    <div class="go">${ADJ[n].map((b) => b + via(b)).join('<br>')}</div>${(() => { const s = SECRET.filter(([a, b]) => a === n || b === n); return s.length ? `<div class="muted" style="margin-top:6px">ทางลับ (ต้องมีการ์ด): ${s.map(([a, b, nm]) => (a === n ? b : a) + ' · ' + nm).join('<br>')}</div>` : ''; })()}`;
+}
+function hereInfo() {
+  document.getElementById('hereInfo').innerHTML = here ? `ไปต่อได้: <b>${ADJ[here].join(' · ')}</b>` : '';
+}
+
+const selEl = document.getElementById('here');
+for (const n of Object.keys(R).sort((a, b) => a.localeCompare(b, 'th'))) selEl.add(new Option(n, n));
+selEl.value = here;
+selEl.addEventListener('change', () => { here = selEl.value; save('aethergard-here', here); sel = null; info(here || null); hereInfo(); render(); });
+
+cv.addEventListener('click', (e) => {
+  const [x, y] = canvasPoint(cv, e);
+  let hit = null;
+  if (Math.hypot(x - SKY.x, y - SKY.y - 15) < 70) hit = 'หมู่เกาะเมฆา';
+  else { const v = at(Math.floor(x / STEP), Math.floor(y / STEP)); hit = v >= 0 ? G.names[v] : null; }
+  sel = hit && hit !== sel ? hit : null;
+  info(sel || here || null);
+  render();
+});
+
+document.getElementById('showSecret').checked = showSecret;
+document.getElementById('showSecret').addEventListener('change', (e) => { showSecret = e.target.checked; save('aethergard-secret', showSecret); render(); });
+document.querySelectorAll('button[data-d]').forEach((b) => b.addEventListener('click', () => {
+  const n = sel || here;
+  if (!n) return;
+  dun[n] = b.dataset.d || undefined;
+  save('aethergard-dungeons', dun);
+  render();
+}));
+document.getElementById('clearDun').addEventListener('click', () => { dun = {}; save('aethergard-dungeons', dun); render(); });
+paintBase();
+info(here || null);
+hereInfo();
+render();
+};
+</script>
+<script>
+MAPS.afterlife = () => {
+const document = mapDoc('afterlife');
+const { fbm, buildGrid, regions, paintLand, drawBorders, vignette, decorate, cartouche, icon, label, pin, badge, load, save, canvasPoint } = MapCore;
+// ---- ข้อมูลตาม afterlife-list-draft.md (รอบ 16) · เรียงบนลงล่าง ----
+const REALMS = [
+  { name: 'เทวดา', life: 100, mood: 'สุขมาก', deck: ['เสวยสุข', 'วิมาน', 'หลงสุขจนบุญหมดเร็ว'], icon: 'temple', land: '#e6d48e', deco: 'cloud' },
+  { name: 'มนุษย์', life: 60, mood: 'กลาง (วิญญาณรอเกิด)', deck: ['วิญญาณรอเกิด', 'ทบทวนชาติก่อน', 'เลือกครอบครัว'], icon: 'castle', land: '#9cc46e', deco: 'grass' },
+  { name: 'ดิรัจฉาน', life: 50, mood: 'ทุกข์เล็กน้อย', deck: ['เกิดเป็นสัตว์สั้น ๆ', 'เอาตัวรอด', 'เจอคนใจดี'], icon: 'claw', land: '#b9a067', deco: 'forest' },
+  { name: 'เปรต', life: 40, mood: 'ทุกข์', deck: ['หิวรอส่วนบุญ', 'เฝ้าบ้านเก่า', 'ขออุทิศจากลูกหลาน'], icon: 'ruin', land: '#8d8499', deco: 'ash' },
+  { name: 'นรก', life: 30, mood: 'ทุกข์มาก', deck: ['ชดใช้บาปทีละหมวด (SIN_CATS)', 'เจอคนที่เคยทำร้าย'], icon: 'skull', land: '#a9483a', deco: 'flame' },
+];
+const COMMON = ['ฟังธรรม', 'เห็นลูกหลานทำบุญอุทิศ', 'พบบรรพบุรุษ'];
+const FOCUS = [
+  ['ชดใช้กรรม', 'บัญชีบาปลดเร็วขึ้น · ทุกข์มาก'],
+  ['ฟังธรรม', '+ปัญญาธรรม · ปล่อยวางเสียน้อยลง'],
+  ['เฝ้าลูกหลาน', '+ความผูกพัน · เกิดในตระกูลเดิมง่ายขึ้น'],
+  ['เสวยสุข', '+สุข · ชีวิตทิพย์ลดเร็ว (บุญหมด)'],
+  ['ทำบุญในภพ', 'สะสมบุญไปร้านบุญท้ายวง · ชีวิตทิพย์ลด'],
+];
+const YEAR_BASE = 3;
+const YEAR_DIV = 2;
+const YEAR_CAP = 30;
+const years = (net) => Math.min(YEAR_CAP, YEAR_BASE + Math.abs(net) / YEAR_DIV);
+
+// ---- ผัง: แถบละภูมิ เส้นแบ่งเป็นคลื่นจาก noise ----
+const W = 1200, H = 800, STEP = 3;
+const TOP = 100, BAND = 126;
+const rowY = (k) => TOP + BAND * k + BAND / 2;
+const SEEDS = Object.fromEntries(REALMS.map((r, k) => [r.name, [[200, rowY(k)], [520, rowY(k)], [840, rowY(k)], [1080, rowY(k)]]]));
+const isLand = (x, y) => {
+  const wob = 30 * (fbm(x / 80, y / 80) - 0.5);
+  return x > 40 + wob && x < W - 40 - wob && y > TOP - 10 + wob && y < TOP + BAND * 5 + 5 - wob;
+};
+const G = buildGrid({ w: W, h: H, step: STEP, seeds: SEEDS, isLand });
+const { cells } = regions(G);
+const R = Object.fromEntries(REALMS.map((r) => [r.name, r]));
+const town = (n) => [600, rowY(REALMS.indexOf(R[n]))];
+
+const cv = document.getElementById('map');
+const ctx = cv.getContext('2d');
+const base = document.createElement('canvas');
+base.width = W; base.height = H;
+(function paintBase() {
+  const b = base.getContext('2d');
+  paintLand(b, G, (n) => R[n].land, { inner: '#3b3352', outer: '#120f1c', r0: 120, r1: 820, shore: [170, 150, 210], waves: false });
+  drawBorders(b, G);
+  for (const r of REALMS) decorate(b, cells[r.name], [town(r.name), [380, town(r.name)[1]], [820, town(r.name)[1]]], r.deco);
+  cartouche(b, 'ปรโลก · ภูมิ 5', 'บนสุข ล่างทุกข์ · อยู่ตามบัญชีบุญบาป แล้วไปเกิด', { w: 360 });
+  // แกนกลาง = กองกลางที่ทุกภูมิจั่วได้
+  b.save();
+  b.strokeStyle = 'rgba(255,245,215,.55)'; b.setLineDash([2, 7]); b.lineWidth = 3; b.lineCap = 'round';
+  b.beginPath(); b.moveTo(600, TOP + 8); b.lineTo(600, TOP + BAND * 5 - 8); b.stroke();
+  b.restore();
+  vignette(b, W, H);
+})();
+
+let sel = null;
+let here = load('aethergard-afterlife-here', '');
+let net = load('aethergard-afterlife-net', 11);
+let year = load('aethergard-afterlife-year', 0);
+
+function render() {
+  ctx.drawImage(base, 0, 0);
+  const focus = sel || here;
+  if (focus) {
+    ctx.fillStyle = 'rgba(15,10,25,.4)';
+    for (const r of REALMS) if (r.name !== focus) for (const [x, y] of cells[r.name]) ctx.fillRect(x - 1, y - 1, STEP, STEP);
+  }
+  for (const r of REALMS) {
+    const [x, y] = town(r.name);
+    icon(ctx, r.icon, x, y);
+    label(ctx, `ภูมิ${r.name}`, x, y + 30, { size: 17 });
+    label(ctx, `ชีวิตทิพย์ ${r.life} · ${r.mood}`, x, y + 48, { size: 12, color: '#3b2a1a' });
+    // ธีมกองการ์ดซ้าย/ขวาของแกน
+    r.deck.forEach((d, i) => label(ctx, d, i % 2 ? 900 : 300, y - 14 + Math.floor(i / 2) * 22 + (r.deck.length < 3 ? 10 : 0), { size: 13, color: '#4a3020' }));
+  }
+  label(ctx, `กองกลาง: ${COMMON.join(' · ')}`, 600, TOP + BAND * 5 + 32, { size: 14, color: '#2e1e10' });
+  if (here) {
+    const [x, y] = town(here);
+    pin(ctx, x, y);
+    const total = years(net);
+    badge(ctx, x + 70, y - 20, `${Math.min(year, Math.ceil(total))}`, '#8a3b12', 13);
+    label(ctx, `/${total} ปี`, x + 104, y - 15, { size: 12, color: '#2e1e10' });
+  }
+}
+
+function info(n) {
+  const el = document.getElementById('info');
+  if (!n) { el.innerHTML = '<span class="muted">คลิกภูมิบนผังเพื่อดูกองการ์ด</span>'; return; }
+  const r = R[n];
+  el.innerHTML = `<h2>ภูมิ${n}</h2>
+    <div>ชีวิตทิพย์เริ่ม <b>${r.life}</b> · ${r.mood}</div>
+    <div style="margin-top:6px">กองการ์ดภูมินี้:</div><ul>${r.deck.map((d) => `<li>${d}</li>`).join('')}</ul>
+    <div class="muted" style="margin-top:6px">+ กองกลาง: ${COMMON.join(' · ')}</div>`;
+}
+function yearsInfo() {
+  const t = years(net);
+  document.getElementById('years').innerHTML = `ปีทิพย์ที่ต้องอยู่ <span class="big">${t}</span> ปี <span class="muted">= ${YEAR_BASE} + |${net}| ÷ ${YEAR_DIV}${t === YEAR_CAP ? ' (ชนเพดาน)' : ''}</span>`;
+}
+
+const hereEl = document.getElementById('here');
+for (const r of REALMS) hereEl.add(new Option(r.name, r.name));
+hereEl.value = here;
+const netEl = document.getElementById('net'), yearEl = document.getElementById('year');
+netEl.value = net; yearEl.value = year;
+hereEl.addEventListener('change', () => { here = hereEl.value; save('aethergard-afterlife-here', here); sel = null; info(here || null); render(); });
+netEl.addEventListener('input', () => { net = Number(netEl.value) || 0; save('aethergard-afterlife-net', net); yearsInfo(); render(); });
+yearEl.addEventListener('input', () => { year = Math.max(0, Math.floor(Number(yearEl.value) || 0)); save('aethergard-afterlife-year', year); render(); });
+cv.addEventListener('click', (e) => {
+  const [x, y] = canvasPoint(cv, e);
+  const v = G.at(Math.floor(x / STEP), Math.floor(y / STEP));
+  const hit = v >= 0 ? G.names[v] : null;
+  sel = hit && hit !== sel ? hit : null;
+  info(sel || here || null);
+  render();
+});
+document.getElementById('focus').innerHTML = FOCUS.map(([f, e]) => `<tr><td><b>${f}</b></td><td>${e}</td></tr>`).join('');
+info(here || null);
+yearsInfo();
+render();
+};
+</script>
+<script>
+MAPS.dungeon = () => {
+const document = mapDoc('dungeon');
+const { fbm, buildGrid, regions, paintLand, drawBorders, vignette, decorate, cartouche, icon, label, pin, badge, load, save, canvasPoint } = MapCore;
+// ---- ข้อมูลตาม decisions.md รอบ 22 + ชื่อแคว้นจาก continent-list-draft.md ----
+const REGIONS = ['เฮลวาร์ด', 'เวอร์ดานี', 'มาริสฮาเวน', 'เลียวเซล', 'กรอมดาล', 'ทุ่งเถ้าคาร์กัล', 'พนาไร้ชื่อ', 'นอร์ธเวล', 'ผาวายุ', 'หมู่เกาะเมฆา', 'ผืนทรายชาด', 'เล็กซาเรีย', 'ออเรเลีย', 'ซีรอน', 'บึงพันฝาย', 'ปากเหวพันชั้น', 'โคราลิส', 'เทือกพิษ', 'โอรัน', 'ทุ่งหญ้าเสียง'];
+// แคว้นอันตราย = โอกาสเกิดดันเจียน ×3: 4 แคว้นไม่มีผู้ปกครอง + ปากเหวพันชั้น + คาร์กัล + โอรัน
+const DANGER = ['พนาไร้ชื่อ', 'หมู่เกาะเมฆา', 'เทือกพิษ', 'ทุ่งหญ้าเสียง', 'ปากเหวพันชั้น', 'ทุ่งเถ้าคาร์กัล', 'โอรัน'];
+const FLOOR_MIN = 5;
+const FLOOR_MAX = 10;
+const ROOM = {
+  '': { name: 'ยังไม่รู้', icon: null },
+  trap: { name: 'กับดัก', icon: 'trap' },
+  treasure: { name: 'สมบัติ', icon: 'chest' },
+  monster: { name: 'มอนสเตอร์', icon: 'claw' },
+};
+const CYCLE = ['', 'trap', 'treasure', 'monster'];
+
+// ---- สถานะ: ต่อแคว้น { floors, reached (0 = ยังไม่เข้า · N+1 = ถึงบอส), rooms: { ชั้น: ชนิด } } ----
+const PINNED = load('aethergard-dungeons', {}); // ปักจากแผนที่ทวีป
+let runs = load('aethergard-dungeon-runs', {});
+const ordered = [...REGIONS.filter((n) => PINNED[n]), ...REGIONS.filter((n) => !PINNED[n]).sort((a, b) => a.localeCompare(b, 'th'))];
+let where = load('aethergard-dungeon-where', '') || ordered[0];
+let sel = null;
+const run = () => (runs[where] ??= { floors: 7, reached: 0, rooms: {} });
+const persist = () => save('aethergard-dungeon-runs', runs);
+
+const W = 1200, H = 800, STEP = 4;
+const cv = document.getElementById('map');
+const ctx = cv.getContext('2d');
+const base = document.createElement('canvas');
+base.width = W; base.height = H;
+let G, cells, centers, roomKeys;
+
+// ห้องเดินงูลง 3 แถว ซ้าย→ขวา ขวา→ซ้าย · ห้องสุดท้าย = บอส
+function layout(n) {
+  const total = n + 1, perRow = Math.ceil(total / 3), pts = [];
+  for (let k = 0; k < total; k++) {
+    const row = Math.floor(k / perRow), col = k % perRow;
+    const t = perRow === 1 ? 0.5 : col / (perRow - 1);
+    const x = 190 + (row % 2 ? 1 - t : t) * 820;
+    pts.push([x + 30 * (fbm(k * 1.7, 3) - 0.5), 190 + row * 220 + 40 * (fbm(k * 2.3, 7) - 0.5)]);
+  }
+  return pts;
+}
+const distSeg = (x, y, [x1, y1], [x2, y2]) => {
+  const dx = x2 - x1, dy = y2 - y1, t = Math.max(0, Math.min(1, ((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy)));
+  return Math.hypot(x - x1 - t * dx, y - y1 - t * dy);
+};
+const ENTRY = () => [centers[0][0] - 120, centers[0][1] - 70];
+function depthColor(k, n) {
+  if (k === n) return '#6b2a24';
+  const t = n > 1 ? k / (n - 1) : 0;
+  const a = [196, 172, 128], b = [128, 82, 62];
+  return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
+}
+
+function build() {
+  const n = run().floors;
+  centers = layout(n);
+  roomKeys = centers.map((_, k) => (k === n ? 'boss' : String(k + 1)));
+  const seeds = Object.fromEntries(roomKeys.map((r, k) => [r, [centers[k]]]));
+  const path = [ENTRY(), ...centers];
+  const isLand = (x, y) => {
+    const wob = 40 * (fbm(x / 45, y / 45) - 0.5);
+    if (centers.some(([cx, cy], k) => Math.hypot(x - cx, y - cy) + wob < (k === n ? 105 : 78))) return true;
+    for (let k = 0; k < path.length - 1; k++) if (distSeg(x, y, path[k], path[k + 1]) + wob * 0.5 < 22) return true;
+    return false;
+  };
+  G = buildGrid({ w: W, h: H, step: STEP, seeds, isLand });
+  ({ cells } = regions(G));
+  const b = base.getContext('2d');
+  paintLand(b, G, (r) => depthColor(roomKeys.indexOf(r), n), { inner: '#3a302a', outer: '#120d0b', r0: 150, r1: 760, shore: [90, 70, 55], waves: false });
+  drawBorders(b, G);
+  roomKeys.forEach((r, k) => decorate(b, cells[r], [centers[k]], k === n ? 'ash' : k >= n * 0.6 ? 'hill' : null));
+  cartouche(b, `ดันเจียนลับ · ${where}`, `${n} ชั้น + บอส · ถอยได้ทุกชั้น เข้าใหม่เริ่มชั้น 1`, { w: 380 });
+  vignette(b, W, H);
+}
+
+function render() {
+  const r = run(), n = r.floors;
+  ctx.drawImage(base, 0, 0);
+  // ห้องที่ยังลงไม่ถึง = มืด
+  ctx.fillStyle = 'rgba(10,6,4,.55)';
+  roomKeys.forEach((rk, k) => { if (k + 1 > r.reached) for (const [x, y] of cells[rk]) ctx.fillRect(x - 1, y - 1, STEP, STEP); });
+  const [ex, ey] = ENTRY();
+  icon(ctx, 'door', ex, ey);
+  label(ctx, 'ทางเข้า', ex, ey + 27, { size: 13 });
+  roomKeys.forEach((rk, k) => {
+    const [x, y] = centers[k];
+    const boss = k === n;
+    if (boss) icon(ctx, 'skull', x, y);
+    else if (ROOM[r.rooms[rk] || ''].icon) icon(ctx, ROOM[r.rooms[rk]].icon, x, y);
+    else badge(ctx, x, y, '?', '#5b4a3a', 11);
+    label(ctx, boss ? 'บอส' : `ชั้น ${k + 1}`, x, y + 27, { color: sel === k ? '#d62f12' : '#2e1e10' });
+    if (!boss && r.rooms[rk]) label(ctx, ROOM[r.rooms[rk]].name, x, y + 44, { size: 12, color: '#5b3a1a' });
+  });
+  if (r.reached > 0) { const [x, y] = centers[r.reached - 1]; pin(ctx, x, y); }
+  info();
+}
+
+function info() {
+  const r = run(), n = r.floors;
+  const cnt = (t) => Object.values(r.rooms).filter((v) => v === t).length;
+  document.getElementById('runInfo').innerHTML = r.reached === 0
+    ? '<span class="muted">ยังไม่เข้า</span>'
+    : `ลงถึง <b>${r.reached > n ? 'ห้องบอส' : 'ชั้น ' + r.reached}</b> จาก ${n} ชั้น<br><span class="muted">กับดัก ${cnt('trap')} · สมบัติ ${cnt('treasure')} · มอนสเตอร์ ${cnt('monster')}</span>`;
+  document.getElementById('whereInfo').innerHTML = `${DANGER.includes(where) ? 'แคว้นอันตราย — โอกาสเกิด ×3' : 'แคว้นทั่วไป'}${PINNED[where] ? ` · ปักไว้บนแผนที่ทวีป: ${{ rumor: '? ข่าวลือ', found: '⚔ เจอแล้ว', done: '✓ ผ่านแล้ว' }[PINNED[where]]}` : ''}`;
+}
+
+const whereEl = document.getElementById('where');
+for (const n of ordered) whereEl.add(new Option((PINNED[n] ? '📍 ' : '') + n + (DANGER.includes(n) ? ' (อันตราย)' : ''), n));
+whereEl.value = where;
+const floorsEl = document.getElementById('floors');
+for (let k = FLOOR_MIN; k <= FLOOR_MAX; k++) floorsEl.add(new Option(`${k} ชั้น`, k));
+const sync = () => { floorsEl.value = run().floors; sel = null; build(); render(); };
+whereEl.addEventListener('change', () => { where = whereEl.value; save('aethergard-dungeon-where', where); sync(); });
+floorsEl.addEventListener('change', () => {
+  const r = run();
+  r.floors = +floorsEl.value;
+  r.reached = Math.min(r.reached, r.floors + 1);
+  for (const k of Object.keys(r.rooms)) if (+k > r.floors) delete r.rooms[k];
+  persist(); sync();
+});
+cv.addEventListener('click', (e) => {
+  const [x, y] = canvasPoint(cv, e);
+  const v = G.at(Math.floor(x / STEP), Math.floor(y / STEP));
+  if (v < 0) { sel = null; render(); return; }
+  const k = roomKeys.indexOf(G.names[v]);
+  const rk = roomKeys[k];
+  if (sel === k && rk !== 'boss') {
+    const r = run();
+    r.rooms[rk] = CYCLE[(CYCLE.indexOf(r.rooms[rk] || '') + 1) % CYCLE.length];
+    if (!r.rooms[rk]) delete r.rooms[rk];
+    persist();
+  }
+  sel = k;
+  render();
+});
+document.getElementById('reach').addEventListener('click', () => { if (sel == null) return; run().reached = sel + 1; persist(); render(); });
+document.getElementById('retreat').addEventListener('click', () => { const r = run(); r.reached = 0; r.rooms = {}; persist(); sel = null; render(); });
+
+// คำอธิบายสัญลักษณ์วาดด้วยไอคอนชุดเดียวกับแผนที่
+const legend = document.getElementById('legend');
+for (const [t, txt] of [['door', 'ทางเข้า'], ['trap', 'กับดัก'], ['chest', 'สมบัติ'], ['claw', 'มอนสเตอร์'], ['skull', 'บอส']]) {
+  const c = document.createElement('canvas'); c.width = 26; c.height = 26; c.style.cssText = 'display:inline-block;width:26px;height:26px;vertical-align:middle;box-shadow:none;cursor:default';
+  icon(c.getContext('2d'), t, 13, 13);
+  const row = document.createElement('div'); row.style.margin = '3px 0'; row.append(c, ' ' + txt); legend.append(row);
+}
+legend.insertAdjacentHTML('beforeend', '<div class="muted" style="font-size:12px">สีห้องเข้มลงตามความลึก · ห้องที่ยังลงไม่ถึงมืด · หมุดแดง = ชั้นที่อยู่</div>');
+sync();
+};
+</script>
+<script>
+MAPS.lineage = () => {
+const document = mapDoc('lineage');
+const { label, badge, vignette, cartouche, load, save } = MapCore;
+// ---- ข้อมูลตามแกน next-life main (src/engine: CLASSES · REALMS · KIN_TIERS · FAME.names · FAMILY_TITLES) · ตรวจด้วย node maps/check-data.mjs ----
+const CLASSES = ['ยากไร้', 'ยากจนมาก', 'ยากจน', 'ค่อนข้างจน', 'ชนชั้นกลางล่าง', 'ชนชั้นกลาง', 'ชนชั้นกลางบน', 'มีอันจะกิน', 'ร่ำรวย', 'มั่งคั่ง'];
+const REALMS = ['นรก', 'เปรต', 'ดิรัจฉาน', 'มนุษย์', 'เทวดา'];
+const KIN = ['ลูก', 'หลาน', 'เหลน'];
+const FAME = ['ไร้ชื่อ', 'มีหน้ามีตา', 'ผู้มีบารมีในถิ่น', 'ตระกูลใหญ่'];
+const FAMILY_TITLES = ['ตระกูลไต่บันได', 'บรรพบุรุษไม่เคยตกนรก', 'หนี้ที่ส่งต่อกันมาสามรุ่น', 'ตระกูลอายุยืน', 'ผีบรรพบุรุษเฝ้าบ้าน', 'ดวงวิญญาณพเนจร', 'ตระกูลมีเทวดา'];
+const KEY = 'nextlife-lineage';
+// อักษรในวงภูมิ = พยัญชนะหลัก (ตัวแรกของ เปรต/เทวดา เป็นสระลอย อ่านไม่ออก)
+const REALM_GLYPH = { นรก: 'น', เปรต: 'ป', ดิรัจฉาน: 'ด', มนุษย์: 'ม', เทวดา: 'ท' };
+const REALM_COL = { นรก: '#b0412e', เปรต: '#8a5a8a', ดิรัจฉาน: '#6f7d3a', มนุษย์: '#9a7d42', เทวดา: '#c8961e' };
+
+// แถวเดียวกับที่เกมเก็บ: {name, cls, age, gone, realm, path, tier} หรือ {isekai, name, world, ending}
+// บรรทัดจากเกม (lineageText): "รุ่นที่ N · [ชื่อ ·] เพศ · [จังหวัด ·] ฐานะX · ตายอายุ|หายตัวไปตอนอายุ N · ไปภูมิY [· กลับมาเกิดเป็นลูก/หลาน/เหลน] [· …]"
+//                           ต่างโลก: "รุ่นที่ N · ชื่อ · ต่างโลก (โลก) · ตอนจบ"
+function parseLine(line) {
+  const parts = line.trim().split(' · ');
+  if (!/^รุ่นที่ \d+$/.test(parts[0] ?? '')) return null;
+  const away = parts.findIndex((p) => /^ต่างโลก \(.+\)$/.test(p));
+  if (away > 0) return { isekai: true, name: parts.slice(1, away).join(' · '), world: parts[away].slice('ต่างโลก ('.length, -1), ending: parts.slice(away + 1).join(' · ') };
+  const cls = parts.find((p) => p.startsWith('ฐานะ'))?.slice(4);
+  const end = parts.find((p) => /^(ตายอายุ|หายตัวไปตอนอายุ) \d+$/.test(p));
+  const realm = parts.find((p) => p.startsWith('ไปภูมิ'))?.slice(6);
+  if (!CLASSES.includes(cls) || !end || !REALMS.includes(realm)) return null;
+  const kin = parts.find((p) => p.startsWith('กลับมาเกิดเป็น'))?.slice(14);
+  const sexAt = parts.findIndex((p) => p === 'ชาย' || p === 'หญิง');
+  return { name: sexAt > 1 ? parts.slice(1, sexAt).join(' · ') : '', cls, age: Number(end.match(/\d+$/)[0]), gone: end.startsWith('หาย'), realm, path: KIN.includes(kin) ? 'child' : 'karma', tier: KIN.indexOf(kin) + 1 || null };
+}
+
+let state = load(KEY, null);
+if (!state || !Array.isArray(state.rows)) state = { rows: [], fame: 0, titles: [] };
+const persist = () => save(KEY, state);
+
+const cv = document.getElementById('map');
+const c = cv.getContext('2d');
+const W = cv.width, H = cv.height;
+const mix = (a, b, t) => `rgb(${[1, 3, 5].map((k) => Math.round(parseInt(a.slice(k, k + 2), 16) + (parseInt(b.slice(k, k + 2), 16) - parseInt(a.slice(k, k + 2), 16)) * t)).join(',')})`;
+const clsCol = (cls) => mix('#5a4322', '#f0d78c', Math.max(0, CLASSES.indexOf(cls)) / (CLASSES.length - 1));
+
+function draw() {
+  const g = c.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#2a1f14'); g.addColorStop(1, '#17110d');
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
+  cartouche(c, 'ผังตระกูล', `${state.rows.length} รุ่น · ชื่อเสียง ${FAME[state.fame]}${state.titles.length ? ` · ฉายาตระกูล ${state.titles.length}` : ''}`, { x: 20, y: 18, w: 460 });
+  const rows = state.rows;
+  if (!rows.length) {
+    label(c, 'ยังไม่มีรุ่นในผัง — วางข้อความจากเกม หรือเพิ่มรุ่นเอง', W / 2, H / 2, { size: 18 });
+    vignette(c, W, H);
+    return;
+  }
+  const left = 70, right = W - 70, gap = rows.length > 1 ? (right - left) / (rows.length - 1) : 0;
+  const yHome = H * 0.62, yAway = H * 0.34, r = Math.max(9, Math.min(22, gap * 0.3 || 22));
+  const pts = rows.map((l, i) => [rows.length > 1 ? left + i * gap : W / 2, l.isekai ? yAway : yHome]);
+  // เส้นต่อรุ่น: ทองทึบระหว่างชาติไทย · ประเส้นเมื่อแตะชาติต่างโลก · ทางเป็นลูกหลาน = เส้นหนา
+  for (let i = 1; i < pts.length; i++) {
+    const away = rows[i - 1].isekai || rows[i].isekai;
+    c.save();
+    c.setLineDash(away ? [6, 6] : []);
+    c.strokeStyle = away ? 'rgba(122,162,200,.75)' : 'rgba(217,180,90,.8)';
+    c.lineWidth = !away && rows[i - 1].path === 'child' ? 5 : 2.5;
+    c.beginPath(); c.moveTo(...pts[i - 1]); c.lineTo(...pts[i]); c.stroke();
+    c.restore();
+  }
+  const dense = gap && gap < 70;
+  rows.forEach((l, i) => {
+    const [x, y] = pts[i];
+    c.save();
+    c.fillStyle = l.isekai ? '#2c3e52' : clsCol(l.cls);
+    c.strokeStyle = l.isekai ? '#7aa2c8' : '#17110d';
+    c.lineWidth = 2;
+    c.setLineDash(l.gone ? [4, 3] : []);
+    c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); c.stroke();
+    c.restore();
+    c.fillStyle = l.isekai ? '#cfe0f0' : '#17110d';
+    c.font = `bold ${Math.round(r * 0.8)}px Sarabun, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(String(i + 1), x, y + 1);
+    if (l.isekai) {
+      if (!dense) label(c, l.world || 'ต่างโลก', x, y - r - 10, { size: 12, color: '#2c3e52' });
+      return;
+    }
+    if (!dense && l.name) label(c, l.name, x, y - r - 10, { size: 12 });
+    label(c, `${l.gone ? 'หาย' : 'อายุ'} ${l.age}`, x, y + r + 18, { size: dense ? 10 : 12 });
+    badge(c, x, y + r + 40, REALM_GLYPH[l.realm], REALM_COL[l.realm], dense ? 8 : 10);
+    if (!dense) label(c, l.realm, x, y + r + 66, { size: 11, color: REALM_COL[l.realm] });
+    if (l.path === 'child' && i + 1 < rows.length && !dense) label(c, `เกิดเป็น${KIN[(l.tier ?? 1) - 1]}`, (x + pts[i + 1][0]) / 2, yHome - 14, { size: 11, italic: true, color: '#8a3b12' });
+  });
+  // แถบล่าง: ฐานะไล่สี 10 ชั้น + ภูมิ 5
+  CLASSES.forEach((cl, k) => { c.fillStyle = clsCol(cl); c.fillRect(20 + k * 26, H - 30, 24, 10); });
+  label(c, 'ฐานะต่ำ → สูง', 20 + 130, H - 36, { size: 11 });
+  REALMS.forEach((rl, k) => badge(c, 330 + k * 26, H - 25, REALM_GLYPH[rl], REALM_COL[rl], 9));
+  label(c, 'ภูมิที่ไป', 330 + 52, H - 40, { size: 11 });
+  vignette(c, W, H);
+}
+
+function table() {
+  document.getElementById('rows').innerHTML = state.rows.map((l, i) => `<tr><td>รุ่นที่ ${i + 1}</td><td>${l.isekai ? `${l.name} · ต่างโลก (${l.world}) · ${l.ending ?? ''}` : `${l.name ? `${l.name} · ` : ''}ฐานะ${l.cls} · ${l.gone ? 'หายตัวไปตอนอายุ' : 'ตายอายุ'} ${l.age} · ไปภูมิ${l.realm}${l.path === 'child' ? ` · กลับมาเกิดเป็น${KIN[(l.tier ?? 1) - 1]}` : ''}`}</td><td class="x" data-i="${i}">ลบ</td></tr>`).join('') || '<tr><td class="muted">ยังไม่มี</td></tr>';
+}
+function all() { draw(); table(); }
+
+const fill = (id, xs) => { const s = document.getElementById(id); xs.forEach((x, i) => s.add(new Option(x, String(i)))); return s; };
+fill('fCls', CLASSES).value = '2';
+fill('fRealm', REALMS).value = '3';
+fill('fPath', ['ไปตามกรรม', ...KIN.map((k) => `กลับมาเกิดเป็น${k}`)]);
+const fameEl = fill('fame', FAME);
+fameEl.value = String(state.fame);
+fameEl.onchange = () => { state.fame = Number(fameEl.value); persist(); draw(); };
+document.getElementById('titles').innerHTML = FAMILY_TITLES.map((t) => `<label class="row"><input type="checkbox" value="${t}"${state.titles.includes(t) ? ' checked' : ''}> ${t}</label>`).join('');
+document.getElementById('titles').onchange = (e) => {
+  state.titles = [...document.querySelectorAll('#titles input:checked')].map((x) => x.value);
+  persist(); draw();
+};
+document.getElementById('load').onclick = () => {
+  const lines = document.getElementById('paste').value.split(/\r?\n/).filter((l) => l.trim());
+  const rows = lines.map(parseLine).filter(Boolean);
+  document.getElementById('parsed').textContent = `อ่านได้ ${rows.length}/${lines.length} บรรทัด`;
+  if (!rows.length) return;
+  state.rows = rows; persist(); all();
+};
+document.getElementById('add').onclick = () => {
+  const v = (id) => document.getElementById(id);
+  const tierIx = Number(v('fPath').value);
+  state.rows.push(v('fAway').checked
+    ? { isekai: true, name: v('fName').value.trim(), world: v('fWorld').value.trim(), ending: '' }
+    : { name: v('fName').value.trim(), cls: CLASSES[Number(v('fCls').value)], age: Math.max(0, Math.min(120, Number(v('fAge').value) || 0)), gone: v('fGone').checked, realm: REALMS[Number(v('fRealm').value)], path: tierIx ? 'child' : 'karma', tier: tierIx || null });
+  persist(); all();
+};
+document.getElementById('rows').onclick = (e) => {
+  const i = e.target.dataset?.i;
+  if (i === undefined) return;
+  state.rows.splice(Number(i), 1); persist(); all();
+};
+document.getElementById('reset').onclick = () => { state = { rows: [], fame: 0, titles: [] }; persist(); fameEl.value = '0'; document.querySelectorAll('#titles input').forEach((x) => (x.checked = false)); all(); };
+document.fonts?.ready.then(all);
+all();
+};
+</script>
+<script>
+MAPS.milestones = () => {
+const document = mapDoc('milestones');
+const { fbm, rnd, vignette, cartouche, label, badge, load, save, canvasPoint } = MapCore;
+// ---- ข้อมูลตาม tickets/37-main-world-milestones.md หัว "Answer รอบ 20" ข้อ 1 · ร่างเปลี่ยน = แก้ที่นี่ + node maps/check-data.mjs ----
+const LINES = [
+  { name: 'เรียน', steps: ['จบประถม', 'ม.ปลาย/อาชีวะ', 'ปริญญาตรี', 'สูงกว่าตรี'] },
+  { name: 'ราชการ/ยศ', steps: ['เข้ารับราชการ', 'ขั้นกลาง', 'ขั้นสูง', 'ยอดสาย'] },
+  { name: 'การเมือง', steps: ['ผู้นำท้องถิ่น', 'นายก อบต.', 'ส.ส.', 'หัวหน้าพรรค', 'นายกฯ'] },
+  { name: 'ธุรกิจ', steps: ['ค้าขาย', 'เปิดกิจการ', 'มีลูกจ้าง/ลงทุน', 'เศรษฐี'] },
+  { name: 'ธรรม/มู', steps: ['ทำบุญสม่ำเสมอ', 'บวช/เข้าสำนัก', 'คนนับถือ', 'ผู้มีบารมี'] },
+  { name: 'ครอบครัว', steps: ['แต่งงาน', 'มีลูก', 'มีหลาน', 'สี่รุ่นพร้อมหน้า'] },
+  { name: 'มั่งคั่ง', steps: ['มีบ้าน', 'ฐานะขยับ 2 ขั้น', 'มั่งคั่ง'] },
+  { name: 'ทางลัด', steps: ['เงินก้อนแรก', 'รวยทางลัด', 'รอดจนตายไม่โดนจับ'] },
+];
+const KEY = 'nextlife-milestones';
+const COL = ['#2f6f8f', '#6a5a2e', '#8a3b12', '#a5791c', '#6b3f86', '#a04a5a', '#3f7a3a', '#555'];
+
+const cv = document.getElementById('map');
+const ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height;
+const top0 = 110, rowH = (H - top0 - 30) / LINES.length, x0 = 190, x1 = W - 120;
+// ถึงแล้ว = เลขขั้น (0 = ยังไม่ถึงขั้นไหน) · ของที่เก็บผิดรูปถือว่ายังไม่ถึง
+let got = load(KEY, {});
+if (typeof got !== 'object' || !got) got = {};
+const reached = (i) => Math.max(0, Math.min(LINES[i].steps.length, got[LINES[i].name] | 0));
+const at = (i, k) => {
+  const n = LINES[i].steps.length;
+  const x = x0 + ((x1 - x0) * k) / (n - 1);
+  const y = top0 + rowH * (i + 0.5) + Math.sin(x / 90 + i) * 6;
+  return [x, y];
+};
+
+function paper() {
+  const img = ctx.createImageData(W, H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const s = 0.86 + 0.18 * fbm(x / 90, y / 90);
+    const o = (y * W + x) * 4;
+    img.data[o] = 236 * s; img.data[o + 1] = 222 * s; img.data[o + 2] = 186 * s; img.data[o + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+function draw() {
+  paper();
+  cartouche(ctx, 'หลักไมล์ 8 สาย — โลกหลัก', 'ต่อจากใบ 37 รอบ 20 · คลิกหลักไมล์ที่ชีวิตนี้ถึง', { x: 20, y: 18, w: 420 });
+  LINES.forEach((L, i) => {
+    const n = L.steps.length, r = reached(i);
+    // ถนนของสาย: ช่วงที่ถึงแล้วสีของสาย · ที่เหลือเส้นประจาง
+    for (let k = 0; k < n - 1; k++) {
+      const [ax, ay] = at(i, k), [bx, by] = at(i, k + 1);
+      ctx.save();
+      ctx.strokeStyle = k + 1 < r ? COL[i] : 'rgba(80,60,35,.35)';
+      ctx.lineWidth = k + 1 < r ? 6 : 3;
+      ctx.setLineDash(k + 1 < r ? [] : [8, 6]);
+      ctx.beginPath(); ctx.moveTo(ax, ay);
+      ctx.quadraticCurveTo((ax + bx) / 2, (ay + by) / 2 - 12 + 24 * rnd(i, k), bx, by);
+      ctx.stroke();
+      ctx.restore();
+    }
+    label(ctx, L.name, 92, at(i, 0)[1] + 5, { size: 17 });
+    L.steps.forEach((s, k) => {
+      const [x, y] = at(i, k);
+      badge(ctx, x, y, k < r ? '✓' : String(k + 1), k < r ? COL[i] : '#a8977a', 12);
+      label(ctx, s, x, y + 30, { size: 12, color: k < r ? '#2e1e10' : '#6b5638' });
+    });
+    // ปลายสาย: ธงเมื่อถึงขั้นสุดท้าย
+    const [ex, ey] = at(i, n - 1);
+    ctx.save();
+    ctx.fillStyle = r === n ? '#c8961e' : 'rgba(80,60,35,.3)';
+    ctx.fillRect(ex + 22, ey - 22, 3, 26);
+    ctx.beginPath(); ctx.moveTo(ex + 25, ey - 22); ctx.lineTo(ex + 45, ey - 16); ctx.lineTo(ex + 25, ey - 10); ctx.fill();
+    ctx.restore();
+    if (r === n) label(ctx, 'ถึงปลายสาย', ex + 70, ey - 2, { size: 11, italic: true, color: '#8a3b12' });
+  });
+  vignette(ctx, W, H);
+  side();
+}
+function side() {
+  const rows = LINES.map((L, i) => ({ L, r: reached(i), n: L.steps.length }));
+  document.getElementById('sum').innerHTML = rows.map(({ L, r, n }) => `<tr><td>${L.name}</td><td>${r}/${n}${r ? ` · ${L.steps[r - 1]}` : ''}</td></tr>`).join('');
+  // ไกลสุด = สัดส่วนที่ถึง ก่อนจำนวนขั้น (สายสั้นถึงปลายนับไกลกว่าสายยาวที่ถึงครึ่งทาง) · เสมอเรียงตามลำดับสาย
+  const far = rows.filter((x) => x.r).sort((a, b) => b.r / b.n - a.r / a.n || b.r - a.r).slice(0, 3);
+  document.getElementById('ending').innerHTML = far.length
+    ? far.map(({ L, r, n }) => `<li>${L.steps[r - 1]}${r === n ? ` <b>· ปลายสาย${L.name}</b> <span class="muted">(ชื่อพิเศษยังไม่ตั้ง)</span>` : ''}</li>`).join('')
+    : '<li class="muted">ยังไม่ถึงหลักไมล์ไหน</li>';
+}
+cv.addEventListener('click', (e) => {
+  const [px, py] = canvasPoint(cv, e);
+  LINES.forEach((L, i) => L.steps.forEach((_, k) => {
+    const [x, y] = at(i, k);
+    if (Math.hypot(px - x, py - y) > 18) return;
+    const r = reached(i);
+    got[L.name] = r === k + 1 ? k : k + 1;
+    save(KEY, got);
+  }));
+  draw();
+});
+document.getElementById('reset').onclick = () => { got = {}; save(KEY, got); draw(); };
+document.fonts?.ready.then(draw);
+draw();
+};
+</script>
+<script>
+MAPS.politics = () => {
+const document = mapDoc('politics');
+const { fbm, buildGrid, regions, paintLand, drawBorders, vignette, decorate, cartouche, icon, label, pin, badge, load, save, canvasPoint } = MapCore;
+// ---- ข้อมูลตาม politics-list-draft.md (รอบ 14) · เรียงล่างขึ้นบน ----
+const LADDER = [
+  { step: 'ผู้นำท้องถิ่น (สุ่มผู้ใหญ่บ้าน/กำนัน)', short: 'ผู้นำท้องถิ่น', term: 'อยู่ถึงอายุ 60 ไม่มีเลือกตั้งซ้ำ', note: 'ตามกฎหมายจริง · โค้ดเดิมเลือกตั้งทุก 4 ปี ต้องแก้', icon: 'temple', land: '#a9c46a', deco: 'paddy' },
+  { step: 'นายก อบต.', short: 'นายก อบต.', term: '4 ปี', note: '', icon: 'city', land: '#bcc77a', deco: 'grass' },
+  { step: 'ส.ส.', short: 'ส.ส.', term: '4 ปี', note: 'ขั้นแรกที่สังกัดพรรค', icon: 'flag', land: '#c9b67a', deco: 'hill' },
+  { step: 'หัวหน้าพรรค', short: 'หัวหน้าพรรค', term: 'พรรคโหวตซ้ำทุก 4 ปี', note: 'ขั้น + สถานะคู่กับ ส.ส.', icon: 'tower', land: '#bfa27a', deco: 'mountain' },
+  { step: 'นายกฯ', short: 'นายกฯ', term: '4 ปี · รวมไม่เกิน 8 ปี', note: 'ส.ส. ทุกคนลุ้นได้ หัวหน้าพรรคได้เปรียบ', icon: 'castle', land: '#d8c59a', deco: 'peak' },
+];
+const PATHS = [
+  ['การ์ดโหวตในพรรค', 'ส.ส. ครบ 1 สมัย · ใช้คอนเน็คชั่น + ชื่อเสียงตระกูล · แพ้ยังเป็น ส.ส.'],
+  ['ตั้งพรรคเอง', 'เงินก้อนใหญ่ · เป็นหัวหน้าทันที · ชื่อจากชื่อสำรอง · เลือกข้อดี 1 จากตาราง + ข้อเสีย "พรรคใหม่"'],
+  ['อัตโนมัติ', 'ส.ส. ครบ 2 สมัย + คอนเน็คชั่นถึงเกณฑ์ ไม่มีการ์ด'],
+];
+const PARTIES = [
+  ['เพื่อไทไท', 'เพื่อไทย', 'ชนะง่าย เหนือ/อีสาน', 'คดียุบพรรคสุ่มออก'],
+  ['ก้าวไกลกว่า', 'ก้าวไกล', 'ชนะง่าย กทม./เมือง · +ความรู้', 'ดีเกินไปก็โดน ×1.5'],
+  ['ภูมิใจทั่วไทย', 'ภูมิใจไทย', '+คอนเน็คชั่น (บ้านใหญ่)', 'ความสัมพันธ์ลด (โดนมองเป็นงูเห่า)'],
+  ['ประชาปัตย์', 'ประชาธิปัตย์', 'ชนะง่าย ใต้ · +ความสัมพันธ์', 'พรรคขาลง โอกาสลดตามปี'],
+  ['รวมชาติสร้างไทย', 'รวมไทยสร้างชาติ', 'ไม่โดนกลั่นแกล้ง · คดีเบา', 'ความสุขลด (อึดอัด)'],
+  ['พลังประชาชื่น', 'พลังประชารัฐ', 'ค่าหาเสียงครึ่งเดียว (ทุนหนา)', 'ชนะยากขึ้นช่วงคนเบื่อ'],
+  ['ชาวนาก้าวหน้า', '—', 'ชนะง่ายชนบท · +สุขภาพ', 'เงินตำแหน่งน้อย (พรรคเล็ก)'],
+  ['คนบ้านเรา', '—', '+ความสุข · +ความสัมพันธ์', 'ชิงนายกฯ ยากมาก'],
+];
+const SPARE = [
+  ['ไทยสร้างใหม่', 'ไทยสร้างไทย'],
+  ['ชาติไทยพัฒนากว่า', 'ชาติไทยพัฒนา'],
+  ['ประชาชาติไทย', 'ประชาชาติ'],
+  ['เสรีรวมใจ', 'เสรีรวมไทย'],
+  ['ไทยภักดีดี', 'ไทยภักดี'],
+  ['พลังธรรมะ', 'พลังธรรม'],
+];
+const TERM = 4;
+const PM_CAP = 8;
+// ขั้นแรกที่สังกัดพรรค (index ใน LADDER) — ต่ำกว่านี้ไม่สังกัด
+const PARTY_FROM = 2;
+
+// ---- ผัง: บันได 5 ขั้น ซ้ายล่าง → ขวาบน · แต่ละขั้นเป็นเขตของตัวเอง ----
+const W = 1200, H = 800, STEP = 3;
+const X0 = 70, COL = 212, FLOOR = 760;
+// window.top อ่านอย่างเดียวในเบราว์เซอร์ — ชื่อ top ระดับบนสุดทำสคริปต์ทั้งหน้าตาย (SyntaxError)
+const stepTop = (k) => 690 - k * 115;
+const colOf = (x) => Math.floor((x - X0) / COL);
+const cx = (k) => X0 + COL * k + COL / 2;
+const isLand = (x, y) => {
+  const k = colOf(x);
+  if (k < 0 || k >= LADDER.length) return false;
+  return y > stepTop(k) + 10 * (fbm(x / 50, k * 7) - 0.5) && y < FLOOR - 6 * (fbm(x / 60, 3) - 0.5);
+};
+const SEEDS = Object.fromEntries(LADDER.map((r, k) => [r.short, [[cx(k), (stepTop(k) + FLOOR) / 2]]]));
+const NAMES = LADDER.map((r) => r.short);
+const G = buildGrid({ w: W, h: H, step: STEP, seeds: SEEDS, isLand, allow: (x, y, n) => colOf(x) === NAMES.indexOf(n) });
+const { cells } = regions(G);
+const at = (k) => [cx(k), stepTop(k) + 42];
+
+const cv = document.getElementById('map');
+const ctx = cv.getContext('2d');
+const base = document.createElement('canvas');
+base.width = W; base.height = H;
+(function paintBase() {
+  const b = base.getContext('2d');
+  paintLand(b, G, (n) => LADDER[NAMES.indexOf(n)].land, { cx: 900, cy: 120, r0: 60, r1: 1100, inner: '#9cc3dc', outer: '#3a5d7a', shore: [190, 215, 230], waves: false });
+  drawBorders(b, G);
+  LADDER.forEach((r, k) => {
+    const [x, y] = at(k);
+    decorate(b, cells[r.short], [[x, y], [x - 60, y + 40], [x + 60, y + 40], [x, y + 50]], r.deco);
+  });
+  cartouche(b, 'บันไดการเมือง', 'ไต่จากท้องถิ่นถึงนายกฯ · สังกัดพรรคตั้งแต่ ส.ส.', { w: 360 });
+  // เส้นแบ่ง สังกัด/ไม่สังกัดพรรค
+  b.save();
+  const xp = X0 + COL * PARTY_FROM;
+  b.strokeStyle = 'rgba(60,30,15,.7)'; b.setLineDash([6, 6]); b.lineWidth = 2;
+  b.beginPath(); b.moveTo(xp, stepTop(PARTY_FROM) - 40); b.lineTo(xp, FLOOR + 20); b.stroke();
+  b.restore();
+  label(b, '← ไม่สังกัดพรรค', xp - 70, FLOOR + 30, { size: 13, color: '#f1e7cf' });
+  label(b, 'สังกัดพรรค →', xp + 60, FLOOR + 30, { size: 13, color: '#f1e7cf' });
+  vignette(b, W, H);
+})();
+
+// ทางขึ้นหัวหน้าพรรค 3 เส้น: ส.ส. → หัวหน้าพรรค · โค้งซ้อนกันเหนือขั้น
+function paths(c, active) {
+  const [x1, y1] = [cx(2) + 40, stepTop(2) - 6];
+  const [x2, y2] = [cx(3) - 40, stepTop(3) - 6];
+  PATHS.forEach((p, i) => {
+    // ระยะโค้งห่างพอให้วงเลข + ชื่อทางไม่ทับกัน (วงอยู่กลางโค้ง ห่างกันครึ่งหนึ่งของ lift)
+    const lift = 46 + i * 60;
+    const mx = (x1 + x2) / 2, my = Math.min(y1, y2) - lift;
+    c.save();
+    c.strokeStyle = active === 3 ? '#8a3b12' : 'rgba(60,35,20,.75)'; c.lineWidth = 2.2;
+    c.beginPath(); c.moveTo(x1, y1); c.quadraticCurveTo(mx, my, x2, y2); c.stroke();
+    c.beginPath(); c.moveTo(x2, y2); c.lineTo(x2 - 10, y2 - 4); c.lineTo(x2 - 4, y2 - 11); c.closePath(); c.fillStyle = c.strokeStyle; c.fill();
+    c.restore();
+    const bx = 0.25 * x1 + 0.5 * mx + 0.25 * x2, by = 0.25 * y1 + 0.5 * my + 0.25 * y2;
+    badge(c, bx, by, String(i + 1), '#8a3b12', 10);
+    label(c, p[0], bx + 14 + c.measureText(p[0]).width / 2, by + 5, { size: 12 });
+  });
+  // ส.ส. ทุกคนลุ้นนายกฯ ได้ — เส้นประข้ามหัวหน้าพรรค
+  const [sx, sy] = [cx(2), stepTop(2) - 4], [ex, ey] = [cx(4) - 30, stepTop(4) - 10];
+  c.save();
+  c.strokeStyle = 'rgba(255,245,215,.85)'; c.setLineDash([4, 6]); c.lineWidth = 2;
+  c.beginPath(); c.moveTo(sx, sy); c.bezierCurveTo(sx, sy - 300, ex - 200, ey - 80, ex, ey); c.stroke();
+  c.restore();
+  label(c, 'ส.ส. ทุกคนลุ้นนายกฯ ได้ · หัวหน้าพรรคได้เปรียบ', cx(3), stepTop(4) - 70, { size: 13, color: '#2e1e10' });
+}
+
+let sel = null;
+let here = load('aethergard-politics-here', '');
+let years = load('aethergard-politics-years', 0);
+let party = load('aethergard-politics-party', '');
+
+function render() {
+  ctx.drawImage(base, 0, 0);
+  const focus = sel || here;
+  if (focus) {
+    ctx.fillStyle = 'rgba(20,15,10,.35)';
+    for (const n of NAMES) if (n !== focus) for (const [x, y] of cells[n]) ctx.fillRect(x - 1, y - 1, STEP, STEP);
+  }
+  paths(ctx, NAMES.indexOf(focus));
+  LADDER.forEach((r, k) => {
+    const [x, y] = at(k);
+    icon(ctx, r.icon, x, y, { gold: k === LADDER.length - 1 });
+    label(ctx, r.short, x, y + 32, { size: 17 });
+    label(ctx, r.term, x, y + 50, { size: 12, color: '#3b2a1a' });
+    badge(ctx, X0 + COL * k + 16, stepTop(k) + 16, String(k + 1), '#3b2a1a', 10);
+  });
+  if (here) {
+    const k = NAMES.indexOf(here);
+    const [x, y] = at(k);
+    pin(ctx, x - 38, y + 6);
+    badge(ctx, x + 50, y - 8, String(years), '#8a3b12', 13);
+    label(ctx, 'ปี', x + 72, y - 3, { size: 12, color: '#2e1e10' });
+    if (party && k >= PARTY_FROM) label(ctx, `พรรค${party}`, x, y + 70, { size: 13, color: '#8a3b12' });
+  }
+}
+
+function info(n) {
+  const el = document.getElementById('info');
+  if (!n) { el.innerHTML = '<span class="muted">คลิกขั้นบนผังเพื่อดูวาระ</span>'; return; }
+  const k = NAMES.indexOf(n), r = LADDER[k];
+  el.innerHTML = `<h2>ขั้น ${k + 1} · ${r.step}</h2>
+    <div>วาระ: <b>${r.term}</b></div>
+    ${r.note ? `<div class="muted" style="margin-top:4px">${r.note}</div>` : ''}
+    <div style="margin-top:4px">${k >= PARTY_FROM ? 'สังกัดพรรค · ค่าพรรคมีผล' : 'ไม่สังกัดพรรค'}</div>`;
+}
+function termInfo() {
+  const el = document.getElementById('term');
+  if (!here) { el.innerHTML = ''; return; }
+  const k = NAMES.indexOf(here);
+  if (k === 0) { el.innerHTML = '<span class="muted">อยู่ถึงอายุ 60 · ไม่มีเลือกตั้งซ้ำ</span>'; return; }
+  const n = Math.floor(years / TERM) + 1;
+  const left = TERM - (years % TERM);
+  let s = `สมัยที่ <span class="big">${n}</span> · อีก ${left} ปีถึง${k === 3 ? 'พรรคโหวตซ้ำ' : 'เลือกตั้ง'}`;
+  if (k === 4) s += years >= PM_CAP ? ' <b>(ครบเพดาน 8 ปี)</b>' : ` · เหลือ ${PM_CAP - years} ปีถึงเพดาน ${PM_CAP}`;
+  el.innerHTML = s;
+}
+function partyRows() {
+  document.getElementById('parties').innerHTML = PARTIES.map(([n, ref, pro, con]) =>
+    `<tr data-p="${n}" class="${n === party ? 'on' : ''}"><td><b>${n}</b>${ref !== '—' ? `<div class="muted">ล้อ ${ref}</div>` : ''}</td><td>+ ${pro}<br>− ${con}</td></tr>`).join('');
+}
+
+const hereEl = document.getElementById('here'), yearsEl = document.getElementById('years'), partyEl = document.getElementById('party');
+for (const r of LADDER) hereEl.add(new Option(r.short, r.short));
+for (const [n] of [...PARTIES, ...SPARE]) partyEl.add(new Option(n, n));
+hereEl.value = here; yearsEl.value = years; partyEl.value = party;
+hereEl.addEventListener('change', () => { here = hereEl.value; save('aethergard-politics-here', here); sel = null; info(here || null); termInfo(); render(); });
+yearsEl.addEventListener('input', () => { years = Math.max(0, Math.floor(Number(yearsEl.value) || 0)); save('aethergard-politics-years', years); termInfo(); render(); });
+const setParty = (p) => { party = p; partyEl.value = p; save('aethergard-politics-party', p); partyRows(); render(); };
+partyEl.addEventListener('change', () => setParty(partyEl.value));
+document.getElementById('parties').addEventListener('click', (e) => {
+  const tr = e.target.closest('tr');
+  if (tr) setParty(tr.dataset.p === party ? '' : tr.dataset.p);
+});
+cv.addEventListener('click', (e) => {
+  const [x, y] = canvasPoint(cv, e);
+  const v = G.at(Math.floor(x / STEP), Math.floor(y / STEP));
+  const hit = v >= 0 ? G.names[v] : null;
+  sel = hit && hit !== sel ? hit : null;
+  info(sel || here || null);
+  render();
+});
+document.getElementById('paths').innerHTML = PATHS.map(([t, d]) => `<li><b>${t}</b> — ${d}</li>`).join('');
+document.getElementById('spare').innerHTML = SPARE.map(([n, ref]) => `${n} <span class="muted">(${ref})</span>`).join(' · ');
+partyRows();
+info(here || null);
+termInfo();
+render();
+};
+</script>
+<script>
+(() => {
+  const ids = ["continent","afterlife","dungeon","lineage","milestones","politics"];
+  // ดันเจียนอ่านหมุดที่ปักจากผังทวีปครั้งเดียวตอนเริ่ม — เดิมเป็นคนละหน้า เปิดใหม่ก็อ่านใหม่ ⇒ หมุดเปลี่ยนหลังดันเจียนเริ่มแล้ว = โหลดหน้าใหม่
+  const reads = { dungeon: ['aethergard-dungeons'] };
+  const snap = (m) => (reads[m] ?? []).map((k) => localStorage.getItem(k)).join('\n');
+  const started = {};
+  const show = () => {
+    const m = ids.includes(location.hash.slice(1)) ? location.hash.slice(1) : ids[0];
+    if (m in started && started[m] !== snap(m)) { location.reload(); return; }
+    for (const id of ids) document.getElementById(id).hidden = id !== m;
+    for (const a of document.querySelectorAll('.mp-sw a')) a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + m);
+    document.body.dataset.map = m;
+    if (!(m in started)) { started[m] = snap(m); MAPS[m](); }
+  };
+  addEventListener('hashchange', () => { show(); scrollTo(0, 0); });
+  show();
+})();
+</script>
+</body>
+</html>

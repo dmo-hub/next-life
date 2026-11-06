@@ -1,6 +1,6 @@
 // แถบบนชิ้นเดียวของทุกหน้าเว็บ (ยกเว้น play.html · archive/*) — build ฉีดระหว่าง marker · หน้าเขียนมือวาง marker ไว้ครั้งเดียว ส่วนนอก marker build ไม่แตะ
 // แบบ ก ที่เจ้าของเคาะ: ชื่อเกมซ้าย = หน้าแรก · ลิงก์กลางเลื่อนข้างได้ · ปุ่ม "เล่นเกม" ขวา · หน้าปัจจุบัน = ทอง + ตัวหนา
-import { SITE_ROOT } from './tokens.mjs';
+import { SITE_ROOT, SITE_BAR } from './tokens.mjs';
 export const NAV_START = '<!--NAV:START-->';
 export const NAV_END = '<!--NAV:END-->';
 export const NAV_CSS_START = '/*NAV-CSS:START*/';
@@ -20,9 +20,8 @@ export const NAV_MENU = [
 // 390: ลิงก์กลางล้นแถบ ⇒ เงาจางขอบขวาบอกว่าเลื่อนได้ · nav.top a รีเซ็ตกล่องเอง เพราะบางหน้ามีกฎ a.<ชื่อ> ของตัวเอง (otherworld: a.play)
 // T2 (ui-redo 105 · ข้อ 218): แถบกับหัวหน้า (header ชื่อหน้า + คำโปรย) เป็นก้อนครามเดียว เตี้ย ไม่มีลาย — header แบบเดียวทุกหน้า หน้าแรกใช้ header.home ของตัวเอง
 // ลิงก์ในเนื้อขีดเส้นใต้เสมอ (คราม = ตัวหนังสือ แยกด้วยสีไม่ได้) · ลิงก์ที่มี class เป็นปุ่ม/เมนูของหน้า ดูแลกรอบเอง
-export const NAV_CSS = `
-  ${SITE_ROOT}
-  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
+// ตัวแถบแยกจากกฎของหน้า ⇒ ห้องผู้พัฒนาหยิบแถบไปใช้ได้โดย header กับลิงก์ในเนื้อของหน้านั้นคงเดิม
+const NAV_BAR_CSS = `  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
   nav.top a { display: inline-block; color: var(--on-head); text-decoration: none; padding: 0 10px; line-height: 40px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
   nav.top a.dark { color: var(--headink); }
   nav.top a[aria-current] { color: var(--headink); font-weight: 600; }
@@ -31,13 +30,17 @@ export const NAV_CSS = `
   nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
   nav.top a.play { background: var(--gold); color: var(--head); border-radius: var(--r); line-height: 28px; padding: 0 12px; font-weight: 600; white-space: nowrap; }
   nav.top a.play:focus-visible { outline: 2px solid var(--headink); outline-offset: 2px; }
-  body > header:not(.home) { background: var(--head); color: var(--title); padding: 16px 16px 18px; }
+`;
+const NAV_BAR_MASK = `  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
+`;
+export const NAV_CSS = `
+  ${SITE_ROOT}
+${NAV_BAR_CSS}  body > header:not(.home) { background: var(--head); color: var(--title); padding: 16px 16px 18px; }
   body > header:not(.home) h1 { font-family: var(--fh); font-weight: 600; color: var(--title); }
   body > header:not(.home) p { color: var(--on-head2); }
   body > header:not(.home) a { color: var(--headink); text-decoration: underline; text-underline-offset: 3px; }
   main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
-  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
-`;
+${NAV_BAR_MASK}`;
 
 // 390: ลิงก์หน้าปัจจุบันอาจอยู่นอกส่วนที่เห็นของแถบที่ล้น ⇒ ตั้ง scrollLeft ของแถบเอง (scrollIntoView เลื่อนทั้งหน้าแนวตั้งด้วย) · ไม่มี JS แถบยังใช้ได้เหมือนเดิม
 // คำนวณซ้ำหลังฟอนต์โหลด เพราะความกว้างลิงก์เปลี่ยนเมื่อ Sarabun มาแทนฟอนต์สำรอง
@@ -46,7 +49,8 @@ const NAV_SCRIPT = `<script>(()=>{const l=document.querySelector('nav.top .links
 // file = path ใต้ docs/ เช่น about.html · spec/lore-finance-series.html
 export function navHtml(file) {
   const up = '../'.repeat(file.split('/').length - 1);
-  const cur = (href, also = []) => (href === file || also.includes(file) ? ' aria-current="page"' : '');
+  // หน้าใต้ห้องผู้พัฒนานับเป็นหัวนี้ แต่ไม่ใช่หน้านั้นเอง ⇒ "true" ไม่ใช่ "page"
+  const cur = (href, also = []) => (href === file || also.includes(file) ? ' aria-current="page"' : href === 'dev/index.html' && file.startsWith('dev/') ? ' aria-current="true"' : '');
   const a = (href, text, cls, also) => `<a${cls ? ` class="${cls}"` : ''} href="${up}${href}"${cur(href, also)}>${text}</a>`;
   const links = NAV_MENU.map(([h, t, c, also]) => a(h, t, c, also)).join('');
   return `<nav class="top" aria-label="หน้าอื่น">${a('index.html', 'NEXT LIFE', 'brand')}<div class="links">${links}</div>${a('play.html', 'เล่นเกม', 'play')}</nav>${NAV_SCRIPT}`;
@@ -73,7 +77,7 @@ export function navBlocks(html) {
   return { css: pick(NAV_CSS_START, NAV_CSS_END), nav: pick(NAV_START, NAV_END), count: html.split(NAV_START).length - 1 };
 }
 
-// แถบห้องผู้พัฒนา: หน้า dev เขียนมือวางแถบนี้ไว้เอง · หน้าที่ build สร้างใต้ dev/ (คำตัดสินเกม) ใช้ชิ้นนี้ ⇒ แท็บเพิ่ม/ย้ายต้องแก้หน้าเขียนมือด้วย (ด่าน site:check เทียบแท็บ)
+// แถบห้องผู้พัฒนา = แถบเว็บ nav.top + แท็บ 7 ป้าย (ข้อ 292 293): หน้าที่ build สร้างใต้ dev/ เรียก devNavHtml · หน้าเขียนมือ (DEV_NAV_PAGES) build เขียนทับระหว่าง marker
 export const DEV_TABS = [
   ['dev/index.html', 'สารบัญ'],
   ['dev/spec.html', 'ภาคผนวกสเปก'],
@@ -83,40 +87,51 @@ export const DEV_TABS = [
   ['dev/maps/continent.html', 'แผนที่'],
   ['dev/archive/index.html', 'คลังเก่า'],
 ];
-export const DEV_NAV_CSS = `
-${SITE_ROOT}
+
+// ผังทั้งหกอยู่หน้าเดียว สลับด้วย #<ผัง> (ui-redo 101 · ข้อ 189) · ที่เดิมแต่ละผังเป็นหน้าส่งต่อที่ build เขียนทุกรอบ
+// แท็บ "แผนที่" ยังชี้ continent.html — หน้าเขียนมือทุกหน้ามีแท็บนี้ ส่งต่อพาเข้าผังทวีปเองจึงไม่ต้องไล่แก้ทุกหน้า
+export const DEV_MAPS_PAGE = 'dev/maps/index.html';
+export const DEV_MAPS = [
+  ['continent', 'ทวีป', 'แผนที่ทวีปเอเธอร์การ์ด'],
+  ['afterlife', 'ปรโลก', 'ผังภูมิ 5 ในปรโลก'],
+  ['dungeon', 'ดันเจียน', 'แผนที่ชั้นในดันเจียนลับ'],
+  ['lineage', 'ตระกูล', 'ผังตระกูล'],
+  ['milestones', 'หลักไมล์', 'หลักไมล์ 8 สาย — โลกหลัก'],
+  ['politics', 'การเมือง', 'ผังบันไดการเมือง'],
+];
+export const mapsMoved = ([id, , title]) => movedHtml(`dev/maps/${id}.html`, `${DEV_MAPS_PAGE}#${id}`, title);
+export const DEV_NAV_PAGES = ['dev/index.html', 'dev/plan.html', 'dev/spec.html', DEV_MAPS_PAGE, 'dev/archive/index.html', 'dev/archive/b176-samples.html', 'dev/archive/fx-proto.html', 'dev/archive/isekai-life-v1.html'];
+export const DEV_NAV_START = '<!--nav-->';
+export const DEV_NAV_END = '<!--/nav-->';
+// แผนที่กับคลังเก่าไม่ได้ใช้ชุดสีกลาง และแต่ละหน้ามีตัวแปรชื่อซ้ำของตัวเอง ⇒ ตั้งสีเฉพาะที่แถบ
+const devNavCss = (file) => `
+${/^dev\/(maps|archive)\//.test(file) ? SITE_BAR : SITE_ROOT}
+${NAV_BAR_CSS}${NAV_BAR_MASK}
 .nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
 .nl-nav{font:15px/1.4 var(--fb);text-align:left}
 .nl-nav a{text-decoration:none;color:inherit}
-.nl-in{max-width:1040px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
-.nl-top{background:var(--head);color:var(--title)}
-.nl-top>.nl-in{min-height:52px;flex-wrap:wrap;column-gap:12px}
-.nl-brand{font-weight:600;margin-right:auto;padding:12px 0}
-.nl-main{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
-.nl-main a{padding:13px 8px 11px;border-bottom:3px solid transparent;white-space:nowrap}
-.nl-main a[aria-current]{border-bottom-color:var(--gold);font-weight:600}
-.nl-swap{border:1px solid var(--line-strong);padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
-.nl-swap:hover,.nl-main a:hover{opacity:1;color:var(--surface)}
-.nl-dev .nl-top{background:var(--head)}
-.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:var(--accent2);color:var(--surface);vertical-align:2px}
+.nl-in{max-width:${file === DEV_MAPS_PAGE ? 1800 : 1280}px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
 .nl-tabs{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--line)}
 .nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
 .nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
 .nl-tabs a[aria-current]{border-bottom-color:var(--accent2);font-weight:600}
 .nl-tabs.nl-sub{background:var(--bg);font-size:14px}
-@media (max-width:640px){
-.nl-top>.nl-in{padding:0}
-.nl-brand{padding:12px 16px}
-.nl-swap{margin-right:16px}
-.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid var(--line-strong)}
-}
 `;
-// file = path ใต้ docs/ เช่น dev/design-lore.html · หน้าเรื่องของคำตัดสินเกมอยู่ใต้แท็บนั้น ⇒ aria-current="true" (ไม่ใช่ page เพราะไม่ใช่หน้านั้นเอง)
-export function devNavHtml(file) {
+// file = path ใต้ docs/ เช่น dev/design-lore.html · หน้าลูกของแท็บ ⇒ aria-current="true" (ไม่ใช่ page เพราะไม่ใช่หน้านั้นเอง) · แท็บแผนที่ชี้หน้าส่งต่อ แต่หน้าจริงคือหน้ารวมผัง
+// sub = แถวแท็บรองของหน้า (สเปก/แผน · คลังเก่า)
+export function devNavHtml(file, sub = '') {
   const up = '../'.repeat(file.split('/').length - 1);
-  const cur = (href) => (href === file ? ' aria-current="page"' : href === 'dev/design.html' && /^dev\/design-.+\.html$/.test(file) ? ' aria-current="true"' : '');
+  const cur = (href) => (href === file || (href === 'dev/maps/continent.html' && file === DEV_MAPS_PAGE) ? ' aria-current="page"' : (href === 'dev/design.html' && /^dev\/design-.+\.html$/.test(file)) || (href === 'dev/archive/index.html' && file.startsWith('dev/archive/')) ? ' aria-current="true"' : '');
   const tabs = DEV_TABS.map(([h, t]) => `<a href="${up}${h}"${cur(h)}>${t}</a>`).join('');
-  return `<!--nav--><style>${DEV_NAV_CSS}</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="${up}dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="${up}index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in">${tabs}</div></div></div>`;
+  return `${DEV_NAV_START}<style>${devNavCss(file)}</style>${navHtml(file)}<div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in">${tabs}</div></div>${sub}</div>${DEV_NAV_END}`;
+}
+// แถวแท็บรองเป็นของหน้า ⇒ อ่านจากแถบเดิมแล้วเขียนกลับ
+export function injectDevNav(html, file) {
+  const a = html.indexOf(DEV_NAV_START);
+  const b = html.indexOf(DEV_NAV_END, a);
+  if (a < 0 || b < 0) throw new Error(`docs/${file}: ต้องมี ${DEV_NAV_START} … ${DEV_NAV_END}`);
+  const sub = html.slice(a, b).match(/<div class="nl-tabs nl-sub"[\s\S]*?<\/div><\/div>/)?.[0];
+  return html.slice(0, a) + devNavHtml(file, sub) + html.slice(b + DEV_NAV_END.length);
 }
 
 // หน้าส่งต่อของ URL ที่ย้ายไป (GitHub Pages ไม่มี redirect ฝั่งเซิร์ฟเวอร์) — noindex ไม่ใช้ canonical (คำตัดสินเจ้าของ) · พก #ส่วนในหน้าไปด้วย เว้นปลายทางระบุหัวไว้แล้ว (หน้าที่ย้ายมาเป็นหัวในหน้าอื่น)
