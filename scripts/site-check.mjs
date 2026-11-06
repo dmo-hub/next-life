@@ -16,14 +16,14 @@ import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
 import { spoilersHtml, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
-import { navHtml, navBlocks, NAV_CSS, devNavHtml, DEV_TABS, MOVED_MARK, movedHtml, DEV_MAPS, DEV_MAPS_PAGE, mapsMoved } from '../src/site/nav.mjs';
+import { navHtml, navBlocks, NAV_CSS, devNavHtml, injectDevNav, DEV_TABS, MOVED_MARK, movedHtml, DEV_MAPS, DEV_MAPS_PAGE, mapsMoved } from '../src/site/nav.mjs';
 import { uiPage, designMoved, tweakPages, tweakMoved, tweakStatus, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
 import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, GATE_OFF, PUBLIC_HIDE } from '../src/site/gate.mjs';
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
-import { DOCS_TWEAK_PAGE, T13_DEV_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsLayout, injectDocsTweak, pageKind } from '../src/site/docs-tweak.mjs';
+import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsLayout, injectDocsTweak, pageKind } from '../src/site/docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, cardArtBlock, CAT_ART } from '../src/site/card-art-tweak.mjs';
 import { CARD_SPOIL_PAGE, cardSpoilData, cardSpoilBlock } from '../src/site/card-spoil-tweak.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
@@ -256,7 +256,11 @@ const devTabMiss = (html) => {
 };
 const devMiss = devFiles.map((f) => [f, read(f)]).filter(([, h]) => h.includes('class="nl-tabs"')).map(([f, h]) => [f, devTabMiss(h)]).filter(([, m]) => m.length).map(([f, m]) => `${f} ขาด ${m.join(' ')}`);
 const devCtl = devTabMiss(read('dev/index.html').replace(/<a href="[^"]*dev\/design\.html"[^>]*>คำตัดสินเกม<\/a>/, '')).length === 1;
-const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.html" aria-current="true"') && devNavHtml('dev/design.html').includes('href="../dev/design.html" aria-current="page"');
+const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.html" aria-current="true"') && devNavHtml('dev/design.html').includes('href="../dev/design.html" aria-current="page"') && devNavHtml(DEV_MAPS_PAGE).includes('href="../../dev/maps/continent.html" aria-current="page"') && devNavHtml('dev/archive/fx-proto.html').includes('href="../../dev/archive/index.html" aria-current="true"') && devNavHtml('dev/plan.html').includes('href="../dev/index.html" aria-current="true"');
+// 7c3) แถบเว็บแทนแถวบนห้องผู้พัฒนา (ข้อ 292 293): ทุกหน้าที่มีแถวแท็บตรงแถบที่ build เขียน และมีแถบเว็บแถบเดียว · ตัวควบคุม: คืนแถวบนเดิม ⇒ ต้องถูกจับ
+const devBarBad = (f, h) => lf(h) !== lf(injectDevNav(h, f)) || h.split('<nav class="top"').length !== 2;
+const devBarMiss = devFiles.filter((f) => read(f).includes('class="nl-tabs"') && devBarBad(f, read(f)));
+const devBarCtl = devBarBad('dev/index.html', read('dev/index.html').replace('<div class="nl-nav nl-dev">', '<div class="nl-nav nl-dev"><div class="nl-top"></div>'));
 // 7e) หน้าดีไซน์ UI (ui-redo 44): ตรงของที่ build ตอนนี้ · design.html เดิมส่งต่อมาที่นี่ · สีทุกตัวแปรในเกมขึ้นหน้า · ลิงก์ tweak ครบทุกหน้า tweak และปลายทางมีจริง
 // · ชิ้นส่วนตัวอย่างอยู่ใน iframe sandbox ว่าง (ไม่มีสคริปต์ ไม่มี same-origin ⇒ แตะ localStorage ไม่ได้) และ srcdoc ไม่มี <script
 // ตัวควบคุม: แก้สีในเกม 1 ค่า ⇒ หน้าที่ build ต้องเปลี่ยนและมีค่าใหม่ · ถอดลิงก์ tweak 1 ลิงก์ ⇒ ต้องนับขาด · เติม allow-scripts ⇒ ต้องถูกจับ
@@ -350,6 +354,7 @@ const mapsMiss = [...mapsGap(mapsHtml), ...DEV_MAPS.filter((m) => lf(readOr(`dev
 const mapsCtl = mapsGap(mapsHtml.replace(`<section id="${DEV_MAPS[0][0]}"`, '<section')).length === 1 && mapsGap(mapsHtml.replace('</body>', `<i id="${DEV_MAPS[0][0]}"></i></body>`)).some((x) => x.startsWith('id ซ้ำ'));
 check('dev/maps หน้าเดียวสลับครบทุกผัง id ไม่ซ้ำ ที่เดิมส่งต่อ', mapsMiss.length || !mapsCtl, ` ผัง ${DEV_MAPS.length}${mapsMiss.length ? ` · ${mapsMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${mapsCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('หน้าห้องผู้พัฒนามีแท็บครบชุดเดียวกัน', devMiss.length || !devCtl || !devCur, ` ${devFiles.length} หน้า${devMiss.length ? ` · ${devMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${devCtl ? 'จับได้' : 'จับไม่ได้'}`);
+check('หน้าห้องผู้พัฒนาใช้แถบเว็บชุดเดียวกับที่ build เขียน', devBarMiss.length || !devBarCtl, ` ${devBarMiss.length ? `ค้าง ${devBarMiss.slice(0, 4).join(' ')} (build ใหม่)` : 'ตรงทุกหน้า'} · ตัวควบคุม${devBarCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('ทุกหน้ามีแถบบนชุดเดียวและชี้หน้าปัจจุบัน', navMiss.length || !navCtl || !curOk, ` ${navFiles.length} หน้า${navMiss.length ? ` · ${navMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${navCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7c3) หน้า tweak ที่ใช้ CSS เกม (thai-life-deep 185): บล็อกในหน้า = CSS ของ template.html ตอนนี้ — แก้ CSS เกมแล้วลืม build = หน้า tweak โชว์หน้าตาเก่า
@@ -369,7 +374,6 @@ const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worl
 const dtOut = (f) => f === 'play.html' || f.startsWith('archive/') || f.startsWith('dev/ui-redo/') || /tweak/.test(f) || read(f).includes(MOVED_MARK);
 const dtMiss = [
   ...(JSON.stringify(dtBlock) !== JSON.stringify(dtNow) ? [`ค้าง ${DOCS_TWEAK_PAGE} (build ใหม่)`] : []),
-  ...(JSON.stringify(docsTweakBlock(readOr(T13_DEV_PAGE) ?? '')) !== JSON.stringify(dtNow) ? [`ค้าง ${T13_DEV_PAGE} (build ใหม่)`] : []),
   ...dtNow.pages.filter((p) => lf(read(p.f)) !== lf(injectDocsLayout(read(p.f), p.k, p.f)) || !read(p.f).includes('DOCS-LAYOUT:START')).map((p) => `เลย์เอาต์ค้าง ${p.f} (build ใหม่)`),
   ...dtMust.filter((f) => !dtFiles.includes(f)).map((f) => `ขาด ${f}`),
   ...dtFiles.filter((f) => !existsSync(new URL(f, docs)) || dtOut(f)).map((f) => `เกิน ${f}`),

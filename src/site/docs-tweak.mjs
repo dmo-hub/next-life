@@ -6,8 +6,7 @@ import { MOVED_MARK } from './nav.mjs';
 import { cssVars } from './ui.mjs';
 
 export const DOCS_TWEAK_PAGE = 'dev/tweak/docs-tweak.html';
-export const T13_DEV_PAGE = 'dev/tweak/t13-dev-room-tweak.html';
-export const DOCS_TWEAK_PAGES = [DOCS_TWEAK_PAGE, T13_DEV_PAGE];
+export const DOCS_TWEAK_PAGES = [DOCS_TWEAK_PAGE];
 export const DOCS_TWEAK_START = '/*DOCS-TWEAK:START*/';
 export const DOCS_TWEAK_END = '/*DOCS-TWEAK:END*/';
 

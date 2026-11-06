@@ -12,3 +12,8 @@ const LACQUER = { lacquer: '#17110D', lacquer2: '#221912', bronze: '#5A4630' };
 
 // --fh/--fb = หัว Maitree เนื้อ Sarabun (ข้อ 210 216) · --r มุมปุ่ม/ช่อง · --rk มุมการ์ด · หน้าเอกสารไม่มีเงา (ข้อ 217)
 export const SITE_ROOT = `:root { ${Object.entries({ ...T1, ...ON_HEAD, ...LACQUER }).map(([k, v]) => `--${k}:${v};`).join(' ')} --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }`;
+
+// แถบบนบนหน้าที่ไม่ได้ประกาศชุดสีกลาง (แผนที่ · คลังเก่า): ตั้งตัวแปรที่ตัวแถบ ไม่ใช่ :root เพราะหน้าพวกนี้มี --ink --paper --gold ของตัวเองที่เนื้อหน้าใช้อยู่
+// เอาแค่ตัวที่แถบอ่าน ไม่รวม --surface: เลย์เอาต์เอกสารดูคำนี้ว่าหน้ามีชุดสีกลางไหม ประกาศในแถบแล้วหน้าพวกนี้จะโดนทาพื้นด้วยตัวแปรที่ไม่มี
+const BAR_VARS = ['bg', 'ink', 'head', 'headink', 'accent2', 'gold', 'line'];
+export const SITE_BAR = `nav.top, .nl-nav { ${BAR_VARS.map((k) => `--${k}:${T1[k]};`).join(' ')} --on-head:${ON_HEAD['on-head']}; --fb:Sarabun,system-ui,sans-serif; --r:6px; }`;
