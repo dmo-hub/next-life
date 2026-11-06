@@ -2,7 +2,7 @@
 // โครงสาย/อาชีพ/ทางเข้าดึงจาก careers.json + การ์ด (when.occupation · when.ladder · effects.job/ladder) · % อ่านจากไฟล์ผลจำลองเท่านั้น
 // การ์ดที่ไม่มีในไฟล์ผล (ใหม่กว่าผลจำลอง) ขึ้นว่ายังไม่มีผลจำลอง ไม่เดาเลข · สร้างไฟล์ผลด้วย node harness/career-sim.mjs
 import { existsSync, readFileSync } from 'node:fs';
-import { esc, text } from './catalog.mjs';
+import { esc, text, spoilSlot } from './catalog.mjs';
 
 export const OFFICE_UNIT = 'office';
 export const unitKey = (ladder, occ) => `${ladder}|${occ}`;
@@ -105,14 +105,14 @@ const noSim = (ids, ctx) => (ids.length ? `<p class="rare">ยังไม่ม
 function unitHtml(key, title, sub, staticIn, staticCards, sim, ctx, L) {
   const u = sim?.units?.[key];
   const simCards = new Set(sim?.cards ?? []);
-  const head = `<h4>${esc(title)}${sub ? ` <small>${esc(sub)}</small>` : ''}</h4>`;
+  // ชื่อขั้นก็เป็นเฉลย เข้า template พร้อมเนื้อ เหลือชื่ออาชีพบนกล่อง
+  const box = (body) => `<div class="job"><h4>${esc(title)}</h4>${spoilSlot(`job-${key}`, `${sub ? `<p class="lives">${esc(sub)}</p>` : ''}${body}`)}</div>`;
   if (!u || !u.lives) {
-    return `<div class="job">${head}<p class="rare">ยังไม่มีผลจำลอง${sim ? ' — ไม่มีชีวิตจำลองไหนเคยทำงานนี้' : ''}</p>${noSim([...new Set([...staticIn, ...staticCards])].sort(), ctx)}</div>`;
+    return box(`<p class="rare">ยังไม่มีผลจำลอง${sim ? ' — ไม่มีชีวิตจำลองไหนเคยทำงานนี้' : ''}</p>${noSim([...new Set([...staticIn, ...staticCards])].sort(), ctx)}`);
   }
   const seenIn = new Set(u.entries.map((r) => r.id).filter(Boolean));
   const seenCards = new Set(u.cards.map((r) => r.id));
-  return [
-    `<div class="job">${head}`,
+  return box([
     `<p class="lives">เคยทำงานนี้ ${u.lives.toLocaleString('en-US')} จาก ${sim.lives.toLocaleString('en-US')} ชีวิตจำลอง</p>`,
     `<p class="sub">ทางเข้า</p>`,
     pctList(u.entries, u.lives, (r) => viaHtml(r, ctx)),
@@ -122,8 +122,7 @@ function unitHtml(key, title, sub, staticIn, staticCards, sim, ctx, L) {
     noSim(staticCards.filter((id) => !seenCards.has(id) && !simCards.has(id)), ctx),
     `<p class="sub">ทางออก</p>`,
     pctList(u.exits, u.lives, (r) => exitHtml(r, ctx, L)) || '<p class="rare">ไม่มีชีวิตจำลองที่ออกจากงานนี้</p>',
-    '</div>',
-  ].join('');
+  ].join(''));
 }
 
 // L: occ(id) → ชื่ออาชีพ · ladder(id) → "สาย…" (ตัวเดียวกับหน้าเฉลยส่วนการ์ด)
@@ -152,7 +151,7 @@ export function careerHtml(content, L, sim = careerSim()) {
   const office = careers.office;
   if (office) sections.push(`<h3>${esc(office.name)} <small>ทำควบงานเดิมได้ถึงระดับท้องถิ่น</small></h3><div class="jobs">${unitHtml(OFFICE_UNIT, office.name, `ขั้น ${office.steps.map((s) => s.name).join(' · ')}`, [], [], sim, ctx, L2)}</div>`);
   const lead = sim
-    ? `ผลจำลอง ${sim.lives.toLocaleString('en-US')} ชีวิต (บอท ${sim.bots.length} แบบ แบบละ ${sim.perBot.toLocaleString('en-US')} ชีวิต · เกมรุ่น ${esc(sim.sha)}) · เลขในกรอบฟ้า = ชีวิตที่เจอ ÷ ชีวิตที่เคยทำงานนั้น เจอกี่ครั้งก็นับครั้งเดียว ไม่ใช่โอกาสของผลสุ่มบนการ์ด`
+    ? `ผลจำลอง ${sim.lives.toLocaleString('en-US')} ชีวิต (บอท ${sim.bots.length} แบบ แบบละ ${sim.perBot.toLocaleString('en-US')} ชีวิต · เกมรุ่น ${esc(sim.sha)}) · เลขในกรอบ = ชีวิตที่เจอ ÷ ชีวิตที่เคยทำงานนั้น เจอกี่ครั้งก็นับครั้งเดียว ไม่ใช่โอกาสของผลสุ่มบนการ์ด`
     : 'ยังไม่มีไฟล์ผลจำลอง — รายการด้านล่างมาจากข้อมูลการ์ดอย่างเดียว ไม่มีเลข';
-  return `<details id="career"><summary>เส้นทางงาน <small>${Object.keys(careers.ladders).length + (office ? 1 : 0)} สาย · ผลจำลอง</small></summary><p class="lead">${lead}</p>${sections.join('')}</details>`;
+  return `<h2 id="career">เส้นทางงาน <small>${Object.keys(careers.ladders).length + (office ? 1 : 0)} สาย · ผลจำลอง</small></h2><p class="lead">${lead}</p>${sections.join('')}`;
 }
