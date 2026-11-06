@@ -46,47 +46,51 @@
   .tw { overflow-x: auto; margin: 0 0 12px; }
   .tw th, .tw td { overflow-wrap: normal; }
 </style>
+<!--DOCS-LAYOUT:START--><style>
+.w:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){max-width:1280px!important}body>main:not(:has(.w)):not(#app){max-width:1280px;margin-left:auto;margin-right:auto}:is(body>main,body>header,body>footer){padding-left:24px;padding-right:24px}
+main h2:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(:first-child){margin-top:28px}main :is(section,.box):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){margin-bottom:17px}
+main:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){overflow-wrap:anywhere}main .st:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){white-space:normal;max-width:100%}@media (max-width:640px){main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){display:block;max-width:100%;overflow-x:auto}}
+main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) :is(th,td):not(:is(.dark,.dark *)){border:1px solid var(--line)}main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) th:not(:is(.dark,.dark *)){background:var(--bg);color:var(--ink)}
+main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){padding:20px 24px;box-shadow:none}main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(.dark){background:var(--surface)}
+main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r)}
+.tag:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border-radius:0}
+</style><!--DOCS-LAYOUT:END-->
 </head>
 <body>
 <!--nav--><style>
 :root { --bg:#F4ECDC; --surface:#FBF6EA; --ink:#1B2A4A; --muted:#5B5648; --accent:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --seal:#A62B1F; --good:#2F6B4F; --bad:#B3261E; --line:#C9B98F; --line-strong:#8C7A52; --on-head:#E7E2D4; --on-head2:#D8D2C2; --on-head3:#BFB49A; --title:#F4ECDC; --lacquer:#17110D; --lacquer2:#221912; --bronze:#5A4630; --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }
+  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
+  nav.top a { display: inline-block; color: var(--on-head); text-decoration: none; padding: 0 10px; line-height: 40px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: var(--headink); }
+  nav.top a[aria-current] { color: var(--headink); font-weight: 600; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 600; color: var(--headink); padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: var(--gold); color: var(--head); border-radius: var(--r); line-height: 28px; padding: 0 12px; font-weight: 600; white-space: nowrap; }
+  nav.top a.play:focus-visible { outline: 2px solid var(--headink); outline-offset: 2px; }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
+
 .nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
 .nl-nav{font:15px/1.4 var(--fb);text-align:left}
 .nl-nav a{text-decoration:none;color:inherit}
-.nl-in{max-width:1040px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
-.nl-top{background:var(--head);color:var(--title)}
-.nl-top>.nl-in{min-height:52px;flex-wrap:wrap;column-gap:12px}
-.nl-brand{font-weight:600;margin-right:auto;padding:12px 0}
-.nl-main{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
-.nl-main a{padding:13px 8px 11px;border-bottom:3px solid transparent;white-space:nowrap}
-.nl-main a[aria-current]{border-bottom-color:var(--gold);font-weight:600}
-.nl-swap{border:1px solid var(--line-strong);padding:5px 10px;font-size:14px;white-space:nowrap;opacity:.9}
-.nl-swap:hover,.nl-main a:hover{opacity:1;color:var(--surface)}
-.nl-dev .nl-top{background:var(--head)}
-.nl-badge{display:inline-block;margin-left:6px;padding:0 6px;font-size:12px;background:var(--accent2);color:var(--surface);vertical-align:2px}
+.nl-in{max-width:1280px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:4px}
 .nl-tabs{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--line)}
 .nl-tabs .nl-in{overflow-x:auto;scrollbar-width:none}
 .nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
 .nl-tabs a[aria-current]{border-bottom-color:var(--accent2);font-weight:600}
 .nl-tabs.nl-sub{background:var(--bg);font-size:14px}
-@media (max-width:640px){
-.nl-top>.nl-in{padding:0}
-.nl-brand{padding:12px 16px}
-.nl-swap{margin-right:16px}
-.nl-main{order:3;width:100%;padding:0 8px;border-top:1px solid var(--line-strong)}
-}
-</style><div class="nl-nav nl-dev"><div class="nl-top"><div class="nl-in"><a class="nl-brand" href="../dev/index.html">ห้องผู้พัฒนา<span class="nl-badge">dev</span></a><a class="nl-swap" href="../index.html">← กลับหน้าเกม</a></div></div><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html">คำตัดสินเกม</a><a href="../dev/ui.html" aria-current="page">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div>
+</style><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="../index.html">NEXT LIFE</a><div class="links"><a href="../guide.html">วิธีเล่น</a><a href="../whatsnew.html">แพตช์โน้ต</a><a href="../about.html">กลไกในเกม</a><a href="../worlds.html">โลก</a><a href="../catalog.html">การ์ดทั้งหมด</a><a href="../dev/index.html" aria-current="true">ห้องผู้พัฒนา</a></div><a class="play" href="../play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html">คำตัดสินเกม</a><a href="../dev/ui.html" aria-current="page">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div><!--/nav-->
 <header><div class="w">
   <h1>ดีไซน์ UI</h1>
-  <p>สี ตัวอักษร ชิ้นส่วนของหน้าเล่น คำตัดสิน UI หน้า tweak และต้นแบบปรับสด · โครงหน้า เนื้อครบ ยังไม่จัดสวย · เวอร์ชัน <span data-fact="version">v0.6.89</span></p>
+  <p>สี ตัวอักษร ชิ้นส่วนของหน้าเล่น คำตัดสิน UI หน้า tweak และต้นแบบปรับสด · โครงหน้า เนื้อครบ ยังไม่จัดสวย · เวอร์ชัน <span data-fact="version">v0.6.103</span></p>
 </div></header>
 <main><div class="w">
 <p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
 <style>.sws{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 12px}.sws li{display:flex;align-items:center;gap:8px;margin:0;min-width:0}.sws small{overflow-wrap:anywhere}.sw{flex:none;width:28px;height:28px;border:1px solid var(--ink)}.ui-spec{margin:0 0 16px}.ui-spec figcaption{font-size:14px;font-weight:600;margin:0 0 4px}.fspec{margin:0 0 12px;overflow-wrap:anywhere}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.wait{color:var(--muted);font-size:14px}.st{display:inline-block;font-size:12px;font-weight:600;padding:0 6px;border:1px solid currentColor;margin-left:6px;white-space:nowrap;line-height:1.5}.st.done{color:var(--good)}.st.pick{color:var(--accent2)}.st.wait{color:var(--ink)}.ui-live{width:min(1400px,calc(100vw - 32px));margin:0 0 16px calc(50% - min(700px,calc(50vw - 16px)))}.ui-live iframe{display:block;width:100%;height:min(900px,calc(100vh - 24px));min-height:560px;border:1px solid var(--line);background:var(--bg)}</style>
 <h2 id="ui-decisions">คำตัดสิน UI</h2>
 <p>หน้าเล่นใช้การ์ดใบเดียวกลางจอ แถบสถานะสองแถวบนการ์ด แถบเมนูล่าง · ธีมการ์ดสามแบบ: กระดาษ (ชีวิตนี้) · ลายรดน้ำ (ระหว่างชาติ) · ต่างโลก · งานปรับหน้าตาทุกชิ้นมีหน้า tweak ให้เจ้าของเลือกก่อนลงจริง · คำตัดสินเต็ม: <a href="design-ui-redo.html">คำตัดสินเกม เรื่อง ui-redo</a></p>
-<h3>หน้า tweak (15)</h3>
-<ul id="ui-tweaks"><li><a href="#ui-live">ต้นแบบปรับสด</a><span class="st pick">เลือกแล้ว รอลงเกม</span></li><li><a href="#ui-t-b67">หน้า tweak B67: สถิติวิญญาณ + จอนิพพาน/โพธิสัตว์</a><span class="st pick">เลือกแล้ว รอลงเกม</span></li><li><a href="#ui-t-card-art">ภาพบนการ์ด: พื้นหลังแรกเกิด + ภาพหมวดการ์ดผล (tweak)</a><span class="st pick">เลือกแล้ว รอลงเกม</span></li><li><a href="#ui-t-card-spoil">T14 หน้าการ์ดรวม: ปุ่มดูผลและกล่องเฉลย (tweak)</a><span class="st pick">เลือกแล้ว ชุด ค ปรับ (ข้อ 236–238) รอลงใบ 127</span></li><li><a href="#ui-t-cards">ต้นแบบการ์ด v2</a></li><li><a href="#ui-t-death">T10 การ์ดตาย book: กรอบ ลาย ตรา (tweak)</a><span class="st pick">เลือกแล้ว ชุด ก ปรับ (ข้อ 239–241) รอลงใบ 119</span></li><li><a href="#ui-t-docs">ปรับเลย์เอาต์เว็บเอกสาร (tweak)</a></li><li><a href="#ui-t-entry">ปรับใบชวนไปต่างโลก (tweak)</a><span class="st pick">เลือกแล้ว รอลงเกม</span></li><li><a href="#ui-t-head">ปรับหัวการ์ด + เมนู 6 ปุ่ม + แท็บโฟกัส (tweak)</a><span class="st done">ลงแล้วบางส่วน v0.6.65–66 · ใบ 49 v0.6.75</span><span class="st pick">เลือกแล้ว รอลงใบ 50–51 · ไม่มีเกจฐานะ</span></li><li><a href="#ui-t-me-panel">แผงตัวฉัน: รวมเงิน</a><span class="st pick">เลือกแล้ว รอลงใบ 131 · ประวัติงานแบบช่วงอายุ</span></li><li><a href="#ui-t-shelf-tabs">ปุ่มแท็บชั้นสมุด 9 แบบ (tweak)</a><span class="st pick">เลือกแล้ว รอลงเกม</span></li><li><a href="#ui-t-style-tones">ต้นแบบสไตล์ 4 ทิศ เทียบใบ 02 (tweak)</a><span class="st pick">เลือกแล้ว รอลงเกม</span></li><li><a href="#ui-t-t1-tokens">T1 ชุดสี + ฟอนต์กลาง (tweak)</a><span class="st pick">ชาติไทยลงเกมแล้ว (ใบ 105) · โลกอื่นคงสีเดิมรอใบ 120/121</span></li><li><a href="#ui-t-t1-worlds">T1 ช่วงคั่น: สีโลกอื่นก่อน T11 (tweak)</a><span class="st pick">เลือกแล้ว ชุด ก ไม่แตะสีโลกอื่นจนใบ 121 (ข้อ 228)</span></li><li><a href="#ui-t-t9-title-medal">T9 ฉายาตราเหรียญ (tweak)</a><span class="st pick">เลือกแล้ว ชุด ก ตราแปดเหลี่ยม Maitree (ข้อ 242–244) รอลงใบ 117</span></li></ul>
+<h3>หน้า tweak (11)</h3>
+<ul id="ui-tweaks"><li><a href="#ui-live">ต้นแบบปรับสด</a><span class="st pick">เลือกแล้ว รอลงเกม</span></li><li><a href="#ui-t-b67">หน้า tweak B67: สถิติวิญญาณ + จอนิพพาน/โพธิสัตว์</a><span class="st pick">เลือกแล้ว รอลงเกม</span></li><li><a href="#ui-t-card-art">ภาพบนการ์ด: พื้นหลังแรกเกิด + ภาพหมวดการ์ดผล (tweak)</a><span class="st pick">เลือกแล้ว รอลงเกม</span></li><li><a href="#ui-t-cards">ต้นแบบการ์ด v2</a></li><li><a href="#ui-t-docs">ปรับเลย์เอาต์เว็บเอกสาร (tweak)</a></li><li><a href="#ui-t-entry">ปรับใบชวนไปต่างโลก (tweak)</a><span class="st pick">เลือกแล้ว รอลงเกม</span></li><li><a href="#ui-t-head">ปรับหัวการ์ด + เมนู 6 ปุ่ม + แท็บโฟกัส (tweak)</a><span class="st done">ลงแล้วบางส่วน v0.6.65–66 · ใบ 49 v0.6.75</span><span class="st pick">เลือกแล้ว รอลงใบ 50–51 · ไม่มีเกจฐานะ</span></li><li><a href="#ui-t-me-panel">แผงตัวฉัน: รวมเงิน</a><span class="st pick">เลือกแล้ว รอลงใบ 131 · ประวัติงานแบบช่วงอายุ</span></li><li><a href="#ui-t-style-tones">ต้นแบบสไตล์ 4 ทิศ เทียบใบ 02 (tweak)</a><span class="st pick">เลือกแล้ว รอลงเกม</span></li><li><a href="#ui-t-t1-tokens">T1 ชุดสี + ฟอนต์กลาง (tweak)</a><span class="st pick">ชาติไทยลงเกมแล้ว (ใบ 105) · โลกอื่นคงสีเดิมรอใบ 120/121</span></li><li><a href="#ui-t-t1-worlds">T1 ช่วงคั่น: สีโลกอื่นก่อน T11 (tweak)</a><span class="st pick">เลือกแล้ว ชุด ก ไม่แตะสีโลกอื่นจนใบ 121 (ข้อ 228)</span></li></ul>
 <h2 id="ui-live">ต้นแบบปรับสด</h2>
 <p>จอต้นแบบหน้าเล่นกดได้ (ui-redo 02) — ปรับเลย์เอาต์/ชิ้นย่อยแล้วกด "คัดลอกค่า" ส่งผู้รวมงาน · ค่าที่ปรับจำไว้ในเครื่อง (ชุดเดียวกับหน้า tweak เดิม)<span class="st pick">เลือกแล้ว รอลงเกม</span></p>
 <div class="ui-live"><iframe title="ต้นแบบปรับสด" allow="clipboard-write" srcdoc="<!doctype html>
@@ -457,6 +461,7 @@
     skill: '<path d=&quot;m12 3 2.2 5.6L20 9.5l-4.5 3.8L17 19l-5-3.1L7 19l1.5-5.7L4 9.5l5.8-.9z&quot;/>',
     job: '<path d=&quot;M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z&quot;/>',
     speed: '<path d=&quot;M4 18a8 8 0 1 1 16 0&quot;/><path d=&quot;m12 18 4-6&quot;/>',
+    focus: '<circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;8&quot;/><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;4&quot;/><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;0.8&quot;/>',
     past: '<path d=&quot;M4 12a8 8 0 1 0 2.3-5.6&quot;/><path d=&quot;M4 4v4h4&quot;/><path d=&quot;M12 8v4l3 2&quot;/>',
     pet: '<circle cx=&quot;6.5&quot; cy=&quot;10&quot; r=&quot;1.8&quot;/><circle cx=&quot;10&quot; cy=&quot;6.5&quot; r=&quot;1.8&quot;/><circle cx=&quot;14&quot; cy=&quot;6.5&quot; r=&quot;1.8&quot;/><circle cx=&quot;17.5&quot; cy=&quot;10&quot; r=&quot;1.8&quot;/><path d=&quot;M8 17.5c0-3 1.8-5.5 4-5.5s4 2.5 4 5.5c0 1.6-1.8 2-4 2s-4-.4-4-2z&quot;/>',
     menu: '<path d=&quot;M4 7h16M4 12h16M4 17h16&quot;/>',
@@ -578,9 +583,9 @@
   const MENUS = {
     thai: { 5: [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['life', 'ชีวิต', 'life'], ['family', 'ครอบครัว', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['money', 'เงิน', 'money'], ['shelf', 'สมุด', 'shelf']] },
     isekai: { 5: [['me', 'ตัวฉัน', 'me'], ['skill', 'สกิล', 'skill'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['life', 'ชีวิต', 'life'], ['skill', 'สกิล', 'skill'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf']], '4more': [['me', 'ตัวฉัน', 'me'], ['skill', 'สกิล', 'skill'], ['job', 'อาชีพ', 'job'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf']] },
-    after: { 5: [['past', 'ชีวิตที่แล้ว', 'past'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['past', 'ชีวิตที่แล้ว', 'past'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['past', 'ชีวิตที่แล้ว', 'past'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf']] },
+    after: { 5: [['past', 'ชีวิตที่แล้ว', 'past'], ['focus', 'โฟกัส', 'focus'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['past', 'ชีวิตที่แล้ว', 'past'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['past', 'ชีวิตที่แล้ว', 'past'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf']] },
   };
-  const PANEL_T = { me: 'ตัวฉัน', life: 'ชีวิต', family: 'ครอบครัว', money: 'เงิน', shelf: 'สมุด', more: 'เพิ่มเติม', skill: 'สกิล', job: 'อาชีพ', speed: 'ความเร็ว', past: 'ชีวิตที่แล้ว' };
+  const PANEL_T = { me: 'ตัวฉัน', life: 'ชีวิต', family: 'ครอบครัว', money: 'เงิน', shelf: 'สมุด', more: 'เพิ่มเติม', skill: 'สกิล', job: 'อาชีพ', speed: 'ความเร็ว', past: 'ชีวิตที่แล้ว', focus: 'โฟกัส' };
   const PEOPLE = [['พ', 'สมชาย ศรีสุข', 'พ่อ · 58 ปี', 70], ['ม', 'บุญมี ศรีสุข', 'แม่ · 55 ปี · ป่วย', 85], ['ต', 'ต้น', 'แฟน · 29 ปี', 62], ['ก', 'กานต์', 'น้องชาย · 22 ปี', 40]];
   const PETROW = `<li><span class=&quot;av&quot;>${ic('pet')}</span><span class=&quot;nm&quot;>ขนุน<small>แมวส้ม · 4 ปี</small></span><span class=&quot;br&quot;><i style=&quot;width:90%&quot;></i></span></li>`;
 
@@ -880,6 +885,7 @@
     }
     if (id === 'skill' &amp;&amp; cfg.iSkill === 'carry') return `<p class=&quot;kk&quot;>พกข้ามชาติได้ 3 สกิล · ชาติใหม่เริ่มขั้น 1 แล้วโตเร็วจนถึงขั้นในสมุด</p><div class=&quot;carry&quot;><span class=&quot;f&quot;>${ic('skill')}ลูกไฟ<small>ในสมุด ขั้น 3<br>ตอนนี้ ขั้น 1</small></span><span class=&quot;f&quot;>${ic('skill')}โล่น้ำแข็ง<small>ในสมุด ขั้น 2<br>ตอนนี้ ขั้น 2</small></span><span>ว่าง</span></div><div class=&quot;follow&quot;><h4>ตามไปชาติหน้า</h4><ul><li>ลูกไฟ · โล่น้ำแข็ง (ขั้นในสมุดจำไว้)</li><li>ชื่อในตำนานของโลกนี้</li></ul><h4>ไม่ตามไป</h4><ul><li class=&quot;no&quot;>เดินเงา (ไม่ได้พก)</li><li class=&quot;no&quot;>ทองในกระเป๋า</li><li class=&quot;no&quot;>อาชีพนักผจญภัยกับระดับกิลด์</li></ul></div>`;
     if (id === 'more') return `<ul class=&quot;lst&quot;>${cfg.pet === 'more' ? `<li>${ic('pet')} สัตว์เลี้ยง<em>ขนุน · แมวส้ม</em></li>` : ''}${cfg.menu === '4more' ? `<li>${ic('money')} เงิน<em>฿184,000</em></li>` : ''}<li>${ic('shelf')} บันทึก/โหลดเกม</li><li>${ic('menu')} ตั้งค่า</li></ul>`;
+    if (id === 'focus') return `<p class=&quot;kk&quot;>ชาติที่แล้วทุ่มเทมากสุด</p><ul class=&quot;lst&quot;><li>${ic('focus')} งาน<em>ดูอย่างเดียว</em></li></ul>`;
     if (id === 'past') return `<ul class=&quot;tl&quot;><li>นิดา ศรีสุข<small>ตาย 74 ปี · ครูประถม · ขอนแก่น</small></li><li>ประยูร ทองดี<small>ตาย 81 ปี · ชาวนา</small></li></ul>`;
     if (id === 'skill') return `<ul class=&quot;lst&quot;><li>${ic('skill')} ลูกไฟ<em>ระดับ 3</em></li><li>${ic('skill')} โล่น้ำแข็ง<em>ระดับ 1</em></li></ul>`;
     if (id === 'speed') return `<ul class=&quot;lst&quot;><li>ปีละการ์ด<em>ปกติ</em></li><li>ข้ามปีเงียบ<em>เร็ว</em></li></ul>`;
@@ -1118,7 +1124,7 @@
   const QS = [
     ['ชุดปุ่มเมนูล่าง (ชาติไทย)', 'menu', 'year', [['5', 'ตัวฉัน (รวมเงิน) · ครอบครัว · สมุด · เพิ่มเติม'], ['4', 'ชีวิต (รวมเงิน) · ครอบครัว · สมุด · เพิ่มเติม'], ['4more', 'ตัวฉัน · ครอบครัว · เงิน · สมุด + ปุ่ม ⋯ บนแถบสถานะ']]],
     ['เมนูต่างโลก', 'menu', 'isekai', [['5', 'ตัวฉัน (รวมอาชีพ) · สกิล · ความเร็ว · สมุด · เพิ่มเติม'], ['4', 'ชีวิต · สกิล · ความเร็ว · สมุด'], ['4more', 'ตัวฉัน · สกิล · อาชีพ · ความเร็ว · สมุด']]],
-    ['เมนูปรโลก', 'menu', 'after', [['5', 'ชีวิตที่แล้ว · ตระกูล · สมุด · เพิ่มเติม'], ['4', 'ชีวิตที่แล้ว · สมุด · เพิ่มเติม'], ['4more', 'ชีวิตที่แล้ว · ตระกูล · สมุด']]],
+    ['เมนูปรโลก', 'menu', 'after', [['5', 'ชีวิตที่แล้ว · โฟกัส · ตระกูล · สมุด · เพิ่มเติม'], ['4', 'ชีวิตที่แล้ว · สมุด · เพิ่มเติม'], ['4more', 'ชีวิตที่แล้ว · ตระกูล · สมุด']]],
     ['แท็บการ์ดตาย', 'dPre', 'death', [['a', DSETS.a.join(' · ')], ['b', DSETS.b.join(' · ')], ['c', DSETS.c.join(' · ')]]],
     ['สัตว์เลี้ยง', 'pet', 'me', [['family', 'ท้ายแผงครอบครัว'], ['family', 'ท้ายแผงครอบครัว'], ['none', 'ยังไม่ทำแผง คงบรรทัดในการ์ดตาย']]],
     ['หน้าเปิดเกม', 'home', 'home', [['old', 'เปลี่ยนแค่สี/ตัวอักษร ในชิ้นโครง + เมนู'], ['world', 'รื้อด้วย ในชิ้นโครง + เมนู (ในจอสด = เลือกโลกเป็นการ์ด)'], ['old', 'คงเดิม รื้อเป็นชิ้นแยกท้ายคิว']]],
@@ -1181,18 +1187,14 @@
 "></iframe></div>
 <h2 id="ui-t-b67">หน้า tweak B67: สถิติวิญญาณ + จอนิพพาน/โพธิสัตว์</h2><p><small>dev/tweak/b67-tweak.html</small><span class="st pick">เลือกแล้ว รอลงเกม</span></p><div class="ui-live"><iframe title="หน้า tweak B67: สถิติวิญญาณ + จอนิพพาน/โพธิสัตว์" allow="clipboard-write" loading="lazy" src="tweak/b67-tweak.html"></iframe></div>
 <h2 id="ui-t-card-art">ภาพบนการ์ด: พื้นหลังแรกเกิด + ภาพหมวดการ์ดผล (tweak)</h2><p><small>dev/tweak/card-art-tweak.html</small><span class="st pick">เลือกแล้ว รอลงเกม</span></p><div class="ui-live"><iframe title="ภาพบนการ์ด: พื้นหลังแรกเกิด + ภาพหมวดการ์ดผล (tweak)" allow="clipboard-write" loading="lazy" src="tweak/card-art-tweak.html"></iframe></div>
-<h2 id="ui-t-card-spoil">T14 หน้าการ์ดรวม: ปุ่มดูผลและกล่องเฉลย (tweak)</h2><p><small>dev/tweak/card-spoil-tweak.html</small><span class="st pick">เลือกแล้ว ชุด ค ปรับ (ข้อ 236–238) รอลงใบ 127</span></p><div class="ui-live"><iframe title="T14 หน้าการ์ดรวม: ปุ่มดูผลและกล่องเฉลย (tweak)" allow="clipboard-write" loading="lazy" src="tweak/card-spoil-tweak.html"></iframe></div>
 <h2 id="ui-t-cards">ต้นแบบการ์ด v2</h2><p><small>dev/tweak/cards.html</small></p><div class="ui-live"><iframe title="ต้นแบบการ์ด v2" allow="clipboard-write" loading="lazy" src="tweak/cards.html"></iframe></div>
-<h2 id="ui-t-death">T10 การ์ดตาย book: กรอบ ลาย ตรา (tweak)</h2><p><small>dev/tweak/death-tweak.html</small><span class="st pick">เลือกแล้ว ชุด ก ปรับ (ข้อ 239–241) รอลงใบ 119</span></p><div class="ui-live"><iframe title="T10 การ์ดตาย book: กรอบ ลาย ตรา (tweak)" allow="clipboard-write" loading="lazy" src="tweak/death-tweak.html"></iframe></div>
 <h2 id="ui-t-docs">ปรับเลย์เอาต์เว็บเอกสาร (tweak)</h2><p><small>dev/tweak/docs-tweak.html</small></p><div class="ui-live"><iframe title="ปรับเลย์เอาต์เว็บเอกสาร (tweak)" allow="clipboard-write" loading="lazy" src="tweak/docs-tweak.html"></iframe></div>
 <h2 id="ui-t-entry">ปรับใบชวนไปต่างโลก (tweak)</h2><p><small>dev/tweak/entry-tweak.html</small><span class="st pick">เลือกแล้ว รอลงเกม</span></p><div class="ui-live"><iframe title="ปรับใบชวนไปต่างโลก (tweak)" allow="clipboard-write" loading="lazy" src="tweak/entry-tweak.html"></iframe></div>
 <h2 id="ui-t-head">ปรับหัวการ์ด + เมนู 6 ปุ่ม + แท็บโฟกัส (tweak)</h2><p><small>dev/tweak/head-tweak.html</small><span class="st done">ลงแล้วบางส่วน v0.6.65–66 · ใบ 49 v0.6.75</span><span class="st pick">เลือกแล้ว รอลงใบ 50–51 · ไม่มีเกจฐานะ</span></p><div class="ui-live"><iframe title="ปรับหัวการ์ด + เมนู 6 ปุ่ม + แท็บโฟกัส (tweak)" allow="clipboard-write" loading="lazy" src="tweak/head-tweak.html"></iframe></div>
 <h2 id="ui-t-me-panel">แผงตัวฉัน: รวมเงิน</h2><p><small>dev/tweak/me-panel-tweak.html</small><span class="st pick">เลือกแล้ว รอลงใบ 131 · ประวัติงานแบบช่วงอายุ</span></p><div class="ui-live"><iframe title="แผงตัวฉัน: รวมเงิน" allow="clipboard-write" loading="lazy" src="tweak/me-panel-tweak.html"></iframe></div>
-<h2 id="ui-t-shelf-tabs">ปุ่มแท็บชั้นสมุด 9 แบบ (tweak)</h2><p><small>dev/tweak/shelf-tabs-tweak.html</small><span class="st pick">เลือกแล้ว รอลงเกม</span></p><div class="ui-live"><iframe title="ปุ่มแท็บชั้นสมุด 9 แบบ (tweak)" allow="clipboard-write" loading="lazy" src="tweak/shelf-tabs-tweak.html"></iframe></div>
 <h2 id="ui-t-style-tones">ต้นแบบสไตล์ 4 ทิศ เทียบใบ 02 (tweak)</h2><p><small>dev/tweak/style-tones-tweak.html</small><span class="st pick">เลือกแล้ว รอลงเกม</span></p><div class="ui-live"><iframe title="ต้นแบบสไตล์ 4 ทิศ เทียบใบ 02 (tweak)" allow="clipboard-write" loading="lazy" src="tweak/style-tones-tweak.html"></iframe></div>
 <h2 id="ui-t-t1-tokens">T1 ชุดสี + ฟอนต์กลาง (tweak)</h2><p><small>dev/tweak/t1-tokens-tweak.html</small><span class="st pick">ชาติไทยลงเกมแล้ว (ใบ 105) · โลกอื่นคงสีเดิมรอใบ 120/121</span></p><div class="ui-live"><iframe title="T1 ชุดสี + ฟอนต์กลาง (tweak)" allow="clipboard-write" loading="lazy" src="tweak/t1-tokens-tweak.html"></iframe></div>
 <h2 id="ui-t-t1-worlds">T1 ช่วงคั่น: สีโลกอื่นก่อน T11 (tweak)</h2><p><small>dev/tweak/t1-worlds-tweak.html</small><span class="st pick">เลือกแล้ว ชุด ก ไม่แตะสีโลกอื่นจนใบ 121 (ข้อ 228)</span></p><div class="ui-live"><iframe title="T1 ช่วงคั่น: สีโลกอื่นก่อน T11 (tweak)" allow="clipboard-write" loading="lazy" src="tweak/t1-worlds-tweak.html"></iframe></div>
-<h2 id="ui-t-t9-title-medal">T9 ฉายาตราเหรียญ (tweak)</h2><p><small>dev/tweak/t9-title-medal-tweak.html</small><span class="st pick">เลือกแล้ว ชุด ก ตราแปดเหลี่ยม Maitree (ข้อ 242–244) รอลงใบ 117</span></p><div class="ui-live"><iframe title="T9 ฉายาตราเหรียญ (tweak)" allow="clipboard-write" loading="lazy" src="tweak/t9-title-medal-tweak.html"></iframe></div>
 <h2 id="ui-colors">สี</h2>
 <p>อ่านจากตัวแปร CSS ของหน้าเล่น (<code>src/ui/template.html</code>) ตอน build</p>
 <h3><code>:root</code></h3><ul class="sws"><li><span class="sw" style="background:#F4ECDC"></span><code>--page</code> <small>#F4ECDC</small></li><li><span class="sw" style="background:#1B2A4A"></span><code>--ink</code> <small>#1B2A4A</small></li><li><span class="sw" style="background:#5B5648"></span><code>--muted</code> <small>#5B5648</small></li><li><span class="sw" style="background:#FBF6EA"></span><code>--paper</code> <small>#FBF6EA</small></li><li><span class="sw" style="background:#C9B98F"></span><code>--rule</code> <small>#C9B98F</small></li><li><span class="sw" style="background:#8C7A52"></span><code>--line-strong</code> <small>#8C7A52</small></li><li><span class="sw" style="background:#A62B1F"></span><code>--red</code> <small>#A62B1F</small></li><li><span class="sw" style="background:#2F6B4F"></span><code>--green</code> <small>#2F6B4F</small></li><li><span class="sw" style="background:#7A5C12"></span><code>--blue</code> <small>#7A5C12</small></li><li><span class="sw" style="background:#1B2A4A"></span><code>--head</code> <small>#1B2A4A</small></li><li><span class="sw" style="background:#17110D"></span><code>--lacquer</code> <small>#17110D</small></li><li><span class="sw" style="background:#221912"></span><code>--lacquer2</code> <small>#221912</small></li><li><span class="sw" style="background:#D9B45A"></span><code>--gold</code> <small>#D9B45A</small></li><li><span class="sw" style="background:#F0D78C"></span><code>--gold2</code> <small>#F0D78C</small></li><li><span class="sw" style="background:#EFE3C2"></span><code>--cream</code> <small>#EFE3C2</small></li><li><span class="sw" style="background:#5A4630"></span><code>--bronze</code> <small>#5A4630</small></li><li><span class="sw" style="background:#8A6D3B"></span><code>--bronze2</code> <small>#8A6D3B</small></li><li><span class="sw" style="background:#BFAE86"></span><code>--sand</code> <small>#BFAE86</small></li><li><span class="sw" style="background:#015EC1"></span><code>--fl</code> <small>#015EC1</small></li><li><span class="sw" style="background:#B3261E"></span><code>--dg</code> <small>#B3261E</small></li><li><span class="sw" style="background:#E2D9C6"></span><code>--track</code> <small>#E2D9C6</small></li></ul>
@@ -1200,7 +1202,7 @@
 <h3><code>.i .choice, .b .choice, .a .choice:hover, .a .choice:focus-visible</code></h3><ul class="sws"><li><span class="sw" style="background:#7FE0A8"></span><code>--fx-up</code> <small>#7FE0A8</small></li><li><span class="sw" style="background:#FF8A7A"></span><code>--fx-dn</code> <small>#FF8A7A</small></li></ul>
 <h3><code>body:has(#app &gt; .card.i)</code></h3><ul class="sws"><li><span class="sw" style="background:#0B0D20"></span><code>--page</code> <small>#0B0D20</small></li><li><span class="sw" style="background:#A6AEDB"></span><code>--muted</code> <small>#A6AEDB</small></li><li><span class="sw" style="background:#E8ECFF"></span><code>--ink</code> <small>#E8ECFF</small></li><li><span class="sw" style="background:#D3D8F5"></span><code>--ink2</code> <small>#D3D8F5</small></li><li><span class="sw" style="background:#161A3A"></span><code>--paper</code> <small>#161A3A</small></li><li><span class="sw" style="background:#232A5E"></span><code>--paper2</code> <small>#232A5E</small></li><li><span class="sw" style="background:#3B4BA8"></span><code>--rule2</code> <small>#3B4BA8</small></li><li><span class="sw" style="background:#6FE3FF"></span><code>--fl</code> <small>#6FE3FF</small></li><li><span class="sw" style="background:#FF8A8A"></span><code>--dg</code> <small>#FF8A8A</small></li><li><span class="sw" style="background:#262C5A"></span><code>--track</code> <small>#262C5A</small></li></ul>
 <h3><code>body:has(#app &gt; .card.af)</code></h3><ul class="sws"><li><span class="sw" style="background:#0E0A08"></span><code>--page</code> <small>#0E0A08</small></li><li><span class="sw" style="background:#BFAE86"></span><code>--muted</code> <small>#BFAE86</small></li><li><span class="sw" style="background:#EFE3C2"></span><code>--ink</code> <small>#EFE3C2</small></li><li><span class="sw" style="background:#E3D6B3"></span><code>--ink2</code> <small>#E3D6B3</small></li><li><span class="sw" style="background:#17110D"></span><code>--paper</code> <small>#17110D</small></li><li><span class="sw" style="background:#2A2018"></span><code>--paper2</code> <small>#2A2018</small></li><li><span class="sw" style="background:#5A4630"></span><code>--rule2</code> <small>#5A4630</small></li><li><span class="sw" style="background:#D9B45A"></span><code>--fl</code> <small>#D9B45A</small></li><li><span class="sw" style="background:#FF8A7A"></span><code>--dg</code> <small>#FF8A7A</small></li><li><span class="sw" style="background:#2A2018"></span><code>--track</code> <small>#2A2018</small></li></ul>
-<h3>ค่าอื่น</h3><table><tr><th>ที่</th><th>ตัวแปร</th><th>ค่า</th></tr><tr><td><code>:root</code></td><td><code>--ink2</code></td><td>color-mix(in srgb, #1B2A4A 70%, #5B5648)</td></tr><tr><td><code>:root</code></td><td><code>--paper2</code></td><td>color-mix(in srgb, #FBF6EA 45%, #F4ECDC)</td></tr><tr><td><code>:root</code></td><td><code>--rule2</code></td><td>color-mix(in srgb, #C9B98F 60%, #FBF6EA)</td></tr><tr><td><code>:root</code></td><td><code>--ft</code></td><td>Sarabun,system-ui,sans-serif</td></tr><tr><td><code>:root</code></td><td><code>--fh</code></td><td>Maitree,serif</td></tr><tr><td><code>:root</code></td><td><code>--r</code></td><td>6px</td></tr><tr><td><code>:root</code></td><td><code>--rk</code></td><td>8px</td></tr><tr><td><code>:root</code></td><td><code>--rc</code></td><td>999px</td></tr><tr><td><code>:root</code></td><td><code>--sh</code></td><td>0 1px 0 var(--gold), 0 6px 18px color-mix(in srgb, var(--ink) 10%, transparent)</td></tr><tr><td><code>:root</code></td><td><code>--cw</code></td><td>800px</td></tr><tr><td><code>:root</code></td><td><code>--pad-y</code></td><td>36px</td></tr><tr><td><code>:root</code></td><td><code>--pad-x</code></td><td>32px</td></tr><tr><td><code>:root</code></td><td><code>--chrome</code></td><td>136px</td></tr><tr><td><code>:root</code></td><td><code>--nav-h</code></td><td>60px</td></tr><tr><td><code>:root</code></td><td><code>--rail-w</code></td><td>calc(220px + env(safe-area-inset-left))</td></tr><tr><td><code>:root</code></td><td><code>--sheet-w</code></td><td>420px</td></tr><tr><td><code>:root</code></td><td><code>--rail-w</code></td><td>calc(96px + env(safe-area-inset-left))</td></tr></table>
+<h3>ค่าอื่น</h3><table><tr><th>ที่</th><th>ตัวแปร</th><th>ค่า</th></tr><tr><td><code>:root</code></td><td><code>--ink2</code></td><td>color-mix(in srgb, #1B2A4A 70%, #5B5648)</td></tr><tr><td><code>:root</code></td><td><code>--paper2</code></td><td>color-mix(in srgb, #FBF6EA 45%, #F4ECDC)</td></tr><tr><td><code>:root</code></td><td><code>--rule2</code></td><td>color-mix(in srgb, #C9B98F 60%, #FBF6EA)</td></tr><tr><td><code>:root</code></td><td><code>--seal</code></td><td>var(--red)</td></tr><tr><td><code>:root</code></td><td><code>--ft</code></td><td>Sarabun,system-ui,sans-serif</td></tr><tr><td><code>:root</code></td><td><code>--fh</code></td><td>Maitree,serif</td></tr><tr><td><code>:root</code></td><td><code>--r</code></td><td>6px</td></tr><tr><td><code>:root</code></td><td><code>--rk</code></td><td>8px</td></tr><tr><td><code>:root</code></td><td><code>--rc</code></td><td>999px</td></tr><tr><td><code>:root</code></td><td><code>--sh</code></td><td>0 1px 0 var(--gold), 0 6px 18px color-mix(in srgb, var(--ink) 10%, transparent)</td></tr><tr><td><code>:root</code></td><td><code>--cw</code></td><td>800px</td></tr><tr><td><code>:root</code></td><td><code>--pad-y</code></td><td>36px</td></tr><tr><td><code>:root</code></td><td><code>--pad-x</code></td><td>32px</td></tr><tr><td><code>:root</code></td><td><code>--chrome</code></td><td>136px</td></tr><tr><td><code>:root</code></td><td><code>--nav-h</code></td><td>60px</td></tr><tr><td><code>.a .bk-tabs</code></td><td><code>--tu</code></td><td>var(--ink)</td></tr><tr><td><code>.a .bk-tabs</code></td><td><code>--tmuted</code></td><td>var(--muted)</td></tr><tr><td><code>.a .bk-tabs</code></td><td><code>--tfaint</code></td><td>var(--rule)</td></tr><tr><td><code>.a .bk-tabs</code></td><td><code>--tfocus</code></td><td>var(--ink)</td></tr><tr><td><code>.a .bk-tabs</code></td><td><code>--to</code></td><td>var(--red)</td></tr><tr><td><code>.b .bk-tabs</code></td><td><code>--tu</code></td><td>var(--cream)</td></tr><tr><td><code>.b .bk-tabs</code></td><td><code>--tmuted</code></td><td>var(--sand)</td></tr><tr><td><code>.b .bk-tabs</code></td><td><code>--tfaint</code></td><td>var(--bronze2)</td></tr><tr><td><code>.b .bk-tabs</code></td><td><code>--tfocus</code></td><td>var(--gold2)</td></tr><tr><td><code>.b .bk-tabs</code></td><td><code>--to</code></td><td>var(--gold)</td></tr><tr><td><code>:root</code></td><td><code>--rail-w</code></td><td>calc(220px + env(safe-area-inset-left))</td></tr><tr><td><code>:root</code></td><td><code>--sheet-w</code></td><td>420px</td></tr><tr><td><code>:root</code></td><td><code>--rail-w</code></td><td>calc(96px + env(safe-area-inset-left))</td></tr></table>
 <h2 id="ui-fonts">ตัวอักษร</h2>
 <p>ฟอนต์ที่ฝังในหน้าเล่น (<code>src/ui/fonts</code>) — ตัวอย่างวาดด้วยฟอนต์จริงของเกมอยู่ต้นกรอบแรกในหัวชิ้นส่วนตัวอย่าง</p>
 <ul><li>Sarabun 400 <small>Sarabun-Regular.woff2</small></li><li>Sarabun 600 <small>Sarabun-SemiBold.woff2</small></li><li>Srisakdi 700 <small>Srisakdi-Bold.woff2</small></li><li>Maitree 600 <small>Maitree-SemiBold.woff2</small></li></ul>
@@ -1219,7 +1221,7 @@
 :root {
   --page:#F4ECDC; --ink:#1B2A4A; --ink2:color-mix(in srgb, #1B2A4A 70%, #5B5648); --muted:#5B5648;
   --paper:#FBF6EA; --paper2:color-mix(in srgb, #FBF6EA 45%, #F4ECDC); --rule:#C9B98F; --rule2:color-mix(in srgb, #C9B98F 60%, #FBF6EA); --line-strong:#8C7A52;
-  --red:#A62B1F; --green:#2F6B4F; --blue:#7A5C12; --head:#1B2A4A;
+  --red:#A62B1F; --seal:var(--red); --green:#2F6B4F; --blue:#7A5C12; --head:#1B2A4A;
   --lacquer:#17110D; --lacquer2:#221912; --gold:#D9B45A; --gold2:#F0D78C; --cream:#EFE3C2; --bronze:#5A4630; --bronze2:#8A6D3B; --sand:#BFAE86;
   --fl:#015EC1; --dg:#B3261E; --track:#E2D9C6;
   --ft:Sarabun,system-ui,sans-serif; --fh:Maitree,serif;
@@ -1246,6 +1248,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
    · เพดานตามความสูงจอหักหัวเว็บ+ระยะบน (--chrome) · svh = จอตอนแถบเบราว์เซอร์โผล่ ไม่ยืดหดตามการเลื่อนแบบ dvh ปุ่มจึงไม่กระโดดระหว่างเลื่อน */
 :root { --chrome:136px; }
 .card { display:flex; flex-direction:column; border-radius:var(--rk); box-shadow:var(--sh); min-height:560px; min-height:min(560px, calc(100vh - var(--chrome))); min-height:min(560px, calc(100svh - var(--chrome) - env(safe-area-inset-bottom))); }
+/* ชั้นทับ ไม่ใช่พื้นการ์ด: แถบปุ่มติดล่างมีพื้นทึบบังมุมล่าง */
+.card.yc { position:relative; }
+.card.yc::after { content:&quot;&quot;; position:absolute; inset:0; z-index:3; pointer-events:none; background-image:url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'16'%20height%3D'16'%3E%3Cg%20transform%3D%22rotate(0%208%208)%22%3E%3Cpath%20d%3D%22M1%2015V5q0-4%204-4h10M5%2011V7q0-2%202-2h4%22%20fill%3D%22none%22%20stroke%3D%22%23B08A35%22%20stroke-width%3D%221.2%22%2F%3E%3Ccircle%20cx%3D%228%22%20cy%3D%228%22%20r%3D%221%22%20fill%3D%22%23B08A35%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;),url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'16'%20height%3D'16'%3E%3Cg%20transform%3D%22rotate(90%208%208)%22%3E%3Cpath%20d%3D%22M1%2015V5q0-4%204-4h10M5%2011V7q0-2%202-2h4%22%20fill%3D%22none%22%20stroke%3D%22%23B08A35%22%20stroke-width%3D%221.2%22%2F%3E%3Ccircle%20cx%3D%228%22%20cy%3D%228%22%20r%3D%221%22%20fill%3D%22%23B08A35%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;),url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'16'%20height%3D'16'%3E%3Cg%20transform%3D%22rotate(270%208%208)%22%3E%3Cpath%20d%3D%22M1%2015V5q0-4%204-4h10M5%2011V7q0-2%202-2h4%22%20fill%3D%22none%22%20stroke%3D%22%23B08A35%22%20stroke-width%3D%221.2%22%2F%3E%3Ccircle%20cx%3D%228%22%20cy%3D%228%22%20r%3D%221%22%20fill%3D%22%23B08A35%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;),url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'16'%20height%3D'16'%3E%3Cg%20transform%3D%22rotate(180%208%208)%22%3E%3Cpath%20d%3D%22M1%2015V5q0-4%204-4h10M5%2011V7q0-2%202-2h4%22%20fill%3D%22none%22%20stroke%3D%22%23B08A35%22%20stroke-width%3D%221.2%22%2F%3E%3Ccircle%20cx%3D%228%22%20cy%3D%228%22%20r%3D%221%22%20fill%3D%22%23B08A35%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;); background-repeat:no-repeat; background-position:3px 3px,calc(100% - 3px) 3px,3px calc(100% - 3px),calc(100% - 3px) calc(100% - 3px); }
 /* ข้อความสำหรับโปรแกรมอ่านจอเท่านั้น */
 .sr { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 /* จุดแดง &quot;ใหม่&quot; (B116): ชั้นสมุด · แท็บในชั้นสมุด · แผงฉายา/เหตุการณ์ — ป้ายอ่านจอบอกความหมายแทนสี */
@@ -1391,6 +1396,30 @@ body:has(.mnav) .foot { display:none; }
 .me dd { margin:0; color:var(--ink2); }
 .me .focus { padding:0; }
 .me .meta { margin:0; padding:0; font-size:14px; }
+/* แท็บโฟกัส (ui-redo 50 · JSON 47 แบบ ก รายการเดียว): ตัวที่ถืออยู่เป็นกรอบสีเน้น · ปีสะสมเป็นป้ายคำ ไม่มีเลข
+   · ป้ายชำนาญแล้วใช้สีพื้นแผ่นเป็นตัวอักษร — ชุดปรโลกสีเน้นเป็นทอง ตัวขาวบนทองอ่านไม่ออก */
+.ft h3 { margin:16px 0 8px; font-size:14px; color:var(--muted); }
+.ft-now { border:1px solid var(--fl); border-radius:var(--r); padding:10px 12px; display:flex; flex-wrap:wrap; gap:2px 8px; align-items:center; }
+.ft-now b { font-size:16px; } .ft-now .ft-fx { flex-basis:100%; }
+.ft-word { display:inline-block; padding:0 8px; border-radius:999px; font-size:12px; font-weight:600; background:var(--paper2); color:var(--ink); white-space:nowrap; }
+.ft-word.full { background:var(--fl); color:var(--paper); }
+.ft-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.ft-list button { all:unset; box-sizing:border-box; width:100%; min-height:48px; padding:8px 12px; border:1px solid var(--rule2); border-radius:var(--r); display:flex; flex-wrap:wrap; gap:2px 8px; align-items:center; cursor:pointer; font-size:14px; overflow-wrap:anywhere; }
+.ft-list button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.ft-list button.on { border-color:var(--fl); box-shadow:inset 3px 0 0 var(--fl); font-weight:600; }
+.ft-fx { font-size:12px; color:var(--ink2); font-weight:400; }
+.ft-list .ft-fx { flex-basis:100%; }
+.ft-new { font-size:12px; font-weight:600; color:var(--fl); }
+.ft-chain { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:13px; }
+.ft-chain li { border-left:3px solid var(--rule2); padding:2px 0 2px 10px; }
+.ft-chain li.open { border-color:var(--fl); }
+.ft-chain li.gone { opacity:0.6; }
+.ft-chain .st { display:block; font-size:12px; color:var(--muted); }
+/* ดูอย่างเดียว (สรุปตอนตาย): ไม่มีกรอบแบบปุ่ม ไม่ให้ดูเหมือนกดได้ */
+.ft-ro { gap:0; } .ft-ro li { padding:8px 0; border-bottom:1px solid var(--rule2); font-size:14px; }
+.ft-note { font-size:13px; color:var(--muted); margin:8px 0 0; }
+/* ไอคอนเมนู (JSON 47 แบบ ข): เส้นบางสีตามป้าย ปุ่มที่เปิดอยู่เปลี่ยนสีทั้งไอคอนและป้าย */
+.mnav button svg { width:22px; height:22px; flex:none; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
 /* หัวค่าสถานะคู่ปุ่มพับคำอธิบาย (ui-redo 131) — ปุ่มหน้าตาเดียวกับ &quot;กลับไปการ์ด&quot; แตะได้ 44px */
 .me-hh { display:flex; align-items:baseline; gap:12px; margin:16px 0 8px; }
 .me-hh h3 { flex:1; margin:0; }
@@ -1469,9 +1498,10 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .choice { all:unset; box-sizing:border-box; min-height:52px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; border-radius:var(--r); cursor:pointer; font-size:15px; }
 /* เลขปุ่มลัดนำหน้าตัวเลือก (ui-redo ใบ 02) — ข้อความตัวเลือกกินที่ที่เหลือ ป้ายผลยังชิดขวา */
 .choice > kbd { display:inline-grid; place-items:center; width:26px; height:26px; flex:none; font:600 13px/1 var(--ft); border:1px solid var(--rule2); border-radius:var(--rc); color:var(--muted); }
+.card.yc .choice > kbd { border-radius:3px; }
 .choice > kbd + span { flex:1; min-width:0; }
 .choice:hover > kbd, .choice:focus-visible > kbd { border-color:currentColor; color:inherit; }
-.choice .fx { font-size:12px; text-align:right; flex-shrink:0; max-width:50%; }
+.choice .fx { font-size:13px; text-align:right; flex-shrink:0; max-width:50%; }
 .choice .fx span { white-space:nowrap; }
 /* ปุ่มล็อกใช้ช่องป้ายผลวางเหตุผลเป็นประโยค — ก้อนเดียวไม่มี &quot; · &quot; ห้ามตัดแล้วยาวเกินครึ่งปุ่มจนล้นจอมือถือ (B174) */
 .choice:disabled .fx span { white-space:normal; }
@@ -1483,9 +1513,9 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .choice .fx .fxp > [aria-hidden] { display:inline-flex; align-items:center; gap:2px; }
 .choice .fx .fxp svg { width:1.15em; height:1.15em; flex:none; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
 .choice .fx .fxp b { font-weight:600; }
-.choice .fx .up, .choice .fx .dn { padding:0 5px; border-radius:999px; }
-.choice .fx .up { color:var(--fx-up); background:color-mix(in srgb, var(--fx-up) 16%, transparent); }
-.choice .fx .dn { color:var(--fx-dn); background:color-mix(in srgb, var(--fx-dn) 16%, transparent); }
+.choice .fx .up, .choice .fx .dn { padding:0 5px; }
+.choice .fx .up { color:var(--fx-up); }
+.choice .fx .dn { color:var(--fx-dn); }
 /* ปุ่มกู้มาจ่าย (B111) ห้อยใต้ตัวเลือกที่ขาดเงิน — ย่อและเยื้องให้เห็นว่าเป็นทางของปุ่มบน ไม่ใช่ตัวเลือกใหม่ */
 .choice.loan { min-height:40px; margin:-4px 0 0 24px; padding:6px 12px; font-size:13.5px; }
 /* ชื่อตัวเลือกบนปุ่มกู้ยาวได้ทั้งประโยค — บรรทัดเดียวตัดท้ายด้วย … ไม่งั้นปุ่มกู้สูงกว่าตัวเลือกเอง · min-width:0 ให้ก้อนข้อความหดในแถว flex ได้ */
@@ -1541,10 +1571,17 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .pic-th .yr { font-size:10px; color:var(--sand); }
 .lineage-view { display:grid; gap:6px; }
 .lineage-text summary { cursor:pointer; font-size:13px; color:var(--muted); min-height:44px; display:flex; align-items:center; }
-.bk-tabs { display:flex; flex-wrap:wrap; gap:6px; }
-.bk-tabs button { all:unset; cursor:pointer; min-height:44px; padding:0 12px; border:1px solid var(--ink2); border-radius:999px; font-size:13px; font-weight:600; display:inline-flex; align-items:center; }
-.bk-tabs button[aria-pressed=&quot;true&quot;] { background:var(--ink); color:var(--paper); }
-.bk-tabs button:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+.a .bk-tabs { --tu:var(--ink); --tmuted:var(--muted); --tfaint:var(--rule); --tfocus:var(--ink); --to:var(--red); }
+.b .bk-tabs { --tu:var(--cream); --tmuted:var(--sand); --tfaint:var(--bronze2); --tfocus:var(--gold2); --to:var(--gold); }
+.bk-tabs { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:2px; align-items:stretch; border-bottom:1px solid var(--tfaint); }
+@media (min-width:720px) { .bk-tabs { grid-template-columns:repeat(6, minmax(0, 1fr)); } }
+.bk-tabs button { all:unset; box-sizing:border-box; position:relative; cursor:pointer; min-height:44px; padding:6px 2px; display:flex; flex-direction:column; align-items:center; justify-content:center; row-gap:2px; font-size:13px; font-weight:600; line-height:1.25; text-align:center; color:var(--tmuted); }
+.bk-tabs button > span { white-space:nowrap; }
+.bk-tabs svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; opacity:.75; }
+.bk-tabs button[aria-pressed=&quot;true&quot;] { background:color-mix(in srgb, var(--to) 14%, transparent); color:var(--tu); font-weight:700; box-shadow:inset 0 4px 0 var(--to); }
+.bk-tabs button[aria-pressed=&quot;true&quot;] svg { opacity:1; }
+.bk-tabs button:focus-visible { outline:2px solid var(--tfocus); outline-offset:2px; }
+.bk-tabs .new-dot { position:absolute; top:6px; left:calc(50% + 14px); margin:0; }
 .bk-sec, .pic-ev { display:flex; flex-direction:column; gap:6px; padding-top:10px; border-top:1px dashed var(--rule); }
 .bk-sec > .h, .pic-ev > .h { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:14px; font-weight:700; color:var(--ink); }
 .bk-sec > .h small, .pic-ev > .h small { font-weight:600; color:var(--muted); margin-left:auto; }
@@ -1641,15 +1678,20 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .deed { margin:0; display:flex; flex-direction:column; gap:2px; font-size:13px; overflow-wrap:anywhere; color:#E3D6B3; }
 .deed b { color:var(--gold2); font-size:12px; }
 .deed.bad b { color:#E39A8A; }
-/* มรณบัตร — หนังสืองานศพ (B83b D3 ทาง B): ขาวดำ กรอบหนา รูปกลางใบ · กราฟกับสรุปข้างในคงสีทาง A */
-.a.mem { position:relative; isolation:isolate; background:#FFFFFF; border:12px solid #1F1F1F; outline:1px solid #8A8A8A; outline-offset:-6px; color:#1F1F1F; }
+/* มรณบัตร — หนังสืองานศพ (B83b D3 ทาง B): ขาวดำ รูปกลางใบ · กราฟกับสรุปข้างในคงสีทาง A
+   กรอบเส้นคู่ไม่มีเส้นใน: เส้นในตกกลางช่องของเส้นคู่แล้วถมเป็นเส้นหนา (ข้อ 239) · ลายกนกแถบบน-ล่างเป็นของหนังสืองานศพเท่านั้น ป้ายคนหายคงกระดาษประกาศ */
+.a.mem { position:relative; isolation:isolate; color:#1F1F1F; }
+.a.mem:not(.lost) { border:8px double #1F1F1F; border-radius:0; background:url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%231F1F1F%22%20stroke-opacity%3D%220.2%22%20stroke-width%3D%221.4%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M20%2038c-7-4-10-11-7-18%201%204%204%206%206%206-3-5-2-12%203-17%200%205%203%208%206%2010%203%203%203%208%200%2011%202-1%204-3%204-6%203%206%200%2012-6%2014%22%2F%3E%3Cpath%20d%3D%22M20%2038c-3-3-3-7%200-9%202-1%204%200%204%202s-2%203-3%202%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;) left top / 32px 32px repeat-x, url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%231F1F1F%22%20stroke-opacity%3D%220.2%22%20stroke-width%3D%221.4%22%20stroke-linecap%3D%22round%22%20transform%3D%22translate(0%2040)%20scale(1%20-1)%22%3E%3Cpath%20d%3D%22M20%2038c-7-4-10-11-7-18%201%204%204%206%206%206-3-5-2-12%203-17%200%205%203%208%206%2010%203%203%203%208%200%2011%202-1%204-3%204-6%203%206%200%2012-6%2014%22%2F%3E%3Cpath%20d%3D%22M20%2038c-3-3-3-7%200-9%202-1%204%200%204%202s-2%203-3%202%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;) left bottom / 32px 32px repeat-x, #FFFFFF; }
+.a.mem:not(.lost) .d-rest { padding-bottom:26px; }
+/* ตราอยู่ใน .p-left หลัง panels() แต่ .p-left ไม่ตั้ง position ⇒ absolute ยึดมุมการ์ด */
+.d-seal { position:absolute; right:18px; top:18px; z-index:1; display:grid; place-items:center; width:52px; height:52px; border-radius:50%; background:var(--seal); color:#FFFFFF; outline:1.5px solid #FFFFFF; outline-offset:-5px; transform:rotate(-8deg); font:700 15px/1 Srisakdi,serif; user-select:none; }
 /* ภาพฉากเป็นพื้นหลังจาง (ui-redo 57 · ค่าแรกเกิดใบ 61: ชิดบนกลาง กว้างเต็ม จาง 0.1) — z-index ติดลบใต้เนื้อ แต่ isolation ของการ์ดกันไม่ให้ลงไปใต้พื้นขาว
    ทุกเส้นเป็นหมึกดำ (เจ้าของตั้งสีทองเป็น #000000) */
 .d-bg { position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none; color:#000000; }
 .d-bg svg { position:absolute; left:50%; top:0; width:100%; height:auto; transform:translateX(-50%); opacity:0.1; }
 .d-bg [fill]:not([fill=&quot;none&quot;]) { fill:currentColor; }
 .d-bg [stroke] { stroke:currentColor; }
-.mem .top { background:transparent; color:#1F1F1F; justify-content:center; padding-top:18px; }
+.mem .top { background:transparent; color:#1F1F1F; justify-content:center; padding-top:19.2px; }
 .mem .top b { font-family:Srisakdi,serif; font-size:22px; font-weight:700; }
 .por { align-self:center; width:96px; height:96px; border:1px solid #1F1F1F; padding:4px; }
 .d-head { display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; }
@@ -1689,7 +1731,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .d-share-in { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
 .d-share .choice { flex:1 1 auto; min-height:44px; padding:6px 12px; justify-content:center; font-size:14px; background:transparent; border-style:dashed; }
 /* ป้ายตามหาคนหาย (B139): กระดาษประกาศติดเสา หัวแดงตัวหนา — ต่างจากหนังสืองานศพขาวดำ ให้รู้ว่ายังไม่มีใครถือว่าจากไป */
-.a.mem.lost { background:#FFF8E1; border:3px dashed #B3261E; outline:none; }
+.a.mem.lost { background:#FFF8E1; border:3px dashed #B3261E; }
 .lost .top { padding-top:20px; }
 .lost .top b { font-family:var(--ft); font-size:24px; font-weight:800; color:#B3261E; letter-spacing:0.02em; }
 .lost .por { border:2px solid #1F1F1F; }
@@ -1736,7 +1778,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .fx-cap small { display:block; font-family:Sarabun,sans-serif; font-size:13px; color:var(--sand); }
 .fx-title { position:absolute; inset:0; display:grid; place-items:center; }
 .fx-title svg { overflow:visible; max-width:92vw; height:auto; }
-.fx-title .fx-name { font-family:Pridi,serif; font-weight:600; }
+.fx-title .fx-name { font-family:Maitree,serif; font-weight:600; }
 /* ทั้งหน้าเข้าธีมต่างโลกตามการ์ดที่ขึ้นจอ — ผูกกับการ์ดด้วย :has จึงไม่ต้องตามล้างธงทุกจุดที่วาดจอไทย */
 /* ui-redo ใบ 13: ชุดกรมท่าเรืองของต้นแบบลงตัวแปรหน้า — แถบสถานะ เมนูล่าง/ราวซ้าย และแผงจากเมนูเปลี่ยนสีตามโดยไม่มีกฎแยก */
 body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; --ink:#E8ECFF; --ink2:#D3D8F5; --paper:#161A3A; --paper2:#232A5E; --rule2:#3B4BA8; --fl:#6FE3FF; --dg:#FF8A8A; --track:#262C5A; }
@@ -1752,13 +1794,6 @@ body:has(#app > .card.af) .logo b { color:var(--gold); }
 body:has(#app > .card.af) .logo small, body:has(#app > .card.af) .logo .ver, body:has(#app > .card.af) .logo .saved { color:var(--sand); }
 body:has(#app > .card.af) .foot a { color:var(--ink2); }
 .af .sb { background:#120D0A; }
-/* แถบโฟกัสต่างโลก (05a): โครง .focus ของโลกหลัก สีชุดต่างโลก · ทางที่ทำอยู่เด่นสีทอง ไม่จางแบบตัวเลือกล็อก */
-.ifocusbar { padding:8px 20px 0; }
-.ifocusbar button { border-color:#2A3478; background:#0E1024; color:#E8ECFF; }
-.ifocusbar button:hover, .ifocusbar button:focus-visible { border-color:#6FE3FF; background:#1E2350; }
-.ifocusbar .focus-fx, .ifocusbar .focus-go { color:#6FE3FF; opacity:1; }
-.ifocusbar .focus-pick .on { border-color:#F2C94C; background:#1E2350; }
-.ifocusbar .focus-pick .on .focus-fx { color:#F2C94C; }
 /* จดหมายเหตุบนการ์ดจบ — ป้ายอายุทอง เส้นซ้ายบอกชนิดบรรทัดแบบต้นแบบ · ช่วงวัยพับได้ ชีวิตยาวราวร้อยบรรทัดจึงไม่ดันปุ่มลงไปไกล */
 .ichron .istage { margin-top:6px; }
 .ichron .istage > summary { cursor:pointer; font-size:13px; color:#6FE3FF; }
@@ -1823,7 +1858,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   :root { --rail-w:calc(220px + env(safe-area-inset-left)); --sheet-w:420px; }
   body:has(.mnav) { padding-bottom:0; padding-left:var(--rail-w); }
   .mnav { top:0; right:auto; width:var(--rail-w); max-width:none; flex-direction:column; gap:4px; margin:0; padding:max(16px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left)); border-top:0; border-right:1px solid var(--rule2); box-shadow:4px 0 16px rgb(0 0 0 / .06); }
-  .mnav button { flex:none; flex-direction:row; justify-content:flex-start; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
+  .mnav button { flex:none; flex-direction:row; justify-content:flex-start; gap:10px; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
   .mnav button:hover { background:var(--paper2); }
   .mnav button[aria-expanded=&quot;true&quot;] { background:var(--paper2); box-shadow:inset 3px 0 0 var(--fl); }
   .mnav .new-dot { position:static; margin-left:6px; }
@@ -1833,7 +1868,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --rail-w:calc(96px + env(safe-area-inset-left)); }
   .mnav { gap:2px; padding:max(8px, env(safe-area-inset-top)) 6px max(8px, env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left)); }
-  .mnav button { justify-content:center; min-height:44px; padding:0 4px; font-size:13px; }
+  .mnav button { flex-direction:column; justify-content:center; gap:2px; min-height:44px; padding:0 4px; font-size:13px; }
 }
 /* ราว/แผงเริ่มใต้หัวเว็บ (ui-redo ใบ 67 · เจ้าของเลือกจากภาพ): หัวเว็บกว้างเต็มจอทับช่องราว · --hd = ขอบล่างหัวที่วัดขณะเลื่อน เลื่อนพ้นแล้วชิดบน
    · มือถือแนวนอนเตี้ยคงราวเต็มสูงแบบเดิม (หัวบางอยู่แล้ว) */
@@ -1850,7 +1885,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 }
 @keyframes drw { from { transform:translateX(100%); } }
 
-#app{padding:0 12px 12px}.card{min-height:0}.mnav{position:static;margin-top:8px}body:has(.mnav){padding-bottom:0}</style></head><body><div id=&quot;app&quot;><h4 style=&quot;margin:16px 0 6px;font:600 14px var(--ft)&quot;>ตัวอย่างฟอนต์</h4><p class=&quot;fspec&quot; style=&quot;font-family:'Sarabun';font-weight:400;font-size:20px;margin:0 0 8px&quot;>Sarabun 400 — เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด 0123456789</p><p class=&quot;fspec&quot; style=&quot;font-family:'Sarabun';font-weight:600;font-size:20px;margin:0 0 8px&quot;>Sarabun 600 — เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด 0123456789</p><p class=&quot;fspec&quot; style=&quot;font-family:'Srisakdi';font-weight:700;font-size:20px;margin:0 0 8px&quot;>Srisakdi 700 — เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด 0123456789</p><p class=&quot;fspec&quot; style=&quot;font-family:'Maitree';font-weight:600;font-size:20px;margin:0 0 8px&quot;>Maitree 600 — เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด 0123456789</p><h4 style=&quot;margin:16px 0 6px;font:600 14px var(--ft)&quot;>การ์ดเหตุการณ์ + แถบสถานะ + ปุ่ม + แถบเมนูล่าง (ชีวิตนี้)</h4><article class=&quot;card a&quot;><header class=&quot;sb&quot;><div class=&quot;sb-r1&quot;><span class=&quot;sb-who&quot;><b>สมชาย ใจดี</b><small>ขอนแก่น · ช่วงหนุ่มสาว</small><small class=&quot;hd-job&quot;>พนักงานบริษัท</small></span><span class=&quot;sb-age&quot;><b>20</b><small> ปี</small></span></div><div class=&quot;hd-row&quot;><span class=&quot;mk&quot;>ฐานะ</span><span class=&quot;hd-word&quot;>ชนชั้นกลาง</span><span class=&quot;hd-cash red&quot;><span class=&quot;mk&quot;>เงินสด</span><b>1.2 แสน</b><span class=&quot;lw&quot;>มีกู้</span></span></div><ul class=&quot;sb-m&quot;><li><span class=&quot;mh&quot;><span class=&quot;mk&quot;>ชีวิต</span><b class=&quot;num&quot;>72</b><em><span aria-hidden=&quot;true&quot;>▲</span>3</em></span><span class=&quot;br&quot;><i style=&quot;width:72%&quot;></i></span></li><li><span class=&quot;mh&quot;><span class=&quot;mk&quot;>ความสุข</span><b class=&quot;num&quot;>58</b><em class=&quot;dn&quot;><span aria-hidden=&quot;true&quot;>▼</span>2</em></span><span class=&quot;br&quot;><i style=&quot;width:58%&quot;></i></span></li><li><span class=&quot;mh&quot;><span class=&quot;mk&quot;>ความรู้</span><b class=&quot;num&quot;>41</b></span><span class=&quot;br&quot;><i style=&quot;width:41%&quot;></i></span></li><li class=&quot;low&quot;><span class=&quot;mh&quot;><span class=&quot;mk&quot;>ความสัมพันธ์</span><b class=&quot;num&quot;>18</b><em class=&quot;dn&quot;><span aria-hidden=&quot;true&quot;>▼</span>5</em></span><span class=&quot;br&quot;><i style=&quot;width:18%&quot;></i></span></li></ul></header><div class=&quot;body&quot;><span class=&quot;kicker&quot;>ช่วงหนุ่มสาว · อายุ 20</span><h3>รูปในแชตรุ่น</h3><p>หลายเดือนผ่านไป เพื่อนร่วมรุ่นส่งรูปมาในแชต เพื่อนคนที่หายไปพร้อมเงินของอาร์มนั่งยิ้มอยู่ในร้านกาแฟอีกจังหวัด เหมือนไม่เคยมีเรื่องอะไรกัน</p></div><div class=&quot;choices&quot;><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>1</kbd><span>ขับรถไปทวงถึงที่</span><span class=&quot;fx&quot;><span>สำเร็จ ~35%</span></span></button><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>2</kbd><span>โพสต์ทวงในกลุ่มรุ่น</span><span class=&quot;fx&quot;><span>สำเร็จ ~45%</span></span></button><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>3</kbd><span>ไปแจ้งความไว้เป็นหลักฐาน</span><span class=&quot;fx&quot;><span>สำเร็จ ~45%</span></span></button><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>4</kbd><span>ปล่อยไป ถือว่าซื้อบทเรียน</span><span class=&quot;fx&quot;><span>ความสุข ↓ · ความรู้ ↑</span></span></button><button class=&quot;choice&quot; type=&quot;button&quot; disabled><span>ทางที่ยังไม่เปิด</span><span class=&quot;fx&quot;><span>ล็อก · ต้องมีความรู้ 60</span></span></button></div></article><nav class=&quot;mnav&quot; aria-label=&quot;เมนู&quot;><button type=&quot;button&quot; aria-expanded=&quot;true&quot;><span>ตัวฉัน</span></button><button type=&quot;button&quot;><span>ครอบครัว</span></button><button type=&quot;button&quot;><span>สมุด</span></button><button type=&quot;button&quot;><span>เพิ่มเติม</span></button></nav><h4 style=&quot;margin:16px 0 6px;font:600 14px var(--ft)&quot;>การ์ดระหว่างชาติ (ธีม B)</h4><article class=&quot;card b af&quot;><div class=&quot;top&quot;><b>ระหว่างชาติ</b><small>สมชาย ใจดี · จากไปอายุ 78</small></div><div class=&quot;body&quot;><span class=&quot;kicker&quot;>ทางเกิด</span><h3 class=&quot;lead&quot;>ตัวอย่างการ์ดลายรดน้ำ (ธีม B)</h3></div><div class=&quot;choices&quot;><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>1</kbd><span>ไปเกิด</span><span class=&quot;fx&quot;><span>ตามบุญที่ทำมา</span></span></button><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>2</kbd><span>เริ่มตระกูลใหม่</span></button></div></article></div></body></html>"></iframe></figure>
+#app{padding:0 12px 12px}.card{min-height:0}.mnav{position:static;margin-top:8px}body:has(.mnav){padding-bottom:0}</style></head><body><div id=&quot;app&quot;><h4 style=&quot;margin:16px 0 6px;font:600 14px var(--ft)&quot;>ตัวอย่างฟอนต์</h4><p class=&quot;fspec&quot; style=&quot;font-family:'Sarabun';font-weight:400;font-size:20px;margin:0 0 8px&quot;>Sarabun 400 — เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด 0123456789</p><p class=&quot;fspec&quot; style=&quot;font-family:'Sarabun';font-weight:600;font-size:20px;margin:0 0 8px&quot;>Sarabun 600 — เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด 0123456789</p><p class=&quot;fspec&quot; style=&quot;font-family:'Srisakdi';font-weight:700;font-size:20px;margin:0 0 8px&quot;>Srisakdi 700 — เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด 0123456789</p><p class=&quot;fspec&quot; style=&quot;font-family:'Maitree';font-weight:600;font-size:20px;margin:0 0 8px&quot;>Maitree 600 — เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด 0123456789</p><h4 style=&quot;margin:16px 0 6px;font:600 14px var(--ft)&quot;>การ์ดเหตุการณ์ + แถบสถานะ + ปุ่ม + แถบเมนูล่าง (ชีวิตนี้)</h4><article class=&quot;card a&quot;><header class=&quot;sb&quot;><div class=&quot;sb-r1&quot;><span class=&quot;sb-who&quot;><b>สมชาย ใจดี</b><small>ขอนแก่น · ช่วงทำงาน</small><small class=&quot;hd-job&quot;>พนักงานบริษัท</small></span><span class=&quot;sb-age&quot;><b>41</b><small> ปี</small></span></div><div class=&quot;hd-row&quot;><span class=&quot;mk&quot;>ฐานะ</span><span class=&quot;hd-word&quot;>ชนชั้นกลาง</span><span class=&quot;hd-cash red&quot;><span class=&quot;mk&quot;>เงินสด</span><b>1.2 แสน</b><span class=&quot;lw&quot;>มีกู้</span></span></div><ul class=&quot;sb-m&quot;><li><span class=&quot;mh&quot;><span class=&quot;mk&quot;>ชีวิต</span><b class=&quot;num&quot;>72</b><em><span aria-hidden=&quot;true&quot;>▲</span>3</em></span><span class=&quot;br&quot;><i style=&quot;width:72%&quot;></i></span></li><li><span class=&quot;mh&quot;><span class=&quot;mk&quot;>ความสุข</span><b class=&quot;num&quot;>58</b><em class=&quot;dn&quot;><span aria-hidden=&quot;true&quot;>▼</span>2</em></span><span class=&quot;br&quot;><i style=&quot;width:58%&quot;></i></span></li><li><span class=&quot;mh&quot;><span class=&quot;mk&quot;>ความรู้</span><b class=&quot;num&quot;>41</b></span><span class=&quot;br&quot;><i style=&quot;width:41%&quot;></i></span></li><li class=&quot;low&quot;><span class=&quot;mh&quot;><span class=&quot;mk&quot;>ความสัมพันธ์</span><b class=&quot;num&quot;>18</b><em class=&quot;dn&quot;><span aria-hidden=&quot;true&quot;>▼</span>5</em></span><span class=&quot;br&quot;><i style=&quot;width:18%&quot;></i></span></li></ul></header><div class=&quot;body&quot;><span class=&quot;kicker&quot;>ช่วงทำงาน · อายุ 41</span><h3>ซองสีน้ำตาลบนโต๊ะ</h3><p>ผู้รับเหมาวางซองหนาเตอะไว้ข้างแฟ้ม ยิ้มบอกว่าแค่เซ็นผ่านงานที่วัสดุไม่ตรงสเปก ใครเขาก็ทำกัน ในซองเท่าเงินเดือนหลายเดือน</p></div><div class=&quot;choices&quot;><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>1</kbd><span>รับซอง เซ็นให้เงียบ ๆ</span><span class=&quot;fx&quot;><span>สำเร็จ ~75%</span></span></button><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>2</kbd><span>ขอเพิ่มเป็นสองเท่า</span><span class=&quot;fx&quot;><span>สำเร็จ ~35%</span></span></button><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>3</kbd><span>ดันซองคืน ไม่เซ็น</span><span class=&quot;fx&quot;><span>สำเร็จ ~75%</span></span></button><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>4</kbd><span>เก็บซองเป็นหลักฐาน แจ้งผู้ตรวจ</span><span class=&quot;fx&quot;><span>สำเร็จ ~40%</span></span></button><button class=&quot;choice&quot; type=&quot;button&quot; disabled><span>ทางที่ยังไม่เปิด</span><span class=&quot;fx&quot;><span>ล็อก · ต้องมีความรู้ 60</span></span></button></div></article><nav class=&quot;mnav&quot; aria-label=&quot;เมนู&quot;><button type=&quot;button&quot; aria-expanded=&quot;true&quot;><span>ตัวฉัน</span></button><button type=&quot;button&quot;><span>โฟกัส</span></button><button type=&quot;button&quot;><span>ครอบครัว</span></button><button type=&quot;button&quot;><span>สมุด</span></button><button type=&quot;button&quot;><span>เพิ่มเติม</span></button></nav><h4 style=&quot;margin:16px 0 6px;font:600 14px var(--ft)&quot;>การ์ดระหว่างชาติ (ธีม B)</h4><article class=&quot;card b af&quot;><div class=&quot;top&quot;><b>ระหว่างชาติ</b><small>สมชาย ใจดี · จากไปอายุ 78</small></div><div class=&quot;body&quot;><span class=&quot;kicker&quot;>ทางเกิด</span><h3 class=&quot;lead&quot;>ตัวอย่างการ์ดลายรดน้ำ (ธีม B)</h3></div><div class=&quot;choices&quot;><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>1</kbd><span>ไปเกิด</span><span class=&quot;fx&quot;><span>ตามบุญที่ทำมา</span></span></button><button class=&quot;choice&quot; type=&quot;button&quot;><kbd>2</kbd><span>เริ่มตระกูลใหม่</span></button></div></article></div></body></html>"></iframe></figure>
 <figure class="ui-spec"><figcaption>ต่างโลก</figcaption><iframe title="ต่างโลก" sandbox="" style="width:100%;height:480px;border:1px solid var(--line);background:var(--surface)" srcdoc="<!doctype html><html lang=&quot;th&quot;><head><meta charset=&quot;utf-8&quot;><meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;><style>
 @font-face { font-family:&quot;Sarabun&quot;; font-weight:400; font-style:normal; font-display:swap; src:url(../fonts/Sarabun-Regular.woff2) format('woff2'); }
 @font-face { font-family:&quot;Sarabun&quot;; font-weight:600; font-style:normal; font-display:swap; src:url(../fonts/Sarabun-SemiBold.woff2) format('woff2'); }
@@ -1864,7 +1899,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 :root {
   --page:#F4ECDC; --ink:#1B2A4A; --ink2:color-mix(in srgb, #1B2A4A 70%, #5B5648); --muted:#5B5648;
   --paper:#FBF6EA; --paper2:color-mix(in srgb, #FBF6EA 45%, #F4ECDC); --rule:#C9B98F; --rule2:color-mix(in srgb, #C9B98F 60%, #FBF6EA); --line-strong:#8C7A52;
-  --red:#A62B1F; --green:#2F6B4F; --blue:#7A5C12; --head:#1B2A4A;
+  --red:#A62B1F; --seal:var(--red); --green:#2F6B4F; --blue:#7A5C12; --head:#1B2A4A;
   --lacquer:#17110D; --lacquer2:#221912; --gold:#D9B45A; --gold2:#F0D78C; --cream:#EFE3C2; --bronze:#5A4630; --bronze2:#8A6D3B; --sand:#BFAE86;
   --fl:#015EC1; --dg:#B3261E; --track:#E2D9C6;
   --ft:Sarabun,system-ui,sans-serif; --fh:Maitree,serif;
@@ -1891,6 +1926,9 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
    · เพดานตามความสูงจอหักหัวเว็บ+ระยะบน (--chrome) · svh = จอตอนแถบเบราว์เซอร์โผล่ ไม่ยืดหดตามการเลื่อนแบบ dvh ปุ่มจึงไม่กระโดดระหว่างเลื่อน */
 :root { --chrome:136px; }
 .card { display:flex; flex-direction:column; border-radius:var(--rk); box-shadow:var(--sh); min-height:560px; min-height:min(560px, calc(100vh - var(--chrome))); min-height:min(560px, calc(100svh - var(--chrome) - env(safe-area-inset-bottom))); }
+/* ชั้นทับ ไม่ใช่พื้นการ์ด: แถบปุ่มติดล่างมีพื้นทึบบังมุมล่าง */
+.card.yc { position:relative; }
+.card.yc::after { content:&quot;&quot;; position:absolute; inset:0; z-index:3; pointer-events:none; background-image:url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'16'%20height%3D'16'%3E%3Cg%20transform%3D%22rotate(0%208%208)%22%3E%3Cpath%20d%3D%22M1%2015V5q0-4%204-4h10M5%2011V7q0-2%202-2h4%22%20fill%3D%22none%22%20stroke%3D%22%23B08A35%22%20stroke-width%3D%221.2%22%2F%3E%3Ccircle%20cx%3D%228%22%20cy%3D%228%22%20r%3D%221%22%20fill%3D%22%23B08A35%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;),url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'16'%20height%3D'16'%3E%3Cg%20transform%3D%22rotate(90%208%208)%22%3E%3Cpath%20d%3D%22M1%2015V5q0-4%204-4h10M5%2011V7q0-2%202-2h4%22%20fill%3D%22none%22%20stroke%3D%22%23B08A35%22%20stroke-width%3D%221.2%22%2F%3E%3Ccircle%20cx%3D%228%22%20cy%3D%228%22%20r%3D%221%22%20fill%3D%22%23B08A35%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;),url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'16'%20height%3D'16'%3E%3Cg%20transform%3D%22rotate(270%208%208)%22%3E%3Cpath%20d%3D%22M1%2015V5q0-4%204-4h10M5%2011V7q0-2%202-2h4%22%20fill%3D%22none%22%20stroke%3D%22%23B08A35%22%20stroke-width%3D%221.2%22%2F%3E%3Ccircle%20cx%3D%228%22%20cy%3D%228%22%20r%3D%221%22%20fill%3D%22%23B08A35%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;),url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'16'%20height%3D'16'%3E%3Cg%20transform%3D%22rotate(180%208%208)%22%3E%3Cpath%20d%3D%22M1%2015V5q0-4%204-4h10M5%2011V7q0-2%202-2h4%22%20fill%3D%22none%22%20stroke%3D%22%23B08A35%22%20stroke-width%3D%221.2%22%2F%3E%3Ccircle%20cx%3D%228%22%20cy%3D%228%22%20r%3D%221%22%20fill%3D%22%23B08A35%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;); background-repeat:no-repeat; background-position:3px 3px,calc(100% - 3px) 3px,3px calc(100% - 3px),calc(100% - 3px) calc(100% - 3px); }
 /* ข้อความสำหรับโปรแกรมอ่านจอเท่านั้น */
 .sr { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 /* จุดแดง &quot;ใหม่&quot; (B116): ชั้นสมุด · แท็บในชั้นสมุด · แผงฉายา/เหตุการณ์ — ป้ายอ่านจอบอกความหมายแทนสี */
@@ -2036,6 +2074,30 @@ body:has(.mnav) .foot { display:none; }
 .me dd { margin:0; color:var(--ink2); }
 .me .focus { padding:0; }
 .me .meta { margin:0; padding:0; font-size:14px; }
+/* แท็บโฟกัส (ui-redo 50 · JSON 47 แบบ ก รายการเดียว): ตัวที่ถืออยู่เป็นกรอบสีเน้น · ปีสะสมเป็นป้ายคำ ไม่มีเลข
+   · ป้ายชำนาญแล้วใช้สีพื้นแผ่นเป็นตัวอักษร — ชุดปรโลกสีเน้นเป็นทอง ตัวขาวบนทองอ่านไม่ออก */
+.ft h3 { margin:16px 0 8px; font-size:14px; color:var(--muted); }
+.ft-now { border:1px solid var(--fl); border-radius:var(--r); padding:10px 12px; display:flex; flex-wrap:wrap; gap:2px 8px; align-items:center; }
+.ft-now b { font-size:16px; } .ft-now .ft-fx { flex-basis:100%; }
+.ft-word { display:inline-block; padding:0 8px; border-radius:999px; font-size:12px; font-weight:600; background:var(--paper2); color:var(--ink); white-space:nowrap; }
+.ft-word.full { background:var(--fl); color:var(--paper); }
+.ft-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.ft-list button { all:unset; box-sizing:border-box; width:100%; min-height:48px; padding:8px 12px; border:1px solid var(--rule2); border-radius:var(--r); display:flex; flex-wrap:wrap; gap:2px 8px; align-items:center; cursor:pointer; font-size:14px; overflow-wrap:anywhere; }
+.ft-list button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.ft-list button.on { border-color:var(--fl); box-shadow:inset 3px 0 0 var(--fl); font-weight:600; }
+.ft-fx { font-size:12px; color:var(--ink2); font-weight:400; }
+.ft-list .ft-fx { flex-basis:100%; }
+.ft-new { font-size:12px; font-weight:600; color:var(--fl); }
+.ft-chain { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:13px; }
+.ft-chain li { border-left:3px solid var(--rule2); padding:2px 0 2px 10px; }
+.ft-chain li.open { border-color:var(--fl); }
+.ft-chain li.gone { opacity:0.6; }
+.ft-chain .st { display:block; font-size:12px; color:var(--muted); }
+/* ดูอย่างเดียว (สรุปตอนตาย): ไม่มีกรอบแบบปุ่ม ไม่ให้ดูเหมือนกดได้ */
+.ft-ro { gap:0; } .ft-ro li { padding:8px 0; border-bottom:1px solid var(--rule2); font-size:14px; }
+.ft-note { font-size:13px; color:var(--muted); margin:8px 0 0; }
+/* ไอคอนเมนู (JSON 47 แบบ ข): เส้นบางสีตามป้าย ปุ่มที่เปิดอยู่เปลี่ยนสีทั้งไอคอนและป้าย */
+.mnav button svg { width:22px; height:22px; flex:none; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
 /* หัวค่าสถานะคู่ปุ่มพับคำอธิบาย (ui-redo 131) — ปุ่มหน้าตาเดียวกับ &quot;กลับไปการ์ด&quot; แตะได้ 44px */
 .me-hh { display:flex; align-items:baseline; gap:12px; margin:16px 0 8px; }
 .me-hh h3 { flex:1; margin:0; }
@@ -2114,9 +2176,10 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .choice { all:unset; box-sizing:border-box; min-height:52px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; border-radius:var(--r); cursor:pointer; font-size:15px; }
 /* เลขปุ่มลัดนำหน้าตัวเลือก (ui-redo ใบ 02) — ข้อความตัวเลือกกินที่ที่เหลือ ป้ายผลยังชิดขวา */
 .choice > kbd { display:inline-grid; place-items:center; width:26px; height:26px; flex:none; font:600 13px/1 var(--ft); border:1px solid var(--rule2); border-radius:var(--rc); color:var(--muted); }
+.card.yc .choice > kbd { border-radius:3px; }
 .choice > kbd + span { flex:1; min-width:0; }
 .choice:hover > kbd, .choice:focus-visible > kbd { border-color:currentColor; color:inherit; }
-.choice .fx { font-size:12px; text-align:right; flex-shrink:0; max-width:50%; }
+.choice .fx { font-size:13px; text-align:right; flex-shrink:0; max-width:50%; }
 .choice .fx span { white-space:nowrap; }
 /* ปุ่มล็อกใช้ช่องป้ายผลวางเหตุผลเป็นประโยค — ก้อนเดียวไม่มี &quot; · &quot; ห้ามตัดแล้วยาวเกินครึ่งปุ่มจนล้นจอมือถือ (B174) */
 .choice:disabled .fx span { white-space:normal; }
@@ -2128,9 +2191,9 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .choice .fx .fxp > [aria-hidden] { display:inline-flex; align-items:center; gap:2px; }
 .choice .fx .fxp svg { width:1.15em; height:1.15em; flex:none; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
 .choice .fx .fxp b { font-weight:600; }
-.choice .fx .up, .choice .fx .dn { padding:0 5px; border-radius:999px; }
-.choice .fx .up { color:var(--fx-up); background:color-mix(in srgb, var(--fx-up) 16%, transparent); }
-.choice .fx .dn { color:var(--fx-dn); background:color-mix(in srgb, var(--fx-dn) 16%, transparent); }
+.choice .fx .up, .choice .fx .dn { padding:0 5px; }
+.choice .fx .up { color:var(--fx-up); }
+.choice .fx .dn { color:var(--fx-dn); }
 /* ปุ่มกู้มาจ่าย (B111) ห้อยใต้ตัวเลือกที่ขาดเงิน — ย่อและเยื้องให้เห็นว่าเป็นทางของปุ่มบน ไม่ใช่ตัวเลือกใหม่ */
 .choice.loan { min-height:40px; margin:-4px 0 0 24px; padding:6px 12px; font-size:13.5px; }
 /* ชื่อตัวเลือกบนปุ่มกู้ยาวได้ทั้งประโยค — บรรทัดเดียวตัดท้ายด้วย … ไม่งั้นปุ่มกู้สูงกว่าตัวเลือกเอง · min-width:0 ให้ก้อนข้อความหดในแถว flex ได้ */
@@ -2186,10 +2249,17 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .pic-th .yr { font-size:10px; color:var(--sand); }
 .lineage-view { display:grid; gap:6px; }
 .lineage-text summary { cursor:pointer; font-size:13px; color:var(--muted); min-height:44px; display:flex; align-items:center; }
-.bk-tabs { display:flex; flex-wrap:wrap; gap:6px; }
-.bk-tabs button { all:unset; cursor:pointer; min-height:44px; padding:0 12px; border:1px solid var(--ink2); border-radius:999px; font-size:13px; font-weight:600; display:inline-flex; align-items:center; }
-.bk-tabs button[aria-pressed=&quot;true&quot;] { background:var(--ink); color:var(--paper); }
-.bk-tabs button:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+.a .bk-tabs { --tu:var(--ink); --tmuted:var(--muted); --tfaint:var(--rule); --tfocus:var(--ink); --to:var(--red); }
+.b .bk-tabs { --tu:var(--cream); --tmuted:var(--sand); --tfaint:var(--bronze2); --tfocus:var(--gold2); --to:var(--gold); }
+.bk-tabs { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:2px; align-items:stretch; border-bottom:1px solid var(--tfaint); }
+@media (min-width:720px) { .bk-tabs { grid-template-columns:repeat(6, minmax(0, 1fr)); } }
+.bk-tabs button { all:unset; box-sizing:border-box; position:relative; cursor:pointer; min-height:44px; padding:6px 2px; display:flex; flex-direction:column; align-items:center; justify-content:center; row-gap:2px; font-size:13px; font-weight:600; line-height:1.25; text-align:center; color:var(--tmuted); }
+.bk-tabs button > span { white-space:nowrap; }
+.bk-tabs svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; opacity:.75; }
+.bk-tabs button[aria-pressed=&quot;true&quot;] { background:color-mix(in srgb, var(--to) 14%, transparent); color:var(--tu); font-weight:700; box-shadow:inset 0 4px 0 var(--to); }
+.bk-tabs button[aria-pressed=&quot;true&quot;] svg { opacity:1; }
+.bk-tabs button:focus-visible { outline:2px solid var(--tfocus); outline-offset:2px; }
+.bk-tabs .new-dot { position:absolute; top:6px; left:calc(50% + 14px); margin:0; }
 .bk-sec, .pic-ev { display:flex; flex-direction:column; gap:6px; padding-top:10px; border-top:1px dashed var(--rule); }
 .bk-sec > .h, .pic-ev > .h { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:14px; font-weight:700; color:var(--ink); }
 .bk-sec > .h small, .pic-ev > .h small { font-weight:600; color:var(--muted); margin-left:auto; }
@@ -2286,15 +2356,20 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .deed { margin:0; display:flex; flex-direction:column; gap:2px; font-size:13px; overflow-wrap:anywhere; color:#E3D6B3; }
 .deed b { color:var(--gold2); font-size:12px; }
 .deed.bad b { color:#E39A8A; }
-/* มรณบัตร — หนังสืองานศพ (B83b D3 ทาง B): ขาวดำ กรอบหนา รูปกลางใบ · กราฟกับสรุปข้างในคงสีทาง A */
-.a.mem { position:relative; isolation:isolate; background:#FFFFFF; border:12px solid #1F1F1F; outline:1px solid #8A8A8A; outline-offset:-6px; color:#1F1F1F; }
+/* มรณบัตร — หนังสืองานศพ (B83b D3 ทาง B): ขาวดำ รูปกลางใบ · กราฟกับสรุปข้างในคงสีทาง A
+   กรอบเส้นคู่ไม่มีเส้นใน: เส้นในตกกลางช่องของเส้นคู่แล้วถมเป็นเส้นหนา (ข้อ 239) · ลายกนกแถบบน-ล่างเป็นของหนังสืองานศพเท่านั้น ป้ายคนหายคงกระดาษประกาศ */
+.a.mem { position:relative; isolation:isolate; color:#1F1F1F; }
+.a.mem:not(.lost) { border:8px double #1F1F1F; border-radius:0; background:url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%231F1F1F%22%20stroke-opacity%3D%220.2%22%20stroke-width%3D%221.4%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M20%2038c-7-4-10-11-7-18%201%204%204%206%206%206-3-5-2-12%203-17%200%205%203%208%206%2010%203%203%203%208%200%2011%202-1%204-3%204-6%203%206%200%2012-6%2014%22%2F%3E%3Cpath%20d%3D%22M20%2038c-3-3-3-7%200-9%202-1%204%200%204%202s-2%203-3%202%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;) left top / 32px 32px repeat-x, url(&quot;data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%231F1F1F%22%20stroke-opacity%3D%220.2%22%20stroke-width%3D%221.4%22%20stroke-linecap%3D%22round%22%20transform%3D%22translate(0%2040)%20scale(1%20-1)%22%3E%3Cpath%20d%3D%22M20%2038c-7-4-10-11-7-18%201%204%204%206%206%206-3-5-2-12%203-17%200%205%203%208%206%2010%203%203%203%208%200%2011%202-1%204-3%204-6%203%206%200%2012-6%2014%22%2F%3E%3Cpath%20d%3D%22M20%2038c-3-3-3-7%200-9%202-1%204%200%204%202s-2%203-3%202%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E&quot;) left bottom / 32px 32px repeat-x, #FFFFFF; }
+.a.mem:not(.lost) .d-rest { padding-bottom:26px; }
+/* ตราอยู่ใน .p-left หลัง panels() แต่ .p-left ไม่ตั้ง position ⇒ absolute ยึดมุมการ์ด */
+.d-seal { position:absolute; right:18px; top:18px; z-index:1; display:grid; place-items:center; width:52px; height:52px; border-radius:50%; background:var(--seal); color:#FFFFFF; outline:1.5px solid #FFFFFF; outline-offset:-5px; transform:rotate(-8deg); font:700 15px/1 Srisakdi,serif; user-select:none; }
 /* ภาพฉากเป็นพื้นหลังจาง (ui-redo 57 · ค่าแรกเกิดใบ 61: ชิดบนกลาง กว้างเต็ม จาง 0.1) — z-index ติดลบใต้เนื้อ แต่ isolation ของการ์ดกันไม่ให้ลงไปใต้พื้นขาว
    ทุกเส้นเป็นหมึกดำ (เจ้าของตั้งสีทองเป็น #000000) */
 .d-bg { position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none; color:#000000; }
 .d-bg svg { position:absolute; left:50%; top:0; width:100%; height:auto; transform:translateX(-50%); opacity:0.1; }
 .d-bg [fill]:not([fill=&quot;none&quot;]) { fill:currentColor; }
 .d-bg [stroke] { stroke:currentColor; }
-.mem .top { background:transparent; color:#1F1F1F; justify-content:center; padding-top:18px; }
+.mem .top { background:transparent; color:#1F1F1F; justify-content:center; padding-top:19.2px; }
 .mem .top b { font-family:Srisakdi,serif; font-size:22px; font-weight:700; }
 .por { align-self:center; width:96px; height:96px; border:1px solid #1F1F1F; padding:4px; }
 .d-head { display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; }
@@ -2334,7 +2409,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .d-share-in { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
 .d-share .choice { flex:1 1 auto; min-height:44px; padding:6px 12px; justify-content:center; font-size:14px; background:transparent; border-style:dashed; }
 /* ป้ายตามหาคนหาย (B139): กระดาษประกาศติดเสา หัวแดงตัวหนา — ต่างจากหนังสืองานศพขาวดำ ให้รู้ว่ายังไม่มีใครถือว่าจากไป */
-.a.mem.lost { background:#FFF8E1; border:3px dashed #B3261E; outline:none; }
+.a.mem.lost { background:#FFF8E1; border:3px dashed #B3261E; }
 .lost .top { padding-top:20px; }
 .lost .top b { font-family:var(--ft); font-size:24px; font-weight:800; color:#B3261E; letter-spacing:0.02em; }
 .lost .por { border:2px solid #1F1F1F; }
@@ -2381,7 +2456,7 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .fx-cap small { display:block; font-family:Sarabun,sans-serif; font-size:13px; color:var(--sand); }
 .fx-title { position:absolute; inset:0; display:grid; place-items:center; }
 .fx-title svg { overflow:visible; max-width:92vw; height:auto; }
-.fx-title .fx-name { font-family:Pridi,serif; font-weight:600; }
+.fx-title .fx-name { font-family:Maitree,serif; font-weight:600; }
 /* ทั้งหน้าเข้าธีมต่างโลกตามการ์ดที่ขึ้นจอ — ผูกกับการ์ดด้วย :has จึงไม่ต้องตามล้างธงทุกจุดที่วาดจอไทย */
 /* ui-redo ใบ 13: ชุดกรมท่าเรืองของต้นแบบลงตัวแปรหน้า — แถบสถานะ เมนูล่าง/ราวซ้าย และแผงจากเมนูเปลี่ยนสีตามโดยไม่มีกฎแยก */
 body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; --ink:#E8ECFF; --ink2:#D3D8F5; --paper:#161A3A; --paper2:#232A5E; --rule2:#3B4BA8; --fl:#6FE3FF; --dg:#FF8A8A; --track:#262C5A; }
@@ -2397,13 +2472,6 @@ body:has(#app > .card.af) .logo b { color:var(--gold); }
 body:has(#app > .card.af) .logo small, body:has(#app > .card.af) .logo .ver, body:has(#app > .card.af) .logo .saved { color:var(--sand); }
 body:has(#app > .card.af) .foot a { color:var(--ink2); }
 .af .sb { background:#120D0A; }
-/* แถบโฟกัสต่างโลก (05a): โครง .focus ของโลกหลัก สีชุดต่างโลก · ทางที่ทำอยู่เด่นสีทอง ไม่จางแบบตัวเลือกล็อก */
-.ifocusbar { padding:8px 20px 0; }
-.ifocusbar button { border-color:#2A3478; background:#0E1024; color:#E8ECFF; }
-.ifocusbar button:hover, .ifocusbar button:focus-visible { border-color:#6FE3FF; background:#1E2350; }
-.ifocusbar .focus-fx, .ifocusbar .focus-go { color:#6FE3FF; opacity:1; }
-.ifocusbar .focus-pick .on { border-color:#F2C94C; background:#1E2350; }
-.ifocusbar .focus-pick .on .focus-fx { color:#F2C94C; }
 /* จดหมายเหตุบนการ์ดจบ — ป้ายอายุทอง เส้นซ้ายบอกชนิดบรรทัดแบบต้นแบบ · ช่วงวัยพับได้ ชีวิตยาวราวร้อยบรรทัดจึงไม่ดันปุ่มลงไปไกล */
 .ichron .istage { margin-top:6px; }
 .ichron .istage > summary { cursor:pointer; font-size:13px; color:#6FE3FF; }
@@ -2468,7 +2536,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   :root { --rail-w:calc(220px + env(safe-area-inset-left)); --sheet-w:420px; }
   body:has(.mnav) { padding-bottom:0; padding-left:var(--rail-w); }
   .mnav { top:0; right:auto; width:var(--rail-w); max-width:none; flex-direction:column; gap:4px; margin:0; padding:max(16px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left)); border-top:0; border-right:1px solid var(--rule2); box-shadow:4px 0 16px rgb(0 0 0 / .06); }
-  .mnav button { flex:none; flex-direction:row; justify-content:flex-start; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
+  .mnav button { flex:none; flex-direction:row; justify-content:flex-start; gap:10px; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
   .mnav button:hover { background:var(--paper2); }
   .mnav button[aria-expanded=&quot;true&quot;] { background:var(--paper2); box-shadow:inset 3px 0 0 var(--fl); }
   .mnav .new-dot { position:static; margin-left:6px; }
@@ -2478,7 +2546,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 @media (orientation: landscape) and (max-height: 540px) {
   :root { --rail-w:calc(96px + env(safe-area-inset-left)); }
   .mnav { gap:2px; padding:max(8px, env(safe-area-inset-top)) 6px max(8px, env(safe-area-inset-bottom)) calc(6px + env(safe-area-inset-left)); }
-  .mnav button { justify-content:center; min-height:44px; padding:0 4px; font-size:13px; }
+  .mnav button { flex-direction:column; justify-content:center; gap:2px; min-height:44px; padding:0 4px; font-size:13px; }
 }
 /* ราว/แผงเริ่มใต้หัวเว็บ (ui-redo ใบ 67 · เจ้าของเลือกจากภาพ): หัวเว็บกว้างเต็มจอทับช่องราว · --hd = ขอบล่างหัวที่วัดขณะเลื่อน เลื่อนพ้นแล้วชิดบน
    · มือถือแนวนอนเตี้ยคงราวเต็มสูงแบบเดิม (หัวบางอยู่แล้ว) */
