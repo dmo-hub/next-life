@@ -14,7 +14,7 @@ import { GAME_CSS_PAGES, gameCss, injectGameCss } from './game-css.mjs';
 import { gatedFiles, injectGate, readGateHash } from './gate.mjs';
 import { injectSeo, sitemapXml, faviconSvg, SITEMAP, FAVICON_SVG } from './seo.mjs';
 import { ART_INK } from '../ui/art.mjs';
-import { DOCS_TWEAK_PAGE, docsTweakData, injectDocsTweak } from './docs-tweak.mjs';
+import { DOCS_TWEAK_PAGES, docsTweakData, injectDocsTweak } from './docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, injectCardArt } from './card-art-tweak.mjs';
 import { CARD_SPOIL_PAGE, cardSpoilData, injectCardSpoil } from './card-spoil-tweak.mjs';
 
@@ -93,10 +93,12 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     put(at(`docs/${file}`), next, html);
   }
   // หน้า tweak เว็บเอกสาร (ui-redo 32): รายการหน้าคิดหลังทุกหน้าข้างบนเขียนเสร็จ ⇒ หน้าที่เพิ่ง build ใหม่อยู่ในรายการด้วย
-  const dt = readFileSync(at(`docs/${DOCS_TWEAK_PAGE}`), 'utf8');
-  const dtNext = injectDocsTweak(dt, docsTweakData(at('docs/'), readFileSync(at('src/ui/template.html'), 'utf8')), `docs/${DOCS_TWEAK_PAGE}`);
-  put(at(`docs/${DOCS_TWEAK_PAGE}`), dtNext, dt);
-  out.push(DOCS_TWEAK_PAGE.replace(/\.html$/, ''));
+  const dtData = docsTweakData(at('docs/'), readFileSync(at('src/ui/template.html'), 'utf8'));
+  for (const file of DOCS_TWEAK_PAGES) {
+    const dt = readFileSync(at(`docs/${file}`), 'utf8');
+    put(at(`docs/${file}`), injectDocsTweak(dt, dtData, `docs/${file}`), dt);
+    out.push(file.replace(/\.html$/, ''));
+  }
   // หน้า tweak ภาพบนการ์ด (ui-redo 58): รูปทรงจาก art.mjs + ตัวเลขหมวดที่ harness/result-cats.mjs เขียนไว้
   const ca = readFileSync(at(`docs/${CARD_ART_PAGE}`), 'utf8');
   const caNext = injectCardArt(ca, cardArtData(), `docs/${CARD_ART_PAGE}`);
