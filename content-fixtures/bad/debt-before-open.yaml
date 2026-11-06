@@ -1,0 +1,13 @@
+# กู้กองทุนหมู่บ้านในการ์ดที่ออกได้ก่อนปีเปิดกองทุน — lint ต้องจับ ไม่งั้นแกน throw "ยังไม่มีในปี" ตอนเล่น
+events:
+  - id: debt_coop_too_early
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2520, 2650]
+    text: "ค่าปุ๋ยปีนี้แพงกว่าเงินที่เหลือในบ้าน"
+    choices:
+      - {text: "กู้กองทุนหมู่บ้านมาซื้อปุ๋ย", effects: {debt: {kind: coop, amount: {unit: income_x, amount: 0.5}}}, merit: [{cat: neutral}]}
+      - {text: "ใช้ปุ๋ยหมักแทน", merit: [{cat: neutral}]}
+      - {text: "ขอยืมญาติ", merit: [{cat: neutral}]}
+      - {text: "ลดแปลงปลูกลง", merit: [{cat: neutral}]}
