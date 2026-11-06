@@ -8605,13 +8605,15 @@ function makeHeir(af, r) {
       // ผู้เล่นรุ่นก่อนตายตามชะตาเดิมของตัวเอง (diesAt) · อีกคนแก่และตายตามตารางชีพแบบพ่อแม่ทั่วไป
       // คู่ครองจริงเป็นพ่อ/แม่อีกคน: อายุตอนลูกเกิดจากปีเกิดจริง · ตายไปแล้วตอนเราตาย = ตายที่อายุนั้น · ไม่มีคู่จริง = สร้างแบบเดิม
       const year0 = st.birthYear + kidAge;
+      // ลูกเรียกผู้เล่นตามอัตลักษณ์ (หญิงข้ามเพศ = แม่) · คู่ชายเป็นพ่อ ⇒ บ้านมีแม่และพ่อครบเหมือนชีวิตอื่น · ไม่มีอัตลักษณ์ = เพศกำเนิดเท่าเดิม
+      const self = speechSex(st);
       parents = [
-        { sex: st.sex, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...deathOf(st) },
+        { sex: self, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...deathOf(st) },
         spouse && spouse.born <= year0
           ? { sex: spouse.sex, age: year0 - spouse.born, alive: spouse.diedAge === null || spouse.diedAge > year0 - spouse.born, ...(spouse.diedAge !== null && { diesAt: spouse.diedAge, ...kinDeathOf(spouse) }), name: spouse.name }
-          : { sex: otherSex(st.sex), age: spouseAge(rng, st.sex, kidAge), alive: true },
+          : { sex: otherSex(self), age: spouseAge(rng, self, kidAge), alive: true },
       ];
-      legacy = { age: st.age - kidAge, units, debt, from: elderWord(1, null, st.sex) };
+      legacy = { age: st.age - kidAge, units, debt, from: elderWord(1, null, self) };
     } else {
       // รุ่นคั่นกลางเกิดห่างกันตามช่วงอายุแม่ตอนคลอด · พ่อ/แม่ของผู้เล่นใหม่เป็นลูก (หรือหลาน) ของรุ่นก่อน แก่และตายตามตารางชีพ
       // หลานจริง = เกิดปีของเขา พ่อ/แม่สายเลือดคือลูกจริงที่ให้กำเนิด · ไม่มีคนจริง = ห่างรุ่นสุ่มแบบเดิม (เริ่มจากปีเกิดลูกจริงถ้ามี)
