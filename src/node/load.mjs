@@ -481,6 +481,9 @@ export function loadItems(p = 'content/rules/items.yaml') {
   return { slots, cap: doc.cap, list: doc.items ?? {} };
 }
 
+// เส้นเตรียมทหาร: เนื้อหาสนามสอบ + ตัวเลขที่เจ้าของเคาะ (engine: src/engine/cadet.mjs)
+export const loadCadet = (p = 'content/rules/cadet.yaml') => parse(read(p));
+
 // ทะเบียนสายเรื่องรายคน (krung-1): ทุกคีย์ arc บนการ์ดต้องมีชื่อ — หน้าจบใช้บอกสถานะสาย · harness ส่งทะเบียนของ fixture เองได้
 export function loadArcs(events, p = 'content/rules/arcs.yaml') {
   const arcs = parse(read(p))?.arcs ?? {};
@@ -490,11 +493,23 @@ export function loadArcs(events, p = 'content/rules/arcs.yaml') {
   return arcs;
 }
 
-// เส้นเตรียมทหาร: เนื้อหาสนามสอบ + ตัวเลขที่เจ้าของเคาะ (engine: src/engine/cadet.mjs)
-export const loadCadet = (p = 'content/rules/cadet.yaml') => parse(read(p));
+// ปีเริ่มยุคของเส้นเตรียมทหาร (numbers.mobile_year ฯลฯ) — years ของการ์ดเนื้อหาเป็นเลขตรง จึงผูกด้วยทะเบียน era_cards แทน
+// era_cards.<ชื่อค่า>.before = การ์ดที่ years ต้องจบที่ ค่า−1 · .from = การ์ดที่ years ต้องเริ่มที่ค่า · ไม่ตรง = build ล้ม (เลขไม่หลุดจากค่าที่เจ้าของเคาะ)
+export function checkCadetEraCards(cadet, events) {
+  const n = cadet?.numbers ?? {}, byId = new Map(events.map((e) => [e.id, e])), bad = [];
+  for (const [key, sides] of Object.entries(n.era_cards ?? {})) {
+    const y = n[key];
+    if (!Number.isInteger(y)) { bad.push(`era_cards.${key}: ไม่มี numbers.${key}`); continue; }
+    for (const id of sides?.before ?? []) { const e = byId.get(id); if (!e) bad.push(`era_cards.${key}.before: ไม่มีการ์ด ${id}`); else if (e.years?.[1] !== y - 1) bad.push(`${id}: years ต้องจบที่ ${y - 1} (${key} = ${y}) แต่เป็น ${JSON.stringify(e.years)}`); }
+    for (const id of sides?.from ?? []) { const e = byId.get(id); if (!e) bad.push(`era_cards.${key}.from: ไม่มีการ์ด ${id}`); else if (e.years?.[0] !== y) bad.push(`${id}: years ต้องเริ่มที่ ${y} (${key} = ${y}) แต่เป็น ${JSON.stringify(e.years)}`); }
+  }
+  if (bad.length) throw new Error(`content/rules/cadet.yaml era_cards ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+}
 
 export function loadContent() {
   const events = loadEvents();
   const focus = loadFocus();
-  return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet: loadCadet() };
+  const cadet = loadCadet();
+  checkCadetEraCards(cadet, events);
+  return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet };
 }

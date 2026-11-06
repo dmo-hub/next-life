@@ -2,6 +2,7 @@
 import { FLAG_RE, meritCat, STAGE_AGES, AFTERLIFE_STAGE } from './vocab.mjs';
 import { EXAM_PASS, BOND_FLAG } from '../../engine/career.mjs';
 import { DEBT_FLAGS } from '../../engine/life.mjs';
+import { CADET_SET_FLAGS } from '../../engine/cadet.mjs';
 import { isObj, isRange, list, effectSites, choicesOf } from './util.mjs';
 
 // รอบหลายใบที่ผู้เล่นต้องเดินจนจบ (ดันเจียนไทย)
@@ -49,9 +50,9 @@ export const rules = [
   },
   {
     id: 'flag-unset',
-    desc: 'ธงที่ when.flags อ้าง ต้องมีตัวเลือกใดตั้ง (sets_flags) หรือแกนตั้งให้จากป้ายธง (vow_broken) หรือด่านเรียนต่อ (exam_pass:uni · scholar_bond) หรือยอดหนี้ (in_debt · informal_debt)',
+    desc: 'ธงที่ when.flags อ้าง ต้องมีตัวเลือกใดตั้ง (sets_flags) หรือแกนตั้งให้จากป้ายธง (vow_broken) หรือด่านเรียนต่อ (exam_pass:uni · scholar_bond) หรือยอดหนี้ (in_debt · informal_debt) หรือเส้นเตรียมทหาร (cadet_passed · cadet_retry · cadet_body_seen)',
     all(events, ctx, r) {
-      const set = new Set([EXAM_PASS, BOND_FLAG, ...DEBT_FLAGS]);
+      const set = new Set([EXAM_PASS, BOND_FLAG, ...DEBT_FLAGS, ...CADET_SET_FLAGS]);
       for (const { e } of events) {
         for (const x of flagRefs(e)) if (x.set) set.add(x.f);
         for (const { node } of effectSites(e)) for (const m of list(node.merit)) if (meritCat(m?.cat)?.flag) set.add(meritCat(m.cat).id);
