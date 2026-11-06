@@ -368,10 +368,17 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .pic-th .yr { font-size:10px; color:var(--sand); }
 .lineage-view { display:grid; gap:6px; }
 .lineage-text summary { cursor:pointer; font-size:13px; color:var(--muted); min-height:44px; display:flex; align-items:center; }
-.bk-tabs { display:flex; flex-wrap:wrap; gap:6px; }
-.bk-tabs button { all:unset; cursor:pointer; min-height:44px; padding:0 12px; border:1px solid var(--ink2); border-radius:999px; font-size:13px; font-weight:600; display:inline-flex; align-items:center; }
-.bk-tabs button[aria-pressed="true"] { background:var(--ink); color:var(--paper); }
-.bk-tabs button:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+.a .bk-tabs { --tu:var(--ink); --tmuted:var(--muted); --tfaint:var(--rule); --tfocus:var(--ink); --to:var(--red); }
+.b .bk-tabs { --tu:var(--cream); --tmuted:var(--sand); --tfaint:var(--bronze2); --tfocus:var(--gold2); --to:var(--gold); }
+.bk-tabs { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:2px; align-items:stretch; border-bottom:1px solid var(--tfaint); }
+@media (min-width:720px) { .bk-tabs { grid-template-columns:repeat(6, minmax(0, 1fr)); } }
+.bk-tabs button { all:unset; box-sizing:border-box; position:relative; cursor:pointer; min-height:44px; padding:6px 2px; display:flex; flex-direction:column; align-items:center; justify-content:center; row-gap:2px; font-size:13px; font-weight:600; line-height:1.25; text-align:center; color:var(--tmuted); }
+.bk-tabs button > span { white-space:nowrap; }
+.bk-tabs svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; opacity:.75; }
+.bk-tabs button[aria-pressed="true"] { background:color-mix(in srgb, var(--to) 14%, transparent); color:var(--tu); font-weight:700; box-shadow:inset 0 4px 0 var(--to); }
+.bk-tabs button[aria-pressed="true"] svg { opacity:1; }
+.bk-tabs button:focus-visible { outline:2px solid var(--tfocus); outline-offset:2px; }
+.bk-tabs .new-dot { position:absolute; top:6px; left:calc(50% + 14px); margin:0; }
 .bk-sec, .pic-ev { display:flex; flex-direction:column; gap:6px; padding-top:10px; border-top:1px dashed var(--rule); }
 .bk-sec > .h, .pic-ev > .h { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:14px; font-weight:700; color:var(--ink); }
 .bk-sec > .h small, .pic-ev > .h small { font-weight:600; color:var(--muted); margin-left:auto; }
