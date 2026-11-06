@@ -1,0 +1,43 @@
+name: เสนอสายหรือระบบใหม่
+description: เสนอสาย ระบบ หรือเนื้อหาชุดใหม่ ให้เจ้าของเคาะก่อนลงมือ
+title: "เสนอ: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        เปิดฟอร์มนี้ก่อนเริ่มทำ รอเจ้าของเคาะแล้วค่อยแตกเป็นใบงาน ฟอร์มนี้ยังไม่ใช่ใบงาน
+  - type: textarea
+    id: scope
+    attributes:
+      label: ขอบเขต
+      description: ทำอะไร และไม่ทำอะไร
+    validations:
+      required: true
+  - type: textarea
+    id: player
+    attributes:
+      label: ผู้เล่นเห็นอะไร
+      description: เล่าเป็นภาพบนจอ เช่น การ์ดใหม่ ปุ่มใหม่ ค่าที่เปลี่ยน
+    validations:
+      required: true
+  - type: textarea
+    id: numbers
+    attributes:
+      label: ตัวเลขที่ต้องเคาะ
+      description: ตัวเลขสมดุลที่ต้องให้เจ้าของตัดสิน พร้อมค่าที่เสนอและที่มา
+    validations:
+      required: true
+  - type: textarea
+    id: touches
+    attributes:
+      label: การ์ดหรือไฟล์เดิมที่แตะ
+      description: รหัสการ์ดหรือ path ที่ต้องแก้ ถ้าไม่แตะของเดิมให้เขียนว่าไม่แตะ
+    validations:
+      required: true
+  - type: textarea
+    id: split
+    attributes:
+      label: แบ่งได้กี่ PR
+      description: แบ่งเป็นกี่ใบ แต่ละใบส่งอะไร และลำดับก่อนหลัง
+    validations:
+      required: true

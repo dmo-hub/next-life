@@ -12,7 +12,7 @@ const content = loadContent();
 // ไม่มี bundler: ตัด import/export ออกแล้วต่อโมดูลตามลำดับ dependency ให้เป็นสคริปต์เดียว
 const strip = (src) =>
   src.replace(/^import .*?;\s*$/gm, '').replace(/^export \* from .*$/gm, '').replace(/^export /gm, '');
-const files = [...['rng', 'era', 'birth', 'family', 'finance', 'merit', 'career', 'rank', 'pace', 'death', 'court', 'warn', 'focus', 'memory', 'past', 'life', 'goal', 'belief', 'continent', 'isekai', 'afterlife', 'intro', 'titles', 'save'].map((m) => `./src/engine/${m}.mjs`), './src/ui/art.mjs', './src/ui/shelfart.mjs', './src/ui/labels.mjs', './src/ui/app.mjs'];
+const files = [...['rng', 'era', 'birth', 'family', 'finance', 'merit', 'career', 'rank', 'pace', 'death', 'court', 'cadet', 'warn', 'focus', 'memory', 'past', 'life', 'goal', 'belief', 'continent', 'isekai', 'afterlife', 'intro', 'titles', 'save'].map((m) => `./src/engine/${m}.mjs`), './src/ui/art.mjs', './src/ui/shelfart.mjs', './src/ui/labels.mjs', './src/ui/app.mjs'];
 // ต่อทุกโมดูลไว้ scope เดียว: function ชื่อซ้ำไม่ error แต่ตัวหลังทับตัวแรกเงียบ ๆ — ชื่อชั้นบนสุดซ้ำข้ามไฟล์ต้องหยุด build
 // เลขเวอร์ชันจองชื่อไว้ก่อน: โมดูลไหนประกาศเลขเองอีก = มีซอร์สถือเลขสองที่ build หยุด
 const owner = new Map([['APP_VERSION', 'src/version.json'], ['APP_BUILD', 'src/version.json'], ['RELEASE_NOTES', 'docs/whatsnew.html']]);
@@ -52,7 +52,7 @@ writeFileSync(new URL('./docs/play.html', import.meta.url), toLf(read('./src/ui/
 // หน้า tweak ที่ต้องหน้าตาเกมจริง (ui-redo 46): ฉีด CSS ของ template + ฟอนต์หน้าเล่นตอน build — หน้าไม่ลอก CSS เอง แก้เกมแล้วต้นแบบตามทันที
 const GAME_CSS = ['/*GAME-CSS:START*/', '/*GAME-CSS:END*/'];
 const gameCss = read('./src/ui/template.html').match(/<style>([\s\S]*?)<\/style>/)[1].replace('/*__FONTS__*/', () => fontsCss(playFonts().filter(([f]) => f !== 'Srisakdi'), `../../${FONT_DIR}`).trimEnd());
-for (const page of ['./docs/dev/tweak/head-tweak.html', './docs/dev/tweak/death-tweak.html']) {
+for (const page of ['./docs/dev/tweak/head-tweak.html']) {
   const html = read(page);
   const [a, b] = GAME_CSS.map((m) => html.indexOf(m));
   if (a < 0 || b < a) throw new Error(`${page}: ต้องมี ${GAME_CSS.join(' … ')}`);

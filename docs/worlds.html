@@ -74,6 +74,15 @@
   @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
 /*NAV-CSS:END*/
 </style>
+<!--DOCS-LAYOUT:START--><style>
+.w:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){max-width:960px!important}body>main:not(:has(.w)):not(#app){max-width:960px;margin-left:auto;margin-right:auto}:is(body>main,body>header,body>footer){padding-left:24px;padding-right:24px}
+main h2:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(:first-child){margin-top:28px}main :is(section,.box):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){margin-bottom:17px}
+main:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){overflow-wrap:anywhere}main .st:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){white-space:normal;max-width:100%}@media (max-width:640px){main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){display:block;max-width:100%;overflow-x:auto}}
+main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) :is(th,td):not(:is(.dark,.dark *)){border:1px solid var(--line)}main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) th:not(:is(.dark,.dark *)){background:var(--bg);color:var(--ink)}
+main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){padding:20px 24px;box-shadow:none}main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(.dark){background:var(--surface)}
+main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r)}
+.tag:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border-radius:0}
+</style><!--DOCS-LAYOUT:END-->
 </head>
 <body>
 <!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">NEXT LIFE</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="worlds.html" aria-current="page">โลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
@@ -108,7 +117,7 @@
   <section class="box">
     <h2>ชาตินี้</h2>
     <p>เกิดแบบสุ่มเป็นคนไทยหนึ่งคนใน <span data-fact="provinces">77</span> จังหวัด ฐานะ <span data-fact="classes">10</span> ระดับตามยุคจริง ใช้ชีวิตทีละการ์ด เรียน ทำงาน มีครอบครัว แล้วตายตามตารางชีพจริง</p>
-    <p>การ์ดช่วงมีชีวิต <span data-fact="lifeCards">434</span> ใบ</p>
+    <p>การ์ดช่วงมีชีวิต <span data-fact="lifeCards">515</span> ใบ</p>
   </section>
 
   <section class="box dark">
