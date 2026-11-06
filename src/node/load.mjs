@@ -481,7 +481,10 @@ export function loadItems(p = 'content/rules/items.yaml') {
   return { slots, cap: doc.cap, list: doc.items ?? {} };
 }
 
+// เส้นเตรียมทหาร: เนื้อหาสนามสอบ + ตัวเลขที่เจ้าของเคาะ (engine: src/engine/cadet.mjs)
+export const loadCadet = (p = 'content/rules/cadet.yaml') => parse(read(p));
+
 export function loadContent() {
   const focus = loadFocus();
-  return { events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus) };
+  return { events: loadEvents(), era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), cadet: loadCadet() };
 }

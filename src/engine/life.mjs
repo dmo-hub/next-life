@@ -9,6 +9,7 @@ import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './car
 import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
 import { beliefOk, beliefFired, beliefChoice, moneyTight } from './belief.mjs';
 import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './court.mjs';
+import { cadetActive, cadetCard, chooseCadet, cadetAfterChoice } from './cadet.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
@@ -1468,6 +1469,12 @@ function drawCard(st) {
     }
     return emit(st, card);
   }
+  // เส้นเตรียมทหาร (cadet.mjs): ลำดับฉากรอบสมัคร/สนามสอบ ออกต่อจากการ์ดผลของตัวเลือกที่เปิดมัน · ไม่เดินเวลา
+  if (st.cadet && !st.dead && cadetActive(st)) {
+    if (st.cadet.cur) throw new Error('ยังมีการ์ดที่รอเลือก');
+    const card = cadetCard(st);
+    if (card) return emit(st, card);
+  }
   for (;;) {
     if (st.advance) {
       // สุ่มตายของปีที่อายุ st.age ก่อนขึ้นปีใหม่ — ทารกจึงตายได้ตั้งแต่ขวบปีแรกตามอัตราตายทารกจริง และอายุบนการ์ดตายเป็นปีเต็ม
@@ -1863,6 +1870,7 @@ export function noteDeed(st, text, record, age = st.age) {
 export function choose(st, idx, loan) {
   if (st.court) return chooseCourt(st, idx);
   if (st.trip) return chooseIsekai(st.trip, idx);
+  if (st.cadet?.cur) return chooseCadet(st, idx);
   const ev = st.pending;
   if (ev?.alloc) {
     const opt = ev.alloc[idx];
@@ -1954,6 +1962,7 @@ export function choose(st, idx, loan) {
   // ใบในรอบเดียวกัน (ev.run) ที่สุขภาพหมดอยู่ก่อนกด = โรคที่ถึงคิวกลางรอบ ไม่ใช่ผลของใบนี้ — จำไว้ก่อนผลของตัวเลือกลง
   const ill = ev.run !== undefined && st.health <= 0;
   const nat = natureBoost(st, ev);
+  const flagsBefore = { ...st.flags };
   let because = applyEffects(st, c.effects, s, ss, 1, nat);
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
@@ -2036,6 +2045,7 @@ export function choose(st, idx, loan) {
     after.splice(at < 0 ? after.length : at, 0, warnCard(st.age, stageOf(st.age), WARN.text));
   }
   st.queue.unshift(...after);
+  cadetAfterChoice(st, ev, c, flagsBefore);
 }
 
 function deathCard(st) {

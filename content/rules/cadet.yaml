@@ -1,0 +1,5117 @@
+# เส้นเตรียมทหาร · สนามสอบ (เฟส 2) และฉากปีสอบซ้ำ — engine: src/engine/cadet.mjs
+# ที่มา: demo ที่เจ้าของเล่นและเคาะแล้ว (.claude/research/demo/data-04.js · cadet-phase1-demo.html) 2026-11-05
+# ธงที่ engine ตั้งเอง (ไม่อยู่ในทะเบียนธงเพราะยังไม่มีการ์ดเนื้อหาอ่าน): cadet_body_seen · cadet_passed · cadet_retry · cadet_branch:<เหล่า> (ลงทะเบียนเป็น prefix)
+# numbers = ค่าที่เจ้าของเคาะ · fx ในไฟล์นี้เป็นหน่วย demo (1 = fx_unit แต้ม)
+numbers:
+  written_min: 13
+  know_min: 65
+  iv_min: 13
+  body_min:
+    army: 80
+    navy: 65
+    airforce: 70
+    police: 55
+  ask_max: 5
+  report_days: 2
+  exam_injury: 0.15
+  letdown: -20
+  web_year: 2550
+  photo_year: 2550
+  phone_board_year: 2558
+  fx_unit: 5
+  commission_after: 7
+  last_age: 18
+branches:
+  army: ทบ.
+  navy: ทร.
+  airforce: ทอ.
+  police: ตร.
+branchLabels:
+  army: ทบ.
+  navy: ทร.
+  airforce: ทอ.
+  police: ตร.
+apply:
+  - id: X1
+    title: ช่องเหล่าในใบสมัคร
+    variantOf: null
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: 2506
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: ใบสมัครมีช่องเหล่าให้ติ๊กสี่ช่อง ทบ. ทร. ทอ. ตร. แต่ละเหล่าสอบคนละสนาม คนละวัน ค่าสมัครแยกกัน ติ๊กกี่ช่องก็ได้ ขอแค่ไปสอบให้ครบทุกสนามที่ติ๊กไว้
+    kind: toggle
+    ageMin: 16
+    ageMax: 18
+    contextLines:
+      - when:
+          flagsHas:
+            - cadet_retry
+        line: ใบปีก่อนยังอยู่ในแฟ้ม รอยปากกาตรงช่องเดิมยังชัด
+      - when:
+          flagsHas:
+            - cadet_family_secret
+        line: ค่าสมัครทุกช่องต้องออกเอง ที่บ้านยังไม่รู้ว่ามีใบนี้
+      - when:
+          poor: true
+          flagsNot:
+            - cadet_family_support
+        line: ติ๊กเพิ่มหนึ่งช่อง ก็คือค่ารถอีกหนึ่งเที่ยว
+      - when:
+          flagsHas:
+            - cadet_family_support
+        line: ผู้ใหญ่ในบ้านนั่งข้าง ๆ คอยดูว่ากรอกครบทุกช่องไหม
+    toggles:
+      - branch: army
+        label: ติ๊กช่อง ทบ.
+        hint: ภาคสนาม ที่นั่งไม่น้อย แต่คนแย่งมาก
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+      - branch: navy
+        label: ติ๊กช่อง ทร.
+        hint: ทะเล ที่นั่งน้อยที่สุด
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+      - branch: airforce
+        label: ติ๊กช่อง ทอ.
+        hint: ฟ้า ขั้นตอนเป๊ะ ที่นั่งน้อย
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+      - branch: police
+        label: ติ๊กช่อง ตร.
+        hint: อยู่กับประชาชน ที่นั่งมากที่สุด
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+        yearMin: 2506
+    selectAll:
+      label: ติ๊กทุกช่องที่เปิด
+      hint: ทุกสนาม ทุกค่าสมัคร ทุกเที่ยวรถ
+    submit:
+      label: ส่งใบสมัคร
+      lockReason: ยังไม่ได้ติ๊กสักช่อง
+      moneyLockReason: ค่าสมัครเกินเงินที่มี
+    submitResults:
+      "1": ทุ่มทั้งหมดไว้ที่สนามเดียว
+      "2": เผื่อไว้อีกทาง แต่ใจยังอยู่ที่ช่องแรก
+      "3": เผื่อไว้อีกทาง แต่ใจยังอยู่ที่ช่องแรก
+      "4": ปฏิทินเดือนนั้นเต็มไปด้วยวงกลมสีแดง
+    orderNote: เรียงตัวเลือกเหล่าที่มี cadet_lean:* ก่อน แล้ว saw_* · ลำดับวันสอบ = ลำดับที่ติ๊ก (ข้อเสนอ Q5)
+  - id: X1-pre2506
+    title: ช่องเหล่าในใบสมัคร
+    variantOf: X1
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: 2505
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: ใบสมัครมีช่องเหล่าให้ติ๊กสามช่อง ทบ. ทร. ทอ. แต่ละเหล่าสอบคนละสนาม คนละวัน ค่าสมัครแยกกัน ติ๊กกี่ช่องก็ได้ ขอแค่ไปสอบให้ครบทุกสนามที่ติ๊กไว้
+    note: ตัวบทแทน (ร่างให้แค่ทิศ 'สี่ช่อง → สามช่อง ตัด ตร.')
+    kind: toggle
+    ageMin: 16
+    ageMax: 18
+    contextLines:
+      - when:
+          flagsHas:
+            - cadet_retry
+        line: ใบปีก่อนยังอยู่ในแฟ้ม รอยปากกาตรงช่องเดิมยังชัด
+      - when:
+          flagsHas:
+            - cadet_family_secret
+        line: ค่าสมัครทุกช่องต้องออกเอง ที่บ้านยังไม่รู้ว่ามีใบนี้
+      - when:
+          poor: true
+          flagsNot:
+            - cadet_family_support
+        line: ติ๊กเพิ่มหนึ่งช่อง ก็คือค่ารถอีกหนึ่งเที่ยว
+      - when:
+          flagsHas:
+            - cadet_family_support
+        line: ผู้ใหญ่ในบ้านนั่งข้าง ๆ คอยดูว่ากรอกครบทุกช่องไหม
+    toggles:
+      - branch: army
+        label: ติ๊กช่อง ทบ.
+        hint: ภาคสนาม ที่นั่งไม่น้อย แต่คนแย่งมาก
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+      - branch: navy
+        label: ติ๊กช่อง ทร.
+        hint: ทะเล ที่นั่งน้อยที่สุด
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+      - branch: airforce
+        label: ติ๊กช่อง ทอ.
+        hint: ฟ้า ขั้นตอนเป๊ะ ที่นั่งน้อย
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+      - branch: police
+        label: ติ๊กช่อง ตร.
+        hint: อยู่กับประชาชน ที่นั่งมากที่สุด
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+        yearMin: 2506
+    selectAll:
+      label: ติ๊กทุกช่องที่เปิด
+      hint: ทุกสนาม ทุกค่าสมัคร ทุกเที่ยวรถ
+    submit:
+      label: ส่งใบสมัคร
+      lockReason: ยังไม่ได้ติ๊กสักช่อง
+      moneyLockReason: ค่าสมัครเกินเงินที่มี
+    submitResults:
+      "1": ทุ่มทั้งหมดไว้ที่สนามเดียว
+      "2": เผื่อไว้อีกทาง แต่ใจยังอยู่ที่ช่องแรก
+      "3": เผื่อไว้อีกทาง แต่ใจยังอยู่ที่ช่องแรก
+      "4": ปฏิทินเดือนนั้นเต็มไปด้วยวงกลมสีแดง
+    orderNote: เรียงตัวเลือกเหล่าที่มี cadet_lean:* ก่อน แล้ว saw_* · ลำดับวันสอบ = ลำดับที่ติ๊ก (ข้อเสนอ Q5)
+  - id: X1-ข
+    title: ช่องเหล่าในใบสมัคร
+    variantOf: X1
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    placement: afterExamMorning
+    text: โต๊ะลงทะเบียนหน้าประตูมีป้ายแยกสี่เหล่า ทบ. ทร. ทอ. ตร. เจ้าหน้าที่ถามว่าสมัครไว้กี่สนาม {ชื่อ} หยิบใบสมัครออกมาดูอีกครั้ง
+    note: แบบ ข ใช้เมื่อวางหลัง EXAM_MORNING · Q1
+    kind: toggle
+    ageMin: 16
+    ageMax: 18
+    contextLines:
+      - when:
+          flagsHas:
+            - cadet_retry
+        line: ใบปีก่อนยังอยู่ในแฟ้ม รอยปากกาตรงช่องเดิมยังชัด
+      - when:
+          flagsHas:
+            - cadet_family_secret
+        line: ค่าสมัครทุกช่องต้องออกเอง ที่บ้านยังไม่รู้ว่ามีใบนี้
+      - when:
+          poor: true
+          flagsNot:
+            - cadet_family_support
+        line: ติ๊กเพิ่มหนึ่งช่อง ก็คือค่ารถอีกหนึ่งเที่ยว
+      - when:
+          flagsHas:
+            - cadet_family_support
+        line: ผู้ใหญ่ในบ้านนั่งข้าง ๆ คอยดูว่ากรอกครบทุกช่องไหม
+    toggles:
+      - branch: army
+        label: ติ๊กช่อง ทบ.
+        hint: ภาคสนาม ที่นั่งไม่น้อย แต่คนแย่งมาก
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+      - branch: navy
+        label: ติ๊กช่อง ทร.
+        hint: ทะเล ที่นั่งน้อยที่สุด
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+      - branch: airforce
+        label: ติ๊กช่อง ทอ.
+        hint: ฟ้า ขั้นตอนเป๊ะ ที่นั่งน้อย
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+      - branch: police
+        label: ติ๊กช่อง ตร.
+        hint: อยู่กับประชาชน ที่นั่งมากที่สุด
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+        yearMin: 2506
+    selectAll:
+      label: ติ๊กทุกช่องที่เปิด
+      hint: ทุกสนาม ทุกค่าสมัคร ทุกเที่ยวรถ
+    submit:
+      label: ส่งใบสมัคร
+      lockReason: ยังไม่ได้ติ๊กสักช่อง
+      moneyLockReason: ค่าสมัครเกินเงินที่มี
+    submitResults:
+      "1": ทุ่มทั้งหมดไว้ที่สนามเดียว
+      "2": เผื่อไว้อีกทาง แต่ใจยังอยู่ที่ช่องแรก
+      "3": เผื่อไว้อีกทาง แต่ใจยังอยู่ที่ช่องแรก
+      "4": ปฏิทินเดือนนั้นเต็มไปด้วยวงกลมสีแดง
+    orderNote: เรียงตัวเลือกเหล่าที่มี cadet_lean:* ก่อน แล้ว saw_* · ลำดับวันสอบ = ลำดับที่ติ๊ก (ข้อเสนอ Q5)
+dayIntro:
+  first: สองชั่วโมงแรกเป็นเลข วิทย์ อังกฤษ {ชื่อ} ทำไปเท่าที่อ่านมา ชุดสุดท้ายในซองเป็นแบบวัดความพร้อมห้าข้อ ทุกข้อเป็นเหตุการณ์ที่ต้องเลือกทันที
+  later: วิชาการผ่านไปอีกชุด เหลือแบบวัดความพร้อมของสนามนี้
+  dayLabel: "วันที่{n} · "
+  contextLines:
+    - when:
+        flagsHas:
+          - cadet_retry
+      line: ห้องเดิม กลิ่นเดิม แต่มือไม่สั่นเท่าปีก่อน
+    - when:
+        flagsHas:
+          - cadet_prep_group
+        rival: A
+      line: เพื่อนห้องสามนั่งห่างไปสามแถว ไม่หันมาเลยสักครั้ง
+  screenTitle: สนามสอบเตรียมทหาร · ชุด {เหล่า} · ข้อ {i} / 5
+  passRule:
+    quizMin: 13
+    knowledgeMin: 50
+dayHeader:
+  army: สนาม ทบ. · หอประชุมใหญ่ โต๊ะเรียงเป็นร้อยแถว
+  navy: สนาม ทร. · ตึกเรียนวันอาทิตย์ แอร์เย็นจนมือชา
+  airforce: สนาม ทอ. · หน้าต่างห้องสอบมองเห็นรันเวย์
+  police: สนาม ตร. · โรงยิมใหญ่ คนคุมสอบใส่ชุดสีกากี
+quiz:
+  army:
+    - q: เดินทางไกล 20 กม. เพื่อนในหมู่แบกเป้ไม่ไหว
+      options:
+        - label: แบ่งของเพื่อนมาแบกบางส่วน
+          score: 5
+        - label: ให้กำลังใจ เดินประกบเพื่อนไป
+          score: 4
+        - label: เดินช้าลงเป็นเพื่อน
+          score: 3
+        - label: บอกให้เพื่อนไปขอพักกับครูเอง
+          score: 2
+        - label: เดินนำไปก่อน เดี๋ยวเพื่อนตามมา
+          score: 0
+    - q: ฝึกในป่า แผนที่กับเข็มทิศชี้คนละทาง และใกล้มืดแล้ว
+      options:
+        - label: หยุด ดูจุดสังเกต ตกลงทางกับหมู่
+          score: 5
+        - label: หยุดรอ ให้หัวหน้าหมู่เลือกทางเอง
+          score: 4
+        - label: ตามเข็มทิศไปเลย
+          score: 3
+        - label: นั่งรอให้ครูฝึกมาตามหา
+          score: 2
+        - label: แยกกันไปหาทาง
+          score: 0
+    - q: น้ำท่วมหมู่บ้าน ได้คำสั่งให้ขนกระสอบทราย แต่ยายคนหนึ่งขอให้ช่วยขนของในบ้าน
+      options:
+        - label: แจ้งหัวหน้าหมู่ ขอคนไปช่วยยาย
+          score: 5
+        - label: ขนกระสอบต่อ แจ้งเรื่องยายตอนพัก
+          score: 4
+        - label: ไปช่วยยายก่อนเลย
+          score: 3
+        - label: ให้ยายไปรอที่ศูนย์อพยพก่อน
+          score: 2
+        - label: บอกยายว่าไม่ใช่หน้าที่
+          score: 0
+    - q: ขุดหลุมบุคคลกลางแดด มือเริ่มพอง
+      options:
+        - label: พันผ้าแล้วขุดต่อจนเสร็จ
+          score: 5
+        - label: ขอพักดื่มน้ำ แล้วกลับมาขุดต่อ
+          score: 4
+        - label: ฝืนขุดต่อ ไม่บอกใครว่ามือพอง
+          score: 3
+        - label: ขอเปลี่ยนไปทำงานที่เบากว่า
+          score: 2
+        - label: แอบไปนั่งหลังต้นไม้
+          score: 0
+    - q: อยู่เวรยามตอนตีสอง เพื่อนคู่เวรขอแอบงีบ
+      options:
+        - label: ชวนคุยกันให้ตื่นจนครบเวร
+          score: 5
+        - label: เตือนเพื่อนห้ามหลับ แล้วเฝ้าต่อ
+          score: 4
+        - label: ให้งีบ 10 นาทีแล้วปลุก
+          score: 3
+        - label: ปล่อยเพื่อนหลับไป ไม่พูดอะไร
+          score: 2
+        - label: งีบด้วยกัน ไม่มีใครเห็น
+          score: 0
+  navy:
+    - q: คลื่นแรง เพื่อนเมาคลื่นจนทำเวรไม่ไหว
+      options:
+        - label: ทำเวรแทนแล้วรายงานหัวหน้าเวร
+          score: 5
+        - label: รายงานหัวหน้าเวร ขอคนมาแทน
+          score: 4
+        - label: ให้เพื่อนพักโดยไม่บอกใคร
+          score: 3
+        - label: บอกเพื่อนให้ฝืนทำไปก่อน
+          score: 2
+        - label: ปล่อยให้ตำแหน่งว่าง
+          score: 0
+    - q: ฝึกสละเรือ ต้องกระโดดจากดาดฟ้าลงทะเล แต่กลัวความสูง
+      options:
+        - label: ทำตามท่าที่ฝึกแล้วกระโดด
+          score: 5
+        - label: ลังเลอยู่นาน แต่ก็กระโดดตามท่า
+          score: 4
+        - label: ขอไปเป็นคนสุดท้าย
+          score: 3
+        - label: ขอครูข้ามขั้นนี้ไปก่อน
+          score: 2
+        - label: ปีนบันไดลงแทน
+          score: 0
+    - q: ขัดดาดฟ้าเสร็จ แต่รุ่นพี่บอกว่ายังไม่ผ่าน
+      options:
+        - label: ถามว่าตรงไหนไม่ผ่าน แล้วขัดใหม่
+          score: 5
+        - label: ขัดใหม่ทั้งหมดโดยไม่ถาม
+          score: 4
+        - label: ขัดซ้ำเฉพาะจุดที่เดาเอาเอง
+          score: 3
+        - label: เงียบ รอให้รุ่นพี่เดินไปก่อน
+          score: 2
+        - label: เถียงว่าสะอาดแล้ว
+          score: 0
+    - q: เห็นชาวประมงตกน้ำ คลื่นแรง
+      options:
+        - label: ตะโกน "คนตกน้ำ" ชี้ตัว โยนห่วง
+          score: 5
+        - label: ตะโกน "คนตกน้ำ" แล้ววิ่งหาห่วง
+          score: 4
+        - label: กระโดดลงไปช่วยเอง
+          score: 3
+        - label: ยืนมอง รอให้คนอื่นตะโกนก่อน
+          score: 2
+        - label: วิ่งไปตามผู้บังคับการ ทิ้งจุดมอง
+          score: 0
+    - q: ต้องออกทะเล 3 เดือน พลาดวันเกิดแม่
+      options:
+        - label: ฝากจดหมายไว้ โทรหาเมื่อเข้าฝั่ง
+          score: 5
+        - label: โทรบอกแม่ก่อนออกเรือ
+          score: 4
+        - label: เสียใจแต่ทำงานต่อ
+          score: 3
+        - label: ไม่บอกแม่ว่าจะออกทะเลนาน
+          score: 2
+        - label: ขอถอนตัวจากภารกิจ
+          score: 0
+  airforce:
+    - q: ในห้องฝึกบินจำลอง สัญญาณเตือนดังขึ้นระหว่างบิน
+      options:
+        - label: ตั้งสติ ทำขั้นตอนฉุกเฉินทีละข้อ
+          score: 5
+        - label: แจ้งครูแล้วรอคำสั่ง
+          score: 4
+        - label: แก้เองตามที่คิด ไม่เปิดคู่มือ
+          score: 3
+        - label: ปล่อยไว้ก่อน รอดูว่าเตือนซ้ำไหม
+          score: 2
+        - label: ปิดเสียงเตือนแล้วบินต่อ
+          score: 0
+    - q: ช่างบอกว่าเช็กเครื่องแล้ว ยังเหลือเวลาก่อนขึ้นบิน
+      options:
+        - label: เดินตรวจรอบเครื่องตามรายการเอง
+          score: 5
+        - label: ถามช่างว่าเช็กข้อไหนบ้าง
+          score: 4
+        - label: มองรอบเครื่องคร่าวๆ ไม่ดูรายการ
+          score: 3
+        - label: รอให้ครูบอกว่าต้องตรวจไหม
+          score: 2
+        - label: เชื่อช่าง ขึ้นเครื่องเลย
+          score: 0
+    - q: อากาศแปรปรวน ครูให้ตัดสินใจเองว่าจะบินต่อหรือกลับ
+      options:
+        - label: กลับฐาน ปลอดภัยก่อน
+          score: 5
+        - label: ถามหอบังคับการเรื่องอากาศก่อน
+          score: 4
+        - label: บินวนรอดูอากาศ
+          score: 3
+        - label: วิทยุถามครูให้ตัดสินแทน
+          score: 2
+        - label: บินต่อ เสียดายชั่วโมงบิน
+          score: 0
+    - q: คืนก่อนวันทดสอบบิน เพื่อนชวนดูบอลถึงตีสอง
+      options:
+        - label: นอนให้พอ ชวนเพื่อนนอนด้วย
+          score: 5
+        - label: นอนให้พอ ปล่อยเพื่อนดูไป
+          score: 4
+        - label: ดูครึ่งแรกแล้วนอน
+          score: 3
+        - label: ดูไปก่อน ง่วงเมื่อไรค่อยนอน
+          score: 2
+        - label: ดูจนจบ
+          score: 0
+    - q: ทำผิดขั้นตอนเล็กน้อยระหว่างฝึก ไม่มีใครเห็น
+      options:
+        - label: รายงานครูเองหลังลงจอด
+          score: 5
+        - label: บอกครูตอนสรุปผลท้ายวัน
+          score: 4
+        - label: จดไว้ไม่ให้ผิดซ้ำ
+          score: 3
+        - label: ยอมรับถ้ามีคนถาม ไม่งั้นไม่พูด
+          score: 2
+        - label: เงียบไว้ ไม่มีใครเห็นอยู่แล้ว
+          score: 0
+  police:
+    - q: คนสองคนทะเลาะกันกลางตลาด เริ่มผลักกัน
+      options:
+        - label: แยกสองฝ่ายอย่างใจเย็น ฟังทั้งคู่
+          score: 5
+        - label: แยกสองฝ่ายออก แล้วให้แยกย้ายไป
+          score: 4
+        - label: เรียกเจ้าหน้าที่มาจัดการ
+          score: 3
+        - label: ยืนดูห่างๆ รอให้เลิกกันเอง
+          score: 2
+        - label: เข้าข้างคนที่ดูน่าสงสารกว่า
+          score: 0
+    - q: ตั้งด่าน คนขับฝ่าฝืนยื่นเงินให้เพื่อขอให้ปล่อย
+      options:
+        - label: ปฏิเสธ ออกใบสั่งตามจริง
+          score: 5
+        - label: ปฏิเสธ ส่งให้หัวหน้าด่านตัดสิน
+          score: 4
+        - label: ปฏิเสธเงิน แต่ปล่อยไปเพราะสงสาร
+          score: 3
+        - label: ทำเป็นไม่เห็นเงิน โบกให้ผ่านไป
+          score: 2
+        - label: รับไว้ เงินแค่นิดเดียว
+          score: 0
+    - q: ยายมาแจ้งว่าแมวหาย ตอนที่โรงพักกำลังยุ่ง
+      options:
+        - label: รับเรื่องสุภาพ จดรายละเอียดไว้
+          score: 5
+        - label: ให้ยายนั่งรอ ว่างแล้วรับเรื่อง
+          score: 4
+        - label: แนะให้ไปถามเพื่อนบ้านก่อน
+          score: 3
+        - label: บอกให้ยายมาใหม่วันหลัง
+          score: 2
+        - label: บอกว่าเรื่องเล็ก ไม่รับ
+          score: 0
+    - q: เด็กหลงทางในงานวัด ร้องไห้
+      options:
+        - label: พาไปจุดประกาศ อยู่ด้วยจนพ่อแม่มา
+          score: 5
+        - label: พาไปจุดประกาศ ฝากเจ้าหน้าที่ไว้
+          score: 4
+        - label: ฝากไว้กับแม่ค้าที่รู้จัก
+          score: 3
+        - label: ให้เด็กรอตรงนี้ เดี๋ยวพ่อแม่คงมา
+          score: 2
+        - label: ชี้ทางให้เดินไปจุดประกาศเอง
+          score: 0
+    - q: เพื่อนสนิทขับรถชนท้ายคนอื่น ขอให้ช่วยบันทึกว่าอีกฝ่ายผิด
+      options:
+        - label: ปฏิเสธ ต้องบันทึกตามจริง
+          score: 5
+        - label: บันทึกตามจริง แต่ไม่อธิบายเพื่อน
+          score: 4
+        - label: ขอไม่ยุ่งเรื่องนี้
+          score: 3
+        - label: ไม่รับสายเพื่อน ปล่อยเงียบไป
+          score: 2
+        - label: ช่วยเพราะเป็นเพื่อน
+          score: 0
+interludeFeel:
+  good: ออกจากห้องสอบเมื่อวานแล้วใจเบา
+  mid: ยังนึกถึงข้อหนึ่งที่ลังเลอยู่นาน
+  bad: เมื่อวานมีหลายข้อที่ตอบไปแล้วอยากขอแก้
+interludes:
+  - id: I1
+    title: ข้าวกล่องหน้าสนาม
+    kind: interlude
+    variantOf: null
+    priority: 5
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: สอบเสร็จบ่ายสาม หน้าสนามมีรถเข็นขายข้าวเรียงยาวจนสุดรั้ว เด็กหัวเกรียนนั่งกินกันตามขอบฟุตบาท บางคนยังเปิดหนังสือค้างไว้บนตัก พรุ่งนี้ยังมีอีกสนาม
+    options:
+      - label: กินให้อิ่ม แล้วกลับไปนอน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: หลับตั้งแต่หัวค่ำ ไม่ทันได้เปิดหนังสือ
+        outcomes: null
+      - label: นั่งเทียบคำตอบกับคนอื่น
+        hint: อาจโล่งใจ หรืออาจนอนไม่หลับ
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes:
+          - p: 1
+            result: คำตอบตรงกับคนที่ดูเก่งที่สุดในกลุ่ม
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 1
+              relations: 0
+              network: 0
+              money: 0
+            setFlags: []
+            when:
+              mood: good
+          - p: 1
+            result: ทุกคนตอบไม่เหมือนกันสักข้อ
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: -1
+              relations: 0
+              network: 0
+              money: 0
+            setFlags: []
+      - label: ทักเด็กที่นั่งกินข้าง ๆ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: คุยกันจนข้าวเย็นชืด เขาสมัครสนามเดียวกับเราพรุ่งนี้
+        outcomes: null
+        randomFlag:
+          flag: cadet_met_c
+          p: 0.5
+          ifNot: true
+      - label: อดมื้อนี้ เก็บเงินไว้ค่ารถ
+        hint: ประหยัดได้ แต่ท้องว่าง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: -1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ดื่มน้ำก๊อกหน้าสนามจนอิ่ม แล้วเดินไปป้ายรถเมล์
+        outcomes: null
+  - id: I1-บ้าน
+    title: ข้าวกล่องหน้าสนาม
+    kind: interlude
+    variantOf: I1
+    cond:
+      sex: ชาย
+      regions:
+        - กลาง
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas:
+        - cadet_family_support
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: สอบเสร็จบ่ายสาม ผู้ใหญ่ในบ้านห่อข้าวมาให้ ยังอุ่นอยู่ในกล่อง เด็กหัวเกรียนนั่งกินกันตามขอบฟุตบาท บางคนยังเปิดหนังสือค้างไว้บนตัก พรุ่งนี้ยังมีอีกสนาม
+    options:
+      - label: กินให้อิ่ม แล้วกลับไปนอน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: หลับตั้งแต่หัวค่ำ ไม่ทันได้เปิดหนังสือ
+        outcomes: null
+      - label: นั่งเทียบคำตอบกับคนอื่น
+        hint: อาจโล่งใจ หรืออาจนอนไม่หลับ
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes:
+          - p: 1
+            result: คำตอบตรงกับคนที่ดูเก่งที่สุดในกลุ่ม
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 1
+              relations: 0
+              network: 0
+              money: 0
+            setFlags: []
+            when:
+              mood: good
+          - p: 1
+            result: ทุกคนตอบไม่เหมือนกันสักข้อ
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: -1
+              relations: 0
+              network: 0
+              money: 0
+            setFlags: []
+      - label: ทักเด็กที่นั่งกินข้าง ๆ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: คุยกันจนข้าวเย็นชืด เขาสมัครสนามเดียวกับเราพรุ่งนี้
+        outcomes: null
+        randomFlag:
+          flag: cadet_met_c
+          p: 0.5
+          ifNot: true
+      - label: อดมื้อนี้ เก็บเงินไว้ค่ารถ
+        hint: ประหยัดได้ แต่ท้องว่าง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: -1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ดื่มน้ำก๊อกหน้าสนามจนอิ่ม แล้วเดินไปป้ายรถเมล์
+        outcomes: null
+  - id: I1-ลับ
+    title: ข้าวกล่องหน้าสนาม
+    kind: interlude
+    variantOf: I1
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas:
+        - cadet_family_secret
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: สอบเสร็จบ่ายสาม หน้าสนามมีรถเข็นขายข้าวเรียงยาวจนสุดรั้ว เด็กหัวเกรียนนั่งกินกันตามขอบฟุตบาท บางคนยังเปิดหนังสือค้างไว้บนตัก พรุ่งนี้ยังมีอีกสนาม ที่บ้านคิดว่าวันนี้ไปติวกับเพื่อน
+    options:
+      - label: กินให้อิ่ม แล้วกลับไปนอน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: หลับตั้งแต่หัวค่ำ ไม่ทันได้เปิดหนังสือ
+        outcomes: null
+      - label: นั่งเทียบคำตอบกับคนอื่น
+        hint: อาจโล่งใจ หรืออาจนอนไม่หลับ
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes:
+          - p: 1
+            result: คำตอบตรงกับคนที่ดูเก่งที่สุดในกลุ่ม
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 1
+              relations: 0
+              network: 0
+              money: 0
+            setFlags: []
+            when:
+              mood: good
+          - p: 1
+            result: ทุกคนตอบไม่เหมือนกันสักข้อ
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: -1
+              relations: 0
+              network: 0
+              money: 0
+            setFlags: []
+      - label: ทักเด็กที่นั่งกินข้าง ๆ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: คุยกันจนข้าวเย็นชืด เขาสมัครสนามเดียวกับเราพรุ่งนี้
+        outcomes: null
+        randomFlag:
+          flag: cadet_met_c
+          p: 0.5
+          ifNot: true
+      - label: อดมื้อนี้ เก็บเงินไว้ค่ารถ
+        hint: ประหยัดได้ แต่ท้องว่าง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: -1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ดื่มน้ำก๊อกหน้าสนามจนอิ่ม แล้วเดินไปป้ายรถเมล์
+        outcomes: null
+  - id: I2
+    title: ไปอีกสนาม
+    kind: interlude
+    variantOf: null
+    priority: 4
+    once: true
+    cond:
+      sex: ชาย
+      regions:
+        - เหนือ
+        - ตะวันออกเฉียงเหนือ
+        - ตะวันออก
+        - ใต้
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: สนามพรุ่งนี้อยู่อีกฟากเมือง {ชื่อ} ต้องต่อรถสองทอดกับนั่งรถทัวร์อีกช่วง ในกระเป๋าเหลือชุดนักเรียนตัวเดียวที่ยังไม่ได้ซัก กับบัตรประจำตัวสอบอีกใบ
+    options:
+      - label: นอนบนรถให้เต็มที่
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: หลับตั้งแต่ออกจากท่ารถ ตื่นมาก็ถึงแล้ว
+        outcomes: null
+      - label: อ่านข้อสอบเก่าใต้ไฟรถ
+        hint: ได้ทวน แต่ตาจะล้า
+        requiresMoney: 0
+        fx:
+          knowledge: 1
+          health: -1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: อ่านจนไฟในรถดับ ตาแสบไปถึงเช้า
+        outcomes: null
+      - label: คุยกับเด็กสอบที่นั่งข้าง ๆ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: เขามาสอบปีที่สอง เล่าว่าสนามพรุ่งนี้เข้มเรื่องเวลา
+        outcomes: null
+        randomFlag:
+          flag: cadet_met_c
+          p: 0.5
+          ifNot: true
+      - label: นั่งรถไฟชั้นสามแทน ถูกกว่า
+        hint: ถูกกว่า แต่ถึงช้าและนอนไม่ค่อยได้
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: -1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: เก้าอี้ไม้แข็งทั้งคืน ถึงสถานีตอนฟ้ายังไม่สว่าง
+        outcomes: null
+        note: เงิน ↓ น้อยกว่าทางอื่น (demo = 0)
+  - id: I3
+    title: คืนก่อนสนามถัดไป
+    kind: interlude
+    variantOf: null
+    priority: 5
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: คืนนี้ต้องนอนให้ได้ พรุ่งนี้เป็นแบบวัดของอีกเหล่า ไม่เหมือนชุดเมื่อวานสักข้อ เสื้อนักเรียนตากไว้ที่ราวหน้าต่าง ยังไม่แห้งดี
+    contextLines:
+      - when:
+          nextBranchIsLean: true
+        line: สนามพรุ่งนี้คือเหล่าที่ใจเอนไปตั้งแต่แรก
+    options:
+      - label: เข้านอนตั้งแต่สองทุ่ม
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes:
+          - p: 0.5
+            result: หลับก่อนจะได้นับแกะ
+            fx:
+              knowledge: 0
+              health: 1
+              happiness: 0
+              relations: 0
+              network: 0
+              money: 0
+            setFlags: []
+          - p: 0.5
+            result: ลืมตาฟังเสียงรถจนดึก
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: -1
+              relations: 0
+              network: 0
+              money: 0
+            setFlags: []
+      - label: อ่านทวนเรื่องของเหล่าพรุ่งนี้
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 1
+          health: -1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: พลิกสมุดจดหน้าที่เขียนชื่อเหล่าไว้ตัวโต
+        outcomes: null
+      - label: รีดชุดให้เรียบ เตรียมของให้ครบ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ดินสอสองแท่ง ยางลบ บัตรสอบ เรียงไว้ข้างหมอน
+        outcomes: null
+      - label: สวดมนต์สั้น ๆ ก่อนนอน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: สวดจบบทเดียวก็ง่วง
+        outcomes: null
+        merit:
+          bhavana: 1
+  - id: I4
+    title: โทรหาบ้าน
+    kind: interlude
+    variantOf: null
+    priority: 5
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: 2544
+      school: null
+      flagsHas: null
+      flagsNot:
+        - cadet_family_secret
+      family: null
+      poor: null
+      classes: null
+    text: ตู้โทรศัพท์หน้าสนามมีคนต่อคิวยาว เหรียญในมือพอคุยได้ไม่กี่นาที
+    options:
+      - label: เล่าว่าเมื่อวานทำได้ดี
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ปลายสายหัวเราะ แล้วถามว่ากินข้าวหรือยัง
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+      - label: บอกตามจริงว่าเหนื่อย
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ผู้ใหญ่ในบ้านบอกว่าเหนื่อยก็พัก ไม่มีใครว่า
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+      - label: ขอเงินค่ารถเพิ่ม
+        hint: ได้เงิน แต่รู้ว่าที่บ้านต้องเจียด
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: -1
+          network: 0
+          money: 1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: พรุ่งนี้เงินจะโอนมา ปลายสายเงียบไปนิดหนึ่งก่อนตอบ
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+        fxIfPoor:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: -2
+          network: 0
+          money: 1
+      - label: บอกว่าค้างบ้านเพื่อน สบายดี
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: วางสายแล้วยืนอยู่หน้าตู้นานกว่าตอนคุย
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_secret
+        lockReason: ที่บ้านรู้อยู่แล้วว่ามาสอบ
+      - label: ยอมบอกว่ามาสอบ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags:
+          - cadet_family_secret
+        schedule: []
+        result: null
+        outcomes:
+          - p: 0.5
+            result: ปลายสายเงียบไปนาน แล้วบอกว่าพรุ่งนี้สู้ ๆ
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 0
+              relations: 1
+              network: 0
+              money: 0
+            setFlags:
+              - cadet_family_told
+          - p: 0.5
+            result: ปลายสายถามว่าทำไมไม่บอก แล้ววางสายไปก่อน
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 0
+              relations: -1
+              network: 0
+              money: 0
+            setFlags:
+              - cadet_family_told
+        requires:
+          flagsHas:
+            - cadet_family_secret
+        merit:
+          sila: 1
+      - label: ไม่โทร เดินกลับที่พัก
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: เก็บเหรียญไว้ค่ารถเมล์พรุ่งนี้
+        outcomes: null
+  - id: I4-ลับ
+    title: โทรหาบ้าน
+    kind: interlude
+    variantOf: I4
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: 2544
+      school: null
+      flagsHas:
+        - cadet_family_secret
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: ตู้โทรศัพท์หน้าสนามมีคนต่อคิวยาว เหรียญในมือพอคุยได้ไม่กี่นาที ที่บ้านยังคิดว่า {ชื่อ} ค้างบ้านเพื่อน
+    options:
+      - label: เล่าว่าเมื่อวานทำได้ดี
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ปลายสายหัวเราะ แล้วถามว่ากินข้าวหรือยัง
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+      - label: บอกตามจริงว่าเหนื่อย
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ผู้ใหญ่ในบ้านบอกว่าเหนื่อยก็พัก ไม่มีใครว่า
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+      - label: ขอเงินค่ารถเพิ่ม
+        hint: ได้เงิน แต่รู้ว่าที่บ้านต้องเจียด
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: -1
+          network: 0
+          money: 1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: พรุ่งนี้เงินจะโอนมา ปลายสายเงียบไปนิดหนึ่งก่อนตอบ
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+        fxIfPoor:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: -2
+          network: 0
+          money: 1
+      - label: บอกว่าค้างบ้านเพื่อน สบายดี
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: วางสายแล้วยืนอยู่หน้าตู้นานกว่าตอนคุย
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_secret
+        lockReason: ที่บ้านรู้อยู่แล้วว่ามาสอบ
+      - label: ยอมบอกว่ามาสอบ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags:
+          - cadet_family_secret
+        schedule: []
+        result: null
+        outcomes:
+          - p: 0.5
+            result: ปลายสายเงียบไปนาน แล้วบอกว่าพรุ่งนี้สู้ ๆ
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 0
+              relations: 1
+              network: 0
+              money: 0
+            setFlags:
+              - cadet_family_told
+          - p: 0.5
+            result: ปลายสายถามว่าทำไมไม่บอก แล้ววางสายไปก่อน
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 0
+              relations: -1
+              network: 0
+              money: 0
+            setFlags:
+              - cadet_family_told
+        requires:
+          flagsHas:
+            - cadet_family_secret
+        merit:
+          sila: 1
+      - label: ไม่โทร เดินกลับที่พัก
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: เก็บเหรียญไว้ค่ารถเมล์พรุ่งนี้
+        outcomes: null
+  - id: I4-มือถือ
+    title: โทรหาบ้าน
+    kind: interlude
+    variantOf: I4
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: 2545
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot:
+        - cadet_family_secret
+      family: null
+      poor: null
+      classes: null
+    text: สัญญาณโทรศัพท์หน้าสนามขึ้นแค่ขีดเดียว ต้องเดินไปยืนใต้ต้นไม้ถึงจะได้ยิน
+    options:
+      - label: เล่าว่าเมื่อวานทำได้ดี
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ปลายสายหัวเราะ แล้วถามว่ากินข้าวหรือยัง
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+      - label: บอกตามจริงว่าเหนื่อย
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ผู้ใหญ่ในบ้านบอกว่าเหนื่อยก็พัก ไม่มีใครว่า
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+      - label: ขอเงินค่ารถเพิ่ม
+        hint: ได้เงิน แต่รู้ว่าที่บ้านต้องเจียด
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: -1
+          network: 0
+          money: 1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: พรุ่งนี้เงินจะโอนมา ปลายสายเงียบไปนิดหนึ่งก่อนตอบ
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+        fxIfPoor:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: -2
+          network: 0
+          money: 1
+      - label: บอกว่าค้างบ้านเพื่อน สบายดี
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: วางสายแล้วยืนอยู่หน้าตู้นานกว่าตอนคุย
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_secret
+        lockReason: ที่บ้านรู้อยู่แล้วว่ามาสอบ
+      - label: ยอมบอกว่ามาสอบ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags:
+          - cadet_family_secret
+        schedule: []
+        result: null
+        outcomes:
+          - p: 0.5
+            result: ปลายสายเงียบไปนาน แล้วบอกว่าพรุ่งนี้สู้ ๆ
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 0
+              relations: 1
+              network: 0
+              money: 0
+            setFlags:
+              - cadet_family_told
+          - p: 0.5
+            result: ปลายสายถามว่าทำไมไม่บอก แล้ววางสายไปก่อน
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 0
+              relations: -1
+              network: 0
+              money: 0
+            setFlags:
+              - cadet_family_told
+        requires:
+          flagsHas:
+            - cadet_family_secret
+        merit:
+          sila: 1
+      - label: ไม่โทร เดินกลับที่พัก
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: เก็บเหรียญไว้ค่ารถเมล์พรุ่งนี้
+        outcomes: null
+    pending: ปีเริ่มเจ้าของตั้ง
+  - id: I4-มือถือ-ลับ
+    title: โทรหาบ้าน
+    kind: interlude
+    variantOf: I4
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: 2545
+      yearMax: null
+      school: null
+      flagsHas:
+        - cadet_family_secret
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: สัญญาณโทรศัพท์หน้าสนามขึ้นแค่ขีดเดียว ต้องเดินไปยืนใต้ต้นไม้ถึงจะได้ยิน ที่บ้านยังคิดว่า {ชื่อ} ค้างบ้านเพื่อน
+    options:
+      - label: เล่าว่าเมื่อวานทำได้ดี
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ปลายสายหัวเราะ แล้วถามว่ากินข้าวหรือยัง
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+      - label: บอกตามจริงว่าเหนื่อย
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ผู้ใหญ่ในบ้านบอกว่าเหนื่อยก็พัก ไม่มีใครว่า
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+      - label: ขอเงินค่ารถเพิ่ม
+        hint: ได้เงิน แต่รู้ว่าที่บ้านต้องเจียด
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: -1
+          network: 0
+          money: 1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: พรุ่งนี้เงินจะโอนมา ปลายสายเงียบไปนิดหนึ่งก่อนตอบ
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+        fxIfPoor:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: -2
+          network: 0
+          money: 1
+      - label: บอกว่าค้างบ้านเพื่อน สบายดี
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: วางสายแล้วยืนอยู่หน้าตู้นานกว่าตอนคุย
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_secret
+        lockReason: ที่บ้านรู้อยู่แล้วว่ามาสอบ
+      - label: ยอมบอกว่ามาสอบ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags:
+          - cadet_family_secret
+        schedule: []
+        result: null
+        outcomes:
+          - p: 0.5
+            result: ปลายสายเงียบไปนาน แล้วบอกว่าพรุ่งนี้สู้ ๆ
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 0
+              relations: 1
+              network: 0
+              money: 0
+            setFlags:
+              - cadet_family_told
+          - p: 0.5
+            result: ปลายสายถามว่าทำไมไม่บอก แล้ววางสายไปก่อน
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 0
+              relations: -1
+              network: 0
+              money: 0
+            setFlags:
+              - cadet_family_told
+        requires:
+          flagsHas:
+            - cadet_family_secret
+        merit:
+          sila: 1
+      - label: ไม่โทร เดินกลับที่พัก
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: เก็บเหรียญไว้ค่ารถเมล์พรุ่งนี้
+        outcomes: null
+    pending: ปีเริ่มเจ้าของตั้ง
+  - id: I5-A
+    title: เจอกันอีกแล้ว
+    kind: interlude
+    variantOf: I5
+    priority: 3
+    once: true
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas:
+        - cadet_prep_group
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+      rival: A
+    text: เพื่อนห้องสามยืนรอหน้าประตูสนาม ถือสมุดเล่มเดียวกับที่ติวด้วยกันมา เขาถามว่าเมื่อวานข้อสุดท้ายตอบอะไร
+    options:
+      - label: คุยเรื่องข้อสอบเมื่อวาน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 1
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ตอบไม่ตรงกันสองข้อ ต่างคนต่างไม่ยอมเปลี่ยน
+        outcomes: null
+        moodHappiness:
+          good: 1
+          mid: 0
+          bad: -1
+      - label: ชวนไปกินข้าวด้วยกัน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ข้าวไข่เจียวสองจาน คุยกันแต่เรื่องที่ไม่ใช่ข้อสอบ
+        outcomes: null
+        bondByRival:
+          A: cadet_bond_a
+          C: cadet_bond_c
+      - label: ติวทวนกันอีกรอบ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 1
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags:
+          - cadet_bond_a
+        clearFlags: []
+        schedule: []
+        result: ทวนกันจนร้านปิด คนละข้อที่อีกคนไม่แม่น
+        outcomes: null
+      - label: ทักทายแล้วแยกไปอ่านต่อ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 1
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: นั่งอ่านคนเดียวใต้ต้นไม้ จนได้ยินเสียงเรียกเข้าแถว
+        outcomes: null
+  - id: I5-C
+    title: เจอกันอีกแล้ว
+    kind: interlude
+    variantOf: I5
+    priority: 3
+    once: true
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas:
+        - cadet_met_c
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+      rival: C
+    text: เด็กผิวคล้ำแดดคนเดิมนั่งอยู่ศาลาข้างสนาม เขาบอกว่าคืนนี้นอนวัดใกล้ ๆ ประหยัดค่าห้อง ถ้าจะไปด้วยก็มีเสื่อเหลือ
+    options:
+      - label: คุยเรื่องข้อสอบเมื่อวาน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 1
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ตอบไม่ตรงกันสองข้อ ต่างคนต่างไม่ยอมเปลี่ยน
+        outcomes: null
+        moodHappiness:
+          good: 1
+          mid: 0
+          bad: -1
+      - label: ชวนไปกินข้าวด้วยกัน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ข้าวไข่เจียวสองจาน คุยกันแต่เรื่องที่ไม่ใช่ข้อสอบ
+        outcomes: null
+        bondByRival:
+          A: cadet_bond_a
+          C: cadet_bond_c
+      - label: ไปนอนวัดกับเขา
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: -1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags:
+          - cadet_bond_c
+        clearFlags: []
+        schedule: []
+        result: เสื่อแถวเดียวกับเด็กสอบอีกสิบคน หลับไปตอนสวดมนต์เย็นจบ
+        outcomes: null
+      - label: ทักทายแล้วแยกไปอ่านต่อ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 1
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: นั่งอ่านคนเดียวใต้ต้นไม้ จนได้ยินเสียงเรียกเข้าแถว
+        outcomes: null
+  - id: I5-B
+    title: เจอกันอีกแล้ว
+    kind: interlude
+    variantOf: I5
+    priority: 3
+    once: true
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas:
+        - cadet_prep_camp
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+      rival: B
+    text: รถคันใหญ่จอดส่งลูกนายพลคนนั้นหน้าสนาม เขาเห็น {ชื่อ} ยืนรอรถเมล์ แล้วชวนขึ้นรถไปสนามถัดไปด้วยกัน
+    note: ติดรถไม่มีผลต่อการสอบ (real_org_fraud)
+    options:
+      - label: คุยเรื่องข้อสอบเมื่อวาน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 1
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ตอบไม่ตรงกันสองข้อ ต่างคนต่างไม่ยอมเปลี่ยน
+        outcomes: null
+        moodHappiness:
+          good: 1
+          mid: 0
+          bad: -1
+      - label: ชวนไปกินข้าวด้วยกัน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ข้าวไข่เจียวสองจาน คุยกันแต่เรื่องที่ไม่ใช่ข้อสอบ
+        outcomes: null
+        bondByRival:
+          A: cadet_bond_a
+          C: cadet_bond_c
+      - label: ขอบคุณ แล้วติดรถไปด้วย
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 1
+          happiness: 0
+          relations: 0
+          network: 1
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ในรถแอร์เย็น เขาเล่าว่าก็ตื่นเต้นเหมือนกัน
+        outcomes: null
+      - label: ทักทายแล้วแยกไปอ่านต่อ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 1
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: นั่งอ่านคนเดียวใต้ต้นไม้ จนได้ยินเสียงเรียกเข้าแถว
+        outcomes: null
+  - id: I6
+    title: ขาที่ยังล้า
+    kind: interlude
+    variantOf: null
+    priority: 2
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+      intervalMin: 2
+      healthDropped: true
+    text: ตื่นเช้าวันที่{วัน}ของการสอบ น่องตึงเหมือนวิ่งมาทั้งคืน ตาเพ่งกระดาษมาหลายวันจนแสบ อีกไม่นานก็ถึงรอบพลศึกษา ถ้ายังได้ไปถึง
+    note: "{วัน} = สาม/สี่ ตามวันจริง (ร่างเขียน 'วันที่สาม')"
+    options:
+      - label: ยืดเส้นทั้งเช้าก่อนออกจากที่พัก
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ยืดจนหลังเปียกเหงื่อ ขาเบาขึ้นครึ่งหนึ่ง
+        outcomes: null
+      - label: ซื้อยาหม่องกับยาแก้ปวด
+        hint: หายปวด แต่เงินลด
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: กลิ่นยาหม่องลอยไปทั้งแถวสอบ
+        outcomes: null
+      - label: ฝืนวิ่งตามตารางซ้อมเดิม
+        hint: ดีถ้าร่างกายชิน ไม่ชินจะยิ่งล้า
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes:
+          - p: 1
+            result: วิ่งรอบแรกหนัก รอบที่สองตัวก็เบา
+            fx:
+              knowledge: 0
+              health: 1
+              happiness: 0
+              relations: 0
+              network: 0
+              money: 0
+            setFlags: []
+            when:
+              flagsHas:
+                - sporty
+          - p: 1
+            result: วิ่งได้ครึ่งทางก็ต้องเดิน
+            fx:
+              knowledge: 0
+              health: -1
+              happiness: 0
+              relations: 0
+              network: 0
+              money: 0
+            setFlags: []
+      - label: ปล่อยใจ นอนยาวถึงสาย
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: -1
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ตื่นมาแดดเต็มห้อง เกือบไม่ทันเวลาเข้าสนาม
+        outcomes: null
+  - id: I7
+    title: เงินในกระเป๋าเหลือน้อย
+    kind: interlude
+    variantOf: null
+    priority: 1
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot:
+        - cadet_family_secret
+      family: null
+      poor: null
+      classes:
+        - poor
+        - mid
+      moneyMax: 1
+    altCond:
+      classes:
+        - poor
+      flagsNot:
+        - cadet_family_support
+      intervalMin: 2
+    text: นับเงินที่เหลือในกระเป๋าแล้ว พอค่ารถไปสนามถัดไปพอดี แต่ไม่พอค่าห้องอีกคืน กับข้าวอีกสามมื้อ
+    options:
+      - label: นอนศาลาวัดแทนห้องพัก
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: -1
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: พระให้ยืมผ้าห่ม ยุงเยอะแต่หลับได้
+        outcomes: null
+      - label: กินบะหมี่ซองทุกมื้อ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: -1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: สามมื้อรสเดียวกัน แต่ยังมีค่ารถกลับบ้าน
+        outcomes: null
+      - label: ยืมเพื่อนที่มาสอบด้วยกัน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: เพื่อนยื่นแบงก์ยับ ๆ ให้ บอกว่าคืนตอนติดยศก็ได้
+        outcomes: null
+        requires:
+          anyFlags:
+            - cadet_prep_group
+            - cadet_met_c
+        lockReason: ไม่มีคนรู้จักให้ยืม
+      - label: ขอผู้ใหญ่ในบ้านส่งเงินมา
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: -1
+          network: 0
+          money: 1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: เงินมาถึงพร้อมข้อความสั้น ๆ ว่าอย่าอดข้าว
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+      - label: ไม่ไปสนามที่เหลือ กลับบ้าน
+        hint: ประหยัดได้ แต่สนามที่เหลือจะไม่ได้สอบ
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: บัตรสอบใบที่เหลือยังไม่ได้ใช้ พับเก็บไว้ในกระเป๋าเสื้อ
+        outcomes: null
+        withdrawRemaining: true
+  - id: I7-ลับ
+    title: เงินในกระเป๋าเหลือน้อย
+    kind: interlude
+    variantOf: I7
+    priority: 1
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas:
+        - cadet_family_secret
+      flagsNot: null
+      family: null
+      poor: null
+      classes:
+        - poor
+        - mid
+      moneyMax: 1
+    altCond:
+      classes:
+        - poor
+      flagsNot:
+        - cadet_family_support
+      intervalMin: 2
+    text: นับเงินที่เหลือในกระเป๋าแล้ว พอค่ารถไปสนามถัดไปพอดี แต่ไม่พอค่าห้องอีกคืน กับข้าวอีกสามมื้อ ขอที่บ้านไม่ได้ เพราะที่บ้านไม่รู้ว่ามาสอบ
+    options:
+      - label: นอนศาลาวัดแทนห้องพัก
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: -1
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: พระให้ยืมผ้าห่ม ยุงเยอะแต่หลับได้
+        outcomes: null
+      - label: กินบะหมี่ซองทุกมื้อ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: -1
+          happiness: 0
+          relations: 0
+          network: 0
+          money: -1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: สามมื้อรสเดียวกัน แต่ยังมีค่ารถกลับบ้าน
+        outcomes: null
+      - label: ยืมเพื่อนที่มาสอบด้วยกัน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: เพื่อนยื่นแบงก์ยับ ๆ ให้ บอกว่าคืนตอนติดยศก็ได้
+        outcomes: null
+        requires:
+          anyFlags:
+            - cadet_prep_group
+            - cadet_met_c
+        lockReason: ไม่มีคนรู้จักให้ยืม
+      - label: ขอผู้ใหญ่ในบ้านส่งเงินมา
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: -1
+          network: 0
+          money: 1
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: เงินมาถึงพร้อมข้อความสั้น ๆ ว่าอย่าอดข้าว
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+      - label: ไม่ไปสนามที่เหลือ กลับบ้าน
+        hint: ประหยัดได้ แต่สนามที่เหลือจะไม่ได้สอบ
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: บัตรสอบใบที่เหลือยังไม่ได้ใช้ พับเก็บไว้ในกระเป๋าเสื้อ
+        outcomes: null
+        withdrawRemaining: true
+board:
+  id: X3
+  title: ป้ายประกาศรอบแรก
+  kind: core
+  text: |-
+    วางดินสอ ส่งกระดาษ แล้วรออีกหลายวัน ป้ายหน้ากองสอบติดรายชื่อเรียงลำดับ คนเบียดกันจนต้องเขย่งดู
+    {passList}
+    {failList}
+  listFormat:
+    pass: "{เหล่า} ลำดับ {ลำดับ} ผ่าน"
+    fail: "{เหล่า} ไม่ผ่าน"
+  failReasons:
+    quiz: คะแนนแบบวัดความพร้อมของสนามนี้ไม่ถึงครึ่ง
+    knowledge: แบบวัดผ่าน แต่วิชาการยังไม่ถึงเกณฑ์
+    both: ทั้งแบบวัดและวิชาการยังไม่ถึง
+  eraLine:
+    yearMin: 2558
+    line: คนครึ่งหนึ่งก้มดูผลในโทรศัพท์ อีกครึ่งยังอยากเห็นชื่อบนกระดาษ
+    pending: ปีเจ้าของตั้ง
+  rivalLines:
+    - when:
+        flagsHas:
+          - cadet_prep_group
+        rivalPass: A
+      line: ชื่อเพื่อนห้องสามอยู่เกือบบนสุด เขาหันมายิ้ม แล้วถามเบา ๆ ว่ารอบหน้ามีสระไหม
+    - when:
+        flagsHas:
+          - cadet_prep_group
+        rivalFail: A
+      line: เพื่อนห้องสามไล่นิ้วหาชื่อตัวเองสองรอบ แล้วเดินออกไปคนเดียว
+    - when:
+        flagsHas:
+          - cadet_prep_camp
+      line: ชื่อลูกนายพลคนนั้นอยู่แถวบน ครูพิเศษยืนถ่ายรูปป้ายให้
+    - when:
+        flagsNot:
+          - cadet_prep_camp
+      line: ได้ยินคนข้าง ๆ พูดถึงลูกนายพลที่ติดแถวบนทุกสนาม
+    - when:
+        flagsHas:
+          - cadet_met_c
+        rivalPass: C
+      line: เด็กผิวคล้ำแดดคนนั้นชี้ชื่อตัวเองให้ดู ปีนี้เขามาถึงรอบสองอีกครั้ง
+  allFail: X10
+  options:
+    - label: ซ้อมว่ายน้ำทุกเย็นจนวันสอบ
+      hint: ช่วยที่สระ ถ้าร่างกายไหว
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 0
+        relations: 0
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: null
+      outcomes:
+        - p: 0.6
+          result: วันสุดท้ายว่ายสุดสระโดยไม่ต้องเงยหน้าหาขอบ
+          fx:
+            knowledge: 0
+            health: 1
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags:
+            - cadet_drill_swim
+        - p: 0.4
+          result: ซ้อมหนักจนไหล่ระบม ยกแขนแทบไม่ขึ้น
+          fx:
+            knowledge: 0
+            health: -1
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+    - label: นอนให้พอ กินให้ครบ
+      hint: ร่างกายพร้อม แต่ไม่ได้ซ้อมอะไรเพิ่ม
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 1
+        happiness: 0
+        relations: 0
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: หลับก่อนสี่ทุ่มทุกคืน ตื่นมาตัวเบา
+      outcomes: null
+    - label: ซ้อมกับเพื่อนติวทุกเย็น
+      hint: null
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 1
+        happiness: 0
+        relations: 1
+        network: 0
+        money: 0
+      setFlags:
+        - cadet_bond_a
+      clearFlags: []
+      schedule: []
+      result: null
+      outcomes:
+        - p: 0.5
+          result: เพื่อนห้องสามว่ายถึงฝั่งได้เป็นครั้งแรก ทั้งคู่หัวเราะจนสำลักน้ำ
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags:
+            - cadet_a_swims
+        - p: 0.5
+          result: เพื่อนยังเกาะขอบสระ แต่ไม่ขอกลับบ้านก่อนแล้ว
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+      requires:
+        flagsHas:
+          - cadet_prep_group
+        rivalPass: A
+      lockReason: ไม่มีเพื่อนติวที่ผ่านรอบแรกด้วย
+      merit:
+        help_others: 1
+    - label: ขอรุ่นพี่พาเดินดูสนามจริง
+      hint: null
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 0
+        relations: 0
+        network: 1
+        money: 0
+      setFlags:
+        - cadet_tips
+      clearFlags: []
+      schedule: []
+      result: รุ่นพี่ชี้ทีละจุด ตรงนี้ดึงข้อ ตรงนั้นเข้าคิวสระ อย่าออกตัวแรงตอนพันเมตร
+      outcomes: null
+      requires:
+        anyFlags:
+          - cadet_senior_tutor
+          - knows_senior
+      lockReason: ไม่รู้จักรุ่นพี่ที่เคยผ่านสนามนี้
+    - label: ฉลองกับคนที่สอบมาด้วยกัน
+      hint: ใจสบาย แต่วันสอบใกล้เข้ามา
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: -1
+        happiness: 2
+        relations: 0
+        network: 0
+        money: 0
+      setFlags:
+        - cadet_celebrated
+      clearFlags: []
+      schedule: []
+      result: หมูกระทะร้านหน้าสนามจนดึก ขากลับตาแทบปิด
+      outcomes: null
+      note: cadet_celebrated = ธงชั่วคราวของ demo ใช้บรรทัดต่อท้าย X4
+physical:
+  id: X4
+  title: ราวดึงข้อถึงลู่วิ่ง
+  kind: core
+  text: สนามพลศึกษาเริ่มเจ็ดโมงเช้า ดึงข้อ ลุกนั่ง นั่งงอตัว ยืนกระโดดไกล วิ่งเก็บของ วิ่งห้าสิบเมตร แล้วปิดท้ายด้วยวิ่งหนึ่งพันเมตรกลางแดด ทุกสถานีมีครูยืนกดนาฬิการอ
+  contextLines:
+    - when:
+        flagsHas:
+          - cadet_body_seen
+      line: รู้ลำดับสถานีทุกจุด เหมือนเคยเดินมาแล้ว
+    - when:
+        flagsHas:
+          - sporty
+      line: ขาคุ้นลู่วิ่งจากตีห้าทุกเช้า
+    - when:
+        flagsHas:
+          - cadet_celebrated
+      line: หัวยังตื้อจากเมื่อคืน
+  healthMin: 50
+  lowHealthLine: ตั้งแต่สถานีที่สามแขนก็เริ่มสั่น ร่างกายยังไม่พร้อมพอ
+  failStation:
+    noSporty: วิ่งพันเมตร
+    sporty: ดึงข้อ
+  baseRisk: 0.1
+  riskFlags:
+    sporty: 0.6
+    cadet_tips: 0.7
+    cadet_bond_c: 0.8
+    cadet_prep_senior: 0.8
+  options:
+    - label: ออกตัวแรง เกาะกลุ่มหน้า
+      hint: ถ้าแรงถึงจะเข้าเส้นสวย ถ้าไม่ถึงจะหมดกลางทาง
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 0
+        relations: 0
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: null
+      outcomes: null
+      risk:
+        base: 1.5
+        ifFlags:
+          sporty: 0.4
+        healthHighMin: 65
+      pass: เข้าเส้นในกลุ่มแรก ครูพยักหน้าให้
+      fail: รอบสุดท้ายขาหนักเหมือนถ่วงทราย
+    - label: คุมจังหวะตามที่ซ้อมมา
+      hint: ไม่หวือหวา แต่ไม่พลาดง่าย
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 0
+        relations: 0
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: null
+      outcomes: null
+      risk:
+        base: 1
+        ifFlags:
+          cadet_tips: 0.8
+          sporty: 0.8
+      pass: รอบไหนก็เท่ากัน เข้าเส้นทันเวลาสบาย ๆ
+      fail: จังหวะดี แต่เวลาเกินไปไม่กี่วินาที
+    - label: วิ่งประกบเพื่อนที่มาด้วยกัน
+      hint: null
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 0
+        relations: 0
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: null
+      outcomes: null
+      requires:
+        anyFlags:
+          - cadet_bond_a
+          - cadet_bond_c
+      lockReason: ไม่มีเพื่อนสนิทในสนามนี้
+      merit:
+        help_others: 1
+      risk:
+        base: 0.8
+        rivalMult: 0.8
+      pass: ผลัดกันนำคนละรอบ เข้าเส้นห่างกันไม่ถึงก้าว
+      fail: เพื่อนถึงก่อน หันมาตะโกนเรียกจนเสียงแหบ
+    - label: เก็บแรงไว้ให้สระว่ายน้ำ
+      hint: ลู่วิ่งเสี่ยงขึ้นนิด สระเบาลง
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 0
+        relations: 0
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: null
+      outcomes: null
+      risk:
+        base: 1.2
+        swimMult: 0.8
+      pass: เข้าเส้นเฉียดฉิว แต่แขนยังมีแรงเหลือ
+      fail: เก็บแรงมากไป เวลาเกินเส้น
+swim:
+  - id: X5-A
+    variantOf: X5
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas:
+        - cadet_prep_group
+      flagsNot:
+        - cadet_a_swims
+      family: null
+      poor: null
+      classes: null
+    text: สระยาวห้าสิบเมตร น้ำเย็นจนขนลุก กรรมการเป่านกหวีดปล่อยทีละหกลู่ ต้องแตะขอบอีกฝั่งก่อนนาฬิกาหยุด คนที่ขึ้นมาแล้วนั่งหอบเรียงอยู่ริมสระ เพื่อนห้องสามยืนลู่ข้าง ๆ หน้าซีดเหมือนกระดาษ
+    options:
+      - label: ฟรีสไตล์เต็มแรงตั้งแต่ต้น
+        hint: เร็วที่สุด ถ้าว่ายเป็นจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 2
+          ifFlags:
+            can_swim: 0.3
+        pass: แตะขอบก่อนลู่อื่นเกือบตัว
+        fail: ครึ่งสระแรกเร็ว ครึ่งหลังหายใจไม่ทัน ต้องเกาะเชือกลู่
+      - label: ท่ากบ ช้าแต่ไม่จม
+        hint: ถึงฝั่งแน่กว่า แต่นาฬิกาไม่รอ
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 0.7
+          ifFlags:
+            can_swim: 1.6
+        pass: ช้าแต่ไม่หยุด แตะขอบทันก่อนนกหวีด
+        fail: ถึงฝั่ง แต่นาฬิกาหยุดไปก่อนแล้ว
+      - label: ตั้งสติ หายใจตามจังหวะที่ซ้อม
+        hint: ใช้ได้ดีถ้าซ้อมมาจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 1
+          ifFlags:
+            can_swim: 0.6
+            cadet_drill_swim: 0.6
+        pass: นับจังหวะในใจจนลืมว่ามีคนดู
+        fail: จังหวะที่ซ้อมหายไปตั้งแต่กลืนน้ำคำแรก
+      - label: ตะโกนเชียร์เพื่อนลู่ข้าง ๆ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        requires:
+          anyFlags:
+            - cadet_prep_group
+            - cadet_met_c
+        lockReason: ไม่มีคนรู้จักในรอบนี้
+        merit:
+          help_others: 1
+        risk:
+          base: 1
+          rivalMult: 0.7
+        useRivalResult: true
+        pass: เพื่อนแตะขอบแล้วชูมือหาเรา
+        fail: เพื่อนถูกดึงขึ้นจากน้ำกลางทาง
+    title: ห้าสิบเมตร
+    kind: core
+    baseRisk: 0.15
+    riskFlags:
+      no_can_swim: 3
+      coastal: 0.6
+      cadet_drill_swim: 0.7
+      cadet_bond_c: 0.8
+  - id: X5-ทะเล-ว่ายเป็น
+    variantOf: X5
+    cond:
+      sex: ชาย
+      regions:
+        - ใต้
+        - ตะวันออก
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas:
+        - can_swim
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: สระยาวห้าสิบเมตร น้ำเย็นจนขนลุก กรรมการเป่านกหวีดปล่อยทีละหกลู่ ต้องแตะขอบอีกฝั่งก่อนนาฬิกาหยุด คนที่ขึ้นมาแล้วนั่งหอบเรียงอยู่ริมสระ {ชื่อ} โตมากับน้ำทะเล น้ำในสระนิ่งกว่าคลื่นหน้าบ้านมาก
+    options:
+      - label: ฟรีสไตล์เต็มแรงตั้งแต่ต้น
+        hint: เร็วที่สุด ถ้าว่ายเป็นจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 2
+          ifFlags:
+            can_swim: 0.3
+        pass: แตะขอบก่อนลู่อื่นเกือบตัว
+        fail: ครึ่งสระแรกเร็ว ครึ่งหลังหายใจไม่ทัน ต้องเกาะเชือกลู่
+      - label: ท่ากบ ช้าแต่ไม่จม
+        hint: ถึงฝั่งแน่กว่า แต่นาฬิกาไม่รอ
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 0.7
+          ifFlags:
+            can_swim: 1.6
+        pass: ช้าแต่ไม่หยุด แตะขอบทันก่อนนกหวีด
+        fail: ถึงฝั่ง แต่นาฬิกาหยุดไปก่อนแล้ว
+      - label: ตั้งสติ หายใจตามจังหวะที่ซ้อม
+        hint: ใช้ได้ดีถ้าซ้อมมาจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 1
+          ifFlags:
+            can_swim: 0.6
+            cadet_drill_swim: 0.6
+        pass: นับจังหวะในใจจนลืมว่ามีคนดู
+        fail: จังหวะที่ซ้อมหายไปตั้งแต่กลืนน้ำคำแรก
+      - label: ตะโกนเชียร์เพื่อนลู่ข้าง ๆ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        requires:
+          anyFlags:
+            - cadet_prep_group
+            - cadet_met_c
+        lockReason: ไม่มีคนรู้จักในรอบนี้
+        merit:
+          help_others: 1
+        risk:
+          base: 1
+          rivalMult: 0.7
+        useRivalResult: true
+        pass: เพื่อนแตะขอบแล้วชูมือหาเรา
+        fail: เพื่อนถูกดึงขึ้นจากน้ำกลางทาง
+    title: ห้าสิบเมตร
+    kind: core
+    baseRisk: 0.15
+    riskFlags:
+      no_can_swim: 3
+      coastal: 0.6
+      cadet_drill_swim: 0.7
+      cadet_bond_c: 0.8
+  - id: X5-ทะเล-ไม่เป็น
+    variantOf: X5
+    cond:
+      sex: ชาย
+      regions:
+        - ใต้
+        - ตะวันออก
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot:
+        - can_swim
+      family: null
+      poor: null
+      classes: null
+    text: สระยาวห้าสิบเมตร น้ำเย็นจนขนลุก กรรมการเป่านกหวีดปล่อยทีละหกลู่ ต้องแตะขอบอีกฝั่งก่อนนาฬิกาหยุด คนที่ขึ้นมาแล้วนั่งหอบเรียงอยู่ริมสระ บ้านอยู่ใกล้ทะเล แต่ไม่เคยว่ายจริงจังนอกจากเล่นน้ำตื้น
+    options:
+      - label: ฟรีสไตล์เต็มแรงตั้งแต่ต้น
+        hint: เร็วที่สุด ถ้าว่ายเป็นจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 2
+          ifFlags:
+            can_swim: 0.3
+        pass: แตะขอบก่อนลู่อื่นเกือบตัว
+        fail: ครึ่งสระแรกเร็ว ครึ่งหลังหายใจไม่ทัน ต้องเกาะเชือกลู่
+      - label: ท่ากบ ช้าแต่ไม่จม
+        hint: ถึงฝั่งแน่กว่า แต่นาฬิกาไม่รอ
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 0.7
+          ifFlags:
+            can_swim: 1.6
+        pass: ช้าแต่ไม่หยุด แตะขอบทันก่อนนกหวีด
+        fail: ถึงฝั่ง แต่นาฬิกาหยุดไปก่อนแล้ว
+      - label: ตั้งสติ หายใจตามจังหวะที่ซ้อม
+        hint: ใช้ได้ดีถ้าซ้อมมาจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 1
+          ifFlags:
+            can_swim: 0.6
+            cadet_drill_swim: 0.6
+        pass: นับจังหวะในใจจนลืมว่ามีคนดู
+        fail: จังหวะที่ซ้อมหายไปตั้งแต่กลืนน้ำคำแรก
+      - label: ตะโกนเชียร์เพื่อนลู่ข้าง ๆ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        requires:
+          anyFlags:
+            - cadet_prep_group
+            - cadet_met_c
+        lockReason: ไม่มีคนรู้จักในรอบนี้
+        merit:
+          help_others: 1
+        risk:
+          base: 1
+          rivalMult: 0.7
+        useRivalResult: true
+        pass: เพื่อนแตะขอบแล้วชูมือหาเรา
+        fail: เพื่อนถูกดึงขึ้นจากน้ำกลางทาง
+    title: ห้าสิบเมตร
+    kind: core
+    baseRisk: 0.15
+    riskFlags:
+      no_can_swim: 3
+      coastal: 0.6
+      cadet_drill_swim: 0.7
+      cadet_bond_c: 0.8
+  - id: X5-ไม่เป็น
+    variantOf: X5
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions:
+        - ใต้
+        - ตะวันออก
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot:
+        - can_swim
+      family: null
+      poor: null
+      classes: null
+    text: สระยาวห้าสิบเมตร น้ำเย็นจนขนลุก กรรมการเป่านกหวีดปล่อยทีละหกลู่ ต้องแตะขอบอีกฝั่งก่อนนาฬิกาหยุด คนที่ขึ้นมาแล้วนั่งหอบเรียงอยู่ริมสระ เพิ่งหัดว่ายจริงจังไม่นาน อีกฝั่งดูไกลกว่าตอนซ้อม
+    options:
+      - label: ฟรีสไตล์เต็มแรงตั้งแต่ต้น
+        hint: เร็วที่สุด ถ้าว่ายเป็นจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 2
+          ifFlags:
+            can_swim: 0.3
+        pass: แตะขอบก่อนลู่อื่นเกือบตัว
+        fail: ครึ่งสระแรกเร็ว ครึ่งหลังหายใจไม่ทัน ต้องเกาะเชือกลู่
+      - label: ท่ากบ ช้าแต่ไม่จม
+        hint: ถึงฝั่งแน่กว่า แต่นาฬิกาไม่รอ
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 0.7
+          ifFlags:
+            can_swim: 1.6
+        pass: ช้าแต่ไม่หยุด แตะขอบทันก่อนนกหวีด
+        fail: ถึงฝั่ง แต่นาฬิกาหยุดไปก่อนแล้ว
+      - label: ตั้งสติ หายใจตามจังหวะที่ซ้อม
+        hint: ใช้ได้ดีถ้าซ้อมมาจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 1
+          ifFlags:
+            can_swim: 0.6
+            cadet_drill_swim: 0.6
+        pass: นับจังหวะในใจจนลืมว่ามีคนดู
+        fail: จังหวะที่ซ้อมหายไปตั้งแต่กลืนน้ำคำแรก
+      - label: ตะโกนเชียร์เพื่อนลู่ข้าง ๆ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        requires:
+          anyFlags:
+            - cadet_prep_group
+            - cadet_met_c
+        lockReason: ไม่มีคนรู้จักในรอบนี้
+        merit:
+          help_others: 1
+        risk:
+          base: 1
+          rivalMult: 0.7
+        useRivalResult: true
+        pass: เพื่อนแตะขอบแล้วชูมือหาเรา
+        fail: เพื่อนถูกดึงขึ้นจากน้ำกลางทาง
+    title: ห้าสิบเมตร
+    kind: core
+    baseRisk: 0.15
+    riskFlags:
+      no_can_swim: 3
+      coastal: 0.6
+      cadet_drill_swim: 0.7
+      cadet_bond_c: 0.8
+  - id: X5-ว่ายเป็น
+    variantOf: X5
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions:
+        - ใต้
+        - ตะวันออก
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas:
+        - can_swim
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: สระยาวห้าสิบเมตร น้ำเย็นจนขนลุก กรรมการเป่านกหวีดปล่อยทีละหกลู่ ต้องแตะขอบอีกฝั่งก่อนนาฬิกาหยุด คนที่ขึ้นมาแล้วนั่งหอบเรียงอยู่ริมสระ สระเทศบาลตอนเย็นที่ซ้อมมา ยาวไม่ถึงครึ่งของสระนี้
+    options:
+      - label: ฟรีสไตล์เต็มแรงตั้งแต่ต้น
+        hint: เร็วที่สุด ถ้าว่ายเป็นจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 2
+          ifFlags:
+            can_swim: 0.3
+        pass: แตะขอบก่อนลู่อื่นเกือบตัว
+        fail: ครึ่งสระแรกเร็ว ครึ่งหลังหายใจไม่ทัน ต้องเกาะเชือกลู่
+      - label: ท่ากบ ช้าแต่ไม่จม
+        hint: ถึงฝั่งแน่กว่า แต่นาฬิกาไม่รอ
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 0.7
+          ifFlags:
+            can_swim: 1.6
+        pass: ช้าแต่ไม่หยุด แตะขอบทันก่อนนกหวีด
+        fail: ถึงฝั่ง แต่นาฬิกาหยุดไปก่อนแล้ว
+      - label: ตั้งสติ หายใจตามจังหวะที่ซ้อม
+        hint: ใช้ได้ดีถ้าซ้อมมาจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 1
+          ifFlags:
+            can_swim: 0.6
+            cadet_drill_swim: 0.6
+        pass: นับจังหวะในใจจนลืมว่ามีคนดู
+        fail: จังหวะที่ซ้อมหายไปตั้งแต่กลืนน้ำคำแรก
+      - label: ตะโกนเชียร์เพื่อนลู่ข้าง ๆ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        requires:
+          anyFlags:
+            - cadet_prep_group
+            - cadet_met_c
+        lockReason: ไม่มีคนรู้จักในรอบนี้
+        merit:
+          help_others: 1
+        risk:
+          base: 1
+          rivalMult: 0.7
+        useRivalResult: true
+        pass: เพื่อนแตะขอบแล้วชูมือหาเรา
+        fail: เพื่อนถูกดึงขึ้นจากน้ำกลางทาง
+    title: ห้าสิบเมตร
+    kind: core
+    baseRisk: 0.15
+    riskFlags:
+      no_can_swim: 3
+      coastal: 0.6
+      cadet_drill_swim: 0.7
+      cadet_bond_c: 0.8
+  - id: X5
+    variantOf: null
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: สระยาวห้าสิบเมตร น้ำเย็นจนขนลุก กรรมการเป่านกหวีดปล่อยทีละหกลู่ ต้องแตะขอบอีกฝั่งก่อนนาฬิกาหยุด คนที่ขึ้นมาแล้วนั่งหอบเรียงอยู่ริมสระ
+    options:
+      - label: ฟรีสไตล์เต็มแรงตั้งแต่ต้น
+        hint: เร็วที่สุด ถ้าว่ายเป็นจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 2
+          ifFlags:
+            can_swim: 0.3
+        pass: แตะขอบก่อนลู่อื่นเกือบตัว
+        fail: ครึ่งสระแรกเร็ว ครึ่งหลังหายใจไม่ทัน ต้องเกาะเชือกลู่
+      - label: ท่ากบ ช้าแต่ไม่จม
+        hint: ถึงฝั่งแน่กว่า แต่นาฬิกาไม่รอ
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 0.7
+          ifFlags:
+            can_swim: 1.6
+        pass: ช้าแต่ไม่หยุด แตะขอบทันก่อนนกหวีด
+        fail: ถึงฝั่ง แต่นาฬิกาหยุดไปก่อนแล้ว
+      - label: ตั้งสติ หายใจตามจังหวะที่ซ้อม
+        hint: ใช้ได้ดีถ้าซ้อมมาจริง
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        risk:
+          base: 1
+          ifFlags:
+            can_swim: 0.6
+            cadet_drill_swim: 0.6
+        pass: นับจังหวะในใจจนลืมว่ามีคนดู
+        fail: จังหวะที่ซ้อมหายไปตั้งแต่กลืนน้ำคำแรก
+      - label: ตะโกนเชียร์เพื่อนลู่ข้าง ๆ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: null
+        outcomes: null
+        requires:
+          anyFlags:
+            - cadet_prep_group
+            - cadet_met_c
+        lockReason: ไม่มีคนรู้จักในรอบนี้
+        merit:
+          help_others: 1
+        risk:
+          base: 1
+          rivalMult: 0.7
+        useRivalResult: true
+        pass: เพื่อนแตะขอบแล้วชูมือหาเรา
+        fail: เพื่อนถูกดึงขึ้นจากน้ำกลางทาง
+    title: ห้าสิบเมตร
+    kind: core
+    baseRisk: 0.15
+    riskFlags:
+      no_can_swim: 3
+      coastal: 0.6
+      cadet_drill_swim: 0.7
+      cadet_bond_c: 0.8
+medical:
+  id: X6
+  title: ห้าห้องตรวจ
+  kind: core
+  text: ตึกตรวจร่างกายมีห้าห้อง หัวใจ ร่างกาย หู คอ จมูก ฟัน และตา ผู้สมัครเดินตามลูกศรบนพื้น ถือแฟ้มประวัติแนบอก ห้องตาอยู่สุดทางเดิน คิวยาวที่สุด
+  contextLines:
+    - when:
+        flagsHas:
+          - cadet_retry
+          - cadet_fail:medical
+      line: ห้องสุดท้ายห้องเดิม ปีนี้ใจเต้นแรงกว่าตอนวิ่งพันเมตร
+  note: ตัวเลือกไม่เปลี่ยนผลตรวจ
+  failRisk: 0.08
+  roomWeights:
+    eye: 4
+    ent: 1
+    dental: 1
+    heart: 1
+  failLines:
+    eye: ห้องสุดท้าย หมอให้อ่านแผ่นเดิมซ้ำสามรอบ แล้วเขียนอะไรบางอย่างลงแฟ้มโดยไม่เงยหน้า
+    eyeAirforce: ห้องตามีเกณฑ์ของ ทอ. แยกอีกแผ่น {ชื่อ} อ่านแถวล่างสุดไม่ออก
+    ent: หมอส่องหูซ้ายนานกว่าข้างขวา แล้วเรียกหมออีกคนมาดู
+    dental: ฟันกรามที่ปวดมาตั้งแต่ปีก่อน ไม่เคยไปหาหมอเลยสักครั้ง
+    heart: หมอฟังเสียงหัวใจนานผิดปกติ แล้วขอให้มาตรวจซ้ำอีกรอบ ผลก็เหมือนเดิม
+  options:
+    - label: กรอกประวัติป่วยตามจริงทุกข้อ
+      hint: null
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 0
+        relations: 0
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: เขียนแม้แต่หอบตอนเด็กที่หายไปนานแล้ว หมออ่านแล้วพยักหน้า
+      outcomes: null
+      merit:
+        sila: 1
+    - label: นั่งนิ่ง ๆ นับลมหายใจรอคิว
+      hint: null
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 1
+        relations: 0
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: นับถึงร้อยสามรอบ ชื่อก็ถูกเรียก
+      outcomes: null
+      merit:
+        bhavana: 1
+    - label: ถามหมอว่าห้องตาตรวจอะไร
+      hint: null
+      requiresMoney: 0
+      fx:
+        knowledge: 1
+        health: 0
+        happiness: 0
+        relations: 0
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: หมอชี้แผ่นตัวอักษรบนผนัง แล้วบอกว่าอย่าเพ่งจนตาแห้ง
+      outcomes: null
+    - label: คุยกับเด็กที่นั่งรอข้าง ๆ
+      hint: null
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 0
+        relations: 1
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: มาจากคนละภาค แต่สมัครเหล่าเดียวกัน แลกชื่อกันไว้เผื่อเจอวันรายงานตัว
+      outcomes: null
+interview:
+  head: ห้องสัมภาษณ์มีโต๊ะยาวตัวเดียว นายทหารสามคนนั่งเรียงกัน คนกลางเปิดแฟ้มของ {ชื่อ} อ่านอยู่ครู่หนึ่ง แล้วถามขึ้นข้อเดียว
+  policeOnlyReplace:
+    นายทหาร: นายตำรวจ
+    ทหาร": ตำรวจ"
+  results:
+    up: คนกลางจดอะไรสั้น ๆ แล้วยิ้มที่มุมปาก
+    zero: สามคนพยักหน้าพร้อมกัน แล้วเรียกคนถัดไป
+    down: คนขวาสุดเลิกคิ้ว แล้วปิดแฟ้ม
+  note: ตัวแรกที่เข้า ก → ฉ · rank ขยับลำดับบนป้ายเท่านั้น ไม่ตัดสินผล (Q2)
+  variants:
+    - id: X7-ก
+      title: คำถามข้อเดียว
+      kind: core
+      variantOf: X7
+      cond:
+        sex: ชาย
+        regions: null
+        notRegions: null
+        heir: null
+        notHeir: null
+        yearMin: null
+        yearMax: null
+        school: null
+        flagsHas:
+          - cadet_retry
+        flagsNot: null
+        family: null
+        poor: null
+        classes: null
+      text: ห้องสัมภาษณ์มีโต๊ะยาวตัวเดียว นายทหารสามคนนั่งเรียงกัน คนกลางเปิดแฟ้มของ {ชื่อ} อ่านอยู่ครู่หนึ่ง แล้วถามขึ้นข้อเดียว "ปีก่อนมาแล้วใช่ไหม พลาดตรงไหน ปีนี้ทำอะไรต่างไป"
+      options:
+        - label: บอกตรง ๆ ว่าพลาดตรงไหน แก้ยังไง
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          merit:
+            sila: 1
+          rank: 1
+        - label: บอกว่าปีก่อนแค่ดวงไม่ดี
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: -1
+        - label: บอกว่ายังอยากได้ จึงกลับมา
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 1
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 0
+        - label: เล่าว่าซ้อมกับเพื่อนที่ตกด้วยกัน
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 1
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          requires:
+            flagsHas:
+              - cadet_bond_c
+          lockReason: ไม่มีเพื่อนที่สอบซ้ำด้วยกัน
+          rank: 1
+    - id: X7-ข
+      title: คำถามข้อเดียว
+      kind: core
+      variantOf: X7
+      cond:
+        sex: ชาย
+        regions: null
+        notRegions: null
+        heir: null
+        notHeir: null
+        yearMin: null
+        yearMax: null
+        school: null
+        flagsHas:
+          - cadet_family_secret
+        flagsNot: null
+        family: null
+        poor: null
+        classes: null
+      text: ห้องสัมภาษณ์มีโต๊ะยาวตัวเดียว นายทหารสามคนนั่งเรียงกัน คนกลางเปิดแฟ้มของ {ชื่อ} อ่านอยู่ครู่หนึ่ง แล้วถามขึ้นข้อเดียว "ใบนี้ต้องมีลายเซ็นผู้ปกครองตอนรายงานตัว ที่บ้านรู้หรือยังว่ามาสอบ"
+      options:
+        - label: ยังไม่รู้ ถ้าติดจะบอกเอง
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          merit:
+            sila: 1
+          rank: 0
+        - label: ยัง แต่คืนนี้จะกลับไปบอก
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 1
+            network: 0
+            money: 0
+          setFlags:
+            - cadet_family_told
+          clearFlags:
+            - cadet_family_secret
+          schedule: []
+          result: null
+          outcomes: null
+          merit:
+            sila: 1
+          rank: 1
+        - label: รู้แล้ว
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: -1
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 0
+        - label: ขอไม่ตอบเรื่องนี้
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: -1
+    - id: X7-ค
+      title: คำถามข้อเดียว
+      kind: core
+      variantOf: X7
+      cond:
+        sex: ชาย
+        regions: null
+        notRegions: null
+        heir: null
+        notHeir: null
+        yearMin: null
+        yearMax: null
+        school: null
+        flagsHas: null
+        flagsNot: null
+        family: null
+        poor: null
+        classes: null
+        anyFlags:
+          - army_family
+          - police_family
+      text: ห้องสัมภาษณ์มีโต๊ะยาวตัวเดียว นายทหารสามคนนั่งเรียงกัน คนกลางเปิดแฟ้มของ {ชื่อ} อ่านอยู่ครู่หนึ่ง แล้วถามขึ้นข้อเดียว "แฟ้มเขียนว่าคนในบ้านเคยรับราชการในเครื่องแบบ อยากเป็นแบบเขาหรือ"
+      note: cond = flagsHas army_family หรือ police_family (รอ CE-01)
+      options:
+        - label: อยากเป็น แต่อยากได้มาด้วยตัวเอง
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 1
+        - label: เคยเห็นเขาเหนื่อย ก็ยังอยากมา
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 1
+        - label: ที่บ้านอยากให้มา
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: -1
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 0
+        - label: มาเพราะเงินเดือนกับสวัสดิการ
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 0
+    - id: X7-ง
+      title: คำถามข้อเดียว
+      kind: core
+      variantOf: X7
+      cond:
+        sex: ชาย
+        regions: null
+        notRegions: null
+        heir: null
+        notHeir: null
+        yearMin: null
+        yearMax: null
+        school: null
+        flagsHas: null
+        flagsNot: null
+        family: null
+        poor: null
+        classes: null
+        branchesMin: 2
+      text: ห้องสัมภาษณ์มีโต๊ะยาวตัวเดียว นายทหารสามคนนั่งเรียงกัน คนกลางเปิดแฟ้มของ {ชื่อ} อ่านอยู่ครู่หนึ่ง แล้วถามขึ้นข้อเดียว "สมัครมาหลายเหล่า ถ้าติดทุกเหล่าจะเลือกที่ไหน เพราะอะไร"
+      options:
+        - label: เหล่าที่ฝันไว้ตั้งแต่แรก
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          requires:
+            flagsHas:
+              - "cadet_lean:"
+          lockReason: ยังไม่เคยใจเอนไปเหล่าไหน
+          setPickHint: true
+          rank: 1
+        - label: เหล่าที่ยังขาดคน ไปได้ทุกที่
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 1
+        - label: ที่ไหนก็ได้ ขอแค่ได้เป็น
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 0
+        - label: เหล่าเดียวกับเพื่อนที่มาด้วย
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: -1
+    - id: X7-จ
+      title: คำถามข้อเดียว
+      kind: core
+      variantOf: X7
+      cond:
+        sex: ชาย
+        regions: null
+        notRegions: null
+        heir: null
+        notHeir: null
+        yearMin: null
+        yearMax: null
+        school: null
+        flagsHas: null
+        flagsNot:
+          - cadet_family_support
+        family: null
+        poor: null
+        classes:
+          - poor
+      text: ห้องสัมภาษณ์มีโต๊ะยาวตัวเดียว นายทหารสามคนนั่งเรียงกัน คนกลางเปิดแฟ้มของ {ชื่อ} อ่านอยู่ครู่หนึ่ง แล้วถามขึ้นข้อเดียว "ถ้าปีนี้ไม่ติด จะทำอะไรต่อ"
+      options:
+        - label: สอบใหม่ และทำงานช่วยบ้านไปด้วย
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          merit:
+            care_parents: 1
+          rank: 1
+        - label: เรียนให้จบ ม.ปลายก่อน
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 1
+        - label: ยังไม่ได้คิดเลย
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: -1
+        - label: ไม่ติดก็ไม่เป็นไร
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 1
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 0
+    - id: X7-ฉ
+      title: คำถามข้อเดียว
+      kind: core
+      variantOf: X7
+      cond:
+        sex: ชาย
+        regions: null
+        notRegions: null
+        heir: null
+        notHeir: null
+        yearMin: null
+        yearMax: null
+        school: null
+        flagsHas: null
+        flagsNot: null
+        family: null
+        poor: null
+        classes: null
+      text: ห้องสัมภาษณ์มีโต๊ะยาวตัวเดียว นายทหารสามคนนั่งเรียงกัน คนกลางเปิดแฟ้มของ {ชื่อ} อ่านอยู่ครู่หนึ่ง แล้วถามขึ้นข้อเดียว "ทำไมถึงอยากเป็นทหาร"
+      options:
+        - label: อยากมีงานที่ทำให้บ้านพึ่งได้
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 1
+        - label: เห็นรุ่นพี่แล้วอยากเป็นแบบนั้น
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          requires:
+            anyFlags:
+              - knows_senior
+              - saw_
+          lockReason: ไม่มีใครให้เอ่ยถึง
+          rank: 1
+        - label: อยากใส่เครื่องแบบ
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 0
+        - label: ยังไม่รู้จะเรียนอะไรต่อ
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: -1
+finalBoard:
+  head: ป้ายผลสุดท้ายแยกเป็นรายเหล่า แผ่นละไม่กี่ร้อยชื่อ
+  rivalLines:
+    A:
+      pass: ชื่อเพื่อนห้องสามอยู่บนแผ่นเดียวกัน
+      failSwim: ใต้ชื่อเพื่อนห้องสามเขียนว่าว่ายน้ำไม่ผ่าน
+    B:
+      pass: ลูกนายพลคนนั้นติดตามที่ใคร ๆ คาด
+      fail: ลูกนายพลไม่มีชื่อบนแผ่นไหนเลย ได้ยินว่าตกห้องตา
+    C:
+      pass: เด็กผิวคล้ำแดดชูมือขึ้นฟ้า ปีที่สองของเขาสำเร็จแล้ว
+      fail: เขาพับใบประกาศใส่กระเป๋า ไม่พูดอะไรสักคำ
+chooseBranch:
+  id: X8
+  title: เลือกได้เหล่าเดียว
+  kind: core
+  text: ชื่อ {ชื่อ} อยู่บนป้ายมากกว่าหนึ่งแผ่น แต่ใบยืนยันสิทธิ์มีช่องให้เซ็นได้ช่องเดียว เหล่าที่ไม่ได้เลือก จะมีคนลำดับถัดไปได้ที่นั่งแทน
+  contextLines:
+    - when:
+        flagsHas:
+          - cadet_family_support
+      line: ผู้ใหญ่ในบ้านยืนอ่านป้ายอยู่ข้าง ๆ ไม่พูดว่าให้เลือกอะไร
+  note: ปุ่มเหล่าแสดงเฉพาะเหล่าที่ติด
+  options:
+    - label: เลือก ทบ.
+      hint: ภาคสนาม ย้ายไปได้ทั่วประเทศ
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 1
+        relations: 0
+        network: 0
+        money: 0
+      setFlags:
+        - cadet_branch:army
+      clearFlags: []
+      schedule: []
+      result: ปากกาหยุดเหนือช่องนั้นนานจนเจ้าหน้าที่ต้องกระแอม แล้วจึงเซ็น
+      outcomes: null
+      branch: army
+      leanLabel: เลือก ทบ. ตามที่ฝันไว้
+      leanFlag: cadet_lean:army
+      leanFx:
+        knowledge: 0
+        health: 0
+        happiness: 2
+        relations: 0
+        network: 0
+        money: 0
+    - label: เลือก ทร.
+      hint: อยู่กลางทะเลนาน ห่างบ้านนาน
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 1
+        relations: 0
+        network: 0
+        money: 0
+      setFlags:
+        - cadet_branch:navy
+      clearFlags: []
+      schedule: []
+      result: ปากกาหยุดเหนือช่องนั้นนานจนเจ้าหน้าที่ต้องกระแอม แล้วจึงเซ็น
+      outcomes: null
+      branch: navy
+      leanLabel: เลือก ทร. ตามที่ฝันไว้
+      leanFlag: cadet_lean:navy
+      leanFx:
+        knowledge: 0
+        health: 0
+        happiness: 2
+        relations: 0
+        network: 0
+        money: 0
+    - label: เลือก ทอ.
+      hint: ขั้นตอนเข้ม ตาต้องดีไปตลอด
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 1
+        relations: 0
+        network: 0
+        money: 0
+      setFlags:
+        - cadet_branch:airforce
+      clearFlags: []
+      schedule: []
+      result: ปากกาหยุดเหนือช่องนั้นนานจนเจ้าหน้าที่ต้องกระแอม แล้วจึงเซ็น
+      outcomes: null
+      branch: airforce
+      leanLabel: เลือก ทอ. ตามที่ฝันไว้
+      leanFlag: cadet_lean:airforce
+      leanFx:
+        knowledge: 0
+        health: 0
+        happiness: 2
+        relations: 0
+        network: 0
+        money: 0
+    - label: เลือก ตร.
+      hint: อยู่กับประชาชนทุกวัน
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 1
+        relations: 0
+        network: 0
+        money: 0
+      setFlags:
+        - cadet_branch:police
+      clearFlags: []
+      schedule: []
+      result: ปากกาหยุดเหนือช่องนั้นนานจนเจ้าหน้าที่ต้องกระแอม แล้วจึงเซ็น
+      outcomes: null
+      branch: police
+      leanLabel: เลือก ตร. ตามที่ฝันไว้
+      leanFlag: cadet_lean:police
+      leanFx:
+        knowledge: 0
+        health: 0
+        happiness: 2
+        relations: 0
+        network: 0
+        money: 0
+    - label: เลือกตามที่ผู้ใหญ่ในบ้านอยาก
+      hint: null
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: -1
+        relations: 1
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: ปากกาหยุดเหนือช่องนั้นนานจนเจ้าหน้าที่ต้องกระแอม แล้วจึงเซ็น
+      outcomes: null
+      requires:
+        flagsHas:
+          - cadet_family_told
+      lockReason: ที่บ้านยังไม่รู้ว่ามาสอบ
+      merit:
+        care_parents: 1
+      branchPick: heirOrRandom
+    - label: เลือกเหล่าเดียวกับเพื่อน
+      hint: null
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: 0
+        relations: 1
+        network: 0
+        money: 0
+      setFlags: []
+      clearFlags: []
+      schedule: []
+      result: สองคนเซ็นช่องเดียวกัน ห่างกันแค่สองบรรทัด
+      outcomes: null
+      requires:
+        rivalSameBranch: true
+      lockReason: ไม่มีเพื่อนติดเหล่าเดียวกัน
+      branchPick: rival
+      bondByRival:
+        A: cadet_bond_a
+        C: cadet_bond_c
+    - label: สละสิทธิ์ทุกเหล่า
+      hint: ไม่มีชื่อในรุ่นนี้
+      requiresMoney: 0
+      fx:
+        knowledge: 0
+        health: 0
+        happiness: -1
+        relations: 0
+        network: 0
+        money: 0
+      setFlags:
+        - cadet_seat_declined
+      clearFlags: []
+      schedule: []
+      result: null
+      outcomes: null
+      next: X10
+      failReason: declined
+passed:
+  - id: X9-ก
+    title: ข่าวถึงบ้าน
+    kind: core
+    variantOf: X9
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas:
+        - cadet_family_secret
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: ใบแจ้งวันรายงานตัวต้องมีลายเซ็นผู้ปกครอง ที่บ้านยังไม่รู้ด้วยซ้ำว่ามาสอบ {ชื่อ} ยืนหน้าประตูบ้านนานกว่าทุกวัน ในมือมีกระดาษแผ่นเดียวที่จะเปลี่ยนเจ็ดปีข้างหน้า
+    header: ติด {เหล่า}
+    onEnter:
+      setFlags:
+        - cadet_pass:{เหล่า}
+      clearFlags:
+        - cadet_dream
+        - cadet_drill_swim
+        - "cadet_fail:"
+    contextLines:
+      - when:
+          flagsHas:
+            - cadet_retry
+        line: ปีก่อนยังไม่มีชื่อ ปีนี้มีแล้ว
+    options:
+      - label: ขอโทษที่ไม่บอกตั้งแต่แรก
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags:
+          - cadet_family_secret
+        schedule: []
+        result: null
+        outcomes:
+          - p: 0.5
+            result: ผู้ใหญ่ในบ้านถามว่าทำไมไม่บอก แล้วจับปากกาเซ็นโดยไม่ถามอีก
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 0
+              relations: 0
+              network: 0
+              money: 0
+            setFlags:
+              - cadet_family_told
+          - p: 0.5
+            result: สามคืนแรกเงียบทั้งบ้าน คืนที่สี่ลายเซ็นก็มาอยู่บนใบนั้น
+            fx:
+              knowledge: 0
+              health: 0
+              happiness: 0
+              relations: 0
+              network: 0
+              money: 0
+            setFlags:
+              - cadet_family_told
+        merit:
+          sila: 1
+      - label: ยื่นใบให้เซ็นเงียบ ๆ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: -1
+          network: 0
+          money: 0
+        setFlags:
+          - cadet_family_told
+        clearFlags:
+          - cadet_family_secret
+        schedule: []
+        result: ลายเซ็นมาครบ แต่มื้อเย็นคืนนั้นไม่มีใครถามเรื่องสอบเลย
+        outcomes: null
+      - label: ก้มกราบผู้ใหญ่ในบ้าน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 2
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: มือที่ลูบหัวเกรียนสั่นนิดหนึ่ง แต่ไม่มีใครพูดถึง
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ต้องบอกที่บ้านก่อน
+        merit:
+          care_parents: 1
+      - label: ไปบอกครูที่โรงเรียน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 1
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ครูแนะแนวเอาชื่อไปติดบอร์ดหน้าห้อง ข้างใบปลิวค่ายติวแผ่นเดิม
+        outcomes: null
+      - label: ทำบุญที่วัดใกล้บ้าน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ใส่บาตรเช้าวันอาทิตย์ หลวงตาถามว่าจะไปไกลแค่ไหน
+        outcomes: null
+        merit:
+          dana: 1
+      - label: ตัดผมเกรียน รอวันรายงานตัว
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ร้านตัดผมหน้าตลาดไม่คิดเงิน บอกว่าตัดให้ว่าที่นายร้อย
+        outcomes: null
+  - id: X9-ข
+    title: ข่าวถึงบ้าน
+    kind: core
+    variantOf: X9
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes:
+        - poor
+    altCond:
+      flagsHas:
+        - family_debt
+    text: ใบแจ้งวันรายงานตัวมีรายการของที่ต้องเตรียมยาวครึ่งหน้า ผู้ใหญ่ในบ้านอ่านจบแล้วเงียบไปนาน ก่อนจะยิ้มออกมา ถ้าเรียนจนจบ {ชื่อ} จะติดยศตอนอายุ{อายุติดยศ}
+    header: ติด {เหล่า}
+    onEnter:
+      setFlags:
+        - cadet_pass:{เหล่า}
+      clearFlags:
+        - cadet_dream
+        - cadet_drill_swim
+        - "cadet_fail:"
+    contextLines:
+      - when:
+          flagsHas:
+            - cadet_retry
+        line: ปีก่อนยังไม่มีชื่อ ปีนี้มีแล้ว
+    options:
+      - label: ก้มกราบผู้ใหญ่ในบ้าน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 2
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: มือที่ลูบหัวเกรียนสั่นนิดหนึ่ง แต่ไม่มีใครพูดถึง
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ต้องบอกที่บ้านก่อน
+        merit:
+          care_parents: 1
+      - label: สัญญาจะช่วยใช้หนี้ทีละน้อย
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: จดตัวเลขหนี้ไว้หลังสมุด เผื่อวันที่ได้เบี้ยเลี้ยงครั้งแรก
+        outcomes: null
+        requires:
+          flagsHas:
+            - family_debt
+        lockReason: บ้านไม่ได้เป็นหนี้ค่าติว
+        merit:
+          care_parents: 1
+      - label: ไปบอกครูที่โรงเรียน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 1
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ครูแนะแนวเอาชื่อไปติดบอร์ดหน้าห้อง ข้างใบปลิวค่ายติวแผ่นเดิม
+        outcomes: null
+      - label: ทำบุญที่วัดใกล้บ้าน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ใส่บาตรเช้าวันอาทิตย์ หลวงตาถามว่าจะไปไกลแค่ไหน
+        outcomes: null
+        merit:
+          dana: 1
+      - label: ตัดผมเกรียน รอวันรายงานตัว
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ร้านตัดผมหน้าตลาดไม่คิดเงิน บอกว่าตัดให้ว่าที่นายร้อย
+        outcomes: null
+  - id: X9-ค
+    title: ข่าวถึงบ้าน
+    kind: core
+    variantOf: X9
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+      anyFlags:
+        - army_family
+        - police_family
+    text: ผู้ใหญ่ในบ้านเปิดตู้ หยิบรูปถ่ายในกรอบเก่าที่สีซีดแล้วออกมาวางคู่กับใบแจ้งวันรายงานตัว ไม่มีใครพูดอะไร แต่ทั้งบ้านรู้ว่าอีกเจ็ดปีจะมีรูปใหม่มาวางข้างกัน
+    header: ติด {เหล่า}
+    onEnter:
+      setFlags:
+        - cadet_pass:{เหล่า}
+      clearFlags:
+        - cadet_dream
+        - cadet_drill_swim
+        - "cadet_fail:"
+    contextLines:
+      - when:
+          flagsHas:
+            - cadet_retry
+        line: ปีก่อนยังไม่มีชื่อ ปีนี้มีแล้ว
+    options:
+      - label: ก้มกราบผู้ใหญ่ในบ้าน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 2
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: มือที่ลูบหัวเกรียนสั่นนิดหนึ่ง แต่ไม่มีใครพูดถึง
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ต้องบอกที่บ้านก่อน
+        merit:
+          care_parents: 1
+      - label: สัญญาจะช่วยใช้หนี้ทีละน้อย
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: จดตัวเลขหนี้ไว้หลังสมุด เผื่อวันที่ได้เบี้ยเลี้ยงครั้งแรก
+        outcomes: null
+        requires:
+          flagsHas:
+            - family_debt
+        lockReason: บ้านไม่ได้เป็นหนี้ค่าติว
+        merit:
+          care_parents: 1
+      - label: ไปบอกครูที่โรงเรียน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 1
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ครูแนะแนวเอาชื่อไปติดบอร์ดหน้าห้อง ข้างใบปลิวค่ายติวแผ่นเดิม
+        outcomes: null
+      - label: ทำบุญที่วัดใกล้บ้าน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ใส่บาตรเช้าวันอาทิตย์ หลวงตาถามว่าจะไปไกลแค่ไหน
+        outcomes: null
+        merit:
+          dana: 1
+      - label: ตัดผมเกรียน รอวันรายงานตัว
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ร้านตัดผมหน้าตลาดไม่คิดเงิน บอกว่าตัดให้ว่าที่นายร้อย
+        outcomes: null
+  - id: X9-ง
+    title: ข่าวถึงบ้าน
+    kind: core
+    variantOf: X9
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: ผู้ใหญ่ในบ้านรออยู่ใต้ต้นไม้หน้ากองสอบตั้งแต่เช้า เห็นหน้า {ชื่อ} ก็รู้คำตอบก่อนจะได้พูด อีกไม่กี่เดือนต้องเข้าโรงเรียน ถ้าเรียนจนจบจะติดยศตอนอายุ{อายุติดยศ}
+    header: ติด {เหล่า}
+    onEnter:
+      setFlags:
+        - cadet_pass:{เหล่า}
+      clearFlags:
+        - cadet_dream
+        - cadet_drill_swim
+        - "cadet_fail:"
+    contextLines:
+      - when:
+          flagsHas:
+            - cadet_retry
+        line: ปีก่อนยังไม่มีชื่อ ปีนี้มีแล้ว
+    options:
+      - label: ก้มกราบผู้ใหญ่ในบ้าน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 2
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: มือที่ลูบหัวเกรียนสั่นนิดหนึ่ง แต่ไม่มีใครพูดถึง
+        outcomes: null
+        requires:
+          flagsHas:
+            - cadet_family_told
+        lockReason: ต้องบอกที่บ้านก่อน
+        merit:
+          care_parents: 1
+      - label: สัญญาจะช่วยใช้หนี้ทีละน้อย
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: จดตัวเลขหนี้ไว้หลังสมุด เผื่อวันที่ได้เบี้ยเลี้ยงครั้งแรก
+        outcomes: null
+        requires:
+          flagsHas:
+            - family_debt
+        lockReason: บ้านไม่ได้เป็นหนี้ค่าติว
+        merit:
+          care_parents: 1
+      - label: ไปบอกครูที่โรงเรียน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 1
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ครูแนะแนวเอาชื่อไปติดบอร์ดหน้าห้อง ข้างใบปลิวค่ายติวแผ่นเดิม
+        outcomes: null
+      - label: ทำบุญที่วัดใกล้บ้าน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ใส่บาตรเช้าวันอาทิตย์ หลวงตาถามว่าจะไปไกลแค่ไหน
+        outcomes: null
+        merit:
+          dana: 1
+      - label: ตัดผมเกรียน รอวันรายงานตัว
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ร้านตัดผมหน้าตลาดไม่คิดเงิน บอกว่าตัดให้ว่าที่นายร้อย
+        outcomes: null
+rankAgeWords:
+  "16": ยี่สิบสาม
+  "17": ยี่สิบสี่
+  "18": ยี่สิบห้า
+failed:
+  - id: X10-ก
+    title: ชื่อที่ไม่อยู่บนป้าย
+    kind: core
+    variantOf: X10
+    ageMin: 16
+    ageMax: 17
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: "{เหตุ} ทางกลับบ้านวันนั้นยาวกว่าขามา แต่อายุยังอยู่ในเกณฑ์ ประกาศรับสมัครปีหน้าจะออกอีกครั้ง"
+    reasonLines:
+      written: คะแนนข้อเขียนห่างเส้นเรียกรอบสองไปไม่ไกล
+      quiz: คะแนนแบบวัดความพร้อมไม่ถึงครึ่ง
+      knowledge: แบบวัดผ่าน แต่วิชาการยังไม่ถึงเกณฑ์
+      land: ข้อเขียนผ่าน แต่ตกที่{สถานี}
+      swim: ข้อเขียนผ่าน แต่ตกที่สระว่ายน้ำ
+      medical: ผ่านทุกสนาม เว้นห้องตรวจห้องเดียว
+      rank: ผ่านทุกด่าน แต่ลำดับเลยที่นั่งไปไม่กี่ชื่อ
+      declined: ชื่ออยู่บนป้าย แต่ช่องเซ็นยังว่าง
+    contextLines:
+      - when:
+          flagsHas:
+            - cadet_family_secret
+        line: อย่างน้อยที่บ้านก็ไม่ต้องรู้ว่าตก
+    rivalLines:
+      - when:
+          rivalPass: A
+        line: เพื่อนห้องสามติด เขาโทรมาแต่ไม่รู้จะพูดอะไรก่อน
+      - when:
+          rivalPass: C
+        line: เด็กผิวคล้ำแดดคนนั้นติดในปีที่สองของเขา
+      - when:
+          rivalFail: C
+        line: เขาบอกว่าจะมาอีกปี ถามว่าจะมาด้วยกันไหม
+    options:
+      - label: สอบใหม่ แก้จุดที่พลาด
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags:
+          - cadet_retry
+        clearFlags: []
+        schedule: []
+        result: สมัครสระเทศบาลรายปี ไปตั้งแต่วันจันทร์ถัดมา
+        outcomes: null
+        fxByReason:
+          quiz:
+            knowledge: 1
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          knowledge:
+            knowledge: 2
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          written:
+            knowledge: 1
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          land:
+            knowledge: 0
+            health: 1
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          swim:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          medical:
+            knowledge: 0
+            health: 0
+            happiness: -1
+            relations: 0
+            network: 0
+            money: 0
+          rank:
+            knowledge: 1
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          declined:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+        swimReasonRandomFlag: can_swim
+        hintByAge:
+          "16": ยังมีปีหน้า แต่ต้องเริ่มคืนนี้
+          "17": ปีหน้าต้องเลือกว่าจะสอบต่อหรือพอ
+        hintPoorExtra: ค่าสมัครอีกปี ค่ารถอีกปี
+        note: ข้อความผลในร่างให้ตัวอย่างเฉพาะเหตุสระ
+      - label: เรียนไปก่อน ปีหน้าค่อยคิด
+        hint: ปีหน้ายังสมัครได้
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: เก็บบัตรประจำตัวสอบไว้ในลิ้นชัก แล้วกลับไปทำการบ้านที่ค้าง
+        outcomes: null
+      - label: พอแค่นี้ ไปทางอื่น
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags:
+          - cadet_let_go
+        clearFlags:
+          - cadet_dream
+        schedule: []
+        result: ไม่ได้เสียใจกับปีที่ซ้อมมา แค่รู้ว่าพอแล้ว
+        outcomes: null
+      - label: ไปหาเพื่อนที่ติด
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: แสดงความยินดีได้เต็มปาก แม้ขากลับจะเงียบไปทั้งทาง
+        outcomes: null
+        requires:
+          rivalPassAny:
+            - A
+            - C
+        lockReason: ไม่มีคนรู้จักที่ติด
+        bondByRival:
+          A: cadet_bond_a
+          C: cadet_bond_c
+      - label: นัดเพื่อนที่ตกด้วยกันซ้อมต่อ
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 1
+          happiness: 0
+          relations: 1
+          network: 0
+          money: 0
+        setFlags:
+          - cadet_retry
+        clearFlags: []
+        schedule: []
+        result: สนามซ้อมเดิม คนเดิม ปีนี้ไม่มีใครพูดว่าโชคไม่ดี
+        outcomes: null
+        requires:
+          rivalFailAny:
+            - A
+            - C
+        lockReason: ไม่มีเพื่อนที่ตกด้วยกัน
+        bondByRival:
+          A: cadet_bond_a
+          C: cadet_bond_c
+      - label: ขังตัวเองในห้องหลายวัน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -2
+          relations: 0
+          network: 0
+          money: 0
+        setFlags: []
+        clearFlags: []
+        schedule: []
+        result: ไม่มีใครเคาะประตู จนวันที่สามมีจานข้าววางรออยู่หน้าห้อง
+        outcomes: null
+  - id: X10-ข
+    title: ชื่อที่ไม่อยู่บนป้าย
+    kind: core
+    variantOf: X10
+    ageMin: 18
+    ageMax: 18
+    cond:
+      sex: ชาย
+      regions: null
+      notRegions: null
+      heir: null
+      notHeir: null
+      yearMin: null
+      yearMax: null
+      school: null
+      flagsHas: null
+      flagsNot: null
+      family: null
+      poor: null
+      classes: null
+    text: "{เหตุ} นี่เป็นปีสุดท้ายที่สมัครได้ เพื่อนร่วมชั้นไปเรียนต่อและทำงานกันหมดแล้ว ใบสมัครเรียนต่อที่พักไว้ทั้งปียังวางอยู่บนโต๊ะ"
+    reasonLines:
+      written: คะแนนข้อเขียนห่างเส้นเรียกรอบสองไปไม่ไกล
+      quiz: คะแนนแบบวัดความพร้อมไม่ถึงครึ่ง
+      knowledge: แบบวัดผ่าน แต่วิชาการยังไม่ถึงเกณฑ์
+      land: ข้อเขียนผ่าน แต่ตกที่{สถานี}
+      swim: ข้อเขียนผ่าน แต่ตกที่สระว่ายน้ำ
+      medical: ผ่านทุกสนาม เว้นห้องตรวจห้องเดียว
+      rank: ผ่านทุกด่าน แต่ลำดับเลยที่นั่งไปไม่กี่ชื่อ
+      declined: ชื่ออยู่บนป้าย แต่ช่องเซ็นยังว่าง
+    after: ปล่อยด่าน ม.6/ปวช. ที่พักไว้ (uni_exam + schoolGate)
+    options:
+      - label: หยิบใบสมัครเรียนต่อขึ้นมา
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 1
+          health: 0
+          happiness: 0
+          relations: 0
+          network: 0
+          money: 0
+        setFlags:
+          - cadet_let_go
+        clearFlags:
+          - cadet_dream
+        schedule: []
+        result: กรอกช่องแรกช้า ๆ เหมือนตอนกรอกใบสมัครเตรียมทหารครั้งแรก
+        outcomes: null
+      - label: ขอพักใจสักพักก่อน
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: -1
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags:
+          - cadet_let_go
+        clearFlags:
+          - cadet_dream
+        schedule: []
+        result: ตื่นสายเป็นครั้งแรกในสามปี ไม่มีใครปลุกตอนตีห้า
+        outcomes: null
+      - label: เก็บบัตรสอบทั้งสามใบไว้ที่ระลึก
+        hint: สามปีที่ไม่ได้หายไปไหน
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: 1
+          relations: 0
+          network: 0
+          money: 0
+        setFlags:
+          - cadet_let_go
+        clearFlags:
+          - cadet_dream
+        schedule: []
+        result: บัตรสามใบรูปหน้าสามแบบ ผมเกรียนเท่ากันทุกใบ
+        outcomes: null
+        labelIfFewer: เก็บบัตรสอบไว้ที่ระลึก
+        fullLabelRetryCount: 3
+      - label: ไปแสดงความยินดีกับเพื่อนที่ติด
+        hint: null
+        requiresMoney: 0
+        fx:
+          knowledge: 0
+          health: 0
+          happiness: -1
+          relations: 1
+          network: 0
+          money: 0
+        setFlags:
+          - cadet_let_go
+        clearFlags:
+          - cadet_dream
+        schedule: []
+        result: เพื่อนกอดแน่นจนหมวกหล่น แล้วบอกว่าวันติดยศต้องมานะ
+        outcomes: null
+        requires:
+          rivalPassAny:
+            - A
+            - C
+        lockReason: ไม่มีคนรู้จักที่ติด
+        bondByRival:
+          A: cadet_bond_a
+          C: cadet_bond_c
+# ---- สัมภาษณ์ (เจ้าของเคาะ 2026-11-05) · ใช้ 4 ข้อสุ่มจากคลัง + ข้อตลก 1 ข้อ (ได้เต็มเสมอ) · ผ่าน ≥ numbers.iv_min
+# a = [ข้อความตัวเลือก, คะแนน] · {เหล่า} = เหล่าแรกที่ผ่านพลศึกษา · qSecret = ใช้แทนเมื่อยังปิดที่บ้าน
+interviewQs:
+  - q: "แนะนำตัวเองสั้น ๆ"
+    a: [["บอกชื่อ โรงเรียน บ้าน และเหตุผลที่มา", 5], ["บอกชื่อกับโรงเรียน แล้วรอคำถามต่อ", 4], ["เล่ายาวตั้งแต่เด็กจนถูกขอให้สรุป", 3], ["พูดเร็วจนติด ต้องเริ่มใหม่", 2], ["ท่องประโยคที่จำมา ไม่ใช่เรื่องตัวเอง", 0]]
+  - q: "ทำไมถึงอยากเข้า {เหล่า}"
+    a: [["เล่าเรื่องจริงที่ทำให้สนใจ", 5], ["อยากมีอาชีพมั่นคง ดูแลที่บ้านได้", 4], ["มีคนแนะนำ แล้วก็เริ่มชอบเอง", 3], ["ยังไม่แน่ใจ แต่อยากลองดู", 2], ["ใส่เครื่องแบบแล้วคนเกรงใจ", 0]]
+  - q: "เพื่อนร่วมรุ่นทำผิดระเบียบ แล้วขอให้ช่วยปิดไว้ จะทำยังไง"
+    a: [["เตือนให้ไปรายงานเอง ไม่ไปจะบอกรุ่นพี่", 5], ["บอกตรง ๆ ว่าช่วยปิดไม่ได้", 4], ["ไม่ยุ่ง ให้เป็นเรื่องของเขา", 3], ["ช่วยครั้งเดียว ครั้งหน้าไม่ช่วย", 2], ["ช่วยปิด เพื่อนต้องมาก่อน", 0]]
+  - q: "ที่นี่ฝึกหนักและอยู่ไกลบ้าน ถ้าคิดถึงบ้านมากจะทำยังไง"
+    qSecret: "ที่บ้านรู้หรือยังว่ามาสอบ ถ้าคิดถึงบ้านตอนฝึกจะทำยังไง"
+    a: [["ติดต่อบ้านตามเวลาที่ให้ แล้วฝึกต่อ", 5], ["คุยกับเพื่อนที่รู้สึกเหมือนกัน", 4], ["อดทนเงียบ ๆ ไม่บอกใคร", 3], ["ขอลากลับบ้านบ่อย ๆ", 2], ["ถ้าไม่ไหวจริงก็ลาออก", 0]]
+  - q: "ถ้าปีนี้ไม่ติด จะทำอะไรต่อ"
+    a: [["กลับไปแก้จุดที่พลาด แล้วสอบใหม่", 5], ["สอบใหม่ปีหน้า", 4], ["เรียนต่อมหาวิทยาลัยตามแผนสำรอง", 3], ["ยังไม่ได้คิด", 2], ["รู้จักผู้ใหญ่ ฝากเข้าได้", 0]]
+# ข้อตลกของจ่าขมลมโชย — คารวะ 7 ประจัญบาน (2545): เสียงแกร๊ก + "ช่วยกูด้วย… ช่วยหน่อยเถอะครับ" · ชื่อผู้กององอาจคงไว้ (เจ้าของเคาะ)
+# a = [ข้อความตัวเลือก, ปฏิกิริยากรรมการ]
+interviewFunny:
+  - text: "จ่าขมลมโชยวางแก้วกาแฟลงช้า ๆ \"สมมุติ… เธอเป็นลูกหมู่ของผู้กองท่านหนึ่ง\" แล้วเหลือบไปทางผู้กององอาจ\n\"ผู้กองบอกว่าทางนี้รู้ดี แล้วก็เหยียบดัง แกร๊ก ทั้งหมู่วิ่งหายเข้าป่าหมด ผู้กองตะโกน ช่วยกูด้วย! …เงียบ… ช่วยหน่อยเถอะครับ… เธอจะทำยังไง\"\nผู้กององอาจกระแอมยาว"
+    a:
+      - ["ยืนเป็นเพื่อนผู้กองครับ ไม่เหงา", "ผู้กองบูรพาสำลักน้ำ ผู้กององอาจพยักหน้าช้า ๆ \"…ใช้ได้\""]
+      - ["หาหินหนักเท่าผู้กองมาวางแทนครับ", "จ่า: \"ก้อนต้องใหญ่มากนะ\" ผู้กององอาจหันขวับไปมองจ่า"]
+      - ["รอจนผู้กองพูดคำว่า \"ครับ\"", "จ่า: \"ทำไม\" ตอบว่า \"รอให้ผู้กองพูดสุภาพก่อนครับ พูดกูแล้วไม่ลื่นหู\" ผู้กองบูรพาหัวเราะออกเสียง"]
+      - ["วิ่งไปตามหมู่กลับมาครับ ถ้าเขาจำทางได้", "จ่า: \"หมู่นี้ไม่มีใครจำทางได้\" แล้วมองผู้กององอาจอีกรอบ"]
