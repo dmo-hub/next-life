@@ -1485,6 +1485,8 @@ function drawCard(st) {
     if (st.cadet.cur) throw new Error('ยังมีการ์ดที่รอเลือก');
     const card = cadetCard(st);
     if (card) return emit(st, card);
+    // ขั้นของ cadet เติมคิวได้ ต้องเปิดคิวก่อนลงไปขึ้นปี
+    if (st.queue.length) return nextCard(st);
   }
   for (;;) {
     if (st.advance) {
