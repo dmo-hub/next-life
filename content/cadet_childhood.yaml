@@ -1,0 +1,390 @@
+# nl-writer file b002
+# กลุ่ม cadet_ · เส้นเตรียมทหาร เฟส 1 · วัยเด็ก (อายุ 10–12) · เฉพาะผู้ชาย · ฉากเห็นเครื่องแบบ 4 เหล่า แบบไม่ยัดเยียด
+# ที่มา: .claude/research/demo/data-01.js (E0 T1 T1b T3 ตร1 ตร2 ตร4 N1 X3 A3) · data-02.js (SR0) · ร่างให้เจ้าของเลือกและแก้
+# จังหวะ (เจ้าของ: อย่างน้อย 2 ฉากก่อนอายุ 13 · ไม่ติดกันสองปี): ช่อง 10 ขวบ กับช่อง 12 ขวบ ช่องละหนึ่งใบ (หลักไมล์)
+#   ทุกใบในช่องเดียวกันมี when.flags.not ธงช่อง และทุกตัวเลือกตั้งธงช่อง → ใบแรกตามลำดับไฟล์ที่เข้าเงื่อนไขออก ใบที่เหลือข้าม
+#   ช่อง 10 (ทบ./ตร.): ตร1 → ตร2 → A3 → E0 (ใบสุดท้ายรับทุกคนที่เหลือ) · ช่อง 12 (ทร./ทอ.): X3 → T3 → N1 → T1 → T1b
+# ตั้งธง: saw_army saw_navy saw_airforce saw_police (บางตัวเลือกเท่านั้น) · cadet_seen10 cadet_seen12 (ธงช่อง) · knows_senior cadet_lean:<เหล่า> (SR0) · cadet_tips (ตร4)
+# อ่านธง: cadet_dream (ตร4 ปุ่มสุดท้าย · ไฟล์เส้นตั้งเป้าเป็นคนตั้ง)
+# ข้อความผลของตัวเลือกที่ไม่มีผลสุ่มเก็บเป็นคอมเมนต์ "ผล:" (สคีมาเกมยังไม่มีช่องผลของตัวเลือกเดี่ยว)
+# ยังไม่ทำ: X5 (ทายาททหาร) · ตร3 (ทายาทตำรวจ) — รอแกนเพิ่ม army_family / police_family ในหมวด heir:
+events:
+  # ── ช่อง 10 ขวบ · ทบ./ตร. ──
+  # >>> nl-writer b002 evt cadet_police_class_01
+  - id: cadet_police_class_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2542, 2650]
+    at_age: 10
+    when: {sex: [ชาย], school: [primary], region: [กรุงเทพฯ และปริมณฑล, กลาง, ตะวันตก], flags: {not: [cadet_seen10]}}
+    title: "ครูที่ใส่เครื่องแบบ"
+    text: "เทอมนี้มีครูคนใหม่มาสอนสัปดาห์ละคาบ เป็นตำรวจในเครื่องแบบ ยืนหน้าห้องสอนวิธีปฏิเสธเวลามีคนชวนลองของไม่ดี ท้ายคาบครูเปิดให้ถามอะไรก็ได้ ทั้งห้องเงียบไปพักใหญ่ {ชื่อ} ยังนึกไม่ออกว่าจะถามอะไร"
+    choices:
+      # ผล: สมุดเล่มนั้นอยู่ในกระเป๋านักเรียนอีกหลายปี
+      - text: "จดวิธีปฏิเสธลงสมุดทุกข้อ"
+        effects: {knowledge: 1, health: 1}
+        sets_flags: [cadet_seen10]
+        merit: [{cat: sila, level: 1}]
+      # ผล: ตื่นมาอีกทีครูเดินออกจากห้องไปแล้ว เพื่อนข้างโต๊ะยังคุยเรื่องหมวกไม่หยุด
+      - text: "ฟุบหลับท้ายห้อง รอหมดคาบ"
+        effects: {happiness: 1}
+        sets_flags: [cadet_seen10]
+        merit: [{cat: neutral}]
+      # ผล: หมวกใหญ่จนบังตา ทั้งห้องหัวเราะจนครูต้องเคาะโต๊ะ แต่ครูก็หัวเราะด้วย
+      - text: "ขอลองสวมหมวกครูหนึ่งที"
+        effects: {happiness: 1}
+        sets_flags: [cadet_seen10, saw_police]
+        schedules: [{event: cadet_police_whistle_01, after_years: [3, 4]}]
+        merit: [{cat: neutral}]
+      # ผล: ครูหัวเราะ บอกว่าจะเป็นอะไรก็ต้องเรียนให้จบก่อน แล้วหัดวิ่งให้ไหว
+      - text: "ยกมือถามว่าตำรวจต้องเรียนอะไร"
+        effects: {knowledge: 1}
+        sets_flags: [cadet_seen10, saw_police]
+        schedules: [{event: cadet_police_whistle_01, after_years: [3, 4]}]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b002 evt cadet_police_class_01
+
+  # >>> nl-writer b002 evt cadet_police_chain_01
+  - id: cadet_police_chain_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    at_age: 10
+    when: {sex: [ชาย], region: [กรุงเทพฯ และปริมณฑล, กลาง, ตะวันตก], flags: {not: [cadet_seen10]}}
+    title: "สร้อยที่คอหายไป"
+    text: "ท่ารถตอนเย็นคนแน่น {ชื่อ} ยืนเฝ้ากระเป๋าให้ผู้ใหญ่ในบ้านที่ไปต่อแถวซื้อตั๋ว ชายแปลกหน้าเดินสวนมา กระชากสร้อยพระที่คอแล้ววิ่งหายเข้าไปในฝูงคน คอยังแสบอยู่ แต่ไม่มีใครหันมามองเลยสักคน"
+    choices:
+      # ผล: คนขายน้ำอ้อยช่วยวิ่งไล่แต่ไม่ทัน กลับมาปลอบด้วยน้ำอ้อยหนึ่งถุง
+      - text: "ร้องตะโกนให้คนช่วยจับ"
+        effects: {relations: 1}
+        sets_flags: [cadet_seen10]
+        merit: [{cat: neutral}]
+      # ผล: ผู้ใหญ่ในบ้านกลับมาเห็นรอยแดงที่คอ จูงมือไม่ยอมปล่อยไปจนถึงบ้าน
+      - text: "ยืนนิ่ง กำคอตัวเองไว้"
+        effects: {relations: 1}
+        sets_flags: [cadet_seen10]
+        merit: [{cat: neutral}]
+      - text: "วิ่งไล่ตามคนร้ายเอง"
+        hint: "อาจเจ็บตัว"
+        sets_flags: [cadet_seen10]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, text: "ล้มเข่าแตกกลางลานจอดรถ เงยหน้าขึ้นมาคนร้ายก็หายไปแล้ว", effects: {health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนร้ายตกใจทำสร้อยหล่นกลางทาง เด็กข้างทางเก็บมาคืนให้ทั้งที่หอบ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - text: "วิ่งไปป้อมตำรวจหน้าท่ารถ"
+        sets_flags: [cadet_seen10]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 9, text: "ตำรวจวิ่งตามไปทั้งที่ยังถือแก้วกาแฟ กลับมาพร้อมสร้อยเส้นเดิม แล้วห้อยคอคืนให้เอง", effects: {happiness: 1}, sets_flags: [saw_police], merit: [{cat: neutral}]}
+          - {weight: 11, text: "ตำรวจจดชื่อลงสมุดแล้วบอกว่าคงหายาก ตลอดทางกลับบ้านยังเสียดายสร้อยเส้นนั้น", effects: {happiness: -1}, merit: [{cat: neutral}]}
+  # <<< nl-writer b002 evt cadet_police_chain_01
+
+  # >>> nl-writer b002 evt cadet_army_bugle_01
+  - id: cadet_army_bugle_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    at_age: 10
+    when: {sex: [ชาย], region: [ตะวันออก, ใต้], flags: {not: [cadet_seen10]}}
+    title: "แตรหกโมงหน้าค่าย"
+    text: "ปิดเทอมนี้ไปค้างบ้านยายที่อยู่ห่างค่ายทหารแค่ถนนกั้น ทุกเช้าหกโมงเสียงแตรดังข้ามรั้ว ตามด้วยแถวทหารวิ่งร้องเพลงผ่านหน้าบ้าน เสียงรองเท้ากระทบถนนพร้อมกันเหมือนคนคนเดียว เช้านี้ {ชื่อ} ตื่นทันพอดี"
+    choices:
+      # ผล: เสียงเพลงค่อย ๆ ไกลออกไปจนหลับต่อได้
+      - text: "ดึงผ้าห่มคลุมหัว นอนต่อ"
+        effects: {happiness: 1}
+        sets_flags: [cadet_seen10]
+        merit: [{cat: neutral}]
+      # ผล: เช้านี้ขายน้ำได้หมดกระติก ยายแบ่งเหรียญให้ไว้ซื้อขนม
+      - text: "ช่วยยายตั้งแผงขายน้ำหน้าบ้าน"
+        effects: {relations: 1, money: {unit: income_x, amount: 0.2}}
+        sets_flags: [cadet_seen10]
+        merit: [{cat: neutral}]
+      # ผล: ปีนต้นมะม่วงจนได้เต็มตะกร้า ยายเอาไปแบ่งข้างบ้าน
+      - text: "ไปเก็บมะม่วงหลังบ้านยาย"
+        effects: {health: 1}
+        sets_flags: [cadet_seen10]
+        merit: [{cat: neutral}]
+      # ผล: วิ่งได้ครึ่งทางก็หอบ ทหารท้ายแถวหันมาชูนิ้วโป้งให้
+      - text: "วิ่งตามแถวไปจนสุดถนน"
+        effects: {health: 1}
+        sets_flags: [cadet_seen10, saw_army]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b002 evt cadet_army_bugle_01
+
+  # >>> nl-writer b002 evt cadet_army_flood_01
+  - id: cadet_army_flood_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    at_age: 10
+    when: {sex: [ชาย], flags: {not: [cadet_seen10]}}
+    title: "เรือท้องแบนหน้าบ้าน"
+    text: "น้ำท่วมถึงเอว ไฟดับมาสามคืน เรือท้องแบนของทหารแล่นเข้ามาในซอย ทหารหนุ่มคนหนึ่งลุยน้ำไปแบกยายบ้านตรงข้ามขึ้นเรือ ก่อนไปเขาหันมาถามว่า 'บ้านนี้อยู่กันกี่คน'"
+    choices:
+      # ผล: ขนข้าวสารกับหม้อหุงข้าวขึ้นไปทันก่อนน้ำขึ้นอีกคืบ แม่ลูบหัวทีหนึ่ง
+      - text: "ช่วยแม่ขนของขึ้นชั้นบน"
+        requires: {family: [{role: parent, sex: หญิง, alive: true}], reason: "ไม่มีแม่อยู่ด้วยแล้ว"}
+        effects: {relations: 1}
+        sets_flags: [cadet_seen10]
+        merit: [{cat: care_parents, level: 1}]
+      # ผล: ยายหันมาโบกมือจากหัวเรือ บอกว่าน้ำลดแล้วจะทำขนมมาให้
+      - text: "ช่วยส่งถุงของยายขึ้นเรือ"
+        effects: {relations: 1}
+        sets_flags: [cadet_seen10]
+        merit: [{cat: help_others, level: 1}]
+      # ผล: เรือเลี้ยวพ้นหัวซอยไป เสียงเครื่องเรือค่อย ๆ เงียบลง
+      - text: "ยืนดูจนเรือลับตา"
+        effects: {happiness: 1}
+        sets_flags: [cadet_seen10, saw_army]
+        merit: [{cat: neutral}]
+      # ผล: นั่งกอดน้องอยู่ชั้นบน เล่าเรื่องผีให้ฟังจนน้องหลับ ได้ยินแค่เสียงเรือแล่นผ่านไป
+      - text: "กลัวน้ำ หลบอยู่ชั้นบนกับน้อง"
+        effects: {health: 1}
+        sets_flags: [cadet_seen10]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b002 evt cadet_army_flood_01
+
+  # ── อายุ 11–12 · ใบกอง · พี่บ้านข้าง ๆ (SR0) ──
+  # >>> nl-writer b002 evt cadet_senior_home_01
+  - id: cadet_senior_home_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2506, 2650]
+    weight: 0.5
+    when: {age: [11, 12], sex: [ชาย], flags: {not: [knows_senior]}}
+    title: "พี่บ้านข้าง ๆ กลับมาปิดเทอม"
+    text: "ปิดเทอมนี้ลูกชายบ้านข้าง ๆ กลับมาจากกรุงเทพฯ ทั้งซอยรู้กันว่าเขาสอบติดเตรียมทหาร ผมตัดสั้นเกรียน พูดกับผู้ใหญ่ทีไรยืนตัวตรงทุกที ตกเย็นเขาออกวิ่งรอบหมู่บ้าน ผ่านหน้าบ้าน {ชื่อ} ทุกวัน"
+    choices:
+      # ผล: ปิดเทอมหมดไปกับสนามดินหลังวัด ไม่ได้คุยกับพี่เขาสักคำ
+      - text: "ไปเตะบอลกับเพื่อนตามเดิม"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      # ผล: นั่งเฝ้าร้านทุกเย็น เห็นพี่เขาวิ่งผ่านไปมาเหมือนนาฬิกา
+      - text: "ช่วยที่บ้านขายของช่วงปิดเทอม"
+        effects: {relations: 1, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
+      # ผล: วิ่งไม่ถึงครึ่งรอบก็หอบ พี่เขาหันมายิ้มทีหนึ่งแล้ววิ่งต่อ
+      - text: "วิ่งตามหลังพี่เขาไปสักรอบ"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      # ผล: พี่เขาหยุดคุยด้วย ถามว่าเรียนชั้นไหน แล้วบอกว่ามีอะไรสงสัยก็มาถามได้
+      - text: "ทักพี่เขาตอนวิ่งผ่านหน้าบ้าน"
+        effects: {network: 1}
+        sets_flags: [knows_senior]
+        merit: [{cat: neutral}]
+      - text: "ถามพี่ว่าจะไปเป็นทหารอะไร"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "พี่บอกว่าจะเลือกทหารบก เพราะอยากอยู่ใกล้คน เวลาบ้านเมืองมีภัยจะได้ไปช่วย", effects: {knowledge: 1}, sets_flags: [knows_senior, "cadet_lean:army"], merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่บอกว่าอยากเป็นทหารเรือ ตอนนี้ว่ายน้ำทุกเช้าจนผิวคล้ำไปทั้งตัว", effects: {knowledge: 1}, sets_flags: [knows_senior, "cadet_lean:navy"], merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่ชี้ขึ้นฟ้า บอกว่าอยากเป็นทหารอากาศ แต่ต้องรอดูว่าสายตาผ่านไหม", effects: {knowledge: 1}, sets_flags: [knows_senior, "cadet_lean:airforce"], merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่บอกว่าจะไปเป็นตำรวจ เรียนรวมกับเพื่อนทหารก่อน แล้วค่อยแยกทาง", effects: {knowledge: 1}, sets_flags: [knows_senior, "cadet_lean:police"], merit: [{cat: neutral}]}
+  # <<< nl-writer b002 evt cadet_senior_home_01
+
+  # ── ช่อง 12 ขวบ · ทร./ทอ. ──
+  # >>> nl-writer b002 evt cadet_navy_storm_01
+  - id: cadet_navy_storm_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    at_age: 12
+    when: {sex: [ชาย], region: [ใต้, ตะวันออก], flags: {not: [cadet_seen12]}}
+    title: "เรือสีเทาเข้าอ่าว"
+    text: "พายุเข้าฝั่งสามวันติด เรือประมงของคนในหมู่บ้านหายไปสองลำ เช้าวันที่สี่ เรือสีเทาลำใหญ่ของทหารเรือแล่นเข้ามาในอ่าว ลากเรือที่หายไปกลับมาทั้งสองลำ ทั้งหมู่บ้านวิ่งลงไปที่ชายหาด"
+    choices:
+      # ผล: แบกน้ำจนแขนล้า ลุงเจ้าของเรือที่รอดมายกขวดดื่มรวดเดียวแล้วยิ้มขอบใจ
+      - text: "ช่วยผู้ใหญ่ขนน้ำขนข้าวไปให้"
+        effects: {relations: 1, health: -1}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: help_others, level: 1}]
+      # ผล: ได้ยินเสียงคนทั้งหมู่บ้านโห่ร้องมาจากชายหาด น้องหลับไปในตักก่อนเสียงจะเงียบ
+      - text: "กลัวทะเล อยู่บ้านดูน้อง"
+        effects: {relations: 1}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+      # ผล: เก็บกระเบื้องกับกิ่งไม้จนลานบ้านโล่ง แม่บอกว่าวันนี้แรงดีกว่าผู้ใหญ่บางคน
+      - text: "ไปช่วยแม่เก็บของที่พายุพัดพัง"
+        requires: {family: [{role: parent, sex: หญิง, alive: true}], reason: "ไม่มีแม่อยู่ด้วยแล้ว"}
+        effects: {health: 1}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: care_parents, level: 1}]
+      # ผล: ทรายร้อนจนต้องยืนเขย่งเท้า รอจนเรือเข้าฝั่งครบทุกลำ
+      - text: "วิ่งลงไปรอที่ชายหาด"
+        effects: {happiness: 1}
+        sets_flags: [cadet_seen12, saw_navy]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b002 evt cadet_navy_storm_01
+
+  # >>> nl-writer b002 evt cadet_airforce_haze_01
+  - id: cadet_airforce_haze_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2558, 2650]
+    at_age: 12
+    when: {sex: [ชาย], region: [เหนือ], flags: {not: [cadet_seen12]}}
+    title: "ละอองน้ำเหนือดอย"
+    text: "ควันไฟป่าคลุมดอยมาครึ่งเดือน ฟ้าเป็นสีส้มทั้งวัน บ่ายวันหนึ่งเครื่องบินลำเลียงสีเทาของทหารอากาศบินต่ำผ่านหมู่บ้าน ปล่อยละอองน้ำเป็นสายยาวลงบนสันเขา เด็กทั้งโรงเรียนวิ่งออกไปยืนดูกลางสนาม"
+    choices:
+      # ผล: น้อง ป.1 ใส่หน้ากากกลับด้าน ต้องช่วยใส่ใหม่ทีละคน
+      - text: "ช่วยครูแจกหน้ากากให้รุ่นน้อง"
+        effects: {relations: 1}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: help_others, level: 1}]
+      # ผล: ได้ยินแค่เสียงเครื่องยนต์ผ่านไป ห้องอับแต่หายใจสบายกว่าข้างนอก
+      - text: "ปิดหน้าต่าง นั่งอยู่ในห้อง"
+        effects: {health: 1}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+      # ผล: เครื่องบินกระดกปีกทีหนึ่ง ทั้งสนามกรี๊ดว่าเขาโบกตอบ แล้วไอกันทั้งแถว
+      - text: "วิ่งไปโบกมือกลางสนามกับเพื่อน"
+        effects: {happiness: 1, health: -1}
+        sets_flags: [cadet_seen12, saw_airforce]
+        merit: [{cat: neutral}]
+      # ผล: วนกลับมาสี่รอบก่อนค่ำ จดไว้หลังสมุดพร้อมรูปวาดปีก
+      - text: "นับว่าเครื่องบินวนกลับมากี่รอบ"
+        effects: {knowledge: 1}
+        sets_flags: [cadet_seen12, saw_airforce]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b002 evt cadet_airforce_haze_01
+
+  # >>> nl-writer b002 evt cadet_navy_trip_01
+  - id: cadet_navy_trip_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    at_age: 12
+    when: {sex: [ชาย], school: [primary, lower], region: [กรุงเทพฯ และปริมณฑล, กลาง, ตะวันตก], flags: {not: [cadet_seen12]}}
+    title: "รถบัสไปทะเล"
+    text: "ทัศนศึกษาปลายปี รถบัสของโรงเรียนออกตั้งแต่ตีสี่ ถึงทะเลตอนสาย ครูพาแวะบ่อเลี้ยงลูกเต่าในเขตทหารเรือ พี่ทหารเรือยืนเล่าว่าเต่ากว่าจะโตต้องรอดอะไรมาบ้าง ไกลออกไปกลางอ่าวมีเรือสีเทาลำใหญ่จอดนิ่งอยู่"
+    choices:
+      # ผล: ทั้งห้องตัวเปียกขึ้นรถบัส ครูบ่นทั้งทางแต่ก็หัวเราะตาม
+      - text: "วิ่งลงทะเลกับเพื่อนทั้งห้อง"
+        effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: -0.2}}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+      # ผล: ลูกเต่าดิ้นในมือแล้วว่ายหายไปในบ่อ พี่ทหารเรือบอกว่าอีกยี่สิบปีอาจกลับมาวางไข่ที่หาดนี้
+      - text: "ขออุ้มลูกเต่าปล่อยลงบ่อ"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+      # ผล: เพื่อนกลับมาเล่าเรื่องเต่าให้ฟังทั้งอาทิตย์ แต่ที่บ้านมีเงินเหลือซื้อกับข้าวอีกหลายมื้อ
+      - text: "ไม่ไป เก็บค่ารถไว้ให้ที่บ้าน"
+        effects: {relations: 1}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+      # ผล: พี่ทหารบอกว่าเพิ่งกลับจากออกทะเลเป็นเดือน ฟังแล้วก็นึกถึงบ้านแทนเขา
+      - text: "ถามพี่ทหารว่าเรือลำนั้นไปไหน"
+        effects: {knowledge: 1, money: {unit: income_x, amount: -0.2}}
+        sets_flags: [cadet_seen12, saw_navy]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b002 evt cadet_navy_trip_01
+
+  # >>> nl-writer b002 evt cadet_airforce_toy_01
+  - id: cadet_airforce_toy_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2557]
+    at_age: 12
+    when: {sex: [ชาย], flags: {not: [cadet_seen12]}}
+    title: "เครื่องบินไม้ของน้า"
+    text: "สงกรานต์ปีนี้ น้าที่เป็นช่างเครื่องบินอยู่กองบินต่างจังหวัดกลับมาบ้าน ใส่ชุดทหารอากาศเดินเข้าซอย ในมือถือโมเดลเครื่องบินไม้มาฝาก {ชื่อ} หนึ่งลำ น้าเล่าว่าที่กองบินคนขับมีไม่กี่คน แต่คนที่ทำให้เครื่องขึ้นได้มีเป็นร้อย"
+    choices:
+      # ผล: รถของเล่นที่พังมาสามเดือนกลับมาวิ่งได้ น้าบอกว่ามือแบบนี้ไปทางช่างอะไรก็ได้
+      - text: "ขอให้น้าสอนซ่อมของเล่นที่พัง"
+        effects: {knowledge: 1, relations: 1}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+      # ผล: เครื่องบินไม้ถูกโยนกันทั้งบ่ายจนปีกบิ่น แต่ทั้งซอยหัวเราะกันจนค่ำ
+      - text: "เอาไปเล่นกับเพื่อนในซอย"
+        effects: {happiness: 1, relations: 1}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+      - text: "ขอให้น้าพาไปดูโรงเก็บเครื่องบิน"
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ยามหน้าประตูยอมให้เดินดูแค่ลานจอด เสียงเครื่องยนต์ดังจนต้องปิดหู", effects: {happiness: 1}, sets_flags: [saw_airforce], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยามหน้าประตูไม่ให้เข้า น้าเลยพาไปกินก๋วยเตี๋ยวหน้ากองบินแทน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+      # ผล: น้าบอกว่ามีหลายทาง ต้องเรียนเลขกับภาษาให้ดีก่อน แล้วชวนคุยเรื่องอื่นต่อ
+      - text: "ถามว่าคนขับเครื่องบินเรียนที่ไหน"
+        effects: {knowledge: 1}
+        sets_flags: [cadet_seen12, saw_airforce]
+        merit: [{cat: neutral}]
+      # ผล: เครื่องบินไม้ลำนั้นตั้งอยู่บนตู้ เป็นของฝากจากน้าอีกชิ้นหนึ่ง
+      - text: "ไหว้ขอบคุณน้า แล้ววางไว้บนตู้"
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b002 evt cadet_airforce_toy_01
+
+  # >>> nl-writer b002 evt cadet_airforce_toy_02
+  - id: cadet_airforce_toy_02
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2558, 2650]
+    at_age: 12
+    when: {sex: [ชาย], flags: {not: [cadet_seen12]}}
+    title: "เครื่องบินไม้ของน้า"
+    text: "สงกรานต์ปีนี้ น้าที่เป็นช่างเครื่องบินอยู่กองบินต่างจังหวัดกลับมาบ้าน ใส่ชุดทหารอากาศเดินเข้าซอย ในมือถือโมเดลเครื่องบินไม้มาฝาก {ชื่อ} หนึ่งลำ น้าเล่าว่าที่กองบินคนขับมีไม่กี่คน แต่คนที่ทำให้เครื่องขึ้นได้มีเป็นร้อย"
+    choices:
+      - text: "ขอให้น้าสอนซ่อมของเล่นที่พัง"
+        effects: {knowledge: 1, relations: 1}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+      - text: "เอาไปเล่นกับเพื่อนในซอย"
+        effects: {happiness: 1, relations: 1}
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+      - text: "ขอให้น้าพาไปดูโรงเก็บเครื่องบิน"
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, text: "ยามหน้าประตูยอมให้เดินดูแค่ลานจอด เสียงเครื่องยนต์ดังจนต้องปิดหู", effects: {happiness: 1}, sets_flags: [saw_airforce], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยามหน้าประตูไม่ให้เข้า น้าเลยพาไปกินก๋วยเตี๋ยวหน้ากองบินแทน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+      - text: "ถามว่าคนขับเครื่องบินเรียนที่ไหน"
+        effects: {knowledge: 1}
+        sets_flags: [cadet_seen12, saw_airforce]
+        merit: [{cat: neutral}]
+      - text: "ไหว้ขอบคุณน้า แล้ววางไว้บนตู้"
+        sets_flags: [cadet_seen12]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b002 evt cadet_airforce_toy_02
+
+  # ── อายุ 13–14 · นัดจาก cadet_police_class_01 (ตร4) ──
+  # >>> nl-writer b002 evt cadet_police_whistle_01
+  - id: cadet_police_whistle_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2545, 2650]
+    when: {sex: [ชาย], school: [lower, upper, voc]}
+    title: "นกหวีดหน้าประตูโรงเรียน"
+    text: "เช้าวันเปิดเทอม ตำรวจจราจรที่ยืนเป่านกหวีดหน้าประตูโรงเรียนใหม่ คือครูตำรวจที่เคยมาสอนตอนประถม ผมหงอกขึ้นเยอะ แต่ท่าโบกมือยังเหมือนเดิม รถติดยาวจนเขาไม่มีเวลาหันมามองใคร"
+    choices:
+      # ผล: เขาหันมาเพ่งหน้าอยู่นาน แล้วยิ้มกว้าง บอกว่าโตจนจำแทบไม่ได้
+      - text: "ยกมือไหว้ เรียกว่าครู"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      # ผล: ครูเป่านกหวีดหยุดรถให้ แล้วยกนิ้วโป้งมาทางนี้
+      - text: "ช่วยจูงน้องตัวเล็กข้ามถนน"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      # ผล: เสียงนกหวีดดังตามหลังไปจนถึงหน้าห้องเรียน
+      - text: "เดินผ่านไปเงียบ ๆ"
+        merit: [{cat: neutral}]
+      # ผล: เขาบอกว่าตัวเองไม่ได้เรียนทางนั้น แต่รุ่นน้องที่ติดวิ่งทุกเช้าไม่เคยขาด
+      - text: "ถามเรื่องสอบนายร้อยตำรวจ"
+        requires: {flags: {has: [cadet_dream]}, reason: "ยังไม่ได้ตั้งเป้าสอบเตรียมทหาร"}
+        effects: {knowledge: 1}
+        sets_flags: [cadet_tips]
+        merit: [{cat: neutral}]
+  # <<< nl-writer b002 evt cadet_police_whistle_01

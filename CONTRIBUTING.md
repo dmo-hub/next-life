@@ -12,6 +12,7 @@
 
 ## อ่านก่อนเริ่ม
 
+- `.claude/skills/next-life-contributor/SKILL.md` — ขั้นตอนส่งงานสำหรับคนที่ใช้ AI ช่วยทำ `CLAUDE.md` สั่งให้ Claude Code อ่านไฟล์นี้เอง
 - `GDD.md` — เอกสารออกแบบเกม (กติกาแต่ละระบบอยู่หน้า `docs/about.html` · `worlds.html` · `otherworld.html`)
 - `design/<เรื่อง>/decisions.md` — ข้อที่เจ้าของเคาะแล้ว ห้ามทำขัด
 - `design/<เรื่อง>/MAP.md` — ใบงานในเรื่องนั้นและลำดับ
