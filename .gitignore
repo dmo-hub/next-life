@@ -4,4 +4,7 @@ node_modules/
 !.claude/skills/
 .claude/skills/*
 !.claude/skills/next-life-contributor/
+!.claude/skills/frontend-design/
+!.claude/skills/theme-factory/
+!.claude/skills/tweaks/
 .vscode/
