@@ -15,7 +15,7 @@
 //   (10) สายนักล่า (ใบ 19): ขั้น 3 เข้าสายผ่านการ์ดรับสมัคร ชื่องานเป็นขั้นนักล่า เลื่อนขั้นได้ · ขั้น 0–1 เข้าสาย 0 · ปฏิเสธการ์ดแล้วทำงานบริการไม่ถูกจับเข้าสาย
 //   (11) ดันเจียนไทย (ใบ 21): ขั้น 3 รอบละ 2–3 ใบ · คนถูกดึงตายในดันเจียน 0 · นักล่าตายด้วย accident/assault · ค่าซ้อนไม่ขยับ · ขั้น 0–1 ไม่เจอ
 //        โรคที่ถึงคิวกลางรอบตายท้ายรอบ 0 ตัดกลางทาง (ชุดบังคับสุขภาพ 0 ก่อนใบเข้า) · ห้องบอสทางไม่ตายลงโรค ไม่ใช่บาดแผล
-import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, overlapStageOf, overlapPlan, PATHS, ENTRY } from '../src/engine/index.mjs';
+import { playLife, playAfterlife, nextLife, newLife, mixSeed, overlapOf, overlapStageOf, overlapPlan, PATHS, ENTRY, ISEKAI_EVENTS } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
 
@@ -28,6 +28,11 @@ const n = opt('n', 200);
 const gens = opt('gens', 4);
 const seed = opt('seed', 1);
 const content = loadContent();
+// การ์ดต่างโลกที่ติด overlap_stage ทุกใบต้องออก > 0 ครั้งในชาติขั้น ≥ 1 — ด่าน isekai ข้ามการ์ดพวกนี้แล้วให้ด่านนี้ตัดสินแทน
+// OVERLAP_ISK_CTL=1 ตัวควบคุม: ตั้งขั้นของการ์ดพวกนี้เกินขั้นสูงสุด ⇒ ไม่มีใบไหนออก ด่านต้องตก
+const ISK_STAGED = ISEKAI_EVENTS.filter((e) => e.overlap_stage);
+if (process.env.OVERLAP_ISK_CTL === '1') for (const e of ISK_STAGED) e.overlap_stage = [9, 9];
+const ISK_STAGED_IDS = new Set(ISK_STAGED.map((e) => e.id));
 const RUMOR = 'overlap_rumor_';
 const rumorsOf = (state) => Object.entries(state.fired ?? {}).reduce((s, [id, f]) => s + (id.startsWith(RUMOR) ? f.n : 0), 0);
 // (8) ตารางนัดการ์ดซ้อนทับ (ใบ 14): โควตาต่อชีวิตตามขั้นเขียนจากสเปก (decisions 34 · 41) ไม่อ่านค่าคงที่ของ engine
@@ -53,6 +58,7 @@ const watchIsekai = (r) => {
       r.iskCard++;
       if (got < 1) r.iskCardBad++;
     }
+    if (got >= 1 && ISK_STAGED_IDS.has(card.id)) r.iskById[card.id] = (r.iskById[card.id] ?? 0) + 1;
   };
 };
 
@@ -91,7 +97,7 @@ const fail = (msg) => fails.push(msg);
 let resetChecked = 0;
 for (const [name, base] of Object.entries(BOTS)) {
   for (const [mode, bot] of [['ข้าม', crosser(base)], ['ไม่ข้าม', stayer(base)]]) {
-    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, rumor: 0, bad: 0, drop: 0, families: 0, top: 0, iskLives: 0, iskStage: {}, iskBad: 0, iskCard: 0, iskCardBad: 0, plan: {}, planBad: 0, replan: 0, replanDiff: 0, replanSame: 0, replanSameDiff: 0, replanShow: '' };
+    const r = { name, mode, byGen: Array.from({ length: gens }, () => []), born: 0, trip: 0, lost: 0, reTrip: 0, reBorn: 0, chain: 0, rumor: 0, bad: 0, drop: 0, families: 0, top: 0, iskLives: 0, iskStage: {}, iskBad: 0, iskCard: 0, iskCardBad: 0, iskById: {}, plan: {}, planBad: 0, replan: 0, replanDiff: 0, replanSame: 0, replanSameDiff: 0, replanShow: '' };
     rows.push(r);
     const watch = watchIsekai(r);
     for (let i = 0; i < n; i++) {
@@ -199,6 +205,10 @@ const iskStage = {};
 for (const r of cross) for (const [k, v] of Object.entries(r.iskStage)) iskStage[k] = (iskStage[k] ?? 0) + v;
 if (!iskStage[1]) fail('ไม่มีชาติต่างโลกที่เห็นขั้น ≥ 1 — ตัววัดขั้นฝั่งต่างโลกไม่ได้วัดอะไร');
 if (!sum('iskCard')) fail(`ฝั่งข้ามโลกไม่มีการ์ด ${ISK_CARD}* ออกเลย`);
+const iskById = (id) => cross.reduce((s, r) => s + (r.iskById[id] ?? 0), 0);
+const iskMiss = ISK_STAGED.filter((e) => !iskById(e.id));
+if (!ISK_STAGED.length) fail('ไม่มีการ์ดต่างโลกติด overlap_stage ในกอง — ด่านรายใบไม่ได้วัดอะไร');
+if (iskMiss.length) fail(`การ์ดต่างโลกขั้นซ้อนทับที่ไม่มีชาติขั้น ≥ 1 ได้เห็น: ${iskMiss.map((e) => e.id).join(' · ')}`);
 
 // (8) ต่อขั้นจากชีวิตจริง + ตารางก่อน/หลังทริป
 const planBy = {};
@@ -281,7 +291,7 @@ console.log(`\nตัวควบคุมไม่ข้ามโลก: ${rows
 console.log(`เริ่มตระกูลใหม่ตรวจ ${resetChecked} ครั้ง`);
 console.log(`การ์ดข่าวลือ (${RUMOR}*): ข้าม ${sum('rumor')} ครั้ง · ไม่ข้าม ${rows.filter((r) => r.mode === 'ไม่ข้าม').reduce((s, r) => s + r.rumor, 0)} ครั้ง`);
 console.log(`ขั้นที่ชาติต่างโลกเห็น (ฝั่งข้ามโลก ${sum('iskLives')} ชาติ): ${Object.keys(iskStage).sort().map((k) => `ขั้น ${k} = ${iskStage[k]}`).join(' · ')} · ไม่ตรงขั้นตระกูลตอนข้าม ${rows.reduce((s, r) => s + r.iskBad, 0)}`);
-console.log(`การ์ดต่างโลก (${ISK_CARD}*): ข้าม ${sum('iskCard')} ครั้ง · ออกในชาติขั้น 0 ${rows.reduce((s, r) => s + r.iskCardBad, 0)} · ไม่ข้าม ${rows.filter((r) => r.mode === 'ไม่ข้าม').reduce((s, r) => s + r.iskCard, 0)}`);
+console.log(`การ์ดต่างโลก (${ISK_CARD}*): ข้าม ${sum('iskCard')} ครั้ง · ออกในชาติขั้น 0 ${rows.reduce((s, r) => s + r.iskCardBad, 0)} · ไม่ข้าม ${rows.filter((r) => r.mode === 'ไม่ข้าม').reduce((s, r) => s + r.iskCard, 0)} · รายใบขั้น ≥ 1 ${ISK_STAGED.map((e) => `${e.id} ${iskById(e.id)}`).join(' · ')}`);
 console.log(`\nตารางนัดการ์ดซ้อนทับ (${PLAN_PREFIX}*) ต่อชีวิตตามขั้นตอนเกิด (ทุกบอท ทั้งสองแบบ):`);
 for (const k of Object.keys(planBy).sort()) {
   const p = planBy[k];

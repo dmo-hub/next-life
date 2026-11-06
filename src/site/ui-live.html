@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ปรับหน้าเล่นสด (tweak) · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Pridi:wght@400;600&family=Sarabun:wght@400;600;700&family=Srisakdi:wght@700&display=swap">
+<link rel="stylesheet" href="../fonts/fonts.css">
 <style>
   /* หน้า tweak (ui-redo 02) — ไฟล์เดียว ไม่พึ่ง proto.js/ภาพ ⇒ เปิด file:// ได้ · จอต้นแบบวาดใหม่ทุกครั้งที่ค่าเปลี่ยน */
   body { margin: 0; background: #E6E0D3; color: #1F2430; font: 15px/1.55 Sarabun, "Noto Sans Thai", system-ui, sans-serif; }
@@ -367,6 +366,7 @@
     skill: '<path d="m12 3 2.2 5.6L20 9.5l-4.5 3.8L17 19l-5-3.1L7 19l1.5-5.7L4 9.5l5.8-.9z"/>',
     job: '<path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/>',
     speed: '<path d="M4 18a8 8 0 1 1 16 0"/><path d="m12 18 4-6"/>',
+    focus: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.8"/>',
     past: '<path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/><path d="M12 8v4l3 2"/>',
     pet: '<circle cx="6.5" cy="10" r="1.8"/><circle cx="10" cy="6.5" r="1.8"/><circle cx="14" cy="6.5" r="1.8"/><circle cx="17.5" cy="10" r="1.8"/><path d="M8 17.5c0-3 1.8-5.5 4-5.5s4 2.5 4 5.5c0 1.6-1.8 2-4 2s-4-.4-4-2z"/>',
     menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
@@ -486,11 +486,11 @@
     ] },
   };
   const MENUS = {
-    thai: { 5: [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['money', 'เงิน', 'money'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['life', 'ชีวิต', 'life'], ['family', 'ครอบครัว', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['money', 'เงิน', 'money'], ['shelf', 'สมุด', 'shelf']] },
+    thai: { 5: [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['life', 'ชีวิต', 'life'], ['family', 'ครอบครัว', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['me', 'ตัวฉัน', 'me'], ['family', 'ครอบครัว', 'family'], ['money', 'เงิน', 'money'], ['shelf', 'สมุด', 'shelf']] },
     isekai: { 5: [['me', 'ตัวฉัน', 'me'], ['skill', 'สกิล', 'skill'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['life', 'ชีวิต', 'life'], ['skill', 'สกิล', 'skill'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf']], '4more': [['me', 'ตัวฉัน', 'me'], ['skill', 'สกิล', 'skill'], ['job', 'อาชีพ', 'job'], ['speed', 'ความเร็ว', 'speed'], ['shelf', 'สมุด', 'shelf']] },
-    after: { 5: [['past', 'ชีวิตที่แล้ว', 'past'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['past', 'ชีวิตที่แล้ว', 'past'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['past', 'ชีวิตที่แล้ว', 'past'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf']] },
+    after: { 5: [['past', 'ชีวิตที่แล้ว', 'past'], ['focus', 'โฟกัส', 'focus'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], 4: [['past', 'ชีวิตที่แล้ว', 'past'], ['shelf', 'สมุด', 'shelf'], ['more', 'เพิ่มเติม', 'more']], '4more': [['past', 'ชีวิตที่แล้ว', 'past'], ['family', 'ตระกูล', 'family'], ['shelf', 'สมุด', 'shelf']] },
   };
-  const PANEL_T = { me: 'ตัวฉัน', life: 'ชีวิต', family: 'ครอบครัว', money: 'เงิน', shelf: 'สมุด', more: 'เพิ่มเติม', skill: 'สกิล', job: 'อาชีพ', speed: 'ความเร็ว', past: 'ชีวิตที่แล้ว' };
+  const PANEL_T = { me: 'ตัวฉัน', life: 'ชีวิต', family: 'ครอบครัว', money: 'เงิน', shelf: 'สมุด', more: 'เพิ่มเติม', skill: 'สกิล', job: 'อาชีพ', speed: 'ความเร็ว', past: 'ชีวิตที่แล้ว', focus: 'โฟกัส' };
   const PEOPLE = [['พ', 'สมชาย ศรีสุข', 'พ่อ · 58 ปี', 70], ['ม', 'บุญมี ศรีสุข', 'แม่ · 55 ปี · ป่วย', 85], ['ต', 'ต้น', 'แฟน · 29 ปี', 62], ['ก', 'กานต์', 'น้องชาย · 22 ปี', 40]];
   const PETROW = `<li><span class="av">${ic('pet')}</span><span class="nm">ขนุน<small>แมวส้ม · 4 ปี</small></span><span class="br"><i style="width:90%"></i></span></li>`;
 
@@ -790,6 +790,7 @@
     }
     if (id === 'skill' && cfg.iSkill === 'carry') return `<p class="kk">พกข้ามชาติได้ 3 สกิล · ชาติใหม่เริ่มขั้น 1 แล้วโตเร็วจนถึงขั้นในสมุด</p><div class="carry"><span class="f">${ic('skill')}ลูกไฟ<small>ในสมุด ขั้น 3<br>ตอนนี้ ขั้น 1</small></span><span class="f">${ic('skill')}โล่น้ำแข็ง<small>ในสมุด ขั้น 2<br>ตอนนี้ ขั้น 2</small></span><span>ว่าง</span></div><div class="follow"><h4>ตามไปชาติหน้า</h4><ul><li>ลูกไฟ · โล่น้ำแข็ง (ขั้นในสมุดจำไว้)</li><li>ชื่อในตำนานของโลกนี้</li></ul><h4>ไม่ตามไป</h4><ul><li class="no">เดินเงา (ไม่ได้พก)</li><li class="no">ทองในกระเป๋า</li><li class="no">อาชีพนักผจญภัยกับระดับกิลด์</li></ul></div>`;
     if (id === 'more') return `<ul class="lst">${cfg.pet === 'more' ? `<li>${ic('pet')} สัตว์เลี้ยง<em>ขนุน · แมวส้ม</em></li>` : ''}${cfg.menu === '4more' ? `<li>${ic('money')} เงิน<em>฿184,000</em></li>` : ''}<li>${ic('shelf')} บันทึก/โหลดเกม</li><li>${ic('menu')} ตั้งค่า</li></ul>`;
+    if (id === 'focus') return `<p class="kk">ชาติที่แล้วทุ่มเทมากสุด</p><ul class="lst"><li>${ic('focus')} งาน<em>ดูอย่างเดียว</em></li></ul>`;
     if (id === 'past') return `<ul class="tl"><li>นิดา ศรีสุข<small>ตาย 74 ปี · ครูประถม · ขอนแก่น</small></li><li>ประยูร ทองดี<small>ตาย 81 ปี · ชาวนา</small></li></ul>`;
     if (id === 'skill') return `<ul class="lst"><li>${ic('skill')} ลูกไฟ<em>ระดับ 3</em></li><li>${ic('skill')} โล่น้ำแข็ง<em>ระดับ 1</em></li></ul>`;
     if (id === 'speed') return `<ul class="lst"><li>ปีละการ์ด<em>ปกติ</em></li><li>ข้ามปีเงียบ<em>เร็ว</em></li></ul>`;
@@ -1026,9 +1027,9 @@
   ];
   // [หัวข้อ, key ใน cfg, ฉากที่ไปดู, [ค่า, ข้อความ] ของ A B C]
   const QS = [
-    ['ชุดปุ่มเมนูล่าง (ชาติไทย)', 'menu', 'year', [['5', 'ตัวฉัน · ครอบครัว · เงิน · สมุด · เพิ่มเติม'], ['4', 'ชีวิต (รวมเงิน) · ครอบครัว · สมุด · เพิ่มเติม'], ['4more', 'ตัวฉัน · ครอบครัว · เงิน · สมุด + ปุ่ม ⋯ บนแถบสถานะ']]],
+    ['ชุดปุ่มเมนูล่าง (ชาติไทย)', 'menu', 'year', [['5', 'ตัวฉัน (รวมเงิน) · ครอบครัว · สมุด · เพิ่มเติม'], ['4', 'ชีวิต (รวมเงิน) · ครอบครัว · สมุด · เพิ่มเติม'], ['4more', 'ตัวฉัน · ครอบครัว · เงิน · สมุด + ปุ่ม ⋯ บนแถบสถานะ']]],
     ['เมนูต่างโลก', 'menu', 'isekai', [['5', 'ตัวฉัน (รวมอาชีพ) · สกิล · ความเร็ว · สมุด · เพิ่มเติม'], ['4', 'ชีวิต · สกิล · ความเร็ว · สมุด'], ['4more', 'ตัวฉัน · สกิล · อาชีพ · ความเร็ว · สมุด']]],
-    ['เมนูปรโลก', 'menu', 'after', [['5', 'ชีวิตที่แล้ว · ตระกูล · สมุด · เพิ่มเติม'], ['4', 'ชีวิตที่แล้ว · สมุด · เพิ่มเติม'], ['4more', 'ชีวิตที่แล้ว · ตระกูล · สมุด']]],
+    ['เมนูปรโลก', 'menu', 'after', [['5', 'ชีวิตที่แล้ว · โฟกัส · ตระกูล · สมุด · เพิ่มเติม'], ['4', 'ชีวิตที่แล้ว · สมุด · เพิ่มเติม'], ['4more', 'ชีวิตที่แล้ว · ตระกูล · สมุด']]],
     ['แท็บการ์ดตาย', 'dPre', 'death', [['a', DSETS.a.join(' · ')], ['b', DSETS.b.join(' · ')], ['c', DSETS.c.join(' · ')]]],
     ['สัตว์เลี้ยง', 'pet', 'me', [['family', 'ท้ายแผงครอบครัว'], ['family', 'ท้ายแผงครอบครัว'], ['none', 'ยังไม่ทำแผง คงบรรทัดในการ์ดตาย']]],
     ['หน้าเปิดเกม', 'home', 'home', [['old', 'เปลี่ยนแค่สี/ตัวอักษร ในชิ้นโครง + เมนู'], ['world', 'รื้อด้วย ในชิ้นโครง + เมนู (ในจอสด = เลือกโลกเป็นการ์ด)'], ['old', 'คงเดิม รื้อเป็นชิ้นแยกท้ายคิว']]],

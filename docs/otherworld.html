@@ -6,71 +6,87 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ต่างโลก · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
 <meta name="description" content="ต่างโลกในเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด: เข้าทางไหน เกิดเป็นอะไร ค่าสถานะ กิลด์ บุญบาปต่างโลก และกลับโลกเดิมได้อะไร พร้อมบอกว่าอะไรเล่นได้แล้วและอะไรกำลังทำ">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pridi:wght@400;600&family=Sarabun:wght@400;600&family=Srisakdi:wght@700&display=swap">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; background: #E6E0D3; color: #1F2430; font-family: Sarabun, sans-serif; line-height: 1.7; }
-  header { background: #17110D; color: #EFE3C2; padding: 36px 16px 30px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.7; }
+  header { background: var(--lacquer); color: var(--headink); padding: 36px 16px 30px; }
   .w { max-width: 760px; margin: 0 auto; }
-  h1 { font-family: Srisakdi, serif; color: #F0D78C; font-size: clamp(30px, 6vw, 44px); margin: 0 0 8px; line-height: 1.25; }
-  header p { margin: 0; color: #E3D6B5; }
-  header a { color: #F0D78C; }
+  h1 { font-family: Srisakdi, serif; color: var(--headink); font-size: clamp(30px, 6vw, 44px); margin: 0 0 8px; line-height: 1.25; }
+  header p { margin: 0; color: var(--on-head); }
+  header a { color: var(--headink); }
   main { padding: 24px 16px 64px; }
-  h2 { font-family: Pridi, serif; font-size: 22px; margin: 30px 0 8px; }
+  h2 { font-family: var(--fh); font-size: 22px; margin: 30px 0 8px; }
   h3 { font-size: 17px; margin: 18px 0 4px; }
-  .lead { margin: 0 0 8px; color: #3A3F4B; }
+  .lead { margin: 0 0 8px; color: var(--muted); }
   ul { padding-left: 22px; margin: 0 0 12px; }
   li { margin: 0 0 6px; }
   .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; }
-  .now { color: #2F6B66; } .soon { color: #5B4A8A; } .canon { color: #A23B2C; }
-  .box { background: #F4EFE3; border: 1px solid #C9BFA9; padding: 14px 18px; margin: 0 0 16px; }
+  .now { color: var(--good); } .soon { color: var(--muted); } .canon { color: var(--accent2); }
+  .box { background: var(--surface); border: 1px solid var(--line); padding: 14px 18px; margin: 0 0 16px; }
   .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
   .two .box { margin: 0; }
-  .two b { font-family: Pridi, serif; }
+  .two b { font-family: var(--fh); }
   figure { margin: 0 0 16px; }
-  figure img { display: block; width: 100%; max-width: 390px; height: auto; border: 1px solid #5A4630; }
-  figcaption { font-size: 13px; color: #4A4F5C; }
+  figure img { display: block; width: 100%; max-width: 390px; height: auto; border: 1px solid var(--bronze); }
+  figcaption { font-size: 13px; color: var(--muted); }
   .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-  a.play { display: inline-block; margin: 8px 0; padding: 10px 22px; min-height: 44px; background: #17110D; color: #F0D78C; font-family: Pridi, serif; font-size: 18px; text-decoration: none; border: 2px solid #5A4630; }
-  a.play:hover, a.play:focus-visible { border-color: #D9B45A; outline: none; }
-  footer { font-size: 13px; color: #4A4F5C; margin-top: 32px; }
-  a { color: #A23B2C; }
+  a.play { display: inline-block; margin: 8px 0; padding: 10px 22px; min-height: 44px; background: var(--lacquer); color: var(--headink); font-family: var(--fh); font-size: 18px; text-decoration: none; border: 2px solid var(--bronze); }
+  a.play:hover, a.play:focus-visible { border-color: var(--gold); outline: none; }
+  footer { font-size: 13px; color: var(--muted); margin-top: 32px; }
+  a { color: var(--accent2); }
   /* กติกาทีละระบบ (ย้ายจากหน้า GDD เดิม) */
-  .rules section { background: #F4EFE3; color: #1F2430; border: 1px solid #C9BFA9; padding: 16px 20px; margin: 0 0 16px; text-align: left; }
-  .rules section.dark { background: #17110D; color: #EFE3C2; border-color: #5A4630; }
-  .rules section.dark a { color: #F0D78C; }
-  .rules h2 { font-family: Pridi, serif; font-size: 22px; margin: 0 0 8px; }
-  .rules h3 { font-family: Pridi, serif; font-size: 17px; margin: 16px 0 4px; }
+  .rules section { background: var(--surface); color: var(--ink); border: 1px solid var(--line); padding: 16px 20px; margin: 0 0 16px; text-align: left; }
+  .rules section.dark { background: var(--lacquer); color: var(--headink); border-color: var(--bronze); }
+  .rules section.dark a { color: var(--headink); }
+  .rules h2 { font-family: var(--fh); font-size: 22px; margin: 0 0 8px; }
+  .rules h3 { font-family: var(--fh); font-size: 17px; margin: 16px 0 4px; }
   .rules ul, .rules ol { padding-left: 22px; margin: 0 0 8px; }
   .rules li { margin: 0 0 6px; }
   .rules p { margin: 0 0 8px; }
-  .rules .note { font-size: 14px; color: #4A4F5C; }
-  .rules section.dark .note { color: #CFC3A6; }
+  .rules .note { font-size: 14px; color: var(--muted); }
+  .rules section.dark .note { color: var(--on-head3); }
   .rules .tbl { overflow-x: auto; margin: 6px 0 10px; }
   .rules table { border-collapse: collapse; width: 100%; font-size: 14px; }
-  .rules th, .rules td { border: 1px solid #C9BFA9; padding: 4px 8px; text-align: left; vertical-align: top; }
-  .rules th { background: #E9E2D2; font-weight: 600; }
-  .rules section.dark th { background: #2A2017; }
-  .rules section.dark th, .rules section.dark td { border-color: #5A4630; }
-  .rules code { font-size: 13px; background: #E9E2D2; padding: 0 4px; overflow-wrap: anywhere; }
-  .rules section.dark code { background: #2A2017; }
+  .rules th, .rules td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; vertical-align: top; }
+  .rules th { background: var(--bg); font-weight: 600; }
+  .rules section.dark th { background: var(--lacquer2); }
+  .rules section.dark th, .rules section.dark td { border-color: var(--bronze); }
+  .rules code { font-size: 13px; background: var(--bg); padding: 0 4px; overflow-wrap: anywhere; }
+  .rules section.dark code { background: var(--lacquer2); }
   .rules .flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 10px; font-size: 14px; }
-  .rules .flow span { border: 1px solid #1F2430; padding: 2px 10px; background: #fff; }
-  .rules .flow i { font-style: normal; color: #A23B2C; }
-  .rules section.dark .flow span { background: #221912; border-color: #D9B45A; }
+  .rules .flow span { border: 1px solid var(--line-strong); padding: 2px 10px; background: var(--surface); }
+  .rules .flow i { font-style: normal; color: var(--accent2); }
+  .rules section.dark .flow i { color: var(--gold); }
+  .rules section.dark .flow span { background: var(--lacquer2); border-color: var(--gold); }
   /*NAV-CSS:START*/
-  nav.top { display: flex; align-items: center; gap: 4px; background: #17110D; border-bottom: 1px solid #5A4630; padding: 0 12px; font-family: Sarabun, sans-serif; line-height: normal; }
-  nav.top a { display: inline-block; color: #E3DDD0; text-decoration: none; padding: 0 10px; line-height: 44px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
-  nav.top a.dark { color: #F0D78C; }
-  nav.top a[aria-current] { color: #F0D78C; font-weight: 700; }
+  :root { --bg:#F4ECDC; --surface:#FBF6EA; --ink:#1B2A4A; --muted:#5B5648; --accent:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --seal:#A62B1F; --good:#2F6B4F; --bad:#B3261E; --line:#C9B98F; --line-strong:#8C7A52; --on-head:#E7E2D4; --on-head2:#D8D2C2; --on-head3:#BFB49A; --title:#F4ECDC; --lacquer:#17110D; --lacquer2:#221912; --bronze:#5A4630; --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }
+  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
+  nav.top a { display: inline-block; color: var(--on-head); text-decoration: none; padding: 0 10px; line-height: 40px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: var(--headink); }
+  nav.top a[aria-current] { color: var(--headink); font-weight: 600; }
   nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
-  nav.top .brand { font-weight: 700; color: #F4EFE3; padding-left: 0; white-space: nowrap; }
+  nav.top .brand { font-weight: 600; color: var(--headink); padding-left: 0; white-space: nowrap; }
   nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
-  nav.top a.play { background: #F0D78C; color: #17110D; border-radius: 6px; line-height: 32px; padding: 0 12px; font-weight: 700; white-space: nowrap; }
-  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); } }
+  nav.top a.play { background: var(--gold); color: var(--head); border-radius: var(--r); line-height: 28px; padding: 0 12px; font-weight: 600; white-space: nowrap; }
+  nav.top a.play:focus-visible { outline: 2px solid var(--headink); outline-offset: 2px; }
+  body > header:not(.home) { background: var(--head); color: var(--title); padding: 16px 16px 18px; }
+  body > header:not(.home) h1 { font-family: var(--fh); font-weight: 600; color: var(--title); }
+  body > header:not(.home) p { color: var(--on-head2); }
+  body > header:not(.home) a { color: var(--headink); text-decoration: underline; text-underline-offset: 3px; }
+  main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
 /*NAV-CSS:END*/
 </style>
+<!--DOCS-LAYOUT:START--><style>
+.w:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){max-width:960px!important}body>main:not(:has(.w)):not(#app){max-width:960px;margin-left:auto;margin-right:auto}:is(body>main,body>header,body>footer){padding-left:24px;padding-right:24px}
+main h2:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(:first-child){margin-top:28px}main :is(section,.box):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){margin-bottom:17px}
+main:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){overflow-wrap:anywhere}main .st:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){white-space:normal;max-width:100%}@media (max-width:640px){main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){display:block;max-width:100%;overflow-x:auto}}
+main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) :is(th,td):not(:is(.dark,.dark *)){border:1px solid var(--line)}main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) th:not(:is(.dark,.dark *)){background:var(--bg);color:var(--ink)}
+main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){padding:20px 24px;box-shadow:none}main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(.dark){background:var(--surface)}
+main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r)}
+.tag:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border-radius:0}
+</style><!--DOCS-LAYOUT:END-->
 </head>
 <body>
 <!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">NEXT LIFE</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="worlds.html" aria-current="page">โลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
@@ -124,7 +140,7 @@
     <li>สกิลข้ามชาติ: ตอนจบชาติต่างโลกและที่ปรโลกหลังชีวิตไทย เลือกสกิล 1 อย่างลงสมุดสกิล (มี <span data-fact="skillAll">11</span> อย่าง) · ได้ซ้ำ = ขั้นในสมุดขึ้น สูงสุดขั้น <span data-fact="skillTop">3</span> · ก่อนไปเกิดเลือกพกจากสมุดได้ <span data-fact="skillCarry">3</span> อย่าง ใช้ทั้งชีวิตไทยและชาติต่างโลกที่ตามมา · ของที่พกเริ่มขั้น 1 แล้วฝึกด้วยการ์ดฝึกสกิล ถึงขั้นในสมุดได้เร็วกว่าครั้งแรก · สกิลที่ไม่ได้พกยังอยู่ในสมุด</li>
     <li>ค่าสถานะชุดของต่างโลก: HP · พลัง · เวท · บารมี · โชค</li>
     <li>ค่าตั้งต้นติดมาจากชาติไทยด้วย: สุขภาพเป็นพลัง ความรู้เป็นเวท ความสัมพันธ์เป็นบารมี ความสุขเป็นโชค คอนเน็คชั่นเป็นชื่อเสียง ทรัพย์สินเป็นทอง ยิ่งอยู่โลกเดิมนานยิ่งติดตัวไปมาก เต็มที่ตอนอายุ 40 · ตายตอนสุขภาพแย่ HP เริ่มต่ำลง แต่หักไม่เกิน 30</li>
-    <li>แนวเล่นต่างจากชาติไทยชัด: ส่วนใหญ่กดผ่านทีละตาโดยไม่ต้องตัดสิน แต่ละช่วงวัยเลือกสิ่งที่จะทุ่มเท แล้วมีจดหมายเหตุบันทึกเรื่องที่เกิด</li>
+    <li>แนวเล่นต่างจากชาติไทยชัด: ส่วนใหญ่กดผ่านทีละตาโดยไม่ต้องตัดสิน ตั้งโฟกัสได้ทุกเมื่อในแผงตัวฉัน (ทางเลือกเปลี่ยนตามช่วงวัย โฟกัสที่ไม่เหมาะกับวัยใหม่กลับเป็นตามน้ำ) แล้วมีจดหมายเหตุบันทึกเรื่องที่เกิด</li>
     <li>ความรู้จากโลกเดิม 9 หมวด (อาหาร เกษตร แพทย์ การค้า ช่าง การพิมพ์ ทหาร การเมือง บันเทิง) เปิดทางลัดได้ ใช้แล้วล้มเหลวได้</li>
     <li>ชื่อเสียงเป็นอีกแกนหนึ่ง โลกจำเป็นตำนาน ดังทางร้ายก็ถูกจำเป็นคนร้าย</li>
     <li>บัญชีบุญบาปเป็นบัญชีเดียวของดวงวิญญาณ ไปต่างโลกก็พกกรรมไปด้วยแบบเดียวกับเกิดใหม่ ต่างโลกจึงไม่ใช่ทางล้างบาป · บัญชียังซ่อนและเฉลยที่ปรโลกที่เดียวเหมือนเดิม</li>
@@ -187,7 +203,7 @@
     <li><span class="tag soon">กำลังทำ</span>ต่างโลกในเกมหลักจะไม่มีเรื่องทาส การใส่ร้ายทางเพศ หรือฮาเร็ม ฉากตลาดในเกมสั้นจะเปลี่ยนตอนย้ายเข้าเกมหลัก</li>
   </ul>
 
-  <footer>โปรเจกต์ส่วนตัว · แฟนตาซีในเกมไม่ได้อ้างว่าเป็นคำสอน · เวอร์ชันเกมหลัก <span data-fact="version">v0.6.77</span> (<span data-fact="build">2026-11-05</span>)</footer>
+  <footer>โปรเจกต์ส่วนตัว · แฟนตาซีในเกมไม่ได้อ้างว่าเป็นคำสอน · เวอร์ชันเกมหลัก <span data-fact="version">v0.6.103</span> (<span data-fact="build">2026-11-06</span>)</footer>
 </div></main>
 </body>
 </html>

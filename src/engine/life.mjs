@@ -9,10 +9,11 @@ import { TRACKS, SCHOOL_FROM, eduRank, schoolGate, jobCard, netAid } from './car
 import { jobWage, officePay, officeFull, rankName, enterByJob, enterLadder, promote, setOffice, ageRank, promoDue, promoCard, officeDue, officeCard, ladderOf, recruitDue, recruitCard, severanceDays, rankLevel, earlyDue, earlyCard, ladderStartPay, officeStep, budgetDue, budgetCard } from './rank.mjs';
 import { beliefOk, beliefFired, beliefChoice, moneyTight } from './belief.mjs';
 import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './court.mjs';
+import { cadetActive, cadetCard, chooseCadet, cadetAfterChoice } from './cadet.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
-import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
+import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
 import { pastLifeOk, pastTalent, talentStart } from './past.mjs';
@@ -887,6 +888,12 @@ function stepYear(st) {
   if (isWorking(st)) {
     const w = (st.workYears ??= {});
     w[st.occupation] = (w[st.occupation] ?? 0) + 1;
+    // ช่วงงานตามอายุ (ui-redo 131) ให้แผงตัวฉันเรียงประวัติงาน · ปีว่างงานคั่น = ช่วงใหม่ · workYears คงไว้ให้ past/titles
+    // เซฟก่อนมีช่องนี้เริ่มนับจากปีที่เล่นต่อ — ปีก่อนหน้าจอคิดจาก workYears ลบผลรวมช่วง ไม่เดาอายุย้อนหลัง
+    const spans = (st.workSpans ??= []);
+    const last = spans.at(-1);
+    if (last?.occ === st.occupation && last.to === st.age - 1) last.to = st.age;
+    else spans.push({ occ: st.occupation, from: st.age, to: st.age });
   }
 
   st.age += 1;
@@ -1473,6 +1480,12 @@ function drawCard(st) {
     }
     return emit(st, card);
   }
+  // เส้นเตรียมทหาร (cadet.mjs): ลำดับฉากรอบสมัคร/สนามสอบ ออกต่อจากการ์ดผลของตัวเลือกที่เปิดมัน
+  if (st.cadet && !st.dead && cadetActive(st)) {
+    if (st.cadet.cur) throw new Error('ยังมีการ์ดที่รอเลือก');
+    const card = cadetCard(st);
+    if (card) return emit(st, card);
+  }
   for (;;) {
     if (st.advance) {
       // สุ่มตายของปีที่อายุ st.age ก่อนขึ้นปีใหม่ — ทารกจึงตายได้ตั้งแต่ขวบปีแรกตามอัตราตายทารกจริง และอายุบนการ์ดตายเป็นปีเต็ม
@@ -1602,7 +1615,10 @@ export const arcSummary = (st) => Object.entries(st.arcs ?? {}).map(([key, a]) =
 // ชีวิตที่เนื้อหาไม่มีกองจึงได้ชะตาเดิมทุกหลัก
 function drawPool(st, year) {
   const stage = stageOf(st.age);
-  const pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e));
+  let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e));
+  // เส้นเตรียมทหาร: ถือธงนี้อยู่ = จั่วเฉพาะใบที่ต้องมีธงนี้ เรื่องชีวิตวัยรุ่นทั่วไปไม่แทรกเส้นเตรียมสอบ
+  const focusFlag = st.content.cadet?.numbers?.pool_focus_flag;
+  if (focusFlag && st.flags[focusFlag]) pool = pool.filter((e) => e.when?.flags?.has?.includes(focusFlag));
   // รอบที่กองแห้งนับแยกช่วงวัย — harness/pace.mjs อ่านเป็นรายการกองที่ต้องเติม (ไม่ออกไปกับการ์ด)
   if (!pool.length) (st.poolDry ??= {})[stage] = (st.poolDry[stage] ?? 0) + 1;
   if (!pool.length || st.rng.next() >= POOL_CHANCE[stage]) return null;
@@ -1911,6 +1927,7 @@ export function noteDeed(st, text, record, age = st.age) {
 export function choose(st, idx, loan) {
   if (st.court) return chooseCourt(st, idx);
   if (st.trip) return chooseIsekai(st.trip, idx);
+  if (st.cadet?.cur) return chooseCadet(st, idx);
   const ev = st.pending;
   if (ev?.alloc) {
     const opt = ev.alloc[idx];
@@ -2002,6 +2019,7 @@ export function choose(st, idx, loan) {
   // ใบในรอบเดียวกัน (ev.run) ที่สุขภาพหมดอยู่ก่อนกด = โรคที่ถึงคิวกลางรอบ ไม่ใช่ผลของใบนี้ — จำไว้ก่อนผลของตัวเลือกลง
   const ill = ev.run !== undefined && st.health <= 0;
   const nat = natureBoost(st, ev);
+  const flagsBefore = { ...st.flags };
   let because = applyEffects(st, c.effects, s, ss, 1, nat);
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
@@ -2084,6 +2102,7 @@ export function choose(st, idx, loan) {
     after.splice(at < 0 ? after.length : at, 0, warnCard(st.age, stageOf(st.age), WARN.text));
   }
   st.queue.unshift(...after);
+  cadetAfterChoice(st, ev, c, flagsBefore);
 }
 
 function deathCard(st) {
@@ -2315,6 +2334,11 @@ export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, c
     }
     if (card.trip && card.kind === 'isekai') {
       if (card.choices.length) choose(st, warnPick(card) >= 0 ? warnPick(card) : pickChoice.trip ? pickChoice.trip(card, bot) : tripAny(card, bot));
+      // ไม่มีใบทุ่มเทเข้าช่วงวัยแล้ว (ui-redo 83) — บอทตั้งโฟกัสตาแรกของช่วงจากใบเลือกรูปเดิม เหมือนผู้เล่นเปิดแผงตัวฉัน
+      else if (card.entered) {
+        const fc = isekaiFocusCard(st.trip);
+        isekaiFocusPick(st.trip, pickChoice.trip ? pickChoice.trip(fc, bot) : tripAny(fc, bot));
+      }
       continue;
     }
     // บอทคืนเลขตัวเลือก หรือ {i, loan} เมื่อกู้มาจ่าย (B111)
