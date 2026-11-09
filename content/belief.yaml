@@ -4,6 +4,7 @@
 events:
   # ดูดวง — ผลคำทำนาย 3 โทนสุ่มเท่ากัน ไม่อ่านบัญชี ไม่สอดคล้องกับเหตุการณ์จริง · โทนเตือนเสนอพิธีได้ครั้งเดียว
   - id: bel_fortune_market
+    away_block: [abroad]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -40,6 +41,7 @@ events:
           - {weight: 1, ok: true, text: "หมอดูให้นั่งโต๊ะแทนตอนลุกไปพัก ลูกค้าบางคนเดินกลับมาหาคุณเอง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เรียนได้สามเดือน หมอดูเรียกค่าครูก้อนโตแล้วยังไม่ยอมสอนเคล็ดจริง", effects: {money: {unit: income_x, amount: -0.3}, happiness: -1}, merit: [{cat: neutral}]}
   - id: bel_fortune_market_rite
+    away_block: [abroad]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -67,6 +69,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: bel_fortune_cards
+    away_block: [abroad]
     type: B
     category: belief
     stage: กลางคน
@@ -103,6 +106,7 @@ events:
           - {weight: 2, ok: true, text: "ลูกค้าวันหยุดต่อคิวยาวขึ้นทุกเดือน บางคนพาเพื่อนมาด้วย", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ทายว่าลูกค้าจะได้เลื่อนขั้น เดือนถัดมาเขาถูกเลิกจ้าง กลับมาต่อว่าถึงหน้าโต๊ะ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
   - id: bel_fortune_cards_rite
+    away_block: [abroad]
     type: B
     category: belief
     stage: กลางคน
@@ -131,6 +135,7 @@ events:
 
   # ฤกษ์ยาม — ถือฤกษ์ให้ผู้ใหญ่สบายใจ ไม่มีผลต่อความสำเร็จของงานนั้น
   - id: bel_auspicious_house
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -163,6 +168,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: bel_auspicious_shop
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -195,6 +201,7 @@ events:
 
   # เครื่องราง/สักยันต์ — ความอุ่นใจเท่านั้น ไม่ลดความเสี่ยงใด ๆ · ข้อห้ามของสำนักเป็นเนื้อเรื่อง ไม่มีกลไกลงโทษ
   - id: bel_amulet_center
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -231,6 +238,7 @@ events:
           - {weight: 1, text: "รับพระเก๊มาเข้าแผงทั้งชุด กว่าจะรู้ก็ปล่อยไปหลายองค์ ต้องตามขอโทษลูกค้า", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
 
   - id: bel_amulet_yantra
+    away_block: [abroad]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -268,6 +276,7 @@ events:
 
   # ทำบุญเสริมดวง — คู่เจตนา ต้นทุนเท่ากัน ป้ายเหมือนกัน · ทำหวังผลบุญน้อยกว่า 1 ระดับ และมีการ์ดตามมาถ้าเงินไม่ดีขึ้น
   - id: bel_merit_wish_robe
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -294,6 +303,7 @@ events:
     choices: []
 
   - id: bel_merit_wish_birthday
+    away_block: [abroad]
     type: B
     category: belief
     stage: กลางคน
@@ -346,6 +356,7 @@ events:
       - {id: donate, text: "ไหว้แล้วหยอดตู้บริจาค", cost: {unit: fixed_baht, amount: 20, ref_year: 2560}, merit: [{cat: dana, level: 1}]}
       - {id: wait, text: "รออยู่ข้างนอก ไม่เข้าไปไหว้", merit: [{cat: neutral}]}
   - id: bel_vow_exam_due
+    away_block: [abroad]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -361,6 +372,7 @@ events:
       - {id: defer, text: "ขอเลื่อนไปก่อน", redeem: defer, schedules: [{event: bel_vow_exam_due2, after_years: [1, 2]}], merit: [{cat: neutral}]}
       - {id: plus, text: "แก้บนพร้อมถวายสังฆทาน", redeem: full, cost: {unit: fixed_baht, amount: 2000, ref_year: 2560}, clears_flags: [vow_open:exam], effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
   - id: bel_vow_exam_due2
+    away_block: [abroad]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -377,6 +389,7 @@ events:
       - {id: plus, text: "แก้บนพร้อมถวายสังฆทาน", redeem: full, cost: {unit: fixed_baht, amount: 2000, ref_year: 2560}, clears_flags: [vow_open:exam], effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
 
   - id: bel_vow_parent
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -402,6 +415,7 @@ events:
       - {id: chant, text: "นั่งสวดมนต์เงียบ ๆ หน้าห้อง", effects: {happiness: 1}, merit: [{cat: bhavana, level: 1}]}
       - {id: call, text: "โทรบอกญาติให้รู้ไว้", effects: {relations: 1}, merit: [{cat: neutral}]}
   - id: bel_vow_parent_due
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -417,6 +431,7 @@ events:
       - {id: defer, text: "ขอเลื่อนไปก่อน", redeem: defer, schedules: [{event: bel_vow_parent_due2, after_years: [1, 2]}], merit: [{cat: neutral}]}
       - {id: plus, text: "แก้บนพร้อมทำบุญเพิ่ม", redeem: full, cost: {unit: fixed_baht, amount: 2500, ref_year: 2560}, clears_flags: [vow_open:parent], effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
   - id: bel_vow_parent_due2
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -460,6 +475,7 @@ events:
       - {id: tell, text: "เล่าความฝันให้คนที่บ้านฟัง", effects: {relations: 1}, merit: [{cat: neutral}]}
 
   - id: bel_lottery_tree
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -477,6 +493,7 @@ events:
       - {id: offer, text: "ไหว้ขอให้ผ่านเดือนนี้ไปได้", effects: {happiness: 1}, merit: [{cat: neutral}]}
 
   - id: bel_lottery_plate
+    away_block: [abroad]
     type: B
     category: belief
     stage: กลางคน

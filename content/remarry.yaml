@@ -4,6 +4,7 @@
 # แต่งรอบสองใช้ธง married อย่างเดียว = แกนเพิ่มคู่ใหม่ให้ (ตอนไม่มีคู่ที่ยังอยู่) เหมือน young_wedding_01
 events:
   - id: remarry_love_work_01
+    away_block: [abroad]
     type: A
     category: family
     stage: ทำงาน
@@ -40,6 +41,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: remarry_love_mid_01
+    away_block: [abroad]
     type: A
     category: family
     stage: กลางคน
@@ -113,6 +115,7 @@ events:
 
   # ← เรื่องต่อของการ์ดรักใหม่ วัยละใบ (เรื่องต่อต้องอยู่ช่วงเดียวกับแม่ · ไม่มี weight · ออกทาง next เท่านั้น)
   - id: remarry_wedding_work_01
+    away_block: [abroad]
     type: A
     category: family
     stage: ทำงาน
@@ -143,6 +146,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: remarry_wedding_mid_01
+    away_block: [abroad]
     type: A
     category: family
     stage: กลางคน

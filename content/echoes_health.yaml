@@ -125,6 +125,7 @@ events:
 
   # ← child_drown_01 "ขอแม่ไปเรียนว่ายน้ำให้เป็น"
   - id: echo_health_swim_save_01
+    away_block: [abroad]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -187,6 +188,7 @@ events:
 
   # ← workh_burnout_01 "ไปพบจิตแพทย์"
   - id: echo_health_listener_01
+    away_block: [abroad]
     type: A
     category: health
     stage: กลางคน

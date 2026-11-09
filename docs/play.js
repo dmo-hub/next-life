@@ -3598,7 +3598,7 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
     // วัดพรสวรรค์หลังเข้าสาย — อาชีพเปลี่ยนตามขั้นแรกของสาย
     st.incomeMult = talentStart(st);
     // ทางแรกของสาย (B170): การ์ด first_of ออกปีที่เข้าสาย ครั้งเดียวต่อชีวิต (เข้าสายซ้ำไม่ออกอีก) · แทนการ์ดกองสุ่มหนึ่งใบแบบผลย้อน ชีวิตจึงไม่ยาวขึ้น
-    const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id]);
+    const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id] && awayOk(st, e));
     if (first) {
       st.done[first.id] = true;
       st.due.push({ kind: 'eraEvent', ev: first, age: st.age });
@@ -4526,7 +4526,8 @@ function arcDefer(st) {
 
 // สถานะอยู่นอกบ้าน (ใบ 237 · ข้อ 426–428 443–445): ไม่มี st.away = อยู่บ้าน ⇒ ชีวิตที่ไม่ไปไหนไม่ถูกแตะเลขสุ่มหรือช่องเซฟเลย
 // ป้าย away_block เป็นรายใบรายชนิด เพราะกองสุ่มไม่รู้ว่าใบไหนต้องอยู่บ้าน และ pool_focus_flag ล็อกทั้งกองใช้แทนไม่ได้
-const awayOk = (st, e) => !st.outside || !e.away_block?.includes(st.outside.kind);
+// away_only = การ์ดที่เล่าชีวิตช่วงนอกบ้าน กดกลับบ้านกลางทางแล้วนัดที่ค้างจึงไม่ออก ไม่ต้องตามลบจากตารางนัด
+const awayOk = (st, e) => (!e.away_only || e.away_only.includes(st.outside?.kind)) && (!st.outside || !e.away_block?.includes(st.outside.kind));
 
 // นัดและหลักไมล์ที่ตกช่วงนอกบ้านเลื่อนทีละปีจนกลับ (เจ้าของเคาะข้อ 444) — ไม่รู้ล่วงหน้าว่าจะกลับปีไหน จึงตั้งอายุเป้าตรง ๆ แบบ arcDefer ไม่ได้
 // หลักไมล์ต้องจดเป็นนัด เพราะ byAge ผูกอายุเดียว พ้นปีแล้วไม่ถูกค้นอีก · ติด milestone ไว้ไม่ให้หักโควตาแบบผลย้อน
@@ -5001,7 +5002,7 @@ function choose(st, idx, loan) {
     if (o.text) after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(o.text, st) + (helper ? ` · ${helper.who ?? AID_WHO[helper.role]}${helper.name}มาช่วยประคอง เลยหนักแค่ครึ่งเดียว` : '') + (gotO ? ` · ${gotO}` : ''), tag: fxTag(o.effects, [...(ev.hidden ?? []), ...(c.hidden ?? [])]), evId: ev.id });
     // ผลชี้เรื่องต่อ: การ์ดเลือกของเหตุการณ์นั้นตามหลังการ์ดผลทันที อายุเดียวกัน · เงื่อนไขปี/when ไม่ผ่าน = จบที่การ์ดผล
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
-    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow) && arcNextOk(st, ev, follow)) {
+    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow) && awayOk(st, follow) && arcNextOk(st, ev, follow)) {
       st.done[follow.id] = true;
       st.fired[follow.id] = { n: (st.fired[follow.id]?.n ?? 0) + 1, age: st.age };
       beliefFired(st, follow);

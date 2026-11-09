@@ -118,6 +118,9 @@ flags:
   cadet_met_senior: "ได้คุยกับรุ่นพี่สี่เหล่าที่โรงเรียนแล้ว (กันฉากพี่หน้าบ้านซ้ำ)"
   # >>> nl-writer b001 flag cadet_dream
   cadet_dream: "ตั้งใจจะสอบเตรียมทหาร"
+  abroad_went: "เคยไปทำงานเมืองนอก"
+  abroad_undoc: "กำลังอยู่เมืองนอกโดยไม่มีสัญญา"
+  abroad_deported: "เคยถูกส่งกลับจากเมืองนอก"
   # <<< nl-writer b001 flag cadet_dream
   # >>> nl-writer b001 flag cadet_declined
   cadet_declined: "ขอไม่ให้เตือนเรื่องสอบเตรียมทหารอีก"

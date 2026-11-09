@@ -370,6 +370,7 @@ events:
 
   # ── เรื่องต่อ (ออกทาง next เท่านั้น · ไม่มี era/weight) ──
   - id: era_econ_oil2_farm_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -399,6 +400,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: era_econ_gfc_cafe_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน

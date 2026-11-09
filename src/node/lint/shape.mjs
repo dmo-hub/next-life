@@ -19,7 +19,7 @@ const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
-  event: ['away_block', 'away_call', 'id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
+  event: ['away_block', 'away_call', 'away_only', 'id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
@@ -515,6 +515,7 @@ export const rules = [
     desc: 'สถานะนอกบ้าน: away_block = รายการชนิดจากทะเบียน content/rules/away.yaml · away_call = {text} · effects.away_enter = ชนิดจากทะเบียน · effects.away_leave = true',
     event(e, ctx, r) {
       if (e.away_block !== undefined && !nonEmptySubset(e.away_block, ctx.awayKinds)) r('.away_block', `ต้องเป็นรายการจาก ${ctx.awayKinds.join(' ')}`);
+      if (e.away_only !== undefined && !nonEmptySubset(e.away_only, ctx.awayKinds)) r('.away_only', `ต้องเป็นรายการจาก ${ctx.awayKinds.join(' ')}`);
       if (e.away_call !== undefined && (!isObj(e.away_call) || typeof e.away_call.text !== 'string' || !e.away_call.text.trim() || Object.keys(e.away_call).length !== 1)) r('.away_call', 'ต้องเป็น {text: ข้อความ}');
       for (const { c, path } of choicesOf(e)) {
         for (const [w, p] of [[c, path], ...list(c.outcomes).map((o, i) => [o, `${path}.outcomes[${i}]`])]) {

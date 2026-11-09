@@ -8,6 +8,7 @@
 # ไม่ใช่ทริปต่างโลก: ไม่แตะ st.trip และไม่ขึ้นค่าซ้อนทับ
 events:
   - id: overlap_dungeon_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -43,6 +44,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: overlap_dungeon_02
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -54,6 +56,7 @@ events:
     choices: *gate_choices
 
   - id: overlap_dungeon_03
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -65,6 +68,7 @@ events:
     choices: *gate_choices
 
   - id: overlap_dungeon_04
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -77,6 +81,7 @@ events:
 
   # สายนักล่า ใบกลาง: ถอยได้ 2 ทาง (จบรอบที่ 2 ใบ) · ไปต่อ 2 ทาง (ช่วย/ทิ้งเพื่อน) — ทุกทางยังไม่ตาย
   - id: dungeon_hunt_mid_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -108,6 +113,7 @@ events:
 
   # ห้องบอส: 3 ทางสู้ (ล็อกนักล่า · ตายจริงด้วยกลุ่มสาเหตุเดิม) · 1 ทางถอย · ชีวิตคูณหลัก ความรู้คูณเสริม
   - id: dungeon_hunt_boss_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -147,6 +153,7 @@ events:
 
   # สายถูกดึง (ครั้งแรก): รอดเสมอ — ไม่มีผลลดสุขภาพ ไม่มี die · ใบกลางจบได้เลย 2 ทาง ไปทางออก 2 ทาง
   - id: dungeon_pull_mid_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -177,6 +184,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: dungeon_pull_out_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน

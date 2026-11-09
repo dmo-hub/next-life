@@ -43,6 +43,7 @@ events:
           - {weight: 2, text: "ได้เงินครบ มารู้ทีหลังว่าที่บ้านเอาโฉนดที่นาไปจำนำมาให้", effects: {relations: 2, happiness: -2}, merit: [{cat: neutral}]}
 
   - id: debt_car_buy_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -83,6 +84,7 @@ events:
         merit: [{cat: care_parents, level: 1}]
 
   - id: debt_guarantor_ask_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -124,6 +126,7 @@ events:
           - {weight: 2, text: "ทะเลาะเรื่องเงินทอนทุกคืน ร้านปิดในปีเดียว เพื่อนก็หายไปด้วย", effects: {relations: -2, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}], next: debt_friend_gone_01}
 
   - id: debt_guarantor_default_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -156,6 +159,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: debt_house_buy_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -196,6 +200,7 @@ events:
           - {weight: 2, text: "ไปดูของจริงถึงรู้ว่าเป็นที่ดินตาบอด ไม่มีทางเข้า ขายต่อใครก็ไม่เอา", effects: {happiness: -2}, merit: [{cat: neutral}], next: debt_landlocked_01}
 
   - id: debt_house_squatter_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -227,6 +232,7 @@ events:
         merit: [{cat: greed_harm, level: 1}]
 
   - id: debt_cash_short_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -268,6 +274,7 @@ events:
           - {weight: 3, text: "หมดตัวก่อนเที่ยงคืน สุดท้ายต้องโทรหาเบอร์บนเสาไฟอยู่ดี แถมยอดมากกว่าเดิม", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 1.2}}, money: {unit: income_x, amount: -1.2}, happiness: -2}, sets_flags: [loan_shark], merit: [{cat: neutral}], next: debt_shark_found_01}
 
   - id: debt_shark_collect_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -316,6 +323,7 @@ events:
           - {weight: 2, text: "สองเดือนต่อมา มอเตอร์ไซค์คันเดิมมาจอดหน้าห้องเช่าใหม่", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}], next: debt_shark_found_01}
 
   - id: debt_shark_threat_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -347,6 +355,7 @@ events:
           - {weight: 1, text: "ผู้ใหญ่รับปากอย่างดี แล้วขอค่าเหนื่อยไปอีกก้อน", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
 
   - id: debt_shark_collect_mid_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: กลางคน
@@ -428,6 +437,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: debt_house_sell_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: กลางคน
@@ -516,6 +526,7 @@ events:
 
   # เรื่องต่อหนี้นอกระบบวัยหนุ่มสาว (young_loan_01 · young_abroad_01) — ออกทาง next เท่านั้น · คอขวด = debt_shark_young_deadline_01
   - id: debt_shark_young_door_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -552,6 +563,7 @@ events:
           - {weight: 1, text: "แจ้งแล้วเรื่องเงียบ คืนนั้นมีคนเตะประตูห้องจนกลอนหลุด", effects: {happiness: -2}, next: debt_shark_young_deadline_01, merit: [{cat: neutral}]}
 
   - id: debt_shark_young_deadline_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -585,6 +597,7 @@ events:
 
   # เรื่องต่อหนี้นอกระบบวัยทำงาน (debt_cash_short_01 · debt_shark_collect_01) — ออกทาง next เท่านั้น · คอขวด = debt_shark_deadline_01
   - id: debt_shark_found_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -620,6 +633,7 @@ events:
           - {weight: 2, text: "เช้าวันรุ่งขึ้น หน้าประตูมีกระดาษเขียนยอดหนี้ตัวโตแปะไว้ให้ทั้งซอยอ่าน", effects: {happiness: -1, relations: -1}, next: debt_shark_deadline_01, merit: [{cat: neutral}]}
 
   - id: debt_shark_deadline_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -684,6 +698,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: debt_friend_reunion_01
+    away_block: [abroad]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -714,6 +729,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ debt_house_buy_01 (ที่ดินตาบอด) — ออกทาง next เท่านั้น
   - id: debt_landlocked_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน

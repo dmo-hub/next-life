@@ -3,6 +3,7 @@
 # id ขึ้นต้น overlap_ ไม่ใส่ weight — แกนนัดตามโควตาของขั้น (overlapPlan) ใส่ weight = ออกซ้ำทางกองสุ่มเกินโควตา
 events:
   - id: overlap_rumor_01
+    away_block: [abroad]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -31,6 +32,7 @@ events:
   # ขั้น 3 เกตเปิดทั้งสังคม: ประกาศรับสมัครนักล่า ทางเดียวที่เข้าสาย hunter (สายนี้ไม่มี occs คนทำงานบริการจึงไม่ถูกจับเข้าเอง)
   # กั้น ladder ไว้ที่คนนอกสายบำนาญ — ข้าราชการ/ทหาร/ตำรวจได้การ์ดดันเจียนตามอาชีพแทน ไม่ลาออกมาสมัคร
   - id: overlap_hunter_recruit_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน

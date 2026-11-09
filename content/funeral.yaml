@@ -117,6 +117,7 @@ events:
 
   # ใบที่ทายาทอ่าน (id ขึ้นต้น heir_letter_): แกนดันเข้าคิวตามหลังการ์ดมรดก ปีที่ผู้ฝากตาย ไม่ก่อนอายุ 13 · ใบละชนิดคำฝาก
   - id: heir_letter_study_01
+    away_block: [abroad]
     type: A
     category: family
     stage: วัยรุ่น
@@ -143,6 +144,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: heir_letter_kin_01
+    away_block: [abroad]
     type: A
     category: family
     stage: วัยรุ่น
@@ -169,6 +171,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: heir_letter_home_01
+    away_block: [abroad]
     type: A
     category: family
     stage: วัยรุ่น
@@ -195,6 +198,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: heir_letter_save_01
+    away_block: [abroad]
     type: A
     category: family
     stage: วัยรุ่น
@@ -225,6 +229,7 @@ events:
   # เพดานอายุ 55 กั้นไม่ให้คำฝากเรื่องเรียน/บ้านเกิดโผล่ตอนชรา — นัดที่เลยเพดานหายเงียบตามตั้งใจ
   # ← heir_letter_study_01 "เก็บไว้ จะทำตามที่ฝาก"
   - id: heir_heed_study_01
+    away_block: [abroad]
     type: A
     category: study
     stage: หนุ่มสาว
@@ -256,6 +261,7 @@ events:
 
   # ← heir_letter_kin_01 "เก็บไว้ จะทำตามที่ฝาก"
   - id: heir_heed_kin_01
+    away_block: [abroad]
     type: A
     category: family
     stage: หนุ่มสาว
@@ -287,6 +293,7 @@ events:
 
   # ← heir_letter_home_01 "เก็บไว้ จะทำตามที่ฝาก"
   - id: heir_heed_home_01
+    away_block: [abroad]
     type: A
     category: family
     stage: หนุ่มสาว

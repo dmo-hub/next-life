@@ -58,6 +58,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: echo_rescued_junior_01
+    away_block: [abroad]
     type: A
     category: health
     stage: ทำงาน
@@ -85,6 +86,7 @@ events:
         merit: [{cat: sila, level: 1}]
 
   - id: echo_extorted_juniors_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -115,6 +117,7 @@ events:
         merit: [{cat: greed_harm, level: 1}]
 
   - id: echo_spoke_up_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: กลางคน
@@ -142,6 +145,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: echo_endured_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: กลางคน

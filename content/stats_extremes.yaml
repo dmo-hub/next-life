@@ -87,6 +87,7 @@ events:
         merit: [{cat: care_parents, level: 1}]
 
   - id: stats_high_network_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน

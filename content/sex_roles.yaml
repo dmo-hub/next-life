@@ -34,6 +34,7 @@ events:
         merit: [{cat: greed_harm, level: 1}]
 
   - id: sex_ordain_01
+    away_block: [abroad]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -62,6 +63,7 @@ events:
         merit: [{cat: dana, level: 1}]
 
   - id: sex_daughter_care_01
+    away_call: {text: "น้าโทรมาถึงเมืองนอก พ่อล้มในห้องน้ำ ต่อจากนี้ต้องมีคนอยู่ด้วยตลอด วงญาติเงียบไปพักหนึ่ง แล้วน้าก็ว่า ก็{ชื่อ}ไง ยังไม่มีครอบครัว"}
     type: A
     category: family
     stage: ทำงาน
@@ -122,6 +124,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: sex_pay_gap_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
