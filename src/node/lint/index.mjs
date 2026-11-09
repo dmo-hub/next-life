@@ -40,7 +40,8 @@ export function lintContext() {
   const focusTagsAll = focusTags(focusDoc);
   const gateFocuses = Object.entries(focusDoc.focuses ?? {}).filter(([, f]) => f?.group === 'gate').map(([id]) => id);
   const items = Object.keys(parse(read('content/rules/items.yaml')).items ?? {});
-  return { regions, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: focusDoc.natures ?? {}, natureAge: focusDoc.nature_age, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
+  const awayKinds = Object.keys(parse(read('content/rules/away.yaml')).kinds ?? {});
+  return { awayKinds, regions, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: focusDoc.natures ?? {}, natureAge: focusDoc.nature_age, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]

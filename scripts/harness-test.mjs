@@ -784,6 +784,42 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 278 ตัวควบคุม: ไม่ส่ง heirId ⇒ throw', ok(last) && last.threw);
 }
 
+// ใบ 237 สถานะอยู่นอกบ้าน: ใบ fixture ในกองจริง · บอทเลือกตัวแรก ยกเว้นการ์ดโทรมาบอกที่กดปุ่มกลับบ้าน (ตัวท้าย) เมื่อ back = true
+// ตัวควบคุม: ไม่เข้าสถานะ ⇒ ใบติดป้ายต้องออกอายุเดิม และสถานะไม่เกิด
+{
+  const base = loadContent();
+  const ch = (extra = {}) => ({ text: 'ตัวเลือก', merit: [{ cat: 'neutral' }], ...extra });
+  const card = (id, at_age, extra = {}, first = {}) => ({ id, type: 'A', category: 'family', stage: 'หนุ่มสาว', years: [2400, 2700], age: at_age, text: 'ข้อความ', choices: [ch(first), ch(), ch(), ch()], ...extra });
+  const run = (enter, back) => {
+    const events = [
+      card('t237_enter', 20, {}, enter ? { effects: { away_enter: 'abroad' } } : {}),
+      card('t237_block', 22, { away_block: ['abroad'] }),
+      card('t237_call', 24, { away_call: { text: 'สายจากบ้าน' } }),
+    ];
+    const content = { ...base, events: [...base.events, ...events] };
+    const pick = (c) => (c.kind === 'event' && c.id === 't237_call' && back && c.choices.length === 5 ? 4 : openChoices(c)[0]);
+    const r = { block: [], call: [], lives: 0, awayAfterCall: [], paid: 0, moneyBack: 0 };
+    for (let i = 0; i < 400 && r.lives < 40; i++) {
+      let reached = false, before = null, after = null;
+      playLife(mixSeed(0x237, i), content, pick, (c, st) => {
+        if (before !== null && after === null && c.kind === 'event') { after = st.money; r.awayAfterCall.push(!!st.away); if (back) r.moneyBack += before - after; }
+        if (c.kind !== 'event') return;
+        if (c.id === 't237_block') r.block.push(c.age);
+        if (c.id === 't237_call') { reached = true; before = st.money; r.call.push({ text: c.text, n: c.choices.length, age: c.age }); }
+      });
+      if (reached) r.lives++;
+    }
+    return r;
+  };
+  const stay = run(true, false), back = run(true, true), none = run(false, false);
+  const callOk = (r) => r.lives > 0 && r.call.every((c) => c.text === 'สายจากบ้าน' && c.n === 5);
+  check('ใบ 237 นอกบ้าน: ใบติดป้ายไม่ออกอายุเดิม และไม่ออกตลอดช่วงที่ยังไม่กลับ', stay.lives > 0 && stay.block.length === 0, `lives ${stay.lives} ออก ${stay.block.length}`);
+  check('ใบ 237 โทรมาบอก: ใช้คำแทนและมีปุ่มกลับบ้านต่อท้าย', callOk(stay), `lives ${stay.lives}`);
+  check('ใบ 237 กดกลับบ้าน: จบสถานะ', back.lives > 0 && back.awayAfterCall.length > 0 && back.awayAfterCall.every((a) => !a), `n ${back.awayAfterCall.length}`);
+  check('ใบ 237 ใบที่เลื่อนออกปีแรกหลังกลับ (อายุ 25)', back.block.length > 0 && back.block.every((a) => a === 25), `อายุ ${[...new Set(back.block)]}`);
+  check('ใบ 237 ตัวควบคุม: ไม่เข้าสถานะ ใบติดป้ายออกอายุเดิม 22 การ์ดโทรไม่แปลงร่าง', none.block.length > 0 && none.block.every((a) => a === 22) && none.call.every((c) => c.n === 4 && c.text === 'ข้อความ'), `อายุ ${[...new Set(none.block)]}`);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {

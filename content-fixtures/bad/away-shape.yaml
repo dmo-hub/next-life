@@ -1,0 +1,16 @@
+# ป้ายชนิดนอกทะเบียน + away_call ไม่มี text + away_enter ชนิดนอกทะเบียน + away_leave ไม่ใช่ true
+events:
+  - id: bad_away_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    away_block: [moon]
+    away_call: {say: "สายจากบ้าน"}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ไป", merit: [{cat: neutral}], effects: {away_enter: moon}}
+      - {text: "ไม่ไป", merit: [{cat: neutral}], effects: {away_leave: 1}}
+      - {text: "รอก่อน", merit: [{cat: neutral}]}
+      - {text: "ถามที่บ้าน", merit: [{cat: neutral}]}

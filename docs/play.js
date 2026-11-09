@@ -3606,6 +3606,8 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
     }
   }
   if (fx.promote !== undefined) promote(st, fx.promote);
+  if (fx.away_enter !== undefined) st.away = { kind: fx.away_enter, from: st.age };
+  if (fx.away_leave) delete st.away;
   if (fx.office !== undefined) setOffice(st, fx.office);
   for (const [k, v] of Object.entries(fx.chronic ?? {})) {
     const lv = Math.max(-CHRONIC_MAX, Math.min(CHRONIC_MAX, (st.chronic[k] ?? 0) + v));
@@ -4189,6 +4191,7 @@ const ERA_NEWS = { merge: true };
 
 // news = ข่าวบ้านเมืองที่รวมมาเป็นบรรทัดนำ (B58) — การ์ดยังเป็นของเหตุการณ์ ตัวเลือก/เซฟเดินเหมือนเดิม
 function eventCard(st, ev, news = null, echoFrom = undefined) {
+  ev = awayCallCard(st, ev);
   pickFocus(st);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
@@ -4449,9 +4452,10 @@ function drawCard(st) {
     // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
     const year = st.birthYear + st.age;
     arcDefer(st);
-    let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
+    awayDefer(st);
+    let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && awayOk(st, e));
     // ผลย้อนที่นัดไว้ปีนี้กินโควตาแบบเรื่องต่อ — หลักไมล์ที่ออกจาก dueAt เหมือนกันไม่หัก
-    if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age)) takeYearQuota(st);
+    if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age && !x.milestone)) takeYearQuota(st);
     // กองสุ่มจับได้ปีละ poolRounds รอบ หลังหลักไมล์/นัดของปีนั้นหมดแล้ว · การ์ดที่จับได้อาจนัดตอนต่อปีเดียวกัน — ค้นนัดก่อนรอบถัดไป
     poolTurn(st);
     while (!ev && st.poolLeft > 0) {
@@ -4520,6 +4524,34 @@ function arcDefer(st) {
   }
 }
 
+// สถานะอยู่นอกบ้าน (ใบ 237 · ข้อ 426–428 443–445): ไม่มี st.away = อยู่บ้าน ⇒ ชีวิตที่ไม่ไปไหนไม่ถูกแตะเลขสุ่มหรือช่องเซฟเลย
+// ป้าย away_block เป็นรายใบรายชนิด เพราะกองสุ่มไม่รู้ว่าใบไหนต้องอยู่บ้าน และ pool_focus_flag ล็อกทั้งกองใช้แทนไม่ได้
+const awayOk = (st, e) => !st.away || !e.away_block?.includes(st.away.kind);
+
+// นัดและหลักไมล์ที่ตกช่วงนอกบ้านเลื่อนทีละปีจนกลับ (เจ้าของเคาะข้อ 444) — ไม่รู้ล่วงหน้าว่าจะกลับปีไหน จึงตั้งอายุเป้าตรง ๆ แบบ arcDefer ไม่ได้
+// หลักไมล์ต้องจดเป็นนัด เพราะ byAge ผูกอายุเดียว พ้นปีแล้วไม่ถูกค้นอีก · ติด milestone ไว้ไม่ให้หักโควตาแบบผลย้อน
+function awayDefer(st) {
+  if (!st.away) return;
+  const events = st.content.events;
+  const ix = lifeEventIndex(events);
+  for (const x of st.scheduled) {
+    const e = x.age === st.age && ix.pos.has(x.event) && events[ix.pos.get(x.event)];
+    if (e && !st.done[e.id] && !awayOk(st, e)) x.age = st.age + 1;
+  }
+  for (const i of ix.byAge.get(st.age) ?? []) {
+    const e = events[i];
+    if (!st.done[e.id] && !awayOk(st, e) && !st.scheduled.some((x) => x.event === e.id)) st.scheduled.push({ event: e.id, age: st.age + 1, milestone: true });
+  }
+}
+
+// โทรมาบอก (ข้อ 427 443): ตัวเลือกเดิมคงลำดับเดิมเพราะ harness/เซฟ/ผลย้อนจับด้วยเลขลำดับ ปุ่มกลับบ้านจึงต่อท้ายเสมอ · สำเนาใบ ไม่แก้เนื้อหากลาง
+function awayCallCard(st, ev) {
+  if (!st.away || !ev.away_call) return ev;
+  const kind = st.content.away.kinds[st.away.kind];
+  const back = { text: kind.return_text, effects: { money: { unit: 'income_x', amount: -kind.return_cost }, away_leave: true }, merit: [{ cat: 'neutral' }] };
+  return { ...ev, text: ev.away_call.text, choices: [...ev.choices, back] };
+}
+
 // จดตอนตอนการ์ดออก (eventCard จุดเดียว ทุกทางเข้า) · ช่องใส่เมื่อมีค่า
 function arcFired(st, ev) {
   const a = st.arcs?.[ev.arc];
@@ -4534,7 +4566,7 @@ const arcSummary = (st) => Object.entries(st.arcs ?? {}).map(([key, a]) => ({ ke
 // ชีวิตที่เนื้อหาไม่มีกองจึงได้ชะตาเดิมทุกหลัก
 function drawPool(st, year) {
   const stage = stageOf(st.age);
-  let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e));
+  let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e) && awayOk(st, e));
   // เส้นเตรียมทหาร: ถือธงนี้อยู่ = จั่วเฉพาะใบที่ต้องมีธงนี้ เรื่องชีวิตวัยรุ่นทั่วไปไม่แทรกเส้นเตรียมสอบ
   const focusFlag = st.content.cadet?.numbers?.pool_focus_flag;
   if (focusFlag && st.flags[focusFlag]) pool = pool.filter((e) => e.when?.flags?.has?.includes(focusFlag));

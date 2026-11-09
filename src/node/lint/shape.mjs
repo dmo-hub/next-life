@@ -19,11 +19,11 @@ const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
+  event: ['away_block', 'away_call', 'id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'away_enter', 'away_leave', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   debt: ['kind', 'amount'],
@@ -508,6 +508,22 @@ export const rules = [
       if (e.ambient === undefined) return;
       if (e.ambient !== true) r('.ambient', `ambient ต้องเป็น true (ได้ ${JSON.stringify(e.ambient)}) — ไม่ใช่ ambient ให้ลบช่องออก`);
       if (e.weight === undefined || e.herald_of !== undefined) r('.ambient', 'การ์ดบรรยากาศต้องมี weight และไม่ใช่ใบลาง (herald_of ข้ามแบบชีวิตอยู่แล้ว)');
+    },
+  },
+  {
+    id: 'away-shape',
+    desc: 'สถานะนอกบ้าน: away_block = รายการชนิดจากทะเบียน content/rules/away.yaml · away_call = {text} · effects.away_enter = ชนิดจากทะเบียน · effects.away_leave = true',
+    event(e, ctx, r) {
+      if (e.away_block !== undefined && !nonEmptySubset(e.away_block, ctx.awayKinds)) r('.away_block', `ต้องเป็นรายการจาก ${ctx.awayKinds.join(' ')}`);
+      if (e.away_call !== undefined && (!isObj(e.away_call) || typeof e.away_call.text !== 'string' || !e.away_call.text.trim() || Object.keys(e.away_call).length !== 1)) r('.away_call', 'ต้องเป็น {text: ข้อความ}');
+      for (const { c, path } of choicesOf(e)) {
+        for (const [w, p] of [[c, path], ...list(c.outcomes).map((o, i) => [o, `${path}.outcomes[${i}]`])]) {
+          const fx = w?.effects;
+          if (!isObj(fx)) continue;
+          if (fx.away_enter !== undefined && !ctx.awayKinds.includes(fx.away_enter)) r(`${p}.effects.away_enter`, `ต้องเป็นชนิด ${ctx.awayKinds.join('|')} ได้ ${JSON.stringify(fx.away_enter)}`);
+          if (fx.away_leave !== undefined && fx.away_leave !== true) r(`${p}.effects.away_leave`, 'ต้องเป็น true');
+        }
+      }
     },
   },
   {
