@@ -1,0 +1,402 @@
+# สายนักบิน/แอร์โฮสเตส (ใบ 256 จากร่าง 212) · ที่มาแต่ละใบอยู่ในรีเสิร์ชใบ 212
+# ฐาน next-life origin/main cff8aa52 (วัด) · main ขยับเป็น 486ae804 ระหว่างทาง (drift.yaml + life.mjs drift stage · ไม่แตะ content ที่สายนี้อ่าน) · prefix sky_ (ค้นได้ 0)
+# ของเดิม: นักบินมีแค่ทางทหารอากาศของสายเตรียมทหาร (cadet_first_flight_01 · cadet_lean:airforce · เฉพาะชาย) · สายนี้เป็นนักบินพลเรือน + พนักงานต้อนรับ ไม่แตะสาย cadet
+# เปิดทุกเพศ · ใบสมัครพนักงานต้อนรับใบเดียวทุกเพศ ไม่บอกเกณฑ์ที่ต่างตามเพศ (ตัวเลือกคู่อยู่ในไฟล์รีเสิร์ช) · เกณฑ์โสด/ไม่มีบุตรใช้ when.flags not [married, has_kids] (ตรงประกาศรับสมัครจริง)
+# ปีจริง: ใบหยุดบินโรคระบาดกั้น 2563–2564 · ใบจ่ายเพื่อบินกั้น 2569 ขึ้นไป (ปีข่าวที่เปิดได้) · ที่เหลือออกทุกปี
+# หนี้: กู้เรียนบินใช้ bank_loan (ไม่มีปีเปิด · data/debt.json limit 3 ⇒ กู้ไม่เกิน 3 เท่ารายได้) · เรียนเองล็อกเงิน 5 เท่ารายได้
+# ไต่ขั้น: ฝันเด็ก → เล็งทาง (วัยรุ่น) → โรงเรียนการบิน หรือ สมัครพนักงานต้อนรับ (หนุ่มสาว) → สอบเข้าสายการบิน → ปลายสายกองถือธง sky_air
+# decisions 414: เด็ก 1 · วัยรุ่น 1 · หนุ่มสาว 5 · ทำงาน 4 · กลางคน 1 · ชรา 1
+# ไม่มีชื่อคน สายการบิน สนามบิน หรือแบรนด์จริง · โรคระบาดไม่เอ่ยชื่อโรค
+events:
+  - id: sky_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [7, 12]}
+    title: "เครื่องบินผ่านหัว"
+    text: "ทุ่งหลังบ้านอยู่ใต้เส้นทางบิน ทุกเย็นเครื่องบินลำใหญ่ร่อนต่ำผ่านจนเห็นหน้าต่างเป็นจุด ๆ เด็กแถวบ้านวิ่งไล่เงาเครื่องบินแข่งกัน คุณหยุดวิ่งแล้วยืนดูจนมันลับไป"
+    choices:
+      - id: dream
+        text: "บอกทุกคนว่าโตไปจะขับเครื่องบิน"
+        sets_flags: [sky_dream]
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: wave
+        text: "โบกมือให้คนบนเครื่อง"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: paper_plane
+        text: "พับเครื่องบินกระดาษแข่งกับเพื่อน"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: ask_where
+        text: "ถามผู้ใหญ่ว่ามันบินไปไหน"
+        sets_flags: [sky_dream]
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: sky_teen_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {sky_dream: 3}, class: {มีอันจะกิน: 1.5, ร่ำรวย: 1.5, มั่งคั่ง: 1.5}}
+    when: {age: [15, 17], school: [upper], flags: {not: [sky_aim_pilot, sky_aim_crew]}}
+    title: "งานบนฟ้า"
+    text: "รุ่นพี่ที่เป็นพนักงานต้อนรับบนเครื่องบินกลับมาแนะแนวในชุดยูนิฟอร์ม เล่าเรื่องค้างคืนต่างประเทศ อีกคนเรียนจบโรงเรียนการบิน บอกว่าค่าเรียนเป็นล้านและยังต้องรอสายการบินเรียกอีกหลายปี"
+    choices:
+      - id: pilot
+        text: "จะเป็นนักบินให้ได้"
+        sets_flags: [sky_aim_pilot]
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: crew
+        text: "เล็งเป็นพนักงานต้อนรับ"
+        sets_flags: [sky_aim_crew]
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: english
+        text: "ลงเรียนภาษาอังกฤษไว้ก่อน"
+        effects: {knowledge: 2, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: selfie
+        text: "ขอถ่ายรูปกับยูนิฟอร์มรุ่นพี่"
+        effects: {happiness: 2, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: sky_school_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [19, 26], flags: {has: [sky_aim_pilot], not: [sky_cadet, sky_pilot]}}
+    title: "โรงเรียนการบิน"
+    text: "โรงเรียนการบินเปิดรับรุ่นใหม่ ค่าเรียนจนได้ใบอนุญาตนักบินพาณิชย์หลายล้านบาท ต้องผ่านตรวจร่างกาย สอบภาษาอังกฤษ และชั่วโมงบินอีกหลายร้อยชั่วโมง ที่บ้านนั่งคุยเรื่องเงินกันทั้งคืน"
+    choices:
+      - id: pay_cash
+        text: "ใช้เงินเก็บที่บ้านจ่าย"
+        requires: {money: {unit: income_x, amount: 5}, reason: "เงินไม่พอค่าเรียนบิน"}
+        cost: {unit: income_x, amount: 5}
+        sets_flags: [sky_cadet]
+        effects: {knowledge: 2, network: 1}
+        schedules: [{event: sky_hire_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: loan
+        text: "กู้ธนาคารมาเรียน"
+        hint: "ผ่อนอีกหลายปี ต่อให้ยังหางานบินไม่ได้"
+        sets_flags: [sky_cadet]
+        effects: {knowledge: 2, money: {unit: income_x, amount: 3}, debt: {kind: bank_loan, amount: {unit: income_x, amount: 3}}}
+        schedules: [{event: sky_hire_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: crew_instead
+        text: "เปลี่ยนไปสมัครพนักงานต้อนรับ"
+        clears_flags: [sky_aim_pilot]
+        sets_flags: [sky_aim_crew]
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: simulator
+        text: "เล่นเกมจำลองการบินที่บ้านแทน"
+        clears_flags: [sky_aim_pilot]
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+
+  - id: sky_hire_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [21, 32], flags: {has: [sky_cadet], not: [sky_pilot]}}
+    title: "รอสายการบินเรียก"
+    text: "ได้ใบอนุญาตนักบินพาณิชย์แล้ว แต่ยังไม่มีสายการบินไหนเรียก เพื่อนร่วมรุ่นบางคนไปขับแท็กซี่ระหว่างรอ บางคนไปบินเครื่องเล็กพ่นยาไร่อ้อย สายการบินหนึ่งเพิ่งประกาศเปิดสอบนักบินผู้ช่วย"
+    choices:
+      - id: apply
+        text: "สอบเข้าสายการบิน"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5, health: 1.3}}, text: "ผ่านทุกด่าน ได้ที่นั่งขวามือในห้องนักบิน", sets_flags: [sky_pilot, sky_air], effects: {job: professional, happiness: 3}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตกด่านเครื่องจำลอง ต้องรอรอบหน้า", effects: {happiness: -2}, schedules: [{event: sky_hire_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: crop
+        text: "ไปบินเครื่องเล็กสะสมชั่วโมง"
+        effects: {knowledge: 1, health: -1, money: {unit: income_x, amount: 0.3}}
+        schedules: [{event: sky_hire_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: ground
+        text: "เลิกรอ ไปทำงานภาคพื้นดิน"
+        clears_flags: [sky_cadet, sky_aim_pilot]
+        effects: {job: service, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: taxi
+        text: "ขับแท็กซี่ระหว่างรอ"
+        effects: {money: {unit: income_x, amount: 0.3}, relations: 1}
+        schedules: [{event: sky_hire_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+
+  - id: sky_paytofly_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2569, 2650]
+    weight: 2
+    when: {age: [22, 30], flags: {has: [sky_cadet], not: [sky_pilot]}}
+    title: "จ่ายเพื่อบิน"
+    text: "สายการบินเสนอที่นั่งนักบินผู้ช่วย แต่ต้องจ่ายค่าฝึกขับเครื่องรุ่นนั้นเองล่วงหน้าอีกหลายล้าน นักบินที่มีใบอนุญาตแต่ว่างงานมีเป็นพัน ถ้าไม่รับ คนต่อแถวรับแทนทันที"
+    choices:
+      - id: pay
+        text: "กู้เพิ่มมาจ่ายค่าฝึก"
+        outcomes:
+          - {weight: 2, ok: true, text: "ได้บินจริง แต่เงินเดือนครึ่งหนึ่งหายไปกับค่างวด", sets_flags: [sky_pilot, sky_air], effects: {job: professional, happiness: 1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ธนาคารไม่อนุมัติ ที่นั่งไปตกเป็นของคนต่อแถว", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: refuse
+        text: "ไม่จ่าย รอที่ที่ออกค่าฝึกให้"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: post
+        text: "โพสต์เล่าเรื่องนี้ลงกลุ่มนักบิน"
+        effects: {network: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: abroad
+        text: "ไปสมัครสายการบินต่างประเทศ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ได้บินกับสายการบินต่างชาติ กลับบ้านปีละครั้ง", sets_flags: [sky_pilot, sky_air], effects: {job: professional, happiness: 2, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไม่มีใครตอบอีเมล", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: sky_crew_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [20, 26], flags: {has: [sky_aim_crew], not: [sky_crew, married, has_kids]}}
+    title: "สมัครพนักงานต้อนรับ"
+    text: "ประกาศรับพนักงานต้อนรับบนเครื่องบิน ต้องจบปริญญา โสด ไม่มีบุตร ส่วนสูงถึงเกณฑ์ ว่ายน้ำได้ต่อเนื่อง และมีผลสอบภาษาอังกฤษ ห้องสัมภาษณ์ให้เดินหนึ่งรอบ ยิ้ม แล้วตอบคำถามเป็นภาษาอังกฤษ"
+    choices:
+      - id: apply
+        text: "ไปสัมภาษณ์ตามรอบ"
+        requires: {edu: อุดมศึกษา, reason: "ต้องจบปริญญาตรี"}
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.4, health: 1.3}}, text: "ติดรุ่น ได้ยูนิฟอร์มชุดแรกกับกระเป๋าล้อลาก", sets_flags: [sky_crew, sky_air], effects: {job: service, happiness: 3}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตกรอบตอบคำถาม คนสมัครเป็นพัน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: course
+        text: "ลงคอร์สติวสอบแอร์ก่อน"
+        requires: {money: {unit: income_x, amount: 0.2}, edu: อุดมศึกษา, reason: "ต้องจบปริญญาตรีและมีค่าคอร์ส"}
+        cost: {unit: income_x, amount: 0.2}
+        outcomes:
+          - {weight: 1.5, ok: true, multipliers: {stats: {network: 1.4}}, text: "ตอบได้ทุกคำถาม ติดรุ่นนี้", sets_flags: [sky_crew, sky_air], effects: {job: service, happiness: 3}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ติวจนท่องคำตอบได้ แต่กรรมการถามเรื่องอื่น", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swim
+        text: "ไปฝึกว่ายน้ำให้ผ่านเกณฑ์ก่อน"
+        effects: {health: 2}
+        merit: [{cat: neutral}]
+      - id: other
+        text: "ไม่สมัคร ทำงานบริษัทต่อ"
+        clears_flags: [sky_aim_crew]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: sky_layover_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [22, 30], flags: {has: [sky_air]}}
+    title: "ค้างคืนต่างเมือง"
+    text: "เที่ยวบินลงตีห้า ได้พักโรงแรมต่างเมืองหนึ่งคืน ร่างกายไม่รู้ว่าตอนนี้กี่โมง เพื่อนร่วมเที่ยวบินชวนไปตลาดเช้า อีกคนบอกว่าจะนอนจนถึงเวลาเรียกตัว"
+    choices:
+      - id: market
+        text: "ไปตลาดเช้ากับเพื่อนร่วมเที่ยวบิน"
+        effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: sleep
+        text: "นอนให้เต็มที่"
+        effects: {health: 2}
+        merit: [{cat: neutral}]
+      - id: call_home
+        text: "วิดีโอคอลหาที่บ้าน"
+        effects: {relations: 2}
+        merit: [{cat: neutral}]
+      - id: shop
+        text: "หิ้วของฝากกลับไปขายต่อ"
+        effects: {money: {unit: income_x, amount: 0.2}, health: -1}
+        merit: [{cat: neutral}]
+
+  - id: sky_grounded_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2563, 2564]
+    weight: 3
+    when: {age: [31, 45], flags: {has: [sky_air]}}
+    title: "เครื่องบินจอดทั้งฝูง"
+    text: "โรคระบาดทำให้สายการบินหยุดบินทั้งฝูง ลานจอดเต็มไปด้วยเครื่องบินที่ไม่มีใครขึ้น บริษัทประกาศหักเงินเดือนพนักงานตั้งแต่สิบถึงครึ่งหนึ่ง และขอให้ลางานไม่รับค่าจ้าง"
+    choices:
+      - id: wait
+        text: "รับเงินเดือนลดแล้วรอ"
+        effects: {happiness: -2, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: delivery
+        text: "ขับมอเตอร์ไซค์ส่งอาหาร"
+        effects: {money: {unit: income_x, amount: 0.2}, health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: online
+        text: "ไลฟ์ขายของในยูนิฟอร์ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนดูหลักหมื่น ขายของหมดทุกไลฟ์", effects: {money: {unit: income_x, amount: 0.5}, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บริษัทส่งจดหมายเตือนเรื่องใส่ยูนิฟอร์มขายของ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit
+        text: "ลาออก กลับไปทำงานที่บ้าน"
+        clears_flags: [sky_air, sky_pilot, sky_crew]
+        effects: {job: service, relations: 2}
+        merit: [{cat: neutral}]
+
+  - id: sky_captain_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], flags: {has: [sky_pilot]}}
+    title: "ที่นั่งซ้ายมือ"
+    text: "ชั่วโมงบินครบเกณฑ์สอบเลื่อนเป็นกัปตัน ต้องผ่านเครื่องจำลองที่ใส่เหตุขัดข้องทีละอย่างจนเหงื่อซึม และกัปตันผู้ตรวจที่ขึ้นชื่อว่าไม่เคยให้ใครผ่านรอบแรก"
+    choices:
+      - id: sit
+        text: "เข้าสอบรอบนี้"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ผ่านรอบแรก ได้ย้ายไปนั่งซ้ายมือ", effects: {money: {unit: income_x, amount: 1}, happiness: 3, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เครื่องยนต์ดับข้างเดียวในเครื่องจำลอง แก้ช้าไปสามวินาที", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_year
+        text: "ขอเก็บชั่วโมงอีกปี"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: mentor
+        text: "ขอให้กัปตันรุ่นพี่ช่วยซ้อม"
+        effects: {network: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: stay_fo
+        text: "อยู่ขวามือต่อ ไม่อยากรับภาระ"
+        effects: {happiness: 1, health: 1}
+        merit: [{cat: neutral}]
+
+  - id: sky_fatigue_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], flags: {has: [sky_air]}}
+    title: "ตื่นตีสามอีกแล้ว"
+    text: "ตารางบินเดือนนี้มีเที่ยวเช้ามืดติดกันสี่วัน ตื่นตีสามไปรายงานตัว กลับถึงบ้านตอนบ่ายแล้วนอนไม่หลับ งานแต่งเพื่อนสนิทตรงกับวันบินพอดี"
+    choices:
+      - id: swap
+        text: "ขอแลกเที่ยวบินไปงานแต่ง"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.4}}, text: "เพื่อนร่วมงานยอมแลกให้ ได้ขึ้นเวทีถ่ายรูปกับบ่าวสาว", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีใครว่างแลก ส่งของขวัญไปแทน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: report_tired
+        text: "แจ้งว่าล้าเกินจะบิน"
+        effects: {health: 2, network: -1}
+        merit: [{cat: neutral}]
+      - id: coffee
+        text: "กาแฟสองแก้วแล้วไปต่อ"
+        effects: {health: -2, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: blackout
+        text: "ซื้อผ้าปิดตากับที่อุดหูชุดใหม่"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+
+  - id: sky_ground_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [33, 45], flags: {has: [sky_crew]}}
+    title: "หัวหน้าเที่ยวบินหรือพื้นดิน"
+    text: "บินมาสิบกว่าปี หัวเข่าเริ่มประท้วงทุกครั้งที่เข็นรถเสิร์ฟ บริษัทเปิดสอบหัวหน้าพนักงานต้อนรับ อีกทางคือย้ายลงมาทำงานภาคพื้นดิน ได้นอนบ้านทุกคืนแต่ค่าเบี้ยเลี้ยงหาย"
+    choices:
+      - id: purser
+        text: "สอบหัวหน้าพนักงานต้อนรับ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "ได้ขึ้นเป็นหัวหน้า ยืนประตูหน้าทักผู้โดยสารคนแรก", effects: {money: {unit: income_x, amount: 0.5}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตกรอบสัมภาษณ์ รุ่นน้องได้ไปแทน", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ground
+        text: "ย้ายลงภาคพื้นดิน"
+        effects: {relations: 2, health: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: teach
+        text: "ไปเป็นครูสอนติวสอบแอร์"
+        clears_flags: [sky_crew]
+        effects: {network: 2, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
+      - id: stay
+        text: "บินต่อจนกว่าหัวเข่าจะไม่ไหว"
+        effects: {health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: sky_mid_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59], flags: {has: [sky_air]}}
+    title: "ตรวจร่างกายประจำปี"
+    text: "การตรวจร่างกายประจำปีของคนทำงานบนเครื่องบินละเอียดขึ้นทุกปีตามอายุ หมอขอดูผลคลื่นหัวใจซ้ำสองรอบ เพื่อนรุ่นเดียวกันบางคนไม่ผ่าน ต้องลงจากเครื่องถาวร"
+    choices:
+      - id: exercise
+        text: "วิ่งทุกเช้าก่อนตรวจรอบหน้า"
+        effects: {health: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: early_retire
+        text: "ขอเกษียณก่อนกำหนด"
+        clears_flags: [sky_pilot, sky_crew]
+        effects: {happiness: 1, relations: 2, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: instructor
+        text: "ย้ายไปเป็นครูฝึกบนเครื่องจำลอง"
+        effects: {network: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: ignore
+        text: "ช่างมัน ยังบินไหว"
+        effects: {health: -1}
+        merit: [{cat: neutral}]
+
+  - id: sky_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85], flags: {has: [sky_air]}}
+    title: "นั่งที่ผู้โดยสาร"
+    text: "ครั้งนี้ขึ้นเครื่องในฐานะผู้โดยสาร หลานนั่งริมหน้าต่าง ถามว่าเครื่องบินลอยได้ยังไง พนักงานต้อนรับรุ่นหลานเห็นเข็มกลัดเก่าบนเสื้อคุณแล้วยิ้ม"
+    choices:
+      - id: explain
+        text: "อธิบายเรื่องปีกให้หลานฟัง"
+        effects: {happiness: 2, relations: 2}
+        merit: [{cat: neutral}]
+      - id: help_crew
+        text: "ช่วยเก็บกระเป๋าขึ้นช่องเหนือหัว"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: sleep
+        text: "หลับตั้งแต่ล้อยังไม่พ้นพื้น"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: window
+        text: "ขอแลกที่นั่งริมหน้าต่างกับหลาน"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
