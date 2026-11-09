@@ -115,9 +115,12 @@ const ovChained = [...OV.events].filter((id) => !OV.roots.has(id));
 const ids = (xs) => (xs.length ? ` (${xs.join(' · ')})` : '');
 console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run lineage): การ์ดที่ต้องมีธงพ่อแม่ ${HEIR_PARENT.size} ใบ · ธงที่มีแต่ของทายาทตั้ง ${HEIR_FLAG_SET.size} ตัว${ids([...HEIR_FLAG_SET])} · ผู้อ่านธงพวกนั้นตามโซ่ การ์ด ${heirChained.length}${ids(heirChained)} · ตัวเลือก ${HEIR_CHOICE_SET.size}${ids([...HEIR_CHOICE_SET])}${chainOff ? ' · ตัวควบคุมปิดโซ่' : ''}`);
 console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run overlap): การ์ดขั้นซ้อนทับ ≥ 1 ${OV.roots.size} ใบ${ids([...OV.roots])} · ตามโซ่ การ์ด ${ovChained.length}${ids(ovChained)} · ตัวเลือก ${OV.choices.size}${ids([...OV.choices])} · ธง ${OV.flags.size}${ids([...OV.flags])}${overlapOff ? ' · ตัวควบคุมไม่ข้ามโซ่นี้' : ''}`);
-const HEIR_ONLY = new Set([...HEIR_EVENTS, ...OV.events]);
-const HEIR_CHOICES = new Set([...HEIR_CHOICE_SET, ...OV.choices]);
-const HEIR_FLAGS = new Set([...HEIR_FLAG_SET, ...OV.flags]);
+// เหตุแต่ง (drift_) นัดเฉพาะรุ่น 2 ขึ้นไป ⇒ ชีวิตรุ่นเดียวถึงไม่ได้โดยโครงสร้าง · ถึงได้จริงตัดสินที่ npm run drift
+const DR = reachChain(content.events, CHAIN_ROOTS.drift);
+console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run drift): เหตุแต่ง ${DR.roots.size} ใบ${ids([...DR.roots])} · ตามโซ่ การ์ด ${DR.events.size - DR.roots.size} · ตัวเลือก ${DR.choices.size} · ธง ${DR.flags.size}`);
+const HEIR_ONLY = new Set([...HEIR_EVENTS, ...OV.events, ...DR.events]);
+const HEIR_CHOICES = new Set([...HEIR_CHOICE_SET, ...OV.choices, ...DR.choices]);
+const HEIR_FLAGS = new Set([...HEIR_FLAG_SET, ...OV.flags, ...DR.flags]);
 // ใบศาล (B153) แกนแทรกเองตอนเฉียดตาย/ถูกเรียกตัว และบอทศาลเลือกแทน — ไม่จั่วจากกองและไม่ผ่านบอทหลัก ⇒ ด่าน 2 ตัดสินไม่ได้
 // ด่านว่าออกครบลำดับและถูกเรียกตัวทุกชีวิตที่ถือธงอยู่ที่ npm run near · ธง cheat_death ข้ามเฉพาะตอนยังไม่มีการ์ดตั้ง (near ตั้งเอง) — มีการ์ดตั้งเมื่อไรกลับมาตัดสินที่นี่
 const COURT_ONLY = new Set(content.events.filter((e) => COURT_SCENES.includes(e.scene)).map((e) => e.id));

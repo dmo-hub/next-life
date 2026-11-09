@@ -1632,7 +1632,6 @@ interludes:
         schedule: []
         result: เก็บเหรียญไว้ค่ารถเมล์พรุ่งนี้
         outcomes: null
-    pending: ปีเริ่มเจ้าของตั้ง
   - id: I4-มือถือ-ลับ
     title: โทรหาบ้าน
     kind: interlude
@@ -1796,7 +1795,6 @@ interludes:
         schedule: []
         result: เก็บเหรียญไว้ค่ารถเมล์พรุ่งนี้
         outcomes: null
-    pending: ปีเริ่มเจ้าของตั้ง
   - id: I5-A
     title: เจอกันอีกแล้ว
     kind: interlude
@@ -2430,7 +2428,6 @@ board:
   eraLine:
     yearMin: 2558
     line: คนครึ่งหนึ่งก้มดูผลในโทรศัพท์ อีกครึ่งยังอยากเห็นชื่อบนกระดาษ
-    pending: ปีเจ้าของตั้ง
   rivalLines:
     - when:
         flagsHas:

@@ -336,6 +336,7 @@ export function newLife(seed, content, heir = null) {
   lifeFocusBorn(st, heir?.focus);
   if (heir?.gates?.length) st.gates = [...heir.gates];
   overlapPlan(st);
+  driftPlan(st);
   return st;
 }
 
@@ -1524,10 +1525,9 @@ function drawCard(st) {
     // ปิดลำดับเส้นสอบแล้ว (ตก/สละสิทธิ์/เลิก): ปล่อยด่านจบ ม.6/ปวช. ที่รอผลทันทีในปีเดียวกัน — ใบท้ายปีเป็นการ์ดเส้นสอบ ไม่ผ่าน choose() ของการ์ดปกติ (S3 ข้อ 3 รั่ว)
     const out = [];
     releaseTrack(st, out);
-    if (out.length) {
-      st.queue.unshift(...out);
-      return nextCard(st);
-    }
+    if (out.length) st.queue.unshift(...out);
+    // ขั้นของ cadet เติมคิวได้ ต้องเปิดคิวก่อนลงไปขึ้นปี (จาก main)
+    if (st.queue.length) return nextCard(st);
   }
   for (;;) {
     if (st.advance) {
@@ -1625,9 +1625,10 @@ const dreamPool = (st) => { const f = st.content.cadet?.numbers?.pool_focus_flag
 
 // โควตาการ์ด: การ์ดเรื่องต่อ (next) ผลย้อน (schedules) และการ์ดงบ/เลือกตั้งของตำแหน่งการเมือง แทนที่การ์ดกองสุ่มหนึ่งใบ — ติดค้างไว้ แล้วทิ้งการ์ดกองสุ่มใบถัดไปที่จั่วได้
 // หักเป็นใบ ไม่ใช่รอบจั่ว เพราะรอบหนึ่งออกการ์ดแค่ตามโอกาส POOL_CHANCE · ปีที่จั่วไม่ได้อีกแล้วค้างไปหักปีถัดไป
+// หนี้ค้างได้ไม่เกินรอบจั่วของปีหนึ่ง (เจ้าของเคาะข้อ 432) — สายที่นัดถี่สะสมหนี้จนกองไม่ออกอีกหลายปี
 // เนื้อหาเพิ่มสายเรื่องต่อได้โดยชีวิตไม่ยาวขึ้น · ชีวิตที่ไม่เจอเรื่องต่อจั่วและดึงเลขสุ่มเท่าเดิมทุกรอบ
 export function takeYearQuota(st) {
-  st.poolOwed = (st.poolOwed ?? 0) + 1;
+  st.poolOwed = Math.min((st.poolOwed ?? 0) + 1, poolRounds(stageOf(st.age)));
 }
 
 // สายเรื่องรายคน (krung-1): การ์ดที่มี arc เดินใต้โควตาปีเดิม ไม่ใช่ตัวคุมแยก — ใบกองสุ่มเป็นใบกองอยู่แล้ว ใบนัด/เรื่องต่อหักโควตาตามเดิม ชีวิตจึงไม่ยาวขึ้น
@@ -2296,6 +2297,32 @@ export function overlapPlan(st, run = 0, stage = overlapStageOf(st)) {
   }
 }
 
+// ขั้นความเพี้ยน: ค่าแยกจากค่าซ้อนทับ ไม่เขียนกลับไปที่ค่านั้น · ชีวิตแรกของเซฟ = 0 เสมอ แม้ทริปกลับบ้านดันค่าซ้อนทับขึ้นแล้ว
+// รุ่น 2 ขึ้นไปได้อย่างน้อยขั้น 1 แล้วตามขั้นซ้อนทับเมื่อสูงกว่า
+// ขั้น 4 ได้จำนวนเท่าขั้น 3 (เจ้าของเคาะ world-drift ข้อ 34) · ตัดที่แถวสุดท้ายกันค่าซ้อนทับเพิ่มขั้นในอนาคตแล้วอ่านแถวที่ไม่มี
+export const DRIFT_PLAN = { salt: 0x510e527f, prefix: 'drift_', ages: [15, 70], quota: [[0, 0], [1, 1], [2, 3], [4, 6], [4, 6]] };
+export const driftStageOf = (st) => ((st.gen ?? 1) < 2 ? 0 : Math.min(Math.max(1, overlapStageOf(st)), DRIFT_PLAN.quota.length - 1));
+const driftFired = (st) => Object.keys(st.done).filter((id) => id.startsWith(DRIFT_PLAN.prefix)).length;
+// เหตุแต่งเป็นการ์ดนัด: ลง st.scheduled ⇒ กินโควตาปีแบบผลย้อน ไม่ผ่านทางเหตุบ้านเมือง (lastEraAge · ฉายา storm/survivor ไม่เห็น)
+// stream แยกจาก seed ไม่ดึง st.rng · ขั้น 0 ไม่เพิ่มช่องใด ⇒ ชีวิตแรกเดินเท่าเดิมทุกหลัก
+// st.drift = ขั้นตอนวางแผน · ชีวิตจากเซฟเก่าไม่มีช่องนี้ ⇒ ทริปกลับบ้านไม่วางแผนให้ชีวิตที่เล่นค้าง (เซฟเก่าเริ่มนับชีวิตถัดไป)
+// ทริปกลับบ้านวางใหม่ด้วย stream ของรอบนั้น หักเหตุที่ออกไปแล้ว ⇒ ทั้งชีวิตไม่เกินจำนวนของขั้นล่าสุด
+export function driftPlan(st, run = 0, stage = driftStageOf(st)) {
+  if (!stage || (run && !st.drift)) return;
+  st.drift = stage;
+  st.scheduled = st.scheduled.filter((x) => !x.drift);
+  const rng = makeRng(mixSeed(st.seed ^ DRIFT_PLAN.salt, run));
+  const [lo, hi] = DRIFT_PLAN.quota[stage];
+  const pool = st.content.events.filter((e) => e.id.startsWith(DRIFT_PLAN.prefix) && !st.done[e.id]);
+  for (let left = rng.int(lo, hi) - driftFired(st); left > 0 && pool.length; left--) {
+    const [ev] = pool.splice(rng.int(0, pool.length - 1), 1);
+    // ช่วงอายุของการ์ดตัดกับช่วงแผน ⇒ นัดตกปีที่ when.age ผ่าน การ์ดออกตรงปีที่นัด
+    const [a0, a1] = ev.when?.age ?? DRIFT_PLAN.ages;
+    const from = Math.max(st.age + 1, DRIFT_PLAN.ages[0], a0), to = Math.min(DRIFT_PLAN.ages[1], a1);
+    if (from <= to) st.scheduled.push({ event: ev.id, age: rng.int(from, to), drift: true });
+  }
+}
+
 // ปีที่หายไปเดินด้วย stepYear ปกติ (เงิน คนในบ้าน ด่านเรียน) แต่ไม่ทอยตายและไม่จับกอง — ตัวไม่อยู่ เรื่องของปีนั้นจึงมาเป็นข่าวหลังกลับ
 function tripBack(st) {
   const isk = st.trip;
@@ -2317,6 +2344,7 @@ function tripBack(st) {
   st.knowledge = clamp(st.knowledge + c.knowledge);
   for (let i = 0; i < isk.trip.thai; i++) stepYear(st);
   overlapPlan(st, st.trips.length);
+  driftPlan(st, st.trips.length);
   // ใบตัดสินใจที่ถึงกำหนดทุกปี (เลื่อนขั้น ทบทวนเงิน ช่วงวัย) ซ้อนกันหลายใบ — เก็บใบล่าสุดของแต่ละเรื่อง ใบเก่าสร้างจากสถานะที่ไม่ใช่แล้ว
   const key = (c) => (c.kind === 'eraEvent' ? `e:${c.ev.id}` : ['alloc', 'stage', 'omen'].includes(c.kind) ? c.kind : null);
   st.due = st.due.filter((c, i) => !key(c) || !st.due.slice(i + 1).some((d) => key(d) === key(c))).map((c) => ({ ...c, age: st.age }));

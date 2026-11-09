@@ -590,7 +590,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 1
-    when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], flags: {has: [cadet_dream, cadet_family_told], not: [cadet_prep_camp, cadet_prep_group, cadet_prep_self, cadet_prep_senior, cadet_family_support, cadet_family_secret]}}
+    when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], flags: {has: [cadet_dream, cadet_family_told], not: [cadet_family_support, cadet_family_secret]}}
     title: "เงินก้อนปลายปี"
     text: "ปลายปีที่บ้านมีรายได้เข้ามามากกว่าที่คิด ผู้ใหญ่ในบ้านนั่งนับเงินบนเสื่อ แล้วเรียก {ชื่อ} มานั่งข้าง ๆ 'เรื่องค่าติวที่เคยบอก ยังคิดจะไปอยู่ไหม'"
     choices:
@@ -654,7 +654,7 @@ events:
     years: [2501, 2650]
     weight: 1.5
     multipliers: {flags: {saw_airforce: 1.5}}
-    when: {sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream], not: [cadet_prep_camp, cadet_prep_group, cadet_prep_self, cadet_prep_senior, knows_senior, cadet_senior_tutor]}}
+    when: {sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream]}}
     title: "ห้องสมุดวันเสาร์"
     text: "ครูแนะแนวประกาศหน้าเสาธงว่ารุ่นพี่ศิษย์เก่าที่สอบติดเตรียมทหารเมื่อปีก่อน จะกลับมาติวให้รุ่นน้องฟรีทุกวันเสาร์ที่ห้องสมุด ใครสนใจให้มาลงชื่อ กระดาษหน้าห้องแนะแนวยังว่างอยู่ครึ่งหน้า"
     choices:
@@ -1069,8 +1069,8 @@ events:
     category: society
     stage: วัยรุ่น
     years: [2501, 2650]
-    weight: 0.5
-    when: {sex: [ชาย], age: [15, 15], school: [lower], flags: {has: [cadet_dream]}}
+    weight: 1
+    when: {sex: [ชาย], age: [15, 15], flags: {has: [cadet_dream]}}
     title: "ทะเลสามวัน"
     text: "จบ ม.สาม เพื่อนทั้งห้องนัดไปทะเลด้วยกันสามวัน ค่ารถหารกันคนละนิด วันที่นัดตรงกับสัปดาห์ที่ตั้งใจจะอ่านหนักที่สุดพอดี เพื่อนสนิทแวะมาชวนถึงหน้าบ้านทุกเย็น"
     choices:
@@ -1098,7 +1098,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 0.5
-    when: {sex: [ชาย], age: [14, 15], flags: {has: [cadet_dream]}}
+    when: {sex: [ชาย], age: [14, 17], flags: {has: [cadet_dream]}}
     title: "คืนวันเสาร์ที่งานวัด"
     text: "คนที่แอบชอบมาตั้งแต่เปิดเทอมชวนไปเดินงานวัดคืนวันเสาร์ ส่วนเช้าวันอาทิตย์มีสอบจำลองเตรียมทหารที่ต้องตื่นตั้งแต่ตีห้า"
     choices:

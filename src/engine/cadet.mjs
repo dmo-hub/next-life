@@ -2,7 +2,7 @@
 // st.cadet = ลำดับขั้นที่กำลังเล่น (null = ไม่มี) · st.cadetInfo = ความจำข้ามปี (สอบกี่ครั้ง · ตกเพราะอะไร · ใบสมัคร)
 // ทุกค่าใน state เป็นข้อมูลล้วน (เซฟได้) · สุ่มจาก stream ของตัวเอง (seed ^ SALT + ตัวนับ) ไม่แตะ rng ของโลก
 // เนื้อหา/ตัวเลข: content/rules/cadet.yaml (ที่มา: demo ที่เจ้าของเคาะ 2026-11-05) · fx ในไฟล์นั้นเป็นหน่วย demo (×numbers.fx_unit แต้ม)
-import { STAT_KEYS, fill, stageOf, fxTag, TAG_MID } from './life.mjs';
+import { STAT_KEYS, fill, stageOf, fxTag, TAG_MID, whenOk } from './life.mjs';
 
 // ทั้งไฟล์อยู่ใน scope เดียว — build ต่อทุกไฟล์เป็นสคริปต์เดียว ชื่อภายในจึงต้องไม่หลุดไปชนไฟล์อื่น
 const CADET = (() => {
@@ -223,14 +223,16 @@ const CADET = (() => {
     for (const f of ['cadet_prep_camp', 'cadet_prep_group', 'cadet_prep_self', 'cadet_prep_senior']) delete st.flags[f];
     const evs = st.content.events;
     const choice = evs.find((e) => e.id === 'cadet_prep_choice');
-    const pool = evs.filter((e) => /^cadet_(slack|friends_call|chores|pt\d|train)/.test(e.id));
-    const picks = shuffle(st, pool).slice(0, 4);
-    for (const e of [choice, ...picks].filter(Boolean)) {
-      delete st.done[e.id];
-      st.queue.push({ kind: 'eraEvent', ev: e, age: st.age });
-    }
     st.cadet.afterQueue = true;
-    st.cadet.steps.push(['e9r'], ['mornr'], ['exam']);
+    // retake = ใบที่ปีสอบซ้ำดึงกลับมาเอง ไม่ได้มาจาก schedules ด่าน continuity จึงไม่เทียบกับปีที่นัด
+    st.cadet.retake = [];
+    if (choice) requeue(st, choice);
+    st.cadet.steps.push(['reprepCards'], ['e9r'], ['mornr'], ['exam']);
+  }
+  function requeue(st, e) {
+    delete st.done[e.id];
+    st.cadet.retake.push(e.id);
+    st.queue.push({ kind: 'eraEvent', ev: e, age: st.age });
   }
 
   // ---------- steps ----------
@@ -295,6 +297,13 @@ const CADET = (() => {
       { label: 'ไม่ติวแล้ว อ่านทวนเองเบา ๆ', _reprep: 'skip', fx: { knowledge: 1 }, result: 'อ่านวันละบท ไม่เร่ง ไม่หยุด' },
       { label: 'ไม่ติวแล้ว ฝึกร่างกายอย่างเดียว', _reprep: 'skip', fx: { health: 1 }, result: 'ความรู้ว่าพอแล้ว ที่เหลือคือขากับปอด' },
       { label: 'ไม่ติวแล้ว ใช้ชีวิตตามปกติรอวันสอบ', _reprep: 'skip', fx: { happiness: 1 }, result: 'ปีนี้ไม่มีใบปลิวติดข้างโต๊ะ' }]);
+  };
+  // จับหลังเลือกวิธีติวแล้ว ธงวิธีติวใหม่จึงตัดใบค่าย/ใบบ้านที่ไม่ตรงทางออก · การ์ดในคิวต้องออกก่อนขั้นถัดไป จึง HOLD
+  S.reprepCards = (st) => {
+    const pool = st.content.events.filter((e) => /^cadet_(slack|friends_call|chores|pt\d|train)/.test(e.id) && whenOk(st, e.when));
+    const picks = shuffle(st, pool).slice(0, 4);
+    for (const e of picks) requeue(st, e);
+    return picks.length ? 'HOLD' : null;
   };
   S.wait1 = (st) => C('wait1', 'เดือนที่เหลือ', 'ไม่มีค่ายติว ไม่มีตารางอ่าน วันธรรมดากลับมาเป็นวันธรรมดา แต่ปฏิทินบนผนังมีวันหนึ่งที่วงไว้', [
     { label: 'ช่วยงานที่บ้านเต็มที่', fx: { relations: 1 }, result: `${elder(st)}บอกว่าปีนี้ดูใจเย็นกว่าปีก่อน` },
