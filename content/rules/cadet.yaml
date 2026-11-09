@@ -1124,7 +1124,7 @@ interludes:
       heir: null
       notHeir: null
       yearMin: null
-      yearMax: 2544
+      yearMax: 2547
       school: null
       flagsHas: null
       flagsNot:
@@ -1286,7 +1286,7 @@ interludes:
       heir: null
       notHeir: null
       yearMin: null
-      yearMax: 2544
+      yearMax: 2547
       school: null
       flagsHas:
         - cadet_family_secret
@@ -1447,7 +1447,7 @@ interludes:
       notRegions: null
       heir: null
       notHeir: null
-      yearMin: 2545
+      yearMin: 2548
       yearMax: null
       school: null
       flagsHas: null
@@ -1599,7 +1599,6 @@ interludes:
         schedule: []
         result: เก็บเหรียญไว้ค่ารถเมล์พรุ่งนี้
         outcomes: null
-    pending: ปีเริ่มเจ้าของตั้ง
   - id: I4-มือถือ-ลับ
     title: โทรหาบ้าน
     kind: interlude
@@ -1610,7 +1609,7 @@ interludes:
       notRegions: null
       heir: null
       notHeir: null
-      yearMin: 2545
+      yearMin: 2548
       yearMax: null
       school: null
       flagsHas:
@@ -1762,7 +1761,6 @@ interludes:
         schedule: []
         result: เก็บเหรียญไว้ค่ารถเมล์พรุ่งนี้
         outcomes: null
-    pending: ปีเริ่มเจ้าของตั้ง
   - id: I5-A
     title: เจอกันอีกแล้ว
     kind: interlude
@@ -2396,7 +2394,6 @@ board:
   eraLine:
     yearMin: 2558
     line: คนครึ่งหนึ่งก้มดูผลในโทรศัพท์ อีกครึ่งยังอยากเห็นชื่อบนกระดาษ
-    pending: ปีเจ้าของตั้ง
   rivalLines:
     - when:
         flagsHas:

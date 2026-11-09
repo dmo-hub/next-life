@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="th">
+<head>
+<!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>โฟกัสชีวิต · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<meta name="description" content="โฟกัสชีวิตในเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด — ทุกเรื่องที่ทุ่มเทได้ ช่วงวัยที่เลือกได้ เงื่อนไข และป้ายบนปุ่ม">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: 12px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.7; }
+  header { background: var(--head); color: var(--title); padding: 32px 16px 28px; }
+  .w { max-width: 960px; margin: 0 auto; }
+  h1 { font-family: var(--fh); font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
+  header p { margin: 0 0 6px; color: var(--on-head); max-width: 680px; }
+  header a { color: var(--title); }
+  main { padding: 20px 16px 64px; }
+  a { color: var(--accent2); }
+  .toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin: 0 0 28px; }
+  .toc section { background: var(--surface); border: 1px solid var(--line); padding: 14px 16px; }
+  .toc h2 { font-family: var(--fh); font-size: 20px; margin: 0 0 6px; }
+  .toc ol { margin: 0; padding-left: 22px; }
+  .toc li { margin: 0 0 6px; }
+  .toc li > a { color: var(--ink); font-weight: 600; line-height: 1.5; padding: 4px 0; display: inline; }
+  .toc small { color: var(--muted); }
+  .toc .sub { font-size: 14px; line-height: 1.5; }
+  .toc .sub a { display: block; color: var(--muted); padding: 3px 0; }
+  .doc { background: var(--surface); border: 1px solid var(--line); padding: 18px 20px; margin: 0 0 20px; overflow-wrap: anywhere; }
+  .doc > h2 { font-family: var(--fh); font-size: clamp(22px, 4vw, 28px); line-height: 1.35; margin: 0 0 4px; }
+  .doc h3 { font-family: var(--fh); font-size: 21px; margin: 24px 0 6px; border-bottom: 1px solid var(--line); padding-bottom: 2px; }
+  .doc h4 { font-family: var(--fh); font-size: 18px; margin: 18px 0 4px; }
+  .doc h5 { font-size: 16px; margin: 14px 0 4px; }
+  .doc p { margin: 0 0 10px; }
+  .doc ul, .doc ol { margin: 0 0 10px; padding-left: 22px; }
+  .doc li { margin: 0 0 4px; }
+  .doc li ul, .doc li ol { margin: 4px 0 0; }
+  .src { font-size: 13px; color: var(--muted); }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: .88em; background: var(--bg); padding: 0 4px; }
+  pre { background: var(--head); color: var(--title); padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .tw { overflow-x: auto; margin: 0 0 12px; }
+  table { border-collapse: collapse; font-size: 14px; background: var(--surface); min-width: 100%; }
+  th, td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; vertical-align: top; overflow-wrap: normal; }
+  th { background: var(--bg); font-weight: 600; }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; }
+  .toc a { display: inline-block; padding: 8px 12px; min-height: 44px; line-height: 28px; background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink); text-decoration: none; }
+  .toc a:hover, .toc a:focus-visible { border-color: var(--ink); outline: none; }
+  main section { background: var(--surface); border: 1px solid var(--line); padding: 16px 20px; margin: 0 0 16px; }
+  main section h2 { font-family: var(--fh); font-size: 22px; margin: 0 0 8px; }
+  main section p, main section ul, main section ol { margin: 0 0 8px; }
+  main section ul, main section ol { padding-left: 22px; }
+  .stages small { color: var(--muted); }
+  .gi { display: inline-flex; vertical-align: -2px; color: var(--accent2); }
+  .gi svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .fx { white-space: nowrap; font-size: 14px; border: 1px solid var(--line); padding: 0 6px; background: var(--surface); }
+  /* ป้ายผลไอคอนชุดเดียวกับปุ่มในเกม (fxHtml ใน labels.mjs) · สีชาติไทยเพราะพื้นหน้านี้สว่าง */
+  .fx .fxp, .fx .fxp > [aria-hidden], .fxk { display: inline-flex; align-items: center; gap: 2px; vertical-align: -2px; }
+  .fx svg, .fxk svg { width: 1.15em; height: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .fx .up, .fx .dn { padding: 0 5px; border-radius: 999px; }
+  .fx .up { color: var(--good); background: color-mix(in srgb, var(--good) 16%, transparent); }
+  .fx .dn { color: var(--bad); background: color-mix(in srgb, var(--bad) 16%, transparent); }
+  .fxk { margin-right: 6px; white-space: nowrap; }
+  b.btn { display: inline-block; font-weight: 600; border: 1px solid var(--line-strong); padding: 0 8px; background: var(--surface); white-space: nowrap; }
+  dl { margin: 0; } dt { font-weight: 600; margin-top: 8px; } dd { margin: 0 0 4px; }
+  kbd { font-family: ui-monospace, Consolas, monospace; font-size: 13px; border: 1px solid var(--line-strong); border-bottom-width: 2px; padding: 0 5px; background: var(--surface); }
+  footer { font-size: 13px; color: var(--muted); margin-top: 32px; }
+  details.old { margin: 12px 0 0; } details.old summary { cursor: pointer; font-weight: 600; min-height: 44px; line-height: 44px; }
+  h3 { font-family: var(--fh); font-size: 19px; margin: 18px 0 6px; } h2 small, h3 small { font-family: var(--fb); font-size: 14px; color: var(--muted); font-weight: 400; }
+  .ft .fx { white-space: normal; }
+  @media (max-width: 640px) {
+    .ft, .ft tbody, .ft tr, .ft td { display: block; min-width: 0; }
+    .ft thead { display: none; }
+    .ft tr { border: 1px solid var(--line); margin: 0 0 8px; padding: 6px 10px; background: var(--surface); }
+    .ft td { border: 0; padding: 2px 0; }
+    .ft td[data-k]::before { content: attr(data-k); display: block; font-size: 12px; color: var(--muted); }
+    .ft td:first-child::before { display: none; }
+  }
+  /*NAV-CSS:START*/
+  :root { --bg:#F4ECDC; --surface:#FBF6EA; --ink:#1B2A4A; --muted:#5B5648; --accent:#1B2A4A; --head:#1B2A4A; --headink:#E8CF8A; --accent2:#7A5C12; --gold:#D9B45A; --seal:#A62B1F; --good:#2F6B4F; --bad:#B3261E; --line:#C9B98F; --line-strong:#8C7A52; --on-head:#E7E2D4; --on-head2:#D8D2C2; --on-head3:#BFB49A; --title:#F4ECDC; --lacquer:#17110D; --lacquer2:#221912; --bronze:#5A4630; --fh:Maitree,serif; --fb:Sarabun,system-ui,sans-serif; --r:6px; --rk:8px; }
+  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
+  nav.top a { display: inline-block; color: var(--on-head); text-decoration: none; padding: 0 10px; line-height: 40px; font-size: 14px; font-weight: 400; font-family: inherit; margin: 0; min-height: 0; border: 0; border-radius: 0; background: none; }
+  nav.top a.dark { color: var(--headink); }
+  nav.top a[aria-current] { color: var(--headink); font-weight: 600; }
+  nav.top a:hover, nav.top a:focus-visible { text-decoration: underline; text-underline-offset: 4px; outline: none; }
+  nav.top .brand { font-weight: 600; color: var(--headink); padding-left: 0; white-space: nowrap; }
+  nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  nav.top a.play { background: var(--gold); color: var(--head); border-radius: var(--r); line-height: 28px; padding: 0 12px; font-weight: 600; white-space: nowrap; }
+  nav.top a.play:focus-visible { outline: 2px solid var(--headink); outline-offset: 2px; }
+  body > header:not(.home) { background: var(--head); color: var(--title); padding: 16px 16px 18px; }
+  body > header:not(.home) h1 { font-family: var(--fh); font-weight: 600; color: var(--title); }
+  body > header:not(.home) p { color: var(--on-head2); }
+  body > header:not(.home) a { color: var(--headink); text-decoration: underline; text-underline-offset: 3px; }
+  main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
+  @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
+/*NAV-CSS:END*/
+</style>
+<!--DOCS-LAYOUT:START--><style>
+.w:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){max-width:1280px!important}body>main:not(:has(.w)):not(#app){max-width:1280px;margin-left:auto;margin-right:auto}:is(body>main,body>header,body>footer){padding-left:24px;padding-right:24px}
+main h2:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(:first-child){margin-top:28px}main :is(section,.box):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){margin-bottom:17px}
+main:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){overflow-wrap:anywhere}main .st:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){white-space:normal;max-width:100%}@media (max-width:640px){main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){display:block;max-width:100%;overflow-x:auto}}
+main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) :is(th,td):not(:is(.dark,.dark *)){border:1px solid var(--line)}main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) th:not(:is(.dark,.dark *)){background:var(--bg);color:var(--ink)}
+main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){padding:20px 24px;box-shadow:none}main :is(section,.box,.panel,.world,a.card,.card,.tcard):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(.dark){background:var(--surface)}
+main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r)}
+.tag:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){border-radius:0}
+</style><!--DOCS-LAYOUT:END-->
+</head>
+<body>
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">NEXT LIFE</a><div class="links"><a href="guide.html" aria-current="page">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="worlds.html">โลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
+<header><div class="w">
+  <h1>โฟกัสชีวิต</h1>
+  <p>ทุกเรื่องที่ทุ่มเทได้ในเกม ช่วงวัยที่เลือกได้ เงื่อนไข และป้ายบนปุ่ม ดึงจากชุดเดียวกับในเกม ระดับคู่มือ ไม่เฉลยผลเป็นตัวเลข</p>
+  <p>เวอร์ชัน <span data-fact="version">v0.6.113</span></p>
+</div></header>
+<main><div class="w">
+
+<nav class="toc" aria-label="สารบัญ"><a href="#what">โฟกัสคืออะไร</a><a href="#year">นับปียังไง</a><a href="#thai">โลกนี้</a><a href="#chain">ปลายสาย</a><a href="#gate">ประตูเข้าสาย</a><a href="#heir">ทายาท</a><a href="#isekai">ต่างโลก</a><a href="#afterlife">ปรโลก</a></nav>
+<section id="what"><h2>โฟกัสคืออะไร</h2>
+<p>โฟกัสคือสิ่งที่ชีวิตนั้นทุ่มเทในแต่ละปี นอกจากตัวเลือกบนการ์ด เช่น ตั้งใจเรียน ทุ่มงาน หรือดูแลครอบครัว · ทุ่มเทเรื่องไหน ค่าสถานะขยับตามเรื่องนั้นทีละน้อยทุกปี และการ์ดเรื่องเดียวกันออกบ่อยขึ้น</p>
+<ul>
+<li>ป้ายบนปุ่มบอกแค่ค่าไหนขึ้นหรือลง เช่น <span class="fx">ความรู้ขึ้นมาก · ความสุขลด</span> ไม่บอกตัวเลข · <span class="fx">มาก</span> คือขยับแรงกว่าตัวอื่น</li>
+<li>ไม่ตั้งอะไรเลยคือ <b>ใช้ชีวิตตามน้ำ</b> ไม่มีผล ไม่ถ่วงการ์ด ชีวิตเดินแบบเดียวกับไม่มีปุ่มนี้</li>
+<li>ผลเรื่องเงินคิดเฉพาะปีที่มีรายได้ของตัวเอง ค่าใช้จ่ายของโฟกัสหักจากเงินเก็บได้แค่ส่วนหนึ่งต่อปี ไม่กู้มาทุ่ม</li>
+<li>บางโฟกัสเปิดทางใหม่: ปลายสายที่ซ่อนอยู่ ตัวเลือกของสายอาชีพบนการ์ด และโฟกัสวัยเด็กของทายาท</li>
+</ul></section>
+<section id="year"><h2>นับปียังไง</h2><ul>
+<li>ผลทั้งปีคิดตามโฟกัสที่ถืออยู่ตอนสิ้นปี ตัวเดียว · เปลี่ยนกลางปีกี่ครั้งก็ได้</li>
+<li>ปีที่เปลี่ยนโฟกัสไม่นับเป็น <b>ปีเต็ม</b> ของโฟกัสไหน · ปลายสาย ประตูเข้าสาย อาชีพต่างโลก และย้ายแคว้น นับเฉพาะปีเต็ม จึงต้องทุ่มเทต่อเนื่อง</li>
+<li>เข้าช่วงวัยที่โฟกัสนั้นเลือกไม่ได้แล้ว หรือเงื่อนไขหมดไป เช่น เลิกงาน เกมเปลี่ยนกลับเป็นตามน้ำเอง ปีที่สะสมไว้ไม่หาย</li>
+</ul></section>
+<section id="thai"><h2>โลกนี้ <small>30 โฟกัส</small></h2>
+<p>แท็บ <b>โฟกัส</b> ในเมนูเปิดแผงทับการ์ด บอกเรื่องที่ทุ่มเทอยู่กับรายการที่เลือกได้ในช่วงวัยนี้ กดเปลี่ยนได้ทุกเมื่อโดยไม่ต้องรอการ์ด ผลคิดตอนสิ้นปี · ตัวแรกในรายการคือ <b>ใช้ชีวิตตามน้ำ</b></p>
+<p>ตารางนี้มีทุกโฟกัสในเกม ตอนเล่นจะเห็นเฉพาะตัวที่ช่วงวัยและเงื่อนไขตรงในปีนั้น</p>
+<h3 id="g-work">งานและเงิน <small>10 โฟกัส</small></h3><div class="tw"><table class="ft"><thead><tr><th>โฟกัส</th><th>เลือกได้ช่วง</th><th>ต้องมีก่อน</th><th>ป้ายบนปุ่ม</th><th>การ์ดที่ออกบ่อยขึ้น</th></tr></thead><tbody><tr id="f-study_hard"><td data-k="โฟกัส"><b>ตั้งใจเรียน</b></td><td data-k="เลือกได้ช่วง">เด็ก · วัยรุ่น · หนุ่มสาว</td><td data-k="ต้องมีก่อน">ยังเรียนอยู่</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความรู้ขึ้นมาก · ความสุขลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">การเรียน</td></tr><tr id="f-follow_dream"><td data-k="โฟกัส"><b>ตามความฝัน</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · หนุ่มสาว</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสุขขึ้น · ความรู้ขึ้น · เงินลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">งานและเงิน</td></tr><tr id="f-work_hard"><td data-k="โฟกัส"><b>ทุ่มงาน</b></td><td data-k="เลือกได้ช่วง">หนุ่มสาว · ทำงาน · กลางคน</td><td data-k="ต้องมีก่อน">มีงานทำ</td><td data-k="ป้ายบนปุ่ม"><span class="fx">เงินขึ้น · ชีวิตลด · ความสัมพันธ์ลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">งานและเงิน</td></tr><tr id="f-side_income"><td data-k="โฟกัส"><b>หารายได้เสริม</b></td><td data-k="เลือกได้ช่วง">หนุ่มสาว · ทำงาน · กลางคน</td><td data-k="ต้องมีก่อน">มีงานทำ</td><td data-k="ป้ายบนปุ่ม"><span class="fx">เงินขึ้น · ชีวิตลด · ความสุขลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">งานและเงิน</td></tr><tr id="f-save_money"><td data-k="โฟกัส"><b>อดออม</b></td><td data-k="เลือกได้ช่วง">หนุ่มสาว · ทำงาน · กลางคน · ชรา</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">เงินขึ้น · ความสุขลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">งานและเงิน</td></tr><tr id="f-scholarship"><td data-k="โฟกัส"><b>สอบชิงทุนเรียนต่อ</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · หนุ่มสาว</td><td data-k="ต้องมีก่อน">ทุ่มเทตั้งใจเรียนครบ 3 ปีเต็มแล้ว โผล่ตั้งแต่ช่วงวัยถัดไป · เรียนตั้งแต่มัธยมขึ้นไป</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความรู้ขึ้นมาก · ความสุขลด · ความสัมพันธ์ลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">การเรียน</td></tr><tr id="f-family_trade"><td data-k="โฟกัส"><b>สืบทอดกิจการครอบครัว</b></td><td data-k="เลือกได้ช่วง">หนุ่มสาว · ทำงาน · กลางคน</td><td data-k="ต้องมีก่อน">ทุ่มเทช่วยงานบ้านครบ 3 ปีเต็มแล้ว โผล่ตั้งแต่ช่วงวัยถัดไป</td><td data-k="ป้ายบนปุ่ม"><span class="fx">เงินขึ้น · ความสัมพันธ์ขึ้น · ความสุขลด · มีเสี่ยง</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">งานและเงิน</td></tr><tr id="f-dream_job"><td data-k="โฟกัส"><b>ทำงานสายฝัน</b></td><td data-k="เลือกได้ช่วง">หนุ่มสาว · ทำงาน</td><td data-k="ต้องมีก่อน">ทุ่มเทตามความฝันครบ 3 ปีเต็มแล้ว โผล่ตั้งแต่ช่วงวัยถัดไป</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสุขขึ้นมาก · เงินลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">งานและเงิน</td></tr><tr id="f-exec_climb"><td data-k="โฟกัส"><b>ไต่ตำแหน่งบริหาร</b></td><td data-k="เลือกได้ช่วง">ทำงาน · กลางคน</td><td data-k="ต้องมีก่อน">ทุ่มเททุ่มงานครบ 3 ปีเต็มแล้ว โผล่ตั้งแต่ช่วงวัยถัดไป · มีงานทำ</td><td data-k="ป้ายบนปุ่ม"><span class="fx">เงินขึ้น · เส้นสายขึ้น · ชีวิตลดมาก · ความสัมพันธ์ลด · มีเสี่ยง</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">งานและเงิน</td></tr><tr id="f-invest_long"><td data-k="โฟกัส"><b>ลงทุนระยะยาว</b></td><td data-k="เลือกได้ช่วง">ทำงาน · กลางคน · ชรา</td><td data-k="ต้องมีก่อน">ทุ่มเทอดออมครบ 3 ปีเต็มแล้ว โผล่ตั้งแต่ช่วงวัยถัดไป</td><td data-k="ป้ายบนปุ่ม"><span class="fx">เงินขึ้น · ความสุขลด · มีเสี่ยง</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">งานและเงิน</td></tr></tbody></table></div><h3 id="g-people">คนและครอบครัว <small>9 โฟกัส</small></h3><div class="tw"><table class="ft"><thead><tr><th>โฟกัส</th><th>เลือกได้ช่วง</th><th>ต้องมีก่อน</th><th>ป้ายบนปุ่ม</th><th>การ์ดที่ออกบ่อยขึ้น</th></tr></thead><tbody><tr id="f-play_friends"><td data-k="โฟกัส"><b>เล่นกับเพื่อน</b></td><td data-k="เลือกได้ช่วง">เด็ก · วัยรุ่น</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสัมพันธ์ขึ้น · ความสุขขึ้น · ความรู้ลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">สังคม</td></tr><tr id="f-house_chores"><td data-k="โฟกัส"><b>ช่วยงานบ้าน</b></td><td data-k="เลือกได้ช่วง">เด็ก · วัยรุ่น</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสัมพันธ์ขึ้น · ความสุขลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">ครอบครัว</td></tr><tr id="f-party_friends"><td data-k="โฟกัส"><b>คบเพื่อนเที่ยว</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · หนุ่มสาว · ทำงาน</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสัมพันธ์ขึ้น · เส้นสายขึ้น · ความสุขขึ้น · ความรู้ลด · เงินลด · มีเสี่ยง</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">สังคม</td></tr><tr id="f-find_partner"><td data-k="โฟกัส"><b>หาคู่</b></td><td data-k="เลือกได้ช่วง">หนุ่มสาว · ทำงาน · กลางคน</td><td data-k="ต้องมีก่อน">ยังไม่มีคู่ และไม่อยู่ในช่วงไว้ทุกข์คู่</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสุขขึ้น · เงินลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">ครอบครัว</td></tr><tr id="f-family_care"><td data-k="โฟกัส"><b>ดูแลครอบครัว</b></td><td data-k="เลือกได้ช่วง">หนุ่มสาว · ทำงาน · กลางคน · ชรา</td><td data-k="ต้องมีก่อน">มีคู่หรือมีลูก</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสัมพันธ์ขึ้นมาก · ความสุขขึ้น · เงินลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">ครอบครัว</td></tr><tr id="f-parent_care"><td data-k="โฟกัส"><b>ดูแลพ่อแม่</b></td><td data-k="เลือกได้ช่วง">ทำงาน · กลางคน</td><td data-k="ต้องมีก่อน">พ่อหรือแม่อายุ 60 ขึ้นไปยังอยู่</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสัมพันธ์ขึ้น · เงินลด · ความสุขลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">ครอบครัว</td></tr><tr id="f-teach_kids"><td data-k="โฟกัส"><b>สอนลูกหลาน</b></td><td data-k="เลือกได้ช่วง">ชรา</td><td data-k="ต้องมีก่อน">มีลูกหรือหลาน</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสัมพันธ์ขึ้น · ความสุขขึ้น · ชีวิตลด · เงินลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">ครอบครัว</td></tr><tr id="f-gang_lead"><td data-k="โฟกัส"><b>เป็นหัวโจกกลุ่ม</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · หนุ่มสาว</td><td data-k="ต้องมีก่อน">ทุ่มเทเล่นกับเพื่อนครบ 3 ปีเต็มแล้ว โผล่ตั้งแต่ช่วงวัยถัดไป</td><td data-k="ป้ายบนปุ่ม"><span class="fx">เส้นสายขึ้น · ความสัมพันธ์ขึ้น · ความรู้ลด · มีเสี่ยง</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">สังคม</td></tr><tr id="f-raise_kids"><td data-k="โฟกัส"><b>ปั้นลูกให้ได้ดี</b></td><td data-k="เลือกได้ช่วง">ทำงาน · กลางคน</td><td data-k="ต้องมีก่อน">ทุ่มเทดูแลครอบครัวครบ 3 ปีเต็มแล้ว โผล่ตั้งแต่ช่วงวัยถัดไป · มีลูก</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสัมพันธ์ขึ้นมาก · เงินลด · ความสุขลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">ครอบครัว</td></tr></tbody></table></div><h3 id="g-body">กายและใจ <small>6 โฟกัส</small></h3><div class="tw"><table class="ft"><thead><tr><th>โฟกัส</th><th>เลือกได้ช่วง</th><th>ต้องมีก่อน</th><th>ป้ายบนปุ่ม</th><th>การ์ดที่ออกบ่อยขึ้น</th></tr></thead><tbody><tr id="f-run_wild"><td data-k="โฟกัส"><b>วิ่งเล่นซุกซน</b></td><td data-k="เลือกได้ช่วง">เด็ก · วัยรุ่น</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">ชีวิตขึ้น · ความสุขขึ้น · ความรู้ลด · มีเสี่ยง</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">สุขภาพ</td></tr><tr id="f-health_care"><td data-k="โฟกัส"><b>ดูแลสุขภาพ</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · หนุ่มสาว · ทำงาน · กลางคน · ชรา</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">ชีวิตขึ้นมาก · เงินลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">สุขภาพ</td></tr><tr id="f-rest_travel"><td data-k="โฟกัส"><b>พักผ่อนท่องเที่ยว</b></td><td data-k="เลือกได้ช่วง">หนุ่มสาว · ทำงาน · กลางคน · ชรา</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสุขขึ้นมาก · ชีวิตขึ้น · เงินลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">สุขภาพ</td></tr><tr id="f-make_merit"><td data-k="โฟกัส"><b>ทำทานปฏิบัติธรรม</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · หนุ่มสาว · ทำงาน · กลางคน · ชรา</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสุขขึ้น · เงินลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">ความเชื่อ</td></tr><tr id="f-sport"><td data-k="โฟกัส"><b>เล่นกีฬาจริงจัง</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · หนุ่มสาว</td><td data-k="ต้องมีก่อน">ทุ่มเทวิ่งเล่นซุกซนครบ 3 ปีเต็มแล้ว โผล่ตั้งแต่ช่วงวัยถัดไป</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ชีวิตขึ้นมาก · เส้นสายขึ้น · ความรู้ลด · มีเสี่ยง</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">สุขภาพ</td></tr><tr id="f-temple_pillar"><td data-k="โฟกัส"><b>เป็นกำลังหลักของวัดและชุมชน</b></td><td data-k="เลือกได้ช่วง">กลางคน · ชรา</td><td data-k="ต้องมีก่อน">ทุ่มเททำทานปฏิบัติธรรมครบ 3 ปีเต็มแล้ว โผล่ตั้งแต่ช่วงวัยถัดไป</td><td data-k="ป้ายบนปุ่ม"><span class="fx">เส้นสายขึ้น · ความสุขขึ้น · เงินลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">ความเชื่อ</td></tr></tbody></table></div><h3 id="g-gate">ประตูเข้าสาย <small>5 โฟกัส</small></h3><div class="tw"><table class="ft"><thead><tr><th>โฟกัส</th><th>เลือกได้ช่วง</th><th>ต้องมีก่อน</th><th>ป้ายบนปุ่ม</th><th>การ์ดที่ออกบ่อยขึ้น</th></tr></thead><tbody><tr id="f-politics_base"><td data-k="โฟกัส"><b>สร้างฐานการเมือง</b></td><td data-k="เลือกได้ช่วง">ทำงาน · กลางคน · ชรา</td><td data-k="ต้องมีก่อน">อายุ 25 ปีขึ้นไป</td><td data-k="ป้ายบนปุ่ม"><span class="fx">เส้นสายขึ้นมาก · เงินลด · ความสัมพันธ์ลด · มีเสี่ยง</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">สังคม</td></tr><tr id="f-ordain"><td data-k="โฟกัส"><b>บวชบำเพ็ญ</b></td><td data-k="เลือกได้ช่วง">หนุ่มสาว · ทำงาน · กลางคน · ชรา</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสุขขึ้น · ความรู้ขึ้น · เงินลดมาก · ความสัมพันธ์ลด</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">ความเชื่อ</td></tr><tr id="f-business"><td data-k="โฟกัส"><b>ทำธุรกิจลงทุน</b></td><td data-k="เลือกได้ช่วง">หนุ่มสาว · ทำงาน · กลางคน</td><td data-k="ต้องมีก่อน">มีเงินเก็บหรือมีงานทำ</td><td data-k="ป้ายบนปุ่ม"><span class="fx">เงินขึ้น · ชีวิตลด · ความสุขลด · มีเสี่ยง</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">งานและเงิน</td></tr><tr id="f-occult"><td data-k="โฟกัส"><b>ศึกษาสายมู</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · หนุ่มสาว · ทำงาน · กลางคน · ชรา</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">ความสุขขึ้น · เงินลด · ความรู้ลด · มีเสี่ยง</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">ความเชื่อ</td></tr><tr id="f-shortcut_money"><td data-k="โฟกัส"><b>หาเงินทางลัด</b></td><td data-k="เลือกได้ช่วง">หนุ่มสาว · ทำงาน · กลางคน</td><td data-k="ต้องมีก่อน"><small>—</small></td><td data-k="ป้ายบนปุ่ม"><span class="fx">เงินขึ้นมาก · ความสัมพันธ์ลด · มีเสี่ยง</span></td><td data-k="การ์ดที่ออกบ่อยขึ้น">งานและเงิน</td></tr></tbody></table></div>
+<h3 id="chain">ปลายสาย</h3>
+<p>บางโฟกัสซ่อนอยู่จนกว่าจะทุ่มเทกับตัวต้นสายครบ 3 ปีเต็ม แล้วจึงโผล่ตั้งแต่ช่วงวัยถัดไป ไม่ใช่ช่วงวัยที่เพิ่งครบ</p><ul><li>ตั้งใจเรียน → <b>สอบชิงทุนเรียนต่อ</b></li><li>เล่นกับเพื่อน → <b>เป็นหัวโจกกลุ่ม</b></li><li>ช่วยงานบ้าน → <b>สืบทอดกิจการครอบครัว</b></li><li>วิ่งเล่นซุกซน → <b>เล่นกีฬาจริงจัง</b></li><li>ตามความฝัน → <b>ทำงานสายฝัน</b></li><li>ทุ่มงาน → <b>ไต่ตำแหน่งบริหาร</b></li><li>อดออม → <b>ลงทุนระยะยาว</b></li><li>ดูแลครอบครัว → <b>ปั้นลูกให้ได้ดี</b></li><li>ทำทานปฏิบัติธรรม → <b>เป็นกำลังหลักของวัดและชุมชน</b></li></ul>
+<h3 id="gate">ประตูเข้าสาย</h3>
+<p>โฟกัสหมวดประตู (สร้างฐานการเมือง · บวชบำเพ็ญ · ทำธุรกิจลงทุน · ศึกษาสายมู · หาเงินทางลัด) ทุ่มเทครบ 3 ปีเต็มแล้วจึงเปิดตัวเลือกของสายนั้นบนการ์ด เช่น เปิดกิจการ หรือลงสมัคร · ก่อนนั้นตัวเลือกพวกนี้ไม่ขึ้นบนการ์ด การ์ดยังออกด้วยตัวเลือกที่เหลือ · บางการ์ดชวนเข้าสายเองได้โดยไม่ต้องทุ่มเท</p>
+<h3 id="risk">โฟกัสที่มีเสี่ยง</h3>
+<p>ป้าย <span class="fx">มีเสี่ยง</span> บนปุ่มบอกว่าปีที่ทุ่มเทเรื่องนี้อาจมีเรื่องร้ายตามมา ไม่บอกว่าเรื่องอะไรหรือบ่อยแค่ไหน · เสี่ยงบางอย่างถึงตาย แต่ครั้งแรกจะมาเป็นการ์ดเตือนก่อนเสมอ ไม่มีใครตายจากโฟกัสโดยไม่เคยเห็นสัญญาณ</p>
+<h3 id="heir">ทายาทในตระกูล</h3>
+<p>ไปเกิดเป็นลูกหลานในตระกูลเดิม ชีวิตใหม่เริ่มด้วยโฟกัสวัยเด็กตามโฟกัสหลักของรุ่นก่อน (ตัวที่ทุ่มเทครบปีมากที่สุด) และรับประตูเข้าสายที่รุ่นก่อนเปิดไว้ · ถ้าโฟกัสวัยเด็กนั้นยังเลือกไม่ได้ เช่นยังไม่เข้าเรียน เกมรอจนเปิดได้ · เปลี่ยนเองได้ทันทีเหมือนโฟกัสอื่น · เกิดที่อื่นหรือรุ่นก่อนไม่เคยทุ่มเทอะไร เริ่มแบบตามน้ำ</p>
+<p>โฟกัสหลักของรุ่นก่อน → โฟกัสที่ทายาทเริ่ม · ตัวที่ไม่อยู่ในรายการ ทายาทเริ่มแบบตามน้ำ</p>
+<ul><li>เล่นกับเพื่อน · คบเพื่อนเที่ยว · หาคู่ · สร้างฐานการเมือง · ศึกษาสายมู · หาเงินทางลัด · เป็นหัวโจกกลุ่ม → <b>เล่นกับเพื่อน</b></li><li>ตั้งใจเรียน · ตามความฝัน · ทำธุรกิจลงทุน · สอบชิงทุนเรียนต่อ · ทำงานสายฝัน → <b>ตั้งใจเรียน</b></li><li>ช่วยงานบ้าน · ทุ่มงาน · หารายได้เสริม · อดออม · ดูแลครอบครัว · ดูแลพ่อแม่ · ทำทานปฏิบัติธรรม · บวชบำเพ็ญ · สืบทอดกิจการครอบครัว · ไต่ตำแหน่งบริหาร · ลงทุนระยะยาว · ปั้นลูกให้ได้ดี · เป็นกำลังหลักของวัดและชุมชน → <b>ช่วยงานบ้าน</b></li><li>วิ่งเล่นซุกซน · ดูแลสุขภาพ · พักผ่อนท่องเที่ยว · เล่นกีฬาจริงจัง → <b>วิ่งเล่นซุกซน</b></li></ul></section>
+<section id="isekai"><h2>ต่างโลก <small>13 ทุ่มเท + ทางลัด 9</small></h2>
+<p>ชาติต่างโลกเวลาเดินเอง เปลี่ยนเรื่องที่ทุ่มเทได้ทุกเมื่อที่แท็บ <b>โฟกัส</b> ไม่มีการ์ดหยุดถาม · รายการเปลี่ยนตามช่วงวัย เข้าช่วงวัยที่เรื่องเดิมเลือกไม่ได้แล้ว เกมเปลี่ยนกลับเป็นตามน้ำเองแล้วบอกบนใบถัดไป</p>
+<p>เรื่องที่ทุ่มเทค้างข้ามปีจนกว่าจะเปลี่ยน แต่ละปีได้ค่าตามป้ายบนปุ่ม และเหตุการณ์สายเดียวกันโผล่บ่อยขึ้น · ป้ายบอกเฉพาะค่าบนจอที่ขึ้น บางเรื่องจึงไม่มีป้าย แต่ยังมีผล</p>
+<div class="tw"><table class="ft"><thead><tr><th>ทุ่มเท</th><th>เลือกได้ช่วง</th><th>ป้ายบนปุ่ม</th></tr></thead><tbody><tr id="i-play"><td data-k="ทุ่มเท"><b>วิ่งเล่นตามประสาเด็ก</b></td><td data-k="เลือกได้ช่วง">วัยเด็ก</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ชีวิต · โชค ขึ้น</span></td></tr><tr id="i-sword"><td data-k="ทุ่มเท"><b>ฝึกดาบ</b></td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">พลัง ขึ้น</span></td></tr><tr id="i-magic"><td data-k="ทุ่มเท"><b>ฝึกเวท</b></td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">เวท ขึ้น</span></td></tr><tr id="i-people"><td data-k="ทุ่มเท"><b>คบหาผู้คน</b></td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><small>ไม่มีป้าย</small></td></tr><tr id="i-roam"><td data-k="ทุ่มเท"><b>ออกเดินทางเสี่ยงโชค</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · วัยผู้ใหญ่ · วัยกลางคน</td><td data-k="ป้ายบนปุ่ม"><span class="fx">โชค · ทอง ขึ้น</span></td></tr><tr id="i-study"><td data-k="ทุ่มเท"><b>อ่านตำรา</b></td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">เวท ขึ้น</span></td></tr><tr id="i-work"><td data-k="ทุ่มเท"><b>ทำงานหาเงิน</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · วัยผู้ใหญ่ · วัยกลางคน · วัยชรา</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ทอง ขึ้น</span></td></tr><tr id="i-rest"><td data-k="ทุ่มเท"><b>พักผ่อนอยู่บ้าน</b></td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ชีวิต ขึ้น</span></td></tr><tr id="i-fame"><td data-k="ทุ่มเท"><b>สร้างชื่อเสียง</b></td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ชื่อเสียง ขึ้น</span></td></tr><tr id="i-mate"><td data-k="ทุ่มเท"><b>หาคู่</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · วัยผู้ใหญ่ · วัยกลางคน</td><td data-k="ป้ายบนปุ่ม"><small>ไม่มีป้าย</small></td></tr><tr id="i-kin"><td data-k="ทุ่มเท"><b>ดูแลครอบครัว</b></td><td data-k="เลือกได้ช่วง">วัยผู้ใหญ่ · วัยกลางคน · วัยชรา</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ชีวิต ขึ้น</span></td></tr><tr id="i-alms"><td data-k="ทุ่มเท"><b>ทำทาน</b></td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ชื่อเสียง ขึ้น</span></td></tr><tr id="i-explore"><td data-k="ทุ่มเท"><b>สำรวจดินแดน</b></td><td data-k="เลือกได้ช่วง">วัยรุ่น · วัยผู้ใหญ่ · วัยกลางคน</td><td data-k="ป้ายบนปุ่ม"><span class="fx">โชค ขึ้น</span></td></tr></tbody></table></div>
+<h3 id="i-near">ใกล้ตาย</h3>
+<p>ชีวิตตกถึงขีดใกล้ตาย การ์ด "ใกล้ตาย" ให้เลือก "เปลี่ยนโฟกัส" ซึ่งเปิดใบเลือกโฟกัสกลางช่วงวัยและติดป้ายแนะนำที่ <b>พักผ่อนอยู่บ้าน</b></p>
+<h3 id="i-move">ย้ายแคว้น</h3>
+<p>ทุ่มเท <b>สำรวจดินแดน</b> ครบ 2 ปีเต็มนับจากเกิดหรือย้ายครั้งก่อน ได้การ์ดทางแยกให้ย้ายไปแคว้นที่มีถนนติดกัน หรืออยู่ที่เดิมแล้วเริ่มนับใหม่</p>
+<h3 id="i-career">อาชีพจากสิ่งที่ทุ่มเท</h3>
+<p>ทุ่มเทเรื่องต้นทางรวมกันครบ 3 ปีเต็มได้อาชีพนั้นติดตัวทั้งชาติ มีหลายอาชีพพร้อมกันได้ และผลของอาชีพซ้อนกับเรื่องที่ทุ่มเทอยู่</p><ul><li><b>นักดาบ</b> ← ฝึกดาบ</li><li><b>จอมเวท</b> ← ฝึกเวท</li><li><b>พ่อค้า</b> ← ทำงานหาเงิน หรือ ค้าขายแบบบ้านเกิด</li><li><b>นักผจญภัย</b> ← ออกเดินทางเสี่ยงโชค หรือ สำรวจดินแดน</li><li><b>นักบวช</b> ← ทำทาน หรือ รักษาคนแบบบ้านเกิด</li></ul>
+<h3 id="i-know">ทางลัดจากความรู้โลกเดิม</h3>
+<p>คนที่ข้ามมาจากโลกนี้จำเรื่องจากบ้านเกิดได้ ความรู้หมวดไหนสะสมมากพอ (จากเหตุการณ์ของหมวดนั้นและการอ่านตำรา) ทางลัดของหมวดนั้นต่อท้ายรายการทุ่มเท · ทุ่มเททางลัดแล้วเหตุการณ์หมวดนั้นโผล่บ่อยขึ้น</p>
+<div class="tw"><table class="ft"><thead><tr><th>ทางลัด</th><th>หมวดความรู้</th><th>เลือกได้ช่วง</th><th>ป้ายบนปุ่ม</th></tr></thead><tbody><tr><td data-k="ทางลัด"><b>เปิดร้านอาหารแบบบ้านเกิด</b></td><td data-k="หมวดความรู้">อาหาร</td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ทอง · ชื่อเสียง ขึ้น</span></td></tr><tr><td data-k="ทางลัด"><b>ทำแปลงทดลองแบบบ้านเกิด</b></td><td data-k="หมวดความรู้">เกษตร</td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ทอง · ชื่อเสียง · ชีวิต ขึ้น</span></td></tr><tr><td data-k="ทางลัด"><b>รักษาคนแบบบ้านเกิด</b></td><td data-k="หมวดความรู้">แพทย์และสุขอนามัย</td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ทอง · ชื่อเสียง ขึ้น</span></td></tr><tr><td data-k="ทางลัด"><b>ค้าขายแบบบ้านเกิด</b></td><td data-k="หมวดความรู้">การค้า</td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ทอง ขึ้น</span></td></tr><tr><td data-k="ทางลัด"><b>ประดิษฐ์ของแบบบ้านเกิด</b></td><td data-k="หมวดความรู้">ช่าง</td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ทอง · พลัง ขึ้น</span></td></tr><tr><td data-k="ทางลัด"><b>สอนหนังสือแบบบ้านเกิด</b></td><td data-k="หมวดความรู้">การพิมพ์และการศึกษา</td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ชื่อเสียง ขึ้น</span></td></tr><tr><td data-k="ทางลัด"><b>ฝึกทหารแบบบ้านเกิด</b></td><td data-k="หมวดความรู้">การทหาร</td><td data-k="เลือกได้ช่วง">วัยผู้ใหญ่ · วัยกลางคน · วัยชรา</td><td data-k="ป้ายบนปุ่ม"><span class="fx">พลัง · ชื่อเสียง ขึ้น</span></td></tr><tr><td data-k="ทางลัด"><b>ช่วยงานราชการแบบบ้านเกิด</b></td><td data-k="หมวดความรู้">การเมืองและกฎหมาย</td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ทอง ขึ้น</span></td></tr><tr><td data-k="ทางลัด"><b>ทำเรื่องสนุกแบบบ้านเกิด</b></td><td data-k="หมวดความรู้">บันเทิง</td><td data-k="เลือกได้ช่วง">ทุกช่วงวัย</td><td data-k="ป้ายบนปุ่ม"><span class="fx">ทอง ขึ้น</span></td></tr></tbody></table></div>
+<h3 id="i-home">หายตัวข้ามไปทั้งตัว</h3>
+<p>ชาติที่หลุดไปต่างโลกทั้งตัว (ไม่ได้ตายก่อน) มี <b>ตามหาทางกลับบ้าน</b> ต่อท้ายรายการทุกช่วงวัย ป้ายบนปุ่ม <span class="fx">ใกล้ทางกลับบ้านขึ้น</span> · ปีที่ใช้ตามหาคือปีที่ไม่ได้ฝึกอย่างอื่น</p>
+<details class="old"><summary>ชาติเก่า (เซฟก่อนมีทวีป)</summary><p>ชาติที่เริ่มก่อนมีทวีปมีเรื่องทุ่มเทของบทบาทเป็นตัวแรกในรายการเพิ่มอีกหนึ่งตัว ชาติใหม่ไม่มีรายการนี้</p><ul><li>ผู้กล้าที่ถูกอัญเชิญ: <b>ตามหาทางไปปราสาทจอมมาร</b></li><li>ลูกขุนนางบ้านนอก: <b>เรียนงานปกครองที่ดิน</b></li><li>เกิดเป็นสไลม์: <b>ดูดซับแล้ววิวัฒน์</b></li><li>นางร้ายในเกมจีบหนุ่ม: <b>หักธงหายนะทีละธง</b></li><li>สโลว์ไลฟ์ชายป่า: <b>ดูแลร้านชายป่า</b></li><li>ชาวบ้านมีอาชีพ: <b>ช่วยงานโรงตีเหล็ก</b></li><li>ลูกพ่อค้าเร่: <b>ตามพ่อไปค้าขาย</b></li><li>เอลฟ์ป่าลึก: <b>ฟังเสียงป่า</b></li><li>คนแคระเหมืองหิน: <b>ขุดเหมืองกับตีเหล็ก</b></li><li>ก็อบลินตัวเล็ก: <b>หาอาหารให้รัง</b></li><li>ลูกจอมมาร: <b>เรียนวิชาสายจอมมาร</b></li></ul></details></section>
+<section id="afterlife"><h2>ปรโลก</h2>
+<p>ปรโลกมีแท็บ <b>โฟกัส</b> ไว้ดูว่าชาติที่แล้วทุ่มเทเรื่องไหน แต่เลือกใหม่ไม่ได้ ช่วงระหว่างชาติเดินด้วยการ์ดอย่างเดียว · สิ่งที่ปรโลกทำกับโฟกัสคือส่งต่อ: เกิดเป็นลูกหลานในตระกูลเดิมได้โฟกัสวัยเด็กกับประตูเข้าสายจากรุ่นก่อน (ดู<a href="#heir">ทายาทในตระกูล</a>)</p></section>
+  <footer>วิธีเล่นทั้งเกม → <a href="guide.html">วิธีเล่น</a> · อะไรมาจากข้อมูลจริง อะไรเป็นสมมติฐานเกม → <a href="about.html">กลไกในเกม</a></footer>
+  <!-- คำปฏิเสธย้ายมาจากหน้าแรก (ui-redo 105 · ข้อ 220) — ห้ามหายจากเว็บ -->
+  <footer>โปรเจกต์ส่วนตัว · ข้อมูลการเงินในเกมเป็นข้อมูลเพื่อออกแบบเกม ไม่ใช่คำแนะนำการลงทุน · แฟนตาซีในเกมได้แรงบันดาลใจจากคติไทย ไม่ได้อ้างว่าเป็นคำสอน</footer>
+</div></main>
+</body>
+</html>

@@ -27,6 +27,9 @@ export function lintContext() {
     lore.set(f, loreHeadings(f, read(`docs/spec/${f}`)));
   }
   const eras = new Set(JSON.parse(read('data/era-events.json')).events.map((x) => x.id));
+  // ปีเปิดของหนี้แต่ละชนิด (data/debt.json kinds.*.from) กับปีเริ่มของเหตุบ้านเมือง — กติกา debt-before-open ใช้กั้นช่วงปีการ์ด
+  const debtFrom = new Map(Object.entries(JSON.parse(read('data/debt.json')).kinds).filter(([, k]) => Number.isFinite(k?.from)).map(([id, k]) => [id, k.from]));
+  const eraFrom = new Map(JSON.parse(read('data/era-events.json')).events.map((x) => [x.id, x.from]));
   const occupations = JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id);
   const ladders = Object.keys(JSON.parse(read('data/careers.json')).ladders);
   const reg = parse(read('content/rules/flags.yaml'));
@@ -37,7 +40,7 @@ export function lintContext() {
   const focusTagsAll = focusTags(focusDoc);
   const gateFocuses = Object.entries(focusDoc.focuses ?? {}).filter(([, f]) => f?.group === 'gate').map(([id]) => id);
   const items = Object.keys(parse(read('content/rules/items.yaml')).items ?? {});
-  return { regions, systems, eras, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: focusDoc.natures ?? {}, natureAge: focusDoc.nature_age, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
+  return { regions, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: focusDoc.natures ?? {}, natureAge: focusDoc.nature_age, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]
