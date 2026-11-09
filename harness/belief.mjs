@@ -66,6 +66,8 @@ const score = (c) =>
   }, 0);
 const persona = (sign) => (card, rng, st) => {
   const open = openChoices(card);
+  // การ์ดเตรียมทหารไม่ผ่าน st.pending และไม่มีป้ายบุญบาป — สุ่มแบบบอทสุ่ม
+  if (!st.pending) return open[rng.int(0, open.length - 1)];
   if (st.pending.alloc) return sign ? 0 : open[rng.int(0, open.length - 1)];
   if (!sign) return open[rng.int(0, open.length - 1)];
   const s = open.map((i) => sign * score(st.pending.choices[i]));
@@ -75,7 +77,7 @@ const persona = (sign) => (card, rng, st) => {
 };
 const buyer = (pick, ms) => (card, rng, st) => {
   const ev = st.pending;
-  const i = ev.belief?.kind === 'lottery_numen' ? ev.choices.findIndex((c) => c.ticket) : -1;
+  const i = ev?.belief?.kind === 'lottery_numen' ? ev.choices.findIndex((c) => c.ticket) : -1;
   if (i < 0 || card.locked?.[i]) return pick(card, rng, st);
   ms.push(smallPrizeMult(st.ledger, ev.belief.odds_modifier));
   return i;
