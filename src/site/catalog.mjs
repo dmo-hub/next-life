@@ -2,6 +2,8 @@
 // ทั้งหน้าประกอบใน spoilers.mjs (catalogHtml)
 
 export const CATEGORY = { family: 'ครอบครัว', study: 'การเรียน', work_money: 'งานและเงิน', health: 'สุขภาพ', society: 'สังคม', belief: 'ความเชื่อ' };
+import { sinceTag } from './card-since.mjs';
+
 export const AFTER = 'ระหว่างชาติ';
 
 export const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -23,6 +25,7 @@ export function catalogCard(e, back) {
   return [
     `<article class="c a" id="${esc(e.id)}">`,
     `<h4>${text(e.title ?? 'ไม่มีชื่อการ์ด')}</h4>`,
+    sinceTag(e.id),
     '<div class="sp-front">',
     tags.length ? `<p class="tags">${tags.map((t) => `<span>${esc(t)}</span>`).join('')}</p>` : '',
     `<p>${text(e.text)}</p>`,
