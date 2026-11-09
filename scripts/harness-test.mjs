@@ -353,8 +353,9 @@ const f2 = (v) => v.toFixed(2);
 }
 
 // B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50% (ใบ: สืบทอดโอกาสเล็กน้อย ไม่ใช่ได้แน่) · นับเฉพาะทายาทที่พ่อแม่มีนิสัยและถึงอายุล็อก
-// ตัวควบคุม heir_nature 0 (เจ้าของเคาะ): seed เดียวกัน ชีวิตแรกเดินเหมือนกันทุกหลัก และแต้มไม่มีผลก่อนล็อก
-// ⇒ ทายาทรุ่นแรกต่างกันแค่แต้มทุ่มเทที่ได้จากพ่อแม่ — ทายาทที่ได้นิสัยเดียวกันต้องลดลง ไม่งั้นสายแต้มทายาทไม่ต่อ
+// ตัวควบคุม heir_nature (เจ้าของเคาะ): ตรวจที่กลไก ไม่ตรวจที่ผลสุ่ม · บอทแทบไม่ได้ทายาทที่รับโฟกัสจากพ่อแม่ (3 จาก 240) ส่วนต่าง
+// "ได้นิสัยเดียวกัน" ระหว่างค่าจริงกับ 0 จึงบางแค่ ~0.5% ของทายาท การ์ดใหม่อะไรก็ขยับเลขสุ่มจนเท่ากันได้ ⇒ ยัดโฟกัสตัวเด็กให้ทายาทเอง
+// เดินชีวิตเดียวกันสองฝั่ง (ชีวิตเดินเหมือนกันจนล็อกนิสัย) แล้วอ่านแต้มนิสัยรวมก่อนล็อก (ล็อกลบ naturePts) ค่าจริงต้องมากกว่า 0
 {
   const content = loadContent();
   const heirs = (n) => {
@@ -377,11 +378,32 @@ const f2 = (v) => v.toFixed(2);
   };
   const real = heirs(40);
   check('B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50%', real.all >= 50 && real.pct <= 50, `${real.same}/${real.all} = ${f2(real.pct)}%`);
+  const natureSum = (st) => Object.values(st.naturePts ?? {}).reduce((a, b) => a + b, 0);
+  const kid = Object.values(content.focus.focuses).find((f) => f.kid)?.kid;
+  const heirPts = () => {
+    let lives = 0, born = 0, total = 0;
+    for (const bot of Object.values(BOTS)) {
+      for (let i = 0; i < 4; i++) {
+        const { state: parent } = playLife(mixSeed(1, i * 7919), content, bot);
+        const af = playAfterlife(parent, bot);
+        let last = 0, isBorn = false;
+        playLife(mixSeed(1, i * 7919 + 1), content, bot, (card, st) => {
+          if (st.naturePts) last = natureSum(st);
+          if (st.focusBorn) isBorn = true;
+        }, nextLife({ ...af, heir: { ...af.heir, focus: kid } }));
+        lives++;
+        if (isBorn) born++;
+        total += last;
+      }
+    }
+    return { lives, born, total };
+  };
   const keep = content.focus.heir_nature;
+  const ptsReal = heirPts();
   content.focus.heir_nature = 0;
-  const zero = heirs(40);
+  const ptsZero = heirPts();
   content.focus.heir_nature = keep;
-  check('B41 ตัวควบคุม: heir_nature 0 ⇒ ทายาทนิสัยเดียวกันลดลง', zero.all === real.all && zero.same < real.same, `${zero.same}/${zero.all} = ${f2(zero.pct)}% · จริง ${real.same}`);
+  check('B41 ตัวควบคุม: heir_nature 0 ⇒ แต้มนิสัยรวมของทายาทก่อนล็อกลดลง', !!kid && ptsReal.born === ptsReal.lives && ptsZero.lives === ptsReal.lives && ptsZero.total < ptsReal.total, `จริง ${ptsReal.total} · ศูนย์ ${ptsZero.total} · ทายาท ${ptsReal.lives} รับโฟกัสพ่อแม่ ${ptsReal.born}`);
 }
 
 // ใบ 06a: ด่านทวีปจับตัวสุ่ม/แผนที่ที่พังได้ (ตัวควบคุม) — ป้อนของพังเข้า contChecks ตรง ๆ ไม่แก้ข้อมูลจริง
