@@ -179,6 +179,12 @@ flags:
   # >>> nl-writer b003 flag cadet_exam_door
   cadet_exam_door: "ไปถึงห้องสอบเตรียมทหารมาแล้ว"
   # <<< nl-writer b003 flag cadet_exam_door
+  # สายนางงาม
+  pageant_walked: "เคยขึ้นเวทีประกวด"
+  pageant_local: "เคยได้สายสะพายเวทีท้องถิ่น"
+  pageant_province: "เคยครองตำแหน่งนางงามจังหวัด"
+  pageant_camp: "เคยเก็บตัวเวทีระดับประเทศ"
+  pageant_crown: "เคยครองมงกุฎระดับประเทศ"
 
 # ธงมีพารามิเตอร์ <ชื่อ>:<id> — ทะเบียนเก็บแค่ชื่อหน้า · id หลัง : เป็นของการ์ดคู่นั้น
 prefixes:

@@ -12,7 +12,7 @@ import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT, CHILD_UNTIL, SCHOOL_FROM 
 import { newLife, CLASSES, SEXES, fill } from '../src/engine/life.mjs';
 import { CATEGORIES, MERIT_CATS, MAX_LEN, MIN_CHOICES, SCHOOL_VALUES, PLACEHOLDERS } from '../src/node/lint/vocab.mjs';
 import { SCENES } from '../src/engine/afterlife.mjs';
-import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenText } from '../src/engine/merit.mjs';
+import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenText, SIN_CATS, ISEKAI_CATS, GAME_CATS, meritName, meritId } from '../src/engine/merit.mjs';
 import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../src/engine/isekai.mjs';
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 
@@ -68,6 +68,14 @@ const controls = {
 };
 for (const [name, args] of Object.entries(controls)) if (!checkMeritTable(...args).length) fails.push(`merit-table ตัวควบคุม "${name}" ไม่ตก`);
 rows.push(['merit-table ตัวควบคุม', `${Object.keys(controls).length} แบบ`]);
+// หมวดบาปไตรภูมิ (ใบ 202): บาปตามคติชาติไทย หนักเท่าหมวดเดิม · ไม่ใช่หมวดต่างโลก/กลไกเกม · ชื่อบนการ์ดคิดบัญชีเป็นไทย
+for (const [id, th] of [['kill_animal', 'ฆ่าสัตว์'], ['wrong_view', 'มิจฉาทิฏฐิ']]) {
+  if (!SIN_CATS.includes(id)) fails.push(`ใบ 202: ${id} ไม่อยู่ใน SIN_CATS`);
+  if (ISEKAI_CATS.includes(id) || GAME_CATS.includes(id)) fails.push(`ใบ 202: ${id} ต้องไม่อยู่ใน ISEKAI_CATS/GAME_CATS`);
+  if (MERIT_WEIGHTS[id] !== 1) fails.push(`ใบ 202: ${id} น้ำหนัก ${MERIT_WEIGHTS[id]} ไม่ใช่ 1`);
+  if (meritName(id) !== th || meritId(th) !== id) fails.push(`ใบ 202: ${id} ชื่อแสดง ${meritName(id)} ไม่ใช่ ${th}`);
+}
+rows.push(['ใบ 202 หมวดไตรภูมิ', 'kill_animal · wrong_view']);
 // ผลเบาชาติไทยของสกิล (06s): ของจริงผ่าน · ตัวควบคุมผิดทีละอย่างต้องตก
 const skThai = checkSkillThai(CATEGORIES);
 rows.push(['skill-thai', skThai.length ? `ตก ${skThai.length} ข้อ` : `ผ่าน (${Object.values(ISEKAI_SKILLS).filter((s) => s.thai).length} สกิล)`]);
