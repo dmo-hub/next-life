@@ -32,7 +32,7 @@ jobs:
     steps:
       - id: plan
         env:
-          REF: ${{ inputs.ref || '73c8042f' }}
+          REF: ${{ inputs.ref || 'b5c5b105' }}
           GATES: ${{ inputs.gates || 'full,side,titles,density,overlap,keep,continuity' }}
           SEED2: ${{ inputs.seed2 || '1689122133' }}
         run: |
