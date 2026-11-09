@@ -1,0 +1,100 @@
+name: heavy gates
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: branch or sha to test
+        required: true
+        default: main
+      gates:
+        description: comma list of full, side, titles, density, overlap, keep, continuity
+        required: true
+        default: full,side,titles,density,overlap,keep,continuity
+      seed2:
+        description: comma list of seed2 values, one full job each
+        required: true
+        default: '1689122133'
+  # Temporary: workflow_dispatch only exists once this file is on main.
+  push:
+    branches: [lane-b/287-heavy-gates]
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      ref: ${{ steps.plan.outputs.ref }}
+    steps:
+      - id: plan
+        env:
+          REF: ${{ inputs.ref || '73c8042f' }}
+          GATES: ${{ inputs.gates || 'full,side,titles,density,overlap,keep,continuity' }}
+          SEED2: ${{ inputs.seed2 || '1689122133' }}
+        run: |
+          node --input-type=module <<'EOF' >> "$GITHUB_OUTPUT"
+          const { REF, GATES, SEED2 } = process.env;
+          const seeds = SEED2.split(',').map((s) => s.trim());
+          if (!seeds.every((s) => /^\d+$/.test(s))) throw new Error(`bad seed2: ${SEED2}`);
+          const npm = (name) => ({ name, cmd: `npm run ${name}` });
+          // A 4-core runner gives full.mjs only one worker slot next to its 5 side harnesses
+          // (slots = cores - side), so full runs --solo and each side harness gets its own job.
+          const table = {
+            full: seeds.map((s) => ({ name: `full-seed2-${s}`, cmd: `node harness/full.mjs --n 20000 --seed 1 --seed2 ${s} --solo` })),
+            side: ['merit', 'lineage', 'finance', 'titles', 'belief'].map(npm),
+            titles: [2, 3].map((s) => ({ name: `titles-seed${s}`, cmd: `node harness/titles.mjs --n 2000 --gens 3 --seed ${s}` })),
+            density: [npm('density')],
+            overlap: [npm('overlap')],
+            keep: [{ name: 'keep', cmd: 'node harness/keep.mjs --n 4000' }],
+            continuity: [npm('continuity')],
+          };
+          const include = GATES.split(',').map((g) => g.trim()).flatMap((g) => {
+            if (!Object.hasOwn(table, g)) throw new Error(`unknown gate: ${g}`);
+            return table[g];
+          });
+          console.log(`matrix=${JSON.stringify({ include })}`);
+          console.log(`ref=${REF}`);
+          EOF
+
+  gate:
+    needs: plan
+    runs-on: ubuntu-latest
+    # Below GitHub's 360-minute job ceiling so the log is still uploaded.
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    name: ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.plan.outputs.ref }}
+      # Exact local version: seeded results must be comparable number for number.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.17.0
+          cache: npm
+      - run: npm ci
+      - id: sha
+        run: echo "short=$(git rev-parse --short=8 HEAD)" >> "$GITHUB_OUTPUT"
+      - name: run gate
+        shell: bash
+        env:
+          CMD: ${{ matrix.cmd }}
+        run: |
+          echo "sha $(git rev-parse HEAD) node $(node -v) cores $(nproc) cmd $CMD" | tee gate.log
+          start=$SECONDS
+          code=0
+          bash -c "$CMD" 2>&1 | tee -a gate.log || code=$?
+          echo "exit=$code seconds=$((SECONDS - start))" | tee -a gate.log
+          exit "$code"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ steps.sha.outputs.short }}-${{ matrix.name }}
+          path: gate.log
+          retention-days: 14
