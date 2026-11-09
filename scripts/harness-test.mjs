@@ -802,7 +802,7 @@ const f2 = (v) => v.toFixed(2);
     for (let i = 0; i < 400 && r.lives < 40; i++) {
       let reached = false, before = null, after = null;
       playLife(mixSeed(0x237, i), content, pick, (c, st) => {
-        if (before !== null && after === null && c.kind === 'event') { after = st.money; r.awayAfterCall.push(!!st.away); if (back) r.moneyBack += before - after; }
+        if (before !== null && after === null && c.kind === 'event') { after = st.money; r.awayAfterCall.push(!!st.outside); if (back) r.moneyBack += before - after; }
         if (c.kind !== 'event') return;
         if (c.id === 't237_block') r.block.push(c.age);
         if (c.id === 't237_call') { reached = true; before = st.money; r.call.push({ text: c.text, n: c.choices.length, age: c.age }); }

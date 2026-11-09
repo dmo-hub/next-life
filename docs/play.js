@@ -3606,8 +3606,8 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
     }
   }
   if (fx.promote !== undefined) promote(st, fx.promote);
-  if (fx.away_enter !== undefined) st.away = { kind: fx.away_enter, from: st.age };
-  if (fx.away_leave) delete st.away;
+  if (fx.away_enter !== undefined) st.outside = { kind: fx.away_enter, from: st.age };
+  if (fx.away_leave) delete st.outside;
   if (fx.office !== undefined) setOffice(st, fx.office);
   for (const [k, v] of Object.entries(fx.chronic ?? {})) {
     const lv = Math.max(-CHRONIC_MAX, Math.min(CHRONIC_MAX, (st.chronic[k] ?? 0) + v));
@@ -4526,12 +4526,12 @@ function arcDefer(st) {
 
 // สถานะอยู่นอกบ้าน (ใบ 237 · ข้อ 426–428 443–445): ไม่มี st.away = อยู่บ้าน ⇒ ชีวิตที่ไม่ไปไหนไม่ถูกแตะเลขสุ่มหรือช่องเซฟเลย
 // ป้าย away_block เป็นรายใบรายชนิด เพราะกองสุ่มไม่รู้ว่าใบไหนต้องอยู่บ้าน และ pool_focus_flag ล็อกทั้งกองใช้แทนไม่ได้
-const awayOk = (st, e) => !st.away || !e.away_block?.includes(st.away.kind);
+const awayOk = (st, e) => !st.outside || !e.away_block?.includes(st.outside.kind);
 
 // นัดและหลักไมล์ที่ตกช่วงนอกบ้านเลื่อนทีละปีจนกลับ (เจ้าของเคาะข้อ 444) — ไม่รู้ล่วงหน้าว่าจะกลับปีไหน จึงตั้งอายุเป้าตรง ๆ แบบ arcDefer ไม่ได้
 // หลักไมล์ต้องจดเป็นนัด เพราะ byAge ผูกอายุเดียว พ้นปีแล้วไม่ถูกค้นอีก · ติด milestone ไว้ไม่ให้หักโควตาแบบผลย้อน
 function awayDefer(st) {
-  if (!st.away) return;
+  if (!st.outside) return;
   const events = st.content.events;
   const ix = lifeEventIndex(events);
   for (const x of st.scheduled) {
@@ -4546,8 +4546,8 @@ function awayDefer(st) {
 
 // โทรมาบอก (ข้อ 427 443): ตัวเลือกเดิมคงลำดับเดิมเพราะ harness/เซฟ/ผลย้อนจับด้วยเลขลำดับ ปุ่มกลับบ้านจึงต่อท้ายเสมอ · สำเนาใบ ไม่แก้เนื้อหากลาง
 function awayCallCard(st, ev) {
-  if (!st.away || !ev.away_call) return ev;
-  const kind = st.content.away.kinds[st.away.kind];
+  if (!st.outside || !ev.away_call) return ev;
+  const kind = st.content.away.kinds[st.outside.kind];
   const back = { text: kind.return_text, effects: { money: { unit: 'income_x', amount: -kind.return_cost }, away_leave: true }, merit: [{ cat: 'neutral' }] };
   return { ...ev, text: ev.away_call.text, choices: [...ev.choices, back] };
 }
