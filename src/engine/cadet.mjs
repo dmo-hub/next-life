@@ -2,7 +2,7 @@
 // st.cadet = ลำดับขั้นที่กำลังเล่น (null = ไม่มี) · st.cadetInfo = ความจำข้ามปี (สอบกี่ครั้ง · ตกเพราะอะไร · ใบสมัคร)
 // ทุกค่าใน state เป็นข้อมูลล้วน (เซฟได้) · สุ่มจาก stream ของตัวเอง (seed ^ SALT + ตัวนับ) ไม่แตะ rng ของโลก
 // เนื้อหา/ตัวเลข: content/rules/cadet.yaml (ที่มา: demo ที่เจ้าของเคาะ 2026-11-05) · fx ในไฟล์นั้นเป็นหน่วย demo (×numbers.fx_unit แต้ม)
-import { STAT_KEYS, fill, stageOf, fxTag, TAG_MID, whenOk } from './life.mjs';
+import { STAT_KEYS, fill, stageOf, fxTag, TAG_MID, whenOk, heirCase, campusName } from './life.mjs';
 
 // ทั้งไฟล์อยู่ใน scope เดียว — build ต่อทุกไฟล์เป็นสคริปต์เดียว ชื่อภายในจึงต้องไม่หลุดไปชนไฟล์อื่น
 const CADET = (() => {
@@ -51,7 +51,7 @@ const CADET = (() => {
     return `ป้าหยิบหมวก${hat}ใบเก่าของ${who}ออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}เอ็ง${young}"`;
   }
   // ที่ตั้งโรงเรียนตามปี (numbers.campus_*) — แทน "นครนายก" ที่เคยเขียนตายทุกยุค
-  const campus = (st) => (year(st) < (N(st).campus_nayok_year ?? 2543) ? 'กรุงเทพฯ' : 'นครนายก');
+  const campus = (st) => campusName(st);   // ตัวเดียวกับ {ที่ตั้ง} ใน fill (life.mjs) · B1
   // การ์ดผิดหวัง (G4 · เจ้าของสั่ง 2026-11-06): คนเก็บหมวกกลับเข้าตู้ใช้หลักเดียวกับ heirHat — พ่อ/แม่ที่รับราชการถ้ายังอยู่ · ไม่งั้นอีกคน · ไม่มีพ่อแม่ = ป้า
   function heirHatBack(st, heir) {
     const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', ps = st.parents ?? [];
@@ -84,6 +84,9 @@ const CADET = (() => {
     if (c.flagsNot?.some((f) => (f.endsWith(':') ? hasPrefix(st, f) : has(st, f)))) return false;
     if (c.flagsHasPrefix && !hasPrefix(st, c.flagsHasPrefix)) return false;
     if (c.family === 'mother' && !(fam === 'both' || fam === 'mother')) return false;
+    // B1 (ยกจาก Demo condOk): family 'father' = พ่อยังอยู่ · heirAlive = คนที่เคยรับราชการยังอยู่ในบ้าน (ไม่ใช่พ่อที่เสียแล้ว)
+    if (c.family === 'father' && !(fam === 'both' || fam === 'fatherOnly')) return false;
+    if (c.heirAlive && heirCase(st) === 'lateFather') return false;
     if (c.family === 'fatherOnly' && fam !== 'fatherOnly') return false;
     if (c.noParents && fam !== 'none') return false;
     if (c.poor === true && clsGroup(st) !== 'poor') return false;
@@ -92,7 +95,20 @@ const CADET = (() => {
   }
   // requires ของตัวเลือก: คีย์ rival* ล็อกไว้จนกว่าจะมีระบบเพื่อนคู่แข่ง (เจ้าของเคาะ 2026-11-06) · ที่เหลือใช้ condOk
   const reqOk = (st, r) => !Object.keys(r).some((k) => k.startsWith('rival')) && condOk(st, r);
-  const lockOf = (st, o) => o.lock ?? (o.requires && !reqOk(st, o.requires) ? fill(o.lockReason ?? 'ยังเลือกไม่ได้', st) : null);
+  // requires.reasons (B1): เหตุล็อกแยกตามข้อ — ข้อแรกที่ไม่ผ่านและมีเหตุเขียนไว้ · ไม่มี = lockReason รวม
+  function lockOf(st, o) {
+    if (o.lock) return o.lock;
+    const r = o.requires;
+    if (!r || reqOk(st, r)) return null;
+    const own = Object.keys(r.reasons ?? {}).find((k) => k in r && !reqOk(st, { [k]: r[k] }));
+    return fill(own ? r.reasons[own] : o.lockReason ?? 'ยังเลือกไม่ได้', st);
+  }
+  // show_if / hide_if (B1 · เดโมเขียน showIf/hideIf): เงื่อนไขแบบ condOk · ไม่ตรง = ตัดตัวเลือกออก (ไม่โชว์ล็อก)
+  // การ์ดแกนเก็บรายการที่แสดงจริงไว้ใน st.cadet.cur ตัวเลขที่กดจึงชี้ตัวที่เห็นเสมอ
+  const visible = (st, o) => {
+    const s = o.show_if ?? o.showIf, h = o.hide_if ?? o.hideIf;
+    return (!s || condOk(st, s)) && (!h || !condOk(st, h));
+  };
   const firstOk = (st, list) => [].concat(list ?? []).find((c) => !c.cond || condOk(st, c.cond)) ?? [].concat(list ?? [])[0];
 
   // fx หน่วย demo → แต้มจริง (เงินไม่ใช้ — หน่วยเงินของ demo ไม่ใช่บาท)
@@ -114,7 +130,7 @@ const CADET = (() => {
     const hit = (c.contextLines ?? []).find((x) => condOk(st, x.when));
     if (hit) text += ' ' + fill(hit.line, st);
     // ล็อกปุ่ม (เจ้าของเคาะ 2026-11-06): requires ไม่ผ่าน = ล็อก พร้อม lockReason จากเนื้อหา · ล็อกครบทุกปุ่ม = ปลดปุ่มสุดท้าย กันเกมค้าง
-    const options = (c.options?.length ? c.options : [{ label: 'ต่อ' }]).map((o) => ({ ...o, lock: lockOf(st, o) }));
+    const options = (c.options?.length ? c.options : [{ label: 'ต่อ' }]).filter((o) => visible(st, o)).map((o) => ({ ...o, lock: lockOf(st, o) }));
     if (options.every((o) => o.lock)) options[options.length - 1].lock = null;
     st.cadet.cur = options;
     st.cadet.curId = c.id;

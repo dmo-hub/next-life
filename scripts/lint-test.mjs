@@ -57,6 +57,54 @@ for (const b of ctx.banned) {
 const table = checkMeritTable(MERIT_CATS);
 rows.push(['merit-table', table.length ? `ตก ${table.length} ข้อ` : 'ผ่าน']);
 for (const t of table) fails.push(`merit-table: ${t}`);
+// ---- B1 เส้นเตรียมทหาร (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-09): ตัวแทนมีเงื่อนไข · show_if/hide_if · requires.reasons ----
+{
+  const { placeholdersIn: phIn, fillLongest: longest } = await import('../src/node/lint/util.mjs');
+  const { heirCase, choiceHidden } = await import('../src/engine/life.mjs');
+  const st0 = newLife(1, loadContent());
+  const base = { ...st0, sex: 'ชาย', region: 'ตะวันออกเฉียงเหนือ', birthYear: 2550, age: 17, flags: {}, parentFlags: { police_family: true } };
+  const alive = (f, m) => [{ sex: 'ชาย', alive: f }, { sex: 'หญิง', alive: m }];
+  const cases = [
+    // [ชื่อ, state, ข้อความ, ผลที่ต้องได้]
+    ['ทายาท พ่อยังอยู่', { parents: alive(true, true) }, '{ทายาท:พ่อ|แม่|พ่อที่เสีย}', 'พ่อ'],
+    ['ทายาท มีแต่แม่ (เกิดหลังปีรับหญิง)', { parents: alive(false, true) }, '{ทายาท:พ่อ|แม่{ถิ่น}|พ่อที่เสีย}', 'แม่เด้อ'],
+    ['ทายาทตำรวจ มีแต่แม่ เกิดก่อนปีรับหญิง', { parents: alive(false, true), birthYear: 2530 }, '{ทายาท:พ่อ|แม่|พ่อที่เสีย}', 'พ่อที่เสีย'],
+    ['ทายาท ไม่มีพ่อแม่', { parents: alive(false, false) }, '{ทายาท:พ่อ|แม่|พ่อที่เสีย} {ลูก}', 'พ่อที่เสีย หลาน'],
+    ['มือถือ ก่อนปี', { birthYear: 2520, age: 17 }, '{มือถือ:โทร|จดหมาย}', 'จดหมาย'],
+    ['ลับ', { flags: { cadet_family_secret: true } }, '{ลับ:แอบ|รู้}', 'แอบ'],
+    ['ค่าย ไม่ใช่เด็กค่าย', {}, '{ค่าย:เปิดเทอมแล้ว }นอน', 'นอน'],
+    ['ถิ่น นะ ภาคเหนือ', { region: 'เหนือ' }, 'ตั้งใจนะ{ถิ่น}', 'ตั้งใจเน้อ'],
+    ['ถิ่น นะ ภาคกลาง', { region: 'กลาง' }, 'ตั้งใจนะ{ถิ่น} ไป ๆ{ถิ่น}', 'ตั้งใจนะ ไป ๆ'],
+    ['ทางแม่ + ที่ตั้ง', { birthYear: 2525, age: 17 }, '{ทางแม่}@{ที่ตั้ง}', 'พนักงานสอบสวนหญิง@กรุงเทพฯ'],
+  ];
+  let ok = 0;
+  for (const [name, patch, text, want] of cases) {
+    const got = fill(text, { ...base, ...patch });
+    if (got === want) ok++;
+    else fails.push(`B1 fill ${name}: "${text}" ได้ "${got}" ต้องได้ "${want}"`);
+  }
+  rows.push(['B1 ตัวแทนมีเงื่อนไข', `${ok}/${cases.length} กรณี`]);
+  // ด่าน: ช่องมีเงื่อนไขตรวจชื่อ/จำนวนทาง · ความยาววัดทางยาวสุด
+  const ph = phIn('{ทายาท:a{ชื่อ}|b|c} {ลับ:x|y|z} {ไม่มี:a|b}');
+  if (!ph.includes('ทายาท:') || !ph.includes('ชื่อ') || !ph.includes('ลับ:เกินทาง') || !ph.includes('ไม่มี:เกินทาง')) fails.push(`B1 placeholdersIn: ได้ ${JSON.stringify(ph)}`);
+  if (longest('{ลับ:ก|{ทางแม่}}') !== PLACEHOLDERS.ทางแม่) fails.push(`B1 fillLongest: ได้ "${longest('{ลับ:ก|{ทางแม่}}')}"`);
+  // show_if/hide_if ซ่อน · คู่เงื่อนไขเดียวกันเห็นอย่างใดอย่างหนึ่งเสมอ
+  const mom = { family: [{ role: 'parent', sex: 'หญิง', alive: true }] };
+  for (const m of [true, false]) {
+    const s1 = { ...base, parents: alive(true, m) };
+    const vis = [choiceHidden(s1, { show_if: mom }), choiceHidden(s1, { hide_if: mom })].filter((h) => !h).length;
+    if (vis !== 1) fails.push(`B1 show_if/hide_if: แม่${m ? 'อยู่' : 'ไม่อยู่'} เห็น ${vis} ตัว ต้องเห็น 1`);
+  }
+  rows.push(['B1 show_if/hide_if', 'คู่แทนกันเห็นหนึ่งตัวเสมอ']);
+  // choice-count นับกรณีซ่อนมากสุด: show_if ข้างเดียวทำให้ไม่ถึง 4 ต้องตก
+  const thin = { events: [{ id: 'fixture_b1_thin', type: 'A', category: 'family', stage: 'วัยรุ่น', years: [2501, 2650], text: 'ก', choices: [
+    { text: 'ก', show_if: mom, merit: [{ cat: 'neutral' }] }, ...['ข', 'ค', 'ง'].map((t) => ({ text: t, merit: [{ cat: 'neutral' }] }))] }] };
+  const thinRules = lintDocs([{ file: 'b1-thin.yaml', doc: thin }], ctx).map((p) => p.rule);
+  if (!thinRules.includes('choice-count')) fails.push(`B1 choice-count: show_if ข้างเดียวเหลือ 3 ตัวต้องตก ได้ [${thinRules.join(', ')}]`);
+  rows.push(['B1 choice-count กรณีซ่อนมากสุด', thinRules.includes('choice-count') ? 'ตกถูก' : 'ไม่ตก']);
+  void heirCase;
+}
+
 const controls = {
   'vow_broken หนักเท่าระดับ 1': [MERIT_CATS, { ...MERIT_WEIGHTS, vow_broken: 1 }],
   'หมวดกลไกเกมหนักเท่าหมวดตามคติ': [MERIT_CATS, { ...MERIT_WEIGHTS, cheat_exploit: 1 }],

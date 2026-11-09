@@ -2060,7 +2060,7 @@ const CADET = (() => {
     return `ป้าหยิบหมวก${hat}ใบเก่าของ${who}ออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}เอ็ง${young}"`;
   }
   // ที่ตั้งโรงเรียนตามปี (numbers.campus_*) — แทน "นครนายก" ที่เคยเขียนตายทุกยุค
-  const campus = (st) => (year(st) < (N(st).campus_nayok_year ?? 2543) ? 'กรุงเทพฯ' : 'นครนายก');
+  const campus = (st) => campusName(st);   // ตัวเดียวกับ {ที่ตั้ง} ใน fill (life.mjs) · B1
   // การ์ดผิดหวัง (G4 · เจ้าของสั่ง 2026-11-06): คนเก็บหมวกกลับเข้าตู้ใช้หลักเดียวกับ heirHat — พ่อ/แม่ที่รับราชการถ้ายังอยู่ · ไม่งั้นอีกคน · ไม่มีพ่อแม่ = ป้า
   function heirHatBack(st, heir) {
     const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', ps = st.parents ?? [];
@@ -2093,6 +2093,9 @@ const CADET = (() => {
     if (c.flagsNot?.some((f) => (f.endsWith(':') ? hasPrefix(st, f) : has(st, f)))) return false;
     if (c.flagsHasPrefix && !hasPrefix(st, c.flagsHasPrefix)) return false;
     if (c.family === 'mother' && !(fam === 'both' || fam === 'mother')) return false;
+    // B1 (ยกจาก Demo condOk): family 'father' = พ่อยังอยู่ · heirAlive = คนที่เคยรับราชการยังอยู่ในบ้าน (ไม่ใช่พ่อที่เสียแล้ว)
+    if (c.family === 'father' && !(fam === 'both' || fam === 'fatherOnly')) return false;
+    if (c.heirAlive && heirCase(st) === 'lateFather') return false;
     if (c.family === 'fatherOnly' && fam !== 'fatherOnly') return false;
     if (c.noParents && fam !== 'none') return false;
     if (c.poor === true && clsGroup(st) !== 'poor') return false;
@@ -2101,7 +2104,20 @@ const CADET = (() => {
   }
   // requires ของตัวเลือก: คีย์ rival* ล็อกไว้จนกว่าจะมีระบบเพื่อนคู่แข่ง (เจ้าของเคาะ 2026-11-06) · ที่เหลือใช้ condOk
   const reqOk = (st, r) => !Object.keys(r).some((k) => k.startsWith('rival')) && condOk(st, r);
-  const lockOf = (st, o) => o.lock ?? (o.requires && !reqOk(st, o.requires) ? fill(o.lockReason ?? 'ยังเลือกไม่ได้', st) : null);
+  // requires.reasons (B1): เหตุล็อกแยกตามข้อ — ข้อแรกที่ไม่ผ่านและมีเหตุเขียนไว้ · ไม่มี = lockReason รวม
+  function lockOf(st, o) {
+    if (o.lock) return o.lock;
+    const r = o.requires;
+    if (!r || reqOk(st, r)) return null;
+    const own = Object.keys(r.reasons ?? {}).find((k) => k in r && !reqOk(st, { [k]: r[k] }));
+    return fill(own ? r.reasons[own] : o.lockReason ?? 'ยังเลือกไม่ได้', st);
+  }
+  // show_if / hide_if (B1 · เดโมเขียน showIf/hideIf): เงื่อนไขแบบ condOk · ไม่ตรง = ตัดตัวเลือกออก (ไม่โชว์ล็อก)
+  // การ์ดแกนเก็บรายการที่แสดงจริงไว้ใน st.cadet.cur ตัวเลขที่กดจึงชี้ตัวที่เห็นเสมอ
+  const visible = (st, o) => {
+    const s = o.show_if ?? o.showIf, h = o.hide_if ?? o.hideIf;
+    return (!s || condOk(st, s)) && (!h || !condOk(st, h));
+  };
   const firstOk = (st, list) => [].concat(list ?? []).find((c) => !c.cond || condOk(st, c.cond)) ?? [].concat(list ?? [])[0];
 
   // fx หน่วย demo → แต้มจริง (เงินไม่ใช้ — หน่วยเงินของ demo ไม่ใช่บาท)
@@ -2123,7 +2139,7 @@ const CADET = (() => {
     const hit = (c.contextLines ?? []).find((x) => condOk(st, x.when));
     if (hit) text += ' ' + fill(hit.line, st);
     // ล็อกปุ่ม (เจ้าของเคาะ 2026-11-06): requires ไม่ผ่าน = ล็อก พร้อม lockReason จากเนื้อหา · ล็อกครบทุกปุ่ม = ปลดปุ่มสุดท้าย กันเกมค้าง
-    const options = (c.options?.length ? c.options : [{ label: 'ต่อ' }]).map((o) => ({ ...o, lock: lockOf(st, o) }));
+    const options = (c.options?.length ? c.options : [{ label: 'ต่อ' }]).filter((o) => visible(st, o)).map((o) => ({ ...o, lock: lockOf(st, o) }));
     if (options.every((o) => o.lock)) options[options.length - 1].lock = null;
     st.cadet.cur = options;
     st.cadet.curId = c.id;
@@ -3585,7 +3601,18 @@ const FILL = {
   เงิน: (st) => Math.round(st.money).toLocaleString('en-US'),
   ชื่อ: (st) => st.name,
   // ผู้ใหญ่คนเดียวที่ดูแลในบ้าน (เจ้าของเคาะ ก 2026-11-06 · ใช้แทน "ผู้ใหญ่ในบ้าน" ที่หมายถึงคนเดียว): แม่ยังอยู่ = แม่ · มีแต่พ่อ = พ่อ · ไม่มีพ่อแม่ = ป้า
-  ผู้ใหญ่: (st) => (st.parents?.find((p) => p.sex === 'หญิง')?.alive ? 'แม่' : st.parents?.find((p) => p.sex === 'ชาย')?.alive ? 'พ่อ' : 'ป้า'),
+  ผู้ใหญ่: (st) => homeElder(st),
+  // ---- เส้นเตรียมทหาร B1 (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-09 · ยกจาก Demo fill) ----
+  // คำลงท้ายภาษาถิ่น เฉพาะคำพูดครอบครัวที่ติดป้ายไว้: อีสาน เด้อ · เหนือ เน้อ · ใต้ หนิ · ภาคอื่นว่าง ("นะ{ถิ่น}" / "ๆ{ถิ่น}" จัดใน fill)
+  ถิ่น: (st) => DIALECT[st.region] ?? '',
+  // คนพูดเรียกตัวละคร: พ่อ/แม่พูด = ลูก · ป้าพูด (ไม่มีพ่อแม่) = หลาน
+  ลูก: (st) => (homeElder(st) === 'ป้า' ? 'หลาน' : 'ลูก'),
+  // คนในบ้านที่เคยใส่เครื่องแบบ (heirCase): พ่อยังอยู่ = พ่อ · มีแต่แม่ที่รับราชการเอง = แม่ · ไม่งั้น = ผู้ใหญ่ที่ดูแล
+  ผู้ใหญ่ทายาท: (st) => ({ father: 'พ่อ', mother: 'แม่' })[heirCase(st)] ?? homeElder(st),
+  // ทางรับราชการของแม่ (เจ้าของเคาะ 2026-11-09): ทายาทตำรวจ = พนักงานสอบสวนหญิง · ทายาททหาร = พยาบาลทหาร
+  ทางแม่: (st) => (heirOfLine(st) === 'police' ? 'พนักงานสอบสวนหญิง' : 'พยาบาลทหาร'),
+  // ที่ตั้งโรงเรียนเตรียมทหารตามปี (numbers.campus_nayok_year)
+  ที่ตั้ง: (st) => campusName(st),
   // ชื่อ + นามสกุล (บท S1 2026-11-06 ใช้กับ "นตท.{ชื่อเต็ม}") · เกมยังไม่มีนามสกุล = ชื่อเฉย ๆ · คำนำหน้าไม่ใส่ใน {ชื่อ}/{ชื่อเต็ม} (เจ้าของเคาะ A1)
   ชื่อเต็ม: (st) => (st.surname ? `${st.name} ${st.surname}` : st.name),
   ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
@@ -3617,9 +3644,46 @@ const CAUSE_TEXT = {
   road: ['จาก', 'อุบัติเหตุบนท้องถนน'], accident: ['จาก', 'อุบัติเหตุ'], assault: ['เพราะ', 'ถูกทำร้าย'], newborn: ['ด้วย', 'ภาวะแทรกซ้อนแรกเกิด'],
 };
 const causeWords = (cause, age) => (cause === 'other' ? (age >= STAGES.at(-1).from ? ['ด้วย', 'วัยชรา'] : null) : CAUSE_TEXT[cause] ?? null);
+// ตัวแทนมีเงื่อนไข {key:ทาง1|ทาง2|…} (B1 เส้นเตรียมทหาร · ยกจาก Demo) — แต่ละทางซ้อนตัวแทนธรรมดาได้หนึ่งชั้น เช่น {ลับ:{ผู้ใหญ่}ยังไม่รู้|…}
+// ค่าที่คืน = ลำดับทาง · ทางที่ไม่ได้เขียน = ว่าง · lint (util.condBranches) วัดความยาวที่ทางยาวสุด
+const FILL_COND = {
+  // ทายาท 3 ทาง: พ่อรับราชการยังอยู่ | แม่รับราชการเอง | พ่อที่เสียแล้ว (เจ้าของเคาะ 2026-11-09)
+  ทายาท: (st) => ({ father: 0, mother: 1, lateFather: 2 })[heirCase(st)],
+  // มือถือ: ตั้งแต่ปี numbers.mobile_year | ก่อนหน้า
+  มือถือ: (st) => (st.birthYear + st.age >= (cadetNum(st).mobile_year ?? 2542) ? 0 : 1),
+  // ลับ: แอบสอบ (cadet_family_secret) | ที่บ้านรู้
+  ลับ: (st) => (st.flags.cadet_family_secret ? 0 : 1),
+  // ค่าย: เด็กค่ายติว (cadet_prep_camp) | คนอื่น (มักเว้นว่าง)
+  ค่าย: (st) => (st.flags.cadet_prep_camp ? 0 : 1),
+};
+const COND_RE = /\{([^{}:|]+):((?:[^{}]|\{[^{}]*\})*)\}/g;
 function fill(text, st) {
-  return text.replace(/\{([^{}]*)\}/g, (m, k) => (FILL[k] ? String(FILL[k](st)) : m));
+  const picked = text.replace(COND_RE, (m, k, body) => (FILL_COND[k] ? body.split('|')[FILL_COND[k](st)] ?? '' : m));
+  // คำลงท้ายถิ่น: "นะ{ถิ่น}" แทน นะ · "ๆ{ถิ่น}" เว้นวรรคก่อนคำลงท้าย · ภาคที่ไม่มีคำลงท้ายคงรูปเดิม
+  const p = FILL.ถิ่น(st);
+  const dialect = picked.replaceAll('นะ{ถิ่น}', p || 'นะ').replaceAll('ๆ{ถิ่น}', p ? `ๆ ${p}` : 'ๆ');
+  return dialect.replace(/\{([^{}]*)\}/g, (m, k) => (FILL[k] ? String(FILL[k](st)) : m));
 }
+
+// ---- ตัวช่วยของเส้นเตรียมทหาร (B1) · cadet.mjs ใช้ชุดเดียวกัน ----
+const DIALECT = { ตะวันออกเฉียงเหนือ: 'เด้อ', เหนือ: 'เน้อ', ใต้: 'หนิ' };
+const cadetNum = (st) => st.content?.cadet?.numbers ?? {};
+const parentAlive = (st, sex) => !!st.parents?.find((p) => p.sex === sex)?.alive;
+const homeElder = (st) => (parentAlive(st, 'หญิง') ? 'แม่' : parentAlive(st, 'ชาย') ? 'พ่อ' : 'ป้า');
+const heirOfLine = (st) => (st.parentFlags?.army_family ? 'army' : st.parentFlags?.police_family ? 'police' : null);
+// คนที่เคยรับราชการ (เจ้าของเคาะ 2026-11-09): พ่อยังอยู่ = father · มีแต่แม่ = mother (แม่รับราชการทางอื่น)
+// ยกเว้นทายาทตำรวจที่เกิดก่อน numbers.police_woman_year (ยังไม่รับผู้หญิงเป็นพนักงานสอบสวน) = lateFather · ไม่มีพ่อแม่ = lateFather (พ่อที่เสียแล้ว ป้าเล่า)
+// ตัดสินจากปีเกิด (คงที่ทั้งชีวิต) ไม่ต้องเก็บใน state
+function heirCase(st) {
+  if (parentAlive(st, 'ชาย')) return 'father';
+  if (parentAlive(st, 'หญิง') && !(heirOfLine(st) === 'police' && st.birthYear < (cadetNum(st).police_woman_year ?? 2538))) return 'mother';
+  return 'lateFather';
+}
+const campusName = (st) => (st.birthYear + st.age < (cadetNum(st).campus_nayok_year ?? 2543) ? 'กรุงเทพฯ' : 'นครนายก');
+
+// ตัวเลือกที่แทนกัน show_if / hide_if (B1): เงื่อนไขแบบ when · ไม่ตรง = ซ่อน (ไม่โชว์ล็อก) · ยังอยู่ในรายการตามเลขลำดับเดิม (เซฟ/ผลย้อนจับเลขลำดับ) แต่ล็อก + hidden
+const choiceHidden = (st, c) => (c.show_if !== undefined && !whenOk(st, c.show_if)) || (c.hide_if !== undefined && whenOk(st, c.hide_if));
+const HIDE_LOCK = 'ไม่ใช่ทางของชีวิตนี้';
 
 function levelValue(level) {
   const v = LEVELS[Math.abs(level)];
@@ -4369,7 +4433,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     locked: ev.choices.map((c) => lockReason(st, c)),
     // ตัวเลือกที่พาเข้าสาย (ป้าย gate) ซ่อนจนประตูเปิด — ล็อกไว้ด้วย (กดไม่ได้ · บอทข้าม) แต่ไม่ตัดออก
     // เพราะ harness/เซฟ/ผลย้อนจับตัวเลือกด้วยเลขลำดับในเนื้อหา · ใบที่ไม่มีป้ายไม่มีช่องนี้
-    ...(ev.choices.some((c) => c.gate) && { hidden: ev.choices.map((c) => gateShut(st, c)) }),
+    ...(ev.choices.some((c) => c.gate || c.show_if || c.hide_if) && { hidden: ev.choices.map((c) => gateShut(st, c) || choiceHidden(st, c)) }),
     ...moneyShort(ev, st),
   });
 }
@@ -4451,6 +4515,7 @@ const greyLaunderLock = (st) => ((st.grey ?? 0) <= 0 ? 'ไม่มีเงิ
 function lockReason(st, c, extra = 0) {
   if (st.pending?.id === FUNERAL.rite && st.funeralPick && c.id !== st.funeralPick) return 'ไม่ใช่แบบที่ตกลงกัน';
   if (gateShut(st, c)) return GATE_LOCK;
+  if (choiceHidden(st, c)) return HIDE_LOCK;
   if (c.effects?.grey_launder) {
     const g = greyLaunderLock(st);
     if (g) return g;
@@ -4463,19 +4528,23 @@ function lockReason(st, c, extra = 0) {
   if (q.age && st.age > (q.age.max ?? Infinity)) return `อายุเกิน ${q.age.max} ปี`;
   // ตัวเลือกวัยโตของนิสัย (B41) — บอกนิสัยที่ขาดเป็นคำ ผู้เล่นจึงรู้ว่าวัยเด็กแบบไหนเปิดทางนี้
   if (q.nature && st.nature !== q.nature) return `ต้องเป็นคน${st.content.focus?.natures?.[q.nature]?.name ?? ''}`;
+  // why = [ข้อที่ไม่ผ่าน, ข้อความ] · requires.reasons ใส่เหตุแยกตามข้อได้ (B1 เช่น flags = "ต้องให้ที่บ้านเซ็นยินยอม" · money = เงินไม่พอ)
   const why = [];
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
   const purse = (st.dead ? deadPurse(st) : st.money) + extra;
-  if (q.money && purse < moneyValue(st, q.money, true)) why.push('เงินไม่พอ');
+  if (q.money && purse < moneyValue(st, q.money, true)) why.push(['money', 'เงินไม่พอ']);
   for (const [k, b] of Object.entries(q.stats ?? {})) {
-    if (b.min !== undefined && st[k] < b.min) why.push(k === 'network' ? 'ยังไม่มีเส้นสายพอ' : `${STAT_LABELS[k]}ไม่ถึง`);
-    if (b.max !== undefined && st[k] > b.max) why.push(`${STAT_LABELS[k]}มากเกินไป`);
+    if (b.min !== undefined && st[k] < b.min) why.push(['stats', k === 'network' ? 'ยังไม่มีเส้นสายพอ' : `${STAT_LABELS[k]}ไม่ถึง`]);
+    if (b.max !== undefined && st[k] > b.max) why.push(['stats', `${STAT_LABELS[k]}มากเกินไป`]);
   }
-  if (q.flags && !flagsOk(st, q.flags)) why.push('ยังไม่เข้าเงื่อนไข');
-  if (q.edu && eduRank(st.edu) < eduRank(q.edu)) why.push('วุฒิไม่ถึง');
-  if (q.family && !q.family.every((f) => familyOk(st, f))) why.push(familyWhy(q.family));
+  if (q.flags && !flagsOk(st, q.flags)) why.push(['flags', 'ยังไม่เข้าเงื่อนไข']);
+  if (q.edu && eduRank(st.edu) < eduRank(q.edu)) why.push(['edu', 'วุฒิไม่ถึง']);
+  if (q.family && !q.family.every((f) => familyOk(st, f))) why.push(['family', familyWhy(q.family)]);
   if (!why.length) return null;
-  return q.reason ?? why.join(' · ');
+  // เหตุแยกข้อมาก่อน (ข้อแรกที่ไม่ผ่านและมีเหตุเขียนไว้) · ไม่มี = reason รวม · ไม่มีทั้งคู่ = เหตุอัตโนมัติ
+  const own = why.find(([k]) => q.reasons?.[k]);
+  if (own) return q.reasons[own[0]];
+  return q.reason ?? why.map(([, t]) => t).join(' · ');
 }
 
 // ดัชนีตัวเลือกที่กดได้ — บอทเลือกจากชุดนี้เท่านั้น · ไม่มีตัวล็อก = ทุกตัว (ลำดับสุ่มของบอทจึงเหมือนก่อนมีการล็อก)

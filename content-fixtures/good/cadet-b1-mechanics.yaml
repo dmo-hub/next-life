@@ -1,0 +1,41 @@
+# B1 เส้นเตรียมทหาร (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-09): การ์ดตัวอย่างที่ต้องผ่านด่าน
+# ตัวแทนมีเงื่อนไข {ทายาท:…|…|…} {มือถือ:…|…} {ลับ:…|…} {ค่าย:…} · ตัวแทนใหม่ {ถิ่น} {ลูก} {ผู้ใหญ่ทายาท} {ทางแม่} {ที่ตั้ง}
+# ตัวเลือกที่แทนกัน show_if / hide_if (เงื่อนไขเดียวกัน · ตอนซ่อนมากสุดยังเหลือ 4) · เหตุล็อกแยกข้อ requires.reasons
+events:
+  - id: fixture_cadet_b1_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2501, 2650]
+    when: {sex: [ชาย], age: [15, 17]}
+    title: "คืนก่อนสอบ"
+    text: "{ค่าย:เปิดเทอมแล้ว }{ผู้ใหญ่ทายาท}{ทายาท:เล่าเรื่องสมัยหนุ่ม|เล่าเรื่องสมัยเป็น{ทางแม่}|เปิดอัลบั้มรูปพ่อ} {มือถือ:แล้วโทรหาญาติ|แล้วเขียนจดหมายถึงญาติ} ที่{ที่ตั้ง} {ลับ:ทั้งที่ยังไม่รู้ว่า{ลูก}จะไปสอบ|บอกว่าตั้งใจนะ{ถิ่น}}"
+    choices:
+      - id: amulet_mom
+        text: "รับพระเครื่องจาก{ผู้ใหญ่}"
+        show_if: {family: [{role: parent, sex: หญิง, alive: true}]}
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: amulet_own
+        text: "กำพระประจำตัวไว้"
+        hide_if: {family: [{role: parent, sex: หญิง, alive: true}]}
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: camp
+        text: "ขอไปค่ายกินนอน"
+        requires: {flags: {not: [cadet_family_secret]}, money: {unit: income_x, amount: 1}, reasons: {flags: "ต้องให้ที่บ้านเซ็นยินยอม", money: "เงินไม่พอค่าค่าย"}}
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: sleep
+        text: "เข้านอนเร็ว"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: read
+        text: "ทวนหนังสืออีกรอบ"
+        effects: {knowledge: 1}
+        sets_flags: [cadet_family_secret]
+        merit: [{cat: neutral}]
+      - id: run
+        text: "ออกไปวิ่งรอบหมู่บ้าน"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
