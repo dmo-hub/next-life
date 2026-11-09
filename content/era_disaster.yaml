@@ -62,6 +62,40 @@ events:
         effects: {health: -1, relations: 2, happiness: 1}
         merit: [{cat: help_others, level: 1}]
 
+  # มุมใหม่ (ใบ 217): ชาวสวนภาคใต้ · ออกแทนใบผู้ใหญ่เมื่อ when ผ่าน
+  - id: era_dis_typhoon_south_farm_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: typhoon_gay
+    when: {age: [19, 64], region: [ใต้], occupation: [farmer]}
+    title: "สวนยางล้มทั้งแปลง"
+    text: "พายุผ่านไปคืนเดียว ต้นยางที่กรีดมาสิบปีล้มทับกันเป็นแถว ต้นมะพร้าวหักครึ่งลำ เพื่อนบ้านยืนดูสวนตัวเองเงียบ ๆ ทั้งหมู่บ้าน"
+    choices:
+      - id: replant
+        text: "ค้ำต้นที่รอด ปลูกใหม่ที่เหลือ"
+        effects: {health: -1, happiness: -1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: sell_logs
+        text: "ขายไม้ยางที่ล้มให้โรงเลื่อย"
+        effects: {money: {unit: income_x, amount: 0.2}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: help_neighbors
+        text: "ช่วยเพื่อนบ้านเคลียร์สวนก่อน"
+        effects: {health: -1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: go_city
+        text: "เข้าเมืองหางานระหว่างรอต้นโต"
+        effects: {relations: -1, income_mult: 0.9, network: 1}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ค้ำต้นไว้ตั้งแต่ได้ยินข่าวลม"
+        requires: {flags: {has: ["braced:typhoon_gay"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:typhoon_gay"]
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+
   - id: era_dis_typhoon_adult_01
     type: A
     category: society
@@ -170,6 +204,42 @@ events:
         effects: {health: 1, happiness: 1}
         merit: [{cat: neutral}]
 
+  # มุมใหม่ (ใบ 217): คนงานบริการ · ออกแทนใบผู้ใหญ่เมื่อ when ผ่าน
+  - id: era_dis_sars_service_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: sars
+    when: {age: [19, 59], occupation: [service]}
+    title: "แขกยกเลิกทั้งกรุ๊ป"
+    text: "ทัวร์จากต่างประเทศยกเลิกติดกันทั้งเดือน ห้องพักว่างเกินครึ่ง หัวหน้าเรียกประชุมแล้วบอกว่าใครอยากลาไม่รับเงินเดือน ให้ยกมือ"
+    choices:
+      - id: unpaid_leave
+        text: "ยกมือลา กลับไปอยู่บ้านก่อน"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: cover_shifts
+        text: "อยู่ต่อ รับทำแทนคนที่ลา"
+        effects: {health: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: local_guests
+        text: "เสนอทำโปรให้คนไทยเที่ยวแทน"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "แขกในประเทศจองเต็มทุกวันหยุด หัวหน้าจำชื่อคุณได้", effects: {network: 1, income_mult: 1.05}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โปรออกไปแล้วแต่ไม่มีใครกล้าเดินทาง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mask_job
+        text: "ไปรับจ้างแพ็กหน้ากากอนามัย"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ใช้เงินที่กันไว้รอแขกกลับมา"
+        requires: {flags: {has: ["braced:sars"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:sars"]
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+
   - id: era_dis_sars_adult_01
     type: A
     category: society
@@ -245,6 +315,40 @@ events:
       - id: move_inland
         text: "ฝันร้าย ขอพ่อแม่ย้ายไปไกลทะเล"
         effects: {health: 1, happiness: -1, income_mult: 0.8}
+        merit: [{cat: neutral}]
+
+  # มุมใหม่ (ใบ 217): คนภาคใต้ที่ทำงานบริการ · ออกแทนใบผู้ใหญ่เมื่อ when ผ่าน
+  - id: era_dis_tsunami_south_work_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: tsunami
+    when: {age: [19, 59], region: [ใต้], occupation: [service, labor, craft]}
+    title: "ที่ทำงานหายไปกับน้ำ"
+    text: "ร้านริมหาดที่คุณทำงานเหลือแต่เสาปูน เจ้าของร้านยังติดต่อไม่ได้ ศูนย์พักพิงรับคนเพิ่มทุกชั่วโมง มีคนตะโกนหาชื่อคนในครอบครัวไม่หยุด"
+    choices:
+      - id: shelter_help
+        text: "อยู่ช่วยงานที่ศูนย์พักพิง"
+        effects: {health: -1, happiness: -1, relations: 2}
+        merit: [{cat: help_others, level: 2}]
+      - id: search_boss
+        text: "ตามหาเจ้าของร้านตามโรงพยาบาล"
+        effects: {health: -1, relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: go_home
+        text: "กลับไปอยู่บ้านญาติต่างจังหวัด"
+        effects: {happiness: -1, income_mult: 0.9}
+        merit: [{cat: neutral}]
+      - id: rebuild_job
+        text: "รับจ้างเก็บซากรอร้านสร้างใหม่"
+        effects: {health: -1, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "พาคนในร้านขึ้นที่สูงตามที่ซ้อม"
+        requires: {flags: {has: ["braced:tsunami"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:tsunami"]
+        effects: {happiness: 1, relations: 2}
         merit: [{cat: neutral}]
 
   - id: era_dis_tsunami_adult_01
@@ -352,6 +456,40 @@ events:
         effects: {happiness: 1, relations: 1}
         merit: [{cat: help_others, level: 1}]
 
+  # มุมใหม่ (ใบ 217): คนงานโรงงานภาคกลาง · ออกแทนใบผู้ใหญ่เมื่อ when ผ่าน
+  - id: era_dis_flood_factory_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: great_flood
+    when: {age: [19, 59], region: [กลาง, กรุงเทพฯ และปริมณฑล], occupation: [factory]}
+    title: "นิคมจมทั้งแถบ"
+    text: "น้ำข้ามคันกั้นเข้านิคมตอนกลางคืน เครื่องจักรจมถึงหลังคา หัวหน้าไลน์บอกว่าโรงงานอาจปิดหลายเดือน บางคนได้ย้ายไปโรงงานพี่น้องอีกจังหวัด"
+    choices:
+      - id: move_plant
+        text: "ย้ายไปโรงงานอีกจังหวัด"
+        effects: {relations: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: wait_pay
+        text: "รอรับเงินชดเชยที่บ้าน"
+        effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: sandbag_crew
+        text: "ไปช่วยกรอกกระสอบทรายกันน้ำ"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: boat_hire
+        text: "รับจ้างพายเรือส่งของในซอย"
+        effects: {health: -1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "ย้ายของขึ้นชั้นสองไว้ก่อนน้ำมา"
+        requires: {flags: {has: ["braced:great_flood"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:great_flood"]
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+
   - id: era_dis_flood_adult_01
     type: A
     category: society
@@ -455,6 +593,40 @@ events:
         text: "แบ่งขนมให้พ่อที่นั่งเครียด"
         effects: {relations: 2, happiness: -1}
         merit: [{cat: care_parents, level: 1}]
+
+  # มุมใหม่ (ใบ 217): พนักงานออฟฟิศ · ออกแทนใบผู้ใหญ่เมื่อ when ผ่าน
+  - id: era_dis_covid_office_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: covid19
+    when: {age: [19, 59], occupation: [clerk, technician, professional, manager]}
+    title: "ประชุมจากโต๊ะกินข้าว"
+    text: "บริษัทสั่งทำงานจากบ้านไม่มีกำหนด โต๊ะกินข้าวกลายเป็นโต๊ะทำงาน ประชุมออนไลน์ติดกันจนค่ำ คนในบ้านต้องเดินผ่านหลังกล้องแบบก้มหัว"
+    choices:
+      - id: set_desk
+        text: "ซื้อโต๊ะเก้าอี้ จัดมุมทำงาน"
+        effects: {health: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: always_online
+        text: "ตอบงานทุกข้อความแม้ดึก"
+        effects: {health: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: move_hometown
+        text: "กลับไปทำงานจากบ้านต่างจังหวัด"
+        effects: {relations: 2, network: -1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: side_course
+        text: "เรียนคอร์สออนไลน์แทนเวลาเดินทาง"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: use_braced
+        text: "หยิบหน้ากากที่ตุนไว้แจกคนในทีม"
+        requires: {flags: {has: ["braced:covid19"]}, reason: "ไม่ได้เตรียมไว้ตั้งแต่ปีก่อน"}
+        clears_flags: ["braced:covid19"]
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
 
   - id: era_dis_covid_adult_01
     type: A
