@@ -2471,6 +2471,7 @@ const CADET = (() => {
       { label: 'ไล่ดูอีกรอบให้แน่ใจ', result: 'อ่านเลขทีละตัว ตรงทุกตัว' },
       last ? { label: 'ยิ้มกว้างจนแก้มตึง', fx: { happiness: 1 }, result: 'เหลืออีกรอบเดียว ยิ้มได้ก่อนก็ไม่เสียหาย' } : { label: 'ยิ้มอยู่คนเดียว ยังไม่บอกใคร', fx: { happiness: 1 }, result: 'เก็บไว้ในใจก่อน รอบหน้ายังมีอีกหลายด่าน' }];
   }
+  const BOARD_SWIM = ['ซ้อมว่ายน้ำทุกเย็นจนวันสอบ', 'ซ้อมกับเพื่อนติวทุกเย็น'];
   S.board = (st) => {
     const P = st.cadet.p2, n = N(st), c = firstOk(st, D(st).board) ?? {};
     const pass = P.branches.filter((b) => P.written[b]), fail = P.branches.filter((b) => !P.written[b]), none = !pass.length;
@@ -2484,7 +2485,10 @@ const CADET = (() => {
     if (rl) text += '\n' + rl.line;
     text += `\n\n${!fail.length ? 'ผ่านครบทุกเหล่าที่สมัคร' : none ? 'ไม่ผ่านเลยสักเหล่า' : `ผ่าน ${pass.length} จาก ${P.branches.length} เหล่า`}\n\n${P.branches.map((b) => writtenScoreLine(st, b)).join('\n')}`;   // บล็อกคะแนน (เจ้าของเคาะ B) แทนบรรทัดเกณฑ์เดิม
     P.steps = none ? [['failed']] : [['cheer', 'phys'], ['physAsk', 'phys'], ['nearExam'], ['bodyDay'], ['judgeBody'], ['bodyWait'], ['announce', 'body'], ['bodyBoard']];
-    return C('board', 'ประกาศผลรอบแรก', text, reactOpts(st, none, false));
+    // ข้อ 436: สอบผ่านแล้วต่อท้ายเฉพาะตัวเลือกสระจาก yaml — ธง cadet_drill_swim / cadet_a_swims ตั้งได้ทางนี้ทางเดียว
+    // rivalPass ใน requires ยังไม่มีแกนรองรับ (เหมือน rivalLines) จึงเช็กเฉพาะเงื่อนไขที่ condOk อ่านได้
+    const swim = none ? [] : (c.options ?? []).filter((o) => BOARD_SWIM.includes(o.label)).map((o) => ({ ...o, lock: o.requires && !condOk(st, o.requires) ? (o.lockReason ?? 'ยังทำไม่ได้') : null }));
+    return C('board', 'ประกาศผลรอบแรก', text, [...reactOpts(st, none, false), ...swim]);
   };
 
   S.cheer = (st, round) => {
@@ -4604,14 +4608,14 @@ function drawCard(st) {
     arcDefer(st);
     let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
     // ผลย้อนที่นัดไว้ปีนี้กินโควตาแบบเรื่องต่อ — หลักไมล์ที่ออกจาก dueAt เหมือนกันไม่หัก
-    if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age)) takeYearQuota(st);
+    if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age)) takeYearQuota(st, ev.id.startsWith('cadet_') ? 0.5 : 1);
     // กองสุ่มจับได้ปีละ poolRounds รอบ หลังหลักไมล์/นัดของปีนั้นหมดแล้ว · การ์ดที่จับได้อาจนัดตอนต่อปีเดียวกัน — ค้นนัดก่อนรอบถัดไป
     poolTurn(st);
     while (!ev && st.poolLeft > 0) {
       st.poolLeft--;
       ev = drawPool(st, year);
       // ใบที่ทิ้งแทนเรื่องต่อไม่นับว่าออก — ยังจั่วได้อีกในปีหลัง
-      if (ev && st.poolOwed) {
+      if (ev && st.poolOwed >= 1) {
         st.poolOwed--;
         ev = null;
       }
@@ -4655,8 +4659,9 @@ const dreamPool = (st) => { const f = st.content.cadet?.numbers?.pool_focus_flag
 // หักเป็นใบ ไม่ใช่รอบจั่ว เพราะรอบหนึ่งออกการ์ดแค่ตามโอกาส POOL_CHANCE · ปีที่จั่วไม่ได้อีกแล้วค้างไปหักปีถัดไป
 // หนี้ค้างได้ไม่เกินรอบจั่วของปีหนึ่ง (เจ้าของเคาะข้อ 432) — สายที่นัดถี่สะสมหนี้จนกองไม่ออกอีกหลายปี
 // เนื้อหาเพิ่มสายเรื่องต่อได้โดยชีวิตไม่ยาวขึ้น · ชีวิตที่ไม่เจอเรื่องต่อจั่วและดึงเลขสุ่มเท่าเดิมทุกรอบ
-function takeYearQuota(st) {
-  st.poolOwed = Math.min((st.poolOwed ?? 0) + 1, poolRounds(stageOf(st.age)));
+// การ์ดนัดสายเตรียมทหารหักครึ่งเดียว (เจ้าของเคาะข้อ 453) — สายนี้ชายล้วนและนัดถี่ หักเต็มทำให้ใบกองวัยรุ่นของชายน้อยกว่าหญิง ทุกสายที่ทางเข้าเป็นใบกองวัยรุ่นจึงเอียงตามเพศ
+function takeYearQuota(st, n = 1) {
+  st.poolOwed = Math.min((st.poolOwed ?? 0) + n, poolRounds(stageOf(st.age)));
 }
 
 // สายเรื่องรายคน (krung-1): การ์ดที่มี arc เดินใต้โควตาปีเดิม ไม่ใช่ตัวคุมแยก — ใบกองสุ่มเป็นใบกองอยู่แล้ว ใบนัด/เรื่องต่อหักโควตาตามเดิม ชีวิตจึงไม่ยาวขึ้น
