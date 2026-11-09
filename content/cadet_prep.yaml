@@ -12,7 +12,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "ใบสมัครในกระเป๋า"
     text: "{ชื่อ} ตั้งใจแล้วว่าจะสอบเข้าโรงเรียนเตรียมทหาร ใบรับสมัครพับอยู่ในกระเป๋านักเรียนมาหลายวัน ถ้าสอบติดต้องไปอยู่โรงเรียนประจำ ก่อนสอบก็มีค่าติว เรื่องนี้ต้องคุยกับผู้ใหญ่ในบ้านสักวัน"
     choices:
@@ -44,7 +44,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: parent, alive: true, count: [0, 0]}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: parent, alive: true, count: [0, 0]}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "บอกคนที่บ้านดีไหม"
     text: "{ชื่อ} ตั้งใจจะสอบเข้าโรงเรียนเตรียมทหาร แต่ยังไม่ได้บอกผู้ใหญ่ที่เลี้ยงมาตั้งแต่เล็ก ถ้าสอบติด ต้องไปอยู่โรงเรียนประจำตั้งแต่อายุ 16 บ้านจะเหลือคนน้อยลงอีก เย็นนี้ผู้ใหญ่ในบ้านนั่งพับผ้าอยู่หน้าทีวี"
     choices:
@@ -93,7 +93,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], age: [13, 17], class: [ยากไร้, ยากจนมาก, ยากจน, ค่อนข้างจน], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 17], class: [ยากไร้, ยากจนมาก, ยากจน, ค่อนข้างจน], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "เรียนฟรี แต่ค่าติวไม่ฟรี"
     text: "{ชื่อ} อยากสอบเข้าโรงเรียนเตรียมทหาร ถ้าสอบติดก็เรียนฟรี แต่ก่อนสอบต้องมีค่าติว ค่าสมัคร และค่ารถเข้าเมือง มื้อเย็นวันนี้ ผู้ใหญ่ในบ้านกำลังคุยกันว่าเดือนหน้าเงินจะไม่พอใช้"
     choices:
@@ -138,7 +138,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: parent, sex: หญิง, alive: true}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: parent, sex: หญิง, alive: true}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "จะบอกแม่ดีไหม"
     text: "{ชื่อ} ตั้งใจจะสอบเข้าโรงเรียนเตรียมทหาร แต่ยังไม่ได้บอกใคร มื้อเย็นวันนี้แม่ถามว่า 'ช่วงนี้ตื่นไปวิ่งแต่เช้าทุกวัน มีอะไรหรือเปล่า' ถ้าสอบติด ต้องไปอยู่โรงเรียนประจำตั้งแต่อายุ 16 และก่อนสอบก็ต้องมีค่าติว"
     choices:
@@ -186,7 +186,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: parent, sex: ชาย, alive: true}, {role: parent, sex: หญิง, alive: true, count: [0, 0]}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: parent, sex: ชาย, alive: true}, {role: parent, sex: หญิง, alive: true, count: [0, 0]}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "จะบอกพ่อดีไหม"
     text: "{ชื่อ} อยู่กับพ่อสองคน ตั้งใจจะสอบเข้าโรงเรียนเตรียมทหารแต่ยังไม่ได้บอก คืนนี้ช่วยพ่อซ่อมพัดลมอยู่หน้าบ้าน พ่อถามขึ้นมาว่า 'ช่วงนี้อ่านหนังสือดึกทุกคืน มีอะไรหรือเปล่า' ถ้าสอบติด ต้องไปอยู่โรงเรียนประจำ ทิ้งพ่อไว้คนเดียว"
     choices:
@@ -234,7 +234,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
     text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} แต่ไม่มีเงินเก็บ ผู้ใหญ่ในบ้านจึงไปขอยืมญาติ ตกค่ำกลับมาพร้อมซองเงิน บอกว่า 'ขายผลผลิตได้แล้วค่อยทยอยคืนเขา ญาติฝากมาว่าให้ตั้งใจเรียนนะ'"
     choices:
@@ -274,7 +274,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
     text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} แต่ไม่มีเงินเก็บ ผู้ใหญ่ในบ้านจึงไปกู้เงินรายวันในตลาด บอกว่า 'ดอกไม่เท่าไร ขายของได้เดี๋ยวก็หมด' แต่ทุกเย็น {ชื่อ} เห็นสมุดจดยอดส่งดอกวางอยู่ข้างกระป๋องเงิน"
     choices:
@@ -315,7 +315,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2544, 2650]
-    when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
     text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} ผู้ใหญ่ในบ้านจึงไปขอกู้กองทุนหมู่บ้าน มีเพื่อนบ้านสองคนช่วยค้ำ ในที่ประชุมมีคนถามว่าจะกู้ไปทำอะไร ผู้ใหญ่ในบ้านตอบว่า 'เป็นค่าติวสอบเตรียมทหารของเด็กในบ้าน'"
     choices:
@@ -355,7 +355,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2543]
-    when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
     text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} ผู้ใหญ่ในบ้านจึงไปขอกู้สหกรณ์ที่เป็นสมาชิกอยู่ ต้องหาเพื่อนบ้านมาช่วยค้ำ เจ้าหน้าที่ถามว่าจะกู้ไปลงทุนอะไร ผู้ใหญ่ในบ้านตอบว่า 'ลงทุนให้เด็กในบ้านได้เรียน'"
     choices:
@@ -395,7 +395,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
     text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} แต่ไม่มีเงินเก็บ ผู้ใหญ่ในบ้านจึงเอาสร้อยทองเส้นเดียวของบ้านไปจำนำ แล้วบอกว่า 'ขายของได้เมื่อไรก็ไปไถ่คืน ไม่ต้องห่วง' ใบจำนำเก็บไว้ในกล่องบนหิ้ง"
     choices:
@@ -435,7 +435,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
     text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} ผู้ใหญ่ในบ้านจึงขายวัวสองตัวให้คนรับซื้อที่มาถึงคอก ยังไม่ถึงช่วงราคาดี เลยได้เงินน้อยกว่าที่หวังไว้ เย็นนั้นคอกหลังบ้านดูโล่งกว่าทุกวัน"
     choices:
@@ -472,7 +472,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], age: [14, 18], flags: {has: [cadet_dream, cadet_family_secret], not: [cadet_family_told]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [14, 18], flags: {has: [cadet_dream, cadet_family_secret], not: [cadet_family_told]}}
     title: "หนังสือใต้ที่นอน"
     text: "ผู้ใหญ่ในบ้านเก็บกวาดห้องของ {ชื่อ} แล้วเจอหนังสือข้อสอบเก่าเตรียมทหารซ่อนอยู่ใต้ที่นอน มื้อเย็นวันนั้นหนังสือเล่มนั้นวางอยู่บนโต๊ะ ผู้ใหญ่ในบ้านถามว่า 'จะสอบเตรียมทหารเหรอ ทำไมไม่บอกกัน'"
     choices:
@@ -514,7 +514,7 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], age: [14, 18], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน], flags: {has: [cadet_dream, cadet_family_told], not: [cadet_family_support]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [14, 18], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน], flags: {has: [cadet_dream, cadet_family_told], not: [cadet_family_support]}}
     title: "ที่บ้านเห็นความตั้งใจ"
     text: "เย็นนี้ผู้ใหญ่ในบ้านเปิดดูสมุดพกของ {ชื่อ} อยู่นาน ตกดึกเห็นไฟโต๊ะอ่านหนังสือยังเปิดอยู่ จึงมาเคาะประตูแล้วบอกว่า 'เห็นตั้งใจขนาดนี้ ถ้ายังอยากเข้าค่ายติวเตรียมทหาร เดี๋ยวช่วยออกให้นะ'"
     choices:
@@ -545,7 +545,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 1
-    when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], flags: {has: [cadet_dream, cadet_family_told], not: [cadet_family_support, cadet_family_secret]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], flags: {has: [cadet_dream, cadet_family_told], not: [cadet_family_support, cadet_family_secret]}}
     title: "เงินก้อนปลายปี"
     text: "ปลายปีที่บ้านมีรายได้เข้ามามากกว่าที่คิด ผู้ใหญ่ในบ้านนั่งนับเงินบนเสื่อ แล้วเรียก {ชื่อ} มานั่งข้าง ๆ 'เรื่องค่าติวที่เคยบอก ยังคิดจะไปอยู่ไหม'"
     choices:
@@ -576,7 +576,7 @@ events:
     stage: วัยรุ่น
     years: [2506, 2650]
     weight: 1.5
-    when: {sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream, knows_senior], not: [cadet_prep_camp, cadet_prep_group, cadet_prep_self, cadet_prep_senior, cadet_senior_tutor]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream, knows_senior], not: [cadet_prep_camp, cadet_prep_group, cadet_prep_self, cadet_prep_senior, cadet_senior_tutor]}}
     title: "พี่กลับบ้านช่วงลาพัก"
     text: "รุ่นพี่ที่เคยวิ่งผ่านหน้าบ้านทุกเช้ากลับมาช่วงลาพัก ผมสั้นเกรียน ยืนตัวตรงกว่าเดิม แม่ของพี่เขาเล่าให้คนทั้งซอยฟังว่าลูกชายอยู่บ้านได้ไม่กี่วัน"
     choices:
@@ -609,7 +609,7 @@ events:
     years: [2501, 2650]
     weight: 1.5
     multipliers: {flags: {saw_airforce: 1.5}}
-    when: {sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream]}}
     title: "ห้องสมุดวันเสาร์"
     text: "ครูแนะแนวประกาศหน้าเสาธงว่ารุ่นพี่ศิษย์เก่าที่สอบติดเตรียมทหารเมื่อปีก่อน จะกลับมาติวให้รุ่นน้องฟรีทุกวันเสาร์ที่ห้องสมุด ใครสนใจให้มาลงชื่อ กระดาษหน้าห้องแนะแนวยังว่างอยู่ครึ่งหน้า"
     choices:
@@ -640,7 +640,7 @@ events:
     category: study
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], flags: {has: [cadet_dream]}}
     title: "ใบปลิวเต็มบอร์ด"
     text: "ใบปลิวค่ายติวเตรียมทหารติดเต็มบอร์ดหน้าโรงเรียน 'กินนอนในค่ายทั้งปิดเทอม เช้าติวเลข เย็นวิ่ง' ราคาไม่ใช่น้อย มุมล่างของบอร์ดมีกระดาษแผ่นเล็กลายมือหวัด ๆ 'หาเพื่อนติวเตรียมทหาร ห้องสาม'"
     choices:
@@ -710,7 +710,7 @@ events:
     category: study
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream], not: [cadet_prep_camp]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream], not: [cadet_prep_camp]}}
     title: "หนังสือเล่มเดิม"
     text: "ตารางอ่านหนังสือที่ {ชื่อ} เขียนติดฝาบ้านเลยกำหนดมาสามสัปดาห์แล้ว ไม่มีใครมาตรวจ ไม่มีใครดุ ข้อสอบเก่าเปิดค้างอยู่หน้าเดิม เสียงละครจากห้องข้าง ๆ ดังลอดมาทุกคืน"
     choices:
@@ -745,7 +745,7 @@ events:
     category: study
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream, cadet_prep_camp]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream, cadet_prep_camp]}}
     title: "หนังสือเล่มเดิม"
     text: "คาบเช้าของค่ายติวเริ่มหกโมงครึ่ง เพื่อนร่วมห้องพักดึงผ้าห่มคลุมหัว บอกว่าวันนี้แค่คาบทบทวน ไม่เข้าก็ไม่เป็นไร ครูไม่เช็กชื่อ แต่ค่าค่ายจ่ายไปแล้วทั้งก้อน"
     choices:
@@ -777,7 +777,7 @@ events:
     years: [2501, 2650]
     weight: 1
     repeat: {gap: 1, max: 2}
-    when: {sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream], not: [cadet_prep_camp]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream], not: [cadet_prep_camp]}}
     title: "คืนที่เพื่อนมาชวน"
     text: "เย็นวันศุกร์เพื่อนกลุ่มเดิมมายืนรอหน้าบ้าน ชวน {ชื่อ} ออกไปเที่ยวในเมืองจนดึก 'อ่านทุกวันไม่เบื่อเหรอ ไปด้วยกันสักคืน' ข้อสอบเก่าบทที่ค้างไว้ยังวางอยู่บนโต๊ะ"
     choices:
@@ -809,7 +809,7 @@ events:
     years: [2501, 2650]
     weight: 1
     repeat: {gap: 1, max: 2}
-    when: {sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream, cadet_prep_camp]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream, cadet_prep_camp]}}
     title: "คืนที่เพื่อนมาชวน"
     text: "ดึกแล้วในค่ายติว เพื่อนร่วมห้องนัดกันปีนรั้วไปกินข้าวต้มหน้าปากซอยแล้วต่อตลาดกลางคืน ครูเวรเดินตรวจรอบเดียวตอนสี่ทุ่ม พรุ่งนี้เช้ามีสอบเก็บคะแนน"
     choices:
@@ -843,7 +843,7 @@ events:
     years: [2501, 2650]
     weight: 1
     repeat: {gap: 1, max: 2}
-    when: {sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream], not: [cadet_prep_camp]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream], not: [cadet_prep_camp]}}
     title: "งานที่ไม่มีใครทำแทน"
     text: "ช่วงนี้งานในบ้านล้นมือ ทั้งเฝ้าร้าน หุงข้าว ช่วยงานไร่ ผู้ใหญ่ในบ้านไม่ได้ห้ามอ่านหนังสือ แต่ถ้า {ชื่อ} ไม่ทำ ก็ไม่มีใครทำแทน ข้อสอบเก่าเล่มหนาวางรออยู่มุมห้อง"
     choices:
@@ -874,7 +874,7 @@ events:
     years: [2501, 2650]
     weight: 1
     repeat: {gap: 1, max: 2}
-    when: {sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream, cadet_prep_camp]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream, cadet_prep_camp]}}
     title: "งานที่ไม่มีใครทำแทน"
     text: "จดหมายจากบ้านมาถึงค่ายติว ช่วงนี้งานที่บ้านล้นมือ ถ้าว่างขอให้กลับไปช่วยสักสัปดาห์ ค่าค่ายจ่ายไปแล้ว ห้องติวกำลังเข้าบทที่ออกสอบบ่อยที่สุด"
     choices:
@@ -908,7 +908,7 @@ events:
     weight: 1
     repeat: {gap: 1, max: 2}
     multipliers: {flags: {saw_navy: 1.5}}
-    when: {sex: [ชาย], age: [14, 17], flags: {has: [cadet_dream], not: [can_swim]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [14, 17], flags: {has: [cadet_dream], not: [can_swim]}}
     title: "ห้าสิบเมตร"
     text: "วันแรกที่ลงสระ {ชื่อ} ว่ายได้ไม่ถึงสิบเมตรก็ต้องคว้าขอบสระ หายใจไม่ทัน รุ่นพี่ที่มาซ้อมด้วยบอกว่าสนามจริงจับเวลาว่ายห้าสิบเมตร คนที่ข้อเขียนผ่านแต่มาตกตรงนี้ก็มี"
     choices:
@@ -952,7 +952,7 @@ events:
     years: [2501, 2650]
     weight: 1
     multipliers: {flags: {saw_army: 1.5}}
-    when: {sex: [ชาย], age: [14, 17], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [14, 17], flags: {has: [cadet_dream]}}
     title: "ตีห้า"
     text: "นาฬิกาปลุกดังตอนตีห้า ข้างนอกยังมืด ลมเย็นลอดหน้าต่างเข้ามา เมื่อวานที่ราวดึงข้อในสนามโรงเรียน {ชื่อ} ดึงได้แค่สามครั้งก็ห้อยตัวค้าง เพื่อนข้างราวหัวเราะจนต้องหันหน้าหนี"
     choices:
@@ -986,7 +986,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 0.5
-    when: {sex: [ชาย], age: [15, 17], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [15, 17], flags: {has: [cadet_dream]}}
     title: "คนที่รู้จักผู้ใหญ่"
     text: "คนรู้จักของญาติแวะมาที่บ้าน บอกว่ารู้จักผู้ใหญ่ในกองสอบ ฝากให้ติดได้แน่นอน แต่ต้องจ่ายก่อนเป็นก้อนใหญ่ รับแต่เงินสด และห้ามบอกใครเด็ดขาด"
     choices:
@@ -1025,7 +1025,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 1
-    when: {sex: [ชาย], age: [15, 15], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [15, 15], flags: {has: [cadet_dream]}}
     title: "ทะเลสามวัน"
     text: "จบ ม.สาม เพื่อนทั้งห้องนัดไปทะเลด้วยกันสามวัน ค่ารถหารกันคนละนิด วันที่นัดตรงกับสัปดาห์ที่ตั้งใจจะอ่านหนักที่สุดพอดี เพื่อนสนิทแวะมาชวนถึงหน้าบ้านทุกเย็น"
     choices:
@@ -1053,7 +1053,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 0.5
-    when: {sex: [ชาย], age: [14, 17], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [14, 17], flags: {has: [cadet_dream]}}
     title: "คืนวันเสาร์ที่งานวัด"
     text: "คนที่แอบชอบมาตั้งแต่เปิดเทอมชวนไปเดินงานวัดคืนวันเสาร์ ส่วนเช้าวันอาทิตย์มีสอบจำลองเตรียมทหารที่ต้องตื่นตั้งแต่ตีห้า"
     choices:
@@ -1085,7 +1085,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 1
-    when: {sex: [ชาย], age: [15, 17], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [15, 17], flags: {has: [cadet_dream]}}
     title: "ปีที่สองของเขา"
     text: "ที่สนามซ้อมวิ่ง มีเด็กผู้ชายผิวคล้ำแดดที่ขี่รถมาจากอีกอำเภอ ซ้อมทุกเย็นไม่เคยขาด เขาเล่าว่าปีนี้ข้อเขียนผ่านแล้ว แต่มาตกรอบสองที่สระว่ายน้ำ ปีหน้าจะกลับมาใหม่"
     choices:
@@ -1116,7 +1116,7 @@ events:
     stage: วัยรุ่น
     at_age: 16
     years: [2501, 2650]
-    when: {sex: [ชาย], school: [upper, voc], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], school: [upper, voc], flags: {has: [cadet_dream]}}
     title: "แจ้งสิทธิสอบเตรียมทหาร"
     text: "ประกาศรับสมัครสอบเตรียมทหารปีนี้ออกแล้ว ปีนี้เป็นปีแรกที่ {ชื่อ} อายุถึงเกณฑ์ ใบสมัครวางอยู่บนโต๊ะ ช่องเลือกเหล่ายังว่าง เหลือแค่ตัดสินใจว่าจะยื่นปีนี้หรือรอให้พร้อมกว่านี้"
     choices:
@@ -1157,7 +1157,7 @@ events:
     stage: วัยรุ่น
     at_age: 17
     years: [2501, 2650]
-    when: {sex: [ชาย], school: [upper, voc], flags: {has: [cadet_dream], not: [cadet_exam_door]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], school: [upper, voc], flags: {has: [cadet_dream], not: [cadet_exam_door]}}
     title: "แจ้งสิทธิสอบเตรียมทหาร"
     text: "ประกาศรับสมัครสอบเตรียมทหารออกอีกปี {ชื่อ} ยังอยู่ในเกณฑ์อายุ เพื่อนที่ฝันเดียวกันบางคนเลิกไปแล้ว บางคนยังซ้อมอยู่ทุกเย็น ใบสมัครแผ่นใหม่วางรออยู่บนโต๊ะ"
     choices:
@@ -1198,7 +1198,7 @@ events:
     stage: วัยรุ่น
     at_age: 17
     years: [2501, 2650]
-    when: {sex: [ชาย], school: [upper, voc], flags: {has: [cadet_dream, cadet_exam_door]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], school: [upper, voc], flags: {has: [cadet_dream, cadet_exam_door]}}
     title: "แจ้งสิทธิสอบเตรียมทหาร"
     text: "ประกาศรับสมัครสอบเตรียมทหารออกอีกปี ใบประกาศผลของปีก่อนยังพับอยู่ในลิ้นชัก {ชื่อ} รู้แล้วว่าสนามจริงหน้าตาเป็นอย่างไร เหลือแค่ตัดสินใจว่าจะกลับไปอีกครั้งไหม"
     choices:
@@ -1239,7 +1239,7 @@ events:
     stage: วัยรุ่น
     at_age: 18
     years: [2501, 2650]
-    when: {sex: [ชาย], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], flags: {has: [cadet_dream]}}
     title: "ครั้งสุดท้ายที่สมัครได้"
     text: "เพื่อนร่วมชั้นทยอยกรอกใบสมัครเรียนต่อและใบสมัครงาน ส่วนประกาศรับสมัครเตรียมทหารปีนี้เป็นปีสุดท้ายที่ {ชื่อ} ยังอยู่ในเกณฑ์อายุ ถ้าเลือกสอบต่อ เรื่องเรียนต่อต้องรอจนรู้ผล"
     choices:
@@ -1281,7 +1281,7 @@ events:
     category: study
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้], flags: {has: [cadet_dream]}}
     title: "คืนก่อนสอบ"
     text: "รถทัวร์ออกจากบ้านตั้งแต่ฟ้ายังไม่สว่าง ถึงเมืองที่มีสนามสอบตอนบ่าย ในกระเป๋ามีบัตรประจำตัวสอบ ดินสอสองแท่ง กับแว่นว่ายน้ำ ทั้งเมืองเต็มไปด้วยเด็กผู้ชายหัวเกรียนที่มาเพื่อสิ่งเดียวกัน คืนนี้ต้องหาที่นอนให้ได้"
     choices:
@@ -1333,7 +1333,7 @@ events:
     category: study
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], region: [กรุงเทพฯ และปริมณฑล], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], region: [กรุงเทพฯ และปริมณฑล], flags: {has: [cadet_dream]}}
     title: "คืนก่อนสอบ"
     text: "สนามสอบอยู่ห่างบ้านไม่กี่ป้ายรถเมล์ แต่คืนนี้ทั้งบ้านเงียบผิดปกติ บัตรประจำตัวสอบวางอยู่บนโต๊ะข้างดินสอสองแท่งกับแว่นว่ายน้ำ ข้างนอกมีเสียงรถวิ่งผ่านไม่ขาดสาย"
     choices:
@@ -1385,7 +1385,7 @@ events:
     category: study
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], flags: {has: [cadet_dream]}}
     title: "เช้าวันสอบ"
     text: "เช้าวันสอบ หน้าประตูสนามมีเด็กผู้ชายหัวเกรียนเข้าแถวยาวจนเลยรั้ว ผู้ปกครองนั่งรอใต้ต้นไม้ {ชื่อ} กำบัตรประจำตัวสอบไว้แน่น แล้วก้าวเข้าประตูตามแถวไป"
     choices:
@@ -1426,7 +1426,7 @@ events:
     years: [2501, 2650]
     weight: 3
     repeat: {gap: 1, max: 3}
-    when: {sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
     title: "ตีห้ารอบหมู่บ้าน"
     text: "นาฬิกาปลุกดังตีห้า ข้างนอกยังมืด หมาข้างบ้านเงยหน้ามองแล้วนอนต่อ"
     choices:
@@ -1461,7 +1461,7 @@ events:
     years: [2501, 2650]
     weight: 3
     repeat: {gap: 1, max: 3}
-    when: {sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
     title: "ราวเหล็กหลังโรงเรียน"
     text: "ราวเหล็กหลังสนามบอลสีลอกเป็นแผ่น เด็กรุ่นน้องใช้ห้อยโหนเล่น หลังเลิกเรียนว่างอยู่ราวเดียว"
     choices:
@@ -1495,7 +1495,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 3
-    when: {sex: [ชาย], age: [13, 18], region: [ใต้, ตะวันออก], flags: {has: [cadet_dream], not: [can_swim]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 18], region: [ใต้, ตะวันออก], flags: {has: [cadet_dream], not: [can_swim]}}
     title: "น้ำลึกห้าสิบเมตร"
     text: "เกณฑ์ว่ายน้ำห้าสิบเมตรยังเป็นข้อเดียวที่ยังทำไม่ได้ ใกล้บ้านมีที่ให้ฝึกอยู่ที่เดียว ทะเลหน้าหาดตอนเช้าคลื่นเรียบ ชาวประมงพายเรือออกไปไกลแล้ว"
     choices:
@@ -1528,7 +1528,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 3
-    when: {sex: [ชาย], age: [13, 18], region: [กรุงเทพฯ และปริมณฑล, กลาง, ตะวันตก, ตะวันออกเฉียงเหนือ, เหนือ], flags: {has: [cadet_dream], not: [can_swim]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 18], region: [กรุงเทพฯ และปริมณฑล, กลาง, ตะวันตก, ตะวันออกเฉียงเหนือ, เหนือ], flags: {has: [cadet_dream], not: [can_swim]}}
     title: "น้ำลึกห้าสิบเมตร"
     text: "เกณฑ์ว่ายน้ำห้าสิบเมตรยังเป็นข้อเดียวที่ยังทำไม่ได้ ใกล้บ้านมีที่ให้ฝึกไม่กี่ที่ สระเทศบาลต้องเสียค่าเข้า หรือคลองหลังวัดที่เด็กแถวนั้นกระโดดเล่นทุกเย็น"
     choices:
@@ -1562,7 +1562,7 @@ events:
     years: [2501, 2650]
     weight: 3
     repeat: {gap: 1, max: 3}
-    when: {sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
     title: "ฝนตกทั้งเช้า"
     text: "ฝนเทลงมาตั้งแต่ตีสี่ หลังคาสังกะสีดังจนคุยกันไม่ได้ยิน วันนี้เป็นวันซ้อมตามตาราง"
     choices:
@@ -1596,7 +1596,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 4
-    when: {sex: [ชาย], age: [13, 18], class: [ยากไร้, ยากจนมาก, ยากจน, ค่อนข้างจน], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 18], class: [ยากไร้, ยากจนมาก, ยากจน, ค่อนข้างจน], flags: {has: [cadet_dream]}}
     title: "แบกกระสอบช่วยที่บ้าน"
     text: "ช่วงนี้ที่บ้านมีงานต้องแบกขน ไม่มีเวลาไปวิ่งตามตาราง"
     choices:
@@ -1630,7 +1630,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 4
-    when: {sex: [ชาย], age: [13, 18], class: [ชนชั้นกลางบน, มีอันจะกิน, มั่งคั่ง, ร่ำรวย], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 18], class: [ชนชั้นกลางบน, มีอันจะกิน, มั่งคั่ง, ร่ำรวย], flags: {has: [cadet_dream]}}
     title: "โค้ชที่ยิมใกล้บ้าน"
     text: "ที่บ้านสมัครยิมให้ มีโค้ชคอยจับเวลา โค้ชบอกว่าพลังมีพอ ขาดแค่ความสม่ำเสมอ"
     choices:
@@ -1664,7 +1664,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 1.2
-    when: {sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
     multipliers: {flags: {cadet_prep_group: 3, cadet_bond_a: 3, cadet_senior_tutor: 3, knows_senior: 3}}
     title: "ซ้อมกับคนที่สอบด้วยกัน"
     text: "มีคนชวนไปซ้อมด้วยกันที่สนามกีฬาจังหวัด จับเวลาวิ่งพันเมตรให้กัน"
@@ -1699,7 +1699,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 2.5
-    when: {sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
+    when: {identity: [ตามเพศกำเนิด], sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
     title: "บันไดวัดสามร้อยขั้น"
     text: "วัดบนเขาท้ายตำบลมีบันไดสามร้อยขั้น มีคนเล่าว่ารุ่นพี่ที่ติดเตรียมทหารเคยวิ่งขึ้นลงที่นี่ทุกเช้า"
     choices:
