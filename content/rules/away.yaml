@@ -1,0 +1,6 @@
+# ทะเบียนชนิดสถานะอยู่นอกบ้าน (ใบ 237) — คีย์ใช้ใน away_block ของการ์ด และ effects.away_enter ของตัวเลือก
+# return_text = ปุ่มกลับบ้านบนการ์ดโทรมาบอก · return_cost = ราคากลับบ้าน หน่วย income_x (เจ้าของเคาะข้อ 443)
+kinds:
+  abroad: {name: "ทำงานต่างแดน", return_text: "ลางานบินกลับบ้าน", return_cost: 1}
+  monk: {name: "บวชเรียน", return_text: "ลาสิกขากลับบ้าน", return_cost: 1}
+  camp: {name: "เข้าค่าย", return_text: "ออกจากค่ายกลับบ้าน", return_cost: 1}

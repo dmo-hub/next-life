@@ -523,6 +523,14 @@ export function loadItems(p = 'content/rules/items.yaml') {
 export const loadCadet = (p = 'content/rules/cadet.yaml') => parse(read(p));
 
 // ทะเบียนสายเรื่องรายคน (krung-1): ทุกคีย์ arc บนการ์ดต้องมีชื่อ — หน้าจบใช้บอกสถานะสาย · harness ส่งทะเบียนของ fixture เองได้
+// ทะเบียนชนิดสถานะอยู่นอกบ้าน (ใบ 237) — การ์ดอ้างชื่อชนิด lint ตรวจชื่อกับทะเบียน · ค่าที่ engine อ่านต้องครบ ไม่งั้นพังตอนการ์ดโทรมาบอกออก
+export function loadAway(p = 'content/rules/away.yaml') {
+  const kinds = parse(read(p))?.kinds ?? {};
+  const bad = Object.entries(kinds).filter(([, k]) => typeof k?.name !== 'string' || typeof k?.return_text !== 'string' || !(k?.return_cost > 0)).map(([id]) => `ชนิด ${id} ต้องมี name return_text return_cost > 0`);
+  if (bad.length) throw new Error(bad.join('\n'));
+  return { kinds };
+}
+
 export function loadArcs(events, p = 'content/rules/arcs.yaml') {
   const arcs = parse(read(p))?.arcs ?? {};
   const bad = Object.entries(arcs).filter(([, a]) => typeof a?.name !== 'string' || !a.name.trim()).map(([k]) => `สาย ${k} ไม่มี name`);
@@ -569,5 +577,5 @@ export function loadContent() {
   const cadet = loadCadet();
   checkCadetEraCards(cadet, events);
   checkCadetHeirText(cadet);
-  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), focus, tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet };
+  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), focus, tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), away: loadAway(), arcs: loadArcs(events), cadet };
 }
