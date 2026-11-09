@@ -1,0 +1,522 @@
+# ร่างเรื่อง น้ำท่วม อยู่กับภัยระดับครัวเรือน · 15 ใบ · ลงเกมแล้ว ใบ 247 จากร่าง 246 · แก้ตามข้อค้านรอบ 1 · บ้านและเพื่อนบ้านเท่านั้น · ไม่อ้างเหตุใหญ่ปีจริง · ไม่อ่านและไม่ตั้งธง
+events:
+  - id: highwater_centipede_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [6, 12]}
+    title: "ตะขาบตัวที่สอง"
+    text: "ฝนตกติดกันหลายวันจนตะขาบเดินเข้าบ้าน ลุงที่มาช่วยซ่อมรั้วเตือนว่าอย่าไปเหยียบ ตัวที่ถูกเหยียบจะส่งกลิ่นเรียกเพื่อนมา คุณไม่เชื่อ เลยเอารองเท้าแตะกระทืบไปหนึ่งตัวหน้าครัว รอยยังอยู่บนพื้นตรงนั้น"
+    choices:
+      - id: hw_wash_spot
+        text: "ตักน้ำมาล้างรอยให้สะอาด"
+        effects: {knowledge: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: hw_watch_spot
+        text: "นั่งเฝ้าว่าจะมีตัวใหม่ไหม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตัวที่สองเดินออกมาจากใต้ตุ่มจริง คุณวิ่งไปบอกผู้ใหญ่ แล้วเล่าเรื่องนี้ให้เพื่อนฟังไปอีกสามวัน", effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เฝ้าจนเผลอหลับพิงเสา ตื่นมาเจอแต่มดเดินแถวผ่านหน้า ลุงหัวเราะที่คุณยังนั่งอยู่ที่เดิม", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_tell_grownup
+        text: "บอกผู้ใหญ่ให้มาดูก่อน"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: hw_go_barefoot
+        text: "ยังไม่เชื่อ เดินเท้าเปล่าต่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "วิ่งเล่นได้ทั้งบ่ายไม่เจออะไร คุณไปบอกเพื่อนว่าเรื่องของลุงเป็นนิทาน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ก้าวที่สามเห็นตะขาบอีกตัวข้างนิ้วเท้า คุณกระโดดขึ้นโต๊ะกินข้าวโดยไม่รู้ตัว และไม่ลงมาอีกจนค่ำ", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_centipede_sign
+        text: "เขียนป้ายห้ามตะขาบเข้าบ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ใหญ่ขำจนลืมดุเรื่องเปลืองกระดาษ ป้ายอยู่ตรงนั้นทั้งหน้าฝน คุณถือว่าได้ผลเพราะวันนั้นไม่เจอตัวใหม่", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เช้ามาตะขาบเดินผ่านใต้ป้ายพอดี เพื่อนบอกว่ามันคงอ่านหนังสือไม่ออก คุณเลยต้องวาดรูปเพิ่ม", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_basin_count_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [7, 12]}
+    title: "นับกะละมังหน้าบ้าน"
+    text: "หน้าแล้งปีนี้น้ำในบ่อแห้ง ทุกบ้านวางกะละมังกับถังเรียงหน้าบ้านรอรถน้ำที่ผู้ใหญ่ลงขันกันจ้างมา เด็กแถวนี้เดินนับว่าบ้านไหนมีกี่ใบ บ้านคุณมีสี่ใบ บ้านตรงข้ามมีเจ็ดใบ รถกำลังเลี้ยวเข้าซอย"
+    choices:
+      - id: hw_hold_hose
+        text: "ช่วยจับสายน้ำจ่อถัง"
+        effects: {relations: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: hw_carry_for_grandma
+        text: "ไปช่วยยกถังให้ยายท้ายซอย"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hw_record_count
+        text: "จดจำนวนใส่สมุดไว้ทุกบ้าน"
+        effects: {knowledge: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hw_play_spill
+        text: "ขอเล่นน้ำที่หกจากถัง"
+        effects: {happiness: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hw_add_pots
+        text: "ขนหม้อแกงมาต่อแถวให้ครบแปด"
+        outcomes:
+          - {weight: 1, ok: true, text: "บ้านคุณชนะแบบไม่มีใครตั้งกติกา คนขับรถน้ำหัวเราะแล้วเติมหม้อแกงให้ทุกใบจนเต็ม", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หม้อแกงยังไม่ได้ล้าง น้ำออกมาเป็นรสแกงส้ม ผู้ใหญ่เรียกให้ไปขัดหม้อทั้งบ่าย", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_water_week_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [13, 18]}
+    title: "ประชุมเรื่องอาบน้ำ"
+    text: "หน้าแล้งนี้บ้านคุณต้องซื้อน้ำใช้มาอาทิตย์กว่าแล้ว คืนนี้ผู้ใหญ่เรียกประชุมบนเสื่อว่าจะอาบน้ำสองวันครั้งไหวไหม สมุดจดรายจ่ายเปิดอยู่กลางวง แล้วทุกคนก็หันมามองคนที่เหงื่อออกเยอะที่สุดในบ้าน ซึ่งก็คือคุณ"
+    choices:
+      - id: hw_bath_agree
+        text: "ตกลง อาบสองวันครั้ง"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hw_bath_ladle
+        text: "ขออาบแค่วันละสามขัน"
+        effects: {knowledge: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: hw_bath_reuse
+        text: "รองน้ำอาบไว้ราดส้วมต่อ"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hw_bath_friend_well
+        text: "ไปขออาบบ้านเพื่อนที่มีบ่อ"
+        effects: {network: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hw_bath_sniff_vote
+        text: "เสนอให้ดมกลิ่นตัวแล้วค่อยโหวต"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทุกคนเดินมาให้ดมทีละคน ที่ประชุมขำจนลืมเถียง สุดท้ายได้อาบสองวันครั้งโดยไม่มีใครค้าน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผลโหวตเป็นเอกฉันท์ว่าคุณต้องอาบก่อนใคร และใช้น้ำได้น้อยที่สุด ทั้งบ้านเรียกคุณว่าตัวชี้วัดไปจนฝนตก", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_blackout_stars_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [13, 18]}
+    title: "ไฟดับทั้งอำเภอ"
+    text: "พายุผ่านไปแล้ว ไฟดับทั้งอำเภอมาสี่ชั่วโมงกว่า ตู้เย็นหยุดคราง พัดลมไม่หมุน ทั้งซอยยกเสื่อออกมานั่งหน้าบ้าน ดาวขึ้นเต็มฟ้า เด็กเล็กเริ่มงอแง ป้าบ้านตรงข้ามหันมาถามว่าใครเล่านิทานเป็นบ้าง"
+    choices:
+      - id: hw_tell_tale
+        text: "รับเล่านิทานให้เด็กฟัง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กนั่งนิ่งฟังจนจบเรื่อง ผู้ใหญ่ก็เงียบฟังด้วย ไฟมาเมื่อไรไม่มีใครลุกไปเปิด", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณจำตอนจบไม่ได้เลยแต่งสด เด็กถามต่ออีกสิบคำถาม คุณได้เล่านิทานต่อทุกคืนไปอีกสัปดาห์", effects: {happiness: 1, knowledge: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_find_stars
+        text: "นอนนับดาวเงียบ ๆ"
+        effects: {happiness: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: hw_fan_elders
+        text: "พัดวีให้คนแก่ในซอย"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hw_check_fallen
+        text: "เดินดูว่ากิ่งไม้หักตรงไหน"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: hw_ghost_story
+        text: "เปลี่ยนเป็นเล่าเรื่องผีแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กเงียบกริบเกาะกันเป็นก้อน ผู้ใหญ่ขอบคุณที่ทำให้เด็กหยุดงอแงได้ในที่สุด", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คืนนั้นเด็กทั้งซอยไม่ยอมเข้าห้องน้ำคนเดียว ป้าเดินมาคิดบัญชีกับคุณถึงหน้าบ้าน", effects: {relations: -2, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_toilet_lid_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "เวรส่องคอห่าน"
+    text: "น้ำรอบบ้านยังไม่ลด ใคร ๆ ก็เล่าว่างูโผล่มาจากคอห่านได้ ก่อนเข้าส้วมจึงต้องมีคนส่องดูทุกครั้ง คนในบ้านตกลงกันไม่ได้ว่าใครเป็นเวร ตอนนี้ทุกคนปวดท้องพร้อมกันหน้าประตู"
+    choices:
+      - id: hw_lid_self
+        text: "ยอมส่องเองทุกรอบ"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hw_lid_rota
+        text: "เขียนตารางเวรติดหน้าห้องน้ำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตารางเวรใช้ได้จริงจนน้ำลด คนในบ้านขอลอกไปใช้กับเวรล้างจานต่อ", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนที่ได้เวรตีสองไม่ตื่น คนที่ปวดตีสองก็ต้องส่องเอง ตารางเลยกลายเป็นเรื่องให้ทะเลาะกันแทน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_lid_ladle
+        text: "ราดน้ำไล่สามขันก่อนเข้า"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hw_lid_neighbor
+        text: "ไปขอเข้าห้องน้ำบ้านที่สูงกว่า"
+        effects: {network: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: hw_lid_song
+        text: "ร้องเพลงเตือนงูก่อนส่องทุกครั้ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่เจองูสักตัว คุณจึงถือว่าเพลงได้ผล คนในบ้านขอเพลงกันจนคุณกลายเป็นวงประจำห้องน้ำ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ข้างบ้านนึกว่ามีคนเป็นอะไร ตะโกนถามข้ามรั้วกลางดึก คุณต้องอธิบายผ่านประตูห้องน้ำ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_musty_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [20, 30]}
+    title: "ไล่ดมกลิ่นทุกห้อง"
+    text: "ล้างบ้านเสร็จมาสามวันแล้ว แต่กลิ่นอับยังลอยอยู่ตรงไหนสักแห่ง คุณเดินดมทีละห้องเหมือนตำรวจหาของกลาง ป้าข้างบ้านเดินมาแนะนำน้ำหมักของป้า ซึ่งตัวน้ำหมักเองก็มีกลิ่นไม่น้อยเหมือนกัน"
+    choices:
+      - id: hw_open_windows
+        text: "เปิดหน้าต่างทุกบานทิ้งไว้"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hw_sun_all
+        text: "ขนฟูกกับพรมออกตากแดด"
+        effects: {health: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hw_try_ferment
+        text: "ลองน้ำหมักของป้าดู"
+        outcomes:
+          - {weight: 1, ok: true, text: "กลิ่นอับหายจริง เหลือแต่กลิ่นน้ำหมักอยู่อีกสองสัปดาห์ ป้าแวะมาดมเองแล้วบอกว่าใช้ได้", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตอนนี้บ้านมีสองกลิ่นซ้อนกัน แมลงวันแถวนี้มาตั้งหลักที่หน้าต่างบ้านคุณ", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_live_with_it
+        text: "ทนไป เดี๋ยวจมูกก็ชินเอง"
+        effects: {health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hw_nose_judge
+        text: "เชิญคนจมูกดีในซอยมาชี้จุด"
+        outcomes:
+          - {weight: 1, ok: true, text: "เธอเดินดมสามรอบแล้วชี้ไปที่ตู้เสื้อผ้า พบถุงเท้าเปียกอยู่หลังตู้ตั้งแต่วันน้ำเข้า คุณเลี้ยงกาแฟเธอหนึ่งแก้ว", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เธอบอกว่ากลิ่นมาจากตัวคุณ ทั้งซอยรู้ก่อนค่ำ คุณอาบน้ำสองรอบและไม่กล้าออกจากบ้านไปหนึ่งวัน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_shoe_knock_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "เคาะรองเท้าก่อนออกบ้าน"
+    text: "น้ำเริ่มลดแล้ว คนในซอยเล่าว่างูชอบหลบในรองเท้า เช้านี้ทุกบ้านจึงเคาะรองเท้ากันเสียงดังเป็นวงปี่พาทย์ คุณต้องรีบออกจากบ้าน แต่รองเท้าคู่ที่จะใส่วางอยู่นอกชานมาทั้งคืน"
+    choices:
+      - id: hw_knock_shoe
+        text: "เคาะสามทีแล้วค่อยใส่"
+        effects: {knowledge: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: hw_wear_straight
+        text: "ใส่เลย สายแล้ว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่มีอะไรนอกจากพื้นรองเท้าที่ยังชื้น คุณถึงที่หมายทันเวลาและโล่งใจไปครึ่งวัน", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นิ้วเท้าแตะอะไรเย็น ๆ คุณกระโดดออกมาทั้งรองเท้า สุดท้ายเป็นแค่ใบไม้เปียก แต่ทั้งซอยเห็นท่านั้นแล้ว", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_stick_poke
+        text: "เอาไม้เขี่ยดูให้ทั่วก่อน"
+        effects: {knowledge: 1, happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: hw_stay_relative
+        text: "ไปนอนบ้านญาติจนน้ำแห้ง"
+        effects: {health: 1, relations: -1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: hw_hang_shoes
+        text: "แขวนรองเท้าทุกคู่ไว้บนราว"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนบ้านเห็นแล้วทำตาม ทั้งซอยมีรองเท้าแกว่งไปมาเต็มราว คุณใส่คู่ที่แห้งแล้วออกจากบ้านอย่างสบายใจ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝนลงตอนบ่าย รองเท้าเปียกเต็มราวทุกคู่ พรุ่งนี้ไม่มีคู่ไหนให้ต้องเคาะเลย", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_mud_first_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ตักโคลนก่อนจับสายยาง"
+    text: "วันแรกที่น้ำลด คนในบ้านแย่งกันถือสายยางเพราะมันเป็นงานเดียวที่ดูสนุก แต่โคลนบนพื้นหนาเกินกว่าจะฉีดไหว ต้องมีคนลงมือตักก่อน ถังกับพลั่วกองอยู่ตรงนั้น ไม่มีใครมองมันเลย"
+    choices:
+      - id: hw_shovel_first
+        text: "คว้าพลั่วตักก่อนคนแรก"
+        effects: {health: -1, relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hw_spray_anyway
+        text: "ฉีดเลย ไม่รอใคร"
+        outcomes:
+          - {weight: 1, ok: true, text: "โคลนชั้นบนหลุดออกไปได้จริง พื้นโผล่มาสักนิด คุณยืนเท้าสะเอวเหมือนงานเสร็จแล้ว", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โคลนหนาไม่ไปไหน แต่ไหลไปอุดท่อน้ำทิ้ง คุณเลยได้ล้วงท่อก่อนตักโคลนจริงอีกที", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_wait_rain
+        text: "รอฝนมาช่วยล้างให้"
+        effects: {happiness: 1, relations: -1, health: -1}
+        merit: [{cat: neutral}]
+      - id: hw_call_neighbors
+        text: "ขอแรงเพื่อนบ้าน แล้วไปช่วยคืน"
+        effects: {network: 2, relations: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hw_draw_lots
+        text: "จับฉลากว่าใครได้ถือสายยาง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนแพ้ทุกคนไปตักโคลนโดยไม่บ่น เพราะหวังว่ารอบหน้าจะได้สายยาง คุณเป็นคนเก็บฉลากไว้เองทั้งหมด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณจับได้พลั่ว ทุกคนหันมามองแล้วยิ้ม แม้แต่คนที่ไม่ได้จับฉลากก็มาร่วมยิ้มด้วย", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_radio_sun_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "วิทยุตากแดดเรียงแถว"
+    text: "น้ำลดแล้ว บ้านคุณขนพัดลม วิทยุ และเตารีดมาเรียงตากแดดหน้าบ้าน ถอดปลั๊กไว้ทุกตัว เด็กข้างบ้านอยากรู้ว่าวิทยุยังร้องเพลงได้ไหม ส่วนเพื่อนบ้านเดินมาบอกว่าของเขาเสียบแล้วก็ไม่เห็นเป็นไร"
+    choices:
+      - id: hw_wait_dry
+        text: "ห้ามเสียบจนกว่าจะแห้งสนิท"
+        effects: {knowledge: 1, relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hw_call_repairman
+        text: "ตามช่างมาดูให้ก่อน"
+        effects: {knowledge: 1, network: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: hw_open_it_up
+        text: "แกะเครื่องออกเช็ดเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณเช็ดจนแห้งแล้วประกอบกลับได้ เหลือสกรูสองตัวที่ไม่รู้ของตรงไหน แต่วิทยุยังร้องเพลงได้", effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เครื่องไม่ยอมปิดฝาเหมือนเดิม คุณเอาเชือกมัดไว้ และวิทยุตัวนี้ก็รับได้แต่สถานีเดียว", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_sell_scrap
+        text: "ขายเป็นของเก่าไปเลย"
+        effects: {money: {unit: income_x, amount: 0.01}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hw_sun_market
+        text: "จัดเป็นตลาดนัดของตากแดด"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนเดินผ่านแวะดู ถามราคาพัดลมที่ไม่ได้ขาย เพื่อนบ้านเอาของมาร่วมวางกันเต็มซอย", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตอนคุณเข้าครัว เด็กข้างบ้านขายวิทยุให้คนเดินผ่านแล้วเอาเงินมาส่ง ทั้งที่คุณยังไม่ได้ตั้งราคา", effects: {happiness: -1, money: {unit: income_x, amount: 0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_old_wok_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45], family: [{role: parent, sex: หญิง, alive: true}]}
+    title: "กระทะใบเก่าของแม่"
+    text: "หลังน้ำลด เครื่องครัวขึ้นราเป็นจุด ๆ ขัดแล้วก็ยังติดอยู่ เจ้าหน้าที่อนามัยบอกว่าล้างแล้วยังมีเชื้อราให้ทิ้ง แต่แม่กอดกระทะใบนี้ไว้แน่น บอกว่าแกงมาตั้งแต่คุณยังเดินไม่เป็น ทัพพีอีกอันก็ประวัติยาวไม่แพ้กัน"
+    choices:
+      - id: hw_persuade_mom
+        text: "เกลี้ยกล่อมจนแม่ยอมทิ้ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "แม่ฟังจนจบแล้ววางกระทะลงช้า ๆ ขอยืนดูเป็นครั้งสุดท้าย จากนั้นแกงหม้อใหม่ก็รสเดิมอยู่ดี", effects: {relations: 2, health: 1}, merit: [{cat: care_parents, level: 1}]}
+          - {weight: 1, text: "แม่ไม่พูดกับคุณสามวัน กระทะยังอยู่ที่เดิม แต่ย้ายมาแขวนบนหัวเตียงแทน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_swap_new_wok
+        text: "แอบซื้อใบใหม่มาวางแทน"
+        effects: {health: 1, relations: -1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: hw_scrub_again
+        text: "ขัดอีกรอบให้แม่เห็นกับตา"
+        effects: {knowledge: 1, relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: hw_keep_as_memento
+        text: "เก็บไว้ดู แต่ห้ามใช้ทำกับข้าว"
+        effects: {relations: 1, happiness: 1, health: 1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: hw_farewell_wok
+        text: "จัดงานอำลากระทะหน้าบ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนบ้านมาร่วมฟังประวัติกระทะ แม่เล่าจนน้ำตาซึม แล้วโยนลงถังเองกับมือ", effects: {happiness: 2, relations: 2}, merit: [{cat: care_parents, level: 1}]}
+          - {weight: 1, text: "งานจบ แม่เดินไปเก็บกระทะกลับเข้าครัวเงียบ ๆ และบอกว่าที่อำลาคือทัพพี", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_sandbag_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [33, 45]}
+    title: "กระสอบทรายคนละท่า"
+    text: "น้ำในคลองขึ้นเรื่อย ๆ คนในซอยมาช่วยกันเรียงกระสอบทรายกั้นปากซอย ทุกคนเรียงคนละท่า ใครเคยเห็นมาแบบไหนก็ยืนยันแบบนั้น ลุงบ้านหัวมุมเอาแผ่นพลาสติกมาดึงคลุมจนตึงเปรี๊ยะ แล้วหันมาถามคุณว่าสวยไหม"
+    choices:
+      - id: hw_warn_tight
+        text: "บอกลุงว่าอย่าดึงตึงเกินไป"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงลองผ่อนลงนิดหนึ่ง เถียงอีกสามนาทีแล้วเงียบไป เย็นนั้นลุงเล่าให้คนอื่นฟังเหมือนคิดได้เอง", effects: {knowledge: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงบอกว่าเรียงกระสอบมาตั้งแต่คุณยังไม่เกิด ปีนี้คุณได้ไปยืนส่งกระสอบท้ายแถวตลอดงาน", effects: {relations: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_stack_quiet
+        text: "เรียงต่อเงียบ ๆ ตามแถวเดิม"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: hw_sandbag_elder
+        text: "ไปขนกระสอบให้บ้านคนแก่ก่อน"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hw_home_first
+        text: "กลับไปยกของในบ้านตัวเอง"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hw_contest_stack
+        text: "เสนอประกวดแถวกระสอบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "แถวคนละท่าตรงกันขึ้นทันทีเพราะไม่มีใครอยากแพ้ ลุงได้ที่หนึ่งและเลี้ยงน้ำหวานทั้งซอย", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กรรมการมีแต่คนเรียงแถวตัวเอง ตัดสินไม่ได้จนน้ำมาถึงเท้า ทุกคนจึงหันมาเรียงต่อกันเงียบ ๆ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_one_boots_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "บูทคู่เดียวทั้งบ้าน"
+    text: "น้ำในบ้านยังเจิ่ง โคลนเต็มพื้น บ้านคุณมีรองเท้าบูทคู่เดียว ใครได้ใส่ก็ได้เข้าไปเก็บของ คนในบ้านยืนรอหน้าประตู แต่ละคนมีของสำคัญของตัวเองคนละอย่าง และเบอร์เท้าไม่มีใครตรงกันเลย"
+    choices:
+      - id: hw_boots_self
+        text: "ใส่เองเข้าไปเก็บทีเดียว"
+        effects: {health: 1, relations: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hw_boots_turns
+        text: "ผลัดกันคนละสิบนาที"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทุกคนได้ของตัวเองครบ ใส่แล้วหลวมบ้างคับบ้างตามเท้าแต่ละคน แต่ไม่มีใครบ่นจนกลับออกมา", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถอดรองเท้าส่งกันจนใช้เวลามากกว่าเก็บของจริง ตะวันตกดินแล้วยังเก็บได้แค่กล่องเดียว", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_borrow_boots
+        text: "ไปขอยืมบ้านข้าง ๆ"
+        effects: {network: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: hw_buy_boots
+        text: "ซื้อเพิ่มอีกสองคู่ เลิกเถียง"
+        effects: {happiness: 1, health: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: hw_bag_legs
+        text: "พันถุงพลาสติกถึงเข่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณเดินเหมือนหุ่นไล่กาเดินได้ เก็บได้แค่ของบนชั้นใกล้ประตูแล้วรีบถอยออกมา คนที่เหลือขำแล้วส่งบูทให้คนถัดไป", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถุงแตกตั้งแต่ก้าวที่สอง คุณออกมาพร้อมเท้าเลอะและกล่องไม่ได้สักใบ ทุกคนหลบตาพลางกลั้นขำ", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_clutter_gift_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "มุมรกกับของฝาก"
+    text: "ฝนใกล้มา คุณตั้งใจจัดมุมรกหลังบ้านกับพุ่มไม้ข้างรั้ว คนแถวนี้เตือนว่ามุมอับคือบ้านของสัตว์มีพิษ แต่พอคุณเคลียร์ได้ครึ่งทาง เพื่อนบ้านก็หอบโอ่งแตก พัดลมเก่า และหนังสือพิมพ์สามกองมาฝาก บอกว่าเผื่อได้ใช้"
+    choices:
+      - id: hw_refuse_gift
+        text: "ปฏิเสธนุ่มนวล ไม่รับเพิ่ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนบ้านเข้าใจ เดินหอบกลับไป แล้วเล่าให้ทั้งซอยฟังว่าบ้านคุณกำลังจริงจังเรื่องงู", effects: {health: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขายิ้มบาง ๆ วางไว้ที่รั้วบอกว่าเผื่อเปลี่ยนใจ เช้ามาโอ่งแตกใบนั้นยังอยู่ตรงเดิม", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_store_upstairs
+        text: "รับไว้ แล้วขนไปไว้ชั้นบน"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: hw_trim_first
+        text: "ตัดพุ่มไม้ก่อน เรื่องอื่นค่อยว่า"
+        effects: {health: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: hw_pass_along
+        text: "เอาไปแบ่งให้บ้านอื่นต่อ"
+        effects: {network: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hw_return_secretly
+        text: "ขนไปคืนตอนเขาไม่อยู่บ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขากลับมาเห็นของเต็มหน้าบ้านแล้วคิดว่ามีคนเอามาให้ ดีใจจนเดินมาเล่าให้คุณฟังด้วยตัวเอง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาเดินสวนคุณกลางซอยพอดี คุณถือพัดลมเก่าอยู่ในมือ และไม่มีคำอธิบายใดฟังขึ้นเลย", effects: {relations: -2, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_foot_wipe_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "พิธีเช็ดเท้าตอนเย็น"
+    text: "ลุยน้ำไปตลาดทุกวันจนเท้าเปื่อย หมอบอกให้ล้างแล้วเช็ดให้แห้งทันที ทุกเย็นเพื่อนบ้านแถวนี้จึงนั่งเรียงบนแคร่หน้าบ้าน เช็ดเท้ากันคนละผืน แลกข่าวในซอยไปพลาง วันนี้ผ้าของคุณหายไปผืนหนึ่ง"
+    choices:
+      - id: hw_wipe_nightly
+        text: "ล้างแล้วเช็ดให้แห้งทุกเย็น"
+        effects: {health: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hw_buy_powder
+        text: "ซื้อแป้งมาแบ่งกันทั้งแคร่"
+        effects: {network: 2, relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: help_others, level: 1}]
+      - id: hw_skip_wipe
+        text: "ข้ามวันนี้ไป เหนื่อยแล้ว"
+        effects: {health: -2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hw_borrow_towel
+        text: "ขอยืมผ้าคนข้าง ๆ"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hw_foot_club
+        text: "ตั้งชมรมเช็ดเท้าแห่งซอย"
+        outcomes:
+          - {weight: 1, ok: true, text: "มีสมาชิกเจ็ดคนภายในสามวัน ไม่มีค่าสมาชิก มีแต่กติกาว่าห้ามใช้ผ้าผืนเดียวกับใคร", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประชุมครั้งแรกเถียงกันเรื่องตำแหน่งประธาน เท้าทุกคนเปียกอยู่อย่างนั้นจนเลิกประชุม", effects: {health: -1, relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: highwater_under_house_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 75]}
+    title: "ยกอะไรขึ้นก่อนดี"
+    text: "น้ำหลากมาทุกปี ของใต้ถุนบ้านต้องขึ้นชั้นบนก่อนค่ำ ทั้งไก่ เครื่องมือ แคร่ และกระสอบข้าวโพด ระเบียงมีที่จำกัด หลังคุณก็ไม่เหมือนเมื่อสิบปีก่อน เด็กหนุ่มข้างบ้านยืนรอฟังว่าจะให้ยกอะไรก่อน"
+    choices:
+      - id: hw_chickens_first
+        text: "ไก่ก่อน ของอื่นรอได้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไก่ครบทุกตัวบนระเบียง เสียงดังทั้งคืน แต่เช้ามาคุณได้ไข่ฟองแรกจากบนราวตากผ้า", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไก่สองตัวบินลงไปทุกครั้งที่ยกขึ้น เด็กหนุ่มไล่จนหมดแรง แล้วคุณต้องนั่งปลอบเขาอีกต่างหาก", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hw_tools_first
+        text: "เครื่องมือหากินขึ้นก่อน"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hw_order_by_weight
+        text: "นั่งสั่งการ ไม่ยกเอง"
+        effects: {health: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: hw_ask_upstream
+        text: "ถามคนต้นน้ำว่ายังขึ้นอีกไหม"
+        effects: {network: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: hw_raft_cot
+        text: "ยกแคร่ขึ้นไปนั่งเป็นประธาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทุกคนต้องทำงานรอบแคร่ คุณได้นั่งคุมจนงานจบ ไก่ก็มาเกาะพักข้าง ๆ เป็นเพื่อนอีกสองตัว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แคร่ตัวนั้นกินที่ระเบียงจนหมด ของที่เหลือไม่มีที่วาง คุณต้องลงจากตำแหน่งพร้อมแคร่ทั้งตัว", effects: {relations: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

@@ -1,0 +1,520 @@
+# ร่างเรื่อง เกณฑ์ทหาร · 15 ใบ · แก้ตามข้อค้าน · มุมเพื่อน เพื่อนบ้าน ครอบครัว คนในหมู่บ้าน · ไม่อ่านและไม่ตั้งธง
+events:
+  - id: draftee_hair_rule_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2562, 2650]
+    weight: 2
+    when: {age: [15, 18], school: [upper, voc]}
+    title: "ผมหน้าห้าเซนติเมตร"
+    text: "ปีนี้เพื่อนที่เรียนวิชาทหารไว้ผมรองทรงสูงได้ ด้านหน้ายาวไม่เกินห้าเซนติเมตร เช้าวันฝึกเลยมีแถววัดผมด้านหน้ากันหลังห้องน้ำ เพื่อนคนหนึ่งยื่นไม้บรรทัดมาให้คุณ บอกว่ามือคุณนิ่งที่สุดในห้อง ช่วยดูทีว่ารอดไหม"
+    choices:
+      - id: draftee_hair_measure_true
+        text: "วัดตามจริง บอกตามตรง"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_hair_trim_help
+        text: "ขอกรรไกรมาเล็มให้พอดี"
+        outcomes:
+          - {weight: 1, ok: true, text: "เล็มไปนิดเดียวก็เข้าเกณฑ์ เพื่อนส่องกระจกแล้วบอกว่าหล่อขึ้น คุณเลยมีคนมาต่อคิวเพิ่มอีกสามหัว", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ข้างซ้ายสั้นกว่าข้างขวา เพื่อนต้องเดินเอียงคอไปทั้งเช้า และเลิกเรียกคุณว่ามือนิ่ง", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: draftee_hair_stay_out
+        text: "คืนไม้บรรทัด ไม่ขอยุ่ง"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: draftee_hair_ask_rule
+        text: "ถามว่าวัดจากตรงไหนถึงตรงไหน"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: draftee_hair_wet_comb
+        text: "แนะให้หวีเปียก จะดูสั้นลง"
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวแนบลงไปจนผ่านฉลุย เพื่อนยกให้คุณเป็นที่ปรึกษาประจำแถว แล้วไปยืมหวีกันทั้งห้อง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูฝึกเดินมาพอดี ยืนมองน้ำหยดจากผมหน้าอยู่นาน แล้วถามว่าฝนตกเฉพาะหัวเธอหรือ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_bike_shop_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [16, 18], school: [upper, voc]}
+    title: "ร้านซ่อมที่ขาดคนไปหนึ่ง"
+    text: "พี่ชายของเพื่อนร่วมห้องจับได้ใบแดงเมื่อเดือนก่อน ร้านซ่อมจักรยานของบ้านนั้นเลยเหลือคนทำไม่พอ เพื่อนรีบกลับบ้านทุกเย็น การบ้านส่งไม่ทันมาสามวิชาแล้ว เขาเดินมาขอลอกของคุณ ท่าทางเหนื่อยจนแทบไม่มีแรงอาย"
+    choices:
+      - id: draftee_bike_tutor
+        text: "นั่งติวให้ตอนพักเที่ยง"
+        effects: {relations: 2, knowledge: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_bike_copy
+        text: "ให้ลอกไปก่อนรอบนี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ส่งทันทุกวิชา เขาแบ่งยางในเก่ามาให้เป็นค่าตอบแทน คุณไม่รู้จะเอาไปทำอะไรแต่ก็รับไว้", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลอกมาทั้งชื่อคุณด้วย ครูเรียกไปยืนคู่กันหน้าห้อง เขาหลับตาพึมพำว่าขอโทษ", effects: {relations: 1, knowledge: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: draftee_bike_shop_help
+        text: "ไปช่วยที่ร้านหลังเลิกเรียน"
+        effects: {relations: 2, knowledge: 1, health: -1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_bike_tell_teacher
+        text: "บอกครูให้เข้าใจเรื่องที่บ้าน"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_bike_spoke_trade
+        text: "แลกการบ้านกับสอนเปลี่ยนซี่ล้อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "สองเดือนต่อมาคุณเปลี่ยนซี่ล้อเป็น เพื่อนสอบผ่าน ทั้งคู่ต่างเชื่อว่าตัวเองได้กำไร", effects: {knowledge: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ล้อคันแรกที่คุณลงมือบิดเป็นรูปเลขแปด เจ้าของคันเดินจูงกลับบ้านพร้อมคำขอโทษจากทั้งร้าน", effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_first_table_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 24]}
+    title: "ซองเอกสารอยู่ที่บ้าน"
+    text: "เจ็ดโมงเช้า คุณมาเป็นเพื่อนคนสนิทในวันตรวจเลือก คนตำบลเดียวกันยืนแถวเดียวกันจนทักกันได้ทั้งสนาม โต๊ะแรกจะเรียกชื่อและตรวจหลักฐาน เขาคลำกระเป๋าเสื้อแล้วหน้าซีด ซองเอกสารน่าจะยังอยู่บนโต๊ะกินข้าว"
+    choices:
+      - id: draftee_table_ride_home
+        text: "บึ่งรถกลับไปเอาให้"
+        outcomes:
+          - {weight: 1, ok: true, text: "กลับมาทันก่อนถึงคิวสี่คน เขากอดซองแน่นเหมือนกลัวมันจะลอยไป แล้วเลี้ยงข้าวคุณหนึ่งมื้อ", effects: {relations: 2, health: -1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ซองไม่ได้อยู่บนโต๊ะ มันอยู่ในกระเป๋ากางเกงเขามาตั้งแต่เช้า คุณกลับถึงสนามพร้อมเหงื่อท่วมตัว", effects: {relations: 1, health: -1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_table_ask_officer
+        text: "พาไปถามเจ้าหน้าที่ตรง ๆ"
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_table_calm
+        text: "ให้นั่งลงแล้วค้นทีละกระเป๋า"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_table_stay_back
+        text: "ยืนรอหลังรั้ว ปล่อยเขาจัดการ"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: draftee_table_whole_line
+        text: "ถามคนทั้งแถวว่าใครเห็นซองไหม"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนแถวหน้าชี้ว่าซองเสียบอยู่ในหมวกเขาเอง ทั้งแถวหัวเราะพร้อมกัน บรรยากาศเริ่มผ่อนคลายขึ้นมาหน่อย", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้ซองมาสามซองแต่ไม่ใช่ของเขาสักซอง คนทั้งแถวเริ่มคลำกระเป๋าตัวเอง และบางคนก็หน้าซีดตาม", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_water_stall_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "น้ำเย็นหน้าสนามตรวจเลือก"
+    text: "ญาติของหนุ่ม ๆ มากันตั้งแต่เช้ามืด นั่งรอข้างสนามเป็นชั่วโมง คุณมาช่วยน้าตั้งโต๊ะขายน้ำเย็นกับข้าวเหนียวหมูปิ้ง แดดเริ่มแรง คิวยาวถึงรั้ว ป้าคนหนึ่งกำเงินแล้วบอกว่าไม่หิว แต่ขอนั่งใต้ร่มร้านคุณได้ไหม"
+    choices:
+      - id: draftee_stall_free_seat
+        text: "ยกเก้าอี้ให้ป้านั่งเลย"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_stall_ice_free
+        text: "ยกน้ำให้ป้าแก้วหนึ่งฟรี ๆ"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}, happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: draftee_stall_full_price
+        text: "ขายตามราคา เกรงใจน้า"
+        effects: {money: {unit: income_x, amount: 0.02}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: draftee_stall_more_ice
+        text: "รีบไปซื้อน้ำแข็งเพิ่ม"
+        effects: {money: {unit: income_x, amount: 0.03}, health: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_stall_lucky_label
+        text: "ตั้งชื่อน้ำว่าน้ำแก้วใบดำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนซื้ออ่านป้ายแล้วหัวเราะออกมาได้ น้ำหมดก่อนเที่ยง น้าถามว่าปีหน้าคุณว่างไหม", effects: {money: {unit: income_x, amount: 0.04}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หนุ่มที่เพิ่งจับได้ใบแดงมาหยุดอ่านป้ายแล้วเดินเลยไปเงียบ ๆ คุณแอบปลดป้ายลงทั้งที่ไม่มีใครบอก", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_plastic_chair_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 26]}
+    title: "เหลือยี่สิบเอ็ดที่นั่ง"
+    text: "เก้าอี้พลาสติกบางจนขยับทีดังกรอบ เพื่อนคุณนั่งแถวกลาง ตัวเกร็งรอเรียกชื่อ ประกาศว่าวันนี้มีคนสมัครก่อนสิบห้าคน เหลือยี่สิบเอ็ดที่ให้จับกันในหกสิบแปดคน เขาหันมาหาคุณหลังรั้ว ขยับปากถามว่าดีขึ้นไหม"
+    choices:
+      - id: draftee_chair_thumbs
+        text: "ชูนิ้วโป้งให้ใจชื้น"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_chair_math
+        text: "เขียนเลขตัวโตใส่กระดาษชูให้ดู"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตัวเลขออกมาดีกว่าที่เขากลัว เขาพยักหน้าแล้วเลิกกัดเล็บ คนที่ยืนหลังรั้วข้าง ๆ คุณเอียงมาขอให้คิดของหลานเขาด้วย", effects: {knowledge: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณคูณผิดจนได้ว่าเขาต้องจับสองรอบ คนรอบรั้วช่วยกันแก้จนเลขนั้นกลายเป็นเรื่องตลกทั้งแถว", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: draftee_chair_buy_water
+        text: "ไปซื้อน้ำมารอท่า"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_chair_quiet
+        text: "ยืนนิ่ง ๆ ไม่ทำให้เขาคิดมาก"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_chair_count_chairs
+        text: "นับเก้าอี้ซ้ำเผื่อประกาศผิด"
+        outcomes:
+          - {weight: 1, ok: true, text: "นับได้เท่าประกาศทุกรอบ แต่การนับทำให้คุณกับเขาหายใจเป็นจังหวะ จนถึงคิวก็ไม่มีใครเป็นลม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กรรมการถามว่านับอะไร คุณตอบว่าเก้าอี้ ป้าข้างรั้วพยักหน้าเห็นใจเหมือนคุณแดดลงหัวไปแล้ว", effects: {happiness: 1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_red_card_friend_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 26]}
+    title: "เพื่อนนั่งลงกับพื้น"
+    text: "ใบแดงในมือเพื่อนสนิทยังยับตามรอยนิ้ว เขาทรุดนั่งข้างรั้ว เอามือปิดหน้าอยู่นาน พอเงยขึ้นมาบอกว่าตกใจ แต่ไม่ได้กลัว เสียงยังสั่นอยู่ คุณเดินไปถึงแล้วเขาก็ไม่พูดอะไรต่อ"
+    choices:
+      - id: draftee_red_sit_beside
+        text: "นั่งลงข้าง ๆ ไม่พูดอะไร"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_red_tell_family
+        text: "อาสาไปบอกทางบ้านเขาเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทางบ้านเขาเงียบไปครู่หนึ่ง แล้วถามคุณว่ากินข้าวหรือยัง คุณนั่งกินข้าวกับทางบ้านเขาจนหมดจาน ไม่มีใครเอ่ยคำว่าใบแดงอีก", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ป้าของเขาปล่อยโฮตั้งแต่คำแรก คุณยืนกลางบ้านคนอื่นจนค่ำ พูดอะไรก็ไม่ดีขึ้น", effects: {relations: 1, happiness: -2}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_red_rice_shop
+        text: "พาไปกินข้าวร้านโปรด"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.02}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_red_give_space
+        text: "ปล่อยเขาอยู่คนเดียวสักพัก"
+        effects: {relations: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_red_shave_pact
+        text: "สัญญาว่าจะโกนหัวเป็นเพื่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณโกนจริงเย็นนั้นเลย หัวคุณขาวกว่าหน้าอยู่สองโทน เขาเห็นแล้วหัวเราะออกมาเป็นครั้งแรกในวันนั้น", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช่างที่ตลาดบอกว่าหัวทรงนี้โกนแล้วน่าจะเสียใจ คุณกลับไปหาเพื่อนพร้อมผมครบทุกเส้นและความละอาย", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_letter_home_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 26]}
+    title: "จดหมายคืนแรกของเพื่อน"
+    text: "ซองเล็ก ๆ ส่งมาถึงบ้านคุณ เพื่อนที่เพิ่งเข้าค่ายเขียนมาว่าอยู่ได้ แต่คืนแรก ๆ ก็คิดถึงบ้าน บรรทัดท้ายขอให้แวะดูยายของเขาหน่อย ยายหูไม่ดี ชอบบอกใครต่อใครว่าหลานไปทำงานต่างจังหวัดแล้วเดี๋ยวก็กลับ"
+    choices:
+      - id: draftee_letter_visit_grandma
+        text: "แวะไปหายายสัปดาห์ละครั้ง"
+        effects: {relations: 2, happiness: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_letter_write_back
+        text: "เขียนตอบยาวสองหน้า"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_letter_read_to_her
+        text: "เอาจดหมายไปอ่านให้ยายฟัง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยายให้อ่านซ้ำสามรอบจนจำได้ทั้งฉบับ แล้วเล่าต่อให้คนทั้งตลาดเหมือนหลานเขียนถึงแกคนเดียว", effects: {relations: 2, happiness: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ยายได้ยินว่าหลานคิดถึงบ้าน แล้วรีบเตรียมห่อข้าวจะฝากไปให้ คุณต้องหาคนที่จะเข้าเมืองมารับห่อข้าวนั้นจนได้", effects: {relations: 1, happiness: -1, health: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_letter_next_week
+        text: "เก็บไว้ก่อน ค่อยว่างแล้วไป"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: draftee_letter_fake_news
+        text: "เขียนตอบว่าบ้านนี้ยังเหมือนเดิม"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณเล่าแค่มะม่วงหน้าบ้านออกผลกับน้ำขึ้นถึงบันได เขาตอบกลับมาว่าฉบับนี้ทำให้นอนหลับได้ทั้งคืน", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาตอบกลับมาหน้าเดียวว่า เหมือนเดิมแปลว่าหลังคาบ้านยังรั่วใช่ไหม คุณเลยต้องไปขึ้นหลังคาให้", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_reserve_call_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 38], occupation: [factory, labor, service, technician]}
+    title: "ใบปลดในกระเป๋าเก่า"
+    text: "เพื่อนร่วมกะเคยเป็นทหารเกณฑ์ เย็นนี้รื้อกระเป๋าเก่าเจอใบปลด เพิ่งนึกได้ว่าปลดแล้วยังเป็นทหารกองหนุนอยู่ เขาวางใบนั้นบนโต๊ะห้องพัก ถามคุณว่าแบบนี้ต้องแจ้งอะไรที่ทำงานไหม ทั้งที่คุณเองก็เพิ่งได้ยินคำนี้"
+    choices:
+      - id: draftee_reserve_read_paper
+        text: "ช่วยอ่านใบปลดทีละบรรทัด"
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_reserve_ask_lead
+        text: "พาไปถามหัวหน้ากะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวหน้ากะไม่รู้เหมือนกัน แต่จดชื่อไว้แล้วรับปากจะไปถามให้ เขาเดินกลับมาหน้าโล่งขึ้น ทั้งที่ยังไม่มีใครได้คำตอบ", effects: {network: 2, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "หัวหน้ากะถามกลับว่าสองคนนี้ว่างมากหรือ แล้วเพิ่มงานเก็บพื้นให้ทั้งคู่ ส่วนคำถามเรื่องกองหนุนยังค้างอยู่ที่เดิม", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: draftee_reserve_ask_himself
+        text: "บอกให้เขาไปถามเอาเอง"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: draftee_reserve_keep_safe
+        text: "แนะให้เก็บใบปลดใส่ซองให้ดี"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_reserve_old_boots
+        text: "ถามว่ารองเท้าเก่ายังใส่ได้ไหม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาลองที่ห้องพักเดี๋ยวนั้น เท้าเข้าได้แต่ผูกเชือกไม่ถึง ทั้งกะหัวเราะจนเกือบลืมว่ายังมีงานต่อ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พื้นรองเท้าหลุดติดพื้นห้องพัก เขาเงียบแล้วบอกว่าคงต้องซื้อใหม่ คุณเสียค่าข้าวเที่ยงไปปลอบใจเขา", effects: {relations: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_measure_tape_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [33, 45]}
+    title: "วัดตัวต่อหน้าคนทั้งตำบล"
+    text: "หนุ่มข้างบ้านขอให้คุณไปเป็นเพื่อนในวันตรวจเลือก พอถึงขั้นกรรมการวัดสูงและรอบตัว เขาต้องยืนตัวตรงต่อหน้าคนตำบลเดียวกัน ป้า ๆ ข้างรั้วเริ่มวิจารณ์กันเสียงดัง เขาเหลือบมาหาคุณ ทำตาเหมือนขอให้ช่วยอะไรก็ได้"
+    choices:
+      - id: draftee_tape_distract_aunties
+        text: "ชวนป้า ๆ คุยเรื่องอื่น"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_tape_nod
+        text: "พยักหน้าให้เขาใจเย็น"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_tape_buy_water
+        text: "ซื้อน้ำไปรอที่โต๊ะถัดไป"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_tape_look_away
+        text: "ยืนเฉย ๆ ไม่อยากเด่น"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: draftee_tape_tease_back
+        text: "แซวกลับให้ป้า ๆ หันมาหาคุณ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้า ๆ หันมาวิจารณ์ทรงผมคุณแทนจนเขาวัดเสร็จ เขาเดินกลับมาไหว้คุณหนึ่งที ส่วนทรงผมคุณกลายเป็นเรื่องเล่าประจำตลาด", effects: {happiness: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ป้าคนหนึ่งจำคุณได้ตั้งแต่เด็ก แล้วเล่าเรื่องคุณฉี่รดที่นอนให้คนทั้งรั้วฟัง เด็กหนุ่มได้วัดตัวอย่างสงบ คุณไม่สงบ", effects: {happiness: 1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_coworker_roll_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [34, 45], occupation: [craft, technician, service]}
+    title: "เด็กฝึกงานถูกเรียกแถว"
+    text: "ช่างในร้านเคยเป็นทหารเกณฑ์ พูดเสมอว่าตอนนั้นได้ประสบการณ์ใหม่ในชีวิต เช้านี้เด็กฝึกงานมาสาย เขาเรียกเข้าแถวกลางลานจอดรถแล้วสั่งนับหนึ่งถึงสิบ เด็กหันมามองคุณว่าต้องนับจริงไหม ส่วนลูกค้าเริ่มหยุดดู"
+    choices:
+      - id: draftee_roll_stop_gently
+        text: "แตะไหล่ชวนช่างคุยก่อน"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_roll_rule_time
+        text: "เสนอกติกามาสายให้ทั้งร้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "มาสายเก็บขยะหน้าร้าน ไม่มีใครต้องนับ เด็กตรงเวลาขึ้น ช่างบ่นว่าไม่มีศิลปะแต่ก็ทำตาม", effects: {network: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กติกาข้อแรกจับได้คุณเองเช้าวันจันทร์ ช่างยืนกอดอกดูคุณเก็บขยะหน้าร้านด้วยสีหน้าสุขใจ", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: draftee_roll_let_it
+        text: "ปล่อยไป เดี๋ยวเขาก็เลิก"
+        effects: {relations: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_roll_ask_story
+        text: "ถามว่าสมัยนั้นถูกเรียกแบบนี้ไหม"
+        effects: {knowledge: 1, relations: 2}
+        merit: [{cat: neutral}]
+      - id: draftee_roll_join_line
+        text: "เข้าแถวนับด้วยอีกคน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณนับดังที่สุดในร้าน ช่างกลั้นหัวเราะไม่อยู่ แถวแตก ลูกค้าปรบมือ แล้วทุกคนก็กลับไปทำงาน", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณนับถึงเจ็ดแล้วนับเจ็ดซ้ำอีกที ช่างสั่งเริ่มใหม่ เด็กฝึกงานมองคุณด้วยแววตาสงสาร", effects: {happiness: 1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_son_lottery_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [46, 59], family: [{role: child, sex: ชาย, age: [20, 23], alive: true}]}
+    title: "มาถึงก่อนเจ้าหน้าที่"
+    text: "ลูกชายของคุณถึงวันตรวจเลือกปีนี้ คุณมาถึงสนามตั้งแต่เช้ามืด นั่งรอข้างรั้วกับครอบครัวอื่น ๆ เป็นชั่วโมง คนที่จับได้ใบดำจะได้กลับบ้าน คนที่จับได้ใบแดงก็ต้องไป ตัวเขายืนอยู่ไกลจนคุณเห็นแค่ท้ายทอย"
+    choices:
+      - id: draftee_son_stay_fence
+        text: "นั่งเฝ้าไม่ลุกไปไหน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ใบดำ เขาเดินกลับมาถือกระดาษ คุณยื่นน้ำให้โดยไม่พูดอะไร มือทั้งสองคู่ยังสั่นเหมือนกัน", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ใบแดง เขาเดินกลับมาแล้วบอกว่าไม่เป็นไร คุณพยักหน้า แล้วช่วยกันนับของที่ต้องเตรียมอยู่หลังรั้ว", effects: {relations: 2, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: draftee_son_pray_quiet
+        text: "ไหว้พระในใจ ไม่บอกใคร"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: bhavana, level: 1}]
+      - id: draftee_son_feed_neighbors
+        text: "แบ่งข้าวเหนียวให้คนข้าง ๆ"
+        effects: {relations: 2, network: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: dana, level: 1}]
+      - id: draftee_son_shade_walk
+        text: "ไปหลบแดดข้างตึกก่อน"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: draftee_son_binocular
+        text: "ขอยืมกล้องส่องพระมาดูแถว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ส่องเจอท้ายทอยชัดขึ้นเล็กน้อย แต่ป้าข้างรั้วขอต่อคิวส่องลูกแกด้วย วันนั้นคุณเลยได้เพื่อนใหม่ทั้งแถว", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ส่องทั้งเช้าได้เห็นแต่แหวนเจ้าของกล้อง ลูกชายคุณเดินมาสะกิดว่าเขาจับเสร็จตั้งนานแล้ว", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_visit_food_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "แกงจืดเดินทางไกล"
+    text: "ค่ายของหลานชายเปิดให้ญาติเยี่ยมตั้งแต่สัปดาห์ที่สาม ทุกบ้านเตรียมข้าวปลาอาหารที่เด็ก ๆ ชอบมาเป็นหม้อ ๆ พี่สาวของคุณขับรถออกตั้งแต่ตีสี่ คุณนั่งเบาะหลังกับกับข้าวเต็มคัน แกงจืดหม้อใหญ่เริ่มกระฉอกตั้งแต่โค้งแรก"
+    choices:
+      - id: draftee_visit_hold_pot
+        text: "กอดหม้อแกงไว้ตลอดทาง"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: draftee_visit_share_tent
+        text: "จัดสำรับแบ่งเพื่อนร่วมผลัด"
+        effects: {relations: 2, network: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: dana, level: 1}]
+      - id: draftee_visit_ask_him
+        text: "ปล่อยให้เขาเล่า ไม่ซักไซ้"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_visit_only_favorite
+        text: "ขนแค่ของโปรดสองอย่างพอ"
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.01}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: draftee_visit_soup_rescue
+        text: "แวะปั๊มเติมน้ำใส่แกงจืด"
+        outcomes:
+          - {weight: 1, ok: true, text: "แกงจางลงนิดหน่อยแต่ปริมาณกลับมา หลานชายซดหมดหม้อแล้วบอกว่าแบบนี้แหละรสบ้าน คุณไม่เถียง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้ำจากก๊อกปั๊มรสแปลกจนหลานชายซดแล้วนิ่งไปครู่ใหญ่ ก่อนจะบอกว่าคิดถึงบ้านจริง ๆ", effects: {happiness: 1, relations: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_sendoff_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "น้องเล็กของครอบครัว"
+    text: "ป้าข้างบ้านขอให้คุณไปเป็นเพื่อนส่งหลานรายงานตัว นายทหารบอกญาติว่าจะดูแลทหารใหม่เสมือนน้องเล็กของครอบครัว ป้าฟังแล้วหันมากระซิบถามคุณว่า หลานป้ากินเผ็ดไม่ได้ น้องเล็กบ้านเขากินเผ็ดกันไหม"
+    choices:
+      - id: draftee_sendoff_ask_officer
+        text: "พาป้าไปถามเจ้าหน้าที่จริง ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหน้าที่ตอบเรื่องอาหารให้อย่างไม่รีบ ป้าฟังจบแล้วไหว้ขอบคุณ พลางเขียนคำว่าไม่เผ็ดใส่กระดาษฝากเอาไว้", effects: {relations: 2, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "คนต่อแถวยาวไปถึงประตู เจ้าหน้าที่ได้แต่พยักหน้าทีละคน ป้าออกมาเล่าว่าทางนั้นรับปากว่าน่าจะไม่เผ็ด", effects: {happiness: 1, relations: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_sendoff_comfort
+        text: "บอกป้าว่าเดี๋ยวเขาก็ชิน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_sendoff_drive_home
+        text: "รับป้ากลับบ้านแล้วแวะกินข้าว"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_sendoff_stand_by
+        text: "ยืนเงียบ ๆ เป็นเพื่อนจนเสร็จ"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: draftee_sendoff_chili_note
+        text: "เขียนป้ายไม่เผ็ดติดเป้หลาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนร่วมผลัดอ่านป้ายแล้วแบ่งไข่เจียวให้ ป้าเล่าเรื่องป้ายนี้ไปอีกหลายงานบุญ และเล่าทุกครั้งว่าเป็นความคิดของแก", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลานขอให้คุณแกะป้ายออกก่อนเข้าแถว แล้วมองเหมือนคุณเพิ่งเอาชื่อเล่นตอนเด็กไปติดประกาศ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_name_origin_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 75]}
+    title: "ทำไมต้องใบดำใบแดง"
+    text: "เด็กแถวบ้านวิ่งมาถามว่าทำไมต้องเรียกใบดำใบแดง คุณเคยฟังคนรุ่นก่อนเล่าว่าเป็นสลากที่เขียนแผนกของกองประจำการไว้ แต่จำได้แค่นั้น เด็กนั่งลงรอฟังแล้ว ทำท่าว่ามีเวลาทั้งบ่าย"
+    choices:
+      - id: draftee_origin_tell_known
+        text: "เล่าเท่าที่จำได้จริง ๆ"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_origin_old_paper
+        text: "ค้นหนังสือเก่าที่บ้านให้ดู"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอคำนี้ในหน้าเก่า ๆ พอดี เด็กจดลงสมุดแล้วเอาไปอวดครู ครูแวะมาถามคุณต่อถึงหน้าบ้าน", effects: {knowledge: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ค้นหลายกล่องเจอแต่ใบเสร็จค่าน้ำปีเก่า เด็กกลับไปแล้ว คุณนั่งอ่านใบเสร็จต่อคนเดียวจนเย็น", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: draftee_origin_ask_neighbor
+        text: "พาเด็กไปถามลุงข้างบ้าน"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_origin_send_away
+        text: "บอกให้ไปถามครูเอาเอง"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: draftee_origin_invent
+        text: "แต่งว่ามาจากสีเสื้อคนจับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กทำตาโต เชื่อทั้งหมด แล้วถามว่าเสื้อสีเขียวล่ะจับได้อะไร คุณต้องแต่งต่ออีกหนึ่งบ่าย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูมาหาคุณถึงบ้าน บอกว่านักเรียนตอบข้อสอบแบบนี้กันทั้งห้อง คุณต้องอธิบายใหม่ด้วยน้ำเสียงจริงจัง", effects: {knowledge: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: draftee_old_friend_tea_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [62, 78]}
+    title: "เรื่องใบแดงรอบที่ร้อย"
+    text: "ที่ร้านกาแฟหัวมุม เพื่อนรุ่นเดียวกันเล่าวันจับได้ใบแดงให้คนทั้งโต๊ะฟังเป็นรอบที่เท่าไรไม่รู้ ทุกรอบเขาบอกว่าคิดไว้แล้วว่าได้แดงก็ไปก็แล้วกัน ทุกรอบมือเขาหยุดคนกาแฟตรงคำนี้ วันนี้คนหนุ่มโต๊ะข้างเงี่ยหูฟัง"
+    choices:
+      - id: draftee_tea_let_him
+        text: "ฟังเหมือนยังไม่เคยได้ยิน"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: draftee_tea_ask_who_waited
+        text: "ถามว่าวันนั้นใครมารอเขา"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาหยุดไปครู่หนึ่ง แล้วเล่าส่วนที่ไม่เคยเล่า โต๊ะทั้งโต๊ะเงียบลง กาแฟเย็นไปโดยไม่มีใครบ่น", effects: {relations: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาเปลี่ยนเรื่องทันทีไปเรื่องราคาปุ๋ย คุณรู้ว่าถามเกินไปหนึ่งคำ แต่ก็ไม่รู้ว่าคำไหน", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: draftee_tea_invite_young
+        text: "ชวนคนหนุ่มโต๊ะข้างมาฟังด้วย"
+        effects: {network: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_tea_change_subject
+        text: "เปลี่ยนไปคุยเรื่องอื่น"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: draftee_tea_finish_line
+        text: "พูดประโยคสุดท้ายแทนเขา"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณพูดพร้อมเขาพอดีว่าได้แดงก็ไปก็แล้วกัน โต๊ะหัวเราะ เขาตบไหล่คุณแล้วสั่งกาแฟให้อีกแก้ว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาเงียบแล้วบอกว่าวันนี้จะเล่าเรื่องอื่น และเล่าเรื่องปุ๋ยจนร้านปิด ทั้งโต๊ะมองคุณอย่างไม่ให้อภัย", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
