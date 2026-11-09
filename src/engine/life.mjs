@@ -1,6 +1,6 @@
 import { makeRng, mixSeed } from './rng.mjs';
 import { dlcOpen, dlcStamp, getDlcDefault } from './dlc.mjs';
-import { BIRTH_IDENTITY, identityOf, speechSex, newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, pickKinGhost, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
+import { childFarOk, focusChildFar, childMate, childMateWord, BIRTH_IDENTITY, identityOf, speechSex, newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, pickKinGhost, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp, HIT, HIT_KILL, isAcute, frailOf } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
@@ -677,6 +677,8 @@ export const FILL = {
   แจ้งการจากไป: (st) => (st.grief ? lossText(st.grief) : 'คนในบ้านจากไปแล้ว'),
   ทางกลับ: (st) => (st.age < GRIEF.adultAge ? 'กลับไปเรียน' : isWorking(st) ? 'กลับไปทำงาน' : 'กลับไปใช้ชีวิตตามเดิม'),
   บวชหน้าไฟ: (st) => (st.age < GRIEF.novice ? 'บวชเณรหน้าไฟ' : 'บวชหน้าไฟ'),
+  ชื่อคู่ลูก: (st) => childMate(st, focusOf(st, 'child')) ?? 'คู่ของลูก',
+  คำคู่ลูก: (st) => (focusOf(st, 'child') ? childMateWord(focusOf(st, 'child')) : 'คู่ของลูก'),
   ชื่อผู้จากไป: (st) => (lastLoss(st) ? lossCall(lastLoss(st)) : 'คนในบ้าน'),
   ชื่อคู่เก่า: (st) => lastSpouseLoss(st)?.name ?? 'คู่ชีวิตคนก่อน',
   ปีคู่เก่า: (st) => (spouseYears(st) ? `${spouseYears(st)} ปี` : 'หลายปี'),
@@ -1534,6 +1536,7 @@ export const ERA_NEWS = { merge: true };
 function eventCard(st, ev, news = null, echoFrom = undefined) {
   ev = awayCallCard(st, ev);
   pickFocus(st);
+  if (ev.when?.child_far) focusChildFar(st, ev.when.child_far);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
@@ -2272,6 +2275,7 @@ export function whenOk(st, when) {
   if (when.loss && !lossOk(st, when.loss)) return false;
   if (when.illness && !illnessOk(st, when.illness)) return false;
   if (when.kin_illness && !kinIllOk(st, when.kin_illness)) return false;
+  if (when.child_far && !childFarOk(st, when.child_far)) return false;
   if (when.filial && !filialOk(st, when.filial)) return false;
   if (when.heredity && !heredityOk(st, when.heredity)) return false;
   if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
