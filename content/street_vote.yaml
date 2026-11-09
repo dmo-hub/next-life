@@ -1,0 +1,511 @@
+# ร่างเรื่อง การเมืองท้องถิ่น · ลงเกมแล้ว ใบ 245 จากร่าง 244 · ผ่าน workflow ใบ 244
+# ร่างเรื่อง การเมืองท้องถิ่น · 15 ใบ · ยังไม่ลงเกม · แก้ตามข้อค้านรอบ 1 · ผู้เล่นเป็นชาวบ้าน ผู้ลงคะแนน หรือคนช่วยงาน · ใบที่ผู้เล่นอายุ 25 ขึ้นไปไม่เอ่ยตำแหน่งผู้ใหญ่บ้าน · ไม่ตั้งธงใหม่ ไม่อ่านธง
+events:
+  - id: localvote_child_booth_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [8, 12]}
+    title: "หีบบัตรในศาลาหมู่บ้าน"
+    text: "วันเลือกผู้ใหญ่บ้าน ศาลาหมู่บ้านคนเต็มตั้งแต่เช้า ผู้ใหญ่ต่อแถวรอกาบัตรกันเงียบกริบ คุณกับเพื่อนเกาะรั้วดูอยู่ครึ่งวัน เจ้าหน้าที่หันมาบอกว่าห้ามเข้าใกล้หีบ พรุ่งนี้ที่โรงเรียนก็ต้องเลือกหัวหน้าห้องพอดี"
+    choices:
+      - id: localvote_child_class_01
+        text: "ทำหีบเลือกหัวหน้าห้องเองบ้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครูยอมให้ลองหย่อนบัตรในกล่องชอล์ก เพื่อนนับคะแนนกันเสียงดังจนห้องข้าง ๆ ชะโงกมาดู", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บัตรในกล่องมีมากกว่าคนในห้องสามใบ เพื่อนเถียงกันจนหมดคาบ ครูเลยชี้หัวหน้าเอง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_child_ask_01
+        text: "ถามเจ้าหน้าที่ว่านับคะแนนยังไง"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_child_play_01
+        text: "เบื่อแล้ว ไปเล่นที่ลานวัดดีกว่า"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_child_dog_01
+        text: "ตั้งหีบเลือกหมาประจำซอย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กทั้งซอยมาหย่อนก้อนหินลงกระป๋อง หมาด่างชนะขาดลอย แล้วเดินหนีไปก่อนประกาศผล", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้สมัครตัวหนึ่งกินข้าวเหนียวที่ใช้แทนบัตรจนหมด การเลือกตั้งเป็นโมฆะ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_molam_poll_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [15, 18]}
+    title: "หีบเลือกคณะหมอลำ"
+    text: "งานบุญประจำปีของหมู่บ้านเพื่อน ชาวบ้านจะลงคะแนนเลือกคณะหมอลำกันจริงจัง มีกรรมการหน่วย มีบัตรดีบัตรเสีย ผู้ใหญ่บ้านหลายหมู่มานั่งเป็นกรรมการ คุณถูกขอให้ช่วยถือหีบ แล้วเพื่อนกลุ่มหนึ่งก็มากระซิบว่าคณะของเขาต้องชนะ"
+    choices:
+      - id: localvote_molam_straight_01
+        text: "ถือหีบตรง ๆ ไม่ฟังใคร"
+        outcomes:
+          - {weight: 1, ok: true, text: "นับเสร็จคะแนนห่างกันสามใบ ทุกฝ่ายยอมรับ ผู้ใหญ่บ้านตบบ่าว่าปีหน้ามาช่วยอีก", effects: {network: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กลุ่มเพื่อนแพ้แล้วงอนไปทั้งคืน ไม่มีใครชวนคุณกลับบ้านด้วย", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_molam_count_01
+        text: "ขอไปช่วยดูบัตรเสียแทน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_molam_dodge_01
+        text: "ปฏิเสธ ขอเดินเที่ยวงานเฉย ๆ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_molam_stage_01
+        text: "ขึ้นเวทีร้องหาเสียงให้คณะโปรด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้องเพี้ยนทั้งเพลงแต่คนทั้งลานปรบมือ นักร้องคณะที่คุณเชียร์กวักมือเรียกขึ้นไปยืนด้วย", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กรรมการเชิญลงจากเวทีกลางเพลง เพื่อนเอาไปล้อต่อจนเปิดเทอม", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_phapa_name_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [14, 18]}
+    title: "รายชื่อหน้าต้นผ้าป่า"
+    text: "หมู่บ้านทอดผ้าป่า ผู้เฒ่าบ่นว่าแต่ก่อนแขวนผ้าไว้ข้างทางก็จบ ไม่ต้องอ่านชื่อใคร แต่ปีนี้คุณได้อ่านรายชื่อคนร่วมทำบุญ และคนที่จะลงผู้ใหญ่บ้านทั้งสองคนต่างแวะมาขอให้อ่านชื่อตัวเองก่อน"
+    choices:
+      - id: localvote_phapa_ledger_01
+        text: "อ่านตามลำดับในสมุดเป๊ะ ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้เฒ่าพยักหน้าตลอดรายการ ทั้งสองคนไม่พอใจเท่ากันพอดี เลยไม่มีใครว่าอะไร", effects: {relations: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชื่อคนหนึ่งบังเอิญมาก่อน อีกฝ่ายเดินมาถามผู้เฒ่าว่าเด็กคนนี้เป็นของฝั่งไหน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_phapa_pair_01
+        text: "อ่านสองชื่อนั้นติดกันเลย"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: localvote_phapa_handoff_01
+        text: "ส่งให้ผู้ใหญ่อ่านแทนเถอะ"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: localvote_phapa_boxing_01
+        text: "อ่านแบบพากย์มวยทั้งรายการ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งศาลาหัวเราะจนลืมเรื่องใครมาก่อนใคร ยอดทำบุญปีนี้มากกว่าทุกปี", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้เฒ่าเงยหน้ามองนิ่ง ๆ คุณเสียงค่อยลงเองตั้งแต่ชื่อที่สาม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_homeward_trip_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [21, 30]}
+    title: "ต้องกลับไปกาที่บ้าน"
+    text: "คุณมาทำงานต่างถิ่น แต่ชื่อยังอยู่บ้านเก่า เลือกตั้งที่บ้านคราวนี้ ใครจะลงคะแนนต้องเดินทางกลับไปเอง ค่ารถไปกลับเท่าค่าแรงสองวัน หัวหน้าถามว่าวันอาทิตย์จะมาทำงานล่วงเวลาไหม ส่วนญาติฝากมาว่าคราวนี้สูสีกันมาก"
+    choices:
+      - id: localvote_homeward_go_01
+        text: "กลับไปกา แล้วค้างเยี่ยมญาติ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถึงศาลาหมู่บ้านทันก่อนปิดหีบ ญาติยกกับข้าวมาตั้งเต็มโต๊ะ ถามทุกเรื่องยกเว้นว่ากาใคร", effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถเสียกลางทาง ไปถึงหลังปิดหีบสิบนาที เจ้าหน้าที่ยังใจดีให้น้ำดื่มหนึ่งแก้ว", effects: {happiness: -2, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_homeward_ot_01
+        text: "อยู่ทำล่วงเวลา เอาเงินดีกว่า"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.03}}
+        merit: [{cat: neutral}]
+      - id: localvote_homeward_share_01
+        text: "ชวนคนบ้านเดียวกันเหมารถกลับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "รถหนึ่งคันเต็มคนบ้านเดียวกัน คุยกันตลอดทางจนได้งานใหม่ติดมือกลับมาด้วย", effects: {network: 2, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครึ่งคันถกกันเรื่องผู้สมัครตั้งแต่ออกจากเมือง ไปถึงบ้านแทบไม่มองหน้ากัน", effects: {relations: -1, happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_homeward_bike_01
+        text: "ปั่นจักรยานกลับ ประหยัดค่ารถ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไปถึงตอนหีบใกล้ปิด ขาสั่นจับปากกาแทบไม่อยู่ ชาวบ้านเล่าเรื่องคุณกันไปทั้งปี", effects: {happiness: 2, health: -1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปั่นได้ครึ่งทางยางแตก ต้องนั่งรถกลับเอาจักรยานขึ้นหลังคา ค่ารถแพงกว่าเดิมอีก", effects: {health: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_harvest_guest_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "ผู้สมัครมาลงแขก"
+    text: "หน้าเกี่ยวปีนี้ชาวบ้านนัดลงแขก ตกเย็นเจ้าของนาเลี้ยงข้าว แปลงของญาติที่คุณมาช่วยคุมวันนี้มีคนที่จะลงกรรมการหมู่บ้านถือเคียวมายืนรอด้วย คนในนาเริ่มมองหน้ากัน"
+    choices:
+      - id: localvote_harvest_welcome_01
+        text: "รับน้ำใจ ให้ลงนาเหมือนทุกคน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเกี่ยวจริงจนเย็น ไม่พูดเรื่องเลือกตั้งสักคำ คนในนาเริ่มนับถือแม้จะไม่บอกว่ากาใคร", effects: {relations: 1, network: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาหาเสียงยาวตลอดแปลง ข้าวเสร็จช้าไปครึ่งวัน คนเกี่ยวบ่นอุบ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_harvest_rule_01
+        text: "ช่วยได้ แต่ห้ามคุยเลือกตั้ง"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_harvest_far_01
+        text: "ส่งไปเกี่ยวแปลงไกลสุด"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: localvote_harvest_race_01
+        text: "ท้าแข่งเกี่ยวข้าวให้ทั้งนาดู"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งนาเชียร์กันลั่นทุ่ง งานเสร็จก่อนบ่ายสาม เจ้าของนาต้องหุงข้าวเพิ่มอีกหม้อ", effects: {happiness: 2, relations: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณเกี่ยวเร็วจนเคียวบาดนิ้ว ผู้สมัครเลยได้โอกาสพันแผลให้ต่อหน้าทั้งทุ่ง", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_sick_notice_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ไข้ขึ้นเช้าวันเลือกตั้ง"
+    text: "เช้าวันเลือกตั้งท้องถิ่น หน่วยตั้งอยู่ที่ศาลาหมู่บ้าน แต่คุณไข้ขึ้นจนลุกไม่ไหว เพื่อนบ้านที่แวะมาดูบอกว่าไปไม่ไหวก็ฝากบอกกรรมการหน่วยไว้ว่าป่วย ส่วนคนอีกซอยเคาะประตูมาบอกว่าหนึ่งคะแนนก็มีค่า จะช่วยพยุงไปเอง"
+    choices:
+      - id: localvote_sick_rest_01
+        text: "นอนพัก ฝากบอกกรรมการว่าป่วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาจดชื่อไว้ให้แล้วบอกให้รีบหาย สามวันไข้ก็ลด", effects: {health: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝากคนลืมบอก มีคนมาถามว่าหายไปไหน คุณต้องเล่าเรื่องไข้ซ้ำไปทั้งซอย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_sick_go_01
+        text: "กัดฟันให้เขาพยุงไปกา"
+        outcomes:
+          - {weight: 1, ok: true, text: "กาเสร็จคนในแถวรีบหาเก้าอี้ให้นั่ง ได้ยินคำชมตลอดทางกลับ", effects: {network: 1, happiness: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กลับถึงบ้านไข้ขึ้นกว่าเดิม นอนซมต่ออีกสัปดาห์เต็ม", effects: {health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_sick_skip_01
+        text: "ปล่อยผ่าน ไม่อยากวุ่นวาย"
+        effects: {health: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: localvote_sick_bed_01
+        text: "ให้หามไปทั้งเตียงเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนบ้านสี่คนหามเตียงผ่านทั้งซอย ไม่มีใครจำชื่อผู้สมัครได้ แต่จำคุณได้ทุกคน", effects: {happiness: 3, network: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เตียงกว้างกว่าประตูศาลา เจ้าหน้าที่ชี้ให้หามกลับ แล้วบอกให้ไปนอนเสียเถอะ", effects: {happiness: -1, health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_committee_hand_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ยกมือกลางศาลา"
+    text: "ประชุมหมู่บ้านคืนนี้ต้องเลือกกรรมการหมู่บ้าน ชาวบ้านเสนอมาสองชื่อ คนหนึ่งขยันแต่พูดแรง อีกคนเป็นญาติเจ้าของร้านที่คุณติดค่าข้าวสารอยู่ ประธานที่ประชุมให้ยกมือกันกลางศาลา ทุกคนจะเห็นกันหมดว่าใครยกให้ใคร"
+    choices:
+      - id: localvote_committee_worker_01
+        text: "ยกให้คนขยันที่พูดแรง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาได้เป็นกรรมการ เดือนถัดมาท่อระบายน้ำหน้าซอยก็ได้ลอกจริง", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของร้านจำได้ เดือนนั้นทวงค่าข้าวสารก่อนกำหนดเจ็ดวัน", effects: {relations: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_committee_debt_01
+        text: "ยกให้ญาติเจ้าของร้าน"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: localvote_committee_secret_01
+        text: "เสนอหย่อนบัตรแทนยกมือ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งศาลาเงียบไปอึดใจ แล้วมีคนฉีกกระดาษแจกกัน คืนนั้นไม่มีใครต้องเกรงใจใคร", effects: {network: 1, knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประธานถามว่าคุณกลัวอะไร คนหัวเราะกันทั้งศาลา สุดท้ายก็ยกมือเหมือนเดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_committee_abstain_01
+        text: "นั่งเฉย ไม่ยกให้ใครเลย"
+        effects: {relations: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_committee_both_01
+        text: "ยกสองมือ ให้ทั้งสองคนเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ประธานขำจนจดคะแนนไม่ถูก ขอให้นับใหม่ทั้งรอบ บรรยากาศดีขึ้นทันตา", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งสองฝั่งถือว่าคุณไม่จริงใจ เดินสวนกันหน้าร้านไม่มีใครทัก", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_concrete_pool_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ลงขันเทถนนเอง"
+    text: "ถนนเข้าหมู่บ้านเป็นหลุมเป็นบ่อมานับสิบปี ขอไปกี่ครั้งเรื่องก็เงียบ ชาวบ้านนัดคุยกันแล้วตกลงจะลงขันคนละเล็กละน้อยซื้อปูนมาเทเอง คนเก็บเงินมาถึงหน้าบ้านคุณแล้ว บางคนยังบ่นว่าถ้าเทเองทางการจะยิ่งไม่มา"
+    choices:
+      - id: localvote_concrete_pay_01
+        text: "ร่วมลงขันเต็มส่วน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เทเสร็จในสามเสาร์ รถเข้าหมู่บ้านได้ไม่สะดุด รอยมือเด็กยังติดอยู่บนปูนตรงโค้ง", effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝนลงก่อนปูนแห้ง ทางเรียบอยู่ได้แค่หน้าฝนเดียว ต้องลงขันซ้ำอีกรอบ", effects: {happiness: -1, money: {unit: income_x, amount: -0.06}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_concrete_labor_01
+        text: "เงินไม่พอ ขอลงแรงแทน"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: localvote_concrete_petition_01
+        text: "ล่าชื่อขอทางการอีกรอบก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คราวนี้มีเจ้าหน้าที่ลงมาดูจริง ถนนเข้าแผนปีหน้า ชาวบ้านยังเก็บเงินลงขันไว้เผื่อ", effects: {network: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รายชื่อหายไปในกองเอกสาร คนลงขันเทถนนไปก่อนโดยไม่มีชื่อคุณ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_concrete_wait_01
+        text: "รอทางการต่อ ไม่จ่ายซ้ำซ้อน"
+        effects: {relations: -1, money: {unit: income_x, amount: 0.01}}
+        merit: [{cat: neutral}]
+      - id: localvote_concrete_banana_01
+        text: "ปลูกกล้วยริมหลุมประจานเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "กล้วยงามเรียงริมหลุม นอกทางรถพอดี เจ้าหน้าที่ผ่านมาเห็นแล้วรีบจดไว้ ชาวบ้านได้กินกล้วยก่อนได้ถนน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าหน้าที่มาบอกให้ถอนภายในเจ็ดวัน กล้วยยังไม่ทันออกเครือ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_kin_or_friend_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ญาติลงแข่งกับเพื่อนรัก"
+    text: "ชาวบ้านจะเลือกกรรมการหมู่บ้านคนใหม่ ญาติของคุณลงสมัครหนึ่งคน เพื่อนที่โตมาด้วยกันลงอีกคน ต่างคนต่างแวะมาถามเบา ๆ ว่าวันนั้นไปกาให้ใช่ไหม ญาติคนอื่นก็นั่งรอฟังคำตอบอยู่ด้วย"
+    choices:
+      - id: localvote_kin_side_01
+        text: "บอกตรง ๆ ว่าเลือกญาติ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนเงียบไปพักหนึ่ง แล้วบอกว่าเข้าใจ ผ่านไปหนึ่งปียังนั่งกินข้าวร้านเดิมด้วยกันได้", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนแพ้แล้วย้ายร้านข้าวไปนั่งอีกฝั่งของตลาด คุณเห็นหลังเขาทุกเช้า", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_kin_friend_01
+        text: "บอกญาติว่าใจอยู่กับเพื่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ญาติโกรธอยู่สองอาทิตย์ แล้วยอมรับว่าเพื่อนคุณขยันจริง งานบุญปีหน้ายังนั่งโต๊ะเดียวกัน", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "งานเลี้ยงรวมญาติปีนั้นไม่มีใครส่งจานให้คุณเลย", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_kin_secret_01
+        text: "ตอบทั้งคู่ว่าบัตรคือความลับ"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_kin_away_01
+        text: "ขอไปธุระต่างจังหวัดวันนั้น"
+        effects: {relations: -1, happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: localvote_kin_lunch_01
+        text: "ชวนสองคนกินข้าวหม้อเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "นั่งเงียบกันจนข้าวเย็น แล้วทั้งคู่ก็เริ่มนินทาคุณด้วยกัน ซึ่งถือว่าได้ผล", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ต่างคนต่างกินเร็วเพื่อจะได้เป็นคนลุกก่อน หม้อหมดในห้านาที คุณยังไม่ได้ตัก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_age_limit_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "พี่ใหญ่หรือคนหนุ่ม"
+    text: "เลือกกรรมการหมู่บ้านรอบนี้มีพี่ใหญ่ที่รู้จักทุกครัวเรือน ทำงานให้หมู่บ้านมานานจนคนเกรงใจ ส่วนอีกคนอายุสามสิบกว่า ไฟแรงแต่ยังไม่เคยจัดงานบุญสักงาน วงน้ำชาหน้าร้านหันมาถามความเห็นคุณ"
+    choices:
+      - id: localvote_age_elder_01
+        text: "พี่ใหญ่รู้งาน เลือกคนนี้แหละ"
+        outcomes:
+          - {weight: 1, ok: true, text: "งานในหมู่บ้านเดินเหมือนเดิมไม่สะดุด พี่ใหญ่ยังจำได้ว่าหลังไหนน้ำไม่ไหล", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่ใหญ่ถือว่าทำมานานแล้วไม่ฟังใคร ประชุมกี่ครั้งก็จบที่เรื่องเดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_age_young_01
+        text: "ให้โอกาสคนหนุ่มบ้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนหนุ่มเดินเรื่องขอไฟส่องทางได้ในปีแรก วงน้ำชาหันมาพูดกันว่าเห็นแววตั้งแต่แรก", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "งานบุญแรกเขาสั่งข้าวสารขาดไปครึ่ง ชาวบ้านต้องหุงกันเองทั้งคืน", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_age_ask_01
+        text: "ถามทั้งสองว่าจะทำอะไรก่อน"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_age_quiet_01
+        text: "ไม่ออกความเห็น กาเงียบ ๆ"
+        effects: {relations: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_age_recite_01
+        text: "ให้สองคนท่องชื่อทุกบ้านในหมู่"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนหนุ่มจำได้ครึ่งเดียว พี่ใหญ่จำได้หมดแล้วยังท่องชื่อหมาทุกหลังแถมให้ วงน้ำชาหัวเราะจนลืมเถียง", effects: {happiness: 2, relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่ใหญ่ถือว่าถูกลองภูมิ เดินกลับบ้านไปไม่พูดอะไร วงน้ำชาร้างไปหลายเย็น", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_road_width_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "สี่เมตรหรือหกเมตร"
+    text: "ทางการจะทำถนนคอนกรีตเข้าหมู่บ้านกว้างสี่เมตร แต่ชาวบ้านส่วนมากอยากได้หกเมตร ประชุมหมู่บ้านคืนนี้เถียงกันว่าจะขอแก้แบบหรือรับตามเดิม ถ้าขอแก้อาจต้องรอกันอีกนาน ถ้ากว้างหกเมตรรั้วบ้านหลายหลังก็ต้องถอย"
+    choices:
+      - id: localvote_road_four_01
+        text: "รับสี่เมตร ได้ถนนก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถนนเสร็จภายในหน้าแล้ง รถสวนกันต้องหลบบ้าง แต่ไม่ต้องลุยโคลนอีกแล้ว", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถไถสวนกับรถกระบะบนถนนใหม่ ติดกันครึ่งเช้า ทั้งสองฝั่งหันมามองคนที่ยกมือรับสี่เมตร", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_road_six_01
+        text: "ยืนยันหกเมตร ทำครั้งเดียวจบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "แบบแก้ผ่าน รั้วถอยกันคนละนิด ถนนกว้างพอให้งานบุญตั้งโต๊ะริมทางได้", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรื่องกลับไปต่อคิวใหม่ อีกสองหน้าฝนก็ยังเป็นโคลนเหมือนเดิม", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_road_talk_01
+        text: "ให้บ้านที่ติดถนนคุยกันก่อน"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_road_passing_01
+        text: "เสนอสี่เมตร มีจุดหลบรถเป็นช่วง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทางการรับได้ ชาวบ้านก็รับได้ จุดหลบรถกลายเป็นที่ตั้งแผงส้มตำไปสองจุด", effects: {knowledge: 1, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีใครยอมให้จุดหลบรถอยู่หน้าบ้านตัวเอง ประชุมล่มตอนสามทุ่ม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_road_buffalo_01
+        text: "พรุ่งนี้จูงควายมาเดินเทียบให้ดู"
+        outcomes:
+          - {weight: 1, ok: true, text: "ควายสองตัวเดินเรียงกันเต็มทางพอดี คนที่มาดูหน้างานหัวเราะแล้วยอมรับว่ารถคงพอสวนได้", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ควายตัวหนึ่งไม่เดินตาม ลากคุณลงคูต่อหน้าคนทั้งหมู่บ้าน", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_envelope_feast_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "ซองงานบ้านกรรมการ"
+    text: "กรรมการหมู่บ้านคนที่ชนะเลือกตั้งทำบุญขึ้นบ้านใหม่ คนในงานยังจำได้ว่าญาติคุณเดินช่วยอีกฝั่งเต็มตัว เงินก้นถุงก็เหลือไม่มาก คนแถวนี้ถือว่ามาให้เห็นหน้าสำคัญกว่าเงินในซอง และทั้งหมู่บ้านจะเห็นว่าคุณมาหรือไม่มา"
+    choices:
+      - id: localvote_envelope_small_01
+        text: "ใส่ซองเท่าที่มี ไปร่วมงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าภาพเดินมาตักแกงให้เองหนึ่งทัพพี เรื่องเลือกตั้งจบลงตรงหม้อนั้น", effects: {relations: 2, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนจดซองอ่านยอดของคุณเสียงดังไปหน่อย แต่เจ้าภาพทำเป็นไม่ได้ยิน", effects: {happiness: -1, relations: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_envelope_dishes_01
+        text: "ไม่ใส่ซอง ไปช่วยล้างจานแทน"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: localvote_envelope_send_01
+        text: "ฝากซองไป ตัวไม่ไป"
+        effects: {relations: -1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: localvote_envelope_skip_01
+        text: "ไม่ไปเลย ขอหน้าด้านสักปี"
+        effects: {relations: -2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_envelope_letter_01
+        text: "สอดจดหมายขอโทษสามหน้าในซอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าภาพอ่านจบแล้วหัวเราะ เอาจดหมายไปเล่าในงานเป็นเรื่องขำประจำปี", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนเปิดซองคือญาติเจ้าภาพ อ่านดังกลางงาน ได้ยินทั้งสามหน้า ไม่มีใครกล้ามองหน้าคุณ", effects: {relations: -1, happiness: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_kathin_sides_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "กฐินสามัคคีสองฝั่ง"
+    text: "หลังเลือกตั้งหมู่บ้านเหมือนแตกเป็นสองฝั่ง แต่กฐินสามัคคีปีนี้ต้องอาศัยทุกบ้านช่วยกัน เจ้าภาพร่วมขอให้คุณจัดคนล้างผัก ตำน้ำพริก และตั้งขบวน ปัญหาคือทั้งสองฝั่งไม่ยอมตั้งหม้อแกงบนเตาเดียวกัน"
+    choices:
+      - id: localvote_kathin_mix_01
+        text: "จับคู่สองฝั่งเข้าครัวด้วยกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทะเลาะกันเรื่องเกลืออยู่ครู่เดียว แล้วก็บ่นแกงของวัดข้าง ๆ ด้วยกันจนเย็น", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าสองคนเดินออกจากครัวคนละทาง ขบวนกฐินไม่มีข้าวเลี้ยงจนสาย", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_kathin_split_01
+        text: "แยกครัวซ้ายขวา ไม่ต้องเจอกัน"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: localvote_kathin_own_01
+        text: "ทำงานส่วนตัวเงียบ ๆ ไม่ยุ่ง"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: localvote_kathin_contest_01
+        text: "จัดแข่งตำน้ำพริกสองฝั่งเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งลานวัดมาชิมน้ำพริก ตัดสินกันไม่ได้ ได้น้ำพริกพอเลี้ยงทั้งขบวนกับญาติอีกตำบล", effects: {happiness: 2, relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝั่งที่แพ้หาว่าคุณใส่พริกเข้าข้างอีกฝั่ง คุณต้องกินน้ำพริกทั้งสองครกจนหมด", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_elder_ballot_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [65, 85]}
+    title: "เดินไปศาลาไม่ไหว"
+    text: "วันเลือกตั้งมาถึงอีกรอบ หน่วยตั้งอยู่ที่ศาลาอเนกประสงค์ของหมู่บ้าน ไกลจากบ้านคุณพอควร เข่าไม่เหมือนเดิมแล้ว หลานบ้านข้าง ๆ อาสาพาไปตั้งแต่เช้า แต่หมอเตือนให้เลี่ยงแดด เจ้าหน้าที่หน่วยใจดีคอยบอกทาง ถ้าไปถึงได้"
+    choices:
+      - id: localvote_elder_early_01
+        text: "ให้หลานข้างบ้านพาไปแต่เช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถึงก่อนแดดแรง เจอเพื่อนรุ่นเดียวกันอีกสามคนนั่งรอหีบเปิด คุยกันจนลืมว่ามาทำอะไร", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ต่อแถวนานกว่าที่คิด กลับถึงบ้านหน้ามืดต้องนอนพักทั้งบ่าย", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_elder_stay_01
+        text: "ขอพักรอบนี้ อยู่บ้านดีกว่า"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: localvote_elder_cane_01
+        text: "เดินเองด้วยไม้เท้าเก่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ใช้เวลาเดินหนึ่งชั่วโมงเต็ม เจ้าหน้าที่ยกเก้าอี้มาให้ก่อนที่คุณจะเอ่ยปาก", effects: {happiness: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดินได้ครึ่งทางเข่าล็อก ต้องนั่งรอที่ร้านน้ำชาจนมีคนผ่านมารับ", effects: {health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_elder_parasol_01
+        text: "นั่งรถเข็น ให้กางร่มล้อมสามคัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนทั้งแถวหลีกทางให้เหมือนขบวนเจ้าภาพกฐิน คุณยกมือรับไหว้จนถึงหน้าหีบ", effects: {happiness: 3, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลมพัดร่มหงายกลางทาง หลานข้างบ้านวิ่งตามไปสองทุ่ง คุณนั่งรออยู่กลางแดดคนเดียว", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: localvote_kathin_queue_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 85]}
+    title: "วัดดังหรือวัดเล็ก"
+    text: "ประชุมหมู่บ้านถามความเห็นผู้เฒ่าว่าปีหน้าจะไปทอดกฐินที่ไหน วัดดังในตัวจังหวัดมีคนจองเจ้าภาพล่วงหน้ากันเป็นสิบปี ส่วนวัดเล็กท้ายหมู่บ้านยังไม่มีเจ้าภาพเลย คนรุ่นหลานอยากไปวัดดังเพราะเห็นว่าเป็นหน้าเป็นตาของหมู่บ้าน"
+    choices:
+      - id: localvote_queue_small_01
+        text: "พูดให้เลือกวัดเล็กของเราเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งหมู่บ้านลงมือเอง กุฏิหลังเก่าได้เปลี่ยนหลังคา เจ้าอาวาสเดินมาขอบใจถึงศาลา", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนรุ่นหลานบ่นว่าไม่มีอะไรจะเล่าให้เพื่อนฟัง ปีนั้นมาช่วยงานกันไม่ครบ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_queue_famous_01
+        text: "จองวัดดังไว้ รอคิวไปก่อน"
+        effects: {network: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: localvote_queue_hands_01
+        text: "ขอให้ยกมือกันทั้งศาลา"
+        outcomes:
+          - {weight: 1, ok: true, text: "นับมือได้ใกล้เคียงกันมาก เลยตกลงกันว่าปีหน้าวัดเล็ก พอถึงคิวค่อยไปวัดดัง", effects: {relations: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นับมือสามรอบได้สามผล คนนับเป็นคนเดิมทั้งสามรอบ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: localvote_queue_heirs_01
+        text: "จองไว้ให้คนรุ่นหลังของหมู่บ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนจดของวัดหัวเราะแล้วจดให้จริง ลงว่าเจ้าภาพร่วม รอคิวอีกยี่สิบแปดปี", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เด็กหัวซอยถามว่าแล้วรุ่นนั้นจะชื่ออะไร คุณต้องนั่งตั้งชื่อคนที่ยังไม่มีอยู่ทั้งบ่าย", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
