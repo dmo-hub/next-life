@@ -1,0 +1,396 @@
+# สายพระนักเรียน สอบเปรียญ 13 ใบ
+# เส้นหลักกั้น sex ชาย เพราะบรรพชาอุปสมบทในคณะสงฆ์ไทยเป็นของผู้ชาย · ทางแม่ชีอยู่ใบ 117 ไม่ทำที่นี่
+# ไต่ขั้นด้วยธง + นัด: บวชเรียน → เรียนบาลี 1 ปี → สอบต้น 2-3 ปี → สอบกลาง 3-4 ปี → ทางแยก 1-2 ปี · ปีว่างระหว่างนัดให้กองออก
+# ไม่แตะคำเรื่องราชสำนัก (banned monarchy) · ตัวเลือกปั่นเป็นเรื่องความซนของเด็ก ไม่ล้อพระเณร · เนื้อศาสนาเจ้าของอ่านก่อนลง (decisions 72)
+# decisions 414: เส้นเด็กต้องอยู่วัยรุ่นตามจริง ใบปลายสายกระจายไปทำงาน กลางคน ชรา
+# เจ้าของเลือก 2026-11-06: ลงครบ 13 ใบ · เปิดทุกฐานะ (ข้อความยังเล่าเรื่องเด็กบ้านไม่มีเงิน) · ขั้นสูงสุดปรับใกล้จริง น้ำหนัก 1:5 (26% เดิมคือสุ่มเพี้ยนที่ n เล็ก) · การ์ดขัดตอนบวชไปรวมใบ 237
+events:
+  - id: pali_village_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [10, 12], sex: [ชาย]}
+    title: "เรียนต่อที่วัด"
+    text: "จบชั้นประถมปีนี้ ค่ารถเข้าเมืองกับค่าชุดนักเรียนที่บ้านไม่มีให้ ท่านเจ้าอาวาสแวะคุยกับผู้ใหญ่ในบ้านใต้ถุน บอกว่าถ้าบวชเณร มีข้าว มีที่นอน และได้เรียนหนังสือต่อ"
+    choices:
+      - id: ordain
+        text: "บวชเณร ไปเรียนที่วัด"
+        sets_flags: [pali_novice]
+        schedules: [{event: pali_first_01, after_years: [1, 1]}]
+        effects: {away_enter: monk, knowledge: 1, relations: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: work_home
+        text: "อยู่บ้านช่วยงานในนา"
+        effects: {relations: 1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: near_school
+        text: "เดินไปเรียนโรงเรียนไกลเอง"
+        effects: {knowledge: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: ask_friend
+        text: "ถามเพื่อนว่าเณรเล่นบอลได้ไหม"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: pali_late_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [15, 18], sex: [ชาย]}
+    title: "ทางต่อหลังจบ ม.ต้น"
+    text: "เพื่อนเริ่มเข้าเมืองไปทำงาน ที่บ้านไม่มีเงินส่งเรียนต่อ ครูที่โรงเรียนบอกว่ามีวัดรับเด็กจบ ม.ต้น บวชเรียนต่อ เช้าเรียนบาลี บ่ายเรียนวิชาสามัญ จนจบ ม.ปลาย"
+    choices:
+      - id: ordain
+        text: "บวชเรียนต่อ ม.ปลาย"
+        sets_flags: [pali_novice]
+        schedules: [{event: pali_first_01, after_years: [1, 1]}]
+        effects: {away_enter: monk, knowledge: 1, happiness: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: go_work
+        text: "เข้าเมืองไปทำงาน"
+        effects: {money: {unit: income_x, amount: 0.1}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: stay_help
+        text: "อยู่ช่วยงานบ้านปีหนึ่งก่อน"
+        effects: {relations: 1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: ask_shave
+        text: "ถามว่าโกนคิ้วด้วยจริงไหม"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: pali_first_01
+    away_only: [monk]
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [11, 20], sex: [ชาย], flags: {has: [pali_novice]}}
+    title: "ท่องบาลีก่อนสว่าง"
+    text: "ตีสี่ระฆังดัง ทำวัตรเช้า บิณฑบาต แล้วเข้าห้องเรียนไวยากรณ์บาลีที่ท่องเท่าไรก็ยังสับสน รุ่นพี่บอกว่าท่องให้ขึ้นใจก่อน เข้าใจทีหลัง เย็นนี้ยังมีวิชาสามัญอีกสองคาบ"
+    choices:
+      - id: memorize
+        text: "ท่องจนขึ้นใจทุกหน้า"
+        schedules: [{event: pali_exam_low_01, after_years: [2, 3]}]
+        effects: {knowledge: 2, health: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: ask_senior
+        text: "ขอรุ่นพี่สอนเพิ่มตอนค่ำ"
+        schedules: [{event: pali_exam_low_01, after_years: [2, 3]}]
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: slow
+        text: "เรียนเท่าที่ไหว"
+        schedules: [{event: pali_exam_low_01, after_years: [2, 3]}]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: dog_recite
+        text: "ท่องให้สุนัขวัดฟังทุกเย็น"
+        schedules: [{event: pali_exam_low_01, after_years: [2, 3]}]
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: pali_homesick_01
+    away_only: [monk]
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 8
+    when: {age: [13, 18], sex: [ชาย], flags: {has: [pali_novice]}}
+    title: "งานบุญที่บ้านเกิด"
+    text: "คนจากหมู่บ้านมาทำบุญที่วัดในเมือง ฝากข้าวเหนียวห่อใบตองมาให้ ได้กลิ่นแล้วนึกถึงบ้าน พี่น้องรุ่นเดียวกันบอกว่าฝนปีนี้ดี คุณนั่งฟังโดยไม่กล้าถามว่าที่บ้านยังไหวไหม"
+    choices:
+      - id: letter
+        text: "เขียนจดหมายส่งกลับบ้าน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: ask_leave
+        text: "ขอท่านกลับไปเยี่ยมบ้าน"
+        effects: {relations: 2, knowledge: -1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: chant
+        text: "นั่งสวดมนต์จนใจสงบ"
+        effects: {happiness: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: share_rice
+        text: "แบ่งข้าวเหนียวให้เณรทั้งกุฏิ"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: dana, level: 1}]
+
+  - id: pali_friend_01
+    away_only: [monk]
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 8
+    when: {age: [14, 18], sex: [ชาย], flags: {has: [pali_novice]}}
+    title: "เพื่อนเณรลาสิกขา"
+    text: "เพื่อนร่วมกุฏิจบ ม.ต้นแล้วขอสึกออกไปเรียนข้างนอก คืนสุดท้ายเขาพับจีวรเรียบร้อย บอกว่าข้างนอกมีโรงเรียนช่าง ไม่ต้องท่องบาลีแล้ว แล้วถามว่าคุณจะอยู่อีกนานแค่ไหน"
+    choices:
+      - id: stay
+        text: "บอกว่าจะอยู่สอบให้จบก่อน"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: sila, level: 1}]
+      - id: leave_too
+        text: "สึกออกไปพร้อมกัน"
+        sets_flags: [pali_left]
+        clears_flags: [pali_novice]
+        effects: {away_leave: true, happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: wish_well
+        text: "ให้พรเพื่อน กลับไปอ่านหนังสือ"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: swap_notes
+        text: "ขอสมุดจดเล่มเก่าไว้เป็นที่ระลึก"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: pali_exam_low_01
+    away_only: [monk]
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [13, 24], sex: [ชาย], flags: {has: [pali_novice]}}
+    title: "สนามสอบบาลี"
+    text: "พระเณรจากหลายวัดนั่งเต็มศาลาสอบ คนเข้าสอบเป็นหมื่น สอบได้ไม่กี่คนในสิบ ข้อสอบแปลให้เขียนด้วยลายมือสวย เขียนผิดคำเดียวความหมายก็ไปคนละทาง"
+    choices:
+      - id: careful
+        text: "แปลช้า ๆ ตรวจทุกคำ"
+        schedules: [{event: pali_exam_mid_01, after_years: [3, 4]}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ชื่อคุณอยู่ในประกาศ ท่านเจ้าอาวาสพยักหน้าครั้งเดียว", effects: {knowledge: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไม่มีชื่อในประกาศ รุ่นพี่บอกว่าส่วนใหญ่ก็ต้องสอบซ้ำแบบนี้", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: fast
+        text: "เขียนให้ครบก่อนหมดเวลา"
+        schedules: [{event: pali_exam_mid_01, after_years: [3, 4]}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เฉียดผ่าน ชื่อคุณอยู่ท้ายประกาศ", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ผิดตั้งแต่บรรทัดที่สาม กลับไปท่องใหม่อีกปี", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit_exam
+        text: "ไม่สอบแล้ว ขอลาสิกขา"
+        sets_flags: [pali_left]
+        clears_flags: [pali_novice]
+        effects: {away_leave: true, happiness: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: pretty_hand
+        text: "คัดลายมือสวยกว่าเนื้อความ"
+        schedules: [{event: pali_exam_mid_01, after_years: [3, 4]}]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: pali_exam_mid_01
+    away_only: [monk]
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [16, 30], sex: [ชาย], flags: {has: [pali_novice]}}
+    title: "ประโยคที่เทียบวุฒิได้"
+    text: "สอบผ่านขั้นนี้ เอาใบไปเทียบวุฒิมัธยมปลายได้ คนนอกวัดเริ่มรู้ว่าคุณอ่านอะไรมา วัดในเมืองเขียนจดหมายมาชวนไปเรียนสำนักใหญ่ ส่วนที่บ้านถามว่าจะกลับเมื่อไร"
+    choices:
+      - id: city_school
+        text: "ย้ายไปสำนักเรียนในเมือง"
+        schedules: [{event: pali_fork_01, after_years: [1, 2]}]
+        effects: {knowledge: 2, network: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: stay_temple
+        text: "อยู่ช่วยสอนรุ่นน้องที่วัดเดิม"
+        schedules: [{event: pali_fork_01, after_years: [1, 2]}]
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: use_paper
+        text: "เอาใบเทียบวุฒิ ลาสิกขา"
+        sets_flags: [pali_left]
+        clears_flags: [pali_novice]
+        effects: {away_leave: true, knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: frame_paper
+        text: "ส่งใบไปให้ที่บ้านใส่กรอบ"
+        schedules: [{event: pali_fork_01, after_years: [1, 2]}]
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: care_parents, level: 1}]
+
+  - id: pali_fork_01
+    away_only: [monk]
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [18, 33], sex: [ชาย], flags: {has: [pali_novice]}}
+    title: "ทางแยกของผ้าเหลือง"
+    text: "อายุถึงเกณฑ์อุปสมบทแล้ว ท่านอาจารย์ถามว่าจะบวชพระเรียนต่อ หรือจะสึกไปเรียนมหาวิทยาลัย พี่น้องที่บ้านรอให้กลับไปช่วยงาน คุณอยู่ในผ้าเหลืองมานานกว่าที่เคยใส่เสื้อนักเรียน"
+    choices:
+      - id: full_monk
+        text: "อุปสมบท อยู่เรียนต่อ"
+        sets_flags: [pali_monk]
+        schedules: [{event: pali_high_01, after_years: [4, 6]}]
+        effects: {knowledge: 1, happiness: 1, relations: -1}
+        merit: [{cat: sila, level: 2}]
+      - id: university
+        text: "ลาสิกขา สอบเข้าเรียนต่อ"
+        sets_flags: [pali_left]
+        clears_flags: [pali_novice]
+        effects: {away_leave: true, knowledge: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: go_home
+        text: "สึกกลับไปช่วยงานที่บ้าน"
+        sets_flags: [pali_left]
+        clears_flags: [pali_novice]
+        effects: {away_leave: true, relations: 2}
+        merit: [{cat: care_parents, level: 1}]
+      - id: ask_time
+        text: "ขอเวลาคิดหนึ่งพรรษา"
+        sets_flags: [pali_monk]
+        schedules: [{event: pali_high_01, after_years: [4, 6]}]
+        effects: {happiness: 1}
+        merit: [{cat: sila, level: 1}]
+
+  - id: pali_high_01
+    away_only: [monk]
+    type: A
+    category: study
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {age: [22, 45], sex: [ชาย], flags: {has: [pali_monk]}}
+    title: "ขั้นสูงสุด"
+    text: "คนเข้าสอบเหลือไม่กี่ร้อย สอบได้ราวหนึ่งในหก บางรูปสอบซ้ำจนผมเริ่มหงอก ท่านอาจารย์บอกว่าตำแหน่งไม่ใช่เป้าหมาย แต่คุณอ่านหนังสือเล่มนี้มาตั้งแต่ยังท่องไวยากรณ์ไม่จำ"
+    choices:
+      - id: sit_exam
+        text: "เข้าสอบอีกครั้ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "สอบได้ขั้นสูงสุด ศาลาทั้งวัดเงียบไปครู่หนึ่งแล้วค่อยแสดงความยินดี", effects: {away_leave: true, happiness: 3, knowledge: 2, network: 2}, sets_flags: [pali_top], merit: [{cat: sila, level: 1}]}
+          - {weight: 5, text: "ไม่ผ่าน ท่านอาจารย์ยื่นตำราเล่มเดิมกลับมาให้", effects: {away_leave: true, happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: teach_instead
+        text: "หยุดสอบ ตั้งใจสอนรุ่นน้อง"
+        effects: {away_leave: true, relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: practice
+        text: "วางตำรา ไปปฏิบัติภาวนา"
+        effects: {away_leave: true, happiness: 2}
+        merit: [{cat: sila, level: 2}]
+      - id: disrobe
+        text: "ลาสิกขา ออกไปใช้ความรู้"
+        sets_flags: [pali_left]
+        clears_flags: [pali_novice, pali_monk]
+        effects: {away_leave: true, knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: pali_tid_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 5
+    when: {age: [31, 45], sex: [ชาย], flags: {has: [pali_left]}}
+    title: "ทิดในที่ทำงาน"
+    text: "คนในที่ทำงานเรียกคุณว่าทิด เวลาบริษัทมีงานทำบุญ ทุกคนหันมาให้คุณนำสวด ใบสมัครงานไม่มีช่องสำหรับปีที่อยู่วัด คุณยังตื่นตีสี่ทั้งที่ไม่มีระฆังแล้ว"
+    choices:
+      - id: lead_chant
+        text: "นำสวดให้ด้วยความเต็มใจ"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: night_class
+        text: "ลงเรียนภาคค่ำเก็บวุฒิใหม่"
+        effects: {knowledge: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: keep_quiet
+        text: "ไม่เล่าเรื่องวัดให้ใครฟัง"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: read_sign
+        text: "แปลคำบนป้ายร้านให้เพื่อนฟัง"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: pali_teacher_01
+    away_only: [monk]
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [46, 59], sex: [ชาย], flags: {has: [pali_monk, pali_novice]}}
+    title: "ห้องเรียนที่เณรน้อยลง"
+    text: "ปีนี้มีเณรเข้าใหม่ไม่ถึงสิบรูป สมัยคุณมาเต็มศาลา เด็กบ้านจนมีทางไปเรียนอื่นมากขึ้น เจ้าคณะถามว่าจะยุบสำนักเรียน ส่งเด็กที่เหลือไปวัดในเมืองดีไหม"
+    choices:
+      - id: keep_open
+        text: "คงห้องเรียนไว้ สอนเอง"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: merge
+        text: "ส่งเด็กไปเรียนที่ใหญ่กว่า"
+        effects: {network: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: fund_kids
+        text: "หาทุนให้เณรเรียนวิชาชีพด้วย"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: old_exam
+        text: "เล่าเรื่องสอบตกให้เณรฟังทั้งห้อง"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: pali_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [60, 85], sex: [ชาย], flags: {has: [pali_left]}}
+    title: "กลับไปวัดที่เคยอยู่"
+    text: "คุณกลับไปวัดที่เคยบวชเรียน กุฏิไม้เปลี่ยนเป็นปูน ต้นมะม่วงยังอยู่ เณรรูปหนึ่งถามว่าโยมเคยอยู่ที่นี่หรือ คุณจำได้ทั้งบทสวดเช้า แต่จำชื่อเพื่อนร่วมกุฏิไม่ครบแล้ว"
+    choices:
+      - id: donate
+        text: "ทำบุญค่าเล่าเรียนให้เณร"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: dana, level: 2}]
+      - id: ordain_old
+        text: "ขอบวชอีกครั้งตอนแก่"
+        effects: {happiness: 2, relations: -1}
+        merit: [{cat: sila, level: 2}]
+      - id: chant_along
+        text: "นั่งสวดมนต์เย็นกับเณร"
+        effects: {happiness: 2}
+        merit: [{cat: sila, level: 1}]
+      - id: mango
+        text: "ขอมะม่วงต้นเดิมกลับบ้าน"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: pali_sister_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [10, 12], sex: [หญิง]}
+    title: "ที่เรียนของเด็กผู้ชาย"
+    text: "เด็กชายบ้านข้าง ๆ จบ ป.6 แล้วไปบวชเรียนที่วัดในเมือง มีข้าว มีหนังสือให้ คุณสอบได้ที่หนึ่งของห้อง แต่ผู้ใหญ่บอกว่าวัดไม่รับเด็กผู้หญิง คุณต้องหาทางเรียนต่อเอง"
+    choices:
+      - id: teacher
+        text: "ไปถามครูเรื่องทุนเรียนต่อ"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: help_home
+        text: "ออกมาช่วยงานที่บ้าน"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: borrow_books
+        text: "ยืมตำราเขามาอ่านเอง"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: recite_louder
+        text: "ท่องสูตรคูณแข่งกับเสียงสวด"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]

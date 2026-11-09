@@ -1,7 +1,7 @@
 # กลุ่ม business · ช่วงวัยทำงาน/กลางคน (บางใบหนุ่มสาว) · ธุรกิจตามยุค (ร้านชำ · รถเข็น · ร้านอาหาร · สวน · แฟรนไชส์) + แชร์ลูกโซ่
 events:
   - id: biz_grocery_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -37,7 +37,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: biz_grocery_rival_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -70,7 +70,7 @@ events:
           - {weight: 2, text: "มีคนเห็นตอนพูดแล้วเอาไปบอกต่อ ทั้งซอยเลิกคุยด้วย", effects: {relations: -3, happiness: -1}, merit: [{cat: neutral}]}
 
   - id: biz_food_cart_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -111,7 +111,7 @@ events:
           - {weight: 1, text: "โดนเทศกิจยึดรถตั้งแต่วันที่สาม น้ำจิ้มเต็มถังยังไม่ได้เปิดฝา", effects: {happiness: -2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
 
   - id: biz_restaurant_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -156,7 +156,7 @@ events:
           - {weight: 1, text: "หกเดือนแรกขายได้ดี แล้วมีโครงการขยายถนน ปิดหน้าร้านยาวสองปี", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
 
   - id: biz_farm_expand_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -198,7 +198,7 @@ events:
           - {weight: 1, text: "ราคาข้าวดิ่งตั้งแต่ปีแรก ได้ที่เพิ่มแต่งานหนักเป็นสองเท่า", effects: {health: -1, income_mult: 0.9}, merit: [{cat: neutral}]}
 
   - id: biz_farm_buyer_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -231,7 +231,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: biz_franchise_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -270,7 +270,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: biz_partner_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -304,7 +304,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: biz_ponzi_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -342,7 +342,7 @@ events:
           - {weight: 1, text: "เพื่อนบ้านหาว่าอิจฉา เลิกพูดด้วยไปเป็นปี", effects: {happiness: -1}, merit: [{cat: neutral}]}
 
   - id: biz_ponzi_pay_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -382,7 +382,7 @@ events:
     lore_ref: lore-finance-series.html#6
 
   - id: biz_ponzi_crash_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -418,7 +418,7 @@ events:
     lore_ref: lore-finance-series.html#6
 
   - id: biz_ponzi_again_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -453,7 +453,7 @@ events:
         merit: [{cat: help_others, level: 2}]
   # เรื่องต่อ biz_grocery_01 (สมุดเชื่อ) — ออกทาง next เท่านั้น
   - id: biz_credit_book_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -484,7 +484,7 @@ events:
 
   # ประตูการเมืองของนักธุรกิจ (โฟกัสใบ 04 · เจ้าของเคาะ): เจ้าของกิจการถูกชวนลงการเมืองได้โดยไม่ต้องเคยโฟกัสการเมือง · ตอบรับ = ประตูเปิด การ์ดชวนลงสมัครจึงออกได้
   - id: biz_politics_invite_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: กลางคน

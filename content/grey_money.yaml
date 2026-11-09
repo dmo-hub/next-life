@@ -3,7 +3,7 @@
 # ทุกใบจึงมีทางอื่นที่กดได้เสมออย่างน้อย 3 ทาง · ยึดในการ์ดไม่เกินที่แกนยึดตอนถูกจับจริง (ถูกจับแรงกว่าถูกตรวจ)
 events:
   - id: grey_audit_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -38,7 +38,7 @@ events:
           - {weight: 1, text: "หมายเรียกฉบับที่สองมาถึงบ้าน คนในบ้านเปิดอ่านก่อน", effects: {relations: -1, happiness: -2}, merit: [{cat: neutral}]}
 
   - id: grey_ex_partner_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -70,7 +70,7 @@ events:
         effects: {relations: 1, happiness: -1}
 
   - id: grey_land_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -102,7 +102,7 @@ events:
         effects: {relations: 1}
 
   - id: grey_front_shop_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -131,7 +131,7 @@ events:
         effects: {relations: 1}
 
   - id: grey_temple_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน

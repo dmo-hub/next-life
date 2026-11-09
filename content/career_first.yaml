@@ -3,7 +3,7 @@
 # ผลย้อนกับใบแก้ตัวกั้น ladder ⇒ ออกจากสายแล้วเรื่องเงียบไป
 events:
   - id: first_police_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -42,7 +42,7 @@ events:
 
   # ← first_police_01 "รับไว้ตามธรรมเนียม"
   - id: echo_police_ledger_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -117,7 +117,7 @@ events:
 
   # ใบแก้ตัวของคนรับซองแรก — ล้าง badge_bent ได้ (took_bribe คงเป็นประวัติ)
   - id: police_bent_turn_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -150,7 +150,7 @@ events:
 
   # ใบยั่วของคนคืนซองแรก — รับแล้วชื่อสะอาดหาย
   - id: police_clean_tempt_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -184,7 +184,7 @@ events:
 
   # ราชการ — ใบเบิกล่วงเวลาที่ไม่ได้ทำ
   - id: first_gov_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -222,7 +222,7 @@ events:
 
   # ← first_gov_01 "เซ็นตามทุกคน"
   - id: echo_gov_audit_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -260,7 +260,7 @@ events:
 
   # ← first_gov_01 "ขีดชื่อตัวเองออก"
   - id: echo_gov_trusted_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -294,7 +294,7 @@ events:
           - {weight: 1, text: "ผู้อำนวยการเห็นราคากลางที่ขยับ เรียกคืนงานแล้วไม่พูดกับคุณอีก", effects: {network: -2, happiness: -2}, merit: [{cat: neutral}]}
 
   - id: gov_bent_turn_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -326,7 +326,7 @@ events:
         effects: {relations: 1, happiness: 1}
 
   - id: gov_clean_tempt_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -359,7 +359,7 @@ events:
 
   # ทหาร — พลทหารรับใช้
   - id: first_army_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -397,7 +397,7 @@ events:
 
   # ← first_army_01 "ใช้งานตามธรรมเนียม"
   - id: echo_army_complaint_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -462,7 +462,7 @@ events:
         effects: {happiness: -1}
 
   - id: army_bent_turn_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -494,7 +494,7 @@ events:
         effects: {relations: 1, happiness: 1}
 
   - id: army_clean_tempt_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -525,7 +525,7 @@ events:
 
   # ทางแรกของนักล่า: ภารกิจแรกในเกต ไม่มีผลย้อนตามมา (ดันเจียนเป็นของใบถัดไป)
   - id: first_hunter_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน

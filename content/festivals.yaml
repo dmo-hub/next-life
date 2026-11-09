@@ -3,6 +3,7 @@
 # ผลเบาทุกใบ (±1–2) — การ์ดบรรยากาศ ไม่ใช่ทางลัดเปลี่ยนชีวิต · ผู้ใหญ่ในบ้านเรียกรวม ๆ เพราะใบเด็กไม่ผูกว่าพ่อหรือแม่ยังอยู่
 events:
   - id: fest_songkran_kid_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -132,6 +133,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_loykrathong_kid_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -165,7 +167,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_loykrathong_adult_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -196,6 +198,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: fest_newyear_kid_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -229,7 +232,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_newyear_adult_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน

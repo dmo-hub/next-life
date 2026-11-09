@@ -42,7 +42,7 @@ events:
         merit: [{cat: sila, level: 1}]
 
   - id: mid_guarantor_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -81,7 +81,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_kid_uni_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: กลางคน
@@ -116,7 +116,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_parent_care_01
-    away_call: {text: "ตีสองโทรศัพท์จากบ้านเกิดดังถึงเมืองนอก คนที่บ้านล้มในห้องน้ำ หมอบอกว่าต่อไปต้องมีคนดูแลตลอด ญาติถามว่าคุณจะกลับไหม"}
+    away_call: {text: "ตีสองโทรศัพท์จากบ้านเกิดดังขึ้น คนที่บ้านล้มในห้องน้ำ หมอบอกว่าต่อไปต้องมีคนดูแลตลอด ญาติถามว่าคุณจะกลับไหม"}
     type: A
     category: family
     stage: กลางคน
@@ -208,7 +208,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_risky_bet_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -247,7 +247,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_online_boom_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -320,7 +320,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_insurance_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -362,7 +362,7 @@ events:
 
   # เรื่องต่อ (next) — ไม่มี weight · อายุเดียวกับการ์ดต้นทาง
   - id: mid_online_empire_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -466,7 +466,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_scam_victims_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -532,7 +532,7 @@ events:
           - {weight: 1, text: "ญาติโกรธที่ประจานกัน กลุ่มเงียบกริบ", effects: {relations: -2}, merit: [{cat: neutral}]}
   # B167: การ์ดแรกที่ใช้ระบบญาติป่วย (when.kin_illness) — ออกหลังแกนแจ้งว่าพ่อ/แม่ป่วยโรคเรื้อรัง · ตัวเลือกติด filial
   - id: mid_parent_ill_01
-    away_call: {text: "{พ่อแม่ที่ป่วย}โทรมาถึงเมืองนอก เล่าผลตรวจด้วยเสียงเรียบ ๆ ว่าต่อไปต้องมีคนพาไปโรงพยาบาลทุกเดือน แล้วไม่ถามว่าคุณจะกลับเมื่อไร"}
+    away_call: {text: "{พ่อแม่ที่ป่วย}โทรมา เล่าผลตรวจด้วยเสียงเรียบ ๆ ว่าต่อไปต้องมีคนพาไปโรงพยาบาลทุกเดือน แล้วไม่ถามว่าคุณจะกลับเมื่อไร"}
     type: A
     category: family
     stage: กลางคน

@@ -2,6 +2,7 @@
 # ผลรายปี (ความสุข · ค่าเลี้ยง · พาเดิน) แกนคิดเองใน family.mjs · การ์ดนี้มีแค่จังหวะที่ต้องเลือก
 events:
   - id: pet_stray_kid_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -31,7 +32,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: pet_kitten_gift_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: หนุ่มสาว
@@ -61,7 +62,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: pet_stray_work_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: ทำงาน
@@ -91,7 +92,7 @@ events:
         merit: [{cat: dana, level: 1}]
 
   - id: pet_breed_buy_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: ทำงาน
@@ -122,7 +123,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: pet_kid_asks_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: กลางคน
@@ -280,7 +281,7 @@ events:
         merit: [{cat: dana, level: 1}]
 
   - id: pet_move_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: ทำงาน
@@ -374,7 +375,7 @@ events:
         merit: [{cat: dana, level: 1}]
 
   - id: herd_start_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -408,7 +409,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: herd_disease_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน

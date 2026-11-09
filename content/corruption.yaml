@@ -1,7 +1,7 @@
 # กลุ่มทางทุจริต · ช่วงวัยทำงาน (31–45) + กลางคน (46–59) · ทางโกงให้เงินเร็วแลกบาป/โดนจับ คู่ทางสุจริตเสมอ + การ์ดสอบสวนย้อนหลัง
 events:
   - id: fraud_sign_bribe_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -43,7 +43,7 @@ events:
           - {weight: 2, text: "เรื่องเงียบหาย ไม่กี่วันต่อมามีจดหมายไม่ลงชื่อมาถึงบ้าน เขียนว่ารู้นะว่าหลานเรียนที่ไหน", effects: {happiness: -1}, next: fraud_whistle_01, merit: [{cat: neutral}]}
 
   - id: fraud_whistle_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -74,7 +74,7 @@ events:
           - {weight: 1, text: "ข่าวออกแค่วันเดียวแล้วเงียบ แต่ถูกฟ้องหมิ่นประมาทตามมาเป็นปี", effects: {money: {unit: income_x, amount: -1}, happiness: -2}, merit: [{cat: neutral}]}
 
   - id: fraud_contract_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -111,7 +111,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fraud_scale_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -150,7 +150,7 @@ events:
           - {weight: 2, text: "เพื่อนบ้านโกรธจัด ปล่อยข่าวว่าเราขายของเน่า ทั้งตลาดมองค้อน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}], next: fraud_scale_gossip_01}
 
   - id: fraud_materials_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -191,7 +191,7 @@ events:
           - {weight: 2, text: "หักมุม เจ้าของเป็นญาติหัวหน้า เรื่องเงียบหาย แล้วเราโดนจับผิดทุกวันจนต้องทนกัดฟัน", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
 
   - id: fraud_scale_rumor_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -222,7 +222,7 @@ events:
           - {weight: 2, text: "ไม่มีใครกลับมาอยู่ดี ยอดขายหายไปเกือบครึ่ง", effects: {income_mult: 0.8, happiness: -1}, merit: [{cat: neutral}]}
 
   - id: fraud_village_fund_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: กลางคน
@@ -259,7 +259,7 @@ events:
           - {weight: 1, text: "คนตรวจเป็นญาติผู้ใหญ่บ้าน หาว่าเราไม่ไว้ใจเพื่อนบ้าน งานบุญปีนี้ไม่มีใครชวน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
 
   - id: fraud_village_meeting_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: กลางคน
@@ -289,7 +289,7 @@ events:
         merit: [{cat: greed_harm, level: 2}]
 
   - id: fraud_wage_squeeze_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -328,7 +328,7 @@ events:
           - {weight: 2, text: "ถูกลดตำแหน่งไปคุมโกดัง แต่ลูกน้องเก่ายังแวะมาเลี้ยงข้าวทุกเดือน", effects: {income_mult: 0.7, relations: 1, happiness: -1}, merit: [{cat: neutral}]}
 
   - id: fraud_audit_back_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: กลางคน
@@ -403,7 +403,7 @@ events:
           - {weight: 1, text: "หลานเห็นใบอนุโมทนาแล้วถามต่อว่า เจ้าของเงินจริงได้อะไรบ้าง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
   # เรื่องต่อ fraud_sign_bribe_01 (ขอสองเท่า โดนล่อซื้อ) — ออกทาง next เท่านั้น
   - id: fraud_sting_bail_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: ทำงาน
@@ -433,7 +433,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ fraud_contract_01 (อัดเสียงแจ้งความ ถูกขึ้นบัญชีดำ) — ออกทาง next เท่านั้น
   - id: fraud_blacklist_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -465,7 +465,7 @@ events:
         merit: [{cat: greed_harm, level: 1}]
   # เรื่องต่อ fraud_scale_01 (เตือนลูกค้า โดนปล่อยข่าวของเน่า) — ออกทาง next เท่านั้น
   - id: fraud_scale_gossip_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -497,7 +497,7 @@ events:
           - {weight: 2, text: "เถียงกันเสียงดังกลางตลาด เจ้าของตลาดสั่งพักแผงทั้งสองเจ้าไปหนึ่งอาทิตย์", effects: {money: {unit: income_x, amount: -0.5}, happiness: -1}, merit: [{cat: neutral}]}
   # เรื่องต่อ fraud_village_fund_01 (หนีเข้าเมือง ตำรวจตามเจอ) — ออกทาง next เท่านั้น
   - id: fraud_village_court_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: กลางคน

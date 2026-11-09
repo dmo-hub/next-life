@@ -188,7 +188,7 @@ events:
 
   # ← workh_burnout_01 "ไปพบจิตแพทย์"
   - id: echo_health_listener_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: health
     stage: กลางคน
