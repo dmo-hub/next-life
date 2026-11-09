@@ -1,0 +1,487 @@
+# ร่างเรื่อง สุขภาพและโรงพยาบาลจากมุมคนไข้ · 15 ใบ · ลงเกมแล้ว ใบ 243 จากร่าง 242 · แก้ตามข้อค้านรอบ 1
+events:
+  - id: patient_smelling_salts_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [19, 30]}
+    title: "ยาดมหนึ่งฟุดบนรถเมล์"
+    text: "เดือนเมษา รถเมล์เปิดหน้าต่างทุกบานแต่ลมที่พัดเข้ามาร้อนพอ ๆ กับไอจากท่อ ยืนโหนราวมาครึ่งชั่วโมง ตาเริ่มพร่า หูอื้อ ป้าที่นั่งข้างประตูดึงหลอดยาดมออกจากกระเป๋าผ้า ยื่นให้โดยไม่พูดอะไร ดมหนึ่งฟุดโลกกลับมาชัด ป้าลงป้ายหน้าพร้อมยาดมของแก"
+    choices:
+      - id: buy_own
+        text: "ซื้อหลอดยาดมพกติดกระเป๋า"
+        effects: {health: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: borrow_always
+        text: "ขอดมจากคนข้าง ๆ ทุกเที่ยว"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนแปลกหน้าสายเดิมยื่นให้ทุกเช้า ผ่านไปเดือนเดียวรู้จักกันครึ่งคัน", effects: {network: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้หลอดของลุงที่ผสมพิมเสนแรงจัด จามสามทีติด น้ำตาไหลถึงป้ายลง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: check_why
+        text: "ไปตรวจว่าทำไมหน้ามืดบ่อย"
+        outcomes:
+          - {weight: 1, ok: true, text: "หมอถามสามข้อ ได้ความว่ากินข้าวเช้าไม่ทันกับนอนตีสอง สั่งให้กินก่อนออกจากบ้าน", effects: {health: 2, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รอคิวครึ่งวัน หมอวัดความดันแล้วบอกว่าปกติดี ให้ดื่มน้ำเยอะ ๆ", effects: {happiness: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: get_off
+        text: "เดินลงก่อนถึงป้าย ไปต่อในร่ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอร้านน้ำมะพร้าวใต้ร่มไม้ กลายเป็นทางเดินประจำทุกเช้าหน้าร้อน", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดินเพลินจนเลยเวลาเข้างาน โดนหักค่าแรงครึ่งชั่วโมง", effects: {health: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: patient_balm_jar_01
+    type: A
+    category: health
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [13, 18]}
+    title: "ตลับยาหม่องบนหิ้งยาย"
+    text: "วันรุ่งขึ้นหลังกีฬาสี น่องทั้งสองข้างตึงจนลงบันไดต้องเดินตะแคง ตลับยาหม่องประจำบ้านวางอยู่บนหิ้งข้างพระ ยายจำได้ว่าเหลือแค่ไหน เพราะใช้นิ้วก้อยปาดทีละนิดมาทั้งปี และเปิดดูทุกเย็นก่อนสวดมนต์"
+    choices:
+      - id: smear_all
+        text: "ทาทั้งขาแล้วไปโรงเรียน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เดินคล่องขึ้นตั้งแต่คาบสอง เพื่อนทั้งห้องตามกลิ่นมาขอแตะปลายนิ้วไปทาบ้าง", effects: {health: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กลิ่นฉุนลอยทั่วห้อง ครูเปิดหน้าต่างทุกบานแล้วถามว่าใครเป็นลม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: smooth_over
+        text: "ทาแล้วเกลี่ยให้ดูเต็มเท่าเดิม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยายเปิดตลับแล้วพยักหน้า ไม่ทักอะไร", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รอยนิ้วชี้ใหญ่กลางตลับฟ้องทุกอย่าง ยายย้ายตลับไปซ่อนที่ใหม่", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_grandma
+        text: "ขอให้ยายบีบนวดให้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยายนวดไปเล่าเรื่องสมัยสาวไป เล่าจบสองเรื่องขาก็หายตึง", effects: {relations: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยายกดจุดกลางน่องแรงจนร้องลั่นบ้าน หมาข้างบ้านเห่ารับ", effects: {health: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tough_it
+        text: "ทนเดินขาแข็งไปเอง"
+        effects: {health: -1}
+        merit: [{cat: neutral}]
+
+  - id: patient_sachet_meds_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59], family: [{role: parent, sex: ชาย, alive: true}]}
+    title: "ซองยาแก้ปวดจากร้านชำ"
+    text: "พ่อปวดเอวมาหลายปี เช้านี้เห็นแกแกะซองยาจากร้านชำปากซอย ในซองมีเม็ดสีขาว สีเหลือง สีชมพูรวมกัน กินแล้วหายปวดในครึ่งชั่วโมงจริง แกว่าซองละไม่กี่บาท ถูกกว่าค่ารถไปหาหมอ ใต้ที่นอนมีซองเปล่ามัดหนังยางเป็นปึก"
+    choices:
+      - id: say_it
+        text: "ทักตรง ๆ ว่าไม่สบายใจ"
+        outcomes:
+          - {weight: 1, ok: true, text: "พ่อเงียบไปนาน แล้วยื่นมัดซองเปล่าให้คุณเอาไปทิ้งเอง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พ่อตอบว่ากินมาสิบปียังเดินตลาดได้ทุกเช้า แล้วไม่คุยด้วยไปสามวัน", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pharmacist
+        text: "พาไปร้านยาที่มีเภสัชกร"
+        outcomes:
+          - {weight: 1, ok: true, text: "เภสัชกรอ่านซองแล้วนิ่ง ก่อนอธิบายช้า ๆ พ่อฟังจนจบแล้วยอมเปลี่ยนยา", effects: {relations: 2, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พ่อเถียงเภสัชกรกลางร้านว่าซองเก่าแรงกว่า เดินออกมามือเปล่า", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swap_vitamins
+        text: "แอบสลับซองเป็นวิตามิน"
+        outcomes:
+          - {weight: 1, ok: true, text: "วันที่ห้าพ่อหน้ามืดกลางตลาด หมอซักจนรู้ว่ายาชุดถูกหยุดกะทันหัน สั่งให้ค่อย ๆ ลดยาภายใต้การดูแล พ่อเลยยอมไปตามนัด", effects: {health: -1, relations: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของร้านชำบอกพ่อว่าไม่เคยเปลี่ยนสูตร พ่อนับซองในถุงแล้วหันมามองคุณ", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: let_be
+        text: "ปล่อยตามใจ แกโตแล้ว"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: patient_bp_doorstep_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [35, 45]}
+    title: "ผ้าพันแขนมาถึงหน้าบ้าน"
+    text: "ป้าข้างบ้านที่ช่วยงานอนามัยตำบลเคาะประตูตั้งแต่เจ็ดโมง ถือสมุดรายชื่อกับเครื่องวัดความดันพร้อมผ้าพันแขน บอกว่าคนอายุสามสิบห้าขึ้นไปในซอยเหลือแค่คุณที่ยังไม่ได้วัด เสาร์นี้ศาลาหมู่บ้านมีหมออนามัยมาตรวจให้ฟรีด้วย"
+    choices:
+      - id: arm_now
+        text: "ยื่นแขนวัดตรงหน้าประตูเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตัวเลขปกติ ป้าจดลงสมุดแล้วรีบไปเคาะบ้านถัดไป คุณออกจากบ้านทันรถเที่ยวเดิม", effects: {health: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตัวเลขสูงกว่าเกณฑ์ ป้าอ่านออกเสียงดังจนบ้านฝั่งตรงข้ามโผล่หน้าต่างมาดู ข่าวไปถึงท้ายซอยก่อนคุณถึงที่ทำงาน", effects: {health: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: next_week
+        text: "ผัดไปเสาร์หน้า"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: whole_soi
+        text: "ชวนทั้งซอยไปศาลาพร้อมกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ศาลาแน่นตั้งแต่แปดโมง ป้าจดชื่อไม่ทัน ยกให้คุณเป็นคนเรียกคิว", effects: {network: 2, relations: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชวนได้สองคน มาเพราะนึกว่ามีข้าวต้มแจก พอรู้ว่าไม่มีก็กลับก่อนถึงคิว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: three_coffees
+        text: "ดื่มกาแฟสามแก้วก่อนไปวัด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตัวเลขออกมาพอดีเกณฑ์ ป้าชมว่าใจแข็งแรงเหมือนหนุ่มสาว", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เข็มเด้งสูงจนป้าวัดซ้ำสามรอบ แล้วนัดมาวัดใหม่ทุกเช้าอีกหนึ่งสัปดาห์", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: patient_long_arm_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [38, 45]}
+    title: "แขนยาวไม่พอ"
+    text: "ช่วงนี้อ่านฉลากขวดยาต้องยืดแขนจนสุด ใบเสร็จตัวเล็กต้องเอาไปส่องใต้หลอดไฟ เพื่อนร่วมงานเห็นคุณถือหนังสือพิมพ์ห่างตัวเป็นศอก แซวว่ากำลังจะโยนทิ้งหรืออ่านอยู่ อายุ {อายุ} ตัวหนังสือในโลกเหมือนหดลงพร้อมกัน"
+    choices:
+      - id: market_glasses
+        text: "ซื้อแว่นสำเร็จรูปแผงตลาดนัด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลองสามอันได้อันที่ชัดพอดี ราคาเท่าข้าวสองจาน", effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อันที่ซื้อเลนส์สองข้างไม่เท่ากัน ใส่ครึ่งชั่วโมงปวดขมับ", effects: {health: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: optician
+        text: "ไปวัดสายตาที่ร้านแว่น"
+        effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: stretch_on
+        text: "ฝืนยืดแขนต่อไป"
+        effects: {health: -1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: share_glasses
+        text: "ยืมแว่นเพื่อนข้างโต๊ะใส่เป็นกะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ค่าสายตาตรงกันพอดี ตกลงแบ่งกันใส่ เช้าคุณ บ่ายเขา", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนสายตาสั้น ใส่แล้วพื้นห้องเอียง เดินชนประตูกระจกต่อหน้าหัวหน้า", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: patient_one_chair_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45], family: [{role: parent, sex: ชาย, alive: true}]}
+    title: "เก้าอี้พับข้างเตียงตัวเดียว"
+    text: "พ่อนอนพักฟื้นหลังผ่าตัดไส้เลื่อนห้าคืนในหอผู้ป่วยรวม ป้ายหน้าประตูเขียนว่าเฝ้าไข้กลางคืนได้หนึ่งคนต่อเตียง ญาติมากันเต็มม้านั่งหน้าตึก ทุกคนอยากอยู่ แต่ข้างเตียงมีเก้าอี้พับแค่ตัวเดียว"
+    choices:
+      - id: stay_all
+        text: "ลางานเฝ้าเองทุกคืน"
+        effects: {relations: 2, health: -1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: roster
+        text: "เขียนตารางเวรแปะหัวเตียง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทุกคนได้คืนละรอบ ญาติที่ไม่ค่อยคุยกันได้นั่งกินข้าวหน้าตึกด้วยกันทุกเย็น", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อาคนหนึ่งขีดชื่อตัวเองออก แล้วเขียนชื่อคุณแทนไว้สองคืน", effects: {relations: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: send_money
+        text: "ส่งค่าข้าวแทนการเฝ้า"
+        effects: {relations: -1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: two_under_bed
+        text: "แอบนอนสองคนบนเสื่อใต้เตียง"
+        outcomes:
+          - {weight: 1, ok: true, text: "พยาบาลเวรดึกเดินผ่านแล้วทำเป็นมองไม่เห็น พ่อหลับสบายเพราะมีคนคุยด้วยสองคน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เสียงกรนจากใต้เตียงดังจนเตียงข้าง ๆ ร้องเรียน ทั้งสองคนถูกเชิญออกตอนตีสอง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: patient_squat_knees_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [50, 59]}
+    title: "เข่าที่นั่งยองมาทั้งชีวิต"
+    text: "นั่งยองซักผ้าในกะละมังมาตั้งแต่จำความได้ เดี๋ยวนี้ลุกทีต้องเกาะขอบโอ่ง เข่าลั่นกร๊อบจนคนในบ้านหันมอง ขึ้นบันไดศาลาวัดต้องจับราวสองมือ หมอโรงพยาบาลอำเภอบอกว่าน้ำหนักลงห้ากิโล เข่าจะเบาขึ้นเยอะ"
+    choices:
+      - id: lose_weight
+        text: "ลดข้าวเย็น เดินทุกเช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "สามเดือนน้ำหนักหายไปสี่กิโล ลุกจากกะละมังได้โดยไม่ต้องเกาะโอ่ง", effects: {health: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดินได้สัปดาห์เดียว ฝนตกติดกันเลยเลิก ข้าวเย็นกลับมาสองจานเหมือนเดิม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: physio
+        text: "ทำกายภาพที่โรงพยาบาล"
+        effects: {health: 1, happiness: -1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: painkillers
+        text: "กินยาแก้ปวดทนไปก่อน"
+        effects: {health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: temple_stairs
+        text: "ขึ้นบันไดวัดร้อยขั้นพิสูจน์เข่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถึงขั้นบนสุดทั้งที่หอบ ยืนมองทุ่งนาจากบนเขาแล้วยิ้มคนเดียว", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขั้นที่หกสิบเข่าทรุด คนขายดอกไม้ธูปเทียนต้องเดินขึ้นมาพยุงลง", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: patient_fasting_eve_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 55]}
+    title: "คืนก่อนเจาะเลือด"
+    text: "ใบนัดตรวจสุขภาพประจำปีเขียนตัวแดงว่างดน้ำงดอาหารหลังสองทุ่ม ตอนนี้สี่ทุ่ม ท้องร้องดังกว่าวิทยุห้องข้าง ๆ ในตู้กับข้าวมีชาเย็นถุงที่ซื้อไว้ตั้งแต่บ่าย น้ำแข็งละลายจนสีจาง พรุ่งนี้คิวเจาะเลือดเริ่มหกโมงครึ่ง"
+    choices:
+      - id: water_only
+        text: "ดื่มแต่น้ำเปล่า นอนเร็ว"
+        effects: {health: 1, happiness: -1}
+        sets_flags: [health_checked]
+        merit: [{cat: neutral}]
+      - id: one_sip
+        text: "จิบชาเย็นแค่หลอดเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนเจาะเลือดไม่ถามอะไร ผลออกมาเรียบร้อย คุณจะไม่มีวันรู้ว่าหลอดนั้นนับหรือไม่นับ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนเจาะเลือดถามว่าดื่มอะไรมาไหม คุณตอบช้าไปหนึ่งวินาที ได้ใบนัดใหม่สัปดาห์หน้า", effects: {happiness: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: secret_supper
+        text: "แอบซดข้าวต้มสองชาม"
+        outcomes:
+          - {weight: 1, ok: true, text: "อิ่มหลับสบาย เช้ามาเข็มแรกเสร็จไว คนต่อแถวข้างหลังแซวว่าหน้าคุณสดชื่นที่สุดในแถว", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไขมันในหลอดเลือดขุ่นจนห้องแล็บส่งคืน ต้องงดอาหารรอบสองพร้อมเพื่อนร่วมแผนกที่หัวเราะอยู่ข้าง ๆ", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: oversleep
+        text: "ตื่นสายแล้วไม่ไปเลย"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+
+  - id: patient_denture_pork_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [65, 85]}
+    title: "หมูปิ้งที่เคี้ยวไม่ไหว"
+    text: "ฟันกรามซี่สุดท้ายหลุดตอนกัดฝรั่ง เหลือฟันหน้าบนสี่ซี่ ข้าวเหนียวหมูปิ้งเจ้าประจำหน้าตลาดกลายเป็นของที่ได้แต่มอง หลานซื้อมาฝากก็ต้องฉีกหมูเป็นเส้นเล็ก ๆ จุ่มน้ำแกงจนนิ่ม กินข้าวไม่อร่อยมาเป็นเดือน"
+    choices:
+      - id: hospital_dentures
+        text: "ทำฟันปลอมที่โรงพยาบาล รอคิว"
+        outcomes:
+          - {weight: 1, ok: true, text: "รอห้าเดือนได้ฟันชุดใหม่ วันแรกกัดหมูปิ้งเต็มคำจนน้ำตาซึม", effects: {happiness: 3, health: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฟันชุดใหม่หลวมทุกครั้งที่หัวเราะ ต้องกลับไปแก้อีกสองรอบ", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: market_maker
+        text: "ให้ช่างทำฟันในตลาดทำให้"
+        outcomes:
+          - {weight: 1, ok: true, text: "เสร็จในสามวัน ใส่แล้วพอใช้ได้ หลานชมว่ายิ้มแล้วหน้าเด็กลงสิบปี", effects: {happiness: 2, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฟันชุดนั้นกดเหงือกจนเป็นแผล อยู่ในแก้วน้ำข้างเตียงมากกว่าอยู่ในปาก", effects: {health: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mortar
+        text: "ตำหมูปิ้งในครกก่อนกิน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หมูปิ้งตำได้รสเดิมแปดส่วน หลานตั้งชื่อเมนูนี้ว่าหมูหยองสูตรบ้านเรา", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครกที่หยิบมาเพิ่งตำพริกเสร็จ หมูปิ้งเผ็ดจนนั่งซดน้ำทั้งบ่าย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: porridge
+        text: "กินข้าวต้มไปก่อน"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: patient_night_er_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [19, 30]}
+    title: "ตีสองที่ห้องฉุกเฉิน"
+    text: "ไข้ขึ้นกับเจ็บคอจนกลืนน้ำลายไม่ลง ตีสองนั่งรถรับจ้างไปห้องฉุกเฉิน พยาบาลหน้าห้องวัดไข้แล้วชี้ให้ไปนั่งม้านั่งแถวหลัง เปลคนเจ็บถูกเข็นผ่านหน้าไปสามเตียง คนข้าง ๆ บอกว่านั่งรอมาตั้งแต่ห้าทุ่ม"
+    choices:
+      - id: wait_turn
+        text: "นั่งรอตามลำดับ"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: home_meds
+        text: "กลับบ้านกินยาลดไข้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ห่มผ้าสองผืนจนเหงื่อแตก ไข้ลดตอนรุ่งสาง ตื่นมาเสียงแหบเหมือนนักร้องหลังคอนเสิร์ต", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไข้กลับขึ้นอีกตอนตีห้า ต้องกลับไปนั่งม้านั่งแถวเดิม", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: morning_clinic
+        text: "รอเช้าไปคลินิกหน้าตลาด"
+        effects: {health: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: act_wheezy
+        text: "ทำหอบให้ได้ตรวจก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "แกล้งหอบได้สองที พยาบาลเดินมาฟังปอดแล้วยิ้ม ยื่นยาอมให้หนึ่งเม็ดระหว่างรอคิวเดิม", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "พยาบาลฟังปอดแล้วบอกว่าหายใจโล่งกว่าคนเฝ้าไข้อีก ส่งกลับไปนั่งแถวหลังสุด", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: patient_far_hospital_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "โรงพยาบาลคู่สัญญาอีกฝั่งเมือง"
+    text: "ย้ายบ้านมาได้สามเดือน สวัสดิการรักษาพยาบาลของที่ทำงานผูกกับโรงพยาบาลคู่สัญญาแห่งเดียวแถวบ้านเก่า ต้องนั่งรถเมล์สองต่อกับเรือข้ามฟากอีกหนึ่ง เพื่อนร่วมโต๊ะบอกว่ายื่นขอย้ายไปอีกแห่งได้ถึงสิ้นเดือนนี้ แต่ต้องแนบสำเนาทะเบียนบ้านใหม่"
+    choices:
+      - id: file_now
+        text: "ยื่นขอย้ายโรงพยาบาลวันนี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "เรื่องผ่านทันรอบ โรงพยาบาลแห่งใหม่เดินถึงในสิบนาที", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทะเบียนบ้านใหม่ยังย้ายไม่เสร็จ แบบฟอร์มถูกส่งคืนมาพร้อมคลิปหนีบกระดาษ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: next_year
+        text: "ปล่อยไปก่อน ปีหน้าค่อยว่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งปีไม่ป่วยสักครั้ง ไม่ต้องข้ามฟากแม้แต่เที่ยวเดียว", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ท้องเสียกลางเดือนธันวา ต้องนั่งเรือข้ามฟากทั้งที่ท้องบิด", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: noodle_rule
+        text: "เลือกจากร้านก๋วยเตี๋ยวหน้า รพ."
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้านเย็นตาโฟหน้าโรงพยาบาลอร่อยจริง วันนัดตรวจกลายเป็นวันที่รอคอย", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โรงพยาบาลที่เลือกไกลกว่าเดิม ก๋วยเตี๋ยวอร่อยแต่ต้องนั่งรถชั่วโมงครึ่ง", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_hr
+        text: "ขอฝ่ายบุคคลอธิบายสวัสดิการ"
+        outcomes:
+          - {weight: 1, ok: true, text: "นั่งฟังยาวทั้งบ่าย ได้รู้ว่าเบิกค่ารถไปโรงพยาบาลคู่สัญญาได้ด้วย คนฝ่ายบุคคลจำหน้าคุณได้ตั้งแต่วันนั้น", effects: {knowledge: 1, network: 1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝ่ายบุคคลยื่นแฟ้มหนาสองนิ้วให้ไปอ่านเอง งานค้างบนโต๊ะพอกจนต้องอยู่ถึงสองทุ่ม", effects: {knowledge: 1, happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: patient_tartar_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "หินปูนกับน้ำแข็งแก้วแรก"
+    text: "เคี้ยวน้ำแข็งทีไรฟันล่างเสียวจี๊ดถึงขมับ เพื่อนร่วมงานบอกว่าคลินิกทำฟันหน้าตลาดขูดหินปูนครึ่งชั่วโมงเสร็จ เขาไปมาเมื่อวาน วันนี้ยิ้มโชว์ฟันขาวไปทั้งแผนก ส่วนคุณไม่ได้นั่งเก้าอี้ทำฟันมาตั้งแต่จบมัธยม"
+    choices:
+      - id: go_now
+        text: "ไปขูดเย็นนี้เลย"
+        effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: no_ice
+        text: "เลิกเคี้ยวน้ำแข็งไปก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "อาการเสียวหายไปเอง แต่ทุกครั้งที่ได้ยินคนข้างโต๊ะเคี้ยวน้ำแข็งก็อดน้ำลายสอไม่ได้", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หินปูนยังพอกต่อเงียบ ๆ ปีถัดมาเหงือกบวมจนต้องไปคลินิกอยู่ดี", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: salt_brush
+        text: "แปรงด้วยเกลือแรง ๆ เช้าเย็น"
+        outcomes:
+          - {weight: 1, ok: true, text: "เหงือกแน่นขึ้นจริง แต่หินปูนยังเกาะอยู่ที่เดิม", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แปรงแรงจนเหงือกร่น เสียวหนักกว่าเดิม สุดท้ายก็ต้องไปคลินิกอยู่ดี", effects: {health: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: half_mouth
+        text: "ขอขูดครึ่งปาก จ่ายครึ่งเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "หมอฟันหัวเราะแล้วยอม นัดอีกครึ่งเดือนหน้า ลิ้นแตะฟันสองฝั่งไม่เหมือนกันไปทั้งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หมอฟันอธิบายยาวว่าทำไมไม่ได้ จบที่ขูดเต็มปากราคาเต็ม", effects: {money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: patient_hot_plough_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59]}
+    title: "หมอเหยียบเหล็กเผาไฟ"
+    text: "ปวดเอวเรื้อรังมาสองปี ป้าแนะนำหมอพื้นบ้านทางเหนือ เขาเอาเท้าจุ่มน้ำมันงา แตะผาลไถที่เผาไฟจนแดง แล้วเหยียบลงบนหลังคนไข้ คนรอคิวนั่งเต็มใต้ถุนบ้าน แต่ละคนเล่าผลไม่เหมือนกันสักคน"
+    choices:
+      - id: go_try
+        text: "นั่งรถทัวร์ไปลองตามคำบอก"
+        outcomes:
+          - {weight: 1, ok: true, text: "ความร้อนจากฝ่าเท้าซึมลงหลังจนเหงื่อออก ลุกขึ้นตัวเบาอยู่หลายวัน", effects: {health: 1, happiness: 2, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เหยียบไปสามรอบ หลังยังปวดเท่าเดิม ได้ข้าวซอยร้านหน้าวัดเป็นของปลอบใจ", effects: {money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: xray_first
+        text: "ไปเอกซเรย์ที่โรงพยาบาลก่อน"
+        effects: {knowledge: 1, health: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: ask_queue
+        text: "ถามคนรอคิวว่าใครหายจริงบ้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงคนหนึ่งเล่าตรง ๆ ว่ามาเพราะสบายใจ แต่นัดโรงพยาบาลก็ไปไม่เคยขาด", effects: {knowledge: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถามห้าคนได้ห้าคำตอบ กลับบ้านพร้อมความงงกับน้ำมันงาหนึ่งขวด", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: both_secret
+        text: "ไปทั้งสองที่ ไม่บอกใครสักฝั่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "หมอโรงพยาบาลชมว่ากล้ามหลังคลายดี คุณไม่กล้าบอกว่าเป็นฝีมือฝ่าเท้าของใคร", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หมอโรงพยาบาลเห็นรอยแดงเป็นรูปฝ่าเท้ากลางหลัง ซักยาวจนคิวข้างหลังบ่น", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: patient_slipper_queue_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "รองเท้าแตะต่อคิวแทนตัว"
+    text: "จุกท้องหลังกินข้าวมาสองเดือน ผัดมาตลอดเพราะไม่อยากเสียงานทั้งวันไปกับคิวโรงพยาบาลรัฐ เช้านี้จุกจนต้องงอตัว ตีห้าครึ่งหน้าห้องบัตร รองเท้าแตะวางเรียงแทนคนยาวถึงประตูรั้ว คลินิกเอกชนหัวมุมเปิดแปดโมง"
+    choices:
+      - id: line_up
+        text: "วางรองเท้าต่อแถวแล้วรอ"
+        effects: {health: 1, happiness: -1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: private_clinic
+        text: "ไปคลินิกเอกชน จ่ายเอง"
+        effects: {health: 1, money: {unit: income_x, amount: -0.08}}
+        merit: [{cat: neutral}]
+      - id: pharmacy
+        text: "ซื้อยาร้านขายยากินไปก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยาลดกรดเอาอยู่ เภสัชกรกำชับว่าถ้ายังไม่หายต้องไปหาหมอ", effects: {health: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อาการเงียบไปสามวันแล้วกลับมาหนักกว่าเดิม รอบนี้ต้องไปห้องฉุกเฉิน", effects: {health: -2, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nudge_slipper
+        text: "แอบเลื่อนรองเท้าแซงสองคู่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่มีใครทัน ได้บัตรคิวเร็วขึ้นครึ่งชั่วโมง", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เจ้าของสองคู่นั้นยืนดูอยู่ใต้ร่มไม้ตั้งแต่แรก ทั้งแถวหันมามองพร้อมกัน", effects: {relations: -1, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: patient_taped_glasses_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59], family: [{role: parent, sex: หญิง, alive: true}]}
+    title: "แว่นของแม่พันเทปขาว"
+    text: "ขาแว่นของแม่หักมาตั้งแต่ต้นปี แม่พันเทปขาวไว้จนหนาเป็นปม ใส่แล้วเอียงไปข้างหนึ่ง อ่านสลากกินแบ่งต้องเอียงคอตาม แม่บอกว่ายังใช้ได้ ไม่อยากให้เสียเงิน ร้านแว่นในตัวอำเภอรับเปลี่ยนขาได้ แต่ต้องทิ้งแว่นไว้ครึ่งวัน"
+    choices:
+      - id: sneak_fix
+        text: "แอบเอาไปเปลี่ยนขาตอนแม่หลับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้านเปลี่ยนขาเสร็จก่อนแม่ตื่น แม่ใส่แล้วงงว่าทำไมไม่เอียง ถามอยู่สามวันว่าใครทำ", effects: {relations: 2, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านต้องสั่งขาแว่นจากต่างจังหวัดอีกหนึ่งสัปดาห์ แม่ตื่นมาควานหาแว่นทั่วบ้านจนสาย", effects: {relations: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wire_fix
+        text: "ดัดลวดเส้นเล็กทำขาแว่นใหม่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ขาลวดแข็งกว่าของเดิม แม่ใส่ไปอวดทั้งตลาดว่าฝีมือคนในบ้าน", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลวดเกี่ยวผมแม่ทุกครั้งที่ถอด แม่แกะทิ้งแล้วพันเทปทับใหม่", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: paint_tape
+        text: "ทาสีเทปให้ดูเหมือนกรอบใหม่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทาสีน้ำตาลลายกระดองเต่าจนเนียน ป้าข้างบ้านถามแม่ว่าตัดแว่นใหม่ร้านไหน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สียังไม่แห้งดี แม่ใส่ไปตลาดกลับมามีรอยน้ำตาลเป็นทางยาวตรงขมับ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: leave_it
+        text: "แม่ว่าใช้ได้ ก็ปล่อยไป"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]

@@ -1,0 +1,479 @@
+# ร่างเรื่อง เที่ยวและเทศกาลท้องถิ่น · 15 ใบ · ลงเกมแล้ว ใบ 243 จากร่าง 242 · แก้ตามข้อค้านรอบ 1 · เลี่ยงสงกรานต์ เข้าพรรษา ลอยกระทง ปีใหม่ (มีใน festivals.yaml แล้ว)
+# เลี่ยงซ้ำของเดิม: กฐิน (love_kathin_committee_01) · สารท/ชิงเปรต/ข้าวประดับดิน (afterlife) · ผีตาโขน (legend_mask_01) · ผ้าป่า (belief) · เทียนพรรษา (festivals) · งานเลี้ยงจับฉลากที่ทำงาน (festivals)
+events:
+  - id: tour_nine_temples_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "รถบัสเก้าวัดต้นปี"
+    text: "ต้นปีกลุ่มป้าในซอยเหมารถบัสไหว้พระเก้าวัดในวันเดียว ป้าหัวหน้าทัวร์ย้ำว่าเก้าพ้องกับก้าว ไหว้ครบแล้วงานจะก้าวหน้า ที่นั่งเหลือสองตัวท้ายรถ ค่าทัวร์รวมข้าวกล่องสองมื้อ รถออกตีห้า กลับถึงซอยสามทุ่ม"
+    choices:
+      - id: join_full
+        text: "จองที่นั่ง ไปให้ครบเก้าวัด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครบเก้าวัดตามแผน ป้าทั้งรถจำชื่อคุณได้ ขากลับแบ่งข้าวเหนียวหมูทอดให้จนอิ่ม", effects: {relations: 2, network: 1, health: -1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วัดที่เจ็ดคนแน่นจนรถวนหาที่จอดเกือบชั่วโมง ถึงวัดที่เก้าโบสถ์ปิดแล้ว ได้ไหว้แค่หน้าประตู", effects: {health: -1, happiness: -1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: stay_home
+        text: "ใช้วันหยุดนอนพักที่บ้าน"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: send_money
+        text: "ฝากเงินทำบุญไปกับป้า"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: ten_temples
+        text: "ขอไปสิบวัด เผื่อก้าวกระโดด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าหัวหน้าทัวร์ชอบใจ สั่งรถแวะวัดที่สิบริมทาง ทั้งรถปรบมือให้ไอเดียนี้", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วัดที่สิบอยู่คนละทางกับเส้นกลับ ทั้งรถถึงซอยเกือบเที่ยงคืน ป้าหัวหน้าทัวร์ไม่ทักคุณไปทั้งเดือน", effects: {relations: -2, health: -1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_red_cross_fair_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45], family: [{role: child, alive: true}]}
+    title: "งานกาชาดคืนวันเสาร์"
+    text: "งานกาชาดประจำปีที่สวนกลางเมือง เข้าประตูมาก็เจอซุ้มสลากกาชาดเรียงยาว ไฟประดับเต็มต้นไม้ ลูกเดินนำไปหยุดหน้าซุ้มปาลูกดอกทีละซุ้ม ในกระเป๋ามีเงินที่ตั้งใจไว้สำหรับคืนนี้แค่ก้อนเดียว"
+    choices:
+      - id: many_tickets
+        text: "ซื้อสลากกาชาดทีเดียวสิบใบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้พัดลมตั้งพื้นหนึ่งตัว หิ้วกลับบ้านกันสองคนเหมือนได้ถ้วยรางวัล", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สิบใบได้ผงซักฟอกถุงเล็กหนึ่งถุง ที่เหลือเป็นบัตรขอบคุณ", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: donate_walk
+        text: "หย่อนเงินบริจาคแล้วเดินชมไฟ"
+        effects: {happiness: 1, relations: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: every_booth
+        text: "ปล่อยลูกเล่นทุกซุ้มที่อยากเล่น"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ตุ๊กตาตัวใหญ่จากซุ้มยิงปืนจุก ลูกหอบกลับบ้านทั้งที่ตุ๊กตาตัวโตกว่ากระเป๋า", effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.08}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครบทุกซุ้มได้แค่พวงกุญแจสามอัน เงินหมดก่อนถึงซุ้มอาหาร ต้องกลับไปกินข้าวต้มที่บ้าน", effects: {relations: 1, happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: dart_duel
+        text: "ท้าลูกแข่งปาลูกดอกเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ปาแตกสามใบติด คนเฝ้าซุ้มยกตุ๊กตาให้ ลูกเล่าเรื่องนี้ซ้ำทั้งสัปดาห์", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณพลาดทั้งสิบดอก ลูกปาต่อแตกทุกใบ คุณได้หน้าที่หอบตุ๊กตาเดินทั้งงาน", effects: {happiness: 1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_rocket_pool_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59]}
+    title: "ลงขันบั้งไฟเดือนหก"
+    text: "เดือนหกฟ้ายังไม่ให้ฝน ผู้ใหญ่บ้านเรียกประชุมใต้ต้นมะขาม ปีนี้หมู่บ้านจะทำบั้งไฟขึ้นถวายพญาแถนตามความเชื่อเรื่องขอฝน ต้องการคนอัดดินปืนกับคนต่อเงินค่าไม้ไผ่ ตามธรรมเนียม บั้งไฟของใครแตกคาฐานต้องถูกหามโยนลงโคลน"
+    choices:
+      - id: chip_in
+        text: "ลงขันค่าไม้ไผ่กับดินปืน"
+        effects: {network: 1, relations: 1, money: {unit: income_x, amount: -0.04}}
+        merit: [{cat: neutral}]
+      - id: pack_powder
+        text: "อาสาช่วยช่างอัดหางบั้งไฟ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช่างสอนวิธีอัดให้แน่นทีละชั้น บั้งไฟของหมู่บ้านขึ้นตรงจนคนตะโกนกันทั้งทุ่ง", effects: {network: 2, happiness: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผงดินปืนปลิวเข้าตาตอนอัด ต้องนั่งล้างตาที่เต็นท์ปฐมพยาบาลข้างลานครึ่งวัน พลาดดูวันจุด", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: work_as_usual
+        text: "ไม่ยุ่ง ไปทำงานตามปกติ"
+        effects: {relations: -1, money: {unit: income_x, amount: 0.02}}
+        merit: [{cat: neutral}]
+      - id: mud_dare
+        text: "ท้าหมู่บ้านข้าง ใครแพ้ลงโคลน"
+        outcomes:
+          - {weight: 1, ok: true, text: "บั้งไฟของหมู่บ้านคุณขึ้นสูงจนลับตา ทีมหมู่บ้านข้างเคียงถูกหามโยนลงโคลนกลางเสียงเชียร์ แล้วชวนกันมากินข้าวด้วยกัน", effects: {happiness: 2, network: 2, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บั้งไฟของหมู่บ้านคุณพ่นควันแล้วแตกคาฐาน คุณในฐานะคนท้าถูกหามโยนลงโคลนเป็นคนแรก", effects: {happiness: 1, health: -1, relations: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_rocket_parade_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [13, 18]}
+    title: "แถวหน้าขบวนแห่บั้งไฟ"
+    text: "วันแห่บั้งไฟ ครูฝึกเซิ้งของหมู่บ้านขาดคนแถวหน้าสองคน เพื่อนในกลุ่มชี้มาที่คุณ ชุดเพิ่งเย็บเสร็จเมื่อคืน แถวหน้าต้องเต้นตากแดดสามกิโลจนถึงลานจุด ข้างทางมีกองเชียร์ถือน้ำเย็นกับกระติบข้าวเหนียวรออยู่"
+    choices:
+      - id: front_row
+        text: "รับแถวหน้า เต้นจนถึงลาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "แดดเปรี้ยงแต่จังหวะกลองพาไปจนสุดทาง ผู้ใหญ่ทั้งหมู่บ้านจำหน้าคุณได้", effects: {happiness: 2, network: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กิโลที่สองหน้ามืด ต้องนั่งพักใต้ต้นไม้ ดูขบวนเดินผ่านไปทั้งที่ยังใส่ชุดเต็มยศ", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: water_runner
+        text: "เดินถือน้ำแจกคนในขบวน"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: watch_shade
+        text: "ยืนดูใต้ร่มกับกองเชียร์"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: pot_lid
+        text: "คว้าฝาหม้อมาตีให้จังหวะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เสียงฝาหม้อเข้ากับกลองยาวพอดี มือกลองหันมาพยักหน้า ปีหน้าเขาชวนเข้าวงจริง", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตีเร็วกว่ากลองครึ่งจังหวะ แถวหน้าเต้นเพี้ยนตามทั้งแถว ครูฝึกยึดฝาหม้อไปคืนเจ้าของ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_boat_pull_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "ลากเรือพระวันออกพรรษา"
+    text: "ออกพรรษาปีนี้ญาติทางใต้ชวนลงไปงานชักพระ คุณนั่งรถไฟกลางคืนไปถึงตอนเช้า เรือพนมพระประดับผ้าสีกับกระดาษฉลุตั้งอยู่บนล้อ เชือกลากยาวเต็มถนน ข้างทางมีคนขายต้มห่อใบพ้อ ป้าบอกว่ามาถึงแล้วต้องได้ลากสักครั้ง"
+    choices:
+      - id: pull_rope
+        text: "จับเชือกลากไปจนถึงวัด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลากไปพร้อมเสียงโห่จังหวะเดียวกันทั้งถนน ญาติชี้บอกคนแถวนั้นว่าคนนี้มาจากไกล", effects: {happiness: 2, relations: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มือพองตั้งแต่ครึ่งทาง ฝืนลากต่อจนผิวแตก ขากลับต้องให้ญาติถือกระเป๋าให้", effects: {health: -2, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: buy_tom
+        text: "ซื้อต้มใบพ้อไปถวายพระ"
+        effects: {happiness: 1, relations: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: roadside_stall
+        text: "ช่วยญาติขายของริมทาง"
+        effects: {network: 1, health: -1, money: {unit: income_x, amount: 0.03}}
+        merit: [{cat: neutral}]
+      - id: throw_tom
+        text: "เข้าวงปาต้มกับเด็ก ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ปาต้มขึ้นเรือพระได้ตามที่ผู้ใหญ่สอน เด็กทั้งวงยกให้คุณเป็นหัวหน้าทีม", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ต้มห่อหนึ่งพลาดไปโดนหัวคนตีกลอง ต้องเดินไปยกมือขอโทษทั้งที่ยังกลั้นหัวเราะไม่อยู่", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_yellow_flags_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [19, 30]}
+    title: "เก้าวันธงเหลือง"
+    text: "เพื่อนชวนลงไปเที่ยวเมืองทางใต้ช่วงเทศกาลถือศีลกินผัก ทั้งเมืองแขวนธงเหลือง ร้านข้าวแกงเปลี่ยนเป็นอาหารเจ คนแต่งชุดขาวเดินไปโรงเจตั้งแต่เช้ามืด ป้ายหน้าที่พักเขียนว่าเก้าวันนี้ขอให้งดเนื้อสัตว์"
+    choices:
+      - id: full_nine
+        text: "ถือศีลกินผักให้ครบเก้าวัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "วันที่ห้าตัวเบาจนตื่นเช้าได้เอง กลับบ้านไปยังกินผักต่ออีกสัปดาห์", effects: {health: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วันที่สามกินแต่ของทอดเจจนคอแห้ง หน้าขึ้นตุ่มทั้งแถบ", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: dinner_only
+        text: "กินเจเฉพาะมื้อเย็น"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: food_crawl
+        text: "ตะลุยร้านอาหารเจทุกซุ้ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้รู้ว่าโปรตีนเกษตรทำเป็นหมูแดงได้ จดสูตรกลับไปลองทำเอง", effects: {knowledge: 1, happiness: 2, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กินจนจุกแน่นหน้าอก ต้องนอนพักที่ห้องทั้งบ่ายแทนไปทะเล", effects: {health: -1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: secret_pork
+        text: "ใส่ชุดขาวแต่แอบหาหมูปิ้ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "แผงหมูปิ้งปิดทั้งเมืองเก้าวันนี้ เดินหาจนเย็นได้แต่ปาท่องโก๋ เลยถือศีลไปโดยไม่ตั้งใจ", effects: {health: 1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจอแผงเดียวในซอยลึก ยืนกินหลังเสาไฟ เพื่อนเดินผ่านมาพอดีพร้อมกล้องถ่ายรูป", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_red_envelopes_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59]}
+    title: "ซองแดงตรุษจีนริมน้ำ"
+    text: "ตรุษจีนปีนี้ไหว้บรรพบุรุษเสร็จตั้งแต่เจ็ดโมงเช้า หลาน ๆ สิบสองคนเรียงแถวกล่าวคำอวยพรรอซองแดง กลางตลาดริมน้ำเสียงกลองขบวนแห่มังกรดังมาถึงบ้าน ญาติที่มีแผงขายของหน้าบ้านปิดมาสองวัน มีคนเคาะถามหาของ ญาติเลยฝากให้คุณช่วยเฝ้า"
+    choices:
+      - id: equal_thick
+        text: "ใส่ซองหนาเท่ากันทุกคน"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.08}}
+        merit: [{cat: neutral}]
+      - id: by_age
+        text: "ใส่ตามวัย คนเล็กได้น้อยกว่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "หลานคนโตช่วยอธิบายให้น้อง ๆ ฟังว่าทำไม ทั้งบ้านพยักหน้าตาม", effects: {relations: 1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลานคนเล็กแกะซองนับแบงก์เทียบกับพี่กลางวงข้าว แล้วร้องไห้ดังกว่ากลองมังกร", effects: {relations: -1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mind_stall
+        text: "ช่วยญาติเปิดแผงรับคนดูขบวน"
+        effects: {relations: 1, happiness: -1, health: -1, money: {unit: income_x, amount: 0.03}}
+        merit: [{cat: neutral}]
+      - id: fortune_god
+        text: "แต่งเป็นเทพเจ้าโชคลาภแจกซอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "หลาน ๆ กรี๊ดวิ่งเข้าใส่ คนเดินดูขบวนหน้าบ้านต่อแถวขอถ่ายรูปด้วย", effects: {happiness: 3, relations: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หนวดปลอมหลุดลงหม้อต้มจับฉ่าย ผู้ใหญ่ในบ้านเอาเรื่องนี้มาเล่าทุกตรุษจีนหลังจากนั้น", effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_gold_leaf_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45], family: [{role: parent, alive: true}]}
+    title: "พาท่านไปปิดทองงานเจดีย์"
+    text: "งานนมัสการเจดีย์ใหญ่ประจำปีที่นครปฐมจัดหลายสัปดาห์ คนจากทุกอำเภอขึ้นรถมาปิดทอง คุณพาคนเฒ่าในบ้านไปตั้งแต่บ่ายสาม ทางเดินรอบองค์เจดีย์แน่นจนต้องเกาะกันเป็นแถว ร้านขนมกับชิงช้าสวรรค์เปิดไฟรออยู่ข้างล่าง"
+    choices:
+      - id: queue_together
+        text: "ต่อคิวปิดทองด้วยกันจนเสร็จ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ท่านปิดทองแผ่นสุดท้ายแล้วหันมายิ้ม ขากลับเล่าเรื่องงานนี้สมัยท่านยังหนุ่มสาวยันถึงบ้าน", effects: {relations: 2, happiness: 2, health: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนเบียดจนท่านหน้ามืด ต้องพานั่งพักหน้าหน่วยปฐมพยาบาลจนงานเกือบเลิก", effects: {relations: 1, happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: shop_first
+        text: "พาเดินซื้อของข้างล่างก่อน"
+        effects: {happiness: 1, relations: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: go_alone
+        text: "ให้ท่านนั่งรอที่ศาลา ไปปิดเอง"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: ferris_wheel
+        text: "ชวนท่านขึ้นชิงช้าสวรรค์"
+        outcomes:
+          - {weight: 1, ok: true, text: "ท่านหัวเราะตั้งแต่ตู้ลอยพ้นยอดไม้ ชี้บอกว่าเห็นหลังคาตลาดที่เคยมาขายของสมัยก่อน", effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตู้ค้างอยู่บนยอดสิบนาที ท่านจับราวแน่นไม่พูดสักคำ ลงมาแล้วขอกลับบ้านทันที", effects: {happiness: -1, relations: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_riverside_fair_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [19, 30]}
+    title: "นัดดูขบวนแห่พระทางน้ำ"
+    text: "หน้าแล้ง วัดใหญ่ริมลำน้ำนครชัยศรีจัดงานประจำปี มีขบวนเรือแห่พระพุทธรูปตามตำนานว่าองค์พระล่องน้ำมาขึ้นท่าหน้าวัด คนที่คุณเพิ่งคบได้สองเดือนชวนไปดู ตลิ่งสองฝั่งคนจองที่กันตั้งแต่บ่าย ท่าน้ำมีเรือพายให้เช่ากับร้านขนมเรียงยาว"
+    choices:
+      - id: rent_boat
+        text: "เช่าเรือพายตามขบวน"
+        outcomes:
+          - {weight: 1, ok: true, text: "พายตามขบวนไปด้วยกันจนเรือพระเทียบท่า ระหว่างทางคุยกันจนรู้ว่าบ้านเกิดห่างกันแค่สองอำเภอ", effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พายไม่เข้าจังหวะกัน เรือหมุนวนกลางน้ำจนขบวนผ่านไปหมด ขึ้นฝั่งมาเปียกทั้งคู่และเงียบใส่กัน", effects: {happiness: -1, relations: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bank_spot
+        text: "จองที่ริมตลิ่งรอดูขบวน"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: snack_first
+        text: "เดินกินของริมท่าน้ำก่อน"
+        effects: {happiness: 2, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: love_stick
+        text: "เขย่าเซียมซีถามเรื่องคู่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ใบที่เขียนว่าคู่นี้อยู่กันยืด เขาพับใบเซียมซีเก็บไว้ในกระเป๋าสตางค์", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้ใบที่เขียนว่าให้รอคนใหม่ เขาอ่านแล้วเงียบไปตลอดทางกลับ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_plateau_hike_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [19, 30]}
+    title: "ขึ้นภูวันหยุดยาว"
+    text: "วันหยุดยาวเพื่อนกลุ่มเดิมนัดขึ้นภูกระดึง ทางเดินถึงหลังแปชันเกือบหกกิโล เชิงเขามีคนหาบรับจ้างยืนรอพร้อมไม้คานกับตาชั่ง คิดค่าแบกตามน้ำหนัก บางบ้านหาบกันมาหลายรุ่น เป้ของคุณหนักสิบห้ากิโล หม้อสนามกับเสื่อผูกห้อยข้าง"
+    choices:
+      - id: hire_porter
+        text: "จ้างคนหาบแบกเป้ขึ้นไป"
+        effects: {health: 1, happiness: 1, network: 1, money: {unit: income_x, amount: -0.04}}
+        merit: [{cat: neutral}]
+      - id: carry_self
+        text: "แบกเองทั้งเป้ ถือว่าซ้อม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถึงหลังแปตอนบ่ายแก่ ขาสั่นแต่ได้ยืนดูทะเลหมอกด้วยความภูมิใจเต็มอก", effects: {health: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ซำที่หกเข่าเริ่มไม่ฟัง ต้องจ้างคนหาบกลางทางแพงกว่าจ้างที่เชิงเขาเกือบเท่าตัว", effects: {health: -1, money: {unit: income_x, amount: -0.06}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: split_load
+        text: "ฝากหาบเฉพาะของหนักครึ่งเดียว"
+        effects: {health: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: race_porter
+        text: "ท้าคนหาบแข่งกันขึ้นถึงยอด"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณนำได้สองซำ ซำที่สามเขาเดินแซงทั้งที่หาบเต็มสองข้าง แล้วยกมือทักอย่างสุภาพ", effects: {happiness: 2, health: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เร่งจนตะคริวกินน่องที่ซำห้า คนหาบที่คุณท้าเลยหาบเป้คุณขึ้นไปให้ในราคาพิเศษ", effects: {health: -1, happiness: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_orchard_fair_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59]}
+    title: "เฝ้าซุ้มงานชาวสวน"
+    text: "งานเทศกาลชาวสวนประจำอำเภอเปิดซุ้มให้คนในตำบลเอาผลผลิตมาขาย ปีนี้ลองกองกับมังคุดในสวนญาติออกพร้อมกันจนตะกร้าล้น ญาติฝากให้คุณช่วยเฝ้าซุ้มสามวัน ขายได้แบ่งกันคนละครึ่ง ซุ้มข้าง ๆ ตัดราคาตั้งแต่วันแรก ส่วนเวทีกลางงานรับสมัครประกวดผลไม้"
+    choices:
+      - id: cut_price
+        text: "ลดราคาให้หมดก่อนของช้ำ"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.03}}
+        merit: [{cat: neutral}]
+      - id: hold_price
+        text: "ยืนราคา ของค้างก็ให้ค้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "วันสุดท้ายคนซื้อจากต่างจังหวัดเหมาไปทั้งซุ้มในราคาที่ตั้ง ญาติยิ้มไม่หุบตอนนับเงิน", effects: {relations: 1, money: {unit: income_x, amount: 0.06}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลองกองเริ่มร่วงจากช่อตั้งแต่วันที่สาม ต้องแจกคนในงานไปครึ่งหนึ่ง ญาติถามเบา ๆ ว่าทำไมไม่ลดราคา", effects: {relations: -1, money: {unit: income_x, amount: 0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: enter_contest
+        text: "คัดมังคุดผิวสวยส่งประกวด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้รางวัลที่สองในชื่อสวนญาติ คนมาต่อแถวหน้าซุ้มขอซื้อรุ่นเดียวกับที่ประกวด", effects: {network: 2, relations: 1, money: {unit: income_x, amount: 0.04}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กรรมการผ่าดูเนื้อ เจอเนื้อแก้วสองกลีบ ไม่ติดอันดับ แต่ได้วิธีดูผิวมาจากกรรมการ", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: free_tasting
+        text: "ประกาศชิมฟรีจนกว่าจะอิ่ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนแห่มาทั้งงาน ชิมแล้วซื้อกลับต่อ ยอดขายบ่ายนั้นมากกว่าสองวันแรกรวมกัน", effects: {network: 2, happiness: 2, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นักเรียนทัศนศึกษาทั้งคันรถลงมาชิมจนเกลี้ยงซุ้ม แล้วขึ้นรถไปโดยไม่มีใครซื้อสักกิโล คุณควักเงินตัวเองคืนค่าผลไม้ให้ญาติ", effects: {happiness: 1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_buffalo_race_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "ขี่ควายแทนน้าข้างบ้าน"
+    text: "งานวิ่งควายประจำอำเภอเหลืออีกสามวัน น้าข้างบ้านที่ส่งควายแข่งทุกปีข้อเท้าแพลงจากคันนา มาขอให้คุณขี่แทน ควายตัวนี้ขึ้นชื่อเรื่องออกตัวเร็วแต่ไม่ชอบเสียงประทัด ทางบ้านน้าเตรียมผ้าแพรสีชมพูไว้ประดับเขาแล้ว"
+    choices:
+      - id: ride
+        text: "รับขี่ ซ้อมทุกเย็นสามวัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ออกตัวพร้อมเสียงนกหวีด เข้าเส้นเป็นที่สอง น้าข้างบ้านกอดคอคุณทั้งที่ยังเดินกะเผลก", effects: {happiness: 2, network: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประทัดข้างสนามดังกลางทาง ควายหักเข้าแปลงข้าง คุณลงไปนั่งในโคลนต่อหน้าคนทั้งอำเภอ", effects: {health: -1, happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: dress_only
+        text: "ช่วยแต่งควายแต่ไม่ขึ้นขี่"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: cheer
+        text: "ไปยืนเชียร์ข้างสนาม"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: drum_parade
+        text: "จ้างวงกลองยาวแห่ควายเข้าสนาม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ควายเดินเข้าสนามสง่ากว่าทุกตัว กรรมการให้รางวัลแต่งสวยเพิ่มอีกถ้วย", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กลองยาวลั่นนัดแรก ควายวิ่งหนีออกนอกงาน น้าข้างบ้านกะเผลกตามไปทั้งขาแพลง", effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_salak_basket_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [60, 80]}
+    title: "ก๋วยสลากปลายฝน"
+    text: "ปลายฝนวัดในชุมชนจัดงานตานก๋วยสลาก คุณสานก๋วยไม้ไผ่มาตั้งแต่ต้นเดือน ใส่ข้าวสาร ขนม ไม้ขีดไฟ แล้วเขียนชื่อคนที่จากไปไว้บนเส้นสลาก หลาน ๆ ที่ทำงานในเมืองส่งข่าวว่าอาจกลับไม่ทัน เพื่อนบ้านถามว่าปีนี้จะทำก๋วยใหญ่อีกไหม"
+    choices:
+      - id: small_basket
+        text: "ทำก๋วยเล็กพอแรงตัวเอง"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: big_basket
+        text: "ทำก๋วยใหญ่เต็มสูตรเดิม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ก๋วยใหญ่ตั้งเด่นหน้าศาลา คนรุ่นเดียวกันมายืนชมว่ามือยังไม่ตก", effects: {happiness: 2, network: 1, health: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สานจนดึกทุกคืนจนปวดหลัง ถึงวันงานต้องให้เพื่อนบ้านช่วยแบกไปวัดแทน", effects: {health: -2, relations: 1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: call_kin
+        text: "ฝากข่าวให้หลานกลับมาช่วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "หลานกลับมาทันคืนก่อนงาน นั่งสานก๋วยด้วยกันจนดึก คุณเล่าเรื่องคนในเส้นสลากให้ฟังทีละชื่อ", effects: {relations: 3, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ข่าวไปถึงช้า หลานมาถึงตอนพระฉันเพลเสร็จแล้ว ได้แต่ช่วยเก็บของกลับบ้าน", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: poem_slip
+        text: "เขียนเส้นสลากยาวเป็นกลอน"
+        outcomes:
+          - {weight: 1, ok: true, text: "พระที่จับได้เส้นของคุณอ่านกลอนจนจบแล้วอนุโมทนา คนทั้งศาลานั่งฟังเงียบ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กลอนยาวจนเส้นสลากพับไม่ลงก๋วย ต้องม้วนผูกไว้ข้างนอกเหมือนธงงานวัด", effects: {happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_company_trip_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager]}
+    title: "ทริปบริษัทสามวันสองคืน"
+    text: "ฝ่ายบุคคลติดประกาศทริปประจำปีพาพนักงานไปทะเลสามวันสองคืน บริษัทออกค่ารถบัสกับที่พัก ค่ากินนอกตารางจ่ายเอง บ่ายวันที่สองมีเกมชายหาดแข่งระหว่างแผนก ปิดท้ายด้วยชักเย่อ ห้องพักจับคู่ตามรายชื่อ คุณได้นอนห้องเดียวกับหัวหน้าแผนก"
+    choices:
+      - id: go_full
+        text: "ไปครบ ลงเกมชายหาดด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "แผนกคุณชนะวิ่งกระสอบ ได้นั่งกินข้าวเย็นโต๊ะเดียวกับผู้จัดการฝ่ายอื่น หลังทริปเขาเรียกคุณไปช่วยงานโครงการใหม่", effects: {network: 2, happiness: 1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วิ่งกระสอบล้มข้อเท้าพลิก กลับมาทำงานเดินกะเผลกไปทั้งสัปดาห์", effects: {health: -1, happiness: 1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swap_room
+        text: "ไปเที่ยว แต่ขอสลับห้องกับเพื่อน"
+        effects: {health: 1, happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: stay_back
+        text: "ลาไปดูแลธุระที่บ้าน"
+        effects: {relations: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: run_tug
+        text: "อาสาคุมเกมชักเย่อเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "นับจังหวะเรียกเสียงหัวเราะได้ทั้งริมหาด ผู้บริหารที่ยืนดูอยู่จำชื่อคุณได้ตั้งแต่บ่ายนั้น", effects: {network: 3, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เป่านกหวีดเร็วไปจังหวะเดียว ทั้งสองแผนกล้มคว่ำกองทราย แล้วหันมาค้อนคุณพร้อมกันทั้งสองฝั่ง", effects: {relations: -1, happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: tour_bamboo_rice_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [7, 12]}
+    title: "ข้าวหลามสิบกระบอก"
+    text: "ปิดเทอม ผู้ใหญ่ในบ้านเหมารถพาญาติไปเที่ยวทะเลบางแสนหนึ่งวัน ขากลับรถแวะตลาดหนองมน ทุกคนแย่งกันซื้อข้าวหลามกับขนมไปฝากคนในซอย คุณได้หน้าที่ถือถุงข้าวหลามสิบกระบอกไว้บนตัก ในกระเป๋ามีเงินค่าขนมเหลืออยู่นิดหน่อย"
+    choices:
+      - id: hold_tight
+        text: "กอดถุงไว้แน่นจนถึงบ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ส่งข้าวหลามครบสิบกระบอก ป้าข้างบ้านลูบหัวแล้วแบ่งให้หนึ่งกระบอก", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลับคาถุงกลางทาง กระบอกหนึ่งแตก ข้าวเหนียวมูนเปื้อนกางเกงเต็มตัว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: own_gift
+        text: "เอาเงินค่าขนมซื้อของฝากเพื่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนในซอยดีใจจนวิ่งไปอวดทั้งกลุ่ม แต่ค่าขนมหมดเกลี้ยง ขากลับนั่งมองญาติกินข้าวหลามอยู่คนเดียว", effects: {relations: 2, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขนมกะทิในถุงเยิ้มเพราะแดดบนรถ ถึงมือเพื่อนเหลือแต่ถุงเหนียว ๆ ค่าขนมก็หมดไปแล้ว", effects: {relations: 1, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sneak_one
+        text: "แอบแกะกินหนึ่งกระบอก"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่มีใครนับ ข้าวหลามยังอุ่น หวานมันจนจำรสได้อีกหลายปี", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถึงบ้านนับได้เก้า ผู้ใหญ่ในบ้านมองหน้าคุณแล้วชี้ที่เศษไม้ไผ่ติดเสื้อ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bus_stall
+        text: "เปิดแผงขายข้าวหลามบนรถ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ญาติท้ายรถซื้อต่อสามกระบอกเพราะของตัวเองกินหมดแล้ว ได้เงินค่าขนมเพิ่มอีกนิด", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขายไปสองกระบอก ถึงบ้านป้าเจ้าของข้าวหลามถามหา ต้องคืนเงินพร้อมยกมือไหว้ขอโทษ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

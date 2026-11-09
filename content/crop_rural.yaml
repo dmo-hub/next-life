@@ -1,0 +1,492 @@
+# ร่างเรื่อง ชีวิตชนบทและเกษตร · 15 ใบ · ลงเกมแล้ว ใบ 243 จากร่าง 242 · แก้ตามข้อค้านรอบ 1
+events:
+  - id: crop_buffalo_graze_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [8, 12], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้]}
+    title: "จูงควายให้ตาบ้านถัดไป"
+    text: "ตาบ้านถัดไปเข่าไม่ดี ฝากให้คุณจูงควายตัวเมียของแกไปเล็มหญ้าคันนาหลังเลิกเรียน ได้ค่าขนมวันละเหรียญ ตาบ่นว่าควายในซอยเหลือน้อยลงทุกปี ตัวนี้แกจะไม่ขาย จะเลี้ยงไว้ให้ลูกควายรุ่นต่อไปได้ไถนาต่อ"
+    choices:
+      - id: every_evening
+        text: "รับงาน จูงทุกเย็นไม่ขาด"
+        effects: {relations: 1, health: 1, happiness: -1, money: {unit: income_x, amount: 0.02}}
+        merit: [{cat: neutral}]
+      - id: listen_tales
+        text: "จูงไปแล้วนั่งฟังตาเล่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตาเล่าปีที่ควายพาว่ายข้ามคลองตอนน้ำหลาก ฟังเพลินจนกลับบ้านพร้อมพระจันทร์", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฟังเพลินจนควายเดินไปเล็มข้าวในนาลุงท้ายซอย ต้องไปขอโทษพร้อมตา", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bring_friend
+        text: "ชวนเพื่อนมาช่วย แบ่งค่าขนม"
+        effects: {network: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: ride_home
+        text: "ขี่หลังควายกลับบ้านอย่างเท่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ควายเดินช้า ๆ พาคุณผ่านหน้าบ้านทุกหลังในซอย เด็กบ้านอื่นมองตามตาละห้อย", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ควายหยุดกินหญ้ากะทันหัน คุณไถลลงแอ่งโคลนทั้งตัว เดินกลับบ้านเลอะถึงหู", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_cane_market_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [14, 18]}
+    title: "น้ำอ้อยตีสี่"
+    text: "ป้าข้างบ้านปลูกอ้อยไว้คั้นน้ำขายตลาดนัดเช้าวันเสาร์ ขาดคนหมุนเครื่องหีบ ให้ค่าแรงรายวันกับน้ำอ้อยกินไม่อั้น ต้องตื่นตีสี่ไปปอกเปลือกอ้อยหน้าแผง แผงติดกันเป็นร้านวุ้นของน้าอีกคนที่ชอบแซวเด็กหนุ่มสาว"
+    choices:
+      - id: crank
+        text: "ไปหมุนเครื่องหีบทุกเสาร์"
+        effects: {money: {unit: income_x, amount: 0.05}, health: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: call_out
+        text: "ยืนเรียกลูกค้าหน้าแผง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เสียงคุณดังข้ามไปถึงแผงหมูปิ้ง คนเดินตลาดแวะซื้อจนป้าต้องคั้นเพิ่มอีกถัง", effects: {network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตะโกนแข่งกับแผงข้าง ๆ ทั้งเช้า วันจันทร์ไปโรงเรียนเสียงแหบจนตอบชื่อในห้องไม่ได้", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: cane_jelly
+        text: "เสนอเอาน้ำอ้อยไปทำวุ้นขาย"
+        outcomes:
+          - {weight: 1, ok: true, text: "วุ้นน้ำอ้อยหมดถาดก่อนเก้าโมง ป้ากับน้าร้านวุ้นตกลงแบ่งกำไรให้คุณ", effects: {money: {unit: income_x, amount: 0.05}, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วุ้นไม่แข็งตัวทั้งถาด ป้ายิ้มแห้ง ๆ ยกให้คุณกินเป็นน้ำหวาน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: drink_all
+        text: "ดื่มน้ำอ้อยแทนข้าวเช้าทุกแก้ว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตื่นตัวทั้งเช้า หมุนเครื่องเร็วจนป้าต้องวิ่งหาอ้อยมาเติม", effects: {happiness: 1, money: {unit: income_x, amount: 0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แก้วที่หกคุณหายไปห้องน้ำหลังตลาดสามรอบ ป้าหมุนเครื่องเองครึ่งเช้า", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sleep_in
+        text: "ขอนอนต่อ ไม่รับงาน"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+
+  - id: crop_dung_floor_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [22, 30], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้], family: [{role: parent, sex: ชาย, alive: true}]}
+    title: "ลานตากข้าวสูตรควาย"
+    text: "กลับบ้านช่วงเกี่ยวข้าว พ่อหิ้วถังมูลควายผสมน้ำมารอที่ลาน บอกว่าลานฉาบแบบนี้ดูดความชื้น ข้าวแห้งไวกว่าลานปูน แต่ต้องรอให้แห้งสามสี่วันก่อนตากได้ วันลาของคุณเหลือห้าวัน กลิ่นลอยไปถึงหน้าบ้าน"
+    choices:
+      - id: smear
+        text: "ถกแขนเสื้อ ฉาบลานกับพ่อ"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: tarp
+        text: "ขอปูผ้าใบตากแทน ไม่ต้องรอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ข้าวบนผ้าใบแห้งทันกำหนด พ่อหยิบเมล็ดขึ้นมากัดแล้วพยักหน้าครั้งเดียว", effects: {health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผ้าใบอบร้อนจนข้าวด้านล่างชื้น ต้องย้ายไปตากลานของพ่ออีกรอบ วันลาหมดพอดี", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: extend_leave
+        text: "ลางานเพิ่ม อยู่จนข้าวแห้ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ข้าวบนลานแห้งไวจริง พื้นอุ่นแต่ไม่ร้อน พ่อสอนวิธีกลับข้าวเป็นคลื่นด้วยคราดไม้", effects: {knowledge: 1, relations: 2, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้ายอมเซ็นลาแต่หักเบี้ยขยันทั้งเดือน", effects: {relations: 1, money: {unit: income_x, amount: -0.15}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: race_smear
+        text: "ท้าญาติแข่งฉาบใครเรียบกว่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลานฝั่งคุณเรียบจนป้าข้างบ้านขอยืมตัวไปฉาบลานบ้านแกต่อ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รีบจนลื่นนั่งลงกลางลาน รอยก้นประทับอยู่บนลานไปทั้งฤดู", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_home_plot_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [24, 30], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้], family: [{role: parent, sex: หญิง, alive: true}]}
+    title: "แปลงผักวันหยุด"
+    text: "คุณทำงานประจำในอำเภอ เสาร์อาทิตย์กลับไปช่วยแม่ดูแปลงผักหลังบ้าน ตำราเกษตรที่ยืมห้องสมุดมาบอกให้ยกร่องเว้นระยะ แม่หว่านเมล็ดแน่นตามที่ยายสอน ผักกาดสองแปลงขึ้นคนละหน้าตา แม่ถามว่าอ่านมาแล้วจะเอาแบบไหน"
+    choices:
+      - id: by_book
+        text: "ยกร่องตามตำราทั้งแปลง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผักกาดแปลงยกร่องต้นอวบ เก็บได้ทีละครึ่งแปลง แม่เอาไปอวดป้าข้างบ้าน", effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร่องสวยแต่รดน้ำไม่ทั่ว ผักแถวนอกเหี่ยวทั้งแถว แม่ไม่ว่าอะไร แค่หว่านซ่อมให้", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: by_mom
+        text: "ปลูกแบบแม่ ไม่เถียง"
+        effects: {relations: 2}
+        merit: [{cat: neutral}]
+      - id: split
+        text: "แบ่งครึ่งแปลง ลองทั้งสองแบบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "สองแปลงได้ผลพอ ๆ กัน คุณกับแม่เถียงกันเรื่องรสชาติจนข้าวเย็นหมดหม้อ", effects: {relations: 1, knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หนอนลงทั้งสองแปลงในคืนเดียว แม่บอกว่าอย่างน้อยหนอนก็ไม่เลือกข้าง", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: scarecrow
+        text: "ตั้งหุ่นไล่กาใส่ชุดทำงานตัวเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าข้างบ้านทักหุ่นว่ากลับมาแล้วเหรอ แม่หัวเราะจนต้องนั่งลง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อีกาเกาะหัวหุ่นทุกเช้า คนในซอยเริ่มเรียกหุ่นด้วยชื่อเล่นของคุณ", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: rest
+        text: "บอกแม่ว่าวันหยุดขอพัก"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: crop_harvest_help_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้]}
+    title: "แรงคืนแรงหน้าเกี่ยว"
+    text: "ลุงบ้านท้ายทุ่งมาบอกว่าจะลงแขกเกี่ยววันพฤหัส ปีก่อนลุงมาช่วยเกี่ยวนาของที่บ้านคุณ ยังติดแรงกันอยู่ แต่วันเดียวกันเถ้าแก่ตำบลข้าง ๆ จ้างเกี่ยวรายวันค่าแรงงาม ญาติในบ้านเปิดสมุดที่จดว่าใครยังติดแรงใคร"
+    choices:
+      - id: repay_labor
+        text: "ไปช่วยลุงตามที่ติดแรงไว้"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: paid_harvest
+        text: "ไปรับจ้างเกี่ยวทั้งวัน"
+        effects: {money: {unit: income_x, amount: 0.15}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: half_half
+        text: "ช่วยลุงครึ่งวัน รับจ้างครึ่งวัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เกี่ยวนาลุงเสร็จก่อนเที่ยง ทันไปรับจ้างภาคบ่าย ขากลับปวดหลังจนยืดไม่ขึ้น", effects: {money: {unit: income_x, amount: 0.07}, relations: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เถ้าแก่ไม่รับคนมาครึ่งวัน ส่วนนาลุงก็เกี่ยวเสร็จก่อนคุณกลับไปถึง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: somtam
+        text: "หอบส้มตำครกใหญ่ไปแทนแรง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ส้มตำถูกยกไปวางกลางคันนา คนเกี่ยวทั้งทุ่งพักก่อนเวลาครึ่งชั่วโมง ลุงนับว่าหายกัน", effects: {relations: 1, happiness: 2, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงกินจนหมดครกแล้วขอบใจ ก่อนเปิดสมุดชี้ว่าส้มตำยังไม่นับเป็นแรง", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_coop_shop_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้]}
+    title: "ร้านค้าของหมู่บ้าน"
+    text: "ศาลากลางหมู่บ้านติดประกาศเปิดร้านค้าชุมชน รับสมาชิกลงเงินคนละเท่ากัน สิ้นปีปันผลตามยอดซื้อ ของใช้ถูกกว่าและไม่ต้องนั่งรถเข้าอำเภอ แต่ต้องมีคนอาสาเฝ้าร้านตอนเย็นเวียนกัน ป้าร้านชำปากซอยยืนอ่านประกาศนานกว่าใคร"
+    choices:
+      - id: join
+        text: "ลงเงินเป็นสมาชิก"
+        effects: {money: {unit: income_x, amount: -0.05}, network: 1}
+        merit: [{cat: neutral}]
+      - id: volunteer
+        text: "อาสาเฝ้าร้านเย็นวันอังคาร"
+        outcomes:
+          - {weight: 1, ok: true, text: "กรรมการส่งคุณไปรับของจากยี่ปั๊วในอำเภอ ต่อราคาส่งได้ต่ำกว่าที่ป้าปากซอยซื้อมา ของบนชั้นร้านถูกลงทั้งแถว", effects: {network: 1, knowledge: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เฝ้าร้านคืนฝนตก ทั้งคืนมีลูกค้าคนเดียวมาซื้อไม้ขีดไฟกลักเดียว", effects: {relations: 1, happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: loyal_aunt
+        text: "ซื้อร้านป้าปากซอยต่อ"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: credit_book
+        text: "ขอเป็นคนจดบัญชีเงินเชื่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "สมุดเงินเชื่อลายมือคุณเรียบร้อยจนกรรมการเอาไปเป็นแบบ ปีหน้าชวนมาช่วยทำบัญชีทั้งร้าน", effects: {network: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงคนหนึ่งซื้อเชื่อเต็มสองหน้า ทุกครั้งที่เจอกันแกถามว่าปีนี้ปันผลเท่าไหร่", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: name_shop
+        text: "เสนอตั้งชื่อร้านในที่ประชุม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ชื่อที่คุณเสนอชนะขาด ป้ายไม้เขียนมือแขวนหน้าร้าน คนเรียกร้านตามชื่อนั้นจนเด็กในหมู่บ้านคิดว่าเป็นชื่อคุณ", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชื่อยาวเกินป้าย ช่างเขียนได้ครึ่งเดียว ร้านถูกเรียกด้วยครึ่งคำที่ฟังแปลกไปทั้งปี", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_mixed_plot_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [33, 45], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้]}
+    title: "ไร่สิบไร่ที่น้าฝากไว้"
+    text: "น้ายกไร่สิบไร่ให้คุณดูแล คนเช่าปลูกมันสำปะหลังขุดขายปีละรอบมาหลายปี หมดสัญญาปีนี้ เพื่อนบ้านแปลงติดกันแบ่งสองไร่ปลูกถั่วดิน มะละกอ ผักชี มีเงินเข้ามือทุกอาทิตย์แต่ต้องรดน้ำทุกเย็น คนในวงข้าวบอกว่าเดี๋ยวก็กลับมาปลูกมัน"
+    choices:
+      - id: try_two
+        text: "แบ่งสองไร่ลองแปลงผสม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผักชีตัดขายได้ทุกอาทิตย์ มะละกอติดผลชุดแรกพอแบ่งข้างบ้าน แต่เย็นไหนไม่รดน้ำก็รู้ทันที", effects: {money: {unit: income_x, amount: 0.1}, happiness: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หนูขุดถั่วดินกินไปครึ่งแปลง คนในวงข้าวพยักหน้าเหมือนรู้อยู่แล้ว", effects: {money: {unit: income_x, amount: -0.05}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: switch_all
+        text: "เปลี่ยนทั้งสิบไร่ทีเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งสิบไร่เขียวเต็ม ส่งแม่ค้าได้ทุกวันพุธ แต่ทั้งปีคุณไม่ได้นอนกลางวันเลย", effects: {money: {unit: income_x, amount: 0.2}, knowledge: 1, health: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้ำบ่อไม่พอรดสิบไร่ ผักชีเหลืองไปครึ่ง ต้องกลับไปลงมันอีกห้าไร่", effects: {money: {unit: income_x, amount: -0.15}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep_cassava
+        text: "ให้คนเดิมเช่าปลูกมันต่อ"
+        effects: {money: {unit: income_x, amount: 0.03}}
+        merit: [{cat: neutral}]
+      - id: all_coriander
+        text: "ปลูกผักชีเต็มแปลงตามราคา"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผักชีออกตรงช่วงสารทจีนพอดี แม่ค้ามารับถึงหัวแปลงก่อนรายอื่น", effects: {money: {unit: income_x, amount: 0.1}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งตำบลคิดเหมือนคุณ ผักชีล้นตลาดจนแม่ค้าแถมฟรีกับก๋วยเตี๋ยว", effects: {money: {unit: income_x, amount: -0.08}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_tarp_pond_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "บ่อปลาไม่ต้องขุด"
+    text: "ที่หลังบ้านแคบเกินจะขุดบ่อ ช่างในตำบลแนะให้ตั้งโครงเหล็กกรุผ้าใบเป็นบ่อลอย ใส่ปลานิลรุ่นเล็กได้หลายร้อยตัว ต้องเปลี่ยนน้ำ ให้อาหารเช้าเย็น และเปิดเครื่องเติมอากาศทั้งคืน เพื่อนบ้านยืนชะเง้อดูตั้งแต่วันตั้งโครง"
+    choices:
+      - id: tilapia
+        text: "ตั้งบ่อ เลี้ยงปลานิลจริงจัง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครบหกเดือนจับปลาได้ทั้งบ่อ ขายในหมู่บ้านหมดในเช้าเดียว เหลือไว้ทอดกินอีกสองกะละมัง", effects: {money: {unit: income_x, amount: 0.1}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไฟดับกลางดึกสองคืนติด คุณนั่งเอาไม้พายตีน้ำให้ปลาจนเช้า", effects: {health: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: catfish
+        text: "เลี้ยงปลาดุกแทน ทนกว่า"
+        effects: {money: {unit: income_x, amount: 0.05}, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: chili
+        text: "ไม่ตั้ง เก็บที่ไว้ปลูกพริก"
+        effects: {money: {unit: income_x, amount: 0.02}}
+        merit: [{cat: neutral}]
+      - id: name_fish
+        text: "ตั้งชื่อปลาทุกตัวไว้เรียก"
+        outcomes:
+          - {weight: 1, ok: true, text: "ปลาไม่มาตามชื่อ แต่ว่ายมารอขอบบ่อทุกครั้งที่ได้ยินเสียงฝาถังอาหาร เด็กข้างบ้านมาขอดูทุกเย็น", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วันจับขายคุณยืนถือสวิงนานจนเพื่อนบ้านมาจับแทน สองตัวที่ชื่อเพราะสุดถูกแอบปล่อยลงคลองวัด", effects: {happiness: 1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_pineapple_rows_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45], region: [ใต้, ตะวันออก, ตะวันออกเฉียงเหนือ]}
+    title: "สับปะรดในร่องยาง"
+    text: "น้าลงต้นยางไว้แล้วเข่าไม่ดี ฝากแปลงให้คุณดูแล แลกส่วนแบ่งวันเปิดกรีด ต้นยังเล็ก อีกหลายปีกว่าจะกรีดได้ หญ้าในร่องขึ้นท่วมเข่า สองตายายสวนติดกันปลูกสับปะรดแซมร่อง ขายได้ทุกหน้าแถมหญ้าไม่ขึ้น แกยื่นหน่อพันธุ์ให้หนึ่งกระสอบ"
+    choices:
+      - id: plant_pineapple
+        text: "ปลูกแซมตามแนวที่แกสอน"
+        effects: {money: {unit: income_x, amount: 0.1}, health: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: just_weed
+        text: "ตัดหญ้าอย่างเดียว รอยางโต"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: banana
+        text: "ปลูกกล้วยแซมแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "กล้วยออกเครือแรกพอแจกทั้งซอย ป้าข้างบ้านเอาไปทำกล้วยตากส่งกลับมาให้ครึ่งหนึ่ง", effects: {relations: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กอกล้วยโตเร็วจนบังแดดต้นยาง ต้องโค่นออกครึ่งแถว", effects: {money: {unit: income_x, amount: -0.05}, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: spell_name
+        text: "ปลูกสับปะรดเรียงเป็นตัวอักษร"
+        outcomes:
+          - {weight: 1, ok: true, text: "จากเนินหลังวัดมองเห็นชื่อคุณเป็นแถวสับปะรด คนผ่านทางแวะถามซื้อถึงหน้าสวน", effects: {network: 2, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปลูกเพี้ยนไปแถวเดียว ตัวอักษรอ่านเป็นอีกคำ คนแถวนั้นเรียกสวนนี้ตามคำนั้นไปทั้งปี", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_tower_call_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้]}
+    title: "เสียงตามสายตีห้าครึ่ง"
+    text: "ลำโพงบนเสาหน้าศาลาดังตอนตีห้าครึ่ง ผู้ใหญ่บ้านนัดประชุมคืนนี้เรื่องแบ่งเวรเปิดน้ำเข้านา ต่อด้วยตามหาเจ้าของไก่ชนที่หลุดไปเดินในวัด แล้วอ่านรายชื่อบ้านที่ยังไม่ส่งข้าวสารงานบุญกฐิน ชื่อคุณอยู่ลำดับที่สาม"
+    choices:
+      - id: attend
+        text: "ไปประชุม ขอเวรน้ำดี ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้เวรน้ำคืนวันพุธที่คนน้อย แลกกับรับปากไปช่วยตั้งโรงครัวงานบุญ", effects: {network: 1, relations: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประชุมยืดถึงสี่ทุ่มเพราะเถียงเรื่องไก่ชน เรื่องเวรน้ำเลื่อนไปคราวหน้า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: send_rice
+        text: "รีบหอบข้าวสารไปส่งศาลาก่อนเที่ยง"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: send_kin
+        text: "ฝากญาติไปประชุมแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ญาติได้เวรน้ำมาตามที่ขอ แถมข่าวว่าไก่ชนเป็นของใคร", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ญาติกลับมาบอกว่ารับปากแทนคุณให้ช่วยเลี้ยงไก่ชนตัวนั้นจนกว่าเจ้าของจะมารับ", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mango_ad
+        text: "ขอไมค์ประกาศขายมะม่วงต่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ใหญ่บ้านให้สามสิบวินาที ก่อนเที่ยงมะม่วงหมดค้าง บ้านท้ายซอยสั่งเพิ่มอีกสองตะกร้า", effects: {money: {unit: income_x, amount: 0.05}, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พูดเร็วจนลำโพงอื้อ ทั้งหมู่บ้านได้ยินแค่คำว่ามะม่วงกับชื่อคุณ คนมาเคาะประตูถามว่ามะม่วงใครหาย", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_khao_kab_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59], region: [เหนือ]}
+    title: "แผ่นข้าวแคบหน้าหนาว"
+    text: "หน้าหนาวกลุ่มป้าสูงวัยในหมู่บ้านนัดทำข้าวแคบ แป้งข้าวผสมงาถูกละเลงบนผ้าขาวที่ขึงปากหม้อนึ่ง สุกแล้วยกไปตากบนแผงไม้ไผ่เต็มลาน ป้าหัวหน้ากลุ่มชวนคุณมาช่วยตากเช้าละสามชั่วโมง ได้ค่าแรงนิดหน่อยกับแผ่นที่แตก"
+    choices:
+      - id: help_dry
+        text: "ช่วยตากแผ่นทุกเช้า"
+        effects: {relations: 2, health: -1, money: {unit: income_x, amount: 0.03}}
+        merit: [{cat: neutral}]
+      - id: new_flavor
+        text: "ชวนลองทำรสพริกลาบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "แผ่นรสพริกลาบหมดก่อนรสเดิม ป้าหัวหน้าจดสูตรต่อท้ายสูตรเก่าของกลุ่ม", effects: {knowledge: 1, network: 1, money: {unit: income_x, amount: 0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าอาวุโสชิมแล้ววางคืน บอกว่าข้าวแคบไม่ใช่ลาบ คุณกลับไปตากแผ่นแบบเดิมเงียบ ๆ", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sell_town
+        text: "รับไปเร่ขายที่ตลาดอำเภอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ขายหมดสองถุงใหญ่ ร้านขายของฝากในอำเภอขอรับไปวางประจำ", effects: {network: 2, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลมแรงพัดถาดโชว์คว่ำ แผ่นแตกครึ่งถาด", effects: {money: {unit: income_x, amount: -0.02}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: eat_broken
+        text: "กินแผ่นที่แตกแทนข้าวเช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "แผ่นแตกออกมาพอดีมือทุกเช้า คุณอิ่มข้าวแคบไปทั้งหน้าหนาวโดยไม่มีใครว่า", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าเริ่มสังเกตว่าแผ่นแตกเฉพาะตอนผ่านมือคุณ เลยย้ายคุณไปล้างหม้อแทน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_ferment_uncle_01
+    type: A
+    category: study
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59]}
+    title: "สูตรลับลุงท้ายซอย"
+    text: "ลุงท้ายซอยปลูกผักสวนครัวงามกว่าใครโดยไม่ซื้อปุ๋ยสักกระสอบ ทุกอย่างมาจากลองผิดลองถูกหลายสิบปี ถังหมักหลังบ้านแกมีเศษผัก กากน้ำตาล กับอีกอย่างที่แกไม่ยอมบอก คุณหิ้วมะม่วงไปฝาก แกยอมเล่าถ้าฟังจนจบทั้งบ่าย"
+    choices:
+      - id: take_notes
+        text: "นั่งฟังจนจบ จดทุกขั้น"
+        effects: {knowledge: 2, relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: half_listen
+        text: "ฟังครึ่งเดียว ไปลองแบบตัวเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "สูตรครึ่งเดียวได้ผลพอใช้ ลุงเดินผ่านมาเด็ดใบผักชิม บอกว่ายังขาดอีกอย่าง แต่ก็ไม่บอกอยู่ดี", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถังหมักของคุณกลิ่นแรงจนบ้านข้าง ๆ มาเคาะประตูถามว่าท่อตันหรือเปล่า", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: buy_bag
+        text: "ซื้อปุ๋ยถุงตามเดิม ง่ายกว่า"
+        effects: {money: {unit: income_x, amount: -0.05}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: apprentice
+        text: "ขอเป็นศิษย์ ถือจอบตามทุกเช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "เดือนที่สามลุงยอมบอกส่วนผสมลับ เป็นของที่มีในครัวทุกบ้าน คุณหัวเราะจนจอบหลุดมือ", effects: {knowledge: 2, relations: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงใช้ศิษย์ใหม่ขุดร่องทั้งสวนจนครบเดือน สูตรลับยังอยู่ในหัวแกเหมือนเดิม", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_friend_quits_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 56]}
+    title: "เพื่อนลาออกไปปลูกผัก"
+    text: "เพื่อนร่วมรุ่นที่เป็นผู้บริหารมาเกือบยี่สิบปียื่นใบลาออก กลับไปล้อมรั้วที่หลังบ้านต่างจังหวัดทำสวนผัก รายได้หายไปทั้งก้อน แต่จดหมายฉบับล่าสุดเล่าว่ามะเขือชุดแรกออกแล้ว ชวนคุณไปช่วยเก็บเสาร์นี้ พร้อมถามว่าเคยคิดจะทำแบบนี้บ้างไหม"
+    choices:
+      - id: help_pick
+        text: "ไปช่วยเก็บผักทุกเสาร์"
+        effects: {happiness: 2, health: 1, network: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: buy_weekly
+        text: "สั่งผักเขาส่งมาทุกอาทิตย์"
+        effects: {money: {unit: income_x, amount: -0.03}, relations: 1}
+        merit: [{cat: neutral}]
+      - id: pot_garden
+        text: "ลองปลูกผักกระถางที่บ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "พริกกับกะเพรากระถางรอดครบ เด็ดใส่ผัดได้ทุกมื้อ", effects: {happiness: 1, health: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลืมรดน้ำสามวันช่วงไปทำงานต่างจังหวัด กลับมาเหลือแต่กระถาง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: timetable
+        text: "ทำตารางงานรายชั่วโมงให้สวนเขา"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนแปะตารางข้างโรงเก็บจอบ ทำตามได้สองวันแล้วหัวเราะ บอกว่าลาออกมาเพื่อหนีตารางแบบนี้", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณยืนจับเวลาเก็บมะเขือจนเพื่อนยื่นตะกร้าให้ถือเอง", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_elder_class_01
+    type: A
+    category: study
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [62, 80], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้]}
+    title: "ห้องเรียนวันพุธ"
+    text: "อบต.เปิดห้องเรียนผู้สูงอายุที่ศาลาทุกวันพุธ มีวิชาสมุนไพรใกล้ตัว รำไม้พลอง และงานฝีมือ แจกกระเป๋ากับป้ายชื่อเหมือนเด็กเข้าเรียนใหม่ เพื่อนรุ่นเดียวกันจากสามหมู่บ้านมานั่งเรียงแถว ครูอาสาเป็นหลานสาวบ้านใกล้กัน"
+    choices:
+      - id: herbs
+        text: "เรียนสมุนไพร จดเต็มสมุด"
+        effects: {knowledge: 2, health: 1}
+        merit: [{cat: neutral}]
+      - id: staff_dance
+        text: "เข้าแถวรำไม้พลองทุกพุธ"
+        effects: {health: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: teach_weave
+        text: "ขอสอนจักสานแทนนั่งเรียน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ชั้นจักสานของคุณมีคนลงชื่อมากกว่าวิชาสมุนไพร ครูอาสาขอนั่งเรียนด้วยอีกคน", effects: {network: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สอนเร็วไปหน่อย ตะกร้าของเพื่อนร่วมชั้นออกมาเป็นทรงหมวกทั้งแถว", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: class_head
+        text: "ลงสมัครหัวหน้าห้อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้คะแนนท่วมท้นจากคนหมู่บ้านเดียวกัน งานแรกคือคุมแถวเข้าห้องน้ำตอนพัก", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แพ้ป้าบ้านตรงข้ามสองคะแนน ป้าตั้งคุณเป็นรองหัวหน้าฝ่ายถือกระติกน้ำ", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: crop_granary_fix_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [65, 85], region: [กลาง, ตะวันออก, ตะวันตก, เหนือ, ตะวันออกเฉียงเหนือ, ใต้]}
+    title: "ยุ้งข้าวหลังเก่า"
+    text: "หลานกับเพื่อนมาขอซ่อมยุ้งข้าวไม้ที่ปิดตายมาหลายปี ตั้งใจเก็บข้าวเปลือกไว้กินทั้งปีแบบสมัยก่อน พื้นยุ้งยังแน่นแต่ฝาด้านเหนือผุ หลานถามว่าเมื่อก่อนกันหนูกันมอดอย่างไร ข้าวต้องเต็มแค่ไหนถึงจะพอไปถึงหน้าเกี่ยวปีหน้า"
+    choices:
+      - id: tell_all
+        text: "เล่าทุกขั้นตั้งแต่เสาถึงฝา"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: hammer
+        text: "ลงมือตอกไม้กระดานเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "มือยังจำระยะตอกได้ ฝาด้านเหนือเสร็จในบ่ายเดียว หลานมองค้อนในมือคุณไม่วางตา", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตอกได้สามแผ่นหลังก็เริ่มฟ้อง หลานยกเก้าอี้มาให้นั่งคุมงานแทน", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep_storage
+        text: "ให้ใช้ยุ้งเก็บของอย่างเดิม"
+        effects: {relations: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: nap_loft
+        text: "ขอขึ้นไปนอนกลางวันในยุ้ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยุ้งเย็นกว่าบ้านหลังใหญ่ คุณหลับสบายจนหลานต้องตอกตะปูทีละตัวเบา ๆ", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปีนบันไดไม้ได้ครึ่งทาง หลานสามคนต้องช่วยกันประคองลงไปนอนแคร่ใต้ยุ้งแทน", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

@@ -1,0 +1,514 @@
+# ร่างเรื่อง บ้าน หอ และเพื่อนบ้าน · 15 ใบ · ลงเกมแล้ว ใบ 243 จากร่าง 242 · แก้ตามข้อค้านรอบ 1 · สัตว์ในเรื่องเป็นของเพื่อนบ้านทั้งหมด · ธงใน when ใช้แค่ home_owner
+events:
+  - id: nbr_party_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "วงบ้านข้างไม่เคยเลิกก่อนไก่ขัน"
+    text: "คืนวันอาทิตย์บ้านข้าง ๆ ตั้งวงใต้ถุนบ้านอีกแล้ว ร้องเพลงกันเอง ตีขวดตีโต๊ะเป็นจังหวะ ไก่ขันรอบแรกแล้วยังมีคนขอเพลงต่อ พรุ่งนี้คุณต้องออกจากบ้านตั้งแต่หกโมง และวงนี้ตั้งทุกสุดสัปดาห์มาสามเดือนติด"
+    choices:
+      - id: walk_over
+        text: "เดินไปบอกตรง ๆ ตอนนั้นเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของวงยกมือไหว้ขอโทษ ลดเสียงลงทันที วันรุ่งขึ้นยังส่งแกงมาให้ถ้วยหนึ่ง", effects: {relations: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนในวงตะโกนชวนให้มานั่งด้วย เจ้าของบ้านทำหน้าไม่พอใจ ตั้งแต่นั้นเดินสวนกันก็ไม่ทัก", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: log_dates
+        text: "จดวันเวลาลงสมุดไว้ก่อน"
+        effects: {knowledge: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: ask_elder
+        text: "ฝากลุงหัวซอยช่วยพูดให้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงหัวซอยแวะไปนั่งคุยตอนกลางวัน วงเลื่อนมาเลิกเที่ยงคืนโดยไม่มีใครเสียหน้า", effects: {relations: 1, network: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงหัวซอยเดินไปเตือนตอนสี่ทุ่ม แล้วติดวงร้องเพลงอยู่ด้วยถึงตีสาม", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: endure
+        text: "ยัดสำลีอุดหูแล้วนอนต่อ"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: join_in
+        text: "ถือกับแกล้มไปร่วมวงเสียเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณร้องเพลงเพี้ยนจนทั้งวงหัวเราะท้องแข็ง เจ้าของวงเกรงใจแขกใหม่ ยอมเลิกตั้งแต่ตีหนึ่ง", effects: {happiness: 2, relations: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตื่นมาอีกทีเที่ยงวันจันทร์ ที่ทำงานส่งคนมาเคาะประตูถามว่ายังหายใจอยู่ไหม", effects: {health: -2, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_mango_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59]}
+    title: "ใบมะม่วงในรางน้ำ"
+    text: "กิ่งมะม่วงอกร่องบ้านข้าง ๆ ยื่นข้ามรั้วมาครึ่งหลังคา ใบร่วงอุดรางน้ำจนฝนห่าแรกล้นเข้าครัว ปีนี้ผลดกจนกิ่งย้อยแตะกระเบื้อง เจ้าของต้นคือป้าที่ส่งข้าวต้มมัดมาให้ทุกออกพรรษา"
+    choices:
+      - id: ask_trim
+        text: "เดินไปขอให้ป้าช่วยตัด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าเรียกหลานมาตัดเฉพาะกิ่งที่ล้ำ พอผลแก่ก็หิ้วมาให้ตะกร้าใหญ่", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้ารับปากแล้วลืมไปทั้งหน้าฝน คุณต้องปีนขึ้นไปลอกรางเองทุกอาทิตย์", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: warn_then_cut
+        text: "บอกป้าไว้ ป้าไม่ตัดค่อยตัดเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผ่านไปสองอาทิตย์ป้ายังไม่ว่าง คุณตัดตรงแนวรั้วพอดี ป้าชะโงกมาดูแล้วพยักหน้า ไม่มีใครพูดอะไรอีก", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตัดตามที่บอกไว้ แต่เลื่อยเพลินเกินแนวไปศอกหนึ่ง ป้ายืนมองกิ่งที่ล้มอยู่ฝั่งบ้านตัวเองนานมาก", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_season
+        text: "รอหลังหน้ามะม่วงค่อยว่ากัน"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: net_catch
+        text: "ขึงตาข่ายรับผลฝั่งเราไว้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตาข่ายรับมะม่วงได้วันละหลายผล คุณแบ่งไปคืนป้าครึ่งหนึ่ง ป้าหัวเราะจนต้องนั่งลง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตาข่ายรับใบไม้ไว้หนาจนกิ่งหัก ฟาดกระเบื้องแตกไปสองแผ่น", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_deposit_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [21, 30]}
+    title: "เงินประกันสองเดือน"
+    text: "ย้ายออกจากห้องเช่าที่อยู่มาสองปี วันคืนกุญแจ เจ้าของห้องบอกว่าเงินประกันสองเดือนคืนไม่ได้ เพราะไม่ได้แจ้งล่วงหน้าสามสิบวัน คุณจำได้ว่าบอกไว้ตอนจ่ายค่าห้องเดือนก่อน แต่บอกด้วยปากเปล่า ไม่มีกระดาษสักใบ"
+    choices:
+      - id: walk_check
+        text: "ชวนเจ้าของเดินตรวจห้องด้วยกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ห้องสะอาดไม่มีอะไรเสีย เจ้าของยอมคืนเดือนครึ่ง หักค่าทาสีไว้ครึ่งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 0.15}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของชี้รอยตะปูบนผนังทีละรู นับไปนับมาครบเงินประกันพอดี", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: let_go
+        text: "ยอมเสีย ขนของออกไปเลย"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: district
+        text: "ไปปรึกษาเจ้าหน้าที่ที่อำเภอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหน้าที่ทำหนังสือเรียกมาคุยสามฝ่าย เจ้าของห้องคืนเงินครบโดยไม่มองหน้าคุณ", effects: {knowledge: 1, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลางานไปสามรอบ เรื่องยังอยู่ในแฟ้มเดิม ค่ารถรวมแล้วเกือบเท่าเงินที่ทวง", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: repaint
+        text: "ทาสีห้องใหม่เองก่อนคืนกุญแจ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ห้องดูใหม่กว่าวันที่ย้ายเข้า เจ้าของยืนอึ้งไปพักหนึ่งแล้วคืนเงินเต็มจำนวน", effects: {happiness: 1, health: -1, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผสมสีผิดเฉด ห้องกลายเป็นสีชมพูบานเย็น เจ้าของหักค่าทาสีกลับเป็นสีเดิมอีกรอบ", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_dog_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "นาฬิกาปลุกตีห้าข้างรั้ว"
+    text: "บ้านข้าง ๆ ออกไปค้าขายตั้งแต่ตีสี่ ผูกหมาตัวโตไว้หน้าบ้านตัวเดียว พอรถคันแรกวิ่งผ่านซอย มันก็เห่าไม่หยุดจนฟ้าสว่าง คุณนอนไม่เต็มอิ่มมาครึ่งเดือนแล้ว คนในซอยเริ่มบ่นกันที่ร้านข้าวแกงหัวซอย"
+    choices:
+      - id: talk_owner
+        text: "ดักคุยกับเจ้าของตอนเย็น"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของไม่รู้มาก่อนเลยเพราะไม่เคยอยู่บ้านตอนเช้า ย้ายที่ผูกไปหลังบ้าน เสียงเบาลงครึ่งหนึ่ง", effects: {health: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของถามกลับว่าหมาเห่ามันผิดตรงไหน แล้วปิดประตูใส่หน้า", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: feed_dog
+        text: "เอาข้าวคลุกไปฝากหมาทุกเช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "สัปดาห์ที่สองมันนั่งกระดิกหางรอแทนการเห่า เจ้าของรู้เข้าก็เดินมาขอบคุณถึงหน้าบ้าน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มันจำเสียงฝีเท้าคุณได้ พอคุณขยับตัวตอนตีห้า มันก็เห่าเรียกข้าวทันที", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tell_head
+        text: "แจ้งผู้ใหญ่บ้านให้ช่วยดู"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ใหญ่บ้านแวะไปคุยให้ เจ้าของทำคอกมีหลังคาบังให้หมาข้างบ้าน มันหลับยาวถึงเช้า", effects: {health: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ใหญ่บ้านไปเตือนเสียงดังจนคนทั้งซอยรู้ว่าใครเป็นคนแจ้ง", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: jog_dawn
+        text: "ตื่นตีห้าตามมันไปวิ่งเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "สามเดือนผ่านไปต้องเจาะรูเข็มขัดใหม่ เสียงเห่าตอนตีห้ากลายเป็นนาฬิกาปลุกที่ขาดไม่ได้", effects: {health: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วิ่งได้สามวันก็กลับมานอนฟังเสียงเห่าเหมือนเดิม แต่ได้น่องปวดเพิ่มมา", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_meter_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [19, 30]}
+    title: "เลขมิเตอร์ไม่ตรงใบเก็บเงิน"
+    text: "เดือนนี้คุณกลับห้องแค่ไปนอน แต่ใบเก็บค่าไฟที่สอดใต้ประตูสูงกว่าเดือนก่อนเกือบเท่าตัว คืนนั้นคุณย่องไปดูมิเตอร์หน้าห้อง จดเลขไว้หลังกล่องไม้ขีด เลขไม่ตรงกับที่เจ้าของหอเขียนมาสักตัว"
+    choices:
+      - id: ask_owner
+        text: "ถือเลขที่จดไปถามเจ้าของหอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของหอเปิดสมุดดูแล้วบอกว่าจดสลับห้อง คืนส่วนต่างให้พร้อมคำขอโทษ", effects: {happiness: 1, money: {unit: income_x, amount: 0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของหอบอกว่ามิเตอร์ที่นี่คิดอีกแบบ ถ้าไม่พอใจก็ย้ายออกไปได้", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: compare
+        text: "ชวนข้างห้องเอาใบมาเทียบกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งชั้นเจอเหมือนกัน หกห้องเดินไปถามพร้อมกัน เจ้าของหอยอมคิดตามเลขจริง", effects: {network: 1, relations: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ข้างห้องเทียบเสร็จก็แอบไปถามคนเดียว ได้ลดแค่ห้องตัวเอง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: let_it
+        text: "ปล่อยผ่าน กลัวถูกเชิญออก"
+        effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: candle
+        text: "ถอดหลอดไฟ อยู่กับเทียนทั้งเดือน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ห้องมืดทั้งเดือนแต่ใบเก็บเงินยังมาเท่าเดิม เจ้าของหอจนมุม ต้องไล่จดมิเตอร์ใหม่ทั้งชั้น", effects: {happiness: 1, network: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อ่านหนังสือใต้แสงเทียนจนตาลาย พอสิ้นเดือนเจ้าของหอลดให้แค่ค่าหลอดไฟ", effects: {health: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_kitchen_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59], flags: {has: [home_owner]}}
+    title: "ครัวที่ล้ำไปหนึ่งคืบ"
+    text: "ต่อเติมครัวหลังบ้านเสร็จได้สองปี บ้านข้าง ๆ จะขายที่ จึงจ้างคนมารังวัด หมุดใหม่ตอกอยู่ใต้ผนังครัวคุณพอดี ล้ำไปหนึ่งคืบตลอดแนว ลุงเจ้าของที่ยืนเกาหัว เพราะอยู่ติดกันมายี่สิบปีไม่เคยมีเรื่องกันเลย"
+    choices:
+      - id: pay_land
+        text: "ขอจ่ายค่าที่ตรงนั้นตามตกลง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงคิดราคาถูกกว่าตลาด แล้วพากันไปทำบันทึกที่สำนักงานที่ดิน", effects: {relations: 2, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนที่จะมาซื้อที่ต่อไม่ยอม ตั้งราคาตามใจจนคุณต้องขอผ่อนเป็นงวด", effects: {happiness: -1, money: {unit: income_x, amount: -0.4}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: demolish
+        text: "รื้อผนังส่วนที่ล้ำออกเอง"
+        effects: {relations: 1, happiness: -1, money: {unit: income_x, amount: -0.15}}
+        merit: [{cat: neutral}]
+      - id: argue
+        text: "เถียงว่าหมุดผิด ขอรังวัดใหม่"
+        outcomes:
+          - {weight: 1, ok: true, text: "รังวัดซ้ำแล้วหมุดขยับกลับไปครึ่งคืบ เหลือส่วนล้ำนิดเดียว คุยกันง่ายขึ้นเยอะ", effects: {happiness: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรื่องลากยาวเป็นปี ลุงเลิกทักคุณ คนทั้งซอยรู้ว่าสองบ้านนี้ไม่มองหน้ากัน", effects: {relations: -2, happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: share_kitchen
+        text: "ชวนลุงมาใช้ครัวร่วมกันแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงยกเตาถ่านมาตั้งข้างเตาคุณ ทุกเย็นมีกับข้าวสองบ้านวางอยู่บนโต๊ะเดียว", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงมาจริงทุกวัน พาญาติมาด้วยอีกสามคน ค่าถ่านกับค่าน้ำปลาขึ้นเป็นสองเท่า", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_path_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [60, 85]}
+    title: "ลวดหนามกลางทางเดินเก่า"
+    text: "ที่บ้านคุณมีที่ของคนอื่นล้อมอยู่ทุกด้าน ทางออกถนนมีแค่ทางเดินแคบผ่านแปลงข้างที่ใช้มาตั้งแต่ยังหนุ่มสาว เช้านี้เจ้าของคนใหม่ขึงลวดหนามขวางไว้สองชั้น ติดป้ายว่าที่ส่วนบุคคล อีกสามด้านเป็นสวนกับคูน้ำ ไม่มีทางอื่นออกถึงถนนเลย"
+    choices:
+      - id: ask_elders
+        text: "ไปถามผู้เฒ่าว่าทางนี้ใช้มากี่ปี"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้เฒ่าในซอยยืนยันว่าเดินกันมาเกินสามสิบปี เจ้าหน้าที่อำเภออธิบายว่าทางที่ใช้มานานขนาดนี้มีสิทธิตามกฎหมาย เจ้าของคนใหม่ยอมตัดลวด", effects: {knowledge: 1, relations: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้เฒ่าสามคนจำปีไม่ตรงกันสักคน เถียงกันเองที่ร้านน้ำชาจนค่ำ ลวดหนามยังอยู่ที่เดิม", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gather_soi
+        text: "ชวนคนในซอยไปคุยพร้อมกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนทั้งซอยยืนเรียงหน้าบ้านเขา เขาเพิ่งรู้ว่าทางนี้ใช้กันมาหลายสิบปี ยอมเปิดทางให้", effects: {network: 1, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปกันสิบคน เขาเห็นเป็นการรุมบีบ ปิดประตูแล้วไปจ้างทนายมาคุยแทน", effects: {relations: -1, happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_quiet
+        text: "รอให้เขาเปิดเอง ไม่อยากมีเรื่อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "สองเดือนผ่านไป เขาเห็นคุณยืนเกาะรั้วทุกเช้า ใจอ่อนเปิดช่องให้เดินเอง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รอทั้งหน้าแล้ง ต้องฝากบ้านข้าง ๆ ซื้อของให้ทุกอย่าง", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: curry_visit
+        text: "หิ้วแกงหม้อใหญ่ไปทำความรู้จัก"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเป็นคนต่างถิ่น ไม่รู้เลยว่าทางนี้มีคนใช้ กินแกงหมดหม้อแล้วตัดลวดให้เองกับมือ", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขารับหม้อแกงไว้ ขอบคุณอย่างสุภาพ ลวดหนามยังอยู่ที่เดิม หม้อก็ยังไม่ได้คืน", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_fund_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45], flags: {has: [home_owner]}}
+    title: "เงินกองกลางที่ค้างสามเดือน"
+    text: "ซอยนี้เก็บเงินกองกลางเดือนละครั้ง ไว้จ่ายค่าไฟส่องทาง ค่าคนเฝ้าซอย และค่าลอกท่อ กรรมการซอยถือสมุดเล่มหนามาเคาะประตู บอกว่าบ้านคุณค้างสามเดือน ทั้งที่ไฟหน้าบ้านดับมาตั้งแต่ต้นปียังไม่มีใครมาเปลี่ยน"
+    choices:
+      - id: pay_all
+        text: "จ่ายให้ครบ ตัดความรำคาญ"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: see_books
+        text: "ขอดูบัญชีกองกลางก่อนจ่าย"
+        outcomes:
+          - {weight: 1, ok: true, text: "บัญชีเขียนเรียบร้อยทุกบาท ไฟหน้าบ้านถูกเปลี่ยนในสัปดาห์นั้นเลย", effects: {knowledge: 1, relations: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กรรมการทำหน้าเหมือนโดนกล่าวหา ทั้งซอยลือกันว่าบ้านคุณขี้เหนียว", effects: {relations: -2, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: meeting
+        text: "ชวนทั้งซอยเปิดประชุมกันใหม่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ประชุมใต้ต้นไม้หัวซอยได้ข้อตกลงใหม่ ทุกคนยกมือเลือกคุณเป็นคนถือบัญชี", effects: {network: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประชุมสามชั่วโมง ทะเลาะกันเรื่องสีเสาไฟ สุดท้ายไม่ได้ข้อตกลงอะไรเลย", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: own_bulb
+        text: "ซื้อหลอดไฟมาปีนเปลี่ยนเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไฟหน้าบ้านสว่างคืนนั้นเลย กรรมการซอยเห็นแล้วหักค่ากองกลางให้หนึ่งเดือน", effects: {happiness: 1, relations: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตกบันไดลงมาข้อเท้าแพลง หลอดไฟสว่างดี แต่คุณเดินกะเผลกไปครึ่งเดือน", effects: {health: -2, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: lantern_sign
+        text: "แขวนตะเกียง ติดป้ายไฟกองกลาง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนเดินผ่านอ่านป้ายแล้วหัวเราะกันทั้งซอย กรรมการรีบหิ้วหลอดไฟมาเปลี่ยนให้ก่อนค่ำ", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กรรมการถือว่าโดนประจานกลางซอย เดินผ่านหน้าบ้านคุณทีไรก็เบือนหน้าหนี", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_register_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "ชื่อยังอยู่บ้านเก่า"
+    text: "ย้ายเข้าบ้านหลังใหม่มาเกือบสองอาทิตย์ ข้าวของยังอยู่ในลังครึ่งบ้าน ป้าบ้านตรงข้ามทักว่าแจ้งย้ายเข้าหรือยัง ต้องไปทำภายในสิบห้าวัน ไม่งั้นโดนปรับ ส่วนหนังสือราชการก็ยังส่งไปบ้านเก่า ชื่อผู้มีสิทธิเลือกตั้งก็ยังอยู่เขตเดิม"
+    choices:
+      - id: go_self
+        text: "ลางานครึ่งวันไปอำเภอเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหน้าที่ใจดี เสร็จในชั่วโมงเดียว ยังกลับไปทันกินข้าวกลางวันกับที่ทำงาน", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลืมเอกสารบ้านเก่ามาหนึ่งแผ่น ต้องกลับไปอีกรอบ เสียวันลาไปสองวัน", effects: {happiness: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: proxy
+        text: "ฝากญาติไปทำแทนพร้อมใบมอบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ญาติทำให้เรียบร้อย แลกกับข้าวมื้อใหญ่หนึ่งมื้อ", effects: {relations: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ญาติไปถึงแล้วใบมอบเซ็นไม่ครบ ต้องกลับมาใหม่ แล้วบ่นเรื่องนี้ไปอีกครึ่งปี", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: later
+        text: "ปล่อยไว้ก่อน ยังไม่ว่าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "แกะลังเสร็จทันวันที่สิบสี่พอดี วิ่งไปทำทันก่อนอำเภอปิด", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เลยกำหนดไปเดือนกว่า ไปอำเภอทีเดียวได้ทั้งค่าปรับและคำบ่นยาวหนึ่งชุด", effects: {happiness: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: all_boxes
+        text: "ขนลังเอกสารทั้งหมดไปอำเภอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหน้าที่ขอเอกสารอะไรคุณมีหมด คนในคิวพากันยกนิ้วให้ เสร็จก่อนเที่ยง", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลังหล่นกลางห้องโถงอำเภอ กระดาษกระจายทั่วพื้น คนในคิวช่วยกันเก็บจนบ่าย", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_pillar_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59], flags: {has: [home_owner]}}
+    title: "ฤกษ์ยกเสาเอกตีห้าครึ่ง"
+    text: "บ้านไม้หลังเก่าผุจนต้องรื้อสร้างใหม่บนที่เดิม ผู้ใหญ่ในซอยดูฤกษ์ยกเสาเอกให้ตอนตีห้าครึ่ง ต้องมีผ้าแดง ใบไม้มงคล และคนช่วยยกเสาอีกหลายแรง ช่างบอกว่าถ้าฤกษ์เลื่อน งานทั้งหมดก็เลื่อนตาม"
+    choices:
+      - id: full_soi
+        text: "เชิญทั้งซอย เลี้ยงข้าวต้มเช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนมาช่วยยกเสาเกินจำเป็นสองเท่า หม้อข้าวต้มหมดก่อนฟ้าสาง", effects: {relations: 2, network: 1, money: {unit: income_x, amount: -0.08}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แขกมาช้ากว่าฤกษ์ ช่างกับคุณต้องยกกันเองสามคน หลังเคล็ดไปอาทิตย์หนึ่ง", effects: {health: -1, money: {unit: income_x, amount: -0.08}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: simple
+        text: "ทำกันเองในบ้าน เรียบง่าย"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: skip_rite
+        text: "ข้ามพิธี ให้ช่างลงเสาเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "งานเดินเร็วกว่ากำหนดสองวัน ประหยัดค่าเลี้ยงไปได้ก้อนหนึ่ง", effects: {money: {unit: income_x, amount: 0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าข้างบ้านทักทุกครั้งที่เดินผ่านว่าบ้านนี้ไม่ยกเสาตามฤกษ์ บ้านยังไม่ทันเสร็จ คนทั้งซอยก็รู้กันหมดแล้ว", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: coin_pit
+        text: "หย่อนเหรียญทุกเหรียญในบ้านลงหลุม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กในซอยช่วยนับเหรียญที่หย่อนลงหลุมเสียงดัง ทั้งงานหัวเราะพร้อมกันตอนนับผิดรอบที่สาม", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เทกระป๋องเหรียญลงหลุมหมด เช้านั้นไม่เหลือเหรียญจ่ายค่ารถไปตลาด", effects: {happiness: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_roof_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [46, 59]}
+    title: "ลงแขกยกหลังคาบ้านปลายซอย"
+    text: "บ้านปลายซอยจะเปลี่ยนหลังคาที่รั่วมาสามหน้าฝน เจ้าของบ้านไม่มีเงินจ้างช่างครบชุด จึงเดินบอกทั้งซอยว่าเสาร์นี้ลงแขก มีข้าวเหนียวหมูทอดเลี้ยง ใครว่างมาช่วยกันได้ หลังคาบ้านคุณเองก็เริ่มมีรอยน้ำซึมตรงมุมห้อง"
+    choices:
+      - id: full_day
+        text: "ไปช่วยเต็มวันตั้งแต่เช้ายันค่ำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตกเย็นเจ้าของบ้านจับมือบอกว่า หน้าฝนหน้าจะพาคนทั้งซอยไปช่วยบ้านคุณบ้าง", effects: {relations: 2, network: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แดดเที่ยงร้อนจัด คุณหน้ามืดต้องลงมานอนพักใต้ถุนบ้านครึ่งวัน", effects: {health: -2, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: half_day
+        text: "ไปช่วยครึ่งเช้าแล้วกลับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช่วยขนกระเบื้องขึ้นนั่งร้านครบกองแรกแล้วขอตัว เจ้าของบ้านส่งห่อข้าวเหนียวให้ติดมือกลับ", effects: {relations: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดินออกจากงานตอนสาย คนบนหลังคาตะโกนแซวว่ามาช่วยแค่พอได้กินหมูทอด", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: send_money
+        text: "ติดธุระ ฝากเงินค่าตะปูไปแทน"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: cook_pot
+        text: "อาสาคุมหม้อแกงเลี้ยงคนงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "แกงหม้อใหญ่ของคุณหมดก่อนหลังคาเสร็จ คนในซอยพูดถึงกันไปทั้งปี", effects: {happiness: 2, relations: 2, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ใส่พริกมือหนักไปหน่อย คนบนหลังคาต้องลงมากินน้ำทุกสิบนาที งานช้าไปครึ่งวัน", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_tap_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [31, 45]}
+    title: "น้ำประปาไหลตอนตีสี่"
+    text: "บ้านคุณอยู่ปลายท่อประปาของซอย ตอนเย็นน้ำไหลเป็นเส้นเท่าไส้ดินสอ บางวันไม่ไหลเลย ต้องตื่นตีสี่มารองใส่โอ่ง หลายวันมานี้น้ำที่ได้ยังขุ่นแดงมีตะกอนก้นถัง ส่วนบ้านต้นท่อยังรดน้ำต้นไม้กันตอนเย็นได้สบาย"
+    choices:
+      - id: share_hours
+        text: "ตกลงแบ่งเวลาเปิดน้ำกับต้นท่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "บ้านต้นท่อยอมงดรดน้ำต้นไม้ตอนเย็น น้ำถึงปลายท่อแรงขึ้นจนคุณได้นอนถึงเช้า", effects: {health: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตกลงกันได้สามวัน แล้วทุกอย่างก็กลับไปเหมือนเดิม", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: petition
+        text: "ล่ารายชื่อไปร้องผู้ใหญ่บ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ชื่อครบทั้งซอย ผู้ใหญ่บ้านพาช่างมาล้างท่อ น้ำใสขึ้นภายในเดือน", effects: {health: 1, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รายชื่อไปค้างอยู่บนโต๊ะผู้ใหญ่บ้านจนหมดหน้าแล้ง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: buy_jars
+        text: "ซื้อโอ่งเพิ่มมารองตุนไว้"
+        effects: {health: 1, money: {unit: income_x, amount: -0.04}}
+        merit: [{cat: neutral}]
+      - id: sand_filter
+        text: "ทำที่กรองน้ำจากทรายกับถ่าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้ำที่หยดออกมาใสจนข้างบ้านมาขอสูตร ไม่นานซอยนี้มีที่กรองทำมือทุกบ้าน", effects: {knowledge: 1, network: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ใส่ถ่านผิดชนิด น้ำไหลออกมาดำกว่าเดิม ต้องล้างโอ่งใหม่ทั้งแถว", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_trash_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [60, 85]}
+    title: "ถุงขยะข้างรั้วทุกคืนวันพุธ"
+    text: "สองปีมานี้มีถุงขยะมาวางพิงรั้วบ้านคุณทุกคืนวันพุธ เช้ามาหมาจรฉีกจนเศษอาหารกระจายถึงหน้าประตู ไม่มีใครเห็นว่าใครเอามาทิ้ง คนในซอยเดากันไปคนละทาง และทุกคนก็ดูมีพิรุธไปหมด"
+    choices:
+      - id: stakeout
+        text: "นั่งเฝ้าหลังหน้าต่างทั้งคืน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตีสองเจอคนขี่จักรยานจากซอยอื่นมาวางถุง คุณจุดตะเกียงส่องหน้า เขาไม่กลับมาอีกเลย", effects: {happiness: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นั่งจนหลับคาขอบหน้าต่าง ตื่นมาเจอถุงใหม่วางอยู่ที่เดิม", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sign
+        text: "เขียนป้ายขอร้องแขวนที่รั้ว"
+        outcomes:
+          - {weight: 1, ok: true, text: "คืนวันพุธถัดมาไม่มีถุงมาอีก ไม่มีใครรู้ว่าใครอ่านป้ายแล้วอาย", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ใครสักคนเขียนต่อท้ายป้ายว่า แล้วจะให้ทิ้งที่ไหน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: clean_quiet
+        text: "เก็บไปทิ้งเองเงียบ ๆ"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: open_bag
+        text: "แกะถุงหาซองจดหมายที่มีชื่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอซองจดหมายจ่าหน้าชื่อเจ้าของอยู่ก้นถุง คุณเดินไปคืนถึงบ้าน เขายกมือไหว้แล้วไม่ทำอีก", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชื่อบนซองเป็นของคนที่ย้ายออกจากซอยไปตั้งแต่สามปีก่อน ปริศนายังไม่จบ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_morning_call_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [65, 90]}
+    title: "เสียงเรียกหน้าบ้านทุกเช้า"
+    text: "ช่วงที่คนในบ้านไปทำงานต่างจังหวัด คุณอยู่บ้านคนเดียวทั้งวัน ป้าบ้านตรงข้ามแวะมาเรียกหน้าบ้านทุกเช้าเจ็ดโมง ถ้าคุณไม่ขานรับ เขาจะเปิดประตูรั้วเข้ามาดูถึงใน บางวันมีแกงจืดถ้วยเล็กติดมือมาด้วย"
+    choices:
+      - id: accept
+        text: "รับน้ำใจ ชวนนั่งกินข้าวด้วยกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "กินข้าวเช้าด้วยกันทุกวันจนเป็นธรรมเนียม ป้าเล่าเรื่องในซอยให้ฟังครบทุกบ้าน", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าเริ่มฝากหลานไว้ให้ช่วยดูทุกวัน บ้านไม่เงียบอีกเลย แต่หลังคุณเริ่มไม่ไหว", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: decline
+        text: "บอกว่าไม่ต้องลำบาก เกรงใจ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าเลิกถือกับข้าวมา แต่ยังเรียกหน้าบ้านทุกเช้าเหมือนเดิม", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าเลิกแวะมาเลย บ้านเงียบจนได้ยินเสียงนาฬิกาเดินทั้งวัน", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watch_house
+        text: "ช่วยเฝ้าบ้านป้าตอนเขาไปตลาด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้ากลับจากตลาดพร้อมขนมถุงใหญ่ คนในซอยเริ่มฝากบ้านกับคุณกันเป็นแถว", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มีคนมาส่งของระหว่างนั้น คุณเซ็นรับแทนผิดบ้าน ป้าต้องเดินตามคืนอีกสองวัน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: cookoff
+        text: "ทำแกงตอบแทน แข่งกันทุกวันเสาร์"
+        outcomes:
+          - {weight: 1, ok: true, text: "สองบ้านแข่งกันจนคนทั้งซอยมาเป็นกรรมการชิม วันเสาร์กลายเป็นวันกินข้าวรวมของซอย", effects: {happiness: 3, network: 2, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แกงของคุณเค็มจนป้าต้องดื่มน้ำไปสามขัน ป้าขอเปลี่ยนเป็นแข่งรดน้ำต้นไม้แทน", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nbr_roommate_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.5
+    when: {age: [19, 22], school: [uni]}
+    title: "รูมเมทที่ไม่เคยปิดไฟ"
+    text: "หอพักของมหาวิทยาลัยจับคู่ห้องให้เอง คุณได้รูมเมทที่อ่านหนังสือตั้งแต่สี่ทุ่มถึงตีสาม เปิดไฟสว่างทั้งห้อง พึมพำท่องสูตรดังพอให้คุณท่องตามได้ในฝัน อาทิตย์หน้าสอบกลางภาคกันทั้งสองคน"
+    choices:
+      - id: set_rules
+        text: "นั่งคุยตั้งกติกาปิดไฟกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตกลงกันว่าเที่ยงคืนปิดไฟใหญ่ เขาย้ายไปอ่านใต้โคมเล็ก สองคนสอบผ่านกันหมด", effects: {knowledge: 1, relations: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตกลงกันได้คืนเดียว คืนต่อมาเขาลืม แล้วทำหน้าเสียใจทุกครั้งที่คุณทัก", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: move_room
+        text: "ยื่นเรื่องขอย้ายห้อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ย้ายไปอยู่กับคนที่หลับตั้งแต่สามทุ่ม นอนเต็มอิ่มเป็นครั้งแรกของเทอม", effects: {health: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ห้องใหม่ได้รูมเมทที่กรนดังกว่าเสียงท่องสูตรสองเท่า", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: endure_mask
+        text: "ทนเอา ใช้ผ้าปิดตานอน"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: study_along
+        text: "อ่านตามไปด้วยเลยถึงตีสาม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฟังเขาท่องจนจำได้ทั้งบท สอบกลางภาคได้คะแนนดีกว่าวิชาที่ตั้งใจอ่านเอง", effects: {knowledge: 2, relations: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อ่านถึงตีสามติดกันสามคืน วันสอบหลับคาโต๊ะตั้งแต่ข้อสาม", effects: {health: -1, knowledge: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
