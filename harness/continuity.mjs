@@ -88,7 +88,8 @@ function echoCheck(st, shown) {
 }
 
 const seenTarget = new Map();
-// ยอดคาดต่อปลายทาง = ผลรวมสัดส่วน weight ของผลที่ชี้ไปตอนบอทกดตัวเลือกนั้น (ไม่คิดตัวคูณ/when/ปี จึงเป็นเพดานบน)
+// ยอดคาดต่อปลายทาง = ผลรวมสัดส่วน weight ของผลที่ชี้ไป นับตอนถึงปีนัดเมื่อ when ของปลายทางผ่าน แบบเดียวกับที่ engine ตรวจตอนออกการ์ด (ตายก่อนนัด = ไม่นับ)
+// ตัวคูณ/ปีไม่คิด จึงยังเป็นเพดานบน · ปลายทาง belief นับตอนกด เพราะธงที่ when อ่านถูกล้างพร้อมการ์ด เหตุเดียวกับที่ offWhen เว้นไว้
 // ปลายทางที่คาดต่ำกว่า RARE_EXPECT ออก 0 ครั้งได้เพราะ rng ล้วน — แยกจาก "ไม่เคยออก" ไม่ให้เป็นสัญญาณหลอก
 const RARE_EXPECT = 3;
 const expect = new Map();
@@ -103,18 +104,23 @@ for (const [name, bot] of Object.entries(BOTS)) {
     // ช่วงอายุที่นัดไว้ต่อปลายทาง จดจากตัวเลือกที่บอทกด (ทุกผลสุ่มของตัวเลือกนั้น) — นัดปีเดียวกันถูกใช้ก่อนการ์ดใบถัดไปออก อ่าน st.scheduled ไม่ทัน
     const booked = [];
     let at = 0;
+    let waiting = [];
+    const expectAt = (id, lo, hi, v) => {
+      if (byId[id]?.category === 'belief') addExpect(id, v);
+      else waiting.push({ id, lo, hi, v });
+    };
     const pick = (card, rng, x) => {
       const idx = bot(card, rng, x);
       const c = card.kind === 'event' && byId[card.id]?.choices?.[idx];
       for (const w of c ? [c, ...(c.outcomes ?? [])] : []) for (const sc of w.schedules ?? []) booked.push([sc.event, at + sc.after_years[0], at + sc.after_years[1]]);
       if (c) {
         // ผลย้อนมีโอกาส (gameslash-2) — ยอดคาดคูณ chance ไม่งั้นปลายทางที่ตั้งใจให้ออกน้อยถูกนับว่าไม่ถึงเป้า
-        for (const sc of c.schedules ?? []) addExpect(sc.event, sc.chance ?? 1);
+        for (const sc of c.schedules ?? []) expectAt(sc.event, at + sc.after_years[0], at + sc.after_years[1], sc.chance ?? 1);
         const total = (c.outcomes ?? []).reduce((a, o) => a + (o.weight ?? 1), 0);
         for (const o of c.outcomes ?? []) {
           const share = (o.weight ?? 1) / total;
-          if (o.next) addExpect(o.next, share);
-          for (const sc of o.schedules ?? []) addExpect(sc.event, share * (sc.chance ?? 1));
+          if (o.next) expectAt(o.next, at, at, share);
+          for (const sc of o.schedules ?? []) expectAt(sc.event, at + sc.after_years[0], at + sc.after_years[1], share * (sc.chance ?? 1));
         }
       }
       return idx;
@@ -122,6 +128,14 @@ for (const [name, bot] of Object.entries(BOTS)) {
     const shown = [];
     const { state } = playLife(mixSeed(seed, i), content, pick, (card, st) => {
       age = at = st.age;
+      waiting = waiting.filter((w) => {
+        if (st.age < w.lo) return true;
+        if (st.age <= w.hi && whenOk(st, byId[w.id]?.when)) {
+          addExpect(w.id, w.v);
+          return false;
+        }
+        return st.age <= w.hi;
+      });
       if (card.kind !== 'event' || !card.id) return;
       if (card.echoFrom !== undefined) shown.push({ from: card.echoFrom, age: card.age, title: card.title });
       if (NEXT.has(card.id)) {
