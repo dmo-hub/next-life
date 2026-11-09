@@ -1725,7 +1725,7 @@ const isekaiKnowOffers = (isk, stage) => Object.keys(ISEKAI_KNOW).filter((k) => 
 const isekaiFocusOffers = (isk, stage) => [...(isk.role ? ['role'] : []), ...Object.keys(ISEKAI_FOCUS).filter((id) => !ISEKAI_FOCUS[id].stages || ISEKAI_FOCUS[id].stages.includes(stage.id)), ...(isk.trip ? [TRIP_QUEST.id] : []), ...isekaiKnowOffers(isk, stage)];
 // ป้ายบนปุ่มทุ่มเท: บอกว่าค่าไหนขึ้น ไม่บอกตัวเลข · สุข/รู้/บารมี/เป้าหมายโลกเป็นค่าซ่อน จึงไม่ขึ้นป้าย
 const ISEKAI_FOCUS_HIDDEN = new Set(['joy', 'wit', 'know', 'cha', 'goal']);
-const isekaiFocusFx = (isk, id) => {
+export const isekaiFocusFx = (isk, id) => {
   if (id === TRIP_QUEST.id) return 'ใกล้ทางกลับบ้านขึ้น';
   const f = isekaiFocusDef(isk, id);
   const up = Object.entries(f.gain).filter(([k, v]) => v > 0 && !ISEKAI_FOCUS_HIDDEN.has(k)).map(([k]) => ISEKAI_FX[k]);

@@ -40,6 +40,8 @@ export function splitDeadChoices(events, fired, explored, picks, min = MIN_EXPEC
 export const CHAIN_ROOTS = {
   heir: (e) => !!e.when?.parent_flags?.has?.length,
   overlap: (e) => (e.when?.overlap_stage?.[0] ?? 0) >= 1,
+  // เหตุแต่ง (drift_) นัดเฉพาะรุ่น 2 ขึ้นไป (ตัดสินที่ npm run drift)
+  drift: (e) => e.id.startsWith('drift_'),
 };
 
 // โซ่จากราก: ของที่ตั้งได้แค่จากของในโซ่ (ธง · สายงานจาก effects.ladder) เป็นของโซ่ → ผู้อ่านเข้าโซ่ต่อ … วนจนนิ่ง
