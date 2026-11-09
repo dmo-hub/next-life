@@ -1,0 +1,460 @@
+# ร่างเรื่อง คนที่บ้านของแรงงานไทยต่างแดน · 15 ใบ · ลงเกมแล้ว ใบ 249 จากร่าง 248 · แก้ตามข้อค้านรอบ 1 · ผู้เล่นเป็นคนที่บ้าน ญาติ เพื่อนบ้านเสมอ ไม่ไปต่างแดนเอง · ไม่อ่านและไม่ตั้งธง · ไม่ผูกปี
+events:
+  - id: kinabroad_kid_village_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [7, 12], school: [primary], family: [{role: parent, sex: ชาย, alive: true}]}
+    title: "พ่อไปไกล ญาติเต็มซอย"
+    text: "พ่อไปทำงานเมืองนอกตั้งแต่ต้นปี ป้าหลังบ้านตักข้าวให้แล้วถามว่าคิดถึงไหม คุณยังไม่ทันตอบ น้าท้ายซอยก็ตะโกนเรียกไปช่วยจับไก่ เพื่อนอีกสามคนมายืนรอหน้ารั้ว วันหนึ่งผ่านไปเร็วจนลืมนึก"
+    choices:
+      - id: kinabroad_kid_not_lonely
+        text: "บอกป้าว่าไม่เหงา คนเยอะ"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_kid_catch_hens
+        text: "ช่วยน้าไล่จับไก่จนครบเล้า"
+        effects: {health: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_kid_count_days
+        text: "นั่งกาปฏิทินนับวันข้างฝา"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_kid_every_house
+        text: "ไปกินข้าวให้ครบทุกบ้านในซอย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณกินครบสี่บ้านในเย็นเดียว ทุกบ้านตักเพิ่มให้เพราะคิดว่ายังไม่ได้กิน ปีนั้นตัวโตขึ้นจนเสื้อเก่าติดกระดุมไม่ลง", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถึงบ้านที่สามท้องก็เริ่มประท้วง ป้าเอายาธาตุมาให้ แล้วเล่าให้ทั้งซอยฟังว่าเจ้าตัวเล็กกินจุกว่าแขกงานบวช", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_letter_wait_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [13, 18]}
+    title: "จดหมายที่ปากทางหมู่บ้าน"
+    text: "ยายข้างบ้านตาไม่ดี ทุกเจ็ดวันคุณจึงปั่นจักรยานไปรับจดหมายจากหลานยายที่บุรุษไปรษณีย์ฝากไว้ที่ร้านปากทาง ฉบับล่าสุดเล่าว่างานเมืองนอกหนักกว่าที่คิด แต่ท้ายจดหมายเขียนถึงคนอ่านว่า อย่าบอกยาย ยายนั่งรอฟังอยู่บนแคร่แล้ว"
+    choices:
+      - id: kinabroad_letter_read_true
+        text: "อ่านตามจริงทุกบรรทัด"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_letter_skip_hard
+        text: "ข้ามตอนลำบากไปเบา ๆ"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_letter_reply_for
+        text: "ช่วยยายเขียนตอบกลับ"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_letter_do_voice
+        text: "อ่านโดยดัดเสียงเป็นหลานยาย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยายหัวเราะจนน้ำตาเล็ด บอกว่าเสียงเหมือนตอนหลานเป็นหวัด ตั้งแต่นั้นคนในซอยเอาจดหมายมาให้คุณอ่านกันเป็นแถว", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยายฟังไปได้สองบรรทัดก็เงียบ แล้วบอกว่าอย่าทำอีกเลย เสียงนี้ทำให้คิดถึงกว่าเดิม คุณอ่านที่เหลือด้วยเสียงตัวเอง", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_airport_wait_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [14, 18], school: [lower, upper, voc]}
+    title: "นั่งรถข้ามคืนไปรอรับ"
+    text: "เพื่อนร่วมห้องชวนนั่งรถข้ามคืนเป็นเพื่อน ไปรอรับพ่อของเขาที่กลับจากทำงานเมืองนอกหลายปี ตอนพ่อเขาไป เพื่อนยังตัวเล็ก เลยกลัวจะจำหน้าไม่ได้ พรุ่งนี้มีสอบเก็บคะแนนวิชาหนึ่ง แต่ครูยังไม่ได้ตอบว่าสอบชดเชยได้ไหม"
+    choices:
+      - id: kinabroad_airport_go_along
+        text: "ไปเป็นเพื่อนจนถึงที่หมาย"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_airport_stay_exam
+        text: "อยู่สอบ ฝากขนมไปให้"
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_airport_old_photo
+        text: "ช่วยหารูปเก่าให้เพื่อนพกไป"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_airport_sign_all
+        text: "ทำป้ายต้อนรับถือไว้สูงเกินหัว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้ายใหญ่จนคนที่เดินออกมามองกันทั้งแถว ชายผอมคนหนึ่งยืนอ่านนาน แล้วเรียกชื่อเพื่อนคุณเสียงสั่น ไม่ต้องจำหน้าอีกเลย", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณสะกดนามสกุลผิดไปหนึ่งตัว เจ้าตัวเดินผ่านไปสองรอบ เพื่อนต้องวิ่งตามไปดึงแขนเอง ป้ายนั้นกลายเป็นของที่เขาเก็บไว้ล้อคุณ", effects: {happiness: 1, relations: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_house_wait_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [22, 30]}
+    title: "บ้านที่สร้างรอคนกลับ"
+    text: "สามีของพี่ข้างบ้านส่งเงินกลับทุกเดือนให้สร้างบ้านรอ พี่เขาเลยต้องคุมช่างและซื้อวัสดุเองทั้งที่ไม่เคยรู้จักปูนกับทราย วันนี้ช่างบอกว่าไม้ไม่พออีกแล้ว พี่เขาหันมาถามคุณว่าที่ช่างพูดนี่จริงหรือเปล่า"
+    choices:
+      - id: kinabroad_house_list_items
+        text: "ช่วยจดของที่ซื้อทีละรายการ"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_house_haggle
+        text: "ไปต่อราคาที่ร้านวัสดุด้วยกัน"
+        effects: {network: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_house_stay_out
+        text: "บอกว่าไม่รู้เรื่องช่าง"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_house_fake_foreman
+        text: "ยืนกอดอกทำหน้าเป็นนายช่างใหญ่"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณไม่พูดสักคำ แค่เดินเคาะเสาแล้วพยักหน้า ช่างเริ่มวัดไม้ใหม่เองจนพบว่ายังเหลือพอ พี่ข้างบ้านยกแกงมาให้สองถ้วย", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช่างยื่นตลับเมตรให้แล้วถามว่าระยะนี้ใช้เท่าไรดี คุณอ่านผิดด้านของตลับเมตร ช่างทั้งหน้างานหัวเราะและคุณเดินกลับบ้านทางหลังรั้ว", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_porch_talk_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [20, 28]}
+    title: "ลุงที่ไม่อยากให้ไปซ้ำ"
+    text: "ลุงข้างบ้านเคยไปทำงานเมืองนอกหลายปี กลับมาพร้อมหลังที่ก้มไม่สุด ตอนนี้ลูกชายของลุงซึ่งเป็นเพื่อนคุณอยากไปบ้าง ลุงไม่ยอม บอกว่าไม่อยากให้เขาไปลำบากซ้ำ สองคนเงียบใส่กันมาสามวัน แล้วต่างคนต่างมาหาคุณที่ชานบ้าน"
+    choices:
+      - id: kinabroad_porch_hear_both
+        text: "ฟังทั้งสองคนจนจบ"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_porch_side_uncle
+        text: "เข้าข้างลุง บอกเพื่อนให้หยุดคิด"
+        effects: {relations: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_porch_side_friend
+        text: "บอกลุงว่าเขาโตแล้ว"
+        effects: {network: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_porch_uncle_instead
+        text: "เสนอว่าให้ลุงไปอีกรอบแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงหัวเราะออกมาครั้งแรกในรอบสามวัน แล้วเล่าเรื่องหลังปวดให้เพื่อนคุณฟังยาวจนฟ้ามืด สองคนเริ่มพูดกันอีกครั้งโดยไม่มีใครขอโทษก่อน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงไม่ขำ บอกว่าถ้ายังไหวก็ไปแล้ว คุณนั่งเงียบกินน้ำจนหมดแก้ว แล้วขอตัวกลับบ้านก่อนฝนตกทั้งที่ฟ้ายังใส", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_cement_lane_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "รถขนปูนจอดขวางซอย"
+    text: "คนข้างบ้านที่ไปทำงานเมืองนอกส่งเงินมาสร้างบ้านใหม่ รถขนปูนขนทรายจอดขวางซอยตั้งแต่เช้า ฝุ่นเข้าครัวคุณทุกช่อง ญาติเขาเดินออกมายิ้มเหนียม ๆ บอกว่าอีกไม่กี่เที่ยวก็หมด ส่วนคุณยังออกจากบ้านไม่ได้"
+    choices:
+      - id: kinabroad_cement_move_things
+        text: "ย้ายของหลบให้รถเข้าสะดวก"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_cement_complain
+        text: "เดินไปบ่นให้ญาติเขาฟัง"
+        effects: {happiness: 1, relations: -2}
+        merit: [{cat: neutral}]
+      - id: kinabroad_cement_slip_fence
+        text: "มุดข้างรั้วออกไปธุระ"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_cement_coffee_stall
+        text: "ตั้งโต๊ะขายกาแฟให้คนงานเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนขับรถขนปูนซื้อคนแรก ช่างทั้งหน้างานตามมาอีกแถว บ้านเขายังไม่มีหลังคา แต่โต๊ะของคุณเริ่มมีลูกค้าประจำ", effects: {happiness: 1, network: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝุ่นปูนลงแก้วหมดทุกแก้วก่อนจะได้เสิร์ฟ คุณนั่งเทกาแฟทิ้งข้างรั้ว คนงานยังเดินมาขอน้ำเปล่าฟรีอีกสองกา", effects: {happiness: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_lend_fare_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ขอยืมค่าเดินทาง"
+    text: "เพื่อนบ้านเดินก้มหน้ามาถึงหน้าบ้านคุณตอนเย็น เขาได้งานเมืองนอก ค่านายหน้าต้องวางมัดจำก่อน ทั้งบ้านนั่งนับเงินกันแล้วยังขาดอีกก้อน สหกรณ์ก็กู้เต็มแล้ว เขาบอกว่าไปถึงแล้วจะส่งคืนเป็นงวดทุกเดือน"
+    choices:
+      - id: kinabroad_lend_on_trust
+        text: "ให้ยืมไปโดยไม่ต้องเขียนอะไร"
+        outcomes:
+          - {weight: 2, ok: true, text: "เงินงวดแรกมาช้าไปหนึ่งเดือน แต่มาจริงพร้อมจดหมายขอบคุณ ครบกำหนดเขาคืนหมด และคนในซอยก็รู้ว่าบ้านคุณไว้ใจได้", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ข่าวจากเขาหายไปหลังสองงวดแรก ญาติเขาหลบหน้าเวลาเจอกันที่ตลาด ก้อนนั้นคุณเลิกนับรวมในบัญชีเอง", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: dana, level: 1}]
+      - id: kinabroad_lend_write_note
+        text: "ให้ยืม แต่ขอเขียนสัญญาชัด ๆ"
+        effects: {knowledge: 1, relations: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: kinabroad_lend_check_first
+        text: "ชวนไปถามอำเภอเรื่องนายหน้าก่อน"
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_lend_decline
+        text: "บอกตรง ๆ ว่าไม่มีให้ยืม"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_lend_three_hens
+        text: "ขอไก่สามตัวเป็นหลักประกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาหิ้วไก่มาจริง ไก่ไข่ทุกวันจนคุณเริ่มคิดว่าได้ดอกเบี้ยเป็นไข่ พอเงินงวดสุดท้ายมา คุณต้องคืนไก่ทั้งที่ตั้งชื่อไปแล้ว", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไก่สามตัวบินข้ามรั้วกลับบ้านเดิมภายในคืนเดียว เขาหิ้วมาส่งใหม่อีกสองรอบ แล้วทั้งคู่ตกลงกันว่าเขียนกระดาษก็พอ", effects: {happiness: 1, knowledge: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_chair_front_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [33, 45]}
+    title: "เก้าอี้หน้าบ้านป้า"
+    text: "ป้าข้างบ้านตั้งเก้าอี้ตัวหนึ่งไว้หน้าบ้านมาหลายปี ลูกชายของป้าส่งกลับมาจากโรงงานที่เมืองนอก ไม่เคยมีใครได้นั่งจริง ๆ แดดเผาจนสีเริ่มซีด วันนี้ป้าถามคุณว่าเก้าอี้แบบนี้ที่ตลาดมีขายไหม พร้อมยิ้มรอคำตอบ"
+    choices:
+      - id: kinabroad_chair_no_market
+        text: "บอกว่าฝีมือแบบนี้ตลาดไม่มี"
+        effects: {relations: 2, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_chair_shade
+        text: "ช่วยย้ายเข้าร่มกันสีซีด"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_chair_honest
+        text: "ตอบตามจริงว่ามีเหมือนกัน"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_chair_sit_ask
+        text: "ขอนั่งลองสักทีให้เป็นสิริมงคล"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าปัดฝุ่นให้ก่อนแล้วยืนดูคุณนั่งอย่างพอใจ คุณชมว่านั่งสบายกว่าแคร่ที่บ้าน ป้าเล่าเรื่องโรงงานนั้นต่อจนหมดกาน้ำชา", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขาเก้าอี้ลั่นดังเปรี๊ยะตอนคุณเอนหลัง คุณรีบลุกยืนตัวตรงเหมือนเข้าแถว ป้าตรวจทั้งสี่ขาอยู่นาน แล้วบอกว่าคราวหน้าขอยืนคุยกันดีกว่า", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_empty_visit_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [36, 45]}
+    title: "ไปเยี่ยมคนเพิ่งกลับ"
+    text: "ชายข้างบ้านกลับจากเมืองนอกได้สองเดือน ไม่มีรถคันใหม่ ไม่มีบ้านใหม่ มีแต่หนี้ที่มากกว่าตอนไป คนในซอยเลิกถามและเลิกแวะ เย็นนี้คุณเดินผ่านหน้าบ้าน เขานั่งซ่อมแหอยู่คนเดียว เงยหน้าขึ้นมาพอดี"
+    choices:
+      - id: kinabroad_empty_ask_food
+        text: "ถามแค่ว่ากินข้าวหรือยัง"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_empty_offer_work
+        text: "ชวนไปรับจ้างงานที่คุณรู้จัก"
+        effects: {network: 2, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_empty_ask_money
+        text: "ถามว่าเงินหายไปไหนหมด"
+        effects: {knowledge: 1, relations: -2}
+        merit: [{cat: neutral}]
+      - id: kinabroad_empty_curry_pot
+        text: "ยกแกงหม้อใหญ่ไปวางแล้วรีบกลับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "วันรุ่งขึ้นหม้อถูกล้างสะอาดมาวางหน้าบ้านคุณ ในหม้อมีผักจากหลังบ้านเขากำหนึ่ง คุณยกแกงไปอีก หม้อก็กลับมาพร้อมผักอีกกำ", effects: {happiness: 1, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วันรุ่งขึ้นหม้อกลับมาเปล่า ไม่มีคำพูดสักคำ คุณล้างหม้อเก็บเข้าครัว แล้วไม่ได้เล่าให้ใครฟัง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: dana, level: 1}]
+      - id: kinabroad_empty_borrow_net
+        text: "แกล้งมาขอยืมแหแทนการทักทาย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขายื่นแหให้พร้อมสอนวิธีเหวี่ยง คุณเหวี่ยงไปติดรั้วตัวเองสองรอบ เขาหัวเราะเป็นครั้งแรกตั้งแต่กลับมา แล้วเดินมาแกะให้เอง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาถามว่าจะเอาไปลงน้ำที่ไหน คุณนึกชื่อคลองไม่ออกสักคลอง ทั้งคู่เงียบไปพักใหญ่ แล้วคุณก็เดินกลับบ้านมือเปล่า", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_deed_rent_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "มีคนขอเช่าโฉนด"
+    text: "เพื่อนบ้านถือโฉนดมาให้คุณดูด้วยมือเปียกเหงื่อ มีนายหน้ามาขอเช่าโฉนดที่ดินที่บ้านเขาตั้งอยู่ บอกว่าเอาไปค้ำเงินกู้ให้คนไปทำงานเมืองนอก จ่ายค่าเช่าก้อนใหญ่ทันที เขาไม่ได้ถามเรื่องกฎหมาย ถามแค่ว่าคุณจะทำไหม"
+    choices:
+      - id: kinabroad_deed_warn
+        text: "บอกให้เก็บโฉนดไว้ก่อน"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_deed_go_amphoe
+        text: "พาไปถามที่ดินอำเภอด้วยกัน"
+        effects: {knowledge: 2, network: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_deed_his_call
+        text: "บอกว่าแล้วแต่เขาตัดสินใจ"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_deed_plate_note
+        text: "จดเลขทะเบียนรถนายหน้าไว้ข้างโอ่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณยืนเขียนตัวโตอยู่ข้างโอ่งทั้งที่เขาจอดรถมองอยู่ นายหน้าเห็นแล้วไม่แวะมาอีก คุณเล่าเรื่องนี้ซ้ำจนเพื่อนบ้านท่องเลขทะเบียนได้", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝนตกคืนเดียว เลขข้างโอ่งเลือนหมด คุณจำได้แค่สีรถ แล้วยังเถียงกับตัวเองอีกว่าเป็นสีเขียวหรือสีฟ้า", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_interest_day_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "วันจ่ายดอกเบี้ย"
+    text: "ถึงกำหนดจ่ายดอกเบี้ย ป้าข้างบ้านกำเงินที่ลูกสาวของป้าส่งมาจากเมืองนอกไว้แน่น สิบกว่าปีมานี้จ่ายได้แค่ดอก เงินต้นไม่เคยขยับ ป้าอ่านหนังสือไม่คล่องจึงชวนคุณไปช่วยดูใบเสร็จ ระหว่างทางป้าพูดเบา ๆ ว่าเหนื่อย"
+    choices:
+      - id: kinabroad_interest_read_all
+        text: "อ่านใบเสร็จให้ฟังทีละบรรทัด"
+        effects: {knowledge: 1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_interest_ledger
+        text: "ช่วยจดบัญชีหนี้ให้ป้าเก็บไว้"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_interest_chip_in
+        text: "ออกค่าดอกเดือนนี้ให้ส่วนหนึ่ง"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: dana, level: 1}]
+      - id: kinabroad_interest_only_walk
+        text: "ไปส่งถึงหน้าประตูแล้วรอข้างนอก"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_interest_mango
+        text: "ลองต่อดอกด้วยมะม่วงสองเข่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหนี้ไม่ลดดอกสักบาท แต่รับมะม่วงไว้แล้วยอมผ่อนกำหนดให้ป้าอีกสองอาทิตย์ ป้าหัวเราะได้ตลอดทางกลับ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าหนี้รับมะม่วงทั้งสองเข่งแล้วแจ้งยอดเดิมด้วยหน้าตาเฉย คุณกับป้าเดินกลับด้วยเข่งเปล่า ตกลงกันว่าจะไม่เล่าให้ใครฟัง", effects: {happiness: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_months_left_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "เหลือกินได้อีกกี่เดือน"
+    text: "น้องข้างบ้านไปทำงานเมืองนอก ทิ้งเงินก้อนหนึ่งไว้ให้ทางบ้าน แต่สามเดือนแล้วเงินที่บอกจะส่งยังไม่มา ในบ้านรายได้น้อย มีคนแก่กับเด็กสองคนต้องกินต้องเรียน เย็นนี้ภรรยาเขาขอให้คุณมาช่วยนับเงินที่เหลือ เพราะคิดเลขไม่ทันแล้ว"
+    choices:
+      - id: kinabroad_months_sit_count
+        text: "นั่งทำบัญชีรายจ่ายกับเขา"
+        effects: {knowledge: 1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_months_rice_sack
+        text: "แบกข้าวสารมาให้กระสอบหนึ่ง"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: dana, level: 1}]
+      - id: kinabroad_months_small_job
+        text: "หางานรับจ้างในตลาดให้"
+        effects: {network: 2, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_months_excuse
+        text: "อ้างว่าติดธุระแล้วไม่ไป"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_months_count_thrice
+        text: "นับซ้ำสามรอบ เผื่อมันเพิ่ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "รอบที่สามเด็กคนเล็กเจอธนบัตรเหน็บอยู่ในสมุดเก่าหนึ่งใบ ทั้งบ้านเฮเหมือนถูกรางวัล แล้วเย็นนั้นก็กินข้าวกันได้เหมือนปกติ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สามรอบได้เลขเดิมทุกรอบ ไม่มีใครขำ คุณวางเงินเก็บเข้าซอง แล้วนั่งอยู่เป็นเพื่อนจนเด็กหลับ", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_safe_wish_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "ขอแค่ให้ปลอดภัย"
+    text: "เพื่อนบ้านรุ่นเดียวกับคุณส่งลูกของเธอเรียนจบครบสามคน คนเล็กยังทำงานอยู่เมืองนอก ปีนี้ก็ไม่ได้กลับอีก เย็นนี้เธอนั่งเล่าให้คุณฟังหน้าบ้านด้วยเสียงเรียบ บอกว่าไม่รู้จะทำยังไง ก็ได้แต่ขอให้อยู่ที่นั่นอย่างปลอดภัย"
+    choices:
+      - id: kinabroad_safe_sit_quiet
+        text: "นั่งฟังอยู่เงียบ ๆ จนมืด"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_safe_go_temple
+        text: "ชวนเธอไปทำบุญด้วยกัน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: kinabroad_safe_tell_own
+        text: "เล่าเรื่องบ้านตัวเองกลบไปเลย"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_safe_contest
+        text: "แข่งกับเธอว่าใครเป็นห่วงเก่งกว่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "เธอชนะขาดลอย นับได้ว่าคนเล็กไม่ได้กินข้าวบ้านมากี่ปีกี่เดือน แล้วหัวเราะออกมา บอกว่าแข่งแบบนี้ขอไม่ชนะดีกว่า", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณเริ่มนับเรื่องบ้านตัวเองไปได้สองข้อ แล้วพบว่าเธอเงียบไปนาน คุณเปลี่ยนไปชวนคุยเรื่องกล้วยหลังบ้านแทนจนหมดเย็น", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_first_group_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [62, 85]}
+    title: "รุ่นแรกที่ออกจากหมู่บ้าน"
+    text: "หลานข้างบ้านทำรายงานเรื่องหมู่บ้าน มาถามว่าทำไมบ้านหลังใหญ่ในซอยถึงเป็นของคนที่เคยไปเมืองนอก คุณจำวันที่คนกลุ่มแรกแบกกระเป๋าออกจากหมู่บ้านได้ บางคนกลับมาสร้างฐานะให้ลูกหลาน บางคนกลับมาแล้วไม่เหมือนเดิม"
+    choices:
+      - id: kinabroad_first_tell_both
+        text: "เล่าทั้งคนที่รวยและคนที่เจ็บ"
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_first_only_good
+        text: "เล่าเฉพาะตอนที่ชื่นใจ"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_first_send_elder
+        text: "ส่งไปถามผู้ใหญ่บ้านดีกว่า"
+        effects: {network: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_first_walked_there
+        text: "บอกว่าสมัยนั้นเขาเดินไปกันเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "หลานเขียนลงรายงานตามนั้น ครูส่งกลับมาพร้อมคำถามตัวแดง เด็กมาถามคุณต่อจนได้ฟังเรื่องจริงครบ และได้คะแนนจากส่วนนั้นเต็ม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลานเชื่อและเล่าต่อทั้งห้อง พอรู้ความจริงก็ไม่มาถามอะไรคุณอีกหนึ่งเดือน ต้องเอาขนมไปง้อถึงหน้าบ้าน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kinabroad_next_gen_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 78]}
+    title: "ความลับของหลานข้างบ้าน"
+    text: "คนรุ่นคุณในซอยกลับจากเมืองนอกมาตั้งตัวได้หลายปีแล้ว ทุกคนคิดว่าเรื่องนี้จบแล้ว แต่หลานชายข้างบ้านเพิ่งมากระซิบว่ารุ่นเขาจะไปบ้าง ที่นี่ไม่มีงาน เขายังไม่กล้าบอกที่บ้าน และขอให้คุณช่วยพูดแทน"
+    choices:
+      - id: kinabroad_next_tell_family
+        text: "บอกให้เขาไปพูดกับที่บ้านเอง"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_next_keep_secret
+        text: "รับปากว่าจะเก็บไว้ก่อน"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: kinabroad_next_speak_for
+        text: "เดินไปบอกที่บ้านเขาแทนให้"
+        effects: {relations: 2, network: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_next_find_work
+        text: "ช่วยถามหางานแถวนี้ให้ก่อน"
+        effects: {network: 2, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: kinabroad_next_hand_broom
+        text: "ยื่นไม้กวาด บอกให้ลองงานนี้ก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขากวาดลานให้จนสะอาดแล้วนั่งคุยต่อ คุณได้ลานสะอาดกับเรื่องที่เขาไม่กล้าบอกใคร พอเย็นเขาหัวเราะได้และเริ่มคิดรอบคอบขึ้น", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาวางไม้กวาดแล้วบอกว่าผู้ใหญ่ก็เป็นแบบนี้ทุกคน คุณเลยต้องกวาดลานเองทั้งเย็น พร้อมกับคิดถึงวันที่รุ่นคุณออกจากซอย", effects: {happiness: -1, health: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
