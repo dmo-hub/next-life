@@ -1,0 +1,414 @@
+# สายสอบบรรจุครู/ก.พ. (ใบ 255 จากร่าง 212) · ที่มาแต่ละใบอยู่ในรีเสิร์ชใบ 212
+# ฐาน next-life origin/main cff8aa52 · prefix kru_ (ครู · สายใหม่) + kp_ (ขยายทางสอบ ก.พ. เดิม) · ค้น id ทั้งสองได้ 0
+# ของเดิมที่ต่อ: ladder gov (data/careers.json 5 ขั้น · การ์ด career_first 4 ใบ when ladder gov) · ทาง "สอบ ก.พ." ในการ์ดงานแรก (career.mjs jobCard) · การ์ดรับสมัครกลางทาง recruit_gov (rank.mjs)
+# ครูสอบบรรจุผ่าน = effects.ladder gov (ใช้ขั้นยศข้าราชการพลเรือนเดิม ชื่อขั้นไม่ใช่ของครู · ทางขั้นยศครูเป็นข้อเสนอ engine แยก)
+# ใบรับเข้าอ่านธง exam_pass:uni + school uni ของแกน (แบบเดียวกับสายหมอ พยาบาล)
+# ปีจริง: ใบทุนครูบ้านเกิดกั้น 2563 ขึ้นไป (ทุนเริ่มปีการศึกษา 2563) · ใบกู้สหกรณ์ 2 ใบกั้น 2544 ขึ้นไป (หนี้ชนิด coop ของเกมเปิด 2544 · ก่อนนั้น borrow throw) · ที่เหลือออกทุกปี
+# เปิดทุกเพศใบเดียว · ใบทุนบ้านเกิดเปิดเฉพาะฐานะ ยากไร้ ยากจนมาก (ทุนให้ครัวเรือนรายได้ต่ำสุด)
+# ใบกองต้องมี weight · นัดใบรับเข้า +4 ปีจากใบวัยรุ่น
+# decisions 414: เด็ก 1 · วัยรุ่น 2 · หนุ่มสาว 6 (นัด 3 + กอง 3) · ทำงาน 2 · กลางคน 1 (นัดหนี้สหกรณ์) · ชรา 1
+# ไม่มีชื่อคน โรงเรียน สหกรณ์ หรือสถาบันกวดวิชาจริง · ไม่สอนวิธีโกงสอบ
+events:
+  - id: kru_kid_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {good_student: 2}}
+    when: {age: [8, 12]}
+    title: "ครูตัวน้อย"
+    text: "ครูประจำชั้นลาไปประชุมทั้งบ่าย ฝากให้คุณคุมห้องแล้วอ่านนิทานให้เพื่อนฟัง พอคุณยืนหน้ากระดาน ทั้งห้องเงียบกว่าตอนครูอยู่เสียอีก"
+    choices:
+      - id: dream
+        text: "บอกครูว่าโตไปอยากเป็นครู"
+        sets_flags: [kru_dream]
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: read
+        text: "อ่านนิทานทำเสียงทุกตัวละคร"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: strict
+        text: "จดชื่อคนคุยลงกระดาน"
+        effects: {relations: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: play
+        text: "ชวนทั้งห้องเล่นเกมแทน"
+        sets_flags: [kru_dream]
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: kru_teen_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {kru_dream: 3, good_student: 1.5}}
+    when: {age: [15, 17], school: [upper], flags: {not: [kru_aim]}}
+    title: "ครูแนะแนวถามทางต่อ"
+    text: "ครูแนะแนวแจกใบเลือกคณะ คนในบ้านอยากให้เรียนครู บอกว่าบรรจุแล้วมีบำนาญ มีสวัสดิการรักษาพยาบาลทั้งบ้าน รุ่นพี่ที่จบครูบางคนยังสอบบรรจุไม่ติด ต้องเป็นครูอัตราจ้างรอปีต่อปี"
+    choices:
+      - id: education
+        text: "เลือกคณะครู"
+        sets_flags: [kru_aim]
+        effects: {knowledge: 1, relations: 1}
+        schedules: [{event: kru_admit_01, after_years: [4, 4]}]
+        merit: [{cat: neutral}]
+      - id: other
+        text: "เลือกคณะอื่นที่ชอบ"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: ask_senior
+        text: "ถามรุ่นพี่อัตราจ้างให้ละเอียด"
+        effects: {network: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: fortune
+        text: "ให้หมอดูหน้าวัดเลือกให้"
+        outcomes:
+          - {weight: 1, ok: true, text: "หมอดูชี้ว่าดวงเป็นครู คุณเลยกรอกคณะครูไว้อันดับแรก", sets_flags: [kru_aim], effects: {happiness: 1}, schedules: [{event: kru_admit_01, after_years: [4, 4]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "หมอดูบอกว่าดวงค้าขาย คุณขำจนลืมถามต่อ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: kru_local_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2563, 2650]
+    weight: 1
+    multipliers: {flags: {kru_dream: 3, good_student: 2}}
+    when: {age: [16, 17], school: [upper], class: [ยากไร้, ยากจนมาก], flags: {not: [kru_aim]}}
+    title: "ทุนครูบ้านเกิด"
+    text: "ครูประจำชั้นยื่นใบประกาศทุนให้เรียนครูจนจบปริญญา มีค่าเทอม ค่าหอ ค่ากินรายวัน จบแล้วได้บรรจุเป็นครูในโรงเรียนเล็กแถวบ้าน ครูบอกว่าทั้งอำเภอได้ไม่กี่ที่ ต้องสอบแข่งและมีคนมาสัมภาษณ์ถึงบ้าน"
+    choices:
+      - id: apply
+        text: "สมัครทุนครูบ้านเกิด"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ได้ทุน มีชื่อติดบอร์ดหน้าโรงเรียน", sets_flags: [kru_aim, kru_local], effects: {happiness: 2, relations: 1}, schedules: [{event: kru_admit_01, after_years: [3, 3]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไม่ได้ทุน แต่ยังเลือกคณะครูได้ตามปกติ", sets_flags: [kru_aim], effects: {happiness: -1}, schedules: [{event: kru_admit_01, after_years: [3, 3]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: work_now
+        text: "ไม่สมัคร จะออกไปทำงานช่วยที่บ้าน"
+        effects: {relations: 1, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
+      - id: give_friend
+        text: "บอกให้เพื่อนที่จนกว่าไปสมัคร"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: clean_house
+        text: "รีบกลับไปเก็บบ้านรอคนสัมภาษณ์"
+        sets_flags: [kru_aim]
+        effects: {relations: 1}
+        schedules: [{event: kru_admit_01, after_years: [3, 3]}]
+        merit: [{cat: neutral}]
+
+  - id: kru_admit_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [19, 22], school: [uni], flags: {has: [kru_aim, exam_pass:uni], not: [kru_student, kru_civil]}}
+    title: "นักศึกษาครู"
+    text: "ชุดนักศึกษาครูต้องรีดจีบให้ตรงทุกเช้า วิชาแรกให้ยืนสอนเพื่อนในห้องห้านาที อาจารย์จับเวลาแล้วชี้ว่าคุณหันหลังให้ห้องตอนเขียนกระดานนานเกินไป"
+    choices:
+      - id: practice
+        text: "ซ้อมสอนหน้ากระจกทุกคืน"
+        sets_flags: [kru_student]
+        effects: {knowledge: 2, happiness: -1}
+        schedules: [{event: kru_practicum_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: club
+        text: "เข้าชมรมค่ายอาสาสอนหนังสือ"
+        sets_flags: [kru_student]
+        effects: {network: 2, relations: 1}
+        schedules: [{event: kru_practicum_01, after_years: [2, 2]}]
+        merit: [{cat: help_others, level: 1}]
+      - id: switch
+        text: "ย้ายไปคณะอื่น"
+        clears_flags: [kru_aim, kru_local]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: nap
+        text: "นั่งแถวหลังสุด รอเวลาเลิก"
+        sets_flags: [kru_student]
+        effects: {health: 1}
+        schedules: [{event: kru_practicum_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+
+  - id: kru_practicum_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [21, 26], flags: {has: [kru_student], not: [kru_civil]}}
+    title: "ฝึกสอนเทอมแรก"
+    text: "ลงฝึกสอนจริงในโรงเรียนประจำอำเภอ ห้องที่ได้มีนักเรียนสี่สิบคน แถวหลังเล่นโทรศัพท์ทั้งคาบ ครูพี่เลี้ยงยื่นแฟ้มแผนการสอนหนาเท่าสมุดโทรศัพท์ให้ บอกว่าเขียนให้ครบก่อนวันศุกร์"
+    choices:
+      - id: plan
+        text: "นั่งเขียนแผนจนตีสอง"
+        effects: {knowledge: 2, health: -1}
+        schedules: [{event: kru_exam_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: back_row
+        text: "ไปนั่งคุยกับแถวหลัง"
+        effects: {relations: 2}
+        schedules: [{event: kru_exam_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: game
+        text: "สอนผ่านเกมทั้งคาบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งห้องตื่น ครูพี่เลี้ยงขอยืมเกมไปใช้ต่อ", effects: {happiness: 2, network: 1}, schedules: [{event: kru_exam_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "เสียงดังจนห้องข้าง ๆ มาเคาะประตู", effects: {happiness: -1}, schedules: [{event: kru_exam_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit_teach
+        text: "พอแล้ว ไม่อยากเป็นครู"
+        clears_flags: [kru_student, kru_aim]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: kru_exam_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [22, 34], flags: {has: [kru_student], not: [kru_civil]}}
+    title: "สอบบรรจุครู"
+    text: "ประกาศสอบบรรจุครูผู้ช่วยออกมาแล้ว ทั้งจังหวัดเปิดไม่กี่สิบอัตรา คนสมัครเป็นพัน ร้านถ่ายเอกสารหน้ามหาวิทยาลัยขายชีตสรุปจนหมดแผง เพื่อนบางคนสอบมาแล้วสามปี"
+    choices:
+      - id: sit
+        text: "อ่านเอง แล้วเข้าสอบ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.6}}, text: "ติดอันดับในบัญชี ได้เรียกบรรจุเป็นครูผู้ช่วย", sets_flags: [kru_civil], effects: {ladder: gov, happiness: 3}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "คะแนนไม่ถึง ต้องรอรอบหน้า", sets_flags: [kru_temp], effects: {job: clerk, happiness: -1}, schedules: [{event: kru_exam_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tutor
+        text: "ลงคอร์สติวสอบครู"
+        requires: {money: {unit: income_x, amount: 0.2}, reason: "เงินไม่พอค่าติว"}
+        cost: {unit: income_x, amount: 0.2}
+        outcomes:
+          - {weight: 1.5, ok: true, multipliers: {stats: {knowledge: 1.6}}, text: "ติดบัญชี ได้บรรจุเป็นครูผู้ช่วย", sets_flags: [kru_civil], effects: {ladder: gov, happiness: 3}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ติวครบทุกคอร์สแต่ยังไม่ติด", sets_flags: [kru_temp], effects: {job: clerk, happiness: -2}, schedules: [{event: kru_exam_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: home_post
+        text: "รายงานตัวโรงเรียนตามทุน"
+        requires: {flags: {has: [kru_local]}, reason: "ไม่ได้รับทุนครูบ้านเกิด"}
+        sets_flags: [kru_civil]
+        effects: {ladder: gov, relations: 2}
+        merit: [{cat: neutral}]
+      - id: give_up
+        text: "ไม่สอบ ไปทำงานบริษัท"
+        clears_flags: [kru_student]
+        effects: {money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+
+  - id: kru_temp_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [23, 30], flags: {has: [kru_temp], not: [kru_civil]}}
+    title: "ครูอัตราจ้าง"
+    text: "สอนเต็มตารางเหมือนครูประจำ แถมได้งานธุรการกับงานพัสดุของโรงเรียนมาอีกกอง เงินเดือนออกช้าเพราะรองบจากเขต ผู้อำนวยการบอกว่าปีหน้าอาจไม่มีงบจ้างต่อ"
+    choices:
+      - id: stay
+        text: "สอนต่อ อ่านสอบไปด้วย"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: tutor_side
+        text: "รับสอนพิเศษตอนเย็น"
+        effects: {money: {unit: income_x, amount: 0.4}, health: -1}
+        merit: [{cat: neutral}]
+      - id: leave
+        text: "ลาออกไปทำงานบริษัท"
+        clears_flags: [kru_temp, kru_student]
+        effects: {money: {unit: income_x, amount: 0.5}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: plant
+        text: "ปลูกผักหลังอาคารเรียนกับเด็ก"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: kp_exam_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [22, 30], occupation: [clerk, professional, manager, technician], ladder: [none, private, trade]}
+    title: "สอบภาค ก."
+    text: "เพื่อนร่วมรุ่นครึ่งกลุ่มแชตลงสมัครสอบความรู้ทั่วไปของ ก.พ. ปีนั้นที่นั่งสอบเป็นแสน คนที่ผ่านมีไม่กี่เปอร์เซ็นต์ ผ่านแล้วก็ยังต้องไปสอบของหน่วยงานที่เปิดรับอีกรอบ"
+    choices:
+      - id: sit
+        text: "สมัครสอบ อ่านตอนกลางคืน"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.8}}, text: "ผ่านภาค ก. ได้ใบรับรองไว้ยื่นสมัครหน่วยงาน", sets_flags: [kp_pass_a], effects: {happiness: 2}, schedules: [{event: kp_agency_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ขาดไปไม่กี่คะแนน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tutor
+        text: "ลงคอร์สติวภาค ก."
+        requires: {money: {unit: income_x, amount: 0.15}, reason: "เงินไม่พอค่าติว"}
+        cost: {unit: income_x, amount: 0.15}
+        outcomes:
+          - {weight: 1.5, ok: true, multipliers: {stats: {knowledge: 1.8}}, text: "ผ่านภาค ก. คะแนนเฉียดเกณฑ์", sets_flags: [kp_pass_a], effects: {happiness: 2}, schedules: [{event: kp_agency_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ติวจนจำสูตรได้แต่ไม่ผ่าน", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: skip
+        text: "ไม่สอบ งานเอกชนก็ดีอยู่แล้ว"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: sit_for_friend
+        text: "ไปเป็นเพื่อนเพื่อนสอบเฉย ๆ"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: kp_agency_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [23, 34], flags: {has: [kp_pass_a]}, ladder: [none, private, trade]}
+    title: "บัญชีสำรองลำดับที่สี่สิบ"
+    text: "สอบหน่วยงานผ่าน ได้ชื่อในบัญชีลำดับที่สี่สิบ หน่วยงานเรียกบรรจุทีละไม่กี่คน บัญชีมีอายุแค่สองปี เพื่อนในบัญชีเดียวกันโทรมาถามทุกเดือนว่าเรียกถึงลำดับไหนแล้ว"
+    choices:
+      - id: wait
+        text: "รอเรียกตัว ทำงานเดิมไปก่อน"
+        clears_flags: [kp_pass_a]
+        outcomes:
+          - {weight: 1, ok: true, text: "ปลายปีที่สองหน่วยงานเรียกถึงลำดับคุณพอดี", effects: {ladder: gov, happiness: 3}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บัญชีหมดอายุก่อนเรียกถึง ต้องเริ่มสอบใหม่", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: other_agency
+        text: "ใช้บัญชีไปยื่นหน่วยงานอื่น"
+        clears_flags: [kp_pass_a]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "หน่วยงานต่างจังหวัดขอใช้บัญชี ได้บรรจุแต่ต้องย้ายบ้าน", effects: {ladder: gov, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีหน่วยงานไหนขอใช้บัญชี", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: give_up
+        text: "ทิ้งบัญชี อยู่เอกชนต่อ"
+        clears_flags: [kp_pass_a]
+        effects: {money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - id: shrine
+        text: "บนศาลหน้ากระทรวงไว้ก่อน"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: kru_small_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], flags: {has: [kru_civil]}}
+    title: "สอนควบชั้น"
+    text: "โรงเรียนเล็กท้ายตำบลมีนักเรียนไม่ถึงหกสิบคน ครูไม่ครบชั้น คุณต้องสอนสองชั้นในห้องเดียว ตอนบ่ายยังต้องทำบัญชีอาหารกลางวันกับรายงานส่งเขตอีกสามแฟ้ม"
+    choices:
+      - id: both
+        text: "สอนสองชั้นไปพร้อมกัน"
+        effects: {knowledge: 1, health: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: request
+        text: "ทำเรื่องขอย้ายโรงเรียนใหญ่"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "ได้ย้ายเข้าเมือง เด็กเก่าวิ่งมาส่งที่รถ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรื่องย้ายค้างอยู่ที่เขตอีกปี", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: community
+        text: "ชวนผู้ปกครองมาช่วยสอนงานช่าง"
+        effects: {network: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: lunch
+        text: "ทำกับข้าวกลางวันให้ทั้งโรงเรียน"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: kru_loan_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2544, 2650]
+    weight: 1
+    when: {age: [31, 45], flags: {has: [kru_civil]}}
+    title: "สหกรณ์ให้กู้"
+    text: "สหกรณ์ออมทรัพย์ของครูให้กู้ได้หลายเท่าของเงินเดือน หักผ่อนจากเงินเดือนอัตโนมัติ เพื่อนครูในห้องพักครูกู้ซ้อนกันหลายก้อน ซื้อรถ ซื้อบ้าน ปิดหนี้ก้อนเก่า"
+    choices:
+      - id: borrow
+        text: "กู้ก้อนใหญ่ ซื้อบ้าน"
+        sets_flags: [kru_coop_debt]
+        effects: {happiness: 2, money: {unit: income_x, amount: 2}, debt: {kind: coop, amount: {unit: income_x, amount: 2}}}
+        schedules: [{event: kru_loan_02, after_years: [5, 8]}]
+        merit: [{cat: neutral}]
+      - id: small
+        text: "กู้นิดเดียวพอซ่อมบ้าน"
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.5}, debt: {kind: coop, amount: {unit: income_x, amount: 0.5}}}
+        merit: [{cat: neutral}]
+      - id: save
+        text: "ไม่กู้ ฝากออมทุกเดือนแทน"
+        effects: {money: {unit: income_x, amount: -0.1}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: guarantor
+        text: "เซ็นค้ำให้เพื่อนครู"
+        sets_flags: [kru_coop_debt]
+        effects: {relations: 2}
+        schedules: [{event: kru_loan_02, after_years: [5, 8]}]
+        merit: [{cat: neutral}]
+
+  - id: kru_loan_02
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2544, 2650]
+    when: {age: [36, 60], flags: {has: [kru_coop_debt]}}
+    title: "สลิปเงินเดือนเหลือนิดเดียว"
+    text: "สลิปเงินเดือนเดือนนี้หักสหกรณ์ หักธนาคาร หักค่าประกัน จนเงินที่เหลือเข้าบัญชีไม่พอค่ากับข้าวทั้งเดือน ห้องพักครูคุยกันเรื่องโครงการรวมหนี้ที่รัฐเพิ่งประกาศ"
+    choices:
+      - id: consolidate
+        text: "เข้าโครงการรวมหนี้"
+        clears_flags: [kru_coop_debt]
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: side
+        text: "รับสอนพิเศษทุกเย็นจนหมดหนี้"
+        clears_flags: [kru_coop_debt]
+        effects: {health: -2, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+      - id: borrow_more
+        text: "กู้ก้อนใหม่มาโปะก้อนเก่า"
+        effects: {happiness: 1, debt: {kind: coop, amount: {unit: income_x, amount: 1}}, money: {unit: income_x, amount: 1}}
+        merit: [{cat: neutral}]
+      - id: sell_car
+        text: "ขายรถ นั่งรถสองแถวไปสอน"
+        clears_flags: [kru_coop_debt]
+        effects: {money: {unit: income_x, amount: 1}, happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+
+  - id: kru_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85], flags: {has: [kru_civil]}}
+    title: "ลูกศิษย์รุ่นแรก"
+    text: "วันครูปีนี้ลูกศิษย์รุ่นแรกนัดกันมาเต็มบ้าน บางคนผมขาวกว่าคุณแล้ว คนหนึ่งยื่นสมุดการบ้านเก่าที่คุณเคยเขียนคำว่า ดีมาก ด้วยปากกาแดง เขาเก็บไว้ตั้งแต่ ป.สาม"
+    choices:
+      - id: cry
+        text: "รับพานไหว้ทั้งน้ำตา"
+        effects: {happiness: 3, relations: 2}
+        merit: [{cat: neutral}]
+      - id: quiz
+        text: "ถามสูตรคูณแม่เจ็ดทั้งวง"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: tutor_free
+        text: "เปิดบ้านสอนหนังสือหลานศิษย์ฟรี"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: photo
+        text: "ขอถ่ายรูปหมู่เก็บไว้"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
