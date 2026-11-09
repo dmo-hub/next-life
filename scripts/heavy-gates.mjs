@@ -69,7 +69,9 @@ async function collect([runId, outDir = `heavy-gates-${runId}`]) {
     const dir = join(outDir, a.name);
     writeFileSync(zip, Buffer.from(await res.arrayBuffer()));
     mkdirSync(dir, { recursive: true });
-    execFileSync('tar', ['-xf', zip, '-C', dir]);
+    // Windows' own tar reads zip; the GNU tar that Git Bash puts first on PATH cannot.
+    const tar = process.platform === 'win32' ? join(process.env.SystemRoot, 'System32', 'tar.exe') : 'bsdtar';
+    execFileSync(tar, ['-xf', `${a.name}.zip`, '-C', a.name], { cwd: outDir });
     rmSync(zip);
     console.log(join(dir, 'gate.log'));
   }
