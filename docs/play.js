@@ -266,6 +266,9 @@ const BOND_CARE_PER_REL = 2;
 const KIN_AID = { from: 60, base: 50, span: 120, scale: 0.5, roles: ['spouse', 'child', 'grandchild'] };
 // แก่แล้วไม่เหลือคนในบ้านที่ยังอยู่ (คู่ ลูก หลาน สัตว์คู่ใจ) = เสียความสุข/สุขภาพต่อปี · ไม่ดึงเลขสุ่ม — ค่าตั้งของเกม (B167)
 const KIN_LONELY = { from: 65, happiness: 2, health: 0.3 };
+// ลูกอยู่ไกล (m.far): ยังเป็นคนในบ้านทุกเรื่อง ต่างจาก left ที่หลุดจากธง has_kids การ์ดเรียกชื่อ ญาติช่วย และความเหงา
+// ความผูกพันลดเพิ่มปีละเท่านี้ แม้ปีนั้นได้ดูแล · ไม่ทะลุ BOND_FLOOR
+const KIN_FAR = { decay: 2 };
 // เราดูแลพ่อแม่แบบไหน (B167) — ตัวเลือกการ์ดดูแลพ่อแม่ติด filial · จดเฉพาะชีวิตนี้ ไม่ส่งต่อรุ่น
 // way = วิธีครั้งล่าสุด (การ์ดชราให้ลูกทำแบบเดียวกัน) · score = บุญดูแลพ่อแม่ − บาปทำร้ายผู้ใหญ่ ตามระดับของตัวเลือก
 // ถึงอายุ at ลูกที่ยังอยู่ได้ bond ± step × score (ไม่เกิน cap) — ลูกที่เห็นเราดูแลพ่อแม่ผูกพันกับเรามากขึ้น · kinAid ทำงานต่อเอง
@@ -321,7 +324,7 @@ function newKin(seed) {
 }
 
 // ชื่อทุกคนในบ้าน (รวมรุ่นก่อนในผังตระกูล) — ชื่อใหม่เลี่ยงชุดนี้
-const kinTakenNames = (st) => [st.name, ...st.parents.map((p) => p.name), ...st.kin.map((m) => m.name), ...(st.lineage ?? []).map((l) => l.name)].filter(Boolean);
+const kinTakenNames = (st) => [st.name, ...st.parents.map((p) => p.name), ...st.kin.flatMap((m) => [m.name, m.mate]), ...(st.lineage ?? []).map((l) => l.name)].filter(Boolean);
 
 // พ่อแม่ที่ยังไม่มีชื่อ (ชีวิตแรก/ทางเกิดใหม่) ได้ชื่อจาก seed ตามยุคปีเกิดของเขา — ไม่ดึงเลขสุ่ม ไม่แตะชื่อผู้เล่น
 function nameParents(st) {
@@ -429,6 +432,10 @@ function applyFamily(st, c, care = 0) {
     if (op.add) for (let i = 0; i < (op.n ?? 1); i++) addMember(st, op.add, ANIMAL.includes(op.add) ? { kind: op.kind, life: op.life, name: op.name } : {});
     if (op.bond) bondAdd(st, bondTargets(st, op.bond), op.d);
     if (op.leave) for (const m of livingOf(st, op.leave)) m.left = true;
+    if (op.far || op.back) {
+      const m = focusOf(st, op.far ?? op.back);
+      if (m?.alive) m.far = !!op.far;
+    }
     if (op.die === 'parent') {
       const p = st.parents.find((x) => x.alive);
       if (p) {
@@ -473,6 +480,7 @@ function kinYearlyBond(st) {
     }
   }
   st.kinCared = false;
+  for (const m of st.kin) if (m.far && m.alive && m.bond > BOND_FLOOR) m.bond = Math.max(BOND_FLOOR, m.bond - KIN_FAR.decay);
   if (st.age >= KIN_LONELY.from && (KIN_LONELY.happiness || KIN_LONELY.health) && !st.kin.some((m) => KIN_HOUSEHOLD.includes(m.role) && m.alive && !m.left)) {
     st.happiness = bondClamp(st.happiness - KIN_LONELY.happiness);
     st.health = bondClamp(st.health - KIN_LONELY.health);
@@ -591,6 +599,29 @@ function spouseYears(st) {
 }
 // ชื่อที่การ์ดสูญเสียเรียก — สัตว์เรียกแบบ petCall
 const lossCall = (l) => (ANIMAL.includes(l.role) ? petCall(l) : l.name);
+
+// ลูกที่การ์ดย้ายไกล/กลับพร้อมหลานพูดถึง: far = อยู่ไกลอยู่ไหม · age = อายุลูก · grandkids = ต้องมีหลานที่ยังอยู่จากลูกคนนี้
+const grandkidsOf = (st, m) => st.kin.filter((g) => g.role === 'grandchild' && g.of === m.id && g.alive && !g.left);
+const childFarList = (st, w) => {
+  const year = kinYearOf(st);
+  return st.kin.filter((m) => m.role === 'child' && m.alive && !m.left && !!m.far === w.far && kinInRange(year - m.born, w.age) && (!w.grandkids || grandkidsOf(st, m).length));
+};
+const childFarOk = (st, w) => childFarList(st, w).length > 0;
+// การ์ด when.child_far ต้องเรียกลูกคนที่ตรงเงื่อนไข ไม่ใช่คนที่ pickFocus สุ่มได้ · เอาคนโตสุด ไม่ดึงเลขสุ่ม
+function focusChildFar(st, w) {
+  const m = childFarList(st, w)[0];
+  if (!m) return;
+  st.kinFocus.child = m.id;
+  const g = grandkidsOf(st, m)[0];
+  if (g) st.kinFocus.grandchild = g.id;
+}
+// ชื่อคู่ของลูกอยู่บนตัวลูก ไม่ใช่สมาชิกอีกคน · สุ่มจาก seed+id ครั้งแรกที่ถูกเรียก ไม่ดึง kinRng เซฟเก่าจึงได้ชื่อเอง
+function childMate(st, m) {
+  if (!m) return null;
+  m.mate ??= pickName(mixSeed(st.seed, 0x3a7e + m.id), kinOtherSex(m.sex), m.born, st.content.era.names, kinTakenNames(st));
+  return m.mate;
+}
+const childMateWord = (m) => (m?.sex === 'หญิง' ? 'ลูกเขย' : 'ลูกสะใภ้');
 
 // เงื่อนไขครอบครัวของการ์ด (when.family / requires.family): บทบาท · เพศ · ยังอยู่ · ช่วงอายุ · จำนวน
 // ไม่ใส่ count = ต้องมีอย่างน้อย 1 คนที่ตรง · คู่ที่หย่าแล้วไม่นับเป็นคู่ครอง
@@ -3472,6 +3503,8 @@ const FILL = {
   ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
   ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
   ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',
+  ชื่อคู่ลูก: (st) => childMate(st, focusOf(st, 'child')) ?? 'คู่ของลูก',
+  คำคู่ลูก: (st) => (focusOf(st, 'child') ? childMateWord(focusOf(st, 'child')) : 'คู่ของลูก'),
   ชื่อผู้จากไป: (st) => (lastLoss(st) ? lossCall(lastLoss(st)) : 'คนในบ้าน'),
   ชื่อคู่เก่า: (st) => lastSpouseLoss(st)?.name ?? 'คู่ชีวิตคนก่อน',
   ปีคู่เก่า: (st) => (spouseYears(st) ? `${spouseYears(st)} ปี` : 'หลายปี'),
@@ -4190,6 +4223,7 @@ const ERA_NEWS = { merge: true };
 // news = ข่าวบ้านเมืองที่รวมมาเป็นบรรทัดนำ (B58) — การ์ดยังเป็นของเหตุการณ์ ตัวเลือก/เซฟเดินเหมือนเดิม
 function eventCard(st, ev, news = null, echoFrom = undefined) {
   pickFocus(st);
+  if (ev.when?.child_far) focusChildFar(st, ev.when.child_far);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
@@ -4755,6 +4789,7 @@ function whenOk(st, when) {
   if (when.loss && !lossOk(st, when.loss)) return false;
   if (when.illness && !illnessOk(st, when.illness)) return false;
   if (when.kin_illness && !kinIllOk(st, when.kin_illness)) return false;
+  if (when.child_far && !childFarOk(st, when.child_far)) return false;
   if (when.filial && !filialOk(st, when.filial)) return false;
   if (when.heredity && !heredityOk(st, when.heredity)) return false;
   if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
