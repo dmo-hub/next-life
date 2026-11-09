@@ -153,6 +153,9 @@ function checkMultipliers(m, at, r) {
   for (const k of MONEY_KEYS) if (m[k] !== undefined && !(ratioBound(m[k]) && positive(m[k].v))) r(`${at}.${k}`, 'ต้องเป็น {min, max, v} อัตราส่วน ≥ 0 อย่างน้อยหนึ่งขอบ v เป็นเลขบวก');
 }
 
+// ธงทายาทของเส้นเตรียมทหาร (พ่อ/แม่เคยรับราชการ) · ตัวแทนที่ต้องกั้นด้วยธงนี้
+const HEIR_FLAGS = ['army_family', 'police_family'];
+const HEIR_PH = /\{ทายาท:|\{ผู้ใหญ่ทายาท\}|\{ทางแม่\}/;
 // ป้ายราคาทางลัดดำ (B156): ผู้เล่นเห็นระดับบาปเป็นคำ ไม่เห็นตัวเลข · ระดับ 3 ขึ้นไปรวมเป็นหนักมาก
 const SIN_PRICE = { 1: 'บาปเบา', 2: 'บาปหนัก', 3: 'บาปหนักมาก' };
 const SIN_PRICE_RE = /ราคา: (บาปหนักมาก|บาปหนัก|บาปเบา)/;
@@ -310,6 +313,22 @@ export const rules = [
       const span = STAGE_AGES[e.stage];
       if (!isInt(e.at_age) || !span || e.at_age < span[0] || e.at_age > span[1]) {
         r('.at_age', `at_age ${e.at_age} ไม่อยู่ในช่วง ${e.stage}${span ? ` (${span[0]}–${span[1]})` : ''}`);
+      }
+    },
+  },
+  {
+    // R1 ของ S3 (B1 · g-b7 สั่ง 2026-11-09): ตัวแทนฝั่งทายาทเล่าถึงคนในบ้านที่เคยรับราชการ — ชีวิตที่ไม่ใช่ลูกทหาร/ตำรวจได้ "พ่อเล่าเรื่องสมัยหนุ่ม" ผิด ๆ
+    id: 'heir-unguarded',
+    desc: `ข้อความที่ใช้ {ทายาท:…} {ผู้ใหญ่ทายาท} {ทางแม่} ต้องกั้นด้วยธงทายาท (${HEIR_FLAGS.join(' / ')}): when.parent_flags.has ทั้งใบ หรือ show_if.parent_flags.has ของตัวเลือกนั้น`,
+    event(e, ctx, r) {
+      const guarded = (w) => list(w?.parent_flags?.has).some((f) => HEIR_FLAGS.includes(f));
+      if (guarded(e.when)) return;
+      const heirText = (s) => typeof s === 'string' && HEIR_PH.test(s);
+      if (heirText(e.title) || heirText(e.text)) r('.text', 'ใช้ตัวแทนฝั่งทายาท แต่การ์ดไม่กั้นด้วยธงทายาท');
+      for (const { c, path } of choicesOf(e)) {
+        if (guarded(c.show_if)) continue;
+        const texts = [c.text, c.label, c.hint, c.result, c.requires?.reason, ...Object.values(c.requires?.reasons ?? {}), ...list(c.outcomes).map((o) => o?.text)];
+        if (texts.some(heirText)) r(path, 'ตัวเลือกใช้ตัวแทนฝั่งทายาท แต่ไม่กั้นด้วยธงทายาท (ทั้งใบหรือ show_if ของตัวเลือก)');
       }
     },
   },

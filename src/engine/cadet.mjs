@@ -100,7 +100,9 @@ const CADET = (() => {
     if (o.lock) return o.lock;
     const r = o.requires;
     if (!r || reqOk(st, r)) return null;
-    const own = Object.keys(r.reasons ?? {}).find((k) => k in r && !reqOk(st, { [k]: r[k] }));
+    // R3 (เจ้าของเคาะ 2026-11-09): เหตุเรื่องเล่าก่อนเหตุเงิน
+    const keys = Object.keys(r.reasons ?? {}).sort((a, b) => (a === 'money') - (b === 'money'));
+    const own = keys.find((k) => k in r && !reqOk(st, { [k]: r[k] }));
     return fill(own ? r.reasons[own] : o.lockReason ?? 'ยังเลือกไม่ได้', st);
   }
   // show_if / hide_if (B1 · เดโมเขียน showIf/hideIf): เงื่อนไขแบบ condOk · ไม่ตรง = ตัดตัวเลือกออก (ไม่โชว์ล็อก)

@@ -2109,7 +2109,9 @@ const CADET = (() => {
     if (o.lock) return o.lock;
     const r = o.requires;
     if (!r || reqOk(st, r)) return null;
-    const own = Object.keys(r.reasons ?? {}).find((k) => k in r && !reqOk(st, { [k]: r[k] }));
+    // R3 (เจ้าของเคาะ 2026-11-09): เหตุเรื่องเล่าก่อนเหตุเงิน
+    const keys = Object.keys(r.reasons ?? {}).sort((a, b) => (a === 'money') - (b === 'money'));
+    const own = keys.find((k) => k in r && !reqOk(st, { [k]: r[k] }));
     return fill(own ? r.reasons[own] : o.lockReason ?? 'ยังเลือกไม่ได้', st);
   }
   // show_if / hide_if (B1 · เดโมเขียน showIf/hideIf): เงื่อนไขแบบ condOk · ไม่ตรง = ตัดตัวเลือกออก (ไม่โชว์ล็อก)
@@ -4541,8 +4543,9 @@ function lockReason(st, c, extra = 0) {
   if (q.edu && eduRank(st.edu) < eduRank(q.edu)) why.push(['edu', 'วุฒิไม่ถึง']);
   if (q.family && !q.family.every((f) => familyOk(st, f))) why.push(['family', familyWhy(q.family)]);
   if (!why.length) return null;
-  // เหตุแยกข้อมาก่อน (ข้อแรกที่ไม่ผ่านและมีเหตุเขียนไว้) · ไม่มี = reason รวม · ไม่มีทั้งคู่ = เหตุอัตโนมัติ
-  const own = why.find(([k]) => q.reasons?.[k]);
+  // เหตุแยกข้อมาก่อน · R3 (เจ้าของเคาะ 2026-11-09): เหตุเรื่องเล่าก่อนเหตุเงิน (แอบสอบ + เงินไม่พอ → "ต้องให้ที่บ้านเซ็นยินยอม")
+  // ไม่มีเหตุแยกข้อ = reason รวม · ไม่มีทั้งคู่ = เหตุอัตโนมัติ
+  const own = why.find(([k]) => k !== 'money' && q.reasons?.[k]) ?? why.find(([k]) => q.reasons?.[k]);
   if (own) return q.reasons[own[0]];
   return q.reason ?? why.map(([, t]) => t).join(' · ');
 }
