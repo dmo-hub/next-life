@@ -7,9 +7,9 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {age: [31, 45], occupation: [clerk, technician, professional, manager, factory, service]}
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager, factory, service, officer, senior_officer]}
     title: "คูปองตรวจสุขภาพ"
-    text: "บริษัทแจกคูปองตรวจสุขภาพประจำปี ต้องลางานครึ่งวันไปเจาะเลือดตั้งแต่เช้า ถ้าอยากตรวจหัวใจกับน้ำตาลละเอียดต้องจ่ายเพิ่มเอง คนในแผนกครึ่งหนึ่งไม่ไป"
+    text: "ที่ทำงานแจกคูปองตรวจสุขภาพประจำปี ต้องลางานครึ่งวันไปเจาะเลือดตั้งแต่เช้า ถ้าอยากตรวจหัวใจกับน้ำตาลละเอียดต้องจ่ายเพิ่มเอง คนในแผนกครึ่งหนึ่งไม่ไป"
     choices:
       - id: go_check
         text: "ไปตรวจละเอียด จ่ายเพิ่มเอง"

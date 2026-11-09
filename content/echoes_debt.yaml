@@ -10,7 +10,7 @@ events:
     years: [2539, 2650]
     systems: [student_loan]
     lore_ref: lore-finance-series.html#6
-    when: {occupation: [clerk, professional, manager, factory, technician, service]}
+    when: {occupation: [clerk, professional, manager, factory, technician, service, officer, senior_officer]}
     title: "บรรทัดใหม่ในสลิป"
     text: "สลิปเงินเดือนเดือนนี้มีบรรทัดใหม่ หักชำระกยศ. ผ่านนายจ้าง ฝ่ายบุคคลส่งรายชื่อเข้ากลุ่มแผนกผิดห้อง ทั้งแผนกรู้กันก่อนเที่ยงว่าใครยังค้างหนี้สมัยเรียน ทั้งที่มือถือเครื่องนั้นพังไปนานแล้ว"
     choices:
