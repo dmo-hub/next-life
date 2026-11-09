@@ -110,6 +110,7 @@ events:
           - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_cattle, after_years: [0, 0]}], merit: [{cat: neutral}]}
       - id: read_alone
         text: "บอกที่บ้าน แต่จะอ่านเองไม่ติว"
+        result: "{ผู้ใหญ่}โล่งใจ บอกว่า 'อ่านเองได้ก็ดีเลย ประหยัดไปเยอะ{ถิ่น}'"
         effects: {relations: 1}
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
@@ -156,6 +157,7 @@ events:
           - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_cattle, after_years: [0, 0]}], merit: [{cat: neutral}]}
       - id: read_alone
         text: "บอกที่บ้าน แต่จะอ่านเองไม่ติว"
+        result: "{ผู้ใหญ่}โล่งใจ บอกว่า 'อ่านเองได้ก็ดีเลย ประหยัดไปเยอะ{ถิ่น}'"
         effects: {relations: 1}
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
@@ -309,6 +311,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "ทุกวันเสาร์ไปช่วยขนของที่ร้านวัสดุ เงินในซองพอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ไม่รับเงิน จะอ่านหนังสือเอง"
+        result: "{ผู้ใหญ่}เอาซองไปคืนญาติทั้งที่ยังไม่แกะ ไม่ว่าอะไร แต่มื้อเย็นนั้นเงียบกว่าปกติ"
         effects: {happiness: -1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -350,6 +353,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "ตื่นตีห้าไปช่วยร้านในตลาดก่อนไปโรงเรียน เงินที่กู้มาพอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ขอให้เอาเงินไปคืนเขาก่อน"
+        result: "ที่บ้านเอาเงินไปคืนในวันนั้น เสียดอกแค่ไม่กี่วัน {ชื่อ} กลับไปอ่านหนังสือเอง"
         effects: {happiness: -1, relations: 1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -390,6 +394,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "ปิดเทอมไปรับจ้างในไร่ข้างบ้านช่วยส่งงวดแรก เงินกู้พอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ขอให้ยกเลิกเงินกู้ จะอ่านเอง"
+        result: "{ผู้ใหญ่}ไปขอถอนชื่อจากรอบนี้ คิวกู้ตกไปเป็นของบ้านถัดไป"
         effects: {happiness: -1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -430,6 +435,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "ปิดเทอมไปรับจ้างในไร่ข้างบ้านช่วยส่งงวดแรก เงินกู้พอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ขอให้ยกเลิกเงินกู้ จะอ่านเอง"
+        result: "{ผู้ใหญ่}ไปบอกเจ้าหน้าที่ว่าไม่กู้แล้ว {ชื่อ} กลับไปอ่านหนังสือเอง"
         effects: {happiness: -1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -470,6 +476,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "ล้างจานร้านข้าวแกงทุกเย็นเก็บไว้ไถ่สร้อย เงินจำนำพอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ขอให้ไปไถ่สร้อยคืนก่อน"
+        result: "สัปดาห์นั้นสร้อยกลับมาอยู่ที่บ้าน {ชื่อ} กลับไปอ่านหนังสือข้อสอบเก่าเอง"
         effects: {happiness: -1, relations: 1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -507,6 +514,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "หลังเลิกเรียนต้อนวัวบ้านอื่นไปกินหญ้าจนผิวลอก เงินค่าวัวพอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ขอให้ซื้อวัวคืน จะอ่านเอง"
+        result: "คนรับซื้อไม่ยอมขายวัวคืน เงินจึงเก็บไว้ใช้ในบ้าน {ชื่อ} อ่านหนังสือเอง"
         effects: {happiness: -1, relations: 1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -565,11 +573,13 @@ events:
     choices:
       - id: accept
         text: "รับไว้ ขอบคุณที่ช่วย"
+        result: "{ผู้ใหญ่}ยิ้ม 'เรื่องเงินไม่ต้องคิดแล้ว แต่นอนบ้างนะ{ถิ่น} เดี๋ยวไม่สบาย'"
         effects: {happiness: 1, relations: 2}
         sets_flags: [cadet_family_support]
         merit: [{cat: neutral}]
       - id: half
         text: "รับครึ่งเดียว อีกครึ่งออกเอง"
+        result: "{ผู้ใหญ่}หัวเราะ 'ดื้อขนาดนี้ ไปอยู่โรงเรียนประจำรอดแน่{ถิ่น}' ค่าติวเลยช่วยกันออกคนละครึ่ง"
         hint: "ค่าค่ายครึ่งหนึ่งต้องใช้เงินเก็บตัวเอง"
         effects: {happiness: 1, relations: 1}
         sets_flags: [cadet_family_support, cadet_share_half]
@@ -580,6 +590,7 @@ events:
         merit: [{cat: neutral}]
       - id: try_alone
         text: "ขอบคุณ แต่ขอลองอ่านเองก่อน"
+        result: "{ผู้ใหญ่}ไม่ตื๊อ แต่ก่อนปิดประตูบอกว่า 'ถ้าเปลี่ยนใจก็มาบอกล่ะ{ถิ่น}'"
         effects: {relations: 1}
         merit: [{cat: neutral}]
   # <<< nl-writer b003 evt cadet_family_sees
@@ -596,21 +607,25 @@ events:
     choices:
       - id: accept
         text: "รับไว้ สัญญาว่าจะตั้งใจ"
+        result: "{ผู้ใหญ่}แบ่งเงินใส่ซองแยกไว้ เขียนหน้าซองว่าค่าติว"
         effects: {relations: 1}
         sets_flags: [cadet_family_support]
         merit: [{cat: neutral}]
       - id: half
         text: "ขอครึ่งเดียว ที่เหลือหาเอง"
+        result: "ได้เงินมาก้อนหนึ่ง {ผู้ใหญ่}บอกว่าถ้าขาดเท่าไรค่อยมาว่ากัน"
         hint: "ค่าค่ายครึ่งหนึ่งต้องใช้เงินเก็บตัวเอง"
         effects: {relations: 1}
         sets_flags: [cadet_family_support, cadet_share_half]
         merit: [{cat: neutral}]
       - id: books
         text: "ขอแค่ค่าหนังสือก็พอ"
+        result: "หนังสือเตรียมสอบเล่มใหม่วางบนโต๊ะ กลิ่นกระดาษยังไม่จาง"
         effects: {knowledge: 1}
         merit: [{cat: neutral}]
       - id: keep_home
         text: "เก็บไว้ใช้ในบ้านก่อนดีกว่า"
+        result: "{ผู้ใหญ่}เงียบไปพักหนึ่ง แล้วตบไหล่เบา ๆ บอกว่าโตแล้วจริง ๆ"
         effects: {happiness: -1, relations: 2}
         merit: [{cat: neutral}]
   # <<< nl-writer b003 evt cadet_family_bonus
@@ -1003,7 +1018,15 @@ events:
     choices:
       - id: with_father
         text: "ออกไปวิ่งกับพ่อทุกเช้า"
-        requires: {family: [{role: parent, sex: ชาย, alive: true}]}
+        result: "พ่อวิ่งช้ากว่าแต่ไม่เคยหยุด สองคนคุยกันมากกว่าที่เคยคุยมาทั้งปี"
+        show_if: {family: [{role: parent, sex: ชาย, alive: true}]}
+        effects: {health: 1, relations: 1}
+        sets_flags: [sporty]
+        merit: [{cat: neutral}]
+      - id: with_neighbor
+        text: "นัดเพื่อนข้างบ้านวิ่งทุกเช้า"
+        result: "เพื่อนข้างบ้านวิ่งช้ากว่าแต่ไม่เคยผิดนัด สองคนคุยกันมากกว่าที่เคยคุยมาทั้งปี"
+        hide_if: {family: [{role: parent, sex: ชาย, alive: true}]}
         effects: {health: 1, relations: 1}
         sets_flags: [sporty]
         merit: [{cat: neutral}]
@@ -1351,6 +1374,7 @@ events:
         merit: [{cat: neutral}]
       - id: amulet
         text: "สวดมนต์ กำพระที่แม่ให้แล้วนอน"
+        result: "พระองค์เล็กที่แม่ยัดใส่กระเป๋าเสื้อตอนเช้ายังอุ่นอยู่ในมือ"
         requires: {family: [{role: parent, sex: หญิง, alive: true}]}
         show_if: {family: [{role: parent, sex: หญิง, alive: true}], flags: {not: [cadet_family_secret]}}
         effects: {happiness: 1, relations: 1}
@@ -1358,6 +1382,7 @@ events:
         merit: [{cat: neutral}]
       - id: amulet_own
         text: "สวดมนต์ กำพระประจำตัวแล้วนอน"
+        result: "พระองค์เล็กที่ห้อยคอมาตั้งแต่เด็กอุ่นอยู่ในมือ"
         hide_if: {family: [{role: parent, sex: หญิง, alive: true}], flags: {not: [cadet_family_secret]}}
         effects: {happiness: 1, relations: 1}
         schedules: [{event: cadet_exam_morning, after_years: [0, 0]}]
@@ -1410,6 +1435,7 @@ events:
           - {weight: 1, text: "นอนลืมตาฟังเสียงรถจนตีหนึ่ง", effects: {happiness: -1}, merit: [{cat: neutral}]}
       - id: amulet
         text: "สวดมนต์ กำพระที่แม่ให้แล้วนอน"
+        result: "พระองค์เล็กที่แม่ยื่นให้หลังมื้อเย็นยังอุ่นอยู่ในมือ"
         requires: {family: [{role: parent, sex: หญิง, alive: true}]}
         show_if: {family: [{role: parent, sex: หญิง, alive: true}], flags: {not: [cadet_family_secret]}}
         effects: {happiness: 1, relations: 1}
@@ -1417,6 +1443,7 @@ events:
         merit: [{cat: neutral}]
       - id: amulet_own
         text: "สวดมนต์ กำพระประจำตัวแล้วนอน"
+        result: "พระองค์เล็กที่ห้อยคอมาตั้งแต่เด็กอุ่นอยู่ในมือ"
         hide_if: {family: [{role: parent, sex: หญิง, alive: true}], flags: {not: [cadet_family_secret]}}
         effects: {happiness: 1, relations: 1}
         schedules: [{event: cadet_exam_morning, after_years: [0, 0]}]
@@ -1634,6 +1661,7 @@ events:
           - {weight: 3, text: "กลับมาตัวร้อน นอนซมไปหนึ่งวัน", effects: {health: 1}, merit: [{cat: neutral}]}
       - id: normal
         text: "ซ้อมในบ้าน วิดพื้นกับกระโดดตบ"
+        result: "ทำจนพื้นลั่น ห้องข้าง ๆ ตะโกนถามว่าทำอะไรอยู่"
         effects: {health: 1}
         merit: [{cat: neutral}]
       - id: light

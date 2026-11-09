@@ -26,6 +26,8 @@ export function textsOf(e) {
     for (const k of ['text', 'label']) if (typeof c[k] === 'string') out.push({ kind: 'choice', path: `${path}.${k}`, s: c[k] });
     // เหตุผลที่ล็อกขึ้นบนปุ่มแทนป้ายผล — ผ่านด่านความยาว/คำต้องห้ามเหมือนข้อความตัวเลือก
     if (typeof c.hint === 'string') out.push({ kind: 'hint', path: `${path}.hint`, s: c.hint });
+    // ผลทางเดียว (Q1) ผ่านด่านความยาว/คำต้องห้ามแบบข้อความผล
+    if (typeof c.result === 'string') out.push({ kind: 'text', path: `${path}.result`, s: c.result });
     if (typeof c.requires?.reason === 'string') out.push({ kind: 'choice', path: `${path}.requires.reason`, s: c.requires.reason });
     // เหตุล็อกแยกข้อ (B1 requires.reasons) ขึ้นบนปุ่มแบบเดียวกับ reason
     for (const [k, v] of Object.entries(c.requires?.reasons ?? {})) if (typeof v === 'string') out.push({ kind: 'choice', path: `${path}.requires.reasons.${k}`, s: v });

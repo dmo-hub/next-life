@@ -2171,6 +2171,9 @@ export function choose(st, idx, loan) {
       takeYearQuota(st);
       after.push({ kind: 'eraEvent', ev: follow, age: st.age });
     }
+  } else if (c.result) {
+    // ผลทางเดียว (Q1 เจ้าของเคาะ ก 2026-11-09): ตัวเลือกไม่มีผลสุ่มแต่มีข้อความผล → การ์ดผลใบเดียว ป้ายหมวดจากผลของตัวเลือก
+    after.push({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: fill(c.result, st), tag: fxTag(c.effects, [...(ev.hidden ?? []), ...(c.hidden ?? [])]), evId: ev.id });
   }
   if (because) st.because = nat.text;
   // จดหมายคำฝาก: เลือกคำฝากใบย่อยก่อน แล้วคำสั่งเสียกลับมาตามปกติ

@@ -20,7 +20,7 @@ const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
@@ -471,8 +471,11 @@ export const rules = [
     desc: 'ผลสุ่ม outcomes มีอย่างน้อย 2 ทาง แต่ละทางมี weight เลขบวก',
     event(e, ctx, r) {
       for (const { c, path } of choicesOf(e)) {
+        // ผลทางเดียว (Q1): result เป็นข้อความ · ใช้คู่กับ outcomes ไม่ได้ (ผลสุ่มเล่าผลเองแล้ว)
+        if (c.result !== undefined && (typeof c.result !== 'string' || !c.result.trim())) r(`${path}.result`, 'result ต้องเป็นข้อความ');
+        if (c.result !== undefined && c.outcomes !== undefined) r(`${path}.result`, 'มี outcomes แล้วใส่ result ไม่ได้ — เขียนข้อความผลในแต่ละทางแทน');
         if (c.outcomes === undefined) continue;
-        if (!Array.isArray(c.outcomes) || c.outcomes.length < 2) { r(`${path}.outcomes`, 'outcomes ต้องมีอย่างน้อย 2 ทาง'); continue; }
+        if (!Array.isArray(c.outcomes) || c.outcomes.length < 2) { r(`${path}.outcomes`, 'outcomes ต้องมีอย่างน้อย 2 ทาง (ผลทางเดียวใช้ result)'); continue; }
         c.outcomes.forEach((o, j) => !(isObj(o) && positive(o.weight)) && r(`${path}.outcomes[${j}]`, 'ต้องมี weight เลขบวก'));
       }
     },

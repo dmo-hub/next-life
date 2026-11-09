@@ -29,6 +29,7 @@ events:
       - id: sleep
         text: "เข้านอนเร็ว"
         effects: {health: 1}
+        result: "หลับก่อนสี่ทุ่ม {ผู้ใหญ่}ปิดไฟให้แล้วบอกว่าพรุ่งนี้สู้ ๆ{ถิ่น}"   # Q1 ผลทางเดียว
         merit: [{cat: neutral}]
       - id: read
         text: "ทวนหนังสืออีกรอบ"

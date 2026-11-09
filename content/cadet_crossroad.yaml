@@ -531,6 +531,7 @@ events:
     choices:
       - id: fix_light
         text: "รับปากจะช่วยซ่อมไฟท้ายพรุ่งนี้"
+        result: "เช้าวันรุ่งขึ้นนั่งไขน็อตไฟท้ายกับ{ผู้ใหญ่} ใช้หลอดไฟราคาไม่ถึงค่าแบงก์ใบนั้น"
         effects: {knowledge: 1, relations: 1}
         merit: [{cat: neutral}]
       - id: look_away
