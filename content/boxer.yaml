@@ -78,7 +78,7 @@ events:
     category: society
     stage: วัยรุ่น
     years: [2500, 2650]
-    weight: 3
+    weight: 0.75
     multipliers: {flags: {sporty: 2, bullied: 1.5}}
     when: {age: [13, 17]}
     title: "ซ้อมกับเด็กค่ายรุ่นน้อง"
@@ -140,7 +140,7 @@ events:
     category: health
     stage: วัยรุ่น
     years: [2500, 2650]
-    weight: 4
+    weight: 1
     when: {age: [13, 18], flags: {has: [boxer_fought]}}
     title: "ตื่นมาบนผ้าใบ"
     text: "คุณจำไม่ได้ว่าล้มตอนไหน รู้ตัวอีกทีกรรมการนับจบแล้ว ปกติต้องพักอย่างน้อยสามสัปดาห์ แต่สิบวันข้างหน้ามีคู่ที่ค่ายรับไว้แล้ว เงินมัดจำก็รับมาแล้ว หัวยังมึนเวลาก้มผูกเชือกรองเท้า"

@@ -42,7 +42,7 @@ events:
     category: society
     stage: วัยรุ่น
     years: [2500, 2650]
-    weight: 3
+    weight: 0.75
     multipliers: {flags: {singer_seed: 2}}
     when: {age: [13, 18]}
     title: "เวทีประกวดงานประจำปีอำเภอ"
