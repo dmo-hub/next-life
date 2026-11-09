@@ -3853,8 +3853,14 @@ function invest(st, { asset, share }) {
 // จบช่วงเรียน: ได้วุฒิ แล้วออกด่านเรียนต่อ หรือการ์ดหางานถ้าเป็นช่วงสุดท้าย
 function finishTrack(st, year) {
   const track = st.school && TRACKS[st.school];
-  if (!track || st.age !== track.until) return;
+  // คนที่ด่านถูกเลื่อน อาจพ้นอายุจบของช่วงเรียนที่เลือกหลังสึกแล้ว ⇒ เทียบตรงตัวจะไม่ออกด่านอีกเลย
+  if (!track || (st.age !== track.until && !(st.schoolHeld && st.age > track.until))) return;
   if (eduRank(track.edu) > eduRank(st.edu)) st.edu = track.edu;
+  // ด่านเรียนต่อ/หางานเป็นทางเลือกของฆราวาส ⇒ บวชอยู่ได้วุฒิก่อน แล้วรอออกปีแรกหลังสึก
+  if (st.outside && (st.outside.kind === 'monk' || st.schoolHeld)) {
+    st.schoolHeld = true;
+    return;
+  }
   // เส้นเตรียมทหาร (OQ-1 เจ้าของเคาะ): ยังถือธงฝัน/กำลังอยู่ในสนามสอบ = ด่านจบ ม.6/ปวช. รอจนรู้ผล (trackExit ออกทีหลังใน afterChoice)
   // เฉพาะ ม.ปลาย/ปวช. — ด่านจบ ม.ต้น (เลือกเรียนต่อ) ต้องออกตามเวลา ไม่งั้นเลือก ม.ปลายช้าเกินอายุจบแล้วค้างในโรงเรียน
   if (cadetLive(st) && (st.school === 'upper' || st.school === 'voc')) {
@@ -4137,7 +4143,7 @@ const HERALD_FLAG = 'braced:';
 function preludes(st, exam, year) {
   const out = [];
   for (const ev of st.content.events) {
-    if (ev.prelude?.before !== exam || st.done[ev.id] || !inYears(ev, year) || !whenOk(st, ev.when) || !beliefOk(st, ev)) continue;
+    if (ev.prelude?.before !== exam || st.done[ev.id] || !inYears(ev, year) || !whenOk(st, ev.when) || !beliefOk(st, ev) || !awayOk(st, ev)) continue;
     if (st.rng.next() >= ev.prelude.chance) continue;
     st.done[ev.id] = true;
     st.fired[ev.id] = { n: 1, age: st.age };
