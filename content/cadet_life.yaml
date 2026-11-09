@@ -1,6 +1,10 @@
 # ชีวิตเด็กเตรียมทหาร (อายุ 13–18) — การ์ดกองสุ่มหลังตัดสินใจสอบ (ถือ cadet_dream)
 # ระหว่างถือ cadet_dream กองสุ่มวัยรุ่นจั่วเฉพาะใบที่ when.flags.has มี cadet_dream (numbers.pool_focus_flag ใน rules/cadet.yaml)
-# ยกจากเดโม data-06.js (MIL1–MIL12 · เจ้าของ 2026-11-06) · ตัดบรรทัดตามบริบท (ภาค/ชนชั้น/ค่ายติว) เพราะ schema การ์ดยังไม่มี
+# ยกจากเดโม data-06.js (MIL1–MIL12 · เจ้าของ 2026-11-06) · ผล 2 ทาง + การ์ดแยกตามบริบท ตาม .claude/research/cadet-life-outcomes.md (เจ้าของเคาะ 2026-11-06)
+# ผล A น้ำหนัก 3 = ประโยคเดโม · ผล B น้ำหนัก 1 = ประโยคใหม่ ค่าเท่า A ทุกข้อ
+# การ์ดแยก (ชื่อเดิม + บรรทัดตามบริบทต่อท้าย) เงื่อนไขไม่ซ้อนกับใบหลัก: ชนชั้นจน/ไม่จน · ภาค · ธง cadet_prep_camp · ปียุค
+# ธง cadet_life_seen:<เรื่อง> กันเห็นเรื่องเดียวกันสองใบ เมื่อบริบทเปลี่ยนกลางวัยรุ่น (ได้ธงค่ายติว · ข้ามปี · เลื่อนชนชั้น/ย้ายภาค)
+# branch_map แยกที่ numbers.mobile_year (2542) — ทะเบียน numbers.era_cards ใน rules/cadet.yaml · build ตรวจปีให้ตรงเสมอ
 events:
   - id: cadet_life_first_crewcut
     type: A
@@ -16,34 +20,198 @@ events:
       age:
         - 13
         - 17
+      class:
+        - ชนชั้นกลางล่าง
+        - ชนชั้นกลาง
+        - ชนชั้นกลางบน
+        - มีอันจะกิน
+        - ร่ำรวย
+        - มั่งคั่ง
       flags:
         has:
           - cadet_dream
+        not:
+          - cadet_life_seen:first_crewcut
     title: หัวเกรียนครั้งแรก
     text: ร้านตัดผมหน้าตลาดมีรูปทรงผมนักเรียนเตรียมทหารติดข้างกระจก ช่างถามว่าเอาแบบเดิมหรือแบบในรูป
     choices:
       - id: c1
         text: เอาแบบในรูป เกรียนสามด้าน
-        effects:
-          happiness: 1
+        outcomes:
+          - weight: 3
+            text: ลูบหัวตัวเองทั้งทางกลับบ้าน เย็นนั้นที่บ้านหัวเราะแต่ก็ชม
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ช่างมือหนักไปหน่อย ด้านซ้ายสั้นกว่าด้านขวา ใส่หมวกไปโรงเรียนอยู่สามวัน
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:first_crewcut
         merit:
           - cat: neutral
       - id: c2
         text: ขอสั้นกว่าเดิมนิดเดียวก่อน
-        effects:
-          relations: 1
+        outcomes:
+          - weight: 3
+            text: ครูฝ่ายปกครองผ่านมาเห็นแล้วพยักหน้า
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ไม่มีใครสังเกตว่าตัดผมมา ยกเว้นแม่ค้าข้าวเหนียวหน้าโรงเรียน
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:first_crewcut
         merit:
           - cat: neutral
       - id: c3
         text: ถามช่างว่าใครที่สอบติดเคยมาตัด
-        effects:
-          network: 1
+        outcomes:
+          - weight: 3
+            text: ช่างเล่าถึงลูกค้าสามคนที่ติดเมื่อปีก่อน หนึ่งในนั้นยังแวะมาตัดทุกครั้งที่ลาพัก
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ช่างนึกไม่ออกสักคน แต่เล่าเรื่องลูกชายตัวเองที่สอบไม่ติดจนตัดเสร็จ
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:first_crewcut
         merit:
           - cat: neutral
       - id: c4
         text: ไว้ผมยาวต่ออีกปี
-        effects:
-          happiness: 1
+        outcomes:
+          - weight: 3
+            text: ยังไม่ถึงเวลา เก็บรูปทรงผมนั้นไว้ในใจก่อน
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เดินออกจากร้านแล้วหันกลับไปมองรูปนั้นอีกที
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:first_crewcut
+        merit:
+          - cat: neutral
+  - id: cadet_life_first_crewcut_poor
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 1
+    when:
+      sex:
+        - ชาย
+      age:
+        - 13
+        - 15
+      class:
+        - ยากไร้
+        - ยากจนมาก
+        - ยากจน
+        - ค่อนข้างจน
+      flags:
+        has:
+          - cadet_dream
+        not:
+          - cadet_life_seen:first_crewcut
+    title: หัวเกรียนครั้งแรก
+    text: ร้านตัดผมหน้าตลาดมีรูปทรงผมนักเรียนเตรียมทหารติดข้างกระจก ช่างถามว่าเอาแบบเดิมหรือแบบในรูป ค่าตัดสามสิบบาท เท่ากันทั้งสองแบบ
+    choices:
+      - id: c1
+        text: เอาแบบในรูป เกรียนสามด้าน
+        outcomes:
+          - weight: 3
+            text: ลูบหัวตัวเองทั้งทางกลับบ้าน เย็นนั้นที่บ้านหัวเราะแต่ก็ชม
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ช่างมือหนักไปหน่อย ด้านซ้ายสั้นกว่าด้านขวา ใส่หมวกไปโรงเรียนอยู่สามวัน
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:first_crewcut
+        merit:
+          - cat: neutral
+      - id: c2
+        text: ขอสั้นกว่าเดิมนิดเดียวก่อน
+        outcomes:
+          - weight: 3
+            text: ครูฝ่ายปกครองผ่านมาเห็นแล้วพยักหน้า
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ไม่มีใครสังเกตว่าตัดผมมา ยกเว้นแม่ค้าข้าวเหนียวหน้าโรงเรียน
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:first_crewcut
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ถามช่างว่าใครที่สอบติดเคยมาตัด
+        outcomes:
+          - weight: 3
+            text: ช่างเล่าถึงลูกค้าสามคนที่ติดเมื่อปีก่อน หนึ่งในนั้นยังแวะมาตัดทุกครั้งที่ลาพัก
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ช่างนึกไม่ออกสักคน แต่เล่าเรื่องลูกชายตัวเองที่สอบไม่ติดจนตัดเสร็จ
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:first_crewcut
+        merit:
+          - cat: neutral
+      - id: c4
+        text: ไว้ผมยาวต่ออีกปี
+        outcomes:
+          - weight: 3
+            text: ยังไม่ถึงเวลา เก็บรูปทรงผมนั้นไว้ในใจก่อน
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เดินออกจากร้านแล้วหันกลับไปมองรูปนั้นอีกที
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:first_crewcut
         merit:
           - cat: neutral
   - id: cadet_life_rd_drill
@@ -71,26 +239,70 @@ events:
     choices:
       - id: c1
         text: ยืนตรงต่อ ไม่กะพริบตา
-        effects:
-          health: 1
+        outcomes:
+          - weight: 3
+            text: ครูฝึกจดชื่อไว้ในสมุด บอกว่าคนนี้ไปได้
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ยืนจนตาพร่า แต่ไม่ล้ม ครูฝึกเดินผ่านไปเฉย ๆ
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c2
         text: ขานรับเสียงดังกว่าทุกคน
-        effects:
-          network: 1
+        outcomes:
+          - weight: 3
+            text: ทั้งแถวหันมามอง ครูฝึกยิ้มมุมปาก
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ครูฝึกสั่งให้ขานใหม่อีกสามรอบ ทั้งแถวหัวเราะ
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c3
         text: ถามครูฝึกเรื่องสอบเตรียมทหาร
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: ครูฝึกเล่าว่าสนามพลศึกษาจริงร้อนกว่านี้อีก ให้ซ้อมกลางแดดไว้
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ครูฝึกบอกว่าถามผิดเวลา ไว้หลังเลิกแถวค่อยมาคุย
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c4
         text: พยุงเพื่อนที่เป็นลมไปหลบร่ม
-        effects:
-          relations: 1
+        outcomes:
+          - weight: 3
+            text: ครูฝึกเห็น ไม่ได้ดุสักคำ
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ครูฝึกเรียกกลับเข้าแถว เพื่อนที่เป็นลมพยักหน้าขอบใจตามหลัง
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
   - id: cadet_life_kids_day_camp
@@ -107,34 +319,294 @@ events:
       age:
         - 13
         - 17
+      region:
+        - กลาง
+        - กรุงเทพฯ และปริมณฑล
+        - ตะวันตก
+        - ตะวันออกเฉียงเหนือ
       flags:
         has:
           - cadet_dream
+        not:
+          - cadet_life_seen:kids_day_camp
     title: วันเด็กในค่าย
     text: วันเด็กปีนี้ค่ายทหารใกล้บ้านเปิดให้เข้าชม รถถังจอดเรียงให้ปีน เด็กเล็กต่อแถวยาว {ชื่อ} มากับน้องข้างบ้าน แต่สายตาไปหยุดที่โต๊ะรับสมัครข้อมูลโรงเรียนเตรียมทหาร
     choices:
       - id: c1
         text: ไปยืนถามที่โต๊ะรับสมัคร
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: ได้แผ่นพับมาแผ่นหนึ่ง พี่ที่โต๊ะเขียนเบอร์ติดต่อไว้ให้
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: คนต่อแถวยาว ได้แผ่นพับแผ่นสุดท้ายพอดี
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
         merit:
           - cat: neutral
       - id: c2
         text: พาน้องไปปีนรถถังก่อน
-        effects:
-          relations: 1
+        outcomes:
+          - weight: 3
+            text: น้องหัวเราะจนเสียงแหบ ขากลับเพิ่งได้แวะโต๊ะรับสมัคร
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: กว่าน้องจะยอมลงจากรถถัง โต๊ะรับสมัครก็เก็บของแล้ว
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
         merit:
           - cat: neutral
       - id: c3
         text: ถ่ายรูปคู่กับทหารที่ยืนเวร
-        effects:
-          happiness: 1
+        outcomes:
+          - weight: 3
+            text: รูปนั้นถูกพิมพ์ใส่กรอบตั้งไว้ข้างหนังสือ
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ทหารยืนนิ่งไม่ยิ้มสักนิด รูปออกมาเหมือนถ่ายกับรูปปั้น
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
         merit:
           - cat: neutral
       - id: c4
         text: แอบดูทหารใหม่ฝึกแถวหลังเต็นท์
-        effects:
-          health: 1
+        outcomes:
+          - weight: 3
+            text: จำท่าซ้ายหันขวาหันกลับมาซ้อมเองที่บ้าน
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ทหารยามเดินมาไล่ให้ไปดูรถถังตรงหน้าแทน
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
+        merit:
+          - cat: neutral
+  - id: cadet_life_kids_day_camp_navy
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 1
+    when:
+      sex:
+        - ชาย
+      age:
+        - 13
+        - 14
+      region:
+        - ใต้
+        - ตะวันออก
+      flags:
+        has:
+          - cadet_dream
+        not:
+          - cadet_life_seen:kids_day_camp
+    title: วันเด็กในค่าย
+    text: วันเด็กปีนี้ค่ายทหารใกล้บ้านเปิดให้เข้าชม รถถังจอดเรียงให้ปีน เด็กเล็กต่อแถวยาว {ชื่อ} มากับน้องข้างบ้าน แต่สายตาไปหยุดที่โต๊ะรับสมัครข้อมูลโรงเรียนเตรียมทหาร ปีนี้ฐานทัพเรือเปิดให้ขึ้นเรือรบด้วย คิวยาวกว่ารถถังสองเท่า
+    choices:
+      - id: c1
+        text: ไปยืนถามที่โต๊ะรับสมัคร
+        outcomes:
+          - weight: 3
+            text: ได้แผ่นพับมาแผ่นหนึ่ง พี่ที่โต๊ะเขียนเบอร์ติดต่อไว้ให้
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: คนต่อแถวยาว ได้แผ่นพับแผ่นสุดท้ายพอดี
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
+        merit:
+          - cat: neutral
+      - id: c2
+        text: พาน้องไปปีนรถถังก่อน
+        outcomes:
+          - weight: 3
+            text: น้องหัวเราะจนเสียงแหบ ขากลับเพิ่งได้แวะโต๊ะรับสมัคร
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: กว่าน้องจะยอมลงจากรถถัง โต๊ะรับสมัครก็เก็บของแล้ว
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ถ่ายรูปคู่กับทหารที่ยืนเวร
+        outcomes:
+          - weight: 3
+            text: รูปนั้นถูกพิมพ์ใส่กรอบตั้งไว้ข้างหนังสือ
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ทหารยืนนิ่งไม่ยิ้มสักนิด รูปออกมาเหมือนถ่ายกับรูปปั้น
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
+        merit:
+          - cat: neutral
+      - id: c4
+        text: แอบดูทหารใหม่ฝึกแถวหลังเต็นท์
+        outcomes:
+          - weight: 3
+            text: จำท่าซ้ายหันขวาหันกลับมาซ้อมเองที่บ้าน
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ทหารยามเดินมาไล่ให้ไปดูรถถังตรงหน้าแทน
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
+        merit:
+          - cat: neutral
+  - id: cadet_life_kids_day_camp_air
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 1
+    when:
+      sex:
+        - ชาย
+      age:
+        - 13
+        - 14
+      region:
+        - เหนือ
+      flags:
+        has:
+          - cadet_dream
+        not:
+          - cadet_life_seen:kids_day_camp
+    title: วันเด็กในค่าย
+    text: วันเด็กปีนี้ค่ายทหารใกล้บ้านเปิดให้เข้าชม รถถังจอดเรียงให้ปีน เด็กเล็กต่อแถวยาว {ชื่อ} มากับน้องข้างบ้าน แต่สายตาไปหยุดที่โต๊ะรับสมัครข้อมูลโรงเรียนเตรียมทหาร ฝั่งกองบินมีเครื่องบินฝึกจอดให้ถ่ายรูป
+    choices:
+      - id: c1
+        text: ไปยืนถามที่โต๊ะรับสมัคร
+        outcomes:
+          - weight: 3
+            text: ได้แผ่นพับมาแผ่นหนึ่ง พี่ที่โต๊ะเขียนเบอร์ติดต่อไว้ให้
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: คนต่อแถวยาว ได้แผ่นพับแผ่นสุดท้ายพอดี
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
+        merit:
+          - cat: neutral
+      - id: c2
+        text: พาน้องไปปีนรถถังก่อน
+        outcomes:
+          - weight: 3
+            text: น้องหัวเราะจนเสียงแหบ ขากลับเพิ่งได้แวะโต๊ะรับสมัคร
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: กว่าน้องจะยอมลงจากรถถัง โต๊ะรับสมัครก็เก็บของแล้ว
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ถ่ายรูปคู่กับทหารที่ยืนเวร
+        outcomes:
+          - weight: 3
+            text: รูปนั้นถูกพิมพ์ใส่กรอบตั้งไว้ข้างหนังสือ
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ทหารยืนนิ่งไม่ยิ้มสักนิด รูปออกมาเหมือนถ่ายกับรูปปั้น
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
+        merit:
+          - cat: neutral
+      - id: c4
+        text: แอบดูทหารใหม่ฝึกแถวหลังเต็นท์
+        outcomes:
+          - weight: 3
+            text: จำท่าซ้ายหันขวาหันกลับมาซ้อมเองที่บ้าน
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ทหารยามเดินมาไล่ให้ไปดูรถถังตรงหน้าแทน
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:kids_day_camp
         merit:
           - cat: neutral
   - id: cadet_life_nickname_captain
@@ -159,29 +631,177 @@ events:
     choices:
       - id: c1
         text: วันทยหัตถ์ตอบให้ถูกท่า
-        effects:
-          relations: 1
+        outcomes:
+          - weight: 3
+            text: ทั้งห้องปรบมือ ฉายาติดไปจนจบเทอม
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ครูประจำชั้นเดินเข้ามาพอดี เลยต้องวันทยหัตถ์ครูด้วย
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c2
         text: หัวเราะไปด้วย ไม่ถือ
-        effects:
-          happiness: 1
+        outcomes:
+          - weight: 3
+            text: พอเห็นว่าไม่โกรธ เพื่อนก็เลิกล้อไปเอง
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ฉายานั้นติดอยู่อีกหลายปี เพื่อนบางคนจำชื่อจริงไม่ได้แล้ว
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c3
         text: ชวนเพื่อนที่ล้อมาวิ่งตอนเช้า
-        effects:
-          health: 1
+        outcomes:
+          - weight: 3
+            text: มาได้สามวันแล้วหายไป แต่ไม่ล้ออีกเลย
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เพื่อนมาวิ่งด้วยจริง ๆ จนจบเทอม แล้วบอกว่าจะสอบด้วย
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c4
         text: เงียบ แล้วกลับไปอ่านหนังสือ
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: ล้อแค่ไหนคะแนนก็ไม่ได้ลดลง
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เพื่อนว่าเย่อหยิ่ง ล้อหนักกว่าเดิมไปอีกพัก
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
   - id: cadet_life_evening_news
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2557
+    weight: 0.9
+    when:
+      sex:
+        - ชาย
+      age:
+        - 13
+        - 18
+      region:
+        - กลาง
+        - กรุงเทพฯ และปริมณฑล
+        - ตะวันออก
+        - ตะวันตก
+        - ใต้
+      flags:
+        has:
+          - cadet_dream
+        not:
+          - cadet_life_seen:evening_news
+    title: ข่าวภาคค่ำ
+    text: ข่าวภาคค่ำมีรายงานทหารช่วยน้ำท่วม แบกกระสอบทรายกันทั้งคืน ผู้ใหญ่ในบ้านหันมามอง {ชื่อ} แวบหนึ่ง แล้วกลับไปดูทีวีต่อ
+    choices:
+      - id: c1
+        text: ถามที่บ้านว่าถ้าเป็นเราจะไปไหม
+        outcomes:
+          - weight: 3
+            text: คุยกันจนข่าวจบ ไม่มีใครเปลี่ยนช่อง
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ผู้ใหญ่ในบ้านตอบสั้น ๆ ว่าให้สอบติดก่อนค่อยว่ากัน
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
+        merit:
+          - cat: neutral
+      - id: c2
+        text: จดชื่อหน่วยที่ไปช่วยไว้
+        outcomes:
+          - weight: 3
+            text: เปิดหาในหนังสือว่าหน่วยนั้นอยู่เหล่าไหน
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ชื่อหน่วยยาวจนจดไม่ทัน ได้มาแค่ครึ่งเดียว
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ลุกไปวิดพื้นข้างทีวี
+        outcomes:
+          - weight: 3
+            text: วิดจนข่าวกีฬาจบ
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: วิดได้ยี่สิบครั้ง ผู้ใหญ่ในบ้านบอกให้หลบ บังทีวี
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
+        merit:
+          - cat: neutral
+      - id: c4
+        text: นึกถึงตัวเองในชุดนั้น
+        outcomes:
+          - weight: 3
+            text: หลับฝันเรื่องกระสอบทรายทั้งคืน
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: นึกต่อไม่ออกว่าจะทนแบกได้กี่กระสอบ
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
+        merit:
+          - cat: neutral
+  - id: cadet_life_evening_news_near
     type: A
     category: family
     stage: วัยรุ่น
@@ -195,34 +815,195 @@ events:
       age:
         - 13
         - 18
+      region:
+        - เหนือ
+        - ตะวันออกเฉียงเหนือ
       flags:
         has:
           - cadet_dream
+        not:
+          - cadet_life_seen:evening_news
     title: ข่าวภาคค่ำ
-    text: ข่าวภาคค่ำมีรายงานทหารช่วยน้ำท่วม แบกกระสอบทรายกันทั้งคืน ผู้ใหญ่ในบ้านหันมามอง {ชื่อ} แวบหนึ่ง แล้วกลับไปดูทีวีต่อ
+    text: ข่าวภาคค่ำมีรายงานทหารช่วยน้ำท่วม แบกกระสอบทรายกันทั้งคืน ผู้ใหญ่ในบ้านหันมามอง {ชื่อ} แวบหนึ่ง แล้วกลับไปดูทีวีต่อ หมู่บ้านในข่าวอยู่ห่างไปไม่กี่อำเภอ
     choices:
       - id: c1
         text: ถามที่บ้านว่าถ้าเป็นเราจะไปไหม
-        effects:
-          relations: 1
+        outcomes:
+          - weight: 3
+            text: คุยกันจนข่าวจบ ไม่มีใครเปลี่ยนช่อง
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ผู้ใหญ่ในบ้านตอบสั้น ๆ ว่าให้สอบติดก่อนค่อยว่ากัน
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
         merit:
           - cat: neutral
       - id: c2
         text: จดชื่อหน่วยที่ไปช่วยไว้
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: เปิดหาในหนังสือว่าหน่วยนั้นอยู่เหล่าไหน
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ชื่อหน่วยยาวจนจดไม่ทัน ได้มาแค่ครึ่งเดียว
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
         merit:
           - cat: neutral
       - id: c3
         text: ลุกไปวิดพื้นข้างทีวี
-        effects:
-          health: 1
+        outcomes:
+          - weight: 3
+            text: วิดจนข่าวกีฬาจบ
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: วิดได้ยี่สิบครั้ง ผู้ใหญ่ในบ้านบอกให้หลบ บังทีวี
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
         merit:
           - cat: neutral
       - id: c4
         text: นึกถึงตัวเองในชุดนั้น
-        effects:
-          happiness: 1
+        outcomes:
+          - weight: 3
+            text: หลับฝันเรื่องกระสอบทรายทั้งคืน
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: นึกต่อไม่ออกว่าจะทนแบกได้กี่กระสอบ
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
+        merit:
+          - cat: neutral
+  - id: cadet_life_evening_news_line
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years:
+      - 2558
+      - 2650
+    weight: 0.9
+    when:
+      sex:
+        - ชาย
+      age:
+        - 13
+        - 18
+      region:
+        - กลาง
+        - กรุงเทพฯ และปริมณฑล
+        - ตะวันออก
+        - ตะวันตก
+        - ใต้
+      flags:
+        has:
+          - cadet_dream
+        not:
+          - cadet_life_seen:evening_news
+    title: ข่าวภาคค่ำ
+    text: ข่าวภาคค่ำมีรายงานทหารช่วยน้ำท่วม แบกกระสอบทรายกันทั้งคืน ผู้ใหญ่ในบ้านหันมามอง {ชื่อ} แวบหนึ่ง แล้วกลับไปดูทีวีต่อ คลิปเดียวกันมีคนแชร์ในกลุ่มไลน์ครอบครัวด้วย
+    choices:
+      - id: c1
+        text: ถามที่บ้านว่าถ้าเป็นเราจะไปไหม
+        outcomes:
+          - weight: 3
+            text: คุยกันจนข่าวจบ ไม่มีใครเปลี่ยนช่อง
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ผู้ใหญ่ในบ้านตอบสั้น ๆ ว่าให้สอบติดก่อนค่อยว่ากัน
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
+        merit:
+          - cat: neutral
+      - id: c2
+        text: จดชื่อหน่วยที่ไปช่วยไว้
+        outcomes:
+          - weight: 3
+            text: เปิดหาในหนังสือว่าหน่วยนั้นอยู่เหล่าไหน
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ชื่อหน่วยยาวจนจดไม่ทัน ได้มาแค่ครึ่งเดียว
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ลุกไปวิดพื้นข้างทีวี
+        outcomes:
+          - weight: 3
+            text: วิดจนข่าวกีฬาจบ
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: วิดได้ยี่สิบครั้ง ผู้ใหญ่ในบ้านบอกให้หลบ บังทีวี
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
+        merit:
+          - cat: neutral
+      - id: c4
+        text: นึกถึงตัวเองในชุดนั้น
+        outcomes:
+          - weight: 3
+            text: หลับฝันเรื่องกระสอบทรายทั้งคืน
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: นึกต่อไม่ออกว่าจะทนแบกได้กี่กระสอบ
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:evening_news
         merit:
           - cat: neutral
   - id: cadet_life_old_exam_swap
@@ -242,32 +1023,189 @@ events:
       flags:
         has:
           - cadet_dream
+        not:
+          - cadet_prep_camp
+          - cadet_life_seen:old_exam_swap
     title: ข้อสอบเก่าแลกกัน
     text: ที่โรงเรียนมีเด็กอีกสามคนที่จะสอบเตรียมทหารปีเดียวกัน แต่ละคนมีข้อสอบเก่าคนละชุด คนหนึ่งเสนอให้ถ่ายเอกสารแลกกัน
     choices:
       - id: c1
         text: แลกครบทุกชุด แล้วนัดติวด้วยกัน
-        effects:
-          knowledge: 1
-          relations: 1
+        outcomes:
+          - weight: 3
+            text: ห้องสมุดตอนเย็นมีโต๊ะประจำสี่คน
+            effects:
+              knowledge: 1
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: นัดได้สองครั้งก็เหลือกันสองคน แต่ข้อสอบครบทุกชุด
+            effects:
+              knowledge: 1
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:old_exam_swap
         merit:
           - cat: neutral
       - id: c2
         text: แลก แต่ขออ่านคนเดียว
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: อ่านเร็วกว่า แต่บางข้อไม่มีใครให้ถาม
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: สำเนาที่ได้มาซีดจนอ่านไม่ออกไปหลายหน้า
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:old_exam_swap
         merit:
           - cat: neutral
       - id: c3
         text: ให้ชุดของตัวเองไปฟรี ๆ
-        effects:
-          network: 1
+        outcomes:
+          - weight: 3
+            text: ปีต่อมามีคนจำได้ว่าใครให้ข้อสอบชุดนั้น
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เพื่อนรับไปแล้วไม่ได้คืน ต้องไปถ่ายเอกสารจากเพื่อนอีกที
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:old_exam_swap
         merit:
           - cat: neutral
       - id: c4
         text: ไม่แลก เก็บไว้อ่านเอง
-        effects:
-          happiness: -1
+        outcomes:
+          - weight: 3
+            text: ได้อ่านอยู่ชุดเดียว เพื่อนสามคนนั่งติวกันโดยไม่มีเรา
+            effects:
+              happiness: -1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เพื่อนสามคนเลิกชวนคุยเรื่องสอบไปเลย
+            effects:
+              happiness: -1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:old_exam_swap
+        merit:
+          - cat: neutral
+  - id: cadet_life_old_exam_swap_camp
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 1
+    when:
+      sex:
+        - ชาย
+      age:
+        - 14
+        - 17
+      flags:
+        has:
+          - cadet_dream
+          - cadet_prep_camp
+        not:
+          - cadet_life_seen:old_exam_swap
+    title: ข้อสอบเก่าแลกกัน
+    text: ที่โรงเรียนมีเด็กอีกสามคนที่จะสอบเตรียมทหารปีเดียวกัน แต่ละคนมีข้อสอบเก่าคนละชุด คนหนึ่งเสนอให้ถ่ายเอกสารแลกกัน ชุดของ {ชื่อ} มาจากค่ายติว คนอื่นอยากได้ที่สุด
+    choices:
+      - id: c1
+        text: แลกครบทุกชุด แล้วนัดติวด้วยกัน
+        outcomes:
+          - weight: 3
+            text: ห้องสมุดตอนเย็นมีโต๊ะประจำสี่คน
+            effects:
+              knowledge: 1
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: นัดได้สองครั้งก็เหลือกันสองคน แต่ข้อสอบครบทุกชุด
+            effects:
+              knowledge: 1
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:old_exam_swap
+        merit:
+          - cat: neutral
+      - id: c2
+        text: แลก แต่ขออ่านคนเดียว
+        outcomes:
+          - weight: 3
+            text: อ่านเร็วกว่า แต่บางข้อไม่มีใครให้ถาม
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: สำเนาที่ได้มาซีดจนอ่านไม่ออกไปหลายหน้า
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:old_exam_swap
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ให้ชุดของตัวเองไปฟรี ๆ
+        outcomes:
+          - weight: 3
+            text: ปีต่อมามีคนจำได้ว่าใครให้ข้อสอบชุดนั้น
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เพื่อนรับไปแล้วไม่ได้คืน ต้องไปถ่ายเอกสารจากเพื่อนอีกที
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:old_exam_swap
+        merit:
+          - cat: neutral
+      - id: c4
+        text: ไม่แลก เก็บไว้อ่านเอง
+        outcomes:
+          - weight: 3
+            text: ได้อ่านอยู่ชุดเดียว เพื่อนสามคนนั่งติวกันโดยไม่มีเรา
+            effects:
+              happiness: -1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เพื่อนสามคนเลิกชวนคุยเรื่องสอบไปเลย
+            effects:
+              happiness: -1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:old_exam_swap
         merit:
           - cat: neutral
   - id: cadet_life_oath_parade_tv
@@ -287,31 +1225,75 @@ events:
       flags:
         has:
           - cadet_dream
-    title: พิธีถวายสัตย์ทางทีวี
-    text: ทีวีถ่ายทอดพิธีสวนสนามถวายสัตย์ปฏิญาณ แถวนักเรียนนายร้อยเดินเท้าพร้อมกันจนพื้นสนามสั่น {ชื่อ} นั่งดูตั้งแต่แถวแรกจนแถวสุดท้าย
+    title: สวนสนามทางทีวี
+    text: ทีวีถ่ายทอดพิธีสวนสนามของนักเรียนนายร้อย แถวเดินเท้าพร้อมกันจนพื้นสนามสั่น {ชื่อ} นั่งดูตั้งแต่แถวแรกจนแถวสุดท้าย
     choices:
       - id: c1
         text: นับก้าวตามจนจำจังหวะได้
-        effects:
-          health: 1
+        outcomes:
+          - weight: 3
+            text: เดินในบ้านตามจังหวะนั้นจนผู้ใหญ่ในบ้านต้องหลบทาง
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: นับได้ครึ่งทางก็หลงจังหวะ ต้องรอดูแถวถัดไป
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c2
         text: ทายว่าแถวไหนเป็นเหล่าไหน
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: ทายถูกเกือบหมด ผิดแค่แถวทหารอากาศกับตำรวจ
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ทายถูกครบทุกแถว ไม่มีใครในบ้านเชื่อว่าไม่ได้โกง
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c3
         text: ชวนที่บ้านมานั่งดูด้วย
-        effects:
-          relations: 1
+        outcomes:
+          - weight: 3
+            text: ผู้ใหญ่ในบ้านถามว่าวันนั้นจะได้มาดูไหม
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ทุกคนนั่งดูได้สิบนาทีก็ขอเปลี่ยนช่องไปดูละคร
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c4
         text: ปิดทีวีแล้วไปอ่านหนังสือต่อ
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: ภาพนั้นยังวนอยู่ในหัวตอนอ่าน
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: อ่านไปได้หน้าเดียวก็กลับมาเปิดดูต่อ
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
   - id: cadet_life_conscript_home
@@ -328,39 +1310,100 @@ events:
       age:
         - 14
         - 17
+      class:
+        - ชนชั้นกลางล่าง
+        - ชนชั้นกลาง
+        - ชนชั้นกลางบน
+        - มีอันจะกิน
+        - ร่ำรวย
+        - มั่งคั่ง
       flags:
         has:
           - cadet_dream
+        not:
+          - cadet_life_seen:conscript_home
     title: พี่ทหารเกณฑ์กลับบ้าน
     text: ลูกชายบ้านท้ายซอยจับได้ใบแดงเมื่อปีก่อน วันนี้ลาพักกลับบ้าน ผิวคล้ำ หัวเกรียน นั่งอยู่ที่ร้านน้ำชาหน้าซอย
     choices:
       - id: c1
         text: ไปนั่งถามเรื่องการฝึก
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: เขาเล่าว่าสามเดือนแรกหนักที่สุด แล้วร่างกายจะชินเอง
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เขาเล่าแต่เรื่องอาหารในกองร้อย จนน้ำชาหมดกา
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:conscript_home
         merit:
           - cat: neutral
       - id: c2
         text: ขอให้สอนท่ากายบริหาร
-        effects:
-          health: 1
+        outcomes:
+          - weight: 3
+            text: สอนท่าที่ครูฝึกใช้ทุกเช้า ทำตามได้ครบรอบแรกก็หอบ
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ทำท่าแรกผิดจนเขาหัวเราะ แต่สอนซ้ำให้จนได้
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:conscript_home
         merit:
           - cat: neutral
       - id: c3
         text: ถามว่าทำไมไม่สอบเป็นนายร้อย
-        effects:
-          network: 1
+        outcomes:
+          - weight: 3
+            text: เขาหัวเราะ บอกว่าตอนนั้นไม่มีใครบอกว่ามีทางนี้
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เขาเงียบไปนาน แล้วบอกว่าสอบแล้วแต่ไม่ติด ให้ตั้งใจกว่าเขา
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:conscript_home
         merit:
           - cat: neutral
       - id: c4
         text: แค่ทักทายแล้วเดินผ่าน
-        effects:
-          happiness: 1
+        outcomes:
+          - weight: 3
+            text: เขายกมือไหว้ตอบ ยิ้มกว้างกว่าที่คิด
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เขาไม่ทันเห็น กำลังเล่าเรื่องค่ายให้ลุงร้านน้ำชาฟัง
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:conscript_home
         merit:
           - cat: neutral
-  - id: cadet_life_branch_map
+  - id: cadet_life_conscript_home_poor
     type: A
-    category: study
+    category: society
     stage: วัยรุ่น
     years:
       - 2501
@@ -372,34 +1415,289 @@ events:
       age:
         - 14
         - 17
+      class:
+        - ยากไร้
+        - ยากจนมาก
+        - ยากจน
+        - ค่อนข้างจน
       flags:
         has:
           - cadet_dream
+        not:
+          - cadet_life_seen:conscript_home
+    title: พี่ทหารเกณฑ์กลับบ้าน
+    text: ลูกชายบ้านท้ายซอยจับได้ใบแดงเมื่อปีก่อน วันนี้ลาพักกลับบ้าน ผิวคล้ำ หัวเกรียน นั่งอยู่ที่ร้านน้ำชาหน้าซอย บ้านนั้นจนพอ ๆ กับบ้าน {ชื่อ} เขาบอกว่าเงินเดือนพลทหารส่งให้แม่เขาทุกเดือน
+    choices:
+      - id: c1
+        text: ไปนั่งถามเรื่องการฝึก
+        outcomes:
+          - weight: 3
+            text: เขาเล่าว่าสามเดือนแรกหนักที่สุด แล้วร่างกายจะชินเอง
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เขาเล่าแต่เรื่องอาหารในกองร้อย จนน้ำชาหมดกา
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:conscript_home
+        merit:
+          - cat: neutral
+      - id: c2
+        text: ขอให้สอนท่ากายบริหาร
+        outcomes:
+          - weight: 3
+            text: สอนท่าที่ครูฝึกใช้ทุกเช้า ทำตามได้ครบรอบแรกก็หอบ
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ทำท่าแรกผิดจนเขาหัวเราะ แต่สอนซ้ำให้จนได้
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:conscript_home
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ถามว่าทำไมไม่สอบเป็นนายร้อย
+        outcomes:
+          - weight: 3
+            text: เขาหัวเราะ บอกว่าตอนนั้นไม่มีใครบอกว่ามีทางนี้
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เขาเงียบไปนาน แล้วบอกว่าสอบแล้วแต่ไม่ติด ให้ตั้งใจกว่าเขา
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:conscript_home
+        merit:
+          - cat: neutral
+      - id: c4
+        text: แค่ทักทายแล้วเดินผ่าน
+        outcomes:
+          - weight: 3
+            text: เขายกมือไหว้ตอบ ยิ้มกว้างกว่าที่คิด
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เขาไม่ทันเห็น กำลังเล่าเรื่องค่ายให้ลุงร้านน้ำชาฟัง
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:conscript_home
+        merit:
+          - cat: neutral
+  - id: cadet_life_branch_map
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2541
+    weight: 0.9
+    when:
+      sex:
+        - ชาย
+      age:
+        - 14
+        - 17
+      flags:
+        has:
+          - cadet_dream
+        not:
+          - cadet_life_seen:branch_map
     title: แผนที่เหล่า
     text: ครูภูมิศาสตร์ให้ทำรายงานเรื่องอะไรก็ได้ {ชื่อ} เลือกเรื่องที่ตั้งของโรงเรียนเหล่าทัพ ปักหมุดบนแผนที่ประเทศ
     choices:
       - id: c1
         text: ทำครบสี่เหล่า มีรูปประกอบ
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: ครูให้คะแนนเต็ม แล้วเอาไปติดบอร์ดหลังห้อง
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: รูปตัดจากหนังสือพิมพ์เก่า ครูถามว่าไปหามาจากไหนครบขนาดนี้
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:branch_map
         merit:
           - cat: neutral
       - id: c2
         text: เน้นเหล่าที่ใจเอียงไป
-        effects:
-          happiness: 1
+        outcomes:
+          - weight: 3
+            text: เขียนเกินหน้ากระดาษไปสองหน้า
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ครูเขียนท้ายรายงานว่า 'อีกสามเหล่าล่ะ'
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:branch_map
         merit:
           - cat: neutral
       - id: c3
         text: ชวนเพื่อนที่จะสอบด้วยกันทำ
-        effects:
-          relations: 1
+        outcomes:
+          - weight: 3
+            text: แบ่งกันคนละเหล่า เสร็จก่อนกำหนดสามวัน
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เถียงกันว่าเหล่าไหนดีที่สุดจนเกือบส่งไม่ทัน
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:branch_map
+        merit:
+          - cat: neutral
+      - id: c4
+        text: เขียนจดหมายถามรุ่นพี่ในนั้น
+        outcomes:
+          - weight: 3
+            text: รุ่นพี่เขียนจดหมายตอบมาสองหน้า เล่าเรื่องโรงนอนละเอียดทุกซอก
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: จดหมายตอบมาช้าเกือบเดือน รุ่นพี่ขอโทษที่ติดฝึก แต่เล่าเรื่องโรงนอนมาให้ครบ
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:branch_map
+        merit:
+          - cat: neutral
+  - id: cadet_life_branch_map_phone
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years:
+      - 2542
+      - 2650
+    weight: 0.9
+    when:
+      sex:
+        - ชาย
+      age:
+        - 14
+        - 17
+      flags:
+        has:
+          - cadet_dream
+        not:
+          - cadet_life_seen:branch_map
+    title: แผนที่เหล่า
+    text: ครูภูมิศาสตร์ให้ทำรายงานเรื่องอะไรก็ได้ {ชื่อ} เลือกเรื่องที่ตั้งของโรงเรียนเหล่าทัพ ปักหมุดบนแผนที่ประเทศ
+    choices:
+      - id: c1
+        text: ทำครบสี่เหล่า มีรูปประกอบ
+        outcomes:
+          - weight: 3
+            text: ครูให้คะแนนเต็ม แล้วเอาไปติดบอร์ดหลังห้อง
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: รูปตัดจากหนังสือพิมพ์เก่า ครูถามว่าไปหามาจากไหนครบขนาดนี้
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:branch_map
+        merit:
+          - cat: neutral
+      - id: c2
+        text: เน้นเหล่าที่ใจเอียงไป
+        outcomes:
+          - weight: 3
+            text: เขียนเกินหน้ากระดาษไปสองหน้า
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ครูเขียนท้ายรายงานว่า 'อีกสามเหล่าล่ะ'
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:branch_map
+        merit:
+          - cat: neutral
+      - id: c3
+        text: ชวนเพื่อนที่จะสอบด้วยกันทำ
+        outcomes:
+          - weight: 3
+            text: แบ่งกันคนละเหล่า เสร็จก่อนกำหนดสามวัน
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เถียงกันว่าเหล่าไหนดีที่สุดจนเกือบส่งไม่ทัน
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:branch_map
         merit:
           - cat: neutral
       - id: c4
         text: โทรถามรุ่นพี่ที่อยู่ในนั้นจริง
-        effects:
-          network: 1
+        outcomes:
+          - weight: 3
+            text: รุ่นพี่เล่าเรื่องโรงนอนให้ฟังจนสายตัด
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: รุ่นพี่ติดฝึก ฝากเพื่อนมาบอกว่าไว้ลาพักจะเล่าให้ฟัง
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:branch_map
         merit:
           - cat: neutral
   - id: cadet_life_tutor_billboard
@@ -419,29 +1717,177 @@ events:
       flags:
         has:
           - cadet_dream
+        not:
+          - cadet_prep_camp
+          - cadet_life_seen:tutor_billboard
     title: ป้ายหน้าค่ายติว
     text: หน้าค่ายติวในเมืองขึ้นป้ายรายชื่อคนสอบติดเมื่อปีก่อน ชื่อเรียงยาวสองแผ่น มีรูปหน้าตรงในชุดนักเรียนเตรียมทหารทุกคน
     choices:
       - id: c1
         text: ยืนอ่านทุกชื่อ
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: จำได้ว่ามีคนจากอำเภอเดียวกันสองคน
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: อ่านถึงแผ่นที่สองก็ต้องรีบไปขึ้นรถกลับบ้าน
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:tutor_billboard
         merit:
           - cat: neutral
       - id: c2
         text: จดชื่อคนจากอำเภอเดียวกันไว้
-        effects:
-          network: 1
+        outcomes:
+          - weight: 3
+            text: ปีหน้าจะลองไปหาเขาให้ช่วยแนะนำ
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ปากกาหมึกหมดกลางทาง ได้มาแค่ชื่อเดียว
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:tutor_billboard
         merit:
           - cat: neutral
       - id: c3
         text: นึกภาพรูปตัวเองบนป้าย
-        effects:
-          happiness: 1
+        outcomes:
+          - weight: 3
+            text: เดินกลับบ้านช้ากว่าปกติ
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: นึกแล้วใจเต้นแรง ไม่แน่ใจว่าเพราะดีใจหรือกลัว
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:tutor_billboard
         merit:
           - cat: neutral
       - id: c4
         text: เดินผ่านไปเฉย ๆ
+        outcomes:
+          - weight: 3
+            text: ป้ายนั้นยังอยู่ในหัวจนถึงบ้าน
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เลี้ยวหัวมุมแล้วยังเหลียวกลับไปมองอีกครั้ง
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:tutor_billboard
+        merit:
+          - cat: neutral
+  - id: cadet_life_tutor_billboard_camp
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years:
+      - 2501
+      - 2650
+    weight: 0.8
+    when:
+      sex:
+        - ชาย
+      age:
+        - 15
+        - 17
+      flags:
+        has:
+          - cadet_dream
+          - cadet_prep_camp
+        not:
+          - cadet_life_seen:tutor_billboard
+    title: ป้ายหน้าค่ายติว
+    text: หน้าค่ายติวในเมืองขึ้นป้ายรายชื่อคนสอบติดเมื่อปีก่อน ชื่อเรียงยาวสองแผ่น มีรูปหน้าตรงในชุดนักเรียนเตรียมทหารทุกคน ครูติวบอกว่าปีหน้าจะมีรูปของรุ่นนี้ขึ้นแทน
+    choices:
+      - id: c1
+        text: ยืนอ่านทุกชื่อ
+        outcomes:
+          - weight: 3
+            text: จำได้ว่ามีคนจากอำเภอเดียวกันสองคน
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: อ่านถึงแผ่นที่สองก็ต้องรีบไปขึ้นรถกลับบ้าน
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:tutor_billboard
+        merit:
+          - cat: neutral
+      - id: c2
+        text: จดชื่อคนจากอำเภอเดียวกันไว้
+        outcomes:
+          - weight: 3
+            text: ปีหน้าจะลองไปหาเขาให้ช่วยแนะนำ
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ปากกาหมึกหมดกลางทาง ได้มาแค่ชื่อเดียว
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:tutor_billboard
+        merit:
+          - cat: neutral
+      - id: c3
+        text: นึกภาพรูปตัวเองบนป้าย
+        outcomes:
+          - weight: 3
+            text: เดินกลับบ้านช้ากว่าปกติ
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: นึกแล้วใจเต้นแรง ไม่แน่ใจว่าเพราะดีใจหรือกลัว
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:tutor_billboard
+        merit:
+          - cat: neutral
+      - id: c4
+        text: เดินผ่านไปเฉย ๆ
+        outcomes:
+          - weight: 3
+            text: ป้ายนั้นยังอยู่ในหัวจนถึงบ้าน
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เลี้ยวหัวมุมแล้วยังเหลียวกลับไปมองอีกครั้ง
+            merit:
+              - cat: neutral
+        sets_flags:
+          - cadet_life_seen:tutor_billboard
         merit:
           - cat: neutral
   - id: cadet_life_traffic_police
@@ -466,26 +1912,70 @@ events:
     choices:
       - id: c1
         text: อาสาช่วยจัดแถวเด็กข้ามถนน
-        effects:
-          relations: 1
+        outcomes:
+          - weight: 3
+            text: ตำรวจพยักหน้าขอบใจ พรุ่งนี้ทักชื่อได้แล้ว
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เปียกทั้งตัว เข้าห้องสาย แต่ครูไม่ว่าอะไร
+            effects:
+              relations: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c2
         text: ถามตำรวจว่าเข้ามาทางไหน
-        effects:
-          network: 1
+        outcomes:
+          - weight: 3
+            text: เขาเล่าว่าสอบนายสิบ ไม่ได้ผ่านเตรียมทหาร แล้วบอกว่าทางนั้นดีกว่า
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: เขาบอกให้ไปเข้าแถวก่อน ไว้วันไม่มีฝนค่อยมาถาม
+            effects:
+              network: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c3
         text: ยืนดูท่าโบกรถ
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: ท่าโบกรถมีจังหวะเหมือนท่าฝึกแถว
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ดูเพลินจนรถเมล์สาดน้ำขังใส่ทั้งตัว
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c4
         text: วิ่งข้ามไปก่อนจะสาย
-        effects:
-          health: 1
+        outcomes:
+          - weight: 3
+            text: เข้าแถวหน้าเสาธงทันพอดี
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: ตำรวจเป่านกหวีดเรียกให้กลับไปข้ามตรงทางม้าลาย
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
   - id: cadet_life_midterm_night
@@ -513,25 +2003,69 @@ events:
     choices:
       - id: c1
         text: อ่านหนังสือเรียนให้จบก่อน
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: เกรดในโรงเรียนก็เป็นเกณฑ์อย่างหนึ่ง
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: อ่านจบตีหนึ่ง ข้อสอบเก่าเตรียมทหารยังเปิดค้างอยู่หน้าเดิม
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c2
         text: แบ่งเวลาอย่างละครึ่ง
-        effects:
-          knowledge: 1
+        outcomes:
+          - weight: 3
+            text: นอนดึกกว่าที่ตั้งใจไว้ชั่วโมงหนึ่ง
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: อ่านอย่างละครึ่งแต่จำได้ไม่ครบสักอย่าง
+            effects:
+              knowledge: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c3
         text: อ่านข้อสอบเก่าต่อ
-        effects:
-          happiness: 1
+        outcomes:
+          - weight: 3
+            text: สอบกลางภาคได้ไม่ดีนัก แต่ไม่เสียใจ
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: สอบกลางภาคได้คะแนนน้อยจนครูประจำชั้นเรียกไปคุย
+            effects:
+              happiness: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral
       - id: c4
         text: ปิดไฟนอน พรุ่งนี้ค่อยว่ากัน
-        effects:
-          health: 1
+        outcomes:
+          - weight: 3
+            text: หลับสนิท ตื่นมาหัวโล่ง
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
+          - weight: 1
+            text: นอนไม่หลับ ลุกมาเปิดไฟอ่านตอนตีสาม
+            effects:
+              health: 1
+            merit:
+              - cat: neutral
         merit:
           - cat: neutral

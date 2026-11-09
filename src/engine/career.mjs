@@ -24,7 +24,6 @@ export const EXAMS = [...new Set(Object.values(TRACKS).map((t) => t.exam).filter
 // ธงที่แกนตั้งเมื่อสอบเข้ามหาวิทยาลัยติด (ทุกทางที่มีการสอบ) — การ์ดแก้บนตอนสอบเข้าอ่านธงนี้ ไม่ติด/ไม่ได้สอบ = ไม่ทวง
 export const EXAM_PASS = 'exam_pass:uni';
 // สอบเข้าโรงเรียนนายร้อยต้องผ่านทั้งข้อเขียนและร่างกาย · สอบ ก.พ. ต้องจบปริญญา (B40)
-const CADET_NEED = { stats: { knowledge: { min: 45 }, health: { min: 50 } }, reason: 'ความรู้หรือชีวิตยังไม่ถึงเกณฑ์สอบ' };
 export const SCHOOL_FROM = 6;
 // ทุนสอบชิงมีภาระใช้ทุน (B118): ธงค้างจนการ์ดชดใช้ทุนเคลียร์ · การ์ดอยู่ใน content/scholarship_bond.yaml
 export const BOND_FLAG = 'scholar_bond';
@@ -154,19 +153,8 @@ export function schoolGate(st) {
         ],
       },
       { text: 'ขอพรก่อนสอบมหาวิทยาลัยรัฐ', hint: uniHint, requires: uniLock, outcomes: exam({ wish: WISH, stats: { knowledge: 3, network: 1.5 } }) },
-      // ชื่อปุ่มสองโรงเรียนต้องแยกกันออกตั้งแต่อ่านครั้งแรก — ต่อกันแค่คำว่า "ตำรวจ" ผู้เล่นเดาไม่ออกว่าอันแรกคือทหาร (B125)
-      ...[
-        ['cadet', 'สอบเข้านายร้อย จปร. (ทหารบก)', 'ไม่เสียค่าเทอม · จบแล้วติดยศร้อยตรี'],
-        ['police_cadet', 'สอบเข้านายร้อยตำรวจ (สามพราน)', 'ไม่เสียค่าเทอม · จบแล้วติดยศร้อยตำรวจตรี'],
-      ].map(([school, text, hint]) => ({
-        text,
-        hint,
-        requires: CADET_NEED,
-        outcomes: [
-          { weight: 1, ok: true, multipliers: { stats: { knowledge: 2, health: 1.5 } }, text: `สอบติด ได้เข้า${TRACKS[school].name}`, effects: { school, network: 1 } },
-          { weight: 1.2, text: 'สอบไม่ติด ต้องออกหางานทำ', effects: { school: 'none', happiness: -1 } },
-        ],
-      })),
+      // ทางเข้าโรงเรียนนายร้อยตรงจากด่านนี้ถอดแล้ว (OQ-2 · CE-08 เจ้าของเคาะ): ทางหลักของนายร้อยคือเส้นเตรียมทหาร (cadet.mjs)
+      // ผู้หญิงยังเข้าทหาร/ตำรวจทางอื่นได้ตามเดิม · track cadet/police_cadet ยังใช้หลังสอบติดเตรียมทหาร
       { text: 'ออกไปหางานทำ', effects: { school: 'none' } },
     ],
   };

@@ -104,7 +104,8 @@ function statusBar(card, s) {
   const bar = el('header', 'sb');
   const r1 = el('div', 'sb-r1');
   const who = el('span', 'sb-who');
-  who.append(el('b', null, `${genLabel()}${st.name}`), whereLine(`${provinceLabel(st)} · ช่วง${card.stage}`), headJob(lifeJob(card.age)));
+  // คำนำหน้า (เช่น นตท.) โชว์ที่หัวจอและสายตระกูล ไม่อยู่ในตัวบท (เจ้าของเคาะ A1 2026-11-06)
+  who.append(el('b', null, `${genLabel()}${st.title ?? ''}${st.name}`), whereLine(`${provinceLabel(st)} · ช่วง${card.stage}`), headJob(lifeJob(card.age)));
   const age = el('span', 'sb-age');
   age.append(el('b', null, card.funeral ? `จากไปอายุ ${card.age}` : String(card.age)));
   if (!card.funeral) age.append(el('small', null, ' ปี'));
@@ -707,7 +708,7 @@ function standingGens(lineage, life = null) {
 // ชีวิตนี้: จุดต้นช่วงวัยที่แกนจดไว้ + ฐานะ ณ ตอนนี้ (หรือตอนตาย) เป็นจุดท้าย
 function standingNow(dead) {
   const pts = [...st.standing.filter((p) => p.age < st.age), { age: st.age, cls: standingOf(st) }];
-  return { gen: st.gen, name: st.name, age: st.age, live: !dead, pts };
+  return { gen: st.gen, name: `${st.title ?? ''}${st.name}`, age: st.age, live: !dead, pts };
 }
 // ช่องรุ่นถัดไปมีจุดเดียว จึงแคบกว่าช่องรุ่นปกติ
 const NEXT_GEN_W = 0.3;
