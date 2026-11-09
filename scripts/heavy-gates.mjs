@@ -2,7 +2,7 @@
 //   node scripts/heavy-gates.mjs run <ref> [gates] [seed2]
 //   node scripts/heavy-gates.mjs status [runId]
 //   node scripts/heavy-gates.mjs fetch <runId> [outDir]
-// Reads GITHUB_TOKEN from the environment only, so the token never lands in a file.
+// Takes the token from GITHUB_TOKEN or `gh auth token` at run time, so it never lands in a file.
 import { mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -10,7 +10,15 @@ import { join } from 'node:path';
 const REPO = 'dmo-hub/next-life';
 const API = `https://api.github.com/repos/${REPO}`;
 const WORKFLOW = 'heavy-gates.yml';
-const token = process.env.GITHUB_TOKEN;
+const token = process.env.GITHUB_TOKEN || ghToken();
+
+function ghToken() {
+  try {
+    return execFileSync('gh', ['auth', 'token'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return '';
+  }
+}
 
 const headers = () => ({
   Accept: 'application/vnd.github+json',
@@ -25,7 +33,7 @@ async function api(path, init) {
 }
 
 function requireToken() {
-  if (!token) throw new Error('GITHUB_TOKEN is not set');
+  if (!token) throw new Error('no token: run gh auth login, or set GITHUB_TOKEN');
 }
 
 async function dispatch([ref, gates, seed2]) {
