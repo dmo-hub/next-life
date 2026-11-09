@@ -1,0 +1,57 @@
+# ลูกย้ายไกล/กลับพร้อมหลาน (ใบ 103) — ใช้ when.child_far เพื่อเรียกลูกคนที่ตรงเงื่อนไข
+# ไม่มีตัวเลือกไหนเพิ่มสุขภาพ: ชีวิตต้องไม่ยาวขึ้นเพราะลูกกลับมา
+events:
+  - id: mid_child_far_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [46, 59], family: [{role: child, alive: true}], child_far: {far: false, age: [24, 42]}}
+    title: "งานอยู่อีกจังหวัด"
+    text: "{ชื่อลูก}ได้งานใหม่ไกลบ้าน เงินดีกว่าเดิมเกือบเท่าตัว คืนนั้นพา{คำคู่ลูก}{ชื่อคู่ลูก}มากินข้าวด้วย แล้วค่อย ๆ ถามว่าคุณคิดยังไง"
+    choices:
+      - text: "บอกให้ไปเถอะ ทางนี้ไม่เป็นไร"
+        effects: {relations: 1, happiness: -1}
+        family: [{far: child}, {bond: child, d: 5}]
+        merit: [{cat: neutral}]
+      - text: "ไปได้ แต่ปีใหม่ต้องกลับบ้าน"
+        effects: {relations: 1}
+        family: [{far: child}]
+        merit: [{cat: neutral}]
+      - text: "ขอให้หางานแถวนี้ก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "{ชื่อลูก}ยอมลองหางานแถวบ้านอีกปี แม้หน้าตาจะไม่ค่อยเต็มใจ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "{ชื่อลูก}ฟังจนจบแล้วก็ยังไป วันย้ายของแทบไม่ได้คุยกัน", effects: {relations: -2, happiness: -1}, family: [{far: child}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - text: "ช่วยออกค่ามัดจำบ้านเช่าให้"
+        requires: {money: {unit: income_x, amount: 0.3}, reason: "ไม่มีเงินเหลือพอจะช่วย"}
+        effects: {relations: 2, money: {unit: income_x, amount: -0.3}}
+        family: [{far: child}, {bond: child, d: 8}]
+        merit: [{cat: help_others, level: 1}]
+
+  - id: old_child_back_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [62, 95], family: [{role: child, alive: true}], child_far: {far: true, grandkids: true}}
+    title: "กลับมาอยู่แถวบ้าน"
+    text: "{ชื่อลูก}โทรมาบอกว่าขอย้ายกลับมาอยู่ใกล้ ๆ เสียงของ{คำคู่ลูก}{ชื่อคู่ลูก}ดังแทรกมาว่าจองโรงเรียนให้{ชื่อหลาน}แล้ว ไม่ได้เจอกันนานจนหลานคงจำหน้าไม่ได้"
+    choices:
+      - text: "เก็บห้องว่างไว้ให้ทุกคน"
+        effects: {relations: 2, happiness: 2, money: {unit: income_x, amount: -0.2}}
+        family: [{back: child}, {bond: child, d: 15}, {bond: grandchild, d: 10}]
+        merit: [{cat: help_others, level: 1}]
+      - text: "หาบ้านหลังเล็กให้อยู่ใกล้กัน"
+        effects: {relations: 1, happiness: 2}
+        family: [{back: child}, {bond: child, d: 10}]
+        merit: [{cat: neutral}]
+      - text: "ไปรับหลานที่โรงเรียนเองทุกเย็น"
+        effects: {happiness: 3, relations: 1}
+        family: [{back: child}, {bond: grandchild, d: 15}]
+        merit: [{cat: neutral}]
+      - text: "บอกว่าอยู่ทางนั้นดีแล้ว"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: neutral}]

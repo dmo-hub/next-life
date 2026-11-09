@@ -22,7 +22,7 @@ const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
-  familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
+  familyOp: ['add', 'n', 'leave', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
@@ -30,7 +30,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years', 'chance'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', 'dark_gate', 'past_life', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'child_far', 'heredity', 'filial', 'parent_flags', 'overlap_stage', 'dark_gate', 'past_life', ...MONEY_KEYS],
   pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
@@ -655,8 +655,8 @@ export const rules = [
         if (!Array.isArray(node.family) || !node.family.length) { r(`${path}.family`, 'family ต้องเป็นรายการไม่ว่าง'); continue; }
         node.family.forEach((o, i) => {
           const p = `${path}.family[${i}]`;
-          const kinds = ['add', 'leave', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
-          if (kinds.length !== 1) return r(p, 'ต้องมี add leave die หรือ bond อย่างเดียว');
+          const kinds = ['add', 'leave', 'far', 'back', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
+          if (kinds.length !== 1) return r(p, 'ต้องมี add leave far back die หรือ bond อย่างเดียว');
           if (o.add !== undefined && !['spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น spouse child grandchild pet herd peer');
           // สัตว์ไม่มีตารางชีพในข้อมูล — อายุขัยของชนิดต้องมาจากเนื้อหา · ชนิดต้องอยู่ในตารางของแกน (ผลต่อปีอ่านจากตาราง ชนิดสะกดผิด = ไม่มีผลเงียบ)
           const animals = o.add === 'pet' ? PET_KINDS : o.add === 'herd' ? HERD_KINDS : null;
@@ -669,6 +669,7 @@ export const rules = [
           if (o.bond === undefined && o.d !== undefined) r(`${p}.d`, 'd ใช้กับ bond เท่านั้น');
           if (o.n !== undefined && (o.add === undefined || !isInt(o.n) || o.n < 1 || o.n > 3)) r(`${p}.n`, 'n ใช้กับ add เป็น 1–3');
           if (o.leave !== undefined && !['spouse', 'pet', 'herd'].includes(o.leave)) r(`${p}.leave`, 'leave ใช้ได้กับ spouse pet herd');
+          for (const k of ['far', 'back']) if (o[k] !== undefined && o[k] !== 'child') r(`${p}.${k}`, `${k} ใช้ได้กับ child`);
           if (o.die !== undefined && !FAMILY_ROLES.includes(o.die)) r(`${p}.die`, `die ต้องเป็น ${FAMILY_ROLES.join(' ')}`);
           // สาเหตุที่จอต้องพาสายด่วน (self_harm) ห้ามเนื้อหาสั่ง — เจ้าของไม่ให้มีการ์ดที่พาไปสู่การทำร้ายตัวเอง
           if (o.cause !== undefined) {
@@ -707,6 +708,17 @@ export const rules = [
       if (!isObj(ill) || Object.keys(ill).some((k) => k !== 'causes' && k !== 'left')) return r('.when.illness', 'illness ต้องเป็น {causes?, left?}');
       if (ill.causes !== undefined && !(Array.isArray(ill.causes) && ill.causes.length && ill.causes.every((x) => CHRONIC.includes(x)))) r('.when.illness.causes', `causes ต้องเป็นรายการจาก ${CHRONIC.join(' ')}`);
       if (ill.left !== undefined && !isRange(ill.left, 0, ILL_YEARS[1] - 1)) r('.when.illness.left', `left ต้องเป็น [lo, hi] ใน 0–${ILL_YEARS[1] - 1}`);
+    },
+  },
+  {
+    id: 'child-far',
+    desc: 'when.child_far = {far: true|false, age?: [lo, hi], grandkids?: true} — ลูกที่ยังอยู่และอยู่ไกล/อยู่ใกล้ตามที่ระบุ · การ์ดเรียกลูกคนนั้น',
+    event(e, ctx, r) {
+      const w = isObj(e.when) ? e.when.child_far : undefined;
+      if (w === undefined) return;
+      if (!isObj(w) || Object.keys(w).some((k) => !['far', 'age', 'grandkids'].includes(k)) || typeof w.far !== 'boolean') return r('.when.child_far', 'child_far ต้องเป็น {far: true|false, age?, grandkids?}');
+      if (w.age !== undefined && !isRange(w.age, 0, 120)) r('.when.child_far.age', 'age ต้องเป็น [lo, hi]');
+      if (w.grandkids !== undefined && w.grandkids !== true) r('.when.child_far.grandkids', 'grandkids ใส่ได้แค่ true');
     },
   },
   {
