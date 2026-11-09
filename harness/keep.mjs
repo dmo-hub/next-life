@@ -65,6 +65,8 @@ const lostOf = (base, now) => Object.fromEntries(Object.keys(base).filter((k) =>
 
 // เซฟกลางชีวิต (การ์ด 10–69) ด้วยตัวเลือกแรกที่กดได้ — ทางเดียวกับที่วัดตอนสำรวจ 29 เวอร์ชัน
 const firstOpen = (card) => Math.max(0, (card.choices ?? []).findIndex((_, i) => !card.locked?.[i]));
+// ทางสืบสายเลือดต้องระบุคน เหมือนจอที่ส่ง id ของคนที่ผู้เล่นกด · แกนอ่าน id เฉพาะทางนี้ การ์ดอื่นส่งไปก็ไม่มีผล
+const pickAfter = (af, card, idx) => chooseAfter(af, idx, card.heirs?.[0]?.id);
 const kept = (st) => ({ age: st.age, money: Math.round(st.money), flags: Object.keys(st.flags).sort().join(), gen: st.gen ?? 1 });
 function makeSnaps() {
   const out = [];
@@ -96,7 +98,7 @@ function makeAfterSnaps(n) {
     const stop = 3 + (i * 7) % 20;
     card = nextAfterCard(af);
     for (let k = 0; k < stop && !card.done; k++) {
-      if (card.choices?.length) chooseAfter(af, firstOpen(card));
+      if (card.choices?.length) pickAfter(af, card, firstOpen(card));
       card = nextAfterCard(af);
     }
     if (card.done || af.isekai) continue;
@@ -125,7 +127,7 @@ function replay(s, cont, seed) {
       if (!af.isekai && card.choices?.length && !af.pending) { r.stale = 1; card = nextAfterCard(af); }
       for (let k = 0; k < AFTER_MAX && !card.done; k++) {
         if (card.loop) r.loopCards++;
-        if (card.choices?.length) chooseAfter(af, pickOpen(card));
+        if (card.choices?.length) pickAfter(af, card, pickOpen(card));
         card = nextAfterCard(af);
       }
       if (!card.done) throw new Error(`ระหว่างชาติไม่จบใน ${AFTER_MAX} การ์ด`);

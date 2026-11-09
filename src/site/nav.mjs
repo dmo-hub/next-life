@@ -7,7 +7,8 @@ export const NAV_CSS_START = '/*NAV-CSS:START*/';
 export const NAV_CSS_END = '/*NAV-CSS:END*/';
 
 export const NAV_MENU = [
-  ['guide.html', 'วิธีเล่น'],
+  // หน้าโฟกัสไม่มีป้ายของตัวเอง (เจ้าของเคาะ) เข้าจากลิงก์ในหน้าวิธีเล่น
+  ['guide.html', 'วิธีเล่น', null, ['focus.html']],
   ['whatsnew.html', 'แพตช์โน้ต'],
   ['about.html', 'กลไกในเกม'],
   // เจ้าของรวมสองหน้าเป็นหัวเดียว "โลก" · หน้าต่างโลกยังอยู่ (ลิงก์จากหน้าโลก) และนับเป็นหัวนี้ตอนเปิดอยู่

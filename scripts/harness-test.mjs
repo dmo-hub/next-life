@@ -739,6 +739,65 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 133 ตัวควบคุม: ถอด ambient ⇒ นับเข้าแบบชีวิต', ctl > 0, `นับเข้า ${ctl}`);
 }
 
+// ใบ 278 ทางเลือกทายาทด้วยมือ (ปุ่มสายเลือด): เลือกคนไหนต้องได้คนนั้นหลัง snapshot/restore · บอทไม่กดปุ่มนี้ (manual) ⇒ ไม่มีด่านบอทตัวไหนครอบ
+// ผู้สืบสายเลือด ≥ 2 คนเกิดน้อย (~1% ของชีวิตบอทสายครอบครัว) ⇒ เติมลูกวัยรับมรดกเองหลังตาย ให้เคสนิ่งและเร็ว
+// ตัวควบคุม: เลือกคนแรกต้องได้คนแรก (ตัววัดแยกคนได้) · ไม่ส่ง heirId ต้อง throw (ไม่ใช่ได้คนแรกเงียบ)
+// ไม่ครอบ: เซฟแบบลำดับปุ่มของหน้าเว็บ (bloodPick ใน src/ui/app.mjs ผูก DOM)
+{
+  const { startAfterlife, nextAfterCard, chooseAfter, heirCandidates, HEIR_AGE } = await import('../src/engine/index.mjs');
+  const { addMember } = await import('../src/engine/family.mjs');
+  const content = loadContent();
+  const bot = BOTS['สายครอบครัว'];
+  const died = () => {
+    for (let i = 0; i < 50; i++) {
+      const { state } = playLife(mixSeed(0x278, i), content, bot);
+      if (state.kin && !state.tripLost) return state;
+    }
+    return null;
+  };
+  const toPath = (af) => {
+    for (let g = 0; g < 400; g++) {
+      const card = nextAfterCard(af);
+      if (af.pending?.path) return card;
+      if (card.done) return null;
+      if (card.choices?.length) chooseAfter(af, bot(card, af.botRng, af));
+    }
+    return null;
+  };
+  const pick = (which) => {
+    const st = died();
+    if (!st) return { err: 'ไม่มีชีวิตที่มีครอบครัว' };
+    const year = st.birthYear + st.age;
+    for (let k = heirCandidates(st).length; k < 2; k++) addMember(st, 'child', { born: year - HEIR_AGE[0] - k });
+    const heirs = heirCandidates(st);
+    const af = startAfterlife(st);
+    const card = toPath(af);
+    const b = (card?.manual ?? []).findIndex(Boolean);
+    if (b < 0) return { err: 'การ์ดทางเกิดไม่มีปุ่มสายเลือด', heirs };
+    let threw = false;
+    try {
+      chooseAfter(af, b);
+    } catch {
+      threw = true;
+    }
+    const want = which === 'last' ? heirs.at(-1) : heirs[0];
+    chooseAfter(af, b, want.id);
+    const back = restore(snapshot({ st: af.st, af }, content), content).af;
+    for (let g = 0; g < 400 && !back.heir; g++) {
+      const c = nextAfterCard(back);
+      if (c.done) break;
+      if (c.choices?.length) chooseAfter(back, bot(c, back.botRng, back));
+    }
+    if (!back.heir) return { err: 'ไม่ถึงการ์ดส่งต่อ', heirs };
+    return { heirs, threw, want, got: nextLife(back).name };
+  };
+  const last = pick('last'), first = pick('first');
+  const ok = (r) => !r.err && r.heirs.length >= 2;
+  check('ใบ 278 ปุ่มสายเลือดเลือกคนสุดท้าย หลังเซฟ/โหลดได้คนที่เลือก', ok(last) && last.got === last.want.name && last.got !== last.heirs[0].name, last.err ?? `${last.heirs.length} คน · เลือก ${last.want.name} · ได้ ${last.got}`);
+  check('ใบ 278 ตัวควบคุม: เลือกคนแรกได้คนแรก', ok(first) && first.got === first.heirs[0].name, first.err ?? `ได้ ${first.got}`);
+  check('ใบ 278 ตัวควบคุม: ไม่ส่ง heirId ⇒ throw', ok(last) && last.threw);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {
