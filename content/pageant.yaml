@@ -1,0 +1,432 @@
+# สายนางงาม: ไต่ขั้นด้วยธง + นัด ไม่ใช้ pool_focus_flag กองสุ่มยังออกตามปกติระหว่างปีนัด
+# ได้สายสะพาย → นัดจังหวัด 1-2 ปี → นัดเก็บตัว 2-3 ปี → นัดตอบคำถาม 1 ปี → ถูกปลด 30%
+# ใบ camp final strip ไม่มี weight = ใบนัดล้วน · เพดานอายุกว้างเพราะนัดที่ when ไม่ผ่านจะตกเงียบ
+# การ์ดวัยต่ำกว่า 18 ไม่พูดถึงรูปร่าง ชุดว่ายน้ำ หรือสปอนเซอร์
+events:
+  - id: pageant_school_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [13, 18], sex: [หญิง]}
+    title: "ถือป้ายนำขบวนกีฬาสี"
+    text: "ครูประจำสีเดินดูทั้งห้องแล้วชี้มาที่คุณ บอกว่าปีนี้ให้ถือป้ายนำขบวน ต้องซ้อมเดินหลังเลิกเรียนทุกวันจนถึงวันงาน เพื่อนในห้องเริ่มแซวตั้งแต่ยังไม่ได้ตอบ"
+    choices:
+      - id: accept
+        text: "รับ ซ้อมเดินทุกเย็น"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: shy
+        text: "ขอยกให้เพื่อนในห้อง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: study
+        text: "อ้างว่าต้องอ่านหนังสือสอบ"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: book_walk
+        text: "ทูนหนังสือเดินกลางโรงอาหาร"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_fair_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [17, 18], sex: [หญิง]}
+    title: "ป้ายรับสมัครหน้าที่ว่าการอำเภอ"
+    text: "งานประจำปีของอำเภอติดป้ายหาสาวงามขึ้นเวที ป้าร้านเช่าชุดไทยทักว่าลองดูสักครั้ง ชุดกับแต่งหน้าคิดราคาเด็กบ้านใกล้กัน ขึ้นเวทีคืนเดียวก็รู้เลยว่าชอบหรือไม่ชอบ"
+    choices:
+      - id: enter
+        text: "เช่าชุดไทยแล้วขึ้นเวที"
+        sets_flags: [pageant_walked]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {happiness: 1.3}}, text: "ได้สายสะพายขวัญใจประชาชน คนในตลาดเรียกชื่อคุณอยู่หลายวัน", effects: {happiness: 2, network: 1}, sets_flags: [pageant_local], schedules: [{event: pageant_province_01, after_years: [1, 2]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "เดินผ่านไปโดยไม่ติดรอบ แต่ป้าเช่าชุดจำหน้าคุณได้แล้ว", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watch
+        text: "ไปยืนดูหน้าเวทีก่อน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: help_friend
+        text: "ช่วยเพื่อนแต่งตัวหลังเวที"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: wrong_side
+        text: "ขึ้นเวทีผิดฝั่ง ยืนยิ้มต่อ"
+        sets_flags: [pageant_walked]
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_temple_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [19, 27], sex: [หญิง]}
+    title: "นางนพมาศงานวัด"
+    text: "คืนลอยกระทงปีนี้วัดข้างบ้านจัดประกวดนางนพมาศ ร้านแต่งหน้าคิวเต็มตั้งแต่บ่าย กรรมการเป็นคนในตำบลที่รู้จักกันหมด รางวัลมีซองเงิน ถ้วย และสายสะพายหนึ่งเส้น"
+    choices:
+      - id: enter
+        text: "ลงประกวด เช่าชุดไทย"
+        sets_flags: [pageant_walked]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "สายสะพายเส้นแรกของชีวิต คนทั้งตำบลรู้แล้วว่าคุณเป็นลูกบ้านไหน", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: 0.1}}, sets_flags: [pageant_local], schedules: [{event: pageant_province_01, after_years: [1, 2]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้รองอันดับสอง ซองเงินพอค่าเช่าชุดกับค่าแต่งหน้าพอดี", effects: {happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: float
+        text: "ไปช่วยวัดทำกระทงแทน"
+        effects: {relations: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: sit_out
+        text: "ไม่ขึ้นเวที ไปลอยกระทงเฉย ๆ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: heckle
+        text: "เชียร์เพื่อนจนกรรมการต้องหันมอง"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_circuit_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 5
+    when: {age: [19, 28], sex: [หญิง], flags: {has: [pageant_walked]}}
+    title: "หกเวทีในเจ็ดคืน"
+    text: "ช่วงลอยกระทงมีเวทีนางนพมาศทั่วทุกอำเภอ พี่ที่เดินสายมาก่อนชวนนั่งรถตู้ไปด้วยกัน คืนนี้เวทีวัด พรุ่งนี้เวทีเทศบาล ชุดเดิมซักไม่ทัน นอนบนรถเป็นหลัก"
+    choices:
+      - id: all_six
+        text: "เดินสายครบทุกเวที"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "ได้สายสะพายกลับบ้านหลายเส้น ซองเงินรวมแล้วคุ้มค่ารถ", effects: {network: 1, health: -1, money: {unit: income_x, amount: 0.2}}, sets_flags: [pageant_local], schedules: [{event: pageant_province_01, after_years: [1, 2]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "เหนื่อยจนยิ้มไม่ออกตั้งแต่เวทีที่สี่ กลับบ้านมือเปล่า", effects: {health: -1, happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: one_near
+        text: "เลือกเวทีใกล้บ้านเวทีเดียว"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: help_van
+        text: "ไปเป็นคนช่วยแต่งหน้าในรถ"
+        effects: {network: 1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: van_karaoke
+        text: "ร้องเพลงในรถจนคนขับขอเปลี่ยนคิว"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_coach_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 5
+    when: {age: [19, 27], sex: [หญิง], flags: {has: [pageant_walked]}}
+    title: "ครูสอนเดินหลังร้านตัดผม"
+    text: "พี่เลี้ยงนางงามในเมืองรับสอนเดินกับตอบคำถามหลังร้าน ให้เดินบนแผ่นกระเบื้องทีละเส้น แล้วถามว่าถ้าเป็นผู้หญิงที่สวยที่สุดจะทำอะไรให้บ้านเมือง ตอบช้าก็ให้เริ่มใหม่"
+    choices:
+      - id: pay_lessons
+        text: "จ่ายค่าเรียนครบคอร์ส"
+        effects: {knowledge: 1, network: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: help_for_lessons
+        text: "ช่วยงานร้านแลกค่าเรียน"
+        effects: {knowledge: 1, relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: self_practice
+        text: "ซ้อมเองหน้ากระจกที่บ้าน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: world_peace
+        text: "ตอบสันติภาพโลกทุกข้อ"
+        effects: {happiness: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_province_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [19, 29], sex: [หญิง], flags: {has: [pageant_local]}}
+    title: "ตัวแทนจังหวัด"
+    text: "กองประกวดประจำจังหวัดเปิดรับสมัคร เวทีนี้ส่งต่อถึงเวทีใหญ่ระดับประเทศ ผู้ใหญ่ในจังหวัดนั่งเป็นกรรมการ รางวัลเป็นเงินก้อน แต่ค่าชุดราตรีกับค่าเดินทางต้องออกเองก่อน"
+    choices:
+      - id: full_gown
+        text: "ตัดชุดราตรีใหม่ทั้งชุด"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "ประกาศชื่อคุณเป็นคนสุดท้าย มงกุฎจังหวัดหนักกว่าที่คิด", effects: {happiness: 2, network: 2, money: {unit: income_x, amount: 0.3}}, sets_flags: [pageant_province], schedules: [{event: pageant_camp_01, after_years: [2, 3]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้แค่เข้ารอบ ค่าชุดยังผ่อนไม่หมด", effects: {happiness: -1, money: {unit: income_x, amount: -0.4}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: rent_gown
+        text: "เช่าชุดร้านเดิม สู้ด้วยคำตอบ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "กรรมการจำคำตอบคุณได้ ชุดเก่าไม่ใช่ปัญหาอีกต่อไป", effects: {happiness: 2, knowledge: 1}, sets_flags: [pageant_province], schedules: [{event: pageant_camp_01, after_years: [2, 3]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "คนหลังเวทีจำชุดนี้ได้จากปีก่อน คุณยิ้มไปจนจบงาน", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: skip
+        text: "พอแค่นี้ กลับไปทำงาน"
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: sash_collection
+        text: "ใส่สายสะพายทุกเส้นไปสมัคร"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_costume_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 10
+    when: {age: [19, 28], sex: [หญิง], flags: {has: [pageant_province]}}
+    title: "ชุดประจำจังหวัด"
+    text: "รอบชุดประจำจังหวัดปีนี้ยิ่งแปลกยิ่งได้ใจกรรมการ ดีไซเนอร์ร้านเช่าชุดโชว์เสนอเอาของดีของจังหวัดมาใส่ทั้งตัว ชุดสูงกว่าประตูรถตู้ และหนักพอจะต้องมีคนช่วยเดิน"
+    choices:
+      - id: go_big
+        text: "ทำเต็มที่ ขนกันมาทั้งคันรถ"
+        effects: {happiness: 1, network: 2, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: local_weave
+        text: "ใช้ผ้าทอชุมชนของจังหวัด"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: borrow
+        text: "ยืมชุดเก่าปีก่อนมาปรับ"
+        effects: {money: {unit: income_x, amount: 0.05}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: fruit_gown
+        text: "ใส่ผลไม้ประจำจังหวัดของจริง"
+        effects: {happiness: 2, health: -1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_sponsor_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 10
+    when: {age: [20, 28], sex: [หญิง], flags: {has: [pageant_province]}}
+    title: "ผู้สนับสนุนรายแรก"
+    text: "เจ้าของร้านใหญ่ในจังหวัดเสนอออกค่าชุดและค่าเดินทางทั้งหมด แลกกับป้ายชื่อร้านบนทุกภาพ งานเปิดร้านทุกสาขา และเซ็นสัญญาว่าห้ามรับงานคู่แข่งสองปี"
+    choices:
+      - id: sign
+        text: "เซ็นตามที่เสนอ"
+        effects: {network: 1, happiness: -1, money: {unit: income_x, amount: 0.4}}
+        merit: [{cat: neutral}]
+      - id: negotiate
+        text: "ขอตัดข้อห้ามออกก่อนเซ็น"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "เจ้าของร้านหัวเราะแล้วยอมลดเหลือปีเดียว", effects: {knowledge: 1, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ข้อเสนอไปตกกับสาวงามเบอร์ถัดไป", effects: {network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: self_fund
+        text: "ไม่รับ ออกเงินเองทั้งหมด"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: ribbon_cut
+        text: "เปิดร้านจนกรรไกรตัดริบบิ้นทื่อ"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_diet_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 10
+    when: {age: [20, 28], sex: [หญิง], flags: {has: [pageant_province]}}
+    title: "ก่อนวันเก็บตัว"
+    text: "เหลืออีกไม่กี่สัปดาห์จะเก็บตัว พี่เลี้ยงมองชุดที่ตัดไว้แล้วมองคุณ บอกว่าเวทีใหญ่กล้องไม่ปรานีใคร คนรอบตัวเริ่มนับทุกคำที่คุณกิน และคุณเองก็เริ่มนับด้วย"
+    choices:
+      - id: steady
+        text: "ออกกำลังกายตามปกติ กินครบ"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: starve
+        text: "อดให้ทันวันเก็บตัว"
+        effects: {health: -2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: alter_gown
+        text: "ให้ร้านแก้ชุดแทนการแก้ตัวเอง"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: midnight_noodle
+        text: "แอบกินก๋วยเตี๋ยวกับพี่เลี้ยง"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_camp_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [20, 32], sex: [หญิง], flags: {has: [pageant_province]}}
+    title: "วันเก็บตัว"
+    text: "ผู้เข้าประกวดจากทุกจังหวัดขึ้นรถตั้งแต่ตีห้า วันละห้าหกสถานที่ ทั้งล่องแพกลางฝนและเดินขึ้นเขา ส้นสูงอยู่ในกระเป๋าเสมอ กองประกวดคอยดูว่าใครยังยิ้มให้คนอื่นตอนเหนื่อย"
+    choices:
+      - id: stay_kind
+        text: "ช่วยเพื่อนร่วมห้องทุกคน"
+        sets_flags: [pageant_camp]
+        schedules: [{event: pageant_final_01, after_years: [1, 1]}]
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: front_row
+        text: "แย่งยืนแถวหน้าทุกภาพ"
+        sets_flags: [pageant_camp]
+        schedules: [{event: pageant_final_01, after_years: [1, 1]}]
+        effects: {network: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: withdraw
+        text: "ขอถอนตัว กลับบ้าน"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: raft_leader
+        text: "แย่งถ่อแพจากคนขับ"
+        sets_flags: [pageant_camp]
+        schedules: [{event: pageant_final_01, after_years: [1, 1]}]
+        effects: {happiness: 1, relations: 1, health: -1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_final_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [20, 33], sex: [หญิง], flags: {has: [pageant_camp]}}
+    title: "รอบตอบคำถาม"
+    text: "เหลือคุณกับอีกสี่คนกลางเวที ไฟร้อนจนเครื่องสำอางเริ่มไหล พิธีกรดึงซองออกจากโถ คำถามคือถ้าได้มงกุฎคืนนี้ จะบอกอะไรกับเด็กผู้หญิงในจังหวัดของคุณ"
+    choices:
+      - id: honest
+        text: "เล่าเรื่องจริงของตัวเอง"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ทั้งฮอลล์เงียบแล้วปรบมือ มงกุฎระดับประเทศลงบนหัวคุณ", effects: {happiness: 3, network: 3, money: {unit: income_x, amount: 1}}, sets_flags: [pageant_crown], schedules: [{event: pageant_strip_01, after_years: [1, 2], chance: 0.3}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้รองอันดับหนึ่ง แฟนเวทีเถียงกันเรื่องผลตัดสินทั้งคืน", effects: {happiness: 1, network: 2, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: memorized
+        text: "ตอบตามที่ท่องมา"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่พลาดสักคำ มงกุฎเป็นของคุณ", effects: {happiness: 2, network: 2, money: {unit: income_x, amount: 1}}, sets_flags: [pageant_crown], schedules: [{event: pageant_strip_01, after_years: [1, 2], chance: 0.3}], merit: [{cat: neutral}]}
+          - {weight: 3, text: "คำตอบเหมือนคนก่อนหน้าทุกคำ เสียงในฮอลล์แผ่วลงทันที", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: thank
+        text: "ขอบคุณคนที่บ้านจนหมดเวลา"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: neutral}]
+      - id: wrong_card
+        text: "ตอบคำถามของคนก่อนหน้า"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_strip_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [20, 35], sex: [หญิง], flags: {has: [pageant_crown]}}
+    title: "หนังสือจากกองประกวด"
+    text: "จดหมายจากกองประกวดมาถึงบ้าน แจ้งว่าคุณผิดสัญญาเรื่องงานที่รับ ขอให้คืนมงกุฎและสายสะพายในเจ็ดวัน ข่าวออกก่อนจดหมายถึงมือคุณหนึ่งวัน"
+    choices:
+      - id: return_crown
+        text: "คืนมงกุฎ ไม่พูดอะไร"
+        effects: {happiness: -2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: fight
+        text: "เปิดสัญญาสู้กันตามจริง"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "กองประกวดถอยจดหมาย คุณได้ตำแหน่งคืนแต่ไม่ได้งานจากเวทีนี้อีก", effects: {happiness: 1, network: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ต้องคืนตำแหน่ง แล้วยังมีค่าทนายต้องจ่าย", effects: {happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_elder
+        text: "ให้ผู้ใหญ่ในจังหวัดไปคุยแทน"
+        effects: {network: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: crown_photo
+        text: "ถ่ายรูปคู่มงกุฎก่อนส่งไปรษณีย์"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: pageant_after_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [31, 45], sex: [หญิง], flags: {has: [pageant_local]}}
+    title: "สายสะพายในตู้"
+    text: "รุ่นน้องในตำบลมาขอยืมสายสะพายเก่าไปถ่ายรูปกับเล่าว่าอยากลงประกวด คุณเปิดตู้แล้วเจอซองเงินเปล่า รูปคู่บนเวที และสัญญาหลายฉบับที่ไม่เคยอ่านจบ"
+    choices:
+      - id: teach
+        text: "เปิดสอนเดินให้เด็กในตำบล"
+        effects: {happiness: 1, network: 1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: dana, level: 1}]
+      - id: warn
+        text: "เล่าทุกอย่าง รวมตอนที่ไม่สวย"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: lend
+        text: "ให้ยืม แล้วปิดตู้เหมือนเดิม"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: try_on
+        text: "ลองใส่สายสะพายไปตลาด"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+
+  - id: pageant_judge_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [46, 59], sex: [หญิง], flags: {has: [pageant_local]}}
+    title: "นั่งโต๊ะกรรมการ"
+    text: "งานประจำปีเชิญคุณไปนั่งกรรมการ เพราะยังมีคนจำได้ว่าเคยครองตำแหน่ง เด็กสาวคนหนึ่งเช่าชุดร้านเดิมที่คุณเคยเช่า อีกคนเป็นหลานของคนจัดงาน ผู้จัดกระซิบข้างโต๊ะก่อนลงคะแนน"
+    choices:
+      - id: fair
+        text: "ให้คะแนนตามที่เห็น"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: nod
+        text: "พยักหน้าให้ผู้จัด"
+        effects: {network: 1, happiness: -1}
+        merit: [{cat: greed_harm, level: 1}]
+      - id: mentor
+        text: "เรียกเด็กเช่าชุดมาคุยหลังงาน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: old_answer
+        text: "ถามคำถามเดียวกับที่เคยตอบพลาด"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+
+  - id: pageant_backstage_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [19, 30], sex: [ชาย]}
+    title: "คนหลังเวที"
+    text: "เพื่อนสาวลงประกวดงานประจำจังหวัด ไม่มีใครขับรถและแบกชุด เธอขอให้คุณช่วยสามคืน คืนแรกคุณถือไม้แขวนชุด คืนที่สามคุณรู้แล้วว่าเข็มกลัดกับเทปกาวอยู่ตรงไหนของกระเป๋า"
+    choices:
+      - id: drive
+        text: "ขับรถให้ครบสามคืน"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: neutral}]
+      - id: learn_trade
+        text: "ขอช่างสอนแต่งหน้าทำผม"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: decline
+        text: "ปฏิเสธ ต้องทำงานเช้า"
+        effects: {money: {unit: income_x, amount: 0.05}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hype_man
+        text: "ชูป้ายเชียร์คนเดียวทั้งฮอลล์"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
