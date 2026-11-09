@@ -1963,7 +1963,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
     "cadet_dream",
     "cadet_prep_camp"
    ],
-   "flagsNot": [],
+   "flagsNot": ["cadet_family_secret"],
    "family": null,
    "poor": null
   },
@@ -2362,7 +2362,30 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
     "result": "พ่อวิ่งช้ากว่าแต่ไม่เคยหยุด สองคนคุยกันมากกว่าที่เคยคุยมาทั้งปี",
     "outcomes": null,
     "next": null,
-    "requiresFamily": "father"
+    "requiresFamily": "father",
+    "showIf": {"family": "father"}
+   },
+   {
+    "label": "นัดเพื่อนข้างบ้านวิ่งทุกเช้า",
+    "hint": null,
+    "requiresMoney": 0,
+    "fx": {
+     "knowledge": 0,
+     "health": 1,
+     "happiness": 0,
+     "relations": 1,
+     "network": 0,
+     "money": 0
+    },
+    "setFlags": [
+     "sporty"
+    ],
+    "clearFlags": [],
+    "schedule": [],
+    "result": "เพื่อนข้างบ้านวิ่งช้ากว่าแต่ไม่เคยผิดนัด สองคนคุยกันมากกว่าที่เคยคุยมาทั้งปี",
+    "outcomes": null,
+    "next": null,
+    "hideIf": {"family": "father"}
    },
    {
     "label": "นัดเพื่อนติววิ่งรอบสนาม",
@@ -2479,7 +2502,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
    "flagsHas": [
     "cadet_dream"
    ],
-   "flagsNot": [],
+   "flagsNot": ["cadet_family_secret"],
    "family": null,
    "poor": null
   },
@@ -2542,7 +2565,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
      },
      {
       "p": 0.5,
-      "result": "{ผู้ใหญ่}แอบรวบเงินจ่ายไป ไม่กี่วันเบอร์นั้นก็ปิด",
+      "result": "{ผู้ใหญ่}แอบรวบเงินจ่ายไป ไม่กี่วัน{มือถือ:เบอร์นั้นก็ปิด|คนนั้นก็หายไปเลย ไปถามหาที่ไหนก็ไม่มีใครรู้จัก}",
       "fx": {
        "knowledge": 0,
        "health": 0,
@@ -2578,7 +2601,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
     "outcomes": [
      {
       "p": 0.8,
-      "result": "จ่ายครบแล้วเบอร์นั้นก็ปิดไปตลอดกาล",
+      "result": "จ่ายครบแล้ว{มือถือ:เบอร์นั้นก็ปิดไปตลอดกาล|คนนั้นก็หายไปเลย ไม่มีใครเจออีก}",
       "fx": {
        "knowledge": 0,
        "health": 0,
@@ -2594,7 +2617,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
      },
      {
       "p": 0.2,
-      "result": "มีข้อความตอบกลับคำเดียวว่าเรียบร้อย ชื่อ {ชื่อ} ถูกจดลงสมุดของใครบางคน",
+      "result": "{มือถือ:มีข้อความตอบกลับคำเดียวว่าเรียบร้อย|มีจดหมายตอบกลับมาบรรทัดเดียวว่าเรียบร้อย} ชื่อ {ชื่อ} ถูกจดลงสมุดของใครบางคน",
       "fx": {
        "knowledge": 0,
        "health": 0,
@@ -2679,7 +2702,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
    "flagsHas": [
     "cadet_dream"
    ],
-   "flagsNot": [],
+   "flagsNot": ["cadet_family_secret"],
    "family": null,
    "poor": null
   },
@@ -5485,7 +5508,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
   },
   "variantOf": "F1",
   "replaces": null,
-  "text": "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} {ผู้ใหญ่}จึงไปขอกู้กองทุนหมู่บ้าน มีเพื่อนบ้านสองคนช่วยค้ำ ในที่ประชุมมีคนถามว่าจะกู้ไปทำอะไร {ผู้ใหญ่}ตอบว่า 'เอาไปให้หลานติวสอบเตรียมทหารจ้ะ{ถิ่น}'",
+  "text": "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} {ผู้ใหญ่}จึงไปขอกู้กองทุนหมู่บ้าน มีเพื่อนบ้านสองคนช่วยค้ำ ในที่ประชุมมีคนถามว่าจะกู้ไปทำอะไร {ผู้ใหญ่}ตอบว่า 'เอาไปให้{ลูก}ติวสอบเตรียมทหารจ้ะ{ถิ่น}'",
   "options": [
    {
     "label": "รับเงินไว้ สัญญาว่าจะตั้งใจ",

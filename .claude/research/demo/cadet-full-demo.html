@@ -5801,7 +5801,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
     "cadet_dream",
     "cadet_prep_camp"
    ],
-   "flagsNot": [],
+   "flagsNot": ["cadet_family_secret"],
    "family": null,
    "poor": null
   },
@@ -6200,7 +6200,30 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
     "result": "พ่อวิ่งช้ากว่าแต่ไม่เคยหยุด สองคนคุยกันมากกว่าที่เคยคุยมาทั้งปี",
     "outcomes": null,
     "next": null,
-    "requiresFamily": "father"
+    "requiresFamily": "father",
+    "showIf": {"family": "father"}
+   },
+   {
+    "label": "นัดเพื่อนข้างบ้านวิ่งทุกเช้า",
+    "hint": null,
+    "requiresMoney": 0,
+    "fx": {
+     "knowledge": 0,
+     "health": 1,
+     "happiness": 0,
+     "relations": 1,
+     "network": 0,
+     "money": 0
+    },
+    "setFlags": [
+     "sporty"
+    ],
+    "clearFlags": [],
+    "schedule": [],
+    "result": "เพื่อนข้างบ้านวิ่งช้ากว่าแต่ไม่เคยผิดนัด สองคนคุยกันมากกว่าที่เคยคุยมาทั้งปี",
+    "outcomes": null,
+    "next": null,
+    "hideIf": {"family": "father"}
    },
    {
     "label": "นัดเพื่อนติววิ่งรอบสนาม",
@@ -6317,7 +6340,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
    "flagsHas": [
     "cadet_dream"
    ],
-   "flagsNot": [],
+   "flagsNot": ["cadet_family_secret"],
    "family": null,
    "poor": null
   },
@@ -6380,7 +6403,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
      },
      {
       "p": 0.5,
-      "result": "{ผู้ใหญ่}แอบรวบเงินจ่ายไป ไม่กี่วันเบอร์นั้นก็ปิด",
+      "result": "{ผู้ใหญ่}แอบรวบเงินจ่ายไป ไม่กี่วัน{มือถือ:เบอร์นั้นก็ปิด|คนนั้นก็หายไปเลย ไปถามหาที่ไหนก็ไม่มีใครรู้จัก}",
       "fx": {
        "knowledge": 0,
        "health": 0,
@@ -6416,7 +6439,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
     "outcomes": [
      {
       "p": 0.8,
-      "result": "จ่ายครบแล้วเบอร์นั้นก็ปิดไปตลอดกาล",
+      "result": "จ่ายครบแล้ว{มือถือ:เบอร์นั้นก็ปิดไปตลอดกาล|คนนั้นก็หายไปเลย ไม่มีใครเจออีก}",
       "fx": {
        "knowledge": 0,
        "health": 0,
@@ -6432,7 +6455,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
      },
      {
       "p": 0.2,
-      "result": "มีข้อความตอบกลับคำเดียวว่าเรียบร้อย ชื่อ {ชื่อ} ถูกจดลงสมุดของใครบางคน",
+      "result": "{มือถือ:มีข้อความตอบกลับคำเดียวว่าเรียบร้อย|มีจดหมายตอบกลับมาบรรทัดเดียวว่าเรียบร้อย} ชื่อ {ชื่อ} ถูกจดลงสมุดของใครบางคน",
       "fx": {
        "knowledge": 0,
        "health": 0,
@@ -6517,7 +6540,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
    "flagsHas": [
     "cadet_dream"
    ],
-   "flagsNot": [],
+   "flagsNot": ["cadet_family_secret"],
    "family": null,
    "poor": null
   },
@@ -9323,7 +9346,7 @@ window.DEMO_EVENTS = (window.DEMO_EVENTS || []).concat([
   },
   "variantOf": "F1",
   "replaces": null,
-  "text": "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} {ผู้ใหญ่}จึงไปขอกู้กองทุนหมู่บ้าน มีเพื่อนบ้านสองคนช่วยค้ำ ในที่ประชุมมีคนถามว่าจะกู้ไปทำอะไร {ผู้ใหญ่}ตอบว่า 'เอาไปให้หลานติวสอบเตรียมทหารจ้ะ{ถิ่น}'",
+  "text": "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} {ผู้ใหญ่}จึงไปขอกู้กองทุนหมู่บ้าน มีเพื่อนบ้านสองคนช่วยค้ำ ในที่ประชุมมีคนถามว่าจะกู้ไปทำอะไร {ผู้ใหญ่}ตอบว่า 'เอาไปให้{ลูก}ติวสอบเตรียมทหารจ้ะ{ถิ่น}'",
   "options": [
    {
     "label": "รับเงินไว้ สัญญาว่าจะตั้งใจ",
@@ -11413,6 +11436,7 @@ function start(p) {
         flags: new Set(), done: new Set(), queue: [], sched: [], log: [], ended: false,
         inspireCount: 0, inspireAges: [10, 12] };   // owner: ≥2 before deciding, never back to back
   if (p.heir) S.flags.add(p.heir + '_family');
+  S.heirMomServed = !(p.heir === 'police' && p.birthYear < POLICE_WOMAN_YEAR);   // เจ้าของเคาะ 2026-11-09: ตัดสินครั้งเดียวตอนเกิด ไม่คิดใหม่ทุกปี
   beginYear();
 }
 
@@ -11438,6 +11462,7 @@ function condOk(c) {
   if (c.flagsHasPrefix && !hasPrefix(c.flagsHasPrefix)) return false;
   if (c.family === 'mother' && !(S.family === 'both' || S.family === 'mother')) return false;
   if (c.family === 'fatherOnly' && S.family !== 'fatherOnly') return false;
+  if (c.family === 'father' && !(S.family === 'both' || S.family === 'fatherOnly')) return false;
   if (c.noParents && S.family !== 'none') return false;
   if (c.heirAlive && heirCase() === 'lateFather') return false;   // บ้านพักในค่าย/หลังโรงพัก ต้องมีคนในบ้านที่ยังรับราชการอยู่
   if (c.poor === true && S.cls !== 'poor') return false;
@@ -11704,10 +11729,10 @@ const dialect = t => { const p = DIALECT[S.region]; return t.replaceAll('นะ{
 // {ผู้ใหญ่} = คนในบ้านคนเดียว (elder) · {ผู้ใหญ่ทายาท} = คนในบ้านที่เคยใส่เครื่องแบบ (มีพ่อ = พ่อ) · {ที่ตั้ง} = ที่ตั้ง รร.ตท. ตามปี
 // ทายาท (เจ้าของเคาะ 2026-11-09): คนที่ผ่านเตรียมทหารต้องเป็นผู้ชาย · มีพ่อ = พ่อรับราชการ · มีแต่แม่ = แม่รับราชการทางอื่น (ทบ. พยาบาลทหาร · ตร. พนักงานสอบสวนหญิง ตั้งแต่ 2538)
 // · ไม่มีพ่อแม่ = พ่อที่เสียแล้วรับราชการ ป้าเล่าถึงพ่อ ป้าไม่เคยรับราชการ
-const POLICE_WOMAN_YEAR = 2538;   // เจ้าของเคาะ 2026-11-09: ปีแรกที่รับผู้หญิงเป็นพนักงานสอบสวน (บรรจุจากผู้จบปริญญา) · ก่อนปีนี้ แม่ที่เป็นทายาทตำรวจใช้แบบพ่อที่เสียแล้ว (แม่เล่าแทนป้า)
+const POLICE_WOMAN_YEAR = 2538;   // เจ้าของเคาะ 2026-11-09: ปีแรกที่รับผู้หญิงเป็นพนักงานสอบสวน (บรรจุจากผู้จบปริญญา) · ตัวละครเกิดก่อนปีนี้ แม่ที่เป็นทายาทตำรวจใช้แบบพ่อที่เสียแล้วทั้งชีวิต (แม่เล่าแทนป้า) · ตัดสินใน start()
 function heirCase() {
   if (S.family === 'both' || S.family === 'fatherOnly') return 'father';
-  if (S.family === 'mother' && !(S.heir === 'police' && year() < POLICE_WOMAN_YEAR)) return 'mother';
+  if (S.family === 'mother' && S.heirMomServed !== false) return 'mother';
   return 'lateFather';
 }
 const herRoute = () => S.heir === 'police' ? 'พนักงานสอบสวนหญิง' : 'พยาบาลทหาร';
@@ -11721,7 +11746,9 @@ const campus = () => year() < CAMPUS_NAYOK_YEAR ? 'กรุงเทพฯ' : '
 const fill = t => dialect(heirPick(t || '').replaceAll('{ทางแม่}', herRoute()).replaceAll('{ชื่อเต็ม}', fullName()).replaceAll('{ชื่อ}', S.name).replaceAll('{เหล่า}', leanBranch())
   .replaceAll('{เงินไม่พอ}', moneyTalk())
   .replace(/\{ค่าย:([^}]*)\}/g, (_, s) => S.flags.has('cadet_prep_camp') ? s : '')   // D1 รอบ 2: คำบอกช่วงเวลาเฉพาะเด็กค่าย
-  .replaceAll('{ผู้ใหญ่ทายาท}', heirElder()).replaceAll('{ผู้ใหญ่}', elder()).replaceAll('{ที่ตั้ง}', campus()));
+  .replaceAll('{ผู้ใหญ่ทายาท}', heirElder()).replaceAll('{ผู้ใหญ่}', elder()).replaceAll('{ที่ตั้ง}', campus())
+  .replace(/\{มือถือ:([^{}|]*)\|([^{}]*)\}/g, (_, a, b) => year() >= MOBILE_YEAR ? a : b)   // {มือถือ:ตั้งแต่ยุคมือถือ|ก่อนยุคมือถือ}
+  .replaceAll('{ลูก}', momVoice()[1]));   // {ลูก} = ลูก (พ่อ/แม่พูด) · หลาน (ป้าพูด)
 // D2 รอบ 2 · E2-ค บรรทัดเปิดตามคนในบ้าน (ประโยคต่อจากนั้นคงเดิม)
 const moneyTalk = () => S.family === 'both' ? 'มื้อเย็นนี้พ่อกับแม่คุยกันเสียงเบา ๆ ว่าเดือนหน้าเงินจะไม่พอใช้'
   : `มื้อเย็นนี้${elder()}นั่งนับเงินในกระป๋อง บ่นเบา ๆ ว่าเดือนหน้าคงไม่พอใช้`;
@@ -12076,6 +12103,7 @@ function waitDay() {
 const WEB_YEAR = 2550;   // demo guess: results online from this year · owner to set
 const elder = () => ({ both: 'แม่', mother: 'แม่', fatherOnly: 'พ่อ' })[S.family] || 'ป้า';
 const secretNow = () => S.flags.has('cadet_family_secret');
+const closeBond = () => S.flags.has('cadet_bond_a') || S.flags.has('cadet_bond_c');   // แอบสอบ: เพื่อนสนิทที่มาด้วยได้จริง
 // แอบสอบ: ปุ่มโทรบอกที่บ้าน = โทรสารภาพ ล้างความลับ (เจ้าของเคาะ 2026-11-09)
 const revealCall = result => ({ label: 'โทรบอกที่บ้านว่าแอบไปสอบมา', hint: 'ที่บ้านจะรู้ทุกอย่างตอนนี้', fx: { relations: 1 }, merit: { sila: 1 },
   clearFlags: ['cadet_family_secret'], setFlags: ['cadet_family_told'], result });
@@ -12149,11 +12177,12 @@ function announceCard(round) {
   const no = S.p2.examNo || 10000 + Math.floor(Math.random() * 9000);
   S.p2.examNo = no;
   if (fin) return asCard({ id: 'X6a', title: 'บ่ายวันประกาศผลสุดท้าย',
-    text: `กินข้าวกลางวันไม่ลง ${web ? 'ผลจะขึ้นเว็บตอนบ่ายสาม' : 'ป้ายสุดท้ายจะติดตอนบ่ายสาม'} ${secretNow() ? 'เพื่อนสนิทนั่งรอเป็นเพื่อน' : elder() + 'นั่งรออยู่ด้วย'}\nรอบนี้ไม่มีรอบหน้าแล้ว ติดคือติด`,
+    text: `กินข้าวกลางวันไม่ลง ${web ? 'ผลจะขึ้นเว็บตอนบ่ายสาม' : 'ป้ายสุดท้ายจะติดตอนบ่ายสาม'} ${secretNow() ? (closeBond() ? 'เพื่อนสนิทนั่งรอเป็นเพื่อน' : '') : elder() + 'นั่งรออยู่ด้วย'}\nรอบนี้ไม่มีรอบหน้าแล้ว ติดคือติด`,
     options: [
       web ? { label: 'กดรีเฟรชเองทุกนาที', fx: { health: -1 }, _how: 'self', result: 'นิ้วโป้งเมื่อยก่อนหน้าเว็บจะโหลด' }
           : { label: 'เดินไปดูป้ายเอง', fx: { network: 1 }, _how: 'self', result: 'คนหน้าป้ายน้อยกว่ารอบแรกมาก ทุกคนเงียบ' },
-      { label: `ให้${checker()}ดูให้`, fx: { relations: 1 }, _how: 'elder', result: `${checker()}ลุกขึ้นช้า ๆ แล้วเดินไปก่อน` },
+      { label: `ให้${checker()}ดูให้`, fx: { relations: 1 }, _how: 'elder', result: `${checker()}ลุกขึ้นช้า ๆ แล้วเดินไปก่อน`,
+        ...(secretNow() ? { requires: { anyFlags: ['cadet_bond_a', 'cadet_bond_c'] }, lockReason: 'มาคนเดียว ไม่มีใครดูแทน' } : {}) },
       { label: 'รอให้คนซาก่อนค่อยดู', fx: { health: 1 }, _how: 'wait', result: 'นั่งนับมดบนโต๊ะจนบ่ายสี่' },
       { label: 'ไหว้พระอีกรอบ แล้วค่อยไปดู', fx: { happiness: 1 }, _how: 'pray', result: 'ไหว้นานกว่าทุกครั้ง ไม่ได้ขออะไร' },
       ...(web ? [] : [paperOpt(true)])] });
@@ -12164,7 +12193,8 @@ function announceCard(round) {
     options: [
       web ? { label: 'นั่งกดรีเฟรชหน้าเว็บที่ล่มอยู่', fx: { health: -1 }, _how: 'self', result: 'เว็บค้างไปครึ่งชั่วโมง พอหน้าโหลดขึ้น นิ้วก็สั่น' }
           : { label: 'ไปเบียดดูหน้าป้ายเอง', fx: { network: 1 }, _how: 'self', result: 'เบียดอยู่กลางคนเป็นร้อย ได้คุยกับคนที่มาดูผลเหมือนกัน' },
-      { label: `ให้${checker()}ดูให้`, fx: { relations: 1 }, _how: 'elder', result: `${checker()}เดินเข้าไปก่อน หันกลับมาโดยยังไม่พูดอะไร` },
+      { label: `ให้${checker()}ดูให้`, fx: { relations: 1 }, _how: 'elder', result: `${checker()}เดินเข้าไปก่อน หันกลับมาโดยยังไม่พูดอะไร`,
+        ...(secretNow() ? { requires: { anyFlags: ['cadet_bond_a', 'cadet_bond_c'] }, lockReason: 'มาคนเดียว ไม่มีใครดูแทน' } : {}) },
       { label: 'รอให้คนซาก่อนค่อยดู', fx: { health: 1 }, _how: 'wait', result: 'นั่งรอใต้ต้นไม้จนสาย ไม่ต้องเบียดใคร' },
       { label: 'แวะไหว้พระก่อน แล้วค่อยไปดู', fx: { happiness: 1 }, _how: 'pray', result: 'จุดธูปขอให้ใจนิ่ง ไม่ได้ขอให้ติด' },
       ...(web ? [] : [paperOpt(false)])] });
@@ -12358,6 +12388,7 @@ function x3Card() {
   const pass = P.branches.filter(b => P.written[b]), fail = P.branches.filter(b => !P.written[b]);
   const all = !fail.length, none = !pass.length, sum = all ? 'all' : none ? 'none' : 'some';
   const fr = (firstOk(P2().board) || {}).failReasons || {};
+  const home = e === 'ข' && how === 'elder', kw = kinWord();   // ยุค ข ให้คนอื่นดู = {ชื่อ} รออยู่ข้างโทรศัพท์บ้าน
   const open = ({
     self: { ก: 'มุดผ่านไหล่คนข้างหน้าเข้าไปจนจมูกเกือบชนกระดาษ', ข: 'หน้าจอค่อย ๆ โหลดทีละครึ่งบรรทัด', ค: 'นิ้วโป้งเลื่อนช้ากว่าที่ใจอยากให้เลื่อน' },
     elder: { ก: '{คน}เดินหายเข้าไปในฝูงคน {ชื่อ} ยืนรอที่เดิม มือเย็นทั้งที่แดดร้อน', ข: '{คน}นั่งรถไปดูป้ายจริงหน้ากองสอบแทน {ชื่อ} นั่งรอข้างโทรศัพท์บ้าน', ค: '{คน}ยื่นมือมาขอโทรศัพท์ แล้วหันหลังให้' },
@@ -12379,24 +12410,33 @@ function x3Card() {
   if (e === 'ค' && how === 'wait') react = none ? 'กลุ่มแชตเงียบผิดปกติ ไม่มีใครพิมพ์ชื่อ {ชื่อ}' : `ข้อความแรกในกลุ่มเด้งขึ้นมาว่า เจอชื่อ${mung()}แล้ว`;   // Q-V3
   if (e === 'ข' && how === 'wait') react = none ? 'หน้าจอโหลดครบแล้ว ไม่มีเลขของเราสักบรรทัด ลุกจากเก้าอี้ให้คนต่อคิว' : all ? 'โหลดครบทุกเหล่า เลขของเรายังอยู่ทุกแผ่น' : 'เลขของเราอยู่บนจอ แต่ไม่ครบทุกแผ่น';
   if (e === 'ค' && how === 'elder') react = { all: '{คน}หันกลับมา ยกนิ้วโป้งให้ก่อนจะพูดอะไร', some: '{คน}ชูนิ้วขึ้นมาไม่ครบมือ แล้วยิ้มให้', none: '{คน}วางโทรศัพท์ลงช้า ๆ แล้วถามว่าหิวไหม' }[sum];
+  if (home) react = { all: 'โทรศัพท์บ้านดังขึ้น {คน}บอกในสายว่าเจอเลขของเราครบทุกแผ่น', some: 'โทรศัพท์บ้านดังขึ้น {คน}อ่านเลขให้ฟังทีละแผ่น บางแผ่นก็เงียบไป',
+    none: 'โทรศัพท์บ้านดังขึ้น {คน}เงียบไปนานก่อนจะบอกว่าไม่เจอ' }[sum];
   // rival A/C lines wait for a rival system (owner 2026-11-06: rival* locked until then) · only the B lines + rare surname line
   const rl = [S.flags.has('cadet_prep_camp') ? (e === 'ค' ? 'ที่ติวส่งรูปป้ายเข้ากลุ่ม ชื่อลูกนายพลคนนั้นอยู่แถวบน' : 'ชื่อลูกนายพลคนนั้นอยู่แถวบน ครูพิเศษยืนถ่ายรูปป้ายให้') : e === 'ค' ? 'ในกลุ่มแชตมีคนส่งต่อกันว่า ลูกนายพลคนหนึ่งติดแถวบนทุกสนาม' : 'ได้ยินคนข้าง ๆ พูดถึงลูกนายพลที่ติดแถวบนทุกสนาม'];
   if (Math.random() < RARE_P) rl.push('คนข้าง ๆ ร้องเสียงหลง เพราะเห็นนามสกุลตัวเอง แต่ชื่อต้นไม่ใช่');
+  if (home) { rl.length = 0; if (S.flags.has('cadet_prep_camp')) rl.push('{คน}เล่าในสายด้วยว่าชื่อลูกนายพลคนนั้นอยู่แถวบน'); }   // อยู่บ้าน ไม่เห็นป้าย ไม่มีคนข้าง ๆ
   const text = kin(`${open[e] || open.ก}\n\n${block.join('\n')}\n\n${summary}\n${react}\n${rl.slice(0, 2).join(' ')}`);
   const last = S.age >= 18;
   const opts = none ? [
-    { label: 'ไล่ดูอีกรอบ เผื่อตาฝาด', fx: { happiness: -1 }, result: 'รอบที่สามช้ากว่ารอบแรก แต่ตัวเลขก็ยังเหมือนเดิม' },
+    home ? { label: `ขอให้${kw}ดูซ้ำอีกรอบ`, fx: { happiness: -1 }, result: `${kw}เงียบไปพักหนึ่ง แล้วบอกว่าดูสามรอบแล้ว ไม่มีจริง ๆ` }
+      : { label: 'ไล่ดูอีกรอบ เผื่อตาฝาด', fx: { happiness: -1 }, result: 'รอบที่สามช้ากว่ารอบแรก แต่ตัวเลขก็ยังเหมือนเดิม' },
     { label: 'ดูว่าขาดไปตรงไหน', hint: 'เจ็บ แต่รู้ว่าปีหน้าต้องแก้อะไร', fx: { knowledge: 1 },
       result: last ? 'จดบรรทัดเหตุไว้ ไม่ใช่เพื่อปีหน้า แต่เพื่อไม่ลืม' : 'จดบรรทัดเหตุไว้หลังบัตรสอบ ตัวหนังสือเล็กจนแทบอ่านไม่ออก' },
     secret ? { label: 'เก็บไว้คนเดียวก่อน', fx: { happiness: -1 }, result: 'บัตรสอบพับเก็บไว้ลึกสุดของกระเป๋า' }
-      : { label: 'บอกที่บ้านเองก่อนใคร', fx: { relations: 1 }, result: 'ปลายทางเงียบไปนิดหนึ่ง แล้วบอกว่ากลับมากินข้าวบ้าน' },
-    { label: 'เดินออกมาเงียบ ๆ', result: 'เดินผ่านเสียงดีใจของคนอื่น ไม่หันกลับไปมอง' }]
+      : home ? { label: `คุยกับ${kw}ต่อในสาย`, fx: { relations: 1 }, result: `${kw}บอกว่าไม่เป็นไร เดี๋ยวกลับถึงบ้านแล้วค่อยคุยกัน` }
+      : how === 'elder' ? { label: `คุยกับ${kw}ตรง ๆ`, fx: { relations: 1 }, result: `${kw}จับไหล่ไว้ บอกว่าไม่เป็นไร กลับบ้านไปกินข้าวกันก่อน` }
+      : { label: 'บอกที่บ้านเองก่อนใคร', fx: { relations: 1 }, result: 'ปลายทางเงียบไปนิดหนึ่ง แล้วบอกว่าไม่เป็นไร คืนนี้กินข้าวด้วยกัน' },
+    home ? { label: 'วางสายแล้วนั่งเงียบ ๆ', result: 'นั่งข้างโทรศัพท์อยู่อย่างนั้นจนมืด' }
+      : { label: 'เดินออกมาเงียบ ๆ', result: 'เดินผ่านเสียงดีใจของคนอื่น ไม่หันกลับไปมอง' }]
   : [
-    { label: 'ร้องออกมาดัง ๆ', fx: { happiness: 1 }, result: all ? 'เสียงดังจนคนแปลกหน้าหันมาปรบมือให้' : 'ร้องได้ครึ่งเสียง แล้วนึกถึงอีกแผ่น' },
+    { label: 'ร้องออกมาดัง ๆ', fx: { happiness: 1 }, result: home ? 'ร้องดังจนหมาข้างบ้านเห่าตาม' : all ? 'เสียงดังจนคนแปลกหน้าหันมาปรบมือให้' : 'ร้องได้ครึ่งเสียง แล้วนึกถึงอีกแผ่น' },
     e === 'ก' ? { label: 'จดเลขลำดับใส่ฝ่ามือ', fx: { happiness: 1 }, result: 'หมึกปากกาซึมลงลายมือ ไม่ยอมล้างจนถึงเย็น' }
+      : home ? { label: `จดเลขลำดับที่${kw}อ่านให้ฟัง`, fx: { happiness: 1 }, result: 'เขียนตัวโต ๆ บนปฏิทินข้างโทรศัพท์ แล้ววงไว้สองรอบ' }
       : e === 'ข' ? { label: 'สั่งพิมพ์หน้านั้นเก็บไว้', hint: 'ได้กระดาษเก็บ แต่เสียค่าพิมพ์', fx: { happiness: 1, money: -0.4 }, result: 'กระดาษยังอุ่นจากเครื่องพิมพ์ พับใส่กระเป๋าเสื้อ' }
       : { label: 'แคปหน้าจอเก็บไว้', fx: { happiness: 1 }, result: 'รูปเดียวกันถูกแคปซ้ำสามรอบ กลัวมันหาย' },
-    { label: 'มองหาเลขของเพื่อนด้วย', fx: { relations: 1 }, merit: { help_others: 1 }, result: 'ไล่หาให้คนข้าง ๆ ที่หาไม่เจอ จนเขาเจอ' },
+    home ? { label: `ขอให้${kw}ดูเลขของเพื่อนให้ด้วย`, fx: { relations: 1 }, merit: { help_others: 1 }, result: `${kw}ไล่หาให้อีกรอบ จนเจอเลขของเพื่อน` }
+      : { label: 'มองหาเลขของเพื่อนด้วย', fx: { relations: 1 }, merit: { help_others: 1 }, result: 'ไล่หาให้คนข้าง ๆ ที่หาไม่เจอ จนเขาเจอ' },
     { label: 'นิ่งไว้ รอบสองยังไม่จบ', hint: 'ใจไม่ฟุ้ง แต่ไม่ได้ฉลองเต็มที่', fx: { health: 1 }, result: 'พยักหน้าให้ตัวเองครั้งเดียว แล้วคิดถึงสระว่ายน้ำ' }];
   if (none) S.p2.steps = [() => failedCard()];
   else S.p2.steps = [() => x3bCard(pass, fail), () => physAsk('phys'), () => nearExamCard(), () => bodyDayCard(), () => judgeBody(),
@@ -12432,7 +12472,8 @@ function x3bCard(pass, fail) {
   if (!secret && S.heir === 'army') L.push('ลุงที่เคยรับราชการทหารโทรมา เล่าเรื่องรุ่นตัวเองยาวจนแบตหมด');
   if (!secret && S.heir === 'police') L.push('ญาติที่เป็นตำรวจแวะมาถึงบ้าน ถอดหมวกวางบนโต๊ะ แล้วบอกว่ารอบสองหนักกว่านี้');
   if (!secret && friend) L.push(friendWrittenLine());   // ข้อ 2 · เพื่อนติวในฉากประกาศผล
-  if (S.flags.has('cadet_prep_camp')) L.push('ที่ติวขึ้นป้ายรายชื่อเด็กของตัวเองหน้าตึก ชื่อ {ชื่อ} อยู่ค่อนไปทางท้าย');
+  if (S.flags.has('cadet_prep_camp')) { const sc = bestWritten(pass);   // ตำแหน่งบนป้ายตามคะแนน (ลำดับ = 20 + (25 − คะแนน) × 30)
+    L.push(`ที่ติวขึ้นป้ายรายชื่อเด็กของตัวเองหน้าตึก ชื่อ {ชื่อ} อยู่${sc >= 21 ? 'แถวต้น ๆ' : sc >= 17 ? 'กลาง ๆ แผ่น' : 'ค่อนไปทางท้าย'}`); }
   if (S.flags.has('cadet_prep_senior') || S.flags.has('cadet_senior_tutor')) L.push('รุ่นพี่ส่งข้อความมาสั้น ๆ ว่า "ดีใจด้วยน้อง แต่พละโหดกว่านี้เยอะนะ ซ้อมไว้เลย"');
   // เกลี่ย S3 ข้อ 15/17/18: ร้านกาแฟนับในเพดาน 2 บรรทัด แทนที่บรรทัดฐานะ/ภาค · ใบ Q-N1 ไม่ใส่ (หนังสือพิมพ์ซ้ำในใบเดียว)
   const pc = paperReveal ? '' : paperCheer();
@@ -12507,7 +12548,11 @@ function cheerCard(pass, fail, round = 'phys') {
   const iv = round === 'iv', fin = round === 'final';
   // cadet-voice-joy-pass.md ข้อ 3 (Q-L2 ร่างใหม่) · {ถิ่น} = คำลงท้ายภาษาถิ่นในคำพูดครอบครัว
   const L = [], wasSecret = secretNow();
-  if (wasSecret) {
+  // แอบสอบ ก่อนรอบสุดท้าย: ที่บ้านยังไม่รู้ ไม่มีบรรทัดดีใจของบ้าน (เจ้าของเคาะ 2026-11-09) · บอกได้เองจากตัวเลือก
+  const keepSecret = wasSecret && !fin;
+  if (keepSecret) L.push(iv ? 'ผลพลศึกษาออกแล้ว ผ่าน แต่ที่บ้านยังไม่รู้ว่ามีอะไรให้ดีใจ {ชื่อ} กินข้าวเย็นเหมือนทุกวัน ยิ้มอยู่คนเดียว'
+    : 'ผ่านข้อเขียนแล้ว แต่ที่บ้านยังไม่รู้ว่ามีอะไรให้ดีใจ {ชื่อ} กินข้าวเย็นเหมือนทุกวัน ยิ้มอยู่คนเดียว');
+  else if (wasSecret) {
     L.push('{ผู้ใหญ่}ตกใจจนพูดไม่ออก ตีแขนเบา ๆ "แอบไปสอบแล้วติดซะด้วยเนี่ยนะ!" แล้วก็หัวเราะลั่นบ้าน');
     S.flags.delete('cadet_family_secret'); S.flags.add('cadet_family_told');   // no longer a secret from here on
   }
@@ -12531,7 +12576,13 @@ function cheerCard(pass, fail, round = 'phys') {
   if (fail.length) L.push(fin ? `${fail.map(b => BR_TH[b]).join(' ')} ไม่ติด แต่ติด ${pass.map(b => BR_TH[b]).join(' ')} แล้ว`
     : `${fail.map(b => BR_TH[b]).join(' ')} ไม่ผ่านก็จริง แต่ยังเหลือ ${pass.map(b => BR_TH[b]).join(' ')} ให้ไปต่อ`);
   // E1 · ตัวเลือกรอบสุดท้ายแทนชุดเดิมทั้ง 4 · ข้อ 3.4 · ตัวเลือกรอบอื่น (ผลค่าเดิม)
-  const opts = fin ? [
+  const opts = keepSecret ? [
+      { label: 'เก็บไว้คนเดียวก่อน', fx: { happiness: 1 }, result: 'กินข้าวเย็นกับที่บ้านเหมือนทุกวัน ไม่มีใครรู้ว่าวันนี้ผ่านอะไรมา' },
+      { label: 'เล่าให้ที่บ้านฟังตอนกินข้าวเย็น', hint: 'ที่บ้านจะรู้ทุกอย่างตอนนี้', fx: { relations: 1 }, merit: { sila: 1 },
+        clearFlags: ['cadet_family_secret'], setFlags: ['cadet_family_told'],
+        result: `{ผู้ใหญ่}วางช้อนลง "แอบไปสอบเตรียมทหารมาเหรอ แล้วผ่าน${iv ? 'พละ' : 'ข้อเขียน'}ด้วย?" แล้วก็หัวเราะทั้งที่ยังงง` },
+      { label: 'ขอตัวเข้านอนเร็ว', fx: { health: 1 }, result: 'นอนเต็มอิ่มเป็นคืนแรกในรอบหลายเดือน' }]
+    : fin ? [
       wasSecret ? { label: 'กอด{ผู้ใหญ่}ที่เพิ่งรู้เรื่อง', fx: { relations: 1 }, result: '{ผู้ใหญ่}ตีหลังเบา ๆ สองที "คราวหน้าบอกกันก่อนนะ{ถิ่น}" แล้วกอดแน่นกว่าเดิม' }
         : { label: 'กอด{ผู้ใหญ่}ให้แน่น', fx: { relations: 1 }, result: '{ผู้ใหญ่}กอดตอบแรงกว่า ไม่มีใครพูดอะไรอยู่นาน' },
       { label: 'จุดธูปบอกปู่ย่าที่หิ้งพระ', fx: { happiness: 1 }, result: 'ปักธูปแล้วยืนยิ้มอยู่หน้าหิ้ง {ผู้ใหญ่}มายืนข้าง ๆ "ปู่ย่าคงดีใจแย่เลย{ถิ่น}"' },
@@ -12576,7 +12627,8 @@ function bodyBoard() {
   else S.p2.steps = [() => cheerCard(pass, fail, 'iv'), () => physAsk('iv'), () => ivEveCard(), () => ivIntroCard(), () => { queueInterview(); return null; }];
   const opts = none
     ? [{ label: 'อ่านซ้ำอีกรอบ', fx: {}, result: 'ไล่ดูอีกสองรอบ เลขนั้นไม่มีจริง ๆ' },
-       { label: `เดินกลับไปหา${who}`, fx: { relations: 1 }, result: `${who}จับไหล่ไว้ ไม่ถามอะไรสักคำ` },
+       { label: `เดินกลับไปหา${who}`, fx: { relations: 1 }, result: `${who}จับไหล่ไว้ ไม่ถามอะไรสักคำ`,
+         ...(secretNow() ? { requires: { anyFlags: ['cadet_bond_a', 'cadet_bond_c'] }, lockReason: 'มาคนเดียว ไม่มีใครรออยู่' } : {}) },
        { label: 'ไปนั่งคนเดียวสักพัก', fx: { happiness: -1 }, result: 'นั่งอยู่ใต้ต้นไม้จนคนกลับกันหมด' },
        { label: 'บอกตัวเองว่าปีหน้าจะซ้อมให้หนักกว่านี้', fx: { health: 1 }, result: 'เย็นนั้นออกไปวิ่งรอบหมู่บ้านทั้งที่ยังเมื่อย' }]
     : [S.p2.how === 'elder' && !secretNow() ? { label: `หันไปกอด${who}`, fx: { relations: 1 }, result: `${who}ตบหลังแรง ๆ สองที` }
@@ -12657,7 +12709,8 @@ function ivEveCard() {
   return asCard({ id: 'X5e', title: 'วันก่อนสัมภาษณ์',
     text: 'พรุ่งนี้คือรอบสุดท้าย ไม่มีวิ่ง ไม่มีข้อสอบ มีแค่โต๊ะตัวเดียวกับกรรมการสามคน',
     options: [
-      { label: `ให้${elder()}ช่วยถามซ้อม`, fx: { relations: 1 }, result: `${elder()}ถามข้อแรกว่า "ทำไมอยากเป็น" แล้วฟังจนจบ` },
+      secretNow() ? { label: 'ซ้อมตอบหน้ากระจกคนเดียว', fx: { happiness: 1 }, result: 'ถามตัวเองว่า "ทำไมอยากเป็น" แล้วตอบหน้ากระจกจนจำได้ทุกคำ' }
+        : { label: `ให้${elder()}ช่วยถามซ้อม`, fx: { relations: 1 }, result: `${elder()}ถามข้อแรกว่า "ทำไมอยากเป็น" แล้วฟังจนจบ` },
       { label: 'ตัดผม รีดเสื้อ ขัดรองเท้า', fx: { happiness: 1 }, result: 'ชุดนักเรียนแขวนรอไว้หน้าตู้ เรียบจนไม่กล้านั่ง' },
       { label: 'อ่านประวัติเหล่าที่สมัครไว้', fx: { knowledge: 1 }, result: 'จำชื่อสถาบันกับปีที่ก่อตั้งได้ขึ้นใจ' },
       { label: 'นอนเร็วกว่าทุกวัน', fx: { health: 1 }, result: 'หลับไปก่อนคิดคำตอบเสร็จ' }] });
@@ -12766,7 +12819,8 @@ function finalBoard() {
   S.p2.steps = none ? [() => failedCard()] : [() => cheerCard(pass, fail, 'final'), () => chooseOrPack(pass)];
   const opts = none
     ? [{ label: 'อ่านซ้ำอีกรอบ', fx: {}, result: 'มาถึงรอบสุดท้ายแล้ว แต่เลขนั้นไม่มีจริง ๆ' },
-       { label: `เดินกลับไปหา${who}`, fx: { relations: 1 }, result: `${who}บอกว่ามาถึงตรงนี้ก็เก่งแล้ว` },
+       { label: `เดินกลับไปหา${who}`, fx: { relations: 1 }, result: `${who}บอกว่ามาถึงตรงนี้ก็เก่งแล้ว`,
+         ...(secretNow() ? { requires: { anyFlags: ['cadet_bond_a', 'cadet_bond_c'] }, lockReason: 'มาคนเดียว ไม่มีใครรออยู่' } : {}) },
        { label: 'ไปนั่งคนเดียวสักพัก', fx: { happiness: -1 }, result: 'นั่งจนป้ายถูกปลดลง' },
        S.age < 18 ? { label: 'จดเลขคนที่ติดไว้ ปีหน้าจะมาใหม่', fx: { knowledge: 1 }, result: 'เขียนไว้หลังบัตรสอบ' }
                   : { label: 'เก็บบัตรสอบใบนี้ไว้', fx: { happiness: 1 }, result: 'ปีสุดท้ายแล้ว แต่มาถึงรอบสุดท้ายได้ก็ไม่เสียใจ' }]
@@ -12927,7 +12981,8 @@ function failedCard() {
     if (res) mouth = `\n${mom}บอกว่า "ขาดไป${numTh(res.reserveNo)}ที่เองนะ{ถิ่น}${kid} ปีหน้าเอาใหม่"`;
     else if (kb && !S.p2.branches.some(b => S.p2.written[b])) mouth = `\n${hasFather() ? 'พ่อ' : elder()}บอกว่า "ขาดอีก${numTh(KNOW_MIN - (S.p2.know?.[kb] ?? S.stats.knowledge))}คะแนนเอง ปีหน้าอ่านเพิ่มอีกหน่อยก็ได้แล้ว{ถิ่น}"`;
   }
-  return asCard(c, { id: c.id || 'X10', text: (c.text || '').replaceAll('{เหตุ}', why).replaceAll('{สถานี}', 'รอบพลศึกษา เพราะร่างกายยังไม่ถึงเกณฑ์ของเหล่าที่สมัคร') + unsaid + mouth });
+  const stayedHome = ['noreport', 'noshow', 'noshow_iv'].includes(S.p2.failStage);   // ไม่ได้ออกไปไหน ไม่มีทางกลับบ้าน
+  return asCard(c, { id: c.id || 'X10', text: (c.text || '').replaceAll('ทางกลับบ้านวันนั้นยาวกว่าขามา', stayedHome ? 'วันนั้นทั้งวันไม่ได้ออกจากบ้าน' : 'ทางกลับบ้านวันนั้นยาวกว่าขามา').replaceAll('{เหตุ}', why).replaceAll('{สถานี}', 'รอบพลศึกษา เพราะร่างกายยังไม่ถึงเกณฑ์ของเหล่าที่สมัคร') + unsaid + mouth });
 }
 function endExamYear() {
   S.p2 = null;
