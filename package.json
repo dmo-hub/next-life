@@ -13,7 +13,7 @@
     "finance": "node harness/finance.mjs --n 50000 --seed 1",
     "lineage": "node harness/lineage.mjs --n 2000 --gens 3 --seed 1",
     "isekai": "node harness/isekai.mjs --n 4000 --seed 1",
-    "titles": "node harness/titles.mjs --n 2000 --gens 3 --seed 1",
+    "titles": "node harness/titles.mjs --n 700 --gens 3 --seed 1",
     "omen-ctl": "node harness/omen-ctl.mjs --n 2000 --gens 3 --seed 1",
     "overlap": "node harness/overlap.mjs --n 1000 --gens 4 --seed 1",
     "drift": "node harness/drift.mjs --n 300 --seed 1",
