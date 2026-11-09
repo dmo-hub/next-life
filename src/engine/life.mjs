@@ -857,7 +857,7 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
     // วัดพรสวรรค์หลังเข้าสาย — อาชีพเปลี่ยนตามขั้นแรกของสาย
     st.incomeMult = talentStart(st);
     // ทางแรกของสาย (B170): การ์ด first_of ออกปีที่เข้าสาย ครั้งเดียวต่อชีวิต (เข้าสายซ้ำไม่ออกอีก) · แทนการ์ดกองสุ่มหนึ่งใบแบบผลย้อน ชีวิตจึงไม่ยาวขึ้น
-    const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id]);
+    const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id] && awayOk(st, e));
     if (first) {
       st.done[first.id] = true;
       st.due.push({ kind: 'eraEvent', ev: first, age: st.age });
@@ -1890,7 +1890,8 @@ function arcDefer(st) {
 
 // สถานะอยู่นอกบ้าน (ใบ 237 · ข้อ 426–428 443–445): ไม่มี st.away = อยู่บ้าน ⇒ ชีวิตที่ไม่ไปไหนไม่ถูกแตะเลขสุ่มหรือช่องเซฟเลย
 // ป้าย away_block เป็นรายใบรายชนิด เพราะกองสุ่มไม่รู้ว่าใบไหนต้องอยู่บ้าน และ pool_focus_flag ล็อกทั้งกองใช้แทนไม่ได้
-const awayOk = (st, e) => !st.outside || !e.away_block?.includes(st.outside.kind);
+// away_only = การ์ดที่เล่าชีวิตช่วงนอกบ้าน กดกลับบ้านกลางทางแล้วนัดที่ค้างจึงไม่ออก ไม่ต้องตามลบจากตารางนัด
+const awayOk = (st, e) => (!e.away_only || e.away_only.includes(st.outside?.kind)) && (!st.outside || !e.away_block?.includes(st.outside.kind));
 
 // นัดและหลักไมล์ที่ตกช่วงนอกบ้านเลื่อนทีละปีจนกลับ (เจ้าของเคาะข้อ 444) — ไม่รู้ล่วงหน้าว่าจะกลับปีไหน จึงตั้งอายุเป้าตรง ๆ แบบ arcDefer ไม่ได้
 // หลักไมล์ต้องจดเป็นนัด เพราะ byAge ผูกอายุเดียว พ้นปีแล้วไม่ถูกค้นอีก · ติด milestone ไว้ไม่ให้หักโควตาแบบผลย้อน
@@ -2446,7 +2447,7 @@ export function choose(st, idx, loan) {
     const capped = DRAW_RULES.nextCap !== Infinity;
     const start = capped && !st.inStory?.[ev.id] && follow?.run === undefined;
     const stage = stageOf(st.age);
-    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow) && arcNextOk(st, ev, follow) && !(start && (st.stories?.[stage] ?? 0) >= DRAW_RULES.nextCap)) {
+    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow) && awayOk(st, follow) && arcNextOk(st, ev, follow) && !(start && (st.stories?.[stage] ?? 0) >= DRAW_RULES.nextCap)) {
       if (start) (st.stories ??= {})[stage] = (st.stories[stage] ?? 0) + 1;
       if (capped) (st.inStory ??= {})[follow.id] = true;
       st.done[follow.id] = true;

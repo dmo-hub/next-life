@@ -13,7 +13,7 @@ export const AFTER = 'ระหว่างชาติ';
 export const CARD_GROUPS = [
   { name: 'สุขภาพ', files: ['*_health', 'stats_extremes'] },
   { name: 'อาชีพเฉพาะทาง', files: ['job_*', '*_career', 'singer', 'boxer', 'pageant'] },
-  { name: 'งานและเงิน', files: ['work_*', 'business', 'debt*', 'corruption', 'lottery', 'grey_money', 'career_first', 'crop_rural'] },
+  { name: 'งานและเงิน', files: ['work_*', 'business', 'debt*', 'corruption', 'lottery', 'grey_money', 'career_first', 'crop_rural', 'labor_abroad'] },
   { name: 'สายเตรียมทหาร', files: ['cadet_*'] },
   { name: 'ครอบครัว', files: ['child_family', 'old_family', 'echoes_family', 'pets', 'remarry', 'heir', 'grief', 'funeral'] },
   { name: 'ชีวิตประจำวัน', files: ['daily_*', 'life_*', 'street_*', 'tour_local'] },

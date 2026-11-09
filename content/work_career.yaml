@@ -1,6 +1,7 @@
 # กลุ่มเปลี่ยนงาน/สายอาชีพ · ช่วงหนุ่มสาว (19–30) · ทำงาน (31–45) · กลางคน (46–59) · ใช้ job/requires.edu ย้ายสายงาน และ network เป็นตัวคูณโอกาส
 events:
   - id: career_poach_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -37,6 +38,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: career_poach_cornered_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -59,6 +61,7 @@ events:
           - {weight: 3, text: "ไม่มีใครตามมาเลย เงินเก็บหมดไปกับค่าเช่าออฟฟิศ", effects: {money: {unit: income_x, amount: -2}, income_mult: 0.8}, sets_flags: [own_business], merit: [{cat: neutral}]}
 
   - id: career_dream_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -87,6 +90,7 @@ events:
       - {id: night_course, text: "ลงคอร์สกลางคืนเรื่องที่ฝันไว้", requires: {nature: learn}, effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
 
   - id: career_dream_crossroad_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -106,6 +110,7 @@ events:
       - {text: "กลับบ้านขอพ่อแม่ช่วยทุน", requires: {family: [{role: parent, alive: true}]}, effects: {relations: -1, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
 
   - id: career_transfer_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -142,6 +147,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: career_lead_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -177,6 +183,7 @@ events:
           - {weight: 2, text: "ลูกน้องลาออกยกทีมในเดือนเดียว ถูกถอดจากตำแหน่งกลางที่ประชุม", effects: {happiness: -3, income_mult: 0.85, relations: -1}, merit: [{cat: neutral}]}
 
   - id: career_lead_mutiny_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -194,6 +201,7 @@ events:
       - {text: "ทำงานหนักให้ดูเป็นตัวอย่าง", effects: {health: -2, relations: 1}, merit: [{cat: neutral}]}
 
   - id: career_midlife_restart_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: กลางคน
@@ -233,6 +241,7 @@ events:
           - {weight: 2, text: "ทุกคนบอกว่าจะช่วยดู แล้วก็หายเงียบ สุดท้ายต้องรับจ้างรายวัน", effects: {job: labor, happiness: -1}, merit: [{cat: neutral}]}
 
   - id: career_factory_tech_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -264,6 +273,7 @@ events:
   # ตอนสองของเรื่องสอบช่างเทคนิค — ออกทางนัดจาก career_factory_tech_01 เท่านั้น (ไม่มี weight) ปีเดียวกัน
   # ไม่ตั้ง when: นัดปีเดียวกันต้องออกแน่ เรื่องจึงไม่ขาดกลางทาง
   - id: career_factory_exam_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -294,6 +304,7 @@ events:
       - {id: withdraw, text: "ถอนตัว กลับไปทำโอทีเหมือนเดิม", effects: {money: {unit: income_x, amount: 0.5}, health: -1}, merit: [{cat: neutral}]}
 
   - id: career_farm_city_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -329,6 +340,7 @@ events:
           - {weight: 2, text: "ฝนไม่มาอีกปี ผักตายทั้งแปลง", effects: {income_mult: 0.8, happiness: -1}, merit: [{cat: neutral}]}
 
   - id: career_nepotism_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน

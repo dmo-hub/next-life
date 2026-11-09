@@ -2,6 +2,7 @@
 # ใช้ธงวัยต้น: good_student (ทุน/ไปนอก) · likes_clips (อินฟลูฯ) · bullied (หัวหน้าเอาเปรียบ/ปาร์ตี้) · sporty (ไปนอก) · school_record (ทุนยากขึ้น)
 events:
   - id: young_scholarship_01
+    away_block: [abroad]
     type: A
     category: study
     stage: หนุ่มสาว
@@ -38,6 +39,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_first_boss_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -72,6 +74,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_wedding_01
+    away_block: [abroad]
     type: A
     category: family
     stage: หนุ่มสาว
@@ -118,6 +121,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_baby_01
+    away_block: [abroad]
     type: A
     category: family
     stage: หนุ่มสาว
@@ -158,6 +162,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_loan_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -198,6 +203,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_shop_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -254,6 +260,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_party_01
+    away_block: [abroad]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -293,6 +300,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_influencer_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -331,6 +339,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_abroad_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -373,6 +382,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_boss_room_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -408,6 +418,7 @@ events:
 
   # เรื่องต่อของ young_shop_01 (ร้านกาแฟดัง) — ออกทาง next เท่านั้น
   - id: young_shop_rush_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -441,6 +452,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ young_wedding_01 (กู้จ่ายสินสอด) — ออกทาง next เท่านั้น
   - id: young_dowry_debt_01
+    away_block: [abroad]
     type: A
     category: family
     stage: หนุ่มสาว
@@ -470,6 +482,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ young_influencer_01 (ลาออกทำคอนเทนต์ กระแสหมด) — ออกทาง next เท่านั้น
   - id: young_influencer_fade_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว

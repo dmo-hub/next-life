@@ -34,6 +34,7 @@ events:
         schedules: [{event: echo_old_friend_cold_01, after_years: [20, 22]}]
 
   - id: echo_old_friend_help_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -63,6 +64,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: echo_old_friend_cold_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -154,6 +156,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: echo_school_record_exam_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว

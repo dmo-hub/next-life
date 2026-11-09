@@ -3,6 +3,7 @@
 # ทางนอกระบบตั้ง loan_shark ให้การ์ดทวงหนี้นอกระบบเดิมรับต่อ จึงไม่นัดใบทวงของสายนี้
 events:
   - id: debt_invest_offer_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน

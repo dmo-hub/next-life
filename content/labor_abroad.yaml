@@ -1,0 +1,402 @@
+# สายแรงงานไทยในต่างแดน 13 ใบ
+# ไม่แก้ young_abroad_01 ของเดิม (ใบนั้นจบ 3 ปีในคลิกเดียว) · สายนี้เปิดใหม่ด้วยใบชวน 2 ใบแล้วเดินเป็นนัด
+# ถูกกฎหมาย: dorm → remit → renew → return · ไม่มีสัญญา: gate → ghost → (sick/amnesty กอง) raid → return
+# ใช้ธง + schedules + effects.debt เดิม ไม่ใช้ pool_focus_flag · ปีเริ่ม 2513 ตามหน้าประวัติแรงงานไทย
+# ไม่เล่าวิธีผ่านด่าน ไม่บอกช่องทาง ไม่ล้อคนที่ถูกหลอก · ไม่มีชื่อบริษัท ชื่อโครงการ ชื่อประเทศ
+events:
+  - id: abroad_village_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2513, 2650]
+    weight: 3
+    when: {age: [23, 30], flags: {not: [abroad_went]}}
+    title: "บ้านปูนหลังแรกในซอย"
+    text: "เพื่อนรุ่นเดียวกันกลับจากเมืองนอกสามปี รื้อบ้านไม้สร้างบ้านปูนสองชั้น คืนขึ้นบ้านใหม่เขาเล่าว่าเงินเดือนหนึ่งเดือนที่นั่นเท่าทำนาทั้งปี แล้วถามว่าคุณจะไปด้วยกันรอบหน้าไหม"
+    choices:
+      - id: official
+        text: "ไปสมัครที่สำนักงานจัดหางาน"
+        sets_flags: [abroad_went]
+        schedules: [{event: abroad_dorm_01, after_years: [1, 1]}]
+        effects: {knowledge: 1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 0.8}}}
+        merit: [{cat: neutral}]
+      - id: no_contract
+        text: "ตามเพื่อนไปก่อน สัญญาค่อยว่ากัน"
+        sets_flags: [abroad_went]
+        schedules: [{event: abroad_gate_01, after_years: [1, 1]}]
+        effects: {debt: {kind: informal, amount: {unit: income_x, amount: 0.6}}}
+        merit: [{cat: neutral}]
+      - id: stay_home
+        text: "ไม่ไป ทำงานที่นี่ต่อ"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: copy_house
+        text: "ถามราคาบ้านปูนแทนเรื่องงาน"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: abroad_recruit_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2513, 2650]
+    weight: 3
+    when: {age: [31, 40], flags: {not: [abroad_went]}}
+    title: "ค่าหัวก้อนแรก"
+    text: "คนในหมู่บ้านมาบอกว่ามีงานเมืองนอก เก็บค่าดำเนินการก่อนครึ่งหนึ่ง ที่เหลือหักจากเงินเดือน เขาไม่มีใบอนุญาตให้ดู มีแค่รูปคนยืนหน้าโรงงานในโทรศัพท์ ที่นาจำนองได้ถ้าต้องการจริง"
+    choices:
+      - id: check_office
+        text: "เอาชื่อไปถามสำนักงานจัดหางาน"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ไม่มีชื่อในทะเบียน คุณเก็บเงินไว้ได้ แล้วสมัครทางสำนักงานแทน", effects: {knowledge: 1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 0.8}}}, sets_flags: [abroad_went], schedules: [{event: abroad_dorm_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีชื่อในทะเบียน คุณเก็บเงินไว้ได้ แต่รอบรับสมัครปิดไปแล้ว", effects: {knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pay_now
+        text: "จำนองที่นา จ่ายให้ทันรอบนี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ออกเดินทางจริง ตั๋วเที่ยวเดียว ไม่มีใครพูดถึงสัญญา", effects: {debt: {kind: informal, amount: {unit: income_x, amount: 1}}}, sets_flags: [abroad_went], schedules: [{event: abroad_gate_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "วันนัดไม่มีรถมารับ เบอร์นั้นปิดไปแล้ว เงินหายทั้งก้อน", effects: {happiness: -3, debt: {kind: informal, amount: {unit: income_x, amount: 1}}}, sets_flags: [loan_shark], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: refuse
+        text: "ไม่จ่าย เตือนคนในหมู่บ้าน"
+        effects: {relations: 1, network: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: show_photo
+        text: "ขอถ่ายรูปคู่กับรูปในโทรศัพท์"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: abroad_gate_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2513, 2650]
+    when: {age: [24, 42], flags: {has: [abroad_went]}}
+    title: "แถวตรวจคนเข้าเมือง"
+    text: "เครื่องลงตอนเช้ามืด คนไทยเที่ยวบินเดียวกันยืนเรียงแถวเงียบผิดปกติ เจ้าหน้าที่เรียกทีละคนเข้าห้องข้าง ๆ คุณนึกถึงเงินที่กู้มาและคนที่บ้านซึ่งยังรอข่าวอยู่"
+    choices:
+      - id: answer
+        text: "ตอบตามจริงทุกคำถาม"
+        outcomes:
+          - {weight: 1, text: "เจ้าหน้าที่ประทับตราปฏิเสธ คุณกลับเที่ยวบินเดิมพร้อมหนี้ก้อนเดิม", effects: {happiness: -3, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "คุณผ่านออกมาได้ คนมารับพาขึ้นรถทันทีโดยไม่ถามชื่อ", effects: {away_enter: abroad, health: -1}, sets_flags: [abroad_undoc], schedules: [{event: abroad_ghost_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: silent
+        text: "ก้มหน้า รอให้เรียกชื่อ"
+        outcomes:
+          - {weight: 2, text: "ถูกส่งกลับยกกลุ่ม คุณนั่งเงียบตลอดทางกลับบ้าน", effects: {happiness: -3}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ไม่มีใครเรียกชื่อคุณ คุณเดินตามคนอื่นออกไปโดยไม่หันมอง", effects: {away_enter: abroad, happiness: -1}, sets_flags: [abroad_undoc], schedules: [{event: abroad_ghost_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: go_home
+        text: "ขอซื้อตั๋วกลับเอง"
+        effects: {happiness: -2, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: share_snack
+        text: "แบ่งข้าวเหนียวให้คนข้างหน้า"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: dana, level: 1}]
+
+  - id: abroad_dorm_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2513, 2650]
+    when: {age: [24, 42], flags: {has: [abroad_went]}}
+    title: "เตียงสองชั้นหลังโรงงาน"
+    text: "ปีแรกในหอหลังโรงงาน หกคนหนึ่งห้อง คนไทยทำอาหารกินกันเองวันหยุด ค่าล่วงเวลาดีแต่ต้องยืนกะดึก เงินเดือนงวดแรกถูกหักค่าหอกับค่าประกันก่อนถึงมือ"
+    choices:
+      - id: overtime
+        text: "รับล่วงเวลาทุกวันที่มี"
+        schedules: [{event: abroad_remit_01, after_years: [1, 2]}]
+        effects: {away_enter: abroad, health: -1, money: {unit: income_x, amount: 1}}
+        merit: [{cat: neutral}]
+      - id: language
+        text: "ใช้วันหยุดเรียนภาษาที่นี่"
+        schedules: [{event: abroad_remit_01, after_years: [1, 2]}]
+        effects: {away_enter: abroad, knowledge: 1, network: 1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+      - id: ask_payslip
+        text: "ถามหัวหน้าว่าหักค่าอะไรบ้าง"
+        schedules: [{event: abroad_remit_01, after_years: [1, 2]}]
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวหน้าเปิดเอกสารให้ดู ยอดหักลดลงตามจริง", effects: {away_enter: abroad, knowledge: 1, money: {unit: income_x, amount: 0.7}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถามแล้วกะล่วงเวลาของคุณหายไปทั้งเดือน", effects: {away_enter: abroad, happiness: -1, money: {unit: income_x, amount: 0.4}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: som_tam
+        text: "ขายส้มตำให้คนทั้งหอ"
+        schedules: [{event: abroad_remit_01, after_years: [1, 2]}]
+        effects: {away_enter: abroad, relations: 1, happiness: 1, money: {unit: income_x, amount: 0.6}}
+        merit: [{cat: neutral}]
+
+  - id: abroad_ghost_01
+    away_only: [abroad]
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2513, 2650]
+    when: {age: [24, 43], flags: {has: [abroad_undoc]}}
+    title: "ไร่ผักตามฤดู"
+    text: "คนที่มาก่อนพาไปไร่ผักนอกเมือง เงินสดรายสัปดาห์ นอนในเรือนกระจกเก่า ไม่มีใครถามชื่อจริง เวลามีรถแปลกหน้าวิ่งเข้าซอย ทุกคนรู้ว่าต้องวางจอบแล้วเดินเข้าป่าข้างไร่"
+    choices:
+      - id: work_on
+        text: "ทำต่อ เก็บเงินใส่กระป๋อง"
+        schedules: [{event: abroad_raid_01, after_years: [2, 3]}]
+        effects: {health: -1, money: {unit: income_x, amount: 1.2}}
+        merit: [{cat: neutral}]
+      - id: send_all
+        text: "ฝากคนกลับบ้านเอาเงินไปให้"
+        schedules: [{event: abroad_raid_01, after_years: [2, 3]}]
+        outcomes:
+          - {weight: 2, ok: true, text: "เงินถึงบ้านครบ ที่บ้านโทรมาร้องไห้ดีใจ", effects: {relations: 2, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนที่ฝากหายไปพร้อมเงินสามเดือน", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit_early
+        text: "พอแล้ว หาทางกลับบ้าน"
+        schedules: [{event: abroad_return_01, after_years: [1, 1]}]
+        clears_flags: [abroad_undoc]
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.2}}
+        merit: [{cat: neutral}]
+      - id: name_cabbage
+        text: "ตั้งชื่อผักกาดให้ครบทั้งแปลง"
+        schedules: [{event: abroad_raid_01, after_years: [2, 3]}]
+        effects: {happiness: 2, money: {unit: income_x, amount: 0.8}}
+        merit: [{cat: neutral}]
+
+  - id: abroad_sick_01
+    away_only: [abroad]
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2513, 2650]
+    weight: 8
+    when: {age: [24, 45], flags: {has: [abroad_undoc]}}
+    title: "ไข้ขึ้นกลางฤดูเก็บ"
+    text: "ไข้ไม่ลงมาสองวันแล้ว เพื่อนในไร่บอกว่าไปโรงพยาบาลค่ารักษาเท่าค่าแรงเป็นเดือน และเขาจะถามเอกสาร ในกระเป๋ามียาที่คนไทยรุ่นก่อนทิ้งไว้ ฉลากอ่านไม่ออกสักตัว"
+    choices:
+      - id: hospital
+        text: "ไปโรงพยาบาลตามตรง"
+        effects: {health: 2, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: endure
+        text: "นอนรอให้หายเอง"
+        effects: {health: -2}
+        merit: [{cat: neutral}]
+      - id: friend_care
+        text: "ขอเพื่อนในไร่ช่วยดู"
+        effects: {health: -1, relations: 2}
+        merit: [{cat: neutral}]
+      - id: call_home
+        text: "โทรให้ที่บ้านบอกสูตรต้มยา"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: abroad_amnesty_01
+    away_only: [abroad]
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2562, 2650]
+    weight: 8
+    when: {age: [24, 45], flags: {has: [abroad_undoc]}}
+    title: "ประกาศให้รายงานตัวกลับ"
+    text: "สถานทูตประกาศว่าคนที่อยู่เกินกำหนดรายงานตัวกลับเองได้โดยไม่เสียค่าปรับ ถ้าพ้นเส้นตายจะเจอโทษหนัก คนในไร่เถียงกันทั้งคืนว่าจริงไหม และกลับไปแล้วหนี้ที่เหลือจะใช้อะไรจ่าย"
+    choices:
+      - id: report
+        text: "รายงานตัวกลับบ้าน"
+        clears_flags: [abroad_undoc]
+        schedules: [{event: abroad_return_01, after_years: [1, 1]}]
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: stay_on
+        text: "อยู่ต่อจนหนี้หมด"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.8}}
+        merit: [{cat: neutral}]
+      - id: ask_embassy
+        text: "โทรถามสถานทูตให้แน่ใจ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: pack_kimchi
+        text: "เริ่มหัดดองผักไว้ขายที่บ้าน"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: abroad_raid_01
+    away_only: [abroad]
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2513, 2650]
+    when: {age: [25, 48], flags: {has: [abroad_undoc]}}
+    title: "รถแปลกหน้าเข้าซอย"
+    text: "เช้านี้มีรถเจ้าหน้าที่สามคันจอดปิดปากซอย ไม่มีเวลาเก็บกระป๋องเงินใต้เตียง คนในไร่ต่างคนต่างวิ่ง เพื่อนคนหนึ่งข้อเท้าพลิกล้มอยู่กลางแปลงผัก"
+    choices:
+      - id: run
+        text: "วิ่งเข้าป่าข้างไร่"
+        schedules: [{event: abroad_return_01, after_years: [1, 2]}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "รอดมาได้ เงินใต้เตียงหายหมด คุณตัดสินใจว่าพอแล้ว", effects: {health: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ถูกจับที่ชายป่า กักตัวหลายสัปดาห์แล้วส่งกลับ ห้ามเข้าประเทศอีก", effects: {happiness: -3, money: {unit: income_x, amount: -0.8}}, sets_flags: [abroad_deported], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: help_friend
+        text: "กลับไปพยุงเพื่อน"
+        schedules: [{event: abroad_return_01, after_years: [1, 2]}]
+        effects: {relations: 2, happiness: -2, money: {unit: income_x, amount: -0.8}}
+        sets_flags: [abroad_deported]
+        merit: [{cat: help_others, level: 2}]
+      - id: surrender
+        text: "ยืนรอ ยกมือให้เจ้าหน้าที่"
+        schedules: [{event: abroad_return_01, after_years: [1, 2]}]
+        effects: {happiness: -2, money: {unit: income_x, amount: -0.6}}
+        sets_flags: [abroad_deported]
+        merit: [{cat: neutral}]
+      - id: grab_can
+        text: "คว้ากระป๋องเงินก่อนออกวิ่ง"
+        schedules: [{event: abroad_return_01, after_years: [1, 2]}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้เงินมาครึ่งกระป๋อง ที่เหลือหกเรี่ยรายกลางแปลง", effects: {money: {unit: income_x, amount: 0.3}, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เงินไม่ได้ ตัวก็ไม่รอด เจ้าหน้าที่ยืนรออยู่หน้าประตู", effects: {happiness: -3}, sets_flags: [abroad_deported], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: abroad_remit_01
+    away_only: [abroad]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2513, 2650]
+    when: {age: [25, 44], flags: {has: [abroad_went]}}
+    title: "สมุดโอนเงินรายเดือน"
+    text: "ทุกสิ้นเดือนคุณยืนต่อคิวส่งเงินกลับบ้าน ปลายสายบอกว่าหลังคารั่ว ญาติป่วย งานบวชหลานใกล้เข้ามา ไม่มีใครถามว่าที่นี่อากาศเป็นยังไง ยอดหนี้ในสมุดยังไม่ทันลดเท่าที่คิด"
+    choices:
+      - id: send_all
+        text: "ส่งให้เกือบหมดทุกเดือน"
+        schedules: [{event: abroad_renew_01, after_years: [1, 2]}]
+        effects: {relations: 2, happiness: -1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: pay_debt
+        text: "โปะหนี้ก่อน บอกว่าเงินเดือนลด"
+        schedules: [{event: abroad_renew_01, after_years: [1, 2]}]
+        effects: {relations: -1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+      - id: split
+        text: "แบ่งครึ่ง ส่วนหนึ่งเก็บไว้เอง"
+        schedules: [{event: abroad_renew_01, after_years: [1, 2]}]
+        effects: {relations: 1, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - id: send_appliance
+        text: "ส่งหม้อหุงข้าวกลับบ้านแทนเงิน"
+        schedules: [{event: abroad_renew_01, after_years: [1, 2]}]
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: abroad_renew_01
+    away_only: [abroad]
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2513, 2650]
+    when: {age: [26, 46], flags: {has: [abroad_went]}}
+    title: "สัญญาครบกำหนด"
+    text: "สัญญาสามปีใกล้ครบ นายจ้างถามว่าจะต่อไหม รอบนี้ไม่ต้องจ่ายค่าเดินทางใหม่ แต่ลูกน้องรุ่นเดียวกันเริ่มปวดหลังกันทุกคน ที่บ้านโทรมาถามว่ากลับปีไหน"
+    choices:
+      - id: renew
+        text: "ต่อสัญญาอีกรอบ"
+        schedules: [{event: abroad_return_01, after_years: [2, 3]}]
+        effects: {health: -1, relations: -1, money: {unit: income_x, amount: 1.5}}
+        merit: [{cat: neutral}]
+      - id: come_home
+        text: "กลับบ้านตามกำหนด"
+        schedules: [{event: abroad_return_01, after_years: [1, 1]}]
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+      - id: overstay
+        text: "ไม่ต่อ แต่หนีออกไปอยู่ต่อเอง"
+        sets_flags: [abroad_undoc]
+        schedules: [{event: abroad_raid_01, after_years: [1, 2]}]
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.8}}
+        merit: [{cat: neutral}]
+      - id: farewell_party
+        text: "จัดงานลาจนหัวหน้าเลิกงานเร็ว"
+        schedules: [{event: abroad_return_01, after_years: [1, 1]}]
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: abroad_return_01
+    away_only: [abroad]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2513, 2650]
+    when: {age: [26, 50], flags: {has: [abroad_went]}}
+    title: "ลงรถทัวร์หน้าบ้าน"
+    text: "คุณกลับมาพร้อมกระเป๋าใบเดิมและเงินเท่าที่เหลือ เด็กในบ้านโตจนจำไม่ได้ เพื่อนบ้านถามว่าได้มากี่แสน ญาติเดินเข้ามาทีละคน คุณยังตื่นตีห้าเหมือนต้องเข้ากะ"
+    choices:
+      - id: build_house
+        text: "รื้อบ้านเก่า สร้างบ้านปูน"
+        effects: {away_leave: true, happiness: 2, relations: 1, money: {unit: income_x, amount: -1}}
+        merit: [{cat: neutral}]
+      - id: start_shop
+        text: "เปิดร้านเล็กหน้าบ้าน"
+        effects: {away_leave: true, knowledge: 1, network: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: clear_debt
+        text: "ใช้หนี้ให้หมดก่อนทำอะไร"
+        effects: {away_leave: true, happiness: 1, money: {unit: income_x, amount: -0.8}}
+        merit: [{cat: neutral}]
+      - id: souvenir
+        text: "แจกของฝากจนกระเป๋าว่าง"
+        effects: {away_leave: true, relations: 2, happiness: 1}
+        merit: [{cat: dana, level: 1}]
+
+  - id: abroad_left_behind_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2518, 2650]
+    weight: 1
+    when: {age: [7, 12], family: [{role: parent, alive: true}]}
+    title: "กล่องจากเมืองนอก"
+    text: "ผู้ใหญ่คนหนึ่งในบ้านไปทำงานเมืองนอกตั้งแต่คุณยังเล็ก ส่งกล่องกลับมาปีละครั้ง มีเสื้อ ขนม และรูปถ่ายคนยืนหน้าตึกแปลกตา เพื่อนที่โรงเรียนถามว่าคนในรูปคือใคร"
+    choices:
+      - id: proud
+        text: "เอารูปไปอวดเพื่อนทั้งห้อง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: keep_photo
+        text: "เก็บรูปไว้ใต้หมอน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: write_letter
+        text: "ขอครูช่วยเขียนจดหมายตอบ"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: eat_all
+        text: "กินขนมหมดก่อนใครเห็น"
+        effects: {happiness: 2, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: abroad_late_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2513, 2650]
+    weight: 3
+    when: {age: [46, 59], flags: {has: [abroad_went]}}
+    title: "หลังปวดจากปีเก่า"
+    text: "หมอถามว่าเคยทำงานหนักอะไรมา คุณนึกถึงกะดึกและแปลงผักที่เมืองนอก หลานในบ้านเริ่มคุยกันเรื่องสอบภาษาจะไปบ้าง บอกว่ารอบนี้ทำทุกอย่างผ่านสำนักงาน"
+    choices:
+      - id: back_clinic
+        text: "รักษาหลังให้จริงจัง"
+        effects: {health: 2, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: tell_truth
+        text: "เล่าทุกอย่างให้หลานฟัง"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: lend_money
+        text: "ออกค่าเดินทางให้หลาน"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: dana, level: 1}]
+      - id: old_language
+        text: "สอนหลานคำด่าภาษาที่นั่น"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]

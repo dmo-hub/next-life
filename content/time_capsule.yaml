@@ -44,6 +44,7 @@ events:
 
   # ← capsule_bury_01 "เขียนจดหมายถึงตัวเองตอนโต"
   - id: echo_capsule_letter_01
+    away_block: [abroad]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -75,6 +76,7 @@ events:
 
   # ← capsule_bury_01 "ใส่รูปถ่ายกับเพื่อนทั้งห้อง"
   - id: echo_capsule_photo_01
+    away_block: [abroad]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -106,6 +108,7 @@ events:
 
   # ← capsule_bury_01 "ยอมใส่ของเล่นชิ้นโปรด"
   - id: echo_capsule_toy_01
+    away_block: [abroad]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -137,6 +140,7 @@ events:
 
   # ← capsule_bury_01 "ใส่เหรียญที่หยอดกระปุกมา"
   - id: echo_capsule_coin_01
+    away_block: [abroad]
     type: A
     category: society
     stage: หนุ่มสาว

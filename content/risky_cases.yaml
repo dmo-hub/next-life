@@ -95,6 +95,7 @@ events:
 
   # หนุ่มสาว — ใบผ่านงานปลอม
   - id: young_risky_cert_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -126,6 +127,7 @@ events:
 
   # ← young_risky_cert_01 "ซื้อใบผ่านงานปลอม" (ทางโดน)
   - id: risky_cert_caught_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -159,6 +161,7 @@ events:
 
   # ← young_risky_cert_01 "ซื้อใบผ่านงานปลอม" (ทางไม่โดน)
   - id: risky_cert_quiet_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -185,6 +188,7 @@ events:
 
   # ทำงาน — ฝากชื่อขึ้นตำแหน่ง
   - id: work_risky_string_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -218,6 +222,7 @@ events:
 
   # ← work_risky_string_01 "ฝากชื่อกับเพื่อนที่เป็นกรรมการ" (ทางโดน)
   - id: risky_string_caught_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
@@ -252,6 +257,7 @@ events:
 
   # ← work_risky_string_01 "ฝากชื่อกับเพื่อนที่เป็นกรรมการ" (ทางไม่โดน)
   - id: risky_string_quiet_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน

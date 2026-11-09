@@ -36,6 +36,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_songkran_adult_01
+    away_block: [abroad]
     type: A
     category: family
     stage: ทำงาน
@@ -100,6 +101,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_lent_adult_01
+    away_block: [abroad]
     type: A
     category: society
     stage: กลางคน
@@ -163,6 +165,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_loykrathong_adult_01
+    away_block: [abroad]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -226,6 +229,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_newyear_adult_01
+    away_block: [abroad]
     type: A
     category: work_money
     stage: ทำงาน
