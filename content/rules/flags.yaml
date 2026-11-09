@@ -122,6 +122,7 @@ flags:
   abroad_undoc: "กำลังอยู่เมืองนอกโดยไม่มีสัญญา"
   abroad_deported: "เคยถูกส่งกลับจากเมืองนอก"
   # <<< nl-writer b001 flag cadet_dream
+  cadet_declined_seat: "ติดเตรียมทหารแล้วสละสิทธิ์ทุกเหล่า (แกนตั้ง · ปีหน้ายังสอบได้ · การ์ดเชิญปกติกันไว้ ใบเชิญรอบใหม่ออกแทน)"
   # >>> nl-writer b001 flag cadet_declined
   cadet_declined: "ขอไม่ให้เตือนเรื่องสอบเตรียมทหารอีก"
   # <<< nl-writer b001 flag cadet_declined
@@ -182,6 +183,12 @@ flags:
   # >>> nl-writer b003 flag cadet_exam_door
   cadet_exam_door: "ไปถึงห้องสอบเตรียมทหารมาแล้ว"
   # <<< nl-writer b003 flag cadet_exam_door
+  # สายนางงาม
+  pageant_walked: "เคยขึ้นเวทีประกวด"
+  pageant_local: "เคยได้สายสะพายเวทีท้องถิ่น"
+  pageant_province: "เคยครองตำแหน่งนางงามจังหวัด"
+  pageant_camp: "เคยเก็บตัวเวทีระดับประเทศ"
+  pageant_crown: "เคยครองมงกุฎระดับประเทศ"
 
 # ธงมีพารามิเตอร์ <ชื่อ>:<id> — ทะเบียนเก็บแค่ชื่อหน้า · id หลัง : เป็นของการ์ดคู่นั้น
 prefixes:
@@ -194,6 +201,9 @@ prefixes:
   # >>> nl-writer b004 flag cadet_branch
   cadet_branch: "ติดเตรียมทหารต่อเหล่านี้ (id = army · navy · airforce · police)"
   # <<< nl-writer b004 flag cadet_branch
+  # >>> nl-writer b005 flag cadet_life_seen
+  cadet_life_seen: "เห็นเรื่องนี้ในชีวิตเด็กเตรียมทหารแล้ว กันใบแยกตามบริบทออกซ้ำ (id = first_crewcut · kids_day_camp · evening_news · old_exam_swap · conscript_home · branch_map · tutor_billboard)"
+  # <<< nl-writer b005 flag cadet_life_seen
   vow_open: "บนบานไว้ ยังไม่แก้บน"
   hope_set: "ทำบุญหวังผล รอดูว่าเงินดีขึ้นไหม"
   has_amulet: "มีเครื่องราง/สักยันต์ชนิดนี้"

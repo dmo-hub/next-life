@@ -20,23 +20,23 @@ events:
         text: "พูดเรื่องนี้ให้ได้ภายในวันนี้"
         effects: {happiness: 1}
         merit: [{cat: neutral}]
-        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
+        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_poor_one, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
       - id: list_costs
         text: "จดค่าใช้จ่ายให้ครบก่อนพูด"
         effects: {knowledge: 1}
         merit: [{cat: neutral}]
-        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
+        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_poor_one, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
       - id: ask_friend
         text: "ถามเพื่อนว่าบอกที่บ้านยังไง"
         effects: {relations: 1}
         merit: [{cat: neutral}]
-        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
+        schedules: [{event: cadet_tell_none, after_years: [0, 0]}, {event: cadet_tell_poor, after_years: [0, 0]}, {event: cadet_tell_poor_one, after_years: [0, 0]}, {event: cadet_tell_mother, after_years: [0, 0]}, {event: cadet_tell_father, after_years: [0, 0]}]
       - id: wait_year
         text: "รอจังหวะดี ๆ ไว้ปีหน้า"
         hint: "ได้คุยช้าลง เวลาเตรียมตัวก็สั้นลง"
         effects: {happiness: -1}
         merit: [{cat: neutral}]
-        schedules: [{event: cadet_tell_none, after_years: [1, 1]}, {event: cadet_tell_poor, after_years: [1, 1]}, {event: cadet_tell_mother, after_years: [1, 1]}, {event: cadet_tell_father, after_years: [1, 1]}]
+        schedules: [{event: cadet_tell_none, after_years: [1, 1]}, {event: cadet_tell_poor, after_years: [1, 1]}, {event: cadet_tell_poor_one, after_years: [1, 1]}, {event: cadet_tell_mother, after_years: [1, 1]}, {event: cadet_tell_father, after_years: [1, 1]}]
   # <<< nl-writer b003 evt cadet_tell_family
   # >>> nl-writer b003 evt cadet_tell_none
   - id: cadet_tell_none
@@ -46,7 +46,7 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: parent, alive: true, count: [0, 0]}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "บอกคนที่บ้านดีไหม"
-    text: "{ชื่อ} ตั้งใจจะสอบเข้าโรงเรียนเตรียมทหาร แต่ยังไม่ได้บอกผู้ใหญ่ที่เลี้ยงมาตั้งแต่เล็ก ถ้าสอบติด ต้องไปอยู่โรงเรียนประจำตั้งแต่อายุ 16 บ้านจะเหลือคนน้อยลงอีก เย็นนี้ผู้ใหญ่ในบ้านนั่งพับผ้าอยู่หน้าทีวี"
+    text: "เย็นนี้ผู้ใหญ่ที่เลี้ยง {ชื่อ} มาตั้งแต่เล็กนั่งพับผ้าอยู่หน้าทีวี บ้านนี้มีกันไม่กี่คน ถ้าสอบติดต้องไปอยู่โรงเรียนประจำ บ้านจะเงียบลงอีก ใบสมัครในกระเป๋ายังพับอยู่ที่เดิม"
     choices:
       - id: tell
         text: "บอกตรง ๆ ว่าอยากสอบ"
@@ -93,9 +93,9 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2501, 2650]
-    when: {sex: [ชาย], age: [13, 17], class: [ยากไร้, ยากจนมาก, ยากจน, ค่อนข้างจน], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
+    when: {sex: [ชาย], age: [13, 17], class: [ยากไร้, ยากจนมาก, ยากจน, ค่อนข้างจน], family: [{role: parent, alive: true, count: [2, 2]}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "เรียนฟรี แต่ค่าติวไม่ฟรี"
-    text: "{ชื่อ} อยากสอบเข้าโรงเรียนเตรียมทหาร ถ้าสอบติดก็เรียนฟรี แต่ก่อนสอบต้องมีค่าติว ค่าสมัคร และค่ารถเข้าเมือง มื้อเย็นวันนี้ ผู้ใหญ่ในบ้านกำลังคุยกันว่าเดือนหน้าเงินจะไม่พอใช้"
+    text: "มื้อเย็นนี้พ่อกับแม่คุยกันเสียงเบา ๆ ว่าเดือนหน้าเงินจะไม่พอใช้ {ชื่อ} กินข้าวเงียบ ๆ ถ้าสอบติดก็เรียนฟรีจริง แต่ก่อนจะถึงวันนั้นยังมีค่าติว ค่าสมัคร กับค่ารถเข้าเมือง"
     choices:
       - id: tell
         text: "บอกที่บ้านตรง ๆ ว่าอยากสอบ"
@@ -132,6 +132,51 @@ events:
         clears_flags: [cadet_dream]
         merit: [{cat: neutral}]
   # <<< nl-writer b003 evt cadet_tell_poor
+
+  # S2 2026-11-06 (D2 · เจ้าของเลือก ก): แยกจาก cadet_tell_poor — พ่อแม่ไม่ครบ ใช้ {ผู้ใหญ่} (แม่/พ่อ/ป้า) นั่งนับเงิน · ใบเดิมเหลือเฉพาะพ่อแม่ครบ
+  - id: cadet_tell_poor_one
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2501, 2650]
+    when: {sex: [ชาย], age: [13, 17], class: [ยากไร้, ยากจนมาก, ยากจน, ค่อนข้างจน], family: [{role: parent, alive: true, count: [0, 1]}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
+    title: "เรียนฟรี แต่ค่าติวไม่ฟรี"
+    text: "มื้อเย็นนี้{ผู้ใหญ่}นั่งนับเงินในกระป๋อง บ่นเบา ๆ ว่าเดือนหน้าคงไม่พอใช้ {ชื่อ} กินข้าวเงียบ ๆ ถ้าสอบติดก็เรียนฟรีจริง แต่ก่อนจะถึงวันนั้นยังมีค่าติว ค่าสมัคร กับค่ารถเข้าเมือง"
+    choices:
+      - id: tell
+        text: "บอกที่บ้านตรง ๆ ว่าอยากสอบ"
+        sets_flags: [cadet_family_told]
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 6.5, text: "ที่บ้านไม่ห้าม แต่ไม่มีเงินค่าติวให้ ผู้ใหญ่ในบ้านไปขอยืมข้อสอบเก่าจากบ้านข้าง ๆ มาให้อ่าน", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_relative, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_loanshark, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_village, after_years: [0, 0]}, {event: cadet_fund_coop, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_pawn, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_cattle, after_years: [0, 0]}], merit: [{cat: neutral}]}
+      - id: read_alone
+        text: "บอกที่บ้าน แต่จะอ่านเองไม่ติว"
+        effects: {relations: 1}
+        sets_flags: [cadet_family_told]
+        merit: [{cat: neutral}]
+      - id: earn_fee
+        text: "บอก แล้วรับจ้างหาค่าสมัครเอง"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.1}}
+        sets_flags: [cadet_family_told]
+        merit: [{cat: neutral}]
+      - id: keep_secret
+        text: "ยังไม่บอก ไม่อยากให้ที่บ้านกังวล"
+        hint: "ค่าใช้จ่ายต้องหาเอง"
+        effects: {relations: -1}
+        sets_flags: [cadet_family_secret]
+        schedules: [{event: cadet_papers_found, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: let_go
+        text: "เลิกคิด ช่วยงานที่บ้านดีกว่า"
+        effects: {happiness: -2}
+        sets_flags: [cadet_let_go]
+        clears_flags: [cadet_dream]
+        merit: [{cat: neutral}]
   # >>> nl-writer b003 evt cadet_tell_mother
   - id: cadet_tell_mother
     type: A
@@ -140,7 +185,7 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: parent, sex: หญิง, alive: true}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "จะบอกแม่ดีไหม"
-    text: "{ชื่อ} ตั้งใจจะสอบเข้าโรงเรียนเตรียมทหาร แต่ยังไม่ได้บอกใคร มื้อเย็นวันนี้แม่ถามว่า 'ช่วงนี้ตื่นไปวิ่งแต่เช้าทุกวัน มีอะไรหรือเปล่า' ถ้าสอบติด ต้องไปอยู่โรงเรียนประจำตั้งแต่อายุ 16 และก่อนสอบก็ต้องมีค่าติว"
+    text: "มื้อเย็นนี้ {ชื่อ} ยังไม่ทันได้เปิดปาก แม่ก็วางช้อนลงก่อน 'ช่วงนี้ตื่นไปวิ่งแต่เช้าทุกวัน มีอะไรจะบอกแม่หรือเปล่า' ถ้าพูดออกไปตอนนี้ ต้องตอบให้ได้ทั้งเรื่องไปอยู่โรงเรียนประจำตั้งแต่อายุ 16 และเรื่องค่าติว"
     choices:
       - id: tell
         text: "บอกแม่ตรง ๆ ว่าอยากสอบ"
@@ -188,7 +233,7 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: parent, sex: ชาย, alive: true}, {role: parent, sex: หญิง, alive: true, count: [0, 0]}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "จะบอกพ่อดีไหม"
-    text: "{ชื่อ} อยู่กับพ่อสองคน ตั้งใจจะสอบเข้าโรงเรียนเตรียมทหารแต่ยังไม่ได้บอก คืนนี้ช่วยพ่อซ่อมพัดลมอยู่หน้าบ้าน พ่อถามขึ้นมาว่า 'ช่วงนี้อ่านหนังสือดึกทุกคืน มีอะไรหรือเปล่า' ถ้าสอบติด ต้องไปอยู่โรงเรียนประจำ ทิ้งพ่อไว้คนเดียว"
+    text: "คืนนี้ช่วยพ่อซ่อมพัดลมอยู่หน้าบ้าน บ้านนี้มีกันอยู่สองคนพ่อลูก พ่อขันน็อตไปพลางถามไปพลาง 'ช่วงนี้อ่านหนังสือดึกทุกคืนเลยนะ มีอะไรหรือเปล่า' ถ้าสอบติด พ่อจะต้องอยู่บ้านคนเดียว"
     choices:
       - id: tell
         text: "บอกพ่อตรง ๆ ว่าอยากสอบ"
@@ -576,7 +621,7 @@ events:
     stage: วัยรุ่น
     years: [2506, 2650]
     weight: 1.5
-    when: {sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream, knows_senior], not: [cadet_prep_camp, cadet_prep_group, cadet_prep_self, cadet_prep_senior, cadet_senior_tutor]}}
+    when: {sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream, knows_senior], not: [cadet_prep_camp, cadet_prep_group, cadet_prep_senior, cadet_senior_tutor]}}
     title: "พี่กลับบ้านช่วงลาพัก"
     text: "รุ่นพี่ที่เคยวิ่งผ่านหน้าบ้านทุกเช้ากลับมาช่วงลาพัก ผมสั้นเกรียน ยืนตัวตรงกว่าเดิม แม่ของพี่เขาเล่าให้คนทั้งซอยฟังว่าลูกชายอยู่บ้านได้ไม่กี่วัน"
     choices:
