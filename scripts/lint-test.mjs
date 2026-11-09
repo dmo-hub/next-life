@@ -76,6 +76,7 @@ for (const t of table) fails.push(`merit-table: ${t}`);
     ['ถิ่น นะ ภาคเหนือ', { region: 'เหนือ' }, 'ตั้งใจนะ{ถิ่น}', 'ตั้งใจเน้อ'],
     ['ถิ่น นะ ภาคกลาง', { region: 'กลาง' }, 'ตั้งใจนะ{ถิ่น} ไป ๆ{ถิ่น}', 'ตั้งใจนะ ไป ๆ'],
     ['ทางแม่ + ที่ตั้ง', { birthYear: 2525, age: 17 }, '{ทางแม่}@{ที่ตั้ง}', 'พนักงานสอบสวนหญิง@กรุงเทพฯ'],
+    ['ไม่ใช่ทายาท = ว่าง (กันชั้นที่สอง)', { parentFlags: {}, parents: alive(true, true) }, '[{ทายาท:พ่อ|แม่|พ่อที่เสีย}{ผู้ใหญ่ทายาท}{ทางแม่}]', '[]'],
   ];
   let ok = 0;
   for (const [name, patch, text, want] of cases) {
@@ -197,10 +198,13 @@ for (const tone of Object.keys(OMEN_TEXT)) for (let s = 0; s < 500; s++) for (le
 rows.push(['ข้อความลางเลือกได้ทุก seed', omenMiss ? `ไม่ได้ข้อความ ${omenMiss} ครั้ง` : 'ผ่าน']);
 if (omenMiss) fails.push(`omenText คืนค่าที่ไม่ใช่ข้อความ ${omenMiss} ครั้ง`);
 // ทุกช่องในรายการปิดของด่าน build ต้องมีตัวเติมในแกน ไม่งั้นผ่านด่านแต่โผล่ดิบบนการ์ด · ทั้งสองเพศ
+const EMPTY_OK = ['ถิ่น', 'ผู้ใหญ่ทายาท', 'ทางแม่'];
 for (const sex of SEXES) {
   const st = { ...newLife(1, loadContent()), sex };
   for (const k of Object.keys(PLACEHOLDERS)) {
-    const out = fill(`{${k}}`, st);
+    // B1: ช่องที่ว่างได้โดยตั้งใจ — {ถิ่น} ภาคที่ไม่มีคำลงท้าย · ฝั่งทายาทว่างเมื่อไม่ใช่ลูกทหาร/ตำรวจ (กันชั้นที่สอง) → ลองด้วยชีวิตทายาทภาคอีสานแทน
+    const heirSt = EMPTY_OK.includes(k) ? { ...st, region: 'ตะวันออกเฉียงเหนือ', parentFlags: { army_family: true } } : st;
+    const out = fill(`{${k}}`, heirSt);
     if (/[{}]/.test(out) || !out.trim()) fails.push(`ช่อง {${k}} แกนไม่เติม (${sex}): "${out}"`);
     else if (out.length > PLACEHOLDERS[k].length) fails.push(`ช่อง {${k}} เติมแล้วยาว ${out.length} เกินค่ายาวสุดที่ด่านความยาวใช้ (${PLACEHOLDERS[k].length}) — แก้ PLACEHOLDERS`);
   }
