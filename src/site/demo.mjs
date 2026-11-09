@@ -31,6 +31,8 @@ function replay(content, seed, nth, path) {
       const j = k++ - nth;
       if (j < 0 || j >= path.length) return p;
       last = j === path.length - 1;
+      // การ์ดที่ไม่เรียกบอท (memory · เตือน) คั่นแล้วเลขลำดับเลื่อน ทางนี้อาจชี้การ์ดอีกใบที่กดไม่ได้ ⇒ จบสายแทนการล้ม
+      if (c.locked?.[path[j]]) throw STOP;
       return path[j];
     }, (c) => {
       if (!last) return;
