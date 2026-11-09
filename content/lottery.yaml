@@ -1,7 +1,7 @@
 # กลุ่ม work_money · หวยปกติ (ไม่ใช่สายมู) ช่วงหนุ่มสาว–ชรา · ลุ้นทีละใบ ติดเป็นนิสัย หวยใต้ดิน ลงขัน และญาติที่โผล่มาตอนถูกใหญ่
 events:
   - id: lot_vendor_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -44,7 +44,7 @@ events:
           - {weight: 2, text: "ขายไม่ออกสักใบ ต้องเหมาที่เหลือเองตามที่ตกลง แล้วก็ไม่ถูกสักใบ", effects: {happiness: -1, money: {unit: fixed_baht, amount: -1600, ref_year: 2560}}, merit: [{cat: neutral}]}
 
   - id: lot_pool_split_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -75,7 +75,7 @@ events:
         merit: [{cat: dana, level: 2}, {cat: help_others, level: 1}]
 
   - id: lot_pool_small_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -106,7 +106,7 @@ events:
           - {weight: 1, ok: true, text: "งวดหน้าถูกท้ายสามตัวซ้ำอีกใบ ทั้งกลุ่มเรียก{ชื่อ}ว่ามือขลัง ได้คนละพันกว่าบาทพร้อมเรื่องเล่าไปอีกนาน", effects: {relations: 2, happiness: 2, money: {unit: fixed_baht, amount: 1600, ref_year: 2560}}, merit: [{cat: neutral}]}
 
   - id: lot_habit_drain_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -143,7 +143,7 @@ events:
           - {weight: 1, text: "ตำรวจบุกจับวงโพยวันหวยออก ต้องเสียค่าปรับ ข่าวไปถึงที่ทำงานก่อนตัวจะกลับถึงบ้าน", effects: {happiness: -2, network: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
 
   - id: lot_jackpot_kin_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -181,7 +181,7 @@ events:
           - {weight: 3, text: "เพื่อนหายเงียบพร้อมเงินครึ่งหนึ่งของรางวัล เบอร์โทรใช้ไม่ได้ตั้งแต่สัปดาห์แรก", effects: {happiness: -3, network: -1, money: {unit: fixed_baht, amount: -3000000, ref_year: 2560}}, merit: [{cat: neutral}]}
 
   - id: lot_underground_mid_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -249,7 +249,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ lot_underground_mid_01 (แจ้งตำรวจ ทั้งซอยรู้ว่าใครโทร) — ออกทาง next เท่านั้น
   - id: lot_snitch_soi_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: กลางคน

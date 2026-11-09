@@ -3,6 +3,7 @@
 events:
   # ---- 65-2 เพื่อนวัยเด็กกลับมา 20 ปีให้หลัง ----
   - id: kid_friend_lunch_01
+    away_block: [monk]
     type: A
     category: society
     stage: เด็ก
@@ -93,6 +94,7 @@ events:
 
   # ---- 65-1 ความผิดวัยเด็กโดนจับได้ → สอบราชการ/เรียนต่อยาก ----
   - id: kid_exam_copy_01
+    away_block: [monk]
     type: A
     category: study
     stage: เด็ก
@@ -128,6 +130,7 @@ events:
           - {weight: 1, text: "ภารโรงเดินผ่านมาเห็น ชื่อถูกจดลงสมุดประวัติพร้อมเพื่อน", effects: {happiness: -1}, sets_flags: [school_record], schedules: [{event: echo_school_record_exam_01, after_years: [10, 13]}], merit: [{cat: neutral}]}
 
   - id: teen_record_turn_01
+    away_block: [monk]
     type: A
     category: study
     stage: วัยรุ่น
@@ -156,7 +159,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: echo_school_record_exam_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว

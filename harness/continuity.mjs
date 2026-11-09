@@ -131,7 +131,7 @@ for (const [name, bot] of Object.entries(BOTS)) {
       if (ECHO.has(card.id)) {
         echo++;
         catEcho.add(catOf.get(card.id));
-        if (byId[card.id].category !== 'belief' && !st.cadet?.retake?.includes(card.id) && !(byId[card.id].away_block && st.flags.abroad_went) && !booked.some(([id, lo, hi]) => id === card.id && st.age >= lo && st.age <= hi)) offDate++;
+        if (byId[card.id].category !== 'belief' && !st.cadet?.retake?.includes(card.id) && !(byId[card.id].away_block && (st.flags.abroad_went || st.flags.pali_novice || st.flags.pali_left)) && !booked.some(([id, lo, hi]) => id === card.id && st.age >= lo && st.age <= hi)) offDate++;
         if (byId[card.id].category !== 'belief' && !whenOk(st, byId[card.id].when)) offWhen++;
       }
       if (NEXT.has(card.id) || ECHO.has(card.id)) seenTarget.set(card.id, (seenTarget.get(card.id) ?? 0) + 1);

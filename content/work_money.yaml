@@ -1,7 +1,7 @@
 # กลุ่ม work_money · ช่วงวัยทำงาน (31–45) · การ์ดกองสุ่มเรื่องงาน/เงิน ใช้ income_mult เป็นผลไกล
 events:
   - id: work_layoff_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -43,7 +43,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: work_promotion_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -108,7 +108,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: work_guarantor_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -142,7 +142,7 @@ events:
           - {weight: 1, text: "เพื่อนน้อยใจว่าไม่ไว้ใจกัน เลิกคบไปเลย", effects: {relations: -2}, merit: [{cat: neutral}]}
 
   - id: work_house_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -183,7 +183,7 @@ events:
 
   # ช่วงกลางคน: กิจการส่วนใหญ่เปิดตอนกลางคน (ตัวเลือกเปิดกิจการติดประตูโฟกัสธุรกิจ) — อยู่ช่วงทำงานแทบไม่มีใครมีกิจการทันเห็นใบนี้
   - id: work_biz_boom_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -218,7 +218,7 @@ events:
           - {weight: 2, text: "นักรีวิวคนเดิมกลับมาแฉ ร้านร้างภายในเดือนเดียว", effects: {happiness: -2, relations: -1, income_mult: 0.7}, merit: [{cat: neutral}]}
 
   - id: work_biz_bust_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -253,7 +253,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: work_influencer_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -286,7 +286,7 @@ events:
         merit: [{cat: help_others, level: 2}]
 
   - id: work_online_shop_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -326,7 +326,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: work_guarantor_chase_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -358,7 +358,7 @@ events:
 
   # เรื่องต่อ work_biz_boom_01 — อยู่ช่วงกลางคนตามต้นทาง
   - id: work_franchise_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -389,7 +389,7 @@ events:
         merit: [{cat: help_others, level: 1}]
   # เรื่องต่อ work_online_shop_01 (ครีมค้างสต็อก) — ออกทาง next เท่านั้น
   - id: work_cream_stock_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน

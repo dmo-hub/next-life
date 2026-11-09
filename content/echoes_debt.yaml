@@ -4,7 +4,7 @@
 events:
   # ← debt_student_loan_01 "กู้มา แบ่งไปซื้อมือถือใหม่"
   - id: echo_debt_payroll_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -38,7 +38,7 @@ events:
 
   # ← debt_student_loan_01 "ทำงานพิเศษส่งตัวเอง"
   - id: echo_debt_old_boss_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -137,7 +137,7 @@ events:
 
   # ← debt_cash_short_01 "ลงวงไพ่ หวังพลิกคืนเดียว"
   - id: echo_debt_card_table_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: ทำงาน
@@ -170,7 +170,7 @@ events:
 
   # ← debt_refinance_01 "แต่งสลิปเงินเดือนกู้เพิ่ม" (ผ่านฉลุย)
   - id: echo_debt_slip_audit_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน

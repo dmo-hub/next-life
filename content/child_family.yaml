@@ -1,6 +1,7 @@
 # กลุ่ม kid_ · ช่วงวัยเด็ก 0–12 · เด็กเลือกเอง ผู้ใหญ่อยู่ในเนื้อความ/ผลลัพธ์ · ตั้งธงที่ส่งผลตอนโต (likes_clips good_student sporty bullied) · broken_home ใช้ในไฟล์นี้ (kid_bullied_01)
 events:
   - id: kid_clips_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -29,6 +30,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: kid_tutor_01
+    away_block: [monk]
     type: A
     category: study
     stage: เด็ก
@@ -60,6 +62,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: kid_sport_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -90,6 +93,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: kid_bullied_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -128,6 +132,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: kid_move_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -156,6 +161,7 @@ events:
         merit: [{cat: care_parents, level: 1}]
 
   - id: kid_parents_fight_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -214,6 +220,7 @@ events:
 
   # เรื่องต่อจาก kid_clips_01 (คลิปแมวดัง) — ออกทาง next เท่านั้น
   - id: kid_clips_fame_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -242,6 +249,7 @@ events:
 
   # เรื่องต่อจาก kid_sport_01 (เหรียญทองจังหวัด) — ออกทาง next เท่านั้น
   - id: kid_sport_school_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -272,6 +280,7 @@ events:
         merit: [{cat: help_others, level: 1}]
   # เรื่องต่อ kid_grandma_01 (วิ่งหายในตลาด) — ออกทาง next เท่านั้น
   - id: kid_lost_market_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก

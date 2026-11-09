@@ -271,6 +271,7 @@ events:
 
   # ตอนต่อของสาย next (ยิมนาสติกรุ่ง / ขายลูกอมรุ่ง) — ไม่อยู่ในกองสุ่ม เข้าผ่าน next เท่านั้น
   - id: child_gym_team_01
+    away_block: [monk]
     type: A
     category: health
     stage: เด็ก
@@ -304,6 +305,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: child_candy_shop_01
+    away_block: [monk]
     type: A
     category: work_money
     stage: เด็ก

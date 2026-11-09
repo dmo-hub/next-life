@@ -6,7 +6,7 @@
 #   greed_harm       เอาประโยชน์ฝั่งเราไปเบียดคนอื่นที่ไม่ได้ยินยอม
 events:
   - id: dilemma_mother_or_tuition_01
-    away_call: {text: "ที่บ้านโทรมาถึงเมืองนอก แม่ต้องผ่าตัดหัวใจ ส่วนที่สิทธิไม่ครอบคลุมต้องจ่ายเอง ปีเดียวกับที่ลูกสอบติดคณะที่ฝัน เงินเก็บที่มีพอสำหรับทางเดียว"}
+    away_call: {text: "ที่บ้านโทรมา แม่ต้องผ่าตัดหัวใจ ส่วนที่สิทธิไม่ครอบคลุมต้องจ่ายเอง ปีเดียวกับที่ลูกสอบติดคณะที่ฝัน เงินเก็บที่มีพอสำหรับทางเดียว"}
     type: A
     category: family
     stage: กลางคน
@@ -42,7 +42,7 @@ events:
         merit: [{cat: care_parents, level: 1}, {cat: help_others, level: 1}, {cat: abuse_elders, level: 1}]
 
   - id: dilemma_father_diagnosis_01
-    away_call: {text: "พี่น้องโทรมาถึงเมืองนอก ผลชิ้นเนื้อของพ่อออกแล้ว มะเร็งระยะท้าย เหลือเวลาราวหนึ่งปี พ่อยังไม่รู้ และทุกคนรอฟังว่าคุณจะว่ายังไง"}
+    away_call: {text: "พี่น้องโทรมา ผลชิ้นเนื้อของพ่อออกแล้ว มะเร็งระยะท้าย เหลือเวลาราวหนึ่งปี พ่อยังไม่รู้ และทุกคนรอฟังว่าคุณจะว่ายังไง"}
     type: A
     category: health
     stage: กลางคน
@@ -70,7 +70,7 @@ events:
         merit: [{cat: bhavana, level: 1}, {cat: abuse_elders, level: 1}]
 
   - id: dilemma_team_cut_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -105,7 +105,7 @@ events:
         merit: [{cat: help_others, level: 2}]
 
   - id: dilemma_father_care_01
-    away_call: {text: "คู่ชีวิตโทรมาถึงเมืองนอก พ่อหลงลืมหนักขึ้น เดินออกจากบ้านกลางดึกไปแล้วสองครั้ง และบอกตรง ๆ ว่าดูแลคนเดียวไม่ไหวแล้ว"}
+    away_call: {text: "คู่ชีวิตโทรมา พ่อหลงลืมหนักขึ้น เดินออกจากบ้านกลางดึกไปแล้วสองครั้ง และบอกตรง ๆ ว่าดูแลคนเดียวไม่ไหวแล้ว"}
     type: A
     category: family
     stage: กลางคน

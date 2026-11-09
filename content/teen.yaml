@@ -1,6 +1,7 @@
 # กองสุ่มวัยรุ่น (13–18) — ตัวละครเลือกเอง · ตั้งธง smoker likes_clips good_student sporty bullied
 events:
   - id: teen_entrance_exam_01
+    away_block: [monk]
     type: A
     category: study
     stage: วัยรุ่น
@@ -39,6 +40,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: teen_gaming_01
+    away_block: [monk]
     type: A
     category: study
     stage: วัยรุ่น
@@ -69,6 +71,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: teen_first_smoke_01
+    away_block: [monk]
     type: A
     category: health
     stage: วัยรุ่น
@@ -104,6 +107,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: teen_first_love_01
+    away_block: [monk]
     type: A
     category: family
     stage: วัยรุ่น
@@ -137,6 +141,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: teen_gang_01
+    away_block: [monk]
     type: A
     category: society
     stage: วัยรุ่น
@@ -172,6 +177,7 @@ events:
         merit: [{cat: help_others, level: 2}]
 
   - id: teen_viral_clip_01
+    away_block: [monk]
     type: A
     category: work_money
     stage: วัยรุ่น
@@ -207,6 +213,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: teen_part_time_01
+    away_block: [monk]
     type: A
     category: work_money
     stage: วัยรุ่น
@@ -243,6 +250,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: teen_moto_crash_01
+    away_block: [monk]
     type: A
     category: health
     stage: วัยรุ่น
@@ -277,6 +285,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: teen_esports_scout_01
+    away_block: [monk]
     type: A
     category: work_money
     stage: วัยรุ่น
@@ -311,6 +320,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: teen_clip_backlash_01
+    away_block: [monk]
     type: A
     category: society
     stage: วัยรุ่น
@@ -340,6 +350,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ teen_part_time_01 (เคสค้างสต็อก) — ออกทาง next เท่านั้น
   - id: teen_case_stock_01
+    away_block: [monk]
     type: A
     category: work_money
     stage: วัยรุ่น
@@ -369,6 +380,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ teen_gang_01 (ถูกรวบทั้งแก๊ง) — ออกทาง next เท่านั้น
   - id: teen_gang_bust_01
+    away_block: [monk]
     type: A
     category: society
     stage: วัยรุ่น
@@ -398,6 +410,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ teen_moto_crash_01 (เพื่อนหนีทิ้ง) — ออกทาง next เท่านั้น
   - id: teen_moto_friend_01
+    away_block: [monk]
     type: A
     category: society
     stage: วัยรุ่น
@@ -427,6 +440,7 @@ events:
         merit: [{cat: bhavana, level: 1}]
   # เรื่องต่อ teen_first_smoke_01 (ฟ้องครู ความแตก) — ออกทาง next เท่านั้น
   - id: teen_snitch_gate_01
+    away_block: [monk]
     type: A
     category: society
     stage: วัยรุ่น
@@ -456,6 +470,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ teen_gaming_01 (ตกรอบแรก ครูโทรหาที่บ้าน) — ออกทาง next เท่านั้น
   - id: teen_gaming_grounded_01
+    away_block: [monk]
     type: A
     category: study
     stage: วัยรุ่น
@@ -485,6 +500,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ teen_first_love_01 (ปฏิเสธเพื่อรักษาเพื่อน แต่เพื่อนเงียบ) — ออกทาง next เท่านั้น
   - id: teen_friend_silent_01
+    away_block: [monk]
     type: A
     category: society
     stage: วัยรุ่น
@@ -514,6 +530,7 @@ events:
           - {weight: 1, text: "คนกลางเล่าเรื่องจดหมายไปทั่วห้อง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
   # เรื่องต่อ teen_entrance_exam_01 (ฝนผิดแถว) — ออกทาง next เท่านั้น
   - id: teen_exam_after_01
+    away_block: [monk]
     type: A
     category: study
     stage: วัยรุ่น

@@ -509,7 +509,7 @@ events:
 
   # ---------- เรื่องต่อ (ออกทาง next เท่านั้น) ----------
   - id: era_dis_tsunami_land_offer_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -540,7 +540,7 @@ events:
         merit: [{cat: dana, level: 2}]
 
   - id: era_dis_covid_shop_boom_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน

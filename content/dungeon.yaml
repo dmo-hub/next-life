@@ -81,7 +81,7 @@ events:
 
   # สายนักล่า ใบกลาง: ถอยได้ 2 ทาง (จบรอบที่ 2 ใบ) · ไปต่อ 2 ทาง (ช่วย/ทิ้งเพื่อน) — ทุกทางยังไม่ตาย
   - id: dungeon_hunt_mid_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -113,7 +113,7 @@ events:
 
   # ห้องบอส: 3 ทางสู้ (ล็อกนักล่า · ตายจริงด้วยกลุ่มสาเหตุเดิม) · 1 ทางถอย · ชีวิตคูณหลัก ความรู้คูณเสริม
   - id: dungeon_hunt_boss_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน

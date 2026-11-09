@@ -3,6 +3,7 @@
 # ใบเปิดไม่มี when — นัดมาจากตัวเลือกเท่านั้น ใส่เงื่อนไขแล้วไม่ผ่านปีนั้น นัดหายเงียบ
 events:
   - id: capsule_bury_01
+    away_block: [monk]
     type: A
     category: study
     stage: เด็ก

@@ -1,6 +1,6 @@
 events:
   - id: workh_office_syndrome_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: health
     stage: ทำงาน
@@ -74,7 +74,7 @@ events:
         merit: [{cat: help_others, level: 2}]
 
   - id: workh_burnout_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: health
     stage: ทำงาน
@@ -113,6 +113,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: workh_drunk_drive_01
+    away_block: [monk]
     type: A
     category: health
     stage: ทำงาน
@@ -233,7 +234,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: workh_viral_offer_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: health
     stage: ทำงาน
@@ -265,7 +266,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: workh_bone_healer_call_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: health
     stage: ทำงาน

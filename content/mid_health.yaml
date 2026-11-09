@@ -335,7 +335,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ midh_heart_01 (นั่งรถเมล์กลับ อาการหายเอง) — ออกทาง next เท่านั้น
   - id: midh_heart_checkup_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: health
     stage: กลางคน
@@ -365,7 +365,7 @@ events:
           - {weight: 2, text: "อ่านกระทู้ทั้งคืนจนเครียด นอนไม่หลับไปหลายวัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
   # เรื่องต่อ midh_kidney_stone_01 (ทนปวดจนเป็นลมที่ทำงาน) — ออกทาง next เท่านั้น
   - id: midh_faint_work_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน

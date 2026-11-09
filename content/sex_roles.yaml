@@ -2,6 +2,7 @@
 # ผลต่างตามยุคเขียนด้วย when.year (ช่องว่างค่าแรงยุคก่อน 2540) · การ์ดอัตลักษณ์รอ state identity ของแกน
 events:
   - id: sex_lottery_01
+    away_block: [monk]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -63,7 +64,7 @@ events:
         merit: [{cat: dana, level: 1}]
 
   - id: sex_daughter_care_01
-    away_call: {text: "น้าโทรมาถึงเมืองนอก พ่อล้มในห้องน้ำ ต่อจากนี้ต้องมีคนอยู่ด้วยตลอด วงญาติเงียบไปพักหนึ่ง แล้วน้าก็ว่า ก็{ชื่อ}ไง ยังไม่มีครอบครัว"}
+    away_call: {text: "น้าโทรมา พ่อล้มในห้องน้ำ ต่อจากนี้ต้องมีคนอยู่ด้วยตลอด วงญาติเงียบไปพักหนึ่ง แล้วน้าก็ว่า ก็{ชื่อ}ไง ยังไม่มีครอบครัว"}
     type: A
     category: family
     stage: ทำงาน
@@ -124,7 +125,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: sex_pay_gap_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน

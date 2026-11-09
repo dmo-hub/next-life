@@ -4,7 +4,7 @@
 events:
   # ← kid_parents_fight_01 "ทำเป็นไม่ได้ยิน เก็บไว้คนเดียว"
   - id: echo_fam_behind_door_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: ทำงาน
@@ -64,7 +64,7 @@ events:
 
   # ← young_wedding_01 "ขอเวลาคิดก่อนนะ" ผลที่เขาเดินออกจากร้าน
   - id: echo_fam_ring_back_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: ทำงาน
@@ -155,7 +155,7 @@ events:
 
   # ← fraud_sign_bribe_01 "ดันซองคืน ไม่เซ็น"
   - id: echo_fraud_clean_hands_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -184,7 +184,7 @@ events:
 
   # ← fraud_whistle_01 "ยืนยันให้การจนสุดทาง"
   - id: echo_fraud_witness_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -215,7 +215,7 @@ events:
 
   # ← fraud_wage_squeeze_01 "ลดเงินเดือนตัวเองแทนโอที"
   - id: echo_fraud_old_team_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -244,7 +244,7 @@ events:
 
   # แฟนเก่าที่เลิกไม่ดี (B166) ← young_wedding_01 "ปฏิเสธ" · teen_first_love_01 "แอบคบ" ผลที่บ้านจับได้
   - id: fam_ex_return_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: ทำงาน
@@ -285,7 +285,7 @@ events:
 
   # ← fam_ex_return_01 "ปิดประตู ทำเป็นไม่อยู่บ้าน"
   - id: echo_fam_ex_crash_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: ทำงาน

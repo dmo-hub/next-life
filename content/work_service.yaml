@@ -2,7 +2,7 @@
 # คนในสายนี้ถูกตั้งอาชีพเป็น professional/manager ตามขั้นยศ การ์ดเรื่องบริษัทจึงกั้นด้วย ladder แล้ว ⇒ ชีวิตช่วงทำงานของสายนี้มาจากไฟล์นี้
 events:
   - id: army_border_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -40,7 +40,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: army_batman_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: ทำงาน
@@ -76,7 +76,7 @@ events:
           - {weight: 1, text: "นายรุ่นเดียวกันหัวเราะว่าเลี้ยงลูกน้องเสียคน", effects: {network: -1}, merit: [{cat: neutral}]}
 
   - id: service_procure_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -113,7 +113,7 @@ events:
           - {weight: 2, text: "เรื่องเงียบหาย อีกสามเดือนคุณถูกย้ายไปประจำหน่วยที่ไกลที่สุด", effects: {happiness: -2, income_mult: 0.9}, merit: [{cat: neutral}]}
 
   - id: police_envelope_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -152,7 +152,7 @@ events:
           - {weight: 2, text: "เรื่องถูกส่งกลับมาให้หัวหน้าสอบเอง ทั้งโรงพักไม่มีใครคุยด้วย", effects: {relations: -2, happiness: -2}, merit: [{cat: neutral}]}
 
   - id: police_swap_driver_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: ทำงาน
@@ -189,7 +189,7 @@ events:
           - {weight: 1, text: "ถูกสอบว่าใครปล่อยเรื่อง หาตัวไม่ได้ แต่ชื่อคุณอยู่ในรายชื่อที่ไม่มีใครไว้ใจ", effects: {network: -2}, merit: [{cat: neutral}]}
 
   - id: police_night_shift_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: health
     stage: ทำงาน
@@ -205,7 +205,7 @@ events:
       - {id: drink_off, text: "ลงเวรแล้วตั้งวงกับเพื่อน", effects: {health: -1, relations: 1}, merit: [{cat: intoxicants, level: 1}]}
 
   - id: gov_transfer_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -244,7 +244,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: gov_budget_rush_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -276,7 +276,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: gov_hire_nephew_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: กลางคน

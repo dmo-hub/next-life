@@ -797,7 +797,7 @@ const f2 = (v) => v.toFixed(2);
       card('t237_call', 24, { away_call: { text: 'สายจากบ้าน' } }),
     ];
     // ตัดสายที่เข้าสถานะจริงออก ใบ fixture จะได้เป็นทางเข้าเดียว
-    const content = { ...base, events: [...base.events.filter((e) => !e.id.startsWith('abroad_')), ...events] };
+    const content = { ...base, events: [...base.events.filter((e) => !e.id.startsWith('abroad_') && !e.id.startsWith('pali_')), ...events] };
     const pick = (c) => (c.kind === 'event' && c.id === 't237_call' && back && c.choices.length === 5 ? 4 : openChoices(c)[0]);
     const r = { block: [], call: [], lives: 0, awayAfterCall: [], paid: 0, moneyBack: 0 };
     for (let i = 0; i < 400 && r.lives < 40; i++) {

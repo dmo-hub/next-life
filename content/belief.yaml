@@ -4,7 +4,7 @@
 events:
   # ดูดวง — ผลคำทำนาย 3 โทนสุ่มเท่ากัน ไม่อ่านบัญชี ไม่สอดคล้องกับเหตุการณ์จริง · โทนเตือนเสนอพิธีได้ครั้งเดียว
   - id: bel_fortune_market
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -41,7 +41,7 @@ events:
           - {weight: 1, ok: true, text: "หมอดูให้นั่งโต๊ะแทนตอนลุกไปพัก ลูกค้าบางคนเดินกลับมาหาคุณเอง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เรียนได้สามเดือน หมอดูเรียกค่าครูก้อนโตแล้วยังไม่ยอมสอนเคล็ดจริง", effects: {money: {unit: income_x, amount: -0.3}, happiness: -1}, merit: [{cat: neutral}]}
   - id: bel_fortune_market_rite
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -69,7 +69,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: bel_fortune_cards
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: กลางคน
@@ -106,7 +106,7 @@ events:
           - {weight: 2, ok: true, text: "ลูกค้าวันหยุดต่อคิวยาวขึ้นทุกเดือน บางคนพาเพื่อนมาด้วย", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ทายว่าลูกค้าจะได้เลื่อนขั้น เดือนถัดมาเขาถูกเลิกจ้าง กลับมาต่อว่าถึงหน้าโต๊ะ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
   - id: bel_fortune_cards_rite
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: กลางคน
@@ -135,7 +135,7 @@ events:
 
   # ฤกษ์ยาม — ถือฤกษ์ให้ผู้ใหญ่สบายใจ ไม่มีผลต่อความสำเร็จของงานนั้น
   - id: bel_auspicious_house
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: ทำงาน
@@ -168,7 +168,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: bel_auspicious_shop
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: ทำงาน
@@ -201,7 +201,7 @@ events:
 
   # เครื่องราง/สักยันต์ — ความอุ่นใจเท่านั้น ไม่ลดความเสี่ยงใด ๆ · ข้อห้ามของสำนักเป็นเนื้อเรื่อง ไม่มีกลไกลงโทษ
   - id: bel_amulet_center
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: ทำงาน
@@ -238,7 +238,7 @@ events:
           - {weight: 1, text: "รับพระเก๊มาเข้าแผงทั้งชุด กว่าจะรู้ก็ปล่อยไปหลายองค์ ต้องตามขอโทษลูกค้า", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
 
   - id: bel_amulet_yantra
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -332,6 +332,7 @@ events:
   # บนบาน/แก้บน — ผลของเรื่องที่บนเป็นอิสระจากการบน · แก้ตามกำลังมีทุกใบ ≤0.05 เท่าเงินเก็บต่อปี · เลื่อนได้ครั้งเดียว
   # ศาลเจ้าก่อนสอบไม่อยู่ในกองสุ่ม (B63): แกนวางไว้หน้าด่านสอบเข้ามหาวิทยาลัยปีจบ ม.ปลาย/ปวช. · แก้บนทวงเฉพาะคนที่สอบติด (exam_pass:uni)
   - id: bel_vow_exam
+    away_block: [monk]
     type: B
     category: belief
     stage: วัยรุ่น
@@ -475,7 +476,7 @@ events:
       - {id: tell, text: "เล่าความฝันให้คนที่บ้านฟัง", effects: {relations: 1}, merit: [{cat: neutral}]}
 
   - id: bel_lottery_tree
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: ทำงาน
@@ -493,7 +494,7 @@ events:
       - {id: offer, text: "ไหว้ขอให้ผ่านเดือนนี้ไปได้", effects: {happiness: 1}, merit: [{cat: neutral}]}
 
   - id: bel_lottery_plate
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: กลางคน
