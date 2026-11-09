@@ -10,6 +10,7 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const [notesFile, wt = process.cwd()] = process.argv.slice(2);
 if (!notesFile) throw new Error('ใช้: npm run rel -- <notes.json> [worktree]');
@@ -65,7 +66,7 @@ const html = read('docs/whatsnew.html');
 const anchor = html.match(/<p class="lead">การเปลี่ยนแปลงทีละเวอร์ชัน[^\n]*\n\r?\n/);
 if (!anchor) throw new Error('หาจุดแทรกโน้ตใน whatsnew ไม่เจอ');
 const eol = html.includes('\r\n') ? '\r\n' : '\n';
-const block = [`  <h3>${ver} <small>${today}</small></h3>`, '  <ul>', ...g.note.map((n) => `    <li>${n}</li>`), '  </ul>', '', ''].join(eol);
+const block = [`  <h3 id="${ver}">${ver} <small>${today}</small></h3>`, '  <ul>', ...g.note.map((n) => `    <li>${n}</li>`), '  </ul>', '', ''].join(eol);
 let out = html.replace(anchor[0], anchor[0] + block);
 // เจ้าของสั่งให้หัวกำลังทำรวมงานค้างทั้งหมดทุกครั้งที่ปล่อย — ส่ง soon = แทนทั้งรายการ ไม่ต่อท้าย กันของที่ปล่อยแล้วค้างอยู่
 if (g.soon) {
@@ -76,6 +77,10 @@ if (g.soon) {
   const items = g.soon.map((s) => `${eol}    <li><span class="tag soon">กำลังทำ</span>${s}</li>`).join('');
   out = out.replace(soonRe, (_, head, tail) => head + items + tail);
 }
+
+// ก่อน bump เพราะ bump build หน้าการ์ดรอบสุดท้าย · BASE อ่านรุ่นเก่าที่ไม่มีทะเบียน
+const newCards = BASE ? null : await (await import(pathToFileURL(path.join(wt, 'src/site/card-since.mjs')).href)).addNewCards(ver, { write: !DRY });
+console.log(newCards ? `การ์ดใหม่ ${newCards.length} ใบ → ${ver}${newCards.length ? `: ${newCards.join(' ')}` : ''}` : 'การ์ดใหม่: ข้าม (BASE)');
 
 if (DRY) {
   console.log(`เวอร์ชัน: v${cur[1]}.${cur[2]}.${cur[3]} → ${ver}${BASE ? ` (อ่านจาก ${BASE})` : ''}`);
@@ -100,6 +105,6 @@ const docs = git('diff', '--name-only', '--', 'docs').split('\n').filter(Boolean
 const eolOnly = new Set(docs.filter((f) => !git('diff', '--ignore-cr-at-eol', '--name-only', '--', f)));
 const addDocs = [...docs.filter((f) => !eolOnly.has(f)), ...git('ls-files', '--others', '--exclude-standard', '--', 'docs').split('\n').filter(Boolean)];
 if (eolOnly.size) console.log(`  ข้าม EOL ล้วน: ${[...eolOnly].join(' ')}`);
-git('add', '--', verFile, ...addDocs, ...KEEP.filter((f) => fs.existsSync(path.join(wt, f))));
+git('add', '--', verFile, 'src/site/card-since.json', ...addDocs, ...KEEP.filter((f) => fs.existsSync(path.join(wt, f))));
 git('commit', '-q', '-m', `chore(ui): bump demo version ${ver} for ${g.tag}`);
 console.log(`  ${ver} ${git('rev-parse', '--short', 'HEAD')}`);
