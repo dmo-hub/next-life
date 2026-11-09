@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: branch or sha to test
+        description: branch or full 40-character sha to test
         required: true
         default: main
       gates:
@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   plan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
@@ -32,12 +32,14 @@ jobs:
     steps:
       - id: plan
         env:
-          REF: ${{ inputs.ref || 'b5c5b105' }}
+          REF: ${{ inputs.ref || 'b5c5b10541dd6f3fc6a91fc8bcf7d2260df47bee' }}
           GATES: ${{ inputs.gates || 'full,side,titles,density,overlap,keep,continuity' }}
           SEED2: ${{ inputs.seed2 || '1689122133' }}
         run: |
           node --input-type=module <<'EOF' >> "$GITHUB_OUTPUT"
           const { REF, GATES, SEED2 } = process.env;
+          // actions/checkout rejects abbreviated shas with an opaque git error.
+          if (/^[0-9a-f]{7,39}$/i.test(REF)) throw new Error(`use the full 40-character sha: ${REF}`);
           const seeds = SEED2.split(',').map((s) => s.trim());
           if (!seeds.every((s) => /^\d+$/.test(s))) throw new Error(`bad seed2: ${SEED2}`);
           const npm = (name) => ({ name, cmd: `npm run ${name}` });
@@ -62,7 +64,7 @@ jobs:
 
   gate:
     needs: plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Below GitHub's 360-minute job ceiling so the log is still uploaded.
     timeout-minutes: 350
     strategy:
