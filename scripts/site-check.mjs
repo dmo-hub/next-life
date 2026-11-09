@@ -13,6 +13,8 @@ import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR, SPEC_START, SPEC_E
 import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
 import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
+import { NEED_TEXT } from '../src/site/focus.mjs';
+import { focusWords, STAT_LABELS, FOCUS_NEEDS, ISEKAI_FOCUS, ISEKAI_KNOW } from '../src/engine/index.mjs';
 import { catalogHtml, spoilerBacks, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
@@ -25,6 +27,7 @@ import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
 import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsLayout, injectDocsTweak, pageKind } from '../src/site/docs-tweak.mjs';
 import { CARD_ART_PAGE, cardArtData, cardArtBlock, CAT_ART } from '../src/site/card-art-tweak.mjs';
+import { CARD_PIC_PAGE, cardPicData, cardPicBlock } from '../src/site/card-pic-tweak.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
 import { PLAY_FILES, playAssets, playScripts, swJs } from '../src/site/play-files.mjs';
 
@@ -430,6 +433,19 @@ const caMiss = [
 const caCtl = caBlock && JSON.stringify({ ...caBlock, counts: { ...caBlock.counts, cats: caBlock.counts.cats.slice(1) } }) !== JSON.stringify(caNow);
 check('หน้า tweak ภาพบนการ์ดใช้ภาพ+ตัวเลขหมวดชุดปัจจุบัน', caMiss.length || !caCtl, ` ${caCats.length} หมวด${caMiss.length ? ` · ${caMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${caCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
+// 7c6) หน้า tweak ภาพประจำการ์ด (ใบ 209): บล็อกในหน้า = รูปทรง + ข้อความการ์ดจริงตอนนี้ · ตัวอย่าง 8 ใบ ครบ 3 โลก + ฉากยาก 5 ใบ · มีป้ายในสารบัญห้องผู้พัฒนา
+// ตัวควบคุม: ถอดภาพแรกจากบล็อก ⇒ ต้องไม่ตรง
+const cpBlock = cardPicBlock(readOr(CARD_PIC_PAGE) ?? '');
+const cpNow = cardPicData();
+const cpMiss = [
+  ...(JSON.stringify(cpBlock) !== JSON.stringify(cpNow) ? [`ค้าง ${CARD_PIC_PAGE} (build ใหม่)`] : []),
+  ...(cpNow.pics.filter((p) => !p.hard).length === 8 && cpNow.pics.filter((p) => p.hard).length === 5 ? [] : [`ตัวอย่าง ${cpNow.pics.length} ใบ`]),
+  ...['a', 'af', 'i'].filter((w) => !cpNow.pics.some((p) => p.world === w)).map((w) => `ไม่มีตัวอย่างโลก ${w}`),
+  ...(tweakStatus(docs, read('dev/index.html'))['ui-t-card-pic'] ? [] : ['ไม่มีป้ายใน dev/index']),
+];
+const cpCtl = cpBlock && JSON.stringify({ ...cpBlock, pics: cpBlock.pics.slice(1) }) !== JSON.stringify(cpNow);
+check('หน้า tweak ภาพประจำการ์ดใช้ภาพ+ข้อความการ์ดชุดปัจจุบัน', cpMiss.length || !cpCtl, ` ${cpNow.pics.length} ภาพ${cpMiss.length ? ` · ${cpMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${cpCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
 // 7d) แผนงาน (ui-redo 23 · ย้ายไป whatsnew ui-redo 69): แถวหมวดใต้หัวกำลังทำ = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
 // · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)
 // ตัวควบคุม: เติมหมวดใหม่ 1 หมวดใน whatsnew ⇒ กล่องที่คาดต้องเปลี่ยน · ถอด id หัวแรก ⇒ ลิงก์ต้องหาปลายทางไม่เจอ
@@ -802,6 +818,25 @@ check('.gitattributes merge=build ครบหน้าที่ build สร้
   const ctlBad = Object.entries(ctl).filter(([, v]) => !seoGap(v).length).map(([k]) => k);
   check('SEO หน้าแรก (canonical · og:image จริง · JSON-LD) · play มี description/canonical · sitemap ทุก URL ไฟล์จริงไม่ noindex', miss.length || ctlBad.length, ` sitemap ${[...now.sitemap.matchAll(/<loc>/g)].length} URL${miss.length ? ` · ${miss.join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(', ')}` : 'จับได้'}`);
 }
+
+// 12) หน้าโฟกัส: ทุกโฟกัสโลกนี้ขึ้นพร้อมป้ายเดียวกับปุ่มในเกม · ทุ่มเท/ทางลัด/อาชีพต่างโลกครบ · เงื่อนไข need มีคำครบ
+// · ระดับคู่มือ: ไม่มีข้อความเสี่ยง (ผลที่เกิดจริง) หรือตัวเลขโอกาส/ตัวคูณ · หน้าที่มีเมนูลิงก์มาที่หน้านี้
+const focusPage = read('focus.html');
+const fdefs = content.focus.focuses;
+const focusGap = (html) => [
+  ...Object.entries(fdefs).filter(([id, d]) => !new RegExp(`<tr id="f-${id}"><td[^>]*><b>${escHtml(d.name)}</b>[\\s\\S]*?${escHtml(focusWords(d, STAT_LABELS))}`).test(html)).map(([, d]) => d.name),
+  ...[...Object.values(ISEKAI_FOCUS), ...Object.values(ISEKAI_KNOW).map((k) => k.focus), ...Object.values(ISEKAI_CAREERS)].filter((x) => !html.includes(`<b>${escHtml(x.name)}</b>`)).map((x) => x.name),
+];
+const riskTexts = Object.values(fdefs).flatMap((d) => (d.risk ?? []).map((r) => r.text ?? r.warn));
+const focusLeak = (html) => [...riskTexts.filter((t) => html.includes(escHtml(t))), ...(/\d\s*%|×\s*\d|\d+\.\d+/.test(html.slice(html.indexOf('<main'))) ? ['ตัวเลขโอกาส/ตัวคูณ'] : [])];
+const needOff = [...Object.keys(FOCUS_NEEDS).filter((k) => !NEED_TEXT[k]), ...Object.keys(NEED_TEXT).filter((k) => !FOCUS_NEEDS[k])];
+const noLink = !read('guide.html').includes('href="focus.html"');
+// ตัวควบคุม: ตัดโฟกัสแรกออก · แปะข้อความเสี่ยงตัวแรก ⇒ ต้องถูกจับทั้งคู่
+const f0 = Object.values(fdefs)[0];
+const focusCtl = focusGap(focusPage.replaceAll(`<b>${escHtml(f0.name)}</b>`, '')).includes(f0.name) && focusLeak(`${focusPage}<p>${escHtml(riskTexts[0])}</p>`).length > 0;
+const fGap = focusGap(focusPage);
+const fLeak = focusLeak(focusPage);
+check('หน้าโฟกัสครบทุกโฟกัสพร้อมป้ายเดียวกับเกม ไม่เผยผลเสี่ยงหรือตัวเลข และหน้าวิธีเล่นลิงก์ถึง', fGap.length || fLeak.length || needOff.length || noLink || !focusCtl, ` ขาด ${fGap.join(',')} · เผย ${fLeak.join(',')} · need ${needOff.join(',')} · ลิงก์ ${noLink} · ตัวควบคุม ${focusCtl}`);
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 process.exit(fail ? 1 : 0);

@@ -1,0 +1,30 @@
+# เหตุบ้านเมืองแต่ง (ความจริงจางข้ามชาติ): ชื่อสมมติทั้งหมด ไม่อิงเหตุจริงเฉพาะเจาะจง · ชีวิตแรกของเซฟไม่ออก
+# id ขึ้นต้น drift_ ไม่ใส่ weight — แกนนัดตามจำนวนของขั้นความเพี้ยน (driftPlan) ใส่ weight = ออกซ้ำทางกองสุ่มเกินจำนวน
+# ไม่ใส่ era และไม่ลง data/era-events.json — ตัวนับเหตุการณ์บ้านเมืองและฉายาจากเหตุจริงนับเฉพาะเหตุจริง
+# when.age = ช่วงที่นัดได้ (ตัดกับช่วงแผน) ⇒ การ์ดออกตรงปีที่นัด
+events:
+  - id: drift_bridge_sink_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {age: [18, 70]}
+    title: "สะพานศรีนคราทรุด"
+    text: "ข่าวเช้าทุกช่องเปิดภาพเดียวกัน สะพานศรีนคราที่คนข้ามไปทำงานวันละหลายแสนคันทรุดลงกลางช่วงไปเกือบเมตร กรมทางหลวงประกาศปิดซ่อมหกเดือน รถติดลามไปทั้งฝั่ง คนในที่ทำงานเริ่มคุยกันว่าจะย้ายที่พักหรือลาออกดี"
+    choices:
+      - id: leave_early
+        text: "ตื่นเช้าขึ้น ทนนั่งรถอ้อมไกล"
+        effects: {health: -1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: rent_near
+        text: "เช่าห้องใกล้ที่ทำงานไปก่อน"
+        effects: {money: {unit: income_x, amount: -0.2}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: share_ride
+        text: "ชวนเพื่อนนั่งเรือข้ามฟากด้วยกัน"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: work_home
+        text: "ขอหัวหน้าทำงานจากบ้านช่วงซ่อม"
+        effects: {knowledge: 1, network: -1}
+        merit: [{cat: neutral}]

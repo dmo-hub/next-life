@@ -61,6 +61,19 @@ export const rules = [
     },
   },
   {
+    id: 'debt-before-open',
+    desc: 'ผลที่กู้หนี้ชนิดที่มีปีเปิด (data/debt.json from เช่น กองทุนหมู่บ้าน) ต้องกั้นปีการ์ดไม่ให้ก่อนปีเปิด — ไม่งั้นแกน throw ตอนเล่น',
+    event(e, ctx, r) {
+      // ปีแรกที่การ์ดออกได้จริง: years · when.year · ปีเริ่มเหตุบ้านเมืองที่ผูก (era) — เอาค่าสูงสุด
+      const lo = Math.max(years(e)?.[0] ?? -Infinity, isRange(e.when?.year, YEAR_MIN, YEAR_MAX) ? e.when.year[0] : -Infinity, ctx.eraFrom?.get(e.era) ?? -Infinity);
+      for (const { node, path } of effectSites(e)) {
+        const kind = isObj(node.effects) ? node.effects.debt?.kind : undefined;
+        const from = ctx.debtFrom?.get(kind);
+        if (from !== undefined && lo < from) r(`${path}.effects.debt`, `กู้ ${kind} เปิดปี ${from} แต่การ์ดออกได้ตั้งแต่ปี ${lo} — กั้น years หรือ when.year ให้เริ่ม ${from}`);
+      }
+    },
+  },
+  {
     id: 'system-undeclared',
     desc: 'ข้อความที่มีคำของระบบ (keywords) ต้องประกาศระบบนั้นใน systems — กันลืมประกาศแล้วด่านปีไม่ทำงาน',
     event(e, ctx, r) {
