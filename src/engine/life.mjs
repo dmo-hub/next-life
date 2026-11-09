@@ -1670,7 +1670,10 @@ function awayDefer(st) {
   const ix = lifeEventIndex(events);
   for (const x of st.scheduled) {
     const e = x.age === st.age && ix.pos.has(x.event) && events[ix.pos.get(x.event)];
-    if (e && !st.done[e.id] && !awayOk(st, e)) x.age = st.age + 1;
+    if (!e || st.done[e.id] || awayOk(st, e)) continue;
+    // จดปีที่เลื่อนไว้บนนัด: ปีนั้นอาจไม่มีการ์ดออกเลย ผู้ตรวจจึงอ่านสถานะนอกบ้านย้อนหลังจากการ์ดไม่ได้
+    (x.held ??= []).push({ age: st.age, kind: st.outside.kind });
+    x.age = st.age + 1;
   }
   for (const i of ix.byAge.get(st.age) ?? []) {
     const e = events[i];

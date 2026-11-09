@@ -27,20 +27,34 @@ const isDrift = (id) => typeof id === 'string' && id.startsWith(PREFIX);
 const fail = [];
 const rows = [];
 
-// ออกผิดปี = การ์ดที่ออกแต่ไม่มีนัดอายุเดียวกันในแผน
-const offDate = (plan, fired) => fired.filter((f) => !plan.some((p) => p.event === f.id && p.age === f.age)).length;
+// ออกผิดปี = ออกก่อนนัด · ออกตอนยังอยู่นอกบ้านชนิดที่การ์ดห้าม · หรือช้ากว่านัดโดยมีปีที่ไม่ได้ถูกเลื่อนเพราะนอกบ้าน
+// นัดเลื่อนจนกลับบ้านเป็นกติกาของ awayDefer ไม่ใช่ความเพี้ยน แต่ต้องพิสูจน์ครบทุกปีที่ช้า จาก held ที่แกนจด
+const blockedKinds = (id) => content.events.find((e) => e.id === id)?.away_block ?? [];
+const heldEveryYear = (p, f) => {
+  const kinds = blockedKinds(f.id);
+  for (let a = p.age; a < f.age; a++) if (!(p.held ?? []).some((h) => h.age === a && kinds.includes(h.kind))) return false;
+  return true;
+};
+const isOff = (plan, f) => {
+  if (f.away && blockedKinds(f.id).includes(f.away)) return true;
+  const p = plan.find((x) => x.event === f.id);
+  return !p || f.age < p.age || !heldEveryYear(p, f);
+};
+const offDate = (plan, fired) => fired.filter((f) => isOff(plan, f)).length;
 
-let ctlSeen = false, ctlOff = 0;
+let ctlSeen = false, ctlOff = 0, ctlLate = 0, ctlAway = 0, held = 0;
 for (const [name, bot] of Object.entries(BOTS)) {
   let g1 = 0, sched = 0, fired = 0, off = 0, badQuota = 0, eraLeak = 0, eraLast = 0;
   for (let i = 0; i < n; i++) {
     let st = newLife(mixSeed(seed, i), content);
     for (let g = 0; g < 2; g++) {
-      const plan = st.scheduled.filter((x) => x.drift).map((x) => ({ ...x }));
+      const live = st.scheduled.filter((x) => x.drift);
+      const plan = live.map((x) => ({ ...x }));
       const seen = [];
-      const { state } = playLife(st.seed, content, bot, (c) => {
-        if (isDrift(c.id)) seen.push({ id: c.id, age: c.age });
+      const { state } = playLife(st.seed, content, bot, (c, s) => {
+        if (isDrift(c.id)) seen.push({ id: c.id, age: c.age, away: s?.outside?.kind ?? null });
       }, st);
+      plan.forEach((p, k) => { p.held = live[k].held; });
       if (g === 0) {
         g1 += plan.length + seen.length;
         if (i === 0) {
@@ -56,7 +70,11 @@ for (const [name, bot] of Object.entries(BOTS)) {
       sched += plan.length;
       fired += seen.length;
       off += offDate(plan, seen);
+      held += seen.filter((f) => !isOff(plan, f) && plan.some((p) => p.event === f.id && f.age > p.age)).length;
       if (i === 0 && seen.length) ctlOff += offDate(plan.map((p) => ({ ...p, age: p.age + 1 })), seen);
+      // ตัวควบคุม: ช้า 1 ปีโดยไม่มีปีที่เลื่อน · ออกตอนยังอยู่นอกบ้าน — ทั้งสองแบบต้องนับเป็นผิดปี
+      ctlLate += offDate(plan.map((p) => ({ ...p, age: p.age - 1, held: undefined })), seen);
+      ctlAway += offDate(plan, seen.filter((f) => blockedKinds(f.id).length).map((f) => ({ ...f, away: blockedKinds(f.id)[0] })));
       const shown = erasShown(state, state.age);
       eraLeak += shown.filter(({ e }) => isDrift(e.id)).length;
       const last = shown.length ? Math.max(...shown.map(({ age }) => age)) : null;
@@ -73,7 +91,9 @@ for (const [name, bot] of Object.entries(BOTS)) {
 }
 if (!ctlSeen) fail.push('(1) ตัวควบคุม: บังคับขั้น 1 ให้รุ่น 1 แล้วไม่เห็นนัด — ตัววัดไม่ได้วัด');
 if (!ctlOff) fail.push('(2) ตัวควบคุม: เลื่อนปีนัดแล้วตัววัดผิดปีไม่เห็น');
-rows.push(`ตัวควบคุม (1) บังคับขั้น 1 เห็นนัด: ${ctlSeen} · (2) เลื่อนปีนัดเห็นผิดปี: ${ctlOff}`);
+if (!ctlLate) fail.push('(2) ตัวควบคุม: ช้าโดยไม่ได้อยู่นอกบ้านแล้วตัววัดไม่เห็น');
+if (!ctlAway) fail.push('(2) ตัวควบคุม: ออกตอนยังอยู่นอกบ้านแล้วตัววัดไม่เห็น');
+rows.push(`ตัวควบคุม (1) บังคับขั้น 1 เห็นนัด: ${ctlSeen} · (2) เลื่อนปีนัดเห็นผิดปี: ${ctlOff} · ช้าโดยไม่นอกบ้านเห็นผิดปี: ${ctlLate} · ออกตอนนอกบ้านเห็นผิดปี: ${ctlAway} · เลื่อนเพราะนอกบ้านครบทุกปี: ${held}`);
 
 // (3) ข้อมูลเหตุบ้านเมือง — อ่านเลขเดียวกับหน้าเว็บ (siteFacts.eraEvents) · ตัวควบคุมเติมเหตุแต่ง 1 ใบ เลขเหตุไม่ขยับ แต่เลขการ์ดขยับ (ตัวควบคุมได้เติมจริง)
 const leak = content.era.events.filter((e) => isDrift(e.id)).length;
