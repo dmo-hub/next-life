@@ -105,7 +105,7 @@ apply:
       - when:
           flagsHas:
             - cadet_family_support
-        line: ผู้ใหญ่ในบ้านนั่งข้าง ๆ คอยดูว่ากรอกครบทุกช่องไหม
+        line: "{ผู้ใหญ่}นั่งข้าง ๆ คอยดูว่ากรอกครบทุกช่องไหม"
     toggles:
       - branch: army
         label: ติ๊กช่อง ทบ.
@@ -200,7 +200,7 @@ apply:
       - when:
           flagsHas:
             - cadet_family_support
-        line: ผู้ใหญ่ในบ้านนั่งข้าง ๆ คอยดูว่ากรอกครบทุกช่องไหม
+        line: "{ผู้ใหญ่}นั่งข้าง ๆ คอยดูว่ากรอกครบทุกช่องไหม"
     toggles:
       - branch: army
         label: ติ๊กช่อง ทบ.
@@ -296,7 +296,7 @@ apply:
       - when:
           flagsHas:
             - cadet_family_support
-        line: ผู้ใหญ่ในบ้านนั่งข้าง ๆ คอยดูว่ากรอกครบทุกช่องไหม
+        line: "{ผู้ใหญ่}นั่งข้าง ๆ คอยดูว่ากรอกครบทุกช่องไหม"
     toggles:
       - branch: army
         label: ติ๊กช่อง ทบ.
@@ -752,7 +752,7 @@ interludes:
       family: null
       poor: null
       classes: null
-    text: สอบเสร็จบ่ายสาม ผู้ใหญ่ในบ้านห่อข้าวมาให้ ยังอุ่นอยู่ในกล่อง เด็กหัวเกรียนนั่งกินกันตามขอบฟุตบาท บางคนยังเปิดหนังสือค้างไว้บนตัก พรุ่งนี้ยังมีอีกสนาม
+    text: สอบเสร็จบ่ายสาม {ผู้ใหญ่}ห่อข้าวมาให้ ยังอุ่นอยู่ในกล่อง เด็กหัวเกรียนนั่งกินกันตามขอบฟุตบาท บางคนยังเปิดหนังสือค้างไว้บนตัก พรุ่งนี้ยังมีอีกสนาม
     options:
       - label: กินให้อิ่ม แล้วกลับไปนอน
         hint: null
@@ -825,20 +825,20 @@ interludes:
           flag: cadet_met_c
           p: 0.5
           ifNot: true
-      - label: อดมื้อนี้ เก็บเงินไว้ค่ารถ
-        hint: ประหยัดได้ แต่ท้องว่าง
+      - label: แบ่งข้าวให้เด็กที่ไม่มีอะไรกิน
+        hint: null
         requiresMoney: 0
         fx:
           knowledge: 0
-          health: -1
+          health: 0
           happiness: 0
-          relations: 0
+          relations: 1
           network: 0
           money: 0
         setFlags: []
         clearFlags: []
         schedule: []
-        result: ดื่มน้ำก๊อกหน้าสนามจนอิ่ม แล้วเดินไปป้ายรถเมล์
+        result: แบ่งครึ่งกล่องให้เด็กที่นั่งข้าง ๆ เขาบอกว่าพรุ่งนี้สอบสนามเดียวกัน
         outcomes: null
   - id: I1-ลับ
     title: ข้าวกล่องหน้าสนาม
@@ -1199,7 +1199,7 @@ interludes:
         setFlags: []
         clearFlags: []
         schedule: []
-        result: ผู้ใหญ่ในบ้านบอกว่าเหนื่อยก็พัก ไม่มีใครว่า
+        result: "{ผู้ใหญ่}บอกว่าเหนื่อยก็พัก ไม่มีใครว่า"
         outcomes: null
         requires:
           flagsHas:
@@ -1362,7 +1362,7 @@ interludes:
         setFlags: []
         clearFlags: []
         schedule: []
-        result: ผู้ใหญ่ในบ้านบอกว่าเหนื่อยก็พัก ไม่มีใครว่า
+        result: "{ผู้ใหญ่}บอกว่าเหนื่อยก็พัก ไม่มีใครว่า"
         outcomes: null
         requires:
           flagsHas:
@@ -1525,7 +1525,7 @@ interludes:
         setFlags: []
         clearFlags: []
         schedule: []
-        result: ผู้ใหญ่ในบ้านบอกว่าเหนื่อยก็พัก ไม่มีใครว่า
+        result: "{ผู้ใหญ่}บอกว่าเหนื่อยก็พัก ไม่มีใครว่า"
         outcomes: null
         requires:
           flagsHas:
@@ -1688,7 +1688,7 @@ interludes:
         setFlags: []
         clearFlags: []
         schedule: []
-        result: ผู้ใหญ่ในบ้านบอกว่าเหนื่อยก็พัก ไม่มีใครว่า
+        result: "{ผู้ใหญ่}บอกว่าเหนื่อยก็พัก ไม่มีใครว่า"
         outcomes: null
         requires:
           flagsHas:
@@ -2262,7 +2262,7 @@ interludes:
             - cadet_prep_group
             - cadet_met_c
         lockReason: ไม่มีคนรู้จักให้ยืม
-      - label: ขอผู้ใหญ่ในบ้านส่งเงินมา
+      - label: ขอ{ผู้ใหญ่}ส่งเงินมา
         hint: null
         requiresMoney: 0
         fx:
@@ -2378,7 +2378,7 @@ interludes:
             - cadet_prep_group
             - cadet_met_c
         lockReason: ไม่มีคนรู้จักให้ยืม
-      - label: ขอผู้ใหญ่ในบ้านส่งเงินมา
+      - label: ขอ{ผู้ใหญ่}ส่งเงินมา
         hint: null
         requiresMoney: 0
         fx:
@@ -4092,7 +4092,7 @@ chooseBranch:
     - when:
         flagsHas:
           - cadet_family_support
-      line: ผู้ใหญ่ในบ้านยืนอ่านป้ายอยู่ข้าง ๆ ไม่พูดว่าให้เลือกอะไร
+      line: "{ผู้ใหญ่}ยืนอ่านป้ายอยู่ข้าง ๆ ไม่พูดว่าให้เลือกอะไร"
   note: ปุ่มเหล่าแสดงเฉพาะเหล่าที่ติด
   options:
     - label: เลือก ทบ.
@@ -4199,7 +4199,7 @@ chooseBranch:
         relations: 0
         network: 0
         money: 0
-    - label: เลือกตามที่ผู้ใหญ่ในบ้านอยาก
+    - label: เลือกตามที่{ผู้ใหญ่}อยาก
       hint: null
       requiresMoney: 0
       fx:
@@ -4313,7 +4313,7 @@ passed:
         result: null
         outcomes:
           - p: 0.5
-            result: ผู้ใหญ่ในบ้านถามว่าทำไมไม่บอก แล้วจับปากกาเซ็นโดยไม่ถามอีก
+            result: "{ผู้ใหญ่}ถามว่าทำไมไม่บอก แล้วจับปากกาเซ็นโดยไม่ถามอีก"
             fx:
               knowledge: 0
               health: 0
@@ -4443,7 +4443,7 @@ passed:
     altCond:
       flagsHas:
         - family_debt
-    text: ใบแจ้งวันรายงานตัวมีรายการของที่ต้องเตรียมยาวครึ่งหน้า ผู้ใหญ่ในบ้านอ่านจบแล้วเงียบไปนาน ก่อนจะยิ้มออกมา ถ้าเรียนจนจบ {ชื่อ} จะติดยศตอนอายุ{อายุติดยศ}
+    text: ใบแจ้งวันรายงานตัวมีรายการของที่ต้องเตรียมยาวครึ่งหน้า {ผู้ใหญ่}อ่านจบแล้วเงียบไปนาน ก่อนจะยิ้มออกมา ถ้าเรียนจนจบ {ชื่อ} จะติดยศตอนอายุ{อายุติดยศ}
     header: ติด {เหล่า}
     onEnter:
       setFlags:
@@ -4690,7 +4690,7 @@ passed:
       family: null
       poor: null
       classes: null
-    text: ผู้ใหญ่ในบ้านรออยู่ใต้ต้นไม้หน้ากองสอบตั้งแต่เช้า เห็นหน้า {ชื่อ} ก็รู้คำตอบก่อนจะได้พูด อีกไม่กี่เดือนต้องเข้าโรงเรียน ถ้าเรียนจนจบจะติดยศตอนอายุ{อายุติดยศ}
+    text: "{ผู้ใหญ่}รออยู่ใต้ต้นไม้หน้ากองสอบตั้งแต่เช้า เห็นหน้า {ชื่อ} ก็รู้คำตอบก่อนจะได้พูด อีกไม่กี่เดือนต้องเข้าโรงเรียน ถ้าเรียนจนจบจะติดยศตอนอายุ{อายุติดยศ}"
     header: ติด {เหล่า}
     onEnter:
       setFlags:
