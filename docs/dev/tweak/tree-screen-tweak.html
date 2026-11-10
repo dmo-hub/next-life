@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="th">
+<head>
+<!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>จอต้นไม้โฟกัส 3 แบบ (tweak) · focus-tree ใบ 02</title>
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<style>
+/* หน้า tweak focus-tree ใบ 02 · ให้เจ้าของเลือกจอต้นไม้ที่จะแทนรายการในแท็บโฟกัส (ข้อ 12 · ทับ ui-redo ข้อ 164)
+   โหนดทั้งหมดเป็นตัวอย่าง 12 ตัว (แขนงละ 3) ไม่ใช่เนื้อเกมจริง · ไม่มีตัวเลขบนหลอด/โหนด (ข้อ 10 46)
+   ช่อง "?" จองที่เดิม (ข้อ 61) · "เริ่มจาง" (ข้อ 63) · keystone บอกข้อเสียเป็นคำก่อนทุ่ม (ข้อ 60) */
+:root { --ui:#1F2430; --uibg:#ECEAE4; --uiline:#C9C4B8; --surf:#FBF8F1; --muted:#4A4F5C; --w:#B73824; --p:#015EC1; --b:#2F6B66; --d:#7A5C12; --bad:#B3261E; }
+* { box-sizing:border-box; }
+html, body { margin:0; }
+body { background:var(--uibg); color:var(--ui); font:14px/1.5 "Noto Sans Thai",system-ui,sans-serif; overflow-x:hidden; }
+button { font:inherit; color:inherit; cursor:pointer; }
+button:focus-visible, summary:focus-visible { outline:2px solid #015EC1; outline-offset:2px; }
+header.sb { position:sticky; top:0; z-index:5; display:flex; flex-wrap:wrap; gap:6px 12px; align-items:center; padding:8px 16px; background:#fff; border-bottom:1px solid var(--uiline); }
+header.sb h1 { font-size:15px; margin:0; flex:1 1 auto; }
+.seg { display:inline-flex; border:1px solid var(--uiline); border-radius:8px; overflow:hidden; }
+.seg button { border:0; background:none; padding:0 12px; min-height:36px; border-right:1px solid var(--uiline); font-size:13px; }
+.seg button:last-child { border-right:0; }
+.seg button[aria-pressed="true"] { background:var(--ui); color:#fff; }
+.vt { min-height:36px; padding:0 12px; border:1px solid var(--ui); border-radius:8px; background:#fff; font-size:13px; font-weight:700; }
+main { max-width:390px; margin:0 auto; padding:12px 0 80px; }
+.note { margin:0 16px 10px; color:var(--muted); font-size:12px; }
+.phone { width:100%; background:var(--surf); border:1px solid var(--uiline); border-radius:12px; overflow:hidden; padding:10px 10px 14px; }
+.tabs { display:flex; gap:4px; margin-bottom:10px; }
+.tabs button { flex:1 1 0; min-width:0; min-height:40px; padding:0 2px; border:1px solid var(--uiline); border-radius:8px; background:#fff; font-size:12px; line-height:1.2; overflow-wrap:anywhere; }
+.tabs button[aria-pressed="true"] { color:#fff; border-color:transparent; }
+.tools { display:flex; gap:6px; align-items:center; margin-bottom:8px; font-size:12px; color:var(--muted); }
+.tools button { width:36px; min-height:36px; border:1px solid var(--uiline); border-radius:8px; background:#fff; font-size:16px; }
+.tools span { flex:1; }
+
+/* การ์ดโหนด (ใช้ร่วมทุกแบบ) */
+.nd { background:#fff; border:1px solid var(--uiline); border-left:5px solid var(--c); border-radius:10px; padding:8px 10px; }
+.nd h3 { margin:0; font-size:14px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.nd .g { height:8px; border-radius:4px; background:#E4E0D6; overflow:hidden; margin:6px 0 2px; }
+.nd .g i { display:block; height:100%; background:var(--c); }
+.nd .sw { font-size:12px; color:var(--muted); }
+.nd.locked { opacity:.7; }
+.nd.hid { border-style:dashed; border-left-style:dashed; background:#F2EFE8; }
+.nd.key { border-color:var(--bad); border-left-color:var(--bad); }
+.bd { font-size:11px; padding:1px 7px; border-radius:10px; background:#F3E3C0; color:#6A4A00; font-weight:400; }
+.bd.k { background:#F6D5D2; color:var(--bad); }
+.bd.t { background:#E4E0D6; color:var(--muted); }
+.down { margin:6px 0 4px; padding:6px 8px; border-radius:6px; background:#FBE9E7; color:#7A1A12; font-size:12px; }
+.throw { width:100%; min-height:40px; border:0; border-radius:8px; background:var(--ui); color:#fff; font-size:13px; }
+.throw[disabled] { background:#9A9688; cursor:not-allowed; }
+.tag { font-size:11px; color:var(--muted); margin:0 0 3px; }
+
+/* แบบ 1: กิ่งแนวตั้ง */
+.d1row { display:flex; gap:8px; align-items:stretch; }
+.d1age { flex:none; width:44px; font-size:11px; color:var(--muted); text-align:right; padding-top:8px; }
+.d1spine { flex:none; width:12px; position:relative; }
+.d1spine::before { content:""; position:absolute; left:5px; top:0; bottom:0; width:2px; background:var(--c); }
+.d1spine::after { content:""; position:absolute; left:0; top:14px; width:12px; height:12px; border-radius:50%; background:var(--c); border:2px solid #fff; }
+.d1row.hidn .d1spine::after { background:#fff; border:2px dashed var(--c); }
+.d1row:last-child .d1spine::before { bottom:auto; height:20px; }
+.d1body { flex:1 1 0; min-width:0; padding-bottom:10px; }
+.d1body.offr { padding-left:22px; }
+.d1body.offl { padding-right:22px; }
+
+/* ตัวเลื่อน/ซูม (ต้นเต็ม) */
+.zs { overflow:auto; border:1px solid var(--uiline); border-radius:8px; background:#fff; max-height:520px; }
+.zw { position:relative; }
+.zi { position:absolute; left:0; top:0; transform-origin:0 0; }
+.mn { position:absolute; width:104px; transform:translate(-50%,-22px); text-align:center; background:none; border:0; padding:0; }
+.mn .o { width:40px; height:40px; margin:0 auto 2px; border-radius:50%; border:3px solid var(--c); background:var(--c); display:grid; place-items:center; color:#fff; font-size:15px; line-height:1; }
+.mn.key .o { border-radius:6px; transform:rotate(45deg); border-color:var(--bad); background:var(--bad); }
+.mn.locked .o { background:#fff; color:var(--c); opacity:.7; }
+.mn.act .o { background:#fff; color:var(--c); }
+.mn.hid .o { background:#fff; border-style:dashed; color:var(--c); }
+.mn.sel .o { box-shadow:0 0 0 3px #015EC1; }
+.mn span { display:block; font-size:11px; line-height:1.25; }
+.mn .bd { display:inline-block; margin-top:1px; }
+.zi svg { position:absolute; left:0; top:0; pointer-events:none; }
+
+/* แบบ 3: ตารางชั้นวัย */
+.tb { display:grid; grid-template-columns:54px repeat(4,112px); gap:4px; width:514px; padding:6px; }
+.tb .h { font-size:12px; font-weight:700; text-align:center; color:#fff; border-radius:6px; padding:4px 2px; }
+.tb .bandh { font-size:12px; font-weight:700; background:#E4E0D6; border-radius:6px; padding:4px; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:2px; }
+.tb .bandh button { border:1px solid var(--uiline); background:#fff; border-radius:6px; min-height:32px; padding:0 6px; font-size:11px; }
+.tb .cell { min-height:56px; }
+.tb .cell .nd { padding:5px 6px; border-left-width:4px; text-align:left; width:100%; }
+.tb .cell .nd h3 { font-size:12px; }
+.tb .cell .nd .g { height:6px; margin:4px 0 1px; }
+.tb .cell .nd .sw { font-size:11px; }
+.tb .cell.empty { border:1px dashed var(--uiline); border-radius:8px; }
+.tb .cellbtn { all:unset; display:block; cursor:pointer; }
+.tb .cellbtn:focus-visible { outline:2px solid #015EC1; outline-offset:2px; }
+.tb .cellbtn.sel .nd { box-shadow:0 0 0 3px #015EC1; }
+.tb .cell.fold { display:none; }
+details.band { margin-bottom:8px; }
+details.band > summary { cursor:pointer; min-height:36px; display:flex; align-items:center; font-weight:700; font-size:13px; }
+details.band .nd + .nd { margin-top:6px; }
+.empty-slot { border:1px dashed var(--uiline); border-radius:10px; padding:10px; font-size:12px; color:var(--muted); }
+
+/* แบบ 2: วงรัศมี */
+.rad { display:block; max-width:none; touch-action:manipulation; }
+.rad text { font-family:inherit; }
+.rad .bn { cursor:pointer; }
+.rad .nn { cursor:pointer; }
+.rad .nn:focus-visible { outline:2px solid #015EC1; }
+
+.sel-panel { margin-top:10px; }
+.sel-panel > b { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; font-weight:400; }
+</style>
+</head>
+<body>
+<header class="sb">
+  <h1>จอต้นไม้โฟกัส · เลือก 1 ใน 3 แบบ</h1>
+  <div class="seg" role="group" aria-label="แบบ" id="designs">
+    <button data-design="1" aria-pressed="true">1 กิ่งแนวตั้ง</button>
+    <button data-design="2" aria-pressed="false">2 วงรัศมี</button>
+    <button data-design="3" aria-pressed="false">3 ตารางชั้นวัย</button>
+  </div>
+  <button class="vt" id="vt" type="button" aria-pressed="false">ดูต้นเต็ม</button>
+</header>
+<main>
+  <p class="note" id="note"></p>
+  <div class="phone" id="root"></div>
+</main>
+<script>
+(function () {
+  var B = [
+    { id: 'w', n: 'งาน', c: '#B73824' },
+    { id: 'p', n: 'คน', c: '#015EC1' },
+    { id: 'b', n: 'กายใจ', c: '#2F6B66' },
+    { id: 'd', n: 'ธรรม', c: '#7A5C12' }
+  ];
+  var BN = ['งาน', 'คน', 'กายใจ', 'ความเชื่อ/ธรรม'];
+  var BANDS = ['วัยเด็ก', 'วัยรุ่น', 'วัยทำงาน', 'วัยเก๋า'];
+  /* st: done ปลดแล้ว · act ทุ่มอยู่ · fade ปลดแล้วแต่เริ่มจาง · lock ยังไม่ถึง · hid ซ่อน (จอง "?") · g = ความเต็มของหลอด */
+  var N = [
+    { id: 'w1', b: 0, r: 0, name: 'ช่วยงานบ้านช่วยไร่', st: 'done', par: [] },
+    { id: 'w2', b: 0, r: 1, name: 'ฝึกงานช่าง', st: 'act', g: 0.35, sw: 'ทุ่มอยู่', par: ['w1', 'b1'] },
+    { id: 'w3', b: 0, r: 2, name: 'หัวหน้าช่าง', st: 'lock', par: ['w2', 'b2'] },
+    { id: 'p1', b: 1, r: 0, name: 'เพื่อนบ้านวัยเด็ก', st: 'done', par: [] },
+    { id: 'p2', b: 1, r: 1, name: 'เพื่อนสนิท', st: 'fade', par: ['p1'] },
+    { id: 'p3', b: 1, r: 2, name: 'ผู้ใหญ่ที่เคารพ', st: 'lock', par: ['p2', 'd2'] },
+    { id: 'b1', b: 2, r: 0, name: 'วิ่งเล่นกลางแจ้ง', st: 'done', par: [] },
+    { id: 'b2', b: 2, r: 1, name: 'ออกกำลังสม่ำเสมอ', st: 'act', g: 0.85, sw: 'รอโอกาส', par: ['b1'] },
+    { id: 'b3', b: 2, r: 2, name: 'ฝืนร่างเอาชนะ', st: 'lock', key: true, par: ['b2'],
+      down: 'ได้แรงมากแต่ร่างกายทรุดเร็วถาวร ล้างไม่ได้ และเลื่อนเข้าเองไม่ได้ ต้องกดเลือกเอง' },
+    { id: 'd1', b: 3, r: 0, name: 'ไปวัดกับยาย', st: 'done', par: [] },
+    { id: 'd2', b: 3, r: 1, name: 'สงบใจ', st: 'hid', par: ['d1'] },
+    { id: 'd3', b: 3, r: 3, name: 'ปล่อยวางทั้งชีวิต', st: 'lock', key: true, par: ['p3', 'd2'],
+      down: 'ใจเบาจนไม่อยากสะสมอะไรอีก เงินกับตำแหน่งโตช้าลงถาวร ล้างไม่ได้' }
+  ];
+  var BY = {};
+  N.forEach(function (n) { BY[n.id] = n; });
+
+  var KEY = 'tweaks-tree-screen';
+  var S = { design: 1, view: 'branch', br: 0, z: 100, sel: null, fold: {} };
+  try { var sv = JSON.parse(localStorage.getItem(KEY) || 'null'); if (sv) { ['design', 'view', 'br', 'z'].forEach(function (k) { if (sv[k] != null) S[k] = sv[k]; }); } } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify({ design: S.design, view: S.view, br: S.br, z: S.z })); } catch (e) {} }
+
+  var root = document.getElementById('root');
+  var NOTES = {
+    1: 'แบบ 1 · กิ่งแนวตั้ง: ทีละแขนงเรียงบนลงล่างตามวัย (ทางแยก/ทางรวมเยื้องซ้ายขวา) · ต้นเต็มเป็น 4 คอลัมน์เลื่อนข้างและซูมได้',
+    2: 'แบบ 2 · วงรัศมี: ต้นเต็มเป็นวงกลม 4 ส่วน เกิดอยู่กลาง วัยมากอยู่วงนอก · แตะชื่อแขนงเพื่อซูมเข้าส่วนนั้น',
+    3: 'แบบ 3 · ตารางชั้นวัย: แถว = วัย คอลัมน์ = แขนง พับแถวได้ · ทีละแขนงเป็นการ์ดเต็มความกว้าง'
+  };
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function stage(n) {
+    if (n.st === 'done') return 'ปลดแล้ว';
+    if (n.st === 'fade') return 'เริ่มจาง';
+    if (n.st === 'act') return n.sw;
+    if (n.st === 'hid') return 'ยังไม่เห็น';
+    return n.r > 2 ? 'ไกลเกินไป' : 'ยังไม่ถึงวัย';
+  }
+  function gaugeW(n) { return n.st === 'done' || n.st === 'fade' ? 100 : n.st === 'act' ? Math.round(n.g * 100) : 0; }
+  function badges(n) {
+    return (n.st === 'fade' ? '<span class="bd">เริ่มจาง</span>' : '') + (n.key ? '<span class="bd k">หักเห</span>' : '');
+  }
+  /* การ์ดโหนด: ใช้ร่วมทุกแบบ */
+  function card(n, full) {
+    var c = B[n.b].c;
+    if (n.st === 'hid') {
+      return '<div class="nd hid" style="--c:' + c + '"><h3>?</h3><div class="sw">ซ่อนอยู่ จองที่ไว้ที่เดิม เข้าใกล้แล้วจะเห็น</div></div>';
+    }
+    var h = '<div class="nd ' + (n.st === 'lock' ? 'locked ' : '') + (n.key ? 'key' : '') + '" style="--c:' + c + '">' +
+      '<h3>' + esc(n.name) + badges(n) + '</h3>' +
+      '<div class="g" aria-hidden="true"><i style="width:' + gaugeW(n) + '%"></i></div>' +
+      '<div class="sw">' + stage(n) + '</div>';
+    if (full && n.key) {
+      h += '<div class="down">ข้อเสียก่อนทุ่ม: ' + esc(n.down) + '</div><button class="throw" type="button" disabled>ทุ่มปีเต็มเข้าโหนดนี้</button>';
+    } else if (full && n.st === 'act') {
+      h += '<button class="throw" type="button" disabled>ทุ่มปีเต็มเข้าโหนดนี้</button>';
+    }
+    return h + '</div>';
+  }
+  function tabs() {
+    return '<div class="tabs" role="group" aria-label="แขนง">' + B.map(function (b, i) {
+      return '<button type="button" data-br="' + i + '" aria-pressed="' + (S.br === i) + '"' + (S.br === i ? ' style="background:' + b.c + '"' : '') + '>' + BN[i] + '</button>';
+    }).join('') + '</div>';
+  }
+  function zoomBar() {
+    return '<div class="tools"><button type="button" data-z="-" aria-label="ซูมออก">−</button><button type="button" data-z="+" aria-label="ซูมเข้า">+</button><span>ลากเลื่อนดูทั้งต้น · ซูมได้</span></div>';
+  }
+  function selPanel() {
+    var n = S.sel && BY[S.sel];
+    return '<div class="sel-panel"><b>แตะโหนดเพื่อดูรายละเอียด</b>' + (n ? card(n, true) : '') + '</div>';
+  }
+  function kids(n) { return N.filter(function (m) { return m.par.indexOf(n.id) >= 0; }); }
+
+  /* ===== แบบ 1 ===== */
+  function d1Branch() {
+    var list = N.filter(function (n) { return n.b === S.br; }).sort(function (a, b) { return a.r - b.r; });
+    return tabs() + list.map(function (n) {
+      var crossIn = n.par.filter(function (p) { return BY[p].b !== n.b; });
+      var crossOut = kids(n).filter(function (m) { return m.b !== n.b; });
+      var tag = '';
+      if (crossIn.length) tag += '<p class="tag">รวมทางจาก' + crossIn.map(function (p) { return BN[BY[p].b]; }).join(' ') + '</p>';
+      if (crossOut.length) tag += '<p class="tag">แยกไปทาง' + crossOut.map(function (m) { return BN[m.b]; }).filter(function (v, i, a) { return a.indexOf(v) === i; }).join(' ') + '</p>';
+      return '<div class="d1row' + (n.st === 'hid' ? ' hidn' : '') + '" style="--c:' + B[n.b].c + '"><div class="d1age">' + BANDS[n.r] + '</div><div class="d1spine"></div>' +
+        '<div class="d1body ' + (crossIn.length ? 'offr' : crossOut.length ? 'offl' : '') + '">' + tag + card(n, true) + '</div></div>';
+    }).join('');
+  }
+  var COLW = 120, ROWH = 112, TOP = 44;
+  function pos1(n) { return { x: COLW / 2 + n.b * COLW, y: TOP + n.r * ROWH }; }
+  function lines(posf, W, H) {
+    var s = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">';
+    N.forEach(function (n) {
+      n.par.forEach(function (p) {
+        var a = posf(BY[p]), b = posf(n), cross = BY[p].b !== n.b;
+        s += '<line x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '" stroke="' + (cross ? '#6B6558' : B[n.b].c) + '" stroke-width="2"' + (cross ? ' stroke-dasharray="5 4"' : '') + '/>';
+      });
+    });
+    return s + '</svg>';
+  }
+  function mini(n, left, top) {
+    var glyph = n.st === 'hid' ? '?' : n.st === 'done' || n.st === 'fade' ? '✓' : n.st === 'act' ? '◐' : n.key ? '' : '·';
+    var cls = 'mn ' + (n.key ? 'key ' : '') + (n.st === 'lock' ? 'locked ' : n.st === 'act' ? 'act ' : n.st === 'hid' ? 'hid ' : '') + (S.sel === n.id ? 'sel' : '');
+    return '<button type="button" class="' + cls + '" data-sel="' + n.id + '" style="--c:' + B[n.b].c + ';left:' + left + 'px;top:' + top + 'px" aria-label="' + (n.st === 'hid' ? 'ช่องซ่อน' : esc(n.name)) + '">' +
+      '<div class="o"><span style="transform:' + (n.key ? 'rotate(-45deg)' : 'none') + '">' + glyph + '</span></div>' +
+      '<span>' + (n.st === 'hid' ? '?' : esc(n.name)) + '</span>' + (n.st === 'fade' ? '<span class="bd">เริ่มจาง</span>' : '') + '</button>';
+  }
+  function d1Full() {
+    var W = COLW * 4, H = TOP + 3 * ROWH + 70;
+    var head = B.map(function (b, i) { return '<div style="position:absolute;left:' + (i * COLW + 6) + 'px;top:4px;width:' + (COLW - 12) + 'px;text-align:center;font-weight:700;font-size:12px;color:#fff;background:' + b.c + ';border-radius:6px;padding:3px 0">' + BN[i] + '</div>'; }).join('');
+    var ages = BANDS.map(function (a, r) { return '<div style="position:absolute;left:2px;top:' + (TOP + r * ROWH - 8) + 'px;font-size:10px;color:#4A4F5C">' + a + '</div>'; }).join('');
+    return zoomBar() + '<div class="zs" id="zs"><div class="zw"><div class="zi" style="width:' + W + 'px;height:' + H + 'px">' + head + lines(pos1, W, H) + N.map(function (n) { var p = pos1(n); return mini(n, p.x, p.y); }).join('') + ages + '</div></div></div>' + selPanel();
+  }
+
+  /* ===== แบบ 2 ===== */
+  var R0 = 38, RS = 52;
+  function ang(n) { return (n.b * 90 - 45 + (n.r % 2 ? -17 : 17)) * Math.PI / 180; }
+  function pos2(n) { var r = R0 + (n.r + 1) * RS - 14, a = ang(n); return { x: r * Math.cos(a), y: r * Math.sin(a) }; }
+  function radSvg(vb, w, brOnly) {
+    var s = '<svg class="rad" width="' + w + '" viewBox="' + vb + '" role="group" aria-label="ต้นไม้วงรัศมี">';
+    for (var r = 0; r < 4; r++) s += '<circle cx="0" cy="0" r="' + (R0 + (r + 1) * RS - 14) + '" fill="none" stroke="#C9C4B8" stroke-dasharray="3 4"/>';
+    for (var i = 0; i < 4; i++) {
+      var a = (i * 90 - 90) * Math.PI / 180, ro = R0 + 4 * RS - 8;
+      s += '<line x1="0" y1="0" x2="' + ro * Math.cos(a) + '" y2="' + ro * Math.sin(a) + '" stroke="#C9C4B8"/>';
+    }
+    N.forEach(function (n) {
+      n.par.forEach(function (p) {
+        var a = pos2(BY[p]), b = pos2(n), cross = BY[p].b !== n.b;
+        s += '<path d="M' + a.x + ' ' + a.y + ' Q' + (cross ? 0 : (a.x + b.x) / 2) + ' ' + (cross ? 0 : (a.y + b.y) / 2) + ' ' + b.x + ' ' + b.y + '" fill="none" stroke="' + (cross ? '#6B6558' : B[n.b].c) + '" stroke-width="2"' + (cross ? ' stroke-dasharray="5 4"' : '') + '/>';
+      });
+    });
+    s += '<circle cx="0" cy="0" r="22" fill="#1F2430"/><text x="0" y="4" text-anchor="middle" font-size="11" fill="#fff">เกิด</text>';
+    N.forEach(function (n) {
+      var p = pos2(n), c = B[n.b].c, sel = S.sel === n.id;
+      var sh = n.key
+        ? '<rect x="-10" y="-10" width="20" height="20" transform="rotate(45)" fill="' + (n.st === 'lock' ? '#fff' : '#B3261E') + '" stroke="#B3261E" stroke-width="3"/>'
+        : '<circle r="12" fill="' + (n.st === 'done' || n.st === 'fade' ? c : '#fff') + '" stroke="' + c + '" stroke-width="3"' + (n.st === 'hid' ? ' stroke-dasharray="3 3"' : '') + (n.st === 'lock' ? ' opacity=".6"' : '') + '/>';
+      if (n.st === 'act') sh += '<circle r="17" fill="none" stroke="' + c + '" stroke-width="3" stroke-dasharray="' + (n.g * 107).toFixed(1) + ' 107" transform="rotate(-90)"/>';
+      if (sel) sh += '<circle r="21" fill="none" stroke="#015EC1" stroke-width="2"/>';
+      var lab = n.st === 'hid' ? '?' : n.name;
+      var anch = Math.cos(ang(n)) > 0.2 ? 'start' : Math.cos(ang(n)) < -0.2 ? 'end' : 'middle';
+      var lx = anch === 'start' ? 20 : anch === 'end' ? -20 : 0, ly = anch === 'middle' ? 28 : 4;
+      var txt = '<text x="' + lx + '" y="' + ly + '" text-anchor="' + anch + '" font-size="11" fill="#1F2430">' + esc(lab) + '</text>';
+      if (n.st === 'fade') txt += '<text x="' + lx + '" y="' + (ly + 12) + '" text-anchor="' + anch + '" font-size="9" fill="#6A4A00">เริ่มจาง</text>';
+      if (n.st === 'hid') sh += '<text y="4" text-anchor="middle" font-size="12" fill="' + c + '">?</text>';
+      s += '<g class="nn" tabindex="0" role="button" data-sel="' + n.id + '" aria-label="' + (n.st === 'hid' ? 'ช่องซ่อน' : esc(n.name)) + '" transform="translate(' + p.x + ' ' + p.y + ')">' + sh + txt + '</g>';
+    });
+    B.forEach(function (b, i) {
+      var a = (i * 90 - 45) * Math.PI / 180, r = R0 + 4 * RS + 2;
+      s += '<g class="bn" tabindex="0" role="button" data-br="' + i + '" data-zoom="1" aria-label="ซูมแขนง' + BN[i] + '" transform="translate(' + r * Math.cos(a) + ' ' + r * Math.sin(a) + ')"><rect x="-34" y="-12" width="68" height="24" rx="12" fill="' + b.c + '"/><text y="4" text-anchor="middle" font-size="11" fill="#fff">' + (i === 3 ? 'ธรรม' : BN[i]) + '</text></g>';
+    });
+    return s + '</svg>';
+  }
+  function d2Full() {
+    var w = Math.round(480 * S.z / 100);
+    return zoomBar() + '<div class="zs" id="zs"><div style="width:' + w + 'px">' + radSvg('-240 -240 480 480', w) + '</div></div>' + selPanel();
+  }
+  function d2Branch() {
+    var i = S.br, a0 = (i * 90 - 90) * Math.PI / 180, a1 = (i * 90) * Math.PI / 180, ro = R0 + 4 * RS + 20;
+    var xs = [0], ys = [0];
+    for (var k = 0; k <= 12; k++) { var a = a0 + (a1 - a0) * k / 12; xs.push(ro * Math.cos(a)); ys.push(ro * Math.sin(a)); }
+    var x0 = Math.min.apply(null, xs) - 24, x1 = Math.max.apply(null, xs) + 24, y0 = Math.min.apply(null, ys) - 24, y1 = Math.max.apply(null, ys) + 24;
+    return tabs() + radSvg(x0 + ' ' + y0 + ' ' + (x1 - x0) + ' ' + (y1 - y0), '100%') + selPanel();
+  }
+
+  /* ===== แบบ 3 ===== */
+  function d3Full() {
+    var h = '<div class="tb"><div></div>' + B.map(function (b, i) { return '<div class="h" style="background:' + b.c + '">' + BN[i] + '</div>'; }).join('');
+    BANDS.forEach(function (bn, r) {
+      var fold = !!S.fold[r];
+      h += '<div class="bandh">' + bn + '<button type="button" data-fold="' + r + '" aria-expanded="' + !fold + '">' + (fold ? 'กางออก' : 'พับ') + '</button></div>';
+      B.forEach(function (b, i) {
+        var n = N.filter(function (m) { return m.b === i && m.r === r; })[0];
+        h += '<div class="cell' + (n ? '' : ' empty') + (fold ? ' fold' : '') + '">' + (n ? '<button type="button" class="cellbtn' + (S.sel === n.id ? ' sel' : '') + '" data-sel="' + n.id + '">' + card(n, false) + '</button>' : '') + '</div>';
+      });
+    });
+    return zoomBar() + '<div class="zs" id="zs"><div class="zw"><div class="zi">' + h + '</div></div></div></div>' + selPanel();
+    /* tb + zi + zw + zs */
+  }
+  function d3Branch() {
+    return tabs() + BANDS.map(function (bn, r) {
+      var list = N.filter(function (n) { return n.b === S.br && n.r === r; });
+      return '<details class="band" open><summary>' + bn + '</summary>' +
+        (list.length ? list.map(function (n) { return card(n, true); }).join('') : '<div class="empty-slot">ยังไม่ลงโหนดตัวอย่างในวัยนี้</div>') + '</details>';
+    }).join('');
+  }
+
+  function render() {
+    var f = S.view === 'full';
+    root.innerHTML = S.design === 1 ? (f ? d1Full() : d1Branch()) : S.design === 2 ? (f ? d2Full() : d2Branch()) : (f ? d3Full() : d3Branch());
+    document.getElementById('note').textContent = NOTES[S.design];
+    var vt = document.getElementById('vt');
+    vt.textContent = f ? 'ดูทีละแขนง' : 'ดูต้นเต็ม';
+    vt.setAttribute('aria-pressed', String(f));
+    Array.prototype.forEach.call(document.querySelectorAll('#designs button'), function (b) { b.setAttribute('aria-pressed', String(+b.dataset.design === S.design)); });
+    fit();
+  }
+  /* ต้นเต็มแบบ 1 และ 3 ซูมด้วย transform: ขนาดกรอบนอกต้องตามขนาดจริงหลังซูม */
+  function fit() {
+    Array.prototype.forEach.call(document.querySelectorAll('.zw'), function (zw) {
+      var zi = zw.firstElementChild, z = S.z / 100;
+      zi.style.transform = 'scale(' + z + ')';
+      zw.style.width = zi.offsetWidth * z + 'px';
+      zw.style.height = zi.offsetHeight * z + 'px';
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-design],[data-br],[data-z],[data-sel],[data-fold]');
+    if (!t) return;
+    if (t.dataset.design) S.design = +t.dataset.design;
+    else if (t.dataset.fold) { S.fold[t.dataset.fold] = !S.fold[t.dataset.fold]; }
+    else if (t.dataset.z) S.z = Math.max(60, Math.min(180, S.z + (t.dataset.z === '+' ? 20 : -20)));
+    else if (t.dataset.sel) S.sel = t.dataset.sel;
+    else if (t.dataset.br != null) { S.br = +t.dataset.br; if (t.dataset.zoom) S.view = 'branch'; }
+    save(); render();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var t = e.target.closest && e.target.closest('g[data-sel],g[data-br]');
+    if (t) { e.preventDefault(); t.dispatchEvent(new MouseEvent('click', { bubbles: true })); }
+  });
+  document.getElementById('vt').addEventListener('click', function () { S.view = S.view === 'full' ? 'branch' : 'full'; save(); render(); });
+  render();
+})();
+</script>
+</body>
+</html>
