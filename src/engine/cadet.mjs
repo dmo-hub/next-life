@@ -649,7 +649,6 @@ const CADET = (() => {
     P.failStage = 'declined';
     I.lastFail = 'declined';
     delete st.flags.cadet_dream;
-    delete st.flags.cadet_exam_door;
     st.flags.cadet_declined_seat = true;
     // Q-A1 (ก): ปีหน้าอายุยังสมัครได้ = การ์ดเชิญรอบใหม่ "ใบประกาศปีที่สอง" (ลำดับค้างข้ามปี แบบฤดูสอบ) · เกินอายุ = จบเส้น
     P.steps = st.age + 1 <= (N(st).last_age ?? 18) ? [['returnHold']] : [['end']];
