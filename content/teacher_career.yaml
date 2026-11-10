@@ -85,7 +85,7 @@ events:
       - id: apply
         text: "สมัครทุนครูบ้านเกิด"
         outcomes:
-          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ได้ทุน มีชื่อติดบอร์ดหน้าโรงเรียน", sets_flags: [kru_aim, kru_local], effects: {happiness: 2, relations: 1}, schedules: [{event: kru_admit_01, after_years: [3, 3]}], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ได้ทุน มีชื่อติดบอร์ดหน้าโรงเรียน", sets_flags: [kru_aim, kru_local], effects: {happiness: 2, relations: 1}, schedules: [{event: kru_admit_01, after_years: [3, 3]}, {event: kru_admit_local_01, after_years: [3, 3]}], merit: [{cat: neutral}]}
           - {weight: 2, text: "ไม่ได้ทุน แต่ยังเลือกคณะครูได้ตามปกติ", sets_flags: [kru_aim], effects: {happiness: -1}, schedules: [{event: kru_admit_01, after_years: [3, 3]}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: work_now
@@ -134,6 +134,39 @@ events:
         text: "นั่งแถวหลังสุด รอเวลาเลิก"
         sets_flags: [kru_student]
         effects: {health: 1}
+        schedules: [{event: kru_practicum_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+
+  - id: kru_admit_local_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2563, 2650]
+    when: {age: [19, 22], flags: {has: [kru_aim, kru_local], not: [kru_student, kru_civil, exam_pass:uni]}}
+    title: "นักศึกษาครูทุนบ้านเกิด"
+    text: "ทุนครูบ้านเกิดพาเข้าคณะครูโดยไม่ต้องแย่งที่นั่งสอบกับใคร ค่าหอกับค่าเทอมออกตรงจากทุน ใบแจ้งทุนแนบสัญญาว่าจบแล้วต้องกลับไปบรรจุโรงเรียนเล็กแถวบ้าน เพื่อนในหอถามว่าพร้อมไปอยู่หมู่บ้านเดิมอีกสิบปีหรือยัง"
+    choices:
+      - id: practice
+        text: "ซ้อมสอนหน้ากระจกทุกคืน"
+        sets_flags: [kru_student]
+        effects: {school: uni, knowledge: 2, happiness: -1}
+        schedules: [{event: kru_practicum_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: club
+        text: "เข้าชมรมค่ายอาสาสอนหนังสือ"
+        sets_flags: [kru_student]
+        effects: {school: uni, network: 2, relations: 1}
+        schedules: [{event: kru_practicum_01, after_years: [2, 2]}]
+        merit: [{cat: help_others, level: 1}]
+      - id: switch
+        text: "คืนทุน ย้ายไปคณะอื่น"
+        clears_flags: [kru_aim, kru_local]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: nap
+        text: "นั่งแถวหลังสุด รอเวลาเลิก"
+        sets_flags: [kru_student]
+        effects: {school: uni, health: 1}
         schedules: [{event: kru_practicum_01, after_years: [2, 2]}]
         merit: [{cat: neutral}]
 
