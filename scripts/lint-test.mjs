@@ -334,7 +334,8 @@ const used = new Set();
 for (const { doc } of realDocs) for (const { s: f } of flagNames(doc)) used.add(f.split(':')[0]);
 // ธงที่แกนตั้งเอง (ป้ายหมวด 9 · ศาลสั่งล้มละลาย) มีในทะเบียนเพื่อให้เนื้อหาอ่านได้ ไม่ต้องรอเนื้อหาใช้
 // cheat_death: แกนอ่านตอนผลสุ่มตาย (ถูกเรียกตัว B153) — มีผู้อ่านแล้วแม้ยังไม่มีการ์ดตั้ง
-const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death'];
+// army_family / police_family (B5): แกนตั้งตอนเข้าสายยศ army/police (rank.mjs markService)
+const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death', 'army_family', 'police_family'];
 const stale = [...ctx.flags.flags, ...ctx.flags.prefixes].filter((f) => !used.has(f) && !ENGINE_FLAGS.includes(f));
 rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${ctx.flags.prefixes.size} ชื่อหน้า · ค้าง ${stale.length}`]);
 // ธงมีพารามิเตอร์ยังไม่มีเนื้อหาจริงใช้ (มีแค่ใน fixture สายมู) จึงไม่นับว่าค้าง
@@ -344,6 +345,7 @@ if (!realDocs.some(({ doc }) => (doc.events ?? []).some((e) => e.id === BOND_EVE
 
 // ทะเบียน heir: (ธงที่แกนส่งถึงทายาท) — ตรวจทั้งชุด ไม่ใส่ใน RULES เพราะ fixture รันทีละไฟล์ จะตกด้วยกติกานี้ทุกไฟล์
 // tier เพดาน 2 (หลาน) — เหลนไม่ได้รับธง
+const ENGINE_HEIR_READS = ['army_family', 'police_family'];
 function heirCheck(reg, docs) {
   const problems = [];
   const flagSet = new Set(Object.keys(reg.flags ?? {}));
@@ -353,7 +355,8 @@ function heirCheck(reg, docs) {
     if (!isObj(h) || typeof h.tell !== 'string' || !h.tell.trim() || h.tell.length > MAX_LEN.hint) problems.push(`ทะเบียน heir: "${f}" tell ต้องเป็นข้อความไม่ว่าง ≤ ${MAX_LEN.hint} ตัวอักษร (หน้าจอใช้คำนี้)`);
     if (isObj(h) && h.from_age !== undefined && !(Number.isInteger(h.from_age) && h.from_age >= 0 && h.from_age <= 60)) problems.push(`ทะเบียน heir: "${f}" from_age ต้องเป็นจำนวนเต็ม 0–60`);
   }
-  const read = new Set();
+  // B5: ธงทายาทเตรียมทหาร แกนอ่านเอง (cadet.mjs heirOf · life.mjs heirOfLine → {ทายาท:} {ผู้ใหญ่ทายาท} {ทางแม่} · rules/cadet.yaml cond.heir) ไม่ผ่าน when.parent_flags
+  const read = new Set(ENGINE_HEIR_READS);
   for (const { doc } of docs) for (const e of doc.events ?? []) for (const { f } of parentRefs(isObj(e) ? e : {})) read.add(f);
   return { problems, unread: Object.keys(reg.heir ?? {}).filter((f) => !read.has(f)) };
 }

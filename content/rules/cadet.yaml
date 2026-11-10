@@ -64,7 +64,7 @@ numbers:
   camp_board_mid: 17
   # B5 ทายาทจากการเกิด (เจ้าของเคาะ 2026-11-10): ครอบครัวใหม่มีโอกาสเกิดมามีพ่อหรือแม่รับราชการทหาร/ตำรวจ 5.00% (ธง army_family / police_family · from_age 0)
   heir_birth_p: 0.05
-  heir_police_share: 0.5    # สัดส่วนตำรวจในโอกาสนั้น (ที่เหลือ = ทหาร) · ⚠ ค่าชั่วคราว รอเจ้าของเคาะผ่าน g-b7
+  heir_police_share: 0.5    # สัดส่วนตำรวจในโอกาสนั้น (ที่เหลือ = ทหาร) · เจ้าของเคาะ 2026-11-10 ครึ่งต่อครึ่ง 2.50% / 2.50%
   rank_rough_from: 10       # ลำดับตั้งแต่ค่านี้ พ่อพูดแบบปัด ("ลำดับหกสิบกว่า") · น้อยกว่า = ไม่พูด (ข้อ 4)
 branches:
   army: ทบ.
@@ -3737,7 +3737,6 @@ interview:
         sex: ชาย
         regions: null
         notRegions: null
-        heir: null
         notHeir: null
         yearMin: null
         yearMax: null
@@ -3747,11 +3746,12 @@ interview:
         family: null
         poor: null
         classes: null
-        anyFlags:
-          - army_family
-          - police_family
+        # B5 (2026-11-10): ธงทายาทอยู่ใน parentFlags → กั้นด้วย heir (anyFlags อ่าน flags ของผู้เล่นเอง ไม่ใช่ของพ่อแม่)
+        heir:
+          - army
+          - police
       text: ห้องสัมภาษณ์มีโต๊ะยาวตัวเดียว นายทหารสามคนนั่งเรียงกัน คนกลางเปิดแฟ้มของ {ชื่อ} อ่านอยู่ครู่หนึ่ง แล้วถามขึ้นข้อเดียว "แฟ้มเขียนว่าคนในบ้านเคยรับราชการในเครื่องแบบ อยากเป็นแบบเขาหรือ"
-      note: cond = flagsHas army_family หรือ police_family (รอ CE-01)
+      note: cond = ทายาททหาร/ตำรวจ (heir · B5)
       options:
         - label: อยากเป็น แต่อยากได้มาด้วยตัวเอง
           hint: null

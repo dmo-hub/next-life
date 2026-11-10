@@ -173,6 +173,16 @@ export function monthlyIncome(st, year = st.birthYear + st.age) {
 
 // heir = รุ่นถัดไปจากระหว่างชาติ (afterlife.mjs): จุดเกิด/ฐานะ/ค่าเริ่ม/บัญชีที่ส่งต่อ ทับค่าที่สุ่ม
 // ยังดึงเลขสุ่มของโลกครบชุดเดิมก่อนทับ — ตำแหน่ง stream ของรุ่นถัดไปเหมือนชีวิตแรกทุกประการ
+// B5 ทายาทจากการเกิด (เจ้าของเคาะ 2026-11-10 · 5.00% · from_age 0): ครอบครัวใหม่ (ชีวิตแรก / ไปเกิดบ้านอื่น) สุ่มว่าพ่อหรือแม่เคยรับราชการ
+// ทางเป็นลูก/สายเลือด (heir.tier) = บ้านเดิม ไม่สุ่ม — ได้ธงก็ต่อเมื่อรุ่นก่อนถือธงจริง (afterlife heirFlags)
+// stream แยกจาก seed เหมือนจังหวัด/พ่อแม่ — ไม่กินเลขสุ่มของโลก ลำดับชีวิตเดิมไม่เลื่อน · ค่าเป็นชั้น 1 (ลูก) แบบที่ heirFlags ส่ง
+function birthHeirFlags(seed, content, heir) {
+  if (heir?.tier) return {};
+  const n = content.cadet?.numbers ?? {}, r = makeRng((seed ^ 0x7a3c11e5) >>> 0);   // salt ของ B5 เอง (ไม่ใช้ร่วมกับ stream อื่น)
+  if (r.next() >= (n.heir_birth_p ?? 0)) return {};
+  return { [r.next() < (n.heir_police_share ?? 0.5) ? 'police_family' : 'army_family']: 1 };
+}
+
 export function newLife(seed, content, heir = null) {
   const era = content.era;
   const rng = makeRng(seed);
@@ -270,7 +280,8 @@ export function newLife(seed, content, heir = null) {
     omenAge: null,
     flags: {},
     // ธงของรุ่นก่อนที่ทายาทได้รู้ {ธง: ชั้น} — แยกจาก flags เพราะ flags คือสิ่งที่ตัวเองเคยทำ (ฉายา/ความเสี่ยงตายอ่านอยู่)
-    parentFlags: heir?.parentFlags ?? {},
+    // B5: ทางเป็นลูก/สายเลือด = ธงจากรุ่นก่อนเท่านั้น · ครอบครัวใหม่ (afterlife ส่ง {} มา) = สุ่มทายาทจากการเกิด
+    parentFlags: heir?.tier ? heir.parentFlags ?? {} : { ...(heir?.parentFlags ?? {}), ...birthHeirFlags(seed, content, heir) },
     // สกิลที่พกมาจากคลัง [{ id, lv }] (06s) ใช้ทั้งชีวิตนี้และชาติต่างโลกที่ตามมา · ไม่พก = ไม่มีช่อง (state เท่าก่อนมีสกิลข้ามชาติ)
     ...(heir?.skills?.length && { skills: heir.skills }),
     // ค่าที่ได้จากช่องพกที่ไม่ใช้ (ใบ 201) — การ์ดเกิดบอกเป็นคำ · เซฟเก่าไม่มี = ไม่มีบรรทัด

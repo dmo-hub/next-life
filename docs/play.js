@@ -1483,16 +1483,28 @@ function rankName(st) {
   return officeFull(st) ? officeStep(st).name : `${job} · ${officeStep(st).name}`;
 }
 
+// B5 (เจ้าของเคาะ Q3 2026-11-10): เข้าสายยศทหาร/ตำรวจ = ตั้งธงทายาทให้ลูก (army_family / police_family · flags.yaml heir: tier 1)
+// afterlife heirFlags อ่านธงตอนตาย → ลูกทุกคนได้ รวมลูกที่เกิดก่อนพ่อแม่เข้ารับราชการ
+const SERVICE_FLAG = { army: 'army_family', police: 'police_family' };
+function markService(st, id) {
+  const f = SERVICE_FLAG[id];
+  if (!f) return;
+  st.flags[f] = true;
+  (st.flagAge ??= {})[f] ??= st.age;   // เซฟเก่าอาจไม่มี flagAge
+}
+
 // เข้าสายตามงานที่ได้ (effects.job): อาชีพที่มีสายเอกชน/สายอาชีพสั้นเริ่มขั้นของอาชีพนั้น · งานอื่นออกจากสายเดิม
 function enterByJob(st, occ) {
   const L = st.content.era.careers.ladders;
   const id = Object.keys(L).find((k) => L[k].occs?.includes(occ));
   st.ladder = id ? { id, rank: L[id].start?.[occ] ?? 0, since: st.age, prog: 0 } : null;
+  markService(st, id);   // B5
 }
 
 // เข้าสายราชการ/ทหาร/ตำรวจ (effects.ladder): อาชีพเปลี่ยนตามขั้น ให้การ์ดเนื้อหาที่กรองด้วยอาชีพยังเจอคนในสายนี้
 function enterLadder(st, id) {
   st.ladder = { id, rank: 0, since: st.age, prog: 0, from: st.age };
+  markService(st, id);   // B5
   syncOcc(st);
 }
 function syncOcc(st) {
@@ -2676,9 +2688,10 @@ const CADET = (() => {
     const rv = atBoard ? ((firstOk(st, D(st).board) ?? {}).rivalLines ?? []).filter((r) => !r.general).find((r) => condOk(st, r.when)) : null;
     const rl = [];
     if (rv) rl.push(rv.line);
-    else if (rand(st) < (n.rare_line_p ?? 0.25)) rl.push(home ? (camp ? a.homeCamp : null) : camp ? a.rivalCamp?.[ek] : a.rivalAll?.[ek]);   // อยู่บ้าน ไม่เห็นป้าย ได้ยินจากที่ติวเท่านั้น
+    else if (rand(st) < (n.rare_line_p ?? 0.25)) rl.push(home ? (camp ? a.homeCamp : null) : camp && how !== 'paper' ? a.rivalCamp?.[ek] : a.rivalAll?.[ek]);   // อยู่บ้าน ไม่เห็นป้าย ได้ยินจากที่ติวเท่านั้น · S3-a: อ่านหนังสือพิมพ์ไม่เห็นครูถ่ายรูปป้าย → สายทั่วไป
     if (!home && rand(st) < (n.rare_line_p ?? 0.25)) rl.push(a.rare);   // V7 บรรทัดหายากคนนามสกุลซ้ำ (ไม่ใช่คู่แข่ง)
-    const text = `${open}\n\n${block.join('\n')}\n\n${summary}\n${react}\n${rl.filter(Boolean).slice(0, 2).join(' ')}`.replaceAll('{คน}', kw);
+    // S3-b (g-b7 2026-11-10): บรรทัดที่ว่าง (react/คู่แข่ง) ไม่ทิ้งบรรทัดเปล่าไว้ก่อนบล็อกคะแนน
+    const text = `${open}\n\n${block.join('\n')}\n\n${[summary, react, rl.filter(Boolean).slice(0, 2).join(' ')].filter(Boolean).join('\n')}`.replaceAll('{คน}', kw);
     const last = st.age >= (N(st).last_age ?? 18);
     // ตัวเลือก (Demo x3Card): ตก = แยกตามวิธีที่ดู (อยู่บ้าน/ให้คนดู/ดูเอง) · B3 ที่เลื่อนมา B4 · ผ่าน = ตามยุค
     const opts = none ? [
@@ -3534,6 +3547,16 @@ function monthlyIncome(st, year = st.birthYear + st.age) {
 
 // heir = รุ่นถัดไปจากระหว่างชาติ (afterlife.mjs): จุดเกิด/ฐานะ/ค่าเริ่ม/บัญชีที่ส่งต่อ ทับค่าที่สุ่ม
 // ยังดึงเลขสุ่มของโลกครบชุดเดิมก่อนทับ — ตำแหน่ง stream ของรุ่นถัดไปเหมือนชีวิตแรกทุกประการ
+// B5 ทายาทจากการเกิด (เจ้าของเคาะ 2026-11-10 · 5.00% · from_age 0): ครอบครัวใหม่ (ชีวิตแรก / ไปเกิดบ้านอื่น) สุ่มว่าพ่อหรือแม่เคยรับราชการ
+// ทางเป็นลูก/สายเลือด (heir.tier) = บ้านเดิม ไม่สุ่ม — ได้ธงก็ต่อเมื่อรุ่นก่อนถือธงจริง (afterlife heirFlags)
+// stream แยกจาก seed เหมือนจังหวัด/พ่อแม่ — ไม่กินเลขสุ่มของโลก ลำดับชีวิตเดิมไม่เลื่อน · ค่าเป็นชั้น 1 (ลูก) แบบที่ heirFlags ส่ง
+function birthHeirFlags(seed, content, heir) {
+  if (heir?.tier) return {};
+  const n = content.cadet?.numbers ?? {}, r = makeRng((seed ^ 0x7a3c11e5) >>> 0);   // salt ของ B5 เอง (ไม่ใช้ร่วมกับ stream อื่น)
+  if (r.next() >= (n.heir_birth_p ?? 0)) return {};
+  return { [r.next() < (n.heir_police_share ?? 0.5) ? 'police_family' : 'army_family']: 1 };
+}
+
 function newLife(seed, content, heir = null) {
   const era = content.era;
   const rng = makeRng(seed);
@@ -3631,7 +3654,8 @@ function newLife(seed, content, heir = null) {
     omenAge: null,
     flags: {},
     // ธงของรุ่นก่อนที่ทายาทได้รู้ {ธง: ชั้น} — แยกจาก flags เพราะ flags คือสิ่งที่ตัวเองเคยทำ (ฉายา/ความเสี่ยงตายอ่านอยู่)
-    parentFlags: heir?.parentFlags ?? {},
+    // B5: ทางเป็นลูก/สายเลือด = ธงจากรุ่นก่อนเท่านั้น · ครอบครัวใหม่ (afterlife ส่ง {} มา) = สุ่มทายาทจากการเกิด
+    parentFlags: heir?.tier ? heir.parentFlags ?? {} : { ...(heir?.parentFlags ?? {}), ...birthHeirFlags(seed, content, heir) },
     // สกิลที่พกมาจากคลัง [{ id, lv }] (06s) ใช้ทั้งชีวิตนี้และชาติต่างโลกที่ตามมา · ไม่พก = ไม่มีช่อง (state เท่าก่อนมีสกิลข้ามชาติ)
     ...(heir?.skills?.length && { skills: heir.skills }),
     // ค่าที่ได้จากช่องพกที่ไม่ใช้ (ใบ 201) — การ์ดเกิดบอกเป็นคำ · เซฟเก่าไม่มี = ไม่มีบรรทัด

@@ -667,9 +667,10 @@ const CADET = (() => {
     const rv = atBoard ? ((firstOk(st, D(st).board) ?? {}).rivalLines ?? []).filter((r) => !r.general).find((r) => condOk(st, r.when)) : null;
     const rl = [];
     if (rv) rl.push(rv.line);
-    else if (rand(st) < (n.rare_line_p ?? 0.25)) rl.push(home ? (camp ? a.homeCamp : null) : camp ? a.rivalCamp?.[ek] : a.rivalAll?.[ek]);   // อยู่บ้าน ไม่เห็นป้าย ได้ยินจากที่ติวเท่านั้น
+    else if (rand(st) < (n.rare_line_p ?? 0.25)) rl.push(home ? (camp ? a.homeCamp : null) : camp && how !== 'paper' ? a.rivalCamp?.[ek] : a.rivalAll?.[ek]);   // อยู่บ้าน ไม่เห็นป้าย ได้ยินจากที่ติวเท่านั้น · S3-a: อ่านหนังสือพิมพ์ไม่เห็นครูถ่ายรูปป้าย → สายทั่วไป
     if (!home && rand(st) < (n.rare_line_p ?? 0.25)) rl.push(a.rare);   // V7 บรรทัดหายากคนนามสกุลซ้ำ (ไม่ใช่คู่แข่ง)
-    const text = `${open}\n\n${block.join('\n')}\n\n${summary}\n${react}\n${rl.filter(Boolean).slice(0, 2).join(' ')}`.replaceAll('{คน}', kw);
+    // S3-b (g-b7 2026-11-10): บรรทัดที่ว่าง (react/คู่แข่ง) ไม่ทิ้งบรรทัดเปล่าไว้ก่อนบล็อกคะแนน
+    const text = `${open}\n\n${block.join('\n')}\n\n${[summary, react, rl.filter(Boolean).slice(0, 2).join(' ')].filter(Boolean).join('\n')}`.replaceAll('{คน}', kw);
     const last = st.age >= (N(st).last_age ?? 18);
     // ตัวเลือก (Demo x3Card): ตก = แยกตามวิธีที่ดู (อยู่บ้าน/ให้คนดู/ดูเอง) · B3 ที่เลื่อนมา B4 · ผ่าน = ตามยุค
     const opts = none ? [

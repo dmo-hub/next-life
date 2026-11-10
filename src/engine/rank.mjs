@@ -89,16 +89,28 @@ export function rankName(st) {
   return officeFull(st) ? officeStep(st).name : `${job} · ${officeStep(st).name}`;
 }
 
+// B5 (เจ้าของเคาะ Q3 2026-11-10): เข้าสายยศทหาร/ตำรวจ = ตั้งธงทายาทให้ลูก (army_family / police_family · flags.yaml heir: tier 1)
+// afterlife heirFlags อ่านธงตอนตาย → ลูกทุกคนได้ รวมลูกที่เกิดก่อนพ่อแม่เข้ารับราชการ
+const SERVICE_FLAG = { army: 'army_family', police: 'police_family' };
+function markService(st, id) {
+  const f = SERVICE_FLAG[id];
+  if (!f) return;
+  st.flags[f] = true;
+  (st.flagAge ??= {})[f] ??= st.age;   // เซฟเก่าอาจไม่มี flagAge
+}
+
 // เข้าสายตามงานที่ได้ (effects.job): อาชีพที่มีสายเอกชน/สายอาชีพสั้นเริ่มขั้นของอาชีพนั้น · งานอื่นออกจากสายเดิม
 export function enterByJob(st, occ) {
   const L = st.content.era.careers.ladders;
   const id = Object.keys(L).find((k) => L[k].occs?.includes(occ));
   st.ladder = id ? { id, rank: L[id].start?.[occ] ?? 0, since: st.age, prog: 0 } : null;
+  markService(st, id);   // B5
 }
 
 // เข้าสายราชการ/ทหาร/ตำรวจ (effects.ladder): อาชีพเปลี่ยนตามขั้น ให้การ์ดเนื้อหาที่กรองด้วยอาชีพยังเจอคนในสายนี้
 export function enterLadder(st, id) {
   st.ladder = { id, rank: 0, since: st.age, prog: 0, from: st.age };
+  markService(st, id);   // B5
   syncOcc(st);
 }
 function syncOcc(st) {
