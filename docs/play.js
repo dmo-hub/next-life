@@ -928,7 +928,8 @@ function pickOccupation(era, seed, cls) {
     r -= w[i];
     if (r < 0) return f.occupations[i];
   }
-  return f.occupations.at(-1);
+  // ปัดเศษทศนิยมเหลือ r ≥ 0 — ตกที่อาชีพเกิดได้ตัวท้าย ไม่ใช่อาชีพตามขั้นยศ
+  return f.occupations.findLast((o) => o.birth);
 }
 
 // พอร์ตปรับสัดส่วนคืนทุกต้นปี · สินทรัพย์ที่ปีนี้ซื้อไม่ได้ย้ายไปเงินฝาก
@@ -1304,11 +1305,12 @@ const JOB_EXTRA_AT = 70;
 const JOB_OPEN_MIN = 2;
 function jobCard(st) {
   const f = st.content.era.finance;
-  const occs = f.occupations;
+  // อาชีพตามขั้นยศไม่ใช่งานที่สมัครได้ และต้องไม่ขยับอันดับค่าจ้าง/top ของอาชีพอื่น
+  const occs = f.occupations.filter((o) => o.birth);
   const top = occs.length - 1;
   const rank = new Map([...occs].sort((a, b) => a.wage - b.wage).map((o, r) => [o.id, r]));
   const tilt = (st.network - 50) / 50;
-  const w = f.occByClass[st.cls].map((x, i) => x * Math.exp(tilt * (rank.get(occs[i].id) / top)));
+  const w = occs.map((o, i) => f.occByClass[st.cls][i] * Math.exp(tilt * (rank.get(o.id) / top)));
   const rng = makeRng((st.seed ^ 0x1f83d9ab ^ Math.imul(st.age + 1, 0x9e3779b1)) >>> 0);
   const tooLow = (o) => eduRank(o.edu) > eduRank(st.edu);
   const pool = occs.map((o, i) => ({ o, w: w[i] })).filter((x) => x.o.id !== 'labor' && x.o.id !== st.familyOcc);
@@ -1335,8 +1337,11 @@ function jobCard(st) {
     { weight: 1, text: `ไม่ได้งาน${o.name} ต้องรับจ้างทั่วไปไปก่อน`, effects: { job: 'labor', happiness: -1 } },
   ];
   const choices = picked.map((o) => ({ text: `สมัครงาน${o.name}`, requires: lock(o), outcomes: apply(o, okWeight(o), { stats: { network: 1.6, knowledge: 1.4 } }) }));
-  const fam = occs.find((o) => o.id === st.familyOcc);
-  if (fam.id !== 'labor') choices.push({ text: `สืบต่องานบ้าน ${fam.name}`, effects: { job: fam.id, relations: 1 } });
+  const fam = f.occupations.find((o) => o.id === st.familyOcc);
+  // บ้านสายยศสืบต่อด้วยการเข้าสายของพ่อแม่ที่ขั้นแรก — ไม่รับยศเดิมของพ่อแม่ไปทั้งตัว
+  const famLadder = st.familyLadder && st.content.era.careers.ladders[st.familyLadder];
+  if (famLadder) choices.push({ text: `สืบต่องานบ้าน เข้าสาย${famLadder.name}`, effects: { ladder: st.familyLadder, relations: 1 } });
+  else if (fam.id !== 'labor') choices.push({ text: `สืบต่องานบ้าน ${fam.name}`, effects: { job: fam.id, relations: 1 } });
   choices.push({ text: 'รับจ้างทั่วไปไปก่อน', effects: { job: 'labor' } });
   if (eduRank(st.edu) >= eduRank('อุดมศึกษา')) {
     choices.push({
@@ -1501,7 +1506,7 @@ function enterByJob(st, occ) {
   markService(st, id);   // B5
 }
 
-// เข้าสายราชการ/ทหาร/ตำรวจ (effects.ladder): อาชีพเปลี่ยนตามขั้น ให้การ์ดเนื้อหาที่กรองด้วยอาชีพยังเจอคนในสายนี้
+// เข้าสายราชการ/ทหาร/ตำรวจ (effects.ladder): อาชีพเปลี่ยนตามขั้น (officer · senior_officer) ให้การ์ดที่กรองด้วยอาชีพแยกคนในสายนี้จากภาคเอกชนได้
 function enterLadder(st, id) {
   st.ladder = { id, rank: 0, since: st.age, prog: 0, from: st.age };
   markService(st, id);   // B5
@@ -3607,6 +3612,8 @@ function newLife(seed, content, heir = null) {
     occupation: occupation.id,
     occupationName: occupation.name,
     familyOcc: occupation.id,
+    // บ้านสายยศ (afterlife ส่งมาเมื่ออาชีพสุดท้ายของพ่อแม่เป็นขั้นยศ) · ไม่มีคีย์ = สืบต่อด้วยอาชีพบ้านตามปกติ
+    ...(heir?.familyLadder && { familyLadder: heir.familyLadder }),
     workFrom: null,
     // สายยศ/ตำแหน่ง (B40 · rank.mjs): ขั้นในสายอาชีพ · ตำแหน่งการเมือง · บำนาญต่อปีเป็นบาทค่าเงินปีเกิด
     ladder: null,
@@ -9162,7 +9169,7 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
-  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, province = null, parentFlags = {}, letter = null;
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, parentFlags = {}, letter = null;
   const death = deathStanding(st);
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
@@ -9172,6 +9179,8 @@ function makeHeir(af, r) {
   if (af.path === 'child' || blood) {
     // บ้านของรุ่นถัดไปคือบ้านของคนในชาติก่อน — อาชีพของครอบครัวจึงเป็นงานสุดท้ายของเขา ไม่สุ่มใหม่
     occupation = st.occupation;
+    // อาชีพตามขั้นยศมีความหมายแค่ในสาย — บ้านส่งต่อสายของพ่อแม่ให้การ์ดหางานพากลับเข้าสาย
+    if (st.content.era.finance.occupations.find((o) => o.id === occupation)?.birth === false) familyLadder = st.ladder?.id ?? null;
     tier = blood ? KIN_TIERS[blood.role === 'child' ? 0 : 1] : weighted(rng, KIN_TIERS, KIN_TIERS.map((t) => t.w));
     // ลูก/หลานที่ยังอยู่จริง (B36a): เกิดเป็นคนหนึ่งในนั้น · ไม่มีลูกเหลือแต่มีหลาน = ชั้นลูกเลื่อนเป็นหลาน · สุ่มเลือกคนจาก kinRng ของชีวิตก่อน
     const kids = livingKin(st, 'child'), grand = livingKin(st, 'grandchild');
@@ -9265,6 +9274,7 @@ function makeHeir(af, r) {
     parents,
     legacy,
     occupation,
+    ...(familyLadder && { familyLadder }),
     bonus,
     ledger,
     carried,
