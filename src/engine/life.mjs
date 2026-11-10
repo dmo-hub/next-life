@@ -617,7 +617,8 @@ export const causeWords = (cause, age) => (cause === 'other' ? (age >= STAGES.at
 export const FILL_COND = {
   // ทายาท 3 ทาง: พ่อรับราชการยังอยู่ | แม่รับราชการเอง | พ่อที่เสียแล้ว (เจ้าของเคาะ 2026-11-09)
   // ไม่ใช่ทายาท = ไม่มีทางไหนตรง → ว่าง (กันชั้นที่สอง)
-  ทายาท: (st) => (heirOfLine(st) ? ({ father: 0, mother: 1, lateFather: 2 })[heirCase(st)] : -1),
+  // lateMother (ancestor หญิงที่เสียแล้ว) ยังไม่มีบท → ไม่มีทาง = ว่าง (เจ้าของเคาะ 2026-11-10 · รอ S1)
+  ทายาท: (st) => (heirOfLine(st) ? ({ father: 0, mother: 1, lateFather: 2 })[heirCase(st)] ?? -1 : -1),
   // มือถือ: ตั้งแต่ปี numbers.mobile_year | ก่อนหน้า
   มือถือ: (st) => (st.birthYear + st.age >= (cadetNum(st).mobile_year ?? 2542) ? 0 : 1),
   // ลับ: แอบสอบ (cadet_family_secret) | ที่บ้านรู้
@@ -643,7 +644,12 @@ export const heirOfLine = (st) => (st.parentFlags?.army_family ? 'army' : st.par
 // คนที่เคยรับราชการ (เจ้าของเคาะ 2026-11-09): พ่อยังอยู่ = father · มีแต่แม่ = mother (แม่รับราชการทางอื่น)
 // ยกเว้นทายาทตำรวจที่เกิดก่อน numbers.police_woman_year (ยังไม่รับผู้หญิงเป็นพนักงานสอบสวน) = lateFather · ไม่มีพ่อแม่ = lateFather (พ่อที่เสียแล้ว ป้าเล่า)
 // ตัดสินจากปีเกิด (คงที่ทั้งชีวิต) ไม่ต้องเก็บใน state
+// เจ้าของเคาะ 2026-11-10 (ยกเว้น R2 เฉพาะกรณีนี้): ทายาทที่สืบจากผู้เล่นชาติก่อน = parents[].ancestor คือคนที่เคยรับราชการ (เกมรู้เพศจริง)
+// ancestor ยังอยู่ = father/mother ตามเพศ · ancestor ชายที่เสียแล้ว = lateFather · ancestor หญิงที่เสียแล้ว = lateMother (ยังไม่มีบท → ไม่ขึ้นบทฝั่งทายาท · {ทายาท:} ว่าง)
+// ทายาทจากการเกิด 5.00% (ไม่มี ancestor) ใช้กติกาเดิมด้านล่าง
 export function heirCase(st) {
+  const anc = heirOfLine(st) && st.parents?.find((p) => p.ancestor);
+  if (anc) return anc.alive ? (anc.sex === 'หญิง' ? 'mother' : 'father') : anc.sex === 'หญิง' ? 'lateMother' : 'lateFather';
   if (parentAlive(st, 'ชาย')) return 'father';
   if (parentAlive(st, 'หญิง') && !(heirOfLine(st) === 'police' && st.birthYear < (cadetNum(st).police_woman_year ?? 2538))) return 'mother';
   return 'lateFather';

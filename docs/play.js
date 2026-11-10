@@ -2118,14 +2118,18 @@ const CADET = (() => {
     return A(st).paper?.cheer ?? '';
   }
   // หมวกใบเก่าของพ่อ/แม่ที่เป็นทหาร/ตำรวจ (D3 บท S1 รอบ 2 · เจ้าของรับ 2026-11-06)
-  // B5 (เจ้าของเคาะ 2026-11-09 · R2): คนที่เคยรับราชการมาจาก heirCase (ครอบครัวชาตินี้) ไม่ใช้ parents[].ancestor
+  // B5 (เจ้าของเคาะ 2026-11-09 · R2): คนที่เคยรับราชการมาจาก heirCase (ครอบครัวชาตินี้) · ทายาทจากผู้เล่นชาติก่อน = ancestor (เคาะ 2026-11-10)
   // father = พ่อยังอยู่ · mother = มีแต่แม่ (แม่รับราชการเอง) · lateFather = พ่อที่เสียแล้ว → แม่ที่ยังอยู่หรือป้าเป็นคนหยิบหมวกของพ่อ
+  // เจ้าของเคาะ 2026-11-10: ทายาทจากผู้เล่นชาติก่อนใช้ ancestor (heirCase ใน life.mjs) · lateMother ยังไม่มีบท → null = ไม่ขึ้นบรรทัดหมวก
   const heirHatOwner = (st) => {
     const hc = heirCase(st), dad = hc !== 'mother';
+    if (hc === 'lateMother') return null;
     return { hc, who: dad ? 'พ่อ' : 'แม่', young: dad ? 'ตอนหนุ่ม ๆ' : 'ตอนสาว ๆ', keeper: hc === 'lateFather' ? (parentAlive(st, 'หญิง') ? 'แม่' : 'ป้า') : null };
   };
   function heirHat(st, heir) {
-    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', { who, young, keeper } = heirHatOwner(st);
+    const o = heirHatOwner(st);
+    if (!o) return '';
+    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', { who, young, keeper } = o;
     if (!keeper) return `${who}หยิบหมวก${hat}ใบเก่าออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}${young}"`;
     if (keeper === 'แม่') return `แม่หยิบหมวก${hat}ใบเก่าของพ่อออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือนพ่อ${young}"`;
     return `ป้าหยิบหมวก${hat}ใบเก่าของพ่อออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือนพ่อเอ็ง${young}"`;
@@ -2135,7 +2139,9 @@ const CADET = (() => {
   // การ์ดผิดหวัง (G4 · เจ้าของสั่ง 2026-11-06): คนเก็บหมวกกลับเข้าตู้ใช้หลักเดียวกับ heirHat — พ่อ/แม่ที่รับราชการถ้ายังอยู่ · ไม่งั้นอีกคน · ไม่มีพ่อแม่ = ป้า
   // B5: ใช้ heirHatOwner เดียวกับ heirHat (heirCase · ไม่ใช้ ancestor)
   function heirHatBack(st, heir) {
-    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', { who, keeper } = heirHatOwner(st);
+    const o = heirHatOwner(st);
+    if (!o) return '';
+    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', { who, keeper } = o;
     if (!keeper) return `${who}เก็บหมวก${hat}ใบเก่ากลับเข้าตู้ ไม่ได้พูดถึงอีก`;
     return `${keeper}เก็บหมวก${hat}ใบเก่าของพ่อกลับเข้าตู้ ไม่ได้พูดถึงอีก`;
   }
@@ -2152,6 +2158,7 @@ const CADET = (() => {
     if (c.notRegions?.includes(st.region)) return false;
     // B5: heir รับค่าเดียวหรือรายการ (X9-ค = [army, police] ทายาทสายไหนก็ได้)
     if (c.heir && ![].concat(c.heir).includes(heir)) return false;
+    if (c.heir && heirCase(st) === 'lateMother') return false;   // เจ้าของเคาะ 2026-11-10: ancestor หญิงที่เสียแล้วยังไม่มีบท → บรรทัด/ใบฝั่งทายาทไม่ขึ้น
     if (c.notHeir && [].concat(c.notHeir).includes(heir)) return false;
     if (c.classes?.length && !c.classes.includes(clsGroup(st)) && !c.classes.includes(st.cls)) return false;
     if (c.anyFlags && !c.anyFlags.some((f) => has(st, f))) return false;
@@ -2166,7 +2173,7 @@ const CADET = (() => {
     if (c.family === 'mother' && !(fam === 'both' || fam === 'mother')) return false;
     // B1 (ยกจาก Demo condOk): family 'father' = พ่อยังอยู่ · heirAlive = คนที่เคยรับราชการยังอยู่ในบ้าน (ไม่ใช่พ่อที่เสียแล้ว)
     if (c.family === 'father' && !(fam === 'both' || fam === 'fatherOnly')) return false;
-    if (c.heirAlive && heirCase(st) === 'lateFather') return false;
+    if (c.heirAlive && ['lateFather', 'lateMother'].includes(heirCase(st))) return false;
     if (c.family === 'fatherOnly' && fam !== 'fatherOnly') return false;
     if (c.noParents && fam !== 'none') return false;
     if (c.poor === true && clsGroup(st) !== 'poor') return false;
@@ -2210,7 +2217,9 @@ const CADET = (() => {
   const C = (id, title, text, options, extra = {}) => ({ id, title, text, options, ...extra });
   const status = (title, text) => C('cadet_status', title, text, [{ label: 'ต่อ' }]);
   // B4: {คน} (Demo kinWord) ไม่มีใน FILL ของ life.mjs — แทนในเส้นนี้ก่อนส่งเข้า fill ทุกครั้ง (ข้อความ · ปุ่ม · คำใบ้ · การ์ดผล)
-  const fillK = (s, st) => fill(String(s ?? '').replaceAll('{คน}', kinWord(st)), st);
+  // {ปีติดยศ} (เจ้าของเคาะ 2026-11-10 · X9 "อีกเจ็ดปี"): ปีจากรายงานตัวถึงติดยศของเหล่าที่เลือก เป็นคำไทย (ทหาร เจ็ด · ตำรวจ หก) — ไม่ฝังเลข
+  const rankYearsWord = (st) => { const P = st.cadet?.p2; return numTh(commissionYears(st, P?.chosen ?? P?.final?.[0] ?? 'army')); };
+  const fillK = (s, st) => fill(String(s ?? '').replaceAll('{คน}', kinWord(st)).replaceAll('{ปีติดยศ}', rankYearsWord(st)), st);
   function render(st, c) {
     let text = fillK(c.text ?? '', st);
     const hit = (c.contextLines ?? []).find((x) => condOk(st, x.when));
@@ -2285,7 +2294,7 @@ const CADET = (() => {
     const I = info(st), P = K.p2;
     applyFx(st, o.fx);
     setFlags(st, o);
-    let result = o.result;
+    let result = o.result, pick = null;
     // ป้ายหมวดการ์ดผล (ui-redo 60): ทิศจากผลค่ารวมของตัวเลือก + ผลสุ่ม · ต้นทาง = การ์ดเส้นเตรียมทหารที่เพิ่งเลือก
     const fxSum = { ...o.fx };
     const evId = `cadet:${K.curId}`;
@@ -2293,7 +2302,8 @@ const CADET = (() => {
     const outs = (o.outcomes ?? []).filter((x) => !x.whenFlag || has(st, x.whenFlag));
     if (outs.length) {
       const tot = outs.reduce((s, x) => s + (x.p ?? 1), 0);
-      let r = rand(st) * tot, pick = outs.at(-1);
+      let r = rand(st) * tot;
+      pick = outs.at(-1);
       for (const x of outs) if ((r -= x.p ?? 1) <= 0) { pick = x; break; }
       result = pick.result ?? result;
       applyFx(st, pick.fx);
@@ -2302,6 +2312,8 @@ const CADET = (() => {
       if (pick._injure && P) P.steps = [['injury'], ['failed']];
     }
     // ----- actions -----
+    // บั๊ก S3 (2026-11-10): ใบเชิญหลังสละที่นั่งนัดคืนก่อนสอบปีนี้เอง — การ์ด far/near กรองตามภาคเอง (เหมือน schedules ของ cadet_notice_*)
+    if (o._examNight || pick?._examNight) for (const e of ['cadet_exam_night_far', 'cadet_exam_night_near']) st.scheduled.push({ event: e, age: st.age, from: st.age });
     if (o._toggle) { I.order.push(o._toggle); K.steps.unshift(['apply']); }
     if (o._submit) st.log?.push({ id: 'cadet_apply', age: st.age, text: I.order.map((b) => BT(st, b)).join(' · ') });
     if (o._score != null) { P.scores[o._branch] = (P.scores[o._branch] ?? 0) + o._score; return; }
@@ -2600,7 +2612,6 @@ const CADET = (() => {
       { label: 'ไล่ดูอีกรอบให้แน่ใจ', result: 'อ่านเลขทีละตัว ตรงทุกตัว' },
       last ? { label: 'ยิ้มกว้างจนแก้มตึง', fx: { happiness: 1 }, result: 'เหลืออีกรอบเดียว ยิ้มได้ก่อนก็ไม่เสียหาย' } : { label: 'ยิ้มอยู่คนเดียว ยังไม่บอกใคร', fx: { happiness: 1 }, result: 'เก็บไว้ในใจก่อน รอบหน้ายังมีอีกหลายด่าน' }];
   }
-  const BOARD_SWIM = ['ซ้อมว่ายน้ำทุกเย็นจนวันสอบ', 'ซ้อมกับเพื่อนติวทุกเย็น'];
   S.board = (st) => {
     const P = st.cadet.p2, n = N(st), c = firstOk(st, D(st).board) ?? {};
     const pass = P.branches.filter((b) => P.written[b]), fail = P.branches.filter((b) => !P.written[b]), none = !pass.length;
@@ -2614,10 +2625,8 @@ const CADET = (() => {
     if (rl) text += '\n' + rl.line;
     text += `\n\n${!fail.length ? 'ผ่านครบทุกเหล่าที่สมัคร' : none ? 'ไม่ผ่านเลยสักเหล่า' : `ผ่าน ${pass.length} จาก ${P.branches.length} เหล่า`}\n\n${P.branches.map((b) => writtenScoreLine(st, b)).join('\n')}`;   // บล็อกคะแนน (เจ้าของเคาะ B) แทนบรรทัดเกณฑ์เดิม
     P.steps = none ? [['failed']] : [['cheer', 'phys'], ['physAsk', 'phys'], ['nearExam'], ['bodyDay'], ['judgeBody'], ['bodyWait'], ['announce', 'body'], ['bodyBoard']];
-    // ข้อ 436: สอบผ่านแล้วต่อท้ายเฉพาะตัวเลือกสระจาก yaml — ธง cadet_drill_swim / cadet_a_swims ตั้งได้ทางนี้ทางเดียว
-    // rivalPass ใน requires ยังไม่มีแกนรองรับ (เหมือน rivalLines) จึงเช็กเฉพาะเงื่อนไขที่ condOk อ่านได้
-    const swim = none ? [] : (c.options ?? []).filter((o) => BOARD_SWIM.includes(o.label)).map((o) => ({ ...o, lock: o.requires && !condOk(st, o.requires) ? (o.lockReason ?? 'ยังทำไม่ได้') : null }));
-    return C('board', 'ประกาศผลรอบแรก', text, [...reactOpts(st, none, false), ...swim]);
+    // ล้างโค้ดตาย (g-b7 2026-11-10): ตัวเลือกซ้อมว่ายน้ำ (BOARD_SWIM ข้อ 436) ย้ายไป S.x3b แล้ว (ตัวเลือก + ล็อกครบ) · ใบนี้ไม่มีขั้นไหนเรียกแล้ว
+    return C('board', 'ประกาศผลรอบแรก', text, reactOpts(st, none, false));
   };
 
   // ---------- B4 · X2w วันว่างก่อนประกาศ (Demo x2wCard 12271 · §7.1) ----------
@@ -2812,7 +2821,7 @@ const CADET = (() => {
       L.push(J[fam] ?? J.none ?? '');
     }
     const heir = heirOf(st);
-    if (heir && fin) L.push(heirHat(st, heir));   // หมวกทายาท · B5: คนสวมหมวกให้ตาม heirCase
+    if (heir && fin && heirHat(st, heir)) L.push(heirHat(st, heir));   // หมวกทายาท · B5: คนสวมหมวกให้ตาม heirCase · lateMother = ไม่มีบรรทัด
     if (!iv && !fin && (has(st, 'cadet_prep_group') || has(st, 'cadet_bond_a'))) L.push(friendWrittenLine(st));   // B4 เพื่อนติวตามยุค (ใช้กับเซฟเก่าที่ค้าง cheer phys)
     const sn = A(st).joy?.senior ?? {};
     if (has(st, 'cadet_senior_tutor') || has(st, 'knows_senior')) L.push(fin ? sn.final : iv ? sn.iv : sn.written);
@@ -2873,7 +2882,7 @@ const CADET = (() => {
       : ({ both: `พ่อวางช้อนลงกลางมื้อเย็น แม่ถามซ้ำว่าทำไมไม่ไป ทั้งที่${why}`, mother: `แม่ถามซ้ำว่าทำไมไม่ไป ทั้งที่${why} แล้วก็เงียบไปทั้งคืน`, fatherOnly: 'พ่อไม่ได้ดุสักคำ แค่ลุกไปนั่งสูบบุหรี่หน้าบ้านจนดึก' })[family(st)]
         ?? 'ป้าไม่ถามอะไร แต่เก็บรูปป้ายประกาศที่ติดตู้เย็นลงไปไว้ในลิ้นชัก';
     // B3: บรรทัดทายาท (เก็บหมวกเข้าตู้) ไม่ขึ้นตอนแอบสอบ — ที่บ้านเพิ่งรู้เรื่อง ไม่เคยหยิบหมวกออกมา (Demo d6efcd16 · เจ้าของรับ 2026-11-09)
-    return C('letdown', 'ความเงียบที่บ้าน', head + (heirOf(st) && !secretNow(st) ? `\n${heirHatBack(st, heirOf(st))}` : ''), [
+    return C('letdown', 'ความเงียบที่บ้าน', head + (heirOf(st) && !secretNow(st) && heirHatBack(st, heirOf(st)) ? `\n${heirHatBack(st, heirOf(st))}` : ''), [
       { label: 'ขอโทษ', fx, result: `${who}พยักหน้า แต่ไม่ได้มองหน้า` }, { label: 'อธิบายว่ายังไม่พร้อม', fx, result: 'พูดจบแล้วห้องก็เงียบเหมือนเดิม' },
       { label: 'ไม่พูดอะไร เข้าห้องไป', fx, result: 'ได้ยินเสียงล้างจานนานกว่าทุกวัน' }, { label: 'ออกไปนั่งข้างนอกคนเดียว', fx, result: 'กลับเข้าบ้านตอนไฟดับหมดแล้ว' }]);
   };
@@ -3012,18 +3021,18 @@ const CADET = (() => {
     st.cadet.waitAge = st.age + 1;
     return 'HOLD';
   };
-  // การ์ดเชิญรอบใหม่หลังสละสิทธิ์ (บท S1 · cadet_invite_return_01 / เดโม INV-R) · ทุกทางล้าง cadet_declined_seat
-  // สมัคร = ตั้งธงฝัน กลับเข้าเส้นปกติ (การ์ดสิทธิสอบ/ใบสมัครตามอายุ) · ไม่สอบ = cadet_let_go
+  // การ์ดเชิญรอบใหม่หลังสละสิทธิ์ (บท S1 · cadet_invite_return_01 / เดโม INV-R) · ไม่สอบ = cadet_let_go
+  // บั๊ก S3 (เจ้าของเคาะ 2026-11-10 "คนสละที่นั่งสอบใหม่ได้"): ใบนี้เป็นใบเชิญใบเดียวของปี — cadet_notice_17_retry / cadet_notice_18 ไม่ขึ้นกับคนถือ cadet_declined_seat
+  // สมัคร = ตั้งธงฝัน + นัดคืนก่อนสอบปีนี้เอง (_examNight แบบ schedules ของใบแจ้งสิทธิ) · ธง declined_seat คงไว้จนจบปี (endYear/arrive ล้าง) ใบแจ้งสิทธิจึงไม่ซ้ำปีเดียวกัน
   S.returnInvite = (st) => {
     const last = st.age >= (N(st).last_age ?? 18);
     const lines = [secretNow(st) ? 'ปีก่อนที่บ้านไม่รู้ ปีนี้ก็ยังไม่มีใครรู้' : `${elder(st)}เห็นแล้วไม่พูดอะไร แค่วางใบประกาศไว้บนโต๊ะกินข้าว`, last ? 'ปีนี้คือปีสุดท้ายที่อายุยังสมัครได้' : ''].filter(Boolean);
-    const clear = ['cadet_declined_seat'];
     return C('return_invite', 'ใบประกาศปีที่สอง', `ปีก่อนติดแล้วไม่ไป ปีนี้ใบประกาศกลับมาติดบอร์ดอีก หัวกระดาษเหมือนเดิมทุกตัว ใบแจ้งผลปีก่อนยังพับอยู่ในลิ้นชัก {ชื่อ} ยืนอ่านอยู่นานกว่าใคร\n${lines.join('\n')}`, [
-      { label: 'สมัครอีกรอบ คราวนี้ไปให้ถึง', fx: { happiness: 1 }, setFlags: ['cadet_dream'], clearFlags: clear, result: 'หยิบใบแจ้งปีก่อนออกมาวางข้างใบสมัครใหม่' },
-      { label: 'สมัคร คราวนี้เลือกเหล่าให้ตรงใจ', fx: { knowledge: 1 }, setFlags: ['cadet_dream'], clearFlags: clear, result: 'กางรายชื่อสี่เหล่าบนโต๊ะ ปีนี้รู้แล้วว่าใจอยู่ตรงไหน' },
-      { label: 'ไม่สอบ ทางที่เลือกไว้ดีแล้ว', fx: { happiness: 1 }, setFlags: ['cadet_let_go'], clearFlags: clear, result: 'ฉีกใบประกาศเป็นสองท่อน แล้วก็ไม่ได้คิดถึงมันอีก' },
-      { label: 'ไปถามครูแนะแนวก่อนตัดสินใจ', fx: { network: 1 }, clearFlags: clear,
-        outcomes: [{ p: 2, setFlags: ['cadet_dream'], result: 'ครูบอกว่า "ติดมาแล้วครั้งหนึ่ง ปีนี้ก็ติดได้ ลองอีกทีเถอะ"' },
+      { label: 'สมัครอีกรอบ คราวนี้ไปให้ถึง', fx: { happiness: 1 }, setFlags: ['cadet_dream'], _examNight: true, result: 'หยิบใบแจ้งปีก่อนออกมาวางข้างใบสมัครใหม่' },
+      { label: 'สมัคร คราวนี้เลือกเหล่าให้ตรงใจ', fx: { knowledge: 1 }, setFlags: ['cadet_dream'], _examNight: true, result: 'กางรายชื่อสี่เหล่าบนโต๊ะ ปีนี้รู้แล้วว่าใจอยู่ตรงไหน' },
+      { label: 'ไม่สอบ ทางที่เลือกไว้ดีแล้ว', fx: { happiness: 1 }, setFlags: ['cadet_let_go'], result: 'ฉีกใบประกาศเป็นสองท่อน แล้วก็ไม่ได้คิดถึงมันอีก' },
+      { label: 'ไปถามครูแนะแนวก่อนตัดสินใจ', fx: { network: 1 },
+        outcomes: [{ p: 2, setFlags: ['cadet_dream'], _examNight: true, result: 'ครูบอกว่า "ติดมาแล้วครั้งหนึ่ง ปีนี้ก็ติดได้ ลองอีกทีเถอะ"' },
           { p: 1, setFlags: ['cadet_let_go'], result: 'ครูถามกลับว่าปีก่อนทำไมไม่ไป ตอบไม่ได้ เลยตัดสินใจไม่สมัคร' }] }]);
   };
   S.pack = (st, b) => {
@@ -3059,6 +3068,7 @@ const CADET = (() => {
   S.arrive = (st, b) => {
     st.title = 'นตท.';   // คำนำหน้าเริ่มวันรายงานตัวตามของจริง (เจ้าของเคาะ A 2026-11-06) · โชว์ที่หัวจอ/สายตระกูล ไม่ใส่ใน {ชื่อ} · เฟส 3 เปลี่ยนเป็น นนร./นนอ./นรต.
     st.flags.cadet_passed = true;
+    delete st.flags.cadet_declined_seat;   // บั๊ก S3: กลับมาสอบติดและรายงานตัวแล้ว
     st.flags[`cadet_branch:${b}`] = true;
     info(st).passAge = st.age;
     info(st).commissionAge = st.age + commissionYears(st, b);   // บันไดยศเริ่มที่อายุนี้ (ตร. 6 ปี · เหล่าอื่น 7 ปี)
@@ -3112,6 +3122,7 @@ const CADET = (() => {
   S.endYear = (st) => {
     const last = st.age >= (N(st).last_age ?? 18);
     delete st.flags.cadet_exam_door;
+    delete st.flags.cadet_declined_seat;   // บั๊ก S3: ปีที่กลับมาสอบจบแล้ว — ปีหน้าเป็นคนสอบซ้ำปกติ ใบแจ้งสิทธิขึ้นได้
     if (!last && !has(st, 'cadet_let_go')) {
       st.flags.cadet_dream = true;
       st.flags.cadet_retry = true;
@@ -3999,7 +4010,8 @@ const causeWords = (cause, age) => (cause === 'other' ? (age >= STAGES.at(-1).fr
 const FILL_COND = {
   // ทายาท 3 ทาง: พ่อรับราชการยังอยู่ | แม่รับราชการเอง | พ่อที่เสียแล้ว (เจ้าของเคาะ 2026-11-09)
   // ไม่ใช่ทายาท = ไม่มีทางไหนตรง → ว่าง (กันชั้นที่สอง)
-  ทายาท: (st) => (heirOfLine(st) ? ({ father: 0, mother: 1, lateFather: 2 })[heirCase(st)] : -1),
+  // lateMother (ancestor หญิงที่เสียแล้ว) ยังไม่มีบท → ไม่มีทาง = ว่าง (เจ้าของเคาะ 2026-11-10 · รอ S1)
+  ทายาท: (st) => (heirOfLine(st) ? ({ father: 0, mother: 1, lateFather: 2 })[heirCase(st)] ?? -1 : -1),
   // มือถือ: ตั้งแต่ปี numbers.mobile_year | ก่อนหน้า
   มือถือ: (st) => (st.birthYear + st.age >= (cadetNum(st).mobile_year ?? 2542) ? 0 : 1),
   // ลับ: แอบสอบ (cadet_family_secret) | ที่บ้านรู้
@@ -4025,7 +4037,12 @@ const heirOfLine = (st) => (st.parentFlags?.army_family ? 'army' : st.parentFlag
 // คนที่เคยรับราชการ (เจ้าของเคาะ 2026-11-09): พ่อยังอยู่ = father · มีแต่แม่ = mother (แม่รับราชการทางอื่น)
 // ยกเว้นทายาทตำรวจที่เกิดก่อน numbers.police_woman_year (ยังไม่รับผู้หญิงเป็นพนักงานสอบสวน) = lateFather · ไม่มีพ่อแม่ = lateFather (พ่อที่เสียแล้ว ป้าเล่า)
 // ตัดสินจากปีเกิด (คงที่ทั้งชีวิต) ไม่ต้องเก็บใน state
+// เจ้าของเคาะ 2026-11-10 (ยกเว้น R2 เฉพาะกรณีนี้): ทายาทที่สืบจากผู้เล่นชาติก่อน = parents[].ancestor คือคนที่เคยรับราชการ (เกมรู้เพศจริง)
+// ancestor ยังอยู่ = father/mother ตามเพศ · ancestor ชายที่เสียแล้ว = lateFather · ancestor หญิงที่เสียแล้ว = lateMother (ยังไม่มีบท → ไม่ขึ้นบทฝั่งทายาท · {ทายาท:} ว่าง)
+// ทายาทจากการเกิด 5.00% (ไม่มี ancestor) ใช้กติกาเดิมด้านล่าง
 function heirCase(st) {
+  const anc = heirOfLine(st) && st.parents?.find((p) => p.ancestor);
+  if (anc) return anc.alive ? (anc.sex === 'หญิง' ? 'mother' : 'father') : anc.sex === 'หญิง' ? 'lateMother' : 'lateFather';
   if (parentAlive(st, 'ชาย')) return 'father';
   if (parentAlive(st, 'หญิง') && !(heirOfLine(st) === 'police' && st.birthYear < (cadetNum(st).police_woman_year ?? 2538))) return 'mother';
   return 'lateFather';
