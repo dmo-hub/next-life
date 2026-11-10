@@ -2,7 +2,7 @@
 // st.cadet = ลำดับขั้นที่กำลังเล่น (null = ไม่มี) · st.cadetInfo = ความจำข้ามปี (สอบกี่ครั้ง · ตกเพราะอะไร · ใบสมัคร)
 // ทุกค่าใน state เป็นข้อมูลล้วน (เซฟได้) · สุ่มจาก stream ของตัวเอง (seed ^ SALT + ตัวนับ) ไม่แตะ rng ของโลก
 // เนื้อหา/ตัวเลข: content/rules/cadet.yaml (ที่มา: demo ที่เจ้าของเคาะ 2026-11-05) · fx ในไฟล์นั้นเป็นหน่วย demo (×numbers.fx_unit แต้ม)
-import { STAT_KEYS, fill, stageOf, fxTag, TAG_MID, whenOk, heirCase, campusName } from './life.mjs';
+import { STAT_KEYS, fill, stageOf, fxTag, TAG_MID, whenOk, heirCase, campusName, parentAlive } from './life.mjs';
 
 // ทั้งไฟล์อยู่ใน scope เดียว — build ต่อทุกไฟล์เป็นสคริปต์เดียว ชื่อภายในจึงต้องไม่หลุดไปชนไฟล์อื่น
 const CADET = (() => {
@@ -96,25 +96,27 @@ const CADET = (() => {
     P.paperCheered = true;
     return A(st).paper?.cheer ?? '';
   }
-  // หมวกใบเก่าของพ่อ/แม่ที่เป็นทหาร/ตำรวจ (D3 บท S1 รอบ 2 · เจ้าของรับ 2026-11-06): ทายาทมาจากพ่อหรือแม่ (parents[].ancestor) ไม่ใช่ตา
-  // ไม่รู้ว่าใคร (ทายาทจากสุ่มตอนเกิด) = ถือว่าพ่อ
+  // หมวกใบเก่าของพ่อ/แม่ที่เป็นทหาร/ตำรวจ (D3 บท S1 รอบ 2 · เจ้าของรับ 2026-11-06)
+  // B5 (เจ้าของเคาะ 2026-11-09 · R2): คนที่เคยรับราชการมาจาก heirCase (ครอบครัวชาตินี้) ไม่ใช้ parents[].ancestor
+  // father = พ่อยังอยู่ · mother = มีแต่แม่ (แม่รับราชการเอง) · lateFather = พ่อที่เสียแล้ว → แม่ที่ยังอยู่หรือป้าเป็นคนหยิบหมวกของพ่อ
+  const heirHatOwner = (st) => {
+    const hc = heirCase(st), dad = hc !== 'mother';
+    return { hc, who: dad ? 'พ่อ' : 'แม่', young: dad ? 'ตอนหนุ่ม ๆ' : 'ตอนสาว ๆ', keeper: hc === 'lateFather' ? (parentAlive(st, 'หญิง') ? 'แม่' : 'ป้า') : null };
+  };
   function heirHat(st, heir) {
-    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', ps = st.parents ?? [];
-    const hp = ps.find((p) => p.ancestor) ?? ps.find((p) => p.sex === 'ชาย') ?? { sex: 'ชาย' }, dad = hp.sex === 'ชาย';
-    const who = dad ? 'พ่อ' : 'แม่', young = dad ? 'ตอนหนุ่ม ๆ' : 'ตอนสาว ๆ', other = ps.find((p) => p !== hp && p.alive);
-    if (hp.alive) return `${who}หยิบหมวก${hat}ใบเก่าออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}${young}"`;
-    if (other) return `${other.sex === 'ชาย' ? 'พ่อ' : 'แม่'}หยิบหมวกใบเก่าของ${who}ออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}${young}"`;
-    return `ป้าหยิบหมวก${hat}ใบเก่าของ${who}ออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}เอ็ง${young}"`;
+    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', { who, young, keeper } = heirHatOwner(st);
+    if (!keeper) return `${who}หยิบหมวก${hat}ใบเก่าออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}${young}"`;
+    if (keeper === 'แม่') return `แม่หยิบหมวก${hat}ใบเก่าของพ่อออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือนพ่อ${young}"`;
+    return `ป้าหยิบหมวก${hat}ใบเก่าของพ่อออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือนพ่อเอ็ง${young}"`;
   }
   // ที่ตั้งโรงเรียนตามปี (numbers.campus_*) — แทน "นครนายก" ที่เคยเขียนตายทุกยุค
   const campus = (st) => campusName(st);   // ตัวเดียวกับ {ที่ตั้ง} ใน fill (life.mjs) · B1
   // การ์ดผิดหวัง (G4 · เจ้าของสั่ง 2026-11-06): คนเก็บหมวกกลับเข้าตู้ใช้หลักเดียวกับ heirHat — พ่อ/แม่ที่รับราชการถ้ายังอยู่ · ไม่งั้นอีกคน · ไม่มีพ่อแม่ = ป้า
+  // B5: ใช้ heirHatOwner เดียวกับ heirHat (heirCase · ไม่ใช้ ancestor)
   function heirHatBack(st, heir) {
-    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', ps = st.parents ?? [];
-    const hp = ps.find((p) => p.ancestor) ?? ps.find((p) => p.sex === 'ชาย') ?? { sex: 'ชาย' }, who = hp.sex === 'ชาย' ? 'พ่อ' : 'แม่';
-    const other = ps.find((p) => p !== hp && p.alive);
-    if (hp.alive) return `${who}เก็บหมวก${hat}ใบเก่ากลับเข้าตู้ ไม่ได้พูดถึงอีก`;
-    return `${other ? (other.sex === 'ชาย' ? 'พ่อ' : 'แม่') : 'ป้า'}เก็บหมวก${hat}ใบเก่าของ${who}กลับเข้าตู้ ไม่ได้พูดถึงอีก`;
+    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', { who, keeper } = heirHatOwner(st);
+    if (!keeper) return `${who}เก็บหมวก${hat}ใบเก่ากลับเข้าตู้ ไม่ได้พูดถึงอีก`;
+    return `${keeper}เก็บหมวก${hat}ใบเก่าของพ่อกลับเข้าตู้ ไม่ได้พูดถึงอีก`;
   }
   const txt = (v) => (typeof v === 'string' ? v : v?.text ?? '');
 
@@ -127,7 +129,8 @@ const CADET = (() => {
     if (c.sex && c.sex !== st.sex) return false;
     if (c.regions?.length && !c.regions.includes(st.region)) return false;
     if (c.notRegions?.includes(st.region)) return false;
-    if (c.heir && heir !== c.heir) return false;
+    // B5: heir รับค่าเดียวหรือรายการ (X9-ค = [army, police] ทายาทสายไหนก็ได้)
+    if (c.heir && ![].concat(c.heir).includes(heir)) return false;
     if (c.notHeir && [].concat(c.notHeir).includes(heir)) return false;
     if (c.classes?.length && !c.classes.includes(clsGroup(st)) && !c.classes.includes(st.cls)) return false;
     if (c.anyFlags && !c.anyFlags.some((f) => has(st, f))) return false;
@@ -608,7 +611,8 @@ const CADET = (() => {
     const key = secret ? 'secret' : clsGroup(st) === 'poor' && !has(st, 'cadet_family_support') ? 'poor' : waitMood(st);
     const c = a.cards?.[key] ?? { text: '', options: [] };
     const text = (c.text ?? '') + (key === 'mid' && web ? c.textWeb ?? '' : '');
-    return C(`x2w_${key}`, a.title ?? 'วันว่างก่อนประกาศผล', `${a.open ?? ''}\n${text}\n${ctx.filter(Boolean).slice(0, 2).join(' ')}`, (c.options ?? []).map((o) => rndOpt(st, o)));
+    // S3 (g-b7 2026-11-10): resultWeb = ผลของตัวเลือกในยุคเว็บ (ไม่ต้องนั่งรถไปดูป้าย)
+    return C(`x2w_${key}`, a.title ?? 'วันว่างก่อนประกาศผล', `${a.open ?? ''}\n${text}\n${ctx.filter(Boolean).slice(0, 2).join(' ')}`, (c.options ?? []).map((o) => rndOpt(st, web && o.resultWeb ? { ...o, result: o.resultWeb } : o)));
   };
 
   // ---------- B4 · X3a เช้าวันประกาศ · วิธีดูผล (Demo x3aCard 12330 · §7.2) ----------
@@ -655,11 +659,16 @@ const CADET = (() => {
     if (e === 'ข' && how === 'wait') react = R.waitข?.[sum] ?? react;
     if (e === 'ค' && how === 'elder') react = R.elderค?.[sum] ?? react;
     if (home) react = sub(R.home?.[sum], { เสียง: ring });
-    // คู่แข่ง A/C รอระบบคู่แข่ง (เจ้าของ 2026-11-06) · เหลือบรรทัด B + บรรทัดหายาก (V7 = numbers.rare_line_p)
-    const camp = has(st, 'cadet_prep_camp'), ek = e === 'ค' ? 'ค' : 'else';
-    const rl = [camp ? a.rivalCamp?.[ek] : a.rivalAll?.[ek]];
-    if (rand(st) < (N(st).rare_line_p ?? 0.25)) rl.push(a.rare);
-    if (home) { rl.length = 0; if (camp) rl.push(a.homeCamp); }   // อยู่บ้าน ไม่เห็นป้าย ไม่มีคนข้าง ๆ
+    // Q3 เจ้าของไม่รับ (g-b7 2026-11-10): คืนบรรทัดคู่แข่งเดิม board.rivalLines (เพื่อนห้องสาม · เด็กผิวคล้ำแดด) ให้ขึ้นได้ตามเงื่อนไขเดิม
+    // บรรทัดลูกนายพล (rivalCamp/rivalAll · ข้อ general ใน rivalLines) = บรรทัดนาน ๆ ขึ้น ใช้ rare_line_p · คู่แข่งกับลูกนายพลไม่ซ้อนในใบเดียว
+    // เห็นคู่แข่งได้ต้องยืนอยู่หน้าป้าย: ปีแรก · ไม่ใช่ดูเว็บเอง (เงื่อนไขเดิม) · ไม่ใช่อยู่บ้านรอโทรศัพท์ · ไม่ใช่อ่านหนังสือพิมพ์
+    const camp = has(st, 'cadet_prep_camp'), ek = e === 'ค' ? 'ค' : 'else', n = N(st);
+    const atBoard = info(st).tries <= 1 && (year(st) < n.web_year || how !== 'self') && !home && how !== 'paper';
+    const rv = atBoard ? ((firstOk(st, D(st).board) ?? {}).rivalLines ?? []).filter((r) => !r.general).find((r) => condOk(st, r.when)) : null;
+    const rl = [];
+    if (rv) rl.push(rv.line);
+    else if (rand(st) < (n.rare_line_p ?? 0.25)) rl.push(home ? (camp ? a.homeCamp : null) : camp ? a.rivalCamp?.[ek] : a.rivalAll?.[ek]);   // อยู่บ้าน ไม่เห็นป้าย ได้ยินจากที่ติวเท่านั้น
+    if (!home && rand(st) < (n.rare_line_p ?? 0.25)) rl.push(a.rare);   // V7 บรรทัดหายากคนนามสกุลซ้ำ (ไม่ใช่คู่แข่ง)
     const text = `${open}\n\n${block.join('\n')}\n\n${summary}\n${react}\n${rl.filter(Boolean).slice(0, 2).join(' ')}`.replaceAll('{คน}', kw);
     const last = st.age >= (N(st).last_age ?? 18);
     // ตัวเลือก (Demo x3Card): ตก = แยกตามวิธีที่ดู (อยู่บ้าน/ให้คนดู/ดูเอง) · B3 ที่เลื่อนมา B4 · ผ่าน = ตามยุค
@@ -715,7 +724,9 @@ const CADET = (() => {
       st.flags.cadet_family_told = true;
     }
     const secret = secretNow(st), e = eraR(st), g = clsGroup(st), poorFar = g === 'poor' && examFar(st), J = A(st).joy?.written ?? {};
-    const main = secret ? a.secretMain : J[fam] ?? J.none;
+    // S3 (g-b7 2026-11-10): พ่อแม่ครบ ก่อนยุคมือถือหรือบ้านลำบาก = ปั่นจักรยานไปบอกเพื่อนบ้าน แทนโทรหาเพื่อนที่ทำงาน
+    const noPhone = fam === 'both' && (year(st) < (N(st).mobile_year ?? 2542) || g === 'poor');
+    const main = secret ? a.secretMain : (noPhone ? J.bothNoPhone : null) ?? J[fam] ?? J.none;
     // ข้อ 4 ปากคน: บ้านรู้ = คนในบ้านพูดคะแนน · แอบสอบ + เพื่อนติว = เพื่อนพูดคะแนน
     const friend = has(st, 'cadet_prep_group') || has(st, 'cadet_bond_a');
     const mouth = !secret && !reveal ? writtenMouth(st, pass) : secret && friend ? friendScoreLine(st, pass) : '';
@@ -773,7 +784,7 @@ const CADET = (() => {
       L.push(J[fam] ?? J.none ?? '');
     }
     const heir = heirOf(st);
-    if (heir && fin) L.push(heirHat(st, heir));   // หมวกทายาท = ของเกมเดิม (ปรับเป็น heirCase ใน B5 · นอกใบนี้)
+    if (heir && fin) L.push(heirHat(st, heir));   // หมวกทายาท · B5: คนสวมหมวกให้ตาม heirCase
     if (!iv && !fin && (has(st, 'cadet_prep_group') || has(st, 'cadet_bond_a'))) L.push(friendWrittenLine(st));   // B4 เพื่อนติวตามยุค (ใช้กับเซฟเก่าที่ค้าง cheer phys)
     const sn = A(st).joy?.senior ?? {};
     if (has(st, 'cadet_senior_tutor') || has(st, 'knows_senior')) L.push(fin ? sn.final : iv ? sn.iv : sn.written);
@@ -1055,6 +1066,8 @@ const CADET = (() => {
     // B4 (Demo failedCard 12978–12990): ซ้อมคำพูดไว้ตอนแอบสอบ (X2w-W5) แต่ไม่ได้ใช้
     const M = A(st).mouth ?? {}, n = N(st);
     if (P.rehearsed && secretNow(st)) c.text += `\n${M.unsaid}`;
+    // g-b7 2026-11-10 (Demo failedCard stayedHome): ตกเพราะไม่ไปสอบพละ/สัมภาษณ์/รายงานตัว = วันนั้นไม่ได้ออกไปไหน ไม่มีทางกลับบ้าน
+    if (['noreport', 'noshow', 'noshow_iv'].includes(P.failStage) && !writtenNone) c.text = c.text.replace('ทางกลับบ้านวันนั้นยาวกว่าขามา', 'วันนั้นทั้งวันไม่ได้ออกจากบ้าน');
     // ข้อ 4 ปากคน (บ้านรู้ · ยังมีปีหน้า): ตัวสำรอง = {ผู้ใหญ่} พูดว่าขาดไปกี่ที่ · ตกข้อเขียนทุกเหล่าเพราะความรู้ = พ่อ (ไม่มีพ่อ = {ผู้ใหญ่}) พูดว่าขาดกี่คะแนน
     if (!secretNow(st) && st.age < (n.last_age ?? 18)) {
       const res = Object.values(P.ranks ?? {}).filter((x) => x.kind === 'reserve').sort((p, q) => p.reserveNo - q.reserveNo)[0];

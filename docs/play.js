@@ -2617,7 +2617,8 @@ const CADET = (() => {
     const key = secret ? 'secret' : clsGroup(st) === 'poor' && !has(st, 'cadet_family_support') ? 'poor' : waitMood(st);
     const c = a.cards?.[key] ?? { text: '', options: [] };
     const text = (c.text ?? '') + (key === 'mid' && web ? c.textWeb ?? '' : '');
-    return C(`x2w_${key}`, a.title ?? 'วันว่างก่อนประกาศผล', `${a.open ?? ''}\n${text}\n${ctx.filter(Boolean).slice(0, 2).join(' ')}`, (c.options ?? []).map((o) => rndOpt(st, o)));
+    // S3 (g-b7 2026-11-10): resultWeb = ผลของตัวเลือกในยุคเว็บ (ไม่ต้องนั่งรถไปดูป้าย)
+    return C(`x2w_${key}`, a.title ?? 'วันว่างก่อนประกาศผล', `${a.open ?? ''}\n${text}\n${ctx.filter(Boolean).slice(0, 2).join(' ')}`, (c.options ?? []).map((o) => rndOpt(st, web && o.resultWeb ? { ...o, result: o.resultWeb } : o)));
   };
 
   // ---------- B4 · X3a เช้าวันประกาศ · วิธีดูผล (Demo x3aCard 12330 · §7.2) ----------
@@ -2664,11 +2665,16 @@ const CADET = (() => {
     if (e === 'ข' && how === 'wait') react = R.waitข?.[sum] ?? react;
     if (e === 'ค' && how === 'elder') react = R.elderค?.[sum] ?? react;
     if (home) react = sub(R.home?.[sum], { เสียง: ring });
-    // คู่แข่ง A/C รอระบบคู่แข่ง (เจ้าของ 2026-11-06) · เหลือบรรทัด B + บรรทัดหายาก (V7 = numbers.rare_line_p)
-    const camp = has(st, 'cadet_prep_camp'), ek = e === 'ค' ? 'ค' : 'else';
-    const rl = [camp ? a.rivalCamp?.[ek] : a.rivalAll?.[ek]];
-    if (rand(st) < (N(st).rare_line_p ?? 0.25)) rl.push(a.rare);
-    if (home) { rl.length = 0; if (camp) rl.push(a.homeCamp); }   // อยู่บ้าน ไม่เห็นป้าย ไม่มีคนข้าง ๆ
+    // Q3 เจ้าของไม่รับ (g-b7 2026-11-10): คืนบรรทัดคู่แข่งเดิม board.rivalLines (เพื่อนห้องสาม · เด็กผิวคล้ำแดด) ให้ขึ้นได้ตามเงื่อนไขเดิม
+    // บรรทัดลูกนายพล (rivalCamp/rivalAll · ข้อ general ใน rivalLines) = บรรทัดนาน ๆ ขึ้น ใช้ rare_line_p · คู่แข่งกับลูกนายพลไม่ซ้อนในใบเดียว
+    // เห็นคู่แข่งได้ต้องยืนอยู่หน้าป้าย: ปีแรก · ไม่ใช่ดูเว็บเอง (เงื่อนไขเดิม) · ไม่ใช่อยู่บ้านรอโทรศัพท์ · ไม่ใช่อ่านหนังสือพิมพ์
+    const camp = has(st, 'cadet_prep_camp'), ek = e === 'ค' ? 'ค' : 'else', n = N(st);
+    const atBoard = info(st).tries <= 1 && (year(st) < n.web_year || how !== 'self') && !home && how !== 'paper';
+    const rv = atBoard ? ((firstOk(st, D(st).board) ?? {}).rivalLines ?? []).filter((r) => !r.general).find((r) => condOk(st, r.when)) : null;
+    const rl = [];
+    if (rv) rl.push(rv.line);
+    else if (rand(st) < (n.rare_line_p ?? 0.25)) rl.push(home ? (camp ? a.homeCamp : null) : camp ? a.rivalCamp?.[ek] : a.rivalAll?.[ek]);   // อยู่บ้าน ไม่เห็นป้าย ได้ยินจากที่ติวเท่านั้น
+    if (!home && rand(st) < (n.rare_line_p ?? 0.25)) rl.push(a.rare);   // V7 บรรทัดหายากคนนามสกุลซ้ำ (ไม่ใช่คู่แข่ง)
     const text = `${open}\n\n${block.join('\n')}\n\n${summary}\n${react}\n${rl.filter(Boolean).slice(0, 2).join(' ')}`.replaceAll('{คน}', kw);
     const last = st.age >= (N(st).last_age ?? 18);
     // ตัวเลือก (Demo x3Card): ตก = แยกตามวิธีที่ดู (อยู่บ้าน/ให้คนดู/ดูเอง) · B3 ที่เลื่อนมา B4 · ผ่าน = ตามยุค
@@ -2724,7 +2730,9 @@ const CADET = (() => {
       st.flags.cadet_family_told = true;
     }
     const secret = secretNow(st), e = eraR(st), g = clsGroup(st), poorFar = g === 'poor' && examFar(st), J = A(st).joy?.written ?? {};
-    const main = secret ? a.secretMain : J[fam] ?? J.none;
+    // S3 (g-b7 2026-11-10): พ่อแม่ครบ ก่อนยุคมือถือหรือบ้านลำบาก = ปั่นจักรยานไปบอกเพื่อนบ้าน แทนโทรหาเพื่อนที่ทำงาน
+    const noPhone = fam === 'both' && (year(st) < (N(st).mobile_year ?? 2542) || g === 'poor');
+    const main = secret ? a.secretMain : (noPhone ? J.bothNoPhone : null) ?? J[fam] ?? J.none;
     // ข้อ 4 ปากคน: บ้านรู้ = คนในบ้านพูดคะแนน · แอบสอบ + เพื่อนติว = เพื่อนพูดคะแนน
     const friend = has(st, 'cadet_prep_group') || has(st, 'cadet_bond_a');
     const mouth = !secret && !reveal ? writtenMouth(st, pass) : secret && friend ? friendScoreLine(st, pass) : '';
@@ -3064,6 +3072,8 @@ const CADET = (() => {
     // B4 (Demo failedCard 12978–12990): ซ้อมคำพูดไว้ตอนแอบสอบ (X2w-W5) แต่ไม่ได้ใช้
     const M = A(st).mouth ?? {}, n = N(st);
     if (P.rehearsed && secretNow(st)) c.text += `\n${M.unsaid}`;
+    // g-b7 2026-11-10 (Demo failedCard stayedHome): ตกเพราะไม่ไปสอบพละ/สัมภาษณ์/รายงานตัว = วันนั้นไม่ได้ออกไปไหน ไม่มีทางกลับบ้าน
+    if (['noreport', 'noshow', 'noshow_iv'].includes(P.failStage) && !writtenNone) c.text = c.text.replace('ทางกลับบ้านวันนั้นยาวกว่าขามา', 'วันนั้นทั้งวันไม่ได้ออกจากบ้าน');
     // ข้อ 4 ปากคน (บ้านรู้ · ยังมีปีหน้า): ตัวสำรอง = {ผู้ใหญ่} พูดว่าขาดไปกี่ที่ · ตกข้อเขียนทุกเหล่าเพราะความรู้ = พ่อ (ไม่มีพ่อ = {ผู้ใหญ่}) พูดว่าขาดกี่คะแนน
     if (!secretNow(st) && st.age < (n.last_age ?? 18)) {
       const res = Object.values(P.ranks ?? {}).filter((x) => x.kind === 'reserve').sort((p, q) => p.reserveNo - q.reserveNo)[0];

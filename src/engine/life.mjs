@@ -626,7 +626,7 @@ export function fill(text, st) {
 // ---- ตัวช่วยของเส้นเตรียมทหาร (B1) · cadet.mjs ใช้ชุดเดียวกัน ----
 const DIALECT = { ตะวันออกเฉียงเหนือ: 'เด้อ', เหนือ: 'เน้อ', ใต้: 'หนิ' };
 const cadetNum = (st) => st.content?.cadet?.numbers ?? {};
-const parentAlive = (st, sex) => !!st.parents?.find((p) => p.sex === sex)?.alive;
+export const parentAlive = (st, sex) => !!st.parents?.find((p) => p.sex === sex)?.alive;
 export const homeElder = (st) => (parentAlive(st, 'หญิง') ? 'แม่' : parentAlive(st, 'ชาย') ? 'พ่อ' : 'ป้า');
 export const heirOfLine = (st) => (st.parentFlags?.army_family ? 'army' : st.parentFlags?.police_family ? 'police' : null);
 // คนที่เคยรับราชการ (เจ้าของเคาะ 2026-11-09): พ่อยังอยู่ = father · มีแต่แม่ = mother (แม่รับราชการทางอื่น)
