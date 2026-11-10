@@ -2120,16 +2120,21 @@ const CADET = (() => {
   // หมวกใบเก่าของพ่อ/แม่ที่เป็นทหาร/ตำรวจ (D3 บท S1 รอบ 2 · เจ้าของรับ 2026-11-06)
   // B5 (เจ้าของเคาะ 2026-11-09 · R2): คนที่เคยรับราชการมาจาก heirCase (ครอบครัวชาตินี้) · ทายาทจากผู้เล่นชาติก่อน = ancestor (เคาะ 2026-11-10)
   // father = พ่อยังอยู่ · mother = มีแต่แม่ (แม่รับราชการเอง) · lateFather = พ่อที่เสียแล้ว → แม่ที่ยังอยู่หรือป้าเป็นคนหยิบหมวกของพ่อ
-  // เจ้าของเคาะ 2026-11-10: ทายาทจากผู้เล่นชาติก่อนใช้ ancestor (heirCase ใน life.mjs) · lateMother ยังไม่มีบท → null = ไม่ขึ้นบรรทัดหมวก
+  // เจ้าของเคาะ 2026-11-10: ทายาทจากผู้เล่นชาติก่อนใช้ ancestor (heirCase ใน life.mjs)
+  // lateMother (บท S1 cadet-b5-late-mother.md a1/a2/b · เจ้าของเคาะ 2026-11-10): หมวกของแม่ · คนหยิบ = พ่อถ้ายังอยู่ ไม่งั้นป้า
   const heirHatOwner = (st) => {
-    const hc = heirCase(st), dad = hc !== 'mother';
-    if (hc === 'lateMother') return null;
+    const hc = heirCase(st), dad = hc !== 'mother' && hc !== 'lateMother';
+    if (hc === 'lateMother') return { hc, who: 'แม่', keeper: parentAlive(st, 'ชาย') ? 'พ่อ' : 'ป้า' };
     return { hc, who: dad ? 'พ่อ' : 'แม่', young: dad ? 'ตอนหนุ่ม ๆ' : 'ตอนสาว ๆ', keeper: hc === 'lateFather' ? (parentAlive(st, 'หญิง') ? 'แม่' : 'ป้า') : null };
   };
   function heirHat(st, heir) {
     const o = heirHatOwner(st);
     if (!o) return '';
     const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', { who, young, keeper } = o;
+    // a1/a2: หมวกผู้หญิงเล็กกว่าหัวลูกชาย → "เล็กไปเบอร์หนึ่ง" · แม่ไม่มีบทพูด (คนตายไม่พูด)
+    if (o.hc === 'lateMother') return keeper === 'พ่อ'
+      ? `พ่อหยิบหมวก${hat}ใบเก่าของแม่ออกจากตู้ มาวางบนหัว {ชื่อ} หมวกเล็กไปเบอร์หนึ่ง พ่อหัวเราะทั้งที่ตาแดง "หัวโตเหมือนพ่อ แต่ใจเหมือนแม่"`
+      : `ป้าหยิบหมวก${hat}ใบเก่าของแม่ออกจากตู้ มาวางบนหัว {ชื่อ} หมวกเล็กไปเบอร์หนึ่ง ป้ายิ้มทั้งที่ตาแดง "แม่เอ็งคงอยากเห็นวันนี้"`;
     if (!keeper) return `${who}หยิบหมวก${hat}ใบเก่าออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}${young}"`;
     if (keeper === 'แม่') return `แม่หยิบหมวก${hat}ใบเก่าของพ่อออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือนพ่อ${young}"`;
     return `ป้าหยิบหมวก${hat}ใบเก่าของพ่อออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือนพ่อเอ็ง${young}"`;
@@ -2143,7 +2148,8 @@ const CADET = (() => {
     if (!o) return '';
     const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', { who, keeper } = o;
     if (!keeper) return `${who}เก็บหมวก${hat}ใบเก่ากลับเข้าตู้ ไม่ได้พูดถึงอีก`;
-    return `${keeper}เก็บหมวก${hat}ใบเก่าของพ่อกลับเข้าตู้ ไม่ได้พูดถึงอีก`;
+    // b (lateMother): หมวกของแม่ · ทางอื่นของพ่อ
+    return `${keeper}เก็บหมวก${hat}ใบเก่าของ${who === 'แม่' && o.hc === 'lateMother' ? 'แม่' : 'พ่อ'}กลับเข้าตู้ ไม่ได้พูดถึงอีก`;
   }
   const txt = (v) => (typeof v === 'string' ? v : v?.text ?? '');
 
@@ -2158,7 +2164,8 @@ const CADET = (() => {
     if (c.notRegions?.includes(st.region)) return false;
     // B5: heir รับค่าเดียวหรือรายการ (X9-ค = [army, police] ทายาทสายไหนก็ได้)
     if (c.heir && ![].concat(c.heir).includes(heir)) return false;
-    if (c.heir && heirCase(st) === 'lateMother') return false;   // เจ้าของเคาะ 2026-11-10: ancestor หญิงที่เสียแล้วยังไม่มีบท → บรรทัด/ใบฝั่งทายาทไม่ขึ้น
+    // lateMother มีบทแล้ว (เจ้าของเคาะ 2026-11-10) → ลบกั้นเดิม · heirCase = เลือกบรรทัด/ตัวเลือกตามกรณีทายาท (x3b heirLines e1/e2 · X7-ค ตัวเลือก 2)
+    if (c.heirCase && !(heir && [].concat(c.heirCase).includes(heirCase(st)))) return false;
     if (c.notHeir && [].concat(c.notHeir).includes(heir)) return false;
     if (c.classes?.length && !c.classes.includes(clsGroup(st)) && !c.classes.includes(st.cls)) return false;
     if (c.anyFlags && !c.anyFlags.some((f) => has(st, f))) return false;
@@ -2219,7 +2226,13 @@ const CADET = (() => {
   // B4: {คน} (Demo kinWord) ไม่มีใน FILL ของ life.mjs — แทนในเส้นนี้ก่อนส่งเข้า fill ทุกครั้ง (ข้อความ · ปุ่ม · คำใบ้ · การ์ดผล)
   // {ปีติดยศ} (เจ้าของเคาะ 2026-11-10 · X9 "อีกเจ็ดปี"): ปีจากรายงานตัวถึงติดยศของเหล่าที่เลือก เป็นคำไทย (ทหาร เจ็ด · ตำรวจ หก) — ไม่ฝังเลข
   const rankYearsWord = (st) => { const P = st.cadet?.p2; return numTh(commissionYears(st, P?.chosen ?? P?.final?.[0] ?? 'army')); };
-  const fillK = (s, st) => fill(String(s ?? '').replaceAll('{คน}', kinWord(st)).replaceAll('{ปีติดยศ}', rankYearsWord(st)), st);
+  // {ผู้สัมภาษณ์} (เจ้าของเคาะ 2026-11-10 · X7-ค ทุกทาง): ตามเหล่าที่สอบ ไม่ใช่สายแม่ — ตร. = นายตำรวจ · ทบ./ทร./ทอ. = นายทหาร
+  // เหล่าที่สอบ = เหล่าที่เลือกแล้ว → เหล่าแรกที่ผ่านพละ (เข้าห้องสัมภาษณ์) → เหล่าแรกที่สมัคร
+  const examBranch = (st) => { const P = st.cadet?.p2; return P?.chosen ?? P?.branches?.find((b) => P.body?.[b]) ?? P?.branches?.[0] ?? 'army'; };
+  // {หมวก} (บท S1 lateMother · X7-ค f2): ทหาร/ตำรวจ ตามสายทายาท (เหมือนหมวกใน heirHat)
+  const hatWord = (st) => (heirOf(st) === 'police' ? 'ตำรวจ' : 'ทหาร');
+  const fillK = (s, st) => fill(String(s ?? '').replaceAll('{คน}', kinWord(st)).replaceAll('{ปีติดยศ}', rankYearsWord(st))
+    .replaceAll('{ผู้สัมภาษณ์}', examBranch(st) === 'police' ? 'นายตำรวจ' : 'นายทหาร').replaceAll('{หมวก}', hatWord(st)), st);
   function render(st, c) {
     let text = fillK(c.text ?? '', st);
     const hit = (c.contextLines ?? []).find((x) => condOk(st, x.when));
@@ -3991,7 +4004,8 @@ const FILL = {
   // กันชั้นที่สอง (S3 · g-b7 2026-11-09): ไม่ใช่ทายาท = ว่าง แม้ด่าน heir-unguarded หลุด
   ผู้ใหญ่ทายาท: (st) => (heirOfLine(st) ? ({ father: 'พ่อ', mother: 'แม่' })[heirCase(st)] ?? homeElder(st) : ''),
   // ทางรับราชการของแม่ (เจ้าของเคาะ 2026-11-09): ทายาทตำรวจ = พนักงานสอบสวนหญิง · ทายาททหาร = พยาบาลทหาร
-  ทางแม่: (st) => ({ police: 'พนักงานสอบสวนหญิง', army: 'พยาบาลทหาร' })[heirOfLine(st)] ?? '',
+  // เจ้าของเคาะ 2026-11-10 ทาง ก (cadet-b5-late-mother.md ข้อ 4): แม่เป็นผู้เล่นชาติก่อน (ancestor) = "ทหาร"/"ตำรวจ" ไม่ระบุสาย (เกมไม่ได้เก็บสายจริง) · ทายาทจากการเกิดใช้ค่าเดิม
+  ทางแม่: (st) => (st.parents?.some((p) => p.ancestor && p.sex === 'หญิง') ? { police: 'ตำรวจ', army: 'ทหาร' } : { police: 'พนักงานสอบสวนหญิง', army: 'พยาบาลทหาร' })[heirOfLine(st)] ?? '',
   // ที่ตั้งโรงเรียนเตรียมทหารตามปี (numbers.campus_nayok_year)
   ที่ตั้ง: (st) => campusName(st),
   // ชื่อ + นามสกุล (บท S1 2026-11-06 ใช้กับ "นตท.{ชื่อเต็ม}") · เกมยังไม่มีนามสกุล = ชื่อเฉย ๆ · คำนำหน้าไม่ใส่ใน {ชื่อ}/{ชื่อเต็ม} (เจ้าของเคาะ A1)
@@ -4030,8 +4044,8 @@ const causeWords = (cause, age) => (cause === 'other' ? (age >= STAGES.at(-1).fr
 const FILL_COND = {
   // ทายาท 3 ทาง: พ่อรับราชการยังอยู่ | แม่รับราชการเอง | พ่อที่เสียแล้ว (เจ้าของเคาะ 2026-11-09)
   // ไม่ใช่ทายาท = ไม่มีทางไหนตรง → ว่าง (กันชั้นที่สอง)
-  // lateMother (ancestor หญิงที่เสียแล้ว) ยังไม่มีบท → ไม่มีทาง = ว่าง (เจ้าของเคาะ 2026-11-10 · รอ S1)
-  ทายาท: (st) => (heirOfLine(st) ? ({ father: 0, mother: 1, lateFather: 2 })[heirCase(st)] ?? -1 : -1),
+  // ทาง 4 = lateMother แม่ (ผู้เล่นชาติก่อน) ที่รับราชการแล้วเสียไปแล้ว (เจ้าของเคาะบท S1 2026-11-10 · cadet-b5-late-mother.md) · ข้อความที่มีแค่ 3 ทาง = ว่าง
+  ทายาท: (st) => (heirOfLine(st) ? ({ father: 0, mother: 1, lateFather: 2, lateMother: 3 })[heirCase(st)] ?? -1 : -1),
   // มือถือ: ตั้งแต่ปี numbers.mobile_year | ก่อนหน้า
   มือถือ: (st) => (st.birthYear + st.age >= (cadetNum(st).mobile_year ?? 2542) ? 0 : 1),
   // ลับ: แอบสอบ (cadet_family_secret) | ที่บ้านรู้
