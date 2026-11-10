@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter } from '../src/engine/index.mjs';
+import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
@@ -524,13 +524,19 @@ const f2 = (v) => v.toFixed(2);
 {
   const base = loadContent();
   const dark = loadEvents('content-fixtures/good/').filter((e) => e.when?.dark_gate);
+  // ไม่เปราะ (เจ้าของเคาะ 2026-11-06): เดิมสุ่มทุกชั้น ออกแค่ 0–3 ชีวิต เนื้อหาใหม่เลื่อนเลขสุ่มแล้วตกเป็น 0
+  // ⇒ ใช้ชีวิตที่เกิดมาจน (4 ชั้นล่าง · เงินตึงจริง) และหนุนน้ำหนักใบ fixture ×100 ให้จั่วถึงตอนประตูเปิด (วัดแล้ว 7–12/150 ทุก salt)
+  // ประตูยังเป็นตัวตัดสินเหมือนเดิม — ตัวควบคุมใช้น้ำหนักเดียวกัน
+  const POOR = CLASSES.slice(0, 4);
+  const seeds = [];
+  for (let i = 0; seeds.length < 150; i++) if (POOR.includes(newLife(mixSeed(0xb99a, i), base).cls)) seeds.push(mixSeed(0xb99a, i));
   const run = (events, botName, n) => {
-    const content = { ...base, events: [...base.events, ...events] };
+    const content = { ...base, events: [...base.events, ...events.map((e) => ({ ...e, weight: e.weight * 100 }))] };
     const ids = new Set(events.map((e) => e.id));
     let lives = 0, shown = 0, closed = 0;
     for (let i = 0; i < n; i++) {
       let hit = false;
-      playLife(mixSeed(0xb99a, i), content, BOTS[botName], (card, st) => {
+      playLife(seeds[i], content, BOTS[botName], (card, st) => {
         if (card.kind !== 'event' || !ids.has(card.id)) return;
         shown++;
         hit = true;
