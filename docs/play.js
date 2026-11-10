@@ -2171,6 +2171,8 @@ const CADET = (() => {
   // การ์ดใบถัดไปของลำดับ · null = จบลำดับ (life.mjs ปิดให้)
   function _cadetCard(st) {
     const K = st.cadet;
+    // เลิกสอบจากการ์ดเนื้อหา (เช่น cadet_notice_18) ระหว่างลำดับฤดูสอบค้างจากปีก่อน: ปิดลำดับ ไม่งั้นการ์ดติว/ใบสมัครออกต่อทั้งที่ไม่มีธงฝัน · อยู่ในสนามสอบแล้ว (p2) เดินต่อจนจบ
+    if (has(st, 'cadet_let_go') && !K.p2) K.steps = [];
     while (K.steps.length) {
       const [name, ...a] = K.steps.shift();
       const c = STEP[name]?.(st, ...a);
