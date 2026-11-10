@@ -3209,6 +3209,20 @@ function monthlyIncome(st, year = st.birthYear + st.age) {
 
 // heir = รุ่นถัดไปจากระหว่างชาติ (afterlife.mjs): จุดเกิด/ฐานะ/ค่าเริ่ม/บัญชีที่ส่งต่อ ทับค่าที่สุ่ม
 // ยังดึงเลขสุ่มของโลกครบชุดเดิมก่อนทับ — ตำแหน่ง stream ของรุ่นถัดไปเหมือนชีวิตแรกทุกประการ
+// ธงบ้านเกิด (ใบ 105): สุ่มเฉพาะเกิดใหม่ (ไม่มี heir) จาก stream แยก — ไม่กินเลขสุ่มของโลก · ทอยครบทุกธงเสมอ ลำดับเลขจึงไม่ขึ้นกับผลทอยก่อนหน้า
+// ธงที่มี class_max ไม่ทอย อ่านจากฐานะที่สุ่มไว้แล้ว · ทายาทได้ธงจากชีวิตรุ่นก่อนผ่าน heir.homeFlags (afterlife.mjs) ไม่สุ่มซ้ำ
+function rollHomeFlags(content, seed, clsIdx) {
+  const rng = makeRng(seed ^ 0xbb67ae85);
+  const out = {};
+  for (const [f, h] of Object.entries(content.home ?? {})) {
+    if (h.p === undefined) continue;
+    const hit = rng.next() < h.p;
+    if (hit && !(h.not_with ?? []).some((o) => out[o])) out[f] = 1;
+  }
+  for (const [f, h] of Object.entries(content.home ?? {})) if (h.class_max !== undefined && clsIdx <= h.class_max) out[f] = 1;
+  return out;
+}
+
 function newLife(seed, content, heir = null) {
   const era = content.era;
   const rng = makeRng(seed);
@@ -3307,6 +3321,8 @@ function newLife(seed, content, heir = null) {
     flags: {},
     // ธงของรุ่นก่อนที่ทายาทได้รู้ {ธง: ชั้น} — แยกจาก flags เพราะ flags คือสิ่งที่ตัวเองเคยทำ (ฉายา/ความเสี่ยงตายอ่านอยู่)
     parentFlags: heir?.parentFlags ?? {},
+    // ธงบ้านเกิด {ธง: 1} — เล่าที่การ์ดเกิด · การ์ดเด็กอ่านด้วย when.home_flags · เซฟเก่าไม่มีช่อง = ไม่มีธง (อ่านแบบ ?.)
+    homeFlags: heir ? (heir.homeFlags ?? {}) : rollHomeFlags(content, seed, CLASSES.indexOf(cls)),
     // สกิลที่พกมาจากคลัง [{ id, lv }] (06s) ใช้ทั้งชีวิตนี้และชาติต่างโลกที่ตามมา · ไม่พก = ไม่มีช่อง (state เท่าก่อนมีสกิลข้ามชาติ)
     ...(heir?.skills?.length && { skills: heir.skills }),
     // ค่าที่ได้จากช่องพกที่ไม่ใช้ (ใบ 201) — การ์ดเกิดบอกเป็นคำ · เซฟเก่าไม่มี = ไม่มีบรรทัด
@@ -4366,6 +4382,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     // สายเรื่องรายคน: ตอนที่เท่าไร ห่างตอนก่อนกี่ปี — ป้ายบนการ์ด · harness นับระยะจากช่องนี้
     ...(ev.arc && { arc: { key: ev.arc, n: st.arcs[ev.arc].n, ...(st.arcs[ev.arc].gap && { gap: st.arcs[ev.arc].gap }) } }),
     ...parentFrom(st, ev),
+    ...homeFrom(st, ev),
     funeral: ev.id === FUNERAL.wishes || ev.id === FUNERAL.rite,
     age: st.age,
     stage: stageOf(st.age),
@@ -4899,6 +4916,7 @@ function poolMultiplier(st, m) {
   if (m.overlap_stage !== undefined) x *= m.overlap_stage ** overlapStageOf(st);
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
   for (const [f, v] of Object.entries(m.parent_flags ?? {})) if (st.parentFlags?.[f]) x *= v;
+  for (const [f, v] of Object.entries(m.home_flags ?? {})) if (st.homeFlags?.[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
   if (m.rank) x *= m.rank ** rankLevel(st);
   // ตัวคูณเงิน {min, max, v}: อัตราส่วนอยู่ในช่วง = คูณ v · คำนวณเฉพาะการ์ดที่ใช้ เพราะกองสุ่มเรียกทุกใบทุกปี
@@ -4919,6 +4937,13 @@ const inBound = (v, b) => !b || ((b.min === undefined || v >= b.min) && (b.max =
 const flagsOk = (st, f) => (f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]);
 // เซฟก่อนมีช่องนี้ไม่มี parentFlags — อ่านแบบ ?. ให้เท่ากับไม่มีธงพ่อแม่
 const parentFlagsOk = (st, f) => (f.has ?? []).every((k) => st.parentFlags?.[k]) && !(f.not ?? []).some((k) => st.parentFlags?.[k]);
+// ธงบ้านเกิด (ใบ 105) — เซฟก่อนมีช่องนี้ไม่มี homeFlags อ่านแบบ ?. ให้เท่ากับไม่มีธง
+const homeFlagsOk = (st, f) => (f.has ?? []).every((k) => st.homeFlags?.[k]) && !(f.not ?? []).some((k) => st.homeFlags?.[k]);
+// ป้ายบนการ์ด: ธงบ้านเกิดที่ทำให้ใบนี้ออก (when.home_flags.has เท่านั้น เหมือนป้ายธงพ่อแม่)
+const homeFrom = (st, ev) => {
+  const x = (ev.when?.home_flags?.has ?? []).filter((f) => st.homeFlags?.[f]);
+  return x.length ? { homeFrom: x } : {};
+};
 // ป้ายบนการ์ด: ธงพ่อแม่ที่ทำให้ใบนี้ออก (when.parent_flags.has เท่านั้น — ตัวคูณแค่เอียงโอกาส ไม่ได้เล่า)
 const parentFrom = (st, ev) => {
   const x = (ev.when?.parent_flags?.has ?? []).filter((f) => st.parentFlags?.[f]).map((f) => ({ flag: f, tier: st.parentFlags[f] }));
@@ -4949,6 +4974,7 @@ function whenOk(st, when) {
     if (MONEY_KEYS.some((k) => when[k] && !inBound(r[k], when[k]))) return false;
   }
   if (when.parent_flags && !parentFlagsOk(st, when.parent_flags)) return false;
+  if (when.home_flags && !homeFlagsOk(st, when.home_flags)) return false;
   if (when.dark_gate && !darkGateOk(st)) return false;
   if (when.past_life && !pastLifeOk(st, when.past_life)) return false;
   return !when.flags || flagsOk(st, when.flags);
@@ -8739,6 +8765,10 @@ const kinDeathOf = (m) => (m.cause ? { cause: m.cause, ...illOf(m.cause, m.diedA
 // ไม่ดึงเลขสุ่ม: ไม่มีการ์ดอ่าน parent_flags = เล่นเท่าเดิมทุกไบต์ · เก็บแยกจาก st.flags ของทายาท (ธงตัวตนของเขาเอง)
 const heirFlags = (st, tier) => Object.fromEntries(Object.entries(st.content.heir ?? {}).filter(([f, h]) => st.flags[f] && tier <= h.tier).map(([f]) => [f, tier]));
 
+// ธงบ้านเกิดของทายาทสายเลือด (ใบ 105) — คิดจากชีวิตรุ่นก่อนจริง ไม่สุ่ม: ชั้นลูกเท่านั้น ได้เมื่อรุ่นก่อนเคยติดธงหนี้ในทะเบียน (from_life_flags) หรือเคยล้มละลาย
+// ธงเลี้ยงดูไม่มีทางส่งต่อ (ไม่มีการ์ดไหนตั้ง · ตัวเลือกเลี้ยงลูกเป็นใบแยก) · ไม่ดึงเลขสุ่ม
+const heirHome = (st, tier) => (tier === 1 ? Object.fromEntries(Object.entries(st.content.home ?? {}).filter(([, h]) => h.from_life_flags && (h.from_life_flags.some((f) => st.flags[f]) || st.bankruptcies > 0)).map(([f]) => [f, 1])) : {});
+
 function makeHeir(af, r) {
   const st = af.st;
   const era = st.content.era;
@@ -8746,7 +8776,7 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
-  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, province = null, parentFlags = {}, letter = null;
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, province = null, parentFlags = {}, homeFlags = {}, letter = null;
   const death = deathStanding(st);
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
@@ -8766,6 +8796,7 @@ function makeHeir(af, r) {
     const spouse = (st.kin ?? []).filter((m) => m.role === 'spouse').at(-1) ?? null;
     if (me) ({ sex, name } = me);
     parentFlags = heirFlags(st, tier.tier);
+    homeFlags = heirHome(st, tier.tier);
     const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
@@ -8855,6 +8886,7 @@ function makeHeir(af, r) {
     kept: ledger.merit + ledger.sin,
     tier: tier?.tier ?? null,
     parentFlags,
+    homeFlags,
     letter,
     // ส่วนที่บ้านส่งต่อ แยกจาก bonus (ซึ่งรวมผลกรรม) ให้การ์ดเปิดชีวิตเล่าทิศได้โดยไม่เผยบัญชี
     kin: { relations: kin('relations'), network: kin('network') },
@@ -9019,6 +9051,9 @@ const SPARE_WORDS = { health: 'ร่างกายแข็งแรงกว�
 const SPARE_NONE = 'ติดตัวมาแต่เกิด: เด็กคนนี้โดดเด่นรอบด้านอยู่แล้ว ช่องที่เว้นไว้จึงไม่มีอะไรเติมได้อีก';
 const spareText = (keys) => (keys.length ? `ติดตัวมาแต่เกิด: ${keys.map((k) => SPARE_WORDS[k]).join(' · ')}` : SPARE_NONE);
 
+// ธงบ้านเกิด (ใบ 105): บรรทัดเดียวต่อธงตามลำดับทะเบียน · ไม่มีธง/เซฟเก่า = ไม่มีบรรทัด · ข้อความอยู่ content/rules/flags.yaml home:
+const homeLines = (st) => Object.entries(st.content?.home ?? {}).filter(([f]) => st.homeFlags?.[f]).map(([, h]) => h.tell);
+
 function introCard(st, heir) {
   return {
     kind: 'intro',
@@ -9029,7 +9064,7 @@ function introCard(st, heir) {
     text: st.age > 0
       ? `คุณเล่นต่อเป็น “${st.name}” วัย ${st.age} ปี ที่${provinceLabel(st)} ชื่อจริงว่า “${st.realName}”`
       : `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${provinceLabel(st)} ได้ชื่อจริงว่า “${st.realName}” ชื่อเล่นว่า “${st.name}”`,
-    story: [familyText(st), eraText(st), ...(st.spare ? [spareText(st.spare)] : [])],
+    story: [familyText(st), eraText(st), ...homeLines(st), ...(st.spare ? [spareText(st.spare)] : [])],
     // heir ที่ไม่มีรุ่นก่อน (harness สร้างทับค่าเกิดเฉย ๆ) ไม่มีอะไรให้สืบทอด
     inherit: heir && st.lineage.length ? inheritText(st, heir) : [],
     lineage: lineageBrief(st.lineage),
