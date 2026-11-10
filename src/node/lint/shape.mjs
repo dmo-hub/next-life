@@ -20,7 +20,7 @@ const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'only_sex', 'letter', 'nature', 'upgrade', 'arc_end'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
@@ -691,7 +691,7 @@ export const rules = [
       // การ์ดสูญเสีย (B36a2): แกนจดเฉพาะคนในบ้านที่จากไปเอง — พ่อแม่/เพื่อนรุ่นไม่มีสัญญาณนี้ ใส่ไปการ์ดไม่เคยออก
       const loss = isObj(e.when) ? e.when.loss : undefined;
       if (loss === undefined) return;
-      const LOSS_ROLES = ['spouse', 'child', 'grandchild', 'pet', 'herd'];
+      const LOSS_ROLES = ['parent', 'spouse', 'child', 'grandchild', 'pet', 'herd'];
       if (!isObj(loss) || Object.keys(loss).some((k) => !['roles', 'within', 'after'].includes(k))) return r('.when.loss', 'loss ต้องเป็น {roles?, within?, after?}');
       if (loss.roles !== undefined && !(Array.isArray(loss.roles) && loss.roles.length && loss.roles.every((x) => LOSS_ROLES.includes(x)))) r('.when.loss.roles', `roles ต้องเป็นรายการจาก ${LOSS_ROLES.join(' ')}`);
       if (loss.within !== undefined && !(isInt(loss.within) && loss.within >= 0 && loss.within <= 10)) r('.when.loss.within', 'within ต้องเป็นจำนวนปี 0–10');

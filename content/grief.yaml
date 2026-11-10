@@ -1,0 +1,87 @@
+# การ์ดไว้อาลัย (ใบ 104): ไม่อยู่ในกองสุ่ม (ไม่มี weight) · แกนเรียกตอนคนใกล้ตัวจากไปเอง แทนบรรทัดแจ้งเดิม (GRIEF ใน life.mjs)
+# เลขลำดับตัวเลือกต้องตรงกันทุกใบ · บวชหน้าไฟซ่อนจากผู้เล่นหญิงด้วย only_sex
+# stage ใส่ตามกติกาโครงข้อมูล — แกนไม่อ่าน
+events:
+  - id: grief_parent_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {loss: {roles: [parent], within: 1}}
+    title: "ไว้อาลัย"
+    text: "{แจ้งการจากไป} งานศพผ่านไปแล้ว บ้านเงียบกว่าที่เคย เสื้อตัวเก่าของท่านยังแขวนอยู่ที่เดิม"
+    choices:
+      - id: ordain
+        text: "{บวชหน้าไฟ}ให้ท่าน"
+        only_sex: [ชาย]
+        requires: {age: {min: 7}}
+        effects: {happiness: 1}
+        merit: [{cat: sila, level: 1}, {cat: care_parents, level: 1}]
+      - id: merit
+        text: "ทำบุญอุทิศให้ท่าน"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: keep
+        text: "เก็บเสื้อตัวเก่าของท่านไว้"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: back
+        text: "{ทางกลับ}เลย"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: grief_spouse_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {loss: {roles: [spouse], within: 1}}
+    title: "ไว้อาลัย"
+    text: "{แจ้งการจากไป} คนมาร่วมงานกลับกันหมดแล้ว หมอนอีกใบยังวางอยู่ข้างเตียง"
+    choices:
+      - id: ordain
+        text: "{บวชหน้าไฟ}อุทิศให้"
+        only_sex: [ชาย]
+        requires: {age: {min: 7}}
+        effects: {happiness: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: merit
+        text: "ทำบุญอุทิศให้"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: keep
+        text: "เก็บรูปถ่ายใบโปรดไว้ข้างเตียง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: back
+        text: "{ทางกลับ}เลย"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: grief_child_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {loss: {roles: [child], within: 1}}
+    title: "ไว้อาลัย"
+    text: "{แจ้งการจากไป} ไม่มีใครเตรียมใจกับงานแบบนี้ได้ ข้าวของของลูกยังอยู่ในห้องเดิม"
+    choices:
+      - id: ordain
+        text: "{บวชหน้าไฟ}อุทิศให้ลูก"
+        only_sex: [ชาย]
+        requires: {age: {min: 7}}
+        effects: {happiness: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: merit
+        text: "ทำบุญอุทิศให้ลูก"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: keep
+        text: "เก็บของชิ้นโปรดของลูกไว้"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: back
+        text: "{ทางกลับ}เลย"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]

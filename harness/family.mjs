@@ -105,7 +105,8 @@ for (const [bot, pick] of Object.entries(BOTS)) {
       const spouses = st.kin.filter((m) => m.role === 'spouse');
       if (spouses.length < 2 || spouses.at(-1).born === undefined) rewedBad++;
     }
-    lossEvents += st.kinLoss.length;
+    // พ่อแม่ตอนผู้เล่นเด็กเล็กลงบันทึกอย่างเดียว ไม่มีการ์ดแจ้ง (ใบ 104)
+    lossEvents += st.kinLoss.filter((l) => !(l.role === 'parent' && l.atYou < 7)).length;
     for (const m of st.kin) {
       roles[m.role]++;
       // สัตว์ตายตามอายุขัยของชนิด ไม่ใช่ตารางชีพคน (B44)
