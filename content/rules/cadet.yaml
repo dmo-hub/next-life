@@ -3770,9 +3770,9 @@ interview:
           result: null
           outcomes: null
           rank: 1
-        # lateMother (บท S1 · เจ้าของเคาะ 2026-11-10 · cadet-b5-late-mother.md f3 · ซ่อนข้อเดิม)
+        # lateMother / lateFather (บท S1 · เจ้าของเคาะ 2026-11-10 · cadet-b5-late-mother.md f3 · ซ่อนข้อเดิม)
         - label: เคยเห็นเขาเหนื่อย ก็ยังอยากมา
-          hideIf: { heirCase: lateMother }
+          hideIf: { heirCase: [lateMother, lateFather] }
           hint: null
           requiresMoney: 0
           fx:
@@ -3791,6 +3791,24 @@ interview:
         # lateMother (บท S1 · เจ้าของเคาะ 2026-11-10 · cadet-b5-late-mother.md f3)
         - label: รู้จักแม่จากรูป ก็ยังอยากมา
           showIf: { heirCase: lateMother }
+          hint: null
+          requiresMoney: 0
+          fx:
+            knowledge: 0
+            health: 0
+            happiness: 0
+            relations: 0
+            network: 0
+            money: 0
+          setFlags: []
+          clearFlags: []
+          schedule: []
+          result: null
+          outcomes: null
+          rank: 1
+        # lateFather (เจ้าของเคาะ 2026-11-10 · แทน "เคยเห็นเขาเหนื่อย…" · ผล/ค่าเดิมเหมือน f3)
+        - label: รู้จักพ่อจากรูป ก็ยังอยากมา
+          showIf: { heirCase: lateFather }
           hint: null
           requiresMoney: 0
           fx:
