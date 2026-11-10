@@ -160,14 +160,14 @@ for (const [name, pick] of Object.entries(BOTS)) {
       // ต้องเล่นออกมาเหมือนชีวิตไม่มี heir ทุกหลัก — ถ้า heir ไปเลื่อน stream ชะตาจะต่าง
       if (g === 0 && i < 200) {
         const plain = newLife(h.seed, content);
-        const twin = newLife(h.seed, content, { birthYear: plain.birthYear, sex: plain.sex, region: { name: plain.region, ses: plain.ses }, cls: plain.cls, bonus: {} });
+        const twin = newLife(h.seed, content, { birthYear: plain.birthYear, sex: plain.sex, region: { name: plain.region, ses: plain.ses }, cls: plain.cls, bonus: {}, homeFlags: plain.homeFlags });
         const a = playLife(h.seed, content, pick, null, plain), b = playLife(h.seed, content, pick, null, twin);
         if (a.age !== b.age || a.cards !== b.cards || Math.round(a.state.money) !== Math.round(b.state.money)) streamBad++;
         streamChecks++;
         // ธงพ่อแม่ครบทั้งทะเบียนต้องไม่ขยับอะไรนอกการ์ดที่อ่านมัน (ความเสี่ยงตาย ฉายา ตำแหน่ง อ่าน flags ไม่ใช่ parentFlags)
         // มีการ์ดอ่านแล้วชีวิตต่างได้โดยชอบ ⇒ ส่วนนี้วัดได้เฉพาะตอนเนื้อหายังไม่มีผู้อ่าน
         if (!heirReaders.length) {
-          const full = newLife(h.seed, content, { birthYear: plain.birthYear, sex: plain.sex, region: { name: plain.region, ses: plain.ses }, cls: plain.cls, bonus: {}, parentFlags: Object.fromEntries(Object.keys(HEIR).map((k) => [k, 1])) });
+          const full = newLife(h.seed, content, { birthYear: plain.birthYear, sex: plain.sex, region: { name: plain.region, ses: plain.ses }, cls: plain.cls, bonus: {}, homeFlags: plain.homeFlags, parentFlags: Object.fromEntries(Object.keys(HEIR).map((k) => [k, 1])) });
           const c = playLife(h.seed, content, pick, null, full);
           if (a.age !== c.age || a.cards !== c.cards || Math.round(a.state.money) !== Math.round(c.state.money)) heirTwin++;
         }

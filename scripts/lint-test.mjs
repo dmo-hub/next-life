@@ -5,7 +5,7 @@ import { parse } from 'yaml';
 import { RULES, DOC_SHAPE, lintContext, lintDocs, formatProblem } from '../src/node/lint/index.mjs';
 import { OK_DIRECTION_SKIP } from '../src/node/lint/shape.mjs';
 import { strings, isObj } from '../src/node/lint/util.mjs';
-import { parentRefs } from '../src/node/lint/flags.mjs';
+import { parentRefs, homeRefs } from '../src/node/lint/flags.mjs';
 import { loadEvents, loadEra, loadContent, checkNames } from '../src/node/load.mjs';
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
 import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT, CHILD_UNTIL, SCHOOL_FROM } from '../src/engine/career.mjs';
@@ -364,6 +364,39 @@ for (const [name, r] of Object.entries(heirControls)) if (!heirCheck(r, realDocs
 for (const f of heir.unread) fails.push(`ทะเบียน heir: "${f}" ไม่มีการ์ดอ่าน (when.parent_flags / multipliers.parent_flags)`);
 if (!heirCheck(flagReg, []).unread.length) fails.push('ทะเบียน heir: ตัวควบคุม "ไม่มีการ์ด" ไม่ตก');
 rows.push(['ทะเบียน heir:', `${Object.keys(flagReg.heir ?? {}).length} ธง · ตัวควบคุม ${Object.keys(heirControls).length + 1} แบบ · ไม่มีการ์ดอ่าน ${heir.unread.length}`]);
+
+// ทะเบียน home: (ธงบ้านเกิด ใบ 105) — แต่ละธงต้องมี tell ไม่ว่าง · p อยู่ 0–1 หรือมี class_max (0–9) หรือ from_heir_flags อย่างน้อยหนึ่งทาง · from_heir_flags/not_with อ้างธงที่มีจริง · ต้องมีการ์ดอ่านทุกธง
+function homeCheck(reg, docs) {
+  const problems = [];
+  const home = reg.home ?? {};
+  for (const [f, h] of Object.entries(home)) {
+    if (!/^[a-z][a-z0-9_]*$/.test(f)) problems.push(`ทะเบียน home: "${f}" ชื่อผิดรูป`);
+    if (!isObj(h)) { problems.push(`ทะเบียน home: "${f}" ต้องเป็น object`); continue; }
+    if (typeof h.tell !== 'string' || !h.tell.trim() || h.tell.length > MAX_LEN.hint) problems.push(`ทะเบียน home: "${f}" tell ต้องเป็นข้อความไม่ว่าง ≤ ${MAX_LEN.hint} ตัวอักษร`);
+    const roll = h.p !== undefined, cls = h.class_max !== undefined;
+    if (roll === cls) problems.push(`ทะเบียน home: "${f}" ต้องมี p (สุ่ม) หรือ class_max (จากฐานะ) อย่างใดอย่างหนึ่ง`);
+    if (roll && !(typeof h.p === 'number' && h.p > 0 && h.p < 1)) problems.push(`ทะเบียน home: "${f}" p ต้องอยู่ระหว่าง 0 ถึง 1`);
+    if (cls && !(Number.isInteger(h.class_max) && h.class_max >= 0 && h.class_max < CLASSES.length - 1)) problems.push(`ทะเบียน home: "${f}" class_max ต้องเป็นจำนวนเต็ม 0–${CLASSES.length - 2}`);
+    for (const o of h.not_with ?? []) if (!(o in home)) problems.push(`ทะเบียน home: "${f}" not_with อ้างธงที่ไม่มี "${o}"`);
+    if (h.from_life_flags !== undefined && !(Array.isArray(h.from_life_flags) && h.from_life_flags.every((x) => x in (reg.flags ?? {})))) problems.push(`ทะเบียน home: "${f}" from_life_flags ต้องเป็นรายการธงในหมวด flags:`);
+  }
+  const read = new Set();
+  for (const { doc } of docs) for (const e of doc.events ?? []) for (const { f } of homeRefs(isObj(e) ? e : {})) read.add(f);
+  return { problems, unread: Object.keys(home).filter((f) => !read.has(f)) };
+}
+const home = homeCheck(flagReg, realDocs);
+for (const p of home.problems) fails.push(p);
+const homeControls = {
+  'tell ว่าง': { ...flagReg, home: { ...flagReg.home, strict_home: { p: 0.2, tell: ' ' } } },
+  'ไม่มีทั้ง p และ class_max': { ...flagReg, home: { ...flagReg.home, strict_home: { tell: 'x' } } },
+  'p เกิน 1': { ...flagReg, home: { ...flagReg.home, strict_home: { p: 1.5, tell: 'x' } } },
+  'not_with ธงที่ไม่มี': { ...flagReg, home: { ...flagReg.home, lenient_home: { p: 0.2, not_with: ['nope'], tell: 'x' } } },
+  'from_life_flags นอก flags:': { ...flagReg, home: { ...flagReg.home, home_in_debt: { class_max: 2, from_life_flags: ['no_such'], tell: 'x' } } },
+};
+for (const [name, r] of Object.entries(homeControls)) if (!homeCheck(r, realDocs).problems.length) fails.push(`ทะเบียน home: ตัวควบคุม "${name}" ไม่ตก`);
+for (const f of home.unread) fails.push(`ทะเบียน home: "${f}" ไม่มีการ์ดอ่าน (when.home_flags / multipliers.home_flags)`);
+if (!homeCheck(flagReg, []).unread.length) fails.push('ทะเบียน home: ตัวควบคุม "ไม่มีการ์ด" ไม่ตก');
+rows.push(['ทะเบียน home:', `${Object.keys(flagReg.home ?? {}).length} ธง · ตัวควบคุม ${Object.keys(homeControls).length + 1} แบบ · ไม่มีการ์ดอ่าน ${home.unread.length}`]);
 
 // ป้ายนิสัย (B41): ไฟล์ bad จับได้แค่ทางเดียว — ไล่ทุกทางที่กติกาต้องตก จากการ์ดฐานที่ผ่าน แก้ทีละจุด
 const natureProblems = (e, c = ctx) => lintDocs([{ file: 'nature-control', doc: { events: [e] } }], c).filter((p) => p.rule === 'nature-tag');

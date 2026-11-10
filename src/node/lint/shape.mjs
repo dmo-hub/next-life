@@ -30,13 +30,13 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years', 'chance'],
-  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'overlap_stage', 'dark_gate', 'past_life', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'home_flags', 'overlap_stage', 'dark_gate', 'past_life', ...MONEY_KEYS],
   pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
   family: ['role', 'sex', 'age', 'alive', 'count', 'health', 'relations'],
-  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
+  multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'home_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
   requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'reason', 'reasons'],
@@ -58,6 +58,7 @@ function* shaped(e) {
     }
     if (isObj(w.flags)) yield ['whenFlags', w.flags, '.when.flags'];
     if (isObj(w.parent_flags)) yield ['whenFlags', w.parent_flags, '.when.parent_flags'];
+    if (isObj(w.home_flags)) yield ['whenFlags', w.home_flags, '.when.home_flags'];
     if (isObj(w.past_life)) yield ['pastLife', w.past_life, '.when.past_life'];
     for (const k of MONEY_KEYS) if (isObj(w[k])) yield ['bound', w[k], `.when.${k}`];
     for (const [i, f] of list(w.family).entries()) {
