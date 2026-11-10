@@ -2660,7 +2660,10 @@ const CADET = (() => {
     delete st.flags.cadet_dream;
     st.flags.cadet_declined_seat = true;
     // Q-A1 (ก): ปีหน้าอายุยังสมัครได้ = การ์ดเชิญรอบใหม่ "ใบประกาศปีที่สอง" (ลำดับค้างข้ามปี แบบฤดูสอบ) · เกินอายุ = จบเส้น
-    P.steps = st.age + 1 <= (N(st).last_age ?? 18) ? [['returnHold']] : [['end']];
+    // ประตูสนามคงไว้เฉพาะคนที่ยังสมัครปีหน้าได้ (cadet_notice_17_retry ต้องใช้) · จบเส้นแล้วยังถือ = cadetLive ใน life.mjs ค้าง ด่านจบ ม.6/การ์ดหางานเลื่อนไม่สิ้นสุด
+    const again = st.age + 1 <= (N(st).last_age ?? 18);
+    if (!again) delete st.flags.cadet_exam_door;
+    P.steps = again ? [['returnHold']] : [['end']];
     const home = secretNow(st) ? 'ที่บ้านไม่รู้ด้วยซ้ำว่าเคยติด' : `${elder(st)}ถามซ้ำสองรอบว่าแน่ใจแล้วนะ แล้วก็ไม่ถามอีก`;
     return C('declined', 'ใบแจ้งที่ไม่ได้ใช้', `ชื่อ {ชื่อ} อยู่บนป้ายของ ${P.final.map((b) => BT(st, b)).join(' ')} แต่ตัดสินใจแล้วว่าปีนี้จะไม่ไปรายงานตัว ใบแจ้งผลพับเก็บไว้ในลิ้นชัก\n${home}`, [
       { label: 'เก็บใบแจ้งไว้เป็นที่ระลึก', fx: { happiness: 1 }, result: 'บางคืนยังหยิบขึ้นมาอ่าน แล้วก็พับเก็บที่เดิม' },
@@ -3931,7 +3934,8 @@ function releaseTrack(st, out) {
   const track = !st.flags.cadet_passed && st.school && TRACKS[st.school];
   if (track) trackExit(st, track, st.birthYear + st.age, out);
 }
-const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet_exam_door && !st.flags.cadet_passed));
+// เลิกสอบแล้ว (cadet_let_go) ประตูไม่นับ: คนสละที่นั่งถือประตูข้ามปีไว้รอการ์ดสอบซ้ำ ถ้าเลิกกลางทาง ประตูไม่มีปีสอบมาล้าง
+const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet_exam_door && !st.flags.cadet_passed && !st.flags.cadet_let_go));
 function dueJob(st) {
   if (cadetLive(st)) st.needJob = true;
   else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });

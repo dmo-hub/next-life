@@ -900,7 +900,8 @@ function releaseTrack(st, out) {
   const track = !st.flags.cadet_passed && st.school && TRACKS[st.school];
   if (track) trackExit(st, track, st.birthYear + st.age, out);
 }
-const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet_exam_door && !st.flags.cadet_passed));
+// เลิกสอบแล้ว (cadet_let_go) ประตูไม่นับ: คนสละที่นั่งถือประตูข้ามปีไว้รอการ์ดสอบซ้ำ ถ้าเลิกกลางทาง ประตูไม่มีปีสอบมาล้าง
+const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet_exam_door && !st.flags.cadet_passed && !st.flags.cadet_let_go));
 function dueJob(st) {
   if (cadetLive(st)) st.needJob = true;
   else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
