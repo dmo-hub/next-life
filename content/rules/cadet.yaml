@@ -6,6 +6,7 @@ numbers:
   written_min: 13
   know_min: 65
   iv_min: 13
+  iv_rank_step: 3            # X7 คำถามข้อแรก: rank 1 = เลื่อนลำดับบนป้ายผลสุดท้ายของเหล่าที่ติด 3 ลำดับ (เจ้าของเคาะ 2026-11-10 Q2)
   body_min:
     army: 80
     navy: 65
