@@ -2105,25 +2105,27 @@ const CADET = (() => {
     P.paperCheered = true;
     return A(st).paper?.cheer ?? '';
   }
-  // หมวกใบเก่าของพ่อ/แม่ที่เป็นทหาร/ตำรวจ (D3 บท S1 รอบ 2 · เจ้าของรับ 2026-11-06): ทายาทมาจากพ่อหรือแม่ (parents[].ancestor) ไม่ใช่ตา
-  // ไม่รู้ว่าใคร (ทายาทจากสุ่มตอนเกิด) = ถือว่าพ่อ
+  // หมวกใบเก่าของพ่อ/แม่ที่เป็นทหาร/ตำรวจ (D3 บท S1 รอบ 2 · เจ้าของรับ 2026-11-06)
+  // B5 (เจ้าของเคาะ 2026-11-09 · R2): คนที่เคยรับราชการมาจาก heirCase (ครอบครัวชาตินี้) ไม่ใช้ parents[].ancestor
+  // father = พ่อยังอยู่ · mother = มีแต่แม่ (แม่รับราชการเอง) · lateFather = พ่อที่เสียแล้ว → แม่ที่ยังอยู่หรือป้าเป็นคนหยิบหมวกของพ่อ
+  const heirHatOwner = (st) => {
+    const hc = heirCase(st), dad = hc !== 'mother';
+    return { hc, who: dad ? 'พ่อ' : 'แม่', young: dad ? 'ตอนหนุ่ม ๆ' : 'ตอนสาว ๆ', keeper: hc === 'lateFather' ? (parentAlive(st, 'หญิง') ? 'แม่' : 'ป้า') : null };
+  };
   function heirHat(st, heir) {
-    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', ps = st.parents ?? [];
-    const hp = ps.find((p) => p.ancestor) ?? ps.find((p) => p.sex === 'ชาย') ?? { sex: 'ชาย' }, dad = hp.sex === 'ชาย';
-    const who = dad ? 'พ่อ' : 'แม่', young = dad ? 'ตอนหนุ่ม ๆ' : 'ตอนสาว ๆ', other = ps.find((p) => p !== hp && p.alive);
-    if (hp.alive) return `${who}หยิบหมวก${hat}ใบเก่าออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}${young}"`;
-    if (other) return `${other.sex === 'ชาย' ? 'พ่อ' : 'แม่'}หยิบหมวกใบเก่าของ${who}ออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}${young}"`;
-    return `ป้าหยิบหมวก${hat}ใบเก่าของ${who}ออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}เอ็ง${young}"`;
+    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', { who, young, keeper } = heirHatOwner(st);
+    if (!keeper) return `${who}หยิบหมวก${hat}ใบเก่าออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือน${who}${young}"`;
+    if (keeper === 'แม่') return `แม่หยิบหมวก${hat}ใบเก่าของพ่อออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือนพ่อ${young}"`;
+    return `ป้าหยิบหมวก${hat}ใบเก่าของพ่อออกจากตู้มาสวมให้ "พอดีหัวเลย เหมือนพ่อเอ็ง${young}"`;
   }
   // ที่ตั้งโรงเรียนตามปี (numbers.campus_*) — แทน "นครนายก" ที่เคยเขียนตายทุกยุค
   const campus = (st) => campusName(st);   // ตัวเดียวกับ {ที่ตั้ง} ใน fill (life.mjs) · B1
   // การ์ดผิดหวัง (G4 · เจ้าของสั่ง 2026-11-06): คนเก็บหมวกกลับเข้าตู้ใช้หลักเดียวกับ heirHat — พ่อ/แม่ที่รับราชการถ้ายังอยู่ · ไม่งั้นอีกคน · ไม่มีพ่อแม่ = ป้า
+  // B5: ใช้ heirHatOwner เดียวกับ heirHat (heirCase · ไม่ใช้ ancestor)
   function heirHatBack(st, heir) {
-    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', ps = st.parents ?? [];
-    const hp = ps.find((p) => p.ancestor) ?? ps.find((p) => p.sex === 'ชาย') ?? { sex: 'ชาย' }, who = hp.sex === 'ชาย' ? 'พ่อ' : 'แม่';
-    const other = ps.find((p) => p !== hp && p.alive);
-    if (hp.alive) return `${who}เก็บหมวก${hat}ใบเก่ากลับเข้าตู้ ไม่ได้พูดถึงอีก`;
-    return `${other ? (other.sex === 'ชาย' ? 'พ่อ' : 'แม่') : 'ป้า'}เก็บหมวก${hat}ใบเก่าของ${who}กลับเข้าตู้ ไม่ได้พูดถึงอีก`;
+    const hat = heir === 'police' ? 'ตำรวจ' : 'ทหาร', { who, keeper } = heirHatOwner(st);
+    if (!keeper) return `${who}เก็บหมวก${hat}ใบเก่ากลับเข้าตู้ ไม่ได้พูดถึงอีก`;
+    return `${keeper}เก็บหมวก${hat}ใบเก่าของพ่อกลับเข้าตู้ ไม่ได้พูดถึงอีก`;
   }
   const txt = (v) => (typeof v === 'string' ? v : v?.text ?? '');
 
@@ -2136,7 +2138,8 @@ const CADET = (() => {
     if (c.sex && c.sex !== st.sex) return false;
     if (c.regions?.length && !c.regions.includes(st.region)) return false;
     if (c.notRegions?.includes(st.region)) return false;
-    if (c.heir && heir !== c.heir) return false;
+    // B5: heir รับค่าเดียวหรือรายการ (X9-ค = [army, police] ทายาทสายไหนก็ได้)
+    if (c.heir && ![].concat(c.heir).includes(heir)) return false;
     if (c.notHeir && [].concat(c.notHeir).includes(heir)) return false;
     if (c.classes?.length && !c.classes.includes(clsGroup(st)) && !c.classes.includes(st.cls)) return false;
     if (c.anyFlags && !c.anyFlags.some((f) => has(st, f))) return false;
@@ -2790,7 +2793,7 @@ const CADET = (() => {
       L.push(J[fam] ?? J.none ?? '');
     }
     const heir = heirOf(st);
-    if (heir && fin) L.push(heirHat(st, heir));   // หมวกทายาท = ของเกมเดิม (ปรับเป็น heirCase ใน B5 · นอกใบนี้)
+    if (heir && fin) L.push(heirHat(st, heir));   // หมวกทายาท · B5: คนสวมหมวกให้ตาม heirCase
     if (!iv && !fin && (has(st, 'cadet_prep_group') || has(st, 'cadet_bond_a'))) L.push(friendWrittenLine(st));   // B4 เพื่อนติวตามยุค (ใช้กับเซฟเก่าที่ค้าง cheer phys)
     const sn = A(st).joy?.senior ?? {};
     if (has(st, 'cadet_senior_tutor') || has(st, 'knows_senior')) L.push(fin ? sn.final : iv ? sn.iv : sn.written);

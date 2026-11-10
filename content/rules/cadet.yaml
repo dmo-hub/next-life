@@ -62,6 +62,9 @@ numbers:
   wait_mood_good: 20        # คะแนนแบบวัดดีสุด ≥ ค่านี้ = ใจเบา (W1) · ≥ written_min = ลังเล (W2) · ต่ำกว่า = อยากขอแก้ (W3) (Q2)
   camp_board_top: 21        # ป้ายที่ติว: คะแนน ≥ ค่านี้ = แถวต้น ๆ · ≥ camp_board_mid = กลาง ๆ แผ่น · ต่ำกว่า = ค่อนไปทางท้าย
   camp_board_mid: 17
+  # B5 ทายาทจากการเกิด (เจ้าของเคาะ 2026-11-10): ครอบครัวใหม่มีโอกาสเกิดมามีพ่อหรือแม่รับราชการทหาร/ตำรวจ 5.00% (ธง army_family / police_family · from_age 0)
+  heir_birth_p: 0.05
+  heir_police_share: 0.5    # สัดส่วนตำรวจในโอกาสนั้น (ที่เหลือ = ทหาร) · ⚠ ค่าชั่วคราว รอเจ้าของเคาะผ่าน g-b7
   rank_rough_from: 10       # ลำดับตั้งแต่ค่านี้ พ่อพูดแบบปัด ("ลำดับหกสิบกว่า") · น้อยกว่า = ไม่พูด (ข้อ 4)
 branches:
   army: ทบ.
@@ -4565,7 +4568,6 @@ passed:
       sex: ชาย
       regions: null
       notRegions: null
-      heir: null
       notHeir: null
       yearMin: null
       yearMax: null
