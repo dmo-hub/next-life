@@ -301,6 +301,7 @@ export function ageKin(st, year, saving = 0) {
 
 // ข้อความการ์ดแจ้งการจากไป (แกนออกเองทุกครั้ง — เนื้อหาต่อยอดด้วย when.loss ได้)
 const LOSS_WHO = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน' };
+const lossParentWord = (l) => (l.sex === 'หญิง' ? 'แม่' : 'พ่อ');
 const PET_LOSS_TEXT = {
   old: (who, age) => `${who}หลับไปอย่างสงบตามวัย ด้วยวัย ${age} ปี`,
   sick: (who, age) => `${who}ป่วยหนักแล้วจากไป ด้วยวัย ${age} ปี`,
@@ -308,7 +309,7 @@ const PET_LOSS_TEXT = {
 };
 export function lossText(l) {
   if (l.role === 'herd') return `ฝูง${l.kind}ที่เลี้ยงไว้ค่อย ๆ หมดไป ไม่ได้เลี้ยงต่อแล้ว`;
-  const who = l.role === 'pet' ? (l.name ? `เจ้า${l.name} ${l.kind}ที่เลี้ยงไว้` : `${l.kind}ที่เลี้ยงไว้`) : `${LOSS_WHO[l.role]}${l.name}`;
+  const who = l.role === 'pet' ? (l.name ? `เจ้า${l.name} ${l.kind}ที่เลี้ยงไว้` : `${l.kind}ที่เลี้ยงไว้`) : l.role === 'parent' ? `${lossParentWord(l)}${l.name ?? ''}` : `${LOSS_WHO[l.role]}${l.name}`;
   if (l.role === 'pet' && PET_LOSS_TEXT[l.cause]) return PET_LOSS_TEXT[l.cause](who, l.age);
   return l.age < 1 ? `${who}จากไปตั้งแต่ยังไม่ทันครบขวบ` : `${who}จากไปแล้ว ด้วยวัย ${l.age} ปี`;
 }
@@ -345,7 +346,8 @@ export function lossOk(st, w) {
   return pool.some((l) => year - l.year >= (w.after ?? 0) && year - l.year <= (w.within ?? 0));
 }
 // ชื่อคนที่จากไปล่าสุด ให้การ์ดสูญเสียเรียก ({ชื่อผู้จากไป})
-export const lastLoss = (st) => (st.kinLoss ?? []).at(-1) ?? null;
+// พ่อแม่ไม่นับ: ผู้เรียกคือการ์ดสัตว์เลี้ยง ถ้าพ่อแม่ตายทีหลังจะเรียกชื่อพ่อแม่แทนสัตว์
+export const lastLoss = (st) => (st.kinLoss ?? []).findLast((l) => l.role !== 'parent') ?? null;
 // คู่ที่จากไปล่าสุด ({ชื่อคู่เก่า}) — คนที่จากไปล่าสุดอาจเป็นสัตว์หรือลูก การ์ดรักใหม่จึงเรียกคู่ตรง ๆ
 export const lastSpouseLoss = (st) => (st.kinLoss ?? []).findLast((l) => l.role === 'spouse') ?? null;
 // ปีที่อยู่ด้วยกัน ({ปีคู่เก่า}): อายุตอนแต่ง = flagAge.married (ไม่ถูกลบตอนธงหลุด) · ไม่รู้อายุตอนแต่ง = ไม่บอกเลขปี
