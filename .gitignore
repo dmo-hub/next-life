@@ -27,4 +27,7 @@ node_modules/
 !.claude/settings.json
 !.claude/hooks/
 !.claude/agents/
+!.claude/knowledge/
+.claude/knowledge/*
+!.claude/knowledge/lore/
 .vscode/
