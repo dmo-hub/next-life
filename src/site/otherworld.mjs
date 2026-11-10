@@ -3,6 +3,7 @@
 // ชาติใหม่เกิดในทวีป (06d): ส่วนหลักพูดถึงแฟ้มเกิด/เผ่า/แคว้น · บทบาท 4 โลกกับการ์ดเฉพาะโลกย้ายไปกลุ่มพับ "ชาติเก่า" (ยังเล่นถึงจากเซฟ)
 import { ISEKAI, ISEKAI_TIME, ISEKAI_STAGES, ISEKAI_STAT, ISEKAI_FX, ISEKAI_SKILLS, ISEKAI_WORLDS, ISEKAI_ROLES, ISEKAI_DEATH, ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_KNOW, ISEKAI_KNOW_T, ISEKAI_LORE, ISEKAI_FAME, ISEKAI_POTION, ISEKAI_FOCUS, ISEKAI_CAREERS, ISEKAI_CAREER_T, GODDESS, GODDESS_VOWS, PATHS, CONT_LIFE, CONT_END, CONT_REGIONS, CONT_RACES, CONT_TIER, CONT_DISPUTES, CONT_MOVE, contRaceStart, meritName, roleInfo } from '../engine/index.mjs';
 import { esc, text as rawText, spoilSlot } from './catalog.mjs';
+import { sinceTag } from './card-since.mjs';
 
 // เหตุการณ์ตำนาน (B68i) เรียกชื่อคนต่างโลกรุ่นก่อนตอนเล่น — หน้าเว็บแสดงเป็นช่องชื่อแบบเดียวกับ {ชื่อชาติก่อน}
 // site-check เทียบหน้ารวมการ์ดด้วยตัวนี้ตัวเดียวกัน ข้อความที่มีช่องชื่อจึงตรงกับที่หน้าแสดง
@@ -67,7 +68,7 @@ const skillItems = (desc) => Object.entries(ISEKAI_SKILLS).map(([id, s]) => `<li
 const skillPick = () => pickCard('ของขวัญจากเทพธิดา', `เลือกสกิลโกง 1 อย่างจาก ${ISEKAI.skills} อย่างที่สุ่มมา`, skillItems(() => ''));
 
 function eventCard(e, back) {
-  return [`<article class="c x" id="isk-${esc(e.id)}">`, `<h4>${esc(e.title)}</h4>`, '<div class="sp-front">', tagLine(tags(e)), `<p>${text(e.text)}</p>`, `<ul>${e.choices.map((c) => `<li>${text(c.t)}</li>`).join('')}</ul>`, '</div>', spoilSlot(`isk-${e.id}`, back), '</article>'].join('');
+  return [`<article class="c x" id="isk-${esc(e.id)}">`, `<h4>${esc(e.title)}</h4>`, sinceTag(e.id), '<div class="sp-front">', tagLine(tags(e)), `<p>${text(e.text)}</p>`, `<ul>${e.choices.map((c) => `<li>${text(c.t)}</li>`).join('')}</ul>`, '</div>', spoilSlot(`isk-${e.id}`, back), '</article>'].join('');
 }
 
 // meritTags = ตัววาดป้ายบุญบาปของเฉลยไทย — ส่งเข้ามาแทน import กลับ เพื่อให้ป้ายสองโลกหน้าตา/แต้มเดียวกัน

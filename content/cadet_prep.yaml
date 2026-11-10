@@ -636,7 +636,7 @@ events:
     stage: วัยรุ่น
     years: [2506, 2650]
     weight: 1.5
-    when: {sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream, knows_senior], not: [cadet_prep_camp, cadet_prep_group, cadet_prep_self, cadet_prep_senior, cadet_senior_tutor]}}
+    when: {sex: [ชาย], age: [13, 17], flags: {has: [cadet_dream, knows_senior], not: [cadet_prep_camp, cadet_prep_group, cadet_prep_senior, cadet_senior_tutor]}}
     title: "พี่กลับบ้านช่วงลาพัก"
     text: "รุ่นพี่ที่เคยวิ่งผ่านหน้าบ้านทุกเช้ากลับมาช่วงลาพัก ผมสั้นเกรียน ยืนตัวตรงกว่าเดิม แม่ของพี่เขาเล่าให้คนทั้งซอยฟังว่าลูกชายอยู่บ้านได้ไม่กี่วัน"
     choices:

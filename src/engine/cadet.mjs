@@ -243,6 +243,8 @@ const CADET = (() => {
   // การ์ดใบถัดไปของลำดับ · null = จบลำดับ (life.mjs ปิดให้)
   function _cadetCard(st) {
     const K = st.cadet;
+    // เลิกสอบจากการ์ดเนื้อหา (เช่น cadet_notice_18) ระหว่างลำดับฤดูสอบค้างจากปีก่อน: ปิดลำดับ ไม่งั้นการ์ดติว/ใบสมัครออกต่อทั้งที่ไม่มีธงฝัน · อยู่ในสนามสอบแล้ว (p2) เดินต่อจนจบ
+    if (has(st, 'cadet_let_go') && !K.p2) K.steps = [];
     while (K.steps.length) {
       const [name, ...a] = K.steps.shift();
       const c = STEP[name]?.(st, ...a);
@@ -577,6 +579,7 @@ const CADET = (() => {
       { label: 'ไล่ดูอีกรอบให้แน่ใจ', result: 'อ่านเลขทีละตัว ตรงทุกตัว' },
       last ? { label: 'ยิ้มกว้างจนแก้มตึง', fx: { happiness: 1 }, result: 'เหลืออีกรอบเดียว ยิ้มได้ก่อนก็ไม่เสียหาย' } : { label: 'ยิ้มอยู่คนเดียว ยังไม่บอกใคร', fx: { happiness: 1 }, result: 'เก็บไว้ในใจก่อน รอบหน้ายังมีอีกหลายด่าน' }];
   }
+  const BOARD_SWIM = ['ซ้อมว่ายน้ำทุกเย็นจนวันสอบ', 'ซ้อมกับเพื่อนติวทุกเย็น'];
   S.board = (st) => {
     const P = st.cadet.p2, n = N(st), c = firstOk(st, D(st).board) ?? {};
     const pass = P.branches.filter((b) => P.written[b]), fail = P.branches.filter((b) => !P.written[b]), none = !pass.length;
@@ -590,7 +593,10 @@ const CADET = (() => {
     if (rl) text += '\n' + rl.line;
     text += `\n\n${!fail.length ? 'ผ่านครบทุกเหล่าที่สมัคร' : none ? 'ไม่ผ่านเลยสักเหล่า' : `ผ่าน ${pass.length} จาก ${P.branches.length} เหล่า`}\n\n${P.branches.map((b) => writtenScoreLine(st, b)).join('\n')}`;   // บล็อกคะแนน (เจ้าของเคาะ B) แทนบรรทัดเกณฑ์เดิม
     P.steps = none ? [['failed']] : [['cheer', 'phys'], ['physAsk', 'phys'], ['nearExam'], ['bodyDay'], ['judgeBody'], ['bodyWait'], ['announce', 'body'], ['bodyBoard']];
-    return C('board', 'ประกาศผลรอบแรก', text, reactOpts(st, none, false));
+    // ข้อ 436: สอบผ่านแล้วต่อท้ายเฉพาะตัวเลือกสระจาก yaml — ธง cadet_drill_swim / cadet_a_swims ตั้งได้ทางนี้ทางเดียว
+    // rivalPass ใน requires ยังไม่มีแกนรองรับ (เหมือน rivalLines) จึงเช็กเฉพาะเงื่อนไขที่ condOk อ่านได้
+    const swim = none ? [] : (c.options ?? []).filter((o) => BOARD_SWIM.includes(o.label)).map((o) => ({ ...o, lock: o.requires && !condOk(st, o.requires) ? (o.lockReason ?? 'ยังทำไม่ได้') : null }));
+    return C('board', 'ประกาศผลรอบแรก', text, [...reactOpts(st, none, false), ...swim]);
   };
 
   // ---------- B4 · X2w วันว่างก่อนประกาศ (Demo x2wCard 12271 · §7.1) ----------
@@ -965,10 +971,12 @@ const CADET = (() => {
     P.failStage = 'declined';
     I.lastFail = 'declined';
     delete st.flags.cadet_dream;
-    delete st.flags.cadet_exam_door;
     st.flags.cadet_declined_seat = true;
     // Q-A1 (ก): ปีหน้าอายุยังสมัครได้ = การ์ดเชิญรอบใหม่ "ใบประกาศปีที่สอง" (ลำดับค้างข้ามปี แบบฤดูสอบ) · เกินอายุ = จบเส้น
-    P.steps = st.age + 1 <= (N(st).last_age ?? 18) ? [['returnHold']] : [['end']];
+    // ประตูสนามคงไว้เฉพาะคนที่ยังสมัครปีหน้าได้ (cadet_notice_17_retry ต้องใช้) · จบเส้นแล้วยังถือ = cadetLive ใน life.mjs ค้าง ด่านจบ ม.6/การ์ดหางานเลื่อนไม่สิ้นสุด
+    const again = st.age + 1 <= (N(st).last_age ?? 18);
+    if (!again) delete st.flags.cadet_exam_door;
+    P.steps = again ? [['returnHold']] : [['end']];
     const home = secretNow(st) ? 'ที่บ้านไม่รู้ด้วยซ้ำว่าเคยติด' : `${elder(st)}ถามซ้ำสองรอบว่าแน่ใจแล้วนะ แล้วก็ไม่ถามอีก`;
     return C('declined', 'ใบแจ้งที่ไม่ได้ใช้', `ชื่อ {ชื่อ} อยู่บนป้ายของ ${P.final.map((b) => BT(st, b)).join(' ')} แต่ตัดสินใจแล้วว่าปีนี้จะไม่ไปรายงานตัว ใบแจ้งผลพับเก็บไว้ในลิ้นชัก\n${home}`, [
       { label: 'เก็บใบแจ้งไว้เป็นที่ระลึก', fx: { happiness: 1 }, result: 'บางคืนยังหยิบขึ้นมาอ่าน แล้วก็พับเก็บที่เดิม' },

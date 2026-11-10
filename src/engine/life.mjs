@@ -961,7 +961,8 @@ function releaseTrack(st, out) {
   const track = !st.flags.cadet_passed && st.school && TRACKS[st.school];
   if (track) trackExit(st, track, st.birthYear + st.age, out);
 }
-const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet_exam_door && !st.flags.cadet_passed));
+// เลิกสอบแล้ว (cadet_let_go) ประตูไม่นับ: คนสละที่นั่งถือประตูข้ามปีไว้รอการ์ดสอบซ้ำ ถ้าเลิกกลางทาง ประตูไม่มีปีสอบมาล้าง
+const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet_exam_door && !st.flags.cadet_passed && !st.flags.cadet_let_go));
 function dueJob(st) {
   if (cadetLive(st)) st.needJob = true;
   else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
@@ -1643,14 +1644,14 @@ function drawCard(st) {
     arcDefer(st);
     let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
     // ผลย้อนที่นัดไว้ปีนี้กินโควตาแบบเรื่องต่อ — หลักไมล์ที่ออกจาก dueAt เหมือนกันไม่หัก
-    if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age)) takeYearQuota(st);
+    if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age)) takeYearQuota(st, ev.id.startsWith('cadet_') ? 0.5 : 1);
     // กองสุ่มจับได้ปีละ poolRounds รอบ หลังหลักไมล์/นัดของปีนั้นหมดแล้ว · การ์ดที่จับได้อาจนัดตอนต่อปีเดียวกัน — ค้นนัดก่อนรอบถัดไป
     poolTurn(st);
     while (!ev && st.poolLeft > 0) {
       st.poolLeft--;
       ev = drawPool(st, year);
       // ใบที่ทิ้งแทนเรื่องต่อไม่นับว่าออก — ยังจั่วได้อีกในปีหลัง
-      if (ev && st.poolOwed) {
+      if (ev && st.poolOwed >= 1) {
         st.poolOwed--;
         ev = null;
       }
@@ -1694,8 +1695,9 @@ const dreamPool = (st) => { const f = st.content.cadet?.numbers?.pool_focus_flag
 // หักเป็นใบ ไม่ใช่รอบจั่ว เพราะรอบหนึ่งออกการ์ดแค่ตามโอกาส POOL_CHANCE · ปีที่จั่วไม่ได้อีกแล้วค้างไปหักปีถัดไป
 // หนี้ค้างได้ไม่เกินรอบจั่วของปีหนึ่ง (เจ้าของเคาะข้อ 432) — สายที่นัดถี่สะสมหนี้จนกองไม่ออกอีกหลายปี
 // เนื้อหาเพิ่มสายเรื่องต่อได้โดยชีวิตไม่ยาวขึ้น · ชีวิตที่ไม่เจอเรื่องต่อจั่วและดึงเลขสุ่มเท่าเดิมทุกรอบ
-export function takeYearQuota(st) {
-  st.poolOwed = Math.min((st.poolOwed ?? 0) + 1, poolRounds(stageOf(st.age)));
+// การ์ดนัดสายเตรียมทหารหักครึ่งเดียว (เจ้าของเคาะข้อ 453) — สายนี้ชายล้วนและนัดถี่ หักเต็มทำให้ใบกองวัยรุ่นของชายน้อยกว่าหญิง ทุกสายที่ทางเข้าเป็นใบกองวัยรุ่นจึงเอียงตามเพศ
+export function takeYearQuota(st, n = 1) {
+  st.poolOwed = Math.min((st.poolOwed ?? 0) + n, poolRounds(stageOf(st.age)));
 }
 
 // สายเรื่องรายคน (krung-1): การ์ดที่มี arc เดินใต้โควตาปีเดิม ไม่ใช่ตัวคุมแยก — ใบกองสุ่มเป็นใบกองอยู่แล้ว ใบนัด/เรื่องต่อหักโควตาตามเดิม ชีวิตจึงไม่ยาวขึ้น

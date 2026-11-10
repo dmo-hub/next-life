@@ -2,6 +2,7 @@
 // · หน้ารวมการ์ดไม่มีผล/บุญบาป/น้ำหนัก · ทุกการ์ดใน content อยู่บนหน้ารวมการ์ด
 // · ส่วนต่างโลก (B88b) ทั้งสองหน้าครบทุกการ์ด · หน้ารวมการ์ดไม่มีผลสำเร็จ/พลาด ความยาก หรือตอนจบ
 // · หน้าเฉลย (B88) ครบทุกการ์ด/ตัวเลือก/ผลสุ่ม และเฉลยจริง — กฎ "ไม่หลุดบุญบาป" ของหน้ารวมการ์ดไม่ใช้กับหน้านี้
+import { cardIds, readSince } from '../src/site/card-since.mjs';
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
 import { siteFacts, injectFacts, readVersion, versionLines, releaseLog, notesLines, NOTE_CUT } from '../src/site/facts.mjs';
@@ -461,7 +462,9 @@ const coreAbout = read('about.html').includes('<h2 id="core">ระบบหล�
 const roadNoId = (w) => soonCats(w).filter((c) => !w.includes(`id="${c.id}"`)).map((c) => c.name);
 const relSrc = readFileSync(new URL('../scripts/rel.mjs', import.meta.url), 'utf8');
 const relSees = /\/<h3\[\\s>\]\//.test(relSrc);
-const wnMore = wn.replace('<h2>แพตช์โน้ต</h2>', '<h3>หมวดทดสอบ</h3>\n  <ul>\n    <li>x</li>\n  </ul>\n\n  <h2>แพตช์โน้ต</h2>');
+// แทรกหน้า <h2> ที่ปิดหัวกำลังทำ — หัววางแผนไว้คั่นก่อนแพตช์โน้ต หมวดของมันไม่ใช่แผนงาน
+const soonEnd = wn.indexOf('<h2>', wn.indexOf('<h2>กำลังทำ</h2>') + 1);
+const wnMore = `${wn.slice(0, soonEnd)}<h3>หมวดทดสอบ</h3>\n  <ul>\n    <li>x</li>\n  </ul>\n\n  ${wn.slice(soonEnd)}`;
 const roadCtl = roadmapHtml(soonCats(wnMore)) !== roadNow && roadNoId(wn.replace(`<h3 id="${roadCats[0]?.id}">`, '<h3>')).length === 1;
 const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'แถวหมวดใน whatsnew ไม่ตรงหัวกำลังทำ (build ใหม่)', homeLeft.length && `หน้าแรกยังมี ${homeLeft.join(' ')}`, !coreAbout && 'about ไม่มีหัวระบบหลัก', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
 check('แถวหมวดใต้หัวกำลังทำใน whatsnew ตรงหมวดและลิงก์ถึงหัวหมวด · หน้าแรกไม่มีแผนงาน/ระบบหลัก · about มีระบบหลัก', roadBad.length || !roadCtl || !homeCtl, ` ${roadCats.length} หมวด${roadBad.length ? ` · ${roadBad.join(' | ')}` : ''} · ตัวควบคุม${roadCtl && homeCtl ? 'จับได้' : 'จับไม่ได้'}`);
@@ -499,7 +502,8 @@ check('คู่มือมีป้ายปุ่มจากค่ากล�
 // 9) เลขรุ่นในเกมลิงก์แพตช์โน้ต (B121): text fragment เลื่อนไปที่คำแรกที่ตรง ⇒ เลขรุ่นแต่ละตัวต้องโผล่ครั้งแรกที่หัวข้อของรุ่นนั้น
 // หน้าเล่นแยกไฟล์ (ui-redo 96): เลขรุ่น/โน้ต/โค้ดอยู่ใน play.js · ด่านที่อ่าน "ตัวเกม" อ่าน HTML + สคริปต์รวมกัน
 const play = `${read('play.html')}\n${read(PLAY_FILES.app)}`;
-const notes = read('whatsnew.html');
+// id ของหัวรุ่นไม่ใช่ข้อความบนจอ text fragment ไม่นับ
+const notes = read('whatsnew.html').replace(/<h3 id="v[\d.]+">/g, '<h3>');
 const vers = [...notes.matchAll(/<h3>(v\d+\.\d+\.\d+)/g)].map((m) => [m[1], m.index + 4]);
 const early = vers.filter(([v, at]) => notes.search(new RegExp(`${v.replace(/\./g, '\\.')}(?!\\d)`)) !== at).map(([v]) => v);
 check('เลขรุ่นในเกมเป็นลิงก์แพตช์โน้ต และหัวข้อแต่ละรุ่นเป็นจุดแรกที่เลขนั้นโผล่', !play.includes('whatsnew.html#:~:text=') || !play.includes('<a id="appVer"') || !vers.length || early.length, ` ${vers.length} รุ่น${early.length ? ` · โผล่ก่อนหัวข้อ: ${early.slice(0, 5).join(' ')}` : ''}`);
@@ -525,7 +529,7 @@ const notesLog = releaseLog(wnNow);
 const notesIn = (html, log) => html.includes(notesLines(log));
 const notesDirty = notesLog.flatMap((r) => r.items).filter((t) => /[<>]|&[#\w]+;/.test(t) || t.length > NOTE_CUT);
 const topV = notesLog[0]?.v;
-const wnEmptied = topV ? wnNow.replace(new RegExp(`(<h3>${topV.replace(/\./g, '\\.')} <small>[^<]*</small></h3>\\s*<ul>)[\\s\\S]*?(</ul>)`), '$1$2') : wnNow;
+const wnEmptied = topV ? wnNow.replace(new RegExp(`(<h3[^>]*>${topV.replace(/\./g, '\\.')} <small>[^<]*</small></h3>\\s*<ul>)[\\s\\S]*?(</ul>)`), '$1$2') : wnNow;
 const cutLog = releaseLog(wnEmptied);
 const notesCtl = !!topV && cutLog[0]?.v !== topV && !notesIn(play, cutLog);
 if (topV !== ver.version) console.log(`  ⚠ ${ver.version} ไม่มีข้อในแพตช์โน้ต — แผ่นแจ้งอัปเดตใช้ ${topV ?? '(ไม่มีรุ่นไหนมีโน้ต)'} (เตือน ไม่ตก)`);
@@ -837,6 +841,26 @@ const focusCtl = focusGap(focusPage.replaceAll(`<b>${escHtml(f0.name)}</b>`, '')
 const fGap = focusGap(focusPage);
 const fLeak = focusLeak(focusPage);
 check('หน้าโฟกัสครบทุกโฟกัสพร้อมป้ายเดียวกับเกม ไม่เผยผลเสี่ยงหรือตัวเลข และหน้าวิธีเล่นลิงก์ถึง', fGap.length || fLeak.length || needOff.length || noLink || !focusCtl, ` ขาด ${fGap.join(',')} · เผย ${fLeak.join(',')} · need ${needOff.join(',')} · ลิงก์ ${noLink} · ตัวควบคุม ${focusCtl}`);
+
+// 285) ป้ายเวอร์ชันบนหน้าการ์ด: การ์ดที่ปล่อยแล้วต้องมีเวอร์ชันในทะเบียน · เวอร์ชันนั้นต้องมีหัวใน whatsnew · หัวรุ่นทุกหัวมี id
+// การ์ดใหม่ที่ไม่อยู่ในฐาน keep = รอ rel.mjs เติมตอนปล่อย ไม่ตก · ต่างโลกไม่อยู่ในฐาน keep จึงเตือนอย่างเดียว
+// ตัวควบคุม: ลบ id หนึ่งจากทะเบียน · ถอด id หัวรุ่น ⇒ ต้องจับได้
+const sinceIds = await cardIds();
+const sinceMap = readSince();
+const sinceKeep = new Set(Object.values(JSON.parse(readFileSync(new URL('../harness/keep-ids.json', import.meta.url), 'utf8'))).flat());
+const sinceWn = read('whatsnew.html');
+const sinceProblems = (map, wnHtml) => {
+  const heads = new Set([...wnHtml.matchAll(/<h3 id="(v\d+\.\d+\.\d+)">\1 /g)].map((m) => m[1]));
+  return [...sinceIds.filter((id) => !map[id] && sinceKeep.has(id)).map((id) => `ไม่มีเวอร์ชัน ${id}`), ...[...new Set(sinceIds.map((id) => map[id]).filter(Boolean))].filter((v) => !heads.has(v)).map((v) => `ไม่มีหัว ${v}`), ...[...wnHtml.matchAll(/<h3>(v\d+\.\d+\.\d+)/g)].map((m) => `หัวไม่มี id ${m[1]}`)];
+};
+const sinceBad = sinceProblems(sinceMap, sinceWn);
+const sinceFirst = sinceIds.find((id) => sinceMap[id] && sinceKeep.has(id));
+const { [sinceFirst]: _dropped, ...sinceLess } = sinceMap;
+const sinceCtl = sinceProblems(sinceLess, sinceWn).length === sinceBad.length + 1 && sinceProblems(sinceMap, sinceWn.replace(`<h3 id="${sinceMap[sinceFirst]}">`, '<h3>')).length > sinceBad.length;
+const sinceShown = sinceIds.filter((id) => sinceMap[id] && !page.includes(`<a href="whatsnew.html#${sinceMap[id]}">เพิ่มใน ${sinceMap[id]}</a>`));
+const sinceWait = sinceIds.filter((id) => !sinceMap[id] && !sinceKeep.has(id));
+if (sinceWait.length) console.log(`  ⚠ การ์ดรอเวอร์ชันตอนปล่อย ${sinceWait.length} ใบ: ${sinceWait.slice(0, 8).join(' ')}`);
+check('ป้ายเวอร์ชันการ์ด: การ์ดที่ปล่อยแล้วมีเวอร์ชันและหัวใน whatsnew · หน้าการ์ดแสดงป้าย', sinceBad.length || sinceShown.length || !sinceCtl, ` การ์ด ${sinceIds.length} · ทะเบียน ${Object.keys(sinceMap).length} · ${sinceBad.slice(0, 5).join(' ')}${sinceShown.length ? ` ไม่ขึ้นป้าย ${sinceShown.slice(0, 5).join(' ')}` : ''} · ตัวควบคุมจับได้ ${sinceCtl}`);
 
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 process.exit(fail ? 1 : 0);

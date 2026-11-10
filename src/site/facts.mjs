@@ -27,7 +27,7 @@ export function noteCut(t) {
 export function releaseLog(html, keep = NOTE_KEEP) {
   const part = html.slice(Math.max(0, html.indexOf('<h2>แพตช์โน้ต</h2>')));
   const out = [];
-  for (const m of part.matchAll(/<h3>(v[\d.]+) <small>[^<]*<\/small><\/h3>\s*<ul>([\s\S]*?)<\/ul>/g)) {
+  for (const m of part.matchAll(/<h3(?: id="v[\d.]+")?>(v[\d.]+) <small>[^<]*<\/small><\/h3>\s*<ul>([\s\S]*?)<\/ul>/g)) {
     const items = [...m[2].matchAll(/<li>([\s\S]*?)<\/li>/g)].map(([, li]) => noteCut(plain(li))).filter(Boolean);
     if (items.length) out.push({ v: m[1], items });
     if (out.length >= keep) break;
