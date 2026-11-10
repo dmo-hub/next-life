@@ -34,6 +34,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 3
+    multipliers: {home_flags: {strict_home: 2, lenient_home: 0.5}}
     when: {age: [7, 12], school: [primary, lower], family: [{role: parent, alive: true}]}
     title: "คอร์สกวดวิชาสุดสัปดาห์"
     text: "เพื่อนร่วมห้องทุกคนเรียนพิเศษ เสาร์อาทิตย์หายไปหมด ครูประจำชั้นบอกพ่อแม่ว่า '{ชื่อ}หัวไว แต่ขี้เกียจ'"
@@ -161,7 +162,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 2
-    multipliers: {parent_flags: {heavy_drinker: 2, guarantor: 1.5}}
+    multipliers: {parent_flags: {heavy_drinker: 2, guarantor: 1.5}, home_flags: {home_in_debt: 2, warm_home: 0.5}}
     when: {age: [6, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "เสียงจานแตกกลางดึก"
     text: "พ่อแม่ทะเลาะเรื่องเงินทุกคืน คุณนอนกอดหมอนฟังอยู่หลังประตู เช้ามาทั้งคู่ยิ้มให้เหมือนไม่มีอะไรเกิดขึ้น"
@@ -190,6 +191,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     weight: 1
+    multipliers: {home_flags: {busy_parents: 2}}
     when: {age: [5, 10], family: [{role: parent, alive: true}]}
     title: "หน้าร้อนที่บ้านยาย"
     text: "หน้าร้อนนี้พ่อแม่ทำงานไม่มีวันหยุด ยายที่{ภาค}โทรมาบอกว่าคิดถึงหลาน มีเป็ดเกิดใหม่สิบตัวรออยู่"
@@ -300,4 +302,35 @@ events:
       - id: sit_and_cry
         text: "นั่งร้องไห้ตรงนั้น"
         effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ธงบ้านเกิด strict_home (ใบ 105 · การ์ดนำร่อง) — ออกเฉพาะเด็กที่เกิดมาในบ้านเข้มงวด · ตัวเลือกไม่ตั้งธง ไม่บอกตัวเลข
+  - id: kid_strict_rules_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 6
+    when: {age: [7, 12], home_flags: {has: [strict_home]}, family: [{role: parent, alive: true}]}
+    title: "ตารางที่ติดข้างตู้เย็น"
+    text: "ที่บ้านมีตารางติดตู้เย็น ตื่นกี่โมง ทำการบ้านกี่โมง เล่นได้ถึงกี่โมง เพื่อนชวนไปเตะบอลหลังเลิกเรียน แต่ในตารางไม่มีช่องว่างให้"
+    choices:
+      - text: "ทำตามตารางทุกข้อ ไม่ให้ใครต้องดุ"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - text: "แอบไปเตะบอลแล้วรีบกลับมาก่อนเวลา"
+        nature: bold
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "กลับถึงบ้านก่อนพ่อแม่ได้พอดี ตารางไม่มีใครรู้ว่าขาดไปชั่วโมงหนึ่ง", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กลับช้าไปสิบนาที โดนเรียกคุยหน้าบ้านต่อหน้าเพื่อนบ้าน", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+      - text: "ขอต่อรอง ทำการบ้านเสร็จขอไปเล่น"
+        nature: social
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 2}}, text: "พ่อแม่เงียบไปครู่หนึ่ง แล้วเพิ่มช่องเล่นวันเสาร์ลงในตาราง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ได้คำตอบว่ากฎคือกฎ แต่พ่อแม่ก็ฟังจนจบ", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - text: "เอาเวลาในตารางไปอ่านเรื่องที่ชอบ"
+        nature: learn
+        effects: {knowledge: 2, happiness: 1}
         merit: [{cat: neutral}]

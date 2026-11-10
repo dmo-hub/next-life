@@ -173,6 +173,20 @@ export function monthlyIncome(st, year = st.birthYear + st.age) {
 
 // heir = รุ่นถัดไปจากระหว่างชาติ (afterlife.mjs): จุดเกิด/ฐานะ/ค่าเริ่ม/บัญชีที่ส่งต่อ ทับค่าที่สุ่ม
 // ยังดึงเลขสุ่มของโลกครบชุดเดิมก่อนทับ — ตำแหน่ง stream ของรุ่นถัดไปเหมือนชีวิตแรกทุกประการ
+// ธงบ้านเกิด (ใบ 105): สุ่มเฉพาะเกิดใหม่ (ไม่มี heir) จาก stream แยก — ไม่กินเลขสุ่มของโลก · ทอยครบทุกธงเสมอ ลำดับเลขจึงไม่ขึ้นกับผลทอยก่อนหน้า
+// ธงที่มี class_max ไม่ทอย อ่านจากฐานะที่สุ่มไว้แล้ว · ทายาทได้ธงจากชีวิตรุ่นก่อนผ่าน heir.homeFlags (afterlife.mjs) ไม่สุ่มซ้ำ
+export function rollHomeFlags(content, seed, clsIdx) {
+  const rng = makeRng(seed ^ 0xbb67ae85);
+  const out = {};
+  for (const [f, h] of Object.entries(content.home ?? {})) {
+    if (h.p === undefined) continue;
+    const hit = rng.next() < h.p;
+    if (hit && !(h.not_with ?? []).some((o) => out[o])) out[f] = 1;
+  }
+  for (const [f, h] of Object.entries(content.home ?? {})) if (h.class_max !== undefined && clsIdx <= h.class_max) out[f] = 1;
+  return out;
+}
+
 export function newLife(seed, content, heir = null) {
   const era = content.era;
   const rng = makeRng(seed);
@@ -271,6 +285,8 @@ export function newLife(seed, content, heir = null) {
     flags: {},
     // ธงของรุ่นก่อนที่ทายาทได้รู้ {ธง: ชั้น} — แยกจาก flags เพราะ flags คือสิ่งที่ตัวเองเคยทำ (ฉายา/ความเสี่ยงตายอ่านอยู่)
     parentFlags: heir?.parentFlags ?? {},
+    // ธงบ้านเกิด {ธง: 1} — เล่าที่การ์ดเกิด · การ์ดเด็กอ่านด้วย when.home_flags · เซฟเก่าไม่มีช่อง = ไม่มีธง (อ่านแบบ ?.)
+    homeFlags: heir ? (heir.homeFlags ?? {}) : rollHomeFlags(content, seed, CLASSES.indexOf(cls)),
     // สกิลที่พกมาจากคลัง [{ id, lv }] (06s) ใช้ทั้งชีวิตนี้และชาติต่างโลกที่ตามมา · ไม่พก = ไม่มีช่อง (state เท่าก่อนมีสกิลข้ามชาติ)
     ...(heir?.skills?.length && { skills: heir.skills }),
     // ค่าที่ได้จากช่องพกที่ไม่ใช้ (ใบ 201) — การ์ดเกิดบอกเป็นคำ · เซฟเก่าไม่มี = ไม่มีบรรทัด
@@ -1330,6 +1346,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     // สายเรื่องรายคน: ตอนที่เท่าไร ห่างตอนก่อนกี่ปี — ป้ายบนการ์ด · harness นับระยะจากช่องนี้
     ...(ev.arc && { arc: { key: ev.arc, n: st.arcs[ev.arc].n, ...(st.arcs[ev.arc].gap && { gap: st.arcs[ev.arc].gap }) } }),
     ...parentFrom(st, ev),
+    ...homeFrom(st, ev),
     funeral: ev.id === FUNERAL.wishes || ev.id === FUNERAL.rite,
     age: st.age,
     stage: stageOf(st.age),
@@ -1863,6 +1880,7 @@ export function poolMultiplier(st, m) {
   if (m.overlap_stage !== undefined) x *= m.overlap_stage ** overlapStageOf(st);
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
   for (const [f, v] of Object.entries(m.parent_flags ?? {})) if (st.parentFlags?.[f]) x *= v;
+  for (const [f, v] of Object.entries(m.home_flags ?? {})) if (st.homeFlags?.[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
   if (m.rank) x *= m.rank ** rankLevel(st);
   // ตัวคูณเงิน {min, max, v}: อัตราส่วนอยู่ในช่วง = คูณ v · คำนวณเฉพาะการ์ดที่ใช้ เพราะกองสุ่มเรียกทุกใบทุกปี
@@ -1883,6 +1901,13 @@ const inBound = (v, b) => !b || ((b.min === undefined || v >= b.min) && (b.max =
 const flagsOk = (st, f) => (f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]);
 // เซฟก่อนมีช่องนี้ไม่มี parentFlags — อ่านแบบ ?. ให้เท่ากับไม่มีธงพ่อแม่
 const parentFlagsOk = (st, f) => (f.has ?? []).every((k) => st.parentFlags?.[k]) && !(f.not ?? []).some((k) => st.parentFlags?.[k]);
+// ธงบ้านเกิด (ใบ 105) — เซฟก่อนมีช่องนี้ไม่มี homeFlags อ่านแบบ ?. ให้เท่ากับไม่มีธง
+const homeFlagsOk = (st, f) => (f.has ?? []).every((k) => st.homeFlags?.[k]) && !(f.not ?? []).some((k) => st.homeFlags?.[k]);
+// ป้ายบนการ์ด: ธงบ้านเกิดที่ทำให้ใบนี้ออก (when.home_flags.has เท่านั้น เหมือนป้ายธงพ่อแม่)
+const homeFrom = (st, ev) => {
+  const x = (ev.when?.home_flags?.has ?? []).filter((f) => st.homeFlags?.[f]);
+  return x.length ? { homeFrom: x } : {};
+};
 // ป้ายบนการ์ด: ธงพ่อแม่ที่ทำให้ใบนี้ออก (when.parent_flags.has เท่านั้น — ตัวคูณแค่เอียงโอกาส ไม่ได้เล่า)
 const parentFrom = (st, ev) => {
   const x = (ev.when?.parent_flags?.has ?? []).filter((f) => st.parentFlags?.[f]).map((f) => ({ flag: f, tier: st.parentFlags[f] }));
@@ -1913,6 +1938,7 @@ export function whenOk(st, when) {
     if (MONEY_KEYS.some((k) => when[k] && !inBound(r[k], when[k]))) return false;
   }
   if (when.parent_flags && !parentFlagsOk(st, when.parent_flags)) return false;
+  if (when.home_flags && !homeFlagsOk(st, when.home_flags)) return false;
   if (when.dark_gate && !darkGateOk(st)) return false;
   if (when.past_life && !pastLifeOk(st, when.past_life)) return false;
   return !when.flags || flagsOk(st, when.flags);

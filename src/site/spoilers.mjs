@@ -20,7 +20,8 @@ const FILIAL_TH = { self: 'ดูแลเอง', share: 'แบ่งเวร
 // ชื่อธงอ่านจากทะเบียนธงชุดเดียวกับด่าน lint · ธงมีพารามิเตอร์ (vow_open:xxx) ใช้คำอธิบายของชื่อหน้า
 export function flagNames(root = new URL('../../', import.meta.url)) {
   const doc = parse(readFileSync(new URL('content/rules/flags.yaml', root), 'utf8'));
-  return { ...doc.flags, ...Object.fromEntries(Object.entries(doc.prefixes ?? {}).map(([k, v]) => [`${k}:`, v])) };
+  // ธงบ้านเกิด (ใบ 105) ใช้ข้อความ tell บนการ์ดเกิดเป็นชื่อที่หน้าเฉลยแสดง
+  return { ...doc.flags, ...Object.fromEntries(Object.entries(doc.home ?? {}).map(([k, v]) => [k, v.tell])), ...Object.fromEntries(Object.entries(doc.prefixes ?? {}).map(([k, v]) => [`${k}:`, v])) };
 }
 
 // ชื่อกลุ่มสาเหตุตายของ when.past_life.cause — อ่านไฟล์ข้อมูลเดียวกับที่ lint ตรวจ id
@@ -127,6 +128,7 @@ function mults(m, L) {
   const out = [];
   for (const [f, v] of Object.entries(m.flags ?? {})) out.push(`×${v} ถ้า${L.flag(f)}`);
   for (const [f, v] of Object.entries(m.parent_flags ?? {})) out.push(`×${v} ถ้ารุ่นก่อน${L.flag(f)}`);
+  for (const [f, v] of Object.entries(m.home_flags ?? {})) out.push(`×${v} ถ้าบ้านเกิดมี ${L.flag(f)}`);
   for (const [k, v] of Object.entries(m.stats ?? {})) out.push(`×${v} เมื่อ${STAT_LABELS[k]}สูง (÷${v} เมื่อต่ำ)`);
   for (const [o, v] of Object.entries(m.occupation ?? {})) out.push(`×${v} ถ้าทำงาน${esc(L.occ(o))}`);
   for (const [c, v] of Object.entries(m.class ?? {})) out.push(`×${v} ถ้าฐานะ${esc(c)}`);
@@ -196,6 +198,8 @@ function conditions(e, L) {
   out.push(...flagCond(w.flags, L));
   // ธงของพ่อแม่รุ่นก่อน ไม่ใช่ของตัวละคร — การ์ดจึงออกเฉพาะชีวิตที่เกิดเป็นลูกของรุ่นก่อน
   out.push(...flagCond(w.parent_flags, L, 'เกิดเป็นลูกของรุ่นก่อนที่'));
+  // ธงบ้านเกิดสุ่มตอนเกิดใหม่ (ทายาทหนี้สืบจากรุ่นก่อน) — การ์ดออกเฉพาะชีวิตที่บ้านเป็นแบบนั้น
+  out.push(...flagCond(w.home_flags, L, 'บ้านเกิด'));
   out.push(...pastCond(w.past_life, L));
   if (e.realm) out.push(`ไป${any(e.realm.map((r) => REALMS.find((x) => x.id === r)?.name ?? r))}`);
   if (e.repeat) out.push(`ออกซ้ำได้ ${e.repeat.max} ครั้ง เว้น ${e.repeat.gap} ปี`);

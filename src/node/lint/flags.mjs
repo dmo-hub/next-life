@@ -33,6 +33,14 @@ export function parentRefs(e) {
   for (const [m, at] of parentMults(e)) if (isObj(m) && isObj(m.parent_flags)) for (const f of Object.keys(m.parent_flags)) out.push({ f, k: 'mult', path: `${at}.parent_flags.${f}` });
   return out;
 }
+// ผู้อ่านธงบ้านเกิด (ใบ 105): when.home_flags.has/not · multipliers.home_flags ของใบและของผลสุ่ม — รูปเดียวกับธงพ่อแม่ ทะเบียนคือหมวด home:
+export function homeRefs(e) {
+  const out = [];
+  const w = isObj(e.when) && isObj(e.when.home_flags) ? e.when.home_flags : {};
+  for (const k of ['has', 'not']) list(w[k]).forEach((f, i) => out.push({ f, k, path: `.when.home_flags.${k}[${i}]` }));
+  for (const [m, at] of parentMults(e)) if (isObj(m) && isObj(m.home_flags)) for (const f of Object.keys(m.home_flags)) out.push({ f, k: 'mult', path: `${at}.home_flags.${f}` });
+  return out;
+}
 // ธงพ่อแม่ไม่มีพารามิเตอร์ — ทะเบียน heir: มีแต่ชื่อเต็ม
 const parentFlagName = (f) => typeof f === 'string' && FLAG_RE.test(f) && !f.includes(':');
 const positive = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
@@ -184,6 +192,21 @@ export const rules = [
       for (const { f, path } of refs) if (!parentFlagName(f)) r(path, `ธง "${f}" ผิดรูป (ธงพ่อแม่ไม่มีพารามิเตอร์)`);
       for (const [m, at] of parentMults(e)) if (isObj(m) && m.parent_flags !== undefined && (!isObj(m.parent_flags) || Object.values(m.parent_flags).some((v) => !positive(v)))) r(`${at}.parent_flags`, 'ต้องเป็น {ชื่อธง: เลขบวก}');
       if (e.stage === AFTERLIFE_STAGE && refs.length) r('.when.parent_flags', 'ฉากระหว่างชาติใช้ parent_flags ไม่ได้');
+    },
+  },
+  {
+    id: 'home-flag',
+    desc: 'ธงที่ when.home_flags / multipliers.home_flags อ้าง ต้องอยู่ในหมวด home: ของ content/rules/flags.yaml · when.home_flags = {has: [...], not: [...]} ไม่ซ้ำระหว่าง has กับ not · multipliers.home_flags = {ชื่อธง: เลขบวก} · ใช้ไม่ได้ในฉากระหว่างชาติ',
+    event(e, ctx, r) {
+      if (isObj(e.when) && e.when.home_flags !== undefined) {
+        const w = e.when.home_flags;
+        if (!isObj(w) || ['has', 'not'].some((k) => w[k] !== undefined && !Array.isArray(w[k])) || (w.has === undefined && w.not === undefined)) r('.when.home_flags', 'home_flags ต้องเป็น {has: [...], not: [...]} อย่างน้อยหนึ่งฝั่ง และเป็นรายการ');
+        else for (const f of list(w.has)) if (list(w.not).includes(f)) r('.when.home_flags', `ธง "${f}" อยู่ทั้ง has และ not — การ์ดไม่มีวันออก`);
+      }
+      const refs = homeRefs(e);
+      for (const { f, path } of refs) if (!ctx.flags.home.has(f)) r(path, `ธง "${f}" ไม่อยู่ในหมวด home: ของทะเบียน`);
+      for (const [m, at] of parentMults(e)) if (isObj(m) && m.home_flags !== undefined && (!isObj(m.home_flags) || Object.values(m.home_flags).some((v) => !positive(v)))) r(`${at}.home_flags`, 'ต้องเป็น {ชื่อธง: เลขบวก}');
+      if (e.stage === AFTERLIFE_STAGE && refs.length) r('.when.home_flags', 'ฉากระหว่างชาติใช้ home_flags ไม่ได้');
     },
   },
   {
