@@ -388,7 +388,7 @@ export function loadCareers(fin) {
     for (const o of l.occs ?? []) if (!occIds.has(o)) throw new Error(`สาย ${id} อ้างอาชีพที่ไม่มี: ${o}`);
     return [id, { name: l.name, occs: l.occs, start: l.start, pension: !!l.pension, steps: l.steps.map(step) }];
   }));
-  return { ladders, office: { steps: c.office.steps.map(step) }, pension: { div: c.pension.div, cap: c.pension.cap }, severance: c.severance.rows };
+  return { ladders, office: { name: c.office.name, steps: c.office.steps.map(step) }, pension: { div: c.pension.div, cap: c.pension.cap }, severance: c.severance.rows };
 }
 
 // หมวด heir: ของทะเบียนธง = ชุดธงที่แกนส่งถึงทายาท — แกนต้องรู้ตอนเล่น ไม่ใช่แค่ lint
