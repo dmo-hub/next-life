@@ -506,10 +506,30 @@ export function checkCadetEraCards(cadet, events) {
   if (bad.length) throw new Error(`content/rules/cadet.yaml era_cards ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
 }
 
+// heir-unguarded ฝั่งข้อมูลแกน (S3 · g-b7 สั่งก่อน B4 2026-11-10): rules/cadet.yaml ไม่ผ่าน lint การ์ด จึงตรวจตอนโหลด — build ล้มถ้าไม่กั้น
+// ข้อความที่ใช้ {ทายาท:…} {ผู้ใหญ่ทายาท} {ทางแม่} ต้องอยู่ใต้ object ที่กั้นด้วยทายาท: cond.heir · when.heir · showIf/show_if.heir (ชั้นตัวเองหรือชั้นบน)
+// fill คืนว่างเมื่อไม่ใช่ทายาทอยู่แล้ว (กันชั้นที่สอง) — ด่านนี้กันไม่ให้ประโยคครึ่ง ๆ โผล่
+const HEIR_TEXT = /\{ทายาท:|\{ผู้ใหญ่ทายาท\}|\{ทางแม่\}/;
+const heirGuard = (o) => ['cond', 'when', 'showIf', 'show_if'].some((k) => o?.[k] && typeof o[k] === 'object' && o[k].heir);
+export function checkCadetHeirText(cadet) {
+  const bad = [];
+  (function walk(o, path, guarded) {
+    if (Array.isArray(o)) return o.forEach((x, i) => walk(x, `${path}[${i}]`, guarded));
+    if (!o || typeof o !== 'object') return;
+    const g = guarded || heirGuard(o);
+    for (const [k, v] of Object.entries(o)) {
+      if (typeof v === 'string' && HEIR_TEXT.test(v) && !g) bad.push(`${path}.${k}: ใช้ตัวแทนฝั่งทายาทแต่ไม่กั้นด้วย heir`);
+      else if (v && typeof v === 'object') walk(v, `${path}.${k}`, g);
+    }
+  })(cadet, 'cadet', false);
+  if (bad.length) throw new Error(`content/rules/cadet.yaml heir-unguarded ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+}
+
 export function loadContent() {
   const events = loadEvents();
   const focus = loadFocus();
   const cadet = loadCadet();
   checkCadetEraCards(cadet, events);
+  checkCadetHeirText(cadet);
   return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet };
 }

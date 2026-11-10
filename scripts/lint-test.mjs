@@ -57,6 +57,17 @@ for (const b of ctx.banned) {
 const table = checkMeritTable(MERIT_CATS);
 rows.push(['merit-table', table.length ? `ตก ${table.length} ข้อ` : 'ผ่าน']);
 for (const t of table) fails.push(`merit-table: ${t}`);
+// ---- heir-unguarded ฝั่ง rules/cadet.yaml (ก่อน B4): ไม่กั้น = ล้ม · กั้นที่ชั้นการ์ด/บรรทัด = ผ่าน ----
+{
+  const { checkCadetHeirText } = await import('../src/node/load.mjs');
+  const throws = (c) => { try { checkCadetHeirText(c); return false; } catch { return true; } };
+  const okCases = [{ board: [{ cond: { heir: 'army' }, text: '{ผู้ใหญ่ทายาท}ยิ้ม' }] }, { board: [{ contextLines: [{ when: { heir: 'police' }, line: 'เป็น{ทางแม่}' }] }] }];
+  const badCases = [{ board: [{ text: '{ทายาท:พ่อ|แม่|พ่อที่เสีย}' }] }, { board: [{ contextLines: [{ when: { flagsHas: ['x'] }, line: '{ผู้ใหญ่ทายาท}' }] }] }];
+  const ok = okCases.every((c) => !throws(c)) && badCases.every(throws);
+  if (!ok) fails.push('heir-unguarded rules/cadet.yaml: ตัวตรวจไม่ล้ม/ล้มผิดกรณี');
+  rows.push(['heir-unguarded rules/cadet.yaml', ok ? 'ผ่าน 4 กรณี' : 'ผิด']);
+}
+
 // ---- B1 เส้นเตรียมทหาร (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-09): ตัวแทนมีเงื่อนไข · show_if/hide_if · requires.reasons ----
 {
   const { placeholdersIn: phIn, fillLongest: longest } = await import('../src/node/lint/util.mjs');
