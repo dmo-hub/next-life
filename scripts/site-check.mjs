@@ -462,7 +462,9 @@ const coreAbout = read('about.html').includes('<h2 id="core">ระบบหล�
 const roadNoId = (w) => soonCats(w).filter((c) => !w.includes(`id="${c.id}"`)).map((c) => c.name);
 const relSrc = readFileSync(new URL('../scripts/rel.mjs', import.meta.url), 'utf8');
 const relSees = /\/<h3\[\\s>\]\//.test(relSrc);
-const wnMore = wn.replace('<h2>แพตช์โน้ต</h2>', '<h3>หมวดทดสอบ</h3>\n  <ul>\n    <li>x</li>\n  </ul>\n\n  <h2>แพตช์โน้ต</h2>');
+// แทรกหน้า <h2> ที่ปิดหัวกำลังทำ — หัววางแผนไว้คั่นก่อนแพตช์โน้ต หมวดของมันไม่ใช่แผนงาน
+const soonEnd = wn.indexOf('<h2>', wn.indexOf('<h2>กำลังทำ</h2>') + 1);
+const wnMore = `${wn.slice(0, soonEnd)}<h3>หมวดทดสอบ</h3>\n  <ul>\n    <li>x</li>\n  </ul>\n\n  ${wn.slice(soonEnd)}`;
 const roadCtl = roadmapHtml(soonCats(wnMore)) !== roadNow && roadNoId(wn.replace(`<h3 id="${roadCats[0]?.id}">`, '<h3>')).length === 1;
 const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'แถวหมวดใน whatsnew ไม่ตรงหัวกำลังทำ (build ใหม่)', homeLeft.length && `หน้าแรกยังมี ${homeLeft.join(' ')}`, !coreAbout && 'about ไม่มีหัวระบบหลัก', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
 check('แถวหมวดใต้หัวกำลังทำใน whatsnew ตรงหมวดและลิงก์ถึงหัวหมวด · หน้าแรกไม่มีแผนงาน/ระบบหลัก · about มีระบบหลัก', roadBad.length || !roadCtl || !homeCtl, ` ${roadCats.length} หมวด${roadBad.length ? ` · ${roadBad.join(' | ')}` : ''} · ตัวควบคุม${roadCtl && homeCtl ? 'จับได้' : 'จับไม่ได้'}`);
