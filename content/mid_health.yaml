@@ -6,7 +6,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 2
-    multipliers: {flags: {sporty: 0.5, heavy_drinker: 1.5}, occupation: {clerk: 1.3, manager: 1.3, professional: 1.2}}
+    multipliers: {flags: {sporty: 0.5, heavy_drinker: 1.5}, occupation: {clerk: 1.3, manager: 1.3, professional: 1.2, senior_officer: 1.3, officer: 1.2}}
     title: "น้ำตาลเกินร้อย"
     text: "ตรวจสุขภาพประจำปีตอนอายุ {อายุ} พยาบาลเจาะเลือดซ้ำสองรอบเพราะไม่เชื่อตัวเลข หมอยื่นผลให้แล้วถามว่า ชานมวันละกี่แก้ว"
     choices:
@@ -38,7 +38,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 2
-    multipliers: {flags: {smoker: 1.5, heavy_drinker: 1.5, sporty: 0.6}, occupation: {manager: 1.5, clerk: 1.2, professional: 1.2, farmer: 0.5}}
+    multipliers: {flags: {smoker: 1.5, heavy_drinker: 1.5, sporty: 0.6}, occupation: {manager: 1.5, clerk: 1.2, professional: 1.2, farmer: 0.5, senior_officer: 1.5, officer: 1.2}}
     title: "ตัวเลขที่ร้านขายยา"
     text: "ปวดท้ายทอยมาสามวัน แวะวัดความดันที่ร้านขายยา เภสัชกรมองจอแล้วขอวัดใหม่ทันที รอบสองตัวเลขยิ่งสูงกว่าเดิม"
     choices:
@@ -118,7 +118,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 2
-    multipliers: {flags: {smoker: 3, heavy_drinker: 1.5, sporty: 0.5}, occupation: {manager: 1.4, labor: 1.2}}
+    multipliers: {flags: {smoker: 3, heavy_drinker: 1.5, sporty: 0.5}, occupation: {manager: 1.4, labor: 1.2, senior_officer: 1.4, officer: 1.4}}
     title: "ช้างนั่งบนหน้าอก"
     text: "เดินขึ้นสะพานลอยได้ครึ่งทาง หน้าอกแน่นเหมือนมีช้างนั่งทับ เหงื่อแตกทั้งที่ลมเย็น แม่ค้าข้างทางรีบเลื่อนเก้าอี้มาให้นั่ง"
     choices:
