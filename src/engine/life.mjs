@@ -143,11 +143,14 @@ export const isWorking = (st, age = st.age) => st.workFrom !== null && age >= st
 // ช่วงเรียนที่การ์ดเห็น: ก่อนวัยเข้าเรียนยังไม่มีช่วงเรียน (ค่าเริ่ม primary รออยู่) · เลิกเรียนแล้ว = none
 export const schoolOf = (st, age = st.age) => (st.school && age >= SCHOOL_FROM ? st.school : 'none');
 
+// คำนำหน้าของนักเรียนเตรียมทหาร: "นรม." ตั้งแต่วันรายงานตัว แล้วเป็น "นตท." เมื่อได้ชุดปกติ (เจ้าของเคาะ 2026-11-11)
+const CADET_TITLES = ['นรม.', 'นตท.'];
 // ป้ายสถานะงานบนจอ: ก่อนมีงานไม่โชว์อาชีพ (อาชีพตอนเกิดเป็นของครอบครัว ใช้คิดเงินติดตัวเท่านั้น)
 export function jobText(st, age = st.age) {
   if (st.workFrom === null) {
     // นตท. (สอบติดเตรียมทหาร) ใช้ track โรงเรียนนายร้อยชั่วคราว — ป้ายบนจอต้องเป็นนักเรียนเตรียมทหาร (เจ้าของเคาะ A 2026-11-06)
-    if (st.title === 'นตท.') return 'นักเรียนเตรียมทหาร';
+    // ช่วงแรกเป็น "นรม." (นักเรียนใหม่) ได้ชุดปกติแล้วเป็น "นตท." ทั้งสองแบบคือนักเรียนเตรียมทหาร (เจ้าของเคาะ 2026-11-11)
+    if (CADET_TITLES.includes(st.title)) return 'นักเรียนเตรียมทหาร';
     if (st.school && age >= SCHOOL_FROM) return `กำลังเรียน${TRACKS[st.school].name}`;
     return age < SCHOOL_FROM ? 'ยังไม่เข้าเรียน' : 'ยังไม่ทำงาน';
   }
@@ -908,7 +911,8 @@ function trackExit(st, track, year, out = st.due) {
   else {
     st.school = null;
     // จบโรงเรียนนายร้อยเข้าบันไดยศ: เลิกเป็น นตท. (G2 เจ้าของเคาะ 2026-11-06) · เฟส 3 ค่อยใส่ยศจริง
-    if (track.ladder && st.title === 'นตท.') delete st.title;
+    // ติดยศแล้วเอาคำนำหน้านักเรียนออก ทั้ง "นรม." และ "นตท." (เจ้าของเคาะ 2026-11-11)
+    if (track.ladder && CADET_TITLES.includes(st.title)) delete st.title;
     if (track.ladder) applyEffects(st, { ladder: track.ladder });
     else dueJob(st);
   }
