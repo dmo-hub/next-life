@@ -59,10 +59,10 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
 .nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
 .nl-tabs a[aria-current]{border-bottom-color:var(--accent2);font-weight:600}
 .nl-tabs.nl-sub{background:var(--bg);font-size:14px}
-</style><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="../index.html">NEXT LIFE</a><div class="links"><a href="../guide.html">วิธีเล่น</a><a href="../whatsnew.html">แพตช์โน้ต</a><a href="../about.html">กลไกในเกม</a><a href="../worlds.html">โลก</a><a href="../catalog.html">การ์ดทั้งหมด</a><a href="../dev/index.html" aria-current="page">ห้องผู้พัฒนา</a></div><a class="play" href="../play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html" aria-current="page">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html">คำตัดสินเกม</a><a href="../dev/ui.html">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a><a href="../dev/archive/index.html">คลังเก่า</a></div></div></div><!--/nav-->
+</style><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="../index.html">NEXT LIFE</a><div class="links"><a href="../guide.html">วิธีเล่น</a><a href="../whatsnew.html">แพตช์โน้ต</a><a href="../about.html">กลไกในเกม</a><a href="../worlds.html">โลก</a><a href="../catalog.html">การ์ดทั้งหมด</a><a href="../dev/index.html" aria-current="page">ห้องผู้พัฒนา</a></div><a class="play" href="../play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html" aria-current="page">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html">คำตัดสินเกม</a><a href="../dev/ui.html">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a></div></div></div><!--/nav-->
 <header><div class="w">
   <h1>ห้องผู้พัฒนา</h1>
-  <p>เครื่องมือ แผนที่ แผนงาน และต้นแบบ สำหรับคนที่ร่วมทำเกม · ผู้เล่นไม่ต้องอ่านก็เล่นได้</p>
+  <p>เครื่องมือ แผนที่ และแผนงาน สำหรับคนที่ร่วมทำเกม · ผู้เล่นไม่ต้องอ่านก็เล่นได้</p>
 </div></header>
 <main><div class="w grid">
   <section class="box"><h2>ร่วมพัฒนา</h2><ul>
@@ -74,36 +74,18 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
     <li><a href="https://github.com/dmo-hub/next-life">เอกสารออกแบบเกม (GDD.md)</a><small>ไฟล์ GDD.md ในรากของ repo · ภาพรวม แก่น วงจร ลูป เทคนิค ขอบเขต · กติกาแต่ละระบบย้ายไปหน้ากลไกในเกม/ปรโลก/ต่างโลก</small></li>
     <li><a href="spec.html">ภาคผนวกสเปกและรีเสิร์ช</a><small>เอกสาร docs/spec ทุกไฟล์ในหน้าเดียว</small></li>
     <li><a href="design.html">คำตัดสินเกม</a><small>แผนที่และคำตัดสินของเจ้าของแยกตามเรื่อง</small></li>
-    <li><a href="ui.html">การออกแบบ</a><small>ดีไซน์ UI: สี ตัวอักษร ชิ้นส่วนหน้าเล่น คำตัดสิน UI และหน้า tweak</small></li>
+    <li><a href="ui.html">การออกแบบ</a><small>ดีไซน์ UI: สี ตัวอักษร ชิ้นส่วนหน้าเล่น และคำตัดสิน UI</small></li>
     <li><a href="../whatsnew.html">ระบบที่กำลังทำ</a><small>หัว "กำลังทำ" ในแพตช์โน้ต แบ่งตามหมวด</small></li>
   </ul></section>
   <section class="box"><h2>สเปกและแผน</h2><ul>
-    <li><a href="plan.html">แผนเฟส + แกนต่อเนื่อง</a><small>ลำดับเฟสและด่านของแต่ละเฟส</small></li>
+    <li><a href="plan.html">แผนตอนนี้ + แผนเฟสเดิม</a><small>แผนออกแบบที่กำลังเดินแยกตามเรื่อง · ตารางเฟสเดิมเก็บเป็นประวัติ</small></li>
     <li><a href="../spec/lore-finance-series.html">ข้อมูลการเงินในเกม</a><small>ชุดตัวเลขหุ้น ทอง ดอกเบี้ย บ้าน พร้อมที่มา</small></li>
   </ul></section>
   <section class="box"><h2>แผนที่</h2><ul>
     <li><a href="maps/index.html#continent">ทวีป</a> · <a href="maps/index.html#afterlife">ปรโลก</a> · <a href="maps/index.html#dungeon">ดันเจียน</a></li>
     <li><a href="maps/index.html#lineage">ตระกูล</a> · <a href="maps/index.html#milestones">หลักไมล์</a> · <a href="maps/index.html#politics">การเมือง</a><small>หน้าเดียวสลับ 6 ผัง · วาดด้วย canvas ล้วน</small></li>
   </ul></section>
-  <section class="box"><h2>ต้นแบบหน้าเล่นใหม่</h2><ul>
-    <li><a href="ui.html#ui-live">ปรับหน้าเล่นสด</a><span class="st pick">เลือกแล้ว รอลงเกม</span><small>จอต้นแบบกดได้ ปรับเลย์เอาต์/ชิ้นย่อยสด · เริ่มจาก A/B/C · ตารางเทียบ 3 สไตล์ · คัดลอกคำตอบ</small></li>
-    <li><a href="ui.html#ui-t-t1-tokens">T1 ชุดสี + ฟอนต์กลาง</a><span class="st pick">ชาติไทยลงเกมแล้ว (ใบ 105) · โลกอื่นคงสีเดิมรอใบ 120/121</span><small>ชุด 0 ปัจจุบัน · คราม (ink = accent) · ชาดเดิม · hex ทุก token · ฟอนต์หัว/เนื้อ · ขั้นอักษร · มุม · เงา · contrast ทุกคู่สี + วัดในจอ · 390 + 1280 · ใช้ CSS เกมจริง · คัดลอก JSON</small></li>
-    <li><a href="ui.html#ui-t-t1-worlds">T1 ช่วงคั่น: สีโลกอื่นก่อน T11</a><span class="st pick">เลือกแล้ว ชุด ก ไม่แตะสีโลกอื่นจนใบ 121 (ข้อ 228)</span><small>ใบ 105 ลงชุดสี T1 แล้วทำอะไรกับการ์ด B · ต่างโลก · ปรโลก · ภาพแชร์ · ชุด 0 เกมตอนนี้ + ก ข ค · ปรับ hex · contrast สดทุกคู่รวม token ไทยบนการ์ดต่างโลก · 390 + 1280 · ใช้ CSS เกมจริง · คัดลอก JSON</small></li>
-    <li><a href="ui.html#ui-t-menu">T4 เมนูล่าง/ราวซ้าย</a><span class="st wait">รอเจ้าของเลือก</span></li>
-    <li><a href="ui.html#ui-t-tree-screen">จอต้นไม้โฟกัส 8 แบบ</a><span class="st wait">รอเจ้าของเลือก</span><small>focus-tree ใบ 02 · กิ่งแนวตั้ง / วงรัศมี / ตารางชั้นวัย / กลุ่มดาว / รังผึ้ง / แผนที่ชีวิต / ต้นไม้จริง / ใยวงกลม · 5 แขนง · ทุกแบบสลับทีละแขนง ↔ ต้นเต็ม · โหนดตัวอย่าง 25 ตัว</small></li>
-    <li><a href="ui.html#ui-t-me-panel">แผงตัวฉัน: เงิน · พับคำอธิบาย · ประวัติงาน</a><span class="st pick">เลือกแล้ว รอลงใบ 131 · ประวัติงานแบบช่วงอายุ</span><small>ใบ 130 · ข้อ 225–227 · ชุด 0 เกมตอนนี้ + ก ข ค · ตัดปุ่มเงินรวมเข้าแผงตัวฉัน (ก่อนโฟกัส/หลังฐานะและงาน) · ปุ่มพับคำอธิบายค่า ตั้งต้น + จำค่า · ประวัติงาน ที่วาง + ปีรวม/ช่วงอายุ · 390 + 1280 + แนวนอน · contrast สด · ใช้ CSS เกมจริง · คัดลอก JSON</small></li>
-    <li><a href="ui.html#ui-t-style-tones">ต้นแบบสไตล์ 4 ทิศ เทียบใบ 02</a><span class="st pick">เลือกแล้ว รอลงเกม</span><small>ใบ 02 สไตล์ปัจจุบัน + ทิศ 1–4 (ใบ 89) · หน้าเล่น · เมนู 6 ปุ่ม · การ์ดตาย 6 แท็บ · nav เอกสาร 5 เมนู · 390/1280 · คัดลอก JSON → ใบ 92</small></li>
-    <li><a href="ui.html#ui-t-b67">B67 สถิติวิญญาณ + จอนิพพาน/โพธิสัตว์</a><span class="st pick">เลือกแล้ว รอลงเกม</span><small>แท็บที่ 4 ในชั้นสมุด · จอถึงเกณฑ์บารมีข้ามชาติ · preset A/B/C · คัดลอกค่า</small></li>
-    <li><a href="ui.html#ui-t-card-art">ภาพบนการ์ด: พื้นหลังแรกเกิด + ภาพหมวดการ์ดผล</a><span class="st pick">เลือกแล้ว รอลงเกม</span><small>ภาพแรกเกิดจางหลังข้อความ · ภาพหมวดการ์ดผล 10 หมวด + สัดส่วนจากด่าน · ใช้ CSS เกมจริง · JSON ก้อนเดียว</small></li>
-    <li><a href="ui.html#ui-t-card-pic">ภาพประจำการ์ด: ตำแหน่ง ขนาด สไตล์เส้น</a><span class="st pick">เลือกแล้ว รอลงเกม</span><small>ใบ 209 · แบนเนอร์เหนือหัวเรื่อง เส้น + ระบายสี · ตัวอย่าง SVG 8 ใบจากการ์ดจริง · วาดจริงใบ 210</small></li>
-    <li><a href="ui.html#ui-t-entry">ใบชวนไปต่างโลก</a><span class="st pick">เลือกแล้ว รอลงเกม</span><small>ใบชวน + ใบลางเป็นการ์ดธรรมดา · ถามซ้ำแบบเบา · ใช้ CSS เกมจริง · เริ่มจาก ก/ข/ค · คัดลอกคำตอบ</small></li>
-    <li><a href="ui.html#ui-t-head">หัวการ์ด + เมนู 6 ปุ่ม + แท็บโฟกัส</a><span class="st done">ลงแล้วบางส่วน v0.6.65–66 · ใบ 49 v0.6.75</span><span class="st pick">เลือกแล้ว รอลงใบ 50–51 · ไม่มีเกจฐานะ</span><small>เกจฐานะ 10 ขั้น · เงินสดย่อคำไทย · แถวอาชีพ · เมนู 6 ปุ่ม 3 แบบ · แท็บโฟกัส 3 แบบ · จอ 360/390/1280 ใน iframe ใช้ CSS เกมจริง · คัดลอก JSON</small></li>
-    <li><a href="ui.html#ui-t-cards">ต้นแบบการ์ด v2 (D1–D10 · ธีม T1–T3)</a><small>หน้าตาการ์ดทุกชนิดทั้งชาติไทยและต่างโลก + ชุดธีม · เดิมคือ cards.html</small></li>
-  </ul></section>
-  <section class="box" id="archive"><h2>คลังต้นแบบเก่า</h2><ul>
-    <li><a href="archive/index.html">สารบัญคลัง</a><small>ต้นแบบที่ไม่ได้ใช้แล้ว เก็บไว้ดูที่มา</small></li>
-  </ul></section>
-  <section class="box"><h2>ที่วางของใหม่</h2><small>HTML ใหม่ของเลนวางใต้ dev/ แล้วเติมในผังเมนู (src/site/nav.mjs) กับกล่องในหน้านี้ · site:check ตรวจว่าไม่มีหน้าตกผัง</small></section>
+  <section class="box"><h2>ที่วางของใหม่</h2><small>HTML ใหม่ของเลนวางใต้ dev/ แล้วเติมในผังเมนู (src/site/nav.mjs) กับกล่องในหน้านี้ · site:check ตรวจว่าไม่มีหน้าตกผัง · หน้า tweak (ให้เจ้าของเลือกแบบ) ใช้แล้วทิ้ง: ทำในเครื่อง ไม่ขึ้นเว็บ คำตัดสินจดลง design/</small></section>
 </div></main>
 </body>
 </html>

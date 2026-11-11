@@ -1,9 +1,8 @@
 // ร่างหมวดการ์ดผล (ui-redo 58 ข้อ 84 90 92): นับการ์ดผลต่อหมวดจากชีวิตบอท + เก็บข้อความจริงให้หน้า tweak ภาพบนการ์ด
 // หมวดจับจากข้อมูลที่การ์ดมี (ข้อ 83) ไม่อ่านคำในข้อความ · ทิศผลนับเฉพาะค่าที่ไม่ซ่อน แบบเดียวกับลูกศรบนแถบค่า (ข้อ 90)
 // ป้ายหมวดจริงเป็นงาน engine ใบ 60 — ไฟล์นี้เป็นร่างตารางให้เจ้าของเลือก แหล่งที่การ์ดไม่มีฟิลด์บอก (มรดก เกษียณ ล้มละลาย รอดตาย) ตกหมวดกลางจนใบ 60 แนบป้าย
-// --write เขียนผลลง src/site/card-art-tweak.json (build ฉีดเข้าหน้า tweak) · ไม่ใส่ = พิมพ์ตารางอย่างเดียว
+// พิมพ์ตารางอย่างเดียว · --write <ไฟล์> เขียน JSON ไว้ทำหน้า tweak ในเครื่อง (หน้า tweak ใช้แล้วทิ้ง ไม่ commit)
 import { readFileSync, writeFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { playLife, playAfterlife, nextLife, mixSeed, horoscope, standingOf } from '../src/engine/index.mjs';
 import { SHOWN_STATS } from '../src/ui/labels.mjs';
 import { artTier } from '../src/ui/art.mjs';
@@ -12,8 +11,8 @@ import { BOTS, random, isekaiBot } from './bots.mjs';
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? Number(process.argv[i + 1]) : d; };
 const n = arg('--n', 300), seed = arg('--seed', 1);
-const WRITE = process.argv.includes('--write');
-export const RESULT_CATS_FILE = new URL('../src/site/card-art-tweak.json', import.meta.url);
+const wi = process.argv.indexOf('--write');
+const WRITE = wi > 0 ? process.argv[wi + 1] : null;
 
 // ลำดับ = ลำดับตัดสิน: ข้อแรกที่ตรงได้หมวดนั้น · mid รับที่เหลือทุกใบ (ข้อ 84)
 export const RESULT_CATS = [
@@ -131,7 +130,7 @@ console.log(`หมวดกลาง ≤ ครึ่ง (ข้อ 92) → ${m
 console.log(`  ตัวกรองค่าซ่อน (ข้อ 90): การ์ดผลที่ตัวเลือกซ่อนค่า ${veiledN} ใบ (ตกหมวดกลางเพราะซ่อน ${veiledMid})`);
 if (WRITE) {
   const out = { seed, n, bots: Object.keys(RUN), total, skipped, cats: RESULT_CATS.map(([k, name, rule]) => ({ k, name, rule, n: count[k], samples: samples[k] })), intro };
-  writeFileSync(RESULT_CATS_FILE, `${JSON.stringify(out, null, 1)}\n`);
-  console.log(`เขียน ${fileURLToPath(RESULT_CATS_FILE)}`);
+  writeFileSync(WRITE, `${JSON.stringify(out, null, 1)}\n`);
+  console.log(`เขียน ${WRITE}`);
 }
 if (!midOk || !ctlOk) process.exitCode = 1;

@@ -1,4 +1,4 @@
-// แถบบนชิ้นเดียวของทุกหน้าเว็บ (ยกเว้น play.html · archive/*) — build ฉีดระหว่าง marker · หน้าเขียนมือวาง marker ไว้ครั้งเดียว ส่วนนอก marker build ไม่แตะ
+// แถบบนชิ้นเดียวของทุกหน้าเว็บ (ยกเว้น play.html) — build ฉีดระหว่าง marker · หน้าเขียนมือวาง marker ไว้ครั้งเดียว ส่วนนอก marker build ไม่แตะ
 // แบบ ก ที่เจ้าของเคาะ: ชื่อเกมซ้าย = หน้าแรก · ลิงก์กลางเลื่อนข้างได้ · ปุ่ม "เล่นเกม" ขวา · หน้าปัจจุบัน = ทอง + ตัวหนา
 import { SITE_ROOT, SITE_BAR } from './tokens.mjs';
 export const NAV_START = '<!--NAV:START-->';
@@ -86,7 +86,6 @@ export const DEV_TABS = [
   ['dev/design.html', 'คำตัดสินเกม'],
   ['dev/ui.html', 'การออกแบบ'],
   ['dev/maps/continent.html', 'แผนที่'],
-  ['dev/archive/index.html', 'คลังเก่า'],
 ];
 
 // ผังทั้งหกอยู่หน้าเดียว สลับด้วย #<ผัง> (ui-redo 101 · ข้อ 189) · ที่เดิมแต่ละผังเป็นหน้าส่งต่อที่ build เขียนทุกรอบ
@@ -101,12 +100,12 @@ export const DEV_MAPS = [
   ['politics', 'การเมือง', 'ผังบันไดการเมือง'],
 ];
 export const mapsMoved = ([id, , title]) => movedHtml(`dev/maps/${id}.html`, `${DEV_MAPS_PAGE}#${id}`, title);
-export const DEV_NAV_PAGES = ['dev/index.html', 'dev/plan.html', 'dev/spec.html', DEV_MAPS_PAGE, 'dev/archive/index.html', 'dev/archive/b176-samples.html', 'dev/archive/fx-proto.html', 'dev/archive/isekai-life-v1.html'];
+export const DEV_NAV_PAGES = ['dev/index.html', 'dev/plan.html', 'dev/spec.html', DEV_MAPS_PAGE];
 export const DEV_NAV_START = '<!--nav-->';
 export const DEV_NAV_END = '<!--/nav-->';
-// แผนที่กับคลังเก่าไม่ได้ใช้ชุดสีกลาง และแต่ละหน้ามีตัวแปรชื่อซ้ำของตัวเอง ⇒ ตั้งสีเฉพาะที่แถบ
+// แผนที่ไม่ได้ใช้ชุดสีกลาง และแต่ละหน้ามีตัวแปรชื่อซ้ำของตัวเอง ⇒ ตั้งสีเฉพาะที่แถบ
 const devNavCss = (file) => `
-${/^dev\/(maps|archive)\//.test(file) ? SITE_BAR : SITE_ROOT}
+${/^dev\/maps\//.test(file) ? SITE_BAR : SITE_ROOT}
 ${NAV_BAR_CSS}${NAV_BAR_MASK}
 .nl-nav,.nl-nav *{box-sizing:border-box;margin:0}
 .nl-nav{font:15px/1.4 var(--fb);text-align:left}
@@ -119,10 +118,10 @@ ${NAV_BAR_CSS}${NAV_BAR_MASK}
 .nl-tabs.nl-sub{background:var(--bg);font-size:14px}
 `;
 // file = path ใต้ docs/ เช่น dev/design-lore.html · หน้าลูกของแท็บ ⇒ aria-current="true" (ไม่ใช่ page เพราะไม่ใช่หน้านั้นเอง) · แท็บแผนที่ชี้หน้าส่งต่อ แต่หน้าจริงคือหน้ารวมผัง
-// sub = แถวแท็บรองของหน้า (สเปก/แผน · คลังเก่า)
+// sub = แถวแท็บรองของหน้า (สเปก/แผน)
 export function devNavHtml(file, sub = '') {
   const up = '../'.repeat(file.split('/').length - 1);
-  const cur = (href) => (href === file || (href === 'dev/maps/continent.html' && file === DEV_MAPS_PAGE) ? ' aria-current="page"' : (href === 'dev/design.html' && /^dev\/design-.+\.html$/.test(file)) || (href === 'dev/archive/index.html' && file.startsWith('dev/archive/')) ? ' aria-current="true"' : '');
+  const cur = (href) => (href === file || (href === 'dev/maps/continent.html' && file === DEV_MAPS_PAGE) ? ' aria-current="page"' : (href === 'dev/design.html' && /^dev\/design-.+\.html$/.test(file)) ? ' aria-current="true"' : '');
   const tabs = DEV_TABS.map(([h, t]) => `<a href="${up}${h}"${cur(h)}>${t}</a>`).join('');
   return `${DEV_NAV_START}<style>${devNavCss(file)}</style>${navHtml(file)}<div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in">${tabs}</div></div>${sub}</div>${DEV_NAV_END}`;
 }

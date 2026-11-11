@@ -5,7 +5,7 @@ export const T1 = {
   bg: '#F4ECDC', surface: '#FBF6EA', ink: '#1B2A4A', muted: '#5B5648', accent: '#1B2A4A', head: '#1B2A4A', headink: '#E8CF8A',
   accent2: '#7A5C12', gold: '#D9B45A', seal: '#A62B1F', good: '#2F6B4F', bad: '#B3261E', line: '#C9B98F', 'line-strong': '#8C7A52',
 };
-// ตัวหนังสือรองบนพื้นคราม (ค่าจากหน้า tweak T2/T3 ที่เคาะ) · ห้องผู้พัฒนาใช้ตัวเดียวกัน
+// ตัวหนังสือรองบนพื้นคราม (ค่าที่เจ้าของเคาะใน T2/T3) · ห้องผู้พัฒนาใช้ตัวเดียวกัน
 const ON_HEAD = { 'on-head': '#E7E2D4', 'on-head2': '#D8D2C2', 'on-head3': '#BFB49A', title: '#F4ECDC' };
 // กล่องมืดในหน้าเอกสาร (ปรโลก/ระหว่างชาติ) = ดำรักชุดเดิมของการ์ด B ในเกม — สีโลกอื่นคงเดิมจนใบ 121 (ข้อ 228)
 const LACQUER = { lacquer: '#17110D', lacquer2: '#221912', bronze: '#5A4630' };
