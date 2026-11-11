@@ -2171,6 +2171,16 @@ const CADET = (() => {
     if (c.anyFlags && !c.anyFlags.some((f) => has(st, f))) return false;
     // X7-ง (เจ้าของเคาะต่อ X7 2026-11-10): branchesMin = สมัครอย่างน้อยกี่เหล่าในปีสอบนี้ (บท "สมัครมาหลายเหล่า") · Demo ประกาศไว้แต่ไม่เคยตรวจ
     if (c.branchesMin && (st.cadet?.p2?.branches?.length ?? 0) < c.branchesMin) return false;
+    // ปีก่อนพลาดแบบไหน (เจ้าของเคาะ 2026-11-10): lastFail = ต้องเป็นแบบในรายการ · notLastFail = ต้องไม่ใช่แบบในรายการ
+    // เช่น สละที่นั่ง (declined) หรือไม่ไปรายงานตัว (noreport) ได้คำถามข้อแรกและบรรทัดข่าวถึงบ้านแยกจากคนสอบตก
+    const prev = st.cadet?.p2?.prevFail ?? info(st).lastFail;
+    if (c.lastFail && ![].concat(c.lastFail).includes(prev)) return false;
+    if (c.notLastFail && [].concat(c.notLastFail).includes(prev)) return false;
+    // ข่าวถึงบ้านแบบ "แม่รออยู่ใต้ต้นไม้หน้ากองสอบ" (เจ้าของเคาะ 2026-11-10): ผู้เล่นไปดูป้ายผลด้วยตัวเอง (ไม่ใช่ดูเว็บ/หนังสือพิมพ์
+    // หรือให้ผู้ใหญ่ไปดูแทน) และที่บ้านรู้เรื่องสอบตั้งแต่ก่อนวันสอบ
+    // ข่าวถึงบ้านของคนที่แอบสอบมาจนถึงวันประกาศ แล้วเพิ่งโทรบอกที่บ้านตอนเห็นผล (เจ้าของเคาะ 2026-11-10)
+    if (c.toldAtResult && !(st.cadet?.p2?.secretAtFinal && !secretNow(st))) return false;
+    if (c.boardSelf && !(['self', 'wait', 'pray'].includes(st.cadet?.p2?.how) && year(st) < N(st).web_year && st.cadet?.p2?.homeKnewBefore)) return false;
     if (c.yearMin && year(st) < c.yearMin) return false;
     if (c.yearMax && year(st) > c.yearMax) return false;
     if (c.yearFrom && year(st) < yearOf(st, c.yearFrom)) return false;
@@ -2231,20 +2241,14 @@ const CADET = (() => {
   // {อายุติดยศ} (X9 ข่าวถึงบ้าน · ต่อเข้า engine 2026-11-10): อายุตอนติดยศเป็นคำไทย = อายุตอนนี้ + ปีถึงติดยศของเหล่าที่เลือก
   // Demo ใช้ S.age + 7 ตายตัว / rankAgeWords ในเนื้อหาก็นับ +7 → ตร. (6 ปี) จะเกินไปหนึ่งปี จึงคิดจาก commissionYears แบบเดียวกับ {ปีติดยศ}
   const rankAgeWord = (st) => { const P = st.cadet?.p2; return numTh(st.age + commissionYears(st, P?.chosen ?? P?.final?.[0] ?? 'army')); };
-  // {ผู้สัมภาษณ์} (เจ้าของเคาะ 2026-11-10 · X7-ค ทุกทาง): ตามเหล่าที่สอบ ไม่ใช่สายแม่ — ตร. = นายตำรวจ · ทบ./ทร./ทอ. = นายทหาร
-  // เหล่าที่สอบ = เหล่าที่เลือกแล้ว → เหล่าที่ผ่านพละ (เข้าห้องสัมภาษณ์ · ผสม ตร.+ทหาร = กรรมการ) → เหล่าแรกที่สมัคร
-  // เจ้าของเคาะ 2026-11-10: เหล่าที่ผ่านพละมีทั้ง ตร. และเหล่าทหาร = "กรรมการ" (ตรงกับ iv_intro) · ฝั่งเดียวใช้นายทหาร/นายตำรวจ
-  const interviewerWord = (st) => {
-    const P = st.cadet?.p2;
-    if (P?.chosen) return P.chosen === 'police' ? 'นายตำรวจ' : 'นายทหาร';
-    const passed = (P?.branches ?? []).filter((b) => P.body?.[b]);
-    if (passed.includes('police') && passed.some((b) => b !== 'police')) return 'กรรมการ';
-    return (passed[0] ?? P?.branches?.[0] ?? 'army') === 'police' ? 'นายตำรวจ' : 'นายทหาร';
-  };
+  // คำเรียกคนสัมภาษณ์ตามเหล่า (นายทหาร/นายตำรวจ/กรรมการ) ตัดออกแล้ว (เจ้าของเคาะ 2026-11-10 ผลตรวจ S3):
+  // คำถามข้อแรกให้ผู้กององอาจเป็นคนถามเลย "ผู้กอง" ใช้ได้ทั้งฝั่งทหารและตำรวจ
+  // คนที่ผ่านพละเฉพาะเหล่าตำรวจ: คำในคำถามที่พูดถึงทหารยังเปลี่ยนเป็นตำรวจตามตารางในเนื้อหา
+  const policeOnly = (st) => { const P = st.cadet?.p2, passed = (P?.branches ?? []).filter((b) => P.body?.[b]); return passed.length > 0 && passed.every((b) => b === 'police'); };
   // {หมวก} (บท S1 lateMother · X7-ค f2): ทหาร/ตำรวจ ตามสายทายาท (เหมือนหมวกใน heirHat)
   const hatWord = (st) => (heirOf(st) === 'police' ? 'ตำรวจ' : 'ทหาร');
   const fillK = (s, st) => fill(String(s ?? '').replaceAll('{คน}', kinWord(st)).replaceAll('{ปีติดยศ}', rankYearsWord(st)).replaceAll('{อายุติดยศ}', rankAgeWord(st))
-    .replaceAll('{ผู้สัมภาษณ์}', interviewerWord(st)).replaceAll('{หมวก}', hatWord(st)), st);
+    .replaceAll('{หมวก}', hatWord(st)), st);
   function render(st, c) {
     let text = fillK(c.text ?? '', st);
     const hit = (c.contextLines ?? []).find((x) => condOk(st, x.when));
@@ -2536,9 +2540,13 @@ const CADET = (() => {
     delete st.flags.cadet_dream;
     st.flags.cadet_exam_door = true;
     I.tries = (I.tries ?? 0) + 1;
+    // จำไว้ก่อนล้าง (เจ้าของเคาะ 2026-11-10 ผลตรวจ S3): ปีก่อนพลาดแบบไหน — คนที่ปีก่อนติดแล้วสละที่นั่งหรือไม่ไปรายงานตัว
+    // ต้องได้คำถามสัมภาษณ์และบรรทัดข่าวถึงบ้านของตัวเอง ไม่ใช่บทคนสอบตก
+    const prevFail = I.lastFail;
     I.lastFail = null;
     const order = I.order?.length ? I.order : [pickOne(st, BR)];
-    const P = (K.p2 = { branches: [...order], scores: {}, written: {}, reason: {}, askNs: {}, steps: [] });
+    // บ้านรู้ตั้งแต่ก่อนสอบไหม (เจ้าของเคาะ 2026-11-10): ใช้เลือกบทข่าวถึงบ้าน "แม่รออยู่ใต้ต้นไม้หน้ากองสอบ"
+    const P = (K.p2 = { branches: [...order], scores: {}, written: {}, reason: {}, askNs: {}, steps: [], prevFail, homeKnewBefore: !secretNow(st) });
     order.forEach((b, i) => {
       if (i > 0) P.steps.push(['interlude', i + 1]);
       P.steps.push(['day', b, i + 1]);
@@ -2984,7 +2992,8 @@ const CADET = (() => {
     [{ label: 'นั่งตัวตรง วางมือบนเข่า', result: 'เก้าอี้ดังเอี๊ยด ทั้งห้องเงียบ' }]);
   // สัมภาษณ์: 4 ข้อจริงจัง (สุ่มจากคลัง ผู้กองสองคนผลัดกันถาม) + ข้อตลกของจ่าขมลมโชยเป็นข้อ 3 หรือ 4 (ได้เต็มเสมอ) · ผ่าน ≥ iv_min
   // X7 (เจ้าของเคาะ 2026-11-10 Q1 ก): การ์ด "คำถามข้อเดียว" แทนคำถามข้อแรกของชุด ยังเป็นห้าข้อ · ไม่มี variant ตรง = ใช้คลัง 4 ข้อเหมือนเดิม
-  const ivX7 = (st) => [].concat(D(st).interview?.variants ?? []).find((v) => !v.cond || condOk(st, v.cond));
+  // แบบที่ยังไม่มีตัวเลือก (เช่น X7-ก′ คนสละที่นั่ง รอบท S1) ข้ามไปแบบถัดไปก่อน
+  const ivX7 = (st) => [].concat(D(st).interview?.variants ?? []).find((v) => (v.options ?? []).length && (!v.cond || condOk(st, v.cond)));
   S.interview = (st) => {
     const x7 = ivX7(st);
     const P = st.cadet.p2, pool = shuffle(st, (D(st).interviewQs ?? [])).slice(0, x7 ? 3 : 4);
@@ -3003,16 +3012,16 @@ const CADET = (() => {
     const qq = q.qSecret && secretNow(st) ? q.qSecret : question;
     return C(`ivq${no}`, `${who} · ข้อ ${no}/5`, `${who}ถาม: "${qq}"`, shuffle(st, q.a.map(([label, sc]) => ({ label, _iv: sc }))));
   };
-  // X7 ข้อแรก: คนถาม = คนกลาง (ผู้กององอาจ · IV_PANEL[0]) · "นายทหาร" ในบทตามเหล่าที่ผ่านพละ (interviewerWord · ผสม = กรรมการ)
-  // ตร. ฝั่งเดียว = policeOnlyReplace ของเนื้อหา (นายทหาร → นายตำรวจ · ทหาร" → ตำรวจ") · ผล = interview.results ตามทิศ rank เมื่อตัวเลือกไม่มีบรรทัดผลเอง
+  // คำถามข้อแรก (เจ้าของเคาะ 2026-11-10): ผู้กององอาจเป็นคนถาม · ชื่อการ์ดตามเนื้อหา "คำถามข้อแรก"
+  // ผู้เล่นที่ผ่านพละเฉพาะเหล่าตำรวจ คำว่าทหารในคำถามเปลี่ยนเป็นตำรวจตามตารางในเนื้อหา
+  // ตัวเลือกที่ไม่มีบรรทัดผลของตัวเอง ใช้บรรทัดผลกลางตามว่าตอบดี/กลาง ๆ/ไม่ดี
   S.ivx = (st, no) => {
-    const iv = D(st).interview ?? {}, v = ivX7(st), who = IV_PANEL[(no - 1) % 2], word = interviewerWord(st);
+    const iv = D(st).interview ?? {}, v = ivX7(st);
     let text = String(v.text ?? '');
-    if (word === 'นายตำรวจ') for (const [a, b] of Object.entries(iv.policeOnlyReplace ?? {})) text = text.replaceAll(a, b);
-    else text = text.replaceAll('นายทหาร', word);
+    if (policeOnly(st)) for (const [a, b] of Object.entries(iv.policeOnlyReplace ?? {})) text = text.replaceAll(a, b);
     const res = iv.results ?? {};
     const options = (v.options ?? []).map(({ rank, ...o }) => ({ ...o, _ivRank: rank ?? 0, result: o.result ?? (rank > 0 ? res.up : rank < 0 ? res.down : res.zero) }));
-    return C('ivx', `${who} · ข้อ ${no}/5`, text, options, { contextLines: v.contextLines });
+    return C('ivx', v.title ?? `${IV_PANEL[0]} · ข้อ ${no}/5`, text, options, { contextLines: v.contextLines });
   };
   S.ivf = (st, no) => {
     const f = pickOne(st, D(st).interviewFunny ?? []);
@@ -3027,6 +3036,8 @@ const CADET = (() => {
   };
   S.finalBoard = (st) => {
     const P = st.cadet.p2, pass = P.ivOk ? P.branches.filter((b) => P.written[b] && P.body?.[b]) : [], none = !pass.length, who = checker(st);
+    // จำไว้ว่ายังแอบสอบอยู่ตอนเห็นผลรอบสุดท้ายไหม (เจ้าของเคาะ 2026-11-10): ใช้เลือกบทข่าวถึงบ้านของคนที่เพิ่งโทรบอกที่บ้านจากหน้าป้าย
+    P.secretAtFinal = secretNow(st);
     const why = (b) => (!P.written[b] ? 'ไม่ผ่านข้อเขียน' : !P.body?.[b] ? 'ไม่ผ่านพลศึกษา' : 'ไม่ผ่านสัมภาษณ์');
     const web = year(st) >= N(st).web_year, no = P.examNo;
     const head = secretWeb(st) ? secretWebHead(st, none) : ({ self: web ? `หน้าเว็บโหลดขึ้นมา รายชื่อสั้นจนเลื่อนไม่สุดนิ้ว ไล่หาเลข ${no}` : `ป้ายแผ่นสุดท้าย รายชื่อสั้นจนอ่านจบในครั้งเดียว ไล่หาเลข ${no}`,
@@ -3104,15 +3115,15 @@ const CADET = (() => {
   // onEnter ของเนื้อหา: ตั้ง cadet_pass:<id เหล่า> (Q4 ข · ทะเบียน prefix ใน flags.yaml) + ล้างธงฝัน/ซ้อมว่าย/cadet_fail:* · cadet_passed ยังตั้งตอนรายงานตัวเหมือนเดิม
   // หัว "ติด {เหล่า}" ขึ้นบรรทัดแรก · Demo Q4 (2026-11-06): ผู้ใหญ่ไปดูป้ายให้ (how = elder) และที่บ้านรู้ = "บ้านรู้ตั้งแต่หน้าป้าย"
   S.passNews = (st, b) => {
-    const P = st.cadet.p2, c = firstOk(st, D(st).passed);
+    // เลือกบทข่าวถึงบ้าน: แบบแรกที่เงื่อนไขตรง · ไม่ตรงสักแบบ = แบบที่เนื้อหาตั้งเป็นบทสำรอง (เจ้าของเคาะ 2026-11-10: ใช้บทบ้านจน X9-ข)
+    const list = [].concat(D(st).passed ?? []);
+    const P = st.cadet.p2, c = list.find((x) => !x.cond || condOk(st, x.cond)) ?? list.find((x) => x.fallback);
     P.chosen = b;
     P.steps = [['pack', b]];
     if (!c) return S.pack(st, b);
-    const on = c.onEnter ?? {};
-    for (const f of on.setFlags ?? []) st.flags[f.replaceAll('{เหล่า}', b)] = true;
-    for (const f of on.clearFlags ?? []) {
-      if (f.endsWith(':')) { for (const k of Object.keys(st.flags)) if (k.startsWith(f)) delete st.flags[k]; } else delete st.flags[f];
-    }
+    P.newsId = c.id;   // จำไว้ให้วันรายงานตัวล้างธงตามบทนี้
+    // ตอนข่าวถึงบ้าน ตั้งธงว่าติดเหล่านี้ (เจ้าของเคาะ Q4) · การล้างธงฝัน/ซ้อมว่าย/สอบตก ย้ายไปทำวันรายงานตัว (เจ้าของเคาะ 2026-11-10)
+    for (const f of c.onEnter?.setFlags ?? []) st.flags[f.replaceAll('{เหล่า}', b)] = true;
     const t = (s) => (s == null ? s : String(s).replaceAll('{เหล่า}', BT(st, b)));
     const homeKnew = P.how === 'elder' && !secretNow(st) ? '\nบ้านรู้ตั้งแต่หน้าป้าย' : '';
     return C('pass_news', t(c.title), [t(c.header), t(c.text) + homeKnew].filter(Boolean).join('\n'),
@@ -3147,12 +3158,19 @@ const CADET = (() => {
     { label: `คุยกับ${elder(st)}ตรง ๆ`, fx: { relations: 1 }, result: `${elder(st)}ฟังจนจบ แล้วบอกว่าตัดสินใจเองนะ ไม่ว่าทางไหนก็ยังเป็นลูก` },
     { label: 'โทรหารุ่นพี่ที่เคยผ่าน', fx: { network: 1 }, result: 'รุ่นพี่บอกว่าคืนแรกทุกคนร้องไห้ คืนที่สามจะหลับเป็นตาย' },
     { label: 'ออกไปเดินเล่นให้หัวโล่ง', fx: { happiness: 1 }, result: 'เดินจนมืด กลับมากระเป๋ายังอยู่ที่เดิม' }]);
-  S.noReport = (st) => { st.cadet.p2.failStage = 'noreport'; return status('ไม่มารายงานตัว', 'เลยกำหนดรายงานตัวแล้ว สิทธิ์ถูกส่งต่อให้ตัวสำรองลำดับถัดไป\nปีนี้ถือว่าสอบตก เพราะไม่มารายงานตัว'); };
+  // ไม่ไปรายงานตัว = เอาธง "ติดเหล่านี้" ที่ตั้งตอนข่าวถึงบ้านออก (เจ้าของเคาะ 2026-11-10 ผลตรวจ S3)
+  S.noReport = (st) => { for (const k of Object.keys(st.flags)) if (k.startsWith('cadet_pass:')) delete st.flags[k]; st.cadet.p2.failStage = 'noreport'; return status('ไม่มารายงานตัว', 'เลยกำหนดรายงานตัวแล้ว สิทธิ์ถูกส่งต่อให้ตัวสำรองลำดับถัดไป\nปีนี้ถือว่าสอบตก เพราะไม่มารายงานตัว'); };
   // รายงานตัว = จบเส้นสอบ · ธงบอกเหล่าและปีติดยศให้เนื้อหาต่อไป (ชีวิตใน รร.เตรียมทหาร/บันไดยศ = งานถัดไป)
   S.arrive = (st, b) => {
     st.title = 'นตท.';   // คำนำหน้าเริ่มวันรายงานตัวตามของจริง (เจ้าของเคาะ A 2026-11-06) · โชว์ที่หัวจอ/สายตระกูล ไม่ใส่ใน {ชื่อ} · เฟส 3 เปลี่ยนเป็น นนร./นนอ./นรต.
     st.flags.cadet_passed = true;
     delete st.flags.cadet_declined_seat;   // บั๊ก S3: กลับมาสอบติดและรายงานตัวแล้ว
+    // ล้างธงฝันอยากสอบ ซ้อมว่าย และเรื่องสอบตกเก่า ตอนรายงานตัวจริง ไม่ใช่ตอนข่าวถึงบ้าน (เจ้าของเคาะ 2026-11-10 ผลตรวจ S3)
+    // เพราะคนที่ติดแล้วไม่ไปรายงานตัว ยังต้องเป็นคนที่อยากสอบอยู่
+    const news = [].concat(D(st).passed ?? []).find((x) => x.id === st.cadet.p2?.newsId);
+    for (const f of news?.onReport?.clearFlags ?? []) {
+      if (f.endsWith(':')) { for (const k of Object.keys(st.flags)) if (k.startsWith(f)) delete st.flags[k]; } else delete st.flags[f];
+    }
     st.flags[`cadet_branch:${b}`] = true;
     info(st).passAge = st.age;
     info(st).commissionAge = st.age + commissionYears(st, b);   // บันไดยศเริ่มที่อายุนี้ (ตร. 6 ปี · เหล่าอื่น 7 ปี)
