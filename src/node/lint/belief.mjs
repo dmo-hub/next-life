@@ -1,4 +1,4 @@
-// กติกาส่วนต่อ belief ของใบ 12 ด่าน build ข้อ (ก)–(ช) · (ช) คำต้องห้ามอยู่ใน banned.yaml
+// กติกาส่วนต่อ belief ของใบ 12 ด่าน build ข้อ (ก)–(ช)
 import { BELIEF_KINDS, TRADITIONS, OUTSIDE_CANON, INTENTS, REDEEM, BELIEF_EFFECTS, LOTTERY, VOW_LIGHT_MAX, YEAR_MIN, YEAR_MAX, meritCat } from './vocab.mjs';
 import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, same, strings } from './util.mjs';
 import { REF_TABLE } from '../../engine/merit.mjs';

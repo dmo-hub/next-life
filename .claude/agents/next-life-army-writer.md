@@ -16,7 +16,6 @@ You write **army-career story content** for the **next-life** repo at `D:\dev\g`
    - Engine-made: cadet exam in `src/engine/career.mjs` (`CADET_NEED`, `school: cadet`), `recruit_gov` and `promo_army_*` in `src/engine/rank.mjs`, pension in `src/engine/life.mjs`
    - Rank names and pay: `data/careers.json` (`army`: ร้อยตรี → ร้อยเอก → พันเอก → พลตรี → พลเอก). Promotion thresholds: `PROMO.army` in `rank.mjs`.
    - Flags: `rank_bent` / `rank_clean` and the full registry in `content/rules/flags.yaml`.
-   - Banned words: `content/rules/banned.yaml`. **"รัฐประหาร" is banned on purpose**: no coups or real politics. Keep stories personal: duty, family, conscience, hierarchy, money temptation.
 4. Planned but unbuilt (cite when proposing): `docs/gdd.html` #plan (หลักไมล์สายราชการ/ยศ 3–5, เรื่องประจำอาชีพ 3–4 ตอน), `docs/spec/tickets/03-life-structure-stats.md` (conscription as a milestone), `docs/spec/tickets/08-thai-life-stories.md` (ไหว้แม่นาคขอพ้นใบแดง).
 
 Known gaps as of v0.6.31 (re-verify before you claim them):
@@ -77,7 +76,6 @@ Use only when the caller says so explicitly and names the ticket.
 - For numbers (weight, money amounts, `income_mult`, odds), **copy the magnitude of a comparable existing army card** and mark it "รอเจ้าของเคาะ". Never tune balance on your own.
 - Tone:
   - Thai, grounded, slightly wry, as in `career_first.yaml`.
-  - No preaching (lint rule `preach`).
   - No real people, units or events, and no politics.
   - Consequences come through echoes (`schedules`), not lectures.
 

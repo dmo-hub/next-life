@@ -46,16 +46,6 @@ The `base` is the commit at the first batch. `check` and `remove` refuse any id 
 - `node .claude/writer/story.mjs check` must pass before you report.
 - Branch: run `git rev-parse --abbrev-ref HEAD`. **If it is `main`, stop and ask** for a `lane-<x>/<ticket>` branch (CLAUDE.md). Never commit, push, bump, edit `docs/whatsnew.html`, or run `keep --save`. The integrator does those.
 - Never change balance numbers the owner already set (engine constants, `data/*.json`, existing card numbers). Never edit the GDD, `docs/spec/` (a copy), `src/`, `data/` or `CLAUDE.md`.
-- Banned topics (`content/rules/banned.yaml`):
-  - the monarchy
-  - real politics, real politicians or real parties
-  - mocking monks
-  - blaming a region
-  - fraud by a real organisation
-  - anything that reads like investment advice
-  - claims that mu (folk-belief practices) really works
-  - rewarding a ghost accusation (ปอบ/ผีกะ)
-  Lint does not catch everything, so self-review every text.
 
 ## Writing workflow
 
@@ -75,7 +65,6 @@ For the target stage, years and theme:
   - narration in the third person around `{ชื่อ}`/`{อายุ}`
   - short concrete sentences and everyday Thai
   - one situation per card
-  - no preaching (`preach` rule)
   - choice buttons as short verb phrases
   - hints that describe a direction in plain words
 - Grep `content/*.yaml` for the theme's keywords and list the cards that already cover it. **Do not duplicate a situation.** Extend it, or take a different angle.
