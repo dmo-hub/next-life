@@ -375,11 +375,11 @@ const f2 = (v) => v.toFixed(2);
     }
     return { same, all, pct: all ? (same / all) * 100 : 0 };
   };
-  const real = heirs(40);
+  const real = heirs(160);
   check('B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50%', real.all >= 50 && real.pct <= 50, `${real.same}/${real.all} = ${f2(real.pct)}%`);
   const keep = content.focus.heir_nature;
   content.focus.heir_nature = 0;
-  const zero = heirs(40);
+  const zero = heirs(160);
   content.focus.heir_nature = keep;
   check('B41 ตัวควบคุม: heir_nature 0 ⇒ ทายาทนิสัยเดียวกันลดลง', zero.all === real.all && zero.same < real.same, `${zero.same}/${zero.all} = ${f2(zero.pct)}% · จริง ${real.same}`);
 }
