@@ -8,7 +8,7 @@
       "steps": [
         {
           "name": "ข้าราชการระดับปฏิบัติการ",
-          "occ": "professional",
+          "occ": "officer",
           "pay": {
             "v": 17300,
             "y": 2567,
@@ -18,7 +18,7 @@
         },
         {
           "name": "ข้าราชการระดับชำนาญการ",
-          "occ": "professional",
+          "occ": "officer",
           "pay": {
             "v": 33500,
             "y": 2567,
@@ -28,7 +28,7 @@
         },
         {
           "name": "ผู้อำนวยการกอง",
-          "occ": "manager",
+          "occ": "senior_officer",
           "pay": {
             "v": 48600,
             "y": 2567,
@@ -38,7 +38,7 @@
         },
         {
           "name": "อธิบดี",
-          "occ": "manager",
+          "occ": "senior_officer",
           "pay": {
             "v": 81100,
             "y": 2567,
@@ -48,7 +48,7 @@
         },
         {
           "name": "ปลัดกระทรวง",
-          "occ": "manager",
+          "occ": "senior_officer",
           "pay": {
             "v": 97800,
             "y": 2567,
@@ -64,7 +64,7 @@
       "steps": [
         {
           "name": "ร้อยตรี",
-          "occ": "professional",
+          "occ": "officer",
           "pay": {
             "v": 17400,
             "y": 2567,
@@ -74,7 +74,7 @@
         },
         {
           "name": "ร้อยเอก",
-          "occ": "professional",
+          "occ": "officer",
           "pay": {
             "v": 30000,
             "y": 2567,
@@ -84,7 +84,7 @@
         },
         {
           "name": "พันเอก",
-          "occ": "manager",
+          "occ": "senior_officer",
           "pay": {
             "v": 52100,
             "y": 2567,
@@ -94,7 +94,7 @@
         },
         {
           "name": "พลตรี",
-          "occ": "manager",
+          "occ": "senior_officer",
           "pay": {
             "v": 67900,
             "y": 2567,
@@ -104,7 +104,7 @@
         },
         {
           "name": "พลเอก",
-          "occ": "manager",
+          "occ": "senior_officer",
           "pay": {
             "v": 97800,
             "y": 2567,
@@ -120,7 +120,7 @@
       "steps": [
         {
           "name": "ร้อยตำรวจตรี",
-          "occ": "professional",
+          "occ": "officer",
           "pay": {
             "v": 17400,
             "y": 2567,
@@ -130,7 +130,7 @@
         },
         {
           "name": "ร้อยตำรวจเอก",
-          "occ": "professional",
+          "occ": "officer",
           "pay": {
             "v": 30000,
             "y": 2567,
@@ -140,7 +140,7 @@
         },
         {
           "name": "พันตำรวจเอก",
-          "occ": "manager",
+          "occ": "senior_officer",
           "pay": {
             "v": 52100,
             "y": 2567,
@@ -150,7 +150,7 @@
         },
         {
           "name": "พลตำรวจตรี",
-          "occ": "manager",
+          "occ": "senior_officer",
           "pay": {
             "v": 67900,
             "y": 2567,
@@ -160,7 +160,7 @@
         },
         {
           "name": "พลตำรวจเอก",
-          "occ": "manager",
+          "occ": "senior_officer",
           "pay": {
             "v": 97800,
             "y": 2567,

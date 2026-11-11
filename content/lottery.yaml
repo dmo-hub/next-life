@@ -8,7 +8,7 @@ events:
     weight: 2
     multipliers: {parent_flags: {lottery_habit: 1.5}}
     # เรื่องเปิดด้วยเงินเดือนก้อนแรก — อาชีพครบทุกตัว = มีงานของตัวเองแล้ว (ยังไม่ทำงานไม่ออก)
-    when: {occupation: [farmer, labor, factory, craft, service, clerk, technician, professional, manager]}
+    when: {occupation: [farmer, labor, factory, craft, service, clerk, technician, professional, manager, officer, senior_officer]}
     title: "แผงล็อตเตอรี่หน้าโต๊ะ"
     text: "แม่ค้าล็อตเตอรี่เดินถือแผงมาหยุดที่โต๊ะข้าวเที่ยง เพื่อนสี่คนกำลังหารกันซื้อเลขชุด ส่วน{ชื่อ}เพิ่งได้เงินเดือนมาหมาด ๆ ในกระเป๋ายังหนาอยู่"
     choices:

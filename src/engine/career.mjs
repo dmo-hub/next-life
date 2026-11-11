@@ -167,11 +167,12 @@ export const JOB_EXTRA_AT = 70;
 export const JOB_OPEN_MIN = 2;
 export function jobCard(st) {
   const f = st.content.era.finance;
-  const occs = f.occupations;
+  // อาชีพตามขั้นยศไม่ใช่งานที่สมัครได้ และต้องไม่ขยับอันดับค่าจ้าง/top ของอาชีพอื่น
+  const occs = f.occupations.filter((o) => o.birth);
   const top = occs.length - 1;
   const rank = new Map([...occs].sort((a, b) => a.wage - b.wage).map((o, r) => [o.id, r]));
   const tilt = (st.network - 50) / 50;
-  const w = f.occByClass[st.cls].map((x, i) => x * Math.exp(tilt * (rank.get(occs[i].id) / top)));
+  const w = occs.map((o, i) => f.occByClass[st.cls][i] * Math.exp(tilt * (rank.get(o.id) / top)));
   const rng = makeRng((st.seed ^ 0x1f83d9ab ^ Math.imul(st.age + 1, 0x9e3779b1)) >>> 0);
   const tooLow = (o) => eduRank(o.edu) > eduRank(st.edu);
   const pool = occs.map((o, i) => ({ o, w: w[i] })).filter((x) => x.o.id !== 'labor' && x.o.id !== st.familyOcc);
@@ -198,8 +199,11 @@ export function jobCard(st) {
     { weight: 1, text: `ไม่ได้งาน${o.name} ต้องรับจ้างทั่วไปไปก่อน`, effects: { job: 'labor', happiness: -1 } },
   ];
   const choices = picked.map((o) => ({ text: `สมัครงาน${o.name}`, requires: lock(o), outcomes: apply(o, okWeight(o), { stats: { network: 1.6, knowledge: 1.4 } }) }));
-  const fam = occs.find((o) => o.id === st.familyOcc);
-  if (fam.id !== 'labor') choices.push({ text: `สืบต่องานบ้าน ${fam.name}`, effects: { job: fam.id, relations: 1 } });
+  const fam = f.occupations.find((o) => o.id === st.familyOcc);
+  // บ้านสายยศสืบต่อด้วยการเข้าสายของพ่อแม่ที่ขั้นแรก — ไม่รับยศเดิมของพ่อแม่ไปทั้งตัว
+  const famLadder = st.familyLadder && st.content.era.careers.ladders[st.familyLadder];
+  if (famLadder) choices.push({ text: `สืบต่องานบ้าน เข้าสาย${famLadder.name}`, effects: { ladder: st.familyLadder, relations: 1 } });
+  else if (fam.id !== 'labor') choices.push({ text: `สืบต่องานบ้าน ${fam.name}`, effects: { job: fam.id, relations: 1 } });
   choices.push({ text: 'รับจ้างทั่วไปไปก่อน', effects: { job: 'labor' } });
   if (eduRank(st.edu) >= eduRank('อุดมศึกษา')) {
     choices.push({
