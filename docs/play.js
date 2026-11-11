@@ -2176,10 +2176,13 @@ const CADET = (() => {
     const prev = st.cadet?.p2?.prevFail ?? info(st).lastFail;
     if (c.lastFail && ![].concat(c.lastFail).includes(prev)) return false;
     if (c.notLastFail && [].concat(c.notLastFail).includes(prev)) return false;
+    // ข่าวถึงบ้านของคนที่แอบสอบมาจนถึงวันประกาศ แล้วกดโทรบอกที่บ้านเองตอนเห็นผล (เจ้าของเคาะ 2026-11-10)
+    // ไม่นับคนที่ไม่ได้โทร แล้วบ้านมารู้ตอนกินข้าวเย็นจากใบที่ต้องเซ็น คนกลุ่มนั้นได้อีกบทหนึ่ง (เจ้าของเคาะ 2026-11-11)
+    if (c.toldAtResult && !(st.cadet?.p2?.secretAtFinal && !secretNow(st) && !st.cadet?.p2?.toldAtDinner)) return false;
+    // ข่าวถึงบ้านของคนที่แอบสอบ ไม่ได้โทรบอก แล้วบ้านรู้ตอนกินข้าวเย็นในการ์ด "คืนที่บ้านไม่มีใครนอน" (เจ้าของเคาะ 2026-11-11)
+    if (c.toldAtDinner && !st.cadet?.p2?.toldAtDinner) return false;
     // ข่าวถึงบ้านแบบ "แม่รออยู่ใต้ต้นไม้หน้ากองสอบ" (เจ้าของเคาะ 2026-11-10): ผู้เล่นไปดูป้ายผลด้วยตัวเอง (ไม่ใช่ดูเว็บ/หนังสือพิมพ์
     // หรือให้ผู้ใหญ่ไปดูแทน) และที่บ้านรู้เรื่องสอบตั้งแต่ก่อนวันสอบ
-    // ข่าวถึงบ้านของคนที่แอบสอบมาจนถึงวันประกาศ แล้วเพิ่งโทรบอกที่บ้านตอนเห็นผล (เจ้าของเคาะ 2026-11-10)
-    if (c.toldAtResult && !(st.cadet?.p2?.secretAtFinal && !secretNow(st))) return false;
     if (c.boardSelf && !(['self', 'wait', 'pray'].includes(st.cadet?.p2?.how) && year(st) < N(st).web_year && st.cadet?.p2?.homeKnewBefore)) return false;
     if (c.yearMin && year(st) < c.yearMin) return false;
     if (c.yearMax && year(st) > c.yearMax) return false;
@@ -2868,6 +2871,8 @@ const CADET = (() => {
         : '{ผู้ใหญ่}อ่านแล้วตกใจจนพูดไม่ออก ตีแขนเบา ๆ "แอบไปสอบแล้วติดซะด้วยเนี่ยนะ!" แล้วก็หัวเราะลั่นบ้าน');
       delete st.flags.cadet_family_secret;   // จากนี้ไม่ใช่ความลับแล้ว
       st.flags.cadet_family_told = true;
+      // จำไว้ว่าบ้านรู้ตอนกินข้าวเย็น ไม่ได้รู้จากโทรศัพท์ ข่าวถึงบ้านจะได้ไม่เล่าว่า "บ่ายนี้เพิ่งโทรบอก" (เจ้าของเคาะ 2026-11-11)
+      P.toldAtDinner = true;
     } else {
       // B4 ฉากดีใจ (Demo cheerCard 12565 · cadet-voice-joy-pass.md ข้อ 3 · Q-L2): ตารางตามคนในบ้าน announce.joy.<รอบ> · ไม่มีพ่อแม่ = none (ป้า)
       const J = A(st).joy?.[fin ? 'final' : iv ? 'iv' : 'written'] ?? {};
