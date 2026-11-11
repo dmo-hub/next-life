@@ -107,7 +107,7 @@ export function enterByJob(st, occ) {
   markService(st, id);   // B5
 }
 
-// เข้าสายราชการ/ทหาร/ตำรวจ (effects.ladder): อาชีพเปลี่ยนตามขั้น ให้การ์ดเนื้อหาที่กรองด้วยอาชีพยังเจอคนในสายนี้
+// เข้าสายราชการ/ทหาร/ตำรวจ (effects.ladder): อาชีพเปลี่ยนตามขั้น (officer · senior_officer) ให้การ์ดที่กรองด้วยอาชีพแยกคนในสายนี้จากภาคเอกชนได้
 export function enterLadder(st, id) {
   st.ladder = { id, rank: 0, since: st.age, prog: 0, from: st.age };
   markService(st, id);   // B5
