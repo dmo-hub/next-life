@@ -1,0 +1,71 @@
+# ต้นไม้โฟกัส (ใบ 03 tracer) — กติกาอยู่ src/engine/tree.mjs · ที่นี่คือเนื้อ · อยู่คู่โฟกัสเดิม (focus.yaml) ไม่แทนที่
+# ตอนนี้มีแขนงลึกลับ (occ) เฉพาะโหนดเล็ก ตามร่าง tree-draft.html รอบ 4 · โหนดใหญ่/หักเห/โหนดกลางลงในใบถัดไป
+# ตัวเลขทุกตัวเป็นจุดเริ่มต้น ให้ harness `tree` ปรับ (ข้อ 74)
+#
+# year_scale = ผลเต็มต่อปีคูณเท่านี้ (ระดับ ±1..±3 แบบการ์ด เหมือน focus.yaml)
+# light_unit = ผลเบาถาวรต่อปีหลังปลด แยกตามขนาดโหนด (s เล็ก · b ใหญ่ · k หักเห) เป็นหน่วย "ระดับการ์ด/ปี" (งบรวม ≤ 0.50 ข้อ 20)
+# ต่อโหนด: branch · size · stages (ช่วงวัยที่ทุ่มได้) · pre (โหนดต้นทาง ในแขนงเดียวกัน = ปลดอันใดอันหนึ่งก็พอ ข้อ 72)
+#   years = ปีเต็มที่ต้องทุ่ม · cards = จำนวนการ์ดหมวดตรงที่ต้องตอบระหว่างทุ่ม (ข้อไหนก็นับ ข้อ 45) · cat = หมวดการ์ดที่นับ
+#   fx = ผลเต็มระหว่างทุ่ม · light = ผลเบาถาวรหลังปลด (ระดับ) · hidden = ซ่อนจนต้นทางปลดแล้ว (ช่อง "?" จองที่ไว้)
+year_scale: 0.25
+light_unit:
+  s: 0.007
+  b: 0.014
+  k: 0.025
+nodes:
+  o1:
+    name: ไปวัดกับยาย
+    branch: occ
+    size: s
+    stages: [เด็ก]
+    pre: []
+    years: 2
+    cards: 1
+    cat: [belief]
+    fx: { happiness: 1, relations: 1 }
+    light: { happiness: 1 }
+  o2:
+    name: เข้าค่ายธรรมะ
+    branch: occ
+    size: s
+    stages: [เด็ก, วัยรุ่น]
+    pre: [o1]
+    years: 3
+    cards: 1
+    cat: [belief]
+    fx: { happiness: 1, knowledge: 1 }
+    light: { knowledge: 1 }
+  o3:
+    name: ทำบุญเป็นนิจ
+    branch: occ
+    size: s
+    stages: [วัยรุ่น, หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    pre: [o1]
+    years: 3
+    cards: 2
+    cat: [belief]
+    fx: { happiness: 1 }
+    light: { happiness: 1 }
+  o4:
+    name: ถือศีลฟังธรรม
+    branch: occ
+    size: s
+    stages: [หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    pre: [o3]
+    years: 4
+    cards: 2
+    cat: [belief]
+    fx: { happiness: 1, relations: 1 }
+    light: { happiness: 1 }
+  o6:
+    name: ศึกษาสายมู
+    branch: occ
+    size: s
+    hidden: true
+    stages: [วัยรุ่น, หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    pre: [o3]
+    years: 3
+    cards: 2
+    cat: [belief]
+    fx: { happiness: 1, knowledge: -1 }
+    light: { happiness: 1 }

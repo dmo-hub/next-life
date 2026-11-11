@@ -15,6 +15,7 @@ import { SCENES } from '../src/engine/afterlife.mjs';
 import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenText, SIN_CATS, ISEKAI_CATS, GAME_CATS, meritName, meritId } from '../src/engine/merit.mjs';
 import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../src/engine/isekai.mjs';
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
+import { checkTree } from '../src/node/lint/tree.mjs';
 
 const root = new URL('../', import.meta.url);
 const dir = (d) => readdirSync(new URL(d, root)).filter((n) => n.endsWith('.yaml')).sort();
@@ -429,6 +430,30 @@ try {
     if (!ok) fails.push(`isekai overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกด้วย isekai-overlap'} ได้ [${ps.map(formatIsekaiProblem).join(' | ') || 'ผ่าน'}]`);
   }
   rows.push(['isekai overlap_stage ตก/ผ่าน', `${iskOverlapCases.length} เคส`]);
+}
+
+// ต้นไม้โฟกัส (ใบ 03): ทะเบียนผิดรูปต้องตก (ขอบชี้โหนดที่ไม่มี · วนเป็นวง · หมวด/ช่วงวัย/ผลผิด) · ทะเบียนถูกรูปต้องผ่าน · ของจริงต้องผ่าน
+{
+  const node = (over = {}) => ({ name: 'โหนดทดสอบ', branch: 'occ', size: 's', stages: ['เด็ก'], pre: [], years: 2, cards: 1, cat: ['belief'], fx: { happiness: 1 }, light: { happiness: 1 }, ...over });
+  const doc = (nodes) => ({ year_scale: 0.25, light_unit: { s: 0.007, b: 0.014, k: 0.025 }, nodes });
+  const treeCases = [
+    ['good: สองโหนดต่อกัน', doc({ a: node(), b: node({ pre: ['a'] }) }), 0],
+    ['bad: ขอบชี้โหนดที่ไม่มี', doc({ a: node({ pre: ['ghost'] }) }), 1],
+    ['bad: ต้นทางชี้ตัวเอง', doc({ a: node({ pre: ['a'] }) }), 1],
+    ['bad: ต้นทางวนเป็นวง', doc({ a: node({ pre: ['b'] }), b: node({ pre: ['a'] }) }), 1],
+    ['bad: หมวดการ์ดไม่มีจริง', doc({ a: node({ cat: ['nope'] }) }), 1],
+    ['bad: ช่วงวัยไม่มีจริง', doc({ a: node({ stages: ['วัยทอง'] }) }), 1],
+    ['bad: ปีเป็นศูนย์', doc({ a: node({ years: 0 }) }), 1],
+    ['bad: ผลเกินระดับ', doc({ a: node({ fx: { happiness: 5 } }) }), 1],
+    ['bad: ชื่อมีตัวเลข', doc({ a: node({ name: 'โหนด 1' }) }), 1],
+  ];
+  for (const [name, d, want] of treeCases) {
+    const ps = checkTree(d);
+    if ((ps.length > 0) !== (want > 0)) fails.push(`tree "${name}": ต้อง${want ? 'ตก' : 'ผ่าน'} ได้ [${ps.join(' | ') || 'ผ่าน'}]`);
+  }
+  const real = checkTree(parse(readFileSync(new URL('content/rules/tree.yaml', root), 'utf8')));
+  if (real.length) fails.push(`content/rules/tree.yaml ไม่ผ่าน: ${real.join(' | ')}`);
+  rows.push(['ต้นไม้โฟกัส ทะเบียนตก/ผ่าน', `${treeCases.length} เคส + ของจริง`]);
 }
 
 // ชื่อที่ src/ui import ต้องมีจริงในไฟล์ปลายทาง — build ต่อไฟล์เป็นสคริปต์เดียวแล้วตัด import ทิ้ง ชื่อหายจึงไม่พังตอน build แต่พังทั้งเกมตอนกด (bookAdd v0.6.55)
