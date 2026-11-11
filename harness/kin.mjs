@@ -43,9 +43,12 @@ function* kinSpots(e) {
   const w = e.when ?? {};
   const skip = new Set(w.loss ? (w.loss.roles ?? Object.values(NEED).map((n) => n.role)) : []);
   for (const o of (e.choices ?? []).flatMap((c) => [c, ...(c.outcomes ?? [])])) for (const op of o.family ?? []) if (op.add) skip.add(op.add);
-  const spots = [['text', `${e.title ?? ''} ${e.text ?? ''}`, null]];
-  // ฉากระหว่างชาติไม่มีระบบล็อกตัวเลือก — requires ไม่นับ
-  (e.choices ?? []).forEach((c, i) => spots.push([`#${i}`, [c.text, c.result, ...(c.outcomes ?? []).map((o) => o.text)].filter(Boolean).join(' | '), e.stage === AFTERLIFE_STAGE ? null : c.requires]));
+  // B1 เส้นเตรียมทหาร: ทางในช่อง {ทายาท:พ่อ|แม่|พ่อที่เสีย} แกนเลือกตามพ่อแม่ที่ยังอยู่เอง (life.mjs heirCase) — ไม่นับเป็นคำที่ต้องมีเงื่อนไขกั้น
+  const unheir = (t) => t.replace(/\{ทายาท:(?:[^{}]|\{[^{}]*\})*\}/g, ' ');
+  const spots = [['text', unheir(`${e.title ?? ''} ${e.text ?? ''}`), null]];
+  // ฉากระหว่างชาติไม่มีระบบล็อกตัวเลือก — requires ไม่นับ · show_if.family (B1) กั้นได้เหมือน requires.family (ตัวเลือกไม่โผล่ถ้าไม่ตรง)
+  (e.choices ?? []).forEach((c, i) => spots.push([`#${i}`, unheir([c.text, c.result, ...(c.outcomes ?? []).map((o) => o.text)].filter(Boolean).join(' | ')),
+    e.stage === AFTERLIFE_STAGE ? null : c.show_if?.family ? { ...c.requires, family: [...(c.requires?.family ?? []), ...c.show_if.family] } : c.requires]));
   for (const [at, text, q] of spots) {
     for (const [who, re] of Object.entries(KIN_WORDS)) {
       const need = NEED[who];

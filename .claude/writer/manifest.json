@@ -1,0 +1,44 @@
+{
+  "batches": [
+    {
+      "id": "b001",
+      "topic": "เตรียมทหาร ทางแยกอายุ 13–17 (กระดาษแนะแนว รุ่นพี่ การ์ดชวน)",
+      "brief": ".claude/research/cadet-phase1-02-crossroad.md",
+      "branch": "EX",
+      "base": "c6aadad707f506a046c5b958d758b9469672479f",
+      "created": "2026-11-05T04:39:28.700Z"
+    },
+    {
+      "id": "b002",
+      "topic": "เตรียมทหาร เฟส 1 วัยเด็ก (ฉากเห็นเครื่องแบบ 10–12 + SR0 + ตร4)",
+      "brief": ".claude/research/cadet-phase1-01-childhood.md",
+      "branch": "EX",
+      "base": "c6aadad707f506a046c5b958d758b9469672479f",
+      "created": "2026-11-05T04:41:30.882Z"
+    },
+    {
+      "id": "b003",
+      "topic": "เตรียมทหาร เตรียมตัวจนถึงเช้าวันสอบ (บอกที่บ้าน ค่าติว วิธีติว สิ่งยั่วใจ แจ้งสิทธิสอบ)",
+      "brief": ".claude/research/cadet-phase1-03-prep-to-exam-day.md",
+      "branch": "EX",
+      "base": "c6aadad707f506a046c5b958d758b9469672479f",
+      "created": "2026-11-05T04:44:34.918Z"
+    },
+    {
+      "id": "b004",
+      "topic": "เตรียมทหาร ย้ายเดโมเข้าเกม: ฉากฝึกพละ PT1–PT8 + แก้ข้อความตาม QA เดโม",
+      "brief": ".claude/research/demo/data-05.js",
+      "branch": "EX",
+      "base": "c6aadad707f506a046c5b958d758b9469672479f",
+      "created": "2026-11-05T11:03:33.084Z"
+    },
+    {
+      "id": "b005",
+      "topic": "cadet_life ผล 2 ทาง + การ์ดแยกตามบริบท (ธงกันเห็นซ้ำ)",
+      "brief": ".claude/research/cadet-life-outcomes.md",
+      "branch": "EX",
+      "base": "c6aadad707f506a046c5b958d758b9469672479f",
+      "created": "2026-11-06T11:59:46.145Z"
+    }
+  ]
+}

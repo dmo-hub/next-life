@@ -57,6 +57,66 @@ for (const b of ctx.banned) {
 const table = checkMeritTable(MERIT_CATS);
 rows.push(['merit-table', table.length ? `ตก ${table.length} ข้อ` : 'ผ่าน']);
 for (const t of table) fails.push(`merit-table: ${t}`);
+// ---- heir-unguarded ฝั่ง rules/cadet.yaml (ก่อน B4): ไม่กั้น = ล้ม · กั้นที่ชั้นการ์ด/บรรทัด = ผ่าน ----
+{
+  const { checkCadetHeirText } = await import('../src/node/load.mjs');
+  const throws = (c) => { try { checkCadetHeirText(c); return false; } catch { return true; } };
+  const okCases = [{ board: [{ cond: { heir: 'army' }, text: '{ผู้ใหญ่ทายาท}ยิ้ม' }] }, { board: [{ contextLines: [{ when: { heir: 'police' }, line: 'เป็น{ทางแม่}' }] }] }];
+  const badCases = [{ board: [{ text: '{ทายาท:พ่อ|แม่|พ่อที่เสีย}' }] }, { board: [{ contextLines: [{ when: { flagsHas: ['x'] }, line: '{ผู้ใหญ่ทายาท}' }] }] }];
+  const ok = okCases.every((c) => !throws(c)) && badCases.every(throws);
+  if (!ok) fails.push('heir-unguarded rules/cadet.yaml: ตัวตรวจไม่ล้ม/ล้มผิดกรณี');
+  rows.push(['heir-unguarded rules/cadet.yaml', ok ? 'ผ่าน 4 กรณี' : 'ผิด']);
+}
+
+// ---- B1 เส้นเตรียมทหาร (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-09): ตัวแทนมีเงื่อนไข · show_if/hide_if · requires.reasons ----
+{
+  const { placeholdersIn: phIn, fillLongest: longest } = await import('../src/node/lint/util.mjs');
+  const { heirCase, choiceHidden } = await import('../src/engine/life.mjs');
+  const st0 = newLife(1, loadContent());
+  const base = { ...st0, sex: 'ชาย', region: 'ตะวันออกเฉียงเหนือ', birthYear: 2550, age: 17, flags: {}, parentFlags: { police_family: true } };
+  const alive = (f, m) => [{ sex: 'ชาย', alive: f }, { sex: 'หญิง', alive: m }];
+  const cases = [
+    // [ชื่อ, state, ข้อความ, ผลที่ต้องได้]
+    ['ทายาท พ่อยังอยู่', { parents: alive(true, true) }, '{ทายาท:พ่อ|แม่|พ่อที่เสีย}', 'พ่อ'],
+    ['ทายาท มีแต่แม่ (เกิดหลังปีรับหญิง)', { parents: alive(false, true) }, '{ทายาท:พ่อ|แม่{ถิ่น}|พ่อที่เสีย}', 'แม่เด้อ'],
+    ['ทายาทตำรวจ มีแต่แม่ เกิดก่อนปีรับหญิง', { parents: alive(false, true), birthYear: 2530 }, '{ทายาท:พ่อ|แม่|พ่อที่เสีย}', 'พ่อที่เสีย'],
+    ['ทายาท ไม่มีพ่อแม่', { parents: alive(false, false) }, '{ทายาท:พ่อ|แม่|พ่อที่เสีย} {ลูก}', 'พ่อที่เสีย หลาน'],
+    ['มือถือ ก่อนปี', { birthYear: 2520, age: 17 }, '{มือถือ:โทร|จดหมาย}', 'จดหมาย'],
+    ['ลับ', { flags: { cadet_family_secret: true } }, '{ลับ:แอบ|รู้}', 'แอบ'],
+    ['ค่าย ไม่ใช่เด็กค่าย', {}, '{ค่าย:เปิดเทอมแล้ว }นอน', 'นอน'],
+    ['ถิ่น นะ ภาคเหนือ', { region: 'เหนือ' }, 'ตั้งใจนะ{ถิ่น}', 'ตั้งใจเน้อ'],
+    ['ถิ่น นะ ภาคกลาง', { region: 'กลาง' }, 'ตั้งใจนะ{ถิ่น} ไป ๆ{ถิ่น}', 'ตั้งใจนะ ไป ๆ'],
+    ['ทางแม่ + ที่ตั้ง', { birthYear: 2525, age: 17 }, '{ทางแม่}@{ที่ตั้ง}', 'พนักงานสอบสวนหญิง@กรุงเทพฯ'],
+    ['ไม่ใช่ทายาท = ว่าง (กันชั้นที่สอง)', { parentFlags: {}, parents: alive(true, true) }, '[{ทายาท:พ่อ|แม่|พ่อที่เสีย}{ผู้ใหญ่ทายาท}{ทางแม่}]', '[]'],
+  ];
+  let ok = 0;
+  for (const [name, patch, text, want] of cases) {
+    const got = fill(text, { ...base, ...patch });
+    if (got === want) ok++;
+    else fails.push(`B1 fill ${name}: "${text}" ได้ "${got}" ต้องได้ "${want}"`);
+  }
+  rows.push(['B1 ตัวแทนมีเงื่อนไข', `${ok}/${cases.length} กรณี`]);
+  // ด่าน: ช่องมีเงื่อนไขตรวจชื่อ/จำนวนทาง · ความยาววัดทางยาวสุด
+  const ph = phIn('{ทายาท:a{ชื่อ}|b|c} {ลับ:x|y|z} {ไม่มี:a|b}');
+  if (!ph.includes('ทายาท:') || !ph.includes('ชื่อ') || !ph.includes('ลับ:เกินทาง') || !ph.includes('ไม่มี:เกินทาง')) fails.push(`B1 placeholdersIn: ได้ ${JSON.stringify(ph)}`);
+  if (longest('{ลับ:ก|{ทางแม่}}') !== PLACEHOLDERS.ทางแม่) fails.push(`B1 fillLongest: ได้ "${longest('{ลับ:ก|{ทางแม่}}')}"`);
+  // show_if/hide_if ซ่อน · คู่เงื่อนไขเดียวกันเห็นอย่างใดอย่างหนึ่งเสมอ
+  const mom = { family: [{ role: 'parent', sex: 'หญิง', alive: true }] };
+  for (const m of [true, false]) {
+    const s1 = { ...base, parents: alive(true, m) };
+    const vis = [choiceHidden(s1, { show_if: mom }), choiceHidden(s1, { hide_if: mom })].filter((h) => !h).length;
+    if (vis !== 1) fails.push(`B1 show_if/hide_if: แม่${m ? 'อยู่' : 'ไม่อยู่'} เห็น ${vis} ตัว ต้องเห็น 1`);
+  }
+  rows.push(['B1 show_if/hide_if', 'คู่แทนกันเห็นหนึ่งตัวเสมอ']);
+  // choice-count นับกรณีซ่อนมากสุด: show_if ข้างเดียวทำให้ไม่ถึง 4 ต้องตก
+  const thin = { events: [{ id: 'fixture_b1_thin', type: 'A', category: 'family', stage: 'วัยรุ่น', years: [2501, 2650], text: 'ก', choices: [
+    { text: 'ก', show_if: mom, merit: [{ cat: 'neutral' }] }, ...['ข', 'ค', 'ง'].map((t) => ({ text: t, merit: [{ cat: 'neutral' }] }))] }] };
+  const thinRules = lintDocs([{ file: 'b1-thin.yaml', doc: thin }], ctx).map((p) => p.rule);
+  if (!thinRules.includes('choice-count')) fails.push(`B1 choice-count: show_if ข้างเดียวเหลือ 3 ตัวต้องตก ได้ [${thinRules.join(', ')}]`);
+  rows.push(['B1 choice-count กรณีซ่อนมากสุด', thinRules.includes('choice-count') ? 'ตกถูก' : 'ไม่ตก']);
+  void heirCase;
+}
+
 const controls = {
   'vow_broken หนักเท่าระดับ 1': [MERIT_CATS, { ...MERIT_WEIGHTS, vow_broken: 1 }],
   'หมวดกลไกเกมหนักเท่าหมวดตามคติ': [MERIT_CATS, { ...MERIT_WEIGHTS, cheat_exploit: 1 }],
@@ -149,10 +209,13 @@ for (const tone of Object.keys(OMEN_TEXT)) for (let s = 0; s < 500; s++) for (le
 rows.push(['ข้อความลางเลือกได้ทุก seed', omenMiss ? `ไม่ได้ข้อความ ${omenMiss} ครั้ง` : 'ผ่าน']);
 if (omenMiss) fails.push(`omenText คืนค่าที่ไม่ใช่ข้อความ ${omenMiss} ครั้ง`);
 // ทุกช่องในรายการปิดของด่าน build ต้องมีตัวเติมในแกน ไม่งั้นผ่านด่านแต่โผล่ดิบบนการ์ด · ทั้งสองเพศ
+const EMPTY_OK = ['ถิ่น', 'ผู้ใหญ่ทายาท', 'ทางแม่'];
 for (const sex of SEXES) {
   const st = { ...newLife(1, loadContent()), sex };
   for (const k of Object.keys(PLACEHOLDERS)) {
-    const out = fill(`{${k}}`, st);
+    // B1: ช่องที่ว่างได้โดยตั้งใจ — {ถิ่น} ภาคที่ไม่มีคำลงท้าย · ฝั่งทายาทว่างเมื่อไม่ใช่ลูกทหาร/ตำรวจ (กันชั้นที่สอง) → ลองด้วยชีวิตทายาทภาคอีสานแทน
+    const heirSt = EMPTY_OK.includes(k) ? { ...st, region: 'ตะวันออกเฉียงเหนือ', parentFlags: { army_family: true } } : st;
+    const out = fill(`{${k}}`, heirSt);
     if (/[{}]/.test(out) || !out.trim()) fails.push(`ช่อง {${k}} แกนไม่เติม (${sex}): "${out}"`);
     else if (out.length > PLACEHOLDERS[k].length) fails.push(`ช่อง {${k}} เติมแล้วยาว ${out.length} เกินค่ายาวสุดที่ด่านความยาวใช้ (${PLACEHOLDERS[k].length}) — แก้ PLACEHOLDERS`);
   }
@@ -271,7 +334,8 @@ const used = new Set();
 for (const { doc } of realDocs) for (const { s: f } of flagNames(doc)) used.add(f.split(':')[0]);
 // ธงที่แกนตั้งเอง (ป้ายหมวด 9 · ศาลสั่งล้มละลาย) มีในทะเบียนเพื่อให้เนื้อหาอ่านได้ ไม่ต้องรอเนื้อหาใช้
 // cheat_death: แกนอ่านตอนผลสุ่มตาย (ถูกเรียกตัว B153) — มีผู้อ่านแล้วแม้ยังไม่มีการ์ดตั้ง
-const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death'];
+// army_family / police_family (B5): แกนตั้งตอนเข้าสายยศ army/police (rank.mjs markService)
+const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death', 'army_family', 'police_family'];
 const stale = [...ctx.flags.flags, ...ctx.flags.prefixes].filter((f) => !used.has(f) && !ENGINE_FLAGS.includes(f));
 rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${ctx.flags.prefixes.size} ชื่อหน้า · ค้าง ${stale.length}`]);
 // ธงมีพารามิเตอร์ยังไม่มีเนื้อหาจริงใช้ (มีแค่ใน fixture สายมู) จึงไม่นับว่าค้าง
@@ -281,6 +345,7 @@ if (!realDocs.some(({ doc }) => (doc.events ?? []).some((e) => e.id === BOND_EVE
 
 // ทะเบียน heir: (ธงที่แกนส่งถึงทายาท) — ตรวจทั้งชุด ไม่ใส่ใน RULES เพราะ fixture รันทีละไฟล์ จะตกด้วยกติกานี้ทุกไฟล์
 // tier เพดาน 2 (หลาน) — เหลนไม่ได้รับธง
+const ENGINE_HEIR_READS = ['army_family', 'police_family'];
 function heirCheck(reg, docs) {
   const problems = [];
   const flagSet = new Set(Object.keys(reg.flags ?? {}));
@@ -290,7 +355,8 @@ function heirCheck(reg, docs) {
     if (!isObj(h) || typeof h.tell !== 'string' || !h.tell.trim() || h.tell.length > MAX_LEN.hint) problems.push(`ทะเบียน heir: "${f}" tell ต้องเป็นข้อความไม่ว่าง ≤ ${MAX_LEN.hint} ตัวอักษร (หน้าจอใช้คำนี้)`);
     if (isObj(h) && h.from_age !== undefined && !(Number.isInteger(h.from_age) && h.from_age >= 0 && h.from_age <= 60)) problems.push(`ทะเบียน heir: "${f}" from_age ต้องเป็นจำนวนเต็ม 0–60`);
   }
-  const read = new Set();
+  // B5: ธงทายาทเตรียมทหาร แกนอ่านเอง (cadet.mjs heirOf · life.mjs heirOfLine → {ทายาท:} {ผู้ใหญ่ทายาท} {ทางแม่} · rules/cadet.yaml cond.heir) ไม่ผ่าน when.parent_flags
+  const read = new Set(ENGINE_HEIR_READS);
   for (const { doc } of docs) for (const e of doc.events ?? []) for (const { f } of parentRefs(isObj(e) ? e : {})) read.add(f);
   return { problems, unread: Object.keys(reg.heir ?? {}).filter((f) => !read.has(f)) };
 }

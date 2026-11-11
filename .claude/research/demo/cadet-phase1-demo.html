@@ -1,0 +1,1260 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>เตรียมทหาร เฟส 1 · Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f3ee;--card:#fff;--ink:#1f2328;--mute:#6b7280;--line:#e5e1d8;--acc:#3b5b3a;--acc2:#8a6d2f;--good:#2f7d4a;--bad:#b03a2e;--chip:#efeae0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--card:#1f2226;--ink:#e8e6e1;--mute:#9aa0a6;--line:#30343a;--acc:#8fb98d;--acc2:#d6b46a;--good:#6cc68b;--bad:#ef7a6d;--chip:#2a2e33}}
+:root[data-theme="dark"]{--bg:#15171a;--card:#1f2226;--ink:#e8e6e1;--mute:#9aa0a6;--line:#30343a;--acc:#8fb98d;--acc2:#d6b46a;--good:#6cc68b;--bad:#ef7a6d;--chip:#2a2e33}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Sarabun,system-ui,sans-serif;font-size:16px;line-height:1.6}
+header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header h1{font-size:18px;margin:0}
+header .note{color:var(--mute);font-size:13px}
+main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;padding:16px;max-width:1100px;margin:0 auto}
+@media (max-width:820px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.badge{font-size:12px;background:var(--chip);border-radius:99px;padding:2px 10px;color:var(--mute)}
+.badge.age{background:var(--acc);color:#fff}
+h2{margin:4px 0 8px;font-size:20px}
+.text{white-space:pre-wrap;margin:0 0 14px}
+.opts{display:flex;flex-direction:column;gap:8px}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 12px;text-align:left}
+button:hover:not(:disabled){border-color:var(--acc)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:var(--acc);color:#fff;border-color:var(--acc);text-align:center}
+.hint{display:block;font-size:13px;color:var(--mute)}
+.result{border-left:3px solid var(--acc2);padding:6px 10px;margin:10px 0;background:var(--chip);border-radius:6px}
+.fx{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px}
+.fx span{font-size:13px;border-radius:6px;padding:1px 8px;background:var(--chip)}
+.fx .up{color:var(--good)} .fx .down{color:var(--bad)}
+.stat{display:grid;grid-template-columns:80px 1fr 34px;gap:6px;align-items:center;font-size:14px;margin:4px 0}
+.bar{height:8px;background:var(--chip);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc)}
+.side h3{font-size:15px;margin:12px 0 6px}
+.flags{display:flex;gap:4px;flex-wrap:wrap}
+.flags span{font-size:12px;background:var(--chip);border-radius:6px;padding:1px 6px;font-family:ui-monospace,monospace}
+.log{font-size:13px;color:var(--mute);max-height:260px;overflow:auto;padding-left:18px;margin:0}
+label{display:block;font-size:14px;margin:8px 0 2px;color:var(--mute)}
+select,input{font:inherit;width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.warn{font-size:13px;color:var(--mute);margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+  <h1>เส้นเตรียมทหาร · เฟส 1 (วัยเด็ก → หน้าห้องสอบ)</h1>
+  <span class="note">Demo ทดลองเนื้อเรื่อง · ตัวเลขเป็นค่าสมมติ ไม่ใช่ค่าสมดุลจริง</span>
+</header>
+<main>
+  <section id="stage" class="card"></section>
+  <aside class="card side" id="side"></aside>
+</main>
+<script src="data-00.js"></script>
+<script src="data-01.js"></script>
+<script src="data-02.js"></script>
+<script src="data-03.js"></script>
+<script src="data-04.js"></script>
+<script src="data-05.js"></script>
+<script src="data-06.js"></script>
+<script>
+(() => {
+// owner 2026-11-05: no events that hand out exactly the camp fee — money must come from the character's own life
+const DISABLED = new Set(['U1', 'U2', 'U3']);
+const EVENTS = (window.DEMO_EVENTS || []).filter(e => !DISABLED.has(e.id));
+// owner 2026-11-05: "what will you do with your life" crossroad must not show while committed to the exam —
+// the family-tell scene already covers it; it may come back once he drops the path or ages out
+const CADET_BLOCKED = new Set(['N-milestone_teen_crossroad']);
+for (const e of EVENTS) if (CADET_BLOCKED.has(e.id)) e.cond = { ...(e.cond || {}), flagsNot: [...(e.cond?.flagsNot || []), 'cadet_dream'] };
+const byId = Object.fromEntries(EVENTS.map(e => [e.id, e]));
+const STATS = [['knowledge','ความรู้'],['health','ชีวิต'],['happiness','ความสุข'],['relations','ความสัมพันธ์'],['network','เส้นสาย'],['money','เงิน']];
+const SCALE = 5;            // demo: ↑ = +5
+const POOL_CHANCE = 0.7;    // demo: chance per draw round
+const POOL_ROUNDS = 2;      // demo: up to 2 life events per year
+const INSPIRE_WEIGHT = 0.35;// demo: uniform/inspiration scenes are rarer than normal life
+const INVITE_CHANCE = 0.4;  // demo: re-entry notice is occasional, never two years running
+// owner 2026-11-05: written-round knowledge bar 65 (real game median at 16) — prep gives a GAIN, not a fixed ceiling,
+// so a poor kid starting ~52–55 can still pass by studying hard (self-study diligent ≈ +15)
+// diligent prep must carry even the lowest base (~40) past 65, whatever the class; slacking leaves the gap open
+const PREP_BUDGET = { cadet_prep_camp: 35, cadet_prep_group: 30, cadet_prep_senior: 30, cadet_prep_self: 30 };
+const DILIGENCE_PER_YEAR = 2;   // guaranteed "will you study?" scenes each prep year
+// physical + medical on one day, judged by health per branch (owner 2026-11-05) · demo numbers, owner sets real ones
+const BODY_MIN = { police: 55, navy: 65, airforce: 70, army: 80 };
+const SWIM_FREE = 70;           // can't swim and not coastal: still makes 50 m if health ≥ this
+const TRAIN_PER_YEAR = 3;       // guaranteed physical-training scenes each prep year
+const HEALTH_BUDGET = 40;       // most health training can add over the prep years (enough for the poorest start to reach ทบ.)
+const isTraining = e => /^PT\d/.test(e.id);
+const isDiligence = e => /^(K\d|D[123])/.test(e.id);
+function prepBudget() { for (const [f, b] of Object.entries(PREP_BUDGET)) if (S.flags.has(f)) return b; return 0; }
+const CAMP_COST = 3;       // demo: tutoring-camp fee in money units (owner sets the real value)
+const UNLOCK_BEFORE_E3 = 0.6; // demo: chance of one unlock event right before a same-year E3
+const INSPIRE_MAX = 3;     // demo: at most 3 inspiration scenes before deciding (2 are guaranteed)
+// two different years; favour 10 & 12 so they rarely sit back to back
+const pickTwo = a => Math.random() < 0.5 ? [a[0], a[2]] : (Math.random() < 0.5 ? [a[0], a[1]] : [a[1], a[2]]);
+const BRANCH = {army:'ทหารบก', navy:'ทหารเรือ', airforce:'ทหารอากาศ', police:'ตำรวจ'};
+const $ = s => document.querySelector(s);
+const stage = $('#stage'), side = $('#side');
+let S;
+
+function setup() {
+  S = null;
+  stage.innerHTML = `
+    <h2>สร้างตัวละคร</h2>
+    <div class="row">
+      <div><label>ชื่อ</label><input id="f-name" value="ภูมิ"></div>
+      <div><label>เพศ</label><select id="f-sex"><option>ชาย</option><option>หญิง</option></select></div>
+      <div><label>ภาค</label><select id="f-region"><option>กลาง</option><option>เหนือ</option><option>ตะวันออกเฉียงเหนือ</option><option>ตะวันออก</option><option>ใต้</option></select></div>
+      <div><label>ปีเกิด (พ.ศ.)</label><input id="f-year" type="number" value="2552"></div>
+      <div><label>ฐานะ</label><select id="f-class"><option value="poor">ลำบาก</option><option value="mid" selected>ปานกลาง</option><option value="rich">มีอันจะกิน</option></select></div>
+      <div><label>พ่อแม่</label><select id="f-family"><option value="both">มีพ่อและแม่</option><option value="mother">มีแต่แม่</option><option value="fatherOnly">มีแต่พ่อ</option><option value="none">ไม่มีพ่อแม่แล้ว</option></select></div>
+      <div><label>เป็นทายาท</label><select id="f-heir"><option value="">ไม่ใช่</option><option value="army">ลูกทหาร</option><option value="police">ลูกตำรวจ</option></select></div>
+      <div><label>หลังจบ ม.3</label><select id="f-track"><option value="upper">ม.ปลาย</option><option value="voc">ปวช.</option></select></div>
+    </div>
+    <p class="warn">เริ่มที่อายุ 10 · จบเมื่อถึงประตูห้องสอบ หรือพ้นเกณฑ์อายุ · ฉากที่ต้องรอ engine (เช่นแบบทายาท) จำลองให้เห็นในนี้แล้ว</p>
+    <button class="primary" id="go">เริ่มเล่น</button>`;
+  $('#go').onclick = () => start({
+    name: $('#f-name').value || 'ภูมิ', sex: $('#f-sex').value, region: $('#f-region').value,
+    birthYear: +$('#f-year').value || 2552, cls: $('#f-class').value, family: $('#f-family').value,
+    heir: $('#f-heir').value || null, track: $('#f-track').value });
+  renderSide();
+}
+
+function start(p) {
+  // money follows the game's own flow: no extra savings mechanic — only events move it
+  // starting knowledge at 10 follows the real game's spread by class (poor lower, rich higher)
+  const k0 = { poor: [40, 54], mid: [46, 60], rich: [52, 66] }[p.cls];
+  // starting health follows the real game's spread at 13–17 by class (poor ~55, middle ~67, rich ~85)
+  const h0 = { poor: [44, 64], mid: [56, 78], rich: [70, 95] }[p.cls];
+  const rint = r => r[0] + Math.floor(Math.random() * (r[1] - r[0] + 1));
+  S = { ...p, age: 10, stats: {knowledge: rint(k0), health: rint(h0), happiness:55, relations:50, network:40, money: 0},
+        flags: new Set(), done: new Set(), queue: [], sched: [], log: [], ended: false,
+        inspireCount: 0, inspireAges: [10, 12] };   // owner: ≥2 before deciding, never back to back
+  if (p.heir) S.flags.add(p.heir + '_family');
+  beginYear();
+}
+
+const school = () => S.age <= 12 ? 'primary' : S.age <= 15 ? 'lower' : S.track;
+const year = () => S.birthYear + S.age;
+const hasPrefix = pre => [...S.flags].some(f => f.startsWith(pre));
+
+function condOk(c) {
+  if (!c) return true;
+  if (c.sex && c.sex !== S.sex) return false;
+  if (c.regions && c.regions.length && !c.regions.includes(S.region)) return false;
+  if (c.notRegions && c.notRegions.includes(S.region)) return false;
+  if (c.heir && S.heir !== c.heir) return false;
+  if (c.notHeir && [].concat(c.notHeir).includes(S.heir)) return false;
+  if (c.classes && c.classes.length && !c.classes.includes(S.cls)) return false;
+  if (c.knowledgeMax != null && (S.prepGain || 0) >= prepBudget()) return false;   // study cards stop once this prep method's gain budget is used
+  if (c.anyFlags && !c.anyFlags.some(f => S.flags.has(f))) return false;
+  if (c.yearMin && year() < c.yearMin) return false;
+  if (c.yearMax && year() > c.yearMax) return false;
+  if (c.school && c.school.length && !c.school.includes(school())) return false;
+  if (c.flagsHas && c.flagsHas.some(f => f.endsWith(':') ? !hasPrefix(f) : !S.flags.has(f))) return false;
+  if (c.flagsNot && c.flagsNot.some(f => f.endsWith(':') ? hasPrefix(f) : S.flags.has(f))) return false;
+  if (c.flagsHasPrefix && !hasPrefix(c.flagsHasPrefix)) return false;
+  if (c.family === 'mother' && !(S.family === 'both' || S.family === 'mother')) return false;
+  if (c.family === 'fatherOnly' && S.family !== 'fatherOnly') return false;
+  if (c.noParents && S.family !== 'none') return false;
+  if (c.poor === true && S.cls !== 'poor') return false;
+  if (c.poor === false && S.cls === 'poor') return false;
+  return true;
+}
+const inAge = e => S.age >= (e.ageMin ?? 0) && S.age <= (e.ageMax ?? e.ageMin ?? 99);
+
+// an id may be a base with variants (variantOf); pick the variant whose cond matches
+// criteria sheet for all 4 branches, shown once when he first decides to sit the exam
+// health bars per branch, as printed on the criteria sheet
+const bodyRule = () => `ชีวิต ตร. ${BODY_MIN.police} · ทร. ${BODY_MIN.navy} · ทอ. ${BODY_MIN.airforce} · ทบ. ${BODY_MIN.army} ขึ้นไป (รวมว่ายน้ำ 50 เมตร)`;
+function bodyReach(h) {
+  const ok = BR.filter(b => h >= BODY_MIN[b]), next = BR.filter(b => h < BODY_MIN[b]).sort((a, b) => BODY_MIN[a] - BODY_MIN[b])[0];
+  return `ชีวิต ${h} → ${ok.length ? 'ถึง ' + ok.map(b => BR_TH[b]).join(' ') : 'ยังไม่ถึงสักเหล่า'}${next ? ` · ขาดอีก ${BODY_MIN[next] - h} ถึง ${BR_TH[next]}` : ''}`;
+}
+function criteriaCard(retry) {
+  const k = S.stats.knowledge, h = S.stats.health, gap = Math.max(0, 65 - k);
+  const mark = ok => ok ? '✓' : '✗';
+  return { id: retry ? '__CRIT2' : '__CRITERIA', title: retry ? 'เกณฑ์สอบปีนี้' : 'แผ่นเกณฑ์รับสมัครสี่เหล่า', kind: 'scheduled', repeatable: !!retry,
+    text: (retry ? `ยื่นใบสมัครแล้ว แนบมากับบัตรสอบคือแผ่นเกณฑ์ปีนี้ เหมือนปีก่อนทุกข้อ\n\n`
+                 : `ครูแนะแนวยื่นกระดาษแผ่นหนึ่งให้ เป็นเกณฑ์ที่เหมือนกันทั้งสี่เหล่า ทบ. ทร. ทอ. ตร.\n\n`) +
+      `• ผู้สมัคร: ชาย อายุ 16–18 ปี เรียน ม.ปลาย หรือ ปวช. · สอบได้ปีละครั้ง\n` +
+      `• ข้อเขียน: แบบวัดความพร้อมของแต่ละเหล่า ได้อย่างน้อย 13 จาก 25 และความรู้ 65 ขึ้นไป\n` +
+      `• พลศึกษาและตรวจร่างกาย (สอบวันเดียวกัน): ${bodyRule()}\n` +
+      `• สัมภาษณ์\n` +
+      `• สมัครได้หลายเหล่า แต่ละเหล่าสอบคนละวัน ติดหลายเหล่าเลือกได้เหล่าเดียว\n\n` +
+      `ตอนนี้ ${S.name}: ความรู้ ${k} ${mark(k >= 65)}${gap ? ` (ขาดอีก ${gap})` : ''} · ${bodyReach(h)}` +
+      `${S.flags.has('can_swim') ? ' · ว่ายน้ำเป็นแล้ว' : ' · ยังไม่ได้หัดว่ายน้ำ'}`,
+    options: [
+      { label: 'จดเกณฑ์ไว้ ตั้งเป้าทำความรู้ให้ถึง', fx: { knowledge: 1 }, result: 'ติดกระดาษไว้ข้างโต๊ะ เขียนเลขเป้าหมายตัวโตไว้มุมบน' },
+      { label: 'เริ่มวิ่งตอนเช้าให้ร่างกายพร้อม', fx: { health: 1 }, result: 'ตั้งนาฬิกาปลุกตีห้า พรุ่งนี้เริ่มวิ่งรอบหมู่บ้าน' },
+      { label: 'ถามครูว่าเตรียมตัวยังไงดี', fx: { network: 1 }, setFlags: ['cadet_tips'], result: 'ครูเล่าว่ารุ่นพี่ที่ติด เริ่มอ่านจริงจังก่อนสอบสองปี' },
+      { label: 'พับเก็บไว้ ยังมีเวลาอีกหลายปี', fx: {}, _fold: true, result: 'กระดาษถูกพับสี่ทบ เก็บไว้ในกระเป๋านักเรียน' }] };
+}
+// the folded sheet falls out of the school bag right before he picks how to prep (E3)
+function refoldCard() {
+  const k = S.stats.knowledge, h = S.stats.health, gap = Math.max(0, 65 - k);
+  const mark = ok => ok ? '✓' : '✗';
+  return { id: '__REFOLD', title: 'กระดาษที่พับไว้', kind: 'scheduled',
+    text: `ระหว่างรื้อกระเป๋านักเรียน กระดาษแผ่นหนึ่งที่พับสี่ทบหล่นออกมา\n` +
+      `แผ่นเกณฑ์รับสมัครสี่เหล่าที่ครูแนะแนวให้ไว้ ขอบกระดาษเริ่มยับ\n\n` +
+      `ข้อเขียน: ได้อย่างน้อย 13 จาก 25 และความรู้ 65 ขึ้นไป · พลศึกษาและตรวจร่างกาย: ${bodyRule()}\n\n` +
+      `ตอนนี้ ${S.name}: ความรู้ ${k} ${mark(k >= 65)}${gap ? ` (ขาดอีก ${gap})` : ''} · ${bodyReach(h)}` +
+      `${S.flags.has('can_swim') ? ' · ว่ายน้ำเป็นแล้ว' : ' · ยังไม่ได้หัดว่ายน้ำ'}`,
+    options: [
+      { label: 'คลี่ออก ติดไว้ข้างโต๊ะ', fx: { knowledge: 1 }, result: gap ? `ขาดอีก ${gap} คะแนน ตัวเลขนี้อยู่ในสายตาทุกครั้งที่นั่งลง` : 'ถึงเกณฑ์แล้ว แต่ติดไว้กันลืม' },
+      { label: 'ลอกเกณฑ์ลงปกหลังสมุด', fx: {}, result: 'เขียนตัวเลขสองสามบรรทัดไว้หลังสมุด เปิดเจอทุกวัน' },
+      { label: 'พับเก็บเหมือนเดิม', fx: {}, result: 'พับกลับสี่ทบ ใส่กระเป๋าใบเดิม' },
+      { label: 'เอาไปให้เพื่อนที่จะสอบด้วยกันดู', fx: { network: 1 }, result: 'เพื่อนอ่านจบแล้วพูดว่า "ปีนี้เอาจริงนะ"' }] };
+}
+// prep season comes round again after a failed year · what tripped him last time decides the nudge
+function seasonCard() {
+  const k = S.stats.knowledge, h = S.stats.health, why = S.lastFail;   // kept until he sits again, so a skipped year still gets the reminder
+  const mark = ok => ok ? '✓' : '✗';
+  const last = ({ written: 'ปีก่อนตกตั้งแต่ข้อเขียน', land: 'ปีก่อนพลาดที่สนามพลศึกษา', swim: 'ปีก่อนไปไม่ถึงขอบสระ',
+    medical: 'ปีก่อนตกที่ห้องตรวจร่างกาย', noshow: 'ปีก่อนผ่านข้อเขียน แต่ไม่ได้ไปสอบพลศึกษา', injury: 'ปีก่อนซ้อมหนักจนเจ็บก่อนวันสอบพละ', noshow_iv: 'ปีก่อนผ่านถึงรอบสัมภาษณ์ แต่ไม่ได้ไปสัมภาษณ์', interview: 'ปีก่อนตกรอบสัมภาษณ์', noreport: 'ปีก่อนติดแล้ว แต่ไม่ไปรายงานตัว' })[why] || 'ปีก่อนยังไม่ติด';
+  return { id: '__SEASON', title: 'ฤดูสอบวนกลับมา', kind: 'scheduled', repeatable: true,
+    text: `ใบปลิวกวดวิชาเตรียมทหารเริ่มติดเต็มบอร์ดหน้าโรงเรียนอีกครั้ง เหลืออีกไม่กี่เดือนก็ถึงวันสอบ\n${last}\n\n` +
+      `ตอนนี้ ${S.name}: ความรู้ ${k} ${mark(k >= KNOW_MIN)}${k < KNOW_MIN ? ` (ขาดอีก ${KNOW_MIN - k})` : ''} · ${bodyReach(h)}` +
+      `${S.flags.has('can_swim') ? ' · ว่ายน้ำเป็นแล้ว' : ' · ยังไม่ได้หัดว่ายน้ำ'}`,
+    options: [
+      { label: 'ทบทวนบทที่อ่อนใหม่ตั้งแต่ต้น', fx: { knowledge: 1 }, result: 'เปิดสมุดเล่มปีก่อน รอยปากกาแดงยังอยู่ทุกหน้า' },
+      { label: 'เริ่มวิ่งตอนเช้าอีกครั้ง', fx: { health: 1 }, result: 'รองเท้าคู่เดิมยังใส่ได้ แต่วิ่งรอบแรกเหนื่อยกว่าที่คิด' },
+      { label: 'ไปหัดว่ายน้ำที่สระเทศบาล', fx: { health: 1 }, setFlags: ['can_swim'], result: 'สมัครสระรายเดือน ไปทุกเย็นวันเสาร์' },
+      { label: 'ยังไม่อยากคิดเรื่องสอบตอนนี้', fx: { happiness: 1 }, result: 'เดินผ่านบอร์ดไปเฉย ๆ แต่ยังจำวันสอบได้' }] };
+}
+// retry year, after applying: tutor again or go straight to exam day (owner 2026-11-05)
+function reprepCard() {
+  const k = S.stats.knowledge, h = S.stats.health, ready = k >= KNOW_MIN && h >= BODY_MIN.army;
+  return { id: '__REPREP', title: 'ติวอีกรอบไหม', kind: 'scheduled', repeatable: true,
+    text: `เหลือเวลาก่อนวันสอบอีกไม่กี่เดือน ปีก่อนติวมาแล้วหนึ่งรอบ\n` +
+      `ความรู้ ${k}/${KNOW_MIN} ${k >= KNOW_MIN ? '✓' : '✗'} · ${bodyReach(h)}\n${ready ? 'ถึงเกณฑ์ทุกข้อของทุกเหล่าแล้ว' : 'ยังมีข้อที่ไม่ถึงเกณฑ์ของบางเหล่า'}`,
+    options: [
+      { label: 'ติวอีกรอบ เลือกวิธีใหม่', _reprep: 'again', hint: 'หาที่ติวใหม่ แล้วติวไปจนถึงวันสอบ', result: 'หยิบใบปลิวกวดวิชาที่เก็บไว้ขึ้นมาดูอีกครั้ง' },
+      { label: 'ไม่ติวแล้ว อ่านทวนเองเบา ๆ', _reprep: 'skip', fx: { knowledge: 1 }, result: 'อ่านวันละบท ไม่เร่ง ไม่หยุด' },
+      { label: 'ไม่ติวแล้ว ฝึกร่างกายอย่างเดียว', _reprep: 'skip', fx: { health: 1 }, result: 'ความรู้ว่าพอแล้ว ที่เหลือคือขากับปอด' },
+      { label: 'ไม่ติวแล้ว ใช้ชีวิตตามปกติรอวันสอบ', _reprep: 'skip', fx: { happiness: 1 }, result: 'ปีนี้ไม่มีใบปลิวติดข้างโต๊ะ' }] };
+}
+// waiting scenes between "no more tutoring" and exam day
+function waitCard(id) {
+  const first = id === '__WAIT1', who = elder();
+  return first
+    ? { id, title: 'เดือนที่เหลือ', kind: 'scheduled', repeatable: true,
+        text: `ไม่มีค่ายติว ไม่มีตารางอ่าน วันธรรมดากลับมาเป็นวันธรรมดา แต่ปฏิทินบนผนังมีวันหนึ่งที่วงไว้`,
+        options: [
+          { label: 'ช่วยงานที่บ้านเต็มที่', fx: { relations: 1 }, result: `${who}บอกว่าปีนี้ดูใจเย็นกว่าปีก่อน` },
+          { label: 'ไปเที่ยวกับเพื่อนสักวัน', fx: { happiness: 1 }, result: 'ทั้งวันไม่มีใครพูดเรื่องสอบ' },
+          { label: 'ซ้อมว่ายน้ำสัปดาห์ละครั้ง', fx: { health: 1 }, result: 'ว่ายสบายขึ้นทุกสัปดาห์' },
+          { label: 'เปิดข้อสอบเก่าดูเล่นก่อนนอน', fx: { knowledge: 1 }, result: 'ข้อที่ปีก่อนตอบผิด ปีนี้ตอบได้' }] }
+    : { id, title: 'อีกสัปดาห์เดียว', kind: 'scheduled', repeatable: true,
+        text: `อีกเจ็ดวันถึงวันสอบ บัตรสอบวางอยู่บนโต๊ะ ปีนี้ไม่ต้องรีบอ่านอะไร มีแค่ต้องรอ`,
+        options: [
+          { label: 'นอนให้ตรงเวลาทุกคืน', fx: { health: 1 }, result: 'ตื่นตีห้าได้โดยไม่ต้องตั้งนาฬิกา' },
+          { label: 'ไปไหว้พระ', fx: { happiness: 1 }, result: 'ขอให้ใจนิ่งเหมือนเดิม ไม่ได้ขอให้ติด' },
+          { label: 'คุยกับเพื่อนที่สอบปีนี้ด้วยกัน', fx: { network: 1 }, result: 'นัดเจอกันหน้าสนามสอบ' },
+          { label: 'เตรียมของสอบไว้แต่เนิ่น ๆ', fx: {}, result: 'ดินสอ ยางลบ บัตรประชาชน วางเรียงไว้ครบ' }] };
+}
+function resolve(id) {
+  if (id === '__CRITERIA') return criteriaCard();
+  if (id === '__SEASON') return seasonCard();
+  if (id === '__E9R') return retryEveCard();
+  if (id === '__MORNR') return retryMorningCard();
+  if (id === '__CRIT2') return { ...criteriaCard(true), options: [
+    { label: 'ไล่ดูทีละข้อ เทียบกับตัวเอง', fx: {}, result: 'ข้อไหนถึงแล้ว ข้อไหนยังขาด เห็นชัดกว่าปีก่อน' },
+    { label: 'ติดไว้ข้างโต๊ะเหมือนเดิม', fx: { knowledge: 1 }, result: 'ติดทับรอยเทปเก่าของปีก่อน' },
+    { label: 'วงข้อที่ปีก่อนพลาดไว้', fx: {}, result: 'วงปากกาแดงไว้ข้อเดียว แล้ววงซ้ำอีกรอบ' },
+    { label: 'พับใส่กระเป๋าไว้กับบัตรสอบ', fx: {}, result: 'บัตรสอบกับแผ่นเกณฑ์อยู่ในซองเดียวกัน' }] };
+  if (id === '__REPREP') return reprepCard();
+  if (id === '__WAIT1' || id === '__WAIT2') return waitCard(id);
+  const vars = EVENTS.filter(v => v.variantOf === id && condOk(v.cond));
+  if (vars.length) return vars[0];
+  return byId[id] && condOk(byId[id].cond) ? byId[id] : null;
+}
+function famOk(f) {
+  if (!f) return true;
+  if (f === 'mother') return S.family === 'both' || S.family === 'mother';
+  if (f === 'father') return S.family === 'both' || S.family === 'fatherOnly';
+  if (f === 'parent') return S.family !== 'none';
+  return true;
+}
+// a base milestone is skipped when one of its replacing variants matches
+function replaced(e) {
+  return EVENTS.some(v => v.replaces === e.id && inAge(v) && condOk(v.cond));
+}
+
+// add training scenes so this year has TRAIN_PER_YEAR of them, slotted between the study scenes
+function pushTraining(q) {
+  let have = q.filter(id => /^PT\d/.test(id)).length;
+  while (have < TRAIN_PER_YEAR) {
+    const pick = weighted(EVENTS.filter(e => isTraining(e) && condOk(e.cond) && !q.includes(e.id) && (e.repeatable || !S.done.has(e.id)) && S.seenAge?.[e.id] !== S.age - 1));
+    if (!pick) break;
+    const study = q.map((id, i) => byId[id] && isDiligence(byId[id]) ? i : -1).filter(i => i >= 0);
+    const at = study.length ? study[Math.min(have, study.length - 1)] + 1 : q.length;
+    q.splice(at, 0, pick.id); have++;
+  }
+}
+function beginYear() {
+  if (S.age > 18) return finish('พ้นเกณฑ์อายุรับสมัคร ชีวิตเดินต่อตามทางอื่นของเกม');
+  const q = [];
+  // milestones (fire at their first eligible age)
+  for (const e of EVENTS) {
+    if (e.kind !== 'milestone' || S.done.has(e.id)) continue;
+    if (S.age !== e.ageMin) continue;
+    if (!condOk(e.cond)) continue;
+    if (!e.replaces && replaced(e)) continue;
+    q.push(e.id);
+  }
+  // scheduled follow-ups come after this year's life events (so unlock events can land before E3)
+  // retry years: study follow-ups wait until he has applied and chosen to tutor again
+  const isExpo = id => !S.flags.has('cadet_dream') && /^(A\d|ตร\d|E0|X5|T\d|T1b|N\d|X3|SR0)/.test(id);
+  // an exposure follow-up that would land right after last year's inspiration waits a year (owner: never back to back)
+  S.sched.filter(s => s.age === S.age && isExpo(s.id) && S.lastInspire === S.age - 1 && S.age < 16).forEach(s => s.age++);
+  const dueSched = S.sched.filter(s => s.age === S.age).map(s => s.id).filter(id => !(S.everFailed && /^(K\d|D[123])/.test(id)));
+  S.sched = S.sched.filter(s => s.age !== S.age);
+  const expoDue = dueSched.some(isExpo);
+  // re-entry invitation: occasional, never two years in a row (engine-made in the real game)
+  const dreaming = S.flags.has('cadet_dream');
+  // before committing: occasional, natural; after committing the exam notices (S16/S17/S18) come every year as normal
+  if (S.sex === 'ชาย' && S.age >= 14 && S.age <= 17 && !dreaming && !S.flags.has('cadet_declined')
+      && S.lastInvite !== S.age - 1 && Math.random() < INVITE_CHANCE) {
+    const inv = byId['INV-' + S.age];
+    if (inv) { q.push(inv.id); S.lastInvite = S.age; }
+  }
+  // pool: normal life mixed with inspiration; prep chain only after committing
+  const retryWait = S.everFailed && S.retryYear !== S.age;
+  // committed to the exam: ordinary teen-life cards stop, the military-life pool (data-06) takes over (owner 2026-11-06)
+  const eligible = () => EVENTS.filter(e => e.kind === 'pool' && inAge(e) && condOk(e.cond) && !(dreaming && e.normal) && !(retryWait && (isDiligence(e) || isTraining(e)))
+      && (e.repeatable || (!S.done.has(e.id) && !(e.variantOf && S.done.has(e.variantOf)))) && !q.includes(e.id)
+      && !(!e.replaces && replaced(e)) && !(e.replaces && S.done.has(e.replaces)));
+  const insp = e => !e.normal && !(e.cond?.flagsHas || []).includes('cadet_dream');
+  const guaranteed = S.sex === 'ชาย' && !dreaming && S.inspireAges.includes(S.age);
+  let inspiredThisYear = false;
+  for (let r = 0; r < POOL_ROUNDS; r++) {
+    // in a guaranteed year the first draw is always normal life, so inspiration lands between everyday events
+    if (!guaranteed && Math.random() >= POOL_CHANCE) continue;
+    const allowInsp = !guaranteed && !dreaming && !inspiredThisYear && S.lastInspire !== S.age - 1 && S.inspireCount < INSPIRE_MAX
+      && !S.inspireAges.includes(S.age + 1) && !S.inspireAges.includes(S.age - 1) && !expoDue
+      && !S.sched.some(x => x.age === S.age + 1 && isExpo(x.id));
+    const list = eligible().filter(e => !insp(e) || allowInsp)
+      .map(e => ({ ...e, weight: (e.weight ?? 1) * (insp(e) ? INSPIRE_WEIGHT : 1) }));
+    const pick = weighted(list);
+    if (!pick) continue;
+    if (insp(pick)) { inspiredThisYear = true; S.lastInspire = S.age; S.inspireCount++; }
+    q.push(pick.id);
+  }
+  if (guaranteed && !inspiredThisYear) {
+    const pick = weighted(eligible().filter(insp));
+    if (pick) { q.push(pick.id); S.lastInspire = S.age; S.inspireCount++; }
+  }
+  // failed last year and still in the race: a reminder when prep season comes round (owner 2026-11-05)
+  if (S.lastFail && dreaming) q.push('__SEASON');
+  // prep years: guaranteed diligence-test scenes (study vs play) — this is where knowledge for the exam is won or lost
+  // retry years: no prep scenes until he has applied again and chosen to tutor (see __REPREP)
+  if (dreaming && prepBudget() > 0 && !S.flags.has('cadet_exam_door') && !S.everFailed) {
+    let have = q.filter(id => byId[id] && isDiligence(byId[id])).length;
+    while (have < DILIGENCE_PER_YEAR) {
+      const pick = weighted(eligible().filter(e => isDiligence(e) && !q.includes(e.id) && S.seenAge?.[e.id] !== S.age - 1));
+      if (!pick) break;
+      q.push(pick.id); have++;
+    }
+  }
+  // prep years: guaranteed physical-training scenes woven in with the study scenes (owner 2026-11-05)
+  if (dreaming && !S.flags.has('cadet_exam_door') && !S.everFailed) pushTraining(q);
+  // middle-class family that said no may come back after seeing his effort (more likely if knowledge is high)
+  if (S.pendingF2 === S.age && !S.flags.has('cadet_family_support') && S.flags.has('cadet_dream')
+      && Math.random() < 0.35 + 0.5 * Math.max(0, Math.min(1, (S.stats.knowledge - 55) / 20))) q.push('F2');
+  q.push(...dueSched);
+  // exam notices (engine-made): 16 and 17 end of year, 18 start of year
+  if (S.sex === 'ชาย' && S.flags.has('cadet_dream')) {
+    if (S.age === 18) { q.unshift('S18'); const iS = q.indexOf('__SEASON'); if (iS > 0) { q.splice(iS, 1); q.unshift('__SEASON'); } }   // age 18: season reminder before S18
+    if (S.age === 16 || S.age === 17) q.push('S' + S.age);
+  }
+  S.queue = [...new Set(q)];
+  S.log.push(`— อายุ ${S.age} (พ.ศ. ${year()}) · ${({primary:'ประถม',lower:'ม.ต้น',upper:'ม.ปลาย',voc:'ปวช.'})[school()]}`);
+  next();
+}
+
+function weighted(list) {
+  const tot = list.reduce((a, e) => a + (e.weight ?? 1), 0);
+  let r = Math.random() * tot;
+  for (const e of list) { r -= (e.weight ?? 1); if (r <= 0) return e; }
+  return null;
+}
+
+function next() {
+  if (S.p2) return p2Next();
+  if (S.examChain) {
+    const id = S.examChain.shift();
+    if (!id) return window.DEMO_PHASE2 ? startPhase2() : finish('ถึงประตูห้องสอบแล้ว · เนื้อหาในสนามสอบเป็นเฟสถัดไป');
+    return show(resolve(id) || byId[id]);
+  }
+  while (S.queue.length) {
+    const id = S.queue.shift();
+    // the folded criteria sheet turns up again right before choosing how to prep (owner 2026-11-05)
+    if (id === 'E3' && S.criteriaFolded && !S.refoldShown && !S.done.has('E3')) {
+      S.refoldShown = true; S.queue.unshift('E3'); return show(refoldCard());
+    }
+    const e = resolve(id);
+    if (!e) continue;
+    // drawn before he committed this year: once he is on the cadet road, swap ordinary life for military life
+    if (e.normal && S.flags.has('cadet_dream')) {
+      const alt = weighted(EVENTS.filter(m => m.milLife && inAge(m) && condOk(m.cond) && (m.repeatable || !S.done.has(m.id)) && !S.queue.includes(m.id)));
+      if (alt) return show(alt);
+      continue;
+    }
+    if (e.kind !== 'exam' && !e.repeatable && S.done.has(e.id) && !id.startsWith('INV-')) continue;
+    if (e.kind !== 'exam' && !e.repeatable && e.variantOf && S.done.has(e.variantOf)) continue;
+    return show(e);
+  }
+  if (S.doorPending) { S.doorPending = false; return examDoor(); }
+  S.age++;
+  beginYear();
+}
+
+const fill = t => (t || '').replaceAll('{ชื่อ}', S.name).replaceAll('{เหล่า}', leanBranch());
+function leanBranch() {
+  const l = [...S.flags].find(f => f.startsWith('cadet_lean:'));
+  if (l) return BRANCH[l.split(':')[1]] || l.split(':')[1];
+  const seen = Object.keys(BRANCH).filter(b => S.flags.has('saw_' + b));
+  return BRANCH[seen[Math.floor(Math.random() * seen.length)] || 'army'];
+}
+
+function show(e) {
+  let text = fill(e.text);
+  let options = [...(e.options || [])];
+  if (e.contextLines) {
+    const hit = e.contextLines.find(c => condOk(c.when));
+    if (hit) {
+      const line = hit.altLine && Math.random() < 0.5 ? hit.altLine : hit.line;
+      text += ' ' + fill(line);
+      if (hit.extraOption) options.push(hit.extraOption);
+      if (hit.altResult) options = options.map(o => o.other ? { ...o, result: hit.altResult } : o);
+    }
+  }
+  const kindTh = e.normal ? 'ชีวิตปกติ (การ์ดเดิมของเกม)' : e.milLife ? 'ชีวิตเด็กเตรียมทหาร' : isDiligence(e) ? 'ทดสอบความตั้งใจระหว่างติว' : {milestone:'หลักไมล์', pool:'สุ่ม', scheduled:'ต่อเนื่อง', invite:'การ์ดเชิญรายปี', exam:'ด่านสอบ'}[e.kind] || e.kind;
+  stage.innerHTML = `
+    <div class="badges"><span class="badge age">อายุ ${S.age}</span><span class="badge">${kindTh}</span><span class="badge">${e.id}</span></div>
+    <h2>${fill(e.title)}</h2>
+    <p class="text">${text}</p>
+    <div class="opts"></div>`;
+  const box = stage.querySelector('.opts');
+  S.cur = options;   // test hook only (automated playthroughs read the current options)
+  options.forEach(o => {
+    const b = document.createElement('button');
+    const familyCamp = [].concat(o.requiresFlags || []).includes('cadet_family_support');
+    const need = familyCamp ? campOwnNeed() : (S.cls === 'rich' ? 0 : (o.requiresMoney || o.requires?.money || 0));
+    if (familyCamp && S.flags.has('cadet_family_support') && (S.familyShare ?? 1) < 1)
+      o = { ...o, hint: `ที่บ้านออกให้ราว ${Math.round(S.familyShare * 100)}% ที่เหลือใช้เงินตัวเอง`, _ownPay: need };
+    const noMoney = need > 0 && S.stats.money < need;
+    const noCond = (o.requires && !condOk(o.requires))
+      || (o.requiresFlags && [].concat(o.requiresFlags).some(f => !S.flags.has(f)))
+      || (o.requiresAnyFlags && !o.requiresAnyFlags.some(f => S.flags.has(f)))
+      || (o.requiresNetwork && S.stats.network < 40 + o.requiresNetwork * 10)
+      || (o.requiresFamily && !famOk(o.requiresFamily));
+    b.disabled = noMoney || noCond;
+    const why = noMoney ? 'เงินไม่พอ' : noCond ? (o.lockReason || o.requires?.reason || 'ยังเลือกไม่ได้') : '';
+    b.innerHTML = fill(o.label) + (o.hint ? `<span class="hint">${fill(o.hint)}</span>` : '') + (why ? `<span class="hint">🔒 ${why}</span>` : '');
+    b.onclick = () => choose(e, o);
+    box.appendChild(b);
+  });
+  renderSide();
+}
+
+// base: poor 30% · middle 50–80% (fixed per family) · rich 100%
+// poor & middle: knowledge adds a bonus, ramping from knowledge 40 (+0) to 60 (+KNOW_BONUS_MAX)
+const KNOW_BONUS_MAX = 0.2;  // demo value — owner to set
+const knowBonus = () => KNOW_BONUS_MAX * Math.max(0, Math.min(1, (S.stats.knowledge - 55) / 20));
+function familySupportChance() {
+  if (S.cls === 'rich') return 1;
+  // poor: knowledge at the exam bar (≥40) earns +10%; below it the family more likely says no
+  if (S.cls === 'poor') return S.stats.knowledge >= 55 ? 0.4 : 0.3;
+  if (S.cls === 'mid' && S.midSupport == null) S.midSupport = 0.5 + Math.random() * 0.3;
+  const base = S.cls === 'poor' ? 0.3 : S.midSupport;
+  return Math.min(0.99, base + knowBonus());
+}
+// what share of the camp fee the family covers: poor 30–100% (and how they raise it), others all of it
+const FUND_WAYS = ['fund:borrow_relative', 'fund:loan_shark', 'fund:village_fund', 'fund:pawn', 'fund:sell_livestock'];
+function onFamilySupport() {
+  if (S.cls === 'poor') {
+    // how much they can raise also follows his knowledge: <40 → 30–60% · 40–59 → 40–80% · ≥60 → 60–100%
+    const k = S.stats.knowledge, [lo, hi] = k >= 75 ? [0.6, 1] : k >= 55 ? [0.4, 0.8] : [0.3, 0.6];
+    S.familyShare = Math.round((lo + Math.random() * (hi - lo)) * 10) / 10;
+    const way = FUND_WAYS[Math.floor(Math.random() * FUND_WAYS.length)];
+    S.flags.add(way);
+    S.log.push(`ที่บ้านออกค่าติวได้ราว ${Math.round(S.familyShare * 100)}%`);
+    if (resolve('F1')) S.queue.unshift('F1');
+  } else S.familyShare = 1;
+}
+// own money still needed for the family-paid camp option
+const campOwnNeed = () => Math.ceil(CAMP_COST * (1 - (S.familyShare ?? 1)));
+
+function applyFx(fx) {
+  const out = [];
+  for (const [k, v] of Object.entries(fx || {})) {
+    if (!v || !(k in S.stats)) continue;
+    const d = k === 'money' ? v : v * SCALE;
+    S.stats[k] = k === 'money' ? Math.max(0, S.stats[k] + d) : Math.max(0, Math.min(100, S.stats[k] + d));
+    out.push([k, d]);
+  }
+  return out;
+}
+
+function choose(e, o) {
+  S.done.add(e.id);
+  (S.seenAge ??= {})[e.id] = S.age;
+  if (!S.flags.has('cadet_dream') && /^(A\d|ตร\d|E0|X5|T\d|T1b|N\d|X3|SR0)$/.test(e.id)) S.lastInspire = S.age;
+  if (o._iv != null && S.p2) {   // interview: serious answers move on silently; the funny one shows the panel's reaction
+    S.p2.iv = (S.p2.iv || 0) + o._iv;
+    if (!o.result) return next();
+  }
+  if (o._score != null) {   // questionnaire: no feedback, no score shown — straight to the next question
+    S.p2.scores[o._branch] = (S.p2.scores[o._branch] || 0) + o._score;
+    return next();
+  }
+  if (o._report && S.p2) {
+    if (o._report === 'go') S.p2.steps = [() => arriveCard(S.p2.chosen)];
+    else if (o._report === 'wait') S.p2.steps = [() => extraDaysCard(), () => reportAsk(1)];
+    else S.p2.steps = [() => noReportCard(), () => letDownCard('report'), () => failedCard()];
+  }
+  if (o._pick) { if (o._pick === 'none') { S.p2.steps = [() => { finish('สละสิทธิ์ทุกเหล่า ชีวิตเดินต่อทางอื่น'); return 'END'; }]; } else S.p2.steps = [() => packNotice(o._pick)]; }
+  if (o._how && S.p2) S.p2.how = o._how;
+  if (o._reprep === 'again') {
+    // tutor again: pick a prep method anew (E3) with a fresh gain budget, then the usual study-vs-play scenes
+    Object.keys(PREP_BUDGET).forEach(f => S.flags.delete(f));
+    S.prepGain = 0; S.done.delete('E3');
+    const dil = EVENTS.filter(x => isDiligence(x) && condOk({ ...(x.cond || {}), knowledgeMax: undefined }));
+    const picks = [];
+    for (let i = 0; i < DILIGENCE_PER_YEAR; i++) { const p = weighted(dil.filter(x => !picks.includes(x))); if (p) picks.push(p); }
+    picks.forEach(p => S.done.delete(p.id));
+    const q2 = ['E3', ...picks.map(p => p.id)];
+    pushTraining(q2);
+    S.queue.push(...q2);
+  }
+  if (o._reprep === 'skip') S.queue.push('__WAIT1', '__WAIT2');
+  if (o._phys === 'wait' && S.p2) {
+    const r = o._round || 'phys';
+    S.p2.askNs = S.p2.askNs || {};
+    S.p2.askNs[r] = (S.p2.askNs[r] || 0) + 1;
+    S.p2.steps.unshift(S.p2.askNs[r] >= PHYS_ASK_MAX ? () => noShowCard(r) : () => physAsk(r));
+  }
+  if (e.variantOf) S.done.add(e.variantOf);
+  if (e.replaces) S.done.add(e.replaces);
+  const hadSupport = S.flags.has('cadet_family_support');
+  const kBefore = S.stats.knowledge, hBefore = S.stats.health;
+  let result = o.result, deltas = applyFx(o._ownPay ? { ...(o.fx || {}), money: (o.fx?.money || 0) - o._ownPay } : o.fx);
+  (o.setFlags || []).forEach(f => S.flags.add(f));
+  (o.clearFlags || []).forEach(f => S.flags.delete(f));
+  if (o._fold) S.criteriaFolded = true;
+  if ((o.setFlags || []).includes('cadet_dream') && (S.age === 16 || S.age === 17) && !S.p2 && !S.queue.includes('S' + S.age) && !S.done.has('S' + S.age)) S.queue.push('S' + S.age);
+  if ((o.setFlags || []).includes('cadet_dream') && !S.everDream) { S.everDream = true; S.showCriteria = true; }
+  let outs = (o.outcomes || []).filter(x => (!x.whenFlag || S.flags.has(x.whenFlag)) && (!x.whenNotFlag || !S.flags.has(x.whenNotFlag)) && (!x.when || condOk(x.when)));
+  // family paying for tutoring depends on the family's means (owner 2026-11-05)
+  const sup = outs.filter(x => (x.setFlags || []).includes('cadet_family_support'));
+  if (sup.length && sup.length < outs.length) {
+    const pSup = familySupportChance();
+    const tS = sup.reduce((a, x) => a + (x.p ?? 1), 0), rest = outs.filter(x => !sup.includes(x)), tR = rest.reduce((a, x) => a + (x.p ?? 1), 0);
+    outs = [...sup.map(x => ({ ...x, p: pSup * (x.p ?? 1) / tS })), ...rest.map(x => ({ ...x, p: (1 - pSup) * (x.p ?? 1) / (tR || 1) }))];
+  }
+  if (outs.length) {
+    const tot = outs.reduce((a, x) => a + (x.p ?? 1), 0);
+    let r = Math.random() * tot, pick = outs[outs.length - 1];
+    for (const x of outs) { r -= (x.p ?? 1); if (r <= 0) { pick = x; break; } }
+    result = pick.result || result;
+    if (pick._injure && S.p2) S.p2.steps = [() => injuryCard(), () => failedCard()];
+    deltas = deltas.concat(applyFx(pick.fx));
+    (pick.setFlags || []).forEach(f => S.flags.add(f));
+  }
+  // study gains from prep cards stop at that prep method's ceiling (camp 60 · self 50 · group/senior 55)
+  // study cards add knowledge up to the prep method's gain budget (camp +20 · group/senior +15 · self +15)
+  if (e.cond?.knowledgeMax != null && S.stats.knowledge > kBefore) {
+    const gain = S.stats.knowledge - kBefore, room = Math.max(0, prepBudget() - (S.prepGain || 0)), cut = Math.max(0, gain - room);
+    S.stats.knowledge -= cut;
+    S.prepGain = (S.prepGain || 0) + gain - cut;
+    deltas = deltas.map(([k, d]) => k === 'knowledge' ? [k, d - cut] : [k, d]);
+  }
+  // training scenes add health up to HEALTH_BUDGET in total
+  if (isTraining(e) && S.stats.health > hBefore) {
+    const gain = S.stats.health - hBefore, room = Math.max(0, HEALTH_BUDGET - (S.trainGain || 0)), cut = Math.max(0, gain - room);
+    S.stats.health -= cut;
+    S.trainGain = (S.trainGain || 0) + gain - cut;
+    deltas = deltas.map(([k, d]) => k === 'health' ? [k, d - cut] : [k, d]);
+  }
+  // family funding follow-ups
+  if (!hadSupport && S.flags.has('cadet_family_support')) onFamilySupport();
+  if (S.cls === 'mid' && S.flags.has('cadet_family_told') && !S.flags.has('cadet_family_support')
+      && S.flags.has('cadet_dream') && S.pendingF2 == null) S.pendingF2 = S.age + 1;
+  const now = [];
+  for (const s of (o.schedule || [])) {
+    const lo = s.afterYears ?? 0, hi = s.afterYearsMax ?? lo;
+    const at = S.age + lo + Math.floor(Math.random() * (hi - lo + 1));
+    if (at === S.age) now.push(s.id); else S.sched.push({ id: s.id, age: at });
+  }
+  // late entrants hit E3 the same year: give one chance at an unlock event (U*) right before it
+  const iE3 = now.indexOf('E3');
+  if (iE3 >= 0 && Math.random() < UNLOCK_BEFORE_E3) {
+    const u = weighted(EVENTS.filter(x => /^U\d/.test(x.id) && inAge(x) && condOk(x.cond) && !S.done.has(x.id)));
+    if (u) now.splice(iE3, 0, u.id);
+  }
+  S.queue.unshift(...now);   // same-year follow-ups keep the order they were listed in
+  if (S.showCriteria) { S.showCriteria = false; S.queue.unshift('__CRITERIA'); }   // criteria sheet comes right after deciding
+  S.log.push(`${e.id} · ${fill(o.label)}`);
+  const lbl = Object.fromEntries(STATS);
+  stage.querySelector('.opts').innerHTML = '';
+  stage.insertAdjacentHTML('beforeend', `
+    <div class="result">${fill(result) || '…'}</div>
+    <div class="fx">${deltas.map(([k, d]) => `<span class="${d > 0 ? 'up' : 'down'}">${lbl[k]} ${d > 0 ? '+' : ''}${d}</span>`).join('')}</div>
+    <button class="primary" id="cont">ต่อ</button>`);
+  renderSide();
+  $('#cont').onclick = () => {
+    if (S.examChain) return next();
+    if (o.next === 'EXAM_DOOR' && !S.applyOrder) return applyForm();   // fill in the branches first, then carry on
+    if (o.next === 'EXAM_DOOR') {
+      // retry year: after applying again → criteria sheet → tutor again? → prep or waiting scenes → exam day (owner 2026-11-05)
+      if (S.everFailed && S.retryYear !== S.age) {
+        S.retryYear = S.age; S.doorPending = true;
+        S.queue = ['__CRIT2', '__REPREP'];
+        return next();
+      }
+      return examDoor();
+    }
+    if (o.next === 'STOP' && S.age >= 18) return finish('เลือกพอแล้ว ชีวิตเดินต่อทางมหาวิทยาลัยหรือสายอื่นตามเกมเดิม');
+    next();
+  };
+}
+
+function examDoor() {
+  const e9 = resolve('E9') || EVENTS.find(e => /^E9/.test(e.id) && condOk(e.cond));
+  S.queue = [];
+  S.examChain = [];
+  if (S.tries) S.examChain.push('__E9R', '__MORNR');   // he has sat it before (owner 2026-11-05: "ปีที่สอง")
+  else { if (e9) S.examChain.push(e9.id); if (byId.EXAM_MORNING) S.examChain.push('EXAM_MORNING'); }
+  next();
+}
+const LASTFAIL_NOTE = { written: 'ปีก่อนพลาดตั้งแต่ข้อเขียน', land: 'ปีก่อนพลาดที่สนามพลศึกษา', injury: 'ปีก่อนข้อเท้าพลิกก่อนวันสอบพละ',
+  interview: 'ปีก่อนพลาดที่ห้องสัมภาษณ์', noshow: 'ปีก่อนผ่านข้อเขียนแต่ไม่ได้ไปสอบพละ', noshow_iv: 'ปีก่อนมาถึงรอบสัมภาษณ์แต่ไม่ได้ไป', noreport: 'ปีก่อนติดแล้วแต่ไม่ได้ไปรายงานตัว' };
+function retryEveCard() {
+  const last = S.age >= 18, note = LASTFAIL_NOTE[S.lastFail] || 'ปีก่อนยังไม่ติด';
+  return { id: '__E9R', title: last ? 'คืนก่อนสอบ ครั้งสุดท้าย' : 'คืนก่อนสอบ ปีที่สอง', kind: 'exam', repeatable: true,
+    text: `ปีนี้ไม่ต้องถามทางไปสนามสอบแล้ว รู้ว่ารถเที่ยวไหนถึงก่อน ร้านข้าวไหนเปิดดึก ห้องน้ำตรงไหนคิวสั้น\n` +
+      `บัตรสอบใบใหม่วางทับใบของปีก่อน ${note}${last ? ' ปีนี้คือครั้งสุดท้ายที่อายุยังสมัครได้' : ''}`,
+    options: [
+      { label: 'เปิดสมุดจดจุดที่พลาดปีก่อน', fx: { knowledge: 1 }, result: 'อ่านจนจบหน้า แล้วขีดเส้นใต้บรรทัดเดียว "อย่าพลาดซ้ำ"' },
+      { label: 'โทรหาบ้าน', fx: { relations: 1 }, result: 'ปลายสายบอกว่าปีนี้ไม่ต้องรีบ ทำเท่าที่ทำได้' },
+      { label: 'ทักเด็กที่มาสอบครั้งแรก', fx: { network: 1 }, result: 'เด็กคนนั้นถามทางไปห้องสอบ เหมือนที่ตัวเองเคยถามเมื่อปีก่อน' },
+      { label: 'เข้านอนตั้งแต่สองทุ่ม', fx: { health: 1 }, result: 'ปีนี้หลับได้ก่อนเที่ยงคืน' }] };
+}
+function retryMorningCard() {
+  return { id: '__MORNR', title: 'เช้าวันสอบ', kind: 'exam', repeatable: true,
+    text: `แถวหน้าประตูสนามยาวเหมือนเดิม แต่ปีนี้ ${S.name} ไม่ต้องเขย่งมองหาป้าย รู้ว่าแถวไหนคือแถวของตัวเอง\nเด็กหน้าใหม่ข้าง ๆ กำบัตรสอบแน่นจนกระดาษยับ เหมือนตัวเองเมื่อปีก่อน`,
+    options: [{ label: 'เข้าห้องสอบ' }] };
+}
+
+// ───────────── phase 2: inside the exam ─────────────
+const P2 = () => window.DEMO_PHASE2 || {};
+const BR = ['army', 'navy', 'airforce', 'police'];
+const BR_TH = { army: 'ทบ.', navy: 'ทร.', airforce: 'ทอ.', police: 'ตร.' };
+const WRITTEN_MIN = 13, KNOW_MIN = 65, HEALTH_MIN = 50;
+const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(x => x[1]);
+const firstOk = list => [].concat(list || []).find(c => !c.cond || condOk(c.cond)) || [].concat(list || [])[0];
+const asCard = (c, extra = {}) => ({ id: c?.id || 'P2', title: c?.title || '', kind: 'exam', text: c?.text || '',
+  options: (c?.options && c.options.length ? c.options : [{ label: 'ต่อ' }]), contextLines: c?.contextLines, ...extra });
+const txt = v => typeof v === 'string' ? v : (v?.text || '');
+const statusCard = (title, text) => asCard({ id: 'RES', title, text, options: [{ label: 'ต่อ' }] });
+
+// the application form: ticked when he applies (at the exam notice) · the exam itself starts later with this order
+function applyForm() {
+  const ap = firstOk(P2().apply) || {};
+  stage.innerHTML = `
+    <div class="badges"><span class="badge age">อายุ ${S.age}</span><span class="badge">สนามสอบ</span><span class="badge">${ap.id || 'X1'}</span></div>
+    <h2>${fill(ap.title || 'ช่องเหล่าในใบสมัคร')}</h2>
+    <p class="text">${fill(ap.text || 'เลือกเหล่าที่จะสมัครสอบ')}</p>
+    <div class="opts">${BR.map(b => `<label style="display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px">
+      <input type="checkbox" value="${b}" style="width:auto"> ${(P2().apply?.branchLabels || P2().branchLabels || BR_TH)[b] || BR_TH[b]}</label>`).join('')}
+      <span class="hint">ติ๊กตามลำดับที่อยากสอบ · ลำดับที่ติ๊กคือลำดับวันสอบ · แต่ละเหล่าสอบคนละวัน</span>
+      <button class="primary" id="apply">ส่งใบสมัคร</button></div>`;
+  const order = [];
+  stage.querySelectorAll('input[type=checkbox]').forEach(cb => cb.onchange = () => {
+    if (cb.checked) order.push(cb.value); else order.splice(order.indexOf(cb.value), 1);
+  });
+  $('#apply').onclick = () => {
+    if (!order.length) return;
+    S.applyOrder = [...order];
+    S.log.push(`ยื่นใบสมัคร: ${order.map(b => BR_TH[b]).join(' · ')}`);
+    // continue exactly as the notice's "apply" choice would
+    if (S.everFailed && S.retryYear !== S.age) { S.retryYear = S.age; S.doorPending = true; S.queue = ['__CRIT2', '__REPREP']; return next(); }
+    return examDoor();
+  };
+  renderSide();
+}
+function startPhase2() {
+  S.examChain = null;
+  const order = S.applyOrder || [];
+  S.applyOrder = null;
+  {
+    S.tries = (S.tries || 0) + 1;
+    S.lastFail = null;
+    S.p2 = { branches: [...order], scores: {}, written: {}, steps: [], lastScore: null, physical: null, medical: null };
+    S.log.push(`สมัครสอบ: ${order.map(b => BR_TH[b]).join(' · ')}`);
+    order.forEach((b, i) => {
+      if (i > 0) S.p2.steps.push(() => { S.p2.dayNo = i + 1; return interlude(); });
+      S.p2.steps.push(() => asCard({ id: 'X2-' + b, title: `วันสอบ ${BR_TH[b]} · วันที่ ${i + 1}`,
+        text: [txt((P2().dayHeader || {})[b]), txt((P2().dayIntro || {})[b])].filter(Boolean).join(' ') || `วันสอบข้อเขียนของ ${BR_TH[b]}`,
+        options: [{ label: 'เข้าห้องสอบ', result: 'แจกข้อสอบแล้ว ห้องเงียบจนได้ยินเสียงพัดลม' }] }));
+      ((P2().quiz || {})[b] || []).forEach((q, k) => S.p2.steps.push(() => asCard(
+        { id: `Q-${b}-${k + 1}`, title: `ข้อสอบ ${BR_TH[b]} · ข้อ ${k + 1}/5`, text: q.q,
+          options: shuffle(q.options.map(o => ({ label: o.label, _score: o.score, _branch: b }))) })));
+      S.p2.steps.push(() => { judgeWritten(b); return null; });
+    });
+    S.p2.steps.push(() => waitDay());   // one empty day after the last branch, then results (owner 2026-11-05)
+    S.p2.steps.push(() => announceCard());   // how he checks the board · small fx (owner 2026-11-05)
+    S.p2.steps.push(() => board());
+    renderSide();
+    next();
+  }
+}
+
+function judgeWritten(b) {
+  const sc = S.p2.scores[b] || 0;
+  const ok = sc >= WRITTEN_MIN && S.stats.knowledge >= KNOW_MIN;
+  S.p2.written[b] = ok;
+  S.p2.reason = S.p2.reason || {};
+  S.p2.reason[b] = ok ? null : (sc < WRITTEN_MIN && S.stats.knowledge < KNOW_MIN ? 'both' : sc < WRITTEN_MIN ? 'quiz' : 'knowledge');
+  S.p2.lastScore = sc;
+  S.log.push(`ข้อเขียน ${BR_TH[b]}: ${sc}/25 · ความรู้ ${S.stats.knowledge} → ${ok ? 'ผ่าน' : 'ไม่ผ่าน'}`);
+}
+
+function interlude() {
+  const mood = S.p2.lastScore == null ? null : S.p2.lastScore >= WRITTEN_MIN ? 'good' : 'bad';
+  const list = (P2().interludes || []).filter(c => (!c.cond?.mood || c.cond.mood === mood)
+    && (c.cond?.moneyMax == null || S.stats.money <= c.cond.moneyMax) && (!c.cond || condOk({ ...c.cond, mood: undefined, moneyMax: undefined })));
+  const c = list[Math.floor(Math.random() * list.length)];
+  const dayTh = ['', 'หนึ่ง', 'สอง', 'สาม', 'สี่'][S.p2.dayNo] || String(S.p2.dayNo);
+  return c ? asCard(c, { id: c.id || 'X2i', text: (c.text || '').replaceAll('{วัน}', dayTh) }) : null;
+}
+
+function waitDay() {
+  const okAll = S.p2.branches.every(b => (S.p2.scores[b] || 0) >= WRITTEN_MIN);
+  const list = [].concat(P2().waitDay || []).filter(c => (!c.cond?.mood || c.cond.mood === (okAll ? 'good' : 'bad'))
+    && (!c.cond || condOk({ ...c.cond, mood: undefined })));
+  const c = list[Math.floor(Math.random() * list.length)]
+    || { title: 'วันว่างก่อนประกาศผล', text: `สอบครบ ${S.p2.branches.length} เหล่าแล้ว พรุ่งนี้ประกาศผล วันนี้ไม่มีอะไรต้องทำ`,
+         options: [{ label: 'นอนให้เต็มอิ่ม', fx: { health: 1 }, result: 'หลับยาวถึงเที่ยง' },
+                   { label: 'นั่งนึกคำตอบทีละข้อ', fx: {}, result: 'บางข้อมั่นใจ บางข้อไม่แน่ใจ' },
+                   { label: 'ช่วยงานที่บ้าน', fx: { happiness: 1 }, result: 'ทั้งวันมีงานให้มือทำ ใจเลยไม่ค่อยวิ่งไปที่ผลสอบ' },
+                   { label: 'โทรคุยกับเพื่อนที่สอบด้วยกัน', fx: { network: 1 }, result: 'คุยกันเรื่องข้อที่ตอบไม่ตรงกัน แล้วก็เลิกคุยเรื่องนี้' }] };
+  return asCard(c, { id: c.id || 'X2w' });
+}
+
+// demo texts · to be replaced by the researcher draft (cadet-phase2-announce.md)
+const WEB_YEAR = 2550;   // demo guess: results online from this year · owner to set
+const elder = () => ({ both: 'แม่', mother: 'แม่', fatherOnly: 'พ่อ' })[S.family] || 'ป้า';
+const secretNow = () => S.flags.has('cadet_family_secret');
+const checker = () => secretNow() ? 'เพื่อนสนิท' : elder();   // who goes to look at the board for him
+function announceCard(round) {
+  const web = year() >= WEB_YEAR, body = round === 'body', fin = round === 'final';
+  const no = S.p2.examNo || 10000 + Math.floor(Math.random() * 9000);
+  S.p2.examNo = no;
+  if (fin) return asCard({ id: 'X6a', title: 'บ่ายวันประกาศผลสุดท้าย',
+    text: `กินข้าวกลางวันไม่ลง ${web ? 'ผลจะขึ้นเว็บตอนบ่ายสาม' : 'ป้ายสุดท้ายจะติดตอนบ่ายสาม'} ${secretNow() ? 'เพื่อนสนิทนั่งรอเป็นเพื่อน' : elder() + 'นั่งรออยู่ด้วย'}\nรอบนี้ไม่มีรอบหน้าแล้ว ติดคือติด`,
+    options: [
+      web ? { label: 'กดรีเฟรชเองทุกนาที', fx: { health: -1 }, _how: 'self', result: 'นิ้วโป้งเมื่อยก่อนหน้าเว็บจะโหลด' }
+          : { label: 'เดินไปดูป้ายเอง', fx: { network: 1 }, _how: 'self', result: 'คนหน้าป้ายน้อยกว่ารอบแรกมาก ทุกคนเงียบ' },
+      { label: `ให้${checker()}ดูให้`, fx: { relations: 1 }, _how: 'elder', result: `${checker()}ลุกขึ้นช้า ๆ แล้วเดินไปก่อน` },
+      { label: 'รอให้คนซาก่อนค่อยดู', fx: { health: 1 }, _how: 'wait', result: 'นั่งนับมดบนโต๊ะจนบ่ายสี่' },
+      { label: 'ไหว้พระอีกรอบ แล้วค่อยไปดู', fx: { happiness: 1 }, _how: 'pray', result: 'ไหว้นานกว่าทุกครั้ง ไม่ได้ขออะไร' }] });
+  return asCard({ id: body ? 'X4a' : 'X3a', title: body ? 'เช้าวันประกาศผลพลศึกษา' : 'เช้าวันประกาศผล',
+    text: `${S.tries > 1 ? 'ปีก่อนก็ตื่นแต่เช้าแบบนี้ ' : ''}ตื่นตั้งแต่ตีห้าครึ่ง ${web ? 'ผลจะขึ้นเว็บตอนเก้าโมง' : 'ป้ายจะติดหน้ากองสอบตอนเก้าโมง'} ${elder()}ตื่นมาหุงข้าวก่อนเวลา ไม่มีใครพูดเรื่องผลสอบ\n` +
+      (body ? `รอบนี้คือผลพลศึกษาและตรวจร่างกาย ผ่านแล้วเหลือแค่สัมภาษณ์\nเลขประจำตัวสอบ ${no} เลขเดิม`
+            : `เลขประจำตัวสอบ ${no} จำได้ขึ้นใจตั้งแต่วันสมัคร`),
+    options: [
+      web ? { label: 'นั่งกดรีเฟรชหน้าเว็บที่ล่มอยู่', fx: { health: -1 }, _how: 'self', result: 'เว็บค้างไปครึ่งชั่วโมง พอหน้าโหลดขึ้น นิ้วก็สั่น' }
+          : { label: 'ไปเบียดดูหน้าป้ายเอง', fx: { network: 1 }, _how: 'self', result: 'เบียดอยู่กลางคนเป็นร้อย ได้คุยกับคนที่มาดูผลเหมือนกัน' },
+      { label: `ให้${checker()}ดูให้`, fx: { relations: 1 }, _how: 'elder', result: `${checker()}เดินเข้าไปก่อน หันกลับมาโดยยังไม่พูดอะไร` },
+      { label: 'รอให้คนซาก่อนค่อยดู', fx: { health: 1 }, _how: 'wait', result: 'นั่งรอใต้ต้นไม้จนสาย ไม่ต้องเบียดใคร' },
+      { label: 'แวะไหว้พระก่อน แล้วค่อยไปดู', fx: { happiness: 1 }, _how: 'pray', result: 'จุดธูปขอให้ใจนิ่ง ไม่ได้ขอให้ติด' }] });
+}
+function board() {
+  const pass = S.p2.branches.filter(b => S.p2.written[b]), fail = S.p2.branches.filter(b => !S.p2.written[b]);
+  const c = firstOk(P2().board) || { title: 'ป้ายประกาศผลรอบแรก', text: '', options: [{ label: 'ดูผล' }] };
+  const lf = c.listFormat || { pass: '{เหล่า} ผ่าน', fail: '{เหล่า} ไม่ผ่าน' };
+  const lines = S.p2.branches.map(b => S.p2.written[b]
+    ? lf.pass.replaceAll('{เหล่า}', BR_TH[b]).replaceAll('{ลำดับ}', 50 + Math.floor(Math.random() * 400))
+    : lf.fail.replaceAll('{เหล่า}', BR_TH[b]) + (c.failReasons?.[S.p2.reason[b]] ? ` (${c.failReasons[S.p2.reason[b]]})` : ''));
+  // all branches revealed at once on one card (owner 2026-11-05)
+  const no = S.p2.examNo, who = checker(), all = !fail.length, none = !pass.length, phone = year() >= 2550;
+  const head = ({
+    self: year() >= WEB_YEAR ? `หน้าเว็บโหลดขึ้นมาทีละบรรทัด ไล่หาเลข ${no} ทีละเหล่า` : `นิ้วไล่ลงตามรายชื่อบนป้าย หาเลข ${no} ทีละเหล่า`,
+    elder: none ? `${who}เดินกลับมาช้า ๆ ไม่พูดอะไร แล้วยื่นกระดาษที่จดไว้ให้ดู` : `${who}หันกลับมา ยิ้มก่อนจะพูด แล้วยื่นกระดาษที่จดไว้ให้ดู`,
+    wait: `หน้าป้ายเหลือคนไม่กี่คน ไล่หาเลข ${no} ได้ช้า ๆ ทีละเหล่า`,
+    pray: `กลิ่นธูปยังติดมือ ยืนนิ่งหน้าป้าย แล้วค่อย ๆ ไล่หาเลข ${no}`,
+  })[S.p2.how] || `ไล่หาเลข ${no} ทีละเหล่า`;
+  let text = `${head}\n\n${lines.join('\n')}`;
+  if (Math.random() < 0.4 && !none) text += `\nเกือบใจหายเพราะเลข ${no - 6} อยู่บรรทัดบน ต้องอ่านซ้ำอีกที`;
+  if (c.eraLine && year() >= (c.eraLine.yearMin || 0)) text += '\n' + c.eraLine.line;
+  const rl = (S.tries || 0) <= 1 && (year() < WEB_YEAR || S.p2.how !== 'self') ? (c.rivalLines || []).find(r => condOk(r.when)) : null; if (rl) text += '\n' + rl.line;
+  text += `\n\n${all ? 'ผ่านครบทุกเหล่าที่สมัคร' : none ? 'ไม่ผ่านเลยสักเหล่า' : `ผ่าน ${pass.length} จาก ${S.p2.branches.length} เหล่า`}`;
+  if (none) S.p2.steps = [() => failedCard()];
+  else S.p2.steps = [() => cheerCard(pass, fail, 'phys'), () => physAsk('phys'), () => nearExamCard(), () => bodyDayCard(), () => judgeBody(),
+    () => bodyWaitCard(), () => announceCard('body'), () => bodyBoard()];
+  const opts = none
+    ? [{ label: 'อ่านซ้ำอีกรอบ เผื่อมองข้าม', fx: {}, result: 'ไล่ดูอีกสองรอบ เลขนั้นไม่มีจริง ๆ' },
+       { label: `เดินกลับไปหา${who}`, fx: { relations: 1 }, result: `${who}จับไหล่ไว้ ไม่ถามอะไรสักคำ` },
+       { label: 'ไปนั่งคนเดียวสักพัก', fx: { happiness: -1 }, result: 'นั่งอยู่ใต้ต้นไม้จนคนกลับกันหมด' },
+       { label: 'จำหน้าป้ายนี้ไว้ ปีหน้าจะกลับมา', fx: { knowledge: 1 }, result: 'คืนนั้นหยิบหนังสือเล่มเดิมขึ้นมาเปิดอีกครั้ง' }]
+    : [phone ? { label: 'ถ่ายรูปป้ายเก็บไว้', fx: { happiness: 1 }, result: 'ซูมจนเห็นเลขตัวเองชัด ๆ' }
+             : { label: 'จดเลขลำดับไว้ในสมุด', fx: { happiness: 1 }, result: 'เขียนตัวโต ๆ แล้ววงไว้สองรอบ' },
+       S.p2.how === 'elder' && !secretNow() ? { label: `หันไปกอด${who}`, fx: { relations: 1 }, result: `${who}กอดตอบแน่นกว่าที่คิด` }
+         : { label: 'โทรบอกที่บ้านทันที', fx: { relations: 1 }, result: 'ปลายสายเงียบไปครู่หนึ่ง แล้วเสียงก็ดังขึ้น' },
+       { label: 'ไล่ดูอีกรอบให้แน่ใจ', fx: {}, result: 'อ่านเลขทีละตัว ตรงทุกตัว' },
+       { label: 'ยิ้มอยู่คนเดียว ยังไม่บอกใคร', fx: { happiness: 1 }, result: 'เก็บไว้ในใจก่อน รอบหน้ายังมีอีกหลายด่าน' }];
+  return asCard(c, { id: c.id || 'X3', title: 'ประกาศผลรอบแรก', text: `${text}\n\n(ข้อเขียนผ่านเมื่อได้ ≥ ${WRITTEN_MIN}/25 และความรู้ ≥ ${KNOW_MIN})`, options: opts });
+}
+
+// after passing the written round: sit the physical now, or wait a day and be asked again · 5 refusals = no-show fail (owner 2026-11-05)
+const PHYS_ASK_MAX = 5;
+function physAsk(round = 'phys') {
+  const iv = round === 'iv';
+  S.p2.askNs = S.p2.askNs || {};
+  const n = S.p2.askNs[round] || 0, left = PHYS_ASK_MAX - n;
+  const place = iv ? 'ห้องสัมภาษณ์' : 'สนามพลศึกษา';
+  const text = n === 0
+    ? (iv ? `ห้องสัมภาษณ์รอบสุดท้ายเปิดให้ผู้ผ่านพลศึกษาเข้าได้ภายใน ${PHYS_ASK_MAX} วัน ขอคิวได้วันไหนก็ได้ในช่วงนี้`
+          : `สนามพลศึกษาเปิดให้ผู้ผ่านข้อเขียนเข้าสอบได้ภายใน ${PHYS_ASK_MAX} วัน ไปวันไหนก็ได้ในช่วงนี้\nดึงข้อ ลุกนั่ง วิ่ง แล้วว่ายน้ำ 50 เมตร`)
+    : `ผ่านไปอีกวัน ${place}ยังเปิดอยู่ เหลืออีก ${left} วัน${left === 1 ? ' วันนี้เป็นวันสุดท้าย' : ''}`;
+  return asCard({ id: iv ? 'X5c' : 'X3c', title: n === 0 ? `${place}เปิดแล้ว` : `${place} · เหลือ ${left} วัน`, text,
+    options: iv ? [
+      { label: 'ไปสอบสัมภาษณ์เลย', _phys: 'go', _round: round, result: 'ยื่นชื่อขอคิว ได้คิวสัมภาษณ์วันมะรืน' },
+      { label: 'ยังไม่ไป ขอเตรียมตัวอีกวัน', _phys: 'wait', _round: round, result: left === 1 ? 'วันสุดท้ายผ่านไป ห้องสัมภาษณ์ปิดรับคิว' : 'ซ้อมพูดหน้ากระจกแล้วก็เลื่อนไปอีกวัน' }]
+    : [
+      { label: 'ไปสอบพรุ่งนี้', _phys: 'go', _round: round, result: 'วงวันพรุ่งนี้ไว้ในปฏิทิน เตรียมชุดกีฬาไว้ข้างเตียง' },
+      { label: 'ขอพักอีกวัน ค่อยไป', _phys: 'wait', _round: round, result: left === 1 ? 'วันสุดท้ายผ่านไป สนามปิดประตูตอนห้าโมงเย็น' : ['นอนมองเพดาน บอกตัวเองว่าพรุ่งนี้ค่อยไป', 'ออกไปวิ่งเหยาะ ๆ แล้วกลับมานอนต่อ', 'หยิบรองเท้าวิ่งขึ้นมาดู แล้ววางลงที่เดิม'][n % 3] }] });
+}
+function noShowCard(round = 'phys') {
+  const iv = round === 'iv';
+  if (!iv) S.p2.physical = false;
+  S.p2.failStage = iv ? 'noshow_iv' : 'noshow';
+  S.log.push(`ไม่ไป${iv ? 'สัมภาษณ์' : 'สอบพลศึกษา'}ภายในกำหนด → ตก`);
+  S.p2.steps = [() => letDownCard(round), () => failedCard()];
+  return statusCard(iv ? 'ไม่ได้เข้าสัมภาษณ์' : 'ไม่ได้เข้าสอบพลศึกษา', iv
+    ? `ครบ ${PHYS_ASK_MAX} วันแล้ว ไม่ได้ไปขอคิวสัมภาษณ์เลยสักวัน\nชื่อในรอบสุดท้ายถูกขีดออก ปีนี้ถือว่าสอบตก`
+    : `ครบ ${PHYS_ASK_MAX} วันแล้ว ไม่ได้ไปสนามพลศึกษาเลยสักวัน\nชื่อในรายชื่อรอบสองถูกขีดออก ปีนี้ถือว่าสอบตก`);
+}
+// family let down · happiness −20 and relations −20 whichever way he answers (owner 2026-11-05)
+function letDownCard(round = 'phys') {
+  const who = elder(), fx = { happiness: -20 / SCALE, relations: -20 / SCALE };   // = −20 each after demo SCALE
+  const head = S.flags.has('cadet_family_secret')
+    ? `ญาติที่รู้จักคนคุมสนามเอาเรื่องมาเล่าที่บ้าน ${who}เพิ่งรู้ทีเดียวทั้งสองเรื่อง ว่าไปสอบมา และผ่าน${round === 'iv' ? 'มาถึงรอบสุดท้าย' : 'ข้อเขียน'}แล้วแต่ไม่ไปสอบต่อ`
+    : ({ both: `พ่อวางช้อนลงกลางมื้อเย็น แม่ถามซ้ำว่าทำไมไม่ไป ทั้งที่${round === 'report' ? 'ติดแล้ว' : 'ผ่านมาแล้ว'}`,
+         mother: `แม่ถามซ้ำว่าทำไมไม่ไป ทั้งที่${round === 'report' ? 'ติดแล้ว' : 'ผ่านมาแล้ว'} แล้วก็เงียบไปทั้งคืน`,
+         fatherOnly: 'พ่อไม่ได้ดุสักคำ แค่ลุกไปนั่งสูบบุหรี่หน้าบ้านจนดึก' })[S.family]
+      || 'ป้าไม่ถามอะไร แต่เก็บรูปป้ายประกาศที่ติดตู้เย็นลงไปไว้ในลิ้นชัก';
+  const extra = S.heir ? '\nผู้ใหญ่ในบ้านเก็บหมวกใบเก่ากลับเข้าตู้ ไม่ได้พูดถึงอีก' : '';
+  return asCard({ id: 'X3d', title: 'ความเงียบที่บ้าน', text: head + extra,
+    options: [
+      { label: 'ขอโทษ', fx, result: `${who}พยักหน้า แต่ไม่ได้มองหน้า` },
+      { label: 'อธิบายว่ายังไม่พร้อม', fx, result: 'พูดจบแล้วห้องก็เงียบเหมือนเดิม' },
+      { label: 'ไม่พูดอะไร เข้าห้องไป', fx, result: 'ได้ยินเสียงล้างจานนานกว่าทุกวัน' },
+      { label: 'ออกไปนั่งข้างนอกคนเดียว', fx, result: 'กลับเข้าบ้านตอนไฟดับหมดแล้ว' }] });
+}
+
+// people around him celebrate · lines follow his own life (family, secret, heir, friends, class)
+function cheerCard(pass, fail, round = 'phys') {
+  const iv = round === 'iv', fin = round === 'final';
+  const who = elder(), L = [];
+  if (secretNow()) {
+    L.push(`ที่บ้านเพิ่งรู้วันนี้ว่าไปสอบมา ${who}ตกใจอยู่ครู่หนึ่ง แล้วถึงค่อยยิ้ม`);
+    S.flags.delete('cadet_family_secret'); S.flags.add('cadet_family_told');   // no longer a secret from here on
+  }
+  else if (!fin) L.push((iv ? { both: 'แม่โทรบอกญาติทีละคน พ่อแอบไปซื้อเสื้อเชิ้ตตัวใหม่มาวางไว้หน้าห้อง',
+      mother: 'แม่จุดธูปบอกปู่ย่าที่หิ้งพระ ขอให้ผ่านอีกรอบเดียว',
+      fatherOnly: 'พ่อเล่าเรื่องสมัยหนุ่มที่ไม่เคยเล่า แล้วบอกว่าสัมภาษณ์ให้พูดความจริง' }
+    : { both: 'แม่ยิ้มทั้งวัน พ่อบอกว่าอย่าเพิ่งดีใจ ยังมีอีกสองรอบ',
+      mother: 'แม่ทำกับข้าวจานโปรดให้ แล้วถามว่ารอบหน้าสอบอะไร',
+      fatherOnly: 'พ่อพยักหน้า บอกว่า "ดี" แล้วถามว่าวิ่งไหวไหม' })[S.family]
+    || (iv ? 'ป้าซื้อเสื้อเชิ้ตตัวใหม่มาให้ใส่ไปสัมภาษณ์' : 'ป้าเอาเรื่องไปเล่าให้ข้างบ้านฟังตั้งแต่ยังไม่ค่ำ'));
+  else if (fin) L.push(({ both: 'แม่ปล่อยโฮออกมาก่อนใคร พ่อยืนนิ่งอยู่นาน แล้วเดินมาตบไหล่สองที',
+    mother: 'แม่กอดไว้นานจนข้าวที่ตั้งไว้ไหม้ แล้วก็หัวเราะทั้งน้ำตา',
+    fatherOnly: 'พ่อหยิบโทรศัพท์โทรหาทุกคนในสมุดเบอร์ เสียงดังกว่าที่เคยได้ยิน' })[S.family]
+    || 'ป้าที่เลี้ยงมาเอารูปถ่ายรับปริญญาของใครสักคนออกจากกรอบ บอกว่าจะเก็บกรอบนี้ไว้ใส่รูปเครื่องแบบ');
+  if (S.heir && fin) L.push(`ผู้ใหญ่ในบ้านหยิบหมวก${S.heir === 'police' ? 'ตำรวจ' : 'ทหาร'}ใบเก่าออกจากตู้ ให้ลองสวมดูเล่น ๆ`);
+  if (!iv && !fin && (S.flags.has('cadet_prep_group') || S.flags.has('cadet_bond_a'))) L.push(year() >= 2545 ? 'เพื่อนติวส่งรูปป้ายมา วงเลขของทั้งคู่ไว้' : 'เพื่อนติวปั่นจักรยานมาถึงหน้าบ้าน ตะโกนว่า "เราติดทั้งคู่"');
+  if (S.flags.has('cadet_senior_tutor') || S.flags.has('knows_senior')) L.push(fin ? 'รุ่นพี่บอกสั้น ๆ ว่า "ยินดีต้อนรับ น้องใหม่ เจอกันที่นครนายก"' : iv ? 'รุ่นพี่บอกสั้น ๆ ว่า "สัมภาษณ์ตอบตามจริง อย่าท่องมา"' : 'รุ่นพี่บอกสั้น ๆ ว่า "ดีใจด้วย แต่รอบพลศึกษาหนักกว่านี้นะ"');
+  if (fin && S.cls === 'poor') L.push('ข้างบ้านเอาขนมมาฝาก คนทั้งซอยรู้ข่าวก่อนค่ำ');
+  else if (fin && S.cls === 'rich') L.push('ที่บ้านจองโต๊ะร้านอาหาร ญาติโทรมาแสดงความยินดีไม่ขาดสาย');
+  else if (fin) L.push('ป้าข้างบ้านตะโกนถามข้ามรั้ว พอรู้ข่าวก็ยกนิ้วให้');
+  if (fail.length) L.push(fin ? `${fail.map(b => BR_TH[b]).join(' ')} ไม่ติด แต่ติด ${pass.map(b => BR_TH[b]).join(' ')} แล้ว`
+    : `${fail.map(b => BR_TH[b]).join(' ')} ไม่ผ่านก็จริง แต่ยังเหลือ ${pass.map(b => BR_TH[b]).join(' ')} ให้ไปต่อ`);
+  return asCard({ id: fin ? 'X6b' : iv ? 'X4b' : 'X3b', title: fin ? 'คืนที่บ้านไม่มีใครนอน' : iv ? 'เย็นวันประกาศผลพลศึกษา' : 'เย็นวันประกาศผล',
+    text: `${L.join('\n')}\n\n${fin ? 'ติดเตรียมทหารแล้ว' : iv ? 'เหลือรอบเดียว คือสัมภาษณ์' : 'อีกไม่กี่วันจะสอบพลศึกษาและว่ายน้ำ'}`, options: [
+      { label: 'ยกมือไหว้ขอบคุณทุกคน', fx: { relations: 1 }, result: 'ทุกคนยิ้ม แต่ไม่มีใครถามเรื่องรอบหน้า' },
+      { label: 'กินข้าวเย็นกับที่บ้านให้นานกว่าทุกวัน', fx: { happiness: 1 }, result: 'คืนนั้นหลับง่ายกว่าทุกคืน' },
+      fin ? { label: 'บอกทุกคนว่าจะตั้งใจเรียน', fx: {}, result: 'พูดออกไปแล้ว ทุกคนปรบมือ' }
+          : { label: 'บอกทุกคนว่ายังไม่จบ ยังมีอีกรอบ', fx: {}, result: 'พูดออกไปแล้ว ใจก็กลับมานิ่ง' },
+      { label: 'ขอตัวเข้านอนเร็ว', fx: { health: 1 }, result: 'นอนเต็มอิ่มเป็นคืนแรกในรอบหลายเดือน' }] });
+}
+// the day after the physical: an ordinary waiting day (owner 2026-11-05)
+function bodyWaitCard() {
+  return asCard({ id: 'X4w', title: 'วันหลังสอบพละ',
+    text: 'ตื่นมาเมื่อยไปทั้งตัว ขึ้นบันไดทีละขั้นยังต้องจับราว ผลจะประกาศพรุ่งนี้',
+    options: [
+      { label: 'นอนพักทั้งวัน', fx: { health: 1 }, result: 'หลับ ๆ ตื่น ๆ จนเย็น ขาเริ่มกลับมาเป็นของตัวเอง' },
+      { label: 'นั่งนึกทบทวนทีละสถานี', fx: {}, result: 'ดึงข้อได้ตามเป้า วิ่งพันเมตรช้ากว่าที่ซ้อมนิดหน่อย' },
+      { label: `ช่วย${elder()}ทำงานบ้านเบา ๆ`, fx: { relations: 1 }, result: `${elder()}ไม่ถามเรื่องสอบ แค่ยื่นยาหม่องมาให้` },
+      { label: 'ไปนั่งเล่นกับเพื่อนที่สอบด้วยกัน', fx: { happiness: 1 }, result: 'เทียบกันว่าใครเมื่อยตรงไหน แล้วหัวเราะกันทั้งวง' }] });
+}
+// physical + medical results: every branch at once, like the written board (owner 2026-11-05)
+function bodyBoard() {
+  const live = S.p2.branches.filter(b => S.p2.written[b]);
+  const pass = live.filter(b => S.p2.body[b]), fail = live.filter(b => !S.p2.body[b]);
+  const no = S.p2.examNo, who = checker(), none = !pass.length, all = !fail.length, h = S.stats.health;
+  const head = ({
+    self: year() >= WEB_YEAR ? `หน้าเว็บโหลดขึ้นมาอีกครั้ง ไล่หาเลข ${no}` : `ป้ายแผ่นใหม่ รายชื่อสั้นกว่าเดิมมาก ไล่หาเลข ${no}`,
+    elder: none ? `${who}เดินกลับมาช้า ๆ ไม่พูดอะไร` : `${who}หันกลับมา ชูนิ้วให้ก่อนจะพูด`,
+    wait: `หน้าป้ายเหลือคนไม่กี่คน ไล่หาเลข ${no} ได้ช้า ๆ`,
+    pray: `ไหว้พระมาอีกรอบ ยืนนิ่งหน้าป้าย แล้วค่อย ๆ ไล่หาเลข ${no}`,
+  })[S.p2.how] || `ไล่หาเลข ${no}`;
+  const lines = live.map(b => `${BR_TH[b]} (เกณฑ์ชีวิต ${BODY_MIN[b]}) ${S.p2.body[b] ? 'ผ่าน' : 'ไม่ผ่าน'}`);
+  let text = `${head}\n${S.p2.bodyHead || ''}\n\n${lines.join('\n')}\n\n` +
+    `${all ? 'ผ่านพลศึกษาและตรวจร่างกายครบทุกเหล่า' : none ? 'ไม่ผ่านพลศึกษาสักเหล่า' : `ผ่าน ${pass.length} จาก ${live.length} เหล่า`} · ชีวิตวันสอบ ${h}`;
+  if (none) S.p2.steps = [() => failedCard()];
+  else S.p2.steps = [() => cheerCard(pass, fail, 'iv'), () => physAsk('iv'), () => ivEveCard(), () => ivIntroCard(), () => { queueInterview(); return null; }];
+  const opts = none
+    ? [{ label: 'อ่านซ้ำอีกรอบ', fx: {}, result: 'ไล่ดูอีกสองรอบ เลขนั้นไม่มีจริง ๆ' },
+       { label: `เดินกลับไปหา${who}`, fx: { relations: 1 }, result: `${who}จับไหล่ไว้ ไม่ถามอะไรสักคำ` },
+       { label: 'ไปนั่งคนเดียวสักพัก', fx: { happiness: -1 }, result: 'นั่งอยู่ใต้ต้นไม้จนคนกลับกันหมด' },
+       { label: 'บอกตัวเองว่าปีหน้าจะซ้อมให้หนักกว่านี้', fx: { health: 1 }, result: 'เย็นนั้นออกไปวิ่งรอบหมู่บ้านทั้งที่ยังเมื่อย' }]
+    : [S.p2.how === 'elder' && !secretNow() ? { label: `หันไปกอด${who}`, fx: { relations: 1 }, result: `${who}ตบหลังแรง ๆ สองที` }
+         : { label: 'โทรบอกที่บ้านทันที', fx: { relations: 1 }, result: 'ปลายสายดังขึ้นก่อนจะพูดจบ' },
+       { label: 'ไล่ดูอีกรอบให้แน่ใจ', fx: {}, result: 'อ่านเลขทีละตัว ตรงทุกตัว' },
+       { label: 'ยิ้มกว้างจนแก้มตึง', fx: { happiness: 1 }, result: 'เหลืออีกรอบเดียว ยิ้มได้ก่อนก็ไม่เสียหาย' },
+       { label: 'ไปแสดงความยินดีกับคนที่ผ่านด้วยกัน', fx: { network: 1 }, result: 'แลกเบอร์กันไว้ เผื่อได้เจอกันอีกที่นครนายก' }];
+  return asCard({ id: 'X4r', title: 'ประกาศผลพลศึกษาและตรวจร่างกาย', text, options: opts });
+}
+// ---- interview: one sitting for every branch still in (owner 2026-11-05)
+// 5 questions = 4 serious (random from the pool, asked by the two captains in turn) + 1 funny from จ่าขมลมโชย as Q3 or Q4
+// funny question always scores full · pass = ≥ IV_MIN of 25
+const IV_MIN = 13;
+const IV_PANEL = ['ผู้กององอาจ', 'ผู้กองบูรพา'], IV_FUNNY_BY = 'จ่าขมลมโชย';
+const ivBranch = () => BR_TH[S.p2.branches.find(b => S.p2.body?.[b])] || 'เหล่านี้';
+const IV_POOL = [
+  { q: 'แนะนำตัวเองสั้น ๆ', a: [
+    ['บอกชื่อ โรงเรียน บ้าน และเหตุผลที่มา', 5], ['บอกชื่อกับโรงเรียน แล้วรอคำถามต่อ', 4],
+    ['เล่ายาวตั้งแต่เด็กจนถูกขอให้สรุป', 3], ['พูดเร็วจนติด ต้องเริ่มใหม่', 2], ['ท่องประโยคที่จำมา ไม่ใช่เรื่องตัวเอง', 0]] },
+  { q: () => `ทำไมถึงอยากเข้า ${ivBranch()}`, a: [
+    ['เล่าเรื่องจริงที่ทำให้สนใจ', 5], ['อยากมีอาชีพมั่นคง ดูแลที่บ้านได้', 4],
+    ['มีคนแนะนำ แล้วก็เริ่มชอบเอง', 3], ['ยังไม่แน่ใจ แต่อยากลองดู', 2], ['ใส่เครื่องแบบแล้วคนเกรงใจ', 0]] },
+  { q: 'เพื่อนร่วมรุ่นทำผิดระเบียบ แล้วขอให้ช่วยปิดไว้ จะทำยังไง', a: [
+    ['เตือนให้ไปรายงานเอง ไม่ไปจะบอกรุ่นพี่', 5], ['บอกตรง ๆ ว่าช่วยปิดไม่ได้', 4],
+    ['ไม่ยุ่ง ให้เป็นเรื่องของเขา', 3], ['ช่วยครั้งเดียว ครั้งหน้าไม่ช่วย', 2], ['ช่วยปิด เพื่อนต้องมาก่อน', 0]] },
+  { q: () => S.flags.has('cadet_family_secret') ? 'ที่บ้านรู้หรือยังว่ามาสอบ ถ้าคิดถึงบ้านตอนฝึกจะทำยังไง' : 'ที่นี่ฝึกหนักและอยู่ไกลบ้าน ถ้าคิดถึงบ้านมากจะทำยังไง', a: [
+    ['ติดต่อบ้านตามเวลาที่ให้ แล้วฝึกต่อ', 5], ['คุยกับเพื่อนที่รู้สึกเหมือนกัน', 4],
+    ['อดทนเงียบ ๆ ไม่บอกใคร', 3], ['ขอลากลับบ้านบ่อย ๆ', 2], ['ถ้าไม่ไหวจริงก็ลาออก', 0]] },
+  { q: 'ถ้าปีนี้ไม่ติด จะทำอะไรต่อ', a: [
+    ['กลับไปแก้จุดที่พลาด แล้วสอบใหม่', 5], ['สอบใหม่ปีหน้า', 4],
+    ['เรียนต่อมหาวิทยาลัยตามแผนสำรอง', 3], ['ยังไม่ได้คิด', 2], ['รู้จักผู้ใหญ่ ฝากเข้าได้', 0]] }
+];
+// funny question from จ่าขมลมโชย · homage to 7 ประจัญบาน (2545) gags: the landmine "แกร๊ก" + "ช่วย…ด้วย / ช่วยหน่อยเถอะครับ",
+// owner picked F1 only, keeps the name ผู้กององอาจ as homage, allows "กู" · every answer = full score (owner 2026-11-05)
+const IV_FUNNY = [
+  { text: 'จ่าขมลมโชยวางแก้วกาแฟลงช้า ๆ "สมมุติ… เธอเป็นลูกหมู่ของผู้กองท่านหนึ่ง" แล้วเหลือบไปทางผู้กององอาจ\n' +
+      '"ผู้กองบอกว่าทางนี้รู้ดี แล้วก็เหยียบดัง แกร๊ก ทั้งหมู่วิ่งหายเข้าป่าหมด ผู้กองตะโกน ช่วยกูด้วย! …เงียบ… ช่วยหน่อยเถอะครับ… เธอจะทำยังไง"\n' +
+      'ผู้กององอาจกระแอมยาว', a: [
+    ['ยืนเป็นเพื่อนผู้กองครับ ไม่เหงา', 'ผู้กองบูรพาสำลักน้ำ ผู้กององอาจพยักหน้าช้า ๆ "…ใช้ได้"'],
+    ['หาหินหนักเท่าผู้กองมาวางแทนครับ', 'จ่า: "ก้อนต้องใหญ่มากนะ" ผู้กององอาจหันขวับไปมองจ่า'],
+    ['รอจนผู้กองพูดคำว่า "ครับ"', 'จ่า: "ทำไม" ตอบว่า "รอให้ผู้กองพูดสุภาพก่อนครับ พูดกูแล้วไม่ลื่นหู" ผู้กองบูรพาหัวเราะออกเสียง'],
+    ['วิ่งไปตามหมู่กลับมาครับ ถ้าเขาจำทางได้', 'จ่า: "หมู่นี้ไม่มีใครจำทางได้" แล้วมองผู้กององอาจอีกรอบ']] }
+];
+function ivIntroCard() {
+  return asCard({ id: 'X7', title: 'ห้องสัมภาษณ์',
+    text: `ห้องสัมภาษณ์มีโต๊ะยาวตัวเดียว กรรมการสามคน ผู้กององอาจนั่งกลาง เสียงดังกว่าพัดลม จ่าขมลมโชยนั่งซ้าย หน้านิ่ง ผู้กองบูรพานั่งขวา ยิ้มให้ก่อน\n"นั่ง" ผู้กององอาจชี้เก้าอี้ "ห้าข้อ ตอบตามจริง"`,
+    options: [{ label: 'นั่งตัวตรง วางมือบนเข่า', result: 'เก้าอี้ดังเอี๊ยด ทั้งห้องเงียบ' }] });
+}
+function queueInterview() {
+  const pool = shuffle([...IV_POOL]).slice(0, 4);
+  const funnyAt = 2 + Math.floor(Math.random() * 2);   // Q3 or Q4
+  const slots = [...pool]; slots.splice(funnyAt, 0, 'FUNNY');
+  S.p2.iv = 0;
+  const cards = slots.map((x, i) => () => {
+    if (x === 'FUNNY') {
+      const f = IV_FUNNY[Math.floor(Math.random() * IV_FUNNY.length)];
+      return asCard({ id: 'X7f', title: `${IV_FUNNY_BY} · ข้อ ${i + 1}/5`, text: f.text,
+        options: f.a.map(([label, react]) => ({ label, _iv: 5, result: react })) });
+    }
+    const who = IV_PANEL[i % 2];
+    return asCard({ id: `X7q${i + 1}`, title: `${who} · ข้อ ${i + 1}/5`, text: `${who}ถาม: "${typeof x.q === 'function' ? x.q() : x.q}"`,
+      options: shuffle(x.a.map(([label, sc]) => ({ label, _iv: sc }))) });
+  });
+  S.p2.steps.unshift(...cards, () => judgeInterview());
+}
+function judgeInterview() {
+  const ok = (S.p2.iv || 0) >= IV_MIN;
+  S.log.push(`สัมภาษณ์ ${S.p2.iv}/25 → ${ok ? 'ผ่าน' : 'ไม่ผ่าน'}`);
+  S.p2.ivOk = ok;
+  if (!ok) S.p2.failStage = 'interview';
+  // results the same afternoon, every branch at once (owner 2026-11-05)
+  S.p2.steps = [() => announceCard('final'), () => finalBoard()];
+  return statusCard('จบการสัมภาษณ์', 'ผู้กององอาจปิดแฟ้ม บอกว่าผลรอบสุดท้ายประกาศบ่ายนี้ จ่าขมลมโชยยังหน้านิ่งเหมือนเดิม ผู้กองบูรพาจดบรรทัดสุดท้ายแล้ววางปากกา');
+}
+// the day between booking the interview and sitting it (owner 2026-11-05)
+function ivEveCard() {
+  return asCard({ id: 'X5e', title: 'วันก่อนสัมภาษณ์',
+    text: 'พรุ่งนี้คือรอบสุดท้าย ไม่มีวิ่ง ไม่มีข้อสอบ มีแค่โต๊ะตัวเดียวกับกรรมการสามคน',
+    options: [
+      { label: `ให้${elder()}ช่วยถามซ้อม`, fx: { relations: 1 }, result: `${elder()}ถามข้อแรกว่า "ทำไมอยากเป็น" แล้วฟังจนจบ` },
+      { label: 'ตัดผม รีดเสื้อ ขัดรองเท้า', fx: { happiness: 1 }, result: 'ชุดนักเรียนแขวนรอไว้หน้าตู้ เรียบจนไม่กล้านั่ง' },
+      { label: 'อ่านประวัติเหล่าที่สมัครไว้', fx: { knowledge: 1 }, result: 'จำชื่อสถาบันกับปีที่ก่อตั้งได้ขึ้นใจ' },
+      { label: 'นอนเร็วกว่าทุกวัน', fx: { health: 1 }, result: 'หลับไปก่อนคิดคำตอบเสร็จ' }] });
+}
+// the day before the physical (once he has picked his day): train on hard, go light, or rest · hard has a 15% chance of an injury that keeps him out (owner 2026-11-05)
+const EXAM_INJURY = 0.15;
+function nearExamCard() {
+  return asCard({ id: 'X3e', title: 'วันก่อนสอบพละ',
+    text: `พรุ่งนี้เช้าคือวันพลศึกษาและตรวจร่างกาย ร่างกายตอนนี้ ${bodyReach(S.stats.health)}\nเหลือวันนี้วันเดียว จะใช้มันยังไง`,
+    options: [
+      { label: 'ซ้อมพละต่อแบบหนัก', hint: 'ได้ชีวิตเพิ่ม แต่อาจเจ็บจนสอบไม่ไหว', fx: {},
+        outcomes: [{ p: 1 - EXAM_INJURY, result: 'ซ้อมหนักอีกรอบ วิ่งพันเมตรเร็วที่สุดตั้งแต่เคยจับเวลา', fx: { health: 2 } },
+                   { p: EXAM_INJURY, result: 'ข้อเท้าพลิกตอนกระโดดไกล ตกค่ำบวมจนลงน้ำหนักไม่ได้', fx: {}, _injure: true }] },
+      { label: 'ออกกำลังกายเบา ๆ', fx: { health: 0.4 }, result: 'วิ่งเหยาะ ๆ กับยืดเส้น ตัวเบาแต่ไม่ล้า' },
+      { label: 'พักเตรียมร่างกาย', fx: { happiness: 1 }, result: 'นอนให้พอ กินให้ครบ ไม่ฝืนอะไร' },
+      { label: 'ไปเดินดูสนามสอบล่วงหน้า', fx: { network: 1 }, result: 'นับระยะลู่วิ่งกับขอบสระไว้ในหัว' }] });
+}
+function injuryCard() {
+  S.p2.physical = false; S.p2.failStage = 'injury';
+  S.log.push('เจ็บก่อนวันสอบพละ → สอบไม่ไหว');
+  return statusCard('สอบพละไม่ไหว', 'เช้าวันสอบไปถึงสนามทั้งที่ข้อเท้ายังพันผ้า ครูคุมสอบให้ลองวิ่งแค่สิบเมตรก็เห็นว่าไม่ไหว\nปีนี้จึงถือว่าไม่ผ่านรอบพลศึกษา');
+}
+
+function roundCard(key) {
+  if (key !== 'physical' && key !== 'interview' && S.p2.physical === false) return null;
+  if (key === 'interview' && (S.p2.physical === false || S.p2.medical === false)) return null;
+  let c = P2()[key];
+  if (key === 'interview') {
+    const v = firstOk(c?.variants);
+    return v ? asCard(v, { id: v.id || 'X7', text: [c.head, v.text].filter(Boolean).join(' ') }) : null;
+  }
+  c = firstOk(c);
+  return c ? asCard(c, { id: c.id || key }) : null;
+}
+// physical + swim + medical on one day, one yardstick: health against each branch's bar (owner 2026-11-05)
+function bodyDayCard() {
+  const c = firstOk(P2().physical) || {};
+  return asCard(c, { id: c.id || 'X4', title: 'วันพลศึกษาและตรวจร่างกาย',
+    text: `${c.text || 'สนามพลศึกษาเริ่มเจ็ดโมงเช้า'}
+บ่ายลงสระว่ายน้ำห้าสิบเมตร ต่อด้วยห้องตรวจร่างกายห้าห้อง จบในวันเดียว`,
+    options: c.options && c.options.length ? c.options : [{ label: 'เข้าแถวรอเรียกชื่อ', result: 'ได้ป้ายหมายเลขติดหน้าอก' }] });
+}
+const swimOk = () => true;   // swim is folded into the health bar (owner 2026-11-05)
+function judgeBody() {
+  const h = S.stats.health, swim = swimOk();
+  S.p2.body = {};
+  const live = S.p2.branches.filter(b => S.p2.written[b]);
+  live.forEach(b => S.p2.body[b] = swim && h >= BODY_MIN[b]);
+  S.flags.add('cadet_body_seen');   // next year's physical: he knows the stations
+  const any = live.some(b => S.p2.body[b]);
+  S.p2.physical = any; S.p2.medical = any;
+  if (!any) S.p2.failStage = swim ? 'land' : 'swim';
+  S.log.push(`พลศึกษา+ตรวจร่างกาย (ชีวิต ${h}${swim ? '' : ' · ว่ายไม่ถึง'}) → ${live.map(b => BR_TH[b] + (S.p2.body[b] ? '✓' : '✗')).join(' ')}`);
+  const lines = live.map(b => `${BR_TH[b]} เกณฑ์ ${BODY_MIN[b]} ${S.p2.body[b] ? '✓ ผ่าน' : '✗ ไม่ผ่าน'}`);
+  const head = !swim ? 'ว่ายไปไม่ถึงขอบสระ ครูคุมสระส่ายหน้า'
+    : any ? (live.every(b => S.p2.body[b]) ? 'ผ่านทุกสถานี ห้องตรวจสุดท้ายประทับตราให้' : 'บางสถานีทำได้ไม่ถึงเกณฑ์ของบางเหล่า')
+    : 'วิ่งพันเมตรเข้าเส้นช้ากว่าเวลาที่กำหนด';
+  S.p2.bodyHead = head;
+  return null;   // results are announced a day later (owner 2026-11-05)
+}
+function judgePhysical() {
+  const p = S.stats.health < HEALTH_MIN ? 0 : (S.flags.has('sporty') ? 0.97 : 0.9);
+  S.p2.physical = Math.random() < p;
+  if (!S.p2.physical) S.p2.failStage = 'land';
+  S.log.push(`พลศึกษา 7 สถานี (ชีวิต ${S.stats.health}) → ${S.p2.physical ? 'ผ่าน' : 'ไม่ผ่าน'}`);
+  const ph = P2().physical || {};
+  return statusCard('ผลพลศึกษา', S.p2.physical ? `ผ่านครบทุกสถานี (ชีวิต ${S.stats.health})`
+    : (S.stats.health < HEALTH_MIN && ph.lowHealthLine ? ph.lowHealthLine + ` (ชีวิต ${S.stats.health} ต่ำกว่า ${HEALTH_MIN})` : 'พลาดหนึ่งสถานี ไม่ผ่านรอบพลศึกษา'));
+}
+function judgeSwim() {
+  if (S.p2.physical === false) return null;
+  const coastal = ['ใต้', 'ตะวันออก'].includes(S.region);
+  const p = S.stats.health < HEALTH_MIN ? 0 : S.flags.has('can_swim') ? 0.97 : coastal ? 0.9 : 0.75;
+  S.p2.physical = Math.random() < p;
+  if (!S.p2.physical) S.p2.failStage = 'swim';
+  S.log.push(`ว่ายน้ำ 50 เมตร → ${S.p2.physical ? 'ผ่าน' : 'ไม่ผ่าน'}`);
+  return statusCard('ผลว่ายน้ำ', S.p2.physical ? 'แตะขอบสระครบห้าสิบเมตร' : 'ไปไม่ถึงขอบสระ ไม่ผ่านรอบพลศึกษา');
+}
+function judgeMedical() {
+  if (S.p2.physical === false) return null;
+  S.p2.medical = Math.random() < 0.92;
+  S.log.push(`ตรวจร่างกาย → ${S.p2.medical ? 'ผ่าน' : 'ไม่ผ่าน'}`);
+  return statusCard('ผลตรวจร่างกาย', S.p2.medical ? 'ผ่านครบห้าห้องตรวจ' : 'ห้องตรวจสายตาบันทึกว่าไม่ผ่านเกณฑ์');
+}
+// final results: every branch he applied for, at once (owner 2026-11-05)
+function finalBoard() {
+  const pass = S.p2.ivOk ? S.p2.branches.filter(b => S.p2.written[b] && S.p2.body?.[b]) : [];
+  const fail = S.p2.branches.filter(b => !pass.includes(b));
+  const no = S.p2.examNo, who = checker(), none = !pass.length;
+  const why = b => !S.p2.written[b] ? 'ไม่ผ่านข้อเขียน' : !S.p2.body?.[b] ? 'ไม่ผ่านพลศึกษา' : 'ไม่ผ่านสัมภาษณ์';
+  const head = ({
+    self: year() >= WEB_YEAR ? `หน้าเว็บโหลดขึ้นมา รายชื่อสั้นจนเลื่อนไม่สุดนิ้ว ไล่หาเลข ${no}` : `ป้ายแผ่นสุดท้าย รายชื่อสั้นจนอ่านจบในครั้งเดียว ไล่หาเลข ${no}`,
+    elder: none ? `${who}เดินกลับมาช้า ๆ ไม่พูดอะไร` : `${who}ยังเดินไม่ถึงป้ายดี ก็หันกลับมาตะโกนเรียกชื่อ`,
+    wait: `หน้าป้ายเหลือคนสองคน ไล่หาเลข ${no} ได้ช้า ๆ`,
+    pray: `มือยังพนมค้างอยู่ตอนอ่านเลข ${no}`,
+  })[S.p2.how] || `ไล่หาเลข ${no}`;
+  const lines = S.p2.branches.map(b => pass.includes(b) ? `${BR_TH[b]} ติด` : `${BR_TH[b]} ไม่ติด (${why(b)})`);
+  const text = `${head}\n\n${lines.join('\n')}\n\n${none ? 'ปีนี้ไม่ติดสักเหล่า' : pass.length === S.p2.branches.length ? 'ติดครบทุกเหล่าที่สมัคร' : `ติด ${pass.length} จาก ${S.p2.branches.length} เหล่า`}`;
+  S.log.push(`ประกาศผลสุดท้าย: ${none ? 'ไม่ติด' : 'ติด ' + pass.map(b => BR_TH[b]).join(' ')}`);
+  S.p2.final = pass;
+  S.p2.steps = none ? [() => failedCard()] : [() => cheerCard(pass, fail, 'final'), () => chooseOrPack(pass)];
+  const opts = none
+    ? [{ label: 'อ่านซ้ำอีกรอบ', fx: {}, result: 'มาถึงรอบสุดท้ายแล้ว แต่เลขนั้นไม่มีจริง ๆ' },
+       { label: `เดินกลับไปหา${who}`, fx: { relations: 1 }, result: `${who}บอกว่ามาถึงตรงนี้ก็เก่งแล้ว` },
+       { label: 'ไปนั่งคนเดียวสักพัก', fx: { happiness: -1 }, result: 'นั่งจนป้ายถูกปลดลง' },
+       S.age < 18 ? { label: 'จดเลขคนที่ติดไว้ ปีหน้าจะมาใหม่', fx: { knowledge: 1 }, result: 'เขียนไว้หลังบัตรสอบ' }
+                  : { label: 'เก็บบัตรสอบใบนี้ไว้', fx: { happiness: 1 }, result: 'ปีสุดท้ายแล้ว แต่มาถึงรอบสุดท้ายได้ก็ไม่เสียใจ' }]
+    : [{ label: 'กระโดดกอดคนข้าง ๆ', fx: { happiness: 1 }, result: 'กอดไปแล้วถึงรู้ว่าไม่รู้จักกัน เขาก็ติดเหมือนกัน' },
+       !secretNow() ? { label: `หันไปกอด${elder()}`, fx: { relations: 1 }, result: `${elder()}ร้องไห้ก่อนจะพูดอะไรออกมาได้` }
+         : { label: 'โทรบอกที่บ้านทันที', fx: { relations: 1 }, result: 'ยังไม่ทันพูดจบ ปลายสายก็ร้องไห้' },
+       { label: 'อ่านเลขซ้ำห้ารอบ', fx: {}, result: 'ตรงทุกรอบ' },
+       { label: 'ยืนนิ่ง ๆ ให้ใจตามทัน', fx: { health: 1 }, result: 'หายใจเข้าลึก ๆ สามครั้ง แล้วยิ้มออกมาเอง' }];
+  return asCard({ id: 'X6', title: 'ประกาศผลรอบสุดท้าย', text, options: opts });
+}
+function chooseOrPack(passed) {
+  if (passed.length === 1) return packNotice(passed[0]);
+  const c = firstOk(P2().chooseBranch) || { title: 'ติดหลายเหล่า', text: 'เลือกได้เหล่าเดียว' };
+  return asCard(c, { id: c.id || 'X8', options: [...passed.map(b => ({ label: `เลือก ${BR_TH[b]}`, _pick: b })), { label: 'สละสิทธิ์ทั้งหมด', _pick: 'none' }] });
+}
+// report-in notice: 2 days to pack · farewell scenes · then go now, or 2 more days and a last call (owner 2026-11-05)
+const REPORT_DAYS = 2;
+function packNotice(b) {
+  S.p2.chosen = b;
+  S.p2.steps = [() => farewellSchool(), () => farewellFriends(), () => reportAsk(0)];
+  return statusCard('หนังสือแจ้งรายงานตัว', `โรงเรียนเตรียมทหาร (ต่อ ${BR_TH[b]}) เปิดรับรายงานตัวที่นครนายก ${REPORT_DAYS * 2} วัน ใช้ ${REPORT_DAYS} วันแรกเก็บของและบอกลาได้\nเตรียมเสื้อผ้าตามรายการ ตัดผมสั้นเกรียน เอาบัตรประชาชนกับหนังสือแจ้งฉบับนี้มาด้วย`);
+}
+function farewellSchool() {
+  return asCard({ id: 'X9a', title: 'วันที่ 1 · โรงเรียนเก่า',
+    text: `ไปยื่นเรื่องลาออกที่ห้องธุรการ ครูประจำชั้นเซ็นให้แล้วถามว่า "จะไปแล้วเหรอ"`,
+    options: [
+      { label: 'ไปกราบลาครูประจำชั้น', fx: { relations: 1 }, result: 'ครูลูบหัวที่เพิ่งตัดเกรียน บอกว่ากลับมาเยี่ยมด้วยนะ' },
+      { label: 'แวะลาครูพละที่สนาม', fx: { health: 1 }, result: 'ครูให้วิ่งรอบสนามรอบสุดท้าย "เอาไว้อวดรุ่นน้อง"' },
+      { label: 'ไปคืนหนังสือห้องสมุดที่ค้างไว้', fx: { knowledge: 1 }, result: 'บรรณารักษ์ยกเลิกค่าปรับให้ เป็นของขวัญ' },
+      { label: 'เดินดูห้องเรียนเดิมเป็นครั้งสุดท้าย', fx: { happiness: 1 }, result: 'โต๊ะตัวเดิมยังมีรอยปากกาที่เขียนไว้ตอน ม.ต้น' }] });
+}
+function farewellFriends() {
+  return asCard({ id: 'X9b', title: 'วันที่ 2 · บอกลา',
+    text: `พรุ่งนี้ต้องไปแล้ว กระเป๋าใบใหญ่ตั้งอยู่กลางห้อง ${elder()}พับเสื้อให้ทีละตัว`,
+    options: [
+      { label: 'นัดเพื่อนกินข้าวมื้อสุดท้าย', fx: { relations: 1 }, result: 'เพื่อนจ่ายให้ทั้งโต๊ะ บอกว่าไว้ติดยศแล้วค่อยเลี้ยงคืน' },
+      { label: `อยู่ช่วย${elder()}จัดกระเป๋า`, fx: { relations: 1 }, result: `${elder()}แอบใส่ขนมไว้ก้นกระเป๋า ทั้งที่รายการบอกว่าห้ามนำมา` },
+      { label: 'ไปไหว้พระขอพร', fx: { happiness: 1 }, result: 'ขอให้ตัวเองอดทนได้ ไม่ได้ขออะไรมากกว่านั้น' },
+      { label: 'นอนเร็ว เก็บแรงไว้', fx: { health: 1 }, result: 'นอนไม่หลับอยู่นาน แต่ก็หลับไปเอง' }] });
+}
+function reportAsk(n) {
+  const last = n > 0;
+  return asCard({ id: last ? 'X9d' : 'X9c', title: last ? 'วันสุดท้ายของการรายงานตัว' : 'ครบสองวันแล้ว',
+    text: last ? 'วันนี้เป็นวันสุดท้ายที่โรงเรียนเตรียมทหารรับรายงานตัว ไม่ไปวันนี้ สิทธิ์จะหลุดไปถึงตัวสำรอง'
+               : `ครบ ${REPORT_DAYS} วันแล้ว กระเป๋าพร้อม หนังสือแจ้งอยู่ในซอง จะออกเดินทางไปนครนายกเลยไหม`,
+    options: [
+      { label: 'ไปเลย', _report: 'go', result: 'ยกกระเป๋าขึ้นรถ ไม่หันกลับไปมองบ้าน กลัวจะไม่อยากไป' },
+      { label: last ? 'ไม่ไป' : 'ขออีกสองวัน', _report: last ? 'no' : 'wait', result: last ? 'นั่งดูนาฬิกาจนเลยเวลาปิดรับรายงานตัว' : 'วางกระเป๋าไว้ที่เดิม บอกตัวเองว่าขอเวลาอีกนิด' }] });
+}
+function extraDaysCard() {
+  return asCard({ id: 'X9e', title: 'สองวันที่ขอไว้',
+    text: 'กระเป๋ายังตั้งอยู่กลางห้อง ไม่มีใครในบ้านพูดถึงมัน ทุกคนเดินอ้อม',
+    options: [
+      { label: 'นั่งคิดว่ากลัวอะไรอยู่', fx: {}, result: 'กลัวคิดถึงบ้าน กลัวสู้รุ่นพี่ไม่ได้ กลัวทุกอย่างพร้อมกัน' },
+      { label: `คุยกับ${elder()}ตรง ๆ`, fx: { relations: 1 }, result: `${elder()}ฟังจนจบ แล้วบอกว่าตัดสินใจเองนะ ไม่ว่าทางไหนก็ยังเป็นลูก` },
+      { label: 'โทรหารุ่นพี่ที่เคยผ่าน', fx: { network: 1 }, result: 'รุ่นพี่บอกว่าคืนแรกทุกคนร้องไห้ คืนที่สามจะหลับเป็นตาย' },
+      { label: 'ออกไปเดินเล่นให้หัวโล่ง', fx: { happiness: 1 }, result: 'เดินจนมืด กลับมากระเป๋ายังอยู่ที่เดิม' }] });
+}
+function noReportCard() {
+  S.p2.failStage = 'noreport';
+  S.log.push('ไม่ไปรายงานตัวภายในกำหนด → ตก');
+  return statusCard('ไม่มารายงานตัว', 'เลยกำหนดรายงานตัวแล้ว สิทธิ์ถูกส่งต่อให้ตัวสำรองลำดับถัดไป\nปีนี้ถือว่าสอบตก เพราะไม่มารายงานตัว');
+}
+function finalResult() {
+  const passed = S.p2.branches.filter(b => S.p2.written[b] && S.p2.body?.[b]);
+  S.log.push(`ประกาศผล: ${passed.length ? 'ติด ' + passed.map(b => BR_TH[b]).join(' ') : 'ไม่ติด'}`);
+  if (!passed.length) return failedCard();
+  if (passed.length === 1) return passedCard(passed[0]);
+  const c = firstOk(P2().chooseBranch) || { title: 'ติดหลายเหล่า', text: 'เลือกได้เหล่าเดียว' };
+  return asCard(c, { id: c.id || 'X8', options: [...passed.map(b => ({ label: `เลือก ${BR_TH[b]}`, _pick: b })), { label: 'สละสิทธิ์ทั้งหมด', _pick: 'none' }] });
+}
+function arriveCard(b) {
+  S.p2.steps = [() => { finish(`ติดเตรียมทหาร (ต่อ ${BR_TH[b]}) · จะติดยศตอนอายุ ${S.age + 7} · เฟสถัดไปคือชีวิตในโรงเรียนเตรียมทหาร`); return 'END'; }];
+  return statusCard('รายงานตัวที่นครนายก', `รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BR_TH[b]} อีกเจ็ดปีจะได้ติดยศ`);
+}
+function passedCard(b) {
+  S.p2.chosen = b;
+  const c = firstOk(P2().passed) || { title: 'ติดแล้ว', text: 'ติด {เหล่า}', options: [{ label: 'ไปรายงานตัว' }] };
+  const t = s => (s || '').replaceAll('{เหล่า}', BR_TH[b]).replaceAll('{อายุติดยศ}', S.age + 7);
+  S.p2.steps = [() => { finish(`ติดเตรียมทหาร (ต่อ ${BR_TH[b]}) · จะติดยศตอนอายุ ${S.age + 7} · เฟสถัดไปคือชีวิตในโรงเรียนเตรียมทหาร`); return 'END'; }];
+  return asCard(c, { id: c.id || 'X9', title: t(c.title), text: t(c.text), options: (c.options || [{ label: 'ต่อ' }]).map(o => ({ ...o, label: t(o.label), result: t(o.result) })) });
+}
+function failedCard() {
+  const list = [].concat(P2().failed || []);
+  let c = list.find(x => S.age >= 18 ? (x.cond?.ageMin ?? x.ageMin ?? 0) >= 18 || /18/.test(x.id || '') : !((x.cond?.ageMin ?? x.ageMin ?? 0) >= 18) && !/18/.test(x.id || '')) || list[0]
+    || { title: 'ไม่ติด', text: 'ปีนี้ยังไม่ติด', options: [{ label: 'ต่อ' }] };
+  S.p2.steps = [() => endExamYear(), () => 'END'];
+  const why = !S.p2.branches.some(b => S.p2.written[b])
+    ? (c.reasonLines?.[S.p2.reason?.[S.p2.branches[0]]] || c.reasonLines?.written || '')
+    : S.p2.failStage === 'noshow' ? 'ผ่านข้อเขียนแล้ว แต่ไม่ไปสอบพลศึกษาภายในกำหนด'
+    : S.p2.failStage === 'injury' ? 'ผ่านข้อเขียนแล้ว แต่เจ็บก่อนวันสอบพละจนสอบไม่ไหว'
+    : S.p2.failStage === 'noreport' ? 'สอบติดแล้ว แต่ไม่ไปรายงานตัวภายในกำหนด'
+    : S.p2.failStage === 'interview' ? 'ผ่านพลศึกษาแล้ว แต่คะแนนสัมภาษณ์ยังไม่ถึงเกณฑ์'
+    : S.p2.failStage === 'noshow_iv' ? 'ผ่านมาถึงรอบสุดท้ายแล้ว แต่ไม่ไปสัมภาษณ์ภายในกำหนด'
+    : S.p2.physical === false ? (c.reasonLines?.[S.p2.failStage] || 'ตกรอบพลศึกษา') : (c.reasonLines?.medical || 'ตกตรวจร่างกาย');
+  S.lastFail = !S.p2.branches.some(b => S.p2.written[b]) ? 'written' : S.p2.failStage || 'medical';
+  S.everFailed = true;
+  const nTh = ['', 'หนึ่ง', 'สอง', 'สาม'][S.tries || 1] || 'สาม';
+  const retryRes = ({ written: 'ซื้อข้อสอบเก่าชุดใหม่มาอ่านตั้งแต่สัปดาห์แรก', land: 'เริ่มวิ่งตอนเช้าตั้งแต่วันจันทร์ถัดมา', injury: 'พักข้อเท้าให้หาย แล้วค่อยกลับไปวิ่ง',
+    interview: 'ซ้อมตอบคำถามหน้ากระจกทุกคืน', noshow: 'บอกตัวเองว่าปีหน้าจะไม่หนีอีก', noshow_iv: 'บอกตัวเองว่าปีหน้าจะไม่หนีอีก', noreport: 'บอกตัวเองว่าปีหน้าจะไม่หนีอีก' })[S.lastFail];
+  c = { ...c, options: (c.options || []).map(o => ({ ...o,
+    label: (o.label || '').replaceAll('ทั้งสามใบ', `ทั้ง${nTh}ใบ`), hint: o.hint ? o.hint.replaceAll('สามปี', `${nTh}ปี`) : o.hint,
+    result: o.label === 'สอบใหม่ แก้จุดที่พลาด' && retryRes ? retryRes : o.result })) };
+  return asCard(c, { id: c.id || 'X10', text: (c.text || '').replaceAll('{เหตุ}', why).replaceAll('{สถานี}', 'รอบพลศึกษา เพราะร่างกายยังไม่ถึงเกณฑ์ของเหล่าที่สมัคร') });
+}
+function endExamYear() {
+  S.p2 = null;
+  // still in the race next year unless he let it go (failed card options set cadet_let_go / clear cadet_dream)
+  if (S.age < 18 && !S.flags.has('cadet_let_go')) S.flags.add('cadet_dream');
+  if (S.age >= 18) { finish(`หมดสิทธิ์สอบตามอายุแล้ว (สอบไป ${S.tries || 1} ครั้ง) · ด่านจบ ม.6/ปวช. ที่พักไว้เดินต่อ ไปทางมหาวิทยาลัยหรือสายอื่นตามเกมเดิม`); return 'END'; }
+  S.flags.delete('cadet_exam_door');
+  S.age++;
+  beginYear();
+  return 'END';
+}
+
+function p2Next() {
+  while (S.p2 && S.p2.steps.length) {
+    const r = S.p2.steps.shift()();
+    if (r === 'END') return;
+    if (r) return show(r);
+  }
+  if (S.p2) { S.p2 = null; finish('จบสนามสอบ'); }
+}
+
+function finish(msg) {
+  S.ended = true;
+  stage.innerHTML = `<div class="badges"><span class="badge age">อายุ ${S.age}</span></div>
+    <h2>จบเฟส 1</h2><p class="text">${msg}</p>
+    <button class="primary" id="again">เล่นใหม่</button>`;
+  $('#again').onclick = setup;
+  renderSide();
+}
+
+function renderSide() {
+  if (!S) { side.innerHTML = `<h3>ข้อมูลใน demo</h3><p class="warn">โหลดเหตุการณ์ ${EVENTS.length} ใบ</p>`; return; }
+  side.innerHTML = `
+    <h3>${S.name} · ${S.sex} · ${S.region}</h3>
+    ${STATS.map(([k, l]) => k === 'money'
+      ? `<div class="stat"><span>${l}</span><span>${'฿'.repeat(Math.min(S.stats.money, 10)) || '—'}</span><span>${S.stats.money}</span></div>`
+      : `<div class="stat"><span>${l}</span><div class="bar"><i style="width:${S.stats[k]}%"></i></div><span>${S.stats[k]}</span></div>`).join('')}
+    <h3>ธง</h3><div class="flags">${[...S.flags].map(f => `<span>${f}</span>`).join('') || '<span>—</span>'}</div>
+    <h3>บันทึก</h3><ol class="log">${S.log.slice(-40).map(l => `<li>${l}</li>`).join('')}</ol>`;
+}
+
+window.__demoState = () => S;   // test hook only
+setup();
+})();
+</script>
+</body>
+</html>

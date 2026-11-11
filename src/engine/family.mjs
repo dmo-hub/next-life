@@ -339,7 +339,10 @@ export function kinIllOk(st, w) {
 // after = ต้องผ่านมาอย่างน้อยกี่ปี (B165 ช่วงไว้ทุกข์ — การ์ดรักใหม่ไม่ขึ้นก่อนพ้นช่วง)
 export function lossOk(st, w) {
   const year = kinYearOf(st);
-  return (st.kinLoss ?? []).some((l) => (!w.roles || w.roles.includes(l.role)) && year - l.year >= (w.after ?? 0) && year - l.year <= (w.within ?? 0));
+  const match = (st.kinLoss ?? []).filter((l) => !w.roles || w.roles.includes(l.role));
+  // after > 0: ช่วงไว้ทุกข์นับจากการสูญเสียล่าสุดเท่านั้น — คู่คนก่อนที่จากไปนานแล้วต้องไม่ปลดล็อกให้ตอนคู่คนใหม่เพิ่งตาย
+  const pool = w.after > 0 ? match.slice(-1) : match;
+  return pool.some((l) => year - l.year >= (w.after ?? 0) && year - l.year <= (w.within ?? 0));
 }
 // ชื่อคนที่จากไปล่าสุด ให้การ์ดสูญเสียเรียก ({ชื่อผู้จากไป})
 export const lastLoss = (st) => (st.kinLoss ?? []).at(-1) ?? null;
@@ -455,6 +458,17 @@ export function heirPets(st, birthYear, tier) {
     .filter((m) => ANIMAL.includes(m.role) && m.alive && !m.left)
     .map(({ role, kind, name, born, maxAge, sex, bond }) => ({ role, kind, name, born, maxAge, sex, bond }));
   return pets.length ? pets : undefined;
+}
+
+// คนตายที่ตระกูลโลกซ้อนจำได้ (ผีญาติดึงไปใช้) — เฉพาะคนที่ตายก่อนเรา · พ่อ/แม่ที่เป็นผู้เล่นรุ่นก่อนคือชาติก่อนของเราเอง ไม่ใช่วิญญาณอื่น · ฝูงสัตว์ไม่มีตัวตนรายตัว
+// เก็บเลขรุ่นแทนปีตาย: ผีสุ่มเอียงหารุ่นใกล้ ไม่ได้กรองว่าไปเกิดแล้วหรือยัง
+export function deadKinOf(st) {
+  const gen = st.gen ?? 1;
+  const one = (m, role) => ({ name: m.name ?? null, role, bond: m.bond ?? BOND_START[role], cause: m.cause ?? null, gen });
+  return [
+    ...st.parents.filter((p) => !p.alive && !p.ancestor).map((p) => one(p, 'parent')),
+    ...(st.kin ?? []).filter((m) => !m.alive && m.role !== 'herd').map((m) => one(m, m.role)),
+  ];
 }
 
 // มรณบัตร: ใครรับเลี้ยงสัตว์ต่อ — คู่ชีวิต > ลูก > หลาน ที่ยังอยู่ ไม่มีใคร = เพื่อนบ้าน

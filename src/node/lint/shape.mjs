@@ -12,7 +12,7 @@ import { CHRONIC, ILL_YEARS, HEREDITARY, CARE_CAUSES } from '../../engine/death.
 import { SIN_CATS } from '../../engine/merit.mjs';
 import { REALMS } from '../../engine/afterlife.mjs';
 import { PAST_GONE, PAST_PROVINCE } from '../../engine/past.mjs';
-import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isMoney } from './util.mjs';
+import { isObj, isInt, isRange, list, choicesOf, effectSites, textsOf, placeholdersIn, isLedgerPlaceholder, isCondPlaceholder, isMoney } from './util.mjs';
 // คนที่ when.kin_illness เลือกได้ = พ่อแม่ + คนในบ้านที่แกนออกการ์ดแจ้งป่วย (เพื่อนรุ่นไม่แจ้ง)
 const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 // ตายในดันเจียนไม่มีกลุ่มสาเหตุของตัวเอง — ลงกลุ่มบาดเจ็บเดิมให้ด่าน causes และสถิติตายตามอายุยังเทียบ WHO ได้
@@ -20,7 +20,7 @@ const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
   event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
   familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
@@ -39,7 +39,7 @@ const KEYS = {
   multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
-  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'reason'],
+  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'reason', 'reasons'],
   belief: ['kind', 'tradition', 'outside_canon', 'vow', 'trigger', 'cap_per_life', 'prize_table', 'stake', 'odds_modifier'],
   vow: ['deadline_years', 'due_event', 'redeem_full_cost', 'redeem_light_cost', 'defer_once'],
   trigger: ['money_state'],
@@ -85,6 +85,12 @@ function* shaped(e) {
   if (isObj(e.prelude)) yield ['prelude', e.prelude, '.prelude'];
   for (const { c, path } of choicesOf(e)) {
     yield ['choice', c, path];
+    // ตัวเลือกที่แทนกัน (B1): show_if / hide_if ใช้ key ชุดเดียวกับ when
+    for (const k of ['show_if', 'hide_if']) if (isObj(c[k])) {
+      yield ['when', c[k], `${path}.${k}`];
+      if (isObj(c[k].flags)) yield ['whenFlags', c[k].flags, `${path}.${k}.flags`];
+      for (const [i, f] of list(c[k].family).entries()) if (isObj(f)) yield ['family', f, `${path}.${k}.family[${i}]`];
+    }
     const q = c.requires;
     if (!isObj(q)) continue;
     yield ['requires', q, `${path}.requires`];
@@ -147,6 +153,9 @@ function checkMultipliers(m, at, r) {
   for (const k of MONEY_KEYS) if (m[k] !== undefined && !(ratioBound(m[k]) && positive(m[k].v))) r(`${at}.${k}`, 'ต้องเป็น {min, max, v} อัตราส่วน ≥ 0 อย่างน้อยหนึ่งขอบ v เป็นเลขบวก');
 }
 
+// ธงทายาทของเส้นเตรียมทหาร (พ่อ/แม่เคยรับราชการ) · ตัวแทนที่ต้องกั้นด้วยธงนี้
+const HEIR_FLAGS = ['army_family', 'police_family'];
+const HEIR_PH = /\{ทายาท:|\{ผู้ใหญ่ทายาท\}|\{ทางแม่\}/;
 // ป้ายราคาทางลัดดำ (B156): ผู้เล่นเห็นระดับบาปเป็นคำ ไม่เห็นตัวเลข · ระดับ 3 ขึ้นไปรวมเป็นหนักมาก
 const SIN_PRICE = { 1: 'บาปเบา', 2: 'บาปหนัก', 3: 'บาปหนักมาก' };
 const SIN_PRICE_RE = /ราคา: (บาปหนักมาก|บาปหนัก|บาปเบา)/;
@@ -187,6 +196,18 @@ export const rules = [
     desc: `การ์ดที่มีตัวเลือกต้องมีอย่างน้อย ${MIN_CHOICES} ตัวเลือก · การ์ดเล่าเรื่องใช้ choices: [] ได้`,
     event(e, ctx, r) {
       if (Array.isArray(e.choices) && e.choices.length && e.choices.length < MIN_CHOICES) r('.choices', `มี ${e.choices.length} ตัวเลือก ต้องมีอย่างน้อย ${MIN_CHOICES}`);
+      // B1 ตัวเลือกที่แทนกัน: นับกรณีซ่อนมากสุด — ไม่มีเงื่อนไข เห็นเสมอ · เงื่อนไขเดียวกัน show_if กับ hide_if เห็นอย่างใดอย่างหนึ่ง (นับข้างที่น้อยกว่า) · มีข้างเดียว = อาจซ่อนหมด
+      if (Array.isArray(e.choices) && e.choices.some((c) => c?.show_if || c?.hide_if)) {
+        const show = {}, hide = {};
+        let always = 0;
+        for (const c of e.choices) {
+          if (c?.show_if) show[JSON.stringify(c.show_if)] = (show[JSON.stringify(c.show_if)] ?? 0) + 1;
+          else if (c?.hide_if) hide[JSON.stringify(c.hide_if)] = (hide[JSON.stringify(c.hide_if)] ?? 0) + 1;
+          else always++;
+        }
+        const least = always + [...new Set([...Object.keys(show), ...Object.keys(hide)])].reduce((n, k) => n + Math.min(show[k] ?? 0, hide[k] ?? 0), 0);
+        if (least < MIN_CHOICES) r('.choices', `ตอนซ่อนมากสุดเหลือ ${least} ตัวเลือก ต้องเหลืออย่างน้อย ${MIN_CHOICES} (show_if/hide_if ต้องจับคู่เงื่อนไขเดียวกัน)`);
+      }
     },
   },
   {
@@ -292,6 +313,22 @@ export const rules = [
       const span = STAGE_AGES[e.stage];
       if (!isInt(e.at_age) || !span || e.at_age < span[0] || e.at_age > span[1]) {
         r('.at_age', `at_age ${e.at_age} ไม่อยู่ในช่วง ${e.stage}${span ? ` (${span[0]}–${span[1]})` : ''}`);
+      }
+    },
+  },
+  {
+    // R1 ของ S3 (B1 · g-b7 สั่ง 2026-11-09): ตัวแทนฝั่งทายาทเล่าถึงคนในบ้านที่เคยรับราชการ — ชีวิตที่ไม่ใช่ลูกทหาร/ตำรวจได้ "พ่อเล่าเรื่องสมัยหนุ่ม" ผิด ๆ
+    id: 'heir-unguarded',
+    desc: `ข้อความที่ใช้ {ทายาท:…} {ผู้ใหญ่ทายาท} {ทางแม่} ต้องกั้นด้วยธงทายาท (${HEIR_FLAGS.join(' / ')}): when.parent_flags.has ทั้งใบ หรือ show_if.parent_flags.has ของตัวเลือกนั้น`,
+    event(e, ctx, r) {
+      const guarded = (w) => list(w?.parent_flags?.has).some((f) => HEIR_FLAGS.includes(f));
+      if (guarded(e.when)) return;
+      const heirText = (s) => typeof s === 'string' && HEIR_PH.test(s);
+      if (heirText(e.title) || heirText(e.text)) r('.text', 'ใช้ตัวแทนฝั่งทายาท แต่การ์ดไม่กั้นด้วยธงทายาท');
+      for (const { c, path } of choicesOf(e)) {
+        if (guarded(c.show_if)) continue;
+        const texts = [c.text, c.label, c.hint, c.result, c.requires?.reason, ...Object.values(c.requires?.reasons ?? {}), ...list(c.outcomes).map((o) => o?.text)];
+        if (texts.some(heirText)) r(path, 'ตัวเลือกใช้ตัวแทนฝั่งทายาท แต่ไม่กั้นด้วยธงทายาท (ทั้งใบหรือ show_if ของตัวเลือก)');
       }
     },
   },
@@ -434,8 +471,11 @@ export const rules = [
     desc: 'ผลสุ่ม outcomes มีอย่างน้อย 2 ทาง แต่ละทางมี weight เลขบวก',
     event(e, ctx, r) {
       for (const { c, path } of choicesOf(e)) {
+        // ผลทางเดียว (Q1): result เป็นข้อความ · ใช้คู่กับ outcomes ไม่ได้ (ผลสุ่มเล่าผลเองแล้ว)
+        if (c.result !== undefined && (typeof c.result !== 'string' || !c.result.trim())) r(`${path}.result`, 'result ต้องเป็นข้อความ');
+        if (c.result !== undefined && c.outcomes !== undefined) r(`${path}.result`, 'มี outcomes แล้วใส่ result ไม่ได้ — เขียนข้อความผลในแต่ละทางแทน');
         if (c.outcomes === undefined) continue;
-        if (!Array.isArray(c.outcomes) || c.outcomes.length < 2) { r(`${path}.outcomes`, 'outcomes ต้องมีอย่างน้อย 2 ทาง'); continue; }
+        if (!Array.isArray(c.outcomes) || c.outcomes.length < 2) { r(`${path}.outcomes`, 'outcomes ต้องมีอย่างน้อย 2 ทาง (ผลทางเดียวใช้ result)'); continue; }
         c.outcomes.forEach((o, j) => !(isObj(o) && positive(o.weight)) && r(`${path}.outcomes[${j}]`, 'ต้องมี weight เลขบวก'));
       }
     },
@@ -445,7 +485,7 @@ export const rules = [
     desc: `ช่องแทนค่าในข้อความต้องอยู่ในรายการปิด ${Object.keys(PLACEHOLDERS).map((k) => `{${k}}`).join(' ')}`,
     event(e, ctx, r) {
       for (const { path, s } of textsOf(e)) {
-        for (const k of placeholdersIn(s)) if (!(k in PLACEHOLDERS) && !isLedgerPlaceholder(k)) r(path, `ช่องแทนค่า {${k}} ไม่อยู่ในรายการ`);
+        for (const k of placeholdersIn(s)) if (!(k in PLACEHOLDERS) && !isCondPlaceholder(k) && !isLedgerPlaceholder(k)) r(path, `ช่องแทนค่า {${k}} ไม่อยู่ในรายการ`);
       }
     },
   },  {
@@ -545,7 +585,10 @@ export const rules = [
         if (q.stats !== undefined && (!isObj(q.stats) || Object.entries(q.stats).some(([k, b]) => !STAT_KEYS.includes(k) || !bound(b) || (b.min === undefined && b.max === undefined)))) r(`${at}.stats`, 'ต้องเป็น {ค่าสถานะ: {min, max}} 0–100');
         if (q.flags !== undefined && (!isObj(q.flags) || ['has', 'not'].some((k) => q.flags[k] !== undefined && !Array.isArray(q.flags[k])))) r(`${at}.flags`, 'flags ต้องเป็น {has: [...], not: [...]}');
         // ชื่อธงเป็นภาษาโค้ด ผู้เล่นอ่านไม่ออก — ต้องบอกเหตุผลเป็นคำ
-        if (q.flags !== undefined && !(typeof q.reason === 'string' && q.reason.trim())) r(`${at}.reason`, 'ล็อกด้วยธงต้องมี reason ที่ผู้เล่นอ่านเข้าใจ');
+        // B1: เหตุแยกข้อ reasons.flags ใช้แทน reason ได้
+        if (q.flags !== undefined && !(typeof q.reason === 'string' && q.reason.trim()) && !(typeof q.reasons?.flags === 'string' && q.reasons.flags.trim())) r(`${at}.reason`, 'ล็อกด้วยธงต้องมี reason ที่ผู้เล่นอ่านเข้าใจ');
+        // B1 requires.reasons = {ข้อ: เหตุ} · ข้อต้องเป็นเงื่อนไขที่มีจริงใน requires นี้ · เหตุเป็นข้อความ
+        if (q.reasons !== undefined && !(isObj(q.reasons) && Object.entries(q.reasons).every(([k, v]) => ['money', 'stats', 'flags', 'edu', 'family'].includes(k) && q[k] !== undefined && typeof v === 'string' && v.trim()))) r(`${at}.reasons`, 'reasons ต้องเป็น {money|stats|flags|edu|family: ข้อความ} ของข้อที่มีใน requires');
         if (q.reason !== undefined && !(typeof q.reason === 'string' && q.reason.trim())) r(`${at}.reason`, 'reason ต้องเป็นข้อความ');
       }
       if (cs.length && cs.every(({ c }) => c.requires !== undefined)) r('.choices', 'ทุกตัวเลือกล็อกได้ — ต้องมีตัวเลือกที่ไม่มี requires อย่างน้อย 1 ตัว ไม่งั้นการ์ดค้าง');

@@ -1,0 +1,27 @@
+# ต้องตกด้วย heir-unguarded อย่างเดียว: ใช้ {ทายาท:…} โดยไม่กั้นด้วย parent_flags army_family/police_family
+events:
+  - id: fixture_heir_unguarded_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2501, 2650]
+    when: {sex: [ชาย], age: [15, 17]}
+    title: "คืนก่อนสอบ"
+    text: "{ทายาท:ผู้ใหญ่เล่าเรื่องสมัยหนุ่ม|ผู้ใหญ่เล่าเรื่องสมัยรับราชการ|ผู้ใหญ่เปิดอัลบั้มเก่า} ก่อนนอน"
+    choices:
+      - id: a
+        text: "ฟังจนจบ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: b
+        text: "เข้านอนเร็ว"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: c
+        text: "ทวนหนังสือ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: d
+        text: "ออกไปวิ่ง"
+        effects: {health: 1}
+        merit: [{cat: neutral}]

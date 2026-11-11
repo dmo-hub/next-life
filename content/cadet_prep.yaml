@@ -53,9 +53,9 @@ events:
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 13, multipliers: {class: {มีอันจะกิน: 100, ร่ำรวย: 100, มั่งคั่ง: 100}, stats: {knowledge: 2}}, text: "ผู้ใหญ่ในบ้านวางผ้าลง แล้วบอกว่า 'เงินเก็บที่มีอยู่ เอาไปเป็นค่าติวเถอะ'", effects: {relations: 2}, sets_flags: [cadet_family_support], merit: [{cat: neutral}]}
-          - {weight: 3.5, multipliers: {stats: {knowledge: 2}}, text: "ผู้ใหญ่ในบ้านไม่ห้าม แต่บอกตรง ๆ ว่า 'ไม่มีเงินพอส่งค่าติวนะ'", effects: {happiness: -1, relations: 1}, schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
-          - {weight: 3.5, multipliers: {stats: {knowledge: 0.5}}, text: "ผู้ใหญ่ในบ้านไม่ห้าม แต่บอกตรง ๆ ว่า 'ไม่มีเงินพอส่งค่าติวนะ'", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 13, multipliers: {class: {มีอันจะกิน: 100, ร่ำรวย: 100, มั่งคั่ง: 100}, stats: {knowledge: 2}}, text: "{ผู้ใหญ่}วางผ้าลง แล้วบอกว่า 'เงินที่เก็บไว้น่ะ เอาไปจ่ายค่าติวเลย ไม่ต้องเกรงใจ{ถิ่น}'", effects: {relations: 2}, sets_flags: [cadet_family_support], merit: [{cat: neutral}]}
+          - {weight: 3.5, multipliers: {stats: {knowledge: 2}}, text: "{ผู้ใหญ่}ไม่ห้าม แต่บอกตรง ๆ ว่า 'อยากสอบก็สอบไป แต่ค่าติวบ้านเราไม่มีให้นะ{ถิ่น}'", effects: {happiness: -1, relations: 1}, schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 3.5, multipliers: {stats: {knowledge: 0.5}}, text: "{ผู้ใหญ่}ไม่ห้าม แต่บอกตรง ๆ ว่า 'อยากสอบก็สอบไป แต่ค่าติวบ้านเราไม่มีให้นะ{ถิ่น}'", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
       - id: ask_relatives
         text: "ไปขอญาติช่วยเรื่องค่าติว"
         effects: {network: 1}
@@ -71,8 +71,8 @@ events:
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, multipliers: {stats: {knowledge: 2}}, text: "ผู้ใหญ่ในบ้านพยักหน้า 'ลองดู ถ้าไม่ไหวก็กลับมาบอก'", schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
-          - {weight: 1, multipliers: {stats: {knowledge: 0.5}}, text: "ผู้ใหญ่ในบ้านพยักหน้า 'ลองดู ถ้าไม่ไหวก็กลับมาบอก'", merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {knowledge: 2}}, text: "{ผู้ใหญ่}พยักหน้า 'ก็ลองดู ไม่ไหวเมื่อไหร่ค่อยว่ากันใหม่{ถิ่น}'", schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {knowledge: 0.5}}, text: "{ผู้ใหญ่}พยักหน้า 'ก็ลองดู ไม่ไหวเมื่อไหร่ค่อยว่ากันใหม่{ถิ่น}'", merit: [{cat: neutral}]}
       - id: keep_secret
         text: "ยังไม่บอก ไม่อยากเป็นภาระ"
         hint: "ค่าใช้จ่ายต้องหาเอง"
@@ -102,14 +102,15 @@ events:
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 6.5, text: "ที่บ้านไม่ห้าม แต่ไม่มีเงินค่าติวให้ ผู้ใหญ่ในบ้านไปขอยืมข้อสอบเก่าจากบ้านข้าง ๆ มาให้อ่าน", effects: {relations: 2}, merit: [{cat: neutral}]}
-          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_relative, after_years: [0, 0]}], merit: [{cat: neutral}]}
-          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_loanshark, after_years: [0, 0]}], merit: [{cat: neutral}]}
-          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_village, after_years: [0, 0]}, {event: cadet_fund_coop, after_years: [0, 0]}], merit: [{cat: neutral}]}
-          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_pawn, after_years: [0, 0]}], merit: [{cat: neutral}]}
-          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_cattle, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 6.5, text: "ที่บ้านไม่ห้าม แต่ไม่มีเงินค่าติวให้ {ผู้ใหญ่}ไปขอยืมข้อสอบเก่าจากบ้านข้าง ๆ มาให้อ่าน", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_relative, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_loanshark, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_village, after_years: [0, 0]}, {event: cadet_fund_coop, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_pawn, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_cattle, after_years: [0, 0]}], merit: [{cat: neutral}]}
       - id: read_alone
         text: "บอกที่บ้าน แต่จะอ่านเองไม่ติว"
+        result: "{ผู้ใหญ่}โล่งใจ บอกว่า 'อ่านเองได้ก็ดีเลย ประหยัดไปเยอะ{ถิ่น}'"
         effects: {relations: 1}
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
@@ -148,14 +149,15 @@ events:
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 6.5, text: "ที่บ้านไม่ห้าม แต่ไม่มีเงินค่าติวให้ ผู้ใหญ่ในบ้านไปขอยืมข้อสอบเก่าจากบ้านข้าง ๆ มาให้อ่าน", effects: {relations: 2}, merit: [{cat: neutral}]}
-          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_relative, after_years: [0, 0]}], merit: [{cat: neutral}]}
-          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_loanshark, after_years: [0, 0]}], merit: [{cat: neutral}]}
-          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_village, after_years: [0, 0]}, {event: cadet_fund_coop, after_years: [0, 0]}], merit: [{cat: neutral}]}
-          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_pawn, after_years: [0, 0]}], merit: [{cat: neutral}]}
-          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "ผู้ใหญ่ในบ้านนิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_cattle, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 6.5, text: "ที่บ้านไม่ห้าม แต่ไม่มีเงินค่าติวให้ {ผู้ใหญ่}ไปขอยืมข้อสอบเก่าจากบ้านข้าง ๆ มาให้อ่าน", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_relative, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_loanshark, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_village, after_years: [0, 0]}, {event: cadet_fund_coop, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_pawn, after_years: [0, 0]}], merit: [{cat: neutral}]}
+          - {weight: 0.7, multipliers: {stats: {knowledge: 1.3}}, text: "{ผู้ใหญ่}นิ่งไปนาน แล้วบอกว่า 'เรื่องค่าติว เดี๋ยวหาทางให้'", effects: {relations: 1}, sets_flags: [cadet_family_support], schedules: [{event: cadet_fund_cattle, after_years: [0, 0]}], merit: [{cat: neutral}]}
       - id: read_alone
         text: "บอกที่บ้าน แต่จะอ่านเองไม่ติว"
+        result: "{ผู้ใหญ่}โล่งใจ บอกว่า 'อ่านเองได้ก็ดีเลย ประหยัดไปเยอะ{ถิ่น}'"
         effects: {relations: 1}
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
@@ -185,14 +187,14 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: parent, sex: หญิง, alive: true}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "จะบอกแม่ดีไหม"
-    text: "มื้อเย็นนี้ {ชื่อ} ยังไม่ทันได้เปิดปาก แม่ก็วางช้อนลงก่อน 'ช่วงนี้ตื่นไปวิ่งแต่เช้าทุกวัน มีอะไรจะบอกแม่หรือเปล่า' ถ้าพูดออกไปตอนนี้ ต้องตอบให้ได้ทั้งเรื่องไปอยู่โรงเรียนประจำตั้งแต่อายุ 16 และเรื่องค่าติว"
+    text: "มื้อเย็นนี้ {ชื่อ} ยังไม่ทันได้เปิดปาก แม่ก็วางช้อนลงก่อน 'ช่วงนี้ตื่นไปวิ่งตั้งแต่ไก่โห่ทุกวันเลยนะ มีอะไรจะบอกแม่ไหมเนี่ย' ถ้าพูดออกไปตอนนี้ ต้องตอบให้ได้ทั้งเรื่องไปอยู่โรงเรียนประจำตั้งแต่อายุ 16 และเรื่องค่าติว"
     choices:
       - id: tell
         text: "บอกแม่ตรง ๆ ว่าอยากสอบ"
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 13, multipliers: {class: {มีอันจะกิน: 100, ร่ำรวย: 100, มั่งคั่ง: 100}, stats: {knowledge: 2}}, text: "แม่เงียบไปพักหนึ่ง แล้วบอกว่า 'ค่าติวเท่าไร เดี๋ยวแม่ออกให้'", effects: {happiness: 1, relations: 1}, sets_flags: [cadet_family_support], merit: [{cat: neutral}]}
+          - {weight: 13, multipliers: {class: {มีอันจะกิน: 100, ร่ำรวย: 100, มั่งคั่ง: 100}, stats: {knowledge: 2}}, text: "แม่เงียบไปพักหนึ่ง แล้วบอกว่า 'ค่าติวเท่าไหร่ล่ะ เดี๋ยวแม่หาให้{ถิ่น}'", effects: {happiness: 1, relations: 1}, sets_flags: [cadet_family_support], merit: [{cat: neutral}]}
           - {weight: 3.5, multipliers: {stats: {knowledge: 2}}, text: "แม่ไม่ห้าม แต่ห่วงที่ลูกต้องไปอยู่ไกลบ้าน เรื่องค่าติวขอคิดดูก่อน", effects: {happiness: -1}, schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
           - {weight: 3.5, multipliers: {stats: {knowledge: 0.5}}, text: "แม่ไม่ห้าม แต่ห่วงที่ลูกต้องไปอยู่ไกลบ้าน เรื่องค่าติวขอคิดดูก่อน", effects: {happiness: -1}, merit: [{cat: neutral}]}
       - id: bring_senior
@@ -209,8 +211,8 @@ events:
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, multipliers: {stats: {knowledge: 2}}, text: "แม่ไม่ห้าม บอกว่า 'ลองดู ถ้าเงินไม่พอก็มาบอกแม่นะ'", schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
-          - {weight: 1, multipliers: {stats: {knowledge: 0.5}}, text: "แม่ไม่ห้าม บอกว่า 'ลองดู ถ้าเงินไม่พอก็มาบอกแม่นะ'", merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {knowledge: 2}}, text: "แม่ไม่ห้าม บอกว่า 'เอาเลยลูก เงินขาดเท่าไหร่ก็บอกแม่{ถิ่น}'", schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {knowledge: 0.5}}, text: "แม่ไม่ห้าม บอกว่า 'เอาเลยลูก เงินขาดเท่าไหร่ก็บอกแม่{ถิ่น}'", merit: [{cat: neutral}]}
       - id: keep_secret
         text: "ยังไม่บอก แอบเตรียมตัวเอง"
         hint: "ค่าใช้จ่ายต้องหาเอง"
@@ -233,16 +235,16 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], family: [{role: parent, sex: ชาย, alive: true}, {role: parent, sex: หญิง, alive: true, count: [0, 0]}], flags: {has: [cadet_dream], not: [cadet_family_told, cadet_family_secret]}}
     title: "จะบอกพ่อดีไหม"
-    text: "คืนนี้ช่วยพ่อซ่อมพัดลมอยู่หน้าบ้าน บ้านนี้มีกันอยู่สองคนพ่อลูก พ่อขันน็อตไปพลางถามไปพลาง 'ช่วงนี้อ่านหนังสือดึกทุกคืนเลยนะ มีอะไรหรือเปล่า' ถ้าสอบติด พ่อจะต้องอยู่บ้านคนเดียว"
+    text: "คืนนี้ช่วยพ่อซ่อมพัดลมอยู่หน้าบ้าน บ้านนี้มีกันอยู่สองคนพ่อลูก พ่อขันน็อตไปพลางถามไปพลาง 'ไฟห้องเปิดถึงตีหนึ่งทุกคืนเลยนะ มีอะไรรึเปล่า' ถ้าสอบติด พ่อจะต้องอยู่บ้านคนเดียว"
     choices:
       - id: tell
         text: "บอกพ่อตรง ๆ ว่าอยากสอบ"
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 13, multipliers: {class: {มีอันจะกิน: 100, ร่ำรวย: 100, มั่งคั่ง: 100}, stats: {knowledge: 2}}, text: "พ่อวางไขควงแล้วบอกว่า 'ค่าติวเดี๋ยวพ่อจัดการ พรุ่งนี้ตื่นไปวิ่งด้วยกัน'", effects: {happiness: 1, relations: 1}, sets_flags: [cadet_family_support], merit: [{cat: neutral}]}
-          - {weight: 3.5, multipliers: {stats: {knowledge: 2}}, text: "พ่อถามว่า 'รู้ใช่ไหมว่ามันหนัก' แล้วก็เงียบไป ไม่พูดเรื่องค่าติวเลย", effects: {happiness: -1}, schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
-          - {weight: 3.5, multipliers: {stats: {knowledge: 0.5}}, text: "พ่อถามว่า 'รู้ใช่ไหมว่ามันหนัก' แล้วก็เงียบไป ไม่พูดเรื่องค่าติวเลย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 13, multipliers: {class: {มีอันจะกิน: 100, ร่ำรวย: 100, มั่งคั่ง: 100}, stats: {knowledge: 2}}, text: "พ่อวางไขควงแล้วบอกว่า 'ค่าติวพ่อจัดการเอง พรุ่งนี้ตีห้าตื่นไปวิ่งกับพ่อ{ถิ่น}'", effects: {happiness: 1, relations: 1}, sets_flags: [cadet_family_support], merit: [{cat: neutral}]}
+          - {weight: 3.5, multipliers: {stats: {knowledge: 2}}, text: "พ่อถามว่า 'รู้ใช่มั้ยว่าเข้าไปแล้วมันหนัก ไม่ใช่เล่น ๆ นะ{ถิ่น}' แล้วก็เงียบไป ไม่พูดเรื่องค่าติวเลย", effects: {happiness: -1}, schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 3.5, multipliers: {stats: {knowledge: 0.5}}, text: "พ่อถามว่า 'รู้ใช่มั้ยว่าเข้าไปแล้วมันหนัก ไม่ใช่เล่น ๆ นะ{ถิ่น}' แล้วก็เงียบไป ไม่พูดเรื่องค่าติวเลย", effects: {happiness: -1}, merit: [{cat: neutral}]}
       - id: see_field
         text: "ชวนพ่อไปดูสนามสอบด้วยกัน"
         sets_flags: [cadet_family_told]
@@ -257,8 +259,8 @@ events:
         sets_flags: [cadet_family_told]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, multipliers: {stats: {knowledge: 2}}, text: "พ่อพยักหน้า 'โตแล้ว คิดเองได้ ขาดเหลืออะไรก็บอกพ่อ'", schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
-          - {weight: 1, multipliers: {stats: {knowledge: 0.5}}, text: "พ่อพยักหน้า 'โตแล้ว คิดเองได้ ขาดเหลืออะไรก็บอกพ่อ'", merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {knowledge: 2}}, text: "พ่อพยักหน้า 'โตแล้ว เลือกเองได้ ขาดอะไรก็บอกพ่อแล้วกัน{ถิ่น}'", schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {knowledge: 0.5}}, text: "พ่อพยักหน้า 'โตแล้ว เลือกเองได้ ขาดอะไรก็บอกพ่อแล้วกัน{ถิ่น}'", merit: [{cat: neutral}]}
       - id: keep_secret
         text: "ยังไม่บอก แอบเตรียมตัวเอง"
         hint: "ค่าใช้จ่ายต้องหาเอง"
@@ -281,7 +283,7 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
-    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} แต่ไม่มีเงินเก็บ ผู้ใหญ่ในบ้านจึงไปขอยืมญาติ ตกค่ำกลับมาพร้อมซองเงิน บอกว่า 'ขายผลผลิตได้แล้วค่อยทยอยคืนเขา ญาติฝากมาว่าให้ตั้งใจเรียนนะ'"
+    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} แต่ไม่มีเงินเก็บ {ผู้ใหญ่}จึงไปขอยืมญาติ ตกค่ำกลับมาพร้อมซองเงิน บอกว่า 'ขายข้าวได้แล้วค่อยทยอยคืนเขา ป้าเขาฝากบอกว่าให้ตั้งใจนะ{ถิ่น}'"
     choices:
       - id: accept
         text: "รับเงินไว้ สัญญาว่าจะตั้งใจ"
@@ -309,6 +311,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "ทุกวันเสาร์ไปช่วยขนของที่ร้านวัสดุ เงินในซองพอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ไม่รับเงิน จะอ่านหนังสือเอง"
+        result: "{ผู้ใหญ่}เอาซองไปคืนญาติทั้งที่ยังไม่แกะ ไม่ว่าอะไร แต่มื้อเย็นนั้นเงียบกว่าปกติ"
         effects: {happiness: -1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -321,7 +324,7 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
-    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} แต่ไม่มีเงินเก็บ ผู้ใหญ่ในบ้านจึงไปกู้เงินรายวันในตลาด บอกว่า 'ดอกไม่เท่าไร ขายของได้เดี๋ยวก็หมด' แต่ทุกเย็น {ชื่อ} เห็นสมุดจดยอดส่งดอกวางอยู่ข้างกระป๋องเงิน"
+    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} แต่ไม่มีเงินเก็บ {ผู้ใหญ่}จึงไปกู้เงินรายวันในตลาด บอกว่า 'ดอกนิดเดียวเอง ขายของไม่กี่วันก็หมดแล้ว{ถิ่น}' แต่ทุกเย็น {ชื่อ} เห็นสมุดจดยอดส่งดอกวางอยู่ข้างกระป๋องเงิน"
     choices:
       - id: accept
         text: "รับเงินไว้ สัญญาว่าจะตั้งใจ"
@@ -350,6 +353,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "ตื่นตีห้าไปช่วยร้านในตลาดก่อนไปโรงเรียน เงินที่กู้มาพอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ขอให้เอาเงินไปคืนเขาก่อน"
+        result: "ที่บ้านเอาเงินไปคืนในวันนั้น เสียดอกแค่ไม่กี่วัน {ชื่อ} กลับไปอ่านหนังสือเอง"
         effects: {happiness: -1, relations: 1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -362,7 +366,7 @@ events:
     years: [2544, 2650]
     when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
-    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} ผู้ใหญ่ในบ้านจึงไปขอกู้กองทุนหมู่บ้าน มีเพื่อนบ้านสองคนช่วยค้ำ ในที่ประชุมมีคนถามว่าจะกู้ไปทำอะไร ผู้ใหญ่ในบ้านตอบว่า 'เป็นค่าติวสอบเตรียมทหารของเด็กในบ้าน'"
+    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} {ผู้ใหญ่}จึงไปขอกู้กองทุนหมู่บ้าน มีเพื่อนบ้านสองคนช่วยค้ำ ในที่ประชุมมีคนถามว่าจะกู้ไปทำอะไร {ผู้ใหญ่}ตอบว่า 'เอาไปให้{ลูก}ติวสอบเตรียมทหารจ้ะ{ถิ่น}'"
     choices:
       - id: accept
         text: "รับเงินไว้ สัญญาว่าจะตั้งใจ"
@@ -390,6 +394,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "ปิดเทอมไปรับจ้างในไร่ข้างบ้านช่วยส่งงวดแรก เงินกู้พอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ขอให้ยกเลิกเงินกู้ จะอ่านเอง"
+        result: "{ผู้ใหญ่}ไปขอถอนชื่อจากรอบนี้ คิวกู้ตกไปเป็นของบ้านถัดไป"
         effects: {happiness: -1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -402,7 +407,7 @@ events:
     years: [2501, 2543]
     when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
-    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} ผู้ใหญ่ในบ้านจึงไปขอกู้สหกรณ์ที่เป็นสมาชิกอยู่ ต้องหาเพื่อนบ้านมาช่วยค้ำ เจ้าหน้าที่ถามว่าจะกู้ไปลงทุนอะไร ผู้ใหญ่ในบ้านตอบว่า 'ลงทุนให้เด็กในบ้านได้เรียน'"
+    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} {ผู้ใหญ่}จึงไปขอกู้สหกรณ์ที่เป็นสมาชิกอยู่ ต้องหาเพื่อนบ้านมาช่วยค้ำ เจ้าหน้าที่ถามว่าจะกู้ไปลงทุนอะไร {ผู้ใหญ่}ตอบว่า 'ลงทุนให้ลูกให้หลานได้เรียนนี่แหละ{ถิ่น}'"
     choices:
       - id: accept
         text: "รับเงินไว้ สัญญาว่าจะตั้งใจ"
@@ -430,6 +435,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "ปิดเทอมไปรับจ้างในไร่ข้างบ้านช่วยส่งงวดแรก เงินกู้พอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ขอให้ยกเลิกเงินกู้ จะอ่านเอง"
+        result: "{ผู้ใหญ่}ไปบอกเจ้าหน้าที่ว่าไม่กู้แล้ว {ชื่อ} กลับไปอ่านหนังสือเอง"
         effects: {happiness: -1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -442,7 +448,7 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
-    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} แต่ไม่มีเงินเก็บ ผู้ใหญ่ในบ้านจึงเอาสร้อยทองเส้นเดียวของบ้านไปจำนำ แล้วบอกว่า 'ขายของได้เมื่อไรก็ไปไถ่คืน ไม่ต้องห่วง' ใบจำนำเก็บไว้ในกล่องบนหิ้ง"
+    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} แต่ไม่มีเงินเก็บ {ผู้ใหญ่}จึงเอาสร้อยทองเส้นเดียวของบ้านไปจำนำ แล้วบอกว่า 'เดี๋ยวขายของได้ก็ไปไถ่คืน ไม่ต้องห่วงหรอก{ถิ่น}' ใบจำนำเก็บไว้ในกล่องบนหิ้ง"
     choices:
       - id: accept
         text: "รับเงินไว้ สัญญาว่าจะตั้งใจ"
@@ -470,6 +476,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "ล้างจานร้านข้าวแกงทุกเย็นเก็บไว้ไถ่สร้อย เงินจำนำพอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ขอให้ไปไถ่สร้อยคืนก่อน"
+        result: "สัปดาห์นั้นสร้อยกลับมาอยู่ที่บ้าน {ชื่อ} กลับไปอ่านหนังสือข้อสอบเก่าเอง"
         effects: {happiness: -1, relations: 1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -482,7 +489,7 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], flags: {has: [cadet_dream, cadet_family_support]}}
     title: "ที่บ้านหาเงินค่าติว"
-    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} ผู้ใหญ่ในบ้านจึงขายวัวสองตัวให้คนรับซื้อที่มาถึงคอก ยังไม่ถึงช่วงราคาดี เลยได้เงินน้อยกว่าที่หวังไว้ เย็นนั้นคอกหลังบ้านดูโล่งกว่าทุกวัน"
+    text: "ที่บ้านรับปากจะออกค่าติวให้ {ชื่อ} {ผู้ใหญ่}จึงขายวัวสองตัวให้คนรับซื้อที่มาถึงคอก ยังไม่ถึงช่วงราคาดี เลยได้เงินน้อยกว่าที่หวังไว้ เย็นนั้นคอกหลังบ้านดูโล่งกว่าทุกวัน"
     choices:
       - id: accept
         text: "รับเงินไว้ สัญญาว่าจะตั้งใจ"
@@ -507,6 +514,7 @@ events:
           - {weight: 2, multipliers: {stats: {knowledge: 0.33}}, text: "หลังเลิกเรียนต้อนวัวบ้านอื่นไปกินหญ้าจนผิวลอก เงินค่าวัวพอแค่ราวครึ่งค่าค่าย ที่เหลือต้องใช้เงินเก็บตัวเอง", sets_flags: [cadet_share_half], merit: [{cat: neutral}]}
       - id: decline
         text: "ขอให้ซื้อวัวคืน จะอ่านเอง"
+        result: "คนรับซื้อไม่ยอมขายวัวคืน เงินจึงเก็บไว้ใช้ในบ้าน {ชื่อ} อ่านหนังสือเอง"
         effects: {happiness: -1, relations: 1}
         clears_flags: [cadet_family_support]
         merit: [{cat: neutral}]
@@ -519,7 +527,7 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], age: [14, 18], flags: {has: [cadet_dream, cadet_family_secret], not: [cadet_family_told]}}
     title: "หนังสือใต้ที่นอน"
-    text: "ผู้ใหญ่ในบ้านเก็บกวาดห้องของ {ชื่อ} แล้วเจอหนังสือข้อสอบเก่าเตรียมทหารซ่อนอยู่ใต้ที่นอน มื้อเย็นวันนั้นหนังสือเล่มนั้นวางอยู่บนโต๊ะ ผู้ใหญ่ในบ้านถามว่า 'จะสอบเตรียมทหารเหรอ ทำไมไม่บอกกัน'"
+    text: "{ผู้ใหญ่}เก็บกวาดห้องของ {ชื่อ} แล้วเจอหนังสือข้อสอบเก่าเตรียมทหารซ่อนอยู่ใต้ที่นอน มื้อเย็นวันนั้นหนังสือเล่มนั้นวางอยู่บนโต๊ะ {ผู้ใหญ่}ถามว่า 'นี่จะสอบเตรียมทหารเหรอ ทำไมไม่เห็นบอกกันสักคำ'"
     choices:
       - id: confess
         text: "ขอโทษ แล้วเล่าให้ฟังทั้งหมด"
@@ -527,9 +535,9 @@ events:
         clears_flags: [cadet_family_secret]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, text: "ฟังจบ ผู้ใหญ่ในบ้านบอกว่า 'คราวหน้าบอกกันตรง ๆ' แล้วรับปากจะช่วยค่าติว", effects: {relations: 1}, sets_flags: [cadet_family_support], merit: [{cat: neutral}]}
-          - {weight: 0.5, multipliers: {stats: {knowledge: 2}}, text: "ผู้ใหญ่ในบ้านไม่ดุ แต่ก็ไม่พูดเรื่องสอบหรือค่าติวอีกเลย", effects: {relations: -1}, schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
-          - {weight: 0.5, multipliers: {stats: {knowledge: 0.5}}, text: "ผู้ใหญ่ในบ้านไม่ดุ แต่ก็ไม่พูดเรื่องสอบหรือค่าติวอีกเลย", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฟังจบ {ผู้ใหญ่}บอกว่า 'คราวหลังมีอะไรก็บอกกันตรง ๆ นะ{ถิ่น} ไม่ต้องแอบ' แล้วรับปากว่าค่าสมัครกับค่ารถไปสอบ เดี๋ยวที่บ้านออกให้", effects: {relations: 1}, sets_flags: [cadet_family_support], merit: [{cat: neutral}]}
+          - {weight: 0.5, multipliers: {stats: {knowledge: 2}}, text: "{ผู้ใหญ่}ไม่ดุ แต่ก็ไม่พูดเรื่องสอบหรือค่าติวอีกเลย", effects: {relations: -1}, schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 0.5, multipliers: {stats: {knowledge: 0.5}}, text: "{ผู้ใหญ่}ไม่ดุ แต่ก็ไม่พูดเรื่องสอบหรือค่าติวอีกเลย", effects: {relations: -1}, merit: [{cat: neutral}]}
       - id: ask_ride
         text: "เล่าแล้วขอให้ไปส่งวันสอบ"
         effects: {relations: 2}
@@ -537,8 +545,8 @@ events:
         clears_flags: [cadet_family_secret]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, multipliers: {stats: {knowledge: 2}}, text: "ผู้ใหญ่ในบ้านรับปากจะไปส่ง มื้อเย็นที่เงียบอยู่กลับมาคุยกันได้อีกครั้ง", schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
-          - {weight: 1, multipliers: {stats: {knowledge: 0.5}}, text: "ผู้ใหญ่ในบ้านรับปากจะไปส่ง มื้อเย็นที่เงียบอยู่กลับมาคุยกันได้อีกครั้ง", merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {knowledge: 2}}, text: "{ผู้ใหญ่}รับปากจะไปส่ง มื้อเย็นที่เงียบอยู่กลับมาคุยกันได้อีกครั้ง", schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {knowledge: 0.5}}, text: "{ผู้ใหญ่}รับปากจะไปส่ง มื้อเย็นที่เงียบอยู่กลับมาคุยกันได้อีกครั้ง", merit: [{cat: neutral}]}
       - id: try_alone
         text: "บอกว่าอยากลองเองก่อน"
         effects: {happiness: 1}
@@ -546,8 +554,8 @@ events:
         clears_flags: [cadet_family_secret]
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, multipliers: {stats: {knowledge: 2}}, text: "ผู้ใหญ่ในบ้านถอนหายใจ 'โตแล้วก็ลองดู แต่อย่าปิดกันอีกนะ'", schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
-          - {weight: 1, multipliers: {stats: {knowledge: 0.5}}, text: "ผู้ใหญ่ในบ้านถอนหายใจ 'โตแล้วก็ลองดู แต่อย่าปิดกันอีกนะ'", merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {knowledge: 2}}, text: "{ผู้ใหญ่}ถอนหายใจ 'เอาเถอะ อยากลองก็ลอง แต่อย่ามาแอบแบบนี้อีกล่ะ{ถิ่น}'", schedules: [{event: cadet_family_sees, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, multipliers: {stats: {knowledge: 0.5}}, text: "{ผู้ใหญ่}ถอนหายใจ 'เอาเถอะ อยากลองก็ลอง แต่อย่ามาแอบแบบนี้อีกล่ะ{ถิ่น}'", merit: [{cat: neutral}]}
       - id: deny
         text: "ปัดว่าแค่หยิบมาอ่านเล่น"
         effects: {relations: -2}
@@ -561,15 +569,17 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], age: [14, 18], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน], flags: {has: [cadet_dream, cadet_family_told], not: [cadet_family_support]}}
     title: "ที่บ้านเห็นความตั้งใจ"
-    text: "เย็นนี้ผู้ใหญ่ในบ้านเปิดดูสมุดพกของ {ชื่อ} อยู่นาน ตกดึกเห็นไฟโต๊ะอ่านหนังสือยังเปิดอยู่ จึงมาเคาะประตูแล้วบอกว่า 'เห็นตั้งใจขนาดนี้ ถ้ายังอยากเข้าค่ายติวเตรียมทหาร เดี๋ยวช่วยออกให้นะ'"
+    text: "เย็นนี้{ผู้ใหญ่}เปิดดูสมุดพกของ {ชื่อ} อยู่นาน ตกดึกเห็นไฟโต๊ะอ่านหนังสือยังเปิดอยู่ จึงมาเคาะประตูแล้วบอกว่า 'เห็นอ่านหนังสือทุกคืนแบบนี้ ถ้ายังอยากเข้าค่ายติวอยู่ เดี๋ยวช่วยออกให้{ถิ่น}'"
     choices:
       - id: accept
         text: "รับไว้ ขอบคุณที่ช่วย"
+        result: "{ผู้ใหญ่}ยิ้ม 'เรื่องเงินไม่ต้องคิดแล้ว แต่นอนบ้างนะ{ถิ่น} เดี๋ยวไม่สบาย'"
         effects: {happiness: 1, relations: 2}
         sets_flags: [cadet_family_support]
         merit: [{cat: neutral}]
       - id: half
         text: "รับครึ่งเดียว อีกครึ่งออกเอง"
+        result: "{ผู้ใหญ่}หัวเราะ 'ดื้อขนาดนี้ ไปอยู่โรงเรียนประจำรอดแน่{ถิ่น}' ค่าติวเลยช่วยกันออกคนละครึ่ง"
         hint: "ค่าค่ายครึ่งหนึ่งต้องใช้เงินเก็บตัวเอง"
         effects: {happiness: 1, relations: 1}
         sets_flags: [cadet_family_support, cadet_share_half]
@@ -580,6 +590,7 @@ events:
         merit: [{cat: neutral}]
       - id: try_alone
         text: "ขอบคุณ แต่ขอลองอ่านเองก่อน"
+        result: "{ผู้ใหญ่}ไม่ตื๊อ แต่ก่อนปิดประตูบอกว่า 'ถ้าเปลี่ยนใจก็มาบอกล่ะ{ถิ่น}'"
         effects: {relations: 1}
         merit: [{cat: neutral}]
   # <<< nl-writer b003 evt cadet_family_sees
@@ -592,25 +603,29 @@ events:
     weight: 1
     when: {sex: [ชาย], age: [13, 17], class: [ชนชั้นกลางล่าง, ชนชั้นกลาง, ชนชั้นกลางบน, มีอันจะกิน, ร่ำรวย, มั่งคั่ง], flags: {has: [cadet_dream, cadet_family_told], not: [cadet_family_support, cadet_family_secret]}}
     title: "เงินก้อนปลายปี"
-    text: "ปลายปีที่บ้านมีรายได้เข้ามามากกว่าที่คิด ผู้ใหญ่ในบ้านนั่งนับเงินบนเสื่อ แล้วเรียก {ชื่อ} มานั่งข้าง ๆ 'เรื่องค่าติวที่เคยบอก ยังคิดจะไปอยู่ไหม'"
+    text: "ปลายปีที่บ้านมีรายได้เข้ามามากกว่าที่คิด {ผู้ใหญ่}นั่งนับเงินบนเสื่อ แล้วเรียก {ชื่อ} มานั่งข้าง ๆ 'เรื่องค่าติวที่เคยบอก ยังคิดจะไปอยู่ไหม'"
     choices:
       - id: accept
         text: "รับไว้ สัญญาว่าจะตั้งใจ"
+        result: "{ผู้ใหญ่}แบ่งเงินใส่ซองแยกไว้ เขียนหน้าซองว่าค่าติว"
         effects: {relations: 1}
         sets_flags: [cadet_family_support]
         merit: [{cat: neutral}]
       - id: half
         text: "ขอครึ่งเดียว ที่เหลือหาเอง"
+        result: "ได้เงินมาก้อนหนึ่ง {ผู้ใหญ่}บอกว่าถ้าขาดเท่าไรค่อยมาว่ากัน"
         hint: "ค่าค่ายครึ่งหนึ่งต้องใช้เงินเก็บตัวเอง"
         effects: {relations: 1}
         sets_flags: [cadet_family_support, cadet_share_half]
         merit: [{cat: neutral}]
       - id: books
         text: "ขอแค่ค่าหนังสือก็พอ"
+        result: "หนังสือเตรียมสอบเล่มใหม่วางบนโต๊ะ กลิ่นกระดาษยังไม่จาง"
         effects: {knowledge: 1}
         merit: [{cat: neutral}]
       - id: keep_home
         text: "เก็บไว้ใช้ในบ้านก่อนดีกว่า"
+        result: "{ผู้ใหญ่}เงียบไปพักหนึ่ง แล้วตบไหล่เบา ๆ บอกว่าโตแล้วจริง ๆ"
         effects: {happiness: -1, relations: 2}
         merit: [{cat: neutral}]
   # <<< nl-writer b003 evt cadet_family_bonus
@@ -716,7 +731,7 @@ events:
       - id: camp_own
         text: "เข้าค่ายติว ใช้เงินเก็บตัวเอง"
         hint: "ค่าค่าย · ค่าที่พัก · ห่างบ้านทั้งปิดเทอม"
-        requires: {money: {unit: income_x, amount: 0.3}, reason: "เงินเก็บไม่พอค่าค่ายติว"}
+        requires: {money: {unit: income_x, amount: 0.3}, flags: {not: [cadet_family_secret]}, reason: "เงินเก็บไม่พอค่าค่ายติว", reasons: {flags: "ต้องให้ที่บ้านเซ็นยินยอม", money: "เงินเก็บไม่พอค่าค่ายติว"}}
         effects: {knowledge: 2, relations: -1, money: {unit: income_x, amount: -0.3}}
         sets_flags: [cadet_prep_camp]
         schedules: [{event: cadet_slack_home, after_years: [1, 1]}, {event: cadet_slack_camp, after_years: [1, 1]}]
@@ -890,7 +905,7 @@ events:
     repeat: {gap: 1, max: 2}
     when: {sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream], not: [cadet_prep_camp]}}
     title: "งานที่ไม่มีใครทำแทน"
-    text: "ช่วงนี้งานในบ้านล้นมือ ทั้งเฝ้าร้าน หุงข้าว ช่วยงานไร่ ผู้ใหญ่ในบ้านไม่ได้ห้ามอ่านหนังสือ แต่ถ้า {ชื่อ} ไม่ทำ ก็ไม่มีใครทำแทน ข้อสอบเก่าเล่มหนาวางรออยู่มุมห้อง"
+    text: "ช่วงนี้งานในบ้านล้นมือ ทั้งเฝ้าร้าน หุงข้าว ช่วยงานไร่ {ผู้ใหญ่}ไม่ได้ห้ามอ่านหนังสือ แต่ถ้า {ชื่อ} ไม่ทำ ก็ไม่มีใครทำแทน ข้อสอบเก่าเล่มหนาวางรออยู่มุมห้อง"
     choices:
       - id: late_read
         text: "ทำงานให้เสร็จ แล้วอ่านตอนดึก"
@@ -919,7 +934,7 @@ events:
     years: [2501, 2650]
     weight: 1
     repeat: {gap: 1, max: 2}
-    when: {sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream, cadet_prep_camp]}}
+    when: {sex: [ชาย], age: [14, 18], school: [lower, upper, voc], flags: {has: [cadet_dream, cadet_prep_camp], not: [cadet_family_secret]}}   # B3: แอบสอบ ที่บ้านไม่รู้ว่าไปค่ายสอบ = ไม่มีจดหมายจากบ้านถึงค่าย (Demo D3-ข · เจ้าของรับ 2026-11-09)
     title: "งานที่ไม่มีใครทำแทน"
     text: "จดหมายจากบ้านมาถึงค่ายติว ช่วงนี้งานที่บ้านล้นมือ ถ้าว่างขอให้กลับไปช่วยสักสัปดาห์ ค่าค่ายจ่ายไปแล้ว ห้องติวกำลังเข้าบทที่ออกสอบบ่อยที่สุด"
     choices:
@@ -999,11 +1014,19 @@ events:
     multipliers: {flags: {saw_army: 1.5}}
     when: {sex: [ชาย], age: [14, 17], flags: {has: [cadet_dream]}}
     title: "ตีห้า"
-    text: "นาฬิกาปลุกดังตอนตีห้า ข้างนอกยังมืด ลมเย็นลอดหน้าต่างเข้ามา เมื่อวานที่ราวดึงข้อในสนามโรงเรียน {ชื่อ} ดึงได้แค่สามครั้งก็ห้อยตัวค้าง เพื่อนข้างราวหัวเราะจนต้องหันหน้าหนี"
+    text: "{ค่าย:เปิดเทอมแล้ว }นาฬิกาปลุกดังตอนตีห้า ข้างนอกยังมืด ลมเย็นลอดหน้าต่างเข้ามา เมื่อวานที่ราวดึงข้อในสนามโรงเรียน {ชื่อ} ดึงได้แค่สามครั้งก็ห้อยตัวค้าง เพื่อนข้างราวหัวเราะจนต้องหันหน้าหนี"
     choices:
       - id: with_father
         text: "ออกไปวิ่งกับพ่อทุกเช้า"
-        requires: {family: [{role: parent, sex: ชาย, alive: true}]}
+        result: "พ่อวิ่งช้ากว่าแต่ไม่เคยหยุด สองคนคุยกันมากกว่าที่เคยคุยมาทั้งปี"
+        show_if: {family: [{role: parent, sex: ชาย, alive: true}]}
+        effects: {health: 1, relations: 1}
+        sets_flags: [sporty]
+        merit: [{cat: neutral}]
+      - id: with_neighbor
+        text: "นัดเพื่อนข้างบ้านวิ่งทุกเช้า"
+        result: "เพื่อนข้างบ้านวิ่งช้ากว่าแต่ไม่เคยผิดนัด สองคนคุยกันมากกว่าที่เคยคุยมาทั้งปี"
+        hide_if: {family: [{role: parent, sex: ชาย, alive: true}]}
         effects: {health: 1, relations: 1}
         sets_flags: [sporty]
         merit: [{cat: neutral}]
@@ -1031,7 +1054,7 @@ events:
     stage: วัยรุ่น
     years: [2501, 2650]
     weight: 0.5
-    when: {sex: [ชาย], age: [15, 17], flags: {has: [cadet_dream]}}
+    when: {sex: [ชาย], age: [15, 17], flags: {has: [cadet_dream], not: [cadet_family_secret]}}   # B3: แอบสอบ ญาติไม่รู้ว่าจะสอบ = ไม่มีคนมาเสนอฝากเข้า (Demo E6-ก · เจ้าของรับ 2026-11-09)
     title: "คนที่รู้จักผู้ใหญ่"
     text: "คนรู้จักของญาติแวะมาที่บ้าน บอกว่ารู้จักผู้ใหญ่ในกองสอบ ฝากให้ติดได้แน่นอน แต่ต้องจ่ายก่อนเป็นก้อนใหญ่ รับแต่เงินสด และห้ามบอกใครเด็ดขาด"
     choices:
@@ -1041,11 +1064,11 @@ events:
         sets_flags: [refused_fixer]
         merit: [{cat: neutral}]
       - id: elders_decide
-        text: "ให้ผู้ใหญ่ในบ้านตัดสิน"
+        text: "ให้{ผู้ใหญ่}ตัดสิน"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, text: "ผู้ใหญ่ในบ้านเชิญเขากลับ บอกว่าบ้านนี้สอบเอง", effects: {relations: 1}, sets_flags: [refused_fixer], merit: [{cat: neutral}]}
-          - {weight: 1, text: "ผู้ใหญ่ในบ้านแอบรวบเงินจ่ายไป ไม่กี่วันเบอร์นั้นก็ปิด", effects: {relations: -1, money: {unit: income_x, amount: -0.5}}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ผู้ใหญ่}เชิญเขากลับ บอกว่าบ้านนี้สอบเอง", effects: {relations: 1}, sets_flags: [refused_fixer], merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ผู้ใหญ่}แอบรวบเงินจ่ายไป ไม่กี่วัน{มือถือ:เบอร์นั้นก็ปิด|คนนั้นก็หายไปเลย ไปถามหาที่ไหนก็ไม่มีใครรู้จัก}", effects: {relations: -1, money: {unit: income_x, amount: -0.5}}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
       - id: pay_secretly
         text: "แอบรวบรวมเงินจ่ายเอง"
         hint: "ราคา: บาปเบา"
@@ -1351,7 +1374,16 @@ events:
         merit: [{cat: neutral}]
       - id: amulet
         text: "สวดมนต์ กำพระที่แม่ให้แล้วนอน"
+        result: "พระองค์เล็กที่แม่ยัดใส่กระเป๋าเสื้อตอนเช้ายังอุ่นอยู่ในมือ"
         requires: {family: [{role: parent, sex: หญิง, alive: true}]}
+        show_if: {family: [{role: parent, sex: หญิง, alive: true}], flags: {not: [cadet_family_secret]}}
+        effects: {happiness: 1, relations: 1}
+        schedules: [{event: cadet_exam_morning, after_years: [0, 0]}]
+        merit: [{cat: neutral}]
+      - id: amulet_own
+        text: "สวดมนต์ กำพระประจำตัวแล้วนอน"
+        result: "พระองค์เล็กที่ห้อยคอมาตั้งแต่เด็กอุ่นอยู่ในมือ"
+        hide_if: {family: [{role: parent, sex: หญิง, alive: true}], flags: {not: [cadet_family_secret]}}
         effects: {happiness: 1, relations: 1}
         schedules: [{event: cadet_exam_morning, after_years: [0, 0]}]
         merit: [{cat: neutral}]
@@ -1373,6 +1405,7 @@ events:
         merit: [{cat: neutral}]
   # <<< nl-writer b003 evt cadet_exam_night_far
   # >>> nl-writer b003 evt cadet_exam_night_near
+  # B3 แอบสอบ (Demo E9-ข · เจ้าของรับ 2026-11-09): ที่บ้านไม่รู้ว่าพรุ่งนี้สอบ = ดูทีวีกันตามปกติ ไม่ใช่ "เงียบผิดปกติ"
   - id: cadet_exam_night_near
     type: A
     category: study
@@ -1380,7 +1413,7 @@ events:
     years: [2501, 2650]
     when: {sex: [ชาย], region: [กรุงเทพฯ และปริมณฑล], flags: {has: [cadet_dream]}}
     title: "คืนก่อนสอบ"
-    text: "สนามสอบอยู่ห่างบ้านไม่กี่ป้ายรถเมล์ แต่คืนนี้ทั้งบ้านเงียบผิดปกติ บัตรประจำตัวสอบวางอยู่บนโต๊ะข้างดินสอสองแท่งกับแว่นว่ายน้ำ ข้างนอกมีเสียงรถวิ่งผ่านไม่ขาดสาย"
+    text: "สนามสอบอยู่ห่างบ้านไม่กี่ป้ายรถเมล์ แต่คืนนี้{ลับ:ที่บ้านดูทีวีกันตามปกติ ไม่มีใครรู้ว่าพรุ่งนี้มีอะไร|ทั้งบ้านเงียบผิดปกติ} บัตรประจำตัวสอบวางอยู่บนโต๊ะข้างดินสอสองแท่งกับแว่นว่ายน้ำ ข้างนอกมีเสียงรถวิ่งผ่านไม่ขาดสาย"
     choices:
       - id: review
         text: "อ่านทวนอีกรอบ"
@@ -1403,7 +1436,16 @@ events:
           - {weight: 1, text: "นอนลืมตาฟังเสียงรถจนตีหนึ่ง", effects: {happiness: -1}, merit: [{cat: neutral}]}
       - id: amulet
         text: "สวดมนต์ กำพระที่แม่ให้แล้วนอน"
+        result: "พระองค์เล็กที่แม่ยื่นให้หลังมื้อเย็นยังอุ่นอยู่ในมือ"
         requires: {family: [{role: parent, sex: หญิง, alive: true}]}
+        show_if: {family: [{role: parent, sex: หญิง, alive: true}], flags: {not: [cadet_family_secret]}}
+        effects: {happiness: 1, relations: 1}
+        schedules: [{event: cadet_exam_morning, after_years: [0, 0]}]
+        merit: [{cat: neutral}]
+      - id: amulet_own
+        text: "สวดมนต์ กำพระประจำตัวแล้วนอน"
+        result: "พระองค์เล็กที่ห้อยคอมาตั้งแต่เด็กอุ่นอยู่ในมือ"
+        hide_if: {family: [{role: parent, sex: หญิง, alive: true}], flags: {not: [cadet_family_secret]}}
         effects: {happiness: 1, relations: 1}
         schedules: [{event: cadet_exam_morning, after_years: [0, 0]}]
         merit: [{cat: neutral}]
@@ -1473,7 +1515,7 @@ events:
     repeat: {gap: 1, max: 3}
     when: {sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
     title: "ตีห้ารอบหมู่บ้าน"
-    text: "นาฬิกาปลุกดังตีห้า ข้างนอกยังมืด หมาข้างบ้านเงยหน้ามองแล้วนอนต่อ"
+    text: "{ค่าย:เปิดเทอมแล้ว กลับมาซ้อมเองที่บ้าน }นาฬิกาปลุกดังตีห้า ข้างนอกยังมืด หมาข้างบ้านเงยหน้ามองแล้วนอนต่อ"
     choices:
       - id: hard
         text: "วิ่งสามรอบ เร่งรอบสุดท้าย"
@@ -1542,7 +1584,7 @@ events:
     weight: 3
     when: {sex: [ชาย], age: [13, 18], region: [ใต้, ตะวันออก], flags: {has: [cadet_dream], not: [can_swim]}}
     title: "น้ำลึกห้าสิบเมตร"
-    text: "เกณฑ์ว่ายน้ำห้าสิบเมตรยังเป็นข้อเดียวที่ยังทำไม่ได้ ใกล้บ้านมีที่ให้ฝึกอยู่ที่เดียว ทะเลหน้าหาดตอนเช้าคลื่นเรียบ ชาวประมงพายเรือออกไปไกลแล้ว"
+    text: "เกณฑ์ว่ายน้ำห้าสิบเมตรยังเป็นข้อเดียวที่ยังทำไม่ได้ {ค่าย:ช่วงเปิดเทอม }ใกล้บ้านมีที่ให้ฝึกอยู่ที่เดียว ทะเลหน้าหาดตอนเช้าคลื่นเรียบ ชาวประมงพายเรือออกไปไกลแล้ว"
     choices:
       - id: daily
         text: "ฝึกทุกเย็นจนว่ายสุดระยะ"
@@ -1575,7 +1617,7 @@ events:
     weight: 3
     when: {sex: [ชาย], age: [13, 18], region: [กรุงเทพฯ และปริมณฑล, กลาง, ตะวันตก, ตะวันออกเฉียงเหนือ, เหนือ], flags: {has: [cadet_dream], not: [can_swim]}}
     title: "น้ำลึกห้าสิบเมตร"
-    text: "เกณฑ์ว่ายน้ำห้าสิบเมตรยังเป็นข้อเดียวที่ยังทำไม่ได้ ใกล้บ้านมีที่ให้ฝึกไม่กี่ที่ สระเทศบาลต้องเสียค่าเข้า หรือคลองหลังวัดที่เด็กแถวนั้นกระโดดเล่นทุกเย็น"
+    text: "เกณฑ์ว่ายน้ำห้าสิบเมตรยังเป็นข้อเดียวที่ยังทำไม่ได้ {ค่าย:ช่วงเปิดเทอม }ใกล้บ้านมีที่ให้ฝึกไม่กี่ที่ สระเทศบาลต้องเสียค่าเข้า หรือคลองหลังวัดที่เด็กแถวนั้นกระโดดเล่นทุกเย็น"
     choices:
       - id: daily
         text: "ฝึกทุกเย็นจนว่ายสุดระยะ"
@@ -1609,17 +1651,18 @@ events:
     repeat: {gap: 1, max: 3}
     when: {sex: [ชาย], age: [13, 18], flags: {has: [cadet_dream]}}
     title: "ฝนตกทั้งเช้า"
-    text: "ฝนเทลงมาตั้งแต่ตีสี่ หลังคาสังกะสีดังจนคุยกันไม่ได้ยิน วันนี้เป็นวันซ้อมตามตาราง"
+    text: "ฝนเทลงมาตั้งแต่ตีสี่ เสียงฝนกระหน่ำหลังคาจนคุยกันไม่ได้ยิน วันนี้เป็นวันซ้อมตามตาราง"
     choices:
       - id: hard
         text: "ออกไปวิ่งกลางฝน"
         hint: "ได้มากสุด แต่อาจเจ็บ"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 17, text: "เปียกทั้งตัวแต่วิ่งครบ กลับมามีน้ำขิงร้อน ๆ ต้มรอไว้", effects: {health: 2}, merit: [{cat: neutral}]}
+          - {weight: 17, text: "เปียกทั้งตัวแต่วิ่งครบ อาบน้ำอุ่นแล้วยังนั่งตัวสั่นอยู่พักใหญ่", effects: {health: 2}, merit: [{cat: neutral}]}
           - {weight: 3, text: "กลับมาตัวร้อน นอนซมไปหนึ่งวัน", effects: {health: 1}, merit: [{cat: neutral}]}
       - id: normal
         text: "ซ้อมในบ้าน วิดพื้นกับกระโดดตบ"
+        result: "ทำจนพื้นลั่น ห้องข้าง ๆ ตะโกนถามว่าทำอะไรอยู่"
         effects: {health: 1}
         merit: [{cat: neutral}]
       - id: light
