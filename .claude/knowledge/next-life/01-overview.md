@@ -61,7 +61,7 @@ Snapshot: v0.6.31 (2026-11-03) · repo `D:\dev\g` · remote `dmo-hub/next-life` 
 | `src/site/` | Builds the site pages + data-fact injection |
 | `content/*.yaml` | Main-world events |
 | `content/isekai/` | Isekai cards |
-| `content/rules/` | flags, focus, near-hints, banned |
+| `content/rules/` | flags, focus, near-hints |
 | `content-fixtures/` | bad/good lint test fixtures + harness-only content (never shipped) |
 | `data/*.json` | Real era data; every number needs a source or an assumption |
 | `harness/` | Bots + gates for simulating lives |

@@ -20,15 +20,12 @@ import { catalogHtml, spoilerBacks, flagNames, systemNames } from '../src/site/s
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, injectDevNav, DEV_TABS, MOVED_MARK, movedHtml, DEV_MAPS, DEV_MAPS_PAGE, mapsMoved } from '../src/site/nav.mjs';
-import { uiPage, designMoved, tweakPages, tweakMoved, tweakStatus, cssVars, liveMoved, UI_PAGE, UI_MOVED_FROM, UI_LIVE_ID, UI_LIVE_FROM, UI_LIVE_TITLE } from '../src/site/ui.mjs';
+import { uiPage, designMoved, cssVars, UI_PAGE, UI_MOVED_FROM } from '../src/site/ui.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
-import { GAME_CSS_PAGES, gameCss, gameCssBlock } from '../src/site/game-css.mjs';
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, GATE_OFF, PUBLIC_HIDE } from '../src/site/gate.mjs';
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
-import { DOCS_TWEAK_PAGE, DOCS_TWEAK_START, docsTweakData, docsTweakBlock, injectDocsLayout, injectDocsTweak, pageKind } from '../src/site/docs-tweak.mjs';
-import { CARD_ART_PAGE, cardArtData, cardArtBlock, CAT_ART } from '../src/site/card-art-tweak.mjs';
-import { CARD_PIC_PAGE, cardPicData, cardPicBlock } from '../src/site/card-pic-tweak.mjs';
+import { docsScope, injectDocsLayout, pageKind, DOCS_LAYOUT_START, DOCS_LAYOUT_END } from '../src/site/docs-layout.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
 import { PLAY_FILES, playAssets, playScripts, swJs } from '../src/site/play-files.mjs';
 
@@ -64,7 +61,7 @@ const moved = ['cards', 'titles'].every((k) => probe.includes(`data-fact="${k}">
 check('ตัวควบคุม: ข้อมูลเปลี่ยนแล้วเลขบนหน้าเปลี่ยนตาม', !moved, ` (การ์ด ${facts.cards} → ${f2.cards} · ฉายา ${facts.titles} → ${f2.titles})`);
 
 // 3) ลิงก์ภายในเว็บไม่ตาย (ไฟล์ · รูป · ที่มาจากหน้าใน docs/ และ docs/spec/ ที่หน้าเว็บลิงก์ถึง)
-const all = [...pages, 'dev/tweak/cards', 'whatsnew', 'archive/cards-v1', 'archive/overview-v1', 'dev/index', 'dev/spec'];
+const all = [...pages, 'whatsnew', 'dev/index', 'dev/spec'];
 const dead = [];
 for (const p of all) {
   const html = read(`${p}.html`);
@@ -265,7 +262,7 @@ const designCtl = designGap(designOut, (f) => gated(designHtml(designTpl, cutFir
 const movedCtl = designGap(designOut, (f) => readOr(DESIGN_AT + f), (f) => (f === designOut[0][0] ? null : readOr(f))).some((x) => x.startsWith('ไม่มีหน้าส่งต่อ'));
 check('หน้าคำตัดสินเกมใต้ dev/ ครบทุกไฟล์ใน design/ ตรงของที่ build และที่เดิมเป็นหน้าส่งต่อ', designMiss.length || !designCtl || !movedCtl, ` ไฟล์ ${designFiles().length} · ${designOut.length} หน้า${designMiss.length ? ` · ${designMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${designCtl && movedCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
-// 7c) แถบบนชุดเดียวทุกหน้า: ทุกหน้าใต้ docs/ และ docs/spec/ (ยกเว้น play.html · archive/) มี marker ชุดเดียว เนื้อ = ที่ nav.mjs สร้างให้หน้านั้น (ชี้หน้าปัจจุบันถูก) · ไม่มีแถบเก่าค้าง
+// 7c) แถบบนชุดเดียวทุกหน้า: ทุกหน้าใต้ docs/ และ docs/spec/ (ยกเว้น play.html) มี marker ชุดเดียว เนื้อ = ที่ nav.mjs สร้างให้หน้านั้น (ชี้หน้าปัจจุบันถูก) · ไม่มีแถบเก่าค้าง
 // อ่านรายชื่อหน้าจากโฟลเดอร์ ⇒ หน้าใหม่ที่ลืมวาง marker ตกเอง · ตัวควบคุม: ถอด marker · แถบของหน้าอื่น · แถบเก่าซ้อน ⇒ ต้องถูกจับทั้งสาม
 const navFiles = [...readdirSync(docs).filter((n) => n.endsWith('.html') && n !== 'play.html' && !read(n).includes(MOVED_MARK)), ...readdirSync(new URL('spec/', docs)).filter((n) => n.endsWith('.html')).map((n) => `spec/${n}`)];
 const navBad = (file, raw) => {
@@ -293,85 +290,36 @@ const devTabMiss = (html) => {
 };
 const devMiss = devFiles.map((f) => [f, read(f)]).filter(([, h]) => h.includes('class="nl-tabs"')).map(([f, h]) => [f, devTabMiss(h)]).filter(([, m]) => m.length).map(([f, m]) => `${f} ขาด ${m.join(' ')}`);
 const devCtl = devTabMiss(read('dev/index.html').replace(/<a href="[^"]*dev\/design\.html"[^>]*>คำตัดสินเกม<\/a>/, '')).length === 1;
-const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.html" aria-current="true"') && devNavHtml('dev/design.html').includes('href="../dev/design.html" aria-current="page"') && devNavHtml(DEV_MAPS_PAGE).includes('href="../../dev/maps/continent.html" aria-current="page"') && devNavHtml('dev/archive/fx-proto.html').includes('href="../../dev/archive/index.html" aria-current="true"') && devNavHtml('dev/plan.html').includes('href="../dev/index.html" aria-current="true"');
+const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.html" aria-current="true"') && devNavHtml('dev/design.html').includes('href="../dev/design.html" aria-current="page"') && devNavHtml(DEV_MAPS_PAGE).includes('href="../../dev/maps/continent.html" aria-current="page"') && devNavHtml('dev/plan.html').includes('href="../dev/index.html" aria-current="true"');
 // 7c3) แถบเว็บแทนแถวบนห้องผู้พัฒนา (ข้อ 292 293): ทุกหน้าที่มีแถวแท็บตรงแถบที่ build เขียน และมีแถบเว็บแถบเดียว · ตัวควบคุม: คืนแถวบนเดิม ⇒ ต้องถูกจับ
 const devBarBad = (f, h) => lf(h) !== lf(injectDevNav(h, f)) || h.split('<nav class="top"').length !== 2;
 const devBarMiss = devFiles.filter((f) => read(f).includes('class="nl-tabs"') && devBarBad(f, read(f)));
 const devBarCtl = devBarBad('dev/index.html', read('dev/index.html').replace('<div class="nl-nav nl-dev">', '<div class="nl-nav nl-dev"><div class="nl-top"></div>'));
-// 7e) หน้าดีไซน์ UI (ui-redo 44): ตรงของที่ build ตอนนี้ · design.html เดิมส่งต่อมาที่นี่ · สีทุกตัวแปรในเกมขึ้นหน้า · ลิงก์ tweak ครบทุกหน้า tweak และปลายทางมีจริง
+// 7e) หน้าดีไซน์ UI (ui-redo 44): ตรงของที่ build ตอนนี้ · design.html เดิมส่งต่อมาที่นี่ · สีทุกตัวแปรในเกมขึ้นหน้า
 // · ชิ้นส่วนตัวอย่างอยู่ใน iframe sandbox ว่าง (ไม่มีสคริปต์ ไม่มี same-origin ⇒ แตะ localStorage ไม่ได้) และ srcdoc ไม่มี <script
-// ตัวควบคุม: แก้สีในเกม 1 ค่า ⇒ หน้าที่ build ต้องเปลี่ยนและมีค่าใหม่ · ถอดลิงก์ tweak 1 ลิงก์ ⇒ ต้องนับขาด · เติม allow-scripts ⇒ ต้องถูกจับ
+// ตัวควบคุม: แก้สีในเกม 1 ค่า ⇒ หน้าที่ build ต้องเปลี่ยนและมีค่าใหม่ · เติม allow-scripts ⇒ ต้องถูกจับ
 const uiTpl = readFileSync(new URL('../src/ui/template.html', import.meta.url), 'utf8');
 const uiBuilt = (tpl) => gated(designHtml(designTpl, uiPage(content, docs, tpl), UI_PAGE.slice(DESIGN_AT.length)), UI_PAGE);
 const uiNow = uiBuilt(uiTpl);
 const uiHtml = readOr(UI_PAGE) ?? '';
 const uiColors = cssVars(uiTpl.match(/<style>([\s\S]*?)<\/style>/)[1]).flatMap((g) => g.vars).filter(([, v]) => /^(#|rgba?\(|hsla?\()/i.test(v));
-const uiTweaks = tweakPages(docs);
-// หน้า tweak เป็นหัวในหน้านี้ (ui-redo 79): ทุกหน้าใต้ dev/tweak/ มีลิงก์ในสารบัญ · หัว · กรอบที่ชี้ไฟล์และไม่มี sandbox (คีย์ localStorage เดิม) · ที่เดิมเป็นหน้าส่งต่อมาหัว
-const uiTweakGap = (html) => {
-  const box = html.match(/<ul id="ui-tweaks">([\s\S]*?)<\/ul>/)?.[1] ?? '';
-  const frame = (f) => html.match(new RegExp(`<iframe[^>]* src="${f.slice(4)}"[^>]*>`))?.[0];
-  return uiTweaks.flatMap((t) => {
-    const [f, , id, from] = t;
-    return [
-      ...(box.includes(`href="#${id}"`) ? [] : [`ขาดลิงก์ ${id}`]),
-      ...(html.includes(`<h2 id="${id}">`) ? [] : [`ขาดหัว ${id}`]),
-      ...(!frame(f) ? [`ขาดกรอบ ${f}`] : /sandbox/.test(frame(f)) ? [`กรอบมี sandbox ${f}`] : []),
-      ...(lf(readOr(from)) !== tweakMoved(t) ? [`${from} ไม่ส่งต่อมา #${id}`] : []),
-    ];
-  });
-};
-// แถวในสารบัญห้องผู้พัฒนาที่ชี้หัว tweak (ui.html#ui-t-*) ต้องมีหน้าจริงใต้ dev/tweak/ — ลบหน้า tweak ที่ลงเกมแล้วต้องเอาแถวออกด้วย ไม่งั้นลิงก์ไปหัวที่ไม่มี
-const devRowGap = (indexHtml) => Object.keys(tweakStatus(docs, indexHtml)).filter((id) => id.startsWith('ui-t-') && !uiTweaks.some((t) => t[2] === id)).map((id) => `dev/index ชี้หัวที่ไม่มีหน้า #${id}`);
 const uiFrameBad = (html) => {
-  // กรอบต้นแบบปรับสด (7e2) และกรอบหน้า tweak (src=) ตั้งใจรันสคริปต์ — ด่านนี้ดูแค่ชิ้นส่วนตัวอย่าง
-  const frames = [...html.matchAll(/<iframe[^>]*>/g)].map((m) => m[0]).filter((f) => !f.includes(`title="${UI_LIVE_TITLE}"`) && !f.includes(' src="'));
+  const frames = [...html.matchAll(/<iframe[^>]*>/g)].map((m) => m[0]);
   return !frames.length || frames.some((f) => !/ sandbox=""/.test(f) || /&lt;script|<script/i.test(f));
 };
 const uiMiss = [
   ...(lf(uiHtml) !== lf(uiNow) ? [`ค้าง ${UI_PAGE}`] : []),
   ...(lf(readOr(UI_MOVED_FROM)) !== designMoved(UI_MOVED_FROM, '') ? [`${UI_MOVED_FROM} ไม่ส่งต่อมา ${UI_PAGE}`] : []),
   ...uiColors.filter(([, v]) => !uiHtml.includes(`background:${v}`)).map(([k]) => `ไม่มีสี ${k}`),
-  ...uiTweakGap(uiHtml),
-  ...devRowGap(),
   ...(uiFrameBad(uiHtml) ? ['iframe ไม่ปิดสคริปต์'] : []),
 ];
 const [uiK, uiV] = uiColors[0] ?? ['', ''];
 const uiRecolor = uiBuilt(uiTpl.replace(`${uiK}:${uiV}`, `${uiK}:#010203`));
 const uiCtl =
   uiRecolor !== uiNow && uiRecolor.includes('background:#010203') &&
-  (uiTweaks.length === 0 || uiTweakGap(uiHtml.replace(`<h2 id="${uiTweaks[0][2]}">`, '<h2>')).length === 1) &&
-  uiFrameBad(uiHtml.replace(' sandbox=""', ' sandbox="allow-scripts"')) &&
-  devRowGap((readOr('dev/index.html') ?? '').replace('<ul', '<ul><li><a href="ui.html#ui-t-gone">x</a></li>')).length === 1;
-check('หน้าดีไซน์ UI ตรงของที่ build สีจากเกมครบ ลิงก์ tweak ครบ ตัวอย่างไม่รันสคริปต์', uiMiss.length || !uiCtl, ` สี ${uiColors.length} · tweak ${uiTweaks.length}${uiMiss.length ? ` · ${uiMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${uiCtl ? 'จับได้' : 'จับไม่ได้'}`);
+  uiFrameBad(uiHtml.replace(' sandbox=""', ' sandbox="allow-scripts"'));
+check('หน้าดีไซน์ UI ตรงของที่ build สีจากเกมครบ ตัวอย่างไม่รันสคริปต์', uiMiss.length || !uiCtl, ` สี ${uiColors.length}${uiMiss.length ? ` · ${uiMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${uiCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
-// 7e2) ต้นแบบปรับสด (ui-redo 76): หัวในหน้าดีไซน์ UI มีกรอบที่รันสคริปต์ได้และไม่มี sandbox (sandbox ไม่มี allow-same-origin ⇒ localStorage throw ค่าที่เจ้าของปรับไว้หาย)
-// · สคริปต์ยังจำค่าใต้คีย์เดิมและคัดลอกลง clipboard · tweak.html เดิมเป็นหน้าส่งต่อมาหัวนี้ · ไม่มีลิงก์/แท็บชี้ tweak.html เดิมเหลือ
-// ตัวควบคุม: ถอดหัวออก ⇒ ต้องตก · ใส่ sandbox="allow-scripts" ⇒ ต้องตก
-const liveBad = (html) => {
-  const h = html.indexOf(`<h2 id="${UI_LIVE_ID}">`);
-  const open = `<iframe title="${UI_LIVE_TITLE}"`;
-  const a = h < 0 ? -1 : html.indexOf(open, h);
-  const s = a < 0 ? -1 : html.indexOf(' srcdoc="', a);
-  if (s < 0) return ['ไม่มีหัวต้นแบบปรับสด'];
-  const doc = html.slice(s + 9, html.indexOf('"', s + 9)).replace(/&quot;/g, '"').replace(/&amp;/g, '&');
-  return [
-    ...(html.slice(a, s).includes('sandbox') ? ['กรอบต้นแบบมี sandbox'] : []),
-    ...(doc.includes("const KEY = 'uiredo02-tweak'") ? [] : ['คีย์ localStorage เปลี่ยน']),
-    ...(doc.includes('navigator.clipboard.writeText') ? [] : ['ไม่มีคัดลอก']),
-  ];
-};
-const liveLinks = [...devFiles, ...readdirSync(docs).filter((n) => n.endsWith('.html'))].filter((f) => !read(f).includes(MOVED_MARK) && [UI_LIVE_FROM, ...uiTweaks.map((t) => t[3])].some((o) => read(f).includes(o.startsWith('dev/') ? `${o.slice(4)}"` : `"${'../'.repeat(f.split('/').length - 1)}${o}"`)));
-const liveMiss = [
-  ...liveBad(uiHtml),
-  ...(lf(readOr(UI_LIVE_FROM)) !== liveMoved() ? [`${UI_LIVE_FROM} ไม่ส่งต่อมา ${UI_PAGE}#${UI_LIVE_ID}`] : []),
-  ...liveLinks.map((f) => `${f} ยังลิงก์หน้า tweak ที่เดิม`),
-  ...(DEV_TABS.some(([h]) => h === UI_LIVE_FROM) ? ['แท็บ dev ยังมี tweak.html'] : []),
-];
-const liveCtl =
-  liveBad(uiHtml.replace(`<h2 id="${UI_LIVE_ID}">`, '<h2>')).length > 0 &&
-  liveBad(uiHtml.replace(`<iframe title="${UI_LIVE_TITLE}"`, `<iframe title="${UI_LIVE_TITLE}" sandbox="allow-scripts"`)).includes('กรอบต้นแบบมี sandbox');
-check('ต้นแบบปรับสดอยู่ในหน้าดีไซน์ UI รันสคริปต์ จำค่าคีย์เดิม คัดลอกได้ ที่เดิมส่งต่อ', liveMiss.length || !liveCtl, `${liveMiss.length ? ` ${liveMiss.slice(0, 4).join(' | ')} ·` : ''} ตัวควบคุม${liveCtl ? 'จับได้' : 'จับไม่ได้'}`);
 // 7e3) dev/maps หน้าเดียว (ui-redo 101): ทุกผังมีหัว · ปุ่มสลับ · สคริปต์ห่อของตัวเอง · id ในหน้าไม่ซ้ำ (เดิมทุกหน้าใช้ map/info/here) · ที่เดิมส่งต่อมา #ผัง
 // ตัวควบคุม: ถอดหัวผังแรก ⇒ ต้องนับขาด · id ซ้ำ ⇒ ต้องถูกจับ
 const mapsGap = (html) => {
@@ -394,58 +342,22 @@ check('หน้าห้องผู้พัฒนามีแท็บคร�
 check('หน้าห้องผู้พัฒนาใช้แถบเว็บชุดเดียวกับที่ build เขียน', devBarMiss.length || !devBarCtl, ` ${devBarMiss.length ? `ค้าง ${devBarMiss.slice(0, 4).join(' ')} (build ใหม่)` : 'ตรงทุกหน้า'} · ตัวควบคุม${devBarCtl ? 'จับได้' : 'จับไม่ได้'}`);
 check('ทุกหน้ามีแถบบนชุดเดียวและชี้หน้าปัจจุบัน', navMiss.length || !navCtl || !curOk, ` ${navFiles.length} หน้า${navMiss.length ? ` · ${navMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${navCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
-// 7c3) หน้า tweak ที่ใช้ CSS เกม (thai-life-deep 185): บล็อกในหน้า = CSS ของ template.html ตอนนี้ — แก้ CSS เกมแล้วลืม build = หน้า tweak โชว์หน้าตาเก่า
-// ตัวควบคุม: CSS ที่ต่างไป 1 ตัวอักษรต้องไม่ผ่าน
-const liveCss = toLf(gameCss(readFileSync(new URL('../src/ui/template.html', import.meta.url), 'utf8')));
-const cssMiss = GAME_CSS_PAGES.filter((f) => gameCssBlock(read(f)) !== liveCss);
-const cssCtl = gameCssBlock(read(GAME_CSS_PAGES[0])) !== `${liveCss} `;
-check('หน้า tweak ใช้ CSS เกมชุดปัจจุบัน', cssMiss.length || !cssCtl, ` ${GAME_CSS_PAGES.length} หน้า${cssMiss.length ? ` · เก่า ${cssMiss.join(' ')}` : ''} · ตัวควบคุม${cssCtl ? 'จับได้' : 'จับไม่ได้'}`);
-
-// 7c4) หน้า tweak เว็บเอกสาร (ui-redo 32): รายการในหน้า = ขอบเขตที่คิดจาก docs/ ตอนนี้ + :root หน้าเล่นตอนนี้ · ไม่มีหน้านอกขอบเขต (ตัวเกม คลังเก่า หน้า tweak หน้าส่งต่อ) · ทุกหน้ามีไฟล์จริง
-// ตัวควบคุม: ถอดหน้า 1 หน้าจากบล็อก ⇒ ต้องไม่ตรง · ขอบเขตที่คิดได้ต้องมีครบชุดหลักที่ใบงานระบุ
-const dtHtml = readOr(DOCS_TWEAK_PAGE) ?? '';
-const dtNow = docsTweakData(docs, uiTpl);
-const dtBlock = docsTweakBlock(dtHtml);
-const dtFiles = dtNow.pages.map((p) => p.f);
-const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', DEV_MAPS_PAGE, 'dev/archive/index.html'];
-const dtOut = (f) => f === 'play.html' || f.startsWith('archive/') || f.startsWith('dev/ui-redo/') || /tweak/.test(f) || read(f).includes(MOVED_MARK);
+// 7c4) เลย์เอาต์เว็บเอกสาร (ui-redo 32): ทุกหน้าในขอบเขต (คิดจาก docs/ ตอนนี้) มีบล็อกเลย์เอาต์ตรงที่ build ฉีด · ขอบเขตมีชุดหลักครบ ไม่มีหน้านอกขอบเขต (ตัวเกม · หน้าส่งต่อ)
+// ตัวควบคุม: ถอดบล็อกเลย์เอาต์ออกจากหน้าแรกของขอบเขต ⇒ ต้องถูกจับ
+const dtScope = docsScope(docs);
+const dtFiles = dtScope.map((p) => p.f);
+const layoutBad = (p, html) => lf(html) !== lf(injectDocsLayout(html, p.k, p.f)) || !html.includes(DOCS_LAYOUT_START);
+const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', DEV_MAPS_PAGE];
+const dtOut = (f) => f === 'play.html' || read(f).includes(MOVED_MARK);
 const dtMiss = [
-  ...(JSON.stringify(dtBlock) !== JSON.stringify(dtNow) ? [`ค้าง ${DOCS_TWEAK_PAGE} (build ใหม่)`] : []),
-  ...dtNow.pages.filter((p) => lf(read(p.f)) !== lf(injectDocsLayout(read(p.f), p.k, p.f)) || !read(p.f).includes('DOCS-LAYOUT:START')).map((p) => `เลย์เอาต์ค้าง ${p.f} (build ใหม่)`),
+  ...dtScope.filter((p) => layoutBad(p, read(p.f))).map((p) => `เลย์เอาต์ค้าง ${p.f} (build ใหม่)`),
   ...dtMust.filter((f) => !dtFiles.includes(f)).map((f) => `ขาด ${f}`),
   ...dtFiles.filter((f) => !existsSync(new URL(f, docs)) || dtOut(f)).map((f) => `เกิน ${f}`),
-  ...(dtNow.pages.filter((p) => p.k === 'map').length !== dtFiles.filter((f) => f.startsWith('dev/maps/')).length ? ['dev/maps ไม่ได้ชนิดแผนที่'] : []),
+  ...(dtScope.filter((p) => p.k === 'map').length !== dtFiles.filter((f) => f.startsWith('dev/maps/')).length ? ['dev/maps ไม่ได้ชนิดแผนที่'] : []),
 ];
-const dtCtl = dtBlock && JSON.stringify({ ...dtBlock, pages: dtBlock.pages.slice(1) }) !== JSON.stringify(dtNow) && !injectDocsTweak(dtHtml, dtNow, 'ctl').includes(`${DOCS_TWEAK_START}null`);
-check('หน้า tweak เว็บเอกสารมีทุกหน้าในขอบเขต', dtMiss.length || !dtCtl, ` ${dtFiles.length} หน้า${dtMiss.length ? ` · ${dtMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${dtCtl ? 'จับได้' : 'จับไม่ได้'}`);
-
-// 7c5) หน้า tweak ภาพบนการ์ด (ui-redo 58): บล็อกในหน้า = รูปทรงจาก art.mjs + ตัวเลขหมวดในไฟล์ของ harness ตอนนี้ · ทุกหมวดมีภาพ · หมวดกลาง ≤ ครึ่ง (ข้อ 92)
-// ตัวควบคุม: ถอดหมวดแรกจากบล็อก ⇒ ต้องไม่ตรง
-const caBlock = cardArtBlock(readOr(CARD_ART_PAGE) ?? '');
-const caNow = cardArtData();
-const caCats = caNow.counts.cats;
-const caMid = caCats.find((c) => c.k === 'mid');
-const caMiss = [
-  ...(JSON.stringify(caBlock) !== JSON.stringify(caNow) ? [`ค้าง ${CARD_ART_PAGE} (build ใหม่)`] : []),
-  ...(!caMid ? ['ไม่มีหมวดกลาง mid'] : caMid.n * 2 > caNow.counts.total - caNow.counts.skipped ? [`หมวดกลางเกินครึ่ง ${caMid.n}`] : []),
-  ...Object.keys(CAT_ART).filter((k) => !caCats.some((c) => c.k === k)).map((k) => `ภาพเกิน ${k}`),
-  ...caCats.filter((c) => !c.samples.length && c.n).map((c) => `ไม่มีข้อความตัวอย่าง ${c.k}`),
-];
-const caCtl = caBlock && JSON.stringify({ ...caBlock, counts: { ...caBlock.counts, cats: caBlock.counts.cats.slice(1) } }) !== JSON.stringify(caNow);
-check('หน้า tweak ภาพบนการ์ดใช้ภาพ+ตัวเลขหมวดชุดปัจจุบัน', caMiss.length || !caCtl, ` ${caCats.length} หมวด${caMiss.length ? ` · ${caMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${caCtl ? 'จับได้' : 'จับไม่ได้'}`);
-
-// 7c6) หน้า tweak ภาพประจำการ์ด (ใบ 209): บล็อกในหน้า = รูปทรง + ข้อความการ์ดจริงตอนนี้ · ตัวอย่าง 8 ใบ ครบ 3 โลก + ฉากยาก 5 ใบ · มีป้ายในสารบัญห้องผู้พัฒนา
-// ตัวควบคุม: ถอดภาพแรกจากบล็อก ⇒ ต้องไม่ตรง
-const cpBlock = cardPicBlock(readOr(CARD_PIC_PAGE) ?? '');
-const cpNow = cardPicData();
-const cpMiss = [
-  ...(JSON.stringify(cpBlock) !== JSON.stringify(cpNow) ? [`ค้าง ${CARD_PIC_PAGE} (build ใหม่)`] : []),
-  ...(cpNow.pics.filter((p) => !p.hard).length === 8 && cpNow.pics.filter((p) => p.hard).length === 5 ? [] : [`ตัวอย่าง ${cpNow.pics.length} ใบ`]),
-  ...['a', 'af', 'i'].filter((w) => !cpNow.pics.some((p) => p.world === w)).map((w) => `ไม่มีตัวอย่างโลก ${w}`),
-  ...(tweakStatus(docs, read('dev/index.html'))['ui-t-card-pic'] ? [] : ['ไม่มีป้ายใน dev/index']),
-];
-const cpCtl = cpBlock && JSON.stringify({ ...cpBlock, pics: cpBlock.pics.slice(1) }) !== JSON.stringify(cpNow);
-check('หน้า tweak ภาพประจำการ์ดใช้ภาพ+ข้อความการ์ดชุดปัจจุบัน', cpMiss.length || !cpCtl, ` ${cpNow.pics.length} ภาพ${cpMiss.length ? ` · ${cpMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${cpCtl ? 'จับได้' : 'จับไม่ได้'}`);
+const dtCut = (h) => h.slice(0, h.indexOf(DOCS_LAYOUT_START)) + h.slice(h.indexOf(DOCS_LAYOUT_END) + DOCS_LAYOUT_END.length);
+const dtCtl = dtScope.length > 0 && layoutBad(dtScope[0], dtCut(read(dtScope[0].f)));
+check('ทุกหน้าในขอบเขตเว็บเอกสารมีเลย์เอาต์กลางชุดปัจจุบัน', dtMiss.length || !dtCtl, ` ${dtFiles.length} หน้า${dtMiss.length ? ` · ${dtMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${dtCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) แผนงาน (ui-redo 23 · ย้ายไป whatsnew ui-redo 69): แถวหมวดใต้หัวกำลังทำ = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
 // · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)

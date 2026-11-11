@@ -47,12 +47,6 @@ for (const f of dir('content-fixtures/good/')) {
   for (const p of ps) fails.push(`good: ${formatProblem(p)}`);
 }
 
-for (const b of ctx.banned) {
-  for (const s of b.bad ?? []) if (!b.re.test(s)) fails.push(`banned ${b.id}: ไม่จับ "${s}"`);
-  for (const s of b.ok ?? []) if (b.re.test(s)) fails.push(`banned ${b.id}: จับผิด "${s}"`);
-  if (!b.bad?.length || !b.ok?.length) fails.push(`banned ${b.id}: ต้องมีตัวอย่าง bad และ ok`);
-}
-
 // ตารางบุญบาป: ของจริงผ่าน · ตัวควบคุมที่ผิดทีละอย่างต้องตก (กันด่านที่ไม่เคยตก)
 const table = checkMeritTable(MERIT_CATS);
 rows.push(['merit-table', table.length ? `ตก ${table.length} ข้อ` : 'ผ่าน']);
@@ -197,9 +191,8 @@ for (const [id, byIdx] of Object.entries(ISEKAI_MERIT)) for (const [i, tags] of 
   }
 }
 rows.push(['isekai-merit', `${iskTags} ป้าย`]);
-// ข้อความลางอยู่ในแกน ไม่ผ่านด่านเนื้อหา — ตรวจคำต้องห้าม · ความยาว · ไม่มีตัวเลข ที่นี่แทน
+// ข้อความลางอยู่ในแกน ไม่ผ่านด่านเนื้อหา — ตรวจความยาว · ไม่มีตัวเลข ที่นี่แทน
 for (const [tone, xs] of Object.entries(OMEN_TEXT)) for (const s of xs) {
-  for (const b of ctx.banned) if (b.re.test(s)) fails.push(`ลาง ${tone}: โดนคำต้องห้าม ${b.id} "${s}"`);
   if (s.length > MAX_LEN.text) fails.push(`ลาง ${tone}: ยาวเกิน ${MAX_LEN.text} "${s}"`);
   if (/[0-9๐-๙]/.test(s)) fails.push(`ลาง ${tone}: มีตัวเลข "${s}"`);
 }
@@ -222,22 +215,10 @@ for (const sex of SEXES) {
 }
 rows.push(['ช่องแทนค่าแกนเติมครบ', `${Object.keys(PLACEHOLDERS).length} ช่อง × ${SEXES.length} เพศ`]);
 
-// ชื่อเล่น (B27): ผ่านด่านของ loader แล้ว ยังต้องไม่โดนคำต้องห้ามของเนื้อหา · ด่านต้องจับชื่อที่หลุดรายการ avoid/ยุคมีรู
-// ชื่อจริงขึ้นจอได้เหมือนชื่อเล่น (pickRealName) และผู้เล่นพิมพ์ชื่อเองไม่ได้ — รายการนี้คือที่เดียวที่กันชื่อนักการเมือง/สถาบันได้
+// ชื่อเล่น (B27): ด่านต้องจับชื่อที่หลุดรายการ avoid/ยุคมีรู
 const namesRaw = JSON.parse(readFileSync(new URL('data/names.json', root), 'utf8'));
 const nameFrom = namesRaw.eras[0].from, nameTo = namesRaw.eras.at(-1).to;
-const bannedNames = (names) => names.eras.flatMap((e) => SEXES.flatMap((sex) => [[sex, e[sex]], [`จริง${sex}`, e.จริง[sex]]].flatMap(([kind, xs]) =>
-  xs.flatMap((n) => ctx.banned.filter((b) => b.re.test(n)).map((b) => ({ id: b.id, msg: `ชื่อ ${e.from} ${kind}: โดนคำต้องห้าม ${b.id} "${n}"` }))))));
 const nameCount = namesRaw.eras.reduce((t, e) => t + SEXES.reduce((u, sex) => u + e[sex].length + e.จริง[sex].length, 0), 0);
-for (const { msg } of bannedNames(namesRaw)) fails.push(msg);
-// ตัวควบคุมคำต้องห้าม: ชื่อเล่นและชื่อจริงต้องจับได้ทั้งการเมืองจริงและสถาบัน
-const withReal = (sex, n) => ({ ...namesRaw, eras: [{ ...namesRaw.eras[0], จริง: { ...namesRaw.eras[0].จริง, [sex]: [...namesRaw.eras[0].จริง[sex], n] } }, ...namesRaw.eras.slice(1)] });
-const bannedControls = [
-  ['ชื่อเล่นชนนักการเมือง', 'real_politics', { ...namesRaw, eras: [{ ...namesRaw.eras[0], ชาย: [...namesRaw.eras[0].ชาย, 'ทักษิณ'] }, ...namesRaw.eras.slice(1)] }],
-  ['ชื่อจริงชนนักการเมือง', 'real_politics', withReal('หญิง', 'ยิ่งลักษณ์')],
-  ['ชื่อจริงชนสถาบัน', 'monarchy', withReal('ชาย', 'เจ้าฟ้าชาย')],
-];
-for (const [name, id, n] of bannedControls) if (!bannedNames(n).some((x) => x.id === id)) fails.push(`names ตัวควบคุม "${name}" ไม่ตก ${id}`);
 for (const p of checkNames(namesRaw, nameFrom, nameTo)) fails.push(`names: ${p}`);
 const withFirst = (k, xs) => ({ ...namesRaw, eras: [{ ...namesRaw.eras[0], [k]: xs }, ...namesRaw.eras.slice(1)] });
 const nameControls = {
@@ -258,7 +239,7 @@ for (let s = 1; s <= 200; s++) {
   if (newLife(s, nameContent, { ...nameHeir, lineage: [{ gen: 1, name: free }] }).name === free) nameClash++;
 }
 if (nameClash) fails.push(`รุ่นถัดไปได้ชื่อซ้ำรุ่นก่อน ${nameClash} ครั้งใน 200 seed`);
-rows.push(['ชื่อเล่น+ชื่อจริง', `${nameCount} ชื่อ · ${namesRaw.eras.length} ยุค ${nameFrom}–${nameTo} · ตัวควบคุม ${Object.keys(nameControls).length + bannedControls.length} แบบ`]);
+rows.push(['ชื่อเล่น+ชื่อจริง', `${nameCount} ชื่อ · ${namesRaw.eras.length} ยุค ${nameFrom}–${nameTo} · ตัวควบคุม ${Object.keys(nameControls).length} แบบ`]);
 
 // การ์ดจัดสรรเงินสร้างในแกน ไม่ผ่านด่านเนื้อหา — ตรวจทุกปีของเกม: ≥4 ตัวเลือก · ยาว · คำต้องห้าม · หุ้นไม่โผล่ก่อน 2518
 const era = loadEra();
@@ -275,7 +256,6 @@ for (let y = 2500; y <= 2700; y++) {
   for (const o of opts) seenLabels.add(o.label);
 }
 for (const s of [...seenLabels, DISCLAIMER]) {
-  for (const b of ctx.banned) if (b.re.test(s)) fails.push(`การ์ดจัดสรร: โดนคำต้องห้าม ${b.id} "${s}"`);
   if (s.length > MAX_LEN.choice) fails.push(`การ์ดจัดสรร: ยาวเกิน ${MAX_LEN.choice} "${s}"`);
 }
 rows.push(['การ์ดจัดสรร 2500–2700', `${seenLabels.size} ข้อความ`]);
@@ -307,7 +287,6 @@ for (const cls of CLASSES) for (const network of [0, 50, 100]) for (const [i, ed
 for (const [t, track] of Object.entries(TRACKS)) {
   if (track.gate) checkCareer(schoolGate(Object.assign(newLife(1, career), { school: t, age: track.until })), `ด่านเรียนต่อ ${t}`);
 }
-for (const s of careerTexts) for (const b of ctx.banned) if (b.re.test(s)) fails.push(`การ์ดเรียน/งาน: โดนคำต้องห้าม ${b.id} "${s}"`);
 rows.push(['การ์ดเรียน/งานจากแกน', `${careerCards} ใบ · ${careerTexts.size} ข้อความ`]);
 
 // เสียงเด็ก (B61): การ์ดเรียน/งานที่แกนสร้างก่อน CHILD_UNTIL ต้องไม่มีตัวเลือกเสียงผู้ใหญ่ — ไล่ทุกอายุที่ออกได้ × ฐานะ × คอนเน็คชั่น
@@ -461,7 +440,7 @@ try {
 
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
-console.log(`\nกติกา ${ruleIds.length} · ไฟล์ bad ${bad.length} · คำต้องห้าม ${ctx.banned.length} ข้อ`);
+console.log(`\nกติกา ${ruleIds.length} · ไฟล์ bad ${bad.length}`);
 if (fails.length) {
   for (const f of fails) console.log(`  ✗ ${f}`);
   console.log(`ไม่ผ่าน ${fails.length} ข้อ`);

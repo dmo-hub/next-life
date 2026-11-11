@@ -8,15 +8,12 @@ import { demoHtml } from './demo.mjs';
 import { focusHtml } from './focus.mjs';
 import { designPages, designHtml, DESIGN_AT } from './design.mjs';
 import { injectNav, injectDevNav, DEV_NAV_PAGES, movedHtml, DEV_MAPS, mapsMoved } from './nav.mjs';
-import { uiPage, designMoved, liveMoved, tweakPages, tweakMoved, UI_PAGE, UI_LIVE_FROM } from './ui.mjs';
+import { uiPage, designMoved, UI_PAGE } from './ui.mjs';
 import { soonCats, soonIds, injectRoadmap } from './roadmap.mjs';
-import { GAME_CSS_PAGES, gameCss, injectGameCss } from './game-css.mjs';
 import { gatedFiles, injectGate, readGateHash } from './gate.mjs';
 import { injectSeo, sitemapXml, faviconSvg, SITEMAP, FAVICON_SVG } from './seo.mjs';
 import { ART_INK } from '../ui/art.mjs';
-import { DOCS_TWEAK_PAGES, docsScope, docsTweakData, injectDocsLayout, injectDocsTweak } from './docs-tweak.mjs';
-import { CARD_ART_PAGE, cardArtData, injectCardArt } from './card-art-tweak.mjs';
-import { CARD_PIC_PAGE, cardPicData, injectCardPic } from './card-pic-tweak.mjs';
+import { docsScope, injectDocsLayout } from './docs-layout.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
 export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
@@ -77,19 +74,10 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   // หน้าดีไซน์ UI (ui-redo 44) ใช้แม่แบบเดียวกับหน้าคำตัดสินเกม ⇒ แถบห้องผู้พัฒนา + noindex ชุดเดียวกัน
   put(at(`docs/${UI_PAGE}`), designHtml(designTpl, uiPage(content, at('docs/')), UI_PAGE.slice(DESIGN_AT.length)));
   out.push(UI_PAGE.replace(/\.html$/, ''));
-  put(at(`docs/${UI_LIVE_FROM}`), liveMoved());
-  for (const t of tweakPages(at('docs/'))) put(at(`docs/${t[3]}`), tweakMoved(t));
   for (const m of DEV_MAPS) put(at(`docs/dev/maps/${m[0]}.html`), mapsMoved(m));
   // เรื่องที่ถูกรวม/ลบออกจาก design/ ทิ้งหน้าเก่าไว้ = ลิงก์ค้างที่ไม่ตรงต้นฉบับ · ที่เดิมที่เป็นหน้าเนื้อ (ไม่ใช่หน้าส่งต่อ) ก็ลบ
   const made = new Set(designOut.map(([f]) => f));
   for (const dir of ['docs/', `docs/${DESIGN_AT}`]) for (const f of readdirSync(at(dir)).filter((n) => /^design-.+\.html$/.test(n) && !made.has(n))) unlinkSync(at(`${dir}${f}`));
-  const css = gameCss(readFileSync(at('src/ui/template.html'), 'utf8'));
-  for (const file of GAME_CSS_PAGES) {
-    const html = readFileSync(at(`docs/${file}`), 'utf8');
-    const next = injectGameCss(html, css, `docs/${file}`);
-    put(at(`docs/${file}`), next, html);
-    out.push(file.replace(/\.html$/, ''));
-  }
   for (const file of NAV_PAGES) {
     const html = readFileSync(at(`docs/${file}`), 'utf8');
     // แถวหมวดแผนงานใต้หัวกำลังทำ (ui-redo 69) อ่านหมวดจากหน้าเดียวกัน
@@ -100,24 +88,11 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
     const html = readFileSync(at(`docs/${file}`), 'utf8');
     put(at(`docs/${file}`), injectDevNav(html, file), html);
   }
-  // หน้า tweak เว็บเอกสาร (ui-redo 32): รายการหน้าคิดหลังทุกหน้าข้างบนเขียนเสร็จ ⇒ หน้าที่เพิ่ง build ใหม่อยู่ในรายการด้วย
+  // เลย์เอาต์เว็บเอกสาร (ui-redo 32): รายการหน้าคิดหลังทุกหน้าข้างบนเขียนเสร็จ ⇒ หน้าที่เพิ่ง build ใหม่อยู่ในรายการด้วย
   for (const { f, k } of docsScope(at('docs/'))) {
     const html = readFileSync(at(`docs/${f}`), 'utf8');
     put(at(`docs/${f}`), injectDocsLayout(html, k, `docs/${f}`), html);
   }
-  const dtData = docsTweakData(at('docs/'), readFileSync(at('src/ui/template.html'), 'utf8'));
-  for (const file of DOCS_TWEAK_PAGES) {
-    const dt = readFileSync(at(`docs/${file}`), 'utf8');
-    put(at(`docs/${file}`), injectDocsTweak(dt, dtData, `docs/${file}`), dt);
-    out.push(file.replace(/\.html$/, ''));
-  }
-  // หน้า tweak ภาพบนการ์ด (ui-redo 58): รูปทรงจาก art.mjs + ตัวเลขหมวดที่ harness/result-cats.mjs เขียนไว้
-  const ca = readFileSync(at(`docs/${CARD_ART_PAGE}`), 'utf8');
-  const caNext = injectCardArt(ca, cardArtData(), `docs/${CARD_ART_PAGE}`);
-  put(at(`docs/${CARD_ART_PAGE}`), caNext, ca);
-  // หน้า tweak ภาพประจำการ์ด (ใบ 209): รูปทรง + ข้อความการ์ดจริง + ตัวเลขขนาด
-  const cp = readFileSync(at(`docs/${CARD_PIC_PAGE}`), 'utf8');
-  put(at(`docs/${CARD_PIC_PAGE}`), injectCardPic(cp, cardPicData(), `docs/${CARD_PIC_PAGE}`), cp);
   // กล่องรหัส (ui-redo 72) ฉีดท้ายสุด — หน้าที่ build สร้างใหม่ข้างบนต้องได้บล็อกด้วย · play.html (build.mjs เขียน) ไม่ติดรหัสอยู่แล้ว
   const hash = readGateHash();
   for (const file of gatedFiles(at('docs/'))) {

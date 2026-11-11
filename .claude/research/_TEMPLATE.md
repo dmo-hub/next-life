@@ -50,7 +50,6 @@
 - ห้ามยกชื่อตัวละคร ข้อความ ฉาก หรือเหตุการณ์เฉพาะของเกมอื่นมาใช้ · ดูได้เฉพาะรูปแบบกลไก
 
 ## 4. เรื่องอ่อนไหว / ข้อห้าม
-- โยงกับ id ใน `content/rules/banned.yaml`: monarchy · real_politics · monk_mockery · region_blame · investment_advice · real_org_fraud · numen_works · ghost_accusation_glory
 - ระบุว่าข้อไหนต้องเลี่ยง และควรเล่าแทนอย่างไร
 
 ## 5. เชื่อมกับระบบเกมที่มี

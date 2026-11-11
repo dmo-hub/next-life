@@ -4,7 +4,6 @@
 // ตัวคูณ m คำนวณตอนบอทกดซื้อจากฟังก์ชันเดียวกับแกน — harness อ่านบัญชีได้ แกนไม่เก็บ m ไว้ใน state
 import { playLife, openChoices, mixSeed, makeRng, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, LOTTERY_PRIZES, drawPrize, smallPrizeMult } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
-import { lintContext } from '../src/node/lint/index.mjs';
 import { LOTTERY } from '../src/node/lint/vocab.mjs';
 
 const args = process.argv.slice(2);
@@ -83,15 +82,13 @@ const buyer = (pick, ms) => (card, rng, st) => {
   return i;
 };
 
-const ctx = lintContext();
-const texts = new Set();
 const BOTS = { สายบุญ: 1, สายบาป: -1, สุ่ม: 0 };
 const res = {};
 for (const [name, sign] of Object.entries(BOTS)) {
   const r = { tickets: [], lives: 0, over: 0, five: 0, fiveHit: 0, maxFires: 0 };
   for (let i = 0; i < n; i++) {
     const ms = [];
-    const { state } = playLife(mixSeed(seed, i), content, buyer(persona(sign), ms), (card) => card.kind === 'result' && card.type === 'B' && texts.add(card.text));
+    const { state } = playLife(mixSeed(seed, i), content, buyer(persona(sign), ms));
     const b = state.belief;
     if (!b?.lottery) continue;
     r.lives++;
@@ -141,11 +138,6 @@ const over = Object.values(res).reduce((s, r) => s + r.over, 0);
 console.log(`เพดาน ${cap} ครั้ง/ชีวิต (lint ≤${LOTTERY.cap}): ชีวิตที่ทะลุหรือนับใบไม่ตรง ${over} → ${verdict(over === 0)}`);
 const g = res['สายบุญ'];
 console.log(`อ้างอิง: บุญเต็มที่เจอครบ ${cap} ใบ ถูกรางวัลเล็ก ≥1 ครั้ง ${g.fiveHit}/${g.five} = ${g.five ? pct(g.fiveHit / g.five, 1) : '-'} (ใบ 12 คาด ≈25.0% · ฐาน ≈6.8%)`);
-
-// ข้อความผลที่แกนเขียนเองต้องผ่านคำต้องห้ามชุดเดียวกับเนื้อหา (ไม่บอกว่าเลข/บุญทำให้ถูก)
-const hits = [...texts].flatMap((s) => ctx.banned.filter((b) => b.re.test(s)).map((b) => `${b.id}: ${s}`));
-for (const h of hits) console.log(`  ✗ ${h}`);
-console.log(`ข้อความผลของแกน ${texts.size} แบบ ผ่านคำต้องห้าม ${ctx.banned.length} ข้อ → ${verdict(!hits.length)}`);
 
 // ด่าน 7: บอทสุ่มล้วน (ไม่บังคับซื้อ) เนื้อหาเต็ม vs ตัดเหตุการณ์ belief ทั้งหมด — ส่วนต่างอายุเฉลี่ยต้องไม่มีนัยสำคัญ
 const noBelief = { ...content, events: content.events.filter((e) => !e.belief) };

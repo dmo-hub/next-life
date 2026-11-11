@@ -30,7 +30,7 @@ export const FONTS = [
   ['Noto Serif Thai', 600, 'NotoSerifThai-SemiBold'],
 ];
 // หน้าเล่น: Sarabun = เนื้อ + ภาพแชร์/ภาพชั้นสมุด (canvas) · Maitree 600 = หัว (หัวที่ขอ 700 ได้ 600) · Srisakdi มีแค่ 700 ที่ใช้ (ทุกจุดเป็นตัวหนา)
-// Noto Sans Thai ถอดจากหน้าเล่น (ข้อ 216) · ยังอยู่ใน FONTS เพราะหน้า tweak/แผนที่ dev ยังใช้
+// Noto Sans Thai ถอดจากหน้าเล่น (ข้อ 216) · ยังอยู่ใน FONTS เพราะหน้า dev ยังใช้
 export const PLAY_FACES = ['Sarabun 400', 'Sarabun 600', 'Maitree 600', 'Srisakdi 700'];
 export const FONT_DIR = 'fonts/';
 export const FONT_CSS = `${FONT_DIR}fonts.css`;

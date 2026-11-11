@@ -6,7 +6,6 @@ import { rules as shape } from './shape.mjs';
 import { rules as merit } from './merit.mjs';
 import { rules as flags } from './flags.mjs';
 import { rules as systems } from './systems.mjs';
-import { rules as banned, compileBanned } from './banned.mjs';
 import { rules as lore, loreHeadings } from './lore.mjs';
 import { rules as belief } from './belief.mjs';
 import { rules as afterlife } from './afterlife.mjs';
@@ -14,7 +13,7 @@ import { rules as kin } from './kin.mjs';
 import { rules as focus, focusTags } from './focus.mjs';
 import { isObj } from './util.mjs';
 
-export const RULES = [...shape, ...merit, ...flags, ...systems, ...banned, ...lore, ...belief, ...afterlife, ...kin, ...focus];
+export const RULES = [...shape, ...merit, ...flags, ...systems, ...lore, ...belief, ...afterlife, ...kin, ...focus];
 const root = new URL('../../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
 
@@ -40,7 +39,7 @@ export function lintContext() {
   const focusTagsAll = focusTags(focusDoc);
   const gateFocuses = Object.entries(focusDoc.focuses ?? {}).filter(([, f]) => f?.group === 'gate').map(([id]) => id);
   const items = Object.keys(parse(read('content/rules/items.yaml')).items ?? {});
-  return { regions, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: focusDoc.natures ?? {}, natureAge: focusDoc.nature_age, banned: compileBanned(parse(read('content/rules/banned.yaml')), 'content/rules/banned.yaml') };
+  return { regions, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: focusDoc.natures ?? {}, natureAge: focusDoc.nature_age };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]

@@ -36,7 +36,6 @@
 - stage ตามช่วงอายุ: เด็ก 0–12 · วัยรุ่น 13–18 · หนุ่มสาว 19–30 · ทำงาน 31–45 · กลางคน 46–59 · ชรา 60+
 - category: study work_money family health belief society · stat: health happiness knowledge relations network + money
 - lint `kin-unguarded` จับคำ ลูก แม่ สัตว์เลี้ยง ที่ไม่มีเงื่อนไขว่ายังอยู่ · เลี่ยงคำหรือใส่ when.family
-- คำต้องห้ามอยู่ content/rules/banned.yaml
 
 ## วิธีวัด (repo อ่านอย่างเดียว)
 

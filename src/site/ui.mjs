@@ -1,8 +1,8 @@
-// หน้าดีไซน์ UI ในห้องผู้พัฒนา (ui-redo 44): สี ตัวอักษร ชิ้นส่วนตัวอย่าง คำตัดสิน UI ลิงก์หน้า tweak ช่องภาพจอเกม — โครงเนื้อครบ ยังไม่จัดสวย (หน้าตาเป็นงานใบ 32/35)
+// หน้าดีไซน์ UI ในห้องผู้พัฒนา (ui-redo 44): สี ตัวอักษร ชิ้นส่วนตัวอย่าง คำตัดสิน UI ช่องภาพจอเกม — โครงเนื้อครบ ยังไม่จัดสวย (หน้าตาเป็นงานใบ 32/35)
 // สีและฟอนต์อ่านจาก CSS ของเกม (src/ui/template.html) ตอน build ⇒ แก้ค่าในเกมที่เดียว หน้านี้เปลี่ยนตามเมื่อ build ใหม่
 // ชิ้นส่วนตัวอย่างใช้ CSS ของเกมจริง + markup เขียนเองแบบเดโมการ์ด (ข้อ 49) · วางใน iframe sandbox ไม่มี allow-scripts/allow-same-origin
 // ⇒ ไม่มีสคริปต์ และเข้า localStorage ของเว็บไม่ได้ เซฟที่เล่นค้างไว้ไม่โดนแตะ · CSS ของเกมไม่รั่วมาทับหน้าเอกสาร
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { esc } from './catalog.mjs';
 import { demoCard } from './demo.mjs';
 import { STAT_LABELS } from '../engine/life.mjs';
@@ -20,11 +20,6 @@ export const UI_TITLE = 'ดีไซน์ UI';
 export const UI_SHOTS_AT = 'dev/shots/';
 export const UI_SHOTS = [['start', 'เริ่มชีวิต'], ['mid', 'กลางชีวิต'], ['death', 'ตาย']];
 export const UI_SHOT_W = [390, 1280];
-// ต้นแบบปรับสด (ui-redo 02) เดิมเป็นหน้า tweak.html แยก — ย้ายมาเป็นหัวในหน้านี้ (ui-redo 76) · ที่เดิมเป็นหน้าส่งต่อ
-export const UI_LIVE_ID = 'ui-live';
-export const UI_LIVE_FROM = 'dev/ui-redo/tweak.html';
-export const UI_LIVE_TITLE = 'ต้นแบบปรับสด';
-const LIVE_SRC = new URL('ui-live.html', import.meta.url);
 
 const TEMPLATE = new URL('../ui/template.html', import.meta.url);
 const APP = new URL('../ui/app.mjs', import.meta.url);
@@ -63,27 +58,6 @@ export function menuLabels(name, src = readFileSync(APP, 'utf8')) {
   return [...m[1].matchAll(/\['[^']*', '([^']*)'\]/g)].map((x) => x[1]);
 }
 
-// หน้า tweak ทุกหน้าเป็นหัวในหน้านี้ (ui-redo 79) — ตัวหน้าอยู่ใต้ dev/tweak/ ลึกเท่าที่เดิม (ลิงก์ ../../ ในหน้ายังถูก) และฝังด้วย iframe
-// ที่เดิมใต้ dev/ui-redo/ เป็นหน้าส่งต่อมาหัว → [path ใต้ docs/, ชื่อหน้า, id หัว, ที่เดิม]
-export const UI_TWEAK_AT = 'dev/tweak/';
-export const UI_TWEAK_FROM = 'dev/ui-redo/';
-// หน้าที่ไม่ได้มาจาก dev/ui-redo/ → ที่เดิมของมัน · ต้นแบบการ์ด v2 เดิมเป็นหน้าเอกสารชั้นบนสุด (ui-redo 99 · ข้อ 179)
-export const UI_TWEAK_FROM_AT = { 'cards.html': 'cards.html' };
-export function tweakPages(docs) {
-  return readdirSync(new URL(UI_TWEAK_AT, docs))
-    .filter((n) => n.endsWith('.html'))
-    .sort()
-    .map((n) => [`${UI_TWEAK_AT}${n}`, readFileSync(new URL(UI_TWEAK_AT + n, docs), 'utf8').match(/<title>([^<]*)<\/title>/)?.[1]?.split(' · ')[0] ?? n, `ui-t-${n.replace(/(-tweak)?\.html$/, '')}`, UI_TWEAK_FROM_AT[n] ?? UI_TWEAK_FROM + n]);
-}
-
-// ป้ายสถานะของหัว = ป้ายในแถวของหัวนั้นบนสารบัญห้องผู้พัฒนา (แก้ป้ายที่เดียว) · id → HTML ของป้าย
-// html ส่งเข้าได้ให้ด่านลองแถวที่ไม่มีหน้า
-export function tweakStatus(docs, html = readFileSync(new URL('dev/index.html', docs), 'utf8')) {
-  return Object.fromEntries([...html.matchAll(/<a href="ui\.html#([a-z0-9-]+)">[^<]*<\/a>((?:<span class="st [a-z]+">[^<]*<\/span>)*)/g)].map((m) => [m[1], m[2]]));
-}
-const PUBLIC_TITLE = (t) => (PUBLIC_HIDE.test(t) ? 'หน้า tweak' : t);
-export const tweakMoved = ([, title, id, from]) => movedHtml(from, `${UI_PAGE}#${id}`, PUBLIC_TITLE(title));
-
 const meter = (k, v, d) =>
   `<li${v <= 20 ? ' class="low"' : ''}><span class="mh"><span class="mk">${esc(STAT_LABELS[k])}</span><b class="num">${v}</b>${d ? `<em${d < 0 ? ' class="dn"' : ''}><span aria-hidden="true">${d > 0 ? '▲' : '▼'}</span>${Math.abs(d)}</em>` : ''}</span><span class="br"><i style="width:${v}%"></i></span></li>`;
 const choice = (n, text, fx, off) =>
@@ -114,13 +88,6 @@ const frame = (css, title, parts, h) => {
   return `<figure class="ui-spec"><figcaption>${esc(title)}</figcaption><iframe title="${esc(title)}" sandbox="" style="width:100%;height:${h}px;border:1px solid var(--line);background:var(--surface)" srcdoc="${doc.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></iframe></figure>`;
 };
 
-// ต้นแบบปรับสดต้องรันสคริปต์ จำค่าใน localStorage คีย์เดิม และคัดลอกลง clipboard ⇒ iframe ไม่มี sandbox (srcdoc ได้ origin ของหน้านี้ = origin เดียวกับหน้า tweak เดิม ค่าที่เจ้าของปรับไว้ยังอ่านได้)
-// ไม่ย้ายสคริปต์มาไว้ในหน้า เพราะ CSS/ID ของต้นแบบ (body · h2 · #view · #msg) จะชนหน้าเอกสาร · ต้นแบบต้องกว้างเกิน 1000 ถึงได้แผงซ้าย+จอขวา ⇒ กรอบกว้างกว่าคอลัมน์เนื้อ 900
-export function liveFrame(src = readFileSync(LIVE_SRC, 'utf8')) {
-  const doc = src.replace(/\r\n/g, '\n');
-  return `<div class="ui-live"><iframe title="${UI_LIVE_TITLE}" allow="clipboard-write" srcdoc="${doc.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></iframe></div>`;
-}
-
 // tpl ส่งเข้าได้ให้ด่านลองแก้สีในเกมแล้วดูว่าหน้านี้เปลี่ยนตาม
 export function uiPage(content, docs, tpl = readFileSync(TEMPLATE, 'utf8')) {
   const css = gameCss(tpl);
@@ -129,8 +96,6 @@ export function uiPage(content, docs, tpl = readFileSync(TEMPLATE, 'utf8')) {
   const colors = groups.map((g) => [g.sel, g.vars.filter(([, v]) => isColor(v))]).filter(([, v]) => v.length);
   const others = groups.flatMap((g) => g.vars.filter(([, v]) => !isColor(v)).map(([k, v]) => [g.sel, k, v]));
   const sw = ([k, v]) => `<li><span class="sw" style="background:${esc(v)}"></span><code>${esc(k)}</code> <small>${esc(v)}</small></li>`;
-  const tweaks = tweakPages(docs);
-  const status = tweakStatus(docs);
   const parts = specimens(content, src);
   const shot = ([id, name]) =>
     `<div><h3>${esc(name)}</h3>${UI_SHOT_W.map((w) => {
@@ -141,13 +106,6 @@ export function uiPage(content, docs, tpl = readFileSync(TEMPLATE, 'utf8')) {
     '<style>.sws{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 12px}.sws li{display:flex;align-items:center;gap:8px;margin:0;min-width:0}.sws small{overflow-wrap:anywhere}.sw{flex:none;width:28px;height:28px;border:1px solid var(--ink)}.ui-spec{margin:0 0 16px}.ui-spec figcaption{font-size:14px;font-weight:600;margin:0 0 4px}.fspec{margin:0 0 12px;overflow-wrap:anywhere}.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.wait{color:var(--muted);font-size:14px}.st{display:inline-block;font-size:12px;font-weight:600;padding:0 6px;border:1px solid currentColor;margin-left:6px;white-space:nowrap;line-height:1.5}.st.done{color:var(--good)}.st.pick{color:var(--accent2)}.st.wait{color:var(--ink)}.ui-live{width:min(1400px,calc(100vw - 32px));margin:0 0 16px calc(50% - min(700px,calc(50vw - 16px)))}.ui-live iframe{display:block;width:100%;height:min(900px,calc(100vh - 24px));min-height:560px;border:1px solid var(--line);background:var(--bg)}</style>',
     '<h2 id="ui-decisions">คำตัดสิน UI</h2>',
     `<p>หน้าเล่นใช้การ์ดใบเดียวกลางจอ แถบสถานะสองแถวบนการ์ด แถบเมนูล่าง · ธีมการ์ดสามแบบ: กระดาษ (ชีวิตนี้) · ลายรดน้ำ (ระหว่างชาติ) · ต่างโลก · งานปรับหน้าตาทุกชิ้นมีหน้า tweak ให้เจ้าของเลือกก่อนลงจริง · คำตัดสินเต็ม: <a href="design-ui-redo.html">คำตัดสินเกม เรื่อง ui-redo</a></p>`,
-    `<h3>หน้า tweak (${tweaks.length + 1})</h3>`,
-    `<ul id="ui-tweaks"><li><a href="#${UI_LIVE_ID}">${UI_LIVE_TITLE}</a>${status[UI_LIVE_ID] ?? ''}</li>${tweaks.map(([, t, id]) => `<li><a href="#${id}">${esc(t)}</a>${status[id] ?? ''}</li>`).join('')}</ul>`,
-    `<h2 id="${UI_LIVE_ID}">${UI_LIVE_TITLE}</h2>`,
-    `<p>จอต้นแบบหน้าเล่นกดได้ (ui-redo 02) — ปรับเลย์เอาต์/ชิ้นย่อยแล้วกด "คัดลอกค่า" ส่งผู้รวมงาน · ค่าที่ปรับจำไว้ในเครื่อง (ชุดเดียวกับหน้า tweak เดิม)${status[UI_LIVE_ID] ?? ''}</p>`,
-    liveFrame(),
-    // กรอบ src ไม่มี sandbox ด้วยเหตุเดียวกับต้นแบบปรับสด (คีย์ localStorage เดิมของแต่ละหน้า · คัดลอก) · แต่ละหน้าอยู่กรอบของตัวเอง ⇒ global JS · header.sb · :root ของแต่ละหน้าไม่ชนกัน
-    ...tweaks.map(([f, t, id]) => `<h2 id="${id}">${esc(t)}</h2><p><small>${esc(f)}</small>${status[id] ?? ''}</p><div class="ui-live"><iframe title="${esc(t)}" allow="clipboard-write" loading="lazy" src="${f.slice(4)}"></iframe></div>`),
     '<h2 id="ui-colors">สี</h2>',
     '<p>อ่านจากตัวแปร CSS ของหน้าเล่น (<code>src/ui/template.html</code>) ตอน build</p>',
     ...colors.map(([sel, vars]) => `<h3><code>${esc(sel)}</code></h3><ul class="sws">${vars.map(sw).join('')}</ul>`),
@@ -163,10 +121,9 @@ export function uiPage(content, docs, tpl = readFileSync(TEMPLATE, 'utf8')) {
     '<p>ภาพจาก <code>npm run shots</code> (ใบ 45) — เลนที่แก้จอเกมรันแล้ว commit ภาพ</p>',
     `<div class="shots">${UI_SHOTS.map(shot).join('')}</div>`,
   ].join('\n');
-  return { title: UI_TITLE, lead: 'สี ตัวอักษร ชิ้นส่วนของหน้าเล่น คำตัดสิน UI หน้า tweak และต้นแบบปรับสด · โครงหน้า เนื้อครบ ยังไม่จัดสวย', body };
+  return { title: UI_TITLE, lead: 'สี ตัวอักษร ชิ้นส่วนของหน้าเล่น และคำตัดสิน UI · โครงหน้า เนื้อครบ ยังไม่จัดสวย', body };
 }
 
-export const liveMoved = () => movedHtml(UI_LIVE_FROM, `${UI_PAGE}#${UI_LIVE_ID}`, UI_LIVE_TITLE);
 
 // หน้าส่งต่อของที่เดิมใต้ docs/ ของหน้าคำตัดสินเกม — design.html ไปหน้านี้ ที่เหลือไปหน้าเดิมใต้ dev/
 // หน้าส่งต่อไม่ติดรหัส (ui-redo 70) ⇒ ชื่อเรื่องที่มีคำซ่อนใช้ชื่อกลาง

@@ -170,8 +170,8 @@ Measured after each placeholder is filled with its longest value (rule `text-len
 ## 3. Lint gates (`src/node/lint/`, 86 rule ids)
 
 ### How it runs
-- `RULES` = shape + merit + flags + systems + banned + lore + belief + afterlife + kin + focus.
-- `lintContext()` loads everything the rules need: regions, systems, lore headings from `docs/spec/lore-*`, eras, occupations, ladders, the flag registry, death causes, focus tags, and banned.yaml.
+- `RULES` = shape + merit + flags + systems + lore + belief + afterlife + kin + focus.
+- `lintContext()` loads everything the rules need: regions, systems, lore headings from `docs/spec/lore-*`, eras, occupations, ladders, the flag registry, death causes, and focus tags.
 - Every problem is reported; the run does not stop at the first.
 - The error format is a contract: `` `${file} · ${id}${path} · ${rule}: ${msg}` ``
   - Example: `content/young.yaml · young_x_01.choices[2].hint · choice-hint: hint ห้ามมีตัวเลข…`
@@ -208,23 +208,16 @@ Measured after each placeholder is filled with its longest value (rule `text-len
 | merit | `merit-missing`, `merit-category`, `merit-level`, `merit-neutral-alone` |
 | flags | `flag-format` (`^[a-z][a-z0-9_]*(:[a-z0-9_]+)?$`); `flag-unset` (every flag read must be set somewhere or be an engine flag); `flag-registry` (must be in `content/rules/flags.yaml` under flags or prefixes); `schedule-target`, `next-target`, `next-cycle`; `parent-flag-registry`, `parent-flag-shape`, `parent-flag-age` |
 | systems | `system-unknown`, `system-closed`, `system-before-start`, `system-after-end`, `asset-system`, `debt-system`, `system-undeclared` |
-| banned | `banned-word` (regex from banned.yaml); `preach` (no ควรจะ / คุณควร / ชีวิตคือ / กรรมตามสนอง in narration); `accuse-no-reward` (accusing someone of being ปอบ / ผีกะ / กระสือ cannot pay off) |
 | lore | `lore-required`, `lore-ref` (the heading must really exist in docs/spec), `text-length` |
 | belief (17) | `belief-shape`, `belief-category`, `outside-canon`, `belief-effects`, `lottery-*` (9 rules), `ledger-read`, `ledger-text`, `pair-match`, `vow-light` |
 | afterlife | `afterlife-shape` (stage ระหว่างชาติ needs scene, `type: B`, effects only on stats); `afterlife-coverage` (every scene × realm has a card with no `when`); `court-shape` |
 | kin | `kin-unguarded`: text that mentions แม่ / พ่อ / คู่ / ลูก / สัตว์เลี้ยง needs a `when.family` or `requires.family` guard |
 | focus | `focus-tag` (`tags: {}` is empty, so only the 6 categories are valid); `focus-gate` (gate ids must be politics_base / ordain / business / occult / shortcut_money, and not every choice may be gated) |
 
-### `content/rules/banned.yaml`
-- Format: `banned: [{id, why, pattern (regex, u flag), bad: [...], ok: [...]}]`.
-- 8 ids: `monarchy`, `real_politics`, `monk_mockery`, `region_blame`, `investment_advice`, `real_org_fraud`, `numen_works`, `ghost_accusation_glory`.
-- It deliberately does not catch everything. The owner still reads all text.
-
 ### `npm run lint:test` (`scripts/lint-test.mjs`)
 Fixture checks:
 - Each `content-fixtures/bad/<rule>.yaml` (86 files) must fail **exactly that one rule**, and every rule needs a bad file.
 - `good/*.yaml` must pass with no problems.
-- Each banned entry must match all of its `bad` strings and none of its `ok` strings.
 
 Other checks:
 - The merit table passes, and 7 broken control tables fail.
@@ -288,7 +281,6 @@ Registries in `content/rules/`:
 - `flags.yaml`: `flags:`, `prefixes:`, `heir:`
 - `focus.yaml`
 - `near-hints.yaml`
-- `banned.yaml`
 
 ## 5. Isekai (`src/engine/isekai.mjs`, `continent.mjs`)
 
@@ -410,7 +402,6 @@ Fame ≥ 20 records a legend. It is marked dark if more than half of the fame ca
    - `flag-unset`
    - `choice-lock`: a flag lock needs `reason`, and at least one choice must stay unlocked
    - `lore-required`, `system-undeclared`
-   - `preach`, `banned-word`
    - `ok-direction`
    - `next-target`, `next-cycle`, `schedule-target`
 4. Run:
