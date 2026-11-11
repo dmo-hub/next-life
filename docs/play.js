@@ -3235,6 +3235,60 @@ function focusWords(def, labels) {
   return [...up, ...down, ...(def.risk?.length ? ['มีเสี่ยง'] : [])].join(' · ');
 }
 
+// ต้นไม้โฟกัส (ใบ 03 tracer): กติกากลางตัวเดียว เรียกจากโลกใดก็ได้ — h = ผู้ถือสถานะของโลกนั้น (โลกหลัก = st)
+// สถานะอยู่บน h.tree = { cur, done:{id:อายุที่ปลด}, yrs:{id:ปีที่ทุ่ม}, cards:{id:การ์ดที่นับ}, hist:[[อายุ,id]] } — ภาพถ่ายเซฟพาไปเอง
+// ไม่เคยทุ่ม = ไม่มี h.tree: ชีวิตที่ไม่แตะต้นไม้เดินเท่าเดิมทุกหลัก (ไม่ดึงเลขสุ่ม ไม่ถ่วงการ์ด)
+// ทุ่มได้แค่โหนดที่ยังไม่ปลด (ข้อ 36) · ปลดแล้วเลื่อนไปโหนดถัดไปเอง ไม่เสียปี · เปลี่ยนเองทีหลังได้ ไม่เสียปี (ข้อ 43) · ทางแยกไม่ล็อก เวลาเป็นราคา (ข้อ 8)
+
+// ตัวควบคุมของ harness: ปิดการนับการ์ด → โหนดที่ต้องตอบการ์ดต้องปลดไม่ได้เลย
+// anyCat / cardsFree = ทางเลือกที่ harness ใช้ทำตารางเสนอเจ้าของเท่านั้น (นับทุกหมวด · ไม่ต้องตอบการ์ด) ห้ามเปิดนอก harness
+const treeCtl = { cards: true, anyCat: false, cardsFree: false };
+
+// ต้นทางผ่านแล้ว: ไม่มีต้นทาง = เปิดอยู่ · ในแขนงเดียวกันปลดอันใดอันหนึ่งก็พอ (ข้อ 72) · โหนดกลาง (and) ต้องครบทุกต้นทาง
+const treeReach = (h, def) => {
+  const need = def.pre ?? [];
+  const done = h?.tree?.done ?? {};
+  return !need.length || (def.and ? need.every((p) => done[p] !== undefined) : need.some((p) => done[p] !== undefined));
+};
+
+// ทุ่มได้ตอนนี้: ยังไม่ปลด + ช่วงวัยตรง + ต้นทางผ่านแล้ว (โหนดซ่อนโผล่ตอนต้นทางผ่าน = เกณฑ์เดียวกัน)
+const treeOpen = (h, def, id, stage) => !!def && h?.tree?.done?.[id] === undefined && (!def.stages || def.stages.includes(stage)) && treeReach(h, def);
+const treeOffers = (h, defs, stage) => Object.keys(defs).filter((id) => treeOpen(h, defs[id], id, stage));
+
+// เลือกทุ่มโหนด · ซ้ำตัวเดิมไม่ใช่การเปลี่ยน · เปลี่ยนไม่เสียปี (ปีที่เปลี่ยนยังนับให้โหนดใหม่ตอนสิ้นปี)
+function treeInvest(h, defs, id, stage) {
+  if (!treeOpen(h, defs[id], id, stage)) throw new Error(`ทุ่มโหนดนี้ตอนนี้ไม่ได้: ${id}`);
+  (h.tree ??= { cur: null, done: {}, yrs: {}, cards: {}, hist: [] }).cur = id;
+}
+
+// นับการ์ดที่ตอบ: เฉพาะโหนดที่กำลังทุ่ม และหมวดการ์ดตรงหมวดของโหนด
+function treeCard(h, defs, category) {
+  const t = h.tree;
+  if (!treeCtl.cards || !t?.cur) return;
+  if (treeCtl.anyCat || defs[t.cur].cat.includes(category)) t.cards[t.cur] = (t.cards[t.cur] ?? 0) + 1;
+}
+
+// ปิดปีที่อายุ age: คืน { id, unlocked } ของโหนดที่ทุ่มปีนี้ · ไม่ได้ทุ่ม/โหนดหลุดช่วงวัยแล้ว = null (ปีนั้นไม่นับให้ใคร)
+// ปลด = ปีเต็มครบ + การ์ดหมวดตรงครบ · ปลดแล้วเลื่อนไปโหนดแรกที่ทุ่มได้ต่อทันที ปีถัดไปนับเลย ไม่เสียปี
+function treeYearEnd(h, defs, stage, age) {
+  const t = h.tree;
+  if (!t?.cur) return null;
+  const id = t.cur;
+  if (!treeOpen(h, defs[id], id, stage)) {
+    t.cur = null;
+    return null;
+  }
+  t.yrs[id] = (t.yrs[id] ?? 0) + 1;
+  t.hist.push([age, id]);
+  const def = defs[id];
+  const unlocked = t.yrs[id] >= def.years && (treeCtl.cardsFree || (t.cards[id] ?? 0) >= def.cards);
+  if (unlocked) {
+    t.done[id] = age;
+    t.cur = treeOffers(h, defs, stage).find((x) => x !== id && !defs[x].hidden) ?? null;
+  }
+  return { id, unlocked };
+}
+
 // ตายสงบย้อนความทรงจำ (B168): ตายตอนขึ้นปีด้วยวัยชราหรือโรคเรื้อรังที่หมอบอกไว้ อายุ 60 ขึ้นไป → การ์ดย้อนชีวิตใบเดียวก่อนคำสั่งเสีย
 // คัดแบบกำหนดได้จาก log/ญาติของชีวิตนั้น ไม่ดึงเลขสุ่ม ไม่ตั้งธง ไม่ให้ผลค่า ⇒ บอทและผลเกมเดินเท่าเดิม ต่างแค่การ์ดหนึ่งใบกับบรรทัดบนมรณบัตร
 // ไม่ import life.mjs (life.mjs import ไฟล์นี้) — ผู้เรียกส่ง stageOf มาเอง
@@ -3399,6 +3453,7 @@ function pastFromLineage(lineage, realmId) {
   }
   return { lives: rows.length, province: last.province ?? null, job: null, jobYears: 0, cause: last.gone ? PAST_GONE : last.cause ?? 'other', realm: realmId(last.realm), realms, jobs: [], treasures: [], wish: null, barami: 0 };
 }
+
 
 
 
@@ -4379,6 +4434,7 @@ const HEIR_UNI_KNOW = 55;
 function stepYear(st) {
   const prevStage = stageOf(st.age);
   lifeFocusYear(st);
+  lifeTreeYear(st);
   natureLock(st);
   // ปีสุดท้ายที่ทำงานต้องวัดก่อนขึ้นอายุ — ขึ้นแล้ว isWorking เป็นเท็จ
   // คนที่ยังนั่งตำแหน่งเต็มเวลาหลังเกษียณวัดใหม่ทุกปีจนเลิกทำงาน — ปีที่ปกติถึงเกษียณได้ค่าเดิม
@@ -5216,6 +5272,20 @@ function lifeFocusYear(st) {
   (def.risk ?? []).forEach((r, i) => lifeFocusRisk(st, id, r, i));
 }
 
+// ต้นไม้โฟกัส (ใบ 03): กติกากลางอยู่ tree.mjs · เนื้อ content.tree · ไม่เคยทุ่ม = ไม่แตะอะไร (ไม่ดึงเลขสุ่ม)
+// ทุ่มอยู่: ผลเต็มของโหนดที่ทุ่มปีนี้ · ปลดแล้ว: ผลเบาถาวรของทุกโหนดที่ปลด ต่อปี (ผลของโหนดที่เพิ่งปลดปีนี้เริ่มปีหน้า)
+const lifeTreeDefs = (st) => st.content.tree?.nodes ?? {};
+const treeInvestNode = (st, id) => treeInvest(st, lifeTreeDefs(st), id, stageOf(st.age));
+const treeOffersNow = (st) => treeOffers(st, lifeTreeDefs(st), stageOf(st.age));
+function lifeTreeYear(st) {
+  const c = st.content.tree;
+  if (!st.tree || !c) return;
+  const light = Object.keys(st.tree.done).filter((id) => st.tree.done[id] < st.age);
+  const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age);
+  if (r) applyEffects(st, c.nodes[r.id].fx, c.year_scale);
+  for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size]);
+}
+
 // เสี่ยงสุ่มของโฟกัส: ทอยจาก stream ของ (seed · อายุ · ข้อ) ไม่แตะ rng ของโลก ชีวิตจึงต่างจากตามน้ำแค่ผลที่เกิดจริง
 // เสี่ยงตาย (cause): ครั้งแรกเป็นการ์ดเตือน (ผลเจ็บตาม fx) · โดนซ้ำหลังเตือน = ตายต้นปีถัดไปด้วยสาเหตุนั้น — ไม่มีใครตายจากโฟกัสโดยไม่ได้เห็นสัญญาณก่อน
 const FOCUS_RISK_SALT = 0x6f0c5a17;
@@ -5561,6 +5631,7 @@ function choose(st, idx, loan) {
   let because = applyEffects(st, c.effects, s, ss, 1, nat);
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
+  if (st.tree && st.content.tree) treeCard(st, st.content.tree.nodes, ev.category);
   naturePoint(st, c.nature, 1);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
@@ -5903,6 +5974,7 @@ function playLife(seed, content, pickChoice, onCard, st = newLife(seed, content)
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
     // บอทที่มีนโยบายโฟกัส (ใบ 04) ตั้งโฟกัสหลังเห็นการ์ด — นโยบายสุ่มจาก stream ของตัวเอง ไม่แตะ rng ของโลก
     if (pickChoice.focus && !st.dead && !st.trip && !st.court) pickChoice.focus(st);
+    if (pickChoice.tree && !st.dead && !st.trip && !st.court) pickChoice.tree(st);
     // บอทที่ไม่ได้ประกาศ isekai ปฏิเสธการ์ดชวนโดยไม่ดึงเลขสุ่ม ⇒ ชีวิตเดินเท่าเดิม
     // การ์ดในทริป (B68m) ไม่มีป้ายบุญบาปแบบชีวิตไทย — บอทที่ประกาศ trip เลือกเอง ที่เหลือสุ่มตัวที่ไม่ล็อก
     if (card.court) {
