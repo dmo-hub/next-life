@@ -17,7 +17,6 @@ Read these first, so the brief fits the existing systems and doesn't duplicate c
 - `.claude/knowledge/next-life/04-content-isekai.md`: event YAML schema, lint rules, text limits, content inventory
 - `.claude/knowledge/next-life/03-systems-data.md` and `02-engine-core.md`: read the parts the topic touches (money, careers, merit, focus, death)
 - `.claude/knowledge/next-life/06-workflow-roadmap.md` §5: the planned phase related to the topic
-- `content/rules/banned.yaml`: banned topics
 - `content/rules/flags.yaml` and `content/rules/focus.yaml`: existing flags and focuses
 - `data/careers.json`, `data/system-starts.json`, `data/era-events.json`: careers, the years systems became available, era events
 - Grep `content/*.yaml` for keywords on the topic, and list the cards that already exist
