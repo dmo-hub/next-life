@@ -54,17 +54,17 @@ export const rules = [
   },
   {
     id: 'belief-effects',
-    desc: '(ข) สายมู (ยกเว้น lottery_numen) ให้ผลได้แค่ ความสุข · ความสัมพันธ์ · เงินจ่ายออก · ธง · ป้ายบุญ — ห้ามแตะสุขภาพ ความรู้ หรือได้เงินเข้า',
+    desc: '(ข) สายลี้ลับ (ยกเว้น lottery_numen) ให้ผลได้แค่ ความสุข · ความสัมพันธ์ · เงินจ่ายออก · ธง · ป้ายบุญ — ห้ามแตะสุขภาพ ความรู้ หรือได้เงินเข้า',
     event(e, ctx, r) {
       if (!beliefOf(e) || lottery(e)) return;
       for (const { node, path } of effectSites(e)) {
         if (!isObj(node.effects)) continue;
-        for (const k of Object.keys(node.effects)) if (!BELIEF_EFFECTS.includes(k)) r(`${path}.effects.${k}`, `สายมูห้ามมีผลต่อ ${k}`);
-        if (node.effects.money?.amount > 0) r(`${path}.effects.money`, 'สายมูห้ามมีเงินเข้า (จ่ายออกเท่านั้น)');
+        for (const k of Object.keys(node.effects)) if (!BELIEF_EFFECTS.includes(k)) r(`${path}.effects.${k}`, `สายลี้ลับห้ามมีผลต่อ ${k}`);
+        if (node.effects.money?.amount > 0) r(`${path}.effects.money`, 'สายลี้ลับห้ามมีเงินเข้า (จ่ายออกเท่านั้น)');
       }
     },
   },
-  lotteryRule('lottery-trigger', '(ค) หวยสายมูเกิดเฉพาะตอนเงินตึง: trigger.money_state = tight', (e, r) => {
+  lotteryRule('lottery-trigger', '(ค) หวยสายลี้ลับเกิดเฉพาะตอนเงินตึง: trigger.money_state = tight', (e, r) => {
     if (e.belief.trigger?.money_state !== 'tight') r('.belief.trigger', 'ต้องเป็น {money_state: tight}');
   }),
   lotteryRule('lottery-cap', `(ค) cap_per_life เป็นจำนวนเต็ม 1–${LOTTERY.cap}`, (e, r) => {
@@ -92,7 +92,7 @@ export const rules = [
   }),
   {
     id: 'lottery-ticket',
-    desc: '(ค) หวยสายมูมีตัวเลือกซื้อใบ (ticket: true) ตัวเดียว — แกนเก็บราคาจาก stake และจับรางวัลเอง ตัวเลือกนั้นห้ามมี cost/เงิน/outcomes · ticket ใช้ได้เฉพาะ lottery_numen',
+    desc: '(ค) หวยสายลี้ลับมีตัวเลือกซื้อใบ (ticket: true) ตัวเดียว — แกนเก็บราคาจาก stake และจับรางวัลเอง ตัวเลือกนั้นห้ามมี cost/เงิน/outcomes · ticket ใช้ได้เฉพาะ lottery_numen',
     event(e, ctx, r) {
       const tickets = choicesOf(e).filter(({ c }) => c.ticket !== undefined);
       for (const { c, path } of tickets) {
@@ -100,21 +100,21 @@ export const rules = [
         if (!lottery(e)) r(`${path}.ticket`, 'ticket ใช้ได้เฉพาะ lottery_numen');
         if (c.cost !== undefined || c.effects?.money !== undefined || c.outcomes !== undefined) r(path, 'ตัวเลือกซื้อใบห้ามมี cost/effects.money/outcomes — ราคาใบมาจาก belief.stake รางวัลมาจากตาราง');
       }
-      if (lottery(e) && tickets.length !== 1) r('.choices', `หวยสายมูต้องมีตัวเลือก ticket: true 1 ตัว ได้ ${tickets.length}`);
+      if (lottery(e) && tickets.length !== 1) r('.choices', `หวยสายลี้ลับต้องมีตัวเลือก ticket: true 1 ตัว ได้ ${tickets.length}`);
     },
   },
   {
     id: 'ledger-read',
-    desc: '(ค) เฉพาะ lottery_numen อ่านบัญชีบุญบาป (merit_ledger / odds_modifier / prize_table) ได้ · กิจกรรมสายมูอื่นห้ามมีตัวคูณกรรม',
+    desc: '(ค) เฉพาะ lottery_numen อ่านบัญชีบุญบาป (merit_ledger / odds_modifier / prize_table) ได้ · กิจกรรมสายลี้ลับอื่นห้ามมีตัวคูณกรรม',
     event(e, ctx, r) {
       if (lottery(e)) return;
       const b = beliefOf(e) ?? {};
       for (const k of ['odds_modifier', 'prize_table', 'cap_per_life', 'stake', 'trigger']) if (b[k] !== undefined) r(`.belief.${k}`, `${k} ใช้ได้เฉพาะ lottery_numen`);
       for (const { path, s } of strings(e)) if (/merit_ledger/.test(s)) r(path, 'อ่าน merit_ledger ได้เฉพาะ lottery_numen');
-      // ตัวคูณกรรมก็อ่านบัญชี — กิจกรรมสายมูห้ามให้บุญบาปเอียงโอกาสเกิดหรือผลสุ่ม
+      // ตัวคูณกรรมก็อ่านบัญชี — กิจกรรมสายลี้ลับห้ามให้บุญบาปเอียงโอกาสเกิดหรือผลสุ่ม
       if (!beliefOf(e)) return;
-      if (isObj(e.multipliers) && e.multipliers.karma !== undefined) r('.multipliers.karma', 'กิจกรรมสายมูห้ามใช้ตัวคูณกรรม');
-      for (const { node, path } of effectSites(e)) if (isObj(node.multipliers) && node.multipliers.karma !== undefined) r(`${path}.multipliers.karma`, 'กิจกรรมสายมูห้ามใช้ตัวคูณกรรม');
+      if (isObj(e.multipliers) && e.multipliers.karma !== undefined) r('.multipliers.karma', 'กิจกรรมสายลี้ลับห้ามใช้ตัวคูณกรรม');
+      for (const { node, path } of effectSites(e)) if (isObj(node.multipliers) && node.multipliers.karma !== undefined) r(`${path}.multipliers.karma`, 'กิจกรรมสายลี้ลับห้ามใช้ตัวคูณกรรม');
     },
   },
   {
@@ -124,7 +124,7 @@ export const rules = [
       for (const { path, s } of textsOf(e)) for (const k of placeholdersIn(s)) if (isLedgerPlaceholder(k)) r(path, `ช่อง {${k}} อ่านค่าบัญชีที่ต้องซ่อน`);
     },
   },
-  lotteryRule('lottery-prize-text', `(ค) หวยสายมูที่เกิดได้ก่อนปี ${LOTTERY.prizeTextBefore} ห้ามระบุมูลค่ารางวัลเป็นตัวเลข`, (e, r) => {
+  lotteryRule('lottery-prize-text', `(ค) หวยสายลี้ลับที่เกิดได้ก่อนปี ${LOTTERY.prizeTextBefore} ห้ามระบุมูลค่ารางวัลเป็นตัวเลข`, (e, r) => {
     if (!isRange(e.years, YEAR_MIN, YEAR_MAX) || e.years[0] >= LOTTERY.prizeTextBefore) return;
     for (const { path, s } of textsOf(e)) if (/[0-9๐-๙][0-9๐-๙,]*\s*(บาท|ล้าน|แสน|หมื่น)/.test(s)) r(path, 'มีมูลค่าเป็นตัวเลขในเหตุการณ์ที่เกิดได้ก่อนปี 2560');
   }),

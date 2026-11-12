@@ -1,8 +1,8 @@
 // การ์ดซ้ำ + ผลย้อนถึงจริง ต่อชีวิต (ไอเดีย bitlife-8): คำบ่นหลักของเกมแนวนี้คือ "ใบเดิมอีกแล้ว" กับ "เลือกไปไม่มีผล"
 // ข้อ 1 ใบเนื้อหาที่ออกเกินมา (ครั้งที่ 2+ ของ id เดียว) ต่อชีวิต p95 ≤ MAX_EXTRA
-// ข้อ 2/3 นัดผลย้อนที่แกนใส่จริง (st.scheduled.push) นอกสายมู: ถึงตรงอายุนัด ≥ MIN_HIT · ยังมีชีวิตแต่ไม่ออก (ค้าง) ≤ MAX_STUCK
+// ข้อ 2/3 นัดผลย้อนที่แกนใส่จริง (st.scheduled.push) นอกสายลี้ลับ: ถึงตรงอายุนัด ≥ MIN_HIT · ยังมีชีวิตแต่ไม่ออก (ค้าง) ≤ MAX_STUCK
 // continuity ตรวจว่าผลย้อนออกตรงปีและตาม when — ด่านนี้วัดว่านัดที่ใส่ไปถึงผู้เล่นกี่ส่วน และแยกค้างออกจากตายก่อนนัด
-// สายมูไม่นับข้อ 2/3: ระบบความเชื่อปล่อย/ล้างธงที่ when อ่านเอง (ตรวจที่ npm run belief)
+// สายลี้ลับไม่นับข้อ 2/3: ระบบความเชื่อปล่อย/ล้างธงที่ when อ่านเอง (ตรวจที่ npm run belief)
 import { playLife, newLife, mixSeed, whenOk } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
@@ -17,7 +17,7 @@ const byId = Object.fromEntries(content.events.map((e) => [e.id, e]));
 const q = (xs, p) => [...xs].sort((a, b) => a - b)[Math.min(xs.length - 1, Math.floor(p * xs.length))];
 const pct = (a, b) => (b ? `${((100 * a) / b).toFixed(1)}%` : '-');
 
-// สายมูดูทั้งสาย (ต้นทาง + ปลายทางทุกชั้น) แบบ continuity — ปลายทางที่ไม่ได้ขึ้นต้น bel_ แต่อยู่ในสายความเชื่อก็นับเป็นมู
+// สายลี้ลับดูทั้งสาย (ต้นทาง + ปลายทางทุกชั้น) แบบ continuity — ปลายทางที่ไม่ได้ขึ้นต้น bel_ แต่อยู่ในสายความเชื่อก็นับเป็นมู
 const up = new Map(), down = new Map();
 const link = (from, to) => { for (const [m, a, b] of [[up, to, from], [down, from, to]]) (m.get(a) ?? m.set(a, new Set()).get(a)).add(b); };
 for (const e of content.events) for (const c of e.choices ?? []) {
@@ -102,7 +102,7 @@ const lives = extras.length;
 console.log(`\nใบเนื้อหาที่ออกเกินมาต่อชีวิต: p50 ${q(extras, 0.5)} · p95 ${q(extras, 0.95)} · สูงสุด ${Math.max(...extras)} · id ซ้ำต่อชีวิต p95 ${q(dupIdsLife, 0.95)} · ชีวิตที่มี ≥1 ${pct(extras.filter((x) => x).length, lives)}`);
 console.log(`  ตัดออก (ครั้งที่ 2+): ${SKIP.map((p) => `${p}* ${skipped[p]}`).join(' · ')} · แกนสร้างอื่นที่ไม่มีใน content ${engineOnly}`);
 console.log(`  id ซ้ำบ่อยสุด (สัดส่วนชีวิต): ${[...dupIds].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([id, v]) => `${id} ${pct(v, lives)}`).join(' · ')}`);
-console.log(`\nนัดผลย้อนนอกสายมู ${E.n} นัด (${(E.n / lives).toFixed(2)}/ชีวิต): ถึงตรงนัด ${pct(E.hit, E.n)} · ตายก่อนนัด ${pct(E.dead, E.n)} · ออกไปก่อนนัดแล้ว ${pct(E.done, E.n)} · ค้าง ${pct(E.stuck, E.n)}`);
+console.log(`\nนัดผลย้อนนอกสายลี้ลับ ${E.n} นัด (${(E.n / lives).toFixed(2)}/ชีวิต): ถึงตรงนัด ${pct(E.hit, E.n)} · ตายก่อนนัด ${pct(E.dead, E.n)} · ออกไปก่อนนัดแล้ว ${pct(E.done, E.n)} · ค้าง ${pct(E.stuck, E.n)}`);
 console.log('  ค้างแยกเหตุ (ให้เลน A ดูเงื่อนไขปลายทาง):');
 for (const [id, o] of [...stuckIds].sort((a, b) => b[1].n - a[1].n).slice(0, 15)) {
   const { n: k, ...why } = o;
@@ -112,7 +112,7 @@ console.log(`\nเหตุบ้านเมืองต่อกลุ่ม�
 console.log('');
 check('เหตุบ้านเมืองกลุ่มเดียวกันไม่เกิน 1 ใบต่อชีวิต', eraOver, ` · ${eraOver} ชีวิต`);
 check(`ใบเนื้อหาที่ออกเกินมาต่อชีวิต p95 ≤ ${REPEAT.maxExtra}`, q(extras, 0.95) > REPEAT.maxExtra ? 1 : 0, ` · ${q(extras, 0.95)}`);
-check(`ผลย้อนนอกสายมูถึงตรงนัด ≥ ${REPEAT.minHit * 100}%`, E.hit < REPEAT.minHit * E.n ? 1 : 0, ` · ${pct(E.hit, E.n)}`);
-check(`ผลย้อนนอกสายมูค้าง ≤ ${REPEAT.maxStuck * 100}%`, E.stuck > REPEAT.maxStuck * E.n ? 1 : 0, ` · ${pct(E.stuck, E.n)}`);
+check(`ผลย้อนนอกสายลี้ลับถึงตรงนัด ≥ ${REPEAT.minHit * 100}%`, E.hit < REPEAT.minHit * E.n ? 1 : 0, ` · ${pct(E.hit, E.n)}`);
+check(`ผลย้อนนอกสายลี้ลับค้าง ≤ ${REPEAT.maxStuck * 100}%`, E.stuck > REPEAT.maxStuck * E.n ? 1 : 0, ` · ${pct(E.stuck, E.n)}`);
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 if (fail) process.exitCode = 1;

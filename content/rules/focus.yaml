@@ -201,7 +201,7 @@ focuses:
       - {chance: 0.06, fx: {money: {unit: income_x, amount: -2}, happiness: -2}, text: "ลูกค้ารายใหญ่เบี้ยวหนี้ทั้งก้อน กิจการขาดทุนหนักจนต้องเอาเงินเก็บมาโปะ"}
     kid: study_hard
   occult:
-    name: ศึกษาสายมู
+    name: ศึกษาสายลี้ลับ
     group: gate
     stages: [วัยรุ่น, หนุ่มสาว, ทำงาน, กลางคน, ชรา]
     fx: {happiness: 1, money: {unit: income_x, amount: -0.5}, knowledge: -1}

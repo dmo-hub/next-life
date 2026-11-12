@@ -328,7 +328,7 @@ for (const { doc } of realDocs) for (const { s: f } of flagNames(doc)) used.add(
 const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death', 'army_family', 'police_family'];
 const stale = [...ctx.flags.flags, ...ctx.flags.prefixes].filter((f) => !used.has(f) && !ENGINE_FLAGS.includes(f));
 rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${ctx.flags.prefixes.size} ชื่อหน้า · ค้าง ${stale.length}`]);
-// ธงมีพารามิเตอร์ยังไม่มีเนื้อหาจริงใช้ (มีแค่ใน fixture สายมู) จึงไม่นับว่าค้าง
+// ธงมีพารามิเตอร์ยังไม่มีเนื้อหาจริงใช้ (มีแค่ใน fixture สายลี้ลับ) จึงไม่นับว่าค้าง
 for (const f of stale) if (!ctx.flags.prefixes.has(f)) fails.push(`ทะเบียนธง: "${f}" ไม่มีเนื้อหาใน content/ ใช้`);
 // แกนนัดการ์ดชดใช้ทุนด้วย id — ไม่มีใน content = dueAt ข้ามเงียบ ทุนกลับเป็นของฟรี
 if (!realDocs.some(({ doc }) => (doc.events ?? []).some((e) => e.id === BOND_EVENT))) fails.push(`การ์ดชดใช้ทุน "${BOND_EVENT}" ไม่มีใน content/`);

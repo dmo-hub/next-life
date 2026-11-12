@@ -79,7 +79,7 @@ npm run rel -- <notes.json> [worktree]
 | `npm run sim` | จำลอง 1,000 ชีวิต ดูผลเร็ว ๆ |
 | `npm run gate` | 20,000 ชีวิต: อายุตายตรงตารางชีพจริง · ความยาวชีวิต · ค่าแถบไม่หลุด 0–100 |
 | `npm run full` | ชุดเต็มก่อนขึ้น main · `-- --seed2 N` รันซ้ำ seed เดิม · `full:release` 100,000 ชีวิต |
-| `npm run merit` · `lineage` · `finance` · `belief` · `titles` | ด่านเฉพาะระบบ: บุญบาป · ข้ามรุ่น · การเงิน · สายมู · ฉายา |
+| `npm run merit` · `lineage` · `finance` · `belief` · `titles` | ด่านเฉพาะระบบ: บุญบาป · ข้ามรุ่น · การเงิน · สายลี้ลับ · ฉายา |
 | `npm run lifehash` | เทียบผลเล่นก่อน/หลังแก้ ว่าเปลี่ยนแค่ที่ตั้งใจ |
 | `npm run shots` | ตรวจล้นจอ/console ทุกหน้าเว็บ 390/1280 + ถ่ายภาพจอเกม เริ่ม · กลางชีวิต · ตาย ลง `docs/dev/shots/` (แล้ว build ให้หน้าดีไซน์ UI ขึ้นภาพ) · `-- --check` ตรวจอย่างเดียว ไม่เขียนภาพ (ต้องมี playwright-core) |
 | `npm run fetch:data` · `fetch:finance` | ดึงข้อมูล World Bank / WHO ใหม่ (ต้องต่อเน็ต) |
