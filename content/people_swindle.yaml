@@ -160,7 +160,7 @@ events:
     category: society
     stage: ชรา
     years: [2500, 2650]
-    weight: 0.0625
+    weight: 0.25
     when: {age: [60, 85]}
     multipliers: {flags: {scam_aware: 0.5}}
     title: "เพื่อนซื้อไปแล้วนะคะ"
@@ -451,7 +451,7 @@ events:
     category: family
     stage: ชรา
     years: [2500, 2650]
-    weight: 0.0625
+    weight: 1
     when: {age: [60, 85], family: [{role: child, alive: true}]}
     multipliers: {flags: {scam_aware: 0.5}}
     title: "ทองคำเพื่อไปขึ้นครู"
@@ -526,7 +526,7 @@ events:
     category: health
     stage: ชรา
     years: [2500, 2650]
-    weight: 0.0625
+    weight: 0.25
     when: {age: [60, 85]}
     title: "ยาเม็ดปั้นจากลุงท้ายซอย"
     text: "ปวดข้อมาหลายเดือน ลุงท้ายซอยเอายาปั้นเม็ดกลมดำมาฝาก ฉลากเขียนว่าแก้ปวดเส้นปวดข้อและหอบหืดในขวดเดียว กินแล้วเดินคล่องจริงภายในวันเดียว คนทั้งซอยมาขอซื้อต่อ แต่พักนี้คุณส่องกระจกแล้วเห็นหน้าตัวเองกลมขึ้นทุกวัน"
