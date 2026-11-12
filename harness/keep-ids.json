@@ -1,5 +1,5 @@
 {
- "version": "v0.6.118",
+ "version": "v0.6.121",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -163,6 +163,7 @@
   "debt_shark_threat_01",
   "debt_shark_young_deadline_01",
   "debt_shark_young_door_01",
+  "dungeon_breach_01",
   "dungeon_hunt_boss_01",
   "dungeon_hunt_mid_01",
   "dungeon_pull_mid_01",
@@ -577,6 +578,7 @@
   "dungeon_hunt_boss_01",
   "dungeon_pull_mid_01",
   "dungeon_pull_out_01",
+  "dungeon_breach_01",
   "echo_lent_friend_01",
   "echo_kept_savings_01",
   "echo_rescued_junior_01",
