@@ -108,7 +108,6 @@ events:
     category: study
     stage: หนุ่มสาว
     years: [2500, 2650]
-    weight: 1
     when: {age: [19, 22], school: [uni], flags: {has: [kru_aim, exam_pass:uni], not: [kru_student, kru_civil]}}
     title: "นักศึกษาครู"
     text: "ชุดนักศึกษาครูต้องรีดจีบให้ตรงทุกเช้า วิชาแรกให้ยืนสอนเพื่อนในห้องห้านาที อาจารย์จับเวลาแล้วชี้ว่าคุณหันหลังให้ห้องตอนเขียนกระดานนานเกินไป"

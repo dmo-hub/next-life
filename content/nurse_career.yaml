@@ -76,7 +76,6 @@ events:
     category: study
     stage: หนุ่มสาว
     years: [2500, 2650]
-    weight: 1
     when: {age: [19, 22], school: [uni], flags: {has: [nurse_aim, exam_pass:uni], not: [nurse_student, nurse_rn, nurse_missed]}}
     title: "ชุดขาวตัวแรก"
     text: "รายชื่อนักศึกษาพยาบาลติดบอร์ดหน้าอาคารเรียน วันรายงานตัวต้องวัดตัวตัดชุดขาว ทั้งชั้นปีมีหอพักหลังเดียว กฎเข้าหอสองทุ่ม อาจารย์บอกว่าปีหน้าเริ่มลงฝึกบนตึกผู้ป่วย"

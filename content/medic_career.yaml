@@ -115,7 +115,6 @@ events:
     category: study
     stage: หนุ่มสาว
     years: [2500, 2650]
-    weight: 1
     when: {age: [19, 22], school: [uni], flags: {has: [med_aim, exam_pass:uni], not: [med_student, med_doctor, med_missed]}}
     title: "ประกาศผลคณะแพทย์"
     text: "คะแนนสอบเข้ามหาวิทยาลัยพอให้ติดคณะหนึ่งแล้ว แต่รายชื่อคณะแพทย์ประกาศช้ากว่า คืนนั้นคนทั้งบ้านนั่งรอหน้าจอ ใครบางคนจุดธูปไว้หน้าหิ้งตั้งแต่หัวค่ำ"
