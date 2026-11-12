@@ -107,7 +107,7 @@ export const TRADITIONS = ['พุทธ', 'ผี', 'พราหมณ์', '�
 export const OUTSIDE_CANON = ['odds_by_merit', 'vow_broken', 'intent_merit'];
 export const INTENTS = ['sincere', 'wish_for_gain'];
 export const REDEEM = ['full', 'light', 'defer', 'none'];
-// ผลที่กิจกรรมสายมูให้ได้ (ใบ 12 ข้อ ข) — เงินต้องเป็นจ่ายออกเท่านั้น
+// ผลที่กิจกรรมสายลี้ลับให้ได้ (ใบ 12 ข้อ ข) — เงินต้องเป็นจ่ายออกเท่านั้น
 export const BELIEF_EFFECTS = ['happiness', 'relations', 'money'];
 export const LOTTERY = { maxMult: 4, cap: 5, prizeTable: 'finance.lottery', prizeTextBefore: 2560 };
 export const VOW_LIGHT_MAX = 0.05;

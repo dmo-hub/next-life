@@ -103,6 +103,9 @@ const SPARE_WORDS = { health: 'ร่างกายแข็งแรงกว�
 const SPARE_NONE = 'ติดตัวมาแต่เกิด: เด็กคนนี้โดดเด่นรอบด้านอยู่แล้ว ช่องที่เว้นไว้จึงไม่มีอะไรเติมได้อีก';
 const spareText = (keys) => (keys.length ? `ติดตัวมาแต่เกิด: ${keys.map((k) => SPARE_WORDS[k]).join(' · ')}` : SPARE_NONE);
 
+// ธงบ้านเกิด (ใบ 105): บรรทัดเดียวต่อธงตามลำดับทะเบียน · ไม่มีธง/เซฟเก่า = ไม่มีบรรทัด · ข้อความอยู่ content/rules/flags.yaml home:
+const homeLines = (st) => Object.entries(st.content?.home ?? {}).filter(([f]) => st.homeFlags?.[f]).map(([, h]) => h.tell);
+
 export function introCard(st, heir) {
   return {
     kind: 'intro',
@@ -113,7 +116,7 @@ export function introCard(st, heir) {
     text: st.age > 0
       ? `คุณเล่นต่อเป็น “${st.name}” วัย ${st.age} ปี ที่${provinceLabel(st)} ชื่อจริงว่า “${st.realName}”`
       : `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${provinceLabel(st)} ได้ชื่อจริงว่า “${st.realName}” ชื่อเล่นว่า “${st.name}”`,
-    story: [familyText(st), eraText(st), ...(st.spare ? [spareText(st.spare)] : [])],
+    story: [familyText(st), eraText(st), ...homeLines(st), ...(st.spare ? [spareText(st.spare)] : [])],
     // heir ที่ไม่มีรุ่นก่อน (harness สร้างทับค่าเกิดเฉย ๆ) ไม่มีอะไรให้สืบทอด
     inherit: heir && st.lineage.length ? inheritText(st, heir) : [],
     lineage: lineageBrief(st.lineage),

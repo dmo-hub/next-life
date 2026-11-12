@@ -187,6 +187,20 @@ function birthHeirFlags(seed, content, heir) {
   return { [r.next() < (n.heir_police_share ?? 0.5) ? 'police_family' : 'army_family']: 1 };
 }
 
+// ธงบ้านเกิด (ใบ 105): สุ่มเฉพาะเกิดใหม่ (ไม่มี heir) จาก stream แยก — ไม่กินเลขสุ่มของโลก · ทอยครบทุกธงเสมอ ลำดับเลขจึงไม่ขึ้นกับผลทอยก่อนหน้า
+// ธงที่มี class_max ไม่ทอย อ่านจากฐานะที่สุ่มไว้แล้ว · ทายาทได้ธงจากชีวิตรุ่นก่อนผ่าน heir.homeFlags (afterlife.mjs) ไม่สุ่มซ้ำ
+export function rollHomeFlags(content, seed, clsIdx) {
+  const rng = makeRng(seed ^ 0xbb67ae85);
+  const out = {};
+  for (const [f, h] of Object.entries(content.home ?? {})) {
+    if (h.p === undefined) continue;
+    const hit = rng.next() < h.p;
+    if (hit && !(h.not_with ?? []).some((o) => out[o])) out[f] = 1;
+  }
+  for (const [f, h] of Object.entries(content.home ?? {})) if (h.class_max !== undefined && clsIdx <= h.class_max) out[f] = 1;
+  return out;
+}
+
 export function newLife(seed, content, heir = null) {
   const era = content.era;
   const rng = makeRng(seed);
@@ -290,6 +304,8 @@ export function newLife(seed, content, heir = null) {
     // ธงของรุ่นก่อนที่ทายาทได้รู้ {ธง: ชั้น} — แยกจาก flags เพราะ flags คือสิ่งที่ตัวเองเคยทำ (ฉายา/ความเสี่ยงตายอ่านอยู่)
     // B5: ทางเป็นลูก/สายเลือด = ธงจากรุ่นก่อนเท่านั้น · ครอบครัวใหม่ (afterlife ส่ง {} มา) = สุ่มทายาทจากการเกิด
     parentFlags: heir?.tier ? heir.parentFlags ?? {} : { ...(heir?.parentFlags ?? {}), ...birthHeirFlags(seed, content, heir) },
+    // ธงบ้านเกิด {ธง: 1} — เล่าที่การ์ดเกิด · การ์ดเด็กอ่านด้วย when.home_flags · เซฟเก่าไม่มีช่อง = ไม่มีธง (อ่านแบบ ?.)
+    homeFlags: heir ? (heir.homeFlags ?? {}) : rollHomeFlags(content, seed, CLASSES.indexOf(cls)),
     // สกิลที่พกมาจากคลัง [{ id, lv }] (06s) ใช้ทั้งชีวิตนี้และชาติต่างโลกที่ตามมา · ไม่พก = ไม่มีช่อง (state เท่าก่อนมีสกิลข้ามชาติ)
     ...(heir?.skills?.length && { skills: heir.skills }),
     // ค่าที่ได้จากช่องพกที่ไม่ใช้ (ใบ 201) — การ์ดเกิดบอกเป็นคำ · เซฟเก่าไม่มี = ไม่มีบรรทัด
@@ -414,7 +430,7 @@ export function riskLabel(outcomes) {
   return RISK.find(([max]) => spread <= max)[1];
 }
 
-// ป้ายผลบนตัวเลือก (ใบ 07): ผลคงที่ = ↑/↓ · ค่าที่เหตุการณ์ซ่อน = ? · หวยสายมู = ? เสมอ (ใบ 12)
+// ป้ายผลบนตัวเลือก (ใบ 07): ผลคงที่ = ↑/↓ · ค่าที่เหตุการณ์ซ่อน = ? · หวยสายลี้ลับ = ? เสมอ (ใบ 12)
 // ผลสุ่มที่มีทางสำเร็จ (ok) = % สำเร็จ · ผลสุ่มที่ไม่มีทางสำเร็จ = ระดับเสี่ยงจากความกว้างของผล
 function choiceFx(st, ev, c) {
   if (ev.belief?.kind === 'lottery_numen') return '?';
@@ -1408,6 +1424,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     // สายเรื่องรายคน: ตอนที่เท่าไร ห่างตอนก่อนกี่ปี — ป้ายบนการ์ด · harness นับระยะจากช่องนี้
     ...(ev.arc && { arc: { key: ev.arc, n: st.arcs[ev.arc].n, ...(st.arcs[ev.arc].gap && { gap: st.arcs[ev.arc].gap }) } }),
     ...parentFrom(st, ev),
+    ...homeFrom(st, ev),
     funeral: ev.id === FUNERAL.wishes || ev.id === FUNERAL.rite,
     age: st.age,
     stage: stageOf(st.age),
@@ -1766,7 +1783,7 @@ function drawPool(st, year) {
   // รอบที่กองแห้งนับแยกช่วงวัย — harness/pace.mjs อ่านเป็นรายการกองที่ต้องเติม (ไม่ออกไปกับการ์ด)
   if (!pool.length) (st.poolDry ??= {})[stage] = (st.poolDry[stage] ?? 0) + 1;
   if (!pool.length || st.rng.next() >= chance) return null;
-  // การ์ดทาง B (สายมู/ลาง) มีเป้าจำนวนต่อชีวิต — จับหลายรอบแล้วหรี่น้ำหนักตามรอบ ไม่ให้ล้นเป้า
+  // การ์ดทาง B (สายลี้ลับ/ลาง) มีเป้าจำนวนต่อชีวิต — จับหลายรอบแล้วหรี่น้ำหนักตามรอบ ไม่ให้ล้นเป้า
   const b = poolEffectScale(stage);
   return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers) * (e.type === 'B' ? b : 1) * lifeFocusMul(st, e)));
 }
@@ -1967,6 +1984,7 @@ export function poolMultiplier(st, m) {
   if (m.overlap_stage !== undefined) x *= m.overlap_stage ** overlapStageOf(st);
   for (const [f, v] of Object.entries(m.flags ?? {})) if (st.flags[f]) x *= v;
   for (const [f, v] of Object.entries(m.parent_flags ?? {})) if (st.parentFlags?.[f]) x *= v;
+  for (const [f, v] of Object.entries(m.home_flags ?? {})) if (st.homeFlags?.[f]) x *= v;
   if (m.occupation && st.workFrom !== null) x *= m.occupation[st.occupation] ?? 1;
   if (m.rank) x *= m.rank ** rankLevel(st);
   // ตัวคูณเงิน {min, max, v}: อัตราส่วนอยู่ในช่วง = คูณ v · คำนวณเฉพาะการ์ดที่ใช้ เพราะกองสุ่มเรียกทุกใบทุกปี
@@ -1987,6 +2005,13 @@ const inBound = (v, b) => !b || ((b.min === undefined || v >= b.min) && (b.max =
 const flagsOk = (st, f) => (f.has ?? []).every((k) => st.flags[k]) && !(f.not ?? []).some((k) => st.flags[k]);
 // เซฟก่อนมีช่องนี้ไม่มี parentFlags — อ่านแบบ ?. ให้เท่ากับไม่มีธงพ่อแม่
 const parentFlagsOk = (st, f) => (f.has ?? []).every((k) => st.parentFlags?.[k]) && !(f.not ?? []).some((k) => st.parentFlags?.[k]);
+// ธงบ้านเกิด (ใบ 105) — เซฟก่อนมีช่องนี้ไม่มี homeFlags อ่านแบบ ?. ให้เท่ากับไม่มีธง
+const homeFlagsOk = (st, f) => (f.has ?? []).every((k) => st.homeFlags?.[k]) && !(f.not ?? []).some((k) => st.homeFlags?.[k]);
+// ป้ายบนการ์ด: ธงบ้านเกิดที่ทำให้ใบนี้ออก (when.home_flags.has เท่านั้น เหมือนป้ายธงพ่อแม่)
+const homeFrom = (st, ev) => {
+  const x = (ev.when?.home_flags?.has ?? []).filter((f) => st.homeFlags?.[f]);
+  return x.length ? { homeFrom: x } : {};
+};
 // ป้ายบนการ์ด: ธงพ่อแม่ที่ทำให้ใบนี้ออก (when.parent_flags.has เท่านั้น — ตัวคูณแค่เอียงโอกาส ไม่ได้เล่า)
 const parentFrom = (st, ev) => {
   const x = (ev.when?.parent_flags?.has ?? []).filter((f) => st.parentFlags?.[f]).map((f) => ({ flag: f, tier: st.parentFlags[f] }));
@@ -2017,6 +2042,7 @@ export function whenOk(st, when) {
     if (MONEY_KEYS.some((k) => when[k] && !inBound(r[k], when[k]))) return false;
   }
   if (when.parent_flags && !parentFlagsOk(st, when.parent_flags)) return false;
+  if (when.home_flags && !homeFlagsOk(st, when.home_flags)) return false;
   if (when.dark_gate && !darkGateOk(st)) return false;
   if (when.past_life && !pastLifeOk(st, when.past_life)) return false;
   return !when.flags || flagsOk(st, when.flags);
@@ -2195,7 +2221,7 @@ export function choose(st, idx, loan) {
   // ผลสุ่ม: จับทางด้วย rng ของโลก (เป็นผลของการเลือก) แล้วเล่าเป็นการ์ดผลลัพธ์ใบถัดไป
   // น้ำหนักแต่ละทางเอียงตาม multipliers ของทางนั้น — บัญชีอ่านหลังป้ายบุญบาปของตัวเลือกนี้ลงแล้ว (กรรมตามทันทันที)
   // การ์ดที่ตัวเลือกนี้ก่อ (ผล → เรื่องต่อ → หางาน) เข้าหัวคิวตามลำดับ ก่อนการ์ดอื่นของปีที่รออยู่
-  // สายมูก่อการ์ดของตัวเองได้ (ผลหวยสายมู) — มาก่อนผลสุ่มของตัวเลือก
+  // สายลี้ลับก่อการ์ดของตัวเองได้ (ผลหวยสายลี้ลับ) — มาก่อนผลสุ่มของตัวเลือก
   const after = beliefChoice(st, ev, c);
   // ตัวเลือกตรงไม่มีการ์ดผล — ของที่ได้เล่าเป็นการ์ดผลใบเดียว (lint ห้าม loot บนตัวเลือกที่มี outcomes)
   if (gotC) after.unshift({ kind: 'result', type: ev.type ?? 'A', age: st.age, stage: stageOf(st.age), text: gotC, tag: 'loot', evId: ev.id });

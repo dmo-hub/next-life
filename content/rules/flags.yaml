@@ -233,3 +233,14 @@ heir:
   # ตั้งตอนเข้าสายยศ army/police (rank.mjs markService) · ครอบครัวใหม่สุ่มได้ตอนเกิด numbers.heir_birth_p (life.mjs birthHeirFlags)
   army_family: {tier: 1, from_age: 0, tell: "พ่อหรือแม่เคยรับราชการทหาร"}
   police_family: {tier: 1, from_age: 0, tell: "พ่อหรือแม่เคยรับราชการตำรวจ"}
+
+# ธงบ้านเกิด (ใบ 105 · decisions 152 172) — เก็บที่ st.homeFlags แยกจาก st.flags และ st.parentFlags · อ่านด้วย when.home_flags / multipliers.home_flags
+# p = โอกาสต่อธงตอนเกิดใหม่ (stream แยก seed ^ 0xbb67ae85 · ทายาทไม่สุ่ม) · not_with = ติดธงที่ระบุแล้วธงนี้ตก
+# class_max = ไม่สุ่ม ได้เมื่อ index ฐานะตอนเกิดไม่เกินค่านี้ (ใช้ฐานะที่สุ่มอยู่แล้ว) · from_life_flags = ทายาทสายเลือด (ชั้นลูก) ได้เมื่อรุ่นก่อนเคยติดธงใดธงหนึ่งใน flags: (หรือเคยล้มละลาย)
+# tell = บรรทัดบนการ์ดเกิด ไม่มีตัวเลข ไม่สัญญาผล
+home:
+  strict_home: {p: 0.2, tell: "ที่บ้านเข้มงวด กฎมีไว้ให้ทำตาม"}
+  lenient_home: {p: 0.2, not_with: [strict_home], tell: "ที่บ้านปล่อยให้เด็กตัดสินใจเองตั้งแต่เล็ก"}
+  warm_home: {p: 0.25, tell: "ที่บ้านคุยกันได้ทุกเรื่อง กินข้าวเย็นพร้อมหน้า"}
+  busy_parents: {p: 0.2, tell: "พ่อแม่ออกแต่เช้ากลับมืด ฝากคุณไว้กับญาติ"}
+  home_in_debt: {class_max: 2, from_life_flags: [loan_shark, family_debt], tell: "ที่บ้านมีหนี้สินติดตัวมาตั้งแต่ก่อนคุณเกิด"}

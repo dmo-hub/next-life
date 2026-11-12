@@ -58,7 +58,7 @@ nodes:
     fx: { happiness: 1, relations: 1 }
     light: { happiness: 1 }
   o6:
-    name: ศึกษาสายมู
+    name: ศึกษาสายลี้ลับ
     branch: occ
     size: s
     hidden: true

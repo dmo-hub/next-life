@@ -398,6 +398,8 @@ export function loadCareers(fin) {
 
 // หมวด heir: ของทะเบียนธง = ชุดธงที่แกนส่งถึงทายาท — แกนต้องรู้ตอนเล่น ไม่ใช่แค่ lint
 const loadHeir = () => parse(read('content/rules/flags.yaml')).heir ?? {};
+// หมวด home: ของทะเบียนธง = ธงบ้านเกิด (ใบ 105) — แกนอ่านตอนสุ่มเกิด/เล่าที่การ์ดเกิด
+const loadHome = () => parse(read('content/rules/flags.yaml')).home ?? {};
 
 // คำใบ้ที่ศาลตอนเฉียดตาย (B153) ระดับละหลายข้อความ — ไม่ใช่การ์ด จึงตรวจตอนโหลดแทนด่านเนื้อหา
 // ห้ามเลขคู่คำบุญ/บาป (กติกาเดียวกับด่านการ์ดไม่เผยบัญชีของ harness)
@@ -544,5 +546,5 @@ export function loadContent() {
   const cadet = loadCadet();
   checkCadetEraCards(cadet, events);
   checkCadetHeirText(cadet);
-  return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet };
+  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), focus, tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet };
 }

@@ -239,7 +239,7 @@ Other checks:
 | File | Events | Covers |
 |---|---|---|
 | afterlife | 28 | Between-lives scenes |
-| belief | 22 | สายมู |
+| belief | 22 | สายลี้ลับ |
 | business | 14 | Era-appropriate business |
 | career_first | 15 | `first_of` cards |
 | child_family | 10 | Childhood, family |
