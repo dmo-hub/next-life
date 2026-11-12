@@ -153,13 +153,13 @@ The 9 occupations (baht/month, 2561):
 - **Every GAME_CATS weight must be below the minimum level-1 weight of the canonical categories** (now .5 < 1).
 - Karma bounds are valid.
 
-## 3. Belief / สายมู (`src/engine/belief.mjs`, `content/belief.yaml`)
+## 3. Belief / สายลี้ลับ (`src/engine/belief.mjs`, `content/belief.yaml`)
 
 ### Activities and lint
 - The 6 kinds:
   - fortune (ดูดวง)
   - auspicious_time (ฤกษ์)
-  - lottery_numen (หวยสายมู)
+  - lottery_numen (หวยสายลี้ลับ)
   - vow (บนบาน/แก้บน)
   - amulet (เครื่องราง/สักยันต์)
   - merit_wish (ทำบุญเสริมดวง)

@@ -27,7 +27,7 @@ Snapshot: v0.6.31 (2026-11-03) · repo `D:\dev\g` · remote `dmo-hub/next-life` 
    - Real economic and disaster events are included. Politics and the monarchy are never touched.
 2. **The fantasy has real game effects.**
    - Karma is strong. It affects death rates (×0.75–×2.0) and wealth in the next life.
-   - สายมู (folk-belief practices) only affect comfort and social stats. The exception is the mu-lottery.
+   - สายลี้ลับ (folk-belief practices) only affect comfort and social stats. The exception is the mu-lottery.
 3. **Choices show direction only (↑/↓), never numbers**, so a script can't easily play the game.
 4. **The family is the long story:** wealth, fame, inheritance and karma pass to the next generation.
 5. **Nothing in the game reads like real investment advice.** Every finance page carries "เกม ไม่ใช่คำแนะนำการลงทุน" (game, not investment advice).
@@ -43,7 +43,7 @@ Snapshot: v0.6.31 (2026-11-03) · repo `D:\dev\g` · remote `dmo-hub/next-life` 
 | Death | Life table × health × karma; near-death; court; funeral | 02 |
 | Finance | 6 assets, real returns, real wages, 7 debt types, bankruptcy, grey money | 03 |
 | Merit/sin | Hidden ledger; 8 Phra Malai sins + vow_broken + game categories; omens | 03 |
-| สายมู | 6 activities; mu-lottery capped at 5 per life | 03 |
+| สายลี้ลับ | 6 activities; mu-lottery capped at 5 per life | 03 |
 | Afterlife + lineage | transfer → devaduta → verdict → path → scene → carry; 30–70% carried; inheritance; fame | 03 |
 | Titles | 4 axes → 17 patterns; 29 titles; 7 family titles | 03 |
 | Content + lint | ~447 YAML events, 86 lint rules | 04 |

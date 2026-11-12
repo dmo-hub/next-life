@@ -1,5 +1,5 @@
-// harness ของสายมู (B09 · ใบ 12 ด่าน harness 6–7) บนเนื้อหาจริง
-// ด่าน 6: หวยสายมู — รางวัลเล็กของบุญเต็ม ÷ 1.4% ≈ max_mult · บาปมาก = ฐานจริง · รางวัลใหญ่ไม่ขยับทุกบอท · เพดานต่อชีวิตไม่ทะลุ
+// harness ของสายลี้ลับ (B09 · ใบ 12 ด่าน harness 6–7) บนเนื้อหาจริง
+// ด่าน 6: หวยสายลี้ลับ — รางวัลเล็กของบุญเต็ม ÷ 1.4% ≈ max_mult · บาปมาก = ฐานจริง · รางวัลใหญ่ไม่ขยับทุกบอท · เพดานต่อชีวิตไม่ทะลุ
 // ด่าน 7: เหตุการณ์ belief ไม่เปลี่ยนอายุเฉลี่ยของบอทสุ่ม (ตัดเหตุการณ์ belief ออกทั้งชุดเป็นตัวควบคุม)
 // ตัวคูณ m คำนวณตอนบอทกดซื้อจากฟังก์ชันเดียวกับแกน — harness อ่านบัญชีได้ แกนไม่เก็บ m ไว้ใน state
 import { playLife, openChoices, mixSeed, makeRng, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, LOTTERY_PRIZES, drawPrize, smallPrizeMult } from '../src/engine/index.mjs';
@@ -55,7 +55,7 @@ for (const m of [1, MAX_MULT]) {
   console.log(`  m ${m}: เล็ก ÷ ฐาน ${f(small / DRAWS / P_SMALL, 3)} (CI ${f(s0 / P_SMALL, 3)}–${f(s1 / P_SMALL, 3)}) → ${verdict(okS)} · ใหญ่ ${pct(big / DRAWS, 4)} (CI ${pct(b0, 4)}–${pct(b1, 4)}) → ${verdict(okB)}`);
 }
 
-// บอทเลือกตามป้ายบุญบาปแบบ harness บุญบาป แต่ซื้อทุกครั้งที่เจอหวยสายมู — ได้ตัวอย่างใบมากพอต่อกลุ่ม
+// บอทเลือกตามป้ายบุญบาปแบบ harness บุญบาป แต่ซื้อทุกครั้งที่เจอหวยสายลี้ลับ — ได้ตัวอย่างใบมากพอต่อกลุ่ม
 const score = (c) =>
   (c.merit ?? []).reduce((s, t) => {
     const id = meritId(t.cat);
@@ -105,7 +105,7 @@ for (const [name, sign] of Object.entries(BOTS)) {
 
 const isSmall = (t) => t.prize && table.prizes.find((p) => p.id === t.prize).small;
 const isBig = (t) => t.prize && !isSmall(t);
-console.log(`\nด่าน 6ข หวยสายมูในเกม · ${n} ชีวิตต่อบอท · seed ${seed} · บอทซื้อทุกใบที่เจอ`);
+console.log(`\nด่าน 6ข หวยสายลี้ลับในเกม · ${n} ชีวิตต่อบอท · seed ${seed} · บอทซื้อทุกใบที่เจอ`);
 console.log('บอท     ชีวิตที่เจอ  ใบ    m เฉลี่ย  บุญเต็ม  เล็ก ÷ ฐาน (ทุกใบ)  ใหญ่ (ครั้ง/คาด)  สูงสุด/ชีวิต');
 for (const [name, r] of Object.entries(res)) {
   const N = r.tickets.length, k = r.tickets.filter(isSmall).length, big = r.tickets.filter(isBig).length;
@@ -149,6 +149,6 @@ const ages = (c) => {
 };
 const a = ages(content), b = ages(noBelief);
 const d = a.mean - b.mean, se = Math.sqrt(a.v / n + b.v / n);
-console.log(`\nด่าน 7: อายุเฉลี่ยบอทสุ่ม มีสายมู ${f(a.mean)} · ไม่มี ${f(b.mean)} (ตัด ${content.events.length - noBelief.events.length} เหตุการณ์) · ต่าง ${d >= 0 ? '+' : ''}${f(d)} ปี (CI 95% ${f(d - Z * se)}–${f(d + Z * se)} ต้องครอบ 0) → ${verdict(Math.abs(d) <= Z * se)}`);
+console.log(`\nด่าน 7: อายุเฉลี่ยบอทสุ่ม มีสายลี้ลับ ${f(a.mean)} · ไม่มี ${f(b.mean)} (ตัด ${content.events.length - noBelief.events.length} เหตุการณ์) · ต่าง ${d >= 0 ? '+' : ''}${f(d)} ปี (CI 95% ${f(d - Z * se)}–${f(d + Z * se)} ต้องครอบ 0) → ${verdict(Math.abs(d) <= Z * se)}`);
 
 if (fail) process.exitCode = 1;

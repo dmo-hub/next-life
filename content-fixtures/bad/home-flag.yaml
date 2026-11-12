@@ -1,0 +1,67 @@
+# อ้างธงบ้านเกิดที่ไม่อยู่หมวด home: (ชื่อพิมพ์ผิด · ธงปกติ) · ธงเดียวกันทั้ง has และ not · ตัวคูณไม่ใช่เลขบวก · ฉากระหว่างชาติอ่านไม่ได้
+events:
+  - id: bad_case_01
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [6, 12], home_flags: {has: [strict_hom, married]}}
+    multipliers: {home_flags: {warm_home: 0}}
+    text: "ข้อความการ์ด"
+    choices:
+      - text: "ทางที่หนึ่ง"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, multipliers: {home_flags: {busy_parents: -1}}, text: "ผลทางหนึ่ง", merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผลทางสอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_both
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [6, 12], home_flags: {has: [strict_home], not: [strict_home]}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_notlist
+    type: A
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [6, 12], home_flags: {has: strict_home}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_after_open_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    text: "ญาติทำบุญไปให้"
+    choices:
+      - {text: อนุโมทนา, merit: [{cat: dana, level: 1}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: bad_after_home_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: transfer
+    years: [2400, 2700]
+    when: {home_flags: {has: [strict_home]}}
+    text: "ญาติทำบุญไปให้"
+    choices:
+      - {text: อนุโมทนา, merit: [{cat: dana, level: 1}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
