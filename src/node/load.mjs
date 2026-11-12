@@ -12,6 +12,7 @@ import { PLACEHOLDERS, MAX_LEN, ID_RE } from './lint/vocab.mjs';
 import { isObj, isMoney } from './lint/util.mjs';
 import { NEAR_HINT_LEVELS } from '../engine/court.mjs';
 import { checkFocus } from './lint/focus.mjs';
+import { checkTree } from './lint/tree.mjs';
 import { lintIsekai, formatIsekaiProblem } from './lint/isekai.mjs';
 import { useIsekaiCards, ISEKAI_SKILLS } from '../engine/isekai.mjs';
 import { TITLES, ALL_PATTERNS, FAMILY_GOALS } from '../engine/titles.mjs';
@@ -427,6 +428,14 @@ function loadFocus() {
   return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, focuses: doc.focuses, ...(doc.natures && { natures: doc.natures, nature_age: doc.nature_age, heir_nature: doc.heir_nature, nature_mul: doc.nature_mul }) };
 }
 
+// ต้นไม้โฟกัส (ใบ 03): ทะเบียนผิดรูป = หยุด build
+function loadTree() {
+  const doc = parse(read('content/rules/tree.yaml'));
+  const bad = checkTree(doc);
+  if (bad.length) throw new Error(`content/rules/tree.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return { year_scale: doc.year_scale, light_unit: doc.light_unit, nodes: doc.nodes };
+}
+
 // สกิลตอนจบชีวิตไทย (06s): id แหล่งหรือ id สกิลพิมพ์ผิด = สกิลไม่เคยออกเงียบ ๆ จึงหยุด build
 // lifeGoal ยังไม่มีระบบให้เทียบ id — ตรวจแค่สกิล
 export function loadSkillMap(p = 'content/rules/skill-map.yaml', focus = loadFocus()) {
@@ -535,5 +544,5 @@ export function loadContent() {
   const cadet = loadCadet();
   checkCadetEraCards(cadet, events);
   checkCadetHeirText(cadet);
-  return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet };
+  return { events, era: loadEra(), heir: loadHeir(), nearHints: loadNearHints(), focus, tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet };
 }

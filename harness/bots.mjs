@@ -2,7 +2,7 @@
 // ทุกตัวเลือกจากตัวเลือกที่กดได้ (openChoices) · ตัดสินจากป้ายบนการ์ด (card.fx) ที่ผู้เล่นเห็นเท่านั้น
 // ข้อยกเว้นเดียว: สายบุญ/บาปอ่านป้ายบุญบาปของตัวเลือก (holder.pending · ต่างโลกอ่าน ISEKAI_MERIT ของการ์ด) แทนการอ่านความหมายของข้อความแบบที่คนทำ — ไม่อ่านบัญชี
 // เสมอกันสุ่มจาก stream ของบอท · holder = st (การ์ดชีวิต) หรือ af (การ์ดระหว่างชาติ)
-import { openChoices, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, STAT_LABELS, STAT_KEYS, makeRng, mixSeed, stageOf, lifeFocusOffers, lifeFocusDefs, setLifeFocus, FOCUS_FLOW, ISEKAI_FX, ISEKAI_LINK, ISEKAI_MERIT } from '../src/engine/index.mjs';
+import { openChoices, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, STAT_LABELS, STAT_KEYS, makeRng, mixSeed, stageOf, lifeFocusOffers, lifeFocusDefs, setLifeFocus, lifeTreeDefs, treeOffersNow, treeInvestNode, FOCUS_FLOW, ISEKAI_FX, ISEKAI_LINK, ISEKAI_MERIT } from '../src/engine/index.mjs';
 
 export const random = (card, rng) => {
   const open = openChoices(card);
@@ -153,3 +153,28 @@ const RAW_BOTS = {
 const FOCUS_KEY = { สายเงิน: 'money', สายสุขภาพ: 'health' };
 const HEALTH_WAY = { สุ่ม: 'avoid', สายสุขภาพ: 'seek' };
 export const BOTS = Object.fromEntries(Object.entries(RAW_BOTS).map(([k, b]) => [k, withFocus(b, FOCUS_KEY[k], HEALTH_WAY[k])]));
+
+// นโยบายต้นไม้ของบอท (ใบ 03 · ข้อ 85): ทุ่มโหนดเดียวทุกปีตลอดชีวิต ไม่มีตามน้ำ · เลือกโหนดตามโปรไฟล์แขนงเป้า ไม่ข้ามแขนงสุ่ม
+// โปรไฟล์ = ไล่ปลดให้ครบแขนงเป้า: เลือกโหนดที่เปิดอยู่ซึ่งมีโหนดลูกหลานในแขนงเยอะสุด (เสมอกันสุ่ม) · โหนดซ่อนบอทไม่แตะ
+// สุ่มจาก stream ของ seed ชีวิตแยกจากบอทเลือกตัวเลือกและ rng ของโลก — บอทที่ไม่ใส่ tree ไม่เคยแตะ ชีวิตของ lifehash เดิมจึงเท่าเดิม
+const TREE_SALT = 0x1b873593;
+const treeMemo = new WeakMap();
+const descendants = (defs, id) => {
+  const seen = new Set();
+  const walk = (x) => { for (const [k, d] of Object.entries(defs)) if (!seen.has(k) && (d.pre ?? []).includes(x)) { seen.add(k); walk(k); } };
+  walk(id);
+  return seen.size;
+};
+export function botTree(st, target) {
+  let rng = treeMemo.get(st);
+  if (!rng) treeMemo.set(st, (rng = makeRng(mixSeed(st.seed ^ TREE_SALT, st.gen ?? 1))));
+  const defs = lifeTreeDefs(st);
+  const offers = treeOffersNow(st).filter((id) => defs[id].branch === target && !defs[id].hidden);
+  if (st.tree?.cur && offers.includes(st.tree.cur)) return;
+  if (!offers.length) return;
+  const score = offers.map((id) => descendants(defs, id));
+  const top = Math.max(...score);
+  const from = offers.filter((_, i) => score[i] === top);
+  treeInvestNode(st, from[rng.int(0, from.length - 1)]);
+}
+export const withTree = (bot, target) => Object.assign((...a) => bot(...a), bot, { tree: (st) => botTree(st, target) });
