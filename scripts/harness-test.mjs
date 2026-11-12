@@ -154,13 +154,21 @@ const f2 = (v) => v.toFixed(2);
   // ตัดการ์ดจริงที่กั้นด้วย when.parent_flags ออก — pf_probe เป็นการ์ดเดียวที่ขึ้นป้าย (ใบที่มีแค่ตัวคูณไม่ขึ้นป้าย) ผลจึงไม่ขยับตามเนื้อหา
   const content = { ...base, events: [...base.events.filter((e) => !e.when?.parent_flags), { ...src, id: 'pf_probe', multipliers: undefined, weight: 1000, when: { parent_flags: { has: ['smoker'] } } }] };
   const pick = (card) => (card.locked ? card.locked.findIndex((x) => !x) : 0);
-  const run = (parentFlags) => {
+  const runWith = (cnt, seed, parentFlags) => {
     const seen = [];
-    const p = newLife(5, content);
-    playLife(5, content, pick, (c) => seen.push(c), newLife(5, content, { birthYear: p.birthYear, sex: p.sex, region: { name: p.region, ses: p.ses }, cls: p.cls, bonus: {}, parentFlags }));
+    const p = newLife(seed, cnt);
+    playLife(seed, cnt, pick, (c) => seen.push(c), newLife(seed, cnt, { birthYear: p.birthYear, sex: p.sex, region: { name: p.region, ses: p.ses }, cls: p.cls, bonus: {}, parentFlags }));
     return { probe: seen.filter((c) => c.id === 'pf_probe'), keyed: seen.filter((c) => 'parentFrom' in c) };
   };
+  // จั่วจากกองสุ่มตามโอกาสต่อปี — เนื้อหาเปลี่ยนแล้วลำดับสุ่มของ seed เดียวอาจไม่จั่ว probe เลย ⇒ หา seed แรกที่ถือธงแล้ว probe ออก (ไม่เจอ = คืน seed 5 ให้เช็กตก)
+  const SEEDS = Array.from({ length: 40 }, (_, i) => 5 + i);
+  const findSeed = (cnt) => SEEDS.find((s) => runWith(cnt, s, { smoker: 1 }).probe.length > 0) ?? 5;
+  const seed = findSeed(content);
+  const run = (parentFlags) => runWith(content, seed, parentFlags);
   const none = run({}), smoker = run({ smoker: 1 }), other = run({ heavy_drinker: 1 });
+  // ตัวควบคุม: probe ที่ต้องการธงที่ไม่มีใครถือ ⇒ ไม่มี seed ไหนใน 40 ตัวทำให้ probe ออก (ตัวหา seed ไม่เสกการ์ดขึ้นมาเอง)
+  const dead = { ...content, events: content.events.map((e) => (e.id === 'pf_probe' ? { ...e, when: { parent_flags: { has: ['pf_nobody_holds'] } } } : e)) };
+  check('B159 ตัวควบคุม: probe ต้องธงที่ไม่มีใครถือ ⇒ ไม่มี seed ไหนทำให้ออก', SEEDS.every((s) => runWith(dead, s, { smoker: 1 }).probe.length === 0));
   check('B159 ไม่มีธงพ่อแม่ = การ์ดอ่านธงไม่ออก · ไม่มีช่อง parentFrom', !none.probe.length && !none.keyed.length && !other.probe.length && !other.keyed.length);
   check('B159 ถือธงตรง = การ์ดออก ป้าย [{flag, tier}] เฉพาะใบนั้น', smoker.probe.length > 0 && smoker.keyed.length === smoker.probe.length && JSON.stringify(smoker.probe[0].parentFrom) === '[{"flag":"smoker","tier":1}]');
 }
