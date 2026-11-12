@@ -13,6 +13,7 @@ import { cadetActive, cadetCard, chooseCadet, cadetAfterChoice } from './cadet.m
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
+import { treeOffers, treeInvest, treeCard, treeYearEnd } from './tree.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
@@ -989,6 +990,7 @@ const HEIR_UNI_KNOW = 55;
 function stepYear(st) {
   const prevStage = stageOf(st.age);
   lifeFocusYear(st);
+  lifeTreeYear(st);
   natureLock(st);
   // ปีสุดท้ายที่ทำงานต้องวัดก่อนขึ้นอายุ — ขึ้นแล้ว isWorking เป็นเท็จ
   // คนที่ยังนั่งตำแหน่งเต็มเวลาหลังเกษียณวัดใหม่ทุกปีจนเลิกทำงาน — ปีที่ปกติถึงเกษียณได้ค่าเดิม
@@ -1826,6 +1828,20 @@ function lifeFocusYear(st) {
   (def.risk ?? []).forEach((r, i) => lifeFocusRisk(st, id, r, i));
 }
 
+// ต้นไม้โฟกัส (ใบ 03): กติกากลางอยู่ tree.mjs · เนื้อ content.tree · ไม่เคยทุ่ม = ไม่แตะอะไร (ไม่ดึงเลขสุ่ม)
+// ทุ่มอยู่: ผลเต็มของโหนดที่ทุ่มปีนี้ · ปลดแล้ว: ผลเบาถาวรของทุกโหนดที่ปลด ต่อปี (ผลของโหนดที่เพิ่งปลดปีนี้เริ่มปีหน้า)
+export const lifeTreeDefs = (st) => st.content.tree?.nodes ?? {};
+export const treeInvestNode = (st, id) => treeInvest(st, lifeTreeDefs(st), id, stageOf(st.age));
+export const treeOffersNow = (st) => treeOffers(st, lifeTreeDefs(st), stageOf(st.age));
+function lifeTreeYear(st) {
+  const c = st.content.tree;
+  if (!st.tree || !c) return;
+  const light = Object.keys(st.tree.done).filter((id) => st.tree.done[id] < st.age);
+  const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age);
+  if (r) applyEffects(st, c.nodes[r.id].fx, c.year_scale);
+  for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size]);
+}
+
 // เสี่ยงสุ่มของโฟกัส: ทอยจาก stream ของ (seed · อายุ · ข้อ) ไม่แตะ rng ของโลก ชีวิตจึงต่างจากตามน้ำแค่ผลที่เกิดจริง
 // เสี่ยงตาย (cause): ครั้งแรกเป็นการ์ดเตือน (ผลเจ็บตาม fx) · โดนซ้ำหลังเตือน = ตายต้นปีถัดไปด้วยสาเหตุนั้น — ไม่มีใครตายจากโฟกัสโดยไม่ได้เห็นสัญญาณก่อน
 const FOCUS_RISK_SALT = 0x6f0c5a17;
@@ -2171,6 +2187,7 @@ export function choose(st, idx, loan) {
   let because = applyEffects(st, c.effects, s, ss, 1, nat);
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
+  if (st.tree && st.content.tree) treeCard(st, st.content.tree.nodes, ev.category);
   naturePoint(st, c.nature, 1);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
@@ -2513,6 +2530,7 @@ export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, c
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
     // บอทที่มีนโยบายโฟกัส (ใบ 04) ตั้งโฟกัสหลังเห็นการ์ด — นโยบายสุ่มจาก stream ของตัวเอง ไม่แตะ rng ของโลก
     if (pickChoice.focus && !st.dead && !st.trip && !st.court) pickChoice.focus(st);
+    if (pickChoice.tree && !st.dead && !st.trip && !st.court) pickChoice.tree(st);
     // บอทที่ไม่ได้ประกาศ isekai ปฏิเสธการ์ดชวนโดยไม่ดึงเลขสุ่ม ⇒ ชีวิตเดินเท่าเดิม
     // การ์ดในทริป (B68m) ไม่มีป้ายบุญบาปแบบชีวิตไทย — บอทที่ประกาศ trip เลือกเอง ที่เหลือสุ่มตัวที่ไม่ล็อก
     if (card.court) {
