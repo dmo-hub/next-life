@@ -5,7 +5,7 @@ events:
     category: work_money
     stage: หนุ่มสาว
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [19, 30]}
     multipliers: {flags: {scam_aware: 0.5}}
     title: "ห้องปรบมือ"
@@ -43,7 +43,7 @@ events:
     category: society
     stage: ทำงาน
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [31, 45]}
     multipliers: {flags: {scam_aware: 0.5}}
     title: "โควตาเหลือที่สุดท้าย"
@@ -83,7 +83,7 @@ events:
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [31, 45]}
     multipliers: {flags: {scam_aware: 0.5}}
     title: "คำตอบเดียวของแม่ทีม"
@@ -124,7 +124,7 @@ events:
     category: society
     stage: ทำงาน
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [31, 45]}
     multipliers: {flags: {scam_aware: 0.5}}
     title: "ทริปแถมที่ไม่มีรถ"
@@ -160,7 +160,7 @@ events:
     category: society
     stage: ชรา
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [60, 85]}
     multipliers: {flags: {scam_aware: 0.5}}
     title: "เพื่อนซื้อไปแล้วนะคะ"
@@ -196,7 +196,7 @@ events:
     category: family
     stage: ทำงาน
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [31, 45], family: [{role: parent, sex: หญิง, alive: true}]}
     title: "เครื่องนวดของแม่"
     text: "กลับบ้านมาเจอเครื่องนวดตัวใหญ่ตั้งกลางห้อง แม่บอกว่าน้องพนักงานมาถึงบ้าน ใจดีมาก ผ่อนได้ เปิดใบสัญญาดูแล้วราคาสูงกว่าร้านในตลาดเกือบเท่าตัว พอไปขอคืน ฝั่งนั้นตอบสุภาพมากว่าคืนได้ แต่ต้องจ่ายค่าดำเนินการเพิ่ม"
@@ -231,7 +231,7 @@ events:
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [31, 45]}
     title: "ของฝากบนโต๊ะทำงาน"
     text: "เพื่อนร่วมงานเอาซองอาหารเสริมมาวางให้ทีละโต๊ะ บอกว่าลองดูไม่คิดเงิน พักนี้เธอชวนกินข้าวบ่อยผิดปกติ ถามเรื่องสุขภาพคุณละเอียดกว่าหมอ และทุกครั้งที่คุณบ่นว่าปวดหลัง เธอพยักหน้าเหมือนรอฟังคำนี้มาทั้งเดือน"
@@ -266,7 +266,7 @@ events:
     category: work_money
     stage: กลางคน
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [46, 59]}
     multipliers: {flags: {scam_aware: 0.5}}
     title: "งานใหญ่รอบหน้า"
@@ -380,7 +380,7 @@ events:
     category: society
     stage: กลางคน
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [46, 59]}
     title: "ผู้วิเศษคนใหม่ของอำเภอ"
     text: "คนในหมู่บ้านเช่ารถไปหาผู้วิเศษคนใหม่ที่เล่ากันว่ารู้ใจคน คุณไปด้วยเพราะมีที่นั่งเหลือ ถนนเข้าไปยังเป็นลูกรัง แต่แผงขายวัตถุมงคลกางโต๊ะรอเรียงกันแล้วยาวเกือบกิโล พวงมาลัยขึ้นราคาทุกร้อยเมตร คนขับบอกว่าพอถึงหน้าบ้านจะแพงที่สุด"
@@ -415,7 +415,7 @@ events:
     category: society
     stage: กลางคน
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [46, 59]}
     multipliers: {flags: {scam_aware: 0.5}}
     title: "ทายถูกสามข้อ"
@@ -451,7 +451,7 @@ events:
     category: family
     stage: ชรา
     years: [2500, 2650]
-    weight: 1
+    weight: 0.0625
     when: {age: [60, 85], family: [{role: child, alive: true}]}
     multipliers: {flags: {scam_aware: 0.5}}
     title: "ทองคำเพื่อไปขึ้นครู"
@@ -489,7 +489,7 @@ events:
     category: family
     stage: กลางคน
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [46, 59]}
     multipliers: {flags: {scam_aware: 0.5}}
     title: "ป้ายใหม่บนแปลงที่ผ่อน"
@@ -526,7 +526,7 @@ events:
     category: health
     stage: ชรา
     years: [2500, 2650]
-    weight: 0.25
+    weight: 0.0625
     when: {age: [60, 85]}
     title: "ยาเม็ดปั้นจากลุงท้ายซอย"
     text: "ปวดข้อมาหลายเดือน ลุงท้ายซอยเอายาปั้นเม็ดกลมดำมาฝาก ฉลากเขียนว่าแก้ปวดเส้นปวดข้อและหอบหืดในขวดเดียว กินแล้วเดินคล่องจริงภายในวันเดียว คนทั้งซอยมาขอซื้อต่อ แต่พักนี้คุณส่องกระจกแล้วเห็นหน้าตัวเองกลมขึ้นทุกวัน"
