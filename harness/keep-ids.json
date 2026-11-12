@@ -1,5 +1,5 @@
 {
- "version": "v0.6.122",
+ "version": "v0.6.123",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -502,6 +502,7 @@
   "kid_clips_fame_01",
   "kid_sport_school_01",
   "kid_lost_market_01",
+  "kid_strict_rules_01",
   "child_dengue_01",
   "child_drown_01",
   "child_tree_01",
