@@ -1,0 +1,500 @@
+# ร่างเรื่อง ช่างทำกุญแจ/ซ่อมกุญแจหน้าร้านหรือแผงริมทาง · 15 ใบ · ลงเกมแล้ว ใบ 316 · แก้ตามข้อค้านรอบ 1 · ผู้เล่นเป็นเด็กยืนดู คนช่วยญาติเรียงดอกเปล่า ลูกค้า เพื่อนบ้าน หรือเพื่อนของช่าง เสมอ · ไม่ยัดอาชีพให้ผู้เล่น · ไม่อ่านและไม่ตั้งธง · ไม่ผูกปี · ไม่มี effects job · ไม่มีเรื่องงัดแงะ กุญแจยานพาหนะ หรือวิธีไขเป็นขั้นตอน
+events:
+  - id: locksmith_grinder_watch_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [6, 12]}
+    title: "เครื่องเจียรร้องวิ้ง"
+    text: "แผงทำกุญแจใต้ต้นไม้ข้างโรงเรียนมีคนต่อคิว คุณยืนดูน้าช่างคีบกุญแจสองดอกเข้าเครื่อง ดอกเดิมไล่ไปตามร่อง ดอกเปล่าค่อย ๆ โดนกัดเป็นฟัน เสียงแหลมวิ้งจนขนลุก แล้วน้าถูตะไบลบคม น้าชี้เส้นชอล์กบนพื้นว่ายืนหลังเส้นนี้เท่านั้น"
+    choices:
+      - id: locksmith_kid_count_teeth
+        text: "ยืนหลังเส้น นับฟันกุญแจ"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_kid_ask_why_teeth
+        text: "ถามว่าทำไมกุญแจต้องมีฟัน"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: locksmith_kid_hold_bags
+        text: "ช่วยถือถุงให้คนที่รอคิว"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: locksmith_kid_buy_water
+        text: "วิ่งไปซื้อน้ำเย็นให้น้าช่าง"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: locksmith_kid_echo_whine
+        text: "ทำเสียงวิ้งตามทุกครั้ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนรอคิวหัวเราะกันทั้งแถว น้าช่างเลยให้คุณเป็นคนตะโกนเรียกคิวถัดไป คุณเรียกเสียงดังจนแม่ค้าร้านข้าง ๆ หันมาดู", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณวิ้งดังกว่าเครื่อง ป้าที่รออยู่สะดุ้งจนกุญแจหลุดมือกลิ้งเข้าใต้โต๊ะ น้าช่างส่งคุณไปนั่งเงียบ ๆ หลังแผง", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_blank_board_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [13, 18]}
+    title: "ปิดเทอมเรียงดอกเปล่า"
+    text: "ปิดเทอมนี้น้าที่ตั้งแผงทำกุญแจหน้าตลาดให้คุณช่วยเรียงดอกเปล่าขึ้นกระดานตามรูปหัว กระดานมีตะขอเป็นร้อย ดอกเปล่าในกล่องหน้าตาคล้ายกันไปหมด น้าบอกว่าคนเดินผ่านมองกระดานนี้ก่อนจะมองหน้าช่างเสมอ"
+    choices:
+      - id: locksmith_board_by_head
+        text: "เรียงตามรูปหัว ทีละตะขอ"
+        effects: {knowledge: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_board_ask_best
+        text: "ถามน้าว่าหัวแบบไหนขายดีสุด"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_board_mind_stall
+        text: "เฝ้าแผงให้น้าไปกินข้าว"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: locksmith_board_half_day
+        text: "ขอทำครึ่งวันแล้วไปเที่ยว"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_board_by_color
+        text: "เรียงไล่สีให้กระดานดูสวย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนเดินผ่านหยุดดูกระดานกันเป็นแถว บางคนซื้อกุญแจคล้องติดมือไปด้วย น้าบอกว่าวันนี้ขายดีกว่าทุกวันในเดือน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กระดานสวยมาก แต่น้าหาหัวที่ต้องใช้ไม่เจอสักอัน ทั้งบ่ายคุณกับน้าช่วยกันรื้อเรียงใหม่ตามรูปหัวเหมือนเดิม", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_brass_or_cheap_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [14, 18]}
+    title: "อันเล็กกับอันทองเหลือง"
+    text: "คุณช่วยเฝ้าแผงตอนน้าไปส่งของ ลุงคนหนึ่งชี้กุญแจคล้องบนพวง ถามว่าอันเล็กสีเงินกับอันทองเหลืองหนักมือต่างกันตรงไหน ราคาห่างกันเกือบเท่าตัว จะเอาไปคล้องรั้วที่โดนฝนทั้งปี น้าเคยพูดเรื่องนี้ให้ฟังครั้งหนึ่ง แต่คุณจำได้ไม่หมด"
+    choices:
+      - id: locksmith_brass_wait_aunt
+        text: "บอกลุงว่ารอน้ากลับมาก่อน"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_brass_read_box
+        text: "อ่านป้ายข้างกล่องให้ลุงฟัง"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: locksmith_brass_fetch_aunt
+        text: "วิ่งไปตามน้าที่ร้านข้าง ๆ"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_brass_honest_tip
+        text: "จำได้ว่าทองเหลืองไม่ขึ้นสนิม"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: locksmith_brass_weigh_hands
+        text: "ให้ลุงถือเทียบน้ำหนักเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงถือเทียบอยู่นานแล้วบอกว่าเอาอันหนัก ของหนักต้องทน น้ากลับมาเห็นของหายไปจากพวงแล้วซื้อน้ำแดงให้คุณหนึ่งแก้ว", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงถือเทียบจนเพลินแล้วแขวนคืนผิดพวง คุณนั่งไล่หาว่าอันไหนมาจากตะขอไหนจนน้ากลับมาถึง", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_spare_lost_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [20, 30]}
+    title: "ดอกสำรองหายก่อนดอกจริง"
+    text: "เดือนก่อนคุณมาทำกุญแจสำรองที่แผงหน้าตลาดเพราะกลัวดอกจริงหาย วันนี้ดอกจริงยังอยู่ดี แต่ดอกสำรองหายไปไหนไม่รู้ คุณกลับมาแผงเดิมยื่นดอกจริงให้ช่างอีกรอบ ช่างจำหน้าได้ ยิ้มแล้วถามว่าคราวนี้เอากี่ดอกดี"
+    choices:
+      - id: locksmith_spare_one_more
+        text: "ดอกเดียวพอ คราวนี้จะเก็บดี"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: locksmith_spare_three
+        text: "ทำสามดอก เก็บคนละที่"
+        effects: {knowledge: 1, happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: locksmith_spare_give_neighbor
+        text: "ทำแล้วฝากไว้กับข้างห้อง"
+        effects: {relations: 1, network: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: locksmith_spare_skip
+        text: "ไม่ทำแล้ว ดอกจริงดอกเดียวพอ"
+        effects: {happiness: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_spare_giant_ring
+        text: "ขอพวงกุญแจอันใหญ่ที่สุด"
+        outcomes:
+          - {weight: 1, ok: true, text: "พวงใหญ่เท่ากำปั้น หายยากจริง แต่ทุกครั้งที่เดิน กระเป๋ากางเกงห้อยไปข้างหนึ่งจนเพื่อนถามว่าพกอะไรมา", effects: {happiness: 2, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พวงใหญ่จนคุณถอดวางบนโต๊ะร้านข้าวทุกครั้งที่นั่ง วันที่สามลืมไว้ทั้งพวง ดอกจริงกับดอกสำรองหายไปพร้อมกันรวดเดียว", effects: {happiness: -2, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_two_am_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [21, 30]}
+    title: "ประตูงับปิดตอนตีสอง"
+    text: "กลับถึงห้องแถวที่เช่าอยู่ตอนตีสอง ประตูงับปิดตามหลังทั้งที่กุญแจวางอยู่บนโต๊ะด้านใน ช่างทำกุญแจปากซอยพักอยู่หลังแผงตัวเอง ไฟยังเปิดอยู่ แต่จะไปเคาะตอนนี้ก็เกรงใจ และค่าเรียกตอนตีสองคงไม่ใช่ราคากลางวัน"
+    choices:
+      - id: locksmith_twoam_knock
+        text: "ไปเคาะเรียกช่างปากซอย"
+        effects: {happiness: 1, network: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: locksmith_twoam_friend
+        text: "ไปขอนอนห้องเพื่อนรอเช้า"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_twoam_wait_owner
+        text: "นั่งรอเจ้าของห้องแถวตื่นหกโมง"
+        effects: {health: -2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_twoam_walk_round
+        text: "เดินอ้อมไปส่องหน้าต่างก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ส่องผ่านช่องหน้าต่างเห็นกุญแจนอนอยู่บนโต๊ะจริง ๆ คุณยืนมองมันอยู่พักใหญ่ แล้วไปเคาะช่างปากซอยด้วยสีหน้าสำนึกผิด ช่างหัวเราะแล้วคิดราคาให้เบากว่าที่กลัว", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ส่องจนคอเคล็ดก็ไม่เห็นอะไรนอกจากความมืด คุณเดินวนรอบตึกตอนตีสามครึ่ง ก่อนกลับไปเคาะช่างอยู่ดี", effects: {happiness: -1, health: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: locksmith_twoam_bring_snack
+        text: "แบ่งขนมในกระเป๋าไปฝากช่าง"
+        effects: {relations: 1, network: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_bent_key_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "กุญแจงอไปนิดเดียว"
+    text: "ประตูห้องไขฝืดมาหลายวัน คุณหิ้วกุญแจไปแผงปากซอยจะขอซื้อตัวล็อกใหม่ทั้งชุด ช่างหยิบกุญแจของคุณขึ้นส่องกับแดด บอกว่าตัวล็อกไม่เป็นอะไร กุญแจดอกนี้งอไปนิดเดียว ทำดอกใหม่ก็จบ ถูกกว่าเปลี่ยนทั้งชุดหลายเท่า"
+    choices:
+      - id: locksmith_bent_new_copy
+        text: "ทำดอกใหม่ตามที่ช่างบอก"
+        effects: {happiness: 1, knowledge: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: locksmith_bent_full_set
+        text: "ขอเปลี่ยนทั้งชุดให้สบายใจ"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: locksmith_bent_ask_how
+        text: "ถามว่ามันงอไปได้ยังไง"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: locksmith_bent_tell_friend
+        text: "ไปบอกเพื่อนที่ประตูฝืดเหมือนกัน"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: locksmith_bent_straighten
+        text: "ขอดัดดอกเดิมให้ตรงเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ดัดบนโต๊ะช่างจนดูตรงดี ไขลื่นอยู่สองอาทิตย์เต็ม แล้วคุณก็กลับมาทำดอกใหม่ที่แผงเดิมอยู่ดี", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ออกแรงดัดไปหน่อยจนหักคามือ ช่างหยิบครึ่งที่เหลือมาทำดอกใหม่ให้โดยไม่พูดอะไร แต่ยิ้มอยู่นานมาก", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_safe_dial_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ตู้เซฟเล็กจำเลขไม่ได้"
+    text: "ตู้เซฟเล็กในบ้านเก็บโฉนดกับรูปเก่าไว้ ไม่มีเงินสักบาท วันนี้คุณหมุนรหัสสามรอบไม่เข้า กระดาษที่จดเลขไว้ก็อยู่ในตู้ด้วย คุณหอบตู้ไปแผงช่างหน้าตลาด ช่างขอดูหลักฐานว่าเป็นของคุณก่อนจะแตะตู้"
+    choices:
+      - id: locksmith_safe_find_receipt
+        text: "กลับบ้านไปหาใบเสร็จตอนซื้อ"
+        effects: {knowledge: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_safe_chat_photos
+        text: "เล่าให้ช่างฟังว่าข้างในมีอะไร"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_safe_pay_open
+        text: "จ่ายค่าเปิดตามที่ช่างบอก"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: locksmith_safe_buy_new
+        text: "ซื้อตู้ใหม่ ตู้เดิมไว้ลุ้นทีหลัง"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: locksmith_safe_birthday
+        text: "ลองหมุนวันเกิดตัวเองต่อหน้าช่าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เปิดได้รอบแรก ช่างไม่คิดเงินสักบาท แต่ขอให้คุณจดเลขลงกระดาษแล้วเก็บไว้นอกตู้ต่อหน้าเขาเดี๋ยวนั้น", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลองวันเกิดทุกคนที่นึกออกจนคิวหลังยาวถึงร้านข้าง ช่างขอให้คุณยกตู้ไปนั่งนึกต่อหลังแผง", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_rusty_gate_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "กุญแจคล้องรั้วไขไม่เข้า"
+    text: "กุญแจคล้องประตูรั้วหน้าบ้านโดนฝนมาหลายปี เช้านี้ไขเท่าไรก็ไม่เปิด คุณบิดจนมือแดง บุรุษไปรษณีย์ถือพัสดุรอเซ็นรับอยู่หน้ารั้ว ช่างที่แผงปากซอยตะโกนมาว่าอย่าบิดแรง เดี๋ยวหักคารู แล้วยกขวดน้ำมันจักรขึ้นโบกให้ดู"
+    choices:
+      - id: locksmith_rusty_borrow_oil
+        text: "วิ่งไปยืมน้ำมันจักรมาหยอด"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_rusty_call_over
+        text: "ขอให้ช่างเดินมาดูให้"
+        effects: {network: 1, relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: locksmith_rusty_over_fence
+        text: "ขอให้ยื่นพัสดุข้ามรั้วมา"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_rusty_coffee_trade
+        text: "ฝากช่างดูให้ แลกกาแฟเย็น"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_rusty_vinegar
+        text: "เอาถุงน้ำส้มสายชูห่อกุญแจแช่ไว้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฟองเล็ก ๆ ผุดรอบห่วง ชั่วโมงต่อมาไขได้ลื่น แต่หน้าบ้านกลิ่นเหมือนโต๊ะเครื่องปรุงร้านก๋วยเตี๋ยวไปอีกสามวัน คนเดินผ่านหันมามองทุกคน", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รอแช่จนบุรุษไปรษณีย์ไปส่งบ้านอื่นแล้ว พัสดุถูกนำกลับไปที่ทำการ คุณต้องปั่นจักรยานไปรับเองตอนบ่ายแดดเปรี้ยง", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_old_big_key_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [33, 45]}
+    title: "กุญแจดอกใหญ่ของบ้านเก่า"
+    text: "ญาติฝากคุณไปทำกุญแจสำรองของประตูไม้บ้านเก่าต่างจังหวัด กุญแจดอกนั้นยาวเท่าฝ่ามือ ฟันเป็นเหลี่ยมแปลกตา ช่างหน้าตลาดพลิกดูอยู่นาน ก้มหาในลิ้นชักทุกช่อง แล้วบอกว่าดอกเปล่าแบบนี้ไม่มีมาหลายปีแล้ว"
+    choices:
+      - id: locksmith_bigkey_other_stall
+        text: "ถามว่าแผงไหนพอจะมีของ"
+        effects: {network: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_bigkey_draw
+        text: "วาดรูปกุญแจเก็บไว้กันลืม"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: locksmith_bigkey_new_lock
+        text: "กลับไปเสนอญาติเปลี่ยนตัวล็อก"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_bigkey_handmade
+        text: "ขอให้ช่างตะไบจากเหล็กแผ่นให้"
+        effects: {happiness: 1, knowledge: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: locksmith_bigkey_take_back
+        text: "ไปส่งญาติที่บ้านเก่าเอง"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: locksmith_bigkey_necklace
+        text: "เสนอให้ใช้ดอกเดียว ห้อยคอไว้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ญาติชอบใจ ห้อยกุญแจดอกใหญ่ไว้ที่คอเหมือนเหรียญรางวัล เดินไปไหนใครก็ทักว่าบ้านหลังนี้คงไม่มีวันล็อกนอกบ้านแน่", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เชือกขาดระหว่างญาติก้มเก็บผัก กุญแจตกลงร่องพื้นกระดาน ทั้งบ้านผลัดกันเอาไม้แขวนเสื้อเขี่ยอยู่ครึ่งวันกว่าจะได้คืน", effects: {happiness: -1, health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_whole_ring_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ช่างต้องมาทำถึงบ้าน"
+    text: "พวงกุญแจหายระหว่างทางกลับจากตลาด คนในบ้านยังเปิดประตูให้ได้ แต่ตู้เสื้อผ้า ลิ้นชักโต๊ะ กับกุญแจคล้องรั้วไม่เหลือดอกไขสักดอก ช่างแผงหน้าร้านโชห่วยฟังจบแล้วบอกว่าแบบนี้ยกมาที่แผงไม่ไหว ต้องไปทำถึงบ้าน แล้วถามว่าสะดวกวันไหน"
+    choices:
+      - id: locksmith_ring_redo_all
+        text: "ให้ช่างมาทำครบทุกตัวพรุ่งนี้"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: locksmith_ring_wardrobe_first
+        text: "ทำแค่ตู้เสื้อผ้าก่อน"
+        effects: {knowledge: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: locksmith_ring_ask_relative
+        text: "ไปถามญาติที่เคยฝากสำรองไว้"
+        effects: {relations: 1, network: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_ring_new_cylinder
+        text: "เปลี่ยนไส้ล็อกประตูหน้าด้วย"
+        effects: {happiness: 1, knowledge: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: locksmith_ring_ask_soi
+        text: "เดินถามร้านข้าวทุกร้านในซอย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้านก๋วยเตี๋ยวเก็บพวงไว้ใต้เคาน์เตอร์ตั้งแต่เมื่อวาน คุณสั่งเพิ่มอีกสองชามเป็นค่าตอบแทน แล้วเดินกลับไปบอกช่างว่าไม่ต้องมาแล้ว", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีร้านไหนเห็นกุญแจ แต่ทุกร้านจำคุณได้ พรุ่งนี้ทั้งซอยรู้ว่าคุณหากุญแจไม่เจอ และทุกคนมีที่ให้ไปหาต่อคนละที่", effects: {happiness: -1, network: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_rain_door_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "ประตูหน้าฝืด ประตูหลังลื่น"
+    text: "หน้าฝนปีนี้ประตูหน้าบ้านไขฝืดขึ้นทุกวัน ทั้งที่ประตูหลังใช้กุญแจชุดเดียวกัน ช่างหน้าตลาดแวะมาดูตอนเย็น ส่องรูแล้วเป่าฝุ่นออกมาเป็นคราบ ไขอีกทีก็ลื่นทันที ช่างบอกว่าฝนสาดเข้าทุกปี ฝุ่นเลยจับกันเป็นก้อน"
+    choices:
+      - id: locksmith_rain_ask_why
+        text: "ถามว่าทำไมไม่เคยมีใครบอก"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: locksmith_rain_pay_visit
+        text: "จ่ายค่าแวะ ทั้งที่ช่างไม่ขอ"
+        effects: {network: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: locksmith_rain_dinner
+        text: "ชวนช่างกินข้าวเย็นก่อนกลับ"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_rain_cloth_cover
+        text: "เอาผ้าคลุมรูกุญแจทุกคืนฝนตก"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_rain_tin_roof
+        text: "ตัดสังกะสีมาทำหลังคาบังรู"
+        outcomes:
+          - {weight: 1, ok: true, text: "บังฝนได้จริง ประตูไขลื่นตลอดหน้าฝน เพื่อนบ้านเดินผ่านถามว่าบ้านนี้ตั้งศาลเล็ก ๆ ไว้หน้าประตูให้ใคร", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สังกะสีเอียงรับน้ำฝนลงรูกุญแจตรง ๆ ช่างแวะมาอีกรอบ ยืนดูแล้วนั่งหัวเราะอยู่บนบันไดหน้าบ้านนานมาก", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_neighbor_drawer_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "กุญแจฝากของป้าข้างบ้าน"
+    text: "ป้าบ้านข้าง ๆ ฝากกุญแจสำรองไว้กับคุณนานแล้ว สายวันนี้ป้าออกไปรดน้ำต้นไม้หน้าบ้าน ประตูงับปิดตามหลัง ป้ามาเรียกที่รั้ว แต่คุณจำไม่ได้ว่าเก็บไว้ที่ไหน ลิ้นชักทุกช่องมีกุญแจหน้าตาคล้ายกันอย่างน้อยสามดอก ไม่มีดอกไหนติดชื่อ"
+    choices:
+      - id: locksmith_drawer_think_back
+        text: "ไล่นึกว่าวันนั้นทำอะไรบ้าง"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_drawer_ask_kin
+        text: "ไปตามญาติป้าที่อยู่ซอยถัดไป"
+        effects: {relations: 1, network: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: locksmith_drawer_lunch
+        text: "ชวนป้ามานั่งกินข้าวกลางวันก่อน"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_drawer_label_all
+        text: "ติดชื่อทุกดอกตั้งแต่วันนี้"
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_drawer_try_all
+        text: "เทลิ้นชักให้ป้าลองทีละดอก"
+        outcomes:
+          - {weight: 1, ok: true, text: "ดอกที่เจ็ดเปิดได้ ป้าดีใจจนเอาขนมมาให้ทั้งกล่อง ส่วนอีกหกดอกที่เหลือ ไม่มีใครในบ้านจำได้ว่าเป็นกุญแจอะไร", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ลองครบทุกดอกแล้วไม่มีดอกไหนใช่ ป้านั่งดื่มน้ำอยู่ที่บ้านคุณจนบ่าย แล้วเล่าเรื่องหลานให้ฟังครบทุกคน", effects: {relations: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_same_stall_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [48, 59], family: [{role: child, alive: true}]}
+    title: "แผงเดิมหน้าตลาด"
+    text: "คุณพาลูกไปทำกุญแจห้องพักที่ลูกเพิ่งย้ายเข้า แผงหน้าตลาดนี้ตั้งมานานหลายสิบปี ช่างคนเดิมผมขาวหมดแล้ว มองหน้าคุณนานแล้วทักว่าหน้าคุ้น ๆ เหมือนคนที่เคยแวะมาทำกุญแจเมื่อนานมาแล้ว ลูกหันมามองคุณทันที"
+    choices:
+      - id: locksmith_stall_admit
+        text: "ยอมรับว่าใช่ แล้วเล่าให้ลูกฟัง"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_stall_deny
+        text: "บอกว่าคงจำคนผิด"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_stall_two_spares
+        text: "ทำสำรองให้ลูกเผื่อไว้สองดอก"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: locksmith_stall_buy_more
+        text: "อุดหนุนกุญแจคล้องอีกอัน"
+        effects: {network: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: locksmith_stall_quiz
+        text: "ท้าช่างว่าจำคนคนนั้นได้แค่ไหน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช่างเล่าได้ทั้งราคาทั้งประตูที่ทำ ลูกขอให้ช่างเล่าเรื่องคุณตอนหนุ่มสาวต่ออีกครึ่งชั่วโมง ส่วนคุณยืนฟังเงียบ ๆ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช่างจำคนผิด เล่าเรื่องลูกค้าอีกคนที่ร้องไห้กลางตลาดเพราะทำไอติมหล่น ลูกเชื่อไปแล้วทั้งเรื่อง", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_listen_teeth_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [62, 85]}
+    title: "ฟังเสียงกุญแจกับเพื่อนเก่า"
+    text: "เพื่อนเก่าของคุณตั้งแผงทำกุญแจหน้าตลาดมาสามสิบปี บ่ายนี้คุณนั่งเป็นเพื่อนใต้ร่ม ลูกค้าคนหนึ่งลองไขกุญแจใหม่กับตัวล็อกที่ถือมา เพื่อนไม่หันไปมองเลย แต่บอกว่าดอกนี้ยังไม่ตรง ฟังเสียงก็รู้ แล้วหันมาถามว่าคุณได้ยินไหม"
+    choices:
+      - id: locksmith_listen_honest
+        text: "บอกตรง ๆ ว่าไม่ได้ยินอะไร"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_listen_learn
+        text: "ขอให้เพื่อนสอนฟังทีละเสียง"
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_listen_tea
+        text: "รินน้ำชาให้เพื่อนกับลูกค้า"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_listen_how_long
+        text: "ถามว่าจะตั้งแผงอีกกี่ปี"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_listen_fake_nod
+        text: "พยักหน้าเหมือนได้ยินชัด"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนให้คุณฟังดอกต่อไปด้วย คุณเดาถูกสามดอกติด ลูกค้าที่รอคิวเริ่มเรียกคุณว่าอาจารย์ เพื่อนหัวเราะจนต้องปิดเครื่องพักหนึ่ง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนถามว่าเสียงมันเป็นยังไง คุณตอบว่าเหมือนเสียงกุญแจ เพื่อนเงียบไปครู่หนึ่ง แล้วยื่นพัดให้คุณช่วยโบกลูกค้าแทน", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_combo_stiff_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 85]}
+    title: "ปุ่มหมุนฝืดจนเลขเลื่อน"
+    text: "กุญแจรหัสหมุนที่คล้องประตูรั้วโดนฝนมาทั้งหน้า เช้านี้ปุ่มหมุนฝืดจนเลขเลื่อนไปจากที่ตั้งไว้ คุณหมุนเลขเดิมสามรอบก็ไม่เปิด เพื่อนบ้านถือถุงกับข้าวเดินผ่านมาพอดี ช่างแผงหน้าตลาดเคยบอกว่ากุญแจรหัสโดนน้ำบ่อยจะเป็นแบบนี้"
+    choices:
+      - id: locksmith_combo_call_stall
+        text: "ฝากเรียกช่างแผงหน้าตลาดมาดู"
+        effects: {network: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: locksmith_combo_back_door
+        text: "ออกทางประตูหลังไปก่อน"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: locksmith_combo_ask_errand
+        text: "ฝากเพื่อนบ้านซื้อของให้ก่อน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_combo_back_to_key
+        text: "เปลี่ยนกลับไปใช้กุญแจดอก"
+        effects: {knowledge: 1, happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: locksmith_combo_ask_neighbor
+        text: "ถามเพื่อนบ้านว่าเห็นหมุนเลขอะไร"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนบ้านบอกเลขได้ครบทุกหลัก เพราะเห็นคุณยืนหมุนอยู่หน้ารั้วทุกเช้า กุญแจเปิดได้รอบเดียว แล้วคุณก็ตัดสินใจเปลี่ยนเลขใหม่ตอนนั้นเลย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนบ้านจำได้แค่สองหลักแรก สองคนเลยยืนผลัดกันหมุนหลักที่เหลืออยู่หน้ารั้ว จนกับข้าวในถุงเริ่มเย็น", effects: {relations: 1, happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

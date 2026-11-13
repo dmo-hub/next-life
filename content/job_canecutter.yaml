@@ -1,0 +1,502 @@
+# ร่างเรื่อง คนรับจ้างตัดอ้อย ขึ้นรถส่งโรงงาน · 15 ใบ · ลงเกมแล้ว ใบ 316 · แก้ตามข้อค้านรอบ 1 · ผู้เล่นเป็นเด็กนั่งร่มไม้กับป้า คนช่วยญาติมัดอ้อย คนส่งข้าว คนจดยอด คนดูแลเพิง ญาติเจ้าของไร่ เพื่อนบ้าน ไม่ใช่อาชีพ · ไม่อ่านและไม่ตั้งธง · ไม่ผูกปี
+events:
+  - id: canecutter_shade_kid_01
+    type: A
+    category: family
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [6, 12]}
+    title: "น้ำอ้อยเปื้อนเสื้อตัวขาว"
+    text: "หน้าหีบผู้ใหญ่ในบ้านไปช่วยญาติตัดอ้อย ป้าที่ยังไม่ลงไร่พาคุณนั่งใต้ต้นมะขามริมไร่ด้วยกัน แล้วยื่นอ้อยเคี้ยวปอกแล้วให้ท่อนหนึ่ง ยาวราวหนึ่งปล้อง น้ำหวานไหลลงคางเป็นทาง เสื้อตัวขาวที่ใส่มาเริ่มเปลี่ยนสีทีละจุด"
+    choices:
+      - id: canecutter_kid_chew_slow
+        text: "เคี้ยวช้า ๆ ก้มหน้าให้หยดลงดิน"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_kid_wipe_shirt
+        text: "เช็ดปากกับชายเสื้อทุกคำ"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_kid_pour_cups
+        text: "รินน้ำใส่แก้วรอผู้ใหญ่มาพัก"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_kid_count_piles
+        text: "นั่งนับกองอ้อยที่เรียงริมทาง"
+        outcomes:
+          - {weight: 1, ok: true, text: "นับได้สามสิบเจ็ดกอง ลุงหัวหน้าชุดนับเองได้สามสิบเจ็ดเหมือนกัน แล้วเรียกคุณว่าคนคุมบัญชีไปทั้งหน้าหีบ", effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นับไปนับมาเผลอหลับพิงต้นมะขาม ตื่นมาอีกทีกองอ้อยขึ้นรถไปหมดแล้ว ส่วนเสื้อก็ยังเหนียวเหมือนเดิม", effects: {health: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: canecutter_kid_ant_trail
+        text: "ใช้ชานอ้อยล่อมดให้เดินแถว"
+        outcomes:
+          - {weight: 1, ok: true, text: "มดเดินเป็นแถวยาวไปถึงรองเท้าลุง คนในชุดที่มานั่งพักเที่ยงยืนดูกันหัวเราะ แล้วช่วยกันวางชานต่อให้แถวยาวกว่าเดิม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มดเปลี่ยนใจเดินขึ้นมาหาน้ำหวานบนเสื้อคุณแทน คุณกระโดดจนกระติกน้ำล้ม ป้าหัวเราะแล้วนั่งปัดมดออกให้ทีละตัว", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_tie_break_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [15, 18]}
+    title: "ปิดเทอมไปช่วยมัดอ้อย"
+    text: "ปิดเทอมนี้ลุงที่เป็นหัวหน้าชุดตัดชวนคุณไปช่วยมัดอ้อยท้ายแถว ผู้ใหญ่ตัดวางเป็นกอง คุณรวบให้ได้ขนาดแล้วรัดเชือก ลุงบอกว่ามัดหลวมยกขึ้นรถแล้วร่วง มัดแน่นก็ช้า ผ่านไปครึ่งเช้ามือเริ่มชา"
+    choices:
+      - id: canecutter_teen_tight_slow
+        text: "มัดแน่นทุกมัด ช้าก็ช่าง"
+        effects: {knowledge: 1, relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_teen_ask_knot
+        text: "ขอให้ลุงสอนเงื่อนรัดอีกรอบ"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: canecutter_teen_help_aunt
+        text: "ไปช่วยป้าแถวข้างที่มัดไม่ทัน"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_teen_shade_rest
+        text: "ขอพักใต้ร่มไม้ก่อนสักพัก"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_teen_bow_knot
+        text: "มัดโบว์ให้ทุกมัดสวยกว่าของลุง"
+        outcomes:
+          - {weight: 1, ok: true, text: "โบว์เชือกสวยจนลุงยืนดูนาน แล้วบอกว่าโรงงานไม่ให้คะแนนความสวย แต่ป้าแถวข้างแบ่งไข่ต้มให้คุณหนึ่งฟองเป็นค่าชม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มัดที่สามโบว์หลุด อ้อยทั้งกองกลิ้งลงร่อง คุณใช้เวลาเก็บนานกว่ามัดใหม่สามมัด", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_long_sleeve_01
+    type: A
+    category: health
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [15, 18]}
+    title: "เสื้อแขนยาวกลางแดดจัด"
+    text: "วันแรกที่ไปช่วยญาติในไร่ คุณใส่เสื้อยืดแขนสั้นเพราะแดดร้อนจัด ป้ายื่นเสื้อแขนยาวเก่าให้ตัวหนึ่ง คุณบอกไม่เป็นไร พอเดินแทรกดงใบอ้อยไปได้สองร่อง แขนเริ่มคันเป็นเส้น ขอบใบมีหนามเล็ก ๆ ที่มองไม่เห็นจนโดนเอง"
+    choices:
+      - id: canecutter_sleeve_wear_now
+        text: "ยอมใส่เสื้อแขนยาวของป้า"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_sleeve_wash_arms
+        text: "ไปล้างแขนแล้วกลับมาทำต่อ"
+        effects: {health: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_sleeve_tough_it
+        text: "ทนไหว ใส่แขนสั้นต่อทั้งวัน"
+        effects: {health: -2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_sleeve_carry_water
+        text: "ขอเปลี่ยนไปหิ้วน้ำให้ทั้งชุด"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_sleeve_socks
+        text: "เอาถุงเท้ามาสวมแขนแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถุงเท้าสองข้างกันใบอ้อยได้จริง ป้าเดินมาดูใกล้ ๆ แล้วขอไอเดียไปบอกทั้งชุด", effects: {health: 1, happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถุงเท้าหลวมเลื่อนลงข้อมือทุกห้านาที ทั้งชุดเรียกคุณว่าคนดึงถุงเท้าไปจนหมดปิดเทอม", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_rice_runner_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "ข้าวเที่ยงเหลือครึ่งตะกร้า"
+    text: "ญาติฝากคุณปั่นจักรยานไปส่งข้าวห่อใบตองให้ชุดตัดอ้อยตอนเที่ยง พักกินได้ชั่วโมงเดียว แต่หลายคนกินไม่กี่คำก็ลุกกลับไปตัดต่อ ข้าวที่ห่อมาเหลือครึ่งตะกร้า ป้าบอกว่าขนกลับก็เสียของ คุณยืนถือตะกร้ากลางแดด"
+    choices:
+      - id: canecutter_rice_wait_all
+        text: "นั่งรอจนทุกคนกินเสร็จ"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_rice_wrap_small
+        text: "พรุ่งนี้ห่อเป็นคำเล็กให้กินเร็ว"
+        effects: {knowledge: 1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_rice_share_next
+        text: "แบ่งให้ชุดตัดไร่ข้าง ๆ"
+        effects: {network: 2, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_rice_ask_head
+        text: "ถามหัวหน้าชุดว่าทำไมรีบนัก"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_rice_eat_rest
+        text: "กินที่เหลือเองให้หมดตะกร้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "อิ่มจนปั่นจักรยานกลับช้ากว่าขามา ป้าชมว่ากินเก่งเหมือนคนรุ่นก่อน ไม่มีข้าวเหลือทิ้งสักห่อ", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กินเสร็จง่วงหลับใต้ต้นไม้ ตื่นมาอีกทีชุดตัดเลิกงานแล้ว ทุกคนเดินผ่านคุณไปพร้อมเสียงหัวเราะ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_bundle_tally_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [20, 30]}
+    title: "สมุดจดยอดมัดประจำชุด"
+    text: "หัวหน้าชุดตัดอ้อยเป็นญาติคุณ สายตาเริ่มฝ้าเลยฝากให้คุณจดยอดมัดของแต่ละคนตอนเย็น ชุดนี้แบ่งค่าตัดกันเองตามจำนวนมัด บางคนได้ร้อยกว่ามัด บางคนสี่สิบห้าสิบ วันนี้น้าสองคนนับกองเดียวกันได้คนละเลข แล้วหันมามองคุณพร้อมกัน"
+    choices:
+      - id: canecutter_tally_recount
+        text: "นับใหม่ต่อหน้าทั้งสองคน"
+        effects: {knowledge: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_tally_split_half
+        text: "แบ่งกองนี้ให้คนละครึ่ง"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_tally_ask_head
+        text: "ส่งเรื่องให้หัวหน้าชุดตัดสิน"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_tally_color_rope
+        text: "เสนอใช้เชือกคนละสีแยกมัด"
+        effects: {knowledge: 1, network: 2}
+        merit: [{cat: neutral}]
+      - id: canecutter_tally_chant
+        text: "ให้ทั้งสองนับออกเสียงพร้อมกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "นับไปได้ยี่สิบมัดทั้งสองก็หัวเราะกันเอง ตกลงเลขกลางได้ก่อนข้าวเย็น หัวหน้าชุดให้คุณถือสมุดต่อไปทั้งหน้าหีบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สองคนนับแข่งกันเสียงดังจนชุดไร่ข้าง ๆ มายืนดู สุดท้ายต่างคนต่างได้เลขใหม่ที่ไม่ตรงกับเลขเดิมของใครเลย", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_weigh_queue_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "คิวลานชั่งยาวกว่าวันตัด"
+    text: "ชุดตัดของญาติตัดอ้อยเต็มคันในสองวัน คุณติดรถไปช่วยดูของที่หน้าโรงงาน พอถึงก็เจอรถอ้อยจอดเรียงล้นลานออกมาริมถนนไปถึงหมู่บ้านข้าง ๆ คนขับคันหน้าบอกว่ารอมาสี่วันแล้ว เสบียงที่คุณเตรียมมาพอแค่ครึ่งวัน"
+    choices:
+      - id: canecutter_queue_find_food
+        text: "เดินหาร้านข้าวในหมู่บ้าน"
+        effects: {network: 1, health: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: canecutter_queue_share_food
+        text: "แบ่งเสบียงให้คนขับคันข้าง ๆ"
+        effects: {relations: 1, network: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_queue_tree_nap
+        text: "ปูเสื่อนอนรอใต้ต้นไม้ริมทาง"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_queue_bus_home
+        text: "นั่งรถโดยสารกลับบ้านไปก่อน"
+        effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: canecutter_queue_chess
+        text: "ชวนคนทั้งแถวเล่นหมากรุก"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนขับห้าคันมาล้อมวงหมากรุกข้างทาง กว่าคิวจะขยับ คุณรู้จักคนทั้งแถว และได้ข้าวเหนียวฟรีมาสองห่อ", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คิวขยับตอนคุณกำลังจะรุกจน คนขับวิ่งกลับไปขึ้นรถกันหมด เหลือคุณนั่งถือหมากอยู่ข้างกระดานคนเดียว", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_glove_care_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [21, 30]}
+    title: "ถุงมือขาดข้างเดียว"
+    text: "คุณไปช่วยชุดตัดของญาติขนมัดอ้อยออกมากองริมทาง หัวหน้าชุดยื่นถุงมือผ้าให้คู่หนึ่ง บอกว่าในชุดนี้ตัดก็ค่อย ๆ ตัด ขนก็ค่อย ๆ ขน ใส่ถุงมือไว้ก่อน ผ่านไปครึ่งเช้า ข้างขวาขาดตรงนิ้วโป้ง ข้างซ้ายยังใหม่เหมือนเพิ่งแกะห่อ"
+    choices:
+      - id: canecutter_glove_wrap_thumb
+        text: "ฉีกเศษผ้าพันนิ้วโป้งไว้ก่อน"
+        effects: {health: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_glove_slow_down
+        text: "ขนช้าลงตามที่หัวหน้าชุดบอก"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_glove_bare_hand
+        text: "ถอดทิ้ง ขนมือเปล่าให้คล่อง"
+        effects: {health: -2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_glove_mend_crew
+        text: "ช่วยพันถุงมือให้คนที่ขาดคู่"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_glove_left_swap
+        text: "หาคนถนัดซ้ายมาแลกข้างกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอน้าคนหนึ่งถนัดซ้าย ถุงมือขาดข้างซ้ายพอดี สองคนแลกกันได้คู่ที่ครบ ทั้งชุดบอกว่าเป็นคู่ที่ฟ้าส่งมา", effects: {health: 1, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งชุดถนัดขวาหมด ทุกคนขาดข้างขวาเหมือนกัน ถุงมือข้างซ้ายสภาพใหม่ห้าข้างกองรวมกันอยู่ข้างกระติก", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_rate_talk_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "คุยค่าตัดแทนทั้งชุด"
+    text: "หน้าหีบปีนี้ญาติที่รวมกันเป็นชุดตัดอ้อยให้คุณคุยกับเจ้าของไร่แทน เพราะพูดเก่งสุดในบ้าน ค่าตัดคิดเป็นตัน เจ้าของไร่เสนอราคาเท่าปีก่อน ญาติที่ยืนข้างหลังกระแอมพร้อมกันสามคน ทั้งที่คุณยังไม่ได้เปิดปาก"
+    choices:
+      - id: canecutter_rate_take_same
+        text: "รับราคาเดิม ไม่ต่อสักบาท"
+        effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: 0.01}}
+        merit: [{cat: neutral}]
+      - id: canecutter_rate_ask_more
+        text: "ขอเพิ่มอีกนิดตามค่าครองชีพ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของไร่คิดอยู่พักหนึ่งแล้วยอมเพิ่มให้ ญาติตบหลังคุณจนไอ คืนนั้นทั้งชุดหุงข้าวเพิ่มอีกหม้อ", effects: {relations: 2, money: {unit: income_x, amount: 0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของไร่ขอเวลาคิดหนึ่งคืน ชุดตัดอีกชุดผ่านมาพอดี คุณนั่งลุ้นทั้งคืนว่างานจะยังอยู่ไหม", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: canecutter_rate_ask_crew
+        text: "หันกลับไปถามญาติก่อนตอบ"
+        effects: {relations: 2, network: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_rate_ask_lodging
+        text: "รับราคาเดิม ขอที่พักให้ครบคน"
+        effects: {relations: 2, health: 1, money: {unit: income_x, amount: 0.01}}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_rate_cough_back
+        text: "กระแอมตอบญาติให้ครบสามที"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของไร่หัวเราะจนลืมราคาเดิม แล้วปัดเศษขึ้นให้ทั้งชุด ญาติบอกว่ากระแอมแบบนี้ต้องจดสูตรไว้ใช้ปีหน้า", effects: {happiness: 2, money: {unit: income_x, amount: 0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของไร่นึกว่าทั้งชุดไม่สบาย เลยขอเลื่อนคุยไปพรุ่งนี้และยื่นยาอมให้คนละเม็ด", effects: {happiness: 1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_rain_hut_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ฝนตกกลางหน้าหีบ"
+    text: "กลางหน้าหีบฝนตกลงมาสองวันติด ไร่ที่ชุดของญาติรับไว้ตัดต่อไม่ได้ ดินเหนียวติดรองเท้าจนเดินไม่ออก คุณดูแลเพิงพักของชุด ข้าวสารเหลือพอหุงอีกสามมื้อ ทุกคนนั่งล้อมกระสอบข้าวสารมองฟ้าเหมือนรอคำตอบ"
+    choices:
+      - id: canecutter_rain_rice_soup
+        text: "ต้มข้าวต้มให้พอได้หลายมื้อ"
+        effects: {knowledge: 1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_rain_buy_rice
+        text: "ลุยดินไปซื้อข้าวสารที่ตลาด"
+        effects: {relations: 1, health: -1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: canecutter_rain_mend_rope
+        text: "ชวนทุกคนซ่อมเชือกมัดอ้อยรอ"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_rain_let_sleep
+        text: "ปล่อยให้ทุกคนนอนพักเต็มที่"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_rain_dance
+        text: "ชวนรำไล่ฝนรอบเพิง"
+        outcomes:
+          - {weight: 1, ok: true, text: "รำได้สามรอบฝนหยุดพอดี ไม่มีใครกล้าบอกว่าบังเอิญ ตั้งแต่วันนั้นคุณถูกเรียกไปรำทุกครั้งที่ฟ้าครึ้ม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รำแล้วฝนหนักกว่าเดิม หลังคาเพิงเริ่มหยดลงกลางวง ทั้งชุดขอร้องให้คุณนั่งลงก่อนเพิงรั่วอีกด้าน", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_load_back_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [33, 45]}
+    title: "ก้มแล้วยกจนหลังร้อง"
+    text: "วันนี้คุณมาช่วยชุดตัดของญาติส่งมัดอ้อยขึ้นรถ รถมารับบ่ายสี่ ช้ากว่านัดสองชั่วโมง ต้องเสร็จก่อนมืด คุณยืนส่งมัดจากพื้น ก้มแล้วยก ก้มแล้วยก ผ่านไปสามสิบมัด หลังเริ่มส่งเสียงที่คุณไม่เคยได้ยินจากตัวเอง"
+    choices:
+      - id: canecutter_load_bend_knees
+        text: "ย่อเข่าแทนการก้มหลัง"
+        effects: {health: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_load_swap_young
+        text: "สลับให้คนหนุ่มกว่ามายืนแทน"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_load_push_on
+        text: "ยกต่อจนครบ ไม่ยอมทิ้งชุด"
+        effects: {health: -2, relations: 2}
+        merit: [{cat: neutral}]
+      - id: canecutter_load_relay
+        text: "จัดคนยืนส่งต่อกันเป็นทอด"
+        effects: {knowledge: 1, network: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_load_count_song
+        text: "ร้องนับเลขให้จังหวะทั้งชุด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งชุดยกตามจังหวะเพลงนับเลข เสร็จก่อนมืดครึ่งชั่วโมง คนขับรถขอให้ร้องอีกรอบตอนรถออก", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นับถึงเจ็ดสิบแล้วลืมว่านับมาจากไหน ทั้งชุดเถียงกันว่ายกไปกี่มัด จนคนขับต้องปีนลงมานับให้เอง", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_crew_dishes_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "ถ้วยเก้าใบ คนสิบสอง"
+    text: "ญาติที่มีไร่อ้อยฝากคุณเตรียมที่พักให้ชุดตัดที่จะมาถึงพรุ่งนี้เช้า ทั้งหม้อข้าว ถ้วยชาม ที่หลับที่นอน ชุดนี้มากันสิบสองคน คุณค้นทั้งบ้านได้ถ้วยเก้าใบ หม้อหนึ่งใบที่ฝาไม่เข้ากัน และเสื่ออีกสามผืนกลิ่นของเก่า"
+    choices:
+      - id: canecutter_dishes_borrow
+        text: "เดินขอยืมถ้วยชามบ้านข้าง ๆ"
+        effects: {network: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_dishes_buy_new
+        text: "ไปตลาดซื้อของใหม่ให้ครบ"
+        effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: canecutter_dishes_air_mats
+        text: "ซักเสื่อตากแดดให้หอมก่อนค่ำ"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_dishes_ask_bring
+        text: "ฝากถามว่าชุดนี้พกถ้วยมาไหม"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_dishes_leaf_bowl
+        text: "พับใบตองทำถ้วยแทนสามใบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถ้วยใบตองใช้ได้จริง คนในชุดชมว่ากินแล้วหอมกว่าถ้วยกระเบื้อง แล้วขอให้พับเพิ่มอีกหลายใบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แกงซึมก้นถ้วยใบตองหยดลงตักคนแรกที่ตัก ทั้งชุดหัวเราะแล้วหันไปตักกินจากหม้อกันเลย", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_yard_cane_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "อ้อยท่อนเศษหลังบ้าน"
+    text: "ชุดตัดของญาติกองมัดอ้อยไว้ริมไร่หลังบ้านคุณ รอรถมารับพรุ่งนี้เช้า ข้างกองมีท่อนสั้นที่ตัดเศษทิ้งไว้หลายท่อน ตกเย็นเด็กในซอยมายืนเกาะรั้วกันเป็นแถว คนโตสุดถามคุณว่าท่อนที่ไม่เอาแล้ว ขอไปเคี้ยวได้ไหม"
+    choices:
+      - id: canecutter_yard_ask_relative
+        text: "ถามญาติก่อนว่าท่อนไหนแบ่งได้"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_yard_share_scraps
+        text: "แบ่งท่อนเศษให้คนละท่อน"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_yard_say_no
+        text: "บอกว่าเป็นของญาติ ให้ไม่ได้"
+        effects: {relations: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_yard_peel_small
+        text: "ปอกให้เด็กเล็กที่เคี้ยวไม่ไหว"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_yard_peel_trade
+        text: "ปอกให้เคี้ยวแลกกับกวาดลาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กกวาดลานบ้านคุณสะอาดกว่าวันปีใหม่ ทุกคนนั่งเคี้ยวกันเป็นแถวบนแคร่ แล้วถามว่าพรุ่งนี้มีอีกไหม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อ้อยท่อนนั้นเป็นพันธุ์ส่งโรงงาน เนื้อแข็งจนเด็กเคี้ยวไม่เข้า ทั้งซอยนั่งมองท่อนอ้อยเหมือนมองไม้ฟืน ส่วนลานยังกวาดไม่เสร็จ", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_move_camp_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "เสื่อลายที่ไม่มีเจ้าของ"
+    text: "ชุดตัดของญาติย้ายจากไร่หนึ่งไปอีกไร่ตามคิวตั้งแต่ธันวาถึงเมษา คุณเป็นคนเก็บข้าวของ ตอนนี้มาถึงไร่ที่สี่ ของบนรถเพิ่มขึ้นทุกรอบ ทั้งกระติก ถุงมือ ไก่ที่เจ้าของไร่ก่อนให้มาหนึ่งตัว และเสื่อผืนลายที่ไม่มีใครรู้ว่าของใคร"
+    choices:
+      - id: canecutter_move_return_mat
+        text: "ย้อนไปถามไร่ก่อน ๆ ทีละไร่"
+        effects: {relations: 1, network: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_move_list_all
+        text: "จดบัญชีของทุกชิ้นก่อนย้าย"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_move_keep_hen
+        text: "เลี้ยงไก่ไว้ที่เพิงพักไปก่อน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_move_leave_extra
+        text: "ฝากของเกินไว้กับไร่ที่จากมา"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_move_mat_prize
+        text: "ให้เสื่อเป็นรางวัลคนตัดเยอะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งชุดแข่งกันตัดจนเสร็จก่อนกำหนด เจ้าของเสื่อตัวจริงโผล่มารับคืนพอดี และขอบใจที่ช่วยเก็บไว้ให้", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สามคนอ้างเป็นเจ้าของเสื่อพร้อมกัน คุณต้องนั่งฟังที่มาของเสื่อทีละคนจนข้าวเย็นชืดทั้งวง", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_thick_hands_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "มือหนากว่าถุงมือ"
+    text: "เพื่อนบ้านรุ่นเดียวกับคุณตัดอ้อยมาทั้งชีวิตจนมือหนาเหมือนเปลือกไม้ หลานของเขาฝากถุงมือคู่ใหม่ผ่านคุณ เบอร์ใหญ่สุดในร้าน เขาใส่ได้ถึงข้อนิ้วที่สองแล้วไม่ไปต่อ หลานยังยืนยิ้มรออยู่ข้างแคร่"
+    choices:
+      - id: canecutter_hands_whisper_kid
+        text: "กระซิบบอกหลานว่ามันเล็กไป"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_hands_praise_fit
+        text: "ชมว่าใส่ครึ่งนิ้วก็ดูดี"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_hands_exchange
+        text: "อาสาพาหลานไปเปลี่ยนที่ร้าน"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_hands_ask_story
+        text: "ขอให้เขาเล่าที่มาของมือคู่นี้"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_hands_stretch
+        text: "แช่น้ำแล้วช่วยดึงให้ยืด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถุงมือยืดจนใส่ได้ทั้งนิ้ว เพื่อนบ้านใส่เดินไปทั้งหมู่บ้าน ใครทักก็ชูมือให้ดูว่าหลานซื้อมา", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถุงมือยืดไปทางเดียว นิ้วโป้งยาวกว่านิ้วกลาง หลานหัวเราะจนนั่งลงแล้วขอเก็บไว้เป็นที่ระลึก", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_shade_clock_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [62, 85]}
+    title: "นาฬิกาเดินได้ใต้ร่มไม้"
+    text: "หน้าหีบปีนี้ชุดตัดของญาติมาตั้งเพิงริมไร่ใกล้บ้าน คุณเดินไปดูถึงหัวคันนาแล้วเข่าขอพัก ญาติเลยให้นั่งใต้ร่มไม้ คอยบอกเวลาเริ่มเจ็ดโมง พักเที่ยง เลิกห้าโมงเย็น คุณยังไม่แน่ใจว่าได้หน้าที่หรือถูกส่งไปพัก"
+    choices:
+      - id: canecutter_clock_accept
+        text: "รับหน้าที่นาฬิกาประจำไร่"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_clock_stay_home
+        text: "อยู่บ้านพักเข่าให้หายก่อน"
+        effects: {health: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: canecutter_clock_fan_crew
+        text: "พัดวีให้คนที่เดินมาพักเที่ยง"
+        effects: {relations: 2, network: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: canecutter_clock_cut_one
+        text: "ขอลองตัดสักต้นให้รู้ว่าเป็นยังไง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตัดได้หนึ่งต้นแล้วชูขึ้นให้ทั้งชุดปรบมือ จากนั้นเดินกลับไปนั่งร่มไม้ตามสัญญา ยิ้มอยู่จนเย็น", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ก้มลงไปแล้วลุกช้ากว่าที่คิด ญาติสองคนช่วยพยุงกลับร่มไม้ พร้อมสัญญาว่าจะไม่เล่าให้ใครฟัง", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: canecutter_clock_can_gong
+        text: "ตีกระป๋องบอกพักทุกชั่วโมง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งชุดได้พักจิบน้ำบ่อยขึ้น ตัดเสร็จเร็วกว่าเดิมเสียอีก หัวหน้าชุดขอยืมเสียงกระป๋องไปใช้ทุกไร่", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตีบอกพักบ่อยจนเจ้าของไร่เดินมาถามว่านี่ไร่อ้อยหรือโรงเรียน คุณตีกระป๋องตอบหนึ่งทีแทนคำอธิบาย", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

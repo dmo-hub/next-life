@@ -1,0 +1,508 @@
+# ร่างเรื่อง ช่างซ่อมนาฬิกาหน้าร้าน/แผงริมทาง · 15 ใบ · ลงเกมแล้ว ใบ 316 · แก้ตามข้อค้านรอบ 1 · ผู้เล่นเป็นลูกค้าที่ถือนาฬิกามา คนช่วยญาติเช็ดกระจก เพื่อนบ้านติดร้าน หรือเด็กยืนดู เสมอ · ไม่มีธงอาชีพช่าง · ไม่อ่านและไม่ตั้งธง · ไม่ผูกปี · ไม่มี effects job
+events:
+  - id: watchrepair_kid_backcase_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [7, 12]}
+    title: "ยืนดูเปิดฝาหลังนาฬิกา"
+    text: "ญาติพาคุณไปส่งนาฬิกาที่แผงซ่อมริมทาง ลุงช่างสอดใบมีดบาง ๆ งัดฝาหลังออก แล้วคีบเฟืองจิ๋วเรียงบนกระดาษขาวทีละตัว ญาติกระซิบว่าห้ามเอานิ้วไปแตะเด็ดขาด ลมเริ่มพัดมุมกระดาษให้ขยับ"
+    choices:
+      - id: watchrepair_kid_hands_back
+        text: "เอามือไขว้หลังไว้ทั้งสองข้าง"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_kid_block_wind
+        text: "ยืนบังลมไม่ให้กระดาษปลิว"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: watchrepair_kid_ask_wheels
+        text: "ถามว่าเฟืองแต่ละตัวทำอะไร"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: watchrepair_kid_cap_loupe
+        text: "หนีบฝาขวดไว้ที่ตาทำท่าตามลุง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงหัวเราะจนต้องวางแหนบ แล้วถือแว่นขยายของจริงให้คุณส่องเฟืองบนกระดาษโดยไม่ต้องแตะอะไรเลย", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝาขวดหลุดจากตากลิ้งไปใต้แผง คุณคลานตามจนพลาดตอนลุงปิดฝาหลัง ญาติบอกว่ารอบหน้าค่อยดูใหม่", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_kid_count_tick
+        text: "นับเสียงติ๊กของเรือนบนชั้น"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_teen_crystal_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [13, 18]}
+    title: "ขัดกระจกให้หายรอย"
+    text: "ปิดเทอมนี้คุณมาช่วยญาติเช็ดกระจกนาฬิกาที่แผง เรือนเก่า ๆ กระจกพลาสติกเป็นรอยขีดเต็มหน้า ลูกค้าคนหนึ่งยื่นนาฬิกาให้แล้วถามว่าขัดให้ใสเหมือนใหม่ได้ไหม จะนั่งรอ ญาติไปซื้อข้าวยังไม่กลับ"
+    choices:
+      - id: watchrepair_teen_honest_deep
+        text: "บอกตรง ๆ ว่าอาจไม่ใสเหมือนใหม่"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_teen_rub_hard
+        text: "เอาผ้าถูสุดแรงจนกว่าจะใส"
+        outcomes:
+          - {weight: 1, ok: true, text: "รอยตื้นกว่าที่คิด ถูไปสิบนาทีหน้าปัดใสขึ้นจนลูกค้าก้มอ่านเลขได้ชัด แล้วทิ้งเหรียญไว้เป็นค่าขนมให้", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถูจนแขนล้า รอยยังอยู่ครบทุกเส้น ญาติกลับมาดูแล้วส่ายหน้า บอกว่าเรือนนี้ควรให้ช่างดูทั้งชิ้น", effects: {health: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_teen_wait_relative
+        text: "ชวนลูกค้านั่งรอญาติกลับมา"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: watchrepair_teen_polish_case
+        text: "ขัดตัวเรือนให้เงาแทน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_teen_tilt_angle
+        text: "สอนให้เอียงดูมุมที่ไม่เห็นรอย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกค้าเอียงข้อมือตามแล้วร้องว่าจริงด้วย เดินกลับไปทั้งที่ยังเอียงแขนค้างอยู่อย่างนั้น", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกค้าเอียงไปมาจนเห็นรอยชัดกว่าเดิม แล้วถามหาญาติของคุณด้วยน้ำเสียงเรียบ ๆ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_teen_tick_study_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [14, 18]}
+    title: "อ่านหนังสือในร้านติ๊กติ๊ก"
+    text: "ปิดเทอมคุณมาช่วยญาติเช็ดกระจกนาฬิกาที่ร้าน ช่วงบ่ายว่างก็กางหนังสือเตรียมสอบ ร้านเงียบจนได้ยินเสียงติ๊กสิบกว่าเรือนซ้อนกันไม่ตรงจังหวะ คุณอ่านบรรทัดเดิมเป็นรอบที่สามแล้ว"
+    choices:
+      - id: watchrepair_teen_read_beat
+        text: "อ่านให้ตรงจังหวะติ๊กไปเลย"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_teen_sit_outside
+        text: "ยกเก้าอี้ไปนั่งอ่านหน้าร้าน"
+        effects: {knowledge: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_teen_ask_loudest
+        text: "ถามญาติว่าเรือนไหนดังสุด"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_teen_find_lag
+        text: "ไล่หาเรือนที่ติ๊กช้ากว่าเพื่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณเงี่ยหูไล่ทีละชั้นจนเจอเรือนที่เดินช้ากว่าเพื่อน ญาติมาฟังแล้วพยักหน้า เล่าให้ลูกค้าฟังทั้งบ่ายว่าใครหาเจอ", effects: {knowledge: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฟังไปฟังมาไม่มีเรือนไหนตรงกันสักเรือน คุณหลับคาหนังสือ ตื่นมาแก้มมีรอยสันปกเป็นเส้นตรง", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_teen_hum_over
+        text: "ฮัมเพลงกลบเสียงติ๊ก"
+        effects: {happiness: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_ya_heirloom_pair_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "นาฬิกาเก่าสองเรือน"
+    text: "คุณได้นาฬิกาตั้งโต๊ะเก่าสองเรือนมาจากบ้านหลังเก่าที่ไปช่วยเก็บของ หิ้วมาวางบนเคาน์เตอร์ร้านซ่อม ช่างบอกว่าต้องล้างเครื่องและหยอดน้ำมันทั้งสองเรือน เด็กข้างร้านที่ยืนดูอยู่ถามว่าเรือนไหนเป็นของใคร คุณเองก็ไม่รู้"
+    choices:
+      - id: watchrepair_ya_fix_both
+        text: "ซ่อมทั้งสองเรือนไปพร้อมกัน"
+        effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_one_by_one
+        text: "ซ่อมทีละเรือน เดือนละเรือน"
+        effects: {knowledge: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_ask_elders
+        text: "กลับไปถามคนแถวบ้านหลังนั้นก่อน"
+        effects: {relations: 2}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_guess_owner
+        text: "เดาว่าเรือนดังเป็นของเจ้าของเดิม"
+        outcomes:
+          - {weight: 1, ok: true, text: "กลับไปเล่าให้คนแก่แถวบ้านหลังนั้นฟัง ท่านหัวเราะบอกว่าเดาถูก เจ้าของเก่าเป็นคนเสียงดังที่สุดในซอย นาฬิกาก็เลยได้นิสัยไปด้วย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กลับไปถามคนแถวนั้น แกแก้ว่าเรือนนั้นเจ้าของเก่าซื้อมือสองมาอีกที แล้วเล่าเรื่องวันที่ซื้อยาวจนถึงมื้อเย็น", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_label_base
+        text: "เขียนชื่อติดใต้ฐานไว้กันลืม"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_ya_strap_hole_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [20, 30]}
+    title: "เจาะรูสายนาฬิกาเพิ่ม"
+    text: "สายหนังนาฬิกาเรือนแรกของคุณหลวมจนหมุนรอบข้อมือ ช่างให้ลองรัดรูที่แน่นสุดก่อน แล้วบอกว่าเจาะเพิ่มอีกรูก็ได้ แต่เจาะแล้วย้อนไม่ได้ ช่างลองเจาะบนกระดาษให้ดูหนึ่งรอบ แล้วรอคุณชี้ตำแหน่ง"
+    choices:
+      - id: watchrepair_ya_one_hole
+        text: "ชี้จุดเดียวพอ แน่นกำลังดี"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_two_holes
+        text: "เจาะสองรู เผื่อหลังมื้อเที่ยง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เช้าใช้รูใน บ่ายขยับมารูนอก นาฬิกาอยู่กับข้อมือพอดีทั้งวัน เพื่อนเห็นแล้วเอาวิธีนี้ไปบอกช่างบ้าง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สองรูห่างกันนิดเดียว ลงรูไหนก็หลวมเท่ากัน คุณกลับไปให้ช่างดูอีกรอบพร้อมรอยยิ้มแห้ง", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_wear_loose
+        text: "ใส่หลวม ๆ ดันขึ้นแขนเอา"
+        effects: {happiness: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_trim_strap
+        text: "ขอให้ตัดปลายสายให้สั้นด้วย"
+        effects: {knowledge: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_paper_again
+        text: "ขอลองเจาะบนกระดาษอีกสองรอบ"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_ya_one_minute_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [22, 30]}
+    title: "ช้าวันละหนึ่งนาที"
+    text: "นาฬิกาข้อมือของคุณเดินช้าวันละหนึ่งนาทีพอดีทุกวัน ไม่ขาดไม่เกิน ช่างถามว่าช้าสม่ำเสมอหรือช้าเป็นบางวัน แล้วเอาปลายไขควงเขี่ยคันเล็กในเครื่องเบา ๆ บอกให้ทิ้งไว้ข้ามคืนดูก่อน แต่พรุ่งนี้คุณต้องออกจากบ้านแต่เช้า"
+    choices:
+      - id: watchrepair_ya_leave_overnight
+        text: "ฝากไว้ข้ามคืนตามที่ช่างบอก"
+        effects: {knowledge: 1, relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_watch_adjust
+        text: "ขอนั่งดูตอนช่างเขี่ยคันปรับ"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_ask_worth
+        text: "ถามว่าช้านาทีเดียวต้องซ่อมไหม"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_five_ahead
+        text: "ตั้งเร็วไปห้านาทีเลยจบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณไปถึงก่อนเวลานัดทุกครั้ง คนที่นัดไว้ชมว่าตรงเวลา ไม่มีใครรู้ว่านาฬิกาของคุณเดินเร็วไปห้านาที", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พอรู้ว่าเร็วห้านาที คุณก็เดินช้าลงห้านาทีทุกเช้าโดยไม่รู้ตัว สุดท้ายไปถึงสายหนึ่งนาทีเท่าเดิม", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_neighbor_knock
+        text: "ฝากเพื่อนบ้านเคาะประตูปลุก"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_ya_forgot_slip_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "ใบรับฝากในกระเป๋ากางเกง"
+    text: "คุณซักกางเกงตัวเก่าแล้วเจอใบรับฝากซ่อมนาฬิกาที่ยับจนพับเป็นรูปเรือ นึกออกว่าฝากไว้ตั้งแต่ต้นปี ร้านปากซอยติดป้ายเตือนให้ถือใบมารับของมาหลายเดือนแล้ว และคุณเดินผ่านป้ายนั้นทุกวัน"
+    choices:
+      - id: watchrepair_ya_go_with_slip
+        text: "คลี่ใบรับแล้วถือไปรับทันที"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_describe_watch
+        text: "ไปบรรยายหน้าตาเรือนให้ช่างฟัง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช่างฟังได้สามคำก็เปิดลิ้นชักหยิบออกมา ไขลานให้สองรอบ เข็มเริ่มเดินทันที ช่างบอกว่ามันรอเจ้าของจนลานหมดไปหลายรอบแล้ว", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณบรรยายจนช่างหยิบออกมาห้าเรือน ไม่มีเรือนไหนใช่ และคุณเริ่มไม่แน่ใจว่าเรือนของตัวเองหน้าตาแบบไหน", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_snack_sorry
+        text: "ซื้อขนมติดมือไปขอโทษช่าง"
+        effects: {relations: 1, network: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_send_friend
+        text: "ฝากเพื่อนที่ผ่านทางไปรับแทน"
+        effects: {network: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_ya_later_free
+        text: "รอวันว่างจริง ๆ ค่อยไป"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_work_twin_bells_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "กระดิ่งปลุกดังทั้งตลาด"
+    text: "คุณหิ้วนาฬิกาปลุกกระดิ่งคู่ที่คนในบ้านบ่นว่าดังเกินมาให้ช่างดู ช่างไขลานลองตั้งปลุก ค้อนเล็กตีกระดิ่งสองใบสลับกันรัวจนเพื่อนบ้านข้างร้านชะโงกหน้าออกมาดู ช่างถามว่าจะให้เบาลงหรือให้ดังเหมือนเดิม"
+    choices:
+      - id: watchrepair_work_make_softer
+        text: "ขอให้เบาลงหน่อย บ้านจะได้สงบ"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_keep_loud
+        text: "ดังแบบนี้ดีแล้ว ไม่สายแน่"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_cloth_bell
+        text: "เอาผ้าพันกระดิ่งเองที่บ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เสียงกริ่งกลายเป็นเสียงเคาะประตูเบา ๆ ทั้งบ้านตื่นอย่างอารมณ์ดีเป็นครั้งแรกในรอบปี", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผ้าหนาเกินไป เช้าวันจันทร์ไม่มีใครได้ยินอะไรเลย ทั้งบ้านตื่นพร้อมกันตอนแดดส่องเข้าห้อง", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_sorry_neighbor
+        text: "หันไปขอโทษเพื่อนบ้านข้างร้าน"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_see_hammer
+        text: "ขอดูว่าค้อนตีกระดิ่งยังไง"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_work_tall_clock_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "นาฬิกาตู้เดินขากะเผลก"
+    text: "นาฬิกาตู้สูงในบ้านญาติเดินจังหวะไม่สม่ำเสมอหลังคุณช่วยย้ายตู้ไปชิดผนังใหม่ ตู้สูงจนขนไปร้านไม่ไหว ช่างจึงมาดูถึงบ้าน ฟังแป๊บเดียวก็บอกว่าพื้นเอียง แล้วหันมามองคนที่ย้ายตู้ ซึ่งก็คือคุณ"
+    choices:
+      - id: watchrepair_work_fold_paper
+        text: "พับกระดาษรองใต้ขาตู้"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_move_back
+        text: "ย้ายตู้กลับที่เดิมทั้งตู้"
+        effects: {health: -2, relations: 2}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_listen_beat
+        text: "นั่งฟังจังหวะกับช่างจนตรง"
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_bob_nut
+        text: "ขอช่างหมุนน็อตใต้ลูกตุ้มแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช่างหมุนน็อตทีละนิดจนเดินเร็วช้าตรงเป๊ะ แล้วชี้ให้ฟังว่ายังกะเผลกอยู่ดีเพราะพื้นเอียง คุณได้รู้ว่านาฬิกาเรือนเดียวเสียได้สองเรื่อง", effects: {knowledge: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช่างหมุนให้ตามขอ เวลาตรงแล้วแต่จังหวะยังติ๊กต่อกกะเผลกเหมือนเดิม สุดท้ายก็ต้องรองขาตู้อยู่ดี แถมเสียค่าแรงเพิ่ม", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_water_level
+        text: "เอาแก้วน้ำวางวัดระดับพื้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้ำในแก้วเอียงให้เห็นชัด ช่างพยักหน้าว่าวิธีนี้ใช้ได้ ตู้กลับมาเดินติ๊กต่อกเรียบเหมือนเดิมก่อนข้าวเย็น", effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แก้วล้ม น้ำไหลเข้าใต้ตู้ ทุกคนต้องช่วยกันเช็ดพื้น ช่างนั่งรอพลางฟังนาฬิกาเดินกะเผลกต่อไป", effects: {relations: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_blame_floor
+        text: "บอกว่าบ้านนี้เอียงมานานแล้ว"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_work_stopped_dawn_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "นาฬิกาในบ้านหยุดเดิน"
+    text: "เช้ามืดป้าที่บ้านปลุกคุณเพราะนาฬิกาฝาผนังหยุดเดิน บ้านเงียบผิดปกติจนป้าถือว่าไม่ดี อยากให้รีบเอาไปให้ช่าง คุณลองไขลานดู เข็มเดินได้ไม่กี่นาทีก็หยุดอีก ร้านซ่อมยังไม่เปิด"
+    choices:
+      - id: watchrepair_work_rush_shop
+        text: "หิ้วไปนั่งรอหน้าร้านก่อนเปิด"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: watchrepair_work_wind_often
+        text: "ไขลานทุกห้านาทีจนร้านเปิด"
+        outcomes:
+          - {weight: 1, ok: true, text: "เข็มขยับไปได้ทีละนิด ป้านั่งเฝ้าด้วยความโล่งใจ บ้านมีเสียงติ๊กอยู่จนถึงเวลาร้านเปิดพอดี", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไขถึงรอบที่สิบก็เริ่มสงสัยว่ากำลังทำอะไรอยู่ ป้าหลับไปแล้ว ส่วนคุณออกจากบ้านสายจนวุ่นทั้งเช้า", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_explain_spring
+        text: "อธิบายป้าว่ารอช่างดูก็พอ"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_borrow_clock
+        text: "ยืมนาฬิกาข้างบ้านมาแขวนแทน"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_tick_mouth
+        text: "ทำปากเป็นเสียงติ๊กให้ป้าฟัง"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_work_sludge_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [33, 45]}
+    title: "ไขแล้วเข็มไม่ขยับ"
+    text: "นาฬิกาไขลานที่คุณใส่ทุกวันมาหลายปี ช่วงนี้ไขทุกเช้าแต่เข็มไม่ยอมขยับ ช่างเปิดฝาหลังแล้วยื่นแว่นขยายให้ส่อง น้ำมันในเครื่องแห้งเหนียวเป็นโคลนจนเครื่องฝืด ต้องล้างทั้งเครื่องแล้วหยอดใหม่ ใช้เวลาหลายวัน"
+    choices:
+      - id: watchrepair_work_full_clean
+        text: "ยอมฝากไว้ ล้างให้หมดจด"
+        effects: {knowledge: 1, happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_tap_first
+        text: "ขอให้เคาะ ๆ ดูก่อนเผื่อเดิน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช่างเคาะเบา ๆ สองทีเข็มกระดิกขึ้นมาจริง คุณใส่กลับไปอย่างดีใจ เดินได้ถึงบ่ายก็หยุดนิ่ง แต่อย่างน้อยก็ได้ใส่ครบครึ่งวัน", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เคาะแล้วเงียบสนิท ช่างบอกว่าเคาะจนค่ำก็ไม่ช่วย แล้วยื่นใบรับฝากล้างเครื่องให้โดยไม่พูดอะไรอีก", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_ask_time
+        text: "เลิกใส่ ถามเวลาคนรอบตัวเอา"
+        effects: {network: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_study_sludge
+        text: "ขอส่องดูนาน ๆ ให้รู้ว่าเป็นยังไง"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: watchrepair_work_ask_interval
+        text: "ถามช่างว่าควรล้างทุกกี่ปี"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_mid_cant_hear_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "เสียงอะไรติ๊ก ๆ ทั้งวัน"
+    text: "บ้านคุณอยู่ติดร้านซ่อมนาฬิกามาหลายปี วันนี้คนแปลกหน้าแวะถามทางหน้าบ้าน แล้วถามต่อว่าเสียงติ๊ก ๆ ทั้งวันนี่ทนได้ยังไง คุณเงี่ยหูฟัง ไม่ได้ยินอะไรเลย จนเขาชี้ไปทางร้านข้าง ๆ"
+    choices:
+      - id: watchrepair_mid_listen_again
+        text: "ตั้งใจฟังจนได้ยินอีกครั้ง"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_mid_show_shop
+        text: "ชวนคนถามทางไปดูร้านข้าง ๆ"
+        effects: {network: 2}
+        merit: [{cat: neutral}]
+      - id: watchrepair_mid_brag_ear
+        text: "อวดว่าแยกเสียงได้ทีละเรือน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณหลับตาชี้ถูกไปสามเรือน ช่างข้างบ้านโผล่หน้ามาปรบมือ คนถามทางยืนดูต่อจนลืมว่าจะไปไหน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชี้ผิดทั้งสามเรือน ช่างข้างบ้านบอกว่าเรือนที่คุณชี้หยุดเดินมาตั้งแต่เมื่อวาน", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_mid_say_used_to
+        text: "บอกว่าอยู่ไปเดี๋ยวก็ชินเอง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_mid_sit_listen
+        text: "ชวนคนถามทางนั่งฟังสักพัก"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_mid_cuckoo_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "นกโผล่ร้องกลางร้าน"
+    text: "คุณนั่งรอช่างเปลี่ยนสายนาฬิกา ช่างก้มหน้าถอดสลักสายทีละข้างอย่างใจเย็น จู่ ๆ นาฬิกาแขวนเรือนไม้ที่มีคนฝากไว้ก็เปิดประตูเล็ก นกตัวจิ๋วโผล่ออกมาร้อง ลูกค้าอีกคนสะดุ้งจนเก้าอี้ครูด ช่างยังทำงานต่อ"
+    choices:
+      - id: watchrepair_mid_laugh_along
+        text: "หัวเราะไปกับลูกค้าคนนั้น"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_mid_count_calls
+        text: "นับว่านกร้องกี่ครั้ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "นกร้องสี่ครั้งตรงกับเวลาบนผนังพอดี คุณประกาศเวลาให้ทั้งร้านฟังด้วยความภูมิใจ", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นกร้องไปสิบสามครั้งตอนบ่ายสี่ ช่างเงยหน้าขึ้นมาบอกว่านั่นแหละเหตุที่เจ้าของเอามาฝาก", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_mid_check_ok
+        text: "ถามคนที่สะดุ้งว่าไหวไหม"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: watchrepair_mid_ask_whose
+        text: "ถามช่างว่าเรือนนี้ของใคร"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_mid_mimic_bird
+        text: "ร้องเลียนเสียงนกตอบกลับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกค้าอีกคนร้องตามด้วย ร้านซ่อมนาฬิกามีเสียงนกสามตัวจนช่างหลุดหัวเราะ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นกหุบกลับเข้าไปพอดี เหลือแต่เสียงคุณร้องอยู่คนเดียวกลางร้าน ช่างเงยหน้ามองนิ่ง ๆ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_old_loupe_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "แว่นขยายติดหน้าสี่สิบปี"
+    text: "คุณหิ้วนาฬิกาไขลานเรือนเก่าไปหาตาช่างที่ซ่อมนาฬิกาหัวมุมมาสี่สิบปี แว่นขยายหนีบติดตาจนเหมือนเป็นส่วนหนึ่งของหน้า มือแกนิ่งกว่ามือคุณเยอะ แกบอกว่าลานมันล้าตามอายุ เหมือนเราสองคนนั่นแหละ"
+    choices:
+      - id: watchrepair_old_new_spring
+        text: "เปลี่ยนลานใหม่ให้เดินต่อ"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: watchrepair_old_sit_chat
+        text: "นั่งคุยเรื่องเก่ารอจนเสร็จ"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_old_listen_duel
+        text: "ท้าแกแข่งฟังว่าเรือนไหนเดินช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณชี้เรือนบนชั้นสองก่อนแก แกถอดแว่นขยายมาเทียบกับเรือนประจำร้าน แล้วยอมรับว่ามันช้าไปนาทีหนึ่งจริง", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณชี้ไปสามเรือนก็ไม่ถูก แกชี้เรือนเดียวแล้วถูกเลย แกบอกว่าฟังมาสี่สิบปี หูมันจำเสียงได้เอง", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_old_kids_watch
+        text: "บอกแกให้ชวนเด็กแถวนี้มาดูบ้าง"
+        effects: {network: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_old_wind_more
+        text: "ไม่ซ่อม ไขวันละหลายรอบเอา"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_old_sunday_wind_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "กุญแจไขลานหักคารู"
+    text: "ทุกคืนวันอาทิตย์คุณเดินไขลานนาฬิกาในบ้านทีละเรือน เด็กข้างบ้านมายืนดูทุกสัปดาห์จนรู้ว่าเรือนไหนต้องไขกี่รอบ คืนนี้กุญแจไขลานเรือนห้องโถงหักคารู ร้านซ่อมหัวมุมเปิดพรุ่งนี้เช้า"
+    choices:
+      - id: watchrepair_old_hang_sign
+        text: "แขวนป้ายว่าเรือนนี้ขอพักก่อน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_old_hand_over
+        text: "ให้เด็กไขเรือนอื่นแทนสักเรือน"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_old_pliers
+        text: "เอาคีมคีบเศษกุญแจออกเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เศษกุญแจหลุดออกมาในครั้งเดียว เด็กข้างบ้านปรบมือ คุณชูคีมขึ้นเหมือนได้ถ้วยรางวัล", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เศษจมลึกกว่าเดิม พรุ่งนี้ช่างหัวมุมใช้เวลาครึ่งเช้าคีบออก แล้วคิดค่าแรงเพิ่มด้วยหน้านิ่ง ๆ", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_old_skip_week
+        text: "ข้ามสัปดาห์นี้ไปทั้งบ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่มีใครในบ้านสังเกต ทุกเรือนเดินต่อจนถึงอาทิตย์หน้าพอดี คุณแอบภูมิใจกับลานที่ยังแข็งแรง", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กลางสัปดาห์บ้านเงียบลงทีละเรือน ทุกคนเพิ่งรู้ว่าเคยได้ยินเสียงติ๊กก็ตอนที่มันหยุด", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watchrepair_old_new_key
+        text: "พรุ่งนี้ไปขอทำกุญแจที่ร้าน"
+        effects: {network: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]

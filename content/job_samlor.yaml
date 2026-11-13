@@ -1,0 +1,496 @@
+# ร่างเรื่อง คนถีบสามล้อรับจ้าง · 15 ใบ · ลงเกมแล้ว ใบ 316 · แก้ตามข้อค้านรอบ 1 · ผู้เล่นเป็นเด็กนั่งเบาะหลัง คนช่วยญาติเช็ดเบาะ ผู้โดยสาร เพื่อนคนถีบ ลูกค้าประจำ เสมอ · ไม่อ่านและไม่ตั้งธง · ไม่ผูกปี · ไม่เปลี่ยนสายชีวิต
+events:
+  - id: samlor_backseat_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [5, 10]}
+    title: "เบาะหลังสามล้อไปตลาด"
+    text: "ป้าข้างบ้านพาคุณติดสามล้อไปตลาดเช้า คุณนั่งเบียดตะกร้าอยู่บนเบาะหวายข้างป้า ประทุนผ้าใบกางบังแดดอยู่เหนือหัว ที่แฮนด์ของลุงคนถีบมีกระดิ่งห้อยอยู่หนึ่งลูก คุณอยากรู้ไปหมดว่าประทุนพับเก็บได้ไหม และกระดิ่งนั่นต้องบีบตอนไหน"
+    choices:
+      - id: samlor_kid_ask_canvas
+        text: "ถามลุงว่าประทุนพับยังไง"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_kid_hold_basket
+        text: "กอดตะกร้าของป้าไว้ไม่ให้ล้ม"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: samlor_kid_count_houses
+        text: "นับบ้านที่ผ่านทีละหลัง"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_kid_nap
+        text: "เอนหลังหลับไปกับลมเย็น"
+        effects: {health: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_kid_ring_bell
+        text: "ขอบีบกระดิ่งแทนลุง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงยื่นกระดิ่งให้ คุณบีบทุกครั้งที่ผ่านหน้าบ้านคน คนในซอยโบกมือตอบกันทั้งแถว ป้าบอกว่าวันนี้ไปตลาดเหมือนแห่ขบวน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณบีบรัวจนหมาข้างทางวิ่งเห่าตามมาสามบ้าน ลุงยิ้มแห้งแล้วขอกระดิ่งคืนอย่างสุภาพ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: samlor_wipe_seat_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [13, 16]}
+    title: "ช่วยลุงเช็ดเบาะปิดเทอม"
+    text: "ปิดเทอมนี้คุณรับหน้าที่เช็ดสามล้อให้ลุงซึ่งเป็นญาติ ก่อนแกออกไปรับขาประจำ เบาะหวายมีฝุ่นติดซอก ประทุนผ้าใบชุ่มน้ำค้าง ลุงบอกว่าเสร็จแล้วจะให้ค่าขนม แต่แกออกจากบ้านตั้งแต่ฟ้ายังไม่สาง"
+    choices:
+      - id: samlor_wipe_wake_early
+        text: "ตื่นก่อนฟ้าสางมาเช็ดให้ทัน"
+        effects: {health: -1, relations: 2, money: {unit: income_x, amount: 0.01}}
+        merit: [{cat: help_others, level: 1}]
+      - id: samlor_wipe_night_before
+        text: "เช็ดไว้ตั้งแต่หัวค่ำแทน"
+        effects: {knowledge: 1, money: {unit: income_x, amount: 0.01}}
+        merit: [{cat: neutral}]
+      - id: samlor_wipe_ask_more
+        text: "ขอค่าขนมเพิ่มเพราะตื่นเช้า"
+        effects: {money: {unit: income_x, amount: 0.01}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_wipe_learn_canvas
+        text: "ขอให้ลุงสอนพับประทุน"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_wipe_polish_shine
+        text: "ขัดเบาะจนขึ้นเงาวับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เบาะเงาจนลูกค้าประจำทักว่าเปลี่ยนรถใหม่หรือ ลุงยืดอกบอกว่าหลานทำ แล้วแถมค่าขนมให้อีกเท่าตัว", effects: {happiness: 2, money: {unit: income_x, amount: 0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เบาะลื่นเกินไป ลูกค้าคนแรกเลื่อนไถลจนต้องจับขอบประทุนไว้ทั้งทาง ลุงกลับมาพร้อมผ้าแห้งผืนใหม่ให้คุณเช็ดออก", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: samlor_rain_queue_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [15, 18]}
+    title: "ฝนตก คนรอสามล้อเต็มศาลา"
+    text: "ฝนตกหนักตอนตลาดวาย แม่ค้ากับเด็กนักเรียนยืนรอสามล้อกันเต็มศาลาริมทาง ลุงที่เป็นญาติฝากให้คุณช่วยดูคิวระหว่างลุงไปส่งเที่ยวแรก ทุกคนบอกว่าตัวเองมาก่อน และกระสอบผักของแม่ค้าก็ไม่มีใครยอมยกหลบ"
+    choices:
+      - id: samlor_rain_elders_first
+        text: "ให้ผู้สูงอายุกับเด็กเล็กขึ้นก่อน"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: samlor_rain_write_list
+        text: "จดชื่อตามลำดับที่เห็นมาถึง"
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_rain_carry_sacks
+        text: "ช่วยยกกระสอบผักขึ้นรถให้"
+        effects: {health: -1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: samlor_rain_hide
+        text: "หลบเข้าร้านกาแฟรอฝนหยุด"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_rain_by_destination
+        text: "ให้คนไปทางเดียวกันขึ้นคันเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนไปทางเดียวกันได้นั่งรถคันเดียวกัน ศาลาโล่งเร็วกว่าทุกวัน ลุงกลับมาเห็นแล้วถามว่าใครสอน", effects: {happiness: 2, network: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทุกคนบอกว่าบ้านตัวเองอยู่ทางเดียวกันหมด รถคันแรกมีคนสามคนกับกระสอบสองใบ ลุงต้องลงจูงไปทั้งทาง", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: samlor_try_pedal_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "ขอลองถีบดูสักรอบ"
+    text: "คุณนั่งสามล้อกลับบ้านแล้วนึกสนุก ขอลุงคนถีบสลับที่ลองถีบดูบ้างตรงลานโล่งหน้าวัด ลุงหัวเราะแล้วลงไปนั่งเบาะแทน บอกว่าเชิญเลย ถีบเป็นแล้วจะได้รู้ คุณจับแฮนด์ปุ๊บ รถก็เริ่มเลี้ยวไปทางซ้ายเอง"
+    choices:
+      - id: samlor_pedal_lean_right
+        text: "เอียงตัวสู้ไปทางขวา"
+        outcomes:
+          - {weight: 1, ok: true, text: "รถค่อย ๆ ตรงทาง คุณถีบได้ครบรอบลาน ลุงปรบมือบนเบาะแล้วบอกว่ารอบหน้าคิดค่าโดยสารคุณแทน", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถวนเป็นวงกลมกลางลานช้า ๆ สามรอบเต็ม เด็กวัดมายืนดูแล้วปรบมือทุกรอบที่คุณผ่าน", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: samlor_pedal_ask_trick
+        text: "ถามลุงว่ามีเคล็ดอะไร"
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_pedal_walk_it
+        text: "ลงจูงรถเดินรอบลานแทน"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_pedal_give_back
+        text: "ยอมแพ้ คืนที่นั่งให้ลุง"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_pedal_tip
+        text: "ถีบไม่ไหว จ่ายค่าเหนื่อยลุงเพิ่ม"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+
+  - id: samlor_two_bags_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "สองคนกับถุงอีกหกใบ"
+    text: "คุณกับเพื่อนตัวโตเพิ่งกินเลี้ยงเสร็จ ถือถุงของฝากมาอีกคนละสามใบ ลุงคนถีบมองทั้งคู่ตั้งแต่หัวจรดเท้า แล้วบอกว่ารับได้สองคน แต่ก็แล้วแต่น้ำหนักนะ พอเพื่อนก้าวขึ้นไปก่อน เบาะหวายแอ่นลงจนได้ยินเสียงดังเอี๊ยด"
+    choices:
+      - id: samlor_bags_two_rides
+        text: "แยกเรียกสองคัน"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: samlor_bags_walk_home
+        text: "ฝากของไว้กับลุง แล้วเดินตาม"
+        effects: {health: 1, happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_bags_balance
+        text: "ช่วยลุงจัดถุงให้รถไม่เอียง"
+        effects: {knowledge: 1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: samlor_bags_pay_more
+        text: "ขอขึ้นทั้งคู่ จ่ายเพิ่มให้"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: samlor_bags_breathe_in
+        text: "แขม่วพุงพร้อมกันแล้วขึ้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งคู่แขม่วจนลุงถีบออกตัวได้ ถึงบ้านแล้วค่อยหายใจออกพร้อมกัน ลุงหัวเราะจนต้องจอดพักหน้าประตู", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แขม่วได้ถึงหัวมุมแรก เพื่อนหัวเราะออกมาก่อน เบาะแอ่นลงอีกนิด ลุงขอให้ลงเดินช่วงทางลาดทั้งคู่", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: samlor_haggle_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [20, 30]}
+    title: "ต่อราคาริมทาง"
+    text: "คุณจะไปบ้านเพื่อนที่อยู่ระหว่างตลาดกับโรงพยาบาล ลุงคนถีบบอกว่าราคาตายตัว ไปตลาดราคาหนึ่ง ไปโรงพยาบาลอีกราคา ตรงกลางไม่มีในตาราง คุณยืนต่อราคากันริมทางจนลุงอีกคันที่จอดข้าง ๆ เริ่มเข้ามาช่วยคิด"
+    choices:
+      - id: samlor_haggle_market_walk
+        text: "จ่ายราคาตลาด แล้วเดินต่อเอง"
+        effects: {health: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: samlor_haggle_full_price
+        text: "จ่ายราคาโรงพยาบาลไปเลย"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: samlor_haggle_halfway
+        text: "เสนอราคากลางระหว่างสองที่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงทั้งสองคันพยักหน้าพร้อมกัน ตั้งชื่อปลายทางใหม่ว่าบ้านเพื่อนคุณ แล้วจดเพิ่มลงตารางราคาในใจ", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงสองคันเถียงกันเองว่าบ้านเพื่อนคุณใกล้ตลาดหรือใกล้โรงพยาบาลมากกว่า คุณยืนรอจนเพื่อนเดินมารับเอง", effects: {happiness: 1, health: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: samlor_haggle_ask_friend
+        text: "ถามว่าปกติเพื่อนจ่ายเท่าไร"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_haggle_other_rider
+        text: "หันไปถามราคาลุงคันข้าง ๆ"
+        effects: {network: 1, relations: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: samlor_full_load_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [21, 30]}
+    title: "ย้ายห้องด้วยสามล้อคันเดียว"
+    text: "คุณย้ายห้องเช่าไปอยู่อีกฝั่งตลาด ของมีที่นอนหนึ่งผืน หม้อสองใบ กับกล่องหนังสือที่หนักกว่าที่คิด ลุงคนถีบดูกองของแล้วบอกว่าถ้าเต็มคันคิดอีกราคา ไม่ใช่ราคาคนนั่ง ส่วนคุณจะนั่งตรงไหนก็ยังไม่มีใครรู้"
+    choices:
+      - id: samlor_load_two_trips
+        text: "แบ่งขนสองเที่ยว"
+        effects: {knowledge: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: samlor_load_walk_beside
+        text: "จ่ายราคาเต็มคัน แล้วเดินข้างรถ"
+        effects: {health: -1, relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: samlor_load_give_books
+        text: "ยกหนังสือให้ห้องสมุดวัดไปบางส่วน"
+        effects: {happiness: 1, knowledge: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_load_tie_rope
+        text: "ช่วยลุงมัดเชือกให้แน่นหนา"
+        effects: {knowledge: 1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: samlor_load_parade
+        text: "ขอให้ลุงถีบรอบตลาดอวดของสักรอบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณเดินนำข้างรถไปรอบตลาด คนขายของเห็นกองของแล้วตามมาช่วยยกขึ้นห้องใหม่ถึงสามคน ยังไม่ทันแกะกล่องคุณก็รู้จักคนครึ่งซอยแล้ว", effects: {happiness: 2, network: 2, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รอบตลาดยาวกว่าที่คิด ช้อนหล่นจากกล่องไปหนึ่งคัน แม่ค้าเก็บมาคืนถึงหน้าห้อง ลุงขอค่ารอบตลาดเพิ่มอีกนิดอย่างเกรงใจ", effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: samlor_wait_market_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ลุงรออยู่หน้าตลาด"
+    text: "คุณไปตลาดซื้อของเข้าบ้าน จ้างสามล้อคันประจำไว้ ลุงบอกว่าไม่ต้องรีบ เดี๋ยวรอ ตอนนี้คุณเดินมาเกือบชั่วโมงแล้ว ของในมือยังขาดอีกสามอย่าง และลุงจอดตากแดดอยู่หน้าตลาดตรงที่ไม่มีร่มไม้สักต้น"
+    choices:
+      - id: samlor_wait_rush
+        text: "ตัดของที่เหลือทิ้ง รีบกลับไป"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_wait_cold_drink
+        text: "ซื้อน้ำเย็นไปให้ลุงก่อน"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: help_others, level: 1}]
+      - id: samlor_wait_list_next
+        text: "จดรายการให้สั้นลงคราวหน้า"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: samlor_wait_pay_extra
+        text: "ให้ค่ารอเพิ่มตอนลงรถ"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_wait_one_more_shop
+        text: "ขอแวะอีกร้านเดียวจริง ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้านสุดท้ายมีขนมที่ลุงชอบพอดี คุณซื้อมาเผื่อ ลุงยิ้มทั้งทางกลับ แล้วพูดว่าร้านเดียวจริง ๆ ของคุณนี่ยาวดีนะ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านเดียวกลายเป็นสี่ร้าน พอกลับมาลุงหลับไปบนเบาะผู้โดยสารแล้ว คุณยืนถือถุงรอให้ลุงตื่นเองอยู่ครู่ใหญ่", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: samlor_chess_queue_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "หมากรุกหน้าคิวสามล้อ"
+    text: "คนถีบสามล้อหน้าตลาดตั้งกระดานหมากรุกรอคิวกันทุกวันช่วงสาย คุณเดินผ่านพอดีตอนที่ลุงคันหัวคิวได้ลูกค้า ลุงลุกขึ้นแล้วชี้ให้คุณนั่งแทน บอกว่าเดินม้าตัวนั้นนะ อย่าเดินอย่างอื่น แล้วก็ถีบออกไป อีกฝ่ายยิ้มรออยู่"
+    choices:
+      - id: samlor_chess_obey
+        text: "เดินม้าตามที่ลุงสั่ง"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_chess_own_move
+        text: "เดินตามใจตัวเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตาของคุณดีกว่าที่ลุงสั่ง พอลุงกลับมาเห็นกระดานก็ยืนนิ่ง แล้วชวนคุณมานั่งรอคิวด้วยทุกเย็น", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อีกฝ่ายรุกจนในสามตา ลุงกลับมาทันเห็นพอดี แล้วไม่พูดกับคุณจนลูกค้าคนถัดไปมาเรียก", effects: {relations: -1, happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: samlor_chess_decline
+        text: "ยกมือขอตัว ไม่ได้มาเล่น"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_chess_hold_seat
+        text: "นั่งเฝ้ากระดานไว้ไม่ขยับ"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_chess_buy_coffee
+        text: "สั่งกาแฟให้ทั้งวง แล้วนั่งดู"
+        effects: {network: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+
+  - id: samlor_wrong_regular_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ลุงคิดว่าเป็นขาประจำ"
+    text: "คุณย้ายมาทำงานเมืองนี้ได้ไม่กี่วัน ขึ้นสามล้อหน้าตลาดแล้วยังไม่ทันบอกทาง ลุงก็ถีบออกไปอย่างมั่นใจ เลี้ยวเข้าซอยที่คุณไม่รู้จัก ลุงชวนคุยว่าวันนี้ไม่ซื้อปลาทูเหมือนทุกวันหรือ คุณไม่เคยซื้อปลาทูที่นี่เลย"
+    choices:
+      - id: samlor_wrong_tell_now
+        text: "บอกลุงตรง ๆ ว่าไม่ใช่"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_wrong_go_along
+        text: "นั่งไปก่อน ดูว่าบ้านใคร"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงจอดหน้าบ้านป้าคนหนึ่งที่หน้าตาคล้ายคุณจนน่าตกใจ ป้าหัวเราะแล้วชวนกินข้าว คุณได้ญาติใหม่ในเมืองนี้หนึ่งคน", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงถีบไปจนสุดซอยแล้วหันมามองหน้าคุณชัด ๆ ครั้งแรก ทั้งคู่เงียบไปพักหนึ่ง แล้วลุงก็ถีบกลับมาที่เดิม", effects: {happiness: -1, health: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: samlor_wrong_ask_name
+        text: "ถามว่าขาประจำคนนั้นเป็นใคร"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_wrong_become_regular
+        text: "บอกว่าตั้งแต่วันนี้ขอเป็นขาประจำ"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: samlor_wrong_buy_fish
+        text: "ขอแวะซื้อปลาทูจริง ๆ ไปเลย"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+
+  - id: samlor_school_run_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "เจ็ดโมงเช้ารอบนักเรียน"
+    text: "ญาติฝากเด็กไว้กับคุณเทอมนี้ คุณจ้างสามล้อคันประจำรับไปโรงเรียนทุกเช้าเจ็ดโมง ลุงไปส่งตรงเวลาทุกวัน แต่สิ้นเดือนลุงบอกว่าบางวันไม่ต้องจ่าย วันไหนเด็กร้องเพลงให้ฟังทั้งทาง ลุงถือว่าหายกันแล้ว"
+    choices:
+      - id: samlor_school_pay_all
+        text: "ยืนยันจ่ายครบทุกวัน"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: samlor_school_accept
+        text: "รับน้ำใจ แล้วไหว้ขอบคุณ"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_school_rice_bag
+        text: "ฝากข้าวสารหนึ่งถังไปให้แทน"
+        effects: {relations: 2, network: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: help_others, level: 1}]
+      - id: samlor_school_ask_count
+        text: "ขอให้ลุงจดวันที่ไม่เก็บไว้"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_school_more_songs
+        text: "ให้เด็กซ้อมเพลงเพิ่มอีกสิบเพลง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กร้องได้ทั้งทางจนเพื่อนบ้านเปิดหน้าต่างฟัง ลุงบอกว่าเดือนนี้ฟรีทั้งเดือน แต่ขอให้เพลงสุดท้ายเปลี่ยนบ้าง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เด็กร้องเพลงเดียววนตั้งแต่บ้านถึงโรงเรียน ลุงขอเก็บเงินตามปกติเพื่อแลกกับความเงียบ", effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: samlor_spare_part_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "อะไหล่ชิ้นเดียวหาไม่ได้"
+    text: "เพื่อนเก่าที่ถีบสามล้อมานานมาบอกคุณว่าชิ้นส่วนเพลาหลังรถแตก ร้านแถวนี้ไม่มีขายแล้ว ร้านที่มีก็ขอราคาสูงกว่าที่เพื่อนหาได้ทั้งเดือน รถคันนี้ใช้หากินมาทั้งชีวิต เพื่อนไม่อยากเปลี่ยนคันใหม่"
+    choices:
+      - id: samlor_part_chip_in
+        text: "ช่วยออกค่าอะไหล่ครึ่งหนึ่ง"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: help_others, level: 1}]
+      - id: samlor_part_search_old
+        text: "ตระเวนหาร้านของเก่าด้วยกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้านเก่าท้ายตลาดมีชิ้นนี้วางฝุ่นจับอยู่บนชั้น เจ้าของร้านจำได้ว่าเคยซื้อสามล้อจากเพื่อนคุณเมื่อนานมาแล้ว และลดให้ครึ่งราคา", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดินกันจนหมดวันได้แต่น็อตที่ไม่เข้าเกลียว เพื่อนบอกว่าขอบใจ แล้วเลี้ยงข้าวคุณแทน รถยังจอดรออะไหล่อยู่หลังบ้าน", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: samlor_part_ask_welder
+        text: "แนะนำช่างที่รู้จักให้ลองเชื่อม"
+        effects: {network: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_part_lend
+        text: "ให้ยืมเงินแล้วนัดคืนทีหลัง"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.02}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_part_listen
+        text: "นั่งฟังเพื่อนบ่นจนหายเครียด"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: samlor_no_hurry_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [48, 59]}
+    title: "ไม่รีบก็ได้ ไปถึงเหมือนกัน"
+    text: "ความดันคุณขึ้น ๆ ลง ๆ วันนี้ต้องไปรับยาที่โรงพยาบาลอำเภอ คุณเลือกนั่งสามล้อ ลุงคนถีบไม่รีบเลยสักนิด แวะทักคนตลอดทาง บอกว่าวันไหนล้อหมุนก็ได้เงิน วันไหนเมื่อยก็พัก แต่คิวรับยาเช้าใกล้ปิดแล้ว"
+    choices:
+      - id: samlor_slow_enjoy
+        text: "นั่งรับลมไปเรื่อย ๆ ตามลุง"
+        effects: {happiness: 2, health: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_slow_ask_hurry
+        text: "ขอลุงเร่งหน่อยเพราะคิวหมอ"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_slow_chat
+        text: "คุยกับลุงเรื่องหมอไปตลอดทาง"
+        effects: {knowledge: 1, relations: 2}
+        merit: [{cat: neutral}]
+      - id: samlor_slow_buy_water
+        text: "ซื้อน้ำให้ลุงระหว่างรอหมอ"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: help_others, level: 1}]
+      - id: samlor_slow_greet_too
+        text: "ทักคนตามทางไปด้วยกับลุง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทักไปทักมาเจอพยาบาลจากโรงพยาบาลอำเภอเดินสวนมา ได้เข้ารับยาทันรอบเช้าพอดี ลุงบอกว่าเห็นไหม ทักคนไม่เคยเสียเวลา", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าคนหนึ่งชวนคุยเรื่องสวนหลังบ้านยาวจนห้องยาปิดรับคิวเช้า คุณได้ส้มจากป้ามาหนึ่งถุงแทน", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: samlor_knee_slope_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "เข่าลั่นตรงทางลาดสะพาน"
+    text: "ตาที่ถีบสามล้อมาสามสิบปีเป็นเพื่อนรุ่นเดียวกับคุณ ตาเล่าว่าตอนเริ่มถีบขึ้นสะพานได้รวดเดียวไม่ต้องพัก ขายังแข็งแรงแต่เข่าเริ่มลั่นทุกครั้งที่ขึ้นทางลาดสะพาน เช้านี้คุณนั่งไปวัดด้วย ได้ยินเสียงเข่ากับโซ่ดังสลับกัน ตาบอกว่าไหว"
+    choices:
+      - id: samlor_knee_walk_up
+        text: "ลงเดินขึ้นสะพานให้รถเบา"
+        effects: {health: 1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: samlor_knee_balm
+        text: "ยื่นยาหม่องให้ตาทาเข่า"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_knee_trust
+        text: "นั่งนิ่ง ๆ เชื่อตาว่าไหว"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_knee_other_road
+        text: "ชวนอ้อมทางที่ไม่มีสะพาน"
+        effects: {knowledge: 1, health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_knee_count_beat
+        text: "นับจังหวะให้ตาถีบตามเสียง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณนับหนึ่งสองดังพอให้ตาได้ยิน เข่ากับโซ่ลั่นตรงจังหวะพอดี ขึ้นสะพานได้รวดเดียว คนเดินผ่านปรบมือให้", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตาหัวเราะจนหมดแรงกลางสะพาน ทั้งคู่ต้องลงจูงรถขึ้นช้า ๆ พักหายใจทุกสามก้าว", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: samlor_regular_missing_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [62, 85]}
+    title: "เช้านี้ตาไม่มาหน้าบ้าน"
+    text: "หลายปีแล้วที่ตาคนถีบคันประจำมาจอดรอหน้าบ้านคุณทุกเช้าตั้งแต่แปดโมงครึ่ง พาไปตลาดบ้าง ไปวัดบ้าง เช้านี้เลยเวลาประจำมานานแล้ว ถนนหน้าบ้านยังว่าง คุณถือตะกร้ายืนรอมาครู่ใหญ่"
+    choices:
+      - id: samlor_missing_walk_check
+        text: "เดินไปดูที่หน้าตลาด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตานั่งจิบกาแฟอยู่หน้าตลาด บอกว่าวันนี้แม่ค้าหยุดกันทั้งตลาด เลยไม่ได้ออกมาวิ่ง แล้วก็ถีบพาคุณไปร้านของชำท้ายซอยแทน ไม่คิดค่ารถสักบาท", effects: {happiness: 2, network: 1, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนถีบคันอื่นบอกว่าตาไปงานบวชหลานต่างอำเภอสามวัน คุณเดินกลับบ้านช้า ๆ แล้วนับวันรอเหมือนเด็กรอปิดเทอม", effects: {health: -1, happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: samlor_missing_other_rider
+        text: "เรียกคันอื่นที่ผ่านมา"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_missing_stay_home
+        text: "ไม่ไปตลาดวันนี้ กินของเหลือ"
+        effects: {health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_missing_ask_neighbor
+        text: "ฝากเพื่อนบ้านถามข่าวตาให้"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_missing_save_snack
+        text: "ทำขนมเผื่อไว้ให้ตาพรุ่งนี้"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
