@@ -1,4 +1,5 @@
 import { makeRng, mixSeed } from './rng.mjs';
+import { dlcOpen, dlcStamp, getDlcDefault } from './dlc.mjs';
 import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp, HIT, HIT_KILL, isAcute, frailOf } from './death.mjs';
@@ -224,6 +225,7 @@ export function newLife(seed, content, heir = null) {
     { sex: 'หญิง', age: motherAge, alive: true },
     { sex: 'ชาย', age: motherAge + famRng.int(0, 8), alive: true },
   ];
+  const dlc = dlcStamp(heir?.dlc ?? getDlcDefault());
   const st = {
     rng,
     seed,
@@ -287,6 +289,8 @@ export function newLife(seed, content, heir = null) {
     fame: heir?.fame ?? 0,
     // ค่าซ้อนทับของตระกูล (overlapOf) — ใส่ช่องเฉพาะเมื่อ > 0 ⇒ ตระกูลที่ไม่เคยข้ามโลกได้สถานะเท่าเดิมทุกไบต์ · เซฟเก่าไม่มีช่อง = 0
     ...(heir?.overlap && { overlap: heir.overlap }),
+    // ก้อน DLC ที่ล็อกของตระกูลนี้ · ทายาทรับต่อจากรุ่นก่อน · ปลดครบ = ไม่มีช่อง (ไบต์เท่าเดิม) · ทายาทที่ไม่ส่ง dlc ใช้ค่าเริ่ม
+    ...(dlc && { dlc }),
     // ความจำข้ามชาติ (past.mjs) + อาชีพที่ติดพรสวรรค์มา — ชีวิตแรกไม่มีช่อง
     ...(heir?.past && { past: heir.past }),
     ...(pastTalent(heir?.past) && { talent: pastTalent(heir.past) }),
@@ -2539,8 +2543,10 @@ export function tripSettle(st, isk) {
 
 // ค่าซ้อนทับ (โลกซ้อนทับ): ตัวนับเดียวของตระกูล ขึ้นทีละ 1 ทุกครั้งที่กลับเข้าโลกที่เคยออกไป ไม่มีทางลด · ไปกับทายาทเหมือนบัญชีบุญบาป
 // ไม่ดึงเลขสุ่ม — ชีวิตที่ไม่ข้ามโลกเดินเท่าเดิม · เริ่มตระกูลใหม่ (newLife ไม่มี heir) = 0
-export const overlapOf = (st) => st?.overlap ?? 0;
+// ก้อนซ้อนทับล็อก = ไม่นับ อ่านได้ 0 เสมอ (ตัวนับเดิมที่เซฟไว้ไม่ถูกลบ ปลดแล้วกลับมาอ่านได้)
+export const overlapOf = (st) => (dlcOpen(st, 'overlap') ? st?.overlap ?? 0 : 0);
 export function overlapStep(st) {
+  if (!dlcOpen(st, 'overlap')) return;
   st.overlap = overlapOf(st) + 1;
 }
 // ขั้นของค่าซ้อนทับ 0–4: การ์ดอ่านแค่ขั้น ไม่อ่านค่าดิบ · ขั้น 1 = ค่า 1 ล็อก · ขั้น 2–4 ไปไม่ถึงจนใบ 16 วัดบอทอัตราจริงแล้วใส่เลข
@@ -2581,7 +2587,7 @@ const driftFired = (st) => Object.keys(st.done).filter((id) => id.startsWith(DRI
 // st.drift = ขั้นตอนวางแผน · ชีวิตจากเซฟเก่าไม่มีช่องนี้ ⇒ ทริปกลับบ้านไม่วางแผนให้ชีวิตที่เล่นค้าง (เซฟเก่าเริ่มนับชีวิตถัดไป)
 // ทริปกลับบ้านวางใหม่ด้วย stream ของรอบนั้น หักเหตุที่ออกไปแล้ว ⇒ ทั้งชีวิตไม่เกินจำนวนของขั้นล่าสุด
 export function driftPlan(st, run = 0, stage = driftStageOf(st)) {
-  if (!stage || (run && !st.drift)) return;
+  if (!stage || (run && !st.drift) || !dlcOpen(st, 'overlap')) return;
   st.drift = stage;
   st.scheduled = st.scheduled.filter((x) => !x.drift);
   const rng = makeRng(mixSeed(st.seed ^ DRIFT_PLAN.salt, run));

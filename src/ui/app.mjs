@@ -1,4 +1,4 @@
-import { newLife, nextCard, causeWords, goalNames, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf } from '../engine/index.mjs';
+import { newLife, dlcOpen, DLC_KEYS, DLC_OPEN, DLC_LOCKED, setDlcDefault, nextCard, causeWords, goalNames, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME, catArt, resultArtCat } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
@@ -507,7 +507,8 @@ function kitList() {
   const reg = st.content.items;
   const name = (id) => reg.list[id].name;
   const dl = el('dl', 'kit');
-  for (const [k, label] of Object.entries(reg.slots)) dl.append(el('dt', null, label), el('dd', null, it.wear[k] ? name(it.wear[k]) : 'ว่าง'));
+  // ช่องอาวุธเป็นของดันเจียน — ซ่อนจนปลดก้อนนั้น (ช่องเครื่องราง/เครื่องแต่งกายอยู่เกมหลัก)
+  for (const [k, label] of Object.entries(reg.slots)) if (k !== 'weapon' || dlcOpen(st, 'dungeon')) dl.append(el('dt', null, label), el('dd', null, it.wear[k] ? name(it.wear[k]) : 'ว่าง'));
   dl.append(el('dt', null, `กระเป๋า ${it.bag.length}/${it.cap}`), el('dd', null, it.bag.map(name).join(' · ') || 'ว่าง'));
   return dl;
 }
@@ -3059,11 +3060,13 @@ function renderAfter(card) {
     choices.append(enter(button(BTN.rebirth, null, rebirth)));
     choices.append(button(BTN.newFamily, null, start));
   } else if (card.choices.length) {
-    const offer = () => choices.replaceChildren(...card.choices.map((c, i) => {
+    // ปุ่มที่ซ่อนตอนล็อก DLC (card.hidden) ไม่วาด แต่ i ยังเป็นลำดับเดิมในแถว — เลขที่ afterPick เขียนลงเซฟไม่เลื่อน
+    const offer = () => choices.replaceChildren(...card.choices.flatMap((c, i) => {
+      if (card.hidden?.[i]) return [];
       const why = lockText(card, i);
       const b = button(c, why ?? card.fx?.[i], () => (card.manual?.[i] ? heirPick(card, i, choices, offer) : play(afterPick(i))), card.hints?.[i]);
       if (why) b.disabled = true;
-      return b;
+      return [b];
     }));
     offer();
   } else choices.append(enter(button(BTN.next, null, next)));
@@ -3578,7 +3581,22 @@ function digestRest(card) {
   return rest;
 }
 
-function begin(seed) {
+// ภาคเสริม (DLC) ระดับเครื่องแบบสมุดฉายา: ปลดแล้วอยู่ทุกตระกูลในเครื่องนี้ · ค่าเริ่ม = ล็อกหมด · เงื่อนไขปลดจริงเป็นใบ 03
+// สวิตช์ทดสอบ ?dlc=all = เปิดหมดเฉพาะหน้านี้ ไม่เขียนลงเครื่อง · อ่านพังได้ (โหมดส่วนตัว) = ล็อกหมด
+const DLC_KEY = 'next-life-dlc-v1';
+function dlcDevice() {
+  try {
+    if (new URLSearchParams(location.search).get('dlc') === 'all') return { ...DLC_OPEN };
+    const b = JSON.parse(localStorage.getItem(DLC_KEY) ?? '{}');
+    return Object.fromEntries(DLC_KEYS.map((k) => [k, b[k] === true]));
+  } catch {
+    return { ...DLC_LOCKED };
+  }
+}
+
+function begin(seed, dlc = dlcDevice()) {
+  // ค่าเริ่มของแกนใช้เฉพาะชีวิตแรกของตระกูล · ทายาทรับ st.dlc ต่อจากรุ่นก่อน
+  setDlcDefault(dlc);
   st = newLife(seed, CONTENT);
   af = null;
   save = { seed, log: '' };
@@ -3647,7 +3665,8 @@ function reroll() {
 // เล่นซ้ำทั้งตระกูลจากเซฟ · ไม่ตรงการ์ดเดิม = null
 function resume(s) {
   try {
-    let card = begin(s.seed);
+    // เซฟ v1 เกิดก่อนมีสวิตช์ = ปลดครบ · เล่นซ้ำบนค่าเครื่องที่ล็อกจะได้การ์ดคนละชุดจนลำดับปุ่มเพี้ยน
+    let card = begin(s.seed, { ...DLC_OPEN });
     if (s.rr) save.rr = 1;
     for (const tok of tokens(s.log)) card = apply(tok);
     save.log = s.log;

@@ -3,6 +3,7 @@
 // ฉากเป็นเนื้อหา (stage ระหว่างชาติ + scene) ผ่านด่าน build ชุดเดียวกับการ์ดชีวิต · ปรโลก/ทางเกิด/ส่งต่อเป็นการ์ดที่แกนสร้าง
 // ใช้ stream สุ่มของตัวเอง — ระหว่างชาติไม่กินเลขสุ่มของโลกของชีวิตใด · ชีวิตที่มี heir ดึงเลขสุ่มของโลกตำแหน่งเดียวกับชีวิตแรก (harness/lineage ตรวจ)
 import { makeRng, mixSeed } from './rng.mjs';
+import { dlcOpen, DLC_OPEN } from './dlc.mjs';
 import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
@@ -228,6 +229,7 @@ const FROM_ISEKAI_PATHS = {
 };
 const pathLocked = (af, id) => {
   if (id === 'child') return af.from ? 'ลูกหลานในโลกเดิมห่างไปหลายรุ่นแล้ว' : hasKids(af.st) ? null : 'ไม่มีลูกหลานให้กลับไปเกิด';
+  if (id === 'isekai' && !dlcOpen(af.st, 'isekai')) return 'ยังไม่ปลดภาคเสริมต่างโลก';
   if (id === 'isekai' && af.from && af.from.run >= ISEKAI.stay) return 'เทพธิดาบอกว่าวิญญาณนี้อยู่ต่างโลกนานพอแล้ว';
   if (id === 'blood' && !pathHeirs(af).length) return 'ไม่มีลูกหลานวัยที่เล่นต่อได้';
   return null;
@@ -244,9 +246,11 @@ function pathCard(af) {
   return emitAfter(af, {
     kind: 'path',
     type: 'B',
-    text: af.blessed && !af.from ? `${base} · มีหญิงผมสีเงินยืนโบกมือรออยู่ข้างทาง บอกว่าเป็นเทพธิดาจากอีกโลกหนึ่ง` : base,
+    text: af.blessed && !af.from && dlcOpen(af.st, 'isekai') ? `${base} · มีหญิงผมสีเงินยืนโบกมือรออยู่ข้างทาง บอกว่าเป็นเทพธิดาจากอีกโลกหนึ่ง` : base,
     choices: paths.map((p) => (af.from ? FROM_ISEKAI_PATHS[p.id] : p.text)),
     locked: paths.map((p) => pathLocked(af, p.id)),
+    // ปุ่มที่ซ่อนตอนล็อก DLC ยังอยู่ในแถว — เลขลำดับปุ่มที่เซฟเก็บ (afterPick) ไม่เลื่อน · UI ข้ามปุ่มนี้
+    ...(!dlcOpen(af.st, 'isekai') && { hidden: paths.map((p) => p.id === 'isekai') }),
     // ปุ่มสายเลือดคนกดได้ บอทไม่กด (openChoices) · หน้าเลือกคนอ่าน heirs แล้วส่ง id กลับทาง chooseAfter
     ...(heirs.length && { manual: paths.map((p) => p.id === 'blood'), heirs }),
   });
@@ -620,7 +624,8 @@ function makeHeir(af, r) {
   const carried = r * (tier?.carry ?? 1);
   const ledger = carryLedger(af.st.ledger, net, carried);
   // ทายาทเกิดในโลกปกติเสมอ — รอบนี้มีชาติต่างโลกคั่น = กลับเข้าโลกที่เคยออกไป +1 (ชาติต่างโลกติดกันหลายรอบก็กลับครั้งเดียว) · ปรโลกคั่นชาติไม่นับ
-  const overlap = overlapOf(st) + (af.isekaiLives.length ? 1 : 0);
+  // ก้อนซ้อนทับล็อก = ไม่นับ (ปลดทีหลังเริ่มขั้น 0)
+  const overlap = overlapOf(st) + (af.isekaiLives.length && dlcOpen(st, 'overlap') ? 1 : 0);
   // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
   const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
   return {
@@ -656,6 +661,8 @@ function makeHeir(af, r) {
     ...(blood && { start: { age: st.birthYear + st.age - blood.born, kinId: blood.id } }),
     fame,
     ...(overlap && { overlap }),
+    // ก้อน DLC ของตระกูลไปกับทายาททุกทาง · ตระกูลที่ไม่มีช่อง = ปลดครบ ต้องส่ง DLC_OPEN ตรง ๆ ไม่งั้น newLife ใช้ค่าเริ่มของเครื่อง
+    dlc: st.dlc ?? DLC_OPEN,
     // ความจำข้ามชาติไปกับทุกทางเกิด · ภูมิ = ภูมิที่ปรโลกชี้ให้ชาติไทย (แบบแถวผังตระกูล)
     past: pastOf(st, thai.realm.id, isGone(st)),
     ...(deadKin.length && { deadKin }),

@@ -6,6 +6,7 @@
 // กรรมจากปรโลก (ระดับ −1..1) เป็นตัวตั้งของโลก: บุญมากได้สกิลให้เลือกมากขึ้นและค่าเริ่มดีขึ้น · บาปหนักได้น้อยลงและโลกโหดขึ้น · ไม่มีตัวเลขบัญชีบนการ์ด
 // บัญชีบุญบาปเป็นของดวงวิญญาณ (ส่วนที่ส่งต่อจากชาติก่อน) — ชาติต่างโลกบันทึกต่อลงบัญชีนั้น แล้วปรโลกตัดสินตอนจบชาติ
 import { makeRng, mixSeed } from './rng.mjs';
+import { dlcOpen } from './dlc.mjs';
 import { newLedger, recordMerit, ledgerLevel, meritId, SIN_CATS } from './merit.mjs';
 import { hintLevel } from './court.mjs';
 import { WARN, crossedLow, warnCard } from './warn.mjs';
@@ -1586,6 +1587,8 @@ export function entryOffers(seed) {
 
 // การ์ดชวนของอายุนี้ (ใบละครั้ง) · ไม่ผ่าน emit ⇒ เลขการ์ดของชีวิตไม่เลื่อน
 export function entryCard(st, stage) {
+  // ล็อก = ไม่มีการ์ดชวน ไม่ตั้งตารางนัด · ตารางนัดสุ่มจาก stream แยก จึงไม่เลื่อนเลขสุ่มของชีวิต
+  if (!dlcOpen(st, 'isekai')) return null;
   st.isekaiEntry ??= entryOffers(st.seed);
   const o = st.isekaiEntry.find((x) => x.age === st.age && !x.seen);
   if (!o) return null;
