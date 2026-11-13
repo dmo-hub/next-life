@@ -539,6 +539,7 @@ function ageKin(st, year, saving = 0) {
 
 // ข้อความการ์ดแจ้งการจากไป (แกนออกเองทุกครั้ง — เนื้อหาต่อยอดด้วย when.loss ได้)
 const LOSS_WHO = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน' };
+const lossParentWord = (l) => (l.sex === 'หญิง' ? 'แม่' : 'พ่อ');
 const PET_LOSS_TEXT = {
   old: (who, age) => `${who}หลับไปอย่างสงบตามวัย ด้วยวัย ${age} ปี`,
   sick: (who, age) => `${who}ป่วยหนักแล้วจากไป ด้วยวัย ${age} ปี`,
@@ -546,7 +547,7 @@ const PET_LOSS_TEXT = {
 };
 function lossText(l) {
   if (l.role === 'herd') return `ฝูง${l.kind}ที่เลี้ยงไว้ค่อย ๆ หมดไป ไม่ได้เลี้ยงต่อแล้ว`;
-  const who = l.role === 'pet' ? (l.name ? `เจ้า${l.name} ${l.kind}ที่เลี้ยงไว้` : `${l.kind}ที่เลี้ยงไว้`) : `${LOSS_WHO[l.role]}${l.name}`;
+  const who = l.role === 'pet' ? (l.name ? `เจ้า${l.name} ${l.kind}ที่เลี้ยงไว้` : `${l.kind}ที่เลี้ยงไว้`) : l.role === 'parent' ? `${lossParentWord(l)}${l.name ?? ''}` : `${LOSS_WHO[l.role]}${l.name}`;
   if (l.role === 'pet' && PET_LOSS_TEXT[l.cause]) return PET_LOSS_TEXT[l.cause](who, l.age);
   return l.age < 1 ? `${who}จากไปตั้งแต่ยังไม่ทันครบขวบ` : `${who}จากไปแล้ว ด้วยวัย ${l.age} ปี`;
 }
@@ -583,7 +584,8 @@ function lossOk(st, w) {
   return pool.some((l) => year - l.year >= (w.after ?? 0) && year - l.year <= (w.within ?? 0));
 }
 // ชื่อคนที่จากไปล่าสุด ให้การ์ดสูญเสียเรียก ({ชื่อผู้จากไป})
-const lastLoss = (st) => (st.kinLoss ?? []).at(-1) ?? null;
+// พ่อแม่ไม่นับ: ผู้เรียกคือการ์ดสัตว์เลี้ยง ถ้าพ่อแม่ตายทีหลังจะเรียกชื่อพ่อแม่แทนสัตว์
+const lastLoss = (st) => (st.kinLoss ?? []).findLast((l) => l.role !== 'parent') ?? null;
 // คู่ที่จากไปล่าสุด ({ชื่อคู่เก่า}) — คนที่จากไปล่าสุดอาจเป็นสัตว์หรือลูก การ์ดรักใหม่จึงเรียกคู่ตรง ๆ
 const lastSpouseLoss = (st) => (st.kinLoss ?? []).findLast((l) => l.role === 'spouse') ?? null;
 // ปีที่อยู่ด้วยกัน ({ปีคู่เก่า}): อายุตอนแต่ง = flagAge.married (ไม่ถูกลบตอนธงหลุด) · ไม่รู้อายุตอนแต่ง = ไม่บอกเลขปี
@@ -4062,6 +4064,9 @@ const FILL = {
   ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
   ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
   ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',
+  แจ้งการจากไป: (st) => (st.grief ? lossText(st.grief) : 'คนในบ้านจากไปแล้ว'),
+  ทางกลับ: (st) => (st.age < GRIEF.adultAge ? 'กลับไปเรียน' : isWorking(st) ? 'กลับไปทำงาน' : 'กลับไปใช้ชีวิตตามเดิม'),
+  บวชหน้าไฟ: (st) => (st.age < GRIEF.novice ? 'บวชเณรหน้าไฟ' : 'บวชหน้าไฟ'),
   ชื่อผู้จากไป: (st) => (lastLoss(st) ? lossCall(lastLoss(st)) : 'คนในบ้าน'),
   ชื่อคู่เก่า: (st) => lastSpouseLoss(st)?.name ?? 'คู่ชีวิตคนก่อน',
   ปีคู่เก่า: (st) => (spouseYears(st) ? `${spouseYears(st)} ปี` : 'หลายปี'),
@@ -4287,7 +4292,17 @@ function flowChronic(st) {
 
 // พ่อแม่แก่และตายตามตารางชีพเดียวกับตัวเอง (แนวชีวิตของปีปฏิทินนั้น) ด้วย stream ของครอบครัว · สาเหตุ+นัดป่วยจาก kinCauseRng (B110)
 // พ่อ/แม่ที่เป็นผู้เล่นรุ่นก่อน (diesAt) ตายตามชะตาที่เล่นไปแล้ว ไม่สุ่มซ้ำ · สาเหตุติดมากับ heir
+// พ่อแม่ที่จากไปเองปีนี้ลงบันทึกสูญเสีย (ตายจาก op die ไม่ผ่านทางนี้ การ์ดใบนั้นเล่าเองแล้ว) · คนที่หายไปต่างโลกไม่มีงานศพให้ไว้อาลัย
+function parentLost(st, p, year, out) {
+  parentDied(st, p, year);
+  if (p.gone) return;
+  const loss = { role: 'parent', name: p.name ?? null, sex: p.sex, age: p.diedAge, year, atYou: st.age, ...(p.cause && { cause: p.cause }) };
+  st.kinLoss.push(loss);
+  out.push(loss);
+}
+
 function ageParents(st, year) {
+  const lost = [];
   for (const p of st.parents) {
     if (!p.alive) continue;
     p.age += 1;
@@ -4295,7 +4310,7 @@ function ageParents(st, year) {
     if (p.diesAt !== undefined) {
       if (p.age >= p.diesAt) {
         p.diedAge = p.age;
-        parentDied(st, p, year);
+        parentLost(st, p, year, lost);
       }
       continue;
     }
@@ -4303,8 +4318,27 @@ function ageParents(st, year) {
     if (cause) {
       p.diedAge = p.age;
       p.cause = cause;
-      parentDied(st, p, year);
+      parentLost(st, p, year, lost);
     }
+  }
+  return lost;
+}
+
+// การ์ดไว้อาลัย: ปีละใบ ให้คนที่ใกล้สุด (rank น้อย = ใกล้) · ผู้เล่นอายุต่ำกว่า minAge ยังเลือกวิธีไว้อาลัยไม่ได้
+// หลาน/สัตว์/ฝูง และคนที่ไม่ได้การ์ด คงบรรทัดแจ้งเดิม · พ่อแม่ตอนผู้เล่นเด็กเล็กลงบันทึกอย่างเดียว ไม่มีบรรทัด
+const GRIEF = { minAge: 7, adultAge: 18, novice: 20, rank: { spouse: 0, child: 1, parent: 2 }, id: (l) => `grief_${l.role}_01`, prefix: 'grief_' };
+const lossLine = (st, l) => ({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l, ...(careHelp(l.cause) && { help: careHelp(l.cause) }), digest: 'kin_loss', tag: 'loss' });
+function queueLosses(st, lost) {
+  const can = st.age >= GRIEF.minAge ? lost.filter((l) => GRIEF.rank[l.role] !== undefined) : [];
+  const top = can.reduce((a, l) => (!a || GRIEF.rank[l.role] < GRIEF.rank[a.role] ? l : a), null);
+  const ev = top && st.content.events.find((e) => e.id === GRIEF.id(top));
+  for (const l of lost) {
+    if (l === top && ev) {
+      st.due.push({ kind: 'eraEvent', ev, age: st.age, grief: l });
+      continue;
+    }
+    if (l.role === 'parent' && st.age < GRIEF.minAge) continue;
+    st.due.push(lossLine(st, l));
   }
 }
 
@@ -4483,10 +4517,10 @@ function stepYear(st) {
   st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * moodMul(st) * (100 - st.knowledge)) / 100);
   st.relations = clamp(st.relations * (1 - RELATION_FADE));
   flowChronic(st);
-  ageParents(st, year);
+  const parentsLost = ageParents(st, year);
   // คนในบ้านจากไปเองปีนี้ = การ์ดแจ้งทุกครั้ง ก่อนเหตุการณ์ของปี
   // digest = ชนิดข่าวญาติ/สัตว์ (ui-redo ใบ 27) ให้จอรวมหลายใบติดกันเป็นใบเดียว · ป้ายคงที่ไม่ดึงเลขสุ่ม · ข่าวตัวเรา/เงิน/ตำแหน่งไม่ติด จึงคงใบเดี่ยว
-  for (const l of ageKin(st, year, yearlySaving(st))) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: lossText(l), loss: l, ...(careHelp(l.cause) && { help: careHelp(l.cause) }), digest: 'kin_loss', tag: 'loss' });
+  queueLosses(st, [...parentsLost, ...ageKin(st, year, yearlySaving(st))]);
   for (const n of kinIllNews(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), ...n, digest: 'kin_ill', tag: 'sick' });
   for (const m of petArrivals(st, year)) st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: petArriveText(m), digest: 'pet', tag: 'pet' });
   if (st.terminal && !st.terminal.told) {
@@ -4870,6 +4904,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     ...parentFrom(st, ev),
     ...homeFrom(st, ev),
     funeral: ev.id === FUNERAL.wishes || ev.id === FUNERAL.rite,
+    ...(ev.id.startsWith(GRIEF.prefix) && st.grief && { loss: st.grief, ...(careHelp(st.grief.cause) && { help: careHelp(st.grief.cause) }) }),
     age: st.age,
     stage: stageOf(st.age),
     title: ev.title ? fill(ev.title, st) : null,
@@ -4881,7 +4916,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     locked: ev.choices.map((c) => lockReason(st, c)),
     // ตัวเลือกที่พาเข้าสาย (ป้าย gate) ซ่อนจนประตูเปิด — ล็อกไว้ด้วย (กดไม่ได้ · บอทข้าม) แต่ไม่ตัดออก
     // เพราะ harness/เซฟ/ผลย้อนจับตัวเลือกด้วยเลขลำดับในเนื้อหา · ใบที่ไม่มีป้ายไม่มีช่องนี้
-    ...(ev.choices.some((c) => c.gate || c.show_if || c.hide_if) && { hidden: ev.choices.map((c) => gateShut(st, c) || choiceHidden(st, c)) }),
+    ...(ev.choices.some((c) => c.gate || c.show_if || c.hide_if || c.only_sex) && { hidden: ev.choices.map((c) => gateShut(st, c) || choiceHidden(st, c) || sexShut(st, c)) }),
     ...moneyShort(ev, st),
   });
 }
@@ -4964,6 +4999,7 @@ function lockReason(st, c, extra = 0) {
   if (st.pending?.id === FUNERAL.rite && st.funeralPick && c.id !== st.funeralPick) return 'ไม่ใช่แบบที่ตกลงกัน';
   if (gateShut(st, c)) return GATE_LOCK;
   if (choiceHidden(st, c)) return HIDE_LOCK;
+  if (sexShut(st, c)) return SEX_LOCK;
   if (c.effects?.grey_launder) {
     const g = greyLaunderLock(st);
     if (g) return g;
@@ -5038,6 +5074,7 @@ function drawCard(st) {
         delete st.done[card.ev.id];
         return nextCard(st);
       }
+      if (card.grief) st.grief = card.grief;
       return eventCard(st, card.ev);
     }
     // ข่าวบ้านเมืองที่มีการ์ดรับมือของเหตุการณ์เดียวกันต่อท้าย = ใบเดียว (B58) — ไม่งั้นผู้เล่นกด "ต่อไป" ใบเปล่าก่อนเรื่องจริง
@@ -5375,6 +5412,9 @@ const lifeGatesOpen = (st) => Object.entries(lifeFocusDefs(st)).filter(([id, d])
 const OFFICE_GATE = 'politics_base';
 const gateShut = (st, c) => !!c.gate && ![c.gate].flat().some((id) => lifeGateOpen(st, id));
 const GATE_LOCK = 'ยังไม่เคยทุ่มเทกับทางนี้';
+// ซ่อนจากเพศอื่น ไม่ใช่แค่ล็อก เพราะผู้เล่นทำให้เปิดไม่ได้ · เลขลำดับตัวเลือกยังคงเดิม
+const sexShut = (st, c) => !!c.only_sex && !c.only_sex.includes(st.sex);
+const SEX_LOCK = 'ไม่ใช่ทางของคุณ';
 function lifeFocusMul(st, e) {
   if (!st.focus) return 1;
   return focusCardMul(lifeFocusDefs(st)[st.focus], [e.category, ...(e.focus ?? [])], st.content.focus.card_mul);
@@ -5727,7 +5767,10 @@ function choose(st, idx, loan) {
   const runOn = ill && !doom && after.some((x) => x.kind === 'eraEvent' && x.ev.run === ev.run);
   if (!st.dead && !st.court && !runOn && (doom || st.health <= 0)) {
     const d = faceDeath(st, doom ?? (ill ? undefined : wound) ?? healthCause(st), { afterQueue: true });
-    st.queue = after.filter((x) => x.kind === 'result');
+    // ตายก่อนถึงการ์ดไว้อาลัย: คนตายเลือกวิธีไว้อาลัยไม่ได้ แต่ข่าวการจากไปยังต้องเล่า
+    // พ่อแม่สองคนจากไปปีเดียวกัน: ตายกลางการ์ดไว้อาลัยใบแรกแล้วบรรทัดแจ้งของอีกคนที่ยังรอคิวต้องไม่หาย
+    const pendingLoss = [...st.queue, ...st.due].filter((x) => x.kind === 'result' && x.tag === 'loss');
+    st.queue = [...pendingLoss, ...after.map((x) => (x.grief ? lossLine(st, x.grief) : x)).filter((x) => x.kind === 'result')];
     st.due = [];
     if (d.fate === 'dead') queueFuneral(st);
     if (d.fate === 'survive') {
