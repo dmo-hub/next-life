@@ -24,6 +24,7 @@
     "family": "node harness/family.mjs --n 5000 --seed 1",
     "causes": "node harness/causes.mjs --n 20000 --seed 1",
     "near": "node harness/near-death.mjs --n 20000 --seed 1",
+    "death-bar": "node harness/death-bar.mjs --n 4000 --seed 1",
     "pact": "node harness/pact.mjs --n 2000 --seed 1",
     "skills": "node harness/skills.mjs --n 200 --seed 1",
     "grey": "node harness/grey.mjs --n 500 --seed 1",
