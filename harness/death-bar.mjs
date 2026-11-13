@@ -1,9 +1,9 @@
 // harness แกนกติกาตาย (ใบ 190): ตายเมื่อหลอดสุขภาพหมดเท่านั้น · ตารางชีพไม่ฆ่าตรงแล้ว แต่อัตราตายต้องยังตรงตาราง
-// ด่าน: (1) ทุกชีวิตที่ตาย หลอดสุขภาพ = 0 ที่การ์ดตาย  (2) อัตราตายทารกจากบอทเทียบ infantMortality ของตาราง ±4σ
+// ด่าน: (1) ทุกชีวิตที่ตาย หลอดสุขภาพ = 0 ที่การ์ดตาย  (2) อัตราตายทารกจากบอทเทียบ qx อายุ 0 ของตาราง ±4σ
 //       (3) ทุกชีวิตที่ตายมีสาเหตุ (st.cause ไม่ว่าง) — การเลิกทอยตรงต้องไม่ทำให้สาเหตุหาย
 // ตัวควบคุม: --ctl ⇒ คาดหลอดตอนตาย = 1 แทน 0 ต้องตกทุกชีวิต (พิสูจน์ว่าด่าน (1) จับได้จริง)
 // ไม่รันตัวเกมจนจบชาติ — เล่นชีวิตเดียวต่อ seed ด้วยบอทสุ่ม
-import { playLife, mixSeed, infantMortality } from '../src/engine/index.mjs';
+import { playLife, mixSeed, qx, protoYear } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { random } from './bots.mjs';
 
@@ -31,7 +31,8 @@ for (let i = 0; i < n; i++) {
     if (!st.cause) noCause++;
   });
   const st = r.state;
-  const p = infantMortality(content.era, st.sex, st.birthYear) / 1000;
+  // เกมยืมปีต้นแบบ (protoYear) ของแต่ละชีวิตมาอ่านตาราง ไม่ใช่ปีเกิดจริง — ค่าคาดต้องอ่านปีเดียวกับที่เกมใช้ตัดสินตาย
+  const p = qx(content.era, st.sex, protoYear(content.era, st.seed, st.birthYear), 0);
   expectInfants += p;
   varInfants += p * (1 - p);
   if (r.age < 1) infants++;
