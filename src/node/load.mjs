@@ -16,11 +16,12 @@ import { checkTree } from './lint/tree.mjs';
 import { lintIsekai, formatIsekaiProblem } from './lint/isekai.mjs';
 import { useIsekaiCards, ISEKAI_SKILLS } from '../engine/isekai.mjs';
 import { TITLES, FAMILY_GOALS } from '../engine/titles.mjs';
-import { setDlcDefault, DLC_LOCKED } from '../engine/dlc.mjs';
+import { setDlcDefault, setDlcFrozen, DLC_LOCKED } from '../engine/dlc.mjs';
 
-// ตัวเลือกเดียวของด่านทุกตัว: ค่าเริ่ม = ปลด DLC หมด (ผลเดิมไม่ขยับ) · NL_DLC=locked = ล็อกหมดแบบเกมใหม่ของผู้เล่น
+// ตัวเลือกเดียวของด่านทุกตัว: ค่าเริ่ม = ปลด DLC หมด (ผลเดิมไม่ขยับ) · NL_DLC=locked = ล็อกหมดและไม่ปลดเอง · NL_DLC=progress = เริ่มล็อกหมดแล้วปลดตามเงื่อนไขจริงแบบผู้เล่น
 // อยู่ที่ตัวโหลดเพราะ harness ทุกตัวโหลดเนื้อหาผ่านที่นี่ · เบราว์เซอร์ตั้งจากสมุดระดับเครื่องแทน (app.mjs)
-if (process.env.NL_DLC === 'locked') setDlcDefault(DLC_LOCKED);
+if (process.env.NL_DLC === 'locked' || process.env.NL_DLC === 'progress') setDlcDefault(DLC_LOCKED);
+if (process.env.NL_DLC === 'locked') setDlcFrozen(true);
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');

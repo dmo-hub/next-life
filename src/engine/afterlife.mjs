@@ -3,14 +3,14 @@
 // ฉากเป็นเนื้อหา (stage ระหว่างชาติ + scene) ผ่านด่าน build ชุดเดียวกับการ์ดชีวิต · ปรโลก/ทางเกิด/ส่งต่อเป็นการ์ดที่แกนสร้าง
 // ใช้ stream สุ่มของตัวเอง — ระหว่างชาติไม่กินเลขสุ่มของโลกของชีวิตใด · ชีวิตที่มี heir ดึงเลขสุ่มของโลกตำแหน่งเดียวกับชีวิตแรก (harness/lineage ตรวจ)
 import { makeRng, mixSeed } from './rng.mjs';
-import { dlcOpen, DLC_OPEN } from './dlc.mjs';
+import { dlcOpen, dlcEarn, dlcNext } from './dlc.mjs';
 import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
 import { goalsMet, titlesOf } from './titles.mjs';
 import { heirPets, letterTo, deadKinOf } from './family.mjs';
 import { CHRONIC } from './death.mjs';
-import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf } from './life.mjs';
+import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf, OVERLAP_STAGE_MIN } from './life.mjs';
 import { ISEKAI, ISEKAI_SKILLS, SKILL, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 import { warnPick } from './warn.mjs';
@@ -200,6 +200,8 @@ function verdictCard(af) {
   const back = af.from ? `ดวงวิญญาณของ${af.from.name}ถูกดึงกลับจากต่างโลกมายืนหน้าปรโลกอีกครั้ง ` : '';
   // ชาติต่างโลกให้สกิลบนการ์ดจบของมันแล้ว — ตอนกลับมาปรโลกจึงไม่ให้ซ้ำจากชีวิตไทยเดิม
   const earn = af.from ? [] : thaiEarn(af.st);
+  // ศาลครั้งแรก = ปรโลกปลด (มีผลชาติหน้า)
+  dlcEarn(af.st, 'afterlife');
   return emitAfter(af, {
     kind: 'verdict',
     type: 'B',
@@ -286,6 +288,8 @@ export const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่
 // ยมทูต/เทวทูตเป็นฉากของชีวิตไทย (เนื้อหาอ่านค่าชาติไทย) จึงเริ่มที่คำตัดสิน
 function closeIsekai(af) {
   const isk = af.isekai;
+  // จบชาติต่างโลก 1 ชาติ = ซ้อนทับปลด
+  dlcEarn(af.st, 'overlap');
   af.isekaiLives.push(isekaiLineage(isk, (af.st.gen ?? 1) + 1 + af.isekaiLives.length));
   // บัญชีเดียวของดวงวิญญาณ (B26 · B68a-2): ชาติต่างโลกที่จบแล้วเขียนกลับลง af.st.ledger ปรโลกรอบใหม่และบันทึกการกระทำ (noteDeed) จึงอ่านที่เดียวกัน
   af.st.ledger = isk.ledger;
@@ -373,6 +377,8 @@ function loopCard(af) {
 
 function loopEndCard(af) {
   const l = af.loop;
+  // จบวงภูมิ 1 รอบในชีวิตที่เริ่มด้วยปรโลกปลดแล้ว = ต่างโลกปลด
+  dlcEarn(af.st, 'isekai');
   l.end = l.health <= 0 ? 'spent' : 'served';
   const text = l.end === 'spent'
     ? `ชีวิตทิพย์หมดลงในปีที่ ${l.year} ก่อนครบกำหนด ${l.years} ปี ดวงวิญญาณจึงถูกพาไปรอเกิดเร็วกว่าที่ชี้ไว้`
@@ -626,6 +632,8 @@ function makeHeir(af, r) {
   // ทายาทเกิดในโลกปกติเสมอ — รอบนี้มีชาติต่างโลกคั่น = กลับเข้าโลกที่เคยออกไป +1 (ชาติต่างโลกติดกันหลายรอบก็กลับครั้งเดียว) · ปรโลกคั่นชาติไม่นับ
   // ก้อนซ้อนทับล็อก = ไม่นับ (ปลดทีหลังเริ่มขั้น 0)
   const overlap = overlapOf(st) + (af.isekaiLives.length && dlcOpen(st, 'overlap') ? 1 : 0);
+  // ค่าซ้อนทับขึ้นขั้นแรก = ดันเจียนปลด
+  if (OVERLAP_STAGE_MIN.findLastIndex((m) => overlap >= m) >= 1) dlcEarn(st, 'dungeon');
   // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
   const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
   return {
@@ -662,7 +670,7 @@ function makeHeir(af, r) {
     fame,
     ...(overlap && { overlap }),
     // ก้อน DLC ของตระกูลไปกับทายาททุกทาง · ตระกูลที่ไม่มีช่อง = ปลดครบ ต้องส่ง DLC_OPEN ตรง ๆ ไม่งั้น newLife ใช้ค่าเริ่มของเครื่อง
-    dlc: st.dlc ?? DLC_OPEN,
+    dlc: dlcNext(st),
     // ความจำข้ามชาติไปกับทุกทางเกิด · ภูมิ = ภูมิที่ปรโลกชี้ให้ชาติไทย (แบบแถวผังตระกูล)
     past: pastOf(st, thai.realm.id, isGone(st)),
     ...(deadKin.length && { deadKin }),

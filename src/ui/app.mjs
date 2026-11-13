@@ -3557,7 +3557,10 @@ function saveClear() {
   }
 }
 
-const show = (card) => (af ? renderAfter(card) : render(card));
+const show = (card) => {
+  dlcSync();
+  return af ? renderAfter(card) : render(card);
+};
 
 function play(tok, times = 1) {
   let card;
@@ -3592,6 +3595,35 @@ function dlcDevice() {
   } catch {
     return { ...DLC_LOCKED };
   }
+}
+
+function dlcWrite(b) {
+  try {
+    localStorage.setItem(DLC_KEY, JSON.stringify(b));
+  } catch {
+    // ไม่มีที่เก็บ — ปลดได้แค่ในตระกูลนี้ (ทายาทรับต่อจาก st) ปิดหน้าแล้วหาย
+  }
+}
+const DLC_NAME = { afterlife: 'ปรโลก', isekai: 'ต่างโลก', overlap: 'โลกซ้อนทับ', dungeon: 'ดันเจียน' };
+// แจ้งปลดทันที แต่ชีวิตและปรโลกรอบที่เล่นอยู่ไม่เปลี่ยน — เริ่มมีผลชาติหน้า (ข้อ 13ค)
+function dlcNotice(keys) {
+  document.querySelector('.dlc-notice')?.remove();
+  const p = el('p', 'note dlc-notice', `ปลดภาคเสริม ${keys.map((k) => DLC_NAME[k]).join(' · ')} แล้ว · เริ่มมีผลตั้งแต่ชาติหน้า`);
+  p.setAttribute('role', 'status');
+  p.addEventListener('click', () => p.remove());
+  root.before(p);
+  setTimeout(() => p.remove(), 12000);
+}
+// สิ่งที่ชีวิตนี้ได้ปลดใหม่ลงค่าเครื่องทันที (ทุกตระกูลในเครื่องได้ด้วย) · ค่าเครื่องที่เปลี่ยนมีผลกับทายาทผ่านค่าเริ่มของแกน
+function dlcSync() {
+  const got = (af?.st ?? st).dlcEarned ?? [];
+  const dev = dlcDevice();
+  const fresh = got.filter((k) => !dev[k]);
+  if (!fresh.length) return;
+  const next = { ...dev, ...Object.fromEntries(fresh.map((k) => [k, true])) };
+  dlcWrite(next);
+  setDlcDefault(next);
+  dlcNotice(fresh);
 }
 
 function begin(seed, dlc = dlcDevice()) {
@@ -3753,6 +3785,8 @@ if (logoEl && window.ResizeObserver) new ResizeObserver(headEdge).observe(logoEl
 function boot() {
   // ล้างโครงหน้าเปิดที่มากับ HTML (template.html) — ทุกทางข้างล่างวาดจอใหม่ลง root
   root.replaceChildren();
+  // ทายาทของตระกูลที่โหลดจากเซฟรับค่าเครื่องผ่านค่าเริ่มของแกน — ไม่ตั้งไว้ = ปลดหมดตามค่าเริ่มของแกน
+  setDlcDefault(dlcDevice());
   const seed = linkSeed();
   dropLinkSeed();
   let card = snapRead();

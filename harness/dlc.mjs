@@ -2,7 +2,7 @@
 // ล็อก = ไม่มีชีวิตไหนเจอการ์ดชวนต่างโลก ทางเกิดที่ 3 ทริป ค่าซ้อนทับ การ์ดนัดซ้อนทับ/เพี้ยน · เลขลำดับปุ่มทางเกิดไม่เลื่อน · ทายาทรับสถานะล็อกต่อ
 // ปลดหมด = ตัวควบคุม: ต้องเจอของพวกนั้นจริง ไม่งั้นตัวนับในฝั่งล็อกที่ได้ 0 พิสูจน์อะไรไม่ได้
 // ผลเท่าเดิมของฝั่งปลดหมดเทียบ sha ฐานอยู่ที่ npm run lifehash (ไม่ซ้ำที่นี่)
-import { playLife, playAfterlife, nextLife, setDlcDefault, DLC_LOCKED, DLC_OPEN, overlapOf, snapshot, restore, mixSeed, makeRng, PATHS } from '../src/engine/index.mjs';
+import { playLife, playAfterlife, nextLife, setDlcDefault, setDlcFrozen, dlcOpen, DLC_KEYS, DLC_LOCKED, DLC_OPEN, overlapOf, snapshot, restore, mixSeed, makeRng, PATHS } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
 
@@ -21,6 +21,8 @@ const OVERLAP_CARD = /^(overlap_|drift_)/;
 
 // เดินตระกูลละ GENS ชาติผ่านปรโลกจริง · เก็บตัวนับต่อสถานะ
 function walk(dlc) {
+  // ชุดล็อกต้องล็อกจริง ไม่ปลดเองตามเงื่อนไข (ชุดปลดตามเงื่อนไขอยู่ท้ายไฟล์)
+  setDlcFrozen(true);
   setDlcDefault(dlc);
   const c = { lives: 0, entry: 0, trip: 0, sched: 0, ovCards: 0, overlapRaw: 0, overlapMax: 0, trips: 0, isekaiPathOpen: 0, isekaiPathHidden: 0, isekaiLives: 0, blessedText: 0, stampBad: 0, heirBad: 0, pathCards: 0, pathLen: new Set(), pathIdx: [] };
   for (const [name, bot] of Object.entries(BOTS)) {
@@ -105,6 +107,54 @@ check('ล็อก: ชีวิตและทายาททุกรุ่�
   check('เซฟภาพถ่าย: ล็อกอยู่หลังโหลด · ชีวิตเก่าไม่มีช่อง = ปลดหมด', JSON.stringify(back.dlc) === JSON.stringify(DLC_LOCKED) && !('dlc' in oldBack));
 }
 void makeRng;
+
+// ปลดตามเงื่อนไขจริง (ใบ 03): เริ่มล็อกหมด ไม่แช่แข็ง เดินตระกูลละ PGENS ชาติ แล้วรายงานสัดส่วนตระกูลที่ปลดแต่ละก้อนต่อชาติ
+// ปลดระหว่างชีวิต/ปรโลก = มีผลชาติหน้า ชีวิตที่กำลังเล่นไม่ถูกแตะ
+{
+  const PGENS = opt('pgens', 8);
+  setDlcFrozen(false);
+  setDlcDefault(DLC_LOCKED);
+  const openAt = DLC_KEYS.map(() => Array(PGENS).fill(0));
+  const reached = Array(PGENS).fill(0);
+  const bad = { firstGen: 0, chain: 0, backslide: 0, midLife: 0, overlapStart: 0 };
+  let fams = 0;
+  for (const bot of Object.values(BOTS)) {
+    for (let i = 0; i < n; i++) {
+      fams++;
+      let st = null, prev = null;
+      for (let g = 0; g < PGENS; g++) {
+        const run = playLife(mixSeed(seed, 5000 + i * 11 + g), content, bot, null, st ?? undefined);
+        const sl = run.state;
+        reached[g]++;
+        DLC_KEYS.forEach((k, ki) => {
+          const o = dlcOpen(sl, k);
+          if (o) openAt[ki][g]++;
+          if (o && ki > 0 && !dlcOpen(sl, DLC_KEYS[ki - 1])) bad.chain++;
+          if (prev?.[ki] && !o) bad.backslide++;
+        });
+        if (g === 0 && DLC_KEYS.some((k) => dlcOpen(sl, k))) bad.firstGen++;
+        // ซ้อนทับเพิ่งปลดในชาตินี้ = ค่าเริ่ม 0
+        if (dlcOpen(sl, 'overlap') && !prev?.[2] && (sl.overlap ?? 0) !== 0) bad.overlapStart++;
+        const before = JSON.stringify(sl.dlc ?? null);
+        const af = playAfterlife(sl, bot);
+        if (JSON.stringify(sl.dlc ?? null) !== before) bad.midLife++;
+        prev = DLC_KEYS.map((k) => dlcOpen(sl, k));
+        if (!af.heir) break;
+        st = nextLife(af);
+      }
+    }
+  }
+  const pct = (a, b) => (b ? `${((a / b) * 100).toFixed(0)}%` : '-');
+  console.log(`
+ปลดตามเงื่อนไข · ${fams} ตระกูล × ${PGENS} ชาติ · สัดส่วนตระกูลที่ปลดแล้วตอนเริ่มชาติ (ปรโลก · ต่างโลก · โลกซ้อนทับ · ดันเจียน)`);
+  for (let g = 0; g < PGENS; g++) console.log(`  ชาติ ${g + 1}: ${DLC_KEYS.map((_, ki) => pct(openAt[ki][g], reached[g]).padStart(4)).join(' · ')}  (ตระกูลถึงชาตินี้ ${reached[g]})`);
+  check('ปลดตามเงื่อนไข: ชาติแรกล็อกหมด (ก่อนศาลครั้งแรก)', bad.firstGen === 0, `ผิด ${bad.firstGen}`);
+  check('ปลดตามเงื่อนไข: ปรโลกปลดทุกตระกูลตั้งแต่ชาติที่ 2 (หลังศาลครั้งแรก)', PGENS < 2 || openAt[0][1] === reached[1], `${openAt[0][1]}/${reached[1]}`);
+  check('ปลดตามเงื่อนไข: ก้อน N ปลดก่อนก้อน N-1 ไม่ได้ · ปลดแล้วไม่ถอย', bad.chain === 0 && bad.backslide === 0, `ข้ามลำดับ ${bad.chain} · ถอย ${bad.backslide}`);
+  check('ปลดตามเงื่อนไข: ปลดระหว่างปรโลกมีผลชาติหน้า (ชีวิตที่เล่นอยู่ไม่เปลี่ยน)', bad.midLife === 0, `ผิด ${bad.midLife}`);
+  check('ปลดตามเงื่อนไข: ค่าซ้อนทับเริ่ม 0 ตอนปลด', bad.overlapStart === 0, `ผิด ${bad.overlapStart}`);
+  check('ปลดตามเงื่อนไข: ต่างโลกปลดได้จริงในบางตระกูล (ตัวควบคุมว่าเงื่อนไขไม่ตาย)', openAt[1].some((x) => x > 0), openAt[1].join('/'));
+}
 
 console.log(fails.length ? `\nตก ${fails.length} ด่าน` : '\nผ่านทุกด่าน');
 process.exit(fails.length ? 1 : 0);
