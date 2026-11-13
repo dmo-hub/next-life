@@ -58,6 +58,16 @@ for (let i = 0; i < n; i++) {
   let healthDeath = false;
   let parentsAt = null;
   let memN = 0, memPrev = false;
+  // ใบ 190: ตายแล้วหลอดถูกตั้ง 0 ทุกชีวิต — "ตายเพราะหลอดหมดจากเหตุ" แยกจากการ์ดตายไม่ได้อีก
+  // faceDeath ตั้ง dead ก่อน health=0 ⇒ อ่านหลอด ณ จังหวะ dead=true ได้ค่าก่อนถูกตั้ง
+  let healthAtDeath = null;
+  const life = new Proxy(newLife(mixSeed(seed, i), content), {
+    set(t, k, v) {
+      if (k === 'dead' && v === true && healthAtDeath === null) healthAtDeath = t.health;
+      t[k] = v;
+      return true;
+    },
+  });
   const r = playLife(mixSeed(seed, i), content, random, (card, st) => {
     if (memPrev && card.id !== 'funeral_wishes_01') mem.order++;
     memPrev = card.kind === 'memory';
@@ -74,7 +84,7 @@ for (let i = 0; i < n; i++) {
     }
     if (card.kind === 'death') {
       if (card.cause !== st.cause) cardMismatch++;
-      healthDeath = st.health <= 0;
+      healthDeath = (healthAtDeath ?? st.health) <= 0;
     }
     const said = card.kind === 'death' ? card.cause : card.loss?.cause;
     if (said === 'self_harm') {
@@ -85,7 +95,7 @@ for (let i = 0; i < n; i++) {
       petLoss++;
       if (!Object.hasOwn(PET_CAUSES, card.loss.cause)) petNoCause++;
     }
-  });
+  }, life);
   const st = r.state;
   const age = r.age;
   // เกณฑ์ตามสเปกเขียนแยกจาก memoryEligible — ใช้ตัวเดียวกัน ด่านจะผ่านเองเสมอ
@@ -95,7 +105,7 @@ for (let i = 0; i < n; i++) {
   if (memN) mem.got++;
   if (memN && !fit) mem.stray++;
   if (memN > 1) mem.multi++;
-  if (fit && !memN) st.health > 0 ? mem.miss++ : mem.missMid++;
+  if (fit && !memN) healthDeath ? mem.missMid++ : mem.miss++;
   const kinDead = [
     ...st.parents.map((p, j) => (!p.alive && parentsAt?.[j] !== null && !p.gone && p.diesAt === undefined ? { m: p, year: st.birthYear + p.diedAge - parentsAt[j], age: p.diedAge, tells: true } : null)).filter(Boolean),
     ...(st.kin ?? []).filter((m) => !m.alive && !['pet', 'herd'].includes(m.role)).map((m) => ({ m, year: m.born + m.diedAge + 1, age: m.diedAge, tells: ['spouse', 'child', 'grandchild'].includes(m.role) && !m.left })),
