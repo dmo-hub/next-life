@@ -223,7 +223,7 @@ for (const x of sideOut) {
   for (const l of lines) console.log(`  ${l}`);
   if (!ok) fails.push(`npm run ${x.name}`);
 }
-if (!scripts.titles) console.log('\nด่าน 1 (แบบชีวิต/ฉายา ≥0.1%) → ไม่ตัดสิน: ยังไม่มี npm run titles ในสาขานี้ (B10 สาย C)');
+if (!scripts.titles) console.log('\nด่าน 1 (ฉายา ≥0.1%) → ไม่ตัดสิน: ยังไม่มี npm run titles ในสาขานี้ (B10 สาย C)');
 
 // ---- ด่าน 5–7 ของใบ 12 บนเนื้อหาจริง ----
 const vowSet = of('สุ่ม', seed).flags.has('vow_broken');

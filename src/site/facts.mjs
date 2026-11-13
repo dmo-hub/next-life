@@ -1,7 +1,7 @@
 // ตัวเลขบนหน้าเว็บ (B65) — คิดจากข้อมูล/โค้ดชุดเดียวกับเกมทุกครั้งที่ build หน้าเว็บจึงไม่ค้างเลขเก่าเมื่อระบบเปลี่ยน
 // หน้า docs อ้างด้วย <span data-fact="ชื่อ">…</span> · ห้ามมีค่าบัญชีบุญบาปรายชีวิต มีแต่กติกาที่ผู้เล่นอ่านได้อยู่แล้ว
 import { readFileSync } from 'node:fs';
-import { ALL_PATTERNS, TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, ISEKAI_CATS, LEGACY, PATTERN_FROM, ENTRY, ENTRY_EVENTS, GODDESS, GODDESS_VOWS, COURT_SCENES, CONT_LIFE, CONT_REGIONS, CONT_RACES, ISEKAI_CAREERS, ISEKAI_CAREER_T, PATHS, HEIR_AGE, ISEKAI_SKILLS, SKILL } from '../engine/index.mjs';
+import { TITLES, FAMILY_TITLES, FAMILY_GOALS, FAME, STAND_MIX, REALMS, CARRY, KARMA, KIN_TIERS, TRACKS, CLASSES, SIN_CATS, FLAG_CATS, ISEKAI_CATS, LEGACY, ENTRY, ENTRY_EVENTS, GODDESS, GODDESS_VOWS, COURT_SCENES, CONT_LIFE, CONT_REGIONS, CONT_RACES, ISEKAI_CAREERS, ISEKAI_CAREER_T, PATHS, HEIR_AGE, ISEKAI_SKILLS, SKILL } from '../engine/index.mjs';
 import { isekaiCardCount } from './otherworld.mjs';
 
 const th = (n) => n.toLocaleString('en-US');
@@ -56,7 +56,6 @@ export function siteFacts(content, ver = readVersion()) {
     afterCards: th(content.events.length - life.length),
     isekaiCards: th(isekaiCardCount()),
     eraEvents: th(era.events.length),
-    patterns: String(ALL_PATTERNS.length),
     titles: String(TITLES.length),
     familyTitles: String(FAMILY_TITLES.length + FAMILY_GOALS.length),
     standMix: String(Math.round(STAND_MIX * 100)),
@@ -76,7 +75,6 @@ export function siteFacts(content, ver = readVersion()) {
     sinAll: String(SIN_CATS.length),
     lotteryMult: String(Math.max(...lottery.map((b) => b.odds_modifier.max_mult))),
     lotteryCap: String(Math.min(...lottery.map((b) => b.cap_per_life))),
-    patternFrom: String(PATTERN_FROM),
     disputePct: String(Math.round(LEGACY.dispute * 100)),
     taxPct: String(Math.round(LEGACY.tax * 100)),
     taxFrom: th(LEGACY.taxFrom / 1e6),

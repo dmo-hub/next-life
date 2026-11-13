@@ -1,5 +1,5 @@
 // ด่าน keep (reigns-13): อัปเดตห้ามล้างของที่ผู้เล่นสะสม — เทียบกับฐานของเวอร์ชันที่ปล่อยล่าสุด (harness/keep-ids.json · harness/fixtures/keep-snaps.json)
-// ก. id ที่ของสะสมในเครื่องผู้เล่นอ้าง ห้ามหาย: ฉายา · แบบชีวิต · ฉายาตระกูล (สมุดฉายา) · ช่องภาพ + เหตุการณ์ยุค (สมุดภาพ · อนุสรณ์)
+// ก. id ที่ของสะสมในเครื่องผู้เล่นอ้าง ห้ามหาย: ฉายา · ฉายาตระกูล (สมุดฉายา) · ช่องภาพ + เหตุการณ์ยุค (สมุดภาพ · อนุสรณ์)
 //    + การ์ดที่ถูกอ้าง (ผลย้อน schedules · การ์ดต่อ next · การ์ดที่ปลดภาพ) — คำนวณจากเนื้อหาตอนรัน · การ์ดอื่นหาย = เตือนพร้อมชื่อ ไม่ตก
 // ข. ชื่อ key ที่เก็บในเครื่องผู้เล่น (localStorage ใน src/ui/app.mjs) ห้ามหาย — เปลี่ยนชื่อ key = ของใน key นั้นหายทั้งก้อน
 // ค. เซฟภาพถ่ายของเวอร์ชันฐาน โหลดด้วยแกนปัจจุบัน (restore → repairLife แบบหน้าเว็บ) แล้วเล่นต่อจนจบ: พัง 0 · ค่าติดมาไม่ตรง 0 · การ์ดค้างใช้ไม่ได้ 0
@@ -8,7 +8,7 @@
 // ตัวควบคุม (รันทุกครั้ง): ตัด id 1 ตัว → ก ต้องเห็น · ตัดการ์ดที่เซฟค้าง → ค ต้องเห็น stale · เซฟรูปแบบอื่น → restore ต้องพัง
 // --save (ผู้รวมงานรันหลัง bump): เขียนฐานใหม่ทั้งสองไฟล์จากเวอร์ชันนี้ · ไม่มีฐาน = ตก ไม่ใช่ผ่านเงียบ
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
-import { newLife, nextCard, choose, makeRng, mixSeed, TITLES, ALL_PATTERNS, FAMILY_TITLES, startAfterlife, nextAfterCard, chooseAfter, nextLife } from '../src/engine/index.mjs';
+import { newLife, nextCard, choose, makeRng, mixSeed, TITLES, FAMILY_TITLES, startAfterlife, nextAfterCard, chooseAfter, nextLife } from '../src/engine/index.mjs';
 import { snapshot, restore, repairLife, SNAP_V } from '../src/engine/save.mjs';
 import { ERA_PICS } from '../src/ui/art.mjs';
 import { loadContent } from '../src/node/load.mjs';
@@ -51,7 +51,6 @@ function referencedEvents() {
 function collect() {
   return {
     titles: TITLES.map((t) => t.id),
-    patterns: ALL_PATTERNS.map((t) => t.id),
     family: FAMILY_TITLES.map((t) => t.id),
     eraEvents: content.era.events.map((e) => e.id),
     picSlots: Object.entries(ERA_PICS).flatMap(([id, slots]) => [`e:${id}`, ...slots.map(([k]) => `s:${id}:${k}`)]),
@@ -60,7 +59,7 @@ function collect() {
     storage: [...new Set([...app.matchAll(/'(next-life-[\w-]+)'/g)].map((m) => m[1]))].sort(),
   };
 }
-const HARD = ['titles', 'patterns', 'family', 'eraEvents', 'picSlots', 'refEvents', 'storage'];
+const HARD = ['titles', 'family', 'eraEvents', 'picSlots', 'refEvents', 'storage'];
 const lostOf = (base, now) => Object.fromEntries(Object.keys(base).filter((k) => Array.isArray(base[k])).map((k) => [k, base[k].filter((x) => !(now[k] ?? []).includes(x))]));
 
 // เซฟกลางชีวิต (การ์ด 10–69) ด้วยตัวเลือกแรกที่กดได้ — ทางเดียวกับที่วัดตอนสำรวจ 29 เวอร์ชัน

@@ -15,7 +15,7 @@ import { checkFocus } from './lint/focus.mjs';
 import { checkTree } from './lint/tree.mjs';
 import { lintIsekai, formatIsekaiProblem } from './lint/isekai.mjs';
 import { useIsekaiCards, ISEKAI_SKILLS } from '../engine/isekai.mjs';
-import { TITLES, ALL_PATTERNS, FAMILY_GOALS } from '../engine/titles.mjs';
+import { TITLES, FAMILY_GOALS } from '../engine/titles.mjs';
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -445,7 +445,6 @@ export function loadSkillMap(p = 'content/rules/skill-map.yaml', focus = loadFoc
   const known = {
     job: json('data/finance.json').occupations.list.map((o) => o.id),
     title: TITLES.map((t) => t.id),
-    pattern: ALL_PATTERNS.map((x) => x.id),
     cause: Object.keys(json('data/death-causes.json').groups),
     goal: FAMILY_GOALS.map((g) => g.id),
     focus: Object.keys(focus.focuses),
