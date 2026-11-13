@@ -1,0 +1,541 @@
+# ร่างเรื่อง พนักงานเก็บขนมูลฝอย คนงานรถขยะเทศบาล · 15 ใบ · ลงเกมแล้ว ใบ 319 · ผู้เล่นเป็นคนในซอย ญาติของพนักงาน เด็กยืนโบกมือ เสมอ ไม่สมมติอาชีพผู้เล่น · ไม่อ่านและไม่ตั้งธง · ไม่ผูกปี · ไม่เปลี่ยนสายชีวิต
+events:
+  - id: garbage_song_truck_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [5, 9]}
+    title: "รถถังห้อยมาแล้ว"
+    text: "ทุกเช้าวันเสาร์ รถคันใหญ่ที่มีถังกับกระสอบห้อยระโยงระยางท้ายรถจะเข้าซอยมา คุณเรียกมันว่ารถถังห้อยมาตั้งแต่จำความได้ เช้านี้น้าจูงมือมายืนรอหน้าบ้าน พี่ ๆ ที่ยืนท้ายรถหันมาทางคุณพอดี"
+    choices:
+      - id: garbage_kid_wave_both
+        text: "โบกมือสองข้างสุดแขน"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: garbage_kid_shout_hello
+        text: "ตะโกนทักพี่ ๆ ทีละคนจนสุดซอย"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่ท้ายรถตะโกนตอบกลับทีละคน เด็กอีกสามบ้านวิ่งออกมาตะโกนด้วย เช้าวันเสาร์ของซอยครึกครื้นเหมือนงานวัด", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตะโกนเพลินจนน้าต้องวิ่งตามมาอุ้มกลับ เสียงแหบไปจนถึงข้าวเย็น และน้าก็หน้าแดงไปด้วย", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garbage_kid_carry_bag
+        text: "ช่วยน้าหิ้วถุงไปวางที่ถัง"
+        effects: {relations: 1, health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_kid_ask_bins
+        text: "ถามน้าว่าทำไมท้ายรถห้อยถังเต็ม"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: garbage_kid_one_finger
+        text: "หลบหลังขาน้า แอบยิ้มให้พี่ ๆ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_bin_drag_teen_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [13, 18]}
+    title: "ลากถังก่อนรถมา"
+    text: "คุณนอนค้างบ้านน้าที่เป็นพนักงานเก็บขยะ น้าแวะลากถังในซอยแคบออกมาวางปากซอยก่อนไปขึ้นรถทุกเช้า ตีสามน้าเคาะประตูห้องถามว่าจะช่วยไหม ถังมีหกใบ ซอยยาวกว่าที่คิด"
+    choices:
+      - id: garbage_teen_help_drag
+        text: "ลุกไปช่วยลากถัง"
+        effects: {health: 1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_teen_alarm_later
+        text: "ขอนอนต่อ พรุ่งนี้ค่อยช่วย"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: garbage_teen_bin_race
+        text: "ท้าน้าแข่งว่าใครลากถึงก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณชนะสองรอบ แพ้สี่รอบ น้าหัวเราะจนต้องหยุดพักกลางซอย เช้านั้นถังครบปากซอยก่อนรถมาตั้งนาน", effects: {happiness: 2, relations: 1, health: 1}, merit: [{cat: help_others, level: 1}], next: garbage_after_teen_01}
+          - {weight: 1, text: "ล้อถังตกร่องท่อ คุณดึงแรงจนหลังยอก น้าเลยลากต่อคนเดียวแล้วกลับมาทายาให้คุณก่อนนอน", effects: {health: -1, relations: 1}, merit: [{cat: neutral}], next: garbage_after_teen_01}
+        merit: [{cat: neutral}]
+      - id: garbage_teen_tie_loose
+        text: "เดินผูกปากถุงที่หลวมให้แน่น"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: garbage_bow_teen_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [13, 17]}
+    title: "ถุงขยะผูกโบว์"
+    text: "ผู้ใหญ่ในบ้านยกหน้าที่ทิ้งขยะให้คุณ คุณเลยผูกปากถุงเป็นโบว์ทุกใบ เช้านี้ป้าข้างบ้านเล่าว่าพี่ ๆ บนรถเก็บขยะถามกันว่าบ้านไหนห่อของขวัญมาให้ แล้วทุกคนก็ชี้มาที่บ้านคุณ"
+    choices:
+      - id: garbage_teen_keep_bow
+        text: "ผูกโบว์ต่อไปทุกวัน"
+        effects: {happiness: 2, network: 1}
+        merit: [{cat: neutral}]
+      - id: garbage_teen_two_colors
+        text: "ใช้โบว์สองสีแยกเปียกกับแห้ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่ ๆ บนรถจำสีได้ภายในสัปดาห์เดียว หยิบแยกได้โดยไม่ต้องเปิดดู ป้าข้างบ้านมาขอสูตรไปผูกบ้าง", effects: {knowledge: 1, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เชือกสีหนึ่งหมดกลางสัปดาห์ คุณผูกสีเดียวกันหมดจนถุงเปียกปนถุงแห้ง พี่บนรถต้องยกดูทีละใบ", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garbage_teen_plain_knot
+        text: "เขินแล้ว กลับไปผูกปมธรรมดา"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: garbage_teen_thank_note
+        text: "เขียนคำขอบคุณติดถุงสิ้นปี"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_shop_water_ya_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [20, 30]}
+    title: "ฝากน้ำไว้ที่ร้านชำ"
+    text: "คุณเช่าห้องอยู่ในซอยมาปีกว่า เห็นพี่ ๆ รถเก็บขยะเหงื่อท่วมทุกเช้า เจ้าของร้านชำปากซอยเล่าว่าหลายบ้านฝากเงินไว้ ถ้ารถผ่านให้พนักงานเข้ามาหยิบน้ำได้เลย แล้วหันมาถามว่าคุณจะร่วมด้วยไหม"
+    choices:
+      - id: garbage_ya_chip_in
+        text: "ฝากเงินไว้กับร้านด้วย"
+        effects: {money: {unit: income_x, amount: -0.01}, relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_ya_whole_month
+        text: "ออกค่าน้ำทั้งเดือนคนเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "พนักงานคนหนึ่งยกมือไหว้ทุกครั้งที่รถผ่านหน้าห้อง คุณไม่รู้เลยว่าเขารู้ได้ยังไง", effects: {money: {unit: income_x, amount: -0.02}, happiness: 2, network: 1}, merit: [{cat: help_others, level: 1}], next: garbage_after_young_01}
+          - {weight: 1, text: "สิ้นเดือนเงินค่ากับข้าวเหลือไม่ถึงสัปดาห์ เจ้าของร้านแอบคืนให้ครึ่งหนึ่ง บอกว่าซอยนี้ช่วยกันคนละนิดก็พอแล้ว", effects: {money: {unit: income_x, amount: -0.01}, relations: 1}, merit: [{cat: help_others, level: 1}], next: garbage_after_young_01}
+        merit: [{cat: neutral}]
+      - id: garbage_ya_ice_refill
+        text: "เติมน้ำแข็งให้ทุกเช้าวันหยุด"
+        effects: {money: {unit: income_x, amount: -0.01}, relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_ya_check_wallet
+        text: "ขอดูกระเป๋าเงินก่อน"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: garbage_ya_learn_names
+        text: "ตั้งใจจำชื่อพี่ ๆ ให้ครบทุกคน"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_sort_myth_ya_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 28]}
+    title: "แยกไปทำไม เทรวมอยู่ดี"
+    text: "คุณย้ายมาอยู่บ้านใหม่ ป้าข้างบ้านแยกขวดกับกระดาษออกจากเศษอาหารทุกวัน คุณบอกว่าแยกไปก็เท่านั้น รถมาก็เทรวมกันอยู่ดี ป้ายิ้มแล้วชี้ไปที่พี่ท้ายรถซึ่งยืนพักอยู่หน้าบ้าน"
+    choices:
+      - id: garbage_ya_ask_crew
+        text: "เดินไปถามพี่ท้ายรถตรง ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่เขาเปิดกระสอบข้างรถให้ดู ขวดอยู่ใบหนึ่ง กระดาษอยู่อีกใบ แล้วเล่าว่าคัดกันบนรถมาตลอด แค่ไม่มีใครเห็น", effects: {knowledge: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถออกพอดีตอนคุณเดินไปถึง พี่เขาตะโกนตอบมาสั้น ๆ ว่าแยกครับ แยกจริง แล้วรถก็เลี้ยวหัวมุมหายไป", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garbage_ya_sort_like_aunt
+        text: "เริ่มแยกตามป้าตั้งแต่วันนี้"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_ya_still_doubt
+        text: "ยังไม่เชื่อ ทิ้งรวมต่อไป"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+      - id: garbage_ya_borrow_bins
+        text: "ขอยืมถังสีของป้ามาลองก่อน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_cousin_shift_ya_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 27]}
+    title: "ห้องเดียวกับคนกะตีสอง"
+    text: "ญาติผู้พี่ที่มาอาศัยห้องคุณเป็นพนักงานเก็บขยะกะดึก ตีหนึ่งครึ่งเขาตื่นมาใส่ชุดทำงานกับรองเท้าบูตอย่างเงียบที่สุด แต่บูตข้างหนึ่งล้มดังโครม คุณลืมตาตื่นพอดี"
+    choices:
+      - id: garbage_ya_brew_coffee
+        text: "ลุกไปชงกาแฟให้หนึ่งแก้ว"
+        effects: {health: -1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_ya_fake_sleep
+        text: "แกล้งหลับ ให้เขาไม่ต้องเกรงใจ"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: garbage_ya_boot_shelf
+        text: "ตอกชั้นวางบูตไม่ให้ล้มอีก"
+        outcomes:
+          - {weight: 1, ok: true, text: "ชั้นไม้ที่ตอกเองตั้งอยู่ได้จนเขาย้ายออก ทุกคืนบูตยืนนิ่งเหมือนทหารกองเกียรติยศ ทั้งห้องได้นอนเต็มอิ่ม", effects: {happiness: 1, relations: 1, knowledge: 1}, merit: [{cat: neutral}], next: garbage_after_young_01}
+          - {weight: 1, text: "ชั้นทรุดตั้งแต่คืนแรก บูตล้มดังกว่าเดิมสองเท่า เขายืนกลั้นหัวเราะอยู่หน้าประตูจนเกือบไปขึ้นรถไม่ทัน", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}], next: garbage_after_young_01}
+        merit: [{cat: neutral}]
+      - id: garbage_ya_walk_to_pickup
+        text: "ตามไปส่งถึงจุดขึ้นรถ"
+        effects: {knowledge: 1, relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: garbage_ya_earplugs
+        text: "ซื้อที่อุดหูมาใส่เงียบ ๆ"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_uncle_study_ya_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [21, 30]}
+    title: "ลุงมาทั้งชุดทำงาน"
+    text: "งานเลี้ยงรวมญาติปีนี้ ลุงอาสาเลี้ยงวงนี้ ลุงที่ขับรถเก็บขยะมาทั้งชีวิตเพิ่งลงกะเช้าแล้วรีบมาทั้งชุดทำงาน ลุงเล่าให้วงฟังว่าไม่มีสมบัติจะให้หลาน ๆ ให้ได้อย่างเดียวคือโอกาสได้เรียน แล้วหันมาถามคุณว่าเป็นยังไงบ้าง"
+    choices:
+      - id: garbage_ya_wai_uncle
+        text: "ยกมือไหว้ขอบคุณลุงกลางวง"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: garbage_ya_tell_plans
+        text: "เล่าแผนชีวิตให้ลุงฟังยาว ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงฟังจนจบไม่ขัดสักคำ แล้วตบไหล่บอกว่าไปให้สุด ญาติที่นั่งฟังอยู่ด้วยปรบมือให้ทั้งวง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เล่ายาวจนลุงที่ตื่นตั้งแต่ตีสองเผลอหลับคาเก้าอี้ ทั้งวงหัวเราะ คุณเลยต้องเล่าต่อให้ป้าฟังแทน", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garbage_ya_pay_table
+        text: "ขอจ่ายค่าอาหารวงนี้แทนลุง"
+        effects: {money: {unit: income_x, amount: -0.02}, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_ya_rest_uncle
+        text: "พาลุงไปนั่งพักมุมที่ลมเย็น"
+        effects: {relations: 1, health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_ya_shy_smile
+        text: "ยิ้มรับ ไม่รู้จะพูดอะไร"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_glass_box_work_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "แก้วแตกใส่กล่อง"
+    text: "แจกันใบใหญ่หล่นแตกกลางบ้าน คุณกวาดเศษมากองไว้ แล้วนึกถึงพี่ท้ายรถที่เคยเล่าว่าถุงดำมองไม่เห็นข้างใน ใส่ถุงมือแล้วก็ยังโดนบาดบ่อย ๆ อีกไม่นานรถก็จะมาแล้ว"
+    choices:
+      - id: garbage_work_box_label
+        text: "ใส่กล่อง เขียนข้างว่าแก้วแตก"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_work_tape_wrap
+        text: "ห่อกระดาษพันเทปหลายชั้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "ห่อแน่นจนพี่ท้ายรถยกขึ้นมาแล้วยิ้ม ยกนิ้วให้กลางซอย เช้าต่อมาเขาทักคุณเป็นบ้านแรก", effects: {relations: 1, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เทปหมดม้วนตอนชั้นที่สอง คุณเลยซ้อนถุงอีกสามใบ สุดท้ายต้องหิ้วไปยื่นเองพร้อมบอกว่าข้างในเป็นแก้ว", effects: {health: -1, relations: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: neutral}]
+      - id: garbage_work_black_bag
+        text: "ใส่ถุงดำรวมไป เร็วดี"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+      - id: garbage_work_hand_over
+        text: "ตื่นรอยื่นให้กับมือพร้อมบอก"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_work_tell_soi
+        text: "ชวนบ้านข้าง ๆ ทำแบบเดียวกัน"
+        effects: {network: 2}
+        merit: [{cat: neutral}]
+
+  - id: garbage_parked_car_work_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "รถญาติขวางรถเก็บขยะ"
+    text: "เมื่อคืนญาติที่มาค้างจอดรถชิดรั้วบ้านคุณฝั่งหนึ่ง บ้านตรงข้ามก็จอดอีกฝั่ง เช้ามืดได้ยินเสียงรถเก็บขยะหยุดอยู่ปากซอยนานผิดปกติ ถุงขยะทั้งซอยยังวางรออยู่หน้าบ้าน"
+    choices:
+      - id: garbage_work_move_car
+        text: "ปลุกญาติให้ไปถอยรถ"
+        effects: {health: -1, relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_work_carry_bags
+        text: "หิ้วถุงทั้งซอยไปส่งปากซอย"
+        outcomes:
+          - {weight: 1, ok: true, text: "บ้านอื่นเห็นก็ออกมาช่วยหิ้ว ทั้งซอยเดินเป็นขบวนในชุดนอน พี่ท้ายรถบอกว่าไม่เคยเห็นซอยไหนทำแบบนี้มาก่อน", effects: {network: 2, relations: 1}, merit: [{cat: help_others, level: 1}], next: garbage_after_work_01}
+          - {weight: 1, text: "หิ้วได้ห้าเที่ยว รถก็ไปซอยถัดไปแล้ว ถุงที่เหลือต้องรออีกวัน ส่วนหลังคุณยอกไปทั้งสัปดาห์", effects: {health: -2, relations: 1}, merit: [{cat: help_others, level: 1}], next: garbage_after_work_01}
+        merit: [{cat: neutral}]
+      - id: garbage_work_knock_opposite
+        text: "เคาะบ้านตรงข้ามให้ย้ายด้วย"
+        effects: {relations: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: garbage_work_blanket
+        text: "ดึงผ้าห่มคลุมหัว"
+        effects: {health: 1, relations: -2}
+        merit: [{cat: neutral}]
+      - id: garbage_work_park_rule
+        text: "เสนอให้ซอยจอดฝั่งเดียว"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_no_leave_work_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "น้าไม่ได้หยุดมาสามเดือน"
+    text: "น้าที่เป็นพนักงานเก็บขยะมานั่งกินข้าวที่บ้านคุณ เล่าว่าไม่ได้ลาหยุดมาเกือบสามเดือน หยุดวันไหนก็โดนหักวันนั้น ประกันอะไรก็ไม่มี น้าบอกว่าเลือกเองนะ ไม่ได้บ่น อยากเก็บเงินให้ครอบครัว แต่เข่าเริ่มไม่ยอมแล้ว"
+    choices:
+      - id: garbage_work_rub_knee
+        text: "หายาหม่องมานวดเข่าให้น้า"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_work_cover_day
+        text: "ออกเงินให้น้าได้หยุดสักวัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้ายอมหยุดหนึ่งวัน นอนยาวถึงเที่ยงเป็นครั้งแรกในรอบหลายเดือน ตื่นมาบอกว่าลืมไปแล้วว่าแดดตอนสายหน้าตาเป็นยังไง", effects: {money: {unit: income_x, amount: -0.02}, relations: 2}, merit: [{cat: help_others, level: 1}], next: garbage_after_work_01}
+          - {weight: 1, text: "น้ารับเงินไว้ แต่เช้ารุ่งขึ้นก็ไปทำงานเหมือนเดิม เงินก้อนนั้นกลายเป็นค่าเทอมหลานแทน น้าบอกว่าแบบนี้ได้พักใจกว่า", effects: {money: {unit: income_x, amount: -0.02}, relations: 1}, merit: [{cat: help_others, level: 1}], next: garbage_after_work_01}
+        merit: [{cat: neutral}]
+      - id: garbage_work_just_listen
+        text: "นั่งฟังเงียบ ๆ ไม่ขัด"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: garbage_work_old_age_plan
+        text: "ชวนน้าคุยเรื่องเก็บเงินยามแก่"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_cold_water_mid_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "เฝ้ากระติกแทนป้า"
+    text: "ป้าข้างบ้านยื่นน้ำเย็นให้พี่ ๆ รถเก็บขยะทุกเช้ามาหลายปีจนรู้จักกันทุกคน เดือนนี้ป้าต้องไปช่วยญาติต่างจังหวัด เลยยกกระติกน้ำแข็งมาวางหน้าบ้านคุณ บอกว่าพรุ่งนี้ตีสี่อย่าลืม"
+    choices:
+      - id: garbage_mid_wake_four
+        text: "ตั้งนาฬิกาปลุกตีสี่ทุกวัน"
+        effects: {health: -1, relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_mid_leave_cooler
+        text: "วางกระติกหน้าบ้านให้หยิบเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เช้าแรกน้ำหมดเกลี้ยง มีกระดาษแผ่นเล็กเหน็บใต้ฝาว่าขอบคุณครับ ลายมือคนละแบบอยู่สี่ลายเซ็น", effects: {happiness: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "น้ำแข็งละลายหมดก่อนรถมา พี่ ๆ เปิดกระติกเจอน้ำอุ่น แต่ยังยกมือขอบคุณมาทางหน้าต่าง คุณอายจนวันต่อมาต้องตื่นมายืนรอเอง", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garbage_mid_add_bread
+        text: "เพิ่มขนมปังกับกาแฟร้อนด้วย"
+        effects: {money: {unit: income_x, amount: -0.01}, relations: 2, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_mid_when_awake
+        text: "ทำแค่วันที่ตื่นทัน"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_gold_mid_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "สร้อยทองไปกับถุงขยะ"
+    text: "คุณซ่อนสร้อยทองไว้ในห่อกระดาษเก่าก้นลิ้นชัก วันเก็บกวาดบ้าน คุณเหมากองกระดาษเก่าใส่ถุงทิ้งไปกับขยะเมื่อเช้า ตกบ่ายเปิดลิ้นชักถึงนึกออก หน้าซีดทันที"
+    choices:
+      - id: garbage_mid_wait_crew
+        text: "รอถามพี่ ๆ รถเก็บขยะพรุ่งนี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่ท้ายรถยื่นห่อกระดาษคืนให้ก่อนคุณจะทันถาม เล่าว่าเจอตอนคัดของบนรถ นึกว่าของปลอมอยู่ตั้งนาน เพิ่งแน่ใจว่าของจริงเมื่อคืน", effects: {happiness: 3, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีใครเห็นห่อนั้นเลย มันไปกับรถตั้งแต่เมื่อเช้า คุณเดินกลับบ้านช้า ๆ แล้วนั่งนิ่งอยู่หน้าลิ้นชักนาน", effects: {money: {unit: income_x, amount: -0.03}, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garbage_mid_report_police
+        text: "ไปลงบันทึกไว้ที่โรงพัก"
+        outcomes:
+          - {weight: 1, ok: true, text: "สองวันต่อมาตำรวจมาเคาะประตู บอกว่ามีพนักงานเก็บขยะนำห่อทองมาแจ้งไว้แล้ว คุณได้คืนครบทุกเส้น", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตำรวจจดไว้ให้อย่างดี แต่ผ่านไปเป็นเดือนก็ยังไม่มีใครมาแจ้ง กระดาษบันทึกแผ่นนั้นกลายเป็นของมีค่าชิ้นเดียวในลิ้นชัก", effects: {money: {unit: income_x, amount: -0.03}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garbage_mid_blame_home
+        text: "โทษตัวเองเสียงดัง"
+        effects: {relations: -2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: garbage_mid_let_go
+        text: "ทำใจ ถือว่าเสียไปแล้ว"
+        effects: {money: {unit: income_x, amount: -0.02}, happiness: -2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: garbage_mid_tell_shop
+        text: "ฝากร้านชำบอกพี่ ๆ ไว้ก่อน"
+        effects: {network: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_holiday_mid_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "หยุดยาวแต่ขยะไม่หยุด"
+    text: "ช่วงหยุดยาวสงกรานต์ ทั้งซอยหยุดงานกันหมด แต่ถุงขยะหน้าบ้านกลับเยอะกว่าทุกวัน ดึกคืนนั้นคุณยังได้ยินเสียงรถเก็บขยะเลี้ยวเข้าซอยตามเวลาเดิม ไม่ขาดสักคืน"
+    choices:
+      - id: garbage_mid_soi_basket
+        text: "ชวนซอยรวมของฝากให้คนรถ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งซอยช่วยกันคนละอย่าง ได้ตะกร้าใหญ่เต็มไปด้วยน้ำหวานกับขนม พี่ ๆ ท้ายรถยืนไหว้ทั้งซอยก่อนรถออก", effects: {network: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เคาะครบซอยได้ขนมมาสองห่อกับน้ำอีกขวด คุณเติมเองจนเต็มตะกร้า กระเป๋าเงินเลยหยุดยาวไปด้วยอีกคน", effects: {money: {unit: income_x, amount: -0.02}, relations: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: neutral}]
+      - id: garbage_mid_less_trash
+        text: "ลดขยะบ้านตัวเองช่วงหยุด"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: garbage_mid_garland
+        text: "เขียนป้ายขอบคุณปักหน้าบ้าน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_mid_lullaby
+        text: "นอนต่อ ฟังเสียงรถเป็นเพลงกล่อม"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_knee_elder_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "ลุงท้ายรถสามสิบปี"
+    text: "ลุงซอยถัดไปตามท้ายรถเก็บขยะมาสามสิบปี ปีนี้เพิ่งได้หยุด ตอนเย็นแกมานั่งม้าหินหน้าบ้านคุณ บ่นว่าปวดหลังปวดเข่าปวดข้อไปหมด แต่ตีสองยังตื่นเองทุกคืน เหมือนกลัวรถจะออกโดยไม่มีแก"
+    choices:
+      - id: garbage_elder_walk_together
+        text: "ชวนลุงเดินเล่นด้วยกันตอนเช้า"
+        effects: {health: 2, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_elder_share_balm
+        text: "แบ่งยาหม่องสมุนไพรให้"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_elder_wave_truck
+        text: "ตีสองชวนลุงไปยืนโบกรถ"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่ ๆ ท้ายรถเห็นลุงก็ตะโกนเรียกกันทั้งคัน ลุงยิ้มกว้างจนคุณเห็นฟันครบ กลับไปนอนหลับยาวถึงสาย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยืนรอจนตีสามรถก็ไม่มา คืนนั้นเปลี่ยนเส้นทาง ลุงกับคุณยืนหาวกันอยู่ปากซอย ขาคุณปวดไปอีกสองวัน", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garbage_elder_hear_stories
+        text: "ขอฟังเรื่องสามสิบปีบนรถ"
+        effects: {knowledge: 1, relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_magic_elder_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [62, 85]}
+    title: "ของวิเศษหน้าบ้าน"
+    text: "แก่ตัวแล้วนอนไม่ค่อยหลับ คืนนี้คุณนั่งริมหน้าต่างตอนตีสอง ตอนเด็กคุณเคยคิดว่าขยะหน้าบ้านเป็นของวิเศษ วางไว้ตอนเย็น เช้ามาก็หายไป คืนนี้เพิ่งเห็นกับตาว่ามีคนห้าคนกับรถหนึ่งคันมาเก็บกลางดึก"
+    choices:
+      - id: garbage_elder_bring_water
+        text: "เดินออกไปยกมือไหว้ขอบคุณ"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่ ๆ ยกมือไหว้ตอบทีละคน คนขับชะโงกหน้าออกมาขอบคุณด้วย คุณกลับไปนอนหลับสนิทเหมือนได้ทำเรื่องที่ค้างมาทั้งชีวิต", effects: {happiness: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เดินไปถึงประตู รถก็ขยับไปบ้านถัดไปแล้ว คุณยืนไหว้ท้ายรถที่ลับตาไปคนเดียว เช้ามาถุงขยะก็หายไปเหมือนทุกวัน ไม่รู้ว่าพี่ ๆ เห็นหรือเปล่า", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garbage_elder_window_wave
+        text: "โบกมือจากหน้าต่าง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: garbage_elder_tie_neat
+        text: "ตั้งใจผูกถุงให้เรียบร้อยกว่าเดิม"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garbage_elder_tell_grandkids
+        text: "เก็บไว้เล่าให้หลาน ๆ ฟัง"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_after_teen_01
+    type: B
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "เรื่องรถเก็บขยะยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องที่เกิดกับรถเก็บขยะหน้าซอยวันนั้นยังถูกเล่าต่อที่ร้านน้ำชา เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: gbg_aft_teen_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gbg_aft_teen_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: gbg_aft_teen_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gbg_aft_teen_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_after_young_01
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "เรื่องรถเก็บขยะยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องที่เกิดกับรถเก็บขยะหน้าซอยวันนั้นยังถูกเล่าต่อที่ร้านน้ำชา เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: gbg_aft_young_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gbg_aft_young_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: gbg_aft_young_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gbg_aft_young_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: garbage_after_work_01
+    type: B
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "เรื่องรถเก็บขยะยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องที่เกิดกับรถเก็บขยะหน้าซอยวันนั้นยังถูกเล่าต่อที่ร้านน้ำชา เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: gbg_aft_work_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gbg_aft_work_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: gbg_aft_work_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gbg_aft_work_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]

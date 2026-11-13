@@ -1,0 +1,519 @@
+# ร่างเรื่อง คนขายพวงมาลัยริมถนน/แยกไฟแดง · 15 ใบ · ลงเกมแล้ว ใบ 319 · ผู้เล่นเป็นลูกค้าในรถ ญาติที่ร้อยมะลิ เพื่อนคนขาย เด็กนั่งรถ เสมอ · ไม่อ่านและไม่ตั้งธง · ไม่ผูกปี · ไม่เปลี่ยน job
+events:
+  - id: garland_kid_red_light_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [5, 12]}
+    title: "เสียงเรียกที่ไฟแดง"
+    text: "รถจอดนิ่งติดไฟแดงยาว คุณนั่งเบาะหลังกับน้า มองออกไปเห็นคนขายใส่เสื้อสีสดยืนบนเกาะกลางถนน แขนคล้องพวงมะลิเต็มไปหมด ได้ยินเสียงร้องว่าพวงมาลัยมั้ยคะ วันนี้วันพระ น้าหันมาถามว่าวันนี้วันอะไรนะ"
+    choices:
+      - id: garland_kid_answer_holy
+        text: "ตอบเสียงดังว่าวันพระ"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: garland_kid_ask_buy
+        text: "ขอน้าซื้อไปไหว้พระที่บ้าน"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: garland_kid_count_arm
+        text: "นั่งนับพวงบนแขนคนขาย"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: garland_kid_wave
+        text: "โบกมือให้คนขายเสื้อสีสด"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนขายโบกกลับแล้วยิ้มกว้าง คุณเล่าเรื่องนี้ให้ทั้งบ้านฟังจนถึงมื้อเย็น และขอให้น้าขับผ่านแยกนี้ทุกวันพระ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณโบกเพลินจนไฟเขียว รถออกไปแล้วยังโบกต่อ คนขับคันหลังงงอยู่พักหนึ่งก่อนจะโบกกลับมาให้", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garland_kid_nap
+        text: "ง่วงเกินกว่าจะสนใจ หลับต่อ"
+        effects: {health: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+
+  - id: garland_teen_dawn_thread_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [13, 18]}
+    title: "ร้อยมะลิตอนตีสี่"
+    text: "ป้าที่ร้อยพวงมาลัยส่งคนขายตามแยกปลุกคุณตั้งแต่ตีสี่ มะลิที่เก็บมาแช่ถังน้ำแข็งรอไว้แล้ว ป้าบอกว่าวันนี้วันพระ ต้องได้มากกว่าทุกวัน ถาดยังว่างอีกครึ่ง ส่วนคุณยังลืมตาไม่ขึ้นข้างหนึ่ง"
+    choices:
+      - id: garland_teen_thread_steady
+        text: "ร้อยช้า ๆ แต่แน่นทุกพวง"
+        effects: {knowledge: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: garland_teen_sort_buds
+        text: "รับหน้าที่คัดดอกตูมให้ป้า"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garland_teen_snooze
+        text: "ขอนอนต่ออีกสิบนาที"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: garland_teen_race_aunt
+        text: "ท้าป้าแข่งร้อยใครเร็วกว่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าชนะขาดลอย แต่ชมว่ามือคุณไวขึ้นทุกเช้า ถาดเต็มก่อนฟ้าสาง ป้าแบ่งข้าวเหนียวหมูปิ้งให้ก่อนใคร", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}], next: garland_after_teen_01}
+          - {weight: 1, text: "คุณเร่งจนเข็มสะกิดนิ้ว ดอกช้ำไปหลายดอก ป้าเลยย้ายคุณไปล้างถังน้ำแข็งแทนจนเช้า", effects: {health: -1, knowledge: 1}, merit: [{cat: neutral}], next: garland_after_teen_01}
+        merit: [{cat: neutral}]
+      - id: garland_teen_tie_tassel
+        text: "ขอหัดผูกอุบะท้ายพวง"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: garland_teen_wet_jasmine_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [13, 18]}
+    title: "มะลิเปียกฝนทั้งตะกร้า"
+    text: "ฝนตกทั้งคืน มะลิที่ญาติเก็บมาเตรียมร้อยส่งคนขายเปียกทั้งตะกร้า ป้าบอกว่าดอกเปียกร้อยแล้วกลีบไม่สวย ต้องผึ่งก่อน แต่คุณยืนยันว่ามะลิเปียกหอมกว่าเดิมเป็นเท่าตัว คนในบ้านยังไม่มีใครเห็นด้วยสักคน"
+    choices:
+      - id: garland_teen_dry_cloth
+        text: "ผึ่งบนผ้าขาวบางทีละกำ"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garland_teen_sniff_vote
+        text: "ให้ทุกคนดมแล้วตัดสิน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าดมแล้วเงียบไปนาน ก่อนยอมรับว่าหอมจริง แต่ก็ยังสั่งให้ผึ่งอยู่ดี คุณถือว่าชนะครึ่งหนึ่ง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ดมกันจนจามพร้อมกันทั้งบ้าน ดอกที่ยื่นให้ดมปลิวลงพื้นไปครึ่งกำ ป้าเก็บตะกร้าคืนไปเงียบ ๆ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garland_teen_float_fallen
+        text: "เก็บดอกร่วงมาลอยน้ำในขัน"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: garland_teen_sleep_rain
+        text: "ฝนตกแบบนี้ ขอนอนต่อ"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: garland_young_wrong_side_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [20, 30]}
+    title: "พวงมาลัยบังกระจกหน้า"
+    text: "คุณซื้อพวงมะลิตอนรถจอดติดไฟแดงยาว เพื่อนที่นั่งข้างคนขับรับไปแขวนให้ด้วยความหวังดี แต่แขวนกลางกระจกหน้า พวงห้อยยาวลงมาจนคุณมองเห็นถนนได้ครึ่งเดียว อุบะแกว่งอยู่ตรงหน้าเหมือนที่ปัดน้ำฝน"
+    choices:
+      - id: garland_young_to_mirror
+        text: "ให้ย้ายไปแขวนกระจกมองหลัง"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: garland_young_pull_over
+        text: "ชิดข้างทางแล้วค่อยแขวนใหม่"
+        effects: {health: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: garland_young_lay_seat
+        text: "วางไว้เบาะ ไว้ไหว้พระที่บ้าน"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: garland_young_friend_hold
+        text: "ให้เพื่อนถือไว้ตลอดทาง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนชูพวงมาลัยไว้จนถึงบ้าน บอกว่าเป็นการไหว้แบบพกพา ทั้งรถหัวเราะจนลืมว่ารถติด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนเมื่อยแขนแล้วเผลอหลับ พวงมาลัยหล่นลงตัก ดอกช้ำไปครึ่งพวง ถึงบ้านเหลือแต่กลิ่นหอมเต็มรถ", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: garland_young_rain_scent_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "กลิ่นมะลิหลังฝนซา"
+    text: "ฝนเพิ่งซา รถคุณจอดติดไฟแดงเลนซ้ายสุด คนขายในชุดกันฝนสีสดยืนชิดขอบทาง ยื่นพวงมะลิที่ยังมีหยดน้ำเกาะมาให้ดู คุณซื้อมาพวงเดียว ไม่ถึงนาทีกลิ่นก็อบไปทั้งรถ เพื่อนที่นั่งมาด้วยสาบานว่าหอมกว่าวันแดดออก"
+    choices:
+      - id: garland_young_crack_window
+        text: "แง้มกระจกให้กลิ่นจางลง"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: garland_young_buy_extra
+        text: "ซื้อเพิ่มอีกพวงไปฝากที่บ้าน"
+        effects: {money: {unit: income_x, amount: -0.01}, relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: garland_young_rain_rule
+        text: "ตั้งกฎใหม่ ฝนตกต้องซื้อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝนตกครั้งถัดมาคุณแวะซื้ออีก บ้านหอมไปทั้งคืน คนในบ้านเริ่มถามพยากรณ์อากาศจากคุณแทนวิทยุ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝนครั้งถัดมาตกหนักจนคนขายไม่ได้ออกมา คุณวนรถรอบแยกอยู่สามรอบกว่าจะยอมกลับบ้านมือเปล่า", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: garland_young_note_scent
+        text: "จดไว้ว่ามะลิเปียกหอมกว่า"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: garland_young_dusk_tray_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "ถาดตอนเย็นที่ยังไม่หมด"
+    text: "เย็นนี้คุณนัดเพื่อนที่ขายพวงมาลัยตรงหัวมุมทางเข้าตลาด ว่าจะไปกินข้าวด้วยกันหลังขายหมด เย็นแล้วในถาดยังเหลือเกือบยี่สิบพวง มะลิเริ่มเหลือง เพื่อนขอยืนอีกนิด ส่วนท้องคุณร้องดังกว่าเสียงแตรรถ"
+    choices:
+      - id: garland_young_call_curb
+        text: "ช่วยเรียกลูกค้าอยู่ที่ขอบทาง"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garland_young_buy_rest
+        text: "เหมาที่เหลือไปแจกเพื่อนบ้าน"
+        effects: {money: {unit: income_x, amount: -0.01}, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: garland_young_eat_beside
+        text: "ซื้อข้าวมานั่งกินรอข้าง ๆ"
+        effects: {happiness: 1, health: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: garland_young_night_sign
+        text: "เขียนป้าย มะลิรอบดึก หอมเข้ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนในรถชะโงกอ่านป้ายแล้วเรียกซื้อจนหมดถาดในครึ่งชั่วโมง เพื่อนเลี้ยงข้าวคุณเป็นค่าคนคิดคำ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}], next: garland_after_young_01}
+          - {weight: 1, text: "ไม่มีใครอ่านป้ายทัน รถผ่านไปหมดทุกคัน เพื่อนพับป้ายไปรองก้นถาดแทน คุณได้กินข้าวตอนฟ้ามืดสนิท", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}], next: garland_after_young_01}
+        merit: [{cat: neutral}]
+
+  - id: garland_young_bright_outfit_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "ชุดใหม่ให้คนในรถเห็น"
+    text: "เพื่อนที่ขายพวงมาลัยริมทางบ่นว่าแต่งตัวธรรมดาแล้วคนในรถมองไม่เห็น ขอให้คุณช่วยคิดชุดใหม่ให้สะดุดตาก่อนวันพระหน้า คุณมีผ้าคลุมสีชมพูสะท้อนแสงจากงานกีฬาสี หมวกปีกกว้างของป้า และเวลาอีกหนึ่งคืน"
+    choices:
+      - id: garland_young_pink_only
+        text: "ใช้ผ้าคลุมสีชมพูชิ้นเดียว"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: garland_young_hat_flowers
+        text: "เย็บดอกไม้ผ้ารอบหมวกให้"
+        effects: {knowledge: 1, relations: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garland_young_just_smile
+        text: "บอกเพื่อนว่ายิ้มกว้างก็พอ"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: garland_young_full_set
+        text: "จัดเต็มทุกชิ้นพร้อมกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนในรถชี้กันทั้งแถว เพื่อนขายหมดถาดก่อนเที่ยง แล้วแวะมาเล่าที่บ้านคุณพร้อมพวงสุดท้ายที่เก็บไว้ให้", effects: {happiness: 2, relations: 1, network: 1}, merit: [{cat: neutral}], next: garland_after_young_01}
+          - {weight: 1, text: "คนในรถมองแต่หมวก ไม่มีใครเห็นพวงมาลัยในมือ ตกบ่ายเพื่อนเอาหมวกมาคืนโดยไม่พูดอะไรสักคำ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}], next: garland_after_young_01}
+        merit: [{cat: neutral}]
+
+  - id: garland_work_smile_window_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ยิ้มหนึ่งทีที่ไฟแดง"
+    text: "เช้าวันจันทร์ คุณขับรถไปทำงานด้วยหน้าบึ้งเพราะงานที่ค้างจากสัปดาห์ก่อน รถจอดติดไฟแดงชิดขอบทางพอดี คนขายพวงมาลัยในเสื้อสีสะดุดตายกพวงขึ้นให้ดู แล้วยิ้มให้ทั้งที่คุณยังไม่ได้หมุนกระจกลง"
+    choices:
+      - id: garland_work_smile_back
+        text: "หมุนกระจกลงแล้วยิ้มกลับ"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: garland_work_buy_thanks
+        text: "ซื้อพวงหนึ่ง ขอบคุณที่ยิ้มให้"
+        effects: {money: {unit: income_x, amount: -0.01}, happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: garland_work_shake_head
+        text: "ส่ายหน้าเบา ๆ แต่ยิ้มให้"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: garland_work_smile_duel
+        text: "ยิ้มกลับให้กว้างกว่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนขายหัวเราะจนต้องหันหลังไปหัวเราะต่อ คุณยิ้มค้างไปถึงที่ทำงาน เพื่อนร่วมงานถามว่าได้โบนัสมาหรือ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}], next: garland_after_work_01}
+          - {weight: 1, text: "ยิ้มเพลินจนไม่ทันเห็นไฟเขียว รถคันหลังบีบแตรยาว คุณออกรถไปทั้งที่หน้ายังยิ้มค้างเหมือนรูปติดบัตร", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}], next: garland_after_work_01}
+        merit: [{cat: neutral}]
+
+  - id: garland_work_holy_eve_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "คืนก่อนวันพระ"
+    text: "ญาติที่ร้อยพวงมาลัยส่งคนขายตามแยกเรียกคุณมาช่วยคืนก่อนวันพระ เพราะวันพระกับเสาร์อาทิตย์ขายดีกว่าวันธรรมดามาก เป้าคืนนี้เกินร้อยแปดสิบพวง ร้อยไปได้ครึ่งเดียว ส่วนคุณต้องตื่นไปทำงานตอนหกโมง"
+    choices:
+      - id: garland_work_until_done
+        text: "ร้อยจนเสร็จแล้วไปทำงานเลย"
+        effects: {health: -2, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: garland_work_until_midnight
+        text: "ช่วยถึงเที่ยงคืนแล้วขอตัว"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garland_work_tassel_only
+        text: "ขอผูกอุบะอย่างเดียว"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: garland_work_assembly_line
+        text: "จัดสายพานร้อยแบบโรงงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "แบ่งคนคัดดอก คนร้อย คนผูกอุบะ ถาดเต็มก่อนตีสอง ญาติบอกว่าวันพระหน้าขอจองตัวคุณเป็นหัวหน้ากะ", effects: {happiness: 2, knowledge: 1, relations: 1}, merit: [{cat: neutral}], next: garland_after_work_01}
+          - {weight: 1, text: "คนผูกอุบะทำเร็วกว่าคนร้อยจนนั่งรอ แล้วหลับคาถาดไปสองคน รวมคุณด้วย ตื่นมามีมะลิติดแก้ม", effects: {health: 1, relations: -1}, merit: [{cat: neutral}], next: garland_after_work_01}
+        merit: [{cat: neutral}]
+
+  - id: garland_work_carpool_rule_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "กติการถติดกันไปทำงาน"
+    text: "คุณกับเพื่อนร่วมงานสามคนติดรถไปทำงานด้วยกัน คนขับมีกติกาข้อเดียว ทุกเช้าต้องได้พวงมาลัยใหม่ไหว้รถ วันนี้ติดไฟแดงห่างคนขายที่ขอบทางไปสองคัน พวงเมื่อวานยังสดอยู่ และทุกคนในรถสายแล้ว"
+    choices:
+      - id: garland_work_yesterday_fine
+        text: "บอกว่าพวงเมื่อวานยังหอมอยู่"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: garland_work_buy_two
+        text: "เสนอซื้อทีละสองพวงเผื่อไว้"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: garland_work_pay_today
+        text: "ออกค่าพวงมาลัยวันนี้ให้"
+        effects: {money: {unit: income_x, amount: -0.01}, relations: 2}
+        merit: [{cat: neutral}]
+      - id: garland_work_guess_shirt
+        text: "แข่งกันทายสีเสื้อคนขายวันนี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณทายถูกว่าสีชมพูสะท้อนแสง ทั้งรถยอมให้คุณเลือกเพลงไปทั้งสัปดาห์ ส่วนพวงมาลัยวันนี้ได้ทันก่อนไฟเขียว", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทายผิดกันทั้งรถ คนขายใส่เสื้อสีเดียวกับเสื้อคนขับพอดี ทุกคนเงียบไปจนถึงที่ทำงาน", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: garland_mid_friday_regular_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "ลูกค้าวันศุกร์มาวันพฤหัส"
+    text: "คุณซื้อพวงมาลัยกับคนขายเจ้าเดิมที่แยกหน้าตลาดทุกวันศุกร์มาหลายปี จนเธอผูกเชือกฟางแดงแยกพวงไว้ให้ เช้านี้คุณจอดชิดขอบทางเหมือนทุกครั้ง เธอยื่นพวงเชือกฟางแดงมาให้ แต่หน้างงกว่าคุณ เพราะวันนี้วันพฤหัส"
+    choices:
+      - id: garland_mid_take_both
+        text: "รับไว้ บอกว่าพรุ่งนี้มาอีก"
+        effects: {money: {unit: income_x, amount: -0.01}, relations: 2}
+        merit: [{cat: neutral}]
+      - id: garland_mid_admit_day
+        text: "ยอมรับว่าจำวันผิดเอง"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: garland_mid_add_thursday
+        text: "ขอเพิ่มเป็นลูกค้าวันพฤหัสด้วย"
+        effects: {money: {unit: income_x, amount: -0.01}, network: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: garland_mid_insist_friday
+        text: "แกล้งยืนยันว่าวันนี้วันศุกร์"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนขายนิ่งไปครู่หนึ่ง แล้วหัวเราะดังจนรถคันข้างหันมามอง คุณได้พวงที่สดที่สุดในถาดพร้อมคำว่าอย่ามาแกล้งกันอีก", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เธอเชื่อสนิท หันไปบอกคนขายข้าง ๆ ว่าวันนี้วันศุกร์ ทั้งหัวมุมนับวันกันใหม่ คุณขับออกไปพร้อมความรู้สึกผิดทั้งวัน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: garland_mid_squashed_seat_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "พวงมาลัยบนเบาะข้างคนขับ"
+    text: "คุณซื้อพวงมาลัยตอนติดไฟแดงขากลับ ตั้งใจเอาไปไหว้พระที่หิ้ง วางไว้เบาะข้างคนขับ แต่ระหว่างทางแวะตลาด แวะร้านยา แวะรับหลาน ถึงบ้านพวงมาลัยถูกถุงกับข้าวทับจนแบน หลานนั่งทับอีกครึ่งพวง"
+    choices:
+      - id: garland_mid_offer_as_is
+        text: "ไหว้ไปตามสภาพ ใจสำคัญกว่า"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: garland_mid_buy_again
+        text: "ขับกลับไปซื้อพวงใหม่"
+        effects: {money: {unit: income_x, amount: -0.01}, health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: garland_mid_pick_good
+        text: "เก็บดอกที่ยังดีใส่จานแทน"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: garland_mid_kid_reshape
+        text: "ให้หลานช่วยดัดพวงคืนรูป"
+        outcomes:
+          - {weight: 1, ok: true, text: "หลานดัดจนกลมสวยกว่าตอนซื้อ แล้วขอไหว้เป็นคนแรก ตั้งแต่นั้นหลานขอนั่งถือพวงมาลัยบนตักทุกครั้ง", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พวงขาดกลางมือหลาน มะลิกลิ้งเต็มพื้น ทั้งบ้านคลานเก็บกันจนลืมไปว่าจะไหว้อะไร", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: garland_mid_old_classmate_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "เพื่อนเก่าที่ขอบทาง"
+    text: "รถคุณจอดติดไฟแดงชิดขอบทาง คนขายพวงมาลัยตรงนั้นยกพวงขึ้นให้ดู แล้วเรียกชื่อเล่นสมัยประถมของคุณ เป็นเพื่อนร่วมห้องที่ไม่ได้เจอกันหลายสิบปี เขาบอกว่าขายตรงนี้มานานจนคนขับขาประจำจำหน้าได้หมด"
+    choices:
+      - id: garland_mid_buy_date
+        text: "ซื้อพวงหนึ่ง นัดกินข้าววันหลัง"
+        effects: {money: {unit: income_x, amount: -0.01}, network: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: garland_mid_ask_house
+        text: "ถามว่าบ้านอยู่ไหน จะแวะไป"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: garland_mid_wai_smile
+        text: "ยกมือทักแล้วยิ้มกว้าง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: garland_mid_school_story
+        text: "รีบเล่าเรื่องสมัยเรียนให้ทัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เล่าทันเรื่องเดียวคือเรื่องที่เขาแอบกินข้าวกล่องของคุณ เขาหัวเราะแล้วยื่นพวงแถมมาให้อีกพวงเป็นค่าข้าว", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไฟเขียวตอนเล่าถึงครึ่ง คุณต้องออกรถไปพร้อมเรื่องค้างคอ วันรุ่งขึ้นเลยวนมาติดไฟแดงเดิมเพื่อเล่าต่อ", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: garland_elder_temple_friend_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "เพื่อนร้อยมะลิหน้าวัด"
+    text: "ยายที่ขายพวงมาลัยหน้าวัดมาสี่สิบปีเป็นเพื่อนรุ่นเดียวกับคุณ เช้าวันพระคุณแวะไปนั่งเป็นเพื่อน ยายร้อยมะลิไปคุยไปโดยไม่ต้องก้มดู มือเร็วกว่าคนครึ่งอายุ แล้วยื่นเข็มกับด้ายมาให้ บอกว่าลองดูสักพวงสิ"
+    choices:
+      - id: garland_elder_thread_slow
+        text: "ร้อยช้า ๆ ทีละดอกตามยาย"
+        effects: {knowledge: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: garland_elder_arrange_tray
+        text: "ขอเป็นคนจัดถาดให้แทน"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: garland_elder_just_chat
+        text: "นั่งคุยเฉย ๆ ไม่ร้อย"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: garland_elder_race_friend
+        text: "ท้ายายแข่งใครเสร็จก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณแพ้ขาดลอย แต่พวงของคุณขายได้ก่อน เพราะคนซื้อบอกว่าดูตั้งใจดี ยายค้อนอยู่ทั้งเช้า", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยายเสร็จไปสามพวง คุณยังร้อยไม่ถึงครึ่ง ด้ายพันนิ้วจนยายต้องหยิบกรรไกรมาตัดให้", effects: {happiness: 1, knowledge: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: garland_elder_jasmine_bush_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "มะลิหน้าบ้านบานพร้อมกัน"
+    text: "พุ่มมะลิหน้าบ้านคุณออกดอกพร้อมกันทั้งพุ่ม เพื่อนบ้านที่ร้อยพวงมาลัยส่งคนขายตามแยกมาขอทุกเช้า คุณเก็บก่อนแดดแรง ใส่ตะกร้าคลุมผ้าขาวบางพรมน้ำ เช้านี้ได้เต็มตะกร้าจนเข่าลั่นตอนลุก แต่เพื่อนบ้านยังไม่มา"
+    choices:
+      - id: garland_elder_carry_over
+        text: "ยกตะกร้าไปส่งถึงบ้านเขา"
+        effects: {health: -1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: garland_elder_wait_shade
+        text: "พรมน้ำผ้าแล้วนั่งรอในร่ม"
+        effects: {health: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: garland_elder_keep_handful
+        text: "แบ่งไว้ไหว้พระที่บ้านกำหนึ่ง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: garland_elder_thread_wait
+        text: "ร้อยเองสักพวงระหว่างรอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "มือยังจำได้ พวงออกมาแน่นสวย เพื่อนบ้านมาถึงแล้วขอเอาไปวางหน้าสุดในถาด", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้อยไปครึ่งพวงสายตาเริ่มพร่า ดอกเรียงคดเหมือนงู เพื่อนบ้านมาถึงพอดีแล้วชมว่าแปลกตาดี", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: garland_after_teen_01
+    type: B
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "เรื่องที่แยกไฟแดงยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องที่เกิดตรงแยกไฟแดงวันนั้นยังถูกเล่าต่อที่ร้านน้ำชาหน้าซอย เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: gar_aft_teen_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gar_aft_teen_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: gar_aft_teen_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gar_aft_teen_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: garland_after_young_01
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "เรื่องที่แยกไฟแดงยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องที่เกิดตรงแยกไฟแดงวันนั้นยังถูกเล่าต่อที่ร้านน้ำชาหน้าซอย เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: gar_aft_young_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gar_aft_young_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: gar_aft_young_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gar_aft_young_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: garland_after_work_01
+    type: B
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "เรื่องที่แยกไฟแดงยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องที่เกิดตรงแยกไฟแดงวันนั้นยังถูกเล่าต่อที่ร้านน้ำชาหน้าซอย เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: gar_aft_work_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gar_aft_work_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: gar_aft_work_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gar_aft_work_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]

@@ -1,0 +1,563 @@
+# ร่างเรื่อง ควาญช้าง/คนดูแลช้างประจำตัว · 15 ใบ · ลงเกมแล้ว ใบ 319 · ผู้เล่นไม่ใช่ควาญ เป็นเด็กที่ยืนดูไกล ๆ ญาติที่ช่วยตัดกล้วยแบกหญ้า เพื่อนบ้านของควาญ นักท่องเที่ยว · ไม่อ่านและไม่ตั้งธง · ไม่ผูกปี · ไม่มี effects job
+events:
+  - id: mahout_bath_watch_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [5, 12]}
+    title: "ฟองขาวบนหลังช้าง"
+    text: "ปิดเทอมไปค้างบ้านป้าต่างอำเภอ เช้านี้ป้าจูงมือคุณไปยืนดูบนตลิ่งไกล ๆ ลุงข้างบ้านกำลังขัดตัวช้างในลำห้วย ถูเครือสะบ้าจนฟองขาวเต็มหลัง ป้าบอกว่านี่คือสบู่ช้าง คุณสงสัยว่าตัวใหญ่ขนาดนี้ต้องใช้สบู่กี่ก้อน"
+    choices:
+      - id: mahout_kid_ask_soap
+        text: "ถามป้าว่าสบู่ช้างทำจากอะไร"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: mahout_kid_shout_tail
+        text: "ตะโกนบอกลุงว่าหางยังไม่ได้ขัด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงหันมายกนิ้วให้ แล้วขัดหางให้ดูอย่างละเอียดทีละช่วง ป้าบอกว่าตาไวแบบนี้วันหลังมาช่วยถือตะกร้าได้", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เสียงคุณดังจนช้างหันมามองทั้งตัว ป้าจูงมือถอยไปอีกสองก้าว แล้วกระซิบว่าคนดูไกล ๆ ต้องดูเงียบ ๆ", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mahout_kid_draw_foam
+        text: "กลับบ้านวาดรูปช้างมีฟอง"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: mahout_kid_call_friend
+        text: "ชวนเด็กข้างบ้านมายืนดูด้วย"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_banana_break_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [13, 18]}
+    title: "ตัดต้นกล้วยช่วงปิดเทอม"
+    text: "ปิดเทอมนี้น้าชวนไปช่วยตัดต้นกล้วยหลังสวน เอาไปให้เพื่อนบ้านที่เป็นควาญ เพราะต้นกล้วยเป็นของที่ช้างต้องกินทุกวัน น้ากำชับว่าตัดแล้ววางกองไว้ริมรั้ว ห้ามถือเข้าไปหาช้างเอง กองแรกยังไม่ครบ ช้างที่ยืนอยู่ไกล ๆ ก็ยกงวงดมลมมาทางนี้แล้ว"
+    choices:
+      - id: mahout_banana_stack
+        text: "ตัดให้ครบแล้ววางกองตามสั่ง"
+        effects: {health: -1, relations: 1, money: {unit: income_x, amount: 0.01}}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_banana_bite_size
+        text: "หั่นเป็นท่อนพอดีคำให้ช้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ควาญหัวเราะแล้วขอบใจที่ใส่ใจ แล้วสอนวิธีวางกองให้หยิบง่ายจากริมรั้ว", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หั่นจนมือพองได้แค่ครึ่งกอง น้าบอกว่าที่คุณหั่นมาทั้งเช้า ช้างกวาดเข้าปากหมดในงวงเดียว", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mahout_banana_wave
+        text: "ยืนโบกมือให้ช้างจากริมรั้ว"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_banana_ask_menu
+        text: "ถามน้าว่าช้างกินอะไรอีกบ้าง"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: mahout_banana_rest
+        text: "ขอพักใต้ร่มก่อนค่อยตัดต่อ"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_tamarind_ball_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [13, 18]}
+    title: "ขนมก้อนกลมของช้าง"
+    text: "ลุงข้างบ้านนั่งปั้นมะขามเปียกคลุกเกลือเป็นก้อนเท่ากำปั้นวางเรียงบนกระด้ง คุณนึกว่าเป็นขนมเลยหยิบจะชิม ลุงหัวเราะบอกว่าของช้าง ช่วยให้ท้องมันระบาย แล้วชวนนั่งปั้นด้วยกันบนชานบ้าน ห่างคอกช้างพอสมควร"
+    choices:
+      - id: mahout_tamarind_roll
+        text: "นั่งช่วยลุงปั้นจนหมดกะละมัง"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_tamarind_taste
+        text: "แอบชิมก้อนเล็ก ๆ สักก้อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เปรี้ยวเค็มจนตาหยี ลุงหัวเราะลั่นจนเพื่อนบ้านชะโงกมาดู คุณรีบกลืนแล้วขอน้ำ", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ท้องปั่นป่วนไปทั้งบ่าย ลุงเดินผ่านห้องน้ำแล้วตะโกนว่าบอกแล้วไงว่ามันช่วยระบาย", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mahout_tamarind_ask_salt
+        text: "ถามว่าทำไมต้องคลุกเกลือ"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: mahout_tamarind_go_home
+        text: "ขอตัวกลับไปนอนเล่นที่บ้าน"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_picky_grass_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "หญ้ากองนี้ไม่เอา"
+    text: "คุณช่วยญาติที่เป็นควาญแบกหญ้ามาวางให้ช้าง เที่ยวที่สามแล้วช้างยังเขี่ยหญ้าชนิดหนึ่งออกข้างทุกครั้ง แต่อีกชนิดกินเกลี้ยง ญาติบอกว่าตัวนี้เลือกกินมาแต่ไหนแต่ไร คนเลี้ยงต้องจำให้ได้ว่ามันชอบอะไร"
+    choices:
+      - id: mahout_grass_remember
+        text: "จำชนิดหญ้าที่ช้างชอบไว้"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: mahout_grass_hide_under
+        text: "แอบซุกหญ้าที่ไม่ชอบไว้ใต้กอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช้างกินเพลินจนหมดกอง ญาติชมว่าหัวไว แล้วขอให้มาช่วยแบกอีกหลายวัน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช้างใช้งวงคุ้ยหยิบเฉพาะชนิดที่ชอบ เหลือหญ้าที่ไม่ชอบเรียงเป็นแถวเหมือนคัดไว้คืนให้คุณดู", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mahout_grass_carry_more
+        text: "แบกชนิดที่มันชอบมาเพิ่ม"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_grass_ask_why
+        text: "ถามญาติว่าทำไมมันไม่กิน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_grass_shade
+        text: "ขอพักดื่มน้ำใต้ร่มไม้"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_selective_ear_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "ได้ยินแค่เสียงกล้วย"
+    text: "ไปเที่ยวต่างจังหวัด คุณยืนดูควาญคนหนึ่งเรียกช้างขึ้นจากน้ำ เรียกชื่อสามรอบช้างยังแช่น้ำนิ่ง ควาญบอกคนดูว่ามันจำเขาได้ดี แค่ไม่อยากขึ้น พอเขาหยิบหวีกล้วยขึ้นมา ช้างหันหัวมาทันที"
+    choices:
+      - id: mahout_ear_laugh
+        text: "หัวเราะไปกับคนดูทั้งท่า"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: mahout_ear_ask_months
+        text: "ถามว่ากว่าจะคุ้นกันใช้กี่เดือน"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: mahout_ear_try_call
+        text: "ขอลองเรียกชื่อมันบ้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช้างหันมาทางคุณ คนทั้งท่าปรบมือ ก่อนจะเห็นว่าคุณบังเอิญยืนอยู่ข้างตะกร้ากล้วยพอดี", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}], next: mahout_after_ya_01}
+          - {weight: 1, text: "ช้างไม่กระดิกหูสักนิด ควาญบอกว่าขนาดเขาเรียกมันยังไม่หัน คนแปลกหน้าไม่ต้องหวัง", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}], next: mahout_after_ya_01}
+        merit: [{cat: neutral}]
+      - id: mahout_ear_buy_banana
+        text: "ซื้อกล้วยฝากควาญไว้ให้มัน"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: mahout_ear_tell_friends
+        text: "จำเรื่องนี้ไปเล่าให้เพื่อนฟัง"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_chatty_visitor_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "คุยเก่งแต่ช้างไม่ฟัง"
+    text: "เพื่อนบ้านที่เป็นควาญชวนคุณเดินตามไปส่งช้างลงอาบน้ำ คุณคุยกับช้างไม่หยุดทั้งชมทั้งเรียก ช้างไม่หันมาสักครั้ง ส่วนเขาไม่พูดอะไรเลย แค่ยื่นมือไปแตะ ช้างก็เลี้ยวตาม เขายิ้มบอกว่าควาญเก่งไม่ต้องพูดมาก แค่แตะก็รู้เรื่อง"
+    choices:
+      - id: mahout_chatty_hush
+        text: "ลองเดินเงียบ ๆ ตามหลังบ้าง"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_chatty_touch
+        text: "ขอลองแตะแบบเขาบ้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาพาคุณไปยืนฝั่งที่ช้างถนัด ช้างหันมามองนิดหนึ่งแล้วเดินต่อ แค่นั้นคุณก็ยิ้มได้ทั้งวัน", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}], next: mahout_after_ya_01}
+          - {weight: 1, text: "เขาบอกให้รออีกสักสามเดือน ช้างยังจำกลิ่นคุณไม่ได้ แล้วพาคุณถอยไปเดินข้างหลังแทน", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}], next: mahout_after_ya_01}
+        merit: [{cat: neutral}]
+      - id: mahout_chatty_sing
+        text: "เปลี่ยนเป็นร้องเพลงให้ช้างฟัง"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: mahout_chatty_ask
+        text: "ถามว่าช้างเข้าใจคนได้ยังไง"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: mahout_chatty_carry
+        text: "ช่วยถือถังกับแปรงขัดให้เขา"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: mahout_sleepy_name_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ชื่อที่เรียกผิดตอนตีห้า"
+    text: "เพื่อนบ้านที่เป็นควาญตื่นแต่มืดไปเก็บกวาดที่ช้างนอน คุณตื่นมาช่วยแบกหญ้าก่อนเข้างาน เขายังลืมตาไม่เต็มที่ ร้องเรียกช้างด้วยชื่อหลานตัวเองเสียงดังลั่น ช้างยืนนิ่งไม่ขยับ เหมือนรอให้เขาเรียกใหม่ให้ถูก"
+    choices:
+      - id: mahout_name_pretend
+        text: "ทำเป็นไม่ได้ยิน แบกต่อเงียบ ๆ"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_name_tease
+        text: "แซวว่าช้างตื่นกว่าคนเลี้ยง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาหัวเราะจนหายง่วง เรียกชื่อถูกรอบเดียว ช้างก็เดินตามออกมาเหมือนรออยู่แล้ว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาหันมาเรียกคุณด้วยชื่อช้างแทนไปทั้งเช้า ใครเดินผ่านซอยก็ได้ยินกันหมด", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mahout_name_coffee
+        text: "ชงกาแฟร้อนให้เขาแก้วหนึ่ง"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_name_call_right
+        text: "ตะโกนชื่อที่ถูกแทนเขา"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: mahout_name_go_work
+        text: "ขอตัวไปทำงานก่อนสาย"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_napier_night_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "หญ้าเนเปียร์ไว้มื้อดึก"
+    text: "เลิกงานแล้วคุณแวะบ้านญาติ เจอทุกคนช่วยกันตัดหญ้าเนเปียร์ไว้ให้ช้างกินตอนกลางคืน ญาติที่เป็นควาญบอกว่าช้างหิววันละหลายรอบ พอช้างในหมู่บ้านรวมกันหลายเชือก ปลูกหญ้าเท่าไรก็ไม่พอ เคียวเล่มที่เหลือวางรอคุณอยู่พอดี"
+    choices:
+      - id: mahout_napier_cut
+        text: "หยิบเคียวลงไปตัดด้วย"
+        effects: {health: -1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_napier_race
+        text: "ท้าญาติแข่งว่าใครตัดได้มาก"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณชนะขาดลอย ญาติยอมเลี้ยงข้าวต้มรอบดึก คืนนั้นช้างได้หญ้ากองโตกว่าทุกคืน", effects: {happiness: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ตัดเร็วจนวัชพืชปนไปครึ่งกอง ช้างเขี่ยกองของคุณทิ้งทั้งหมด ญาติหัวเราะว่าของคุณช้างไม่นับ", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mahout_napier_lend_land
+        text: "ยกที่ว่างหลังบ้านให้ปลูกหญ้า"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_napier_feed_crew
+        text: "ซื้อกับข้าวมาเลี้ยงคนตัดหญ้า"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: mahout_napier_go_home
+        text: "บอกว่าเหนื่อยงาน ขอกลับก่อน"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_early_supper_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ช้างง่วงเร็ว มื้อค่ำต้องเลื่อน"
+    text: "ควาญเพื่อนบ้านเล่าว่าช่วงนี้ช้างง่วงเร็ว เขาต้องเลื่อนมื้อสุดท้ายขึ้นมาเกือบชั่วโมง ไม่งั้นช้างกินแล้วย่อยไม่ดี วันนี้เขาติดธุระ ฝากคุณหิ้วตะกร้าอาหารไปวางที่จุดที่เขาเตรียมไว้ตามเวลาใหม่ แล้วยืนรอห่าง ๆ"
+    choices:
+      - id: mahout_supper_on_time
+        text: "ไปวางตรงเวลาใหม่เป๊ะ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_supper_old_time
+        text: "ไปตามเวลาเดิมที่คุ้นมือ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช้างยังไม่หลับ ยืนรอหน้านิ่ง ๆ เหมือนจะบ่นว่าช้า แต่ก็กินจนหมดตะกร้า", effects: {happiness: 1, relations: 1}, merit: [{cat: help_others, level: 1}], next: mahout_after_work_01}
+          - {weight: 1, text: "ช้างหลับไปแล้ว ตะกร้าวางค้างถึงเช้า เพื่อนบ้านกลับมาบอกว่าเวลาใหม่ช้างเป็นคนตั้ง ไม่ใช่คน", effects: {relations: -1, knowledge: 1}, merit: [{cat: neutral}], next: mahout_after_work_01}
+        merit: [{cat: neutral}]
+      - id: mahout_supper_stay
+        text: "ยืนดูช้างกินจนหมดค่อยกลับ"
+        effects: {happiness: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: mahout_supper_ask_sleep
+        text: "ถามว่าช้างนอนวันละกี่ชั่วโมง"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: mahout_supper_decline
+        text: "ขอโทษ วันนี้กลับดึก"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_good_side_01
+    type: A
+    category: study
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ฝั่งที่ช้างถนัด"
+    text: "ญาติที่เป็นควาญพาช้างเดินกลับจากลำห้วย คุณหิ้วถังน้ำตามหลังห่าง ๆ เขาสอนญาติรุ่นน้องที่เพิ่งมาหัดว่าต้องเดินฝั่งที่ช้างถนัด สอนแบบพี่สอนน้อง ไม่มีห้องเรียน น้องพยักหน้าทุกคำแต่ไปยืนผิดฝั่งทุกรอบ"
+    choices:
+      - id: mahout_side_point
+        text: "ช่วยกระซิบบอกน้องเบา ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_side_remember
+        text: "จำไว้เผื่อวันหนึ่งได้ใช้"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: mahout_side_guess
+        text: "ทายว่าวันนี้ช้างถนัดฝั่งไหน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทายถูก ญาติเลยให้คุณยืนชี้ฝั่งให้น้องดูอีกรอบ น้องยืนถูกฝั่งครั้งแรกของวัน", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทายผิด ช้างเบี่ยงไปทางที่ถนัดจริง คุณก้าวหลบทันแต่น้ำในถังกระฉอกเปียกไปครึ่งตัว", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mahout_side_tease
+        text: "แซวน้องว่าช้างสอนเก่งกว่าคน"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: mahout_side_quiet
+        text: "เดินเงียบ ๆ ไม่ขัดจังหวะ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_herb_tonic_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "ยาบำรุงสิบกว่าอย่าง"
+    text: "ควาญรุ่นเก่าข้างบ้านขอให้คุณช่วยตำสมุนไพรทำยาบำรุงช้าง สูตรนี้ใส่มากกว่าสิบสามชนิด ช่วยให้ช้างเจริญอาหาร เขาจำได้ทุกตัวแต่นึกชื่อไม่ออกครึ่งหนึ่ง ต้องดมแล้วชี้เอา อีกหม้อเขาต้มไว้ประคบช้างที่ตัวบวมน้ำ"
+    choices:
+      - id: mahout_herb_pound
+        text: "ช่วยตำตามที่เขาชี้"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_herb_write
+        text: "ขอจดสูตรไว้ไม่ให้หาย"
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_herb_sniff
+        text: "แข่งทายชื่อสมุนไพรจากกลิ่น"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทายถูกเจ็ดอย่าง เขาบอกว่าจมูกคุณดีกว่าหลานเขาทั้งบ้าน แล้วขอยืมจมูกไปช่วยอีกหลายหม้อ", effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}], next: mahout_after_mid_01}
+          - {weight: 1, text: "ทายผิดหมดทุกถ้วย เขาหัวเราะบอกว่าที่คุณดมอยู่นั่นตะไคร้จากครัวคุณเอง", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}], next: mahout_after_mid_01}
+        merit: [{cat: neutral}]
+      - id: mahout_herb_ask_hot
+        text: "ถามวิธีต้มยาประคบ"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: mahout_herb_skip
+        text: "ขอตัว กลิ่นแรงเกินไป"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_clean_water_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "น้ำแอ่งนี้ช้างไม่กิน"
+    text: "หน้าแล้งปีนี้ห้วยตื้น เพื่อนบ้านที่เป็นควาญมาขอน้ำจากโอ่งบ้านคุณ เพราะช้างของเขาไม่ยอมกินน้ำในแอ่งที่ช้างตัวอื่นไปถ่ายไว้ เขาบอกว่านิสัยมันเป็นแบบนี้มาตลอด เลี้ยงช้างต้องรู้ทั้งของที่มันชอบและของที่มันรังเกียจ"
+    choices:
+      - id: mahout_water_lend
+        text: "ให้ตักจากโอ่งได้ตามสบาย"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_water_haul
+        text: "ช่วยหาบน้ำไปให้ถึงที่"
+        effects: {health: -1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_water_new_bucket
+        text: "ลองเทน้ำแอ่งเดิมใส่ถังใหม่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช้างดมทีเดียวแล้วหันหน้าหนี เพื่อนบ้านหัวเราะ คุณเพิ่งรู้ว่าเปลี่ยนถังหลอกจมูกช้างไม่ได้", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}], next: mahout_after_mid_01}
+          - {weight: 1, text: "ช้างดูดน้ำถังนั้นแล้วพ่นคืนใส่เสื้อคุณทั้งตัว เพื่อนบ้านขอโทษไปหัวเราะไป", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}], next: mahout_after_mid_01}
+        merit: [{cat: neutral}]
+      - id: mahout_water_charge
+        text: "คิดค่าน้ำตามราคาน้ำบ่อ"
+        effects: {relations: -1, money: {unit: income_x, amount: 0.01}}
+        merit: [{cat: neutral}]
+      - id: mahout_water_temple_well
+        text: "แนะให้ไปขอน้ำบ่อวัดด้วย"
+        effects: {network: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_quiet_season_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "ช่วงที่ไม่มีคนมาดูช้าง"
+    text: "ช่วงนี้ไม่มีนักท่องเที่ยวมาดูช้าง ควาญเพื่อนบ้านพาช้างกลับมาอยู่บ้าน ต้องหาเงินเลี้ยงตัวเองและหาอาหารให้ช้างไปพร้อมกัน วันนี้เขามายืนมองดงกล้วยหลังบ้านคุณ แล้วถามอ้อม ๆ ว่ากล้วยดงนี้ปีนี้มีใครจองหรือยัง"
+    choices:
+      - id: mahout_lean_give
+        text: "ให้ตัดไปได้ ไม่คิดเงิน"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_lean_swap
+        text: "แลกกับให้เขาช่วยถางสวน"
+        effects: {relations: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_lean_rally
+        text: "ชวนคนในซอยช่วยกันคนละกอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "บ้านในซอยยกต้นกล้วยมาวางหน้าบ้านเขาเต็มลาน ช้างกินเพลินจนลืมว่าตัวเองเป็นช้างช่างเลือก", effects: {network: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ได้มาแค่สามบ้าน อีกบ้านส่งต้นมะละกอมาแทน ช้างดมแล้วเมิน เพื่อนบ้านยังขอบคุณไม่หยุด", effects: {relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: neutral}]
+      - id: mahout_lean_sell
+        text: "ขายให้ในราคาเพื่อนบ้าน"
+        effects: {money: {unit: income_x, amount: 0.01}}
+        merit: [{cat: neutral}]
+      - id: mahout_lean_dodge
+        text: "ทำเป็นไม่เข้าใจคำถาม"
+        effects: {relations: -2}
+        merit: [{cat: neutral}]
+
+  - id: mahout_forty_years_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 85]}
+    title: "มองตาก็รู้เรื่อง"
+    text: "ควาญเก่าข้างบ้านอยู่กับช้างตัวเดียวมาเกือบสี่สิบปี เย็นนี้คุณสองคนนั่งคุยกันใต้ถุนบ้าน ช้างยืนกินหญ้าอยู่ไม่ไกล เขาไม่ส่งเสียงเรียกสักคำ แค่มองไปทีหนึ่ง ช้างก็เดินมาหยุดข้างตัวเขา คุณถามว่ารู้ใจกันได้ยังไง"
+    choices:
+      - id: mahout_forty_listen
+        text: "นั่งฟังเขาเล่าจนมืด"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_forty_stare
+        text: "ลองมองตาช้างบ้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ช้างมองตอบนิ่ง ๆ แล้วเอางวงไปแตะไหล่เขาแทนคุณ ควาญเก่าหัวเราะว่ามันยังหวงเขาอยู่", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช้างหันหลังให้ทันที ควาญเก่าบอกว่าเกือบสี่สิบปีก่อน มันก็ทำกับเขาแบบนี้เหมือนกัน", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mahout_forty_cane
+        text: "หิ้วอ้อยมาฝากช้างสองมัด"
+        effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: mahout_forty_story_kids
+        text: "ชวนเขาเล่าให้เด็กแถวนี้ฟัง"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_forty_doze
+        text: "เผลอหลับไปกลางเรื่อง"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_old_teacher_01
+    type: A
+    category: study
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 85]}
+    title: "ห้องเรียนใต้ต้นมะขาม"
+    text: "ควาญเก่าในหมู่บ้านเริ่มสอนวิชาเลี้ยงช้างให้หนุ่มรุ่นหลาน วิชานี้ไม่มีห้องเรียน มีแต่พี่สอนน้อง คุณที่รู้จักเขามาทั้งชีวิตนั่งฟังอยู่ข้าง ๆ เขาให้หนุ่มป้อนอาหารด้วยมือให้ช้างจำกลิ่น แต่ช้างรับแค่อ้อย กล้วยวางทิ้งไว้"
+    choices:
+      - id: mahout_teacher_note
+        text: "ช่วยจดสิ่งที่เขาสอนไว้"
+        effects: {knowledge: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: mahout_teacher_old_tale
+        text: "เล่าเรื่องสมัยก่อนเสริมให้ฟัง"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_teacher_banana_bet
+        text: "ทายว่าช้างจะยอมกินกล้วยไหม"
+        outcomes:
+          - {weight: 1, ok: true, text: "หนุ่มปอกกล้วยยื่นให้ ช้างรับไปกินหน้าตาเฉย ควาญเก่ายอมรับว่าแพ้คุณแล้วเลี้ยงกาแฟหนึ่งแก้ว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช้างดมแล้ววางกล้วยคืนบนมือหนุ่มเรียบร้อย คุณต้องเลี้ยงกาแฟควาญเก่าหนึ่งแก้ว", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mahout_teacher_snack
+        text: "หิ้วขนมมาเลี้ยงคนเรียน"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: mahout_teacher_nap
+        text: "งีบใต้ต้นมะขาม ฟังไปด้วย"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_after_ya_01
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "เรื่องช้างยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องช้างกับควาญที่คุณเห็นเมื่อวันก่อนยังถูกเล่าต่อที่ร้านน้ำชาหน้าหมู่บ้าน เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: mahout_aft_ya_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_aft_ya_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_aft_ya_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_aft_ya_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_after_work_01
+    type: B
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "เรื่องช้างยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องช้างกับควาญที่คุณเห็นเมื่อวันก่อนยังถูกเล่าต่อที่ร้านน้ำชาหน้าหมู่บ้าน เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: mahout_aft_work_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_aft_work_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_aft_work_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_aft_work_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: mahout_after_mid_01
+    type: B
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "เรื่องช้างยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องช้างกับควาญที่คุณเห็นเมื่อวันก่อนยังถูกเล่าต่อที่ร้านน้ำชาหน้าหมู่บ้าน เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: mahout_aft_mid_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_aft_mid_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_aft_mid_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: mahout_aft_mid_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]

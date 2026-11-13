@@ -1,0 +1,535 @@
+# ร่างเรื่อง กระเป๋ารถเมล์ · 15 ใบ · ลงเกมแล้ว ใบ 319 · ผู้เล่นเป็นผู้โดยสาร เพื่อนบ้าน หรือเด็กนั่งรถกับผู้ใหญ่ เสมอ · ไม่อ่านและไม่ตั้งธง · ไม่ผูกปี · ไม่มี effects job
+events:
+  - id: busconductor_why_bag_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [5, 12]}
+    title: "ทำไมเรียกว่ากระเป๋า"
+    text: "นั่งรถเมล์ไปตลาดกับผู้ใหญ่ในบ้าน พี่ที่เก็บเงินถือกระบอกเหล็ก ฉีกตั๋วออกจากกระบอกทีละใบ แต่ทุกคนเรียกพี่เขาว่ากระเป๋า คุณมองหากระเป๋าบนตัวพี่เขาตั้งแต่ป้ายแรก ยังหาไม่เจอสักใบ"
+    choices:
+      - id: busc_kid_ask_name
+        text: "ถามพี่เขาตรง ๆ ว่ากระเป๋าอยู่ไหน"
+        outcomes:
+          - {weight: 2, ok: true, text: "พี่หัวเราะ เล่าว่าคนเก็บเงินสมัยก่อนสะพายกระเป๋าหนังใบโต ชื่อเลยติดมาจนวันนี้ทั้งที่เงินย้ายไปอยู่ในกระบอกแล้ว", effects: {knowledge: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่ตอบว่ากระเป๋าอยู่ในใจ ทั้งรถหัวเราะ คุณคิดเรื่องนี้ไม่ออกจนถึงตลาด", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: busc_kid_watch_nail
+        text: "นั่งดูมือฉีกตั๋วเงียบ ๆ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: busc_kid_sandpaper
+        text: "ชี้กระดาษทรายในกระเป๋าเสื้อพี่"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: busc_kid_lend_bag
+        text: "ยื่นกระเป๋านักเรียนให้ยืมใช้"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่รับไปสะพายเดินเก็บเงินหนึ่งรอบ ผู้โดยสารปรบมือ แล้วคืนมาพร้อมตั๋วหนึ่งใบเป็นค่าเช่า", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ใหญ่ดึงมือคุณกลับ ขอโทษพี่เขา แล้วเทศน์ต่อไปจนถึงตลาด", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_coin_relay_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [13, 18]}
+    title: "เหรียญทอนส่งต่อหกมือ"
+    text: "เย็นวันเรียนพิเศษ รถเมล์แน่นจนกระเป๋าเดินไปไม่ถึงท้ายรถ ป้าแถวหลังยื่นแบงก์ข้ามหัวคนมา ตั๋วกับเหรียญทอนต้องส่งต่อกันมือต่อมือ และมือที่ใกล้กระเป๋าที่สุดตอนนี้คือมือคุณ"
+    choices:
+      - id: busc_teen_pass_relay
+        text: "รับไปส่งต่อให้ถึงมือ"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: busc_teen_count_change
+        text: "นับเหรียญทอนให้ป้าก่อนส่ง"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: busc_teen_look_away
+        text: "ทำเป็นมองออกนอกหน้าต่าง"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: busc_teen_relay_beat
+        text: "ตะโกนนำ ส่งต่อเป็นจังหวะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งแถวส่งต่อตามจังหวะเดียวกัน เหรียญถึงมือป้าครบไม่หล่นสักเหรียญ กระเป๋าชูนิ้วให้จากหน้ารถ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}], next: busconductor_after_teen_01}
+          - {weight: 1, text: "จังหวะเร็วไป เหรียญหล่นลงไปในรองเท้าใครสักคน ทั้งแถวต้องยืนขาเดียวช่วยกันหา", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}], next: busconductor_after_teen_01}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_back_step_01
+    type: A
+    category: health
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [13, 18]}
+    title: "ยืนบันไดเพราะไม่อึดอัด"
+    text: "รถเมล์เช้ามาแน่นทุกคัน คุณชอบยืนตรงบันไดหลังเพราะลมเข้าและไม่ต้องดมเสื้อใคร วันนี้กระเป๋ายืนข้างบนตะโกนให้ชิดในมาหลายรอบ แต่ข้างในก็ไม่เหลือที่ให้ชิดแล้ว"
+    choices:
+      - id: busc_teen_squeeze_in
+        text: "เบียดขึ้นไปข้างในตามสั่ง"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: busc_teen_hold_step
+        text: "จับราวแน่น ยืนบันไดต่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถึงหน้าโรงเรียน คุณได้ลงก่อนใครทั้งคัน", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กระเป๋าต้องลงมาเก็บเงินที่บันไดทุกป้าย และขอให้คุณขยับหลบทุกป้ายจนขาล้า", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: busc_teen_next_bus
+        text: "ลงไปรอคันหลังที่ว่างกว่า"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: busc_teen_school_song
+        text: "ชวนคนบนบันไดร้องเพลงโรงเรียน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนบนบันไดสามคนเป็นรุ่นพี่โรงเรียนเดียวกัน ร้องจนกระเป๋าส่ายหัวยิ้ม ได้รุ่นพี่ติวเลขให้ฟรีหนึ่งเทอม", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้องอยู่คนเดียวสองป้าย กระเป๋าก้มลงมาถามว่าไม่สบายหรือเปล่า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_fancy_tube_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "ขอยืมกระบอกไปงานแฟนซี"
+    text: "ห้องเช่าข้างกันมีพี่ที่เป็นกระเป๋ารถเมล์ กระบอกของพี่เขาติดสติกเกอร์ลายดาวจนผู้โดยสารประจำจำได้ก่อนจำหน้า คืนเสาร์นี้คุณมีงานเลี้ยงแต่งตัวแฟนซี เลยเดินไปเคาะห้องขอยืมกระบอกไปประกอบชุด"
+    choices:
+      - id: busc_young_ask_tube
+        text: "ขอยืมตรง ๆ สักคืน"
+        outcomes:
+          - {weight: 2, ok: true, text: "พี่เขาบอกว่ากระบอกกลับบ้านไม่ได้ ต้องฝากห้องเก็บที่อู่ทุกคืน ตั๋วทุกม้วนก็เป็นความรับผิดชอบของคนเบิก แต่สอนเสียงขานเก็บเงินให้ไปใช้แทน", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่เขาอธิบายกฎกระบอกยาวจนคุณไปงานสาย และยังไม่ได้กระบอกอยู่ดี", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: busc_young_tin_tube
+        text: "ทำเองจากกระป๋อง ติดดาวเลียนแบบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งงานถามว่าได้มาจากอู่ไหน พี่ข้างห้องเห็นรูปแล้วบอกว่าดาวของคุณเบี้ยวกว่าของจริง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขอบกระป๋องบาดนิ้วตอนเจาะรู คุณไปงานพร้อมพลาสเตอร์สามแผ่น", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: busc_young_invite_neighbor
+        text: "ชวนพี่เขาไปงานด้วยเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่เขามาในชุดทำงาน ยืนขานเก็บค่าเข้างานจนทุกคนหัวเราะ คืนนั้นคุณได้เพื่อนใหม่ครึ่งห้อง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่เขาเพิ่งเลิกกะดึก นั่งหลับคาเก้าอี้ในงานตั้งแต่หัวค่ำ", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: busc_young_new_costume
+        text: "เปลี่ยนไปแต่งเป็นอย่างอื่น"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_real_sleep_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "หลับเลยป้าย"
+    text: "เลิกกะดึกตอนฟ้าเริ่มสว่าง คุณได้ที่นั่งริมหน้าต่างแล้วหลับตั้งแต่ป้ายแรก ตื่นอีกทีเพราะกระเป๋าแตะไหล่ถามว่าจ่ายค่ารถหรือยัง สีหน้าเหมือนถามประโยคนี้มาหลายรอบแล้ว ป้ายนอกหน้าต่างไม่ใช่ป้ายที่คุณคุ้นเลย"
+    choices:
+      - id: busc_young_pay_ask
+        text: "จ่ายค่ารถ แล้วถามว่าเลยมาไกลไหม"
+        outcomes:
+          - {weight: 1, ok: true, text: "กระเป๋าบอกว่าเลยมาแค่สามป้าย แล้วชี้ป้ายฝั่งตรงข้ามที่รถขากลับจอดให้", effects: {knowledge: 1, relations: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}], next: busconductor_after_young_01}
+          - {weight: 1, text: "เลยมาจนเกือบปลายสาย ต้องนั่งย้อนกลับอีกเที่ยว นอนต่อก็ไม่หลับแล้ว", effects: {health: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}], next: busconductor_after_young_01}
+        merit: [{cat: neutral}]
+      - id: busc_young_show_shift
+        text: "ชี้เสื้อทำงานให้ดูว่าเพิ่งเลิกกะ"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: busc_young_ride_loop
+        text: "นั่งต่อถึงปลายสาย หลับขากลับ"
+        effects: {health: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: busc_young_ask_wake
+        text: "ฝากกระเป๋าปลุกตอนถึงป้ายขากลับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขารับปาก พอถึงป้ายก็ตะโกนลั่นรถว่าคนกะดึกถึงบ้านแล้ว แล้วเคาะหลังคาสองทีให้ออกรถ ทั้งคันหันมามองคุณ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาเปลี่ยนกะลงที่อู่กลางทาง คนใหม่ไม่รู้เรื่อง คุณหลับเลยบ้านเป็นรอบที่สอง", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_stop_or_not_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "คันนี้จอดป้ายนี้ไหม"
+    text: "เพิ่งย้ายมาเรียนต่อในเมือง ป้ายหน้าหอมีรถเมล์ผ่านหลายคัน บางคันจอด บางคันชะลอให้กระเป๋ากระโดดลงก่อนรถหยุดแล้วโบกให้คนรีบขึ้น คุณยกมือค้างครึ่งแขน ไม่แน่ใจว่าคันที่กำลังมาจะจอดหรือแค่ผ่าน"
+    choices:
+      - id: busc_young_wave_full
+        text: "โบกเต็มแขน ไม่ต้องคิดแล้ว"
+        outcomes:
+          - {weight: 1, ok: true, text: "รถจอดตรงหน้าพอดี กระเป๋าเคาะหลังคาสองทีให้ออกรถ แล้วบอกว่าป้ายนี้ต้องโบกแรง ๆ แบบนี้แหละ", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}], next: busconductor_after_young_01}
+          - {weight: 1, text: "รถเลยไปจอดป้ายถัดไป คุณวิ่งตามพร้อมคนอีกสามคน ขึ้นทันแต่หอบจนหยิบเงินไม่ถูก", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}], next: busconductor_after_young_01}
+        merit: [{cat: neutral}]
+      - id: busc_young_ask_aunty
+        text: "ถามป้าที่ยืนรอด้วยกัน"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: busc_young_walk_big
+        text: "เดินไปรอป้ายใหญ่ข้างหน้า"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: busc_young_paper_sign
+        text: "เขียนป้ายกระดาษชูว่าจอดด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "กระเป๋าคันแรกเห็นแล้วหัวเราะจนต้องสะกิดคนขับให้จอด หลังจากนั้นคันไหนผ่านก็ยกมือทักคุณ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลมพัดกระดาษปลิวไปติดกระจกรถคันอื่น คุณยืนมือเปล่าอยู่อีกยี่สิบนาที", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_payday_note_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "เงินเดือนออกเป็นแบงก์ใหญ่"
+    text: "วันเงินเดือนออก ในกระเป๋าสตางค์มีแบงก์ใหญ่ใบเดียว ขึ้นรถตอนชั่วโมงเร่งด่วน กระเป๋าถือกระบอกเดินฝ่าคนมาถึงตัว เหลือบเห็นสีแบงก์ในมือคุณแล้วถอนหายใจยาวกว่าเสียงเบรก"
+    choices:
+      - id: busc_young_hand_note
+        text: "ยื่นไป ขอโทษไปพร้อมกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "กระเป๋าควานเหรียญจนถึงก้นกระบอก ทอนมาเป็นกำ กระเป๋ากางเกงคุณหนักจนเดินเอียงไปทั้งวัน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เหรียญไม่พอ กระเป๋าต้องเดินแลกกับผู้โดยสารทั้งคัน คนครึ่งรถรู้แล้วว่าวันนี้เงินเดือนคุณออก", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: busc_young_swap_coins
+        text: "ขอแลกเหรียญกับคนข้าง ๆ ก่อน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: busc_young_break_note
+        text: "ลงไปแตกแบงก์ร้านข้างทาง"
+        effects: {health: -1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: busc_young_pay_row
+        text: "จ่ายให้ทั้งแถวด้วยแบงก์นี้เลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ห้าคนแถวนั้นยิ้มรับ กระเป๋าทอนง่ายขึ้นทันตา ตลอดเดือนนั้นมีคนลุกให้คุณนั่งทุกเช้า", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พอพูดจบก็มีคนขึ้นมาเพิ่มอีกแปดคนพอดี คุณนับนิ้วในใจไปจนถึงป้ายลง", effects: {happiness: -1, relations: 1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_dark_shift_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "เพื่อนบ้านออกมืดกลับมืด"
+    text: "บ้านตรงข้ามมีคนทำงานเป็นกระเป๋ารถเมล์ คุณเห็นเขาเดินออกจากซอยก่อนไก่ขัน และกลับมามือเปล่าตอนไฟเสาดับไปครึ่งซอย วันหยุดเดียวของเดือน เขานั่งหลับคาเก้าอี้หน้าบ้านทั้งที่ข้าวยังไม่ได้กิน"
+    choices:
+      - id: busc_work_bring_food
+        text: "ยกกับข้าวไปวางไว้ข้างตัว"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: busc_work_quiet_radio
+        text: "ปิดวิทยุบ้านตัวเองให้เขาหลับ"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: busc_work_ask_shift
+        text: "ถามเรื่องกะงานตอนเขาตื่น"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเล่าว่าบางวันยืนบนรถสิบกว่าชั่วโมง ชั่วโมงเร่งด่วนต้องเก็บเงินเยอะจนไม่มีเวลาหายใจ คุณเลิกบ่นเรื่องงานตัวเองไปหนึ่งอาทิตย์", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}], next: busconductor_after_work_01}
+          - {weight: 1, text: "เขาตอบสั้น ๆ ว่าเหนื่อย แล้วหลับต่อกลางประโยค", effects: {happiness: -1}, merit: [{cat: neutral}], next: busconductor_after_work_01}
+        merit: [{cat: neutral}]
+      - id: busc_work_fan_wave
+        text: "ยืนโบกพัดไล่ยุงให้จนเขาตื่น"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาตื่นมาเจอคุณถือพัดอยู่ตรงหน้า ขำจนต้องลุกไปล้างหน้า แล้วชวนกินข้าวด้วยกันทั้งสองบ้าน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โบกจนแขนล้า เขาก็ยังไม่ตื่น ยุงหันมารุมกัดคุณแทน", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_house_bus_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "รถเมล์ของทั้งบ้าน"
+    text: "บ้านท้ายซอยทั้งบ้านทำงานบนรถคันเดียวกัน คนโตขับ อีกคนรับเงิน หลานชายเดินตั๋ว รายได้มาจากส่วนแบ่งค่าตั๋ว วันไหนรถโล่งทั้งบ้านก็หน้าเหี่ยว เย็นนี้รถรับส่งที่ทำงานคุณเสีย เพื่อนทั้งแผนกยืนออกันที่ป้าย"
+    choices:
+      - id: busc_work_herd_team
+        text: "ต้อนเพื่อนทั้งแผนกขึ้นคันนี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "รถเต็มตั้งแต่ป้ายแรก หลานชายเดินตั๋วจนหน้าแดง คนรับเงินเคาะหลังคาเรียกออกรถดังกว่าทุกวัน", effects: {happiness: 2, network: 1, relations: 1}, merit: [{cat: neutral}], next: busconductor_after_work_01}
+          - {weight: 1, text: "เพื่อนครึ่งหนึ่งบ่นว่ารถร้อน ลงกลางทางไปต่อรถอื่น บ้านท้ายซอยยังยกมือขอบคุณคุณอยู่ดี", effects: {relations: 1, network: -1}, merit: [{cat: neutral}], next: busconductor_after_work_01}
+        merit: [{cat: neutral}]
+      - id: busc_work_ride_alone
+        text: "ขึ้นไปคนเดียวเงียบ ๆ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: busc_work_ask_nephew
+        text: "ถามหลานชายว่าเดินตั๋วยากไหม"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: busc_work_wait_van
+        text: "รอรถรับส่งที่ซ่อมให้เสร็จ"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_last_seat_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ที่นั่งว่างตัวสุดท้าย"
+    text: "หน้าร้อน รถเมล์ไม่มีแอร์เปิดหน้าต่างทุกบาน รถเพิ่งโล่งลงหลังผ่านตลาด เหลือที่ว่างข้างคุณที่เดียว กระเป๋าที่ยืนมาตั้งแต่เช้ามองที่นั่งนั้นแวบหนึ่ง แล้วหันไปมองถนนต่อ"
+    choices:
+      - id: busc_work_offer_seat
+        text: "ขยับให้ แล้วตบเบาะเรียก"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขานั่งลงครึ่งก้น ตาคอยมองหน้ารถ บอกว่ากระเป๋าต้องแอบนั่ง แต่ขาได้พักไปสามป้าย", effects: {relations: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "นั่งได้ไม่ถึงป้าย คนขึ้นมาเพิ่ม เขาเด้งขึ้นยืนเร็วกว่าที่คุณจะทันพูดว่าเชิญ", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: busc_work_paper_fan
+        text: "พัดหนังสือพิมพ์ให้ทั้งสองคน"
+        effects: {health: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: busc_work_stretch_legs
+        text: "เหยียดขาเต็มสองที่"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: busc_work_stand_too
+        text: "ลุกยืนเป็นเพื่อนเขาด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาหัวเราะ บอกว่ายืนเก่งขนาดนี้มาสมัครได้เลย คุณยืนโยกตามรถไปจนถึงป้ายลง", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยืนได้สองป้ายก็เหงื่อท่วม หันกลับไปจะนั่ง ป้าคนใหม่นั่งไปเรียบร้อยแล้ว", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_plain_tube_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "จำกระบอกได้ก่อนจำหน้า"
+    text: "ขึ้นรถสายเดิมมาหลายปี คุณจำกระเป๋าแต่ละคนได้จากกระบอกตั๋ว คนหนึ่งเจาะลายดอกไม้ อีกคนติดสติกเกอร์การ์ตูนเต็มกระบอก เช้านี้มีมือยื่นมาเก็บเงินด้วยกระบอกเกลี้ยงไม่มีลาย คุณมองหน้าเขานานผิดปกติ"
+    choices:
+      - id: busc_mid_ask_new
+        text: "ถามว่าเป็นคนใหม่หรือเปล่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาบอกว่าคนเดิมนั่นแหละ กระบอกเก่าตกจนปิดไม่สนิท ฉีกตั๋วไม่ขาด ต้องเปลี่ยนใบใหม่ คุณเพิ่งได้จำหน้าเขาจริง ๆ วันนี้", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาคือคนที่ทอนเงินให้คุณทุกเช้ามาสองปี และตอนนี้รู้แล้วว่าคุณจำแต่กระบอก", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: busc_mid_gift_sticker
+        text: "ซื้อสติกเกอร์มาฝากพรุ่งนี้"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: busc_mid_nod_usual
+        text: "พยักหน้าทักเหมือนทุกวัน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: busc_mid_guess_who
+        text: "ทายว่าเขาเป็นคนไหนในสามคน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทายถูกครั้งแรก เขาดีใจจนลืมทอน ต้องเดินกลับมาให้เหรียญตอนถึงป้ายหน้า", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทายผิดทั้งสามชื่อ เพราะเขาเพิ่งย้ายมาสายนี้เมื่อวาน ทั้งรถช่วยกันทายต่อจนถึงปลายทาง", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_ticket_box_01
+    type: A
+    category: study
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "ตั๋วหลายสีในกล่องเก่า"
+    text: "รื้อตู้เจอกล่องตั๋วรถเมล์ที่เก็บไว้ตั้งแต่สมัยเรียน มีหลายสีปนกัน ผู้ใหญ่สมัยนั้นบอกว่าดูสีตั๋วก็รู้ว่าจ่ายไปเท่าไร เด็กข้างบ้านมาเห็นเข้า ถามว่าเก็บกระดาษพวกนี้ไว้ทำไม"
+    choices:
+      - id: busc_mid_tell_history
+        text: "เล่าเรื่องตั๋วกับกระบอกให้ฟัง"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: busc_mid_sort_colors
+        text: "นั่งเรียงตั๋วตามสีทั้งบ่าย"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: busc_mid_throw_box
+        text: "ทิ้งไปเสียที ตู้จะได้โล่ง"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: busc_mid_color_quiz
+        text: "ให้เด็กทายราคาจากสีตั๋ว"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กทายถูกสองใบติด อ้างว่าเดาจากสีขนม คุณยกกล่องให้เป็นของรางวัล", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณเองก็จำไม่ได้แล้วว่าสีไหนราคาไหน เด็กหัวเราะจนต้องวิ่งกลับบ้านไปเล่าต่อ", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_dropped_tube_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "กระบอกหล่นตรงทางโค้ง"
+    text: "รถเมล์เลี้ยวโค้งแรง กระบอกตั๋วหลุดมือกระเป๋าตกพื้นดังโครม เหรียญทอนกลิ้งไปใต้เบาะทั่วรถ เขาไม่สนเหรียญเลย ก้มลงลองปิดฝากระบอกซ้ำแล้วซ้ำอีก หน้าซีดกว่าตอนรถเลี้ยวเสียอีก"
+    choices:
+      - id: busc_mid_gather_coins
+        text: "ก้มเก็บเหรียญใต้เบาะให้"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: busc_mid_press_lid
+        text: "ลองช่วยบีบฝาให้เข้าที่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝาเข้าล็อกดังกริ๊ก ฉีกตั๋วใบแรกขาดพอดี เขายกมือไหว้คุณกลางรถ", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ฝาบิดหนักกว่าเดิม เขาบอกว่าไม่เป็นไรด้วยเสียงที่เป็นไรมาก", effects: {relations: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: busc_mid_stay_put
+        text: "นั่งนิ่ง ไม่อยากเกะกะ"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: busc_mid_coin_call
+        text: "ประกาศให้ทั้งรถส่งเหรียญคืน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เหรียญไหลมาจากทุกแถว ครบแล้วยังเกินมาหนึ่งเหรียญที่ไม่มีใครยอมรับว่าเป็นของตัวเอง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บางคนส่งเหรียญของตัวเองมาด้วยความเข้าใจผิด กระเป๋าต้องเดินคืนเงินอยู่สามป้าย", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_thirty_sway_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "ยืนโยกมาสามสิบปี"
+    text: "เช้าวันอาทิตย์คุณนั่งรถเมล์ไปวัดเป็นประจำ กระเป๋าคันนี้ผมขาวพอกับคุณ ยืนโยกตามรถมาสามสิบปีจนไม่ต้องจับราว รถเบรกทีไรคนทั้งคันเซ มีเขายืนนิ่งอยู่คนเดียว เช้านี้เขาบ่นว่าเข่าเริ่มไม่ฟังแล้ว"
+    choices:
+      - id: busc_old_share_balm
+        text: "แบ่งยาหม่องให้ทาเข่า"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: busc_old_ask_secret
+        text: "ถามเคล็ดลับยืนไม่เซ"
+        effects: {knowledge: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: busc_old_listen_quiet
+        text: "นั่งฟังเขาเล่าจนถึงวัด"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: busc_old_stand_duel
+        text: "ท้าแข่งยืนไม่จับราว"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณยืนนิ่งได้ถึงสามป้าย คนทั้งรถเชียร์ กระเป๋ายอมแพ้แล้วฉีกตั๋วให้หนึ่งใบเป็นเหรียญรางวัล", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เบรกแรกคุณก็คว้าราวไว้แน่น กระเป๋าหัวเราะแล้วพยุงกลับไปนั่ง บอกว่าเก็บแรงไว้ไหว้พระดีกว่า", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_sandpaper_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "กระดาษทรายแผ่นเดียวกัน"
+    text: "รถจอดรอที่ต้นสายนานกว่าทุกวัน กระเป๋ารุ่นเก๋าคนประจำนั่งถูใบมีดกระบอกตั๋วกับกระดาษทราย บอกว่าทื่อเมื่อไรฉีกตั๋วไม่ขาด คุณนึกถึงกรรไกรที่บ้านซึ่งไม่คมมาหลายปี"
+    choices:
+      - id: busc_old_borrow_sand
+        text: "ขอกระดาษทรายไปลับกรรไกร"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาฉีกให้ครึ่งแผ่นพร้อมสอนให้ถูทางเดียว กลับบ้านกรรไกรคมจนตัดผ้าได้ในทีเดียว", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถูผิดทาง ใบกรรไกรบิ่นเพิ่ม คุณถือไปให้เขาดูอีกวัน เขาส่ายหัวอยู่นาน", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: busc_old_ask_nail
+        text: "ถามว่าทำไมไว้เล็บยาว"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: busc_old_bring_tea
+        text: "ซื้อชาร้อนมาฝากตอนเขาพัก"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: busc_old_grow_nail
+        text: "ประกาศว่าจะไว้เล็บแบบเขาบ้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "สามเดือนต่อมาคุณฉีกกระดาษได้คล่องจนเขาบอกให้มาสมัครแทน แล้วหัวเราะลั่นต้นสาย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เล็บหักตอนแกะฝาขวดน้ำปลาตั้งแต่อาทิตย์แรก คุณยื่นนิ้วให้เขาดูด้วยหน้าเศร้า", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_after_teen_01
+    type: B
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    title: "เรื่องบนรถเมล์ยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องที่เกิดบนรถเมล์วันนั้นยังถูกเล่าต่อที่ร้านน้ำชาหน้าซอย เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: busc_aft_teen_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: busc_aft_teen_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: busc_aft_teen_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: busc_aft_teen_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_after_young_01
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "เรื่องบนรถเมล์ยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องที่เกิดบนรถเมล์วันนั้นยังถูกเล่าต่อที่ร้านน้ำชาหน้าซอย เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: busc_aft_young_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: busc_aft_young_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: busc_aft_young_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: busc_aft_young_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: busconductor_after_work_01
+    type: B
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "เรื่องบนรถเมล์ยังถูกพูดถึง"
+    text: "ผ่านไปไม่กี่วัน เรื่องที่เกิดบนรถเมล์วันนั้นยังถูกเล่าต่อที่ร้านน้ำชาหน้าซอย เสียงรถผ่านถนนดังกลบเสียงคุยเป็นช่วง ๆ คนในวงต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: busc_aft_work_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: busc_aft_work_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: busc_aft_work_quiet
+        text: "ก้มหน้าจิบน้ำชาต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: busc_aft_work_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
