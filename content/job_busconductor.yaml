@@ -8,7 +8,7 @@ events:
     weight: 0.25
     when: {age: [5, 12]}
     title: "ทำไมเรียกว่ากระเป๋า"
-    text: "นั่งรถเมล์ไปตลาดกับผู้ใหญ่ในบ้าน พี่ที่เก็บเงินถือกระบอกเหล็ก ฉีกตั๋วออกจากกระบอกทีละใบ แต่ทุกคนเรียกพี่เขาว่ากระเป๋า คุณมองหากระเป๋าบนตัวพี่เขาตั้งแต่ป้ายแรก ยังหาไม่เจอสักใบ"
+    text: "นั่งรถเมล์ไปตลาดกับผู้ใหญ่ในบ้าน พี่ที่เก็บเงินถือกระบอกตั๋ว ฉีกตั๋วออกจากกระบอกทีละใบ แต่ทุกคนเรียกพี่เขาว่ากระเป๋า คุณมองหากระเป๋าบนตัวพี่เขาตั้งแต่ป้ายแรก ยังหาไม่เจอสักใบ"
     choices:
       - id: busc_kid_ask_name
         text: "ถามพี่เขาตรง ๆ ว่ากระเป๋าอยู่ไหน"
@@ -151,7 +151,7 @@ events:
       - id: busc_young_ask_wake
         text: "ฝากกระเป๋าปลุกตอนถึงป้ายขากลับ"
         outcomes:
-          - {weight: 1, ok: true, text: "เขารับปาก พอถึงป้ายก็ตะโกนลั่นรถว่าคนกะดึกถึงบ้านแล้ว แล้วเคาะหลังคาสองทีให้ออกรถ ทั้งคันหันมามองคุณ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "เขารับปาก พอถึงป้ายก็ตะโกนลั่นรถว่าคนกะดึกถึงบ้านแล้ว แล้วหันไปบอกคนขับให้ออกรถ ทั้งคันหันมามองคุณ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เขาเปลี่ยนกะลงที่อู่กลางทาง คนใหม่ไม่รู้เรื่อง คุณหลับเลยบ้านเป็นรอบที่สอง", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
@@ -168,7 +168,7 @@ events:
       - id: busc_young_wave_full
         text: "โบกเต็มแขน ไม่ต้องคิดแล้ว"
         outcomes:
-          - {weight: 1, ok: true, text: "รถจอดตรงหน้าพอดี กระเป๋าเคาะหลังคาสองทีให้ออกรถ แล้วบอกว่าป้ายนี้ต้องโบกแรง ๆ แบบนี้แหละ", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}], next: busconductor_after_young_01}
+          - {weight: 1, ok: true, text: "รถจอดตรงหน้าพอดี กระเป๋าตะโกนบอกคนขับให้ออกรถ แล้วบอกว่าป้ายนี้ต้องโบกแรง ๆ แบบนี้แหละ", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}], next: busconductor_after_young_01}
           - {weight: 1, text: "รถเลยไปจอดป้ายถัดไป คุณวิ่งตามพร้อมคนอีกสามคน ขึ้นทันแต่หอบจนหยิบเงินไม่ถูก", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}], next: busconductor_after_young_01}
         merit: [{cat: neutral}]
       - id: busc_young_ask_aunty
@@ -225,7 +225,7 @@ events:
     weight: 0.25
     when: {age: [31, 45]}
     title: "เพื่อนบ้านออกมืดกลับมืด"
-    text: "บ้านตรงข้ามมีคนทำงานเป็นกระเป๋ารถเมล์ คุณเห็นเขาเดินออกจากซอยก่อนไก่ขัน และกลับมามือเปล่าตอนไฟเสาดับไปครึ่งซอย วันหยุดเดียวของเดือน เขานั่งหลับคาเก้าอี้หน้าบ้านทั้งที่ข้าวยังไม่ได้กิน"
+    text: "บ้านตรงข้ามมีคนทำงานเป็นกระเป๋ารถเมล์ คุณเห็นเขาเดินออกจากซอยก่อนไก่ขัน และกลับมามือเปล่าตอนไฟเสาดับไปครึ่งซอย วันนั้นเขานั่งหลับคาเก้าอี้หน้าบ้านทั้งที่ข้าวยังไม่ได้กิน"
     choices:
       - id: busc_work_bring_food
         text: "ยกกับข้าวไปวางไว้ข้างตัว"
@@ -261,7 +261,7 @@ events:
       - id: busc_work_herd_team
         text: "ต้อนเพื่อนทั้งแผนกขึ้นคันนี้"
         outcomes:
-          - {weight: 1, ok: true, text: "รถเต็มตั้งแต่ป้ายแรก หลานชายเดินตั๋วจนหน้าแดง คนรับเงินเคาะหลังคาเรียกออกรถดังกว่าทุกวัน", effects: {happiness: 2, network: 1, relations: 1}, merit: [{cat: neutral}], next: busconductor_after_work_01}
+          - {weight: 1, ok: true, text: "รถเต็มตั้งแต่ป้ายแรก หลานชายเดินตั๋วจนหน้าแดง คนรับเงินตะโกนเรียกออกรถดังกว่าทุกวัน", effects: {happiness: 2, network: 1, relations: 1}, merit: [{cat: neutral}], next: busconductor_after_work_01}
           - {weight: 1, text: "เพื่อนครึ่งหนึ่งบ่นว่ารถร้อน ลงกลางทางไปต่อรถอื่น บ้านท้ายซอยยังยกมือขอบคุณคุณอยู่ดี", effects: {relations: 1, network: -1}, merit: [{cat: neutral}], next: busconductor_after_work_01}
         merit: [{cat: neutral}]
       - id: busc_work_ride_alone

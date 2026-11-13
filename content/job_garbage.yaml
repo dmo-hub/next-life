@@ -8,7 +8,7 @@ events:
     weight: 0.25
     when: {age: [5, 9]}
     title: "รถถังห้อยมาแล้ว"
-    text: "ทุกเช้าวันเสาร์ รถคันใหญ่ที่มีถังกับกระสอบห้อยระโยงระยางท้ายรถจะเข้าซอยมา คุณเรียกมันว่ารถถังห้อยมาตั้งแต่จำความได้ เช้านี้น้าจูงมือมายืนรอหน้าบ้าน พี่ ๆ ที่ยืนท้ายรถหันมาทางคุณพอดี"
+    text: "ทุกเช้า รถคันใหญ่ที่มีถังกับกระสอบห้อยระโยงระยางท้ายรถจะเข้าซอยมา คุณเรียกมันว่ารถถังห้อยมาตั้งแต่จำความได้ เช้านี้น้าจูงมือมายืนรอหน้าบ้าน พี่ ๆ ที่ยืนท้ายรถหันมาทางคุณพอดี"
     choices:
       - id: garbage_kid_wave_both
         text: "โบกมือสองข้างสุดแขน"
@@ -174,8 +174,8 @@ events:
       - id: garbage_ya_boot_shelf
         text: "ตอกชั้นวางบูตไม่ให้ล้มอีก"
         outcomes:
-          - {weight: 1, ok: true, text: "ชั้นไม้ที่ตอกเองตั้งอยู่ได้จนเขาย้ายออก ทุกคืนบูตยืนนิ่งเหมือนทหารกองเกียรติยศ ทั้งห้องได้นอนเต็มอิ่ม", effects: {happiness: 1, relations: 1, knowledge: 1}, merit: [{cat: neutral}], next: garbage_after_young_01}
-          - {weight: 1, text: "ชั้นทรุดตั้งแต่คืนแรก บูตล้มดังกว่าเดิมสองเท่า เขายืนกลั้นหัวเราะอยู่หน้าประตูจนเกือบไปขึ้นรถไม่ทัน", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}], next: garbage_after_young_01}
+          - {weight: 1, ok: true, text: "ชั้นไม้ที่ตอกเองตั้งอยู่ได้จนเขาย้ายออก ทุกคืนบูตยืนนิ่งเหมือนทหารกองเกียรติยศ ทั้งห้องได้นอนเต็มอิ่ม", effects: {happiness: 1, relations: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชั้นทรุดตั้งแต่คืนแรก บูตล้มดังกว่าเดิมสองเท่า เขายืนกลั้นหัวเราะอยู่หน้าประตูจนเกือบไปขึ้นรถไม่ทัน", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: garbage_ya_walk_to_pickup
         text: "ตามไปส่งถึงจุดขึ้นรถ"
@@ -302,8 +302,8 @@ events:
       - id: garbage_work_cover_day
         text: "ออกเงินให้น้าได้หยุดสักวัน"
         outcomes:
-          - {weight: 1, ok: true, text: "น้ายอมหยุดหนึ่งวัน นอนยาวถึงเที่ยงเป็นครั้งแรกในรอบหลายเดือน ตื่นมาบอกว่าลืมไปแล้วว่าแดดตอนสายหน้าตาเป็นยังไง", effects: {money: {unit: income_x, amount: -0.02}, relations: 2}, merit: [{cat: help_others, level: 1}], next: garbage_after_work_01}
-          - {weight: 1, text: "น้ารับเงินไว้ แต่เช้ารุ่งขึ้นก็ไปทำงานเหมือนเดิม เงินก้อนนั้นกลายเป็นค่าเทอมหลานแทน น้าบอกว่าแบบนี้ได้พักใจกว่า", effects: {money: {unit: income_x, amount: -0.02}, relations: 1}, merit: [{cat: help_others, level: 1}], next: garbage_after_work_01}
+          - {weight: 1, ok: true, text: "น้ายอมหยุดหนึ่งวัน นอนยาวถึงเที่ยงเป็นครั้งแรกในรอบหลายเดือน ตื่นมาบอกว่าลืมไปแล้วว่าแดดตอนสายหน้าตาเป็นยังไง", effects: {money: {unit: income_x, amount: -0.02}, relations: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "น้ารับเงินไว้ แต่เช้ารุ่งขึ้นก็ไปทำงานเหมือนเดิม เงินก้อนนั้นกลายเป็นค่าเทอมหลานแทน น้าบอกว่าแบบนี้ได้พักใจกว่า", effects: {money: {unit: income_x, amount: -0.02}, relations: 1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: neutral}]
       - id: garbage_work_just_listen
         text: "นั่งฟังเงียบ ๆ ไม่ขัด"
@@ -367,7 +367,7 @@ events:
         merit: [{cat: neutral}]
       - id: garbage_mid_blame_home
         text: "โทษตัวเองเสียงดัง"
-        effects: {relations: -2, happiness: -1}
+        effects: {happiness: -2}
         merit: [{cat: neutral}]
       - id: garbage_mid_let_go
         text: "ทำใจ ถือว่าเสียไปแล้ว"
@@ -444,7 +444,7 @@ events:
     weight: 0.25
     when: {age: [62, 85]}
     title: "ของวิเศษหน้าบ้าน"
-    text: "แก่ตัวแล้วนอนไม่ค่อยหลับ คืนนี้คุณนั่งริมหน้าต่างตอนตีสอง ตอนเด็กคุณเคยคิดว่าขยะหน้าบ้านเป็นของวิเศษ วางไว้ตอนเย็น เช้ามาก็หายไป คืนนี้เพิ่งเห็นกับตาว่ามีคนห้าคนกับรถหนึ่งคันมาเก็บกลางดึก"
+    text: "แก่ตัวแล้วนอนไม่ค่อยหลับ คืนนี้คุณนั่งริมหน้าต่างตอนตีสอง ตอนเด็กคุณเคยคิดว่าขยะหน้าบ้านเป็นของวิเศษ วางไว้ตอนเย็น เช้ามาก็หายไป คืนนี้เห็นกับตาว่ามีคนห้าคนกับรถหนึ่งคันมาเก็บกลางดึก"
     choices:
       - id: garbage_elder_bring_water
         text: "เดินออกไปยกมือไหว้ขอบคุณ"

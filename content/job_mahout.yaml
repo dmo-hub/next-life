@@ -175,7 +175,7 @@ events:
         text: "ขอลองแตะแบบเขาบ้าง"
         outcomes:
           - {weight: 1, ok: true, text: "เขาพาคุณไปยืนฝั่งที่ช้างถนัด ช้างหันมามองนิดหนึ่งแล้วเดินต่อ แค่นั้นคุณก็ยิ้มได้ทั้งวัน", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}], next: mahout_after_ya_01}
-          - {weight: 1, text: "เขาบอกให้รออีกสักสามเดือน ช้างยังจำกลิ่นคุณไม่ได้ แล้วพาคุณถอยไปเดินข้างหลังแทน", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}], next: mahout_after_ya_01}
+          - {weight: 1, text: "เขาบอกให้รอก่อน ช้างยังจำกลิ่นคุณไม่ได้ แล้วพาคุณถอยไปเดินข้างหลังแทน", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}], next: mahout_after_ya_01}
         merit: [{cat: neutral}]
       - id: mahout_chatty_sing
         text: "เปลี่ยนเป็นร้องเพลงให้ช้างฟัง"
@@ -399,7 +399,7 @@ events:
     text: "ช่วงนี้ไม่มีนักท่องเที่ยวมาดูช้าง ควาญเพื่อนบ้านพาช้างกลับมาอยู่บ้าน ต้องหาเงินเลี้ยงตัวเองและหาอาหารให้ช้างไปพร้อมกัน วันนี้เขามายืนมองดงกล้วยหลังบ้านคุณ แล้วถามอ้อม ๆ ว่ากล้วยดงนี้ปีนี้มีใครจองหรือยัง"
     choices:
       - id: mahout_lean_give
-        text: "ให้ตัดไปได้ ไม่คิดเงิน"
+        text: "ให้ตัดไปฟรี ยอมขาดทุนค่ากล้วย"
         effects: {relations: 2, money: {unit: income_x, amount: -0.02}}
         merit: [{cat: help_others, level: 1}]
       - id: mahout_lean_swap
@@ -475,7 +475,7 @@ events:
       - id: mahout_teacher_banana_bet
         text: "ทายว่าช้างจะยอมกินกล้วยไหม"
         outcomes:
-          - {weight: 1, ok: true, text: "หนุ่มปอกกล้วยยื่นให้ ช้างรับไปกินหน้าตาเฉย ควาญเก่ายอมรับว่าแพ้คุณแล้วเลี้ยงกาแฟหนึ่งแก้ว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "หนุ่มยื่นกล้วยให้ ช้างรับไปกินหน้าตาเฉย ควาญเก่ายอมรับว่าแพ้คุณแล้วเลี้ยงกาแฟหนึ่งแก้ว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ช้างดมแล้ววางกล้วยคืนบนมือหนุ่มเรียบร้อย คุณต้องเลี้ยงกาแฟควาญเก่าหนึ่งแก้ว", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: mahout_teacher_snack
