@@ -1,0 +1,428 @@
+# สายหมอลำ/ลูกทุ่ง (ใบ 251 จากร่าง 212)
+# ฐาน next-life origin/main 53bca785 · prefix singer_ (ผู้รวมงานยืนยันไม่ชน) · เปิดทุกเพศ ทุกฐานะ
+# ไม่ใช้ engine ใหม่ · ไม่ใช้ fame (การ์ดยังอ่าน st.fame ไม่ได้) · ไต่ขั้นด้วยธง + นัดแบบนางงาม
+# เจ้าของเลือก 2026-11-06: ลงครบ 14 ใบ · ใบประกวด weight 3 · ออกทุกปี · ใบประกวดวัยรุ่นเอียงตามธง singer_seed ×2
+# ทางเข้า 3 ใบ (เด็ก วัยรุ่น หนุ่มสาว) → ได้ที่ → นัดเข้าคณะ → นัดเดินสาย + นัดค่าย → ติดหู → นัดค่าตัว/สัญญา
+# ใบนัดล้วนไม่มี weight · เพดานอายุใบนัดกว้างกว่าใบต้นทาง เพราะนัดที่ when ไม่ผ่านตกเงียบ
+# ปลายสายกระจายวัย (decisions 414): ทำงาน 3 ใบ กลางคน 1 ชรา 1
+# ชุดบันเทิงใบ 213/216 เป็นมุมคนดู สายนี้เป็นมุมคนร้อง ไม่ซ้ำฉาก
+events:
+  - id: singer_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [8, 12]}
+    title: "ประกวดร้องเพลงเด็กงานวัด"
+    text: "งานวัดปีนี้มีประกวดร้องเพลงเด็ก รางวัลที่หนึ่งเป็นถ้วยกับซองเงิน ป้าข้างบ้านได้ยินคุณร้องตอนกวาดลานบ้านทุกเช้า เลยเอาชื่อคุณไปลงไว้ให้แล้ว เหลือแค่เลือกเพลง"
+    choices:
+      - id: sing
+        text: "ขึ้นร้องเพลงที่ร้องทุกเช้า"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {happiness: 1.3}}, text: "ได้ถ้วยใบแรก คนในงานจำชื่อคุณได้ ป้าข้างบ้านบอกทุกคนว่าเป็นคนส่ง", effects: {happiness: 2, network: 1}, sets_flags: [singer_seed], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ลืมเนื้อท่อนสอง แต่ร้องจนจบ คนดูปรบมือให้กำลังใจ", effects: {happiness: 1}, sets_flags: [singer_seed], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: scared
+        text: "ขอถอนชื่อ อายเกินไป"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: front_row
+        text: "นั่งดูแถวหน้าแทน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: broom_mic
+        text: "ถือไม้กวาดขึ้นเวทีแทนไมค์"
+        sets_flags: [singer_seed]
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: singer_teen_contest_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.75
+    multipliers: {flags: {singer_seed: 2}}
+    when: {age: [13, 18]}
+    title: "เวทีประกวดงานประจำปีอำเภอ"
+    text: "งานประจำปีของอำเภอเปิดรับสมัครประกวดร้องเพลงลูกทุ่ง ค่าสมัครไม่แพง แต่ต้องมีชุดกับเพลงที่ซ้อมมาแล้ว รถที่จะพาไปมีแค่มอเตอร์ไซค์ของเพื่อนบ้าน กรรมการปีนี้มีคนจากคณะดังมานั่งด้วย"
+    choices:
+      - id: enter
+        text: "สมัคร ซ้อมทุกคืน"
+        sets_flags: [singer_stage]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {happiness: 1.3}}, text: "ได้ที่สอง คนจากคณะเดินมาขอเบอร์ที่บ้าน บอกว่าอีกปีสองปีจะติดต่อมา", effects: {happiness: 2, network: 1}, schedules: [{event: singer_troupe_01, after_years: [1, 2]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไม่ติดรอบ แต่ได้รู้ว่าบนเวทีจริงเสียงไมค์ดังกว่าที่ซ้อม", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: study_first
+        text: "ไว้ปีหน้า ปีนี้มีสอบ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: back_friend
+        text: "ไปเป็นกองเชียร์ให้เพื่อน"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: wrong_key
+        text: "ร้องผิดคีย์ทั้งเพลง ยิ้มสู้"
+        sets_flags: [singer_stage]
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: singer_adult_contest_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [19, 28]}
+    title: "เงินรางวัลเท่าเงินเดือน"
+    text: "เวทีประกวดร้องเพลงในงานกาชาดประกาศเงินรางวัลที่หนึ่งเท่าเงินเดือนคุณหนึ่งเดือน เพื่อนร่วมงานได้ยินคุณร้องในวงเหล้าบ่อย เลยรวมเงินค่าสมัครให้ เหลือแค่ลางานคืนวันศุกร์"
+    choices:
+      - id: enter
+        text: "ลางานไปประกวด"
+        sets_flags: [singer_stage]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "ได้ที่หนึ่ง เงินรางวัลแบ่งเลี้ยงเพื่อนครึ่งหนึ่ง เจ้าของคณะยื่นนามบัตรให้หลังเวที", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: 0.2}}, schedules: [{event: singer_troupe_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ตกรอบแรก เพื่อนร่วมงานยังพูดถึงอยู่ทั้งอาทิตย์", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep_job
+        text: "ไม่ลา งานสำคัญกว่า"
+        effects: {money: {unit: income_x, amount: 0.05}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: give_back
+        text: "คืนเงินค่าสมัครให้เพื่อน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: dance_entry
+        text: "สมัครผิดเป็นประกวดเต้น"
+        effects: {happiness: 1, health: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: singer_troupe_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [15, 34], flags: {has: [singer_stage]}}
+    title: "โทรศัพท์จากคณะ"
+    text: "คณะที่เคยขอเบอร์ไว้โทรมาจริง คนในคณะสองร้อยกว่าคน ต้องการคนร้องเปิดวงก่อนนักร้องดัง ได้ค่าแรงเป็นรอบ ต้องนอนรถบัสไปกับคณะทั้งฤดูแสดง บ้านเพิ่งเริ่มพึ่งเงินที่คุณหาได้"
+    choices:
+      - id: join
+        text: "ตามคณะไปทั้งฤดู"
+        sets_flags: [singer_troupe]
+        effects: {happiness: 1, network: 1, relations: -1}
+        schedules: [{event: singer_road_01, after_years: [1, 1]}, {event: singer_label_01, after_years: [2, 3]}]
+        merit: [{cat: neutral}]
+      - id: weekend
+        text: "ขอไปแค่งานใกล้บ้าน"
+        sets_flags: [singer_troupe]
+        effects: {relations: 1, money: {unit: income_x, amount: 0.1}}
+        schedules: [{event: singer_label_01, after_years: [3, 4]}]
+        merit: [{cat: neutral}]
+      - id: decline
+        text: "ปฏิเสธ อยู่ทำงานที่บ้าน"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: costume_job
+        text: "ขอเป็นคนรีดชุดก่อน"
+        sets_flags: [singer_troupe]
+        effects: {knowledge: 1, network: 1}
+        schedules: [{event: singer_road_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+
+  - id: singer_road_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [16, 36], flags: {has: [singer_troupe]}}
+    title: "ฤดูแสดงแปดเดือน"
+    text: "ฤดูแสดงยาวแปดเดือน คณะเล่นเกือบทุกคืน กินข้าวหลังเวที นอนบนรถระหว่างจังหวัด คืนนี้พายุมาก่อนเปิดม่าน หลังคาเวทีโยกตามลม เจ้าภาพจ่ายมัดจำไว้แล้ว คนดูยังนั่งรอใต้ร่ม"
+    choices:
+      - id: perform
+        text: "ร้องต่อ ให้คนดูได้ดู"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "ลมสงบตอนเพลงที่สาม คนดูร้องตามทั้งลาน หัวหน้าคณะเพิ่มเพลงให้คุณอีกหนึ่ง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้ายไฟหล่นใกล้ตัว คุณข้อเท้าพลิกตอนวิ่งหลบ ต้องร้องนั่งเก้าอี้ไปทั้งอาทิตย์", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait
+        text: "รอให้ลมหยุดก่อน"
+        effects: {health: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: help_crew
+        text: "ช่วยทีมเวทีผูกเชือก"
+        effects: {relations: 1, health: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: rain_song
+        text: "เปลี่ยนไปร้องเพลงขอฝน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: singer_dancer_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 6
+    when: {age: [16, 30], flags: {has: [singer_troupe]}}
+    title: "ชุดหางเครื่องชุดใหม่"
+    text: "คณะข้างเคียงเพิ่งเปิดตัวชุดหางเครื่องขนนกทั้งแถว หัวหน้าคณะประกาศว่าฤดูหน้าต้องสู้ ให้ทุกคนออกค่าชุดเองครึ่งหนึ่ง หักจากค่าแรงทีละรอบ ใครไม่ออกก็ยืนแถวหลัง"
+    choices:
+      - id: pay_half
+        text: "ยอมให้หักค่าแรง"
+        effects: {money: {unit: income_x, amount: -0.2}, network: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: back_row
+        text: "ยืนแถวหลังไปก่อน"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: sew_own
+        text: "เย็บเองจากขนไก่บ้าน"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ชุดเหมือนของจริงจากหน้าเวที หัวหน้าคณะสั่งให้เย็บให้คนอื่นด้วย", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขนหลุดกลางเพลงแรก แถวหน้าหัวเราะจนเต้นผิดจังหวะ", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_group
+        text: "รวมกลุ่มขอหัวหน้าลดค่าชุด"
+        effects: {relations: 1, network: -1}
+        merit: [{cat: neutral}]
+
+  - id: singer_label_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [17, 38], flags: {has: [singer_troupe]}}
+    title: "ค่ายเพลงขอฟังเสียง"
+    text: "คนจากค่ายเพลงเล็กมาฟังคุณร้องเปิดวง เขาว่าจะซื้อเพลงขาดมาให้ ทำดนตรี ถ่ายคลิปลงออนไลน์ ค่ายลงทุนหมด แต่ต้องเซ็นสัญญาหลายปี และในสัญญาไม่มีข้อแบ่งยอดคนดูคลิป"
+    choices:
+      - id: sign
+        text: "เซ็นเลย โอกาสมาแล้ว"
+        sets_flags: [singer_record]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "เพลงแรกติดหูคนทั้งภาค งานวัดเปิดเพลงคุณทุกคืน ทั้งที่ไม่มีใครรู้หน้าคุณ", effects: {happiness: 2, network: 2}, sets_flags: [singer_hit], schedules: [{event: singer_fee_01, after_years: [1, 2]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "เพลงเงียบ ค่ายเงียบตาม สัญญายังอยู่ ร้องเปิดวงต่อไป", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: read_contract
+        text: "ขอเอาสัญญาไปให้คนอ่าน"
+        sets_flags: [singer_record]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ค่ายยอมแก้ข้อแบ่งรายได้ เพลงแรกพอมีคนจำ ค่าตัวขยับเล็กน้อย", effects: {knowledge: 1, money: {unit: income_x, amount: 0.2}}, sets_flags: [singer_hit], schedules: [{event: singer_fee_01, after_years: [2, 3]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ค่ายไม่รอ ไปเซ็นกับคนร้องคณะข้าง ๆ แทน", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: stay_troupe
+        text: "ร้องกับคณะต่อ ไม่ผูกค่าย"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: own_clip
+        text: "ถ่ายคลิปเองในห้องน้ำ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {happiness: 1.3}}, text: "เสียงก้องห้องน้ำกลายเป็นจุดขาย คนแชร์ต่อกันทั้งสัปดาห์", effects: {happiness: 2, network: 1}, sets_flags: [singer_hit], schedules: [{event: singer_fee_01, after_years: [2, 3]}], merit: [{cat: neutral}]}
+          - {weight: 3, text: "มีคนดูสิบสองคน เก้าคนเป็นญาติ", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: singer_fee_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [18, 42], flags: {has: [singer_hit]}}
+    title: "นายทุนเจ็ดสิบ สามสิบ"
+    text: "ค่าตัวคุณขึ้นหลักแสนต่อคืนแล้ว แต่คุณไม่มีวงของตัวเอง รับเชิญอย่างเดียว นายทุนที่รับงานให้เสนอแบ่งเจ็ดสิบสามสิบ คุณเจ็ดสิบ เขาสามสิบ ส่วนค่ารถ ค่าแต่งหน้า ค่าวง คุณจ่ายเอง"
+    choices:
+      - id: accept
+        text: "รับ ขอแค่มีงานทุกคืน"
+        effects: {money: {unit: income_x, amount: 0.6}, health: -1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: own_band
+        text: "ตั้งวงเองเล็ก ๆ"
+        sets_flags: [singer_boss]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "งานน้อยลงแต่เงินอยู่กับคุณ คนในวงเป็นเพื่อนเก่าจากคณะ", effects: {money: {unit: income_x, amount: 0.4}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วงใหม่ไม่มีคนรู้จัก คืนที่ไม่มีงานคุณยังต้องจ่ายค่าแรงวง", effects: {money: {unit: income_x, amount: -0.3}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: half_year
+        text: "รับครึ่งปี พักครึ่งปี"
+        effects: {money: {unit: income_x, amount: 0.3}, health: 1}
+        merit: [{cat: neutral}]
+      - id: lucky_shirt
+        text: "ขอใส่เสื้อตัวเดิมทุกงาน"
+        effects: {money: {unit: income_x, amount: 0.5}, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: singer_contract_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 5
+    when: {age: [19, 40], flags: {has: [singer_record]}}
+    title: "สัญญาที่เซ็นตอนยังไม่รู้"
+    text: "สัญญากับค่ายเซ็นตอนคุณอายุสิบเจ็ด ผู้ปกครองเซ็นยินยอมให้ด้วย ตอนนี้เพลงคุณดังแล้ว แต่ซองที่ถึงมือบางกว่าที่เจ้าภาพจ่ายหลายเท่า สัญญายังเหลืออีกหลายปี ค่าซื้อสัญญาคืนหลักล้าน"
+    choices:
+      - id: lawyer
+        text: "หาทนายเจรจาเลิกสัญญา"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "ตกลงซื้อสัญญาคืนแบบผ่อน ต้องรับงานหนักอีกสองปี แต่เงินที่เหลือเป็นของคุณ", effects: {happiness: 2, health: -1, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คดียืดเยื้อ ห้ามร้องเพลงของค่ายระหว่างนั้น งานหายครึ่งหนึ่ง", effects: {happiness: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: endure
+        text: "ทนให้ครบสัญญา"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: talk
+        text: "ขอคุยกับเจ้าของค่ายตรง ๆ"
+        effects: {relations: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: sad_song
+        text: "แต่งเพลงเศร้าเรื่องสัญญา"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: singer_cancel_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [20, 45], flags: {has: [singer_troupe]}}
+    title: "เจ้าภาพยกเลิกทั้งฤดู"
+    text: "งานจ้างที่จองไว้ทั้งฤดูถูกยกเลิกทีละงาน เวทีกับชุดเก็บเข้าโกดัง หัวหน้าคณะบอกว่าจ่ายค่าแรงได้อีกเดือนเดียว มือกลอง แดนเซอร์ ทีมตลก เริ่มไปรับจ้างโรงงานแถวบ้าน"
+    choices:
+      - id: factory
+        text: "ไปทำโรงงานกับเพื่อนในคณะ"
+        effects: {money: {unit: income_x, amount: 0.1}, health: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: sell_food
+        text: "ขายอาหารตามสั่งหน้าบ้าน"
+        effects: {money: {unit: income_x, amount: 0.1}, network: 1}
+        merit: [{cat: neutral}]
+      - id: live_online
+        text: "ร้องไลฟ์ขายบัตรออนไลน์"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "แฟนเก่าซื้อบัตรดูกันเต็มกลุ่ม พอจ่ายค่าแรงคนในวงได้อีกเดือน", effects: {happiness: 1, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เน็ตหลุดกลางเพลง คนดูขอเงินคืนครึ่งกลุ่ม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: practice_cows
+        text: "ซ้อมร้องให้วัวฟังทุกเช้า"
+        effects: {happiness: 1, health: 1}
+        merit: [{cat: neutral}]
+
+  - id: singer_fade_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [31, 45], flags: {has: [singer_hit]}}
+    title: "เพลงใหม่ไม่ติดหู"
+    text: "สามเพลงหลังของคุณไม่มีใครร้องตาม งานวัดยังเปิดแต่เพลงแรก ค่ายเริ่มดันคนร้องรุ่นใหม่ที่อายุเท่ากับปีที่คุณดัง งานจ้างเหลือครึ่ง ต้องเดินสายหางานเอง"
+    choices:
+      - id: old_hit
+        text: "ร้องแต่เพลงแรกทุกงาน"
+        effects: {money: {unit: income_x, amount: 0.2}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: new_style
+        text: "ลองแนวใหม่ทั้งชุด"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "เพลงใหม่ติดในกลุ่มคนรุ่นใหม่ งานกลับมาเกือบเท่าเดิม", effects: {happiness: 2, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "แฟนเก่าไม่ชอบ แฟนใหม่ไม่มา เงินเก็บหายไปกับค่าทำเพลง", effects: {happiness: -1, money: {unit: income_x, amount: -0.4}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit_stage
+        text: "เลิกร้อง เปิดร้านเล็ก ๆ"
+        effects: {relations: 1, happiness: -1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: duet_kid
+        text: "ร้องคู่กับคนร้องรุ่นใหม่"
+        effects: {network: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: singer_boss_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [31, 50], flags: {has: [singer_troupe]}}
+    title: "เปิดคณะเป็นของตัวเอง"
+    text: "คุณอยู่คณะมาหลายฤดู รู้ทุกขั้นตั้งแต่ตั้งเวทีถึงรับมัดจำ เจ้าของรถบัสชวนตั้งคณะใหม่ด้วยกัน คณะเล็กใช้คนหลายสิบ คณะใหญ่ใช้สองร้อยกว่าคน งานรับข้ามปี ราคาตกลงไว้แล้วแม้น้ำมันขึ้น"
+    choices:
+      - id: small
+        text: "เริ่มจากคณะเล็ก"
+        sets_flags: [singer_boss]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "คิวงานเต็มครึ่งฤดูตั้งแต่ปีแรก คนในคณะเรียกคุณว่าหัวหน้า", effects: {money: {unit: income_x, amount: 0.5}, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปีแรกน้ำมันขึ้นกลางฤดู ค่าจ้างที่ตกลงไว้ไม่พอค่ารถ", effects: {money: {unit: income_x, amount: -0.4}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: big
+        text: "กู้มาทำคณะใหญ่เลย"
+        sets_flags: [singer_boss]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "ฤดูแรกงานเต็ม รายได้คืนหนึ่งพอจ่ายค่าแรงคนทั้งคณะ", effects: {money: {unit: income_x, amount: 1}, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "งานจองไม่ถึงครึ่ง ดอกเบี้ยเดินทุกเดือน ต้องขายเวทีชุดหนึ่ง", effects: {money: {unit: income_x, amount: -0.8}, happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: stay
+        text: "อยู่คณะเดิม ไม่เสี่ยง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: name_contest
+        text: "ประกวดตั้งชื่อคณะในหมู่บ้าน"
+        effects: {happiness: 1, network: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: singer_teach_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [46, 59], flags: {has: [singer_stage]}}
+    title: "กรรมการเวทีงานวัด"
+    text: "วัดในตำบลเชิญคุณนั่งกรรมการประกวดร้องเพลงเด็ก คนบนเวทีอายุสิบขวบ ถือไมค์สั่นเหมือนคุณเมื่อก่อน พ่อแม่ของเด็กสองคนเป็นคนรู้จักของคุณ และทั้งคู่มานั่งแถวหน้า"
+    choices:
+      - id: fair
+        text: "ให้คะแนนตามเสียงจริง"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: teach_free
+        text: "รับสอนร้องเด็กฟรีหลังงาน"
+        effects: {relations: 1, network: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: everyone_wins
+        text: "ขอรางวัลชมเชยให้ทุกคน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: sing_judge
+        text: "ขึ้นร้องโชว์ก่อนประกาศผล"
+        effects: {happiness: 2, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: singer_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [60, 85], flags: {has: [singer_stage]}}
+    title: "เพลงเก่ากลับมาในไลฟ์"
+    text: "หลานในซอยเปิดคลิปให้ดู คนร้องรุ่นใหม่เอาเพลงที่คุณร้องเมื่อหลายสิบปีก่อนไปร้องใหม่ คนดูเป็นแสน ในช่องแสดงความเห็นมีคนถามว่าคนร้องคนแรกยังอยู่ไหม"
+    choices:
+      - id: comment
+        text: "พิมพ์ตอบว่ายังอยู่"
+        effects: {happiness: 2, network: 1}
+        merit: [{cat: neutral}]
+      - id: sing_again
+        text: "ให้หลานถ่ายคลิปร้องอีกรอบ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {happiness: 1.3}}, text: "คลิปคนแก่ร้องเพลงตัวเองคนดูมากกว่าคลิปต้นเรื่อง มีวงขอเชิญไปร้องงานวัด", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เสียงไม่เหมือนเดิม แต่มีคนพิมพ์ว่าร้องตามแล้วร้องไห้", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: let_go
+        text: "ปิดจอ ไม่อยากรู้"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: teach_dance
+        text: "สอนหลานเต้นท่าเดิม"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]

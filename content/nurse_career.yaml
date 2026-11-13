@@ -1,0 +1,397 @@
+# สายพยาบาล (ใบ 254 จากร่าง 212) · ที่มาแต่ละใบอยู่ในรีเสิร์ชใบ 212
+# ฐาน next-life origin/main cff8aa52 · prefix nurse_ (ค้น content src data ได้ 0 · id ตัวเลือก hire_nurse ใน mid.yaml ไม่ชน)
+# ต่อของเดิม: ใบรับเข้าอ่านธง exam_pass:uni + school uni ของแกน (เหมือนสายหมอใบ 253) · จบแล้ว effects.job = professional
+# เปิดทุกเพศ ทุกฐานะใบเดียว · ใบทางเข้าเอียงฐานะจน ×2 (ทุนค่ากินค่าหอของวิทยาลัยพยาบาลรัฐ)
+# ปีจริง: ใบลูกจ้างชั่วคราวกั้น 2559 ขึ้นไป (หน้าแรกที่เปิดยืนยันได้) · ใบด่านหน้าโรคระบาดกั้น 2563–2565 · ที่เหลือออกทุกปี
+# ไม่บอกระยะใช้ทุนพยาบาล (หาเอกสารยืนยันไม่ได้) · ไม่พูดเรื่องพยาบาลชายรุ่นแรก (หาปีไม่ได้)
+# ไต่ขั้นด้วยธง + นัด: ฝันเด็ก → ทุนวิทยาลัยพยาบาล (วัยรุ่น) → รับเข้า 19–22 → ฝึกวอร์ด 2 ปี → สอบใบประกอบ 1 ปี → รอบรรจุ → ปลายสายกองถือธง nurse_rn
+# ใบนัดล้วนไม่มี weight · ใบกองต้องมี weight (life.mjs:1775) · นัดใบรับเข้า +4 ปีจากใบวัยรุ่น (บทเรียนสายหมอ: ใบกองช่วงอายุแคบออกยาก)
+# decisions 414: ทางเข้า เด็ก 1 วัยรุ่น 1 · หนุ่มสาว 4 (นัด) · ทำงาน 3 · กลางคน 2 · ชรา 1
+# ไม่มีชื่อคน โรงพยาบาล วิทยาลัย หรือแบรนด์จริง · โรคระบาดไม่เอ่ยชื่อโรค
+events:
+  - id: nurse_kid_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [7, 12]}
+    title: "พยาบาลเวรเช้า"
+    text: "ไข้สูงจนต้องนอนโรงพยาบาลสามคืน พยาบาลเวรเช้าเดินมาวัดไข้ทุกสี่ชั่วโมง พับนกกระดาษจากใบสั่งยาที่ใช้แล้วให้ตัวหนึ่ง วันกลับบ้านคุณยังกำนกตัวนั้นไว้ในมือ"
+    choices:
+      - id: dream
+        text: "บอกที่บ้านว่าโตไปจะเป็นพยาบาล"
+        sets_flags: [nurse_dream]
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: fold
+        text: "ขอให้สอนพับนก"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: brave
+        text: "ไม่ร้องตอนโดนเจาะเลือด"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: draw_card
+        text: "วาดการ์ดขอบคุณไปให้"
+        sets_flags: [nurse_dream]
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: nurse_teen_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {nurse_dream: 3, good_student: 1.5}, class: {ยากไร้: 2, ยากจนมาก: 2, ยากจน: 2}}
+    when: {age: [15, 17], school: [upper], flags: {not: [nurse_aim]}}
+    title: "ทุนวิทยาลัยพยาบาล"
+    text: "ครูแนะแนวอ่านประกาศรับนักศึกษาพยาบาลของรัฐ มีค่ากินค่าหอให้ จบแล้วมีที่ทำงานรอ แต่ต้องทำงานใช้ทุนตามสัญญา ถ้าลาออกก่อนต้องชดใช้เงิน รุ่นพี่ที่กลับมาเยี่ยมโรงเรียนบอกว่าเวรดึกหนักกว่าที่คิด"
+    choices:
+      - id: apply_grant
+        text: "สมัครทุนพยาบาลรัฐ"
+        sets_flags: [nurse_aim, nurse_bond]
+        effects: {knowledge: 1, network: 1}
+        schedules: [{event: nurse_admit_01, after_years: [4, 4]}]
+        merit: [{cat: neutral}]
+      - id: apply_open
+        text: "สอบเข้าพยาบาลแบบไม่รับทุน"
+        sets_flags: [nurse_aim]
+        effects: {knowledge: 1}
+        schedules: [{event: nurse_admit_01, after_years: [4, 4]}]
+        merit: [{cat: neutral}]
+      - id: ask_senior
+        text: "ถามรุ่นพี่เรื่องเวรดึกให้ละเอียด"
+        effects: {network: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: no_blood
+        text: "ไม่ไหว เห็นเลือดแล้วจะเป็นลม"
+        clears_flags: [nurse_dream]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: nurse_admit_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [19, 22], school: [uni], flags: {has: [nurse_aim, exam_pass:uni], not: [nurse_student, nurse_rn, nurse_missed]}}
+    title: "ชุดขาวตัวแรก"
+    text: "รายชื่อนักศึกษาพยาบาลติดบอร์ดหน้าอาคารเรียน วันรายงานตัวต้องวัดตัวตัดชุดขาว ทั้งชั้นปีมีหอพักหลังเดียว กฎเข้าหอสองทุ่ม อาจารย์บอกว่าปีหน้าเริ่มลงฝึกบนตึกผู้ป่วย"
+    choices:
+      - id: enroll
+        text: "รายงานตัว เข้าหอวันแรก"
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {knowledge: 1.5}, flags: {nurse_bond: 1.5}}, text: "ชื่ออยู่ในรายชื่อจริง ได้ชุดขาวกับเตียงริมหน้าต่าง", sets_flags: [nurse_student], effects: {happiness: 2, network: 1}, schedules: [{event: nurse_ward_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "คะแนนไม่ถึงเกณฑ์ ต้องเรียนคณะที่ติดไว้แทน", sets_flags: [nurse_missed], effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: room_party
+        text: "แอบจัดวงหมูกระทะในหอ"
+        outcomes:
+          - {weight: 2, ok: true, text: "เพื่อนร่วมห้องสนิทกันตั้งแต่คืนแรก อาจารย์เวรไม่ได้กลิ่น", sets_flags: [nurse_student], effects: {relations: 2, happiness: 1}, schedules: [{event: nurse_ward_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "อาจารย์เวรเคาะประตู โดนบันทึกชื่อตั้งแต่สัปดาห์แรก", sets_flags: [nurse_student], effects: {happiness: -1}, schedules: [{event: nurse_ward_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: other_major
+        text: "เปลี่ยนใจ เรียนคณะเดิมที่ติด"
+        clears_flags: [nurse_aim, nurse_bond]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: work_first
+        text: "พักเรียน ไปทำงานเก็บเงินก่อน"
+        clears_flags: [nurse_aim, nurse_bond]
+        effects: {money: {unit: income_x, amount: 0.3}, knowledge: -1}
+        merit: [{cat: neutral}]
+
+  - id: nurse_ward_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [20, 26], flags: {has: [nurse_student], not: [nurse_rn]}}
+    title: "ฝึกเวรดึกครั้งแรก"
+    text: "เวรดึกคืนแรกบนตึกผู้ป่วยหนัก พยาบาลพี่เลี้ยงให้ถือแฟ้มตามติดทุกเตียง ตีสามมีเสียงเครื่องดังพร้อมกันสองเตียง คุณยืนอยู่ตรงกลางไม่รู้จะวิ่งไปทางไหนก่อน"
+    choices:
+      - id: follow
+        text: "วิ่งตามพี่เลี้ยง จดทุกขั้น"
+        effects: {knowledge: 2, health: -1}
+        schedules: [{event: nurse_license_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: hold_hand
+        text: "นั่งจับมือคนไข้ที่ร้องหาบ้าน"
+        effects: {relations: 2, knowledge: 1}
+        schedules: [{event: nurse_license_01, after_years: [1, 1]}]
+        merit: [{cat: help_others, level: 1}]
+      - id: coffee
+        text: "ชงกาแฟให้ทั้งเวร"
+        effects: {network: 2}
+        schedules: [{event: nurse_license_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: quit_course
+        text: "ไม่ไหวแล้ว ขอลาออก"
+        clears_flags: [nurse_student]
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+
+  - id: nurse_license_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [21, 28], flags: {has: [nurse_student], not: [nurse_rn]}}
+    title: "สอบใบประกอบพยาบาล"
+    text: "จบปีสุดท้ายแล้วยังไม่ใช่พยาบาลจนกว่าจะสอบใบประกอบวิชาชีพผ่าน ห้องสอบเย็นจนมือชา เพื่อนข้างโต๊ะท่องสูตรคำนวณยาหยดเสียงพึมพำ ใครไม่ผ่านต้องรอสอบรอบหน้า"
+    choices:
+      - id: sit
+        text: "เข้าห้องสอบตามรอบ"
+        outcomes:
+          - {weight: 3, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ผ่านครบทุกวิชา ได้ใบประกอบวิชาชีพการพยาบาล", sets_flags: [nurse_rn], effects: {job: professional, happiness: 2, network: 1}, schedules: [{event: nurse_temp_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตกวิชาเดียว ต้องรอสอบรอบหน้า", effects: {happiness: -2}, schedules: [{event: nurse_license_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: group_read
+        text: "ติวกลุ่มทั้งหอจนเช้า"
+        outcomes:
+          - {weight: 3, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ผ่านทั้งกลุ่ม ถ่ายรูปหมู่หน้าหอเป็นครั้งสุดท้าย", sets_flags: [nurse_rn], effects: {job: professional, relations: 2}, schedules: [{event: nurse_temp_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "อดนอนจนคำนวณยาผิดในห้องสอบ ต้องสอบใหม่รอบหน้า", effects: {health: -1}, schedules: [{event: nurse_license_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pray
+        text: "ไหว้ศาลก่อนเข้าห้องสอบ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {wish: 3}, text: "ผ่าน กลับไปแก้บนด้วยพวงมาลัยใหญ่กว่าเดิม", sets_flags: [nurse_rn], effects: {job: professional, happiness: 2}, schedules: [{event: nurse_temp_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่ผ่าน ต้องสอบใหม่รอบหน้า", effects: {happiness: -1}, schedules: [{event: nurse_license_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: other_work
+        text: "ไม่สอบ ไปทำงานสายอื่น"
+        clears_flags: [nurse_student]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: nurse_temp_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [22, 34], flags: {has: [nurse_rn]}}
+    title: "เวรแรกในตำแหน่งจริง"
+    text: "ได้ตำแหน่งพยาบาลในโรงพยาบาลจังหวัด บางเดือนต้องอยู่เวรต่อกันสิบหกชั่วโมง ป่วยก็หาคนแลกเวรไม่ได้ เพื่อนรุ่นเดียวกันบางคนยอมชดใช้ทุนแล้วลาออกไปโรงพยาบาลเอกชน"
+    choices:
+      - id: endure
+        text: "อยู่ต่อ สะสมอายุงาน"
+        effects: {knowledge: 1, health: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: private
+        text: "ชดใช้ทุน ย้ายไปเอกชน"
+        hint: "เงินเดือนดีกว่า แต่จ่ายคืนก้อนใหญ่"
+        requires: {money: {unit: income_x, amount: 1}, reason: "เงินไม่พอชดใช้ทุน"}
+        clears_flags: [nurse_bond]
+        effects: {money: {unit: income_x, amount: 0.5}, happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: home_town
+        text: "ขอย้ายกลับโรงพยาบาลใกล้บ้าน"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "ได้ย้ายกลับ กินข้าวเย็นกับที่บ้านได้", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรื่องย้ายเงียบ ต้องอยู่ที่เดิมอีกปี", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nap_room
+        text: "หาห้องงีบลับหลังตึก"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: nurse_casual_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2559, 2650]
+    weight: 2
+    when: {age: [23, 30], flags: {has: [nurse_rn]}}
+    title: "ลูกจ้างชั่วคราวหกปี"
+    text: "ทำงานเต็มเวลาเหมือนพยาบาลข้าราชการทุกอย่าง แต่ตำแหน่งยังเป็นลูกจ้างชั่วคราว เงินเดือนไม่ขยับ สวัสดิการน้อยกว่า ปีนี้ประกาศรายชื่อบรรจุออกมาอีกรอบ ชื่อคุณไม่อยู่ในนั้น"
+    choices:
+      - id: wait
+        text: "รอรอบหน้าต่อ"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: petition
+        text: "ร่วมกลุ่มยื่นหนังสือทวงตำแหน่ง"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "รอบถัดมาชื่อคุณได้บรรจุ", effects: {happiness: 3, money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรื่องเงียบไปอีกปี", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: leave
+        text: "ลาออกไปเอกชน"
+        effects: {money: {unit: income_x, amount: 1}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: side_job
+        text: "รับเฝ้าไข้ตามบ้านวันหยุด"
+        effects: {money: {unit: income_x, amount: 0.5}, health: -1}
+        merit: [{cat: neutral}]
+
+  - id: nurse_frontline_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2563, 2565]
+    weight: 3
+    when: {age: [31, 45], flags: {has: [nurse_rn]}}
+    title: "ชุดกันเชื้อทั้งเวร"
+    text: "โรคระบาดทำให้ตึกผู้ป่วยกลายเป็นวอร์ดแยกโรค ใส่ชุดกันเชื้อทั้งเวรจนเหงื่อไหลเข้าตา กลับบ้านไม่ได้เป็นเดือน รัฐประกาศเปิดอัตราบรรจุให้คนที่ทำงานด่านหน้า"
+    choices:
+      - id: stay_front
+        text: "อยู่วอร์ดแยกโรคต่อ"
+        effects: {health: -2, relations: -1, network: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: video_home
+        text: "วิดีโอคอลหาที่บ้านทุกคืน"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: swap_ward
+        text: "ขอย้ายไปตึกที่ไม่ใช่แยกโรค"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: dance_clip
+        text: "ถ่ายคลิปเต้นในชุดกันเชื้อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คลิปคนดูหลักแสน มีคนส่งข้าวกล่องมาให้ทั้งตึก", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าเรียกคุยเรื่องถ่ายคลิปในวอร์ด", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nurse_abroad_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], flags: {has: [nurse_rn]}}
+    title: "สอบใบอนุญาตเมืองนอก"
+    text: "เพื่อนรุ่นเดียวกันส่งรูปจากโรงพยาบาลเมืองนอก ค่าแรงต่อชั่วโมงเท่าเงินเดือนที่นี่หลายวัน แต่ต้องสอบภาษาอังกฤษ สอบใบอนุญาตของประเทศนั้นใหม่ และช่วงแรกอาจต้องทำงานต่ำกว่าวุฒิ"
+    choices:
+      - id: go
+        text: "เก็บเงินสอบ แล้วไป"
+        requires: {money: {unit: income_x, amount: 0.8}, reason: "เงินไม่พอค่าสอบและค่าเดินทาง"}
+        cost: {unit: income_x, amount: 0.8}
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "สอบผ่าน ได้งานพยาบาลเมืองนอก ส่งเงินกลับบ้านทุกเดือน", effects: {money: {unit: income_x, amount: 2}, relations: -2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สอบภาษาไม่ผ่าน เงินค่าสอบหายไปกับลม", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: stay
+        text: "อยู่ที่นี่ ใกล้ที่บ้าน"
+        effects: {relations: 2}
+        merit: [{cat: neutral}]
+      - id: learn_english
+        text: "เรียนภาษาไว้ก่อน ยังไม่ตัดสินใจ"
+        effects: {knowledge: 2, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: ask_photo
+        text: "ขอให้เพื่อนส่งรูปหิมะมาเพิ่ม"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: nurse_night_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], flags: {has: [nurse_rn]}}
+    title: "นอนกลางวันไม่หลับ"
+    text: "เวรดึกติดกันจนร่างกายจำไม่ได้ว่ากลางคืนคือเวลานอน กลางวันนอนไม่หลับ งานวันเกิดคนในบ้านตรงกับเวรอีกปี ทั้งวงข้าวเหลือที่นั่งว่างตรงที่คุณเคยนั่ง"
+    choices:
+      - id: swap
+        text: "แลกเวรไปงานวันเกิด"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.4}}, text: "เพื่อนยอมแลกให้ ได้นั่งวงข้าวครบทุกคน", effects: {relations: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีใครว่างแลก ได้แค่วิดีโอคอลจากห้องพักพยาบาล", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: day_shift
+        text: "ขอย้ายไปเวรเช้าถาวร"
+        effects: {health: 2, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: sleep_pill
+        text: "กินยาช่วยนอนทุกเช้า"
+        effects: {health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: blackout
+        text: "ติดผ้าม่านทึบทั้งห้อง"
+        effects: {health: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+
+  - id: nurse_head_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59], flags: {has: [nurse_rn]}}
+    title: "หัวหน้าตึก"
+    text: "หัวหน้าตึกคนเก่าเกษียณ ทุกคนหันมามองคุณ ตำแหน่งนี้ต้องจัดตารางเวรให้คนที่ไม่พอทั้งตึก รับเรื่องร้องเรียน และยังต้องลงเวรเองเมื่อมีคนลาป่วย"
+    choices:
+      - id: accept
+        text: "รับตำแหน่ง"
+        effects: {network: 2, money: {unit: income_x, amount: 0.3}, health: -1}
+        merit: [{cat: neutral}]
+      - id: fair_roster
+        text: "รับ แล้วจัดเวรเรียงอาวุโส"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: neutral}]
+      - id: decline
+        text: "ปฏิเสธ ขอดูแลคนไข้ต่อ"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: whiteboard
+        text: "ซื้อกระดานเวรแม่เหล็กใหม่"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+
+  - id: nurse_family_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59], flags: {has: [nurse_rn]}}
+    title: "พยาบาลประจำซอย"
+    text: "คนทั้งซอยรู้ว่าบ้านนี้มีพยาบาล ตีสองมีคนเคาะประตูให้ช่วยดูญาติที่หายใจไม่ออก วันอาทิตย์มีคนถือถุงยามาถามว่ากินคู่กันได้ไหม"
+    choices:
+      - id: help
+        text: "ไปดูให้ทุกครั้งที่มีคนเรียก"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: send_hospital
+        text: "แนะให้ไปโรงพยาบาลทุกเรื่อง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: free_clinic
+        text: "ตั้งโต๊ะวัดความดันหน้าบ้าน"
+        effects: {relations: 2, network: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: no_answer
+        text: "ปิดไฟ ทำเป็นไม่อยู่บ้าน"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: nurse_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85], flags: {has: [nurse_rn]}}
+    title: "ชุดขาวในตู้"
+    text: "เกษียณมาหลายปี ชุดขาวยังแขวนอยู่ในตู้ ศูนย์ดูแลผู้สูงอายุในตำบลมาขอให้ช่วยสอนคนเฝ้าไข้รุ่นใหม่ บางคนอายุเท่าหลาน"
+    choices:
+      - id: teach
+        text: "รับสอนสัปดาห์ละวัน"
+        effects: {network: 2, happiness: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: wear_once
+        text: "ใส่ชุดขาวถ่ายรูปอีกครั้ง"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: rest
+        text: "ขอพักจริง ๆ สักที"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: donate
+        text: "ยกตำราทั้งตู้ให้ศูนย์"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: dana, level: 1}]

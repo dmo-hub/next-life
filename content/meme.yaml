@@ -1,0 +1,436 @@
+# การ์ดมีม/มุกหนังไวรัล (ใบ 208 จากร่าง 207)
+# เจ้าของสั่ง 2026-11-06: ออกได้ทุกปี ไม่ผูกปีที่ดัง (ทับ decisions 400) · years ใช้ช่วงเต็มแบบการ์ดกองสุ่มทั่วไป
+# กองสุ่มทุกใบ · เว้นวัย ≤4 · ไม่ใช้ชื่อตัวละคร ชื่อหนัง หรือชื่อแบรนด์ · ที่มาแต่ละใบอยู่ 207-meme-research.md
+events:
+  - id: meme_pager_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "คำหวานผ่านพนักงาน"
+    text: "แฟนพกเพจเจอร์ จะบอกคิดถึงต้องโทรเข้าศูนย์ให้พนักงานพิมพ์ส่งให้ ปลายสายเสียงหวานทวนกลับช้า ๆ ว่า ให้พิมพ์ตามนี้จริง ๆ นะคะ"
+    choices:
+      - id: say_it_all
+        text: "ยืนยันทุกคำ ไม่อายแล้ว"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: shorten
+        text: "ตัดเหลือ กินข้าวยัง"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+      - id: number_code
+        text: "ส่งเลขรหัสที่ตกลงกันไว้"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: flirt_operator
+        text: "ชวนพนักงานคุยต่อแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุยกันจนสายหลุด พนักงานหัวเราะแล้วส่งข้อความให้ฟรีคำหนึ่ง", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "แฟนโทรเข้าศูนย์เดียวกัน เรื่องรู้ถึงหูก่อนคุณวางสาย", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: meme_egg_pet_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [7, 12]}
+    title: "ไข่หิวกลางคาบ"
+    text: "ทั้งห้องพกไข่พลาสติกที่มีตัวเล็ก ๆ ให้เลี้ยง โรงเรียนประกาศห้ามแล้ว แต่ไข่ของคุณร้องติ๊ด ๆ ตอนครูกำลังเดินผ่านโต๊ะ"
+    choices:
+      - id: feed_under_desk
+        text: "แอบกดให้ข้าวใต้โต๊ะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "รอด ตัวในไข่อิ่ม ครูเดินผ่านไปแบบไม่หันมอง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูยึดไข่ใส่ลิ้นชัก มันหิวตายในนั้นตอนพักเที่ยง", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: friend_sitter
+        text: "ฝากเพื่อนเลี้ยงช่วงเรียน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: let_it_go
+        text: "ปล่อยมัน ตั้งใจเรียน"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: egg_funeral
+        text: "จัดงานศพไข่หลังโรงอาหาร"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: meme_old_crush_film_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "หนังพาเดินกลับซอยเก่า"
+    text: "หนังรักเด็กข้างบ้านยุคเพลงเก่าเต็มทุกรอบ ออกจากโรงมาคนรุ่นคุณเงียบกันทั้งแถว ต่างคนต่างนึกถึงเด็กซอยเดียวกันคนหนึ่ง"
+    choices:
+      - id: find_old_friend
+        text: "ไล่ถามหาเพื่อนเก่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอจริง นั่งกินข้าวกันยาว ขำเรื่องเก่าจนร้านจะปิด", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขามีลูกสามแล้ว และจำชื่อคุณไม่ได้เลย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: old_songs
+        text: "เปิดเพลงเก่าวนทั้งสัปดาห์"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: rubber_jump
+        text: "ท้าเพื่อนกระโดดยางลานจอดรถ"
+        effects: {happiness: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: deny_tears
+        text: "บอกว่าหนังธรรมดา แล้วน้ำตาไหล"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: meme_where_is_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.125
+    when: {age: [13, 18]}
+    title: "จักรยานคุณอยู่ไหน"
+    text: "หนังบู๊ปีนี้พระเอกข้ามประเทศไปตามหาช้าง ประโยคที่ตะโกนติดปากไปทั้งโรงเรียน เย็นนี้จักรยานคุณหายไปจากโรงจอด"
+    choices:
+      - id: shout_like_film
+        text: "ตะโกนแบบหนังกลางสนาม"
+        outcomes:
+          - {weight: 2, ok: true, text: "ทั้งสนามหัวเราะแล้วช่วยกันหา รถจอดผิดแถวอยู่หลังโรงอาหาร", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูฝ่ายปกครองได้ยินคนแรก ได้ทั้งเก็บขยะและเดินกลับบ้าน", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: tell_teacher
+        text: "แจ้งครูเวรตามระเบียบ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: walk_home
+        text: "เดินกลับบ้านเงียบ ๆ"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: train_elbow
+        text: "ฝึกศอกกลับก่อนออกตามหา"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: meme_top_friends_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.125
+    when: {age: [13, 18]}
+    title: "หลุดห้าอันดับแรก"
+    text: "ทั้งห้องแต่งหน้าโปรไฟล์ออนไลน์ ใครแวะมาเพลงดังลั่นทันที คืนนี้เพื่อนสนิทเห็นว่าคุณเลื่อนเขาหลุดจากห้าอันดับเพื่อนรัก"
+    choices:
+      - id: restore_rank
+        text: "เอาเขากลับอันดับหนึ่ง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: blame_web
+        text: "โทษว่าเว็บมันรวน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเชื่อ เพราะหน้าโปรไฟล์คุณก็โหลดไม่ขึ้นจริง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาเปิดหน้าโปรไฟล์ให้ทั้งห้องดูตอนพักเที่ยง", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: stand_by_rank
+        text: "ยืนยันผลการจัดอันดับ"
+        effects: {relations: -2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: everyone_first
+        text: "ตั้งเพลงขอโทษเปิดดังลั่น"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: meme_skytrain_love_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 40], flags: {not: [married]}}
+    title: "รถไฟฟ้าสายคนโสด"
+    text: "หนังรักสาวโสดวัยสามสิบเต็มโรงไปทั่ว เพื่อนโสดทั้งกลุ่มออกจากโรงมาพร้อมแผนใหม่ คนในฝันอาจยืนรอบนชานชาลาสักแห่ง"
+    choices:
+      - id: ride_all_day
+        text: "เข้ากรุงไปนั่งวนทั้งวัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้เบอร์คนที่ลุกให้นั่ง คุยกันยาวถึงปลายสาย", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 3, text: "ได้เจอแต่คนหลับพิงไหล่ กลับบ้านพร้อมตั๋วเต็มกระเป๋า", effects: {happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: cook_for_self
+        text: "ซื้อกับข้าวกินคนเดียวสบายกว่า"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: ask_friends
+        text: "ให้เพื่อนจัดนัดบอดให้"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: heroine_look
+        text: "เปลี่ยนทรงผมแบบนางเอก"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+
+  - id: meme_slow_life_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [22, 30]}
+    title: "ขอสโลว์ไลฟ์ก่อนเงินเดือนออก"
+    text: "รุ่นน้องเพิ่งเรียนจบโพสต์รูปจิบกาแฟริมหน้าต่าง บอกว่าจะใช้ชีวิตสโลว์ไลฟ์ นักเล่าเรื่องดังเตือนว่าอย่าเพิ่งรีบช้า คุณเลื่อนดูรูปนี้ในเวลางานพอดี"
+    choices:
+      - id: quit_for_cafe
+        text: "ลาออกไปเปิดร้านกาแฟ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้านเล็กพอมีลูกค้าประจำ ได้นอนเต็มอิ่มแต่เงินเก็บหด", effects: {happiness: 2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ลูกค้าคนเดียวคือตัวคุณเอง กาแฟหมดอายุก่อนเงินหมดนิดเดียว", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hard_work
+        text: "ก้มหน้าทำงานต่อ"
+        effects: {knowledge: 1, money: {unit: income_x, amount: 0.1}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: photo_only
+        text: "ถ่ายรูปกาแฟซองติดแท็กเดียวกัน"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: weekend_slow
+        text: "สโลว์ไลฟ์เฉพาะวันเสาร์"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: meme_doll_seat_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ตุ๊กตาได้นั่งริมหน้าต่าง"
+    text: "เพื่อนร่วมงานพาตุ๊กตาคู่ใจไปเที่ยวด้วย สายการบินเคยขายที่นั่งให้ แต่ตอนนี้ทางการบอกว่านับเป็นสัมภาระ ต้องผ่านเอกซเรย์ เพื่อนหันมามองคุณตาละห้อย"
+    choices:
+      - id: comfort
+        text: "ปลอบเพื่อนจนถึงประตูขึ้นเครื่อง"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: carry_doll
+        text: "ช่วยอุ้มผ่านสายพานเบา ๆ"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: laugh_at_friend
+        text: "หัวเราะลั่นกลางสนามบิน"
+        effects: {relations: -2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: doll_lounge
+        text: "เสนอเปิดเลานจ์รับฝากตุ๊กตา"
+        outcomes:
+          - {weight: 1, ok: true, text: "มีคนจองจริงสามราย คุณเริ่มสงสัยว่าใครกันแน่ที่บ้า", effects: {money: {unit: income_x, amount: 0.2}, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เพื่อนร่วมงานเรียกคุณว่าท่านประธานไปอีกทั้งปี", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: meme_catch_game_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ตัวหายากกลางถนน"
+    text: "เกมจับสัตว์ประหลาดบนแผนที่จริงเปิดในไทย ซอยข้างบ้านมีคนเดินก้มหน้าแน่นกว่าตลาดนัด เย็นนี้ตัวหายากโผล่กลางถนนใหญ่พอดี"
+    choices:
+      - id: cross_now
+        text: "วิ่งข้ามไปจับเดี๋ยวนี้"
+        outcomes:
+          - {weight: 2, ok: true, text: "จับได้ เพื่อนในกลุ่มอิจฉาไปทั้งคืน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มอเตอร์ไซค์เฉี่ยวเข่า ตัวในจอหนีไปพร้อมค่ารักษา", effects: {health: -2, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_light
+        text: "รอไฟเขียว ตัวหายไปก็ช่าง"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: walk_hatch
+        text: "เดินฟักไข่ในเกมทุกเย็น"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: ask_mom_to_catch
+        text: "ฝากเพื่อนถือมือถือจับแทน"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: meme_exam_film_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.125
+    when: {age: [16, 18], school: [upper, voc]}
+    title: "ไอเดียจากหนังโกงสอบ"
+    text: "หนังโกงข้อสอบดังไปทั้งประเทศ ออกจากโรงเพื่อนกระซิบว่าคุณเก่งพอจะส่งคำตอบให้ทั้งห้อง ราคาหัวละเท่าค่าขนมสองเดือน"
+    choices:
+      - id: run_business
+        text: "รับงาน เปิดบริษัทหลังห้อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "รอดทั้งเทอม ได้เงินหนากับชื่อเสียงที่บอกใครไม่ได้", effects: {money: {unit: income_x, amount: 0.2}, happiness: 1}, merit: [{cat: cheat_exploit, level: 1}]}
+          - {weight: 2, text: "กระดาษคำตอบเหมือนกันทั้งห้องจนถึงข้อที่ผิด ครูเรียกผู้ปกครองทั้งแถว", effects: {relations: -1, knowledge: -1, happiness: -1}, merit: [{cat: cheat_exploit, level: 1}]}
+        merit: [{cat: cheat_exploit, level: 1}]
+      - id: refuse
+        text: "ส่ายหน้า ดูหนังก็พอ"
+        effects: {knowledge: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: free_tutor
+        text: "เปิดติวฟรีแทนให้ลอก"
+        effects: {knowledge: 1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: sell_wrong
+        text: "ขายเฉลยปลอมแล้วรีบกลับบ้าน"
+        effects: {money: {unit: income_x, amount: 0.1}, relations: -2}
+        merit: [{cat: cheat_exploit, level: 1}]
+
+  - id: meme_old_speech_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ออเจ้าทั้งออฟฟิศ"
+    text: "ละครย้อนยุคดังจนคนทั้งเมืองพูดคำโบราณ เจ้านายสั่งให้ศุกร์นี้ใส่ชุดไทยมาทำงาน แม่ค้าข้าวแกงยังถามคุณว่าออเจ้ารับอะไร"
+    choices:
+      - id: trip_ayutthaya
+        text: "เช่าชุดไทยไปเดินอยุธยาด้วย"
+        effects: {happiness: 2, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: minimal_cloth
+        text: "คาดผ้าขาวม้าเอวเดียวจบ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: ancient_email
+        text: "ตอบอีเมลด้วยภาษาโบราณ"
+        outcomes:
+          - {weight: 2, ok: true, text: "ลูกค้าส่งต่อกันขำทั้งบริษัท ยอดสั่งซื้อมาเงียบ ๆ", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกค้าอีกฝั่งคิดว่าคุณไม่สบาย ถามหาคนรับผิดชอบคนใหม่", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: skip_trend
+        text: "ไม่ตามกระแส ใส่เสื้อเชิ้ตมา"
+        effects: {relations: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: meme_new_slang_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 85]}
+    title: "แกงปังปุริเย่"
+    text: "เด็กข้างบ้านชิมแกงของคุณแล้วบอกว่าปังปุริเย่มาก คุณยังไม่แน่ใจว่าเขาชมหรือว่าคุณใส่เกลือเยอะ"
+    choices:
+      - id: ask_meaning
+        text: "ถามความหมายตรง ๆ"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: scold_slang
+        text: "บ่นเรื่องภาษาสมัยนี้"
+        effects: {relations: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: use_in_group
+        text: "เอาไปใช้ในกลุ่มเพื่อนเก่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนรุ่นเดียวกันพิมพ์ตามกันทั้งกลุ่ม ไม่มีใครรู้ความหมายสักคน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนโทรมาถามว่าล้มหัวฟาดอะไรหรือเปล่า", effects: {happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: cook_more
+        text: "ตักแกงให้เด็กอีกถ้วย"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: meme_cham_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "งานฉ่ำ"
+    text: "รุ่นน้องในทีมพิมพ์ว่าเดือนนี้งานฉ่ำ เจ้านายรุ่นเก่าอ่านแล้วเดินไปดูหลังคาว่ารั่วตรงไหน ทั้งห้องหันมาให้คุณอธิบาย"
+    choices:
+      - id: translate
+        text: "แปลให้เจ้านายฟังอย่างสุภาพ"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: go_with_it
+        text: "เดินไปหาหลังคารั่วด้วย"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: use_in_report
+        text: "ใส่คำว่าฉ่ำในรายงานประจำเดือน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้บริหารชอบ สั่งให้ใส่ทุกฉบับ คุณเริ่มเสียใจ", effects: {network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รายงานถูกตีกลับพร้อมปากกาแดงวงเดียวตรงคำนั้น", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: stay_silent
+        text: "ทำเป็นพิมพ์งานต่อ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: meme_cry_clip_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "คลิปก่อนดู หลังดู"
+    text: "หนังเรื่องคนดูแลอาม่าทำคนร้องไห้จนคลิปหน้าคนดูเต็มโซเชียล เพื่อนท้าให้ถ่ายด้วยกัน ยิ้มก่อนเข้าโรง แล้วดูว่าออกมาสภาพไหน"
+    choices:
+      - id: real_clip
+        text: "ถ่ายจริง ไม่แต่งหน้ากันไว้"
+        outcomes:
+          - {weight: 2, ok: true, text: "ตาบวมจนเพื่อนจำไม่ได้ คลิปมีคนกดหัวใจมากกว่ารูปรับปริญญา", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณไม่ร้องสักหยด แต่เพื่อนร้องจนคุณต้องเดินจูงกลับ", effects: {relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: call_elder
+        text: "ออกจากโรงแล้วโทรหาผู้ใหญ่ที่บ้าน"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: onion
+        text: "แอบดมหัวหอมก่อนถ่ายคลิป"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: skip_film
+        text: "ไม่ไป บ้านเราน้ำตาแพง"
+        effects: {money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+
+  - id: meme_baby_hippo_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [6, 12]}
+    title: "ก้นฮิปโปแถวยาว"
+    text: "ลูกฮิปโปแคระตัวหนึ่งดังไปทั้งโลกเพราะหน้าเหมือนจะกัดคนเลี้ยง ที่บ้านพาไปสวนสัตว์ คนต่อแถวยาวจนคุณเห็นแค่ก้นมันไกล ๆ"
+    choices:
+      - id: wait_queue
+        text: "รอต่อจนถึงหน้ากรง"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: copy_face
+        text: "ทำหน้าเลียนแบบถ่ายรูปกับป้าย"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: splash_water
+        text: "สาดน้ำปลุกมันตามคนข้าง ๆ"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: greed_harm, level: 1}]
+      - id: other_animals
+        text: "ไปดูเต่าที่ไม่มีคนสนใจ"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]

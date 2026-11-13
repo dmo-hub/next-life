@@ -1,0 +1,456 @@
+# การ์ดชีวิตประจำวันไทยชุด food (ใบ 239 จากร่าง 238)
+events:
+  - id: food_kratha_split_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [22, 30]}
+    title: "โต๊ะนี้หารเท่า"
+    text: "วันได้เงินก้อน แก๊งเดิมนัดร้านหมูกระทะ มันหมูชิ้นเดียวทาวนรอบเตา น้ำซุปขอบกระทะเดือดปุด คุณนั่งคีบวุ้นเส้นมาครึ่งชั่วโมง เพื่อนฝั่งตรงข้ามเพิ่งสั่งกุ้งเพิ่มสองจานกับน้ำอัดลมขวดใหญ่ แล้วหันมาบอกว่าเดี๋ยวหารเท่านะ"
+    choices:
+      - id: eat_worth
+        text: "ลงกุ้งเต็มเตา กินให้คุ้มค่าหาร"
+        outcomes:
+          - {weight: 1, ok: true, text: "คีบทันจานสุดท้าย อิ่มเท่าค่าหารพอดี เดินกลับห้องช้ากว่าปกติครึ่งชั่วโมง", effects: {happiness: 2, health: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กินเร่งจนจุกตั้งแต่ก่อนเก็บเงิน คืนนั้นนอนตะแคงได้ข้างเดียว", effects: {health: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: split_even
+        text: "หารเท่า ไม่พูดอะไร"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: own_share
+        text: "ขอคิดเฉพาะของที่ตัวเองกิน"
+        effects: {relations: -1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: soup_revenge
+        text: "ซดน้ำซุปขอบกระทะเอาคืน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ซดจนเพื่อนต้องเรียกเติมอีกกา ทั้งโต๊ะยกให้คุณเป็นคนคุ้มที่สุดของคืนนี้", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้ำซุปเค็มกว่าที่คิด ลุกไปกินน้ำกลางดึกสามรอบ", effects: {health: -1, happiness: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_somtam_contest_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45], occupation: [factory, clerk, technician, professional, manager]}
+    title: "ตัวแทนแผนกลงแข่งตำส้ม"
+    text: "งานประจำจังหวัดปีนี้มีแข่งตำส้ม ครกไม้เรียงบนเวที กรรมการถือช้อนรอชิมทีละจาน หัวหน้าส่งชื่อคุณเป็นตัวแทนแผนก เพราะเคยคุยในวงข้าวว่ามือหนัก ทั้งที่ปีนี้ทั้งปีคุณตำแต่น้ำพริกถ้วยเล็ก"
+    choices:
+      - id: go_stage
+        text: "ขึ้นเวที ตำตามมือตัวเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เส้นมะละกอไม่กระเด็น รสไม่ขาดไม่เกิน ได้ที่สามพร้อมครกใบใหม่กลับมาตั้งโต๊ะทำงาน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สากลงแรงไป มะละกอกระเด็นใส่โต๊ะกรรมการ ปีหน้าเขาคงจำชื่อแผนกคุณได้", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: cheer_side
+        text: "ยกให้เพื่อน ขอยืนเชียร์ข้างเวที"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: practice
+        text: "ซ้อมตำทุกเย็นจนถึงวันแข่ง"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: ten_chili
+        text: "ใส่พริกสิบเม็ด ให้กรรมการจำได้"
+        outcomes:
+          - {weight: 1, ok: true, text: "กรรมการน้ำตาไหลแต่ตักอีกคำ ได้รางวัลพิเศษที่เพิ่งคิดกันสด ๆ บนเวที", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กรรมการคนแรกขอน้ำ คนที่สองขอพัก จานของคุณถูกวางแยกไว้ปลายโต๊ะ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_curry_queue_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager]}
+    title: "พักเที่ยงเหลือสิบห้านาที"
+    text: "ประชุมลากยาวจนเหลือพักสิบห้านาที หน้าร้านข้าวแกงคนต่อแถวถึงตู้น้ำ ถาดแกงเหลือครึ่ง ป้าถือทัพพีรอคำตอบจากคนข้างหน้าที่ยังชี้ไปชี้มาเหมือนกำลังซื้อบ้าน"
+    choices:
+      - id: stand_queue
+        text: "ยืนรอ สั่งสองอย่างราดข้าว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้แกงก้นถาดเข้มข้นที่สุด กินหมดในหกนาที กลับถึงโต๊ะทันพอดี", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถึงคิวเหลือแต่น้ำแกงกับไข่พะโล้ใบเดียว เข้าประชุมบ่ายพร้อมกลิ่นติดเสื้อ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bag_it
+        text: "ซื้อใส่ถุงกลับไปกินที่โต๊ะ"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: skip_meal
+        text: "ข้ามมื้อ ชงกาแฟซองแทน"
+        effects: {health: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: same_as_front
+        text: "บอกป้าว่าเอาเหมือนคนข้างหน้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าตักทันที ได้ผัดเผ็ดปลาดุกที่ไม่เคยคิดจะสั่ง อร่อยจนกลายเป็นเมนูประจำ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนข้างหน้าสั่งใส่ปิ่นโตสี่เถา ป้าตักให้คุณครบชุด เย็นนี้ยังมีข้าวเหลือกิน", effects: {money: {unit: income_x, amount: -0.03}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_cheap_plate_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ป้ายราคาประหยัดหน้าตลาด"
+    text: "เดือนนี้ของแพงไปหมด ค่าไฟกับค่ารถกินเงินไปก่อนถึงกลางเดือน ร้านข้าวแกงหน้าตลาดติดป้ายใหม่ ราคาประหยัดจานละไม่กี่สิบบาท กับข้าวน้อยลงหน่อยแต่ข้าวเติมได้ คนรู้จักหลายคนต่อแถวอยู่แล้ว ต่างคนต่างทำเป็นไม่เห็นกัน"
+    choices:
+      - id: every_day
+        text: "กินร้านนี้ทุกวันจนสิ้นเดือน"
+        effects: {money: {unit: income_x, amount: 0.05}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: pack_home
+        text: "สลับกับห่อข้าวจากบ้าน"
+        effects: {money: {unit: income_x, amount: 0.03}, health: 1}
+        merit: [{cat: neutral}]
+      - id: buy_friend
+        text: "ซื้อเผื่อเพื่อนที่ตังค์หมด"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: all_extra
+        text: "สั่งพิเศษทุกอย่าง ปลอบใจตัวเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าตักจนมองไม่เห็นข้าว ยังถูกกว่ากาแฟแก้วหนึ่ง วันนี้คุณชนะเศรษฐกิจไปหนึ่งจาน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พิเศษสามอย่างรวมแล้วแพงกว่าร้านเดิม ป้ายราคาประหยัดยังมองคุณอยู่", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_tea_or_lunch_01
+    type: A
+    category: health
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.125
+    when: {age: [14, 18], year: [2563, 2650], school: [lower, upper, voc]}
+    title: "ชานมหรือข้าวเที่ยง"
+    text: "ค่าขนมเหลือพอซื้อได้อย่างเดียว ข้าวในโรงอาหารหนึ่งจาน หรือชานมไข่มุกแก้วใหญ่หน้าโรงเรียนที่แพงกว่าข้าวอีก เพื่อนทั้งกลุ่มถือแก้วเดินมาถามว่าวันนี้คุณเอาหวานกี่เปอร์เซ็นต์ ท้องเริ่มร้องตั้งแต่คาบก่อนเที่ยง"
+    choices:
+      - id: tea
+        text: "เลือกชานม หวานร้อยเปอร์เซ็นต์"
+        outcomes:
+          - {weight: 1, ok: true, text: "เคี้ยวไข่มุกทีละเม็ดอย่างตั้งใจ อยู่ท้องถึงบ่ายจริง ๆ", effects: {happiness: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คาบบ่ายท้องร้องดังจนครูหยุดอ่าน ทั้งห้องหันมาพร้อมกัน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: share_cup
+        text: "ชวนเพื่อนแบ่งแก้ว สองหลอด"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: rice_first
+        text: "กินข้าว เก็บชานมไว้วันหลัง"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: sniff_cup
+        text: "ขอดมแก้วเพื่อนแล้วกินข้าวตาม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนยื่นแก้วให้ดมจริง ข้าวในจานรสดีขึ้นอย่างไม่มีเหตุผล", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนกอดแก้วเดินหนี บอกว่าวันนี้คุณน่ากลัวกว่าครูฝ่ายปกครอง", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_walkway_grill_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "ทางเท้าแคบกลิ่นปิ้งย่าง"
+    text: "ขากลับจากงานต้องเดินผ่านแผงลอยเรียงแน่นจนทางเหลือกว้างเท่าตัว ควันหมูย่างลอยมาเต็มหน้า ข้างหลังมีมอเตอร์ไซค์บีบแตร ข้างหน้าคนซื้อยืนรอไม้ มื้อเย็นคนแถวนี้ฝากท้องกับแผงพวกนี้กันแทบทั้งซอย รวมทั้งคุณด้วย"
+    choices:
+      - id: stop_buy
+        text: "แวะซื้อ ยืนรอกลางทางเดินนี่แหละ"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: wave_bikes
+        text: "รอไม้ไปด้วย ช่วยโบกมอเตอร์ไซค์"
+        effects: {relations: 2, happiness: -1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: detour
+        text: "เดินอ้อมไปตลาดอีกฝั่ง"
+        effects: {health: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: inhale_meal
+        text: "สูดควันเต็มปอด ถือว่าอิ่มแล้ว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถึงบ้านยังจำรสได้ กินข้าวกับไข่ต้มก็เหมือนมีหมูย่างอยู่ในจาน", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สูดแรงไปจนสำลัก ชนป้าถือถุงน้ำจิ้ม เสื้อทำงานหอมกลิ่นนั้นไปอีกสามวัน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_stall_moved_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59], region: [กรุงเทพฯ และปริมณฑล]}
+    title: "แผงปากซอยต้องย้าย"
+    text: "แม่ค้าข้าวเหนียวหมูปากซอยที่ขายให้คุณมาหลายปีบอกว่าเจ้าหน้าที่เขตมาวัดทางเท้า ต้องเหลือที่ให้คนเดินเมตรครึ่ง แผงของเธอเกินไปนิดเดียว พรุ่งนี้อาจต้องย้ายไปอีกฟาก เธอถามว่าคุณจะตามไปกินไหม มือยังห่อข้าวเหนียวไม่หยุด"
+    choices:
+      - id: follow_stall
+        text: "ตามไปอุดหนุนที่ใหม่"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: petition
+        text: "ลงชื่อกับคนในซอยเสนอเขต"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ชื่อครบสามสิบคน เขตยอมให้แผงอยู่ที่เดิมถ้าร่นเข้าอีกหน่อย", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หนังสือเข้าเขตไปแล้ว ตอบกลับมาตอนแผงย้ายเสร็จได้สองเดือน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: let_go
+        text: "ปล่อยไปตามระเบียบ หาร้านใหม่"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: tape_measure
+        text: "เอาตลับเมตรออกมาวัดเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เหลือเมตรครึ่งพอดีถ้าดึงร่มเข้าคืบเดียว เจ้าหน้าที่พยักหน้าแล้วเดินไปแผงถัดไป", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ทางเท้าขาดจริงสิบเซนติเมตร ตั้งแต่วันนั้นคนทั้งซอยเรียกคุณว่าช่างเขต", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_meatball_sauce_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [8, 12], school: [primary, lower]}
+    title: "น้ำจิ้มขวดที่สาม"
+    text: "เลิกเรียน รถเข็นลูกชิ้นปิ้งจอดหน้ารั้ว เงินในกระเป๋าซื้อได้ไม้เดียว ลุงวางน้ำจิ้มไว้สามขวด หวาน เผ็ด กับขวดที่ฝาเปื้อนพริกซึ่งลุงบอกว่าเด็กไม่ไหวหรอก เพื่อนทั้งแถวหันมาดูว่าคุณจะจุ่มขวดไหน"
+    choices:
+      - id: sweet
+        text: "ราดน้ำจิ้มหวานเหมือนทุกวัน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: mix_two
+        text: "ขอลุงผสมหวานกับเผ็ด"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: save_coin
+        text: "เก็บเงินไว้พรุ่งนี้ซื้อสองไม้"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: third_bottle
+        text: "จุ่มขวดที่สามให้ชุ่มทั้งไม้"
+        outcomes:
+          - {weight: 1, ok: true, text: "เผ็ดจนหูอื้อแต่ไม่ร้อง เพื่อนเรียกคุณว่าเจ้าแห่งน้ำจิ้มไปทั้งเทอม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กัดคำเดียวน้ำตาน้ำมูกไหล วิ่งหาก๊อกน้ำหน้าโรงเรียน ไม้ตกไปกับพื้น", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_coin_roti_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [7, 11], year: [2523, 2542], school: [primary]}
+    title: "หน้าปัดท้ายจักรยาน"
+    text: "บ่ายวันเสาร์ ลุงขายโรตีสายไหมปั่นจักรยานเข้าซอย ท้ายรถมีกล่องหยอดเหรียญกับหน้าปัดหมุน หยอดสิบบาทแล้วหน้าปัดจะหยุดที่เลขสามถึงเจ็ด ได้กี่แผ่นตามนั้น เด็กทั้งซอยมุงกันอยู่ คุณเหลือเหรียญสิบเหรียญเดียวในกำมือที่ชื้นเหงื่อ"
+    choices:
+      - id: drop_coin
+        text: "หยอดเหรียญสุดท้าย ลุ้นเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "หน้าปัดหยุดที่เจ็ด ได้เจ็ดแผ่น แป้งม้วนสายไหมแน่นมือ เดินอวดรอบซอยก่อนกิน", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หน้าปัดหยุดที่สาม ต่ำสุดของกล่อง คุณกินช้าที่สุดเท่าที่เคยกิน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: buy_plain
+        text: "ซื้อตามราคา ไม่ต้องลุ้น"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: pool_coin
+        text: "ชวนเพื่อนลงขันหยอด แล้วแบ่งกัน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: touch_dial
+        text: "แอบเอานิ้วแตะหน้าปัดให้หยุด"
+        outcomes:
+          - {weight: 1, ok: true, text: "หน้าปัดค้างที่เจ็ด ลุงหันมาพอดี ยื่นให้ครบแลกกับสัญญาว่าจะไม่แตะกล่องเขาอีก", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงจำหน้าได้ ทุกครั้งที่เห็นคุณในซอยเขาเอามือบังหน้าปัดไว้", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_old_style_pork_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85]}
+    title: "หมูปิ้งกลายเป็นของโบราณ"
+    text: "ปากตลาดมีป้ายใหม่เขียนว่าหมูปิ้งโบราณ คนหนุ่มสาวต่อแถวถ่ายรูป ทั้งที่เจ้าของย่างแบบเดิมมาตั้งแต่คุณยังเรียนหนังสือ รถเข็นหมูปิ้งนมสดข้าง ๆ คนบางตาลง ของกินทุกเช้าของคุณเพิ่งได้ตำแหน่งโบราณ คุณเลยหันมานับอายุตัวเอง"
+    choices:
+      - id: queue_young
+        text: "ยืนต่อคิวกับเด็กรุ่นใหม่"
+        effects: {happiness: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: milk_pork
+        text: "ซื้อเจ้านมสดข้าง ๆ ไม่ต้องรอ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: old_talk
+        text: "ยืนเล่าความหลังกับคนย่าง"
+        effects: {relations: 2}
+        merit: [{cat: neutral}]
+      - id: i_am_old_style
+        text: "ประกาศว่าตัวเองก็สูตรโบราณ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนทั้งแถวขำ ขอถ่ายรูปคุณคู่ป้าย แล้วดันคุณไปยืนหัวแถว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เด็กหนุ่มคนหนึ่งยกเก้าอี้มาให้นั่งทันที คุณไม่รู้ว่าควรขอบใจหรือเคือง", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_coconut_ice_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [62, 85]}
+    title: "กระดิ่งรถไอติมกะทิ"
+    text: "เสียงกระดิ่งรถเข็นดังมาจากปากซอย เด็กข้างบ้านวิ่งออกไปทั้งแถว คุณนั่งอยู่หน้าบ้าน นึกถึงไอติมกะทิใส่ขนมปัง ถั่วลิสง ข้าวเหนียวในถ้วยแรกของชีวิต หมอเคยทักเรื่องหวาน ฟันซี่ล่างก็เสียวทุกครั้งที่เจอของเย็น"
+    choices:
+      - id: full_top
+        text: "เอาครบทุกอย่างเหมือนสมัยก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "รสยังเหมือนเดิมทุกคำ นั่งยิ้มกับถ้วยเปล่าอยู่จนรถเข็นไปพ้นซอย", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อร่อยได้สามคำ ฟันเสียวจนต้องอมน้ำอุ่นทั้งบ่าย", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: one_scoop
+        text: "ขอลูกเดียวใส่ขนมปังพอ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: treat_kids
+        text: "เลี้ยงเด็กข้างบ้าน นั่งดูเขากิน"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: melt_first
+        text: "ซื้อมาตั้งไว้ให้ละลายกันเสียวฟัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยกถ้วยดื่มน้ำกะทิรสเดิมเป๊ะ เด็กข้างบ้านยืนดูเหมือนเห็นของแปลก", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "งีบไปแป๊บเดียว ตื่นมามดเดินแถวเข้าถ้วยก่อนแล้ว", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_patongko_name_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ชื่อจริงของปาท่องโก๋"
+    text: "เช้ามืดรถเข็นปาท่องโก๋จอดหน้าร้านกาแฟโบราณ วงโต๊ะหินอ่อนกำลังจุ่มกาแฟ เพื่อนคนหนึ่งเพิ่งอ่านเจอว่าที่กินอยู่ชื่ออิ่วจาก้วย ส่วนปาท่องโก๋ตัวจริงเป็นขนมน้ำตาลทรายขาว คนไทยจำสลับกันมานาน ทั้งโต๊ะหยุดเคี้ยวแล้วหันมาทางคุณ"
+    choices:
+      - id: argue
+        text: "เถียงว่าทั้งประเทศเรียกแบบนี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ชนะด้วยเสียงข้างมากของโต๊ะ เพื่อนยอมเลี้ยงกาแฟหนึ่งแก้ว", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เถียงจนกาแฟเย็น เพื่อนเปิดหลักฐานให้ดูทีละบรรทัด", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: eat_quiet
+        text: "จุ่มกาแฟกินต่อ ชื่ออะไรก็อร่อย"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: pass_on
+        text: "ซื้อฝากเพื่อนบ้าน แล้วเล่าต่อ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: order_real
+        text: "ตะโกนสั่งอิ่วจาก้วยกับแม่ค้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "แม่ค้าไม่เงยหน้า ตอบกลับว่าเอากี่ตัว แล้วคีบใส่ถุงเหมือนรู้มานานแล้ว", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แม่ค้ามองค้าง ถามว่าไปโดนอะไรมา ตั้งแต่นั้นทั้งโต๊ะเรียกคุณว่าคุณอิ่ว", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_night_market_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [19, 26], year: [2554, 2650], family: [{role: spouse, count: [0, 0]}]}
+    title: "เงินเหลือสองซุ้มสุดท้าย"
+    text: "คืนวันเสาร์คุณนัดคนที่แอบชอบมาตลาดนัดกลางคืน หลอดไฟเหลืองห้อยเต็มทาง วงดนตรีเล่นอยู่หน้ารถเก่า หมึกย่างหมดไปแล้ว ขนมโตเกียวหมดไปแล้ว เงินในกระเป๋าเหลือพอแค่สองซุ้ม เขาชี้ไปที่ร้านเสื้อมือสองแล้วหันมายิ้ม"
+    choices:
+      - id: buy_shirt
+        text: "ซื้อเสื้อตัวนั้นให้เขาเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาใส่ทับตรงนั้น เดินกลับไปถึงที่จอดรถด้วยกันโดยไม่มีใครรีบ", effects: {happiness: 2, relations: 2, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เสื้อคับกว่าที่คิด เขาขอบคุณแล้วถือถุงไว้ทั้งคืน ขากลับคุณเดินเพราะไม่เหลือค่ารถ", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: last_food
+        text: "ชวนกินซุ้มสุดท้ายจนหมดตัว"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: listen_band
+        text: "ชวนนั่งฟังดนตรี ไม่ต้องจ่ายอะไร"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: free_samples
+        text: "พาเดินชิมฟรีทุกถาดจนอิ่ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ชิมครบแปดถาดโดยไม่เสียบาท เขาขำจนบอกว่านัดหน้าให้คุณพาอีก", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถาดที่สามแม่ค้าจำหน้าได้ ยื่นถุงมาถามว่าจะรับกี่ขีด เขาเดินไปรอหน้าซุ้มถัดไป", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_price_sign_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45], year: [2565, 2650], occupation: [factory, service, clerk, technician, professional, manager]}
+    title: "ขึ้นอีกสิบบาทต่อจาน"
+    text: "เช้านี้ร้านตามสั่งหน้าที่ทำงานมีกระดาษแปะใหม่ ข้าวกะเพราขึ้นจานละสิบบาท ป้าเจ้าของร้านก้มหน้าผัดไม่มองใคร บอกเบา ๆ ว่าใจจริงไม่อยากขึ้น ลูกค้าแถวนี้รายได้ไม่มาก แต่ก๊าซถังใหม่ขึ้นจนไม่รู้จะเอาอะไรมาจ่าย"
+    choices:
+      - id: keep_paying
+        text: "จ่ายต่อ ไม่บ่นสักคำ"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: cheaper_shop
+        text: "ย้ายไปร้านถูกกว่าซอยถัดไป"
+        effects: {relations: -1, money: {unit: income_x, amount: 0.02}}
+        merit: [{cat: neutral}]
+      - id: less_side
+        text: "ขอลดกับข้าวแทนจ่ายเพิ่ม"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: bargain_rice
+        text: "ต่อรองขอข้าวพูนจานแทนลดราคา"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าหัวเราะ เขียนต่อท้ายป้ายว่าข้าวพูนราคาเดียวกัน คนข้างหลังสั่งตามคุณทั้งแถว", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้ายกทัพพีชี้ถังก๊าซหลังร้าน ถามว่าจะช่วยออกค่าถังไหม ทั้งแถวเงียบ", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: food_khanomkrok_leave_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59], occupation: [clerk, technician, professional, manager]}
+    title: "ขายแค่วันละสามชั่วโมง"
+    text: "ร้านขนมครกโบราณที่คุณกินมาตั้งแต่เด็กยังโม่แป้งเอง เปิดวันละแค่สามชั่วโมง ตรงเวลางานพอดี แถวยาวตั้งแต่เตายังไม่ร้อน อาทิตย์นี้เพื่อนเก่าจากต่างจังหวัดจะมาเยี่ยม และเขาพูดถึงขนมครกถาดนี้มาสามปีแล้ว"
+    choices:
+      - id: take_leave
+        text: "ลาครึ่งวันไปต่อแถวเอง"
+        effects: {happiness: 2, network: -1}
+        merit: [{cat: neutral}]
+      - id: ask_junior
+        text: "วานน้องที่ออฟฟิศแวะซื้อให้"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: weekend
+        text: "รอวันเสาร์ พาเพื่อนไปต่อคิว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยืนคุยกันในแถวเกือบชั่วโมง ถึงคิวก็ได้ถาดสุดท้ายพอดี", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปถึงตอนป้าเก็บเตาแล้ว เพื่อนบอกงั้นต้องรออีกสามปี", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: fake_doctor
+        text: "ลาว่าไปหาหมอ แล้วไปต่อแถว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ขนมครกร้อนจนปากพอง กลับมาหัวหน้าถามผลตรวจ คุณตอบว่าน้ำตาลปกติดี", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจอหัวหน้ายืนอยู่หน้าคุณสองคิว ทั้งคู่ซื้อเสร็จแล้วไม่พูดเรื่องนี้อีกเลย", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

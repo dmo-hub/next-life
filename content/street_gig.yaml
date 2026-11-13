@@ -1,0 +1,539 @@
+# ร่างเรื่อง งานหาเช้ากินค่ำ · ลงเกมแล้ว ใบ 245 จากร่าง 244 · ผ่าน workflow ใบ 244
+# ร่างเรื่อง งานหาเช้ากินค่ำ · 15 ใบ · ยังไม่ลงเกม · แก้ตามข้อค้านรอบ 1 · การ์ดที่อ้างงานประจำกั้นด้วย when.occupation · ไม่ใส่จำนวนเงินเป็นบาท · ไม่ตั้งธงใหม่
+events:
+  - id: gig_no_holiday_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [5, 12]}
+    title: "ป้าขายขนมไม่เคยหยุด"
+    text: "วันหยุดยาวถนนหน้าบ้านเงียบกริบ มีแค่ป้าขายขนมปากซอยที่ยังตั้งถาดเหมือนทุกวัน ป้าบอกว่าขายแบบนี้จนส่งลูกเรียนจบปริญญาไปคนหนึ่งแล้ว วันนี้ขนมยังเหลือเต็มถาด ป้าเหลือบมองคุณที่ยืนว่างอยู่ตรงนั้น"
+    choices:
+      - id: gig_nh_wrap_01
+        text: "ช่วยป้าห่อขนมจนเย็น"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าสอนพับใบตองไม่ให้มุมรั่ว ขากลับได้ขนมห่อโตกว่าที่เคยซื้อ", effects: {relations: 1, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "คุณห่อจนมุมบานทุกชิ้น ป้ายิ้มแล้วแอบห่อใหม่ตอนคุณหันหลัง", effects: {happiness: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: gig_nh_ask_01
+        text: "ถามป้าว่าทำไมไม่หยุดบ้าง"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: gig_nh_play_01
+        text: "วิ่งไปเล่นกับเพื่อนต่อ"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: gig_nh_rival_01
+        text: "ตั้งโต๊ะขายน้ำเปล่าแข่งกับป้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ขายได้แก้วเดียวให้ป้า ป้าจ่ายเป็นขนมหนึ่งห่อ คุณประกาศตัวเป็นเถ้าแก่ทันที", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แดดเปรี้ยงจนคุณดื่มน้ำหมดโต๊ะเอง กิจการปิดก่อนเที่ยง", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_stall_pack_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [16, 18]}
+    title: "เก็บแผงตอนตลาดวาย"
+    text: "ปิดเทอมคุณไปช่วยป้าข้างบ้านเก็บแผงตอนตลาดวายกับรุ่นพี่ในซอย พับผ้าใบ ยกลังขึ้นรถ เสร็จราวสี่ทุ่ม ป้าให้เป็นค่าขนมทุกคืน คืนนี้ลังเสื้อใบหนึ่งหล่นลงแอ่งน้ำ ไม่มีใครเห็นนอกจากคุณ"
+    choices:
+      - id: gig_sp_tell_01
+        text: "บอกป้าตรง ๆ ว่าลังเปียก"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าบ่นสามประโยค แล้วบอกว่าช่วยกันมาตั้งนานเพิ่งมีคนบอก คืนต่อมาเรียกคุณก่อนใคร", effects: {relations: 2}, merit: [{cat: sila, level: 1}]}
+          - {weight: 1, text: "ป้าหน้าบึ้งทั้งคืน คุณเกรงใจเลยขอเอาเสื้อทั้งลังกลับไปซักที่บ้าน", effects: {health: -1, knowledge: 1}, merit: [{cat: sila, level: 1}]}
+        merit: [{cat: sila, level: 1}]
+      - id: gig_sp_dry_01
+        text: "เอาเสื้อไปผึ่ง ไม่บอกใคร"
+        outcomes:
+          - {weight: 1, ok: true, text: "เช้ามืดเสื้อแห้งพอดี ไม่มีใครรู้ แต่คุณแทบไม่ได้นอน", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าดมเสื้อเหม็นอับตั้งแต่ตัวแรก คนช่วยเก็บแผงทุกคนหันมามองกันเอง", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_sp_elder_01
+        text: "ถามรุ่นพี่ว่าเคยเจอแบบนี้ไหม"
+        effects: {network: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gig_sp_dance_01
+        text: "ถือลังเต้นหน้าพัดลมไล่น้ำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "รุ่นพี่หัวเราะจนต้องวางของ แล้วมาช่วยกันสะบัดเสื้อทีละตัว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลังหลุดมือ ลอยไปกระแทกพัดลมของป้าจนใบพัดเบี้ยว", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_four_houses_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [13, 15]}
+    title: "สี่บ้านในรอบเดียว"
+    text: "ปิดเทอมคุณมาช่วยร้านก๋วยเตี๋ยวส่งของ เย็นนี้มีคนสั่งพร้อมกันสี่บ้าน เถ้าแก่แขวนถุงจนแฮนด์จักรยานเอียง ค่าขนมคิดเป็นเที่ยว ไม่ได้คิดเป็นบ้าน บ้านแรกอยู่ปากซอย บ้านสุดท้ายอยู่ข้ามคลอง แล้วถุงแรกก็เริ่มมีน้ำซุปซึม"
+    choices:
+      - id: gig_fh_far_01
+        text: "ไปบ้านไกลก่อน แล้วย้อนกลับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "บ้านข้ามคลองได้ของร้อน ๆ บอกเถ้าแก่ว่าเด็กคนนี้ใช้ได้", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ย้อนกลับมาถึงปากซอย บ้านแรกยืนกอดอกรออยู่หน้าประตู", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_fh_near_01
+        text: "ไล่จากบ้านใกล้ไปบ้านไกล"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: gig_fh_split_01
+        text: "ขอเถ้าแก่แบ่งเป็นสองเที่ยว"
+        outcomes:
+          - {weight: 1, ok: true, text: "เถ้าแก่ทำหน้าเหมือนเสียเงิน แต่พอไม่มีใครบ่นเรื่องน้ำซุป ก็ให้ทำแบบนี้ทุกวัน", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เถ้าแก่บอกว่าสมัยก่อนหกบ้านยังไปได้ แล้วเล่าเรื่องนั้นจนเลยเวลาปิดร้าน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_fh_tip_01
+        text: "เรียงตามบ้านที่ให้ทิปเก่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "บ้านทิปเก่งได้ก่อน วันนี้ทิปดีเป็นพิเศษ คุณเริ่มจดลงสมุดอย่างจริงจัง", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บ้านทิปเก่งสั่งไปแค่น้ำเปล่าถุงเดียว ส่วนสามบ้านที่เหลือรอจนเส้นอืด", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_fh_song_01
+        text: "ร้องเพลงที่อยู่แล้วถีบเต็มแรง"
+        outcomes:
+          - {weight: 1, ok: true, text: "จบเพลงพอดีหน้าบ้านสุดท้าย ครบทุกถุง บ้านข้ามคลองขอให้ร้องอีกรอบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้องเพลินจนสลับท่อน บ้านแรกได้เย็นตาโฟของบ้านข้ามคลอง ส่วนบ้านข้ามคลองได้เพลงไปฟรี ๆ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_queue_turn_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [19, 23], occupation: [labor, service, craft]}
+    title: "ยายคนนี้ขึ้นแต่คันคุณ"
+    text: "เดือนแรกที่มานั่งคิวรถรับจ้างปากซอย กติกามีข้อเดียว รายได้ต้องหมุนเวียนถึงทุกคน ใครหัวแถวคนนั้นไป แต่ยายบ้านปลายซอยเดินผ่านหัวแถวมายืนข้างคันคุณ บอกว่าขับนิ่มดี หัวแถววันนี้คือพี่ที่สอนงานคุณมาเอง"
+    choices:
+      - id: gig_qt_pass_01
+        text: "เชิญยายขึ้นคันหัวแถว"
+        outcomes:
+          - {weight: 1, ok: true, text: "พี่หัวแถวพยักหน้าเงียบ ๆ ยายบ่นตลอดทาง แต่เย็นนั้นคนทั้งคิวเรียกคุณไปกินข้าวด้วย", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยายเดินกลับบ้านเองเลย ตั้งแต่นั้นเห็นคุณทีไรก็ทำเป็นมองฟ้า", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_qt_share_01
+        text: "รับยาย แล้วแบ่งค่ารอบให้พี่"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: gig_qt_take_01
+        text: "รับยายไปเงียบ ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "วันนั้นไม่มีใครว่าอะไร ยายแนะนำเพื่อนบ้านให้มาขึ้นคันคุณอีกสองคน", effects: {money: {unit: income_x, amount: 0.03}, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตอนเย็นเก้าอี้ของคุณถูกย้ายไปท้ายแถว และไม่มีใครรู้ว่าใครย้าย", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_qt_vote_01
+        text: "เรียกทั้งคิวยกมือโหวตกลางถนน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยายยกมือด้วย คะแนนเลยชนะขาด ทั้งคิวตกลงว่าคนประจำเลือกคันได้ถ้าแบ่งค่ารอบ", effects: {network: 1, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ระหว่างนับคะแนน ยายขึ้นรถสองแถวไปเรียบร้อยแล้ว", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_no_show_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [21, 26], occupation: [labor, service, craft]}
+    title: "กล่องข้าวไม่มีเจ้าของ"
+    text: "คุณรับจ้างส่งของเก็บเงินปลายทาง วันละสองสามรอบต้องเจอแบบนี้ ซื้อข้าวไปส่งถึงหน้าบ้านแล้วเคาะเท่าไหร่ก็ไม่มีคนเปิด ค่ารอบได้นิดเดียว แต่ค่าข้าวในกล่องคุณออกไปก่อนแล้ว กล่องนี้ยังอุ่นอยู่เลย"
+    choices:
+      - id: gig_ns_wait_01
+        text: "นั่งรอหน้าบ้านต่ออีกครึ่งชั่วโมง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของบ้านกลับมาพอดี ขอโทษยกใหญ่แล้วจ่ายให้เกินราคา", effects: {money: {unit: income_x, amount: 0.01}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รอจนยุงกัดครบสองขา ไม่มีใครมา รอบถัดไปก็หลุดมือด้วย", effects: {health: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_ns_eat_01
+        text: "นั่งกินเองหน้าบ้านนั้นเลย"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: gig_ns_guard_01
+        text: "ยกให้ลุงยามปากซอย"
+        effects: {relations: 1, network: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: dana, level: 1}]
+      - id: gig_ns_rule_01
+        text: "ตั้งกฎใหม่ เจ้าใหม่ต้องมัดจำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนสั่งเล่น ๆ หายไปเอง เงินในกระเป๋าไม่รั่วอีก", effects: {knowledge: 1, money: {unit: income_x, amount: 0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนสั่งหน้าใหม่ได้ยินว่าต้องมัดจำ ก็หันไปใช้คนส่งเจ้าอื่นสองบ้าน", effects: {relations: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_ns_shout_01
+        text: "ตะโกนชื่อกับข้าวให้ทั่วซอย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนข้างบ้านโผล่หน้ามาขอซื้อต่อ บอกว่าฟังแล้วหิวขึ้นมาทันที", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งซอยรู้ว่าบ้านนั้นสั่งอะไร แต่ไม่มีใครรู้ว่าเจ้าของไปไหน", effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_win_entry_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [26, 30], occupation: [labor, service, craft]}
+    title: "ค่าเข้าวินผ่อนได้ไหม"
+    text: "วินหน้าตลาดเหลือเสื้ออยู่ตัวเดียว หัวหน้าวินบอกว่าใครจะมานั่งคิวต้องจ่ายค่าเข้าก่อน ย่านรถเยอะก็แพงตามย่าน ก้อนนี้เท่ากับเงินเก็บของคุณทั้งปี วินซอยหลังราคาครึ่งเดียว แต่ทั้งวันมีคนเดินผ่านไม่ถึงสิบ"
+    choices:
+      - id: gig_we_lump_01
+        text: "จ่ายก้อนเดียวให้จบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณได้เสื้อวันเดียวกับที่ตลาดคนแน่น ปีเดียวก็ได้ทุนคืนเกือบหมด", effects: {money: {unit: income_x, amount: -0.15}, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตลาดย้ายทางเข้าไปอีกฝั่งตั้งแต่เดือนถัดมา คุณใส่เสื้อที่แพงที่สุดในชีวิตนั่งมองถนนว่าง", effects: {money: {unit: income_x, amount: -0.9}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_we_install_01
+        text: "ขอผ่อนเป็นงวดรายเดือน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวหน้าวินยอมแบ่งเป็นสิบงวด งวดสุดท้ายยังแถมเลี้ยงข้าวคุณหนึ่งมื้อ", effects: {money: {unit: income_x, amount: -0.3}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผ่อนได้ แต่ที่บวกเพิ่มมาทำให้เหมือนซื้อเสื้อสองตัว", effects: {money: {unit: income_x, amount: -0.7}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_we_back_01
+        text: "ไปนั่งวินซอยหลังแทน"
+        effects: {money: {unit: income_x, amount: -0.5}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: gig_we_skip_01
+        text: "ไม่เข้าวิน หางานส่งของแทน"
+        effects: {knowledge: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: gig_we_curry_01
+        text: "เสนอจ่ายเป็นแกงถุงทุกเที่ยง"
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวหน้าวินชิมแล้วนิ่งไปนาน ก่อนตกลงลดค่าเข้าลงครึ่งหนึ่ง แลกแกงทุกเที่ยงหนึ่งปี", effects: {money: {unit: income_x, amount: -0.4}, relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าวินบอกว่าเงินกินได้ ส่วนแกงนี่กินไม่ลง คนทั้งวินจำคุณได้ในชื่อคนแกงเค็ม", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_shift_start_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 35], occupation: [labor, service, craft]}
+    title: "ออกรถมายังติดลบ"
+    text: "ตีห้าคุณรับกุญแจแท็กซี่เช่า กะละสิบสองชั่วโมง ค่าเช่าจ่ายก่อน ตอนคืนต้องเติมให้เต็ม วิ่งไปหลายสิบกิโลแล้วเงินทั้งหมดยังเป็นของอู่ คิดดูแล้วถ้าหักค่าเช่า ค่าน้ำมัน ค่าซ่อม วันนี้ต้องวิ่งให้ได้อีกเท่าตัวถึงจะเหลือกลับบ้าน"
+    choices:
+      - id: gig_ss_far_01
+        text: "จอดรอเที่ยวไกลเที่ยวเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนไปต่างจังหวัดขึ้นตั้งแต่สิบโมง ค่าเช่าหมดก่อนเที่ยง ที่เหลือของคุณล้วน ๆ", effects: {money: {unit: income_x, amount: 0.04}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "จอดดูนกพิราบจนบ่ายสาม ได้แต่คนถามทางสองคน", effects: {money: {unit: income_x, amount: -0.03}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_ss_short_01
+        text: "วนหน้าตลาด เก็บเที่ยวสั้น"
+        effects: {money: {unit: income_x, amount: 0.01}, health: -1}
+        merit: [{cat: neutral}]
+      - id: gig_ss_envelope_01
+        text: "แบ่งเงินใส่ซองแยกทีละค่า"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: gig_ss_ask_01
+        text: "ขออู่ลดค่าเช่าวันฝนตก"
+        outcomes:
+          - {weight: 1, ok: true, text: "เถ้าแก่อู่ลดให้เฉพาะวันที่น้ำท่วมถึงเข่า แต่แค่นั้นก็รอดไปหลายวัน", effects: {money: {unit: income_x, amount: 0.02}, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เถ้าแก่อู่ถามกลับว่าฝนตกแล้วรถคันนี้ไม่เปียกหรือ แล้วเดินหนีไป", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_ss_garland_01
+        text: "พูดกับมาลัยดอกมะลิหน้ารถ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้โดยสารคนแรกได้ยินทั้งหมด หัวเราะจนทิปให้เพิ่มเป็นค่าละคร", effects: {happiness: 2, money: {unit: income_x, amount: 0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มาลัยดอกมะลิร่วงใส่ตักตรงไฟแดง ผู้โดยสารรีบขอลงก่อนถึงที่", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_shift_mom_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [34, 39], occupation: [labor, service, craft], family: [{role: parent, sex: หญิง, alive: true}]}
+    title: "กุญแจดอกเดียวสองกะ"
+    text: "แท็กซี่คันเดียวเลี้ยงคนสองคน คุณขับกะกลางวันตั้งแต่ตีห้าครึ่ง แม่ขับกะกลางคืน เจอกันวันละสิบนาทีตอนส่งกุญแจ เช้านี้แม่ลงจากรถแล้วเดินช้ากว่าเดือนก่อน บอกว่าไฟหน้ารถสวนมาเริ่มแสบตา แต่งวดรถยังเหลืออีกปีครึ่ง"
+    choices:
+      - id: gig_sm_swap_01
+        text: "ขอสลับ รับกะกลางคืนเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "แม่บ่นว่ากะกลางวันรถติด แต่หน้าตาสดใสขึ้นในสองอาทิตย์", effects: {relations: 2, health: -1}, merit: [{cat: care_parents, level: 1}]}
+          - {weight: 1, text: "คุณนอนกลางวันไม่หลับ ขับรถกลางคืนด้วยตาที่ปรืออยู่ข้างหนึ่ง", effects: {health: -2, relations: 1}, merit: [{cat: care_parents, level: 1}]}
+        merit: [{cat: care_parents, level: 1}]
+      - id: gig_sm_stop_01
+        text: "ชวนแม่เลิกขับ หาคนมาเช่ากะแทน"
+        effects: {money: {unit: income_x, amount: -0.03}, relations: 1, happiness: 1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: gig_sm_eye_01
+        text: "พาแม่ไปตรวจตาก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หมอให้แว่นใหม่ แม่ลองใส่แล้วบอกว่าเพิ่งเห็นว่าคุณแก่ลงเยอะ", effects: {relations: 1, happiness: 2, money: {unit: income_x, amount: -0.01}}, merit: [{cat: care_parents, level: 1}]}
+          - {weight: 1, text: "หมอเตือนว่าไม่ควรขับกลางคืน แม่พยักหน้า แล้วออกกะตามเดิมคืนนั้น", effects: {happiness: -1, knowledge: 1}, merit: [{cat: care_parents, level: 1}]}
+        merit: [{cat: care_parents, level: 1}]
+      - id: gig_sm_note_01
+        text: "แปะโน้ตไว้หน้ารถทุกเช้า"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: gig_sm_hide_01
+        text: "ซ่อนกับข้าวไว้ใต้เบาะให้แม่เจอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "แม่เจอแกงจืดถ้วยโปรดตอนตีสอง เช้าวันต่อมาเจอน้ำพริกซ่อนคืนใต้เบาะคุณ", effects: {relations: 2, happiness: 2}, merit: [{cat: care_parents, level: 1}]}
+          - {weight: 1, text: "แม่ไม่เจอ รถทั้งคันหอมแกงไปอีกสามวัน ผู้โดยสารถามว่าขายด้วยไหม", effects: {happiness: 1, relations: -1}, merit: [{cat: care_parents, level: 1}]}
+        merit: [{cat: care_parents, level: 1}]
+
+  - id: gig_camp_home_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45], occupation: [labor, craft], family: [{role: child, alive: true, age: [4, 17]}]}
+    title: "กลับบ้านปีละสองหน"
+    text: "แคมป์คนงานย้ายตามโครงการทีละสองสามปี หยุดงานวันหนึ่งก็ไม่มีเงินวันนั้น คุณจึงได้กลับบ้านแค่ปีใหม่กับสงกรานต์ คราวนี้ลูกฝากข่าวมาว่างานโรงเรียนอยู่อาทิตย์หน้า ซึ่งตรงกับวันเทปูนใหญ่พอดี"
+    choices:
+      - id: gig_ch_go_01
+        text: "ลางานกลับไปงานโรงเรียน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกเห็นคุณยืนหลังห้องแล้วลืมบทไปครึ่งเพลง แต่เย็นนั้นเดินจูงมือไม่ยอมปล่อย", effects: {relations: 2, happiness: 2, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กลับถึงแคมป์ หัวหน้าชุดเอาคนอื่นลงแทนไปแล้ว ต้องรอโครงการหน้า", effects: {relations: 1, money: {unit: income_x, amount: -0.06}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_ch_money_01
+        text: "ส่งเงินเพิ่มแทนการไป"
+        effects: {money: {unit: income_x, amount: -0.01}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: gig_ch_letter_01
+        text: "เขียนจดหมายยาวฝากครูอ่านให้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครูให้ลูกอ่านหน้าห้อง ลูกอ่านตะกุกตะกักแต่เสียงดังที่สุดในวันนั้น", effects: {relations: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "จดหมายไปถึงหลังงานเลิกสามวัน ลูกเก็บไว้ในกล่องเดียวกับของขวัญปีใหม่", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_ch_visit_01
+        text: "ปิดเทอมนี้ค่อยชวนลูกมาดูแคมป์"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: gig_ch_helmet_01
+        text: "ฝากหมวกแข็งไปนั่งแทนตัว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกวางหมวกไว้บนเก้าอี้หน้าเวที ครูบอกว่าเป็นผู้ปกครองที่นั่งนิ่งที่สุดในงาน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หมวกไปถึงหลังงานเลิก เลยกลายเป็นที่ใส่ลูกแก้ว", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_cross_soi_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [40, 45], occupation: [labor, service, craft]}
+    title: "คันเขตอื่นมาจอดหน้าคิว"
+    text: "บ่ายนี้รถรับจ้างจากเขตอื่นมาจอดรับคนหน้าคิวของคุณอีกแล้ว เสื้อไม่ใช่สีเดียวกัน ไม่เคยเห็นหน้ากันมาก่อน คนในคิวลุกขึ้นยืนกันหลายคน วันนี้ยังไม่มีใครได้เที่ยวเกินสาม และทุกคนกำลังหันมาดูว่าคุณที่นั่งมานานสุดจะทำยังไง"
+    choices:
+      - id: gig_cs_talk_01
+        text: "เดินไปคุยกับคนขับดี ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเพิ่งถูกไล่จากเขตตัวเองมา คุณบอกชื่อคิวที่ยังรับคนให้ เขาไม่มาจอดตรงนี้อีก", effects: {relations: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เขาตอบว่าถนนไม่ใช่ของใคร แล้วรับคนขึ้นไปต่อหน้าทุกคน", effects: {happiness: -1, relations: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: gig_cs_heads_01
+        text: "นัดหัวหน้าสองคิวมาคุยกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตกลงเส้นแบ่งกันได้ที่ร้านกาแฟ เส้นคือหน้าร้านนี้ เจ้าของร้านยิ้มที่สุด", effects: {network: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประชุมสามรอบ ได้ข้อสรุปว่าจะประชุมอีก ส่วนรถก็ยังมาจอดเหมือนเดิม", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_cs_report_01
+        text: "แจ้งเจ้าหน้าที่ว่าเขาวิ่งล้ำเขต"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: gig_cs_ignore_01
+        text: "ปล่อยไป วันนี้คนยังพอมี"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: gig_cs_chess_01
+        text: "ท้าแข่งหมากรุกชิงหน้าคิว"
+        outcomes:
+          - {weight: 1, ok: true, text: "แข่งกันถึงพลบค่ำ คนทั้งสองคิวมามุงจนลืมรับคน คุณชนะแบบเฉียดฉิว", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณแพ้สามตาติด แล้วต้องขอแก้มือในที่ประชุมของคิวตัวเอง", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_return_late_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 50], occupation: [labor, service, craft]}
+    title: "เหลือสี่สิบนาทีต้องคืนรถ"
+    text: "ปลายกะ อีกสี่สิบนาทีต้องถึงอู่ คืนช้าเสียเพิ่มเป็นรายชั่วโมง ข้างทางมีคนแบกกระเป๋าใบใหญ่โบกมือ จะไปไกลถึงสุดสาย เที่ยวนี้จ่ายดีแน่ แต่ไฟแดงข้างหน้าค้างมาสามนาทีแล้ว และคิวปั๊มก่อนคืนรถก็ยาวออกมาถึงถนน"
+    choices:
+      - id: gig_rl_take_01
+        text: "รับเลย คืนช้าก็คืนช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "เที่ยวไกลจ่ายมากกว่าค่าปรับพอให้กินข้าวดี ๆ ได้สองมื้อ", effects: {money: {unit: income_x, amount: 0.03}, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถนนกลับอู่ปิดซ่อม ค่าปรับกินค่ารอบไปจนเกลี้ยง", effects: {money: {unit: income_x, amount: -0.04}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_rl_refuse_01
+        text: "ขอโทษเขา แล้วขับไปอู่"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: gig_rl_hand_01
+        text: "โบกคันหลังให้รับแทน"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: gig_rl_witness_01
+        text: "รับเขา แล้วขอให้ไปยืนยันรถติด"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาลงไปยืนยันกับเถ้าแก่จนเถ้าแก่หัวเราะ คืนนั้นไม่คิดค่าปรับ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้โดยสารฟังแผนแล้วขอลงตรงไฟแดง ทิ้งกระเป๋าใบใหญ่ไว้ให้วิ่งไล่", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_half_pay_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [48, 54], occupation: [labor, service, craft]}
+    title: "ทำเกือบเดือน ได้หยิบมือ"
+    text: "ไม่มีสัญญา มีแต่คำพูดว่าจบงานแล้วคิดให้ คุณทำรายวันเกือบเดือน เจ้าของงานจ่ายครึ่งทางแล้วบอกว่าจะหักลบทีหลัง วันนี้เปิดซองมาเหลือนิดเดียว ค่าข้าวมื้อละไม่กี่บาทก็จริง แต่รวมทั้งเดือนแล้วมากกว่าเงินในซอง"
+    choices:
+      - id: gig_hp_ask_01
+        text: "ทวงตรง ๆ พร้อมสมุดจดวัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของงานเห็นวันที่ครบทุกบรรทัด ยอมจ่ายเพิ่มแม้จะไม่เต็ม", effects: {money: {unit: income_x, amount: 0.03}, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาบอกว่าสมุดใครก็เขียนได้ แล้วไม่เรียกคุณไปทำงานอีก", effects: {money: {unit: income_x, amount: -0.03}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_hp_office_01
+        text: "ไปแจ้งพนักงานตรวจแรงงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ใช้เวลาเดือนกว่า เงินที่ค้างได้คืนเกือบครบ คนในกลุ่มมาขอให้คุณช่วยกรอกแบบฟอร์ม", effects: {money: {unit: income_x, amount: 0.04}, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไปสามรอบ เสียค่ารถมากกว่าเงินค้าง เรื่องยังรอลายเซ็นอยู่", effects: {money: {unit: income_x, amount: -0.02}, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_hp_group_01
+        text: "รวมเพื่อนร่วมงานไปคุยพร้อมกัน"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: gig_hp_letgo_01
+        text: "ปล่อยไป หางานใหม่ดีกว่า"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: gig_hp_dinner_01
+        text: "ตามไปกินข้าวร้านเดียวกับเขา"
+        outcomes:
+          - {weight: 1, ok: true, text: "เย็นที่ห้า เจ้าของงานเลื่อนซองมาให้ข้ามโต๊ะโดยไม่พูดอะไร", effects: {money: {unit: income_x, amount: 0.02}, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาย้ายไปกินร้านอื่น เงินไม่ได้คืน แต่คุณเจอข้าวขาหมูที่อร่อยที่สุดในย่าน", effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_foreman_pocket_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [52, 59], occupation: [labor, craft]}
+    title: "ควักกระเป๋าจ่ายลูกน้อง"
+    text: "งานชะงักมาสามอาทิตย์ เงินงวดจากเจ้าของโครงการยังไม่ออก ชุดช่างของคุณมีแปดคน ค่าแรงรับกันเป็นรายวันมาตลอด เย็นวันศุกร์พวกเขายืนรอหน้าเพิงอย่างเงียบ ๆ เงินที่คุณเก็บไว้ซ่อมหลังคาพอจ่ายได้รอบหนึ่งพอดี"
+    choices:
+      - id: gig_fp_pay_01
+        text: "ควักจ่ายให้ครบทุกคน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เงินงวดออกในเดือนถัดมา ทั้งชุดอยู่ด้วยกันจนจบงาน แถมมาซ่อมหลังคาให้ฟรีหนึ่งเสาร์", effects: {relations: 2, network: 1, money: {unit: income_x, amount: -0.04}}, merit: [{cat: help_others, level: 2}]}
+          - {weight: 1, text: "เงินงวดเลื่อนต่ออีกสองเดือน ฝนแรกตกในบ้านคุณทั้งคืน", effects: {relations: 1, happiness: -2, money: {unit: income_x, amount: -0.06}}, merit: [{cat: help_others, level: 2}]}
+        merit: [{cat: help_others, level: 2}]
+      - id: gig_fp_half_01
+        text: "จ่ายครึ่งหนึ่ง ที่เหลือบอกตามตรง"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: gig_fp_owner_01
+        text: "ไปนั่งรอเจ้าของโครงการถึงที่"
+        outcomes:
+          - {weight: 1, ok: true, text: "นั่งตั้งแต่เช้าจนคนในสำนักงานชงกาแฟให้ เจ้าของยอมเซ็นงวดย่อยให้ก้อนหนึ่ง", effects: {money: {unit: income_x, amount: 0.02}, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของไม่อยู่สามวันติด คุณเริ่มรู้จักยามทุกคนในตึก", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_fp_tell_01
+        text: "บอกทุกคนว่ายังไม่มีเงิน"
+        effects: {relations: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gig_fp_porridge_01
+        text: "ตั้งหม้อข้าวต้มเลี้ยงก่อนบอกข่าว"
+        outcomes:
+          - {weight: 1, ok: true, text: "อิ่มแล้วทุกคนฟังจบโดยไม่มีใครลุก ช่างปูนถามว่าข้าวต้มหม้อนี้จะหักจากค่าแรงไหม", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทุกคนคิดว่าเลี้ยงฉลองเงินงวดออก พอรู้ความจริงข้าวต้มก็จืดลงทันที", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_gone_excuse_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 70]}
+    title: "น้ำมันจะหมด ส่งรถไม่ทัน"
+    text: "หมอนัดเจาะเลือดตอนเช้า ลุงคนขับเจ้าเก่าหน้าปากซอยที่คุณนั่งมาหลายสิบปี ยังใช้ข้ออ้างเดิม น้ำมันจะหมด ส่งรถไม่ทัน ชุดนี้คุณฟังมาตั้งแต่ยังหนุ่มยังสาว เช้านี้ปากซอยมีคันเขาคันเดียว เข่าเริ่มล้า เวลานัดเหลืออีกครึ่งชั่วโมง"
+    choices:
+      - id: gig_ge_extra_01
+        text: "บวกค่ารถให้ลุงอีกหน่อย"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้ำมันมีพอไปถึงโรงพยาบาลพอดีอย่างน่าอัศจรรย์ คุณถึงก่อนหมอ", effects: {health: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงรับเงินแล้วไปส่งครึ่งทาง บอกว่าคราวนี้น้ำมันจะหมดจริง คุณถึงตอนพยาบาลเก็บเข็ม", effects: {health: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_ge_debt_01
+        text: "ทวงว่านั่งคันลุงมาหลายสิบปี"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงเงียบไปพักหนึ่ง แล้วบอกว่าขึ้นมา น้ำมันเมื่อกี้คงเพิ่งนึกได้ว่ายังมี", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงทวงกลับว่าสมัยก่อนคุณยังติดค่ารถอยู่สองเที่ยว นัดหมอต้องเลื่อนไปอีกอาทิตย์", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_ge_bus_01
+        text: "เดินไปต่อรถประจำทาง"
+        effects: {health: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: gig_ge_neighbor_01
+        text: "วานคนข้างบ้านไปส่ง"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: gig_ge_ledger_01
+        text: "กางสมุดจดข้ออ้างให้ลุงดู"
+        outcomes:
+          - {weight: 1, ok: true, text: "ข้ออ้างหลายสิบปีเรียงตามวันที่ ลุงอ่านแล้วหัวเราะจนต้องสตาร์ตรถ คุณถึงก่อนหมอ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงขอยืมสมุดไปหาข้ออ้างที่ยังไม่เคยใช้ คุณยืนรอจนเลยเวลานัด", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: gig_curry_cart_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [64, 80], occupation: [service, labor]}
+    title: "ขายจนจำปีไม่ได้"
+    text: "รถเข็นข้าวแกงของคุณจอดริมทางนานจนจำไม่ได้ว่ากี่ปี จำได้แค่ว่าตรงนี้เคยมีโรงหนังสองโรง ลูกค้ารุ่นแรกพาหลานมากินแล้ว เช้านี้เจ้าหน้าที่มาแจ้งว่าริมทางจะห้ามขาย ที่ในตลาดก็ต้องจ่ายค่าเช่า ซึ่งคุณไม่มีเก็บไว้"
+    choices:
+      - id: gig_cc_rent_01
+        text: "กัดฟันเช่าแผงในตลาด"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนกินเก่าตามเข้ามาถึงในตลาด เดินวนสามรอบกว่าจะเจอ แต่ก็เจอ", effects: {relations: 2, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แผงในตลาดอยู่ลึกจนแม้แต่คุณยังหลงตอนเช้า ขายไม่พอค่าเช่า", effects: {happiness: -2, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_cc_close_01
+        text: "ปิดรถเข็น พักเสียที"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: gig_cc_teach_01
+        text: "สอนสูตรแกงให้เด็กล้างจาน"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: gig_cc_petition_01
+        text: "ล่ารายชื่อคนกินขออยู่ต่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "รายชื่อยาวสี่หน้า เจ้าหน้าที่ขยับจุดตั้งรถเข็นไปหลังเสาไฟให้ แล้วเงียบไป", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้ชื่อมาสี่หน้า ครึ่งหนึ่งเขียนว่าขอแกงส้มเพิ่ม", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: gig_cc_farewell_01
+        text: "ติดป้ายอำลาแล้วขายวันละหม้อใหญ่"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนเก่าแห่มาจนเจ้าหน้าที่ต้องต่อคิวซื้อเอง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้ายสวยเกินจนคนคิดว่าเป็นร้านเปิดใหม่", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

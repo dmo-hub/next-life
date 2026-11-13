@@ -1,0 +1,393 @@
+# สายนักมวยเด็กค่าย (ใบ 252 จากร่าง 212)
+# ฐาน next-life origin/main 53bca785 · prefix boxer_ (กันไว้ให้เลนนี้ · การ์ด 238 sport_waikhru_tv_01 เป็นมุมคนดูทีวี ไม่ซ้ำฉาก)
+# เปิดทุกเพศ ทุกฐานะ · ใบเข้าค่ายเด็กเอียงฐานะจน ×2 (ที่มา: "ไม่มีทางเลือก" ของอดีตนักมวย) · เอียงธง sporty ของเดิม ×2
+# เวทีใหญ่ใบเดียวทุกเพศ ไม่พูดเรื่องข้อห้ามผู้หญิง (เจ้าของเลือก 2026-11-06 · ข้อเท็จจริงปี 2565 อยู่ในไฟล์รีเสิร์ช)
+# เจ้าของเลือก 2026-11-06: ลงทุกใบ (13 หลังรวมเวทีใหญ่) · ใบวัยรุ่น w3 · ใบเข้าค่ายเด็กคูณฐานะจน ×2
+# ไต่ขั้นด้วยธง + นัด: เข้าค่าย → ไฟต์แรก 1 ปี → คุมพิกัด 2–3 ปี → เวทีใหญ่ 1–2 ปี + พนัน → ค่าตัว · ใบกองถือธงรอบข้าง
+# ใบนัดล้วนไม่มี weight · เพดานอายุใบนัดกว้างกว่าใบต้นทาง เพราะนัดที่ when ไม่ผ่านตกเงียบ
+# decisions 414: เส้นต้นอยู่เด็ก/วัยรุ่นตามจริง ปลายสายกระจาย ทำงาน 2 กลางคน 2 ชรา 1
+# ไม่มีชื่อคน ค่าย เวที รายการ หรือแบรนด์จริง · ไม่เล่าเด็กตายบนเวที · ไม่สอนวิธีล้มมวย/โกงตาชั่ง
+events:
+  - id: boxer_kid_01
+    type: A
+    category: work_money
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 3
+    multipliers: {flags: {sporty: 2}, class: {ยากไร้: 2, ยากจนมาก: 2, ยากจน: 2}}
+    when: {age: [8, 12]}
+    title: "ค่ายมวยท้ายหมู่บ้าน"
+    text: "ค่ายมวยท้ายหมู่บ้านรับเด็กไปกินนอนซ้อม ตื่นเช้ามืดวิ่งรอบทุ่ง เย็นเตะกระสอบ ครูมวยบอกว่าเด็กรุ่นคุณขึ้นชกงานวัดได้เงินกลับบ้านแล้ว คนในบ้านเงียบกันไปพักหนึ่งก่อนหันมาถามคุณ"
+    choices:
+      - id: move_in
+        text: "ย้ายไปกินนอนที่ค่าย"
+        sets_flags: [boxer_camp, sporty]
+        effects: {health: 2, relations: -1, knowledge: -1}
+        schedules: [{event: boxer_temple_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: after_school
+        text: "ไปซ้อมแค่ตอนเย็นหลังเลิกเรียน"
+        sets_flags: [boxer_camp, sporty]
+        effects: {health: 1}
+        schedules: [{event: boxer_temple_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: stay_school
+        text: "ไม่ไป อยากเรียนหนังสือ"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: water_boy
+        text: "ไปเป็นเด็กถือถังน้ำข้างเวที"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: boxer_temple_01
+    type: A
+    category: work_money
+    stage: เด็ก
+    years: [2500, 2650]
+    when: {age: [9, 19], flags: {has: [boxer_camp]}}
+    title: "ไฟต์แรกในงานวัด"
+    text: "เวทีชั่วคราวในงานวัดตั้งอยู่ข้างชิงช้าสวรรค์ ครูมวยเอากระดาษให้ผู้ใหญ่ที่บ้านเซ็นตั้งแต่เช้า คู่ชกตัวเท่ากันแต่ชกมาแล้วหลายไฟต์ ซองค่าตัวไม่กี่ร้อยบาท ค่ายหักไปส่วนหนึ่ง คนดูรอบเวทีตะโกนราคากันเสียงดังกว่าเพลงปี่"
+    choices:
+      - id: fight
+        text: "ขึ้นชกตามที่ซ้อมมา"
+        sets_flags: [boxer_fought]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "ชนะคะแนน ซองแรกในชีวิตเอากลับไปให้ที่บ้านเกือบหมด เก็บไว้เองแค่ค่าน้ำแข็งใส", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: 0.05}}, schedules: [{event: boxer_weight_01, after_years: [2, 3]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "แพ้คะแนน ตาบวมไปสามวัน ครูมวยบอกว่าไฟต์หน้าค่อยเอาคืน", effects: {health: -1, happiness: -1}, schedules: [{event: boxer_weight_01, after_years: [3, 3]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: wait_year
+        text: "ขอซ้อมอีกปีก่อนขึ้นชก"
+        effects: {health: 1, relations: -1}
+        schedules: [{event: boxer_temple_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: quit
+        text: "ไม่ชกแล้ว กลับบ้าน"
+        clears_flags: [boxer_camp]
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: ferris
+        text: "แอบไปขึ้นชิงช้าสวรรค์ก่อนชก"
+        sets_flags: [boxer_fought]
+        effects: {happiness: 2, health: -1}
+        schedules: [{event: boxer_weight_01, after_years: [3, 3]}]
+        merit: [{cat: neutral}]
+
+  - id: boxer_teen_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.75
+    multipliers: {flags: {sporty: 2, bullied: 1.5}}
+    when: {age: [13, 17]}
+    title: "ซ้อมกับเด็กค่ายรุ่นน้อง"
+    text: "ค่ายมวยใกล้โรงเรียนเปิดให้คนนอกมาซ้อมตอนเย็น เด็กค่ายอายุน้อยกว่าคุณหลายปีแต่เตะหนักกว่าทุกคนในห้อง ครูมวยดูคุณเตะเป้าอยู่นาน แล้วถามว่าอยากขึ้นเวทีจริงไหม"
+    choices:
+      - id: join
+        text: "สมัครเป็นนักมวยของค่าย"
+        sets_flags: [boxer_camp, sporty]
+        effects: {health: 1, knowledge: -1}
+        schedules: [{event: boxer_temple_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: fitness
+        text: "ซ้อมเอาเหงื่อ ไม่ขึ้นเวที"
+        sets_flags: [sporty]
+        effects: {health: 2}
+        merit: [{cat: neutral}]
+      - id: back_off
+        text: "ไม่ไปอีก เจ็บหน้าแข้ง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: pad_holder
+        text: "ขอเป็นคนถือเป้าให้เด็กค่าย"
+        effects: {health: -1, relations: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: boxer_weight_01
+    type: A
+    category: health
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [11, 23], flags: {has: [boxer_fought]}}
+    title: "พิกัดเดิมทั้งที่ตัวโตขึ้น"
+    text: "คุณสูงขึ้นทุกปีแต่ค่ายอยากให้ชกพิกัดเดิม เพราะคนที่ชอบแทงมวยรู้จักชื่อคุณในรุ่นนี้ อีกสองวันต้องชั่งน้ำหนัก ตาชั่งบอกว่ายังเกินอยู่ ครูมวยยื่นเสื้อกันฝนให้แล้วชี้ไปทางลานวิ่งตอนเที่ยง"
+    choices:
+      - id: cut
+        text: "อดน้ำ วิ่งกลางแดดจนผ่านตาชั่ง"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "ผ่านตาชั่งพอดี ชนะไฟต์นั้น ครูมวยบอกว่าปีหน้าจะส่งไปเวทีใหญ่ในเมือง", effects: {health: -2, happiness: 1, money: {unit: income_x, amount: 0.1}}, sets_flags: [boxer_ranked], schedules: [{event: boxer_bigstage_01, after_years: [1, 2]}, {event: boxer_gamble_01, after_years: [1, 2]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผ่านตาชั่งแต่ไม่มีแรงเหลือ แพ้ตั้งแต่ยกสอง กลับมานอนซมสามวัน", effects: {health: -3, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: move_up
+        text: "ขอขึ้นรุ่นตามตัว"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจอคู่ตัวใหญ่แต่ชกได้เต็มแรง ชนะ ครูมวยยอมส่งชื่อเข้าเวทีในเมือง", effects: {health: 1, happiness: 1}, sets_flags: [boxer_ranked], schedules: [{event: boxer_bigstage_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ค่ายไม่พอใจ ไม่มีคนจัดคู่ให้อีกหลายเดือน", effects: {relations: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit
+        text: "แขวนนวม กลับไปเรียนต่อ"
+        clears_flags: [boxer_camp]
+        effects: {knowledge: 1, happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: eat_first
+        text: "กินข้าวเหนียวก่อน ค่อยคิด"
+        effects: {happiness: 2, relations: -1}
+        merit: [{cat: neutral}]
+
+  - id: boxer_ko_01
+    type: A
+    category: health
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [13, 18], flags: {has: [boxer_fought]}}
+    title: "ตื่นมาบนผ้าใบ"
+    text: "คุณจำไม่ได้ว่าล้มตอนไหน รู้ตัวอีกทีกรรมการนับจบแล้ว ปกติต้องพักอย่างน้อยสามสัปดาห์ แต่สิบวันข้างหน้ามีคู่ที่ค่ายรับไว้แล้ว เงินมัดจำก็รับมาแล้ว หัวยังมึนเวลาก้มผูกเชือกรองเท้า"
+    choices:
+      - id: rest
+        text: "พักให้ครบ แจ้งค่ายยกเลิกคู่"
+        effects: {health: 1, relations: -1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: fight_on
+        text: "ชกตามนัด ไม่อยากให้ค่ายเสียหน้า"
+        sets_flags: [boxer_head]
+        outcomes:
+          - {weight: 1, ok: true, text: "ชนะคะแนนแบบจำยกสามไม่ได้ ครูมวยชมว่าใจถึง", effects: {health: -2, happiness: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โดนน็อกซ้ำ ปวดหัวไปหลายอาทิตย์ อ่านหนังสือได้ไม่ถึงหน้า", effects: {health: -3, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: doctor
+        text: "ไปโรงพยาบาลให้หมอดูหัว"
+        effects: {health: 1, money: {unit: income_x, amount: -0.05}, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: wrong_corner
+        text: "ลุกขึ้นเดินไปผิดมุม"
+        effects: {happiness: 1, health: -1, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: boxer_gamble_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [14, 28], flags: {has: [boxer_ranked]}}
+    title: "ไม่ต้องรีบนะน้อง"
+    text: "คืนก่อนชก มีผู้ชายแปลกหน้ามานั่งรอที่หน้าห้องพักนักมวย พูดเบา ๆ ว่าไฟต์พรุ่งนี้มีคนแทงกันหลักแสน ถ้ายกท้าย ๆ ไม่ต้องรีบ จะมีซองให้มากกว่าค่าตัวทั้งปี แล้ววางเบอร์โทรไว้บนเก้าอี้"
+    choices:
+      - id: refuse
+        text: "ไม่รับ พรุ่งนี้ชกเต็มที่"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: take
+        text: "เก็บเบอร์ไว้ แล้วทำตามที่บอก"
+        hint: "ราคา: บาปเบา"
+        sets_flags: [dirty_money]
+        outcomes:
+          - {weight: 2, ok: true, text: "ได้ซองหนาตามที่ว่า แต่ครูมวยมองหน้าคุณนานผิดปกติหลังลงเวที", effects: {money: {unit: income_x, amount: 0.6, grey: true}, relations: -2, happiness: -1}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 1, text: "กรรมการเห็นท่าไม่ชก สั่งพักใบอนุญาต ชื่อคุณหายจากโปรแกรมไปหลายเดือน", effects: {relations: -2, network: -2}, merit: [{cat: greed_harm, level: 1}]}
+        merit: [{cat: greed_harm, level: 1}]
+      - id: tell_coach
+        text: "เอาเบอร์ไปให้ครูมวยดู"
+        effects: {relations: 2, network: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: wrong_number
+        text: "โทรไปสั่งข้าวผัดกับเบอร์นั้น"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+
+  - id: boxer_bigstage_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [14, 28], flags: {has: [boxer_ranked]}}
+    title: "เวทีใหญ่ในเมืองหลวง"
+    text: "ครั้งแรกที่ได้ขึ้นเวทีมาตรฐานในเมืองหลวง ไฟส่องจนมองไม่เห็นหน้าคนดู คนที่แทงมวยตะโกนราคาจากอัฒจันทร์ชั้นบน ถ้าชนะไฟต์นี้ ชื่อคุณจะได้ขึ้นอันดับของเวที ค่ายจะได้ส่วนแบ่งมากขึ้นด้วย"
+    choices:
+      - id: all_in
+        text: "ลุยตั้งแต่ยกแรก"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "ชนะน็อกยกสาม ชื่อขึ้นอันดับ นักข่าวสายมวยถ่ายรูปไปลงหน้ากีฬา", effects: {happiness: 3, network: 2, money: {unit: income_x, amount: 0.2}}, sets_flags: [boxer_star], schedules: [{event: boxer_purse_01, after_years: [1, 2]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "แพ้คะแนนสูสี คนดูปรบมือ แต่อันดับยังไม่มีชื่อคุณ", effects: {health: -1, happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: patient
+        text: "ชกตามแผนครู เก็บคะแนน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ชนะคะแนนเอกฉันท์ ค่ายจองไฟต์ต่อไปให้ทันที", effects: {happiness: 2, money: {unit: income_x, amount: 0.15}}, sets_flags: [boxer_star], schedules: [{event: boxer_purse_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "เสมอ เซียนมวยบ่นทั้งสนาม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: go_home
+        text: "ชกไฟต์นี้แล้วกลับไปเรียน"
+        clears_flags: [boxer_camp]
+        effects: {knowledge: 1, relations: 1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: dance_long
+        text: "รำไหว้ครูนานจนกรรมการเตือน"
+        effects: {happiness: 2, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: boxer_purse_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [16, 32], flags: {has: [boxer_star]}}
+    title: "ค่าตัวคู่เอก"
+    text: "คุณได้ชกคู่เอกแล้ว แต่ค่าตัวไม่ถึงครึ่งที่รุ่นพี่เคยได้ เจ้าของค่ายบ่นว่าค่าเช่าเวทีขึ้นหลายเท่า โปรโมเตอร์เลยกดค่าตัวลง รายการทุนต่างชาติยื่นสัญญามาให้ ค่าตัวสูงกว่า แต่ต้องเปลี่ยนวิธีชกให้ถูกใจคนดูต่างชาติ"
+    choices:
+      - id: sign
+        text: "เซ็นรายการต่างชาติ"
+        effects: {money: {unit: income_x, amount: 0.5}, network: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: stay
+        text: "อยู่เวทีเดิม ชกให้แฟนมวยไทย"
+        effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: 0.15}}
+        merit: [{cat: neutral}]
+      - id: renegotiate
+        text: "ขอค่ายแบ่งค่าตัวใหม่"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.3}}, text: "ค่ายยอมแบ่งเพิ่ม เพราะกลัวคุณย้ายค่าย", effects: {money: {unit: income_x, amount: 0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูมวยไม่พูดกับคุณไปทั้งเดือน", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: selfie
+        text: "รับจ้างถ่ายรูปกับนักท่องเที่ยว"
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+
+  - id: boxer_retire_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [31, 40], flags: {has: [boxer_fought]}}
+    title: "นวมคู่สุดท้าย"
+    text: "อายุสามสิบกว่า ร่างกายยังซ้อมไหว แต่ไม่มีโปรโมเตอร์ไหนจัดคู่ให้แล้ว เพื่อนรุ่นเดียวกันจากค่ายเดียวกันบางคนเปิดยิมให้ชาวต่างชาติ บางคนไปเป็นยาม ส่วนคุณยังมีนวมคู่สุดท้ายแขวนอยู่ข้างเตียง"
+    choices:
+      - id: certify
+        text: "ไปอบรมสอบเป็นครูมวย"
+        sets_flags: [boxer_coach]
+        effects: {knowledge: 2, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: own_gym
+        text: "ลงทุนเปิดยิมเล็ก ๆ"
+        requires: {money: {unit: income_x, amount: 0.3}, reason: "เงินเก็บไม่พอค่าเช่าที่กับกระสอบ"}
+        effects: {money: {unit: income_x, amount: -0.3}, network: 2, happiness: 1}
+        sets_flags: [boxer_coach]
+        merit: [{cat: neutral}]
+      - id: other_job
+        text: "แขวนนวม ไปหางานอื่น"
+        effects: {relations: 1, happiness: -1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: frame_gloves
+        text: "เอานวมใส่กรอบแขวนผนัง"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+
+  - id: boxer_coach_abroad_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [31, 45], flags: {has: [boxer_coach]}}
+    title: "ครูมวยไปต่างแดน"
+    text: "ยิมมวยในต่างประเทศติดต่อขอครูมวยไทย ค่าจ้างต่อเดือนหลายเท่าของที่เคยได้ในค่าย แต่ต้องผ่านอบรมให้มีใบรับรอง สอนเป็นภาษาที่พูดได้แค่คำนับเลข และต้องอยู่ไกลบ้านเป็นปี"
+    choices:
+      - id: go
+        text: "เก็บกระเป๋าไปสอน"
+        effects: {money: {unit: income_x, amount: 0.8}, network: 2, relations: -2}
+        merit: [{cat: neutral}]
+      - id: stay
+        text: "สอนเด็กในหมู่บ้านต่อ"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: online
+        text: "ถ่ายคลิปสอนลงออนไลน์แทน"
+        effects: {network: 1, knowledge: 1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: neutral}]
+      - id: count_only
+        text: "ฝึกนับหนึ่งถึงสิบภาษาเขาก่อน"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: boxer_camp_owner_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [46, 59], flags: {has: [boxer_fought]}}
+    title: "เด็กที่ถูกพามาฝากค่าย"
+    text: "ผู้หญิงคนหนึ่งจูงเด็กแปดขวบมาหน้าบ้าน ได้ยินว่าคุณเคยเป็นนักมวย ขอฝากให้ซ้อมและพาขึ้นชกงานวัด ที่บ้านไม่มีใครส่งเรียน หมอในข่าวบอกว่าเด็กต่ำกว่าสิบสองไม่ควรโดนต่อยหัว ส่วนคนในวงการบอกว่ายอดมวยทุกคนเริ่มแบบนี้"
+    choices:
+      - id: train_fight
+        text: "รับไว้ พาขึ้นชกงานวัด"
+        effects: {network: 1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: train_only
+        text: "สอนให้ แต่ไม่ให้ขึ้นชกจนโต"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: school
+        text: "พาไปฝากโรงเรียนแทน"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: help_others, level: 1}]
+      - id: shadow
+        text: "สอนชกลมก่อน ชกคนทีหลัง"
+        effects: {happiness: 1, health: 1}
+        merit: [{cat: neutral}]
+
+  - id: boxer_head_01
+    type: A
+    category: health
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 4
+    when: {age: [46, 59], flags: {has: [boxer_head]}}
+    title: "ลืมว่าวางกุญแจไว้ไหน"
+    text: "ช่วงนี้คุณลืมบ่อยขึ้น ชื่อคนที่เพิ่งเจอเมื่อวานหลุดไปทั้งชื่อ บางวันมือสั่นตอนถือแก้วกาแฟ หมอถามว่าเคยโดนกระแทกที่หัวบ่อยไหม คุณนึกถึงสิบวันหลังไฟต์ที่ตื่นมาบนผ้าใบ"
+    choices:
+      - id: scan
+        text: "ตรวจสมองให้ละเอียด"
+        effects: {money: {unit: income_x, amount: -0.2}, health: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: notebook
+        text: "จดทุกอย่างลงสมุดเล่มเล็ก"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: ignore
+        text: "คิดว่าแค่แก่ตัว ไม่ไปหาหมอ"
+        effects: {health: -2}
+        merit: [{cat: neutral}]
+      - id: note_on_door
+        text: "แปะโน้ตไว้หลังประตูทุกบาน"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: boxer_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 3
+    when: {age: [60, 85], flags: {has: [boxer_fought]}}
+    title: "ไหว้ครูประจำปีของค่าย"
+    text: "ค่ายที่คุณเคยกินนอนจัดงานไหว้ครูประจำปี ศิษย์รุ่นหลังที่ไม่เคยเห็นคุณชกยกมือไหว้ตามที่ครูบอก พิธีกรเรียกชื่อในวงการของคุณผ่านไมค์ แล้วขอให้ออกมารำไหว้ครูนำเด็ก ๆ หนึ่งรอบ"
+    choices:
+      - id: lead
+        text: "ออกไปรำนำเด็ก ๆ"
+        effects: {happiness: 2, relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: watch
+        text: "นั่งดู ยิ้มอยู่ข้างเวที"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: donate
+        text: "ให้ซองค่านวมกับเด็กในค่าย"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: help_others, level: 1}]
+      - id: forget_step
+        text: "รำไปลืมท่าไป เด็กหัวเราะทั้งค่าย"
+        effects: {happiness: 2, relations: 2}
+        merit: [{cat: neutral}]

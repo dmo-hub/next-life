@@ -1,0 +1,537 @@
+# ร่างเรื่อง คุก ผู้ต้องขัง · 15 ใบ · ลงเกมแล้ว ใบ 247 จากร่าง 246 · ผู้เล่นเป็นคนนอกเสมอ · ไม่อ่านและไม่ตั้งธง
+events:
+  - id: inmate_toy_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [8, 12]}
+    title: "ซุ้มของเล่นไม้ในงานเกษตร"
+    text: "ป้าข้างบ้านพาคุณเดินงานเกษตร มีซุ้มขายงานไม้ฝีมือคนในเรือนจำ รถลากไม้ทาสีแดงคันเล็กวางอยู่หน้าสุด ป้าบอกว่าเงินค่าของส่วนหนึ่งเก็บไว้ให้คนทำเป็นทุนตอนได้กลับบ้าน ในกระเป๋าคุณมีเงินพอซื้อได้อย่างเดียว"
+    choices:
+      - id: inmate_toy_buy_01
+        text: "ซื้อรถลากไม้คันนั้น"
+        effects: {happiness: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: inmate_toy_snack_01
+        text: "เก็บเงินไว้ซื้อขนมตามเดิม"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_toy_ask_01
+        text: "ถามป้าว่าเขาทำกันยังไง"
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_toy_share_01
+        text: "ชวนป้าช่วยกันออกคนละครึ่ง"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.005}}
+        merit: [{cat: neutral}]
+      - id: inmate_toy_rubber_01
+        text: "ขอแลกกับหนังยางสามเส้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนเฝ้าซุ้มหัวเราะ บอกว่าราคานี้ไม่ได้ แต่สอนคุณผูกหนังยางให้ล้อรถวิ่งเองได้ คุณเดินกลับอย่างมีวิชา", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าได้ยินแล้วเอามือปิดหน้า เล่าเรื่องหนังยางให้ทั้งซอยฟังไปอีกหลายวัน", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_neighbor_teen_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [14, 18]}
+    title: "พี่คนเดิมกลับมาอยู่ซอย"
+    text: "พี่ที่เคยสอนคุณเตะบอลตอนเด็กพ้นโทษกลับมาอยู่บ้านท้ายซอยแล้ว เย็นนี้เขานั่งซ่อมจักรยานอยู่หน้าบ้าน เพื่อนในกลุ่มสะกิดให้เดินไปอีกฝั่งถนน เขาเงยหน้าขึ้นมาพอดี ยังจำคุณได้"
+    choices:
+      - id: inmate_nb_greet_01
+        text: "ทักเหมือนที่เคยทัก"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขายิ้มกว้างแล้วถามว่ายังเตะเท้าซ้ายไม่เป็นอยู่ไหม คุยกันจนมืด เพื่อนที่ยืนรอปากซอยค่อยเดินมาทักด้วย", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เขาตอบสั้น ๆ แล้วก้มลงซ่อมต่อ คงยังไม่รู้จะคุยอะไร คุณเดินต่อไปโดยไม่แน่ใจว่าควรทักซ้ำพรุ่งนี้ไหม", effects: {relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_nb_cross_01
+        text: "เดินไปอีกฝั่งกับเพื่อน"
+        effects: {network: 1, happiness: -1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: inmate_nb_nod_01
+        text: "พยักหน้าให้แล้วเดินผ่าน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_nb_ask_fix_01
+        text: "เข็นจักรยานตัวเองไปให้เขาดู"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_nb_challenge_01
+        text: "ท้าเตะบอลเท้าเปล่าหน้าบ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กทั้งซอยออกมายืนดู เขาชนะคุณห้าลูกรวด และเพื่อนที่สะกิดคุณเมื่อกี้ขอลงเล่นเป็นคนแรก", effects: {happiness: 2, relations: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกแรกคุณเตะเข้ารั้วบ้านป้าเจ้าระเบียบ ทั้งคู่วิ่งหนีไปคนละทาง แล้วกลับมาขอโทษพร้อมกัน", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_field_trip_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [13, 17], school: [lower, upper, voc]}
+    title: "ทัศนศึกษาแปลงเกษตรเรือนจำ"
+    text: "ครูพาห้องคุณไปดูแปลงผักของเรือนจำชั่วคราวที่เปิดให้คนนอกเดินชม คนนำชมบอกว่าคนทำงานแปลงนี้สมัครใจให้ถามได้ แต่ทั้งห้องเงียบ ครูมองมาที่คุณเพราะคุณยกมือเก่งที่สุด"
+    choices:
+      - id: inmate_ft_ask_soil_01
+        text: "ถามเรื่องการปลูกผักแปลงนี้"
+        effects: {knowledge: 2, network: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_ft_ask_after_01
+        text: "ถามว่าออกไปแล้วอยากทำอะไร"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงคนรดน้ำบอกว่าอยากกลับไปทำสวนที่บ้าน แล้วสอนวิธีดูดินด้วยมือ ทั้งห้องเริ่มถามตาม", effects: {knowledge: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เขาคิดอยู่นานแล้วบอกว่ายังไม่กล้าคิด คุณพูดอะไรไม่ออก และนึกถึงคำตอบนั้นตลอดทางกลับ", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: inmate_ft_quiet_01
+        text: "ทำเป็นจดรายงานไม่เงยหน้า"
+        effects: {happiness: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: inmate_ft_buy_01
+        text: "รวมเงินซื้อผักกลับไปโรงเรียน"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: inmate_ft_contest_01
+        text: "ถามว่าผักแปลงนี้เคยชนะประกวดไหม"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนนำชมตอบหน้าตายว่าชนะหนอนมาตลอด บรรยากาศทั้งแปลงคลายลงทันที", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูหันมามองนิ่ง ๆ คืนนั้นคุณได้เขียนรายงานเรื่องกะหล่ำเพิ่มอีกสองหน้า", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_coffee_wall_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [20, 30]}
+    title: "กาแฟริมกำแพงเรือนจำ"
+    text: "ทางไปตลาดมีร้านกาแฟเล็ก ๆ ติดกำแพงเรือนจำ คนชงเป็นผู้ต้องขังใกล้พ้นโทษที่กำลังฝึกอาชีพ เช้านี้เขาตวงผงกาแฟด้วยมือสั่น เพราะเพิ่งมาชงเป็นวันแรก แก้วของคุณออกมาหวานจัดจนเหมือนน้ำเชื่อม"
+    choices:
+      - id: inmate_cw_tell_01
+        text: "บอกดี ๆ ว่าหวานไปนิด"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_cw_drink_01
+        text: "ดื่มหมดแก้ว ไม่พูดอะไร"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: inmate_cw_regular_01
+        text: "แวะอุดหนุนทุกเช้าอีกเดือน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ปลายเดือนกาแฟเริ่มกลมกล่อม เขาจำได้ว่าคุณไม่ใส่นมเยอะ และชงให้โดยไม่ต้องสั่ง", effects: {happiness: 2, relations: 2, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พอคุ้นหน้ากัน เขาก็ถึงกำหนดออกไปแล้ว คนใหม่มายืนตวงผงด้วยมือสั่นเหมือนเดิม คุณจึงสั่งหวานน้อยไว้ก่อน", effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: inmate_cw_avoid_01
+        text: "เปลี่ยนไปร้านปากซอยแทน"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: inmate_cw_rate_01
+        text: "เขียนคะแนนบนแก้ว เจ็ดเต็มสิบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "วันต่อมาแก้วของคุณมีลายมือตอบกลับว่าพรุ่งนี้เอาแปดให้ได้ แก้วกระดาษกลายเป็นจดหมายรายวัน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูฝึกเดินมาอ่านแล้วขอให้คุณเติมคำติชมครบทุกช่องในแบบประเมิน คุณเลยไปถึงธุระสาย", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_halfway_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [24, 30]}
+    title: "อาสาบ้านกึ่งวิถีในชุมชน"
+    text: "ชุมชนกับวัดใกล้บ้านเปิดบ้านกึ่งวิถีรับคนใกล้พ้นโทษที่สมัครใจมาอยู่ กรรมการบอกว่ามาอยู่แล้วก็ดูแลเหมือนคนในบ้าน แต่ขาดคนสอนจดรายจ่ายวันเสาร์ ป้าข้างบ้านกระซิบว่ายังไม่สบายใจ แล้วถามว่าคุณจะไปไหม"
+    choices:
+      - id: inmate_hw_teach_01
+        text: "ไปสอนจดบัญชีทุกเสาร์"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงคนหนึ่งจดรายจ่ายครบเดือนเป็นครั้งแรกในชีวิต แล้วเอาสมุดไปอวดกรรมการทุกคน ป้าข้างบ้านเริ่มฝากกล้วยไปด้วย", effects: {relations: 2, knowledge: 1, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "สอนไปสองเดือน นักเรียนมาบ้างไม่มาบ้าง ตัวเลขไม่เคยตรง แต่พวกเขายังเก็บที่นั่งให้คุณทุกครั้ง", effects: {relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_hw_listen_01
+        text: "ฟังความกังวลของป้าก่อน"
+        effects: {relations: 2}
+        merit: [{cat: neutral}]
+      - id: inmate_hw_decline_01
+        text: "บอกตรง ๆ ว่ายังไม่พร้อม"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: inmate_hw_food_01
+        text: "ทำกับข้าวไปฝากแล้วกลับ"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: dana, level: 1}]
+      - id: inmate_hw_aunt_01
+        text: "ชวนป้าไปเป็นครูด้วยกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าไปด้วยหน้าบึ้ง กลับมาพร้อมรายชื่อคนที่ป้าจะสอนทำแกงส้มเสาร์หน้า", effects: {happiness: 2, relations: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ป้าถามคำถามเดิมกับทุกคนจนหมดเวลาเรียน กรรมการเลยขอให้คุณช่วยคุยกับป้าก่อน", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_hire_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "ใบสมัครที่ฝีมือดีที่สุด"
+    text: "น้าเจ้าของอู่ฝากคุณช่วยคัดช่างเข้าใหม่ ใบสมัครที่ฝีมือดีที่สุดเขียนบอกตรง ๆ ว่าเคยต้องโทษและพ้นโทษแล้ว เขาบอกว่าที่อื่นปฏิเสธมาสี่แห่ง น้าเดินผ่านโต๊ะแล้วพูดว่า แล้วแต่คุณจะเลือก"
+    choices:
+      - id: inmate_hi_interview_01
+        text: "เรียกมาคุยเหมือนคนอื่น"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาลองงานสามวัน ฟังเสียงเครื่องแล้วบอกอาการถูกทุกคัน น้าบอกว่าเดือนหน้าเขียนชื่อเขาลงป้ายช่างได้เลย", effects: {network: 2, relations: 1, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ฝีมือดีจริง แต่ลูกค้าเก่าบางคนรู้แล้วย้ายอู่ น้านั่งคิดเลขเงียบ ๆ และยังไม่ได้ตอบว่าจะให้อยู่ต่อไหม", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_hi_skip_01
+        text: "หยิบใบที่รองลงมาแทน"
+        effects: {happiness: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_hi_ask_uncle_01
+        text: "ถามน้าว่ารับได้แค่ไหนก่อน"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_hi_trial_01
+        text: "เสนอให้ลองงานเดือนหนึ่งทุกคน"
+        effects: {network: 1, knowledge: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_hi_exam_01
+        text: "จัดสอบถอดเครื่องยนต์ปิดตา"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทุกคนสอบเหมือนกันหมด คนเดิมชนะขาด น้าเลยตัดสินจากผลสอบ และเอาผ้าปิดตาไปแขวนเป็นรางวัลหน้าอู่", effects: {happiness: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ผู้สมัครทุกคนถอดเครื่องเก่งเท่ากัน แต่ประกอบกลับไม่ครบสักคน น็อตเหลือบนโต๊ะคุณหนึ่งกำมือ", effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_factory_van_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "รถรับส่งเช้าไปเย็นกลับ"
+    text: "ช่วงงานเร่งคุณไปรับจ้างแพ็กของที่โรงงานปากซอย ทุกเช้ามีรถจากเรือนจำมาส่งคนงานชุดหนึ่ง เย็นก็มารับกลับ พักเที่ยงพวกเขานั่งกันคนละมุม ไม่มีใครเดินไปนั่งด้วย วันนี้โต๊ะเต็ม เหลือเก้าอี้ว่างตรงนั้น"
+    choices:
+      - id: inmate_fv_sit_01
+        text: "ถือข้าวไปนั่งตรงที่ว่าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุยกันเรื่องแกงเผ็ดร้านไหนอร่อย บ่ายนั้นคนข้าง ๆ สอนวิธีพับกล่องที่เร็วกว่าเดิมเกือบเท่าตัว", effects: {relations: 2, knowledge: 1, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ทุกคนเงียบ คุณกินข้าวเร็วเท่าที่จะเร็วได้ แต่วันรุ่งขึ้นคนฝั่งนั้นพยักหน้าให้คุณก่อน", effects: {relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_fv_stand_01
+        text: "ยืนกินข้างโต๊ะแผนกตัวเอง"
+        effects: {health: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_fv_invite_01
+        text: "ขยับโต๊ะแผนกให้นั่งรวมกัน"
+        effects: {relations: 2, network: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_fv_ask_work_01
+        text: "ถามหัวหน้าว่าเขาทำงานยังไง"
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: inmate_fv_box_race_01
+        text: "ท้าแข่งพับกล่องกันตอนพัก"
+        outcomes:
+          - {weight: 1, ok: true, text: "สองฝั่งโต๊ะรุมเชียร์จนลืมว่าใครมาจากไหน แผนกคุณแพ้ยับ และต้องเลี้ยงน้ำแข็งเปล่าทั้งโต๊ะ", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าเดินมาเห็นกล่องพับค้างเป็นกอง เลยสั่งให้ทั้งโต๊ะนับกล่องจนหมดพัก", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_family_day_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [33, 45]}
+    title: "วันที่พี่ช่างพาคนที่บ้านมา"
+    text: "ช่างที่คุณช่วยดูแลงานอยู่ในร้านญาติเคยอยู่ในเรือนจำหลายปี วันนี้เขาจูงลูกสาวของเขากับแม่ของเขามาดูที่ทำงานเป็นครั้งแรก หญิงชราถือถุงขนมมาฝากทุกคน แล้วถามคุณเบา ๆ ว่าเขาทำงานได้ดีไหม พูดจริงไม่ต้องเกรงใจ"
+    choices:
+      - id: inmate_fd_praise_01
+        text: "เล่าเรื่องดีที่เขาทำจริง ๆ"
+        effects: {relations: 2, happiness: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_fd_honest_01
+        text: "เล่าตามจริงทั้งดีทั้งที่ควรแก้"
+        outcomes:
+          - {weight: 1, ok: true, text: "หญิงชราพยักหน้าช้า ๆ แล้วว่าฟังแบบนี้ค่อยเชื่อ เธอฝากขนมให้คุณเพิ่มอีกถุง", effects: {relations: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช่างได้ยินแล้วเงียบไปทั้งบ่าย ตกเย็นเขามาขอให้คุณช่วยดูว่าเรื่องไหนควรแก้ก่อน", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: inmate_fd_short_01
+        text: "ตอบสั้น ๆ ว่าไม่มีปัญหา"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_fd_chair_01
+        text: "ยกเก้าอี้ให้เธอนั่งก่อนคุย"
+        effects: {relations: 2, health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_fd_tour_01
+        text: "พาหนูน้อยทัวร์ร้านแบบพิธีกร"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณแนะนำไขควงทีละตัวราวกับดารา เด็กหัวเราะจนคนทั้งร้านวางงาน ช่างยืนยิ้มไม่พูดอะไร", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เด็กถามว่าไขควงตัวนี้ทำไมถึงงอ คุณไม่มีคำตอบ และทั้งร้านก็รู้แล้วว่าใครทำ", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_massage_wait_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [35, 45]}
+    title: "มือดีแต่ต้องรอเว้นวรรค"
+    text: "เพื่อนบ้านรุ่นเดียวกันฝึกนวดแผนไทยมาตอนอยู่ในเรือนจำจนมือดี พอกลับบ้านถึงรู้ว่าต้องรอระยะเว้นวรรคอีกหลายปีกว่าจะนวดเป็นอาชีพได้ ระหว่างรอเขารับจ้างทั่วไป วันนี้เขาเดินมาถามว่าคุณมีงานอะไรให้ทำบ้างไหม"
+    choices:
+      - id: inmate_mw_fence_01
+        text: "จ้างทาสีรั้วบ้านสามวัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "รั้วเรียบกว่าที่คิด คนในซอยเห็นแล้วเริ่มถามหาเขา งานคั่นเวลาเลยมีต่อไปอีกหลายบ้าน", effects: {relations: 2, network: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ทาเสร็จวันที่สองฝนลงเต็มเม็ด สีไหลลงพื้นเป็นทาง คุณกับเขายืนมองกันแล้วไปซื้อสีมาเพิ่มอีกถัง", effects: {relations: 1, happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_mw_refer_01
+        text: "ฝากงานกับคนรู้จักในตลาด"
+        effects: {network: 1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_mw_rule_01
+        text: "ช่วยไปถามว่าต้องรออีกกี่ปี"
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_mw_no_01
+        text: "บอกว่าตอนนี้ไม่มีงานจริง ๆ"
+        effects: {relations: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_mw_thai_art_01
+        text: "สั่งทาสีรั้วเป็นลายไทย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาตั้งใจวาดจนรั้วคุณกลายเป็นของแปลกประจำซอย เด็ก ๆ แวะมาทายทุกวันว่าลายนั้นคืออะไร", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลายไทยออกมาคล้ายปลาหมึกทั้งแถว คนส่งของเรียกบ้านคุณว่าบ้านปลาหมึก และคุณเป็นคนสั่งเอง", effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_center_shift_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2561, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "เฝ้าแผงแทนวันไปเยี่ยม"
+    text: "เพื่อนบ้านที่ขายของในตลาดขอให้คุณเฝ้าแผงแทนหนึ่งวัน พี่ชายเขาอยู่ในเรือนจำไกลบ้าน ระบบเยี่ยมทางไกลไม่ได้คุยจากบ้าน ต้องไปศูนย์บริการของกรมในเวลาราชการ เขาปิดแผงไปหลายวันแล้ว วันที่ขอตรงกับวันที่คุณนัดทำธุระไว้พอดี"
+    choices:
+      - id: inmate_cs_swap_01
+        text: "เฝ้าแผงให้ เลื่อนธุระตัวเอง"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_cs_half_01
+        text: "รับเฝ้าครึ่งวันเช้าให้"
+        effects: {relations: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_cs_sorry_01
+        text: "บอกว่าวันนั้นไม่ได้จริง ๆ"
+        effects: {relations: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_cs_rota_01
+        text: "ชวนคนในตลาดช่วยแบ่งกันเฝ้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "สามคนรับคนละช่วง เพื่อนบ้านได้ไปตามนัด กลับมาเล่าว่าพี่ชายผอมลงแต่ยังเล่นมุกเดิมได้", effects: {network: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ต้องอธิบายเหตุผลทีละคน เรื่องที่เขาอยากเก็บไว้เลยรู้กันทั้งตลาด เขายิ้มขอบคุณแบบเหนื่อย ๆ", effects: {relations: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: inmate_cs_joke_01
+        text: "ฝากมุกไปให้พี่ชายเขาหนึ่งมุก"
+        outcomes:
+          - {weight: 1, ok: true, text: "สัปดาห์ต่อมาเขาเล่าว่าพี่ชายขำจนเวลาเกือบหมด แล้วฝากมุกที่แป้กกว่ากลับมาให้คุณหนึ่งมุก", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เวลาไม่พอจะเล่ามุก เขาบอกคุณเบา ๆ ว่าคราวหน้าจะพยายาม คุณเลยไม่ถามอีก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_visit_quota_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "เจ็ดคนบนกระบะ เข้าได้ห้า"
+    text: "ครอบครัวข้างบ้านขอติดรถกระบะคุณไปเยี่ยมหลานชายที่เรือนจำ ขึ้นมานั่งกันเจ็ดคน แต่รอบหนึ่งเยี่ยมได้ไม่เกินห้าคน ยายของหลานหันมาถามคุณที่หน้าประตูว่าจะให้ใครรอข้างนอก เพราะทุกคนไม่ยอมลงก่อน"
+    choices:
+      - id: inmate_vq_elder_01
+        text: "เสนอให้คนแก่กับเด็กเข้าก่อน"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_vq_draw_01
+        text: "ให้จับฉลากจากก้านไม้ขีด"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนแพ้ฉลากบ่นนิดหน่อยแล้วไปซื้อน้ำมาแจก ทุกคนยอมกันโดยไม่ต้องมีใครเป็นคนตัดสิน", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยายจับได้ก้านสั้น ทั้งคันเงียบ แล้วหลานสาวก็ยอมสละสิทธิ์ให้ยายเสียงสั่น", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: inmate_vq_stay_out_01
+        text: "อยู่เฝ้ารถ คุยกับคนที่รอ"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_vq_not_mine_01
+        text: "บอกให้ครอบครัวตกลงกันเอง"
+        effects: {relations: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_vq_lunch_01
+        text: "เปิดวงข้าวเหนียวให้คนที่รอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "สองคนที่ไม่ได้เข้าแกะห่อข้าวเหนียวบนท้ายกระบะ คุยถึงหลานจนคนเยี่ยมกลับมาถามว่าข้างนอกเล่าอะไรกันสนุก", effects: {happiness: 2, relations: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ฝนลงพอดี ทั้งสองคนกินข้าวในรถกับคุณ ไม่มีใครพูด แต่ก็ไม่มีใครลุกหนี", effects: {relations: 1, health: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_vq_rollcall_01
+        text: "ขานชื่อเรียงอายุแบบครูเวร"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณยืนท้ายกระบะขานชื่อเสียงเข้ม ทุกคนเข้าแถวทั้งที่ขำ เรียงอายุแล้วได้ห้าคนพอดี", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขานมาถึงยาย ยายถามกลับว่าใครให้คุณมาตะโกนอายุคนแก่หน้าเรือนจำ คุณโดนดุแทนทั้งครอบครัว", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_screen_visit_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2563, 2566]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "สิบนาทีบนจอของป้าข้างบ้าน"
+    text: "ช่วงโรคระบาด ป้าข้างบ้านไปเรือนจำไม่ได้ จึงได้คิวเยี่ยมหลานผ่านจอ เดือนละครั้ง ครั้งละไม่เกินสิบนาที เธอไม่ถนัดของพวกนี้จึงขอให้คุณมานั่งช่วย ทุกครั้งเวลาหมดก่อนได้พูดเรื่องสำคัญ เธอนั่งซ้อมอยู่แล้วหันมาถามว่าควรพูดเรื่องไหนก่อน"
+    choices:
+      - id: inmate_sv_list_01
+        text: "เรียงเรื่องสำคัญสามข้อให้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าพูดครบสามข้อยังเหลือหนึ่งนาที เธอใช้นาทีนั้นมองหน้าหลานเฉย ๆ แล้วทั้งสองก็ยิ้ม", effects: {relations: 2, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "พอภาพขึ้น ป้าลืมที่ซ้อมมาทันที ร้องไห้จนหมดเวลา ตอนภาพตัดเธอบอกว่าคุ้มแล้ว", effects: {relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_sv_leave_01
+        text: "ต่อสายให้แล้วออกไปรอหน้าบ้าน"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_sv_busy_01
+        text: "บอกว่าเดือนนี้ไม่ว่างมาช่วย"
+        effects: {relations: -2, health: 1}
+        merit: [{cat: neutral}]
+      - id: inmate_sv_teach_01
+        text: "สอนป้ากดเองจนจำได้"
+        effects: {knowledge: 1, relations: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_sv_timer_01
+        text: "ถือนาฬิกาทรายเป็นกรรมการ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าเห็นเม็ดทรายแล้วพูดเร็วขึ้นเท่าตัว หลานหัวเราะจนน้ำตาไหล ทั้งสองบอกว่าเดือนหน้าขอเอาอีก", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นาฬิกาทรายล้มกลิ้งลงพื้นตอนนาทีที่สาม ป้าหันมาดุคุณเสียเวลาไปอีกครึ่งนาที", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_digital_letter_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2569, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "จดหมายดิจิทัลของลุงข้างบ้าน"
+    text: "ที่ไปรษณีย์มีบริการส่งจดหมายดิจิทัลถึงคนในเรือนจำ ดูสถานะได้ว่าถึงหรือยัง ลุงข้างบ้านถือลายมือตัวเองสองหน้ามาขอให้คุณพิมพ์ให้ น้องชายแกอยู่ข้างในมาสามปีแล้ว แกอยากรู้ว่าฉบับนี้จะถึงมือน้องไหม"
+    choices:
+      - id: inmate_dl_type_01
+        text: "พิมพ์ให้ตามลายมือทุกคำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "สถานะขึ้นว่าถึงแล้ว ลุงให้คุณกดดูซ้ำสามรอบ จากนั้นขอส่งเพิ่มอีกหนึ่งบรรทัดว่ากินข้าวด้วยนะ", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "สถานะค้างอยู่สองวัน ลุงมายืนหน้าบ้านคุณทุกเช้าเพื่อถามว่าขยับหรือยัง คุณเลยต้องตื่นเช้าตามไปด้วย", effects: {health: -1, relations: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_dl_teach_01
+        text: "สอนลุงพิมพ์ด้วยตัวเอง"
+        effects: {relations: 1, knowledge: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_dl_post_01
+        text: "แนะว่าจดหมายกระดาษยังใช้ได้"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: inmate_dl_trim_01
+        text: "ขอย่อให้เหลือหน้าเดียว"
+        effects: {knowledge: 1, relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: inmate_dl_font_01
+        text: "เลือกตัวอักษรใหญ่เท่าลายมือลุง"
+        outcomes:
+          - {weight: 1, ok: true, text: "จดหมายยาวเจ็ดหน้าเพราะตัวใหญ่ ลุงพอใจมากว่าครั้งนี้น้องต้องอ่านนาน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เครื่องปริ้นท์หมึกหมดกลางหน้าที่สี่ ลุงยืนลุ้นอยู่ข้างหลัง คุณเลยต้องอธิบายว่าเครื่องไม่ได้งอน", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา: ดัดแปลงจากเพจปลอมในแถวรีเสิร์ชเป็นใบปลิว เลี่ยงของผูกยุค
+  - id: inmate_scam_flyer_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ใบปลิวบนกระดานศาลา"
+    text: "คุณอาสาดูแลกระดานประกาศที่ศาลาหมู่บ้าน เช้านี้มีใบปลิวแปะทับประกาศเก่า อ้างว่ารับฝากเงินให้ผู้ต้องขัง โอนเข้าบัญชีส่วนตัวแล้วจะจัดการให้ แถบเบอร์โทรใต้ใบปลิวถูกฉีกไปแล้วสามแถบ ไม่มีใครอยู่แถวนี้นอกจากคุณ"
+    choices:
+      - id: inmate_sf_check_01
+        text: "โทรถามเรือนจำก่อนลงมือ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เรือนจำยืนยันว่าไม่มีช่องทางแบบนั้น คุณติดคำเตือนพร้อมวิธีฝากเงินที่ถูกต้องไว้แทน มีคนแวะอ่านแล้วยืนนิ่งอยู่พักใหญ่", effects: {relations: 2, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "สายโทรไม่ติดทั้งบ่าย ใบปลิวยังแปะอยู่ คุณเขียนกำกับไว้ว่ากำลังตรวจสอบ แล้วจดไว้ว่าพรุ่งนี้ต้องโทรใหม่", effects: {relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_sf_tear_01
+        text: "ฉีกออกแล้วเขียนป้ายเตือนแทน"
+        effects: {network: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_sf_tell_01
+        text: "เดินบอกคนที่ฉีกเบอร์ไปให้ทัน"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_sf_stay_out_01
+        text: "ปล่อยไว้ ไม่ใช่เรื่องของเรา"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+      - id: inmate_sf_call_flyer_01
+        text: "โทรไปถามว่ารับฝากหมาไหม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ปลายสายตอบทันทีว่ารับหมดทุกอย่าง คุณเลยจดคำตอบนี้ติดไว้ใต้ใบปลิวให้คนอ่านตัดสินเอง", effects: {happiness: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ปลายสายด่ากลับยาวสามนาทีแล้วโทรมาซ้ำทั้งสัปดาห์ คุณต้องรับสายในชื่อร้านซ่อมตู้เย็น", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: inmate_elder_return_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 75]}
+    title: "เตรียมบ้านรับเพื่อนเก่า"
+    text: "เพื่อนสมัยเรียนใกล้จะได้กลับบ้านหลังอยู่ในเรือนจำมาหลายปี หลานเขาเดินมาขอคำปรึกษา เจ้าหน้าที่บอกว่าวัยนี้ทักษะเสื่อมไปมาก ทั้งเดินบันไดและจำทางในบ้าน หลานบอกว่าคุณอายุรุ่นเดียวกับเขา น่าจะรู้ว่าต้องเตรียมอะไร"
+    choices:
+      - id: inmate_er_rail_01
+        text: "ช่วยคิดว่าจุดไหนต้องทำราวจับ"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_er_visit_01
+        text: "รับปากจะแวะไปคุยทุกสัปดาห์"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตอนแรกเขาคุยแต่เรื่องเมื่อสี่สิบปีก่อน เดือนที่สามเขาชวนคุณเดินไปตลาดเองโดยจำทางได้", effects: {relations: 2, happiness: 2, health: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "บางวันเขานั่งเงียบทั้งบ่าย คุณก็นั่งเงียบด้วย กลับบ้านเหนื่อยกว่าที่คิด แต่สัปดาห์หน้าก็ยังไปอีก", effects: {relations: 1, health: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_er_food_01
+        text: "สอนหลานทำของที่เขาเคยชอบกิน"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_er_tired_01
+        text: "บอกว่าตัวเองก็ไม่ไหวแล้ว"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: inmate_er_photo_01
+        text: "แนะให้ติดรูปเขาไว้หน้าห้องนอน"
+        outcomes:
+          - {weight: 1, ok: true, text: "วันแรกเขายืนดูนานแล้วบ่นว่ารูปนี้ไม่หล่อ จากนั้นก็หาห้องตัวเองเจอทุกครั้ง", effects: {happiness: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "รูปที่หลานหามาเก่ากว่าตัวจริงสามสิบปี เขาไม่คุ้นกับรูปนั้น ต้องไปหารูปใหม่กันอีกรอบ", effects: {happiness: -1, relations: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: inmate_er_stairs_01
+        text: "อวดหลานว่าตัวเองขึ้นบันไดเก่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณสาธิตขึ้นลงสามรอบ หลานจดทุกจุดที่คุณหยุดหอบ แล้วบอกว่าตรงนั้นแหละต้องมีราวจับ", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถึงขั้นสุดท้ายเข่าคุณประท้วง ปวดไปเองสามวัน หลานต้องเดินเอายาหม่องมาส่งแทนที่จะได้เตรียมบ้าน", effects: {health: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

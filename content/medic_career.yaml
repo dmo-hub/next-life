@@ -1,0 +1,452 @@
+# สายสอบหมอ (ใบ 253 จากร่าง 212) · ที่มาแต่ละใบอยู่ในรีเสิร์ชใบ 212
+# ฐาน next-life origin/main cff8aa52 · prefix med_ (ผู้รวมงานอนุมัติ · ห้ามธงชื่อ medic เดี่ยว ชนหมวดความรู้ต่างโลก)
+# ต่อของเดิม: ใบผลสอบอ่านธง exam_pass:uni + school uni ที่แกนตั้งตอนสอบติดมหาวิทยาลัย · จบแล้ว effects.job = professional (ไม่มีอาชีพ/ขั้นยศหมอใน data)
+# เปิดทุกเพศ ทุกฐานะ · คณะแพทย์พลเรือนไม่พบข้อจำกัดตามเพศ · ใบโควตาบ้านเกิดเอียงฐานะจน ×2
+# ปีจริง: ใบโควตาบ้านเกิดกั้น 2537 ขึ้นไป (CPIRD) · ใบใช้ทุนกั้น 2511 ขึ้นไป (บังคับใช้ทุน) · ที่เหลือออกทุกปี
+# ร่างนี้เลือกทางรวมใบเดียว ไม่แยก CPIRD 3 ปี / ODOD 12 ปี และไม่พูดชื่อสนามสอบตามยุค · ทางแยกตามปีอยู่ในไฟล์รีเสิร์ช
+# ไต่ขั้นด้วยธง + นัด: ฝันเด็ก → ติว/โควตา (วัยรุ่น) → ผลสอบ 19–20 → ขึ้นวอร์ด 3 ปี → สอบใบประกอบ+จบ 2 ปี → ใช้ทุนปีแรก → รพ.ชุมชน → ปลายสายกองถือธง med_doctor
+# ใบนัดล้วนไม่มี weight · เพดานอายุใบนัดกว้างกว่าใบต้นทาง เพราะนัดที่ when ไม่ผ่านตกเงียบ
+# decisions 414: ทางเข้าเด็ก 1 วัยรุ่น 2 ตามจริง · ปลายสายกระจาย ทำงาน 3 กลางคน 2 ชรา 1
+# ไม่มีชื่อคน โรงพยาบาล มหาวิทยาลัย สถาบันกวดวิชา หรือแบรนด์จริง · ไม่สอนวิธีโกงสอบ · ไม่เล่าคนไข้ตายเป็นมุก
+events:
+  - id: med_kid_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {good_student: 2}}
+    when: {age: [8, 12]}
+    title: "ชุดหมอของเล่น"
+    text: "ญาติที่ทำงานในเมืองหอบชุดหมอของเล่นมาฝาก มีหูฟัง ปรอท กับกระเป๋าใบเล็ก ผู้ใหญ่ในวงข้าวพูดกันเสียงดังว่าบ้านนี้ต้องมีหมอสักคน ทุกคนหันมามองคุณพร้อมกัน"
+    choices:
+      - id: dream
+        text: "บอกทุกคนว่าโตไปจะเป็นหมอ"
+        sets_flags: [med_dream]
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: play_vet
+        text: "เอาหูฟังไปฟังเสียงหมาข้างบ้าน"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: shrug
+        text: "ยังไม่รู้ ขอไปเล่นก่อน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: read_book
+        text: "ขอหนังสือร่างกายมนุษย์แทน"
+        sets_flags: [med_dream]
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: med_tutor_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 1
+    multipliers: {flags: {med_dream: 3, good_student: 2}, class: {มีอันจะกิน: 1.5, ร่ำรวย: 1.5, มั่งคั่ง: 1.5}}
+    when: {age: [15, 17], school: [upper]}
+    title: "คอร์สติวสายหมอ"
+    text: "เพื่อนครึ่งห้องลงคอร์สติวสายหมอวันเสาร์อาทิตย์ ห้องติวแอร์เย็นเฉียบ ข้อสอบเก่ากองสูงเท่าเอว รุ่นพี่ที่ติดคณะแพทย์มาเล่าว่าต้องทำโจทย์วันละหลายร้อยข้อ ที่นั่งคณะแพทย์ทั้งประเทศมีแค่หลักพัน ส่วนคนสมัครมากกว่านั้นหลายเท่า"
+    choices:
+      - id: all_in
+        text: "ลงคอร์สเต็มทุกวิชา"
+        requires: {money: {unit: income_x, amount: 0.3}, reason: "ค่าติวไม่พอ"}
+        cost: {unit: income_x, amount: 0.3}
+        sets_flags: [med_aim]
+        effects: {knowledge: 2, happiness: -1, health: -1}
+        schedules: [{event: med_result_01, after_years: [4, 4]}]
+        merit: [{cat: neutral}]
+      - id: self_study
+        text: "อ่านเองจากข้อสอบเก่า"
+        sets_flags: [med_aim]
+        effects: {knowledge: 1, happiness: -1}
+        schedules: [{event: med_result_01, after_years: [4, 4]}]
+        merit: [{cat: neutral}]
+      - id: other_faculty
+        text: "ไม่เอาหมอ เล็งคณะอื่น"
+        clears_flags: [med_dream]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: tutor_sleep
+        text: "ลงคอร์สแล้วแอบหลับหลังห้อง"
+        requires: {money: {unit: income_x, amount: 0.3}, reason: "ค่าติวไม่พอ"}
+        cost: {unit: income_x, amount: 0.3}
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: med_rural_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2537, 2650]
+    weight: 1
+    multipliers: {flags: {med_dream: 2, good_student: 2}, class: {ยากไร้: 2, ยากจนมาก: 2, ยากจน: 2}}
+    when: {age: [16, 17], school: [upper]}
+    title: "โควตาหมอบ้านเกิด"
+    text: "ครูแนะแนวติดประกาศโครงการรับเด็กในจังหวัดไปเรียนแพทย์ เรียนจบต้องกลับมาทำงานโรงพยาบาลในพื้นที่ตามสัญญาหลายปี ผิดสัญญาต้องจ่ายค่าปรับก้อนใหญ่ ครูวงชื่อคุณไว้บนกระดาษก่อนเรียกเข้าไปคุย"
+    choices:
+      - id: apply
+        text: "สมัครโควตาบ้านเกิด"
+        sets_flags: [med_aim, med_rural]
+        effects: {knowledge: 1, network: 1}
+        schedules: [{event: med_result_01, after_years: [4, 4]}]
+        merit: [{cat: neutral}]
+      - id: open_exam
+        text: "สอบรอบปกติ ไม่ติดสัญญา"
+        sets_flags: [med_aim]
+        effects: {happiness: 1}
+        schedules: [{event: med_result_01, after_years: [4, 4]}]
+        merit: [{cat: neutral}]
+      - id: ask_home
+        text: "เอากระดาษกลับไปถามที่บ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ใหญ่ที่บ้านพูดว่าได้หมอกลับมาอยู่ใกล้ ๆ ก็ดี เซ็นให้ทันที", sets_flags: [med_aim, med_rural], effects: {relations: 2}, schedules: [{event: med_result_01, after_years: [4, 4]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ที่บ้านกลัวสัญญาผูกยาว ขอให้หางานทำเร็ว ๆ แทน", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pass_friend
+        text: "ยกที่ให้เพื่อนที่อยากกว่า"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: med_result_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [19, 22], school: [uni], flags: {has: [med_aim, exam_pass:uni], not: [med_student, med_doctor, med_missed]}}
+    title: "ประกาศผลคณะแพทย์"
+    text: "คะแนนสอบเข้ามหาวิทยาลัยพอให้ติดคณะหนึ่งแล้ว แต่รายชื่อคณะแพทย์ประกาศช้ากว่า คืนนั้นคนทั้งบ้านนั่งรอหน้าจอ ใครบางคนจุดธูปไว้หน้าหิ้งตั้งแต่หัวค่ำ"
+    choices:
+      - id: check
+        text: "กดดูผลเอง"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {knowledge: 2}, flags: {med_rural: 1.5}}, text: "ชื่อคุณอยู่ในรายชื่อคณะแพทย์ เสียงกรี๊ดในบ้านดังจนหมาข้างบ้านเห่าตาม", sets_flags: [med_student], effects: {happiness: 3, relations: 1}, schedules: [{event: med_ward_01, after_years: [3, 3]}], merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไม่มีชื่อ ต้องเรียนคณะที่ติดไว้ไปก่อน", sets_flags: [med_missed], effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: private_school
+        text: "ยื่นคณะแพทย์เอกชน"
+        hint: "ค่าเทอมตลอดหลักสูตรหลายล้าน"
+        requires: {money: {unit: income_x, amount: 6}, reason: "เงินไม่พอค่าเทอมแพทย์เอกชน"}
+        cost: {unit: income_x, amount: 6}
+        sets_flags: [med_student]
+        clears_flags: [med_rural]
+        effects: {network: 1}
+        schedules: [{event: med_ward_01, after_years: [3, 3]}]
+        merit: [{cat: neutral}]
+      - id: resit
+        text: "ซิ่ว ติวใหม่อีกปี"
+        hint: "ต้องลาออกจากคณะเดิมก่อนสมัคร"
+        effects: {knowledge: 1, happiness: -1, relations: -1}
+        schedules: [{event: med_result_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: let_go
+        text: "พอแล้ว เรียนคณะที่ติดต่อ"
+        clears_flags: [med_aim, med_rural, med_dream]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: med_ward_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [21, 26], flags: {has: [med_student], not: [med_doctor]}}
+    title: "ขึ้นวอร์ดครั้งแรก"
+    text: "ปีนี้ย้ายจากห้องเรียนขึ้นตึกผู้ป่วย เสื้อกาวน์ตัวสั้นกว่าของอาจารย์ เวรดึกคืนแรกญาติคนไข้เรียกคุณว่าหมอทั้งที่คุณยังเจาะเลือดไม่เป็น รุ่นพี่บอกว่าอีกไม่นานก็ชิน"
+    choices:
+      - id: learn
+        text: "ตามรุ่นพี่ทุกเวร จดทุกอย่าง"
+        effects: {knowledge: 2, health: -1}
+        schedules: [{event: med_license_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: talk_family
+        text: "นั่งคุยกับญาติคนไข้นาน ๆ"
+        effects: {relations: 2, knowledge: 1}
+        schedules: [{event: med_license_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: sleep_stair
+        text: "แอบงีบที่บันไดหนีไฟ"
+        effects: {health: 1, knowledge: -1}
+        schedules: [{event: med_license_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: drop_out
+        text: "ไม่ไหวแล้ว ขอลาออก"
+        clears_flags: [med_student]
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+
+  - id: med_license_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [23, 29], flags: {has: [med_student], not: [med_doctor]}}
+    title: "สอบใบประกอบวิชาชีพ"
+    text: "ปีสุดท้ายต้องผ่านการสอบใบประกอบวิชาชีพก่อนรับปริญญา ห้องสอบปฏิบัติมีคนไข้จำลองนั่งรอทีละห้อง ระฆังดังทุกไม่กี่นาที เพื่อนบางคนออกมาร้องไห้หน้าห้องน้ำ"
+    choices:
+      - id: sit
+        text: "เข้าห้องสอบตามรอบ"
+        outcomes:
+          - {weight: 3, ok: true, multipliers: {stats: {knowledge: 1.5}}, text: "ผ่านทุกขั้น ได้รับปริญญาพร้อมใบประกอบวิชาชีพ", sets_flags: [med_doctor], effects: {job: professional, happiness: 2, network: 2}, schedules: [{event: med_intern_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตกข้อสอบปฏิบัติหนึ่งห้อง ต้องรอสอบซ่อมรอบหน้า", effects: {happiness: -2}, schedules: [{event: med_license_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: group_read
+        text: "ติวกลุ่มกับเพื่อนจนเช้า"
+        outcomes:
+          - {weight: 3, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ผ่านพร้อมเพื่อนทั้งกลุ่ม ถ่ายรูปรับปริญญาด้วยกัน", sets_flags: [med_doctor], effects: {job: professional, relations: 2, network: 2}, schedules: [{event: med_intern_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "อดนอนจนมือสั่นในห้องสอบ ต้องสอบซ่อมรอบหน้า", effects: {health: -1}, schedules: [{event: med_license_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pray
+        text: "ไหว้ศาลหน้าคณะก่อนสอบ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {wish: 3}, text: "ผ่าน ได้รับปริญญา กลับไปแก้บนด้วยพวงมาลัยใหญ่กว่าเดิม", sets_flags: [med_doctor], effects: {job: professional, happiness: 2}, schedules: [{event: med_intern_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่ผ่าน ต้องสอบซ่อมรอบหน้า", effects: {happiness: -1}, schedules: [{event: med_license_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quit_med
+        text: "ไม่สอบ ไปทำงานสายอื่น"
+        clears_flags: [med_student]
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: med_intern_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2511, 2650]
+    when: {age: [24, 32], flags: {has: [med_doctor]}}
+    title: "ใช้ทุนปีแรก"
+    text: "ปีแรกของการใช้ทุนสามปีอยู่โรงพยาบาลจังหวัด เวรต่อเวรจนบางสัปดาห์เกินแปดสิบชั่วโมง ห้องฉุกเฉินตีสามคนไข้ยังต่อแถว เพื่อนรุ่นเดียวกันบางคนเขียนใบลาออกยอมจ่ายค่าปรับ"
+    choices:
+      - id: endure
+        text: "กัดฟันใช้ทุนให้ครบ"
+        effects: {knowledge: 2, health: -2, happiness: -1}
+        schedules: [{event: med_community_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: home_post
+        text: "ขอกลับไปใช้ทุนบ้านเกิด"
+        requires: {flags: {has: [med_rural]}, reason: "ไม่ได้เข้าเรียนโควตาบ้านเกิด"}
+        effects: {relations: 2, happiness: 1, health: -1}
+        schedules: [{event: med_community_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+      - id: pay_fine
+        text: "ลาออก จ่ายค่าปรับผิดสัญญา"
+        hint: "หมดสัญญาทันที แต่เสียเงินก้อน"
+        requires: {money: {unit: income_x, amount: 1.5}, reason: "เงินไม่พอจ่ายค่าปรับ"}
+        cost: {unit: income_x, amount: 1.5}
+        clears_flags: [med_rural]
+        effects: {happiness: 2, network: -1}
+        merit: [{cat: neutral}]
+      - id: vent
+        text: "โพสต์ระบายเรื่องเวรลงกลุ่มลับ"
+        effects: {happiness: 1, network: 1}
+        schedules: [{event: med_community_01, after_years: [1, 1]}]
+        merit: [{cat: neutral}]
+
+  - id: med_community_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [25, 34], flags: {has: [med_doctor]}}
+    title: "หมอคนเดียวทั้งอำเภอ"
+    text: "ปีที่สองย้ายไปโรงพยาบาลชุมชน คืนวันหยุดเหลือหมอเวรคนเดียวทั้งอำเภอ ป้าขายข้าวหน้าโรงพยาบาลจำหน้าได้ ทักทุกเช้าพร้อมยื่นถุงกล้วยทอด หัวหน้าถามว่าจะอยู่ต่อหลังครบสัญญาไหม"
+    choices:
+      - id: stay
+        text: "อยู่ต่อเป็นหมอชุมชน"
+        sets_flags: [med_rural_stay]
+        effects: {relations: 2, network: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: specialty
+        text: "ขอทุนกลับไปเรียนเฉพาะทาง"
+        sets_flags: [med_specialist]
+        effects: {knowledge: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: private_job
+        text: "ครบสัญญาแล้วไปเอกชน"
+        effects: {money: {unit: income_x, amount: 1}, network: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: banana
+        text: "ขอสูตรกล้วยทอดป้า"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: med_offer_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], flags: {has: [med_doctor]}}
+    title: "เอกชนมาทาบ"
+    text: "โรงพยาบาลเอกชนในเมืองส่งคนมาทาบ เสนอเงินเดือนหลายเท่าของราชการ ห้องตรวจแอร์เย็น คนไข้นัดล่วงหน้า ไม่มีเวรต่อเวร แต่ต้องทิ้งคนไข้ประจำที่ตามรักษากันมาหลายปี"
+    choices:
+      - id: move
+        text: "ย้ายไปเอกชน"
+        effects: {money: {unit: income_x, amount: 2}, happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: stay_gov
+        text: "อยู่ราชการต่อ"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: part_time
+        text: "อยู่ราชการ รับเวรเอกชนเสริม"
+        effects: {money: {unit: income_x, amount: 1}, health: -2}
+        merit: [{cat: neutral}]
+      - id: bargain
+        text: "เอาข้อเสนอไปต่อรองที่เดิม"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "ผู้อำนวยการยอมลดเวรให้ ไม่ต้องย้ายไปไหน", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ที่เดิมบอกว่างบไม่มี เดินออกมามือเปล่า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: med_burnout_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [31, 45], flags: {has: [med_doctor]}}
+    title: "เวรที่สามติดกัน"
+    text: "เวรที่สามติดกัน ตาเริ่มมองตัวเลขบนใบสั่งยาเบลอ พยาบาลถามซ้ำว่าใช่ขนาดนี้จริงไหม คุณหยุดมือได้ทันก่อนเซ็น คืนนั้นนั่งในรถที่ลานจอดอยู่นานกว่าจะขับกลับ"
+    choices:
+      - id: report
+        text: "แจ้งหัวหน้าขอลดเวร"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.4}}, text: "หัวหน้าจัดตารางใหม่ ได้นอนครบคืนเป็นครั้งแรกในรอบเดือน", effects: {health: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าบอกว่าทุกคนก็เหนื่อย คนไม่พอจริง ๆ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: therapy
+        text: "นัดคุยกับจิตแพทย์รุ่นพี่"
+        effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: push_on
+        text: "กาแฟอีกแก้ว แล้วไปต่อ"
+        effects: {health: -2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: leave
+        text: "ลาพักร้อนยาวไปทะเล"
+        effects: {health: 2, happiness: 2, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+
+  - id: med_resident_01
+    type: A
+    category: study
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [28, 40], flags: {has: [med_specialist]}}
+    title: "เรียนต่อเฉพาะทาง"
+    text: "สอบติดเรียนต่อเฉพาะทางแล้ว ต้องกลับไปเป็นแพทย์ประจำบ้านในโรงเรียนแพทย์อีกหลายปี เงินเดือนเท่าเดิม เวรมากกว่าเดิม อาจารย์ถามในที่ประชุมเช้าว่าจะเลือกสาขาไหน"
+    choices:
+      - id: surgery
+        text: "สายผ่าตัด ยืนนานแต่เห็นผล"
+        clears_flags: [med_specialist]
+        effects: {knowledge: 2, health: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: medicine
+        text: "สายอายุรกรรม ดูแลยาว"
+        clears_flags: [med_specialist]
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: family_med
+        text: "เวชศาสตร์ครอบครัว กลับชุมชน"
+        clears_flags: [med_specialist]
+        sets_flags: [med_rural_stay]
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: give_up
+        text: "สละสิทธิ์ ทำงานต่อที่เดิม"
+        clears_flags: [med_specialist]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: med_complaint_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59], flags: {has: [med_doctor]}}
+    title: "ญาติคนไข้ยื่นเรื่อง"
+    text: "ญาติคนไข้รายหนึ่งยื่นเรื่องร้องเรียนว่าคุณอธิบายอาการไม่ครบ คลิปเสียงตอนคุยกันหน้าห้องฉุกเฉินถูกส่งต่อในกลุ่มแชตของตำบล นิติกรของโรงพยาบาลนัดคุยวันจันทร์"
+    choices:
+      - id: meet
+        text: "ขอนั่งคุยกับญาติตรง ๆ"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ฟังกันจนจบ ญาติถอนเรื่อง ยกมือไหว้ตอนลากลับ", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุยกันไม่รู้เรื่อง เรื่องเดินต่อไปตามขั้นตอน", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: by_book
+        text: "ให้นิติกรจัดการตามระบบ"
+        effects: {happiness: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: post_side
+        text: "โพสต์เล่าฝั่งตัวเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนร่วมวิชาชีพแชร์ต่อ เสียงเข้าข้างพลิกกลับ", effects: {network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โพสต์ถูกตัดคำไปปั่นต่อ เรื่องใหญ่กว่าเดิม", effects: {happiness: -2, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: offline
+        text: "ปิดโทรศัพท์ไปตกปลาทั้งวัน"
+        effects: {happiness: 1, health: 1}
+        merit: [{cat: neutral}]
+
+  - id: med_clinic_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [46, 59], flags: {has: [med_doctor]}}
+    title: "คลินิกตอนเย็น"
+    text: "ห้องแถวตรงข้ามตลาดว่างพอดี คนแถวบ้านพูดกันว่าถ้าหมอเปิดคลินิกตอนเย็นจะได้ไม่ต้องไปรอโรงพยาบาลครึ่งวัน ค่าเช่า ค่ายา ค่าป้าย รวมแล้วเท่าเงินเดือนหลายเดือน"
+    choices:
+      - id: open
+        text: "เปิดคลินิกหลังเลิกงาน"
+        requires: {money: {unit: income_x, amount: 0.8}, reason: "เงินไม่พอค่าเปิดคลินิก"}
+        cost: {unit: income_x, amount: 0.8}
+        outcomes:
+          - {weight: 2, ok: true, text: "คนไข้แน่นทุกเย็น ได้เงินเพิ่มแต่ข้าวเย็นกินตอนสามทุ่ม", effects: {money: {unit: income_x, amount: 1.5}, health: -1, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านขายยาหัวมุมขายถูกกว่า คลินิกเงียบจนต้องปิด", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: free_day
+        text: "เปิดตรวจฟรีเดือนละวัน"
+        effects: {relations: 2, happiness: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: rest
+        text: "ตอนเย็นขอเป็นเวลาของบ้าน"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: partner
+        text: "ร่วมเปิดกับเพื่อนหมอรุ่นเดียวกัน"
+        effects: {network: 2, money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+
+  - id: med_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85], flags: {has: [med_doctor]}}
+    title: "คนไข้รุ่นแรก"
+    text: "ในงานเลี้ยงเกษียณ ชายวัยกลางคนเดินมายกมือไหว้ เล่าว่าคุณทำคลอดเขาเมื่อคืนฝนตกหนักสมัยใช้ทุน ตอนนี้เขาพาหลานมาให้ดู ทุกคนในโต๊ะเงียบฟัง"
+    choices:
+      - id: remember
+        text: "เล่าเรื่องคืนนั้นให้ทุกคนฟัง"
+        effects: {happiness: 3, relations: 1}
+        merit: [{cat: neutral}]
+      - id: teach
+        text: "รับสอนหมอรุ่นใหม่ต่อ"
+        effects: {knowledge: 1, network: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: volunteer
+        text: "ไปตรวจอาสาตามวัดเดือนละครั้ง"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: pretend
+        text: "แกล้งทำเป็นจำได้ทุกคน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]

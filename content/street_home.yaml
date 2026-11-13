@@ -1,0 +1,527 @@
+# ร่างเรื่อง คนที่บ้านของแรงงานต่างแดน · ลงเกมแล้ว ใบ 245 จากร่าง 244 · ผ่าน workflow ใบ 244
+# ร่างเรื่อง คนที่บ้านของแรงงานต่างแดน · 15 ใบ · ยังไม่ลงเกม · แก้ตามข้อค้านรอบ 1 · ผู้เล่นอยู่เมืองไทยเสมอ · คนที่ไปเป็นเพื่อนบ้านหรือญาติห่าง ๆ · ไม่อ่านและไม่ตั้งธง
+events:
+  - id: homefront_toys_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [8, 12], school: [primary, lower]}
+    title: "ของเล่นจากเมืองนอก"
+    text: "เพื่อนร่วมห้องหิ้วหุ่นไขลานมาโรงเรียนอีกแล้ว พ่อของเพื่อนไปทำงานเมืองนอก ของใหม่มาถึงทีไรเด็กทั้งห้องล้อมดูจนครูต้องไล่กลับโต๊ะ เพื่อนเดินมาถามว่าอยากเล่นไหม ในใจคุณนึกอยากมีคนส่งของแบบนี้มาบ้าง"
+    choices:
+      - id: hf_ask_turn
+        text: "ขอเล่นด้วยคนรอบหนึ่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เล่นกันจนหมดพักเที่ยง เพื่อนคุยโวว่าตัวหน้าจะใหญ่กว่านี้อีก แล้วชวนคุณไปกินข้าวที่บ้าน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไขลานแรงไปหน่อย สปริงดีดดังแป๊ก คุณกับเพื่อนนั่งเงียบทั้งบ่าย ไม่มีใครกล้าบอกครู", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hf_ask_how_feel
+        text: "ถามว่าคิดถึงพ่อเขาไหม"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_show_wood_toy
+        text: "เอาของเล่นไม้ของตัวเองไปอวด"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: hf_pretend_bored
+        text: "ทำเป็นไม่สนใจ แล้วแอบมอง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: hf_trade_frog
+        text: "เสนอแลกหุ่นกับกบหนึ่งตัว"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนหัวเราะจนตัวงอ ไม่แลกหรอก แต่ขอจับกบแล้วยอมให้คุณเล่นหุ่นทั้งสัปดาห์", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กบกระโดดออกจากกระเป๋าไปเกาะโต๊ะครูประจำชั้น คุณได้ยืนหน้าห้องโดยไม่ต้องสมัคร", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา: ดัดแปลงจากโทรศัพท์ปากทางเป็นจดหมาย เลี่ยงของผูกยุค
+  - id: homefront_bicycle_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [7, 12]}
+    title: "จดหมายที่ร้านปากทาง"
+    text: "ป้าข้างบ้านฝากให้ปั่นจักรยานไปดูที่ร้านปากทางหมู่บ้านว่ามีจดหมายจากลุงที่ไปทำงานเมืองนอกไหม ทางไกลจนเหงื่อโชก ป้ายืนรอหน้าบ้านทุกวันจนเด็กแถวนี้รู้เวลากันหมด วันนี้แดดจัดและคุณนัดเล่นกับเพื่อนไว้แล้ว"
+    choices:
+      - id: hf_pedal_now
+        text: "ปั่นไปเดี๋ยวนี้เลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "มีซองติดแสตมป์แปลกตาหนึ่งฉบับ ป้าอ่านแล้วยิ้มทั้งน้ำตา หยิบขนมกล้วยใส่มือคุณจนเต็มกำ", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ไปถึงร้านแล้วไม่มีอะไร คุณปั่นกลับมาบอกป้า ป้าพยักหน้าแล้วเดินเข้าครัวช้ากว่าทุกวัน", effects: {health: 1, happiness: -1, relations: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_play_first
+        text: "เล่นก่อน ค่อยไปตอนเย็น"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hf_bike_gang
+        text: "ชวนเพื่อนปั่นไปเป็นขบวน"
+        effects: {happiness: 1, network: 1, health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_learn_address
+        text: "ขอดูซองเก่าหัดอ่านที่อยู่"
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: hf_fake_regards
+        text: "แต่งว่าลุงฝากความคิดถึงมา"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าหัวเราะแล้วบอกว่าลุงไม่เคยพูดหวานขนาดนี้ในชีวิต แต่ก็ยังให้คุณเล่าซ้ำอีกรอบ", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าเล่าต่อให้ทั้งตลาด พอจดหมายจริงมาถึงไม่มีคำนั้นสักคำ คุณหลบหน้าป้าไปเป็นเดือน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: homefront_dropout_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [13, 17], school: [lower, upper, voc]}
+    title: "เพื่อนที่อยู่กับยาย"
+    text: "เพื่อนร่วมห้องที่อยู่กับยายมาตั้งแต่พ่อเขาไปทำงานเมืองนอก หายจากโรงเรียนมาสองสัปดาห์แล้ว ค่าเล่าเรียนมีคนส่งมาให้ครบ แต่เจ้าตัวบอกว่าไม่อยากมา ยายเดินมาถามคุณถึงหน้าบ้านว่าหลานไปอยู่ที่ไหน"
+    choices:
+      - id: hf_find_friend
+        text: "ไปตามหาที่ท่าน้ำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขานั่งตกปลาอยู่คนเดียว คุยกันจนค่ำ วันจันทร์เขาโผล่มาเรียนพร้อมการบ้านว่างเปล่า", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เขาบอกว่าเรียนไปก็ไม่มีใครมาดูผลสอบ แล้วเดินหนีไป คุณกลับบ้านมือเปล่าและพูดไม่ออก", effects: {happiness: -1, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_tell_homeroom
+        text: "บอกครูประจำชั้นให้ช่วยดู"
+        effects: {network: 1, relations: -1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_bring_notes
+        text: "เอาสมุดจดไปให้ที่บ้าน"
+        effects: {relations: 2, knowledge: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_tell_dont_know
+        text: "บอกยายว่าไม่ทราบจริง ๆ"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+      - id: hf_exam_bet
+        text: "ท้าแข่งคะแนน แพ้เลี้ยงน้ำแข็งไส"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขากลับมาเรียนเพราะหมั่นไส้ คุณแพ้ไปสองคะแนน และจ่ายค่าน้ำแข็งไสอย่างภูมิใจ", effects: {relations: 2, knowledge: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เขาไม่มาสอบ คุณชนะแบบไม่มีคู่แข่ง นั่งกินน้ำแข็งไสคนเดียวแล้วไม่อร่อยเลย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา: แหล่งเล่าทศวรรษ 2533 ใช้เป็นฉากไม่ผูกปี
+  - id: homefront_letter_read_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [19, 30]}
+    title: "อ่านจดหมายให้ยายฟัง"
+    text: "ยายบ้านข้าง ๆ อ่านหนังสือไม่ออก ขอให้คุณอ่านจดหมายจากแม่เด็กที่ไปทำงานเมืองนอก หลานตัวเล็กนั่งเล่นอยู่ตรงนั้น บรรทัดท้ายเขียนว่าฉันเป็นคนไม่ดีที่ทิ้งเด็กไว้ ยายถามว่าเขียนอะไรบ้าง"
+    choices:
+      - id: hf_read_all_lines
+        text: "อ่านทุกบรรทัดตามจริง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยายเงียบไปนาน แล้วบอกให้เขียนตอบว่าหลานกินข้าวได้สองจาน ไม่ต้องคิดมาก คุณจดให้ทุกคำ", effects: {relations: 2, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ยายร้องไห้จนต้องพักกลางคัน หลานเดินมากอดขาโดยไม่รู้เรื่อง คุณนั่งนิ่งถือจดหมายอยู่อย่างนั้น", effects: {happiness: -2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_skip_last_line
+        text: "อ่านข้ามบรรทัดท้ายไป"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hf_write_monthly
+        text: "อาสาเขียนตอบให้ทุกเดือน"
+        effects: {relations: 2, knowledge: 1, happiness: -1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_read_tonight
+        text: "บอกว่าเย็นนี้จะกลับมาอ่าน"
+        effects: {relations: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: hf_draw_child
+        text: "วาดรูปหลานแนบไปแทนคำตอบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณวาดหลานหัวโตตาห่าง ยายดูแล้วหัวเราะจนไอ บอกว่าเหมือนจนไม่ต้องเขียนชื่อกำกับ", effects: {happiness: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "จดหมายฉบับหน้าถามมาว่าทำไมหลานตัวกลมและมีเขา ยายต้องให้คุณเขียนชี้แจงอีกหนึ่งหน้า", effects: {happiness: 1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: homefront_tailor_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [20, 30]}
+    title: "ผ้าตัดชุดก่อนวันงานบุญ"
+    text: "อีกสองวันมีงานบุญใหญ่ ร้านตัดผ้าในตลาดคิวยาวเพราะบ้านที่มีคนไปทำงานเมืองนอกสั่งชุดใหม่กันหมด ใครใส่ผ้าอะไร สร้อยกี่บาท คนในวัดจำได้จนถึงปีหน้า เพื่อนบ้านถามคุณกลางตลาดว่าจะใส่ชุดไหนไป"
+    choices:
+      - id: hf_old_clothes
+        text: "ใส่ชุดเดิม ซักให้สะอาด"
+        effects: {happiness: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: hf_order_new_outfit
+        text: "สั่งตัดชุดใหม่กับเขาบ้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ชุดเสร็จทันวันงาน ป้าหลายคนลูบเนื้อผ้าแล้วถามชื่อร้าน คุณเดินตัวตรงไปทั้งวัน", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช่างงานล้นมือ ตัดแขนสองข้างไม่เท่ากัน คุณต้องยกแขนข้างหนึ่งไว้ตลอดพิธี", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hf_borrow_necklace
+        text: "ยืมสร้อยญาติมาใส่สักวัน"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hf_sew_buttons
+        text: "ไปช่วยร้านเย็บกระดุมรับค่าแรง"
+        effects: {network: 1, knowledge: 1, money: {unit: income_x, amount: 0.02}, health: -1}
+        merit: [{cat: neutral}]
+      - id: hf_banana_leaf_suit
+        text: "บอกว่าจะเย็บชุดจากใบตอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนบ้านขำจนลืมถามต่อ ทั้งตลาดเลิกวัดฐานะคุณ เพราะเห็นว่าคนนี้วัดไม่ได้อยู่แล้ว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คำนี้ไปถึงหูกรรมการวัด คุณถูกเรียกไปอธิบายยาวว่าล้อเล่น และยังต้องไปล้างจานในงาน", effects: {relations: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: homefront_tractor_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "รถไถบ้านคนไปเมืองนอก"
+    text: "ฝนมาช้า ทุกแปลงต้องไถพร้อมกัน บ้านถัดไปมีรถไถคันใหม่ซื้อด้วยเงินที่คนในบ้านส่งมาจากเมืองนอก คนขับเป็นน้าที่ขับให้เฉพาะตอนอารมณ์ดี คุณมีแปลงต้องไถให้ทันก่อนดินแห้งสัปดาห์นี้"
+    choices:
+      - id: hf_rent_tractor
+        text: "ขอเช่าตามราคาตลาด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไถทันเย็นวันที่สาม เจ้าของรับเงินแล้วแถมซ่อมคันนาให้ คุณนับวันปักดำได้เสียที", effects: {happiness: 1, network: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถไถติดหล่มกลางแปลง ต้องเรียกควายบ้านอื่นมาลาก ค่าเช่าไม่ลดและวันก็หมด", effects: {happiness: -2, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hf_swap_harvest_labor
+        text: "แลกแรงเกี่ยวข้าวให้ปลายปี"
+        effects: {relations: 2, health: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: hf_plough_slow
+        text: "ไถเองช้า ๆ แบบเดิม"
+        effects: {health: -2, happiness: 2}
+        merit: [{cat: neutral}]
+      - id: hf_pool_plots
+        text: "รวมแปลงหลายบ้านจ้างพร้อมกัน"
+        effects: {network: 2, relations: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_flatter_driver
+        text: "ซื้อน้ำหวานไปชมน้าว่าขับเท่"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้าอารมณ์ดีตั้งแต่เช้าจรดเย็น ไถให้ฟรีครึ่งแปลง และขับโชว์เลี้ยวหน้าบ้านคุณอีกสามรอบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้าดื่มน้ำหวานหมดแล้วบอกว่าวันนี้อารมณ์เฉย ๆ ทั้งหมู่บ้านรู้ว่าคุณจ่ายค่าน้ำไปเปล่า", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: homefront_borrow_aunt_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "ไปยืมเงินป้าบ้านหัวมุม"
+    text: "เงินขาดมือก่อนฤดูเก็บเกี่ยว ป้าบ้านหัวมุมได้เงินจากคนในบ้านที่อยู่เมืองนอกสม่ำเสมอ และให้เพื่อนบ้านยืมมาหลายคนแล้ว ไม่เคยทวงเสียงดัง แต่ทุกคนที่ยืมมักยกมือเห็นด้วยกับป้าในที่ประชุมหมู่บ้าน"
+    choices:
+      - id: hf_borrow_exact
+        text: "ยืมเท่าที่ขาดจริง ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้านับเงินให้แล้วบอกคืนหลังขายข้าว คุณคืนตรงวัน ป้าเล่าให้ทั้งซอยฟังว่าบ้านนี้ไว้ใจได้", effects: {network: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ได้เงินมาพอดี แต่พอประชุมหมู่บ้านคราวหน้า ทุกคนหันมามองคุณก่อนที่ป้าจะเริ่มพูด", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hf_sell_two_hens
+        text: "ขายไก่สองตัว ไม่ยืมใคร"
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.02}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hf_work_for_loan
+        text: "ขอทำงานในสวนแทนการยืม"
+        effects: {health: -1, relations: 2, money: {unit: income_x, amount: 0.03}}
+        merit: [{cat: neutral}]
+      - id: hf_ask_own_kin
+        text: "ไปขอญาติฝั่งตัวเองก่อน"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hf_free_hand_clause
+        text: "ขอจดไว้ว่ายกมือตามใจตัวเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าหัวเราะจนต้องวางถุงเงิน บอกว่าคนกล้าเขียนแบบนี้ไว้ใจได้ แล้วยังให้ยืมตามขอ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าเก็บถุงเงินแล้วยิ้มหวาน บอกว่าไปยืมคนที่ไม่มีความเห็นดีกว่า คุณเดินกลับบ้านมือเปล่า", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: homefront_meeting_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [33, 45]}
+    title: "ที่นั่งในประชุมหมู่บ้าน"
+    text: "ประชุมกรรมการหมู่บ้านเย็นนี้มีคนหน้าใหม่ ป้าบ้านท้ายตลาดมานั่งแทนผู้ชายบ้านนั้นที่ไปทำงานเมืองนอก ผู้ใหญ่บ้านยังถามหาผู้เฒ่าของบ้าน เธอตอบว่าเรื่องเงินบ้านนี้เธอตัดสินเองมาสามปีแล้ว คุณเป็นคนจดรายงานการประชุม ทั้งห้องหันมาดูว่าจะจดชื่อใคร"
+    choices:
+      - id: hf_back_her
+        text: "เสนอให้จดชื่อเธอเป็นตัวแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ที่ประชุมเงียบครู่หนึ่งแล้วก็จด ปีต่อมามีป้าอีกสองคนเดินมานั่งแถวเดียวกัน", effects: {network: 2, relations: 1, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ผู้เฒ่าบางคนไม่พอใจที่คุณพูดแทรก ปีนี้เรื่องขอขุดลอกคลองหน้าบ้านคุณถูกเลื่อนไปก่อน", effects: {relations: -1, network: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_head_down_minutes
+        text: "ก้มหน้าจดรายงานต่อไป"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: hf_side_elders
+        text: "ขอให้รอถามผู้เฒ่าก่อน"
+        effects: {network: 1, relations: -2}
+        merit: [{cat: neutral}]
+      - id: hf_ask_ledger
+        text: "ถามเธอเรื่องบัญชีกองกลางเลย"
+        effects: {knowledge: 2, network: 1}
+        merit: [{cat: neutral}]
+      - id: hf_bring_big_chair
+        text: "ลุกไปยกเก้าอี้ตัวใหญ่ให้เธอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เก้าอี้ตัวนั้นเคยเป็นของประธาน ทุกคนเข้าใจตรงกันโดยไม่ต้องลงมติ เธอนั่งแล้วพยักหน้าให้คุณครั้งเดียว", effects: {happiness: 2, relations: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ขาเก้าอี้หักกลางที่ประชุม ทั้งห้องหัวเราะจนลืมเรื่องเดิม คุณต้องซ่อมเก้าอี้ไปอีกสองสัปดาห์", effects: {happiness: 1, relations: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: homefront_shops_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "ร้านชำสี่ร้านในถนนเดียว"
+    text: "คนที่เคยไปทำงานเมืองนอกมาเปิดร้านชำริมถนนสายหลักของหมู่บ้านพร้อมกันสี่ร้าน ของเหมือนกันทุกอย่าง ทุกร้านเป็นคนรู้จัก ทุกร้านนั่งมองว่าคุณถือถุงจากร้านไหน วันนี้คุณต้องซื้อน้ำปลาขวดเดียว"
+    choices:
+      - id: hf_nearest_shop
+        text: "ซื้อร้านใกล้บ้านที่สุด"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hf_rotate_shops
+        text: "เวียนซื้อทีละร้าน จดไว้กันลืม"
+        effects: {relations: 2, knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hf_suggest_niches
+        text: "แนะให้แต่ละร้านขายคนละอย่าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้านหนึ่งหันไปขายเมล็ดพันธุ์ อีกร้านรับซ่อมจักรยาน ทุกร้านอยู่รอด และทุกร้านลดราคาให้คุณ", effects: {network: 2, relations: 1, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "สี่ร้านฟังแล้วพยักหน้า วันต่อมาทั้งสี่ร้านเปลี่ยนไปขายเมล็ดพันธุ์เหมือนกันหมด", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hf_market_in_town
+        text: "เข้าไปซื้อที่ตลาดอำเภอแทน"
+        effects: {relations: -1, money: {unit: income_x, amount: -0.01}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hf_four_bottles
+        text: "ซื้อน้ำปลาร้านละขวด จบเรื่อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งสี่ร้านยิ้มให้คุณเท่ากันเป็นครั้งแรก น้ำปลาสี่ขวดอยู่ได้จนถึงปีหน้า", effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งซอยรู้ว่าคุณซื้อร้านละขวด เจ้าของร้านแรกถามว่าทำไมร้านอื่นได้ก่อน คุณก็ตอบไม่ได้", effects: {relations: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: homefront_merit_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ซองผ้าป่ากลุ่มป้า"
+    text: "ซองผ้าป่าของกลุ่มป้าที่ผู้ชายในบ้านไปทำงานเมืองนอกวางอยู่บนโต๊ะคุณ ยอดของทุกคนเขียนไว้เรียงบรรทัด ใครใส่เท่าไรอ่านออกหมด ท้ายซองมียอดรวมกำกับ บรรทัดเหนือชื่อคุณเป็นยอดที่สูงกว่าที่ตั้งใจไว้นิดหน่อย"
+    choices:
+      - id: hf_give_planned
+        text: "ใส่เท่าที่ตั้งใจไว้แต่แรก"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: dana, level: 1}]
+      - id: hf_match_line_above
+        text: "ใส่ให้เท่าบรรทัดบน"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: dana, level: 1}]
+      - id: hf_pencil_amount
+        text: "ขอให้เขียนยอดด้วยดินสอ"
+        effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: dana, level: 1}]
+      - id: hf_anon_box
+        text: "หยอดตู้ที่วัดเงียบ ๆ ไม่ลงชื่อ"
+        effects: {happiness: 2, money: {unit: income_x, amount: -0.01}, network: -1}
+        merit: [{cat: dana, level: 1}]
+      - id: hf_sum_check
+        text: "ทักว่ายอดรวมท้ายซองบวกผิด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยอดรวมขาดไปจริง คนเดินซองขอบคุณ ปีต่อมากลุ่มป้ามาเชิญคุณถือบัญชีให้", effects: {network: 2, knowledge: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: dana, level: 1}]}
+          - {weight: 1, text: "ยอดที่ผิดเป็นลายมือประธานกลุ่ม คุณเดินไปตลาดอีกกี่ครั้งก็ยังมีคนพูดถึงเลขนั้นให้ได้ยิน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: homefront_rumor_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ข่าวหย่าในวงส้มตำ"
+    text: "วงส้มตำใต้ต้นมะขามกำลังเล่าว่าลุงท้ายซอยจดทะเบียนหย่ากับป้าที่ไปทำงานเมืองนอกแล้ว ทั้งที่ลุงเพิ่งเล่าให้คุณฟังว่าเป็นเรื่องจำเป็นทางเอกสาร และยังรักกันเหมือนเดิม วงหันมาถามว่าได้ยินอะไรมาบ้าง"
+    choices:
+      - id: hf_correct_gossip
+        text: "บอกว่าลุงกับป้ายังรักกันดี"
+        outcomes:
+          - {weight: 1, ok: true, text: "วงเงียบไปพักหนึ่งแล้วเปลี่ยนเรื่องไปพูดถึงราคาข้าว ลุงแวะเอาปลาย่างมาฝากคุณในเดือนถัดมา", effects: {relations: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "พรุ่งนี้ทั้งตลาดเล่าว่าคุณรู้เรื่องเอกสารของลุงละเอียดเกินไป ลุงเจอคุณแล้วยิ้มแห้ง", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hf_keep_pounding
+        text: "ตำส้มต่อ ไม่พูดสักคำ"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: hf_warn_uncle
+        text: "แวะไปเตือนลุงว่าข่าวออกแล้ว"
+        effects: {relations: 2, network: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_ask_who_first
+        text: "ถามกลับว่าใครเล่ามาคนแรก"
+        effects: {knowledge: 1, network: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hf_louder_rumor
+        text: "ปล่อยข่าวว่าลุงเลี้ยงงูเหลือม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งวงลืมเรื่องหย่าในพริบตา เดินไปขอดูงูแทน ลุงงงทั้งวัน แต่ไม่มีใครถามเรื่องเอกสารอีก", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนแห่ไปขอดูงูจนลุงต้องปิดประตูบ้าน ลุงรู้ว่าต้นเรื่องคือคุณตั้งแต่เย็นวันนั้น", effects: {relations: -2, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: homefront_sandwich_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59], family: [{role: parent, alive: true}]}
+    title: "หลานมาฝากตอนคนแก่ป่วย"
+    text: "ลูกพี่ลูกน้องไปทำงานเมืองนอกแล้วฝากหลานวัยประถมไว้ที่บ้านคุณ เช้ามืดต้องพาคนแก่ในบ้านไปหาหมอ สายต้องส่งเด็กเข้าเรียน เงินที่ส่งมาพอค่าข้าวเด็กแต่ไม่พอค่ารถ คุณยืนหน้าบ้าน ถุงยาอยู่มือหนึ่ง กระเป๋านักเรียนอีกมือ"
+    choices:
+      - id: hf_do_both_jobs
+        text: "ทำให้ครบ ตื่นตั้งแต่ตีสี่"
+        effects: {relations: 2, health: -2, happiness: -1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: hf_rota_school_run
+        text: "จัดเวรกับเพื่อนบ้านรับส่งเด็ก"
+        effects: {network: 2, relations: 1, health: -1}
+        merit: [{cat: care_parents, level: 1}]
+      - id: hf_write_for_fare
+        text: "เขียนจดหมายขอค่ารถเพิ่ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เดือนถัดมาเงินส่งมาเพิ่มพร้อมรูปถ่ายและคำขอโทษ หลานเอารูปไปวางข้างหมอนทุกคืน", effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: 0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีจดหมายตอบกลับมาสองเดือน คุณเลิกเปิดตู้จดหมาย แล้วออกค่ารถด้วยเงินในกระเป๋าตัวเอง", effects: {happiness: -2, money: {unit: income_x, amount: -0.04}}, merit: [{cat: care_parents, level: 1}]}
+        merit: [{cat: neutral}]
+      - id: hf_pass_child_on
+        text: "ฝากหลานต่อให้บ้านญาติอีกหลัง"
+        effects: {relations: -2, health: 1}
+        merit: [{cat: neutral}]
+      - id: hf_kid_holds_queue
+        text: "ให้หลานถือบัตรคิวแทนผู้ใหญ่"
+        outcomes:
+          - {weight: 1, ok: true, text: "หลานถือบัตรคิวสองมือ อ่านเลขให้คนแก่ฟังทุกครั้งที่เรียก วันนั้นคนในบ้านยิ้มได้ทั้งที่รอหมอสามชั่วโมง", effects: {happiness: 2, relations: 2}, merit: [{cat: care_parents, level: 1}]}
+          - {weight: 1, text: "หลานเมารถมาทั้งทาง คนในห้องรอขยับหนีไปทั้งแถว คุณได้ที่นั่งว่างเต็มม้านั่ง", effects: {happiness: 1, health: -1}, merit: [{cat: care_parents, level: 1}]}
+        merit: [{cat: care_parents, level: 1}]
+
+  - id: homefront_ten_kin_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "เงินก้อนเดียวเลี้ยงสิบคน"
+    text: "หลานที่ไปทำงานเมืองนอกส่งเงินมาที่คุณเพราะไว้ใจที่สุด ในตระกูลมีสิบคนรอแบ่ง น้าป่วย พี่ชายค้างค่าเทอม ส่วนอาก็จะจัดงานบวช ทุกคนรู้วันเงินเข้า และทุกคนมานั่งกินน้ำชาที่บ้านคุณก่อนวันนั้นหนึ่งวัน"
+    choices:
+      - id: hf_list_needs
+        text: "ตั้งกติกาจ่ายตามความจำเป็น"
+        outcomes:
+          - {weight: 1, ok: true, text: "ค่ารักษามาก่อน ค่าเทอมตาม งานบวชรอปีหน้า ทุกคนบ่น แต่ไม่มีใครเดินออกไป", effects: {network: 1, relations: 1, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "อาเห็นว่างานบวชคือความจำเป็นสูงสุดของชีวิต ปีนั้นคุณไม่ได้รับซองงานบวชเลย", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hf_split_equal
+        text: "แบ่งเท่ากันทุกคน ไม่ถามอะไร"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hf_ask_the_sender
+        text: "เขียนถามหลานว่าอยากให้ใครได้"
+        effects: {relations: 1, knowledge: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: hf_keep_nephew_share
+        text: "กันส่วนหนึ่งเป็นเงินเก็บของหลาน"
+        effects: {relations: -1, happiness: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_ledger_on_wall
+        text: "เขียนบัญชีติดฝาบ้านให้ทุกคนดู"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทุกคนอ่านเลขแล้วเงียบ ปีถัดมาญาติเลิกนั่งเฝ้าน้ำชา และคุณได้กินน้ำชาคนเดียวเสียที", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ญาติมาจดเลขกันเป็นหมู่ แล้วถามว่าทำไมค่าน้ำชาไม่มีในบัญชี ฝาบ้านเต็มลายมือคนทั้งตระกูล", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: homefront_chair_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 72]}
+    title: "เก้าอี้หน้าบ้านยาย"
+    text: "ยายบ้านตรงข้ามตั้งเก้าอี้ตัวเก่าไว้หน้าบ้านมาหลายปี หลานของยายเคยประกอบมันในโรงงานเมืองนอกแล้วส่งกลับมา ขาข้างหนึ่งโยกแล้ว ไม่มีใครได้นั่ง ยายเช็ดทุกเช้า และเช้านี้กวักมือเรียกคุณไปดู"
+    choices:
+      - id: hf_fix_chair_leg
+        text: "เอาไม้มาเสริมขาให้"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณตอกลิ่มไม้สองอัน เก้าอี้หยุดโยก ยายยังไม่ยอมให้ใครนั่ง แต่แบ่งกล้วยให้คุณทุกหวี", effects: {relations: 2, happiness: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ตะปูตัวเดียวทำไม้แตกเป็นเส้น ยายมองแผลแล้วไม่พูดอะไร คุณเลยเอาผ้ามาพันไว้จนกว่าจะหาช่างได้", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_sit_beside
+        text: "ยกเก้าอี้ตัวเองมานั่งข้าง ๆ"
+        effects: {relations: 2, happiness: 1, health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_leave_chair
+        text: "ปล่อยไว้ ยายคงรู้ของยาย"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hf_ask_assembler
+        text: "ถามว่าคนประกอบเป็นยังไงบ้าง"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: hf_secret_sit
+        text: "แอบนั่งตอนยายไปตลาด"
+        outcomes:
+          - {weight: 1, ok: true, text: "เก้าอี้นั่งสบายกว่าที่คิดมาก คุณผล็อยหลับ ยายกลับมาเจอ ห่มผ้าให้ แล้วคิดค่าเช่าเป็นมะนาวสามผล", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขาที่โยกเลือกวันนี้พอดี คุณลงไปนั่งกับพื้น ยายเดินกลับมาทันเห็นทั้งท่า", effects: {health: -1, relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: homefront_baby_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 75]}
+    title: "ทารกสามเดือนบ้านข้าง ๆ"
+    text: "เพื่อนบ้านวัยเดียวกันเพิ่งรับหลานอายุสามเดือนมาเลี้ยงกะทันหัน แม่เด็กต้องรีบไปทำงานเมืองนอก ตีสองเสียงร้องทะลุฝา เช้านี้เพื่อนยืนหลับตาอยู่ที่รั้ว ขวดนมในมือคว่ำอยู่ แล้วถามคุณว่าเลี้ยงเด็กนี่ต้องทำยังไงนะ"
+    choices:
+      - id: hf_teach_bottle
+        text: "ไปสอนชงนมตั้งแต่ต้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณเคยเห็นคนแถวบ้านลองอุ่นนมที่ข้อมือ เลยทำให้ดู เพื่อนจดลงกระดาษ คืนนั้นเสียงร้องหยุดตั้งแต่ห้าทุ่ม", effects: {relations: 2, happiness: 1, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "วิธีที่จำมาเป็นของเมื่อห้าสิบปีก่อน หมอบอกว่าเลิกใช้แล้ว เพื่อนยังขอบคุณคุณอยู่ดี", effects: {relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_take_night_watch
+        text: "รับเฝ้าเด็กครึ่งคืน"
+        effects: {relations: 2, health: -2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_clinic_morning
+        text: "พาไปหาหมอเช้านี้"
+        effects: {knowledge: 1, network: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: hf_cook_and_leave
+        text: "ทำกับข้าวไปให้ แล้วกลับบ้าน"
+        effects: {relations: 1, health: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: hf_lullaby_over_fence
+        text: "ร้องเพลงกล่อมเด็กข้ามรั้ว"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กเงียบ เพื่อนหลับ ไก่บ้านคุณหลับ ทั้งซอยนอนเต็มอิ่มเป็นครั้งแรกในรอบเดือน", effects: {happiness: 2, relations: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เด็กหยุดร้องเพื่อฟัง พอคุณหยุดก็ร้องต่อ คุณเลยร้องจนเสียงแหบไปสามวัน", effects: {health: -1, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: help_others, level: 1}]

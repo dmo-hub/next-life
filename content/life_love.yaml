@@ -1,0 +1,488 @@
+# การ์ดชีวิตผู้ใหญ่ชุด love (ใบ 241 จากร่าง 240)
+events:
+  - id: love_envelope_month_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "การ์ดเชิญสามใบในเดือนเดียว"
+    text: "ปลายเดือนนี้มีงานแต่งเพื่อนร่วมแผนกที่โรงแรม งานบวชหลานข้างบ้าน และงานศพครูประจำชั้นสมัยมัธยม การ์ดสามใบเสียบเรียงข้างตู้เย็น เงินในบัญชีพอค่าห้องกับค่าข้าวอีกสองสัปดาห์ ป้าข้างห้องกระซิบว่างานโรงแรมต้องใส่หนากว่างานบ้าน"
+    choices:
+      - id: by_closeness
+        text: "ใส่ตามความสนิท ไม่ตามสถานที่"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.08}}
+        merit: [{cat: neutral}]
+      - id: send_via
+        text: "ฝากซองไปกับเพื่อนทุกงาน"
+        effects: {relations: -1, health: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: go_all_thin
+        text: "ไปครบทุกงาน ซองบางเท่ากัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าภาพทั้งสามงานจำได้แค่ว่าคุณมาถึงงาน ไม่มีใครเปิดซองดูต่อหน้า", effects: {relations: 2, money: {unit: income_x, amount: -0.06}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "งานบวชกับงานศพตรงกันบ่ายวันเสาร์ ขับวนสองวัดจนไปถึงงานศพตอนพระสวดจบแล้ว", effects: {relations: -1, health: -1, money: {unit: income_x, amount: -0.06}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: eat_worth
+        text: "เขียนชื่อตัวโตบนซอง กินให้คุ้ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "บุฟเฟต์โรงแรมคุ้มค่าซองตั้งแต่จานที่สาม เจ้าบ่าวจำชื่อตัวโตได้ เดินมาขอบคุณถึงโต๊ะ", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ชื่อตัวโตบนซองบางถูกเปิดอ่านในกลุ่มแชตแผนก คนในแผนกเรียกคุณว่าบุฟเฟต์ไปทั้งเดือน", effects: {relations: -1, happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_gate_toll_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 42], sex: [ชาย]}
+    title: "ประตูเงินประตูทองบานที่สาม"
+    text: "คุณรับหน้าที่เพื่อนเจ้าบ่าวถือพานซองนำขบวนขันหมาก ผ่านประตูเงินประตูทองมาได้ แต่บานที่สามเป็นสร้อยทองที่น้องสาวเจ้าสาวกับเพื่อนอีกหกคนกั้นไว้ ขอซองเพิ่มพร้อมให้เจ้าบ่าววิดพื้นยี่สิบที กองเชียร์รอบข้างเริ่มนับถอยหลัง"
+    choices:
+      - id: pay_up
+        text: "ควักซองสำรองจ่ายไปเลย"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: haggle
+        text: "ต่อรองซองครึ่ง มุกครึ่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ต่อจนฝั่งเจ้าสาวหัวเราะยอมเปิดประตู ญาติสองฝ่ายจำหน้าคุณได้ทั้งงาน", effects: {network: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ต่อนานจนเลยฤกษ์ไปสิบนาที ผู้ใหญ่สองฝั่งเริ่มมองนาฬิกาพร้อมกัน", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pushups
+        text: "วิดพื้นแทนเจ้าบ่าวยี่สิบที"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครบยี่สิบทีไม่หอบ เสื้อราชปะแตนไม่ขาด ได้เสียงปรบมือทั้งซอย", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทีที่สิบสองกระดุมเสื้อกระเด็น ทั้งขบวนต้องรอคุณกลัดเข็มกลัดแทน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: sing_gate
+        text: "ร้องเพลงลูกทุ่งแลกเปิดประตู"
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้องจบท่อนแรก น้าฝั่งเจ้าสาวร้องรับท่อนสอง ประตูเปิดเองโดยไม่ต้องเพิ่มซอง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้องเพี้ยนจนเด็กแถวหน้าปิดหู แต่ยังต้องจ่ายซองเท่าเดิม", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_dowry_rent_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2555, 2650]
+    weight: 0.0625
+    when: {age: [31, 38], sex: [ชาย], family: [{role: spouse, count: [0, 0]}]}
+    title: "พานสินสอดแบบเช่ารายวัน"
+    text: "ฤกษ์ดีที่สุดของปีเหลืออีกเดือนเดียว เงินเก็บพอแค่ค่าโต๊ะ เพื่อนส่งเพจรับเช่าเงินสดกับทองวางพานมาให้ ค่าเช่าคิดรายวัน มีคนของร้านนั่งเฝ้าพานจนจบพิธีแล้วเก็บกลับ ผู้ใหญ่ฝั่งโน้นยังไม่รู้ว่าเงินในพานจะอยู่แค่ครึ่งวัน"
+    choices:
+      - id: rent
+        text: "เช่ามาวางให้ทันฤกษ์"
+        outcomes:
+          - {weight: 1, ok: true, text: "พิธีผ่านไปสวย รูปพานสินสอดแน่นเต็มเฟรม ค่าเช่าผ่อนหมดในสามเดือน", effects: {happiness: 2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนเฝ้าพานนับแบงก์ต่อหน้าแขกก่อนเก็บใส่กระเป๋า ญาติทั้งงานเห็นพร้อมกัน", effects: {relations: -2, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: delay
+        text: "เลื่อนฤกษ์ไปปีหน้า"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: tell_truth
+        text: "บอกความจริงกับผู้ใหญ่ฝั่งโน้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ใหญ่ฝั่งโน้นนิ่งไปพักหนึ่ง แล้วบอกว่าวางพานเท่าที่มี ที่เหลือค่อยว่ากัน", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าฝั่งโน้นถามซ้ำสามรอบว่าแน่ใจหรือว่าจะแต่ง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: borrow_gold
+        text: "ขอยืมทองทั้งซอยมาวางพาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าข้างบ้านถอดสร้อยให้ยืมสามเส้น พานแน่นกว่าแบบเช่า แถมทั้งซอยมาช่วยงาน", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สร้อยเส้นหนึ่งหลุดหายระหว่างแห่ขบวน ทั้งซอยช่วยกันก้มหาจนมืด", effects: {relations: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_office_funeral_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "เจ้าภาพสวดคืนที่สาม"
+    text: "ตาของเพื่อนร่วมแผนกเสียที่อีสาน งานจัดห้าวัน แผนกรับเป็นเจ้าภาพสวดคืนที่สาม คุณถือซองรวมของทั้งแผนกขึ้นรถทัวร์ข้ามคืนไปคนเดียว ไปถึงจึงรู้ว่าคืนนั้นมีเจ้าภาพร่วมอีกสี่ราย และยังไม่มีใครเตรียมซองถวายพระ"
+    choices:
+      - id: pool_monks
+        text: "ลงขันซองพระกับเจ้าภาพร่วม"
+        outcomes:
+          - {weight: 1, ok: true, text: "รวมกันได้ครบทุกซองก่อนพระขึ้นอาสน์ เจ้าภาพร่วมแลกเบอร์กันทั้งแถว", effects: {network: 2, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตกลงยอดต่อซองกันไม่ได้ เถียงกันเสียงเบาจนพระเริ่มสวด", effects: {relations: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: own_monks
+        text: "ควักเงินตัวเองทำซองพระครบชุด"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: hand_over
+        text: "ส่งซองรวมให้เจ้าภาพ นั่งฟังสวด"
+        effects: {health: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: kitchen_tent
+        text: "เข้าครัวหลังเต็นท์ช่วยตำส้มตำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าในครัวยื่นครกให้ตั้งแต่สามทุ่ม ตำจนตีหนึ่ง ได้ชื่อว่าคนจากในเมืองที่มือหนักที่สุดในงาน", effects: {relations: 2, happiness: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หยิบปลาร้าผิดไห ป้าในครัวต้องเททิ้งทั้งครก แล้วส่งคุณไปล้างจานแทน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_qingming_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2555, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "ฮวงซุ้ยกับงานส่งพรุ่งนี้"
+    text: "กลุ่มแชตญาติส่งตารางเช็งเม้งมาตั้งแต่ต้นเดือน รถตู้ออกตีห้า หมูสามชั้นต้มทั้งชิ้นกับขนมถ้วยฟูสั่งไว้แล้ว กระดาษเงินกระดาษทองพับครบสามถุง ส่วนหัวหน้าเพิ่งเลื่อนส่งงานใหญ่มาเป็นเช้าวันเดียวกัน อาเจ็กหัวกลุ่มพิมพ์ถามว่าปีนี้มากี่คน"
+    choices:
+      - id: go_back
+        text: "ขึ้นรถตู้ตีห้า ส่งงานจากมือถือ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถางหญ้ารอบฮวงซุ้ยเสร็จก่อนแดดแรง ส่งงานทันในร้านโจ๊กข้างสุสาน", effects: {relations: 2, happiness: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สัญญาณบนเนินขึ้นแค่ขีดเดียว งานส่งช้าไปครึ่งวัน", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pray_home
+        text: "ไหว้ที่ห้อง ส่งรูปเข้ากลุ่ม"
+        effects: {relations: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: send_money
+        text: "โอนค่าของไหว้ไปแทนตัว"
+        effects: {relations: 1, happiness: -1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: report_ancestors
+        text: "ฝากอาจุดธูปบอกว่าติดงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "อาจุดธูปเพิ่มให้หนึ่งดอก รายงานบรรพบุรุษเสียงดังจนได้ยินทั้งเนิน แล้วส่งคลิปมาให้ดู", effects: {relations: 1, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "อารายงานบรรพบุรุษครบทุกคำ แล้วเล่าซ้ำให้ญาติทั้งตระกูลฟังอีกรอบตอนกินข้าว", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_aunt_questions_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [25, 30], family: [{role: spouse, count: [0, 0]}]}
+    title: "วงข้าวรวมญาติกับคำถามชุดเดิม"
+    text: "ข้าวคำแรกยังไม่ทันพ้นคอ ป้าคนกลางถามว่าเงินเดือนเท่าไร แฟนมีหรือยัง จะแต่งเมื่อไร ลูกพี่ลูกน้องที่เพิ่งแต่งไปปีก่อนหันมายิ้มรอฟัง น้าอีกคนเติมว่าอายุเท่านี้สมัยก่อนอุ้มคนที่สองแล้ว"
+    choices:
+      - id: honest
+        text: "ตอบตรงทุกข้อ ตัวเลขด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าพยักหน้าช้า ๆ แล้วตักแกงให้เพิ่ม บอกว่าค่อยเป็นค่อยไปก็ได้", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตัวเลขเงินเดือนถูกส่งต่อถึงโต๊ะที่สามก่อนของหวานมา", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: joke
+        text: "ตอบเป็นมุกจนทั้งวงหัวเราะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งวงหัวเราะจนป้าลืมคำถาม หันไปถามเลขหวยงวดหน้ากับน้าแทน", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าขำตามมารยาท แล้วจดคำถามชุดเดิมไว้ถามซ้ำสงกรานต์หน้า", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quiet
+        text: "ยิ้ม ตักข้าวเพิ่ม ไม่ตอบ"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: ask_back
+        text: "ถามกลับว่าลุงได้บำนาญเท่าไร"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงเล่ายาวตั้งแต่สมัยรับราชการจนทั้งวงลืมคำถามเดิม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "วงข้าวเงียบกริบ ป้าวางทัพพีเสียงดังกว่าปกติ", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_last_train_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 39], sex: [หญิง], family: [{role: spouse, count: [0, 0]}]}
+    title: "รถด่วนขบวนสุดท้าย"
+    text: "งานทำบุญขึ้นบ้านใหม่ของญาติ น้าสาวดึงแขนไปนั่งข้าง ๆ กระซิบว่าเลขสามแล้วอย่าเลือกมาก รถด่วนขบวนสุดท้ายใกล้ออกแล้ว แล้วพยักเพยิดไปที่ผู้ชายเสื้อขาวโต๊ะปลาย บอกว่าเพิ่งกลับมาเปิดร้านวัสดุก่อสร้างในอำเภอ"
+    choices:
+      - id: meet
+        text: "ไปทักผู้ชายโต๊ะปลาย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุยเรื่องปูนกับสีทาบ้านได้ชั่วโมงกว่า แลกเบอร์กันก่อนพระฉันเพล", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาเล่าเรื่องร้านวัสดุไม่หยุด จนพระฉันเสร็จก็ยังไม่ถามชื่อคุณ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: own_pace
+        text: "ขอบคุณน้า แล้วเปลี่ยนเรื่อง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: career_first
+        text: "บอกว่าขอเลื่อนขั้นให้ได้ก่อน"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: refund_ticket
+        text: "ถามน้าว่าตั๋วขบวนนี้คืนได้ไหม"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้าหัวเราะจนน้ำตาไหล เลิกจับคู่ให้ แล้วชวนไปช่วยจัดดอกไม้แทน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้าไม่ขำ เล่าให้ทั้งโต๊ะฟังว่าหลานพูดจาไม่น่ารัก", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_son_in_law_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 40], sex: [ชาย], region: [ตะวันออกเฉียงเหนือ], flags: {has: [married]}}
+    title: "เขยย้ายเข้าเรือน"
+    text: "ปีนี้ตกลงกันว่าจะย้ายไปอยู่บ้านฝั่งภรรยาตามธรรมเนียมกินดอง เพราะภรรยาเป็นน้องคนสุดท้องที่ต้องดูแลบ้านเดิม คืนแรกพ่อตาวางจอบไว้ข้างประตู บอกว่าพรุ่งนี้ลงนาตีห้า แม่ยายถามว่ากินปลาร้าได้ไหม"
+    choices:
+      - id: to_field
+        text: "ตื่นตีห้าลงนากับพ่อตา"
+        outcomes:
+          - {weight: 1, ok: true, text: "ดำนาได้แถวตรงกว่าที่คิด พ่อตาไม่พูดอะไร แต่ตักไข่เจียวให้เพิ่ม", effects: {relations: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปวดหลังจนลุกไม่ขึ้นสองวัน พ่อตาลงนาคนเดียวโดยไม่พูดสักคำ", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: city_job
+        text: "ทำงานในเมือง กลับเสาร์อาทิตย์"
+        effects: {relations: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: pla_ra
+        text: "กินปลาร้าทุกมื้อให้ชิน"
+        outcomes:
+          - {weight: 1, ok: true, text: "อาทิตย์ที่สองเริ่มขอน้ำพริกปลาร้าเพิ่มเอง แม่ยายเล่าให้ทั้งหมู่บ้านฟัง", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ท้องเสียสามวัน แม่ยายเลิกทำกับข้าวเผื่อ แยกหม้อให้กินต่างหาก", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: buy_tiller
+        text: "ซื้อรถไถเดินตามให้บ้านนี้เลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "พ่อตาลูบรถไถทั้งเย็น นาปีนี้เสร็จเร็วกว่าทุกปี", effects: {relations: 2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถไถจอดใต้ถุนบ้าน พ่อตายังจูงควายตัวเดิมลงนาเหมือนเคย", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_old_photo_date_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2556, 2650]
+    weight: 0.0625
+    when: {age: [46, 58], family: [{role: spouse, count: [0, 0]}]}
+    title: "รูปโปรไฟล์อายุสิบห้าปี"
+    text: "คุยในแอปหาคู่มาสองเดือน รูปโปรไฟล์ยืนริมทะเล ผมดำเต็มหัว วันนัดจริงที่ร้านข้าวต้ม คนที่โบกมือมีผมเหลือครึ่งหัวกับแว่นสองชั้น เขามองคุณนิ่งไปพักหนึ่งเหมือนกัน เพราะรูปของคุณก็ถ่ายตั้งแต่วันรับปริญญา"
+    choices:
+      - id: stay
+        text: "นั่งลง สั่งข้าวต้มปลาสองชาม"
+        outcomes:
+          - {weight: 1, ok: true, text: "หัวเราะเรื่องรูปเก่ากันจนร้านจะปิด ตัวจริงคุยสนุกกว่าในรูป", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุยกันได้แต่เรื่องยาความดัน นัดหน้าไม่มีใครเอ่ยปาก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: polite_leave
+        text: "กินให้จบแล้วขอตัวอย่างสุภาพ"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: temple_instead
+        text: "ลบแอป ไปช่วยโรงทานที่วัดแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ล้างจานที่โรงทานจนได้รู้จักคนล้างจานข้าง ๆ ที่มาทุกวันพระเหมือนกัน", effects: {happiness: 1, network: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ล้างจานทั้งวันจนหลังแข็ง คนเดียวที่ได้คุยด้วยคือป้าแม่ครัวที่ถามว่ายังโสดอยู่ไหม", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swap_photos
+        text: "เปิดรูปปัจจุบันให้ดูแลกกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ต่างคนต่างวางโทรศัพท์บนโต๊ะ ตกลงถ่ายรูปโปรไฟล์ใหม่ให้กันตรงนั้นเลย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รูปล่าสุดในเครื่องมีแต่ใบเสร็จค่าน้ำกับมิเตอร์ไฟ อีกฝ่ายหัวเราะจนต้องขอตัวกลับก่อน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_funeral_pact_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ประชุมหมู่บ้านเรื่องงานศพ"
+    text: "ศาลากลางบ้านคืนนี้คนแน่นกว่าทุกครั้ง ผู้ใหญ่บ้านเสนอข้อตกลงใหม่ งานศพในหมู่บ้านห้ามตั้งวงเหล้า เลี้ยงข้าวต้มกับน้ำดื่ม สวดไม่เกินสามคืน หลายบ้านเพิ่งกู้มาจัดงาน ลุงหัวแถวลุกขึ้นบอกว่าทำแบบนี้แขกไม่มา คนทั้งศาลาหันมาทางคุณ"
+    choices:
+      - id: support
+        text: "ยกมือหนุนข้อตกลงใหม่"
+        outcomes:
+          - {weight: 1, ok: true, text: "มติผ่าน งานแรกตามกติกาใหม่จบในสามคืน เจ้าภาพไม่ต้องกู้สักบาท", effects: {network: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มติผ่าน แต่งานแรกแขกมาน้อยจริง ลุงหัวแถวไม่ทักคุณไปหลายเดือน", effects: {relations: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep_old
+        text: "ยืนข้างธรรมเนียมเดิม"
+        effects: {relations: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: middle
+        text: "งดเหล้า แต่คืนสวดให้เจ้าภาพเลือก"
+        outcomes:
+          - {weight: 1, ok: true, text: "สองฝั่งยอมคนละครึ่ง คนในศาลาเรียกคุณว่าคนกลางไปอีกนาน", effects: {network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีฝั่งไหนพอใจ ประชุมยืดไปจนเที่ยงคืน ยุงกัดทั้งศาลา", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: show_ledger
+        text: "ขอกางบัญชีค่าเหล้างานที่แล้ว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตัวเลขค่าเหล้าบนกระดานยาวกว่าค่าสวดทั้งงาน ทั้งศาลาเงียบ แล้วยกมือพร้อมกัน", effects: {network: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าภาพงานที่แล้วนั่งอยู่แถวหน้า ลุกออกจากศาลาไปเงียบ ๆ", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_reunion_host_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2555, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ถึงคิวเป็นเจ้าภาพรวมญาติ"
+    text: "สงกรานต์ปีนี้ถึงคิวบ้านคุณเป็นเจ้าภาพรวมญาติ กลุ่มแชตญาติมีเก้าสิบสองคน ตอบว่ามาสิบห้า แต่คุณรู้ว่าจะมากันหกสิบ โต๊ะจีนต้องสั่งก่อนพรุ่งนี้ ค่าโต๊ะเท่าเงินเดือนคุณครึ่งเดือน ยังไม่มีใครพูดว่าใครออก น้าสาวส่งสติกเกอร์ดอกไม้มาสามรูป"
+    choices:
+      - id: order_big
+        text: "สั่งเผื่อหกสิบคน ออกเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "มากันหกสิบสองคนพอดี ญาติสายใต้ที่ไม่เจอกันยี่สิบปียกมือไหว้ขอบคุณ", effects: {relations: 3, network: 1, money: {unit: income_x, amount: -0.4}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มาจริงยี่สิบคน กับข้าวเหลือจนต้องแจกใส่ถุงกลับบ้านทุกคน", effects: {happiness: -1, money: {unit: income_x, amount: -0.4}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pool_box
+        text: "ตั้งกล่องรับเงินช่วยหน้างาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "กล่องเต็มก่อนกับข้าวจานที่สามมาถึง เหลือเป็นทุนงานปีหน้า", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กล่องได้แค่ค่าน้ำแข็ง ญาติบางคนเดินอ้อมกล่องเหมือนไม่เห็น", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: potluck
+        text: "ให้แต่ละสายทำกับข้าวมาสายละอย่าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้แกงจากสี่ภาคบนโต๊ะเดียว ญาติแลกสูตรกันจนค่ำ", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สองสายมามือเปล่า โดนพูดถึงทั้งงาน กลุ่มแชตญาติเงียบไปอีกสามเดือน", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: family_tree
+        text: "ทำผังตระกูลติดบอร์ดหน้าบ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หลานต่างสายยืนดูผังตระกูล เพิ่งรู้ว่าเป็นญาติกับเพื่อนร่วมห้องของตัวเอง", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผังเขียนชื่อน้าผิดสองคน น้าทั้งสองยืนแก้ด้วยปากกาเมจิกจนบอร์ดเลอะ", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_uncle_proposal_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2555, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ลุงขอให้ไปเป็นเถ้าแก่"
+    text: "ลุงแท้ ๆ ของคุณอายุเจ็ดสิบแปด อยู่ตัวคนเดียวมาเก้าปี วันนี้โทรมาบอกว่าจะขอป้าวัยหกสิบแปดจากชมรมผู้สูงอายุแต่งงาน อยากให้คุณเป็นเถ้าแก่ไปสู่ขอ กลุ่มแชตญาติเงียบไปทั้งคืน มีคนเดียวพิมพ์ถามว่าบ้านกับที่นาจะเป็นของใคร"
+    choices:
+      - id: go_ask
+        text: "รับเป็นเถ้าแก่ ใส่เสื้อตัวดีไป"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝั่งป้าเตรียมน้ำแดงกับขนมชั้นรอไว้ ตกลงกันได้ในชั่วโมงเดียว ลุงยิ้มทั้งขากลับ", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่น้องฝั่งป้าถามเรื่องที่นาก่อนถามเรื่องลุง คุยกันจนค่ำยังไม่ได้วันแต่ง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: settle_land
+        text: "เรียกญาติคุยเรื่องที่นาให้จบก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขียนบันทึกกันชัดว่าที่นาแบ่งอย่างไร กลุ่มแชตญาติกลับมาส่งสติกเกอร์ดอกไม้", effects: {relations: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประชุมจบด้วยญาติสองสายไม่มองหน้ากัน ลุงบอกว่าไม่แต่งแล้วก็ได้", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: stay_out
+        text: "บอกลุงว่าเป็นเรื่องของลุงเอง"
+        effects: {relations: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: emcee
+        text: "ขอเป็นพิธีกรงานแต่งลุงด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เล่ากลางงานว่าลุงกับป้าเจอกันตอนแย่งลูกเปตองลูกเดียวกัน ทั้งงานหัวเราะ ลุงเขินจนหูแดง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไมค์หอนกลางพิธีรดน้ำสังข์ ญาติฝั่งเจ้าสาวหันมาค้อนใส่ทั้งแถว", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_kathin_committee_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 78]}
+    title: "กรรมการกฐินรุ่นเก๋า"
+    text: "ออกพรรษาปีนี้วัดประจำหมู่บ้านได้รับกฐิน ไวยาวัจกรเดินมาบอกว่าชื่อคุณอยู่ในกรรมการแล้ว หน้าที่มีตั้งแต่เดินตามซองทั้งหมู่บ้าน ติดแบงก์บนต้นกฐิน จนถึงคุมครัวเลี้ยงขบวนแห่จากสามตำบล หลานเตือนว่าคนที่ทำปีก่อนนอนซมไปทั้งอาทิตย์"
+    choices:
+      - id: take_all
+        text: "รับครบทุกหน้าที่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยอดกฐินทะลุเป้า ชื่อคุณถูกประกาศหน้าศาลาสามรอบ", effects: {network: 2, happiness: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "งานจบสวย แต่หลังงานนอนซมไปทั้งอาทิตย์อย่างที่หลานว่า", effects: {health: -2, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: money_only
+        text: "ร่วมทำบุญเป็นเงิน ไม่รับหน้าที่"
+        effects: {health: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: kitchen
+        text: "ขอคุมครัวอย่างเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "แกงเขียวหวานหม้อใหญ่หมดก่อนขบวนที่สามมาถึง คนถามสูตรจนถึงเย็น", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ข้าวหุงไม่ทันขบวนแรก ต้องวิ่งยืมหม้อจากร้านก๋วยเตี๋ยวหน้าวัด", effects: {health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: dance_lead
+        text: "ชวนหนุ่มสาวในหมู่บ้านรำนำขบวน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หนุ่มสาวมาซ้อมทุกเย็น ขบวนปีนี้มีกลองยาวกับแถวรำยาวที่สุดในอำเภอ", effects: {network: 2, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มาซ้อมแค่สามคน สุดท้ายคุณต้องลงรำนำหน้าขบวนเอง", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_grandkid_lodger_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2555, 2650]
+    weight: 0.25
+    when: {age: [62, 82]}
+    title: "หลานขอมาอาศัยด้วย"
+    text: "หลานวัยยี่สิบห้าตกงานจากในเมือง ลากกระเป๋าใบใหญ่มายืนหน้าบ้าน ขอมาอยู่ด้วยสักพักจนกว่าจะหางานใหม่ได้ ห้องหลังบ้านเก็บของรกจนถึงเพดาน หลานบอกว่าจะสอนใช้มือถือให้ทุกแอป แลกกับที่นอนและข้าวเช้า"
+    choices:
+      - id: clear_room
+        text: "เคลียร์ห้องหลังบ้านให้วันนี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "หลานช่วยขนของจนมืด เจอรูปงานบวชเก่าในหีบ นั่งเล่าให้ฟังจนดึก", effects: {relations: 2, happiness: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ขนของแล้วปวดหลังทั้งอาทิตย์ หลานต้องเป็นคนพาไปคลินิกแทน", effects: {health: -2, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: pay_bills
+        text: "ให้อยู่ได้ แต่ต้องช่วยค่าไฟ"
+        effects: {relations: -1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: market_job
+        text: "พาไปฝากงานกับคนรู้จักในตลาด"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของร้านในตลาดรับหลานเข้าทำงานวันจันทร์ คุณได้หน้าทั้งซอย", effects: {network: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลานไปสายตั้งแต่วันแรก เจ้าของร้านโทรมาฟ้องคุณก่อนเที่ยง", effects: {network: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: breakfast_rent
+        text: "เก็บค่าห้องเป็นข้าวเช้าตามที่ว่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "หลานทอดไข่ดาวไหม้ทุกเช้า จนอาทิตย์ที่สามขอบกรอบพอดีแบบที่คุณชอบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ข้าวเช้าคือบะหมี่กึ่งสำเร็จรูปเจ็ดวันติด หมอทักเรื่องความดันตอนไปตรวจเดือนหน้า", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: love_bouquet_elder_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [62, 80], family: [{role: spouse, count: [0, 0]}]}
+    title: "ช่อดอกไม้ตกใส่ตัก"
+    text: "งานแต่งหลานที่โรงแรมในจังหวัด เจ้าสาวหันหลังโยนช่อดอกไม้ สาวโสดเบียดกันหน้าเวที แต่ช่อลอยข้ามหัวทุกคนมาตกใส่ตักคุณที่นั่งกินเค้กโต๊ะผู้ใหญ่ พิธีกรถือไมค์เดินตรงมา คนโต๊ะข้าง ๆ ที่เป็นหม้ายมาสิบปีปรบมือดังที่สุด"
+    choices:
+      - id: pass_on
+        text: "ยื่นช่อต่อให้สาวโสดหน้าเวที"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: keep
+        text: "ถือกลับบ้าน ปักแจกันหน้าหิ้ง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: tell_story
+        text: "รับไมค์ เล่ารักแรกสมัยหนุ่มสาว"
+        outcomes:
+          - {weight: 1, ok: true, text: "เล่าจบทั้งห้องปรบมือ เจ้าสาวลงมากอด บอกว่าเป็นช่วงที่ดีที่สุดของงาน", effects: {happiness: 2, network: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เล่ายาวเกินสิบนาที หลานเจ้าของงานเขินจนเดินหนีไปหลังเวที", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_dance
+        text: "ชวนคนโต๊ะข้าง ๆ ขึ้นเต้นรำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพลงช้าจบไปสองเพลง อีกฝ่ายขอเบอร์ไว้ ชวนไปเดินออกกำลังที่สวนสาธารณะทุกเช้า", effects: {happiness: 3, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพลงแรกยังไม่จบ เข่าก็ล็อก ต้องกลับไปนั่งประคบน้ำแข็งที่โต๊ะ", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

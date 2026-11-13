@@ -1,0 +1,440 @@
+# ร่างเรื่อง ชีวิตรอบมหาวิทยาลัย · 15 ใบ · ลงเกมแล้ว ใบ 249 จากร่าง 248 · แก้ตามข้อค้านรอบ 1 · ไม่เปลี่ยนสถานะการเรียน ไม่ตั้งธง · ใบที่ผู้เล่นเคยเรียน/เรียนอยู่อ่าน exam_pass:uni · ไม่ผูกปี
+events:
+  - id: campus_reunion_skit_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45], flags: {has: ["exam_pass:uni"]}}
+    title: "เลี้ยงรุ่นกับพี่ว๊ากคนเดิม"
+    text: "งานเลี้ยงรุ่นคณะ พี่ที่เคยรับบทเสียงดังที่สุดตอนรับน้องเดินมานั่งข้างคุณ ตอนนี้พูดเบาจนต้องเอียงหูฟัง เขาสารภาพว่าวันนั้นจำบทไม่ได้ ต้องมีเพื่อนแอบบอกบทอยู่หลังเสา คนทั้งโต๊ะเริ่มเรียกร้องให้เล่นฉากเดิมอีกสักรอบ"
+    choices:
+      - id: campus_reunion_laugh
+        text: "หัวเราะแล้วเล่าฉากของตัวเอง"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: campus_reunion_ask_why
+        text: "ถามตรง ๆ ว่าทำไปเพื่ออะไร"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: campus_reunion_leave
+        text: "ยิ้มให้แล้วขอตัวกลับก่อน"
+        effects: {health: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: campus_reunion_swap_roles
+        text: "ให้พี่เขาเป็นน้อง เล่นสลับบท"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณสั่งให้เขาท่องชื่อเพื่อนทั้งรุ่น เขาจำได้สามคน ทั้งงานหัวเราะจนลืมตักข้าว แล้วขอที่อยู่กันใหม่หมดทั้งโต๊ะ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณลืมบทตัวเองตั้งแต่ประโยคแรก พี่เขาบอกบทให้เสียงเบา ๆ ฉากจบลงแบบที่คนนั่งโต๊ะหลังไม่รู้ว่าเริ่มไปแล้ว", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: campus_reunion_chip_in
+        text: "ชวนลงขันช่วยรุ่นน้องที่ขัดสน"
+        effects: {money: {unit: income_x, amount: -0.2}, relations: 1, network: 1}
+        merit: [{cat: dana, level: 1}]
+
+  - id: campus_tuition_slip_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59], family: [{role: child, alive: true, age: [18, 24]}]}
+    title: "ใบแจ้งค่าเทอมบนโต๊ะกินข้าว"
+    text: "ลูกวางใบแจ้งค่าเทอมไว้ข้างจานกับข้าวแล้วรีบเดินหนี คุณหยิบดินสอขึ้นมาบวกค่าเทอมกับค่าหอ บวกรอบแรกได้ตัวเลขหนึ่ง บวกรอบสองได้อีกตัวเลขหนึ่ง คนในบ้านเริ่มเงียบเหมือนรอฟังผลสอบ"
+    choices:
+      - id: campus_tuition_pay
+        text: "จ่ายเต็ม แล้วตัดของในบ้านแทน"
+        effects: {money: {unit: income_x, amount: -1}, relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: campus_tuition_split
+        text: "คุยกับลูกว่าจะแบ่งจ่ายกันยังไง"
+        effects: {money: {unit: income_x, amount: -0.5}, relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: campus_tuition_borrow
+        text: "ไปยืมญาติที่รู้ว่าจะโดนบ่น"
+        effects: {money: {unit: income_x, amount: -0.2}, relations: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: campus_tuition_recount
+        text: "บวกใหม่จนกว่าตัวเลขจะลดเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "รอบที่เจ็ดเจอว่าคุณบวกค่าหอซ้ำสองครั้งจริง ๆ ตัวเลขลดลงทันที ทั้งบ้านปรบมือให้เหมือนคุณหาเงินมาได้", effects: {happiness: 2, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บวกจนดินสอกุด ตัวเลขยังเท่าเดิมทุกรอบ ลูกมาเก็บจานแล้วบอกเบา ๆ ว่ากำหนดจ่ายคือวันพรุ่งนี้", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_dorm_deposit_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59], family: [{role: child, alive: true, age: [18, 24]}]}
+    title: "นับเงินมัดจำหน้าห้องเจ้าของหอ"
+    text: "วันพาลูกย้ายเข้าหอ คุณยืนนับเงินมัดจำหน้าห้องเจ้าของหอ เจ้าของหอยื่นสัญญาหนาหลายแผ่นให้เซ็น ลูกหิ้วถุงยืนรออยู่บนบันได คนต่อแถวข้างหลังก็เริ่มนับเงินของตัวเองเสียงดัง"
+    choices:
+      - id: campus_deposit_read_all
+        text: "อ่านสัญญาทุกข้อก่อนเซ็น"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: campus_deposit_sign_fast
+        text: "เซ็นเลย คนข้างหลังรออยู่"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: campus_deposit_ask_refund
+        text: "ถามว่าย้ายออกแล้วได้คืนไหม"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: campus_deposit_haggle_room
+        text: "ต่อราคาโดยอ้างว่าห้องหันทิศร้อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของหอเดินไปดูแดดกับคุณจริง ๆ แล้วยอมลดค่าเช่าเดือนแรก ลูกทำหน้าเหมือนไม่รู้จักคุณ แต่ก็รับเงินทอนไว้", effects: {money: {unit: income_x, amount: 0.2}, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของหอพาไปดูห้องฝั่งที่ไม่ร้อน ซึ่งแพงกว่าห้องเดิม คุณยืนเงียบอยู่หน้าห้องนั้นพักใหญ่แล้วเดินกลับมาเซ็นฉบับเดิม", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_grad_photographer_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59], family: [{role: child, alive: true, age: [21, 26]}]}
+    title: "ค่าช่างภาพก้อนสุดท้าย"
+    text: "งานรับปริญญาใกล้เข้ามา ลูกบอกว่าเพื่อนส่วนใหญ่จ้างช่างภาพกันหมด คุณเพิ่งจ่ายค่าชุด ค่ารถ ค่าเลี้ยงญาติไปหมาด ๆ ช่างภาพแถวนั้นบอกราคามา แล้วเสริมว่าถ้าจองวันนี้ แถมรูปกับต้นไม้ใหญ่ให้"
+    choices:
+      - id: campus_photo_hire
+        text: "จ้างเลย ชีวิตมีวันนี้วันเดียว"
+        effects: {money: {unit: income_x, amount: -0.5}, happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: campus_photo_friends
+        text: "ให้เพื่อนลูกช่วยกันถ่าย"
+        effects: {money: {unit: income_x, amount: -0.1}, relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: campus_photo_ask_child
+        text: "ถามลูกว่าอยากได้จริงแค่ไหน"
+        effects: {relations: 2, knowledge: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: campus_photo_self
+        text: "ถ่ายเองทั้งงาน ไม่ต้องจ้างใคร"
+        outcomes:
+          - {weight: 1, ok: true, text: "รูปเอียงทุกรูป แต่ลูกหัวเราะจริงทุกรูปเหมือนกัน รูปใบที่หัวตัดไปครึ่งหนึ่งได้ขึ้นกรอบกลางบ้าน", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รูปออกมามีนิ้วคุณเต็มมุมเกือบทุกใบ ลูกไม่ว่าอะไร แต่ไปขอรูปจากเพื่อนมาใส่อัลบั้มแทน", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_stall_extra_scoop_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "ทัพพีพิเศษหน้ามหาวิทยาลัย"
+    text: "วันหยุดคุณไปช่วยญาติขายข้าวราดแกงหน้ามหาวิทยาลัย ร้านนี้ขึ้นชื่อเรื่องถูกและให้เยอะ เด็กขาประจำคนหนึ่งยื่นเงินเท่าเดิมแล้วมองหม้อแกงด้วยสายตาคนยังไม่ได้กินมาทั้งวัน เจ้าของร้านหันไปทอนเงินอยู่พอดี"
+    choices:
+      - id: campus_stall_extra
+        text: "ตักเพิ่ม แล้วหยอดเงินเองลงกล่อง"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: dana, level: 1}]
+      - id: campus_stall_exact
+        text: "ตักตามปกติ ไม่ใช่ร้านของเรา"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: campus_stall_ask_owner
+        text: "ถามญาติก่อนว่าตักเพิ่มได้ไหม"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: campus_stall_trade
+        text: "แลกข้าวเพิ่มกับให้ช่วยล้างจาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กคนนั้นล้างจานไวกว่าญาติคุณเสียอีก วันต่อมาเขาพาเพื่อนมาทั้งโต๊ะ และทุกคนมองหาอ่างล้างจานก่อนสั่งข้าว", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "จานแตกไปสองใบในห้านาที เขาขอโทษไม่หยุด คุณจึงตักเพิ่มให้อีกทัพพีเพื่อให้เขาหยุดล้าง", effects: {happiness: -1, relations: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_dorm_early_leave_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ขอย้ายกลางเทอมเพราะหอใหม่ถูก"
+    text: "คุณมาดูแลหอพักแทนญาติช่วงหนึ่ง เด็กห้องชั้นสามมาขอย้ายออกกลางเทอมเพราะหอตรงข้ามถูกกว่า สัญญาเขียนไว้ชัดว่าออกก่อนกำหนดไม่คืนเงินประกัน เขาถือสัญญาไว้แน่น แต่สายตามองไปที่ตู้เก็บเงิน"
+    choices:
+      - id: campus_early_follow_contract
+        text: "ไม่คืน ว่าไปตามสัญญา"
+        effects: {relations: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: campus_early_half
+        text: "คืนครึ่งหนึ่ง แลกกับหาคนเช่าต่อ"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: campus_early_ask_kin
+        text: "บอกให้รอถามเจ้าของตัวจริง"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: campus_early_inspect_cheap
+        text: "ขอไปดูหอตรงข้ามด้วยกันก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หอตรงข้ามน้ำไม่ไหลตั้งแต่บ่าย เด็กเดินกลับมาเงียบ ๆ แล้วถามว่าพรุ่งนี้ซักผ้าได้กี่โมง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หอตรงข้ามถูกกว่าและสะอาดกว่าจริง คุณยืนชมอยู่นานจนเจ้าของที่นั่นถามว่าสนใจเช่าด้วยไหม", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_room_inspection_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "วันคืนห้องกับรูปที่ถ่ายไว้"
+    text: "คุณช่วยเพื่อนดูแลหอหน้ามหาวิทยาลัยในวันที่เด็กย้ายออก ตามรายการต้องหักค่าทำความสะอาด เด็กหยิบรูปห้องที่ถ่ายไว้ตอนย้ายเข้ามาวางเรียงบนโต๊ะ แล้วขอรายการหักเป็นลายลักษณ์อักษรด้วยเสียงสุภาพมาก"
+    choices:
+      - id: campus_inspect_write_list
+        text: "เขียนรายการหักให้ครบทุกข้อ"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: campus_inspect_waive
+        text: "ดูรูปแล้วยกเลิกค่าทำความสะอาด"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: campus_inspect_full
+        text: "หักเต็ม ห้องยังไงก็เลอะ"
+        effects: {relations: -2}
+        merit: [{cat: unjust_judgment, level: 1}]
+      - id: campus_inspect_compare
+        text: "เดินเทียบรูปกับห้องทีละมุม"
+        outcomes:
+          - {weight: 1, ok: true, text: "รอยบนผนังมีอยู่ในรูปตั้งแต่วันย้ายเข้า ทั้งสองฝ่ายยืนชมความละเอียดของรูปกันครู่หนึ่ง แล้วคืนเงินครบโดยไม่ต้องเถียง", effects: {knowledge: 1, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไล่เทียบจนค่ำ เจอรอยใหม่แค่จุดเดียว แต่เจอรอยเก่าที่ไม่มีใครซ่อมอีกสิบเจ็ดจุด เพื่อนคุณเริ่มไม่อยากฟังผล", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_old_meter_01
+    type: A
+    category: work_money
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "ค่าไฟของคนอ่านถึงเช้า"
+    text: "คุณเปิดห้องว่างหลังบ้านให้นักศึกษาเช่า เด็กสองคนอยู่ห้องเดียวกัน คนหนึ่งเปิดไฟกับพัดลมอ่านหนังสือทั้งคืน อีกคนหลับตั้งแต่สามทุ่ม สิ้นเดือนคนหลับมาเคาะประตูถามว่าเขาต้องจ่ายค่าไฟครึ่งหนึ่งจริงหรือ"
+    choices:
+      - id: campus_meter_split_half
+        text: "หารครึ่งตามที่ตกลงกันไว้"
+        effects: {happiness: -1, relations: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: campus_meter_sit_them
+        text: "เรียกทั้งสองมาคุยกันต่อหน้า"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: campus_meter_discount
+        text: "ลดให้คนหลับ คุณออกส่วนต่างเอง"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: help_others, level: 1}]
+      - id: campus_meter_curfew
+        text: "ประกาศปิดไฟทั้งบ้านสี่ทุ่มตรง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กอ่านหนังสือย้ายไปนั่งใต้ไฟถนนหน้าบ้าน คนทั้งซอยเริ่มทักเขา ปลายเทอมเขาสอบผ่าน และซอยนี้ก็มีไฟดวงใหม่", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สี่ทุ่มตรงคุณเดินไปสับคัตเอาต์เอง แล้วเดินชนโต๊ะในความมืด เด็กสองคนต้องออกมาหายาหม่องให้", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_old_grad_count_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 90]}
+    title: "สมัยก่อนบัณฑิตไม่ถึงร้อยคน"
+    text: "งานเลี้ยงบัณฑิตของหลานเพื่อนบ้านจัดกันเต็มซอย คุณจำได้ว่าคนเฒ่าเคยเล่าว่าสมัยก่อนโน้น บัณฑิตรุ่นหนึ่งยังไม่ถึงร้อยคน เด็ก ๆ ในงานหันมาถามว่าแล้วเขาถ่ายรูปรวมกันยังไงถึงไม่ต้องยืนบนเก้าอี้"
+    choices:
+      - id: campus_gradcount_tell
+        text: "เล่าเท่าที่จำได้ ตามจริง"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: campus_gradcount_listen
+        text: "ถามเด็ก ๆ ว่าปีนี้เขาเรียนอะไร"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: campus_gradcount_give
+        text: "ใส่ซองให้บัณฑิตเพิ่มอีกนิด"
+        effects: {money: {unit: income_x, amount: -0.2}, relations: 2}
+        merit: [{cat: dana, level: 1}]
+      - id: campus_gradcount_was_there
+        text: "เล่าเหมือนตัวเองอยู่ในรูปนั้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็ก ๆ นั่งฟังตาโต คุณเติมฝนตก ม้าตื่น และอาจารย์ใส่รองเท้าคนละข้าง ทั้งงานเชื่อหมดยกเว้นคนที่รู้อายุคุณ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เด็กคนหนึ่งบวกเลขปีให้ฟังต่อหน้าทุกคน คุณต้องเปลี่ยนเรื่องไปถามว่าข้าวเหลือไหม", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_skip_orientation_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [19, 20], school: [uni], flags: {has: ["exam_pass:uni"]}}
+    title: "สิทธิ์ที่ไม่มีใครเขียนไว้"
+    text: "รุ่นพี่บอกว่าใครไม่มารับน้องจะไม่ได้สิทธิ์บางอย่าง พอถามว่าสิทธิ์อะไร คำตอบเปลี่ยนไปทุกคนที่ถาม คนแรกบอกว่าเสื้อรุ่น คนที่สองบอกว่าชื่อในทำเนียบ คนที่สามบอกว่าถ้าเรียนจริงจะรู้เอง พรุ่งนี้นัดเจ็ดโมง"
+    choices:
+      - id: campus_skip_go_quiet
+        text: "ไปแบบเงียบ ๆ อยู่แถวหลัง"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: campus_skip_half_day
+        text: "ไปครึ่งวัน พอให้รู้จักเพื่อน"
+        effects: {network: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: campus_skip_refuse
+        text: "ไม่ไป และรับสายตาเพื่อนเอง"
+        effects: {happiness: 1, network: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: campus_skip_ask_written
+        text: "ขอดูกฎที่เขียนเป็นลายลักษณ์"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่มีใครหากฎเจอ เรื่องนี้ลามไปทั้งชั้นปี เพื่อนหลายคนถามตามคุณ สิทธิ์ลึกลับนั้นก็ค่อย ๆ เลิกถูกพูดถึง", effects: {knowledge: 1, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รุ่นพี่ตอบว่าจะเอาไปเขียนให้ แล้วเรียกคุณว่าน้องลายลักษณ์จนจบปีสี่ ชื่อนี้ติดไปถึงทำเนียบรุ่น", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_name_mixup_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [19, 20], school: [uni], flags: {has: ["exam_pass:uni"]}}
+    title: "เพื่อนทั้งคณะในลานเดียว"
+    text: "วันแรกเพื่อนทั้งคณะมาเจอกันในลานกิจกรรม คุณพยายามจดชื่อลงมือ เหงื่อลบไปครึ่งหนึ่ง ตอนนี้มีคนโบกมือเรียกคุณจากอีกฝั่งอย่างสนิทสนม คุณจำหน้าได้ แต่ชื่อในมือที่เหลืออยู่อ่านได้แค่ตัว ช"
+    choices:
+      - id: campus_mixup_wave
+        text: "โบกกลับแล้วเรียกว่าเพื่อน"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: campus_mixup_confess
+        text: "สารภาพว่าลืมชื่อ ขอฟังอีกรอบ"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: campus_mixup_book
+        text: "ไปซื้อสมุดมาจดให้เป็นเรื่อง"
+        effects: {knowledge: 1, network: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: campus_mixup_guess
+        text: "เดาเลย คนชื่อขึ้นต้น ช มีเยอะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณตะโกนชื่อหนึ่งแล้วถูกเผง เขาซึ้งใจมากว่าคุณจำได้ เขาเลี้ยงน้ำคุณ และคุณยังไม่กล้าถามว่าเขานามสกุลอะไร", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนที่หันมาคือคนชื่อนั้นอีกคนหนึ่ง ส่วนคนที่โบกมือเดินหน้าเศร้ากลับไป วันนั้นคุณรู้จักเพื่อนเพิ่มหนึ่ง เสียไปหนึ่ง", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_senior_notes_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [20, 22], school: [uni], flags: {has: ["exam_pass:uni"]}}
+    title: "น้องมาขอสมุดจดวิชาเก่า"
+    text: "รุ่นน้องคนหนึ่งมาดักรอหน้าห้องเรียน ขอยืมสมุดจดวิชาที่คุณผ่านมาแล้ว บอกว่าเหลือเวลาอ่านสามวัน สมุดเล่มนั้นคุณจดเองทุกหน้า มีทั้งเนื้อหา รูปวาดอาจารย์ และคำบ่นของตัวเองตอนตีสอง"
+    choices:
+      - id: campus_notes_give_all
+        text: "ให้ยืมทั้งเล่ม ไม่ตัดอะไร"
+        effects: {relations: 2, network: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: campus_notes_teach
+        text: "นั่งติวให้แค่เรื่องที่ออกสอบ"
+        effects: {knowledge: 2, health: -1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: campus_notes_refuse
+        text: "บอกให้ลองอ่านเองก่อน"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: campus_notes_tear_rant
+        text: "ฉีกหน้าที่บ่นออกก่อนให้ยืม"
+        outcomes:
+          - {weight: 1, ok: true, text: "สมุดเหลือครึ่งเล่มแต่ชื่อเสียงคุณยังอยู่ครบ น้องสอบผ่านแล้วถือขนมมาคืนสมุด พร้อมถามว่าครึ่งที่หายไปออกสอบไหม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฉีกผิดหน้า คำบ่นยังอยู่ครบ สูตรหายไปหมด น้องเอามาคืนแล้วบอกว่าได้รู้จักอาจารย์ในมุมที่ไม่เคยรู้มาก่อน", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_probation_lunch_01
+    type: A
+    category: study
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [20, 22], school: [uni], flags: {has: ["exam_pass:uni"]}}
+    title: "มื้อเที่ยงกับเพื่อนติดโปร"
+    text: "เพื่อนที่นั่งข้างคุณมาตั้งแต่ปีหนึ่งเลื่อนใบเกรดมาตรงกลางโต๊ะ เกรดเฉลี่ยต่ำกว่าสองนิดเดียว ติดโปรแล้ว ยังไม่ถึงขั้นรีไทร์ แต่ที่บ้านยังไม่รู้ เขาตักข้าวเข้าปากช้ามาก แล้วถามว่าตอนนี้คุณว่าไง"
+    choices:
+      - id: campus_probation_listen
+        text: "ฟังก่อน ยังไม่พูดเรื่องเกรด"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: campus_probation_plan
+        text: "ชวนลงเรียนวิชาที่พอดึงเกรดได้"
+        effects: {knowledge: 2, relations: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: campus_probation_tell_home
+        text: "แนะให้รีบบอกทางบ้าน"
+        effects: {relations: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: campus_probation_grade_math
+        text: "คำนวณเกรดให้เดี๋ยวนั้นบนใบเสร็จ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตัวเลขออกมาว่าต้องได้บีสองวิชา เพื่อนถือใบเสร็จนั้นไปแปะหัวเตียง เทอมถัดมาเขาเอาขนมมาให้และขอใบเสร็จใบใหม่", effects: {happiness: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ตัวเลขออกมาว่าต้องได้เอเก้าวิชาในเทอมที่ลงได้หกวิชา คุณเลยตักกับข้าวให้เขาเพิ่มแทนคำปลอบใจ", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_volunteer_meeting_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [19, 22], school: [uni], flags: {has: ["exam_pass:uni"]}}
+    title: "ค่ายสามวัน ประชุมยาวกว่าค่าย"
+    text: "ก่อนออกค่ายสามวันที่โรงเรียนต่างจังหวัด ชมรมของคุณประชุมกันหกรอบกว่าจะได้สีกำแพง พอถึงวันลา เด็ก ๆ ขอให้พี่กลับมาอีก ทั้งที่ตารางเรียนเทอมหน้าของคุณเต็มหมดแล้ว"
+    choices:
+      - id: campus_camp_promise
+        text: "รับปากว่ากลับมาแน่นอน"
+        effects: {happiness: 2, relations: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: campus_camp_honest
+        text: "บอกตรง ๆ ว่ายังไม่รู้"
+        effects: {relations: 1, happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: campus_camp_letter
+        text: "ทิ้งที่อยู่ให้เด็กเขียนจดหมายมา"
+        effects: {relations: 2, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: campus_camp_ledger_lesson
+        text: "สอนบัญชีรายรับรายจ่ายทิ้งท้าย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กคนหนึ่งยกมือถามว่าเงินค่าค่ายลงช่องไหน คุณตอบไม่ได้ เด็กช่วยกันคิดจนพบว่าชมรมขาดทุน ครูขอจดวิธีนี้ไว้สอนต่อ", effects: {knowledge: 2, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ช่องรายจ่ายยาวเกินกระดาน เด็กถามว่าทำไมพี่ถึงมาทาสีด้วยเงินที่ไม่มี คุณเลยขอพักสิบนาทีแล้วไม่กลับมาสอนต่อ", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: campus_teen_neighbor_tale_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [15, 18]}
+    title: "พี่ข้างบ้านเล่าเรื่องพี่ว๊าก"
+    text: "พี่ข้างบ้านกลับมาช่วงปิดเทอม เล่าว่าปีแรกมีรุ่นพี่แต่งบทมาตะคอกใส่ทั้งรุ่น ทำหน้าดุจนน้องกลัว ผ่านไปครึ่งวันค่อยรู้ว่าเล่นละครวัดความสามัคคี คนเล่นเองแอบกลั้นขำจนไหล่สั่น เขาหันมาถามว่าคุณจะไปเรียนต่อไหม"
+    choices:
+      - id: campus_tale_ask_more
+        text: "ถามว่าวันนั้นกลัวจริงไหม"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: campus_tale_scoff
+        text: "บอกว่าถ้าเจอเองคงไม่อยู่"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: campus_tale_not_sure
+        text: "บอกว่ายังไม่รู้จะเรียนอะไร"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: campus_tale_rehearse
+        text: "ขอให้สอนหน้าดุเอาไว้ใช้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝึกหน้าดุอยู่กลางลานบ้าน พี่ข้างบ้านบอกว่าผ่าน คุณเอาไปลองกับกระจกได้ครึ่งนาที แล้วก็หัวเราะเอง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หน้าดุของคุณออกมาเหมือนคนปวดท้อง คนทั้งบ้านถามหายาให้ คุณเลิกฝึกตั้งแต่วันนั้น", effects: {happiness: -1, health: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

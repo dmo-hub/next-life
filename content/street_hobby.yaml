@@ -1,0 +1,559 @@
+# ร่างเรื่อง งานอดิเรก · ลงเกมแล้ว ใบ 245 จากร่าง 244 · ผ่าน workflow ใบ 244
+# ร่างเรื่อง งานอดิเรก · 15 ใบ · ยังไม่ลงเกม · แก้ตามข้อค้านรอบ 1 · ไม่ตั้งธงใหม่ · ไม่มีระบบฝึกหรือสมุดสะสม · ผู้เล่นไม่ได้เป็นนักร้องอาชีพ
+events:
+  - id: hobby_betta_leaf_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "ใบไม้ราคาเท่าข้าวหนึ่งมื้อ"
+    text: "คุณเริ่มเลี้ยงปลากัดสองตัว แยกกันคนละโหลไว้ข้างเตียง คนขายบอกว่าขาดใบหูกวางไม่ได้ ช่วยรักษาน้ำและกันโรค ใบแห้งห่อเล็ก ๆ ราคาพอกับข้าวหนึ่งมื้อ ทั้งที่ต้นหูกวางใหญ่ยืนทิ้งใบอยู่หน้าโรงเรียนปลายซอย"
+    choices:
+      - id: hobby_buy_leaf_pack
+        text: "ซื้อใบแห้งตามที่คนขายบอก"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: hobby_pick_school_leaf
+        text: "ไปขอเก็บใบหน้าโรงเรียน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ภารโรงกวาดใบกองไว้ให้เลือกเต็มถุง แถมบอกว่าใบที่แก่จนแดงใช้ดีที่สุด", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เก็บใบที่เพิ่งโดนฉีดยาฆ่าแมลงมาโดยไม่รู้ ต้องรีบเปลี่ยนน้ำทั้งสองโหลกลางดึก", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_brew_leaf_jar
+        text: "หมักน้ำใบหูกวางไว้ใช้ยาว"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้ำสีชาไหเดียวใช้ได้ทั้งปี ครีบปลาบานขึ้นจนเพื่อนร่วมงานขอแบ่งไปขวดหนึ่ง", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปิดไหไม่สนิท กลิ่นลอยไปทั้งบ้าน คนผ่านหน้ารั้วชะโงกดูว่าท่อแตกหรือเปล่า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_change_water_only
+        text: "ไม่ใส่ใบ เปลี่ยนน้ำบ่อยเอา"
+        effects: {health: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: hobby_leaf_everything
+        text: "ใส่ใบหูกวางในทุกอย่างที่มีน้ำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "โหลปลา อ่างบัว แจกันหน้าบ้าน สีชาเหมือนกันหมด ป้าข้างบ้านเดินมาขอสูตรไปใส่อ่างตัวเอง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตักน้ำผิดโอ่งไปหุงข้าว ข้าวทั้งหม้อออกสีน้ำตาลกลิ่นใบไม้เปียก ทุกคนในบ้านเคี้ยวเงียบ ๆ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_betta_bottles_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [13, 18]}
+    title: "โต๊ะกินข้าวกลายเป็นฟาร์ม"
+    text: "ปลากัดที่เพื่อนยกให้ออกตัวเล็กมาเป็นฝูง เลี้ยงมาเดือนกว่าเริ่มไล่กัดกันเอง ต้องแยกตัวละขวด ขวดน้ำปลาขวดยาดองที่หาได้เรียงเต็มโต๊ะข้างครัว คนในบ้านเริ่มถามว่าจะให้วางจานตรงไหน"
+    choices:
+      - id: hobby_sort_all_bottles
+        text: "แยกครบทุกตัว ล้างขวดทั้งคืน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตัวสวยโผล่มาหลายตัวเมื่อแยกขวด เพื่อนที่โรงเรียนต่อคิวขอซื้อ ได้ค่าขนมไปหลายอาทิตย์", effects: {happiness: 1, network: 1, money: {unit: income_x, amount: 0.03}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ล้างขวดจนตีสอง เช้าไปหลับคาห้องเรียน แถมปลาก็ยังรอดไม่ครบ", effects: {health: -1, knowledge: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_give_fry_away
+        text: "แจกเพื่อนไปครึ่งหนึ่ง"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hobby_move_under_stairs
+        text: "ขนขวดไปไว้ใต้บันได"
+        outcomes:
+          - {weight: 1, ok: true, text: "ใต้บันไดร่มพอดี น้ำไม่ร้อน โต๊ะกินข้าวกลับมาใช้วางจานได้ คนในบ้านหายบ่น", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ใครไม่รู้เดินเตะขวดแถวหน้าล้มเป็นโดมิโน พื้นเปียกทั้งบ้านตั้งแต่เช้าตรู่", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_stop_breeding
+        text: "เลี้ยงรุ่นนี้จบแล้วเลิกเพาะ"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hobby_name_each_bottle
+        text: "ติดป้ายชื่อทุกขวด เปิดทำเนียบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนในบ้านเริ่มเรียกปลาตามชื่อที่คุณตั้ง ใครเดินผ่านก็ถามว่าไอ้ขวดที่เจ็ดวันนี้กินหรือยัง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปลาสิบแปดตัวชื่อซ้ำกันห้าตัว พอสลับขวดตอนล้างก็จำไม่ได้อีกเลยว่าใครเป็นใคร", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_betta_strain_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "สีที่ต้องรออีกสี่ปี"
+    text: "เพื่อนคนเพาะย้ายบ้านแล้วยกปลากัดทั้งชุดให้คุณ ปลาออกตัวสีแปลกสดกว่าที่เคยเห็น เขาบอกว่าต้องผสมต่ออีกสี่ห้าปีกว่าสีจะนิ่ง ตอนนี้ตัวสวยตัวด่างยังปนกัน คนรับซื้อปลาจากตลาดแวะมาดู ขอเหมาตัวดีไปเลย บอกว่าคนเลี้ยงยอมจ่ายแพงให้ปลาสีชัด"
+    choices:
+      - id: hobby_keep_breeding_line
+        text: "ไม่ขาย ผสมต่อจนกว่าสีจะนิ่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "รุ่นที่หกออกมาสีเดียวกันทั้งครอก คนเพาะด้วยกันมาขอดูถึงบ้าน คุณนั่งมองโหลจนเย็น", effects: {happiness: 3, knowledge: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สี่ปีให้หลังสีกลับไปซีดเหมือนรุ่นแรก ค่าอาหารปลาบวกแล้วเท่าทริปพักร้อนครั้งหนึ่ง", effects: {happiness: -2, money: {unit: income_x, amount: -0.04}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_sell_best_fish
+        text: "ขายตัวดีให้คนรับซื้อไปเลย"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.06}}
+        merit: [{cat: neutral}]
+      - id: hobby_sell_half_fish
+        text: "ขายครึ่งหนึ่ง เก็บตัวเด่นไว้"
+        effects: {happiness: 1, money: {unit: income_x, amount: 0.03}}
+        merit: [{cat: neutral}]
+      - id: hobby_share_with_breeders
+        text: "แบ่งตัวผสมให้เพื่อนช่วยเพาะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนเพาะอีกสามบ้านช่วยกันคัด เสร็จเร็วกว่าที่คิดไปปีหนึ่ง ทุกคนเรียกสีนี้ว่าสีของกลุ่ม", effects: {network: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนคนหนึ่งเอาปลาไปส่งประกวดในชื่อตัวเอง กลุ่มแตกกันตั้งแต่วันประกาศผล", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_fish_family_tree
+        text: "เขียนผังตระกูลปลาติดฝาบ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผังยาวเต็มผนังห้องรับแขก แขกทุกคนนึกว่าเป็นตระกูลคุณ ถามว่าคนนี้เป็นอะไรกับเจ้าของบ้าน", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขียนไปถึงรุ่นที่สี่แล้วเพิ่งรู้ว่าจับคู่ซ้ำสายเดิมมาตลอด ต้องลบครึ่งผนัง", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_betta_contest_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [19, 30]}
+    title: "ยี่สิบหกประเภทกับปลาหนึ่งตัว"
+    text: "งานเกษตรประจำปีเปิดรับปลากัดเข้าประกวด ใบสมัครแบ่งยิบย่อยตามครีบสั้นครีบยาว สี ขนาด และเพศ รวมยี่สิบหกประเภท ปลากัดที่เพื่อนยกให้คุณครีบไม่สั้นไม่ยาว สีก็ก้ำกึ่ง วันก่อนงาน กรรมการเปิดอธิบายเกณฑ์ตัดสินให้ฟัง"
+    choices:
+      - id: hobby_attend_judge_talk
+        text: "ยอมเสียวันไปฟังเกณฑ์ก่อนส่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "รู้แล้วว่าเขาดูเส้นครีบตรงไหน เลือกประเภทได้ถูก ปลาคุณได้รองชนะเลิศอันดับสาม", effects: {knowledge: 1, happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฟังจบยิ่งรู้ว่าปลาตัวเองผิดเกณฑ์ไปสี่ข้อ เสียไปทั้งวัน แต่ได้ความรู้กลับมาเต็มหัว", effects: {knowledge: 1, happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_ask_seller_category
+        text: "ถามคนขายว่าเข้าประเภทไหน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนขายมองแป๊บเดียวบอกครีบสั้นสีผสม ปลาคุณได้รางวัลชมเชยพร้อมริบบิ้นเส้นเล็ก", effects: {happiness: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนขายบอกอย่างมั่นใจ พอไปถึงโต๊ะลงทะเบียน กรรมการขอให้ย้ายประเภทสามรอบ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_watch_contest_only
+        text: "ไม่ส่ง ไปเดินดูเฉย ๆ"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hobby_keep_fish_home
+        text: "เก็บปลาไว้ดูเองที่บ้าน"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: hobby_invent_category
+        text: "ขอตั้งประเภทที่ยี่สิบเจ็ดเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "กรรมการหัวเราะจนต้องวางแว่น ตั้งชื่อให้ว่าประเภทครีบตัดสินใจไม่ได้ แล้วชวนคุณมาช่วยจดคะแนน", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าหน้าที่เขียนชื่อคุณใส่กระดาษแปะไว้หน้าโต๊ะ เผื่อคุณมาขออีกปีหน้า", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_stamp_tweezers_01
+    type: A
+    category: study
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [8, 12]}
+    title: "คีมคีบกับนิ้วที่เพิ่งกินกล้วย"
+    text: "คุณลอกแสตมป์จากซองจดหมายเก่าไว้เต็มกล่องขนม น้าที่เล่นแสตมป์เห็นเข้าก็ยื่นคีมอันเล็กให้ บอกว่าคนเล่นจริงไม่จับด้วยนิ้ว คราบมันทำให้กระดาษเสีย แล้วเล่าว่าแสตมป์ไทยชุดแรกชื่อโสฬศ คุณเพิ่งกินกล้วยทอดมาหมาด ๆ"
+    choices:
+      - id: hobby_use_tweezers
+        text: "ล้างมือแล้วหัดใช้คีม"
+        outcomes:
+          - {weight: 1, ok: true, text: "คีบหกดวงแรกตกหมด ดวงที่เจ็ดเข้าซองได้ น้าพยักหน้าแล้วเล่าเรื่องแสตมป์ให้ฟังจนค่ำ", effects: {knowledge: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คีบแรงเกินจนฟันแสตมป์ฉีกไปหลายดวง คุณนั่งมองเศษกระดาษอยู่นาน", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_paper_envelopes
+        text: "พับซองกระดาษใส่แยกทีละดวง"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hobby_trade_stamp_class
+        text: "เอาตัวซ้ำไปแลกกับเพื่อนในห้อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "แลกดวงรูปช้างได้ดวงรูปเรือ เพื่อนครึ่งห้องเริ่มขอซองจดหมายจากที่บ้านมาลอกแข่ง", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แลกไปสามดวงได้ดวงเดียว กลับบ้านมาเปิดดูแล้วเพิ่งเห็นว่ามันขาดครึ่ง", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_keep_snack_box
+        text: "ไม่เอาคีม ใส่กล่องขนมเหมือนเดิม"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hobby_chopstick_tweezers
+        text: "ประดิษฐ์คีมจากตะเกียบเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คีมตะเกียบคีบได้จริงจนน้าขอลองใช้ ครูศิลปะเอาไปสาธิตให้ทั้งชั้นดู", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คีมตะเกียบหนีบได้ทุกอย่างยกเว้นแสตมป์ มื้อเย็นคุณเลยไม่มีตะเกียบใช้", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_stamp_yellow_01
+    type: A
+    category: work_money
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 85]}
+    title: "กระดาษเหลืองตามอายุ"
+    text: "คุณเจอกล่องแสตมป์เก่าในตู้ที่ลืมไปหลายสิบปี หิ้วไปให้ร้านประเมิน หวังขายเป็นเงินก้อน คนรับซื้อใช้แว่นส่องทีละซอง บอกว่าหลายดวงกระดาษเหลือง ฟันแตก ถ้าเก็บใส่ซองเมานต์แต่แรกคงไม่เหลืองขนาดนี้ ราคาหักเหลือไม่ถึงครึ่ง ในร้านมีคนหนุ่มยืนฟังอยู่"
+    choices:
+      - id: hobby_sell_at_low_price
+        text: "ขายตามราคาที่ร้านให้"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.05}}
+        merit: [{cat: neutral}]
+      - id: hobby_second_opinion
+        text: "ไปถามร้านอื่นอีกสองร้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ร้านที่สามเจอชุดหายากซ่อนอยู่ในซองท้าย ๆ ให้ราคาดีกว่าร้านแรกเกือบเท่าตัว", effects: {happiness: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทุกร้านให้ราคาใกล้กัน คุณเสียค่ารถไปสามวันเพื่อรู้ว่าร้านแรกไม่ได้โกง", effects: {health: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_give_to_youngster
+        text: "ยกชุดเล็กให้คนหนุ่มในร้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาดีใจจนพูดไม่ออก เดือนถัดมาหิ้วขนมมาเยี่ยม ขอฟังเรื่องแสตมป์แต่ละดวงจนเย็น", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขารับไปอย่างสุภาพ อีกอาทิตย์คุณเห็นชุดนั้นวางขายอยู่ในร้านเดิม", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_take_all_home
+        text: "ไม่ขายแล้ว ขนกลับบ้าน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hobby_story_for_each
+        text: "ขอเล่าประวัติทีละดวงก่อนตีราคา"
+        outcomes:
+          - {weight: 1, ok: true, text: "เล่าถึงดวงที่สี่สิบ เจ้าของร้านปิดร้านเร็วเพื่อฟังต่อ แล้วขยับราคาให้ เพราะฟังจนเกรงใจ", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: 0.07}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เล่าจนร้านปิด เจ้าของร้านเดินไปหลับหลังตู้ ตื่นขึ้นมาเขาก็ยังให้ราคาเท่าเดิม", effects: {happiness: -1, money: {unit: income_x, amount: 0.04}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_stamp_show_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "งานแสตมป์ที่ไปรษณีย์กลาง"
+    text: "ไปรษณีย์กลางจัดงานแสดงแสตมป์ ตู้กระจกเรียงยาวเต็มโถง นักเล่นจากหลายจังหวัดมากันครบ บูธท้ายงานมีคนตั้งโต๊ะแลกเปลี่ยน คนรู้จักฝากซองแสตมป์ตัวซ้ำให้คุณถือมาเป็นปึก บอกว่าแลกอะไรมาก็ได้ ข้างนอกฟ้าเริ่มครึ้ม"
+    choices:
+      - id: hobby_trade_table_show
+        text: "นั่งลงที่โต๊ะแลกเปลี่ยน"
+        outcomes:
+          - {weight: 1, ok: true, text: "แลกได้ดวงที่คนทั้งโต๊ะบอกว่าหายาก คนนั่งข้าง ๆ ขอที่อยู่ไว้ส่งจดหมายคุยกันต่อ", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นั่งต่อรองกับลุงคนหนึ่งสองชั่วโมง สุดท้ายลุงบอกว่าเดิมทีก็ไม่ได้คิดจะแลก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_read_every_case
+        text: "เดินอ่านป้ายครบทุกตู้"
+        effects: {knowledge: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: hobby_buy_first_day_cover
+        text: "ซื้อซองวันแรกจำหน่ายกลับบ้าน"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: hobby_join_collectors_club
+        text: "สมัครเข้าชมรมคนเล่นแสตมป์"
+        outcomes:
+          - {weight: 1, ok: true, text: "ชมรมนัดเจอกันเดือนละครั้งที่ร้านกาแฟเก่า เรื่องที่คุยไม่เคยหมดก่อนกาแฟ", effects: {network: 2, relations: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ประชุมแรกคุณถูกเลือกเป็นเหรัญญิก ทั้งที่ยังจำชื่อใครไม่ได้เลย", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_stamp_on_shirt
+        text: "ติดแสตมป์เต็มเสื้อเดินทั่วงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนหยุดถามทุกห้าก้าว ช่างภาพของงานขอถ่ายรูปไว้ติดบอร์ดหน้าโถงตลอดงาน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฝนตกลงมาก่อนถึงป้ายรถ กาวละลาย แสตมป์ไหลไปกองรวมกันที่ชายเสื้อ", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_amulet_lens_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "ลายนิ้วมือใต้แว่นขยาย"
+    text: "วันอาทิตย์คุณแวะสนามพระหน้าตลาดเพื่อคืนตลับให้คนรู้จัก เซียนแผงข้าง ๆ ก้มส่องทรง พิมพ์ เนื้อ คราบกรุ ไปจนถึงรอยลายนิ้วมือ แล้วยื่นพระผงองค์เล็กให้คุณส่อง เล่าว่ารุ่นนี้ทั้งวงการยอมรับไม่ถึงสิบองค์ แต่เขาเพิ่งได้มาจากบ้านเก่า ท้าให้พิสูจน์"
+    choices:
+      - id: hobby_walk_away_rare
+        text: "ยิ้มคืนให้เขา แล้วเดินต่อ"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: hobby_ask_three_experts
+        text: "ขอเอาไปให้เจ้าอื่นช่วยส่องก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "สามเจ้าส่องแล้วพูดตรงกันว่าองค์ใหม่ คุณไม่เสียเงินสักบาท แถมได้วิธีดูรอยพิมพ์กลับมา", effects: {knowledge: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สามเจ้าให้คำตอบสามแบบ เถียงกันข้ามแผงจนคุณค่อย ๆ ถอยออกมาเงียบ ๆ", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_buy_on_faith
+        text: "ควักเงินเก็บเช่าไว้เลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณห้อยไว้แล้วรู้สึกอุ่นใจ จะแท้หรือไม่ก็ไม่เคยมีใครยืนยันได้ และคุณก็เลิกถาม", effects: {happiness: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สัปดาห์ถัดมาเจอองค์หน้าตาเดียวกันวางเรียงเป็นถาดที่แผงถัดไป", effects: {happiness: -2, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_only_learn_look
+        text: "ขอเรียนวิธีส่อง ไม่ขอเช่า"
+        outcomes:
+          - {weight: 1, ok: true, text: "เซียนชอบคนถาม สอนจุดดูให้สามข้อ แล้วบอกว่าเดือนหน้ามานั่งคุยใหม่ได้", effects: {knowledge: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เซียนเก็บพระกลับเข้าตลับทันที แล้วหันไปคุยกับคนที่มีท่าจะจ่าย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_inspect_own_thumb
+        text: "ส่องลายนิ้วมือตัวเองไปด้วยเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณบอกว่าลายนี้เก่ากว่าแน่ เพราะมีมาตั้งแต่เกิด คนทั้งแผงหัวเราะ เซียนเลยเลี้ยงน้ำเย็นหนึ่งแก้ว", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เซียนมองคุณนิ่ง ๆ แล้วเก็บแว่นขยายคืน จากนั้นก็ไม่มีแผงไหนยื่นแว่นให้คุณอีก", effects: {network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_amulet_contest_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "วันหยุดในงานประกวดพระ"
+    text: "สมาคมผู้นิยมพระเครื่องจัดงานประกวดที่ศาลาวัดในจังหวัด โต๊ะกรรมการเรียงตามรุ่น องค์ที่ได้รางวัลที่หนึ่งถูกวางในตู้ให้คนต่อแถวดู คนรู้จักชวนคุณส่งพระองค์เก่าที่อยู่ในบ้านมานานเข้าประกวด ค่าสมัครไม่แพง แต่ผลประกาศหน้าเวที"
+    choices:
+      - id: hobby_enter_own_piece
+        text: "ส่งองค์เก่าที่บ้านเข้าประกวด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ใบประกาศรางวัลชมเชยใบเล็ก คุณใส่กรอบตั้งไว้มุมห้องรับแขกแล้วไม่เคยย้ายอีกเลย", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กรรมการส่งคืนพร้อมกระดาษแผ่นเล็กเขียนว่าไม่ตรงรุ่น คนรู้จักทำเป็นมองไปทางอื่น", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_queue_view_winner
+        text: "ต่อแถวดูองค์ที่ได้ที่หนึ่ง"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hobby_help_temple_table
+        text: "อาสาช่วยจัดโต๊ะให้ทางวัด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยกโต๊ะทั้งเช้า ตกเย็นกรรมการสมาคมจำชื่อคุณได้ ชวนมาช่วยงานปีหน้าอีก", effects: {relations: 1, network: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ช่วยยกโต๊ะจนหลังเคล็ด งานจบแล้วยังไม่ได้เห็นองค์ไหนกับตาเลย", effects: {health: -2, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_leave_for_food
+        text: "เดินไปหาของกินหน้าวัดแทน"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: hobby_lens_for_everyone
+        text: "แบกแว่นขยายบานใหญ่ไปส่องตู้"
+        outcomes:
+          - {weight: 1, ok: true, text: "แว่นบานเท่าฝาหม้อ คนต่อแถวขอยืมส่องกันทั้งแถว กรรมการถามว่าไปเอามาจากร้านไหน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แว่นบานใหญ่เกินไปจนส่องเห็นแต่ขนตาตัวเอง คนข้างหลังเริ่มกระแอม", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_plant_leaf_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "ใบเดียวเท่าเงินเดือน"
+    text: "กระแสไม้ด่างมาถึงซอยคุณ ใบเดียวราคาเท่าเงินเดือนคนทำงาน ต้นในกระถางหลังบ้านคุณเพิ่งแตกใบขาวสลับเขียว คนรู้จักเดินมาดูแล้วตาโต มีคนเสนอซื้อใบนั้นตอนนี้ อีกคนบอกให้รอ เพราะราคายังขึ้นทุกอาทิตย์"
+    choices:
+      - id: hobby_cut_one_leaf
+        text: "ตัดใบขายทันทีหนึ่งใบ"
+        effects: {happiness: 1, money: {unit: fixed_baht, amount: 6000, ref_year: 2564}}
+        merit: [{cat: neutral}]
+      - id: hobby_wait_plant_grow
+        text: "รอให้ต้นโตค่อยขายทั้งต้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "ต้นแตกยอดเพิ่มอีกสองกิ่ง ราคายังดีทันตอนขาย ได้ก้อนใหญ่พอซ่อมหลังคาบ้าน", effects: {happiness: 2, money: {unit: fixed_baht, amount: 40000, ref_year: 2564}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หกเดือนให้หลังกระแสซา คนที่เคยเสนอซื้อเดินมาถามว่ามีกระถางมือสองขายไหม", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_borrow_buy_more
+        text: "ยืมเงินเพื่อนมาซื้อไม้เพิ่ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ซื้อมาสองกระถาง ขายออกทันก่อนราคาร่วง คืนเพื่อนครบแล้วเหลือกำไรพอเลี้ยงข้าว", effects: {happiness: 1, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดือนถัดมาราคาเหลือหนึ่งในสี่ คุณมีต้นไม้สวยสามกระถางกับหนี้เพื่อนหนึ่งก้อน", effects: {happiness: -2, relations: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_keep_just_for_looks
+        text: "ไม่ขาย ปลูกไว้ดูเล่นต่อไป"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hobby_guard_plant_nightly
+        text: "กางมุ้งนอนเฝ้ากระถางหลังบ้าน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เฝ้าได้สามคืน ใบไม่หายสักใบ คนในซอยเรียกหลังบ้านคุณว่าตู้นิรภัยสีเขียว", effects: {happiness: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีโจรมา มีแต่ยุงทั้งซอย ตื่นเช้ามาหน้าบวมจนที่ทำงานถามว่าไปมีเรื่องกับใคร", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_plant_mail_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [22, 30]}
+    title: "ต้นไม้ไม่ตรงกับในรูป"
+    text: "คุณเห็นรูปไม้ด่างสวยในประกาศขาย รีบส่งเงินไปตามที่อยู่ที่เขาให้ สองอาทิตย์ต่อมาของมาถึงในกล่องกระดาษ เป็นต้นผอมสูงใบเขียวล้วน ด่างแค่ปลายใบเดียว ในกล่องมีกระดาษแผ่นเล็กเขียนว่า ขอบคุณที่อุดหนุน"
+    choices:
+      - id: hobby_write_complaint_seller
+        text: "เขียนจดหมายทวงถึงคนขาย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนขายยอมส่งต้นใหม่มาให้แทน พร้อมจดหมายแก้ตัวยาวสองหน้าเรื่องคนงานจัดของผิด", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "จดหมายตีกลับมาพร้อมตราประทับว่าไม่มีผู้รับตามที่อยู่นี้", effects: {happiness: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_raise_green_plant
+        text: "เลี้ยงต่อ เผื่อด่างออกใบใหม่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ใบที่สี่แตกออกมาด่างครึ่งใบ คุณนั่งมองมันทุกเช้าราวกับเพิ่งถูกรางวัล", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ใบใหม่ออกมาเขียวปี๋ทุกใบ ปลายใบเดียวที่ด่างก็เหลืองแล้วร่วงไป", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_warn_plant_friends
+        text: "เตือนเพื่อนกลุ่มคนรักต้นไม้"
+        effects: {relations: 1, network: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hobby_accept_lesson
+        text: "ทำใจ ถือว่าเสียค่าเรียนรู้"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: hobby_paint_white_stripes
+        text: "แต้มสีขาวลงใบให้ด่างเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนที่มาเยี่ยมมองแล้วก้มดูใกล้ ๆ ก่อนหัวเราะจนต้องนั่งลง ต้นนี้เลยได้ชื่อว่าด่างมือ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "สีอุดรูใบจนต้นเริ่มเฉา สุดท้ายต้องเอาน้ำล้างใบทีละใบตอนเที่ยงคืน", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_plant_cutting_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 85]}
+    title: "อบกิ่งชำสามสิบวัน"
+    text: "คุณตัดกิ่งไม้ที่หวงที่สุดลงกระถาง ครอบโหลแก้วไว้ คนที่ชำกิ่งเป็นบอกว่าต้องอบไว้ราวยี่สิบห้าถึงสามสิบห้าวันกว่ารากจะออก ห้ามเปิดบ่อย วันนี้เป็นวันที่ห้า และคุณเดินมายกโหลดูไปแล้วสามรอบตั้งแต่เช้า"
+    choices:
+      - id: hobby_leave_jar_closed
+        text: "ทนไม่เปิด จนครบกำหนด"
+        outcomes:
+          - {weight: 1, ok: true, text: "วันที่สามสิบรากขาวเล็ก ๆ โผล่มาแนบข้างกระถาง คุณเดินไปบอกคนทั้งซอยทีละบ้าน", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครบวันเปิดโหล กิ่งเน่าไปนานแล้ว ตั้งแต่วันที่ตั้งใจจะไม่แตะมันอีก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_peek_every_morning
+        text: "แง้มดูวันละครั้งตอนเช้า"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: hobby_cuttings_for_neighbors
+        text: "ชำเพิ่มหลายกิ่งไว้แจกเพื่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "รอดครึ่งหนึ่งก็พอแจกทั้งซอย ทุกบ้านมีกระถางที่มาจากมือคุณวางอยู่หน้าประตู", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กิ่งที่ชำทั้งหมดแข่งกันเน่า เหลือแต่คำสัญญาที่เคยบอกเพื่อนไว้ทั่วซอย", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_morning_walk_instead
+        text: "ไปเดินตลาดเช้าให้ลืมโหล"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: hobby_news_to_cutting
+        text: "นั่งเล่าข่าวให้กิ่งฟังทุกเช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "รากออกก่อนกำหนดสองวัน คุณยืนยันว่าเพราะมันชอบข่าวท้องถิ่น คนในซอยเริ่มแวะมาฟังข่าวด้วย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนเดินผ่านรั้วได้ยินคุณบ่นเรื่องราคาไข่กับโหลแก้ว แล้วไปเล่าต่อทั่วตลาด", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_fish_release_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [13, 18]}
+    title: "ปลาเท่าสองนิ้ว"
+    text: "คุณไปตกปลาที่คลองท้ายหมู่บ้านกับรุ่นพี่ที่ตกเก่ง ทั้งเช้าได้ตัวเดียวเท่าสองนิ้ว รุ่นพี่บอกตัวเล็กขนาดนี้ต้องปล่อยคืนน้ำ อย่าทิ้งให้แห้งตายบนฝั่ง แล้วยังไล่ให้เลิกอวดคันเบทคาสติ้งที่ยืมมา เพราะมือใหม่เอาไม่อยู่"
+    choices:
+      - id: hobby_release_small_fish
+        text: "ปล่อยคืนน้ำ แล้วนั่งตกต่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "บ่ายแก่ ๆ ได้ตัวเท่าแขน รุ่นพี่ตบบ่าแล้วชวนมาคราวหน้าอีก", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นั่งถึงเย็นไม่มีอะไรมากิน ได้แต่แดดเผาต้นคอเป็นรางวัล", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_keep_tiny_fish
+        text: "เก็บใส่กระป๋องไว้อวดที่บ้าน"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hobby_borrow_starter_rod
+        text: "ขอคันสปินนิ่งของรุ่นพี่แทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คันสปินนิ่งเบามือ ตีเหยื่อลงตรงจุดได้เป็นครั้งแรก คุณเลยลืมเรื่องอวดคันเบทคาสติ้งไปเลย", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตีเหยื่อไปเกี่ยวกิ่งไผ่ฝั่งตรงข้าม รุ่นพี่ต้องลุยน้ำไปแกะให้", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_quit_go_noodles
+        text: "เลิกตก ไปหาก๋วยเตี๋ยวกิน"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: hobby_whisper_small_fish
+        text: "ฝากปลาไปบอกตัวใหญ่ให้มาแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณกระซิบกับมันก่อนปล่อย ไม่ถึงชั่วโมงได้ตัวโต รุ่นพี่เลยเรียกคุณว่าทูตประจำคลอง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มันคงไม่ได้ไปบอกใคร เพราะที่เหลือของวันคุณตกได้แต่รองเท้าแตะหนึ่งข้าง", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_fish_trip_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "ทริปเขื่อนเช้าวันเสาร์"
+    text: "คุณนัดตกปลาที่เขื่อน แต่เพื่อนที่นัดไว้ฝากคนมาบอกตอนตีห้าว่าไปไม่ได้ เรือเช่าจ่ายมัดจำไว้แล้ว น้ำลึก คนหน้าท่าเตือนว่าไปคนเดียวไม่ดี ต้องใส่ชูชีพ ส่วนบ่อตกปลาหน้าเขื่อนค่าเข้าถูกแสนถูก ขนมปังถุงเดียวนั่งได้ทั้งวัน"
+    choices:
+      - id: hobby_solo_with_vest
+        text: "ลงเรือคนเดียว ใส่ชูชีพเต็มยศ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้ตกเงียบ ๆ ทั้งเช้า น้ำนิ่งจนได้ยินเสียงเหยื่อลงน้ำ กลับมาใจเบาเหมือนได้หยุดยาว", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลมมากลางน้ำ พายกลับเองเกือบชั่วโมง ยังดีที่ใส่ชูชีพ แขนใช้การไม่ได้ไปสองวัน", effects: {health: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_switch_to_pond
+        text: "เปลี่ยนไปนั่งบ่อหน้าเขื่อนแทน"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: hobby_find_pier_partner
+        text: "ชวนคนแปลกหน้าที่ท่าน้ำไปด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเป็นคนพื้นที่ รู้จุดปลาหมด ทริปนั้นปลาเต็มถังและได้เพื่อนตกปลาไปอีกนาน", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาพูดไม่หยุดตั้งแต่ท่าจนเรือเทียบ ปลาหนีไปหมดทั้งลำน้ำ", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_cancel_lose_deposit
+        text: "ยอมเสียมัดจำ กลับไปนอนต่อ"
+        effects: {health: 1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: hobby_vest_all_day
+        text: "ใส่ชูชีพตกปลาบ่อตื้นทั้งวัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้ำลึกแค่หน้าแข้ง คนทั้งบ่อแซวว่าใส่กันจมบนฝั่งหรือ เจ้าของบ่อหัวเราะจนไม่คิดค่าขนมปัง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แดดเที่ยงกับชูชีพหนาทำให้เหงื่อท่วมตัว ปลาไม่ได้สักตัว ได้แต่ผื่นตามคอ", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: hobby_band_practice_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45], flags: {not: [home_owner]}}
+    title: "วงเก่าซ้อมหลังสี่ทุ่ม"
+    text: "เพื่อนสมัยเรียนชวนตั้งวงเล่นกันอีกหน คุณรับเล่นกีตาร์ นัดซ้อมในห้องเช่าหลังเลิกงาน เพิ่งถึงเพลงที่สอง เสียงกลองก็ลากยาวเกินสี่ทุ่ม เจ้าของตึกสอดใบเตือนใต้ประตู ส่วนร้านดนตรีไม้สองชั้นหัวมุมถนนรับวงสมัครเล่นวันธรรมดา"
+    choices:
+      - id: hobby_finish_before_curfew
+        text: "ซ้อมให้จบก่อนสามทุ่มครึ่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เล่นเบาลงแล้วฟังกันรู้เรื่องขึ้นเยอะ เจ้าของตึกแอบมายืนฟังหน้าห้องเพลงสุดท้าย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เลิกงานกันช้า เหลือเวลาซ้อมครึ่งชั่วโมง วงได้แต่ตั้งสายกับคุยเรื่องหนี้", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_play_at_corner_pub
+        text: "ขอไปเล่นร้านหัวมุมคืนธรรมดา"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนนั่งฟังแค่สิบกว่าโต๊ะ แต่ลุกขึ้นเต้นไปสองโต๊ะ เจ้าของร้านให้ข้าวผัดคนละจาน", effects: {happiness: 3, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลืมคอร์ดตั้งแต่ท่อนแรก มือกลองหันมามองคุณตลอดเพลง คนในร้านคุยกันต่อเหมือนไม่มีวง", effects: {happiness: -2, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: hobby_rent_practice_room
+        text: "ลงขันเช่าห้องซ้อมรายชั่วโมง"
+        effects: {happiness: 1, relations: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: hobby_end_the_band
+        text: "เลิกวง กลับไปฟังเพลงเก่าที่ห้อง"
+        effects: {happiness: -1, relations: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: hobby_invite_landlord_drums
+        text: "เชิญเจ้าของตึกมาตีกลองซะเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของตึกตีกลองเป็นตั้งแต่หนุ่ม ใบเตือนใบต่อมาถูกเปลี่ยนเป็นตารางซ้อมที่เขาเขียนเอง", effects: {happiness: 3, network: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาตีครบเพลงด้วยจังหวะของตัวเอง แล้วออกใบเตือนให้คุณเพิ่มอีกหนึ่งใบเรื่องกลองของเขา", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

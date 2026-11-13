@@ -1,0 +1,526 @@
+# ร่างเรื่อง งานแต่ง สินสอด · 15 ใบ · ลงเกมแล้ว ใบ 247 จากร่าง 246 · แก้ตามข้อค้านรอบ 1 · ผู้เล่นเป็นแขก ญาติ เพื่อน คนกั้นประตู คนรับซอง คนทำครัว เถ้าแก่ เพื่อนบ้าน เสมอ · ไม่อ่านและไม่ตั้งธง · ไม่ผูกปี
+events:
+  - id: bridal_gate_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [5, 12]}
+    title: "ด่านสายสร้อยหน้าบ้าน"
+    text: "บ้านญาติจัดงานแต่ง ผู้ใหญ่ยื่นสายสร้อยเส้นยาวให้คุณกับเด็ก ๆ ในบ้านถือกั้นทาง บอกว่าใครจะผ่านต้องมีซองก่อน ขบวนเจ้าบ่าวมาถึงแล้ว ลุงฝั่งนั้นย่อตัวลงมายิ้มถามว่า ด่านนี้คิดเท่าไรดีครับคุณเจ้าหน้าที่"
+    choices:
+      - id: bridal_kid_open_gate
+        text: "รับซองแล้วเปิดทางให้"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_kid_ask_aunt
+        text: "หันไปถามป้าว่าเอาเท่าไร"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_kid_hold_chain
+        text: "กำสายสร้อยแน่น ไม่ยอมปล่อย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงควักซองเพิ่มอีกใบ ทั้งขบวนปรบมือให้ด่านที่ต่อไม่ลง คุณเดินวนถือซองอวดอยู่จนเที่ยง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถือนานจนเลยเวลาที่ผู้ใหญ่นัดไว้ ป้าเดินมาแกะนิ้วคุณออกทีละนิ้ว แล้วขอโทษฝั่งนั้นแทน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_kid_share_small
+        text: "แบ่งซองให้เด็กคนเล็กที่ร้องไห้"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_kid_ice_toll
+        text: "ขอค่าผ่านเป็นไอติมสิบแท่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงส่งคนวิ่งไปร้านปากซอยจริง ๆ ขบวนรอไอติมกันทั้งแถว เด็กทุกคนบอกว่านี่คืองานแต่งที่ดีที่สุดในชีวิต", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงให้ซองแทนแล้วเดินผ่านไป พอเปิดดู คุณไม่รู้ว่าเงินในนั้นซื้อไอติมได้กี่แท่ง จนเด็กคนโตบอกว่าไม่ถึงสิบ", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_kitchen_errand_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [8, 12]}
+    title: "เด็กวิ่งครัวงานแต่ง"
+    text: "ครอบครัวมุสลิมข้างบ้านจัดงานแต่ง ญาติกับเพื่อนบ้านทั้งซอยมาช่วยกันตั้งครัวรับแขกตั้งแต่เช้า คุณตัวเล็กพอจะมุดผ่านหม้อใบใหญ่ได้เลยถูกใช้ไม่หยุด ป้าคนหนึ่งตะโกนบอกให้ไปหยิบของ แต่คุณได้ยินไม่ทันว่าอะไร"
+    choices:
+      - id: bridal_errand_ask_again
+        text: "กลับไปถามป้าอีกรอบ"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_errand_guess
+        text: "วิ่งไปหยิบสิ่งที่คิดว่าใช่"
+        outcomes:
+          - {weight: 1, ok: true, text: "หยิบหอมแดงมาถูกพอดี ป้าเอามือลูบหัวแล้วตักขนมใส่ถ้วยให้ก่อนแขกจะได้กิน", effects: {happiness: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ป้าขอน้ำตาล คุณถือเกลือมาทั้งถุง ทั้งครัวหัวเราะแล้วสั่งให้วิ่งอีกเที่ยว", effects: {health: -1, happiness: 1}, merit: [{cat: help_others, level: 1}]}
+        merit: [{cat: neutral}]
+      - id: bridal_errand_learn_pound
+        text: "ขอหัดตำเครื่องแกงกับป้า"
+        effects: {knowledge: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_errand_hide
+        text: "แอบไปนั่งหลบแดดหลังบ้าน"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_errand_whole_basket
+        text: "ยกมาทั้งตะกร้า ให้ป้าเลือกเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าเลือกของที่ต้องการได้ในพริบตา แล้วเรียกคุณว่าตะกร้าเดินได้ทั้งวัน คนทั้งครัวเรียกใช้กันไม่หยุด", effects: {happiness: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ก้นตะกร้าหลุดกลางครัว หอมกลิ้งไปถึงหน้าประตู คุณคลานเก็บอยู่นานกว่าทำกับข้าวเสียอีก", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_drum_line_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [13, 18], school: [lower, upper, voc]}
+    title: "โดนดึงเข้าขบวนกลองยาว"
+    text: "ขบวนขันหมากบ้านท้ายซอยแห่ผ่านหน้าบ้านพร้อมกลองยาว คุณแค่ออกมายืนดู แต่ป้าคนหนึ่งในขบวนคว้าข้อมือดึงเข้าแถว แดดเปรี้ยง ทุกคนรำกันหมด เพื่อนร่วมห้องยืนอยู่ฝั่งตรงข้ามพอดี และคุณยังถือถุงกับข้าวอยู่ในมือ"
+    choices:
+      - id: bridal_drum_dance_along
+        text: "รำตามไปจนถึงบ้านเจ้าสาว"
+        outcomes:
+          - {weight: 1, ok: true, text: "รำไม่เป็นแต่รำเต็มที่ ถึงบ้านเจ้าสาวมีคนยื่นน้ำเย็นให้เหมือนเป็นญาติแท้ ๆ กับข้าวถึงบ้านช้าไปชั่วโมงหนึ่ง", effects: {happiness: 2, network: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รำเพลิน ถุงกับข้าวแกว่งจนน้ำแกงซึมเลอะขา เพื่อนร่วมห้องจำท่านี้ไปเล่าต่อถึงวันจบการศึกษา", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_drum_carry_tray
+        text: "ขอช่วยยกพานแทนการรำ"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_drum_slip_out
+        text: "ยิ้มแล้วค่อย ๆ หลุดออกจากแถว"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_drum_ask_beat
+        text: "ขอคนตีกลองสอนจังหวะ"
+        effects: {knowledge: 2, network: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_drum_school_move
+        text: "งัดท่าเต้นกีฬาสีมาใส่ขบวน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนตีกลองเร่งจังหวะตาม ทั้งขบวนรำท่ากีฬาสีกันเป็นแถว เถ้าแก่เดินนำยังแอบขยับไหล่", effects: {happiness: 2, relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ท่าที่สามทำเอาคุณชนพานผลไม้ ส้มกลิ้งลงถนน เด็กข้างทางเก็บไปกินหมดก่อนใครจะนับทัน", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_keepsake_short_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [15, 18]}
+    title: "ของชำร่วยเหลือสามชิ้น"
+    text: "ญาติขอให้คุณยืนแจกของที่ระลึกหน้างาน แขกคนละชิ้นตอบแทนที่มาร่วมงาน ตอนนี้ในกล่องเหลือสามชิ้น แต่แขกยังเดินออกมาเป็นแถว ลุงที่ใส่ซองหนาที่สุดในงานกำลังเดินมาถึง คุณรู้เพราะลุงพูดเองตั้งแต่หน้าประตู"
+    choices:
+      - id: bridal_keepsake_queue
+        text: "แจกตามคิว หมดแล้วขอโทษ"
+        effects: {relations: 1, knowledge: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_keepsake_save_elders
+        text: "เก็บไว้ให้ผู้สูงอายุที่เดินช้า"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_keepsake_flowers
+        text: "ไปเก็บดอกไม้หน้างานมาแจกแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "แขกที่ได้ดอกไม้ถือกลับบ้านอย่างงง ๆ แต่ยิ้ม เจ้าภาพผ่านมาเห็นแล้วพยักหน้าให้คุณ", effects: {happiness: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ดอกไม้ที่เด็ดคือซุ้มหน้างานที่ยังถ่ายรูปกันไม่เสร็จ ญาติเจ้าสาวเดินมาตามหาคนเด็ด", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_keepsake_tell_host
+        text: "วิ่งไปบอกเจ้าภาพให้รู้ก่อน"
+        effects: {relations: 1, health: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_keepsake_reserved
+        text: "บอกลุงว่าเหลือแต่รุ่นพิเศษ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงรับของที่ระลึกไปด้วยสองมือ เล่าต่อให้ทั้งโต๊ะฟังว่าตัวเองได้รุ่นพิเศษ แขกที่เหลือเลยไม่กล้าบ่นว่าไม่ได้", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แขกคนถัดไปขอรุ่นพิเศษบ้าง คุณยืนอธิบายว่าสองชิ้นนี้ต่างกันตรงไหนทั้งที่เหมือนกันทุกอย่าง", effects: {relations: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_mc_mic_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [22, 30]}
+    title: "พิธีกรจำเป็น ไมค์ดับ"
+    text: "เพื่อนขอให้คุณเป็นพิธีกรงานเลี้ยงเพราะเห็นว่าคุยเก่ง คุณกำลังอ่านรายชื่อญาติสองฝั่งจากกระดาษที่เขียนมาทั้งคืน ไมค์ดับกลางคำว่าขอเรียนเชิญ แขกทั้งงานมองขึ้นเวที ลุงโต๊ะหน้าตะโกนว่าไม่ได้ยินเลย"
+    choices:
+      - id: bridal_mc_shout
+        text: "ตะโกนเรียกชื่อต่อด้วยเสียงจริง"
+        effects: {health: -1, relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_mc_call_tech
+        text: "ขอเวลาครู่หนึ่ง เรียกช่างเสียง"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_mc_elder_story
+        text: "ชวนญาติคนโตขึ้นมาเล่าเรื่องแทน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ญาติคนโตเล่าเรื่องเจ้าสาวตอนเด็กจนทั้งงานหัวเราะ ไมค์กลับมาตอนไหนไม่มีใครสังเกต เพื่อนกอดคุณจนเครื่องสำอางเลอะ", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เล่ายาวจนพ้นเวลาเปิดฟลอร์ เจ้าภาพส่งสายตามาทางคุณว่าช่วยจบให้หน่อย แต่ไม่มีใครกล้าขึ้นไปพูด", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_mc_sing_cover
+        text: "ร้องเพลงคั่นไปก่อนสักเพลง"
+        effects: {happiness: 1, network: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_mc_mime
+        text: "แสดงละครใบ้บอกชื่อญาติทีละคน"
+        outcomes:
+          - {weight: 1, ok: true, text: "โต๊ะหน้าทายชื่อกันเสียงดังเหมือนเล่นเกม ลุงเจ้าของชื่อยืนรับเสียงปรบมือ งานนี้พูดถึงไปอีกหลายปี", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ท่าของคุณดูเหมือนกำลังขอความช่วยเหลือ คนเดินเสิร์ฟวางแก้วน้ำแล้วพาคุณลงจากเวทีอย่างนุ่มนวล", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_tray_bearer_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [19, 30]}
+    title: "คนต่อท้ายแถวขันหมาก"
+    text: "คุณเป็นเพื่อนเจ้าบ่าวที่มาสาย เลยได้ยืนท้ายขบวนต่อจากเถ้าแก่กับคนยกขันหมากคนอื่น ๆ พานใบที่เหลือคือใบหนักสุด ทั้งกล้วยทั้งอ้อย ทางถึงบ้านเจ้าสาวไกลกว่าที่ใครบอก แขนคุณเริ่มสั่นตั้งแต่ก้าวที่ยี่สิบ"
+    choices:
+      - id: bridal_bearer_endure
+        text: "กัดฟันเดินจนถึงบ้าน"
+        effects: {health: -2, relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_bearer_swap
+        text: "ขอสลับพานกับเพื่อนครึ่งทาง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนรับไปโดยไม่พูดอะไร แล้วคืนให้ตอนถึงหน้าบ้านพอดี คนถ่ายรูปได้ภาพคุณยิ้มสบายเหมือนยกมาคนเดียว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตอนส่งต่อกันอ้อยเอียง แถวข้างหลังต้องหยุดทั้งขบวน เถ้าแก่หันมามองโดยไม่ต้องพูดอะไร", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_bearer_shade
+        text: "เดินชิดรั้วที่มีเงาตลอดทาง"
+        effects: {health: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_bearer_help_elder
+        text: "เดินเป็นเพื่อนผู้ใหญ่ท้ายแถว"
+        effects: {relations: 2, network: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_bearer_dance_tray
+        text: "เต้นตามกลองแบบไม่วางพาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณขยับไหล่ไปกับจังหวะ พานไม่เอียงสักนิด ญาติฝั่งเจ้าสาวชี้มาทางคุณแล้วถามว่าคนนี้มีแฟนหรือยัง", effects: {happiness: 2, network: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กล้วยหนึ่งหวีไถลตกจากพาน คนในขบวนหลบกันเป็นทาง เจ้าบ่าวหันมาทำตาเหมือนจะเลิกคบ", effects: {relations: -2, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_envelope_sum_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "การ์ดเชิญใบที่สามของเดือน"
+    text: "เดือนนี้มีการ์ดงานแต่งใบที่สามวางบนโต๊ะ เป็นคนรู้จักที่เคยช่วยคุณไว้ ซองสองใบแรกกินงบเดือนนี้ไปเยอะแล้ว ถ้าใส่น้อยก็กลัวเขาอ่านออกว่าคิดกันแค่นี้ ถ้าใส่เท่าที่ควรก็ต้องรัดเข็มขัดไปอีกครึ่งเดือน"
+    choices:
+      - id: bridal_sum_as_afford
+        text: "ใส่เท่าที่ไหว ไม่คิดมาก"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.01}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_sum_stretch
+        text: "ใส่เต็มที่ ยอมรัดเข็มขัด"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.03}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_sum_pool
+        text: "ชวนเพื่อนรวมซองใบเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ซองเดียวหนาพอดี เจ้าภาพอ่านชื่อทั้งแถวแล้วยกมือไหว้ทั้งโต๊ะ คุณจ่ายน้อยลงและยังได้ที่นั่งกับเพื่อน", effects: {network: 2, relations: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนคนเก็บเงินลืมซองไว้ที่บ้าน ทั้งกลุ่มเดินเข้างานมือเปล่าแล้วยืนยิ้มแห้งให้เจ้าภาพอยู่นาน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_sum_help_instead
+        text: "ไปช่วยงานเต็มวันแทนซองหนา"
+        effects: {relations: 2, health: -1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_sum_no_name
+        text: "ใส่ซองโดยไม่เขียนชื่อหน้าซอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่มีใครรู้ว่าซองไหนของใคร คุณเดินกินข้าวสบายใจที่สุดในรอบเดือน แล้วแอบดูคนนับซองด้วยความสงบ", effects: {happiness: 2, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนรับซองกางสมุดถามชื่อต่อหน้าแถว แล้วเขียนยอดของคุณลงไปตัวใหญ่จนแถวหลังอ่านออก", effects: {happiness: -1, relations: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_gate_ledger_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "คนถือซองผ่านประตู"
+    text: "ญาติฝั่งเจ้าบ่าวฝากคุณถือซองผ่านประตูทั้งหมด ด่านแรกประตูเงิน ด่านถัดไปประตูทอง ซองจัดเรียงไว้ตามลำดับ แต่พอถึงด่านที่สาม ฝั่งเจ้าสาวขอเพิ่มอีกเท่าตัว ซองในมือบางลงทุกก้าว และบ้านเจ้าสาวยังอีกหลายด่าน"
+    choices:
+      - id: bridal_ledger_negotiate
+        text: "ต่อรองกันดี ๆ แบบผู้ใหญ่"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณขอลดด้วยการร้องเพลงหนึ่งบท ฝั่งเจ้าสาวหัวเราะแล้วเปิดทาง ซองที่เหลือพอถึงด่านสุดท้ายพอดี", effects: {happiness: 2, network: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนกั้นประตูเล่นตามบทไม่ถอย คุณต้องควักซองของตัวเองออกมาอีกใบ เจ้าบ่าวสัญญาว่าจะคืนซึ่งไม่มีใครเชื่อ", effects: {money: {unit: income_x, amount: -0.02}, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_ledger_split_small
+        text: "แบ่งซองที่เหลือให้เท่ากันทุกด่าน"
+        effects: {knowledge: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_ledger_ask_groom
+        text: "กระซิบบอกเจ้าบ่าวว่าเงินจะหมด"
+        effects: {relations: 1, happiness: -1, network: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_ledger_chip_in
+        text: "เติมเงินตัวเองลงไปเงียบ ๆ"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_ledger_iou
+        text: "ยื่นกระดาษเขียนว่าติดไว้ก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝั่งเจ้าสาวอ่านออกเสียงแล้วหัวเราะทั้งแถว ด่านนี้รับใบติดไว้ก่อนจริง และเอาไปแปะหน้าบ้านให้แขกอ่านทั้งวัน", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนกั้นประตูรับกระดาษไว้ แล้วทวงคุณในงานบุญปีถัดมาต่อหน้าญาติทั้งสองฝั่ง", effects: {relations: -1, happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_odd_trays_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "พานขาดไปหนึ่งใบ"
+    text: "เช้างานหมั้นของหลาน คุณช่วยจัดขันหมากอยู่หน้าบ้าน ผู้ใหญ่บอกว่าต้องเป็นจำนวนคู่ ซึ่งนับกี่รอบก็ได้เลขคี่ พานที่หายไปไม่รู้ว่าอยู่รถคันไหน ฤกษ์เหลืออีกไม่ถึงชั่วโมง และทุกคนกำลังมองคนที่ถือสมุดจดอยู่ คือคุณ"
+    choices:
+      - id: bridal_odd_recount
+        text: "นับใหม่ทีละพานต่อหน้าทุกคน"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_odd_run_market
+        text: "รีบไปตลาดหาพานเพิ่ม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้พานเก่าจากร้านขายของบูชาทันเวลา ใส่กล้วยไปหนึ่งหวี ไม่มีใครรู้ว่ามาจากไหนนอกจากคุณกับร้าน", effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "กลับมาถึงแล้วพบว่าพานใบที่หายนั่งอยู่บนตักป้าในรถคันหน้าตลอดทาง ตอนนี้เลยกลายเป็นคี่อีกครั้ง", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_odd_split_tray
+        text: "แบ่งของจากพานใหญ่เป็นสองพาน"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_odd_ask_elder
+        text: "ถามผู้ใหญ่ว่าพอจะมีทางไหม"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_odd_count_lid
+        text: "เสนอให้นับฝาครอบเป็นอีกพาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ใหญ่หัวเราะจนหายเครียด แล้วพาทุกคนย้ายขนมมาแบ่งใส่ถาดกันจนได้เลขคู่ทันฤกษ์", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีใครขำ ป้าหยิบสมุดจดไปจากมือคุณ แล้วให้คุณไปยืนถือร่มแทนจนจบงาน", effects: {relations: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_seating_feud_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [33, 45]}
+    title: "ผังที่นั่งญาติไม่คุยกัน"
+    text: "เพื่อนฝากให้คุณจัดผังที่นั่งงานเลี้ยง ญาติผู้ใหญ่ต้องอยู่โต๊ะหน้า แต่ป้าสองคนไม่คุยกันมาสิบปีเพราะเรื่องที่ไม่มีใครจำได้แล้ว คุณแยกโต๊ะให้ห่างสุดแล้ว เหลือแค่โต๊ะอาหารกลางห้องที่ทั้งสองต้องเดินไปตักเหมือนกัน"
+    choices:
+      - id: bridal_seat_two_lines
+        text: "จัดคิวตักอาหารให้เหลื่อมเวลา"
+        effects: {knowledge: 2, network: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_seat_serve_table
+        text: "ให้เด็ก ๆ ตักไปเสิร์ฟถึงโต๊ะ"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_seat_broker_peace
+        text: "ลองชวนสองคนมาทักกันสักคำ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งสองยืนมองกันแล้วถามว่าทะเลาะเรื่องอะไรนะ ไม่มีใครตอบได้ ตอนจบงานนั่งห่อขนมกลับบ้านด้วยกัน", effects: {relations: 2, happiness: 2}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ป้าคนหนึ่งเริ่มเล่าเรื่องสิบปีก่อนเสียงดังต่อหน้าโต๊ะ คุณนั่งฟังจนจบและถูกขอให้เลือกข้าง", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_seat_leave_to_fate
+        text: "ปล่อยไป ผู้ใหญ่แล้วทั้งคู่"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_seat_shrimp_decoy
+        text: "สั่งยกกุ้งออกไปไว้สองมุมห้อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนกินกุ้งแยกเป็นสองกระแส ป้าทั้งสองอยู่คนละฝั่งห้องโดยไม่ต้องจัดอะไร คุณยืนดูเหมือนขุนศึกที่เพิ่งชนะ", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กุ้งฝั่งหนึ่งหมดก่อน แขกทั้งงานไหลไปอีกฝั่ง ป้าทั้งสองมาจ๊ะเอ๋กันหน้าถาดกุ้งใบสุดท้าย", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_emergency_elder_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "เถ้าแก่จำเป็น"
+    text: "ผู้ใหญ่ที่รับปากไปเป็นเถ้าแก่ให้หลานคุณล้มป่วยกะทันหัน ทุกคนหันมาทางคุณเพราะเป็นคนเดียวที่มีเสื้อแขนยาวรีดแล้ว พรุ่งนี้ต้องไปพบผู้ปกครองของฝ่ายว่าที่เจ้าสาวเพื่อเจรจาสู่ขอ คุณไม่เคยทำ และจำชื่อญาติฝั่งนั้นได้แค่สองคน"
+    choices:
+      - id: bridal_elder_rehearse
+        text: "ซ้อมคำพูดหน้ากระจกทั้งคืน"
+        effects: {knowledge: 2, health: -1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_elder_ask_mentor
+        text: "ไปขอคำแนะนำผู้ใหญ่ที่เคยทำ"
+        effects: {network: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_elder_speak_plain
+        text: "พูดตรง ๆ ว่าเพิ่งเป็นครั้งแรก"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้ใหญ่ฝั่งเจ้าสาวหัวเราะแล้วบอกว่าตัวเองก็ตื่นเต้น บรรยากาศหย่อนลง การเจรจาจบก่อนน้ำชาหมดกา", effects: {relations: 2, happiness: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ฝั่งนั้นพยักหน้าเงียบ ๆ แล้วถามว่าญาติผู้ใหญ่คนอื่นว่างวันไหน คุณกลับบ้านพร้อมคำถามที่ไม่รู้จะบอกหลานยังไง", effects: {happiness: -2, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_elder_decline
+        text: "บอกว่าไม่ไหว ขอให้หาคนอื่น"
+        effects: {happiness: 1, relations: -2}
+        merit: [{cat: neutral}]
+      - id: bridal_elder_cue_cards
+        text: "เขียนบทใส่ฝ่ามือไว้ทั้งสองข้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "อ่านจากมือจนจบ ไม่พลาดสักคำ ผู้ใหญ่ฝั่งนั้นเห็นตั้งแต่ไหว้ แต่ชมว่าลายมือสวยแล้วรับคำสู่ขอไว้พิจารณา", effects: {happiness: 2, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ไหว้ทักทายแล้วเหงื่อออกมือ บทหายไปครึ่ง คุณพูดถึงสภาพอากาศอยู่สิบนาทีจนคนฟังเริ่มเป็นห่วง", effects: {happiness: -1, relations: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_token_dowry_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "เกรงใจกันจนเรื่องไม่จบ"
+    text: "ผู้ใหญ่สองบ้านนั่งกันอยู่ในห้องรับแขก คุณเป็นญาติที่ถูกเชิญมานั่งเป็นพยาน ฝั่งเจ้าบ่าวถามว่าจะให้เตรียมสินสอดเท่าไร ฝั่งเจ้าสาวบอกแล้วแต่เลย รับเป็นพิธีแล้วก็จะคืนให้เด็ก ๆ ไปตั้งตัว ทั้งสองฝั่งเกรงใจกันมาชั่วโมงแล้ว"
+    choices:
+      - id: bridal_token_suggest_number
+        text: "ลองเสนอตัวเลขกลาง ๆ ให้คิด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งสองฝั่งโล่งใจที่มีคนพูดตัวเลขให้ก่อน ตกลงกันได้ก่อนข้าวเย็น คู่บ่าวสาวยกมือไหว้คุณจากหลังประตู", effects: {relations: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ทั้งสองฝั่งหันมามองคุณพร้อมกันแล้วถามว่าเอาตัวเลขนี้มาจากไหน คุณไม่ได้เอามาจากไหนเลย", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_token_ask_couple
+        text: "ชวนถามความเห็นคู่บ่าวสาวก่อน"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_token_sit_quiet
+        text: "นั่งฟังเงียบ ๆ ตามหน้าที่พยาน"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_token_change_topic
+        text: "ชวนคุยเรื่องอาหารในงานก่อน"
+        effects: {happiness: 1, relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_token_refill_tea
+        text: "เติมน้ำชาทุกครั้งที่เริ่มเงียบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "น้ำชาเจ็ดกาทำให้ทั้งสองฝั่งลุกไปห้องน้ำพร้อมกัน พอกลับมาใครก็ไม่อยากนั่งนานแล้ว เรื่องจบในสองประโยค", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กาสุดท้ายหกใส่ตักผู้ใหญ่ฝั่งเจ้าบ่าว ทุกคนบอกไม่เป็นไรด้วยความเกรงใจ และการเจรจาก็ยาวออกไปอีก", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_bag_return_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ถุงเงินหลังแขกบางตา"
+    text: "เพื่อนบ้านไม่อยากเอาเงินเก็บมาวางโชว์ จึงเช่าเงินก้อนมาตั้งบนพานให้งานดูสมฐานะ พอแขกบางตา เขายื่นถุงให้คุณเอาไปคืนตามนัด บอกว่าไว้ใจคุณคนเดียว ระหว่างทาง ป้าบ้านตรงข้ามเดินเข้ามาถามว่าถือถุงอะไร"
+    choices:
+      - id: bridal_bag_say_leftovers
+        text: "บอกว่าของที่เหลือจากครัว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าพยักหน้าแล้วเดินไป คุณส่งถุงถึงมือคนรับครบ เพื่อนบ้านเอาแกงหม้อใหญ่มาให้ในเย็นวันนั้นโดยไม่พูดสักคำ", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าบอกว่างั้นขอแบ่งไปกินหน่อย คุณเดินถอยทีละก้าวพลางชมอากาศวันนี้ และไม่กล้าหันหลัง", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_bag_deliver_first
+        text: "ไม่หยุดคุย รีบเอาไปส่งก่อน"
+        effects: {relations: 1, network: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_bag_walk_with_aunt
+        text: "ชวนป้าคุยเรื่องอื่นจนถึงปากซอย"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_bag_tell_truth
+        text: "บอกตรง ๆ ว่าอย่าถามเลยป้า"
+        effects: {relations: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_bag_decoy_route
+        text: "เดินอ้อมสามซอยให้พ้นสายตา"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่มีใครตามทัน ความลับปลอดภัย คุณถึงที่นัดพร้อมเสื้อโชก คนรับถามว่าเดินมาจากต่างอำเภอหรือ", effects: {health: -1, happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ซอยที่สามคือซอยบ้านป้าอีกคน พรุ่งนี้ทั้งหมู่บ้านรู้ว่าคุณเดินถือถุงวนอยู่สามรอบ", effects: {relations: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_term_dispute_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ของหมั้นหรือสินสอด"
+    text: "ญาติสองฝั่งถกกันกลางโต๊ะกับข้าวว่าสร้อยเส้นนี้เรียกของหมั้นหรือสินสอด ฝั่งหนึ่งยืนยันว่าสินสอดต้องให้วันหมั้นเท่านั้น คุณเคยอ่านมาบ้างว่าไม่จำเป็นต้องให้ตอนนั้น เสียงเริ่มดัง ทุกคนหันมาถามคุณพร้อมกัน"
+    choices:
+      - id: bridal_term_explain_gently
+        text: "บอกเท่าที่รู้ ไม่ฟันธง"
+        effects: {knowledge: 1, relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_term_suggest_expert
+        text: "เสนอให้ถามผู้รู้กฎหมายจริง ๆ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ผู้รู้กฎหมายอธิบายสั้น ๆ ว่าสองคำนี้ต่างกัน ทั้งโต๊ะฟังจบแล้วพยักหน้า และกลับไปกินข้าวต่อราวกับไม่เคยเถียงกัน", effects: {knowledge: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ลุงที่บอกว่ารู้กฎหมายพูดยาวไปถึงเรื่องรั้วบ้านเมื่อปีก่อน โต๊ะนี้เลยมีเรื่องให้เถียงเพิ่มอีกหนึ่งเรื่อง", effects: {relations: -1, happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_term_pause_meal
+        text: "ขอให้พักเถียงจนกินข้าวเสร็จ"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: bridal_term_duck
+        text: "ก้มตักแกงต่อ ทำเป็นไม่ได้ยิน"
+        effects: {health: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_term_third_name
+        text: "เสนอว่าเรียกสร้อยก็พอแล้วมั้ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งโต๊ะเงียบไปหนึ่งอึดใจแล้วหัวเราะพร้อมกัน สร้อยเส้นนั้นถูกเรียกว่าสร้อยเฉย ๆ ไปจนงานเลิก", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าคนหนึ่งจดคำว่าสร้อยลงสมุดไว้เป็นหลักฐานว่าคุณเป็นคนพูด พอเถียงกันรอบใหม่ สมุดเล่มนั้นก็ถูกเปิดอ่านทุกครั้ง", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: bridal_conch_blessing_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 80]}
+    title: "แถวหลั่งน้ำสังข์"
+    text: "คุณเป็นผู้อาวุโสในงานของหลานญาติ เขาเชิญให้หลั่งน้ำสังข์ลงบนศีรษะคู่บ่าวสาวเป็นคนแรก ๆ คนต่อแถวยาวไปถึงประตู คุณเตรียมคำอวยพรมาตั้งแต่เมื่อคืน พอถือหอยสังข์ขึ้นมา คำแรกกลับนึกไม่ออกเลย"
+    choices:
+      - id: bridal_conch_short_wish
+        text: "อวยพรสั้น ๆ ว่าดูแลกันนะ"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_conch_long_wish
+        text: "เล่าเรื่องชีวิตให้ฟังเต็มที่"
+        outcomes:
+          - {weight: 1, ok: true, text: "เรื่องของคุณทำเอาคู่บ่าวสาวน้ำตาคลอ คนต่อแถวก็ฟังจนลืมเมื่อย แล้วเดินมาจับมือคุณหลังจบพิธี", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้ำสังข์หมดก่อนเรื่องจบ คนต่อแถวเริ่มนั่งยอง ๆ ญาติต้องมากระซิบว่าเชิญท่านต่อไป", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: bridal_conch_copy_prior
+        text: "พูดตามคนก่อนหน้าทุกคำ"
+        effects: {happiness: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: bridal_conch_silent_touch
+        text: "แตะไหล่ทั้งสองคน แล้วยิ้มให้"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: bridal_conch_read_palm
+        text: "ทำเป็นดูลายมือบ่าวสาวแก้เก้อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณบอกว่าเส้นนี้แปลว่าอย่านอนดึก ทั้งงานหัวเราะ คู่บ่าวสาวยังจำคำนี้ได้ไปอีกนาน", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "น้ำจากหอยสังข์ไหลลงแขนเสื้อจนเปียกถึงศอก คุณนั่งทำหน้านิ่งเหมือนตั้งใจ แล้วรอให้แถวผ่านไปจนหมด", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

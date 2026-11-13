@@ -1,0 +1,559 @@
+# ร่างเรื่อง ขายตรงและคนหลอกเงิน · 15 ใบ · ลงเกมแล้ว ใบ 249 จากร่าง 248 · แก้ตามข้อค้านรอบ 1 · ทุกใบไม่ผูกปี · ไม่เปลี่ยนสายชีวิตหลัก · ใช้ธง scam_aware ตัวเดียว ไม่ตั้งธงใหม่ · ธงไม่เกินใบละ 1 จุด
+events:
+  - id: swindle_seminar_clap_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [19, 30]}
+    multipliers: {flags: {scam_aware: 0.5}}
+    title: "ห้องปรบมือ"
+    text: "ญาติชวนไปดูสาธิตน้ำยาถูพื้นที่ห้องประชุมชั้นบนร้าน ในห้องมีทั้งคนเพิ่งเรียนจบและคนเกษียณนั่งเต็ม ตัวแทนขายเล่าว่าเคยไม่มีอะไรเลย พอถึงคำว่าอิสรภาพ เสียงปรบมือดังทั้งห้อง ชุดเริ่มต้นวางรออยู่บนตักคุณแล้ว ประตูอยู่หลังแถวสุดท้าย"
+    choices:
+      - id: swindle_seminar_sign_now
+        text: "รับชุดเริ่มต้นตอนมือยังร้อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เดือนแรกขายให้ญาติได้ครบชุด ยอดสวยจนเริ่มนับวันลาออก แล้วก็หมดญาติให้ขาย", effects: {happiness: 1, network: 1, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ของมาเต็มห้อง คนที่จะซื้อคือคนกลุ่มเดียวกับที่ถูกชวนมาฟัง กล่องซ้อนกันจนบังหน้าต่าง", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_seminar_ask_income
+        text: "ขอดูรายได้จริงของคนในห้อง"
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_seminar_toilet_exit
+        text: "ขอไปห้องน้ำ แล้วเดินกลับบ้าน"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_seminar_take_relative
+        text: "ดึงแขนญาติออกมาด้วยกัน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ญาติโวยไปตลอดทาง แต่ซื้อข้าวมันไก่เลี้ยงคุณก่อนกลับ บอกว่าเกือบไปแล้วเหมือนกัน", effects: {relations: 2, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ญาติสะบัดแขน บอกว่าคุณไม่มีวันรวย แล้วเดินกลับเข้าห้องไปคนเดียว", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_seminar_clap_louder
+        text: "ปรบมือดังกว่าคนหน้าห้อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตัวแทนขายเชิญออกไปเล่าความสำเร็จหน้าห้อง คุณเล่าเรื่องผัดกะเพราจนจบ คนปรบมือเท่าเดิม แถมได้น้ำยาตัวอย่างกลับบ้านสองขวด", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มีคนเข้ามาขอสมัครใต้สายคุณ ทั้งที่คุณยังไม่รู้เลยว่าเขาขายอะไร ต้องเดินหนีจนถึงปากซอย", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_agent_quota_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    multipliers: {flags: {scam_aware: 0.5}}
+    title: "โควตาเหลือที่สุดท้าย"
+    text: "ญาติห่าง ๆ รู้จักสายส่งคนไปทำงานเมืองนอก คนทั้งซอยจึงรวมเงินส่งลูกหลานไปชุดเดียวกัน ค่าหัวก้อนใหญ่ ต้องจ่ายก่อนที่นั่งเต็ม ตัวคุณไม่ได้จะไปไหน แต่ทุกบ้านเห็นว่าคุณซื่อที่สุดในซอย เลยหอบซองเงินมาฝากให้ถือกองกลาง"
+    choices:
+      - id: swindle_quota_keep_pot
+        text: "ถือเงินให้ แล้วส่งตามนัด"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนไปถึงจริง งานหนักกว่าที่เล่าสองเท่า แต่เงินส่งกลับมาเกือบครบ ทั้งซอยเอาผลไม้มาฝากคุณอยู่หลายเดือน", effects: {relations: 1, network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ถึงวันนัด ทั้งซอยหอบกระเป๋ามายืนรอหน้าสำนักงาน ห้องนั้นว่าง เหลือแต่ป้ายแขวนเอียงอยู่ แล้วทุกคนก็หันมาถามคุณ", effects: {happiness: -2, relations: -2}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_quota_check_office
+        text: "ไปตรวจชื่อที่สำนักจัดหางาน"
+        outcomes:
+          - {weight: 2, ok: true, text: "เจ้าหน้าที่เปิดทะเบียนแล้วไม่เจอชื่อบริษัทนี้ คุณกลับมาบอกคนทั้งซอย บางบ้านขอเงินคืน บางบ้านเอาไปส่งเอง", effects: {knowledge: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "ไปถึงตรงเวลาพักของเจ้าหน้าที่พอดี กลับมาถึงซอย ญาติมารับซองไปส่งเองแล้ว", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_quota_add_share
+        text: "ลงขันเพิ่มให้เด็กข้างบ้านได้ไป"
+        outcomes:
+          - {weight: 1, ok: true, text: "เด็กคนนั้นไปถึงจริง เขียนจดหมายกลับมาทุกเดือน ปีต่อมาส่งเงินคืนครบ พร้อมขนมต่างเมืองหนึ่งกล่อง", effects: {happiness: 2, relations: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เงินก้อนนั้นหายไปพร้อมสาย เด็กข้างบ้านยังยกมือไหว้คุณทุกเช้า ซึ่งยิ่งทำให้คุณไม่รู้จะมองหน้ายังไง", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_quota_return_pot
+        text: "คืนซองทุกบ้าน ขอไม่ยุ่ง"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_quota_bag_seat
+        text: "ขอจองอีกที่ไว้วางกระเป๋า"
+        outcomes:
+          - {weight: 1, ok: true, text: "ญาติหัวเราะจนหมดอารมณ์ขาย ทั้งวงเลิกรีบจ่าย แล้วนั่งถามกันว่าทำไมที่สุดท้ายมีทุกอาทิตย์", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ญาติจดจริงจังแล้วบอกว่าค่าที่นั่งกระเป๋าแพงกว่าคนนิดหน่อย คุณไม่แน่ใจเลยว่าเขาล้อเล่นอยู่หรือเปล่า", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_team_leader_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    multipliers: {flags: {scam_aware: 0.5}}
+    title: "คำตอบเดียวของแม่ทีม"
+    text: "เพื่อนสนิทเป็นตัวแทนขายครีมบำรุงผิว ยอดเดือนนี้ตกจนลากคุณไปนั่งเป็นเพื่อนตอนปรึกษาแม่ทีม แม่ทีมจับมือเพื่อนแล้วบอกว่าเข้าใจทุกอย่าง ถามอะไรก็ได้คำตอบเดิม ขายไม่ออกให้ตุนเพิ่ม เหนื่อยให้อบรมเพิ่ม เงินหมดให้เลื่อนขั้น แล้วเพื่อนก็หันมามองคุณ"
+    choices:
+      - id: swindle_team_lend_stock
+        text: "ให้เพื่อนยืมเงินตุนอีกรอบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนถึงขั้นใหม่จริง ได้เข็มกลัดเงาวับกับคำชมต่อหน้าทีม ของยังเต็มห้องนอนเขา เงินคุณค่อย ๆ ได้คืนเป็นกระปุกครีม", effects: {relations: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กล่องใหม่ทับกล่องเก่า วันหมดอายุบนกล่องล่างสุดมาถึงก่อนลูกค้าคนแรก เงินที่ให้ยืมก็ไม่มีใครพูดถึงอีกเลย", effects: {happiness: -1, money: {unit: income_x, amount: -0.6}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_team_ask_sold
+        text: "ถามแม่ทีมว่าขายได้จริงกี่กล่อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "แม่ทีมยิ้มแล้วเปลี่ยนเรื่อง ขากลับเพื่อนเปิดสมุดให้ดู ยอดทั้งปีมาจากของที่ตัวเองซื้อเกือบหมด คุณกับเพื่อนนั่งเงียบกันอยู่นาน", effects: {knowledge: 2, relations: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "แม่ทีมบอกว่าคำถามแบบนี้คือพลังลบ เพื่อนขอให้คุณรออยู่นอกห้องในครั้งหน้า", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_team_help_quit
+        text: "ช่วยเพื่อนนับกล่องแล้วขายล้าง"
+        effects: {relations: 2, knowledge: 1, network: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: swindle_team_refer_kin
+        text: "แนะนำญาติให้เพื่อนไปชวนต่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ญาติสมัครเพราะเกรงใจ ยอดเพื่อนขึ้น เจอกันงานบุญปีถัดมาญาติเดินเลี่ยงคุณไปอีกฝั่งของศาลา", effects: {relations: -1, network: 1}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 1, text: "ญาติฟังจบแล้วเปิดตู้ให้ดู ในนั้นมีกล่องแบบเดียวกันจากบริษัทอื่นอีกครึ่งตู้", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_team_sell_back
+        text: "เสนอให้แม่ทีมรับซื้อกล่องคืน"
+        outcomes:
+          - {weight: 1, ok: true, text: "แม่ทีมอึ้งไปเกือบนาที ก่อนบอกว่าเป็นวิธีคิดของผู้นำระดับเพชร แล้วรีบนัดครั้งหน้า เพื่อนหัวเราะครั้งแรกในรอบเดือน", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แม่ทีมรับฟังด้วยรอยยิ้ม แล้วเขียนคอร์สการเจรจาให้คุณไปเรียนด้วยอีกคน เพื่อนจองที่ให้เรียบร้อย", effects: {happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ดัดจากแถวรีเสิร์ช 3 (ไปสนามบินแล้วเที่ยวบินไม่มีจริง) เป็นจุดนัดรถทัวร์ เพื่อให้ออกได้ทุกยุค
+  - id: swindle_free_trip_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    multipliers: {flags: {scam_aware: 0.5}}
+    title: "ทริปแถมที่ไม่มีรถ"
+    text: "จ่ายค่าสมัครซื้อยาบำรุงชุดหนึ่ง ได้บัตรเที่ยวทะเลแถมมาด้วย เช้าวันเดินทางคุณหอบกระเป๋ามาถึงจุดนัดขึ้นรถทัวร์ ไม่มีรถ มีแต่อีกหลายครอบครัวถือบัตรแบบเดียวกัน ยืนมองถนนเหมือนกันหมด"
+    choices:
+      - id: swindle_trip_go_office
+        text: "ยกขบวนไปหาบริษัทถึงที่"
+        outcomes:
+          - {weight: 1, ok: true, text: "พนักงานยอมคืนเงินครึ่งหนึ่งเพื่อให้ทุกคนเลิกยืนหน้าร้าน ระหว่างรอ คนในแถวกลายเป็นเพื่อนกันหมด", effects: {money: {unit: income_x, amount: 0.2}, network: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บริษัทชี้ใบเสร็จ ย้ำว่าเงินคือค่ายา ส่วนทริปเป็นของแถม เดินออกมาพร้อมยาบำรุงอีกกล่องเป็นค่าเสียเวลา", effects: {happiness: -1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_trip_report
+        text: "รวมชื่อทุกคนไปแจ้งความ"
+        effects: {knowledge: 1, network: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: swindle_trip_real_beach
+        text: "ชวนคนที่รอขึ้นรถไฟไปทะเลเอง"
+        effects: {happiness: 2, relations: 1, network: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: swindle_trip_go_home
+        text: "กลับบ้านไปกินยาบำรุงให้คุ้ม"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: swindle_trip_picnic_here
+        text: "ปูเสื่อตรงจุดนัด เที่ยวตรงนี้เลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครอบครัวอื่นปูเสื่อต่อกันยาว ข้าวเหนียวไก่ย่างเดินไปทั่ว กลายเป็นทริปที่ไม่ต้องไปไหนและไม่มีใครลืม", effects: {happiness: 2, network: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของที่มาไล่ตอนบ่าย มีคนถามว่าทะเลอยู่ตรงไหน ไม่มีใครตอบได้จนถึงบ้าน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_door_salesman_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 85]}
+    multipliers: {flags: {scam_aware: 0.5}}
+    title: "เพื่อนซื้อไปแล้วนะคะ"
+    text: "สายวันอังคาร ในบ้านเงียบมีคุณอยู่คนเดียว พนักงานชุดรีดเรียบมาเคาะประตู พูดจาหวานหยดกับคุณยิ่งกว่าคนในบ้าน บอกว่าเพื่อนบ้านวัยเดียวกันซื้อไปแล้วดีจนต้องบอกต่อ เอ่ยชื่อเพื่อนถูกทุกตัวอักษร ยืนยิ้มถือกล่องรอให้เปิดประตู"
+    choices:
+      - id: swindle_door_buy
+        text: "รับไว้ เพื่อนซื้อแล้วน่าจะดี"
+        outcomes:
+          - {weight: 1, ok: true, text: "ของใช้ได้จริงพอประมาณ ราคาแพงไปหน่อย แต่มีคนมานั่งคุยด้วยทั้งบ่าย คุณคิดว่ายอมจ่ายส่วนนี้", effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไปถามเพื่อนทีหลัง เพื่อนบอกว่าซื้อเพราะพนักงานอ้างชื่อคุณเหมือนกัน", effects: {happiness: -1, relations: 1, money: {unit: income_x, amount: -0.5}}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_door_ask_friend
+        text: "บอกให้รอ ขอเดินไปถามเพื่อนก่อน"
+        effects: {knowledge: 1, relations: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: swindle_door_closed
+        text: "พูดผ่านประตูว่าไม่รับ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: swindle_door_warn_street
+        text: "เดินบอกบ้านอื่นในซอยให้ระวัง"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: swindle_door_tell_stories
+        text: "ชวนนั่งฟังเรื่องสมัยหนุ่มสาว"
+        outcomes:
+          - {weight: 2, ok: true, text: "เล่าถึงปีที่น้ำท่วมครั้งแรก พนักงานมองนาฬิกาสี่รอบ ก่อนลากกล่องออกไปโดยที่ยังไม่ได้เปิดฝา", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พนักงานฟังจบจริง ๆ ซึ้งจนร้องไห้ คุณเลยซื้อให้หนึ่งกล่องเพราะสงสารเขา", effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_massager_refund_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45], family: [{role: parent, sex: หญิง, alive: true}]}
+    title: "เครื่องนวดของแม่"
+    text: "กลับบ้านมาเจอเครื่องนวดตัวใหญ่ตั้งกลางห้อง แม่บอกว่าน้องพนักงานมาถึงบ้าน ใจดีมาก ผ่อนได้ เปิดใบสัญญาดูแล้วราคาสูงกว่าร้านในตลาดเกือบเท่าตัว พอไปขอคืน ฝั่งนั้นตอบสุภาพมากว่าคืนได้ แต่ต้องจ่ายค่าดำเนินการเพิ่ม"
+    choices:
+      - id: swindle_massager_pay_return
+        text: "ยอมจ่ายเพิ่มเพื่อคืนให้จบ"
+        effects: {money: {unit: income_x, amount: -0.4}, happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_massager_keep_paying
+        text: "ผ่อนต่อให้แม่ ไม่พูดอะไร"
+        effects: {money: {unit: income_x, amount: -0.7}, relations: 2}
+        merit: [{cat: care_parents, level: 1}]
+      - id: swindle_massager_consumer_office
+        text: "ไปร้องหน่วยคุ้มครองผู้บริโภค"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหน้าที่อ่านสัญญาแล้วเรียกบริษัทมาคุยต่อหน้า ได้คืนโดยไม่ต้องจ่ายเพิ่ม แม่เล่าเรื่องนี้ให้ทั้งซอยฟังอยู่นาน", effects: {knowledge: 2, relations: 1, money: {unit: income_x, amount: 0.3}}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรื่องเดินช้ากว่างวดผ่อน ระหว่างนั้นคุณต้องลางานไปอีกสามครั้ง", effects: {happiness: -1, knowledge: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_massager_blame_mom
+        text: "ดุแม่ว่าทำไมไม่ถามก่อน"
+        effects: {relations: -2, knowledge: 1}
+        merit: [{cat: abuse_elders, level: 1}]
+      - id: swindle_massager_use_it
+        text: "นั่งเครื่องทุกวันให้คุ้มค่างวด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทั้งบ้านผลัดกันนั่งตามตาราง หลังก็หายปวดไปพอควร แขกมาบ้านยังถูกจับนั่งก่อนให้น้ำ", effects: {happiness: 2, health: 1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นั่งเกินเวลาที่คู่มือบอก ลุกมาปวดกว่าเดิม เครื่องยังเหลืออีกยี่สิบงวด", effects: {health: -1, happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_office_sample_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "ของฝากบนโต๊ะทำงาน"
+    text: "เพื่อนร่วมงานเอาซองอาหารเสริมมาวางให้ทีละโต๊ะ บอกว่าลองดูไม่คิดเงิน พักนี้เธอชวนกินข้าวบ่อยผิดปกติ ถามเรื่องสุขภาพคุณละเอียดกว่าหมอ และทุกครั้งที่คุณบ่นว่าปวดหลัง เธอพยักหน้าเหมือนรอฟังคำนี้มาทั้งเดือน"
+    choices:
+      - id: swindle_sample_buy_friend
+        text: "ซื้อหนึ่งชุด ถือว่าช่วยเพื่อน"
+        effects: {money: {unit: income_x, amount: -0.2}, relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_sample_say_straight
+        text: "บอกตรง ๆ ว่าไม่ซื้อแต่ยังคบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เธอถอนหายใจยาว บอกว่าคุณคนแรกที่พูดกับเธอตรง ๆ ทั้งปี แล้วก็เล่าเรื่องหนี้จากการตุนของให้ฟัง", effects: {relations: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เธอพูดว่าไม่เป็นไร โต๊ะของคุณไม่มีซองมาวางอีกเลย และไม่มีคนชวนกินข้าวด้วย", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_sample_avoid
+        text: "เลี่ยงไปกินข้าวตอนบ่ายสาม"
+        effects: {health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: swindle_sample_read_label
+        text: "อ่านฉลากแล้วถามเลขทะเบียน"
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_sample_counter_sell
+        text: "เอาขนมบ้านตัวเองไปขายกลับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ขนมหมดก่อนเที่ยงทั้งถาด เพื่อนร่วมงานซื้อคนละสองห่อ อาหารเสริมยังวางอยู่ที่เดิม", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เธอซื้อขนมคุณหนึ่งห่อ แล้วยื่นใบสมัครให้เป็นการแลกเปลี่ยนทางธุรกิจ หัวหน้าเดินมาถามว่าที่นี่คือตลาดหรือเปล่า", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_next_rally_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    multipliers: {flags: {scam_aware: 0.5}}
+    title: "งานใหญ่รอบหน้า"
+    text: "เพื่อนเก่าเป็นตัวแทนขายมาหลายปี ของยังขายไม่ออก แต่ทีมบอกว่าเพราะยังไม่ได้ไปงานใหญ่ประจำปี เขามาขอยืมค่าเดินทางค่าโรงแรม คนในทีมคนหนึ่งเพิ่งเอาเงินก้อนหลังเกษียณมาลง ยังยิ้มบอกว่าปีหน้าเจอกันบนเวที คุณเปิดสมุดบัญชีดู"
+    choices:
+      - id: swindle_rally_lend
+        text: "ให้ยืมค่าเดินทางไปก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนกลับมาพร้อมเสื้อทีมตัวใหม่กับไฟในอก ยอดเดือนถัดไปเท่าเดิม แต่เขาทยอยคืนเงินคุณจนครบ", effects: {relations: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เวทีใหญ่กว่าเดิม คำพูดเหมือนเดิม เพื่อนกลับมาพร้อมกล่องเพิ่ม เงินที่ให้ยืมกลายเป็นครีมสามกระปุกวางหน้าบ้านคุณ", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_rally_go_along
+        text: "ไปด้วยกัน ดูให้เห็นกับตา"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณกลับมาพร้อมข้อสังเกตว่าคนปรบมือกับคนขายเป็นกลุ่มเดียวกัน เพื่อนฟังแล้วเงียบไปทั้งทาง", effects: {knowledge: 2, relations: 1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เสียงเพลงกับคำว่าครอบครัวทำเอาคุณเกือบเซ็น ปากกาอยู่ในมือแล้วตอนเพื่อนเรียกไปกินข้าว", effects: {happiness: 1, health: -1, money: {unit: income_x, amount: -0.4}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_rally_count_boxes
+        text: "ชวนเพื่อนนั่งรวมยอดที่เสียไป"
+        effects: {happiness: -1, knowledge: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: swindle_rally_warn_teammate
+        text: "ไปคุยกับคนที่ลงเงินก้อนนั้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเงียบไปนาน แล้วขอให้คุณช่วยนับกล่องในบ้านเขา สองคนนั่งนับกันจนค่ำ เดือนถัดมาเขาเลิก", effects: {relations: 2, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เขาขอบคุณแล้วบอกว่าคนที่ถอยตอนนี้คือคนที่ไม่เคยเห็นภาพใหญ่ คุณกลับบ้านพร้อมเพื่อนน้อยลงหนึ่งคน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_rally_treat_instead
+        text: "ไม่ให้ยืม ขอเลี้ยงข้าวแทน"
+        effects: {happiness: 1, relations: -1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: swindle_rally_buffet_only
+        text: "ตามไปเฉพาะช่วงอาหารเย็น"
+        outcomes:
+          - {weight: 1, ok: true, text: "งานเลี้ยงดีกว่าเวทีมาก คุณพบเพื่อนร่วมโต๊ะที่มาเพื่อกุ้งเผาเหมือนกัน ทั้งคู่ไม่ได้ซื้ออะไรเลย", effects: {happiness: 2, network: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทางเข้าห้องอาหารอยู่หลังโต๊ะรับสมัครพอดี คุณอิ่มแล้ว แต่ถือใบสมัครออกมาด้วย", effects: {happiness: -1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_kru_offering_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [15, 18]}
+    title: "ครอบครูแล้วจะรุ่ง"
+    text: "เพื่อนสนิทชวนไปไหว้ครูกับร่างทรงคนหนึ่ง บอกว่าใครครอบแล้วเสน่ห์แรง สอบก็ผ่าน หัวหน้าห้องไปมาแล้วหนึ่งรอบ เครื่องบูชาเขียนมาในกระดาษยาวเท่าไม้บรรทัดสองอัน บรรทัดสุดท้ายคือค่าครู เว้นช่องไว้ให้เติมตามศรัทธา"
+    choices:
+      - id: swindle_kru_pay_all
+        text: "ทุบกระปุกซื้อครบทุกรายการ"
+        outcomes:
+          - {weight: 1, ok: true, text: "พิธีกลิ่นธูปแรงมาก คุณยังสอบวิชาเดิมไม่ผ่าน แต่ทุกคนในห้องรู้จักชื่อคุณหมดเพราะเรื่องนี้", effects: {happiness: 1, network: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "กระดาษใบที่สองออกมาหลังพิธี บอกว่าครูยังไม่รับเต็มใจ กระปุกใบเดียวของคุณจบตั้งแต่ใบแรก", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_kru_go_watch
+        text: "ไปเป็นเพื่อน แต่ไม่ครอบ"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: swindle_kru_real_teacher
+        text: "เอาเวลาไปกราบครูวิชาที่ตก"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_kru_ask_price_list
+        text: "ถามว่าเติมช่องว่างเท่าไรถึงพอ"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_kru_charm_test
+        text: "ขอทดลองเสน่ห์ก่อน ไม่พอใจคืนเงิน"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนหัวเราะจนธูปในมือดับ คุณได้ฉายาว่าลูกค้าขอคืนเงิน และไม่มีใครต้องจ่ายอะไรวันนั้น", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้ช่วยของร่างทรงมองหน้าคุณนาน แล้วบอกว่าต้องเติมเครื่องบูชารอบครูก่อน ถึงจะตอบคำถามนี้ได้", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_aunt_seer_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [14, 18]}
+    title: "หมอดูคนโปรดของป้า"
+    text: "ป้าไปดูดวงกับคนเดิมมาหลายปี ทายแต่ละทีเข้าใจชีวิตป้าเหมือนนั่งอยู่ในครัว พักนี้หมอดูเริ่มมีของให้บูชาหลักพัน บอกว่าทำแล้วเรื่องในบ้านจะเบา ป้าพาคุณไปถือกระเป๋า แล้วกระซิบถามว่าองค์ไหนดี เหมือนคุณรู้เรื่องนี้มากกว่าป้า"
+    choices:
+      - id: swindle_seer_pick_small
+        text: "ชี้องค์เล็กสุดให้ป้า"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: swindle_seer_whisper_stop
+        text: "กระซิบว่าป้าลองไม่ซื้อสักรอบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าเก็บกระเป๋าเงินช้า ๆ ขากลับแวะกินลอดช่อง แล้วบอกว่าเรื่องในบ้านเบาลงไปตั้งแต่ตรงนี้", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าได้ยินแล้วทำตาขวาง หมอดูก็ได้ยินด้วย และทายว่าป้าจะได้หลานที่เลี้ยงยาก ขากลับป้าไม่พูดกับคุณเลย", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_seer_say_nothing
+        text: "ถือกระเป๋าเฉย ๆ ไม่ออกความเห็น"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: swindle_seer_count_customers
+        text: "นับว่ามีคนซื้อไปกี่คนเช้านี้"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: swindle_seer_ask_own_fate
+        text: "ขอให้ทายว่าป้าจะซื้อองค์ไหน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หมอดูทายองค์แพงสุด ป้าเลยซื้อองค์ถูกสุดเพื่อพิสูจน์ ทั้งสองฝ่ายเชื่อว่าตัวเองชนะ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หมอดูทายถูกทันที เพราะป้าถือองค์นั้นอยู่ในมือแล้ว คุณเงียบไปตลอดทางกลับบ้าน", effects: {happiness: -1, knowledge: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_miracle_stalls_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ผู้วิเศษคนใหม่ของอำเภอ"
+    text: "คนในหมู่บ้านเช่ารถไปหาผู้วิเศษคนใหม่ที่เล่ากันว่ารู้ใจคน คุณไปด้วยเพราะมีที่นั่งเหลือ ถนนเข้าไปยังเป็นลูกรัง แต่แผงขายวัตถุมงคลกางโต๊ะรอเรียงกันแล้วยาวเกือบกิโล พวงมาลัยขึ้นราคาทุกร้อยเมตร คนขับบอกว่าพอถึงหน้าบ้านจะแพงที่สุด"
+    choices:
+      - id: swindle_miracle_buy_along
+        text: "ซื้อพวงมาลัยตามคนอื่นไปก่อน"
+        effects: {money: {unit: income_x, amount: -0.2}, relations: 1}
+        merit: [{cat: neutral}]
+      - id: swindle_miracle_wait_bus
+        text: "นั่งรอที่รถ กินส้มกับคนขับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนขับเล่าว่าเดือนก่อนพาคนไปหาผู้วิเศษอีกคนในอำเภอถัดไป แผงชุดเดียวกัน คนขายคนเดิม", effects: {knowledge: 2, happiness: 1}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทั้งรถกลับมาพร้อมเล่าเรื่องมหัศจรรย์ คุณไม่มีอะไรจะเล่า นอกจากส้มสามกิโล", effects: {relations: -1, health: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_miracle_buy_first_stall
+        text: "ซื้อร้านแรกไว้ ก่อนจะแพงขึ้น"
+        effects: {money: {unit: income_x, amount: -0.1}, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: swindle_miracle_warn_elder
+        text: "คอยกันป้าข้างบ้านไม่ให้จ่ายเยอะ"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: swindle_miracle_open_stall
+        text: "ตั้งแผงขายน้ำเย็นต่อท้ายแถว"
+        outcomes:
+          - {weight: 1, ok: true, text: "แดดจัดกว่าศรัทธา น้ำหมดก่อนเที่ยงทั้งลัง คุณเป็นคนเดียวในรถที่กลับบ้านด้วยเงินมากกว่าตอนมา", effects: {happiness: 2, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าถิ่นมายืนกอดอกข้างโต๊ะ บอกว่าตรงนี้มีเจ้าของ คุณยกลังกลับขึ้นรถพร้อมน้ำแข็งที่ละลายหมดแล้ว", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_three_right_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    multipliers: {flags: {scam_aware: 0.5}}
+    title: "ทายถูกสามข้อ"
+    text: "เพื่อนพาไปหาผู้ทำพิธีแก้กรรม เขามองหน้าคุณแล้วบอกวันเกิด บอกเรื่องงานที่ค้างใจ บอกว่าเคยผิดใจกับญาติ ถูกหมดทั้งสามข้อจนขนลุก จากนั้นเขาเลื่อนรายการพิธีมาตรงหน้า แก้ดวงหลักหมื่น แก้ผิดครูหลักแสน ตรงมุมมีตัวอักษรเล็กว่าผ่อนได้"
+    choices:
+      - id: swindle_three_book_rite
+        text: "จองพิธีราคากลาง ๆ ไว้ก่อน"
+        outcomes:
+          - {weight: 1, ok: true, text: "พิธีผ่านไปเงียบ ๆ ชีวิตเหมือนเดิมทุกอย่าง แต่คุณนอนหลับดีขึ้นอยู่ราวหนึ่งเดือน", effects: {happiness: 1, money: {unit: income_x, amount: -0.8}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "จบพิธีเขาเห็นเงาอีกเรื่อง ต้องแก้ต่ออีกชุด เมื่อถามเพื่อนจึงรู้ว่าเพื่อนเล่าเรื่องคุณให้เขาฟังไว้ก่อนแล้ว", effects: {happiness: -2, relations: -1, money: {unit: income_x, amount: -1.2}}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_three_ask_friend
+        text: "หันไปถามเพื่อนว่าเล่าอะไรไว้"
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_three_think_home
+        text: "ขอกลับไปนอนคิดก่อน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: swindle_three_make_up
+        text: "แก้เองด้วยการไปคุยกับญาติ"
+        effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: swindle_three_guess_back
+        text: "ทายวันเกิดเขากลับบ้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ทายผิดทั้งสามครั้ง แต่ห้องทั้งห้องหัวเราะ เขาหมดจังหวะเลื่อนรายการ เพื่อนเลยพาคุณกลับไปกินก๋วยเตี๋ยว", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขายิ้มเย็น บอกว่าคนช่างท้าแบบนี้มีเคราะห์เรื่องปาก ค่าพิธีแก้ปากขึ้นรายการถัดไปทันที", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_gold_for_grandchild_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85], family: [{role: child, alive: true}]}
+    multipliers: {flags: {scam_aware: 0.5}}
+    title: "ทองคำเพื่อไปขึ้นครู"
+    text: "คนทำพิธีมานั่งหน้าบ้าน บอกว่าถ้าไม่ไปขึ้นครูให้ครบ หลานจะไม่เจริญ เขากางรายการให้ดู ขั้นแรกค่าครู ขั้นถัดไปทองคำหนึ่งเส้นกับเงินสด แล้วย้ำว่าต้องเงียบไว้พิธีถึงจะขลัง คุณนั่งมองสมุดเงินฝากในมือ ยังไม่มีใครในบ้านรู้เรื่องนี้"
+    choices:
+      - id: swindle_gold_one_more
+        text: "ถอนเงินจ่ายค่าครูขั้นแรก"
+        outcomes:
+          - {weight: 1, text: "จ่ายครบทุกขั้น เขาบอกว่าเสร็จแล้วก็หายไป หลานยังเหมือนเดิมทุกอย่าง คุณไม่รู้จะดีใจเรื่องไหนก่อน", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "สัปดาห์ต่อมายังมีรายการใหม่อีกหนึ่งข้อ สมุดเล่มนั้นเหลือตัวเลขสุดท้ายที่คุณไม่กล้าบอกใคร", effects: {happiness: -2, health: -1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_gold_tell_family
+        text: "เล่าให้ลูกหลานฟังทั้งหมด"
+        outcomes:
+          - {weight: 2, ok: true, text: "ไม่มีใครดุ หลานนั่งลงข้าง ๆ แล้วบอกว่าเจริญดีอยู่ คุณเพิ่งหายใจเต็มปอดครั้งแรกในรอบหลายเดือน", effects: {relations: 2, happiness: 2}, sets_flags: [scam_aware], merit: [{cat: neutral}]}
+          - {weight: 1, text: "บ้านเงียบไปทั้งเย็น สมุดเล่มนั้นถูกเก็บขึ้นตู้ แต่อย่างน้อยรายการพิธีก็จบลงตรงนี้", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_gold_stop_silently
+        text: "ไม่จ่าย และไม่บอกใคร"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_gold_merit_instead
+        text: "เอาเงินก้อนนี้ทำทุนให้หลานเรียน"
+        effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: dana, level: 1}]
+      - id: swindle_gold_ask_receipt
+        text: "ขอใบเสร็จค่าครูทุกขั้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาโกรธจนลืมเก็บเงิน แล้วไม่กลับมาอีก คุณเก็บปากกาที่เขาลืมไว้เป็นที่ระลึก", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาเขียนใบเสร็จให้จริงด้วยลายมือสวย ระบุว่าได้รับเงินจากผู้มีศรัทธา คุณถือไว้ไม่รู้จะไปยื่นใคร", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_land_sign_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    multipliers: {flags: {scam_aware: 0.5}}
+    title: "ป้ายใหม่บนแปลงที่ผ่อน"
+    text: "ผ่อนที่ดินแปลงเล็กมาหลายปี คนขายสัญญาว่าน้ำไฟพร้อม งวดสุดท้ายจะได้โฉนด วันนี้แวะไปดู เจอป้ายประกาศขายใหม่ปักอยู่กลางแปลง ชื่อบนป้ายไม่ใช่คนขาย ที่ข้างคุณมีอีกสามครอบครัวยืนถือสมุดผ่อนแบบเดียวกัน มองป้ายเดียวกัน"
+    choices:
+      - id: swindle_land_group_lawyer
+        text: "รวมสามครอบครัวจ้างทนาย"
+        outcomes:
+          - {weight: 1, ok: true, text: "คดีกินเวลาหลายปี สุดท้ายได้เงินคืนราวครึ่ง กับเพื่อนร่วมคดีที่ยังชวนกันกินข้าวทุกปี", effects: {money: {unit: income_x, amount: 1}, network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนขายเปลี่ยนที่อยู่ก่อนหมายไปถึง ค่าทนายบวกเข้าไปในยอดที่เสียแล้ว", effects: {happiness: -2, money: {unit: income_x, amount: -0.7}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_land_call_sign
+        text: "ตามหาเจ้าของตามชื่อบนป้าย"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_land_check_office
+        text: "ไปค้นทะเบียนที่สำนักงานที่ดิน"
+        effects: {knowledge: 2, network: 1, money: {unit: income_x, amount: -0.1}}
+        sets_flags: [scam_aware]
+        merit: [{cat: neutral}]
+      - id: swindle_land_let_go
+        text: "ยอมตัดใจ เลิกผ่อนต่อ"
+        effects: {happiness: -2, health: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: swindle_land_plant_banana
+        text: "ปลูกกล้วยรอบแปลงก่อนเขามาดู"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าของตัวจริงมาเห็นกล้วยออกเครือ ยอมให้เก็บจนหมดรุ่น และรับฟังเรื่องทั้งหมดอย่างใจเย็นกว่าที่คิด", effects: {happiness: 2, knowledge: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รถไถของคนซื้อใหม่มาถึงก่อนกล้วยออกดอก คุณยืนดูต้นกล้วยล้มทีละต้น", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: swindle_herb_pellet_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 85]}
+    title: "ยาเม็ดปั้นจากลุงท้ายซอย"
+    text: "ปวดข้อมาหลายเดือน ลุงท้ายซอยเอายาปั้นเม็ดกลมดำมาฝาก ฉลากเขียนว่าแก้ปวดเส้นปวดข้อและหอบหืดในขวดเดียว กินแล้วเดินคล่องจริงภายในวันเดียว คนทั้งซอยมาขอซื้อต่อ แต่พักนี้คุณส่องกระจกแล้วเห็นหน้าตัวเองกลมขึ้นทุกวัน"
+    choices:
+      - id: swindle_herb_keep_taking
+        text: "กินต่อ เดินคล่องดีกว่าหน้าเรียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยังเดินไปตลาดได้อีกหลายเดือน คุณบอกใครต่อใครว่าลุงเก่ง แต่รองเท้าเริ่มคับขึ้นเรื่อย ๆ", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "หมอถามว่ากินอะไรมา พอเห็นขวด หมอวางปากกาแล้วถอนหายใจ น้ำตาลในเลือดกับความดันขึ้นมาพร้อมกัน", effects: {health: -3, happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_herb_take_to_doctor
+        text: "ถือขวดไปให้หมอดู"
+        effects: {health: 1, knowledge: 2, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: swindle_herb_warn_soi
+        text: "บอกคนทั้งซอยให้หยุดกินด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหน้าที่อนามัยมาตรวจขวด ผลออกมาว่ามีสารที่ไม่ควรมี ลุงเองก็ไม่รู้ แล้วก็หยุดฝากยาไปทั้งซอย", effects: {relations: 2, knowledge: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "คนในซอยบอกว่าคุณเป็นคนไม่มีศรัทธา แล้วก็กินกันต่อ ลุงเดินผ่านบ้านคุณโดยไม่ทักอีกเลย", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: swindle_herb_stop_quietly
+        text: "เลิกกินเงียบ ๆ ทนปวดไปก่อน"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: swindle_herb_round_face_joke
+        text: "บอกทุกคนว่าหน้าอิ่มบุญมาเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนวัยเดียวกันทักว่าดูมีราศีขึ้น คุณยิ้มได้ทั้งสัปดาห์ จนหมอที่อนามัยจับคางดูแล้วถามว่ากินอะไรมา", effects: {happiness: 2, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เด็กข้างบ้านวาดรูปคุณหน้ากลมเป็นดวงจันทร์ติดข้างฝา คุณยิ้มกับรูป แต่ข้อเข่ากลับมาปวดเท่าเดิม", effects: {happiness: 1, health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

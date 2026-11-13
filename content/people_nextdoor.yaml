@@ -1,0 +1,495 @@
+# ร่างเรื่อง เพื่อนบ้านและเรื่องในซอย · 15 ใบ · ลงเกมแล้ว ใบ 249 จากร่าง 248 · แก้ตามข้อค้านรอบ 1 · ทุกปี · ไม่เปลี่ยนสายชีวิตหลัก · ไม่ตั้งธง
+events:
+  - id: nextdoor_shoe_dog_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [6, 12], school: [primary, lower]}
+    title: "รองเท้านักเรียนข้างเดียว"
+    text: "รองเท้านักเรียนที่ถอดตากไว้หน้าบ้านหายไปข้างหนึ่ง คุณเดินตามรอยไปจนเจอหมาบ้านป้าข้าง ๆ นอนแทะมันอย่างมีความสุขอยู่ใต้ถุน พรุ่งนี้เช้าครูตรวจรองเท้าหน้าเสาธง"
+    choices:
+      - id: nextdoor_shoe_tell_aunt
+        text: "เดินไปบอกป้าข้างบ้านตรง ๆ"
+        outcomes:
+          - {weight: 2, ok: true, text: "ป้าเห็นสภาพรองเท้าแล้วหัวเราะไม่ออก พาคุณไปซื้อคู่ใหม่ที่ตลาด บอกว่าหมาของป้าทำ ป้าก็ต้องรับผิดชอบ", effects: {happiness: 1, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าไม่อยู่ เจอแต่หมาตัวเดิมกระดิกหางต้อนรับ คุณนั่งรอจนมืดแล้วต้องกลับบ้านมือเปล่า", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_shoe_snatch
+        text: "แย่งคืนจากปากหมาเลย"
+        outcomes:
+          - {weight: 1, ok: true, text: "ดึงกันอยู่พักใหญ่ รองเท้ากลับมาพร้อมรอยฟันครบทุกซี่ แต่ยังพอใส่ไปเข้าแถวได้", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หมานึกว่าชวนเล่น คาบวิ่งรอบซอยสามรอบ คุณวิ่งตามจนหกล้มเข่าถลอก", effects: {health: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_shoe_sandal
+        text: "ใส่รองเท้าแตะไปโรงเรียน"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_shoe_trade
+        text: "เอาอีกข้างไปขอแลกคืน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หมาคายข้างเก่าแล้วงับข้างใหม่แทน คุณถือข้างเก่ากลับบ้าน ผู้ใหญ่ถามว่าตกลงเราได้อะไร คุณยังตอบไม่ได้จนทุกวันนี้", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตอนนี้หมามีครบคู่ นอนหนุนอย่างสบายใจ ส่วนคุณเดินเท้าเปล่ากลับมาอธิบาย", effects: {happiness: -2, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_guava_branch_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [5, 12]}
+    title: "ฝรั่งฝั่งเรา"
+    text: "กิ่งฝรั่งของตาบ้านติดกันยื่นข้ามรั้วมาเหนือหัวคุณ ผลโตเท่ากำปั้นห้อยอยู่พอดีมือ เพื่อนบอกว่าอยู่ฝั่งบ้านเธอก็ของเธอสิ แต่ตาเดินรดน้ำต้นนี้ทุกเย็นและรู้จำนวนผลดีกว่ารู้วันเกิดตัวเอง"
+    choices:
+      - id: nextdoor_guava_ask
+        text: "ตะโกนขอตาก่อนเด็ด"
+        outcomes:
+          - {weight: 2, ok: true, text: "ตาเดินมาเด็ดให้เองสองผล บอกว่าจะตัดหรือแตะกิ่งข้ามรั้ว บอกเจ้าของต้นก่อนเป็นดีที่สุด แล้วชี้ผลที่หวานกว่าให้", effects: {happiness: 1, relations: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตาบอกว่าผลนั้นยังไม่แก่ ให้มาใหม่อาทิตย์หน้า คุณนับวันรอจนเพื่อนเบื่อ", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_guava_pick
+        text: "เด็ดเงียบ ๆ ผลเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ฝรั่งหวานจนคุณกินหมดก่อนรู้สึกผิด ตอนเย็นตานับผลแล้วขมวดคิ้วอยู่นาน", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตาโผล่จากหลังโอ่งพอดี คุณต้องไปช่วยกวาดใบไม้หน้าบ้านตาอยู่ทั้งเย็น", effects: {relations: -1, health: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_guava_wait_drop
+        text: "รอให้มันหล่นเอง"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_guava_stare
+        text: "ยืนจ้องให้ฝรั่งเกรงใจ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตาเห็นคุณยืนจ้องอยู่สามวันติด ทนไม่ไหวเด็ดมาให้เอง บอกว่าไม่เคยเจอใครขอด้วยสายตานานขนาดนี้", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แดดเที่ยงแรงกว่าความตั้งใจ คุณเวียนหัวจนต้องไปนอนพัก ฝรั่งยังอยู่ที่เดิม", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_bottle_night_01
+    type: A
+    category: study
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [13, 18], school: [lower, upper, voc]}
+    title: "ขวดแก้วตีหนึ่งก่อนสอบ"
+    text: "พรุ่งนี้สอบวิชาที่คุณกลัวที่สุด แต่ทุกคืนราวตีหนึ่ง บ้านหลังถัดไปจะโยนขวดแก้วลงถังทีละใบ ดังเพล้งเป็นจังหวะเหมือนมีคนตั้งใจนับ คุณอ่านหน้าเดิมมาสามรอบแล้ว ผู้ใหญ่ในบ้านหลับกันหมด"
+    choices:
+      - id: nextdoor_bottle_note
+        text: "เขียนโน้ตสุภาพเสียบประตูเขา"
+        outcomes:
+          - {weight: 2, ok: true, text: "คืนถัดมาเงียบสนิท เช้าวันต่อมามีขวดน้ำหวานวางหน้าบ้านพร้อมกระดาษเขียนว่า ขอโทษนะ ไม่รู้ว่าเสียงไปถึง", effects: {knowledge: 1, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โน้ตปลิวหายไปกับลม เสียงยังมาตรงเวลา คุณเข้าห้องสอบด้วยตาปรือ", effects: {knowledge: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_bottle_ask_adult
+        text: "ให้ผู้ใหญ่ในบ้านช่วยคุยตอนเช้า"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_bottle_kitchen
+        text: "หนีไปอ่านในครัวหลังบ้าน"
+        effects: {knowledge: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_bottle_rhythm
+        text: "ท่องสูตรตามจังหวะขวด"
+        outcomes:
+          - {weight: 1, ok: true, text: "สูตรที่จำไม่ได้มาทั้งเทอมเข้าหัวตรงจังหวะเพล้ง ในห้องสอบคุณเคาะโต๊ะเบา ๆ แล้วเขียนออกมาได้ครบ", effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คืนนั้นเขาโยนแค่สองใบแล้วเลิก คุณจำสูตรได้ถึงแค่ครึ่งเดียว อีกครึ่งนั่งรอเสียงอยู่ในห้องสอบ", effects: {knowledge: -1, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_grill_smoke_01
+    type: A
+    category: society
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [13, 18], school: [lower, upper, voc]}
+    title: "ควันหมูปิ้งหน้าบ้านน้า"
+    text: "คุณช่วยน้าปิ้งหมูหน้าบ้านก่อนไปเรียน รายได้ของบ้านน้ามาจากเตานี้ แต่ควันลอยติดกำแพงเข้าหน้าต่างบ้านป้าข้าง ๆ ทุกเช้า วันนี้ป้าเดินมาไอให้ดูสามครั้ง บอกว่าผ้าที่ตากไว้เหม็นหมูไปทั้งราว"
+    choices:
+      - id: nextdoor_grill_move_stove
+        text: "ขอน้าขยับเตาออกห่างกำแพง"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: nextdoor_grill_send_pork
+        text: "เอาหมูปิ้งไปขอโทษป้า"
+        outcomes:
+          - {weight: 2, ok: true, text: "ป้ารับไปชิมแล้วบอกว่าเค็มไปนิด สุดท้ายสองบ้านตกลงกันว่าป้าจะตากผ้าหลังแปดโมงเช้า", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้ารับหมูไว้แต่ยังไออยู่ บอกว่าถ้าเช้าพรุ่งนี้ยังเหมือนเดิมจะไปถามเทศบาลดู", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_grill_argue
+        text: "เถียงแทนน้าว่าทำมาหากิน"
+        effects: {happiness: 1, relations: -2}
+        merit: [{cat: neutral}]
+      - id: nextdoor_grill_fan_back
+        text: "พัดควันย้อนกลับทางเดิม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ควันม้วนกลับมาเต็มหน้าร้าน ลูกค้าได้กลิ่นจากปากซอย เช้านั้นหมูหมดก่อนเวลา น้าให้คุณเลื่อนตำแหน่งเป็นหัวหน้าพัด", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลมเปลี่ยนทิศพอดี คุณรับควันเต็มหน้าจนน้ำตาไหลไปโรงเรียนทั้งกลิ่นหมู", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_shop_noise_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [19, 30]}
+    title: "ข้างห้องตอกเหล็กทั้งวัน"
+    text: "คุณเช่าคูหาเล็กไว้รับเย็บผ้าเป็นงานเสริม วางมัดจำไว้สามเดือน เดือนที่สองห้องข้าง ๆ กลายเป็นร้านตอกเหล็ก ลูกค้าคุยกับคุณต้องตะโกน เจ้าของห้องแถวพยักหน้ารับฟังมาเดือนกว่าแล้ว เสียงยังเหมือนเดิม"
+    choices:
+      - id: nextdoor_shop_end_lease
+        text: "ขอเลิกสัญญา เอามัดจำคืน"
+        outcomes:
+          - {weight: 2, ok: true, text: "คุณไล่เรียงว่าแจ้งไปกี่ครั้งแล้วเสียงยังไม่หาย เจ้าของห้องแถวยอมคืนมัดจำ คุณย้ายจักรไปหัวมุมตลาด", effects: {knowledge: 1, happiness: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าของห้องแถวขอเวลาคืนเงินเป็นงวด กว่าจะครบก็ผ่านไปครึ่งปี ส่วนที่ใหม่ยังไม่มีเงินวางมัดจำ", effects: {happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_shop_ask_quiet_hours
+        text: "คุยกับช่าง ขอเวลาเงียบตอนบ่าย"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_shop_municipality
+        text: "ไปร้องเรียนที่เขตหรือเทศบาล"
+        outcomes:
+          - {weight: 1, ok: true, text: "เจ้าหน้าที่มาฟังเสียงถึงหน้าร้าน แล้วขอให้ร้านข้าง ๆ ติดแผ่นกันเสียงและเลิกตอกหลังหกโมงเย็น", effects: {knowledge: 2, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เรื่องเข้าคิวตรวจอีกหลายอาทิตย์ ระหว่างนั้นช่างรู้ว่าใครร้อง เลยทักคุณสั้นลงทุกวัน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_shop_beat_promo
+        text: "เย็บผ้าตามจังหวะค้อนเรียกคน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนเดินตลาดหยุดดูร้านที่เย็บเข้าจังหวะค้อน ช่างข้างห้องตอกช้าลงให้เวลาคุณเข้าตะเข็บ สองร้านเลยได้ลูกค้าเพิ่มด้วยกัน", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ค้อนเร่งขึ้นเมื่อไรเข็มก็เร่งตาม กางเกงลูกค้าออกมาขาสั้นกว่ากันหนึ่งคืบ คุณต้องตัดใหม่ทั้งตัว", effects: {happiness: -1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_flat_bill_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [19, 30]}
+    title: "ค่าไฟหารเท่ากันทุกห้อง"
+    text: "ห้องแถวนี้มีมิเตอร์แยกทุกห้อง แต่เดือนนี้เจ้าของห้องแถวมาเก็บยอดเหมา บอกว่ารวมทั้งแถวแล้วหารเท่ากันทุกห้อง คุณอยู่คนเดียว เปิดพัดลมตัวเดียว ห้องข้าง ๆ มีตู้เย็นสองใบกับเตาอบ แต่ยอดเท่ากันเป๊ะ"
+    choices:
+      - id: nextdoor_flat_compare_bill
+        text: "ขอดูบิลการไฟฟ้าเทียบหน่วย"
+        outcomes:
+          - {weight: 2, ok: true, text: "เขากางบิลรวมแล้วจดเลขมิเตอร์ห้องคุณเทียบต่อหน้า หน่วยของคุณน้อยกว่ายอดที่เก็บเกินครึ่ง เขาคืนส่วนต่างและกลับไปจดตามมิเตอร์", effects: {knowledge: 2, money: {unit: income_x, amount: 0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาบอกว่าบิลฝากญาติไว้ พรุ่งนี้ค่อยดู พรุ่งนี้ของเขาเลื่อนไปจนถึงต้นเดือนหน้า", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_flat_read_meter
+        text: "ขอจดเลขมิเตอร์เองทุกสิ้นเดือน"
+        effects: {knowledge: 1, relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_flat_pay
+        text: "จ่ายไป ไม่อยากมีเรื่อง"
+        cost: {unit: income_x, amount: 0.05}
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_flat_buy_fridge
+        text: "ซื้อตู้เย็นมาใช้ให้คุ้มส่วนแบ่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตู้เย็นมือสองของคุณเย็นดีเกินคาด ข้างห้องเอาน้ำแข็งมาฝากแช่ ทุกเย็นมีคนมานั่งกินน้ำเย็นหน้าห้องคุณ", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดือนต่อมาเจ้าของกลับไปคิดตามมิเตอร์พอดี ตู้เย็นที่ซื้อมาเพื่อเอาคืนกลายเป็นหน่วยไฟของคุณคนเดียว", effects: {happiness: -1, knowledge: 1, money: {unit: income_x, amount: -0.15}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_car_block_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45], flags: {has: [has_car]}}
+    title: "เบรกมือหน้าประตูบ้าน"
+    text: "เช้าวันที่มีนัดสำคัญ คุณเปิดประตูมาเจอรถเก๋งจอดขวางทางออกเต็มคัน รถของคุณติดอยู่ในรั้ว ลองเข็นคันนั้นดูก็รู้ว่าใส่เบรกมือไว้แน่น ไม่มีคนขับ ไม่มีป้ายบอก คนในซอยบอกว่าจอดมาเกือบชั่วโมงแล้ว"
+    choices:
+      - id: nextdoor_car_ask_around
+        text: "เดินถามหาเจ้าของทีละร้าน"
+        outcomes:
+          - {weight: 2, ok: true, text: "เจอเจ้าของนั่งกินก๋วยเตี๋ยวอยู่ปลายซอย เขารีบมาขยับรถแล้วขอโทษ คุณไปสายนิดเดียว และได้ก๋วยเตี๋ยวหนึ่งชามเป็นค่าเสียเวลา", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถามครบทั้งซอยไม่มีใครรู้จัก คุณเดินจนเหงื่อโชก พอกลับมารถยังอยู่ที่เดิม และนัดก็เลยไปแล้ว", effects: {happiness: -2, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_car_police
+        text: "จดเลขทะเบียน แจ้งตำรวจ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตำรวจมาดูที่เกิดเหตุ บอกให้จดหลักฐานไว้และประสานเจ้าหน้าที่จราจรมาเคลื่อนย้าย เจ้าของรถต้องไปเสียค่าปรับ", effects: {knowledge: 2, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตำรวจบอกว่าช่วยได้แค่นี้ ให้ไปถามเจ้าหน้าที่อีกทาง คุณถือสมุดจดเลขทะเบียนนั่งรอหน้าบ้านจนหมดเช้า", effects: {happiness: -2, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_car_hire_ride
+        text: "ทิ้งรถไว้ นั่งรถรับจ้างไปก่อน"
+        cost: {unit: income_x, amount: 0.02}
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_car_coffee_table
+        text: "ตั้งโต๊ะกาแฟรอหน้ารถ"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนผ่านหยุดถามจนเรื่องดังทั้งซอย เจ้าของรถเดินมาเจอวงกาแฟล้อมรถตัวเอง เขาหน้าแดงแล้วเลี้ยงกาแฟทุกคนแทนคำขอโทษ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กาแฟหมดไปสามแก้ว รถไม่ขยับ นัดสำคัญจบไปโดยไม่มีคุณ คนในซอยยังเรียกคุณว่าเจ้าของร้านกาแฟหน้ารถจนถึงทุกวันนี้", effects: {happiness: -1, relations: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_fence_creep_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45], flags: {has: [home_owner]}}
+    title: "รั้วเดินได้"
+    text: "ต้นโกสนริมรั้วเคยห่างรั้วหนึ่งช่วงแขน ปีนี้เหลือแค่คืบเดียว บ้านข้าง ๆ เพิ่งซ่อมรั้วตอนคุณไปต่างจังหวัด ไม่มีใครพูดอะไร เจอหน้ายังยิ้มให้เหมือนเดิม ส่วนโฉนดนอนอยู่ในตู้ คุณไม่เคยเปิดอ่านเลย"
+    choices:
+      - id: nextdoor_fence_ask_now
+        text: "ถามตรง ๆ ตอนรั้วยังใหม่"
+        outcomes:
+          - {weight: 2, ok: true, text: "เพื่อนบ้านตกใจ บอกว่าช่างวัดตามรั้วเก่าที่เอียงมา พอกางโฉนดดูด้วยกันก็ตกลงขยับกลับเข้าที่ ช่วยกันออกคนละครึ่ง", effects: {relations: 2, knowledge: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาตอบว่ารั้วนี้ตรงอยู่แล้วและเดินกลับเข้าบ้าน คุณรู้แค่ว่าต่อจากนี้ต้องไปวัดให้ชัด", effects: {relations: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_fence_survey
+        text: "จ้างช่างรังวัดให้รู้แนว"
+        cost: {unit: income_x, amount: 0.15}
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_fence_let_go
+        text: "ปล่อยไว้ แค่คืบเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยังอยู่กันดีไม่มีเรื่อง คุณย้ายต้นโกสนเข้ามาหนึ่งคืบ แล้วเลิกมองรั้วไปเอง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หลายปีต่อมาตอนจะขายบ้าน คนรับซื้อวัดแล้วเนื้อที่ขาด พอไปถามผู้รู้ก็ได้ยินว่าเรื่องแบบนี้ยิ่งปล่อยไว้ยิ่งเสียเปรียบ", effects: {happiness: -2, knowledge: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_fence_daily_measure
+        text: "ปักไม้วัดรั้วทุกเช้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "คุณจดระยะลงสมุดอยู่สามเดือน เพื่อนบ้านเห็นเข้าถามว่าทำอะไร เรื่องเลยได้คุยกันจริงจังเสียที และสมุดเล่มนั้นก็ช่วยได้มาก", effects: {knowledge: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "รั้วไม่ขยับอีกเลยสามเดือน แต่ไม้ของคุณเอียงเอง คนทั้งซอยรู้แล้วว่าใครตื่นมาวัดรั้วทุกวัน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_old_fee_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45], flags: {has: [home_owner]}}
+    title: "หนี้ที่มากับกุญแจ"
+    text: "ย้ายเข้าบ้านมือสองได้เจ็ดวัน กรรมการหมู่บ้านเดินมาส่งซองทวงค่าบำรุงถนนกับไฟทางย้อนหลังสามปีของเจ้าของเก่า บอกว่าบ้านหลังนี้ค้าง ใครอยู่ก็ต้องจ่าย ซองนั้นหนากว่าเอกสารโอนบ้านของคุณเสียอีก"
+    choices:
+      - id: nextdoor_fee_ask_dates
+        text: "แยกยอดก่อนและหลังรับโอน"
+        outcomes:
+          - {weight: 2, ok: true, text: "กรรมการกลับไปไล่บัญชี ยอมรับว่าหนี้ก่อนวันรับโอนไม่ใช่ของคุณ คุณจ่ายเฉพาะเดือนที่อยู่จริง ซองเหลือแผ่นเดียว", effects: {knowledge: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ที่ประชุมไม่พอใจว่าคนใหม่เรื่องมาก คุณไม่ต้องจ่ายของเก่า แต่เดินผ่านศาลาทีไรมีคนเงียบทุกที", effects: {knowledge: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_fee_pay_all
+        text: "จ่ายให้จบ อยากอยู่อย่างสงบ"
+        cost: {unit: income_x, amount: 0.3}
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_fee_ignore
+        text: "ทิ้งซอง ไม่จ่ายสักบาท"
+        outcomes:
+          - {weight: 1, ok: true, text: "เรื่องเงียบไปหลายเดือน คุณเดินเข้าออกเร็วกว่าปกติเวลาผ่านศาลา แล้วค่อยไปคุยแยกยอดกันทีหลัง", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ส่วนที่เกิดหลังรับโอนค้างจนถึงศาล สุดท้ายต้องจ่ายของตัวเองพร้อมค่าทนายอีกก้อน เงินที่ประหยัดไว้หายหมด", effects: {happiness: -2, knowledge: 1, money: {unit: income_x, amount: -0.25}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_fee_compare_envelopes
+        text: "ขอซองทวงของทุกบ้านมาเทียบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ซองบ้านอื่นบางกว่าของคุณทุกซอง เพราะยอดเจ้าของเก่าถูกนับซ้ำสองรอบ กรรมการขอโทษแล้วชวนคุณมาช่วยจดยอดปีหน้า", effects: {knowledge: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ทุกบ้านเอาซองมาให้พร้อมคำอธิบายยาว สองอาทิตย์ผ่านไปคุณยังฟังไม่จบ ส่วนกองซองยังวางขวางทางเข้าครัวบ้านใหม่", effects: {happiness: -2, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_pothole_fund_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [31, 45]}
+    title: "หลุมนี้ไม่มีเจ้าภาพ"
+    text: "ถนนในซอยแตกเป็นหลุมจนรถเข็นขายของต้องอ้อม คุณไปร้องถึงทางราชการ ได้คำตอบว่าซอยนี้เป็นที่ของเอกชน เข้ามาซ่อมให้ไม่ได้ หัวหน้าซอยจึงเดินบอกทีละบ้านว่าต้องลงขันกันเอง ส่วนบ้านต้นซอยบอกว่าไม่ได้ผ่านหลุมสักนิด"
+    choices:
+      - id: nextdoor_pothole_pay_share
+        text: "ลงขันเต็มส่วนของตัวเอง"
+        cost: {unit: income_x, amount: 0.1}
+        effects: {relations: 2, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: nextdoor_pothole_by_length
+        text: "เสนอคิดตามระยะที่ใช้ถนน"
+        outcomes:
+          - {weight: 2, ok: true, text: "ทั้งซอยเถียงกันหนึ่งคืนก็ยอมรับสูตรนี้ บ้านต้นซอยออกน้อยหน่อยแต่ยังออก ถนนเสร็จก่อนหน้าฝน", effects: {knowledge: 1, network: 2, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "บ้านท้ายซอยโกรธว่าโดนคิดแพงที่สุด สูตรล้มกลางที่ประชุม หลุมยังอยู่ และมีคนไม่มองหน้ากันเพิ่มสามบ้าน", effects: {relations: -2, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_pothole_wait
+        text: "รอดูก่อนว่าบ้านอื่นจ่ายไหม"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_pothole_name_sign
+        text: "ขึ้นป้ายตั้งชื่อหลุม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้ายเขียนว่า หลุมนี้อายุสามขวบแล้ว คนหัวเราะกันทั้งซอย เงินลงขันครบในอาทิตย์เดียว หัวหน้าซอยขอป้ายไปเก็บเป็นที่ระลึก", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้ายล้มลงไปในหลุมตอนฝนแรก ตอนนี้ซอยมีทั้งหลุมและไม้ปักขวางทาง หัวหน้าซอยให้คุณไปเก็บเอง", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_mediator_paper_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "ข้อตกลงกระดาษแผ่นเดียว"
+    text: "ปีนี้ชาวบ้านขอให้คุณช่วยนั่งเป็นกรรมการหมู่บ้าน สองบ้านทะเลาะกันเรื่องค่าซ่อมท่อ คุยกันที่ศาลาจนยอมเซ็นชื่อแบ่งคนละครึ่ง ผ่านไปเดือนเดียวบ้านหนึ่งจ่าย อีกบ้านไม่จ่าย คนที่จ่ายแล้วมาถามคุณว่ากรรมการสั่งเขาได้ไหม"
+    choices:
+      - id: nextdoor_paper_be_honest
+        text: "บอกตรง ๆ ว่ากรรมการสั่งไม่ได้"
+        effects: {knowledge: 2, relations: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_paper_second_talk
+        text: "นัดคุยรอบสองที่ศาลา"
+        outcomes:
+          - {weight: 2, ok: true, text: "บ้านที่ไม่จ่ายสารภาพว่าเงินช็อต ขอแบ่งจ่ายสี่งวด ทั้งสองฝ่ายยอมเขียนกระดาษใหม่อีกแผ่น คราวนี้ทำตามจริง", effects: {relations: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "รอบนี้คนละฝั่งศาลา ไม่มีใครมองหน้ากัน คุณกลับบ้านพร้อมอาการปวดหัวและกระดาษแผ่นเดิม", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_paper_district
+        text: "พาไปปรึกษานายอำเภอ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ที่ว่าการอำเภออธิบายทางเดินเรื่องให้ทั้งสองบ้านจนชัด พอรู้ว่าต้องไปไกลแค่ไหน บ้านที่ค้างก็ยอมจ่ายก่อน", effects: {knowledge: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ต้องกลับไปรวมเอกสารมาใหม่สองรอบ ค่ารถมากกว่าครึ่งหนึ่งของค่าซ่อมท่อแล้ว ทั้งสองบ้านเริ่มโทษคุณแทน", effects: {relations: -1, money: {unit: income_x, amount: -0.03}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_paper_rice_rule
+        text: "ตั้งกติกา ใครผิดนัดเลี้ยงข้าว"
+        outcomes:
+          - {weight: 1, ok: true, text: "บ้านที่ค้างยอมจ่ายเพราะคำนวณแล้วถูกกว่าเลี้ยงข้าว แต่ทั้งซอยยังเรียกร้องให้เลี้ยงอยู่ดี งานนั้นเลยจัดกันในศาลาแบบลงขัน", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ไม่มีใครเซ็นกติกานี้ มีแต่คนมาถามว่าวันไหนเลี้ยง คุณต้องออกค่าข้าวต้มหม้อใหญ่เองเพื่อปิดเรื่อง", effects: {relations: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_path_seller_01
+    type: A
+    category: work_money
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59], flags: {has: [home_owner]}}
+    title: "ทางเดินบนที่ของคุณ"
+    text: "ทางดินเส้นเล็กริมที่ดินของคุณ บ้านหลังใน ๆ ใช้เดินออกถนนมาเกินสิบปี คุณไม่เคยว่าอะไร พอจะขายที่เก็บเป็นเงินก้อนไว้ใช้ตอนแก่ คนมาดูที่บอกว่าจะซื้อ ถ้าปิดทางเส้นนี้ได้ ราคาก็ตกลงกันง่ายขึ้น"
+    choices:
+      - id: nextdoor_path_tell_buyer
+        text: "บอกคนซื้อว่ามีคนใช้ทางนี้"
+        outcomes:
+          - {weight: 2, ok: true, text: "เขาลดราคาลงนิดหน่อยแต่ซื้อโดยเว้นทางไว้ บ้านหลังในเอากล้วยมาให้เป็นเครือ คุณนอนหลับสบายทั้งคืน", effects: {relations: 2, happiness: 1, money: {unit: income_x, amount: 0.3}}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "คนซื้อเดินหนีไป ที่ดินยังขายไม่ออกอีกหลายเดือน ทางดินเส้นนั้นยังมีคนเดินผ่านทักทายคุณทุกเย็น", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_path_lawyer
+        text: "ปรึกษาทนายก่อนรับปาก"
+        cost: {unit: income_x, amount: 0.05}
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: nextdoor_path_close
+        text: "ล้อมรั้วปิดทางแล้วขายให้จบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ได้เงินก้อนตามราคา แต่บ้านหลังในต้องอ้อมไกลกว่าเดิมมาก คนที่เคยทักทุกเย็นหันไปมองทางอื่นแทน", effects: {happiness: -1, relations: -2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: greed_harm, level: 1}]}
+          - {weight: 1, text: "บ้านหลังในไปหาทนาย บอกว่าใช้ทางนี้มาเกินสิบปีอาจมีสิทธิ์ คนซื้อขอถอน คุณเหลือรั้วใหม่หนึ่งแนวกับเพื่อนบ้านที่ไม่คุยด้วย", effects: {relations: -2, happiness: -2, money: {unit: income_x, amount: -0.1}}, merit: [{cat: greed_harm, level: 1}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_path_inch_sale
+        text: "เสนอขายทางให้ทั้งซอยคนละนิ้ว"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนในซอยลงขันซื้อแนวทางเดินจริงจัง ป้ายไม้เล็ก ๆ เขียนว่าทางนี้ของทุกคน คุณได้เงินน้อยกว่าที่คิดแต่กินข้าวฟรีไปอีกหลายบ้าน", effects: {happiness: 2, network: 2, money: {unit: income_x, amount: 0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าท้ายซอยจองไปสามนิ้ว ที่เหลือไม่มีใครเอา คุณต้องคืนเงินสามนิ้วนั้นพร้อมฟังเหตุผลอีกสองชั่วโมง", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_trash_witness_01
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.0625
+    when: {age: [46, 59]}
+    title: "พยานหน้าต่างชั้นบน"
+    text: "สองบ้านติดกันมีเรื่องมาสองปีเพราะขยะถูกปาเข้าบ้าน คุณนั่งริมหน้าต่างชั้นบนทุกเช้าเลยเห็นว่าใครเป็นคนปา คนที่โดนมาขอให้ไปเป็นพยานต่อหน้าเจ้าหน้าที่ ส่วนคนปาคือคนที่เคยพาคุณไปหาหมอเมื่อปีก่อน"
+    choices:
+      - id: nextdoor_witness_tell_what_seen
+        text: "ไปเล่าตามที่เห็นจริง"
+        outcomes:
+          - {weight: 2, ok: true, text: "เจ้าหน้าที่จดตามคำของคุณ เรื่องจบที่การเรียกมาตักเตือน ขยะหยุดลอย ส่วนคนที่เคยพาไปหาหมอเลิกทักคุณไปพักใหญ่", effects: {knowledge: 1, relations: -1, happiness: 1}, merit: [{cat: sila, level: 1}]}
+          - {weight: 1, text: "คำให้การตรงกับหลักฐานแค่บางส่วน เรื่องยืดเยื้อต่ออีกหลายเดือน คุณต้องไปนั่งรอที่ทำการจนเจ้าหน้าที่จำหน้าได้", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_witness_talk_first
+        text: "ไปคุยกับคนปาก่อนสักรอบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาเงียบไปนาน แล้วเล่าว่าเริ่มจากเรื่องหมาเห่าเมื่อสองปีก่อน คืนนั้นคุณพาทั้งสองบ้านมานั่งคุยกัน ขยะหยุดในเดือนนั้น", effects: {relations: 2, network: 1}, merit: [{cat: help_others, level: 1}]}
+          - {weight: 1, text: "เขาหาว่าคุณยุ่งไม่เข้าเรื่อง แล้วเลิกทักคุณไปเลย ส่วนขยะก็ยังถูกปามาเหมือนเดิม", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_witness_stay_out
+        text: "บอกว่าตาไม่ดี ไม่เห็นอะไร"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_witness_daily_log
+        text: "เปิดสมุดบันทึกประจำซอย"
+        outcomes:
+          - {weight: 1, ok: true, text: "สมุดของคุณละเอียดจนเจ้าหน้าที่ถามว่าเคยทำงานสืบสวนมาก่อนไหม สองบ้านยอมตกลงกันเพราะไม่อยากเห็นชื่อตัวเองในหน้าถัดไป", effects: {happiness: 2, network: 2, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณจดว่าวันนี้ฝนตก ขยะไม่ลอย ป้าข้างบ้านทาลิปสติกใหม่ คนทั้งซอยขอดูจนรู้ว่าตัวเองก็อยู่ในสมุดด้วย เรื่องเลยเพิ่มเป็นสี่บ้าน", effects: {relations: -2, happiness: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_tamarind_notice_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [60, 120], flags: {has: [home_owner]}}
+    title: "กิ่งมะขามที่ถูกทวง"
+    text: "ต้นมะขามที่คุณรดน้ำมาหลายสิบปีแผ่กิ่งข้ามรั้วไปบังแปลงพริกบ้านติดกัน เพื่อนบ้านมาบอกถึงหน้าประตูอย่างสุภาพว่าขอให้ตัดภายในเดือนนี้ ถ้าไม่ตัดเขาจะตัดเอง คุณไม่อยากให้กิ่งที่เลี้ยงมาหายไปด้วยมือคนอื่น"
+    choices:
+      - id: nextdoor_tamarind_trim_self
+        text: "ตัดเองให้เสร็จในเดือนนี้"
+        cost: {unit: income_x, amount: 0.03}
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_tamarind_after_pods
+        text: "ขอเลื่อนไปหลังเก็บฝัก"
+        outcomes:
+          - {weight: 2, ok: true, text: "เขายอม แลกกับมะขามหนึ่งถุงใหญ่ หลังเก็บฝักคุณตัดกิ่งเรียบร้อย แปลงพริกฟื้นทันหน้าหนาว", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณลืมนับวัน พอเขาตามมาอีกที พริกแคระไปครึ่งแปลง คุณต้องซื้อพริกให้เขาทั้งหน้า", effects: {relations: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_tamarind_threaten
+        text: "ขู่แจ้งความถ้าเขาแตะกิ่ง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาถอยไปไม่พูดอะไร กิ่งยังอยู่ แต่คนที่เคยเอาผักข้ามรั้วมาให้ก็หยุดไปด้วย", effects: {happiness: 1, relations: -2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผู้รู้บอกคุณว่าเขาบอกกล่าวก่อนแล้ว ถ้าคุณไม่ตัดในเวลาสมควร เขาก็มีสิทธิ์ตัดเอง คุณเลยขายหน้าไปทั้งซอย", effects: {happiness: -2, knowledge: 2, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_tamarind_air_rent
+        text: "เสนอจ่ายค่าเช่าอากาศด้วยมะขาม"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาหัวเราะจนลืมโกรธ ยอมให้กิ่งสูงเหลือไว้ตามสัญญาถุงมะขามปีละครั้ง ส่วนกิ่งต่ำคุณตัดให้จนแปลงพริกได้แดด", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาตอบว่าพริกไม่กินมะขาม แล้วยื่นเลื่อยมาให้ คุณต้องปีนขึ้นไปตัดเองทั้งที่เข่าไม่ค่อยดี", effects: {health: -2, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: nextdoor_pet_gate_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 120], family: [{role: pet, alive: true}]}
+    title: "ลืมลงกลอนประตูรั้ว"
+    text: "เช้านี้คุณลืมลงกลอนประตูรั้ว {ชื่อสัตว์}ออกไปถึงหน้าบ้านถัดไป แล้วกัดข่วนจนขากางเกงของยายขายผักขาด ผิวถลอกนิดหน่อย ยายยืนมองคุณอยู่ ส่วน{ชื่อสัตว์}นั่งนิ่งเหมือนเพิ่งทำความดีมา"
+    choices:
+      - id: nextdoor_pet_clean_wound
+        text: "พายายไปล้างแผลหาหมอ"
+        cost: {unit: income_x, amount: 0.03}
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: nextdoor_pet_pay_trousers
+        text: "ขอโทษ แล้วชดใช้ค่าเสียหาย"
+        cost: {unit: income_x, amount: 0.02}
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: nextdoor_pet_deny
+        text: "บอกว่าไม่ใช่ของบ้านนี้"
+        outcomes:
+          - {weight: 1, ok: true, text: "ยายบ่นแล้วเดินจากไป เย็นนั้นคนในซอยเห็น{ชื่อสัตว์}เดินกลับเข้าบ้านคุณ เรื่องเลยรู้กันทั่ว คุณไม่ได้พูดอะไรต่อ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อสัตว์}วิ่งเข้าหาคุณต่อหน้าทั้งซอย ยายมองหน้าแล้วพูดเบา ๆ ว่าไม่ต้องจ่ายก็ได้ แต่ขอไม่ขายผักให้บ้านนี้แล้ว", effects: {happiness: -2, relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: nextdoor_pet_apologize_itself
+        text: "ให้มันไปขอโทษเอง"
+        outcomes:
+          - {weight: 1, ok: true, text: "{ชื่อสัตว์}เดินเข้าไปถูตัวกับยายเฉย ๆ ยายหัวเราะออกมาได้ คุณพายายไปล้างแผล แล้วซ่อมกลอนประตูในวันนั้น", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อสัตว์}ไม่ยอมเดินสักก้าว คุณต้องอุ้มไปเองทั้งที่หลังไม่ดี ยายบอกว่าคนขอโทษควรเป็นอีกคน", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]

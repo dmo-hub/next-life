@@ -1,0 +1,507 @@
+# การ์ดวัฒนธรรมไทยชุด social (ใบ 216 จากร่าง 213)
+events:
+  # บอกเจ้าของตอนเลือก: กลุ่มท้าหรือแท็กต่อ (powder icebucket toplist idcard homefit) ควรเลือกไม่เกินสองหรือสามใบ powder toplist idcard มาจากหน้าเดียวกัน · กลุ่มส่งต่อตามจำนวนคน (chainmail blessing) อีกกลุ่ม · toplist กับ idcard เปลี่ยนการเปิดเรื่องไม่ขึ้นด้วยแท็กแล้ว
+  # ใบฉากเฉพาะกั้น when แล้ว: freeze oldchat = occupation ออฟฟิศ · selfiestick chainmail = school · ยังไม่ได้วัดอัตราเจอใหม่
+  # ที่มา https://www.thaipost.net/main/detail/95535 · ต้นทางเล่าย้อนวัยเด็ก ไม่ระบุปี
+  # เติมแถวรีเสิร์ช: หน้าเดียวกันเล่าว่า ลงมือเขียนได้ไม่ถึง 10 ใบ รู้สึกขี้คร้าน เลยหยุดเขียน และโยนทิ้งขยะไป (เปิดหน้าซ้ำ 2026-11-06 เจอตามนี้) · ใช้เป็นตัวเลือก tear_it
+  - id: social_chainmail_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [10, 12], school: [primary, lower]}
+    title: "ไปรษณียบัตรคำขู่"
+    text: "ไปรษณียบัตรใบหนึ่งส่งมาถึงคุณ บอกให้คัดลอกส่งต่อยี่สิบคน ข้อความส่งท้ายอ่านแล้วไม่อยากเข้าห้องน้ำคนเดียว ทุกใบต้องเขียนเองด้วยมือ และต้องเสียเงินส่งเองด้วย"
+    choices:
+      - id: copy_all
+        text: "นั่งเขียนจนมือหงิก"
+        effects: {knowledge: 1, happiness: -1, money: {unit: income_x, amount: -0.02}}
+        merit: [{cat: neutral}]
+      - id: tear_it
+        text: "เขียนไม่ถึงสิบใบแล้วโยนทิ้ง"
+        effects: {health: -1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+      - id: ask_teacher
+        text: "เอาไปถามครูประจำชั้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครูบอกว่าไม่มีอะไรเกิดขึ้นหรอก แล้วเล่าว่าตอนเด็กก็เคยเขียน", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ครูเตือนหน้าห้อง เพื่อนรู้ว่าใครเอาเรื่องไปฟ้อง", effects: {knowledge: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: edit_curse
+        text: "แก้คำขู่เป็นให้แจกขนม"
+        outcomes:
+          - {weight: 1, ok: true, text: "มีเพื่อนเอาขนมมาให้จริง บอกว่ากันไว้ก่อน", effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ลายมือคุณจำง่าย ครูเรียกไปคัดลายมือหลังเลิกเรียน", effects: {happiness: -1, knowledge: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://www.marketingoops.com/?p=29805 · ย้ายจากห้องเรียนวัยรุ่นมางานเลี้ยงรุ่นวัยทำงาน กันซ้ำ teen_viral_clip_01 · ตัดตัวเลือกชวนครูออก
+  - id: social_danceclip_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "เพลงตัดเข้าบีท"
+    text: "งานเลี้ยงรุ่นปีนี้มีคนอยากถ่ายคลิปแบบที่เคยฮิต เพื่อนคนหนึ่งเต้นอยู่คนเดียวข้างโต๊ะ ที่เหลือนั่งคีบกับข้าวตามปกติ พอเพลงตัดเข้าบีทหนัก ทุกคนต้องลุกเต้นสุดเหวี่ยง คนถือกล้องหันมาทางคุณ"
+    choices:
+      - id: dance_all
+        text: "ลุกเต้นสุดเหวี่ยง"
+        outcomes:
+          - {weight: 2, ok: true, text: "คลิปวนในกลุ่มรุ่น เพื่อนที่ไม่ได้คุยกันนานทักมาหลายคน", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพลงจบแล้ว ในคลิปเห็นคุณค้างท่าอยู่กลางร้าน หลังยังไม่ยอมกลับที่", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: keep_eating
+        text: "คีบกับข้าวต่อ เอาจริง"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: hold_camera
+        text: "ขอถือกล้องแทนเขา"
+        effects: {relations: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: invite_next_table
+        text: "ชวนโต๊ะข้าง ๆ มาเต้นด้วย"
+        outcomes:
+          - {weight: 1, ok: true, text: "โต๊ะข้าง ๆ ลุกมาเต้นจริง เจ้าของร้านเปิดเพลงซ้ำให้อีกรอบ", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "โต๊ะข้าง ๆ ไปฟ้องร้าน รุ่นคุณโดนเชิญออกก่อนของหวาน", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://www.marketingoops.com/?p=53187
+  - id: social_powder_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30]}
+    title: "ใครไม่กล้าถือว่าป่อด"
+    text: "มิชชั่นส่งต่อรอบนี้คือประแป้งหน้าขาวแล้วโพสต์รูป เพื่อนแท็กชื่อคุณพร้อมคำว่า ใครไม่กล้าถือว่าป่อด คนที่คุณแอบชอบก็อยู่ในรายชื่อเพื่อนด้วย"
+    choices:
+      - id: do_it
+        text: "ประแป้งโพสต์ตามกติกา"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนที่แอบชอบกดหัวใจ คุณเปิดรูปตัวเองดูซ้ำจนดึก", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนที่แอบชอบกดหัวเราะ ไม่กดหัวใจ", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ignore_tag
+        text: "ทำเป็นไม่เห็นแท็ก"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: tag_crush
+        text: "ส่งต่อให้คนที่แอบชอบ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาโพสต์หน้าขาวกลับมา แล้วพิมพ์ถามว่าพอใจยัง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาตอบว่าป่อดก็ได้ แล้วไม่ตอบอะไรอีกเลย", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: whole_can
+        text: "เทหมดกระป๋องให้ขาวกว่าทุกคน"
+        outcomes:
+          - {weight: 1, ok: true, text: "หน้าขาวจนต้องวงรอบตาในรูป คนส่งต่อกันไม่หยุด", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แป้งเข้าจมูก จามจนเช้า กระป๋องนั้นที่บ้านเพิ่งซื้อมาใหม่", effects: {health: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://www.marketingoops.com/digital-life/17-creative-diy-selfie-stick/
+  - id: social_selfiestick_01
+    type: A
+    category: work_money
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 0.125
+    when: {age: [13, 18], school: [lower, upper, voc]}
+    title: "ไม้เซลฟี่แพงขึ้นเรื่อย ๆ"
+    text: "ไปทางไหนก็เห็นคนถือไม้เซลฟี่ พ่อค้าตลาดนัดเก็งกำไรจนราคาแพงขึ้นเรื่อย ๆ เพื่อนในห้องเริ่มมัดมือถือกับด้ามไม้กวาดแล้ว"
+    choices:
+      - id: pay_up
+        text: "กัดฟันซื้อของจริง"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: diy_stick
+        text: "ต่อเองจากด้ามไม้กวาด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ถ่ายได้จริง เพื่อนต่อคิวขอยืม", effects: {knowledge: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มัดไม่แน่น มือถือตกพื้นตอนกดถ่าย เพื่อนขำจนถ่ายไม่ทัน", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: long_arm
+        text: "ใช้แขนเพื่อนตัวสูงแทน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: resell
+        text: "กว้านซื้อมาขายต่อในโรงเรียน"
+        outcomes:
+          - {weight: 1, ok: true, text: "ขายหมดเกลี้ยง ได้กำไรพอซื้อไม้ของตัวเอง เพื่อนเรียกเถ้าแก่", effects: {network: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เดือนถัดมาไม่มีใครถือไม้แล้ว ที่บ้านมีไม้เหลือห้าอัน", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://marketeeronline.co/archives/48577
+  - id: social_sticker_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30], flags: {not: [married]}}
+    title: "ทะเลาะกันด้วยสติกเกอร์"
+    text: "แฟนพิมพ์มาสามย่อหน้าเรื่องเมื่อคืน คุณไม่อยากพิมพ์ยาว เลยกดสติกเกอร์ตัวการ์ตูนยกมือไหว้ ครู่เดียวอีกฝั่งส่งสติกเกอร์ยิ้มกลับมาตัวเดียว ไม่มีข้อความ"
+    choices:
+      - id: call_now
+        text: "โทรไปคุยเลย"
+        outcomes:
+          - {weight: 2, ok: true, text: "คุยกันจนแบตหมด เรื่องเมื่อคืนจบ", effects: {relations: 2, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ปลายสายไม่รับ แล้วส่งสติกเกอร์ยิ้มมาอีกตัว", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: type_long
+        text: "พิมพ์ตอบยาวเท่ากัน"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: read_quiet
+        text: "กดอ่านแล้วเงียบ"
+        effects: {relations: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: sorry_pack
+        text: "ซื้อสติกเกอร์ชุดง้อโดยเฉพาะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ตัวการ์ตูนคุกเข่าทุกแบบ อีกฝั่งหลุดขำ ยอมคุย", effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แฟนตอบว่า งั้นไปคบกับตัวการ์ตูนเลย", effects: {relations: -2, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://thaipublica.org/2014/09/ice-bucket-challenge-lessons/ · ใช้เฉพาะพฤติกรรมท้ากันต่อ ไม่พาดพิงผู้ป่วยต้นเรื่อง
+  - id: social_icebucket_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "น้ำแข็งถังสุดท้าย"
+    text: "เพื่อนแท็กให้ราดน้ำแข็งแล้วท้าต่ออีกสามคน ทั้งที่กระแสจบไปแล้วเป็นเดือน คนอื่นเก็บถังกันหมด เหลือคุณที่ยังมีเวลาอีกวันตามกติกา"
+    choices:
+      - id: dump_all
+        text: "ราดเต็มถังหน้าปากซอย"
+        outcomes:
+          - {weight: 2, ok: true, text: "ถ่ายเทคเดียวจบ เพื่อนกดหัวเราะกันยาว", effects: {happiness: 1, network: 1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เป็นไข้ไปหลายวัน คลิปมีคนดูสิบเอ็ดคน", effects: {health: -2, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: quiet_rice
+        text: "ตั้งข้าวสารถุงเดียวหน้ากล้องแทน"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: pass_on
+        text: "ไม่ราด แต่ท้าต่อคนอื่นไปเลย"
+        effects: {network: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: warm_water
+        text: "ใช้น้ำอุ่นแล้วร้องเหมือนหนาว"
+        outcomes:
+          - {weight: 1, ok: true, text: "แสดงเก่งจนเพื่อนเชื่อ มีคนถามว่าเล่นละครไหม", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "กระติกน้ำร้อนหลุดเข้าเฟรม เพื่อนซูมภาพส่งต่อกันไม่หยุด", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://www.marketingoops.com/?p=53187
+  - id: social_toplist_01
+    type: A
+    category: study
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "สิบหนังในดวงใจ"
+    text: "ช่วงนี้มีแต่คนโพสต์สิบหนังในดวงใจ ลิสต์ของเพื่อนมีแต่หนังยาวสี่ชั่วโมง ลิสต์จริงของคุณมีแต่หนังผีกับหนังที่ดูเพราะแอร์เย็น เช้านี้มีคนท้ามาถึงชื่อคุณ"
+    choices:
+      - id: honest_list
+        text: "โพสต์ลิสต์จริง หนังผีล้วน"
+        outcomes:
+          - {weight: 1, ok: true, text: "มีคนแอบทักมาว่าชอบเหมือนกัน แต่ไม่กล้าโพสต์", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนคอมเมนต์ว่าน่ารักดีนะ แล้วไม่มีใครท้าคุณอีก", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: copy_list
+        text: "ก๊อปลิสต์คนอื่นให้ดูฉลาด"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่มีใครจับได้ มีคนทักมาชวนคุยเรื่องหนังที่คุณไม่เคยดู", effects: {network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนถามถึงฉากจบ คุณตอบว่าชอบภาพ", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: watch_all
+        text: "ดูให้ครบสิบเรื่องก่อนค่อยโพสต์"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: tag_uncle
+        text: "ท้าต่อไปที่ลุงในกลุ่มญาติ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลุงโพสต์ลิสต์หนังเก่ายาวเหยียด พร้อมเล่าว่าดูโรงไหนกับใคร", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลุงโทรมาถามว่าแท็กคืออะไร คุณอธิบายจนข้าวเย็น", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://www.marketingoops.com/?p=136575
+  - id: social_freeze_01
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [19, 30], occupation: [clerk, manager, professional]}
+    title: "นิ่งให้เหมือนหุ่น"
+    text: "ฝ่ายการตลาดอยากได้คลิปยืนนิ่งเหมือนหุ่น ทุกคนต้องหยุดค้างในท่าทำงาน กล้องเดินผ่านทีละโต๊ะ คุณได้บทถือแก้วกาแฟค้างข้างปาก ถ่ายรอบที่เก้าแล้ว และคุณเริ่มอยากจาม"
+    choices:
+      - id: hold_sneeze
+        text: "กลั้นจาม นิ่งให้จบเทค"
+        outcomes:
+          - {weight: 1, ok: true, text: "จบเทคนี้ หัวหน้าเพิ่งจำชื่อคุณได้เป็นครั้งแรก", effects: {network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "จามตอนกล้องมาถึงพอดี ทุกคนกลับไปเริ่มที่โต๊ะแรก", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: back_row
+        text: "ขอไปยืนเป็นฉากหลัง"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: type_secret
+        text: "แอบพิมพ์งานตอนกล้องไม่ผ่าน"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: slow_slide
+        text: "ขยับทีละนิดไปถึงโต๊ะหัวหน้า"
+        outcomes:
+          - {weight: 1, ok: true, text: "คลิปคนเลื่อนข้ามออฟฟิศมีคนดูมากกว่าโฆษณาของบริษัท", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "หัวหน้าเรียกถามว่าปกติทำงานช้าแบบนี้ด้วยหรือเปล่า", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://www.marketingoops.com/?p=8791 · https://www.marketingoops.com/news/msn-messenger · ไม่ใส่ชื่อโปรแกรม
+  - id: social_oldchat_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45], occupation: [clerk, manager, professional]}
+    title: "คนนั่งใกล้ปลั๊ก"
+    text: "โปรแกรมแชตที่บริษัทใช้คุยงานจะปิดบริการเดือนหน้า ลูกค้าเจ้าใหญ่ยังส่งงานผ่านมันทุกวัน ประวัติคุยงานหกปีอยู่ในนั้น หัวหน้าถามว่าใครรู้วิธีย้าย ทุกคนมองคุณเพราะคุณนั่งใกล้ปลั๊ก"
+    choices:
+      - id: save_history
+        text: "นั่งเซฟประวัติคุยทีละหน้า"
+        effects: {knowledge: 1, health: -1}
+        merit: [{cat: neutral}]
+      - id: move_team
+        text: "ไล่ย้ายทีมไปโปรแกรมใหม่"
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกค้าย้ายตาม หัวหน้าบอกที่ประชุมว่าเป็นความคิดของเขา", effects: {knowledge: 1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกค้าเจ้าใหญ่ไม่ย้าย กลับไปส่งแฟกซ์ คุณได้งานเพิ่ม", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: last_day
+        text: "รอวันสุดท้ายค่อยคิด"
+        effects: {happiness: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: say_bye_all
+        text: "ทักลาทุกรายชื่อก่อนมันปิด"
+        outcomes:
+          - {weight: 1, ok: true, text: "รายชื่อเก่าตอบกลับหลายคน หนึ่งในนั้นกำลังหาคนทำงาน", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ในรายชื่อมีลูกค้าเจ้าใหญ่ คุณเพิ่งส่งคำว่าบายจ้าให้เขา", effects: {network: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://www.thairath.co.th/scoop/944195 · https://www.thairath.co.th/money/economics/thai_economics/1616601 · ไม่อ้างตัวบทหรือค่าปรับ
+  - id: social_askprice_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "ราคาทักมานะคะ"
+    text: "คุณเริ่มขายกระเป๋าในเน็ตหลังเลิกงาน ร้านอื่นไม่บอกราคาในโพสต์ ให้ทักข้อความมาถามกันหมด วันนี้มีคนถามราคาสี่สิบคน ซื้อหนึ่งคน อีกคนถามว่าทำไมไม่เขียนไว้เลย"
+    choices:
+      - id: write_price
+        text: "เขียนราคาในโพสต์ทุกชิ้น"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนทักน้อยลง แต่คนที่ทักมาซื้อจริง คุณได้นอนเร็วขึ้น", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ร้านอื่นเห็นราคาแล้วตั้งถูกกว่าคุณนิดเดียว ยอดทักหายไปครึ่งหนึ่ง", effects: {happiness: -1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: inbox_only
+        text: "ทำตามร้านอื่น ราคาอยู่ในแชต"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนทักเยอะ ขายได้อีกหลายใบ ตอบจนหลับคามือถือ", effects: {health: -1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนซื้อแคปแชตไปบ่นในกลุ่ม ร้านคุณดังผิดทาง", effects: {network: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: auto_reply
+        text: "ตั้งข้อความตอบอัตโนมัติ"
+        outcomes:
+          - {weight: 1, ok: true, text: "มันตอบแทนคุณได้ คุณเพิ่งได้กินข้าวตอนข้าวยังร้อน", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกค้าถามว่าส่งวันไหน มันตอบว่าขอบคุณที่สนใจ แล้วตอบแบบนั้นซ้ำ", effects: {network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: price_by_face
+        text: "ตั้งราคาตามรูปโปรไฟล์คนถาม"
+        outcomes:
+          - {weight: 1, ok: true, text: "ขายแพงได้หลายใบ คุณเริ่มดูรูปโปรไฟล์เป็น", effects: {knowledge: 1, money: {unit: income_x, amount: 0.1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่น้องทักมาพร้อมกัน ได้คนละราคา", effects: {network: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://www.marketingoops.com/?p=53187
+  - id: social_idcard_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "บัตรประชาชนใบเก่า"
+    text: "ในกลุ่มเพื่อนกำลังโพสต์ภาพบัตรประชาชนใบเก่ากันเพื่อความฮา คุณรื้อลิ้นชักจนเจอของตัวเอง ผมตัดตามระเบียบ หน้าเหมือนคนเพิ่งถูกปลุกมาตอบคำถาม"
+    choices:
+      - id: cover_number
+        text: "ปิดเลขบัตรแล้วโพสต์"
+        effects: {knowledge: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: post_raw
+        text: "โพสต์เต็มใบ ไม่ปิดอะไรเลย"
+        outcomes:
+          - {weight: 2, ok: true, text: "คนกดหัวเราะกันไม่หยุด ไม่มีอะไรเกิดขึ้น", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "มีคนทักมาบอกว่าเลขบัตรคุณอ่านชัดมาก คืนนั้นเปลี่ยนรหัสทุกอย่าง", effects: {happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: use_license
+        text: "ลองใบขับขี่แทน ปรากฏว่าไม่รอด"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: card_profile
+        text: "ตั้งรูปบัตรเป็นรูปโปรไฟล์ทำงาน"
+        outcomes:
+          - {weight: 1, ok: true, text: "คนเก่าที่เงียบไปนานโผล่มาหัวเราะ แล้วถามว่าตอนนี้ทำอะไรอยู่", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลืมเปลี่ยนกลับ คนสำคัญเห็นรูปนี้ก่อนเห็นหน้าคุณ", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: dig_friend
+        text: "ขุดรูปสมัยเรียนของเพื่อนมาโพสต์"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนขุดของคุณกลับมา กลุ่มแชตคึกคักกว่าปีใหม่", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนไม่ขำ แล้วออกจากกลุ่มไปเงียบ ๆ", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://marketeeronline.co/archives/162457 · ตัดกรอบกักตัวและสงกรานต์ออก เหลือเรื่องท้าแพลงก์ ไม่ผูกช่วงโรคระบาด
+  - id: social_homefit_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [31, 45]}
+    title: "แพลงก์กลางห้องนั่งเล่น"
+    text: "วันนี้คุณอยู่บ้าน ไม่ได้ลุกจากเก้าอี้ตั้งแต่เช้า มือถือเด้ง เพื่อนแท็กให้แพลงก์หนึ่งนาทีแล้วถ่ายคลิปลง พื้นห้องนั่งเล่นดูไกลกว่าที่เคย"
+    choices:
+      - id: plank_real
+        text: "แพลงก์จริงให้ครบนาที"
+        outcomes:
+          - {weight: 1, ok: true, text: "ครบนาทีจริง คุณนอนราบอยู่ตรงนั้นต่ออีกพัก", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตัวสั่นไม่ถึงครึ่งทาง คลิปออกไปแล้ว หลังก็ปวดไปอีกหลายวัน", effects: {health: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: daily_plank
+        text: "ทำทุกเช้าจนจบเดือน"
+        effects: {health: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: back_excuse
+        text: "ตอบว่าหลังยังไม่พร้อม"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: edit_clip
+        text: "ตัดต่อคลิปให้ดูเหมือนครบนาที"
+        outcomes:
+          - {weight: 1, ok: true, text: "ไม่มีใครจับได้ คุณนอนต่อด้วยความภูมิใจ", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "นาฬิกาข้างหลังเดินข้ามไปยี่สิบนาที เพื่อนเห็นก่อนคุณ", effects: {relations: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://www.thaipost.net/main/detail/95535
+  - id: social_blessing_01
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.25
+    when: {age: [46, 59]}
+    title: "พรส่งต่อสิบคน"
+    text: "กลุ่มญาติเด้งตั้งแต่เช้า ข้อความขอให้มั่งมีถูกหวย แต่ต้องส่งต่อเพื่อนอย่างน้อยสิบคน ป้าคนที่ส่งมาแท็กชื่อคุณไว้ แล้วถามต่อว่าส่งหรือยัง"
+    choices:
+      - id: forward_ten
+        text: "ส่งครบสิบ เผื่อไว้ก่อน"
+        effects: {relations: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: reply_amen
+        text: "ตอบว่าสาธุ แล้วไม่ส่งต่อ"
+        outcomes:
+          - {weight: 1, ok: true, text: "ป้าพอใจ เปลี่ยนไปถามคนอื่นแทน", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ป้าตามถามซ้ำทุกเช้า คุณเริ่มกดอ่านช้าลง", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: mute_group
+        text: "ปิดแจ้งเตือนกลุ่มญาติ"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: edit_blessing
+        text: "แก้เป็นขอให้ป้าโอนเงินให้"
+        outcomes:
+          - {weight: 1, ok: true, text: "กลุ่มหัวเราะกันใหญ่ ป้าโอนมาเท่าราคาไข่ฟองเดียว พร้อมคำว่าอย่าใช้หมด", effects: {relations: 1, happiness: 1, money: {unit: income_x, amount: 0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ป้าไม่ขำ งานรวมญาติปีนี้ไม่มีใครนั่งโต๊ะคุณ", effects: {relations: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://www.thairath.co.th/scoop/1751635 · https://today.line.me/th/v2/article/9m8YX8q
+  - id: social_goodmorning_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85]}
+    title: "กุหลาบดอกเดิม"
+    text: "ตีห้าครึ่ง มือถือเด้ง เมื่อวานคุณส่งภาพกุหลาบกับคำว่าสวัสดีไปหาเพื่อนเก่า เช้านี้กุหลาบดอกเดียวกันส่งกลับมา คุณยังไม่ทันล้างหน้า แต่นิ้วเริ่มเลื่อนหาภาพของวันนี้แล้ว"
+    choices:
+      - id: send_back
+        text: "ส่งดอกไม้กลับตามหน้าที่"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: ask_knee
+        text: "จิ้มถามว่าเข่าเป็นไงบ้าง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาตอบว่าดีขึ้นแล้ว แล้วถามถึงเข่าคุณกลับ", effects: {relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เขาเล่าเรื่องเข่าจนถึงเที่ยง ข้าวต้มคุณเย็นหมด", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: make_own
+        text: "หัดทำภาพเอง ใส่หน้าตัวเอง"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: blast_all
+        text: "ส่งกุหลาบให้ทุกกลุ่มทีเดียว"
+        outcomes:
+          - {weight: 1, ok: true, text: "มีคนตอบกลับสิบเจ็ดคน ส่วนใหญ่ส่งกุหลาบดอกเดียวกัน", effects: {relations: 1, network: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ภาพเข้ากลุ่มกรรมการหมู่บ้าน ประธานถามว่าเกี่ยวกับวาระไหน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ที่มา https://www.thaipbs.or.th/verify/content/255 · ไม่อ้างเพจต้นทาง
+  # เติมแถวรีเสิร์ช: หน้าต้นทางมีข้อมูลผู้เสียชีวิตจากฮีทสโตรก การ์ดใช้เฉพาะรูปข้อความเตือน ห้ามพาดพิงเรื่องนั้น
+  - id: social_coldwater_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {age: [60, 85]}
+    title: "ห้ามดื่มน้ำเย็นเด็ดขาด"
+    text: "เพื่อนส่งข้อความเตือนมา อากาศร้อนแล้วดื่มน้ำเย็นจะทำให้หลอดเลือดระเบิด ตัวหนังสือสีแดงเต็มจอ ท้ายข้อความขอให้ส่งต่อคนที่คุณรัก คุณเพิ่งดื่มน้ำเย็นไปครึ่งขวดระหว่างอ่าน"
+    choices:
+      - id: forward_all
+        text: "ส่งต่อทุกกลุ่ม เผื่อจริง"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนตอบว่าขอบใจ แล้วถามว่าเอามาจากไหน คุณตอบไม่ได้", effects: {relations: 1, happiness: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "มีคนแนบผลตรวจว่าไม่จริง กลุ่มเงียบไปครึ่งวัน", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_doctor
+        text: "ถามหมอตอนไปรับยา"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: drink_warm
+        text: "เลิกน้ำเย็นไว้ก่อน เผื่อไว้"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: photo_ice
+        text: "ถ่ายรูปแก้วน้ำแข็งส่งกลับ"
+        outcomes:
+          - {weight: 1, ok: true, text: "เพื่อนส่งรูปแก้วน้ำแข็งของเขากลับมา ใบใหญ่กว่า", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เพื่อนหาว่าประชด หยุดส่งภาพสวัสดีมาหลายวัน", effects: {relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+# ตารางตัดออก (5 แถวจาก 20) · เกณฑ์เดียว: ซ้ำของเดิมหรือซ้ำในชุด = ตัด · เรื่องต้นทางเล่าผู้เสียหายรายบุคคล = ตัด · พฤติกรรมทั่วไปที่ไม่มีคนถูกล้อ = เก็บ (askprice coldwater เก็บตามข้อนี้ ต้นทางเล่าพฤติกรรมรวม ไม่เล่ารายบุคคล)
+# ออกล่าโปเกมอน 2559: ซ้ำ meme_catch_game_01 ในใบ 207 (คนเดินก้มหน้าไล่จับตัวหายาก)
+# เปิดไลฟ์ขายของ กลุ่มฝากร้าน 2563: ซ้ำของเดิมหลายใบ (era_disaster mid old_family มีไลฟ์ขายของอยู่แล้ว)
+# แชร์ข่าวปลอมต่อกันในไลน์ 2564: เป็นพฤติกรรมทั่วไป ไม่เข้าข้อผู้เสียหาย แต่ซ้ำรูปเดียวกับ social_coldwater_01 ในชุดนี้ เก็บใบเดียว
+# สั่งของเก็บเงินปลายทางแล้วไม่รับ 2566: ต้นทางเล่าแม่ค้าที่เสียหายรายบุคคล
+# ร้านอาหารออนไลน์ใช้รูปคนอื่น ไม่ตรงปก 2567: ต้นทางเป็นโพสต์เตือนจากผู้บริโภครายบุคคลที่เสียหาย
+# ผลตรวจรอบแก้: lintDocs ไฟล์ร่างจริงรวม content 548 ใบ รอบเดียว ได้ 0 ปัญหา · การ์ดควบคุมที่ผิดจงใจถูกจับ · id title ไม่ชน content และใบ 207 · ยังไม่ได้รัน gate merit titles และอัตราเจอ (gate ใช้ 11 นาที ต้องถามผู้รวมงานก่อน)
