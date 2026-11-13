@@ -67,6 +67,11 @@ const stuck = new Map(), unfilled = new Map();
 const parentReaders = (e) => [e.when?.parent_flags, e.multipliers?.parent_flags, ...(e.choices ?? []).flatMap((c) => (c.outcomes ?? []).map((o) => o.multipliers?.parent_flags))].some(Boolean);
 const heirReaders = content.events.filter(parentReaders);
 let heirA = 0, heirB = 0, heirC = 0, heirTwin = 0, heirGot = 0;
+// B5: ครอบครัวใหม่สุ่มได้เฉพาะธงรับราชการชั้น 1 ตาม heir_birth_p — ธงอื่น/ชั้นอื่น/หลายธงถือว่าหลุด
+const BIRTH_FLAGS = ['police_family', 'army_family'];
+let birthLives = 0, birthGot = 0;
+// ตัวควบคุม: LINEAGE_PARENT_FLAG_CTL=<ธง> ยัดธงนั้นให้ทางเกิดใหม่ ด่านต้องตก
+const CTL_FLAG = process.env.LINEAGE_PARENT_FLAG_CTL;
 const lens = [];
 // ทางในตระกูลแยกชั้น (B18): จำนวน · ผลรวมสัดส่วนส่งต่อ · มรดก (เท่ารายได้ปี) · |ส่วนต่างความสัมพันธ์+คอนเน็คชั่นจากบ้าน|
 const tiers = KIN_TIERS.map(() => ({ n: 0, carry: 0, legacy: 0, kin: 0, units: [] }));
@@ -180,8 +185,12 @@ for (const [name, pick] of Object.entries(BOTS)) {
       if (verdicts !== 1 + af.isekaiLives.length) isekaiBad++;
       st = nextLife(af);
       const pf = Object.entries(st.parentFlags ?? {});
-      if (af.path !== 'child') { if (pf.length) heirA++; }
-      else {
+      if (af.path !== 'child') {
+        if (CTL_FLAG) pf.push([CTL_FLAG, 1]);
+        birthLives++;
+        if (pf.length > 1 || pf.some(([k, t]) => !BIRTH_FLAGS.includes(k) || t !== 1)) heirA++;
+        else if (pf.length) birthGot++;
+      } else {
         for (const [k, t] of pf) if (!HEIR[k] || t !== h.tier || t > HEIR[k].tier || !prevFlags[k]) heirB++;
         for (const [k, x] of Object.entries(HEIR)) if (prevFlags[k] && h.tier <= x.tier && !st.parentFlags[k]) heirB++;
       }
@@ -301,7 +310,10 @@ for (let i = 0; i < Math.min(n, 500); i++) {
   }, st);
 }
 console.log('');
-check('ทางเกิดใหม่/ต่างโลกไม่ได้ธงพ่อแม่', heirA);
+check('ทางเกิดใหม่/ต่างโลกได้ธงพ่อแม่เฉพาะ police_family/army_family ชั้น 1 ไม่เกินหนึ่งธง', heirA);
+const birthP = content.cadet?.numbers?.heir_birth_p ?? 0;
+const birthSd = Math.sqrt(birthLives * birthP * (1 - birthP));
+check(`ทางเกิดใหม่/ต่างโลกได้ธง B5 ตาม heir_birth_p ${birthP} (${birthGot}/${birthLives} ชีวิต · คาด ${f(birthLives * birthP, 0)} ± ${f(4 * birthSd, 0)})`, Math.abs(birthGot - birthLives * birthP) > 4 * birthSd ? 1 : 0);
 check('ทางเป็นลูกได้ธงในทะเบียน heir: ครบ ชั้นไม่เกินเพดาน และรุ่นก่อนถือจริง', heirB, ` · ได้ธง ${heirGot} ชีวิต`);
 check('ทายาทเกิดมามีธงตัวเองว่าง (ธงพ่อแม่อยู่ช่องแยก)', heirC);
 // ทายาทตายได้ทุกสาเหตุแบบรุ่นแรก (ไอเดีย thelands-5 — เขา: ธงตายค้าง ทายาทอมตะ) · สาเหตุที่รุ่นแรกน้อยกว่าเกณฑ์หายไปในรุ่นหลังได้จาก rng ล้วน ไม่ตัดสิน
