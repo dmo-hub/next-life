@@ -157,8 +157,8 @@ events:
       - id: locksmith_twoam_walk_round
         text: "เดินอ้อมไปส่องหน้าต่างก่อน"
         outcomes:
-          - {weight: 1, ok: true, text: "ส่องผ่านช่องหน้าต่างเห็นกุญแจนอนอยู่บนโต๊ะจริง ๆ คุณยืนมองมันอยู่พักใหญ่ แล้วไปเคาะช่างปากซอยด้วยสีหน้าสำนึกผิด ช่างหัวเราะแล้วคิดราคาให้เบากว่าที่กลัว", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ส่องจนคอเคล็ดก็ไม่เห็นอะไรนอกจากความมืด คุณเดินวนรอบตึกตอนตีสามครึ่ง ก่อนกลับไปเคาะช่างอยู่ดี", effects: {happiness: -1, health: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ส่องผ่านช่องหน้าต่างเห็นกุญแจนอนอยู่บนโต๊ะจริง ๆ คุณยืนมองมันอยู่พักใหญ่ แล้วไปเคาะช่างปากซอยด้วยสีหน้าสำนึกผิด ช่างหัวเราะแล้วคิดราคาให้เบากว่าที่กลัว", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}], next: locksmith_after_ya_01}
+          - {weight: 1, text: "ส่องจนคอเคล็ดก็ไม่เห็นอะไรนอกจากความมืด คุณเดินวนรอบตึกตอนตีสามครึ่ง ก่อนกลับไปเคาะช่างอยู่ดี", effects: {happiness: -1, health: -1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}], next: locksmith_after_ya_01}
         merit: [{cat: neutral}]
       - id: locksmith_twoam_bring_snack
         text: "แบ่งขนมในกระเป๋าไปฝากช่าง"
@@ -227,8 +227,8 @@ events:
       - id: locksmith_safe_birthday
         text: "ลองหมุนวันเกิดตัวเองต่อหน้าช่าง"
         outcomes:
-          - {weight: 1, ok: true, text: "เปิดได้รอบแรก ช่างไม่คิดเงินสักบาท แต่ขอให้คุณจดเลขลงกระดาษแล้วเก็บไว้นอกตู้ต่อหน้าเขาเดี๋ยวนั้น", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ลองวันเกิดทุกคนที่นึกออกจนคิวหลังยาวถึงร้านข้าง ช่างขอให้คุณยกตู้ไปนั่งนึกต่อหลังแผง", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "เปิดได้รอบแรก ช่างไม่คิดเงินสักบาท แต่ขอให้คุณจดเลขลงกระดาษแล้วเก็บไว้นอกตู้ต่อหน้าเขาเดี๋ยวนั้น", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}], next: locksmith_after_work_01}
+          - {weight: 1, text: "ลองวันเกิดทุกคนที่นึกออกจนคิวหลังยาวถึงร้านข้าง ช่างขอให้คุณยกตู้ไปนั่งนึกต่อหลังแผง", effects: {happiness: -1, network: -1}, merit: [{cat: neutral}], next: locksmith_after_work_01}
         merit: [{cat: neutral}]
 
   - id: locksmith_rusty_gate_01
@@ -297,8 +297,8 @@ events:
       - id: locksmith_bigkey_necklace
         text: "เสนอให้ใช้ดอกเดียว ห้อยคอไว้"
         outcomes:
-          - {weight: 1, ok: true, text: "ญาติชอบใจ ห้อยกุญแจดอกใหญ่ไว้ที่คอเหมือนเหรียญรางวัล เดินไปไหนใครก็ทักว่าบ้านหลังนี้คงไม่มีวันล็อกนอกบ้านแน่", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "เชือกขาดระหว่างญาติก้มเก็บผัก กุญแจตกลงร่องพื้นกระดาน ทั้งบ้านผลัดกันเอาไม้แขวนเสื้อเขี่ยอยู่ครึ่งวันกว่าจะได้คืน", effects: {happiness: -1, health: -1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ญาติชอบใจ ห้อยกุญแจดอกใหญ่ไว้ที่คอเหมือนเหรียญรางวัล เดินไปไหนใครก็ทักว่าบ้านหลังนี้คงไม่มีวันล็อกนอกบ้านแน่", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}], next: locksmith_after_work_01}
+          - {weight: 1, text: "เชือกขาดระหว่างญาติก้มเก็บผัก กุญแจตกลงร่องพื้นกระดาน ทั้งบ้านผลัดกันเอาไม้แขวนเสื้อเขี่ยอยู่ครึ่งวันกว่าจะได้คืน", effects: {happiness: -1, health: -1, relations: 1}, merit: [{cat: neutral}], next: locksmith_after_work_01}
         merit: [{cat: neutral}]
 
   - id: locksmith_whole_ring_01
@@ -363,8 +363,8 @@ events:
       - id: locksmith_rain_tin_roof
         text: "ตัดสังกะสีมาทำหลังคาบังรู"
         outcomes:
-          - {weight: 1, ok: true, text: "บังฝนได้จริง ประตูไขลื่นตลอดหน้าฝน เพื่อนบ้านเดินผ่านถามว่าบ้านนี้ตั้งศาลเล็ก ๆ ไว้หน้าประตูให้ใคร", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "สังกะสีเอียงรับน้ำฝนลงรูกุญแจตรง ๆ ช่างแวะมาอีกรอบ ยืนดูแล้วนั่งหัวเราะอยู่บนบันไดหน้าบ้านนานมาก", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "บังฝนได้จริง ประตูไขลื่นตลอดหน้าฝน เพื่อนบ้านเดินผ่านถามว่าบ้านนี้ตั้งศาลเล็ก ๆ ไว้หน้าประตูให้ใคร", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}], next: locksmith_after_mid_01}
+          - {weight: 1, text: "สังกะสีเอียงรับน้ำฝนลงรูกุญแจตรง ๆ ช่างแวะมาอีกรอบ ยืนดูแล้วนั่งหัวเราะอยู่บนบันไดหน้าบ้านนานมาก", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}], next: locksmith_after_mid_01}
         merit: [{cat: neutral}]
 
   - id: locksmith_neighbor_drawer_01
@@ -429,8 +429,8 @@ events:
       - id: locksmith_stall_quiz
         text: "ท้าช่างว่าจำคนคนนั้นได้แค่ไหน"
         outcomes:
-          - {weight: 1, ok: true, text: "ช่างเล่าได้ทั้งราคาทั้งประตูที่ทำ ลูกขอให้ช่างเล่าเรื่องคุณตอนหนุ่มสาวต่ออีกครึ่งชั่วโมง ส่วนคุณยืนฟังเงียบ ๆ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ช่างจำคนผิด เล่าเรื่องลูกค้าอีกคนที่ร้องไห้กลางตลาดเพราะทำไอติมหล่น ลูกเชื่อไปแล้วทั้งเรื่อง", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ช่างเล่าได้ทั้งราคาทั้งประตูที่ทำ ลูกขอให้ช่างเล่าเรื่องคุณตอนหนุ่มสาวต่ออีกครึ่งชั่วโมง ส่วนคุณยืนฟังเงียบ ๆ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}], next: locksmith_after_mid_01}
+          - {weight: 1, text: "ช่างจำคนผิด เล่าเรื่องลูกค้าอีกคนที่ร้องไห้กลางตลาดเพราะทำไอติมหล่น ลูกเชื่อไปแล้วทั้งเรื่อง", effects: {happiness: -1, relations: 1}, merit: [{cat: neutral}], next: locksmith_after_mid_01}
         merit: [{cat: neutral}]
 
   - id: locksmith_listen_teeth_01
@@ -497,4 +497,79 @@ events:
         outcomes:
           - {weight: 1, ok: true, text: "เพื่อนบ้านบอกเลขได้ครบทุกหลัก เพราะเห็นคุณยืนหมุนอยู่หน้ารั้วทุกเช้า กุญแจเปิดได้รอบเดียว แล้วคุณก็ตัดสินใจเปลี่ยนเลขใหม่ตอนนั้นเลย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เพื่อนบ้านจำได้แค่สองหลักแรก สองคนเลยยืนผลัดกันหมุนหลักที่เหลืออยู่หน้ารั้ว จนกับข้าวในถุงเริ่มเย็น", effects: {relations: 1, happiness: -1, health: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_after_ya_01
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "คนเก่ากลับมาที่แผงกุญแจ"
+    text: "ไม่กี่วันต่อมา คนที่เพิ่งผ่านเรื่องกุญแจเมื่อวันก่อนเดินกลับมาที่แผง ในมือถือกุญแจชุดเดิม ยื่นให้ช่างดูแล้วถามว่ามันยังใช้ได้ดีอยู่ไหม"
+    choices:
+      - id: locksmith_aft_ya_try
+        text: "ลองไขกับล็อกหน้าแผงให้ดู"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_aft_ya_oil
+        text: "แนะให้หยอดน้ำมันนิดหน่อย"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_aft_ya_spare
+        text: "ถามว่าจะทำสำรองไว้ไหม"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_aft_ya_smile
+        text: "ยิ้มรับ แล้วรอคิวถัดไป"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_after_work_01
+    type: B
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "คนเก่ากลับมาที่แผงกุญแจ"
+    text: "ไม่กี่วันต่อมา คนที่เพิ่งผ่านเรื่องกุญแจเมื่อวันก่อนเดินกลับมาที่แผง ในมือถือกุญแจชุดเดิม ยื่นให้ช่างดูแล้วถามว่ามันยังใช้ได้ดีอยู่ไหม"
+    choices:
+      - id: locksmith_aft_work_try
+        text: "ลองไขกับล็อกหน้าแผงให้ดู"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_aft_work_oil
+        text: "แนะให้หยอดน้ำมันนิดหน่อย"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_aft_work_spare
+        text: "ถามว่าจะทำสำรองไว้ไหม"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_aft_work_smile
+        text: "ยิ้มรับ แล้วรอคิวถัดไป"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: locksmith_after_mid_01
+    type: B
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "คนเก่ากลับมาที่แผงกุญแจ"
+    text: "ไม่กี่วันต่อมา คนที่เพิ่งผ่านเรื่องกุญแจเมื่อวันก่อนเดินกลับมาที่แผง ในมือถือกุญแจชุดเดิม ยื่นให้ช่างดูแล้วถามว่ามันยังใช้ได้ดีอยู่ไหม"
+    choices:
+      - id: locksmith_aft_mid_try
+        text: "ลองไขกับล็อกหน้าแผงให้ดู"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_aft_mid_oil
+        text: "แนะให้หยอดน้ำมันนิดหน่อย"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_aft_mid_spare
+        text: "ถามว่าจะทำสำรองไว้ไหม"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: locksmith_aft_mid_smile
+        text: "ยิ้มรับ แล้วรอคิวถัดไป"
+        effects: {happiness: 1}
         merit: [{cat: neutral}]

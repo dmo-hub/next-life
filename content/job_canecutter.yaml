@@ -163,8 +163,8 @@ events:
       - id: canecutter_tally_chant
         text: "ให้ทั้งสองนับออกเสียงพร้อมกัน"
         outcomes:
-          - {weight: 1, ok: true, text: "นับไปได้ยี่สิบมัดทั้งสองก็หัวเราะกันเอง ตกลงเลขกลางได้ก่อนข้าวเย็น หัวหน้าชุดให้คุณถือสมุดต่อไปทั้งหน้าหีบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "สองคนนับแข่งกันเสียงดังจนชุดไร่ข้าง ๆ มายืนดู สุดท้ายต่างคนต่างได้เลขใหม่ที่ไม่ตรงกับเลขเดิมของใครเลย", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "นับไปได้ยี่สิบมัดทั้งสองก็หัวเราะกันเอง ตกลงเลขกลางได้ก่อนข้าวเย็น หัวหน้าชุดให้คุณถือสมุดต่อไปทั้งหน้าหีบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}], next: canecutter_after_ya_01}
+          - {weight: 1, text: "สองคนนับแข่งกันเสียงดังจนชุดไร่ข้าง ๆ มายืนดู สุดท้ายต่างคนต่างได้เลขใหม่ที่ไม่ตรงกับเลขเดิมของใครเลย", effects: {happiness: -1, network: 1}, merit: [{cat: neutral}], next: canecutter_after_ya_01}
         merit: [{cat: neutral}]
 
   - id: canecutter_weigh_queue_01
@@ -229,8 +229,8 @@ events:
       - id: canecutter_glove_left_swap
         text: "หาคนถนัดซ้ายมาแลกข้างกัน"
         outcomes:
-          - {weight: 1, ok: true, text: "เจอน้าคนหนึ่งถนัดซ้าย ถุงมือขาดข้างซ้ายพอดี สองคนแลกกันได้คู่ที่ครบ ทั้งชุดบอกว่าเป็นคู่ที่ฟ้าส่งมา", effects: {health: 1, happiness: 2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ทั้งชุดถนัดขวาหมด ทุกคนขาดข้างขวาเหมือนกัน ถุงมือข้างซ้ายสภาพใหม่ห้าข้างกองรวมกันอยู่ข้างกระติก", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "เจอน้าคนหนึ่งถนัดซ้าย ถุงมือขาดข้างซ้ายพอดี สองคนแลกกันได้คู่ที่ครบ ทั้งชุดบอกว่าเป็นคู่ที่ฟ้าส่งมา", effects: {health: 1, happiness: 2}, merit: [{cat: neutral}], next: canecutter_after_ya_01}
+          - {weight: 1, text: "ทั้งชุดถนัดขวาหมด ทุกคนขาดข้างขวาเหมือนกัน ถุงมือข้างซ้ายสภาพใหม่ห้าข้างกองรวมกันอยู่ข้างกระติก", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}], next: canecutter_after_ya_01}
         merit: [{cat: neutral}]
 
   - id: canecutter_rate_talk_01
@@ -297,8 +297,8 @@ events:
       - id: canecutter_rain_dance
         text: "ชวนรำไล่ฝนรอบเพิง"
         outcomes:
-          - {weight: 1, ok: true, text: "รำได้สามรอบฝนหยุดพอดี ไม่มีใครกล้าบอกว่าบังเอิญ ตั้งแต่วันนั้นคุณถูกเรียกไปรำทุกครั้งที่ฟ้าครึ้ม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "รำแล้วฝนหนักกว่าเดิม หลังคาเพิงเริ่มหยดลงกลางวง ทั้งชุดขอร้องให้คุณนั่งลงก่อนเพิงรั่วอีกด้าน", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "รำได้สามรอบฝนหยุดพอดี ไม่มีใครกล้าบอกว่าบังเอิญ ตั้งแต่วันนั้นคุณถูกเรียกไปรำทุกครั้งที่ฟ้าครึ้ม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}], next: canecutter_after_work_01}
+          - {weight: 1, text: "รำแล้วฝนหนักกว่าเดิม หลังคาเพิงเริ่มหยดลงกลางวง ทั้งชุดขอร้องให้คุณนั่งลงก่อนเพิงรั่วอีกด้าน", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}], next: canecutter_after_work_01}
         merit: [{cat: neutral}]
 
   - id: canecutter_load_back_01
@@ -363,8 +363,8 @@ events:
       - id: canecutter_dishes_leaf_bowl
         text: "พับใบตองทำถ้วยแทนสามใบ"
         outcomes:
-          - {weight: 1, ok: true, text: "ถ้วยใบตองใช้ได้จริง คนในชุดชมว่ากินแล้วหอมกว่าถ้วยกระเบื้อง แล้วขอให้พับเพิ่มอีกหลายใบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "แกงซึมก้นถ้วยใบตองหยดลงตักคนแรกที่ตัก ทั้งชุดหัวเราะแล้วหันไปตักกินจากหม้อกันเลย", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ถ้วยใบตองใช้ได้จริง คนในชุดชมว่ากินแล้วหอมกว่าถ้วยกระเบื้อง แล้วขอให้พับเพิ่มอีกหลายใบ", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}], next: canecutter_after_mid_01}
+          - {weight: 1, text: "แกงซึมก้นถ้วยใบตองหยดลงตักคนแรกที่ตัก ทั้งชุดหัวเราะแล้วหันไปตักกินจากหม้อกันเลย", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}], next: canecutter_after_mid_01}
         merit: [{cat: neutral}]
 
   - id: canecutter_yard_cane_01
@@ -429,8 +429,8 @@ events:
       - id: canecutter_move_mat_prize
         text: "ให้เสื่อเป็นรางวัลคนตัดเยอะ"
         outcomes:
-          - {weight: 1, ok: true, text: "ทั้งชุดแข่งกันตัดจนเสร็จก่อนกำหนด เจ้าของเสื่อตัวจริงโผล่มารับคืนพอดี และขอบใจที่ช่วยเก็บไว้ให้", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "สามคนอ้างเป็นเจ้าของเสื่อพร้อมกัน คุณต้องนั่งฟังที่มาของเสื่อทีละคนจนข้าวเย็นชืดทั้งวง", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ทั้งชุดแข่งกันตัดจนเสร็จก่อนกำหนด เจ้าของเสื่อตัวจริงโผล่มารับคืนพอดี และขอบใจที่ช่วยเก็บไว้ให้", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}], next: canecutter_after_mid_01}
+          - {weight: 1, text: "สามคนอ้างเป็นเจ้าของเสื่อพร้อมกัน คุณต้องนั่งฟังที่มาของเสื่อทีละคนจนข้าวเย็นชืดทั้งวง", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}], next: canecutter_after_mid_01}
         merit: [{cat: neutral}]
 
   - id: canecutter_thick_hands_01
@@ -499,4 +499,79 @@ events:
         outcomes:
           - {weight: 1, ok: true, text: "ทั้งชุดได้พักจิบน้ำบ่อยขึ้น ตัดเสร็จเร็วกว่าเดิมเสียอีก หัวหน้าชุดขอยืมเสียงกระป๋องไปใช้ทุกไร่", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ตีบอกพักบ่อยจนเจ้าของไร่เดินมาถามว่านี่ไร่อ้อยหรือโรงเรียน คุณตีกระป๋องตอบหนึ่งทีแทนคำอธิบาย", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_after_ya_01
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "เรื่องในไร่ยังตามมา"
+    text: "ผ่านไปไม่กี่วัน เรื่องในไร่อ้อยเมื่อวันก่อนยังถูกพูดถึงต่อที่หัวแปลง เสียงรถบรรทุกเข้าออกลานชั่งดังกลบเสียงคุยเป็นช่วง ๆ คนในหมู่ต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: canecutter_aft_ya_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_aft_ya_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_aft_ya_work
+        text: "ก้มหน้าตัดอ้อยต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_aft_ya_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_after_work_01
+    type: B
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "เรื่องในไร่ยังตามมา"
+    text: "ผ่านไปไม่กี่วัน เรื่องในไร่อ้อยเมื่อวันก่อนยังถูกพูดถึงต่อที่หัวแปลง เสียงรถบรรทุกเข้าออกลานชั่งดังกลบเสียงคุยเป็นช่วง ๆ คนในหมู่ต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: canecutter_aft_work_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_aft_work_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_aft_work_work
+        text: "ก้มหน้าตัดอ้อยต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_aft_work_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: canecutter_after_mid_01
+    type: B
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "เรื่องในไร่ยังตามมา"
+    text: "ผ่านไปไม่กี่วัน เรื่องในไร่อ้อยเมื่อวันก่อนยังถูกพูดถึงต่อที่หัวแปลง เสียงรถบรรทุกเข้าออกลานชั่งดังกลบเสียงคุยเป็นช่วง ๆ คนในหมู่ต่างหันมามองว่าคุณจะว่าอย่างไร"
+    choices:
+      - id: canecutter_aft_mid_say
+        text: "พูดความเห็นของตัวเองสั้น ๆ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_aft_mid_listen
+        text: "นั่งฟังคนอื่นพูดให้จบก่อน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_aft_mid_work
+        text: "ก้มหน้าตัดอ้อยต่อ ไม่ร่วมวง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: canecutter_aft_mid_joke
+        text: "พูดตลกให้บรรยากาศเบาลง"
+        effects: {happiness: 1, network: 1}
         merit: [{cat: neutral}]

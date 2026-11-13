@@ -151,8 +151,8 @@ events:
       - id: watchrepair_ya_two_holes
         text: "เจาะสองรู เผื่อหลังมื้อเที่ยง"
         outcomes:
-          - {weight: 1, ok: true, text: "เช้าใช้รูใน บ่ายขยับมารูนอก นาฬิกาอยู่กับข้อมือพอดีทั้งวัน เพื่อนเห็นแล้วเอาวิธีนี้ไปบอกช่างบ้าง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "สองรูห่างกันนิดเดียว ลงรูไหนก็หลวมเท่ากัน คุณกลับไปให้ช่างดูอีกรอบพร้อมรอยยิ้มแห้ง", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "เช้าใช้รูใน บ่ายขยับมารูนอก นาฬิกาอยู่กับข้อมือพอดีทั้งวัน เพื่อนเห็นแล้วเอาวิธีนี้ไปบอกช่างบ้าง", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}], next: watchrepair_after_ya_01}
+          - {weight: 1, text: "สองรูห่างกันนิดเดียว ลงรูไหนก็หลวมเท่ากัน คุณกลับไปให้ช่างดูอีกรอบพร้อมรอยยิ้มแห้ง", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}], next: watchrepair_after_ya_01}
         merit: [{cat: neutral}]
       - id: watchrepair_ya_wear_loose
         text: "ใส่หลวม ๆ ดันขึ้นแขนเอา"
@@ -217,8 +217,8 @@ events:
       - id: watchrepair_ya_describe_watch
         text: "ไปบรรยายหน้าตาเรือนให้ช่างฟัง"
         outcomes:
-          - {weight: 1, ok: true, text: "ช่างฟังได้สามคำก็เปิดลิ้นชักหยิบออกมา ไขลานให้สองรอบ เข็มเริ่มเดินทันที ช่างบอกว่ามันรอเจ้าของจนลานหมดไปหลายรอบแล้ว", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "คุณบรรยายจนช่างหยิบออกมาห้าเรือน ไม่มีเรือนไหนใช่ และคุณเริ่มไม่แน่ใจว่าเรือนของตัวเองหน้าตาแบบไหน", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ช่างฟังได้สามคำก็เปิดลิ้นชักหยิบออกมา ไขลานให้สองรอบ เข็มเริ่มเดินทันที ช่างบอกว่ามันรอเจ้าของจนลานหมดไปหลายรอบแล้ว", effects: {happiness: 2, network: 1}, merit: [{cat: neutral}], next: watchrepair_after_ya_01}
+          - {weight: 1, text: "คุณบรรยายจนช่างหยิบออกมาห้าเรือน ไม่มีเรือนไหนใช่ และคุณเริ่มไม่แน่ใจว่าเรือนของตัวเองหน้าตาแบบไหน", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}], next: watchrepair_after_ya_01}
         merit: [{cat: neutral}]
       - id: watchrepair_ya_snack_sorry
         text: "ซื้อขนมติดมือไปขอโทษช่าง"
@@ -291,8 +291,8 @@ events:
       - id: watchrepair_work_bob_nut
         text: "ขอช่างหมุนน็อตใต้ลูกตุ้มแทน"
         outcomes:
-          - {weight: 1, ok: true, text: "ช่างหมุนน็อตทีละนิดจนเดินเร็วช้าตรงเป๊ะ แล้วชี้ให้ฟังว่ายังกะเผลกอยู่ดีเพราะพื้นเอียง คุณได้รู้ว่านาฬิกาเรือนเดียวเสียได้สองเรื่อง", effects: {knowledge: 2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ช่างหมุนให้ตามขอ เวลาตรงแล้วแต่จังหวะยังติ๊กต่อกกะเผลกเหมือนเดิม สุดท้ายก็ต้องรองขาตู้อยู่ดี แถมเสียค่าแรงเพิ่ม", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ช่างหมุนน็อตทีละนิดจนเดินเร็วช้าตรงเป๊ะ แล้วชี้ให้ฟังว่ายังกะเผลกอยู่ดีเพราะพื้นเอียง คุณได้รู้ว่านาฬิกาเรือนเดียวเสียได้สองเรื่อง", effects: {knowledge: 2}, merit: [{cat: neutral}], next: watchrepair_after_work_01}
+          - {weight: 1, text: "ช่างหมุนให้ตามขอ เวลาตรงแล้วแต่จังหวะยังติ๊กต่อกกะเผลกเหมือนเดิม สุดท้ายก็ต้องรองขาตู้อยู่ดี แถมเสียค่าแรงเพิ่ม", effects: {happiness: -1, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}], next: watchrepair_after_work_01}
         merit: [{cat: neutral}]
       - id: watchrepair_work_water_level
         text: "เอาแก้วน้ำวางวัดระดับพื้น"
@@ -355,8 +355,8 @@ events:
       - id: watchrepair_work_tap_first
         text: "ขอให้เคาะ ๆ ดูก่อนเผื่อเดิน"
         outcomes:
-          - {weight: 1, ok: true, text: "ช่างเคาะเบา ๆ สองทีเข็มกระดิกขึ้นมาจริง คุณใส่กลับไปอย่างดีใจ เดินได้ถึงบ่ายก็หยุดนิ่ง แต่อย่างน้อยก็ได้ใส่ครบครึ่งวัน", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "เคาะแล้วเงียบสนิท ช่างบอกว่าเคาะจนค่ำก็ไม่ช่วย แล้วยื่นใบรับฝากล้างเครื่องให้โดยไม่พูดอะไรอีก", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ช่างเคาะเบา ๆ สองทีเข็มกระดิกขึ้นมาจริง คุณใส่กลับไปอย่างดีใจ เดินได้ถึงบ่ายก็หยุดนิ่ง แต่อย่างน้อยก็ได้ใส่ครบครึ่งวัน", effects: {happiness: 1, knowledge: 1}, merit: [{cat: neutral}], next: watchrepair_after_work_01}
+          - {weight: 1, text: "เคาะแล้วเงียบสนิท ช่างบอกว่าเคาะจนค่ำก็ไม่ช่วย แล้วยื่นใบรับฝากล้างเครื่องให้โดยไม่พูดอะไรอีก", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}], next: watchrepair_after_work_01}
         merit: [{cat: neutral}]
       - id: watchrepair_work_ask_time
         text: "เลิกใส่ ถามเวลาคนรอบตัวเอา"
@@ -421,8 +421,8 @@ events:
       - id: watchrepair_mid_count_calls
         text: "นับว่านกร้องกี่ครั้ง"
         outcomes:
-          - {weight: 1, ok: true, text: "นกร้องสี่ครั้งตรงกับเวลาบนผนังพอดี คุณประกาศเวลาให้ทั้งร้านฟังด้วยความภูมิใจ", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "นกร้องไปสิบสามครั้งตอนบ่ายสี่ ช่างเงยหน้าขึ้นมาบอกว่านั่นแหละเหตุที่เจ้าของเอามาฝาก", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "นกร้องสี่ครั้งตรงกับเวลาบนผนังพอดี คุณประกาศเวลาให้ทั้งร้านฟังด้วยความภูมิใจ", effects: {happiness: 2, knowledge: 1}, merit: [{cat: neutral}], next: watchrepair_after_mid_01}
+          - {weight: 1, text: "นกร้องไปสิบสามครั้งตอนบ่ายสี่ ช่างเงยหน้าขึ้นมาบอกว่านั่นแหละเหตุที่เจ้าของเอามาฝาก", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}], next: watchrepair_after_mid_01}
         merit: [{cat: neutral}]
       - id: watchrepair_mid_check_ok
         text: "ถามคนที่สะดุ้งว่าไหวไหม"
@@ -505,4 +505,79 @@ events:
       - id: watchrepair_old_new_key
         text: "พรุ่งนี้ไปขอทำกุญแจที่ร้าน"
         effects: {network: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_after_ya_01
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "ลูกค้าเรือนเดิมแวะกลับมา"
+    text: "ไม่กี่วันต่อมา คนที่เพิ่งผ่านเรื่องนาฬิกาที่แผงแวะกลับมาอีกครั้ง ถือนาฬิกาเรือนเดิมมาด้วย ยื่นให้ดูเฉย ๆ แล้วบอกว่ามาเช็กหน่อยว่ายังเดินตรงอยู่ไหม"
+    choices:
+      - id: watchrepair_aft_ya_check
+        text: "ช่วยเทียบเวลากับนาฬิกาหน้าร้าน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_aft_ya_tea
+        text: "ชวนนั่งดื่มน้ำเย็นระหว่างรอ"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_aft_ya_tip
+        text: "แนะวิธีเก็บให้เดินตรงนานขึ้น"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_aft_ya_wave
+        text: "ยิ้มให้ แล้วทำงานของตัวเองต่อ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_after_work_01
+    type: B
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "ลูกค้าเรือนเดิมแวะกลับมา"
+    text: "ไม่กี่วันต่อมา คนที่เพิ่งผ่านเรื่องนาฬิกาที่แผงแวะกลับมาอีกครั้ง ถือนาฬิกาเรือนเดิมมาด้วย ยื่นให้ดูเฉย ๆ แล้วบอกว่ามาเช็กหน่อยว่ายังเดินตรงอยู่ไหม"
+    choices:
+      - id: watchrepair_aft_work_check
+        text: "ช่วยเทียบเวลากับนาฬิกาหน้าร้าน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_aft_work_tea
+        text: "ชวนนั่งดื่มน้ำเย็นระหว่างรอ"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_aft_work_tip
+        text: "แนะวิธีเก็บให้เดินตรงนานขึ้น"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_aft_work_wave
+        text: "ยิ้มให้ แล้วทำงานของตัวเองต่อ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: watchrepair_after_mid_01
+    type: B
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ลูกค้าเรือนเดิมแวะกลับมา"
+    text: "ไม่กี่วันต่อมา คนที่เพิ่งผ่านเรื่องนาฬิกาที่แผงแวะกลับมาอีกครั้ง ถือนาฬิกาเรือนเดิมมาด้วย ยื่นให้ดูเฉย ๆ แล้วบอกว่ามาเช็กหน่อยว่ายังเดินตรงอยู่ไหม"
+    choices:
+      - id: watchrepair_aft_mid_check
+        text: "ช่วยเทียบเวลากับนาฬิกาหน้าร้าน"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_aft_mid_tea
+        text: "ชวนนั่งดื่มน้ำเย็นระหว่างรอ"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_aft_mid_tip
+        text: "แนะวิธีเก็บให้เดินตรงนานขึ้น"
+        effects: {knowledge: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: watchrepair_aft_mid_wave
+        text: "ยิ้มให้ แล้วทำงานของตัวเองต่อ"
+        effects: {happiness: 1}
         merit: [{cat: neutral}]

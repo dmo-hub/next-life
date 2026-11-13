@@ -161,8 +161,8 @@ events:
       - id: samlor_bags_breathe_in
         text: "แขม่วพุงพร้อมกันแล้วขึ้น"
         outcomes:
-          - {weight: 1, ok: true, text: "ทั้งคู่แขม่วจนลุงถีบออกตัวได้ ถึงบ้านแล้วค่อยหายใจออกพร้อมกัน ลุงหัวเราะจนต้องจอดพักหน้าประตู", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "แขม่วได้ถึงหัวมุมแรก เพื่อนหัวเราะออกมาก่อน เบาะแอ่นลงอีกนิด ลุงขอให้ลงเดินช่วงทางลาดทั้งคู่", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ทั้งคู่แขม่วจนลุงถีบออกตัวได้ ถึงบ้านแล้วค่อยหายใจออกพร้อมกัน ลุงหัวเราะจนต้องจอดพักหน้าประตู", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}], next: samlor_after_ya_01}
+          - {weight: 1, text: "แขม่วได้ถึงหัวมุมแรก เพื่อนหัวเราะออกมาก่อน เบาะแอ่นลงอีกนิด ลุงขอให้ลงเดินช่วงทางลาดทั้งคู่", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}], next: samlor_after_ya_01}
         merit: [{cat: neutral}]
 
   - id: samlor_haggle_01
@@ -227,8 +227,8 @@ events:
       - id: samlor_load_parade
         text: "ขอให้ลุงถีบรอบตลาดอวดของสักรอบ"
         outcomes:
-          - {weight: 1, ok: true, text: "คุณเดินนำข้างรถไปรอบตลาด คนขายของเห็นกองของแล้วตามมาช่วยยกขึ้นห้องใหม่ถึงสามคน ยังไม่ทันแกะกล่องคุณก็รู้จักคนครึ่งซอยแล้ว", effects: {happiness: 2, network: 2, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "รอบตลาดยาวกว่าที่คิด ช้อนหล่นจากกล่องไปหนึ่งคัน แม่ค้าเก็บมาคืนถึงหน้าห้อง ลุงขอค่ารอบตลาดเพิ่มอีกนิดอย่างเกรงใจ", effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "คุณเดินนำข้างรถไปรอบตลาด คนขายของเห็นกองของแล้วตามมาช่วยยกขึ้นห้องใหม่ถึงสามคน ยังไม่ทันแกะกล่องคุณก็รู้จักคนครึ่งซอยแล้ว", effects: {happiness: 2, network: 2, money: {unit: income_x, amount: -0.01}}, merit: [{cat: neutral}], next: samlor_after_ya_01}
+          - {weight: 1, text: "รอบตลาดยาวกว่าที่คิด ช้อนหล่นจากกล่องไปหนึ่งคัน แม่ค้าเก็บมาคืนถึงหน้าห้อง ลุงขอค่ารอบตลาดเพิ่มอีกนิดอย่างเกรงใจ", effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}], next: samlor_after_ya_01}
         merit: [{cat: neutral}]
 
   - id: samlor_wait_market_01
@@ -281,8 +281,8 @@ events:
       - id: samlor_chess_own_move
         text: "เดินตามใจตัวเอง"
         outcomes:
-          - {weight: 1, ok: true, text: "ตาของคุณดีกว่าที่ลุงสั่ง พอลุงกลับมาเห็นกระดานก็ยืนนิ่ง แล้วชวนคุณมานั่งรอคิวด้วยทุกเย็น", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "อีกฝ่ายรุกจนในสามตา ลุงกลับมาทันเห็นพอดี แล้วไม่พูดกับคุณจนลูกค้าคนถัดไปมาเรียก", effects: {relations: -1, happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ตาของคุณดีกว่าที่ลุงสั่ง พอลุงกลับมาเห็นกระดานก็ยืนนิ่ง แล้วชวนคุณมานั่งรอคิวด้วยทุกเย็น", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}], next: samlor_after_work_01}
+          - {weight: 1, text: "อีกฝ่ายรุกจนในสามตา ลุงกลับมาทันเห็นพอดี แล้วไม่พูดกับคุณจนลูกค้าคนถัดไปมาเรียก", effects: {relations: -1, happiness: -1, knowledge: 1}, merit: [{cat: neutral}], next: samlor_after_work_01}
         merit: [{cat: neutral}]
       - id: samlor_chess_decline
         text: "ยกมือขอตัว ไม่ได้มาเล่น"
@@ -359,8 +359,8 @@ events:
       - id: samlor_school_more_songs
         text: "ให้เด็กซ้อมเพลงเพิ่มอีกสิบเพลง"
         outcomes:
-          - {weight: 1, ok: true, text: "เด็กร้องได้ทั้งทางจนเพื่อนบ้านเปิดหน้าต่างฟัง ลุงบอกว่าเดือนนี้ฟรีทั้งเดือน แต่ขอให้เพลงสุดท้ายเปลี่ยนบ้าง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "เด็กร้องเพลงเดียววนตั้งแต่บ้านถึงโรงเรียน ลุงขอเก็บเงินตามปกติเพื่อแลกกับความเงียบ", effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "เด็กร้องได้ทั้งทางจนเพื่อนบ้านเปิดหน้าต่างฟัง ลุงบอกว่าเดือนนี้ฟรีทั้งเดือน แต่ขอให้เพลงสุดท้ายเปลี่ยนบ้าง", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}], next: samlor_after_mid_01}
+          - {weight: 1, text: "เด็กร้องเพลงเดียววนตั้งแต่บ้านถึงโรงเรียน ลุงขอเก็บเงินตามปกติเพื่อแลกกับความเงียบ", effects: {happiness: 1, money: {unit: income_x, amount: -0.02}}, merit: [{cat: neutral}], next: samlor_after_mid_01}
         merit: [{cat: neutral}]
 
   - id: samlor_spare_part_01
@@ -425,8 +425,8 @@ events:
       - id: samlor_slow_greet_too
         text: "ทักคนตามทางไปด้วยกับลุง"
         outcomes:
-          - {weight: 1, ok: true, text: "ทักไปทักมาเจอพยาบาลจากโรงพยาบาลอำเภอเดินสวนมา ได้เข้ารับยาทันรอบเช้าพอดี ลุงบอกว่าเห็นไหม ทักคนไม่เคยเสียเวลา", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ป้าคนหนึ่งชวนคุยเรื่องสวนหลังบ้านยาวจนห้องยาปิดรับคิวเช้า คุณได้ส้มจากป้ามาหนึ่งถุงแทน", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ทักไปทักมาเจอพยาบาลจากโรงพยาบาลอำเภอเดินสวนมา ได้เข้ารับยาทันรอบเช้าพอดี ลุงบอกว่าเห็นไหม ทักคนไม่เคยเสียเวลา", effects: {happiness: 2, network: 2}, merit: [{cat: neutral}], next: samlor_after_mid_01}
+          - {weight: 1, text: "ป้าคนหนึ่งชวนคุยเรื่องสวนหลังบ้านยาวจนห้องยาปิดรับคิวเช้า คุณได้ส้มจากป้ามาหนึ่งถุงแทน", effects: {health: -1, relations: 1}, merit: [{cat: neutral}], next: samlor_after_mid_01}
         merit: [{cat: neutral}]
 
   - id: samlor_knee_slope_01
@@ -494,3 +494,78 @@ events:
         text: "ทำขนมเผื่อไว้ให้ตาพรุ่งนี้"
         effects: {relations: 2, happiness: 1}
         merit: [{cat: help_others, level: 1}]
+
+  - id: samlor_after_ya_01
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    title: "คนถีบคนเดิมผ่านมาอีกรอบ"
+    text: "อีกสองสามวันต่อมา สามล้อคันเดิมที่คุณเจอวันก่อนวิ่งสวนมาบนถนนสายเดียวกัน คนถีบเห็นคุณก็ยกมือทักแล้วชะลอรถ ถามว่าเมื่อวันก่อนเรียบร้อยดีหรือเปล่า"
+    choices:
+      - id: samlor_aft_ya_wave
+        text: "ยกมือทักกลับ บอกว่าเรียบร้อยดี"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_aft_ya_chat
+        text: "ขอคุยด้วยสักครู่ริมทาง"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_aft_ya_water
+        text: "ยื่นน้ำเย็นให้คนถีบ"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_aft_ya_nod
+        text: "พยักหน้ารับ แล้วเดินต่อ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: samlor_after_work_01
+    type: B
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    title: "คนถีบคนเดิมผ่านมาอีกรอบ"
+    text: "อีกสองสามวันต่อมา สามล้อคันเดิมที่คุณเจอวันก่อนวิ่งสวนมาบนถนนสายเดียวกัน คนถีบเห็นคุณก็ยกมือทักแล้วชะลอรถ ถามว่าเมื่อวันก่อนเรียบร้อยดีหรือเปล่า"
+    choices:
+      - id: samlor_aft_work_wave
+        text: "ยกมือทักกลับ บอกว่าเรียบร้อยดี"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_aft_work_chat
+        text: "ขอคุยด้วยสักครู่ริมทาง"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_aft_work_water
+        text: "ยื่นน้ำเย็นให้คนถีบ"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_aft_work_nod
+        text: "พยักหน้ารับ แล้วเดินต่อ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: samlor_after_mid_01
+    type: B
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "คนถีบคนเดิมผ่านมาอีกรอบ"
+    text: "อีกสองสามวันต่อมา สามล้อคันเดิมที่คุณเจอวันก่อนวิ่งสวนมาบนถนนสายเดียวกัน คนถีบเห็นคุณก็ยกมือทักแล้วชะลอรถ ถามว่าเมื่อวันก่อนเรียบร้อยดีหรือเปล่า"
+    choices:
+      - id: samlor_aft_mid_wave
+        text: "ยกมือทักกลับ บอกว่าเรียบร้อยดี"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_aft_mid_chat
+        text: "ขอคุยด้วยสักครู่ริมทาง"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: samlor_aft_mid_water
+        text: "ยื่นน้ำเย็นให้คนถีบ"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: neutral}]
+      - id: samlor_aft_mid_nod
+        text: "พยักหน้ารับ แล้วเดินต่อ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
