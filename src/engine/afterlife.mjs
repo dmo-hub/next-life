@@ -667,7 +667,8 @@ function makeHeir(af, r) {
 // offered = การ์ดเลือกสกิลขึ้นจริง (สมุดไม่ว่าง) — ผู้เรียกบอก ไม่เดาจาก carry ว่าง ⇒ บอท/harness ที่เรียก nextLife(af) เดินเท่าเดิม
 export function nextLife(af, carry = [], book = {}, offered = false) {
   if (!af.heir) throw new Error('ยังไม่ถึงการ์ดส่งต่อ');
-  const heir = { ...af.heir, skills: carryPick(carry, book) };
+  // บัญชีบุญบาปถูกชีวิตใหม่เขียนทับในที่ — คัดลอกก่อน ไม่งั้นเรียกซ้ำบน af เดิมได้ชีวิตที่เริ่มจากบัญชีของรอบก่อน
+  const heir = { ...af.heir, skills: carryPick(carry, book), ...(af.heir.ledger && { ledger: structuredClone(af.heir.ledger) }) };
   const spare = offered ? SKILL.carry - carry.length : 0;
   if (!spare) return newLife(heir.seed, af.st.content, heir);
   // ค่าเข้าเกณฑ์ดูจากค่าเริ่มสุดท้ายของชีวิตเดียวกันที่ยังไม่ได้ค่าเพิ่ม (ฐาน+jitter+bonus หลัง clamp)
