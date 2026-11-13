@@ -1,5 +1,5 @@
 {
- "version": "v0.6.126",
+ "version": "v0.6.127",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -30,30 +30,6 @@
   "rags_riches",
   "never_dark",
   "peaceful"
- ],
- "patterns": [
-  "FHSL",
-  "FHSD",
-  "FHRL",
-  "FHRD",
-  "FASL",
-  "FASD",
-  "FARL",
-  "FARD",
-  "WHSL",
-  "WHSD",
-  "WHRL",
-  "WHRD",
-  "WASL",
-  "WASD",
-  "WARL",
-  "WARD",
-  "HALF",
-  "K0",
-  "KHS",
-  "KHR",
-  "KOS",
-  "KOR"
  ],
  "family": [
   "fam_climb",
