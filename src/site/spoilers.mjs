@@ -217,7 +217,8 @@ function locks(q, L) {
   for (const f of q.family ?? []) out.push(famCond(f));
   if (q.nature) out.push(`เป็นคน${esc(L.nature(q.nature))}`);
   out.push(...flagCond(q.flags, L));
-  return [`เลือกได้เมื่อ ${out.join(' · ')}${q.reason ? ` · ไม่ผ่านจอบอก "${esc(q.reason)}"` : ''}`];
+  const own = Object.entries(q.reasons ?? {}).map(([k, t]) => `ไม่ผ่าน${esc(k)}จอบอก "${esc(t)}"`).join(' · ');
+  return [`เลือกได้เมื่อ ${out.join(' · ')}${q.reason ? ` · ไม่ผ่านจอบอก "${esc(q.reason)}"` : ''}${own ? ` · ${own}` : ''}`];
 }
 
 // การ์ดที่ถูกนัด/ต่อเรื่องบางใบไม่มีชื่อ — ใช้ต้นข้อความแทน และลิงก์ไปการ์ดนั้นบนหน้าเดียวกัน
