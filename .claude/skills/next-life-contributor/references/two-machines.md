@@ -76,6 +76,56 @@ qwen ไม่รู้อะไรจากแชตของเจ้าขอ
 
 เครื่อง qwen ใช้ lane ของตัวเอง เช่น `lane-home/<ชื่อใบ>` ไม่ชนกับ lane ของ session บนเครื่องเจ้าของ
 
+## ทำหลายใบขนาน (หลาย session บนเครื่อง qwen)
+
+**1 session = 1 ใบ = 1 worktree = 1 branch = 1 PR** · จบใบ (เปิด PR แล้ว) = ปิด session · ใบถัดไปเปิด session ใหม่ (context 128k ไม่พอสะสมหลายใบ)
+
+### โฟลเดอร์
+
+- clone หลัก (`next-life/`) อยู่บน `main` เสมอ ใช้แค่ `git fetch` / `git pull --ff-only` และแตก worktree · ห้ามแก้ไฟล์หรือ commit ที่นี่
+- แต่ละใบ: worktree ข้าง clone หลัก แล้วติดตั้งแยก
+
+  ```bash
+  git -C next-life fetch origin
+  git -C next-life worktree add ../nl-home-<ชื่อใบ> -b lane-home/<ชื่อใบ> origin/main
+  cd ../nl-home-<ชื่อใบ>
+  npm ci
+  ```
+
+- `node_modules` ต้องเป็นของ worktree นั้นเอง ห้ามทำ junction/symlink ไปที่ clone หลัก (ลบ worktree ทีหลังแล้วลบทะลุไปของ clone หลัก)
+- session ทำงานเฉพาะใน worktree ของใบตัวเอง ห้ามแตะ worktree ของ session อื่น
+
+### จองใบ กันสอง session ทำใบเดียวกัน
+
+- ก่อนเริ่ม comment ใน issue: `กำลังทำ · lane-home/<ชื่อใบ> · ฐาน <sha ของ origin/main>`
+- issue ที่มี comment นี้แล้วและยังไม่มี PR = มีคนทำอยู่ ห้ามหยิบ
+
+### ก่อนเปิดใบที่สองขึ้นไป: เทียบไฟล์
+
+- เขียนรายการไฟล์ต้นฉบับที่ใบใหม่จะแตะ เทียบกับใบที่เปิดค้าง (`git -C <wt> diff --stat origin/main`)
+- ไม่ซ้อน = ขนานได้
+- ซ้อน (ไฟล์ต้นฉบับเดียวกัน) = ห้ามขนาน รอใบแรกเข้า main ก่อน หรือแตกใบหลังจาก branch ใบแรก แล้วเขียนใน PR ว่า "ต่อบน <sha>"
+- ชนแค่ไฟล์ build (`docs/*.html` ที่ build สร้าง) ไม่นับ ผู้รวมงาน build ทับเอง
+- `package.json` (scripts) กับ `src/node/lint/shape.mjs` โดนเติมพร้อมกันบ่อย ขนานได้ แต่ตอน rebase ต้องเก็บของทั้งสองฝั่ง
+
+### ด่านกับ CPU/RAM
+
+- ด่านเร็ว (`lint:test` · `harness:test` · `site:check` · `check:data` · `node build.mjs`) ขนานได้
+- **ด่านหนัก (`harness/full.mjs` · `titles` · `isekai` · `keep` และด่านที่ใบสั่ง n เต็ม) รันได้ทีละ 1 ตัวทั้งเครื่อง** · ก่อนรันดูว่ามี `node harness/` ของ session อื่นรันอยู่ไหม มี = รอ · ระหว่างรอทำงานอื่นของใบได้
+- รอบจูนใช้ n เล็ก (เรียก `node harness/<ด่าน>.mjs --n <เล็ก>` ตรง ๆ) · n เต็มเฉพาะรอบสุดท้ายก่อนเปิด PR
+- ก่อนรันด่านหนัก `git fetch` ดูว่า main ขยับไฟล์ engine หรือยัง (`git diff --stat HEAD origin/main -- src/engine content data`) ถ้าขยับ rebase ก่อน ไม่งั้นต้องรันใหม่
+
+### ส่งงาน
+
+- rebase บน `origin/main` ล่าสุด → `node build.mjs` → ด่าน → `git push -u origin lane-home/<ชื่อใบ>` → เปิด PR (ปิด issue ด้วย `Closes #<เลข>`)
+- เปิด PR ทีละใบเมื่อเสร็จ ไม่รอรวมชุด
+- ผู้รวมงานตีกลับใน PR = เปิด session ใหม่ที่ worktree เดิม อ่าน comment ใน PR ก่อนแก้
+
+### เก็บกวาดหลัง merge
+
+- PR merge แล้ว: เช็ก `git -C <wt> status --short` ว่างก่อน แล้ว `git -C next-life worktree remove ../nl-home-<ชื่อใบ>` · ไม่ต้องลบ branch
+- `git -C next-life pull --ff-only` ให้ clone หลักตาม main
+
 ## qwen เริ่มหลุด
 
 - ทำซ้ำ อ่านไฟล์เดิมซ้ำ หรือลืมข้อสั่งท้าย ๆ = context เต็ม ให้ซอยใบให้เล็กลง ไม่ใช่สั่งซ้ำ
