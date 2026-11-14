@@ -14,9 +14,9 @@
 
 ## ช่องทางเดียวระหว่างเครื่อง = GitHub
 
-- 2 เครื่องไม่เห็น session ของกันและกัน (SendMessage ข้ามเครื่องไม่ได้) และไฟล์งานของเจ้าของ (backlog · LANES) มีแค่บนเครื่องเจ้าของ
+- 2 เครื่องไม่เห็น session ของกันและกัน (SendMessage ข้ามเครื่องไม่ได้)
 - ใบงาน = issue · คำถาม ผลด่าน และข้อเสนอ = comment ใน PR หรือ issue
-- ห้าม copy `~/.claude` ข้ามเครื่อง ของที่ทั้งสองเครื่องต้องใช้ให้อยู่ใน `.claude/skills/` ของ repo นี้
+- ของที่ qwen ต้องใช้ให้อยู่ใน `.claude/skills/` ของ repo นี้ · ไฟล์งานของเจ้าของ (backlog · LANES) sync ผ่าน repo config ส่วนตัวตามหัว "sync config ของเจ้าของ" ไม่ใช่ช่องทางสั่งงาน qwen
 
 ## ใบงานสำหรับเครื่อง qwen ต้องจบในตัว
 
@@ -125,6 +125,36 @@ qwen ไม่รู้อะไรจากแชตของเจ้าขอ
 
 - PR merge แล้ว: เช็ก `git -C <wt> status --short` ว่างก่อน แล้ว `git -C next-life worktree remove ../nl-home-<ชื่อใบ>` · ไม่ต้องลบ branch
 - `git -C next-life pull --ff-only` ให้ clone หลักตาม main
+
+## sync config ของเจ้าของ (`~/.claude` ของเครื่องเจ้าของ)
+
+ใช้เมื่อเจ้าของเก็บ `~/.claude` เป็น git repo ส่วนตัว และอยากเปิดไฟล์งาน next-life (backlog · LANES · ใบงาน) บนเครื่อง qwen ด้วย
+
+- **ห้าม clone เป็น `~/.claude` ของเครื่อง qwen** — Claude Code จะโหลด CLAUDE.md · skill ทุกตัว · hook ของเครื่องเจ้าของ (path ผูกเครื่อง hook พัง · ของที่ไม่เกี่ยวถูกส่งไป gateway · กิน 128k) · `~/.claude` ของเครื่อง qwen คงชุดเล็กตามขั้นเตรียมเครื่อง
+- **ห้ามวางไว้ที่ `~/.claude/work/thai-life-sim`** — `CLAUDE.md` ของ repo นี้แยกบทบาทจาก path นั้น วางตรงนั้น = qwen ทำตัวเป็นเครื่องเจ้าของ อ่าน LANES ทั้งไฟล์
+- clone แบบดึงเฉพาะ path ที่ใช้ ไปโฟลเดอร์แยก (เช่น `~/claude-config`):
+
+  ```bash
+  git clone --filter=blob:none --no-checkout <url repo config> ~/claude-config
+  cd ~/claude-config
+  git sparse-checkout set --no-cone '/work/thai-life-sim/' '/projects/<โฟลเดอร์ memory ของ next-life>/'
+  git checkout main
+  ```
+
+  `--filter=blob:none` ดาวน์โหลดเนื้อไฟล์เฉพาะ path ที่เลือก · เพิ่ม path ทีหลังด้วย `git sparse-checkout add '/<path>/'` ทีละตัว ห้ามเติม path ที่เป็นงานนอก next-life
+- **เครื่อง qwen เขียนได้เฉพาะ `work/thai-life-sim/home/`** · ไฟล์อื่นอ่านอย่างเดียว (session บนเครื่องเจ้าของแก้ LANES · backlog อยู่ตลอด แก้ซ้อน = conflict) · ไอเดียใหม่จดใน `home/inbox.md` ให้เครื่องเจ้าของย้ายเข้า backlog
+- qwen ไม่อ่าน `~/claude-config` เอง เปิดให้อ่านเมื่อใบงานชี้ไฟล์ในนั้นเท่านั้น
+
+### รอบ sync
+
+| เครื่อง | ดึง | ส่ง |
+|---|---|---|
+| qwen | `git -C ~/claude-config pull --rebase origin main` | commit เฉพาะ `home/` → pull --rebase → `git -C ~/claude-config push origin main` |
+| เจ้าของ | `git -C ~/.claude pull --no-rebase origin main` (working tree มีงาน session อื่นค้าง · ห้าม rebase/autostash) | `git -C ~/.claude push origin main` |
+
+push แล้วขึ้น rejected (non-fast-forward) = อีกเครื่อง push ก่อน ให้ pull แล้ว push ใหม่ · ห้าม force
+
+- memory ของ Claude Code ผูกกับ path ของ repo · clone next-life คนละ path กับเครื่องเจ้าของ = memory ใน `projects/` ไม่โหลดเอง ใช้เป็นที่อ่านอ้างอิงแทน
 
 ## qwen เริ่มหลุด
 
