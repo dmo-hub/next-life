@@ -19,7 +19,9 @@ const read = (p) => readFileSync(new URL(p, root), 'utf8');
 
 // ข้อมูลที่กติกาต้องรู้จากนอกไฟล์เนื้อหา — โหลดครั้งเดียว
 export function lintContext() {
-  const regions = JSON.parse(read('data/birthplace.json')).population.regions.map((x) => x.name);
+  const birthplace = JSON.parse(read('data/birthplace.json')).population;
+  const regions = birthplace.regions.map((x) => x.name);
+  const provinces = birthplace.regions.flatMap((x) => x.provinces.map((p) => p.name));
   const systems = new Map(JSON.parse(read('data/system-starts.json')).systems.map((s) => [s.id, s]));
   const lore = new Map();
   for (const f of readdirSync(new URL('docs/spec/', root)).filter((n) => /^lore-.*\.(md|html)$/.test(n))) {
@@ -39,7 +41,7 @@ export function lintContext() {
   const focusTagsAll = focusTags(focusDoc);
   const gateFocuses = Object.entries(focusDoc.focuses ?? {}).filter(([, f]) => f?.group === 'gate').map(([id]) => id);
   const items = Object.keys(parse(read('content/rules/items.yaml')).items ?? {});
-  return { regions, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: focusDoc.natures ?? {}, natureAge: focusDoc.nature_age };
+  return { regions, provinces, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: focusDoc.natures ?? {}, natureAge: focusDoc.nature_age };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]

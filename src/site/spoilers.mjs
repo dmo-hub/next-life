@@ -177,6 +177,7 @@ function conditions(e, L) {
   if (e.era) out.push(`ช่วง${esc(L.era(e.era))}`);
   for (const s of e.systems ?? []) out.push(`หลังมี${L.sys(s)}`);
   if (w.region) out.push(`ภาค${any(w.region.map(esc))}`);
+  if (w.province) out.push(`จังหวัด${any(w.province.map(esc))}`);
   if (w.sex) out.push(`เพศ${any(w.sex.map(esc))}`);
   if (w.overlap_stage) out.push(`ค่าซ้อนทับขั้น ${range(w.overlap_stage)}`);
   if (w.class) out.push(`ฐานะ${any(w.class.map(esc))}`);

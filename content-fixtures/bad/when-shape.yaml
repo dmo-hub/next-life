@@ -1,4 +1,4 @@
-# ผิดกติกาเดียว: ภาคที่ไม่มีในข้อมูล
+# ผิดกติกาเดียว: ภาค/จังหวัดที่ไม่มีในข้อมูล
 events:
   - id: bad_case_01
     type: A
@@ -6,6 +6,17 @@ events:
     years: [2500, 2650]
     text: "ข้อความการ์ด"
     when: {region: [อีสาน]}
+    choices:
+      - {text: "ตกลง", merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    when: {province: [ภูเก็ตต]}
     choices:
       - {text: "ตกลง", merit: [{cat: neutral}]}
       - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
