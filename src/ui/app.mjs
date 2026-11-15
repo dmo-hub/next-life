@@ -942,20 +942,17 @@ function lifeTitles(card) {
   }
   return card.lifeTitles;
 }
-const TITLES_SHOWN = 3;
-
-// ฉายาบนใบมรณะ (ui-redo 57 · แบบ line ของหนังสืองานศพ): ฉายาเด่นของชีวิตนี้เท่าที่แผงฉายาโชว์ เรียงในบรรทัดเดียว ที่เหลือบอกเป็นจำนวน
+// ฉายาบนใบมรณะ (ui-redo 57 · แบบ line ของหนังสืองานศพ): ฉายาของชีวิตนี้เรียงในบรรทัดเดียว
 // ไม่มีฉายา = ไม่มีบรรทัด (แผงฉายาด้านล่างบอก "ยังไม่ได้ฉายา" อยู่แล้ว)
 function titleLine(card) {
   const { titles } = lifeTitles(card);
   if (!titles.length) return null;
   const p = el('p', 'd-tl');
-  p.append(el('span', 'k', 'ฉายา'), ` ${titles.slice(0, TITLES_SHOWN).map((t) => t.name).join(' · ')}`);
-  if (titles.length > TITLES_SHOWN) p.append(' · ', el('span', 'more-n', `อีก ${titles.length - TITLES_SHOWN} ฉายา`));
+  p.append(el('span', 'k', 'ฉายา'), ` ${titles.map((t) => t.name).join(' · ')}`);
   return p;
 }
 
-// บันทึกการตาย (ใบ 04): ฉายาเด่น 3 + ปุ่มดูทั้งหมด · ฉายาตระกูลแยกหัวข้อ
+// บันทึกการตาย (ใบ 04): ฉายาของชีวิตนี้ (เพดาน TITLE_CAP จาก engine) · ฉายาตระกูลแยกหัวข้อ
 // แผงนี้มีแต่ของชีวิตนี้ (B130) — ของสะสมทุกชีวิตอยู่ในชั้นสมุด หัวข้อจึงย้ำ "ชีวิตนี้" ไม่ให้ปนกับสมุด
 function titlesBox(card) {
   const { titles, family } = lifeTitles(card);
@@ -967,24 +964,12 @@ function titlesBox(card) {
   box.append(el('div', 'h', 'ฉายาที่ได้ชีวิตนี้'));
   if (!titles.length) box.append(el('p', 'sub', 'ชีวิตนี้ยังไม่ได้ฉายา'));
   const ul = el('ul', 'picks');
-  const rows = titles.map((t) => {
+  for (const t of titles) {
     const li = el('li', null, `${t.name} · ${t.tier}`);
     if (isNew(newKey('t', t.id))) li.append(newTag());
-    return li;
-  });
-  rows.forEach((li, i) => {
-    li.hidden = i >= TITLES_SHOWN;
     ul.append(li);
-  });
-  box.append(ul);
-  if (titles.length > TITLES_SHOWN) {
-    const more = el('button', 'more', `ดูฉายาทั้งหมด (${titles.length})`);
-    more.onclick = () => {
-      rows.forEach((li) => (li.hidden = false));
-      more.remove();
-    };
-    box.append(more);
   }
+  box.append(ul);
   if (family.length) {
     box.append(el('div', 'h', 'ฉายาตระกูลที่ได้ชีวิตนี้'));
     const fl = el('ul', 'picks');

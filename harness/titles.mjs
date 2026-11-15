@@ -35,7 +35,7 @@ const hit = (id) => {
   count.set(id, (count.get(id) ?? 0) + 1);
   bySeed[d].set(id, (bySeed[d].get(id) ?? 0) + 1);
 };
-let lives = 0, leak = 0;
+let lives = 0, leak = 0, overCap = 0;
 // ช่องที่ผลของ titlesOf มีได้ — ช่องอื่นนอกนี้ = อาจพาค่าซ่อนออกไปกับการ์ดตาย
 const OUT_KEYS = new Set(['titles', 'family', 'id', 'name', 'tier', 'hint']);
 const started = Date.now();
@@ -51,6 +51,9 @@ for (d = 0; d < SEEDS; d++) for (const [name, bot] of Object.entries(BOTS)) {
         if (k && !OUT_KEYS.has(k) && !/^\d+$/.test(k)) leak++;
         return v;
       });
+      // ด่าน (2) กติกา "1 ชาติได้ฉายาไม่เกิน 3" (decisions thai-life-deep 348) — ฉายาตระกูลไม่นับ
+      // ยืนยันกับเลข 3 ของกติกาตรง ๆ ไม่ใช่ TITLE_CAP — ตัวควบคุม: ตั้ง TITLE_CAP = Infinity แล้วด่านนี้ต้องตก
+      if (t.titles.length > 3) overCap++;
       for (const x of t.titles) hit(`t:${x.id}`);
       for (const x of t.family) hit(`f:${x.id}`);
       if (g < gens - 1) st = nextLife(playAfterlife(state, bot));
@@ -75,4 +78,5 @@ for (const t of FAMILY_TITLES) line(t.name, `f:${t.id}`);
 
 console.log(`\nผลของ titlesOf ไม่มีช่องบัญชีบุญบาป: ${leak ? `รั่ว ${leak} → ตก` : 'ผ่าน'}`);
 console.log(fail ? `ด่าน (1) ตก ${fail} ตัวต่ำกว่า ${MIN_RATE * 100}%` : `ด่าน (1) ผ่าน: ฉายา ${TITLES.length} + ตระกูล ${FAMILY_TITLES.length} ตัว ≥ ${MIN_RATE * 100}% ทุกตัว`);
-if (fail || leak) process.exitCode = 1;
+console.log(`ด่าน (2) ไม่มีชีวิตได้ฉายาเกิน 3 (ตระกูลไม่นับ): ${overCap ? `ตก ${overCap} ชีวิต → ตก` : 'ผ่าน'}`);
+if (fail || leak || overCap) process.exitCode = 1;
