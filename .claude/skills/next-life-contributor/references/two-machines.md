@@ -145,6 +145,70 @@ qwen ไม่รู้อะไรจากแชตของเจ้าขอ
 
 push แล้วขึ้น rejected (non-fast-forward) = อีกเครื่อง push ก่อน ให้ pull แล้ว push ใหม่ · ห้าม force
 
+## เซสชันเจอ API Error
+
+### แยกก่อนว่า error มาจากไหน
+
+| เซสชันเปิดด้วย | error มาจาก | ทำอะไรได้ |
+|---|---|---|
+| `claude` | Anthropic API | รอ · ดู status.claude.com · แก้ฝั่งเราไม่ได้ |
+| `claude-9arm` | gateway 9arm (LiteLLM) | เช็คด้วย `claude-9arm-check` แล้วแก้ตามตารางล่าง |
+
+### `claude-9arm-check` (ยิง gateway ตรง ไม่ผ่าน Claude Code · ไม่พิมพ์ token)
+
+วางที่ `~/.local/bin/claude-9arm-check` (ต้องอยู่ใน PATH) · อ่านค่าจาก `~/.claude-9arm/settings.json` · ถ้าเครื่องเก็บ config ไว้ที่อื่น แก้บรรทัด `CFG`
+
+```bash
+#!/usr/bin/env bash
+set -u
+CFG="$HOME/.claude-9arm/settings.json"
+field() { python -I -c "import json,sys;s=json.load(open(sys.argv[1],encoding='utf-8'));e=s['env'];v={'base':e['ANTHROPIC_BASE_URL'].rstrip('/'),'token':e['ANTHROPIC_AUTH_TOKEN'],'model':s['model']}[sys.argv[2]];sys.stdout.write(v)" "$CFG" "$1"; }
+BASE=$(field base); TOKEN=$(field token); MODEL=$(field model)
+OUT=$(mktemp)
+CODE=$(curl -s -o "$OUT" -w '%{http_code} %{time_total}s' --max-time 120 \
+  -H "Authorization: Bearer $TOKEN" -H "content-type: application/json" -H "anthropic-version: 2023-06-01" \
+  -d "{\"model\":\"$MODEL\",\"max_tokens\":8,\"messages\":[{\"role\":\"user\",\"content\":\"reply ok\"}]}" \
+  "$BASE/v1/messages")
+echo "model=$MODEL status=$CODE"
+head -c 300 "$OUT"; echo
+rm -f "$OUT"
+```
+
+- ใช้ `sys.stdout.write` ไม่ใช่ `print` เพราะ python บน Windows ต่อท้ายด้วย `\r` แล้ว gateway ตอบ `400 Invalid JSON payload: unexpected control character`
+- ตั้งเสร็จลองครั้งแรกต้องได้ `200` · ลองเปลี่ยน token เป็นค่ามั่วชั่วคราวต้องได้ `401` (ไม่ได้ = ตัวเช็คใช้ไม่ได้) แล้วคืนค่าจริง
+
+### อ่านผล
+
+| ผล | สาเหตุ | แก้ |
+|---|---|---|
+| `401 token_not_found` | token ผิด · หมดอายุ · ถูก revoke | ขอ token ใหม่จาก 9arm ใส่ใน settings |
+| `400` เรื่อง effort / reasoning | ไม่ได้ตั้ง `effortLevel` → ใช้ xhigh แล้วโดนปฏิเสธ | ตั้ง `"effortLevel": "medium"` · เช็คว่าเซสชันไม่ได้สั่ง `/effort` ทับ |
+| `400` / `404` เรื่อง model | gateway เปลี่ยนชื่อโมเดล | ถาม 9arm ชื่อใหม่ แก้ทุกจุดใน settings (`model` + `ANTHROPIC_DEFAULT_*_MODEL`) |
+| `429` | ยิงเกินโควตาหรือถี่เกิน | รอ · ลดจำนวน session qwen ที่รันพร้อมกัน |
+| `5xx` · `524` · timeout | gateway ล่มหรือคิวยาว (`524` = คำขอเกิน 100 วิ) | รอ 5–10 นาทีแล้วเช็คใหม่ · ห้าม retry รัว |
+| `200` แต่เซสชันยังพัง | gateway ปกติ ปัญหาอยู่ที่เซสชัน | มักเป็น context เต็มหรือคำขอยาว → ซอยใบให้เล็กลง |
+
+`200` ที่ใช้เวลาหลายสิบวินาทีสำหรับคำตอบ 8 token = คิว gateway ยาว · งานยาวเสี่ยง `524` ช่วงนั้น
+
+### กู้งาน
+
+**Claude ส่งงานย่อยผ่าน `claude-9arm -p` แล้วพัง**
+
+1. `claude-9arm-check`
+2. ได้ `200` → retry ได้ 1 ครั้งด้วย prompt ที่เล็กลง (ทีละไฟล์)
+3. พังซ้ำหรือได้ `5xx` → Claude ทำงานนั้นเอง ห้าม retry ครั้งที่ 3
+4. ดู `git diff` ก่อนทำต่อเสมอ qwen อาจแก้ไฟล์ไปครึ่งทาง
+
+**session qwen ที่ทำทั้งใบพัง**
+
+1. ดู state จาก git ตามหัว "เซสชัน AI พังกลางใบงาน" ใน `SKILL.md`
+2. `claude-9arm-check` · ไม่ได้ `200` = รอ อย่าเปิด session ใหม่ซ้ำ (เจอ error เดิม)
+3. ได้ `200` → เปิด `claude-9arm` ใหม่ใน worktree เดิม ส่ง handoff ตามแม่แบบใน `SKILL.md`
+4. ด่านที่ session เก่าบอกว่าผ่าน ต้องรันใหม่ทั้งหมด
+5. เลิกทำใบนั้น → comment ปลดการจองใน issue ทันที (`ปลดจอง · <เหตุผล>`) ไม่งั้นไม่มี session ไหนหยิบต่อได้
+
+**gateway ล่มนาน** qwen กู้เองไม่ได้ · ใบด่วนให้เครื่องเจ้าของทำแทน · ใบไม่ด่วนปลดจองแล้วรอ
+
 ## qwen เริ่มหลุด
 
 - ทำซ้ำ อ่านไฟล์เดิมซ้ำ หรือลืมข้อสั่งท้าย ๆ = context เต็ม ให้ซอยใบให้เล็กลง ไม่ใช่สั่งซ้ำ
