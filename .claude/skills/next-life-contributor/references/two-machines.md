@@ -164,15 +164,18 @@ set -u
 CFG="$HOME/.claude-9arm/settings.json"
 field() { python -I -c "import json,sys;s=json.load(open(sys.argv[1],encoding='utf-8'));e=s['env'];v={'base':e['ANTHROPIC_BASE_URL'].rstrip('/'),'token':e['ANTHROPIC_AUTH_TOKEN'],'model':s['model']}[sys.argv[2]];sys.stdout.write(v)" "$CFG" "$1"; }
 BASE=$(field base); TOKEN=$(field token); MODEL=$(field model)
-OUT=$(mktemp)
-CODE=$(curl -s -o "$OUT" -w '%{http_code} %{time_total}s' --max-time 120 \
+OUT=$(mktemp); HDR=$(mktemp)
+CODE=$(curl -s -o "$OUT" -D "$HDR" -w '%{http_code} %{time_total}s' --max-time 120 \
   -H "Authorization: Bearer $TOKEN" -H "content-type: application/json" -H "anthropic-version: 2023-06-01" \
   -d "{\"model\":\"$MODEL\",\"max_tokens\":8,\"messages\":[{\"role\":\"user\",\"content\":\"reply ok\"}]}" \
   "$BASE/v1/messages")
 echo "model=$MODEL status=$CODE"
+tr -d '\r' < "$HDR" | awk -F': ' 'tolower($1)=="x-litellm-key-spend"{s=$2} tolower($1)=="x-litellm-key-max-budget"{b=$2} tolower($1)=="x-litellm-key-tpm-limit"{t=$2} END{if(b!="") printf "budget: spent $%.2f of $%s (%.0f%%) · tpm-limit=%s\n", s, b, 100*s/b, t}'
 head -c 300 "$OUT"; echo
-rm -f "$OUT"
+rm -f "$OUT" "$HDR"
 ```
+
+บรรทัด `budget:` อ่านจาก header ของ gateway (`x-litellm-key-*`) · งบหมด = ทุก session ที่ใช้ key นี้พังพร้อมกัน
 
 - ใช้ `sys.stdout.write` ไม่ใช่ `print` เพราะ python บน Windows ต่อท้ายด้วย `\r` แล้ว gateway ตอบ `400 Invalid JSON payload: unexpected control character`
 - ตั้งเสร็จลองครั้งแรกต้องได้ `200` · ลองเปลี่ยน token เป็นค่ามั่วชั่วคราวต้องได้ `401` (ไม่ได้ = ตัวเช็คใช้ไม่ได้) แล้วคืนค่าจริง
@@ -189,6 +192,65 @@ rm -f "$OUT"
 | `200` แต่เซสชันยังพัง | gateway ปกติ ปัญหาอยู่ที่เซสชัน | มักเป็น context เต็มหรือคำขอยาว → ซอยใบให้เล็กลง |
 
 `200` ที่ใช้เวลาหลายสิบวินาทีสำหรับคำตอบ 8 token = คิว gateway ยาว · งานยาวเสี่ยง `524` ช่วงนั้น
+
+### กัน 429 / 5xx
+
+เพดานของ key อ่านจาก header: **TPM 1,000,000 token/นาที** (ไม่มี rpm limit) + **งบรวม** (`x-litellm-key-max-budget`) · ทุก session ที่ใช้ token เดียวกันแบ่งโควตาเดียว
+
+ทำไม 429 เกิด: แต่ละคำขอส่ง context ทั้งก้อน (system prompt + CLAUDE.md + ประวัติแชต) · session ละ ~60k × หลายคำขอ/นาที × หลาย session = ชน 1M ง่าย · session ที่โหลด `~/.claude/CLAUDE.md` ของเครื่องเจ้าของ (หลายร้อย KB) ชนเร็วกว่ามาก
+
+| เรื่อง | กติกา |
+|---|---|
+| จำนวน session | qwen พร้อมกัน **ไม่เกิน 2** · ด่านหนักยังทีละ 1 ตามหัว "ด่านกับ CPU/RAM" |
+| config | qwen ใช้ config dir แยก (`CLAUDE_CONFIG_DIR=~/.claude-9arm`) เท่านั้น · ห้ามใส่ env ของ gateway ใน `~/.claude/settings.json` — ทุก session ใน `~/.claude` จะกลายเป็น qwen ที่โหลด CLAUDE.md ตัวใหญ่ |
+| ขนาด context | `autoCompactWindow 60000` · session ที่บวม (log หลาย MB) ห้ามใช้ต่อ เปิดใหม่ด้วย handoff |
+| ปลุก session | ห้าม SendMessage หาหลาย session พร้อมกัน — ทุกตัวยิง gateway ทันที |
+| ก่อนเปิด session ใหม่ | `claude-9arm-check` · ตอบช้าเกิน 20 วิ = คิวยาว รอ |
+| retry | `"CLAUDE_CODE_MAX_RETRIES": "15"` ใน `env` · ช่วยผ่าน 503/429 ช่วงสั้น ไม่ช่วยตอนล่มนาน |
+| 5xx | ฝั่งเราแก้ไม่ได้ · ล่มนาน = รอ หรือให้เครื่องเจ้าของทำแทน |
+
+**hook เตือนตอนเปิด session ที่ 3** — วาง `~/.claude-9arm/hooks/concurrency.py` แล้วผูกใน `~/.claude-9arm/settings.json` · นับ transcript ใน `~/.claude-9arm/projects` ที่เขียนภายใน 5 นาที (ไม่นับตัวเอง) · เตือนอย่างเดียว ไม่บล็อก
+
+```python
+import glob, json, os, sys, time
+
+ACTIVE_WINDOW_SEC = 300
+MAX_OTHERS = 1
+
+try:
+    sid = json.load(sys.stdin).get("session_id", "")
+except Exception:
+    sid = ""
+
+root = os.path.join(os.path.expanduser("~"), ".claude-9arm", "projects")
+now = time.time()
+others = [
+    f for f in glob.glob(os.path.join(root, "*", "*.jsonl"))
+    if now - os.path.getmtime(f) < ACTIVE_WINDOW_SEC and sid not in os.path.basename(f)
+]
+
+if len(others) > MAX_OTHERS:
+    msg = (f"qwen: {len(others)} other sessions active on the same 9arm key (TPM 1M/min). "
+           f"Running more than {MAX_OTHERS + 1} at once risks 429 - close idle ones first.")
+    print(json.dumps({"systemMessage": msg}))
+```
+
+```json
+"hooks": {
+  "SessionStart": [
+    { "hooks": [ { "type": "command", "command": "python -I <HOME>/.claude-9arm/hooks/concurrency.py" } ] }
+  ]
+}
+```
+
+- ข้อความเป็น ASCII เพราะ stdout ของ python บน Windows เป็น cp1252 · ข้อความไทยทำ hook ล้ม
+- ตั้งเสร็จทดสอบ: ป้อน `{"session_id":"zzz"}` ตอนมี session อื่นรัน ≥2 ต้องได้ `systemMessage` · แก้ `ACTIVE_WINDOW_SEC` เป็น 1 ต้องเงียบ
+
+**ใช้ qwen ในแผง Claude ของ VS Code** — `claudeCode.environmentVariables` เป็น scope `machine` ตั้งรายโฟลเดอร์ไม่ได้ (ตั้งใน VS Code หลัก = ทุกแผงเป็น qwen) · เปิด VS Code อีกอินสแตนซ์ที่ user settings แยก:
+
+- `code --user-data-dir "<HOME>/.vscode-qwen" <repo>` (extension ใช้ชุดเดิม)
+- `<HOME>/.vscode-qwen/User/settings.json`: `"claudeCode.environmentVariables": [{ "name": "CLAUDE_CONFIG_DIR", "value": "<HOME>/.claude-9arm" }]` + สี title bar ต่างจากหน้าต่างหลัก กันสับสน
+- ยืนยันว่าเป็น qwen จริง: transcript ต้องไปขึ้น `~/.claude-9arm/projects` และ `message.model` ของคำตอบเป็นโมเดล qwen ไม่ใช่ `claude-*`
 
 ### กู้งาน
 
