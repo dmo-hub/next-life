@@ -2,10 +2,10 @@
 // ด่านกติกา: ทุกปีที่ทุ่มเข้าหลอดโหนดเดียว · 0 ครั้งที่ทุ่มโหนดที่ปลดแล้ว · ปลดแล้วโหนดถัดไปนับปีถัดไปทันที (ไม่เสียปี) · ตัวควบคุมปิดนับการ์ด = ปลด 0
 // ด่านเกณฑ์ผ่านของเจ้าของ (ข้อ 84 · 86): บอทปลดแขนงลึกลับครบในชีวิตเดียว (o ที่เห็นทั้งหมด + โหนดกลางที่มี o เป็นต้นทาง · o6 ซ่อนไม่นับ)
 // ไม่ครบ = ตก พิมพ์โหนดแรกที่ค้างกับอายุตอนตาย แล้วส่งเจ้าของเคาะ — ห้ามผ่อนเกณฑ์เองในไฟล์นี้
-import { playLife, mixSeed, treeCtl, snapshot, restore, successP, treeRollLevel, treeRollMul, treeCardMul, choiceHidden } from '../src/engine/index.mjs';
+import { playLife, mixSeed, treeInvestNode, treeCtl, snapshot, restore, successP, treeRollLevel, treeRollMul, treeCardMul, choiceHidden } from '../src/engine/index.mjs';
 import { treeBudgetSpent } from '../src/node/lint/tree.mjs';
 import { loadContent } from '../src/node/load.mjs';
-import { random, withTree, botTree } from './bots.mjs';
+import { random, withTree, botTree, withGate } from './bots.mjs';
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? Number(process.argv[i + 1]) : d; };
 const n = arg('--n', 500), seed = arg('--seed', 1);
@@ -229,6 +229,64 @@ if (devOff !== 0) fails.push(`ตัวควบคุม: ปิดผลติ
   const bad = rows.filter(([, got, want]) => got !== want);
   console.log(`ตัวเลือกใหม่ show_if tree: ${rows.length - bad.length}/${rows.length} เคส${bad.length ? ' · ตก: ' + bad.map(([n]) => n).join(' | ') : ''}`);
   for (const [n] of bad) fails.push(`show_if tree "${n}"`);
+}
+
+// 6) การ์ดด่านโหนดใหญ่ + keystone (ใบ 05): ใช้โหนดสังเคราะห์ zb (ใหญ่ ผล 3 ทาง) · zk (keystone) แยกแขนง zz ไม่แตะทะเบียนจริง
+// o5/o8 จริงรอเจ้าของเคาะเนื้อ — ด่านนี้พิสูจน์กลไก: การ์ดด่านโผล่ · ผลทุกทางถูกเลือก · ไม่เลื่อนเข้า keystone เอง · ล้างไม่ได้ · ต้อง ack ก่อนทุ่ม
+{
+  const ALL = ['เด็ก', 'วัยรุ่น', 'หนุ่มสาว', 'ทำงาน', 'กลางคน', 'ชรา'];
+  const zb = { name: 'โหนดใหญ่ทดสอบ', branch: 'zz', size: 'b', stages: ALL, pre: [], years: 2, cards: 0, cat: ['belief'], fx: { happiness: 1 }, light: { happiness: 1 }, roll: 1,
+    gate: { title: 'ด่านทดสอบ', text: 'ถึงด่านของโหนดใหญ่ทดสอบ', results: [{ text: 'ทางหนึ่ง', fx: { happiness: 1 } }, { text: 'ทางสอง', fx: { knowledge: 1 } }, { text: 'ทางสาม', fx: { relations: 1 } }] } };
+  const zk = { name: 'ยอดทดสอบ', branch: 'zz', size: 'k', stages: ALL, pre: ['zb'], years: 2, cards: 0, cat: ['belief'], fx: { happiness: 2 }, light: { happiness: 1 }, roll: 1, keystone: true, warn: 'ได้แรงแต่เสียถาวร', cost: { health: -1 } };
+  const synth = { ...content, tree: { ...content.tree, nodes: { zb, zk, ...defs } } };
+  const m = Math.min(n, 300);
+  const run = (takeKey) => {
+    const res = [];
+    for (let i = 0; i < m; i++) {
+      Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false, passive: true });
+      const tree = (st) => {
+        if (st.tree?.cur) return;
+        if (st.tree?.done?.zb === undefined) { if (stageOf(st.age) === 'เด็ก') treeInvestNode(st, 'zb'); }
+        else if (takeKey && st.tree.done.zk === undefined && !st.tree.pend) { try { treeInvestNode(st, 'zk', true); } catch { /* ช่วงวัยยังไม่ถึง */ } }
+      };
+      let gates = 0, doneSeen = false, lostKey = false;
+      const onCard = (card, st) => {
+        if (card.id === 'tree_gate_zb') gates++;
+        if (st.tree?.done?.zk !== undefined) doneSeen = true;
+        else if (doneSeen) lostKey = true;
+      };
+      const b = Object.assign(withGate(random), { tree });
+      const { state: st } = playLife(mixSeed(seed, i), synth, b, onCard);
+      res.push({ st, gates, lostKey });
+    }
+    return res;
+  };
+  const taken = run(true);
+  const idle = run(false);
+  const gateCards = taken.reduce((s, r) => s + r.gates, 0);
+  const picked = [0, 0, 0];
+  for (const { st } of taken) if (st.tree?.gate?.zb !== undefined) picked[st.tree.gate.zb]++;
+  const gotKey = taken.filter(({ st }) => st.tree?.done?.zk !== undefined).length;
+  const auto = idle.filter(({ st }) => st.tree?.done?.zk !== undefined || st.tree?.hist?.some(([, id]) => id === 'zk')).length;
+  const lost = taken.filter((r) => r.lostKey).length;
+  // keystone ต้องอยู่ก่อนโหนดอื่นในทะเบียน (zb zk นำหน้า) ไม่งั้นการเลื่อนเลือกโหนดจริงก่อนและด่านไม่เคยแตะ guard · keystone ไม่ผ่าน ack ต้องทุ่มไม่ได้ — ลองจนเจอชีวิตที่ถึงขั้นทุ่มจริง (tried) · ไม่เคยถึง = ตก ไม่ใช่ผ่านเงียบ
+  let tried = false, blocked = false;
+  for (let i = 0; i < 20 && !tried; i++) {
+    playLife(mixSeed(seed, i), synth, Object.assign(withGate(random), { tree: (s) => {
+      if (s.tree?.cur || tried) return;
+      if (s.tree?.done?.zb === undefined) { if (stageOf(s.age) === 'เด็ก') treeInvestNode(s, 'zb'); return; }
+      tried = true;
+      try { treeInvestNode(s, 'zk'); } catch { blocked = true; }
+    } }));
+  }
+  const noAck = tried && blocked;
+  console.log(`การ์ดด่าน zb: ${gateCards} ใบใน ${m} ชีวิต · ผลทั้ง 3 ทางถูกเลือก ${picked.join('/')} · ได้ keystone ${gotKey}/${m} · เลื่อนเข้า keystone เอง ${auto}/${m} · keystone หายหลังได้ ${lost} · ทุ่มโดยไม่ ack ${noAck ? 'ถูกกัน' : 'หลุด'}`);
+  if (!gateCards) fails.push('การ์ดด่านโหนดใหญ่ไม่โผล่เลยแม้ปีครบ');
+  picked.forEach((c, k) => { if (!c) fails.push(`ผลทางที่ ${k + 1} ของการ์ดด่านไม่เคยถูกเลือก`); });
+  if (!gotKey) fails.push('ไม่มีชีวิตไหนได้ keystone (บอทตั้งใจทุ่ม)');
+  if (auto) fails.push(`เลื่อนเข้า keystone เอง ${auto} ชีวิต (ต้อง 0)`);
+  if (lost) fails.push(`keystone หายหลังปลด ${lost} ชีวิต (ล้างไม่ได้)`);
+  if (!noAck) fails.push('ทุ่ม keystone โดยไม่ผ่าน ack ได้');
 }
 
 console.log(fails.length ? `\nไม่ผ่าน ${fails.length} ข้อ\n${fails.map((f) => `  ✗ ${f}`).join('\n')}` : '\nผ่านทั้งหมด');

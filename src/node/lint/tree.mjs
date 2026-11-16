@@ -47,6 +47,32 @@ export function checkTree(doc, jobs = null) {
       else for (const [k, v] of Object.entries(n[key])) if (!EFFECT_KEYS.includes(k) || k === 'money' || !fxLevel(v)) out.push(`${at}.${key}.${k} ต้องเป็นค่าสถานะระดับ ±1..±3`);
     }
   }
+  // การ์ดด่านเฉพาะโหนดใหญ่ (ข้อ 32 64): ผล 2–3 ทาง · keystone ได้แรงแต่เสียถาวร (ข้อ 28): 1 ตัวต่อแขนง · ห้ามซ่อน · ต้องมีคำบอกข้อเสียก่อนทุ่ม
+  const keys = {};
+  for (const [id, n] of Object.entries(nodes)) {
+    if (!isObj(n)) continue;
+    const at = `โหนด ${id}`;
+    if (n.gate !== undefined) {
+      const g = n.gate;
+      if (n.size !== 'b') out.push(`${at}.gate ใช้ได้เฉพาะโหนดใหญ่ (size b)`);
+      if (!isObj(g) || typeof g.title !== 'string' || !g.title.trim() || typeof g.text !== 'string' || !g.text.trim()) out.push(`${at}.gate ต้องมี title และ text`);
+      else if (!Array.isArray(g.results) || g.results.length < 2 || g.results.length > 3) out.push(`${at}.gate.results ต้องมี 2–3 ทาง`);
+      else g.results.forEach((r, i) => {
+        if (!isObj(r) || typeof r.text !== 'string' || !r.text.trim()) { out.push(`${at}.gate.results[${i}] ต้องมี text`); return; }
+        if (!isObj(r.fx) || !Object.keys(r.fx).length || Object.entries(r.fx).some(([k, v]) => !EFFECT_KEYS.includes(k) || k === 'money' || !fxLevel(v))) out.push(`${at}.gate.results[${i}].fx ต้องเป็นค่าสถานะระดับ ±1..±3`);
+      });
+    }
+    if (n.keystone !== undefined) {
+      if (n.keystone !== true) out.push(`${at}.keystone ต้องเป็น true หรือไม่ใส่`);
+      if (n.size !== 'k') out.push(`${at} keystone ต้องเป็น size k`);
+      if (n.hidden) out.push(`${at} keystone ห้ามเป็นโหนดซ่อน`);
+      if (n.gate !== undefined) out.push(`${at} keystone ห้ามมีการ์ดด่าน`);
+      if (typeof n.warn !== 'string' || !n.warn.trim()) out.push(`${at} keystone ต้องมี warn (คำบอกข้อเสียก่อนทุ่ม)`);
+      if (!isObj(n.cost) || !Object.keys(n.cost).length || Object.entries(n.cost).some(([k, v]) => !EFFECT_KEYS.includes(k) || k === 'money' || !fxLevel(v) || v > 0)) out.push(`${at}.cost ต้องเป็นค่าสถานะลบระดับ -1..-3 (ข้อเสียถาวร)`);
+      keys[n.branch] = (keys[n.branch] ?? 0) + 1;
+    } else if (n.warn !== undefined || n.cost !== undefined) out.push(`${at} มี warn/cost แต่ไม่ใช่ keystone`);
+  }
+  for (const [b, c] of Object.entries(keys)) if (c > 1) out.push(`แขนง ${b} มี keystone ${c} ตัว (ข้อ 66: แขนงละ 1)`);
   // งบผลเบาถาวรรวมทั้งต้น/ปี (ข้อ 42 · 93): Σ |light| × light_unit เกิน budget = ตก
   const spent = treeBudgetSpent(doc);
   if (spent > doc.budget) out.push(`งบผลเบาถาวรรวม ${spent.toFixed(3)} เกินเพดาน ${doc.budget}`);
