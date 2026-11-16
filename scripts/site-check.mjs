@@ -148,7 +148,10 @@ if (!vHit.length || vHit.some((it) => it.v !== vNew) || recentVersions(['v0.6.13
 const both = stageItems.filter((it) => matchItem(it, { ...none, cat: ['การเรียน'], st: ['วัยรุ่น'] }));
 if (both.some((it) => !it.cats.includes('การเรียน') || it.st !== 'วัยรุ่น')) bad.push('ข้ามกลุ่ม = และ');
 // หน้าฝังซอร์สตัวกรองชุดเดียวกับที่ด่านเรียก · ไม่มี JS = การ์ดไม่ถูกซ่อน
-const shipped = page.includes(matchItem.toString()) && page.includes(recentVersions.toString());
+// เทียบหลัง normalize ปลายบรรทัด: core.autocrlf=true ทำซอร์สที่ checkout เป็น CRLF ส่วนหน้าเป็น LF
+const eolLf = (s) => s.replace(/\r\n/g, '\n');
+const pageLf = eolLf(page);
+const shipped = pageLf.includes(eolLf(matchItem.toString())) && pageLf.includes(eolLf(recentVersions.toString()));
 const hiddenCard = /<article[^>]*\shidden/.test(page);
 check('ตัวกรองการ์ด: กรองแล้วเหลือแต่ใบที่ตรง · หน้าฝังตัวกรองชุดเดียวกับที่ตรวจ · ไม่มี JS เห็นครบ', bad.length || !shipped || hiddenCard || stageItems.length < content.events.length, ` ใบ ${stageItems.length} · ${bad.join(' · ')}${shipped ? '' : ' · ซอร์สตัวกรองไม่ตรง'}${hiddenCard ? ' · มีการ์ดซ่อนมาตั้งแต่ต้น' : ''}`);
 
