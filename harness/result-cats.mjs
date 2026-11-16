@@ -5,7 +5,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { playLife, playAfterlife, nextLife, mixSeed, horoscope, standingOf } from '../src/engine/index.mjs';
 import { SHOWN_STATS } from '../src/ui/labels.mjs';
-import { artTier } from '../src/ui/art.mjs';
+import { artTier, resultArtCat } from '../src/ui/art.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, random, isekaiBot } from './bots.mjs';
 
@@ -55,7 +55,8 @@ export function resultCat(card, ctx) {
 const count = Object.fromEntries(RESULT_CATS.map(([k]) => [k, 0]));
 const samples = Object.fromEntries(RESULT_CATS.map(([k]) => [k, []]));
 const intro = { 0: [], 1: [], 2: [], heir: [] };
-let total = 0, skipped = 0, veiledN = 0, veiledMid = 0;
+let total = 0, skipped = 0, veiledN = 0, veiledMid = 0, diff = 0;
+const diffBy = {};
 const take = (k, card) => {
   const xs = samples[k];
   if (xs.length < SAMPLES && !xs.some((x) => x.t === card.text)) xs.push({ t: card.text, ...(card.story && { s: card.story }), ...(card.illness && { left: card.illness.left }), ...(card.age !== undefined && { age: card.age, stage: card.stage }) });
@@ -79,6 +80,8 @@ function onLife() {
         const hide = new Set([...(ev?.hidden ?? []), ...(ev?.choices?.[i]?.hidden ?? []), ...(prev?.fx?.[i]?.split(' · ').includes('?') ? SHOWN_STATS : [])]);
         const delta = snap && Object.fromEntries(SHOWN_STATS.map((k) => [k, Math.round(st[k]) - Math.round(snap[k])]));
         const k = resultCat(card, { delta, hide, ev });
+        const ka = resultArtCat(card);
+        if (ka !== k) { diff++; diffBy[`${k}→${ka}`] = (diffBy[`${k}→${ka}`] ?? 0) + 1; }
         if (hide.size && delta) {
           veiledN++;
           if (k === 'mid' && resultCat(card, { delta, hide: new Set(), ev }) !== 'mid') veiledMid++;
@@ -127,6 +130,7 @@ const up = { health: 0, happiness: 5, knowledge: 0, relations: 0 };
 const ctlOk = resultCat({}, { delta: up, hide: new Set(), ev: {} }) === 'good' && resultCat({}, { delta: up, hide: new Set(SHOWN_STATS), ev: {} }) === 'mid';
 console.log(`  ตัวควบคุมตัวกรอง: ใบค่าขึ้น ไม่ซ่อน→เรื่องดี · ซ่อน→หมวดกลาง → ${ctlOk ? 'ผ่าน' : 'ตก'}`);
 console.log(`หมวดกลาง ≤ ครึ่ง (ข้อ 92) → ${midOk ? 'ผ่าน' : 'ตก'} ${pct(count.mid)}`);
+console.log(`  หมวดจากป้ายบนการ์ด (resultArtCat ใบ 62) ต่างจากตัวนับนี้ ${diff} ใบ ${JSON.stringify(diffBy)}`);
 console.log(`  ตัวกรองค่าซ่อน (ข้อ 90): การ์ดผลที่ตัวเลือกซ่อนค่า ${veiledN} ใบ (ตกหมวดกลางเพราะซ่อน ${veiledMid})`);
 if (WRITE) {
   const out = { seed, n, bots: Object.keys(RUN), total, skipped, cats: RESULT_CATS.map(([k, name, rule]) => ({ k, name, rule, n: count[k], samples: samples[k] })), intro };

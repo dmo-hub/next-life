@@ -1,5 +1,5 @@
 import { newLife, nextCard, causeWords, goalNames, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf } from '../engine/index.mjs';
-import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME } from './art.mjs';
+import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME, catArt, resultArtCat } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
 
@@ -1123,7 +1123,17 @@ const ERA_OF = new Map(CONTENT.events.filter((c) => c.era).map((c) => [c.id, c.e
 // แรกเกิดเลือกตามฐานะบ้าน (ชุดเดียวกับรูปตัวละคร) · การ์ดตาย/หายตัวผูกในหน้าการ์ดตาย · การ์ดอื่นไม่มีภาพ หน้าตาเดิม
 const SCENE_OF = new Map([['young_wedding_01', 'wed_ask'], ['remarry_wedding_work_01', 'wed_rite'], ['remarry_wedding_mid_01', 'wed_rite'], ['remarry_wedding_old_01', 'wed_rite'], ['young_baby_01', 'baby_news'], ['work_house_01', 'baby_home'], ['retirement', 'retire_home'], ['early_retire', 'retire_early']]);
 const BIRTH_SCENE = ['birth_poor', 'birth_mid', 'birth_rich'];
+// ภาพหมวดการ์ดผล (ui-redo 62 · ข้อ 89): การ์ดผลที่ต่อจากการ์ดมีภาพฉาก/ภาพยุคไม่ใส่ภาพหมวด — ไม่มีภาพสองใบติดกัน · ตัวเดียวกับที่ harness/result-cats.mjs นับ
+let lastBase = null;
+const hasScene = (c) => !!c && (c.kind === 'era' || (c.kind === 'event' && (ERA_OF.has(c.id) || SCENE_OF.has(c.id))));
 // ภาพเล็ก (sm) บนการ์ดแรกเกิด/การ์ดตาย: ปุ่มไปต่อยังอยู่จอแรก 390 · data-scene ให้ด่านจอหาเจอ
+function catSvg(k) {
+  const s = catArt(k);
+  if (!s) return null;
+  const svg = artSvg('era-art scene-art scene-sm cat-art', ERA_ART_W, ERA_ART_H, s.parts);
+  svg.dataset.cat = k;
+  return svg;
+}
 function sceneSvg(id, sm) {
   const s = sceneArt(id);
   if (!s) return null;
@@ -2282,6 +2292,8 @@ window.addEventListener('keydown', (e) => [' ', 'Enter', 'ArrowRight', 'ArrowLef
 function render(card) {
   // ไปกลับกลางชีวิต (B68m): ทริปยังเป็นชีวิตนี้ ปุ่มจึงเดินผ่านปุ่มชีวิต — จอเต็มของทริปเป็นงานเลน C
   if (card.kind === 'isekai') return renderIsekai(card);
+  const prevBase = lastBase;
+  if (card.kind !== 'result') lastBase = card;
   root.replaceChildren();
   const s = statsOf(st);
   const box = el('article', `card ${styleOf(card)}`);
@@ -2388,6 +2400,7 @@ function render(card) {
     } else {
       const scene = SCENE_OF.has(card.id) && sceneSvg(SCENE_OF.get(card.id), false);
       if (scene) body.append(scene);
+      else if (card.kind === 'result' && !card.isekai && !hasScene(prevBase) && !digestRest(card).length) body.append(catSvg(resultArtCat(card)));
     }
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
     body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));

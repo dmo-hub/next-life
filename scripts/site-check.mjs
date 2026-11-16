@@ -25,7 +25,8 @@ import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, injectDevNav, DEV_TABS, MOVED_MARK, movedHtml, DEV_MAPS, DEV_MAPS_PAGE, mapsMoved } from '../src/site/nav.mjs';
 import { uiPage, designMoved, cssVars, UI_PAGE, UI_MOVED_FROM } from '../src/site/ui.mjs';
 import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
-import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
+import { sceneArt, ART_SCENE_IDS, catArt, CAT_IDS, resultArtCat } from '../src/ui/art.mjs';
+import { RESULT_TAGS } from '../src/engine/life.mjs';
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, GATE_OFF, PUBLIC_HIDE } from '../src/site/gate.mjs';
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
 import { docsScope, injectDocsLayout, pageKind, DOCS_LAYOUT_START, DOCS_LAYOUT_END } from '../src/site/docs-layout.mjs';
@@ -533,6 +534,19 @@ const evIds = new Set(content.events.map((e) => e.id));
 const sceneMiss = [...sceneBadParts([...new Set(sceneUsed)], sceneArt).map((id) => `ภาพ ${id} พัง/ไม่มี`), ...sceneNoCard(sceneMap, evIds).map((id) => `ไม่มีการ์ด ${id}`)];
 const sceneCtl = sceneNoCard([...sceneMap, ['no_such_card', 'death']], evIds).includes('no_such_card') && sceneBadParts(['death'], () => ({ parts: [...sceneArt('death').parts, [sceneArt('death').parts[0]]] })).length === 1;
 check('ภาพฉากสำคัญ: ทุกชิ้นวาดได้ · การ์ดที่ผูกมีจริง', sceneMiss.length || sceneMap.length < 5 || !sceneCtl, ` ${ART_SCENE_IDS.length} ภาพ · ผูก ${sceneMap.length} การ์ด + แรกเกิด + การ์ดตาย${sceneMiss.length ? ` · ${sceneMiss.join(' | ')}` : ''} · ตัวควบคุม${sceneCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 9a3) ภาพหมวดการ์ดผล (ui-redo 62 · ข้อ 120): ครบ 10 หมวด ทุกชิ้นเป็น path จริง · ป้ายใบ 60 ทุกค่าตกหมวดที่มีภาพ · หน้าเล่นวาดภาพหมวดจริง (ภาพหมวดหาย = การ์ดผลไม่มีภาพเงียบ ๆ)
+// ตัวควบคุม: ถอดภาพ 1 หมวด · ชิ้นภาพซ้อน array · ป้ายที่ไม่มีหมวด · ถอดการวาดออกจาก app.mjs ⇒ ต้องถูกจับ
+const CAT_WANT = ['after', 'far', 'loss', 'ill', 'pet', 'self', 'luck', 'good', 'bad', 'mid'];
+const catBad = (ids, get) => ids.filter((k) => !get(k) || get(k).parts.some((x) => !x || typeof x.d !== 'string'));
+const catTagBad = (tags, ok) => tags.filter((t) => !ok.includes(resultArtCat({ tag: t })));
+const catDrawn = (src) => /catSvg\(resultArtCat\(card\)\)/.test(src);
+const catMiss = [...catBad(CAT_WANT, catArt).map((k) => `ภาพ ${k} พัง/ไม่มี`), ...CAT_IDS.filter((k) => !CAT_WANT.includes(k)).map((k) => `หมวดเกิน ${k}`), ...catTagBad(RESULT_TAGS, CAT_IDS).map((t) => `ป้าย ${t} ไม่ตกหมวดที่มีภาพ`), ...(catDrawn(appSrc) ? [] : ['app.mjs ไม่วาดภาพหมวด'])];
+const catCtl = catBad(CAT_WANT, (k) => (k === 'loss' ? null : catArt(k))).length === 1
+  && catBad(['loss'], () => ({ parts: [...catArt('loss').parts, [catArt('loss').parts[0]]] })).length === 1
+  && catTagBad(['good'], ['mid']).length === 1;
+const catCtl2 = !catDrawn(appSrc.replace('catSvg(resultArtCat(card))', 'null'));
+check('ภาพหมวดการ์ดผลครบ 10 หมวด · ป้ายทุกค่าตกหมวดที่มีภาพ · หน้าเล่นวาดจริง', catMiss.length || !catCtl || !catCtl2, ` ${CAT_IDS.length} หมวด · ป้าย ${RESULT_TAGS.length} ค่า${catMiss.length ? ` · ${catMiss.join(' | ')}` : ''} · ตัวควบคุม${catCtl && catCtl2 ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 9b) ฟอนต์ไฟล์ในเว็บชุดเดียวทุกหน้า (ui-redo 96 · ข้อ 205): หน้าเล่นมี @font-face ครบทุกแบบที่ใช้ ชี้ fonts/*.woff2 ที่มีจริงและตรงต้นฉบับ src/ui/fonts
 // · fonts.css ตรงตาราง FONTS · ทุกไฟล์ใต้ docs/ (html/js/css) ไม่ดึง Google Fonts
