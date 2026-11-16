@@ -5736,6 +5736,8 @@ function setLifeFocus(st, id) {
 // ปิดปีก่อนขึ้นอายุ: ผลของปีที่อายุ st.age ตามโฟกัสตอนนี้ · ตามน้ำไม่ดึงเลขสุ่มใด
 // ปลายสายที่ต่อจากต้นสาย id (ชื่อบนจอ) · ไม่มี = ต้นสายนี้ไม่ใช่ปณิธาน
 const goalTail = (defs, id) => Object.values(defs).find((d) => d.after === id)?.name;
+// ชื่อปณิธานที่สำเร็จของชีวิตนี้ "ต้นสาย → ปลายสาย" — การ์ดตายกับสมุดอนุสรณ์ใช้ชุดเดียวกัน
+const goalNames = (st) => (st.goalsDone ?? []).map((id) => `${st.content.focus.focuses[id].name} → ${goalTail(st.content.focus.focuses, id)}`);
 function lifeFocusYear(st) {
   const c = st.content.focus;
   // โฟกัสที่รับจากพ่อแม่แต่ยังเปิดไม่ได้ (เช่นยังไม่เข้าเรียน) รอจนเปิด แล้วนับปีนั้นเต็ม · ผู้เล่นตั้งเองก่อน = ทิ้ง
@@ -6276,7 +6278,7 @@ function deathCard(st) {
     card.note = `ยุคนั้นเด็ก${st.sex}อายุ ${st.age} ปีจากไปราว ${Math.max(1, Math.round(q * 10000))} คนในทุก 10,000 คนต่อปี`;
   }
   if (st.age < STAGES[1].from) card.short = true;
-  if (st.goalsDone?.length) card.goals = st.goalsDone.map((id) => `${st.content.focus.focuses[id].name} → ${goalTail(st.content.focus.focuses, id)}`);
+  if (st.goalsDone?.length) card.goals = goalNames(st);
   const pets = petsAfter(st);
   if (pets) card.pets = pets;
   if (st.funeral) {
@@ -9439,7 +9441,7 @@ function thaiEarn(st) {
     cause: isGone(st) || !st.cause ? [] : [st.cause],
     goal: goalsMet(st, (st.estate?.money ?? 0) < 0),
     focus: Object.keys(st.focusYears ?? {}).filter((id) => st.focusYears[id] >= chain),
-    lifeGoal: [],
+    lifeGoal: st.goalsDone ?? [],
   };
   const got = new Set(Object.entries(src).flatMap(([k, ids]) => ids.flatMap((id) => map[k]?.[id] ?? [])));
   return Object.keys(ISEKAI_SKILLS).filter((id) => got.has(id)).map((id) => ({ id, name: ISEKAI_SKILLS[id].name, lv: 1 }));
@@ -12534,7 +12536,7 @@ function memoAdd(t) {
   const m = memoRead();
   const k = `${save.seed}:${st.gen}`;
   if (m.l.some((x) => x.k === k)) return 'ok';
-  m.l.push({ k, n: st.name, r: fullName(), g: st.gen, a: st.age, p: provinceLabel(st), t: t.titles[0]?.name ?? '' });
+  m.l.push({ k, n: st.name, r: fullName(), g: st.gen, a: st.age, p: provinceLabel(st), t: t.titles[0]?.name ?? '', ...(st.goalsDone?.length && { o: goalNames(st) }) });
   for (const x of eraSeen) if (!m.e.includes(x.id)) m.e.push(x.id);
   const r = memoWrite(m);
   shelfDot();
@@ -12660,7 +12662,7 @@ function skillsSeen() {
 }
 const skillsGot = (k) => Object.keys(k.s).length;
 // คำใบ้ของ ??? บอกชนิดแหล่งที่ได้ ไม่บอกชื่อ — ชี้ทางแบบคำใบ้ฉายา · ทุกสกิลเป็นของขวัญเทพธิดาในต่างโลกได้
-const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'โฟกัส', lifeGoal: 'เป้าชีวิต' };
+const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'โฟกัส', lifeGoal: 'ปณิธาน' };
 function skillHint(id) {
   const kinds = Object.entries(CONTENT.skillMap ?? {}).filter(([, m]) => Object.values(m).some((xs) => xs.includes(id))).map(([k]) => SKILL_SRC[k]).filter(Boolean);
   return kinds.length ? `ของขวัญเทพธิดาในต่างโลก หรือชีวิตไทยที่มี${kinds.join('/')}ที่ใช่` : 'ของขวัญเทพธิดาในต่างโลก';
@@ -12814,7 +12816,7 @@ function memoShelf(body, choices, fresh, again) {
   // ลบทีละแถวได้ทันที (สรุปสั้น ไม่ใช่เซฟ ไม่ต้องถามซ้ำ)
   for (const x of [...m.l].reverse()) {
     const li = el('li');
-    const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.r || x.n}`, `อายุ ${x.a} ปี`, x.p, x.t && `ฉายา ${x.t}`].filter(Boolean).join(' · '));
+    const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.r || x.n}`, `อายุ ${x.a} ปี`, x.p, x.t && `ฉายา ${x.t}`, x.o?.length && `ปณิธาน ${x.o.join(' · ')}`].filter(Boolean).join(' · '));
     if (fresh.includes(x.k)) txt.append(newTag());
     li.append(txt);
     const del = el('button', 'more', 'ลบ');
