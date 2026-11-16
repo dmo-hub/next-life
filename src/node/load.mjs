@@ -439,7 +439,7 @@ function loadTree() {
 }
 
 // สกิลตอนจบชีวิตไทย (06s): id แหล่งหรือ id สกิลพิมพ์ผิด = สกิลไม่เคยออกเงียบ ๆ จึงหยุด build
-// lifeGoal ยังไม่มีระบบให้เทียบ id — ตรวจแค่สกิล
+// lifeGoal = id ต้นสายของปณิธาน (ต้นสายที่มีปลายสายต่อใน focus.yaml · st.goalsDone จดตัวนี้)
 export function loadSkillMap(p = 'content/rules/skill-map.yaml', focus = loadFocus()) {
   const doc = parse(read(p)) ?? {};
   const known = {
@@ -448,7 +448,7 @@ export function loadSkillMap(p = 'content/rules/skill-map.yaml', focus = loadFoc
     cause: Object.keys(json('data/death-causes.json').groups),
     goal: FAMILY_GOALS.map((g) => g.id),
     focus: Object.keys(focus.focuses),
-    lifeGoal: null,
+    lifeGoal: [...new Set(Object.values(focus.focuses).map((d) => d.after).filter(Boolean))],
   };
   const bad = Object.keys(doc).filter((k) => !(k in known)).map((k) => `คีย์ ${k} ไม่มีในแกน (${Object.keys(known).join(' ')})`);
   const map = {};

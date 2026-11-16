@@ -179,7 +179,7 @@ export function thaiEarn(st) {
     cause: isGone(st) || !st.cause ? [] : [st.cause],
     goal: goalsMet(st, (st.estate?.money ?? 0) < 0),
     focus: Object.keys(st.focusYears ?? {}).filter((id) => st.focusYears[id] >= chain),
-    lifeGoal: [],
+    lifeGoal: st.goalsDone ?? [],
   };
   const got = new Set(Object.entries(src).flatMap(([k, ids]) => ids.flatMap((id) => map[k]?.[id] ?? [])));
   return Object.keys(ISEKAI_SKILLS).filter((id) => got.has(id)).map((id) => ({ id, name: ISEKAI_SKILLS[id].name, lv: 1 }));

@@ -6,10 +6,19 @@
 # cause    = สาเหตุตาย (groups ใน data/death-causes.json) · ชีวิตที่หายตัวไม่มีสาเหตุ
 # goal     = เป้าตระกูลที่สำเร็จในรุ่นนี้ (FAMILY_GOALS ใน src/engine/titles.mjs)
 # focus    = โฟกัสที่ทุ่มเทสะสมครบ chain_years ของ content/rules/focus.yaml (id โฟกัสในไฟล์นั้น)
-# lifeGoal = เป้าชีวิตส่วนตัว — ระบบยังไม่มี เว้นว่างไว้
+# lifeGoal = ปณิธานที่สำเร็จในชีวิตนี้ (id ต้นสายที่มีปลายสายต่อใน content/rules/focus.yaml · ต้นสายชำนาญครบ chain_years ครั้งแรก)
 job: {}
 title: {}
 cause: {}
 goal: {}
 focus: {}
-lifeGoal: {}
+lifeGoal:
+  study_hard: [appraise]
+  play_friends: [tongue]
+  house_chores: [cook]
+  run_wild: [sword]
+  follow_dream: [luck]
+  work_hard: [exp]
+  save_money: [storage]
+  family_care: [regen]
+  make_merit: [luck]

@@ -1,4 +1,4 @@
-import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf } from '../engine/index.mjs';
+import { newLife, nextCard, causeWords, goalNames, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
@@ -1167,7 +1167,7 @@ function memoAdd(t) {
   const m = memoRead();
   const k = `${save.seed}:${st.gen}`;
   if (m.l.some((x) => x.k === k)) return 'ok';
-  m.l.push({ k, n: st.name, r: fullName(), g: st.gen, a: st.age, p: provinceLabel(st), t: t.titles[0]?.name ?? '' });
+  m.l.push({ k, n: st.name, r: fullName(), g: st.gen, a: st.age, p: provinceLabel(st), t: t.titles[0]?.name ?? '', ...(st.goalsDone?.length && { o: goalNames(st) }) });
   for (const x of eraSeen) if (!m.e.includes(x.id)) m.e.push(x.id);
   const r = memoWrite(m);
   shelfDot();
@@ -1293,7 +1293,7 @@ function skillsSeen() {
 }
 const skillsGot = (k) => Object.keys(k.s).length;
 // คำใบ้ของ ??? บอกชนิดแหล่งที่ได้ ไม่บอกชื่อ — ชี้ทางแบบคำใบ้ฉายา · ทุกสกิลเป็นของขวัญเทพธิดาในต่างโลกได้
-const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'โฟกัส', lifeGoal: 'เป้าชีวิต' };
+const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'โฟกัส', lifeGoal: 'ปณิธาน' };
 function skillHint(id) {
   const kinds = Object.entries(CONTENT.skillMap ?? {}).filter(([, m]) => Object.values(m).some((xs) => xs.includes(id))).map(([k]) => SKILL_SRC[k]).filter(Boolean);
   return kinds.length ? `ของขวัญเทพธิดาในต่างโลก หรือชีวิตไทยที่มี${kinds.join('/')}ที่ใช่` : 'ของขวัญเทพธิดาในต่างโลก';
@@ -1447,7 +1447,7 @@ function memoShelf(body, choices, fresh, again) {
   // ลบทีละแถวได้ทันที (สรุปสั้น ไม่ใช่เซฟ ไม่ต้องถามซ้ำ)
   for (const x of [...m.l].reverse()) {
     const li = el('li');
-    const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.r || x.n}`, `อายุ ${x.a} ปี`, x.p, x.t && `ฉายา ${x.t}`].filter(Boolean).join(' · '));
+    const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.r || x.n}`, `อายุ ${x.a} ปี`, x.p, x.t && `ฉายา ${x.t}`, x.o?.length && `ปณิธาน ${x.o.join(' · ')}`].filter(Boolean).join(' · '));
     if (fresh.includes(x.k)) txt.append(newTag());
     li.append(txt);
     const del = el('button', 'more', 'ลบ');

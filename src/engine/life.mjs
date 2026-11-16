@@ -1932,6 +1932,8 @@ export function setLifeFocus(st, id) {
 // ปิดปีก่อนขึ้นอายุ: ผลของปีที่อายุ st.age ตามโฟกัสตอนนี้ · ตามน้ำไม่ดึงเลขสุ่มใด
 // ปลายสายที่ต่อจากต้นสาย id (ชื่อบนจอ) · ไม่มี = ต้นสายนี้ไม่ใช่ปณิธาน
 const goalTail = (defs, id) => Object.values(defs).find((d) => d.after === id)?.name;
+// ชื่อปณิธานที่สำเร็จของชีวิตนี้ "ต้นสาย → ปลายสาย" — การ์ดตายกับสมุดอนุสรณ์ใช้ชุดเดียวกัน
+export const goalNames = (st) => (st.goalsDone ?? []).map((id) => `${st.content.focus.focuses[id].name} → ${goalTail(st.content.focus.focuses, id)}`);
 export function lifeFocusYear(st) {
   const c = st.content.focus;
   // โฟกัสที่รับจากพ่อแม่แต่ยังเปิดไม่ได้ (เช่นยังไม่เข้าเรียน) รอจนเปิด แล้วนับปีนั้นเต็ม · ผู้เล่นตั้งเองก่อน = ทิ้ง
@@ -2472,7 +2474,7 @@ function deathCard(st) {
     card.note = `ยุคนั้นเด็ก${st.sex}อายุ ${st.age} ปีจากไปราว ${Math.max(1, Math.round(q * 10000))} คนในทุก 10,000 คนต่อปี`;
   }
   if (st.age < STAGES[1].from) card.short = true;
-  if (st.goalsDone?.length) card.goals = st.goalsDone.map((id) => `${st.content.focus.focuses[id].name} → ${goalTail(st.content.focus.focuses, id)}`);
+  if (st.goalsDone?.length) card.goals = goalNames(st);
   const pets = petsAfter(st);
   if (pets) card.pets = pets;
   if (st.funeral) {
