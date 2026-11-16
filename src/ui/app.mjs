@@ -3003,7 +3003,7 @@ function loopBar(l) {
 function renderAfter(card) {
   if (card.kind === 'isekai') return renderIsekai(card);
   root.replaceChildren();
-  const box = el('article', 'card b af');
+  const box = el('article', 'card a b af');
   const top = el('div', 'top');
   // หัวแถบเป็นชื่อเกมเหมือนหน้าเปิด (ui-redo 66 · เจ้าของ) · ฉากที่อยู่บอกด้วยป้ายบนการ์ดแทน
   top.append(el('b', null, GAME_NAME), el('small', null, card.loop ? `${genLabel()}${st.name} · ภูมิ${af.verdict.realm.name} · ปีที่ ${card.loop.year}/${card.loop.years}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
@@ -3238,7 +3238,7 @@ function isekaiFocusPanel(card) {
 const focusUp = (fx) => (fx?.endsWith(' ขึ้น') ? fx.slice(0, -' ขึ้น'.length).split(' · ').map((k) => `${k} ↑`).join(' · ') : fx);
 function renderIsekai(card) {
   root.replaceChildren();
-  const box = el('article', 'card i');
+  const box = el('article', 'card a i');
   const s = card.status;
   const pick = card.trip ? lifePick : afterPick;
   const where = card.trip ? `ข้ามมาตอนอายุ ${card.life}` : `ชาติต่างโลกที่ ${card.run + 1}`;
