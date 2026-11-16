@@ -71,6 +71,14 @@
       "branch": "EX",
       "base": "c6aadad707f506a046c5b958d758b9469672479f",
       "created": "2026-11-16T07:01:52.989Z"
+    },
+    {
+      "id": "b010",
+      "topic": "เตรียมทหาร เฟส 3 ชีวิตในโรงเรียน ช่วง 2: ฉากปี 1 ทั้งหมด (school.order/pools/scenes/lastScene SB-07/deathAid/squadFence) + ตัวเลข band_year save_* stock_* + ธงฉากปี 1 + cadet_resign_debt · ลบ announce.uniformFirst (แทนด้วย SB-27b) · ฮับเคาะ 2026-11-16",
+      "brief": ".claude/research/cadet-phase3-yaml-spec.md",
+      "branch": "EX",
+      "base": "c6aadad707f506a046c5b958d758b9469672479f",
+      "created": "2026-11-16T07:36:30.937Z"
     }
   ]
 }

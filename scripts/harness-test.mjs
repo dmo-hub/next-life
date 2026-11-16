@@ -5,6 +5,8 @@ import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
 import { kinGaps, kinDeadRefs, familyLockShort } from '../harness/kin.mjs';
+import { cadetCard, chooseCadet } from '../src/engine/cadet.mjs';
+import { newLedger } from '../src/engine/merit.mjs';
 
 const fails = [];
 const rows = [];
@@ -863,6 +865,52 @@ const f2 = (v) => v.toFixed(2);
   sv.pact = { survive: true };
   const f2v = dieMidYear(sv, 'training');
   check('เฟส 3 ตายระหว่างฝึก: สัญญารอดตายยังกันได้', f2v === 'survive' && !sv.dead && sv.pact.survive === 'used' && sv.queue.at(-1)?.tag === 'survive', f2v);
+}
+
+// เฟส 3 ช่วง 3 (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16): ชีวิตในโรงเรียนปี 1 เดินจากการ์ดรายงานตัวจนจบด้วยบอทสุ่ม
+// ฉากขึ้นแน่ครบ · ไม่มีวงเล็บค้าง · นตท. ตั้งแต่ SB-27b · ลาออกแล้วกลับ ม.ปลาย ไม่มีคำนำหน้า · บ้านจนลาออก = หนี้ลาออก ไม่ใช่หนี้ค่าติว
+{
+  const content = loadContent();
+  const parents = [{ sex: 'ชาย', alive: true }, { sex: 'หญิง', alive: true }];
+  const mk = (seed, cls) => ({ seed, age: 16, birthYear: 2550 - 16, sex: 'ชาย', region: 'กลาง', flags: {}, parents, parentFlags: {}, content, queue: [], due: [], scheduled: [], done: {}, fired: {},
+    cls, name: 'ภูมิ', health: 90, healthNatural: 90, knowledge: 80, happiness: 50, relations: 50, network: 50, money: 0, log: [], ledger: newLedger(), cadetInfo: { tries: 1, order: ['army'] },
+    cadet: { steps: [['p2']], cur: null, p2: { branches: ['army'], written: { army: true }, reason: {}, body: { army: true }, final: ['army'], chosen: 'army', scores: { army: 20 }, askNs: {}, steps: [['arrive', 'army']] } } });
+  const play = (st, rng, resign) => {
+    const seen = new Set();
+    let raw = 0, titleAt = null;
+    for (let g = 0; g < 400 && !st.dead; g++) {
+      const c = cadetCard(st);
+      if (!c) { if (st.cadet?.waitAge > st.age) { st.age++; continue; } break; }
+      if (/\{[^}]*\}/.test([c.title, c.text, ...(c.choices ?? [])].join(' '))) raw++;
+      if (c.kind === 'result') continue;
+      const id = String(c.id).replace('cadet:school:', '');
+      seen.add(id);
+      if (id === 'SB-27b') titleAt = st.title;
+      const open = c.choices.map((_, k) => k).filter((k) => !c.locked[k]);
+      const quit = c.choices.findIndex((x) => /ยื่นลาออก/.test(x));
+      const stay = open.filter((k) => k !== quit);
+      chooseCadet(st, resign && quit >= 0 ? quit : stay[Math.floor(rng() * stay.length)] ?? open[0]);
+    }
+    return { seen, raw, titleAt };
+  };
+  const fixed = (content.cadet.school.order.year1 ?? []).filter((x) => !/^[@#]/.test(x));
+  let raw = 0, missing = new Set(), badTitle = 0, alive = 0;
+  for (let i = 0; i < 120; i++) {
+    const st = mk(mixSeed(0x5c01, i), 'ชนชั้นกลาง'), R = makeRng(i), r = play(st, () => R.next(), false);
+    raw += r.raw;
+    if (st.dead) continue;
+    alive++;
+    for (const id of fixed) if (!r.seen.has(id)) missing.add(id);
+    if (r.titleAt !== 'นตท.') badTitle++;
+  }
+  check('เฟส 3 ปี 1: ฉากขึ้นแน่ครบทุกชีวิตที่รอด', missing.size === 0, missing.size ? [...missing].join(' ') : `${alive} ชีวิต`);
+  check('เฟส 3 ปี 1: ไม่มีวงเล็บค้างบนจอ', raw === 0, `${raw}`);
+  check('เฟส 3 ปี 1: เป็น นตท. ตั้งแต่ SB-27b', badTitle === 0, `${badTitle}`);
+  const poor = mk(7, 'ยากจน'), rich = mk(8, 'มั่งคั่ง');
+  play(poor, () => 0.5, true);
+  play(rich, () => 0.5, true);
+  check('เฟส 3 ลาออก: กลับ ม.ปลาย ไม่มีคำนำหน้า', poor.school === 'upper' && !poor.title && !poor.cadet, `${poor.school} · ${poor.title}`);
+  check('เฟส 3 ลาออก: บ้านจน = หนี้ลาออก ไม่ใช่หนี้ค่าติว · บ้านรวยไม่มีหนี้', !!poor.flags.cadet_resign_debt && !poor.flags.family_debt && !rich.flags.cadet_resign_debt);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

@@ -1039,6 +1039,16 @@ function releaseTrack(st, out) {
 }
 // เลิกสอบแล้ว (cadet_let_go) ประตูไม่นับ: คนสละที่นั่งถือประตูข้ามปีไว้รอการ์ดสอบซ้ำ ถ้าเลิกกลางทาง ประตูไม่มีปีสอบมาล้าง
 const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet_exam_door && !st.flags.cadet_passed && !st.flags.cadet_let_go));
+// ออกจากโรงเรียนเตรียมทหารกลางทาง (เฟส 3 · ลาออกเอง หรือ ออกเพราะบาดเจ็บ · เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16)
+// เอาคำนำหน้านักเรียนออก แล้วกลับไปเรียน ม.ปลายตามเดิม · อายุถึงวันจบ ม.ปลายแล้ว = ไปการ์ดหางาน (track ที่เลยวันจบไปแล้วไม่จบเอง)
+export function leaveCadetSchool(st) {
+  if (CADET_TITLES.includes(st.title)) delete st.title;
+  if (st.age < TRACKS.upper.until) st.school = 'upper';
+  else {
+    st.school = null;
+    dueJob(st);
+  }
+}
 function dueJob(st) {
   if (cadetLive(st)) st.needJob = true;
   else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
@@ -1815,6 +1825,8 @@ export const arcSummary = (st) => Object.entries(st.arcs ?? {}).map(([key, a]) =
 // กองสุ่ม (B14): เหตุการณ์ไม่มี at_age แต่มี weight · ใบเดิมไม่ซ้ำในชีวิต เว้นแต่ตั้ง repeat · ไม่มีใบที่เกิดได้ = ไม่ดึงเลขสุ่ม
 // ชีวิตที่เนื้อหาไม่มีกองจึงได้ชะตาเดิมทุกหลัก
 function drawPool(st, year) {
+  // เฟส 3 ชีวิตในโรงเรียนเตรียมทหาร (ฮับเคาะ P6): ระหว่าง 2 ปีนี้ขึ้นเฉพาะฉากโรงเรียน การ์ดกองปกติพักไว้
+  if (st.cadet?.school) return null;
   const stage = stageOf(st.age);
   let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e));
   // เส้นเตรียมทหาร (เจ้าของ 2026-11-06): ถือธงนี้อยู่ = จั่วเฉพาะใบที่ต้องมีธงนี้ เรื่องชีวิตวัยรุ่นทั่วไปพักไว้ก่อน

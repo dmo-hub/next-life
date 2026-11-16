@@ -2,7 +2,8 @@
 // st.cadet = ลำดับขั้นที่กำลังเล่น (null = ไม่มี) · st.cadetInfo = ความจำข้ามปี (สอบกี่ครั้ง · ตกเพราะอะไร · ใบสมัคร)
 // ทุกค่าใน state เป็นข้อมูลล้วน (เซฟได้) · สุ่มจาก stream ของตัวเอง (seed ^ SALT + ตัวนับ) ไม่แตะ rng ของโลก
 // เนื้อหา/ตัวเลข: content/rules/cadet.yaml (ที่มา: demo ที่เจ้าของเคาะ 2026-11-05) · fx ในไฟล์นั้นเป็นหน่วย demo (×numbers.fx_unit แต้ม)
-import { STAT_KEYS, fill, stageOf, fxTag, TAG_MID, whenOk, heirCase, campusName, parentAlive } from './life.mjs';
+import { STAT_KEYS, fill, stageOf, fxTag, TAG_MID, whenOk, heirCase, campusName, parentAlive, dieMidYear, leaveCadetSchool } from './life.mjs';
+import { recordMerit } from './merit.mjs';
 
 // ทั้งไฟล์อยู่ใน scope เดียว — build ต่อทุกไฟล์เป็นสคริปต์เดียว ชื่อภายในจึงต้องไม่หลุดไปชนไฟล์อื่น
 const CADET = (() => {
@@ -133,7 +134,8 @@ const CADET = (() => {
   const txt = (v) => (typeof v === 'string' ? v : v?.text ?? '');
 
   // ปีเริ่มยุคอ้างชื่อค่าใน numbers ได้ (เช่น yearFrom: mobile_year) แทนเลขฝัง
-  const yearOf = (st, v) => (typeof v === 'string' ? N(st)[v] : v);
+  // ชื่อแบบมีจุด (school.strict_year) = ค่าในกลุ่มย่อยของ numbers (เฟส 3)
+  const yearOf = (st, v) => (typeof v === 'string' ? v.split('.').reduce((o, k) => o?.[k], N(st)) : v);
   // เงื่อนไขในไฟล์เนื้อหา (สคีมา demo) · คีย์ที่ไม่รู้จักถือว่าผ่าน เหมือน demo
   function condOk(st, c) {
     if (!c) return true;
@@ -181,6 +183,10 @@ const CADET = (() => {
     if (c.poor === false && clsGroup(st) === 'poor') return false;
     // B4 (ยกจาก Demo x2wCard W3 · last = S.age >= 18): lastTry true = ปีสุดท้ายที่อายุยังสมัครได้ · false = ยังมีปีหน้า
     if (c.lastTry != null && (st.age >= (N(st).last_age ?? 18)) !== c.lastTry) return false;
+    // เฟส 3 (ยกจาก Demo): alone = มาคนเดียว (บ้านไกล + จน) · branch / notBranch = เหล่าที่รายงานตัว
+    if (c.alone != null && alone(st) !== c.alone) return false;
+    if (c.branch && ![].concat(c.branch).includes(info(st).branch)) return false;
+    if (c.notBranch && [].concat(c.notBranch).includes(info(st).branch)) return false;
     return true;
   }
   // requires ของตัวเลือก: คีย์ rival* ล็อกไว้จนกว่าจะมีระบบเพื่อนคู่แข่ง (เจ้าของเคาะ 2026-11-06) · ที่เหลือใช้ condOk
@@ -301,6 +307,7 @@ const CADET = (() => {
     const K = st.cadet, o = K?.cur?.[idx];
     if (!o) throw new Error('ตัวเลือกไม่ถูกต้อง');
     if (o.lock) throw new Error('ตัวเลือกนี้ล็อกอยู่');
+    if (o._school) return chooseSchool(st, o);
     K.cur = null;
     const I = info(st), P = K.p2;
     applyFx(st, o.fx);
@@ -1166,22 +1173,204 @@ const CADET = (() => {
     // ข้อจำกัดที่เจ้าของรับไว้: (ก) ติดยศที่ 22 ตายตัว ยังไม่ตาม commissionAge (ข) ทร./ทอ. เข้าบันได army (ค) ช่วงเรียนใช้กองปกติ
     st.school = b === 'police' ? 'police_cadet' : 'cadet';
     st.needJob = false;
-    st.cadet.p2.steps = [['uniform'], ['end']];
+    // เฟส 3: ต่อด้วยชีวิตในโรงเรียนเตรียมทหาร 2 ปี (แทนการ์ดชั่วคราว "ชุดปกติชุดแรก" · ฮับเคาะ 2026-11-16)
+    st.cadet.p2.steps = [['schoolStart']];
     // ฉากหน้าประตูตามที่ตั้งจริงของปีนั้น (บท S1): กรุงเทพฯ = รถเมล์ + ถนน · นครนายก = ข้อความเดิม
     const y = year(st), gate = y >= (N(st).campus_nayok_year ?? 2543) ? 'รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ'
       : `รถเมล์จอดหน้าประตูโรงเรียนเตรียมทหารริมถนน${y < (N(st).campus_rama4_year ?? 2504) ? 'ราชดำเนิน' : 'พระรามที่ 4'} ตอนเช้ามืด รถเริ่มติดตั้งแต่ฟ้ายังไม่สว่าง รุ่นพี่ในชุดฝึกยืนเรียงรับ`;
     // B4 (Demo arriveCard 12950 · บท S1): วันแรกที่ถูกเรียก นตท. · {ชื่อเต็ม} = ชื่อ (เกมยังไม่มีนามสกุล)
     return status(`รายงานตัวที่${campus(st)}`, `${gate}\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BT(st, b)} อีกหลายปีจะได้ติดยศ\n${A(st).reportIn ?? ''}`);   // ⚠ ชั่วคราว: ไม่ระบุจำนวนปีจนเปิดเฟส 3 (ตอนนี้ติดยศที่ 22 ตายตัว ไม่ตรง commissionYears)
   };
-  // การ์ดสั้น "ชุดปกติชุดแรก" ต่อจากการ์ดรายงานตัวในปีเดียวกัน: ได้ใส่เครื่องแบบปกติแล้ว รุ่นพี่ขานชื่อเป็น "นตท." ครั้งแรก
-  // คำนำหน้าเปลี่ยนเป็น "นตท." ตอนการ์ดนี้ขึ้น · ไม่มีตัวเลือก (เจ้าของเคาะ 2026-11-11)
-  // เป็นจุดชั่วคราว พอชีวิตในโรงเรียนเตรียมทหาร (เฟส 3) เข้าเกม ค่อยย้ายไปฉากขุดชุดปกติจริง
+  // การ์ดชั่วคราว "ชุดปกติชุดแรก" ถูกแทนด้วยฉาก SB-27b ในชีวิตโรงเรียน (เฟส 3 · ฮับเคาะ 2026-11-16)
+  // เซฟเก่าที่ค้างขั้นนี้ไว้: แค่เปลี่ยนคำนำหน้าเป็น นตท. แล้วไปต่อ ไม่มีการ์ด
   S.uniform = (st) => {
     st.title = 'นตท.';
-    const u = A(st).uniformFirst ?? {};
-    return status(u.title ?? 'ชุดปกติชุดแรก', u.text ?? '');
+    return null;
   };
   S.end = () => 'END';
+
+  // ---------- เฟส 3 ชีวิตในโรงเรียนเตรียมทหาร 2 ปี (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16 · ยกจาก Demo cadet-phase3-demo.html) ----------
+  // บทอยู่ที่ content/rules/cadet.yaml → school · ตัวเลขอยู่ที่ numbers.school · ไม่ฝังเลขในโค้ด
+  // เดินตามลำดับฉากของปี 1 แล้วรอขึ้นปีหน้าเล่นปี 2 · ช่อง @ = การ์ดสุ่มของปีนั้น · ช่อง # = ร่างกายฟื้น/ลดตอนปิดภาคหรือฝึกภาคสนาม (ไม่มีการ์ด)
+  // ทางออกกลางทาง: ตายระหว่างฝึก (ฉากเสี่ยง) · ออกเพราะบาดเจ็บ (หอฝึก) · ลาออกเอง (จดหมายใต้ที่นอน)
+  const SC = (st) => D(st).school ?? {};
+  const NS = (st) => N(st).school ?? {};
+  // ยุคระเบียบเข้ม: ตั้งแต่ปี strict_year
+  const strict = (st) => year(st) >= (NS(st).strict_year ?? Infinity);
+  // มาคนเดียว (Demo alone): บ้านไกลสนามและฐานะจน — ใช้ทั้งวันพบญาติและลาพัก
+  const alone = (st) => examFar(st) && clsGroup(st) === 'poor';
+  // เงินเก็บต่อปีของบ้านตามฐานะ (ค่าลาออก · เงินช่วยเหลือเมื่อตาย) · บ้านมีเงินเก็บกี่ปี
+  const saveOf = (st) => NS(st)[`save_${clsGroup(st)}`] ?? 0;
+  const stockOf = (st) => (NS(st)[`stock_${clsGroup(st)}`] ?? 0) * saveOf(st);
+  const baht = (n) => Math.round(n).toLocaleString('en-US');
+  // {ผู้ใหญ่} ในบทโรงเรียนใช้ความหมายแบบ Demo: มีทั้งพ่อและแม่ = "พ่อกับแม่" (ต่างจากทั้งเกมที่เป็นคนเดียว)
+  const ADULT = { both: 'พ่อกับแม่', mother: 'แม่', fatherOnly: 'พ่อ' };
+  const schoolSub = (st, s) => String(s ?? '')
+    .replaceAll('{ผู้ใหญ่}', ADULT[family(st)] ?? 'ป้า')
+    .replaceAll('{เหล่า}', BT(st, info(st).branch ?? 'army'))
+    .replaceAll('{บรรทัดยกกอง}', has(st, 'cadet_n9_squad') ? SC(st).squadFence ?? '' : '')
+    .replace(/ {2,}/g, ' ');
+  const pickText = (st, base, by) => (by ?? []).find((x) => condOk(st, x.when))?.text ?? base;
+
+  // โอกาสตายของทางเสี่ยง = ตั้งต้น + เพิ่มตามร่างกายที่ขาดจาก h_ref ทุก 10 แต้ม · ยุคเข้มคูณตัวคูณของฉากนั้น (ไม่มีตัวคูณ = ไม่ลด เช่น หอฝึก)
+  function riskP(st, key) {
+    const n = NS(st), d = Math.max(0, (n.h_ref ?? 90) - st.health) / 10;
+    const mult = strict(st) ? n[`era_${key.slice(0, 2)}`] ?? 1 : 1;
+    return ((n[`p_${key}`] ?? 0) + (n[`s_${key}`] ?? 0) * d) * mult;
+  }
+  // น้ำหนักผลสุ่ม: a/b = สัดส่วนผลสองทาง · friend = เพื่อนร่วมกองตายที่เดินแดด · complaint = ร้องเรียนได้ผล · ตัวเลข = ใช้ตรง ๆ
+  function weightOf(st, w) {
+    const n = NS(st), ow = n.outcome_weights ?? [3, 1];
+    const friend = strict(st) ? n.p_friend_18_strict ?? 0 : n.p_friend_18 ?? 0;
+    const complaint = strict(st) ? n.complaint_post ?? 0 : n.complaint_pre ?? 0;
+    return { a: ow[0], b: ow[1], friend, friend_safe: 1 - friend, complaint, complaint_fail: 1 - complaint }[w] ?? (typeof w === 'number' ? w : 1);
+  }
+  // บุญ/บาปของบทโรงเรียน (merit: {หมวด: ระดับ}) เข้าบัญชีบุญบาปเหมือนการ์ดปกติ
+  function schoolMerit(st, m, key) {
+    if (!m || !st.ledger) return;
+    for (const f of recordMerit(st.ledger, Object.entries(m).map(([cat, level]) => ({ cat, level })), key)) st.flags[f] = true;
+  }
+  // สุ่มการ์ดกองของปีนั้นครั้งเดียวตอนต้นปี จากทุกช่อง @ ของปี (เหมือน Demo drawPool)
+  function drawSchool(st, y) {
+    const Sc = st.cadet.school, sc = SC(st), n = NS(st);
+    const slots = (sc.order?.[`year${y}`] ?? []).filter((x) => String(x).startsWith('@')).map((x) => x.slice(1));
+    const pool = slots.flatMap((s) => sc.pools?.[s] ?? []).filter((id) => condOk(st, sc.scenes?.[id]?.when));
+    for (let i = 0; i < (n.pool_rounds ?? 2); i++) {
+      if (rand(st) >= (n.pool_chance ?? 0.5)) continue;
+      const avail = pool.filter((id) => !Sc.drawn.includes(id));
+      if (avail.length) Sc.drawn.push(pickOne(st, avail));
+    }
+  }
+  // ร่างกายฟื้นตอนปิดภาค ไม่เกิน rest_cap
+  const heal = (st, add) => { const cap = NS(st).rest_cap ?? 100; if (st.health < cap) st.health = Math.min(cap, st.health + add); };
+
+  // เริ่มเฟส 3 ต่อจากการ์ดรายงานตัว
+  S.schoolStart = (st) => {
+    const K = st.cadet;
+    K.p2 = null;
+    K.school = { yi: 0, queue: [...(SC(st).order?.year1 ?? []), '#year2'], drawn: [], cur: null };
+    drawSchool(st, 1);
+    K.steps = [['school']];
+    return null;
+  };
+  S.school = (st) => {
+    const K = st.cadet, Sc = K.school, sc = SC(st), n = NS(st);
+    if (!Sc) return null;
+    while (Sc.queue.length) {
+      const id = Sc.queue.shift();
+      if (id === '#rest_term') { heal(st, n.rest_term ?? 0); continue; }
+      if (id === '#rest_year2') { heal(st, n.rest_year2 ?? 0); continue; }
+      if (id === '#field_drain') { st.health = Math.max(0, st.health - (n.field_drain ?? 0)); continue; }
+      if (id === '#year2') {
+        // จบปี 1: รอขึ้นปีหน้า (P3 ฮับเคาะ: ปี 2 = อายุถัดไป) แล้วสุ่มกองปี 2
+        Sc.yi = 1;
+        Sc.queue = [...(sc.order?.year2 ?? [])];
+        drawSchool(st, 2);
+        K.waitAge = st.age + 1;
+        K.steps.unshift(['school']);
+        return 'HOLD';
+      }
+      if (id.startsWith('@')) {
+        const slot = sc.pools?.[id.slice(1)] ?? [];
+        Sc.queue.unshift(...slot.filter((x) => Sc.drawn.includes(x)));
+        continue;
+      }
+      const c = sc.scenes?.[id];
+      if (!c || !condOk(st, c.when)) continue;
+      // SB-27b พิธีแต่งเครื่องแบบปกติ: คำนำหน้าเปลี่ยนจาก นรม. เป็น นตท. ตอนฉากขึ้น (เจ้าของเคาะ 2026-11-11)
+      if (c.setTitle) st.title = c.setTitle;
+      Sc.cur = id;
+      K.steps.unshift(['school']);
+      const lines = (xs) => (xs ?? []).filter((x) => condOk(st, x.when)).map((x) => schoolSub(st, x.line));
+      const text = [...lines(c.preLines), schoolSub(st, pickText(st, c.text, c.textBy)), ...lines(c.contextLines)].filter(Boolean).join(' ');
+      const options = (c.options?.length ? c.options : [{ label: 'ต่อ' }]).map((o) => ({ ...o, label: schoolSub(st, o.label), ...(o.hint && { hint: schoolSub(st, o.hint) }), _school: true }));
+      return { id: `school:${id}`, title: c.title, text, options };
+    }
+    // จบลำดับ (จบปี 2 หรือยังไม่มีบทปี 2): เข้า track โรงเรียนนายร้อยเดิมต่อ (ตั้งไว้ตั้งแต่รายงานตัว)
+    K.school = null;
+    return 'END';
+  };
+
+  // ออกจากโรงเรียนกลางทาง: ล้างลำดับ แล้วให้ life.mjs พากลับ ม.ปลาย / หางาน
+  function exitSchool(st, flag) {
+    if (flag) st.flags[flag] = true;
+    st.cadet.school = null;
+    st.cadet.steps = [];
+    leaveCadetSchool(st);
+  }
+  // การ์ดออกเพราะบาดเจ็บ (ต่อจากผลไหล่หลุด)
+  S.medicalOut = (st) => {
+    const m = SC(st).medicalOut ?? {};
+    exitSchool(st, 'cadet_medical_out');
+    return status(m.title ?? 'ออกจากโรงเรียนเพราะบาดเจ็บ', schoolSub(st, m.text));
+  };
+
+  function chooseSchool(st, o) {
+    const K = st.cadet, Sc = K.school, id = Sc.cur, c = SC(st).scenes?.[id] ?? {}, n = NS(st);
+    K.cur = null;
+    Sc.cur = null;
+    const evId = `cadet:school:${id}`;
+    // ฉากเสี่ยง: ทอยก่อนผลของตัวเลือก · ตาย = ฉากสุดท้าย แล้วเข้าด่านตายเดียวของเกม (สัญญารอดตาย/ศาลยังทำงาน)
+    if (o.risk && rand(st) < riskP(st, o.risk)) {
+      const aid = `${sub(SC(st).deathAid, { เงินช่วย: baht((n.k_death ?? 0) * saveOf(st)) })}${has(st, 'family_debt') ? SC(st).deathAidDebt ?? '' : ''}`;
+      st.queue.push(S.res(st, [schoolSub(st, SC(st).lastScene?.[id]), aid].filter(Boolean).join('\n'), TAG_MID, evId));
+      const fate = dieMidYear(st, 'training');
+      if (fate === 'dead') st.cadet = null;
+      return;
+    }
+    const hBefore = st.health;   // ร่างกายก่อนบาดเจ็บ ใช้สุ่มว่าต้องออกไหม (ฮับเคาะ 2026-11-16)
+    applyFx(st, o.fx);
+    setFlags(st, o);
+    schoolMerit(st, o.merit, `cadet:${id}`);
+    const fxSum = { ...o.fx };
+    let result = pickText(st, o.result, o.resultBy), pick = null;
+    const outs = o.outcomes ?? [];
+    if (outs.length) {
+      const ws = outs.map((x) => weightOf(st, x.weight));
+      let r = rand(st) * ws.reduce((s, w) => s + w, 0);
+      pick = outs.at(-1);
+      for (let i = 0; i < outs.length; i++) if ((r -= ws[i]) < 0) { pick = outs[i]; break; }
+      result = pickText(st, pick.result, pick.resultBy) ?? result;
+      applyFx(st, pick.fx);
+      setFlags(st, pick);
+      schoolMerit(st, pick.merit, `cadet:${id}`);
+      for (const [k, v] of Object.entries(pick.fx ?? {})) fxSum[k] = (fxSum[k] ?? 0) + v;
+    }
+    // ลาออกเอง: ค่าชดใช้ = k × เงินเก็บต่อปีของบ้าน × ปีที่เรียน (ปัดขึ้น อย่างน้อย 1) · บ้านเงินไม่พอ = ไปกู้ (ธงหนี้ลาออก แยกจากหนี้ค่าติว)
+    if (o.resign) {
+      const cost = (n.k_resign ?? 0) * saveOf(st) * Math.max(1, Sc.yi + 1);
+      const poor = stockOf(st) < cost;
+      if (poor) {
+        result = o.resultPoor ?? result;
+        applyFx(st, o.fxPoor);
+        for (const f of o.setFlagsPoor ?? []) st.flags[f] = true;   // บ้านกู้มาจ่าย = cadet_resign_debt (ตั้งจากบท)
+      }
+      exitSchool(st);
+      if (result) K.steps.unshift(['res', schoolSub(st, result), fxTag(fxSum), evId]);
+      return;
+    }
+    const lines = [schoolSub(st, result), schoolSub(st, o.tail)];
+    if (c.resultTail && condOk(st, c.resultTail.when)) lines.push(schoolSub(st, c.resultTail.line));
+    // ไหล่หลุด: สุ่มต้องออก (ตั้งต้น + เพิ่มตามร่างกายก่อนบาดเจ็บที่ขาด) · ไม่ต้องออก = บทรอด เรียนต่อ
+    let medOut = false;
+    if (pick?.injure) {
+      const p = (n.p_medical_out ?? 0) + (n.s_medical_out ?? 0) * Math.max(0, (n.h_ref ?? 90) - hBefore) / 10;
+      if (rand(st) < p) medOut = true;
+      else {
+        const m = SC(st).medicalStay ?? {};
+        lines.push(schoolSub(st, m.result));
+        applyFx(st, m.fx);
+        setFlags(st, m);
+      }
+    }
+    // ตามพี่พลเอกออกไป: สุ่มถูกจ่าขมจับที่ช่องรั้ว (ทางขอกลับก่อนไม่ถูกจับ เพราะข้ามฉากนั้นไปเอง)
+    const next = o.nextCaught && rand(st) < (n.p_n9_caught ?? 0) ? o.nextCaught : o.next ?? (c.options?.length ? null : c.next);
+    if (next) Sc.queue.unshift(...next);
+    if (o.skip) Sc.queue = Sc.queue.filter((x) => !o.skip.includes(x));
+    if (medOut) K.steps = [['medicalOut']];
+    const text = lines.filter(Boolean).join('\n');
+    if (text) K.steps.unshift(['res', text, fxTag(fxSum), evId]);
+  }
 
   // ไม่ติด: การ์ดจากเนื้อหา (ตามอายุ) + เหตุที่ตก · อายุยังไม่เกินและไม่ได้เลิก = ปีหน้ายังอยู่ในเส้น
   S.failed = (st) => {
