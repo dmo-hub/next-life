@@ -3247,11 +3247,14 @@ const CADET = (() => {
   const baht = (n) => Math.round(n).toLocaleString('en-US');
   // {ผู้ใหญ่} ในบทโรงเรียนใช้ความหมายแบบ Demo: มีทั้งพ่อและแม่ = "พ่อกับแม่" (ต่างจากทั้งเกมที่เป็นคนเดียว)
   const ADULT = { both: 'พ่อกับแม่', mother: 'แม่', fatherOnly: 'พ่อ' };
-  const schoolSub = (st, s) => String(s ?? '')
+  // ชื่อเพื่อนในบทชนกับชื่อผู้เล่น (หรืออ่านเหมือนกัน) = ใช้ชื่อสำรองจาก school.friendNames แทนเพื่อนคนนั้น (ช่วง 5b ฮับเคาะ 2026-11-16)
+  // แทนก่อนเติม {ชื่อ} ชื่อผู้เล่นจึงไม่ถูกแทนตาม
+  const friendSub = (st, s) => Object.entries(SC(st).friendNames ?? {}).reduce((t, [name, f]) => ([].concat(f?.same ?? name).includes(st.name) && f?.alt ? t.replaceAll(name, f.alt) : t), s);
+  const schoolSub = (st, s) => friendSub(st, String(s ?? '')
     .replaceAll('{ผู้ใหญ่}', ADULT[family(st)] ?? 'ป้า')
     .replaceAll('{เหล่า}', BT(st, info(st).branch ?? 'army'))
     .replaceAll('{บรรทัดยกกอง}', has(st, 'cadet_n9_squad') ? SC(st).squadFence ?? '' : '')
-    .replace(/ {2,}/g, ' ');
+    .replace(/ {2,}/g, ' '));
   const pickText = (st, base, by) => (by ?? []).find((x) => condOk(st, x.when))?.text ?? base;
 
   // โอกาสตายของทางเสี่ยง = ตั้งต้น + เพิ่มตามร่างกายที่ขาดจาก h_ref ทุก 10 แต้ม · ยุคเข้มคูณตัวคูณของฉากนั้น (ไม่มีตัวคูณ = ไม่ลด เช่น หอฝึก)
@@ -3326,7 +3329,7 @@ const CADET = (() => {
       const lines = (xs) => (xs ?? []).filter((x) => condOk(st, x.when)).map((x) => schoolSub(st, x.line));
       const text = [...lines(c.preLines), schoolSub(st, pickText(st, c.text, c.textBy)), ...lines(c.contextLines)].filter(Boolean).join(' ');
       const options = (c.options?.length ? c.options : [{ label: 'ต่อ' }]).map((o) => ({ ...o, label: schoolSub(st, o.label), ...(o.hint && { hint: schoolSub(st, o.hint) }), _school: true }));
-      return { id: `school:${id}`, title: pickText(st, c.title, c.titleBy), text, options };   // titleBy = ชื่อฉากตามยุค (SB-22)
+      return { id: `school:${id}`, title: schoolSub(st, pickText(st, c.title, c.titleBy)), text, options };   // titleBy = ชื่อฉากตามยุค (SB-22)
     }
     // จบลำดับ (จบปี 2 หรือยังไม่มีบทปี 2): เข้า track โรงเรียนนายร้อยเดิมต่อ (ตั้งไว้ตั้งแต่รายงานตัว)
     K.school = null;
@@ -4808,7 +4811,7 @@ function startSchool(st, year) {
 function releaseTrack(st, out) {
   if (!st.trackWait || cadetLive(st)) return;
   st.trackWait = false;
-  const track = !st.flags.cadet_passed && st.school && TRACKS[st.school];
+  const track = !(st.flags.cadet_passed && !leftCadet(st)) && st.school && TRACKS[st.school];
   if (track) trackExit(st, track, st.birthYear + st.age, out);
 }
 // เลิกสอบแล้ว (cadet_let_go) ประตูไม่นับ: คนสละที่นั่งถือประตูข้ามปีไว้รอการ์ดสอบซ้ำ ถ้าเลิกกลางทาง ประตูไม่มีปีสอบมาล้าง
@@ -4816,6 +4819,7 @@ const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet
 // ออกจากโรงเรียนเตรียมทหารกลางทาง (เฟส 3 · ลาออกเอง หรือ ออกเพราะบาดเจ็บ · เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16)
 // เอาคำนำหน้านักเรียนออก แล้วกลับไปเรียน ม.ปลายตามเดิม · อายุถึงวันจบ ม.ปลายแล้ว = ไปการ์ดหางาน (track ที่เลยวันจบไปแล้วไม่จบเอง)
 function leaveCadetSchool(st) {
+  (st.cadetInfo ??= { tries: 0 }).left = true;   // จำว่าออกแล้ว: ทางหางาน/ด่านจบ ม.ปลายกลับมาเป็นแบบคนทั่วไป (ช่วง 5b ฮับเคาะ 2026-11-16)
   if (CADET_TITLES.includes(st.title)) delete st.title;
   if (st.age < TRACKS.upper.until) st.school = 'upper';
   else {
@@ -4823,6 +4827,8 @@ function leaveCadetSchool(st) {
     dueJob(st);
   }
 }
+// ออกจากโรงเรียนเตรียมทหารกลางทางแล้ว (ธงสอบติดยังอยู่)
+const leftCadet = (st) => !!st.cadetInfo?.left;
 function dueJob(st) {
   if (cadetLive(st)) st.needJob = true;
   else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
@@ -6112,7 +6118,8 @@ function choose(st, idx, loan) {
   // คำสั่งเสียเลือกได้หลายข้อ: สั่งเรื่องหนึ่งแล้วการ์ดกลับมาให้สั่งต่อ ข้อที่สั่งแล้วล็อกด้วยธงของมันเอง
   if (ev.id === FUNERAL.wishes && (c.sets_flags ?? []).some((f) => f.startsWith('wish_'))) after.push({ kind: 'eraEvent', ev, age: st.age });
   // เลิกเรียนแล้วหางานทันที
-  if (st.needJob && st.flags.cadet_passed) st.needJob = false;   // สอบติดเตรียมทหารแล้ว ไม่ต้องหางาน
+  // สอบติดเตรียมทหารแล้ว ไม่ต้องหางาน — ยกเว้นคนที่ออกจากโรงเรียนกลางทางแล้ว (ลาออก/บาดเจ็บ · ธงสอบติดยังคงไว้ตามที่ฮับเคาะ) ต้องหางานได้ตามปกติ
+  if (st.needJob && st.flags.cadet_passed && !leftCadet(st)) st.needJob = false;
   // ด่านจบ ม.6/ปวช. ที่รอผล: เลิกฝันจากการ์ดปกติ (ทางปิดลำดับเส้นสอบอยู่ใน nextCard)
   releaseTrack(st, after);
   if (st.needJob && !cadetLive(st)) {

@@ -1205,11 +1205,14 @@ const CADET = (() => {
   const baht = (n) => Math.round(n).toLocaleString('en-US');
   // {ผู้ใหญ่} ในบทโรงเรียนใช้ความหมายแบบ Demo: มีทั้งพ่อและแม่ = "พ่อกับแม่" (ต่างจากทั้งเกมที่เป็นคนเดียว)
   const ADULT = { both: 'พ่อกับแม่', mother: 'แม่', fatherOnly: 'พ่อ' };
-  const schoolSub = (st, s) => String(s ?? '')
+  // ชื่อเพื่อนในบทชนกับชื่อผู้เล่น (หรืออ่านเหมือนกัน) = ใช้ชื่อสำรองจาก school.friendNames แทนเพื่อนคนนั้น (ช่วง 5b ฮับเคาะ 2026-11-16)
+  // แทนก่อนเติม {ชื่อ} ชื่อผู้เล่นจึงไม่ถูกแทนตาม
+  const friendSub = (st, s) => Object.entries(SC(st).friendNames ?? {}).reduce((t, [name, f]) => ([].concat(f?.same ?? name).includes(st.name) && f?.alt ? t.replaceAll(name, f.alt) : t), s);
+  const schoolSub = (st, s) => friendSub(st, String(s ?? '')
     .replaceAll('{ผู้ใหญ่}', ADULT[family(st)] ?? 'ป้า')
     .replaceAll('{เหล่า}', BT(st, info(st).branch ?? 'army'))
     .replaceAll('{บรรทัดยกกอง}', has(st, 'cadet_n9_squad') ? SC(st).squadFence ?? '' : '')
-    .replace(/ {2,}/g, ' ');
+    .replace(/ {2,}/g, ' '));
   const pickText = (st, base, by) => (by ?? []).find((x) => condOk(st, x.when))?.text ?? base;
 
   // โอกาสตายของทางเสี่ยง = ตั้งต้น + เพิ่มตามร่างกายที่ขาดจาก h_ref ทุก 10 แต้ม · ยุคเข้มคูณตัวคูณของฉากนั้น (ไม่มีตัวคูณ = ไม่ลด เช่น หอฝึก)
@@ -1284,7 +1287,7 @@ const CADET = (() => {
       const lines = (xs) => (xs ?? []).filter((x) => condOk(st, x.when)).map((x) => schoolSub(st, x.line));
       const text = [...lines(c.preLines), schoolSub(st, pickText(st, c.text, c.textBy)), ...lines(c.contextLines)].filter(Boolean).join(' ');
       const options = (c.options?.length ? c.options : [{ label: 'ต่อ' }]).map((o) => ({ ...o, label: schoolSub(st, o.label), ...(o.hint && { hint: schoolSub(st, o.hint) }), _school: true }));
-      return { id: `school:${id}`, title: pickText(st, c.title, c.titleBy), text, options };   // titleBy = ชื่อฉากตามยุค (SB-22)
+      return { id: `school:${id}`, title: schoolSub(st, pickText(st, c.title, c.titleBy)), text, options };   // titleBy = ชื่อฉากตามยุค (SB-22)
     }
     // จบลำดับ (จบปี 2 หรือยังไม่มีบทปี 2): เข้า track โรงเรียนนายร้อยเดิมต่อ (ตั้งไว้ตั้งแต่รายงานตัว)
     K.school = null;

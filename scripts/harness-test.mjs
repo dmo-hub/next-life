@@ -941,6 +941,76 @@ const f2 = (v) => v.toFixed(2);
   check('เฟส 3 ปี 2 เริ่มจริงหลังขึ้นปี (เดินผ่านลูปขึ้นปีของเกม)', alive > 0 && reached === alive, `${reached}/${alive}`);
 }
 
+// เฟส 3 ช่วง 5b (ผลตรวจในเกมจริง 2026-11-16): ออกจากโรงเรียนกลางทางแล้วต้องได้การ์ดหางาน — ธงสอบติดยังอยู่ แต่ไม่ล้างคำขอหางานของคนที่ออกแล้ว
+// เดินลูปปีจริง: ลาออกตอน 18 · ลาออกตอน 16–17 แล้วเลือกหางานที่ด่านจบ ม.ปลาย · ออกเพราะบาดเจ็บ (ทำให้หอฝึกไม่ตายและไหล่หลุดต้องออกเสมอ)
+{
+  const base = loadContent();
+  const medContent = { ...base, cadet: { ...base.cadet, numbers: { ...base.cadet.numbers, school: { ...base.cadet.numbers.school, p_20: 0, p_medical_out: 1 } } } };
+  const run = (content, age, mode, i) => {
+    const st = newLife(mixSeed(0x5c5b, i), content);
+    Object.assign(st, { age, sex: 'ชาย', health: 95, cadetInfo: { tries: 1, order: ['army'] },
+      cadet: { steps: [['p2']], cur: null, p2: { branches: ['army'], written: { army: true }, reason: {}, body: { army: true }, final: ['army'], chosen: 'army', scores: { army: 20 }, askNs: {}, steps: [['arrive', 'army']] } } });
+    const R = makeRng(i);
+    let out = false, job = false;
+    for (let g = 0; g < 1500 && !st.dead && st.age <= age + 4; g++) {
+      const c = nextCard(st);
+      if (c.kind === 'death') break;
+      if (c.id === 'first_job') { job = true; break; }
+      let open = c.choices?.length ? openChoices(c) : [];
+      if (!open.length) continue;
+      const quit = c.choices.findIndex((x) => /ยื่นลาออก/.test(x)), rush = c.choices.findIndex((x) => /ขึ้นเลย ไม่รอเช็ก/.test(x)), work = c.choices.findIndex((x) => x === 'ออกไปหางานทำ');
+      let k;
+      if (mode === 'quit' && quit >= 0 && !out) { k = quit; out = true; }
+      else if (mode === 'med' && rush >= 0) { k = rush; out = true; }
+      else if (out && work >= 0 && open.includes(work)) k = work;
+      else { open = open.filter((x) => x !== quit); k = open[R.int(0, open.length - 1)]; }
+      choose(st, k);
+    }
+    return { out, job, skip: st.dead || !!st.trip || !!st.court || !out };
+  };
+  const tally = (content, age, mode) => {
+    let n = 0, ok = 0;
+    for (let i = 0; i < 12; i++) { const r = run(content, age, mode, i); if (r.skip) continue; n++; if (r.job) ok++; }
+    return { n, ok };
+  };
+  const q18 = tally(base, 18, 'quit'), q16 = tally(base, 16, 'quit'), q17 = tally(base, 17, 'quit'), med = tally(medContent, 16, 'med');
+  check('เฟส 3 ลาออกตอน 18 ได้การ์ดหางาน', q18.n > 0 && q18.ok === q18.n, `${q18.ok}/${q18.n}`);
+  check('เฟส 3 ลาออกตอน 16–17 แล้วเลือกหางานได้การ์ดหางาน', q16.n + q17.n > 0 && q16.ok + q17.ok === q16.n + q17.n, `${q16.ok + q17.ok}/${q16.n + q17.n}`);
+  check('เฟส 3 ออกเพราะบาดเจ็บแล้วได้การ์ดหางาน', med.n > 0 && med.ok === med.n, `${med.ok}/${med.n}`);
+}
+
+// เฟส 3 ช่วง 5b: ผู้เล่นชื่อเดียวกับเพื่อนในบท (ต้อม · แบงค์ · ดุ่ย) = เพื่อนคนนั้นใช้ชื่อสำรองจาก school.friendNames
+// เล่นสองชีวิต seed เดียวกัน ต่างแค่ชื่อ: ข้อความของชีวิตชื่อเพื่อน = ข้อความของชีวิตชื่อปกติที่แทนเพื่อนด้วยชื่อสำรอง แล้วแทนชื่อผู้เล่น
+{
+  const content = loadContent();
+  const parents = [{ sex: 'ชาย', alive: true }, { sex: 'หญิง', alive: true }];
+  const texts = (name, seed) => {
+    const st = { seed, age: 16, birthYear: 2560 - 16, sex: 'ชาย', region: 'กลาง', flags: {}, parents, parentFlags: {}, content, queue: [], due: [], scheduled: [], done: {}, fired: {},
+      cls: 'ชนชั้นกลาง', name, health: 95, healthNatural: 95, knowledge: 80, happiness: 50, relations: 50, network: 50, money: 0, log: [], ledger: newLedger(), cadetInfo: { tries: 1, order: ['army'] },
+      cadet: { steps: [['p2']], cur: null, p2: { branches: ['army'], written: { army: true }, reason: {}, body: { army: true }, final: ['army'], chosen: 'army', scores: { army: 20 }, askNs: {}, steps: [['arrive', 'army']] } } };
+    const R = makeRng(seed), out = [];
+    for (let g = 0; g < 400 && !st.dead; g++) {
+      const c = cadetCard(st);
+      if (!c) { if (st.cadet?.waitAge > st.age) { st.age++; continue; } break; }
+      out.push([c.title, c.text, ...(c.choices ?? [])].join('\n'));
+      if (c.kind === 'result') continue;
+      const open = c.choices.map((_, k) => k).filter((k) => !c.locked[k] && !/ยื่นลาออก/.test(c.choices[k]));
+      chooseCadet(st, open[R.int(0, open.length - 1)] ?? 0);
+    }
+    return out.join('\n');
+  };
+  const fn = content.cadet.school.friendNames ?? {};
+  const bad = [];
+  for (const [friend, f] of Object.entries(fn)) for (const same of [].concat(f.same ?? friend)) {
+    for (let i = 0; i < 6; i++) {
+      const seed = mixSeed(0x5c5c, i);
+      const want = texts('ฆฆฆ', seed).replaceAll(friend, f.alt).replaceAll('ฆฆฆ', same), got = texts(same, seed);   // ฆฆฆ = ชื่อที่ไม่มีในบทแน่ ๆ
+      if (want !== got) { bad.push(`${same}#${i}`); break; }
+    }
+  }
+  check('เฟส 3 ชื่อผู้เล่นชนชื่อเพื่อน = เพื่อนใช้ชื่อสำรอง', Object.keys(fn).length > 0 && bad.length === 0, bad.join(' ') || `${Object.keys(fn).length} ชื่อ`);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {
