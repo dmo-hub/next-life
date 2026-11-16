@@ -4,6 +4,7 @@
 // · ทางในตระกูลเกิดเป็นลูก/หลานจริงที่ยังอยู่ (ชื่อ/เพศ/ปีเกิดตรง)
 // B36a2: คนในบ้านจากไปเองมีการ์ดแจ้งครบ · คนเป้าของการ์ดสุ่ม · bond อยู่ใน floor–100 ทุกการ์ด (เนื้อหายังไม่มี op ลด bond) · การ์ดดูแลพา bond ขึ้นเกินค่าเริ่มได้จริง · ญาติช่วยเกิดได้จริง
 // · สัตว์เลี้ยงตายตรงอายุขัย · เพื่อนรุ่นเกิดปีเดียวกับเรา · สองบทบาทนี้ไม่ตั้งธง
+// #9: %เคยแต่ง (อยู่ถึง 45) ต่างกันระหว่างช่วงปีเกิดไม่เกิน 3 pp · อายุแต่งครั้งแรกเฉลี่ย 24–28
 import { playLife, playAfterlife, nextLife, mixSeed, lifeQx, focusOf, memberAge, newLife, addMember, ageKin, BOND_START, BOND_FLOOR, FILIAL, openChoices, meritId, MERIT_LEVELS } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, random } from './bots.mjs';
@@ -38,6 +39,13 @@ const whoLeft = (text) => WHO_FIXED.reduce((t, w) => t.split(w).join(''), text).
 // B165 รักครั้งใหม่หลังคู่ตาย: ไม่ขึ้นในช่วงไว้ทุกข์ 3 ปี · ขึ้นได้จริง · แต่งรอบสองได้คู่ใหม่ที่ยังอยู่
 const MOURN = 3;
 let loveCards = 0, loveEarly = 0, rewed = 0, rewedBad = 0;
+// #9 อัตราแต่งงานตามรุ่นเกิด (ด่าน ค): %เคยแต่งของคนอยู่ถึง 45 ต่างกันระหว่างช่วงปีเกิด 10 ปีทุกคู่ ≤ WED_SPREAD pp
+// · อายุแต่งครั้งแรกเฉลี่ยอยู่ใน WED_AGE · "เคยแต่ง" = flagAge.married (จดครั้งแรก ไม่ลบตอนคู่จากไป)
+// เทียบกันเองในเกม ไม่ใช่เทียบโลกจริง
+// ช่วงเล็กสุดต่ำกว่า WED_MIN คน (อยู่ถึง 45) = ข้ามข้อส่วนต่าง: noise ของตัวอย่างเล็กเกิน 3 pp เอง (--n 1000 ช่วงเล็กสุด ~350–500 คน ตก 2 ใน 3 seed)
+const WED_SPREAD = 3, WED_AGE = [24, 28], WED_MIN = 2000;
+const wedCohort = new Map();
+const wedAges = [];
 const kidsAt50 = [];
 const roles = { spouse: 0, child: 0, grandchild: 0 };
 const fmt = (v) => v.toFixed(2);
@@ -128,6 +136,14 @@ for (const [bot, pick] of Object.entries(BOTS)) {
     households++;
     if (new Set(names).size !== names.length) nameDup++;
     if (st.age >= 50) kidsAt50.push(st.kin.filter((m) => m.role === 'child').length);
+    const wedAge = st.flagAge?.married;
+    if (wedAge !== undefined) wedAges.push(wedAge);
+    if (st.age >= 45) {
+      const c = wedCohort.get(Math.floor(st.birthYear / 10) * 10) ?? { to45: 0, ever: 0 };
+      c.to45++;
+      if (wedAge !== undefined) c.ever++;
+      wedCohort.set(Math.floor(st.birthYear / 10) * 10, c);
+    }
     // ทางในตระกูล: ถ้ามีลูก/หลานจริงที่ยังอยู่ ผู้เล่นรุ่นถัดไปต้องเป็นหนึ่งในนั้น
     const af = playAfterlife(st, pick);
     if (af.path === 'child' && af.heir) {
@@ -179,6 +195,21 @@ check('  บรรทัดใครมาส่งไม่มีชื่อ�
 check('  ขึ้นได้ทั้งทางอยู่ช่วยงานและแวะครู่เดียว', whoCame && whoAway ? 0 : 1, ` อยู่ ${whoCame} · แวะ ${whoAway}`);
 check(`การ์ดรักใหม่ไม่ขึ้นใน ${MOURN} ปีหลังคู่ตาย (B165)`, loveEarly, ` ${loveCards} ใบ`);
 check('  การ์ดรักใหม่ขึ้นได้ · แต่งรอบสองได้คู่ใหม่', loveCards && rewed ? rewedBad : 1, ` แต่ง ${rewed} ชีวิต`);
+{
+  const rows = [...wedCohort].sort((a, b) => a[0] - b[0]).map(([from, c]) => ({ from, ...c, pct: (100 * c.ever) / Math.max(1, c.to45) }));
+  const spread = (rs) => Math.max(...rs.map((r) => r.pct)) - Math.min(...rs.map((r) => r.pct));
+  const ageMean = wedAges.reduce((s, v) => s + v, 0) / Math.max(1, wedAges.length);
+  const inAge = (v) => v >= WED_AGE[0] && v <= WED_AGE[1];
+  console.log(`แต่งงานตามรุ่นเกิด (#9) · %เคยแต่ง (อยู่ถึง 45): ${rows.map((r) => `${r.from} ${r.pct.toFixed(1)}% (${r.to45})`).join(' · ')}`);
+  const small = Math.min(...rows.map((r) => r.to45));
+  if (small < WED_MIN) console.log(`%เคยแต่งต่างกันระหว่างช่วงปีเกิด ≤ ${WED_SPREAD} pp ${spread(rows).toFixed(1)} pp → ข้าม (ช่วงเล็กสุด ${small} คน < ${WED_MIN} · รัน --n 5000)`);
+  else check(`%เคยแต่งต่างกันระหว่างช่วงปีเกิด ≤ ${WED_SPREAD} pp`, rows.length >= 2 && spread(rows) <= WED_SPREAD ? 0 : 1, ` ${spread(rows).toFixed(1)} pp · ${rows.length} ช่วง · ช่วงเล็กสุด ${small} คน`);
+  // ตัวควบคุม: ตัดคนเคยแต่งของช่วงแรกลงครึ่ง ส่วนต่างต้องเกินกรอบ
+  const cut = rows.map((r, i) => (i ? r : { ...r, pct: r.pct / 2 }));
+  check('  ตัวควบคุม ช่วงแรกแต่งครึ่งเดียว ต้องหลุดกรอบ', spread(cut) > WED_SPREAD ? 0 : 1, ` ${spread(cut).toFixed(1)} pp`);
+  check(`อายุแต่งครั้งแรกเฉลี่ย ${WED_AGE.join('–')}`, wedAges.length && inAge(ageMean) ? 0 : 1, ` ${fmt(ageMean)} ปี · ${wedAges.length} คน`);
+  check('  ตัวควบคุม อายุ +5 ปี ต้องหลุดกรอบ', inAge(ageMean + 5) ? 1 : 0, ` ${fmt(ageMean + 5)}`);
+}
 
 // สัตว์เลี้ยง/เพื่อนรุ่น: ยังไม่มีเนื้อหาใช้ — ทดสอบกับชีวิตจริงที่เติมสมาชิกเอง
 {
