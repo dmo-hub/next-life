@@ -3585,13 +3585,26 @@ function digestRest(card) {
 }
 
 // ภาคเสริม (DLC) ระดับเครื่องแบบสมุดฉายา: ปลดแล้วอยู่ทุกตระกูลในเครื่องนี้ · ค่าเริ่ม = ล็อกหมด · เงื่อนไขปลดจริงเป็นใบ 03
-// สวิตช์ทดสอบ ?dlc=all = เปิดหมดเฉพาะหน้านี้ ไม่เขียนลงเครื่อง · อ่านพังได้ (โหมดส่วนตัว) = ล็อกหมด
+// สวิตช์ทดสอบ ?dlc=all = เปิดหมดเฉพาะหน้านี้ ไม่เขียนลงเครื่อง · มีผลเฉพาะโฮสต์ dev (localhost/127.0.0.1/::1 · เปิดจากไฟล์) ผู้เล่นจริงพิมพ์แล้วไม่มีผล
+// อ่านพังได้ (โหมดส่วนตัว) = ล็อกหมด
 const DLC_KEY = 'next-life-dlc-v1';
+const devHost = () => ['', 'localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+// ผู้เล่นเดิม (ก่อนมีสวิตช์ DLC · เครื่องไม่มี DLC_KEY): ปลดตามร่องรอยที่เล่นมาแล้ว — migration-options.md ข
+// memorial มีแถว = เคยตายจนจบ ≥ 1 ชีวิต → ปรโลก · สมุดสกิลมีรหัส :i/:t = เคยจบชาติต่างโลก/ทริปต่างโลก → ต่างโลก+ซ้อนทับ (ครบเงื่อนไข 26ข) · ดันเจียนไม่ปลด
+// ก้อนหลังต้องมีก้อนก่อนเสมอ (เงื่อนไขปลดต่อเนื่อง) · ทำครั้งเดียวต่อเครื่อง: เครื่องใหม่ก็เขียนค่าล็อกหมดไว้ ไม่งั้นการ์ดศาลครั้งแรกจะถูกนับเป็นผู้เล่นเดิมแล้วไม่มีป้ายแจ้งปลด
+function dlcMigrate() {
+  const trip = skillsRead().e.some((x) => /:[it]\d*$/.test(String(x)));
+  const b = { afterlife: trip || memoRead().l.length > 0, isekai: trip, overlap: trip, dungeon: false };
+  dlcWrite(b);
+  return b;
+}
 function dlcDevice() {
   try {
-    if (new URLSearchParams(location.search).get('dlc') === 'all') return { ...DLC_OPEN };
-    const b = JSON.parse(localStorage.getItem(DLC_KEY) ?? '{}');
-    return Object.fromEntries(DLC_KEYS.map((k) => [k, b[k] === true]));
+    if (devHost() && new URLSearchParams(location.search).get('dlc') === 'all') return { ...DLC_OPEN };
+    const raw = localStorage.getItem(DLC_KEY);
+    if (raw === null) return dlcMigrate();
+    const b = JSON.parse(raw);
+    return Object.fromEntries(DLC_KEYS.map((k) => [k, b?.[k] === true]));
   } catch {
     return { ...DLC_LOCKED };
   }
