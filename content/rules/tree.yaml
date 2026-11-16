@@ -69,6 +69,43 @@ nodes:
     fx: { happiness: 1, relations: 1 }
     light: { happiness: 1 }
     roll: 1
+  o5:
+    name: บวชเรียน
+    branch: occ
+    size: b
+    stages: [วัยรุ่น, หนุ่มสาว, ทำงาน]
+    pre: [o3]
+    years: 4
+    cards: 2
+    cat: [belief]
+    fx: { happiness: 1, knowledge: 1 }
+    light: { happiness: 1 }
+    roll: 1
+    gate:
+      title: ครบพรรษาแรก
+      text: ครบพรรษาแรกแล้ว ท่านเจ้าอาวาสถามว่าจะเอายังไงต่อ
+      results:
+        - text: สึกกลับมาใช้ชีวิตทางโลก
+          fx: { knowledge: 1, happiness: 1 }
+        - text: อยู่ต่ออีกพรรษา
+          fx: { happiness: 2, relations: -1 }
+        - text: ฝากตัวเป็นลูกศิษย์ท่านเจ้าอาวาส ทำงานวัดต่อ
+          fx: { knowledge: 1, relations: 1 }
+  o8:
+    name: ออกจากทางโลก
+    branch: occ
+    size: k
+    keystone: true
+    stages: [กลางคน, ชรา]
+    pre: [o5]
+    years: 5
+    cards: 2
+    cat: [belief]
+    fx: { happiness: 2, knowledge: 1 }
+    light: { happiness: 1 }
+    roll: 1
+    cost: { relations: -1 }
+    warn: ออกจากทางโลกแล้วย้อนกลับไม่ได้ ใจสงบขึ้นมาก แต่คนที่บ้านจะห่างออกไปตลอดชีวิต
   o6:
     name: ศึกษาสายลี้ลับ
     branch: occ

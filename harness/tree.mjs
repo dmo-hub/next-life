@@ -13,7 +13,7 @@ const TARGET = 'occ';
 const content = loadContent();
 const defs = content.tree.nodes;
 
-const bot = withTree(random, TARGET);
+const bot = withTree(withGate(random), TARGET);
 const lives = (ctl = {}) => {
   Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false, passive: true }, ctl);
   const out = [];
@@ -135,6 +135,20 @@ const T = content.tree;
 // ผู้ปลดจริงของด่านนี้: ที่นับการ์ดทุกหมวด (ตัวเลือกเสนอเจ้าของข้างบน) — ด่านเกณฑ์เจ้าของข้อ 84/86 ตกอยู่ก่อนแล้วจึงไม่มีชีวิตที่ปลดอะไรเลยในกลุ่มหลัก · ผลติดตัววัดกับกลุ่มที่ปลดได้ ไม่ผ่อนเกณฑ์เจ้าของ
 treeCtl.anyCat = true;
 const pop = lives({ anyCat: true });
+// การ์ดด่านของโหนดใหญ่จริง (ใบ 05): วัดกับกลุ่มที่ปลดได้ (anyCat) เหมือนผลติดตัว · o5 ต้องมีการ์ดด่านโผล่ และผลทุกทางถูกเลือก ≥1 ครั้ง · o8 (keystone) ได้เฉพาะที่บอททุ่มเอง
+{
+  const bigs = Object.keys(defs).filter((id) => defs[id].gate);
+  for (const id of bigs) {
+    const k = defs[id].gate.results.length;
+    const picked = Array.from({ length: k }, (_, j) => pop.filter(({ st }) => st.tree?.gate?.[id] === j).length);
+    const total = picked.reduce((a, b) => a + b, 0);
+    console.log(`การ์ดด่านจริง ${id}: ตอบแล้ว ${total}/${n} ชีวิต · ผลแต่ละทาง ${picked.join('/')}`);
+    if (n >= 100 && !total) fails.push(`การ์ดด่าน ${id} ไม่เคยโผล่ในกลุ่มที่ปลดได้`);
+    if (n >= 100 && total >= 30) picked.forEach((c, j) => { if (!c) fails.push(`ผลทางที่ ${j + 1} ของการ์ดด่าน ${id} ไม่เคยถูกเลือก`); });
+  }
+  const keys = Object.keys(defs).filter((id) => defs[id].keystone);
+  for (const id of keys) console.log(`keystone ${id}: ปลด ${pop.filter(({ st }) => st.tree?.done?.[id] !== undefined).length}/${n} ชีวิต (บอททุ่มเองหลัง ack)`);
+}
 treeCtl.anyCat = false;
 
 // 1) งบ (ข้อ 93): ผลเบาถาวรรวมทั้งต้น/ปี ≤ เพดานในทะเบียน · แสดงเทียบโฟกัสเดิมตัวแรงสุดเพื่อประกอบการเคาะ
