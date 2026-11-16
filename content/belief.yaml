@@ -526,3 +526,52 @@ events:
       - {id: sit_listen, text: "นั่งฟังพระเทศน์ข้างยาย", effects: {happiness: 1}, merit: [{cat: neutral}]}
       - {id: ask_story, text: "ถามยายว่าทำไมต้องไปวัด", effects: {relations: 1}, merit: [{cat: neutral}]}
       - {id: play_home, text: "อยู่บ้านเล่นกับเพื่อนบ้านแทน", merit: [{cat: neutral}]}
+
+  # ช่วงวัยรุ่น (ใบ 16 · ข้อ 91) — เพิ่มการ์ดหมวด belief วัย 13–18 ให้โหนด o2 ปลดได้ · เล่าแบบเคารพ ไม่บอกว่าพิธีได้ผล
+  - id: bel_teen_camp_invite
+    type: B
+    category: belief
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 2
+    title: "ชวนไปค่ายธรรมะปิดเทอม"
+    text: "โรงเรียนแปะประกาศค่ายธรรมะปิดเทอม เพื่อนสนิทสองคนจะไป ครูประจำชั้นถามว่าสนใจไหม"
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: merit_wish, tradition: พุทธ}
+    choices:
+      - {id: full_camp, text: "ไปค่ายเต็มช่วงปิดเทอม", effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
+      - {id: last_day, text: "ไปแค่วันสุดท้าย", merit: [{cat: neutral}]}
+      - {id: stay_home, text: "ไม่ไป อยู่บ้านพักผ่อน", merit: [{cat: neutral}]}
+      - {id: go_with_friend, text: "ขอไปกับเพื่อนแต่ไม่เอาของไปเอง", merit: [{cat: neutral}]}
+
+  - id: bel_teen_friend_fortune
+    type: B
+    category: belief
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 2
+    title: "เพื่อนดูดวงให้"
+    text: "เพื่อนในห้องเอาไพ่มาเปิดดูดวงให้ทุกคนช่วงพักเที่ยง ไพ่ใบของเรามีคำเตือนเรื่องสอบ"
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: fortune, tradition: ผสม}
+    choices:
+      - {id: see_through, text: "ขอดูของตัวเองจนจบ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: laugh_off, text: "ขำแล้วเปลี่ยนเรื่อง", merit: [{cat: neutral}]}
+      - {id: ask_fix, text: "ถามว่าจะแก้ยังไง", merit: [{cat: neutral}]}
+      - {id: note_down, text: "ขอจดคำทำนายไว้ในสมุด", merit: [{cat: neutral}]}
+
+  - id: bel_teen_grandma_merit
+    type: B
+    category: belief
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 2
+    title: "ใส่บาตรตอนเช้า"
+    text: "ยายปลุกตั้งแต่ตีห้า บอกให้ช่วยถือถุงอาหารไปใส่บาตรหน้าปากซอย"
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: merit_wish, tradition: พุทธ}
+    choices:
+      - {id: help_give, text: "ไปช่วยใส่บาตร", merit: [{cat: dana, level: 1}]}
+      - {id: stand_wait, text: "ไปแต่ยืนรอ", merit: [{cat: neutral}]}
+      - {id: sleep_on, text: "ขอนอนต่อ", merit: [{cat: neutral}]}
+      - {id: buy_own, text: "ไปแต่ขอซื้อของใส่บาตรเอง", cost: {unit: fixed_baht, amount: 20, ref_year: 2560}, merit: [{cat: dana, level: 1}]}
