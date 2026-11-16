@@ -5,7 +5,8 @@
 
 // ตัวควบคุมของ harness: ปิดการนับการ์ด → โหนดที่ต้องตอบการ์ดต้องปลดไม่ได้เลย
 // anyCat / cardsFree = ทางเลือกที่ harness ใช้ทำตารางเสนอเจ้าของเท่านั้น (นับทุกหมวด · ไม่ต้องตอบการ์ด) ห้ามเปิดนอก harness
-export const treeCtl = { cards: true, anyCat: false, cardsFree: false };
+// passive = ผลติดตัวหลังปลด (ผลเบารายปี · ทอย · ถ่วงการ์ด · ใบ 04) ปิด = ปลดแล้วไม่ให้อะไรเลย (ตัวควบคุมของด่านงบ)
+export const treeCtl = { cards: true, anyCat: false, cardsFree: false, passive: true };
 
 // ต้นทางผ่านแล้ว: ไม่มีต้นทาง = เปิดอยู่ · ในแขนงเดียวกันปลดอันใดอันหนึ่งก็พอ (ข้อ 72) · โหนดกลาง (and) ต้องครบทุกต้นทาง
 export const treeReach = (h, def) => {
@@ -51,3 +52,39 @@ export function treeYearEnd(h, defs, stage, age) {
   }
   return { id, unlocked };
 }
+
+// ── ผลติดตัว (ใบ 04) ── ทุกตัวเป็นฟังก์ชันล้วน ไม่ดึงเลขสุ่ม · ไม่เคยปลดอะไร = 1 เท่าเดิมทุกหลัก
+// ทอยทุกโหนดตามหมวดการ์ด คิดรวมต่อแขนง (ข้อ 58): ระดับ = Σ roll ของโหนดที่ปลดแล้วและหมวดตรง · ตัวคูณ = 1 + k × ระดับ (แบบ thaiSkillMul) · ชนเพดาน okMax ที่ปลายทางเอง
+// อาชีพตรง (ข้อ 17 50 53): โหนดที่ระบุ jobs ให้ job_roll เพิ่มอีกชั้นเดียวเมื่ออาชีพที่ทำอยู่ตรง · ซ้อนกี่โหนดก็นับสูงสุดตัวเดียว ไม่ซ้อน 2 ชั้น
+export function treeRollLevel(h, defs, cat, occ = null) {
+  const done = h?.tree?.done;
+  if (!done || !cat || !treeCtl.passive) return 0;
+  let lv = 0, job = 0;
+  for (const id of Object.keys(done)) {
+    const d = defs[id];
+    if (!d?.cat.includes(cat)) continue;
+    lv += d.roll ?? 0;
+    if (occ && d.jobs?.includes(occ)) job = Math.max(job, d.job_roll ?? 0);
+  }
+  return lv + job;
+}
+export const treeRollMul = (h, defs, k, cat, occ = null) => (k > 0 ? 1 + k * treeRollLevel(h, defs, cat, occ) : 1);
+
+// ถ่วงการ์ดถาวรเฉพาะแขนงที่ปลดมากสุด (ข้อ 42): แขนงอื่น = 1 · เสมอกัน = ไม่ถ่วงใคร (ไม่มีแขนงที่ "มากสุด") · ถ่วงหมวดการ์ดที่โหนดของแขนงนั้นนับ
+// จำค่าไว้ต่อสถานะต้นไม้ (เรียกต่อใบในกองทุกปี) — คีย์ = จำนวนโหนดที่ปลด · ไม่เขียนลง st.tree จึงไม่เข้าเซฟ
+const topCache = new WeakMap();
+function topCats(t, defs) {
+  const n = Object.keys(t.done).length;
+  const hit = topCache.get(t);
+  if (hit && hit.n === n && hit.defs === defs) return hit.cats;
+  const cnt = {};
+  for (const id of Object.keys(t.done)) if (defs[id]) cnt[defs[id].branch] = (cnt[defs[id].branch] ?? 0) + 1;
+  const best = Math.max(0, ...Object.values(cnt));
+  const top = Object.keys(cnt).filter((b) => cnt[b] === best);
+  const cats = new Set();
+  if (best > 0 && top.length === 1) for (const d of Object.values(defs)) if (d.branch === top[0]) for (const c of d.cat) cats.add(c);
+  topCache.set(t, { n, defs, cats });
+  return cats;
+}
+export const treeCardMul = (h, defs, mul, cat) => (treeCtl.passive && h?.tree?.done && mul > 1 && topCats(h.tree, defs).has(cat) ? mul : 1);
+export const treeTopCats = (h, defs) => (h?.tree?.done ? [...topCats(h.tree, defs)] : []);

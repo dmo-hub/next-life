@@ -8,11 +8,17 @@ export const TREE_SIZES = ['s', 'b', 'k'];
 const STAGE_SET = new Set(Object.keys(STAGE_AGES));
 const fxLevel = (v) => isInt(v) && v !== 0 && Math.abs(v) <= 3;
 
-export function checkTree(doc) {
+// ผลเบาถาวรรวมทั้งต้น/ปี หน่วยระดับการ์ด/ปี (ข้อ 93) — ใช้ทั้ง lint และ harness `tree`
+export const treeBudgetSpent = (doc) => Object.values(doc.nodes ?? {}).reduce((a, n) => a + Object.values(n.light ?? {}).reduce((b, v) => b + Math.abs(v), 0) * (doc.light_unit?.[n.size] ?? 0), 0);
+
+export function checkTree(doc, jobs = null) {
   const out = [];
   if (!isObj(doc)) return ['ทะเบียนต้นไม้ต้องเป็น object'];
   if (!(typeof doc.year_scale === 'number' && doc.year_scale > 0)) out.push('year_scale ต้องเป็นเลขบวก');
   for (const k of TREE_SIZES) if (!(typeof doc.light_unit?.[k] === 'number' && doc.light_unit[k] > 0)) out.push(`light_unit.${k} ต้องเป็นเลขบวก`);
+  if (!(typeof doc.roll_k === 'number' && doc.roll_k >= 0)) out.push('roll_k ต้องเป็นเลข ≥ 0');
+  if (!(typeof doc.card_mul === 'number' && doc.card_mul >= 1)) out.push('card_mul ต้องเป็นเลข ≥ 1');
+  if (!(typeof doc.budget === 'number' && doc.budget > 0)) out.push('budget ต้องเป็นเลขบวก');
   const nodes = doc.nodes;
   if (!isObj(nodes) || !Object.keys(nodes).length) return [...out, 'nodes ต้องมีอย่างน้อย 1 โหนด'];
   for (const [id, n] of Object.entries(nodes)) {
@@ -31,11 +37,19 @@ export function checkTree(doc) {
       if (p === id) out.push(`${at}.pre ชี้ตัวเอง`);
       else if (!(p in nodes)) out.push(`${at}.pre ชี้โหนด ${p} ที่ไม่มีในทะเบียน`);
     }
+    if (!isInt(n.roll) || n.roll < 0) out.push(`${at}.roll ต้องเป็นจำนวนเต็ม ≥ 0`);
+    if (n.jobs !== undefined && (!Array.isArray(n.jobs) || !n.jobs.length || n.jobs.some((j) => typeof j !== 'string'))) out.push(`${at}.jobs ต้องเป็นรายการ id อาชีพ`);
+    if (n.job_roll !== undefined && (n.jobs === undefined || !isInt(n.job_roll) || n.job_roll < 1)) out.push(`${at}.job_roll ต้องเป็นจำนวนเต็ม ≥ 1 และต้องมี jobs`);
+    if (jobs && Array.isArray(n.jobs)) for (const j of n.jobs) if (!jobs.includes(j)) out.push(`${at}.jobs ไม่รู้จักอาชีพ ${j}`);
+    if (n.jobs !== undefined && n.job_roll === undefined) out.push(`${at}.jobs ต้องมี job_roll`);
     for (const key of ['fx', 'light']) {
       if (!isObj(n[key]) || !Object.keys(n[key]).length) out.push(`${at}.${key} ต้องมีผลอย่างน้อย 1 ค่า`);
       else for (const [k, v] of Object.entries(n[key])) if (!EFFECT_KEYS.includes(k) || k === 'money' || !fxLevel(v)) out.push(`${at}.${key}.${k} ต้องเป็นค่าสถานะระดับ ±1..±3`);
     }
   }
+  // งบผลเบาถาวรรวมทั้งต้น/ปี (ข้อ 42 · 93): Σ |light| × light_unit เกิน budget = ตก
+  const spent = treeBudgetSpent(doc);
+  if (spent > doc.budget) out.push(`งบผลเบาถาวรรวม ${spent.toFixed(3)} เกินเพดาน ${doc.budget}`);
   // วนเป็นวง = ไม่มีโหนดไหนในวงปลดได้เลย
   const state = {};
   const walk = (id, trail) => {

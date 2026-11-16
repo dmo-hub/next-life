@@ -2,7 +2,8 @@
 // ด่านกติกา: ทุกปีที่ทุ่มเข้าหลอดโหนดเดียว · 0 ครั้งที่ทุ่มโหนดที่ปลดแล้ว · ปลดแล้วโหนดถัดไปนับปีถัดไปทันที (ไม่เสียปี) · ตัวควบคุมปิดนับการ์ด = ปลด 0
 // ด่านเกณฑ์ผ่านของเจ้าของ (ข้อ 84 · 86): บอทปลดแขนงลึกลับครบในชีวิตเดียว (o ที่เห็นทั้งหมด + โหนดกลางที่มี o เป็นต้นทาง · o6 ซ่อนไม่นับ)
 // ไม่ครบ = ตก พิมพ์โหนดแรกที่ค้างกับอายุตอนตาย แล้วส่งเจ้าของเคาะ — ห้ามผ่อนเกณฑ์เองในไฟล์นี้
-import { playLife, mixSeed, treeCtl, snapshot, restore } from '../src/engine/index.mjs';
+import { playLife, mixSeed, treeCtl, snapshot, restore, successP, treeRollLevel, treeRollMul, treeCardMul, choiceHidden } from '../src/engine/index.mjs';
+import { treeBudgetSpent } from '../src/node/lint/tree.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { random, withTree, botTree } from './bots.mjs';
 
@@ -14,7 +15,7 @@ const defs = content.tree.nodes;
 
 const bot = withTree(random, TARGET);
 const lives = (ctl = {}) => {
-  Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false }, ctl);
+  Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false, passive: true }, ctl);
   const out = [];
   for (let i = 0; i < n; i++) {
     // ต่อปีที่เริ่ม: จดว่าบอทมีโหนดให้ทุ่มแต่ไม่ได้ทุ่มหรือไม่ (เสียปี) ก่อนการ์ดแรกของปีนั้น
@@ -126,7 +127,109 @@ for (const [label, ctl] of [['นับการ์ดทุกหมวด (ข
   });
   console.log(`  ${label}: ${cols.join(' · ')}`);
 }
-Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false });
+Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false, passive: true });
+
+// ── ผลติดตัว + งบข้อ 42 (ใบ 04) ──
+console.log('\nผลติดตัว (ใบ 04)');
+const T = content.tree;
+// ผู้ปลดจริงของด่านนี้: ที่นับการ์ดทุกหมวด (ตัวเลือกเสนอเจ้าของข้างบน) — ด่านเกณฑ์เจ้าของข้อ 84/86 ตกอยู่ก่อนแล้วจึงไม่มีชีวิตที่ปลดอะไรเลยในกลุ่มหลัก · ผลติดตัววัดกับกลุ่มที่ปลดได้ ไม่ผ่อนเกณฑ์เจ้าของ
+treeCtl.anyCat = true;
+const pop = lives({ anyCat: true });
+treeCtl.anyCat = false;
+
+// 1) งบ (ข้อ 93): ผลเบาถาวรรวมทั้งต้น/ปี ≤ เพดานในทะเบียน · แสดงเทียบโฟกัสเดิมตัวแรงสุดเพื่อประกอบการเคาะ
+const spent = treeBudgetSpent(T);
+const focusMax = Object.values(content.focus.focuses).map((f) => Object.entries(f.fx ?? {}).filter(([k]) => k !== 'money').map(([, v]) => Math.abs(v))).map((a) => ({ sum: a.reduce((x, y) => x + y, 0) * content.focus.year_scale, one: Math.max(0, ...a) * content.focus.year_scale }));
+console.log(`งบผลเบาถาวรรวม ${spent.toFixed(3)} / เพดาน ${T.budget} (ระดับการ์ด/ปี · ข้อ 93) · เทียบโฟกัสเดิมตัวแรงสุด: รวมทุกค่า ${Math.max(...focusMax.map((x) => x.sum)).toFixed(2)} · ค่าเดียว ${Math.max(...focusMax.map((x) => x.one)).toFixed(2)}`);
+if (spent > T.budget) fails.push(`งบผลเบารวม ${spent.toFixed(3)} เกินเพดาน ${T.budget}`);
+
+// ตัวควบคุมงบ: ปิดผลติดตัว (passive) → ทุกชีวิตที่มีโหนดปลด ตัวคูณทอย/ถ่วงการ์ดต้องเป็น 1 พอดี (ต่างจากฐาน 0) · เปิด → ต้องมีชีวิตที่ต่างจาก 1
+const cats = [...new Set(Object.values(defs).flatMap((d) => d.cat))];
+const dev = (rs) => rs.reduce((s, { st }) => s + cats.reduce((a, c) => a + Math.abs(treeRollMul(st, defs, T.roll_k, c) - 1) + Math.abs(treeCardMul(st, defs, T.card_mul, c) - 1), 0), 0);
+const devOn = dev(pop);
+treeCtl.passive = false;
+const devOff = dev(pop);
+treeCtl.passive = true;
+console.log(`ตัวควบคุมงบ: ผลต่างจากฐาน (ทอย + ถ่วงการ์ด) เปิด ${devOn.toFixed(2)} · ปิดผลติดตัว ${devOff.toFixed(2)}`);
+if (!(devOn > 0)) fails.push('ผลติดตัวเปิดแล้วทอย/ถ่วงการ์ดไม่ต่างจากฐานเลย (ไม่มีผล)');
+if (devOff !== 0) fails.push(`ตัวควบคุม: ปิดผลติดตัวแล้วยังต่างจากฐาน ${devOff}`);
+
+// 2) ถ่วงการ์ดเฉพาะแขนงที่ปลดมากสุด (ข้อ 42) — นิยามสังเคราะห์ 2 แขนง (ทะเบียนจริงมีแขนงเดียว)
+{
+  const mk = (branch, cat, extra = {}) => ({ branch, cat: [cat], roll: 1, ...extra });
+  const syn = { a1: mk('A', 'belief'), a2: mk('A', 'belief'), b1: mk('B', 'family') };
+  const w = (done, cat) => treeCardMul({ tree: { done } }, syn, 1.25, cat);
+  const rows = [
+    ['แขนง A ปลดมากสุด → ถ่วงหมวด A', w({ a1: 5, a2: 6, b1: 7 }, 'belief'), 1.25],
+    ['แขนง B ไม่ใช่แขนงมากสุด → 1', w({ a1: 5, a2: 6, b1: 7 }, 'family'), 1],
+    ['เสมอกัน → ไม่ถ่วงใคร (A)', w({ a1: 5, b1: 7 }, 'belief'), 1],
+    ['เสมอกัน → ไม่ถ่วงใคร (B)', w({ a1: 5, b1: 7 }, 'family'), 1],
+    ['ไม่ได้ปลดอะไร → 1', w({}, 'belief'), 1],
+    ['หมวดนอกแขนง → 1', w({ a1: 5, a2: 6 }, 'study'), 1],
+  ];
+  const bad = rows.filter(([, got, want]) => got !== want);
+  console.log(`ถ่วงการ์ดเฉพาะแขนงปลดมากสุด: ${rows.length - bad.length}/${rows.length} เคส${bad.length ? ' · ตก: ' + bad.map(([n, g, wn]) => `${n} ได้ ${g} ต้อง ${wn}`).join(' | ') : ''}`);
+  for (const [n, g, wn] of bad) fails.push(`ถ่วงการ์ด "${n}" ได้ ${g} ต้อง ${wn}`);
+}
+
+// 3) เกณฑ์ข้อ 58: โหนดเดียวเอียงต่ำกว่าขั้นป้าย 5% · ทุกโอกาสสำเร็จ ≤ 0.95 แม้ปลดครบทั้งทะเบียน
+{
+  const okCards = content.events.filter((e) => e.category === 'belief' && e.choices?.some((c) => c.outcomes?.some((o) => o.ok)));
+  const all = Object.fromEntries(Object.keys(defs).map((id) => [id, 1]));
+  let belowStep = 0, lives = 0, maxP = 0, maxOne = 0, hits = 0;
+  for (const { st } of pop.slice(0, 100)) {
+    lives++;
+    const base = { ...st, tree: undefined };
+    let worst = 0;
+    for (const ev of okCards) for (const c of ev.choices) {
+      if (!c.outcomes?.some((o) => o.ok)) continue;
+      const p0 = successP(base, c, ev);
+      for (const id of Object.keys(defs)) {
+        if (!defs[id].cat.includes(ev.category)) continue;
+        worst = Math.max(worst, Math.abs(successP({ ...st, tree: { done: { [id]: 1 } } }, c, ev) - p0));
+      }
+      maxP = Math.max(maxP, successP({ ...st, tree: { done: all } }, c, ev));
+      hits++;
+    }
+    maxOne = Math.max(maxOne, worst);
+    if (worst < 0.05) belowStep++;
+  }
+  console.log(`ข้อ 58: ชีวิตที่โหนดเดียวเอียงต่ำกว่าขั้น 5% ${belowStep}/${lives} (เอียงสูงสุด ${(maxOne * 100).toFixed(1)} จุด) · โอกาสสำเร็จสูงสุดเมื่อปลดครบ ${maxP.toFixed(3)} (เพดาน 0.95) · ${hits} คู่ ชีวิต×ตัวเลือก`);
+  if (belowStep < lives) fails.push(`ข้อ 58: ชีวิต ${lives - belowStep}/${lives} ที่โหนดเดียวเอียงถึงขั้นป้าย 5% (เอียงสูงสุด ${(maxOne * 100).toFixed(1)} จุด)`);
+  if (maxP > 0.95 + 1e-9) fails.push(`ข้อ 58: โอกาสสำเร็จ ${maxP.toFixed(3)} เกินเพดาน 0.95`);
+  if (!hits) fails.push('ข้อ 58: ไม่มีตัวเลือกหมวดความเชื่อที่มีทางสำเร็จให้วัด');
+}
+
+// 4) อาชีพตรงชั้นเดียว (ข้อ 17 50 53) — นิยามสังเคราะห์ (แขนงงานยังไม่ลงทะเบียน)
+{
+  const syn = {
+    w1: { branch: 'W', cat: ['work_money'], roll: 1, jobs: ['clerk'], job_roll: 1 },
+    w2: { branch: 'W', cat: ['work_money'], roll: 1, jobs: ['clerk', 'officer'], job_roll: 2 },
+  };
+  const h = { tree: { done: { w1: 5, w2: 6 } } };
+  const rows = [
+    ['อาชีพตรง 2 โหนดซ้อนกัน = ทอยปกติ 2 + โบนัสชั้นเดียว (สูงสุด 2) = 4', treeRollLevel(h, syn, 'work_money', 'clerk'), 4],
+    ['อาชีพไม่ตรง = ทอยปกติ 2 ไม่มีโบนัส', treeRollLevel(h, syn, 'work_money', 'farmer'), 2],
+    ['ไม่มีงาน (occ ว่าง) = ทอยปกติ 2', treeRollLevel(h, syn, 'work_money', null), 2],
+    ['อาชีพตรงเฉพาะโหนดเดียว = ทอย 2 + โบนัส 1', treeRollLevel({ tree: { done: { w1: 5, w2: 6 } } }, { ...syn, w2: { ...syn.w2, jobs: ['officer'] } }, 'work_money', 'clerk'), 3],
+  ];
+  const bad = rows.filter(([, got, want]) => got !== want);
+  console.log(`โบนัสอาชีพตรงชั้นเดียว: ${rows.length - bad.length}/${rows.length} เคส${bad.length ? ' · ตก: ' + bad.map(([n, g, wn]) => `${n} ได้ ${g} ต้อง ${wn}`).join(' | ') : ''}`);
+  for (const [n, g, wn] of bad) fails.push(`อาชีพตรง "${n}" ได้ ${g} ต้อง ${wn}`);
+}
+
+// 5) ตัวเลือกใหม่บนการ์ดเดิม: show_if: {tree: [โหนด]} ซ่อนจนปลดครบทุกโหนดที่ระบุ — ไม่มีป้ายใหม่ (กลไกเดียวกับ show_if อื่น)
+{
+  const c = { show_if: { tree: ['o1', 'o2'] } };
+  const rows = [
+    ['ไม่เคยทุ่ม → ซ่อน', choiceHidden({ tree: undefined, flags: {} }, c), true],
+    ['ปลดไม่ครบ → ซ่อน', choiceHidden({ tree: { done: { o1: 3 } }, flags: {} }, c), true],
+    ['ปลดครบ → โชว์', choiceHidden({ tree: { done: { o1: 3, o2: 8 } }, flags: {} }, c), false],
+  ];
+  const bad = rows.filter(([, got, want]) => got !== want);
+  console.log(`ตัวเลือกใหม่ show_if tree: ${rows.length - bad.length}/${rows.length} เคส${bad.length ? ' · ตก: ' + bad.map(([n]) => n).join(' | ') : ''}`);
+  for (const [n] of bad) fails.push(`show_if tree "${n}"`);
+}
 
 console.log(fails.length ? `\nไม่ผ่าน ${fails.length} ข้อ\n${fails.map((f) => `  ✗ ${f}`).join('\n')}` : '\nผ่านทั้งหมด');
 process.exitCode = fails.length ? 1 : 0;

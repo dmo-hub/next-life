@@ -30,7 +30,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years', 'chance'],
-  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'home_flags', 'overlap_stage', 'dark_gate', 'past_life', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'home_flags', 'overlap_stage', 'dark_gate', 'past_life', 'tree', ...MONEY_KEYS],
   pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
@@ -348,6 +348,7 @@ export const rules = [
       if (w.region !== undefined && !nonEmptySubset(w.region, ctx.regions)) r('.when.region', `region ต้องเป็นรายการจาก ${ctx.regions.join(' · ')}`);
       if (w.province !== undefined && !nonEmptySubset(w.province, ctx.provinces)) r('.when.province', `province ต้องเป็นรายการจากจังหวัดใน data/birthplace.json`);
       if (w.sex !== undefined && !nonEmptySubset(w.sex, SEXES)) r('.when.sex', `sex ต้องเป็นรายการจาก ${SEXES.join(' ')}`);
+      if (w.tree !== undefined && !(Array.isArray(w.tree) && w.tree.length && w.tree.every((id) => ctx.treeIds?.includes(id)))) r('.when.tree', 'tree ต้องเป็นรายการ id โหนดต้นไม้ที่มีในทะเบียน (content/rules/tree.yaml)');
       const top = OVERLAP_STAGE_MIN.length - 1;
       if (w.overlap_stage !== undefined && !isRange(w.overlap_stage, 0, top)) r('.when.overlap_stage', `overlap_stage ต้องเป็น [จาก, ถึง] ขั้น 0–${top} จำนวนเต็ม`);
       if (w.stats !== undefined) {

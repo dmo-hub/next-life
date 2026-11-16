@@ -13,7 +13,7 @@ import { cadetActive, cadetCard, chooseCadet, cadetAfterChoice } from './cadet.m
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
-import { treeOffers, treeInvest, treeCard, treeYearEnd } from './tree.mjs';
+import { treeCtl, treeOffers, treeInvest, treeCard, treeYearEnd, treeRollMul, treeCardMul } from './tree.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
@@ -115,7 +115,7 @@ function signPact(st, p) {
 // น้ำหนักทางผลหลังเอียงตาม multipliers และอารมณ์ · การ์ดที่มีทั้งทางสำเร็จและไม่สำเร็จ ตัดโอกาสสำเร็จรวมไว้ okMin–okMax (B112) โดยปรับสองกลุ่มตามสัดส่วน
 // (ไม่ดึงเลขสุ่มเพิ่ม · ป้าย % กับผลจริงใช้ตัวเดียวกัน)
 const outcomeWeights = (st, ev, c) => {
-  const m = (moodCard(ev) ? moodMul(st) : 1) * pactLuck(st) * thaiSkillMul(st.skills, ev?.category);
+  const m = (moodCard(ev) ? moodMul(st) : 1) * pactLuck(st) * thaiSkillMul(st.skills, ev?.category) * lifeTreeRoll(st, ev?.category);
   const w = c.outcomes.map((o) => o.weight * poolMultiplier(st, o.multipliers) * (o.ok ? m : 1));
   const ok = w.reduce((a, x, i) => a + (c.outcomes[i].ok ? x : 0), 0);
   const all = w.reduce((a, x) => a + x, 0);
@@ -1874,13 +1874,15 @@ function lifeFocusYear(st) {
 export const lifeTreeDefs = (st) => st.content.tree?.nodes ?? {};
 export const treeInvestNode = (st, id) => treeInvest(st, lifeTreeDefs(st), id, stageOf(st.age));
 export const treeOffersNow = (st) => treeOffers(st, lifeTreeDefs(st), stageOf(st.age));
+// ทอยตามแขนง (ใบ 04) ตัวคูณทางสำเร็จของการ์ดหมวด cat · อาชีพนับเมื่อมีงานของตัวเองแล้ว (เหมือน when.occupation)
+export const lifeTreeRoll = (st, cat) => (st.tree && st.content.tree ? treeRollMul(st, st.content.tree.nodes, st.content.tree.roll_k, cat, st.workFrom !== null ? st.occupation : null) : 1);
 function lifeTreeYear(st) {
   const c = st.content.tree;
   if (!st.tree || !c) return;
   const light = Object.keys(st.tree.done).filter((id) => st.tree.done[id] < st.age);
   const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age);
   if (r) applyEffects(st, c.nodes[r.id].fx, c.year_scale);
-  for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size]);
+  if (treeCtl.passive) for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size]);
 }
 
 // เสี่ยงสุ่มของโฟกัส: ทอยจาก stream ของ (seed · อายุ · ข้อ) ไม่แตะ rng ของโลก ชีวิตจึงต่างจากตามน้ำแค่ผลที่เกิดจริง
@@ -1959,8 +1961,9 @@ const GATE_LOCK = 'ยังไม่เคยทุ่มเทกับทา�
 const sexShut = (st, c) => !!c.only_sex && !c.only_sex.includes(st.sex);
 const SEX_LOCK = 'ไม่ใช่ทางของคุณ';
 function lifeFocusMul(st, e) {
-  if (!st.focus) return 1;
-  return focusCardMul(lifeFocusDefs(st)[st.focus], [e.category, ...(e.focus ?? [])], st.content.focus.card_mul);
+  const t = st.tree && st.content.tree ? treeCardMul(st, st.content.tree.nodes, st.content.tree.card_mul, e.category) : 1;
+  if (!st.focus) return t;
+  return t * focusCardMul(lifeFocusDefs(st)[st.focus], [e.category, ...(e.focus ?? [])], st.content.focus.card_mul);
 }
 
 // ไล่ทั้งกองเหตุการณ์ทุกปีกินเวลา harness ราวหนึ่งในห้า — จัดกลุ่มครั้งเดียวต่อชุดเนื้อหา (ผูกกับตัวอาเรย์ แทนทั้งอาเรย์ = กลุ่มใหม่)
@@ -2073,6 +2076,7 @@ export function whenOk(st, when) {
   if (when.home_flags && !homeFlagsOk(st, when.home_flags)) return false;
   if (when.dark_gate && !darkGateOk(st)) return false;
   if (when.past_life && !pastLifeOk(st, when.past_life)) return false;
+  if (when.tree && !when.tree.every((id) => st.tree?.done?.[id] !== undefined)) return false;
   return !when.flags || flagsOk(st, when.flags);
 }
 
