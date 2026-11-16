@@ -4,7 +4,6 @@
 // พิมพ์ตารางอย่างเดียว · --write <ไฟล์> เขียน JSON ไว้ทำหน้า tweak ในเครื่อง (หน้า tweak ใช้แล้วทิ้ง ไม่ commit)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { playLife, playAfterlife, nextLife, mixSeed, horoscope, standingOf } from '../src/engine/index.mjs';
-import { SHOWN_STATS } from '../src/ui/labels.mjs';
 import { artTier, resultArtCat } from '../src/ui/art.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, random, isekaiBot } from './bots.mjs';
@@ -37,26 +36,10 @@ const content = loadContent();
 const byId = Object.fromEntries(content.events.map((e) => [e.id, e]));
 const hasScene = (c) => c && (c.kind === 'era' || (c.kind === 'event' && (byId[c.id]?.era || SCENE_IDS.includes(c.id))));
 
-// ctx: delta = ค่าที่เห็นขยับจากตอนกดตัวเลือกล่าสุด (null = ไม่ได้ต่อจากการกด) · hide = ค่าที่ห้ามเผย · ev = เหตุการณ์ของใบที่กด
-export function resultCat(card, ctx) {
-  if (ctx.after) return 'after';
-  if (card.trip) return 'far';
-  if (card.digest === 'kin_loss') return 'loss';
-  if (card.digest === 'kin_ill' || card.illness) return 'ill';
-  if (card.digest === 'pet') return 'pet';
-  if ('nature' in card || card.focusRisk) return 'self';
-  if (ctx.ev?.belief) return 'luck';
-  if (!ctx.delta) return 'mid';
-  const ds = SHOWN_STATS.filter((k) => !ctx.hide.has(k)).map((k) => ctx.delta[k]);
-  const up = ds.some((d) => d > 0), down = ds.some((d) => d < 0);
-  return up && !down ? 'good' : down && !up ? 'bad' : 'mid';
-}
-
 const count = Object.fromEntries(RESULT_CATS.map(([k]) => [k, 0]));
 const samples = Object.fromEntries(RESULT_CATS.map(([k]) => [k, []]));
 const intro = { 0: [], 1: [], 2: [], heir: [] };
-let total = 0, skipped = 0, veiledN = 0, veiledMid = 0, diff = 0;
-const diffBy = {};
+let total = 0, skipped = 0;
 const take = (k, card) => {
   const xs = samples[k];
   if (xs.length < SAMPLES && !xs.some((x) => x.t === card.text)) xs.push({ t: card.text, ...(card.story && { s: card.story }), ...(card.illness && { left: card.illness.left }), ...(card.age !== undefined && { age: card.age, stage: card.stage }) });
@@ -64,7 +47,7 @@ const take = (k, card) => {
 const introOf = (card, st) => ({ age: card.age, text: card.text, story: card.story, horo: horoscope(st), inherit: card.inherit });
 
 function onLife() {
-  let prev = null, snap = null, ev = null;
+  let prev = null;
   return (card, st) => {
     if (card.kind === 'intro') {
       const xs = card.age > 0 ? intro.heir : intro[artTier(standingOf(st))];
@@ -74,25 +57,12 @@ function onLife() {
       total++;
       if (hasScene(prev)) skipped++;
       else {
-        // ตัวเลือกที่เพิ่งกดอยู่ท้าย st.log แล้วตอนการ์ดผลมาถึง · ค่าซ่อนตาม veil ใน app.mjs: ฟิลด์ hidden ของเหตุการณ์/ตัวเลือก หรือป้ายผลมี ? = ซ่อนทั้งแถบ
-        const last = ev && st.log.at(-1);
-        const i = ev && last?.id === ev.id ? last.choice : -1;
-        const hide = new Set([...(ev?.hidden ?? []), ...(ev?.choices?.[i]?.hidden ?? []), ...(prev?.fx?.[i]?.split(' · ').includes('?') ? SHOWN_STATS : [])]);
-        const delta = snap && Object.fromEntries(SHOWN_STATS.map((k) => [k, Math.round(st[k]) - Math.round(snap[k])]));
-        const k = resultCat(card, { delta, hide, ev });
-        const ka = resultArtCat(card);
-        if (ka !== k) { diff++; diffBy[`${k}→${ka}`] = (diffBy[`${k}→${ka}`] ?? 0) + 1; }
-        if (hide.size && delta) {
-          veiledN++;
-          if (k === 'mid' && resultCat(card, { delta, hide: new Set(), ev }) !== 'mid') veiledMid++;
-        }
+        const k = resultArtCat(card);
         count[k]++;
         take(k, card);
       }
     } else {
-      // ใบที่ไม่มีตัวเลือก (บ้านเมือง เปลี่ยนช่วง) ล้างทิ้ง — การ์ดผลระบบหลังใบพวกนี้ไม่ใช่ผลของการกด
-      ev = card.choices?.length && card.id ? byId[card.id] ?? null : null;
-      snap = ev ? Object.fromEntries(SHOWN_STATS.map((k) => [k, st[k]])) : null;
+      // การ์ดที่ไม่ใช่การ์ดผลคือต้นทางที่ใช้ดูว่าต่อจากภาพฉากมั้ย (ข้อ 89)
       prev = card;
     }
   };
@@ -125,13 +95,10 @@ console.log(`หมวดการ์ดผล (ร่าง ui-redo 58) · ${Ob
 console.log(`การ์ดผล ${total} ใบ · ต่อจากการ์ดมีภาพฉาก (ไม่ใส่ภาพหมวด ข้อ 89) ${skipped} · นับหมวด ${counted}`);
 for (const [k, label] of RESULT_CATS) console.log(`  ${label.padEnd(16)} ${String(count[k]).padStart(6)}  ${pct(count[k])}`);
 const midOk = count.mid * 2 <= counted;
-// ตัวควบคุมตัวกรองค่าซ่อน: ใบสังเคราะห์ค่าขึ้นอย่างเดียว ไม่ซ่อน = เรื่องดี · ซ่อนทั้งแถบ = หมวดกลาง — ไม่ย้ายหมวด = ตัวกรองไม่ได้ต่อสาย
-const up = { health: 0, happiness: 5, knowledge: 0, relations: 0 };
-const ctlOk = resultCat({}, { delta: up, hide: new Set(), ev: {} }) === 'good' && resultCat({}, { delta: up, hide: new Set(SHOWN_STATS), ev: {} }) === 'mid';
-console.log(`  ตัวควบคุมตัวกรอง: ใบค่าขึ้น ไม่ซ่อน→เรื่องดี · ซ่อน→หมวดกลาง → ${ctlOk ? 'ผ่าน' : 'ตก'}`);
+// ตัวควบคุม: ป้ายขึ้น = เรื่องดี · ไม่มีป้าย (การ์ดค้างในเซฟเก่า) = หมวดกลาง
+const ctlOk = resultArtCat({ tag: 'good' }) === 'good' && resultArtCat({}) === 'mid';
+console.log(`  ตัวควบคุม: ป้ายขึ้น→เรื่องดี · ไม่มีป้าย→หมวดกลาง → ${ctlOk ? 'ผ่าน' : 'ตก'}`);
 console.log(`หมวดกลาง ≤ ครึ่ง (ข้อ 92) → ${midOk ? 'ผ่าน' : 'ตก'} ${pct(count.mid)}`);
-console.log(`  หมวดจากป้ายบนการ์ด (resultArtCat ใบ 62) ต่างจากตัวนับนี้ ${diff} ใบ ${JSON.stringify(diffBy)}`);
-console.log(`  ตัวกรองค่าซ่อน (ข้อ 90): การ์ดผลที่ตัวเลือกซ่อนค่า ${veiledN} ใบ (ตกหมวดกลางเพราะซ่อน ${veiledMid})`);
 if (WRITE) {
   const out = { seed, n, bots: Object.keys(RUN), total, skipped, cats: RESULT_CATS.map(([k, name, rule]) => ({ k, name, rule, n: count[k], samples: samples[k] })), intro };
   writeFileSync(WRITE, `${JSON.stringify(out, null, 1)}\n`);
