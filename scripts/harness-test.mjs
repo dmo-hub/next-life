@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES } from '../src/engine/index.mjs';
+import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, dieMidYear, causeWords } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
@@ -844,6 +844,25 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 278 ปุ่มสายเลือดเลือกคนสุดท้าย หลังเซฟ/โหลดได้คนที่เลือก', ok(last) && last.got === last.want.name && last.got !== last.heirs[0].name, last.err ?? `${last.heirs.length} คน · เลือก ${last.want.name} · ได้ ${last.got}`);
   check('ใบ 278 ตัวควบคุม: เลือกคนแรกได้คนแรก', ok(first) && first.got === first.heirs[0].name, first.err ?? `ได้ ${first.got}`);
   check('ใบ 278 ตัวควบคุม: ไม่ส่ง heirId ⇒ throw', ok(last) && last.threw);
+}
+
+// เฟส 3 เตรียมทหาร ช่วง 2 (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16): ตายระหว่างฝึก = สาเหตุ training ผ่านด่านตายเดียว
+// การ์ดฉากสุดท้ายที่รอในคิวต้องเล่าก่อนงานศพ · สัญญารอดตายยังกันได้ · คำบนการ์ดตายต้องมี
+{
+  const content = loadContent();
+  const st = newLife(7, content);
+  st.age = 16;
+  const last = { kind: 'result', type: 'A', age: st.age, text: 'ฉากสุดท้าย' };
+  st.queue = [last];
+  const fate = dieMidYear(st, 'training');
+  check('เฟส 3 ตายระหว่างฝึก: ตายด้วยสาเหตุ training', fate === 'dead' && st.dead && st.cause === 'training', `${fate} · ${st.cause}`);
+  check('เฟส 3 ตายระหว่างฝึก: การ์ดฉากสุดท้ายเล่าก่อนงานศพ', st.queue[0] === last && st.queue.length > 1, `คิว ${st.queue.length} ใบ`);
+  check('เฟส 3 ตายระหว่างฝึก: มีคำบนการ์ดตาย', (causeWords('training', 16) ?? []).join('') === 'ระหว่างการฝึกในโรงเรียนเตรียมทหาร');
+  const sv = newLife(7, content);
+  sv.age = 16;
+  sv.pact = { survive: true };
+  const f2v = dieMidYear(sv, 'training');
+  check('เฟส 3 ตายระหว่างฝึก: สัญญารอดตายยังกันได้', f2v === 'survive' && !sv.dead && sv.pact.survive === 'used' && sv.queue.at(-1)?.tag === 'survive', f2v);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

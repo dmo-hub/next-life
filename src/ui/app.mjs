@@ -1315,7 +1315,8 @@ function skillHint(id) {
 const DEATH_KEY = 'next-life-deaths-v1';
 const DEATH_GROUPS = [
   ['ร่างกาย', ['newborn', 'infection', 'pneumonia', 'heart', 'stroke', 'cancer', 'diabetes_kidney', 'liver', 'chronic_resp']],
-  ['อุบัติเหตุ', ['road', 'accident']],
+  // training = ตายระหว่างฝึกในโรงเรียนเตรียมทหาร (เฟส 3 · 2026-11-16) นับเป็นอุบัติเหตุบนหน้า "เคยจากไปแบบนี้"
+  ['อุบัติเหตุ', ['road', 'accident', 'training']],
   ['อื่น ๆ', null],
 ];
 function deathRead() {

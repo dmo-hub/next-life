@@ -4151,6 +4151,16 @@ function faceDeath(st, cause, opts = {}) {
   return { fate: 'dead' };
 }
 
+// ตายกลางปีจากฉากในเส้นที่เดินลำดับของตัวเอง (เฟส 3 ชีวิตในโรงเรียนเตรียมทหาร · เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16)
+// ใช้ด่านตายเดียวกับการ์ดปกติ สัญญารอดตายกับพิธีโกงความตายจึงยังทำงาน · การ์ดผลที่รอในคิว (ฉากสุดท้ายก่อนตาย) เล่าก่อนเสมอ
+// รอดเพราะสัญญา = เล่าการ์ดรอดต่อ แล้วชีวิตในโรงเรียนเดินต่อในปีเดิม (ไม่ข้ามปีแบบตายตอนขึ้นปี)
+function dieMidYear(st, cause) {
+  const d = faceDeath(st, cause, { afterQueue: true });
+  if (d.fate === 'dead') queueFuneral(st);
+  if (d.fate === 'survive') st.queue.push(d.card);
+  return d.fate;
+}
+
 function healthCause(st) {
   const era = st.content.era;
   const py = protoYear(era, st.seed, st.birthYear + st.age);
@@ -4223,6 +4233,8 @@ const CAUSE_TEXT = {
   infection: ['ด้วย', 'โรคติดเชื้อ'], pneumonia: ['ด้วย', 'ปอดอักเสบ'], heart: ['ด้วย', 'โรคหัวใจ'], stroke: ['ด้วย', 'โรคหลอดเลือดสมอง'],
   cancer: ['ด้วย', 'โรคมะเร็ง'], diabetes_kidney: ['ด้วย', 'โรคเบาหวานและไต'], liver: ['ด้วย', 'โรคตับ'], chronic_resp: ['ด้วย', 'โรคปอดเรื้อรัง'],
   road: ['จาก', 'อุบัติเหตุบนท้องถนน'], accident: ['จาก', 'อุบัติเหตุ'], assault: ['เพราะ', 'ถูกทำร้าย'], newborn: ['ด้วย', 'ภาวะแทรกซ้อนแรกเกิด'],
+  // ตายระหว่างฝึกในโรงเรียนเตรียมทหาร (เฟส 3 · เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16) — เกิดจากฉากเสี่ยงในโรงเรียนเท่านั้น ไม่อยู่ในตารางสุ่มสาเหตุตาย
+  training: ['ระหว่าง', 'การฝึกในโรงเรียนเตรียมทหาร'],
 };
 const causeWords = (cause, age) => (cause === 'other' ? (age >= STAGES.at(-1).from ? ['ด้วย', 'วัยชรา'] : null) : CAUSE_TEXT[cause] ?? null);
 // ตัวแทนมีเงื่อนไข {key:ทาง1|ทาง2|…} (B1 เส้นเตรียมทหาร · ยกจาก Demo) — แต่ละทางซ้อนตัวแทนธรรมดาได้หนึ่งชั้น เช่น {ลับ:{ผู้ใหญ่}ยังไม่รู้|…}
@@ -12372,7 +12384,8 @@ function skillHint(id) {
 const DEATH_KEY = 'next-life-deaths-v1';
 const DEATH_GROUPS = [
   ['ร่างกาย', ['newborn', 'infection', 'pneumonia', 'heart', 'stroke', 'cancer', 'diabetes_kidney', 'liver', 'chronic_resp']],
-  ['อุบัติเหตุ', ['road', 'accident']],
+  // training = ตายระหว่างฝึกในโรงเรียนเตรียมทหาร (เฟส 3 · 2026-11-16) นับเป็นอุบัติเหตุบนหน้า "เคยจากไปแบบนี้"
+  ['อุบัติเหตุ', ['road', 'accident', 'training']],
   ['อื่น ๆ', null],
 ];
 function deathRead() {
