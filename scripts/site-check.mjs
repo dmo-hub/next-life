@@ -17,6 +17,9 @@ import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
 import { NEED_TEXT } from '../src/site/focus.mjs';
 import { focusWords, STAT_LABELS, FOCUS_NEEDS, ISEKAI_FOCUS, ISEKAI_KNOW } from '../src/engine/index.mjs';
 import { catalogHtml, spoilerBacks, flagNames, systemNames } from '../src/site/spoilers.mjs';
+import { cadetHtml, readCadet, schoolYears } from '../src/site/cadet-cards.mjs';
+import { matchItem, recentVersions } from '../src/site/catalog-filter.mjs';
+import { FILTER_CATS } from '../src/site/catalog-ui.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, injectDevNav, DEV_TABS, MOVED_MARK, movedHtml, DEV_MAPS, DEV_MAPS_PAGE, mapsMoved } from '../src/site/nav.mjs';
@@ -85,9 +88,13 @@ const escHtml = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>
 const page = read('catalog.html');
 const cards = visible(page);
 const MORE = '<section class="more"';
-const moreAt = page.indexOf(MORE);
-const [pageTh, pageIsk] = cut(page.slice(0, moreAt));
-const [moreJobs, moreIsk] = page.slice(moreAt).split('<h2 id="isk-more">');
+// หมวดสายเตรียมทหาร (ใบ 136) เป็นของมันเอง — ตัดออกก่อนแบ่งส่วนไทย/ต่างโลกที่ด่านเดิมนับด้วย content.events กับ ISEKAI_EVENTS
+const CADET_RE = /<!--cadet:start-->[\s\S]*<!--cadet:end-->/;
+const cadetBlock = page.match(CADET_RE)?.[0] ?? '';
+const pageBase = page.replace(CADET_RE, '');
+const moreAt = pageBase.indexOf(MORE);
+const [pageTh, pageIsk] = cut(pageBase.slice(0, moreAt));
+const [moreJobs, moreIsk] = pageBase.slice(moreAt).split('<h2 id="isk-more">');
 const cardsTh = visible(pageTh);
 const cardsIsk = visible(pageIsk);
 const shown = (cardsTh.match(/<article class="c /g) ?? []).length;
@@ -99,6 +106,51 @@ const leaks = leak.filter((re) => re.test(visible(catalogHtml(content)))).map(St
 // ชื่อหมวดบุญบาปภาษาไทยอาจเป็นคำธรรมดาในข้อความการ์ด — นับเฉพาะ id อังกฤษของหมวด
 const ids = cats.filter((s) => /^[a-z_]+$/.test(s) && new RegExp(`\\b${s}\\b`).test(cards));
 check('หน้ารวมการ์ดไม่มีผล/น้ำหนัก/ป้ายบุญบาป', leaks.length || ids.length, leaks.length || ids.length ? ` · เจอ ${[...leaks, ...ids].join(' ')}` : '');
+
+// 4b) หมวดสายเตรียมทหาร (ใบ 136): จำนวนใบบนหน้า = จำนวนในไฟล์ (นับจากคีย์ในไฟล์ตรง ๆ ไม่ผ่านตัวสร้าง) · ฉากโรงเรียนอยู่ปีเดียว · ด้านหน้าไม่มีผล
+const cadetDoc = readCadet();
+const cadetWant = ['apply', 'interludes', 'passed', 'failed', 'interviewQs', 'interviewFunny'].reduce((s, k) => s + cadetDoc[k].length, 0) + Object.keys(cadetDoc.school.scenes).length;
+const cadetGot = (cadetBlock.match(/<article class="k c" id="/g) ?? []).length;
+const cadetIdsMissing = [...cadetDoc.apply, ...cadetDoc.interludes, ...cadetDoc.passed, ...cadetDoc.failed].map((e) => e.id).concat(Object.keys(cadetDoc.school.scenes)).filter((id) => !cadetBlock.includes(`<article class="k c" id="${escHtml(id)}">`));
+// ตัวควบคุม: ถอดฉากออกจากไฟล์ 1 ใบ แล้วตัวสร้างต้องให้จำนวนต่างจากเดิม
+const cadetLess = { ...cadetDoc, school: { ...cadetDoc.school, scenes: Object.fromEntries(Object.entries(cadetDoc.school.scenes).slice(1)) } };
+const cadetCtl = (cadetHtml(cadetLess).match(/<article class="k c" id="/g) ?? []).length === cadetWant - 1;
+const yrs = schoolYears(cadetDoc.school);
+const yrBoth = yrs.y1.filter((id) => yrs.y2.includes(id));
+const cadetLeak = [/<b class="pct">|<p class="fx">|<span class="m /].filter((re) => re.test(visible(cadetBlock))).map(String);
+check('หมวดสายเตรียมทหารครบทุกใบในไฟล์ ฉากโรงเรียนแยกปี 1/2 ครบ ไม่เผยผลก่อนกด', cadetGot !== cadetWant || cadetIdsMissing.length || !cadetCtl || yrs.y1.length + yrs.y2.length !== Object.keys(cadetDoc.school.scenes).length || yrBoth.length || cadetLeak.length, ` ใบ ${cadetGot}/${cadetWant} · ปี 1 ${yrs.y1.length} · ปี 2 ${yrs.y2.length} · ขาด ${cadetIdsMissing.slice(0, 3).join(' ')} · ตัวควบคุมจับได้ ${cadetCtl}${cadetLeak.length ? ` · เจอ ${cadetLeak.join(' ')}` : ''}`);
+
+// 4c) ตัวกรองการ์ด: รันตัวกรองตัวเดียวกับที่ฝังในหน้า กับการ์ดบนหน้าจริง · กรองหมวด X แล้วเหลือแต่การ์ดที่มีป้าย X · ตัวควบคุม = ตัวกรองที่ไม่กรองต้องตก
+const secs = [...page.matchAll(/<details id="[^"]*" data-st="([^"]*)"/g)];
+const stageItems = secs.flatMap((m, i) => {
+  const end = i + 1 < secs.length ? secs[i + 1].index : page.indexOf(MORE);
+  return [...page.slice(m.index, end).matchAll(/<article class="[^"]*c[^"]*"[^>]*>([\s\S]*?)<\/article>/g)].map((a) => ({
+    cats: [...(a[1].match(/<p class="tags">([\s\S]*?)<\/p>/)?.[1] ?? '').matchAll(/<span>([^<]*)<\/span>/g)].map((s) => s[1]),
+    st: m[1],
+    v: a[1].match(/เพิ่มใน (v[\d.]+)/)?.[1] ?? '',
+  }));
+});
+const none = { cat: [], st: [], since: 'all', vers: [] };
+const bad = [];
+const noFilter = () => true;
+for (const c of FILTER_CATS) {
+  const hit = stageItems.filter((it) => matchItem(it, { ...none, cat: [c] }));
+  if (!hit.length || hit.length === stageItems.length || hit.some((it) => !it.cats.includes(c)) || !stageItems.filter((it) => noFilter(it, { ...none, cat: [c] })).some((it) => !it.cats.includes(c))) bad.push(`หมวด ${c} ${hit.length}`);
+}
+for (const s of ['สายเตรียมทหาร', 'ต่างโลก', 'ปรโลก', 'เด็ก']) {
+  const hit = stageItems.filter((it) => matchItem(it, { ...none, st: [s] }));
+  if (!hit.length || hit.some((it) => it.st !== s)) bad.push(`ช่วง ${s} ${hit.length}`);
+}
+const vAll = stageItems.map((it) => it.v);
+const [vNew] = recentVersions(vAll, 1);
+const vHit = stageItems.filter((it) => matchItem(it, { ...none, since: 'latest', vers: [vNew] }));
+if (!vHit.length || vHit.some((it) => it.v !== vNew) || recentVersions(['v0.6.13', 'v0.6.104', 'v0.6.9'], 2).join() !== 'v0.6.104,v0.6.13') bad.push(`รุ่น ${vNew} ${vHit.length}`);
+const both = stageItems.filter((it) => matchItem(it, { ...none, cat: ['การเรียน'], st: ['วัยรุ่น'] }));
+if (both.some((it) => !it.cats.includes('การเรียน') || it.st !== 'วัยรุ่น')) bad.push('ข้ามกลุ่ม = และ');
+// หน้าฝังซอร์สตัวกรองชุดเดียวกับที่ด่านเรียก · ไม่มี JS = การ์ดไม่ถูกซ่อน
+const shipped = page.includes(matchItem.toString()) && page.includes(recentVersions.toString());
+const hiddenCard = /<article[^>]*\shidden/.test(page);
+check('ตัวกรองการ์ด: กรองแล้วเหลือแต่ใบที่ตรง · หน้าฝังตัวกรองชุดเดียวกับที่ตรวจ · ไม่มี JS เห็นครบ', bad.length || !shipped || hiddenCard || stageItems.length < content.events.length, ` ใบ ${stageItems.length} · ${bad.join(' · ')}${shipped ? '' : ' · ซอร์สตัวกรองไม่ตรง'}${hiddenCard ? ' · มีการ์ดซ่อนมาตั้งแต่ต้น' : ''}`);
 
 // 5) หน้าเฉลย: นับชิ้นบนหน้าเทียบ content ตรง ๆ — ตัวสร้างทำตกหล่นสักทาง (ตัวเลือกซ่อน · ผลสุ่ม · ป้ายบุญบาป) เลขจะไม่เท่า
 const spoilTh = spoilOnly(pageTh);

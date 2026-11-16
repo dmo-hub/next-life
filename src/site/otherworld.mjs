@@ -48,7 +48,7 @@ const oldHtml = (pick, draw) => {
 const lead = () => `<p class="lead">เลือก "${esc(PATHS.find((p) => p.id === 'isekai').text)}" ที่ปรโลก แล้วใช้ชีวิตหนึ่งชาติในโลกแฟนตาซี ก่อนกลับไปให้ปรโลกตัดสิน · การ์ดสีม่วงคือการ์ดต่างโลก</p>`;
 
 function section(n, body) {
-  return `<details id="s${n}"><summary>${ISEKAI_SECTION} <small>${isekaiCardCount()} ใบ</small></summary>${lead()}${body}</details>`;
+  return `<details id="s${n}" data-st="${ISEKAI_SECTION}"><summary>${ISEKAI_SECTION} <small>${isekaiCardCount()} ใบ</small></summary>${lead()}${body}</details>`;
 }
 export const isekaiNav = (n) => `<a href="#s${n}">${ISEKAI_SECTION} <small>${isekaiCardCount()}</small></a>`;
 

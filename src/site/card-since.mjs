@@ -13,8 +13,10 @@ export const sinceTag = (id, map = since) => (map[id] ? `<p class="ver"><a href=
 export async function cardIds() {
   const { loadContent } = await import('../node/load.mjs');
   const { ISEKAI_EVENTS } = await import('../engine/isekai.mjs');
+  const { cadetSchoolIds, readCadet } = await import('./cadet-cards.mjs');
   const { events } = loadContent();
-  return [...events, ...ISEKAI_EVENTS].map((e) => e.id);
+  // ฉากโรงเรียนเตรียมทหารขึ้นหน้ารวมการ์ดเป็นใบ — ใบอื่นของสายนี้ (ใบสมัคร ฉากคั่น ผลสอบ) ไม่ติดป้ายรุ่น จนกว่าไล่ประวัติได้
+  return [...events, ...ISEKAI_EVENTS].map((e) => e.id).concat(cadetSchoolIds(readCadet()));
 }
 
 // บรรทัดละใบ เรียงตาม id ⇒ diff ตอนปล่อยเห็นเฉพาะการ์ดใหม่

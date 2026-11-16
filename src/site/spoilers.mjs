@@ -6,6 +6,8 @@ import { STAGES, STAT_LABELS, MERIT_LEVELS, MERIT_WEIGHTS, SIN_CATS, FLAG_CATS, 
 import { AFTER, esc, text, choiceText, catalogCard } from './catalog.mjs';
 import { isekaiCatalogHtml, isekaiNav, isekaiBoxes } from './otherworld.mjs';
 import { careerHtml, careerSim } from './career.mjs';
+import { cadetHtml, cadetNav, readCadet } from './cadet-cards.mjs';
+import { filterUi } from './catalog-ui.mjs';
 
 const YEAR_ALL = [2400, 2700];
 const sgn = (n) => (n > 0 ? `+${n}` : String(n).replace('-', '−'));
@@ -294,16 +296,16 @@ export function spoilerBacks(content, ids, flags = flagNames(), systems = system
 }
 
 // demo = เดโมการ์ดเล่นได้ (demo.mjs) วางหลังสารบัญ
-export function catalogHtml(content, demo = '', flags = flagNames(), systems = systemNames(), sim = careerSim()) {
+export function catalogHtml(content, demo = '', flags = flagNames(), systems = systemNames(), sim = careerSim(), cadet = readCadet()) {
   const L = labels(content, flags, systems);
   const byId = new Map(content.events.map((e) => [e.id, e]));
   const groups = [...STAGES.map((s) => s.name), AFTER].map((stage) => ({ stage, events: content.events.filter((e) => e.stage === stage) })).filter((g) => g.events.length);
   const nav = groups.map((g, i) => `<a href="#s${i}">${esc(g.stage)} <small>${g.events.length}</small></a>`).join('');
   const body = groups
-    .map((g, i) => `<details id="s${i}"${i === 0 ? ' open' : ''}><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map((e) => catalogCard(e, back(e, L, byId))).join('')}</div></details>`)
+    .map((g, i) => `<details id="s${i}" data-st="${esc(g.stage === AFTER ? 'ปรโลก' : g.stage)}"${i === 0 ? ' open' : ''}><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map((e) => catalogCard(e, back(e, L, byId))).join('')}</div></details>`)
     .join('\n');
   // เฉลยที่ไม่ผูกการ์ดใบใด (ข้อ 187 207) ท้ายหน้า เปิดทีละกล่อง — ไม่มี <article> ด่านนับการ์ดจึงนับเท่าเดิม
   const career = careerHtml(content, L, sim);
   const more = `<section class="more" id="more">${career}<h2 id="isk-more">ต่างโลก</h2><div class="jobs">${isekaiBoxes(merit)}</div></section>`;
-  return `<nav class="toc">${nav}${isekaiNav(groups.length)}${career ? '<a href="#career">เส้นทางงาน</a>' : ''}<a href="#isk-more">เฉลยต่างโลก</a></nav>\n${demo ? `${demo}\n` : ''}${body}\n${isekaiCatalogHtml(groups.length, merit)}\n${more}`;
+  return `<nav class="toc">${nav}${isekaiNav(groups.length)}${cadetNav(cadet)}${career ? '<a href="#career">เส้นทางงาน</a>' : ''}<a href="#isk-more">เฉลยต่างโลก</a></nav>\n${filterUi()}\n${demo ? `${demo}\n` : ''}${body}\n${isekaiCatalogHtml(groups.length, merit)}\n${cadetHtml(cadet)}\n${more}`;
 }
