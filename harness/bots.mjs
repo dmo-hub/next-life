@@ -175,7 +175,8 @@ export function botTree(st, target) {
   const score = offers.map((id) => descendants(defs, id));
   const top = Math.max(...score);
   const from = offers.filter((_, i) => score[i] === top);
-  treeInvestNode(st, from[rng.int(0, from.length - 1)]);
+  const pick = from[rng.int(0, from.length - 1)];
+  treeInvestNode(st, pick, !!defs[pick].keystone);
 }
 // เลือกผลบนการ์ดด่าน (ใบ 05): สุ่มจาก stream ของ seed ชีวิตแยกจากบอทเลือกตัวเลือกและ rng ของโลก — การ์ดด่านออกเฉพาะชีวิตที่ทุ่มโหนดใหญ่ ชีวิตของบอทอื่นไม่ถูกแตะ
 const GATE_SALT = 0x2c1b3c6d;
