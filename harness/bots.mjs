@@ -177,4 +177,14 @@ export function botTree(st, target) {
   const from = offers.filter((_, i) => score[i] === top);
   treeInvestNode(st, from[rng.int(0, from.length - 1)]);
 }
+// เลือกผลบนการ์ดด่าน (ใบ 05): สุ่มจาก stream ของ seed ชีวิตแยกจากบอทเลือกตัวเลือกและ rng ของโลก — การ์ดด่านออกเฉพาะชีวิตที่ทุ่มโหนดใหญ่ ชีวิตของบอทอื่นไม่ถูกแตะ
+const GATE_SALT = 0x2c1b3c6d;
+const gateMemo = new WeakMap();
+export function botGate(card, st) {
+  let rng = gateMemo.get(st);
+  if (!rng) gateMemo.set(st, (rng = makeRng(mixSeed(st.seed ^ GATE_SALT, st.gen ?? 1))));
+  const open = openChoices(card);
+  return open[rng.int(0, open.length - 1)];
+}
+export const withGate = (bot) => (card, rng, st) => (card.id?.startsWith('tree_gate_') ? botGate(card, st) : bot(card, rng, st));
 export const withTree = (bot, target) => Object.assign((...a) => bot(...a), bot, { tree: (st) => botTree(st, target) });

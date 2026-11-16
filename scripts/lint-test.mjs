@@ -512,6 +512,7 @@ try {
 // ต้นไม้โฟกัส (ใบ 03): ทะเบียนผิดรูปต้องตก (ขอบชี้โหนดที่ไม่มี · วนเป็นวง · หมวด/ช่วงวัย/ผลผิด) · ทะเบียนถูกรูปต้องผ่าน · ของจริงต้องผ่าน
 {
   const node = (over = {}) => ({ name: 'โหนดทดสอบ', branch: 'occ', size: 's', stages: ['เด็ก'], pre: [], years: 2, cards: 1, cat: ['belief'], fx: { happiness: 1 }, light: { happiness: 1 }, roll: 1, ...over });
+  const gate = (over = {}) => ({ title: 'ด่านทดสอบ', text: 'ถึงทางแยกของโหนดทดสอบ', results: [{ text: 'ทางหนึ่ง', fx: { happiness: 1 } }, { text: 'อีกทางหนึ่ง', fx: { knowledge: 1 } }], ...over });
   const doc = (nodes, over = {}) => ({ year_scale: 0.25, light_unit: { s: 0.007, b: 0.014, k: 0.025 }, roll_k: 0.1, card_mul: 1.25, budget: 0.5, nodes, ...over });
   const treeCases = [
     ['good: สองโหนดต่อกัน', doc({ a: node(), b: node({ pre: ['a'] }) }), 0],
@@ -530,6 +531,17 @@ try {
     ['bad: job_roll ไม่มี jobs', doc({ a: node({ job_roll: 1 }) }), 1],
     ['bad: งบผลเบารวมเกินเพดาน', doc({ a: node() }, { budget: 0.001 }), 1],
     ['bad: card_mul ต่ำกว่า 1', doc({ a: node() }, { card_mul: 0.5 }), 1],
+    // ใบ 05: การ์ดด่านโหนดใหญ่ · keystone
+    ['good: โหนดใหญ่มีการ์ดด่าน 2 ทาง', doc({ a: node({ size: 'b', gate: gate() }) }), 0],
+    ['bad: การ์ดด่านบนโหนดเล็ก', doc({ a: node({ gate: gate() }) }), 1],
+    ['bad: การ์ดด่านทางเดียว', doc({ a: node({ size: 'b', gate: gate({ results: [{ text: 'ทางเดียว', fx: { happiness: 1 } }] }) }) }), 1],
+    ['bad: การ์ดด่านผล 4 ทาง', doc({ a: node({ size: 'b', gate: gate({ results: Array.from({ length: 4 }, (_, i) => ({ text: `ทาง${'กขคง'[i]}`, fx: { happiness: 1 } })) }) }) }), 1],
+    ['good: keystone ครบ', doc({ a: node({ size: 'k', keystone: true, warn: 'ได้แรงแต่เสียถาวร', cost: { health: -1 } }) }), 0],
+    ['bad: keystone เป็นโหนดซ่อน', doc({ a: node({ size: 'k', keystone: true, hidden: true, warn: 'ได้แรงแต่เสียถาวร', cost: { health: -1 } }) }), 1],
+    ['bad: keystone ไม่มีคำบอกข้อเสีย', doc({ a: node({ size: 'k', keystone: true, cost: { health: -1 } }) }), 1],
+    ['bad: keystone ไม่มีข้อเสียถาวร', doc({ a: node({ size: 'k', keystone: true, warn: 'ได้แรงแต่เสียถาวร' }) }), 1],
+    ['bad: keystone ข้อเสียเป็นค่าบวก', doc({ a: node({ size: 'k', keystone: true, warn: 'ได้แรงแต่เสียถาวร', cost: { health: 1 } }) }), 1],
+    ['bad: keystone สองตัวในแขนงเดียว', doc({ a: node({ size: 'k', keystone: true, warn: 'ข้อเสีย', cost: { health: -1 } }), b: node({ size: 'k', keystone: true, warn: 'ข้อเสีย', cost: { health: -1 } }) }), 1],
   ];
   for (const [name, d, want] of treeCases) {
     const ps = checkTree(d);

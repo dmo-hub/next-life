@@ -42,15 +42,54 @@ export function treeYearEnd(h, defs, stage, age) {
     t.cur = null;
     return null;
   }
+  // การ์ดด่านของโหนดนี้รอตอบอยู่ (ใบ 05): ปีนี้ไม่นับให้ใคร
+  if (t.pend === id) return null;
   t.yrs[id] = (t.yrs[id] ?? 0) + 1;
   t.hist.push([age, id]);
   const def = defs[id];
-  const unlocked = t.yrs[id] >= def.years && (treeCtl.cardsFree || (t.cards[id] ?? 0) >= def.cards);
-  if (unlocked) {
-    t.done[id] = age;
-    t.cur = treeOffers(h, defs, stage).find((x) => x !== id && !defs[x].hidden) ?? null;
+  const ready = t.yrs[id] >= def.years && (treeCtl.cardsFree || (t.cards[id] ?? 0) >= def.cards);
+  // โหนดใหญ่มีการ์ดด่าน: ปีครบ = การ์ดด่านโผล่ ยังไม่ปลด · ปลดตอนตอบการ์ดด่าน (treeGateDone)
+  if (ready && def.gate) {
+    t.pend = id;
+    return { id, unlocked: false, gate: true };
   }
-  return { id, unlocked };
+  if (ready) {
+    t.done[id] = age;
+    t.cur = treeNext(h, defs, stage, id);
+  }
+  return { id, unlocked: ready };
+}
+
+// ปลดแล้วเลื่อนไปโหนดแรกที่ทุ่มได้ต่อ · ไม่เลื่อนเข้าโหนดซ่อน และไม่เลื่อนเข้า keystone เอง (ใบ 05 · ข้อ 28: ต้องเลือกทุ่มเองหลังเห็นข้อเสีย)
+const treeNext = (h, defs, stage, id) => treeOffers(h, defs, stage).find((x) => x !== id && !defs[x].hidden && !defs[x].keystone) ?? null;
+
+// ── การ์ดด่าน + keystone (ใบ 05) ── ทุกตัวไม่ดึงเลขสุ่ม · ผลของการ์ดด่านลงผ่านตัวเลือกของการ์ด (ผลเต็มครั้งเดียว) ไม่ผ่านงบผลเบา
+// ปีครบแต่การ์ดหมวดยังไม่ครบ (ข้อ 46): ใช้บอกขั้น "รอโอกาส" ที่หน้าต้นไม้ · ไม่แตะสถานะ
+export const treeWaiting = (h, defs) => {
+  const t = h?.tree;
+  const id = t?.cur;
+  return !!id && t.pend !== id && t.done[id] === undefined && (t.yrs[id] ?? 0) >= defs[id].years && (t.cards[id] ?? 0) < defs[id].cards;
+};
+// การ์ดด่านของโหนด id เป็นเหตุการณ์ตัวเลือก 2–3 ทาง (ไม่มี weight/category → ไม่ใช่การ์ดกองสุ่ม ไม่ขยับโควตาการ์ดโลกหลัก ไม่นับเป็นการ์ดหมวดของโหนดไหน)
+export function treeGateEvent(defs, id) {
+  const g = defs[id].gate;
+  return {
+    id: `tree_gate_${id}`,
+    type: g.type ?? 'A',
+    treeGate: id,
+    title: g.title,
+    text: g.text,
+    choices: g.results.map((r) => ({ text: r.text, effects: r.fx, ...(r.flags && { sets_flags: r.flags }) })),
+  };
+}
+// ตอบการ์ดด่านแล้ว = ปลดโหนด · จดว่าเลือกผลทางไหน · เลื่อนไปโหนดถัดไป
+export function treeGateDone(h, defs, stage, id, idx, age) {
+  const t = h.tree;
+  if (t?.pend !== id) throw new Error(`ไม่มีการ์ดด่านรอของโหนด ${id}`);
+  t.done[id] = age;
+  (t.gate ??= {})[id] = idx;
+  t.pend = null;
+  t.cur = treeNext(h, defs, stage, id);
 }
 
 // ── ผลติดตัว (ใบ 04) ── ทุกตัวเป็นฟังก์ชันล้วน ไม่ดึงเลขสุ่ม · ไม่เคยปลดอะไร = 1 เท่าเดิมทุกหลัก

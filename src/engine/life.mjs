@@ -14,7 +14,7 @@ import { cadetActive, cadetCard, chooseCadet, cadetAfterChoice } from './cadet.m
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
-import { treeCtl, treeOffers, treeInvest, treeCard, treeYearEnd, treeRollMul, treeCardMul } from './tree.mjs';
+import { treeCtl, treeOffers, treeInvest, treeCard, treeYearEnd, treeRollMul, treeCardMul, treeGateEvent, treeGateDone } from './tree.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
@@ -1989,7 +1989,11 @@ export function lifeFocusYear(st) {
 // ต้นไม้โฟกัส (ใบ 03): กติกากลางอยู่ tree.mjs · เนื้อ content.tree · ไม่เคยทุ่ม = ไม่แตะอะไร (ไม่ดึงเลขสุ่ม)
 // ทุ่มอยู่: ผลเต็มของโหนดที่ทุ่มปีนี้ · ปลดแล้ว: ผลเบาถาวรของทุกโหนดที่ปลด ต่อปี (ผลของโหนดที่เพิ่งปลดปีนี้เริ่มปีหน้า)
 export const lifeTreeDefs = (st) => st.content.tree?.nodes ?? {};
-export const treeInvestNode = (st, id) => treeInvest(st, lifeTreeDefs(st), id, stageOf(st.age));
+// keystone (ใบ 05): ทุ่มได้เมื่อผู้เล่นรับรู้ข้อเสียแล้วเท่านั้น (ack) — ไม่มี ack = ไม่ทุ่ม · UI ต้องแสดง def.warn ก่อนส่ง ack
+export const treeInvestNode = (st, id, ack = false) => {
+  if (lifeTreeDefs(st)[id]?.keystone && !ack) throw new Error(`โหนด ${id} เป็น keystone ต้องรับรู้ข้อเสียก่อนทุ่ม`);
+  treeInvest(st, lifeTreeDefs(st), id, stageOf(st.age));
+};
 export const treeOffersNow = (st) => treeOffers(st, lifeTreeDefs(st), stageOf(st.age));
 // ทอยตามแขนง (ใบ 04) ตัวคูณทางสำเร็จของการ์ดหมวด cat · อาชีพนับเมื่อมีงานของตัวเองแล้ว (เหมือน when.occupation)
 export const lifeTreeRoll = (st, cat) => (st.tree && st.content.tree ? treeRollMul(st, st.content.tree.nodes, st.content.tree.roll_k, cat, st.workFrom !== null ? st.occupation : null) : 1);
@@ -2000,6 +2004,10 @@ function lifeTreeYear(st) {
   const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age);
   if (r) applyEffects(st, c.nodes[r.id].fx, c.year_scale);
   if (treeCtl.passive) for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size]);
+  // keystone ที่ปลดแล้วเสียถาวรทุกปี (ใบ 05 · ข้อ 28) · ไม่ผ่านตัวควบคุม passive: ล้างไม่ได้ (ข้อ 60) ปิดไม่ได้
+  for (const id of light) if (c.nodes[id].cost) applyEffects(st, c.nodes[id].cost, c.light_unit[c.nodes[id].size]);
+  // ปีครบของโหนดใหญ่ = การ์ดด่านเข้าคิวต้นปีถัดไป (st.due) · ไม่ผ่านกองสุ่ม
+  if (r?.gate) st.due.push({ kind: 'eraEvent', ev: treeGateEvent(c.nodes, r.id), age: st.age });
 }
 
 // เสี่ยงสุ่มของโฟกัส: ทอยจาก stream ของ (seed · อายุ · ข้อ) ไม่แตะ rng ของโลก ชีวิตจึงต่างจากตามน้ำแค่ผลที่เกิดจริง
@@ -2367,6 +2375,7 @@ export function choose(st, idx, loan) {
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
   if (st.tree && st.content.tree) treeCard(st, st.content.tree.nodes, ev.category);
+  if (ev.treeGate) treeGateDone(st, st.content.tree.nodes, stageOf(st.age), ev.treeGate, idx, st.age);
   naturePoint(st, c.nature, 1);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
