@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus, dieMidYear, causeWords, nextCard } from '../src/engine/index.mjs';
+import { playLife, lifeFocusYear, levelValue, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus, dieMidYear, causeWords, nextCard } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
@@ -208,6 +208,34 @@ const f2 = (v) => v.toFixed(2);
   const logLen = st.log.length;
   setLifeFocus(st, 'play_friends');
   check('lg01 ข้อ 4 ตั้งโฟกัสไม่เพิ่มการ์ด/บันทึกใด', st.focus === 'play_friends' && st.log.length === logLen && !st.pending, `${st.log.length} · ${logLen}`);
+}
+
+// รางวัลปณิธานสำเร็จ (life-goal ใบ 02): ต้นสายชำนาญครบ chain_years ได้ความสุขระดับ goal_joy ครั้งเดียวต่อสาย · การ์ดตายเล่ารายการ
+{
+  const base = loadContent();
+  const chain = base.focus.chain_years;
+  const joy = levelValue(base.focus.goal_joy);
+  const mk = (id) => { const s = newLife(11, base); s.age = 13; s.school = 'lower'; s.happiness = 40; setLifeFocus(s, id); s.focusAt = 12; return s; };
+  const run = (s, from, n) => { for (let a = from; a < from + n; a++) { s.age = a; lifeFocusYear(s); } return s; };
+  check('lg02 ค่า goal_joy = ระดับ 2 (+12)', base.focus.goal_joy === 2 && joy === 12, `${base.focus.goal_joy} · ${joy}`);
+  const s = mk('study_hard');
+  run(s, 13, chain - 1);
+  check('lg02 ต้นสายยังไม่ครบ = ไม่มีรางวัล ไม่มีรายการ', !s.goalsDone && s.focusMet?.study_hard === undefined, `${s.goalsDone}`);
+  run(s, 13 + chain - 1, 1);
+  check('lg02 ครบ chain_years = ความสุขขึ้น 12 จากผลรางวัล (ผลต่อปีของโฟกัสแยกออก)', s.goalsDone?.join() === 'study_hard', `${s.goalsDone}`);
+  // ตัวควบคุม: เนื้อเดียวกันแต่ goal_joy = 0 ⇒ ส่วนต่างความสุขปีที่ครบ = ผลรางวัลล้วน ๆ (ผลรายปีของโฟกัสหักกันออก)
+  const c0 = mk('study_hard'); c0.content = { ...base, focus: { ...base.focus, goal_joy: 0 } };
+  run(c0, 13, chain);
+  check('lg02 ปีที่ครบได้ความสุข +12 พอดีเทียบตัวควบคุม goal_joy 0', Math.abs(s.happiness - c0.happiness - joy) < 1e-9 && !c0.goalsDone, `${s.happiness - c0.happiness} · ${c0.goalsDone}`);
+  const hDone = s.happiness, nDone = s.goalsDone.length;
+  run(s, 13 + chain, 3);
+  check('lg02 ทุ่มต่อหลังครบ = ไม่ได้รางวัลซ้ำ ไม่มีรายการซ้ำ', s.goalsDone.length === nDone && s.happiness - hDone < joy, `${s.goalsDone} · ${s.happiness - hDone}`);
+  // ปลายสายครบเองไม่ใช่ปณิธาน (ไม่มีสายต่อจากมัน)
+  const t = mk('study_hard'); t.focus = 'scholarship'; t.focusMet = { study_hard: 'วัยรุ่น' }; t.age = 19; t.focusAt = 18;
+  run(t, 19, chain);
+  check('lg02 ปลายสายสะสมครบเอง = ไม่นับเป็นปณิธาน', !t.goalsDone, `${t.goalsDone}`);
+  const none = newLife(11, base);
+  check('lg02 ไม่สำเร็จเลย = ไม่มีรายการบนตัว', !none.goalsDone);
 }
 
 // ประตูเข้าสาย (โฟกัสใบ 04): ตัวเลือกติดป้าย gate ซ่อน (hidden + locked) จนประตูเปิด — ไม่ตัดออก เลขลำดับจึงตรงเนื้อหา · ประตูเปิดจากโฟกัสครบ chain_years · ทายาท · ธงชวน
