@@ -199,6 +199,33 @@ function focusWord(id, h = st) {
   return n >= st.content.focus.chain_years ? el('span', 'ft-word full', 'ชำนาญแล้ว') : el('span', 'ft-word', 'เริ่มชำนาญ');
 }
 const stageIdx = (name) => STAGES.findIndex((s) => s.name === name);
+// ปณิธาน = สายต้น → ปลาย (after ในทะเบียน) ที่ยังมีความหมายตอนนี้: เลือกได้อยู่ · เคยทุ่มต้นสายแล้ว · หรือยังทันช่วงวัยของปลายสาย
+// สถานะอ่านจาก focusMet ตัวเดียวกับที่แกนเปิดปลายสาย — ครบในช่วงวัยไหนเปิดตั้งแต่ช่วงถัดไป
+function focusGoals(offers) {
+  const defs = lifeFocusDefs(st);
+  const stage = stageOf(st.age);
+  const now = stageIdx(stage);
+  const later = (d) => !d.stages || d.stages.some((s) => stageIdx(s) > now);
+  const rows = [];
+  for (const [id, d] of Object.entries(defs)) {
+    if (!d.after) continue;
+    const from = d.after;
+    const met = st.focusMet?.[from];
+    const tried = (st.focusYears?.[from] ?? 0) > 0;
+    let cls = '', text;
+    if (offers.includes(id)) [cls, text] = ['open', `${focusName(from)}ชำนาญแล้ว · เลือกได้ในช่วงนี้`];
+    else if (met === stage) text = `${focusName(from)}ชำนาญแล้ว · เลือกได้ตั้งแต่ช่วงวัยถัดไป`;
+    else if (met !== undefined) [cls, text] = later(d) || d.stages?.includes(stage) ? ['', `${focusName(from)}ชำนาญแล้ว · ยังไม่เข้าเงื่อนไขตอนนี้`] : ['gone', `${focusName(from)}ชำนาญแล้ว · ช่วงวัยที่เลือกได้ผ่านไปแล้ว`];
+    else if (!later(d)) continue;
+    else if (tried) text = `${focusName(from)}เริ่มชำนาญ · ทุ่มต่ออีกหน่อยจะเปิด`;
+    else if (offers.includes(from)) text = 'ยังไม่ได้ทุ่ม';
+    else continue;
+    const li = el('li', cls || null);
+    li.append(el('b', null, `${focusName(from)} → ${d.name}`), el('span', 'st', text));
+    rows.push(li);
+  }
+  return rows;
+}
 // จอต้นไม้โฟกัส (ใบ 12 · ข้อ 88 แบบ 4 กลุ่มดาว) แทนรายการปณิธาน · ผังกับตัววาดอยู่ treeview.mjs
 // สถานะหน้าจอ (แขนงที่ดู ซูม โหนดที่เลือก) อยู่ในหน่วยความจำ ไม่ลงเซฟ · ทุ่ม/เปลี่ยนโหนดเซฟทันทีเหมือนโฟกัสเดิม
 const tvUi = { view: 'branch', br: null, z: 100, sel: null };
@@ -357,6 +384,11 @@ function focusPanel(card) {
     saveWrite(card);
   }, () => focusPanel(card));
   wrap.append(el('h3', null, 'ต้นไม้โฟกัส'), treeScreen(card));
+  // ปณิธานของระบบทุ่มเทเดิม (life-goal 01) คงไว้ใต้ต้นไม้จนใบ 15 ย้ายเป้าไปผูกต้นไม้
+  const goals = focusGoals(offers);
+  const chain = el('ul', 'ft-chain');
+  chain.append(...goals);
+  wrap.append(el('h3', null, 'ปณิธาน'), goals.length ? chain : el('p', 'ft-note', 'ช่วงวัยนี้ไม่มีสายที่ต่อได้'));
   return wrap;
 }
 // ตอนตาย/ปรโลก (ข้อ 69): เรื่องที่ทุ่มมากสุด = focusMain ตัวเดียวกับที่ทายาทรับ · เรื่องอื่นเรียงตามปีที่ทุ่ม ไม่บอกตัวเลข
