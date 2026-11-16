@@ -11288,6 +11288,8 @@ const STAT_HELP = [
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
 
 const root = document.getElementById('app');
+// ลิงก์ "ข้ามไปเนื้อหา" ย้ายโฟกัสมาที่เนื้อหาได้ทุกเบราว์เซอร์ · ตั้งที่นี่ ไม่ใส่ใน HTML เพราะด่านโครงหน้าเปิดจับ <main id="app"> ตรงตัว
+root.tabIndex = -1;
 const appVer = document.getElementById('appVer');
 appVer.textContent = `${APP_VERSION} · ${APP_BUILD}`;
 // เลขรุ่นพาไปแพตช์โน้ตของรุ่นนั้น (B121) — หน้า whatsnew ไม่มี id ต่อรุ่น จึงเลื่อนด้วย text fragment ซึ่งตกไปหัวหน้าเองถ้าเบราว์เซอร์ไม่รองรับ
@@ -13196,7 +13198,23 @@ const numbered = (b, n) => {
   b.prepend(k);
   return b;
 };
+// ลิ้นชัก (dialog โมดัล) ไม่ปล่อย Tab ออกไปหัวเว็บ ราวเมนู หรือการ์ดใต้แผง · ราวเมนูยังกดด้วยเมาส์/นิ้วได้ (กดปุ่มใด = ปิดลิ้นชัก) จึงดักที่คีย์ ไม่ใช้ inert ทั้งราว
+// ตรวจก่อนด่าน repeat ข้างล่าง ไม่งั้นกด Tab ค้างหลุดออกนอกแผง
+const TAB_STOPS = 'a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])';
+function trapSheetTab(e) {
+  const sheet = root.querySelector('.sheet:not(.pin)');
+  if (!sheet || e.key !== 'Tab' || e.altKey || e.ctrlKey || e.metaKey) return;
+  const stops = [...sheet.querySelectorAll(TAB_STOPS)].filter((n) => !n.disabled && !n.closest('[hidden], [inert]') && n.getClientRects().length);
+  if (!stops.length) return;
+  const at = document.activeElement;
+  const edge = e.shiftKey ? stops[0] : stops.at(-1);
+  if (!sheet.contains(at) || at === edge) {
+    e.preventDefault();
+    (e.shiftKey ? stops.at(-1) : stops[0]).focus();
+  }
+}
 document.addEventListener('keydown', (e) => {
+  trapSheetTab(e);
   // กดค้าง = repeat — ไม่นับ ไม่งั้นเลือกรัวข้ามการ์ด
   if (e.repeat || e.altKey || e.ctrlKey || e.metaKey || e.isComposing) return;
   const t = e.target;
