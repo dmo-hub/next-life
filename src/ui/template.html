@@ -40,7 +40,13 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 #app { max-width:calc(var(--cw) + 2 * var(--pad-x)); margin:0 auto; padding:var(--pad-y) max(var(--pad-x), env(safe-area-inset-right)) var(--pad-y) max(var(--pad-x), env(safe-area-inset-left)); }
 /* ป้ายเกมไม่ใช่คำแนะนำการลงทุน (ใบ 11) อยู่ทุกหน้าจอ ไม่ใช่แค่การ์ดจัดสรรเงิน */
 .foot { max-width:calc(var(--cw) + 2 * var(--pad-x)); margin:0 auto; padding:0 max(var(--pad-x), env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(var(--pad-x), env(safe-area-inset-left)); font-size:12px; color:var(--muted); text-align:center; }
-.foot a { color:var(--muted); display:inline-block; min-height:44px; line-height:44px; }
+.foot a, .foot button { color:var(--muted); display:inline-block; min-height:44px; line-height:44px; }
+.foot button { font:inherit; background:none; border:0; padding:0 4px; text-decoration:underline; cursor:pointer; }
+/* h1 ห่อชื่อเกมให้หน้ามีหัวเรื่องเดียว — หน้าตาคงเป็น b เดิม · ลิงก์ข้ามไปเนื้อหาโผล่เมื่อโฟกัสด้วยคีย์บอร์ดเท่านั้น */
+.logo h1 { display:inline; margin:0; font:inherit; }
+.skip { position:absolute; left:8px; top:-100px; z-index:20; padding:10px 16px; background:var(--paper); color:var(--ink); border:2px solid var(--ink); border-radius:var(--r); font-weight:600; }
+.skip:focus { top:max(8px, env(safe-area-inset-top)); }
+#app:focus { outline:none; }
 /* ปุ่มอยู่ท้ายการ์ด (margin-top:auto) — การ์ดสูงตายตัว 560 บนจอเตี้ยดันปุ่มของการ์ดเนื้อสั้นลงใต้แถบเบราว์เซอร์
    · เพดานตามความสูงจอหักหัวเว็บ+ระยะบน (--chrome) · svh = จอตอนแถบเบราว์เซอร์โผล่ ไม่ยืดหดตามการเลื่อนแบบ dvh ปุ่มจึงไม่กระโดดระหว่างเลื่อน */
 :root { --chrome:136px; }
@@ -578,13 +584,13 @@ body:has(#app > .card.i) .logo { background:#0E1024; border-bottom-color:#3B4BA8
 body:has(#app > .card.i) .logo b { font-family:var(--ft); font-weight:600; font-size:clamp(22px, 6vw, 30px); color:#6FE3FF; }
 body:has(#app > .card.i) .logo small, body:has(#app > .card.i) .logo .ver, body:has(#app > .card.i) .logo .saved { color:#A6AEDB; }
 body:has(#app > .card.i) .logo .ver { border-color:#3B4BA8; }
-body:has(#app > .card.i) .foot a { color:#D3D8F5; }
+body:has(#app > .card.i) .foot a, body:has(#app > .card.i) .foot button { color:#D3D8F5; }
 /* ui-redo ใบ 15: ปรโลกชุดดำทองของต้นแบบ (ค่าที่เจ้าของไม่ได้ปรับ) — การ์ดลายรดน้ำเดิม หน้า แถบ 4 ค่า เมนู และแผงเข้าชุดเดียวกัน */
 body:has(#app > .card.af) { --page:#0E0A08; --muted:#BFAE86; --ink:#EFE3C2; --ink2:#E3D6B3; --paper:#17110D; --paper2:#2A2018; --rule2:#5A4630; --fl:#D9B45A; --dg:#FF8A7A; --track:#2A2018; --nav-edge:var(--bronze2); }
 body:has(#app > .card.af) .logo { background:#120D0A; }
 body:has(#app > .card.af) .logo b { color:var(--gold); }
 body:has(#app > .card.af) .logo small, body:has(#app > .card.af) .logo .ver, body:has(#app > .card.af) .logo .saved { color:var(--sand); }
-body:has(#app > .card.af) .foot a { color:var(--ink2); }
+body:has(#app > .card.af) .foot a, body:has(#app > .card.af) .foot button { color:var(--ink2); }
 .af .sb { background:#120D0A; }
 /* จดหมายเหตุบนการ์ดจบ — ป้ายอายุทอง เส้นซ้ายบอกชนิดบรรทัดแบบต้นแบบ · ช่วงวัยพับได้ ชีวิตยาวราวร้อยบรรทัดจึงไม่ดันปุ่มลงไปไกล */
 .ichron .istage { margin-top:6px; }
@@ -679,10 +685,11 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
 </style>
 </head>
 <body>
-<header class="logo"><b>เกิดใหม่ทั้งที <span>ชาตินี้ขอชิงมาเกิด</span></b><small>NEXT LIFE</small><a id="appVer" class="ver" title="เวอร์ชันเดโม · แพตช์โน้ตของเวอร์ชันนี้"></a><span id="saved" class="saved" aria-live="polite"></span></header>
+<a class="skip" href="#app">ข้ามไปเนื้อหา</a>
+<header class="logo"><h1><b>เกิดใหม่ทั้งที <span>ชาตินี้ขอชิงมาเกิด</span></b></h1><small>NEXT LIFE</small><a id="appVer" class="ver" title="เวอร์ชันเดโม · แพตช์โน้ตของเวอร์ชันนี้"></a><span id="saved" class="saved" aria-live="polite"></span></header>
 <!-- โครงหน้าเปิด (ui-redo 96): ขึ้นจอก่อนสคริปต์จบ และยังเห็นเมื่อปิด JavaScript · boot() ใน app.mjs ล้างทิ้งแล้ววาดจอจริง -->
 <main id="app"><article class="card a"><div class="top"><b>เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</b><small>เริ่มชีวิต</small></div><div class="body"><h3 class="lead">เกิดเป็นคนไทยทีละชีวิต เลือกทีละการ์ด</h3><noscript><p class="sub">เกมนี้ต้องเปิด JavaScript ในเบราว์เซอร์ก่อนจึงเล่นได้</p></noscript></div><div class="choices"><button type="button">เริ่มชีวิต</button></div></article></main>
-<footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <span class="foot-shelf"><a href="#" id="shelfLink">ชั้นสมุด</a> · </span><a href="#" id="dayLink">ชาติประจำวัน</a> · <a href="about.html">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
+<footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <span class="foot-shelf"><button type="button" id="shelfLink">ชั้นสมุด</button> · </span><button type="button" id="dayLink">ชาติประจำวัน</button> · <a href="about.html">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
 <!--__SCRIPTS__-->
 </body>
 </html>
