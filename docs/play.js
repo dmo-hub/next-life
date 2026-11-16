@@ -14060,8 +14060,13 @@ function kinParts(members, animals = false) {
     const here = members.filter((m) => m.alive && !m.left).length;
     return [el('h3', null, here ? `สัตว์เลี้ยง · ยังอยู่ ${here}` : 'สัตว์เลี้ยง'), kinList(members)];
   }
-  const alive = members.filter((m) => m.alive).length;
-  return [el('h3', null, `คนในบ้าน · ยังอยู่ ${alive} ${alive === members.length ? 'คน' : `จาก ${members.length} คน`}`), kinList(members)];
+  // คู่ที่จากไป/แยกทางย้ายไปหัวของมันเอง (ui-redo ใบ 30) ไม่ซ้ำในรายการหลัก · คู่ที่ยังอยู่คนเดียวไม่มีหัวนี้
+  const past = members.filter((m) => m.role === 'spouse' && (!m.alive || m.left));
+  const home = members.filter((m) => !past.includes(m));
+  const alive = home.filter((m) => m.alive).length;
+  const out = home.length ? [el('h3', null, `คนในบ้าน · ยังอยู่ ${alive} ${alive === home.length ? 'คน' : `จาก ${home.length} คน`}`), kinList(home)] : [];
+  if (past.length) out.push(el('h3', null, 'คู่ชีวิตที่ผ่านมา'), kinList(past));
+  return out;
 }
 // ผังตระกูลมีเมื่อเป็นรุ่นที่ 2 ขึ้นไป
 function clanParts() {
