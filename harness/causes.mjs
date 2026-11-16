@@ -8,7 +8,7 @@
 // ชิ้น 3: ทำร้ายตัวเองพาสายด่วน 1323 · สัตว์คู่ใจมีสาเหตุ · การ์ดสั่งตายพร้อมสาเหตุได้สาเหตุนั้นโดยไม่ดึงเลขสุ่ม
 // B168: ตายสงบ (วัยชรา/โรคเรื้อรังที่นัดไว้ อายุ ≥60) ได้การ์ดย้อนความทรงจำ 1 ใบพอดีก่อนคำสั่งเสีย · ทางอื่น 0 · ไม่มีช่อง {} ดิบ
 // · ตัวควบคุม นัดตายอุบัติเหตุอายุ 70 = 0 ใบ (นัดโรคเรื้อรังอายุ 70 ต้องได้)
-import { playLife, newLife, applyFamily, mixSeed, protoYear, causeShares, CHRONIC, DEATH_RISK, HEREDITARY, MAX_AGE, PET_CAUSES, memoryStories, isGone, stageOf, MEMORY } from '../src/engine/index.mjs';
+import { playLife, causeWords, newLife, applyFamily, mixSeed, protoYear, causeShares, CHRONIC, DEATH_RISK, HEREDITARY, MAX_AGE, PET_CAUSES, memoryStories, isGone, stageOf, MEMORY } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { random } from './bots.mjs';
 
@@ -141,8 +141,9 @@ for (let i = 0; i < n; i++) {
       g[1] += sh[keys.indexOf(k)];
     }
   }
+  // สาเหตุของฉากเฉพาะเรื่อง (เช่น training ในเตรียมทหาร) ไม่อยู่ในตารางสถิติยุค จึงไม่นับเข้าสัดส่วนเทียบสถิติ · แต่ต้องมีป้ายสาเหตุบนการ์ดตาย (CAUSE_TEXT ผ่าน causeWords) ไม่งั้นนับว่าไม่มีสาเหตุ
   if (!keys.includes(st.cause)) {
-    noCause++;
+    if (!causeWords(st.cause, age)) noCause++;
     continue;
   }
   if (CHRONIC.includes(st.cause) && age >= 3 && !healthDeath) {
