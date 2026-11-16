@@ -445,6 +445,8 @@ export function catArt(k) {
 export function resultArtCat(card) {
   if (card.tag === 'afterlife') return 'after';
   if (card.trip || card.tag === 'trip') return 'far';
+  // สัตว์ในบ้านตาย (loss.role pet/herd) เป็นหมวดสัตว์เลี้ยง ไม่ใช่คนในบ้านจากไป — ไม่งั้นหมวด pet ไม่มีวันขึ้น
+  if (card.loss && ['pet', 'herd'].includes(card.loss.role)) return 'pet';
   if (card.digest === 'kin_loss' || card.tag === 'loss') return 'loss';
   if (card.digest === 'kin_ill' || card.illness || (card.tag === 'sick' && !card.focusRisk)) return 'ill';
   if (card.digest === 'pet' || card.tag === 'pet') return 'pet';
