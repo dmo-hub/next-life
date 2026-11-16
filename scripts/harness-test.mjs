@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, dieMidYear, causeWords } from '../src/engine/index.mjs';
+import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, dieMidYear, causeWords, nextCard } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
@@ -914,6 +914,31 @@ const f2 = (v) => v.toFixed(2);
   play(rich, () => 0.5, true);
   check('เฟส 3 ลาออก: กลับ ม.ปลาย ไม่มีคำนำหน้า', poor.school === 'upper' && !poor.title && !poor.cadet, `${poor.school} · ${poor.title}`);
   check('เฟส 3 ลาออก: บ้านจน = หนี้ลาออก ไม่ใช่หนี้ค่าติว · บ้านรวยไม่มีหนี้', !!poor.flags.cadet_resign_debt && !poor.flags.family_debt && !rich.flags.cadet_resign_debt);
+}
+
+// เฟส 3 ช่วง 5: ปี 2 ต้องเริ่มจริงเมื่อเดินผ่านลูปขึ้นปีของเกม (บั๊กที่เจอตอนวัดในเกมจริง 2026-11-16: กองปกติปิด → ปีที่รอไม่มีการ์ด → เกมข้ามปีจนพ้นช่วงเรียน)
+{
+  const content = loadContent();
+  let reached = 0, alive = 0;
+  for (let i = 0; i < 40; i++) {
+    const st = newLife(mixSeed(0x5c05, i), content);
+    Object.assign(st, { age: 16, sex: 'ชาย', health: 95, cadetInfo: { tries: 1, order: ['army'] },
+      cadet: { steps: [['p2']], cur: null, p2: { branches: ['army'], written: { army: true }, reason: {}, body: { army: true }, final: ['army'], chosen: 'army', scores: { army: 20 }, askNs: {}, steps: [['arrive', 'army']] } } });
+    const R = makeRng(i);
+    let y2 = false;
+    for (let g = 0; g < 500 && !st.dead && st.age <= 18; g++) {
+      const c = nextCard(st);
+      if (c.kind === 'death') break;
+      if (c.id === 'cadet:school:SB-16') y2 = true;
+      if (y2 || st.trip || st.court) break;
+      const open = c.choices?.length ? openChoices(c).filter((k) => !/ยื่นลาออก/.test(c.choices[k])) : [];   // ไม่ลาออก (วัดทางเรียนต่อ)
+      if (open.length) choose(st, open[R.int(0, open.length - 1)]);
+    }
+    if (st.dead || st.trip || st.court || st.flags.cadet_medical_out || st.school === 'upper') continue;
+    alive++;
+    if (y2) reached++;
+  }
+  check('เฟส 3 ปี 2 เริ่มจริงหลังขึ้นปี (เดินผ่านลูปขึ้นปีของเกม)', alive > 0 && reached === alive, `${reached}/${alive}`);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
