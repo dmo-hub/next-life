@@ -20,7 +20,7 @@
   --paper:#FBF6EA; --paper2:color-mix(in srgb, #FBF6EA 45%, #F4ECDC); --rule:#C9B98F; --rule2:color-mix(in srgb, #C9B98F 60%, #FBF6EA); --line-strong:#8C7A52;
   --red:#A62B1F; --seal:var(--red); --green:#2F6B4F; --blue:#7A5C12; --head:#1B2A4A;
   --lacquer:#17110D; --lacquer2:#221912; --gold:#D9B45A; --gold2:#F0D78C; --cream:#EFE3C2; --bronze:#5A4630; --bronze2:#8A6D3B; --sand:#BFAE86;
-  --fl:#015EC1; --dg:#B3261E; --track:#E2D9C6;
+  --fl:#015EC1; --dg:#B3261E; --track:#E2D9C6; --nav-edge:var(--line-strong);
   --ft:Sarabun,system-ui,sans-serif; --fh:Maitree,serif;
   --r:6px; --rk:8px; --rc:999px; --sh:0 1px 0 var(--gold), 0 6px 18px color-mix(in srgb, var(--ink) 10%, transparent);
   --cw:800px; --pad-y:36px; --pad-x:32px;
@@ -148,9 +148,12 @@ body:has(.sb.dying)::after { content:''; position:fixed; inset:0; z-index:9; poi
 body:has(.mnav) { padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)); }
 .mnav { position:fixed; left:0; right:0; bottom:0; z-index:8; display:flex; max-width:calc(var(--cw) + 2 * var(--pad-x)); margin:0 auto; padding:0 max(8px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px, env(safe-area-inset-left)); background:var(--paper); border-top:1px solid var(--rule2); box-shadow:0 -4px 16px rgb(0 0 0 / .06); }
 .mnav button { all:unset; box-sizing:border-box; flex:1 1 0; min-width:0; min-height:var(--nav-h); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:4px 2px; font-size:13px; font-weight:600; color:var(--ink); text-align:center; cursor:pointer; }
-.mnav button[aria-expanded="true"], .mnav button[aria-pressed="true"] { color:var(--fl); box-shadow:inset 0 3px 0 var(--fl); }
+/* ปุ่มเมนูเป็นกล่องมีขอบ ตัวที่เลือกลงพื้น (ui-redo 107 · ข้อ 294 ชุด ข) · ขอบใช้ --nav-edge ≥3:1 กับพื้นแถบทุกโลก (--rule2 ต่ำเกิน) */
+.mnav { gap:6px; padding-top:5px; padding-bottom:calc(5px + env(safe-area-inset-bottom)); }
+.mnav button { min-height:calc(var(--nav-h) - 10px); border:1px solid var(--nav-edge); border-radius:var(--r); }
+.mnav button[aria-expanded="true"], .mnav button[aria-pressed="true"] { color:var(--fl); background:var(--paper2); }
 /* แท็บที่เลือกเป็นคราม เฉพาะจอชาติไทย (ข้อ 223: token ไทยห้ามขึ้นจอโลกอื่น) */
-body:has(#app > .card.a) .mnav button[aria-expanded="true"], body:has(#app > .card.a) .mnav button[aria-pressed="true"] { color:var(--ink); box-shadow:inset 0 3px 0 var(--ink); }
+body:has(#app > .card.a) .mnav button[aria-expanded="true"], body:has(#app > .card.a) .mnav button[aria-pressed="true"] { color:var(--ink); }
 .mnav button:focus-visible { outline:2px solid currentColor; outline-offset:-4px; }
 /* จุดของใหม่ (ใบ 05) มุมขวาบนของคำ ไม่ดันป้ายปุ่มให้เบี้ยว · ฉากที่มีเมนู ลิงก์ท้ายหน้าทั้งชุดย้ายเข้าปุ่มสมุดกับแผงเพิ่มเติม (ใบ 08) ท้ายหน้าจึงซ่อน */
 .mnav button { position:relative; }
@@ -570,14 +573,14 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .fx-title .fx-name { font-family:Maitree,serif; font-weight:600; }
 /* ทั้งหน้าเข้าธีมต่างโลกตามการ์ดที่ขึ้นจอ — ผูกกับการ์ดด้วย :has จึงไม่ต้องตามล้างธงทุกจุดที่วาดจอไทย */
 /* ui-redo ใบ 13: ชุดกรมท่าเรืองของต้นแบบลงตัวแปรหน้า — แถบสถานะ เมนูล่าง/ราวซ้าย และแผงจากเมนูเปลี่ยนสีตามโดยไม่มีกฎแยก */
-body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; --ink:#E8ECFF; --ink2:#D3D8F5; --paper:#161A3A; --paper2:#232A5E; --rule2:#3B4BA8; --fl:#6FE3FF; --dg:#FF8A8A; --track:#262C5A; }
+body:has(#app > .card.i) { --page:#0B0D20; --muted:#A6AEDB; --ink:#E8ECFF; --ink2:#D3D8F5; --paper:#161A3A; --paper2:#232A5E; --rule2:#3B4BA8; --fl:#6FE3FF; --dg:#FF8A8A; --track:#262C5A; --nav-edge:#5663C9; }
 body:has(#app > .card.i) .logo { background:#0E1024; border-bottom-color:#3B4BA8; }
 body:has(#app > .card.i) .logo b { font-family:var(--ft); font-weight:600; font-size:clamp(22px, 6vw, 30px); color:#6FE3FF; }
 body:has(#app > .card.i) .logo small, body:has(#app > .card.i) .logo .ver, body:has(#app > .card.i) .logo .saved { color:#A6AEDB; }
 body:has(#app > .card.i) .logo .ver { border-color:#3B4BA8; }
 body:has(#app > .card.i) .foot a { color:#D3D8F5; }
 /* ui-redo ใบ 15: ปรโลกชุดดำทองของต้นแบบ (ค่าที่เจ้าของไม่ได้ปรับ) — การ์ดลายรดน้ำเดิม หน้า แถบ 4 ค่า เมนู และแผงเข้าชุดเดียวกัน */
-body:has(#app > .card.af) { --page:#0E0A08; --muted:#BFAE86; --ink:#EFE3C2; --ink2:#E3D6B3; --paper:#17110D; --paper2:#2A2018; --rule2:#5A4630; --fl:#D9B45A; --dg:#FF8A7A; --track:#2A2018; }
+body:has(#app > .card.af) { --page:#0E0A08; --muted:#BFAE86; --ink:#EFE3C2; --ink2:#E3D6B3; --paper:#17110D; --paper2:#2A2018; --rule2:#5A4630; --fl:#D9B45A; --dg:#FF8A7A; --track:#2A2018; --nav-edge:var(--bronze2); }
 body:has(#app > .card.af) .logo { background:#120D0A; }
 body:has(#app > .card.af) .logo b { color:var(--gold); }
 body:has(#app > .card.af) .logo small, body:has(#app > .card.af) .logo .ver, body:has(#app > .card.af) .logo .saved { color:var(--sand); }
@@ -649,7 +652,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   .mnav { top:0; right:auto; width:var(--rail-w); max-width:none; flex-direction:column; gap:4px; margin:0; padding:max(16px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left)); border-top:0; border-right:1px solid var(--rule2); box-shadow:4px 0 16px rgb(0 0 0 / .06); }
   .mnav button { flex:none; flex-direction:row; justify-content:flex-start; gap:10px; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
   .mnav button:hover { background:var(--paper2); }
-  .mnav button[aria-expanded="true"], .mnav button[aria-pressed="true"] { background:var(--paper2); box-shadow:inset 3px 0 0 var(--fl); }
+  .mnav button[aria-expanded="true"], .mnav button[aria-pressed="true"] { background:var(--paper2); }
   .mnav .new-dot { position:static; margin-left:6px; }
   body:has(.mnav) .choices.pin { bottom:env(safe-area-inset-bottom); }
   .sheet { top:0; bottom:0; left:auto; width:min(var(--sheet-w), 100vw - var(--rail-w)); max-width:none; max-height:none; margin:0; padding-right:max(20px, env(safe-area-inset-right)); border-left:1px solid var(--rule2); border-radius:0; box-shadow:-10px 0 30px rgb(0 0 0 / .2); }
