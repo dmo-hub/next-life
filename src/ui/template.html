@@ -650,6 +650,12 @@ body:has(#app > .card.af) .foot a, body:has(#app > .card.af) .foot button { colo
   .era-art { width:min(100%, 160px); }
   .choice .fx span { white-space:normal; }
 }
+/* วงโฟกัสคีย์บอร์ดต้องต่างจาก hover (ui-redo 97): ตัวเลือกการ์ดทุกแนวคิดตัด outline ทิ้งตอนโฟกัส ทำให้แยกไม่ออกว่าอยู่ตัวไหนเมื่อเมาส์ไม่ได้ชี้ */
+.logo a.ver:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+.a .choice:focus-visible { outline:3px solid var(--ink); outline-offset:3px; }
+.b .choice:focus-visible { outline:3px solid var(--gold2); outline-offset:3px; }
+.i .choice:focus-visible { outline:3px solid #6FE3FF; outline-offset:3px; }
+.mem .choices > .choice:focus-visible { outline-width:3px; outline-offset:4px; }
 /* เลย์เอาต์คอม (ui-redo ใบ 09 · เจ้าของเคาะราวซ้าย + ลิ้นชัก): จอกว้างแถบเมนูล่างกลายเป็นราวซ้ายค้าง · แผงเปิดเป็นลิ้นชักขวาเต็มความสูง (จอกว้างมากเป็นแผงค้าง ใบ 67 ด้านล่าง)
    · มือถือแนวนอนเตี้ยใช้ราวแคบด้วย — แถบล่าง 60px กินหนึ่งในหกของจอสูง 360 · ราวกว้างเพิ่มตามรอยบากฝั่งซ้าย ป้ายปุ่มจึงไม่ถูกบีบ */
 @media (min-width: 1024px), (orientation: landscape) and (max-height: 540px) {
