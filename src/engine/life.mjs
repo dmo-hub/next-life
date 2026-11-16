@@ -2271,7 +2271,7 @@ export function choose(st, idx, loan) {
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
     // นับสายเฉพาะตอนมีเพดาน — ปิดกติกาแล้ว state ต้องไม่มีช่องเพิ่ม ไม่งั้นตัวควบคุมเทียบฐานไม่ได้
     const capped = DRAW_RULES.nextCap !== Infinity;
-    const start = capped && !st.inStory?.[ev.id];
+    const start = capped && !st.inStory?.[ev.id] && follow?.run === undefined;
     const stage = stageOf(st.age);
     if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow) && arcNextOk(st, ev, follow) && !(start && (st.stories?.[stage] ?? 0) >= DRAW_RULES.nextCap)) {
       if (start) (st.stories ??= {})[stage] = (st.stories[stage] ?? 0) + 1;
