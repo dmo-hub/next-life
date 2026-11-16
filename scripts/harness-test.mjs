@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES } from '../src/engine/index.mjs';
+import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
@@ -171,6 +171,41 @@ const f2 = (v) => v.toFixed(2);
   check('B159 ตัวควบคุม: probe ต้องธงที่ไม่มีใครถือ ⇒ ไม่มี seed ไหนทำให้ออก', SEEDS.every((s) => runWith(dead, s, { smoker: 1 }).probe.length === 0));
   check('B159 ไม่มีธงพ่อแม่ = การ์ดอ่านธงไม่ออก · ไม่มีช่อง parentFrom', !none.probe.length && !none.keyed.length && !other.probe.length && !other.keyed.length);
   check('B159 ถือธงตรง = การ์ดออก ป้าย [{flag, tier}] เฉพาะใบนั้น', smoker.probe.length > 0 && smoker.keyed.length === smoker.probe.length && JSON.stringify(smoker.probe[0].parentFrom) === '[{"flag":"smoker","tier":1}]');
+}
+
+// ปณิธาน = ปลายสายของทุ่มเท (life-goal ใบ 01 · ui-redo 50 ทำจอแล้ว): แกนกลางเป็นตัวเดียวที่ตัดสินว่าปลายสายขึ้นเมื่อไหร่ ไม่มีการ์ดเลือกเป้า
+// ข้อ 3 "ข้ามช่วงไม่ครบแล้วทำครบทีหลัง" ไม่ทำ (เจ้าของเคาะ) — เทสต์ล็อกพฤติกรรมปัจจุบันไว้ให้ใครแก้ต้องเปิดใบใหม่
+{
+  const base = loadContent();
+  const defs = base.focus.focuses;
+  const chain = base.focus.chain_years;
+  const ok = () => true;
+  const years = (h, stage, from, n) => { for (let a = from; a < from + n; a++) focusYearEnd(h, defs, stage, ok, a, chain); return h; };
+  const offered = (h, stage) => focusOffers(defs, stage, ok, h);
+  const tail = (id) => id === 'scholarship' && defs[id].after === 'study_hard';
+
+  check('lg01 ข้อ 1 ปลายสาย scholarship ต่อจาก study_hard ในทะเบียน', tail('scholarship'));
+  const h = { focus: 'study_hard', focusAt: 11 };
+  check('lg01 ข้อ 1 ทุ่มต้นสายยังไม่ครบ = ปลายสายยังซ่อน', !offered(years(h, 'วัยรุ่น', 12, chain - 1), 'วัยรุ่น').includes('scholarship') && h.focusMet?.study_hard === undefined);
+  years(h, 'วัยรุ่น', 12 + chain - 1, 1);
+  check('lg01 ข้อ 1 ครบ chain_years ปีช่วงวัยรุ่น = จดช่วงที่ครบ', h.focusMet?.study_hard === 'วัยรุ่น', `${h.focusMet?.study_hard}`);
+  check('lg01 ข้อ 1 ช่วงที่ครบยังไม่ขึ้นปลายสาย (ขึ้นตั้งแต่ช่วงถัดไป)', !offered(h, 'วัยรุ่น').includes('scholarship'));
+  check('lg01 ข้อ 2 ช่วงถัดไปปลายสายขึ้น เป้าค้างข้ามช่วงวัยได้', offered(h, 'หนุ่มสาว').includes('scholarship'));
+  check('lg01 ข้อ 2 ข้ามช่วงแล้ว focusMet ยังอยู่ (ปลายสายไม่หายเมื่อเปลี่ยนช่วง)', h.focusMet.study_hard === 'วัยรุ่น' && years({ ...h, focus: null }, 'หนุ่มสาว', 20, 1).focusMet.study_hard === 'วัยรุ่น');
+  check('lg01 ข้อ 2 ปลายสายอยู่นอกช่วงวัยของตัวเอง = ไม่ขึ้น (ช่วงวัยของปลายสายคุม)', !offered(h, 'ทำงาน').includes('scholarship'));
+
+  // ข้อ 3 ที่ไม่ทำ: ต้นสายที่ช่วงวัยจบก่อนครบ chain_years สะสมต่อช่วงถัดไปไม่ได้ (focus.mjs focusYearEnd หลุดช่วง = กลับตามน้ำ)
+  const p = { focus: 'play_friends', focusAt: 11 };
+  years(p, 'วัยรุ่น', 12, chain - 1);
+  const back = focusYearEnd(p, defs, 'หนุ่มสาว', ok, 12 + chain - 1, chain);
+  check('lg01 ข้อ 3 (ไม่ทำ) ต้นสายหลุดช่วงวัยก่อนครบ = กลับตามน้ำ ไม่นับปีต่อ', back === null && p.focus === null && p.focusYears.play_friends === chain - 1 && p.focusMet?.play_friends === undefined, `${back} · ${p.focusYears.play_friends}`);
+  check('lg01 ข้อ 3 (ไม่ทำ) ปลายสาย gang_lead ยังซ่อนในช่วงถัดไป', !offered(p, 'หนุ่มสาว').includes('gang_lead'));
+
+  // ข้อ 4: เลือกทุ่มเทเป็นสถานะบนตัวผู้เล่น ไม่ใช่การ์ด — ไม่มีรายการใหม่ในประวัติชีวิตและไม่มีการ์ดค้าง
+  const st = newLife(11, base);
+  const logLen = st.log.length;
+  setLifeFocus(st, 'play_friends');
+  check('lg01 ข้อ 4 ตั้งโฟกัสไม่เพิ่มการ์ด/บันทึกใด', st.focus === 'play_friends' && st.log.length === logLen && !st.pending, `${st.log.length} · ${logLen}`);
 }
 
 // ประตูเข้าสาย (โฟกัสใบ 04): ตัวเลือกติดป้าย gate ซ่อน (hidden + locked) จนประตูเปิด — ไม่ตัดออก เลขลำดับจึงตรงเนื้อหา · ประตูเปิดจากโฟกัสครบ chain_years · ทายาท · ธงชวน
