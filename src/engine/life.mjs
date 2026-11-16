@@ -144,11 +144,14 @@ export const isWorking = (st, age = st.age) => st.workFrom !== null && age >= st
 // ช่วงเรียนที่การ์ดเห็น: ก่อนวัยเข้าเรียนยังไม่มีช่วงเรียน (ค่าเริ่ม primary รออยู่) · เลิกเรียนแล้ว = none
 export const schoolOf = (st, age = st.age) => (st.school && age >= SCHOOL_FROM ? st.school : 'none');
 
+// คำนำหน้าของนักเรียนเตรียมทหาร: "นรม." ตั้งแต่วันรายงานตัว แล้วเป็น "นตท." เมื่อได้ชุดปกติ (เจ้าของเคาะ 2026-11-11)
+const CADET_TITLES = ['นรม.', 'นตท.'];
 // ป้ายสถานะงานบนจอ: ก่อนมีงานไม่โชว์อาชีพ (อาชีพตอนเกิดเป็นของครอบครัว ใช้คิดเงินติดตัวเท่านั้น)
 export function jobText(st, age = st.age) {
   if (st.workFrom === null) {
     // นตท. (สอบติดเตรียมทหาร) ใช้ track โรงเรียนนายร้อยชั่วคราว — ป้ายบนจอต้องเป็นนักเรียนเตรียมทหาร (เจ้าของเคาะ A 2026-11-06)
-    if (st.title === 'นตท.') return 'นักเรียนเตรียมทหาร';
+    // ช่วงแรกเป็น "นรม." (นักเรียนใหม่) ได้ชุดปกติแล้วเป็น "นตท." ทั้งสองแบบคือนักเรียนเตรียมทหาร (เจ้าของเคาะ 2026-11-11)
+    if (CADET_TITLES.includes(st.title)) return 'นักเรียนเตรียมทหาร';
     if (st.school && age >= SCHOOL_FROM) return `กำลังเรียน${TRACKS[st.school].name}`;
     return age < SCHOOL_FROM ? 'ยังไม่เข้าเรียน' : 'ยังไม่ทำงาน';
   }
@@ -563,6 +566,16 @@ function faceDeath(st, cause, opts = {}) {
   return { fate: 'dead' };
 }
 
+// ตายกลางปีจากฉากในเส้นที่เดินลำดับของตัวเอง (เฟส 3 ชีวิตในโรงเรียนเตรียมทหาร · เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16)
+// ใช้ด่านตายเดียวกับการ์ดปกติ สัญญารอดตายกับพิธีโกงความตายจึงยังทำงาน · การ์ดผลที่รอในคิว (ฉากสุดท้ายก่อนตาย) เล่าก่อนเสมอ
+// รอดเพราะสัญญา = เล่าการ์ดรอดต่อ แล้วชีวิตในโรงเรียนเดินต่อในปีเดิม (ไม่ข้ามปีแบบตายตอนขึ้นปี)
+export function dieMidYear(st, cause) {
+  const d = faceDeath(st, cause, { afterQueue: true });
+  if (d.fate === 'dead') queueFuneral(st);
+  if (d.fate === 'survive') st.queue.push(d.card);
+  return d.fate;
+}
+
 function healthCause(st) {
   const era = st.content.era;
   const py = protoYear(era, st.seed, st.birthYear + st.age);
@@ -599,7 +612,8 @@ export const FILL = {
   // กันชั้นที่สอง (S3 · g-b7 2026-11-09): ไม่ใช่ทายาท = ว่าง แม้ด่าน heir-unguarded หลุด
   ผู้ใหญ่ทายาท: (st) => (heirOfLine(st) ? ({ father: 'พ่อ', mother: 'แม่' })[heirCase(st)] ?? homeElder(st) : ''),
   // ทางรับราชการของแม่ (เจ้าของเคาะ 2026-11-09): ทายาทตำรวจ = พนักงานสอบสวนหญิง · ทายาททหาร = พยาบาลทหาร
-  ทางแม่: (st) => ({ police: 'พนักงานสอบสวนหญิง', army: 'พยาบาลทหาร' })[heirOfLine(st)] ?? '',
+  // เจ้าของเคาะ 2026-11-10 ทาง ก (cadet-b5-late-mother.md ข้อ 4): แม่เป็นผู้เล่นชาติก่อน (ancestor) = "ทหาร"/"ตำรวจ" ไม่ระบุสาย (เกมไม่ได้เก็บสายจริง) · ทายาทจากการเกิดใช้ค่าเดิม
+  ทางแม่: (st) => (st.parents?.some((p) => p.ancestor && p.sex === 'หญิง') ? { police: 'ตำรวจ', army: 'ทหาร' } : { police: 'พนักงานสอบสวนหญิง', army: 'พยาบาลทหาร' })[heirOfLine(st)] ?? '',
   // ที่ตั้งโรงเรียนเตรียมทหารตามปี (numbers.campus_nayok_year)
   ที่ตั้ง: (st) => campusName(st),
   // ชื่อ + นามสกุล (บท S1 2026-11-06 ใช้กับ "นตท.{ชื่อเต็ม}") · เกมยังไม่มีนามสกุล = ชื่อเฉย ๆ · คำนำหน้าไม่ใส่ใน {ชื่อ}/{ชื่อเต็ม} (เจ้าของเคาะ A1)
@@ -634,6 +648,8 @@ const CAUSE_TEXT = {
   infection: ['ด้วย', 'โรคติดเชื้อ'], pneumonia: ['ด้วย', 'ปอดอักเสบ'], heart: ['ด้วย', 'โรคหัวใจ'], stroke: ['ด้วย', 'โรคหลอดเลือดสมอง'],
   cancer: ['ด้วย', 'โรคมะเร็ง'], diabetes_kidney: ['ด้วย', 'โรคเบาหวานและไต'], liver: ['ด้วย', 'โรคตับ'], chronic_resp: ['ด้วย', 'โรคปอดเรื้อรัง'],
   road: ['จาก', 'อุบัติเหตุบนท้องถนน'], accident: ['จาก', 'อุบัติเหตุ'], assault: ['เพราะ', 'ถูกทำร้าย'], newborn: ['ด้วย', 'ภาวะแทรกซ้อนแรกเกิด'],
+  // ตายระหว่างฝึกในโรงเรียนเตรียมทหาร (เฟส 3 · เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16) — เกิดจากฉากเสี่ยงในโรงเรียนเท่านั้น ไม่อยู่ในตารางสุ่มสาเหตุตาย
+  training: ['ระหว่าง', 'การฝึกในโรงเรียนเตรียมทหาร'],
 };
 export const causeWords = (cause, age) => (cause === 'other' ? (age >= STAGES.at(-1).from ? ['ด้วย', 'วัยชรา'] : null) : CAUSE_TEXT[cause] ?? null);
 // ตัวแทนมีเงื่อนไข {key:ทาง1|ทาง2|…} (B1 เส้นเตรียมทหาร · ยกจาก Demo) — แต่ละทางซ้อนตัวแทนธรรมดาได้หนึ่งชั้น เช่น {ลับ:{ผู้ใหญ่}ยังไม่รู้|…}
@@ -641,7 +657,8 @@ export const causeWords = (cause, age) => (cause === 'other' ? (age >= STAGES.at
 export const FILL_COND = {
   // ทายาท 3 ทาง: พ่อรับราชการยังอยู่ | แม่รับราชการเอง | พ่อที่เสียแล้ว (เจ้าของเคาะ 2026-11-09)
   // ไม่ใช่ทายาท = ไม่มีทางไหนตรง → ว่าง (กันชั้นที่สอง)
-  ทายาท: (st) => (heirOfLine(st) ? ({ father: 0, mother: 1, lateFather: 2 })[heirCase(st)] : -1),
+  // ทาง 4 = lateMother แม่ (ผู้เล่นชาติก่อน) ที่รับราชการแล้วเสียไปแล้ว (เจ้าของเคาะบท S1 2026-11-10 · cadet-b5-late-mother.md) · ข้อความที่มีแค่ 3 ทาง = ว่าง
+  ทายาท: (st) => (heirOfLine(st) ? ({ father: 0, mother: 1, lateFather: 2, lateMother: 3 })[heirCase(st)] ?? -1 : -1),
   // มือถือ: ตั้งแต่ปี numbers.mobile_year | ก่อนหน้า
   มือถือ: (st) => (st.birthYear + st.age >= (cadetNum(st).mobile_year ?? 2542) ? 0 : 1),
   // ลับ: แอบสอบ (cadet_family_secret) | ที่บ้านรู้
@@ -667,7 +684,12 @@ export const heirOfLine = (st) => (st.parentFlags?.army_family ? 'army' : st.par
 // คนที่เคยรับราชการ (เจ้าของเคาะ 2026-11-09): พ่อยังอยู่ = father · มีแต่แม่ = mother (แม่รับราชการทางอื่น)
 // ยกเว้นทายาทตำรวจที่เกิดก่อน numbers.police_woman_year (ยังไม่รับผู้หญิงเป็นพนักงานสอบสวน) = lateFather · ไม่มีพ่อแม่ = lateFather (พ่อที่เสียแล้ว ป้าเล่า)
 // ตัดสินจากปีเกิด (คงที่ทั้งชีวิต) ไม่ต้องเก็บใน state
+// เจ้าของเคาะ 2026-11-10 (ยกเว้น R2 เฉพาะกรณีนี้): ทายาทที่สืบจากผู้เล่นชาติก่อน = parents[].ancestor คือคนที่เคยรับราชการ (เกมรู้เพศจริง)
+// ancestor ยังอยู่ = father/mother ตามเพศ · ancestor ชายที่เสียแล้ว = lateFather · ancestor หญิงที่เสียแล้ว = lateMother (ยังไม่มีบท → ไม่ขึ้นบทฝั่งทายาท · {ทายาท:} ว่าง)
+// ทายาทจากการเกิด 5.00% (ไม่มี ancestor) ใช้กติกาเดิมด้านล่าง
 export function heirCase(st) {
+  const anc = heirOfLine(st) && st.parents?.find((p) => p.ancestor);
+  if (anc) return anc.alive ? (anc.sex === 'หญิง' ? 'mother' : 'father') : anc.sex === 'หญิง' ? 'lateMother' : 'lateFather';
   if (parentAlive(st, 'ชาย')) return 'father';
   if (parentAlive(st, 'หญิง') && !(heirOfLine(st) === 'police' && st.birthYear < (cadetNum(st).police_woman_year ?? 2538))) return 'mother';
   return 'lateFather';
@@ -952,7 +974,8 @@ function trackExit(st, track, year, out = st.due) {
   else {
     st.school = null;
     // จบโรงเรียนนายร้อยเข้าบันไดยศ: เลิกเป็น นตท. (G2 เจ้าของเคาะ 2026-11-06) · เฟส 3 ค่อยใส่ยศจริง
-    if (track.ladder && st.title === 'นตท.') delete st.title;
+    // ติดยศแล้วเอาคำนำหน้านักเรียนออก ทั้ง "นรม." และ "นตท." (เจ้าของเคาะ 2026-11-11)
+    if (track.ladder && CADET_TITLES.includes(st.title)) delete st.title;
     if (track.ladder) applyEffects(st, { ladder: track.ladder });
     else dueJob(st);
   }
@@ -1016,6 +1039,16 @@ function releaseTrack(st, out) {
 }
 // เลิกสอบแล้ว (cadet_let_go) ประตูไม่นับ: คนสละที่นั่งถือประตูข้ามปีไว้รอการ์ดสอบซ้ำ ถ้าเลิกกลางทาง ประตูไม่มีปีสอบมาล้าง
 const cadetLive = (st) => !!(st.flags.cadet_dream || st.cadet || (st.flags.cadet_exam_door && !st.flags.cadet_passed && !st.flags.cadet_let_go));
+// ออกจากโรงเรียนเตรียมทหารกลางทาง (เฟส 3 · ลาออกเอง หรือ ออกเพราะบาดเจ็บ · เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16)
+// เอาคำนำหน้านักเรียนออก แล้วกลับไปเรียน ม.ปลายตามเดิม · อายุถึงวันจบ ม.ปลายแล้ว = ไปการ์ดหางาน (track ที่เลยวันจบไปแล้วไม่จบเอง)
+export function leaveCadetSchool(st) {
+  if (CADET_TITLES.includes(st.title)) delete st.title;
+  if (st.age < TRACKS.upper.until) st.school = 'upper';
+  else {
+    st.school = null;
+    dueJob(st);
+  }
+}
 function dueJob(st) {
   if (cadetLive(st)) st.needJob = true;
   else st.due.push({ kind: 'eraEvent', ev: jobCard(st), age: st.age });
@@ -1697,6 +1730,12 @@ function drawCard(st) {
       st.due = [];
       return nextCard(st);
     }
+    // ชีวิตในโรงเรียนเตรียมทหารรอขึ้นปี 2 (เฟส 3): กองปกติปิดอยู่ ปีนั้นจึงอาจไม่มีการ์ดอื่นพาออกจากลูปนี้
+    // ถึงปีที่รอแล้วต้องกลับไปเปิดฉากโรงเรียนต่อ ไม่งั้นเกมข้ามปีไปเรื่อย ๆ จนพ้นช่วงเรียน (S2 เจอตอนวัดในเกมจริง 2026-11-16)
+    if (st.cadet?.school && cadetActive(st)) {
+      st.advance = false;
+      return nextCard(st);
+    }
     // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
     const year = st.birthYear + st.age;
     arcDefer(st);
@@ -1792,6 +1831,8 @@ export const arcSummary = (st) => Object.entries(st.arcs ?? {}).map(([key, a]) =
 // กองสุ่ม (B14): เหตุการณ์ไม่มี at_age แต่มี weight · ใบเดิมไม่ซ้ำในชีวิต เว้นแต่ตั้ง repeat · ไม่มีใบที่เกิดได้ = ไม่ดึงเลขสุ่ม
 // ชีวิตที่เนื้อหาไม่มีกองจึงได้ชะตาเดิมทุกหลัก
 function drawPool(st, year) {
+  // เฟส 3 ชีวิตในโรงเรียนเตรียมทหาร (ฮับเคาะ P6): ระหว่าง 2 ปีนี้ขึ้นเฉพาะฉากโรงเรียน การ์ดกองปกติพักไว้
+  if (st.cadet?.school) return null;
   const stage = stageOf(st.age);
   let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e));
   // เส้นเตรียมทหาร (เจ้าของ 2026-11-06): ถือธงนี้อยู่ = จั่วเฉพาะใบที่ต้องมีธงนี้ เรื่องชีวิตวัยรุ่นทั่วไปพักไว้ก่อน

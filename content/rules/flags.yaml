@@ -183,6 +183,77 @@ flags:
   # >>> nl-writer b003 flag cadet_exam_door
   cadet_exam_door: "ไปถึงห้องสอบเตรียมทหารมาแล้ว"
   # <<< nl-writer b003 flag cadet_exam_door
+  # >>> nl-writer b010 flag cadet_bunkmate
+  # เตรียมทหาร เฟส 3 ชีวิตในโรงเรียน ปี 1 (ตั้งในฉาก school ของ rules/cadet.yaml)
+  cadet_bunkmate: "เตรียมทหาร: สนิทกับดุ่ยเพื่อนข้างเตียงตั้งแต่คืนแรกในโรงนอน"
+  # <<< nl-writer b010 flag cadet_bunkmate
+  # >>> nl-writer b010 flag cadet_took_blame
+  cadet_took_blame: "เตรียมทหาร: ฉากใครตด ก้าวออกไปรับแทนทั้งกอง"
+  # <<< nl-writer b010 flag cadet_took_blame
+  # >>> nl-writer b010 flag cadet_called_it
+  cadet_called_it: "เตรียมทหาร: ฉากใครตด รายงานว่าเสียงมาจากข้างหลังแถว เพื่อนเรียกว่าคนกล้า"
+  # <<< nl-writer b010 flag cadet_called_it
+  # >>> nl-writer b010 flag cadet_blamed_dui
+  cadet_blamed_dui: "เตรียมทหาร: ฉากใครตด ชี้ว่าเป็นดุ่ย ดุ่ยยังติดใจ"
+  # <<< nl-writer b010 flag cadet_blamed_dui
+  # >>> nl-writer b010 flag cadet_branch_friends
+  cadet_branch_friends: "เตรียมทหาร: มีเพื่อนต่างเหล่าที่นั่งกินข้าวด้วยกัน"
+  # <<< nl-writer b010 flag cadet_branch_friends
+  # >>> nl-writer b010 flag cadet_silent
+  cadet_silent: "เตรียมทหาร: คืนซ่อมหลังไฟดับ ก้มหน้าทำต่อ ไม่พูดถึงอีก"
+  # <<< nl-writer b010 flag cadet_silent
+  # >>> nl-writer b010 flag cadet_spoke
+  cadet_spoke: "เตรียมทหาร: รายงานเรื่องซ่อมหลังไฟดับต่อนายทหารปกครอง"
+  # <<< nl-writer b010 flag cadet_spoke
+  # >>> nl-writer b010 flag cadet_jaa_bike
+  cadet_jaa_bike: "เตรียมทหาร: เคยเจอจ่าขมขายมอเตอร์ไซค์มือสองที่ลานจอดรถ"
+  # <<< nl-writer b010 flag cadet_jaa_bike
+  # >>> nl-writer b010 flag cadet_egg
+  cadet_egg: "เตรียมทหาร: เคยอยู่ในตลาดไข่พะโล้วันพุธของโรงนอน"
+  # <<< nl-writer b010 flag cadet_egg
+  # >>> nl-writer b010 flag cadet_pe_night
+  cadet_pe_night: "เตรียมทหาร: เคยตามพี่พลเอกหนีออกไปร้านข้าวต้มตอนตีสอง"
+  # <<< nl-writer b010 flag cadet_pe_night
+  # >>> nl-writer b010 flag cadet_n9_squad
+  cadet_n9_squad: "เตรียมทหาร: ชวนต้อม แบงก์ ดุ่ย ไปร้านข้าวต้มด้วยกันทั้งกอง"
+  # <<< nl-writer b010 flag cadet_n9_squad
+  # >>> nl-writer b010 flag cadet_karaoke
+  cadet_karaoke: "เตรียมทหาร: เคยขึ้นร้องเพลงที่ร้านเปิดใหม่ตอนหนีเที่ยว"
+  # <<< nl-writer b010 flag cadet_karaoke
+  # >>> nl-writer b010 flag cadet_saw_jaa
+  cadet_saw_jaa: "เตรียมทหาร: เคยเจอจ่าขมนอกโรงเรียนตอนกลางคืน"
+  # <<< nl-writer b010 flag cadet_saw_jaa
+  # >>> nl-writer b010 flag cadet_n9_caught
+  cadet_n9_caught: "เตรียมทหาร: ถูกจ่าขมจับที่ช่องรั้วตอนหนีเที่ยว"
+  # <<< nl-writer b010 flag cadet_n9_caught
+  # >>> nl-writer b010 flag cadet_odd_squad
+  cadet_odd_squad: "เตรียมทหาร: อยู่ในกลุ่มเพื่อนต้อม แบงก์ ดุ่ย ในโรงนอน"
+  # <<< nl-writer b010 flag cadet_odd_squad
+  # >>> nl-writer b010 flag cadet_resign_debt
+  cadet_resign_debt: "ลาออกจากเตรียมทหารแล้วที่บ้านต้องกู้เงินมาใช้คืนตามสัญญา"
+  # <<< nl-writer b010 flag cadet_resign_debt
+  # >>> nl-writer b011 flag cadet_fair
+  # เตรียมทหาร เฟส 3 ชีวิตในโรงเรียน ปี 2 (ตั้งในฉาก school ของ rules/cadet.yaml)
+  cadet_fair: "เตรียมทหาร: ตอนเป็นรุ่นพี่ปีสอง ลงโทษรุ่นน้องตามระเบียบหรือพาน้องซ้อม"
+  # <<< nl-writer b011 flag cadet_fair
+  # >>> nl-writer b011 flag cadet_harsh
+  cadet_harsh: "เตรียมทหาร: ตอนเป็นรุ่นพี่ปีสอง ซ่อมรุ่นน้องหนักแบบที่เคยโดน"
+  # <<< nl-writer b011 flag cadet_harsh
+  # >>> nl-writer b011 flag cadet_dui_runner
+  cadet_dui_runner: "เตรียมทหาร: คืนเวรยามฝนตก ดุ่ยวิ่งหนีเสียงแมวจนจ่าขมจับเวลา"
+  # <<< nl-writer b011 flag cadet_dui_runner
+  # >>> nl-writer b011 flag cadet_sweetheart
+  cadet_sweetheart: "มีคนที่เขียนจดหมายหากันตอนเรียนเตรียมทหาร"
+  # <<< nl-writer b011 flag cadet_sweetheart
+  # >>> nl-writer b011 flag cadet_lost_friend
+  cadet_lost_friend: "เตรียมทหาร: เพื่อนร่วมกองเสียชีวิตในวันฝึกเดินทางไกลกลางแดด"
+  # <<< nl-writer b011 flag cadet_lost_friend
+  # >>> nl-writer b011 flag cadet_injured_stay
+  cadet_injured_stay: "เตรียมทหาร: ไหล่หลุดที่หอฝึก แต่ได้เรียนต่อ"
+  # <<< nl-writer b011 flag cadet_injured_stay
+  # >>> nl-writer b011 flag cadet_medical_out
+  cadet_medical_out: "ออกจากโรงเรียนเตรียมทหารเพราะบาดเจ็บ (ไหล่หลุดที่หอฝึก)"
+  # <<< nl-writer b011 flag cadet_medical_out
   # สายหมอลำ/ลูกทุ่ง (ใบ 251) — มุมคนร้อง
   singer_seed: "เคยขึ้นเวทีร้องเพลงตอนเด็ก"
   singer_stage: "เคยลงประกวดร้องเพลง"
@@ -248,6 +319,9 @@ prefixes:
   # >>> nl-writer b004 flag cadet_branch
   cadet_branch: "ติดเตรียมทหารต่อเหล่านี้ (id = army · navy · airforce · police)"
   # <<< nl-writer b004 flag cadet_branch
+  # >>> nl-writer b006 flag cadet_pass
+  cadet_pass: "ติดเตรียมทหารแล้ว ตั้งตอนข่าวถึงบ้าน X9 ก่อนรายงานตัว (id = army · navy · airforce · police)"
+  # <<< nl-writer b006 flag cadet_pass
   # >>> nl-writer b005 flag cadet_life_seen
   cadet_life_seen: "เห็นเรื่องนี้ในชีวิตเด็กเตรียมทหารแล้ว กันใบแยกตามบริบทออกซ้ำ (id = first_crewcut · kids_day_camp · evening_news · old_exam_swap · conscript_home · branch_map · tutor_billboard)"
   # <<< nl-writer b005 flag cadet_life_seen
@@ -287,4 +361,4 @@ home:
   lenient_home: {p: 0.2, not_with: [strict_home], tell: "ที่บ้านปล่อยให้เด็กตัดสินใจเองตั้งแต่เล็ก"}
   warm_home: {p: 0.25, tell: "ที่บ้านคุยกันได้ทุกเรื่อง กินข้าวเย็นพร้อมหน้า"}
   busy_parents: {p: 0.2, tell: "พ่อแม่ออกแต่เช้ากลับมืด ฝากคุณไว้กับญาติ"}
-  home_in_debt: {class_max: 2, from_life_flags: [loan_shark, family_debt], tell: "ที่บ้านมีหนี้สินติดตัวมาตั้งแต่ก่อนคุณเกิด"}
+  home_in_debt: {class_max: 2, from_life_flags: [loan_shark, family_debt, cadet_resign_debt], tell: "ที่บ้านมีหนี้สินติดตัวมาตั้งแต่ก่อนคุณเกิด"}

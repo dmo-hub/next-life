@@ -322,6 +322,17 @@ rows.push(['เสียงเด็กการ์ดเรียน/งาน'
 const realDocs = dir('content/').map((f) => load('content/', f));
 const used = new Set();
 for (const { doc } of realDocs) for (const { s: f } of flagNames(doc)) used.add(f.split(':')[0]);
+// เส้นเตรียมทหาร (rules/cadet.yaml) ตั้ง/อ่านธงด้วยคีย์ของเส้นนี้เอง เช่น ฉากชีวิตในโรงเรียน (เฟส 3 · 2026-11-16) — นับเป็นเนื้อหาที่ใช้ธงด้วย
+const CADET_FLAG_KEYS = ['setFlags', 'clearFlags', 'setFlagsPoor', 'flagsHas', 'flagsNot', 'anyFlags'];
+(function walk(x) {
+  if (Array.isArray(x)) return x.forEach(walk);
+  if (!x || typeof x !== 'object') return;
+  for (const [k, v] of Object.entries(x)) {
+    if (CADET_FLAG_KEYS.includes(k) && Array.isArray(v)) {
+      for (const f of v) if (typeof f === 'string') used.add(f.split(':')[0]);
+    } else walk(v);
+  }
+})(load('content/rules/', 'cadet.yaml').doc);
 // ธงที่แกนตั้งเอง (ป้ายหมวด 9 · ศาลสั่งล้มละลาย) มีในทะเบียนเพื่อให้เนื้อหาอ่านได้ ไม่ต้องรอเนื้อหาใช้
 // cheat_death: แกนอ่านตอนผลสุ่มตาย (ถูกเรียกตัว B153) — มีผู้อ่านแล้วแม้ยังไม่มีการ์ดตั้ง
 // army_family / police_family (B5): แกนตั้งตอนเข้าสายยศ army/police (rank.mjs markService)

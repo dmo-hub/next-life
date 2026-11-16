@@ -1,10 +1,12 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus } from '../src/engine/index.mjs';
+import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus, dieMidYear, causeWords, nextCard } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
 import { kinGaps, kinDeadRefs, familyLockShort } from '../harness/kin.mjs';
+import { cadetCard, chooseCadet } from '../src/engine/cadet.mjs';
+import { newLedger } from '../src/engine/merit.mjs';
 
 const fails = [];
 const rows = [];
@@ -879,6 +881,99 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 278 ปุ่มสายเลือดเลือกคนสุดท้าย หลังเซฟ/โหลดได้คนที่เลือก', ok(last) && last.got === last.want.name && last.got !== last.heirs[0].name, last.err ?? `${last.heirs.length} คน · เลือก ${last.want.name} · ได้ ${last.got}`);
   check('ใบ 278 ตัวควบคุม: เลือกคนแรกได้คนแรก', ok(first) && first.got === first.heirs[0].name, first.err ?? `ได้ ${first.got}`);
   check('ใบ 278 ตัวควบคุม: ไม่ส่ง heirId ⇒ throw', ok(last) && last.threw);
+}
+
+// เฟส 3 เตรียมทหาร ช่วง 2 (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16): ตายระหว่างฝึก = สาเหตุ training ผ่านด่านตายเดียว
+// การ์ดฉากสุดท้ายที่รอในคิวต้องเล่าก่อนงานศพ · สัญญารอดตายยังกันได้ · คำบนการ์ดตายต้องมี
+{
+  const content = loadContent();
+  const st = newLife(7, content);
+  st.age = 16;
+  const last = { kind: 'result', type: 'A', age: st.age, text: 'ฉากสุดท้าย' };
+  st.queue = [last];
+  const fate = dieMidYear(st, 'training');
+  check('เฟส 3 ตายระหว่างฝึก: ตายด้วยสาเหตุ training', fate === 'dead' && st.dead && st.cause === 'training', `${fate} · ${st.cause}`);
+  check('เฟส 3 ตายระหว่างฝึก: การ์ดฉากสุดท้ายเล่าก่อนงานศพ', st.queue[0] === last && st.queue.length > 1, `คิว ${st.queue.length} ใบ`);
+  check('เฟส 3 ตายระหว่างฝึก: มีคำบนการ์ดตาย', (causeWords('training', 16) ?? []).join('') === 'ระหว่างการฝึกในโรงเรียนเตรียมทหาร');
+  const sv = newLife(7, content);
+  sv.age = 16;
+  sv.pact = { survive: true };
+  const f2v = dieMidYear(sv, 'training');
+  check('เฟส 3 ตายระหว่างฝึก: สัญญารอดตายยังกันได้', f2v === 'survive' && !sv.dead && sv.pact.survive === 'used' && sv.queue.at(-1)?.tag === 'survive', f2v);
+}
+
+// เฟส 3 ช่วง 3 (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16): ชีวิตในโรงเรียนปี 1 เดินจากการ์ดรายงานตัวจนจบด้วยบอทสุ่ม
+// ฉากขึ้นแน่ครบ · ไม่มีวงเล็บค้าง · นตท. ตั้งแต่ SB-27b · ลาออกแล้วกลับ ม.ปลาย ไม่มีคำนำหน้า · บ้านจนลาออก = หนี้ลาออก ไม่ใช่หนี้ค่าติว
+{
+  const content = loadContent();
+  const parents = [{ sex: 'ชาย', alive: true }, { sex: 'หญิง', alive: true }];
+  const mk = (seed, cls) => ({ seed, age: 16, birthYear: 2550 - 16, sex: 'ชาย', region: 'กลาง', flags: {}, parents, parentFlags: {}, content, queue: [], due: [], scheduled: [], done: {}, fired: {},
+    cls, name: 'ภูมิ', health: 90, healthNatural: 90, knowledge: 80, happiness: 50, relations: 50, network: 50, money: 0, log: [], ledger: newLedger(), cadetInfo: { tries: 1, order: ['army'] },
+    cadet: { steps: [['p2']], cur: null, p2: { branches: ['army'], written: { army: true }, reason: {}, body: { army: true }, final: ['army'], chosen: 'army', scores: { army: 20 }, askNs: {}, steps: [['arrive', 'army']] } } });
+  const play = (st, rng, resign) => {
+    const seen = new Set();
+    let raw = 0, titleAt = null;
+    for (let g = 0; g < 400 && !st.dead; g++) {
+      const c = cadetCard(st);
+      if (!c) { if (st.cadet?.waitAge > st.age) { st.age++; continue; } break; }
+      if (/\{[^}]*\}/.test([c.title, c.text, ...(c.choices ?? [])].join(' '))) raw++;
+      if (c.kind === 'result') continue;
+      const id = String(c.id).replace('cadet:school:', '');
+      seen.add(id);
+      if (id === 'SB-27b') titleAt = st.title;
+      const open = c.choices.map((_, k) => k).filter((k) => !c.locked[k]);
+      const quit = c.choices.findIndex((x) => /ยื่นลาออก/.test(x));
+      const stay = open.filter((k) => k !== quit);
+      chooseCadet(st, resign && quit >= 0 ? quit : stay[Math.floor(rng() * stay.length)] ?? open[0]);
+    }
+    return { seen, raw, titleAt };
+  };
+  const fixed = [...(content.cadet.school.order.year1 ?? []), ...(content.cadet.school.order.year2 ?? [])].filter((x) => !/^[@#]/.test(x));
+  let raw = 0, missing = new Set(), badTitle = 0, alive = 0, dead = 0, badDead = 0, med = 0, badMed = 0;
+  for (let i = 0; i < 120; i++) {
+    const st = mk(mixSeed(0x5c01, i), 'ชนชั้นกลาง'), R = makeRng(i), r = play(st, () => R.next(), false);
+    raw += r.raw;
+    if (st.dead) { dead++; if (st.cause !== 'training') badDead++; continue; }
+    if (st.flags.cadet_medical_out) { med++; if (st.title || st.cadet || st.school !== 'upper') badMed++; continue; }
+    alive++;
+    for (const id of fixed) if (!r.seen.has(id)) missing.add(id);
+    if (r.titleAt !== 'นตท.') badTitle++;
+  }
+  check('เฟส 3 ปี 1–2: ฉากขึ้นแน่ครบทุกชีวิตที่เรียนจบ', missing.size === 0, missing.size ? [...missing].join(' ') : `${alive} ชีวิต`);
+  check('เฟส 3 ตายในโรงเรียน = สาเหตุ training', dead > 0 && badDead === 0, `ตาย ${dead} · ผิด ${badDead}`);
+  check('เฟส 3 ออกเพราะบาดเจ็บ: กลับ ม.ปลาย ไม่มีคำนำหน้า', badMed === 0, `ออก ${med} · ผิด ${badMed}`);
+  check('เฟส 3 ปี 1: ไม่มีวงเล็บค้างบนจอ', raw === 0, `${raw}`);
+  check('เฟส 3 ปี 1: เป็น นตท. ตั้งแต่ SB-27b', badTitle === 0, `${badTitle}`);
+  const poor = mk(7, 'ยากจน'), rich = mk(8, 'มั่งคั่ง');
+  play(poor, () => 0.5, true);
+  play(rich, () => 0.5, true);
+  check('เฟส 3 ลาออก: กลับ ม.ปลาย ไม่มีคำนำหน้า', poor.school === 'upper' && !poor.title && !poor.cadet, `${poor.school} · ${poor.title}`);
+  check('เฟส 3 ลาออก: บ้านจน = หนี้ลาออก ไม่ใช่หนี้ค่าติว · บ้านรวยไม่มีหนี้', !!poor.flags.cadet_resign_debt && !poor.flags.family_debt && !rich.flags.cadet_resign_debt);
+}
+
+// เฟส 3 ช่วง 5: ปี 2 ต้องเริ่มจริงเมื่อเดินผ่านลูปขึ้นปีของเกม (บั๊กที่เจอตอนวัดในเกมจริง 2026-11-16: กองปกติปิด → ปีที่รอไม่มีการ์ด → เกมข้ามปีจนพ้นช่วงเรียน)
+{
+  const content = loadContent();
+  let reached = 0, alive = 0;
+  for (let i = 0; i < 40; i++) {
+    const st = newLife(mixSeed(0x5c05, i), content);
+    Object.assign(st, { age: 16, sex: 'ชาย', health: 95, cadetInfo: { tries: 1, order: ['army'] },
+      cadet: { steps: [['p2']], cur: null, p2: { branches: ['army'], written: { army: true }, reason: {}, body: { army: true }, final: ['army'], chosen: 'army', scores: { army: 20 }, askNs: {}, steps: [['arrive', 'army']] } } });
+    const R = makeRng(i);
+    let y2 = false;
+    for (let g = 0; g < 500 && !st.dead && st.age <= 18; g++) {
+      const c = nextCard(st);
+      if (c.kind === 'death') break;
+      if (c.id === 'cadet:school:SB-16') y2 = true;
+      if (y2 || st.trip || st.court) break;
+      const open = c.choices?.length ? openChoices(c).filter((k) => !/ยื่นลาออก/.test(c.choices[k])) : [];   // ไม่ลาออก (วัดทางเรียนต่อ)
+      if (open.length) choose(st, open[R.int(0, open.length - 1)]);
+    }
+    if (st.dead || st.trip || st.court || st.flags.cadet_medical_out || st.school === 'upper') continue;
+    alive++;
+    if (y2) reached++;
+  }
+  check('เฟส 3 ปี 2 เริ่มจริงหลังขึ้นปี (เดินผ่านลูปขึ้นปีของเกม)', alive > 0 && reached === alive, `${reached}/${alive}`);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
