@@ -28,6 +28,44 @@ function mixSeed(seed, i) {
   return (Math.imul(seed >>> 0, 1000003) + Math.imul(i + 1, 2654435761)) >>> 0;
 }
 
+// สวิตช์ DLC 4 ก้อน — ซ่อนของที่อยู่ในเกมแล้วหลังสวิตช์ โค้ดคงอยู่ · เงื่อนไขปลดอยู่ท้ายไฟล์ (dlcEarn)
+// st.dlc ใส่ช่องเฉพาะเมื่อมีก้อนล็อก ⇒ ชีวิตที่ปลดครบ (ค่าเริ่มของด่าน · เซฟเก่า) ได้สถานะเท่าเดิมทุกไบต์
+const DLC_KEYS = ['afterlife', 'isekai', 'overlap', 'dungeon'];
+const DLC_OPEN = Object.freeze(Object.fromEntries(DLC_KEYS.map((k) => [k, true])));
+const DLC_LOCKED = Object.freeze(Object.fromEntries(DLC_KEYS.map((k) => [k, false])));
+
+// ค่าที่ชีวิตใหม่ที่ไม่มีทายาทใช้ตอนเกิด · ด่านค่าเริ่ม = ปลดหมด · UI ตั้งจากสมุดระดับเครื่องก่อนเริ่มตระกูล
+let dlcDefault = DLC_OPEN;
+const setDlcDefault = (dlc) => {
+  dlcDefault = { ...DLC_OPEN, ...dlc };
+};
+const getDlcDefault = () => dlcDefault;
+
+// ชีวิตที่ไม่มีช่อง dlc = เกิดตอนปลดครบ (เซฟเก่า ทายาทของตระกูลเก่า) — ล็อกทีหลังไม่ดึงของที่เคยเล่นกลับ
+const dlcOpen = (st, key) => (st?.dlc ? st.dlc[key] === true : true);
+
+// ช่องที่เก็บลง st · ปลดครบ = undefined ให้ผู้เรียกไม่ใส่ช่อง
+const dlcStamp = (dlc) => (dlc && DLC_KEYS.some((k) => dlc[k] === false) ? { ...DLC_OPEN, ...dlc } : undefined);
+
+// ด่านตายตัว (NL_DLC=locked): ล็อกแล้วไม่ปลดเอง ไม่งั้นชุดล็อกของใบ 02 กลายเป็นชุดที่ปลดไปเรื่อย ๆ
+let dlcFrozen = false;
+const setDlcFrozen = (on) => {
+  dlcFrozen = !!on;
+};
+
+// เงื่อนไขปลด: ก้อน N ปลดได้เมื่อก้อน N-1 ปลดแล้ว ตั้งแต่ต้นชีวิตนี้ (ได้ระหว่างชีวิต/ปรโลก = จดไว้ มีผลรอบหน้า ไม่แตะชีวิตที่กำลังเล่น)
+// คืน true เมื่อเพิ่งได้ใหม่ · ผู้เรียกแจ้งผู้เล่นและเขียนค่าเครื่อง
+function dlcEarn(st, key) {
+  const i = DLC_KEYS.indexOf(key);
+  if (dlcFrozen || i < 0 || dlcOpen(st, key) || st.dlcEarned?.includes(key)) return false;
+  if (i > 0 && !dlcOpen(st, DLC_KEYS[i - 1])) return false;
+  (st.dlcEarned ??= []).push(key);
+  return true;
+}
+
+// สถานะที่ชีวิตถัดไปรับ: ของชีวิตนี้ + ที่เพิ่งได้ + ค่าเครื่อง (ปลดจากตระกูลอื่นในเครื่องเดียวกันแล้ว ตระกูลนี้ได้ด้วย)
+const dlcNext = (st) => Object.fromEntries(DLC_KEYS.map((k) => [k, dlcOpen(st, k) || !!st.dlcEarned?.includes(k) || dlcDefault[k] === true]));
+
 // ข้อมูลยุคในรูปที่แกนเกมใช้ (สร้างจาก data/*.json โดย src/node/load.mjs) — ฟังก์ชันล้วน ไม่แตะ DOM/ไฟล์
 const MAX_AGE = 120;
 
@@ -3835,6 +3873,7 @@ function pastFromLineage(lineage, realmId) {
 
 
 
+
 const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
 // ชื่อเดิม 3 ระดับ (ยากจน · ชนชั้นกลาง · ร่ำรวย) คงไว้ที่ระดับ 3 · 6 · 9 เนื้อหาที่อ้างชื่อเดิมจึงยังใช้ได้
@@ -4040,6 +4079,7 @@ function newLife(seed, content, heir = null) {
     { sex: 'หญิง', age: motherAge, alive: true },
     { sex: 'ชาย', age: motherAge + famRng.int(0, 8), alive: true },
   ];
+  const dlc = dlcStamp(heir?.dlc ?? getDlcDefault());
   const st = {
     rng,
     seed,
@@ -4103,6 +4143,8 @@ function newLife(seed, content, heir = null) {
     fame: heir?.fame ?? 0,
     // ค่าซ้อนทับของตระกูล (overlapOf) — ใส่ช่องเฉพาะเมื่อ > 0 ⇒ ตระกูลที่ไม่เคยข้ามโลกได้สถานะเท่าเดิมทุกไบต์ · เซฟเก่าไม่มีช่อง = 0
     ...(heir?.overlap && { overlap: heir.overlap }),
+    // ก้อน DLC ที่ล็อกของตระกูลนี้ · ทายาทรับต่อจากรุ่นก่อน · ปลดครบ = ไม่มีช่อง (ไบต์เท่าเดิม) · ทายาทที่ไม่ส่ง dlc ใช้ค่าเริ่ม
+    ...(dlc && { dlc }),
     // ความจำข้ามชาติ (past.mjs) + อาชีพที่ติดพรสวรรค์มา — ชีวิตแรกไม่มีช่อง
     ...(heir?.past && { past: heir.past }),
     ...(pastTalent(heir?.past) && { talent: pastTalent(heir.past) }),
@@ -6355,8 +6397,10 @@ function tripSettle(st, isk) {
 
 // ค่าซ้อนทับ (โลกซ้อนทับ): ตัวนับเดียวของตระกูล ขึ้นทีละ 1 ทุกครั้งที่กลับเข้าโลกที่เคยออกไป ไม่มีทางลด · ไปกับทายาทเหมือนบัญชีบุญบาป
 // ไม่ดึงเลขสุ่ม — ชีวิตที่ไม่ข้ามโลกเดินเท่าเดิม · เริ่มตระกูลใหม่ (newLife ไม่มี heir) = 0
-const overlapOf = (st) => st?.overlap ?? 0;
+// ก้อนซ้อนทับล็อก = ไม่นับ อ่านได้ 0 เสมอ (ตัวนับเดิมที่เซฟไว้ไม่ถูกลบ ปลดแล้วกลับมาอ่านได้)
+const overlapOf = (st) => (dlcOpen(st, 'overlap') ? st?.overlap ?? 0 : 0);
 function overlapStep(st) {
+  if (!dlcOpen(st, 'overlap')) return;
   st.overlap = overlapOf(st) + 1;
 }
 // ขั้นของค่าซ้อนทับ 0–4: การ์ดอ่านแค่ขั้น ไม่อ่านค่าดิบ · ขั้น 1 = ค่า 1 ล็อก · ขั้น 2–4 ไปไม่ถึงจนใบ 16 วัดบอทอัตราจริงแล้วใส่เลข
@@ -6397,7 +6441,7 @@ const driftFired = (st) => Object.keys(st.done).filter((id) => id.startsWith(DRI
 // st.drift = ขั้นตอนวางแผน · ชีวิตจากเซฟเก่าไม่มีช่องนี้ ⇒ ทริปกลับบ้านไม่วางแผนให้ชีวิตที่เล่นค้าง (เซฟเก่าเริ่มนับชีวิตถัดไป)
 // ทริปกลับบ้านวางใหม่ด้วย stream ของรอบนั้น หักเหตุที่ออกไปแล้ว ⇒ ทั้งชีวิตไม่เกินจำนวนของขั้นล่าสุด
 function driftPlan(st, run = 0, stage = driftStageOf(st)) {
-  if (!stage || (run && !st.drift)) return;
+  if (!stage || (run && !st.drift) || !dlcOpen(st, 'overlap')) return;
   st.drift = stage;
   st.scheduled = st.scheduled.filter((x) => !x.drift);
   const rng = makeRng(mixSeed(st.seed ^ DRIFT_PLAN.salt, run));
@@ -6848,6 +6892,7 @@ const contLifeMul = (race) => CONT_RACES[race].pace;
 // ใช้ stream สุ่มของตัวเองจาก seed ของชีวิต — ไม่กินเลขของ af.rng ฉากระหว่างชาติกับการส่งต่อจึงสุ่มได้เหมือนไม่มีต่างโลก
 // กรรมจากปรโลก (ระดับ −1..1) เป็นตัวตั้งของโลก: บุญมากได้สกิลให้เลือกมากขึ้นและค่าเริ่มดีขึ้น · บาปหนักได้น้อยลงและโลกโหดขึ้น · ไม่มีตัวเลขบัญชีบนการ์ด
 // บัญชีบุญบาปเป็นของดวงวิญญาณ (ส่วนที่ส่งต่อจากชาติก่อน) — ชาติต่างโลกบันทึกต่อลงบัญชีนั้น แล้วปรโลกตัดสินตอนจบชาติ
+
 
 
 
@@ -8428,6 +8473,8 @@ function entryOffers(seed) {
 
 // การ์ดชวนของอายุนี้ (ใบละครั้ง) · ไม่ผ่าน emit ⇒ เลขการ์ดของชีวิตไม่เลื่อน
 function entryCard(st, stage) {
+  // ล็อก = ไม่มีการ์ดชวน ไม่ตั้งตารางนัด · ตารางนัดสุ่มจาก stream แยก จึงไม่เลื่อนเลขสุ่มของชีวิต
+  if (!dlcOpen(st, 'isekai')) return null;
   st.isekaiEntry ??= entryOffers(st.seed);
   const o = st.isekaiEntry.find((x) => x.age === st.age && !x.seen);
   if (!o) return null;
@@ -9289,6 +9336,7 @@ const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world:
 
 
 
+
 // ระดับกรรมที่ปรโลก (−1..1) = บัญชีสุทธิ ÷ ref · ref แยกจากตัวคูณกรรมระหว่างชีวิต (KARMA.ref) เพราะบัญชีทั้งชีวิตสะสมไกลกว่า
 // จุดอิ่มของตัวคูณการตายมาก — ใช้ ref เดียวกันแล้วเกือบทุกคนชนเพดาน ภูมิกับฐานะชาติหน้าจะไม่แยกคน
 const VERDICT_REF = 30;
@@ -9473,6 +9521,8 @@ function verdictCard(af) {
   const back = af.from ? `ดวงวิญญาณของ${af.from.name}ถูกดึงกลับจากต่างโลกมายืนหน้าปรโลกอีกครั้ง ` : '';
   // ชาติต่างโลกให้สกิลบนการ์ดจบของมันแล้ว — ตอนกลับมาปรโลกจึงไม่ให้ซ้ำจากชีวิตไทยเดิม
   const earn = af.from ? [] : thaiEarn(af.st);
+  // ศาลครั้งแรก = ปรโลกปลด (มีผลชาติหน้า)
+  dlcEarn(af.st, 'afterlife');
   return emitAfter(af, {
     kind: 'verdict',
     type: 'B',
@@ -9502,6 +9552,7 @@ const FROM_ISEKAI_PATHS = {
 };
 const pathLocked = (af, id) => {
   if (id === 'child') return af.from ? 'ลูกหลานในโลกเดิมห่างไปหลายรุ่นแล้ว' : hasKids(af.st) ? null : 'ไม่มีลูกหลานให้กลับไปเกิด';
+  if (id === 'isekai' && !dlcOpen(af.st, 'isekai')) return 'ยังไม่ปลดภาคเสริมต่างโลก';
   if (id === 'isekai' && af.from && af.from.run >= ISEKAI.stay) return 'เทพธิดาบอกว่าวิญญาณนี้อยู่ต่างโลกนานพอแล้ว';
   if (id === 'blood' && !pathHeirs(af).length) return 'ไม่มีลูกหลานวัยที่เล่นต่อได้';
   return null;
@@ -9518,9 +9569,11 @@ function pathCard(af) {
   return emitAfter(af, {
     kind: 'path',
     type: 'B',
-    text: af.blessed && !af.from ? `${base} · มีหญิงผมสีเงินยืนโบกมือรออยู่ข้างทาง บอกว่าเป็นเทพธิดาจากอีกโลกหนึ่ง` : base,
+    text: af.blessed && !af.from && dlcOpen(af.st, 'isekai') ? `${base} · มีหญิงผมสีเงินยืนโบกมือรออยู่ข้างทาง บอกว่าเป็นเทพธิดาจากอีกโลกหนึ่ง` : base,
     choices: paths.map((p) => (af.from ? FROM_ISEKAI_PATHS[p.id] : p.text)),
     locked: paths.map((p) => pathLocked(af, p.id)),
+    // ปุ่มที่ซ่อนตอนล็อก DLC ยังอยู่ในแถว — เลขลำดับปุ่มที่เซฟเก็บ (afterPick) ไม่เลื่อน · UI ข้ามปุ่มนี้
+    ...(!dlcOpen(af.st, 'isekai') && { hidden: paths.map((p) => p.id === 'isekai') }),
     // ปุ่มสายเลือดคนกดได้ บอทไม่กด (openChoices) · หน้าเลือกคนอ่าน heirs แล้วส่ง id กลับทาง chooseAfter
     ...(heirs.length && { manual: paths.map((p) => p.id === 'blood'), heirs }),
   });
@@ -9556,6 +9609,8 @@ const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่นท�
 // ยมทูต/เทวทูตเป็นฉากของชีวิตไทย (เนื้อหาอ่านค่าชาติไทย) จึงเริ่มที่คำตัดสิน
 function closeIsekai(af) {
   const isk = af.isekai;
+  // จบชาติต่างโลก 1 ชาติ = ซ้อนทับปลด
+  dlcEarn(af.st, 'overlap');
   af.isekaiLives.push(isekaiLineage(isk, (af.st.gen ?? 1) + 1 + af.isekaiLives.length));
   // บัญชีเดียวของดวงวิญญาณ (B26 · B68a-2): ชาติต่างโลกที่จบแล้วเขียนกลับลง af.st.ledger ปรโลกรอบใหม่และบันทึกการกระทำ (noteDeed) จึงอ่านที่เดียวกัน
   af.st.ledger = isk.ledger;
@@ -9643,6 +9698,8 @@ function loopCard(af) {
 
 function loopEndCard(af) {
   const l = af.loop;
+  // จบวงภูมิ 1 รอบในชีวิตที่เริ่มด้วยปรโลกปลดแล้ว = ต่างโลกปลด
+  dlcEarn(af.st, 'isekai');
   l.end = l.health <= 0 ? 'spent' : 'served';
   const text = l.end === 'spent'
     ? `ชีวิตทิพย์หมดลงในปีที่ ${l.year} ก่อนครบกำหนด ${l.years} ปี ดวงวิญญาณจึงถูกพาไปรอเกิดเร็วกว่าที่ชี้ไว้`
@@ -9894,7 +9951,10 @@ function makeHeir(af, r) {
   const carried = r * (tier?.carry ?? 1);
   const ledger = carryLedger(af.st.ledger, net, carried);
   // ทายาทเกิดในโลกปกติเสมอ — รอบนี้มีชาติต่างโลกคั่น = กลับเข้าโลกที่เคยออกไป +1 (ชาติต่างโลกติดกันหลายรอบก็กลับครั้งเดียว) · ปรโลกคั่นชาติไม่นับ
-  const overlap = overlapOf(st) + (af.isekaiLives.length ? 1 : 0);
+  // ก้อนซ้อนทับล็อก = ไม่นับ (ปลดทีหลังเริ่มขั้น 0)
+  const overlap = overlapOf(st) + (af.isekaiLives.length && dlcOpen(st, 'overlap') ? 1 : 0);
+  // ค่าซ้อนทับขึ้นขั้นแรก = ดันเจียนปลด
+  if (OVERLAP_STAGE_MIN.findLastIndex((m) => overlap >= m) >= 1) dlcEarn(st, 'dungeon');
   // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
   const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
   return {
@@ -9930,6 +9990,8 @@ function makeHeir(af, r) {
     ...(blood && { start: { age: st.birthYear + st.age - blood.born, kinId: blood.id } }),
     fame,
     ...(overlap && { overlap }),
+    // ก้อน DLC ของตระกูลไปกับทายาททุกทาง · ตระกูลที่ไม่มีช่อง = ปลดครบ ต้องส่ง DLC_OPEN ตรง ๆ ไม่งั้น newLife ใช้ค่าเริ่มของเครื่อง
+    dlc: dlcNext(st),
     // ความจำข้ามชาติไปกับทุกทางเกิด · ภูมิ = ภูมิที่ปรโลกชี้ให้ชาติไทย (แบบแถวผังตระกูล)
     past: pastOf(st, thai.realm.id, isGone(st)),
     ...(deadKin.length && { deadKin }),
@@ -11976,7 +12038,8 @@ function kitList() {
   const reg = st.content.items;
   const name = (id) => reg.list[id].name;
   const dl = el('dl', 'kit');
-  for (const [k, label] of Object.entries(reg.slots)) dl.append(el('dt', null, label), el('dd', null, it.wear[k] ? name(it.wear[k]) : 'ว่าง'));
+  // ช่องอาวุธเป็นของดันเจียน — ซ่อนจนปลดก้อนนั้น (ช่องเครื่องราง/เครื่องแต่งกายอยู่เกมหลัก)
+  for (const [k, label] of Object.entries(reg.slots)) if (k !== 'weapon' || dlcOpen(st, 'dungeon')) dl.append(el('dt', null, label), el('dd', null, it.wear[k] ? name(it.wear[k]) : 'ว่าง'));
   dl.append(el('dt', null, `กระเป๋า ${it.bag.length}/${it.cap}`), el('dd', null, it.bag.map(name).join(' · ') || 'ว่าง'));
   return dl;
 }
@@ -14528,11 +14591,13 @@ function renderAfter(card) {
     choices.append(enter(button(BTN.rebirth, null, rebirth)));
     choices.append(button(BTN.newFamily, null, start));
   } else if (card.choices.length) {
-    const offer = () => choices.replaceChildren(...card.choices.map((c, i) => {
+    // ปุ่มที่ซ่อนตอนล็อก DLC (card.hidden) ไม่วาด แต่ i ยังเป็นลำดับเดิมในแถว — เลขที่ afterPick เขียนลงเซฟไม่เลื่อน
+    const offer = () => choices.replaceChildren(...card.choices.flatMap((c, i) => {
+      if (card.hidden?.[i]) return [];
       const why = lockText(card, i);
       const b = button(c, why ?? card.fx?.[i], () => (card.manual?.[i] ? heirPick(card, i, choices, offer) : play(afterPick(i))), card.hints?.[i]);
       if (why) b.disabled = true;
-      return b;
+      return [b];
     }));
     offer();
   } else choices.append(enter(button(BTN.next, null, next)));
@@ -15023,7 +15088,10 @@ function saveClear() {
   }
 }
 
-const show = (card) => (af ? renderAfter(card) : render(card));
+const show = (card) => {
+  dlcSync();
+  return af ? renderAfter(card) : render(card);
+};
 
 function play(tok, times = 1) {
   let card;
@@ -15047,7 +15115,64 @@ function digestRest(card) {
   return rest;
 }
 
-function begin(seed) {
+// ภาคเสริม (DLC) ระดับเครื่องแบบสมุดฉายา: ปลดแล้วอยู่ทุกตระกูลในเครื่องนี้ · ค่าเริ่ม = ล็อกหมด · เงื่อนไขปลดจริงเป็นใบ 03
+// สวิตช์ทดสอบ ?dlc=all = เปิดหมดเฉพาะหน้านี้ ไม่เขียนลงเครื่อง · มีผลเฉพาะโฮสต์ dev (localhost/127.0.0.1/::1 · เปิดจากไฟล์) ผู้เล่นจริงพิมพ์แล้วไม่มีผล
+// อ่านพังได้ (โหมดส่วนตัว) = ล็อกหมด
+const DLC_KEY = 'next-life-dlc-v1';
+const devHost = () => ['', 'localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+// ผู้เล่นเดิม (ก่อนมีสวิตช์ DLC · เครื่องไม่มี DLC_KEY): ปลดตามร่องรอยที่เล่นมาแล้ว — migration-options.md ข
+// memorial มีแถว = เคยตายจนจบ ≥ 1 ชีวิต → ปรโลก · สมุดสกิลมีรหัส :i/:t = เคยจบชาติต่างโลก/ทริปต่างโลก → ต่างโลก+ซ้อนทับ (ครบเงื่อนไข 26ข) · ดันเจียนไม่ปลด
+// ก้อนหลังต้องมีก้อนก่อนเสมอ (เงื่อนไขปลดต่อเนื่อง) · ทำครั้งเดียวต่อเครื่อง: เครื่องใหม่ก็เขียนค่าล็อกหมดไว้ ไม่งั้นการ์ดศาลครั้งแรกจะถูกนับเป็นผู้เล่นเดิมแล้วไม่มีป้ายแจ้งปลด
+function dlcMigrate() {
+  const trip = skillsRead().e.some((x) => /:[it]\d*$/.test(String(x)));
+  const b = { afterlife: trip || memoRead().l.length > 0, isekai: trip, overlap: trip, dungeon: false };
+  dlcWrite(b);
+  return b;
+}
+function dlcDevice() {
+  try {
+    if (devHost() && new URLSearchParams(location.search).get('dlc') === 'all') return { ...DLC_OPEN };
+    const raw = localStorage.getItem(DLC_KEY);
+    if (raw === null) return dlcMigrate();
+    const b = JSON.parse(raw);
+    return Object.fromEntries(DLC_KEYS.map((k) => [k, b?.[k] === true]));
+  } catch {
+    return { ...DLC_LOCKED };
+  }
+}
+
+function dlcWrite(b) {
+  try {
+    localStorage.setItem(DLC_KEY, JSON.stringify(b));
+  } catch {
+    // ไม่มีที่เก็บ — ปลดได้แค่ในตระกูลนี้ (ทายาทรับต่อจาก st) ปิดหน้าแล้วหาย
+  }
+}
+const DLC_NAME = { afterlife: 'ปรโลก', isekai: 'ต่างโลก', overlap: 'โลกซ้อนทับ', dungeon: 'ดันเจียน' };
+// แจ้งปลดทันที แต่ชีวิตและปรโลกรอบที่เล่นอยู่ไม่เปลี่ยน — เริ่มมีผลชาติหน้า (ข้อ 13ค)
+function dlcNotice(keys) {
+  document.querySelector('.dlc-notice')?.remove();
+  const p = el('p', 'note dlc-notice', `ปลดภาคเสริม ${keys.map((k) => DLC_NAME[k]).join(' · ')} แล้ว · เริ่มมีผลตั้งแต่ชาติหน้า`);
+  p.setAttribute('role', 'status');
+  p.addEventListener('click', () => p.remove());
+  root.before(p);
+  setTimeout(() => p.remove(), 12000);
+}
+// สิ่งที่ชีวิตนี้ได้ปลดใหม่ลงค่าเครื่องทันที (ทุกตระกูลในเครื่องได้ด้วย) · ค่าเครื่องที่เปลี่ยนมีผลกับทายาทผ่านค่าเริ่มของแกน
+function dlcSync() {
+  const got = (af?.st ?? st).dlcEarned ?? [];
+  const dev = dlcDevice();
+  const fresh = got.filter((k) => !dev[k]);
+  if (!fresh.length) return;
+  const next = { ...dev, ...Object.fromEntries(fresh.map((k) => [k, true])) };
+  dlcWrite(next);
+  setDlcDefault(next);
+  dlcNotice(fresh);
+}
+
+function begin(seed, dlc = dlcDevice()) {
+  // ค่าเริ่มของแกนใช้เฉพาะชีวิตแรกของตระกูล · ทายาทรับ st.dlc ต่อจากรุ่นก่อน
+  setDlcDefault(dlc);
   st = newLife(seed, CONTENT);
   af = null;
   save = { seed, log: '' };
@@ -15116,7 +15241,8 @@ function reroll() {
 // เล่นซ้ำทั้งตระกูลจากเซฟ · ไม่ตรงการ์ดเดิม = null
 function resume(s) {
   try {
-    let card = begin(s.seed);
+    // เซฟ v1 เกิดก่อนมีสวิตช์ = ปลดครบ · เล่นซ้ำบนค่าเครื่องที่ล็อกจะได้การ์ดคนละชุดจนลำดับปุ่มเพี้ยน
+    let card = begin(s.seed, { ...DLC_OPEN });
     if (s.rr) save.rr = 1;
     for (const tok of tokens(s.log)) card = apply(tok);
     save.log = s.log;
@@ -15203,6 +15329,8 @@ if (logoEl && window.ResizeObserver) new ResizeObserver(headEdge).observe(logoEl
 function boot() {
   // ล้างโครงหน้าเปิดที่มากับ HTML (template.html) — ทุกทางข้างล่างวาดจอใหม่ลง root
   root.replaceChildren();
+  // ทายาทของตระกูลที่โหลดจากเซฟรับค่าเครื่องผ่านค่าเริ่มของแกน — ไม่ตั้งไว้ = ปลดหมดตามค่าเริ่มของแกน
+  setDlcDefault(dlcDevice());
   const seed = linkSeed();
   dropLinkSeed();
   let card = snapRead();
