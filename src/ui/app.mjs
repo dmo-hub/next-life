@@ -1,7 +1,8 @@
-import { newLife, dlcOpen, DLC_KEYS, DLC_OPEN, DLC_LOCKED, setDlcDefault, nextCard, causeWords, goalNames, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf, overlapOf, overlapStageOf } from '../engine/index.mjs';
+import { newLife, dlcOpen, DLC_KEYS, DLC_OPEN, DLC_LOCKED, setDlcDefault, nextCard, causeWords, goalNames, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf, overlapOf, overlapStageOf, lifeTreeDefs, treeInvestNode, treeOffersNow, treeWaiting, treeReach } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME, catArt, resultArtCat } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
+import { treeViewSvg, treeViewBranches, TREE_VIEW_BRANCH } from './treeview.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
@@ -198,32 +199,123 @@ function focusWord(id, h = st) {
   return n >= st.content.focus.chain_years ? el('span', 'ft-word full', 'ชำนาญแล้ว') : el('span', 'ft-word', 'เริ่มชำนาญ');
 }
 const stageIdx = (name) => STAGES.findIndex((s) => s.name === name);
-// ปณิธาน = สายต้น → ปลาย (after ในทะเบียน) ที่ยังมีความหมายตอนนี้: เลือกได้อยู่ · เคยทุ่มต้นสายแล้ว · หรือยังทันช่วงวัยของปลายสาย
-// สถานะอ่านจาก focusMet ตัวเดียวกับที่แกนเปิดปลายสาย — ครบในช่วงวัยไหนเปิดตั้งแต่ช่วงถัดไป
-function focusGoals(offers) {
-  const defs = lifeFocusDefs(st);
-  const stage = stageOf(st.age);
-  const now = stageIdx(stage);
-  const later = (d) => !d.stages || d.stages.some((s) => stageIdx(s) > now);
-  const rows = [];
-  for (const [id, d] of Object.entries(defs)) {
-    if (!d.after) continue;
-    const from = d.after;
-    const met = st.focusMet?.[from];
-    const tried = (st.focusYears?.[from] ?? 0) > 0;
-    let cls = '', text;
-    if (offers.includes(id)) [cls, text] = ['open', `${focusName(from)}ชำนาญแล้ว · เลือกได้ในช่วงนี้`];
-    else if (met === stage) text = `${focusName(from)}ชำนาญแล้ว · เลือกได้ตั้งแต่ช่วงวัยถัดไป`;
-    else if (met !== undefined) [cls, text] = later(d) || d.stages?.includes(stage) ? ['', `${focusName(from)}ชำนาญแล้ว · ยังไม่เข้าเงื่อนไขตอนนี้`] : ['gone', `${focusName(from)}ชำนาญแล้ว · ช่วงวัยที่เลือกได้ผ่านไปแล้ว`];
-    else if (!later(d)) continue;
-    else if (tried) text = `${focusName(from)}เริ่มชำนาญ · ทุ่มต่ออีกหน่อยจะเปิด`;
-    else if (offers.includes(from)) text = 'ยังไม่ได้ทุ่ม';
-    else continue;
-    const li = el('li', cls || null);
-    li.append(el('b', null, `${focusName(from)} → ${d.name}`), el('span', 'st', text));
-    rows.push(li);
+// จอต้นไม้โฟกัส (ใบ 12 · ข้อ 88 แบบ 4 กลุ่มดาว) แทนรายการปณิธาน · ผังกับตัววาดอยู่ treeview.mjs
+// สถานะหน้าจอ (แขนงที่ดู ซูม โหนดที่เลือก) อยู่ในหน่วยความจำ ไม่ลงเซฟ · ทุ่ม/เปลี่ยนโหนดเซฟทันทีเหมือนโฟกัสเดิม
+const tvUi = { view: 'branch', br: null, z: 100, sel: null };
+const TV_ZOOM = [60, 180, 20];
+// สถานะโหนดเป็นคำ ไม่มีตัวเลขปีหรือจำนวนการ์ด (ข้อ 46) · g = ความเต็มของวงรอบโหนดที่ทุ่มอยู่
+function tvNodeInfo(id) {
+  const defs = lifeTreeDefs(st), d = defs[id], t = st.tree;
+  if (t?.done?.[id] !== undefined) return { st: 'done', g: 1, word: 'ปลดแล้ว' };
+  const reach = treeReach(st, d);
+  if (d.hidden && !reach) return { st: 'hid', g: 0 };
+  const g = Math.min(1, (t?.yrs?.[id] ?? 0) / d.years);
+  if (t?.cur === id) {
+    if (t.pend === id) return { st: 'wait', g: 1, word: 'รอการ์ดด่าน' };
+    if (treeWaiting(st, defs)) return { st: 'wait', g, word: 'รอโอกาส' };
+    return { st: 'act', g, word: 'กำลังทุ่มอยู่' };
   }
-  return rows;
+  if (treeOffersNow(st).includes(id)) return { st: 'open', g, word: 'ทุ่มได้ตอนนี้' };
+  if (!reach) return { st: 'lock', g: 0, word: 'ต้องปลดโหนดก่อนหน้า' };
+  const now = stageIdx(stageOf(st.age));
+  return { st: 'lock', g: 0, word: d.stages.some((s) => stageIdx(s) > now) ? 'ยังไม่ถึงช่วงวัยที่ทุ่มได้' : 'พ้นช่วงวัยที่ทุ่มได้แล้ว' };
+}
+// แผงของโหนดที่แตะ: ชื่อ · สถานะ · ผลเป็นทิศ (ไม่มีเลข) · keystone บอกข้อเสียก่อนทุ่ม (ข้อ 60) · ปุ่มทุ่ม
+function tvPanel(card, id, redraw) {
+  const d = lifeTreeDefs(st)[id], i = tvNodeInfo(id);
+  const box = el('div', 'tv-sel');
+  if (i.st === 'hid') {
+    box.append(el('b', null, 'ช่องที่ยังซ่อนอยู่'), el('p', 'ft-note', 'ยังไม่รู้ว่ามีอะไรรออยู่ · ปลดโหนดก่อนหน้าแล้วจะเห็น'));
+    return box;
+  }
+  box.append(el('b', null, d.name), el('span', `ft-word${i.st === 'done' ? ' full' : ''}`, i.word));
+  const row = (label, text) => text && box.append(el('span', 'ft-fx', `${label}${text}`));
+  row('ระหว่างทุ่ม: ', focusWords({ fx: d.fx }, STAT_LABELS));
+  row('ปลดแล้วติดตัว: ', focusWords({ fx: d.light }, STAT_LABELS));
+  row('ช่วงวัยที่ทุ่มได้: ', d.stages.join(' · '));
+  if (d.keystone) {
+    box.append(el('p', 'tv-warn', d.warn));
+    row('เสียถาวรทุกปี: ', focusWords({ fx: d.cost }, STAT_LABELS));
+  }
+  if (i.st === 'open') {
+    const b = el('button', 'tv-go', d.keystone ? 'รับรู้ข้อเสียแล้ว · ทุ่มโหนดนี้' : 'ทุ่มโหนดนี้');
+    b.type = 'button';
+    b.onclick = () => {
+      treeInvestNode(st, id, !!d.keystone);
+      saveWrite(card);
+      redraw(id);
+    };
+    box.append(b);
+  }
+  return box;
+}
+function treeScreen(card) {
+  const defs = lifeTreeDefs(st);
+  const brs = treeViewBranches(defs);
+  if (!brs.includes(tvUi.br)) tvUi.br = brs[0];
+  const wrap = el('div', 'tv');
+  const redraw = (focusId) => {
+    const next = treeScreen(card);
+    wrap.replaceWith(next);
+    if (focusId) next.querySelector(`[data-tv="${focusId}"]`)?.focus();
+  };
+  const btn = (text, on, fn, label) => {
+    const b = el('button', null, text);
+    b.type = 'button';
+    if (on !== null) b.setAttribute('aria-pressed', String(on));
+    if (label) b.setAttribute('aria-label', label);
+    b.onclick = fn;
+    return b;
+  };
+  const full = tvUi.view === 'full';
+  const bar = el('div', 'tv-bar');
+  bar.append(btn('ดูทีละแขนง', !full, () => { tvUi.view = 'branch'; redraw(); }), btn('ดูต้นเต็ม', full, () => { tvUi.view = 'full'; redraw(); }));
+  if (full) {
+    const zb = (text, label, dz) => {
+      const b = btn(text, null, () => { tvUi.z = Math.max(TV_ZOOM[0], Math.min(TV_ZOOM[1], tvUi.z + dz)); redraw(); }, label);
+      b.disabled = dz < 0 ? tvUi.z <= TV_ZOOM[0] : tvUi.z >= TV_ZOOM[1];
+      return b;
+    };
+    bar.append(zb('−', 'ซูมออก', -TV_ZOOM[2]), zb('+', 'ซูมเข้า', TV_ZOOM[2]));
+  }
+  wrap.append(bar);
+  if (!full && brs.length > 1) {
+    const tabs = el('div', 'tv-tabs');
+    for (const b of brs) tabs.append(btn(TREE_VIEW_BRANCH[b]?.name ?? b, b === tvUi.br, () => { tvUi.br = b; redraw(); }));
+    wrap.append(tabs);
+  }
+  const { svg, w } = treeViewSvg(defs, { info: tvNodeInfo, only: full ? null : tvUi.br, sel: tvUi.sel });
+  const zs = el('div', full ? 'tv-zs full' : 'tv-zs');
+  zs.innerHTML = svg;
+  if (full) zs.firstElementChild.style.width = `${Math.round((w * tvUi.z) / 100)}px`;
+  const pick = (e) => {
+    const g = e.target.closest('[data-tv]');
+    if (!g) return;
+    tvUi.sel = g.dataset.tv;
+    redraw(tvUi.sel);
+  };
+  // เมาส์ลากเลื่อนต้นเต็ม (นิ้วใช้เลื่อนของเบราว์เซอร์เอง) · ลากแล้วปล่อยไม่นับเป็นการแตะโหนด
+  let drag = null;
+  zs.addEventListener('pointerdown', (e) => { if (full && e.pointerType === 'mouse' && e.button === 0) drag = { x: e.clientX, y: e.clientY, sx: zs.scrollLeft, sy: zs.scrollTop, moved: false }; });
+  zs.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 6) return;
+    drag.moved = true;
+    zs.scrollLeft = drag.sx - dx;
+    zs.scrollTop = drag.sy - dy;
+  });
+  const dragEnd = () => { setTimeout(() => { drag = null; }, 0); };
+  zs.addEventListener('pointerup', dragEnd);
+  zs.addEventListener('pointerleave', dragEnd);
+  zs.addEventListener('click', (e) => { if (!drag?.moved) pick(e); });
+  zs.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(e); }
+  });
+  wrap.append(zs);
+  if (tvUi.sel && defs[tvUi.sel]) wrap.append(tvPanel(card, tvUi.sel, redraw));
+  else wrap.append(el('p', 'ft-note', 'แตะโหนดเพื่อดูรายละเอียดและเลือกทุ่ม'));
+  return wrap;
 }
 // ส่วนร่วมของแท็บโฟกัสสองโลก: ตอนนี้ + เปลี่ยนเป็น · ชาติไทยต่อปณิธาน ต่างโลกไม่มีสายต้น–ปลาย
 // rows = { id, name, fx, on, tags } · pick เปลี่ยนค่าของโลกนั้น · draw วาดแผงใหม่ทั้งก้อนเพราะ "ตอนนี้" ต้องตาม
@@ -264,10 +356,7 @@ function focusPanel(card) {
     setLifeFocus(st, id);
     saveWrite(card);
   }, () => focusPanel(card));
-  const goals = focusGoals(offers);
-  const chain = el('ul', 'ft-chain');
-  chain.append(...goals);
-  wrap.append(el('h3', null, 'ปณิธาน'), goals.length ? chain : el('p', 'ft-note', 'ช่วงวัยนี้ไม่มีสายที่ต่อได้'));
+  wrap.append(el('h3', null, 'ต้นไม้โฟกัส'), treeScreen(card));
   return wrap;
 }
 // ตอนตาย/ปรโลก (ข้อ 69): เรื่องที่ทุ่มมากสุด = focusMain ตัวเดียวกับที่ทายาทรับ · เรื่องอื่นเรียงตามปีที่ทุ่ม ไม่บอกตัวเลข

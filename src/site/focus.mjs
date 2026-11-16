@@ -2,6 +2,7 @@
 // ระดับคู่มือ ไม่ใช่เฉลย: ผลบอกเป็นคำเดียวกับป้ายบนปุ่มในเกม ไม่มีขนาดผล โอกาสเสี่ยง น้ำหนักการ์ด หรือบุญบาป
 import { STAGES, STAT_LABELS, focusWords, FOCUS_FLOW_NAME, ISEKAI_FOCUS, ISEKAI_STAGES, ISEKAI_KNOW, ISEKAI_CAREERS, ISEKAI_CAREER_T, ISEKAI_ROLES, CONT_MOVE, TRIP_QUEST, roleInfo, isekaiFocusFx } from '../engine/index.mjs';
 import { esc, CATEGORY } from './catalog.mjs';
+import { treeViewSvg, treeViewBranches, TREE_VIEW_BRANCH } from '../ui/treeview.mjs';
 
 // หมวดโฟกัสโลกนี้ (group ใน content/rules/focus.yaml) — หมวดใหม่ที่ไม่มีชื่อที่นี่ build หยุด
 export const FOCUS_GROUPS = { work: 'งานและเงิน', people: 'คนและครอบครัว', body: 'กายและใจ', gate: 'ประตูเข้าสาย' };
@@ -37,6 +38,23 @@ const table = (head, rows) => {
   });
   return `<div class="tw"><table class="ft"><thead><tr>${head.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${cells.join('')}</tbody></table></div>`;
 };
+
+// ต้นไม้โฟกัส (ใบ 12): ผังเดียวกับในแอป ดูอย่างเดียว ไม่มีสถานะผู้เล่น · ป้ายผลบอกเป็นคำเหมือนปุ่มในเกม ไม่บอกปี จำนวนการ์ด หรือขนาดผล
+function treeHtml(c) {
+  const defs = c.tree?.nodes;
+  if (!defs) return '';
+  for (const b of treeViewBranches(defs)) if (!TREE_VIEW_BRANCH[b]) throw new Error(`หน้าโฟกัสยังไม่รู้จักแขนง ${b} — เติมชื่อกับสีใน TREE_VIEW_BRANCH (src/ui/treeview.mjs)`);
+  const rows = Object.entries(defs).filter(([, d]) => !d.hidden).map(([id, d]) => {
+    const fx = focusWords({ fx: d.fx }, STAT_LABELS);
+    const cost = d.keystone ? `<br><small>ข้อเสีย: ${esc(d.warn)}</small>` : '';
+    return `<tr id="t-${esc(id)}"><td><b>${esc(d.name)}</b>${cost}</td><td>${esc(TREE_VIEW_BRANCH[d.branch].name)}</td><td>${esc(span(stageOrder(d.stages)))}</td><td>${fxCell(fx)}</td></tr>`;
+  });
+  return `<section id="tree"><h2>ต้นไม้โฟกัส</h2>
+<p>ทุ่มเทเป็นโหนดบนต้นไม้ · แต่ละแขนงรวมกันเป็นกลุ่ม ทุ่มโหนดไหนปีเต็มเข้าโหนดนั้น ปลดแล้วเหลือผลเบาติดตัวถาวร · โหนดกลางต้องปลดโหนดต้นทางครบ · โหนดรูปข้าวหลามตัดคือจุดหักเห เลือกแล้วย้อนไม่ได้ และบอกข้อเสียก่อนทุ่มเสมอ · ช่อง <b>?</b> คือโหนดที่ยังซ่อนอยู่ ไม่บอกว่าเป็นอะไรจนกว่าจะปลดต้นทาง</p>
+${treeViewSvg(defs, { interactive: false }).svg}
+<p><small>แตะแขนงในเกมเพื่อดูทีละกลุ่ม หรือดูต้นเต็มแล้วซูม/ลากได้</small></p>
+${table(['โหนด', 'แขนง', 'ทุ่มได้ช่วง', 'ป้ายระหว่างทุ่ม'], rows)}</section>`;
+}
 
 function thaiRows(defs, ids, chain) {
   return ids.map((id) => {
@@ -109,7 +127,7 @@ export function focusHtml(content) {
   // ตัวอย่างป้ายหยิบจากโฟกัสจริงตัวแรกที่มีทั้งขึ้นมากและลด — ป้ายในเกมเปลี่ยนคำ ตัวอย่างเปลี่ยนตาม
   const ex = Object.values(c.focuses).map((d) => focusWords(d, STAT_LABELS)).find((w) => w.includes('ขึ้นมาก') && w.includes('ลด') && !w.includes('มีเสี่ยง'));
   return `
-<nav class="toc" aria-label="สารบัญ"><a href="#what">โฟกัสคืออะไร</a><a href="#year">นับปียังไง</a><a href="#thai">โลกนี้</a><a href="#chain">ปลายสาย</a><a href="#gate">ประตูเข้าสาย</a><a href="#heir">ทายาท</a><a href="#isekai">ต่างโลก</a><a href="#afterlife">ปรโลก</a></nav>
+<nav class="toc" aria-label="สารบัญ"><a href="#what">โฟกัสคืออะไร</a><a href="#year">นับปียังไง</a><a href="#tree">ต้นไม้</a><a href="#thai">โลกนี้</a><a href="#chain">ปลายสาย</a><a href="#gate">ประตูเข้าสาย</a><a href="#heir">ทายาท</a><a href="#isekai">ต่างโลก</a><a href="#afterlife">ปรโลก</a></nav>
 <section id="what"><h2>โฟกัสคืออะไร</h2>
 <p>โฟกัสคือสิ่งที่ชีวิตนั้นทุ่มเทในแต่ละปี นอกจากตัวเลือกบนการ์ด เช่น ตั้งใจเรียน ทุ่มงาน หรือดูแลครอบครัว · ทุ่มเทเรื่องไหน ค่าสถานะขยับตามเรื่องนั้นทีละน้อยทุกปี และการ์ดเรื่องเดียวกันออกบ่อยขึ้น</p>
 <ul>
@@ -123,7 +141,8 @@ export function focusHtml(content) {
 <li>ปีที่เปลี่ยนโฟกัสไม่นับเป็น <b>ปีเต็ม</b> ของโฟกัสไหน · ปลายสาย ประตูเข้าสาย อาชีพต่างโลก และย้ายแคว้น นับเฉพาะปีเต็ม จึงต้องทุ่มเทต่อเนื่อง</li>
 <li>เข้าช่วงวัยที่โฟกัสนั้นเลือกไม่ได้แล้ว หรือเงื่อนไขหมดไป เช่น เลิกงาน เกมเปลี่ยนกลับเป็นตามน้ำเอง ปีที่สะสมไว้ไม่หาย</li>
 </ul></section>
-${thaiHtml(c)}
+${treeHtml(content)}
+<details class="old" id="thai-old"><summary>รายการโฟกัสเดิม (ยังใช้อยู่ระหว่างย้ายไปต้นไม้)</summary>${thaiHtml(c)}</details>
 ${isekaiHtml()}
 <section id="afterlife"><h2>ปรโลก</h2>
 <p>ปรโลกมีแท็บ <b>โฟกัส</b> ไว้ดูว่าชาติที่แล้วทุ่มเทเรื่องไหน แต่เลือกใหม่ไม่ได้ ช่วงระหว่างชาติเดินด้วยการ์ดอย่างเดียว · สิ่งที่ปรโลกทำกับโฟกัสคือส่งต่อ: เกิดเป็นลูกหลานในตระกูลเดิมได้โฟกัสวัยเด็กกับประตูเข้าสายจากรุ่นก่อน (ดู<a href="#heir">ทายาทในตระกูล</a>)</p></section>`;

@@ -63,6 +63,13 @@
   dl { margin: 0; } dt { font-weight: 600; margin-top: 8px; } dd { margin: 0 0 4px; }
   kbd { font-family: ui-monospace, Consolas, monospace; font-size: 13px; border: 1px solid var(--line-strong); border-bottom-width: 2px; padding: 0 5px; background: var(--surface); }
   footer { font-size: 13px; color: var(--muted); margin-top: 32px; }
+  /* ต้นไม้โฟกัส: SVG จาก src/ui/treeview.mjs · สีแขนงมาจาก --tvc ต่อโหนด */
+  .tv-svg { display: block; width: 100%; max-width: 720px; height: auto; margin: 12px 0; background: var(--surface); border: 1px solid var(--line); }
+  .tv-svg text { font-family: inherit; }
+  .tv-e { fill: none; stroke: var(--tvc); stroke-width: 2; opacity: .75; } .tv-e.x { stroke: var(--muted); stroke-dasharray: 6 4; }
+  .tv-n { fill: var(--surface); stroke: var(--tvc); stroke-width: 3; } .tv-n.k { stroke: #B3261E; } .tv-g.big .tv-n { stroke-width: 5; } .tv-g.s-hid .tv-n { stroke-dasharray: 3 3; }
+  .tv-l { font-size: 12px; fill: var(--ink); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; } .tv-q { font-size: 13px; fill: var(--tvc); }
+  .tv-pill rect { fill: var(--tvc); } .tv-pill text { font-size: 12px; fill: #fff; }
   details.old { margin: 12px 0 0; } details.old summary { cursor: pointer; font-weight: 600; min-height: 44px; line-height: 44px; }
   h3 { font-family: var(--fh); font-size: 19px; margin: 18px 0 6px; } h2 small, h3 small { font-family: var(--fb); font-size: 14px; color: var(--muted); font-weight: 400; }
   .ft .fx { white-space: normal; }
