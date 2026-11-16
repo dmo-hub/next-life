@@ -5734,6 +5734,8 @@ function setLifeFocus(st, id) {
   delete st.focusHeir;
 }
 // ปิดปีก่อนขึ้นอายุ: ผลของปีที่อายุ st.age ตามโฟกัสตอนนี้ · ตามน้ำไม่ดึงเลขสุ่มใด
+// ปลายสายที่ต่อจากต้นสาย id (ชื่อบนจอ) · ไม่มี = ต้นสายนี้ไม่ใช่ปณิธาน
+const goalTail = (defs, id) => Object.values(defs).find((d) => d.after === id)?.name;
 function lifeFocusYear(st) {
   const c = st.content.focus;
   // โฟกัสที่รับจากพ่อแม่แต่ยังเปิดไม่ได้ (เช่นยังไม่เข้าเรียน) รอจนเปิด แล้วนับปีนั้นเต็ม · ผู้เล่นตั้งเองก่อน = ทิ้ง
@@ -5743,9 +5745,15 @@ function lifeFocusYear(st) {
   }
   if (!st.focus) return;
   const full = st.focusAt < st.age;
+  const metBefore = st.focusMet?.[st.focus] !== undefined;
   const id = focusYearEnd(st, c.focuses, stageOf(st.age), lifeFocusOk(st), st.age, c.chain_years);
   if (!id) return;
   const def = c.focuses[id];
+  // ปณิธานสำเร็จ = ต้นสายที่มีปลายสายต่อ ชำนาญครบ chain_years (ตัวเดียวกับป้าย "ชำนาญแล้ว" บนจอ): ได้ความสุขครั้งเดียวต่อสาย (focusMet ตั้งครั้งแรกเท่านั้น) · จดไว้ให้การ์ดตายเล่า
+  if (!metBefore && st.focusMet?.[id] !== undefined && c.goal_joy && goalTail(c.focuses, id)) {
+    st.happiness = clamp(st.happiness + levelValue(c.goal_joy));
+    (st.goalsDone ??= []).push(id);
+  }
   if (full) naturePoint(st, def.nature, st.focusBorn ? c.heir_nature : 1);
   // ผลเงินเป็นเท่าของรายได้ จึงคิดเฉพาะปีที่มีรายได้ของตัวเอง · ค่าใช้จ่ายหรี่ด้วย spend_scale และหักได้ไม่เกินส่วนหนึ่งของเงินเก็บ (ไม่กู้มาทุ่ม)
   // เจ้าของเคาะ "ผลเงินชนด่าน finance = finance ชนะ": หักเต็มกินเงินเก็บไว้ใช้ยามเกษียณ ชีวิตที่ทุ่มยาวล้มละลายเกินกรอบ
@@ -6268,6 +6276,7 @@ function deathCard(st) {
     card.note = `ยุคนั้นเด็ก${st.sex}อายุ ${st.age} ปีจากไปราว ${Math.max(1, Math.round(q * 10000))} คนในทุก 10,000 คนต่อปี`;
   }
   if (st.age < STAGES[1].from) card.short = true;
+  if (st.goalsDone?.length) card.goals = st.goalsDone.map((id) => `${st.content.focus.focuses[id].name} → ${goalTail(st.content.focus.focuses, id)}`);
   const pets = petsAfter(st);
   if (pets) card.pets = pets;
   if (st.funeral) {
@@ -13702,6 +13711,8 @@ function render(card) {
     if (from) sum.push(el('p', 'sub', from.day ? `ชาติประจำวัน ${from.day} · ทุกคนที่เล่นวันนั้นเกิดแบบเดียวกันนี้ ทางที่เลือกต่างกันได้` : 'ชีวิตจากลิงก์เพื่อน · เกิดแบบเดียวกับเพื่อนทุกอย่าง ทางที่เลือกต่างกันได้'));
     // สมุดเต็มต้องให้ผู้เล่นลงมือเอง จึงอยู่แท็บที่เปิดอยู่แล้ว ไม่ซ่อนไว้แท็บอนุสรณ์
     if (card.memo === 'full') sum.push(memoFull(card));
+    // ปณิธานที่สำเร็จ (life-goal 02): ไม่มีสักอัน = ไม่มีบรรทัด
+    if (card.goals?.length) sum.push(el('p', 'sub', `ปณิธานที่ทำสำเร็จ: ${card.goals.join(' · ')}`));
     sum.push(helpBox());
     // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
     const chart = card.life && lifeChart(card.life, card.age, card.cause);
