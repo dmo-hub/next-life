@@ -3281,15 +3281,54 @@ function treeYearEnd(h, defs, stage, age) {
     t.cur = null;
     return null;
   }
+  // การ์ดด่านของโหนดนี้รอตอบอยู่ (ใบ 05): ปีนี้ไม่นับให้ใคร
+  if (t.pend === id) return null;
   t.yrs[id] = (t.yrs[id] ?? 0) + 1;
   t.hist.push([age, id]);
   const def = defs[id];
-  const unlocked = t.yrs[id] >= def.years && (treeCtl.cardsFree || (t.cards[id] ?? 0) >= def.cards);
-  if (unlocked) {
-    t.done[id] = age;
-    t.cur = treeOffers(h, defs, stage).find((x) => x !== id && !defs[x].hidden) ?? null;
+  const ready = t.yrs[id] >= def.years && (treeCtl.cardsFree || (t.cards[id] ?? 0) >= def.cards);
+  // โหนดใหญ่มีการ์ดด่าน: ปีครบ = การ์ดด่านโผล่ ยังไม่ปลด · ปลดตอนตอบการ์ดด่าน (treeGateDone)
+  if (ready && def.gate) {
+    t.pend = id;
+    return { id, unlocked: false, gate: true };
   }
-  return { id, unlocked };
+  if (ready) {
+    t.done[id] = age;
+    t.cur = treeNext(h, defs, stage, id);
+  }
+  return { id, unlocked: ready };
+}
+
+// ปลดแล้วเลื่อนไปโหนดแรกที่ทุ่มได้ต่อ · ไม่เลื่อนเข้าโหนดซ่อน และไม่เลื่อนเข้า keystone เอง (ใบ 05 · ข้อ 28: ต้องเลือกทุ่มเองหลังเห็นข้อเสีย)
+const treeNext = (h, defs, stage, id) => treeOffers(h, defs, stage).find((x) => x !== id && !defs[x].hidden && !defs[x].keystone) ?? null;
+
+// ── การ์ดด่าน + keystone (ใบ 05) ── ทุกตัวไม่ดึงเลขสุ่ม · ผลของการ์ดด่านลงผ่านตัวเลือกของการ์ด (ผลเต็มครั้งเดียว) ไม่ผ่านงบผลเบา
+// ปีครบแต่การ์ดหมวดยังไม่ครบ (ข้อ 46): ใช้บอกขั้น "รอโอกาส" ที่หน้าต้นไม้ · ไม่แตะสถานะ
+const treeWaiting = (h, defs) => {
+  const t = h?.tree;
+  const id = t?.cur;
+  return !!id && t.pend !== id && t.done[id] === undefined && (t.yrs[id] ?? 0) >= defs[id].years && (t.cards[id] ?? 0) < defs[id].cards;
+};
+// การ์ดด่านของโหนด id เป็นเหตุการณ์ตัวเลือก 2–3 ทาง (ไม่มี weight/category → ไม่ใช่การ์ดกองสุ่ม ไม่ขยับโควตาการ์ดโลกหลัก ไม่นับเป็นการ์ดหมวดของโหนดไหน)
+function treeGateEvent(defs, id) {
+  const g = defs[id].gate;
+  return {
+    id: `tree_gate_${id}`,
+    type: g.type ?? 'A',
+    treeGate: id,
+    title: g.title,
+    text: g.text,
+    choices: g.results.map((r) => ({ text: r.text, effects: r.fx, ...(r.flags && { sets_flags: r.flags }) })),
+  };
+}
+// ตอบการ์ดด่านแล้ว = ปลดโหนด · จดว่าเลือกผลทางไหน · เลื่อนไปโหนดถัดไป
+function treeGateDone(h, defs, stage, id, idx, age) {
+  const t = h.tree;
+  if (t?.pend !== id) throw new Error(`ไม่มีการ์ดด่านรอของโหนด ${id}`);
+  t.done[id] = age;
+  (t.gate ??= {})[id] = idx;
+  t.pend = null;
+  t.cur = treeNext(h, defs, stage, id);
 }
 
 // ── ผลติดตัว (ใบ 04) ── ทุกตัวเป็นฟังก์ชันล้วน ไม่ดึงเลขสุ่ม · ไม่เคยปลดอะไร = 1 เท่าเดิมทุกหลัก
@@ -5366,7 +5405,11 @@ function lifeFocusYear(st) {
 // ต้นไม้โฟกัส (ใบ 03): กติกากลางอยู่ tree.mjs · เนื้อ content.tree · ไม่เคยทุ่ม = ไม่แตะอะไร (ไม่ดึงเลขสุ่ม)
 // ทุ่มอยู่: ผลเต็มของโหนดที่ทุ่มปีนี้ · ปลดแล้ว: ผลเบาถาวรของทุกโหนดที่ปลด ต่อปี (ผลของโหนดที่เพิ่งปลดปีนี้เริ่มปีหน้า)
 const lifeTreeDefs = (st) => st.content.tree?.nodes ?? {};
-const treeInvestNode = (st, id) => treeInvest(st, lifeTreeDefs(st), id, stageOf(st.age));
+// keystone (ใบ 05): ทุ่มได้เมื่อผู้เล่นรับรู้ข้อเสียแล้วเท่านั้น (ack) — ไม่มี ack = ไม่ทุ่ม · UI ต้องแสดง def.warn ก่อนส่ง ack
+const treeInvestNode = (st, id, ack = false) => {
+  if (lifeTreeDefs(st)[id]?.keystone && !ack) throw new Error(`โหนด ${id} เป็น keystone ต้องรับรู้ข้อเสียก่อนทุ่ม`);
+  treeInvest(st, lifeTreeDefs(st), id, stageOf(st.age));
+};
 const treeOffersNow = (st) => treeOffers(st, lifeTreeDefs(st), stageOf(st.age));
 // ทอยตามแขนง (ใบ 04) ตัวคูณทางสำเร็จของการ์ดหมวด cat · อาชีพนับเมื่อมีงานของตัวเองแล้ว (เหมือน when.occupation)
 const lifeTreeRoll = (st, cat) => (st.tree && st.content.tree ? treeRollMul(st, st.content.tree.nodes, st.content.tree.roll_k, cat, st.workFrom !== null ? st.occupation : null) : 1);
@@ -5377,6 +5420,10 @@ function lifeTreeYear(st) {
   const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age);
   if (r) applyEffects(st, c.nodes[r.id].fx, c.year_scale);
   if (treeCtl.passive) for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size]);
+  // keystone ที่ปลดแล้วเสียถาวรทุกปี (ใบ 05 · ข้อ 28) · ไม่ผ่านตัวควบคุม passive: ล้างไม่ได้ (ข้อ 60) ปิดไม่ได้
+  for (const id of light) if (c.nodes[id].cost) applyEffects(st, c.nodes[id].cost, c.light_unit[c.nodes[id].size]);
+  // ปีครบของโหนดใหญ่ = การ์ดด่านเข้าคิวต้นปีถัดไป (st.due) · ไม่ผ่านกองสุ่ม
+  if (r?.gate) st.due.push({ kind: 'eraEvent', ev: treeGateEvent(c.nodes, r.id), age: st.age });
 }
 
 // เสี่ยงสุ่มของโฟกัส: ทอยจาก stream ของ (seed · อายุ · ข้อ) ไม่แตะ rng ของโลก ชีวิตจึงต่างจากตามน้ำแค่ผลที่เกิดจริง
@@ -5740,6 +5787,7 @@ function choose(st, idx, loan) {
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
   if (st.tree && st.content.tree) treeCard(st, st.content.tree.nodes, ev.category);
+  if (ev.treeGate) treeGateDone(st, st.content.tree.nodes, stageOf(st.age), ev.treeGate, idx, st.age);
   naturePoint(st, c.nature, 1);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
