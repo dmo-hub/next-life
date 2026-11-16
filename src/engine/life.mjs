@@ -2001,7 +2001,7 @@ function lifeTreeYear(st) {
   const c = st.content.tree;
   if (!st.tree || !c) return;
   const light = Object.keys(st.tree.done).filter((id) => st.tree.done[id] < st.age);
-  const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age);
+  const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age, c.pace);
   if (r) applyEffects(st, c.nodes[r.id].fx, c.year_scale);
   if (treeCtl.passive) for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size]);
   // keystone ที่ปลดแล้วเสียถาวรทุกปี (ใบ 05 · ข้อ 28) · ไม่ผ่านตัวควบคุม passive: ล้างไม่ได้ (ข้อ 60) ปิดไม่ได้

@@ -12,7 +12,7 @@ import { PLACEHOLDERS, MAX_LEN, ID_RE } from './lint/vocab.mjs';
 import { isObj, isMoney } from './lint/util.mjs';
 import { NEAR_HINT_LEVELS } from '../engine/court.mjs';
 import { checkFocus } from './lint/focus.mjs';
-import { checkTree } from './lint/tree.mjs';
+import { checkTree, checkTreePace } from './lint/tree.mjs';
 import { lintIsekai, formatIsekaiProblem } from './lint/isekai.mjs';
 import { useIsekaiCards, ISEKAI_SKILLS } from '../engine/isekai.mjs';
 import { TITLES, FAMILY_GOALS } from '../engine/titles.mjs';
@@ -456,7 +456,10 @@ function loadTree() {
   const doc = parse(read('content/rules/tree.yaml'));
   const bad = checkTree(doc, JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id));
   if (bad.length) throw new Error(`content/rules/tree.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
-  return { year_scale: doc.year_scale, light_unit: doc.light_unit, roll_k: doc.roll_k, card_mul: doc.card_mul, budget: doc.budget, nodes: doc.nodes };
+  const pace = parse(read('content/rules/tree-pace.yaml'));
+  const badPace = checkTreePace(pace);
+  if (badPace.length) throw new Error(`content/rules/tree-pace.yaml ไม่ผ่าน ${badPace.length} ข้อ\n${badPace.join('\n')}`);
+  return { year_scale: doc.year_scale, light_unit: doc.light_unit, roll_k: doc.roll_k, card_mul: doc.card_mul, budget: doc.budget, nodes: doc.nodes, pace };
 }
 
 // สกิลตอนจบชีวิตไทย (06s): id แหล่งหรือ id สกิลพิมพ์ผิด = สกิลไม่เคยออกเงียบ ๆ จึงหยุด build

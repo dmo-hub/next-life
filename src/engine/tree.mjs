@@ -7,6 +7,8 @@
 // anyCat / cardsFree = ทางเลือกที่ harness ใช้ทำตารางเสนอเจ้าของเท่านั้น (นับทุกหมวด · ไม่ต้องตอบการ์ด) ห้ามเปิดนอก harness
 // passive = ผลติดตัวหลังปลด (ผลเบารายปี · ทอย · ถ่วงการ์ด · ใบ 04) ปิด = ปลดแล้วไม่ให้อะไรเลย (ตัวควบคุมของด่านงบ)
 export const treeCtl = { cards: true, anyCat: false, cardsFree: false, passive: true };
+// ตัวเร่ง/ชะลอการปลด (ใบ 08) แยกเปิด/ปิดทีละตัว: ตัวควบคุมของ harness `tree-pace` ปิดตัวที่วัดแล้วต้องเท่าเดิมเป๊ะ
+export const treePaceCtl = { teacher: true, cls: true, learn: true, age: true };
 
 // ต้นทางผ่านแล้ว: ไม่มีต้นทาง = เปิดอยู่ · ในแขนงเดียวกันปลดอันใดอันหนึ่งก็พอ (ข้อ 72) · โหนดกลาง (and) ต้องครบทุกต้นทาง
 export const treeReach = (h, def) => {
@@ -32,9 +34,22 @@ export function treeCard(h, defs, category) {
   if (treeCtl.anyCat || defs[t.cur].cat.includes(category)) t.cards[t.cur] = (t.cards[t.cur] ?? 0) + 1;
 }
 
+// ความเร็วปลดต่อปี (ใบ 08): 1 = ปีเต็มเท่าเดิม · ไม่ส่ง cfg = 1 ทุกหลัก (ชีวิตเก่า/โลกที่ไม่มีตัวเร่งเดินเท่าเดิม)
+// ยิ่งแก่ยิ่งช้า: ลดเชิงเส้นถึง age_end_mul ที่อายุ age_end (สูตรเรียนวิชาอสงไขยย่อสเกลอายุไทย) · ฐานะอ่านจากฐานะตอนเกิด (standing[0]) ทายาท/โลกที่ไม่มี = ไม่ปรับ
+export function treePace(h, cfg, age) {
+  if (!cfg) return 1;
+  let m = 1;
+  if (treePaceCtl.age) m *= 1 - (1 - cfg.age_end_mul) * Math.min(age, cfg.age_end) / cfg.age_end;
+  if (treePaceCtl.teacher && h.flags?.tree_teacher) m *= cfg.teacher;
+  if (treePaceCtl.learn && h.nature === 'learn') m *= cfg.learn;
+  const born = h.standing?.[0]?.cls;
+  if (treePaceCtl.cls && born !== undefined) m *= 1 + cfg.class_step * (born - cfg.class_mid);
+  return m;
+}
+
 // ปิดปีที่อายุ age: คืน { id, unlocked } ของโหนดที่ทุ่มปีนี้ · ไม่ได้ทุ่ม/โหนดหลุดช่วงวัยแล้ว = null (ปีนั้นไม่นับให้ใคร)
 // ปลด = ปีเต็มครบ + การ์ดหมวดตรงครบ · ปลดแล้วเลื่อนไปโหนดแรกที่ทุ่มได้ต่อทันที ปีถัดไปนับเลย ไม่เสียปี
-export function treeYearEnd(h, defs, stage, age) {
+export function treeYearEnd(h, defs, stage, age, pace = null) {
   const t = h.tree;
   if (!t?.cur) return null;
   const id = t.cur;
@@ -44,7 +59,11 @@ export function treeYearEnd(h, defs, stage, age) {
   }
   // การ์ดด่านของโหนดนี้รอตอบอยู่ (ใบ 05): ปีนี้ไม่นับให้ใคร
   if (t.pend === id) return null;
-  t.yrs[id] = (t.yrs[id] ?? 0) + 1;
+  // ปีเศษส่วนปัดทศนิยม 3 ตำแหน่ง กันเลขลอยสะสมจนปลดเพี้ยนปี · ไม่มีตัวเร่ง = +1 เป๊ะเท่าเดิม
+  // t.carry = เศษเกินปีของโหนดที่เพิ่งปลด ทบเข้าปีแรกของโหนดถัดไป (ตัวเร่งเล็กจึงมีผลเฉลี่ยแม้โหนดปีเป็นจำนวนเต็ม) · มีแต่เมื่อความเร็วไม่ใช่จำนวนเต็ม
+  const carry = t.carry ?? 0;
+  if (carry) t.carry = 0;
+  t.yrs[id] = Math.round(((t.yrs[id] ?? 0) + treePace(h, pace, age) + carry) * 1000) / 1000;
   t.hist.push([age, id]);
   const def = defs[id];
   const ready = t.yrs[id] >= def.years && (treeCtl.cardsFree || (t.cards[id] ?? 0) >= def.cards);
@@ -55,6 +74,9 @@ export function treeYearEnd(h, defs, stage, age) {
   }
   if (ready) {
     t.done[id] = age;
+    // เศษเกินเฉพาะส่วนทศนิยม: ปีเต็มที่ค้างเพราะรอการ์ดไม่ทบ (ไม่ให้การรอการ์ดกลายเป็นโบนัสโหนดถัดไป)
+    const over = Math.round((t.yrs[id] - def.years) * 1000) / 1000 % 1;
+    if (over > 0) t.carry = over;
     t.cur = treeNext(h, defs, stage, id);
   }
   return { id, unlocked: ready };
