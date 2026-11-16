@@ -2807,7 +2807,7 @@ function morePanel() {
     notesMark();
     sheet?.querySelector('.sheet-x')?.focus();
   };
-  for (const x of [day, news, link('คู่มือ', 'guide.html'), link('กลไกในเกม', 'about.html'), link('หน้าแรก', 'index.html')]) {
+  for (const x of [day, news, link('คู่มือ', 'guide.html'), link('กลไกในเกม', 'guide.html#core'), link('หน้าแรก', 'index.html')]) {
     const li = el('li');
     li.append(x);
     ul.append(li);

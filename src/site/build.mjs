@@ -16,7 +16,7 @@ import { ART_INK } from '../ui/art.mjs';
 import { docsScope, injectDocsLayout } from './docs-layout.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
-export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
+export const FACT_PAGES = ['index', 'otherworld', 'worlds'];
 // หน้าเขียนมือที่ไม่มีตัวเลขจาก data แต่ต้องมีแถบบนชุดเดียวกัน — ไฟล์อยู่ใต้ docs/
 export const NAV_PAGES = ['whatsnew.html', 'spec/lore-finance-series.html'];
 // หน้าที่ build สร้างทั้งหน้าจากแม่แบบ src/site/<ชื่อ>.html
@@ -63,6 +63,8 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   }
   // เฉลยรวมเข้าหน้าการ์ดแล้ว (ข้อ 187) ที่อยู่เดิมส่งต่อพก #ใบ ไปด้วย
   put(at('docs/spoilers.html'), movedHtml('spoilers.html', 'catalog.html', 'การ์ดทั้งหมด'));
+  // กลไกในเกมรวมเข้าวิธีเล่นแล้ว (ui-redo 98 · ข้อ 190) ที่อยู่เดิมส่งต่อพก #ส่วน ไปด้วย
+  put(at('docs/about.html'), movedHtml('about.html', 'guide.html', 'วิธีเล่น'));
   // หน้าคำตัดสินเกมหลายหน้าจากแม่แบบเดียว — จำนวนหน้าตามโฟลเดอร์ใน design/ · ที่อยู่เดิมใต้ docs/ เขียนเป็นหน้าส่งต่อทุกรอบ (ลิงก์ภายนอกยังเปิดได้)
   const designTpl = injectFacts(readFileSync(at('src/site/design.html'), 'utf8'), facts, 'src/site/design.html');
   const designOut = designPages(new URL('design/', root));

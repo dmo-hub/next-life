@@ -27,7 +27,7 @@ export function guideHtml() {
   const real = HELP.map((h) => `<li><a href="tel:${esc(h.tel)}">${esc(h.label)} · ${esc(h.call)}</a> — ${esc(h.org)} · <a href="${esc(h.web)}" rel="noopener">เว็บทางการ</a></li>`).join('');
   const help = STAT_HELP.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
   return `
-<nav class="toc" aria-label="สารบัญ"><a href="#goal">เล่นยังไง</a><a href="#card">การ์ดกับตัวเลือก</a><a href="#stages">ช่วงชีวิต</a><a href="#buttons">ปุ่ม</a><a href="#menu">เมนู</a><a href="#stats">ค่าสถานะ</a><a href="#keys">แป้นพิมพ์</a><a href="#daily">ชาติประจำวัน</a><a href="#save">เซฟและเวอร์ชัน</a><a href="#help">ช่วยจริง</a></nav>
+<nav class="toc" aria-label="สารบัญ"><a href="#goal">เล่นยังไง</a><a href="#card">การ์ดกับตัวเลือก</a><a href="#stages">ช่วงชีวิต</a><a href="#buttons">ปุ่ม</a><a href="#menu">เมนู</a><a href="#stats">ค่าสถานะ</a><a href="#keys">แป้นพิมพ์</a><a href="#daily">ชาติประจำวัน</a><a href="#save">เซฟและเวอร์ชัน</a><a href="#help">ช่วยจริง</a><a href="#core">กลไกในเกม</a><a href="#rules">กติกาทีละระบบ</a></nav>
 <section id="goal"><h2>เล่นยังไง</h2>
 <p>เกิดแบบสุ่มเป็นคนไทยหนึ่งคน อ่านการ์ดทีละใบแล้วเลือกทาง ชีวิตเดินไปตามปีจนตาย ไม่มีชนะหรือแพ้ ตายแล้วไปปรโลก รู้ผลบุญบาปที่นั่น แล้วไปเกิดต่อเป็นลูกหลานของตัวเองหรือเกิดใหม่ตามกรรม เล่นต่อได้หลายรุ่น</p>
 <p>ตัวละครมีชื่อจริงตามยุคที่เกิดและชื่อเล่น ระหว่างเล่นเรียกชื่อเล่น (แถบบนการ์ด ภาพแชร์ ข้อความแชร์) · ฉากจริงจัง คือหนังสืองานศพ ป้ายคนหาย และปกสมุดชีวิต ขึ้นเป็น "ชื่อจริง (ชื่อเล่น)" ส่วนหน้าสุดท้ายของสมุดชีวิตใช้ชื่อจริงล้วน</p></section>
