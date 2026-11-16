@@ -10878,6 +10878,94 @@ function sceneArt(id) {
   return s ? { label: s[0], parts: [...ERA_FRAME, ...s[1]] } : null;
 }
 
+// ภาพหมวดการ์ดผล (ui-redo 62 · ข้อ 120): 10 หมวด กรอบ ERA_FRAME ชุดเดียวกับภาพฉาก · ข้อห้ามภาพ (ข้อ 156): ไม่มีพระ/พระพุทธรูป/ศพ/สถาบัน · คนในบ้านจากไปเป็นธูปควัน
+const artDrops = (xs, y) => xs.map((x, i) => `M${x} ${y + (i % 2) * 6}l-3 7`).join('');
+const CAT_ART = {
+  after: ['ดอกบัวบานบนเมฆ', [
+    artLine('M40 58q10-10 22-4q6-10 18-4q12-2 14 8H40z', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M106 58q8-8 18-3q8-9 18-2q10 0 12 5h-48z', { stroke: ART_INK.cream, w: 1.2 }),
+    artLotus(100, 44),
+    artLine('M82 46q18 6 36 0', { w: 1.4 }),
+    artLine('M100 14v-4M86 18l-3-3M114 18l3-3', { stroke: ART_INK.cream, w: 1 }),
+  ]],
+  far: ['ประตูโค้งที่มีแสงลอดออกมา', [
+    ART_GROUND,
+    artLine('M78 66V34a22 22 0 0 1 44 0v32'),
+    artLine('M86 66V36a14 14 0 0 1 28 0v30', { stroke: ART_INK.bronze2, w: 1 }),
+    artLine('M72 26l-10-7M128 26l10-7M68 40H54M132 40h14M74 54l-12 4M126 54l12 4', { stroke: ART_INK.cream, w: 1 }),
+    artFill(artCirc(100, 48, 3), ART_INK.cream),
+  ]],
+  loss: ['กระถางธูป ควันลอยขึ้น', [
+    ART_GROUND,
+    artLine('M78 66l4-14h36l4 14'),
+    artLine('M76 52h48', { w: 1.2 }),
+    artLine('M94 52V30M100 52V28M106 52V30', { stroke: ART_INK.bronze2, w: 1 }),
+    artFill(artCirc(94, 30, 1.3) + artCirc(100, 28, 1.3) + artCirc(106, 30, 1.3), ART_INK.cream),
+    artLine('M94 26q-4-6 0-10q4-4 0-8M100 24q4-6 0-10q-4-4 0-8M106 26q-4-6 0-10', { stroke: ART_INK.cream, w: 1 }),
+  ]],
+  ill: ['ขวดยา เม็ดยา และกากบาท', [
+    ART_GROUND,
+    artLine('M70 66V36h24v30zM74 36v-6h16v6M70 46h24'),
+    artLine('M112 34h10v-10h8v10h10v8h-10v10h-8v-10h-10z', { stroke: ART_INK.cream, w: 1.4 }),
+    artFill(artCirc(146, 58, 4) + artCirc(158, 60, 4)),
+  ]],
+  pet: ['แมวนั่งข้างชามข้าว', [
+    ART_GROUND,
+    artLine('M86 66q-4-22 8-30l-2-10l8 6h8l8-6l-2 10q12 8 8 30z'),
+    artLine('M122 62q14 2 14-10', { w: 1.4 }),
+    artFill(artCirc(98, 40, 1.5) + artCirc(110, 40, 1.5), ART_INK.cream),
+    artLine('M140 66q0-8 12-8t12 8z', { stroke: ART_INK.bronze2, w: 1.2 }),
+  ]],
+  self: ['ทางแยกกับป้ายบอกทาง', [
+    artLine('M56 66l34-14M144 66l-34-14', { stroke: ART_INK.bronze2, w: 1 }),
+    artLine('M100 66V20'),
+    artLine('M100 26h30l6 5l-6 5h-30zM100 40h-28l-6 5l6 5h28z', { stroke: ART_INK.cream, w: 1.2 }),
+    ART_GROUND,
+  ]],
+  luck: ['สลากกับดาวโชค', [
+    artLine('M58 26h64v32h-64zM72 26v32', { w: 1.4 }),
+    artLine('M80 36h32M80 44h24M80 50h28', { stroke: ART_INK.cream, w: 1 }),
+    artFill('M146 22l4 9l10 1l-8 6l3 10l-9-6l-9 6l3-10l-8-6l10-1z'),
+    artLine('M38 30v6M35 33h6M168 54v6M165 57h6', { stroke: ART_INK.cream, w: 1 }),
+  ]],
+  good: ['พระอาทิตย์ขึ้นพ้นขอบฟ้า', [
+    ART_GROUND,
+    artLine('M70 66a30 30 0 0 1 60 0'),
+    artLine('M100 28v-12M74 40l-9-8M126 40l9-8M62 56H50M138 56h12', { stroke: ART_INK.cream, w: 1.2 }),
+    artFill('M84 66a16 16 0 0 1 32 0z'),
+  ]],
+  bad: ['เมฆฝน ฟ้าแลบ', [
+    artLine('M60 42q-14 0-14-11q0-12 15-11q4-12 18-10q8-10 22-4q14-4 18 9q14 0 14 14t-14 13z', { stroke: ART_INK.cream, w: 1.4 }),
+    artFill('M104 42l-10 14h8l-6 12l14-18h-8l6-8z'),
+    artLine(artDrops([66, 78, 128, 140, 152], 48), { stroke: ART_INK.bronze2, w: 1.2 }),
+  ]],
+  mid: ['สมุดบันทึกเปิดค้างไว้', [
+    ART_GROUND,
+    artLine('M100 60V24q-20-8-40-2v38q20-6 40 2q20-8 40-2V22q-20-6-40 2'),
+    artLine('M68 32q12-3 24 0M68 40q12-3 24 0M68 48q12-3 24 0M108 32q12-3 24 0M108 40q12-3 24 0', { stroke: ART_INK.bronze2, w: 1 }),
+    artLine('M142 30l14-12l4 4l-14 12z', { stroke: ART_INK.cream, w: 1.2 }),
+  ]],
+};
+const CAT_IDS = Object.keys(CAT_ART);
+function catArt(k) {
+  const c = CAT_ART[k];
+  return c ? { label: c[0], parts: [...ERA_FRAME, ...c[1].flat()] } : null;
+}
+
+// หมวดของการ์ดผลจากข้อมูลบนการ์ด (ข้อ 83 · ป้าย tag ใบ 60) — ลำดับตัดสินเดียวกับ resultCat ใน harness/result-cats.mjs ที่เจ้าของเห็นสัดส่วนในข้อ 120
+function resultArtCat(card) {
+  if (card.tag === 'afterlife') return 'after';
+  if (card.trip || card.tag === 'trip') return 'far';
+  // สัตว์ในบ้านตาย (loss.role pet/herd) เป็นหมวดสัตว์เลี้ยง ไม่ใช่คนในบ้านจากไป — ไม่งั้นหมวด pet ไม่มีวันขึ้น
+  if (card.loss && ['pet', 'herd'].includes(card.loss.role)) return 'pet';
+  if (card.digest === 'kin_loss' || card.tag === 'loss') return 'loss';
+  if (card.digest === 'kin_ill' || card.illness || (card.tag === 'sick' && !card.focusRisk)) return 'ill';
+  if (card.digest === 'pet' || card.tag === 'pet') return 'pet';
+  if ('nature' in card || card.focusRisk) return 'self';
+  if (card.tag === 'belief') return 'luck';
+  return card.tag === 'good' || card.tag === 'bad' ? card.tag : 'mid';
+}
+
 // ฐานะ 10 ระดับของ standingOf → จน/กลาง/รวย ตามชื่อระดับ (ยากไร้–ค่อนข้างจน · ชนชั้นกลางล่าง–กลางบน · มีอันจะกิน–มั่งคั่ง)
 const artTier = (level) => (level <= 3 ? 0 : level <= 6 ? 1 : 2);
 
@@ -12504,7 +12592,17 @@ const ERA_OF = new Map(CONTENT.events.filter((c) => c.era).map((c) => [c.id, c.e
 // แรกเกิดเลือกตามฐานะบ้าน (ชุดเดียวกับรูปตัวละคร) · การ์ดตาย/หายตัวผูกในหน้าการ์ดตาย · การ์ดอื่นไม่มีภาพ หน้าตาเดิม
 const SCENE_OF = new Map([['young_wedding_01', 'wed_ask'], ['remarry_wedding_work_01', 'wed_rite'], ['remarry_wedding_mid_01', 'wed_rite'], ['remarry_wedding_old_01', 'wed_rite'], ['young_baby_01', 'baby_news'], ['work_house_01', 'baby_home'], ['retirement', 'retire_home'], ['early_retire', 'retire_early']]);
 const BIRTH_SCENE = ['birth_poor', 'birth_mid', 'birth_rich'];
+// ภาพหมวดการ์ดผล (ui-redo 62 · ข้อ 89): การ์ดผลที่ต่อจากการ์ดมีภาพฉาก/ภาพยุคไม่ใส่ภาพหมวด — ไม่มีภาพสองใบติดกัน · ตัวเดียวกับที่ harness/result-cats.mjs นับ
+let lastBase = null;
+const hasScene = (c) => !!c && (c.kind === 'era' || (c.kind === 'event' && (ERA_OF.has(c.id) || SCENE_OF.has(c.id))));
 // ภาพเล็ก (sm) บนการ์ดแรกเกิด/การ์ดตาย: ปุ่มไปต่อยังอยู่จอแรก 390 · data-scene ให้ด่านจอหาเจอ
+function catSvg(k) {
+  const s = catArt(k);
+  if (!s) return null;
+  const svg = artSvg('era-art scene-art scene-sm cat-art', ERA_ART_W, ERA_ART_H, s.parts);
+  svg.dataset.cat = k;
+  return svg;
+}
 function sceneSvg(id, sm) {
   const s = sceneArt(id);
   if (!s) return null;
@@ -13663,6 +13761,8 @@ window.addEventListener('keydown', (e) => [' ', 'Enter', 'ArrowRight', 'ArrowLef
 function render(card) {
   // ไปกลับกลางชีวิต (B68m): ทริปยังเป็นชีวิตนี้ ปุ่มจึงเดินผ่านปุ่มชีวิต — จอเต็มของทริปเป็นงานเลน C
   if (card.kind === 'isekai') return renderIsekai(card);
+  const prevBase = lastBase;
+  if (card.kind !== 'result') lastBase = card;
   root.replaceChildren();
   const s = statsOf(st);
   const box = el('article', `card ${styleOf(card)}`);
@@ -13769,6 +13869,7 @@ function render(card) {
     } else {
       const scene = SCENE_OF.has(card.id) && sceneSvg(SCENE_OF.get(card.id), false);
       if (scene) body.append(scene);
+      else if (card.kind === 'result' && !card.isekai && !hasScene(prevBase) && !digestRest(card).length) body.append(catSvg(resultArtCat(card)));
     }
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
     body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));
