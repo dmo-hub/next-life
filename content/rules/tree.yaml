@@ -65,7 +65,7 @@ nodes:
     name: เข้าค่ายธรรมะ
     branch: occ
     size: s
-    stages: [เด็ก, วัยรุ่น]
+    stages: [เด็ก, วัยรุ่น, หนุ่มสาว]
     pre: [o1]
     years: 3
     cards: 1
