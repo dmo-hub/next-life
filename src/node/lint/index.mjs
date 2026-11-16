@@ -41,7 +41,8 @@ export function lintContext() {
   const focusTagsAll = focusTags(focusDoc);
   const gateFocuses = Object.entries(focusDoc.focuses ?? {}).filter(([, f]) => f?.group === 'gate').map(([id]) => id);
   const items = Object.keys(parse(read('content/rules/items.yaml')).items ?? {});
-  return { regions, provinces, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: focusDoc.natures ?? {}, natureAge: focusDoc.nature_age };
+  const treeIds = Object.keys(parse(read('content/rules/tree.yaml')).nodes ?? {});
+  return { treeIds, regions, provinces, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: focusDoc.natures ?? {}, natureAge: focusDoc.nature_age };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]

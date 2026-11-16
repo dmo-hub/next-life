@@ -511,8 +511,8 @@ try {
 
 // ต้นไม้โฟกัส (ใบ 03): ทะเบียนผิดรูปต้องตก (ขอบชี้โหนดที่ไม่มี · วนเป็นวง · หมวด/ช่วงวัย/ผลผิด) · ทะเบียนถูกรูปต้องผ่าน · ของจริงต้องผ่าน
 {
-  const node = (over = {}) => ({ name: 'โหนดทดสอบ', branch: 'occ', size: 's', stages: ['เด็ก'], pre: [], years: 2, cards: 1, cat: ['belief'], fx: { happiness: 1 }, light: { happiness: 1 }, ...over });
-  const doc = (nodes) => ({ year_scale: 0.25, light_unit: { s: 0.007, b: 0.014, k: 0.025 }, nodes });
+  const node = (over = {}) => ({ name: 'โหนดทดสอบ', branch: 'occ', size: 's', stages: ['เด็ก'], pre: [], years: 2, cards: 1, cat: ['belief'], fx: { happiness: 1 }, light: { happiness: 1 }, roll: 1, ...over });
+  const doc = (nodes, over = {}) => ({ year_scale: 0.25, light_unit: { s: 0.007, b: 0.014, k: 0.025 }, roll_k: 0.1, card_mul: 1.25, budget: 0.5, nodes, ...over });
   const treeCases = [
     ['good: สองโหนดต่อกัน', doc({ a: node(), b: node({ pre: ['a'] }) }), 0],
     ['bad: ขอบชี้โหนดที่ไม่มี', doc({ a: node({ pre: ['ghost'] }) }), 1],
@@ -523,6 +523,13 @@ try {
     ['bad: ปีเป็นศูนย์', doc({ a: node({ years: 0 }) }), 1],
     ['bad: ผลเกินระดับ', doc({ a: node({ fx: { happiness: 5 } }) }), 1],
     ['bad: ชื่อมีตัวเลข', doc({ a: node({ name: 'โหนด 1' }) }), 1],
+    // ใบ 04: ผลติดตัว · ทอย · อาชีพตรง · งบ
+    ['good: โหนดแขนงงานผูกอาชีพ', doc({ a: node({ cat: ['work_money'], jobs: ['clerk'], job_roll: 1 }) }), 0],
+    ['bad: ไม่มีระดับทอย', doc({ a: node({ roll: undefined }) }), 1],
+    ['bad: jobs ไม่มี job_roll', doc({ a: node({ jobs: ['clerk'] }) }), 1],
+    ['bad: job_roll ไม่มี jobs', doc({ a: node({ job_roll: 1 }) }), 1],
+    ['bad: งบผลเบารวมเกินเพดาน', doc({ a: node() }, { budget: 0.001 }), 1],
+    ['bad: card_mul ต่ำกว่า 1', doc({ a: node() }, { card_mul: 0.5 }), 1],
   ];
   for (const [name, d, want] of treeCases) {
     const ps = checkTree(d);
