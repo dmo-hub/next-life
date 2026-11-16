@@ -282,6 +282,7 @@ events:
       - {id: wish, pair_id: mw_robe, intent: wish_for_gain, text: "ทำบุญแล้วขอให้มีโชคลาภ", cost: {unit: income_x, amount: 0.02}, effects: {happiness: 1}, merit: [{cat: dana, level: 1}], sets_flags: [hope_set:mw_robe], schedules: [{event: bel_hope_robe, after_years: [3, 5]}]}
       - {id: help, text: "ไปช่วยยกของในงานแทน", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
       - {id: skip, text: "ไม่ไปงานนี้", merit: [{cat: neutral}]}
+      - {id: usual, text: "ใส่ซองประจำ ชวนเพื่อนบ้านช่วยงาน", show_if: {tree: [o3]}, cost: {unit: income_x, amount: 0.02}, effects: {happiness: 1, relations: 1}, merit: [{cat: dana, level: 2}]}
   - id: bel_hope_robe
     type: A
     category: belief
@@ -308,6 +309,7 @@ events:
       - {id: wish, pair_id: mw_birthday, intent: wish_for_gain, text: "ถวายแล้วขอให้ปีนี้รวย", cost: {unit: income_x, amount: 0.03}, effects: {happiness: 1}, merit: [{cat: dana, level: 1}], sets_flags: [hope_set:mw_birthday], schedules: [{event: bel_hope_birthday, after_years: [3, 5]}]}
       - {id: chant, text: "นั่งสวดมนต์ที่ศาลาสักพัก", effects: {happiness: 1}, merit: [{cat: bhavana, level: 1}]}
       - {id: work, text: "งานเยอะ ไว้ปีหน้า", merit: [{cat: neutral}]}
+      - {id: precepts, text: "ขอถือศีลฟังธรรมที่วัดทั้งวัน", show_if: {tree: [o4]}, effects: {happiness: 1}, merit: [{cat: sila, level: 1}]}
   - id: bel_hope_birthday
     type: A
     category: belief
@@ -345,6 +347,7 @@ events:
       - {id: pray, text: "ไหว้ขอพรเฉย ๆ", merit: [{cat: neutral}]}
       - {id: donate, text: "ไหว้แล้วหยอดตู้บริจาค", cost: {unit: fixed_baht, amount: 20, ref_year: 2560}, merit: [{cat: dana, level: 1}]}
       - {id: wait, text: "รออยู่ข้างนอก ไม่เข้าไปไหว้", merit: [{cat: neutral}]}
+      - {id: sit, text: "นั่งสมาธิหน้าศาล ใจนิ่งก่อนสอบ", show_if: {tree: [o2]}, effects: {happiness: 1}, merit: [{cat: bhavana, level: 1}]}
   - id: bel_vow_exam_due
     type: B
     category: belief
