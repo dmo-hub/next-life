@@ -2876,6 +2876,8 @@ function notesBoot() {
     shut();
   };
 }
+// เซฟเก่าไม่มี since → engine ไม่ส่ง together · ไม่โชว์ 0 ปี
+const togetherText = (m) => (m.together ? ` · อยู่ด้วยกัน ${m.together} ปี` : '');
 function kinList(members) {
   const rank = (m) => FAMILY_ORDER.indexOf(m.role) * 2 + (m.alive ? 0 : 1);
   const ul = el('ul', 'picks');
@@ -2892,10 +2894,10 @@ function kinList(members) {
       // ตาย (ui-redo ใบ 28): ขีดเฉพาะชื่อ แถวไม่จาง อายุที่จากไปอ่านง่าย
       if (!m.alive) {
         const li = el('li', 'dead');
-        li.append(el('s', null, who), ` · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}`);
+        li.append(el('s', null, who), ` · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}${togetherText(m)}`);
         return ul.append(li);
       }
-      row([who, m.age != null && `อายุ ${m.age}`, m.left ? 'แยกทางแล้ว' : m.bondLevel].filter(Boolean).join(' · '), false);
+      row([who, m.age != null && `อายุ ${m.age}`, m.left ? `แยกทางแล้ว${togetherText(m)}` : m.bondLevel].filter(Boolean).join(' · '), false);
     });
   return ul;
 }

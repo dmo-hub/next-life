@@ -107,6 +107,8 @@ export function addMember(st, role, extra = {}) {
     m.kind = extra.kind;
     m.maxAge = extra.maxAge ?? st.kinRng.int(...extra.life);
   }
+  // อายุของเราตอนคู่เข้าบ้าน — ให้แผงบอก "อยู่ด้วยกัน N ปี" ของคู่เก่า · เซฟก่อนมีช่องนี้ไม่มี since
+  if (role === 'spouse') m.since = st.age;
   if (role === 'child') m.order = st.kin.filter((x) => x.role === 'child').length + 1;
   if (role === 'grandchild') {
     // หลานจากเนื้อหา (รับหลานมาเลี้ยง) เป็นลูกของลูกที่ยังอยู่ ถ้ามี — ไม่มีลูกเหลือ = ไม่ระบุพ่อแม่
@@ -190,7 +192,10 @@ export function applyFamily(st, c, care = 0) {
     if (op.add === 'pet' && livingOf(st, 'pet').length) continue;
     if (op.add) for (let i = 0; i < (op.n ?? 1); i++) addMember(st, op.add, ANIMAL.includes(op.add) ? { kind: op.kind, life: op.life, name: op.name } : {});
     if (op.bond) bondAdd(st, bondTargets(st, op.bond), op.d);
-    if (op.leave) for (const m of livingOf(st, op.leave)) m.left = true;
+    if (op.leave) for (const m of livingOf(st, op.leave)) {
+      m.left = true;
+      m.leftAge = st.age;
+    }
     if (op.die === 'parent') {
       const p = st.parents.find((x) => x.alive);
       if (p) {
@@ -248,7 +253,7 @@ function kinLost(st, m, age, year, out) {
   m.alive = false;
   if (!KIN_HOUSEHOLD.includes(m.role) && m.role !== 'herd') return;
   if (m.role === 'pet') st.happiness = bondClamp(st.happiness - PET_GRIEF);
-  const loss = { id: m.id, role: m.role, name: m.name, age, year, ...(m.kind && { kind: m.kind }), ...(m.cause && { cause: m.cause }) };
+  const loss = { id: m.id, role: m.role, name: m.name, age, year, ...(m.kind && { kind: m.kind }), ...(m.cause && { cause: m.cause }), ...(m.since !== undefined && { since: m.since }) };
   st.kinLoss.push(loss);
   out.push(loss);
 }
@@ -353,7 +358,7 @@ export const lastSpouseLoss = (st) => (st.kinLoss ?? []).findLast((l) => l.role 
 // ปีที่อยู่ด้วยกัน ({ปีคู่เก่า}): อายุตอนแต่ง = flagAge.married (ไม่ถูกลบตอนธงหลุด) · ไม่รู้อายุตอนแต่ง = ไม่บอกเลขปี
 export function spouseYears(st) {
   const l = lastSpouseLoss(st);
-  const wed = st.flagAge?.married;
+  const wed = l?.since ?? st.flagAge?.married;
   return l && wed !== undefined ? Math.max(1, l.year - st.birthYear - wed) : null;
 }
 // ชื่อที่การ์ดสูญเสียเรียก — สัตว์เรียกแบบ petCall
@@ -525,6 +530,13 @@ export function letterTo(st) {
 }
 export const letterToText = (m) => (m.name ? `${WHO_WORD[m.role]} ${m.name}` : WHO_WORD[m.role]);
 
+// ปีที่อยู่ด้วยกันของคู่ที่จากไป/แยกทาง · ไม่มี since (เซฟเก่า) = ไม่ส่งช่องนี้ จอไม่โชว์ 0 ปี
+function spouseSpan(st, m) {
+  if (m.since === undefined || (m.alive && !m.left)) return null;
+  const end = m.left ? m.leftAge : (st.kinLoss ?? []).findLast((l) => l.id === m.id)?.year - st.birthYear;
+  return end === undefined || Number.isNaN(end) ? null : { since: m.since, together: Math.max(1, end - m.since), ...(m.leftAge !== undefined && { leftAge: m.leftAge }) };
+}
+
 // รายชื่อให้แผงครอบครัว (B36c) อ่านอย่างเดียว — ช่องที่ไล่ไว้เท่านั้น ไม่มีค่าบัญชีหรือค่าที่อนุมานกรรมได้
 export function familyOf(st) {
   const year = kinYearOf(st);
@@ -537,6 +549,6 @@ export function familyOf(st) {
   // สาเหตุตาย (B110) ให้ผังตระกูลแสดง — มีเฉพาะคนที่จากไปแล้ว · เซฟก่อนมีสาเหตุไม่มีช่องนี้
   const causeOf = (m) => (!m.alive && m.cause ? { cause: m.cause } : {});
   const parents = st.parents.map((p) => ({ role: 'parent', name: p.name ?? null, sex: p.sex, age: p.alive ? p.age : diedOf(p), alive: p.alive, diedAge: diedOf(p), ...causeOf(p), ...bondOf(p) }));
-  const kin = (st.kin ?? []).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...bondOf(m), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }) }));
+  const kin = (st.kin ?? []).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...bondOf(m), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }), ...(m.role === 'spouse' && spouseSpan(st, m)) }));
   return [...parents, ...kin];
 }
