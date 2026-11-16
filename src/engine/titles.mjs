@@ -157,8 +157,12 @@ export function stageSummary(st, stage, fromAge, toAge) {
   return { lines, highlights, norm };
 }
 
-// ระดับเรียงหายากก่อน — บันทึกการตายโชว์ 3 ตัวแรก · ภาพแชร์ใช้ตัวแรก
+// ระดับเรียงหายากก่อน — ภาพแชร์ใช้ตัวแรก
 export const TIERS = ['ตำนาน', 'หายาก', 'ทั่วไป'];
+
+// กติกาเกม (decisions thai-life-deep 348): 1 ชาติได้ฉายาไม่เกิน 3 — เก็บ 3 อันที่หายากที่สุด
+// ฉายาตระกูล (family) ไม่นับรวมในเพดานนี้
+export const TITLE_CAP = 3;
 
 // อาชีพครอบครัวที่ไม่ต้องใช้ปริญญา — ลูกจบมหาวิทยาลัย = คนแรกของบ้าน
 const LOW_FAMILY_OCC = ['farmer', 'labor', 'factory', 'craft'];
@@ -276,7 +280,7 @@ export const FAMILY_TITLES = [
 export function titlesOf(st) {
   const f = lifeFacts(st);
   const pick = ({ id, name, tier, hint }) => ({ id, name, tier, hint });
-  const titles = TITLES.filter((t) => t.test(f)).sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier)).map(pick);
+  const titles = TITLES.filter((t) => t.test(f)).sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier)).slice(0, TITLE_CAP).map(pick);
   // แถวต่างโลก (B68) ไม่มีฐานะ/อายุ/ภูมิแบบชาติไทย — ฉายาตระกูลนับเฉพาะชาติไทย
   const thai = st.lineage.filter((l) => !l.isekai);
   const chain = familyChain(st, f.worth < 0);

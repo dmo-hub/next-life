@@ -1,6 +1,6 @@
 ---
 name: next-life-contributor
-description: ขั้นตอนส่งงานเข้า next-life สำหรับผู้ร่วมทำ ตั้งแต่รับใบงาน ทำ branch รันด่าน จนเปิด PR ที่ผ่านการตรวจ ใช้เมื่อจะเริ่มใบงาน เพิ่มเนื้อหา/ระบบ แก้ engine content หรือหน้าเว็บ commit push เปิดหรือแก้ PR แก้ conflict กับ main หรือ PR ถูกตีกลับ
+description: ขั้นตอนส่งงานเข้า next-life สำหรับผู้ร่วมทำ ตั้งแต่รับใบงาน ทำ branch รันด่าน จนเปิด PR ที่ผ่านการตรวจ ใช้เมื่อจะเริ่มใบงาน เพิ่มเนื้อหา/ระบบ แก้ engine content หรือหน้าเว็บ commit push เปิดหรือแก้ PR แก้ conflict กับ main PR ถูกตีกลับ หรือเซสชัน AI พังกลางใบงาน (API error · context เต็ม) แล้วต้องกู้งานต่อ
 ---
 
 # ส่งงานเข้า next-life
@@ -92,3 +92,37 @@ git checkout <branch เก่า> -- <ไฟล์งานที่เพิ�
 ```
 
 ไฟล์เดิมที่ทั้งสองฝั่งแก้ (`build.mjs` `src/engine/life.mjs` `src/node/load.mjs`) ห้าม checkout ทับ เพราะจะลบงานใน main ทิ้ง ให้เติมบรรทัดของงานเองทีละจุด แล้ว build และรันด่านใหม่ทั้งชุด ปิด PR เก่าแล้วเปิดใหม่ หรือ force push branch ของตัวเอง
+
+## เซสชัน AI พังกลางใบงาน (API error · context เต็ม · เครื่องดับ)
+
+state ของใบงานอ่านจาก git ได้ทุกจุด เช็คก่อนกู้:
+
+```bash
+git branch --show-current   # ต้องเป็น lane-<ชื่อคุณ>/<ชื่อใบ>
+git status --short          # ไฟล์ค้างกี่ตัว
+git log --oneline -3        # commit ไหนค้างบน branch
+```
+
+กู้ตาม stage:
+
+- **ยังไม่ commit** — ไฟล์ค้างใน working tree ยังอยู่ครบ ทำงานต่อได้เลย
+- **commit บางส่วน** — ดู `git log` ว่าถึงขั้นไหนของขั้นตอนใน `CONTRIBUTING.md` แล้วต่อตรง
+- **commit ครบ ยังไม่ push** — push ตามขั้นตอนได้ งานไม่หาย
+- **push แล้ว PR เปิดอยู่** — เซสชันพังไม่กระทบ งานอยู่บน remote แล้ว
+
+ถ้าเซสชันเดิมกู้ไม่ได้ เปิดเซสชันใหม่แล้วส่ง handoff ที่ผูกกับใบงาน:
+
+```
+ใบงาน: issue #<n> — <ชื่อใบ>
+branch: lane-<ชื่อคุณ>/<ชื่อใบ> (commit ล่าสุด: <sha>)
+ขั้นที่ทำแล้ว: <เช่น build ผ่าน · ผ่าน lint:test + harness:test · ยังไม่ site:check>
+ด่านที่ต้องรันเพิ่ม: <ด่านที่ใบงานระบุ>
+```
+
+ผล verify ที่ claim จากเซสชันที่พังเชื่อถือไม่ได้ — เซสชันใหม่ต้องรันด่านซ้ำทุกด่านที่ claim ว่าผ่าน และก่อนเปิด PR ต้อง merge main + `node build.mjs` ใหม่เสมอ เพราะ main อาจขยับระหว่างที่เซสชันพัง
+
+กันใบงานค้างกลางทาง:
+
+- commit ตาม milestone บน lane branch ของตัวเอง (ไม่ใช่ push) — ใบที่แตะหลายไฟล์ commit แยกตามระบบ (`content:` · `fix(ui):` · `feat(engine):`)
+- ห้ามค้าง uncommitted นาน — context เสียได้ แต่ commit แล้วไม่เสีย
+- ใบใหญ่เกิน session เดียว แบ่ง commit ตามระบบแล้ว handoff ระหว่างเซสชัน
