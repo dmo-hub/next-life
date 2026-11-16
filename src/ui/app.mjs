@@ -1,4 +1,4 @@
-import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, ALL_PATTERNS, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf } from '../engine/index.mjs';
+import { newLife, nextCard, causeWords, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
@@ -927,7 +927,7 @@ function deedsPart(deeds) {
   return part;
 }
 
-// แบบชีวิต/ฉายาคิดครั้งเดียวต่อการ์ดตาย แล้วลงสมุดฉายา — กดย้อน/วาดซ้ำไม่นับซ้ำ
+// ฉายาคิดครั้งเดียวต่อการ์ดตาย แล้วลงสมุดฉายา — กดย้อน/วาดซ้ำไม่นับซ้ำ
 function lifeTitles(card) {
   if (!card.lifeTitles) {
     const t = titlesOf(st);
@@ -955,20 +955,15 @@ function titleLine(card) {
   return p;
 }
 
-// บันทึกการตาย (ใบ 04): แบบชีวิต 1 + ฉายาเด่น 3 + ปุ่มดูทั้งหมด · ฉายาตระกูลแยกหัวข้อ
+// บันทึกการตาย (ใบ 04): ฉายาเด่น 3 + ปุ่มดูทั้งหมด · ฉายาตระกูลแยกหัวข้อ
 // แผงนี้มีแต่ของชีวิตนี้ (B130) — ของสะสมทุกชีวิตอยู่ในชั้นสมุด หัวข้อจึงย้ำ "ชีวิตนี้" ไม่ให้ปนกับสมุด
 function titlesBox(card) {
-  const { pattern, titles, family } = lifeTitles(card);
+  const { titles, family } = lifeTitles(card);
   // ของชีวิตนี้ที่เพิ่งเปิดครั้งแรกในสมุด — อ่านจากที่เก็บ ไม่ใช่ตอนลงสมุด รีโหลดที่มรณบัตรจึงยังเห็นจุด
   const unseen = bookRead().n;
-  const mine = [pattern.id && newKey('p', pattern.id), ...titles.map((t) => newKey('t', t.id)), ...family.map((t) => newKey('f', t.id))].filter((k) => k && unseen.includes(k));
+  const mine = [...titles.map((t) => newKey('t', t.id)), ...family.map((t) => newKey('f', t.id))].filter((k) => k && unseen.includes(k));
   const isNew = (k) => mine.includes(k);
   const box = el('div', 'recap titles');
-  box.append(el('div', 'h', 'แบบชีวิตนี้'));
-  const pat = el('p', 'pattern', pattern.name);
-  if (pattern.id && isNew(newKey('p', pattern.id))) pat.append(newTag());
-  box.append(pat);
-  if (pattern.hint) box.append(el('p', 'note', pattern.hint));
   box.append(el('div', 'h', 'ฉายาที่ได้ชีวิตนี้'));
   if (!titles.length) box.append(el('p', 'sub', 'ชีวิตนี้ยังไม่ได้ฉายา'));
   const ul = el('ul', 'picks');
@@ -1002,7 +997,7 @@ function titlesBox(card) {
   }
   clueRow(box, lifeTitles(card).clue, 'คำใบ้ฉายาที่ยังไม่เคยได้');
   const b = bookRead();
-  box.append(shelfButton(`เปิดชั้นสมุด · ฉายา ${b.p.length + b.t.length + b.f.length}/${BOOK_ALL}`, 't'));
+  box.append(shelfButton(`เปิดชั้นสมุด · ฉายา ${b.t.length + b.f.length}/${BOOK_ALL}`, 't'));
   // เปิดแผงแล้วนับว่าเห็นของชีวิตนี้ · ของชีวิตก่อนที่ยังไม่ได้ดูยังติดจุดที่ชั้นสมุด
   return fold(box, 'ฉายาชีวิตนี้', mine.length ? `ได้ฉายาใหม่ ${mine.length}` : null, () => {
     bookSeen(mine);
@@ -1038,9 +1033,10 @@ const BOOK_KEY = 'next-life-book-v1';
 function bookRead() {
   try {
     const b = JSON.parse(localStorage.getItem(BOOK_KEY) ?? '{}');
-    return { p: b.p ?? [], t: b.t ?? [], f: b.f ?? [], n: Array.isArray(b.n) ? b.n : [] };
+    // เซฟเก่ามี p (ชั้นแบบชีวิตที่เลิกแล้ว) และ n "p:<id>" — ไม่นับ ไม่เขียนกลับ
+    return { t: b.t ?? [], f: b.f ?? [], n: Array.isArray(b.n) ? b.n.filter((k) => !String(k).startsWith('p:')) : [] };
   } catch {
-    return { p: [], t: [], f: [], n: [] };
+    return { t: [], f: [], n: [] };
   }
 }
 function bookWrite(b) {
@@ -1059,7 +1055,6 @@ function titleBookAdd(t) {
     b.n.push(newKey(group, id));
     return [...xs, id];
   };
-  if (t.pattern) b.p = add('p', b.p, t.pattern.id);
   for (const x of t.titles) b.t = add('t', b.t, x.id);
   for (const x of t.family) b.f = add('f', b.f, x.id);
   bookWrite(b);
@@ -1075,8 +1070,8 @@ function newDot(label) {
   return d;
 }
 const newTag = () => el('span', 'new-tag', 'ใหม่');
-const BOOK_ALL = ALL_PATTERNS.length + TITLES.length + FAMILY_TITLES.length;
-const bookGot = (b) => b.p.length + b.t.length + b.f.length;
+const BOOK_ALL = TITLES.length + FAMILY_TITLES.length;
+const bookGot = (b) => b.t.length + b.f.length;
 
 // แถบความคืบหน้าในชั้นสมุด — ตัวเลข x/y อยู่ในหัวข้อแล้ว แถบจึงซ่อนจากโปรแกรมอ่านจอ
 function shelfBar(got, all) {
@@ -1101,7 +1096,6 @@ function titleShelf(body, fresh) {
   const b = bookRead();
   body.append(el('p', 'bk-intro', `สะสมจากทุกชีวิตที่เคยเล่น · เปิดแล้ว ${bookGot(b)}/${BOOK_ALL} · ตัวที่ยังไม่ได้เป็น ??? พร้อมคำใบ้`));
   shelfTitleArt(body, [
-    { label: 'แบบชีวิต', groups: [{ key: 'p', items: ALL_PATTERNS, got: b.p }] },
     { label: 'ฉายาประจำตัว', groups: TIERS.map((tier, i) => ({ key: 't', items: TITLES.filter((x) => x.tier === tier), got: b.t, gold2: i === 0 })) },
     { label: 'ฉายาตระกูล', groups: [{ key: 'f', items: FAMILY_TITLES, got: b.f }] },
   ], fresh, bookGot(b), BOOK_ALL);
@@ -1116,8 +1110,6 @@ function titleShelf(body, fresh) {
     }
     return ul;
   };
-  const s1 = shelfSec('แบบชีวิต', b.p.length, ALL_PATTERNS.length, 'ทางที่ชีวิตหนึ่งเดินจนจบ — ชีวิตละ 1 แบบ');
-  s1.append(rows('p', ALL_PATTERNS, b.p));
   const s2 = shelfSec('ฉายาประจำตัว', b.t.length, TITLES.length, 'ได้จากสิ่งที่ทำในชีวิตเดียว — ชีวิตหนึ่งได้หลายฉายา');
   for (const tier of TIERS) {
     const xs = TITLES.filter((x) => x.tier === tier);
@@ -1125,7 +1117,7 @@ function titleShelf(body, fresh) {
   }
   const s3 = shelfSec('ฉายาตระกูล', b.f.length, FAMILY_TITLES.length, 'ได้จากหลายรุ่นต่อกันในตระกูลเดียว');
   s3.append(rows('f', FAMILY_TITLES, b.f));
-  body.append(s1, s2, s3);
+  body.append(s2, s3);
   bookSeen();
 }
 
@@ -1185,7 +1177,7 @@ function memoAdd(t) {
   const m = memoRead();
   const k = `${save.seed}:${st.gen}`;
   if (m.l.some((x) => x.k === k)) return 'ok';
-  m.l.push({ k, n: st.name, r: fullName(), g: st.gen, a: st.age, p: provinceLabel(st), s: t.pattern?.name ?? '', t: t.titles[0]?.name ?? '' });
+  m.l.push({ k, n: st.name, r: fullName(), g: st.gen, a: st.age, p: provinceLabel(st), t: t.titles[0]?.name ?? '' });
   for (const x of eraSeen) if (!m.e.includes(x.id)) m.e.push(x.id);
   const r = memoWrite(m);
   shelfDot();
@@ -1311,7 +1303,7 @@ function skillsSeen() {
 }
 const skillsGot = (k) => Object.keys(k.s).length;
 // คำใบ้ของ ??? บอกชนิดแหล่งที่ได้ ไม่บอกชื่อ — ชี้ทางแบบคำใบ้ฉายา · ทุกสกิลเป็นของขวัญเทพธิดาในต่างโลกได้
-const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', pattern: 'แบบชีวิต', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'โฟกัส', lifeGoal: 'เป้าชีวิต' };
+const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'โฟกัส', lifeGoal: 'เป้าชีวิต' };
 function skillHint(id) {
   const kinds = Object.entries(CONTENT.skillMap ?? {}).filter(([, m]) => Object.values(m).some((xs) => xs.includes(id))).map(([k]) => SKILL_SRC[k]).filter(Boolean);
   return kinds.length ? `ของขวัญเทพธิดาในต่างโลก หรือชีวิตไทยที่มี${kinds.join('/')}ที่ใช่` : 'ของขวัญเทพธิดาในต่างโลก';
@@ -1440,7 +1432,7 @@ function memoShelf(body, choices, fresh, again) {
   // ลบทีละแถวได้ทันที (สรุปสั้น ไม่ใช่เซฟ ไม่ต้องถามซ้ำ)
   for (const x of [...m.l].reverse()) {
     const li = el('li');
-    const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.r || x.n}`, `อายุ ${x.a} ปี`, x.p, x.s && `ชีวิตแบบ${x.s}`, x.t && `ฉายา ${x.t}`].filter(Boolean).join(' · '));
+    const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.r || x.n}`, `อายุ ${x.a} ปี`, x.p, x.t && `ฉายา ${x.t}`].filter(Boolean).join(' · '));
     if (fresh.includes(x.k)) txt.append(newTag());
     li.append(txt);
     const del = el('button', 'more', 'ลบ');
@@ -1573,16 +1565,23 @@ function deathShelf(body) {
   if (!shown) body.append(el('p', 'sub', 'ยังไม่มีชีวิตที่จากไปลงหน้านี้'));
 }
 
+// ชีวิตช่วงไหน จบด้วยอะไร — ใช้เป็นหัวภาพแชร์เมื่อไม่มีฉายา · ไม่อ่านบัญชีบุญบาป
+function lifeLine(age) {
+  const why = isGone(st) ? null : causeWords(st.cause ?? 'other', age);
+  return `ชีวิตช่วง${stageOf(age)}${why ? ` ที่จบลง${why[0]}${why[1]}` : isGone(st) ? ' ที่หายไปจากบ้าน' : ''}`;
+}
+
 // ภาพแชร์รับเฉพาะช่องที่ไล่ชื่อไว้ตรงนี้ — บัญชีบุญบาปบนการ์ดตายหลุดลงภาพไม่ได้ แม้แกนเกมจะเติมช่องใหม่ให้การ์ด
 function shareFacts(card) {
-  const { pattern, titles } = lifeTitles(card);
+  const { titles } = lifeTitles(card);
   return {
     age: card.age,
     name: st.name,
     who: `${st.sex} · ${provinceLabel(st)} · ฐานะ${classNow(st)}`,
     job: `${card.job}${st.edu ? ` · วุฒิ${st.edu}` : ''}`,
-    pattern: { name: pattern.name, hint: pattern.hint ?? '' },
-    title: titles[0] ? { name: titles[0].name, tier: titles[0].tier } : null,
+    // ไม่มีฉายา = หัวภาพเป็นประโยคตามช่วงวัย/สาเหตุตาย (ข้อความที่ผู้เล่นเห็นบนการ์ดตายอยู่แล้ว)
+    line: lifeLine(card.age),
+    title: titles[0] ? { name: titles[0].name, tier: titles[0].tier, hint: titles[0].hint ?? '' } : null,
     avatar: avatarParts(card.age),
     // ชาติประจำวันกำหนดแค่ชีวิตแรก · ลิงก์เพื่อนไม่ใส่ป้ายบนภาพ (การ์ดตายบอกอยู่แล้ว)
     day: st.gen === 1 && save.from?.day ? save.from.day : null,
@@ -1596,7 +1595,6 @@ function summaryText(age, realm = null) {
     `${GAME_NAME} · ${st.name}`,
     `เกิดปี ${st.birthYear} · ${provinceLabel(st)}`,
     `${lifeEndWord(isGone(st))} ${age}`,
-    `ชีวิตแบบ${t.pattern.name}`,
     t.titles[0] ? `ฉายา ${t.titles[0].name} (${t.titles[0].tier})` : 'ยังไม่ได้ฉายา',
     realm && `ไปภูมิ${realm}`,
     `https://${SHARE_URL}`,
@@ -1755,14 +1753,13 @@ async function shareBlob(facts) {
     text(facts.who, '400 40px Sarabun, sans-serif', c('cream'), 58);
     text(facts.job, '400 36px Sarabun, sans-serif', c('sand'), 52);
     rule(44);
-    text('ชีวิตแบบ', '600 30px Sarabun, sans-serif', c('gold'), 44, 0, 1);
-    text(facts.pattern.name, '700 76px Srisakdi, serif', c('gold2'), 92, 0, 1);
-    if (facts.pattern.hint) text(facts.pattern.hint, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 3);
     if (facts.title) {
-      y += 36;
       text('ฉายาหายากที่สุด', '600 30px Sarabun, sans-serif', c('gold'), 44, 0, 1);
-      text(facts.title.name, '700 68px Srisakdi, serif', c('gold2'), 84, 0, 1);
+      text(facts.title.name, '700 76px Srisakdi, serif', c('gold2'), 92, 0, 1);
       text(facts.title.tier, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 1);
+      if (facts.title.hint) text(facts.title.hint, '400 32px Sarabun, sans-serif', c('sand'), 48, 0, 3);
+    } else {
+      text(facts.line, '700 60px Srisakdi, serif', c('gold2'), 80, 0, 3);
     }
   };
   layout();

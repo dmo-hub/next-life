@@ -290,7 +290,7 @@ events:
     stage: เด็ก
     years: [2500, 2650]
     era: tsunami
-    when: {age: [0, 12], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
+    when: {age: [0, 12], province: [ระนอง, พังงา, ภูเก็ต, กระบี่, ตรัง, สตูล], family: [{role: parent, sex: หญิง, alive: true}, {role: parent, sex: ชาย, alive: true}]}
     title: "ทะเลถอยหนี"
     text: "เช้าวันหยุดที่ชายหาด น้ำทะเลลดลงไปไกลผิดปกติ ปลาดิ้นอยู่บนทรายเต็มไปหมด เด็ก ๆ ทั้งหาดวิ่งกรูลงไปเก็บ คุณกำลังจะวิ่งตามเพื่อน"
     choices:

@@ -176,7 +176,6 @@ export function thaiEarn(st) {
   const src = {
     job: st.occupation ? [st.occupation] : [],
     title: t.titles.map((x) => x.id),
-    pattern: t.pattern ? [t.pattern.id] : [],
     cause: isGone(st) || !st.cause ? [] : [st.cause],
     goal: goalsMet(st, (st.estate?.money ?? 0) < 0),
     focus: Object.keys(st.focusYears ?? {}).filter((id) => st.focusYears[id] >= chain),

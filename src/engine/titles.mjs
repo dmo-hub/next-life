@@ -1,6 +1,6 @@
-// ชีวิตแบบ… + ฉายาตามเงื่อนไข + ฉายาตระกูล (ใบ 04 · B10)
+// ฉายาตามเงื่อนไข + ฉายาตระกูล (ใบ 04 · B10)
 // คิดย้อนหลังตอนตายจากสิ่งที่ชีวิตนั้นเลือกจริง (st.log) + สถานะท้ายชีวิต — ไม่เก็บอะไรเพิ่มระหว่างเล่น ไม่ดึงเลขสุ่ม
-// ห้ามอ่านยอดบัญชีบุญบาป (ledger) — แบบชีวิต/ฉายาขึ้นบนการ์ดตายก่อนปรโลกเฉลยบัญชี · อ่านได้เฉพาะป้ายของตัวเลือกที่ผู้เล่นกดเอง
+// ห้ามอ่านยอดบัญชีบุญบาป (ledger) — ฉายาขึ้นบนการ์ดตายก่อนปรโลกเฉลยบัญชี · อ่านได้เฉพาะป้ายของตัวเลือกที่ผู้เล่นกดเอง
 // (การกระทำนั้นผู้เล่นเห็นในข้อความอยู่แล้ว) ไม่รวมยอด ไม่หักกลบ ไม่บอกฝั่งที่หนักกว่า
 import { allocOptions } from './finance.mjs';
 import { meritId, SIN_CATS } from './merit.mjs';
@@ -8,11 +8,6 @@ import { CLASSES, LEVELS, RETIRE_AGE, riskLabel, netWorth, totalDebt, standingOf
 import { expectedDeathAge } from './era.mjs';
 import { nationalIncome } from './birth.mjs';
 import { ladderOf } from './rank.mjs';
-
-// ใบ 04: แบบชีวิตคิดจากเหตุการณ์ที่เกิดจริงหลังอายุ 18
-export const PATTERN_FROM = 18;
-// ตัวเลือกหลัง 18 น้อยกว่านี้ = ข้อมูลไม่พอให้เห็นแบบชีวิต (ตายตอนเด็ก/วัยรุ่น)
-export const PATTERN_MIN_PICKS = 3;
 
 const lv = (v) => (v ? Math.sign(v) * LEVELS[Math.abs(v)] / LEVELS[1] : 0);
 const tags = (c) => (c?.merit ?? []).map((t) => ({ id: meritId(t.cat), level: t.level ?? 1 }));
@@ -31,7 +26,7 @@ function eventIndex(content) {
 
 // ตัวเลือกที่เลือกจริงตั้งแต่อายุ from · การ์ดจัดสรรเงินสร้างตัวเลือกตามปี จึงสร้างซ้ำจากปีนั้น
 // การ์ดที่แกนสร้างเอง (หางาน · เรียนต่อ) ไม่อยู่ในเนื้อหา — งาน/วุฒิอ่านจากสถานะท้ายชีวิตแทน
-export function picksAfter(st, from = PATTERN_FROM) {
+export function picksAfter(st, from) {
   const idx = eventIndex(st.content);
   const out = [];
   for (const l of st.log) {
@@ -42,7 +37,7 @@ export function picksAfter(st, from = PATTERN_FROM) {
       continue;
     }
     const ev = idx.get(l.id);
-    // ใบลางภัยยุคเป็นเสียงเตือนที่ทุกคนได้ยิน (ออกตั้งแต่อายุ 6) ไม่ใช่ทางชีวิต — นับแล้วแกนเสี่ยง/บ้านเกิดของเด็กเอียงจนแบบชีวิตสั้นหาย
+    // ใบลางภัยยุคเป็นเสียงเตือนที่ทุกคนได้ยิน (ออกตั้งแต่อายุ 6) ไม่ใช่ทางชีวิต — นับแล้วแกนเสี่ยง/บ้านเกิดของเด็กเอียงจนสรุปช่วงวัยเพี้ยน
     // การ์ดบรรยากาศ (ambient · เทศกาล) ทุกคนเจอตามปฏิทิน ไม่ได้บอกทางชีวิต — ข้ามด้วยเหตุผลเดียวกับใบลาง
     if (ev?.herald_of || ev?.ambient) continue;
     const c = ev?.choices[l.choice];
@@ -54,7 +49,7 @@ export function picksAfter(st, from = PATTERN_FROM) {
 // คะแนนดิบ 4 แกน (ใบ 04) บวก = ขั้วหลัง · แต่ละแกนคิดจากสิ่งที่ต่างกัน ไม่ใช้ตัวเดียวกันซ้ำสองแกนเท่าที่ทำได้
 // ① ครอบครัว(−) ↔ งาน(+) · ② บ้านเกิด(−) ↔ ไปไกล(+) · ③ มั่นคง(−) ↔ เสี่ยง(+) · ④ ทางโลก(−) ↔ ทางธรรม(+)
 // แยกส่วนที่ไม่อ่านป้ายบุญบาปออกมา ให้สรุปช่วงวัย (stageSummary) ใช้ได้โดยไม่เผยบัญชี · คืน false = การ์ดจัดสรรเงิน (ไม่มีตัวเลือกเนื้อหา)
-// ลำดับการบวกต้องเหมือนเดิม — axisRaw ผลต่างแม้ทศนิยมท้าย ๆ ทำให้ชีวิตที่อยู่ขอบแกนเปลี่ยนแบบชีวิต
+// ลำดับการบวกต้องเหมือนเดิม — stageSummary ผลต่างแม้ทศนิยมท้าย ๆ ทำให้ชีวิตที่อยู่ขอบแกนเปลี่ยนบรรทัดสรุป
 function pickBase(a, p) {
   if (p.alloc !== undefined) {
     // คงแบบเดิม (null) ไม่นับ · ส่วนที่ไม่อยู่ในเงินฝาก/เงินสด = ส่วนที่เสี่ยง
@@ -91,48 +86,11 @@ function pickFlags(a, c) {
   }
 }
 
-export function axisRaw(st) {
-  const picks = picksAfter(st);
-  const a = { work: 0, away: 0, risk: 0, dhamma: 0 };
-  for (const p of picks) {
-    if (!pickBase(a, p)) continue;
-    const c = p.c;
-    for (const t of tags(c)) {
-      if (t.id === 'dana' || t.id === 'sila' || t.id === 'bhavana') a.dhamma += t.level;
-      else if (t.id === 'care_parents') {
-        a.dhamma += 0.5 * t.level;
-        a.work -= t.level;
-        a.away -= t.level;
-      } else if (t.id === 'help_others') a.dhamma += 0.5 * t.level;
-      else if (SIN_CATS.includes(t.id) && t.id !== 'vow_broken') a.dhamma -= t.level;
-    }
-    pickFlags(a, c);
-  }
-  // งานที่ทำ: ทิ้งอาชีพของครอบครัว = ไปไกล · สืบอาชีพครอบครัว = อยู่บ้านเกิด · เรียนจบสูง = ออกจากบ้านไปเรียน
-  if (st.workFrom !== null) a.away += st.occupation === st.familyOcc ? -2 : 2;
-  if (st.edu === 'อุดมศึกษา') a.away += 1;
-  return { ...a, picks: picks.length };
-}
-
-// ค่ากลาง/ช่วงของแต่ละแกนหลังหารด้วย √จำนวนตัวเลือก — ชีวิตยาวเลือกมากกว่า คะแนนดิบจึงกว้างกว่าโดยไม่ได้เอียงกว่า
-// ค่าตั้งจาก harness (npm run titles พิมพ์ค่าที่ควรเป็นทุกรอบ) · cut = มัธยฐาน แบบชีวิต 16 แบบจึงกระจายใกล้กัน · scale = ครึ่ง IQR
-export const AXES = [
-  { id: 'work', cut: -0.633, scale: 0.751 },
-  { id: 'away', cut: 0.186, scale: 0.386 },
-  { id: 'risk', cut: 1.401, scale: 0.528 },
-  { id: 'dhamma', cut: 0.316, scale: 0.371 },
-];
-// "ครึ่ง ๆ" (ใบ 04): แกนที่ |z| ต่ำกว่า NEAR นับว่าใกล้ศูนย์ · ใกล้ศูนย์ตั้งแต่ HALF_AXES แกนขึ้นไป = ครึ่ง ๆ
-export const NEAR = 0.3;
-export const HALF_AXES = 3;
-
-export const axisZ = (raw) => AXES.map((a) => (raw[a.id] / Math.sqrt(raw.picks) - a.cut) / a.scale);
-
 // สรุปภาพรวมสิ่งที่เลือกในช่วงวัย (B21) บนการ์ดเปลี่ยนช่วง — ใช้แค่ 3 แกนที่ไม่แตะป้ายบุญบาป
 // แกนทางโลก/ทางธรรมคิดจากป้ายบุญบาป ใช้ไม่ได้ (เผยบัญชีก่อนปรโลก) · care_parents ก็เป็นป้ายบุญ จึงไม่นับในแกนครอบครัว
 // เด็กยังไม่ทำงาน ขั้วงานของแกนแรกจึงเล่าเป็นเรื่องเรียน/เพื่อนแทน
 const KID_STAGES = ['เด็ก', 'วัยรุ่น'];
-// [มัธยฐาน, ครึ่ง IQR] ของคะแนน ÷ √จำนวนตัวเลือก ต่อช่วงวัย จากบอทสุ่ม — AXES ตั้งจากทั้งชีวิต (รวมงาน/วุฒิท้ายชีวิต)
+// [มัธยฐาน, ครึ่ง IQR] ของคะแนน ÷ √จำนวนตัวเลือก ต่อช่วงวัย จากบอทสุ่ม — ตั้งแยกต่อช่วงวัย ไม่รวมงาน/วุฒิท้ายชีวิต
 // ใช้กับช่วงเดียวแล้วเอียงทั้งก้อน · LEAN 1 = นอกครึ่งกลางของบอทสุ่ม จึงขึ้นราวครึ่งหนึ่งของการ์ดต่อแกน
 // แกนบ้านเกิด/ไปไกลอ่านจากคำในข้อความ หลายช่วงไม่มีเลยจน IQR = 0 — พื้น SCALE_MIN กันหารศูนย์ และให้เอ่ยเมื่อเลือกเรื่องนั้นชัด ๆ
 const STAGE_AXES = {
@@ -197,67 +155,6 @@ export function stageSummary(st, stage, fromAge, toAge) {
     .sort((x, y) => x.age - y.age)
     .map(({ age, text }) => ({ age, text }));
   return { lines, highlights, norm };
-}
-
-// 16 แบบ: id = ขั้วของแกน ①②③④ ตามลำดับ (F ครอบครัว/W งาน · H บ้านเกิด/A ไปไกล · S มั่นคง/R เสี่ยง · L ทางโลก/D ทางธรรม)
-// ชื่อเป็นภาพไทย (ใบ 04: ต้นไม้ · แม่น้ำ · วัด · ตลาด) · ไม่มีแบบไหนดีกว่าแบบอื่น — คำใบ้เล่าทาง ไม่ตัดสิน
-export const PATTERNS = [
-  { id: 'FHSL', name: 'ต้นมะม่วงหน้าบ้าน', hint: 'อยู่ใกล้คนในบ้าน ปลูกอะไรไว้ให้ลูกหลานเก็บกินได้นาน' },
-  { id: 'FHSD', name: 'ต้นโพธิ์ลานวัด', hint: 'ร่มเงาของหมู่บ้าน ไม่ไปไหน และเป็นที่พักใจของคนรอบตัว' },
-  { id: 'FHRL', name: 'แผงตลาดนัดหน้าบ้าน', hint: 'ลุ้นทุกวันเพื่อคนในบ้าน ไม่ทิ้งถิ่น' },
-  { id: 'FHRD', name: 'เรือจ้างข้ามฟาก', hint: 'พายฝ่าน้ำเชี่ยวไปกลับฝั่งเดิม ส่งคนอื่นถึงที่หมาย' },
-  { id: 'FASL', name: 'คลองส่งน้ำ', hint: 'ไหลไปไกลจากต้นทาง แต่ทุกหยดกลับไปเลี้ยงคนที่บ้าน' },
-  { id: 'FASD', name: 'ระฆังวัดต่างถิ่น', hint: 'ไปอยู่ไกล แต่เสียงยังเรียกคนในครอบครัวให้ใจสงบ' },
-  { id: 'FARL', name: 'รถทัวร์สายเหนือ-ใต้', hint: 'ออกไปเสี่ยงไกลบ้าน เพื่อส่งเงินกลับไปหาคนที่รัก' },
-  { id: 'FARD', name: 'เรือกอและกลางทะเล', hint: 'ออกไกลฝ่าคลื่น เชื่อในสิ่งที่มองไม่เห็น เพื่อคนบนฝั่ง' },
-  { id: 'WHSL', name: 'ร้านโชห่วยหัวมุม', hint: 'ทำงานหนักอยู่ที่เดิมทุกวัน ไม่รีบ ไม่เสี่ยง' },
-  { id: 'WHSD', name: 'หอระฆังไม้สัก', hint: 'ทำหน้าที่ของตัวเองอยู่ที่เดิมอย่างเที่ยงตรง' },
-  { id: 'WHRL', name: 'สนามไก่ชนท้ายหมู่บ้าน', hint: 'ไม่ไปไหน แต่ไม่เคยหยุดลุ้น' },
-  { id: 'WHRD', name: 'ตะเกียงเจ้าพายุ', hint: 'สว่างแรงที่บ้านเกิด กล้าเสี่ยงแต่ไม่ทิ้งหลักใจ' },
-  { id: 'WASL', name: 'รางรถไฟสายใต้', hint: 'วิ่งไกลบนทางที่วางไว้แล้ว มั่นคงทีละสถานี' },
-  { id: 'WASD', name: 'ธุดงค์ในเมืองหลวง', hint: 'ไปไกลเพื่องาน แต่เดินทางของตัวเองอย่างสงบ' },
-  { id: 'WARL', name: 'เจ้าพระยาหน้าน้ำ', hint: 'ไหลแรง ไปไกล เสี่ยงล้นตลิ่ง แต่พาของไปได้มาก' },
-  { id: 'WARD', name: 'ว่าวจุฬากลางสนามหลวง', hint: 'ทะยานสูงไกลบ้าน กล้าเสี่ยง และยังมีสายผูกใจไว้' },
-];
-export const HALF = { id: 'HALF', name: 'น้ำครึ่งแก้ว', hint: 'ไม่สุดทางไหนเลย ทุกทางพอดี ๆ' };
-// ชีวิตสั้น: ตายหรือหายตัวก่อนมีตัวเลือกหลังอายุ 18 พอให้เห็นแบบชีวิตผู้ใหญ่ — ผู้เล่นยังควรได้ชื่อชีวิตจริงแทน "ยังบอกไม่ได้"
-// อ่านตัวเลือกตั้งแต่เกิดด้วย 2 แกนที่ไม่แตะป้ายบุญบาป เทียบค่ากลางวัยเด็ก/วัยรุ่นของบอทสุ่ม (STAGE_AXES)
-// ① ใกล้คนในบ้าน(H) ↔ ออกไปหาเรื่องเรียน/เพื่อน(O) · ② มั่นคง(S) ↔ เสี่ยง(R) · ไม่ทันมีตัวเลือกเลยได้แบบของตัวเอง
-// หายตัวก่อนมีตัวเลือกหลัง 18 พอ ไม่เกิดในบอททุกสาย จึงไม่มีแบบแยก (ของสะสมที่ไม่มีใครได้)
-// ชื่อเป็นภาพไทยแบบเดียวกับแบบผู้ใหญ่ · เล่าทาง ไม่สงสารหรือตัดสิน
-export const SHORT_PATTERNS = [
-  { id: 'K0', name: 'เทียนเล่มเล็ก', hint: 'จุดได้ไม่นาน แต่คนข้างตัวยังจำแสงนั้นได้' },
-  { id: 'KHS', name: 'ดอกมะลิริมรั้ว', hint: 'อยู่ใกล้คนในบ้าน เรียบง่าย หอมอ่อน ๆ' },
-  { id: 'KHR', name: 'ลูกนกหัดบิน', hint: 'กล้าลองทั้งที่ยังอยู่ใกล้รัง' },
-  { id: 'KOS', name: 'สมุดปกแข็ง', hint: 'ตั้งใจเรียน เดินตามที่วางไว้ทีละหน้า' },
-  { id: 'KOR', name: 'ลูกโป่งงานวัด', hint: 'ลอยไปหาเรื่องสนุกก่อนใคร ไม่กลัวลม' },
-];
-export const ALL_PATTERNS = [...PATTERNS, HALF, ...SHORT_PATTERNS];
-const POLES = [['F', 'W'], ['H', 'A'], ['S', 'R'], ['L', 'D']];
-
-function shortPattern(st) {
-  const find = (id) => SHORT_PATTERNS.find((p) => p.id === id);
-  const picks = picksAfter(st, 0).filter((p) => p.age < PATTERN_FROM);
-  const a = { work: 0, away: 0, risk: 0, dhamma: 0 };
-  let n = 0;
-  for (const p of picks) {
-    if (!pickBase(a, p)) continue;
-    pickFlags(a, p.c);
-    n++;
-  }
-  if (!n) return find('K0');
-  const ref = STAGE_AXES[KID_STAGES.includes(stageOf(st.age)) ? stageOf(st.age) : KID_STAGES.at(-1)];
-  const z = (k) => (a[k] / Math.sqrt(n) - ref[k][0]) / Math.max(SCALE_MIN, ref[k][1]);
-  return find(`K${z('work') > 0 ? 'O' : 'H'}${z('risk') > 0 ? 'R' : 'S'}`);
-}
-
-// ชีวิตแบบไหน · ตัวเลือกหลังอายุ 18 ไม่พอ = แบบชีวิตสั้น
-export function patternOf(st, raw = axisRaw(st)) {
-  if (raw.picks < PATTERN_MIN_PICKS) return shortPattern(st);
-  const z = axisZ(raw);
-  if (z.filter((v) => Math.abs(v) < NEAR).length >= HALF_AXES) return HALF;
-  const id = z.map((v, i) => POLES[i][v > 0 ? 1 : 0]).join('');
-  return PATTERNS.find((p) => p.id === id);
 }
 
 // ระดับเรียงหายากก่อน — บันทึกการตายโชว์ 3 ตัวแรก · ภาพแชร์ใช้ตัวแรก
@@ -377,8 +274,6 @@ export const FAMILY_TITLES = [
 
 // ผลรวมของชีวิตนี้ที่การ์ดตาย/สมุดฉายาใช้ · titles เรียงหายากก่อน (ลำดับใน TITLES ภายในระดับเดียวกัน)
 export function titlesOf(st) {
-  const raw = axisRaw(st);
-  const pattern = patternOf(st, raw);
   const f = lifeFacts(st);
   const pick = ({ id, name, tier, hint }) => ({ id, name, tier, hint });
   const titles = TITLES.filter((t) => t.test(f)).sort((a, b) => TIERS.indexOf(a.tier) - TIERS.indexOf(b.tier)).map(pick);
@@ -386,5 +281,5 @@ export function titlesOf(st) {
   const thai = st.lineage.filter((l) => !l.isekai);
   const chain = familyChain(st, f.worth < 0);
   const family = [...FAMILY_TITLES, ...FAMILY_GOALS].filter((t) => t.test(chain, thai)).map(({ id, name, hint }) => ({ id, name, tier: 'ตระกูล', hint }));
-  return { pattern: pattern && { id: pattern.id, name: pattern.name, hint: pattern.hint }, titles, family };
+  return { titles, family };
 }

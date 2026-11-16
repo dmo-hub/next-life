@@ -11,7 +11,7 @@ const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? Number
 const n = arg('--n', 2000), seed = arg('--seed', 1);
 const REPEAT = { maxExtra: 4, minHit: 0.7, maxStuck: 0.12 };
 // ไม่นับเป็นการ์ดซ้ำ: promo_/office_ แกนสร้างตามขั้นบันไดอาชีพ (ไม่มีใน content) · funeral_ คำสั่งเสียวนในงานศพตามแบบ
-const SKIP = ['promo_', 'office_', 'funeral_'];
+const SKIP = ['promo_', 'office_', 'funeral_', 'grief_'];
 const content = loadContent();
 const byId = Object.fromEntries(content.events.map((e) => [e.id, e]));
 const q = (xs, p) => [...xs].sort((a, b) => a - b)[Math.min(xs.length - 1, Math.floor(p * xs.length))];

@@ -177,6 +177,7 @@ function conditions(e, L) {
   if (e.era) out.push(`ช่วง${esc(L.era(e.era))}`);
   for (const s of e.systems ?? []) out.push(`หลังมี${L.sys(s)}`);
   if (w.region) out.push(`ภาค${any(w.region.map(esc))}`);
+  if (w.province) out.push(`จังหวัด${any(w.province.map(esc))}`);
   if (w.sex) out.push(`เพศ${any(w.sex.map(esc))}`);
   if (w.overlap_stage) out.push(`ค่าซ้อนทับขั้น ${range(w.overlap_stage)}`);
   if (w.class) out.push(`ฐานะ${any(w.class.map(esc))}`);
@@ -217,7 +218,8 @@ function locks(q, L) {
   for (const f of q.family ?? []) out.push(famCond(f));
   if (q.nature) out.push(`เป็นคน${esc(L.nature(q.nature))}`);
   out.push(...flagCond(q.flags, L));
-  return [`เลือกได้เมื่อ ${out.join(' · ')}${q.reason ? ` · ไม่ผ่านจอบอก "${esc(q.reason)}"` : ''}`];
+  const own = Object.entries(q.reasons ?? {}).map(([k, t]) => `ไม่ผ่าน${esc(k)}จอบอก "${esc(t)}"`).join(' · ');
+  return [`เลือกได้เมื่อ ${out.join(' · ')}${q.reason ? ` · ไม่ผ่านจอบอก "${esc(q.reason)}"` : ''}${own ? ` · ${own}` : ''}`];
 }
 
 // การ์ดที่ถูกนัด/ต่อเรื่องบางใบไม่มีชื่อ — ใช้ต้นข้อความแทน และลิงก์ไปการ์ดนั้นบนหน้าเดียวกัน

@@ -1,5 +1,5 @@
-// ด่านตัวควบคุมลาง (omc-2): ลางที่มีตัวเลือกตามมาเปลี่ยนแบบชีวิต/ฉายาได้ (ลางภัยยุคเคยกดลูกนกหัดบินจน full ตก) — เกมอื่นไม่มีลางเตือนก่อนภัยให้เทียบตัวเลข
-// เดิน seed เดียวกันสองชุด: เนื้อหาเต็ม vs ตัดใบลางออกจากเนื้อหา แล้วเทียบอัตราแบบชีวิต + ฉายาทุกตัว (ชุดเดียวกับ titles.mjs)
+// ด่านตัวควบคุมลาง (omc-2): ลางที่มีตัวเลือกตามมาเปลี่ยนฉายาได้ (ลางภัยยุคเคยกดลูกนกหัดบินจน full ตก) — เกมอื่นไม่มีลางเตือนก่อนภัยให้เทียบตัวเลข
+// เดิน seed เดียวกันสองชุด: เนื้อหาเต็ม vs ตัดใบลางออกจากเนื้อหา แล้วเทียบอัตราฉายาทุกตัว (ชุดเดียวกับ titles.mjs)
 // ตัดที่เนื้อหา ไม่ใช่ตัดออกจาก log หลังเล่น — ต้องเห็นผลของธง braced: และโควตาปีที่ใบลางกิน
 // ใช้เมื่อ diff แตะใบลาง/ที่ออกลาง · ไม่เข้า full (เวลา) · ไม่ครอบลางบัญชี (ไม่มีตัวเลือก · ตัดต้องเพิ่มธงใน engine)
 // ลูปนับลอกจาก titles.mjs ไม่ import — ไฟล์นั้นเป็นสคริปต์รันทันที
@@ -7,7 +7,7 @@ import { Worker, isMainThread, parentPort, workerData } from 'node:worker_thread
 import { availableParallelism } from 'node:os';
 import { createHash } from 'node:crypto';
 import { playLife, playAfterlife, nextLife, mixSeed } from '../src/engine/index.mjs';
-import { titlesOf, ALL_PATTERNS, TITLES, FAMILY_TITLES } from '../src/engine/titles.mjs';
+import { titlesOf, TITLES, FAMILY_TITLES } from '../src/engine/titles.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
 
@@ -41,7 +41,6 @@ if (!isMainThread) {
     for (let g = 0; g < gens; g++) {
       const { age, state } = playLife(mixSeed(seed, i * 7919 + g), content, play, null, st ?? undefined);
       const t = titlesOf(state);
-      if (t.pattern) hit(`p:${t.pattern.id}`);
       for (const x of t.titles) hit(`t:${x.id}`);
       for (const x of t.family) hit(`f:${x.id}`);
       // done จับใบที่ออกแต่ไม่ลง log ด้วย (ใบไม่มีตัวเลือก) — ตัวควบคุม (1) ต้องไม่พลาดใบลางที่หลุดมา
@@ -153,8 +152,6 @@ if (!isMainThread) {
     };
     console.log(`\n${label} · ชีวิตละชุด ${A.lives}`);
     console.log(`  ${''.padEnd(28)} ${'มีลาง'.padStart(14)} ${'ตัดลาง'.padStart(14)} ${'ต่าง'.padStart(7)} ${'z'.padStart(6)} ${'สัมพัทธ์'.padStart(5)}`);
-    console.log('แบบชีวิต');
-    for (const x of ALL_PATTERNS) line(x.name, `p:${x.id}`);
     console.log('ฉายา');
     for (const x of TITLES) line(x.name, `t:${x.id}`);
     console.log('ฉายาตระกูล');
@@ -162,9 +159,9 @@ if (!isMainThread) {
     return fail;
   };
   const fail = table('ทุกบอทรวม (ตัดสิน)', Object.keys(BOTS), true);
-  // เพดานแบบชีวิตกระจุกวัดบนบอทสุ่ม — พิมพ์ให้เห็นแยก แต่ไม่ตัดสิน: ชีวิตชุดเดียวน้อยกว่ารวม 6 เท่า ตัวหายากแกว่งเกิน z ง่าย
+  // เพดานฉายากระจุกวัดบนบอทสุ่ม — พิมพ์ให้เห็นแยก แต่ไม่ตัดสิน: ชีวิตชุดเดียวน้อยกว่ารวม 6 เท่า ตัวหายากแกว่งเกิน z ง่าย
   table('บอทสุ่มอย่างเดียว (ดูอย่างเดียว ไม่ตัดสิน)', ['สุ่ม'], false);
   for (const id of accepted) console.log(`~ ${id} เกินขอบแต่ยอมรับแล้ว: ${ACCEPTED[id]}`);
-  console.log(fail ? `\nด่านตัวควบคุมลางตก ${fail} ตัว (|z| ≥ ${Z_FAIL} และต่างสัมพัทธ์ ≥ ${REL_FAIL * 100}%)` : `\nด่านตัวควบคุมลางผ่าน: แบบชีวิต ${ALL_PATTERNS.length} + ฉายา ${TITLES.length} + ตระกูล ${FAMILY_TITLES.length} ตัว ไม่มีตัวไหนขยับเกินขอบ`);
+  console.log(fail ? `\nด่านตัวควบคุมลางตก ${fail} ตัว (|z| ≥ ${Z_FAIL} และต่างสัมพัทธ์ ≥ ${REL_FAIL * 100}%)` : `\nด่านตัวควบคุมลางผ่าน: ฉายา ${TITLES.length} + ตระกูล ${FAMILY_TITLES.length} ตัว ไม่มีตัวไหนขยับเกินขอบ`);
   if (fail) process.exitCode = 1;
 }
