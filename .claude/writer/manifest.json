@@ -79,6 +79,14 @@
       "branch": "EX",
       "base": "c6aadad707f506a046c5b958d758b9469672479f",
       "created": "2026-11-16T07:36:30.937Z"
+    },
+    {
+      "id": "b011",
+      "topic": "เตรียมทหาร เฟส 3 ชีวิตในโรงเรียน ช่วง 4: ฉากปี 2 ทั้งหมด (school.order.year2/pools y2a y2b/scenes ปี 2/lastScene SB-18 SB-20/medicalStay/medicalOut) + ธงฉากปี 2 · ฮับเคาะ 2026-11-16",
+      "brief": ".claude/research/cadet-phase3-yaml-spec.md",
+      "branch": "EX",
+      "base": "c6aadad707f506a046c5b958d758b9469672479f",
+      "created": "2026-11-16T09:13:12.752Z"
     }
   ]
 }

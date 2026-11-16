@@ -893,17 +893,20 @@ const f2 = (v) => v.toFixed(2);
     }
     return { seen, raw, titleAt };
   };
-  const fixed = (content.cadet.school.order.year1 ?? []).filter((x) => !/^[@#]/.test(x));
-  let raw = 0, missing = new Set(), badTitle = 0, alive = 0;
+  const fixed = [...(content.cadet.school.order.year1 ?? []), ...(content.cadet.school.order.year2 ?? [])].filter((x) => !/^[@#]/.test(x));
+  let raw = 0, missing = new Set(), badTitle = 0, alive = 0, dead = 0, badDead = 0, med = 0, badMed = 0;
   for (let i = 0; i < 120; i++) {
     const st = mk(mixSeed(0x5c01, i), 'ชนชั้นกลาง'), R = makeRng(i), r = play(st, () => R.next(), false);
     raw += r.raw;
-    if (st.dead) continue;
+    if (st.dead) { dead++; if (st.cause !== 'training') badDead++; continue; }
+    if (st.flags.cadet_medical_out) { med++; if (st.title || st.cadet || st.school !== 'upper') badMed++; continue; }
     alive++;
     for (const id of fixed) if (!r.seen.has(id)) missing.add(id);
     if (r.titleAt !== 'นตท.') badTitle++;
   }
-  check('เฟส 3 ปี 1: ฉากขึ้นแน่ครบทุกชีวิตที่รอด', missing.size === 0, missing.size ? [...missing].join(' ') : `${alive} ชีวิต`);
+  check('เฟส 3 ปี 1–2: ฉากขึ้นแน่ครบทุกชีวิตที่เรียนจบ', missing.size === 0, missing.size ? [...missing].join(' ') : `${alive} ชีวิต`);
+  check('เฟส 3 ตายในโรงเรียน = สาเหตุ training', dead > 0 && badDead === 0, `ตาย ${dead} · ผิด ${badDead}`);
+  check('เฟส 3 ออกเพราะบาดเจ็บ: กลับ ม.ปลาย ไม่มีคำนำหน้า', badMed === 0, `ออก ${med} · ผิด ${badMed}`);
   check('เฟส 3 ปี 1: ไม่มีวงเล็บค้างบนจอ', raw === 0, `${raw}`);
   check('เฟส 3 ปี 1: เป็น นตท. ตั้งแต่ SB-27b', badTitle === 0, `${badTitle}`);
   const poor = mk(7, 'ยากจน'), rich = mk(8, 'มั่งคั่ง');

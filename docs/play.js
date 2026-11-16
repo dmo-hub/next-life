@@ -3326,7 +3326,7 @@ const CADET = (() => {
       const lines = (xs) => (xs ?? []).filter((x) => condOk(st, x.when)).map((x) => schoolSub(st, x.line));
       const text = [...lines(c.preLines), schoolSub(st, pickText(st, c.text, c.textBy)), ...lines(c.contextLines)].filter(Boolean).join(' ');
       const options = (c.options?.length ? c.options : [{ label: 'ต่อ' }]).map((o) => ({ ...o, label: schoolSub(st, o.label), ...(o.hint && { hint: schoolSub(st, o.hint) }), _school: true }));
-      return { id: `school:${id}`, title: c.title, text, options };
+      return { id: `school:${id}`, title: pickText(st, c.title, c.titleBy), text, options };   // titleBy = ชื่อฉากตามยุค (SB-22)
     }
     // จบลำดับ (จบปี 2 หรือยังไม่มีบทปี 2): เข้า track โรงเรียนนายร้อยเดิมต่อ (ตั้งไว้ตั้งแต่รายงานตัว)
     K.school = null;
@@ -3334,8 +3334,7 @@ const CADET = (() => {
   };
 
   // ออกจากโรงเรียนกลางทาง: ล้างลำดับ แล้วให้ life.mjs พากลับ ม.ปลาย / หางาน
-  function exitSchool(st, flag) {
-    if (flag) st.flags[flag] = true;
+  function exitSchool(st) {
     st.cadet.school = null;
     st.cadet.steps = [];
     leaveCadetSchool(st);
@@ -3343,7 +3342,8 @@ const CADET = (() => {
   // การ์ดออกเพราะบาดเจ็บ (ต่อจากผลไหล่หลุด)
   S.medicalOut = (st) => {
     const m = SC(st).medicalOut ?? {};
-    exitSchool(st, 'cadet_medical_out');
+    setFlags(st, m);   // cadet_medical_out (ตั้งจากบท)
+    exitSchool(st);
     return status(m.title ?? 'ออกจากโรงเรียนเพราะบาดเจ็บ', schoolSub(st, m.text));
   };
 

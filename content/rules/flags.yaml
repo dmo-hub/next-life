@@ -232,6 +232,28 @@ flags:
   # >>> nl-writer b010 flag cadet_resign_debt
   cadet_resign_debt: "ลาออกจากเตรียมทหารแล้วที่บ้านต้องกู้เงินมาใช้คืนตามสัญญา"
   # <<< nl-writer b010 flag cadet_resign_debt
+  # >>> nl-writer b011 flag cadet_fair
+  # เตรียมทหาร เฟส 3 ชีวิตในโรงเรียน ปี 2 (ตั้งในฉาก school ของ rules/cadet.yaml)
+  cadet_fair: "เตรียมทหาร: ตอนเป็นรุ่นพี่ปีสอง ลงโทษรุ่นน้องตามระเบียบหรือพาน้องซ้อม"
+  # <<< nl-writer b011 flag cadet_fair
+  # >>> nl-writer b011 flag cadet_harsh
+  cadet_harsh: "เตรียมทหาร: ตอนเป็นรุ่นพี่ปีสอง ซ่อมรุ่นน้องหนักแบบที่เคยโดน"
+  # <<< nl-writer b011 flag cadet_harsh
+  # >>> nl-writer b011 flag cadet_dui_runner
+  cadet_dui_runner: "เตรียมทหาร: คืนเวรยามฝนตก ดุ่ยวิ่งหนีเสียงแมวจนจ่าขมจับเวลา"
+  # <<< nl-writer b011 flag cadet_dui_runner
+  # >>> nl-writer b011 flag cadet_sweetheart
+  cadet_sweetheart: "มีคนที่เขียนจดหมายหากันตอนเรียนเตรียมทหาร"
+  # <<< nl-writer b011 flag cadet_sweetheart
+  # >>> nl-writer b011 flag cadet_lost_friend
+  cadet_lost_friend: "เตรียมทหาร: เพื่อนร่วมกองเสียชีวิตในวันฝึกเดินทางไกลกลางแดด"
+  # <<< nl-writer b011 flag cadet_lost_friend
+  # >>> nl-writer b011 flag cadet_injured_stay
+  cadet_injured_stay: "เตรียมทหาร: ไหล่หลุดที่หอฝึก แต่ได้เรียนต่อ"
+  # <<< nl-writer b011 flag cadet_injured_stay
+  # >>> nl-writer b011 flag cadet_medical_out
+  cadet_medical_out: "ออกจากโรงเรียนเตรียมทหารเพราะบาดเจ็บ (ไหล่หลุดที่หอฝึก)"
+  # <<< nl-writer b011 flag cadet_medical_out
   # สายหมอลำ/ลูกทุ่ง (ใบ 251) — มุมคนร้อง
   singer_seed: "เคยขึ้นเวทีร้องเพลงตอนเด็ก"
   singer_stage: "เคยลงประกวดร้องเพลง"
