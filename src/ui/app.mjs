@@ -306,10 +306,13 @@ function lifeMenu(card, box, after = false) {
   sheetClose = null;
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
+  // ยังไม่ตาย = ชั้นสมุดคงราวกับแผงค้างไว้ · มรณบัตรกับปรโลกเปิดสมุดแบบเดิม (แทนทั้งหน้า)
+  if (!after && card.kind !== 'death') nav.dataset.keepShelf = '1';
   const isk = card.kind === 'isekai';
   const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), focus: () => (isk ? isekaiFocusPanel(card) : focusPanel(card)), skill: () => isekaiSkillPanel(card.status), family: after ? clanPanel : familyPanel, more: morePanel, past: pastPanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
-  const views = { shelf: () => openShelf() };
+  // กลางชีวิตกด "สมุด" ซ้ำ = กลับการ์ด (ชั้นสมุดวาดแค่ช่องกลาง ราวกับแผงค้างคงอยู่)
+  const views = { shelf: () => (shelfBack && root.querySelector('.shelf-view') ? shelfBack() : openShelf()) };
   // ต่างโลกช่วงยังไม่มีร่าง (ไม่มีหน้าต่างสถานะ) ไม่มีอะไรให้แผงตัวฉันกับสกิลโชว์
   // ห้องสีขาวเลือกสกิลมีร่างแล้วแต่รายการโฟกัสเริ่มที่ใบตาแรก จึงกรองแท็บโฟกัสด้วยรายการ ไม่ใช่ร่าง
   const items = after ? AFTER_MENU : isk ? ISEKAI_MENU.filter(([id]) => (id === 'focus' ? (af?.isekai ?? st?.trip)?.focusOffers?.length : (id !== 'me' && id !== 'skill') || card.status)) : LIFE_MENU;
@@ -1373,18 +1376,42 @@ const SHELF_ICON = {
   p: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/>',
   d: '<path d="M12 21v-7"/><path d="M12 14c-4 0-6-3-6-6 3 0 5 1 6 3 1-2 3-3 6-3 0 3-2 6-6 6z"/><path d="M9 21h6"/>',
 };
-function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh()) {
+// กลางชีวิตมีราวเมนู (.mnav) กับแผงค้าง (.sheet) อยู่ใน root — ชั้นสมุดแทนเฉพาะการ์ด ราวกับแผงไม่ถูกแตะ (ui-redo ใบ 82)
+const shelfKeep = () => !!root.querySelector(':scope > .mnav[data-keep-shelf]');
+const shelfCardNodes = () => [...root.childNodes].filter((n) => !(n.matches?.('.mnav, .sheet') && shelfKeep()));
+let shelfBack = null;
+function openShelf(tab, prev = shelfCardNodes(), onBack, fresh = shelfFresh()) {
   // เปิดจากเมนู/ท้ายหน้า/หน้าเล่นต่อ: ไปแท็บที่มีของใหม่ก่อน
   tab ??= SHELF_TABS.find(([k]) => fresh[k].length)?.[0] ?? 'm';
   const again = (t = tab) => openShelf(t, prev, onBack, fresh);
+  const keep = shelfKeep();
+  const shelfBtn = () => root.querySelector(':scope > .mnav [data-menu="shelf"]');
   const back = () => {
-    root.replaceChildren(...prev);
+    if (keep) {
+      for (const n of [...root.children]) if (!n.matches('.mnav, .sheet')) n.remove();
+      root.querySelector(':scope > .mnav').before(...prev);
+      shelfBtn()?.setAttribute('aria-pressed', 'false');
+    } else root.replaceChildren(...prev);
+    shelfBack = null;
     // จุดบนปุ่มเมนูที่คืนมายังเป็นของตอนก่อนเปิด
     shelfDot();
     onBack?.();
+    if (keep) shelfBtn()?.focus();
   };
-  const choices = homeCard('ชั้นสมุด', ['ชั้นสมุด']);
-  root.firstChild.classList.add('shelf-view');
+  shelfBack = back;
+  const reopen = !!root.querySelector('.shelf-view');
+  const choices = homeCard('ชั้นสมุด', ['ชั้นสมุด'], keep);
+  const card = root.querySelector(':scope > .card');
+  card.classList.add('shelf-view');
+  if (keep) {
+    shelfBtn()?.setAttribute('aria-pressed', 'true');
+    // เข้าสมุดครั้งแรกโฟกัสหัวสมุด · สลับแท็บคงโฟกัสไว้ที่แท็บ ไม่ดึงกลับหัว
+    if (!reopen) {
+      const h = card.querySelector('.lead');
+      h.tabIndex = -1;
+      h.focus({ preventScroll: true });
+    }
+  }
   const body = root.querySelector('.body');
   const tabs = el('div', 'bk-tabs');
   tabs.setAttribute('role', 'group');
@@ -3590,8 +3617,11 @@ function resume(s) {
   }
 }
 
-function homeCard(title, lines) {
-  root.replaceChildren();
+function homeCard(title, lines, keep = false) {
+  // keep: ราวเมนูกับแผงค้างอยู่ใน root ด้วย ลบเฉพาะการ์ดเดิม
+  if (keep) {
+    for (const n of [...root.children]) if (!n.matches('.mnav, .sheet')) n.remove();
+  } else root.replaceChildren();
   const box = el('article', 'card a');
   const top = el('div', 'top');
   top.append(el('b', null, GAME_NAME), el('small', null, title));
@@ -3599,7 +3629,9 @@ function homeCard(title, lines) {
   lines.forEach((t, i) => body.append(el(i ? 'p' : 'h3', i ? 'sub' : 'lead', t)));
   const choices = el('div', 'choices');
   box.append(top, body, choices);
-  root.append(box);
+  const nav = keep && root.querySelector(':scope > .mnav');
+  if (nav) nav.before(box);
+  else root.append(box);
   return choices;
 }
 

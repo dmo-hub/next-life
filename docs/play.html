@@ -151,9 +151,9 @@ body:has(.sb.dying)::after { content:''; position:fixed; inset:0; z-index:9; poi
 body:has(.mnav) { padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom)); }
 .mnav { position:fixed; left:0; right:0; bottom:0; z-index:8; display:flex; max-width:calc(var(--cw) + 2 * var(--pad-x)); margin:0 auto; padding:0 max(8px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px, env(safe-area-inset-left)); background:var(--paper); border-top:1px solid var(--rule2); box-shadow:0 -4px 16px rgb(0 0 0 / .06); }
 .mnav button { all:unset; box-sizing:border-box; flex:1 1 0; min-width:0; min-height:var(--nav-h); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:4px 2px; font-size:13px; font-weight:600; color:var(--ink); text-align:center; cursor:pointer; }
-.mnav button[aria-expanded="true"] { color:var(--fl); box-shadow:inset 0 3px 0 var(--fl); }
+.mnav button[aria-expanded="true"], .mnav button[aria-pressed="true"] { color:var(--fl); box-shadow:inset 0 3px 0 var(--fl); }
 /* แท็บที่เลือกเป็นคราม เฉพาะจอชาติไทย (ข้อ 223: token ไทยห้ามขึ้นจอโลกอื่น) */
-body:has(#app > .card.a) .mnav button[aria-expanded="true"] { color:var(--ink); box-shadow:inset 0 3px 0 var(--ink); }
+body:has(#app > .card.a) .mnav button[aria-expanded="true"], body:has(#app > .card.a) .mnav button[aria-pressed="true"] { color:var(--ink); box-shadow:inset 0 3px 0 var(--ink); }
 .mnav button:focus-visible { outline:2px solid currentColor; outline-offset:-4px; }
 /* จุดของใหม่ (ใบ 05) มุมขวาบนของคำ ไม่ดันป้ายปุ่มให้เบี้ยว · ฉากที่มีเมนู ลิงก์ท้ายหน้าทั้งชุดย้ายเข้าปุ่มสมุดกับแผงเพิ่มเติม (ใบ 08) ท้ายหน้าจึงซ่อน */
 .mnav button { position:relative; }
@@ -652,7 +652,7 @@ body:has(#app > .card.af) .foot a { color:var(--ink2); }
   .mnav { top:0; right:auto; width:var(--rail-w); max-width:none; flex-direction:column; gap:4px; margin:0; padding:max(16px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left)); border-top:0; border-right:1px solid var(--rule2); box-shadow:4px 0 16px rgb(0 0 0 / .06); }
   .mnav button { flex:none; flex-direction:row; justify-content:flex-start; gap:10px; min-height:46px; padding:0 12px; border-radius:var(--r); font-size:15px; }
   .mnav button:hover { background:var(--paper2); }
-  .mnav button[aria-expanded="true"] { background:var(--paper2); box-shadow:inset 3px 0 0 var(--fl); }
+  .mnav button[aria-expanded="true"], .mnav button[aria-pressed="true"] { background:var(--paper2); box-shadow:inset 3px 0 0 var(--fl); }
   .mnav .new-dot { position:static; margin-left:6px; }
   body:has(.mnav) .choices.pin { bottom:env(safe-area-inset-bottom); }
   .sheet { top:0; bottom:0; left:auto; width:min(var(--sheet-w), 100vw - var(--rail-w)); max-width:none; max-height:none; margin:0; padding-right:max(20px, env(safe-area-inset-right)); border-left:1px solid var(--rule2); border-radius:0; box-shadow:-10px 0 30px rgb(0 0 0 / .2); }
