@@ -1931,6 +1931,36 @@ function causeHazards(st, py, age, k) {
   return era.causes.keys.map((key, j) => base * k * s[j] * (riskOf(st, key) / normOf(era, st.sex, key, b)));
 }
 
+// ใบ 190 (decisions 319 324 328 337): ตารางชีพไม่ฆ่าตรงแล้ว — ตายเมื่อหลอดสุขภาพหมดเท่านั้น
+// เหตุเฉียบพลัน/อุบัติเหตุ = เกิดเหตุแล้วกดหลอด hit = เส้นธรรมชาติ × สุ่ม lo–hi · hit ≥ หลอดที่เหลือ = ตาย ไม่ถึง = รอดเป็นแผล
+// โอกาสเกิดเหตุ = ส่วนของ qx ÷ โอกาสที่เหตุหนึ่งครั้งฆ่าคนบนเส้นธรรมชาติ ⇒ คนบนเส้นตายเท่าตารางเดิม · หลอดสูงกว่าเส้นรอดง่ายกว่าเอง
+// แทนตัวคูณสุขภาพเดิม (1−d/50) ที่ทำให้คนรอดเหตุเสี่ยงสูงตลอดชีวิต — แผลฟื้นคืนทีละปี (heal = สัดส่วนของแผลที่คืนต่อปี)
+// ส่วนเกินเส้นจางเอง excessFade ต่อปี · ส่วนขาดจากเหตุอื่น (การ์ด) ฟื้นเอง mend ต่อปี (decisions 398)
+// สองค่าต้องเท่ากัน — จางแต่ไม่ฟื้น หลอดของคนไม่ดูแลตัวไหลต่ำกว่าเส้นทั้งชีวิต อายุตายเฉลี่ยต่ำกว่าตารางหลายปี · ขนาดกดสุ่มจาก stream แยก (salt) ไม่ดึง st.rng/causeRng
+const HIT = { lo: 0.1, hi: 1.5, heal: 0.5, excessFade: 0.05, mend: 0.05, salt: 0x2545f491 };
+const HIT_KILL = (HIT.hi - 1) / (HIT.hi - HIT.lo);
+// สาเหตุที่มาแบบเหตุครั้งเดียว · other (แก่) ไม่ทอยแล้ว เป็นหลอดลดเงียบแทน (frailOf) · โรคเรื้อรังนัดล่วงหน้าตามเดิม
+const isAcute = (key) => key !== 'other' && !CHRONIC.includes(key);
+// ส่วนของเส้นธรรมชาติที่หลอดหายไปกับความแก่ — ขนาดที่ทำให้เหตุเฉียบพลันฆ่าเพิ่มเท่าส่วน other ของตารางพอดี
+// เหตุที่ฆ่าเพราะส่วนนี้ (ถ้าไม่แก่จะรอด) นับสาเหตุเป็น other ⇒ ทั้งอัตราตายและสัดส่วนสาเหตุยังตรงข้อมูล
+// คิดจากสัดส่วนของประชากร ไม่ผ่านปัจจัยเสี่ยงรายคน — หลอดส่วนแก่ไม่ฟื้น ถ้าใช้ค่ารายคน ปีที่เสี่ยงเฉียบพลันลดลงชั่วคราว
+// (เลิกงานเสี่ยง ฯลฯ) other/acute พุ่งแล้วค้างทั้งชีวิต ⇒ หลอดต่ำเกินเส้นตั้งแต่วัยกลางคน
+// สัดส่วนรายปีปฏิทินแกว่งแรง (ปีเดียวกระโดด 3–5 เท่า) — ค่าไม่ลดจึงต้องเฉลี่ยหน้าต่างย้อนหลังก่อน ไม่งั้นเก็บยอดแหลมไว้
+const FRAIL_WINDOW = 5;
+function frailOf(st, year, age) {
+  const era = st.content.era;
+  const keys = era.causes.keys;
+  const oj = keys.indexOf('other');
+  let acute = 0;
+  let other = 0;
+  for (let k = 0; k < FRAIL_WINDOW && age - k >= 0; k++) {
+    const s = causeShares(era, st.sex, protoYear(era, st.seed, year - k), age - k);
+    acute += s.reduce((sum, x, j) => sum + (isAcute(keys[j]) ? x : 0), 0);
+    other += s[oj] ?? 0;
+  }
+  return acute > 0 ? Math.min(1, ((HIT.hi - 1) * other) / acute) : 0;
+}
+
 // สุ่มสาเหตุตามน้ำหนัก · เฉพาะดัชนีที่ allow ยอม (ไม่ใส่ = ทุกตัว)
 function pickCause(rng, keys, w, allow = null) {
   let sum = 0;
@@ -3946,7 +3976,7 @@ function fixedFx(ev, c) {
 // ตัวคูณอิงส่วนต่างจากเส้นสุขภาพตามธรรมชาติของชีวิตนั้น ไม่ใช่ค่าคงที่ — ชีวิตที่ไม่มีเหตุการณ์จึงได้ qx จริงพอดี
 // และสุขภาพที่ไหลลงตามวัยไม่ถูกนับซ้ำกับ qx ที่สูงขึ้นตามวัยอยู่แล้ว · สุขภาพแย่เพิ่มความเสี่ยงแรงกว่าสุขภาพดีลด
 function healthMultiplier(st) {
-  const d = st.health - st.healthNatural;
+  const d = st.health - (st.healthNatural - (st.frail ?? 0));
   return d < 0 ? 1 - d / 50 : Math.max(0.6, 1 - d / 150);
 }
 
@@ -3954,16 +3984,58 @@ function healthMultiplier(st) {
 // ทุกที่ที่อ่านตารางชีพ/สัดส่วนสาเหตุ/ช่วงป่วยใช้อายุนี้ (B110) ไม่งั้นคนกลับจากต่างโลกตายตามอายุไทย
 const bodyAge = (st) => st.age + (st.away ?? 0);
 
-// ผลรวมทุกสาเหตุ (B110) — ปัจจัยเสี่ยงเอียงทั้งสาเหตุและโอกาสตายรวม
+// หลอดรายปี (ใบ 190 · decisions 324 328 337) หลังไหลตามวัย: แผลจากเหตุเฉียบพลันฟื้นคืนหาเส้น · ส่วนเกินเส้นจางช้า ส่วนขาดอื่นฟื้นช้าเท่ากัน
+// ความแก่ (สาเหตุ other) กดหลอดเงียบไม่ฟื้น ไม่มีการ์ด · เส้นที่ผู้เล่นเห็น = เส้นธรรมชาติ − ส่วนแก่ · ไม่ดึงเลขสุ่ม
+function barYear(st) {
+  const line = st.healthNatural - (st.frail ?? 0);
+  if (st.wound > 0) {
+    const back = st.wound * HIT.heal;
+    st.wound -= back;
+    if (st.health < line) st.health = clamp(Math.min(line, st.health + back));
+  }
+  if (st.health > line) st.health = clamp(st.health - (st.health - line) * HIT.excessFade);
+  else if (st.health < line) st.health = clamp(st.health + (line - st.health) * HIT.mend);
+  const era = st.content.era;
+  const py = protoYear(era, st.seed, st.birthYear + st.age);
+  const age = bodyAge(st);
+  if (age >= MAX_AGE || qx(era, st.sex, py, age) >= 1) return;
+  const want = st.healthNatural * frailOf(st, st.birthYear + st.age, age);
+  if (want > (st.frail ?? 0)) {
+    st.health = clamp(st.health - (want - (st.frail ?? 0)));
+    st.frail = want;
+  }
+}
+
+// ส่วนเหตุของปีนี้ (ใบ 190): โรคเรื้อรังส่วนที่ยังไม่มีนัด (เด็กเล็ก) ตายตรงตามเดิม · เหตุเฉียบพลันเป็นโอกาสเกิดเหตุที่กดหลอด
+// ตัวคูณมีแค่กรรม — สุขภาพมีผลผ่านหลอดที่เหลือตอนโดนกดแทน
+function yearHazards(st, py, age) {
+  const keys = st.content.era.causes.keys;
+  const hz = causeHazards(st, py, age, karmaMultiplier(st.ledger));
+  // เด็กเล็กยังไม่มีนัดจากปีก่อนครบทุกระยะ — ส่วนที่นัดไม่ถึงของโรคเรื้อรังตายปีนี้เลย
+  const span = ILL_YEARS[1] - ILL_YEARS[0] + 1;
+  const unscheduled = (span - Math.max(0, Math.min(span, age - ILL_YEARS[0] + 1))) / span;
+  const chronic = hz.map((x, j) => (CHRONIC.includes(keys[j]) ? x * unscheduled : 0));
+  const acute = hz.map((x, j) => (isAcute(keys[j]) ? x : 0));
+  const cSum = chronic.reduce((s, x) => s + x, 0);
+  const event = Math.min(1 - cSum, acute.reduce((s, x) => s + x, 0) / HIT_KILL);
+  return { keys, hz, chronic, acute, cSum, event };
+}
+// โอกาสที่เหตุหนึ่งครั้งฆ่าคนที่หลอดเหลือ h (hit สุ่มเท่ากันช่วง lo–hi เท่าของเส้นธรรมชาติ)
+const hitKills = (st) => Math.max(0, Math.min(1, (HIT.hi - st.health / Math.max(st.healthNatural, 1e-9)) / (HIT.hi - HIT.lo)));
+const hitRng = (st) => (st.hitRng ??= makeRng(st.seed ^ HIT.salt));
+
+// โอกาสตายรวมของปีนี้ (B110 · ใบ 190) — ปัจจัยเสี่ยงเอียงทั้งสาเหตุและโอกาสตาย · หลอดยิ่งต่ำยิ่งตายง่าย
 function deathChance(st) {
   const py = protoYear(st.content.era, st.seed, st.birthYear + st.age);
   const age = bodyAge(st);
-  if (qx(st.content.era, st.sex, py, age) >= 1) return 1;
-  return Math.min(1, causeHazards(st, py, age, healthMultiplier(st) * karmaMultiplier(st.ledger)).reduce((s, x) => s + x, 0));
+  if (st.health <= 0 || qx(st.content.era, st.sex, py, age) >= 1) return 1;
+  const { cSum, event } = yearHazards(st, py, age);
+  return Math.min(1, cSum + event * hitKills(st));
 }
 
 // ตายปีนี้ด้วยสาเหตุอะไร · null = รอด — ดึง st.rng ครั้งเดียวต่อปีเท่าเดิม สาเหตุและนัดป่วยใช้ causeRng แยก
 // โรคเรื้อรังไม่ตายปีที่สุ่มโดน แต่นัดตายอีก 1–3 ปีข้างหน้าด้วยโอกาสของอายุนั้น (scheduleIllness) — ผลรวมยังตรงตารางชีพ
+// เหตุเฉียบพลัน (ใบ 190): กดหลอด เกินหลอด = ตาย · ไม่เกิน = รอดเป็นแผล (st.wound ฟื้นใน stepYear)
 function deathRoll(st) {
   const u = st.rng.next();
   if (st.terminal && st.age >= st.terminal.age) return st.terminal.cause;
@@ -3971,16 +4043,17 @@ function deathRoll(st) {
   const py = protoYear(era, st.seed, st.birthYear + st.age);
   const age = bodyAge(st);
   if (qx(era, st.sex, py, age) >= 1) return 'other';
-  const keys = era.causes.keys;
-  const hz = causeHazards(st, py, age, healthMultiplier(st) * karmaMultiplier(st.ledger));
-  // เด็กเล็กยังไม่มีนัดจากปีก่อนครบทุกระยะ — ส่วนที่นัดไม่ถึงของโรคเรื้อรังตายปีนี้เลย
-  const span = ILL_YEARS[1] - ILL_YEARS[0] + 1;
-  const unscheduled = (span - Math.max(0, Math.min(span, age - ILL_YEARS[0] + 1))) / span;
-  const now = hz.map((x, j) => (CHRONIC.includes(keys[j]) ? x * unscheduled : x));
-  const sum = now.reduce((s, x) => s + x, 0);
-  if (u < sum) return pickCause(st.causeRng, keys, now);
-  // เฉียดตาย (B153) ต้องไหลต่อไปนัดป่วยเหมือนรอดปกติ — ข้ามแล้ว causeRng ขาดหนึ่งครั้ง นัดโรคทั้งชีวิตเลื่อน
-  nearMiss(st, u - sum, keys, now);
+  const { keys, hz, chronic, acute, cSum, event } = yearHazards(st, py, age);
+  if (u < cSum) return pickCause(st.causeRng, keys, chronic);
+  if (u < cSum + event) {
+    const hit = st.healthNatural * (HIT.lo + (HIT.hi - HIT.lo) * hitRng(st).next());
+    if (hit >= st.health) return hit < st.health + (st.frail ?? 0) ? 'other' : pickCause(st.causeRng, keys, acute);
+    st.health = clamp(st.health - hit);
+    st.wound = (st.wound ?? 0) + hit;
+  }
+  // เฉียดตาย (B153) ช่องต่อจากช่องเกิดเหตุ ขนาดเท่าเดิม ⇒ อัตราเฉียดตายไม่ขยับ
+  // ต้องไหลต่อไปนัดป่วยเหมือนรอดปกติ — ข้ามแล้ว causeRng ขาดหนึ่งครั้ง นัดโรคทั้งชีวิตเลื่อน
+  else nearMiss(st, u - cSum - event, keys, hz);
   if (!st.terminal) scheduleIllness(st);
   return null;
 }
@@ -4017,6 +4090,8 @@ function faceDeath(st, cause, opts = {}) {
   }
   st.dead = true;
   st.cause = cause;
+  // ตายเมื่อหลอดหมดเท่านั้น (ใบ 190) — การ์ดตายเห็นหลอด 0 ทุกทาง
+  st.health = 0;
   return { fate: 'dead' };
 }
 
@@ -4426,6 +4501,7 @@ function skipToAge(st, age) {
     const r = healthDecay(st.age);
     st.health = clamp(st.health * (1 - r));
     st.healthNatural *= 1 - r;
+    barYear(st);
     st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
     st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * moodMul(st) * (100 - st.knowledge)) / 100);
     st.relations = clamp(st.relations * (1 - RELATION_FADE));
@@ -4513,6 +4589,7 @@ function stepYear(st) {
   const r = healthDecay(st.age);
   st.health = clamp(st.health * (1 - r));
   st.healthNatural *= 1 - r;
+  barYear(st);
   st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
   st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * moodMul(st) * (100 - st.knowledge)) / 100);
   st.relations = clamp(st.relations * (1 - RELATION_FADE));
@@ -5055,6 +5132,7 @@ function drawCard(st) {
     if (c.mode !== 'summons') return nextCard(st);
     st.dead = true;
     st.cause = c.cause;
+    st.health = 0;
     return queueFuneral(st) ? nextCard(st) : deathCard(st);
   }
   if (st.trip) {
