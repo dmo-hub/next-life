@@ -49,6 +49,8 @@ export function schoolGate(st) {
       ...base,
       choices: [
         { text: 'เรียนต่อ ม.ต้นใกล้บ้าน', effects: { school: 'lower', knowledge: 1 } },
+        // ตัวเร่งต้นไม้โฟกัส (ใบ 08): แลกความรู้ +1 ของทางใกล้บ้านกับธงครู — ไม่เพิ่มการ์ด ไม่แตะโควตา
+        { text: 'ฝากตัวเป็นศิษย์ครูประจำชั้น', hint: 'ครูรับเป็นศิษย์ เรียนรู้อะไรได้เร็วขึ้น', sets_flags: ['tree_teacher'], effects: { school: 'lower' } },
         {
           text: 'อ่านหนังสือสอบโรงเรียนดังในเมือง',
           requires: { money: cash(0.3), reason: 'ที่บ้านไม่มีค่าเทอมค่ารถให้' },

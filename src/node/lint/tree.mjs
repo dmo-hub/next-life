@@ -62,3 +62,15 @@ export function checkTree(doc, jobs = null) {
   for (const id of Object.keys(nodes)) walk(id, []);
   return out;
 }
+
+// ตัวเร่ง/ชะลอการปลด (ใบ 08): ทุกค่าต้องเป็นเลขบวก ความเร็วต่อปีไม่ติดลบ/ไม่หยุดนิ่ง (ต่ำสุด = age_end_mul × ตัวชะลอที่สุด > 0)
+export function checkTreePace(doc) {
+  if (!isObj(doc)) return ['tree-pace ต้องเป็น object'];
+  const out = [];
+  for (const k of ['age_end', 'teacher', 'learn']) if (!(typeof doc[k] === 'number' && doc[k] > 0)) out.push(`${k} ต้องเป็นเลขบวก`);
+  if (!(typeof doc.age_end_mul === 'number' && doc.age_end_mul > 0 && doc.age_end_mul <= 1)) out.push('age_end_mul ต้องอยู่ใน (0, 1]');
+  if (!(typeof doc.class_step === 'number' && doc.class_step >= 0)) out.push('class_step ต้องเป็นเลข ≥ 0');
+  if (!(typeof doc.class_mid === 'number' && doc.class_mid >= 0 && doc.class_mid <= 9)) out.push('class_mid ต้องอยู่ใน [0, 9]');
+  if (typeof doc.class_step === 'number' && typeof doc.class_mid === 'number' && 1 - doc.class_step * doc.class_mid <= 0) out.push('class_step × class_mid ต้อง < 1 (ฐานะต่ำสุดห้ามหยุดนิ่ง)');
+  return out;
+}

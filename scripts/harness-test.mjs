@@ -1,5 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
+import { treePace, treePaceCtl, treeInvest, treeYearEnd } from '../src/engine/index.mjs';
 import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES } from '../src/engine/index.mjs';
 import { loadContent, loadEvents } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
@@ -844,6 +845,47 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 278 ปุ่มสายเลือดเลือกคนสุดท้าย หลังเซฟ/โหลดได้คนที่เลือก', ok(last) && last.got === last.want.name && last.got !== last.heirs[0].name, last.err ?? `${last.heirs.length} คน · เลือก ${last.want.name} · ได้ ${last.got}`);
   check('ใบ 278 ตัวควบคุม: เลือกคนแรกได้คนแรก', ok(first) && first.got === first.heirs[0].name, first.err ?? `ได้ ${first.got}`);
   check('ใบ 278 ตัวควบคุม: ไม่ส่ง heirId ⇒ throw', ok(last) && last.threw);
+}
+
+// ใบ 08 ตัวเร่ง/ชะลอการปลด: ความเร็วต่อปีคิดถูกบนตัวอย่างมือ · ปิดตัวเร่ง/ไม่มีค่า = 1 เป๊ะ · ปีเศษส่วนทำให้โหนด 5 ปีปลดเร็วขึ้นจริง
+{
+  const cfg = { age_end: 75, age_end_mul: 0.6, teacher: 1.25, learn: 1.15, class_step: 0.02, class_mid: 4.5 };
+  const only = (o) => Object.assign(treePaceCtl, { teacher: false, cls: false, learn: false, age: false }, o);
+  const near = (a, b) => Math.abs(a - b) < 1e-9;
+  try {
+    only({ age: true });
+    check('ใบ 08 ยิ่งแก่ยิ่งช้า: อายุ 0 = 1 · 75 = 0.6 · เกิน 75 คงที่', near(treePace({}, cfg, 0), 1) && near(treePace({}, cfg, 75), 0.6) && near(treePace({}, cfg, 120), 0.6) && treePace({}, cfg, 40) < treePace({}, cfg, 20), `${treePace({}, cfg, 0)} · ${treePace({}, cfg, 75)}`);
+    only({ teacher: true, learn: true });
+    check('ใบ 08 ครูธง ×1.25 · ใฝ่รู้ ×1.15 · ไม่มี = 1', near(treePace({ flags: { tree_teacher: true } }, cfg, 5), 1.25) && near(treePace({ nature: 'learn' }, cfg, 5), 1.15) && treePace({ flags: {}, nature: 'duty' }, cfg, 5) === 1);
+    only({ cls: true });
+    check('ใบ 08 ฐานะตอนเกิด: กลาง 4.5 = 1 · สูงกว่าเร็วกว่า · ไม่มีฐานะ = 1', near(treePace({ standing: [{ cls: 9 }] }, cfg, 5), 1.09) && near(treePace({ standing: [{ cls: 0 }] }, cfg, 5), 0.91) && treePace({}, cfg, 5) === 1);
+    only({});
+    check('ตัวควบคุม ใบ 08: ปิดทุกตัวเร่ง หรือไม่ส่งค่า = 1 เป๊ะ', treePace({ flags: { tree_teacher: true }, nature: 'learn', standing: [{ cls: 9 }] }, cfg, 60) === 1 && treePace({}, null, 60) === 1);
+    only({ teacher: true });
+    const defs = { a: { years: 5, cards: 0, cat: [], stages: ['เด็ก'] } };
+    const ticks = (pace, flags) => {
+      const h = { flags };
+      treeInvest(h, defs, 'a', 'เด็ก');
+      let n = 0;
+      for (; n < 20; ) { n++; if (treeYearEnd(h, defs, 'เด็ก', 5 + n, pace)?.unlocked) break; }
+      return n;
+    };
+    const ticks3 = (flags) => {
+      const d3 = { a: { years: 3, cards: 0, cat: [], stages: ['เด็ก'] }, b: { years: 3, cards: 0, cat: [], stages: ['เด็ก'] } };
+      const h = { flags };
+      treeInvest(h, d3, 'a', 'เด็ก');
+      const out = [];
+      for (let y = 1; y <= 12 && out.length < 2; y++) {
+        const r = treeYearEnd(h, d3, 'เด็ก', y, cfg);
+        if (r?.unlocked) out.push(y);
+      }
+      return out;
+    };
+    check('ใบ 08 เศษทบ: 2 โหนด 3 ปี มีครู ×1.25 ปลดปีที่ 3 และ 5 (ไม่มีครู 3 และ 6)', JSON.stringify(ticks3({ tree_teacher: true })) === '[3,5]' && JSON.stringify(ticks3({})) === '[3,6]', `${JSON.stringify(ticks3({ tree_teacher: true }))} · ${JSON.stringify(ticks3({}))}`);
+    check('ใบ 08 โหนด 5 ปี: มีครู ×1.25 ปลดที่ปีที่ 4 · ไม่มีครูปีที่ 5', (() => { const a = ticks(cfg, { tree_teacher: true }), b = ticks(cfg, {}); return a === 4 && b === 5; })());
+  } finally {
+    Object.assign(treePaceCtl, { teacher: true, cls: true, learn: true, age: true });
+  }
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
