@@ -680,7 +680,7 @@ if (fails.length) {
     return j;
   };
   const LIMIT = 400, SEEDS = 3;
-  // ธง hunter ที่ตัวเลือกปลายโซ่ใช้ออกแค่ขั้นสูงสุด ⇒ ให้ขั้นสูงสุดได้ชีวิตครึ่งหนึ่ง ไม่ใช่สี่ส่วน
+  // ธง hunter ที่ตัวเลือกปลายโซ่ใช้ออกแค่ขั้น 3–4 (ดันเจียนติด overlap_stage [3,4]) ⇒ แถวนี้ให้ขั้น 3–4 รวม 6/8 ของชีวิต (ขั้น 4 = 3/8) ไม่ใช่ 2/4
   const top = OVERLAP_STAGE_MIN.length - 1;
   const CHASE_STAGES = [...Array(top).keys()].map((k) => k + 1).concat(Array.from({ length: top }, (_, k) => top - (k % 2)));
   const union = new Set();
