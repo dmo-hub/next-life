@@ -184,6 +184,7 @@ function conditions(e, L) {
   if (w.identity) out.push(`อัตลักษณ์${any(w.identity.map(esc))}`);
   if (w.overlap_stage) out.push(`ค่าซ้อนทับขั้น ${range(w.overlap_stage)}`);
   if (w.kin_ghost) out.push(`ผีญาติ${any(w.kin_ghost.map((m) => (m === 'haunt' ? 'มาทวง' : 'มาเตือน')))}`);
+  if (w.ancestor) out.push('มีชาติก่อนในผังตระกูล');
   if (w.class) out.push(`ฐานะ${any(w.class.map(esc))}`);
   if (w.occupation) out.push(`ทำงาน${any(w.occupation.map((o) => esc(L.occ(o))))}`);
   if (w.ladder) out.push(any(w.ladder.map((l) => esc(L.ladder(l)))));
