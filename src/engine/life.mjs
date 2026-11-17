@@ -1,6 +1,6 @@
 import { makeRng, mixSeed } from './rng.mjs';
 import { dlcOpen, dlcStamp, getDlcDefault } from './dlc.mjs';
-import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
+import { newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, pickKinGhost, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp, HIT, HIT_KILL, isAcute, frailOf } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
@@ -670,6 +670,9 @@ export const FILL = {
   ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
   ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
   ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',
+  // ผีญาติ (ใบ 26): คนที่การ์ดผีญาติเลือกจากรายชื่อคนตายของตระกูล — ว่างเมื่อไม่มีรายชื่อ (การ์ดไม่ออกอยู่แล้วเพราะ when.kin_ghost)
+  ผีญาติ: (st) => pickKinGhost(st)?.name ?? 'ญาติ',
+  ผีญาติบทบาท: (st) => pickKinGhost(st)?.word ?? 'ญาติ',
   แจ้งการจากไป: (st) => (st.grief ? lossText(st.grief) : 'คนในบ้านจากไปแล้ว'),
   ทางกลับ: (st) => (st.age < GRIEF.adultAge ? 'กลับไปเรียน' : isWorking(st) ? 'กลับไปทำงาน' : 'กลับไปใช้ชีวิตตามเดิม'),
   บวชหน้าไฟ: (st) => (st.age < GRIEF.novice ? 'บวชเณรหน้าไฟ' : 'บวชหน้าไฟ'),
@@ -2163,6 +2166,8 @@ export function whenOk(st, when) {
   if (when.province && !when.province.includes(st.province)) return false;
   if (when.sex && !when.sex.includes(st.sex)) return false;
   if (when.overlap_stage && !inRange(overlapStageOf(st), when.overlap_stage)) return false;
+  // ผีญาติ: ขั้นซ้อนทับ ≥ 1 ถึงจะมีผีญาติ · สีหน้าของคนที่ถูกเลือกต้องตรงกับที่การ์ดขอ (haunt | warn)
+  if (when.kin_ghost && !(overlapStageOf(st) >= 1 && when.kin_ghost.includes(pickKinGhost(st)?.mood))) return false;
   for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;
   // อาชีพนับเมื่อมีงานของตัวเองแล้ว — อาชีพครอบครัวก่อนทำงานไม่ทำให้การ์ดที่ทำงานออก
   if (when.occupation && !(st.workFrom !== null && when.occupation.includes(st.occupation))) return false;

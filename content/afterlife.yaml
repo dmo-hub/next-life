@@ -892,3 +892,53 @@ events:
       - text: "ชวนคนข้างหน้าคุยเรื่องชาติก่อน"
         effects: {relations: 1}
         merit: [{cat: neutral}]
+
+  # ผีญาติ (ใบ 26): ฉากบรรพบุรุษเฝ้าบ้านที่เจอผีญาติของตระกูล — สีหน้าตามสาเหตุตายกับ bond (family.mjs pickKinGhost)
+  # แทนที่ตัวเลือกในกองฉาก ancestor ไม่เพิ่มขั้น ⇒ ปรโลกไม่ยาวขึ้น · ไม่มีรายชื่อญาติตายหรือตระกูลขั้น 0 ใบนี้ไม่เข้ากอง
+  - id: after_ancestor_kin_haunt_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: ancestor
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    weight: 3
+    when: {kin_ghost: [haunt]}
+    title: "ผีเรือนอีกตนที่ไม่ยอมไป"
+    text: "บนขื่อเรือนมีผีเรือนอีกตนนั่งอยู่ก่อนแล้ว คือ{ผีญาติบทบาท}{ผีญาติ} สีหน้าไม่ได้มาเฝ้า แต่เหมือนยังติดค้างกับคนในบ้านอยู่ ทุกครั้งที่เด็กในเปลร้อง มันขยับจะลงไป แล้วชะงักมองมาที่คุณ"
+    choices:
+      - text: "นั่งลงข้าง ๆ ฟังเรื่องที่ค้าง"
+        effects: {relations: 1}
+        merit: [{cat: bhavana, level: 1}]
+      - text: "ช่วยกันกล่อมเด็กจนหลับ"
+        effects: {health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - text: "แผ่เมตตาให้ ขอให้วางได้"
+        effects: {happiness: 1}
+        merit: [{cat: bhavana, level: 1}]
+      - text: "เมินหน้าไปทางอื่น"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: after_ancestor_kin_warn_01
+    type: B
+    stage: ระหว่างชาติ
+    scene: ancestor
+    years: [2400, 2700]
+    lore_ref: lore-afterlife.md#3
+    weight: 3
+    when: {kin_ghost: [warn]}
+    title: "{ผีญาติบทบาท}ชี้ทางให้"
+    text: "คืนแรกที่คุณขึ้นไปนั่งบนหิ้ง{ผีญาติบทบาท}{ผีญาติ} เดินผ่านมาก่อนแล้ว ทำหน้าเหมือนคนที่เฝ้าบ้านนี้มานาน ชี้ไปที่หัวเสากับมุมครัวสลับกัน ราวกับจะบอกว่าตรงไหนของบ้านควรระวังก่อนเด็กโต"
+    choices:
+      - text: "ไปเฝ้าตรงมุมที่ชี้ก่อน"
+        effects: {health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - text: "ขอให้เล่าเรื่องบ้านให้ฟัง"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - text: "แบ่งที่นั่งบนหิ้งให้"
+        effects: {relations: 1}
+        merit: [{cat: dana, level: 1}]
+      - text: "ทักทายแล้วนั่งนิ่ง ๆ ไม่ถามอะไร"
+        effects: {happiness: 1}
+        merit: [{cat: bhavana, level: 1}]

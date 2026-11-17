@@ -182,6 +182,7 @@ function conditions(e, L) {
   if (w.province) out.push(`จังหวัด${any(w.province.map(esc))}`);
   if (w.sex) out.push(`เพศ${any(w.sex.map(esc))}`);
   if (w.overlap_stage) out.push(`ค่าซ้อนทับขั้น ${range(w.overlap_stage)}`);
+  if (w.kin_ghost) out.push(`ผีญาติ${any(w.kin_ghost.map((m) => (m === 'haunt' ? 'มาทวง' : 'มาเตือน')))}`);
   if (w.class) out.push(`ฐานะ${any(w.class.map(esc))}`);
   if (w.occupation) out.push(`ทำงาน${any(w.occupation.map((o) => esc(L.occ(o))))}`);
   if (w.ladder) out.push(any(w.ladder.map((l) => esc(L.ladder(l)))));
