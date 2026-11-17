@@ -754,6 +754,30 @@ function deadKinOf(st) {
   ];
 }
 
+// ผีญาติ (ใบ 26): หยิบหนึ่งคนจากรายชื่อคนตายที่ตระกูลจำ (รายชื่อชาติก่อน ๆ + คนตายของชาตินี้ เหมือนที่ปรโลกส่งต่อ)
+// เจ้าของเคาะ 11-17: สีหน้าผีอ่านจากสาเหตุตาย + bond ที่เก็บอยู่แล้ว ไม่เพิ่มฟิลด์ deadKin · ตายผิดธรรมชาติหรือ bond ต่ำ = ทวง · ตายธรรมดาและ bond สูง = เตือน/ช่วย
+// ถ่วงรุ่นใกล้กับ bond สูง · stream แยกจาก seed ไม่ดึง st.rng ⇒ ชีวิตที่ไม่มีการ์ดผีญาติเดินเท่าเดิม · ไม่ผูกกับจำนวนการ์ดที่ออกแล้ว กันชื่อกับสีหน้าเปลี่ยนกลางการ์ด
+// self_harm ไม่ขึ้นจอ (เหมือนป้ายสาเหตุ) · สัตว์ไม่เป็นผีญาติ · คนไม่มีชื่อเรียกไม่ได้
+const KIN_GHOST = { salt: 0x6b1d9e57, haunt: { bond: 50, causes: ['road', 'accident', 'assault', 'training'] }, genDecay: 0.5 };
+const ghostWord = (st, e) => {
+  if (e.gen === (st.gen ?? 1)) {
+    const word = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน', peer: 'เพื่อน' }[e.role];
+    return word ?? (st.parents.find((p) => p.name === e.name)?.sex === 'หญิง' ? 'แม่' : 'พ่อ');
+  }
+  return e.role === 'parent' ? 'บรรพบุรุษ' : e.role === 'spouse' ? 'ญาติผู้ใหญ่' : 'ญาติ';
+};
+function pickKinGhost(st) {
+  const list = [...(st.deadKin ?? []), ...deadKinOf(st)].filter((e) => e.name && !ANIMAL.includes(e.role) && e.cause !== 'self_harm');
+  if (!list.length) return null;
+  const gen = st.gen ?? 1;
+  const w = list.map((e) => KIN_GHOST.genDecay ** Math.max(0, gen - e.gen) * (0.2 + e.bond / 100));
+  let r = makeRng(mixSeed(st.seed ^ KIN_GHOST.salt, gen)).next() * w.reduce((a, b) => a + b, 0);
+  const i = Math.max(0, w.findIndex((x) => (r -= x) < 0));
+  const e = list[i];
+  const mood = KIN_GHOST.haunt.causes.includes(e.cause) || e.bond < KIN_GHOST.haunt.bond ? 'haunt' : 'warn';
+  return { name: e.name, role: e.role, gen: e.gen, bond: e.bond, mood, word: ghostWord(st, e) };
+}
+
 // มรณบัตร: ใครรับเลี้ยงสัตว์ต่อ — คู่ชีวิต > ลูก > หลาน ที่ยังอยู่ ไม่มีใคร = เพื่อนบ้าน
 function petsAfter(st) {
   const pets = (st.kin ?? []).filter((m) => ANIMAL.includes(m.role) && m.alive && !m.left);
@@ -4524,6 +4548,9 @@ const FILL = {
   ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
   ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
   ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',
+  // ผีญาติ (ใบ 26): คนที่การ์ดผีญาติเลือกจากรายชื่อคนตายของตระกูล — ว่างเมื่อไม่มีรายชื่อ (การ์ดไม่ออกอยู่แล้วเพราะ when.kin_ghost)
+  ผีญาติ: (st) => pickKinGhost(st)?.name ?? 'ญาติ',
+  ผีญาติบทบาท: (st) => pickKinGhost(st)?.word ?? 'ญาติ',
   แจ้งการจากไป: (st) => (st.grief ? lossText(st.grief) : 'คนในบ้านจากไปแล้ว'),
   ทางกลับ: (st) => (st.age < GRIEF.adultAge ? 'กลับไปเรียน' : isWorking(st) ? 'กลับไปทำงาน' : 'กลับไปใช้ชีวิตตามเดิม'),
   บวชหน้าไฟ: (st) => (st.age < GRIEF.novice ? 'บวชเณรหน้าไฟ' : 'บวชหน้าไฟ'),
@@ -6017,6 +6044,8 @@ function whenOk(st, when) {
   if (when.province && !when.province.includes(st.province)) return false;
   if (when.sex && !when.sex.includes(st.sex)) return false;
   if (when.overlap_stage && !inRange(overlapStageOf(st), when.overlap_stage)) return false;
+  // ผีญาติ: ขั้นซ้อนทับ ≥ 1 ถึงจะมีผีญาติ · สีหน้าของคนที่ถูกเลือกต้องตรงกับที่การ์ดขอ (haunt | warn)
+  if (when.kin_ghost && !(overlapStageOf(st) >= 1 && when.kin_ghost.includes(pickKinGhost(st)?.mood))) return false;
   for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;
   // อาชีพนับเมื่อมีงานของตัวเองแล้ว — อาชีพครอบครัวก่อนทำงานไม่ทำให้การ์ดที่ทำงานออก
   if (when.occupation && !(st.workFrom !== null && when.occupation.includes(st.occupation))) return false;
