@@ -14587,6 +14587,7 @@ function renderAfter(card) {
     if (chart) body.append(chart);
   }
   if (card.note) body.append(el('p', 'note', card.note));
+  if (card.done && overlapOf(af.heir ?? af.st) > 0) body.append(el('p', 'note', OVERLAP_RESET_WARN));
   if (card.done) {
     choices.append(enter(button(BTN.rebirth, null, rebirth)));
     choices.append(button(BTN.newFamily, null, start));
@@ -15270,15 +15271,19 @@ function homeCard(title, lines, keep = false) {
   return choices;
 }
 
+// ตระกูลค่าซ้อนทับ > 0 ล้างแล้วโลกที่บางลงหายด้วย · ค่า 0 ไม่เพิ่มบรรทัดใด หน้าต้องเหมือนฐานทุกตัวอักษร
+const OVERLAP_RESET_WARN = 'โลกที่บางลงจะหายไปด้วย';
+const overlapWarnLines = () => (overlapOf(af?.heir ?? st) > 0 ? [OVERLAP_RESET_WARN] : []);
+
 // ล้างเซฟ = ลบทั้งตระกูล จึงถามซ้ำก่อน · สมุดทุกเล่มในชั้นสมุดแยก key ไม่โดนล้าง
 function confirmNew(back, go = () => start(), title = 'เริ่มตระกูลใหม่', yes = 'ลบแล้วเริ่มตระกูลใหม่') {
-  const choices = homeCard(title, ['ลบชีวิตที่ค้างไว้ทั้งตระกูล?', 'ผังตระกูลและสิ่งที่สืบทอดจะหายทั้งหมด กู้คืนไม่ได้ · สมุดในชั้นสมุดยังอยู่ครบ']);
+  const choices = homeCard(title, ['ลบชีวิตที่ค้างไว้ทั้งตระกูล?', 'ผังตระกูลและสิ่งที่สืบทอดจะหายทั้งหมด กู้คืนไม่ได้ · สมุดในชั้นสมุดยังอยู่ครบ', ...overlapWarnLines()]);
   choices.append(button(yes, null, go), button('ยกเลิก', null, back));
 }
 
 // เปิดลิงก์เพื่อนตอนมีตระกูลค้าง: ถามก่อนทับ · Enter = เล่นต่อของเดิม กดพลาดจะได้ไม่เสียตระกูล
 function linkAsk(card, seed) {
-  const choices = homeCard('ลิงก์จากเพื่อน', ['เพื่อนชวนเกิดชีวิตเดียวกัน', `มีชีวิตที่เล่นค้างไว้ (${genLabel()}${st.name}) · เกิดตามลิงก์ = ลบตระกูลนี้ทั้งหมด สมุดในชั้นสมุดยังอยู่ครบ`]);
+  const choices = homeCard('ลิงก์จากเพื่อน', ['เพื่อนชวนเกิดชีวิตเดียวกัน', `มีชีวิตที่เล่นค้างไว้ (${genLabel()}${st.name}) · เกิดตามลิงก์ = ลบตระกูลนี้ทั้งหมด สมุดในชั้นสมุดยังอยู่ครบ`, ...overlapWarnLines()]);
   choices.append(enter(button(BTN.resume, null, () => home(card))), button('ลบแล้วเกิดตามลิงก์', null, () => startLink(seed)));
 }
 
