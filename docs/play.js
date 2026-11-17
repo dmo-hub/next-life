@@ -350,6 +350,16 @@ const bondLabel = (b) => BOND_LEVELS.find(([min]) => b >= min)[1];
 const bondClamp = (b) => Math.max(0, Math.min(100, b));
 
 const kinOtherSex = (sex) => (sex === 'ชาย' ? 'หญิง' : 'ชาย');
+// อัตลักษณ์: ค่าเดียวที่เปิด (เจ้าของเคาะ decisions 423) · ได้จากการ์ดวัยรุ่นที่ผู้เล่นเลือก · ไม่มีช่อง = ตามเพศกำเนิด (ชีวิตเดิม/เซฟเก่าเท่าเดิม)
+// birth = เพศกำเนิดที่ตั้งค่านี้ได้ (lint ตรวจ when.sex ของการ์ดที่ตั้ง) · partner = เพศของคู่ · ตารางชีพยังตามเพศกำเนิด
+const BIRTH_IDENTITY = 'ตามเพศกำเนิด';
+const IDENTITY = { หญิงข้ามเพศ: { birth: ['ชาย'], partner: 'ชาย', speech: 'หญิง' } };
+const IDENTITIES = [BIRTH_IDENTITY, ...Object.keys(IDENTITY)];
+const identityOf = (st) => st.identity ?? BIRTH_IDENTITY;
+// เพศที่ตัวละครใช้พูดถึงตัวเอง (คำลงท้าย · สรรพนาม) — อัตลักษณ์ทับเพศกำเนิด
+const speechSex = (st) => IDENTITY[st.identity]?.speech ?? st.sex;
+// ไม่ดึงเลขสุ่ม — ชีวิตที่ไม่มีอัตลักษณ์ได้คู่ต่างเพศกำเนิดเหมือนเดิมทุกหลัก
+const partnerSex = (st) => IDENTITY[st.identity]?.partner ?? kinOtherSex(st.sex);
 const kinInRange = (v, r) => !r || (v >= r[0] && v <= r[1]);
 const kinYearOf = (st) => st.birthYear + st.age;
 const memberAge = (st, m, year = kinYearOf(st)) => (m.alive ? year - m.born : m.diedAge);
@@ -374,7 +384,7 @@ function addMember(st, role, extra = {}) {
   const year = kinYearOf(st);
   const id = ++st.kinSeq;
   // สัตว์ติดบ้าน/ส่งต่อทายาทส่ง sex born maxAge มาเอง — ไม่ดึง kinRng ลำดับสุ่มของคนในบ้านจึงไม่ขยับ
-  const sex = extra.sex ?? (role === 'spouse' ? kinOtherSex(st.sex) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง');
+  const sex = extra.sex ?? (role === 'spouse' ? partnerSex(st) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง');
   const born = extra.born ?? (role === 'spouse' ? st.birthYear + st.kinRng.int(...KIN_SPOUSE_GAP) : role === 'peer' ? st.birthYear : year);
   // ชื่อคู่ใจสุ่มจาก seed+id ไม่ดึงเลข · ฝูงไม่มีชื่อ
   const name = role === 'herd' ? null : role === 'pet' ? (extra.name ?? petName(st, extra.kind, id)) : pickName(mixSeed(st.seed, 0x4b1d + id), sex, born, st.content.era.names, kinTakenNames(st));
@@ -4560,8 +4570,8 @@ const FILL = {
   ชื่อสัตว์: (st) => (focusOf(st, 'pet') ? petCall(focusOf(st, 'pet')) : 'เจ้าตัวเล็ก'),
   ชนิดสัตว์: (st) => focusOf(st, 'pet')?.kind ?? 'สัตว์',
   ชื่อฝูง: (st) => (focusOf(st, 'herd') ? petCall(focusOf(st, 'herd')) : 'สัตว์ในคอก'),
-  ครับ: (st) => (st.sex === 'หญิง' ? 'ค่ะ' : 'ครับ'),
-  ผม: (st) => (st.sex === 'หญิง' ? 'ฉัน' : 'ผม'),
+  ครับ: (st) => (speechSex(st) === 'หญิง' ? 'ค่ะ' : 'ครับ'),
+  ผม: (st) => (speechSex(st) === 'หญิง' ? 'ฉัน' : 'ผม'),
   ลูกดูแลแบบเรา: (st) => filialMirrorText(st),
   พ่อแม่ที่ป่วย: (st) => illParentWord(st),
   // จดหมายคำฝาก (afterfall-3): ฝั่งผู้ฝากอ่านคนรอบตัวตอนตาย · ฝั่งทายาทอ่าน st.letter ที่ระหว่างชาติสร้างไว้
@@ -4703,6 +4713,11 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
   if (fx.income_mult) {
     const m = nat?.job && fx.income_mult > 1 ? ((hit = true), 1 + (fx.income_mult - 1) * nat.mul) : fx.income_mult;
     st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * m ** s));
+  }
+  // การ์ดที่ตั้งต้องกั้นเพศกำเนิดให้ตรง (lint) · ตามเพศกำเนิด = ล้างช่อง ⇒ ชีวิตที่ไม่ตั้งไม่มีช่องนี้
+  if (fx.identity) {
+    if (fx.identity === BIRTH_IDENTITY) delete st.identity;
+    else st.identity = fx.identity;
   }
   if (fx.school) {
     st.school = fx.school === 'none' ? null : fx.school;
@@ -6045,6 +6060,7 @@ function whenOk(st, when) {
   if (when.region && !when.region.includes(st.region)) return false;
   if (when.province && !when.province.includes(st.province)) return false;
   if (when.sex && !when.sex.includes(st.sex)) return false;
+  if (when.identity && !when.identity.includes(identityOf(st))) return false;
   if (when.overlap_stage && !inRange(overlapStageOf(st), when.overlap_stage)) return false;
   // ผีญาติ: ขั้นซ้อนทับ ≥ 1 ถึงจะมีผีญาติ · สีหน้าของคนที่ถูกเลือกต้องตรงกับที่การ์ดขอ (haunt | warn)
   if (when.kin_ghost && !(overlapStageOf(st) >= 1 && when.kin_ghost.includes(pickKinGhost(st)?.mood))) return false;
@@ -9927,13 +9943,15 @@ function makeHeir(af, r) {
       // ผู้เล่นรุ่นก่อนตายตามชะตาเดิมของตัวเอง (diesAt) · อีกคนแก่และตายตามตารางชีพแบบพ่อแม่ทั่วไป
       // คู่ครองจริงเป็นพ่อ/แม่อีกคน: อายุตอนลูกเกิดจากปีเกิดจริง · ตายไปแล้วตอนเราตาย = ตายที่อายุนั้น · ไม่มีคู่จริง = สร้างแบบเดิม
       const year0 = st.birthYear + kidAge;
+      // ลูกเรียกผู้เล่นตามอัตลักษณ์ (หญิงข้ามเพศ = แม่) · คู่ชายเป็นพ่อ ⇒ บ้านมีแม่และพ่อครบเหมือนชีวิตอื่น · ไม่มีอัตลักษณ์ = เพศกำเนิดเท่าเดิม
+      const self = speechSex(st);
       parents = [
-        { sex: st.sex, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...deathOf(st) },
+        { sex: self, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...deathOf(st) },
         spouse && spouse.born <= year0
           ? { sex: spouse.sex, age: year0 - spouse.born, alive: spouse.diedAge === null || spouse.diedAge > year0 - spouse.born, ...(spouse.diedAge !== null && { diesAt: spouse.diedAge, ...kinDeathOf(spouse) }), name: spouse.name }
-          : { sex: otherSex(st.sex), age: spouseAge(rng, st.sex, kidAge), alive: true },
+          : { sex: otherSex(self), age: spouseAge(rng, self, kidAge), alive: true },
       ];
-      legacy = { age: st.age - kidAge, units, debt, from: elderWord(1, null, st.sex) };
+      legacy = { age: st.age - kidAge, units, debt, from: elderWord(1, null, self) };
     } else {
       // รุ่นคั่นกลางเกิดห่างกันตามช่วงอายุแม่ตอนคลอด · พ่อ/แม่ของผู้เล่นใหม่เป็นลูก (หรือหลาน) ของรุ่นก่อน แก่และตายตามตารางชีพ
       // หลานจริง = เกิดปีของเขา พ่อ/แม่สายเลือดคือลูกจริงที่ให้กำเนิด · ไม่มีคนจริง = ห่างรุ่นสุ่มแบบเดิม (เริ่มจากปีเกิดลูกจริงถ้ามี)
