@@ -673,11 +673,16 @@ if (fails.length) {
     const ks = card.choices.map((_, k) => k).filter((k) => open(card, k));
     const fresh = ks.filter((k) => chain.choices.has(key(k)) && !hit.has(key(k)));
     const side = ks.filter((k) => setsOwn(ev.choices[k]) === greedy);
-    const j = fresh.length ? fresh[rng.int(0, fresh.length - 1)] : side.length && (greedy || chain.events.has(ev.id)) ? side[rng.int(0, side.length - 1)] : BOTS.สุ่ม(card, rng, h);
+    // ตัวเลือกที่พาเข้าใบถัดไปในโซ่ต้องกดซ้ำได้ ไม่งั้นพอกดครั้งแรกแล้วทางเข้าห้องบอสไม่เคยถูกเลือกอีก (ทางตั้งธงข้างเคียงแย่งไปหมด)
+    const deep = ks.filter((k) => [].concat(ev.choices[k].outcomes ?? []).some((o) => chain.events.has(o?.next)));
+    const j = fresh.length ? fresh[rng.int(0, fresh.length - 1)] : deep.length && chain.events.has(ev.id) ? deep[rng.int(0, deep.length - 1)] : side.length && (greedy || chain.events.has(ev.id)) ? side[rng.int(0, side.length - 1)] : BOTS.สุ่ม(card, rng, h);
     if (chain.choices.has(key(j))) hit.add(key(j));
     return j;
   };
   const LIMIT = 400, SEEDS = 3;
+  // ธง hunter ที่ตัวเลือกปลายโซ่ใช้ออกแค่ขั้นสูงสุด ⇒ ให้ขั้นสูงสุดได้ชีวิตครึ่งหนึ่ง ไม่ใช่สี่ส่วน
+  const top = OVERLAP_STAGE_MIN.length - 1;
+  const CHASE_STAGES = [...Array(top).keys()].map((k) => k + 1).concat(Array.from({ length: top }, (_, k) => top - (k % 2)));
   const union = new Set();
   const runs = [];
   const keep = OVERLAP_STAGE_MIN.slice();
@@ -688,10 +693,10 @@ if (fails.length) {
       let lives = 0;
       for (let i = 0; i < LIMIT && [...want].some((x) => !hit.has(x)); i++) {
         const s = newLife(mixSeed(sd ^ 0x0c12, i), content);
-        s.overlap = 1 + (i % 4);
+        s.overlap = CHASE_STAGES[i % CHASE_STAGES.length];
         overlapPlan(s, 0);
         lives++;
-        playLife(mixSeed(sd ^ 0x0c12, i), content, chase(((i >> 2) & 1) === 0, hit), (card) => { if (want.has(card.id)) hit.add(card.id); }, s);
+        playLife(mixSeed(sd ^ 0x0c12, i), content, chase(((i / CHASE_STAGES.length | 0) & 1) === 0, hit), (card) => { if (want.has(card.id)) hit.add(card.id); }, s);
       }
       for (const x of hit) union.add(x);
       runs.push({ sd, lives, miss: [...want].filter((x) => !hit.has(x)) });
