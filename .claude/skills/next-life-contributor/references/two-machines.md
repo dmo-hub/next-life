@@ -129,10 +129,10 @@ qwen ไม่รู้อะไรจากแชตของเจ้าขอ
 
 ## sync ไฟล์งานของเจ้าของ (repo ไฟล์งาน next-life)
 
-ไฟล์งานของเจ้าของ (backlog · LANES · ใบงาน · log ผู้รวมงาน) อยู่ใน repo private แยกของเจ้าของ (ชื่อ/URL อยู่ใน handoff ที่เจ้าของส่งให้ ไม่อยู่ในไฟล์นี้) · บนเครื่องเจ้าของ repo นี้อยู่ที่ `~/.claude/work/thai-life-sim`
+ไฟล์งานของเจ้าของ (backlog · LANES · ใบงาน · log ผู้รวมงาน) อยู่ใน repo private แยกของเจ้าของ (ชื่อ/URL อยู่ใน handoff ที่เจ้าของส่งให้ ไม่อยู่ในไฟล์นี้) · บนเครื่องเจ้าของ repo นี้อยู่ที่ `D:/Project/Mini Project/next-life-owner`
 
 - **token ของเครื่อง qwen เห็นได้แค่ repo นี้** — fine-grained PAT เลือก repo เดียว (Contents: Read and write) · ห้ามใช้ token ที่เห็น repo อื่นของเจ้าของ
-- **ห้าม clone ไปที่ `~/.claude/work/thai-life-sim` ของเครื่อง qwen** — `CLAUDE.md` ของ repo นี้แยกบทบาทจาก path นั้น วางตรงนั้น = qwen ทำตัวเป็นเครื่องเจ้าของ อ่าน LANES ทั้งไฟล์ · clone ไปโฟลเดอร์แยก เช่น `~/next-life-owner`
+- **ห้าม clone ไปที่ `D:/Project/Mini Project/next-life-owner` ของเครื่อง qwen** — `CLAUDE.md` ของ repo นี้แยกบทบาทจาก path เต็มนั้น (ไม่ใช่ชื่อโฟลเดอร์) วางตรงนั้น = qwen ทำตัวเป็นเครื่องเจ้าของ อ่าน LANES ทั้งไฟล์ · clone ไปโฟลเดอร์แยก เช่น `~/next-life-owner`
 - **เครื่อง qwen เขียนได้เฉพาะ `home/`** · ไฟล์อื่นอ่านอย่างเดียว (session บนเครื่องเจ้าของแก้ LANES · backlog อยู่ตลอด แก้ซ้อน = conflict) · ไอเดียใหม่จดใน `home/inbox.md` ให้เครื่องเจ้าของย้ายเข้า backlog
 - qwen ไม่อ่านโฟลเดอร์นี้เอง เปิดให้อ่านเมื่อใบงานชี้ไฟล์ในนั้นเท่านั้น (LANES ยาวมาก กิน 128k)
 
@@ -141,7 +141,7 @@ qwen ไม่รู้อะไรจากแชตของเจ้าขอ
 | เครื่อง | ดึง | ส่ง |
 |---|---|---|
 | qwen | `git -C ~/next-life-owner pull --rebase origin main` | commit เฉพาะ `home/` → pull --rebase → `git -C ~/next-life-owner push origin main` |
-| เจ้าของ | `git -C ~/.claude/work/thai-life-sim pull --no-rebase origin main` (working tree มีงาน session อื่นค้าง · ห้าม rebase/autostash) | `git -C ~/.claude/work/thai-life-sim push origin main` |
+| เจ้าของ | `git -C "D:/Project/Mini Project/next-life-owner" pull --no-rebase origin main` (working tree มีงาน session อื่นค้าง · ห้าม rebase/autostash) | `git -C "D:/Project/Mini Project/next-life-owner" push origin main` |
 
 push แล้วขึ้น rejected (non-fast-forward) = อีกเครื่อง push ก่อน ให้ pull แล้ว push ใหม่ · ห้าม force
 

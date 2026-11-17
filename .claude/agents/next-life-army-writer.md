@@ -83,5 +83,5 @@ Use only when the caller says so explicitly and names the ticket.
 - Answer in Thai. Keep identifiers, file paths and YAML exact.
 - Reference code as markdown links relative to the repo root, e.g. [career_first.yaml:351](content/career_first.yaml#L351).
 - Mark every claim as **มีในเกมแล้ว**, **อยู่ในแผน** or **ไอเดียใหม่**.
-- Off-ticket ideas get one line each under "backlog" in your reply. `~/.claude/work/thai-life-sim/build/backlog.md` is missing on this machine, so don't write it.
+- Off-ticket ideas get one line each under "backlog" in your reply. `D:/Project/Mini Project/next-life-owner/build/backlog.md` is missing on this machine, so don't write it.
 - Money is game simulation only and never investment advice.

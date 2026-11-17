@@ -5,8 +5,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import path from 'node:path';
 
-// สัญญาณเดียวกับ CLAUDE.md: เครื่องที่มีโฟลเดอร์นี้คือเครื่องเจ้าของ
-if (existsSync(path.join(homedir(), '.claude', 'work', 'thai-life-sim'))) process.exit(0);
+// สัญญาณเดียวกับ CLAUDE.md: เครื่องที่มี path เต็มนี้คือเครื่องเจ้าของ · ห้ามดูแค่ชื่อโฟลเดอร์
+// next-life-owner เพราะเครื่องผู้ร่วมทำก็ clone ชื่อนั้น · ที่เดิมใต้ ~/.claude ยังนับจนกว่าจะลบ
+const OWNER_HOMES = ['D:/Project/Mini Project/next-life-owner', path.join(homedir(), '.claude', 'work', 'thai-life-sim')];
+if (OWNER_HOMES.some((p) => existsSync(p))) process.exit(0);
 
 let input;
 try {
