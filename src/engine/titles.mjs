@@ -182,7 +182,10 @@ export function lifeFacts(st) {
   }
   // เหตุบ้านเมืองที่ทันตอนเป็นผู้ใหญ่ นับเฉพาะกลุ่มที่ขึ้นการ์ดให้เห็น — ปีที่กลุ่มเหตุถูกซ่อน (ออกแล้ว/เว้นช่วง) ผู้เล่นไม่รู้ว่ารอดอะไรมา
   const crises = new Set(), disasters = new Set();
-  for (const { e, age } of erasShown(st, st.age)) if (age >= 20) (e.kind === 'economy' ? crises : disasters).add(e.id);
+  for (const { e, age } of erasShown(st, st.age)) if (age >= 20) {
+    if (e.kind === 'economy') crises.add(e.id);
+    else if (e.kind === 'disaster') disasters.add(e.id);
+  }
   const worth = netWorth(st);
   return {
     st,

@@ -41,6 +41,19 @@ const artVirus = (cx, cy, r) => {
 };
 const artHouse = (x, base, s = 1) => artLine(`M${x} ${base}v${-14 * s}l${12 * s} ${-10 * s}l${12 * s} ${10 * s}v${14 * s}zM${x + 9 * s} ${base}v${-7 * s}h${6 * s}v${7 * s}`);
 
+const artPerson = (x, base, s = 1) => [
+  artLine(artCirc(x, base - 16 * s, 3 * s), { w: 1.2 }),
+  artLine(`M${x} ${base - 13 * s}v${7 * s}l${-3 * s} ${6 * s}M${x} ${base - 6 * s}l${3 * s} ${6 * s}M${x - 4 * s} ${base - 10 * s}h${8 * s}`, { w: 1.2 }),
+];
+const artFlame = (x, y) => artFill(`M${x} ${y}c3 4 4 7 0 9c-4-2-3-5 0-9z`);
+const artBox = (x, y, w, h) => artLine(`M${x} ${y}h${w}v${h}h${-w}zM${x + w / 2} ${y}v${h * 0.4}`, { w: 1.2 });
+const artBag = (x, y) => artLine(`M${x} ${y}h12q2 0 2 3t-2 3h-12q-2 0-2-3t2-3z`, { w: 1 });
+const artFish = (x, y) => [artFill(`M${x} ${y}q8-6 16 0q-8 6-16 0zM${x} ${y}l-5-4v8z`), artFill(artCirc(x + 12, y - 1, 0.9), ART_INK.lacquer2)];
+const artPlane = (x, y) => artLine(`M${x} ${y}h26q6 0 8 3q-2 3-8 3h-26zM${x + 4} ${y}l-4-8h4l6 8M${x + 12} ${y + 3}l6 8h4l-2-8`, { w: 1.2 });
+const artPalm = (x, base) => [artLine(`M${x} ${base}q-2-18 8-32`, { w: 2 }), artLine(`M${x + 8} ${base - 32}q-12-4-18 6M${x + 8} ${base - 32}q12-6 18 4M${x + 8} ${base - 32}q-4-10-14-10`)];
+const artStilt = (x) => artLine(`M${x - 2} 40l14-12l14 12zM${x} 40v12h24v-12M${x + 2} 52v10M${x + 22} 52v10M${x + 9} 52v-7h6v7`, { w: 1.2 });
+const artWheel = (cx, cy, r) => artLine(artCirc(cx, cy, r), { w: 1.2 });
+
 // ยุคละภาพเดียว ใช้กับทุกการ์ดของยุคนั้น — คีย์ตาม id เหตุการณ์ใน data/era-events.json
 const ERA_SCENES = {
   oil_crisis_1: [ART_GROUND, artBarrel(56, 38), artBarrel(78, 38), artBarrel(67, 10), artFill('M128 18c0 0-11 15-11 24a11 11 0 0 0 22 0c0-9-11-24-11-24z'), artUp(158)],
@@ -97,6 +110,107 @@ const ERA_SCENES = {
     artLine('M128 46h6v-6M152 46h-6v-6', { stroke: ART_INK.cream, w: 1 }),
     artFill(artCirc(140, 40, 2.2)),
   ],
+  aids_first_case: [
+    ART_GROUND,
+    artLine('M40 66V36l20-14l20 14v30zM54 66V50h12v16'),
+    artLine('M100 20h40v34h-40zM108 30h24M108 38h24M108 46h14', { w: 1.2 }),
+    artFill(artCirc(166, 36, 5)),
+    artLine('M160 66V46q6-4 12 0v20', { w: 1.2 }),
+  ],
+  aids_idu_wave: [
+    ART_GROUND,
+    artLine('M30 66V30h30v36M38 40h14M38 48h14'),
+    ...artVirus(100, 38, 9),
+    artLine('M136 66V36h26v30M142 44h14', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M170 28v16M162 36h16', { w: 2 }),
+  ],
+  kathun_landslide: [
+    artLine('M24 66L70 24L108 40L176 66', { stroke: ART_INK.bronze2 }),
+    artLine('M70 24C78 40 70 54 56 62M92 34C98 46 90 56 80 64', { stroke: ART_INK.cream, w: 1.2 }),
+    artFill('M96 54l8-4l6 6l-6 6zM112 58l6-3l5 5l-7 3z'),
+    artHouse(136, 64, 0.9),
+    artLine(artWave(24, 176, 70, 12, 3), { stroke: ART_INK.bronze2, w: 1 }),
+  ],
+  mobile_phone_boom: [
+    ART_GROUND,
+    artLine('M44 66V16M36 66h16M38 30l6-6l6 6M36 42l8-8l8 8'),
+    artLine('M60 24q8 6 0 14M68 20q12 10 0 22', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M110 18h30q4 0 4 4v42q0 4-4 4h-30q-4 0-4-4V22q0-4 4-4zM112 26h26v22h-26zM119 56h12', { w: 1.2 }),
+    artFill(artCirc(125, 37, 3), ART_INK.gold),
+    artLine('M156 30q8 8 0 18M164 26q12 12 0 26', { stroke: ART_INK.cream, w: 1.2 }),
+  ],
+  aids_condom_campaign: [
+    ART_GROUND,
+    artLine('M30 62V18h56v44zM36 24h44M36 32h30', { w: 1.2 }),
+    artFill('M50 42h16v14h-16z', ART_INK.cream),
+    artLine('M108 50q0-10 8-10t8 10q0 8-8 8t-8-8zM124 50h12', { w: 1.2 }),
+    ...artPerson(150, 66, 1.4),
+    artLine('M164 40h14M171 33v14', { stroke: ART_INK.cream, w: 1.6 }),
+  ],
+  toy_factory_fire: [
+    ART_GROUND,
+    artLine('M40 66V34h60v32M46 66V46h14v20M72 66V46h14v20'),
+    artFlame(56, 24), artFlame(76, 20), artFlame(90, 26),
+    artLine('M110 28q8-6 6-16q10 6 6 18M118 20q10-8 4-18', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M132 66V50h20v16M138 58h8', { w: 1.2 }),
+    artBox(160, 46, 14, 20),
+  ],
+  hotel_collapse: [
+    ART_GROUND,
+    artLine('M36 66V22h40v14l-6 8v22M40 30h8M56 30h8M40 40h8M40 50h8'),
+    artLine('M84 66l10-10l12 6l10-14l14 10l12-2l12 10', { stroke: ART_INK.cream }),
+    artFill('M96 62l6-4l6 4zM120 62l6-4l6 4z'),
+    artLine('M150 40l10-8l8 8M156 66V46', { w: 1.2 }),
+    artLine('M60 12v6M70 14l-2 5M50 14l2 5', { stroke: ART_INK.cream, w: 1 }),
+  ],
+  asian_games_bangkok: [
+    ART_GROUND,
+    artLine('M30 66V44q0-12 14-12h112q14 0 14 12v22M44 66V50h112v16'),
+    artLine('M60 50V38M80 50V38M100 50V38M120 50V38M140 50V38', { stroke: ART_INK.cream, w: 1 }),
+    artLine('M70 20a8 8 0 1 0 0.01 0M90 20a8 8 0 1 0 0.01 0M110 20a8 8 0 1 0 0.01 0M80 26a8 8 0 1 0 0.01 0M100 26a8 8 0 1 0 0.01 0', { w: 1.1 }),
+    artFill(artCirc(166, 16, 3), ART_INK.gold),
+  ],
+  bts_opening: [
+    ART_GROUND,
+    artLine('M20 30h160M20 36h160', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M40 36V66M100 36V66M160 36V66', { w: 2 }),
+    artLine('M54 26h44q4 0 4 4v6H50v-6q0-4 4-4zM58 26v10M70 26v10M82 26v10M94 26v10', { w: 1.2 }),
+    artFill(artCirc(60, 34, 1) + artCirc(94, 34, 1), ART_INK.gold),
+    artLine('M120 66V46h30v20M128 54h14', { stroke: ART_INK.bronze2, w: 1 }),
+  ],
+  internet_commercial: [
+    ART_GROUND,
+    artLine('M50 20h60v34h-60zM56 26h48v22h-48zM70 54v8h20v-8M62 62h36'),
+    artLine('M64 34h20M64 40h30', { stroke: ART_INK.cream, w: 1 }),
+    artLine(artCirc(150, 36, 14), { w: 1.2 }),
+    artLine('M136 36h28M150 22q-8 14 0 28M150 22q8 14 0 28', { stroke: ART_INK.cream, w: 1 }),
+    artLine('M112 36h22', { stroke: ART_INK.bronze2, w: 1 }),
+  ],
+  avian_flu: [
+    ART_GROUND,
+    artLine('M30 66V44l14-10l14 10v22M44 66V54h6v12'),
+    artLine('M86 56q10-18 24-10q6-4 10 2l6 0l-4 4q-2 12-14 14q-14 2-22-10zM116 46l-4-2', { w: 1.3 }),
+    artFill(artCirc(118, 48, 1), ART_INK.gold),
+    ...artVirus(160, 30, 6),
+    artLine('M140 60h30', { stroke: ART_INK.bronze2, w: 1 }),
+  ],
+  suvarnabhumi_opening: [
+    ART_GROUND,
+    artLine('M24 66h152'),
+    artLine('M30 52h140v14M30 52q0-12 20-12h100q20 0 20 12', { w: 1.2 }),
+    artLine('M70 40V18h16v22M62 18h32', { w: 1.2 }),
+    artPlane(112, 22),
+    artLine('M104 28q-12 4-24 12', { stroke: ART_INK.cream, w: 1 }),
+    artLine('M36 58h8M52 58h8M68 58h8M84 58h8M100 58h8M116 58h8M132 58h8M148 58h8', { stroke: ART_INK.cream, w: 1 }),
+  ],
+  pm25_haze: [
+    artLine(artWave(20, 180, 20, 8, 5), { stroke: ART_INK.cream, w: 1.2 }),
+    artLine(artWave(20, 180, 32, 8, 5), { stroke: ART_INK.bronze2, w: 1.2 }),
+    ART_GROUND,
+    artLine('M30 66V48h18v18M60 66V36h22v30M92 66V44h16v22M124 66V30h24v36M156 66V46h16v20'),
+    artLine('M64 42h6M64 50h6M128 38h8M128 46h8', { stroke: ART_INK.cream, w: 1 }),
+    artLine(artCirc(100, 14, 7), { stroke: ART_INK.cream, w: 1 }),
+  ],
 };
 
 export function eraArt(id) {
@@ -104,18 +218,6 @@ export function eraArt(id) {
   return scene ? [...ERA_FRAME, ...scene] : null;
 }
 
-const artPerson = (x, base, s = 1) => [
-  artLine(artCirc(x, base - 16 * s, 3 * s), { w: 1.2 }),
-  artLine(`M${x} ${base - 13 * s}v${7 * s}l${-3 * s} ${6 * s}M${x} ${base - 6 * s}l${3 * s} ${6 * s}M${x - 4 * s} ${base - 10 * s}h${8 * s}`, { w: 1.2 }),
-];
-const artFlame = (x, y) => artFill(`M${x} ${y}c3 4 4 7 0 9c-4-2-3-5 0-9z`);
-const artBox = (x, y, w, h) => artLine(`M${x} ${y}h${w}v${h}h${-w}zM${x + w / 2} ${y}v${h * 0.4}`, { w: 1.2 });
-const artBag = (x, y) => artLine(`M${x} ${y}h12q2 0 2 3t-2 3h-12q-2 0-2-3t2-3z`, { w: 1 });
-const artFish = (x, y) => [artFill(`M${x} ${y}q8-6 16 0q-8 6-16 0zM${x} ${y}l-5-4v8z`), artFill(artCirc(x + 12, y - 1, 0.9), ART_INK.lacquer2)];
-const artPlane = (x, y) => artLine(`M${x} ${y}h26q6 0 8 3q-2 3-8 3h-26zM${x + 4} ${y}l-4-8h4l6 8M${x + 12} ${y + 3}l6 8h4l-2-8`, { w: 1.2 });
-const artPalm = (x, base) => [artLine(`M${x} ${base}q-2-18 8-32`, { w: 2 }), artLine(`M${x + 8} ${base - 32}q-12-4-18 6M${x + 8} ${base - 32}q12-6 18 4M${x + 8} ${base - 32}q-4-10-14-10`)];
-const artStilt = (x) => artLine(`M${x - 2} 40l14-12l14 12zM${x} 40v12h24v-12M${x + 2} 52v10M${x + 22} 52v10M${x + 9} 52v-7h6v7`, { w: 1.2 });
-const artWheel = (cx, cy, r) => artLine(artCirc(cx, cy, r), { w: 1.2 });
 
 // สมุดภาพบ้านเมือง (B130): ภาพละช่อง ปลดตามวัยที่เจอการ์ดของเหตุการณ์ หรือการ์ดตามมา (sp) · กรอบเดียวกับภาพยุค
 // [ช่อง, ป้ายช่อง, คำบรรยายภาพ, รูปทรง] · ภาพหลักของเหตุการณ์คือภาพยุคเดิม ไม่อยู่ในรายการนี้

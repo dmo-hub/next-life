@@ -1219,6 +1219,7 @@ function memoUnseen() {
 // ผู้เล่นเดิมจึงได้ภาพหลักย้อนหลัง · n = ภาพที่เพิ่งได้แต่ยังไม่เปิดดู (จุดแดงแบบสมุดฉายา)
 const PICS_KEY = 'next-life-pics-v1';
 // วิกฤตน้ำมันครั้งแรกเกิดก่อนปีเกิดแรกสุดของเกม ไม่มีชีวิตไหนทันเห็น — ไม่ตั้งช่องที่ปลดไม่ได้ตลอดกาล
+const ERA_KIND_LABEL = { economy: 'เศรษฐกิจ', disaster: 'ภัยพิบัติ', accident: 'อุบัติภัย', health: 'สุขภาพ', city: 'เมือง', sport: 'กีฬา' };
 const PIC_EVENTS = ERA_EVENTS.filter((e) => ERA_PICS[e.id]);
 const PIC_ALL = PIC_EVENTS.reduce((n, e) => n + 1 + ERA_PICS[e.id].length, 0);
 // การ์ดตามมาของเหตุการณ์ไม่มีช่อง era ในเนื้อหา จึงผูกด้วย id การ์ด · การ์ดยุคใช้ช่วงวัยของการ์ดเป็นช่อง
@@ -1530,7 +1531,7 @@ function picShelf(body, fresh) {
     const h = el('div', 'h', met ? e.name : '???');
     if (met && fresh.includes(`e:${e.id}`)) h.firstChild.after(newTag());
     h.append(el('small', null, `${n}/${1 + slots.length}`));
-    s.append(h, el('div', 'yr', `${e.kind === 'economy' ? 'เศรษฐกิจ' : 'ภัยพิบัติ'} · พ.ศ. ${e.from}${e.to !== e.from ? `–${e.to}` : ''}`));
+    s.append(h, el('div', 'yr', `${ERA_KIND_LABEL[e.kind] ?? e.kind} · พ.ศ. ${e.from}${e.to !== e.from ? `–${e.to}` : ''}`));
     const grid = el('div', 'pic-slots');
     const main = el('div', `pic-slot main${met ? '' : ' lock'}`);
     if (met) main.append(artSvg('era-art', ERA_ART_W, ERA_ART_H, eraArt(e.id)));
