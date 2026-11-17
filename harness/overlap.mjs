@@ -743,6 +743,8 @@ if (fails.length) {
       for (let i = 0; i < LIMIT && [...want].some((x) => !hit.has(x)); i++) {
         const s = newLife(mixSeed(sd ^ 0x0c12, i), content);
         s.overlap = CHASE_STAGES[i % CHASE_STAGES.length];
+        // การ์ดผีบรรพบุรุษ (ใบ 18) กั้นด้วยแถวชาติไทยในผังตระกูล · newLife เปล่าไม่มีผัง ⇒ ใส่ให้ชีวิตไล่ตามแบบที่ปรโลกส่งต่อ ไม่ใช่รายชื่อยกเว้น
+        s.lineage = [{ gen: 1, name: 'ก้อย', sex: 'หญิง', province: s.province, cls: s.cls, age: 71, cause: 'other' }];
         overlapPlan(s, 0);
         lives++;
         playLife(mixSeed(sd ^ 0x0c12, i), content, chase(((i / CHASE_STAGES.length | 0) & 1) === 0, hit), (card) => { if (want.has(card.id)) hit.add(card.id); }, s);
