@@ -30,12 +30,26 @@ export function careerSim(root = new URL('../../', import.meta.url)) {
   return sim;
 }
 
+// key กล่องบนหน้า (สาย|อาชีพ + office) — ผลจำลองเก็บชุดนี้ไว้ ไม่งั้นแยก "key ตกรุ่น" ออกจาก "ไม่มีใครเคยทำงานนี้" ไม่ได้
+export function careerUnitKeys(content) {
+  const careers = content.era.careers;
+  const keys = Object.entries(careers.ladders).flatMap(([lad, ladder]) => ladderOccs(ladder).map((occ) => unitKey(lad, occ)));
+  return careers.office ? [...keys, OFFICE_UNIT] : keys;
+}
+
 // ชุดการ์ดในกองไม่ตรงไฟล์ผล = ผลจำลองค้าง (การ์ดเพิ่ม/ลบ/เปลี่ยน id) — site:check เตือน ไม่ตก
 export function simDrift(content, sim = careerSim()) {
-  if (!sim) return { missing: [...careerCardIds(content)], gone: [], noFile: true };
+  if (!sim) return { missing: [...careerCardIds(content)], gone: [], staleKeys: [], noFile: true };
   const now = careerCardIds(content);
   const then = new Set(sim.cards ?? []);
-  return { missing: [...now].filter((id) => !then.has(id)).sort(), gone: [...then].filter((id) => !now.has(id)).sort(), noFile: false };
+  const keysNow = careerUnitKeys(content);
+  const keysThen = new Set(sim.unitKeys ?? []);
+  return {
+    missing: [...now].filter((id) => !then.has(id)).sort(),
+    gone: [...then].filter((id) => !now.has(id)).sort(),
+    staleKeys: keysNow.filter((k) => !keysThen.has(k)).sort(),
+    noFile: false,
+  };
 }
 
 // สายที่อาชีพเปลี่ยนตามขั้น (ราชการ ทหาร ตำรวจ) ไล่อาชีพจากขั้น · สายเอกชน/สายอาชีพอ่านรายการอาชีพของสาย

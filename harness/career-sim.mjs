@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { playLife, mixSeed, isWorking, RETIRE_AGE } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS } from './bots.mjs';
-import { careerCardIds, isCareerCard, OFFICE_UNIT, unitKey } from '../src/site/career.mjs';
+import { careerCardIds, careerUnitKeys, isCareerCard, OFFICE_UNIT, unitKey } from '../src/site/career.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
@@ -126,6 +126,7 @@ const result = {
   bots: botNames,
   lives: n * botNames.length,
   cards: [...CAREER].sort(),
+  unitKeys: careerUnitKeys(content).sort(),
   units: Object.fromEntries([...tally].sort(([a], [b]) => a.localeCompare(b)).map(([k, t]) => [k, { lives: t.lives, entries: sorted(t.entries), cards: sorted(t.cards), exits: sorted(t.exits) }])),
 };
 writeFileSync(out, `${JSON.stringify(result, null, 1)}\n`);

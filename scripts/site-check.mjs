@@ -262,6 +262,7 @@ const jobWant = Object.values(content.era.careers.ladders).reduce((s, l) => s + 
 const jobGot = (moreJobs.match(/<div class="job">/g) ?? []).length;
 check('หน้าเฉลยมีเส้นทางงานครบทุกอาชีพในทุกสาย', jobGot !== jobWant || !moreJobs.includes('id="career"'), ` ${jobGot}/${jobWant}`);
 const drift = simDrift(content);
+check('key กล่องเส้นทางงานทุกกล่องมีในไฟล์ผลจำลอง (ladder/ขั้นเปลี่ยนแล้วต้องรัน career:sim ใหม่)', !drift.noFile && drift.staleKeys.length > 0, drift.staleKeys.length ? ` ตกรุ่น ${drift.staleKeys.length}: ${drift.staleKeys.slice(0, 5).join(', ')}` : '');
 if (drift.noFile) console.log(`⚠ เตือน: ไม่มี ${SIM_FILE} — หน้าเฉลยส่วนเส้นทางงานไม่มีเลข · รัน npm run career:sim`);
 else if (drift.missing.length || drift.gone.length)
   console.log(`⚠ เตือน: ผลจำลองเส้นทางงานค้าง — การ์ดใหม่ไม่มีผล ${drift.missing.length} (${drift.missing.slice(0, 5).join(', ')}) · การ์ดที่หายจากกอง ${drift.gone.length} (${drift.gone.slice(0, 5).join(', ')}) · รัน npm run career:sim แล้ว build`);
