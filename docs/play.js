@@ -12346,7 +12346,11 @@ function lineageList(all, brief = all.length) {
 }
 
 // ผังตระกูลเป็นภาพ (เจ้าของสั่ง) · ข้อความเดิมพับไว้ใต้ภาพ — ชื่อ จังหวัด ฉายา และ screen reader ยังอ่านได้
-function lineageView(all, now, brief = all.length, youWord) {
+// คำใบ้กำแพงโลกใต้ผังตระกูล: เลือกจากขั้น (overlapStageOf) ไม่อ่านค่าดิบ เกณฑ์ขั้นเปลี่ยนแล้ว UI ไม่ต้องแก้ · ขั้น 0 ไม่ขึ้น · ไม่แสดงตัวเลข
+const OVERLAP_VEIL = ['', 'ม่านระหว่างโลก: บาง', 'ม่านระหว่างโลก: ขาด', 'ม่านระหว่างโลก: ฉีกกว้าง'];
+const overlapVeil = (src) => OVERLAP_VEIL[Math.min(overlapStageOf(src), OVERLAP_VEIL.length - 1)];
+
+function lineageView(all, now, brief = all.length, youWord, src) {
   const box = el('div', 'lineage-view');
   const shown = all.slice(-brief);
   const draw = () => shelfLineageArt(box, shown, all.length - shown.length, now, CLASSES, youWord, all.findLast((l) => !l.isekai));
@@ -12354,6 +12358,8 @@ function lineageView(all, now, brief = all.length, youWord) {
   const d = el('details', 'lineage-text');
   d.append(el('summary', null, 'อ่านเป็นข้อความ'), lineageList(all, brief));
   box.append(d);
+  const veil = src && overlapVeil(src);
+  if (veil) box.append(el('p', 'sub', veil));
   // การ์ดสร้างก่อนติดหน้า (และจอหมุน/ย่อได้ภายหลัง) ภาพที่วาดไว้ถูก CSS ยืดจนวงกลมเป็นวงรี — วาดใหม่ทุกครั้งที่ความกว้างจริงเปลี่ยน
   if (cv && typeof ResizeObserver === 'function') {
     let shown = false;
@@ -13960,7 +13966,7 @@ function render(card) {
         const box = el('div', 'recap');
         box.append(el('div', 'h', card.age > 0 ? 'สิ่งที่สืบทอดจากรุ่นก่อน' : 'สิ่งที่สืบทอดจากชาติก่อน'), list(card.inherit, 'picks'));
         // เจ้าของสั่งไม่ย่อรุ่นต้นทางซ้าย — ผังบนการ์ดแรกเกิดโชว์ครบทุกรุ่น (ภาพบีบป้ายเองเมื่อรุ่นถี่)
-        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageView(st.lineage, st.cls));
+        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageView(st.lineage, st.cls, undefined, undefined, st));
         body.append(box);
       }
       // ใบสืบทอดยาว/จอเตี้ยดันปุ่มหลุดใต้เมนูล่าง — ปุ่มติดจอแทนการพับเนื้อ (เจ้าของสั่งผังตระกูลครบทุกรุ่น)
@@ -14249,7 +14255,7 @@ function kinParts(members, animals = false) {
 // ผังตระกูลมีเมื่อเป็นรุ่นที่ 2 ขึ้นไป
 function clanParts() {
   const out = [];
-  if (st.lineage.length) out.push(el('h3', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageView(st.lineage, st.cls));
+  if (st.lineage.length) out.push(el('h3', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageView(st.lineage, st.cls, undefined, undefined, st));
   out.push(
     el('h3', null, st.lineage.length ? `กราฟฐานะตระกูล · ${st.lineage.length + 1} รุ่น` : 'กราฟฐานะตระกูล'),
     standingChart(standingGens(st.lineage, standingNow(!!st.dead)), null, false) ?? el('p', 'sub', 'ยังมีจุดเดียว — กราฟขึ้นเมื่อถึงช่วงวัยถัดไป'),
@@ -14581,7 +14587,7 @@ function renderAfter(card) {
   if (card.earn) body.append(earnBox(card.earn, `${save.seed}:${st.gen}:v`));
   if (card.lineage) {
     body.append(el('div', 'kicker', 'ผังตระกูล'));
-    body.append(af.heir ? lineageView(af.heir.lineage, af.heir.cls, af.heir.lineage.length, 'รุ่นถัดไป') : list(card.lineage, 'picks'));
+    body.append(af.heir ? lineageView(af.heir.lineage, af.heir.cls, af.heir.lineage.length, 'รุ่นถัดไป', af.heir) : list(card.lineage, 'picks'));
     // การ์ดส่งต่อ (B95): ผังตระกูลรวมชีวิตที่เพิ่งจบแล้ว + จุดฐานะบ้านที่รุ่นถัดไปจะเกิด
     const chart = af.heir && standingChart(standingGens(af.heir.lineage), CLASSES.indexOf(af.heir.cls));
     if (chart) body.append(chart);
