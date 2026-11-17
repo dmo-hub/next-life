@@ -94,7 +94,7 @@ const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN);
 const lines = [];
 for (const r of rows) {
   const t = (k) => r.by.reduce((s, b) => s + b[k], 0);
-  lines.push(`${r.name.padEnd(10)} ชีวิต: ${r.by.map((b, k) => `ขั้น${k}=${b.life}/${b.lives}`).join(' ')} · ปรโลก: ${r.by.map((b, k) => `ขั้น${k}=${b.after}/${b.afterLives}`).join(' ')}`);
+  lines.push(`${r.name.padEnd(10)} การ์ดออก ชีวิต: ${r.by.map((b, k) => `ตระกูลเริ่มขั้น${k}=${b.life}/${b.lives}`).join(' ')} · ปรโลก: ${r.by.map((b, k) => `เริ่มขั้น${k}=${b.after}/${b.afterLives}`).join(' ')} · ออกตอนขั้นซ้อนทับ 0 = ${r.zero} (ต้อง 0)`);
   lines.push(`           ผี ทวง ${r.mood.haunt} เตือน ${r.mood.warn} · ห่างรุ่น 0/1/2/3+ = ${r.gap.join('/')} · ปรโลกทางลูกขั้น1 ใบเฉลี่ย มีฉากผี ${mean(r.afCards.with).toFixed(2)} (${r.afCards.with.length}) ไม่มี ${mean(r.afCards.without).toFixed(2)} (${r.afCards.without.length})`);
   if (r.zero) fail(`${r.name}: การ์ดผีญาติออกตอนขั้นซ้อนทับ 0 จำนวน ${r.zero}`);
   for (const k of [1]) {
@@ -106,8 +106,14 @@ for (const r of rows) {
   if (r.unstable) fail(`${r.name}: pickKinGhost ผลไม่คงที่ ${r.unstable}`);
   const near = r.gap[0] + r.gap[1] + r.gap[2];
   if (near < (near + r.gap[3]) * 0.5) fail(`${r.name}: ผีส่วนใหญ่ไม่ได้ห่างไม่เกิน 2 รุ่น`);
-  if (r.afCards.with.length && r.afCards.without.length && Math.abs(mean(r.afCards.with) - mean(r.afCards.without)) > 1) fail(`${r.name}: ปรโลกยาวขึ้น/สั้นลงเกิน 1 ใบเมื่อมีฉากผี`);
 }
+// ปรโลกไม่ยาวขึ้น: รวมทุกบอทแล้วเทียบ — ต่อบอทตัวอย่างเหลือหลักหน่วย ตกตามสุ่ม · น้อยกว่า MIN_SAMPLE ฝั่งใดฝั่งหนึ่ง = ตัดสินไม่ได้ ตก (ตัววัดไม่ได้วัดอะไร)
+const MIN_SAMPLE = 20;
+const withG = rows.flatMap((r) => r.afCards.with);
+const withoutG = rows.flatMap((r) => r.afCards.without);
+lines.push(`ปรโลกทางลูก (รวมทุกบอท) ใบเฉลี่ย มีฉากผี ${mean(withG).toFixed(2)} (${withG.length}) ไม่มี ${mean(withoutG).toFixed(2)} (${withoutG.length})`);
+if (withG.length < MIN_SAMPLE || withoutG.length < MIN_SAMPLE) fail(`ตัวอย่างปรโลกน้อยกว่า ${MIN_SAMPLE} (มี ${withG.length} · ไม่มี ${withoutG.length}) — เพิ่ม --n`);
+else if (Math.abs(mean(withG) - mean(withoutG)) > 1) fail('ปรโลกยาวขึ้น/สั้นลงเกิน 1 ใบเมื่อมีฉากผี');
 console.log(lines.join('\n'));
 console.log(fails.length ? `ตก ${fails.length} ข้อ\n${fails.join('\n')}` : 'ผ่านทุกด่าน');
 process.exit(fails.length ? 1 : 0);
