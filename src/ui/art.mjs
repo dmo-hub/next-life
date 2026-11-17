@@ -151,7 +151,7 @@ const ERA_SCENES = {
     ART_GROUND,
     artLine('M40 66V34h60v32M46 66V46h14v20M72 66V46h14v20'),
     artFlame(56, 24), artFlame(76, 20), artFlame(90, 26),
-    artLine('M110 28q8-6 6-16q10 6 6 18M118 20q10-8 4-18', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M110 30q8-6 6-14q10 6 6 16M118 24q8-6 4-14', { stroke: ART_INK.cream, w: 1.2 }),
     artLine('M132 66V50h20v16M138 58h8', { w: 1.2 }),
     artBox(160, 46, 14, 20),
   ],
@@ -209,7 +209,7 @@ const ERA_SCENES = {
     ART_GROUND,
     artLine('M30 66V48h18v18M60 66V36h22v30M92 66V44h16v22M124 66V30h24v36M156 66V46h16v20'),
     artLine('M64 42h6M64 50h6M128 38h8M128 46h8', { stroke: ART_INK.cream, w: 1 }),
-    artLine(artCirc(100, 14, 7), { stroke: ART_INK.cream, w: 1 }),
+    artLine(artCirc(100, 17, 5), { stroke: ART_INK.cream, w: 1 }),
   ],
 };
 
