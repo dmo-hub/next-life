@@ -21,6 +21,7 @@ import { cadetHtml, readCadet, schoolYears } from '../src/site/cadet-cards.mjs';
 import { matchItem, recentVersions } from '../src/site/catalog-filter.mjs';
 import { FILTER_CATS } from '../src/site/catalog-ui.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
+import { cardGroupCounts, cardGroupRows } from '../src/site/catalog.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, injectDevNav, DEV_TABS, MOVED_MARK, movedHtml, DEV_MAPS, DEV_MAPS_PAGE, mapsMoved } from '../src/site/nav.mjs';
 import { uiPage, designMoved, cssVars, UI_PAGE, UI_MOVED_FROM } from '../src/site/ui.mjs';
@@ -262,6 +263,12 @@ const jobWant = Object.values(content.era.careers.ladders).reduce((s, l) => s + 
 const jobGot = (moreJobs.match(/<div class="job">/g) ?? []).length;
 check('หน้าเฉลยมีเส้นทางงานครบทุกอาชีพในทุกสาย', jobGot !== jobWant || !moreJobs.includes('id="career"'), ` ${jobGot}/${jobWant}`);
 const drift = simDrift(content);
+// ตารางการ์ดแต่ละหมวด (ใบ 324): ทุกไฟล์ content อยู่ในหมวด · ผลรวมหมวด = การ์ดทั้งหมด · แถวบนหน้า build แล้วตรงที่นับตอนนี้
+const grp = cardGroupCounts();
+check('ไฟล์ content ทุกไฟล์อยู่ในหมวดบนตารางการ์ดแต่ละหมวด (CARD_GROUPS)', grp.unmapped.length > 0, grp.unmapped.length ? ` ไม่มีหมวด: ${grp.unmapped.join(', ')}` : ` (${grp.rows.length} หมวด)`);
+check('ผลรวมตารางการ์ดแต่ละหมวด = การ์ดทั้งหมด', grp.total !== content.events.length, ` ${grp.total}/${content.events.length}`);
+const catalogNow = read('catalog.html');
+check('ตารางการ์ดแต่ละหมวดบนหน้า = ที่นับจากไฟล์ตอนนี้ (ยังไม่ build ใหม่ = ตก)', !cardGroupRows().split('\n').every((r) => catalogNow.includes(r.trim())));
 check('key กล่องเส้นทางงานทุกกล่องมีในไฟล์ผลจำลอง (ladder/ขั้นเปลี่ยนแล้วต้องรัน career:sim ใหม่)', !drift.noFile && drift.staleKeys.length > 0, drift.staleKeys.length ? ` ตกรุ่น ${drift.staleKeys.length}: ${drift.staleKeys.slice(0, 5).join(', ')}` : '');
 if (drift.noFile) console.log(`⚠ เตือน: ไม่มี ${SIM_FILE} — หน้าเฉลยส่วนเส้นทางงานไม่มีเลข · รัน npm run career:sim`);
 else if (drift.missing.length || drift.gone.length)

@@ -2,6 +2,7 @@
 import { readFileSync, writeFileSync, readdirSync, unlinkSync, existsSync } from 'node:fs';
 import { siteFacts, injectFacts } from './facts.mjs';
 import { catalogHtml } from './spoilers.mjs';
+import { cardGroupRows } from './catalog.mjs';
 import { injectSpec, SPEC_PAGE } from './spec.mjs';
 import { guideHtml } from './guide.mjs';
 import { demoHtml } from './demo.mjs';
@@ -57,7 +58,7 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   put(specFile, specNext, specOld);
   out.push('dev/spec');
   for (const [name, slot, html] of GEN_PAGES) {
-    const page = injectFacts(readFileSync(at(`src/site/${name}.html`), 'utf8'), facts, `src/site/${name}.html`).replace(slot, () => html(content));
+    const page = injectFacts(readFileSync(at(`src/site/${name}.html`), 'utf8'), facts, `src/site/${name}.html`).replace(slot, () => html(content)).replace('<!--__CARD_GROUPS__-->', () => cardGroupRows());
     put(at(`docs/${name}.html`), injectNav(page, `${name}.html`));
     out.push(name);
   }
