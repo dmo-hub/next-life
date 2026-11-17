@@ -1,0 +1,277 @@
+# การ์ดบ้านเมือง · อุบัติภัย — ดินถล่ม ไฟไหม้โรงงาน อาคารถล่ม + ฝุ่นก่อสร้าง/เผาไร่ (PM2.5 ฝั่งอุบัติภัย) — เหตุละ ~3 ใบ (เด็ก · ผู้ใหญ่ · ชรา)
+events:
+  # ---------- ดินถล่มทางใต้ ----------
+  - id: era_acc_landslide_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: kathun_landslide
+    when: {age: [6, 12], school: [primary, lower]}
+    title: "ฝนตกไม่หยุดทั้งสัปดาห์"
+    text: "ข่าวว่าฝนทางใต้ตกหนักจนภูเขาถล่มทับหมู่บ้านทั้งหมู่ ครูพาเปิดแผนที่ดูว่าอยู่ตรงไหน เพื่อนบางคนมีญาติอยู่แถวนั้น ทั้งห้องเงียบไปพักใหญ่"
+    choices:
+      - id: draw_card
+        text: "วาดการ์ดให้กำลังใจส่งไปใต้"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: give_lunch_money
+        text: "หยอดเงินค่าขนมลงกล่องบริจาค"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: dana, level: 1}]
+      - id: console_friend
+        text: "นั่งเป็นเพื่อนเด็กที่ญาติอยู่ใต้"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: fear_rain
+        text: "กลัวฝนจนไม่อยากออกไปเล่น"
+        effects: {happiness: -1, health: -1}
+        merit: [{cat: neutral}]
+
+  - id: era_acc_landslide_adult_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: kathun_landslide
+    when: {age: [19, 59]}
+    title: "ภูเขาถล่มทับหมู่บ้าน"
+    text: "ข่าวดินโคลนไหลลงมาทับหมู่บ้านกลางดึก ผู้คนยังขุดหากันอยู่ ที่ทำงานตั้งโต๊ะรับบริจาค บางคนขอลาไปช่วยที่ใต้ งานที่ค้างอยู่ก็ยังต้องมีคนทำ"
+    choices:
+      - id: join_dig
+        text: "ลาไปช่วยขุดหาผู้รอดชีวิต"
+        effects: {health: -1, relations: 2, income_mult: 0.95}
+        merit: [{cat: help_others, level: 2}]
+      - id: donate_office
+        text: "ลงชื่อบริจาคกับที่ทำงาน"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: dana, level: 1}]
+      - id: cover_shift
+        text: "รับกะแทนเพื่อนที่ลาไปช่วย"
+        effects: {health: -1, relations: 1, money: {unit: income_x, amount: 0.1}}
+        merit: [{cat: help_others, level: 1}]
+      - id: check_own_slope
+        text: "ไปดูลาดเขาหลังบ้านตัวเองบ้าง"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: era_acc_landslide_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    era: kathun_landslide
+    when: {age: [60, 110]}
+    title: "ฝนที่เคยเป็นของดี"
+    text: "คนแก่เล่าว่าสมัยก่อนป่าบนเขายังหนา ฝนตกหนักแค่ไหนน้ำก็ซึมลงดิน วันนี้ข่าวภูเขาถล่มทำให้ทั้งวงข้าวต้มพูดกันถึงต้นไม้ที่ถูกตัดไปตลอดสายเขา"
+    choices:
+      - id: tell_story
+        text: "เล่าเรื่องป่าเก่าให้หลานฟัง"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: plant_tree
+        text: "ปลูกต้นไม้ไว้ริมรั้วทุกต้น"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: send_old_clothes
+        text: "คัดเสื้อผ้าดี ๆ ส่งผู้ประสบภัย"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: dana, level: 1}]
+      - id: worry_night
+        text: "นอนไม่หลับทุกคืนที่ฝนตก"
+        effects: {health: -1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ---------- ไฟไหม้โรงงานของเล่น ----------
+  - id: era_acc_fire_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: toy_factory_fire
+    when: {age: [6, 12], school: [primary, lower]}
+    title: "ตุ๊กตาที่ไม่มีใครซื้อ"
+    text: "ข่าวไฟไหม้โรงงานทำของเล่นทำให้คนตายมากมาย ครูบอกว่าตุ๊กตาที่เด็ก ๆ รักหลายตัวมาจากที่นั่น เพื่อนในห้องมีญาติทำงานโรงงานแบบเดียวกัน"
+    choices:
+      - id: hug_friend
+        text: "บอกเพื่อนว่าแม่เขาต้องปลอดภัย"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: ask_mom_work
+        text: "ถามผู้ใหญ่ว่าบ้านมีทางหนีไฟไหม"
+        effects: {knowledge: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: give_toys
+        text: "ยกของเล่นตัวเองให้เด็กที่สูญเสีย"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: scared_smoke
+        text: "ได้กลิ่นควันทีไรใจเต้นแรง"
+        effects: {happiness: -2}
+        merit: [{cat: neutral}]
+
+  - id: era_acc_fire_adult_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: toy_factory_fire
+    when: {age: [19, 59]}
+    title: "ประตูหนีไฟที่ถูกล็อก"
+    text: "ข่าวว่าไฟไหม้โรงงานแล้วคนงานหนีไม่ทัน เพราะประตูถูกล็อกกันของหาย วันรุ่งขึ้นที่ทำงานคุณมีเสียงพูดกันถึงประตูหลังตึกที่ไม่เคยมีใครเปิดตรวจ"
+    choices:
+      - id: inspect_exit
+        text: "ไล่ตรวจทางหนีไฟทั้งตึก"
+        effects: {knowledge: 1, relations: 1, health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: raise_to_boss
+        text: "เสนอหัวหน้าให้ซ้อมหนีไฟ"
+        outcomes:
+          - {weight: 2, ok: true, text: "หัวหน้ารับเรื่องไปจัดซ้อมจริง คนทั้งตึกรู้ทางหนีและเอ่ยชื่อคุณขอบคุณ", effects: {relations: 2, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ถูกมองว่าเรื่องมาก เลยโดนปล่อยให้เป็นเจ้าภาพคนเดียว", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: buy_extinguisher
+        text: "ซื้อถังดับเพลิงไว้ที่บ้าน"
+        effects: {health: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: ignore_news
+        text: "คิดว่าเรื่องแบบนี้ไม่เกิดกับเรา"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: era_acc_fire_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    era: toy_factory_fire
+    when: {age: [60, 110]}
+    title: "ความทรงจำเรื่องควันไฟ"
+    text: "วันครบรอบเหตุไฟไหม้โรงงาน ทีวีเปิดภาพเทียนที่ตั้งเรียงกัน คุณนึกถึงคนที่เคยรู้จักในวัยหนุ่มสาวที่ทำงานโรงงาน ไม่รู้ว่าวันนั้นพวกเขาไปไหนกัน"
+    choices:
+      - id: light_candle
+        text: "จุดเทียนหน้าบ้านร่วมไว้อาลัย"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: call_old_friend
+        text: "โทรหาเพื่อนเก่าที่เคยทำโรงงาน"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: donate_fund
+        text: "ส่งเงินเข้ากองทุนช่วยครอบครัว"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: dana, level: 1}]
+      - id: stay_silent
+        text: "เปลี่ยนช่องทีวีไปดูอย่างอื่น"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ---------- อาคารถล่ม ----------
+  - id: era_acc_collapse_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: hotel_collapse
+    when: {age: [6, 12], school: [primary, lower]}
+    title: "ตึกสูงล้มทั้งหลัง"
+    text: "ข่าวบอกว่าตึกสูงในเมืองโคราชถล่มลงมาทั้งหลัง ผู้ใหญ่ในบ้านเปิดทีวีดูกันทั้งคืน เช้านี้ครูให้ทุกคนมองเพดานห้องเรียนแล้วถามว่ารู้สึกยังไง"
+    choices:
+      - id: ask_why
+        text: "ถามครูว่าตึกถล่มได้อย่างไร"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: draw_building
+        text: "วาดตึกที่แข็งแรงส่งเข้าประกวด"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: avoid_class
+        text: "ไม่อยากเข้านั่งเรียนชั้นบน"
+        effects: {happiness: -1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: help_classmate
+        text: "นั่งเป็นเพื่อนเพื่อนที่เสียใจ"
+        effects: {relations: 2, happiness: -1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: era_acc_collapse_adult_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: hotel_collapse
+    when: {age: [19, 59]}
+    title: "ตึกหลังนี้ปลอดภัยไหม"
+    text: "ตึกโรงแรมกลางเมืองถล่มลงมาแล้วคนติดอยู่ใต้ซากเป็นร้อย ข่าวบอกว่าต่อเติมเกินแบบ คืนนั้นคุณมองเพดานห้องนอนแล้วอดคิดไม่ได้ว่าตึกที่อยู่ตอนนี้เป็นอย่างไร"
+    choices:
+      - id: check_building
+        text: "ถามเจ้าของตึกเรื่องแบบอาคาร"
+        effects: {knowledge: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: move_low_floor
+        text: "ย้ายไปอยู่ชั้นล่างที่แน่นกว่า"
+        effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: neutral}]
+      - id: volunteer_rescue
+        text: "ไปช่วยยกซากกับทีมกู้ภัย"
+        effects: {health: -1, relations: 2}
+        merit: [{cat: help_others, level: 2}]
+      - id: brush_off
+        text: "ปลอบตัวเองว่าตึกเราไม่เป็นไร"
+        effects: {happiness: 1, health: -1}
+        merit: [{cat: neutral}]
+
+  - id: era_acc_collapse_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    era: hotel_collapse
+    when: {age: [60, 110]}
+    title: "บ้านที่สร้างด้วยมือตัวเอง"
+    text: "ข่าวตึกถล่มที่เมืองใหญ่ทำให้คุณนึกถึงบ้านที่ลงแรงสร้างเองเมื่อสามสิบปีก่อน ทุกเสาตอกเองกับมือ ลูกหลานเริ่มถามว่าควรตรวจบ้านหลังนี้ให้แน่ใจไหม"
+    choices:
+      - id: hire_check
+        text: "จ้างช่างมาตรวจความแข็งแรง"
+        effects: {health: 1, happiness: 1, money: {unit: income_x, amount: -0.15}}
+        merit: [{cat: neutral}]
+      - id: teach_grandchild
+        text: "สอนหลานดูรอยร้าวของบ้าน"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: reinforce_self
+        text: "ลงมือเสริมเสาด้วยตัวเอง"
+        effects: {health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: refuse_fear
+        text: "ยืนยันว่าบ้านนี้ไม่มีวันล้ม"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+
+  # ---------- ฝุ่น PM2.5 ฝั่งอุบัติภัย ----------
+  - id: era_acc_haze_adult_01
+    type: A
+    category: work_money
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: pm25_haze
+    when: {age: [19, 59]}
+    title: "ฝุ่นจากไซต์ก่อสร้างข้างบ้าน"
+    text: "ค่าฝุ่นเมืองพุ่งจนโรงเรียนปิด ชาวบ้านชี้ไปที่ไซต์ก่อสร้างและควันเผาไร่รอบเมืองว่าเป็นต้นเหตุ ผู้รับเหมาบอกว่างานต้องเสร็จตามกำหนด ถ้าหยุดก็เสียทั้งเงินและแรงงาน"
+    choices:
+      - id: wear_mask
+        text: "ใส่หน้ากากกรองฝุ่นทุกครั้ง"
+        effects: {health: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+      - id: sign_petition
+        text: "เซ็นชื่อร้องเรียนไซต์ก่อสร้าง"
+        effects: {relations: 1, happiness: 1, network: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: sprinkle_water
+        text: "ช่วยฉีดน้ำลดฝุ่นหน้าซอย"
+        effects: {health: -1, relations: 2}
+        merit: [{cat: help_others, level: 1}]
+      - id: work_through
+        text: "ทำงานต่อไปตามปกติ ไม่สนใจ"
+        effects: {health: -1, income_mult: 1.05}
+        merit: [{cat: neutral}]

@@ -1,0 +1,55 @@
+# การ์ดบ้านเมือง · กีฬา — เอเชียนเกมส์ ครั้งที่จัดในกรุงเทพฯ — 2 ใบ · ไม่ใส่ค่าเศรษฐกิจ
+events:
+  - id: era_sport_asiad_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: asian_games_bangkok
+    when: {age: [6, 12], school: [primary, lower]}
+    title: "ทีวีทั้งซอยเชียร์นักกีฬา"
+    text: "ทั้งซอยมารวมกันหน้าทีวีเครื่องเดียวเพื่อดูนักกีฬาไทยแข่งในกีฬาระดับทวีป ใครได้เหรียญก็ร้องเฮกันทั้งซอย คุณถือธงกระดาษที่วาดเองยืนเชียร์อยู่หน้าสุด"
+    choices:
+      - id: cheer_loud
+        text: "ตะโกนเชียร์สุดเสียงจนแหบ"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: practice_sport
+        text: "ไปซ้อมกีฬาที่ชอบหน้าบ้านทันที"
+        effects: {health: 2}
+        merit: [{cat: neutral}]
+      - id: draw_medal
+        text: "วาดเหรียญทองแจกเพื่อน"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: sleep_through
+        text: "ผล็อยหลับก่อนแข่งจบ"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: era_sport_asiad_adult_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: asian_games_bangkok
+    when: {age: [19, 59]}
+    title: "เมืองหลวงเป็นเจ้าภาพ"
+    text: "กรุงเทพฯ เป็นเจ้าภาพกีฬาระดับทวีป ถนนมีธงประดับ ผู้คนจากหลายประเทศเดินปะปนกันตามตลาด ที่ทำงานเปิดทีวีให้ดูถ่ายทอดสดตอนพักเที่ยง"
+    choices:
+      - id: buy_ticket
+        text: "ซื้อตั๋วเข้าไปดูในสนามจริง"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: volunteer
+        text: "สมัครเป็นอาสาสมัครช่วยงาน"
+        effects: {relations: 2, knowledge: 1, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: guide_foreigner
+        text: "ช่วยชี้ทางนักท่องเที่ยวต่างชาติ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: watch_tv
+        text: "ดูผ่านทีวีที่บ้านกับครอบครัว"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
