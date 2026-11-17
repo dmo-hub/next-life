@@ -227,13 +227,13 @@ events:
         text: "เข้าสถานสงเคราะห์ของรัฐ"
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {network: 1.3}}, text: "เจอเพื่อนรุ่นเดียวกันเพียบ ตั้งวงหมากรุกทุกบ่าย", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ห้องรวมเสียงดังทั้งคืน นอนไม่หลับจนทรุด", effects: {health: -2, happiness: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 1, text: "ห้องรวมเสียงดังทั้งคืน นอนไม่หลับจนทรุด", effects: {health: -2, happiness: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: stay_home
         text: "ยืนกรานอยู่บ้านตัวเอง"
         outcomes:
           - {weight: 2, ok: true, text: "ญาติกับเพื่อนบ้านผลัดกันแวะมาดู บ้านกลับมาคึกคัก", effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}], multipliers: {stats: {relations: 2}}}
-          - {weight: 1, text: "ลื่นล้มในห้องน้ำตอนอยู่คนเดียว นอนรอจนเช้ากว่าจะมีคนเห็น", effects: {health: -3, happiness: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 1, text: "ลื่นล้มในห้องน้ำตอนอยู่คนเดียว นอนรอจนเช้ากว่าจะมีคนเห็น", effects: {health: -3, happiness: -1, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: share_house
         text: "ชวนเพื่อนแก่มาอยู่ด้วยกัน"

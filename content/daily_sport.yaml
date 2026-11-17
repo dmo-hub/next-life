@@ -506,8 +506,8 @@ events:
       - id: join_line
         text: "เข้าแถวลองวันแรก"
         outcomes:
-          - {weight: 2, ok: true, text: "เมื่อยขาที่ไม่เคยรู้ว่ามี เดือนต่อมาคุณตื่นก่อนนาฬิกาเพื่อมาให้ทันแถว", effects: {health: 2, network: 1, happiness: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
-          - {weight: 1, text: "ทำผิดข้างตลอดเพลง เมื่อยจนเดินกลับบ้านไม่ไหว ป้าแถวหลังบอกว่าปีแรกทุกคนเป็นแบบนี้", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 2, ok: true, text: "เมื่อยขาที่ไม่เคยรู้ว่ามี เดือนต่อมาคุณตื่นก่อนนาฬิกาเพื่อมาให้ทันแถว", effects: {health: 2, network: 1, happiness: 1}, sets_flags: [sporty], merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 1, text: "ทำผิดข้างตลอดเพลง เมื่อยจนเดินกลับบ้านไม่ไหว ป้าแถวหลังบอกว่าปีแรกทุกคนเป็นแบบนี้", effects: {health: -1, relations: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: solo_tree
         text: "ฝึกคนเดียวหลังต้นไม้"

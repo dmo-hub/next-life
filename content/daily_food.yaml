@@ -316,7 +316,7 @@ events:
         text: "เอาครบทุกอย่างเหมือนสมัยก่อน"
         outcomes:
           - {weight: 1, ok: true, text: "รสยังเหมือนเดิมทุกคำ นั่งยิ้มกับถ้วยเปล่าอยู่จนรถเข็นไปพ้นซอย", effects: {happiness: 2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "อร่อยได้สามคำ ฟันเสียวจนต้องอมน้ำอุ่นทั้งบ่าย", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 1, text: "อร่อยได้สามคำ ฟันเสียวจนต้องอมน้ำอุ่นทั้งบ่าย", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: one_scoop
         text: "ขอลูกเดียวใส่ขนมปังพอ"

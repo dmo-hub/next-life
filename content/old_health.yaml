@@ -83,8 +83,8 @@ events:
       - id: hip_replace
         text: "ผ่าตัดเปลี่ยนข้อสะโพกเทียม"
         outcomes:
-          - {weight: 3, ok: true, text: "ข้อใหม่ดีกว่าข้อเก่า สามเดือนต่อมาเดินตลาดได้เอง", multipliers: {stats: {health: 2}}, effects: {health: 1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "แผลติดเชื้อ ต้องนอนโรงพยาบาลอีกเป็นเดือน", effects: {health: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 3, ok: true, text: "ข้อใหม่ดีกว่าข้อเก่า สามเดือนต่อมาเดินตลาดได้เอง", multipliers: {stats: {health: 2}}, effects: {health: 1, money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 1, text: "แผลติดเชื้อ ต้องนอนโรงพยาบาลอีกเป็นเดือน", effects: {health: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: bed_rest
         text: "ไม่ผ่า นอนพักบนเตียงเอา"
@@ -93,15 +93,15 @@ events:
       - id: folk_healer
         text: "ไปหมอกระดูกพื้นบ้านต่างจังหวัด"
         outcomes:
-          - {weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "เข้าเฝือกไม้ไผ่กับยาพอกสมุนไพร กระดูกติดเองแบบหมอยังงง", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "กระดูกติดเบี้ยว เดินกะเผลกไปตลอด", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "เข้าเฝือกไม้ไผ่กับยาพอกสมุนไพร กระดูกติดเองแบบหมอยังงง", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 2, text: "กระดูกติดเบี้ยว เดินกะเผลกไปตลอด", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: rebuild_home
         text: "ผ่าตัดแล้วรื้อบ้านติดราวจับ"
         requires: {money: {unit: income_x, amount: 2}, reason: "เงินเก็บไม่พอรื้อบ้าน"}
         outcomes:
-          - {weight: 3, ok: true, multipliers: {stats: {health: 1.3}}, text: "ข้อใหม่บวกราวจับทั้งบ้าน ไม่ล้มอีกเลย ลูกหลานแวะมาช่วยต่อเติมทุกเสาร์", effects: {health: 2, relations: 1, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "แผลติดเชื้อ ราวจับติดเสร็จแต่ยังลุกไม่ไหว เงินหมดไปสองก้อน", effects: {health: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 3, ok: true, multipliers: {stats: {health: 1.3}}, text: "ข้อใหม่บวกราวจับทั้งบ้าน ไม่ล้มอีกเลย ลูกหลานแวะมาช่วยต่อเติมทุกเสาร์", effects: {health: 2, relations: 1, money: {unit: income_x, amount: -2}, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 1, text: "แผลติดเชื้อ ราวจับติดเสร็จแต่ยังลุกไม่ไหว เงินหมดไปสองก้อน", effects: {health: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   - id: oldh_cancer_01
@@ -162,14 +162,14 @@ events:
       - id: home_pd
         text: "ล้างไตทางหน้าท้องเองที่บ้าน"
         outcomes:
-          - {weight: 3, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "คล่องมือในเดือนเดียว ยังได้นั่งขายของหน้าบ้านเหมือนเดิม", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ติดเชื้อในช่องท้อง นอนไอซียูหลายคืน", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 3, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "คล่องมือในเดือนเดียว ยังได้นั่งขายของหน้าบ้านเหมือนเดิม", effects: {health: 1, happiness: 1}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 1, text: "ติดเชื้อในช่องท้อง นอนไอซียูหลายคืน", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: child_kidney
         text: "หลานคนเล็กขอบริจาคไตให้"
         outcomes:
-          - {weight: 2, ok: true, text: "ไตหลานเข้ากันได้ ผ่าตัดเสร็จ สองคนนอนเตียงติดกันหัวเราะทั้งคืน", multipliers: {karma: 1.4}, effects: {health: 3, relations: 3, chronic: {health: 1}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ผลเลือดไม่เข้ากัน แต่น้ำตาวันนั้นทำให้บ้านคืนดีกันหมด", effects: {health: -1, relations: 2}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 2, ok: true, text: "ไตหลานเข้ากันได้ ผ่าตัดเสร็จ สองคนนอนเตียงติดกันหัวเราะทั้งคืน", multipliers: {karma: 1.4}, effects: {health: 3, relations: 3, chronic: {health: 1}}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 1, text: "ผลเลือดไม่เข้ากัน แต่น้ำตาวันนั้นทำให้บ้านคืนดีกันหมด", effects: {health: -1, relations: 2}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: refuse
         text: "ไม่ฟอก ไม่ผ่า ขอกินของอร่อย"

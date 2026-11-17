@@ -58,7 +58,7 @@ events:
       - id: party
         text: "เล่นน้ำกับเพื่อน ตั้งวงจนเช้า"
         outcomes:
-          - {weight: 2, ok: true, text: "สนุกจนเสียงแหบ เพื่อนในแผนกสนิทกันขึ้นอีกหลายคน", effects: {happiness: 2, network: 1}, merit: [{cat: intoxicants, level: 1}]}
+          - {next: after_fest_work_01, weight: 2, ok: true, text: "สนุกจนเสียงแหบ เพื่อนในแผนกสนิทกันขึ้นอีกหลายคน", effects: {happiness: 2, network: 1}, merit: [{cat: intoxicants, level: 1}]}
           - {weight: 1, text: "ขากลับรถเพื่อนเฉี่ยวมอเตอร์ไซค์ ไม่มีใครเจ็บหนักแต่ค่าซ่อมหารกันหลายคน", effects: {happiness: -1, health: -1, money: {unit: income_x, amount: -0.15}}, merit: [{cat: intoxicants, level: 1}]}
         merit: [{cat: intoxicants, level: 1}]
       - id: shift
