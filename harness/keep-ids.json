@@ -1,5 +1,5 @@
 {
- "version": "v0.6.129",
+ "version": "v0.6.130",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -1259,6 +1259,7 @@
   "inmate_elder_return_01",
   "overlap_rumor_01",
   "overlap_hunter_recruit_01",
+  "overlap_ghost_01",
   "pageant_school_01",
   "pageant_fair_01",
   "pageant_temple_01",
@@ -1591,6 +1592,7 @@
  "storage": [
   "next-life-book-v1",
   "next-life-deaths-v1",
+  "next-life-dlc-v1",
   "next-life-me-help-v1",
   "next-life-memorial-seen-v1",
   "next-life-memorial-v1",
