@@ -5530,6 +5530,8 @@ function lockReason(st, c, extra = 0) {
     if (b.max !== undefined && st[k] > b.max) why.push(['stats', `${STAT_LABELS[k]}มากเกินไป`]);
   }
   if (q.flags && !flagsOk(st, q.flags)) why.push(['flags', 'ยังไม่เข้าเงื่อนไข']);
+  // ผังตระกูลมีรุ่นต่างโลก หรือชาตินี้เคยไปแล้วกลับบ้าน (world-overlap 22 · ข้อ 83) — ตัวเดียวกับที่ส่งค่าซ้อนทับเข้าต่างโลก
+  if (q.isekai_lineage && !overlapLeftIsekai(st)) why.push(['isekai_lineage', 'ยังไม่มีใครในสายเลือดเคยข้ามไปต่างโลก']);
   if (q.edu && eduRank(st.edu) < eduRank(q.edu)) why.push(['edu', 'วุฒิไม่ถึง']);
   if (q.family && !q.family.every((f) => familyOk(st, f))) why.push(['family', familyWhy(q.family)]);
   if (!why.length) return null;
