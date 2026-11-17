@@ -39,7 +39,7 @@ const KEYS = {
   multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'home_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
-  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'reason', 'reasons'],
+  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'isekai_lineage', 'reason', 'reasons'],
   belief: ['kind', 'tradition', 'outside_canon', 'vow', 'trigger', 'cap_per_life', 'prize_table', 'stake', 'odds_modifier'],
   vow: ['deadline_years', 'due_event', 'redeem_full_cost', 'redeem_light_cost', 'defer_once'],
   trigger: ['money_state'],
@@ -572,26 +572,29 @@ export const rules = [
   },
   {
     id: 'choice-lock',
-    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, sex?, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), nature?: id นิสัย (เหตุผลแกนเขียนเอง), reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
+    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, sex?, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), nature?: id นิสัย (เหตุผลแกนเขียนเอง), isekai_lineage?: true (ผังตระกูลมีรุ่นต่างโลก หรือชาตินี้เคยกลับจากต่างโลก), reason?} · ล็อกด้วยธง/isekai_lineage ต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
     event(e, ctx, r) {
       const cs = choicesOf(e);
       for (const { c, path } of cs) {
         const q = c.requires;
         if (q === undefined) continue;
         const at = `${path}.requires`;
-        if (!isObj(q) || !['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags edu family age หรือ nature อย่างน้อยหนึ่งอย่าง'); continue; }
+        if (!isObj(q) || !['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'isekai_lineage'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags edu family age nature หรือ isekai_lineage อย่างน้อยหนึ่งอย่าง'); continue; }
         // อายุตามกฎหมาย (เช่น พินัยกรรม 15 ปีขึ้นไป) — แกนเขียนเหตุผล "อายุยังไม่ถึง N ปี" เอง
         if (q.age !== undefined && !(isObj(q.age) && (q.age.min !== undefined || q.age.max !== undefined) && [q.age.min, q.age.max].every((v) => v === undefined || (Number.isInteger(v) && v >= 0 && v <= 120)))) r(`${at}.age`, 'ต้องเป็น {min, max} จำนวนเต็ม 0–120');
         // ตัวเลือกที่พูดถึงคนในบ้านล็อกได้เมื่อไม่มีคนนั้น (เงื่อนไขชุดเดียวกับ when.family)
         if (q.family !== undefined && !(Array.isArray(q.family) && q.family.length && q.family.every((f) => isObj(f) && FAMILY_ROLES.includes(f.role) && (f.alive === undefined || typeof f.alive === 'boolean') && (f.sex === undefined || SEXES.includes(f.sex)) && (f.age === undefined || isRange(f.age, 0, 120)) && (f.count === undefined || isRange(f.count, 0, 20)) && f.health === undefined && f.relations === undefined))) r(`${at}.family`, `ต้องเป็น [{role: parent|spouse|child|grandchild, sex?: ${SEXES.join('|')}, alive?: true/false, age?: [จาก, ถึง], count?: [จาก, ถึง]}]`);
         if (q.money !== undefined && !(isMoney(q.money) && q.money.amount > 0)) r(`${at}.money`, 'ต้องเป็นเงินมีหน่วย amount > 0');
         if (q.stats !== undefined && (!isObj(q.stats) || Object.entries(q.stats).some(([k, b]) => !STAT_KEYS.includes(k) || !bound(b) || (b.min === undefined && b.max === undefined)))) r(`${at}.stats`, 'ต้องเป็น {ค่าสถานะ: {min, max}} 0–100');
+        // ล็อกตามผังตระกูลมีรุ่นต่างโลก (world-overlap 22) — เป็น true เท่านั้น · ธงเป็นภาษาโค้ดเหมือน flags ผู้เล่นต้องอ่านเหตุเป็นคำ
+        if (q.isekai_lineage !== undefined && q.isekai_lineage !== true) r(`${at}.isekai_lineage`, 'isekai_lineage ต้องเป็น true');
+        if (q.isekai_lineage === true && !(typeof q.reason === 'string' && q.reason.trim()) && !(typeof q.reasons?.isekai_lineage === 'string' && q.reasons.isekai_lineage.trim())) r(`${at}.reason`, 'ล็อกด้วย isekai_lineage ต้องมี reason ที่ผู้เล่นอ่านเข้าใจ');
         if (q.flags !== undefined && (!isObj(q.flags) || ['has', 'not'].some((k) => q.flags[k] !== undefined && !Array.isArray(q.flags[k])))) r(`${at}.flags`, 'flags ต้องเป็น {has: [...], not: [...]}');
         // ชื่อธงเป็นภาษาโค้ด ผู้เล่นอ่านไม่ออก — ต้องบอกเหตุผลเป็นคำ
         // B1: เหตุแยกข้อ reasons.flags ใช้แทน reason ได้
         if (q.flags !== undefined && !(typeof q.reason === 'string' && q.reason.trim()) && !(typeof q.reasons?.flags === 'string' && q.reasons.flags.trim())) r(`${at}.reason`, 'ล็อกด้วยธงต้องมี reason ที่ผู้เล่นอ่านเข้าใจ');
         // B1 requires.reasons = {ข้อ: เหตุ} · ข้อต้องเป็นเงื่อนไขที่มีจริงใน requires นี้ · เหตุเป็นข้อความ
-        if (q.reasons !== undefined && !(isObj(q.reasons) && Object.entries(q.reasons).every(([k, v]) => ['money', 'stats', 'flags', 'edu', 'family'].includes(k) && q[k] !== undefined && typeof v === 'string' && v.trim()))) r(`${at}.reasons`, 'reasons ต้องเป็น {money|stats|flags|edu|family: ข้อความ} ของข้อที่มีใน requires');
+        if (q.reasons !== undefined && !(isObj(q.reasons) && Object.entries(q.reasons).every(([k, v]) => ['money', 'stats', 'flags', 'edu', 'family', 'isekai_lineage'].includes(k) && q[k] !== undefined && typeof v === 'string' && v.trim()))) r(`${at}.reasons`, 'reasons ต้องเป็น {money|stats|flags|edu|family|isekai_lineage: ข้อความ} ของข้อที่มีใน requires');
         if (q.reason !== undefined && !(typeof q.reason === 'string' && q.reason.trim())) r(`${at}.reason`, 'reason ต้องเป็นข้อความ');
       }
       if (cs.length && cs.every(({ c }) => c.requires !== undefined)) r('.choices', 'ทุกตัวเลือกล็อกได้ — ต้องมีตัวเลือกที่ไม่มี requires อย่างน้อย 1 ตัว ไม่งั้นการ์ดค้าง');

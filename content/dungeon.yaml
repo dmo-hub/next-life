@@ -42,6 +42,12 @@ events:
         requires: {flags: {has: [dungeon_pulled]}, reason: "ต้องเคยรอดจากเกตถึงรู้ทางหลบ"}
         effects: {relations: 1}
         merit: [{cat: help_others, level: 1}]
+      - id: remembered
+        text: "ใช้สิ่งที่จำได้จากอีกฟากของเกต"
+        requires: {isekai_lineage: true, reason: "ต้องมีคนในสายเลือดเคยไปต่างโลก"}
+        result: "คุณนึกถึงเรื่องเล่าของคนที่เคยข้ามไป เรื่องแสงสีม่วงกับเสียงลมที่ดังก่อนเกตปิด แล้วเดินถอยไปยืนในจุดที่เรื่องเล่าบอกว่าปลอดภัย เกตปิดลงโดยไม่มีใครบาดเจ็บ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
 
   - id: overlap_dungeon_02
     type: A

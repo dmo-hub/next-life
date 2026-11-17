@@ -220,6 +220,7 @@ function locks(q, L) {
   if (q.edu) out.push(`จบ${esc(Array.isArray(q.edu) ? q.edu.join(' หรือ ') : q.edu)}`);
   for (const f of q.family ?? []) out.push(famCond(f));
   if (q.nature) out.push(`เป็นคน${esc(L.nature(q.nature))}`);
+  if (q.isekai_lineage) out.push('ผังตระกูลมีรุ่นต่างโลก หรือชาตินี้เคยข้ามไปแล้วกลับบ้าน');
   out.push(...flagCond(q.flags, L));
   const own = Object.entries(q.reasons ?? {}).map(([k, t]) => `ไม่ผ่าน${esc(k)}จอบอก "${esc(t)}"`).join(' · ');
   return [`เลือกได้เมื่อ ${out.join(' · ')}${q.reason ? ` · ไม่ผ่านจอบอก "${esc(q.reason)}"` : ''}${own ? ` · ${own}` : ''}`];
