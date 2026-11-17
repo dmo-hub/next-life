@@ -14350,6 +14350,13 @@ function morePanel() {
     unblockSheet();
     dayNew();
   };
+  // ท้ายหน้าซ่อนเมื่อมีราวเมนู — เครื่องใหม่ที่ยังไม่มีเซฟเข้าชีวิตแรกพร้อมราวทันที ทางเปิดไฟล์เซฟจึงต้องอยู่ในแผงนี้ด้วย
+  const backup = el('button', null, 'สำรองเซฟ');
+  backup.type = 'button';
+  backup.onclick = () => {
+    unblockSheet();
+    backupOpen();
+  };
   const link = (text, href) => Object.assign(el('a', null, text), { href });
   // อัปเดตล่าสุด: เปลี่ยนเนื้อแผงเดิมเป็นรายการรุ่นนี้ ปุ่มกลับไปการ์ดยังใช้ปิดได้เหมือนเดิม
   const news = el('button', null, NOTES_TITLE);
@@ -14363,7 +14370,7 @@ function morePanel() {
     notesMark();
     sheet?.querySelector('.sheet-x')?.focus();
   };
-  for (const x of [day, news, link('คู่มือ', 'guide.html'), link('กลไกในเกม', 'guide.html#core'), link('หน้าแรก', 'index.html')]) {
+  for (const x of [day, backup, news, link('คู่มือ', 'guide.html'), link('กลไกในเกม', 'guide.html#core'), link('หน้าแรก', 'index.html')]) {
     const li = el('li');
     li.append(x);
     ul.append(li);
@@ -15039,11 +15046,22 @@ function saveWrite(card) {
     localStorage.setItem(SNAP_KEY, snapHide(JSON.stringify({ v: APP_VERSION, snap: snapshot({ st, af, card, ui: uiState() }, CONTENT) })));
     localStorage.removeItem(SAVE_KEY);
     savedMark(true);
+    askPersist();
   } catch {
     // เขียนไม่ลงแต่เซฟเก่ายังอยู่ = รีเฟรชแล้วย้อนไปจุดเก่าโดยไม่รู้ตัว — ลบทิ้งดีกว่า
     saveClear();
     savedMark(false);
   }
+}
+// Safari ลบ localStorage ของเว็บที่ไม่ได้เปิดราว 7 วัน — ขอสิทธิ์เก็บถาวรหลังเซฟลงจริงครั้งแรกของการเปิดหน้า (มีของให้เสียแล้ว)
+// เบราว์เซอร์ตัดสินเอง ได้หรือไม่ได้เกมเล่นต่อเหมือนเดิม · ทางกู้ที่แน่นอนคือไฟล์สำรองเซฟท้ายหน้า
+let persistAsked = false;
+function askPersist() {
+  if (persistAsked) return;
+  persistAsked = true;
+  const s = navigator.storage;
+  if (!s?.persist || !s.persisted) return;
+  s.persisted().then((ok) => ok || s.persist()).catch(() => {});
 }
 function savedMark(ok) {
   const m = document.getElementById('saved');
@@ -15321,6 +15339,109 @@ function dayNew() {
 document.getElementById('dayLink')?.addEventListener('click', (e) => {
   e.preventDefault();
   dayNew();
+});
+
+// สำรองเซฟ: ทุก key ของเกมรวมในไฟล์เดียว — localStorage หายได้ (Safari ล้างเว็บที่ไม่ได้เปิด · ล้างข้อมูลเบราว์เซอร์ · ย้ายเครื่อง)
+// จับทุก key ที่ขึ้นต้นด้วย prefix แทนรายชื่อ key — key ใหม่ในอนาคตติดไฟล์ไปเองไม่ต้องจำมาเติม
+const BACKUP_PREFIX = 'next-life-';
+const BACKUP_KIND = 'next-life-backup';
+function backupKeys() {
+  const keys = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k?.startsWith(BACKUP_PREFIX)) keys[k] = localStorage.getItem(k);
+  }
+  return keys;
+}
+// ไฟล์มาจากนอกเครื่อง: รับเฉพาะรูปที่เกมเขียนเอง — key ของเกม ค่าเป็นสตริง · ผิดรูปแม้ช่องเดียว = ไม่รับทั้งไฟล์
+function backupParse(text) {
+  try {
+    const d = JSON.parse(text);
+    if (d?.kind !== BACKUP_KIND || !d.keys || typeof d.keys !== 'object' || Array.isArray(d.keys)) return null;
+    const ks = Object.entries(d.keys);
+    if (!ks.length || ks.some(([k, v]) => !k.startsWith(BACKUP_PREFIX) || typeof v !== 'string')) return null;
+    return { at: typeof d.at === 'string' ? d.at : null, keys: d.keys };
+  } catch {
+    return null;
+  }
+}
+// เขียนไม่ครบ (ที่เก็บเต็มกลางทาง) = คืนของเดิมทั้งชุด ไม่ทิ้งเซฟครึ่งไฟล์ครึ่งเครื่อง
+function backupApply(keys) {
+  const old = backupKeys();
+  const wipe = () => Object.keys(backupKeys()).forEach((k) => localStorage.removeItem(k));
+  try {
+    wipe();
+    for (const [k, v] of Object.entries(keys)) localStorage.setItem(k, v);
+    return true;
+  } catch {
+    try {
+      wipe();
+      for (const [k, v] of Object.entries(old)) localStorage.setItem(k, v);
+    } catch {
+      // คืนไม่ได้เพราะที่เก็บใช้ไม่ได้ทั้งเครื่อง — ไม่มีอะไรให้คืน
+    }
+    return false;
+  }
+}
+// ทุกการ์ดในทางสำรองเซฟติดป้ายไว้ กดลิงก์ท้ายหน้าซ้ำระหว่างทางจะไม่จำการ์ดสำรองเป็นจอที่ต้องกลับไป
+function backupCard(title, lines) {
+  const choices = homeCard(title, lines);
+  choices.parentElement.classList.add('backup-view');
+  return choices;
+}
+function backupDownload() {
+  const d = new Date();
+  const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const body = JSON.stringify({ kind: BACKUP_KIND, v: APP_VERSION, at: d.toISOString(), keys: backupKeys() });
+  downloadBlob(new Blob([body], { type: 'application/json' }), `next-life-save-${day}.json`);
+}
+function backupPick(back) {
+  const input = el('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = async () => {
+    const f = input.files?.[0];
+    if (!f) return;
+    const data = backupParse(await f.text().catch(() => ''));
+    if (!data) {
+      const choices = backupCard('สำรองเซฟ', ['เปิดไฟล์นี้ไม่ได้', 'ไฟล์นี้ไม่ใช่ไฟล์เซฟของเกม หรือไฟล์เสีย · เซฟในเครื่องนี้ยังอยู่ครบ']);
+      choices.append(button('กลับ', null, back));
+      return;
+    }
+    const when = data.at && !Number.isNaN(Date.parse(data.at)) ? ` (บันทึกเมื่อ ${new Date(data.at).toLocaleDateString('th-TH', { dateStyle: 'long' })})` : '';
+    const choices = backupCard('เปิดไฟล์เซฟ', [`แทนที่เซฟด้วยไฟล์นี้${when}?`, 'ตระกูลที่ค้างและสมุดทุกเล่มในเครื่องนี้จะถูกแทนที่ด้วยของในไฟล์ทั้งหมด กู้คืนไม่ได้ · สำรองของเดิมก่อนถ้ายังอยากเก็บ']);
+    choices.append(
+      button('แทนที่ด้วยไฟล์นี้', null, () => {
+        if (backupApply(data.keys)) return location.reload();
+        const c = backupCard('สำรองเซฟ', ['เขียนเซฟไม่ลง', 'เครื่องนี้ไม่ให้เก็บข้อมูล (โหมดส่วนตัวหรือที่เก็บเต็ม) · เซฟเดิมยังอยู่']);
+        c.append(button('กลับ', null, back));
+      }),
+      button('ยกเลิก', null, back),
+    );
+  };
+  input.click();
+}
+function backupOpen() {
+  const prev = [...root.childNodes];
+  const back = () => root.replaceChildren(...prev);
+  let has = false;
+  let ok = true;
+  try {
+    has = Object.keys(backupKeys()).length > 0;
+  } catch {
+    ok = false;
+  }
+  const lines = !ok
+    ? ['สำรองเซฟไม่ได้', 'เครื่องนี้ไม่ให้เก็บข้อมูล (โหมดส่วนตัวหรือที่เก็บเต็ม)']
+    : ['เก็บเซฟไว้นอกเบราว์เซอร์', has ? 'ตระกูลที่เล่นค้างและสมุดทุกเล่มในชั้นสมุดอยู่ในไฟล์เดียว · ใช้ย้ายเครื่อง หรือกู้คืนเมื่อเบราว์เซอร์ล้างข้อมูล' : 'ยังไม่มีเซฟในเครื่องนี้ · เปิดไฟล์เซฟที่สำรองไว้จากเครื่องอื่นได้'];
+  const choices = backupCard('สำรองเซฟ', lines);
+  if (ok && has) choices.append(button('บันทึกไฟล์เซฟ', null, backupDownload));
+  if (ok) choices.append(button('เปิดไฟล์เซฟ', null, () => backupPick(back)));
+  choices.append(button('กลับ', null, back));
+}
+document.getElementById('backupLink')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (!root.querySelector('.backup-view')) backupOpen();
 });
 shelfDot();
 // เพดานความสูงการ์ด (B116) หักหัวเว็บ — ชื่อเกมตัดสองบรรทัดบนจอแคบ หัวจึงสูงไม่ตายตัว วัดจริงแทนเดาค่าเดียว · 20 = ระยะบนของ #app
