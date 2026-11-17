@@ -96,7 +96,7 @@
   { "id": "mobile_phone_boom", "from": 2533, "to": 2533, "name": "โทรศัพท์มือถือเริ่มแพร่หลาย", "kind": "city",
     "source": "https://en.wikipedia.org/wiki/Advanced_Info_Service",
     "facts": [
-     { "label": "อายุสัมปทานของผู้ให้บริการรายใหญ่", "v": 20, "unit": "ปี", "weak": true, "source": "https://en.wikipedia.org/wiki/Advanced_Info_Service" }
+     { "label": "อายุสัมปทานแรกเริ่มของผู้ให้บริการรายใหญ่ (ต่อมาขยายเป็น 25 ปี)", "v": 20, "unit": "ปี", "weak": true, "source": "https://en.wikipedia.org/wiki/Advanced_Info_Service" }
     ] },
   { "id": "internet_commercial", "from": 2538, "to": 2538, "name": "อินเทอร์เน็ตเชิงพาณิชย์เริ่มให้บริการ", "kind": "city",
     "source": "https://nsrc.org/sites/default/files/archives/case-studies//TH-history.pdf",

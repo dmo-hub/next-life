@@ -33,13 +33,13 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     era: asian_games_bangkok
-    when: {age: [19, 59]}
+    when: {age: [19, 59], region: [กรุงเทพฯ และปริมณฑล]}
     title: "เมืองหลวงเป็นเจ้าภาพ"
     text: "กรุงเทพฯ เป็นเจ้าภาพกีฬาระดับทวีป ถนนมีธงประดับ ผู้คนจากหลายประเทศเดินปะปนกันตามตลาด ที่ทำงานเปิดทีวีให้ดูถ่ายทอดสดตอนพักเที่ยง"
     choices:
       - id: buy_ticket
         text: "ซื้อตั๋วเข้าไปดูในสนามจริง"
-        effects: {happiness: 2, relations: 1}
+        effects: {happiness: 2, relations: 1, money: {unit: income_x, amount: -0.05}}
         merit: [{cat: neutral}]
       - id: volunteer
         text: "สมัครเป็นอาสาสมัครช่วยงาน"
