@@ -129,6 +129,60 @@ const stayer = (bot) => Object.assign((card, rng, h) => {
   return bot(card, rng, h);
 }, bot);
 
+// --real: บอทอัตราจริง (ใบ 16 · decisions 43 ขยาย) — BOTS 6 บุคลิกตามโค้ดเดิมตรงตัว: ปฏิเสธการ์ดชวนเสมอ · ข้ามโลกได้เฉพาะการ์ดทางเกิดที่บอทเลือกเอง
+// ไม่ห่อ crosser/stayer ไม่บังคับ path ⇒ ตัวเลขนี้คืออัตราที่บุคลิกเดิมข้ามจริง · ไม่รันด่านอื่นของไฟล์นี้
+// รุ่น = ชาติไทยต่อเนื่องของตระกูลเดียว (ชาติต่างโลกไม่นับรุ่น) · ค่ากลางคิดเฉพาะเซฟที่ค่า ≥ 1 ณ รุ่นนั้น (decisions 40)
+if (args.includes('--real')) {
+  const { OVERLAP_STAGE_MIN } = await import('../src/engine/life.mjs');
+  const TARGET = { 2: 4, 3: 8, 4: 15 };
+  const med = (xs) => {
+    const s = [...xs].sort((a, b) => a - b);
+    return s.length ? (s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2) : null;
+  };
+  const t0 = Date.now();
+  const all = Array.from({ length: gens }, () => []);
+  const byBot = {};
+  for (const [name, base] of Object.entries(BOTS)) {
+    const per = (byBot[name] = Array.from({ length: gens }, () => []));
+    for (let i = 0; i < n; i++) {
+      let st = null;
+      for (let g = 0; g < gens; g++) {
+        const { state } = playLife(mixSeed(seed, i * 7919 + g), content, base, undefined, st ?? undefined);
+        per[g].push(overlapOf(state));
+        all[g].push(overlapOf(state));
+        if (g === gens - 1) break;
+        st = nextLife(playAfterlife(state, base));
+      }
+    }
+  }
+  const row = (vs) => {
+    const x = vs.filter((v) => v > 0);
+    return { crossed: x.length, total: vs.length, med: med(x), max: x.length ? Math.max(...x) : 0 };
+  };
+  const reach = (rowsByGen, v) => {
+    const g = rowsByGen.findIndex((r) => r.med !== null && r.med >= v);
+    return g < 0 ? null : g + 1;
+  };
+  console.log(`ด่าน overlap --real · บอทอัตราจริง ${Object.keys(BOTS).join(' · ')} × ${n} ตระกูล × ${gens} รุ่น · seed ${seed} · ${((Date.now() - t0) / 1000).toFixed(0)} วิ\n`);
+  const allRows = all.map(row);
+  console.log('รุ่น  ข้ามแล้ว/ทั้งหมด   ค่ากลาง(เฉพาะที่ข้าม)  สูงสุด');
+  allRows.forEach((r, g) => console.log(`${String(g + 1).padStart(3)}  ${String(r.crossed).padStart(5)}/${String(r.total).padEnd(6)}  ${String(r.med ?? '-').padStart(14)}  ${String(r.max).padStart(8)}`));
+  console.log('\nต่อบอท — ค่ากลางเฉพาะที่ข้ามต่อรุ่น (ข้าม/ทั้งหมด ที่รุ่นสุดท้าย):');
+  for (const [name, per] of Object.entries(byBot)) {
+    const rs = per.map(row);
+    console.log(`  ${name}: ${rs.map((r) => r.med ?? '-').join(' ')} (${rs[gens - 1].crossed}/${rs[gens - 1].total})`);
+  }
+  console.log(`\nเกณฑ์ขั้นปัจจุบัน [${OVERLAP_STAGE_MIN.map(String).join(',')}] · เป้ารุ่นที่ถึงขั้น 2/3/4 = 4/8/15 (±1)`);
+  const bad = [];
+  for (const [s, tg] of Object.entries(TARGET)) {
+    const min = OVERLAP_STAGE_MIN[s];
+    const got = Number.isFinite(min) ? reach(allRows, min) : null;
+    console.log(`  ขั้น ${s}: เกณฑ์ ${min} → ถึงรุ่น ${got ?? 'ไม่ถึง'} (เป้า ${tg}) · ค่ากลางที่รุ่นเป้า = ${allRows[tg - 1]?.med ?? '-'}`);
+    if (Number.isFinite(min) && (got === null || Math.abs(got - tg) > 1)) bad.push(`ขั้น ${s}: ถึงรุ่น ${got ?? 'ไม่ถึง'} เป้า ${tg} ±1`);
+  }
+  if (bad.length) console.log(`\nตก: ${bad.join(' · ')}`);
+  process.exit(bad.length ? 1 : 0);
+}
 const started = Date.now();
 const rows = [];
 const fails = [];
