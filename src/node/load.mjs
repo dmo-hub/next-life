@@ -407,8 +407,7 @@ const loadHeir = () => parse(read('content/rules/flags.yaml')).heir ?? {};
 // หมวด home: ของทะเบียนธง = ธงบ้านเกิด (ใบ 105) — แกนอ่านตอนสุ่มเกิด/เล่าที่การ์ดเกิด
 const loadHome = () => parse(read('content/rules/flags.yaml')).home ?? {};
 
-// คำใบ้ที่ศาลตอนเฉียดตาย (B153) ระดับละหลายข้อความ — ไม่ใช่การ์ด จึงตรวจตอนโหลดแทนด่านเนื้อหา
-// ห้ามเลขคู่คำบุญ/บาป (กติกาเดียวกับด่านการ์ดไม่เผยบัญชีของ harness)
+// ปุ่มปฏิกิริยาการ์ดผล ไม่ใช่การ์ด จึงตรวจตอนโหลดแทนด่านเนื้อหา
 export const REACT_COUNT = 4;
 const REACT_MAX = 32;
 export function loadResultReacts(p = 'content/rules/result-reacts.yaml') {
@@ -423,6 +422,8 @@ export function loadResultReacts(p = 'content/rules/result-reacts.yaml') {
   return doc;
 }
 
+// คำใบ้ที่ศาลตอนเฉียดตาย (B153) ระดับละหลายข้อความ — ไม่ใช่การ์ด จึงตรวจตอนโหลดแทนด่านเนื้อหา
+// ห้ามเลขคู่คำบุญ/บาป (กติกาเดียวกับด่านการ์ดไม่เผยบัญชีของ harness)
 export function loadNearHints(p = 'content/rules/near-hints.yaml') {
   const doc = parse(read(p));
   const ids = NEAR_HINT_LEVELS.map((l) => l.id);
