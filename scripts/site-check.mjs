@@ -25,7 +25,7 @@ import { cardGroupCounts, cardGroupRows } from '../src/site/catalog.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, injectDevNav, DEV_TABS, MOVED_MARK, movedHtml, DEV_MAPS, DEV_MAPS_PAGE, mapsMoved } from '../src/site/nav.mjs';
 import { uiPage, designMoved, cssVars, UI_PAGE, UI_MOVED_FROM } from '../src/site/ui.mjs';
-import { soonCats, soonId, soonItems, roadmapHtml, dropDone, soonTicketProblems, DONE_FILE, TICKET_ID, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
+import { soonCats, soonId, soonItems, roadmapHtml, dropDone, soonTicketProblems, DONE_FILE, TICKET_ID, ROAD_START, ROAD_END, PLAN_ID, PLAN_FROM, planPart, planProblems } from '../src/site/roadmap.mjs';
 import { sceneArt, ART_SCENE_IDS, catArt, CAT_IDS, resultArtCat } from '../src/ui/art.mjs';
 import { RESULT_TAGS } from '../src/engine/life.mjs';
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, GATE_OFF, PUBLIC_HIDE } from '../src/site/gate.mjs';
@@ -431,7 +431,7 @@ check('ทุกหน้ามีแถบบนชุดเดียวแล�
 const dtScope = docsScope(docs);
 const dtFiles = dtScope.map((p) => p.f);
 const layoutBad = (p, html) => lf(html) !== lf(injectDocsLayout(html, p.k, p.f)) || !html.includes(DOCS_LAYOUT_START);
-const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', DEV_MAPS_PAGE];
+const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/spec.html', DEV_MAPS_PAGE];
 const dtOut = (f) => f === 'play.html' || read(f).includes(MOVED_MARK);
 const dtMiss = [
   ...dtScope.filter((p) => layoutBad(p, read(p.f))).map((p) => `เลย์เอาต์ค้าง ${p.f} (build ใหม่)`),
@@ -459,7 +459,8 @@ const roadNoId = (w) => soonCats(w).filter((c) => !w.includes(`id="${c.id}"`)).m
 const relSrc = readFileSync(new URL('../scripts/rel.mjs', import.meta.url), 'utf8');
 const relSees = /\/<h3\[\\s>\]\//.test(relSrc);
 // แทรกหน้า <h2> ที่ปิดหัวกำลังทำ — หัววางแผนไว้คั่นก่อนแพตช์โน้ต หมวดของมันไม่ใช่แผนงาน
-const soonEnd = wn.indexOf('<h2>', wn.indexOf('<h2>กำลังทำ</h2>') + 1);
+const soonStart = wn.indexOf('<h2>กำลังทำ</h2>');
+const soonEnd = soonStart + 1 + wn.slice(soonStart + 1).search(/<h2[\s>]/);
 const wnMore = `${wn.slice(0, soonEnd)}<h3>หมวดทดสอบ</h3>\n  <ul>\n    <li>x</li>\n  </ul>\n\n  ${wn.slice(soonEnd)}`;
 const roadCtl = roadmapHtml(soonCats(wnMore)) !== roadNow && roadNoId(wn.replace(`<h3 id="${roadCats[0]?.id}">`, '<h3>')).length === 1;
 const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'แถวหมวดใน whatsnew ไม่ตรงหัวกำลังทำ (build ใหม่)', homeLeft.length && `หน้าแรกยังมี ${homeLeft.join(' ')}`, !coreAbout && 'guide ไม่มีหัวระบบหลัก (กลไกในเกม)', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
@@ -481,6 +482,25 @@ const tkCtl = soonTicketProblems(fakeLi(` data-tickets="${doneIds[0]}"`), doneId
   && (soonNow.some((it) => it.cat === firstCat && it.backlog) || (!soonCats(dropCat.html).some((c) => c.name === firstCat) && !roadIn(dropCat.html).includes(soonId(firstCat)) && !dropCat.unknown.length))
   && dropDone(wn, ['zz999']).unknown[0] === 'zz999';
 check('ข้อในกำลังทำผูกกับใบ และไม่มีข้อที่ใบปิดแล้วค้าง', tkBad.length || !tkCtl, ` ${soonNow.length} ข้อ · backlog ${soonNow.filter((it) => it.backlog).length} · ปิดแล้ว ${doneIds.length} ใบ${tkBad.length ? ` · ${tkBad.slice(0, 5).join(' | ')}${tkBad.length > 5 ? ` …อีก ${tkBad.length - 5}` : ''}` : ''} · ตัวควบคุม${tkCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7d) แผนข้างหน้า (ui-redo 100): หัว "วางแผนไว้" มี id · อยู่นอกหัวกำลังทำ · ไม่มีคำของห้องผู้พัฒนา/โลกที่ปิดอยู่ · หัวกำลังทำอ่านได้ครบเท่าตอนไม่มีส่วนแผน · dev/plan เป็นหน้าส่งต่อมาที่นี่ และไม่อยู่ในแถบห้องผู้พัฒนา
+// ตัวควบคุม: เติมคำ "ใบงาน" ในส่วนแผน ⇒ ตก · ย้ายส่วนแผนเข้าไปในหัวกำลังทำ ⇒ ตก
+const planAt = planPart(wn);
+const planSect = planAt ? wn.slice(...planAt) : '';
+const wnNoPlan = planAt ? wn.slice(0, planAt[0]) + wn.slice(planAt[1]) : wn;
+const soonShort = (w) => JSON.stringify(soonCats(w)) !== JSON.stringify(soonCats(wnNoPlan)) || soonItems(w).length !== soonItems(wnNoPlan).length;
+const planBadOf = (w) => [...planProblems(w), ...(soonShort(w) ? ['หัวกำลังทำอ่านได้ไม่เท่าตอนไม่มีส่วนแผน'] : [])];
+const planPage = read(PLAN_FROM);
+const planBad = [
+  ...planBadOf(wn),
+  ...(!planPage.includes(`${MOVED_MARK} content="whatsnew.html#${PLAN_ID}"`) ? [`${PLAN_FROM} ไม่ใช่หน้าส่งต่อไป whatsnew#${PLAN_ID}`] : []),
+  ...(DEV_TABS.some(([h]) => h === PLAN_FROM) ? [`แถบห้องผู้พัฒนายังมี ${PLAN_FROM}`] : []),
+];
+const midSoon = wnNoPlan.indexOf('</ul>', wnNoPlan.indexOf('<h2>กำลังทำ</h2>')) + '</ul>'.length;
+const planCtl = !!planAt
+  && planBadOf(`${wn.slice(0, planAt[1])}<ul><li>ข้อทดสอบ ใบงาน</li></ul>\n  ${wn.slice(planAt[1])}`).length > planBadOf(wn).length
+  && planBadOf(`${wnNoPlan.slice(0, midSoon)}${planSect}${wnNoPlan.slice(midSoon)}`).length > planBadOf(wn).length;
+check('แผนข้างหน้าอยู่ในแพตช์โน้ตเป็นภาษาผู้เล่น นอกหัวกำลังทำ · dev/plan ส่งต่อมาที่นี่', planBad.length || !planCtl, ` ${(planSect.match(/<li[\s>]/g) ?? []).length} ข้อ${planBad.length ? ` · ${planBad.join(' | ')}` : ''} · ตัวควบคุม${planCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) หน้าโลกที่เล่นได้ (three-worlds 08): บอกแค่ทางที่ผู้เล่นเห็นบนจอเสมอ — ทางลับที่เป็นเหตุสุ่ม (ทริปศาลทั้งตัว court.mjs) ห้ามมีแม้แต่คำ
 // · ทางเกิดครบทุกทางจาก PATHS · แผนภาพ 3 กล่องไม่มีป้ายบนลูกศร (svg มีแค่ <text> ชื่อฉาก) · ลิงก์ไปหน้าต่างโลก

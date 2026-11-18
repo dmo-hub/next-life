@@ -81,7 +81,6 @@ export function navBlocks(html) {
 export const DEV_TABS = [
   ['dev/index.html', 'สารบัญ'],
   ['dev/spec.html', 'ภาคผนวกสเปก'],
-  ['dev/plan.html', 'สเปก/แผน'],
   ['dev/design.html', 'คำตัดสินเกม'],
   ['dev/ui.html', 'การออกแบบ'],
   ['dev/maps/continent.html', 'แผนที่'],
@@ -99,7 +98,7 @@ export const DEV_MAPS = [
   ['politics', 'การเมือง', 'ผังบันไดการเมือง'],
 ];
 export const mapsMoved = ([id, , title]) => movedHtml(`dev/maps/${id}.html`, `${DEV_MAPS_PAGE}#${id}`, title);
-export const DEV_NAV_PAGES = ['dev/index.html', 'dev/plan.html', 'dev/spec.html', DEV_MAPS_PAGE];
+export const DEV_NAV_PAGES = ['dev/index.html', 'dev/spec.html', DEV_MAPS_PAGE];
 export const DEV_NAV_START = '<!--nav-->';
 export const DEV_NAV_END = '<!--/nav-->';
 // แผนที่ไม่ได้ใช้ชุดสีกลาง และแต่ละหน้ามีตัวแปรชื่อซ้ำของตัวเอง ⇒ ตั้งสีเฉพาะที่แถบ
