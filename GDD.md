@@ -11,7 +11,7 @@
 | 1 ภาพรวม · 2 แก่น · 3 วงจรการเล่น | ไฟล์นี้ |
 | 4 ชีวิต · 5 การ์ดและตัวเลือก · 6 เรียน งาน ยศ · 7 ครอบครัว · 8 เงิน · 9 ความตาย · 10 บุญบาป · 11 สายลี้ลับ · 12 ฉายา | [กลไกในเกม › กติกาทีละระบบ](https://dmo-hub.github.io/next-life/about.html#rules) |
 | 13 ปรโลกและรุ่นถัดไป | [ชาตินี้ · ปรโลก · ต่างโลก](https://dmo-hub.github.io/next-life/worlds.html#afterlife) |
-| 14 ต่างโลก | [ต่างโลก › กติกาต่างโลกทั้งหมด](https://dmo-hub.github.io/next-life/otherworld.html#isekai) |
+| 14 ต่างโลก | [ต่างโลก › กติกาต่างโลกทั้งหมด](https://dmo-hub.github.io/next-life/worlds.html#isekai) |
 | 15 ลูปป้อนกลับ | ไฟล์นี้ |
 | 16 เนื้อหา | จำนวนรายหมวด + กติกา: [การ์ดทั้งหมด](https://dmo-hub.github.io/next-life/catalog.html#content) · รูปแบบข้อมูล: ไฟล์นี้ |
 | 17 ภาพและหน้าจอ · 18 เทคนิคและ pipeline | ไฟล์นี้ |

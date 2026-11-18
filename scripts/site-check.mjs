@@ -256,6 +256,29 @@ const aboutCtl = [
   aboutGap(read('about.html').replace(' + location.hash', ''), read('guide.html'), aboutSrcs),
 ].filter((g) => !g.length).length;
 check('about.html เป็นหน้าส่งต่อไป guide พก # · id หัว + data-fact เดิมครบใน guide · ไม่มีลิงก์ค้างไป about', aboutNow.length || aboutCtl, aboutNow.length ? ` · ${aboutNow.slice(0, 4).join(' | ')}` : ` (${ABOUT_IDS.length} id · ${ABOUT_FACTS.length} คีย์ · ตัวควบคุมจับ ${5 - aboutCtl}/5)`);
+// หน้าต่างโลกรวมเข้าหน้า "โลก" (ui-redo 42 · ข้อ 41 131 134): otherworld.html เป็นหน้าส่งต่อไปส่วนต่างโลก พก # ได้ · หัว h2 ทุกหัวของ 2 หน้าเดิมอยู่ในหน้าโลก (10 หัว) · id ลิงก์เก่าครบ · ไม่มีลิงก์ค้างไป otherworld.html
+const WORLD_H2 = ['ชาตินี้', 'ปรโลก', 'ต่างโลก', 'ปรโลกและรุ่นถัดไป', 'ไปต่างโลกได้ทางไหน', 'ชาติต่างโลก', 'ทางเข้าจากเกมหลัก', 'กติกาต่างโลกทั้งหมด', 'ต่างโลกในเกมหลัก', 'ที่มาของต่างโลก'];
+const WORLD_IDS = ['otherworld', 'entry', 'isekai', 'rules', 'afterlife'];
+const owGap = (movedPage, world, srcs) => {
+  const h2 = [...world.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)].map((m) => m[1].replace(/<span class="tag[^>]*>[^<]*<\/span>/g, '').replace(/<[^>]+>/g, '').trim());
+  return [
+    !movedPage.includes(`${MOVED_MARK} content="worlds.html#otherworld"`) && 'otherworld.html ไม่ใช่หน้าส่งต่อไป worlds#otherworld',
+    /location\.replace\([^)]*\+ \(location\.hash \|\|/.test(movedPage) || 'หน้าส่งต่อไม่พก #',
+    ...WORLD_H2.filter((t) => !h2.includes(t)).map((t) => `หน้าโลกขาดหัว "${t}"`),
+    ...WORLD_IDS.filter((id) => !world.includes(`id="${id}"`)).map((id) => `หน้าโลกขาด id="${id}"`),
+    ...srcs.filter(([, s]) => /href="(\.\.\/)*otherworld\.html/.test(s)).map(([n]) => `${n} ยังลิงก์ otherworld.html`),
+  ].filter((x) => x && x !== true);
+};
+const owSrcs = [['docs/guide.html', read('guide.html')], ['docs/worlds.html', read('worlds.html')], ['docs/index.html', read('index.html')], ['docs/whatsnew.html', read('whatsnew.html')], ['src/site/guide.html', readFileSync(new URL('../src/site/guide.html', import.meta.url), 'utf8')], ['src/ui/app.mjs', aboutSrcs[0][1]], ['src/ui/template.html', aboutSrcs[1][1]]];
+const owNow = owGap(read('otherworld.html'), read('worlds.html'), owSrcs);
+const owCtl = [
+  owGap(read('otherworld.html').replace('content="worlds.html#otherworld"', 'content="worlds.html"'), read('worlds.html'), owSrcs),
+  owGap(read('otherworld.html'), read('worlds.html').replace('>กติกาต่างโลกทั้งหมด<', '>x<'), owSrcs),
+  owGap(read('otherworld.html'), read('worlds.html').replace('id="entry"', 'id="x"'), owSrcs),
+  owGap(read('otherworld.html'), read('worlds.html'), [...owSrcs, ['ctl', '<a href="otherworld.html#entry">']]),
+  owGap(read('otherworld.html').replace(' + (location.hash ||', ' + (x ||'), read('worlds.html'), owSrcs),
+].filter((g) => !g.length).length;
+check('otherworld.html เป็นหน้าส่งต่อไปหน้าโลก พก # · หัว h2 ทั้ง 10 + id เดิมครบในหน้าโลก · ไม่มีลิงก์ค้างไป otherworld.html', owNow.length || owCtl, owNow.length ? ` · ${owNow.slice(0, 4).join(' | ')}` : ` (${WORLD_H2.length} หัว · ${WORLD_IDS.length} id · ตัวควบคุมจับ ${5 - owCtl}/5)`);
 // 5b) เส้นทางงาน (ui-redo ใบ 21): ทุกอาชีพในทุกสายของ careers.json + การเมือง มีกล่องบนหน้า
 // ผลจำลองค้าง (การ์ดเพิ่ม/ลบ/เปลี่ยน id หลังรันจำลอง) = เตือน ไม่ตก — จำลองรันสั่งแยก ไม่ผูก build
 const occsOf = (l) => (l.occs ? l.occs.length : new Set(l.steps.map((x) => x.occ)).size);
@@ -283,7 +306,7 @@ const contMiss = (html) => {
   return [...Object.values(CONT_REGIONS), ...Object.values(CONT_RACES), ...Object.values(ISEKAI_CAREERS)].filter((x) => !has(x.name)).map((x) => x.name);
 };
 const ROLE_TALK = /เทพธิดายื่นบทบาท|เลือกบทบาท|บทบาทตอนเกิด/;
-const newPages = { 'catalog ต่างโลก': noOld(cardsIsk), 'spoilers ต่างโลก': noOld(spoilIsk), otherworld: read('otherworld.html'), index: read('index.html'), 'guide (กลไกในเกม)': read('guide.html') };
+const newPages = { 'catalog ต่างโลก': noOld(cardsIsk), 'spoilers ต่างโลก': noOld(spoilIsk), otherworld: read('worlds.html'), index: read('index.html'), 'guide (กลไกในเกม)': read('guide.html') };
 const roleLeft = Object.entries(newPages).filter(([, h]) => ROLE_TALK.test(h)).map(([p]) => p);
 // หน้าต่างโลก (กติกาต่างโลกทั้งหมด ย้ายจากหน้า GDD เดิม) เล่าตอนจบชาติทวีปด้วยเกณฑ์ชื่อเสียงจากโค้ด — ไม่งั้นเหลือแค่ระดับตอนจบของบทบาท 4 โลกเดิม
 const endTalk = (html) => html.includes('data-fact="contFame"');
@@ -431,7 +454,7 @@ check('ทุกหน้ามีแถบบนชุดเดียวแล�
 const dtScope = docsScope(docs);
 const dtFiles = dtScope.map((p) => p.f);
 const layoutBad = (p, html) => lf(html) !== lf(injectDocsLayout(html, p.k, p.f)) || !html.includes(DOCS_LAYOUT_START);
-const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/spec.html', DEV_MAPS_PAGE];
+const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'worlds.html', 'catalog.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/spec.html', DEV_MAPS_PAGE];
 const dtOut = (f) => f === 'play.html' || read(f).includes(MOVED_MARK);
 const dtMiss = [
   ...dtScope.filter((p) => layoutBad(p, read(p.f))).map((p) => `เลย์เอาต์ค้าง ${p.f} (build ใหม่)`),
@@ -527,13 +550,13 @@ const worldsBad = (html) => {
   if (labels.length !== 3 || !WORLD_NAMES.every((n) => labels.includes(n))) why.push(`แผนภาพ: ${labels.join(' ') || 'ไม่มี'}`);
   const pathsMiss = Object.keys(facts).filter((k) => /^path[A-Z]/.test(k) && !html.includes(`data-fact="${k}"`));
   if (pathsMiss.length) why.push(`ทางเกิดขาด ${pathsMiss.join(' ')}`);
-  if (!html.includes('href="otherworld.html')) why.push('ไม่ลิงก์หน้าต่างโลก');
+  if (!html.includes('href="#otherworld"') || !html.includes('id="otherworld"')) why.push('ไม่ลิงก์ส่วนต่างโลก');
   return why;
 };
 const worldsHtml = read('worlds.html');
 const worldsMiss = worldsBad(worldsHtml);
 const worldsCtl = worldsBad(worldsHtml.replace('</main>', '<p>เฉียดตาย</p></main>')).length === 1 && worldsBad(worldsHtml.replace('</svg>', '<text>ตาย</text></svg>')).length === 1;
-check('หน้าโลกที่เล่นได้: ไม่มีคำทางลับ · แผนภาพ 3 กล่องไม่มีป้ายลูกศร · ทางเกิดครบ · ลิงก์ต่างโลก', worldsMiss.length || !worldsCtl, `${worldsMiss.length ? ` · ${worldsMiss.join(' | ')}` : ''} · ตัวควบคุม${worldsCtl ? 'จับได้' : 'จับไม่ได้'}`);
+check('หน้าโลกที่เล่นได้: ไม่มีคำทางลับ · แผนภาพ 3 กล่องไม่มีป้ายลูกศร · ทางเกิดครบ · ลิงก์ส่วนต่างโลก', worldsMiss.length || !worldsCtl, `${worldsMiss.length ? ` · ${worldsMiss.join(' | ')}` : ''} · ตัวควบคุม${worldsCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 8) คู่มือ (B121): ป้ายปุ่มทุกตัวในค่ากลางขึ้นคู่มือพร้อมคำอธิบาย · หน้าจอเกมไม่เขียนป้ายเหล่านั้นตรงซ้ำ (ไม่งั้นแก้ค่ากลางแล้วเกมไม่ตาม)
 const guide = read('guide.html');

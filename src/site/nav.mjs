@@ -10,8 +10,8 @@ export const NAV_MENU = [
   // หน้าโฟกัสไม่มีป้ายของตัวเอง (เจ้าของเคาะ) เข้าจากลิงก์ในหน้าวิธีเล่น
   ['guide.html', 'วิธีเล่น', null, ['focus.html']],
   ['whatsnew.html', 'แพตช์โน้ต'],
-  // เจ้าของรวมสองหน้าเป็นหัวเดียว "โลก" · หน้าต่างโลกยังอยู่ (ลิงก์จากหน้าโลก) และนับเป็นหัวนี้ตอนเปิดอยู่
-  ['worlds.html', 'โลก', null, ['otherworld.html']],
+  // เจ้าของรวมสองหน้าเป็นหัวเดียว "โลก" (ui-redo 42) · otherworld.html เป็นหน้าส่งต่อ ไม่มีแถบ
+  ['worlds.html', 'โลก'],
   ['catalog.html', 'การ์ดทั้งหมด'],
   ['dev/index.html', 'ห้องผู้พัฒนา'],
 ];
@@ -131,8 +131,10 @@ export function injectDevNav(html, file) {
 // หน้าส่งต่อของ URL ที่ย้ายไป (GitHub Pages ไม่มี redirect ฝั่งเซิร์ฟเวอร์) — noindex ไม่ใช้ canonical (คำตัดสินเจ้าของ) · พก #ส่วนในหน้าไปด้วย เว้นปลายทางระบุหัวไว้แล้ว (หน้าที่ย้ายมาเป็นหัวในหน้าอื่น)
 // from/to = path ใต้ docs/ · build เขียนทุกรอบ จึงไม่หายเมื่อ build ซ้ำ · MOVED_MARK ให้ build/ด่านแยกหน้าส่งต่อออกจากหน้าค้าง
 export const MOVED_MARK = '<meta name="next-life-moved"';
-export function movedHtml(from, to, title) {
-  const href = '../'.repeat(from.split('/').length - 1) + to;
+// carry: to มี # = ค่าเริ่มเมื่อลิงก์เก่าไม่มี # · ลิงก์เก่าที่พก # ไปที่ id เดียวกันในหน้าใหม่ (otherworld.html#entry → worlds.html#entry)
+export function movedHtml(from, to, title, carry = false) {
+  const up = '../'.repeat(from.split('/').length - 1);
+  const href = up + to;
   title = title.replace(/&/g, '&amp;').replace(/</g, '&lt;');
   return `<!doctype html>
 <html lang="th">
@@ -143,7 +145,7 @@ export function movedHtml(from, to, title) {
 ${MOVED_MARK} content="${to}">
 <meta http-equiv="refresh" content="0; url=${href}">
 <title>ย้ายแล้ว · ${title}</title>
-<script>location.replace(${JSON.stringify(href)}${to.includes('#') ? '' : ' + location.hash'})</script>
+<script>location.replace(${carry ? `${JSON.stringify(up + to.split('#')[0])} + (location.hash || ${JSON.stringify('#' + to.split('#')[1])})` : `${JSON.stringify(href)}${to.includes('#') ? '' : ' + location.hash'}`})</script>
 </head>
 <body style="font-family:Sarabun,sans-serif;padding:24px">
 <p>หน้านี้ย้ายไปแล้ว — <a href="${href}">${title}</a></p>

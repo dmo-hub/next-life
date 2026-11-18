@@ -63,7 +63,7 @@ async function open(file, width, seed = 7) {
 }
 
 // ทุกหน้าเว็บ 390/1280: ล้นแนวนอน 0 · console error 0
-for (const p of ['index', 'worlds', 'otherworld', 'catalog', 'cards', 'whatsnew', 'guide']) {
+for (const p of ['index', 'worlds', 'catalog', 'cards', 'whatsnew', 'guide']) {
   for (const w of [390, 1280]) {
     const { page, errors } = await open(`${p}.html`, w);
     await page.waitForLoadState('load');

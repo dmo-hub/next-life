@@ -9,7 +9,7 @@ docs/fonts/*.css text eol=lf
 # merge=build: ตอน merge เก็บฝั่งตัวเองไว้ ไม่ต่อข้อความ — CONTENT ใน play.html อยู่บรรทัดเดียว สอง branch แก้ content คนละที่ก็ชนทุกครั้ง
 #   driver ตั้งในเครื่องครั้งเดียว: npm run setup:git (ไม่ตั้ง = merge ข้อความตามปกติ ชนเหมือนเดิม)
 #   หลัง merge ต้อง node build.mjs แล้ว commit docs — ไม่ build จะได้ไฟล์ของฝั่งเดียว (ด่าน "build ตรง commit" จับได้)
-# หน้าเขียนมือ index/about/otherworld/gdd ห้ามใส่ merge=build — build แค่ฉีดตัวเลข เนื้อที่เหลือต้อง merge จริง
+# หน้าเขียนมือ index/worlds/gdd ห้ามใส่ merge=build — build แค่ฉีดตัวเลข เนื้อที่เหลือต้อง merge จริง
 docs/play.html     merge=build
 docs/catalog.html  merge=build
 docs/guide.html    merge=build

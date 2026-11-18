@@ -7,7 +7,7 @@ import { MOVED_MARK } from './nav.mjs';
 const OUT = (f, html) => f === 'play.html' || html.includes(MOVED_MARK);
 
 // กลุ่มในตัวเลือกหน้า + ชนิดความกว้าง: อ่าน = หน้าข้อความยาว · กว้าง = ตาราง/การ์ด · แผนที่ = dev/maps (พื้นมืดตามโลก ข้อ 28)
-const READ = ['index.html', 'guide.html', 'whatsnew.html', 'worlds.html', 'otherworld.html', 'spec/lore-finance-series.html'];
+const READ = ['index.html', 'guide.html', 'whatsnew.html', 'worlds.html', 'spec/lore-finance-series.html'];
 export function pageKind(f) {
   if (f.startsWith('dev/maps/')) return 'map';
   return READ.includes(f) ? 'read' : 'wide';
