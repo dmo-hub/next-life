@@ -118,6 +118,19 @@ export function treeViewLayout(defs, { labelPos = null } = {}) {
   return { W: x1 - x0, H: y1 - y0, P, pills, boxes, labels, overlaps };
 }
 
+// โหนดล็อกเพราะต้นทางยังไม่ปลด: คำบอกชื่อต้นทางที่ยังขาด · คืน { names, joint } หรือ null (บอกชื่อไม่ได้ ให้ใช้คำกลาง ๆ เดิม)
+// reach(id) = ต้นทางของโหนดนั้นผ่านแล้วหรือยัง (กติกาอยู่ที่แกน treeReach) · done = { id: อายุที่ปลด }
+// โหนดกลาง (and) ต้องครบทุกตัว ใช้ "และ" · นอกนั้นตัวใดตัวหนึ่งก็พอ ใช้ "หรือ" — ตรงกับ treeReach
+// ต้นทางที่ตัวเองยังซ่อนอยู่ (hidden และยังไม่ถึง) ห้ามเผยชื่อ ข้อ 29/61 · มีตัวเดียวก็ไม่ได้ ⇒ null ทั้งชุด
+export function treeViewNeed(defs, id, done, reach) {
+  const d = defs[id];
+  const unmet = (d?.pre ?? []).filter((p) => defs[p] && done?.[p] === undefined);
+  if (!unmet.length) return null;
+  if (unmet.some((p) => defs[p].hidden && !reach(p))) return null;
+  return { names: unmet.map((p) => defs[p].name), joint: d.and ? 'และ' : 'หรือ' };
+}
+export const treeViewNeedText = (need, tail) => `${tail === 'ก่อน' ? 'ต้องปลด' : 'ปลด'} ${need.names.map((n) => `"${n}"`).join(` ${need.joint} `)} ${tail === 'ก่อน' ? 'ก่อน' : 'แล้วจะเห็น'}`;
+
 // เส้นโค้งเบาๆ ให้เส้นข้ามกลุ่มไม่ทับกันเป็นเส้นตรงเดียว (แบบ 4)
 const tvR = Math.round;
 const tvEdge = (a, b) => {

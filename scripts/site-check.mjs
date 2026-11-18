@@ -15,7 +15,7 @@ import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
 import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
 import { NEED_TEXT } from '../src/site/focus.mjs';
-import { treeViewLayout } from '../src/ui/treeview.mjs';
+import { treeViewLayout, treeViewNeed, treeViewNeedText } from '../src/ui/treeview.mjs';
 import { focusWords, STAT_LABELS, FOCUS_NEEDS, ISEKAI_FOCUS, ISEKAI_KNOW } from '../src/engine/index.mjs';
 import { catalogHtml, spoilerBacks, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { cadetHtml, readCadet, schoolYears } from '../src/site/cadet-cards.mjs';
@@ -931,6 +931,25 @@ const tvCtl = { a: { name: 'ราก', branch: 'occ', pre: [] }, b: { name: '�
 const tvBad = treeViewLayout(tvDefs).overlaps;
 const tvCtlOk = treeViewLayout(tvCtl, { labelPos: 'below' }).overlaps.length > 0 && treeViewLayout(tvCtl).overlaps.length === 0;
 check('ต้นไม้โฟกัส ป้ายชื่อโหนดไม่ถูกเส้น/โหนด/ป้ายอื่นทับ (ตัวควบคุมจับป้ายใต้โหนดรากได้)', tvBad.length || !tvCtlOk, ` ชน ${tvBad.map((o) => `${o.id}↔${o.kind}:${o.with}`).join(' ')}${tvCtlOk ? '' : ' · ตัวควบคุมไม่ตก'}`);
+
+// 12c) แผงโหนดล็อก/ช่อง ? บอกชื่อต้นทางที่ต้องปลดก่อน (ft12b) · and = "และ" · ไม่ and = "หรือ" · ต้นทางที่ยังซ่อนอยู่ห้ามเผยชื่อ
+// ตัวควบคุม: โค้ดแอปที่ไม่ต่อสายคำกับแผง (คำเดิมล้วน) ⇒ ต้องตก
+const needDone = {};
+const needReach = (p) => needDone[p] !== undefined;
+const needDefs = { a: { name: 'ก', pre: [] }, b: { name: 'ข', pre: [] }, h: { name: 'ลับ', hidden: true, pre: ['a'] }, or: { name: 'ค', pre: ['a', 'b'] }, and: { name: 'ง', and: true, pre: ['a', 'b'] }, onHid: { name: 'จ', pre: ['h'] } };
+const needTxt = (id, tail) => { const n = treeViewNeed(needDefs, id, needDone, needReach); return n ? treeViewNeedText(n, tail) : null; };
+const needReal = Object.entries(tvDefs).filter(([id, d]) => d.hidden && (d.pre ?? []).length).map(([id]) => treeViewNeed(tvDefs, id, {}, () => false)?.names.length ?? 0);
+const needApp = readFileSync(new URL('../src/ui/app.mjs', import.meta.url), 'utf8');
+const needWired = (src) => src.includes("treeViewNeedText(need, 'ก่อน')") && src.includes("treeViewNeedText(need, 'แล้วจะเห็น')");
+const needBad = [
+  needTxt('or', 'ก่อน') !== 'ต้องปลด "ก" หรือ "ข" ก่อน' && 'หรือ',
+  needTxt('and', 'ก่อน') !== 'ต้องปลด "ก" และ "ข" ก่อน' && 'และ',
+  needTxt('h', 'แล้วจะเห็น') !== 'ปลด "ก" แล้วจะเห็น' && 'ช่อง ?',
+  needTxt('onHid', 'ก่อน') !== null && 'เผยชื่อต้นทางที่ซ่อน',
+  needReal.some((n) => !n) && 'ช่อง ? ของจริงไม่มีชื่อต้นทาง',
+  !needWired(needApp) && 'แผงไม่ต่อสายคำ',
+].filter(Boolean);
+check('แผงโหนดล็อก/ช่อง ? บอกชื่อต้นทางที่ต้องปลด · และ/หรือตรงกฎ · ไม่เผยชื่อต้นทางที่ซ่อน (ตัวควบคุมจับโค้ดคำเดิมได้)', needBad.length || needWired(needApp.replaceAll('treeViewNeedText', 'x')), ` ${needBad.join(' · ')}`);
 
 // 285) ป้ายเวอร์ชันบนหน้าการ์ด: การ์ดที่ปล่อยแล้วต้องมีเวอร์ชันในทะเบียน · เวอร์ชันนั้นต้องมีหัวใน whatsnew · หัวรุ่นทุกหัวมี id
 // การ์ดใหม่ที่ไม่อยู่ในฐาน keep = รอ rel.mjs เติมตอนปล่อย ไม่ตก · ต่างโลกไม่อยู่ในฐาน keep จึงเตือนอย่างเดียว

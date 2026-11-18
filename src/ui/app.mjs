@@ -2,7 +2,7 @@ import { newLife, dlcOpen, DLC_KEYS, DLC_OPEN, DLC_LOCKED, setDlcDefault, nextCa
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME, catArt, resultArtCat } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
-import { treeViewSvg, treeViewBranches, TREE_VIEW_BRANCH } from './treeview.mjs';
+import { treeViewSvg, treeViewBranches, TREE_VIEW_BRANCH, treeViewNeed, treeViewNeedText } from './treeview.mjs';
 
 // APP_VERSION · APP_BUILD มาจาก src/version.json — build.mjs ประกาศไว้หัวสคริปต์ ไม่เขียนเลขในไฟล์นี้
 // ชื่อไทยของเกม (B86) — คำว่า "ชาติหน้า" ที่เหลือในเกมเป็นเนื้อเรื่อง ไม่ใช่ชื่อเกม
@@ -230,6 +230,7 @@ function focusGoals(offers) {
 // สถานะหน้าจอ (แขนงที่ดู ซูม โหนดที่เลือก) อยู่ในหน่วยความจำ ไม่ลงเซฟ · ทุ่ม/เปลี่ยนโหนดเซฟทันทีเหมือนโฟกัสเดิม
 const tvUi = { view: 'branch', br: null, z: 100, sel: null };
 const TV_ZOOM = [60, 180, 20];
+const tvNeed = (defs, id) => treeViewNeed(defs, id, st.tree?.done, (p) => treeReach(st, defs[p]));
 // สถานะโหนดเป็นคำ ไม่มีตัวเลขปีหรือจำนวนการ์ด (ข้อ 46) · g = ความเต็มของวงรอบโหนดที่ทุ่มอยู่
 function tvNodeInfo(id) {
   const defs = lifeTreeDefs(st), d = defs[id], t = st.tree;
@@ -243,7 +244,7 @@ function tvNodeInfo(id) {
     return { st: 'act', g, word: 'กำลังทุ่มอยู่' };
   }
   if (treeOffersNow(st).includes(id)) return { st: 'open', g, word: 'ทุ่มได้ตอนนี้' };
-  if (!reach) return { st: 'lock', g: 0, word: 'ต้องปลดโหนดก่อนหน้า' };
+  if (!reach) { const need = tvNeed(defs, id); return { st: 'lock', g: 0, word: need ? treeViewNeedText(need, 'ก่อน') : 'ต้องปลดโหนดก่อนหน้า' }; }
   const now = stageIdx(stageOf(st.age));
   return { st: 'lock', g: 0, word: d.stages.some((s) => stageIdx(s) > now) ? 'ยังไม่ถึงช่วงวัยที่ทุ่มได้' : 'พ้นช่วงวัยที่ทุ่มได้แล้ว' };
 }
@@ -252,7 +253,8 @@ function tvPanel(card, id, redraw) {
   const d = lifeTreeDefs(st)[id], i = tvNodeInfo(id);
   const box = el('div', 'tv-sel');
   if (i.st === 'hid') {
-    box.append(el('b', null, 'ช่องที่ยังซ่อนอยู่'), el('p', 'ft-note', 'ยังไม่รู้ว่ามีอะไรรออยู่ · ปลดโหนดก่อนหน้าแล้วจะเห็น'));
+    const need = tvNeed(lifeTreeDefs(st), id);
+    box.append(el('b', null, 'ช่องที่ยังซ่อนอยู่'), el('p', 'ft-note', `ยังไม่รู้ว่ามีอะไรรออยู่ · ${need ? treeViewNeedText(need, 'แล้วจะเห็น') : 'ปลดโหนดก่อนหน้าแล้วจะเห็น'}`));
     return box;
   }
   box.append(el('b', null, d.name), el('span', `ft-word${i.st === 'done' ? ' full' : ''}`, i.word));
