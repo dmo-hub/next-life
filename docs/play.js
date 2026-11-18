@@ -11942,6 +11942,19 @@ function treeViewLayout(defs, { labelPos = null } = {}) {
   return { W: x1 - x0, H: y1 - y0, P, pills, boxes, labels, overlaps };
 }
 
+// โหนดล็อกเพราะต้นทางยังไม่ปลด: คำบอกชื่อต้นทางที่ยังขาด · คืน { names, joint } หรือ null (บอกชื่อไม่ได้ ให้ใช้คำกลาง ๆ เดิม)
+// reach(id) = ต้นทางของโหนดนั้นผ่านแล้วหรือยัง (กติกาอยู่ที่แกน treeReach) · done = { id: อายุที่ปลด }
+// โหนดกลาง (and) ต้องครบทุกตัว ใช้ "และ" · นอกนั้นตัวใดตัวหนึ่งก็พอ ใช้ "หรือ" — ตรงกับ treeReach
+// ต้นทางที่ตัวเองยังซ่อนอยู่ (hidden และยังไม่ถึง) ห้ามเผยชื่อ ข้อ 29/61 · มีตัวเดียวก็ไม่ได้ ⇒ null ทั้งชุด
+function treeViewNeed(defs, id, done, reach) {
+  const d = defs[id];
+  const unmet = (d?.pre ?? []).filter((p) => defs[p] && done?.[p] === undefined);
+  if (!unmet.length) return null;
+  if (unmet.some((p) => defs[p].hidden && !reach(p))) return null;
+  return { names: unmet.map((p) => defs[p].name), joint: d.and ? 'และ' : 'หรือ' };
+}
+const treeViewNeedText = (need, tail) => `${tail === 'ก่อน' ? 'ต้องปลด' : 'ปลด'} ${need.names.map((n) => `"${n}"`).join(` ${need.joint} `)} ${tail === 'ก่อน' ? 'ก่อน' : 'แล้วจะเห็น'}`;
+
 // เส้นโค้งเบาๆ ให้เส้นข้ามกลุ่มไม่ทับกันเป็นเส้นตรงเดียว (แบบ 4)
 const tvR = Math.round;
 const tvEdge = (a, b) => {
@@ -12211,6 +12224,7 @@ function focusGoals(offers) {
 // สถานะหน้าจอ (แขนงที่ดู ซูม โหนดที่เลือก) อยู่ในหน่วยความจำ ไม่ลงเซฟ · ทุ่ม/เปลี่ยนโหนดเซฟทันทีเหมือนโฟกัสเดิม
 const tvUi = { view: 'branch', br: null, z: 100, sel: null };
 const TV_ZOOM = [60, 180, 20];
+const tvNeed = (defs, id) => treeViewNeed(defs, id, st.tree?.done, (p) => treeReach(st, defs[p]));
 // สถานะโหนดเป็นคำ ไม่มีตัวเลขปีหรือจำนวนการ์ด (ข้อ 46) · g = ความเต็มของวงรอบโหนดที่ทุ่มอยู่
 function tvNodeInfo(id) {
   const defs = lifeTreeDefs(st), d = defs[id], t = st.tree;
@@ -12224,7 +12238,7 @@ function tvNodeInfo(id) {
     return { st: 'act', g, word: 'กำลังทุ่มอยู่' };
   }
   if (treeOffersNow(st).includes(id)) return { st: 'open', g, word: 'ทุ่มได้ตอนนี้' };
-  if (!reach) return { st: 'lock', g: 0, word: 'ต้องปลดโหนดก่อนหน้า' };
+  if (!reach) { const need = tvNeed(defs, id); return { st: 'lock', g: 0, word: need ? treeViewNeedText(need, 'ก่อน') : 'ต้องปลดโหนดก่อนหน้า' }; }
   const now = stageIdx(stageOf(st.age));
   return { st: 'lock', g: 0, word: d.stages.some((s) => stageIdx(s) > now) ? 'ยังไม่ถึงช่วงวัยที่ทุ่มได้' : 'พ้นช่วงวัยที่ทุ่มได้แล้ว' };
 }
@@ -12233,7 +12247,8 @@ function tvPanel(card, id, redraw) {
   const d = lifeTreeDefs(st)[id], i = tvNodeInfo(id);
   const box = el('div', 'tv-sel');
   if (i.st === 'hid') {
-    box.append(el('b', null, 'ช่องที่ยังซ่อนอยู่'), el('p', 'ft-note', 'ยังไม่รู้ว่ามีอะไรรออยู่ · ปลดโหนดก่อนหน้าแล้วจะเห็น'));
+    const need = tvNeed(lifeTreeDefs(st), id);
+    box.append(el('b', null, 'ช่องที่ยังซ่อนอยู่'), el('p', 'ft-note', `ยังไม่รู้ว่ามีอะไรรออยู่ · ${need ? treeViewNeedText(need, 'แล้วจะเห็น') : 'ปลดโหนดก่อนหน้าแล้วจะเห็น'}`));
     return box;
   }
   box.append(el('b', null, d.name), el('span', `ft-word${i.st === 'done' ? ' full' : ''}`, i.word));
