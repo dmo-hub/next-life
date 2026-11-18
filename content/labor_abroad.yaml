@@ -67,6 +67,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: abroad_gate_01
+    away_block: [monk]
     type: A
     category: society
     stage: ทำงาน
@@ -97,6 +98,7 @@ events:
         merit: [{cat: dana, level: 1}]
 
   - id: abroad_dorm_01
+    away_block: [monk]
     type: A
     category: work_money
     stage: ทำงาน
