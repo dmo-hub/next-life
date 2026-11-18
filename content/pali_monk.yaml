@@ -196,7 +196,7 @@ events:
     years: [2500, 2650]
     when: {age: [16, 30], sex: [ชาย], flags: {has: [pali_novice]}}
     title: "ประโยคที่เทียบวุฒิได้"
-    text: "สอบผ่านขั้นนี้ เอาใบไปเทียบวุฒิมัธยมปลายได้ คนนอกวัดเริ่มรู้ว่าคุณอ่านอะไรมา วัดในเมืองเขียนจดหมายมาชวนไปเรียนสำนักใหญ่ ส่วนที่บ้านถามว่าจะกลับเมื่อไร"
+    text: "สอบผ่านเปรียญธรรม 3 ประโยค เอาใบไปเทียบวุฒิมัธยมปลายได้คนนอกวัดเริ่มรู้ว่าคุณอ่านอะไรมา วัดในเมืองเขียนจดหมายมาชวนไปเรียนสำนักใหญ่ ส่วนที่บ้านถามว่าจะกลับเมื่อไร"
     choices:
       - id: city_school
         text: "ย้ายไปสำนักเรียนในเมือง"
@@ -226,7 +226,7 @@ events:
     category: society
     stage: หนุ่มสาว
     years: [2500, 2650]
-    when: {age: [18, 33], sex: [ชาย], flags: {has: [pali_novice]}}
+    when: {age: [20, 33], sex: [ชาย], flags: {has: [pali_novice]}}
     title: "ทางแยกของผ้าเหลือง"
     text: "อายุถึงเกณฑ์อุปสมบทแล้ว ท่านอาจารย์ถามว่าจะบวชพระเรียนต่อ หรือจะสึกไปเรียนมหาวิทยาลัย พี่น้องที่บ้านรอให้กลับไปช่วยงาน คุณอยู่ในผ้าเหลืองมานานกว่าที่เคยใส่เสื้อนักเรียน"
     choices:
@@ -250,8 +250,6 @@ events:
         merit: [{cat: care_parents, level: 1}]
       - id: ask_time
         text: "ขอเวลาคิดหนึ่งพรรษา"
-        sets_flags: [pali_monk]
-        schedules: [{event: pali_high_01, after_years: [4, 6]}]
         effects: {happiness: 1}
         merit: [{cat: sila, level: 1}]
 
@@ -268,21 +266,21 @@ events:
       - id: sit_exam
         text: "เข้าสอบอีกครั้ง"
         outcomes:
-          - {weight: 1, ok: true, text: "สอบได้ขั้นสูงสุด ศาลาทั้งวัดเงียบไปครู่หนึ่งแล้วค่อยแสดงความยินดี", effects: {away_leave: true, happiness: 3, knowledge: 2, network: 2}, sets_flags: [pali_top], merit: [{cat: sila, level: 1}]}
-          - {weight: 5, text: "ไม่ผ่าน ท่านอาจารย์ยื่นตำราเล่มเดิมกลับมาให้", effects: {away_leave: true, happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "สอบได้ขั้นสูงสุด ศาลาทั้งวัดเงียบไปครู่หนึ่งแล้วค่อยแสดงความยินดี", effects: {happiness: 3, knowledge: 2, network: 2}, sets_flags: [pali_top], merit: [{cat: sila, level: 1}]}
+          - {weight: 5, text: "ไม่ผ่าน ท่านอาจารย์ยื่นตำราเล่มเดิมกลับมาให้", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: teach_instead
         text: "หยุดสอบ ตั้งใจสอนรุ่นน้อง"
-        effects: {away_leave: true, relations: 1, network: 1}
+        effects: {relations: 1, network: 1}
         merit: [{cat: help_others, level: 1}]
       - id: practice
         text: "วางตำรา ไปปฏิบัติภาวนา"
-        effects: {away_leave: true, happiness: 2}
+        effects: {happiness: 2}
         merit: [{cat: sila, level: 2}]
       - id: disrobe
         text: "ลาสิกขา ออกไปใช้ความรู้"
         sets_flags: [pali_left]
-        clears_flags: [pali_novice, pali_monk]
+        clears_flags: [pali_novice]
         effects: {away_leave: true, knowledge: 1}
         merit: [{cat: neutral}]
 
@@ -292,7 +290,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 5
-    when: {age: [31, 45], sex: [ชาย], flags: {has: [pali_left]}}
+    when: {age: [31, 45], sex: [ชาย], flags: {has: [pali_left, pali_monk]}}
     title: "ทิดในที่ทำงาน"
     text: "คนในที่ทำงานเรียกคุณว่าทิด เวลาบริษัทมีงานทำบุญ ทุกคนหันมาให้คุณนำสวด ใบสมัครงานไม่มีช่องสำหรับปีที่อยู่วัด คุณยังตื่นตีสี่ทั้งที่ไม่มีระฆังแล้ว"
     choices:
