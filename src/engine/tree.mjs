@@ -8,7 +8,8 @@ import { makeRng, mixSeed } from './rng.mjs';
 // ตัวควบคุมของ harness: ปิดการนับการ์ด → โหนดที่ต้องตอบการ์ดต้องปลดไม่ได้เลย
 // anyCat / cardsFree = ทางเลือกที่ harness ใช้ทำตารางเสนอเจ้าของเท่านั้น (นับทุกหมวด · ไม่ต้องตอบการ์ด) ห้ามเปิดนอก harness
 // passive = ผลติดตัวหลังปลด (ผลเบารายปี · ทอย · ถ่วงการ์ด · ใบ 04) ปิด = ปลดแล้วไม่ให้อะไรเลย (ตัวควบคุมของด่านงบ)
-export const treeCtl = { cards: true, anyCat: false, cardsFree: false, passive: true };
+// rust = สนิม (ใบ 09) ปิด = ผลเบาไม่จางเลย (ตัวควบคุมของ harness)
+export const treeCtl = { cards: true, anyCat: false, cardsFree: false, passive: true, rust: true };
 // ตัวเร่ง/ชะลอการปลด (ใบ 08) แยกเปิด/ปิดทีละตัว: ตัวควบคุมของ harness `tree-pace` ปิดตัวที่วัดแล้วต้องเท่าเดิมเป๊ะ
 export const treePaceCtl = { teacher: true, cls: true, learn: true, age: true };
 
@@ -30,8 +31,10 @@ export function treeInvest(h, defs, id, stage) {
 }
 
 // นับการ์ดที่ตอบ: เฉพาะโหนดที่กำลังทุ่ม และหมวดการ์ดตรงหมวดของโหนด
-export function treeCard(h, defs, category) {
+// "ใช้" โหนดที่ปลดแล้ว (ใบ 09 ข้อ 63) = ตอบการ์ดหมวดตรง ไม่ต้องทุ่ม · จดอายุล่าสุดไว้กันสนิม · ไม่ส่ง age = ไม่จด
+export function treeCard(h, defs, category, age) {
   const t = h.tree;
+  if (t && age !== undefined) for (const id of Object.keys(t.done)) if (defs[id]?.cat.includes(category)) (t.used ??= {})[id] = age;
   if (!treeCtl.cards || !t?.cur) return;
   if (treeCtl.anyCat || defs[t.cur].cat.includes(category)) t.cards[t.cur] = (t.cards[t.cur] ?? 0) + 1;
 }
@@ -54,6 +57,8 @@ export function treePace(h, cfg, age) {
 export function treeYearEnd(h, defs, stage, age, pace = null) {
   const t = h.tree;
   if (!t?.cur) return null;
+  // ปีที่ล้างโหนด หลอดไม่ขยับ (ใบ 09 ข้อ 68)
+  if (t.respec === age) return null;
   const id = t.cur;
   if (!treeOpen(h, defs[id], id, stage)) {
     t.cur = null;
@@ -90,6 +95,33 @@ const treeNext = (h, defs, stage, id) => {
   const open = treeOffers(h, defs, stage).filter((x) => x !== id && !defs[x].hidden && !defs[x].keystone);
   return open.find((x) => defs[x].branch === defs[id].branch) ?? open[0] ?? null;
 };
+
+// ── สนิม + ล้างโหนด (ใบ 09 ข้อ 31 34 56 63 68 94) ── ทุกตัวไม่ดึงเลขสุ่ม · ไม่มี cfg (rust) = ไม่มีสนิม
+// สนิม: ไม่ได้ "ใช้" (ตอบการ์ดหมวดตรง) ครบ cfg.years ปีนับจากครั้งล่าสุด/ตอนปลด → ผลเบาลงเหลือ cfg.floor เท่า · ตัวเลือกที่ปลดไม่หาย · ใช้อีกครั้งผลกลับเต็ม
+export const treeRusty = (h, id, age, cfg) => {
+  const t = h?.tree;
+  const done = t?.done?.[id];
+  return !!cfg && treeCtl.rust && done !== undefined && age - Math.max(done, t.used?.[id] ?? done) >= cfg.years;
+};
+export const treeRustMul = (h, id, age, cfg) => (treeRusty(h, id, age, cfg) ? cfg.floor : 1);
+
+// ล้างโหนดที่ปลดแล้ว: ปีละ 1 โหนด · keystone ล้างไม่ได้ (ข้อ 60) · ปีที่ล้างหลอดไม่ขยับ (treeYearEnd) · โหนดกลับไปทุ่มใหม่ได้ ต้องเริ่มปี/การ์ดใหม่ทั้งหมด
+// t.gone = โหนดที่เคยปลดแล้วล้าง (อายุที่ล้างครั้งล่าสุด) ให้ฉายานับทุกโหนดที่เคยปลด (ข้อ 56)
+export function treeRespec(h, defs, id, age) {
+  const t = h.tree;
+  if (t?.done?.[id] === undefined) throw new Error(`ล้างโหนดที่ยังไม่ปลดไม่ได้: ${id}`);
+  if (defs[id].keystone) throw new Error(`keystone ล้างไม่ได้: ${id}`);
+  if (t.respec === age) throw new Error('ปีนี้ล้างโหนดไปแล้ว (ปีละ 1 โหนด)');
+  delete t.done[id];
+  delete t.yrs[id];
+  delete t.cards[id];
+  if (t.used) delete t.used[id];
+  if (t.gate) delete t.gate[id];
+  (t.gone ??= {})[id] = age;
+  t.respec = age;
+}
+// เคยปลดทั้งหมด = ที่ปลดอยู่ + ที่ล้างไปแล้ว (ฐานของฉายา ข้อ 56)
+export const treeEver = (h) => [...new Set([...Object.keys(h?.tree?.done ?? {}), ...Object.keys(h?.tree?.gone ?? {})])];
 
 // ── การ์ดด่าน + keystone (ใบ 05) ── ทุกตัวไม่ดึงเลขสุ่ม · ผลของการ์ดด่านลงผ่านตัวเลือกของการ์ด (ผลเต็มครั้งเดียว) ไม่ผ่านงบผลเบา
 // ปีครบแต่การ์ดหมวดยังไม่ครบ (ข้อ 46): ใช้บอกขั้น "รอโอกาส" ที่หน้าต้นไม้ · ไม่แตะสถานะ

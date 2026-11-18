@@ -1,4 +1,4 @@
-import { newLife, dlcOpen, DLC_KEYS, DLC_OPEN, DLC_LOCKED, setDlcDefault, nextCard, causeWords, goalNames, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf, overlapOf, overlapStageOf, lifeTreeDefs, lifeTreeStart, treeInvestNode, treeOffersNow, treeWaiting, treeReach } from '../engine/index.mjs';
+import { newLife, dlcOpen, DLC_KEYS, DLC_OPEN, DLC_LOCKED, setDlcDefault, nextCard, causeWords, goalNames, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf, overlapOf, overlapStageOf, lifeTreeDefs, lifeTreeStart, lifeTreeRespec, lifeTreeRusty, treeInvestNode, treeOffersNow, treeWaiting, treeReach } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME, catArt, resultArtCat } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
@@ -240,7 +240,7 @@ const tvNeed = (defs, id) => treeViewNeed(defs, id, st.tree?.done, (p) => treeRe
 // สถานะโหนดเป็นคำ ไม่มีตัวเลขปีหรือจำนวนการ์ด (ข้อ 46) · g = ความเต็มของวงรอบโหนดที่ทุ่มอยู่
 function tvNodeInfo(id) {
   const defs = lifeTreeDefs(st), d = defs[id], t = st.tree;
-  if (t?.done?.[id] !== undefined) return { st: 'done', g: 1, word: 'ปลดแล้ว' };
+  if (t?.done?.[id] !== undefined) return { st: 'done', g: 1, word: lifeTreeRusty(st, id) ? 'ปลดแล้ว · เริ่มจาง' : 'ปลดแล้ว' };
   const reach = treeReach(st, d);
   if (d.hidden && !reach) return { st: 'hid', g: 0 };
   const g = Math.min(1, (t?.yrs?.[id] ?? 0) / d.years);
@@ -253,6 +253,32 @@ function tvNodeInfo(id) {
   if (!reach) { const need = tvNeed(defs, id); return { st: 'lock', g: 0, word: need ? treeViewNeedText(need, 'ก่อน') : 'ต้องปลดโหนดก่อนหน้า' }; }
   const now = stageIdx(stageOf(st.age));
   return { st: 'lock', g: 0, word: d.stages.some((s) => stageIdx(s) > now) ? 'ยังไม่ถึงช่วงวัยที่ทุ่มได้' : 'พ้นช่วงวัยที่ทุ่มได้แล้ว' };
+}
+// โหนดที่ปลดแล้ว (ใบ 09): บอกคำ "เริ่มจาง" + วิธีกันสนิม · ปุ่มล้างต้องกดยืนยัน 2 ครั้ง (ล้างจ่ายด้วยเวลา: ปีนั้นหลอดไม่ขยับ · ปีละ 1 โหนด) · keystone ล้างไม่ได้
+function tvRespec(box, card, id, d, redraw) {
+  if (lifeTreeRusty(st, id)) box.append(el('p', 'ft-note', 'ผลติดตัวเริ่มจางเพราะไม่ได้ใช้นาน · ตอบการ์ดหมวดนี้อีกครั้งผลจะกลับมา · ตัวเลือกที่ปลดแล้วยังอยู่'));
+  if (d.keystone) {
+    box.append(el('p', 'ft-note', 'โหนดหักเหล้างไม่ได้'));
+    return;
+  }
+  if (st.tree?.respec === st.age) {
+    box.append(el('p', 'ft-note', 'ปีนี้ล้างโหนดไปแล้ว · ล้างได้ปีละโหนด'));
+    return;
+  }
+  const b = el('button', 'tv-go', 'ล้างโหนดนี้');
+  b.type = 'button';
+  let sure = false;
+  b.onclick = () => {
+    if (!sure) {
+      sure = true;
+      b.textContent = 'ยืนยัน: ล้างโหนดนี้ · ปีนี้ต้นไม้ไม่ขยับ ต้องทุ่มใหม่ถ้าอยากได้คืน';
+      return;
+    }
+    lifeTreeRespec(st, id);
+    saveWrite(card);
+    redraw(id);
+  };
+  box.append(b);
 }
 // แผงของโหนดที่แตะ: ชื่อ · สถานะ · ผลเป็นทิศ (ไม่มีเลข) · keystone บอกข้อเสียก่อนทุ่ม (ข้อ 60) · ปุ่มทุ่ม
 function tvPanel(card, id, redraw) {
@@ -272,6 +298,7 @@ function tvPanel(card, id, redraw) {
     box.append(el('p', 'tv-warn', d.warn));
     row('เสียถาวรทุกปี: ', focusWords({ fx: d.cost }, STAT_LABELS));
   }
+  if (i.st === 'done') tvRespec(box, card, id, d, redraw);
   if (i.st === 'open') {
     const b = el('button', 'tv-go', d.keystone ? 'รับรู้ข้อเสียแล้ว · ทุ่มโหนดนี้' : 'ทุ่มโหนดนี้');
     b.type = 'button';

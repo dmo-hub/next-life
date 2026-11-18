@@ -535,6 +535,11 @@ try {
     ['bad: job_roll ไม่มี jobs', doc({ a: node({ job_roll: 1 }) }), 1],
     ['bad: งบผลเบารวมเกินเพดาน', doc({ a: node() }, { budget: 0.001 }), 1],
     ['bad: card_mul ต่ำกว่า 1', doc({ a: node() }, { card_mul: 0.5 }), 1],
+    ['ok: สนิม years 5 floor 0.5', doc({ a: node() }, { rust: { years: 5, floor: 0.5 } }), 0],
+    ['bad: สนิม years 0', doc({ a: node() }, { rust: { years: 0, floor: 0.5 } }), 1],
+    ['bad: สนิม floor 1 (ไม่จาง)', doc({ a: node() }, { rust: { years: 5, floor: 1 } }), 1],
+    ['bad: สนิม floor 0 (หายหมด)', doc({ a: node() }, { rust: { years: 5, floor: 0 } }), 1],
+    ['bad: สนิมไม่ใช่ตาราง', doc({ a: node() }, { rust: 5 }), 1],
     // ใบ 05: การ์ดด่านโหนดใหญ่ · keystone
     ['good: โหนดใหญ่มีการ์ดด่าน 2 ทาง', doc({ a: node({ size: 'b', gate: gate() }) }), 0],
     ['bad: การ์ดด่านบนโหนดเล็ก', doc({ a: node({ gate: gate() }) }), 1],

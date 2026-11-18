@@ -42,6 +42,8 @@ export function checkTree(doc, jobs = null) {
   if (!(typeof doc.roll_k === 'number' && doc.roll_k >= 0)) out.push('roll_k ต้องเป็นเลข ≥ 0');
   if (!(typeof doc.card_mul === 'number' && doc.card_mul >= 1)) out.push('card_mul ต้องเป็นเลข ≥ 1');
   if (!(typeof doc.budget === 'number' && doc.budget > 0)) out.push('budget ต้องเป็นเลขบวก');
+  // สนิม (ใบ 09): ไม่ใส่ = ไม่มีสนิม · ใส่ = years จำนวนเต็ม ≥ 1 · floor 0 < x < 1 (จางลง ไม่หายหมด ไม่เพิ่ม)
+  if (doc.rust !== undefined && !(isObj(doc.rust) && Number.isInteger(doc.rust.years) && doc.rust.years >= 1 && typeof doc.rust.floor === 'number' && doc.rust.floor > 0 && doc.rust.floor < 1)) out.push('rust ต้องมี years จำนวนเต็ม ≥ 1 และ floor ระหว่าง 0 ถึง 1 (ไม่รวมปลาย)');
   const nodes = doc.nodes;
   // จุดเกิด (ใบ 06 ข้อ 97): ตารางต้องครอบทุกแขนงจริงของทะเบียน ทุกชั้นฐานะ · แต้มจำนวนเต็ม ≥ 0 · อาชีพต้องมีจริง
   if (doc.start !== undefined) out.push(...checkTreeStart(doc.start, nodes, jobs));

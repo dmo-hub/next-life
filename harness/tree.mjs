@@ -15,7 +15,7 @@ const defs = content.tree.nodes;
 
 const bot = withTree(withGate(random), TARGET);
 const lives = (ctl = {}) => {
-  Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false, passive: true }, ctl);
+  Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false, passive: true, rust: true }, ctl);
   const out = [];
   for (let i = 0; i < n; i++) {
     // ต่อปีที่เริ่ม: จดว่าบอทมีโหนดให้ทุ่มแต่ไม่ได้ทุ่มหรือไม่ (เสียปี) ก่อนการ์ดแรกของปีนั้น
@@ -34,7 +34,7 @@ const lives = (ctl = {}) => {
   }
   return out;
 };
-import { stageOf } from '../src/engine/index.mjs';
+import { stageOf, makeRng, lifeTreeRespec, treeRusty, treeEver } from '../src/engine/index.mjs';
 const stageName = stageOf;
 const reach = (st, id) => { const p = defs[id].pre ?? []; return !p.length || p.some((x) => st.tree?.done?.[x] !== undefined); };
 
@@ -404,6 +404,131 @@ if (devOff !== 0) fails.push(`ตัวควบคุม: ปิดผลติ
   const yrs = [...need].reduce((a, id) => a + defs[id].years, 0);
   console.log(`เกณฑ์ลึกลับครบ (ข้อ 98) ต้องปลด ${need.size} โหนด (รวมแม่) ใช้ปีทุ่มขั้นต่ำ ${yrs} ปี (ทุ่มทีละโหนด ปีละ 1) · อายุขัยเฉลี่ยของบอท ${f1(mean(real.map((x) => x.age)))} ปี`);
 }
+
+// ── ใบ 09: สนิม + ล้างโหนด (ข้อ 31 34 56 63 68 94) ──
+// วัดกับกลุ่มที่ปลดได้ (anyCat เหมือนผลติดตัว) · บอทที่ล้างโหนด = สุ่มล้าง 1 โหนด/ปีจาก stream แยก ไม่แตะ rng ของโลก
+{
+  console.log('\nสนิม + ล้างโหนด (ใบ 09)');
+  const R = content.tree.rust;
+  const m = Math.min(n, 300);
+  const catOf = Object.fromEntries(content.events.map((e) => [e.id, e.category]));
+  const run = (ctl, wash) => {
+    const res = [];
+    for (let i = 0; i < m; i++) {
+      Object.assign(treeCtl, { cards: true, anyCat: true, cardsFree: false, passive: true, rust: true }, ctl);
+      // ตัววัดอิสระ: อายุล่าสุดที่การ์ดหมวดตรงโหนดที่ปลดแล้วโผล่ (นับจากการ์ดที่เห็น ไม่ใช่จาก st.tree.used)
+      // unc = อายุที่การ์ดนอกทะเบียน events (งาน โรงเรียน ด่านต้นไม้ ฯลฯ สร้างตอนเล่น หาหมวดจากทะเบียนไม่ได้) ถูกตอบ — ตัววัดหมวดไม่เห็น
+      const last = {}, unc = new Set();
+      const washes = [], stuck = [];
+      let dupWash = 0;
+      const seen = new Set();
+      const rng = makeRng(mixSeed(seed ^ 0x3a91, i));
+      let snap = null;
+      const tree = (st) => {
+        botTree(st, TARGET);
+        if (seen.has(st.age)) return;
+        seen.add(st.age);
+        // ปีที่บอทไม่ได้เห็นการ์ดเลยไม่มีจุดวัด (hook ไม่ถูกเรียก) · วัดเฉพาะปีถัดไปติดกัน
+        if (snap && st.age === snap.age + 1 && st.tree?.yrs?.[snap.cur] !== snap.y) stuck.push(st.age);
+        snap = null;
+        if (!wash || !st.tree) return;
+        const done = Object.keys(st.tree.done).filter((id) => !defs[id].keystone);
+        if (!done.length || rng.next() > 0.3) return;
+        const id = done[rng.int(0, done.length - 1)];
+        const cur = st.tree.cur;
+        const y = st.tree.yrs?.[cur];
+        lifeTreeRespec(st, id);
+        washes.push(st.age);
+        // ล้างซ้ำปีเดียวกันต้องถูกกัน
+        const other = Object.keys(st.tree.done).find((x) => !defs[x].keystone);
+        if (other) {
+          try { lifeTreeRespec(st, other); dupWash++; } catch { /* ถูกกัน */ }
+        }
+        if (cur) snap = { age: st.age, cur, y };
+      };
+      const onCard = (card, st) => {
+        // การ์ดข้อมูล (ไม่มีตัวเลือก) ไม่ถูกตอบ = ไม่นับเป็นการ "ใช้"
+        const cat = catOf[card.id];
+        if (!st.tree || !card.choices?.length) return;
+        if (!cat) { unc.add(st.age); return; }
+        for (const id of Object.keys(st.tree.done)) if (defs[id].cat.includes(cat)) last[id] = st.age;
+      };
+      const b = Object.assign((...a) => withGate(random)(...a), { tree });
+      const { state: st, age } = playLife(mixSeed(seed, i), content, b, onCard);
+      res.push({ st, age, last, unc, washes, stuck, dupWash });
+    }
+    return res;
+  };
+  const base = run({}, false);
+  const have = base.filter((r) => r.st.tree && Object.keys(r.st.tree.done).length);
+  // 1) นิยามสนิม: โหนดที่ปลดแล้ว จางเมื่อไม่ถูกใช้ครบ years ปีนับจากครั้งล่าสุด/ตอนปลด · ตัววัดอิสระจากการ์ดที่เห็น
+  // ไม่ตรงที่ยอมได้เฉพาะ: ตัววัดว่าจางแต่เอนจินว่าไม่จาง และอายุ "ใช้ล่าสุด" ของเอนจินตรงกับอายุที่มีการ์ดนอกทะเบียนถูกตอบ · ที่เหลือ (เอนจินจางทั้งที่ใช้เมื่อเร็ว ๆ นี้ · ใช้อายุที่ไม่มีการ์ดใดตอบ) = ผิด
+  let nodes = 0, rusty = 0, bad = 0, explained = 0;
+  for (const { st, age, last, unc } of have) {
+    for (const id of Object.keys(st.tree.done)) {
+      nodes++;
+      const idle = age - Math.max(st.tree.done[id], last[id] ?? st.tree.done[id]);
+      const want = idle >= R.years;
+      const got = treeRusty(st, id, age, R);
+      if (got) rusty++;
+      if (want !== got) {
+        if (want && !got && unc.has(st.tree.used?.[id])) explained++;
+        else bad++;
+      }
+    }
+  }
+  console.log(`สนิม: ${have.length} ชีวิตที่ปลดอย่างน้อย 1 โหนด · ${nodes} โหนดตอนตาย · จาง ${rusty} (${f1((rusty / Math.max(1, nodes)) * 100)}%) · ไม่ตรงตัววัดอิสระ ${bad} (อธิบายได้ด้วยการ์ดนอกทะเบียน ${explained})`);
+  if (!have.length) fails.push('สนิม: ไม่มีชีวิตที่ปลดโหนดเลย วัดไม่ได้');
+  if (bad) fails.push(`สนิม: จาง/ไม่จางไม่ตรงตัววัดอิสระ ${bad} โหนด`);
+  if (!rusty) fails.push('สนิม: ไม่มีโหนดจางเลยทั้งกลุ่ม (กลไกไม่ทำงาน หรือบอทใช้ทุกโหนดตลอด)');
+  if (rusty === nodes) fails.push('สนิม: จางทุกโหนด (ไม่เคยถูก "ใช้" ได้เลย)');
+  // ตัวควบคุม: ปิดสนิม → 0 โหนดจาง บนชีวิตชุดเดียวกัน (เทียบของจริงที่จางจริง)
+  const off = run({ rust: false }, false);
+  let rustyOff = 0;
+  for (const { st, age } of off) if (st.tree) for (const id of Object.keys(st.tree.done)) if (treeRusty(st, id, age, R)) rustyOff++;
+  console.log(`ตัวควบคุม (ปิดสนิม): โหนดจาง ${rustyOff} (ฐาน ${rusty})`);
+  if (rustyOff) fails.push(`สนิม: ปิดสนิมแล้วยังมีโหนดจาง ${rustyOff}`);
+  // 2) ล้างโหนด: ≤1 โหนด/ปี · 0 keystone · หลอดไม่ขยับในปีที่ล้าง · เซฟ→โหลดครบ · ฐานของฉายาครบ
+  const wash = run({}, true);
+  let w = 0, dup = 0, stuckN = 0, perAge = 0, ever = 0, everBad = 0, saveW = 0, saveBad = 0;
+  for (const r of wash) {
+    w += r.washes.length;
+    dup += r.dupWash;
+    stuckN += r.stuck.length;
+    if (new Set(r.washes).size !== r.washes.length) perAge++;
+    const t = r.st.tree;
+    if (!t) continue;
+    for (const id of Object.keys(t.gone ?? {})) {
+      ever++;
+      if (defs[id].keystone || !treeEver(r.st).includes(id)) everBad++;
+    }
+    if (t.gone) {
+      saveW++;
+      if (JSON.stringify(restore(snapshot({ st: r.st, af: null, card: null }, content), content).st.tree) !== JSON.stringify(t)) saveBad++;
+    }
+  }
+  console.log(`ล้างโหนด: ${w} ครั้งใน ${wash.length} ชีวิต · ล้างซ้ำปีเดียวกันหลุด ${dup} · ปีเดียวกันซ้ำในบันทึก ${perAge} · หลอดขยับในปีที่ล้าง ${stuckN} · รายการเคยปลดผิด/keystone ${everBad}/${ever} · เซฟ→โหลด ${saveW - saveBad}/${saveW}`);
+  if (!w) fails.push('ล้างโหนด: บอทล้างไม่ได้เลยสักครั้ง วัดไม่ได้');
+  if (dup) fails.push(`ล้างโหนด: ล้างซ้ำปีเดียวกันได้ ${dup} ครั้ง (ต้อง 0)`);
+  if (perAge) fails.push(`ล้างโหนด: ปีเดียวกันล้างมากกว่า 1 โหนด ${perAge} ชีวิต`);
+  if (stuckN) fails.push(`ล้างโหนด: หลอดขยับในปีที่ล้าง ${stuckN} ครั้ง (ต้อง 0)`);
+  if (everBad) fails.push(`ล้างโหนด: รายการเคยปลดผิด/ล้าง keystone ${everBad}`);
+  if (saveBad) fails.push(`ล้างโหนด: เซฟ→โหลดสถานะล้างไม่ตรง ${saveBad}/${saveW}`);
+}
+// keystone ล้างไม่ได้ (โหนดสังเคราะห์ zk) · โหนดที่ยังไม่ปลดล้างไม่ได้
+{
+  const first = Object.keys(defs)[0];
+  const zk = { ...defs[first], branch: 'zz', keystone: true, warn: 'x', cost: { health: -1 }, pre: [], stages: ['เด็ก'] };
+  const st = newLife(mixSeed(seed, 1), { ...content, tree: { ...content.tree, nodes: { ...defs, zk } } });
+  st.tree = { cur: null, done: { zk: 3 }, yrs: {}, cards: {}, hist: [] };
+  let key = false, none = false;
+  try { lifeTreeRespec(st, 'zk'); } catch { key = true; }
+  try { lifeTreeRespec(st, first); } catch { none = true; }
+  console.log(`ล้าง keystone ${key ? 'ถูกกัน' : 'หลุด'} · ล้างโหนดที่ยังไม่ปลด ${none ? 'ถูกกัน' : 'หลุด'}`);
+  if (!key) fails.push('ล้างโหนด: ล้าง keystone ได้');
+  if (!none) fails.push('ล้างโหนด: ล้างโหนดที่ยังไม่ปลดได้');
+}
+Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false, passive: true, rust: true });
 
 console.log(fails.length ? `\nไม่ผ่าน ${fails.length} ข้อ\n${fails.map((f) => `  ✗ ${f}`).join('\n')}` : '\nผ่านทั้งหมด');
 process.exitCode = fails.length ? 1 : 0;
