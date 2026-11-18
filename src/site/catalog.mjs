@@ -23,7 +23,7 @@ export const CARD_GROUPS = [
   { name: 'สังคม', files: ['era_*', 'echoes', 'echoes_debt', 'sex_roles'] },
   { name: 'ช่วงวัยและก้าวสำคัญ', files: ['young', 'mid', 'milestones*', 'time_capsule', 'prepared', 'drift', 'childhood_echoes'] },
   { name: 'ความเชื่อ', files: ['belief'] },
-  { name: 'การเรียน', files: ['teen', 'scholarship_bond'] },
+  { name: 'การเรียน', files: ['teen', 'scholarship_bond', 'pali_monk'] },
   { name: AFTER, files: ['afterlife'] },
 ];
 const fileHits = (pat, name) => (pat.endsWith('*') ? name.startsWith(pat.slice(0, -1)) : pat.startsWith('*') ? name.endsWith(pat.slice(1)) : name === pat);
