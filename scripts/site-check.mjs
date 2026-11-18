@@ -15,6 +15,7 @@ import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
 import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
 import { NEED_TEXT } from '../src/site/focus.mjs';
+import { treeViewLayout } from '../src/ui/treeview.mjs';
 import { focusWords, STAT_LABELS, FOCUS_NEEDS, ISEKAI_FOCUS, ISEKAI_KNOW } from '../src/engine/index.mjs';
 import { catalogHtml, spoilerBacks, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { cadetHtml, readCadet, schoolYears } from '../src/site/cadet-cards.mjs';
@@ -922,6 +923,14 @@ const focusCtl = focusGap(focusPage.replaceAll(`<b>${escHtml(f0.name)}</b>`, '')
 const fGap = focusGap(focusPage);
 const fLeak = focusLeak(focusPage);
 check('หน้าโฟกัสครบทุกโฟกัสพร้อมป้ายเดียวกับเกม ไม่เผยผลเสี่ยงหรือตัวเลข และหน้าวิธีเล่นลิงก์ถึง', fGap.length || fLeak.length || needOff.length || noLink || !focusCtl, ` ขาด ${fGap.join(',')} · เผย ${fLeak.join(',')} · need ${needOff.join(',')} · ลิงก์ ${noLink} · ตัวควบคุม ${focusCtl}`);
+
+// 12b) ต้นไม้โฟกัส: ป้ายชื่อโหนดไม่ถูกเส้น/โหนด/ป้ายอื่น/ป้ายแขนงทับ (ft12 เส้นทำบุญ→ถือศีลวิ่งผ่านป้าย "เข้าค่ายธรรมะ" · เส้นออกจากรากทับป้ายราก)
+// ตัวควบคุม: ต้นสามโหนดรากมีสองลูก บังคับป้ายใต้โหนดทุกตัว ⇒ ต้องจับได้ · เลือกเองแล้วต้องว่าง
+const tvDefs = content.tree?.nodes ?? {};
+const tvCtl = { a: { name: 'ราก', branch: 'occ', pre: [] }, b: { name: 'ซ้าย', branch: 'occ', pre: ['a'] }, c: { name: 'ขวา', branch: 'occ', pre: ['a'] } };
+const tvBad = treeViewLayout(tvDefs).overlaps;
+const tvCtlOk = treeViewLayout(tvCtl, { labelPos: 'below' }).overlaps.length > 0 && treeViewLayout(tvCtl).overlaps.length === 0;
+check('ต้นไม้โฟกัส ป้ายชื่อโหนดไม่ถูกเส้น/โหนด/ป้ายอื่นทับ (ตัวควบคุมจับป้ายใต้โหนดรากได้)', tvBad.length || !tvCtlOk, ` ชน ${tvBad.map((o) => `${o.id}↔${o.kind}:${o.with}`).join(' ')}${tvCtlOk ? '' : ' · ตัวควบคุมไม่ตก'}`);
 
 // 285) ป้ายเวอร์ชันบนหน้าการ์ด: การ์ดที่ปล่อยแล้วต้องมีเวอร์ชันในทะเบียน · เวอร์ชันนั้นต้องมีหัวใน whatsnew · หัวรุ่นทุกหัวมี id
 // การ์ดใหม่ที่ไม่อยู่ในฐาน keep = รอ rel.mjs เติมตอนปล่อย ไม่ตก · ต่างโลกไม่อยู่ในฐาน keep จึงเตือนอย่างเดียว

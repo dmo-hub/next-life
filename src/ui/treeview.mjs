@@ -12,6 +12,25 @@ const TV_PAD_TOP = 30;
 const TV_PAD_BOTTOM = 52;
 const TV_R = 14;
 
+// ป้ายชื่อโหนดไม่ทับเส้น/โหนด/ป้ายอื่น/ป้ายแขนง: ลองวางล่าง บน ขวา ซ้ายตามลำดับ เอาที่แรกที่ไม่ชน (ต้นไม้แตกลงล่างเสมอ ป้ายใต้โหนดจึงถูกเส้นลูกตัด)
+// ความกว้างป้ายประมาณจากจำนวนตัวอักษร (ไม่นับสระ/วรรณยุกต์ลอย) เพราะผังคำนวณก่อนมีฟอนต์
+const TV_POS = ['below', 'above', 'right', 'left'];
+const TV_COMB = /[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]/g;
+const tvLabelW = (name) => 7 * String(name).replace(TV_COMB, '').length;
+const tvLabelAt = (pos, x, y, w) => {
+  const gap = TV_R + 8;
+  if (pos === 'above') return { dx: 0, dy: -(TV_R + 9), anchor: 'middle', box: { x0: x - w / 2, x1: x + w / 2, y0: y - TV_R - 20, y1: y - TV_R - 5 } };
+  if (pos === 'right') return { dx: gap, dy: 4, anchor: 'start', box: { x0: x + gap, x1: x + gap + w, y0: y - 7, y1: y + 8 } };
+  if (pos === 'left') return { dx: -gap, dy: 4, anchor: 'end', box: { x0: x - gap - w, x1: x - gap, y0: y - 7, y1: y + 8 } };
+  return { dx: 0, dy: TV_R + 17, anchor: 'middle', box: { x0: x - w / 2, x1: x + w / 2, y0: y + TV_R + 6, y1: y + TV_R + 21 } };
+};
+const tvHit = (a, b, pad) => a.x0 - pad < b.x1 && b.x0 - pad < a.x1 && a.y0 - pad < b.y1 && b.y0 - pad < a.y1;
+// เส้นโค้งเดียวกับ tvEdge แต่เป็นจุดถี่ ๆ ไว้เช็กชน
+const tvEdgePts = (a, b) => {
+  const cx = (a.x + b.x) / 2 - (b.y - a.y) * 0.12, cy = (a.y + b.y) / 2 + (b.x - a.x) * 0.12;
+  return Array.from({ length: 25 }, (_, i) => { const t = i / 24, u = 1 - t; return { x: u * u * a.x + 2 * u * t * cx + t * t * b.x, y: u * u * a.y + 2 * u * t * cy + t * t * b.y }; });
+};
+
 const tvEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const tvPolar = (deg, r, cx, cy) => ({ x: cx + r * Math.cos((deg * Math.PI) / 180), y: cy + r * Math.sin((deg * Math.PI) / 180) });
 
@@ -20,7 +39,9 @@ export const treeViewBranches = (defs) => [...new Set(Object.values(defs).filter
 
 // ผัง: กลุ่มของแต่ละแขนงรวมเป็นก้อนเดียว วางรอบวง (แขนงเดียว = กลางจอ) · ลึกในกลุ่ม = ห่างจากรากของแขนงตามขอบ pre ที่อยู่แขนงเดียวกัน
 // คืน { W, H, P:{id:{x,y}}, pills:{branch:{x,y}}, boxes:{branch:{x0,y0,x1,y1}} } พิกัดเลื่อนให้มุมซ้ายบนเป็น 0,0
-export function treeViewLayout(defs) {
+// labelPos = บังคับตำแหน่งป้ายทุกโหนด (ไว้ให้ด่านใน site-check ทำตัวควบคุม) · ไม่ส่ง = เลือกเองที่ไม่ชน
+// overlaps = [{ id, kind: 'edge'|'node'|'label'|'pill', with }] ของป้ายที่ยังชนหลังเลือกแล้ว (ผังจริงต้องว่าง)
+export function treeViewLayout(defs, { labelPos = null } = {}) {
   const ids = Object.keys(defs);
   const branches = treeViewBranches(defs);
   const depth = {};
@@ -52,25 +73,49 @@ export function treeViewLayout(defs) {
     const ps = (defs[id].pre ?? []).map((p) => P[p]).filter(Boolean);
     P[id] = { x: ps.reduce((s, p) => s + p.x, 0) / (ps.length || 1), y: ps.reduce((s, p) => s + p.y, 0) / (ps.length || 1) };
   }
+  const edges = [];
+  for (const id of ids) for (const p of defs[id].pre ?? []) if (P[p]) edges.push({ id, pts: tvEdgePts(P[p], P[id]) });
+  const pillBox = (p) => ({ x0: p.x - 44, x1: p.x + 44, y0: p.y - 12, y1: p.y + 12 });
+  const labels = {};
+  const overlaps = [];
+  for (const id of ids) if (P[id]) {
+    const w = tvLabelW(defs[id].name);
+    const tries = (labelPos ? [labelPos] : TV_POS).map((pos) => {
+      const L = { pos, ...tvLabelAt(pos, P[id].x, P[id].y, w) };
+      const hit = [];
+      for (const e of edges) if (e.pts.some((q) => tvHit({ x0: q.x, x1: q.x, y0: q.y, y1: q.y }, L.box, 2))) hit.push({ id, kind: 'edge', with: e.id });
+      for (const o of ids) if (o !== id && P[o] && tvHit({ x0: P[o].x - TV_R - 2, x1: P[o].x + TV_R + 2, y0: P[o].y - TV_R - 2, y1: P[o].y + TV_R + 2 }, L.box, 0)) hit.push({ id, kind: 'node', with: o });
+      for (const [o, l] of Object.entries(labels)) if (tvHit(l.box, L.box, 3)) hit.push({ id, kind: 'label', with: o });
+      for (const [b, p] of Object.entries(pills)) if (tvHit(pillBox(p), L.box, 3)) hit.push({ id, kind: 'pill', with: b });
+      return { L, hit };
+    });
+    const best = tries.find((t) => !t.hit.length) ?? tries.reduce((a, t) => (t.hit.length < a.hit.length ? t : a));
+    labels[id] = best.L;
+    overlaps.push(...best.hit);
+  }
   const all = Object.values(P);
   const px = Object.values(pills);
-  const x0 = Math.min(...all.map((p) => p.x), ...px.map((p) => p.x - 50)) - TV_PAD_X;
-  const x1 = Math.max(...all.map((p) => p.x), ...px.map((p) => p.x + 50)) + TV_PAD_X;
-  const y0 = Math.min(...all.map((p) => p.y - TV_PAD_TOP), ...px.map((p) => p.y - 16));
-  const y1 = Math.max(...all.map((p) => p.y)) + TV_PAD_BOTTOM;
+  const lb = Object.values(labels).map((l) => l.box);
+  const x0 = Math.min(Math.min(...all.map((p) => p.x), ...px.map((p) => p.x - 50)) - TV_PAD_X, ...lb.map((b) => b.x0 - 6));
+  const x1 = Math.max(Math.max(...all.map((p) => p.x), ...px.map((p) => p.x + 50)) + TV_PAD_X, ...lb.map((b) => b.x1 + 6));
+  const y0 = Math.min(...all.map((p) => p.y - TV_PAD_TOP), ...px.map((p) => p.y - 16), ...lb.map((b) => b.y0 - 4));
+  const y1 = Math.max(Math.max(...all.map((p) => p.y)) + TV_PAD_BOTTOM, ...lb.map((b) => b.y1 + 4));
   for (const p of all) { p.x -= x0; p.y -= y0; }
   for (const p of px) { p.x -= x0; p.y -= y0; }
+  for (const b of lb) { b.x0 -= x0; b.x1 -= x0; b.y0 -= y0; b.y1 -= y0; }
   const boxes = {};
   for (const b of branches) {
-    const mine = ids.filter((id) => P[id] && !defs[id].and && defs[id].branch === b).map((id) => P[id]);
+    const mineIds = ids.filter((id) => P[id] && !defs[id].and && defs[id].branch === b);
+    const mine = mineIds.map((id) => P[id]);
+    const mlb = mineIds.map((id) => labels[id].box);
     boxes[b] = {
-      x0: Math.max(0, Math.min(...mine.map((p) => p.x), pills[b].x - 50) - TV_PAD_X),
-      x1: Math.min(x1 - x0, Math.max(...mine.map((p) => p.x), pills[b].x + 50) + TV_PAD_X),
+      x0: Math.max(0, Math.min(Math.min(...mine.map((p) => p.x), pills[b].x - 50) - TV_PAD_X, ...mlb.map((l) => l.x0 - 6))),
+      x1: Math.min(x1 - x0, Math.max(Math.max(...mine.map((p) => p.x), pills[b].x + 50) + TV_PAD_X, ...mlb.map((l) => l.x1 + 6))),
       y0: Math.max(0, pills[b].y - 22),
-      y1: Math.min(y1 - y0, Math.max(...mine.map((p) => p.y)) + TV_PAD_BOTTOM),
+      y1: Math.min(y1 - y0, Math.max(Math.max(...mine.map((p) => p.y)) + TV_PAD_BOTTOM, ...mlb.map((l) => l.y1 + 4))),
     };
   }
-  return { W: x1 - x0, H: y1 - y0, P, pills, boxes };
+  return { W: x1 - x0, H: y1 - y0, P, pills, boxes, labels, overlaps };
 }
 
 // เส้นโค้งเบาๆ ให้เส้นข้ามกลุ่มไม่ทับกันเป็นเส้นตรงเดียว (แบบ 4)
@@ -98,7 +143,8 @@ export function treeViewSvg(defs, { info = () => ({ st: 'plain', g: 0 }), only =
     const ring = i.st === 'act' || i.st === 'wait' ? `<circle class="tv-ring" r="${TV_R + 5}" transform="rotate(-90)" stroke-dasharray="${tvR(Math.min(1, i.g) * 2 * Math.PI * (TV_R + 5))} 999"/>` : '';
     const mark = hid ? '<text class="tv-q" y="4" text-anchor="middle">?</text>' : '';
     const pick = sel === id ? `<circle class="tv-pick" r="${TV_R + 10}"/>` : '';
-    const label = hid ? '' : `<text class="tv-l" y="${TV_R + 17}" text-anchor="middle">${tvEsc(d.name)}</text>`;
+    const lp = L.labels[id];
+    const label = hid ? '' : `<text class="tv-l"${lp.dx ? ` x="${lp.dx}"` : ''} y="${lp.dy}" text-anchor="${lp.anchor}">${tvEsc(d.name)}</text>`;
     const attrs = interactive ? ` tabindex="0" role="button" data-tv="${tvEsc(id)}" aria-label="${tvEsc(hid ? 'ช่องที่ยังซ่อนอยู่' : d.name)}"` : '';
     s += `<g class="tv-g s-${i.st}${d.size === 'b' ? ' big' : ''}"${attrs} style="--tvc:${color(id)}" transform="translate(${tvR(q.x)} ${tvR(q.y)})">${pick}${shape}${ring}${mark}${label}</g>`;
   }
