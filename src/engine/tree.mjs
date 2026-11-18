@@ -3,6 +3,8 @@
 // ไม่เคยทุ่ม = ไม่มี h.tree: ชีวิตที่ไม่แตะต้นไม้เดินเท่าเดิมทุกหลัก (ไม่ดึงเลขสุ่ม ไม่ถ่วงการ์ด)
 // ทุ่มได้แค่โหนดที่ยังไม่ปลด (ข้อ 36) · ปลดแล้วเลื่อนไปโหนดถัดไปเอง ไม่เสียปี · เปลี่ยนเองทีหลังได้ ไม่เสียปี (ข้อ 43) · ทางแยกไม่ล็อก เวลาเป็นราคา (ข้อ 8)
 
+import { makeRng, mixSeed } from './rng.mjs';
+
 // ตัวควบคุมของ harness: ปิดการนับการ์ด → โหนดที่ต้องตอบการ์ดต้องปลดไม่ได้เลย
 // anyCat / cardsFree = ทางเลือกที่ harness ใช้ทำตารางเสนอเจ้าของเท่านั้น (นับทุกหมวด · ไม่ต้องตอบการ์ด) ห้ามเปิดนอก harness
 // passive = ผลติดตัวหลังปลด (ผลเบารายปี · ทอย · ถ่วงการ์ด · ใบ 04) ปิด = ปลดแล้วไม่ให้อะไรเลย (ตัวควบคุมของด่านงบ)
@@ -83,7 +85,11 @@ export function treeYearEnd(h, defs, stage, age, pace = null) {
 }
 
 // ปลดแล้วเลื่อนไปโหนดแรกที่ทุ่มได้ต่อ · ไม่เลื่อนเข้าโหนดซ่อน และไม่เลื่อนเข้า keystone เอง (ใบ 05 · ข้อ 28: ต้องเลือกทุ่มเองหลังเห็นข้อเสีย)
-const treeNext = (h, defs, stage, id) => treeOffers(h, defs, stage).find((x) => x !== id && !defs[x].hidden && !defs[x].keystone) ?? null;
+// แขนงเดียวกับโหนดที่เพิ่งปลดมาก่อน (ต้นไม้หลายแขนงต้นแขนงอื่นเปิดอยู่เสมอ ห้ามเลื่อนข้ามแขนงเอง) · แขนงเดียวกันหมดแล้วค่อยหาแขนงอื่น
+const treeNext = (h, defs, stage, id) => {
+  const open = treeOffers(h, defs, stage).filter((x) => x !== id && !defs[x].hidden && !defs[x].keystone);
+  return open.find((x) => defs[x].branch === defs[id].branch) ?? open[0] ?? null;
+};
 
 // ── การ์ดด่าน + keystone (ใบ 05) ── ทุกตัวไม่ดึงเลขสุ่ม · ผลของการ์ดด่านลงผ่านตัวเลือกของการ์ด (ผลเต็มครั้งเดียว) ไม่ผ่านงบผลเบา
 // ปีครบแต่การ์ดหมวดยังไม่ครบ (ข้อ 46): ใช้บอกขั้น "รอโอกาส" ที่หน้าต้นไม้ · ไม่แตะสถานะ
@@ -114,6 +120,23 @@ export function treeGateDone(h, defs, stage, id, idx, age) {
   t.cur = treeNext(h, defs, stage, id);
 }
 
+// ── จุดเกิด (ใบ 06 · ข้อ 15 39 17 · ข้อ 97) ── ทุกชีวิตเริ่ม 1 แขนง: ถ่วงน้ำหนักตาม ฐานะ > อาชีพ > แขนงพ่อแม่ (ตัวเลขใน tree.yaml start)
+// ฟังก์ชันล้วนจาก seed (stream แยก ไม่ดึงเลขสุ่มของโลก · ไม่เขียนสถานะ) · พ่อแม่ไม่มีโหนดเลย (ไม่มี parentBranch) = ไม่มีน้ำหนักแขนงพ่อแม่ ส่วนที่เหลือยังถ่วงตามฐานะ/อาชีพ (ข้อ 67 73)
+const START_SALT = 0x5bd1e995;
+export const treeStartWeights = (cfg, cls, occ = null, parentBranch = null) => {
+  const band = cls <= 3 ? 'low' : cls <= 6 ? 'mid' : 'high';
+  return Object.fromEntries(Object.keys(cfg.class[band]).map((b) => [b, cfg.base + cfg.class[band][b] + (cfg.job[occ]?.[b] ?? 0) + (b === parentBranch ? cfg.parent_branch : 0)]));
+};
+export function treeStartBranch(cfg, seed, cls, occ = null, parentBranch = null) {
+  const w = treeStartWeights(cfg, cls, occ, parentBranch);
+  const keys = Object.keys(w);
+  let x = makeRng(mixSeed(seed ^ START_SALT, 0)).next() * keys.reduce((a, b) => a + w[b], 0);
+  for (const b of keys) if ((x -= w[b]) < 0) return b;
+  return keys[keys.length - 1];
+}
+// ต้นแขนง = โหนดไม่มีต้นทางของแขนงนั้น (เปิดอยู่ตั้งแต่เด็ก)
+export const treeStartNode = (defs, branch) => Object.keys(defs).find((id) => defs[id].branch === branch && !(defs[id].pre ?? []).length && !defs[id].hidden) ?? null;
+
 // ── ผลติดตัว (ใบ 04) ── ทุกตัวเป็นฟังก์ชันล้วน ไม่ดึงเลขสุ่ม · ไม่เคยปลดอะไร = 1 เท่าเดิมทุกหลัก
 // ทอยทุกโหนดตามหมวดการ์ด คิดรวมต่อแขนง (ข้อ 58): ระดับ = Σ roll ของโหนดที่ปลดแล้วและหมวดตรง · ตัวคูณ = 1 + k × ระดับ (แบบ thaiSkillMul) · ชนเพดาน okMax ที่ปลายทางเอง
 // อาชีพตรง (ข้อ 17 50 53): โหนดที่ระบุ jobs ให้ job_roll เพิ่มอีกชั้นเดียวเมื่ออาชีพที่ทำอยู่ตรง · ซ้อนกี่โหนดก็นับสูงสุดตัวเดียว ไม่ซ้อน 2 ชั้น
@@ -139,7 +162,7 @@ function topCats(t, defs) {
   const hit = topCache.get(t);
   if (hit && hit.n === n && hit.defs === defs) return hit.cats;
   const cnt = {};
-  for (const id of Object.keys(t.done)) if (defs[id]) cnt[defs[id].branch] = (cnt[defs[id].branch] ?? 0) + 1;
+  for (const id of Object.keys(t.done)) if (defs[id] && !defs[id].and) cnt[defs[id].branch] = (cnt[defs[id].branch] ?? 0) + 1;
   const best = Math.max(0, ...Object.values(cnt));
   const top = Object.keys(cnt).filter((b) => cnt[b] === best);
   const cats = new Set();

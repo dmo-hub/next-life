@@ -512,9 +512,11 @@ try {
 
 // ต้นไม้โฟกัส (ใบ 03): ทะเบียนผิดรูปต้องตก (ขอบชี้โหนดที่ไม่มี · วนเป็นวง · หมวด/ช่วงวัย/ผลผิด) · ทะเบียนถูกรูปต้องผ่าน · ของจริงต้องผ่าน
 {
-  const node = (over = {}) => ({ name: 'โหนดทดสอบ', branch: 'occ', size: 's', stages: ['เด็ก'], pre: [], years: 2, cards: 1, cat: ['belief'], fx: { happiness: 1 }, light: { happiness: 1 }, roll: 1, ...over });
+  const ALL_STAGES = ['เด็ก', 'วัยรุ่น', 'หนุ่มสาว', 'ทำงาน', 'กลางคน', 'ชรา'];
+  const node = (over = {}) => ({ name: 'โหนดทดสอบ', branch: 'occ', size: 's', stages: ALL_STAGES, pre: [], years: 2, cards: 1, cat: ['belief'], fx: { happiness: 1 }, light: { happiness: 1 }, roll: 1, ...over });
   const gate = (over = {}) => ({ title: 'ด่านทดสอบ', text: 'ถึงทางแยกของโหนดทดสอบ', results: [{ text: 'ทางหนึ่ง', fx: { happiness: 1 } }, { text: 'อีกทางหนึ่ง', fx: { knowledge: 1 } }], ...over });
   const doc = (nodes, over = {}) => ({ year_scale: 0.25, light_unit: { s: 0.007, b: 0.014, k: 0.025 }, roll_k: 0.1, card_mul: 1.25, budget: 0.5, nodes, ...over });
+  const START = { base: 1, parent_branch: 1, class: { low: { occ: 1 }, mid: { occ: 1 }, high: { occ: 1 } }, job: { clerk: { occ: 1 } } };
   const treeCases = [
     ['good: สองโหนดต่อกัน', doc({ a: node(), b: node({ pre: ['a'] }) }), 0],
     ['bad: ขอบชี้โหนดที่ไม่มี', doc({ a: node({ pre: ['ghost'] }) }), 1],
@@ -542,6 +544,21 @@ try {
     ['bad: keystone ไม่มีคำบอกข้อเสีย', doc({ a: node({ size: 'k', keystone: true, cost: { health: -1 } }) }), 1],
     ['bad: keystone ไม่มีข้อเสียถาวร', doc({ a: node({ size: 'k', keystone: true, warn: 'ได้แรงแต่เสียถาวร' }) }), 1],
     ['bad: keystone ข้อเสียเป็นค่าบวก', doc({ a: node({ size: 'k', keystone: true, warn: 'ได้แรงแต่เสียถาวร', cost: { health: 1 } }) }), 1],
+    // ใบ 06: ทุกวัย ≥1 โหนดที่เห็นต่อแขนง (ข้อ 44 61) · โหนดกลาง (and) · nolight
+    ['good: แขนงเดียวครอบทุกวันด้วยสองโหนด', doc({ a: node({ stages: ALL_STAGES.slice(0, 3) }), b: node({ stages: ALL_STAGES.slice(3), pre: ['a'] }) }), 0],
+    ['bad: แขนงไม่มีโหนดในช่วงวัยหนึ่ง', doc({ a: node({ stages: ALL_STAGES.slice(0, 5) }) }), 1],
+    ['bad: ช่วงวัยนั้นมีแต่โหนดซ่อน', doc({ a: node({ stages: ALL_STAGES.slice(0, 5) }), h: node({ stages: ['ชรา'], hidden: true, pre: ['a'] }) }), 1],
+    ['good: โหนดกลางแม่สองแขนง', doc({ a: node(), x: node({ branch: 'know', cat: ['study'] }), m: node({ branch: 'mid', and: true, pre: ['a', 'x'], cat: ['belief', 'study'] }) }), 0],
+    ['bad: โหนดกลางแม่แขนงเดียว', doc({ a: node(), b: node({ pre: ['a'] }), m: node({ branch: 'mid', and: true, pre: ['a', 'b'] }) }), 1],
+    ['bad: โหนดกลางไม่มี and', doc({ a: node(), x: node({ branch: 'know', cat: ['study'] }), m: node({ branch: 'mid', pre: ['a', 'x'] }) }), 1],
+    ['bad: โหนดในแขนงมี and', doc({ a: node(), b: node({ pre: ['a'], and: true }) }), 1],
+    ['good: nolight ปลดตัวเลือกอย่างเดียว', doc({ a: node({ light: undefined, nolight: true, roll: 0 }) }), 0],
+    ['bad: nolight แต่มี light', doc({ a: node({ nolight: true, roll: 0 }) }), 1],
+    // ใบ 06: จุดเกิด (ข้อ 97)
+    ['good: ตารางจุดเกิดครบแขนง', doc({ a: node() }, { start: START }), 0],
+    ['bad: ตารางจุดเกิดขาดแขนง', doc({ a: node() }, { start: { ...START, class: { ...START.class, mid: {} } } }), 1],
+    ['bad: ตารางจุดเกิดชี้แขนงที่ไม่มี', doc({ a: node() }, { start: { ...START, job: { clerk: { ghost: 1 } } } }), 1],
+    ['bad: ตารางจุดเกิดแต้มติดลบ', doc({ a: node() }, { start: { ...START, class: { ...START.class, low: { occ: -1 } } } }), 1],
     ['bad: keystone สองตัวในแขนงเดียว', doc({ a: node({ size: 'k', keystone: true, warn: 'ข้อเสีย', cost: { health: -1 } }), b: node({ size: 'k', keystone: true, warn: 'ข้อเสีย', cost: { health: -1 } }) }), 1],
   ];
   for (const [name, d, want] of treeCases) {

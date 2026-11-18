@@ -2,7 +2,7 @@
 // ชื่อระดับบนสุดขึ้นต้น tv/TREE_VIEW ทั้งหมด — build ต่อทุกโมดูลเป็นสคริปต์เดียว ชื่อซ้ำกับโมดูลอื่นไม่ได้
 
 // แขนงที่ตั้งชื่อ/สีไว้ · แขนงใหม่ในทะเบียน (content/rules/tree.yaml) ที่ไม่อยู่ที่นี่ = หน้าเว็บหยุด build (site focus.mjs) แทนวาดแขนงไร้ชื่อ
-export const TREE_VIEW_BRANCH = { occ: { name: 'ลึกลับ', color: '#B0509A' } };
+export const TREE_VIEW_BRANCH = { money: { name: 'เงิน', color: '#C77A1E' }, rel: { name: 'ความสัมพันธ์', color: '#D0457A' }, know: { name: 'ความรู้', color: '#3F73D6' }, skill: { name: 'ทักษะ', color: '#1F9A72' }, occ: { name: 'ลึกลับ', color: '#B0509A' }, mid: { name: 'โหนดกลาง', color: '#64748B' } };
 
 const TV_GAP_X = 118;
 const TV_GAP_Y = 76;
@@ -14,11 +14,30 @@ const TV_R = 14;
 
 // ป้ายชื่อโหนดไม่ทับเส้น/โหนด/ป้ายอื่น/ป้ายแขนง: ลองวางล่าง บน ขวา ซ้ายตามลำดับ เอาที่แรกที่ไม่ชน (ต้นไม้แตกลงล่างเสมอ ป้ายใต้โหนดจึงถูกเส้นลูกตัด)
 // ความกว้างป้ายประมาณจากจำนวนตัวอักษร (ไม่นับสระ/วรรณยุกต์ลอย) เพราะผังคำนวณก่อนมีฟอนต์
-const TV_POS = ['below', 'above', 'right', 'left'];
+// ต้นเต็มมีเส้นข้ามแขนงหนาแน่น 4 ทิศไม่พอ: ต่อด้วยป้ายเยื้องมุมและระยะไกลขึ้น (ลองตามลำดับ เอาที่ไม่ชนที่แรก)
+const TV_POS = ['below', 'above', 'right', 'left', 'belowR', 'belowL', 'aboveR', 'aboveL', 'below2', 'above2', 'right2', 'left2',
+  ...[30, 44, 60, 78, 100, 124].flatMap((r) => Array.from({ length: 16 }, (_, i) => `p:${i * 22.5}:${r}`))];
 const TV_COMB = /[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]/g;
 const tvLabelW = (name) => 7 * String(name).replace(TV_COMB, '').length;
 const tvLabelAt = (pos, x, y, w) => {
   const gap = TV_R + 8;
+  const o = TV_R + 6;
+  // p:องศา:ระยะ = ป้ายวางกึ่งกลางที่ระยะนั้นรอบโหนด (เหลือทางเลือกสุดท้ายเมื่อ 12 ทิศข้างบนชนเส้นหมด) · ต้องพ้นวงโหนดตัวเอง
+  if (pos.startsWith('p:')) {
+    const [, deg, rad] = pos.split(':').map(Number);
+    const cx = x + rad * Math.cos((deg * Math.PI) / 180), cy = y + rad * Math.sin((deg * Math.PI) / 180);
+    const box = { x0: cx - w / 2, x1: cx + w / 2, y0: cy - 8, y1: cy + 8 };
+    const own = !(box.x0 > x + TV_R + 2 || box.x1 < x - TV_R - 2 || box.y0 > y + TV_R + 2 || box.y1 < y - TV_R - 2);
+    return { dx: cx - x, dy: cy - y + 4, anchor: 'middle', box, own };
+  }
+  if (pos === 'belowR') return { dx: 6, dy: TV_R + 17, anchor: 'start', box: { x0: x + 6, x1: x + 6 + w, y0: y + o, y1: y + o + 15 } };
+  if (pos === 'belowL') return { dx: -6, dy: TV_R + 17, anchor: 'end', box: { x0: x - 6 - w, x1: x - 6, y0: y + o, y1: y + o + 15 } };
+  if (pos === 'aboveR') return { dx: 6, dy: -(TV_R + 9), anchor: 'start', box: { x0: x + 6, x1: x + 6 + w, y0: y - TV_R - 20, y1: y - TV_R - 5 } };
+  if (pos === 'aboveL') return { dx: -6, dy: -(TV_R + 9), anchor: 'end', box: { x0: x - 6 - w, x1: x - 6, y0: y - TV_R - 20, y1: y - TV_R - 5 } };
+  if (pos === 'below2') return { dx: 0, dy: TV_R + 33, anchor: 'middle', box: { x0: x - w / 2, x1: x + w / 2, y0: y + TV_R + 22, y1: y + TV_R + 37 } };
+  if (pos === 'above2') return { dx: 0, dy: -(TV_R + 25), anchor: 'middle', box: { x0: x - w / 2, x1: x + w / 2, y0: y - TV_R - 36, y1: y - TV_R - 21 } };
+  if (pos === 'right2') return { dx: gap + 14, dy: 4, anchor: 'start', box: { x0: x + gap + 14, x1: x + gap + 14 + w, y0: y - 7, y1: y + 8 } };
+  if (pos === 'left2') return { dx: -gap - 14, dy: 4, anchor: 'end', box: { x0: x - gap - 14 - w, x1: x - gap - 14, y0: y - 7, y1: y + 8 } };
   if (pos === 'above') return { dx: 0, dy: -(TV_R + 9), anchor: 'middle', box: { x0: x - w / 2, x1: x + w / 2, y0: y - TV_R - 20, y1: y - TV_R - 5 } };
   if (pos === 'right') return { dx: gap, dy: 4, anchor: 'start', box: { x0: x + gap, x1: x + gap + w, y0: y - 7, y1: y + 8 } };
   if (pos === 'left') return { dx: -gap, dy: 4, anchor: 'end', box: { x0: x - gap - w, x1: x - gap, y0: y - 7, y1: y + 8 } };
@@ -83,6 +102,7 @@ export function treeViewLayout(defs, { labelPos = null } = {}) {
     const tries = (labelPos ? [labelPos] : TV_POS).map((pos) => {
       const L = { pos, ...tvLabelAt(pos, P[id].x, P[id].y, w) };
       const hit = [];
+      if (L.own) hit.push({ id, kind: 'node', with: id });
       for (const e of edges) if (e.pts.some((q) => tvHit({ x0: q.x, x1: q.x, y0: q.y, y1: q.y }, L.box, 2))) hit.push({ id, kind: 'edge', with: e.id });
       for (const o of ids) if (o !== id && P[o] && tvHit({ x0: P[o].x - TV_R - 2, x1: P[o].x + TV_R + 2, y0: P[o].y - TV_R - 2, y1: P[o].y + TV_R + 2 }, L.box, 0)) hit.push({ id, kind: 'node', with: o });
       for (const [o, l] of Object.entries(labels)) if (tvHit(l.box, L.box, 3)) hit.push({ id, kind: 'label', with: o });
@@ -157,7 +177,7 @@ export function treeViewSvg(defs, { info = () => ({ st: 'plain', g: 0 }), only =
     const mark = hid ? '<text class="tv-q" y="4" text-anchor="middle">?</text>' : '';
     const pick = sel === id ? `<circle class="tv-pick" r="${TV_R + 10}"/>` : '';
     const lp = L.labels[id];
-    const label = hid ? '' : `<text class="tv-l"${lp.dx ? ` x="${lp.dx}"` : ''} y="${lp.dy}" text-anchor="${lp.anchor}">${tvEsc(d.name)}</text>`;
+    const label = hid ? '' : `<text class="tv-l"${lp.dx ? ` x="${tvR(lp.dx)}"` : ''} y="${tvR(lp.dy)}" text-anchor="${lp.anchor}">${tvEsc(d.name)}</text>`;
     const attrs = interactive ? ` tabindex="0" role="button" data-tv="${tvEsc(id)}" aria-label="${tvEsc(hid ? 'ช่องที่ยังซ่อนอยู่' : d.name)}"` : '';
     s += `<g class="tv-g s-${i.st}${d.size === 'b' ? ' big' : ''}"${attrs} style="--tvc:${color(id)}" transform="translate(${tvR(q.x)} ${tvR(q.y)})">${pick}${shape}${ring}${mark}${label}</g>`;
   }

@@ -2,7 +2,7 @@
 // ด่านกติกา: ทุกปีที่ทุ่มเข้าหลอดโหนดเดียว · 0 ครั้งที่ทุ่มโหนดที่ปลดแล้ว · ปลดแล้วโหนดถัดไปนับปีถัดไปทันที (ไม่เสียปี) · ตัวควบคุมปิดนับการ์ด = ปลด 0
 // ด่านเกณฑ์ผ่านของเจ้าของ (ข้อ 84 · 86): บอทปลดแขนงลึกลับครบในชีวิตเดียว (o ที่เห็นทั้งหมด + โหนดกลางที่มี o เป็นต้นทาง · o6 ซ่อนไม่นับ)
 // ไม่ครบ = ตก พิมพ์โหนดแรกที่ค้างกับอายุตอนตาย แล้วส่งเจ้าของเคาะ — ห้ามผ่อนเกณฑ์เองในไฟล์นี้
-import { playLife, mixSeed, treeInvestNode, treeCtl, snapshot, restore, successP, treeRollLevel, treeRollMul, treeCardMul, choiceHidden } from '../src/engine/index.mjs';
+import { newLife, CLASSES, lifeTreeStart, treeStartWeights, treeStartBranch, playLife, mixSeed, treeInvestNode, treeCtl, snapshot, restore, successP, treeRollLevel, treeRollMul, treeCardMul, choiceHidden } from '../src/engine/index.mjs';
 import { treeBudgetSpent } from '../src/node/lint/tree.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { random, withTree, botTree, withGate } from './bots.mjs';
@@ -137,7 +137,7 @@ treeCtl.anyCat = true;
 const pop = lives({ anyCat: true });
 // การ์ดด่านของโหนดใหญ่จริง (ใบ 05): วัดกับกลุ่มที่ปลดได้ (anyCat) เหมือนผลติดตัว · o5 ต้องมีการ์ดด่านโผล่ และผลทุกทางถูกเลือก ≥1 ครั้ง · o8 (keystone) ได้เฉพาะที่บอททุ่มเอง
 {
-  const bigs = Object.keys(defs).filter((id) => defs[id].gate);
+  const bigs = Object.keys(defs).filter((id) => defs[id].gate && defs[id].branch === TARGET);
   for (const id of bigs) {
     const k = defs[id].gate.results.length;
     const picked = Array.from({ length: k }, (_, j) => pop.filter(({ st }) => st.tree?.gate?.[id] === j).length);
@@ -146,7 +146,7 @@ const pop = lives({ anyCat: true });
     if (n >= 100 && !total) fails.push(`การ์ดด่าน ${id} ไม่เคยโผล่ในกลุ่มที่ปลดได้`);
     if (n >= 100 && total >= 30) picked.forEach((c, j) => { if (!c) fails.push(`ผลทางที่ ${j + 1} ของการ์ดด่าน ${id} ไม่เคยถูกเลือก`); });
   }
-  const keys = Object.keys(defs).filter((id) => defs[id].keystone);
+  const keys = Object.keys(defs).filter((id) => defs[id].keystone && defs[id].branch === TARGET);
   for (const id of keys) console.log(`keystone ${id}: ปลด ${pop.filter(({ st }) => st.tree?.done?.[id] !== undefined).length}/${n} ชีวิต (บอททุ่มเองหลัง ack)`);
 }
 treeCtl.anyCat = false;
@@ -301,6 +301,108 @@ if (devOff !== 0) fails.push(`ตัวควบคุม: ปิดผลติ
   if (auto) fails.push(`เลื่อนเข้า keystone เอง ${auto} ชีวิต (ต้อง 0)`);
   if (lost) fails.push(`keystone หายหลังปลด ${lost} ชีวิต (ล้างไม่ได้)`);
   if (!noAck) fails.push('ทุ่ม keystone โดยไม่ผ่าน ack ได้');
+}
+
+// ── ใบ 06: จุดเกิด (ข้อ 15 39 17 97) ── ทุกชีวิตเริ่ม 1 แขนง ถ่วงตามฐานะ > อาชีพ > แขนงพ่อแม่ · พ่อแม่ไม่มีโหนดเลยไม่ได้แต้มแขนงพ่อแม่ (ข้อ 67 73)
+{
+  const S = content.tree.start;
+  const mains = Object.keys(S.class.low);
+  const band = (c) => (c <= 3 ? 'low' : c <= 6 ? 'mid' : 'high');
+  const M = 3000;
+  const tab = {};
+  const exp = {};
+  let bad = 0;
+  for (let i = 0; i < M; i++) {
+    const st = newLife(mixSeed(seed, i), content);
+    const t = lifeTreeStart(st);
+    if (!t || !mains.includes(t.branch) || !defs[t.node] || (defs[t.node].pre ?? []).length) { bad++; continue; }
+    const c = CLASSES.indexOf(st.cls);
+    const w = treeStartWeights(S, c, st.occupation);
+    const sum = Object.values(w).reduce((a, b) => a + b, 0);
+    for (const key of [band(c), `อาชีพ ${st.occupation}`]) {
+      const row = (tab[key] ??= { n: 0 });
+      const ex = (exp[key] ??= {});
+      row.n++;
+      row[t.branch] = (row[t.branch] ?? 0) + 1;
+      for (const b of mains) ex[b] = (ex[b] ?? 0) + w[b] / sum;
+    }
+  }
+  console.log(`\nจุดเกิด (ข้อ 97) · ${M} ชีวิต · ส่วนแบ่งแขนงเริ่ม (%) ตามฐานะ/อาชีพ · ทุกชีวิตเริ่ม 1 แขนง: ${M - bad}/${M}`);
+  console.log(`${'แถว'.padEnd(22)}${'ชีวิต'.padStart(6)}  ${mains.map((b) => b.padStart(6)).join('')}`);
+  const keys = Object.keys(tab).sort((a, b) => (a.startsWith('อาชีพ') - b.startsWith('อาชีพ')) || a.localeCompare(b));
+  let worst = 0;
+  for (const k of keys) {
+    const r2 = tab[k];
+    console.log(`${k.padEnd(22)}${String(r2.n).padStart(6)}  ${mains.map((b) => (((r2[b] ?? 0) / r2.n) * 100).toFixed(0).padStart(6)).join('')}`);
+    if (r2.n >= 300) for (const b of mains) worst = Math.max(worst, Math.abs((r2[b] ?? 0) / r2.n - exp[k][b] / r2.n));
+  }
+  console.log(`ส่วนแบ่งจริงต่างจากน้ำหนักในทะเบียนมากสุด ${(worst * 100).toFixed(1)} จุด (แถวที่ ≥ 300 ชีวิต)`);
+  if (bad) fails.push(`จุดเกิด: ${bad} ชีวิตไม่ได้เริ่มที่ต้นแขนงเดียว`);
+  if (worst > 0.07) fails.push(`จุดเกิด: ส่วนแบ่งจริงต่างจากน้ำหนักในทะเบียน ${(worst * 100).toFixed(1)} จุด (ต้อง ≤ 7)`);
+  const share = (k, b) => (tab[k]?.[b] ?? 0) / (tab[k]?.n || 1);
+  // ถ่วงจริง: ฐานะสูงเริ่มแขนงความรู้มากกว่าฐานะต่ำ · ตัวควบคุม: ตารางแบน (ไม่ถ่วงอะไร) ต้องแบน
+  if (!(share('high', 'know') - share('low', 'know') > 0.1)) fails.push('จุดเกิด: ฐานะสูงไม่เริ่มแขนงความรู้มากกว่าฐานะต่ำ (ไม่ถ่วงตามฐานะ)');
+  if (!(share('low', 'money') - share('high', 'money') > 0.05)) fails.push('จุดเกิด: ฐานะต่ำไม่เริ่มแขนงเงินมากกว่าฐานะสูง');
+  const flat = { base: 1, parent_branch: 0, class: { low: Object.fromEntries(mains.map((b) => [b, 0])), mid: Object.fromEntries(mains.map((b) => [b, 0])), high: Object.fromEntries(mains.map((b) => [b, 0])) }, job: {} };
+  const fc = {};
+  for (let i = 0; i < 2000; i++) { const b = treeStartBranch(flat, mixSeed(seed, i), i % 10, 'clerk'); fc[b] = (fc[b] ?? 0) + 1; }
+  const flatMax = Math.max(...mains.map((b) => Math.abs((fc[b] ?? 0) / 2000 - 1 / mains.length)));
+  console.log(`ตัวควบคุม (ปิดถ่วงทุกอย่าง) ส่วนแบ่งต่างจากเท่ากัน ${(flatMax * 100).toFixed(1)} จุดมากสุด`);
+  if (flatMax > 0.05) fails.push(`จุดเกิด ตัวควบคุม: ปิดถ่วงแล้วยังไม่เท่ากัน (${(flatMax * 100).toFixed(1)} จุด)`);
+  const w0 = treeStartWeights(S, 5, 'clerk', null), w1 = treeStartWeights(S, 5, 'clerk', 'occ');
+  if (!(w1.occ > w0.occ && mains.every((b) => b === 'occ' || w1[b] === w0[b]))) fails.push('จุดเกิด: แขนงพ่อแม่ไม่เพิ่มน้ำหนักให้แขนงนั้นอย่างเดียว');
+  // ลำดับความสำคัญ ฐานะ > อาชีพ > แขนงพ่อแม่ ด้วยขนาดแต้มมากสุดที่แต่ละชั้นขยับได้
+  const spread = (rows) => Math.max(...rows.flatMap((r2) => Object.values(r2))) - 0;
+  const clsMax = Math.max(...Object.values(S.class).flatMap((r2) => Object.values(r2)));
+  const jobMax = Math.max(...Object.values(S.job).flatMap((r2) => Object.values(r2)));
+  console.log(`แต้มมากสุดต่อชั้น: ฐานะ ${clsMax} · อาชีพ ${jobMax} · แขนงพ่อแม่ ${S.parent_branch}`);
+  if (!(clsMax > jobMax && jobMax > S.parent_branch)) fails.push(`จุดเกิด: ลำดับ ฐานะ > อาชีพ > แขนงพ่อแม่ ไม่ตรงขนาดแต้ม (${clsMax}/${jobMax}/${S.parent_branch})`);
+}
+
+// ── ใบ 06: โหนดที่ปลดได้ 0 ครั้งในชีวิตบอท (เกณฑ์ต้นทุนข้อ 49 · ยื่นเจ้าของ ไม่ใช่ด่านผ่าน/ตก) ──
+// โปรไฟล์บอท (ข้อ 85): ตามจุดเกิด · แขนงเดียวทีละแขนง · คู่แขนง 10 คู่ (ถึงโหนดกลาง ข้อ 86) · ใช้กติกาจริง (ต้องตอบการ์ดหมวดตรง) ไม่ผ่อน
+{
+  Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false, passive: true });
+  const PN = arg('--prof', 40);
+  const mains = Object.keys(content.tree.start.class.low);
+  const profiles = [['จุดเกิด', 'start'], ...mains.map((b) => [b, b])];
+  for (let i = 0; i < mains.length; i++) for (let j = i + 1; j < mains.length; j++) profiles.push([`${mains[i]}+${mains[j]}`, [mains[i], mains[j]]]);
+  const hit = Object.fromEntries(Object.keys(defs).map((id) => [id, 0]));
+  const age = Object.fromEntries(Object.keys(defs).map((id) => [id, []]));
+  let total = 0;
+  const t0 = Date.now();
+  for (const [, tgt] of profiles) {
+    const bot = withTree(withGate(random), tgt);
+    for (let i = 0; i < PN; i++) {
+      const { state: st } = playLife(mixSeed(seed, i), content, bot);
+      total++;
+      for (const [id, a] of Object.entries(st.tree?.done ?? {})) { hit[id]++; age[id].push(a); }
+    }
+  }
+  console.log(`\nโหนดที่ปลดได้ในชีวิตบอท · ${profiles.length} โปรไฟล์ × ${PN} ชีวิต = ${total} ชีวิต (${((Date.now() - t0) / 1000).toFixed(0)} วิ) · กติกาจริง ไม่ผ่อน`);
+  const per = mains.concat('mid');
+  for (const b of per) {
+    const ids2 = Object.keys(defs).filter((id) => defs[id].branch === b);
+    console.log(`  ${b}: ${ids2.map((id) => `${id} ${hit[id]}`).join(' · ')}`);
+  }
+  const zero = Object.keys(defs).filter((id) => hit[id] === 0);
+  const zeroSeen = zero.filter((id) => !defs[id].hidden);
+  console.log(`ปลดได้ 0 ครั้ง (ข้อ 49): ${zero.length}/${Object.keys(defs).length} โหนด${zero.length ? ' → ' + zero.map((id) => `${id}${defs[id].hidden ? ' (ซ่อน บอทไม่แตะ)' : ''}`).join(' · ') : ''}`);
+  console.log(`  ที่เห็นแล้วยังปลดไม่ได้เลย ${zeroSeen.length} โหนด · ส่งเจ้าของเคาะ (ห้ามผ่อนเกณฑ์เอง)`);
+  // เกณฑ์ลึกลับครบ (ข้อ 86) ต้องใช้ปีทุ่มขั้นต่ำเท่าไร เทียบอายุขัย: เลือกแม่ในแขนงที่ปีสะสมถูกสุด
+  const chain = (id, memo = {}) => memo[id] ??= defs[id].years + (defs[id].pre.length ? (defs[id].and ? defs[id].pre.reduce((a, q) => a + chain(q, memo), 0) : Math.min(...defs[id].pre.map((q) => chain(q, memo)))) : 0);
+  const need = new Set();
+  const take = (id) => {
+    if (need.has(id)) return;
+    need.add(id);
+    const d = defs[id];
+    if (!d.pre.length) return;
+    if (d.and) d.pre.forEach(take);
+    else take(d.pre.reduce((a, q) => (chain(q) < chain(a) ? q : a)));
+  };
+  WHOLE.forEach(({ id }) => take(id));
+  const yrs = [...need].reduce((a, id) => a + defs[id].years, 0);
+  console.log(`เกณฑ์ลึกลับครบ (ข้อ 98) ต้องปลด ${need.size} โหนด (รวมแม่) ใช้ปีทุ่มขั้นต่ำ ${yrs} ปี (ทุ่มทีละโหนด ปีละ 1) · อายุขัยเฉลี่ยของบอท ${f1(mean(real.map((x) => x.age)))} ปี`);
 }
 
 console.log(fails.length ? `\nไม่ผ่าน ${fails.length} ข้อ\n${fails.map((f) => `  ✗ ${f}`).join('\n')}` : '\nผ่านทั้งหมด');

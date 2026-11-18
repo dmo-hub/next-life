@@ -1,5 +1,5 @@
 # ต้นไม้โฟกัส (ใบ 03 tracer) — กติกาอยู่ src/engine/tree.mjs · ที่นี่คือเนื้อ · อยู่คู่โฟกัสเดิม (focus.yaml) ไม่แทนที่
-# ตอนนี้มีแขนงลึกลับ (occ) เฉพาะโหนดเล็ก ตามร่าง tree-draft.html รอบ 4 · โหนดใหญ่/หักเห/โหนดกลางลงในใบถัดไป
+# ทั้งต้น 5 แขนง (money rel know skill occ) + โหนดกลาง (mid) ตามร่าง tree-draft.html รอบ 4 (ข้อ 76 81 82) · ใบ 06
 # ตัวเลขทุกตัวเป็นจุดเริ่มต้น ให้ harness `tree` ปรับ (ข้อ 74)
 #
 # year_scale = ผลเต็มต่อปีคูณเท่านี้ (ระดับ ±1..±3 แบบการ์ด เหมือน focus.yaml)
@@ -15,6 +15,30 @@
 roll_k: 0.1
 card_mul: 1.25
 budget: 0.5
+# start    = จุดเกิด (ข้อ 15 39 17 97): ทุกชีวิตเริ่ม 1 แขนง สุ่มถ่วงน้ำหนัก = base + ฐานะ + อาชีพ + แขนงพ่อแม่ (ทายาท · ยังไม่ส่งต่อ = 0) · ลำดับความสำคัญ ฐานะ > อาชีพ > แขนงพ่อแม่ ด้วยขนาดแต้ม
+#   class = แต้มต่อแขนงตามชั้นฐานะ (low = ยากไร้..ค่อนข้างจน · mid = ชนชั้นกลางล่าง..กลางบน · high = มีอันจะกิน..มั่งคั่ง) · job = แต้มเพิ่มต่อแขนงตามอาชีพ · parent_branch = แต้มให้แขนงที่พ่อแม่ทุ่มมากสุด
+#   พ่อแม่ไม่มีโหนดเลย = ไม่ได้แต้มแขนงพ่อแม่ ที่เหลือยังถ่วงตามฐานะ/อาชีพ (ข้อ 67 73) · ตัวเลขเป็นจุดเริ่มต้นให้ harness tree วัดส่วนแบ่ง (ข้อ 74)
+# โหนดกลาง (branch mid) = ข้ามแขนง ไม่ใช่แขนงที่ 6: and = ต้องปลดแม่ครบทุกตัว · nolight = ปลดตัวเลือกอย่างเดียว ไม่มีผลเบา/ทอย (ข้อ 83)
+# เงินไม่อยู่ใน fx/light (lint ห้ามตั้งแต่ใบ 03 ให้ด่าน finance คุมเงิน) · แขนงเงินส่งผลผ่านทอยบนการ์ด work_money + ตัวเลือกใหม่ + jobs/job_roll
+start:
+  base: 1
+  parent_branch: 1
+  class:
+    low: { money: 4, skill: 3, rel: 2, know: 1, occ: 2 }
+    mid: { money: 2, skill: 2, rel: 2, know: 2, occ: 2 }
+    high: { money: 2, skill: 1, rel: 2, know: 4, occ: 1 }
+  job:
+    farmer: { skill: 2, money: 1 }
+    labor: { skill: 2 }
+    factory: { money: 2 }
+    craft: { money: 2, skill: 1 }
+    service: { rel: 2, money: 1 }
+    clerk: { know: 2 }
+    technician: { know: 1, skill: 1 }
+    professional: { know: 2 }
+    manager: { rel: 2, money: 1 }
+    officer: { rel: 1, know: 1 }
+    senior_officer: { rel: 2, know: 1 }
 year_scale: 0.25
 light_unit:
   s: 0.007
@@ -119,3 +143,766 @@ nodes:
     fx: { happiness: 1, knowledge: -1 }
     light: { happiness: 1 }
     roll: 1
+  mo1:
+    name: หัดจับงานข้างบ้าน
+    branch: money
+    size: s
+    stages: [เด็ก]
+    pre: []
+    years: 2
+    cards: 1
+    cat: [work_money]
+    fx: { knowledge: 1, happiness: -1 }
+    light: { knowledge: 1 }
+    roll: 1
+    jobs: [farmer, labor, factory, craft]
+    job_roll: 1
+  mo2:
+    name: ตามหาสิ่งที่ถนัด
+    branch: money
+    size: s
+    stages: [วัยรุ่น, หนุ่มสาว, ทำงาน]
+    pre: [mo1]
+    years: 3
+    cards: 2
+    cat: [work_money]
+    fx: { happiness: 1, knowledge: 1 }
+    light: { happiness: 1 }
+    roll: 1
+    jobs: [craft, technician, service]
+    job_roll: 1
+  mo3:
+    name: ยืนได้ด้วยงานของตัวเอง
+    branch: money
+    size: s
+    stages: [หนุ่มสาว, ทำงาน]
+    pre: [mo2]
+    years: 4
+    cards: 3
+    cat: [work_money]
+    fx: { health: -1, relations: -1 }
+    light: { network: 1 }
+    roll: 1
+    jobs: [clerk, factory, labor, farmer, service]
+    job_roll: 1
+  mo4:
+    name: เก็บออมทีละนิด
+    branch: money
+    size: s
+    stages: [หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    pre: [mo3]
+    years: 3
+    cards: 2
+    cat: [work_money]
+    fx: { happiness: -1 }
+    light: { network: 1 }
+    roll: 1
+  mo5:
+    name: ตั้งตัวเป็นเจ้านายตัวเอง
+    branch: money
+    size: b
+    stages: [หนุ่มสาว, ทำงาน]
+    pre: [mo3]
+    years: 5
+    cards: 3
+    cat: [work_money]
+    fx: { health: -1, happiness: -1 }
+    light: { network: 1 }
+    roll: 1
+    jobs: [service, craft, farmer]
+    job_roll: 1
+    gate:
+      title: ตั้งตัวเป็นเจ้านาย
+      text: ถึงวันที่ต้องตัดสินใจว่าจะทำกิจการของตัวเองแบบไหน
+      results:
+        - text: เปิดร้านใหม่ของตัวเอง
+          fx: { network: 1, health: -1 }
+        - text: รับช่วงกิจการของที่บ้าน
+          fx: { relations: 1 }
+        - text: ร่วมหุ้นกับเพื่อน
+          fx: { network: 2, relations: -1 }
+  mo6:
+    name: ไต่ขึ้นบันไดอาชีพ
+    branch: money
+    size: b
+    stages: [ทำงาน, กลางคน, ชรา]
+    pre: [mo3]
+    years: 5
+    cards: 3
+    cat: [work_money]
+    fx: { network: 1, health: -2, relations: -1 }
+    light: { network: 1 }
+    roll: 1
+    jobs: [manager, professional, clerk, technician]
+    job_roll: 1
+    gate:
+      title: บันไดอาชีพ
+      text: โอกาสก้าวขึ้นอีกขั้นมาถึงแล้ว ต้องเลือกว่าจะไปทางไหน
+      results:
+        - text: เดินสายบริหาร รับตำแหน่งที่สูงขึ้น
+          fx: { network: 1, health: -1 }
+        - text: เป็นผู้เชี่ยวชาญสายที่รัก
+          fx: { happiness: 1, knowledge: 1 }
+        - text: เอาเงินก้อนไปต่อยอดระยะยาว
+          fx: { happiness: 1 }
+  mo7:
+    name: ทางลัดหากิน
+    branch: money
+    size: k
+    keystone: true
+    stages: [หนุ่มสาว, ทำงาน, กลางคน]
+    pre: [mo2]
+    years: 6
+    cards: 3
+    cat: [work_money]
+    fx: { network: 1, relations: -1 }
+    light: { network: 1 }
+    roll: 1
+    jobs: [service, labor, manager]
+    job_roll: 1
+    cost: { relations: -1 }
+    warn: ผู้คนรอบตัวไม่ไว้ใจถาวร สัมพันธ์จางเร็วกว่าปกติ และเสี่ยงคดีติดตัวทั้งชีวิต
+  r1:
+    name: วงเพื่อนวัยซน
+    branch: rel
+    size: s
+    stages: [เด็ก]
+    pre: []
+    years: 2
+    cards: 2
+    cat: [society]
+    fx: { relations: 1, happiness: 1, knowledge: -1 }
+    light: { relations: 1 }
+    roll: 1
+    jobs: [service, manager]
+    job_roll: 1
+  r2:
+    name: คนที่เพื่อนฟัง
+    branch: rel
+    size: s
+    stages: [วัยรุ่น, หนุ่มสาว]
+    pre: [r1]
+    years: 3
+    cards: 2
+    cat: [society]
+    fx: { relations: 1, network: 1, knowledge: -1 }
+    light: { network: 1 }
+    roll: 1
+    jobs: [service, manager]
+    job_roll: 1
+  r3:
+    name: หาใจที่ใช่
+    branch: rel
+    size: s
+    stages: [หนุ่มสาว, ทำงาน]
+    pre: [r2]
+    years: 3
+    cards: 2
+    cat: [family]
+    fx: { happiness: 1 }
+    light: { happiness: 1 }
+    roll: 1
+  r4:
+    name: สร้างและเลี้ยงครอบครัว
+    branch: rel
+    size: b
+    stages: [หนุ่มสาว, ทำงาน, กลางคน]
+    pre: [r3]
+    years: 5
+    cards: 3
+    cat: [family]
+    fx: { relations: 2, happiness: 1 }
+    light: { relations: 1 }
+    roll: 1
+    gate:
+      title: ครอบครัวที่ต้องเลือกให้เวลา
+      text: บ้านต้องการเวลาของเรามากขึ้น ต้องเลือกว่าจะทุ่มให้ใคร
+      results:
+        - text: อยู่ติดบ้านให้อบอุ่น
+          fx: { relations: 2, happiness: 1 }
+        - text: ปั้นลูกให้ได้ดี
+          fx: { relations: 1, knowledge: 1 }
+        - text: ดูแลทั้งลูกและพ่อแม่
+          fx: { relations: 2, health: -1 }
+  r5:
+    name: เสียงของชุมชน
+    branch: rel
+    size: b
+    stages: [ทำงาน, กลางคน, ชรา]
+    pre: [r2]
+    years: 5
+    cards: 3
+    cat: [society]
+    fx: { network: 2, relations: -1 }
+    light: { network: 1 }
+    roll: 1
+    gate:
+      title: เสียงของชุมชน
+      text: คนในชุมชนอยากให้ออกมาเป็นปากเสียงให้
+      results:
+        - text: ลงเล่นการเมืองท้องถิ่น
+          fx: { network: 2, relations: -1 }
+        - text: เป็นที่ปรึกษาอยู่หลังฉาก
+          fx: { network: 1 }
+        - text: เป็นผู้ไกล่เกลี่ยของชุมชน
+          fx: { relations: 1 }
+  r6:
+    name: ผูกบุญคุณคนรอบตัว
+    branch: rel
+    size: k
+    keystone: true
+    stages: [หนุ่มสาว, ทำงาน, กลางคน]
+    pre: [r4]
+    years: 6
+    cards: 3
+    cat: [family]
+    fx: { relations: 2, network: 1 }
+    light: { relations: 1 }
+    roll: 1
+    cost: { happiness: -1 }
+    warn: ภาระดูแลคนรอบตัวไม่จบ เงินรั่วไหลทุกปีถาวร และปฏิเสธคำขอของคนใกล้ตัวไม่ได้
+  r7:
+    name: ผู้ใหญ่ที่ลูกหลานนับถือ
+    branch: rel
+    size: s
+    stages: [กลางคน, ชรา]
+    pre: [r4]
+    years: 3
+    cards: 2
+    cat: [family]
+    fx: { relations: 1, happiness: 1, health: -1 }
+    light: { happiness: 1 }
+    roll: 1
+  r8:
+    name: เพื่อนเก่าที่ไม่ทิ้งกัน
+    branch: rel
+    size: s
+    hidden: true
+    stages: [ทำงาน, กลางคน, ชรา]
+    pre: [r2]
+    years: 3
+    cards: 2
+    cat: [society]
+    fx: { relations: 1, happiness: 1 }
+    light: { relations: 1 }
+    roll: 1
+  k1:
+    name: เปิดตำราเปิดโลก
+    branch: know
+    size: s
+    stages: [เด็ก]
+    pre: []
+    years: 2
+    cards: 1
+    cat: [study]
+    fx: { knowledge: 1, happiness: -1 }
+    light: { knowledge: 1 }
+    roll: 1
+    jobs: [professional, clerk, technician]
+    job_roll: 1
+  k2:
+    name: ใบเบิกทางสู่ชั้นสูง
+    branch: know
+    size: b
+    stages: [วัยรุ่น, หนุ่มสาว]
+    pre: [k1]
+    years: 5
+    cards: 2
+    cat: [study]
+    fx: { knowledge: 2, happiness: -1, relations: -1 }
+    light: { knowledge: 1 }
+    roll: 1
+    jobs: [professional, clerk]
+    job_roll: 1
+    gate:
+      title: ทุนการศึกษา
+      text: มีทางให้เรียนต่อชั้นสูง ต้องเลือกว่าจะไปทางทุนไหน
+      results:
+        - text: ทุนรัฐ เส้นทางราชการ
+          fx: { knowledge: 1, network: 1 }
+        - text: ทุนเอกชน มีสัญญาใช้ทุน
+          fx: { knowledge: 2, happiness: -1 }
+        - text: ทุนไปเรียนไกลบ้าน
+          fx: { knowledge: 2, relations: -1 }
+  k3:
+    name: เรียนรู้ตลอดชีวิต
+    branch: know
+    size: s
+    stages: [ทำงาน, กลางคน, ชรา]
+    pre: [k1]
+    years: 3
+    cards: 2
+    cat: [study]
+    fx: { knowledge: 1 }
+    light: { knowledge: 1 }
+    roll: 1
+  k4:
+    name: เปิดสายวิชาชีพ
+    branch: know
+    size: b
+    stages: [หนุ่มสาว, ทำงาน, กลางคน]
+    pre: [k2]
+    years: 5
+    cards: 2
+    cat: [study]
+    fx: { knowledge: 1, happiness: -1 }
+    light: { knowledge: 1 }
+    roll: 1
+    jobs: [professional, technician]
+    job_roll: 1
+    gate:
+      title: ทางแยกสายวิชาชีพ
+      text: ความรู้ที่สะสมพามาถึงทางแยกของสายวิชาชีพ
+      results:
+        - text: สอบใบอนุญาตวิชาชีพ
+          fx: { knowledge: 1, network: 1 }
+        - text: เรียนต่อปริญญาโทหรือเอก
+          fx: { knowledge: 2 }
+        - text: ผันตัวเป็นผู้เชี่ยวชาญอิสระ
+          fx: { knowledge: 1, health: -1 }
+  k5:
+    name: ทุ่มชีวิตให้วิชา
+    branch: know
+    size: k
+    keystone: true
+    stages: [หนุ่มสาว, ทำงาน]
+    pre: [k2]
+    years: 6
+    cards: 2
+    cat: [study]
+    fx: { knowledge: 2, relations: -1, health: -1 }
+    light: { knowledge: 1 }
+    roll: 1
+    jobs: [professional]
+    job_roll: 1
+    cost: { relations: -1, health: -1 }
+    warn: ความสัมพันธ์รอบตัวจางถาวร และร่างกายโทรมสะสมจากการอดนอนทั้งชีวิต
+  s1:
+    name: ปีนป่ายวิ่งเล่น
+    branch: skill
+    size: s
+    stages: [เด็ก]
+    pre: []
+    years: 2
+    cards: 2
+    cat: [health]
+    fx: { health: 1, happiness: 1, knowledge: -1 }
+    light: { health: 1 }
+    roll: 1
+    jobs: [farmer, labor]
+    job_roll: 1
+  s2:
+    name: ลงสนามแข่งจริง
+    branch: skill
+    size: s
+    stages: [วัยรุ่น, หนุ่มสาว]
+    pre: [s1]
+    years: 4
+    cards: 2
+    cat: [health]
+    fx: { health: 2, network: 1, knowledge: -1 }
+    light: { health: 1 }
+    roll: 1
+  s3:
+    name: กินนอนเป็นเวลา
+    branch: skill
+    size: s
+    stages: [วัยรุ่น, หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    pre: [s1]
+    years: 3
+    cards: 2
+    cat: [health]
+    fx: { health: 2 }
+    light: { health: 1 }
+    roll: 1
+  s4:
+    name: หาเวลาพักใจและเปิดโลก
+    branch: skill
+    size: s
+    stages: [หนุ่มสาว, ทำงาน, กลางคน, ชรา]
+    pre: [s3]
+    years: 3
+    cards: 2
+    cat: [health]
+    fx: { happiness: 2, health: 1, knowledge: 1 }
+    light: { happiness: 1 }
+    roll: 1
+  s5:
+    name: กลับมาแข็งแรงใหม่
+    branch: skill
+    size: b
+    stages: [กลางคน, ชรา]
+    pre: [s3]
+    years: 5
+    cards: 3
+    cat: [health]
+    fx: { health: 2, happiness: -1 }
+    light: { health: 1 }
+    roll: 1
+    gate:
+      title: ฟื้นร่างกายให้กลับมา
+      text: ร่างกายส่งสัญญาณว่าถึงเวลาลงแรงฟื้นฟูจริงจัง
+      results:
+        - text: กายภาพบำบัดฟื้นฟู
+          fx: { health: 2 }
+        - text: เปลี่ยนอาหารทั้งบ้าน
+          fx: { health: 1, relations: 1 }
+        - text: ย้ายไปอยู่ที่อากาศดี
+          fx: { health: 1, happiness: 1 }
+  s6:
+    name: วางรากอายุยืน
+    branch: skill
+    size: b
+    stages: [ทำงาน, กลางคน, ชรา]
+    pre: [s3]
+    years: 5
+    cards: 3
+    cat: [health]
+    fx: { health: 1, happiness: 1 }
+    light: { health: 1 }
+    roll: 1
+    gate:
+      title: วางรากอายุยืน
+      text: ถึงเวลาเลือกวิถีชีวิตที่จะพาไปได้ไกลถึงวัยชรา
+      results:
+        - text: กินอยู่แบบคนอายุยืน
+          fx: { health: 2 }
+        - text: ออกกำลังเบาสม่ำเสมอ
+          fx: { health: 1, happiness: 1 }
+        - text: ตรวจและป้องกันโรคก่อนเกิด
+          fx: { health: 1, knowledge: 1 }
+  s7:
+    name: ซ้อมหนักไม่ถอย
+    branch: skill
+    size: k
+    keystone: true
+    stages: [หนุ่มสาว, ทำงาน]
+    pre: [s2]
+    years: 6
+    cards: 3
+    cat: [health]
+    fx: { health: 2, network: 1 }
+    light: { health: 1 }
+    roll: 1
+    cost: { happiness: -1 }
+    warn: บาดเจ็บเก่ากำเริบหนักตอนแก่ อายุขัยคาดสั้นลงเล็กน้อย และความสุขลดเบาลงถาวรจากการฝืนตัวเอง
+  o7:
+    name: ปล่อยวางได้
+    branch: occ
+    size: b
+    stages: [กลางคน, ชรา]
+    pre: [o4]
+    years: 5
+    cards: 2
+    cat: [belief]
+    fx: { happiness: 2 }
+    light: { happiness: 1 }
+    roll: 1
+    gate:
+      title: ปล่อยวาง
+      text: เรื่องที่เคยยึดไว้เริ่มคลายลง ต้องเลือกว่าจะปล่อยวางด้วยทางไหน
+      results:
+        - text: ทางเมตตา
+          fx: { relations: 2 }
+        - text: ทางปัญญา
+          fx: { knowledge: 2 }
+        - text: ทางวางเฉย
+          fx: { happiness: 2, relations: -1 }
+  m1:
+    name: ได้งานตามวิชาที่เรียนมา
+    branch: mid
+    size: s
+    and: true
+    stages: [หนุ่มสาว, ทำงาน]
+    pre: [mo3, k2]
+    years: 3
+    cards: 2
+    cat: [work_money, study]
+    fx: { knowledge: 1, happiness: -1 }
+    light: { knowledge: 1 }
+    roll: 1
+    jobs: [professional, clerk, technician]
+    job_roll: 1
+  m2:
+    name: เส้นสายหนุนทุน
+    branch: mid
+    size: s
+    and: true
+    stages: [ทำงาน, กลางคน]
+    pre: [mo3, r2]
+    years: 3
+    cards: 2
+    cat: [work_money, society]
+    fx: { network: 1, relations: -1 }
+    light: { network: 1 }
+    roll: 1
+    jobs: [service, manager]
+    job_roll: 1
+  m3:
+    name: ทำงานหนักไม่พังกลางทาง
+    branch: mid
+    size: s
+    and: true
+    stages: [ทำงาน, กลางคน]
+    pre: [mo3, s3]
+    years: 3
+    cards: 2
+    cat: [work_money, health]
+    fx: { health: 1, happiness: -1 }
+    light: { health: 1 }
+    roll: 1
+    jobs: [clerk, manager, factory]
+    job_roll: 1
+  m4:
+    name: เงินจากความเชื่อ
+    branch: mid
+    size: b
+    and: true
+    stages: [ทำงาน, กลางคน]
+    pre: [mo2, o3]
+    years: 5
+    cards: 3
+    cat: [work_money, belief]
+    fx: { happiness: -1, relations: -1 }
+    light: { network: 1 }
+    roll: 1
+    jobs: [service]
+    job_roll: 1
+    gate:
+      title: เงินจากความเชื่อ
+      text: มีคนมาจ้างให้ใช้ความเชื่อหาเงิน ต้องเลือกว่าจะรับทางไหน
+      results:
+        - text: ขายเครื่องรางของขลัง
+          fx: { network: 1, happiness: -1 }
+        - text: รับดูดวงรับจ้าง
+          fx: { network: 1 }
+        - text: ทำพิธีเก็บค่าครู
+          fx: { happiness: -1, relations: -1 }
+  m5:
+    name: ผู้ใหญ่ที่ถ่ายทอดความรู้
+    branch: mid
+    size: s
+    and: true
+    stages: [กลางคน, ชรา]
+    pre: [r4, k3]
+    years: 3
+    cards: 2
+    cat: [family, study]
+    fx: { relations: 1, knowledge: 1, happiness: 1 }
+    light: { happiness: 1 }
+    roll: 1
+  m6:
+    name: ดูแลกันและกันให้แข็งแรง
+    branch: mid
+    size: s
+    and: true
+    stages: [ทำงาน, กลางคน, ชรา]
+    pre: [r4, s3]
+    years: 3
+    cards: 2
+    cat: [family, health]
+    fx: { relations: 1, health: 1 }
+    light: { relations: 1 }
+    roll: 1
+  m7:
+    name: เสาหลักของวัดและชุมชน
+    branch: mid
+    size: b
+    and: true
+    stages: [กลางคน, ชรา]
+    pre: [r4, o4]
+    years: 5
+    cards: 3
+    cat: [family, belief]
+    fx: { network: 1, happiness: 1 }
+    light: { happiness: 1 }
+    roll: 1
+    gate:
+      title: เสาหลักของวัดและชุมชน
+      text: ชุมชนอยากให้ช่วยดูแลวัดและงานบุญ
+      results:
+        - text: รับเป็นกรรมการวัด
+          fx: { network: 2 }
+        - text: เป็นผู้นำบุญของชุมชน
+          fx: { relations: 2 }
+        - text: เป็นผู้ถือศีลเป็นแบบอย่าง
+          fx: { happiness: 2 }
+  m8:
+    name: ใช้ความรู้ดูแลตัวเอง
+    branch: mid
+    size: s
+    and: true
+    stages: [ทำงาน, กลางคน]
+    pre: [k2, s3]
+    years: 3
+    cards: 2
+    cat: [study, health]
+    fx: { knowledge: 1, health: 1 }
+    light: { health: 1 }
+    roll: 1
+  m9:
+    name: ธรรมะเชิงปัญญา
+    branch: mid
+    size: s
+    and: true
+    stages: [ทำงาน, กลางคน, ชรา]
+    pre: [k2, o4]
+    years: 3
+    cards: 2
+    cat: [study, belief]
+    fx: { knowledge: 1, happiness: 1 }
+    light: { knowledge: 1 }
+    roll: 1
+  m10:
+    name: ใจนิ่งในพายุ
+    branch: mid
+    size: b
+    and: true
+    stages: [ทำงาน, กลางคน, ชรา]
+    pre: [s4, o4]
+    years: 5
+    cards: 3
+    cat: [health, belief]
+    fx: { happiness: 2, health: 1 }
+    light: { happiness: 1 }
+    roll: 1
+    gate:
+      title: ใจนิ่งในพายุ
+      text: พายุชีวิตลูกใหญ่เข้ามา ต้องเลือกว่าจะตั้งหลักด้วยวิธีไหน
+      results:
+        - text: ฝึกสมาธิทุกเช้า
+          fx: { happiness: 2 }
+        - text: ออกแรงหนักระบายอารมณ์
+          fx: { health: 2 }
+        - text: มีงานอดิเรกที่รัก
+          fx: { happiness: 1, health: 1 }
+  m11:
+    name: หุ้นส่วนชีวิต
+    branch: mid
+    size: s
+    and: true
+    stages: [หนุ่มสาว, ทำงาน]
+    pre: [mo4, r3]
+    years: 3
+    cards: 2
+    cat: [work_money, family]
+    fx: { relations: 1, happiness: -1 }
+    nolight: true
+    roll: 0
+  m12:
+    name: ลงทุนกับความรู้
+    branch: mid
+    size: s
+    and: true
+    stages: [กลางคน, ชรา]
+    pre: [mo4, k3]
+    years: 3
+    cards: 2
+    cat: [work_money, study]
+    fx: { knowledge: 1 }
+    nolight: true
+    roll: 0
+  m13:
+    name: เก็บเงินไว้ดูแลตัวเอง
+    branch: mid
+    size: s
+    and: true
+    stages: [ทำงาน, กลางคน, ชรา]
+    pre: [mo4, s4]
+    years: 3
+    cards: 2
+    cat: [work_money, health]
+    fx: { health: 1, happiness: 1 }
+    nolight: true
+    roll: 0
+  m14:
+    name: ทำบุญแบบมีงบ
+    branch: mid
+    size: s
+    and: true
+    stages: [ทำงาน, กลางคน, ชรา]
+    pre: [mo4, o4]
+    years: 3
+    cards: 2
+    cat: [work_money, belief]
+    fx: { happiness: 1, relations: 1 }
+    nolight: true
+    roll: 0
+  m15:
+    name: กลุ่มติวเพื่อนช่วยเพื่อน
+    branch: mid
+    size: s
+    and: true
+    stages: [วัยรุ่น, หนุ่มสาว]
+    pre: [r2, k2]
+    years: 3
+    cards: 2
+    cat: [society, study]
+    fx: { knowledge: 1, relations: 1, happiness: -1 }
+    nolight: true
+    roll: 0
+  m16:
+    name: ทีมกีฬาโรงเรียน
+    branch: mid
+    size: s
+    and: true
+    stages: [วัยรุ่น, หนุ่มสาว]
+    pre: [r2, s2]
+    years: 3
+    cards: 2
+    cat: [society, health]
+    fx: { relations: 1, health: 1 }
+    nolight: true
+    roll: 0
+  m17:
+    name: ทำบุญกับคู่ใจ
+    branch: mid
+    size: s
+    and: true
+    stages: [หนุ่มสาว, ทำงาน]
+    pre: [r3, o3]
+    years: 3
+    cards: 2
+    cat: [family, belief]
+    fx: { happiness: 1, relations: 1 }
+    nolight: true
+    roll: 0
+  m18:
+    name: ฝึกใจให้เรียนรู้
+    branch: mid
+    size: s
+    and: true
+    stages: [กลางคน, ชรา]
+    pre: [k3, s4]
+    years: 3
+    cards: 2
+    cat: [study, health]
+    fx: { knowledge: 1, happiness: 1, health: 1 }
+    nolight: true
+    roll: 0
+  m19:
+    name: ศึกษาคัมภีร์จริงจัง
+    branch: mid
+    size: s
+    and: true
+    stages: [ทำงาน, กลางคน, ชรา]
+    pre: [k3, o3]
+    years: 3
+    cards: 2
+    cat: [study, belief]
+    fx: { knowledge: 1, happiness: 1 }
+    nolight: true
+    roll: 0
+  m20:
+    name: วินัยกายใจ
+    branch: mid
+    size: s
+    and: true
+    stages: [หนุ่มสาว, ทำงาน]
+    pre: [s2, o3]
+    years: 3
+    cards: 2
+    cat: [health, belief]
+    fx: { health: 1, happiness: 1 }
+    nolight: true
+    roll: 0

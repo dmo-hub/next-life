@@ -2,7 +2,7 @@
 // ทุกตัวเลือกจากตัวเลือกที่กดได้ (openChoices) · ตัดสินจากป้ายบนการ์ด (card.fx) ที่ผู้เล่นเห็นเท่านั้น
 // ข้อยกเว้นเดียว: สายบุญ/บาปอ่านป้ายบุญบาปของตัวเลือก (holder.pending · ต่างโลกอ่าน ISEKAI_MERIT ของการ์ด) แทนการอ่านความหมายของข้อความแบบที่คนทำ — ไม่อ่านบัญชี
 // เสมอกันสุ่มจาก stream ของบอท · holder = st (การ์ดชีวิต) หรือ af (การ์ดระหว่างชาติ)
-import { openChoices, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, STAT_LABELS, STAT_KEYS, makeRng, mixSeed, stageOf, lifeFocusOffers, lifeFocusDefs, setLifeFocus, lifeTreeDefs, treeOffersNow, treeInvestNode, FOCUS_FLOW, ISEKAI_FX, ISEKAI_LINK, ISEKAI_MERIT } from '../src/engine/index.mjs';
+import { openChoices, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, STAT_LABELS, STAT_KEYS, makeRng, mixSeed, stageOf, lifeFocusOffers, lifeFocusDefs, setLifeFocus, lifeTreeDefs, lifeTreeStart, treeOffersNow, treeInvestNode, FOCUS_FLOW, ISEKAI_FX, ISEKAI_LINK, ISEKAI_MERIT } from '../src/engine/index.mjs';
 
 export const random = (card, rng) => {
   const open = openChoices(card);
@@ -165,11 +165,15 @@ const descendants = (defs, id) => {
   walk(id);
   return seen.size;
 };
+// target = แขนงเดียว | รายการแขนง (โปรไฟล์คู่ ลงแขนงคู่เพื่อให้ถึงโหนดกลาง ข้อ 86) | 'start' (แขนงตามจุดเกิดของชีวิตนั้น ข้อ 97)
+// โหนดกลางเลือกได้เมื่อแม่ทุกตัวอยู่ในแขนงเป้า (ถึงโหนดกลางได้ต้องปลดแม่ครบอยู่แล้ว)
+const profile = (st, target) => (target === 'start' ? [lifeTreeStart(st)?.branch] : [].concat(target));
 export function botTree(st, target) {
   let rng = treeMemo.get(st);
   if (!rng) treeMemo.set(st, (rng = makeRng(mixSeed(st.seed ^ TREE_SALT, st.gen ?? 1))));
   const defs = lifeTreeDefs(st);
-  const offers = treeOffersNow(st).filter((id) => defs[id].branch === target && !defs[id].hidden);
+  const want = profile(st, target);
+  const offers = treeOffersNow(st).filter((id) => !defs[id].hidden && (want.includes(defs[id].branch) || (defs[id].and && defs[id].pre.every((p) => want.includes(defs[p].branch)))));
   if (st.tree?.cur && offers.includes(st.tree.cur)) return;
   if (!offers.length) return;
   const score = offers.map((id) => descendants(defs, id));

@@ -14,7 +14,7 @@ import { cadetActive, cadetCard, chooseCadet, cadetAfterChoice } from './cadet.m
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
-import { treeCtl, treeOffers, treeInvest, treeCard, treeYearEnd, treeRollMul, treeCardMul, treeGateEvent, treeGateDone } from './tree.mjs';
+import { treeStartBranch, treeStartNode, treeCtl, treeOffers, treeInvest, treeCard, treeYearEnd, treeRollMul, treeCardMul, treeGateEvent, treeGateDone } from './tree.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
@@ -1994,6 +1994,13 @@ export const treeInvestNode = (st, id, ack = false) => {
   if (lifeTreeDefs(st)[id]?.keystone && !ack) throw new Error(`โหนด ${id} เป็น keystone ต้องรับรู้ข้อเสียก่อนทุ่ม`);
   treeInvest(st, lifeTreeDefs(st), id, stageOf(st.age));
 };
+// จุดเกิดของชีวิต (ใบ 06): แขนงที่ถ่วงตามฐานะ > อาชีพ > แขนงพ่อแม่ + ต้นแขนง · ไม่เขียนสถานะ ผู้เล่น/บอทใช้เป็นค่าตั้งต้นของการทุ่ม
+export function lifeTreeStart(st) {
+  const c = st.content.tree;
+  if (!c?.start) return null;
+  const branch = treeStartBranch(c.start, st.seed, CLASSES.indexOf(st.cls), st.occupation ?? null, st.treeParent ?? null);
+  return { branch, node: treeStartNode(c.nodes, branch) };
+}
 export const treeOffersNow = (st) => treeOffers(st, lifeTreeDefs(st), stageOf(st.age));
 // ทอยตามแขนง (ใบ 04) ตัวคูณทางสำเร็จของการ์ดหมวด cat · อาชีพนับเมื่อมีงานของตัวเองแล้ว (เหมือน when.occupation)
 export const lifeTreeRoll = (st, cat) => (st.tree && st.content.tree ? treeRollMul(st, st.content.tree.nodes, st.content.tree.roll_k, cat, st.workFrom !== null ? st.occupation : null) : 1);
