@@ -374,7 +374,7 @@ const devTabMiss = (html) => {
 };
 const devMiss = devFiles.map((f) => [f, read(f)]).filter(([, h]) => h.includes('class="nl-tabs"')).map(([f, h]) => [f, devTabMiss(h)]).filter(([, m]) => m.length).map(([f, m]) => `${f} ขาด ${m.join(' ')}`);
 const devCtl = devTabMiss(read('dev/index.html').replace(/<a href="[^"]*dev\/design\.html"[^>]*>คำตัดสินเกม<\/a>/, '')).length === 1;
-const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.html" aria-current="true"') && devNavHtml('dev/design.html').includes('href="../dev/design.html" aria-current="page"') && devNavHtml(DEV_MAPS_PAGE).includes('href="../../dev/maps/continent.html" aria-current="page"') && devNavHtml('dev/plan.html').includes('href="../dev/index.html" aria-current="true"');
+const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.html" aria-current="true"') && devNavHtml('dev/design.html').includes('href="../dev/design.html" aria-current="page"') && devNavHtml(DEV_MAPS_PAGE).includes('href="../../dev/maps/continent.html" aria-current="page"') && !devNavHtml('dev/plan.html').split('class="nl-tabs"')[1].includes('aria-current');
 // 7c3) แถบเว็บแทนแถวบนห้องผู้พัฒนา (ข้อ 292 293): ทุกหน้าที่มีแถวแท็บตรงแถบที่ build เขียน และมีแถบเว็บแถบเดียว · ตัวควบคุม: คืนแถวบนเดิม ⇒ ต้องถูกจับ
 const devBarBad = (f, h) => lf(h) !== lf(injectDevNav(h, f)) || h.split('<nav class="top"').length !== 2;
 const devBarMiss = devFiles.filter((f) => read(f).includes('class="nl-tabs"') && devBarBad(f, read(f)));
