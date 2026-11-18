@@ -1,4 +1,4 @@
-# สายพระนักเรียน สอบเปรียญ 13 ใบ
+# สายพระนักเรียน สอบเปรียญ 14 ใบ
 # เส้นหลักกั้น sex ชาย เพราะบรรพชาอุปสมบทในคณะสงฆ์ไทยเป็นของผู้ชาย · ทางแม่ชีอยู่ใบ 117 ไม่ทำที่นี่
 # ไต่ขั้นด้วยธง + นัด: บวชเรียน → เรียนบาลี 1 ปี → สอบต้น 2-3 ปี → สอบกลาง 3-4 ปี → ทางแยก 1-2 ปี · ปีว่างระหว่างนัดให้กองออก
 # ไม่แตะคำเรื่องราชสำนัก (banned monarchy) · ตัวเลือกปั่นเป็นเรื่องความซนของเด็ก ไม่ล้อพระเณร · เนื้อศาสนาเจ้าของอ่านก่อนลง (decisions 72)
@@ -160,7 +160,7 @@ events:
     years: [2500, 2650]
     when: {age: [13, 24], sex: [ชาย], flags: {has: [pali_novice]}}
     title: "สนามสอบบาลี"
-    text: "พระเณรจากหลายวัดนั่งเต็มศาลาสอบ คนเข้าสอบเป็นหมื่น สอบได้ไม่กี่คนในสิบ ข้อสอบแปลให้เขียนด้วยลายมือสวย เขียนผิดคำเดียวความหมายก็ไปคนละทาง"
+    text: "พระเณรจากหลายวัดนั่งเต็มศาลาสอบ คนเข้าสอบเป็นหมื่น สอบได้ไม่มาก ข้อสอบแปลให้เขียนด้วยลายมือสวย เขียนผิดคำเดียวความหมายก็ไปคนละทาง"
     choices:
       - id: careful
         text: "แปลช้า ๆ ตรวจทุกคำ"
@@ -250,8 +250,42 @@ events:
         merit: [{cat: care_parents, level: 1}]
       - id: ask_time
         text: "ขอเวลาคิดหนึ่งพรรษา"
+        schedules: [{event: pali_think_01, after_years: [1, 1]}]
         effects: {happiness: 1}
         merit: [{cat: sila, level: 1}]
+
+  - id: pali_think_01
+    away_only: [monk]
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [21, 34], sex: [ชาย], flags: {has: [pali_novice]}}
+    title: "คิดครบพรรษาแล้ว"
+    text: "ครบพรรษาที่ขอไว้ ท่านอาจารย์ไม่ทวงคำตอบ แต่บาตรกับตำรายังวางที่เดิม จดหมายจากที่บ้านมาอีกฉบับ ถึงเวลาที่คุณต้องตอบตัวเองเสียที"
+    choices:
+      - id: full_monk
+        text: "อุปสมบท อยู่เรียนต่อ"
+        sets_flags: [pali_monk]
+        schedules: [{event: pali_high_01, after_years: [4, 6]}]
+        effects: {knowledge: 1, happiness: 1, relations: -1}
+        merit: [{cat: sila, level: 2}]
+      - id: university
+        text: "ลาสิกขา สอบเข้าเรียนต่อ"
+        sets_flags: [pali_left]
+        clears_flags: [pali_novice]
+        effects: {away_leave: true, knowledge: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: go_home
+        text: "สึกกลับไปช่วยงานที่บ้าน"
+        sets_flags: [pali_left]
+        clears_flags: [pali_novice]
+        effects: {away_leave: true, relations: 2}
+        merit: [{cat: care_parents, level: 1}]
+      - id: ask_friend
+        text: "ไปปรึกษาเพื่อนที่สึกไปแล้ว"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
 
   - id: pali_high_01
     away_only: [monk]
