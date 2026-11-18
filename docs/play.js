@@ -15652,6 +15652,26 @@ function boot() {
   else linkAsk(card, seed);
 }
 
+// สถานะจอเป็น JSON ให้สคริปต์เทส/AI อ่านแทนดูภาพ (ui-redo 137) — อ่านจาก DOM ที่วาดอยู่เท่านั้น ไม่แตะ st/แกน
+// ⇒ ไม่มีของที่จอไม่โชว์ (บุญบาป · ธงลับ · seed · น้ำหนัก) · ตัวเลือกเอาเฉพาะข้อความปุ่ม ไม่เอาป้ายผลข้างปุ่ม
+const screenTxt = (n) => (n?.innerText ?? n?.textContent ?? '').replace(/\s+/g, ' ').trim();
+const screenSeen = (n) => n.getClientRects().length > 0;
+window.render_game_to_text = () => {
+  const card = root.querySelector(':scope > .card');
+  const age = root.querySelector('.sb-age b');
+  const mode = !card ? 'other' : card.querySelector('.d-head') ? 'death' : card.querySelector('.kicker')?.textContent === 'เปิดชีวิต' ? 'start' : 'life';
+  return JSON.stringify({
+    mode,
+    kicker: screenTxt(card?.querySelector('.kicker')),
+    name: screenTxt(root.querySelector('.sb-who b')),
+    age: age ? screenTxt(age) : null,
+    stats: [...root.querySelectorAll('.sb-m > li')].map((li) => ({ label: screenTxt(li.querySelector('.mk')), value: screenTxt(li.querySelector('.num')) })),
+    text: [...(card?.querySelectorAll('.body h3, .body p, .body dd, .body dt') ?? [])].filter(screenSeen).map(screenTxt).filter(Boolean),
+    choices: [...(card?.querySelectorAll('.choices button.choice') ?? [])].map((b) => ({ label: screenTxt(b.querySelector(':scope > span:not(.fx)')?.firstChild), enabled: !b.disabled })),
+    sheetOpen: !!root.querySelector('.sheet'),
+  });
+};
+
 boot();
 notesBoot();
 
