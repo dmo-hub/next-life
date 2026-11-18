@@ -29,13 +29,15 @@ const ISEKAI_BOT_SALT = 0x15e4a1;
 const ISEKAI_CAP = 240;
 
 if (args[0] === '--worker') {
-  const [, root, n, seed, ctl, world] = args;
-  console.log(JSON.stringify(await hashLives(root, Number(n), Number(seed), ctl === '1', world)));
+  const [, root, n, seed, ctl, world, only] = args;
+  console.log(JSON.stringify(await hashLives(root, Number(n), Number(seed), ctl === '1', world, only)));
 } else {
   process.exit(await main());
 }
 
-async function hashLives(root, n, seed, ctl, world) {
+// only = "บอท:i" รันชีวิตเดียวนั้นแล้วคืนรายการการ์ด (รุ่น·ช่วง·อายุ·id) แทน hash — เรียกเฉพาะตอนต่างแล้ว รอบปกติไม่เก็บ trace
+async function hashLives(root, n, seed, ctl, world, only) {
+  const [onlyBot, onlyIdx] = only ? [only.slice(0, only.lastIndexOf(':')), Number(only.slice(only.lastIndexOf(':') + 1))] : [];
   const imp = (p) => import(pathToFileURL(path.join(root, p)).href);
   process.chdir(root);
   const E = await imp('src/engine/index.mjs');
@@ -46,9 +48,18 @@ async function hashLives(root, n, seed, ctl, world) {
   const out = {};
   for (const [name, bot] of Object.entries(BOTS)) {
     out[name] = [];
+    if (only && name !== onlyBot) continue;
     for (let i = 0; i < n; i++) {
+      if (only && i !== onlyIdx) continue;
       const h = createHash('sha256');
-      const see = (card) => h.update(JSON.stringify(card, skip));
+      const trace = [];
+      let tag = '';
+      const see = (card, s) => {
+        const json = JSON.stringify(card, skip);
+        h.update(json);
+        // digest สั้น: การ์ด id เดิมแต่เนื้อ/ตัวเลือกเปลี่ยน (ใบที่แก้การ์ดเดิม) ต้องชี้ใบนั้นได้ ไม่ใช่เห็นแค่ id เท่ากัน
+        if (only) trace.push([`${tag} · อายุ ${s?.age ?? '-'} · ${card.id ?? card.kind ?? card.step}`, createHash('sha256').update(json).digest('hex').slice(0, 6)]);
+      };
       let calls = 0;
       // ห่อด้วย Object.assign ให้ .focus ของบอทติดไป — ห่อเปล่าแล้วบอทไม่โฟกัส ชีวิตไม่ตรงที่ด่านจริงเล่น
       const pick = Object.assign((card, rng, x) => {
@@ -75,22 +86,24 @@ async function hashLives(root, n, seed, ctl, world) {
       } else if (world === 'chain') {
         let st = E.newLife(E.mixSeed(seed, i), content);
         for (let g = 0; g < CHAIN_GENS; g++) {
+          tag = `รุ่น ${g + 1} ชีวิต`;
           const { state, age, cards } = E.playLife(st.seed, content, pick, see, st);
           h.update(`|${g}|${age}|${cards}|${JSON.stringify(state, skip)}`);
+          tag = `รุ่น ${g + 1} ปรโลก`;
           if (g < CHAIN_GENS - 1) st = E.nextLife(E.playAfterlife(state, pick, see));
         }
       } else {
         const { state, age, cards } = E.playLife(E.mixSeed(seed, i), content, pick, see);
         h.update(`|${age}|${cards}|${JSON.stringify(state, skip)}`);
       }
-      out[name].push(h.digest('hex').slice(0, 16));
+      out[name].push(only ? trace : h.digest('hex').slice(0, 16));
     }
   }
   return out;
 }
 
-function run(root, n, seed, ctl, world) {
-  const text = execFileSync(process.execPath, [SELF, '--worker', root, String(n), String(seed), ctl ? '1' : '0', world], { maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'ignore'] });
+function run(root, n, seed, ctl, world, only = '') {
+  const text = execFileSync(process.execPath, [SELF, '--worker', root, String(n), String(seed), ctl ? '1' : '0', world, ...(only ? [only] : [])], { maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'ignore'] });
   return JSON.parse(text);
 }
 
@@ -112,17 +125,31 @@ function extract(sha) {
 }
 
 function compare(a, b) {
-  let diff = 0, total = 0, first = null;
+  let diff = 0, total = 0, first = null, at = null;
   for (const name of Object.keys(a)) {
     a[name].forEach((h, i) => {
       total++;
       if (h !== b[name]?.[i]) {
         diff++;
         first ??= `${name} ชีวิตที่ ${i}`;
+        at ??= `${name}:${i}`;
       }
     });
   }
-  return { diff, total, first };
+  return { diff, total, first, at };
+}
+
+// สายต่างที่ hash เดียวบอกแค่ว่าต่าง — รันสายแรกที่ต่างซ้ำทั้งสองฝั่งแล้วชี้การ์ดแรกที่แยกกัน (รุ่น · ช่วง · อายุ · id)
+function firstSplit(baseDir, n, seed, world, at) {
+  const bot = at.slice(0, at.lastIndexOf(':'));
+  const [a] = run(baseDir, n, seed, false, world, at)[bot];
+  const [b] = run(REPO, n, seed, false, world, at)[bot];
+  let k = 0;
+  while (k < a.length && k < b.length && a[k][0] === b[k][0] && a[k][1] === b[k][1]) k++;
+  if (k === a.length && k === b.length) return 'ไล่การ์ดซ้ำแล้วเท่ากัน — ต่างที่ค่าท้ายสาย (state/อายุ/จำนวนการ์ด) ไม่ใช่การ์ดใบใด';
+  const x = a[k], y = b[k];
+  const same = x && y && x[0] === y[0] ? ' (id เดียวกัน เนื้อการ์ด/ตัวเลือกต่าง)' : '';
+  return `การ์ดที่ ${k + 1} ของสาย · ฐาน: ${x?.[0] ?? '(จบสาย)'} ⇄ ใหม่: ${y?.[0] ?? '(จบสาย)'}${same}`;
 }
 
 async function main() {
@@ -152,6 +179,7 @@ async function main() {
   for (const s of seeds) {
     const r = compare(run(b.dir, n, s, false, world), run(REPO, n, s, false, world));
     console.log(`  seed ${s}: ต่าง ${r.diff}/${r.total}${r.first ? ` · ตัวแรก ${r.first}` : ''}`);
+    if (r.diff && world === 'chain') console.log(`    ${firstSplit(b.dir, n, s, world, r.at)}`);
     if (r.diff) fail++;
   }
   const s0 = seeds[0];
