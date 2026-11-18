@@ -31,7 +31,7 @@ const kidPath = (bot) => (card, rng, h) => (card.kind === 'path' && !card.locked
 const fails = [];
 const fail = (m) => fails.push(m);
 const rows = [];
-// ขั้นสูงสุดที่ตระกูลจริงไปถึงคือขั้น 1 (OVERLAP_STAGE_MIN ขั้น 2+ = Infinity) ⇒ ค่าที่ตั้งได้มีแค่ 0 กับ ≥ 1
+// ด่านนี้ตั้งค่าซ้อนทับดิบเป็น 0 หรือ 1 เท่านั้น (ขั้น 0 กับขั้น 1 ตามเกณฑ์ OVERLAP_STAGE_MIN) · ขั้น 2+ ถึงได้แล้วแต่การ์ดผีญาติอ่านแค่ขั้น ≥ 1 จึงไม่ต้องไล่ค่าสูง
 const stages = [0, 1];
 for (const [name, base] of Object.entries(BOTS)) {
   const bot = kidPath(base);

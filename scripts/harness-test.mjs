@@ -549,7 +549,9 @@ const f2 = (v) => v.toFixed(2);
   check('ขั้นค่าซ้อนทับ: ค่า 0 = ขั้น 0 การ์ดขั้น 1 ไม่ออก ตัวคูณ ×1', before.join() === '0,false,1', before.join());
   check('ขั้นค่าซ้อนทับ: ขึ้นค่ากลางชีวิต → ขั้น 1 การ์ดออกได้ทันที ตัวคูณ ×3 · ตัวคูณ 0 ปิดการ์ด', after.join() === '1,true,3,0', after.join());
   st.overlap = 1e6;
-  check('ขั้นค่าซ้อนทับ: ขั้น 2–4 ยังไปไม่ถึงจนใบ 16 ใส่เกณฑ์ (ค่าสูงแค่ไหนก็ขั้น 1)', E.OVERLAP_STAGE_MIN.length === 5 && E.OVERLAP_STAGE_MIN[1] === 1 && E.overlapStageOf(st) === 1, String(E.overlapStageOf(st)));
+  const edge = [0, 1, 2, 5, 6, 11, 12].map((v) => { st.overlap = v; return E.overlapStageOf(st); });
+  st.overlap = 1e6;
+  check('ขั้นค่าซ้อนทับ: เกณฑ์ใบ 16 [0,1,2,6,12] ขอบแต่ละขั้นถูก · ค่าสูงมาก = ขั้น 4', E.OVERLAP_STAGE_MIN.join() === '0,1,2,6,12' && edge.join() === '0,1,2,2,3,3,4' && E.overlapStageOf(st) === 4, `${edge.join()} · ${E.overlapStageOf(st)}`);
 }
 
 // ใบตามเกตที่ปล่อยไว้: นัดจากทาง pass ไม่ติดป้ายตารางซ้อน ⇒ ทอยตารางใหม่ไม่ล้าง ไม่กินโควตาซ้อน · ถึงคิวกินโควตาปี 1 · ขั้นไม่ใช่ 3–4 ตอนถึงคิว = ไม่ออก
