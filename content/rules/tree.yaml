@@ -906,3 +906,15 @@ nodes:
     fx: { health: 1, happiness: 1 }
     nolight: true
     roll: 0
+  o9:
+    name: นั่งสมาธิกับยาย
+    branch: occ
+    size: s
+    stages: [เด็ก]
+    pre: []
+    years: 2
+    cards: 1
+    cat: [family, belief]
+    fx: { happiness: 1, relations: 1 }
+    nolight: true
+    roll: 0

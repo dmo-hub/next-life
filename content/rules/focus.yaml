@@ -29,11 +29,15 @@ goal_joy: 2
 nature_age: 12
 heir_nature: 0.5
 nature_mul: 1.1
+# node_pts = แต้มนิสัยที่ได้ตอนปลดโหนดเด็ก (ใบ ft07 ข้อ 16 51) · โหนดที่ผูกนิสัยปลดถึงอายุ nature_age ป้อนแต้มเข้ากองเดียวกับทุ่มเทเด็ก · นิสัยเด่น = แต้มสูงสุด นิสัยอื่นที่มีโหนดปลดแล้วแค่เปิดตัวเลือก (requires.nature)
+# ต่อนิสัย: nodes = โหนดต้นไม้ที่ผูก (content/rules/tree.yaml)
+node_pts: 2
 natures:
-  social: {name: เข้ากับคนง่าย, stat: relations, jobs: [service, manager, senior_officer]}
-  learn: {name: ใฝ่รู้, stat: knowledge, jobs: [professional, clerk, technician, officer]}
-  duty: {name: ขยันรับผิดชอบ, stat: money, cards: [work_money], jobs: [farmer, craft, labor, factory]}
-  bold: {name: ใจกล้า, stat: health}
+  social: {name: เข้ากับคนง่าย, stat: relations, jobs: [service, manager, senior_officer], nodes: [r1]}
+  learn: {name: ใฝ่รู้, stat: knowledge, jobs: [professional, clerk, technician, officer], nodes: [k1]}
+  duty: {name: ขยันรับผิดชอบ, stat: money, cards: [work_money], jobs: [farmer, craft, labor, factory], nodes: [mo1]}
+  bold: {name: ใจกล้า, stat: health, nodes: [s1]}
+  calm: {name: สงบใจ, stat: happiness, nodes: [o1, o2, o9]}
 tags: {}
 focuses:
   # ── เด็ก–วัยรุ่น ──

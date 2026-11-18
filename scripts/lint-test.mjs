@@ -16,6 +16,7 @@ import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenTex
 import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../src/engine/isekai.mjs';
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 import { checkTree } from '../src/node/lint/tree.mjs';
+import { checkFocus } from '../src/node/lint/focus.mjs';
 
 const root = new URL('../', import.meta.url);
 const dir = (d) => readdirSync(new URL(d, root)).filter((n) => n.endsWith('.yaml')).sort();
@@ -568,6 +569,21 @@ try {
   const real = checkTree(parse(readFileSync(new URL('content/rules/tree.yaml', root), 'utf8')));
   if (real.length) fails.push(`content/rules/tree.yaml ไม่ผ่าน: ${real.join(' | ')}`);
   rows.push(['ต้นไม้โฟกัส ทะเบียนตก/ผ่าน', `${treeCases.length} เคส + ของจริง`]);
+  // โหนดนิสัยวัยเด็ก (ใบ ft07): natures.<id>.nodes ต้องชี้โหนดจริง · โหนดเดียวผูกนิสัยเดียว · node_pts จำนวนเต็ม ≥ 1
+  const focusDoc = () => parse(readFileSync(new URL('content/rules/focus.yaml', root), 'utf8'));
+  const treeIds = Object.keys(parse(readFileSync(new URL('content/rules/tree.yaml', root), 'utf8')).nodes);
+  const focusCases = [
+    ['good: ของจริง', (d) => d, 0],
+    ['bad: nodes ชี้โหนดที่ไม่มี', (d) => { d.natures.calm.nodes = ['ghost']; return d; }, 1],
+    ['bad: โหนดเดียวผูกสองนิสัย', (d) => { d.natures.bold.nodes = [...d.natures.bold.nodes, d.natures.calm.nodes[0]]; return d; }, 1],
+    ['bad: node_pts เป็น 0', (d) => { d.node_pts = 0; return d; }, 1],
+    ['bad: ไม่มี node_pts', (d) => { delete d.node_pts; return d; }, 1],
+  ];
+  for (const [name, mut, want] of focusCases) {
+    const ps = checkFocus(mut(focusDoc()), { treeNodes: treeIds });
+    if ((ps.length > 0) !== (want > 0)) fails.push(`focus nature "${name}": ต้อง${want ? 'ตก' : 'ผ่าน'} ได้ [${ps.join(' | ') || 'ผ่าน'}]`);
+  }
+  rows.push(['นิสัยวัยเด็ก nodes ตก/ผ่าน', `${focusCases.length} เคส`]);
 }
 
 // ชื่อที่ src/ui import ต้องมีจริงในไฟล์ปลายทาง — build ต่อไฟล์เป็นสคริปต์เดียวแล้วตัด import ทิ้ง ชื่อหายจึงไม่พังตอน build แต่พังทั้งเกมตอนกด (bookAdd v0.6.55)

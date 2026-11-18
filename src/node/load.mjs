@@ -446,9 +446,10 @@ function loadFocus() {
   const doc = parse(read('content/rules/focus.yaml'));
   const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
   const jobs = JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id);
-  const bad = checkFocus(doc, { causes, jobs, flags: Object.keys(parse(read('content/rules/flags.yaml')).flags) });
+  const treeNodes = Object.keys(parse(read('content/rules/tree.yaml')).nodes);
+  const bad = checkFocus(doc, { causes, jobs, treeNodes, flags: Object.keys(parse(read('content/rules/flags.yaml')).flags) });
   if (bad.length) throw new Error(`content/rules/focus.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
-  return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, goal_joy: doc.goal_joy, focuses: doc.focuses, ...(doc.natures && { natures: doc.natures, nature_age: doc.nature_age, heir_nature: doc.heir_nature, nature_mul: doc.nature_mul }) };
+  return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, goal_joy: doc.goal_joy, focuses: doc.focuses, ...(doc.natures && { natures: doc.natures, nature_age: doc.nature_age, heir_nature: doc.heir_nature, nature_mul: doc.nature_mul, node_pts: doc.node_pts }) };
 }
 
 // ต้นไม้โฟกัส (ใบ 03): ทะเบียนผิดรูป = หยุด build
