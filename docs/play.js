@@ -5674,7 +5674,7 @@ function lockReason(st, c, extra = 0) {
   if (q.age && st.age < (q.age.min ?? 0)) return `อายุยังไม่ถึง ${q.age.min} ปี`;
   if (q.age && st.age > (q.age.max ?? Infinity)) return `อายุเกิน ${q.age.max} ปี`;
   // ตัวเลือกวัยโตของนิสัย (B41) — บอกนิสัยที่ขาดเป็นคำ ผู้เล่นจึงรู้ว่าวัยเด็กแบบไหนเปิดทางนี้
-  if (q.nature && st.nature !== q.nature) return `ต้องเป็นคน${st.content.focus?.natures?.[q.nature]?.name ?? ''}`;
+  if (q.nature && st.nature !== q.nature && !st.natureAlso?.includes(q.nature)) return `ต้องเป็นคน${st.content.focus?.natures?.[q.nature]?.name ?? ''}`;
   // why = [ข้อที่ไม่ผ่าน, ข้อความ] · requires.reasons ใส่เหตุแยกตามข้อได้ (B1 เช่น flags = "ต้องให้ที่บ้านเซ็นยินยอม" · money = เงินไม่พอ)
   const why = [];
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
@@ -6067,6 +6067,7 @@ function lifeTreeYear(st) {
   const light = Object.keys(st.tree.done).filter((id) => st.tree.done[id] < st.age);
   const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age, c.pace);
   if (r) applyEffects(st, c.nodes[r.id].fx, c.year_scale);
+  if (r?.unlocked) treeNature(st, r.id);
   if (treeCtl.passive) for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size]);
   // keystone ที่ปลดแล้วเสียถาวรทุกปี (ใบ 05 · ข้อ 28) · ไม่ผ่านตัวควบคุม passive: ล้างไม่ได้ (ข้อ 60) ปิดไม่ได้
   for (const id of light) if (c.nodes[id].cost) applyEffects(st, c.nodes[id].cost, c.light_unit[c.nodes[id].size]);
@@ -6108,6 +6109,16 @@ function lifeFocusBorn(st, kid) {
 // ทายาทเริ่มชาติด้วยทุ่มเทตัวเด็กของพ่อแม่ — นับปีเต็มเท่าลูกที่เลือกเอง ทายาทแทบทุกคนจะได้นิสัยพ่อแม่ จึงนับแค่ heir_nature จนผู้เล่นเปลี่ยนเอง
 // ตัวที่ได้แต้มล่าสุดย้ายไปท้าย naturePts เสมอ แต้มเสมอกันจึงเลือกตัวท้าย (ตัวที่ได้แต้มล่าสุด)
 const NATURE_NONE = 'ยังไม่รู้ว่าตัวเองเป็นคนแบบไหน';
+// โหนดเด็กที่ผูกนิสัยปลดถึงอายุ nature_age: ป้อนแต้ม node_pts เข้ากองเดียวกับทุ่มเทเด็ก + จดนิสัยที่มีโหนดปลดไว้ (ใบ ft07 ข้อ 16 19 51) · นิสัยเด่นยังเป็นตัวแต้มสูงสุดตัวเดียว ตัวอื่นเปิดแค่ตัวเลือก
+function treeNature(st, node) {
+  const c = st.content.focus;
+  if (!c?.natures || !c.node_pts || st.age > c.nature_age) return;
+  const id = Object.keys(c.natures).find((k) => c.natures[k].nodes?.includes(node));
+  if (!id) return;
+  naturePoint(st, id, c.node_pts);
+  const got = (st.natureNodes ??= []);
+  if (!got.includes(id)) got.push(id);
+}
 function naturePoint(st, id, n) {
   const c = st.content.focus;
   if (!id || !n || !c?.natures?.[id] || st.age > c.nature_age) return;
@@ -6126,6 +6137,10 @@ function natureLock(st) {
   delete st.naturePts;
   delete st.focusBorn;
   if (id) st.nature = id;
+  // นิสัยที่มีโหนดปลดแต่ไม่ใช่ตัวเด่น = ปลดตัวเลือกวัยโต ไม่ได้ผลคูณ
+  const also = (st.natureNodes ?? []).filter((k) => k !== id);
+  delete st.natureNodes;
+  if (also.length) st.natureAlso = also;
   st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: id ? `คุณโตมาเป็นคน${c.natures[id].name}` : NATURE_NONE, nature: id, tag: 'nature' });
 }
 // ตัวคูณนิสัยของการ์ดใบนี้: ค่าตรงนิสัย (เงินนับเฉพาะการ์ดหมวดใน cards) + การ์ดขึ้นเงินเดือนเมื่ออาชีพตรงสาย · ไม่มีนิสัย = null คูณ 1 ทุกค่า
