@@ -4878,7 +4878,7 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
     // วัดพรสวรรค์หลังเข้าสาย — อาชีพเปลี่ยนตามขั้นแรกของสาย
     st.incomeMult = talentStart(st);
     // ทางแรกของสาย (B170): การ์ด first_of ออกปีที่เข้าสาย ครั้งเดียวต่อชีวิต (เข้าสายซ้ำไม่ออกอีก) · แทนการ์ดกองสุ่มหนึ่งใบแบบผลย้อน ชีวิตจึงไม่ยาวขึ้น
-    const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id]);
+    const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id] && awayOk(st, e));
     if (first) {
       st.done[first.id] = true;
       st.due.push({ kind: 'eraEvent', ev: first, age: st.age });
@@ -4886,6 +4886,8 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
     }
   }
   if (fx.promote !== undefined) promote(st, fx.promote);
+  if (fx.away_enter !== undefined) st.outside = { kind: fx.away_enter, from: st.age };
+  if (fx.away_leave) delete st.outside;
   if (fx.office !== undefined) setOffice(st, fx.office);
   for (const [k, v] of Object.entries(fx.chronic ?? {})) {
     const lv = Math.max(-CHRONIC_MAX, Math.min(CHRONIC_MAX, (st.chronic[k] ?? 0) + v));
@@ -5543,6 +5545,7 @@ const ERA_NEWS = { merge: true };
 
 // news = ข่าวบ้านเมืองที่รวมมาเป็นบรรทัดนำ (B58) — การ์ดยังเป็นของเหตุการณ์ ตัวเลือก/เซฟเดินเหมือนเดิม
 function eventCard(st, ev, news = null, echoFrom = undefined) {
+  ev = awayCallCard(st, ev);
   pickFocus(st);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
@@ -5826,9 +5829,10 @@ function drawCard(st) {
     // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
     const year = st.birthYear + st.age;
     arcDefer(st);
-    let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
+    awayDefer(st);
+    let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && awayOk(st, e));
     // ผลย้อนที่นัดไว้ปีนี้กินโควตาแบบเรื่องต่อ — หลักไมล์ที่ออกจาก dueAt เหมือนกันไม่หัก
-    if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age)) takeYearQuota(st, ev.id.startsWith('cadet_') ? 0.5 : 1);
+    if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age && !x.milestone)) takeYearQuota(st, ev.id.startsWith('cadet_') ? 0.5 : 1);
     // กองสุ่มจับได้ปีละ poolRounds รอบ หลังหลักไมล์/นัดของปีนั้นหมดแล้ว · การ์ดที่จับได้อาจนัดตอนต่อปีเดียวกัน — ค้นนัดก่อนรอบถัดไป
     poolTurn(st);
     while (!ev && st.poolLeft > 0) {
@@ -5905,6 +5909,38 @@ function arcDefer(st) {
   }
 }
 
+// สถานะอยู่นอกบ้าน (ใบ 237 · ข้อ 426–428 443–445): ไม่มี st.away = อยู่บ้าน ⇒ ชีวิตที่ไม่ไปไหนไม่ถูกแตะเลขสุ่มหรือช่องเซฟเลย
+// ป้าย away_block เป็นรายใบรายชนิด เพราะกองสุ่มไม่รู้ว่าใบไหนต้องอยู่บ้าน และ pool_focus_flag ล็อกทั้งกองใช้แทนไม่ได้
+// away_only = การ์ดที่เล่าชีวิตช่วงนอกบ้าน กดกลับบ้านกลางทางแล้วนัดที่ค้างจึงไม่ออก ไม่ต้องตามลบจากตารางนัด
+const awayOk = (st, e) => (!e.away_only || e.away_only.includes(st.outside?.kind)) && (!st.outside || !e.away_block?.includes(st.outside.kind));
+
+// นัดและหลักไมล์ที่ตกช่วงนอกบ้านเลื่อนทีละปีจนกลับ (เจ้าของเคาะข้อ 444) — ไม่รู้ล่วงหน้าว่าจะกลับปีไหน จึงตั้งอายุเป้าตรง ๆ แบบ arcDefer ไม่ได้
+// หลักไมล์ต้องจดเป็นนัด เพราะ byAge ผูกอายุเดียว พ้นปีแล้วไม่ถูกค้นอีก · ติด milestone ไว้ไม่ให้หักโควตาแบบผลย้อน
+function awayDefer(st) {
+  if (!st.outside) return;
+  const events = st.content.events;
+  const ix = lifeEventIndex(events);
+  for (const x of st.scheduled) {
+    const e = x.age === st.age && ix.pos.has(x.event) && events[ix.pos.get(x.event)];
+    if (!e || st.done[e.id] || awayOk(st, e)) continue;
+    // จดปีที่เลื่อนไว้บนนัด: ปีนั้นอาจไม่มีการ์ดออกเลย ผู้ตรวจจึงอ่านสถานะนอกบ้านย้อนหลังจากการ์ดไม่ได้
+    (x.held ??= []).push({ age: st.age, kind: st.outside.kind });
+    x.age = st.age + 1;
+  }
+  for (const i of ix.byAge.get(st.age) ?? []) {
+    const e = events[i];
+    if (!st.done[e.id] && !awayOk(st, e) && !st.scheduled.some((x) => x.event === e.id)) st.scheduled.push({ event: e.id, age: st.age + 1, milestone: true });
+  }
+}
+
+// โทรมาบอก (ข้อ 427 443): ตัวเลือกเดิมคงลำดับเดิมเพราะ harness/เซฟ/ผลย้อนจับด้วยเลขลำดับ ปุ่มกลับบ้านจึงต่อท้ายเสมอ · สำเนาใบ ไม่แก้เนื้อหากลาง
+function awayCallCard(st, ev) {
+  if (!st.outside || !ev.away_call) return ev;
+  const kind = st.content.away.kinds[st.outside.kind];
+  const back = { text: kind.return_text, effects: { money: { unit: 'income_x', amount: -kind.return_cost }, away_leave: true }, merit: [{ cat: 'neutral' }] };
+  return { ...ev, text: ev.away_call.text, choices: [...ev.choices, back] };
+}
+
 // จดตอนตอนการ์ดออก (eventCard จุดเดียว ทุกทางเข้า) · ช่องใส่เมื่อมีค่า
 function arcFired(st, ev) {
   const a = st.arcs?.[ev.arc];
@@ -5921,7 +5957,7 @@ function drawPool(st, year) {
   // เฟส 3 ชีวิตในโรงเรียนเตรียมทหาร (ฮับเคาะ P6): ระหว่าง 2 ปีนี้ขึ้นเฉพาะฉากโรงเรียน การ์ดกองปกติพักไว้
   if (st.cadet?.school) return null;
   const stage = stageOf(st.age);
-  let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e));
+  let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e) && awayOk(st, e));
   // เส้นเตรียมทหาร (เจ้าของ 2026-11-06): ถือธงนี้อยู่ = จั่วเฉพาะใบที่ต้องมีธงนี้ เรื่องชีวิตวัยรุ่นทั่วไปพักไว้ก่อน
   // ถือธงอยู่: จั่วถี่ขึ้นตาม numbers.dream_pool_chance (รอบต่อปีตั้งใน poolTurn) · กองเฉพาะว่าง = กลับไปกองปกติ ด้วยโอกาสและรอบของชีวิตปกติ
   let chance = POOL_CHANCE[stage];
@@ -6435,7 +6471,7 @@ function choose(st, idx, loan) {
     const capped = DRAW_RULES.nextCap !== Infinity;
     const start = capped && !st.inStory?.[ev.id] && follow?.run === undefined;
     const stage = stageOf(st.age);
-    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow) && arcNextOk(st, ev, follow) && !(start && (st.stories?.[stage] ?? 0) >= DRAW_RULES.nextCap)) {
+    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow) && awayOk(st, follow) && arcNextOk(st, ev, follow) && !(start && (st.stories?.[stage] ?? 0) >= DRAW_RULES.nextCap)) {
       if (start) (st.stories ??= {})[stage] = (st.stories[stage] ?? 0) + 1;
       if (capped) (st.inStory ??= {})[follow.id] = true;
       st.done[follow.id] = true;
