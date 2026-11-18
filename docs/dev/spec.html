@@ -8,10 +8,8 @@
 <meta name="robots" content="noindex">
 <style>
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.7; }
-  header { background: var(--head); color: var(--title); padding: 28px 16px 24px; }
   .w { max-width: 1040px; margin: 0 auto; }
   h1 { margin: 0; font-size: 30px; line-height: 1.3; }
-  header p { margin: 6px 0 0; opacity: .9; }
   main { padding: 20px 16px 64px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
   .box { background: var(--bg); padding: 14px 16px; }
@@ -42,6 +40,12 @@
 </style>
 <!--DOCS-LAYOUT:START--><style>
 .w:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){max-width:1280px!important}body>main:not(:has(.w)):not(#app){max-width:1280px;margin-left:auto;margin-right:auto}:is(body>main,body>header,body>footer){padding-left:24px;padding-right:24px}
+body > header:not(.home){background:var(--head);color:var(--title);padding:16px 16px 18px}
+body > header:not(.home)>.w{margin-left:auto;margin-right:auto}
+body > header:not(.home) h1{font-family:var(--fh);font-weight:600;font-size:clamp(26px,5vw,36px);line-height:1.3;margin:0 0 8px;color:var(--title)}
+body > header:not(.home) p{margin:0 0 6px;max-width:680px;color:var(--on-head2)}
+body > header:not(.home) :is(p,h1):last-child{margin-bottom:0}
+body > header:not(.home) a{color:var(--headink);text-decoration:underline;text-underline-offset:3px}
 main h2:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(:first-child){margin-top:28px}main :is(section,.box):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){margin-bottom:17px}
 main:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){overflow-wrap:anywhere}main .st:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){white-space:normal;max-width:100%}@media (max-width:640px){main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){display:block;max-width:100%;overflow-x:auto}}
 main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) :is(th,td):not(:is(.dark,.dark *)){border:1px solid var(--line)}main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) th:not(:is(.dark,.dark *)){background:var(--bg);color:var(--ink)}
