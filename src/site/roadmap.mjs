@@ -29,7 +29,7 @@ export function soonIds(html) {
 // ข้อในกำลังทำผูกกับใบ (ui-redo 128): <li data-tickets="96 B114"> = ข้อนี้ถอดเมื่อปิดครบทุกใบ · <li data-backlog> = เจ้าของเคาะแล้วแต่ยังไม่มีใบ
 // เลขอยู่ใน attribute เท่านั้น — ผู้เล่นไม่เห็นบนจอ · ใบที่ปิดแล้วอยู่ใน DONE_FILE (rel.mjs เติมจาก notes.json done ทุกรอบที่ปล่อย)
 export const DONE_FILE = 'src/site/tickets-done.json';
-// เลขเปล่า = ui-redo · prefix บอกชุดใบ (tld isk wo lg fb B …) — เลขชนกันข้ามชุด · ท้าย -N = ใบย่อย (fb06c-3)
+// เลขเปล่า = ui-redo · prefix บอกชุดใบ (tld isk wo lg fb ft wd B …) — เลขชนกันข้ามชุด · ท้าย -N = ใบย่อย (fb06c-3)
 export const TICKET_ID = /^[A-Za-z]*\d+[a-z]?(?:-\d+)?$/;
 const attr = (a, k) => a?.match(new RegExp(`\\s${k}(?:="([^"]*)")?(?=[\\s>/]|$)`));
 const idsOf = (t) => (t?.[1] ?? '').trim().split(/\s+/).filter(Boolean);
