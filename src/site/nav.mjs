@@ -18,7 +18,7 @@ export const NAV_MENU = [
 
 // เส้นใต้เหลือไว้ให้ hover/focus — หน้าปัจจุบันแยกด้วยสีกับน้ำหนัก
 // 390: ลิงก์กลางล้นแถบ ⇒ เงาจางขอบขวาบอกว่าเลื่อนได้ · nav.top a รีเซ็ตกล่องเอง เพราะบางหน้ามีกฎ a.<ชื่อ> ของตัวเอง (otherworld: a.play)
-// T2 (ui-redo 105 · ข้อ 218): แถบกับหัวหน้า (header ชื่อหน้า + คำโปรย) เป็นก้อนครามเดียว เตี้ย ไม่มีลาย — header แบบเดียวทุกหน้า หน้าแรกใช้ header.home ของตัวเอง
+// T2 (ui-redo 105 · ข้อ 218): แถบกับหัวหน้า (header ชื่อหน้า + คำโปรย) เป็นก้อนครามเดียว เตี้ย ไม่มีลาย — หน้าแรกใช้ header.home ของตัวเอง · CSS ของ header อยู่ที่ docs-layout.mjs (HEAD_CSS)
 // ลิงก์ในเนื้อขีดเส้นใต้เสมอ (คราม = ตัวหนังสือ แยกด้วยสีไม่ได้) · ลิงก์ที่มี class เป็นปุ่ม/เมนูของหน้า ดูแลกรอบเอง
 // ตัวแถบแยกจากกฎของหน้า ⇒ ห้องผู้พัฒนาหยิบแถบไปใช้ได้โดย header กับลิงก์ในเนื้อของหน้านั้นคงเดิม
 const NAV_BAR_CSS = `  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
@@ -35,11 +35,7 @@ const NAV_BAR_MASK = `  @media (max-width: 760px) { nav.top .links { -webkit-mas
 `;
 export const NAV_CSS = `
   ${SITE_ROOT}
-${NAV_BAR_CSS}  body > header:not(.home) { background: var(--head); color: var(--title); padding: 16px 16px 18px; }
-  body > header:not(.home) h1 { font-family: var(--fh); font-weight: 600; color: var(--title); }
-  body > header:not(.home) p { color: var(--on-head2); }
-  body > header:not(.home) a { color: var(--headink); text-decoration: underline; text-underline-offset: 3px; }
-  main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
+${NAV_BAR_CSS}  main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
 ${NAV_BAR_MASK}`;
 
 // 390: ลิงก์หน้าปัจจุบันอาจอยู่นอกส่วนที่เห็นของแถบที่ล้น ⇒ ตั้ง scrollLeft ของแถบเอง (scrollIntoView เลื่อนทั้งหน้าแนวตั้งด้วย) · ไม่มี JS แถบยังใช้ได้เหมือนเดิม

@@ -443,6 +443,18 @@ const dtCut = (h) => h.slice(0, h.indexOf(DOCS_LAYOUT_START)) + h.slice(h.indexO
 const dtCtl = dtScope.length > 0 && layoutBad(dtScope[0], dtCut(read(dtScope[0].f)));
 check('ทุกหน้าในขอบเขตเว็บเอกสารมีเลย์เอาต์กลางชุดปัจจุบัน', dtMiss.length || !dtCtl, ` ${dtFiles.length} หน้า${dtMiss.length ? ` · ${dtMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${dtCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
+// 7c5) header แบบเดียวทุกหน้า (ui-redo 78): ทุกหน้าในขอบเขตมี <header> เว็บ (ยกเว้นหน้าแรก = header.home · แผนที่ = แถบเลือกผังเต็มจอ) · CSS header อยู่ที่ HEAD_CSS ที่เดียว หน้าไม่ฝัง header{…} เอง (header.sb ในจอจำลองไม่นับ)
+// ตัวควบคุม: (ก) ถอด header หน้าเดียว ⇒ ตก (ข) ฝัง header{background:#2F3833} กลับหน้าเดียว ⇒ ตก
+const headFree = new Set(['index.html', DEV_MAPS_PAGE]);
+const headStyles = (html) => (dtCut(html).match(/<style[^>]*>[\s\S]*?<\/style>/g) ?? []).join('\n');
+const headOwnRule = (html) => /(^|[{};\n])\s*header(\s+[a-z0-9]+)?\s*\{/.test(headStyles(html));
+const headBad = (f, html) => [...(!headFree.has(f) && !html.includes('<header>') ? [`ไม่มี header ${f}`] : []), ...(f !== 'index.html' && headOwnRule(html) ?[`ฝัง header{} เอง ${f}`] : [])];
+const headMiss = dtFiles.flatMap((f) => headBad(f, read(f)));
+const headPick = dtFiles.find((f) => !headFree.has(f));
+const headCtlA = headBad(headPick, read(headPick).replace('<header>', '<div>')).length > 0;
+const headCtlB = headBad(headPick, read(headPick).replace('</style>', 'header{background:#2F3833}</style>')).length > 0;
+check('ทุกหน้าในขอบเขตใช้ header เว็บแบบเดียว ไม่ฝัง CSS เอง', headMiss.length || !headCtlA || !headCtlB, ` ${dtFiles.length} หน้า${headMiss.length ? ` · ${headMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม ก${headCtlA ? 'จับได้' : 'จับไม่ได้'} ข${headCtlB ? 'จับได้' : 'จับไม่ได้'}`);
+
 // 7d) แผนงาน (ui-redo 23 · ย้ายไป whatsnew ui-redo 69): แถวหมวดใต้หัวกำลังทำ = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
 // · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)
 // ตัวควบคุม: เติมหมวดใหม่ 1 หมวดใน whatsnew ⇒ กล่องที่คาดต้องเปลี่ยน · ถอด id หัวแรก ⇒ ลิงก์ต้องหาปลายทางไม่เจอ
