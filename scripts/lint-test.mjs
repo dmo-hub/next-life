@@ -544,6 +544,12 @@ try {
     if (!ok) fails.push(`isekai overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกด้วย isekai-overlap'} ได้ [${ps.map(formatIsekaiProblem).join(' | ') || 'ผ่าน'}]`);
   }
   rows.push(['isekai overlap_stage ตก/ผ่าน', `${iskOverlapCases.length} เคส`]);
+  // หมวดทรยศ (isekai ใบ 09): ไฟล์ตัวควบคุม isekai-merit เปลี่ยนเฉพาะหมวด — betrayal ต้องผ่าน หมวดที่ไม่มียังต้องตก
+  const bm = load(badDir, 'isekai-merit.yaml');
+  const withCat = (cat) => lintIsekai([{ ...bm, doc: { ...bm.doc, cards: bm.doc.cards.map((c) => ({ ...c, choices: c.choices.map((x) => (x.merit ? { ...x, merit: [{ cat, level: 2 }] } : x)) })) } }]).map((p) => p.rule);
+  const bt = { betrayal: withCat('betrayal'), nope: withCat('nope') };
+  if (bt.betrayal.length || bt.nope.join() !== 'isekai-merit') fails.push(`isekai-merit หมวดทรยศ: betrayal [${bt.betrayal}] · nope [${bt.nope}]`);
+  rows.push(['isekai-merit หมวดทรยศ', 'betrayal ผ่าน · หมวดที่ไม่มีตก']);
 }
 
 // ต้นไม้โฟกัส (ใบ 03): ทะเบียนผิดรูปต้องตก (ขอบชี้โหนดที่ไม่มี · วนเป็นวง · หมวด/ช่วงวัย/ผลผิด) · ทะเบียนถูกรูปต้องผ่าน · ของจริงต้องผ่าน
@@ -646,12 +652,6 @@ try {
     }
   }
   rows.push(['ui-imports (src/ui ← import)', `${n} ชื่อ`]);
-  // หมวดทรยศ (isekai ใบ 09): ไฟล์ตัวควบคุม isekai-merit เปลี่ยนเฉพาะหมวด — betrayal ต้องผ่าน หมวดที่ไม่มียังต้องตก
-  const bm = load(badDir, 'isekai-merit.yaml');
-  const withCat = (cat) => lintIsekai([{ ...bm, doc: { ...bm.doc, cards: bm.doc.cards.map((c) => ({ ...c, choices: c.choices.map((x) => (x.merit ? { ...x, merit: [{ cat, level: 2 }] } : x)) })) } }]).map((p) => p.rule);
-  const bt = { betrayal: withCat('betrayal'), nope: withCat('nope') };
-  if (bt.betrayal.length || bt.nope.join() !== 'isekai-merit') fails.push(`isekai-merit หมวดทรยศ: betrayal [${bt.betrayal}] · nope [${bt.nope}]`);
-  rows.push(['isekai-merit หมวดทรยศ', 'betrayal ผ่าน · หมวดที่ไม่มีตก']);
 }
 
 // ---- B64 ป้ายเรื่องหนัก (heavy: turning/sad) + ตัวเลือกปั่น (silly: true): ตัวควบคุมทีละแบบ · คำเตือนนับการ์ดไม่มีตัวเลือกปั่น (ไม่ตก) ----
