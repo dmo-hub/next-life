@@ -153,8 +153,7 @@ treeCtl.anyCat = false;
 
 // 1) งบ (ข้อ 93): ผลเบาถาวรรวมทั้งต้น/ปี ≤ เพดานในทะเบียน · แสดงเทียบโฟกัสเดิมตัวแรงสุดเพื่อประกอบการเคาะ
 const spent = treeBudgetSpent(T);
-const focusMax = Object.values(content.focus.focuses).map((f) => Object.entries(f.fx ?? {}).filter(([k]) => k !== 'money').map(([, v]) => Math.abs(v))).map((a) => ({ sum: a.reduce((x, y) => x + y, 0) * content.focus.year_scale, one: Math.max(0, ...a) * content.focus.year_scale }));
-console.log(`งบผลเบาถาวรรวม ${spent.toFixed(3)} / เพดาน ${T.budget} (ระดับการ์ด/ปี · ข้อ 93) · เทียบโฟกัสเดิมตัวแรงสุด: รวมทุกค่า ${Math.max(...focusMax.map((x) => x.sum)).toFixed(2)} · ค่าเดียว ${Math.max(...focusMax.map((x) => x.one)).toFixed(2)}`);
+console.log(`งบผลเบาถาวรรวม ${spent.toFixed(3)} / เพดาน ${T.budget} (ระดับการ์ด/ปี · ข้อ 93) · เทียบโฟกัสเดิมตัวแรงสุด: รวมทุกค่า ${T.budget_ref.sum.toFixed(2)} · ค่าเดียว ${T.budget_ref.one.toFixed(2)}`);
 if (spent > T.budget) fails.push(`งบผลเบารวม ${spent.toFixed(3)} เกินเพดาน ${T.budget}`);
 
 // ตัวควบคุมงบ: ปิดผลติดตัว (passive) → ทุกชีวิตที่มีโหนดปลด ตัวคูณทอย/ถ่วงการ์ดต้องเป็น 1 พอดี (ต่างจากฐาน 0) · เปิด → ต้องมีชีวิตที่ต่างจาก 1

@@ -17,6 +17,7 @@ import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../s
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 import { checkTree } from '../src/node/lint/tree.mjs';
 import { checkFocus } from '../src/node/lint/focus.mjs';
+import { checkNature } from '../src/node/lint/nature.mjs';
 
 const root = new URL('../', import.meta.url);
 const dir = (d) => readdirSync(new URL(d, root)).filter((n) => n.endsWith('.yaml')).sort();
@@ -575,7 +576,7 @@ try {
   if (real.length) fails.push(`content/rules/tree.yaml ไม่ผ่าน: ${real.join(' | ')}`);
   rows.push(['ต้นไม้โฟกัส ทะเบียนตก/ผ่าน', `${treeCases.length} เคส + ของจริง`]);
   // โหนดนิสัยวัยเด็ก (ใบ ft07): natures.<id>.nodes ต้องชี้โหนดจริง · โหนดเดียวผูกนิสัยเดียว · node_pts จำนวนเต็ม ≥ 1
-  const focusDoc = () => parse(readFileSync(new URL('content/rules/focus.yaml', root), 'utf8'));
+  const focusDoc = () => parse(readFileSync(new URL('content/rules/nature.yaml', root), 'utf8'));
   const treeIds = Object.keys(parse(readFileSync(new URL('content/rules/tree.yaml', root), 'utf8')).nodes);
   const focusCases = [
     ['good: ของจริง', (d) => d, 0],
@@ -585,7 +586,7 @@ try {
     ['bad: ไม่มี node_pts', (d) => { delete d.node_pts; return d; }, 1],
   ];
   for (const [name, mut, want] of focusCases) {
-    const ps = checkFocus(mut(focusDoc()), { treeNodes: treeIds });
+    const ps = checkNature(mut(focusDoc()), { treeNodes: treeIds });
     if ((ps.length > 0) !== (want > 0)) fails.push(`focus nature "${name}": ต้อง${want ? 'ตก' : 'ผ่าน'} ได้ [${ps.join(' | ') || 'ผ่าน'}]`);
   }
   rows.push(['นิสัยวัยเด็ก nodes ตก/ผ่าน', `${focusCases.length} เคส`]);

@@ -38,12 +38,13 @@ export function lintContext() {
   const flags = { flags: new Set(Object.keys(reg.flags)), prefixes: new Set(Object.keys(reg.prefixes)), heir: new Set(heir.map(([k]) => k)), heirFrom: new Map(heir.map(([k, v]) => [k, v?.from_age ?? 0])), home: new Set(Object.keys(reg.home ?? {})) };
   const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
   const focusDoc = parse(read('content/rules/focus.yaml'));
+  const natureDoc = parse(read('content/rules/nature.yaml'));
   const focusTagsAll = focusTags(focusDoc);
   const gateFocuses = Object.entries(focusDoc.focuses ?? {}).filter(([, f]) => f?.group === 'gate').map(([id]) => id);
   const items = Object.keys(parse(read('content/rules/items.yaml')).items ?? {});
   const treeIds = Object.keys(parse(read('content/rules/tree.yaml')).nodes ?? {});
   const awayKinds = Object.keys(parse(read('content/rules/away.yaml')).kinds ?? {});
-  return { awayKinds, treeIds, regions, provinces, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: focusDoc.natures ?? {}, natureAge: focusDoc.nature_age };
+  return { awayKinds, treeIds, regions, provinces, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: natureDoc.natures ?? {}, natureAge: natureDoc.nature_age };
 }
 
 // docs = [{file, doc}] จาก YAML ที่ parse แล้ว · คืน [{file, id, path, rule, msg}]

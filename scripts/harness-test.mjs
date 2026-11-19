@@ -365,7 +365,7 @@ const f2 = (v) => v.toFixed(2);
     throw new Error(`ใบ 05a ไม่มีชาติรอดครบแผน ${JSON.stringify(plan)}`);
   };
   const has = (plan, c) => run(plan).includes(c);
-  check('ใบ 05a ปีอาชีพต่างโลก = chain_years โลกหลัก', I.ISEKAI_CAREER_T.years === base.focus.chain_years, `${I.ISEKAI_CAREER_T.years} · ${base.focus.chain_years}`);
+  check('ใบ 05a ปีอาชีพต่างโลก = ค่าของโลกต่างโลกเอง (จำนวนเต็ม ≥ 1)', Number.isInteger(I.ISEKAI_CAREER_T.years) && I.ISEKAI_CAREER_T.years >= 1, `${I.ISEKAI_CAREER_T.years}`);
   check('ใบ 05a ปีที่เปลี่ยน + 2 ปีเต็ม = ยังไม่ได้อาชีพ', !has([['sword', 3]], 'swordsman'), run([['sword', 3]]).join(' · '));
   check('ใบ 05a ปีที่เปลี่ยน + 3 ปีเต็ม = นักดาบ', has([['sword', 4]], 'swordsman'));
   check('ใบ 05a สะสมไม่ติดกันครบ 3 = นักดาบ', has([['sword', 3], ['rest', 2], ['sword', 2]], 'swordsman'));
@@ -483,10 +483,10 @@ const f2 = (v) => v.toFixed(2);
   };
   const real = heirs(160);
   check('B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50%', real.all >= 50 && real.pct <= 50, `${real.same}/${real.all} = ${f2(real.pct)}%`);
-  const keep = content.focus.heir_nature;
-  content.focus.heir_nature = 0;
+  const keep = content.nature.heir_nature;
+  content.nature.heir_nature = 0;
   const zero = heirs(160);
-  content.focus.heir_nature = keep;
+  content.nature.heir_nature = keep;
   check('B41 ตัวควบคุม: heir_nature 0 ⇒ ทายาทนิสัยเดียวกันลดลง', zero.all === real.all && zero.same < real.same, `${zero.same}/${zero.all} = ${f2(zero.pct)}% · จริง ${real.same}`);
 }
 

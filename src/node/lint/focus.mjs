@@ -37,29 +37,6 @@ export function checkFocus(doc, ctx = {}) {
   if (!isObj(doc)) return ['ทะเบียนโฟกัสต้องเป็น object'];
   for (const k of ['year_scale', 'spend_scale', 'card_mul', 'chain_years']) if (!(typeof doc[k] === 'number' && doc[k] > 0)) out.push(`${k} ต้องเป็นเลขบวก`);
   const tags = new Set(focusTags(doc));
-  // นิสัยจากวัยเด็ก (B41): มาเป็นชุด — มีทะเบียนนิสัย ต้องมีอายุล็อกและแต้มทายาท
-  if (doc.natures !== undefined) {
-    if (!isObj(doc.natures) || !Object.keys(doc.natures).length) out.push('natures ต้องมีอย่างน้อย 1 ตัว');
-    for (const [id, n] of Object.entries(isObj(doc.natures) ? doc.natures : {})) {
-      if (!(isObj(n) && typeof n.name === 'string' && n.name && !FOCUS_BANNED.test(n.name))) {
-        out.push(`natures.${id}.name ต้องเป็นข้อความ ไม่มีตัวเลข/คำบุญบาป`);
-        continue;
-      }
-      if (n.stat !== undefined && ![...STAT_KEYS, 'money'].includes(n.stat)) out.push(`natures.${id}.stat ไม่ใช่ค่าที่คูณได้: ${n.stat}`);
-      for (const t of list(n.cards)) if (!CATEGORIES.includes(t)) out.push(`natures.${id}.cards ไม่ใช่หมวดการ์ด: ${t}`);
-      for (const j of list(n.jobs)) if (ctx.jobs && !ctx.jobs.includes(j)) out.push(`natures.${id}.jobs ไม่รู้จักอาชีพ ${j}`);
-      for (const t of list(n.nodes)) if (ctx.treeNodes && !ctx.treeNodes.includes(t)) out.push(`natures.${id}.nodes ไม่รู้จักโหนดต้นไม้ ${t}`);
-    }
-    if (!(typeof doc.nature_mul === 'number' && doc.nature_mul >= 1)) out.push('nature_mul ต้องเป็นเลข ≥ 1');
-    if (!(isInt(doc.nature_age) && doc.nature_age > 0 && doc.nature_age < STAGE_AGES['วัยรุ่น'][0])) out.push('nature_age ต้องเป็นอายุช่วงเด็ก');
-    if (Object.values(isObj(doc.natures) ? doc.natures : {}).some((n) => list(n?.nodes).length) && !(isInt(doc.node_pts) && doc.node_pts >= 1)) out.push('node_pts ต้องเป็นจำนวนเต็ม ≥ 1 เมื่อมีนิสัยผูกโหนด');
-    const owner = {};
-    for (const [id, n] of Object.entries(isObj(doc.natures) ? doc.natures : {})) for (const t of list(n?.nodes)) {
-      if (owner[t]) out.push(`โหนด ${t} ผูกนิสัยซ้ำ ${owner[t]} กับ ${id} (โหนดเดียวผูกได้นิสัยเดียว)`);
-      owner[t] = id;
-    }
-    if (!(typeof doc.heir_nature === 'number' && doc.heir_nature >= 0 && doc.heir_nature <= 1)) out.push('heir_nature ต้องอยู่ระหว่าง 0–1');
-  }
   if (!isObj(doc.focuses) || !Object.keys(doc.focuses).length) out.push('focuses ต้องมีอย่างน้อย 1 ตัว');
   for (const [id, f] of Object.entries(doc.focuses ?? {})) {
     const at = `focuses.${id}`;
@@ -76,7 +53,7 @@ export function checkFocus(doc, ctx = {}) {
     if (f.after === id) out.push(`${at}.after อ้างตัวเอง`);
     // ตัวเด็กต้องเลือกได้ตั้งแต่เด็ก ไม่งั้นทายาทรอจนโต
     if (f.kid && doc.focuses[f.kid] && !(doc.focuses[f.kid].stages ?? ['เด็ก']).includes('เด็ก')) out.push(`${at}.kid ต้องเป็นโฟกัสที่เปิดช่วงเด็ก: ${f.kid}`);
-    if (f.nature !== undefined && !doc.natures?.[f.nature]) out.push(`${at}.nature อ้างนิสัยที่ไม่มี: ${f.nature}`);
+    if (f.nature !== undefined && !ctx.natures?.[f.nature]) out.push(`${at}.nature อ้างนิสัยที่ไม่มี: ${f.nature}`);
     // แต้มนิสัยนับแค่ช่วงเด็ก — โฟกัสที่เปิดหลังเด็กติด nature ไปก็ไม่ได้แต้ม
     if (f.nature !== undefined && !(f.stages ?? ['เด็ก']).includes('เด็ก')) out.push(`${at}.nature ต้องเป็นโฟกัสที่เปิดช่วงเด็ก`);
     checkFx(f.fx, `${at}.fx`, out);
@@ -129,7 +106,7 @@ export const rules = [
   },
   {
     id: 'nature-tag',
-    desc: `nature ของตัวเลือก และ requires.nature = id นิสัยใน content/rules/focus.yaml · ป้าย nature ติดได้เฉพาะการ์ดที่ออกได้ช่วงอายุ ${NATURE_CARD_FROM}–nature_age (แต้มนับถึงอายุล็อก)`,
+    desc: `nature ของตัวเลือก และ requires.nature = id นิสัยใน content/rules/nature.yaml · ป้าย nature ติดได้เฉพาะการ์ดที่ออกได้ช่วงอายุ ${NATURE_CARD_FROM}–nature_age (แต้มนับถึงอายุล็อก)`,
     event(e, ctx, r) {
       const ids = Object.keys(ctx.natures ?? {});
       const [lo, hi] = cardAges(e);

@@ -12,6 +12,7 @@ import { PLACEHOLDERS, MAX_LEN, ID_RE } from './lint/vocab.mjs';
 import { isObj, isMoney } from './lint/util.mjs';
 import { NEAR_HINT_LEVELS } from '../engine/court.mjs';
 import { checkFocus } from './lint/focus.mjs';
+import { checkNature } from './lint/nature.mjs';
 import { checkTree, checkTreePace } from './lint/tree.mjs';
 import { lintIsekai, formatIsekaiProblem } from './lint/isekai.mjs';
 import { useIsekaiCards, ISEKAI_SKILLS } from '../engine/isekai.mjs';
@@ -447,9 +448,19 @@ function loadFocus() {
   const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
   const jobs = JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id);
   const treeNodes = Object.keys(parse(read('content/rules/tree.yaml')).nodes);
-  const bad = checkFocus(doc, { causes, jobs, treeNodes, flags: Object.keys(parse(read('content/rules/flags.yaml')).flags) });
+  const bad = checkFocus(doc, { causes, jobs, treeNodes, natures: parse(read('content/rules/nature.yaml')).natures, flags: Object.keys(parse(read('content/rules/flags.yaml')).flags) });
   if (bad.length) throw new Error(`content/rules/focus.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
-  return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, goal_joy: doc.goal_joy, focuses: doc.focuses, ...(doc.natures && { natures: doc.natures, nature_age: doc.nature_age, heir_nature: doc.heir_nature, nature_mul: doc.nature_mul, node_pts: doc.node_pts }) };
+  return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, goal_joy: doc.goal_joy, focuses: doc.focuses };
+}
+
+// นิสัยจากวัยเด็ก (B41 · ใบ ft07): ทะเบียนผิดรูป = หยุด build · แยกจาก focus.yaml (ใบ ft15a) เพื่อให้ลบโฟกัสเดิมได้โดยไม่ลากนิสัยไปด้วย
+function loadNature() {
+  const doc = parse(read('content/rules/nature.yaml'));
+  const jobs = JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id);
+  const treeNodes = Object.keys(parse(read('content/rules/tree.yaml')).nodes);
+  const bad = checkNature(doc, { jobs, treeNodes });
+  if (bad.length) throw new Error(`content/rules/nature.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return { nature_age: doc.nature_age, heir_nature: doc.heir_nature, nature_mul: doc.nature_mul, node_pts: doc.node_pts, natures: doc.natures };
 }
 
 // ต้นไม้โฟกัส (ใบ 03): ทะเบียนผิดรูป = หยุด build
@@ -460,7 +471,7 @@ function loadTree() {
   const pace = parse(read('content/rules/tree-pace.yaml'));
   const badPace = checkTreePace(pace);
   if (badPace.length) throw new Error(`content/rules/tree-pace.yaml ไม่ผ่าน ${badPace.length} ข้อ\n${badPace.join('\n')}`);
-  return { year_scale: doc.year_scale, light_unit: doc.light_unit, roll_k: doc.roll_k, card_mul: doc.card_mul, budget: doc.budget, start: doc.start, nodes: doc.nodes, pace, ...(doc.rust && { rust: doc.rust }) };
+  return { year_scale: doc.year_scale, light_unit: doc.light_unit, roll_k: doc.roll_k, card_mul: doc.card_mul, budget: doc.budget, start: doc.start, nodes: doc.nodes, pace, ...(doc.rust && { rust: doc.rust }), ...(doc.budget_ref && { budget_ref: doc.budget_ref }) };
 }
 
 // สกิลตอนจบชีวิตไทย (06s): id แหล่งหรือ id สกิลพิมพ์ผิด = สกิลไม่เคยออกเงียบ ๆ จึงหยุด build
@@ -578,5 +589,5 @@ export function loadContent() {
   const cadet = loadCadet();
   checkCadetEraCards(cadet, events);
   checkCadetHeirText(cadet);
-  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), focus, tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), away: loadAway(), arcs: loadArcs(events), cadet };
+  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), focus, nature: loadNature(), tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), away: loadAway(), arcs: loadArcs(events), cadet };
 }

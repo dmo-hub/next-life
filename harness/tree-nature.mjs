@@ -8,8 +8,8 @@ const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? Number
 const n = arg('--n', 60), seed = arg('--seed', 1);
 const content = loadContent();
 const defs = content.tree.nodes;
-const nat = content.focus.natures;
-const AGE = content.focus.nature_age;
+const nat = content.nature.natures;
+const AGE = content.nature.nature_age;
 const owner = {};
 for (const [id, d] of Object.entries(nat)) for (const t of d.nodes ?? []) owner[t] = id;
 Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false, passive: true });

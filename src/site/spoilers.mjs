@@ -68,8 +68,8 @@ function labels(content, flags, systems) {
   // none = ไม่ได้อยู่สายเลื่อนขั้นใด (แกนเทียบ st.ladder?.id ?? 'none')
   const ladders = content.era.careers?.ladders ?? {};
   const ladder = (id) => (id === 'none' ? 'ไม่อยู่สายเลื่อนขั้น' : ((n) => (n.startsWith('สาย') ? n : `สาย${n}`))(ladders[id]?.name ?? id));
-  // นิสัยจากวัยเด็ก (B41) อยู่ในกติกาทุ่มเท content.focus.natures
-  const nature = (id) => content.focus?.natures?.[id]?.name ?? id;
+  // นิสัยจากวัยเด็ก (B41) อยู่ในกติกาทุ่มเท content.nature.natures
+  const nature = (id) => content.nature?.natures?.[id]?.name ?? id;
   return { occ: (id) => occ[id] ?? id, era: (id) => era[id] ?? id, sys, flag, ladder, nature };
 }
 
