@@ -45,6 +45,15 @@ export function checkTree(doc, jobs = null) {
   // สนิม (ใบ 09): ไม่ใส่ = ไม่มีสนิม · ใส่ = years จำนวนเต็ม ≥ 1 · floor 0 < x < 1 (จางลง ไม่หายหมด ไม่เพิ่ม)
   if (doc.rust !== undefined && !(isObj(doc.rust) && Number.isInteger(doc.rust.years) && doc.rust.years >= 1 && typeof doc.rust.floor === 'number' && doc.rust.floor > 0 && doc.rust.floor < 1)) out.push('rust ต้องมี years จำนวนเต็ม ≥ 1 และ floor ระหว่าง 0 ถึง 1 (ไม่รวมปลาย)');
   const nodes = doc.nodes;
+  // ประตูเข้าสาย (ใบ 10): โหนดต้องมีจริงและเป็นโหนดใหญ่/keystone (ประตูลึก ข้อ 37) · ค่าเป็นชื่อโฟกัสเดิมที่ยังเปิดคู่กัน
+  if (doc.gates !== undefined) {
+    if (!isObj(doc.gates) || !Object.keys(doc.gates).length) out.push('gates ต้องเป็นตารางโหนด → โฟกัสเดิม');
+    else for (const [id, old] of Object.entries(doc.gates)) {
+      if (!isObj(nodes) || !isObj(nodes[id])) out.push(`gates.${id} ไม่ใช่โหนดในทะเบียน`);
+      else if (nodes[id].size === 's') out.push(`gates.${id} ประตูต้องเป็นโหนดใหญ่หรือ keystone ไม่ใช่โหนดเล็ก`);
+      if (typeof old !== 'string' || !old) out.push(`gates.${id} ต้องเป็นชื่อโฟกัสเดิม`);
+    }
+  }
   // จุดเกิด (ใบ 06 ข้อ 97): ตารางต้องครอบทุกแขนงจริงของทะเบียน ทุกชั้นฐานะ · แต้มจำนวนเต็ม ≥ 0 · อาชีพต้องมีจริง
   if (doc.start !== undefined) out.push(...checkTreeStart(doc.start, nodes, jobs));
   if (!isObj(nodes) || !Object.keys(nodes).length) return [...out, 'nodes ต้องมีอย่างน้อย 1 โหนด'];
