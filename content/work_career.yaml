@@ -207,7 +207,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 1
-    when: {occupation: [factory, clerk, technician, manager, professional], ladder: [none, private, trade]}
+    when: {occupation: [clerk, technician, manager, professional], ladder: [none, private]}
     multipliers: {flags: {took_bribe: 1.5, caught_fraud: 2}}
     title: "เริ่มนับหนึ่งตอนห้าสิบ"
     text: "บริษัทปรับโครงสร้าง ชื่อ{ชื่อ}วัย {อายุ} อยู่ในรายชื่อชุดแรก ใบสมัครงานที่ยื่นไปสิบกว่าแห่งเงียบกริบ เพราะทุกที่อยากได้คนอายุน้อยกว่า"

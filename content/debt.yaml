@@ -422,7 +422,7 @@ events:
           - {weight: 1, ok: true, text: "เอาเงินก้อนไปต่อเติมชั้นล่างเป็นห้องเช่า ค่าเช่าจ่ายงวดบ้านแทนได้เกือบหมด", effects: {money: {unit: income_x, amount: 1}, happiness: 2}, merit: [{cat: neutral}]}
           - {weight: 2, text: "เงินก้อนหมดไปกับรถคันใหม่ในเดือนเดียว เหลือแต่งวดบ้านที่ยาวกว่าเดิม", effects: {money: {unit: income_x, amount: -3}, happiness: 1}, sets_flags: [has_car], merit: [{cat: neutral}]}
       - id: fake_slip
-        text: "แต่งสลิปเงินเดือนกู้เพิ่ม"
+        text: "แต่งใบรับรองเงินเดือนกู้เพิ่ม"
         hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:

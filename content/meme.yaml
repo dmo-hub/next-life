@@ -299,7 +299,7 @@ events:
     years: [2500, 2650]
     weight: 0.25
     when: {age: [31, 45]}
-    title: "ออเจ้าทั้งออฟฟิศ"
+    title: "ออเจ้าทั้งที่ทำงาน"
     text: "ละครย้อนยุคดังจนคนทั้งเมืองพูดคำโบราณ เจ้านายสั่งให้ศุกร์นี้ใส่ชุดไทยมาทำงาน แม่ค้าข้าวแกงยังถามคุณว่าออเจ้ารับอะไร"
     choices:
       - id: trip_ayutthaya
@@ -311,7 +311,7 @@ events:
         effects: {happiness: 1}
         merit: [{cat: neutral}]
       - id: ancient_email
-        text: "ตอบอีเมลด้วยภาษาโบราณ"
+        text: "ตอบแชตงานด้วยภาษาโบราณ"
         outcomes:
           - {weight: 2, ok: true, text: "ลูกค้าส่งต่อกันขำทั้งบริษัท ยอดสั่งซื้อมาเงียบ ๆ", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ลูกค้าอีกฝั่งคิดว่าคุณไม่สบาย ถามหาคนรับผิดชอบคนใหม่", effects: {relations: -1}, merit: [{cat: neutral}]}
