@@ -5790,7 +5790,7 @@ function lockReason(st, c, extra = 0) {
   if (q.age && st.age < (q.age.min ?? 0)) return `อายุยังไม่ถึง ${q.age.min} ปี`;
   if (q.age && st.age > (q.age.max ?? Infinity)) return `อายุเกิน ${q.age.max} ปี`;
   // ตัวเลือกวัยโตของนิสัย (B41) — บอกนิสัยที่ขาดเป็นคำ ผู้เล่นจึงรู้ว่าวัยเด็กแบบไหนเปิดทางนี้
-  if (q.nature && st.nature !== q.nature && !st.natureAlso?.includes(q.nature)) return `ต้องเป็นคน${st.content.focus?.natures?.[q.nature]?.name ?? ''}`;
+  if (q.nature && st.nature !== q.nature && !st.natureAlso?.includes(q.nature)) return `ต้องเป็นคน${st.content.nature?.natures?.[q.nature]?.name ?? ''}`;
   // why = [ข้อที่ไม่ผ่าน, ข้อความ] · requires.reasons ใส่เหตุแยกตามข้อได้ (B1 เช่น flags = "ต้องให้ที่บ้านเซ็นยินยอม" · money = เงินไม่พอ)
   const why = [];
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
@@ -6143,7 +6143,7 @@ function lifeFocusYear(st) {
     st.happiness = clamp(st.happiness + levelValue(c.goal_joy));
     (st.goalsDone ??= []).push(id);
   }
-  if (full) naturePoint(st, def.nature, st.focusBorn ? c.heir_nature : 1);
+  if (full) naturePoint(st, def.nature, st.focusBorn ? st.content.nature.heir_nature : 1);
   // ผลเงินเป็นเท่าของรายได้ จึงคิดเฉพาะปีที่มีรายได้ของตัวเอง · ค่าใช้จ่ายหรี่ด้วย spend_scale และหักได้ไม่เกินส่วนหนึ่งของเงินเก็บ (ไม่กู้มาทุ่ม)
   // เจ้าของเคาะ "ผลเงินชนด่าน finance = finance ชนะ": หักเต็มกินเงินเก็บไว้ใช้ยามเกษียณ ชีวิตที่ทุ่มยาวล้มละลายเกินกรอบ
   const { money, ...rest } = def.fx;
@@ -6188,7 +6188,7 @@ function lifeTreeBorn(st, parentBranch) {
 }
 // เซฟเก่า (ข้อ 13 48 99): ต้นไม้ว่าง · เก็บ st.gates ไว้เฉย ๆ · ปลดโหนดต้นของนิสัยที่ล็อกแล้ว (natures[*].nodes[0]) ให้ตรงกัน
 function lifeTreeMigrate(st) {
-  const t = st.content.tree, f = st.content.focus;
+  const t = st.content.tree, f = st.content.nature;
   if (!t || st.treeV) return;
   st.treeV = 1;
   if (st.tree || !f?.natures) return;
@@ -6253,7 +6253,7 @@ function lifeFocusBorn(st, kid) {
 const NATURE_NONE = 'ยังไม่รู้ว่าตัวเองเป็นคนแบบไหน';
 // โหนดเด็กที่ผูกนิสัยปลดถึงอายุ nature_age: ป้อนแต้ม node_pts เข้ากองเดียวกับทุ่มเทเด็ก + จดนิสัยที่มีโหนดปลดไว้ (ใบ ft07 ข้อ 16 19 51) · นิสัยเด่นยังเป็นตัวแต้มสูงสุดตัวเดียว ตัวอื่นเปิดแค่ตัวเลือก
 function treeNature(st, node) {
-  const c = st.content.focus;
+  const c = st.content.nature;
   if (!c?.natures || !c.node_pts || st.age > c.nature_age) return;
   const id = Object.keys(c.natures).find((k) => c.natures[k].nodes?.includes(node));
   if (!id) return;
@@ -6262,7 +6262,7 @@ function treeNature(st, node) {
   if (!got.includes(id)) got.push(id);
 }
 function naturePoint(st, id, n) {
-  const c = st.content.focus;
+  const c = st.content.nature;
   if (!id || !n || !c?.natures?.[id] || st.age > c.nature_age) return;
   const pts = (st.naturePts ??= {});
   const v = (pts[id] ?? 0) + n;
@@ -6271,7 +6271,7 @@ function naturePoint(st, id, n) {
 }
 // ปิดปีอายุ nature_age: การ์ดบอกนิสัยออกก่อนการ์ดเข้าช่วงวัยถัดไป · ไม่มีแต้ม (ตามน้ำ ไม่กดป้าย) = ไม่มีนิสัยเด่น
 function natureLock(st) {
-  const c = st.content.focus;
+  const c = st.content.nature;
   if (!c?.natures || st.age !== c.nature_age) return;
   const pts = st.naturePts ?? {};
   let id = null;
@@ -6287,12 +6287,12 @@ function natureLock(st) {
 }
 // ตัวคูณนิสัยของการ์ดใบนี้: ค่าตรงนิสัย (เงินนับเฉพาะการ์ดหมวดใน cards) + การ์ดขึ้นเงินเดือนเมื่ออาชีพตรงสาย · ไม่มีนิสัย = null คูณ 1 ทุกค่า
 function natureBoost(st, ev) {
-  const n = st.nature && st.content.focus?.natures?.[st.nature];
+  const n = st.nature && st.content.nature?.natures?.[st.nature];
   if (!n) return null;
   const stat = n.stat && (n.stat !== 'money' || !n.cards || n.cards.includes(ev.category)) ? n.stat : null;
   const job = !!n.jobs?.includes(st.occupation) && isWorking(st);
   if (!stat && !job) return null;
-  return { stat, job, mul: st.content.focus.nature_mul, text: `เพราะคุณเป็นคน${n.name} ผลดีเมื่อกี้เลยมากขึ้นอีกนิด` };
+  return { stat, job, mul: st.content.nature.nature_mul, text: `เพราะคุณเป็นคน${n.name} ผลดีเมื่อกี้เลยมากขึ้นอีกนิด` };
 }
 // ประตูเข้าสาย (โฟกัสใบ 04 · เจ้าของเคาะ: ล็อกแค่ประตู): เปิดเมื่อโฟกัสนั้นสะสมครบ chain_years · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
 // · การ์ดชวน (ธง gate:<โฟกัส>) เปิดให้ได้โดยไม่ต้องโฟกัส เช่น นักธุรกิจถูกชวนลงการเมือง
@@ -7618,7 +7618,7 @@ const ISEKAI_FOCUS = {
 };
 
 // อาชีพตามโฟกัส (05a): โฟกัสต้นทางรวมกันสะสมปีเต็มครบ years ⇒ ได้อาชีพนั้นติดตัวทั้งชาติ · ได้หลายอาชีพพร้อมกันได้ (เจ้าของเคาะ)
-// ISEKAI_CAREER_T.years = chain_years ของโลกหลัก (content/rules/focus.yaml · เจ้าของเคาะใช้ค่าเดียวกัน — harness-test เทียบให้)
+// ISEKAI_CAREER_T.years = ค่าของโลกต่างโลกเอง (เท่า chain_years ของโลกหลักตอนเคาะ · ใบ ft15a ตัดการผูกกันเพื่อให้ลบโฟกัสเดิมของโลกหลักได้โดยไม่ลากค่านี้ไปด้วย)
 // gain = ผลต่อปีของอาชีพ คิดแบบเดียวกับทุ่มเท ซ้อนกับโฟกัสที่ถืออยู่ · เจ้าของเคาะชุด T1 = ราว ¼ ของโฟกัสต้นทาง
 const ISEKAI_CAREER_T = { years: 3 };
 const ISEKAI_CAREERS = {
