@@ -135,6 +135,15 @@ export function addMember(st, role, extra = {}) {
 }
 
 const livingOf = (st, role) => st.kin.filter((m) => m.role === role && m.alive && !m.left);
+// สถานะคู่ (ใบ 89 B114 ข้อ 145 164): together อยู่ด้วยกัน · apart แยกทาง (ยังมีคู่ตามกฎหมาย แต่งใหม่ไม่ได้) · divorced หย่า · ม่าย = ตายแล้วและไม่ได้หย่า (derived)
+// ไม่มีช่อง = together (เซฟเก่า) · หย่าแล้วไม่นับเป็นคู่ในงานศพ/จดหมาย/ผู้ถูกหยิบเป็นพ่อแม่ทายาท และคู่ที่หย่าแล้วตายไม่ลงบันทึกสูญเสีย
+export const spouseStatus = (m) => m.status ?? 'together';
+export const isDivorced = (m) => m.role === 'spouse' && m.status === 'divorced';
+// คู่ปัจจุบัน: อยู่ด้วยกัน > แยกทาง > ม่ายล่าสุด · ไม่รวมคู่ที่หย่า · ไม่มี = null
+export function spouseOf(st) {
+  const rows = (st.kin ?? []).filter((m) => m.role === 'spouse' && !isDivorced(m));
+  return rows.findLast((m) => m.alive && !m.left) ?? rows.findLast((m) => m.alive) ?? rows.at(-1) ?? null;
+}
 // ลูกที่ยังมีชีวิต นับแบบเดียวกับที่ afterlife.mjs หารมรดก (ย้ายออกไปแล้วยังเป็นทายาท) · ไม่มีระบบครอบครัว = null
 export const livingChildren = (st) => (st.kin ? st.kin.filter((m) => m.role === 'child' && m.alive).length : null);
 
@@ -209,6 +218,22 @@ export function applyFamily(st, c, care = 0) {
       m.left = true;
       m.leftAge = st.age;
     }
+    // แยกทาง: ออกจากบ้านแต่ยังเป็นคู่ (ธง married ไม่หาย) · หย่า: จบความเป็นคู่ + ธง divorced ให้เนื้อหาแต่งใหม่/คืนดีอ่าน
+    if (op.separate) for (const m of livingOf(st, op.separate)) {
+      m.status = 'apart';
+      m.left = true;
+      m.leftAge = st.age;
+    }
+    if (op.divorce) {
+      for (const m of st.kin.filter((x) => x.role === op.divorce && x.alive && spouseStatus(x) !== 'divorced')) {
+        m.status = 'divorced';
+        m.left = true;
+        m.leftAge ??= st.age;
+        m.divorcedAge = st.age;
+      }
+      st.flags.divorced = true;
+      st.flagAge.divorced ??= st.age;
+    }
     if (op.far || op.back) {
       const m = focusOf(st, op.far ?? op.back);
       if (m?.alive) m.far = !!op.far;
@@ -229,7 +254,7 @@ export function applyFamily(st, c, care = 0) {
     const role = KIN_FLAG_ROLE[f];
     if (!role || ops.some((op) => op.add === role)) continue;
     // แต่งงานซ้ำตอนคู่ยังอยู่ = คนเดิม ไม่เพิ่มคู่
-    if (role === 'spouse' && livingOf(st, 'spouse').length) continue;
+    if (role === 'spouse' && (livingOf(st, 'spouse').length || st.kin.some((m) => m.role === 'spouse' && m.alive && m.status === 'apart'))) continue;
     addMember(st, role);
   }
   if (care > 0) bondAdd(st, bondTargets(st, 'all'), care * BOND_CARE_PER_REL);
@@ -239,7 +264,7 @@ export function applyFamily(st, c, care = 0) {
 // ธงเดิมตามสมาชิกจริง: married = มีคู่ที่ยังอยู่ด้วยกัน · has_kids = มีลูกที่ยังอยู่ · raised_grandkids เป็นเรื่องที่เคยทำ ไม่ถอด
 function kinSyncFlags(st) {
   for (const [f, role] of [['married', 'spouse'], ['has_kids', 'child']]) {
-    if (livingOf(st, role).length) {
+    if (livingOf(st, role).length || (role === 'spouse' && st.kin.some((m) => m.role === 'spouse' && m.alive && m.status === 'apart'))) {
       st.flags[f] = true;
       st.flagAge[f] ??= st.age;
     } else if (st.kin.some((m) => m.role === role)) delete st.flags[f];
@@ -270,6 +295,7 @@ function kinLost(st, m, age, year, out) {
   m.diedAge = age;
   m.alive = false;
   if (!KIN_HOUSEHOLD.includes(m.role) && m.role !== 'herd') return;
+  if (isDivorced(m)) return;
   if (m.role === 'pet') st.happiness = bondClamp(st.happiness - PET_GRIEF);
   const loss = { id: m.id, role: m.role, name: m.name, age, year, ...(m.kind && { kind: m.kind }), ...(m.cause && { cause: m.cause }), ...(m.since !== undefined && { since: m.since }) };
   st.kinLoss.push(loss);
@@ -565,7 +591,7 @@ export function funeralWho(st, guests) {
   const came = {}, away = {};
   let n = 0;
   for (const m of st.kin ?? []) {
-    if (!FUNERAL_WHO.roles.includes(m.role) || !m.alive) continue;
+    if (!FUNERAL_WHO.roles.includes(m.role) || !m.alive || isDivorced(m)) continue;
     const to = (m.bond ?? BOND_START[m.role]) >= FUNERAL_WHO.come ? came : away;
     to[m.role] = (to[m.role] ?? 0) + 1;
     if (to === came) n++;
@@ -588,7 +614,7 @@ export const LETTER_TO = [['child', 'grandchild'], ['peer'], ['spouse']];
 export const LETTER_BOND = 0;
 export function letterTo(st) {
   for (const roles of LETTER_TO) {
-    const ok = (st.kin ?? []).filter((m) => roles.includes(m.role) && m.alive && (m.bond ?? BOND_START[m.role]) >= LETTER_BOND);
+    const ok = (st.kin ?? []).filter((m) => roles.includes(m.role) && m.alive && !isDivorced(m) && (m.bond ?? BOND_START[m.role]) >= LETTER_BOND);
     if (ok.length) return ok.reduce((a, m) => ((m.bond ?? BOND_START[m.role]) > (a.bond ?? BOND_START[a.role]) || ((m.bond ?? BOND_START[m.role]) === (a.bond ?? BOND_START[a.role]) && m.id < a.id) ? m : a));
   }
   return null;
@@ -614,6 +640,6 @@ export function familyOf(st) {
   // สาเหตุตาย (B110) ให้ผังตระกูลแสดง — มีเฉพาะคนที่จากไปแล้ว · เซฟก่อนมีสาเหตุไม่มีช่องนี้
   const causeOf = (m) => (!m.alive && m.cause ? { cause: m.cause } : {});
   const parents = st.parents.map((p) => ({ role: 'parent', name: p.name ?? null, sex: p.sex, age: p.alive ? p.age : diedOf(p), alive: p.alive, diedAge: diedOf(p), ...causeOf(p), ...bondOf(p) }));
-  const kin = (st.kin ?? []).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...bondOf(m), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }), ...(m.role === 'spouse' && spouseSpan(st, m)) }));
+  const kin = (st.kin ?? []).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...bondOf(m), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }), ...(m.role === 'spouse' && m.status && m.status !== 'together' && { status: m.status }), ...(m.role === 'spouse' && spouseSpan(st, m)) }));
   return [...parents, ...kin];
 }

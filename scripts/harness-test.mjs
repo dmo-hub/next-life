@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { treePace, treePaceCtl, treeInvest, treeYearEnd } from '../src/engine/index.mjs';
+import { treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk } from '../src/engine/index.mjs';
 import { playLife, levelValue, thaiEarn, goalNames, lifeTreeGoals, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, dieMidYear, causeWords, nextCard, moneyValue, chooseSpend } from '../src/engine/index.mjs';
 import { loadContent, loadEvents, loadSkillMap } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
@@ -1133,6 +1133,56 @@ const f2 = (v) => v.toFixed(2);
     threw = true;
   }
   check('ใบ 52 เลือกระดับนอกการ์ดทบทวนเงินไม่ได้', threw);
+}
+// สถานะบนตัวคู่ (ใบ 89 B114 ข้อ 145 164): แยกทาง = ยังมีคู่ · หย่า = ไม่นับในงานศพ/จดหมาย/สูญเสีย · คู่ปัจจุบันตามสถานะ · เซฟเก่าไม่มีช่อง = อยู่ด้วยกัน
+{
+  const content = loadContent();
+  const wedding = content.events.find((e) => e.id === 'young_wedding_01');
+  const fresh = () => {
+    const st = newLife(7, content);
+    st.age = 30;
+    applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    return st;
+  };
+  const wedOk = (st) => whenOk(st, wedding.when);
+  const a = fresh();
+  const was = wedOk({ ...a, age: 25 });
+  applyFamily(a, { family: [{ separate: 'spouse' }] });
+  const sp = a.kin.find((m) => m.role === 'spouse');
+  check('ใบ 89 แยกทาง: สถานะ apart · ออกจากบ้านแต่ธง married ไม่หาย', sp.status === 'apart' && sp.left === true && a.flags.married === true && spouseOf(a) === sp);
+  check('ใบ 89 แยกทาง: การ์ดขอแต่งงานไม่ขึ้น (ธง married ยังอยู่) · ก่อนแยกก็ไม่ขึ้นเพราะมีคู่', wedOk({ ...a, age: 25 }) === false && was === false);
+  applyFamily(a, { sets_flags: ['married'] });
+  check('ใบ 89 แยกทาง: แต่งซ้ำไม่เพิ่มคู่คนที่สอง', a.kin.filter((m) => m.role === 'spouse').length === 1);
+  const b = fresh();
+  applyFamily(b, { family: [{ divorce: 'spouse' }] });
+  const sb = b.kin.find((m) => m.role === 'spouse');
+  check('ใบ 89 หย่า: สถานะ divorced · ธง married หาย · ธง divorced ติด · ไม่มีคู่ปัจจุบัน', sb.status === 'divorced' && !b.flags.married && b.flags.divorced === true && spouseOf(b) === null);
+  check('ใบ 89 หย่า: การ์ดขอแต่งงานขึ้นได้อีก', wedOk({ ...b, age: 25 }) === true);
+  const after = (st, m) => { m.born = st.birthYear - 112; for (let y = 0; y < 6 && m.alive; y++) ageKin(st, st.birthYear + st.age + y); return m.alive; };
+  const stillB = after(b, sb);
+  check('ใบ 89 หย่าแล้วตาย: ไม่ลงบันทึกสูญเสียคู่ · ไม่เข้าช่วงไว้ทุกข์ (when.loss)', !stillB && !(b.kinLoss ?? []).some((l) => l.role === 'spouse') && !lossOk(b, { roles: ['spouse'], within: 3 }), `alive ${stillB}`);
+  const c = fresh();
+  applyFamily(c, { family: [{ separate: 'spouse' }] });
+  const sc = c.kin.find((m) => m.role === 'spouse');
+  const stillC = after(c, sc);
+  check('ใบ 89 แยกทางแล้วตาย: ลงสูญเสียคู่ (ยังเป็นคู่ตามกฎหมาย)', !stillC && (c.kinLoss ?? []).some((l) => l.role === 'spouse'), `alive ${stillC}`);
+  const d = fresh();
+  d.kin.find((m) => m.role === 'spouse').bond = 90;
+  check('ใบ 89 งานศพ/จดหมาย: คู่ที่ยังอยู่นับ', !!funeralWho(d, 0)?.text?.includes('คู่ชีวิต') && letterTo(d)?.role === 'spouse');
+  applyFamily(d, { family: [{ divorce: 'spouse' }] });
+  check('ใบ 89 งานศพ/จดหมาย: คู่ที่หย่าไม่นับ', funeralWho(d, 0) === null && letterTo(d) === null);
+  const e = fresh();
+  const old = e.kin.find((m) => m.role === 'spouse');
+  applyFamily(e, { family: [{ divorce: 'spouse' }] });
+  applyFamily(e, { sets_flags: ['married'] });
+  const rows2 = e.kin.filter((m) => m.role === 'spouse');
+  check('ใบ 89 หย่าแล้วแต่งใหม่: คู่ปัจจุบัน = คนใหม่ ไม่ใช่คู่ที่หย่าไป (หยิบเป็นพ่อ/แม่ทายาท)', rows2.length === 2 && spouseOf(e) === rows2[1] && spouseOf(e) !== old);
+  const g = fresh();
+  applyFamily(g, { family: [{ leave: 'spouse' }] });
+  check('ใบ 89 ตัวควบคุม: op leave เดิม (ไม่ใช่แยกทาง) ธง married หาย → การ์ดขอแต่งงานขึ้นได้ · ต่างจากแยกทาง', !g.flags.married && wedOk({ ...g, age: 25 }) === true);
+  const f = fresh();
+  delete f.kin.find((m) => m.role === 'spouse').status;
+  check('ใบ 89 เซฟเก่าไม่มีช่อง status = อยู่ด้วยกัน', spouseStatus(f.kin.find((m) => m.role === 'spouse')) === 'together' && spouseOf(f) === f.kin.find((m) => m.role === 'spouse'));
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
