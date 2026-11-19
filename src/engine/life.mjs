@@ -1,6 +1,6 @@
 import { makeRng, mixSeed } from './rng.mjs';
 import { dlcOpen, dlcStamp, getDlcDefault } from './dlc.mjs';
-import { childFarOk, focusChildFar, childMate, childMateWord, BIRTH_IDENTITY, identityOf, speechSex, newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, pickKinGhost, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
+import { exPartnerOf, childFarOk, focusChildFar, childMate, childMateWord, BIRTH_IDENTITY, identityOf, speechSex, newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, pickKinGhost, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp, HIT, HIT_KILL, isAcute, frailOf } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
@@ -670,6 +670,8 @@ export const FILL = {
   ชื่อเต็ม: (st) => (st.surname ? `${st.name} ${st.surname}` : st.name),
   ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
   ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
+  ชื่อแฟน: (st) => focusOf(st, 'partner')?.name ?? 'แฟน',
+  ชื่อแฟนเก่า: (st) => exPartnerOf(st)?.name ?? 'แฟนเก่า',
   ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',
   // ผีญาติ (ใบ 26): คนที่การ์ดผีญาติเลือกจากรายชื่อคนตายของตระกูล — ว่างเมื่อไม่มีรายชื่อ (การ์ดไม่ออกอยู่แล้วเพราะ when.kin_ghost)
   ผีญาติ: (st) => pickKinGhost(st)?.name ?? 'ญาติ',

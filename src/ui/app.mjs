@@ -2825,11 +2825,12 @@ function helpRow(h) {
 
 // แผงครอบครัว (B36c): คนรอบตัวตอนนี้ แยกจากผังตระกูลที่เล่ารุ่นก่อน · อ่านอย่างเดียว ไม่มี token ในเซฟ
 // ใช้เฉพาะช่องที่ไล่ชื่อไว้ข้างล่าง — แกนเติมช่องใหม่ในสมาชิกก็ไม่หลุดขึ้นจอ · bond บอกเป็นป้ายคำ ไม่ใช่ตัวเลข
-const FAMILY_ORDER = ['parent', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'];
+const FAMILY_ORDER = ['parent', 'partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'];
 const ANIMAL_ROLES = ['pet', 'herd'];
 const kinWord = (m) => {
   const male = m.sex === 'ชาย';
   if (m.role === 'parent') return male ? 'พ่อ' : 'แม่';
+  if (m.role === 'partner') return m.left ? 'แฟนเก่า' : 'แฟน';
   if (m.role === 'spouse') return m.left ? 'อดีตคู่' : male ? 'สามี' : 'ภรรยา';
   if (m.role === 'child') return male ? 'ลูกชาย' : 'ลูกสาว';
   if (m.role === 'grandchild') return male ? 'หลานชาย' : 'หลานสาว';

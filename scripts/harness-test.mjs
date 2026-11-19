@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk } from '../src/engine/index.mjs';
+import { treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk, exPartnerOf, familyOf, lossText, becomePartner } from '../src/engine/index.mjs';
 import { playLife, lifeFocusYear, levelValue, thaiEarn, goalNames, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus, dieMidYear, causeWords, nextCard } from '../src/engine/index.mjs';
 import { loadContent, loadEvents, loadSkillMap } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
@@ -1198,6 +1198,72 @@ const f2 = (v) => v.toFixed(2);
   const f = fresh();
   delete f.kin.find((m) => m.role === 'spouse').status;
   check('ใบ 89 เซฟเก่าไม่มีช่อง status = อยู่ด้วยกัน', spouseStatus(f.kin.find((m) => m.role === 'spouse')) === 'together' && spouseOf(f) === f.kin.find((m) => m.role === 'spouse'));
+}
+
+// บทแฟน (ใบ 90 B114 ข้อ 146 165): แฟนเป็นคนมีชื่อในบ้าน · แต่งกับแฟน = คนเดิมเป็นคู่ · เลิกได้สองฝ่าย ชื่อยังอ้างได้ · เลิกแล้วตายไม่ลงสูญเสีย
+{
+  const content = loadContent();
+  const fresh = () => {
+    const st = newLife(7, content);
+    st.age = 22;
+    applyFamily(st, { family: [{ add: 'partner' }] });
+    return st;
+  };
+  const a = fresh();
+  const pa = a.kin.find((m) => m.role === 'partner');
+  const panel = familyOf(a).find((m) => m.role === 'partner');
+  check('ใบ 90 แฟนเป็นคนมีชื่อในบ้าน: familyOk · แผงครอบครัวเห็นพร้อมชื่อ · เพศแบบคู่ · ไม่ตั้งธง married', familyOk(a, { role: 'partner', alive: true }) && panel?.name === pa.name && !!pa.name && pa.sex === a.kin[0].sex && !a.flags.married);
+  check('ใบ 90 แฟน: ปีเกิดใกล้ผู้เล่น (ไม่ใช่ปีนี้)', Math.abs(pa.born - a.birthYear) <= 12 && pa.born !== a.birthYear + a.age);
+  applyFamily(a, { sets_flags: ['married'] });
+  const sa = a.kin.filter((m) => m.role === 'spouse');
+  check('ใบ 90 แต่งแล้ว (ธง married): แฟนคนเดิมเป็นคู่ id/ชื่อเดิม · ไม่เพิ่มคนที่สอง · ไม่เหลือแฟน', sa.length === 1 && sa[0].id === pa.id && sa[0].name === pa.name && a.kin.every((m) => m.role !== 'partner') && a.flags.married === true && sa[0].since === 22);
+  const b = fresh();
+  const pb = b.kin[0];
+  applyFamily(b, { family: [{ marry: 'partner' }] });
+  check('ใบ 90 op marry: แฟนคนเดิมเป็นคู่ · ธง married ตามสมาชิก', b.kin.length === 1 && b.kin[0].role === 'spouse' && b.kin[0].id === pb.id && b.flags.married === true);
+  const c = fresh();
+  const pc = c.kin[0];
+  applyFamily(c, { family: [{ breakup: 'partner', by: 'them' }] });
+  check('ใบ 90 เลิก (เขาบอกเลิก): ออกจากบ้าน · ไม่นับเป็นแฟนอยู่ · ชื่อแฟนเก่ายังอ้างได้ · ไม่ใช่คู่', pc.status === 'ex' && pc.endedBy === 'them' && !familyOk(c, { role: 'partner', alive: true }) && exPartnerOf(c)?.name === pc.name && !c.flags.married);
+  const d = fresh();
+  applyFamily(d, { family: [{ breakup: 'partner' }] });
+  check('ใบ 90 เลิก (เราบอกเลิก = ค่าตั้งต้น)', d.kin[0].endedBy === 'us' && d.kin[0].status === 'ex');
+  const old = (st, m) => { m.born = st.birthYear - 112; for (let y = 0; y < 6 && m.alive; y++) ageKin(st, st.birthYear + st.age + y); return m.alive; };
+  const stillC = old(c, pc);
+  check('ใบ 90 แฟนเก่าตาย: ไม่ลงบันทึกสูญเสีย', !stillC && (c.kinLoss ?? []).length === 0, `alive ${stillC}`);
+  const e = fresh();
+  const stillE = old(e, e.kin[0]);
+  check('ใบ 90 แฟนที่ยังคบอยู่ตาย: ลงสูญเสียบท แฟน + ข้อความเรียกแฟน', !stillE && e.kinLoss.some((l) => l.role === 'partner') && lossText(e.kinLoss.at(-1)).startsWith('แฟน'), `alive ${stillE}`);
+  const f = fresh();
+  applyFamily(f, { family: [{ breakup: 'partner' }] });
+  applyFamily(f, { sets_flags: ['married'] });
+  check('ใบ 90 เลิกแล้วแต่งใหม่: คู่เป็นคนใหม่ (id ไม่ใช่แฟนเก่า) · แฟนเก่ายังเป็นแฟนเก่า', f.kin.filter((m) => m.role === 'spouse').length === 1 && f.kin.find((m) => m.role === 'spouse').id !== f.kin[0].id && f.kin[0].status === 'ex');
+  const g = newLife(7, content);
+  g.age = 30;
+  applyFamily(g, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+  applyFamily(g, { family: [{ add: 'partner' }] });
+  // แฟนเข้ากลางชีวิตไม่ขยับลำดับสุ่ม/ชื่อของคนที่มาทีหลัง (172 K3): กับ/ไม่มีแฟน คนถัดไปและทอยของ kinRng ต้องเท่ากัน · ตัวควบคุม: คู่ (ใช้สายเดียวกัน) ต้องขยับ
+  const track = (role) => {
+    const st = newLife(7, content);
+    st.age = 22;
+    if (role) applyFamily(st, { family: [{ add: role }] });
+    applyFamily(st, { family: [{ add: 'child' }, { add: 'child' }] });
+    const kids = st.kin.filter((m) => m.role === 'child').map((m) => [m.id, m.name, m.sex, m.born].join('|'));
+    for (let y = 0; y < 12; y++) ageKin(st, st.birthYear + 23 + y);
+    return { kids, next: st.kinRng.next(), alive: st.kin.filter((m) => m.role === 'child').map((m) => m.alive).join() };
+  };
+  const base = track(null), withP = track('partner'), withS = track('spouse');
+  check('ใบ 90 แฟนไม่แตะ kinSeq/kinRng: ลูกที่ตามมา (id ชื่อ เพศ ปีเกิด) + ผลตายราย 12 ปี + เลขสุ่มถัดไป เท่าชีวิตที่ไม่มีแฟน', JSON.stringify(withP) === JSON.stringify(base), JSON.stringify([base, withP]));
+  check('ใบ 90 ตัวควบคุม: เพิ่มคู่ (ใช้สายสุ่มเดิม) แล้วลูกที่ตามมา/เลขสุ่มต่าง · สคริปต์วัดจับความต่างได้', JSON.stringify(withS) !== JSON.stringify(base));
+  const h = newLife(7, content);
+  h.age = 24;
+  applyFamily(h, { family: [{ add: 'peer' }] });
+  const peer = h.kin.find((m) => m.role === 'peer');
+  const was = [peer.id, peer.name, peer.born, peer.sex].join('|');
+  const moved = becomePartner(h, peer);
+  check('ใบ 90 becomePartner: คนนอกบ้าน (peer) ย้ายเข้าเป็นแฟน id/ชื่อ/ปีเกิด/เพศเดิม · เริ่มนับปีคบ · แต่งต่อเป็นคู่ได้', moved === peer && peer.role === 'partner' && [peer.id, peer.name, peer.born, peer.sex].join('|') === was && peer.since === 24 && (applyFamily(h, { sets_flags: ['married'] }), h.kin.find((m) => m.id === peer.id).role === 'spouse'));
+  check('ใบ 90 becomePartner: คู่/แฟนอยู่แล้ว = ไม่ทำอะไร (null)', becomePartner(h, peer) === null && becomePartner(h, null) === null);
+  check('ใบ 90 ชีวิตไม่มีแฟน: แต่งตามเดิม (ธง married เพิ่มคู่ ไม่ผ่านทางแปลงบท)', g.kin.filter((m) => m.role === 'spouse').length === 1 && g.kin.some((m) => m.role === 'partner'));
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
