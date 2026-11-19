@@ -103,7 +103,15 @@ async function hashLives(root, n, seed, ctl, world, only) {
 }
 
 function run(root, n, seed, ctl, world, only = '') {
-  const text = execFileSync(process.execPath, [SELF, '--worker', root, String(n), String(seed), ctl ? '1' : '0', world, ...(only ? [only] : [])], { maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'ignore'] });
+  let text;
+  try {
+    text = execFileSync(process.execPath, [SELF, '--worker', root, String(n), String(seed), ctl ? '1' : '0', world, ...(only ? [only] : [])], { maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'pipe'] });
+  } catch (e) {
+    // worker ล้ม (เช่น node_modules ขาดใน worktree ฐาน) — stderr คือต้นเหตุที่หายไป
+    const err = (e.stderr?.toString() ?? '').split('\n').slice(0, 5).join('\n');
+    if (err) console.error(`worker ล้ม (exit ${e.status}):\n${err}`);
+    process.exit(2);
+  }
   return JSON.parse(text);
 }
 
