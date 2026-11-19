@@ -489,10 +489,10 @@ nodes:
     size: s
     stages: [เด็ก]
     pre: []
-    years: 2
-    cards: 2
+    years: 11
+    cards: 0
     cat: [health]
-    fx: { health: 1, happiness: 1, knowledge: -1 }
+    fx: { health: 3, happiness: 1, knowledge: -1 }
     light: { health: 1 }
     roll: 1
     jobs: [farmer, labor]
@@ -503,10 +503,10 @@ nodes:
     size: s
     stages: [วัยรุ่น, หนุ่มสาว]
     pre: [s1]
-    years: 4
-    cards: 2
+    years: 6
+    cards: 0
     cat: [health]
-    fx: { health: 2, network: 1, knowledge: -1 }
+    fx: { health: 3, network: 1, knowledge: -1 }
     light: { health: 1 }
     roll: 1
   s3:
@@ -515,10 +515,10 @@ nodes:
     size: s
     stages: [วัยรุ่น, หนุ่มสาว, ทำงาน, กลางคน, ชรา]
     pre: [s1]
-    years: 3
-    cards: 2
+    years: 18
+    cards: 0
     cat: [health]
-    fx: { health: 2 }
+    fx: { health: 3 }
     light: { health: 1 }
     roll: 1
   s4:
@@ -527,10 +527,10 @@ nodes:
     size: s
     stages: [หนุ่มสาว, ทำงาน, กลางคน, ชรา]
     pre: [s3]
-    years: 3
-    cards: 2
+    years: 15
+    cards: 0
     cat: [health]
-    fx: { happiness: 2, health: 1, knowledge: 1 }
+    fx: { happiness: 2, health: 3, knowledge: 1 }
     light: { happiness: 1 }
     roll: 1
   s5:
@@ -539,10 +539,10 @@ nodes:
     size: b
     stages: [กลางคน, ชรา]
     pre: [s3]
-    years: 5
-    cards: 3
+    years: 20
+    cards: 0
     cat: [health]
-    fx: { health: 2, happiness: -1 }
+    fx: { health: 3, happiness: -1 }
     light: { health: 1 }
     roll: 1
     gate:
@@ -561,10 +561,10 @@ nodes:
     size: b
     stages: [ทำงาน, กลางคน, ชรา]
     pre: [s3]
-    years: 5
-    cards: 3
+    years: 20
+    cards: 0
     cat: [health]
-    fx: { health: 1, happiness: 1 }
+    fx: { health: 3, happiness: 1 }
     light: { health: 1 }
     roll: 1
     gate:
@@ -584,10 +584,10 @@ nodes:
     keystone: true
     stages: [หนุ่มสาว, ทำงาน]
     pre: [s2]
-    years: 6
-    cards: 3
+    years: 12
+    cards: 0
     cat: [health]
-    fx: { health: 2, network: 1 }
+    fx: { health: 3, network: 1 }
     light: { health: 1 }
     roll: 1
     cost: { happiness: -1 }
