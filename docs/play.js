@@ -3831,6 +3831,22 @@ function treeRespec(h, defs, id, age) {
 // เคยปลดทั้งหมด = ที่ปลดอยู่ + ที่ล้างไปแล้ว (ฐานของฉายา ข้อ 56)
 const treeEver = (h) => [...new Set([...Object.keys(h?.tree?.done ?? {}), ...Object.keys(h?.tree?.gone ?? {})])];
 
+// แขนงหลักของชีวิต = แขนงที่ปลดมากสุด (นับโหนดใน done ไม่รวมโหนดกลาง · เกณฑ์เดียวกับถ่วงการ์ด) · เสมอกัน = แขนงที่ปลดโหนดล่าสุด (ทายาทต้องได้แขนงเดียวเสมอ ต่างจากถ่วงการ์ดที่เสมอ = ไม่ถ่วง)
+function treeMainBranch(h, defs) {
+  const done = h?.tree?.done;
+  if (!done) return null;
+  const n = {}, last = {};
+  for (const [id, age] of Object.entries(done)) {
+    const b = defs[id] && !defs[id].and ? defs[id].branch : null;
+    if (!b) continue;
+    n[b] = (n[b] ?? 0) + 1;
+    last[b] = Math.max(last[b] ?? age, age);
+  }
+  let best = null;
+  for (const b of Object.keys(n)) if (best === null || n[b] > n[best] || (n[b] === n[best] && last[b] > last[best])) best = b;
+  return best;
+}
+
 // ── การ์ดด่าน + keystone (ใบ 05) ── ทุกตัวไม่ดึงเลขสุ่ม · ผลของการ์ดด่านลงผ่านตัวเลือกของการ์ด (ผลเต็มครั้งเดียว) ไม่ผ่านงบผลเบา
 // ปีครบแต่การ์ดหมวดยังไม่ครบ (ข้อ 46): ใช้บอกขั้น "รอโอกาส" ที่หน้าต้นไม้ · ไม่แตะสถานะ
 const treeWaiting = (h, defs) => {
@@ -4452,6 +4468,7 @@ function newLife(seed, content, heir = null) {
   st.statTrail.push(statPoint(st));
   st.stageMark = markStage(st);
   lifeFocusBorn(st, heir?.focus);
+  lifeTreeBorn(st, heir?.treeParent);
   if (heir?.gates?.length) st.gates = [...heir.gates];
   overlapPlan(st);
   driftPlan(st);
@@ -6122,6 +6139,29 @@ function lifeTreeStart(st) {
   if (!c?.start) return null;
   const branch = treeStartBranch(c.start, st.seed, CLASSES.indexOf(st.cls), st.occupation ?? null, st.treeParent ?? null);
   return { branch, node: treeStartNode(c.nodes, branch) };
+}
+// ทายาท (ใบ ft13 · ข้อ 4 18 38 99): ได้ต้นแขนงของแขนงหลักพ่อแม่เป็นโหนดปลดแล้วตั้งแต่เกิด · ไม่ใช่นิสัย (ไม่ป้อนแต้ม treeNature) · ไม่มีผลทางสืบ · ไม่ดึงเลขสุ่ม
+// treeV = เซฟนี้เกิดหลังมีกติกาต้นไม้ · เซฟก่อนหน้าไม่มีธงนี้ ให้ repairLife ย้ายนิสัยเป็นโหนด
+const lifeTreeMain = (st) => (st.tree && st.content.tree ? treeMainBranch(st, st.content.tree.nodes) : null);
+function lifeTreeBorn(st, parentBranch) {
+  const c = st.content.tree;
+  if (!c) return;
+  st.treeV = 1;
+  const node = parentBranch ? treeStartNode(c.nodes, parentBranch) : null;
+  if (!node) return;
+  st.treeParent = parentBranch;
+  st.tree = { cur: null, done: { [node]: 0 }, yrs: {}, cards: {}, hist: [] };
+}
+// เซฟเก่า (ข้อ 13 48 99): ต้นไม้ว่าง · เก็บ st.gates ไว้เฉย ๆ · ปลดโหนดต้นของนิสัยที่ล็อกแล้ว (natures[*].nodes[0]) ให้ตรงกัน
+function lifeTreeMigrate(st) {
+  const t = st.content.tree, f = st.content.focus;
+  if (!t || st.treeV) return;
+  st.treeV = 1;
+  if (st.tree || !f?.natures) return;
+  for (const id of [st.nature, ...(st.natureAlso ?? [])]) {
+    const node = id && f.natures[id]?.nodes?.[0];
+    if (node && t.nodes[node]) (st.tree ??= { cur: null, done: {}, yrs: {}, cards: {}, hist: [] }).done[node] = Math.min(st.age, f.nature_age);
+  }
 }
 const treeOffersNow = (st) => treeOffers(st, lifeTreeDefs(st), stageOf(st.age));
 // สนิม + ล้างโหนด (ใบ 09): ล้างจ่ายด้วยเวลา = ปีนั้นหลอดไม่ขยับ · ผู้เรียกเช็กมีชีวิตอยู่
@@ -10314,6 +10354,8 @@ function makeHeir(af, r) {
     pets: heirPets(st, birthYear, tier),
     // เกิดในตระกูล = รับหมวดโฟกัสหลักของรุ่นก่อนเป็นตัวเด็ก · เกิดที่อื่น/ไม่เคยโฟกัส = ตามน้ำ (ไม่มีฟิลด์ heir จึงเท่าเดิม)
     ...(tier && lifeFocusKid(st) && { focus: lifeFocusKid(st) }),
+    // แขนงหลักของพ่อแม่ → ทายาทได้ต้นแขนงนั้นฟรี (ข้อ 38 99) · พ่อแม่ไม่เคยแตะต้นไม้ = ไม่มีช่อง
+    ...(tier && lifeTreeMain(st) && { treeParent: lifeTreeMain(st) }),
     // ประตูเข้าสายที่รุ่นก่อนเปิดไว้ ส่งต่อเฉพาะทายาทในตระกูล
     ...(tier && lifeGatesOpen(st).length && { gates: lifeGatesOpen(st) }),
     // เริ่มกลางวัย (B76): อายุจริงปีที่รุ่นก่อนตาย · newLife อ่านแล้วข้ามวัยเด็ก
@@ -10824,6 +10866,7 @@ function titlesOf(st) {
 
 
 
+
 const SNAP_V = 1;
 const isRng = (v) => typeof v.next === 'function' && typeof v.int === 'function';
 
@@ -10906,6 +10949,7 @@ function repairLife(st, card) {
     const past = pastFromLineage(st.lineage, (name) => REALMS.find((r) => r.name === name)?.id ?? null);
     if (past) st.past = past;
   }
+  lifeTreeMigrate(st);
   return stale;
 }
 
