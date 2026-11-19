@@ -109,7 +109,7 @@ export const passive = (card, rng, h) => (h.pending?.alloc || !card.fx ? random(
 export const FOCUS_FLOW_SHARE = 1 / 3;
 const FOCUS_SALT = 0x3c6ef372;
 const focusMemo = new WeakMap();
-// ทางดูแลสุขภาพ (decisions 335): บอทสุ่มที่ด่าน 3b ใช้ไม่แตะ ⇒ อายุตายของคนทั่วไปยังเทียบตารางชีพได้ · บอทสายสุขภาพถือตลอด วัดว่ายืดได้แค่ไหน
+// ทางดูแลสุขภาพ (decisions 335): บอทสุ่มที่ด่าน 3b ใช้ไม่แตะ ⇒ อายุตายของคนทั่วไปยังเทียบตารางชีพได้ · บอทสายสุขภาพไม่แตะโฟกัสสุขภาพแล้ว (ทุ่มแขนงทักษะบนต้นไม้ ท้ายไฟล์)
 // ทางสุขภาพนอกโฟกัส (ของในตลาด · ปุ่มหาหมอ) อ่าน bot.health ('avoid' | 'seek') ตัดสินแทนบอทชุดเดียวกัน
 // NL_BOT_HEALTH=keep = ตัวควบคุม: บอทสุ่มกลับมาเลือกโฟกัสสุขภาพได้แบบเดิม (อายุเฉลี่ยด่าน 3b ต้องขยับ)
 export const HEALTH_FOCUS = ['health_care', 'rest_travel'];
@@ -126,15 +126,14 @@ export function botFocus(st, key, health) {
   }
   if (m.flow) return;
   const all = lifeFocusOffers(st).filter((id) => id !== FOCUS_FLOW);
-  const offers = health === 'avoid' && !keepHealth ? all.filter((id) => !HEALTH_FOCUS.includes(id)) : all;
+  const offers = health && !keepHealth ? all.filter((id) => !HEALTH_FOCUS.includes(id)) : all;
   const s = stageOf(st.age);
   if (s === m.stage && (!st.focus || offers.includes(st.focus))) return;
   m.stage = s;
   if (!offers.length) return;
   const defs = lifeFocusDefs(st);
   const top = key ?? STAT_KEYS.reduce((a, k) => (st[k] > st[a] ? k : a));
-  const care = health === 'seek' ? HEALTH_FOCUS.filter((id) => offers.includes(id)) : [];
-  const fit = care.length ? care.slice(0, 1) : offers.filter((id) => defs[id].fx?.[top] > 0);
+  const fit = offers.filter((id) => defs[id].fx?.[top] > 0);
   const from = fit.length ? fit : offers;
   setLifeFocus(st, from[Math.floor(m.rng.next() * from.length)]);
 }
@@ -150,7 +149,7 @@ const RAW_BOTS = {
   สายครอบครัว: labelBot({ relations: 3, happiness: 1 }),
   สายสุขภาพ: labelBot({ health: 3, happiness: 1 }),
 };
-const FOCUS_KEY = { สายเงิน: 'money', สายสุขภาพ: 'health' };
+const FOCUS_KEY = { สายเงิน: 'money' };
 const HEALTH_WAY = { สุ่ม: 'avoid', สายสุขภาพ: 'seek' };
 export const BOTS = Object.fromEntries(Object.entries(RAW_BOTS).map(([k, b]) => [k, withFocus(b, FOCUS_KEY[k], HEALTH_WAY[k])]));
 
@@ -193,3 +192,10 @@ export function botGate(card, st) {
 }
 export const withGate = (bot) => (card, rng, st) => (card.id?.startsWith('tree_gate_') ? botGate(card, st) : bot(card, rng, st));
 export const withTree = (bot, target) => Object.assign((...a) => bot(...a), bot, { tree: (st) => botTree(st, target) });
+
+// ทางฟื้นสุขภาพบนต้นไม้ (ใบ ft11 · ข้อ 36/96): บอทสายสุขภาพทุ่มโหนดแขนงทักษะ (s1–s7 ผลสุขภาพ) แทนโฟกัสสุขภาพที่ถอดแล้ว
+// ต้องผูกหลัง withTree/withGate ประกาศ · NL_BOT_HEALTH_TREE=off = ตัวควบคุม: บอทไม่ทุ่มต้นไม้ (อายุเฉลี่ยบอทสายสุขภาพต้องตกกลับใกล้บอทสุ่ม)
+if (process.env.NL_BOT_HEALTH_TREE !== 'off') {
+  const care = BOTS.สายสุขภาพ;
+  BOTS.สายสุขภาพ = Object.assign(withGate(care), care, { tree: (st) => botTree(st, 'skill') });
+}
