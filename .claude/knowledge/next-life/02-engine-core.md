@@ -132,7 +132,7 @@ Pool and pacing:
 8. `checkBankrupt`, `debtLoad`, `informalFlag`; omen (`OMEN={at:.5, gap:5}`).
 9. **Stage change**: a stage card with `stageRecap`.
 10. School track end: gate, `jobCard` or ladder.
-11. Rank and promo; office end at 60; budget card; office card (needs the gate `politics_base`); recruit; early retirement.
+11. Rank and promo; office end at 60; budget card; office card (needs the gate node `r5`); recruit; early retirement.
 12. `allocCard` (`ALLOC={from:20, every:5, to:70}`).
 13. National era events (gap ≥ `ERA_GAP`, one response card per era id).
 14. `heraldNextYear` (`HERALD_MIN_AGE=18`; the `braced:` flag expires after 1 year).
@@ -220,7 +220,7 @@ Flags:
   - work: work_hard, side_income, save_money
   - people: find_partner, family_care, parent_care, teach_kids
   - body: health_care, rest_travel, make_merit
-  - **gate**: politics_base, ordain, business, occult, shortcut_money (`caught_fraud` .05, assault .015)
+  - **gate**: politics_base, ordain, business, occult, shortcut_money (`caught_fraud` .05, assault .015) — legacy focus names; choices gate on tree nodes instead (below)
 - **Chain ends** (shown from the *next* stage once the parent focus has 3 full years):
   - scholarship ← study_hard
   - gang_lead ← play_friends
@@ -238,11 +238,13 @@ Flags:
   - Button text uses words only ("ขึ้น/ลด/มาก/มีเสี่ยง"), never numbers.
 - Risk uses its own stream:
   - with a `cause`: the first hit is a warn card; the second hit sets `focusDoom`, which means death at the next year.
-- **Gates (ประตู)**: `lifeGateOpen` is true when any of these hold:
-  - `focusYears[id] ≥ 3`
-  - id is in `st.gates` (inherited)
-  - flag `gate:<id>` is set (an invitation card)
-  - `OFFICE_GATE='politics_base'`.
+- **Gates (ประตู)**: a choice's `gate:` is a gate node id from `tree.yaml gates` (mo5 business · mo7 shortcut_money · r5 politics_base · o5 ordain · m4 occult). `lifeGateOpen(st,id)` is true when any of these hold:
+  - `st.tree.done[id]` (the node is unlocked)
+  - legacy focus `gates[id]` has `focusYears ≥ 3` (kept until ticket 15)
+  - id (or its legacy focus name) is in `st.gates` (inherited)
+  - flag `gate:<id>` (or `gate:<legacy name>`) is set (an invitation card)
+  - `OFFICE_GATE='r5'`.
+  - reach proof: `npm run gate-reach`
 - Heir: `lifeFocusKid` takes the `kid` of the parent's main focus (most full years).
 
 ## 9. Careers (`career.mjs`, `rank.mjs`)

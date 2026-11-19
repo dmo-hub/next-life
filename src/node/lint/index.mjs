@@ -40,9 +40,10 @@ export function lintContext() {
   const focusDoc = parse(read('content/rules/focus.yaml'));
   const natureDoc = parse(read('content/rules/nature.yaml'));
   const focusTagsAll = focusTags(focusDoc);
-  const gateFocuses = Object.entries(focusDoc.focuses ?? {}).filter(([, f]) => f?.group === 'gate').map(([id]) => id);
   const items = Object.keys(parse(read('content/rules/items.yaml')).items ?? {});
-  const treeIds = Object.keys(parse(read('content/rules/tree.yaml')).nodes ?? {});
+  const treeDoc = parse(read('content/rules/tree.yaml'));
+  const treeIds = Object.keys(treeDoc.nodes ?? {});
+  const gateFocuses = Object.keys(treeDoc.gates ?? {});
   const awayKinds = Object.keys(parse(read('content/rules/away.yaml')).kinds ?? {});
   return { awayKinds, treeIds, regions, provinces, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: natureDoc.natures ?? {}, natureAge: natureDoc.nature_age };
 }

@@ -35,7 +35,7 @@ events:
         merit: [{cat: neutral}]
       - id: apprentice_palm
         text: "ขอฝากตัวเรียนดูลายมือกับหมอดู"
-        gate: occult
+        gate: m4
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, text: "หมอดูให้นั่งโต๊ะแทนตอนลุกไปพัก ลูกค้าบางคนเดินกลับมาหาคุณเอง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
@@ -100,7 +100,7 @@ events:
         merit: [{cat: neutral}]
       - id: open_table
         text: "ตั้งโต๊ะดูไพ่เองวันหยุด"
-        gate: occult
+        gate: m4
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, text: "ลูกค้าวันหยุดต่อคิวยาวขึ้นทุกเดือน บางคนพาเพื่อนมาด้วย", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
@@ -230,7 +230,7 @@ events:
         merit: [{cat: neutral}]
       - id: rent_stall
         text: "เช่าแผงส่องพระของตัวเอง"
-        gate: occult
+        gate: m4
         effects: {money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
         outcomes:
@@ -270,7 +270,7 @@ events:
         merit: [{cat: neutral}]
       - id: stay_samnak
         text: "ขออยู่ช่วยงานสำนักเป็นศิษย์"
-        gate: occult
+        gate: m4
         effects: {happiness: 1, relations: -1}
         merit: [{cat: neutral}]
 

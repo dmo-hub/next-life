@@ -471,7 +471,7 @@ function loadTree() {
   const pace = parse(read('content/rules/tree-pace.yaml'));
   const badPace = checkTreePace(pace);
   if (badPace.length) throw new Error(`content/rules/tree-pace.yaml ไม่ผ่าน ${badPace.length} ข้อ\n${badPace.join('\n')}`);
-  return { year_scale: doc.year_scale, light_unit: doc.light_unit, roll_k: doc.roll_k, card_mul: doc.card_mul, budget: doc.budget, start: doc.start, nodes: doc.nodes, pace, ...(doc.rust && { rust: doc.rust }), ...(doc.budget_ref && { budget_ref: doc.budget_ref }) };
+  return { year_scale: doc.year_scale, light_unit: doc.light_unit, roll_k: doc.roll_k, card_mul: doc.card_mul, budget: doc.budget, start: doc.start, nodes: doc.nodes, pace, ...(doc.rust && { rust: doc.rust }), ...(doc.budget_ref && { budget_ref: doc.budget_ref }), ...(doc.gates && { gates: doc.gates }) };
 }
 
 // สกิลตอนจบชีวิตไทย (06s): id แหล่งหรือ id สกิลพิมพ์ผิด = สกิลไม่เคยออกเงียบ ๆ จึงหยุด build

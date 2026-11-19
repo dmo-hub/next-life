@@ -278,7 +278,7 @@ const f2 = (v) => v.toFixed(2);
   const byId = new Map(base.events.map((e) => [e.id, e]));
   const gated = base.events.filter((e) => e.choices.some((c) => c.gate));
   const probe = { id: 'gate_probe', type: 'A', category: 'work_money', stage: 'ทำงาน', years: [2400, 2700], weight: 100000, text: 'probe', choices: [
-    { id: 'open', text: 'เปิดกิจการ', gate: 'business', merit: [{ cat: 'neutral' }] }, ...[1, 2, 3].map((i) => ({ id: `n${i}`, text: `อื่น ${i}`, merit: [{ cat: 'neutral' }] })),
+    { id: 'open', text: 'เปิดกิจการ', gate: 'mo5', merit: [{ cat: 'neutral' }] }, ...[1, 2, 3].map((i) => ({ id: `n${i}`, text: `อื่น ${i}`, merit: [{ cat: 'neutral' }] })),
   ] };
   const content = { ...base, events: [...base.events, probe] };
   const visible = (c) => c.choices.filter((_, i) => !c.hidden?.[i]).length;
@@ -292,8 +292,12 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 04 ประตูปิด = ตัวเลือกติดประตูไม่ขึ้น (การ์ดยังออก 3 ตัวเลือก)', seen(() => {}) === 3, `${seen(() => {})}`);
   check('ใบ 04 โฟกัสสะสมครบ chain_years = ตัวเลือกขึ้น', seen((st) => (st.focusYears = { business: base.focus.chain_years })) === 4);
   check('ใบ 04 โฟกัสสะสมไม่ครบ = ยังซ่อน', seen((st) => (st.focusYears = { business: base.focus.chain_years - 1 })) === 3);
-  check('ใบ 04 ทายาทรับประตูที่รุ่นก่อนเปิด = ขึ้นโดยไม่ต้องสะสมเอง', seen((st) => (st.gates = ['business'])) === 4);
-  check('ใบ 04 ธงชวน gate:<โฟกัส> = ขึ้น', seen((st) => (st.flags[GATE_FLAG + 'business'] = true)) === 4);
+  check('ใบ 04 ทายาทรับประตูที่รุ่นก่อนเปิด = ขึ้นโดยไม่ต้องสะสมเอง', seen((st) => (st.gates = ['mo5'])) === 4);
+  check('ใบ 04 ธงชวน gate:<โหนด> = ขึ้น', seen((st) => (st.flags[GATE_FLAG + 'mo5'] = true)) === 4);
+  check('ใบ 10 ปลดโหนดประตู = ตัวเลือกขึ้น', seen((st) => { st.tree = { done: { mo5: 30 }, yrs: {}, cards: {} }; }) === 4);
+  check('ใบ 10 ปลดโหนดอื่น (ไม่ใช่โหนดประตู) = ยังซ่อน', seen((st) => { st.tree = { done: { mo3: 30 }, yrs: {}, cards: {} }; }) === 3);
+  check('ใบ 10 ล้างโหนดประตูแล้ว = ประตูปิดอีก', seen((st) => { st.tree = { done: {}, gone: { mo5: 30 }, yrs: {}, cards: {} }; }) === 3);
+  check('ใบ 10 เซฟเก่า/ทายาทเก็บชื่อโฟกัสเดิม = ยังเปิดประตูเดียวกัน', seen((st) => { st.gates = ['business']; }) === 4 && seen((st) => (st.flags[GATE_FLAG + 'business'] = true)) === 4);
 
   // ชีวิตจริงทั้งกอง: จำนวนตัวเลือกบนการ์ดที่ติดป้าย = ตามสถานะประตูตอนการ์ดออก · ชีวิตตามน้ำ/ประตูปิดไม่เคยเห็นตัวเลือกประตู
   const N = 1200;

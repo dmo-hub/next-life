@@ -14,7 +14,7 @@ events:
     choices:
       - id: open_shop
         text: "เอาเงินชดเชยเปิดร้านเอง"
-        gate: business
+        gate: mo5
         effects: {severance: true}
         merit: [{cat: neutral}]
         outcomes:

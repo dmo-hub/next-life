@@ -2168,13 +2168,18 @@ function natureBoost(st, ev) {
   if (!stat && !job) return null;
   return { stat, job, mul: st.content.nature.nature_mul, text: `เพราะคุณเป็นคน${n.name} ผลดีเมื่อกี้เลยมากขึ้นอีกนิด` };
 }
-// ประตูเข้าสาย (โฟกัสใบ 04 · เจ้าของเคาะ: ล็อกแค่ประตู): เปิดเมื่อโฟกัสนั้นสะสมครบ chain_years · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
-// · การ์ดชวน (ธง gate:<โฟกัส>) เปิดให้ได้โดยไม่ต้องโฟกัส เช่น นักธุรกิจถูกชวนลงการเมือง
+// ประตูเข้าสาย (ใบ 04 → ใบ 10): id = โหนดประตูใน tree.yaml gates · เปิดเมื่อปลดโหนดนั้น · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
+// · การ์ดชวน (ธง gate:<โหนด>) เปิดให้ได้โดยไม่ต้องปลด เช่น นักธุรกิจถูกชวนลงการเมือง
+// · โฟกัสเดิมที่ผูกกับโหนด (gates.<โหนด>) ยังเปิดประตูเดียวกันได้ทั้งสะสมครบ chain_years · ธง · ทายาท (เซฟเก่าเก็บชื่อโฟกัส) จนถอดตอนใบ 15
 export const GATE_FLAG = 'gate:';
-export const lifeGateOpen = (st, id) => (st.focusYears?.[id] ?? 0) >= (st.content.focus?.chain_years ?? Infinity) || !!st.gates?.includes(id) || !!st.flags[GATE_FLAG + id];
-export const lifeGatesOpen = (st) => Object.entries(lifeFocusDefs(st)).filter(([id, d]) => d.group === 'gate' && lifeGateOpen(st, id)).map(([id]) => id);
-// การ์ดชวนลงสมัครตอนยังไม่มีตำแหน่ง = ประตูสายการเมือง
-export const OFFICE_GATE = 'politics_base';
+export const lifeGateOpen = (st, id) => {
+  if (st.tree?.done?.[id] !== undefined) return true;
+  const names = [id, st.content.tree?.gates?.[id]].filter(Boolean);
+  return names.some((n) => (st.focusYears?.[n] ?? 0) >= (st.content.focus?.chain_years ?? Infinity) || !!st.gates?.includes(n) || !!st.flags[GATE_FLAG + n]);
+};
+export const lifeGatesOpen = (st) => Object.keys(st.content.tree?.gates ?? {}).filter((id) => lifeGateOpen(st, id));
+// การ์ดชวนลงสมัครตอนยังไม่มีตำแหน่ง = ประตูสายการเมือง (โหนดเสียงของชุมชน)
+export const OFFICE_GATE = 'r5';
 const gateShut = (st, c) => !!c.gate && ![c.gate].flat().some((id) => lifeGateOpen(st, id));
 const GATE_LOCK = 'ยังไม่เคยทุ่มเทกับทางนี้';
 // ซ่อนจากเพศอื่น ไม่ใช่แค่ล็อก เพราะผู้เล่นทำให้เปิดไม่ได้ · เลขลำดับตัวเลือกยังคงเดิม
