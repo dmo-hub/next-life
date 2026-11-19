@@ -290,6 +290,8 @@ events:
       - {id: sincere, pair_id: mw_robe, intent: sincere, text: "ร่วมทำบุญด้วยใจ", cost: {unit: income_x, amount: 0.02}, effects: {happiness: 1}, merit: [{cat: dana, level: 2}]}
       - {id: wish, pair_id: mw_robe, intent: wish_for_gain, text: "ทำบุญแล้วขอให้มีโชคลาภ", cost: {unit: income_x, amount: 0.02}, effects: {happiness: 1}, merit: [{cat: dana, level: 1}], sets_flags: [hope_set:mw_robe], schedules: [{event: bel_hope_robe, after_years: [3, 5]}]}
       - {id: help, text: "ไปช่วยยกของในงานแทน", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+      - {id: build_hall, text: "ร่วมสร้างศาลาให้วัด", cost: {unit: income_x, amount: 0.06}, effects: {happiness: 1, relations: 1}, merit: [{cat: dana, level: 2}], sets_flags: [built_hall], schedules: [{event: bel_built_hall_later, after_years: [12, 25]}]}
+      - {id: build_pond, text: "ร่วมขุดบ่อน้ำให้หมู่บ้าน", cost: {unit: income_x, amount: 0.06}, effects: {happiness: 1, relations: 1}, merit: [{cat: dana, level: 2}], sets_flags: [built_pond], schedules: [{event: bel_built_pond_later, after_years: [12, 25]}]}
       - {id: skip, text: "ไม่ไปงานนี้", merit: [{cat: neutral}]}
       - {id: usual, text: "ใส่ซองประจำ ชวนเพื่อนบ้านช่วยงาน", show_if: {tree: [o3]}, cost: {unit: income_x, amount: 0.02}, effects: {happiness: 1, relations: 1}, merit: [{cat: dana, level: 2}]}
   - id: bel_hope_robe
@@ -322,6 +324,7 @@ events:
       - {id: sincere, pair_id: mw_birthday, intent: sincere, text: "ถวายด้วยใจ ไม่ขออะไร", cost: {unit: income_x, amount: 0.03}, effects: {happiness: 1}, merit: [{cat: dana, level: 2}]}
       - {id: wish, pair_id: mw_birthday, intent: wish_for_gain, text: "ถวายแล้วขอให้ปีนี้รวย", cost: {unit: income_x, amount: 0.03}, effects: {happiness: 1}, merit: [{cat: dana, level: 1}], sets_flags: [hope_set:mw_birthday], schedules: [{event: bel_hope_birthday, after_years: [3, 5]}]}
       - {id: chant, text: "นั่งสวดมนต์ที่ศาลาสักพัก", effects: {happiness: 1}, merit: [{cat: bhavana, level: 1}]}
+      - {id: build_tree, text: "ร่วมปลูกต้นไม้ในลานวัด", cost: {unit: income_x, amount: 0.03}, effects: {happiness: 1}, merit: [{cat: dana, level: 2}], sets_flags: [built_tree], schedules: [{event: bel_built_tree_later, after_years: [10, 20]}]}
       - {id: work, text: "งานเยอะ ไว้ปีหน้า", merit: [{cat: neutral}]}
       - {id: precepts, text: "ขอถือศีลฟังธรรมที่วัดทั้งวัน", show_if: {tree: [o4]}, effects: {happiness: 1}, merit: [{cat: sila, level: 1}]}
   - id: bel_hope_birthday
@@ -338,6 +341,50 @@ events:
       - {id: ask, text: "ถามคนรู้จักว่าเก็บเงินกันยังไง", effects: {relations: 1}, merit: [{cat: neutral}]}
       - {id: chant, text: "นั่งสวดมนต์ให้ใจนิ่งก่อน", merit: [{cat: bhavana, level: 1}]}
       - {id: close, text: "ปิดสมุดบัญชี ไม่เปิดอีกสักพัก", merit: [{cat: neutral}]}
+
+  # ของถาวรที่ร่วมสร้างไว้ (asam-3 · ใบ 106) — การ์ดนัดจากตัวเลือก "ร่วมสร้าง" ไม่อยู่กองสุ่ม · ไม่อ่านยอดบุญ · ไม่ขยับระดับชุมชน
+  - id: bel_built_hall_later
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ศาลาหลังเดิม"
+    text: "ศาลาวัดที่เคยลงเงินร่วมสร้างยังตั้งอยู่ ไม้เสาเป็นมันจากคนนั่งพิงมาหลายปี ป้ายชื่อผู้ร่วมสร้างซีดจนอ่านยากแล้ว คนรุ่นใหม่ในหมู่บ้านไม่รู้ว่าใครเป็นคนลงเงินหลังนี้"
+    when: {flags: {has: [built_hall]}}
+    choices:
+      - {id: sit, text: "นั่งพักที่ศาลาสักครู่", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: grandchild, text: "พาหลานมานั่งเล่นที่ศาลาหลังนี้", show_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+      - {id: paint, text: "ช่วยทาสีป้ายชื่อให้ชัดขึ้น", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+      - {id: pass, text: "ผ่านไปเฉย ๆ ไม่บอกใคร", merit: [{cat: neutral}]}
+      - {id: alone, text: "มองป้ายชื่อเก่านั้นอยู่นาน", hide_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1}, merit: [{cat: neutral}]}
+  - id: bel_built_pond_later
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "บ่อน้ำหน้าหมู่บ้าน"
+    text: "ฤดูแล้งปีนี้บ่อน้ำที่เคยร่วมกันขุดยังมีน้ำให้ตัก คนเดินผ่านมาตักไปใช้ทั้งวัน บางคนถามว่าบ่อนี้ใครขุด ไม่มีใครตอบได้ชัดเจน"
+    when: {flags: {has: [built_pond]}}
+    choices:
+      - {id: draw, text: "ตักน้ำไปใช้ที่บ้านเหมือนทุกครั้ง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: grandchild, text: "พาหลานมาดูบ่อที่เคยช่วยขุด", show_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+      - {id: clear, text: "ช่วยกันกวาดใบไม้ออกจากปากบ่อ", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+      - {id: say, text: "บอกคนที่ถามว่าเคยช่วยกันขุดมา", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - {id: look, text: "ยืนมองผิวน้ำในบ่อเงียบ ๆ", hide_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1}, merit: [{cat: neutral}]}
+  - id: bel_built_tree_later
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ต้นไม้ที่ปลูกไว้"
+    text: "ต้นไม้ที่ปลูกไว้ในลานวัดวันนั้นสูงเลยหลังคากุฏิไปแล้ว ใต้ร่มมีคนนั่งพักกินข้าวห่อ ไม่มีใครรู้ว่าต้นนี้เคยเป็นกล้าเล็ก ๆ ที่ใครปลูก"
+    when: {flags: {has: [built_tree]}}
+    choices:
+      - {id: rest, text: "นั่งพักใต้ต้นไม้สักครู่", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: grandchild, text: "พาหลานมาเก็บใบไม้ใต้ต้นนี้", show_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+      - {id: water, text: "ตักน้ำรดโคนต้นให้", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+      - {id: pass, text: "เดินผ่านไป", merit: [{cat: neutral}]}
+      - {id: shade, text: "เงยมองยอดต้นไม้อยู่ครู่หนึ่ง", hide_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1}, merit: [{cat: neutral}]}
 
   # บนบาน/แก้บน — ผลของเรื่องที่บนเป็นอิสระจากการบน · แก้ตามกำลังมีทุกใบ ≤0.05 เท่าเงินเก็บต่อปี · เลื่อนได้ครั้งเดียว
   # ศาลเจ้าก่อนสอบไม่อยู่ในกองสุ่ม (B63): แกนวางไว้หน้าด่านสอบเข้ามหาวิทยาลัยปีจบ ม.ปลาย/ปวช. · แก้บนทวงเฉพาะคนที่สอบติด (exam_pass:uni)
