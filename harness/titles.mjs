@@ -7,7 +7,12 @@
 import { playLife, playAfterlife, nextLife, mixSeed } from '../src/engine/index.mjs';
 import { titlesOf, TITLES, FAMILY_TITLES } from '../src/engine/titles.mjs';
 import { loadContent } from '../src/node/load.mjs';
-import { BOTS } from './bots.mjs';
+import { BOTS as BASE_BOTS, random, withTree, withGate } from './bots.mjs';
+
+// ฉายารูปต้นไม้ต้องมีบอทที่เล่นต้นไม้ (ข้อ 62) — BOTS หลักไม่เล่น · ต่อท้ายชุดในด่านนี้เท่านั้น ไม่แตะ bots.mjs
+// ลึก = ไล่แขนงสายสัมพันธ์ (rel) ให้ลึกสุด · กายใจ = แขนง skill
+const TREE_BOTS = { ต้นไม้ลึก: withTree(withGate(random), 'rel'), ต้นไม้กายใจ: withTree(withGate(random), 'skill') };
+const BOTS = { ...BASE_BOTS, ...TREE_BOTS };
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
