@@ -75,6 +75,8 @@ export const PLACEHOLDERS = {
   // ไม่มี {ปี}: หน้าจอซ่อนปี พ.ศ. ผู้เล่นเห็นแค่อายุ — ปีในเกมเป็นปีสลับ บอกไปก็เดาวิกฤตได้
   ชื่อลูก: 'ก'.repeat(20),
   ชื่อคู่: 'ก'.repeat(20),
+  ชื่อแฟน: 'ก'.repeat(20),
+  ชื่อแฟนเก่า: 'ก'.repeat(20),
   ชื่อหลาน: 'ก'.repeat(20),
   ผีญาติ: 'ก'.repeat(20),
   ผีญาติบทบาท: 'ญาติผู้ใหญ่',   // พ่อ · แม่ · คู่ชีวิต · ลูก · หลาน · เพื่อน · บรรพบุรุษ · ญาติผู้ใหญ่ · ญาติ
@@ -132,4 +134,4 @@ export const FLAG_RE = /^[a-z][a-z0-9_]*(:[a-z0-9_]+)?$/;
 export const ID_RE = /^[a-z][a-z0-9_]*$/;
 export const YEAR_MIN = 2400;
 export const YEAR_MAX = 2700;
-export const FAMILY_ROLES = ['parent', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'];
+export const FAMILY_ROLES = ['parent', 'partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'];
