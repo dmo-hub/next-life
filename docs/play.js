@@ -10811,14 +10811,14 @@ function lifeFacts(st) {
 
 const has = (f, ...k) => k.some((x) => f.flags[x]);
 // ฉายาตามเงื่อนไข (ใบ 04) — ทุกตัวตรวจแยกกัน ได้หลายตัวพร้อมกัน ไม่มีลำดับ · ด้านลบใช้คำเห็นใจ ไม่ตำหนิ
-// harness ต้องพิสูจน์ทุกตัว ≥0.1% · ระดับตั้งจากอัตราที่วัดได้ (ทั่วไป >10% · หายาก 1.5–10% · ตำนาน <1.5% รวมทุกบุคลิก) ไม่ใช่ความยากที่คิดเอา
+// harness ต้องพิสูจน์ทุกตัว ≥0.1% · ระดับตั้งจากอัตรา raw ก่อนตัดเพดาน (ทั่วไป ≥10% · หายาก 1–<10% · ตำนาน <1% รวมทุกบุคลิก) ไม่ใช่ความยากที่คิดเอา
 const TITLES = [
   { id: 'hard_worker', tier: 'ทั่วไป', name: 'มือไม่เคยว่าง', hint: 'ทำงานยาวนานหลายสิบปี', test: (f) => f.workYears >= 40 },
-  { id: 'boss', tier: 'ทั่วไป', name: 'เถ้าแก่ตัวเล็ก', hint: 'เคยเปิดกิจการของตัวเอง', test: (f) => has(f, 'own_business') },
+  { id: 'boss', tier: 'หายาก', name: 'เถ้าแก่ตัวเล็ก', hint: 'เคยเปิดกิจการของตัวเอง', test: (f) => has(f, 'own_business') },
   { id: 'vendor', tier: 'ทั่วไป', name: 'คนค้าขายหัวใจสู้', hint: 'หาเลี้ยงชีพด้วยการค้าขายรายวัน', test: (f) => has(f, 'street_vendor', 'online_seller') },
   { id: 'grateful', tier: 'ทั่วไป', name: 'ลูกกตัญญู', hint: 'เลือกดูแลพ่อแม่ซ้ำแล้วซ้ำอีก', test: (f) => (f.tagCount.care_parents ?? 0) >= 2 },
   { id: 'giver', tier: 'ทั่วไป', name: 'มือที่ไม่เคยหุบ', hint: 'ให้ทานบ่อยจนเป็นนิสัย', test: (f) => (f.tagCount.dana ?? 0) >= 3 },
-  { id: 'parent', tier: 'ทั่วไป', name: 'พ่อแม่ของใครสักคน', hint: 'มีลูกให้ห่วง', test: (f) => has(f, 'has_kids') },
+  { id: 'parent', tier: 'หายาก', name: 'พ่อแม่ของใครสักคน', hint: 'มีลูกให้ห่วง', test: (f) => has(f, 'has_kids') },
   { id: 'storm', tier: 'ทั่วไป', name: 'ผ่านมรสุมเศรษฐกิจ', hint: 'เป็นผู้ใหญ่ทันวิกฤตเศรษฐกิจหลายครั้ง', test: (f) => f.crises >= 2 },
   { id: 'homeowner', tier: 'ทั่วไป', name: 'มีบ้านเป็นของตัวเอง', hint: 'ได้บ้านมาด้วยน้ำพักน้ำแรง', test: (f) => has(f, 'home_owner') },
   { id: 'runner', tier: 'ทั่วไป', name: 'นักวิ่งตอนเช้า', hint: 'ดูแลร่างกายเป็นกิจวัตร', test: (f) => has(f, 'sporty') },
@@ -10827,19 +10827,19 @@ const TITLES = [
   { id: 'scarred', tier: 'หายาก', name: 'แผลในใจที่ผ่านมาได้', hint: 'เคยถูกรังแก แต่จากไปอย่างมีความสุข', test: (f) => has(f, 'bullied') && f.st.happiness >= 75 },
   { id: 'kind_fooled', tier: 'ทั่วไป', name: 'ใจดีจนโดนหลอก', hint: 'ไว้ใจคนผิดเรื่องเงิน', test: (f) => has(f, 'ponzi_victim') },
   // caught_fraud = ทุจริตเองแล้วถูกจับ/ไล่ออก — แยกจากฉายาเหยื่อ ใช้คำเห็นใจแบบเดียวกับด้านลบตัวอื่น
-  { id: 'stumbled', tier: 'หายาก', name: 'ผู้เคยก้าวพลาด', hint: 'เคยถูกจับได้เพราะเลือกทางลัด', test: (f) => has(f, 'caught_fraud') },
+  { id: 'stumbled', tier: 'ทั่วไป', name: 'ผู้เคยก้าวพลาด', hint: 'เคยถูกจับได้เพราะเลือกทางลัด', test: (f) => has(f, 'caught_fraud') },
   { id: 'guarantor', tier: 'หายาก', name: 'ผู้แบกหนี้แทนคนอื่น', hint: 'เซ็นค้ำให้คนที่ไว้ใจ', test: (f) => has(f, 'guarantor') },
   { id: 'lone_walker', tier: 'หายาก', name: 'ผู้เดินทางคนเดียว', hint: 'อยู่จนแก่โดยไม่มีครอบครัวของตัวเอง', test: (f) => f.age >= 70 && !has(f, 'has_kids', 'married') && f.st.relations < 20 },
   { id: 'comeback', tier: 'ตำนาน', name: 'ล้มแล้วลุก', hint: 'ล้มละลายแล้วกลับมามีเงินเหลือ', test: (f) => f.st.bankruptcies >= 1 && f.debt <= 0 && f.worth >= 0 },
   { id: 'quiet_rich', tier: 'หายาก', name: 'เศรษฐีเงียบ', hint: 'เกิดไม่สูง แต่จากไปพร้อมทรัพย์ก้อนใหญ่', test: (f) => f.clsIdx <= 4 && f.wealth >= 10 },
   { id: 'folk_sage', tier: 'หายาก', name: 'ปราชญ์ชาวบ้าน', hint: 'รู้มากโดยไม่ต้องมีปริญญา', test: (f) => f.st.knowledge >= 95 && (!f.st.edu || f.st.edu === 'ประถม') },
-  { id: 'outlived', tier: 'หายาก', name: 'อายุยืนเกินคาด', hint: 'อยู่นานกว่าคนรุ่นเดียวกันมาก', test: (f) => f.age >= f.expected + 25 },
+  { id: 'outlived', tier: 'ทั่วไป', name: 'อายุยืนเกินคาด', hint: 'อยู่นานกว่าคนรุ่นเดียวกันมาก', test: (f) => f.age >= f.expected + 25 },
   { id: 'clean_hands', tier: 'หายาก', name: 'มือสะอาดในที่สกปรก', hint: 'เจอทางลัดหลายครั้งแต่ไม่เคยเลือก', test: (f) => f.declined >= 10 && f.sinPicks === 0 },
   { id: 'survivor', tier: 'ทั่วไป', name: 'รอดมาได้ทุกภัย', hint: 'ผ่านภัยพิบัติใหญ่มาหลายครั้ง', test: (f) => f.disasters >= 3 },
   { id: 'lucky_number', tier: 'ทั่วไป', name: 'ผู้รอเลขเด็ด', hint: 'ซื้อหวยจนเป็นนิสัย', test: (f) => has(f, 'lottery_habit') },
-  { id: 'grandparent', tier: 'หายาก', name: 'ผู้เลี้ยงหลานแทนพ่อแม่', hint: 'รับหลานมาเลี้ยงเอง', test: (f) => has(f, 'raised_grandkids') },
-  { id: 'centenarian', tier: 'ตำนาน', name: 'ร้อยปีไม่สาย', hint: 'อยู่ถึงร้อยปี', test: (f) => f.age >= 100 },
-  { id: 'rags_riches', tier: 'ตำนาน', name: 'จากศูนย์สู่เศรษฐี', hint: 'เกิดลำบากที่สุด จากไปพร้อมทรัพย์มหาศาล', test: (f) => f.clsIdx <= 2 && f.wealth >= 20 },
+  { id: 'grandparent', tier: 'ตำนาน', name: 'ผู้เลี้ยงหลานแทนพ่อแม่', hint: 'รับหลานมาเลี้ยงเอง', test: (f) => has(f, 'raised_grandkids') },
+  { id: 'centenarian', tier: 'หายาก', name: 'ร้อยปีไม่สาย', hint: 'อยู่ถึงร้อยปี', test: (f) => f.age >= 100 },
+  { id: 'rags_riches', tier: 'หายาก', name: 'จากศูนย์สู่เศรษฐี', hint: 'เกิดลำบากที่สุด จากไปพร้อมทรัพย์มหาศาล', test: (f) => f.clsIdx <= 2 && f.wealth >= 20 },
   { id: 'never_dark', tier: 'หายาก', name: 'ผู้ไม่เคยเลือกทางมืด', hint: 'ทั้งชีวิตไม่เคยเลือกทางผิดเลยสักครั้ง', test: (f) => f.age >= 60 && f.sinPicks === 0 && f.declined >= 11 },
   { id: 'peaceful', tier: 'ตำนาน', name: 'จากไปอย่างสงบ', hint: 'แก่เฒ่า ไม่มีหนี้ มีคนรักรายล้อม และมีความสุข', test: (f) => f.age >= 80 && f.debt <= 0 && f.worth >= 0 && f.st.relations >= 70 && f.st.happiness >= 70 && has(f, 'has_kids') },
 ];
