@@ -22,7 +22,7 @@ const KEYS = {
   event: ['away_block', 'away_call', 'away_only', 'id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'run', 'arc', 'heavy', 'office_ok'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result', 'only_sex', 'silly'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
-  familyOp: ['add', 'n', 'leave', 'separate', 'divorce', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
+  familyOp: ['add', 'n', 'leave', 'separate', 'divorce', 'breakup', 'by', 'marry', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'away_enter', 'away_leave', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot', 'identity'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
@@ -736,16 +736,16 @@ export const rules = [
   {
     // ผลครอบครัวของตัวเลือก/ผลสุ่ม (B36a · B36a2): เพิ่มสมาชิก · คู่แยกทาง · คนในบ้านจากไป · ความผูกพันขึ้นลง — op ละอย่าง
     id: 'family-ops',
-    desc: 'family = [{add: spouse|child|grandchild|peer, n?: 1–3} | {add: pet|herd, kind, life: [จาก, ถึง], name?} | {leave: spouse|pet|herd} | {separate: spouse} | {divorce: spouse} | {die: role, cause?} | {bond: role|all, d: ±1–30}] — op ละอย่าง · cause = สาเหตุที่การ์ดเล่า (คน: กลุ่มใน data/death-causes.json ยกเว้น self_harm · pet: old|sick|accident · herd ไม่มี)',
+    desc: 'family = [{add: spouse|child|grandchild|peer, n?: 1–3} | {add: pet|herd, kind, life: [จาก, ถึง], name?} | {leave: spouse|pet|herd} | {separate: spouse} | {divorce: spouse} | {breakup: partner, by?: us|them} | {marry: partner} | {die: role, cause?} | {bond: role|all, d: ±1–30}] — op ละอย่าง · cause = สาเหตุที่การ์ดเล่า (คน: กลุ่มใน data/death-causes.json ยกเว้น self_harm · pet: old|sick|accident · herd ไม่มี)',
     event(e, ctx, r) {
       for (const { node, path } of effectSites(e)) {
         if (node.family === undefined) continue;
         if (!Array.isArray(node.family) || !node.family.length) { r(`${path}.family`, 'family ต้องเป็นรายการไม่ว่าง'); continue; }
         node.family.forEach((o, i) => {
           const p = `${path}.family[${i}]`;
-          const kinds = ['add', 'leave', 'separate', 'divorce', 'far', 'back', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
-          if (kinds.length !== 1) return r(p, 'ต้องมี add leave separate divorce far back die หรือ bond อย่างเดียว');
-          if (o.add !== undefined && !['spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น spouse child grandchild pet herd peer');
+          const kinds = ['add', 'leave', 'separate', 'divorce', 'breakup', 'marry', 'far', 'back', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
+          if (kinds.length !== 1) return r(p, 'ต้องมี add leave separate divorce breakup marry far back die หรือ bond อย่างเดียว');
+          if (o.add !== undefined && !['partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น partner spouse child grandchild pet herd peer');
           // สัตว์ไม่มีตารางชีพในข้อมูล — อายุขัยของชนิดต้องมาจากเนื้อหา · ชนิดต้องอยู่ในตารางของแกน (ผลต่อปีอ่านจากตาราง ชนิดสะกดผิด = ไม่มีผลเงียบ)
           const animals = o.add === 'pet' ? PET_KINDS : o.add === 'herd' ? HERD_KINDS : null;
           if (animals && (!Object.hasOwn(animals, o.kind) || !isRange(o.life, 1, 40))) r(`${p}`, `add: ${o.add} ต้องมี kind (${Object.keys(animals).join(' ')}) และ life: [จาก, ถึง] ปี 1–40`);
@@ -757,6 +757,8 @@ export const rules = [
           if (o.bond === undefined && o.d !== undefined) r(`${p}.d`, 'd ใช้กับ bond เท่านั้น');
           if (o.n !== undefined && (o.add === undefined || !isInt(o.n) || o.n < 1 || o.n > 3)) r(`${p}.n`, 'n ใช้กับ add เป็น 1–3');
           if (o.leave !== undefined && !['spouse', 'pet', 'herd'].includes(o.leave)) r(`${p}.leave`, 'leave ใช้ได้กับ spouse pet herd');
+          for (const k of ['breakup', 'marry']) if (o[k] !== undefined && o[k] !== 'partner') r(`${p}.${k}`, `${k} ใช้ได้กับ partner`);
+          if (o.by !== undefined && (o.breakup === undefined || !['us', 'them'].includes(o.by))) r(`${p}.by`, 'by ใช้กับ breakup เป็น us หรือ them');
           for (const k of ['separate', 'divorce']) if (o[k] !== undefined && o[k] !== 'spouse') r(`${p}.${k}`, `${k} ใช้ได้กับ spouse`);
           for (const k of ['far', 'back']) if (o[k] !== undefined && o[k] !== 'child') r(`${p}.${k}`, `${k} ใช้ได้กับ child`);
           if (o.die !== undefined && !FAMILY_ROLES.includes(o.die)) r(`${p}.die`, `die ต้องเป็น ${FAMILY_ROLES.join(' ')}`);
