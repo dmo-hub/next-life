@@ -10,7 +10,7 @@ import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
 import { goalsMet, titlesOf } from './titles.mjs';
 import { heirPets, letterTo, deadKinOf, speechSex } from './family.mjs';
 import { CHRONIC } from './death.mjs';
-import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf, OVERLAP_STAGE_MIN } from './life.mjs';
+import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeTreeMain, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf, OVERLAP_STAGE_MIN } from './life.mjs';
 import { ISEKAI, ISEKAI_SKILLS, SKILL, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 import { warnPick } from './warn.mjs';
@@ -665,6 +665,8 @@ function makeHeir(af, r) {
     pets: heirPets(st, birthYear, tier),
     // เกิดในตระกูล = รับหมวดโฟกัสหลักของรุ่นก่อนเป็นตัวเด็ก · เกิดที่อื่น/ไม่เคยโฟกัส = ตามน้ำ (ไม่มีฟิลด์ heir จึงเท่าเดิม)
     ...(tier && lifeFocusKid(st) && { focus: lifeFocusKid(st) }),
+    // แขนงหลักของพ่อแม่ → ทายาทได้ต้นแขนงนั้นฟรี (ข้อ 38 99) · พ่อแม่ไม่เคยแตะต้นไม้ = ไม่มีช่อง
+    ...(tier && lifeTreeMain(st) && { treeParent: lifeTreeMain(st) }),
     // ประตูเข้าสายที่รุ่นก่อนเปิดไว้ ส่งต่อเฉพาะทายาทในตระกูล
     ...(tier && lifeGatesOpen(st).length && { gates: lifeGatesOpen(st) }),
     // เริ่มกลางวัย (B76): อายุจริงปีที่รุ่นก่อนตาย · newLife อ่านแล้วข้ามวัยเด็ก

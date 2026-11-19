@@ -1,7 +1,7 @@
 // harness ระหว่างชาติ + หลายรุ่น (B06): บอท 3 บุคลิกเล่นตระกูลละหลายรุ่นผ่านฟังก์ชันชุดเดียวกับหน้าเว็บ
 // ด่าน: เล่นครบทุกรุ่น · ช่วงที่ 7 ยาว 6–10 การ์ด · ปรโลกเฉลยบัญชีทุกครั้งและที่เดียว · ส่งต่อ 30–70% ตรงสูตร
 // · ฐานะชาติหน้าขยับตามกรรมทั้งสองทาง (ใบ 05 แรงทุกทาง) · หนี้ไม่ตกถึงลูก · ทุกฉากในเนื้อหาออกได้จริง · ค่าแถบไม่หลุด
-import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier, COURT_SCENES, makeRng } from '../src/engine/index.mjs';
+import { newLife, playLife, playAfterlife, nextLife, openChoices, mixSeed, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, CLASSES, CARRY, carryLedger, AFTERLIFE_STAGE, REALMS, KIN_TIERS, kinTier, COURT_SCENES, makeRng, lifeTreeMain, treeStartNode } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
 import { stuckCard, unfilledIn, heirChain } from './gates.mjs';
 
@@ -293,14 +293,23 @@ check('ไม่มีช่องแทนค่าค้างบนจอร�
 const forceChild = (card, rng, h) => (h.pending?.path && !card.locked?.[0] ? 0 : BOTS.สุ่ม(card, rng));
 const byId = new Map(content.events.map((e) => [e.id, e]));
 const heirFired = new Map(heirReaders.filter((e) => e.when?.parent_flags?.has).map((e) => [e.id, 0]));
-let forced = 0, withFlag = 0, dCards = 0, heirD = 0;
+let forced = 0, withFlag = 0, dCards = 0, heirD = 0, treeKids = 0, treeFree = 0, treeBad = 0;
 for (let i = 0; i < Math.min(n, 500); i++) {
   const first = playLife(mixSeed(seed, 7700 + i), content, forceChild);
+  // บอทไม่ปลดโหนดเอง: ใส่ต้นไม้ให้พ่อแม่เป็นรอบ ๆ (ไม่มี · เงินนำ · ความรู้ชนะเสมอด้วยโหนดล่าสุด) ให้ด่านทายาทมีของวัด
+  if (i % 3) first.state.tree = { cur: null, done: i % 3 === 1 ? { mo1: 5, mo2: 9, r1: 6 } : { r1: 4, k1: 7 }, yrs: {}, cards: {}, hist: [] };
   const af = playAfterlife(first.state, forceChild);
   if (af.path !== 'child') continue;
   const st = nextLife(af);
   forced++;
   if (Object.keys(st.parentFlags).length) withFlag++;
+  // ทายาทในตระกูล (ข้อ 38 99): พ่อแม่มีแขนงหลัก = ทายาทได้ต้นแขนงนั้นโหนดเดียวฟรี · พ่อแม่ไม่เคยปลด = ต้นไม้ว่าง
+  const pm = lifeTreeMain(first.state);
+  const got = Object.keys(st.tree?.done ?? {});
+  if (pm) {
+    treeKids++;
+    if (got.length === 1 && got[0] === treeStartNode(content.tree.nodes, pm) && st.treeParent === pm) treeFree++; else treeBad++;
+  } else if (got.length) treeBad++;
   playLife(st.seed, content, forceChild, (card, s) => {
     if (heirFired.has(card.id)) heirFired.set(card.id, heirFired.get(card.id) + 1);
     if (!card.parentFrom) return;
@@ -323,6 +332,7 @@ console.log(`  สาเหตุตายต่อรุ่น (นับ ${cou
 check('ทายาทรุ่นหลังตายได้ทุกสาเหตุที่รุ่นแรกตาย', lostCause.length, lostCause.length ? ` · หาย: ${lostCause.join(' · ')}` : '');
 check(`ธงพ่อแม่ครบทะเบียนไม่ขยับชีวิตเมื่อไม่มีการ์ดอ่าน (${heirReaders.length ? 'มีผู้อ่านแล้ว ข้าม' : `${streamChecks} คู่`})`, heirTwin);
 check(`ป้าย parentFrom ตรงเงื่อนไขการ์ด (${dCards} ใบ)`, heirD);
+check(`ทายาทในตระกูลได้ต้นแขนงหลักพ่อแม่ฟรีโหนดเดียว (${treeFree}/${treeKids} ชีวิต · พ่อแม่ไม่มีโหนดต้องว่าง)`, treeBad);
 const deadHeir = [...heirFired].filter(([, c]) => !c).map(([id]) => id);
 // ธงหายากถึงทายาทแค่ไม่กี่ชีวิตใน 500 ตระกูล (loan_shark ปิดหนี้ก่อนตาย) — ใบที่ไม่ออกเองลองซ้ำด้วยทายาทที่ถือธงครบ แยกดวงออกจากการ์ดที่ออกไม่ได้จริง
 const HEIR_RETRY = 200;

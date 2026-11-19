@@ -14,7 +14,7 @@ import { cadetActive, cadetCard, chooseCadet, cadetAfterChoice } from './cadet.m
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
 import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
-import { treeStartBranch, treeStartNode, treeCtl, treeOffers, treeInvest, treeCard, treeYearEnd, treeRollMul, treeCardMul, treeGateEvent, treeGateDone, treeRespec, treeRusty, treeRustMul } from './tree.mjs';
+import { treeStartBranch, treeStartNode, treeCtl, treeOffers, treeInvest, treeCard, treeYearEnd, treeRollMul, treeCardMul, treeGateEvent, treeGateDone, treeRespec, treeRusty, treeRustMul, treeMainBranch } from './tree.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
@@ -373,6 +373,7 @@ export function newLife(seed, content, heir = null) {
   st.statTrail.push(statPoint(st));
   st.stageMark = markStage(st);
   lifeFocusBorn(st, heir?.focus);
+  lifeTreeBorn(st, heir?.treeParent);
   if (heir?.gates?.length) st.gates = [...heir.gates];
   overlapPlan(st);
   driftPlan(st);
@@ -2043,6 +2044,29 @@ export function lifeTreeStart(st) {
   if (!c?.start) return null;
   const branch = treeStartBranch(c.start, st.seed, CLASSES.indexOf(st.cls), st.occupation ?? null, st.treeParent ?? null);
   return { branch, node: treeStartNode(c.nodes, branch) };
+}
+// ทายาท (ใบ ft13 · ข้อ 4 18 38 99): ได้ต้นแขนงของแขนงหลักพ่อแม่เป็นโหนดปลดแล้วตั้งแต่เกิด · ไม่ใช่นิสัย (ไม่ป้อนแต้ม treeNature) · ไม่มีผลทางสืบ · ไม่ดึงเลขสุ่ม
+// treeV = เซฟนี้เกิดหลังมีกติกาต้นไม้ · เซฟก่อนหน้าไม่มีธงนี้ ให้ repairLife ย้ายนิสัยเป็นโหนด
+export const lifeTreeMain = (st) => (st.tree && st.content.tree ? treeMainBranch(st, st.content.tree.nodes) : null);
+function lifeTreeBorn(st, parentBranch) {
+  const c = st.content.tree;
+  if (!c) return;
+  st.treeV = 1;
+  const node = parentBranch ? treeStartNode(c.nodes, parentBranch) : null;
+  if (!node) return;
+  st.treeParent = parentBranch;
+  st.tree = { cur: null, done: { [node]: 0 }, yrs: {}, cards: {}, hist: [] };
+}
+// เซฟเก่า (ข้อ 13 48 99): ต้นไม้ว่าง · เก็บ st.gates ไว้เฉย ๆ · ปลดโหนดต้นของนิสัยที่ล็อกแล้ว (natures[*].nodes[0]) ให้ตรงกัน
+export function lifeTreeMigrate(st) {
+  const t = st.content.tree, f = st.content.focus;
+  if (!t || st.treeV) return;
+  st.treeV = 1;
+  if (st.tree || !f?.natures) return;
+  for (const id of [st.nature, ...(st.natureAlso ?? [])]) {
+    const node = id && f.natures[id]?.nodes?.[0];
+    if (node && t.nodes[node]) (st.tree ??= { cur: null, done: {}, yrs: {}, cards: {}, hist: [] }).done[node] = Math.min(st.age, f.nature_age);
+  }
 }
 export const treeOffersNow = (st) => treeOffers(st, lifeTreeDefs(st), stageOf(st.age));
 // สนิม + ล้างโหนด (ใบ 09): ล้างจ่ายด้วยเวลา = ปีนั้นหลอดไม่ขยับ · ผู้เรียกเช็กมีชีวิตอยู่

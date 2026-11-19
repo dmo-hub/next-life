@@ -123,6 +123,22 @@ export function treeRespec(h, defs, id, age) {
 // เคยปลดทั้งหมด = ที่ปลดอยู่ + ที่ล้างไปแล้ว (ฐานของฉายา ข้อ 56)
 export const treeEver = (h) => [...new Set([...Object.keys(h?.tree?.done ?? {}), ...Object.keys(h?.tree?.gone ?? {})])];
 
+// แขนงหลักของชีวิต = แขนงที่ปลดมากสุด (นับโหนดใน done ไม่รวมโหนดกลาง · เกณฑ์เดียวกับถ่วงการ์ด) · เสมอกัน = แขนงที่ปลดโหนดล่าสุด (ทายาทต้องได้แขนงเดียวเสมอ ต่างจากถ่วงการ์ดที่เสมอ = ไม่ถ่วง)
+export function treeMainBranch(h, defs) {
+  const done = h?.tree?.done;
+  if (!done) return null;
+  const n = {}, last = {};
+  for (const [id, age] of Object.entries(done)) {
+    const b = defs[id] && !defs[id].and ? defs[id].branch : null;
+    if (!b) continue;
+    n[b] = (n[b] ?? 0) + 1;
+    last[b] = Math.max(last[b] ?? age, age);
+  }
+  let best = null;
+  for (const b of Object.keys(n)) if (best === null || n[b] > n[best] || (n[b] === n[best] && last[b] > last[best])) best = b;
+  return best;
+}
+
 // ── การ์ดด่าน + keystone (ใบ 05) ── ทุกตัวไม่ดึงเลขสุ่ม · ผลของการ์ดด่านลงผ่านตัวเลือกของการ์ด (ผลเต็มครั้งเดียว) ไม่ผ่านงบผลเบา
 // ปีครบแต่การ์ดหมวดยังไม่ครบ (ข้อ 46): ใช้บอกขั้น "รอโอกาส" ที่หน้าต้นไม้ · ไม่แตะสถานะ
 export const treeWaiting = (h, defs) => {
