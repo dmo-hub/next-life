@@ -562,7 +562,7 @@ events:
     category: belief
     stage: วัยรุ่น
     years: [2500, 2650]
-    weight: 2
+    weight: 3
     title: "ชวนไปค่ายธรรมะปิดเทอม"
     text: "โรงเรียนแปะประกาศค่ายธรรมะปิดเทอม เพื่อนสนิทสองคนจะไป ครูประจำชั้นถามว่าสนใจไหม"
     lore_ref: lore-finance-belief.md#B
@@ -578,7 +578,7 @@ events:
     category: belief
     stage: วัยรุ่น
     years: [2500, 2650]
-    weight: 2
+    weight: 3
     title: "เพื่อนดูดวงให้"
     text: "เพื่อนในห้องเอาไพ่มาเปิดดูดวงให้ทุกคนช่วงพักเที่ยง ไพ่ใบของเรามีคำเตือนเรื่องสอบ"
     lore_ref: lore-finance-belief.md#B
@@ -594,7 +594,7 @@ events:
     category: belief
     stage: วัยรุ่น
     years: [2500, 2650]
-    weight: 2
+    weight: 3
     title: "ใส่บาตรตอนเช้า"
     text: "ยายปลุกตั้งแต่ตีห้า บอกให้ช่วยถือถุงอาหารไปใส่บาตรหน้าปากซอย"
     lore_ref: lore-finance-belief.md#B
