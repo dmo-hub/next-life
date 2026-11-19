@@ -1,5 +1,5 @@
 {
- "version": "v0.6.136",
+ "version": "v0.6.137",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -456,6 +456,7 @@
   "bel_lottery_tree",
   "bel_lottery_plate",
   "bel_lottery_funeral",
+  "bel_kid_temple_grandma",
   "boxer_kid_01",
   "boxer_temple_01",
   "boxer_teen_01",
