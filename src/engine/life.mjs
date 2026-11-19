@@ -167,6 +167,10 @@ export function yearlySaving(st, year = st.birthYear + st.age) {
   return monthlyIncome(st, year) * 12 * era.birth.saveRate;
 }
 
+// ตัวคูณระดับการใช้จ่าย (B29 · ใบ 52): คูณเฉพาะเงินเก็บที่เข้ากระเป๋าแต่ละปี — ไม่แตะ yearlySaving
+// (ราคาการ์ด income_x/เงินติดตัวใช้ yearlySaving ตรง ๆ จึงเท่าเดิมทุกเกม) · normal = ×1 = ค่าเดิม
+export const spendMult = (st) => st.content.spending?.levels?.[st.spendLevel]?.save_mult ?? 1;
+
 // รายได้/เดือนของชีวิตนี้: ค่าจ้างอาชีพ × ตัวคูณรายได้ถาวรจากเหตุการณ์
 // รายได้/เดือนของชีวิตนี้: ค่าจ้างงาน (ขั้นในสายยศทับค่าจ้างอาชีพ) × ตัวคูณรายได้ถาวร
 // ตำแหน่งการเมือง: ท้องถิ่นได้ค่าตอบแทนบวกจากงาน · เต็มเวลาได้อย่างที่มากกว่า (ลาออกจากงานเดิมไปนั่งตำแหน่ง)
@@ -1188,8 +1192,10 @@ function stepYear(st) {
   if (st.money > 0) {
     st.money *= 1 + portfolioReturn(era, st.seed, st.alloc, year);
   } else if (st.money < 0) st.money *= 1 + lendingRate(era, st.seed, year);
-  if (isWorking(st)) st.money += yearlySaving(st, year);
-  else if (st.retireBase !== null) st.money -= retireSpend(st, year) - st.pension * st.price;
+  if (isWorking(st)) st.money += yearlySaving(st, year) * spendMult(st);
+  // เกษียณยังเลือกได้ (เจ้าของเคาะ): ระดับใช้จ่ายมีผลกับรายจ่ายเกษียณ — ประหยัดใช้เงินเก็บช้าลง หรูหราใช้เร็วขึ้น
+  // (ทิศเดียวกับตัวคูณเงินเก็บ: save_mult สูง = ออมมาก = รายจ่ายน้อย) · ค่าเริ่ม normal = ÷1 = ค่าเดิม
+  else if (st.retireBase !== null) st.money -= retireSpend(st, year) / spendMult(st) - st.pension * st.price;
   let paid = 0;
   for (const d of st.debts) {
     const p = payDebt(era, st.seed, d, year);

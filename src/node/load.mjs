@@ -534,6 +534,26 @@ export function loadItems(p = 'content/rules/items.yaml') {
 // เส้นเตรียมทหาร: เนื้อหาสนามสอบ + ตัวเลขที่เจ้าของเคาะ (engine: src/engine/cadet.mjs)
 export const loadCadet = (p = 'content/rules/cadet.yaml') => parse(read(p));
 
+// ระดับการใช้จ่าย (B29 · ใบ 52): ตัวคูณเงินเก็บรายปี + ผลความสุขต่อระดับ — ค่าเริ่มต้องครบ 3 ระดับ
+// normal = ×1 = ค่าเดิมของ main · engine อ่านจาก st.content.spending
+export function loadSpending(p = 'content/rules/spending.yaml') {
+  const doc = parse(read(p));
+  const bad = [];
+  for (const id of ['frugal', 'normal', 'luxury']) {
+    const l = doc?.levels?.[id];
+    if (!l) { bad.push(`levels.${id} หาย`); continue; }
+    if (typeof l.name !== 'string' || !l.name.trim()) bad.push(`levels.${id}.name ต้องเป็นข้อความไม่ว่าง`);
+    if (typeof l.save_mult !== 'number' || l.save_mult <= 0) bad.push(`levels.${id}.save_mult ต้องเป็นเลข > 0`);
+    if (typeof l.happy !== 'number') bad.push(`levels.${id}.happy ต้องเป็นเลข`);
+  }
+  const normal = doc?.levels?.normal;
+  if (normal && normal.save_mult !== 1) bad.push('levels.normal.save_mult ต้องเป็น 1 (ค่าเดิมของ main)');
+  if (normal && normal.happy !== 0) bad.push('levels.normal.happy ต้องเป็น 0 (ค่าเดิมของ main)');
+  if (typeof doc?.luxury_decay !== 'number' || doc.luxury_decay < 0 || doc.luxury_decay > 1) bad.push('luxury_decay ต้องเป็นเลข 0–1');
+  if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return { levels: doc.levels, luxury_decay: doc.luxury_decay };
+}
+
 // ทะเบียนสายเรื่องรายคน (krung-1): ทุกคีย์ arc บนการ์ดต้องมีชื่อ — หน้าจบใช้บอกสถานะสาย · harness ส่งทะเบียนของ fixture เองได้
 // ทะเบียนชนิดสถานะอยู่นอกบ้าน (ใบ 237) — การ์ดอ้างชื่อชนิด lint ตรวจชื่อกับทะเบียน · ค่าที่ engine อ่านต้องครบ ไม่งั้นพังตอนการ์ดโทรมาบอกออก
 export function loadAway(p = 'content/rules/away.yaml') {
@@ -589,5 +609,5 @@ export function loadContent() {
   const cadet = loadCadet();
   checkCadetEraCards(cadet, events);
   checkCadetHeirText(cadet);
-  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), focus, nature: loadNature(), tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), away: loadAway(), arcs: loadArcs(events), cadet };
+  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), focus, nature: loadNature(), tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), away: loadAway(), arcs: loadArcs(events), cadet, spending: loadSpending() };
 }
