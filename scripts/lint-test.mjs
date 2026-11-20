@@ -252,6 +252,38 @@ for (const sex of SEXES) {
 }
 rows.push(['ช่องแทนค่าแกนเติมครบ', `${Object.keys(PLACEHOLDERS).length} ช่อง × ${SEXES.length} เพศ`]);
 
+// ---- คำแทนตามงาน (ใบ 181): {ที่ทำงาน} {คนคุมงาน} ไล่ทุกอาชีพ × ทุกสาย × (ทำงานอยู่/ไม่ได้ทำ) ----
+{
+  const occs = JSON.parse(readFileSync(new URL('data/finance.json', root), 'utf8')).occupations.list.map((o) => o.id);
+  const ladders = [undefined, ...Object.keys(JSON.parse(readFileSync(new URL('data/careers.json', root), 'utf8')).ladders)];
+  const base = { ...newLife(1, loadContent()), age: 30, workFrom: 20, retiredAt: undefined };
+  let n = 0;
+  for (const k of ['ที่ทำงาน', 'คนคุมงาน']) {
+    for (const occ of occs) for (const ladder of ladders) for (const working of [true, false]) {
+      const st = { ...base, occupation: occ, ladder: ladder ? { id: ladder } : null, ...(working ? {} : { workFrom: null }) };
+      const out = fill(`{${k}}`, st);
+      n++;
+      if (/[{}]/.test(out) || !out.trim()) fails.push(`ช่อง {${k}} ว่าง/ไม่เติม (${occ} · สาย ${ladder ?? '-'} · ${working ? 'ทำงานอยู่' : 'ไม่ได้ทำงาน'}): "${out}"`);
+      else if (out.length > PLACEHOLDERS[k].length) fails.push(`ช่อง {${k}} ยาว ${out.length} เกินค่ายาวสุด ${PLACEHOLDERS[k].length} ที่ด่านความยาวใช้ (${occ} · สาย ${ladder ?? '-'}): "${out}"`);
+    }
+  }
+  rows.push(['คำแทนตามงาน อาชีพ×สาย×ทำ/ไม่ทำ', `${n} ชุด`]);
+  // เดโมของใบ: การ์ดเดียว พนักงานบริษัท = ออฟฟิศ · คนค้าขาย = ร้าน · เด็ก (ก่อนทำงาน) = ที่ทำงาน · เกษียณ = ที่ทำงาน · ชาวนา = คำสำรองคนคุมงาน
+  const jobCases = [
+    ['พนักงานบริษัท', { occupation: 'clerk', ladder: { id: 'private' } }, 'ออฟฟิศ', 'หัวหน้าแผนก'],
+    ['คนค้าขาย', { occupation: 'service', ladder: { id: 'trade' } }, 'ร้าน', 'เจ้าของร้าน'],
+    ['เด็กก่อนทำงาน', { occupation: 'clerk', ladder: null, workFrom: null, age: 10 }, 'ที่ทำงาน', 'หัวหน้างาน'],
+    ['เกษียณแล้ว', { occupation: 'clerk', ladder: { id: 'private' }, retiredAt: 55, age: 58 }, 'ที่ทำงาน', 'หัวหน้างาน'],
+    ['ชาวนา (ไม่มีนาย)', { occupation: 'farmer', ladder: { id: 'trade' } }, 'ไร่นา', 'ผู้ใหญ่บ้าน'],
+    ['ทหาร ใช้คำสาย', { occupation: 'officer', ladder: { id: 'army' } }, 'ค่าย', 'ผู้บังคับบัญชา'],
+  ];
+  for (const [name, patch, wantPlace, wantBoss] of jobCases) {
+    const out = fill('{ที่ทำงาน}|{คนคุมงาน}', { ...base, ...patch });
+    if (out !== `${wantPlace}|${wantBoss}`) fails.push(`คำแทนตามงาน "${name}": ต้อง ${wantPlace}|${wantBoss} ได้ ${out}`);
+  }
+  rows.push(['คำแทนตามงาน เดโม+ตัวควบคุม', `${jobCases.length} เคส`]);
+}
+
 // ชื่อเล่น (B27): ด่านต้องจับชื่อที่หลุดรายการ avoid/ยุคมีรู
 const namesRaw = JSON.parse(readFileSync(new URL('data/names.json', root), 'utf8'));
 const nameFrom = namesRaw.eras[0].from, nameTo = namesRaw.eras.at(-1).to;

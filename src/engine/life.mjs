@@ -18,6 +18,7 @@ import { treeStartBranch, treeStartNode, treeCtl, treeOffers, treeInvest, treeCa
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
 import { memoryCard, memoryEligible } from './memory.mjs';
+import { jobWord } from './jobwords.mjs';
 import { pastLifeOk, pastTalent, talentStart } from './past.mjs';
 
 export const SEXES = ['ชาย', 'หญิง'];
@@ -675,6 +676,9 @@ export const FILL = {
   ผีญาติ: (st) => pickKinGhost(st)?.name ?? 'ญาติ',
   ผีญาติบทบาท: (st) => pickKinGhost(st)?.word ?? 'ญาติ',
   แจ้งการจากไป: (st) => (st.grief ? lossText(st.grief) : 'คนในบ้านจากไปแล้ว'),
+  // คำแทนตามงาน (ใบ 181): ก่อนทำงาน/เกษียณ = คำกลาง · ทำงานอยู่ = ตามสาย/อาชีพ (jobwords.mjs)
+  ที่ทำงาน: (st) => jobWord('ที่ทำงาน', { working: isWorking(st), ladder: st.ladder?.id, occ: st.occupation }),
+  คนคุมงาน: (st) => jobWord('คนคุมงาน', { working: isWorking(st), ladder: st.ladder?.id, occ: st.occupation }),
   ทางกลับ: (st) => (st.age < GRIEF.adultAge ? 'กลับไปเรียน' : isWorking(st) ? 'กลับไปทำงาน' : 'กลับไปใช้ชีวิตตามเดิม'),
   บวชหน้าไฟ: (st) => (st.age < GRIEF.novice ? 'บวชเณรหน้าไฟ' : 'บวชหน้าไฟ'),
   ชื่อคู่ลูก: (st) => childMate(st, focusOf(st, 'child')) ?? 'คู่ของลูก',
