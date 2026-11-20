@@ -204,6 +204,10 @@ function conditions(e, L) {
     const k = w.illness;
     out.push(`ตัวเองรู้แล้วว่าป่วยโรคเรื้อรัง${k.causes ? ` (${any(k.causes.map(esc))})` : ''}${k.left ? ` เหลือ ${range(k.left, ' ปี')}` : ''}`);
   }
+  if (w.spouse) {
+    const s = w.spouse;
+    out.push(`มีคู่${s.status === 'apart' ? 'ที่แยกทางกันอยู่' : s.status === 'together' ? 'ที่อยู่ด้วยกัน' : ''}${s.bond ? ` ผูกพัน ${range(s.bond, '')}` : ''}${s.together ? ` อยู่ด้วยกัน ${range(s.together, ' ปี')}` : ''}${s.apart ? ` แยกทางมา ${range(s.apart, ' ปี')}` : ''}`);
+  }
   if (w.filial) {
     const n = w.filial.n ?? [1, 99];
     out.push(`เคยดูแลพ่อแม่ ${n[1] >= 99 ? `${n[0]} ครั้งขึ้นไป` : range(n, ' ครั้ง')}${w.filial.way ? ` ครั้งล่าสุดแบบ${any(w.filial.way.map((x) => FILIAL_TH[x] ?? x))}` : ''}`);

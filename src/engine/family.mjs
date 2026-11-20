@@ -31,6 +31,10 @@ export const KIN_LONELY = { from: 65, happiness: 2, health: 0.3 };
 // ลูกอยู่ไกล (m.far): ยังเป็นคนในบ้านทุกเรื่อง ต่างจาก left ที่หลุดจากธง has_kids การ์ดเรียกชื่อ ญาติช่วย และความเหงา
 // ความผูกพันลดเพิ่มปีละเท่านี้ แม้ปีนั้นได้ดูแล · ไม่ทะลุ BOND_FLOOR
 export const KIN_FAR = { decay: 2 };
+// ลูกหลังหย่าที่อยู่กับอีกฝ่าย (ใบ 92 ข้อ 154): ผูกพันกับเราจางเพิ่มปีละเท่านี้ · ไม่ทะลุ BOND_FLOOR · ยังเป็นทายาท
+export const KIN_CUSTODY = { decay: 2, minorUntil: 18 };
+// หย่าแบ่งสินสมรส (ใบ 92 ข้อ 153 · AI ตัดสิน "แบ่งครึ่ง"): ส่วนสมรส = เงินที่งอกจากปีเริ่มอยู่ด้วยกัน (trail) ถึงวันหย่า · เสียสัดส่วนนี้ของส่วนนั้น
+export const DIVORCE_SPLIT = 0.5;
 // เราดูแลพ่อแม่แบบไหน (B167) — ตัวเลือกการ์ดดูแลพ่อแม่ติด filial · จดเฉพาะชีวิตนี้ ไม่ส่งต่อรุ่น
 // way = วิธีครั้งล่าสุด (การ์ดชราให้ลูกทำแบบเดียวกัน) · score = บุญดูแลพ่อแม่ − บาปทำร้ายผู้ใหญ่ ตามระดับของตัวเลือก
 // ถึงอายุ at ลูกที่ยังอยู่ได้ bond ± step × score (ไม่เกิน cap) — ลูกที่เห็นเราดูแลพ่อแม่ผูกพันกับเรามากขึ้น · kinAid ทำงานต่อเอง
@@ -143,6 +147,26 @@ export function addMember(st, role, extra = {}) {
   return m;
 }
 
+// เงินของเราตอนคู่เข้าบ้าน (จาก trail รายปี) · ไม่มี since/trail (เซฟเก่า) = ไม่แบ่ง · ฐานติดลบนับ 0 · ไม่งอก = ไม่เสีย
+function splitMarital(st, m) {
+  if (m.since === undefined || !st.trail) return;
+  const at = st.trail.find((p) => p.year === st.birthYear + m.since);
+  if (!at) return;
+  const grew = st.money - Math.max(0, at.money);
+  if (st.money > 0 && grew > 0) st.money -= grew * DIVORCE_SPLIT;
+}
+// เงื่อนไขการ์ดตามคู่ปัจจุบัน (when.spouse): status = together|apart · bond [lo,hi] · together [lo,hi] ปีที่อยู่ด้วยกัน · apart [lo,hi] ปีที่แยกทางมาแล้ว
+// คู่ที่หย่าแล้วไม่นับ · เซฟเก่าไม่มี since/leftAge = เงื่อนไขช่วงปีไม่ผ่าน
+export function spouseOk(st, w) {
+  const m = (st.kin ?? []).findLast((x) => x.role === 'spouse' && x.alive && spouseStatus(x) !== 'divorced');
+  if (!m) return false;
+  if (w.status && spouseStatus(m) !== w.status) return false;
+  if (w.bond && !kinInRange(m.bond ?? BOND_START.spouse, w.bond)) return false;
+  if (w.together && (m.left || m.since === undefined || !kinInRange(st.age - m.since, w.together))) return false;
+  if (w.apart && (spouseStatus(m) !== 'apart' || m.leftAge === undefined || !kinInRange(st.age - m.leftAge, w.apart))) return false;
+  return true;
+}
+
 const livingOf = (st, role) => st.kin.filter((m) => m.role === role && m.alive && !m.left);
 // สถานะคู่ (ใบ 89 B114 ข้อ 145 164): together อยู่ด้วยกัน · apart แยกทาง (ยังมีคู่ตามกฎหมาย แต่งใหม่ไม่ได้) · divorced หย่า · ม่าย = ตายแล้วและไม่ได้หย่า (derived)
 // ไม่มีช่อง = together (เซฟเก่า) · หย่าแล้วไม่นับเป็นคู่ในงานศพ/จดหมาย/ผู้ถูกหยิบเป็นพ่อแม่ทายาท และคู่ที่หย่าแล้วตายไม่ลงบันทึกสูญเสีย
@@ -240,7 +264,11 @@ function bondTargets(st, role) {
 }
 
 function bondAdd(st, list, d) {
-  for (const m of list) m.bond = bondClamp((m.bond ?? BOND_START[m.role ?? 'parent']) + d);
+  for (const m of list) {
+    const b = m.bond ?? BOND_START[m.role ?? 'parent'];
+    // ลดไม่ทะลุ BOND_FLOOR (การ์ดทะเลาะใบ 92) — ด่าน family ถือช่วงพื้น–100 · บวกยังตัดที่ 100
+    m.bond = d < 0 ? (b > BOND_FLOOR ? Math.max(BOND_FLOOR, b + d) : b) : bondClamp(b + d);
+  }
   if (d > 0 && list.length) st.kinCared = true;
 }
 
@@ -282,9 +310,23 @@ export function applyFamily(st, c, care = 0) {
         m.left = true;
         m.leftAge ??= st.age;
         m.divorcedAge = st.age;
+        splitMarital(st, m);
       }
       st.flags.divorced = true;
       st.flagAge.divorced ??= st.age;
+    }
+    // คืนดีช่วงแยกทาง: กลับเข้าบ้าน สถานะ together · ผูกพันขยับด้วย op bond ในการ์ดเอง
+    if (op.reconcile) for (const m of st.kin.filter((x) => x.role === 'spouse' && x.alive && spouseStatus(x) === 'apart')) {
+      m.status = 'together';
+      m.left = false;
+      delete m.leftAge;
+      m.reconciledAge = st.age;
+    }
+    // ลูกเล็กของคู่ที่หย่า: self = เราเลี้ยง · other = อยู่กับอีกฝ่าย (ผูกพันจางเร็วกว่า) · ทั้งสองทางยังเป็นทายาท
+    if (op.custody) for (const c of st.kin) {
+      if (c.role !== 'child' || !c.alive || memberAge(st, c) >= KIN_CUSTODY.minorUntil) continue;
+      if (!isDivorced(parentSpouseOf(st, c) ?? {})) continue;
+      c.custody = op.custody;
     }
     if (op.far || op.back) {
       const m = focusOf(st, op.far ?? op.back);
@@ -339,6 +381,7 @@ function kinYearlyBond(st) {
   }
   st.kinCared = false;
   for (const m of st.kin) if (m.far && m.alive && m.bond > BOND_FLOOR) m.bond = Math.max(BOND_FLOOR, m.bond - KIN_FAR.decay);
+  for (const m of st.kin) if (m.custody === 'other' && m.alive && m.bond > BOND_FLOOR) m.bond = Math.max(BOND_FLOOR, m.bond - KIN_CUSTODY.decay);
   if (st.age >= KIN_LONELY.from && (KIN_LONELY.happiness || KIN_LONELY.health) && !st.kin.some((m) => KIN_HOUSEHOLD.includes(m.role) && m.alive && !m.left)) {
     st.happiness = bondClamp(st.happiness - KIN_LONELY.happiness);
     st.health = bondClamp(st.health - KIN_LONELY.health);
