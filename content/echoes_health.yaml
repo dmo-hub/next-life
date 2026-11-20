@@ -188,6 +188,7 @@ events:
 
   # ← workh_burnout_01 "ไปพบจิตแพทย์"
   - id: echo_health_listener_01
+    office_ok: "ต่อเนื่องจาก workh_burnout_01 ที่กรองอาชีพออฟฟิศและกั้นเจ้าของกิจการแล้ว"
     away_block: [abroad, monk]
     type: A
     category: health

@@ -35,6 +35,7 @@ events:
         schedules: [{event: echo_old_friend_cold_01, after_years: [20, 22]}]
 
   - id: echo_old_friend_help_01
+    office_ok: "บริษัทของเพื่อนเก่าและเงินเดือนคืองานที่เขาเสนอ ไม่ใช่ที่ทำงานเดิมของผู้เล่น"
     away_block: [abroad]
     type: A
     category: society
@@ -65,6 +66,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: echo_old_friend_cold_01
+    office_ok: "บริษัทของเพื่อนเก่าที่มางานเลี้ยง ไม่ใช่ที่ทำงานของผู้เล่น"
     away_block: [abroad]
     type: A
     category: society

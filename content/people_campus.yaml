@@ -382,6 +382,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: campus_volunteer_meeting_01
+    office_ok: "ประชุมชมรมอาสาของมหาวิทยาลัย ไม่ใช่ประชุมที่ทำงาน"
     type: A
     category: society
     stage: หนุ่มสาว

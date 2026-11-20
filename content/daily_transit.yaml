@@ -232,6 +232,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: transit_rain_meter_01
+    office_ok: "ประชุมนัดคุยงานในกรุง ผู้เล่นทุกอาชีพมีได้ ไม่ผูกออฟฟิศ"
     type: A
     category: work_money
     stage: ทำงาน
@@ -306,6 +307,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: transit_first_car_01
+    office_ok: "เงินเดือนเป็นรายได้ประจำที่ใช้คิดค่างวดรถ ไม่ผูกกับออฟฟิศ"
     type: A
     category: work_money
     stage: ทำงาน

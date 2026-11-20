@@ -2,6 +2,7 @@
 # ใช้ธงวัยต้น: good_student (ทุน/ไปนอก) · likes_clips (อินฟลูฯ) · bullied (หัวหน้าเอาเปรียบ/ปาร์ตี้) · sporty (ไปนอก) · school_record (ทุนยากขึ้น)
 events:
   - id: young_scholarship_01
+    office_ok: "บริษัทที่รุ่นพี่ชวนไปทำ ไม่ใช่ที่ทำงานของผู้เล่น"
     away_block: [abroad]
     type: A
     category: study
@@ -46,7 +47,7 @@ events:
     years: [2500, 2650]
     weight: 2
     multipliers: {flags: {bullied: 2}, occupation: {clerk: 1.5}}
-    when: {age: [21, 28], occupation: [clerk, technician, professional, manager], ladder: [none, private, trade]}
+    when: {age: [21, 28], occupation: [clerk, technician, professional, manager], ladder: [none, private], flags: {not: [own_business]}}
     title: "หัวหน้าขโมยผลงาน"
     text: "งานแรกปีแรก หัวหน้าโยนงานให้จนดึกทุกคืน แล้วเช้าวันประชุมก็เอาผลงานของคุณขึ้นพรีเซนต์ต่อหน้าผู้บริหารเป็นของตัวเองหน้าตาเฉย"
     choices:
@@ -339,6 +340,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_abroad_01
+    office_ok: "เงินเดือนของงานต่างประเทศที่นายหน้าเสนอ ไม่ใช่ที่ทำงานเดิม"
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -387,7 +389,7 @@ events:
     category: work_money
     stage: หนุ่มสาว
     years: [2500, 2650]
-    when: {occupation: [clerk, technician, professional, manager], ladder: [none, private, trade]}
+    when: {occupation: [clerk, technician, professional, manager], ladder: [none, private], flags: {not: [own_business]}}
     title: "แฟ้มลับในห้องผู้บริหาร"
     text: "ผู้บริหารปิดประตูแล้ววางแฟ้มลงตรงหน้า ข้างในคือใบเบิกปลอมที่หัวหน้าเซ็นมาสองปีเต็ม เขาถามเรียบ ๆ ว่าเรื่องนี้คุณอยากให้จบแบบไหน"
     choices:
@@ -452,6 +454,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ young_wedding_01 (กู้จ่ายสินสอด) — ออกทาง next เท่านั้น
   - id: young_dowry_debt_01
+    office_ok: "เงินเดือนเป็นตัวเทียบเวลาที่ใบแจ้งหนี้ค่าสินสอดมาถึง"
     away_block: [abroad, monk]
     type: A
     category: family

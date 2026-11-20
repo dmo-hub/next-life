@@ -167,6 +167,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: nurse_temp_01
+    office_ok: "เงินเดือนของพยาบาลในใบสายนี้ (ธง nurse_rn)"
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -198,6 +199,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: nurse_casual_01
+    office_ok: "เงินเดือนของพยาบาลลูกจ้างชั่วคราวในใบสายนี้ (ธง nurse_rn)"
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -256,6 +258,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: nurse_abroad_01
+    office_ok: "เงินเดือนเป็นตัวเทียบค่าแรงพยาบาลต่างประเทศ (ธง nurse_rn)"
     type: A
     category: work_money
     stage: ทำงาน

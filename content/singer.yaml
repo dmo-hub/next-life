@@ -70,6 +70,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: singer_adult_contest_01
+    office_ok: "เงินเดือนเป็นตัวเทียบเงินรางวัลประกวดร้องเพลง"
     type: A
     category: work_money
     stage: หนุ่มสาว

@@ -41,6 +41,7 @@ events:
 
   # ← debt_invest_offer_01 "กู้ธนาคารมาลงขันกับเพื่อน"
   - id: echo_debt_invest_due_01
+    office_ok: "เงินเดือนเป็นตัวเทียบกับยอดดอกที่ต้องจ่าย ไม่ผูกกับออฟฟิศ"
     type: A
     category: work_money
     stage: ทำงาน
@@ -85,7 +86,7 @@ events:
         effects: {income_mult: 1.05, relations: 1}
         merit: [{cat: neutral}]
       - id: help_friend_plan
-        text: "ช่วยเพื่อนที่จะกู้วางแผนก่อน"
+        text: "ช่วยเพื่อนที่จะกู้วางแผนไว้ก่อน"
         effects: {income_mult: 1.05, network: 1}
         merit: [{cat: help_others, level: 1}]
       - id: treat_self

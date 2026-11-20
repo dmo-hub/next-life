@@ -233,6 +233,7 @@ events:
         merit: [{cat: sila, level: 2}]
 
   - id: midh_insurance_claim_01
+    office_ok: "บริษัทประกันและเงินชดเชย ไม่ใช่ที่ทำงานของผู้เล่น (ธง has_insurance)"
     type: A
     category: health
     stage: กลางคน

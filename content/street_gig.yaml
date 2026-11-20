@@ -323,6 +323,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: gig_cross_soi_01
+    office_ok: "ประชุมคิวของกลุ่มรับจ้างในซอย ไม่ใช่ประชุมที่ทำงาน"
     type: A
     category: society
     stage: ทำงาน

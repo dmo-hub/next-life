@@ -1,6 +1,7 @@
 # ร่างเรื่อง ขายตรงและคนหลอกเงิน · 15 ใบ · ลงเกมแล้ว ใบ 249 จากร่าง 248 · แก้ตามข้อค้านรอบ 1 · ทุกใบไม่ผูกปี · ไม่เปลี่ยนสายชีวิตหลัก · ใช้ธง scam_aware ตัวเดียว ไม่ตั้งธงใหม่ · ธงไม่เกินใบละ 1 จุด
 events:
   - id: swindle_seminar_clap_01
+    office_ok: "ห้องประชุมชั้นบนร้านเป็นที่สาธิตขายของ ไม่ใช่ที่ทำงาน"
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -39,6 +40,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: swindle_agent_quota_01
+    office_ok: "บริษัทในใบคือบริษัทหลอกลวงที่ชวนเป็นตัวแทน ไม่ใช่ที่ทำงาน"
     type: A
     category: society
     stage: ทำงาน
@@ -79,6 +81,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: swindle_team_leader_01
+    office_ok: "บริษัทอื่นที่ผลิตกล่องในตู้ ไม่ใช่ที่ทำงานของผู้เล่น"
     type: A
     category: work_money
     stage: ทำงาน
@@ -120,6 +123,7 @@ events:
 
   # ดัดจากแถวรีเสิร์ช 3 (ไปสนามบินแล้วเที่ยวบินไม่มีจริง) เป็นจุดนัดรถทัวร์ เพื่อให้ออกได้ทุกยุค
   - id: swindle_free_trip_01
+    office_ok: "บริษัททัวร์ที่ขายทริปฟรี ไม่ใช่ที่ทำงานของผู้เล่น"
     type: A
     category: society
     stage: ทำงาน
@@ -192,6 +196,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: swindle_massager_refund_01
+    office_ok: "บริษัทผู้ขายเครื่องนวดที่ถูกเรียกมาเจรจา ไม่ใช่ที่ทำงาน"
     type: A
     category: family
     stage: ทำงาน

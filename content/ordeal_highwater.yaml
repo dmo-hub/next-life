@@ -454,6 +454,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: highwater_foot_wipe_01
+    office_ok: "ประชุมของชุมชนหลังน้ำท่วม ไม่ใช่ประชุมที่ทำงาน"
     type: A
     category: health
     stage: กลางคน

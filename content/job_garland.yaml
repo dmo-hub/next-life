@@ -212,6 +212,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: garland_work_smile_window_01
+    office_ok: "โบนัสคือเงินพิเศษที่เพื่อนร่วมงานทัก ผู้เล่นทุกอาชีพที่ได้เงินพิเศษอ่านได้"
     type: A
     category: society
     stage: ทำงาน

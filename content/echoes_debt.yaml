@@ -4,6 +4,7 @@
 events:
   # ← debt_student_loan_01 "กู้มา แบ่งไปซื้อมือถือใหม่"
   - id: echo_debt_payroll_01
+    office_ok: "ใบกรองอาชีพลูกจ้างแล้ว สลิปเงินเดือนและแผนกของลูกจ้าง"
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -11,7 +12,7 @@ events:
     years: [2539, 2650]
     systems: [student_loan]
     lore_ref: lore-finance-series.html#6
-    when: {occupation: [clerk, professional, manager, factory, technician, service, officer, senior_officer]}
+    when: {occupation: [clerk, professional, manager, factory, technician, service, officer, senior_officer], flags: {not: [own_business]}}
     title: "บรรทัดใหม่ในสลิป"
     text: "สลิปเงินเดือนเดือนนี้มีบรรทัดใหม่ หักชำระกยศ. ผ่านนายจ้าง ฝ่ายบุคคลส่งรายชื่อเข้ากลุ่มแผนกผิดห้อง ทั้งแผนกรู้กันก่อนเที่ยงว่าใครยังค้างหนี้สมัยเรียน ทั้งที่มือถือเครื่องนั้นพังไปนานแล้ว"
     choices:
@@ -170,6 +171,7 @@ events:
 
   # ← debt_refinance_01 "แต่งสลิปเงินเดือนกู้เพิ่ม" (ผ่านฉลุย)
   - id: echo_debt_slip_audit_01
+    when: {occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -203,6 +205,7 @@ events:
 
   # ← debt_friend_reunion_01 "ยกหนี้ให้ จบกันแค่นี้"
   - id: echo_debt_forgiven_back_01
+    office_ok: "บริษัทของเพื่อนที่เคยยกหนี้ให้ ผู้เล่นไปทำงานด้วย ไม่ใช่ที่ทำงานเดิม"
     type: A
     category: society
     stage: ทำงาน

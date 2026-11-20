@@ -66,6 +66,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: tour_rocket_pool_01
+    office_ok: "ผู้ใหญ่บ้านเรียกประชุมใต้ต้นมะขามเรื่องบั้งไฟ"
     type: A
     category: society
     stage: กลางคน
@@ -418,7 +419,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [31, 45], occupation: [clerk, technician, professional, manager]}
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager], flags: {not: [own_business]}}
     title: "ทริปบริษัทสามวันสองคืน"
     text: "ฝ่ายบุคคลติดประกาศทริปประจำปีพาพนักงานไปทะเลสามวันสองคืน บริษัทออกค่ารถบัสกับที่พัก ค่ากินนอกตารางจ่ายเอง บ่ายวันที่สองมีเกมชายหาดแข่งระหว่างแผนก ปิดท้ายด้วยชักเย่อ ห้องพักจับคู่ตามรายชื่อ คุณได้นอนห้องเดียวกับหัวหน้าแผนก"
     choices:

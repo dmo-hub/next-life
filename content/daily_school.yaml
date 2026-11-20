@@ -232,7 +232,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [31, 45], year: [2568, 2650]}
+    when: {age: [31, 45], year: [2568, 2650], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
     title: "บรรทัดใหม่ในสลิปรุ่นน้อง"
     text: "ข่าวเย็นบอกว่าตั้งแต่เมษายน นายจ้างต้องหักเงินเดือนคนที่ค้างหนี้กู้ยืมเพื่อการศึกษาเดือนละ 3,000 บาท ข่าวยังไม่จบ รุ่นน้องจากโรงเรียนเก่าก็ทักมา ส่งรูปสลิปที่มีบรรทัดใหม่โผล่ขึ้นมา ถามว่าพี่เคยเจอแบบนี้ไหม"
     choices:
@@ -263,7 +263,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [33, 45], family: [{role: child, alive: true, age: [6, 12]}]}
+    when: {age: [33, 45], family: [{role: child, alive: true, age: [6, 12]}], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
     title: "ชุดใหม่รอเปิดเทอม"
     text: "ประกาศมาว่าเลื่อนเปิดเทอมออกไปอีกเดือน ชุดนักเรียนตัวใหม่แขวนรออยู่ในตู้ ลูกอยู่บ้านทั้งวันและดูจะสูงขึ้นทุกสัปดาห์ เช้านี้ลองใส่ดู แขนเสื้อเริ่มหนีข้อมือแล้ว ส่วนที่ทำงานยังให้เข้าตามเวลาเดิม"
     choices:

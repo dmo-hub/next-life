@@ -76,7 +76,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 3
-    when: {age: [28, 55], occupation: [factory, clerk, technician, professional, manager]}
+    when: {age: [28, 55], occupation: [clerk, technician, professional, manager], flags: {not: [own_business]}}
     title: "ต้องมีชื่อหนึ่งชื่อ"
     text: "ที่ทำงานต้องลดคนในทีมหนึ่งคน หัวหน้าขอให้คุณเสนอชื่อภายในพรุ่งนี้ ตัวเลือกคือรุ่นพี่ที่ทำงานช้าลงแต่หาเลี้ยงบ้านคนเดียว กับน้องใหม่ฝีมือดีที่เพิ่งย้ายมาจากต่างจังหวัด"
     choices:

@@ -131,6 +131,7 @@ events:
         effects: {relations: 1}
 
   - id: grey_temple_01
+    office_ok: "เงินเดือนในตัวเลือกคือกำลังทรัพย์ประจำเดือนของคนทำบุญ"
     away_block: [abroad, monk]
     type: A
     category: work_money

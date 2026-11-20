@@ -240,6 +240,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: nbr_fund_01
+    office_ok: "ประชุมของคนในซอยเรื่องกองทุน ไม่ใช่ประชุมที่ทำงาน"
     type: A
     category: society
     stage: ทำงาน

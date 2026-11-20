@@ -7,7 +7,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [clerk, manager, professional, officer, senior_officer]}
+    when: {occupation: [clerk, manager, professional, officer, senior_officer], flags: {not: [own_business]}}
     multipliers: {rank: 1.3, occupation: {manager: 1.5, senior_officer: 1.5, officer: 1.5}, flags: {in_debt: 1.5}}
     title: "ซองสีน้ำตาลบนโต๊ะ"
     text: "ผู้รับเหมาวางซองหนาเตอะไว้ข้างแฟ้ม ยิ้มบอกว่าแค่เซ็นผ่านงานที่วัสดุไม่ตรงสเปก ใครเขาก็ทำกัน ในซองเท่าเงินเดือนหลายเดือน"
@@ -150,13 +150,14 @@ events:
           - {weight: 2, text: "เพื่อนบ้านโกรธจัด ปล่อยข่าวว่าเราขายของเน่า ทั้งตลาดมองค้อน", effects: {relations: -2, happiness: -1}, merit: [{cat: neutral}], next: fraud_scale_gossip_01}
 
   - id: fraud_materials_01
+    office_ok: "ใบกรองอาชีพลูกจ้างแล้ว หัวหน้างานและเงินเดือนของลูกจ้างโรงงาน/ช่าง"
     away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
     weight: 1
-    when: {occupation: [factory, craft]}
+    when: {occupation: [factory, craft], flags: {not: [own_business]}}
     multipliers: {occupation: {factory: 1.3}, flags: {in_debt: 1.3}}
     title: "ใบเบิกวัสดุเกินจริง"
     text: "หัวหน้างานกระซิบว่าเบิกวัสดุเกินใบสั่งไว้ทุกงาน ส่วนที่เหลือมีร้านรับซื้อของเก่าปากซอยจ่ายเงินสด ขอแค่เราเซ็นรับของให้ ทำกันมาหลายปีไม่มีใครเช็ก"
@@ -222,6 +223,7 @@ events:
           - {weight: 2, text: "ไม่มีใครกลับมาอยู่ดี ยอดขายหายไปเกือบครึ่ง", effects: {income_mult: 0.8, happiness: -1}, merit: [{cat: neutral}]}
 
   - id: fraud_village_fund_01
+    office_ok: "ประชุมใหญ่ของหมู่บ้านเรื่องกองทุน"
     away_block: [abroad, monk]
     type: A
     category: society
@@ -259,6 +261,7 @@ events:
           - {weight: 1, text: "คนตรวจเป็นญาติผู้ใหญ่บ้าน หาว่าเราไม่ไว้ใจเพื่อนบ้าน งานบุญปีนี้ไม่มีใครชวน", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
 
   - id: fraud_village_meeting_01
+    office_ok: "ประชุมใหญ่ที่ศาลาหมู่บ้าน"
     away_block: [abroad, monk]
     type: A
     category: society
@@ -295,7 +298,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [manager], ladder: [none, private, trade]}
+    when: {occupation: [manager], ladder: [none, private], flags: {not: [own_business]}}
     multipliers: {rank: 1.3, flags: {in_debt: 1.3}}
     title: "โบนัสแลกโอที"
     text: "เจ้าของบริษัทยื่นข้อเสนอ ถ้าตัดโอทีลูกน้องทั้งแผนกได้ครบปีนี้ โบนัสก้อนใหญ่เป็นของคุณ ลูกน้องหลายคนผ่อนบ้านผ่อนรถอยู่"

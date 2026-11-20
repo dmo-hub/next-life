@@ -1,6 +1,6 @@
-// คำเตือน (ไม่ตก): การ์ดวัยทำงานที่มีคำออฟฟิศแต่ไม่ได้กรองอาชีพ/สาย และไม่ใช้คำแทน {ที่ทำงาน} {คนคุมงาน}
+// ตก: การ์ดวัยทำงานที่มีคำออฟฟิศแต่ไม่ได้กรองอาชีพ/สาย ไม่ใช้คำแทน {ที่ทำงาน} {คนคุมงาน} และไม่มี office_ok
 // รายการคำเป็นของเลนนี้เอง ไม่ใช่ป้ายสายของ harness/work-lane.mjs · ที่นี่จับจากคำในข้อความ ไม่ใช่จากป้าย
-// สลับเป็นตกหลังกวาดการ์ดค้างครบ (ใบ 184) · การ์ดที่คำออฟฟิศถูกต้องอยู่แล้ว (ที่ประชุมหมู่บ้าน) ใส่ office_ok พร้อมเหตุผล
+// การ์ดที่คำออฟฟิศถูกต้องอยู่แล้ว (ที่ประชุมหมู่บ้าน) ใส่ office_ok พร้อมเหตุผล · officeGaps ยังใช้นับใบในทดสอบ
 import { isObj, textsOf } from './util.mjs';
 
 export const OFFICE_STAGES = ['หนุ่มสาว', 'ทำงาน', 'กลางคน'];
@@ -46,6 +46,16 @@ export function officeGaps(docs) {
 }
 
 export const rules = [
+  {
+    id: 'office-filter',
+    desc: 'การ์ดวัยทำงานที่มีคำออฟฟิศ ต้องกรองอาชีพออฟฟิศ (clerk professional manager technician officer senior_officer · ไม่รวมสาย trade) หรือสาย gov/private · หรือใช้ {ที่ทำงาน} {คนคุมงาน} · หรือใส่ office_ok พร้อมเหตุผล',
+    event(e, ctx, r) {
+      if (!OFFICE_STAGES.includes(e.stage) || e.office_ok !== undefined) return;
+      const words = officeHits(e);
+      if (!words.length || PLACEHOLDER.test(JSON.stringify(e)) || officeFiltered(e)) return;
+      r('', `คำออฟฟิศ [${words.join(' ')}] แต่ไม่กรองอาชีพ · กรอง when.occupation ให้เหลือกลุ่มออฟฟิศ + ladder ไม่มี trade · หรือใช้ {ที่ทำงาน}/{คนคุมงาน} · หรือใส่ office_ok เหตุผล`);
+    },
+  },
   {
     id: 'office-exempt',
     desc: `office_ok = เหตุผลที่การ์ดนี้ใช้คำออฟฟิศได้โดยไม่กรองอาชีพ (ข้อความอย่างน้อย ${EXEMPT_MIN} ตัวอักษร เช่น "ที่ประชุมหมู่บ้าน") · ใส่บนการ์ดช่วงหนุ่มสาว/ทำงาน/กลางคนที่มีคำออฟฟิศเท่านั้น`,

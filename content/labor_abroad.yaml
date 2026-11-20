@@ -5,6 +5,7 @@
 # ไม่เล่าวิธีผ่านด่าน ไม่บอกช่องทาง ไม่ล้อคนที่ถูกหลอก · ไม่มีชื่อบริษัท ชื่อโครงการ ชื่อประเทศ
 events:
   - id: abroad_village_01
+    office_ok: "เงินเดือนที่ต่างประเทศเป็นตัวเทียบกับรายได้ในหมู่บ้าน"
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -36,6 +37,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: abroad_recruit_01
+    office_ok: "เงินเดือนคือค่าจ้างงานต่างประเทศที่นายหน้าเสนอ ไม่ใช่ที่ทำงานเดิม"
     type: A
     category: work_money
     stage: ทำงาน
@@ -98,6 +100,7 @@ events:
         merit: [{cat: dana, level: 1}]
 
   - id: abroad_dorm_01
+    office_ok: "เงินเดือนงวดแรกของงานต่างประเทศที่ผู้เล่นไปแล้ว (ธง abroad_went)"
     away_block: [monk]
     type: A
     category: work_money
@@ -260,6 +263,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: abroad_remit_01
+    office_ok: "เงินเดือนของงานต่างประเทศที่ผู้เล่นไปแล้ว (ธง abroad_went)"
     away_only: [abroad]
     type: A
     category: family

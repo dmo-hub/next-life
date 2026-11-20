@@ -262,6 +262,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: nextdoor_old_fee_01
+    office_ok: "ที่ประชุมของคนในหมู่บ้านจัดสรร ไม่ใช่ประชุมที่ทำงาน"
     type: A
     category: work_money
     stage: ทำงาน
@@ -296,6 +297,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: nextdoor_pothole_fund_01
+    office_ok: "ที่ประชุมของคนในซอยเรื่องหลุมถนน ไม่ใช่ประชุมที่ทำงาน"
     type: A
     category: society
     stage: ทำงาน

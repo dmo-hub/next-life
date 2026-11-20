@@ -224,6 +224,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: hobby_stamp_show_01
+    office_ok: "ประชุมชมรมสะสมแสตมป์ ไม่ใช่ประชุมที่ทำงาน"
     type: A
     category: society
     stage: กลางคน
@@ -337,6 +338,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: hobby_plant_leaf_01
+    office_ok: "เงินเดือนเป็นตัวเทียบราคาต้นไม้ ไม่ผูกกับออฟฟิศ"
     type: A
     category: work_money
     stage: ทำงาน
