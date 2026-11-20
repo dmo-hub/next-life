@@ -44,7 +44,7 @@ export function lintContext() {
   const items = Object.keys(parse(read('content/rules/items.yaml')).items ?? {});
   const treeDoc = parse(read('content/rules/tree.yaml'));
   const treeIds = Object.keys(treeDoc.nodes ?? {});
-  const gateFocuses = Object.keys(treeDoc.gates ?? {});
+  const gateFocuses = treeDoc.gates ?? [];
   const awayKinds = Object.keys(parse(read('content/rules/away.yaml')).kinds ?? {});
   return { awayKinds, treeIds, regions, provinces, systems, eras, debtFrom, eraFrom, occupations, ladders, items, lore, flags, causes, focusTags: focusTagsAll, gateFocuses, natures: natureDoc.natures ?? {}, natureAge: natureDoc.nature_age };
 }

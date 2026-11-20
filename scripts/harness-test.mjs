@@ -293,14 +293,13 @@ const f2 = (v) => v.toFixed(2);
     return n;
   };
   check('ใบ 04 ประตูปิด = ตัวเลือกติดประตูไม่ขึ้น (การ์ดยังออก 3 ตัวเลือก)', seen(() => {}) === 3, `${seen(() => {})}`);
-  check('ใบ 04 โฟกัสสะสมครบ chain_years = ตัวเลือกขึ้น', seen((st) => (st.focusYears = { business: base.focus.chain_years })) === 4);
-  check('ใบ 04 โฟกัสสะสมไม่ครบ = ยังซ่อน', seen((st) => (st.focusYears = { business: base.focus.chain_years - 1 })) === 3);
+  check('ft15 focusYears ครบ chain_years ไม่เปิดประตูแล้ว (สะพานตัด · เซฟเก่าแปลงตอนโหลด)', seen((st) => (st.focusYears = { business: base.focus.chain_years })) === 3);
   check('ใบ 04 ทายาทรับประตูที่รุ่นก่อนเปิด = ขึ้นโดยไม่ต้องสะสมเอง', seen((st) => (st.gates = ['mo5'])) === 4);
   check('ใบ 04 ธงชวน gate:<โหนด> = ขึ้น', seen((st) => (st.flags[GATE_FLAG + 'mo5'] = true)) === 4);
   check('ใบ 10 ปลดโหนดประตู = ตัวเลือกขึ้น', seen((st) => { st.tree = { done: { mo5: 30 }, yrs: {}, cards: {} }; }) === 4);
   check('ใบ 10 ปลดโหนดอื่น (ไม่ใช่โหนดประตู) = ยังซ่อน', seen((st) => { st.tree = { done: { mo3: 30 }, yrs: {}, cards: {} }; }) === 3);
   check('ใบ 10 ล้างโหนดประตูแล้ว = ประตูปิดอีก', seen((st) => { st.tree = { done: {}, gone: { mo5: 30 }, yrs: {}, cards: {} }; }) === 3);
-  check('ใบ 10 เซฟเก่า/ทายาทเก็บชื่อโฟกัสเดิม = ยังเปิดประตูเดียวกัน', seen((st) => { st.gates = ['business']; }) === 4 && seen((st) => (st.flags[GATE_FLAG + 'business'] = true)) === 4);
+  check('ft15 st.gates/ธง ชื่อโฟกัสเดิมที่ไม่ผ่านการแปลงตอนโหลด = ไม่เปิดประตู (ชื่อเดิมไม่ใช่รหัสโหนดแล้ว)', seen((st) => { st.gates = ['business']; }) === 3 && seen((st) => (st.flags[GATE_FLAG + 'business'] = true)) === 3);
 
   // ชีวิตจริงทั้งกอง: จำนวนตัวเลือกบนการ์ดที่ติดป้าย = ตามสถานะประตูตอนการ์ดออก · ชีวิตตามน้ำ/ประตูปิดไม่เคยเห็นตัวเลือกประตู
   const N = 1200;
@@ -320,7 +319,7 @@ const f2 = (v) => v.toFixed(2);
       if (/^office_/.test(c.id ?? '') && !s.office) { invites++; if (!lifeGateOpen(s, OFFICE_GATE)) invitesClosed++; }
       if (c.id === 'biz_politics_invite_01') invited = true;
     });
-    if (st.flags.own_business && !(st.focusYears?.politics_base)) { bizLives++; if (invited) bizInvite++; }
+    if (st.flags.own_business && !(st.tree?.done?.r5 !== undefined)) { bizLives++; if (invited) bizInvite++; }
   }
   check('ใบ 04 ตัวเลือกบนการ์ดติดป้าย: ครบตามเนื้อหา · ซ่อน+ล็อกตรงสถานะประตู (ทั้งกอง)', wrong === 0, `ไม่ตรง ${wrong}`);
   check('ใบ 04 การ์ดชวนลงสมัครออกเฉพาะประตูการเมืองเปิด', invitesClosed === 0 && invites > 0, `ชวน ${invites} · ประตูปิดแต่ออก ${invitesClosed}`);
