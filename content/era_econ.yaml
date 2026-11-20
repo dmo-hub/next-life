@@ -513,19 +513,19 @@ events:
     years: [2500, 2650]
     when: {age: [19, 59], occupation: [factory, craft, service, clerk, technician, professional, manager], ladder: [none, private, trade]}
     title: "กาแฟแก้วนี้ขายได้"
-    text: "ร้านกาแฟเล็กของคุณติดปากคนทั้งย่าน มีคนตกงานมาขอซื้อสูตรไปเปิดเอง ส่วนบริษัทเก่าโทรมาชวนกลับไปทำตำแหน่งเดิม"
+    text: "ร้านกาแฟเล็กของคุณติดปากคนทั้งย่าน มีคนตกงานมาขอซื้อสูตรไปเปิดเอง ส่วนที่ทำงานเก่าโทรมาชวนกลับไปทำงานเดิม"
     choices:
       - text: "ขายสูตรเปิดสาขาให้คนอื่น"
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "ร้านสาขาผุดขึ้นห้าจุดในปีเดียว ทุกร้านส่งค่าสูตรให้คุณทุกเดือน", effects: {network: 2, income_mult: 1.2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "สาขาชงกาแฟจืดเหมือนน้ำล้างแก้ว ลูกค้าเหมาว่าร้านคุณก็จืดด้วย", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - text: "ปฏิเสธบริษัท ทุ่มให้ร้านเต็มตัว"
+      - text: "ปฏิเสธที่ทำงานเก่า ทุ่มให้ร้านเต็มตัว"
         gate: business
         effects: {happiness: 2, health: 1, income_mult: 1.2}
         sets_flags: [own_business]
         merit: [{cat: neutral}]
-      - text: "กลับบริษัท ให้แม่ดูร้านแทน"
+      - text: "กลับไปทำงานเดิม ให้แม่ดูร้านแทน"
         requires: {family: [{role: parent, sex: หญิง, alive: true}]}
         effects: {relations: 1, happiness: -1, money: {unit: income_x, amount: 0.5}}
         merit: [{cat: neutral}]
